@@ -32,6 +32,7 @@ struct VMPageWiringInfo;
 #define CREATE_AREA_UNMAP_ADDRESS_RANGE	0x02
 #define CREATE_AREA_DONT_CLEAR			0x04
 #define CREATE_AREA_PRIORITY_VIP		0x08
+#define CREATE_AREA_DONT_COMMIT_MEMORY	0x10
 
 // memory/page allocation priorities
 #define VM_PRIORITY_USER	0

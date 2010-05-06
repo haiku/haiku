@@ -364,15 +364,15 @@ TracingMetaData::Create(TracingMetaData*& _metaData)
 	} else
 		dprintf("No previous tracing meta data found.\n");
 
-	// no previous tracng data found -- create new one
+	// no previous tracing data found -- create new one
 	error = _CreateMetaDataArea(false, area, metaData);
 	if (error != B_OK)
 		return error;
 
-	area = create_area("tracing log",
+	area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
 		(void**)&metaData->fTraceOutputBuffer, B_ANY_KERNEL_ADDRESS,
 		kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 	if (area < 0)
 		return area;
 

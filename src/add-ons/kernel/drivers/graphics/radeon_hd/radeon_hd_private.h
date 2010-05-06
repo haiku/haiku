@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 #ifndef RADEON_RD_PRIVATE_H
 #define RADEON_RD_PRIVATE_H

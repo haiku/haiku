@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the Haiku License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -114,9 +114,10 @@ extern "C" {
 
 struct kernel_args;
 
-extern status_t debug_init(struct kernel_args *args);
-extern status_t	debug_init_post_vm(struct kernel_args *args);
-extern status_t	debug_init_post_modules(struct kernel_args *args);
+extern void		debug_init(struct kernel_args *args);
+extern void		debug_init_post_vm(struct kernel_args *args);
+extern void		debug_init_post_settings(struct kernel_args *args);
+extern void		debug_init_post_modules(struct kernel_args *args);
 extern void		debug_early_boot_message(const char *string);
 extern void		debug_puts(const char *s, int32 length);
 extern bool		debug_debugger_running(void);

@@ -278,10 +278,11 @@ rule DefineBuildProfile name : type : path {
 	#
 	# <name> - The name of the build profile.
 	# <type> - The type of the build profile. Must be one of "image" (plain
-	#          disk image), "vmware-image" (VMware disk image), "disk"
-	#          (actual partition or hard disk device), "cd-image" (ISO CD
-	#          image), "install" (installation in a directory), or "custom"
-	#          (user-defined).
+	#          disk image), "anyboot-image" (custom disk image that can be
+	#          written to CD or disk device), "cd-image" (ISO CD image),
+	#          "vmware-image" (VMware disk image), "disk" (actual partition
+	#          or hard disk device), "install" (installation in a directory),
+	#          or "custom" (user-defined).
 	# <path> - The path associated with the profile. Depending on the profile
 	#          type, this is the path to the disk image/VMware image, hard
 	#          disk/partition device, or the installation directory. If the

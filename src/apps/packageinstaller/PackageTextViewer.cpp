@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright (c) 2007-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -10,6 +10,8 @@
 #include "PackageTextViewer.h"
 
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <ScrollView.h>
 
 #include <GroupLayout.h>
@@ -21,14 +23,15 @@ enum {
 	P_MSG_DECLINE
 };
 
-// Reserved
-#define T(x) x
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageTextViewer"
 
 
 PackageTextViewer::PackageTextViewer(const char *text, bool disclaimer)
-	:	BWindow(BRect(125, 125, 675, 475), T("Disclaimer"), B_MODAL_WINDOW,
-			B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE),
-		fValue(0)
+	:
+	BWindow(BRect(125, 125, 675, 475), TR("Disclaimer"), B_MODAL_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE),
+	fValue(0)
 {
 	_InitView(text, disclaimer);
 }
@@ -90,15 +93,13 @@ PackageTextViewer::MessageReceived(BMessage *msg)
 			delete_sem(fSemaphore);
 			fSemaphore = -1;
 		}
-	}
-	else if (msg->what == P_MSG_DECLINE) {
+	} else if (msg->what == P_MSG_DECLINE) {
 		if (fSemaphore >= B_OK) {
 			fValue = 0;
 			delete_sem(fSemaphore);
 			fSemaphore = -1;
 		}
-	}
-	else
+	} else
 		BWindow::MessageReceived(msg);
 }
 
@@ -115,8 +116,8 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 	BRect bounds;
 	BRect rect = Bounds();
 	if (disclaimer) {
-		BButton *button = new BButton(BRect(0, 0, 1, 1), "accept", T("Accept"),
-				new BMessage(P_MSG_ACCEPT));
+		BButton *button = new BButton(BRect(0, 0, 1, 1), "accept",
+			TR("Accept"), new BMessage(P_MSG_ACCEPT));
 		button->ResizeToPreferred();
 
 		bounds = button->Bounds();
@@ -128,7 +129,7 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 		button->MakeDefault(true);
 		fBackground->AddChild(button);
 
-		button = new BButton(BRect(0, 0, 1, 1), "decline", T("Decline"),
+		button = new BButton(BRect(0, 0, 1, 1), "decline", TR("Decline"),
 				new BMessage(P_MSG_DECLINE));
 		button->ResizeToPreferred();
 
@@ -136,10 +137,9 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 		rect.left -= bounds.right + 7.0f;
 		button->MoveTo(rect.LeftTop());
 		fBackground->AddChild(button);
-	}
-	else {
-		BButton *button = new BButton(BRect(0, 0, 1, 1), "accept", T("Continue"),
-				new BMessage(P_MSG_ACCEPT));
+	} else {
+		BButton *button = new BButton(BRect(0, 0, 1, 1), "accept",
+			TR("Continue"), new BMessage(P_MSG_ACCEPT));
 		button->ResizeToPreferred();
 
 		bounds = button->Bounds();
@@ -157,13 +157,13 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 	bounds.right -= B_V_SCROLL_BAR_WIDTH;
 
 	fText = new BTextView(bounds, "text_view", BRect(0, 0, bounds.Width(),
-				bounds.Height()), B_FOLLOW_NONE, B_WILL_DRAW);
+		bounds.Height()), B_FOLLOW_NONE, B_WILL_DRAW);
 	fText->MakeEditable(false);
 	fText->MakeSelectable(true);
 	fText->SetText(text);
 
 	BScrollView *scroll = new BScrollView("scroll_view", fText,
-			B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
 	
 	fBackground->AddChild(scroll);
 
@@ -184,10 +184,10 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
 
 	if (disclaimer) {
-		BButton *accept = new BButton("accept", T("Accept"),
+		BButton *accept = new BButton("accept", TR("Accept"),
 				new BMessage(P_MSG_ACCEPT));
 
-		BButton *decline = new BButton("decline", T("Decline"),
+		BButton *decline = new BButton("decline", TR("Decline"),
 				new BMessage(P_MSG_DECLINE));
 
 		fBackground = BGroupLayoutBuilder(B_VERTICAL)
@@ -199,7 +199,7 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 			.End();
 	}
 	else {
-		BButton *button = new BButton("accept", T("Continue"),
+		BButton *button = new BButton("accept", TR("Continue"),
 				new BMessage(P_MSG_ACCEPT));
 
 		fBackground = BGroupLayoutBuilder(B_VERTICAL)

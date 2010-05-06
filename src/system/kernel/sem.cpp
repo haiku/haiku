@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -417,9 +417,9 @@ haiku_sem_init(kernel_args *args)
 		sMaxSems <<= 1;
 
 	// create and initialize semaphore table
-	area = create_area("sem_table", (void **)&sSems, B_ANY_KERNEL_ADDRESS,
-		sizeof(struct sem_entry) * sMaxSems, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	area = create_area_etc(B_SYSTEM_TEAM, "sem_table", (void **)&sSems,
+		B_ANY_KERNEL_ADDRESS, sizeof(struct sem_entry) * sMaxSems, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 	if (area < 0)
 		panic("unable to allocate semaphore table!\n");
 

@@ -14,16 +14,20 @@
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <FilePanel.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Path.h>
 
 #include <stdio.h>
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Terminal PrefWindow"
 
 PrefWindow::PrefWindow(const BMessenger &messenger)
-	: BWindow(BRect(0, 0, 375, 185), "Terminal settings",
+	: BWindow(BRect(0, 0, 375, 185), TR("Terminal settings"),
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_AUTO_UPDATE_SIZE_LIMITS),
 	fPreviousPref(new PrefHandler(PrefHandler::Default())),
@@ -34,16 +38,16 @@ PrefWindow::PrefWindow(const BMessenger &messenger)
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_VERTICAL)
 		.SetInsets(10, 10, 10, 10)
-			.Add(new AppearancePrefView("Appearance", fTerminalMessenger))
+			.Add(new AppearancePrefView(TR("Appearance"), fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)
 				.Add(fSaveAsFileButton = new BButton("savebutton",
-					"Save to file" B_UTF8_ELLIPSIS,
+					TR("Save to file" B_UTF8_ELLIPSIS),
 					new BMessage(MSG_SAVEAS_PRESSED), B_WILL_DRAW))
 				.AddGlue()
 				.Add(fRevertButton = new BButton("revertbutton",
-					"Cancel", new BMessage(MSG_REVERT_PRESSED),
+					TR("Cancel"), new BMessage(MSG_REVERT_PRESSED),
 					B_WILL_DRAW))
-				.Add(fSaveButton = new BButton("okbutton", "OK",
+				.Add(fSaveButton = new BButton("okbutton", TR("OK"),
 					new BMessage(MSG_SAVE_PRESSED), B_WILL_DRAW))
 			.End()
 		.End();
@@ -79,8 +83,8 @@ PrefWindow::QuitRequested()
 	if (!fDirty)
 		return true;
 
-	BAlert *alert = new BAlert("", "Save changes to this settings panel?",
-		"Cancel", "Don't save", "Save",
+	BAlert *alert = new BAlert("", TR("Save changes to this settings panel?"),
+		TR("Cancel"), TR("Don't save"), TR("Save"),
 		B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
 		B_WARNING_ALERT); 
 	alert->SetShortcut(0, B_ESCAPE); 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Mark-Jan Bastian. All rights reserved.
@@ -29,6 +29,7 @@
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
+#include <vm/vm.h>
 #include <wait_for_objects.h>
 
 
@@ -644,9 +645,9 @@ port_init(kernel_args *args)
 	size_t size = sizeof(struct port_entry) * sMaxPorts;
 
 	// create and initialize ports table
-	sPortArea = create_area("port_table",
-		(void**)&sPorts, B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	sPortArea = create_area_etc(B_SYSTEM_TEAM, "port_table", (void**)&sPorts,
+		B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 	if (sPortArea < 0) {
 		panic("unable to allocate kernel port table!\n");
 		return sPortArea;

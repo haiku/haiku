@@ -14,13 +14,17 @@
 #include "PackageView.h"
 
 #include <Alert.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <stdio.h>
 
 
-// Macro reserved for later localization
-#define T(x) x
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageInstall"
 
-static int32 install_function(void *data)
+
+static int32
+install_function(void *data)
 {
 	// TODO: Inform if already one thread is running
 	PackageInstall *install = static_cast<PackageInstall *>(data);
@@ -100,13 +104,14 @@ uint32
 PackageInstall::_Install()
 {
 	PackageInfo *info = fParent->GetPackageInfo();
-	pkg_profile *type = static_cast<pkg_profile *>(info->GetProfile(fParent->GetCurrentType()));
+	pkg_profile *type = static_cast<pkg_profile *>(info->GetProfile(
+		fParent->GetCurrentType()));
 	uint32 n = type->items.CountItems(), m = info->GetScriptCount();
 
 	PackageStatus *progress = fParent->GetStatusWindow();
 	progress->Reset(n + m + 5);
 
-	progress->StageStep(1, T("Preparing package"));
+	progress->StageStep(1, TR("Preparing package"));
 
 	InstalledPackageInfo packageInfo(info->GetName(), info->GetVersion());
 
@@ -114,21 +119,21 @@ PackageInstall::_Install()
 	if (err == B_OK) {
 		// The package is already installed, inform the user
 		BAlert *reinstall = new BAlert("reinstall",
-			T("The given package seems to be already installed on your system. "
-				"Would you like to uninstall the existing one and continue the "
-				"installation?"), T("Continue"), T("Abort"));
+			TR("The given package seems to be already installed on your "
+				"system. Would you like to uninstall the existing one and "
+				"continue the installation?"), TR("Continue"), TR("Abort"));
 
 		if (reinstall->Go() == 0) {
 			// Uninstall the package
 			err = packageInfo.Uninstall();
 			if (err != B_OK) {
-				fprintf(stderr, "Error on uninstall\n");
+				fprintf(stderr, TR("Error on uninstall\n"));
 				return P_MSG_I_ERROR;
 			}
 
 			err = packageInfo.SetTo(info->GetName(), info->GetVersion(), true);
 			if (err != B_OK) {
-				fprintf(stderr, "Error on SetTo\n");
+				fprintf(stderr, TR("Error on SetTo\n"));
 				return P_MSG_I_ERROR;
 			}
 		} else {
@@ -138,17 +143,17 @@ PackageInstall::_Install()
 	} else if (err == B_ENTRY_NOT_FOUND) {
 		err = packageInfo.SetTo(info->GetName(), info->GetVersion(), true);
 		if (err != B_OK) {
-			fprintf(stderr, "Error on SetTo\n");
+			fprintf(stderr, TR("Error on SetTo\n"));
 			return P_MSG_I_ERROR;
 		}
 	} else if (progress->Stopped()) {
 		return P_MSG_I_ABORT;
 	} else {
-		fprintf(stderr, "returning on error\n");
+		fprintf(stderr, TR("returning on error\n"));
 		return P_MSG_I_ERROR;
 	}
 
-	progress->StageStep(1, T("Installing files and folders"));
+	progress->StageStep(1, TR("Installing files and folders"));
 
 	// Install files and directories
 	PackageItem *iter;
@@ -181,7 +186,8 @@ PackageInstall::_Install()
 		if (err == B_FILE_EXISTS) {
 			// Writing to path failed because path already exists - ask the user
 			// what to do and retry the writing process
-			choice = fParent->ItemExists(*iter, state.destination, fItemExistsPolicy);
+			choice = fParent->ItemExists(*iter, state.destination,
+				fItemExistsPolicy);
 			if (choice != P_EXISTS_ABORT) {
 				state.policy = choice;
 				err = iter->DoInstall(installPath, &state);
@@ -189,7 +195,7 @@ PackageInstall::_Install()
 		}
 
 		if (err != B_OK) {
-			fprintf(stderr, "Error while writing path\n");
+			fprintf(stderr, TR("Error while writing path\n"));
 			return P_MSG_I_ERROR;
 		}
 
@@ -202,7 +208,7 @@ PackageInstall::_Install()
 		packageInfo.AddItem(state.destination.Path());
 	}
 
-	progress->StageStep(1, T("Running post-installation scripts"), "");
+	progress->StageStep(1, TR("Running post-installation scripts"), "");
 
 	PackageScript *scr;
 	status_t status;
@@ -214,7 +220,7 @@ PackageInstall::_Install()
 		fCurrentScript = scr;
 
 		if (scr->DoInstall() != B_OK) {
-			fprintf(stderr, "Error while running script\n");
+			fprintf(stderr, TR("Error while running script\n"));
 			return P_MSG_I_ERROR;
 		}
 		fCurrentScriptLocker.Unlock();
@@ -232,13 +238,13 @@ PackageInstall::_Install()
 		progress->StageStep(1, NULL, label.String());
 	}
 
-	progress->StageStep(1, T("Finishing installation"), "");
+	progress->StageStep(1, TR("Finishing installation"), "");
 
 	err = packageInfo.Save();
 	if (err != B_OK)
 		return P_MSG_I_ERROR;
 
-	progress->StageStep(1, T("Done"));
+	progress->StageStep(1, TR("Done"));
 
 	// Inform our parent that we finished
 	return P_MSG_I_FINISHED;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -941,22 +941,11 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 
 			int32 next = nextColumn + nextRow * columns;
 			if (next != current) {
-				uint32 workspaces = 0;
-				if (takeMeThere) {
-					workspaces = Workspaces() | (1 << next);
-
-					// add the next workspaces to the workspaces
-					if (workspaces != Workspaces())
-						SetWorkspaces(workspaces);
-				}
-
-				// switch to it
-				activate_workspace(next);
-
-				if (takeMeThere && workspaces != B_ALL_WORKSPACES) {
-					workspaces &= ~(1 << current);
-					SetWorkspaces(workspaces);
-				}
+				BPrivate::AppServerLink link;
+				link.StartMessage(AS_ACTIVATE_WORKSPACE);
+				link.Attach<int32>(next);
+				link.Attach<bool>(takeMeThere);
+				link.Flush();
 			}
 			break;
 		}

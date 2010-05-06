@@ -13,12 +13,15 @@
 #include "BootPromptWindow.h"
 
 
+static int sExitValue;
+
+
 int
 main(int, char **)
 {
 	BootPromptApp app;
 	app.Run();
-	return 0;
+	return sExitValue;
 }
 
 
@@ -40,12 +43,12 @@ BootPromptApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_BOOT_DESKTOP:
-			// TODO: Exit with some value that the Bootscript can deal with.
-			exit(1);
+			sExitValue = 1;
+			PostMessage(B_QUIT_REQUESTED);
 			break;
 		case MSG_RUN_INSTALLER:
-			// TODO: Exit with some value that the Bootscript can deal with.
-			exit(0);
+			sExitValue = 0;
+			PostMessage(B_QUIT_REQUESTED);
 			break;
 
 		default:

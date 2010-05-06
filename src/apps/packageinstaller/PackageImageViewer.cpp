@@ -10,23 +10,24 @@
 #include "PackageImageViewer.h"
 
 #include <BitmapStream.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <Message.h>
 #include <Screen.h>
 #include <TranslatorRoster.h>
 
 
-// Reserved
-#define T(x) x
-
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageImageViewer"
 
 enum {
 	P_MSG_CLOSE = 'pmic'
 };
 
 
-
 ImageView::ImageView(BPositionIO *image)
-	:	BView(BRect(0, 0, 1, 1), "image_view", B_FOLLOW_NONE, B_WILL_DRAW),
+	:
+	BView(BRect(0, 0, 1, 1), "image_view", B_FOLLOW_NONE, B_WILL_DRAW),
 	fSuccess(true)
 {
 	if (!image) {
@@ -64,12 +65,10 @@ ImageView::AttachedToWindow()
 	BRect frame = screen.Frame();
 	BRect image = fImage->Bounds();
 
-	if (image.Width() > (frame.Width() - 100.0f)) {
+	if (image.Width() > (frame.Width() - 100.0f))
 		image.right = frame.Width() - 100.0f;
-	}
-	if (image.Height() > (frame.Height() - 100.0f)) {
+	if (image.Height() > (frame.Height() - 100.0f))
 		image.bottom = frame.Height() - 100.f;
-	}
 
 	ResizeTo(image.Width(), image.Height());
 }
@@ -81,8 +80,8 @@ ImageView::Draw(BRect updateRect)
 	if (fSuccess)
 		DrawBitmapAsync(fImage, Bounds());
 	else {
-		float length = StringWidth(T("Image not loaded correctly"));
-		DrawString(T("Image not loaded correctly"), 
+		float length = StringWidth(TR("Image not loaded correctly"));
+		DrawString(TR("Image not loaded correctly"), 
 			BPoint((Bounds().Width() - length) / 2.0f, 30.0f));
 	}
 }
@@ -101,8 +100,9 @@ ImageView::MouseUp(BPoint point)
 
 
 PackageImageViewer::PackageImageViewer(BPositionIO *image)
-	: BWindow(BRect(100, 100, 100, 100), "", B_MODAL_WINDOW,
-	B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE)
+	:
+	BWindow(BRect(100, 100, 100, 100), "", B_MODAL_WINDOW,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE)
 {
 	fBackground = new ImageView(image);
 	AddChild(fBackground);
@@ -168,8 +168,7 @@ PackageImageViewer::MessageReceived(BMessage *msg)
 			delete_sem(fSemaphore);
 			fSemaphore = -1;
 		}
-	}
-	else
+	} else
 		BWindow::MessageReceived(msg);
 }
 

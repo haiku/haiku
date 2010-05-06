@@ -794,9 +794,11 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		cache = newCache;
 	}
 
-	status = cache->SetMinimalCommitment(size, priority);
-	if (status != B_OK)
-		goto err2;
+	if ((flags & CREATE_AREA_DONT_COMMIT_MEMORY) == 0) {
+		status = cache->SetMinimalCommitment(size, priority);
+		if (status != B_OK)
+			goto err2;
+	}
 
 	// check to see if this address space has entered DELETE state
 	if (addressSpace->IsBeingDeleted()) {
@@ -2229,7 +2231,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	status = map_backing_store(targetAddressSpace, cache, _address,
 		source->cache_offset, source->Size(), addressSpec, source->wiring,
 		protection, sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
-		&target, name, 0, true);
+		&target, name, writableCopy ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY, true);
 	if (status < B_OK)
 		return status;
 
@@ -3652,10 +3654,13 @@ vm_init(kernel_args* args)
 	object_cache_set_minimum_reserve(gPageMappingsObjectCache, 1024);
 
 #if DEBUG_CACHE_LIST
-	create_area("cache info table", (void**)&sCacheInfoTable,
-		B_ANY_KERNEL_ADDRESS,
-		ROUNDUP(kCacheInfoTableCount * sizeof(cache_info), B_PAGE_SIZE),
-		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (vm_page_num_free_pages() >= 200 * 1024 * 1024 / B_PAGE_SIZE) {
+		create_area_etc(VMAddressSpace::KernelID(), "cache info table",
+			(void**)&sCacheInfoTable, B_ANY_KERNEL_ADDRESS,
+			ROUNDUP(kCacheInfoTableCount * sizeof(cache_info), B_PAGE_SIZE),
+			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
+			CREATE_AREA_DONT_WAIT);
+	}
 #endif	// DEBUG_CACHE_LIST
 
 	// add some debugger commands
@@ -3665,12 +3670,16 @@ vm_init(kernel_args* args)
 	add_debugger_command("cache", &dump_cache, "Dump VMCache");
 	add_debugger_command("cache_tree", &dump_cache_tree, "Dump VMCache tree");
 #if DEBUG_CACHE_LIST
-	add_debugger_command_etc("caches", &dump_caches,
-		"List all VMCache trees",
-		"[ \"-c\" ]\n"
-		"All cache trees are listed sorted in decreasing order by number of\n"
-		"used pages or, if \"-c\" is specified, by size of committed memory.\n",
-		0);
+	if (sCacheInfoTable != NULL) {
+		add_debugger_command_etc("caches", &dump_caches,
+			"List all VMCache trees",
+			"[ \"-c\" ]\n"
+			"All cache trees are listed sorted in decreasing order by number "
+				"of\n"
+			"used pages or, if \"-c\" is specified, by size of committed "
+				"memory.\n",
+			0);
+	}
 #endif
 	add_debugger_command("avail", &dump_available_memory,
 		"Dump available memory");

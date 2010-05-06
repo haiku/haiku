@@ -77,7 +77,8 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) ReleaseBuildProfiles ] ;
 # check whether it is unknown or one of the default profiles.
 if $(HAIKU_BUILD_PROFILE) && ! $(HAIKU_BUILD_PROFILE_DEFINED) {
 	# define the obvious default profiles
-	if $(HAIKU_BUILD_PROFILE) in image vmware-image install {
+	if $(HAIKU_BUILD_PROFILE) in anyboot-image cd-image image install
+			vmware-image {
 		DefineBuildProfile $(HAIKU_BUILD_PROFILE) : $(HAIKU_BUILD_PROFILE) ;
 	} else {
 		Exit "Build profile" $(HAIKU_BUILD_PROFILE) "not defined." ;

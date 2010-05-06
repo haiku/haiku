@@ -42,6 +42,12 @@ enum {
 	P_EXISTS_NONE
 };
 
+const uint32 P_NO_KIND = 0;
+const uint32 P_KIND_SCRIPT = 1;
+const uint32 P_KIND_FILE = 2;
+const uint32 P_KIND_DIRECTORY = 3;
+const uint32 P_KIND_SYM_LINK = 4;
+
 extern status_t inflate_data(uint8* in, uint32 inSize, uint8* out,
 	uint32 outSize);
 
@@ -77,7 +83,7 @@ public:
 	virtual	void			SetTo(BFile* parent, const BString& path,
 								uint8 type, uint32 ctime, uint32 mtime,
 								uint64 offset = 0, uint64 size = 0);
-	virtual	const char*		ItemKind() = 0;
+	virtual	const uint32	ItemKind() {return P_NO_KIND;};
 
 	protected:
 			status_t		InitPath(const char* path, BPath* destination);
@@ -115,7 +121,7 @@ public:
 
 	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
-	virtual	const char*		ItemKind();
+	virtual	const uint32	ItemKind();
 };
 
 
@@ -126,7 +132,7 @@ public:
 
 	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
-	virtual	const char*		ItemKind();
+	virtual	const uint32	ItemKind();
 
 			thread_id		GetThreadId() { return fThreadId; }
 			void			SetThreadId(thread_id id) { fThreadId = id; }
@@ -151,7 +157,7 @@ public:
 
 	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
-	virtual	const char*		ItemKind();
+	virtual	const uint32	ItemKind();
 
 private:
 			uint64			fOriginalSize;
@@ -172,7 +178,7 @@ public:
 
 	virtual	status_t		DoInstall(const char* path = NULL,
 								ItemState *state = NULL);
-	virtual	const char*		ItemKind();
+	virtual	const uint32	ItemKind();
 
 private:
 			uint32			fMode;

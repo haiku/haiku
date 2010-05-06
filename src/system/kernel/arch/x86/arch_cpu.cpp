@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -691,9 +691,10 @@ arch_cpu_init_post_vm(kernel_args *args)
 	//i386_selector_init(gGDT);  // pass the new gdt
 
 	// allocate an area for the double fault stacks
-	create_area("double fault stacks", (void**)&sDoubleFaultStacks,
-		B_ANY_KERNEL_ADDRESS, kDoubleFaultStackSize * smp_get_num_cpus(),
-		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	create_area_etc(B_SYSTEM_TEAM, "double fault stacks",
+		(void**)&sDoubleFaultStacks, B_ANY_KERNEL_ADDRESS,
+		kDoubleFaultStackSize * smp_get_num_cpus(), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 
 	vm_translation_map_arch_info* kernelArchTranslationMap
 		= static_cast<X86VMTranslationMap*>(

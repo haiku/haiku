@@ -13,8 +13,10 @@
 
 #include <Alert.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <fs_info.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <OS.h>
 #include <SymLink.h>
@@ -23,8 +25,8 @@
 #include "zlib.h"
 
 
-// Macro reserved for later localization
-#define T(x) x
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageItem"
 
 enum {
 	P_CHUNK_SIZE = 256
@@ -561,10 +563,10 @@ PackageScript::DoInstall(const char *path, ItemState *state)
 }
 
 
-const char*
+const uint32 
 PackageScript::ItemKind()
 {
-	return "script";
+	return P_KIND_SCRIPT;
 }
 
 
@@ -737,10 +739,10 @@ PackageDirectory::DoInstall(const char *path, ItemState *state)
 }
 
 
-const char*
+const uint32 
 PackageDirectory::ItemKind()
 {
-	return "directory";
+	return P_KIND_DIRECTORY;
 }
 
 
@@ -903,10 +905,10 @@ PackageFile::DoInstall(const char *path, ItemState *state)
 }
 
 
-const char*
+const uint32 
 PackageFile::ItemKind()
 {
-	return "file";
+	return P_KIND_FILE;
 }
 
 
@@ -1038,8 +1040,9 @@ PackageLink::DoInstall(const char *path, ItemState *state)
 }
 
 
-const char*
+const uint32 
 PackageLink::ItemKind()
 {
-	return "symbolic link";
+	return P_KIND_SYM_LINK;
 }
+

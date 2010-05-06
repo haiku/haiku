@@ -31,11 +31,8 @@
 <ul class="lang-menu">
 <li class="now"><img src="images/flags/de.png" alt="" /> Deutsch</li>
 <li><a href="welcome_fr.html"><img src="images/flags/fr.png" alt="" />Français</a></li>
-<li><a href="welcome_it.html"><img src="images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="welcome_ru.html"><img src="images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="welcome_es.html"><img src="images/flags/es.png" alt="" />Español</a></li>
-<li><a href="welcome_sv_SE.html"><img src="images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="welcome_jp.html"><img src="images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="welcome_uk.html"><img src="images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="welcome_en.html"><img src="images/flags/gb.png" alt="" />English</a></li>
 </ul>
@@ -49,7 +46,7 @@
 
 <h2>
 <a id="welcome" name="welcome">Willkommen zu Haiku!</a></h2>
-<p>Danke, dass Sie sich für Haiku interessieren! Wir hoffen, dass wir durch unsere erste öffentliche Version neue Entwickler für unser Projekt begeistern können und Anwender in die Lage versetzen, Haiku auszuprobieren. Natürlich ist diese <i>Alpha Version</i> noch lange nicht vollständig oder gar fehlerfrei und sie erfüllt auch noch nicht die Ziele, die wir uns selbst gesteckt haben, aber sie zeigt, warum wir uns in diesem Projekt so engagieren und es ermöglicht anderen, das große Potential von Haiku zu erkunden.</p>
+<p>Danke, für das Interesse an Haiku! Wir hoffen, dass wir durch die zweite öffentliche Version neue Entwickler für unser Projekt begeistern können und Anwendern die Möglichkeit geben, Haiku kennenzulernen. Natürlich ist diese <i>Alpha Version</i> noch lange nicht vollständig oder gar fehlerfrei und sie erfüllt auch noch nicht die Ziele, die wir uns selbst gesteckt haben, aber sie zeigt, warum wir uns in diesem Projekt so engagieren und es ermöglicht anderen, das große Potential von Haiku zu erkunden.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -75,7 +72,7 @@
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="software" name="software">Software installieren</a></h2>
-<p>Da Haiku sowohl binärkompatibel als auch code-kompatibel mit dem BeOS ist, laufen viele BeOS-Anwendungen auch direkt in Haiku. Nach dem Herunterladen eines Programm-Paketes muss es lediglich nach <span class="path">/boot/apps/</span> entpackt (ein Doppelklick öffnet den <span class="app">Expander</span>) und von dort gestartet werden.</p>
+<p>Da Haiku sowohl binärkompatibel als auch code-kompatibel mit dem BeOS ist, laufen viele BeOS-Anwendungen auch direkt in Haiku (für manche Programme muss das Optional Package "beoscompatibility" installiert werden, siehe unten).  Nach dem Herunterladen eines Programm-Paketes muss es lediglich nach <span class="path">/boot/apps/</span> entpackt (ein Doppelklick öffnet den <span class="app">Expander</span>) und von dort gestartet werden.</p>
 
 <p>Große Software-Verzeichnisse sind:</p>
 <ul>
@@ -86,35 +83,37 @@
 </ul>
 
 <p>Daneben existieren auch sogenannte "Optional Packages", die beim Erzeugen von Haiku Images zum Einsatz kommen. Sie sind nicht dazu bestimmt vom Benutzer manuell entpackt und installiert zu werden. Dafür gibt es aber das kleine Skript <tt>installoptionalpackage</tt>. Es dient als Lückenfüller solange noch an Haikus Paketmanagement gearbeitet wird. Mit ihm lassen sich viele der vorhandenen Optional Packages installieren.<br />
-Dazu benutzt man einen Befehl im Terminal:</p>
-<p><tt>installoptionalpackage -l</tt> - listet alle verfügbaren Pakete auf.<br />
-<tt>installoptionalpackage -a {Paketname}</tt> - lädt ein Packet herunter und installiert es.<br />
-<tt>installoptionalpackage -a "{Paketname} {packagename}"</tt> - installiert mehrere Pakete auf einmal. Anführungszeichen nicht vergessen!</p>
+Dazu benutzt man einen Befehl im Terminal: <tt>installoptionalpackage -h</tt> erklärt die verschiedenen Optionen.</p>
+
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="software" name="wifi">WLAN in Haiku</a></h2>
+<p>WLAN funktioniert im gewissen Rahmen. Momentan kann man nur ungeschützte oder WEP verschlüsselte Funknetzwerke nutzen. Wegen verschiedener Lizenzbedingungen der unterschiedlichen Hersteller, ist gegebenenfalls eine manuelle Installation der Firmware nötig. Eine Liste der unterstützten Geräte und Hinweise für sie eventuell erforderliche Installation befindet sich auf der <a href="de/wifi.html">WLAN</a> Seite (auch <a href="http://www.haiku-os.org/guides/wifi">online</a> auf Englisch).</p> 
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="api" name="api">Die API kennenlernen</a></h2>
-<p>Da Haiku eine Reimplemention des BeOS R5 ist, sind die API die gleichen (mit einigen Erweiterungen). Deshalb ist die Dokumentation im BeBook immernoch eine hilfreiche Quelle. Dankenswerter weise hat die Firma ACCESS, die alle Rechte von Be Inc. übernommen hat, einer Veröffentlichung des BeBook zugestimmt.</p>
+<p>Da Haiku eine Reimplemention des BeOS R5 ist, sind die API die gleichen (mit einigen Erweiterungen). Deshalb ist die Dokumentation im Be Book immernoch eine hilfreiche Quelle. Dankenswerter weise hat die Firma ACCESS, die alle Rechte von Be Inc. übernommen hat, einer Veröffentlichung des Be Book zugestimmt.</p>
 
 <p>Diese Informationen sollten einen guten Einstieg in die Materie vermitteln:</p>
 <ul>
 	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">Entwickler FAQ</a></li>
 	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">Source Browser</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">BeBook</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">BeNewsletter Archiv</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">Be Book</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archiv</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="contact" name="contact">Kontakte knüpfen</a></h2>
-<p>Um sich mit anderen Entwickler und Anwender auszutauschen muss man nur an den Diskussionen im IRC, unseren Foren oder Mailinglisten teilnehmen. Wie üblich, wenn sich mehrere Menschen unterhalten, sollte eine gewisse <a href="http://www.haiku-os.org/node/2517">Etikette</a> eingehalten werden.</p>
+<p>Um sich mit anderen Entwickler und Anwender auszutauschen muss man nur an den Diskussionen im IRC, unseren Foren oder Mailinglisten teilnehmen. Wie üblich, wenn sich mehrere Menschen unterhalten, sollte eine gewisse <a href="http://www.haiku-os.org/community/ml/etiquette">Etikette</a> eingehalten werden.</p>
 <ul>
 	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
 	<li><a href="http://www.haiku-os.org/forum" class="printurl">Foren</a></li>
 	<li><a href="http://www.freelists.org/list/haiku" class="printurl">Mailingliste für allgemeine Haiku Themen</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Mailingliste für Programmierer von Haiku selbst</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Mailingliste für Programmierer von Software für Haiku</a></li>
-	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Weitere Mailinglisten</a> zu speziellen Themen</li>
+	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Alle Mailinglisten</a></li>
 </ul>
 
 </div>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright (c) 2007-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -10,16 +10,19 @@
 #include "PackageWindow.h"
 
 #include <Application.h>
-
+#include <Catalog.h>
 #include <GroupLayout.h>
+#include <Locale.h>
 
-// Macro reserved for later localization
-#define T(x) x
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageWindow"
 
 
 PackageWindow::PackageWindow(const entry_ref *ref)
-	:	BWindow(BRect(100, 100, 600, 300), T("PackageInstaller"), B_TITLED_WINDOW,
-			B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+	:
+	BWindow(BRect(100, 100, 600, 300), TR("PackageInstaller"), 
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
 	//SetLayout(new BGroupLayout(B_HORIZONTAL));
 

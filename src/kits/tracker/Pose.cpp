@@ -89,16 +89,10 @@ BPose::BPose(Model *model, BPoseView *view, uint32 clipboardMode, bool selected)
 		if (volume->InitCheck() == B_OK
 			&& fs_stat_dev(device, &info) == B_OK) {
 			// Philosophy here:
-			// Bars go on all drives with read/write capabilities
-			// Exceptions: Not on CDDA, but on NTFS/Ext2
-			// Also note that some volumes may return 0 when
-			// BVolume::Capacity() is called (believe-me... That *DOES*
-			// happen) so we also check for that.
-			off_t capacity = volume->Capacity();
-			if (((!volume->IsReadOnly() && strcmp(info.fsh_name,"cdda"))
-				|| !strcmp(info.fsh_name,"ntfs")
-				|| !strcmp(info.fsh_name,"ext2"))
-				&& capacity > 0) {
+			// Bars go on all read/write volumes
+			// Exceptions: Not on CDDA
+			if (strcmp(info.fsh_name,"cdda") != 0 
+				&& !volume->IsReadOnly()) {
 				// The volume is ok and we want space bars on it
 				gPeriodicUpdatePoses.AddPose(this, view,
 					_PeriodicUpdateCallback, volume);

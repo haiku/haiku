@@ -49,7 +49,7 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	BNode typeNode;
 
 	BFile file;
-	status_t status = file.SetTo(ref, B_READ_ONLY);
+	status_t status = file.SetTo(ref, B_READ_ONLY | O_NOTRAVERSE);
 	if (status < B_OK)
 		return status;
 
@@ -57,7 +57,7 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (_entryIsDir != NULL)
 		*_entryIsDir = isDir;
 
-	if (isDir)
+	if (isDir || !file.IsFile())
 		return B_OK;
 
 	BAppFileInfo appInfo(&file);

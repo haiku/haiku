@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc.
+ * Copyright 2007-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -14,8 +14,10 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <PopUpMenu.h>
@@ -32,25 +34,27 @@
 #include <fs_info.h>
 #include <stdio.h> // For debugging
 
-// Macro reserved for later localization
-#define T(x) x
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageView"
 
 const float kMaxDescHeight = 125.0f;
 const uint32 kSeparatorIndex = 3;
-
 
 
 static void
 convert_size(uint64 size, char *buffer, uint32 n)
 {
 	if (size < 1024)
-		snprintf(buffer, n, "%llu bytes", size);
+		snprintf(buffer, n, TR("%llu bytes"), size);
 	else if (size < 1024 * 1024)
-		snprintf(buffer, n, "%.1f KiB", size / 1024.0f);
+		snprintf(buffer, n, TR("%.1f KiB"), size / 1024.0f);
 	else if (size < 1024 * 1024 * 1024)
-		snprintf(buffer, n, "%.1f MiB", size / (1024.0f*1024.0f));
-	else
-		snprintf(buffer, n, "%.1f GiB", size / (1024.0f*1024.0f*1024.0f));
+		snprintf(buffer, n, TR("%.1f MiB"), size / (1024.0f * 1024.0f));
+	else {
+		snprintf(buffer, n, TR("%.1f GiB"), size
+			/ (1024.0f * 1024.0f * 1024.0f));
+	}
 }
 
 
@@ -59,10 +63,10 @@ convert_size(uint64 size, char *buffer, uint32 n)
 
 
 PackageView::PackageView(BRect frame, const entry_ref *ref)
-	:	BView(frame, "package_view", B_FOLLOW_NONE, 0),
-		//BView("package_view", B_WILL_DRAW, new BGroupLayout(B_HORIZONTAL)),
-	fOpenPanel(new BFilePanel(B_OPEN_PANEL, NULL, NULL,
-		B_DIRECTORY_NODE, false)),
+	:
+	BView(frame, "package_view", B_FOLLOW_NONE, 0),
+	fOpenPanel(new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_DIRECTORY_NODE,
+		false)),
 	fInfo(ref),
 	fInstallProcess(this)
 {
@@ -88,11 +92,11 @@ PackageView::AttachedToWindow()
 {
 	status_t ret = fInfo.InitCheck();
 	if (ret != B_OK && ret != B_NO_INIT) {
-		BAlert *warning = new BAlert(T("parsing_failed"),
-				T("The package file is not readable.\nOne of the possible "
-				"reasons for this might be that the requested file is not a valid "
-				"BeOS .pkg package."), T("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT);
+		BAlert *warning = new BAlert("parsing_failed",
+				TR("The package file is not readable.\nOne of the possible "
+				"reasons for this might be that the requested file is not a "
+				"valid BeOS .pkg package."), TR("OK"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		warning->Go();
 
 		Window()->PostMessage(B_QUIT_REQUESTED);
@@ -104,10 +108,10 @@ PackageView::AttachedToWindow()
 	BString title;
 	BString name = fInfo.GetName();
 	if (name.CountChars() == 0) {
-		title = T("Package installer");
+		title = TR("Package installer");
 	}
 	else {
-		title = T("Install ");
+		title = TR("Install ");
 		title += name;
 	}
 	parent->SetTitle(title.String());
@@ -122,8 +126,8 @@ PackageView::AttachedToWindow()
 		// attaching the view to the window
 		_GroupChanged(0);
 
-		fStatusWindow = new PackageStatus(T("Installation progress"), NULL, NULL,
-				this);
+		fStatusWindow = new PackageStatus(TR("Installation progress"), NULL, 
+			NULL, this);
 
 		// Show the splash screen, if present
 		BMallocIO *image = fInfo.GetSplashScreen();
@@ -135,9 +139,11 @@ PackageView::AttachedToWindow()
 		// Show the disclaimer/info text popup, if present
 		BString disclaimer = fInfo.GetDisclaimer();
 		if (disclaimer.Length() != 0) {
-			PackageTextViewer *text = new PackageTextViewer(disclaimer.String());
+			PackageTextViewer *text = new PackageTextViewer(
+				disclaimer.String());
 			int32 selection = text->Go();
-			// The user didn't accept our disclaimer, this means we cannot continue.
+			// The user didn't accept our disclaimer, this means we cannot
+			// continue.
 			if (selection == 0) {
 				BWindow *parent = Window();
 				if (parent && parent->Lock())
@@ -184,8 +190,8 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_I_FINISHED:
 		{
 			BAlert *notify = new BAlert("installation_success",
-				T("The package you requested has been successfully installed "
-					"on your system."), T("OK"));
+				TR("The package you requested has been successfully installed "
+					"on your system."), TR("OK"));
 
 			notify->Go();
 			fStatusWindow->Hide();
@@ -202,7 +208,8 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_I_ABORT:
 		{
 			BAlert *notify = new BAlert("installation_aborted",
-				T("The installation of the package has been aborted."), T("OK"));
+				TR("The installation of the package has been aborted."), 
+				TR("OK"));
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
@@ -213,12 +220,13 @@ PackageView::MessageReceived(BMessage *msg)
 		}
 		case P_MSG_I_ERROR:
 		{
-			BAlert *notify = new BAlert("installation_failed", // TODO: Review this
-				T("The requested package failed to install on your system. This "
-					"might be a problem with the target package file. Please consult "
-					"this issue with the package distributor."), T("OK"), NULL,
-				NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			fprintf(stderr, "Error while installing the package\n");
+			// TODO: Review this
+			BAlert *notify = new BAlert("installation_failed",
+				TR("The requested package failed to install on your system. "
+				"This might be a problem with the target package file. Please "
+				"consult this issue with the package distributor."), 
+				TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			fprintf(stderr, TR("Error while installing the package\n"));
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
@@ -253,10 +261,12 @@ PackageView::MessageReceived(BMessage *msg)
 					break;
 
 				BString name = path.Path();
-				char sizeString[32];
+				char sizeString[48];
 
-				convert_size(volume.FreeBytes(), sizeString, 32);
-				name << " (" << sizeString << " free)";
+				convert_size(volume.FreeBytes(), sizeString, 48);
+				char buffer[512];
+				snprintf(buffer, sizeof(buffer), "(%s free)", sizeString);
+				name << buffer;
 
 				item->SetLabel(name.String());
 				fCurrentPath.SetTo(path.Path());
@@ -300,14 +310,41 @@ PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 		case P_EXISTS_ASK:
 		case P_EXISTS_NONE:
 		{
-			BString alertString = T("The ");
-
-			alertString << item.ItemKind() << T(" named \'") << path.Leaf() << "\' ";
-			alertString << T("already exists in the given path.\nReplace the file with "
-				"the one from this package or skip it?");
-
-			BAlert *alert = new BAlert(T("file_exists"), alertString.String(),
-				T("Replace"), T("Skip"), T("Abort"));
+			const char* formatString;
+			switch (item.ItemKind()){
+				case P_KIND_SCRIPT:
+					formatString = TR("The script named \'%s\' already exits "
+						"in the given path.\nReplace the script with the one "
+						"from this package or skip it?");   
+					break;
+				case P_KIND_FILE:
+					formatString = TR("The file named \'%s\' already exits "
+						"in the given path.\nReplace the file with the one "
+						"from this package or skip it?");
+					break;
+				case P_KIND_DIRECTORY:
+					formatString = TR("The directory named \'%s\' already "
+						"exits in the given path.\nReplace the directory with "
+						"one from this package or skip it?");
+ 					break;
+				case P_KIND_SYM_LINK:
+					formatString = TR("The symbolic link named \'%s\' already "
+						"exists in the give path.\nReplace the link with the "
+						"one from this package or skip it?");
+					break;
+				default:
+					formatString = TR("The item named \'%s\' already exits "
+						"in the given path.\nReplace the item with the one "
+						"from this package or skip it?");   
+					break;
+			}
+			char buffer[512];
+			snprintf(buffer, sizeof(buffer), formatString, path.Leaf());
+			
+			BString alertString = buffer;
+			
+			BAlert *alert = new BAlert("file_exists", alertString.String(),
+				TR("Replace"), TR("Skip"), TR("Abort"));
 
 			choice = alert->Go();
 			switch (choice) {
@@ -323,13 +360,14 @@ PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 
 			if (policy == P_EXISTS_NONE) {
 				// TODO: Maybe add 'No, but ask again' type of choice as well?
-				alertString = T("Do you want to remember this decision for the rest of "
-					"this installation?\nAll existing files will be ");
+				alertString = TR("Do you want to remember this decision for "
+					"the rest of this installation?\n");
 				alertString << ((choice == P_EXISTS_OVERWRITE)
-					? T("replaced?") : T("skipped?"));
+					? TR("All existing files will be replaced?") 
+					: TR("All existing files will be skipped?"));
 
-				alert = new BAlert(T("policy_decision"), alertString.String(),
-					T("Yes"), T("No"));
+				alert = new BAlert("policy_decision", alertString.String(),
+					TR("Replace all"), TR("Ask again"));
 
 				int32 decision = alert->Go();
 				if (decision == 0)
@@ -361,7 +399,7 @@ PackageView::_InitView()
 	fInstallTypes = new BPopUpMenu("none");
 
 	BMenuField *installType = new BMenuField("install_type",
-		T("Installation type:"), fInstallTypes, 0);
+		TR("Installation type:"), fInstallTypes, 0);
 	installType->SetAlignment(B_ALIGN_RIGHT);
 	installType->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 
@@ -370,10 +408,10 @@ PackageView::_InitView()
 	fInstallDesc->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fInstallDesc->MakeEditable(false);
 	fInstallDesc->MakeSelectable(false);
-	fInstallDesc->SetText(T("No installation type selected"));
+	fInstallDesc->SetText(TR("No installation type selected"));
 	fInstallDesc->TextHeight(0, fInstallDesc->TextLength());
 
-	fInstall = new BButton("install_button", T("Install"),
+	fInstall = new BButton("install_button", TR("Install"),
 			new BMessage(P_MSG_INSTALL));
 
 	BView *installField = BGroupLayoutBuilder(B_VERTICAL, 5.0f)
@@ -416,9 +454,11 @@ PackageView::_InitView()
 	float length = description->TextHeight(0, description->TextLength()) + 5;
 	if (length > kMaxDescHeight) {
 		// Set a scroller for the description.
-		description->ResizeTo(rect.Width() - B_V_SCROLL_BAR_WIDTH, kMaxDescHeight);
+		description->ResizeTo(rect.Width() - B_V_SCROLL_BAR_WIDTH,
+			kMaxDescHeight);
 		BScrollView *scroller = new BScrollView("desciption_view", description,
-				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_NO_BORDER);
+			B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, false, true,
+			B_NO_BORDER);
 
 		AddChild(scroller);
 		rect = scroller->Frame();
@@ -435,8 +475,8 @@ PackageView::_InitView()
 
 	fInstallTypes = new BPopUpMenu("none");
 
-	BMenuField *installType = new BMenuField(BRect(2, 2, 100, 50), "install_type",
-		T("Installation type:"), fInstallTypes, false);
+	BMenuField *installType = new BMenuField(BRect(2, 2, 100, 50),
+		"install_type", TR("Installation type:"), fInstallTypes, false);
 	installType->SetDivider(installType->StringWidth(installType->Label()) + 8);
 	installType->SetAlignment(B_ALIGN_RIGHT);
 	installType->ResizeToPreferred();
@@ -450,12 +490,12 @@ PackageView::_InitView()
 		B_WILL_DRAW);
 	fInstallDesc->MakeEditable(false);
 	fInstallDesc->MakeSelectable(false);
-	fInstallDesc->SetText(T("No installation type selected"));
+	fInstallDesc->SetText(TR("No installation type selected"));
 	fInstallDesc->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fInstallDesc->ResizeTo(rect.Width() - B_V_SCROLL_BAR_WIDTH, 60);
 	BScrollView *scroller = new BScrollView("desciption_view", fInstallDesc,
-				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_NO_BORDER);
+		B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_NO_BORDER);
 
 	installBox->ResizeTo(installBox->Bounds().Width(),
 		scroller->Frame().bottom + 10);
@@ -469,7 +509,7 @@ PackageView::_InitView()
 	rect = installBox->Frame();
 	rect.top = rect.bottom + 5;
 	rect.bottom += 35;
-	fDestField = new BMenuField(rect, "install_to", T("Install to:"),
+	fDestField = new BMenuField(rect, "install_to", TR("Install to:"),
 			fDestination, false);
 	fDestField->SetDivider(fDestField->StringWidth(fDestField->Label()) + 8);
 	fDestField->SetAlignment(B_ALIGN_RIGHT);
@@ -477,11 +517,12 @@ PackageView::_InitView()
 
 	AddChild(fDestField);
 
-	fInstall = new BButton(rect, "install_button", T("Install"),
+	fInstall = new BButton(rect, "install_button", TR("Install"),
 			new BMessage(P_MSG_INSTALL));
 	fInstall->ResizeToPreferred();
 	AddChild(fInstall);
-	fInstall->MoveTo(Bounds().Width() - fInstall->Bounds().Width() - 10, rect.top + 2);
+	fInstall->MoveTo(Bounds().Width() - fInstall->Bounds().Width() - 10,
+		rect.top + 2);
 	fInstall->MakeDefault(true);
 }
 
@@ -493,14 +534,16 @@ PackageView::_InitProfiles()
 	int i = 0, num = fInfo.GetProfileCount();
 	pkg_profile *prof;
 	BMenuItem *item = 0;
-	char sizeString[32];
+	char sizeString[48];
 	BString name = "";
 	BMessage *message;
 
 	if (num > 0) { // Add the default item
 		prof = fInfo.GetProfile(0);
-		convert_size(prof->space_needed, sizeString, 32);
-		name << prof->name << " (" << sizeString << ")";
+		convert_size(prof->space_needed, sizeString, 48);
+		char buffer[512];
+		snprintf(buffer, sizeof(buffer), "(%s)", sizeString);
+		name << prof->name << buffer;
 
 		message = new BMessage(P_MSG_GROUP_CHANGED);
 		message->AddInt32("index", 0);
@@ -514,9 +557,11 @@ PackageView::_InitProfiles()
 		prof = fInfo.GetProfile(i);
 
 		if (prof) {
-			convert_size(prof->space_needed, sizeString, 32);
+			convert_size(prof->space_needed, sizeString, 48);
 			name = prof->name;
-			name << " (" << sizeString << ")";
+			char buffer[512];
+			snprintf(buffer, sizeof(buffer), "(%s)", sizeString);
+			name << buffer;
 
 			message = new BMessage(P_MSG_GROUP_CHANGED);
 			message->AddInt32("index", i);
@@ -554,11 +599,13 @@ PackageView::_GroupChanged(int32 index)
 		BPath path;
 		BMessage *temp;
 		BVolume volume;
+		char buffer[512];
+		const char *tmp = TR("(%s free)");
 
 		if (prof->path_type == P_INSTALL_PATH) {
 			dev_t device;
 			BString name;
-			char sizeString[32];
+			char sizeString[48];
 
 			if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK) {
 				device = dev_for_path(path.Path());
@@ -566,9 +613,10 @@ PackageView::_GroupChanged(int32 index)
 					temp = new BMessage(P_MSG_PATH_CHANGED);
 					temp->AddString("path", BString(path.Path()));
 
-					convert_size(volume.FreeBytes(), sizeString, 32);
+					convert_size(volume.FreeBytes(), sizeString, 48);
 					name = path.Path();
-					name << " (" << sizeString << " free)";
+					snprintf(buffer, sizeof(buffer), tmp, sizeString);
+					name << buffer;
 					item = new BMenuItem(name.String(), temp);
 					item->SetTarget(this);
 					fDestination->AddItem(item);
@@ -580,9 +628,11 @@ PackageView::_GroupChanged(int32 index)
 					temp = new BMessage(P_MSG_PATH_CHANGED);
 					temp->AddString("path", BString(path.Path()));
 
-					convert_size(volume.FreeBytes(), sizeString, 32);
+					convert_size(volume.FreeBytes(), sizeString, 48);
+					char buffer[512];
+					snprintf(buffer, sizeof(buffer), tmp, sizeString);
 					name = path.Path();
-					name << " (" << sizeString << " free)";
+					name << buffer;
 					item = new BMenuItem(name.String(), temp);
 					item->SetTarget(this);
 					fDestination->AddItem(item);
@@ -595,7 +645,8 @@ PackageView::_GroupChanged(int32 index)
 			}
 			fDestination->AddSeparatorItem();
 
-			item = new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(P_MSG_OPEN_PANEL));
+			item = new BMenuItem(TR("Other" B_UTF8_ELLIPSIS), 
+				new BMessage(P_MSG_OPEN_PANEL));
 			item->SetTarget(this);
 			fDestination->AddItem(item);
 
@@ -603,7 +654,7 @@ PackageView::_GroupChanged(int32 index)
 		} else if (prof->path_type == P_USER_PATH) {
 			BString name;
 			bool defaultPathSet = false;
-			char sizeString[32], volumeName[B_FILE_NAME_LENGTH];
+			char sizeString[48], volumeName[B_FILE_NAME_LENGTH];
 			BVolumeRoster roster;
 			BDirectory mountPoint;
 
@@ -619,10 +670,11 @@ PackageView::_GroupChanged(int32 index)
 				temp = new BMessage(P_MSG_PATH_CHANGED);
 				temp->AddString("path", BString(path.Path()));
 
-				convert_size(volume.FreeBytes(), sizeString, 32);
+				convert_size(volume.FreeBytes(), sizeString, 48);
 				volume.GetName(volumeName);
 				name = volumeName;
-				name << " (" << sizeString << " free)";
+				snprintf(buffer, sizeof(buffer), tmp, sizeString);
+				name << buffer;
 				item = new BMenuItem(name.String(), temp);
 				item->SetTarget(this);
 				fDestination->AddItem(item);

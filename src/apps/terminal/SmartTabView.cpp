@@ -16,6 +16,8 @@
 
 #include "SmartTabView.h"
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -60,6 +62,8 @@ SmartTabView::SetInsets(float left, float top, float right, float bottom)
 	fInsets.bottom = bottom;
 }
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Terminal SmartTabView"
 
 void
 SmartTabView::MouseDown(BPoint point)
@@ -76,7 +80,7 @@ SmartTabView::MouseDown(BPoint point)
 				message->AddInt32("index", tabIndex);
 
 				BPopUpMenu* popUpMenu = new BPopUpMenu("tab menu");
-				popUpMenu->AddItem(new BMenuItem("Close tab", message));
+				popUpMenu->AddItem(new BMenuItem(TR("Close tab"), message));
 				popUpMenu->SetAsyncAutoDestruct(true);
 				popUpMenu->SetTargetForItems(BMessenger(this));
 				popUpMenu->Go(ConvertToScreen(point), true, true, true);

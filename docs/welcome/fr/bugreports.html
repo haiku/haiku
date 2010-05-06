@@ -12,6 +12,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -30,11 +31,9 @@
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fr.png" alt="" /> Français</li>
 <li><a href="../de/bugreports.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
-<li><a href="../it/bugreports.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../ru/bugreports.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/bugreports.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
-<li><a href="../sv_SE/bugreports.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
-<li><a href="../jp/bugreports.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bugreports.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/bugreports.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -47,51 +46,51 @@
 
 <h1>Signaler les bogues</h1>
 
-<p>Since our developers are unable to test every hardware combination, nor every different way of interacting with the operating system, we are relying on users to give us some input on how things work at their end. Since Haiku is still quite young, it's very likely that you will encounter bugs. We thank you for taking the time to report these. Together we can improve Haiku, bit by bit.</p>
-<p>To keep our bugtracker effective, it's essential to abide by the <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a>.</p>
+<p>Comme il est impossible pour nos développeurs de tester toutes les combinaisons de matériel, ni tous les cas de figure pouvant interagir avec le système d'exploitation, nous comptons sur les utilisateurs pour nous dire si les choses fonctionnent pour eux. puisque Haiku est encore tout jeune, il est très probable que vous rencontriez des bogues. Nous vous remercions de bien vouloir prendre le temps de nous les signaler. Ensemble, nous pourrons, petit à petit, améliorer Haiku.</p>
+<p>Afin que le suivi de nos bogues reste efficace, il est essentiel de respecter l'<a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Étiquette de suivi des bogues</a>.</p>
 
-<h2>Getting a Trac account</h2>
-<p>To file a ticket, you need to have an account at <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku's Bugtracker</a>.<br />
-When creating a new account, be certain to <b>provide your email address</b> as it is necessary to obtain basic ticket modification privileges. Be sure to <b>check your spam folder</b> shortly afterwards, as the all important verification mail often ends up there.</p>
+<h2>Obtenir un compte Trac</h2>
+<p>Pour remplir un rapport (ticket), vous aurez besoin d’un compte utilisateur sur le <a href="http://dev.haiku-os.org/register" title="Traqueur de bogues de Haiku">Traqueur de bogues de Haiku</a>.<br />
+Lors de la création d’un nouveau compte, pensez à <b>indiquer votre adresse e-mail</b> afin d’obtenir les privilèges basiques de gestions des tickets. N’oubliez pas de <b>Vérifier votre dossier de pourriel</b> après, car les e-mails de vérifications s’y retrouvent souvent.</p>
 
 <h2>Créer un rapport de bogue</h2>
-<p>Before reporting a bug, please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.<br />
-After you have established that it's a unique bug, make your information as accurate as possible:</p>
+<p>Avant de rapporter un bogue, veuillez <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">vérifier</a>qu’il n’est pas déjà répertorié. Vous pouvez aussi utiliser la <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">fonction de recherche</a> pour cela.<br />
+Après vous être assurer que votre bogue est unique, obtenez des informations précises sur votre environnement :</p>
 <ul>
-	<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
-	<li><p>Mention which revision from <acronym title="Subversion, the source code management system we use">SVN</acronym> you are running. You can find this information in '<i>About This System...</i>' from the Deskbar menu.</p></li>
-	<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
-	<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
-	<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to make a screen shot (the <span class="key">PRINT</span> key saves a <acronym title="Portable Network Graphics image format">PNG</acronym> in <span class="path">/boot/home/</span>).</p></li>
+	<li><p>Indiquez comment vous testez Haiku (sur machine réelle, dans VMware, dans Qemu…)</p></li>
+	<li><p>Indiquez quelle révision <acronym title="Subversion, le système de gestion de code source que nous utilisons">SVN</acronym> de Haiku vous utilisez. Vous pouvez trouver des informations à ce sujet dans le menu « <i>About This System…</i> » de la Deskbar.</p></li>
+	<li><p>Décrire le problème que vous rencontrez. Essayez d'être aussi précis que possible : décrivez le comportement réel, et celui que vous attendiez.</p></li>
+	<li><p>Décrivez les actions que vous avez effectuées avant de faire ressortir le bogue. Cela permettra aux développeurs de le reproduire.</p></li>
+	<li><p>Attachez au rapport le plus d’informations possibles. Si le bogue concerne l’interface graphique ou une application, essayez de faire une capture d’écran (la touche <span class="key">IMPR ÉCRAN</span> créera une image <acronym title="Portable Network Graphics image format">PNG</acronym> dans le dossier <span class="path">/boot/home/</span>).</p></li>
 </ul>
 	
-<h3>Software Bugs</h3>
-<p>When an application crashed, you should invoke the debugger from the alert that pops up. Entering <span class="cli">bt</span> into the launched debug Terminal, you create a "backtrace" that you should copy into your bug report.</p>
+<h3>Bogues logiciels</h3>
+<p>Lorsqu'une application se plante, vous devez appeler le débogueur depuis le message d'alerte qui s'affiche. Saisissez <span class="cli">bt</span> dans le Terminal de débogage qui est lancé. Vous obtiendrez ainsi une trace de la « pile d'appel » (<i>backtrace</i>) que vous devez joindre à votre rapport de bogue.</p>
 
-<h3>Hardware Bugs</h3>
-<p>When dealing with a hardware/driver related bug, you should attach the following information:</p>
+<h3>Bogues matériels</h3>
+<p>Lorsque le bogue concerne un matériel ou son pilote, vous devez fournir les renseignements suivants :</p>
 <ul>
-<li><span class="cli">listdev</span> - a detailed listing of your hardware, including vendor and pci id's, similar to Linux' <span class="cli">lshw</span> and <span class="cli">lspci</span>.</li>
-<li><span class="cli">listusb -v</span> - assuming its a USB related issue, similar to <span class="cli">lsusb</span>.</li>
-<li><span class="cli">open /var/log/syslog</span> - the primary system log used by Haiku, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</li>
-<li><span class="cli">listimage | grep drivers/</span> - lists all used drivers.</li>
-<li><span class="cli">ints</span> - only available within <i>Kernel Debugging Land</i> (see below). Shows interrupt usage. There shouldn't be too many that are shared by different devices.</li>
+<li><span class="cli">listdev</span> - fait une liste détaillée de votre matériel, en y incluant les identifiants PCI des fournisseurs, à la manière de <span class="cli">lshw</span> ou <span class="cli">lspci</span> dans GNU/Linux .</li>
+<li><span class="cli">listusb -v</span> - en supposant que c'est un problème lié à l'USB, comme le fait <span class="cli">lsusb</span>.</li>
+<li><span class="cli">open /var/log/syslog</span> - 
+le système de journal d’événements principal de Haiku, similaire au déboguage sur écran durant le démarrage. En l’ouvrant dabs un éditeur de texte avec la commande <span class="cli">open</span> vous pourrez n’en conserver que la partie utile.</li>
+<li><span class="cli">listimage | grep drivers/</span> - liste tous les drivers utilisés.</li>
+<li><span class="cli">ints</span> - seulement disponible dans le <i>mode débogage du noyau</i> (voir ci-dessous). Montre l'utilisation des interruptions. 
+Il ne devrait pas y avoir trop d'interruptions partagées par plusieurs périphériques.</li>
 </ul>
-<p>You enter these commands into Terminal. Add a <span class="cli"> &gt; output.txt</span> after a command, and it's piped into a text file called "output.txt" that you can attach to your bug report or email.</p>
+<p>Ces commandes peuvent être entrées dans le Terminal. Si vous ajoutez <span class="cli"> &gt; sortie.txt</span> après une commande, sa sortie sera redirigée dans un fichier texte nommé « sortie.txt » que vous pourrez attachez à votre rapport de bogue ou e-mail.</p>
 
-<h3>Kernel Debugging Land - KDL</h3>
-<p>When some very low level system component crashed, you may end up in the kernel debugger. It can also be entered deliberately with <span class="key">ALT</span><span class="key">SysReq</span><span class="key">D</span> (<span class="key">SysReq</span> being <span class="key">PRINT</span> on most keyboards).</p>
+<h3>Le mode débogage noyau - KDL</h3>
+<p>Lorsque certains composants systèmes de bas niveau se plantent, vous pouvez être envoyé dans le débogueur du noyau. Vous pouvez également y entrer volontairement avec <span class="key">ALT</span><span class="key">SYST</span><span class="key">D</span> (<span class="key">SYST</span> correspond à <span class="key">IMPR ÉCRAN</span> sur la plupart des claviers). Attention : l'ordre des touches compte.</p>
 <ul>
-<li><span class="cli">co</span> - will exit KDL and continue normal system operation, if possible.</li>
-<li><span class="cli">int</span> - will show interrupt usage (as described above).</li>
-<li><span class="cli">bt</span> - shows a backtrace, detailing where exactly the crash happened.</li>
+<li><span class="cli">co</span> - sortira du KDL et reprendra l’exécution normale, si possible.</li>
+<li><span class="cli">int</span> - affichera l’utilisation des interruptions (comme décrit ci-dessus).</li>
+<li><span class="cli">bt</span> - affiche une trace de déboguage (backtrace), indiquant exactement comment le plantage s’est produit.</li>
 </ul>
 
-<h2>What's next?</h2>
-<p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding
-non-descriptive comments.</p>
-<p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked
-as 'fixed'.</p>
+<h2>Et après ?</h2>
+<p>Une fois le bogue rapporté, un développeur le consultera et essayera de le cataloguer. Retenez que tous les développeurs sont des volontaires; un long délai avant réponse peut s’écouler après le rapport de bogue. L’ajout de nouvelles informations une fois celles-ci disponibles peut généralement permettre à un bogue d’être analysé plus rapidement. Néanmoins, n’essayez pas de « faire remonter » un bogue en ajoutant des commentaires non pertinents.</p>
+<p>N’oubliez pas, le rapport d’un bogue ne se limite pas à sa soumission. Une fois cette tâche faite, vous ferez partie du processus de développement de Haiku. Les développeurs pourront vous poser des question pour essayer de résoudre votre bogue. Merci de rester disponible pour y répondre. Considérez votre travail « terminé » quand le bogue sera marqué comme étant « corrigé ».</p>
 
 </div>
 </div>

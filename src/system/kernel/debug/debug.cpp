@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -1622,7 +1622,7 @@ debug_early_boot_message(const char* string)
 }
 
 
-status_t
+void
 debug_init(kernel_args* args)
 {
 	new(&gDefaultDebugOutputFilter) DefaultDebugOutputFilter;
@@ -1630,11 +1630,11 @@ debug_init(kernel_args* args)
 	syslog_init(args);
 
 	debug_paranoia_init();
-	return arch_debug_console_init(args);
+	arch_debug_console_init(args);
 }
 
 
-status_t
+void
 debug_init_post_vm(kernel_args* args)
 {
 	add_debugger_command_etc("cpu", &cmd_switch_cpu,
@@ -1653,13 +1653,19 @@ debug_init_post_vm(kernel_args* args)
 			"entering KDL.\n", 0);
 
 	debug_builtin_commands_init();
+	arch_debug_init(args);
 
 	debug_heap_init();
 	debug_variables_init();
 	frame_buffer_console_init(args);
 	arch_debug_console_init_settings(args);
 	tracing_init();
+}
 
+
+void
+debug_init_post_settings(struct kernel_args* args)
+{
 	// get debug settings
 
 	sSerialDebugEnabled = get_safemode_boolean("serial_debug_output",
@@ -1679,12 +1685,10 @@ debug_init_post_vm(kernel_args* args)
 		blue_screen_enter(true);
 
 	syslog_init_post_vm(args);
-
-	return arch_debug_init(args);
 }
 
 
-status_t
+void
 debug_init_post_modules(struct kernel_args* args)
 {
 	void* cookie;
@@ -1722,7 +1726,7 @@ debug_init_post_modules(struct kernel_args* args)
 	}
 	close_module_list(cookie);
 
-	return frame_buffer_console_init_post_modules(args);
+	frame_buffer_console_init_post_modules(args);
 }
 
 

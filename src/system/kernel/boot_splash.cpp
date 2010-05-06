@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,6 +35,7 @@
 
 static struct frame_buffer_boot_info *sInfo;
 static uint8 *sUncompressedIcons;
+
 
 static void
 blit8_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
@@ -199,7 +200,7 @@ blit_cropped(const uint8* data, uint16 imageLeft, uint16 imageTop,
 
 
 void
-boot_splash_init(uint8 *boot_splash)
+boot_splash_init(uint8 *bootSplash)
 {
 	TRACE("boot_splash_init: enter\n");
 
@@ -209,7 +210,7 @@ boot_splash_init(uint8 *boot_splash)
 	sInfo = (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO,
 		NULL);
 
-	sUncompressedIcons = boot_splash;
+	sUncompressedIcons = bootSplash;
 }
 
 

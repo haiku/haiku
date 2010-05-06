@@ -10,19 +10,20 @@
 #include "PackageStatus.h"
 
 #include <Autolock.h>
-
+#include <Catalog.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupLayout.h>
+#include <Locale.h>
 
 #include <stdio.h>
 #include <string.h>
 
-// Macro reserved for later localization
-#define T(x) x
-
+#undef TR_CONTEXT
+#define TR_CONTEXT "PackageStatus"
 
 StopButton::StopButton()
-	:	BButton(BRect(0, 0, 22, 18), "stop", "", new BMessage(P_MSG_STOP))
+	:
+	BButton(BRect(0, 0, 22, 18), "stop", TR("Stop"), new BMessage(P_MSG_STOP))
 {
 }
 
@@ -33,7 +34,8 @@ StopButton::Draw(BRect updateRect)
 	BButton::Draw(updateRect);
 
 	updateRect = Bounds();
-	updateRect.InsetBy((updateRect.Width() - 4) / 2, (updateRect.Height() - 4) / 2);
+	updateRect.InsetBy((updateRect.Width() - 4) / 2,
+		(updateRect.Height() - 4) / 2);
 	//updateRect.InsetBy(9, 7);
 	SetHighColor(0, 0, 0);
 	FillRect(updateRect);
@@ -93,14 +95,15 @@ StopButton::Draw(BRect updateRect)
 
 PackageStatus::PackageStatus(const char *title, const char *label, 
 		const char *trailing, BHandler *parent)
-	:	BWindow(BRect(200, 200, 550, 255), title, B_TITLED_WINDOW,
-			B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE, 0),
+	:
+	BWindow(BRect(200, 200, 550, 255), title, B_TITLED_WINDOW,
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE, 0),
 	fIsStopped(false),
 	fParent(parent)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	fStatus = new BStatusBar("status_bar", T("Installing package"));
+	fStatus = new BStatusBar("status_bar", TR("Installing package"));
 	fStatus->SetBarHeight(12);
 
 	fButton = new StopButton();

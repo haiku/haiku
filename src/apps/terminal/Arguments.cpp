@@ -3,11 +3,19 @@
  * Distributed under the terms of the MIT License.
  */
 
+
+#include "Arguments.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "Arguments.h"
+#include <Catalog.h>
+#include <Locale.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Terminal arguments parsing"
 
 
 Arguments::Arguments(int defaultArgsNum, const char * const *defaultArgs)
@@ -27,7 +35,6 @@ Arguments::~Arguments()
 {
 	_SetShellArguments(0, NULL);
 }
-
 
 void
 Arguments::Parse(int argc, const char *const *argv)
@@ -75,7 +82,7 @@ Arguments::Parse(int argc, const char *const *argv)
 				argi++;			
 			} else {
 				// illegal option
-				fprintf(stderr, "Unrecognized option \"%s\"\n", arg);
+				fprintf(stderr, TR("Unrecognized option \"%s\"\n"), arg);
 				fUsageRequested = true;
 			}
 

@@ -20,8 +20,11 @@ OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies MandatoryPackages : Sed Tar ;
 OptionalPackageDependencies NetFS : UserlandFS ;
+OptionalPackageDependencies Pe : PCRE ;
 OptionalPackageDependencies Vim : LibIconv ;
 OptionalPackageDependencies XZ-Utils : Tar ;
-OptionalPackageDependencies Tar : LibIconv ; 
-OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ; 
+OptionalPackageDependencies Tar : LibIconv ;
+OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
+OptionalPackageDependencies Transmission : LibEvent GetText Curl OpenSSL LibIconv ;
+OptionalPackageDependencies GetText : LibIconv ;
 
