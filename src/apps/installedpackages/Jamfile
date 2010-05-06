@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps installedpackages ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders shared interface ;
 SubDirHdrs $(HAIKU_TOP) src apps packageinstaller ;
 
@@ -13,5 +11,14 @@ Application InstalledPackages :
 	main.cpp
 	UninstallWindow.cpp
 	UninstallView.cpp
-	: be tracker $(TARGET_LIBSUPC++)
+	: be locale tracker translation z $(TARGET_LIBSUPC++)
 ;
+
+DoCatalogs InstalledPackages :
+	x-vnd.Haiku-InstalledPackages
+	:
+	main.cpp
+	UninstallView.cpp
+	UninstallWindow.cpp
+;
+

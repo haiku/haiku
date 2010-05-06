@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Haiku, Inc.
+ * Copyright (c) 2007-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -8,41 +8,47 @@
 #ifndef UNINSTALLVIEW_H
 #define UNINSTALLVIEW_H
 
-#include <View.h>
-#include <Layout.h>
-#include <ListView.h>
-#include <ScrollView.h>
-#include <Button.h>
-#include <TextView.h>
+#include <GroupView.h>
 #include <Path.h>
 
 #include "InstalledPackageInfo.h"
 
 
-class UninstallView : public BView {
+class BButton;
+class BListView;
+class BTextView;
+class BScrollView;
+
+
+class UninstallView : public BGroupView {
 public:
-							UninstallView(BRect frame);
-	virtual					~UninstallView();
+								UninstallView();
+	virtual						~UninstallView();
 
-	virtual	void			AttachedToWindow();
-	virtual	void			MessageReceived(BMessage* message);
-		
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
+
 private:
-	class InfoItem;
+			void				_InitView();
+			status_t			_ReloadAppList();
+			void				_AddFile(const char* filename,
+									const node_ref& ref);
+			void				_ClearAppList();
+			void				_CachePathToPackages();
 
-			void			_InitView();
-			status_t		_ReloadAppList();
-			void			_AddFile(const char* filename, const node_ref& ref);
-			void			_ClearAppList();
-			void			_CachePathToPackages();
+private:
+			class InfoItem;
 
-			BPath			fToPackages;
-			BListView*		fAppList;
-			BTextView*		fDescription;
-			BButton*		fButton;
-			BScrollView*	fDescScroll;
+			BPath				fToPackages;
+			BListView*			fAppList;
+			BTextView*			fDescription;
+			BButton*			fButton;
+			BScrollView*		fDescScroll;
 			InstalledPackageInfo fCurrentSelection;
-			bool			fWatcherRunning;
+			bool				fWatcherRunning;
+
+			const char*			fNoPackageSelectedString;
 };
+
 
 #endif // UNINSTALLVIEW_H
