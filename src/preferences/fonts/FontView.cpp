@@ -53,11 +53,11 @@ FontView::FontView()
 	: BView("Fonts", B_WILL_DRAW )
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
- 
-	fPlainView = new FontSelectionView("plain", TR("Plain font:"));
-	fBoldView = new FontSelectionView("bold", TR("Bold font:"));
-	fFixedView = new FontSelectionView("fixed", TR("Fixed font:"));
-	fMenuView = new FontSelectionView("menu", TR("Menu font:"));
+
+	fPlainView = new FontSelectionView("plain", B_TRANSLATE("Plain font:"));
+	fBoldView = new FontSelectionView("bold", B_TRANSLATE("Bold font:"));
+	fFixedView = new FontSelectionView("fixed", B_TRANSLATE("Fixed font:"));
+	fMenuView = new FontSelectionView("menu", B_TRANSLATE("Menu font:"));
 
 	BGridLayout* layout = new BGridLayout(5, 5);
 	layout->SetInsets(10, 10, 10, 10);
@@ -98,7 +98,7 @@ FontView::MessageReceived(BMessage* message)
 			else if (!strcmp(name, "bold"))
 				fBoldView->MessageReceived(message);
 			else if (!strcmp(name, "fixed"))
-				fFixedView->MessageReceived(message);			
+				fFixedView->MessageReceived(message);
 			else if (!strcmp(name, "menu"))
 				fMenuView->MessageReceived(message);
 			else
@@ -106,7 +106,7 @@ FontView::MessageReceived(BMessage* message)
 
 			Window()->PostMessage(kMsgUpdate);
 			break;
-		}	
+		}
 		default:
 			BView::MessageReceived(message);
 	}

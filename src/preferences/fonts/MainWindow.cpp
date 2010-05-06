@@ -40,16 +40,16 @@ static const uint32 kMsgCheckFonts = 'chkf';
 
 
 MainWindow::MainWindow()
-	: BWindow(BRect(0, 0, 1, 1), TR("Fonts"), B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 1, 1), B_TRANSLATE("Fonts"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	fDefaultsButton = new BButton("defaults", TR("Defaults"),
+	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 	fDefaultsButton->SetEnabled(false);
 
-	fRevertButton = new BButton("revert", TR("Revert"),
+	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert), B_WILL_DRAW);
-	fRevertButton->SetEnabled(false);	
+	fRevertButton->SetEnabled(false);
 
 //	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 

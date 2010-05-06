@@ -6,7 +6,7 @@
  *		Mark Hogben
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Axel Dörfler, axeld@pinc-software.de
- *		Philippe Saint-Pierre, stpere@gmail.com 
+ *		Philippe Saint-Pierre, stpere@gmail.com
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
@@ -103,15 +103,18 @@ FontSelectionView::FontSelectionView(const char* name,
 	fFontsMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// size menu
-	fSizesMenuField = new BMenuField("size", TR("Size:"), fSizesMenu, NULL);
+	fSizesMenuField = new BMenuField("size", B_TRANSLATE("Size:"),
+		fSizesMenu, NULL);
 	fSizesMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// preview
 	fPreviewText = new BStringView("preview text",
-		TR_CMT("The quick brown fox jumps over the lazy dog.","Don't translate this literally ! Use a phrase showing all chars from A to Z.")); 
+		B_TRANSLATE_COMMENT("The quick brown fox jumps over the lazy dog.",
+			"Don't translate this literally ! Use a phrase showing all chars "
+			"from A to Z."));
 
 	fPreviewText->SetFont(&fCurrentFont);
-	fPreviewText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET)); 
+	fPreviewText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	// box around preview
 	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
@@ -205,28 +208,28 @@ FontSelectionView::MessageReceived(BMessage *msg)
 }
 
 
-BLayoutItem* 
+BLayoutItem*
 FontSelectionView::CreateSizesLabelLayoutItem()
 {
 	return fSizesMenuField->CreateLabelLayoutItem();
 }
 
 
-BLayoutItem* 
+BLayoutItem*
 FontSelectionView::CreateSizesMenuBarLayoutItem()
 {
 	return fSizesMenuField->CreateMenuBarLayoutItem();
 }
 
 
-BLayoutItem* 
+BLayoutItem*
 FontSelectionView::CreateFontsLabelLayoutItem()
 {
 	return fFontsMenuField->CreateLabelLayoutItem();
 }
 
 
-BLayoutItem* 
+BLayoutItem*
 FontSelectionView::CreateFontsMenuBarLayoutItem()
 {
 	return fFontsMenuField->CreateMenuBarLayoutItem();
@@ -249,7 +252,7 @@ FontSelectionView::_BuildSizesMenu()
 
 		BMessage* message = new BMessage(kMsgSetSize);
 		message->AddInt32("size", size);
-		message->AddString("name", Name()); 
+		message->AddString("name", Name());
 
 		BMenuItem* item = new BMenuItem(label, message);
 		if (size == fCurrentFont.Size())

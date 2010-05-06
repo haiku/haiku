@@ -43,8 +43,8 @@ FontsApp::FontsApp()
 void
 FontsApp::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", TR("Fonts\n"
-		"\tCopyright 2004-2005, Haiku.\n\n"), TR("OK"));
+	BAlert *alert = new BAlert("about", B_TRANSLATE("Fonts\n"
+		"\tCopyright 2004-2005, Haiku.\n\n"), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -52,7 +52,7 @@ FontsApp::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 5, &font);
 
 	alert->Go();
