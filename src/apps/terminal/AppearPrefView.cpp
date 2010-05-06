@@ -62,17 +62,17 @@ AppearancePrefView::AppearancePrefView(const char* name,
   	};
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	
+
 	BMenu* fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
 		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
-	
+
 	BMenu* sizeMenu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
-	
-	fFont = new BMenuField(TR("Font:"), fontMenu);
-	fFontSize = new BMenuField(TR("Size:"), sizeMenu);
-	fColorField = new BMenuField(TR("Color:"),
+
+	fFont = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
+	fFontSize = new BMenuField(B_TRANSLATE("Size:"), sizeMenu);
+	fColorField = new BMenuField(B_TRANSLATE("Color:"),
 		_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 		kColorTable[0]));
 
@@ -93,9 +93,9 @@ AppearancePrefView::AppearancePrefView(const char* name,
 					B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
 			.End()
 		.End();
-	
+
 	AddChild(layoutView);
-	
+
 	fFont->SetAlignment(B_ALIGN_RIGHT);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
 	fColorField->SetAlignment(B_ALIGN_RIGHT);
@@ -105,7 +105,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
 	BTextControl* greenInput = (BTextControl*)fColorControl->ChildAt(1);
 	BTextControl* blueInput = (BTextControl*)fColorControl->ChildAt(2);
-	
+
 	redInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	greenInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	blueInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -160,16 +160,16 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 			const char* style = NULL;
 			msg->FindString("font_family", &family);
 			msg->FindString("font_style", &style);
-			
+
 			PrefHandler* pref = PrefHandler::Default();
-			const char* currentFamily 
+			const char* currentFamily
 				= pref->getString(PREF_HALF_FONT_FAMILY);
 			const char* currentStyle
 				= pref->getString(PREF_HALF_FONT_STYLE);
 			if (currentFamily == NULL || strcmp(currentFamily, family)
 				|| currentStyle == NULL || strcmp(currentStyle, style)) {
 				pref->setString(PREF_HALF_FONT_FAMILY, family);
-				pref->setString(PREF_HALF_FONT_STYLE, style);		
+				pref->setString(PREF_HALF_FONT_STYLE, style);
 				modified = true;
 			}
 			break;
@@ -177,7 +177,7 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 		case MSG_HALF_SIZE_CHANGED:
 			if (strcmp(PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE),
 					fFontSize->Menu()->FindMarked()->Label())) {
-	
+
 				PrefHandler::Default()->setString(PREF_HALF_FONT_SIZE,
 					fFontSize->Menu()->FindMarked()->Label());
 				modified = true;
@@ -224,23 +224,23 @@ IsFontUsable(const BFont& font)
 
 	if (font.IsFixed())
 		return true;
-	
+
 	// manually check if all applicable chars are the same width
 	char buffer[2] = { ' ', 0 };
 	int firstWidth = (int)ceilf(font.StringWidth(buffer));
-	
+
 	// TODO: Workaround for broken fonts/font_subsystem
 	if (firstWidth <= 0)
 		return false;
-		
+
 	for (int c = ' '+1; c <= 0x7e; c++) {
 		buffer[0] = c;
 		int width = (int)ceilf(font.StringWidth(buffer));
-		
+
 		if (width != firstWidth)
 			return false;
 	}
-	
+
 	return true;
 }
 
@@ -253,7 +253,7 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 	BPopUpMenu* menu = new BPopUpMenu("");
 	int32 numFamilies = count_font_families();
 	uint32 flags;
-	
+
 	for (int32 i = 0; i < numFamilies; i++) {
 		font_family family;
 		if (get_font_family(i, &family, &flags) == B_OK) {
@@ -281,7 +281,7 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 			}
 		}
 	}
-	
+
 	if (menu->FindMarked() == NULL)
 		menu->ItemAt(0)->SetMarked(true);
 

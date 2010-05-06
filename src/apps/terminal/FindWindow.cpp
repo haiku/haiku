@@ -32,7 +32,7 @@ const BRect kWindowFrame(10, 30, 250, 200);
 FindWindow::FindWindow(BMessenger messenger, const BString& str,
 		bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	:
-	BWindow(kWindowFrame, TR("Find"), B_FLOATING_WINDOW,
+	BWindow(kWindowFrame, B_TRANSLATE("Find"), B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
 		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindDlgMessenger(messenger)
@@ -48,16 +48,16 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 	BView* layoutView = BGroupLayoutBuilder(B_VERTICAL, 5.0)
 		.SetInsets(spacing, spacing, spacing, spacing)
 		.Add(BGridLayoutBuilder()
-			.Add(fTextRadio = new BRadioButton(TR("Use text:"),
+			.Add(fTextRadio = new BRadioButton(B_TRANSLATE("Use text:"),
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 0)
 			.Add(fFindLabel = new BTextControl(NULL, NULL, NULL), 1, 0)
-			.Add(useSelection = new BRadioButton(TR("Use selection"),
+			.Add(useSelection = new BRadioButton(B_TRANSLATE("Use selection"),
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 1))
 		.Add(separator)
-		.Add(fForwardSearchBox = new BCheckBox(TR("Search forward")))
-		.Add(fMatchCaseBox = new BCheckBox(TR("Match case")))
-		.Add(fMatchWordBox = new BCheckBox(TR("Match word")))
-		.Add(fFindButton = new BButton(TR("Find"), new BMessage(MSG_FIND)))
+		.Add(fForwardSearchBox = new BCheckBox(B_TRANSLATE("Search forward")))
+		.Add(fMatchCaseBox = new BCheckBox(B_TRANSLATE("Match case")))
+		.Add(fMatchWordBox = new BCheckBox(B_TRANSLATE("Match word")))
+		.Add(fFindButton = new BButton(B_TRANSLATE("Find"), new BMessage(MSG_FIND)))
 		.End();
 	AddChild(layoutView);
 

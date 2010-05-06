@@ -96,7 +96,7 @@ TermParse::StartThreads(TerminalBuffer *buffer)
 
 	fQuitting = false;
 	fBuffer = buffer;
-	
+
 	status_t status = _InitPtyReader();
 	if (status < B_OK) {
 		fBuffer = NULL;
@@ -143,7 +143,7 @@ TermParse::_InitTermParse()
 
 	if (fParseThread < 0)
 		return fParseThread;
-		
+
 	resume_thread(fParseThread);
 
 	return B_OK;
@@ -291,17 +291,17 @@ TermParse::DumpState(int *groundtable, int *parsestate, uchar c)
 	{ NULL, NULL }
 	};
 	int i;
-	fprintf(stderr, TR("groundtable: "));
+	fprintf(stderr, B_TRANSLATE("groundtable: "));
 	for (i = 0; tables[i].p; i++) {
 		if (tables[i].p == groundtable)
 			fprintf(stderr, "%s\t", tables[i].name);
 	}
-	fprintf(stderr, TR("parsestate: "));
+	fprintf(stderr, B_TRANSLATE("parsestate: "));
 	for (i = 0; tables[i].p; i++) {
 		if (tables[i].p == parsestate)
 			fprintf(stderr, "%s\t", tables[i].name);
 	}
-	fprintf(stderr, TR("char: 0x%02x (%d)\n"), c, c);
+	fprintf(stderr, B_TRANSLATE("char: 0x%02x (%d)\n"), c, c);
 }
 
 
@@ -332,7 +332,7 @@ TermParse::EscParse()
 	int32 srcLen;
 	int32 dstLen;
 	long dummyState = 0;
-					
+
 	int width = 1;
 	BAutolock locker(fBuffer);
 
@@ -1026,7 +1026,7 @@ TermParse::EscParse()
 					default:
 						break;
 				}
-		} catch (...) {	
+		} catch (...) {
 			break;
 		}
 	}

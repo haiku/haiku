@@ -1431,7 +1431,8 @@ TermView::FrameResized(float width, float height)
 	bool hasResizeView = fResizeRunner != NULL;
 	if (!hasResizeView) {
 		// show the current size in a view
-		fResizeView = new BStringView(BRect(100, 100, 300, 140), TR("size"), "");
+		fResizeView = new BStringView(BRect(100, 100, 300, 140),
+			B_TRANSLATE("size"), "");
 		fResizeView->SetAlignment(B_ALIGN_CENTER);
 		fResizeView->SetFont(be_bold_font);
 
@@ -1825,12 +1826,15 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 	cpMessage->what = kSecondaryMouseDropAction;
 	cpMessage->AddInt8("action", kCopyFiles);
 
-	BMenuItem* insertItem = new BMenuItem(TR("Insert path"), insertMessage);
-	BMenuItem* cdItem = new BMenuItem(TR("Change directory"), cdMessage);
-	BMenuItem* lnItem = new BMenuItem(TR("Create link here"), lnMessage);
-	BMenuItem* mvItem = new BMenuItem(TR("Move here"), mvMessage);
-	BMenuItem* cpItem = new BMenuItem(TR("Copy here"), cpMessage);
-	BMenuItem* chItem = new BMenuItem(TR("Cancel"), NULL);
+	BMenuItem* insertItem = new BMenuItem(
+		B_TRANSLATE("Insert path"), insertMessage);
+	BMenuItem* cdItem = new BMenuItem(
+		B_TRANSLATE("Change directory"), cdMessage);
+	BMenuItem* lnItem = new BMenuItem(
+		B_TRANSLATE("Create link here"), lnMessage);
+	BMenuItem* mvItem = new BMenuItem(B_TRANSLATE("Move here"), mvMessage);
+	BMenuItem* cpItem = new BMenuItem(B_TRANSLATE("Copy here"), cpMessage);
+	BMenuItem* chItem = new BMenuItem(B_TRANSLATE("Cancel"), NULL);
 
 	// if the refs point to different directorys disable the cd menu item
 	bool differentDirs = false;
@@ -1858,7 +1862,8 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 	if (differentDirs)
 		cdItem->SetEnabled(false);
 
-	BPopUpMenu *menu = new BPopUpMenu(TR("Secondary mouse button drop menu"));
+	BPopUpMenu *menu = new BPopUpMenu(
+		B_TRANSLATE("Secondary mouse button drop menu"));
 	menu->SetAsyncAutoDestruct(true);
 	menu->AddItem(insertItem);
 	menu->AddSeparatorItem();
@@ -2768,10 +2773,11 @@ void
 TermView::AboutRequested()
 {
 	BAlert *alert = new (std::nothrow) BAlert("about",
-		TR("Terminal\n\n"
-		"written by Kazuho Okui and Takashi Murai\n"
-		"updated by Kian Duffy and others\n\n"
-		"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n"), TR("OK"));
+		B_TRANSLATE("Terminal\n\n"
+			"written by Kazuho Okui and Takashi Murai\n"
+			"updated by Kian Duffy and others\n\n"
+			"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n"),
+		B_TRANSLATE("OK"));
 	if (alert != NULL)
 		alert->Go();
 }

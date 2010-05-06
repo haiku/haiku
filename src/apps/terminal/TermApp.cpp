@@ -1,7 +1,7 @@
 /*
  * Copyright 2001-2009, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT license.
  */
@@ -67,7 +67,7 @@ TermApp::TermApp()
 	const char *defaultArgs[2];
 	defaultArgs[0] = kDefaultShell;
 	defaultArgs[1] = "--login";
-	
+
 	struct passwd passwdStruct;
 	struct passwd *passwdResult;
 	char stringBuffer[256];
@@ -75,12 +75,12 @@ TermApp::TermApp()
 			sizeof(stringBuffer), &passwdResult)) {
 		defaultArgs[0] = passwdStruct.pw_shell;
 	}
-	
+
 	be_locale->GetAppCatalog(&fAppCatalog);
-	
+
 	fArgs = new Arguments(2, defaultArgs);
-	
-	fWindowTitle = TR("Terminal");
+
+	fWindowTitle = B_TRANSLATE("Terminal");
 	_RegisterTerminal();
 
 	if (fWindowNumber > 0)
@@ -122,7 +122,8 @@ TermApp::ReadyToRun()
 #endif
 	action.sa_userdata = this;
 	if (sigaction(SIGCHLD, &action, NULL) < 0) {
-		fprintf(stderr, TR("sigaction() failed: %s\n"), strerror(errno));
+		fprintf(stderr, B_TRANSLATE("sigaction() failed: %s\n"),
+			strerror(errno));
 		// continue anyway
 	}
 
@@ -134,8 +135,9 @@ TermApp::ReadyToRun()
 	// failed spawn, print stdout and open alert panel
 	// TODO: This alert does never show up.
 	if (status < B_OK) {
-		(new BAlert("alert", TR("Terminal couldn't start the shell. Sorry."),
-			TR("OK"), NULL, NULL, B_WIDTH_FROM_LABEL,
+		(new BAlert("alert",
+			B_TRANSLATE("Terminal couldn't start the shell. Sorry."),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_FROM_LABEL,
 			B_INFO_ALERT))->Go(NULL);
 		PostMessage(B_QUIT_REQUESTED);
 		return;
@@ -200,14 +202,14 @@ void
 TermApp::ArgvReceived(int32 argc, char **argv)
 {
 	fArgs->Parse(argc, argv);
-	
+
 	if (fArgs->UsageRequested()) {
 		_Usage(argv[0]);
 		sUsageRequested = true;
 		PostMessage(B_QUIT_REQUESTED);
-		return;	
+		return;
 	}
-	
+
 	if (fArgs->Title() != NULL)
 		fWindowTitle = fArgs->Title();
 
@@ -216,17 +218,17 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 
 
 void
-TermApp::RefsReceived(BMessage* message) 
-{ 
+TermApp::RefsReceived(BMessage* message)
+{
 	// Works Only Launced by Double-Click file, or Drags file to App.
 	if (!IsLaunching())
 		return;
 
-	entry_ref ref; 
+	entry_ref ref;
 	if (message->FindRef("refs", 0, &ref) != B_OK)
 		return;
 
-	BFile file; 
+	BFile file;
 	if (file.SetTo(&ref, B_READ_WRITE) != B_OK)
 		return;
 
@@ -236,7 +238,7 @@ TermApp::RefsReceived(BMessage* message)
 
 	// if App opened by Pref file
 	if (!strcmp(mimetype, PREFFILE_MIMETYPE)) {
-	
+
 		BEntry ent(&ref);
 		BPath path(&ent);
 		PrefHandler::Default()->OpenText(path.Path());
@@ -249,7 +251,7 @@ TermApp::RefsReceived(BMessage* message)
 		//    beep();
 		return;
 	}
-}  
+}
 
 
 status_t
@@ -258,13 +260,13 @@ TermApp::_MakeTermWindow(BRect &frame)
 	try {
 		fTermWindow = new TermWindow(frame, fWindowTitle.String(), fArgs);
 	} catch (int error) {
-		return (status_t)error;	
+		return (status_t)error;
 	} catch (...) {
 		return B_ERROR;
 	}
 
 	fTermWindow->Show();
-	
+
 	return B_OK;
 }
 
@@ -285,7 +287,7 @@ TermApp::_SwitchTerm()
 {
 	team_id myId = be_app->Team();
 	BList teams;
-	be_roster->GetAppList(TERM_SIGNATURE, &teams); 
+	be_roster->GetAppList(TERM_SIGNATURE, &teams);
 
 	int32 numTerms = teams.CountItems();
 	if (numTerms <= 1)
@@ -504,7 +506,7 @@ TermApp::_RegisterTerminal()
 
 
 //#ifndef B_NETPOSITIVE_APP_SIGNATURE
-//#define B_NETPOSITIVE_APP_SIGNATURE "application/x-vnd.Be-NPOS" 
+//#define B_NETPOSITIVE_APP_SIGNATURE "application/x-vnd.Be-NPOS"
 //#endif
 //
 //void
@@ -518,7 +520,7 @@ TermApp::_RegisterTerminal()
 //  message.AddString("be:url", url);
 
 //  be_roster->Launch(B_NETPOSITIVE_APP_SIGNATURE, &message);
-//  while(!(be_roster->IsRunning(B_NETPOSITIVE_APP_SIGNATURE)))  
+//  while(!(be_roster->IsRunning(B_NETPOSITIVE_APP_SIGNATURE)))
 //    snooze(10000);
 //
 //  // Activate net+
@@ -562,17 +564,17 @@ TermApp::_ChildCleanupThread(void* data)
 void
 TermApp::_Usage(char *name)
 {
-	fprintf(stderr, TR("Haiku Terminal\n"
+	fprintf(stderr, B_TRANSLATE("Haiku Terminal\n"
 		"Copyright 2001-2009 Haiku, Inc.\n"
 		"Copyright(C) 1999 Kazuho Okui and Takashi Murai.\n"
 		"\n"
 		"Usage: %s [OPTION] [SHELL]\n"), name);
 
 	fprintf(stderr,
-		TR("  -h,     --help               print this help\n"    
+		B_TRANSLATE("  -h,     --help               print this help\n"
 		//"  -p,     --preference         load preference file\n"
 		"  -t,     --title              set window title\n"
-		"  -f,     --fullscreen         start fullscreen\n")		
+		"  -f,     --fullscreen         start fullscreen\n")
 		//"  -geom,  --geometry           set window geometry\n"
 		//"                               An example of geometry is \"80x25+100+100\"\n"
 		);

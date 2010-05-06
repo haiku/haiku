@@ -2,7 +2,7 @@
  * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Copyright (c) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Distributed unter the terms of the MIT License.
  */
@@ -130,13 +130,13 @@ PrefHandler::GetDefaultPath(BPath& path)
 	status = path.Append("Terminal");
 	if (status != B_OK)
 		return status;
-	
+
 	// Just create the directory. Harmless if already there
 	status = create_directory(path.Path(), 0755);
 	if (status != B_OK)
 		return status;
-		
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU	
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	status = path.Append("Default");
 #else
 	status = path.Append("HaikuTerminal_settings");
@@ -220,7 +220,7 @@ PrefHandler::SaveAsText(const char *path, const char *mimetype,
 }
 
 
-int32 
+int32
 PrefHandler::getInt32(const char *key)
 {
 	const char *value = fContainer.FindString(key);
@@ -231,7 +231,7 @@ PrefHandler::getInt32(const char *key)
 }
 
 
-float 
+float
 PrefHandler::getFloat(const char *key)
 {
 	const char *value = fContainer.FindString(key);
@@ -244,12 +244,12 @@ PrefHandler::getFloat(const char *key)
 #undef TR_CONTEXT
 #define TR_CONTEXT "Terminal getString"
 
-const char* 
+const char*
 PrefHandler::getString(const char *key)
 {
 	const char *buffer;
 	if (fContainer.FindString(key, &buffer) != B_OK)
-		buffer = TR("Error!");
+		buffer = B_TRANSLATE("Error!");
 
 	//printf("%x GET %s: %s\n", this, key, buf);
 	return buffer;
@@ -281,7 +281,8 @@ PrefHandler::getRGB(const char *key)
 	if (const char *s = fContainer.FindString(key)) {
 		sscanf(s, "%d, %d, %d", &r, &g, &b);
 	} else {
-		fprintf(stderr, TR("PrefHandler::getRGB(%s) - key not found\n"), key);
+		fprintf(stderr,
+			B_TRANSLATE("PrefHandler::getRGB(%s) - key not found\n"), key);
 		r = g = b = 0;
 	}
 

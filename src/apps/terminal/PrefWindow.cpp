@@ -1,7 +1,7 @@
 /*
  * Copyright 2007-2009, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
- * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -27,7 +27,7 @@
 #define TR_CONTEXT "Terminal PrefWindow"
 
 PrefWindow::PrefWindow(const BMessenger &messenger)
-	: BWindow(BRect(0, 0, 375, 185), TR("Terminal settings"),
+	: BWindow(BRect(0, 0, 375, 185), B_TRANSLATE("Terminal settings"),
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_AUTO_UPDATE_SIZE_LIMITS),
 	fPreviousPref(new PrefHandler(PrefHandler::Default())),
@@ -38,22 +38,23 @@ PrefWindow::PrefWindow(const BMessenger &messenger)
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_VERTICAL)
 		.SetInsets(10, 10, 10, 10)
-			.Add(new AppearancePrefView(TR("Appearance"), fTerminalMessenger))
+			.Add(new AppearancePrefView(B_TRANSLATE("Appearance"),
+				fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)
 				.Add(fSaveAsFileButton = new BButton("savebutton",
-					TR("Save to file" B_UTF8_ELLIPSIS),
+					B_TRANSLATE("Save to file" B_UTF8_ELLIPSIS),
 					new BMessage(MSG_SAVEAS_PRESSED), B_WILL_DRAW))
 				.AddGlue()
 				.Add(fRevertButton = new BButton("revertbutton",
-					TR("Cancel"), new BMessage(MSG_REVERT_PRESSED),
+					B_TRANSLATE("Cancel"), new BMessage(MSG_REVERT_PRESSED),
 					B_WILL_DRAW))
-				.Add(fSaveButton = new BButton("okbutton", TR("OK"),
+				.Add(fSaveButton = new BButton("okbutton", B_TRANSLATE("OK"),
 					new BMessage(MSG_SAVE_PRESSED), B_WILL_DRAW))
 			.End()
 		.End();
-			
+
 	fSaveButton->MakeDefault(true);
-	
+
 	AddShortcut('Q', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
@@ -83,13 +84,14 @@ PrefWindow::QuitRequested()
 	if (!fDirty)
 		return true;
 
-	BAlert *alert = new BAlert("", TR("Save changes to this settings panel?"),
-		TR("Cancel"), TR("Don't save"), TR("Save"),
+	BAlert *alert = new BAlert("",
+		B_TRANSLATE("Save changes to this settings panel?"),
+		B_TRANSLATE("Cancel"), B_TRANSLATE("Don't save"), B_TRANSLATE("Save"),
 		B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-		B_WARNING_ALERT); 
-	alert->SetShortcut(0, B_ESCAPE); 
-	alert->SetShortcut(1, 'd'); 
-	alert->SetShortcut(2, 's'); 
+		B_WARNING_ALERT);
+	alert->SetShortcut(0, B_ESCAPE);
+	alert->SetShortcut(1, 'd');
+	alert->SetShortcut(2, 's');
 
 	int32 index = alert->Go();
 	if (index == 0)
@@ -111,7 +113,7 @@ PrefWindow::_SaveAs()
 		BMessenger messenger(this);
 		fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger);
 	}
-	
+
 	fSavePanel->Show();
 }
 

@@ -46,7 +46,7 @@ Arguments::Parse(int argc, const char *const *argv)
 		if (*arg == '-') {
 			if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
 				fUsageRequested = true;
-			
+
 			/*} else if (strcmp(arg, "-l") == 0) {
 				// location
 				float x, y;
@@ -78,11 +78,12 @@ Arguments::Parse(int argc, const char *const *argv)
 					fTitle = argv[argi++];
 
 			} else if (strcmp(arg, "-f") == 0 || strcmp(arg, "--fullscreen") == 0) {
-				fFullScreen = true;				
-				argi++;			
+				fFullScreen = true;
+				argi++;
 			} else {
 				// illegal option
-				fprintf(stderr, TR("Unrecognized option \"%s\"\n"), arg);
+				fprintf(stderr, B_TRANSLATE("Unrecognized option \"%s\"\n"),
+					arg);
 				fUsageRequested = true;
 			}
 

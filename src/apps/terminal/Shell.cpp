@@ -364,7 +364,8 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 			} else {
 				// B_BUSY is a normal case
 				if (errno != B_BUSY)
-					fprintf(stderr, TR("could not open %s: %s\n"), ptyName, strerror(errno));
+					fprintf(stderr, B_TRANSLATE("could not open %s: %s\n"),
+						ptyName, strerror(errno));
 			}
 		}
 		closedir(dir);
@@ -372,7 +373,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 #endif /* __HAIKU__ */
 
 	if (master < 0) {
-    	fprintf(stderr, TR("Didn't find any available pseudo ttys."));
+    	fprintf(stderr, B_TRANSLATE("Didn't find any available pseudo ttys."));
     	return errno;
 	}
 
@@ -380,7 +381,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 	if (grantpt(master) != 0 || unlockpt(master) != 0
 		|| (ttyName = ptsname(master)) == NULL) {
 		close(master);
-    	fprintf(stderr, TR("Failed to init pseudo tty."));
+    	fprintf(stderr, B_TRANSLATE("Failed to init pseudo tty."));
 		return errno;
 	}
 #endif /* __HAIKU__ */
@@ -415,7 +416,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		if (setsid() < 0) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				TR("could not set session leader."));
+				B_TRANSLATE("could not set session leader."));
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -425,7 +426,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		if ((slave = open(ttyName, O_RDWR)) < 0) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				TR("can't open tty (%s)."), ttyName);
+				B_TRANSLATE("can't open tty (%s)."), ttyName);
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -464,7 +465,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		if (tcsetattr(0, TCSANOW, &tio) == -1) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				TR("failed set terminal interface (TERMIOS)."));
+				B_TRANSLATE("failed set terminal interface (TERMIOS)."));
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -480,7 +481,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		if (handshake.status != PTY_WS) {
 			handshake.status = PTY_NG;
 			snprintf(handshake.msg, sizeof(handshake.msg),
-				TR("mismatch handshake."));
+				B_TRANSLATE("mismatch handshake."));
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
@@ -517,8 +518,8 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 		sleep(1);
 		BString knonLocalizedPart = "alert --stop ";
-		const char *kLocalizedPart = 
-			TR("'Cannot execute \"%s\":\n\t%s' 'Use default shell' 'Abort'");
+		const char *kLocalizedPart =
+			B_TRANSLATE("'Cannot execute \"%s\":\n\t%s' 'Use default shell' 'Abort'");
 		const char *spawnAlertMessage = knonLocalizedPart << kLocalizedPart;
 		char errorMessage[256];
 		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, argv[0], strerror(errno));
