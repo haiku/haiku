@@ -662,23 +662,23 @@ if [ IsOptionalHaikuImagePackageAdded GetText ] {
 		Echo "No optional package GetText available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage
-			gettext-0.17-x86-gcc4-2010-05-06.zip
-			: $(baseURL)/gettext-0.17-x86-gcc4-2010-05-06.zip
-			:
-			: true
-		;
-		InstallSourceArchive gettext-0.17_haiku-2010-05-06.tar.xz
-			: $(baseSourceURL)/gettext-0.17_haiku-2010-05-06.tar.xz ;
+			InstallOptionalHaikuImagePackage
+				gettext-0.17-x86-gcc4-2010-05-06.zip
+				: $(baseURL)/gettext-0.17-x86-gcc4-2010-05-06.zip
+				:
+				: true
+			;
+			InstallSourceArchive gettext-0.17_haiku-2010-05-06.tar.xz
+				: $(baseSourceURL)/gettext-0.17_haiku-2010-05-06.tar.xz ;
 		} else if $(HAIKU_GCC_VERSION[1]) = 2 && $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage
-			gettext-0.17-x86-gcc2h-2010-05-06.zip
-			: $(baseURL)/gettext-0.17-x86-gcc2h-2010-05-06.zip
-			:
-			: true
-		;
-		InstallSourceArchive gettext-0.17_haiku-2010-05-06.tar.xz
-			: $(baseSourceURL)/gettext-0.17_haiku-2010-05-06.tar.xz ;
+			InstallOptionalHaikuImagePackage
+				gettext-0.17-x86-gcc2h-2010-05-06.zip
+				: $(baseURL)/gettext-0.17-x86-gcc2h-2010-05-06.zip
+				:
+				: true
+			;
+			InstallSourceArchive gettext-0.17_haiku-2010-05-06.tar.xz
+				: $(baseSourceURL)/gettext-0.17_haiku-2010-05-06.tar.xz ;
 		} else {
 			Echo "No optional package GetText available for $(TARGET_ARCH)-gcc2" ;
 		}
@@ -755,23 +755,23 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 		Echo "No optional package LibEvent available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage
-			libevent-1.4.13-x86-gcc4-2010-05-06.zip
-			: $(baseURL)/libevent-1.4.13-x86-gcc4-2010-05-06.zip
-			:
-			: true
-		;
-		InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
-			: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
+			InstallOptionalHaikuImagePackage
+				libevent-1.4.13-x86-gcc4-2010-05-06.zip
+				: $(baseURL)/libevent-1.4.13-x86-gcc4-2010-05-06.zip
+				:
+				: true
+			;
+			InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
+				: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
 		} else if $(HAIKU_GCC_VERSION[1]) = 2 && $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage
-			libevent-1.4.13-x86-gcc2h-2010-05-06.zip
-			: $(baseURL)/libevent-1.4.13-x86-gcc2h-2010-05-06.zip
-			:
-			: true
-		;
-		InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
-			: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
+			InstallOptionalHaikuImagePackage
+				libevent-1.4.13-x86-gcc2h-2010-05-06.zip
+				: $(baseURL)/libevent-1.4.13-x86-gcc2h-2010-05-06.zip
+				:
+				: true
+			;
+			InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
+				: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
 		} else {
 			Echo "No optional package LibEvent available for $(TARGET_ARCH)-gcc2" ;
 		}
@@ -1255,14 +1255,14 @@ if [ IsOptionalHaikuImagePackageAdded Transmission ] {
 		Echo "No optional package Transmission available for $(TARGET_ARCH)" ;
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage
-			transmission-1.93-x86-gcc4-2010-05-06.zip
-			: $(baseURL)/transmission-1.93-x86-gcc4-2010-05-06.zip
-			:
-			: true
-		;
-		InstallSourceArchive transmission-1.93_haiku-2010-05-06.tar.xz
-			: $(baseSourceURL)/transmission-1.93_haiku-2010-05-06.tar.xz ;
+			InstallOptionalHaikuImagePackage
+				transmission-1.93-x86-gcc4-2010-05-06.zip
+				: $(baseURL)/transmission-1.93-x86-gcc4-2010-05-06.zip
+				:
+				: true
+			;
+			InstallSourceArchive transmission-1.93_haiku-2010-05-06.tar.xz
+				: $(baseSourceURL)/transmission-1.93_haiku-2010-05-06.tar.xz ;
 		} else {
 			Echo "No optional package Transmission available for $(TARGET_ARCH)-gcc2" ;
 		}
