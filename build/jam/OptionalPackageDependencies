@@ -20,7 +20,7 @@ OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies MandatoryPackages : Sed Tar ;
 OptionalPackageDependencies NetFS : UserlandFS ;
-OptionalPackageDependencies Pe PCRE ;
+OptionalPackageDependencies Pe : PCRE ;
 OptionalPackageDependencies Vim : LibIconv ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 OptionalPackageDependencies Tar : LibIconv ;
