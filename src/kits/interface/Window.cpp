@@ -944,7 +944,7 @@ BWindow::DispatchMessage(BMessage* msg, BHandler* target)
 				BPrivate::AppServerLink link;
 				link.StartMessage(AS_ACTIVATE_WORKSPACE);
 				link.Attach<int32>(next);
-				link.Attach<bool>(true);
+				link.Attach<bool>(takeMeThere);
 				link.Flush();
 			}
 			break;
