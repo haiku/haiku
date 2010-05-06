@@ -48,7 +48,8 @@ ProgressReporter::Reset()
 
 	if (fMessage) {
 		BMessage message(*fMessage);
-		message.AddString("status", TR("Collecting copy information."));
+		message.AddString("status",
+			B_TRANSLATE("Collecting copy information."));
 		fMessenger.SendMessage(&message);
 	}
 }
@@ -72,7 +73,7 @@ ProgressReporter::StartTimer()
 
 	if (fMessage) {
 		BMessage message(*fMessage);
-		message.AddString("status", TR("Performing installation."));
+		message.AddString("status", B_TRANSLATE("Performing installation."));
 		fMessenger.SendMessage(&message);
 	}
 }

@@ -79,9 +79,9 @@ InstallerApp::MessageReceived(BMessage* message)
 void
 InstallerApp::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", TR("Installer\n"
+	BAlert *alert = new BAlert("about", B_TRANSLATE("Installer\n"
 		"\twritten by Jérôme Duval and Stephan Aßmus\n"
-		"\tCopyright 2005-2010, Haiku.\n\n"), TR("OK"));
+		"\tCopyright 2005-2010, Haiku.\n\n"), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -102,15 +102,15 @@ InstallerApp::ReadyToRun()
 	// Initilialize the Locale Kit
 	be_locale->GetAppCatalog(&fCatalog);
 
-	const char* infoText = TR(
+	const char* infoText = B_TRANSLATE(
 		"Welcome to the Haiku Installer!\n\n"
-		
+
 		"IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n"
-		
+
 		"This is alpha-quality software! It means there is a high risk of "
 		"losing important data. Make frequent backups! You have been "
 		"warned.\n\n"
-		
+
 		"1)  If you are installing Haiku onto real hardware (not inside an "
 		"emulator) it is recommended that you have already prepared a hard "
 		"disk partition. The Installer and the DriveSetup tool offer to "
@@ -123,40 +123,40 @@ InstallerApp::ReadyToRun()
 		"reboot into Haiku to continue with the installation. You could for "
 		"example use the GParted Live-CD, it can also resize existing "
 		"partitions to make room.\n\n"
-		
+
 		"2)  The Installer will take no steps to integrate Haiku into an "
 		"existing boot menu. The Haiku partition itself will be made "
 		"bootable. If you have GRUB already installed, edit your "
 		"/boot/grub/menu.lst by launching your favorite editor from a "
 		"Terminal like this:\n\n"
-		
+
 		"\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n"
-		
+
 		"You'll note that GRUB uses a different naming strategy for hard "
 		"drives than Linux.\n\n"
-		
+
 		"With GRUB it's: (hdN,n)\n\n"
-		
+
 		"All harddisks start with \"hd\"\n"
 		"\"N\" is the hard disk number, starting with \"0\".\n"
 		"\"n\" is the partition number, also starting with \"0\".\n"
 		"The first logical partition always has the number 4, regardless of "
 		"the number of primary partitions.\n\n"
-		
+
 		"So behind the other menu entries towards the bottom of the file, add "
 		"something similar to these lines:\n\n"
-		
+
 		"\t# Haiku on /dev/sda7\n"
 		"\ttitle\t\t\t\tHaiku\n"
 		"\trootnoverify\t\t(hd0,6)\n"
 		"\tchainloader\t\t+1\n\n"
-		
+
 		"You can see the correct partition in GParted for example.\n\n"
-		
+
 		"3)  When you successfully boot into Haiku for the first time, make "
 		"sure to read our \"Welcome\" documentation, there is a link on the "
 		"Desktop.\n\n"
-		
+
 		"Have fun and thanks a lot for trying out Haiku! We hope you like it!"
 	);
 
@@ -172,17 +172,17 @@ InstallerApp::ReadyToRun()
 	BScrollView* scrollView = new BScrollView("eulaScroll",
 		textView, B_WILL_DRAW, false, true);
 
-	BButton* cancelButton = new BButton(TR("Quit"),
+	BButton* cancelButton = new BButton(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED));
 	cancelButton->SetTarget(this);
 
-	BButton* continueButton = new BButton(TR("Continue"),
+	BButton* continueButton = new BButton(B_TRANSLATE("Continue"),
 		new BMessage(kMsgAgree));
 	continueButton->SetTarget(this);
 	continueButton->MakeDefault(true);
 
 	BRect eulaFrame = BRect(0, 0, 600, 450);
-	fEULAWindow = new BWindow(eulaFrame, TR("README"),
+	fEULAWindow = new BWindow(eulaFrame, B_TRANSLATE("README"),
 		B_MODAL_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS);
 

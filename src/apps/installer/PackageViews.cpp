@@ -320,7 +320,8 @@ PackagesView::Draw(BRect updateRect)
 	if (CountChildren() > 0)
 		return;
 
-	be_control_look->DrawLabel(this, TR("No optional packages available."),
+	be_control_look->DrawLabel(this,
+		B_TRANSLATE("No optional packages available."),
 		Bounds(), updateRect, ViewColor(), BControlLook::B_DISABLED,
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 }

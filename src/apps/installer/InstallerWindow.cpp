@@ -67,7 +67,8 @@ public:
 
 	virtual	void				Draw(BRect update);
 
-	virtual	void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				GetPreferredSize(float* _width,
+									float* _height);
 
 private:
 			void				_Init();
@@ -150,7 +151,7 @@ layout_item_for(BView* view)
 
 
 InstallerWindow::InstallerWindow()
-	: BWindow(BRect(-2000, -2000, -1800, -1800), TR("Installer"),
+	: BWindow(BRect(-2000, -2000, -1800, -1800), B_TRANSLATE("Installer"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEncouragedToSetupPartitions(false),
 	fDriveSetupLaunched(false),
@@ -161,29 +162,33 @@ InstallerWindow::InstallerWindow()
 {
 	LogoView* logoView = new LogoView();
 
-	fStatusView = new BTextView("statusView", be_plain_font, NULL, B_WILL_DRAW);
+	fStatusView = new BTextView("statusView", be_plain_font, NULL,
+		B_WILL_DRAW);
 	fStatusView->SetInsets(10, 10, 10, 10);
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);
 
 	BSize logoSize = logoView->MinSize();
 	logoView->SetExplicitMaxSize(logoSize);
-	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.66, B_SIZE_UNSET));
+	fStatusView->SetExplicitMinSize(BSize(logoSize.width * 0.66,
+		B_SIZE_UNSET));
 
-	fDestMenu = new BPopUpMenu(TR("scanning" B_UTF8_ELLIPSIS), true, false);
-	fSrcMenu = new BPopUpMenu(TR("scanning" B_UTF8_ELLIPSIS), true, false);
+	fDestMenu = new BPopUpMenu(B_TRANSLATE("scanning" B_UTF8_ELLIPSIS),
+		true, false);
+	fSrcMenu = new BPopUpMenu(B_TRANSLATE("scanning" B_UTF8_ELLIPSIS),
+		true, false);
 
-	fSrcMenuField = new BMenuField("srcMenuField", TR("Install from:"),
-		fSrcMenu, NULL);
+	fSrcMenuField = new BMenuField("srcMenuField",
+		B_TRANSLATE("Install from:"), fSrcMenu, NULL);
 	fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fDestMenuField = new BMenuField("destMenuField", TR("Onto:"), fDestMenu,
-		NULL);
+	fDestMenuField = new BMenuField("destMenuField", B_TRANSLATE("Onto:"),
+		fDestMenu, NULL);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fPackagesSwitch = new PaneSwitch("options_button");
-	fPackagesSwitch->SetLabels(TR("Hide optional packages"),
-		TR("Show optional packages"));
+	fPackagesSwitch->SetLabels(B_TRANSLATE("Hide optional packages"),
+		B_TRANSLATE("Show optional packages"));
 	fPackagesSwitch->SetMessage(new BMessage(SHOW_BOTTOM_MESSAGE));
 	fPackagesSwitch->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
@@ -195,34 +200,35 @@ InstallerWindow::InstallerWindow()
 		fPackagesView, B_WILL_DRAW, false, true);
 
 	const char* requiredDiskSpaceString
-		= TR("Additional disk space required: 0.0 KiB");
+		= B_TRANSLATE("Additional disk space required: 0.0 KiB");
 	fSizeView = new BStringView("size_view", requiredDiskSpaceString);
 	fSizeView->SetAlignment(B_ALIGN_RIGHT);
 	fSizeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 	fSizeView->SetExplicitAlignment(
 		BAlignment(B_ALIGN_RIGHT, B_ALIGN_MIDDLE));
 
-	fProgressBar = new BStatusBar("progress", TR("Install progress:  "));
+	fProgressBar = new BStatusBar("progress",
+		B_TRANSLATE("Install progress:  "));
 	fProgressBar->SetMaxValue(100.0);
 
-	fBeginButton = new BButton("begin_button", TR("Begin"),
+	fBeginButton = new BButton("begin_button", B_TRANSLATE("Begin"),
 		new BMessage(BEGIN_MESSAGE));
 	fBeginButton->MakeDefault(true);
 	fBeginButton->SetEnabled(false);
 
 	fLaunchDriveSetupButton = new BButton("setup_button",
-		TR("Set up partitions" B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Set up partitions" B_UTF8_ELLIPSIS),
 		new BMessage(LAUNCH_DRIVE_SETUP));
 
-	fLaunchBootmanItem = new BMenuItem(TR("Set up boot menu"),
+	fLaunchBootmanItem = new BMenuItem(B_TRANSLATE("Set up boot menu"),
 		new BMessage(LAUNCH_BOOTMAN));
 	fLaunchBootmanItem->SetEnabled(false);
 
-	fMakeBootableItem = new BMenuItem(TR("Write boot sector"),
+	fMakeBootableItem = new BMenuItem(B_TRANSLATE("Write boot sector"),
 		new BMessage(MSG_WRITE_BOOT_SECTOR));
 	fMakeBootableItem->SetEnabled(false);
 	BMenuBar* mainMenu = new BMenuBar("main menu");
-	BMenu* toolsMenu = new BMenu(TR("Tools"));
+	BMenu* toolsMenu = new BMenu(B_TRANSLATE("Tools"));
 	toolsMenu->AddItem(fLaunchBootmanItem);
 	toolsMenu->AddItem(fMakeBootableItem);
 	mainMenu->AddItem(toolsMenu);
@@ -273,18 +279,18 @@ InstallerWindow::InstallerWindow()
 
 	// Setup tool tips for the non-obvious features
 	fLaunchDriveSetupButton->SetToolTip(
-		TR("Launch the DriveSetup utility to partition\n"
+		B_TRANSLATE("Launch the DriveSetup utility to partition\n"
 		"available hard drives and other media.\n"
 		"Partitions can be initialized with the\n"
 		"Be File System needed for a Haiku boot\n"
 		"partition."));
 //	fLaunchBootmanItem->SetToolTip(
-//		TR("Install or uninstall the Haiku boot menu, which allows to "
-//		"choose an operating system to boot when the computer starts.\n"
+//		B_TRANSLATE("Install or uninstall the Haiku boot menu, which allows "
+//		"to choose an operating system to boot when the computer starts.\n"
 //		"If this computer already has a boot manager such as GRUB installed, "
 //		"it is better to add Haiku to that menu than to overwrite it."));
 //	fMakeBootableItem->SetToolTip(
-//		TR("Writes the Haiku boot code to the partition start\n"
+//		B_TRANSLATE("Writes the Haiku boot code to the partition start\n"
 //		"sector. This step is automatically performed by\n"
 //		"the installation, but you can manually make a\n"
 //		"partition bootable in case you do not need to\n"
@@ -302,7 +308,7 @@ InstallerWindow::InstallerWindow()
 	// ... and check the two we are interested in.
 	fDriveSetupLaunched = be_roster->IsRunning(DRIVESETUP_SIG);
 	fBootmanLaunched = be_roster->IsRunning(BOOTMAN_SIG);
- 
+
 	if (Lock()) {
 		fLaunchDriveSetupButton->SetEnabled(!fDriveSetupLaunched);
 		fLaunchBootmanItem->SetEnabled(!fBootmanLaunched);
@@ -331,10 +337,11 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			status_t error;
 			if (msg->FindInt32("error", &error) == B_OK) {
 				char errorMessage[2048];
-				snprintf(errorMessage, sizeof(errorMessage), TR("An error was "
-					"encountered and the installation was not completed:\n\n"
+				snprintf(errorMessage, sizeof(errorMessage),
+					B_TRANSLATE("An error was encountered and the "
+					"installation was not completed:\n\n"
 					"Error:  %s"), strerror(error));
-				(new BAlert("error", errorMessage, TR("OK")))->Go();
+				(new BAlert("error", errorMessage, B_TRANSLATE("OK")))->Go();
 			}
 
 			_DisableInterface(false);
@@ -363,7 +370,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					fWorkerThread->SetSpaceRequired(size);
 					fInstallStatus = kInstalling;
 					fWorkerThread->StartInstall();
-					fBeginButton->SetLabel(TR("Stop"));
+					fBeginButton->SetLabel(B_TRANSLATE("Stop"));
 					_DisableInterface(true);
 
 					fProgressBar->SetTo(0.0, NULL, NULL);
@@ -408,16 +415,16 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			fPackagesView->GetTotalSizeAsString(buffer, sizeof(buffer));
 			char string[256];
 			snprintf(string, sizeof(string),
-				TR("Additional disk space required: %s"), buffer);
+				B_TRANSLATE("Additional disk space required: %s"), buffer);
 			fSizeView->SetText(string);
 			break;
 		}
 		case ENCOURAGE_DRIVESETUP:
 		{
-			(new BAlert("use drive setup", TR("No partitions have been found "
-				"that are suitable for installation. Please set up partitions "
-				"and initialize at least one partition with the Be File "
-				"System."), TR("OK")))->Go();
+			(new BAlert("use drive setup", B_TRANSLATE("No partitions have "
+				"been found that are suitable for installation. Please set "
+				"up partitions and initialize at least one partition with the "
+				"Be File System."), B_TRANSLATE("OK")))->Go();
 		}
 		case MSG_STATUS_MESSAGE:
 		{
@@ -429,7 +436,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			if (msg->FindFloat("progress", &progress) == B_OK) {
 				const char* currentItem;
 				if (msg->FindString("item", &currentItem) != B_OK) {
-					currentItem = TR_CMT("???",
+					currentItem = B_TRANSLATE_COMMENT("???",
 						"Unknown currently copied item");
 				}
 				BString trailingLabel;
@@ -438,11 +445,14 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				if (msg->FindInt32("current", &currentCount) == B_OK
 					&& msg->FindInt32("maximum", &maximumCount) == B_OK) {
 					char buffer[64];
-					snprintf(buffer, sizeof(buffer), TR_CMT("%1ld of %2ld",
-						"number of files copied"), currentCount, maximumCount);
+					snprintf(buffer, sizeof(buffer),
+						B_TRANSLATE_COMMENT("%1ld of %2ld",
+							"number of files copied"),
+						currentCount, maximumCount);
 					trailingLabel << buffer;
 				} else {
-					trailingLabel << TR_CMT("?? of ??", "Unknown progress");
+					trailingLabel <<
+						B_TRANSLATE_COMMENT("?? of ??", "Unknown progress");
 				}
 				fProgressBar->SetTo(progress, currentItem,
 					trailingLabel.String());
@@ -458,28 +468,28 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		}
 		case MSG_INSTALL_FINISHED:
 		{
-			
+
 			_SetCopyEngineCancelSemaphore(-1);
 
-			fBeginButton->SetLabel(TR("Quit"));
+			fBeginButton->SetLabel(B_TRANSLATE("Quit"));
 
 			PartitionMenuItem* dstItem
 				= (PartitionMenuItem*)fDestMenu->FindMarked();
 
 			char status[1024];
 			if (be_roster->IsRunning(kDeskbarSignature)) {
-				snprintf(status, sizeof(status), TR("Installation completed. "
-					"Boot sector has been written to '%s'. Press Quit to "
-					"leave the Installer or choose a new target volume to "
-					"perform another installation."),
-					dstItem ? dstItem->Name() : TR_CMT("???",
+				snprintf(status, sizeof(status), B_TRANSLATE("Installation "
+					"completed. Boot sector has been written to '%s'. Press "
+					"Quit to leave the Installer or choose a new target "
+					"volume to perform another installation."),
+					dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
 						"Unknown partition name"));
 			} else {
-				snprintf(status, sizeof(status), TR("Installation completed. "
-					"Boot sector has been written to '%s'. Press Quit to "
-					"restart the computer or choose a new target volume "
-					"to perform another installation."),
-					dstItem ? dstItem->Name() : TR_CMT("???",
+				snprintf(status, sizeof(status), B_TRANSLATE("Installation "
+					"completed. Boot sector has been written to '%s'. Press "
+					"Quit to restart the computer or choose a new target "
+					"volume to perform another installation."),
+					dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
 						"Unknown partition name"));
 			}
 
@@ -502,7 +512,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			if (isDriveSetup || isBootman) {
 				bool scanPartitions = false;
 				if (isDriveSetup) {
-					bool launched = msg->what == B_SOME_APP_LAUNCHED;					
+					bool launched = msg->what == B_SOME_APP_LAUNCHED;
 					// We need to scan partitions if DriveSetup has quit.
 					scanPartitions = fDriveSetupLaunched && !launched;
 					fDriveSetupLaunched = launched;
@@ -514,16 +524,18 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					!fDriveSetupLaunched && !fBootmanLaunched);
 				_DisableInterface(fDriveSetupLaunched || fBootmanLaunched);
 				if (fDriveSetupLaunched && fBootmanLaunched) {
-					_SetStatusMessage(TR("Running Boot Manager and "
+					_SetStatusMessage(B_TRANSLATE("Running Boot Manager and "
 						"DriveSetup" B_UTF8_ELLIPSIS
 						"\n\nClose both applications to continue with the "
 						"installation."));
 				} else if (fDriveSetupLaunched) {
-					_SetStatusMessage(TR("Running DriveSetup" B_UTF8_ELLIPSIS
+					_SetStatusMessage(B_TRANSLATE("Running DriveSetup"
+						B_UTF8_ELLIPSIS
 						"\n\nClose DriveSetup to continue with the "
 						"installation."));
 				} else if (fBootmanLaunched) {
-					_SetStatusMessage(TR("Running Boot Manager" B_UTF8_ELLIPSIS
+					_SetStatusMessage(B_TRANSLATE("Running Boot Manager"
+						B_UTF8_ELLIPSIS
 						"\n\nClose Boot Manager to continue with the "
 						"installation."));
 				} else {
@@ -553,19 +565,19 @@ bool
 InstallerWindow::QuitRequested()
 {
 	if (fDriveSetupLaunched && fBootmanLaunched) {
-		(new BAlert(TR("Quit Boot Manager and DriveSetup"),
-			TR("Please close the Boot Manager and DriveSetup windows before "
-			"closing the Installer window."), TR("OK")))->Go();
+		(new BAlert(B_TRANSLATE("Quit Boot Manager and DriveSetup"),
+			B_TRANSLATE("Please close the Boot Manager and DriveSetup windows "
+			"before closing the Installer window."), B_TRANSLATE("OK")))->Go();
 		return false;
 	} else if (fDriveSetupLaunched) {
-		(new BAlert(TR("Quit DriveSetup"),
-			TR("Please close the DriveSetup window before closing the "
-			"Installer window."), TR("OK")))->Go();
+		(new BAlert(B_TRANSLATE("Quit DriveSetup"),
+			B_TRANSLATE("Please close the DriveSetup window before closing "
+			"the Installer window."), B_TRANSLATE("OK")))->Go();
 		return false;
 	} else if (fBootmanLaunched) {
-		(new BAlert(TR("Quit Boot Manager"),
-			TR("Please close the Boot Manager window before closing the "
-			"Installer window."), TR("OK")))->Go();
+		(new BAlert(B_TRANSLATE("Quit Boot Manager"),
+			B_TRANSLATE("Please close the Boot Manager window before closing "
+			"the Installer window."), B_TRANSLATE("OK")))->Go();
 		return false;
 	}
 
@@ -573,9 +585,10 @@ InstallerWindow::QuitRequested()
 		// This means Deskbar is not running, i.e. Installer is the only
 		// thing on the screen and we will reboot the machine once it quits.
 		if ((new BAlert("reallyQuit",
-			TR("Are you sure you want to abort the installation and restart "
-				"the system?"),
-			TR("Cancel"), TR("Restart system")))->Go() == 0) {
+			B_TRANSLATE("Are you sure you want to abort the installation and "
+				"restart the system?"),
+			B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Restart system")))->Go() == 0) {
 			return false;
 		}
 	}
@@ -615,9 +628,9 @@ InstallerWindow::_LaunchDriveSetup()
 		BEntry entry(path.Path());
 		entry_ref ref;
 		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
-			BAlert* alert = new BAlert("error", TR("DriveSetup, the "
+			BAlert* alert = new BAlert("error", B_TRANSLATE("DriveSetup, the "
 				"application to configure disk partitions, could not be "
-				"launched."), TR("OK"));
+				"launched."), B_TRANSLATE("OK"));
 			alert->Go();
 		}
 	}
@@ -642,9 +655,9 @@ InstallerWindow::_LaunchBootman()
 		BEntry entry(path.Path());
 		entry_ref ref;
 		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
-			BAlert* alert = new BAlert("error", TR("Bootman, the "
+			BAlert* alert = new BAlert("error", B_TRANSLATE("Bootman, the "
 				"application to configure the Haiku boot menu, could not be "
-				"launched."), TR("OK"));
+				"launched."), B_TRANSLATE("OK"));
 			alert->Go();
 		}
 	}
@@ -665,7 +678,7 @@ InstallerWindow::_DisableInterface(bool disable)
 void
 InstallerWindow::_ScanPartitions()
 {
-	_SetStatusMessage(TR("Scanning for disks" B_UTF8_ELLIPSIS));
+	_SetStatusMessage(B_TRANSLATE("Scanning for disks" B_UTF8_ELLIPSIS));
 
 	BMenuItem *item;
 	while ((item = fSrcMenu->RemoveItem((int32)0)))
@@ -691,7 +704,7 @@ InstallerWindow::_UpdateControls()
 		label = srcItem->MenuLabel();
 	} else {
 		if (fSrcMenu->CountItems() == 0)
-			label = TR_CMT("<none>", "No partition available");
+			label = B_TRANSLATE_COMMENT("<none>", "No partition available");
 		else
 			label = ((PartitionMenuItem*)fSrcMenu->ItemAt(0))->MenuLabel();
 	}
@@ -720,40 +733,40 @@ InstallerWindow::_UpdateControls()
 		label = dstItem->MenuLabel();
 	} else {
 		if (fDestMenu->CountItems() == 0)
-			label = TR_CMT("<none>", "No partition available");
+			label = B_TRANSLATE_COMMENT("<none>", "No partition available");
 		else
-			label = TR("Please choose target");
+			label = B_TRANSLATE("Please choose target");
 	}
 	fDestMenuField->MenuItem()->SetLabel(label.String());
 
 	if (srcItem != NULL && dstItem != NULL) {
 		char message[255];
-		sprintf(message, TR("Press the Begin button to install from '%1s' "
-			"onto '%2s'."), srcItem->Name(), dstItem->Name());
+		sprintf(message, B_TRANSLATE("Press the Begin button to install from "
+		"'%1s' onto '%2s'."), srcItem->Name(), dstItem->Name());
 		_SetStatusMessage(message);
 	} else if (srcItem != NULL) {
-		_SetStatusMessage(TR("Choose the disk you want to install onto from "
-			"the pop-up menu. Then click \"Begin\"."));
+		_SetStatusMessage(B_TRANSLATE("Choose the disk you want to install "
+			"onto from the pop-up menu. Then click \"Begin\"."));
 	} else if (dstItem != NULL) {
-		_SetStatusMessage(TR("Choose the source disk from the "
+		_SetStatusMessage(B_TRANSLATE("Choose the source disk from the "
 			"pop-up menu. Then click \"Begin\"."));
 	} else {
-		_SetStatusMessage(TR("Choose the source and destination disk from the "
-			"pop-up menus. Then click \"Begin\"."));
+		_SetStatusMessage(B_TRANSLATE("Choose the source and destination disk "
+			"from the pop-up menus. Then click \"Begin\"."));
 	}
 
 	fInstallStatus = kReadyForInstall;
-	fBeginButton->SetLabel(TR("Begin"));
+	fBeginButton->SetLabel(B_TRANSLATE("Begin"));
 	fBeginButton->SetEnabled(srcItem && dstItem);
 
 	// adjust "Write Boot Sector" and "Set up boot menu" buttons
 	if (dstItem != NULL) {
 		char buffer[256];
-		snprintf(buffer, sizeof(buffer), TR("Write boot sector to '%s'"),
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Write boot sector to '%s'"),
 			dstItem->Name());
 		label = buffer;
 	} else
-		label = TR("Write boot sector");
+		label = B_TRANSLATE("Write boot sector");
 	fMakeBootableItem->SetEnabled(dstItem != NULL);
 	fMakeBootableItem->SetLabel(label.String());
 // TODO: Once bootman support writing to specific disks, enable this, since
@@ -836,13 +849,13 @@ InstallerWindow::_QuitCopyEngine(bool askUser)
 	// First of all block the copy engine, so that it doesn't continue
 	// while the alert is showing, which would be irritating.
 	acquire_sem(fCopyEngineCancelSemaphore);
-	
+
 	bool quit = true;
 	if (askUser) {
 		quit = (new BAlert("cancel",
-			TR("Are you sure you want to to stop the installation?"),
-			TR_CMT("Continue", "In alert after pressing Stop"),
-			TR_CMT("Stop", "In alert after pressing Stop"), 0,
+			B_TRANSLATE("Are you sure you want to to stop the installation?"),
+			B_TRANSLATE_COMMENT("Continue", "In alert after pressing Stop"),
+			B_TRANSLATE_COMMENT("Stop", "In alert after pressing Stop"), 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0;
 	}
 
