@@ -37,7 +37,7 @@ ImageView::ImageView(BPositionIO *image)
 	// Initialize and translate the image
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
 	BBitmapStream stream;
-	if (roster->Translate(image, NULL, NULL, &stream, B_TRANSLATOR_BITMAP) 
+	if (roster->Translate(image, NULL, NULL, &stream, B_TRANSLATOR_BITMAP)
 			< B_OK) {
 		fSuccess = false;
 		return;
@@ -80,8 +80,8 @@ ImageView::Draw(BRect updateRect)
 	if (fSuccess)
 		DrawBitmapAsync(fImage, Bounds());
 	else {
-		float length = StringWidth(TR("Image not loaded correctly"));
-		DrawString(TR("Image not loaded correctly"), 
+		float length = StringWidth(B_TRANSLATE("Image not loaded correctly"));
+		DrawString(B_TRANSLATE("Image not loaded correctly"),
 			BPoint((Bounds().Width() - length) / 2.0f, 30.0f));
 	}
 }
@@ -111,7 +111,7 @@ PackageImageViewer::PackageImageViewer(BPositionIO *image)
 
 	BScreen screen(this);
 	BRect frame = screen.Frame();
-	MoveTo((frame.Width() - Bounds().Width()) / 2.0f, 
+	MoveTo((frame.Width() - Bounds().Width()) / 2.0f,
 			(frame.Height() - Bounds().Height()) / 2.0f);
 }
 
@@ -148,7 +148,7 @@ PackageImageViewer::Go()
 				break;
 			parent->UpdateIfNeeded();
 		}
-	} 
+	}
 	else {
 		// Since there are no spinlocks, wait until the semaphore is free
 		while (acquire_sem(fSemaphore) == B_INTERRUPTED) {

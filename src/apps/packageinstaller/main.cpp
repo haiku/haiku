@@ -28,13 +28,13 @@ class PackageInstaller : public BApplication {
 	public:
 		PackageInstaller();
 		~PackageInstaller();
-		
+
 		void RefsReceived(BMessage *msg);
 		void ArgvReceived(int32 argc, char **argv);
 		void ReadyToRun();
-		
+
 		void MessageReceived(BMessage *msg);
-		
+
 		void AboutRequested();
 
 	private:
@@ -92,7 +92,7 @@ PackageInstaller::RefsReceived(BMessage *msg)
 }
 
 
-void 
+void
 PackageInstaller::ArgvReceived(int32 argc, char **argv)
 {
 	int i;
@@ -100,17 +100,20 @@ PackageInstaller::ArgvReceived(int32 argc, char **argv)
 	entry_ref ref;
 	status_t ret = B_OK;
 	PackageWindow *iter = 0;
-	
+
 	for (i = 1; i < argc; i++) {
 		if (path.SetTo(argv[i]) != B_OK) {
-			fprintf(stderr, TR("Error! \"%s\" is not a valid path.\n"), argv[i]);
+			fprintf(stderr,
+					B_TRANSLATE("Error! \"%s\" is not a valid path.\n"),
+					argv[i]);
 			continue;
 		}
-		
+
 		ret = get_ref_for_path(path.Path(), &ref);
 		if (ret != B_OK) {
-			fprintf(stderr, TR("Error (%s)! Could not open \"%s\".\n"), strerror(ret), 
-					argv[i]);
+			fprintf(stderr,
+					B_TRANSLATE("Error (%s)! Could not open \"%s\".\n"),
+					strerror(ret), argv[i]);
 			continue;
 		}
 
@@ -144,11 +147,11 @@ void
 PackageInstaller::AboutRequested()
 {
 	BAlert *about = new BAlert("about",
-		TR("PackageInstaller\n"
+		B_TRANSLATE("PackageInstaller\n"
 		"BeOS legacy .pkg file installer for Haiku.\n\n"
 		"Copyright 2007,\nŁukasz 'Sil2100' Zemczak\n\n"
 		"Copyright (c) 2007 Haiku, Inc. \n"),
-		TR("OK"));
+		B_TRANSLATE("OK"));
 
 	BTextView *view = about->TextView();
 	BFont font;
@@ -167,7 +170,7 @@ main(void)
 {
 	PackageInstaller app;
 	app.Run();
-	
+
 	return 0;
 }
 

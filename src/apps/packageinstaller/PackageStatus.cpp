@@ -23,7 +23,8 @@
 
 StopButton::StopButton()
 	:
-	BButton(BRect(0, 0, 22, 18), "stop", TR("Stop"), new BMessage(P_MSG_STOP))
+	BButton(BRect(0, 0, 22, 18), "stop", B_TRANSLATE("Stop"),
+		new BMessage(P_MSG_STOP))
 {
 }
 
@@ -48,7 +49,7 @@ StopButton::Draw(BRect updateRect)
 // #pragma mark -
 
 
-/*PackageStatus::PackageStatus(BHandler *parent, const char *title, 
+/*PackageStatus::PackageStatus(BHandler *parent, const char *title,
 		const char *label, const char *trailing)
 	:	BWindow(BRect(200, 200, 550, 275), title, B_TITLED_WINDOW,
 			B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE, 0)
@@ -72,7 +73,7 @@ StopButton::Draw(BRect updateRect)
 	font_height fontHeight;
 	fBackground->GetFontHeight(&fontHeight);
 	BRect frame = fStatus->Frame();
-	fBackground->ResizeTo(Bounds().Width(), (2 * frame.top) + frame.Height() + 
+	fBackground->ResizeTo(Bounds().Width(), (2 * frame.top) + frame.Height() +
 			fontHeight.leading + fontHeight.ascent + fontHeight.descent);
 
 	rect = Bounds();
@@ -93,7 +94,7 @@ StopButton::Draw(BRect updateRect)
 }*/
 
 
-PackageStatus::PackageStatus(const char *title, const char *label, 
+PackageStatus::PackageStatus(const char *title, const char *label,
 		const char *trailing, BHandler *parent)
 	:
 	BWindow(BRect(200, 200, 550, 255), title, B_TITLED_WINDOW,
@@ -103,7 +104,7 @@ PackageStatus::PackageStatus(const char *title, const char *label,
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	fStatus = new BStatusBar("status_bar", TR("Installing package"));
+	fStatus = new BStatusBar("status_bar", B_TRANSLATE("Installing package"));
 	fStatus->SetBarHeight(12);
 
 	fButton = new StopButton();
@@ -114,9 +115,9 @@ PackageStatus::PackageStatus(const char *title, const char *label,
 		.Add(fStatus)
 		.Add(fButton);
 	fBackground->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	AddChild(fBackground);
-	
+
 	fButton->SetTarget(this);
 	Run();
 }

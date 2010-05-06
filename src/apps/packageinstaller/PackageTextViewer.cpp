@@ -29,8 +29,8 @@ enum {
 
 PackageTextViewer::PackageTextViewer(const char *text, bool disclaimer)
 	:
-	BWindow(BRect(125, 125, 675, 475), TR("Disclaimer"), B_MODAL_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE),
+	BWindow(BRect(125, 125, 675, 475), B_TRANSLATE("Disclaimer"),
+		B_MODAL_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE),
 	fValue(0)
 {
 	_InitView(text, disclaimer);
@@ -69,7 +69,7 @@ PackageTextViewer::Go()
 				break;
 			parent->UpdateIfNeeded();
 		}
-	} 
+	}
 	else {
 		// Since there are no spinlocks, wait until the semaphore is free
 		while (acquire_sem(fSemaphore) == B_INTERRUPTED) {
@@ -117,7 +117,7 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 	BRect rect = Bounds();
 	if (disclaimer) {
 		BButton *button = new BButton(BRect(0, 0, 1, 1), "accept",
-			TR("Accept"), new BMessage(P_MSG_ACCEPT));
+			B_TRANSLATE("Accept"), new BMessage(P_MSG_ACCEPT));
 		button->ResizeToPreferred();
 
 		bounds = button->Bounds();
@@ -129,8 +129,8 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 		button->MakeDefault(true);
 		fBackground->AddChild(button);
 
-		button = new BButton(BRect(0, 0, 1, 1), "decline", TR("Decline"),
-				new BMessage(P_MSG_DECLINE));
+		button = new BButton(BRect(0, 0, 1, 1), "decline",
+			B_TRANSLATE("Decline"),	new BMessage(P_MSG_DECLINE));
 		button->ResizeToPreferred();
 
 		bounds = button->Bounds();
@@ -139,7 +139,7 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 		fBackground->AddChild(button);
 	} else {
 		BButton *button = new BButton(BRect(0, 0, 1, 1), "accept",
-			TR("Continue"), new BMessage(P_MSG_ACCEPT));
+			B_TRANSLATE("Continue"), new BMessage(P_MSG_ACCEPT));
 		button->ResizeToPreferred();
 
 		bounds = button->Bounds();
@@ -164,7 +164,7 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 
 	BScrollView *scroll = new BScrollView("scroll_view", fText,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
-	
+
 	fBackground->AddChild(scroll);
 
 	AddChild(fBackground);
@@ -175,8 +175,8 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 PackageTextViewer::_InitView(const char *text, bool disclaimer)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	
-	fText = new BTextView(BRect(0, 0, 1, 1), "text_view", BRect(0, 0, 1, 1), 
+
+	fText = new BTextView(BRect(0, 0, 1, 1), "text_view", BRect(0, 0, 1, 1),
 			B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
 	fText->MakeEditable(false);
 	fText->MakeSelectable(true);
@@ -184,10 +184,10 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
 
 	if (disclaimer) {
-		BButton *accept = new BButton("accept", TR("Accept"),
+		BButton *accept = new BButton("accept", B_TRANSLATE("Accept"),
 				new BMessage(P_MSG_ACCEPT));
 
-		BButton *decline = new BButton("decline", TR("Decline"),
+		BButton *decline = new BButton("decline", B_TRANSLATE("Decline"),
 				new BMessage(P_MSG_DECLINE));
 
 		fBackground = BGroupLayoutBuilder(B_VERTICAL)
@@ -199,7 +199,7 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 			.End();
 	}
 	else {
-		BButton *button = new BButton("accept", TR("Continue"),
+		BButton *button = new BButton("accept", B_TRANSLATE("Continue"),
 				new BMessage(P_MSG_ACCEPT));
 
 		fBackground = BGroupLayoutBuilder(B_VERTICAL)
@@ -211,7 +211,7 @@ PackageTextViewer::_InitView(const char *text, bool disclaimer)
 	}
 
 	AddChild(fBackground);
-	
+
 	fBackground->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fText->SetText(text);
 }*/

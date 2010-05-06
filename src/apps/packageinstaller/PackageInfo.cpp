@@ -50,7 +50,7 @@ PackageInfo::PackageInfo()
 	:
 	fStatus(B_NO_INIT),
 	fPackageFile(0),
-	fDescription(TR("No package available.")),
+	fDescription(B_TRANSLATE("No package available.")),
 	fProfiles(2),
 	fHasImage(false)
 {
@@ -61,7 +61,7 @@ PackageInfo::PackageInfo(const entry_ref *ref)
 	:
 	fStatus(B_NO_INIT),
 	fPackageFile(new BFile(ref, B_READ_ONLY)),
-	fDescription(TR("No package selected.")),
+	fDescription(B_TRANSLATE("No package selected.")),
 	fProfiles(2),
 	fHasImage(false)
 {
@@ -999,7 +999,7 @@ PackageInfo::Parse()
 						localType, ctime, mtime, mode, offset, size);
 				}
 			} else if (element == P_SCRIPT) {
-				fScripts.AddItem(new PackageScript(fPackageFile, offset, size, 
+				fScripts.AddItem(new PackageScript(fPackageFile, offset, size,
 					originalSize));
 			} else {
 				// If the directory tree count is equal to zero, this means all
@@ -1029,7 +1029,7 @@ PackageInfo::Parse()
 			parser_debug("PtcI\n");
 			break;
 		} else {
-			fprintf(stderr, TR("Unknown file tag %s\n"), buffer);
+			fprintf(stderr, B_TRANSLATE("Unknown file tag %s\n"), buffer);
 			RETURN_AND_SET_STATUS(B_ERROR);
 		}
 	}
@@ -1038,10 +1038,11 @@ PackageInfo::Parse()
 		// Inform the user of a possible error
 		int32 selection;
 		BAlert *warning = new BAlert("filesize_wrong",
-			TR("There seems to be a file size mismatch in the package file. "
-				"The package might be corrupted or have been modified after its "
-				"creation. Do you still wish to continue?"), TR("Continue"),
-				TR("Abort"), NULL,
+			B_TRANSLATE("There seems to be a file size mismatch in the "
+				"package file. The package might be corrupted or have been "
+				"modified after its creation. Do you still wish to continue?"),
+				B_TRANSLATE("Continue"),
+				B_TRANSLATE("Abort"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		selection = warning->Go();
 

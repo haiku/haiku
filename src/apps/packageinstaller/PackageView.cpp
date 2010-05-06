@@ -46,14 +46,15 @@ static void
 convert_size(uint64 size, char *buffer, uint32 n)
 {
 	if (size < 1024)
-		snprintf(buffer, n, TR("%llu bytes"), size);
+		snprintf(buffer, n, B_TRANSLATE("%llu bytes"), size);
 	else if (size < 1024 * 1024)
-		snprintf(buffer, n, TR("%.1f KiB"), size / 1024.0f);
+		snprintf(buffer, n, B_TRANSLATE("%.1f KiB"), size / 1024.0f);
 	else if (size < 1024 * 1024 * 1024)
-		snprintf(buffer, n, TR("%.1f MiB"), size / (1024.0f * 1024.0f));
+		snprintf(buffer, n, B_TRANSLATE("%.1f MiB"),
+			size / (1024.0f * 1024.0f));
 	else {
-		snprintf(buffer, n, TR("%.1f GiB"), size
-			/ (1024.0f * 1024.0f * 1024.0f));
+		snprintf(buffer, n, B_TRANSLATE("%.1f GiB"),
+			size / (1024.0f * 1024.0f * 1024.0f));
 	}
 }
 
@@ -93,10 +94,10 @@ PackageView::AttachedToWindow()
 	status_t ret = fInfo.InitCheck();
 	if (ret != B_OK && ret != B_NO_INIT) {
 		BAlert *warning = new BAlert("parsing_failed",
-				TR("The package file is not readable.\nOne of the possible "
-				"reasons for this might be that the requested file is not a "
-				"valid BeOS .pkg package."), TR("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				B_TRANSLATE("The package file is not readable.\nOne of the "
+				"possible reasons for this might be that the requested file "
+				"is not a valid BeOS .pkg package."), B_TRANSLATE("OK"),
+				NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		warning->Go();
 
 		Window()->PostMessage(B_QUIT_REQUESTED);
@@ -108,10 +109,10 @@ PackageView::AttachedToWindow()
 	BString title;
 	BString name = fInfo.GetName();
 	if (name.CountChars() == 0) {
-		title = TR("Package installer");
+		title = B_TRANSLATE("Package installer");
 	}
 	else {
-		title = TR("Install ");
+		title = B_TRANSLATE("Install ");
 		title += name;
 	}
 	parent->SetTitle(title.String());
@@ -126,8 +127,9 @@ PackageView::AttachedToWindow()
 		// attaching the view to the window
 		_GroupChanged(0);
 
-		fStatusWindow = new PackageStatus(TR("Installation progress"), NULL, 
-			NULL, this);
+		fStatusWindow = new PackageStatus
+			(B_TRANSLATE("Installation progress"),
+			NULL, NULL, this);
 
 		// Show the splash screen, if present
 		BMallocIO *image = fInfo.GetSplashScreen();
@@ -190,8 +192,9 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_I_FINISHED:
 		{
 			BAlert *notify = new BAlert("installation_success",
-				TR("The package you requested has been successfully installed "
-					"on your system."), TR("OK"));
+				B_TRANSLATE("The package you requested has been successfully "
+					"installed on your system."),
+				B_TRANSLATE("OK"));
 
 			notify->Go();
 			fStatusWindow->Hide();
@@ -208,8 +211,9 @@ PackageView::MessageReceived(BMessage *msg)
 		case P_MSG_I_ABORT:
 		{
 			BAlert *notify = new BAlert("installation_aborted",
-				TR("The installation of the package has been aborted."), 
-				TR("OK"));
+				B_TRANSLATE(
+					"The installation of the package has been aborted."),
+				B_TRANSLATE("OK"));
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
@@ -222,11 +226,14 @@ PackageView::MessageReceived(BMessage *msg)
 		{
 			// TODO: Review this
 			BAlert *notify = new BAlert("installation_failed",
-				TR("The requested package failed to install on your system. "
-				"This might be a problem with the target package file. Please "
-				"consult this issue with the package distributor."), 
-				TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-			fprintf(stderr, TR("Error while installing the package\n"));
+				B_TRANSLATE("The requested package failed to install on your "
+					"system. This might be a problem with the target package "
+					"file. Please consult this issue with the package "
+					"distributor."),
+				B_TRANSLATE("OK"),
+				NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			fprintf(stderr,
+				B_TRANSLATE("Error while installing the package\n"));
 			notify->Go();
 			fStatusWindow->Hide();
 			fInstall->SetEnabled(true);
@@ -313,38 +320,40 @@ PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 			const char* formatString;
 			switch (item.ItemKind()){
 				case P_KIND_SCRIPT:
-					formatString = TR("The script named \'%s\' already exits "
-						"in the given path.\nReplace the script with the one "
-						"from this package or skip it?");   
+					formatString = B_TRANSLATE("The script named \'%s\' "
+						"already exits in the given path.\nReplace the script "
+						"with the one from this package or skip it?");
 					break;
 				case P_KIND_FILE:
-					formatString = TR("The file named \'%s\' already exits "
-						"in the given path.\nReplace the file with the one "
-						"from this package or skip it?");
+					formatString = B_TRANSLATE("The file named \'%s\' already "
+						"exits in the given path.\nReplace the file with the "
+						"one from this package or skip it?");
 					break;
 				case P_KIND_DIRECTORY:
-					formatString = TR("The directory named \'%s\' already "
-						"exits in the given path.\nReplace the directory with "
-						"one from this package or skip it?");
+					formatString = B_TRANSLATE("The directory named \'%s\' "
+						"already exits in the given path.\nReplace the "
+						"directory with one from this package or skip it?");
  					break;
 				case P_KIND_SYM_LINK:
-					formatString = TR("The symbolic link named \'%s\' already "
-						"exists in the give path.\nReplace the link with the "
-						"one from this package or skip it?");
+					formatString = B_TRANSLATE("The symbolic link named \'%s\' "
+						"already exists in the give path.\nReplace the link "
+						"with the one from this package or skip it?");
 					break;
 				default:
-					formatString = TR("The item named \'%s\' already exits "
-						"in the given path.\nReplace the item with the one "
-						"from this package or skip it?");   
+					formatString = B_TRANSLATE("The item named \'%s\' already "
+						"exits in the given path.\nReplace the item with the "
+						"one from this package or skip it?");
 					break;
 			}
 			char buffer[512];
 			snprintf(buffer, sizeof(buffer), formatString, path.Leaf());
-			
+
 			BString alertString = buffer;
-			
+
 			BAlert *alert = new BAlert("file_exists", alertString.String(),
-				TR("Replace"), TR("Skip"), TR("Abort"));
+				B_TRANSLATE("Replace"),
+				B_TRANSLATE("Skip"),
+				B_TRANSLATE("Abort"));
 
 			choice = alert->Go();
 			switch (choice) {
@@ -360,14 +369,14 @@ PackageView::ItemExists(PackageItem &item, BPath &path, int32 &policy)
 
 			if (policy == P_EXISTS_NONE) {
 				// TODO: Maybe add 'No, but ask again' type of choice as well?
-				alertString = TR("Do you want to remember this decision for "
-					"the rest of this installation?\n");
+				alertString = B_TRANSLATE("Do you want to remember this "
+					"decision for the rest of this installation?\n");
 				alertString << ((choice == P_EXISTS_OVERWRITE)
-					? TR("All existing files will be replaced?") 
-					: TR("All existing files will be skipped?"));
+					? B_TRANSLATE("All existing files will be replaced?")
+					: B_TRANSLATE("All existing files will be skipped?"));
 
 				alert = new BAlert("policy_decision", alertString.String(),
-					TR("Replace all"), TR("Ask again"));
+					B_TRANSLATE("Replace all"), B_TRANSLATE("Ask again"));
 
 				int32 decision = alert->Go();
 				if (decision == 0)
@@ -399,7 +408,7 @@ PackageView::_InitView()
 	fInstallTypes = new BPopUpMenu("none");
 
 	BMenuField *installType = new BMenuField("install_type",
-		TR("Installation type:"), fInstallTypes, 0);
+		B_TRANSLATE("Installation type:"), fInstallTypes, 0);
 	installType->SetAlignment(B_ALIGN_RIGHT);
 	installType->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 
@@ -408,10 +417,10 @@ PackageView::_InitView()
 	fInstallDesc->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fInstallDesc->MakeEditable(false);
 	fInstallDesc->MakeSelectable(false);
-	fInstallDesc->SetText(TR("No installation type selected"));
+	fInstallDesc->SetText(B_TRANSLATE("No installation type selected"));
 	fInstallDesc->TextHeight(0, fInstallDesc->TextLength());
 
-	fInstall = new BButton("install_button", TR("Install"),
+	fInstall = new BButton("install_button", B_TRANSLATE("Install"),
 			new BMessage(P_MSG_INSTALL));
 
 	BView *installField = BGroupLayoutBuilder(B_VERTICAL, 5.0f)
@@ -476,7 +485,8 @@ PackageView::_InitView()
 	fInstallTypes = new BPopUpMenu("none");
 
 	BMenuField *installType = new BMenuField(BRect(2, 2, 100, 50),
-		"install_type", TR("Installation type:"), fInstallTypes, false);
+		"install_type", B_TRANSLATE("Installation type:"),
+		fInstallTypes, false);
 	installType->SetDivider(installType->StringWidth(installType->Label()) + 8);
 	installType->SetAlignment(B_ALIGN_RIGHT);
 	installType->ResizeToPreferred();
@@ -490,7 +500,7 @@ PackageView::_InitView()
 		B_WILL_DRAW);
 	fInstallDesc->MakeEditable(false);
 	fInstallDesc->MakeSelectable(false);
-	fInstallDesc->SetText(TR("No installation type selected"));
+	fInstallDesc->SetText(B_TRANSLATE("No installation type selected"));
 	fInstallDesc->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fInstallDesc->ResizeTo(rect.Width() - B_V_SCROLL_BAR_WIDTH, 60);
@@ -509,7 +519,7 @@ PackageView::_InitView()
 	rect = installBox->Frame();
 	rect.top = rect.bottom + 5;
 	rect.bottom += 35;
-	fDestField = new BMenuField(rect, "install_to", TR("Install to:"),
+	fDestField = new BMenuField(rect, "install_to", B_TRANSLATE("Install to:"),
 			fDestination, false);
 	fDestField->SetDivider(fDestField->StringWidth(fDestField->Label()) + 8);
 	fDestField->SetAlignment(B_ALIGN_RIGHT);
@@ -517,7 +527,7 @@ PackageView::_InitView()
 
 	AddChild(fDestField);
 
-	fInstall = new BButton(rect, "install_button", TR("Install"),
+	fInstall = new BButton(rect, "install_button", B_TRANSLATE("Install"),
 			new BMessage(P_MSG_INSTALL));
 	fInstall->ResizeToPreferred();
 	AddChild(fInstall);
@@ -600,7 +610,7 @@ PackageView::_GroupChanged(int32 index)
 		BMessage *temp;
 		BVolume volume;
 		char buffer[512];
-		const char *tmp = TR("(%s free)");
+		const char *tmp = B_TRANSLATE("(%s free)");
 
 		if (prof->path_type == P_INSTALL_PATH) {
 			dev_t device;
@@ -645,7 +655,7 @@ PackageView::_GroupChanged(int32 index)
 			}
 			fDestination->AddSeparatorItem();
 
-			item = new BMenuItem(TR("Other" B_UTF8_ELLIPSIS), 
+			item = new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 				new BMessage(P_MSG_OPEN_PANEL));
 			item->SetTarget(this);
 			fDestination->AddItem(item);
