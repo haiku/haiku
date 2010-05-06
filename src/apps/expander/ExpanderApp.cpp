@@ -31,13 +31,13 @@ ExpanderApp::ExpanderApp()
 void
 ExpanderApp::AboutRequested()
 {
-	BString appName = TR("Expander");
+	BString appName = B_TRANSLATE("Expander");
 	int nameLength = appName.CountChars();
-	BAlert* alert = new BAlert("about", 
-		appName.Append(TR("\n\twritten by Jérôme Duval\n"
+	BAlert* alert = new BAlert("about",
+		appName.Append(B_TRANSLATE("\n\twritten by Jérôme Duval\n"
 			"\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \n"
 			"Dominic, Hiroshi, Peter, Pavel and Robert\n")),
-		TR("OK"));
+		B_TRANSLATE("OK"));
 	BTextView* view = alert->TextView();
 	BFont font;
 

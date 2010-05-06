@@ -77,16 +77,18 @@ DirectoryFilePanel::Show()
 		}
 
 		rect.right = rect.left -= 30;
-		float width = be_plain_font->StringWidth(TR("Select current")) + 20;
+		float width = be_plain_font->StringWidth(
+			B_TRANSLATE("Select current")) + 20;
 		rect.left = width > 75 ? rect.right - width : rect.right - 75;
-		fCurrentButton = new BButton(rect, "directoryButton", TR("Select current"),
-			new BMessage(MSG_DIRECTORY), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		fCurrentButton = new BButton(rect, "directoryButton",
+			B_TRANSLATE("Select current"), new BMessage(MSG_DIRECTORY),
+			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 
 		background->AddChild(fCurrentButton);
 		fCurrentButton->SetTarget(Messenger());
 
-		SetButtonLabel(B_DEFAULT_BUTTON, TR("Select"));
-		Window()->SetTitle(TR("Expander: Choose destination"));
+		SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Select"));
+		Window()->SetTitle(B_TRANSLATE("Expander: Choose destination"));
 
 		Window()->Unlock();
 
@@ -106,7 +108,7 @@ DirectoryFilePanel::SelectionChanged()
 	entry_ref ref;
 	GetPanelDirectory(&ref);
 	if (snprintf(label, sizeof(label),
-		TR("Select '%s'"), ref.name) >= (int)sizeof(label))
+		B_TRANSLATE("Select '%s'"), ref.name) >= (int)sizeof(label))
 			strcpy(label + sizeof(label) - 5, B_UTF8_ELLIPSIS "'");
 
 	// Resize button so that the label fits

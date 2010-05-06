@@ -31,39 +31,40 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	fUsePanel(NULL)
 {
 	BBox* box = new BBox("background");
-	box->SetLabel(TR("Expander settings"));
+	box->SetLabel(B_TRANSLATE("Expander settings"));
 
 	fAutoExpand = new BCheckBox("autoExpand",
-		TR("Automatically expand files"), NULL);
-	fCloseWindow = new BCheckBox("closeWindowWhenDone", 
-		TR("Close window when done expanding"), NULL);
+		B_TRANSLATE("Automatically expand files"), NULL);
+	fCloseWindow = new BCheckBox("closeWindowWhenDone",
+		B_TRANSLATE("Close window when done expanding"), NULL);
 
 	fLeaveDest = new BRadioButton("leaveDest",
-		TR("Leave destination folder path empty"),
+		B_TRANSLATE("Leave destination folder path empty"),
 		new BMessage(MSG_LEAVEDEST));
 	fSameDest = new BRadioButton("sameDir",
-		TR("Same directory as source (archive) file"),
+		B_TRANSLATE("Same directory as source (archive) file"),
 		new BMessage(MSG_SAMEDIR));
 	fDestUse = new BRadioButton("destUse",
-		TR("Use:"), new BMessage(MSG_DESTUSE));
-	fDestText = new BTextControl("destText", "", "", new BMessage(MSG_DESTTEXT));
+		B_TRANSLATE("Use:"), new BMessage(MSG_DESTUSE));
+	fDestText = new BTextControl("destText", "", "",
+		new BMessage(MSG_DESTTEXT));
 	fDestText->SetDivider(0);
 	fDestText->TextView()->MakeEditable(false);
 	fDestText->SetEnabled(false);
-	fSelect = new BButton("selectButton", TR("Select"),
+	fSelect = new BButton("selectButton", B_TRANSLATE("Select"),
 		new BMessage(MSG_DESTSELECT));
 	fSelect->SetEnabled(false);
 
 	fOpenDest = new BCheckBox("openDestination",
-		TR("Open destination folder after extraction"), NULL);
+		B_TRANSLATE("Open destination folder after extraction"), NULL);
 	fAutoShow = new BCheckBox("autoShow",
-		TR("Automatically show contents listing"), NULL);
+		B_TRANSLATE("Automatically show contents listing"), NULL);
 
 	BView* view = new BGroupView();
-	view->SetLayout(new BGroupLayout(B_HORIZONTAL)); 
-	view->AddChild(BGroupLayoutBuilder(B_VERTICAL) 
+	view->SetLayout(new BGroupLayout(B_HORIZONTAL));
+	view->AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.AddGroup(B_HORIZONTAL)
-			.Add(new BStringView("expansion", TR("Expansion:")))
+			.Add(new BStringView("expansion", B_TRANSLATE("Expansion:")))
 			.AddGlue()
 		.End()
 		.AddGroup(B_VERTICAL, 1)
@@ -72,7 +73,8 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 			.SetInsets(10, 0, 0, 10)
 		.End()
 		.AddGroup(B_HORIZONTAL)
-			.Add(new BStringView("destinationFolder", TR("Destination folder:")))
+			.Add(new BStringView("destinationFolder",
+				B_TRANSLATE("Destination folder:")))
 			.AddGlue()
 		.End()
 		.AddGroup(B_VERTICAL, 1)
@@ -87,7 +89,7 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 			.SetInsets(10, 0, 0, 10)
 		.End()
 		.AddGroup(B_HORIZONTAL)
-			.Add(new BStringView("other", TR("Other:")))
+			.Add(new BStringView("other", B_TRANSLATE("Other:")))
 			.AddGlue()
 		.End()
 		.AddGroup(B_VERTICAL, 1)
@@ -99,21 +101,22 @@ ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	);
 	box->AddChild(view);
 
-	BButton* button = new BButton("OKButton", TR("OK"), new BMessage(MSG_OK));
+	BButton* button = new BButton("OKButton", B_TRANSLATE("OK"),
+		new BMessage(MSG_OK));
 	button->MakeDefault(true);
-	BButton* cancel = new BButton("CancelButton", TR("Cancel"),
+	BButton* cancel = new BButton("CancelButton", B_TRANSLATE("Cancel"),
 		new BMessage(MSG_CANCEL));
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 11) 
-		.Add(box) 
-		.AddGroup(B_HORIZONTAL, 10) 
-			.AddGlue() 
-			.Add(cancel) 
-			.Add(button) 
-		.End() 
-		.SetInsets(10, 10, 10, 10) 
-	); 
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 11)
+		.Add(box)
+		.AddGroup(B_HORIZONTAL, 10)
+			.AddGlue()
+			.Add(cancel)
+			.Add(button)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	CenterOnScreen();
 
@@ -220,13 +223,18 @@ ExpanderPreferences::MessageReceived(BMessage* msg)
 			Hide();
 			break;
 		case MSG_OK:
-			fSettings->ReplaceBool("automatically_expand_files", fAutoExpand->Value() == B_CONTROL_ON);
-			fSettings->ReplaceBool("close_when_done", fCloseWindow->Value() == B_CONTROL_ON);
-			fSettings->ReplaceInt8("destination_folder", (fSameDest->Value() == B_CONTROL_ON) ? 0x63
+			fSettings->ReplaceBool("automatically_expand_files",
+				fAutoExpand->Value() == B_CONTROL_ON);
+			fSettings->ReplaceBool("close_when_done",
+				fCloseWindow->Value() == B_CONTROL_ON);
+			fSettings->ReplaceInt8("destination_folder",
+				(fSameDest->Value() == B_CONTROL_ON) ? 0x63
 				: ((fLeaveDest->Value() == B_CONTROL_ON) ? 0x66 : 0x65));
 			fSettings->ReplaceRef("destination_folder_use", &fRef);
-			fSettings->ReplaceBool("open_destination_folder", fOpenDest->Value() == B_CONTROL_ON);
-			fSettings->ReplaceBool("show_contents_listing", fAutoShow->Value() == B_CONTROL_ON);
+			fSettings->ReplaceBool("open_destination_folder",
+				fOpenDest->Value() == B_CONTROL_ON);
+			fSettings->ReplaceBool("show_contents_listing",
+				fAutoShow->Value() == B_CONTROL_ON);
 			Hide();
 			break;
 		default:
