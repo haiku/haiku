@@ -222,9 +222,9 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 void
 BootPromptWindow::_UpdateStrings()
 {
-	SetTitle(TR("Welcome to Haiku!"));
+	SetTitle(B_TRANSLATE("Welcome to Haiku!"));
 
-	const char* infoText = TR(
+	const char* infoText = B_TRANSLATE(
 		"Do you wish to run the Installer or continue booting to the "
 		"Desktop? You can also select your preferred language and keyboard "
 		"layout from the list below.\n\n"
@@ -237,11 +237,11 @@ BootPromptWindow::_UpdateStrings()
 
 	fInfoTextView->SetText(infoText);
 
-	fDesktopButton->SetLabel(TR("Desktop (Live-CD)"));
-	fInstallerButton->SetLabel(TR("Run Installer"));
+	fDesktopButton->SetLabel(B_TRANSLATE("Desktop (Live-CD)"));
+	fInstallerButton->SetLabel(B_TRANSLATE("Run Installer"));
 
-	fLanguagesLabelView->SetText(TR("Language"));
-	fKeymapsLabelView->SetText(TR("Keymap"));
+	fLanguagesLabelView->SetText(B_TRANSLATE("Language"));
+	fKeymapsLabelView->SetText(B_TRANSLATE("Keymap"));
 
 	_PopulateLanguages();
 	_PopulateKeymaps();
@@ -277,7 +277,7 @@ BootPromptWindow::_PopulateLanguages()
 	// Try to instantiate a BCatalog for each language, it will only work
 	// for translations of this application. So the list of languages will be
 	//  limited to catalogs written for this application, which is on purpose!
-	
+
 	const char* languageString;
 	for (int32 i = 0;
 		installedCatalogs.FindString("langs", i, &languageString) == B_OK;
