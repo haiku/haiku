@@ -9,6 +9,8 @@
 #include <stdio.h>
 
 #include <Autolock.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MessageRunner.h>
 #include <Screen.h>
 #include <StatusBar.h>
@@ -18,10 +20,13 @@
 
 static const uint32 kMsgShow = 'show';
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "ProgressWindow"
+
 
 ProgressWindow::ProgressWindow(BWindow* referenceWindow, bool center)
 	:
-	BWindow(BRect(0, 0, 250, 100), "Progress monitor",
+	BWindow(BRect(0, 0, 250, 100), TR("Progress monitor"),
 		B_MODAL_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fRunner(NULL)
