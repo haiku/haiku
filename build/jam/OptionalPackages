@@ -36,9 +36,11 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	DevelopmentMin			- development headers, libs, tools, from sources only
 #	Expat					- XML parsing libraries
 #	friss					- RSS/ATOM/... feeds reader
+#	GetText					- a framework to help produce multi-lingual messages.
 #	Git						- the distributed version control system
 #	ICU-devel				- the headers for ICU (for development)
 #	KeymapSwitcher			- Desktop utility
+#	LibEvent				- An event notification library
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
 #	LibXML2					- the XML support libary
@@ -64,6 +66,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Subversion				- the version control system
 #	Tar						- archiving utility
 #	TrackerNewTemplates		- template files for Tracker's New menu
+#	Transmission			- A fast, easy, and free BitTorrent Client
 #	UserlandFS				- aids native file system development (like FUSE)
 #	Vim						- the command line text editor
 #	Vision					- powerful native IRC client
@@ -645,6 +648,36 @@ if [ IsOptionalHaikuImagePackageAdded friss ] {
 }
 
 
+# GetText
+if [ IsOptionalHaikuImagePackageAdded GetText ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package GetText available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			gettext-0.17-x86-gcc4-2010-05-06.zip
+			: $(baseURL)/gettext-0.17-x86-gcc4-2010-05-06.zip
+			:
+			: true
+		;
+		InstallSourceArchive gettext-0.17_haiku-2010-05-06.tar.xz
+			: $(baseSourceURL)/gettext-0.17_haiku-2010-05-06.tar.xz ;
+		} else if $(HAIKU_GCC_VERSION[1]) = 2 && $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage
+			gettext-0.17-x86-gcc2h-2010-05-06.zip
+			: $(baseURL)/gettext-0.17-x86-gcc2h-2010-05-06.zip
+			:
+			: true
+		;
+		InstallSourceArchive gettext-0.17_haiku-2010-05-06.tar.xz
+			: $(baseSourceURL)/gettext-0.17_haiku-2010-05-06.tar.xz ;
+		} else {
+			Echo "No optional package GetText available for $(TARGET_ARCH)-gcc2" ;
+		}
+	}
+}
+
+
 # Git
 if [ IsOptionalHaikuImagePackageAdded Git ] {
 	if $(TARGET_ARCH) != x86 {
@@ -704,6 +737,36 @@ if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 		;
 		AddSymlinkToHaikuImage home config be Desktop\ applets
 			: /boot/common/bin/KeymapSwitcher ;
+	}
+}
+
+
+# LibEvent
+if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package LibEvent available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			libevent-1.4.13-x86-gcc4-2010-05-06.zip
+			: $(baseURL)/libevent-1.4.13-x86-gcc4-2010-05-06.zip
+			:
+			: true
+		;
+		InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
+			: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
+		} else if $(HAIKU_GCC_VERSION[1]) = 2 && $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage
+			libevent-1.4.13-x86-gcc2h-2010-05-06.zip
+			: $(baseURL)/libevent-1.4.13-x86-gcc2h-2010-05-06.zip
+			:
+			: true
+		;
+		InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
+			: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
+		} else {
+			Echo "No optional package LibEvent available for $(TARGET_ARCH)-gcc2" ;
+		}
 	}
 }
 
@@ -1175,6 +1238,27 @@ if [ IsOptionalHaikuImagePackageAdded TrackerNewTemplates ] {
 		: $(baseURL)/TrackerNewTemplates-2010-04-26.zip
 		: home config settings Tracker "Tracker New Templates"
 	;
+}
+
+
+# Transmission
+if [ IsOptionalHaikuImagePackageAdded Transmission ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Transmission available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage
+			transmission-1.93-x86-gcc4-2010-05-06.zip
+			: $(baseURL)/transmission-1.93-x86-gcc4-2010-05-06.zip
+			:
+			: true
+		;
+		InstallSourceArchive transmission-1.93_haiku-2010-05-06.tar.xz
+			: $(baseSourceURL)/transmission-1.93_haiku-2010-05-06.tar.xz ;
+		} else {
+			Echo "No optional package Transmission available for $(TARGET_ARCH)-gcc2" ;
+		}
+	}
 }
 
 
