@@ -32,12 +32,13 @@ KeyboardApplication::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case ERROR_DETECTED:
 		{
-			BAlert* errorAlert = new BAlert("Error", TR("Something has gone wrong!"),
-				TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-				B_WARNING_ALERT);
+			BAlert* errorAlert = new BAlert("Error",
+				B_TRANSLATE("Something has gone wrong!"),
+				B_TRANSLATE("OK"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 			errorAlert->Go();
 			be_app->PostMessage(B_QUIT_REQUESTED);
-			break;			
+			break;
 		}
 		default:
 			BApplication::MessageReceived(message);
@@ -49,7 +50,8 @@ KeyboardApplication::MessageReceived(BMessage* message)
 void
 KeyboardApplication::AboutRequested()
 {
-	(new BAlert("about", TR("Written by Andrew Edward McCall"), TR("OK")))->Go();
+	(new BAlert("about", B_TRANSLATE("Written by Andrew Edward McCall"),
+		B_TRANSLATE("OK")))->Go();
 }
 
 
