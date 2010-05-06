@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 
@@ -97,9 +97,9 @@ TMenu::BuildMenu()
 
 		BMessage *msg = new BMessage(M_RANDOM_SIG);
 		if (!fPopup) {
-			AddItem(new BMenuItem(TR("Random"), msg, '0'), 0);
+			AddItem(new BMenuItem(B_TRANSLATE("Random"), msg, '0'), 0);
 		} else {
-			AddItem(new BMenuItem(TR("Random"), msg), 0);
+			AddItem(new BMenuItem(B_TRANSLATE("Random"), msg), 0);
 		}
 	}
 }

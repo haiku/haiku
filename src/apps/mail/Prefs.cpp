@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 
@@ -101,7 +101,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
 	bool* spellCheckStartOn, bool* autoMarkRead, uint8* buttonBar)
 	:
-	BWindow(rect, TR("Mail preferences"),
+	BWindow(rect, B_TRANSLATE("Mail preferences"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 
@@ -139,7 +139,7 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 
 	fNewSpellCheckStartOn(spellCheckStartOn),
 	fSpellCheckStartOn(*fNewSpellCheckStartOn),
-	
+
 	fNewAutoMarkRead(autoMarkRead),
 	fAutoMarkRead(*fNewAutoMarkRead)
 {
@@ -161,19 +161,20 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	interfaceLayout->AlignLayoutWith(mailLayout, B_HORIZONTAL);
 
 	BBox* interfaceBox = new BBox(B_FANCY_BORDER, interfaceView);
-	interfaceBox->SetLabel(TR("User interface"));
+	interfaceBox->SetLabel(B_TRANSLATE("User interface"));
 	BBox* mailBox = new BBox(B_FANCY_BORDER, mailView);
-	mailBox->SetLabel(TR("Mailing"));
+	mailBox->SetLabel(B_TRANSLATE("Mailing"));
 
 	// revert, ok & cancel
 
-	BButton* okButton = new BButton("ok", TR("OK"), new BMessage(P_OK));
+	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
+		new BMessage(P_OK));
 	okButton->MakeDefault(true);
 
-	BButton* cancelButton = new BButton("cancel", TR("Cancel"),
+	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(P_CANCEL));
 
-	fRevert = new BButton("revert", TR("Revert"),
+	fRevert = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(P_REVERT));
 	fRevert->SetEnabled(false);
 
@@ -181,47 +182,53 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	int32 layoutRow = 0;
 
 	fButtonBarMenu = _BuildButtonBarMenu(*buttonBar);
-	menu = new BMenuField("bar", TR("Button bar:"), fButtonBarMenu, NULL);
+	menu = new BMenuField("bar", B_TRANSLATE("Button bar:"),
+		fButtonBarMenu, NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
 	fFontMenu = _BuildFontMenu(font);
-	menu = new BMenuField("font", TR("Font:"), fFontMenu, NULL);
+	menu = new BMenuField("font", B_TRANSLATE("Font:"),
+		fFontMenu, NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
 	fSizeMenu = _BuildSizeMenu(font);
-	menu = new BMenuField("size", TR("Size:"), fSizeMenu, NULL);
+	menu = new BMenuField("size", B_TRANSLATE("Size:"), fSizeMenu, NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
 	fColoredQuotesMenu = _BuildColoredQuotesMenu(fColoredQuotes);
-	menu = new BMenuField("cquotes", TR("Colored quotes:"), fColoredQuotesMenu,
-		NULL);
+	menu = new BMenuField("cquotes", B_TRANSLATE("Colored quotes:"),
+		fColoredQuotesMenu, NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
 	fSpellCheckStartOnMenu = _BuildSpellCheckStartOnMenu(fSpellCheckStartOn);
-	menu = new BMenuField("spellCheckStartOn", TR("Initial spell check mode:"),
+	menu = new BMenuField("spellCheckStartOn",
+		B_TRANSLATE("Initial spell check mode:"),
 		fSpellCheckStartOnMenu, NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 
 	fAutoMarkReadMenu = _BuildAutoMarkReadMenu(fAutoMarkRead);
 	menu = new BMenuField("autoMarkRead",
-		TR("Automatically mark mail as read:"), fAutoMarkReadMenu,	NULL);
+		B_TRANSLATE("Automatically mark mail as read:"),
+		fAutoMarkReadMenu,	NULL);
 	add_menu_to_layout(menu, interfaceLayout, layoutRow);
 	// Mail Accounts
 
 	layoutRow = 0;
 
 	fAccountMenu = _BuildAccountMenu(fAccount);
-	menu = new BMenuField("account", TR("Default account:"), fAccountMenu,
-		NULL);
+	menu = new BMenuField("account", B_TRANSLATE("Default account:"),
+		fAccountMenu, NULL);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
 
 	fReplyToMenu = _BuildReplyToMenu(fReplyTo);
-	menu = new BMenuField("replyTo", TR("Reply account:"), fReplyToMenu, NULL);
+	menu = new BMenuField("replyTo", B_TRANSLATE("Reply account:"),
+		fReplyToMenu, NULL);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
 
 	// Mail Contents
 
-	fReplyPreamble = new BTextControl("replytext", TR("Reply preamble:"),
+	fReplyPreamble = new BTextControl("replytext",
+		B_TRANSLATE("Reply preamble:"),
 		*preamble, new BMessage(P_REPLY_PREAMBLE));
 	fReplyPreamble->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
@@ -236,24 +243,28 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	layoutRow++;
 
 	fSignatureMenu = _BuildSignatureMenu(*sig);
-	menu = new BMenuField("sig", TR("Auto signature:"), fSignatureMenu, NULL);
+	menu = new BMenuField("sig", B_TRANSLATE("Auto signature:"),
+		fSignatureMenu, NULL);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
 
 	fEncodingMenu = _BuildEncodingMenu(fEncoding);
-	menu = new BMenuField("enc", TR("Encoding:"), fEncodingMenu, NULL);
+	menu = new BMenuField("enc", B_TRANSLATE("Encoding:"),
+		fEncodingMenu, NULL);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
 
 	fWarnUnencodableMenu = _BuildWarnUnencodableMenu(fWarnUnencodable);
-	menu = new BMenuField("warnUnencodable", TR("Warn unencodable:"),
+	menu = new BMenuField("warnUnencodable", B_TRANSLATE("Warn unencodable:"),
 		fWarnUnencodableMenu, NULL);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
 
 	fWrapMenu = _BuildWrapMenu(*wrap);
-	menu = new BMenuField("wrap", TR("Text wrapping:"), fWrapMenu, NULL);
+	menu = new BMenuField("wrap", B_TRANSLATE("Text wrapping:"),
+		fWrapMenu, NULL);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
-	
+
 	fAttachAttributesMenu = _BuildAttachAttributesMenu(*attachAttributes);
-	menu = new BMenuField("attachAttributes", TR("Attach attributes:"),
+	menu = new BMenuField("attachAttributes",
+		B_TRANSLATE("Attach attributes:"),
 		fAttachAttributesMenu, NULL);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
 
@@ -370,7 +381,8 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 				}
 
 				strcpy(label,fReplyTo == ACCOUNT_USE_DEFAULT
-					? TR("Use default account") : TR("Account from mail"));
+					? B_TRANSLATE("Use default account")
+					: B_TRANSLATE("Account from mail"));
 				if ((item = fReplyToMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
@@ -379,8 +391,8 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 					item->SetMarked(true);
 
 				strcpy(label, fAttachAttributes
-					? TR("Include file attributes in attachments")
-					: TR("No file attributes, just plain data"));
+					? B_TRANSLATE("Include file attributes in attachments")
+					: B_TRANSLATE("No file attributes, just plain data"));
 				if ((item = fAttachAttributesMenu->FindItem(label)) != NULL)
 					item->SetMarked(true);
 
@@ -482,8 +494,9 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 				*fNewSignature = (char*)malloc(strlen(signature) + 1);
 				strcpy(*fNewSignature, signature);
 			} else {
-				*fNewSignature = (char*)malloc(strlen(TR("None")) + 1);
-				strcpy(*fNewSignature, TR("None"));
+				*fNewSignature = (char*)malloc(
+					strlen(B_TRANSLATE("None")) + 1);
+				strcpy(*fNewSignature, B_TRANSLATE("None"));
 			}
 			break;
 		case P_ENC:
@@ -503,7 +516,7 @@ TPrefsWindow::MessageReceived(BMessage* msg)
 			msg->FindInt8("bar", (int8*)fNewButtonBar);
 			be_app->PostMessage(PREFS_CHANGED);
 			break;
-			
+
 		default:
 			BWindow::MessageReceived(msg);
 	}
@@ -595,13 +608,13 @@ TPrefsWindow::_BuildLevelMenu(int32 level)
 	menu = new BPopUpMenu("");
 	msg = new BMessage(P_LEVEL);
 	msg->AddInt32("level", L_BEGINNER);
-	menu->AddItem(item = new BMenuItem(TR("Beginner"), msg));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Beginner"), msg));
 	if (level == L_BEGINNER)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_LEVEL);
 	msg->AddInt32("level", L_EXPERT);
-	menu->AddItem(item = new BMenuItem(TR("Expert"), msg));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Expert"), msg));
 	if (level == L_EXPERT)
 		item->SetMarked(true);
 
@@ -647,13 +660,13 @@ TPrefsWindow::_BuildReplyToMenu(int32 account)
 
 	BMenuItem* item;
 	BMessage* msg;
-	menu->AddItem(item = new BMenuItem(TR("Use default account"),
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Use default account"),
 		msg = new BMessage(P_REPLYTO)));
 	msg->AddInt32("replyTo", ACCOUNT_USE_DEFAULT);
 	if (account == ACCOUNT_USE_DEFAULT)
 		item->SetMarked(true);
 
-	menu->AddItem(item = new BMenuItem(TR("Account from mail"),
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Account from mail"),
 		msg = new BMessage(P_REPLYTO)));
 	msg->AddInt32("replyTo", ACCOUNT_FROM_MAIL);
 	if (account == ACCOUNT_FROM_MAIL)
@@ -671,11 +684,11 @@ TPrefsWindow::_BuildReplyPreambleMenu()
 		"%f - First name",
 		"%l - Last name",
 */
-		TR("%n - Full name"),
-		TR("%e - E-mail address"),
-		TR("%d - Date"),
+		B_TRANSLATE("%n - Full name"),
+		B_TRANSLATE("%e - E-mail address"),
+		B_TRANSLATE("%d - Date"),
 		"",
-		TR("\\n - Newline"),
+		B_TRANSLATE("\\n - Newline"),
 		NULL
 	};
 
@@ -709,15 +722,15 @@ TPrefsWindow::_BuildSignatureMenu(char* sig)
 	BPopUpMenu* menu = new BPopUpMenu("");
 
 	msg = new BMessage(P_SIG);
-	msg->AddString("signature", TR("None"));
-	menu->AddItem(item = new BMenuItem(TR("None"), msg));
-	if (!strcmp(sig, TR("None")))
+	msg->AddString("signature", B_TRANSLATE("None"));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("None"), msg));
+	if (!strcmp(sig, B_TRANSLATE("None")))
 		item->SetMarked(true);
-	
+
 	msg = new BMessage(P_SIG);
-	msg->AddString("signature", TR("Random"));
-	menu->AddItem(item = new BMenuItem(TR("Random"), msg));
-	if (!strcmp(sig, TR("Random")))
+	msg->AddString("signature", B_TRANSLATE("Random"));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Random"), msg));
+	if (!strcmp(sig, B_TRANSLATE("Random")))
 		item->SetMarked(true);
 	menu->AddSeparatorItem();
 
@@ -808,14 +821,14 @@ TPrefsWindow::_BuildAttachAttributesMenu(bool attachAttributes)
 	msg = new BMessage(P_ATTACH_ATTRIBUTES);
 	msg->AddBool("attachAttributes", true);
 	menu->AddItem(item = new BMenuItem(
-		TR("Include file attributes in attachments"), msg));
+		B_TRANSLATE("Include file attributes in attachments"), msg));
 	if (attachAttributes)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_ATTACH_ATTRIBUTES);
 	msg->AddInt32("attachAttributes", false);
 	menu->AddItem(item = new BMenuItem(
-		TR("No file attributes, just plain data"), msg));
+		B_TRANSLATE("No file attributes, just plain data"), msg));
 	if (!attachAttributes)
 		item->SetMarked(true);
 
@@ -901,19 +914,20 @@ TPrefsWindow::_BuildButtonBarMenu(uint8 show)
 
 	msg = new BMessage(P_BUTTON_BAR);
 	msg->AddInt8("bar", 1);
-	menu->AddItem(item = new BMenuItem(TR("Show icons & labels"), msg));
+	menu->AddItem(item = new BMenuItem(
+		B_TRANSLATE("Show icons & labels"), msg));
 	if (show & 1)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_BUTTON_BAR);
 	msg->AddInt8("bar", 2);
-	menu->AddItem(item = new BMenuItem(TR("Show icons only"), msg));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show icons only"), msg));
 	if (show & 2)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_BUTTON_BAR);
 	msg->AddInt8("bar", 0);
-	menu->AddItem(item = new BMenuItem(TR("Hide"), msg));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Hide"), msg));
 	if (!show)
 		item->SetMarked(true);
 

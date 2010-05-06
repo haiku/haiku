@@ -19,24 +19,25 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 //--------------------------------------------------------------------
-//	
+//
 //	Enclosures.cpp
 //	The enclosures list view (TListView), the list items (TListItem),
-//	and the view containing the list and handling the messages (TEnclosuresView).
+//	and the view containing the list
+//	and handling the messages (TEnclosuresView).
 //--------------------------------------------------------------------
 
 #include "Enclosures.h"
@@ -68,7 +69,7 @@ All rights reserved.
 
 static const float kPlainFontSizeScale = 0.9;
 
-static status_t 
+static status_t
 GetTrackerIcon(BMimeType &type, BBitmap *icon, icon_size iconSize)
 {
 	// set some icon size related variables
@@ -139,14 +140,14 @@ TEnclosuresView::TEnclosuresView(BRect rect, BRect wind_rect)
 
 	BRect r;
 	r.left = ENCLOSE_TEXT_H + font.StringWidth(
-		TR("Attachments: ")) + 5;
+		B_TRANSLATE("Attachments: ")) + 5;
 	r.top = ENCLOSE_FIELD_V;
 	r.right = wind_rect.right - wind_rect.left - B_V_SCROLL_BAR_WIDTH - 9;
 	r.bottom = Frame().Height() - 8;
 	fList = new TListView(r, this);
 	fList->SetInvocationMessage(new BMessage(LIST_INVOKED));
 
-	BScrollView	*scroll = new BScrollView("", fList, B_FOLLOW_LEFT_RIGHT | 
+	BScrollView	*scroll = new BScrollView("", fList, B_FOLLOW_LEFT_RIGHT |
 			B_FOLLOW_TOP, 0, false, true);
 	AddChild(scroll);
 	scroll->ScrollBar(B_VERTICAL)->SetRange(0, 0);
@@ -224,10 +225,10 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 					if (window && window->Mail())
 						window->Mail()->RemoveComponent(item->Component());
 
-					(new BAlert("", TR(
+					(new BAlert("", B_TRANSLATE(
 						"Removing attachments from a forwarded mail is not yet "
 						"implemented!\nIt will not yet work correctly."),
-						TR("OK")))->Go();
+						B_TRANSLATE("OK")))->Go();
 				}
 				else
 					watch_node(item->NodeRef(), B_STOP_WATCHING, this);
@@ -268,7 +269,7 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 						fList->AddItem(item = new TListItem(&ref));
 						fList->Select(fList->CountItems() - 1);
 						fList->ScrollToSelection();
-						
+
 						watch_node(item->NodeRef(), B_WATCH_NAME, this);
 					}
 					else
@@ -278,8 +279,8 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 				{
 					beep();
 					(new BAlert("",
-						TR("Only files can be added as attachments."),
-						TR("OK")))->Go();
+						B_TRANSLATE("Only files can be added as attachments."),
+						B_TRANSLATE("OK")))->Go();
 				}
 			}
 			break;
@@ -355,15 +356,15 @@ static void recursive_attachment_search(TEnclosuresView *us,BMailContainer *mail
 		BMailComponent *component = mail->GetComponent(i);
 		if (component == body)
 			continue;
-			
+
 		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
-			recursive_attachment_search(us,dynamic_cast<BMIMEMultipartMailContainer *>(component),body);	
+			recursive_attachment_search(us,dynamic_cast<BMIMEMultipartMailContainer *>(component),body);
 
 		us->fList->AddItem(new TListItem(component));
 	}
 }
 
-void 
+void
 TEnclosuresView::AddEnclosuresFromMail(BEmailMessage *mail)
 {
 	for (int32 i = 0; i < mail->CountComponents(); i++)
@@ -371,7 +372,7 @@ TEnclosuresView::AddEnclosuresFromMail(BEmailMessage *mail)
 		BMailComponent *component = mail->GetComponent(i);
 		if (component == mail->Body())
 			continue;
-		
+
 		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
 			recursive_attachment_search(this,dynamic_cast<BMIMEMultipartMailContainer *>(component),mail->Body());
 
@@ -413,7 +414,7 @@ TListView::MakeFocus(bool focus)
 void
 TListView::MouseDown(BPoint point)
 {
-	int32 buttons;	
+	int32 buttons;
 	Looper()->CurrentMessage()->FindInt32("buttons",&buttons);
 
 	if (buttons & B_SECONDARY_MOUSE_BUTTON)
@@ -423,13 +424,13 @@ TListView::MouseDown(BPoint point)
 
 		BPopUpMenu menu("enclosure", false, false);
 		menu.SetFont(&font);
-		menu.AddItem(new BMenuItem(TR("Open attachment"),
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Open attachment"),
 			new BMessage(LIST_INVOKED)));
-		menu.AddItem(new BMenuItem(TR("Remove attachment"),
+		menu.AddItem(new BMenuItem(B_TRANSLATE("Remove attachment"),
 			new BMessage(M_REMOVE)));
 
 		BPoint menuStart = ConvertToScreen(point);
-		
+
 		BMenuItem *item;
 		if ((item = menu.Go(menuStart)) != NULL)
 		{
@@ -471,7 +472,7 @@ TListItem::TListItem(entry_ref *ref)
 	fComponent = NULL;
 	fRef = *ref;
 
-	BEntry entry(ref);	
+	BEntry entry(ref);
 	entry.GetNodeRef(&fNodeRef);
 }
 

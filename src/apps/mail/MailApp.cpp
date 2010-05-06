@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 
@@ -122,8 +122,8 @@ TMailApp::TMailApp()
 	// set default values
 	fContentFont.SetSize(12.0);
 	fAutoMarkRead = true;
-	fSignature = (char*)malloc(strlen(TR("None")) + 1);
-	strcpy(fSignature, TR("None"));
+	fSignature = (char*)malloc(strlen(B_TRANSLATE("None")) + 1);
+	strcpy(fSignature, B_TRANSLATE("None"));
 	fReplyPreamble = (char*)malloc(1);
 	fReplyPreamble[0] = '\0';
 
@@ -149,7 +149,7 @@ TMailApp::~TMailApp()
 void
 TMailApp::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", TR("Mail\n\n"
+	BAlert *alert = new BAlert("about", B_TRANSLATE("Mail\n\n"
 		"Written by Robert Polic.\n"
 		"Enhanced by the Dr. Zoidberg crew.\n\n"
 		"Copyright 1991-2001, Be Incorporated.\n"

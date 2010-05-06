@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 // ===========================================================================
@@ -77,14 +77,14 @@ void FindWindow::DoFind(BWindow* window, const char* text)
 					break;	// Found a window
 		}
 	}
-	
+
 	/* ask that window who is in the front */
 	window = dynamic_cast<TMailWindow*>(window)->FrontmostWindow();
 	if (window == NULL)
 		return;
-		
+
 //	Found a window, send a find message
-	
+
 	if (!window->Lock())
 		return;
 	BView* focus = window->FindView("m_content");
@@ -112,13 +112,14 @@ FindPanel::FindPanel(BRect rect)
 	fTextControl->SetText(sPreviousFind.String());
 	fTextControl->MakeFocus();
 	AddChild(fTextControl);
-	
-	fFindButton = new BButton(BRect(0, 0, 90, 20),"FINDBUTTON", TR("Find"),
+
+	fFindButton = new BButton(BRect(0, 0, 90, 20),"FINDBUTTON",
+		B_TRANSLATE("Find"),
 		new BMessage(FINDBUTTON),B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fFindButton->ResizeToPreferred();
 	AddChild(fFindButton);
 	r = fFindButton->Bounds();
-	
+
 	fFindButton->MoveTo(Bounds().right - r.Width() - 8,
 		Bounds().bottom - r.Height() - 8);
 	fFindButton->SetEnabled(sPreviousFind.Length());
@@ -137,12 +138,12 @@ void FindPanel::AttachedToWindow()
 	SetViewColor(216, 216, 216);
 	Window()->SetDefaultButton(fFindButton);
 	fFindButton->SetTarget(this);
-	
+
 	fTextControl->SetTarget(this);
 	fTextControl->ResizeToPreferred();
 	fTextControl->ResizeTo(Bounds().Width() - 20,
 		fTextControl->Frame().Height());
-	
+
 	fTextControl->MakeFocus(true);
 	fTextControl->TextView()->SelectAll();
 }
@@ -214,9 +215,9 @@ void FindPanel::Find()
 
 
 FindWindow::FindWindow()
-	: BWindow(FindWindow::fLastPosition, TR("Find"), B_FLOATING_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK
-			| B_CLOSE_ON_ESCAPE)
+	: BWindow(FindWindow::fLastPosition, B_TRANSLATE("Find"),
+		B_FLOATING_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+			| B_WILL_ACCEPT_FIRST_CLICK | B_CLOSE_ON_ESCAPE)
 {
 	fFindPanel = new FindPanel(Bounds());
 	AddChild(fFindPanel);

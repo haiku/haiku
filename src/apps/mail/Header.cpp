@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 #include "MailApp.h"
@@ -90,7 +90,7 @@ class QPopupMenu : public QueryMenu {
 	public:
 		QPopupMenu(const char *title);
 
-	private:		
+	private:
 		void AddPersonItem(const entry_ref *ref, ino_t node, BString &name,
 			BString &email, const char *attr, BMenu *groupMenu,
 			BMenuItem *superItem);
@@ -159,7 +159,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	BMessage* msg;
 
 	float x = StringWidth( /* The longest title string in the header area */
-		TR("Attachments: ")) + 9;
+		B_TRANSLATE("Attachments: ")) + 9;
 	float y = TO_FIELD_V;
 
 	BMenuBar* dummy = new BMenuBar(BRect(0, 0, 100, 15), "Dummy");
@@ -248,17 +248,18 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (fIncoming && !resending) {
 		// Set up the character set pop-up menu on the right of "To" box.
 		r.Set (windowRect.Width() - widestCharacterSet -
-			StringWidth (TR("Decoding:")) - 2 * SEPARATOR_MARGIN, y - 2,
-			windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
-		field = new BMenuField (r, "decoding", TR("Decoding:"), fEncodingMenu,
-			true /* fixedSize */,
+			StringWidth (B_TRANSLATE("Decoding:")) - 2 * SEPARATOR_MARGIN,
+				y - 2, windowRect.Width() - SEPARATOR_MARGIN,
+				y + menuFieldHeight);
+		field = new BMenuField (r, "decoding", B_TRANSLATE("Decoding:"),
+			fEncodingMenu, true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		field->SetDivider(field->StringWidth(TR("Decoding:")) + 5);
+		field->SetDivider(field->StringWidth(B_TRANSLATE("Decoding:")) + 5);
 		AddChild(field);
 		r.Set(SEPARATOR_MARGIN, y,
 			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
-		sprintf(string, TR("From:"));
+		sprintf(string, B_TRANSLATE("From:"));
 	} else {
 		r.Set(x - 12, y, windowRect.Width() - SEPARATOR_MARGIN,
 			y + menuFieldHeight);
@@ -285,9 +286,10 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 	if (!fIncoming || resending) {
 		r.right = r.left - 5;
-		r.left = r.right - ceilf(be_plain_font->StringWidth(TR("To:")) + 25);
+		r.left = r.right - ceilf(be_plain_font->StringWidth(
+			B_TRANSLATE("To:")) + 25);
 		r.top -= 1;
-		fToMenu = new QPopupMenu(TR("To:"));
+		fToMenu = new QPopupMenu(B_TRANSLATE("To:"));
 		field = new BMenuField(r, "", "", fToMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
@@ -299,16 +301,16 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	if (!fIncoming || resending) {
 		// Put the character set box on the right of the From field.
 		r.Set(windowRect.Width() - widestCharacterSet -
-			StringWidth(TR("Encoding:")) - 2 * SEPARATOR_MARGIN,
+			StringWidth(B_TRANSLATE("Encoding:")) - 2 * SEPARATOR_MARGIN,
 			y - 2, windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		BMenuField* encodingField = new BMenuField(r, "encoding",
-			TR("Encoding:"), fEncodingMenu, true /* fixedSize */,
+			B_TRANSLATE("Encoding:"), fEncodingMenu, true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-		encodingField->SetDivider(encodingField->StringWidth(TR("Encoding:"))
-			+ 5);
+		encodingField->SetDivider(encodingField->StringWidth(
+			B_TRANSLATE("Encoding:")) + 5);
 		AddChild(encodingField);
-		
+
 		field = encodingField;
 
 		// And now the "from account" pop-up menu, on the left side, taking the
@@ -358,8 +360,8 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		}
 		r.Set(SEPARATOR_MARGIN, y - 2,
 			  field->Frame().left - SEPARATOR_MARGIN, y + menuFieldHeight);
-		field = new BMenuField(r, "account", TR("From:"), fAccountMenu,
-			true /* fixedSize */,
+		field = new BMenuField(r, "account", B_TRANSLATE("From:"),
+			fAccountMenu, true /* fixedSize */,
 			B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
 			B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
 		AddChild(field, encodingField);
@@ -374,8 +376,8 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		if (account)
 			r.right -= SEPARATOR_MARGIN + ACCOUNT_FIELD_WIDTH;
-		fAccountTo = new TTextControl(r, TR("To:"), NULL, fIncoming, false,
-			B_FOLLOW_LEFT_RIGHT);
+		fAccountTo = new TTextControl(r, B_TRANSLATE("To:"), NULL, fIncoming,
+			false, B_FOLLOW_LEFT_RIGHT);
 		fAccountTo->SetEnabled(false);
 		fAccountTo->SetDivider(x - 12 - SEPARATOR_MARGIN);
 		fAccountTo->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -383,8 +385,8 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 
 		if (account) {
 			r.left = r.right + 6;  r.right = windowRect.Width() - SEPARATOR_MARGIN;
-			fAccount = new TTextControl(r, TR("Account:"), NULL, fIncoming,
-				false, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+			fAccount = new TTextControl(r, B_TRANSLATE("Account:"), NULL,
+				fIncoming, false, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 			fAccount->SetEnabled(false);
 			AddChild(fAccount);
 		}
@@ -395,8 +397,8 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 	r.Set(SEPARATOR_MARGIN, y,
 		windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 	y += controlHeight;
-	fSubject = new TTextControl(r, TR("Subject:"), new BMessage(SUBJECT_FIELD),
-				fIncoming, false, B_FOLLOW_LEFT_RIGHT);
+	fSubject = new TTextControl(r, B_TRANSLATE("Subject:"),
+		new BMessage(SUBJECT_FIELD),fIncoming, false, B_FOLLOW_LEFT_RIGHT);
 	AddChild(fSubject);
 	(msg = new BMessage(FIELD_CHANGED))->AddInt32("bitmask", FIELD_SUBJECT);
 	fSubject->SetModificationMessage(msg);
@@ -418,9 +420,10 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		fCc->SetModificationMessage(msg);
 
 		r.right = r.left - 5;
-		r.left = r.right - ceilf(be_plain_font->StringWidth(TR("Cc:")) + 25);
+		r.left = r.right - ceilf(be_plain_font->StringWidth(
+			B_TRANSLATE("Cc:")) + 25);
 		r.top -= 1;
-		fCcMenu = new QPopupMenu(TR("Cc:"));
+		fCcMenu = new QPopupMenu(B_TRANSLATE("Cc:"));
 		field = new BMenuField(r, "", "", fCcMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 
@@ -428,7 +431,7 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		field->SetEnabled(true);
 		AddChild(field);
 
-		r.Set(BCC_FIELD_H + be_plain_font->StringWidth(TR("Bcc:")), y,
+		r.Set(BCC_FIELD_H + be_plain_font->StringWidth(B_TRANSLATE("Bcc:")), y,
 			  windowRect.Width() - SEPARATOR_MARGIN, y + menuFieldHeight);
 		y += controlHeight;
 		fBcc = new TTextControl(r, "", new BMessage(BCC_FIELD),
@@ -441,9 +444,10 @@ THeaderView::THeaderView(BRect rect, BRect windowRect, bool incoming,
 		fBcc->SetModificationMessage(msg);
 
 		r.right = r.left - 5;
-		r.left = r.right - ceilf(be_plain_font->StringWidth(TR("Bcc:")) + 25);
+		r.left = r.right - ceilf(be_plain_font->StringWidth(
+			B_TRANSLATE("Bcc:")) + 25);
 		r.top -= 1;
-		fBccMenu = new QPopupMenu(TR("Bcc:"));
+		fBccMenu = new QPopupMenu(B_TRANSLATE("Bcc:"));
 		field = new BMenuField(r, "", "", fBccMenu, true,
 			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 		field->SetDivider(0.0);
@@ -600,7 +604,7 @@ THeaderView::InitGroupCompletion()
 			next = strchr(group, ',');
 		}
 	}
-	
+
 	map<BString *, BString *, CompareBStrings>::iterator iter;
 	for (iter = groupMap.begin(); iter != groupMap.end();) {
 		BString *group = iter->first;
@@ -739,7 +743,7 @@ THeaderView::LoadMessage(BEmailMessage *mail)
 //	#pragma mark - TTextControl
 
 
-TTextControl::TTextControl(BRect rect, const char *label, BMessage *msg, 
+TTextControl::TTextControl(BRect rect, const char *label, BMessage *msg,
 		bool incoming, bool resending, int32 resizingMode)
 	: BComboBox(rect, "happy", label, msg, resizingMode),
 	fRefDropMenu(NULL)
@@ -900,7 +904,7 @@ TTextControl::MessageReceived(BMessage *msg)
 			BString display;
 			BString address;
 			entry_ref ref;
-			
+
 			if (msg->FindString("address", &address) != B_OK
 				|| msg->FindRef("ref", &ref) != B_OK)
 				return;
@@ -960,12 +964,12 @@ QPopupMenu::AddPersonItem(const entry_ref *ref, ino_t node, BString &name,
 	BString	sortKey;
 		// For alphabetical order sorting, usually last name.
 
-	// if we have no Name, just use the email address 
+	// if we have no Name, just use the email address
 	if (name.Length() == 0) {
 		label = email;
 		sortKey = email;
 	} else {
-		// otherwise, pretty-format it 
+		// otherwise, pretty-format it
 		label << name << " (" << email << ")";
 
 		// Extract the last name (last word in the name),

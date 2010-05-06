@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 
@@ -202,11 +202,12 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	// File Menu
 
-	menu = new BMenu(TR("File"));
+	menu = new BMenu(B_TRANSLATE("File"));
 
 	msg = new BMessage(M_NEW);
 	msg->AddInt32("type", M_NEW);
-	menu->AddItem(item = new BMenuItem(TR("New mail message"), msg, 'N'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("New mail message"),
+		msg, 'N'));
 	item->SetTarget(be_app);
 
 	// Cheap hack - only show the drafts menu when composing messages.  Insert
@@ -222,7 +223,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	if (!fIncoming) {
 		QueryMenu *queryMenu;
-		queryMenu = new QueryMenu(TR("Open draft"), false);
+		queryMenu = new QueryMenu(B_TRANSLATE("Open draft"), false);
 		queryMenu->SetTargetForItems(be_app);
 
 		queryMenu->SetPredicate("MAIL:draft==1");
@@ -230,32 +231,32 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	}
 
 	if (!fIncoming || resending) {
-		menu->AddItem(fSendLater = new BMenuItem(TR("Save as draft"),
+		menu->AddItem(fSendLater = new BMenuItem(B_TRANSLATE("Save as draft"),
 			new BMessage(M_SAVE_AS_DRAFT), 'S'));
 	}
 
 	if (!resending && fIncoming) {
 		menu->AddSeparatorItem();
 
-		subMenu = new BMenu(TR("Close and "));
+		subMenu = new BMenu(B_TRANSLATE("Close and "));
 		if (file.GetAttrInfo(B_MAIL_ATTR_STATUS, &info) == B_NO_ERROR)
 			file.ReadAttr(B_MAIL_ATTR_STATUS, B_STRING_TYPE, 0, str, info.size);
 		else
 			str[0] = 0;
 
 		if (!strcmp(str, "New")) {
-			subMenu->AddItem(item = new BMenuItem(TR("Leave as New"),
+			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Leave as New"),
 				new BMessage(M_CLOSE_SAME), 'W', B_SHIFT_KEY));
 #if 0
-			subMenu->AddItem(item = new BMenuItem(TR("Set to Read"),
+			subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Set to Read"),
 				new BMessage(M_CLOSE_READ), 'W'));
 #endif
 			message = M_CLOSE_READ;
 		} else {
 			if (strlen(str))
-				sprintf(status, TR("Leave as '%s'"), str);
+				sprintf(status, B_TRANSLATE("Leave as '%s'"), str);
 			else
-				sprintf(status, TR("Leave same"));
+				sprintf(status, B_TRANSLATE("Leave same"));
 			subMenu->AddItem(item = new BMenuItem(status,
 							new BMessage(M_CLOSE_SAME), 'W'));
 			message = M_CLOSE_SAME;
@@ -263,87 +264,93 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 				new BMessage(M_CLOSE_SAME));
 		}
 
-		subMenu->AddItem(new BMenuItem(TR("Move to trash"),
+		subMenu->AddItem(new BMenuItem(B_TRANSLATE("Move to trash"),
 			new BMessage(M_DELETE), 'T', B_CONTROL_KEY));
 		AddShortcut('T', B_SHIFT_KEY | B_COMMAND_KEY,
 			new BMessage(M_DELETE_NEXT));
 
 		subMenu->AddSeparatorItem();
 
-		subMenu->AddItem(new BMenuItem(TR("Set to Saved"),
+		subMenu->AddItem(new BMenuItem(B_TRANSLATE("Set to Saved"),
 			new BMessage(M_CLOSE_SAVED), 'W', B_CONTROL_KEY));
 
 		if (add_query_menu_items(subMenu, INDEX_STATUS, M_STATUS,
-			TR("Set to %s")) > 0)
+			B_TRANSLATE("Set to %s")) > 0)
 			subMenu->AddSeparatorItem();
 
-		subMenu->AddItem(new BMenuItem(TR("Set to" B_UTF8_ELLIPSIS),
+		subMenu->AddItem(new BMenuItem(B_TRANSLATE("Set to" B_UTF8_ELLIPSIS),
 			new BMessage(M_CLOSE_CUSTOM)));
 
 #if 0
 		subMenu->AddItem(new BMenuItem(new TMenu(
-			TR("Set to" B_UTF8_ELLIPSIS), INDEX_STATUS, M_STATUS, false, false),
+			B_TRANSLATE("Set to" B_UTF8_ELLIPSIS), INDEX_STATUS, M_STATUS,
+				false, false),
 			new BMessage(M_CLOSE_CUSTOM)));
 #endif
 		menu->AddItem(subMenu);
 	} else {
 		menu->AddSeparatorItem();
-		menu->AddItem(new BMenuItem(TR("Close"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 			new BMessage(B_CLOSE_REQUESTED), 'W'));
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(fPrint = new BMenuItem(TR("Page setup" B_UTF8_ELLIPSIS),
+	menu->AddItem(fPrint = new BMenuItem(
+		B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		new BMessage(M_PRINT_SETUP)));
-	menu->AddItem(fPrint = new BMenuItem(TR("Print" B_UTF8_ELLIPSIS),
+	menu->AddItem(fPrint = new BMenuItem(
+		B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
 		new BMessage(M_PRINT), 'P'));
 	fMenuBar->AddItem(menu);
 
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
-		TR("About Mail" B_UTF8_ELLIPSIS),
+		B_TRANSLATE("About Mail" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(TR("Quit"),
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	item->SetTarget(be_app);
 
 	// Edit Menu
 
-	menu = new BMenu(TR("Edit"));
-	menu->AddItem(fUndo = new BMenuItem(TR("Undo"), new BMessage(B_UNDO),
-		'Z', 0));
+	menu = new BMenu(B_TRANSLATE("Edit"));
+	menu->AddItem(fUndo = new BMenuItem(B_TRANSLATE("Undo"),
+		new BMessage(B_UNDO), 'Z', 0));
 	fUndo->SetTarget(NULL, this);
-	menu->AddItem(fRedo = new BMenuItem(TR("Redo"), new BMessage(M_REDO),
-		'Z', B_SHIFT_KEY));
+	menu->AddItem(fRedo = new BMenuItem(B_TRANSLATE("Redo"),
+		new BMessage(M_REDO), 'Z', B_SHIFT_KEY));
 	fRedo->SetTarget(NULL, this);
 	menu->AddSeparatorItem();
-	menu->AddItem(fCut = new BMenuItem(TR("Cut"), new BMessage(B_CUT), 'X'));
+	menu->AddItem(fCut = new BMenuItem(B_TRANSLATE("Cut"),
+		new BMessage(B_CUT), 'X'));
 	fCut->SetTarget(NULL, this);
-	menu->AddItem(fCopy = new BMenuItem(TR("Copy"), new BMessage(B_COPY), 'C'));
+	menu->AddItem(fCopy = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
 	fCopy->SetTarget(NULL, this);
-	menu->AddItem(fPaste = new BMenuItem(TR("Paste"), new BMessage(B_PASTE),
+	menu->AddItem(fPaste = new BMenuItem(B_TRANSLATE("Paste"),
+		new BMessage(B_PASTE),
 		'V'));
 	fPaste->SetTarget(NULL, this);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(TR("Select all"), new BMessage(M_SELECT),
-		'A'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(M_SELECT), 'A'));
 	menu->AddSeparatorItem();
 	item->SetTarget(NULL, this);
-	menu->AddItem(new BMenuItem(TR("Find" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
 		new BMessage(M_FIND), 'F'));
-	menu->AddItem(new BMenuItem(TR("Find again"), new BMessage(M_FIND_AGAIN),
-		'G'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Find again"),
+		new BMessage(M_FIND_AGAIN), 'G'));
 	if (!fIncoming) {
 		menu->AddSeparatorItem();
-		menu->AddItem(fQuote =new BMenuItem(TR("Quote"),
+		menu->AddItem(fQuote =new BMenuItem(B_TRANSLATE("Quote"),
 			new BMessage(M_QUOTE), B_RIGHT_ARROW));
-		menu->AddItem(fRemoveQuote = new BMenuItem(TR("Remove quote"),
+		menu->AddItem(fRemoveQuote = new BMenuItem(B_TRANSLATE("Remove quote"),
 			new BMessage(M_REMOVE_QUOTE), B_LEFT_ARROW));
 		menu->AddSeparatorItem();
-		fSpelling = new BMenuItem(TR("Check spelling"),
+		fSpelling = new BMenuItem(B_TRANSLATE("Check spelling"),
 			new BMessage(M_CHECK_SPELLING), ';');
 		menu->AddItem(fSpelling);
 		if (fApp->StartWithSpellCheckOn())
@@ -351,63 +358,64 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	}
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
-		TR("Preferences" B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Preferences" B_UTF8_ELLIPSIS),
 		new BMessage(M_PREFS),','));
 	item->SetTarget(be_app);
 	fMenuBar->AddItem(menu);
 	menu->AddItem(item = new BMenuItem(
-		TR("Accounts" B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Accounts" B_UTF8_ELLIPSIS),
 		new BMessage(M_ACCOUNTS),'-'));
 	item->SetTarget(be_app);
 
 	// View Menu
 
 	if (!resending && fIncoming) {
-		menu = new BMenu(TR("View"));
-		menu->AddItem(fHeader = new BMenuItem(TR("Show header"),
+		menu = new BMenu(B_TRANSLATE("View"));
+		menu->AddItem(fHeader = new BMenuItem(B_TRANSLATE("Show header"),
 			new BMessage(M_HEADER), 'H'));
-		menu->AddItem(fRaw = new BMenuItem(TR("Show raw message"),
+		menu->AddItem(fRaw = new BMenuItem(B_TRANSLATE("Show raw message"),
 			new BMessage(M_RAW)));
 		fMenuBar->AddItem(menu);
 	}
 
 	// Message Menu
 
-	menu = new BMenu(TR("Message"));
+	menu = new BMenu(B_TRANSLATE("Message"));
 
 	if (!resending && fIncoming) {
 		BMenuItem *menuItem;
-		menu->AddItem(new BMenuItem(TR("Reply"), new BMessage(M_REPLY),'R'));
-		menu->AddItem(new BMenuItem(TR("Reply to sender"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Reply"),
+			new BMessage(M_REPLY),'R'));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Reply to sender"),
 			new BMessage(M_REPLY_TO_SENDER),'R',B_OPTION_KEY));
-		menu->AddItem(new BMenuItem(TR("Reply to all"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Reply to all"),
 			new BMessage(M_REPLY_ALL), 'R', B_SHIFT_KEY));
 
 		menu->AddSeparatorItem();
 
-		menu->AddItem(new BMenuItem(TR("Forward"), new BMessage(M_FORWARD),
-			'J'));
-		menu->AddItem(new BMenuItem(TR("Forward without attachments"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Forward"),
+			new BMessage(M_FORWARD), 'J'));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Forward without attachments"),
 			new BMessage(M_FORWARD_WITHOUT_ATTACHMENTS)));
-		menu->AddItem(menuItem = new BMenuItem(TR("Resend"),
+		menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Resend"),
 			new BMessage(M_RESEND)));
-		menu->AddItem(menuItem = new BMenuItem(TR("Copy to new"),
+		menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Copy to new"),
 			new BMessage(M_COPY_TO_NEW), 'D'));
 
 		menu->AddSeparatorItem();
-		fDeleteNext = new BMenuItem(TR("Move to trash"),
+		fDeleteNext = new BMenuItem(B_TRANSLATE("Move to trash"),
 			new BMessage(M_DELETE_NEXT), 'T');
 		menu->AddItem(fDeleteNext);
 		menu->AddSeparatorItem();
 
-		fPrevMsg = new BMenuItem(TR("Previous message"),
+		fPrevMsg = new BMenuItem(B_TRANSLATE("Previous message"),
 			new BMessage(M_PREVMSG), B_UP_ARROW);
 		menu->AddItem(fPrevMsg);
-		fNextMsg = new BMenuItem(TR("Next message"), new BMessage(M_NEXTMSG),
-			B_DOWN_ARROW);
+		fNextMsg = new BMenuItem(B_TRANSLATE("Next message"),
+			new BMessage(M_NEXTMSG), B_DOWN_ARROW);
 		menu->AddItem(fNextMsg);
 		menu->AddSeparatorItem();
-		fSaveAddrMenu = subMenu = new BMenu(TR("Save address"));
+		fSaveAddrMenu = subMenu = new BMenu(B_TRANSLATE("Save address"));
 
 		// create the list of addresses
 
@@ -462,23 +470,24 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			fMenuBar->AddItem(menu);
 		}
 	} else {
-		menu->AddItem(fSendNow = new BMenuItem(TR("Send message"),
+		menu->AddItem(fSendNow = new BMenuItem(B_TRANSLATE("Send message"),
 			new BMessage(M_SEND_NOW), 'M'));
 
 		if (!fIncoming) {
 			menu->AddSeparatorItem();
-			fSignature = new TMenu(TR("Add signature"), INDEX_SIGNATURE,
-				M_SIGNATURE);
+			fSignature = new TMenu(B_TRANSLATE("Add signature"),
+				INDEX_SIGNATURE, M_SIGNATURE);
 			menu->AddItem(new BMenuItem(fSignature));
 			menu->AddItem(item = new BMenuItem(
-				TR("Edit signatures" B_UTF8_ELLIPSIS),
+				B_TRANSLATE("Edit signatures" B_UTF8_ELLIPSIS),
 				new BMessage(M_EDIT_SIGNATURE)));
 			item->SetTarget(be_app);
 			menu->AddSeparatorItem();
-			menu->AddItem(fAdd = new BMenuItem(TR(
-					"Add enclosure" B_UTF8_ELLIPSIS),
+			menu->AddItem(fAdd = new BMenuItem(
+				B_TRANSLATE("Add enclosure" B_UTF8_ELLIPSIS),
 				new BMessage(M_ADD), 'E'));
-			menu->AddItem(fRemove = new BMenuItem(TR("Remove enclosure"),
+			menu->AddItem(fRemove = new BMenuItem(
+				B_TRANSLATE("Remove enclosure"),
 				new BMessage(M_REMOVE), 'T'));
 		}
 		fMenuBar->AddItem(menu);
@@ -486,7 +495,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	// Queries Menu
 
-	fQueryMenu = new BMenu(TR("Queries"));
+	fQueryMenu = new BMenu(B_TRANSLATE("Queries"));
 	fMenuBar->AddItem(fQueryMenu);
 
 	_RebuildQueryMenu(true);
@@ -543,8 +552,8 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	BString signature = fApp->Signature();
 
-	if (!fIncoming && strcmp(signature.String(), TR("None")) != 0) {
-		if (strcmp(signature.String(), TR("Random")) == 0)
+	if (!fIncoming && strcmp(signature.String(), B_TRANSLATE("None")) != 0) {
+		if (strcmp(signature.String(), B_TRANSLATE("Random")) == 0)
 			PostMessage(M_RANDOM_SIG);
 		else {
 			// Create a query to find this signature
@@ -602,41 +611,47 @@ TMailWindow::BuildButtonBar()
 
 	bbar = new ButtonBar(BRect(0, 0, 100, 100), "ButtonBar", 2, 3, 0, 1, 10,
 		2);
-	bbar->AddButton(TR("New"), 28, new BMessage(M_NEW));
+	bbar->AddButton(B_TRANSLATE("New"), 28, new BMessage(M_NEW));
 	bbar->AddDivider(5);
 	fButtonBar = bbar;
 
 	if (fResending) {
-		fSendButton = bbar->AddButton(TR("Send"), 8, new BMessage(M_SEND_NOW));
+		fSendButton = bbar->AddButton(B_TRANSLATE("Send"), 8,
+			new BMessage(M_SEND_NOW));
 		bbar->AddDivider(5);
 	} else if (!fIncoming) {
-		fSendButton = bbar->AddButton(TR("Send"), 8, new BMessage(M_SEND_NOW));
+		fSendButton = bbar->AddButton(B_TRANSLATE("Send"), 8,
+			new BMessage(M_SEND_NOW));
 		fSendButton->SetEnabled(false);
-		fSigButton = bbar->AddButton(TR("Signature"), 4,
+		fSigButton = bbar->AddButton(B_TRANSLATE("Signature"), 4,
 			new BMessage(M_SIG_MENU));
 		fSigButton->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
-		fSaveButton = bbar->AddButton(TR("Save"), 44,
+		fSaveButton = bbar->AddButton(B_TRANSLATE("Save"), 44,
 			new BMessage(M_SAVE_AS_DRAFT));
 		fSaveButton->SetEnabled(false);
-		fPrintButton = bbar->AddButton(TR("Print"), 16, new BMessage(M_PRINT));
+		fPrintButton = bbar->AddButton(B_TRANSLATE("Print"), 16,
+			new BMessage(M_PRINT));
 		fPrintButton->SetEnabled(false);
-		bbar->AddButton(TR("Trash"), 0, new BMessage(M_DELETE));
+		bbar->AddButton(B_TRANSLATE("Trash"), 0, new BMessage(M_DELETE));
 		bbar->AddDivider(5);
 	} else {
-		BmapButton *button = bbar->AddButton(TR("Reply"), 12,
+		BmapButton *button = bbar->AddButton(B_TRANSLATE("Reply"), 12,
 			new BMessage(M_REPLY));
 		button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
-		button = bbar->AddButton(TR("Forward"), 40, new BMessage(M_FORWARD));
+		button = bbar->AddButton(B_TRANSLATE("Forward"), 40,
+			new BMessage(M_FORWARD));
 		button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
-		fPrintButton = bbar->AddButton(TR("Print"), 16, new BMessage(M_PRINT));
-		bbar->AddButton(TR("Trash"), 0, new BMessage(M_DELETE_NEXT));
+		fPrintButton = bbar->AddButton(B_TRANSLATE("Print"), 16,
+			new BMessage(M_PRINT));
+		bbar->AddButton(B_TRANSLATE("Trash"), 0, new BMessage(M_DELETE_NEXT));
 		if (fApp->ShowSpamGUI()) {
 			button = bbar->AddButton("Spam", 48, new BMessage(M_SPAM_BUTTON));
 			button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
 		}
 		bbar->AddDivider(5);
-		fNextButton = bbar->AddButton(TR("Next"), 24, new BMessage(M_NEXTMSG));
-		bbar->AddButton(TR("Previous"), 20, new BMessage(M_PREVMSG));
+		fNextButton = bbar->AddButton(B_TRANSLATE("Next"), 24,
+			new BMessage(M_NEXTMSG));
+		bbar->AddButton(B_TRANSLATE("Previous"), 20, new BMessage(M_PREVMSG));
 		if (!fAutoMarkRead) {
 			_AddReadButton();
 		}
@@ -1004,7 +1019,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				A popup from a button is good only when the behavior has some
 				consistency and there is some visual indication that a menu
 				will be shown when clicked. A workable implementation would
-				have an extra button attached to the main one which has a 
+				have an extra button attached to the main one which has a
 				downward-pointing arrow. Mozilla Thunderbird's 'Get Mail'
 				button is a good example of this.
 
@@ -1053,10 +1068,11 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON) {
 				BPopUpMenu menu("Reply To", false, false);
-				menu.AddItem(new BMenuItem(TR("Reply"),new BMessage(M_REPLY)));
-				menu.AddItem(new BMenuItem(TR("Reply to sender"),
+				menu.AddItem(new BMenuItem(B_TRANSLATE("Reply"),
+					new BMessage(M_REPLY)));
+				menu.AddItem(new BMenuItem(B_TRANSLATE("Reply to sender"),
 					new BMessage(M_REPLY_TO_SENDER)));
-				menu.AddItem(new BMenuItem(TR("Reply to all"),
+				menu.AddItem(new BMenuItem(B_TRANSLATE("Reply to all"),
 					new BMessage(M_REPLY_ALL)));
 
 				BPoint where;
@@ -1079,9 +1095,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (msg->FindInt32("buttons", (int32 *)&buttons) == B_OK
 				&& buttons == B_SECONDARY_MOUSE_BUTTON) {
 				BPopUpMenu menu("Forward", false, false);
-				menu.AddItem(new BMenuItem(TR("Forward"),
+				menu.AddItem(new BMenuItem(B_TRANSLATE("Forward"),
 					new BMessage(M_FORWARD)));
-				menu.AddItem(new BMenuItem(TR("Forward without attachments"),
+				menu.AddItem(new BMenuItem(
+					B_TRANSLATE("Forward without attachments"),
 					new BMessage(M_FORWARD_WITHOUT_ATTACHMENTS)));
 
 				BPoint where;
@@ -1140,8 +1157,8 @@ TMailWindow::MessageReceived(BMessage *msg)
 						tracker.SendMessage(&msg);
 					} else {
 						(new BAlert("",
-							TR("Need Tracker to move items to trash"),
-							TR("Sorry")))->Go();
+							B_TRANSLATE("Need Tracker to move items to trash"),
+							B_TRANSLATE("Sorry")))->Go();
 					}
 				}
 			} else {
@@ -1297,9 +1314,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 						1, &arg);
 
 					if (result != B_NO_ERROR)
-						(new BAlert("",	TR(
-							"Sorry, could not find an application that supports"
-							" the 'Person' data type."), TR("OK")))->Go();
+						(new BAlert("",	B_TRANSLATE(
+							"Sorry, could not find an application that "
+							"supports the 'Person' data type."),
+							B_TRANSLATE("OK")))->Go();
 				}
 				free(arg);
 			}
@@ -1512,9 +1530,9 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (!gDictCount) {
 				beep();
 				(new BAlert("",
-					TR("Mail couldn't find its dictionary."),
-					TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-					B_STOP_ALERT))->Go();
+					B_TRANSLATE("Mail couldn't find its dictionary."),
+					B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+					B_OFFSET_SPACING, B_STOP_ALERT))->Go();
 			} else {
 				fSpelling->SetMarked(!fSpelling->IsMarked());
 				fContentView->fTextView->EnableSpellCheck(
@@ -1616,15 +1634,17 @@ TMailWindow::QuitRequested()
 			|| strlen(fHeaderView->fSubject->Text())
 			|| (fHeaderView->fCc && strlen(fHeaderView->fCc->Text()))
 			|| (fHeaderView->fBcc && strlen(fHeaderView->fBcc->Text()))
-			|| (strlen(fContentView->fTextView->Text()) && (!fStartingText 
+			|| (strlen(fContentView->fTextView->Text()) && (!fStartingText
 				|| (fStartingText
 					&& strcmp(fContentView->fTextView->Text(), fStartingText))))
-			|| (fEnclosuresView != NULL 
+			|| (fEnclosuresView != NULL
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
-			BAlert *alert = new BAlert("",
-				TR("Do you wish to send this message before closing?"),
-				TR("Discard"), TR("Cancel"), TR("Send"),
+			BAlert *alert = new BAlert("", B_TRANSLATE(
+					"Do you wish to send this message before closing?"),
+				B_TRANSLATE("Discard"),
+				B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Send"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 			alert->SetShortcut(0, 'd');
 			alert->SetShortcut(1, B_ESCAPE);
@@ -1641,9 +1661,11 @@ TMailWindow::QuitRequested()
 			}
 		} else {
 			BAlert *alert = new BAlert("",
-				TR("Do you wish to save this message as a draft before closing?"
-					),
-				TR("Don't save"), TR("Cancel"), TR("Save"),
+				B_TRANSLATE("Do you wish to save this message as a draft "
+					"before closing?"),
+				B_TRANSLATE("Don't save"),
+				B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Save"),
 				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 			alert->SetShortcut(0, 'd');
 			alert->SetShortcut(1, B_ESCAPE);
@@ -2201,8 +2223,8 @@ TMailWindow::Send(bool now)
 		status_t status = SaveAsDraft();
 		if (status != B_OK) {
 			beep();
-			(new BAlert("", TR("E-mail draft could not be saved!"),
-				TR("OK")))->Go();
+			(new BAlert("", B_TRANSLATE("E-mail draft could not be saved!"),
+				B_TRANSLATE("OK")))->Go();
 		}
 		return status;
 	}
@@ -2283,7 +2305,7 @@ TMailWindow::Send(bool now)
 					BString	messageString;
 					BString countString;
 					countString << count;
-					messageString << TR("Your main text contains %ld"
+					messageString << B_TRANSLATE("Your main text contains %ld"
 						" unencodable characters. Perhaps a different "
 						"character set would work better? Hit Send to send it "
 						"anyway "
@@ -2292,8 +2314,8 @@ TMailWindow::Send(bool now)
 						"and try fixing it up.");
 					messageString.ReplaceFirst("%ld", countString);
 					userAnswer = (new BAlert("Question", messageString.String(),
-						TR("Send"),
-						TR("Cancel"),
+						B_TRANSLATE("Send"),
+						B_TRANSLATE("Cancel"),
 						NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
 						B_WARNING_ALERT))->Go();
 					if (userAnswer == 1) {
@@ -2427,9 +2449,9 @@ TMailWindow::Send(bool now)
 			fSent = true;
 
 			int32 start = (new BAlert("no daemon",
-				TR("The mail_daemon is not running. The message is queued and "
-				"will be sent when the mail_daemon is started."),
-				TR("Start now"), TR("OK")))->Go();
+				B_TRANSLATE("The mail_daemon is not running. The message is "
+				"queued and will be sent when the mail_daemon is started."),
+				B_TRANSLATE("Start now"), B_TRANSLATE("OK")))->Go();
 
 			if (start == 0) {
 				result = be_roster->Launch("application/x-vnd.Be-POST");
@@ -2437,7 +2459,8 @@ TMailWindow::Send(bool now)
 					BMailDaemon::SendQueuedMail();
 				} else {
 					errorMessage
-						<< TR("The mail_daemon could not be started:\n\t")
+						<< B_TRANSLATE("The mail_daemon could not be "
+							"started:\n\t")
 						<< strerror(result);
 				}
 			}
@@ -2464,7 +2487,7 @@ TMailWindow::Send(bool now)
 
 	if (result != B_NO_ERROR && result != B_MAIL_NO_DAEMON) {
 		beep();
-		(new BAlert("", errorMessage.String(), TR("OK")))->Go();
+		(new BAlert("", errorMessage.String(), B_TRANSLATE("OK")))->Go();
 	}
 	if (close) {
 		PostMessage(B_QUIT_REQUESTED);
@@ -2687,7 +2710,7 @@ ErrorExit:
 		"Possibly useful error code: %s (%ld).",
 		filePath.Path(), CommandWord, strerror (errorCode), errorCode);
 	(new BAlert("", errorString,
-		TR("OK")))->Go();
+		B_TRANSLATE("OK")))->Go();
 	return errorCode;
 }
 
@@ -2973,7 +2996,8 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 		delete item;
 	}
 
-	fQueryMenu->AddItem(new BMenuItem(TR("Edit queries" B_UTF8_ELLIPSIS),
+	fQueryMenu->AddItem(new BMenuItem(B_TRANSLATE("Edit queries"
+			B_UTF8_ELLIPSIS),
 		new BMessage(M_EDIT_QUERIES), 'E', B_SHIFT_KEY));
 
 	bool queryItemsAdded = false;
@@ -3138,10 +3162,10 @@ TMailWindow::_AddReadButton()
 	int32 buttonIndex = fButtonBar->IndexOf(fNextButton);
 	if (newMail)
 		fReadButton = fButtonBar->AddButton(
-			TR(" Read "), 24, new BMessage(M_READ), buttonIndex);
+			B_TRANSLATE(" Read "), 24, new BMessage(M_READ), buttonIndex);
 	else
 		fReadButton = fButtonBar->AddButton(
-			TR("Unread"), 28, new BMessage(M_UNREAD), buttonIndex);
+			B_TRANSLATE("Unread"), 28, new BMessage(M_UNREAD), buttonIndex);
 }
 
 

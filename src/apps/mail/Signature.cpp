@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 #include "Signature.h"
@@ -60,7 +60,7 @@ extern const char	*kRedoStrings[];
 
 TSignatureWindow::TSignatureWindow(BRect rect)
 	:
-	BWindow (rect, TR("Signatures"), B_TITLED_WINDOW, 0),
+	BWindow (rect, B_TRANSLATE("Signatures"), B_TITLED_WINDOW, 0),
 	fFile(NULL)
 {
 	BMenu		*menu;
@@ -70,30 +70,35 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 	BRect r = Bounds();
 	/*** Set up the menus ****/
 	menu_bar = new BMenuBar(r, "MenuBar");
-	menu = new BMenu(TR("Signature"));
-	menu->AddItem(fNew = new BMenuItem(TR("New"), new BMessage(M_NEW), 'N'));
-	fSignature = new TMenu(TR("Open"), INDEX_SIGNATURE, M_SIGNATURE);
+	menu = new BMenu(B_TRANSLATE("Signature"));
+	menu->AddItem(fNew = new BMenuItem(B_TRANSLATE("New"),
+		new BMessage(M_NEW), 'N'));
+	fSignature = new TMenu(B_TRANSLATE("Open"), INDEX_SIGNATURE, M_SIGNATURE);
 	menu->AddItem(new BMenuItem(fSignature));
 	menu->AddSeparatorItem();
-	menu->AddItem(fSave = new BMenuItem(TR("Save"), new BMessage(M_SAVE), 'S'));
-	menu->AddItem(fDelete = new BMenuItem(TR("Delete"), new BMessage(M_DELETE),
-		'T'));
+	menu->AddItem(fSave = new BMenuItem(B_TRANSLATE("Save"),
+		new BMessage(M_SAVE), 'S'));
+	menu->AddItem(fDelete = new BMenuItem(B_TRANSLATE("Delete"),
+		new BMessage(M_DELETE), 'T'));
 	menu_bar->AddItem(menu);
 
-	menu = new BMenu(TR("Edit"));
-	menu->AddItem(fUndo = new BMenuItem(TR("Undo"), new BMessage(B_UNDO), 'Z'));
+	menu = new BMenu(B_TRANSLATE("Edit"));
+	menu->AddItem(fUndo = new BMenuItem(B_TRANSLATE("Undo"),
+		new BMessage(B_UNDO), 'Z'));
 	fUndo->SetTarget(NULL, this);
 	menu->AddSeparatorItem();
-	menu->AddItem(fCut = new BMenuItem(TR("Cut"), new BMessage(B_CUT), 'X'));
+	menu->AddItem(fCut = new BMenuItem(B_TRANSLATE("Cut"),
+		new BMessage(B_CUT), 'X'));
 	fCut->SetTarget(NULL, this);
-	menu->AddItem(fCopy = new BMenuItem(TR("Copy"), new BMessage(B_COPY), 'C'));
+	menu->AddItem(fCopy = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
 	fCopy->SetTarget(NULL, this);
-	menu->AddItem(fPaste = new BMenuItem(TR("Paste"), new BMessage(B_PASTE),
-		'V'));
+	menu->AddItem(fPaste = new BMenuItem(B_TRANSLATE("Paste"),
+		new BMessage(B_PASTE), 'V'));
 	fPaste->SetTarget(NULL, this);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem(TR("Select all"), new BMessage(M_SELECT),
-		'A'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(M_SELECT), 'A'));
 	item->SetTarget(NULL, this);
 	menu_bar->AddItem(menu);
 
@@ -189,9 +194,11 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 
 		case M_DELETE:
 			if (!(new BAlert("",
-					TR("Really delete this signature? This cannot be undone."),
-					TR("Cancel"), TR("Delete"), NULL, B_WIDTH_AS_USUAL,
-					B_WARNING_ALERT))->Go())
+					B_TRANSLATE("Really delete this signature? This cannot "
+						"be undone."),
+					B_TRANSLATE("Cancel"),
+					B_TRANSLATE("Delete"),
+					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go())
 				break;
 
 			if (fFile) {
@@ -224,8 +231,9 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 				else {
 					fFile = NULL;
 					beep();
-					(new BAlert("", TR("Couldn't open this signature. Sorry."),
-						TR("OK")))->Go();
+					(new BAlert("",
+						B_TRANSLATE("Couldn't open this signature. Sorry."),
+						B_TRANSLATE("OK")))->Go();
 				}
 			}
 			break;
@@ -280,8 +288,11 @@ TSignatureWindow::Clear()
 
 	if (IsDirty()) {
 		beep();
-		BAlert *alert = new BAlert("", TR("Save changes to this signature?"),
-			TR("Don't save"), TR("Cancel"), TR("Save"),
+		BAlert *alert = new BAlert("",
+			B_TRANSLATE("Save changes to this signature?"),
+			B_TRANSLATE("Don't save"),
+			B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Save"),
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, 'd');
 		alert->SetShortcut(1, B_ESCAPE);
@@ -374,8 +385,9 @@ TSignatureWindow::Save()
 
 err_exit:
 	beep();
-	(new BAlert("", TR("An error occurred trying to save this signature."),
-		TR("Sorry")))->Go();
+	(new BAlert("",
+		B_TRANSLATE("An error occurred trying to save this signature."),
+		B_TRANSLATE("Sorry")))->Go();
 }
 
 
@@ -393,8 +405,8 @@ void
 TSignatureView::AttachedToWindow()
 {
 	BRect	rect = Bounds();
-	float	name_text_length = StringWidth(TR("Title:"));
-	float	sig_text_length = StringWidth(TR("Signature:"));
+	float	name_text_length = StringWidth(B_TRANSLATE("Title:"));
+	float	sig_text_length = StringWidth(B_TRANSLATE("Signature:"));
 	float	divide_length;
 
 	if (name_text_length > sig_text_length)
@@ -405,7 +417,8 @@ TSignatureView::AttachedToWindow()
 	rect.InsetBy(8,0);
 	rect.top+= 8;
 
-	fName = new TNameControl(rect, TR("Title:"), new BMessage(NAME_FIELD));
+	fName = new TNameControl(rect, B_TRANSLATE("Title:"),
+		new BMessage(NAME_FIELD));
 	AddChild(fName);
 
 	fName->SetDivider(divide_length + 10);
@@ -427,7 +440,7 @@ TSignatureView::AttachedToWindow()
 
 	rect = scroller->Frame();
 	BStringView *stringView = new BStringView(rect, "SigLabel",
-		TR("Signature:"));
+		B_TRANSLATE("Signature:"));
 	AddChild(stringView);
 
 	float tWidth, tHeight;

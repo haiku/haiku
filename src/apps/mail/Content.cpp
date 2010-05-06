@@ -19,17 +19,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF TITLE, MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 BE INCORPORATED BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Except as contained in this notice, the name of Be Incorporated shall not be
 used in advertising or otherwise to promote the sale, use or other dealings in
 this Software without prior written authorization from Be Incorporated.
 
-BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or registered trademarks
-of Be Incorporated in the United States and other countries. Other brand product
-names are registered trademarks or trademarks of their respective holders.
-All rights reserved.
+BeMail(TM), Tracker(TM), Be(R), BeOS(R), and BeIA(TM) are trademarks or
+registered trademarks of Be Incorporated in the United States and other
+countries. Other brand product names are registered trademarks or trademarks
+of their respective holders. All rights reserved.
 */
 
 
@@ -104,7 +104,7 @@ void Unicode2UTF8(int32 c, char **out);
 
 
 inline bool
-IsInitialUTF8Byte(uchar b)	
+IsInitialUTF8Byte(uchar b)
 {
 	return ((b & 0xC0) != 0x80);
 }
@@ -309,7 +309,7 @@ CheckForURL(const char *string, size_t &urlLength, BString *url = NULL)
 	for (const char **prefix = urlPrefixes; *prefix != 0; prefix++) {
 		if (!cistrncmp(string, *prefix, strlen(*prefix))) {
 			type = TYPE_URL;
-			break;	
+			break;
 		}
 	}
 
@@ -458,7 +458,7 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 {
 	text_run* runs = style->runs;
 	int32 index = style->count;
-	bool begin; 
+	bool begin;
 	int32 pos = 0;
 	int32 diffMode = 0;
 	bool inDiff = false;
@@ -742,8 +742,9 @@ TContentView::MessageReceived(BMessage *msg)
 			} else {
 				beep();
 				(new BAlert("",
-					TR("An error occurred trying to open this signature."),
-					TR("Sorry")))->Go();
+					B_TRANSLATE("An error occurred trying to open this "
+						"signature."),
+					B_TRANSLATE("Sorry")))->Go();
 			}
 			break;
 		}
@@ -768,9 +769,9 @@ TContentView::FindString(const char *str)
 	if (str == NULL)
 		return;
 
-	//	
+	//
 	//	Start from current selection or from the beginning of the pool
-	//	
+	//
 	const char *text = fTextView->Text();
 	int32 count = fTextView->TextLength();
 	fTextView->GetSelection(&start, &finish);
@@ -779,7 +780,7 @@ TContentView::FindString(const char *str)
 	if (!count || text == NULL)
 		return;
 
-	//	
+	//
 	//	Do the find
 	//
 	while (pass < 2) {
@@ -800,10 +801,10 @@ TContentView::FindString(const char *str)
 				}
 			}
 		}
-	
-		//	
+
+		//
 		//	Select the text if it worked
-		//	
+		//
 		if (found != -1) {
 			Window()->Activate();
 			fTextView->Select(found, found + strlen(str));
@@ -839,7 +840,7 @@ TContentView::FrameResized(float /* width */, float /* height */)
 {
 	BRect r(fTextView->Bounds());
 	r.OffsetTo(0, 0);
-	r.InsetBy(5, 5);	
+	r.InsetBy(5, 5);
 	fTextView->SetTextRect(r);
 }
 
@@ -882,9 +883,9 @@ TTextView::TTextView(BRect frame, BRect text, bool incoming,
 	//
 	fEnclosureMenu = new BPopUpMenu("Enclosure", false, false);
 	fEnclosureMenu->SetFont(&menuFont);
-	fEnclosureMenu->AddItem(new BMenuItem(TR("Save attachment" B_UTF8_ELLIPSIS),
-		new BMessage(M_SAVE)));
-	fEnclosureMenu->AddItem(new BMenuItem(TR("Open attachment"),
+	fEnclosureMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("Save attachment" B_UTF8_ELLIPSIS),	new BMessage(M_SAVE)));
+	fEnclosureMenu->AddItem(new BMenuItem(B_TRANSLATE("Open attachment"),
 		new BMessage(M_OPEN)));
 
 	//
@@ -892,9 +893,9 @@ TTextView::TTextView(BRect frame, BRect text, bool incoming,
 	//
 	fLinkMenu = new BPopUpMenu("Link", false, false);
 	fLinkMenu->SetFont(&menuFont);
-	fLinkMenu->AddItem(new BMenuItem(TR("Open this link"),
+	fLinkMenu->AddItem(new BMenuItem(B_TRANSLATE("Open this link"),
 		new BMessage(M_OPEN)));
-	fLinkMenu->AddItem(new BMenuItem(TR("Copy link location"),
+	fLinkMenu->AddItem(new BMenuItem(B_TRANSLATE("Copy link location"),
 		new BMessage(M_COPY)));
 
 	SetDoesUndo(true);
@@ -1060,8 +1061,8 @@ TTextView::KeyDown(const char *key, int32 count)
 							end = textLen;
 							break;
 						}
-					}	
-					start = end;			
+					}
+					start = end;
 				}
 				Select(start, start);
 				ScrollToSelection();
@@ -1124,7 +1125,7 @@ TTextView::KeyDown(const char *key, int32 count)
 				}
 				break;
 			}
-			
+
 			BTextView::KeyDown(key, count);
 			break;
 
@@ -1314,10 +1315,10 @@ TTextView::MessageReceived(BMessage *msg)
 			break;
 		}
 
-		// 
-		// Tracker has responded to a BMessage that was dragged out of 
+		//
+		// Tracker has responded to a BMessage that was dragged out of
 		// this email message.  It has created a file for us, we just have to
-		// put the stuff in it.  
+		// put the stuff in it.
 		//
 		case B_COPY_TARGET:
 		{
@@ -1327,20 +1328,20 @@ TTextView::MessageReceived(BMessage *msg)
 				const char *name;
 				hyper_text *enclosure;
 
-				if (data.FindPointer("enclosure", (void **)&enclosure) == B_OK 
-					&& msg->FindString("name", &name) == B_OK 
+				if (data.FindPointer("enclosure", (void **)&enclosure) == B_OK
+					&& msg->FindString("name", &name) == B_OK
 					&& msg->FindRef("directory", &directory) == B_OK) {
 					switch (enclosure->type) {
 						case TYPE_ENCLOSURE:
 						case TYPE_BE_ENCLOSURE:
 						{
 							//
-							//	Enclosure.  Decode the data and write it out.	
+							//	Enclosure.  Decode the data and write it out.
 							//
 							BMessage saveMsg(M_SAVE);
 							saveMsg.AddString("name", name);
 							saveMsg.AddRef("directory", &directory);
-							saveMsg.AddPointer("enclosure", enclosure);	
+							saveMsg.AddPointer("enclosure", enclosure);
 							Save(&saveMsg, false);
 							break;
 						}
@@ -1352,14 +1353,14 @@ TTextView::MessageReceived(BMessage *msg)
 								// drag recipient didn't ask for any specific type,
 								// create a bookmark file as default
 								replyType = "application/x-vnd.Be-bookmark";
-							
-							BDirectory dir(&directory);	
+
+							BDirectory dir(&directory);
 							BFile file(&dir, name, B_READ_WRITE);
 							if (file.InitCheck() == B_OK) {
 								if (strcmp(replyType, "application/x-vnd.Be-bookmark") == 0) {
 									// we got a request to create a bookmark, stuff
 									// it with the url attribute
-									file.WriteAttr("META:url", B_STRING_TYPE, 0, 
+									file.WriteAttr("META:url", B_STRING_TYPE, 0,
 													enclosure->name, strlen(enclosure->name) + 1);
 								} else if (strcasecmp(replyType, "text/plain") == 0) {
 									// create a plain text file, stuff it with
@@ -1376,8 +1377,8 @@ TTextView::MessageReceived(BMessage *msg)
 						case TYPE_MAILTO:
 						{
 							//
-							//	Add some attributes to the already created 
-							//	person file.  Strip out the 'mailto:' if 
+							//	Add some attributes to the already created
+							//	person file.  Strip out the 'mailto:' if
 							//  possible.
 							//
 							char *addrStart = enclosure->name;
@@ -1388,7 +1389,7 @@ TTextView::MessageReceived(BMessage *msg)
 								}
 
 								if (*addrStart == '\0') {
-									addrStart = enclosure->name;		
+									addrStart = enclosure->name;
 									break;
 								}
 
@@ -1401,13 +1402,13 @@ TTextView::MessageReceived(BMessage *msg)
 								// create a bookmark file as default
 								replyType = "application/x-vnd.Be-bookmark";
 
-							BDirectory dir(&directory);	
+							BDirectory dir(&directory);
 							BFile file(&dir, name, B_READ_WRITE);
 							if (file.InitCheck() == B_OK) {
 								if (!strcmp(replyType, "application/x-person")) {
 									// we got a request to create a bookmark, stuff
 									// it with the address attribute
-									file.WriteAttr("META:email", B_STRING_TYPE, 0, 
+									file.WriteAttr("META:email", B_STRING_TYPE, 0,
 									  addrStart, strlen(enclosure->name) + 1);
 								} else if (!strcasecmp(replyType, "text/plain")) {
 									// create a plain text file, stuff it with the
@@ -1423,7 +1424,7 @@ TTextView::MessageReceived(BMessage *msg)
 					}
 				} else {
 					//
-					// Assume this is handled by BTextView...		
+					// Assume this is handled by BTextView...
 					// (Probably drag clipping.)
 					//
 					BTextView::MessageReceived(msg);
@@ -1444,7 +1445,8 @@ TTextView::MessageReceived(BMessage *msg)
 					case B_INPUT_METHOD_STOPPED:
 						fInputMethodUndoState.active = false;
 						if (fInputMethodUndoBuffer.CountItems() > 0) {
-							KUndoItem *undo = fInputMethodUndoBuffer.ItemAt(fInputMethodUndoBuffer.CountItems() - 1);
+							KUndoItem *undo = fInputMethodUndoBuffer.ItemAt(
+								fInputMethodUndoBuffer.CountItems() - 1);
 							if (undo->History == K_INSERTED){
 								fUndoBuffer.MakeNewUndoItem();
 								fUndoBuffer.AddUndo(undo->RedoText, undo->Length,
@@ -1548,7 +1550,7 @@ TTextView::MouseDown(BPoint where)
 				BMenuItem *addItem = NULL;
 				if (!foundWord && gUserDict >= 0) {
 					menu.AddSeparatorItem();
-					addItem = new BMenuItem(TR("Add"), NULL);
+					addItem = new BMenuItem(B_TRANSLATE("Add"), NULL);
 					menu.AddItem(addItem);
 				}
 
@@ -1606,12 +1608,12 @@ TTextView::MouseDown(BPoint where)
 			bool held = false;
 			uint32 buttons = 0;
 			if (Window()->CurrentMessage()) {
-				Window()->CurrentMessage()->FindInt32("buttons", 
+				Window()->CurrentMessage()->FindInt32("buttons",
 				  (int32 *) &buttons);
 			}
 
 			//
-			// If this is the primary button, wait to see if the user is going 
+			// If this is the primary button, wait to see if the user is going
 			// to single click, hold, or drag.
 			//
 			if (buttons != B_SECONDARY_MOUSE_BUTTON) {
@@ -1644,8 +1646,8 @@ TTextView::MouseDown(BPoint where)
 			}
 
 			//
-			//	If the user has right clicked on this menu, 
-			// 	or held the button down on it for a while, 
+			//	If the user has right clicked on this menu,
+			// 	or held the button down on it for a while,
 			//	pop up a context menu.
 			//
 			if (buttons == B_SECONDARY_MOUSE_BUTTON || held) {
@@ -1673,7 +1675,7 @@ TTextView::MouseDown(BPoint where)
 						}
 					} else if (msg->what == M_COPY) {
 						// copy link location to clipboard
-						
+
 						if (be_clipboard->Lock()) {
 							be_clipboard->Clear();
 
@@ -1690,7 +1692,7 @@ TTextView::MouseDown(BPoint where)
 				}
 			} else {
 				//
-				// Left button.  If the user single clicks, open this link.  
+				// Left button.  If the user single clicks, open this link.
 				// Otherwise, initiate a drag.
 				//
 				if (drag) {
@@ -1711,7 +1713,7 @@ TTextView::MouseDown(BPoint where)
 
 						case TYPE_URL:
 							//
-							// URL.  The user can drag it into the tracker to 
+							// URL.  The user can drag it into the tracker to
 							// create a bookmark file.
 							//
 							dragMessage.AddString("be:types", B_FILE_MIME_TYPE);
@@ -1719,7 +1721,7 @@ TTextView::MouseDown(BPoint where)
 							  "application/x-vnd.Be-bookmark");
 							dragMessage.AddString("be:filetypes", "text/plain");
 							dragMessage.AddString("be:clip_name", "Bookmark");
-							
+
 							dragMessage.AddString("be:url", enclosure->name);
 							break;
 
@@ -1729,28 +1731,28 @@ TTextView::MouseDown(BPoint where)
 							// tracker to create a people file.
 							//
 							dragMessage.AddString("be:types", B_FILE_MIME_TYPE);
-							dragMessage.AddString("be:filetypes", 
+							dragMessage.AddString("be:filetypes",
 							  "application/x-person");
 							dragMessage.AddString("be:filetypes", "text/plain");
 							dragMessage.AddString("be:clip_name", "Person");
-	
+
 							dragMessage.AddString("be:email", enclosure->name);
 							break;
 
 						default:
-							//	
+							//
 							// Otherwise it doesn't have a type that I know how
 							// to save.  It won't have any types and if any
 							// program wants to accept it, more power to them.
 							// (tracker won't.)
-							//	
+							//
 							dragMessage.AddString("be:clip_name", "Hyperlink");
 					}
 
 					BMessage data;
 					data.AddPointer("enclosure", enclosure);
 					dragMessage.AddMessage("be:originator-data", &data);
-		
+
 					BRegion selectRegion;
 					GetTextRegion(start, finish, &selectRegion);
 					DragMessage(&dragMessage, selectRegion.Frame(), this);
@@ -1758,7 +1760,7 @@ TTextView::MouseDown(BPoint where)
 					//
 					//	User Single clicked on the attachment.  Open it.
 					//
-					Open(enclosure);					
+					Open(enclosure);
 				}
 			}
 			return;
@@ -1890,7 +1892,8 @@ TTextView::Open(hyper_text *enclosure)
 			if (result != B_NO_ERROR && result != B_ALREADY_RUNNING) {
 				beep();
 				(new BAlert("",
-					TR("There is no installed handler for URL links."),
+					B_TRANSLATE("There is no installed handler for "
+						"URL links."),
 					"Sorry"))->Go();
 			}
 			break;
@@ -1971,12 +1974,12 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 			BEntry entry;
 			if (dir.FindEntry(name, &entry) == B_NO_ERROR)
 				entry.Remove();
-			
+
 			if ((enclosure->have_ref) && (!enclosure->saved)) {
 				entry.SetTo(&enclosure->ref);
-	
+
 				//
-				// Added true arg and entry_name so MoveTo clobbers as 
+				// Added true arg and entry_name so MoveTo clobbers as
 				// before. This may not be the correct behaviour, but
 				// it's the preserved behaviour.
 				//
@@ -1990,7 +1993,7 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 					return result;
 				}
 			}
-					
+
 			if (result == B_NO_ERROR) {
 				result = dir.CreateFile(name, &file);
 				if (result == B_NO_ERROR && enclosure->content_type) {
@@ -2009,7 +2012,7 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 			}
 		} else {
 			//
-			// 	This file was dragged into the tracker or desktop.  The file 
+			// 	This file was dragged into the tracker or desktop.  The file
 			//	already exists.
 			//
 			result = file.SetTo(&dir, name, B_WRITE_ONLY);
@@ -2035,12 +2038,13 @@ TTextView::Save(BMessage *msg, bool makeNewFile)
 			!cistrcmp("application/octet-stream", enclosure->content_type ? enclosure->content_type : B_EMPTY_STRING));
 		entry.GetNodeRef(&enclosure->node);
 		watch_node(&enclosure->node, B_WATCH_NAME, this);
-	}	
+	}
 
 	if (result != B_NO_ERROR) {
 		beep();
-		(new BAlert("", TR("An error occurred trying to save the attachment."),
-			TR("Sorry")))->Go();
+		(new BAlert("", B_TRANSLATE("An error occurred trying to save "
+				"the attachment."),
+			B_TRANSLATE("Sorry")))->Go();
 	}
 
 	return result;
@@ -2237,7 +2241,7 @@ TTextView::AddAsContent(BEmailMessage *mail, bool wrap, uint32 charset, mail_enc
 	if (vScroller != NULL)
 		vScroller->SetTarget(this);
 	if (hScroller != NULL)
-		hScroller->SetTarget(this);				
+		hScroller->SetTarget(this);
 
 	Show();
 	window->EnableUpdates();
@@ -2320,7 +2324,7 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 
 			BPath path(fileName);
 			enclosure->name = strdup(path.Leaf());
-			
+
 			BMimeType type;
 			component->MIMEType(&type);
 			enclosure->content_type = strdup(type.Type());
@@ -2328,7 +2332,7 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 			char typeDescription[B_MIME_TYPE_LENGTH];
 			if (type.GetShortDescription(typeDescription) != B_OK)
 				strcpy(typeDescription, type.Type() ? type.Type() : B_EMPTY_STRING);
-			
+
 			name = "\n<Enclosure: ";
 			name << enclosure->name << " (Type: " << typeDescription << ")>\n";
 
@@ -2496,7 +2500,7 @@ TTextView::Reader::Run(void *_this)
 		 		buffer = (char *)realloc(buffer, length + 1);
 		 		if (buffer == NULL)
 		 			goto done;
-	 		
+
 		 		memcpy(buffer, header, length);
 
 				length = rfc2047_to_utf8(&buffer, &length, length);
@@ -3077,7 +3081,7 @@ TTextView::WindowActivated(bool flag)
 }
 
 
-void 
+void
 TTextView::AddQuote(int32 start, int32 finish)
 {
 	BRect rect = Bounds();
@@ -3154,7 +3158,7 @@ TTextView::AddQuote(int32 start, int32 finish)
 }
 
 
-void 
+void
 TTextView::RemoveQuote(int32 start, int32 finish)
 {
 	BRect rect = Bounds();
@@ -3279,8 +3283,9 @@ TTextView::Undo(BClipboard */*clipboard*/)
 				} else {
 					::beep();
 					(new BAlert("",
-						TR("Inconsistency occurred in the undo/redo buffer."),
-						TR("OK")))->Go();
+						B_TRANSLATE("Inconsistency occurred in the undo/redo "
+							"buffer."),
+						B_TRANSLATE("OK")))->Go();
 				}
 				break;
 		}
@@ -3325,8 +3330,9 @@ TTextView::Redo()
 			case K_REPLACED:
 				::beep();
 				(new BAlert("",
-					TR("Inconsistency occurred in the undo/redo buffer."),
-					TR("OK")))->Go();
+					B_TRANSLATE("Inconsistency occurred in the undo/redo "
+						"buffer."),
+					B_TRANSLATE("OK")))->Go();
 				break;
 		}
 		ScrollToSelection();
