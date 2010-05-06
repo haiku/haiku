@@ -244,7 +244,7 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 	// TODO: design icon for spaces on partitions
 	SetField(new BBitmapStringField(NULL, "-"), kDeviceColumn);
 
-	SetField(new BStringField(TR("<empty>")), kFilesystemColumn);
+	SetField(new BStringField(B_TRANSLATE("<empty>")), kFilesystemColumn);
 	SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 
 	SetField(new BStringField(kUnavailableString), kMountedAtColumn);
@@ -261,15 +261,15 @@ PartitionListRow::PartitionListRow(partition_id parentID, partition_id id,
 PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "storagelist", resizeMode, 0, B_NO_BORDER, true)
 {
-	AddColumn(new PartitionColumn(TR("Device"), 150, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Device"), 150, 50, 500,
 		B_TRUNCATE_MIDDLE), kDeviceColumn);
-	AddColumn(new PartitionColumn(TR("File system"), 100, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("File system"), 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kFilesystemColumn);
-	AddColumn(new PartitionColumn(TR("Volume name"), 130, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Volume name"), 130, 50, 500,
 		B_TRUNCATE_MIDDLE), kVolumeNameColumn);
-	AddColumn(new PartitionColumn(TR("Mounted at"), 100, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Mounted at"), 100, 50, 500,
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
-	AddColumn(new PartitionColumn(TR("Size"), 100, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Size"), 100, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
 
 	SetSortingEnabled(false);

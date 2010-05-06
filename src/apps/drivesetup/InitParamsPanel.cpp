@@ -92,7 +92,7 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 {
 	AddCommonFilter(fEscapeFilter);
 
-	fOkButton = new BButton(TR("Initialize"), new BMessage(MSG_OK));
+	fOkButton = new BButton(B_TRANSLATE("Initialize"), new BMessage(MSG_OK));
 
 	partition->GetInitializationParameterEditor(diskSystem.String(),
 		&fEditor);
@@ -103,7 +103,7 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 		.Add(fEditor->View())
 		.AddGroup(B_HORIZONTAL, spacing)
 			.AddGlue()
-			.Add(new BButton(TR("Cancel"), new BMessage(MSG_CANCEL)))
+			.Add(new BButton(B_TRANSLATE("Cancel"), new BMessage(MSG_CANCEL)))
 			.Add(fOkButton)
 		.End()
 		.SetInsets(spacing, spacing, spacing, spacing)

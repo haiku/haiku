@@ -102,9 +102,9 @@ SizeSlider::SizeSlider(const char* name, const char* label,
 	SetBarColor((rgb_color){ 0, 80, 255, 255 });
 	char minString[64];
 	char maxString[64];
-	snprintf(minString, sizeof(minString), TR("Offset: %ld MB"),
+	snprintf(minString, sizeof(minString), B_TRANSLATE("Offset: %ld MB"),
 		fStartOffset);
-	snprintf(maxString, sizeof(maxString), TR("End: %ld MB"),
+	snprintf(maxString, sizeof(maxString), B_TRANSLATE("End: %ld MB"),
 		fEndOffset);
 	SetLimitLabels(minString, maxString);
 }
@@ -120,7 +120,7 @@ SizeSlider::UpdateText() const
 {
 	// TODO: Perhaps replace with string_for_size, but it looks like
 	// Value() and fStartOffset are always in MiB.
-	snprintf(fStatusLabel, sizeof(fStatusLabel), TR("%ld MiB"),
+	snprintf(fStatusLabel, sizeof(fStatusLabel), B_TRANSLATE("%ld MiB"),
 		Value() - fStartOffset);
 
 	return fStatusLabel;

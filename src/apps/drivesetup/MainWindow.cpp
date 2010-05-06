@@ -167,24 +167,29 @@ MainWindow::MainWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
 
 	// create all the menu items
-	fFormatMI = new BMenuItem(TR("Format (not implemented)"),
+	fFormatMI = new BMenuItem(B_TRANSLATE("Format (not implemented)"),
 		new BMessage(MSG_FORMAT));
-	fEjectMI = new BMenuItem(TR("Eject"), new BMessage(MSG_EJECT), 'E');
-	fSurfaceTestMI = new BMenuItem(TR("Surface test (not implemented)"),
+	fEjectMI = new BMenuItem(B_TRANSLATE("Eject"),
+		new BMessage(MSG_EJECT), 'E');
+	fSurfaceTestMI = new BMenuItem(
+		B_TRANSLATE("Surface test (not implemented)"),
 		new BMessage(MSG_SURFACE_TEST));
-	fRescanMI = new BMenuItem(TR("Rescan"), new BMessage(MSG_RESCAN));
+	fRescanMI = new BMenuItem(B_TRANSLATE("Rescan"), new BMessage(MSG_RESCAN));
 
-	fCreateMI = new BMenuItem(TR("Create" B_UTF8_ELLIPSIS),
+	fCreateMI = new BMenuItem(B_TRANSLATE("Create" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_CREATE), 'C');
-	fDeleteMI = new BMenuItem(TR("Delete"),	new BMessage(MSG_DELETE), 'D');
+	fDeleteMI = new BMenuItem(B_TRANSLATE("Delete"),
+		new BMessage(MSG_DELETE), 'D');
 
-	fMountMI = new BMenuItem(TR("Mount"), new BMessage(MSG_MOUNT), 'M');
-	fUnmountMI = new BMenuItem(TR("Unmount"), new BMessage(MSG_UNMOUNT), 'U');
-	fMountAllMI = new BMenuItem(TR("Mount all"),
+	fMountMI = new BMenuItem(B_TRANSLATE("Mount"),
+		new BMessage(MSG_MOUNT), 'M');
+	fUnmountMI = new BMenuItem(B_TRANSLATE("Unmount"),
+		new BMessage(MSG_UNMOUNT), 'U');
+	fMountAllMI = new BMenuItem(B_TRANSLATE("Mount all"),
 		new BMessage(MSG_MOUNT_ALL), 'M', B_SHIFT_KEY);
 
 	// Disk menu
-	fDiskMenu = new BMenu(TR("Disk"));
+	fDiskMenu = new BMenu(B_TRANSLATE("Disk"));
 	fDiskMenu->AddItem(fFormatMI);
 	fDiskMenu->AddItem(fEjectMI);
 	fDiskMenu->AddItem(fSurfaceTestMI);
@@ -195,10 +200,10 @@ MainWindow::MainWindow(BRect frame)
 	menuBar->AddItem(fDiskMenu);
 
 	// Parition menu
-	fPartitionMenu = new BMenu(TR("Partition"));
+	fPartitionMenu = new BMenu(B_TRANSLATE("Partition"));
 	fPartitionMenu->AddItem(fCreateMI);
 
-	fInitMenu = new BMenu(TR("Initialize"));
+	fInitMenu = new BMenu(B_TRANSLATE("Initialize"));
 	fPartitionMenu->AddItem(fInitMenu);
 
 	fPartitionMenu->AddItem(fDeleteMI);
@@ -625,12 +630,13 @@ MainWindow::_DisplayPartitionError(BString _message,
 
 	if (error < B_OK) {
 		BString helper = message;
-		const char* errorString = TR_CMT("Error: ", "in any error alert");
+		const char* errorString =
+			B_TRANSLATE_COMMENT("Error: ", "in any error alert");
 		snprintf(message, sizeof(message), "%s\n\n%s%s", helper.String(),
 			errorString, strerror(error));
 	}
 
-	BAlert* alert = new BAlert("error", message, TR("OK"), NULL, NULL,
+	BAlert* alert = new BAlert("error", message, B_TRANSLATE("OK"), NULL, NULL,
 		B_WIDTH_FROM_WIDEST, error < B_OK ? B_STOP_ALERT : B_INFO_ALERT);
 	alert->Go(NULL);
 }
@@ -643,30 +649,30 @@ void
 MainWindow::_Mount(BDiskDevice* disk, partition_id selectedPartition)
 {
 	if (!disk || selectedPartition < 0) {
-		_DisplayPartitionError(TR("You need to select a partition "
+		_DisplayPartitionError(B_TRANSLATE("You need to select a partition "
 			"entry from the list."));
 		return;
 	}
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError(TR("Unable to find the selected partition "
-			"by ID."));
+		_DisplayPartitionError(B_TRANSLATE("Unable to find the selected "
+			"partition by ID."));
 		return;
 	}
 
 	if (!partition->IsMounted()) {
 		status_t ret = partition->Mount();
 		if (ret < B_OK) {
-			_DisplayPartitionError(TR("Could not mount partition %s."),
-				partition, ret);
+			_DisplayPartitionError(
+				B_TRANSLATE("Could not mount partition %s."), partition, ret);
 		} else {
 			// successful mount, adapt to the changes
 			_ScanDrives();
 		}
 	} else {
-		_DisplayPartitionError(TR("The partition %s is already mounted."),
-			partition);
+		_DisplayPartitionError(
+			B_TRANSLATE("The partition %s is already mounted."), partition);
 	}
 }
 
@@ -675,15 +681,15 @@ void
 MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 {
 	if (!disk || selectedPartition < 0) {
-		_DisplayPartitionError(TR("You need to select a partition "
+		_DisplayPartitionError(B_TRANSLATE("You need to select a partition "
 			"entry from the list."));
 		return;
 	}
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError(TR("Unable to find the selected partition "
-			"by ID."));
+		_DisplayPartitionError(B_TRANSLATE("Unable to find the selected "
+			"partition by ID."));
 		return;
 	}
 
@@ -692,7 +698,8 @@ MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 		partition->GetMountPoint(&path);
 		status_t ret = partition->Unmount();
 		if (ret < B_OK) {
-			_DisplayPartitionError(TR("Could not unmount partition %s."),
+			_DisplayPartitionError(
+				B_TRANSLATE("Could not unmount partition %s."),
 				partition, ret);
 		} else {
 			if (dev_for_path(path.Path()) == dev_for_path("/"))
@@ -701,7 +708,8 @@ MainWindow::_Unmount(BDiskDevice* disk, partition_id selectedPartition)
 			_ScanDrives();
 		}
 	} else {
-		_DisplayPartitionError(TR("The partition %s is already unmounted."),
+		_DisplayPartitionError(
+			B_TRANSLATE("The partition %s is already unmounted."),
 			partition);
 	}
 }
@@ -755,45 +763,46 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	const BString& diskSystemName)
 {
 	if (!disk || selectedPartition < 0) {
-		_DisplayPartitionError(TR("You need to select a partition "
+		_DisplayPartitionError(B_TRANSLATE("You need to select a partition "
 			"entry from the list."));
 		return;
 	}
 
 	if (disk->IsReadOnly()) {
-		_DisplayPartitionError(TR("The selected disk is read-only."));
+		_DisplayPartitionError(B_TRANSLATE("The selected disk is read-only."));
 		return;
 	}
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError(TR("Unable to find the selected partition "
-			"by ID."));
+		_DisplayPartitionError(B_TRANSLATE("Unable to find the selected "
+			"partition by ID."));
 		return;
 	}
 
 	if (partition->IsMounted()) {
-		_DisplayPartitionError(TR("The partition %s is currently mounted."));
+		_DisplayPartitionError(
+			B_TRANSLATE("The partition %s is currently mounted."));
 		// TODO: option to unmount and continue on success to unmount
 		return;
 	}
 
 	char message[512];
 	if (partition->ContentName() && strlen(partition->ContentName()) > 0) {
-		snprintf(message, sizeof(message), TR("Are you sure you want to "
-			"initialize the partition \"%s\"? After entering the "
+		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
+			"to initialize the partition \"%s\"? After entering the "
 			"initialization parameters, you can abort this operation "
 			"right before writing changes back to the disk."),
 			partition->ContentName());
 	} else {
-		snprintf(message, sizeof(message), TR("Are you sure you want to "
-			"initialize the selected partition? After entering the "
+		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
+			"to initialize the selected partition? After entering the "
 			"initialization parameters, you can abort this operation "
 			"right before writing changes back to the disk."));
 	}
 	BAlert* alert = new BAlert("first notice", message,
-		TR("Continue"), TR("Cancel"), NULL, B_WIDTH_FROM_WIDEST,
-		B_WARNING_ALERT);
+		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
+		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	int32 choice = alert->Go();
 
 	if (choice == 1)
@@ -812,8 +821,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 	if (!found) {
-		snprintf(message, sizeof(message), TR("Disk system \"%s\"\" not "
-			"found!"));
+		snprintf(message, sizeof(message), B_TRANSLATE("Disk system \"%s\"\" "
+			"not found!"));
 		_DisplayPartitionError(message);
 		return;
 	}
@@ -824,15 +833,15 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	if (diskSystemName != "Be File System"
 		&& diskSystemName != "Intel Partition Map"
 		&& diskSystemName != "Intel Extended Partition") {
-		_DisplayPartitionError(TR("Don't know how to gather initialization "
-			"parameters for this disk system."));
+		_DisplayPartitionError(B_TRANSLATE("Don't know how to gather "
+			"initialization parameters for this disk system."));
 		return;
 	}
 
 	ModificationPreparer modificationPreparer(disk);
 	status_t ret = modificationPreparer.ModificationStatus();
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("There was an error preparing the "
+		_DisplayPartitionError(B_TRANSLATE("There was an error preparing the "
 			"disk for modifications."), NULL, ret);
 		return;
 	}
@@ -855,8 +864,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	ret = partition->ValidateInitialize(diskSystem.PrettyName(),
 		supportsName ? &validatedName : NULL, parameters.String());
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("Validation of the given initialization "
-			"parameters failed."), partition, ret);
+		_DisplayPartitionError(B_TRANSLATE("Validation of the given "
+			"initialization parameters failed."), partition, ret);
 		return;
 	}
 
@@ -865,8 +874,8 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	ret = partition->Initialize(diskSystem.PrettyName(),
 		supportsName ? validatedName.String() : NULL, parameters.String());
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("Initialization of the partition %s "
-			"failed. (Nothing has been written to disk.)"), partition, ret);
+		_DisplayPartitionError(B_TRANSLATE("Initialization of the partition "
+			"%s failed. (Nothing has been written to disk.)"), partition, ret);
 		return;
 	}
 
@@ -876,32 +885,32 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	// Warn the user one more time...
 	if (previousName.Length() > 0) {
 		if (partition->IsDevice()) {
-			snprintf(message, sizeof(message), TR("Are you sure you want to "
-				"write the changes back to disk now?\n\n"
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to write the changes back to disk now?\n\n"
 				"All data on the disk %s will be irretrievably lost if you "
 				"do so!"), previousName.String());
 		} else {
-			snprintf(message, sizeof(message), TR("Are you sure you want to "
-				"write the changes back to disk now?\n\n"
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to write the changes back to disk now?\n\n"
 				"All data on the partition %s will be irretrievably lost if you "
 				"do so!"), previousName.String());
 		}
 	} else {
 		if (partition->IsDevice()) {
-			snprintf(message, sizeof(message), TR("Are you sure you want to "
-				"write the changes back to disk now?\n\n"
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to write the changes back to disk now?\n\n"
 				"All data on the selected disk will be irretrievably lost if "
 				"you do so!"));
 		} else {
-			snprintf(message, sizeof(message), TR("Are you sure you want to "
-				"write the changes back to disk now?\n\n"
+			snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you "
+				"want to write the changes back to disk now?\n\n"
 				"All data on the selected partition will be irretrievably lost "
 				"if you do so!"));
 		}
 	}
 	alert = new BAlert("final notice", message,
-		TR("Write changes"), TR("Cancel"), NULL, B_WIDTH_FROM_WIDEST,
-		B_WARNING_ALERT);
+		B_TRANSLATE("Write changes"), B_TRANSLATE("Cancel"), NULL,
+		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	choice = alert->Go();
 
 	if (choice == 1)
@@ -915,11 +924,11 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	partition = disk->FindDescendant(selectedPartition);
 
 	if (ret == B_OK) {
-		_DisplayPartitionError(TR("The partition %s has been successfully "
-			"initialized.\n"), partition);
+		_DisplayPartitionError(B_TRANSLATE("The partition %s has been "
+			"successfully initialized.\n"), partition);
 	} else {
-		_DisplayPartitionError(TR("Failed to initialize the partition "
-			"%s!\n"), partition, ret);
+		_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
+			"partition %s!\n"), partition, ret);
 	}
 
 	_ScanDrives();
@@ -930,41 +939,41 @@ void
 MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 {
 	if (!disk || selectedPartition > -2) {
-		_DisplayPartitionError(TR("The currently selected partition is not "
-			"empty."));
+		_DisplayPartitionError(B_TRANSLATE("The currently selected partition "
+			"is not empty."));
 		return;
 	}
 
 	if (disk->IsReadOnly()) {
-		_DisplayPartitionError(TR("The selected disk is read-only."));
+		_DisplayPartitionError(B_TRANSLATE("The selected disk is read-only."));
 		return;
 	}
 
 	PartitionListRow* currentSelection = dynamic_cast<PartitionListRow*>(
 		fListView->CurrentSelection());
 	if (!currentSelection) {
-		_DisplayPartitionError(TR("There was an error acquiring the partition "
-			"row."));
+		_DisplayPartitionError(B_TRANSLATE("There was an error acquiring the "
+			"partition row."));
 		return;
 	}
 
 	BPartition* parent = disk->FindDescendant(currentSelection->ParentID());
 	if (!parent) {
-		_DisplayPartitionError(TR("The currently selected partition does not "
-			"have a parent partition."));
+		_DisplayPartitionError(B_TRANSLATE("The currently selected partition "
+			"does not have a parent partition."));
 		return;
 	}
 
 	if (!parent->ContainsPartitioningSystem()) {
-		_DisplayPartitionError(TR("The selected partition does not contain "
-			"a partitioning system."));
+		_DisplayPartitionError(B_TRANSLATE("The selected partition does not "
+			"contain a partitioning system."));
 		return;
 	}
 
 	ModificationPreparer modificationPreparer(disk);
 	status_t ret = modificationPreparer.ModificationStatus();
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("There was an error preparing the "
+		_DisplayPartitionError(B_TRANSLATE("There was an error preparing the "
 			"disk for modifications."), NULL, ret);
 		return;
 	}
@@ -973,15 +982,15 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	BPartitioningInfo partitioningInfo;
 	status_t error = parent->GetPartitioningInfo(&partitioningInfo);
 	if (error != B_OK) {
-		_DisplayPartitionError(TR("Could not aquire partitioning "
+		_DisplayPartitionError(B_TRANSLATE("Could not aquire partitioning "
 			"information."));
 		return;
 	}
 
 	int32 spacesCount = partitioningInfo.CountPartitionableSpaces();
 	if (spacesCount == 0) {
-		_DisplayPartitionError(TR("There's no space on the partition where "
-			"a child partition could be created."));
+		_DisplayPartitionError(B_TRANSLATE("There's no space on the partition "
+			"where a child partition could be created."));
 		return;
 	}
 
@@ -998,17 +1007,17 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 		&name, parameters.String());
 
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("Validation of the given creation "
+		_DisplayPartitionError(B_TRANSLATE("Validation of the given creation "
 			"parameters failed."));
 		return;
 	}
 
 	// Warn the user one more time...
-	BAlert* alert = new BAlert("final notice", TR("Are you sure you want "
-		"to write the changes back to disk now?\n\n"
+	BAlert* alert = new BAlert("final notice", B_TRANSLATE("Are you sure you "
+		"want to write the changes back to disk now?\n\n"
 		"All data on the partition will be irretrievably lost if you do "
-		"so!"), TR("Write changes"), TR("Cancel"), NULL, B_WIDTH_FROM_WIDEST,
-		B_WARNING_ALERT);
+		"so!"), B_TRANSLATE("Write changes"), B_TRANSLATE("Cancel"), NULL,
+		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	int32 choice = alert->Go();
 
 	if (choice == 1)
@@ -1018,7 +1027,8 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 		name.String(), parameters.String());
 
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("Creation of the partition has failed."));
+		_DisplayPartitionError(B_TRANSLATE("Creation of the partition has "
+			"failed."));
 		return;
 	}
 
@@ -1026,8 +1036,8 @@ MainWindow::_Create(BDiskDevice* disk, partition_id selectedPartition)
 	ret = modificationPreparer.CommitModifications();
 
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("Failed to initialize the partition. "
-			"No changes have been written to disk."));
+		_DisplayPartitionError(B_TRANSLATE("Failed to initialize the "
+			"partition. No changes have been written to disk."));
 		return;
 	}
 
@@ -1043,48 +1053,49 @@ void
 MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 {
 	if (!disk || selectedPartition < 0) {
-		_DisplayPartitionError(TR("You need to select a partition "
+		_DisplayPartitionError(B_TRANSLATE("You need to select a partition "
 			"entry from the list."));
 		return;
 	}
 
 	if (disk->IsReadOnly()) {
-		_DisplayPartitionError(TR("The selected disk is read-only."));
+		_DisplayPartitionError(B_TRANSLATE("The selected disk is read-only."));
 		return;
 	}
 
 	BPartition* partition = disk->FindDescendant(selectedPartition);
 	if (!partition) {
-		_DisplayPartitionError(TR("Unable to find the selected partition "
-			"by ID."));
+		_DisplayPartitionError(B_TRANSLATE("Unable to find the selected "
+			"partition by ID."));
 		return;
 	}
 
 	BPartition* parent = partition->Parent();
 	if (!parent) {
-		_DisplayPartitionError(TR("The currently selected partition does "
-			"not have a parent partition."));
+		_DisplayPartitionError(B_TRANSLATE("The currently selected partition "
+			"does not have a parent partition."));
 		return;
 	}
 
 	ModificationPreparer modificationPreparer(disk);
 	status_t ret = modificationPreparer.ModificationStatus();
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("There was an error preparing the "
+		_DisplayPartitionError(B_TRANSLATE("There was an error preparing the "
 			"disk for modifications."), NULL, ret);
 		return;
 	}
 
 	if (!parent->CanDeleteChild(partition->Index())) {
-		_DisplayPartitionError(TR("Cannot delete the selected partition."));
+		_DisplayPartitionError(
+			B_TRANSLATE("Cannot delete the selected partition."));
 		return;
 	}
 
 	// Warn the user one more time...
-	BAlert* alert = new BAlert("final notice", TR("Are you sure you want "
-		"to delete the selected partition?\n\n"
+	BAlert* alert = new BAlert("final notice", B_TRANSLATE("Are you sure you "
+		"want to delete the selected partition?\n\n"
 		"All data on the partition will be irretrievably lost if you "
-		"do so!"), TR("Delete partition"), TR("Cancel"), NULL,
+		"do so!"), B_TRANSLATE("Delete partition"), B_TRANSLATE("Cancel"), NULL,
 		B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 	int32 choice = alert->Go();
 
@@ -1093,14 +1104,15 @@ MainWindow::_Delete(BDiskDevice* disk, partition_id selectedPartition)
 
 	ret = parent->DeleteChild(partition->Index());
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("Could not delete the selected partition."));
+		_DisplayPartitionError(
+			B_TRANSLATE("Could not delete the selected partition."));
 		return;
 	}
 
 	ret = modificationPreparer.CommitModifications();
 
 	if (ret != B_OK) {
-		_DisplayPartitionError(TR("Failed to delete the partition. "
+		_DisplayPartitionError(B_TRANSLATE("Failed to delete the partition. "
 			"No changes have been written to disk."));
 		return;
 	}

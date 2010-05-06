@@ -220,12 +220,12 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	off_t size)
 {
 	// Setup the controls
-	fSizeSlider = new SizeSlider("Slider", TR("Partition size"), NULL, offset,
-		offset + size);
+	fSizeSlider = new SizeSlider("Slider", B_TRANSLATE("Partition size"), NULL,
+		offset, offset + size);
 	fSizeSlider->SetPosition(1.0);
 
-	fNameTextControl = new BTextControl("Name Control", TR("Partition name:"),
-		"", NULL);
+	fNameTextControl = new BTextControl("Name Control",
+		B_TRANSLATE("Partition name:"),	"", NULL);
 	if (!parent->SupportsChildName())
 		fNameTextControl->SetEnabled(false);
 
@@ -244,8 +244,8 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 			item->SetMarked(true);
 	}
 
-	fTypeMenuField = new BMenuField(TR("Partition type:"), fTypePopUpMenu,
-		NULL);
+	fTypeMenuField = new BMenuField(B_TRANSLATE("Partition type:"),
+		fTypePopUpMenu, NULL);
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, spacing);
@@ -267,10 +267,11 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	if (fEditor)
 		AddChild(fEditor->View());
 
-	BButton* okButton = new BButton(TR("Create"), new BMessage(MSG_OK));
+	BButton* okButton = new BButton(B_TRANSLATE("Create"),
+		new BMessage(MSG_OK));
 	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
 		.AddGlue()
-		.Add(new BButton(TR("Cancel"), new BMessage(MSG_CANCEL)))
+		.Add(new BButton(B_TRANSLATE("Cancel"), new BMessage(MSG_CANCEL)))
 		.Add(okButton)
 	);
 	SetDefaultButton(okButton);

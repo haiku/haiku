@@ -200,7 +200,7 @@ public:
 
 	virtual bool Visit(BDiskDevice* device)
 	{
-		PartitionView* view = new PartitionView(TR("Device"), 1.0,
+		PartitionView* view = new PartitionView(B_TRANSLATE("Device"), 1.0,
 			device->Offset(), 0, device->ID());
 		fViewMap.Put(device->ID(), view);
 		fView->GetLayout()->AddView(view);
@@ -227,7 +227,8 @@ public:
 				name << partition->Type();
 			else {
 				char buffer[64];
-				snprintf(buffer, 64, TR("Partition %ld"), partition->ID());
+				snprintf(buffer, 64, B_TRANSLATE("Partition %ld"),
+					partition->ID());
 				name << buffer;
 			}
 		}
@@ -287,8 +288,8 @@ public:
 				double scale = (double)size / parentSize;
 				partition_id id
 					= fSpaceIDMap.SpaceIDFor(partition->ID(), offset);
-				PartitionView* view = new PartitionView(TR("<empty>"), scale,
-					offset, parentView->Level() + 1, id);
+				PartitionView* view = new PartitionView(B_TRANSLATE("<empty>"),
+					scale, offset, parentView->Level() + 1, id);
 
 				fViewMap.Put(id, view);
 				BGroupLayout* layout = parentView->GroupLayout();
@@ -399,9 +400,10 @@ DiskView::Draw(BRect updateRect)
 
 	const char* helpfulMessage;
 	if (fDiskCount == 0)
-		helpfulMessage = TR("No disk devices have been recognized.");
+		helpfulMessage = B_TRANSLATE("No disk devices have been recognized.");
 	else
-		helpfulMessage = TR("Select a partition from the list below.");
+		helpfulMessage =
+			B_TRANSLATE("Select a partition from the list below.");
 
 	float width = StringWidth(helpfulMessage);
 	font_height fh;
