@@ -17,7 +17,10 @@
 #include <unistd.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Clipboard.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
@@ -50,13 +53,16 @@ main()
 	return 0;
 }
 
-	
+#undef TR_CONTEXT
+#define TR_CONTEXT "Terminal TermApp"
+
 TermApp::TermApp()
 	: BApplication(TERM_SIGNATURE),
 	fStartFullscreen(false),
 	fWindowNumber(-1),
 	fTermWindow(NULL),
-	fArgs(NULL)
+	fArgs(NULL),
+	fAppCatalog(NULL)
 {
 	const char *defaultArgs[2];
 	defaultArgs[0] = kDefaultShell;
@@ -70,9 +76,11 @@ TermApp::TermApp()
 		defaultArgs[0] = passwdStruct.pw_shell;
 	}
 	
+	be_locale->GetAppCatalog(&fAppCatalog);
+	
 	fArgs = new Arguments(2, defaultArgs);
 	
-	fWindowTitle = "Terminal";
+	fWindowTitle = TR("Terminal");
 	_RegisterTerminal();
 
 	if (fWindowNumber > 0)
@@ -114,7 +122,7 @@ TermApp::ReadyToRun()
 #endif
 	action.sa_userdata = this;
 	if (sigaction(SIGCHLD, &action, NULL) < 0) {
-		fprintf(stderr, "sigaction() failed: %s\n", strerror(errno));
+		fprintf(stderr, TR("sigaction() failed: %s\n"), strerror(errno));
 		// continue anyway
 	}
 
@@ -126,8 +134,8 @@ TermApp::ReadyToRun()
 	// failed spawn, print stdout and open alert panel
 	// TODO: This alert does never show up.
 	if (status < B_OK) {
-		(new BAlert("alert", "Terminal couldn't start the shell. Sorry.",
-			"OK", NULL, NULL, B_WIDTH_FROM_LABEL,
+		(new BAlert("alert", TR("Terminal couldn't start the shell. Sorry."),
+			TR("OK"), NULL, NULL, B_WIDTH_FROM_LABEL,
 			B_INFO_ALERT))->Go(NULL);
 		PostMessage(B_QUIT_REQUESTED);
 		return;
@@ -554,17 +562,17 @@ TermApp::_ChildCleanupThread(void* data)
 void
 TermApp::_Usage(char *name)
 {
-	fprintf(stderr, "Haiku Terminal\n"
+	fprintf(stderr, TR("Haiku Terminal\n"
 		"Copyright 2001-2009 Haiku, Inc.\n"
 		"Copyright(C) 1999 Kazuho Okui and Takashi Murai.\n"
 		"\n"
-		"Usage: %s [OPTION] [SHELL]\n", name);
+		"Usage: %s [OPTION] [SHELL]\n"), name);
 
 	fprintf(stderr,
-		"  -h,     --help               print this help\n"    
+		TR("  -h,     --help               print this help\n"    
 		//"  -p,     --preference         load preference file\n"
 		"  -t,     --title              set window title\n"
-		"  -f,     --fullscreen         start fullscreen\n"		
+		"  -f,     --fullscreen         start fullscreen\n")		
 		//"  -geom,  --geometry           set window geometry\n"
 		//"                               An example of geometry is \"80x25+100+100\"\n"
 		);

@@ -12,10 +12,12 @@
 #include <stdlib.h>
 
 #include <Button.h>
+#include <Catalog.h>
 #include <ColorControl.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -26,7 +28,8 @@
 #include "PrefHandler.h"
 #include "TermConst.h"
 
-
+#undef TR_CONTEXT ""
+#define TR_CONTEXT "Terminal ApperPrefView"
 
 AppearancePrefView::AppearancePrefView(const char* name,
 		const BMessenger& messenger)
@@ -67,9 +70,9 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	BMenu* sizeMenu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
 	
-	fFont = new BMenuField("Font:", fontMenu);
-	fFontSize = new BMenuField("Size:", sizeMenu);
-	fColorField = new BMenuField("Color:",
+	fFont = new BMenuField(TR("Font:"), fontMenu);
+	fFontSize = new BMenuField(TR("Size:"), sizeMenu);
+	fColorField = new BMenuField(TR("Color:"),
 		_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 		kColorTable[0]));
 

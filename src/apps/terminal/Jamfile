@@ -26,6 +26,6 @@ Application Terminal :
 	TermWindow.cpp
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be tracker textencoding $(TARGET_LIBSUPC++)
+	: be locale tracker textencoding $(TARGET_LIBSUPC++)
 	: Terminal.rdef
 ;

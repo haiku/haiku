@@ -9,6 +9,8 @@
 
 #include "Arguments.h"
 
+#include <Catalog.h>
+#include <Locale.h>
 
 Arguments::Arguments(int defaultArgsNum, const char * const *defaultArgs)
 	: fUsageRequested(false),
@@ -28,6 +30,8 @@ Arguments::~Arguments()
 	_SetShellArguments(0, NULL);
 }
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "Terminal arguments parsing"
 
 void
 Arguments::Parse(int argc, const char *const *argv)
@@ -75,7 +79,7 @@ Arguments::Parse(int argc, const char *const *argv)
 				argi++;			
 			} else {
 				// illegal option
-				fprintf(stderr, "Unrecognized option \"%s\"\n", arg);
+				fprintf(stderr, TR("Unrecognized option \"%s\"\n"), arg);
 				fUsageRequested = true;
 			}
 
