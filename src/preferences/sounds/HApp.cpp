@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku. All rights reserved.
+ * Copyright 2003-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,13 +44,13 @@ void
 HApp::AboutRequested()
 {
 	BAlert* alert = new BAlert(TR("About Sounds"),
-				TR("Sounds\n"
-				"  Brought to you by :\n"
-				"\tOliver Ruiz Dorantes\n"
-				"\tJérôme DUVAL.\n"
-				"  Original work from Atsushi Takamatsu.\n"
-				"Copyright ©2003-2006 Haiku"),
-				TR("OK"));
+		TR("Sounds\n"
+			"  Brought to you by :\n"
+			"\tOliver Ruiz Dorantes\n"
+			"\tJérôme DUVAL.\n"
+			"  Original work from Atsushi Takamatsu.\n"
+			"Copyright ©2003-2006 Haiku"),
+		TR("OK"));
 	alert->Go();
 }
 
@@ -59,7 +59,7 @@ HApp::AboutRequested()
 
 
 int
-main(int, char**)
+main()
 {
 	HApp app;
 	app.Run();
