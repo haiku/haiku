@@ -70,7 +70,7 @@ static const char* kCurrentKeymapName = "(Current)";
 
 KeymapWindow::KeymapWindow()
 	:
-	BWindow(BRect(80, 50, 880, 380), TR("Keymap"), B_TITLED_WINDOW,
+	BWindow(BRect(80, 50, 880, 380), B_TRANSLATE("Keymap"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -78,12 +78,13 @@ KeymapWindow::KeymapWindow()
 	fKeyboardLayoutView = new KeyboardLayoutView("layout");
 	fKeyboardLayoutView->SetKeymap(&fCurrentMap);
 
-	fTextControl = new BTextControl(TR("Sample and clipboard:"), "", NULL);
+	fTextControl = new BTextControl(B_TRANSLATE("Sample and clipboard:"),
+		"", NULL);
 
 	fSwitchShortcutsButton = new BButton("switch", "",
 		new BMessage(kMsgSwitchShortcuts));
 
-	fRevertButton = new BButton("revertButton", TR("Revert"),
+	fRevertButton = new BButton("revertButton", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertKeymap));
 
 	// controls pane
@@ -377,19 +378,19 @@ KeymapWindow::_CreateMenu()
 	BMenuItem* item;
 
 	// Create the File menu
-	BMenu* menu = new BMenu(TR("File"));
-	menu->AddItem(new BMenuItem(TR("Open" B_UTF8_ELLIPSIS),
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileOpen), 'O'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Save as" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgMenuFileSaveAs)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Quit"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
 	// Create keyboard layout menu
-	fLayoutMenu = new BMenu(TR("Layout"));
+	fLayoutMenu = new BMenu(B_TRANSLATE("Layout"));
 	fLayoutMenu->SetRadioMode(true);
 	fLayoutMenu->AddItem(item = new BMenuItem(
 		fKeyboardLayoutView->GetKeyboardLayout()->Name(),
@@ -400,7 +401,7 @@ KeymapWindow::_CreateMenu()
 	menuBar->AddItem(fLayoutMenu);
 
 	// Create the Font menu
-	fFontMenu = new BMenu(TR("Font"));
+	fFontMenu = new BMenu(B_TRANSLATE("Font"));
 	fFontMenu->SetRadioMode(true);
 	int32 numFamilies = count_font_families();
 	font_family family, currentFamily;
@@ -428,9 +429,10 @@ KeymapWindow::_CreateMenu()
 BMenuField*
 KeymapWindow::_CreateDeadKeyMenuField()
 {
-	BPopUpMenu* deadKeyMenu = new BPopUpMenu(TR("Select dead keys"), false, false);
+	BPopUpMenu* deadKeyMenu = new BPopUpMenu(B_TRANSLATE("Select dead keys"),
+		false, false);
 
-	fAcuteMenu = new BMenu(TR("Acute trigger"));
+	fAcuteMenu = new BMenu(B_TRANSLATE("Acute trigger"));
 	fAcuteMenu->SetRadioMode(true);
 	fAcuteMenu->AddItem(new BMenuItem("\xC2\xB4",
 		new BMessage(kMsgDeadKeyAcuteChanged)));
@@ -440,7 +442,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyAcuteChanged)));
 	deadKeyMenu->AddItem(fAcuteMenu);
 
-	fCircumflexMenu = new BMenu(TR("Circumflex trigger"));
+	fCircumflexMenu = new BMenu(B_TRANSLATE("Circumflex trigger"));
 	fCircumflexMenu->SetRadioMode(true);
 	fCircumflexMenu->AddItem(new BMenuItem("^",
 		new BMessage(kMsgDeadKeyCircumflexChanged)));
@@ -448,7 +450,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyCircumflexChanged)));
 	deadKeyMenu->AddItem(fCircumflexMenu);
 
-	fDiaeresisMenu = new BMenu(TR("Diaeresis trigger"));
+	fDiaeresisMenu = new BMenu(B_TRANSLATE("Diaeresis trigger"));
 	fDiaeresisMenu->SetRadioMode(true);
 	fDiaeresisMenu->AddItem(new BMenuItem("\xC2\xA8",
 		new BMessage(kMsgDeadKeyDiaeresisChanged)));
@@ -458,7 +460,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyDiaeresisChanged)));
 	deadKeyMenu->AddItem(fDiaeresisMenu);
 
-	fGraveMenu = new BMenu(TR("Grave trigger"));
+	fGraveMenu = new BMenu(B_TRANSLATE("Grave trigger"));
 	fGraveMenu->SetRadioMode(true);
 	fGraveMenu->AddItem(new BMenuItem("`",
 		new BMessage(kMsgDeadKeyGraveChanged)));
@@ -466,7 +468,7 @@ KeymapWindow::_CreateDeadKeyMenuField()
 		new BMessage(kMsgDeadKeyGraveChanged)));
 	deadKeyMenu->AddItem(fGraveMenu);
 
-	fTildeMenu = new BMenu(TR("Tilde trigger"));
+	fTildeMenu = new BMenu(B_TRANSLATE("Tilde trigger"));
 	fTildeMenu->SetRadioMode(true);
 	fTildeMenu->AddItem(new BMenuItem("~",
 		new BMessage(kMsgDeadKeyTildeChanged)));
@@ -503,9 +505,9 @@ KeymapWindow::_CreateMapLists()
 	_SetListViewSize(fUserListView);
 
 	return BGroupLayoutBuilder(B_VERTICAL)
-		.Add(new BStringView("system", TR("System:")))
+		.Add(new BStringView("system", B_TRANSLATE("System:")))
 		.Add(systemScroller, 3)
-		.Add(new BStringView("user", TR("User:")))
+		.Add(new BStringView("user", B_TRANSLATE("User:")))
 		.Add(userScroller);
 }
 
@@ -587,13 +589,13 @@ KeymapWindow::_SetKeyboardLayout(const char* path)
 void
 KeymapWindow::_UpdateSwitchShortcutButton()
 {
-	const char* label = TR("Switch shortcut keys");
+	const char* label = B_TRANSLATE("Switch shortcut keys");
 	if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5d
 		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5c) {
-		label = TR("Switch shortcut keys to Windows/Linux mode");
+		label = B_TRANSLATE("Switch shortcut keys to Windows/Linux mode");
 	} else if (fCurrentMap.KeyForModifier(B_LEFT_COMMAND_KEY) == 0x5c
 		&& fCurrentMap.KeyForModifier(B_LEFT_CONTROL_KEY) == 0x5d) {
-		label = TR("Switch shortcut keys to Haiku mode");
+		label = B_TRANSLATE("Switch shortcut keys to Haiku mode");
 	}
 
 	fSwitchShortcutsButton->SetLabel(label);
@@ -760,7 +762,7 @@ KeymapWindow::_FillUserMaps()
 	entry_ref ref;
 	_GetCurrentKeymap(ref);
 
-	fUserListView->AddItem(new KeymapListItem(ref, TR("(Current)")));
+	fUserListView->AddItem(new KeymapListItem(ref, B_TRANSLATE("(Current)")));
 
 	fCurrentMapName = _GetActiveKeymapName();
 
