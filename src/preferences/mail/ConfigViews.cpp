@@ -1,7 +1,9 @@
-/* ConfigViews - config views for the account, protocols, and filters
-**
-** Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
-*/
+/*
+ * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+ */
+
+
+//!	Config views for the account, protocols, and filters.
 
 
 #include "ConfigViews.h"
@@ -53,58 +55,66 @@ const uint32 kMsgRemoveFilter = 'rmfi';
 const uint32 kMsgFilterSelected = 'fsel';
 
 
-AccountConfigView::AccountConfigView(BRect rect,Account *account)
-	:	BBox(rect),
-		fAccount(account)
+AccountConfigView::AccountConfigView(BRect rect, Account *account)
+	:
+	BBox(rect),
+	fAccount(account)
 {
-	SetLabel(TR ("Account settings"));
+	SetLabel(TR("Account settings"));
 
-	rect = Bounds().InsetByCopy(8,8);
+	rect = Bounds().InsetByCopy(8, 8);
 	rect.top += 10;
-	CenterContainer *view = new CenterContainer(rect,false);
+	CenterContainer *view = new CenterContainer(rect, false);
 	view->SetSpacing(5);
 
 	// determine font height
 	font_height fontHeight;
 	view->GetFontHeight(&fontHeight);
-	int32 height = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 5;
+	int32 height = (int32)(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading) + 5;
 
 	rect = view->Bounds();
 	rect.bottom = height + 5;
 
-	float labelWidth = view->StringWidth(TR ("Account name:")) + 6;
+	float labelWidth = view->StringWidth(TR("Account name:")) + 6;
 
-	view->AddChild(fNameControl = new BTextControl(rect,NULL,TR ("Account name:"),NULL,new BMessage(kMsgAccountNameChanged)));
+	view->AddChild(fNameControl = new BTextControl(rect, NULL,
+		TR("Account name:"), NULL, new BMessage(kMsgAccountNameChanged)));
 	fNameControl->SetDivider(labelWidth);
-	view->AddChild(fRealNameControl = new BTextControl(rect,NULL,TR ("Real name:"),NULL,NULL));
+	view->AddChild(fRealNameControl = new BTextControl(rect, NULL,
+		TR("Real name:"), NULL, NULL));
 	fRealNameControl->SetDivider(labelWidth);
-	view->AddChild(fReturnAddressControl = new BTextControl(rect,NULL,TR ("Return address:"),NULL,NULL));
+	view->AddChild(fReturnAddressControl = new BTextControl(rect, NULL,
+		TR("Return address:"), NULL, NULL));
 	fReturnAddressControl->SetDivider(labelWidth);
 //			control->TextView()->HideTyping(true);
 
 	BPopUpMenu *chainsPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *chainModes[] = {
-		TR ("Receive mail only"),
-		TR ("Send mail only"),
-		TR ("Send and receive mail")};
+		TR("Receive mail only"),
+		TR("Send mail only"),
+		TR("Send and receive mail")};
 	BMenuItem *item;
-	for (int32 i = 0;i < 3;i++)
-		chainsPopUp->AddItem(item = new BMenuItem(chainModes[i],new BMessage(kMsgAccountTypeChanged)));
+	for (int32 i = 0;i < 3;i++) {
+		chainsPopUp->AddItem(item = new BMenuItem(chainModes[i],
+			new BMessage(kMsgAccountTypeChanged)));
+	}
 
-	fTypeField = new BMenuField(rect,NULL,TR ("Account type:"),chainsPopUp);
+	fTypeField = new BMenuField(rect, NULL, TR("Account type:"), chainsPopUp);
 	fTypeField->SetDivider(labelWidth + 3);
 	view->AddChild(fTypeField);
 
-	float w,h;
-	view->GetPreferredSize(&w,&h);
-	ResizeTo(w + 15,h + 22);
-	view->ResizeTo(w,h);
+	float w, h;
+	view->GetPreferredSize(&w, &h);
+	ResizeTo(w + 15, h + 22);
+	view->ResizeTo(w, h);
 
 	AddChild(view);
 }
 
 
-void AccountConfigView::DetachedFromWindow()
+void
+AccountConfigView::DetachedFromWindow()
 {
 	fAccount->SetName(fNameControl->Text());
 	fAccount->SetRealName(fRealNameControl->Text());
@@ -112,7 +122,8 @@ void AccountConfigView::DetachedFromWindow()
 }
 
 
-void AccountConfigView::AttachedToWindow()
+void
+AccountConfigView::AttachedToWindow()
 {
 	UpdateViews();
 	fNameControl->SetTarget(this);
@@ -120,18 +131,17 @@ void AccountConfigView::AttachedToWindow()
 }
 
 
-void AccountConfigView::MessageReceived(BMessage *msg)
+void
+AccountConfigView::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case kMsgAccountTypeChanged:
 		{
 			int32 index;
-			if (msg->FindInt32("index",&index) < B_OK)
+			if (msg->FindInt32("index", &index) < B_OK)
 				break;
 
-			if (fAccount->Type() < 0)
-			{
+			if (fAccount->Type() < 0) {
 				fNameControl->SetEnabled(true);
 				fRealNameControl->SetEnabled(true);
 				fReturnAddressControl->SetEnabled(true);
@@ -150,14 +160,14 @@ void AccountConfigView::MessageReceived(BMessage *msg)
 }
 
 
-void AccountConfigView::UpdateViews()
+void
+AccountConfigView::UpdateViews()
 {
-	if (!fAccount->Inbound() && !fAccount->Outbound())
-	{
+	if (!fAccount->Inbound() && !fAccount->Outbound()) {
 		if (BMenuItem *item = fTypeField->Menu()->FindMarked())
 			item->SetMarked(false);
-		fTypeField->Menu()->Superitem()->SetLabel(TR ("Select account type"));
-		
+		fTypeField->Menu()->Superitem()->SetLabel(TR("Select account type"));
+
 		fNameControl->SetEnabled(false);
 		fRealNameControl->SetEnabled(false);
 		fReturnAddressControl->SetEnabled(false);
@@ -172,17 +182,18 @@ void AccountConfigView::UpdateViews()
 }
 
 
-//---------------------------------------------------------------------------------------
 //	#pragma mark -
 
-#include <stdio.h>
-FilterConfigView::FilterConfigView(BMailChain *chain,int32 index,BMessage *msg,entry_ref *ref)
-	:	BBox(BRect(0,0,100,100)),
-		fConfigView(NULL),
-		fChain(chain),
-		fIndex(index),
-		fMessage(msg),
-		fEntryRef(ref)
+
+FilterConfigView::FilterConfigView(BMailChain *chain, int32 index,
+		BMessage *msg, entry_ref *ref)
+	:
+	BBox(BRect(0,0,100,100)),
+	fConfigView(NULL),
+	fChain(chain),
+	fIndex(index),
+	fMessage(msg),
+	fEntryRef(ref)
 {
 	Load(msg,ref);
 	BPath addon(ref);
@@ -196,46 +207,46 @@ FilterConfigView::~FilterConfigView()
 }
 
 
-void FilterConfigView::Load(BMessage *msg,entry_ref *ref)
+void
+FilterConfigView::Load(BMessage *msg, entry_ref *ref)
 {
 	ResizeTo(264,30);
 
-	BView *(* instantiate_config)(BMessage *,BMessage *);
+	BView *(* instantiate_config)(BMessage *, BMessage *);
 	BPath addon(ref);
 	fImage = load_add_on(addon.Path());
 	if (fImage < B_OK)
 		return;
 
-	if (get_image_symbol(fImage,"instantiate_config_panel",B_SYMBOL_TYPE_TEXT,(void **)&instantiate_config) < B_OK)
-	{
+	if (get_image_symbol(fImage, "instantiate_config_panel",
+			B_SYMBOL_TYPE_TEXT,(void **)&instantiate_config) < B_OK) {
 		unload_add_on(fImage);
 		fImage = B_MISSING_SYMBOL;
 		return;
 	}
 
-	fConfigView = (*instantiate_config)(msg,fChain->MetaData());
+	fConfigView = (*instantiate_config)(msg, fChain->MetaData());
 
 	float w = fConfigView->Bounds().Width();
 	float h = fConfigView->Bounds().Height();
-	fConfigView->MoveTo(3,13);
-	ResizeTo(w + 6,h + 16);
+	fConfigView->MoveTo(3, 13);
+	ResizeTo(w + 6, h + 16);
 	AddChild(fConfigView);
 }
 
 
-void FilterConfigView::Remove(bool deleteMessage)
+void
+FilterConfigView::Remove(bool deleteMessage)
 {
 	// remove config view here, because they may not be available
 	// anymore, if the add-on is unloaded
-	if (fConfigView && RemoveChild(fConfigView))
-	{
+	if (fConfigView && RemoveChild(fConfigView)) {
 		delete fConfigView;
 		fConfigView = NULL;
 	}
 	unload_add_on(fImage);
 
-	if (deleteMessage)
-	{
+	if (deleteMessage) {
 		delete fMessage;
 		fMessage = NULL;
 	}
@@ -244,119 +255,122 @@ void FilterConfigView::Remove(bool deleteMessage)
 }
 
 
-status_t FilterConfigView::InitCheck()
+status_t
+FilterConfigView::InitCheck()
 {
 	return fImage;
 }
 
 
-void FilterConfigView::DetachedFromWindow()
+void
+FilterConfigView::DetachedFromWindow()
 {
 	if (fConfigView == NULL)
 		return;
 
 	if (fConfigView->Archive(fMessage) >= B_OK)
-		fChain->SetFilter(fIndex,*fMessage,*fEntryRef);
+		fChain->SetFilter(fIndex, *fMessage, *fEntryRef);
 }
 
 
-void FilterConfigView::AttachedToWindow()
+void
+FilterConfigView::AttachedToWindow()
 {
 }
 
 
-//---------------------------------------------------------------------------------------
 //	#pragma mark -
 
 
-ProtocolsConfigView::ProtocolsConfigView(BMailChain *chain,int32 index,BMessage *msg,entry_ref *ref)
-	:	FilterConfigView(chain,index,msg,ref)
+ProtocolsConfigView::ProtocolsConfigView(BMailChain *chain, int32 index,
+		BMessage *msg, entry_ref *ref)
+	:
+	FilterConfigView(chain, index, msg, ref)
 {
 	BPopUpMenu *menu = new BPopUpMenu("Choose Protocol");
 
 	for (int i = 0; i < 2; i++) {
 		BPath path;
-		status_t status = find_directory((i == 0) ? B_USER_ADDONS_DIRECTORY : B_BEOS_ADDONS_DIRECTORY,&path);
-		if (status != B_OK)
-		{
+		status_t status = find_directory(
+			i == 0 ? B_USER_ADDONS_DIRECTORY : B_BEOS_ADDONS_DIRECTORY, &path);
+		if (status != B_OK) {
 			fImage = status;
 			return;
 		}
-	
+
 		path.Append("mail_daemon");
-		
+
 		if (chain->ChainDirection() == inbound)
 			path.Append("inbound_protocols");
 		else
 			path.Append("outbound_protocols");
-		
+
 		BDirectory dir(path.Path());
 		entry_ref protocolRef;
-		while (dir.GetNextRef(&protocolRef) == B_OK)
-		{
+		while (dir.GetNextRef(&protocolRef) == B_OK) {
 			char name[B_FILE_NAME_LENGTH];
 			BEntry entry(&protocolRef);
 			entry.GetName(name);
-	
+
 			BMenuItem *item;
 			BMessage *msg;
-			menu->AddItem(item = new BMenuItem(name,msg = new BMessage(kMsgProtocolChanged)));
-			msg->AddRef("protocol",&protocolRef);
-	
+			menu->AddItem(item = new BMenuItem(name,
+				msg = new BMessage(kMsgProtocolChanged)));
+			msg->AddRef("protocol", &protocolRef);
+
 			if (*ref == protocolRef)
 				item->SetMarked(true);
 		}
 	}
 
-	fProtocolsMenuField = new BMenuField(BRect(0,0,200,40),NULL,NULL,menu);
+	fProtocolsMenuField
+		= new BMenuField(BRect(0, 0, 200, 40), NULL, NULL, menu);
 	fProtocolsMenuField->ResizeToPreferred();
 	SetLabel(fProtocolsMenuField);
 
-	if (fConfigView)
-	{
-		fConfigView->MoveTo(3,21);
-		ResizeBy(0,8);
-	}
-	else
+	if (fConfigView) {
+		fConfigView->MoveTo(3, 21);
+		ResizeBy(0, 8);
+	} else
 		fImage = B_OK;
 }
 
 
-void ProtocolsConfigView::AttachedToWindow()
+void
+ProtocolsConfigView::AttachedToWindow()
 {
 	FilterConfigView::AttachedToWindow();
 	fProtocolsMenuField->Menu()->SetTargetForItems(this);
 }
 
 
-void ProtocolsConfigView::MessageReceived(BMessage *msg)
+void
+ProtocolsConfigView::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case kMsgProtocolChanged:
 		{
 			entry_ref ref;
-			if (msg->FindRef("protocol",&ref) < B_OK)
+			if (msg->FindRef("protocol", &ref) < B_OK)
 				break;
-			
+
 			DetachedFromWindow();
 			Remove(false);
 
 			fEntryRef = new entry_ref(ref);
 			Load(fMessage,fEntryRef);
-			fChain->SetFilter(fIndex,*fMessage,*fEntryRef);
+			fChain->SetFilter(fIndex, *fMessage, *fEntryRef);
 
 			// resize view
-			if (LockLooperWithTimeout(1000000L) == B_OK)
-			{
-				if (fConfigView)
-				{
-					fConfigView->MoveTo(3,21);
-					ResizeBy(0,8);
+			if (LockLooperWithTimeout(1000000L) == B_OK) {
+				if (fConfigView) {
+					fConfigView->MoveTo(3, 21);
+					ResizeBy(0, 8);
 				}
 				UnlockLooper();
-				
-				if (CenterContainer *container = dynamic_cast<CenterContainer *>(Parent()))
+
+				if (CenterContainer *container
+						= dynamic_cast<CenterContainer *>(Parent()))
 					container->Layout();
 			}
 			break;
@@ -368,154 +382,153 @@ void ProtocolsConfigView::MessageReceived(BMessage *msg)
 }
 
 
-//---------------------------------------------------------------------------------------
 //	#pragma mark -
 
-#include <stdio.h>
-class DragListView : public BListView
-{
-	public:
-		DragListView(BRect frame,const char *name,list_view_type type = B_SINGLE_SELECTION_LIST,
-					 uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,BMessage *itemMovedMsg = NULL)
-			: BListView(frame,name,type,resizingMode),
-			fDragging(false),
-			fItemMovedMessage(itemMovedMsg)
-		{
+
+class DragListView : public BListView {
+public:
+	DragListView(BRect frame, const char *name,
+			list_view_type type = B_SINGLE_SELECTION_LIST,
+			 uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			 BMessage *itemMovedMsg = NULL)
+		:
+		BListView(frame, name, type, resizingMode),
+		fDragging(false),
+		fItemMovedMessage(itemMovedMsg)
+	{
+	}
+
+	virtual bool InitiateDrag(BPoint point, int32 index, bool wasSelected)
+	{
+		BRect frame(ItemFrame(index));
+		BBitmap *bitmap = new BBitmap(frame.OffsetToCopy(B_ORIGIN), B_RGBA32,
+			true);
+		BView *view = new BView(bitmap->Bounds(), NULL, 0, 0);
+		bitmap->AddChild(view);
+
+		if (view->LockLooper()) {
+			BListItem *item = ItemAt(index);
+			bool selected = item->IsSelected();
+
+			view->SetLowColor(225, 225, 225, 128);
+			view->FillRect(view->Bounds());
+
+			if (selected)
+				item->Deselect();
+			ItemAt(index)->DrawItem(view, view->Bounds(), true);
+			if (selected)
+				item->Select();
+
+			view->UnlockLooper();
 		}
-		
-		virtual bool InitiateDrag(BPoint point,int32 index,bool wasSelected)
-		{
-			BRect frame(ItemFrame(index));
-			BBitmap *bitmap = new BBitmap(frame.OffsetToCopy(B_ORIGIN),B_RGBA32,true);
-			BView *view = new BView(bitmap->Bounds(),NULL,0,0);
-			bitmap->AddChild(view);
+		fLastDragTarget = -1;
+		fDragIndex = index;
+		fDragging = true;
 
-			if (view->LockLooper())
-			{
-				BListItem *item = ItemAt(index);
-				bool selected = item->IsSelected();
+		BMessage drag(kMsgItemDragged);
+		drag.AddInt32("index", index);
+		DragMessage(&drag, bitmap, B_OP_ALPHA, point - frame.LeftTop(), this);
 
-				view->SetLowColor(225,225,225,128);
-				view->FillRect(view->Bounds());
+		return true;
+	}
 
-				if (selected)
-					item->Deselect();
-				ItemAt(index)->DrawItem(view,view->Bounds(),true);
-				if (selected)
-					item->Select();
+	void DrawDragTargetIndicator(int32 target)
+	{
+		PushState();
+		SetDrawingMode(B_OP_INVERT);
 
-				view->UnlockLooper();
-			}
-			fLastDragTarget = -1;
-			fDragIndex = index;
-			fDragging = true;
+		bool last = false;
+		if (target >= CountItems())
+			target = CountItems() - 1, last = true;
 
-			BMessage drag(kMsgItemDragged);
-			drag.AddInt32("index",index);
-			DragMessage(&drag,bitmap,B_OP_ALPHA,point - frame.LeftTop(),this);
+		BRect frame = ItemFrame(target);
+		if (last)
+			frame.OffsetBy(0,frame.Height());
+		frame.bottom = frame.top + 1;
 
-			return true;
-		}
+		FillRect(frame);
 
-		void DrawDragTargetIndicator(int32 target)
-		{
-			PushState();
-			SetDrawingMode(B_OP_INVERT);
+		PopState();
+	}
 
-			bool last = false;
-			if (target >= CountItems())
-				target = CountItems() - 1, last = true;
+	virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
+	{
+		BListView::MouseMoved(point, transit, msg);
 
-			BRect frame = ItemFrame(target);
-			if (last)
-				frame.OffsetBy(0,frame.Height());
-			frame.bottom = frame.top + 1;
+		if ((transit != B_ENTERED_VIEW && transit != B_INSIDE_VIEW)
+			|| !fDragging)
+			return;
 
-			FillRect(frame);
+		int32 target = IndexOf(point);
+		if (target == -1)
+			target = CountItems();
 
-			PopState();
-		}
+		// correct the target insertion index
+		if (target == fDragIndex || target == fDragIndex + 1)
+			target = -1;
 
-		virtual void MouseMoved(BPoint point,uint32 transit,const BMessage *msg)
-		{
-			BListView::MouseMoved(point,transit,msg);
+		if (target == fLastDragTarget)
+			return;
 
-			if ((transit != B_ENTERED_VIEW && transit != B_INSIDE_VIEW) || !fDragging)
-				return;
+		// remove old target indicator
+		if (fLastDragTarget != -1)
+			DrawDragTargetIndicator(fLastDragTarget);
 
-			int32 target = IndexOf(point);
-			if (target == -1)
-				target = CountItems();
+		// draw new one
+		fLastDragTarget = target;
+		if (target != -1)
+			DrawDragTargetIndicator(target);
+	}
 
-			// correct the target insertion index
-			if (target == fDragIndex || target == fDragIndex + 1)
-				target = -1;
-
-			if (target == fLastDragTarget)
-				return;
-
-			// remove old target indicator
+	virtual void MouseUp(BPoint point)
+	{
+		if (fDragging) {
+			fDragging = false;
 			if (fLastDragTarget != -1)
 				DrawDragTargetIndicator(fLastDragTarget);
-			
-			// draw new one
-			fLastDragTarget = target;
-			if (target != -1)
-				DrawDragTargetIndicator(target);
 		}
+		BListView::MouseUp(point);
+	}
 
-		virtual void MouseUp(BPoint point)
-		{
-			if (fDragging)
+	virtual void MessageReceived(BMessage *msg)
+	{
+		switch (msg->what) {
+			case kMsgItemDragged:
 			{
-				fDragging = false;
-				if (fLastDragTarget != -1)
-					DrawDragTargetIndicator(fLastDragTarget);
-			}
-			BListView::MouseUp(point);
-		}
+				int32 source = msg->FindInt32("index");
+				BPoint point = msg->FindPoint("_drop_point_");
+				ConvertFromScreen(&point);
+				int32 to = IndexOf(point);
+				if (to > fDragIndex)
+					to--;
+				if (to == -1)
+					to = CountItems() - 1;
 
-		virtual void MessageReceived(BMessage *msg)
-		{
-			switch(msg->what)
-			{
-				case kMsgItemDragged:
-				{
-					int32 source = msg->FindInt32("index");
-					BPoint point = msg->FindPoint("_drop_point_");
-					ConvertFromScreen(&point);
-					int32 to = IndexOf(point);
-					if (to > fDragIndex)
-						to--;
-					if (to == -1)
-						to = CountItems() - 1;
+				if (source != to) {
+					MoveItem(source,to);
 
-					if (source != to)
-					{
-						MoveItem(source,to);
-						
-						if (fItemMovedMessage != NULL)
-						{
-							BMessage msg(fItemMovedMessage->what);
-							msg.AddInt32("from",source);
-							msg.AddInt32("to",to);
-							Messenger().SendMessage(&msg);
-						}
+					if (fItemMovedMessage != NULL) {
+						BMessage msg(fItemMovedMessage->what);
+						msg.AddInt32("from",source);
+						msg.AddInt32("to",to);
+						Messenger().SendMessage(&msg);
 					}
-					break;
 				}
+				break;
 			}
-			BListView::MessageReceived(msg);
 		}
-	
-	private:
-		bool		fDragging;
-		int32		fLastDragTarget,fDragIndex;
-		BMessage	*fItemMovedMessage;
+		BListView::MessageReceived(msg);
+	}
+
+private:
+	bool		fDragging;
+	int32		fLastDragTarget,fDragIndex;
+	BMessage	*fItemMovedMessage;
 };
 
 
-void GetPrettyDescriptiveName(BPath &path, char *name, BMessage *msg = NULL)
+void
+GetPrettyDescriptiveName(BPath &path, char *name, BMessage *msg = NULL)
 {
 	strcpy(name, path.Leaf());
 
@@ -536,67 +549,75 @@ void GetPrettyDescriptiveName(BPath &path, char *name, BMessage *msg = NULL)
 //	#pragma mark -
 
 
-FiltersConfigView::FiltersConfigView(BRect rect,Account *account)
-	:	BBox(rect),
-		fAccount(account),
-		fFilterView(NULL)
+FiltersConfigView::FiltersConfigView(BRect rect, Account *account)
+	:
+	BBox(rect),
+	fAccount(account),
+	fFilterView(NULL)
 {
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING);
 
 	BMenuItem *item;
 	BMessage *msg;
-	if ((fChain = fAccount->Inbound()))
-	{
-		menu->AddItem(item = new BMenuItem(TR ("Incoming mail filters"),msg = new BMessage(kMsgChainSelected)));
-		msg->AddPointer("chain",fChain);
+	if ((fChain = fAccount->Inbound())) {
+		menu->AddItem(item = new BMenuItem(TR("Incoming mail filters"),
+			msg = new BMessage(kMsgChainSelected)));
+		msg->AddPointer("chain", fChain);
 		item->SetMarked(true);
 	}
-	if (BMailChain *chain = fAccount->Outbound())
-	{
-		menu->AddItem(item = new BMenuItem(TR ("Outgoing mail filters"),msg = new BMessage(kMsgChainSelected)));
-		msg->AddPointer("chain",chain);
-		if (fChain == NULL)
-		{
+	if (BMailChain *chain = fAccount->Outbound()) {
+		menu->AddItem(item = new BMenuItem(TR("Outgoing mail filters"),
+			msg = new BMessage(kMsgChainSelected)));
+		msg->AddPointer("chain", chain);
+		if (fChain == NULL) {
 			item->SetMarked(true);
 			fChain = chain;
 		}
 	}
 
-	fChainsField = new BMenuField(BRect(0,0,200,40),NULL,NULL,menu);
+	fChainsField = new BMenuField(BRect(0, 0, 200, 40), NULL, NULL, menu);
 	fChainsField->ResizeToPreferred();
 	SetLabel(fChainsField);
 
 	// determine font height
 	font_height fontHeight;
 	fChainsField->GetFontHeight(&fontHeight);
-	int32 height = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading) + 5;
+	int32 height = (int32)(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading) + 5;
 
-	rect = Bounds().InsetByCopy(10,10);
+	rect = Bounds().InsetByCopy(10, 10);
 	rect.top += 18;
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom = rect.top + 4 * height + 2;
-	fListView = new DragListView(rect,NULL,B_SINGLE_SELECTION_LIST,B_FOLLOW_ALL,new BMessage(kMsgFilterMoved));
-	AddChild(new BScrollView(NULL,fListView,B_FOLLOW_ALL,0,false,true));
+	fListView = new DragListView(rect, NULL, B_SINGLE_SELECTION_LIST,
+		B_FOLLOW_ALL, new BMessage(kMsgFilterMoved));
+	AddChild(new BScrollView(NULL, fListView, B_FOLLOW_ALL, 0, false, true));
 	rect.right += B_V_SCROLL_BAR_WIDTH;
 
 //	fListView->Select(gSettings.formats.IndexOf(format));
 	fListView->SetSelectionMessage(new BMessage(kMsgFilterSelected));
 
-	rect.top = rect.bottom + 8;  rect.bottom = rect.top + height;
-	BRect sizeRect = rect;	sizeRect.right = sizeRect.left + 30 + fChainsField->StringWidth(TR ("Add filter"));
+	rect.top = rect.bottom + 8;
+	rect.bottom = rect.top + height;
+	BRect sizeRect = rect;
+	sizeRect.right = sizeRect.left + 30
+		+ fChainsField->StringWidth(TR("Add filter"));
 
-	menu = new BPopUpMenu(TR ("Add filter"));
+	menu = new BPopUpMenu(TR("Add filter"));
 	menu->SetRadioMode(false);
 
-	fAddField = new BMenuField(rect,NULL,NULL,menu);
+	fAddField = new BMenuField(rect, NULL, NULL, menu);
 	fAddField->ResizeToPreferred();
 	AddChild(fAddField);
 
-	sizeRect.left = sizeRect.right + 5;	sizeRect.right = sizeRect.left + 30 + fChainsField->StringWidth(TR ("Remove"));
+	sizeRect.left = sizeRect.right + 5;
+	sizeRect.right = sizeRect.left + 30
+		+ fChainsField->StringWidth(TR("Remove"));
 	sizeRect.top--;
-	AddChild(fRemoveButton = new BButton(sizeRect,NULL,TR ("Remove"),new BMessage(kMsgRemoveFilter),B_FOLLOW_BOTTOM));
+	AddChild(fRemoveButton = new BButton(sizeRect, NULL, TR("Remove"),
+		new BMessage(kMsgRemoveFilter), B_FOLLOW_BOTTOM));
 
-	ResizeTo(Bounds().Width(),sizeRect.bottom + 10);
+	ResizeTo(Bounds().Width(), sizeRect.bottom + 10);
 	SetTo(fChain);
 }
 
@@ -606,18 +627,19 @@ FiltersConfigView::~FiltersConfigView()
 }
 
 
-void FiltersConfigView::SelectFilter(int32 index)
+void
+FiltersConfigView::SelectFilter(int32 index)
 {
 	if (Parent())
 		Parent()->Hide();
 
 	// remove old config view
-	if (fFilterView)
-	{
+	if (fFilterView) {
 		Parent()->RemoveChild(fFilterView);
-		
+
 		// update the name in the list
-		BStringItem *item = (BStringItem *)fListView->ItemAt(fFilterView->fIndex - fFirst);
+		BStringItem *item = (BStringItem *)fListView->ItemAt(
+			fFilterView->fIndex - fFirst);
 
 		char name[B_FILE_NAME_LENGTH];
 		BPath path(fFilterView->fEntryRef);
@@ -628,24 +650,19 @@ void FiltersConfigView::SelectFilter(int32 index)
 		fFilterView = NULL;
 	}
 
-	if (index >= 0)
-	{
+	if (index >= 0) {
 		// add new config view
 		BMessage *msg = new BMessage();
 		entry_ref *ref = new entry_ref();
-		if (fChain->GetFilter(index + fFirst,msg,ref) >= B_OK && Parent())
-		{
-			fFilterView = new FilterConfigView(fChain,index + fFirst,msg,ref);
+		if (fChain->GetFilter(index + fFirst, msg, ref) >= B_OK && Parent()) {
+			fFilterView = new FilterConfigView(fChain,index + fFirst, msg, ref);
 			if (fFilterView->InitCheck() >= B_OK)
 				Parent()->AddChild(fFilterView);
-			else
-			{
+			else {
 				delete fFilterView;
 				fFilterView = NULL;
 			}
-		}
-		else
-		{
+		} else {
 			delete msg;
 			delete ref;
 		}
@@ -660,34 +677,30 @@ void FiltersConfigView::SelectFilter(int32 index)
 }
 
 
-void FiltersConfigView::SetTo(BMailChain *chain)
+void
+FiltersConfigView::SetTo(BMailChain *chain)
 {
 	// remove the filter config view
 	SelectFilter(-1);
 
-	for (int32 i = fListView->CountItems();i-- > 0;)
-	{
+	for (int32 i = fListView->CountItems(); i-- > 0;) {
 		BStringItem *item = (BStringItem *)fListView->RemoveItem(i);
 		delete item;
 	}
 
-	if (chain->ChainDirection() == inbound)
-	{
+	if (chain->ChainDirection() == inbound) {
 		fFirst = 2;		// skip protocol (e.g. POP3), and Parser
 		fLast = 2;		// skip Notifier, and Folder
-	}
-	else
-	{
+	} else {
 		fFirst = 1;		// skip Producer
 		fLast = 1;		// skip protocol (e.g. SMTP)
 	}
+
 	int32 last = chain->CountFilters() - fLast;
-	for (int32 i = fFirst;i < last;i++)
-	{
+	for (int32 i = fFirst; i < last; i++) {
 		BMessage msg;
 		entry_ref ref;
-		if (chain->GetFilter(i,&msg,&ref) == B_OK)
-		{
+		if (chain->GetFilter(i, &msg, &ref) == B_OK) {
 			char name[B_FILE_NAME_LENGTH];
 			BPath addon(&ref);
 			GetPrettyDescriptiveName(addon, name, &msg);
@@ -701,44 +714,45 @@ void FiltersConfigView::SetTo(BMailChain *chain)
 
 	// remove old filter items
 	BMenu *menu = fAddField->Menu();
-	for (int32 i = menu->CountItems();i-- > 0;)
-	{
+	for (int32 i = menu->CountItems(); i-- > 0;) {
 		BMenuItem *item = menu->RemoveItem(i);
 		delete item;
 	}
-	
+
 	for (int i = 0; i < 2; i++) {
 		BPath path;
-		status_t status = find_directory((i == 0) ? B_USER_ADDONS_DIRECTORY : B_BEOS_ADDONS_DIRECTORY,&path);
+		status_t status = find_directory(
+			i == 0 ? B_USER_ADDONS_DIRECTORY : B_BEOS_ADDONS_DIRECTORY, &path);
 		if (status != B_OK)
 			return;
-	
+
 		path.Append("mail_daemon");
-		
+
 		if (fChain->ChainDirection() == inbound)
 			path.Append("inbound_filters");
 		else
 			path.Append("outbound_filters");
-			
+
 		BDirectory dir(path.Path());
 		entry_ref ref;
-		while (dir.GetNextRef(&ref) == B_OK)
-		{
+		while (dir.GetNextRef(&ref) == B_OK) {
 			char name[B_FILE_NAME_LENGTH];
 			BPath path(&ref);
 			GetPrettyDescriptiveName(path, name);
-	
+
 			BMenuItem *item;
 			BMessage *msg;
-			menu->AddItem(item = new BMenuItem(name,msg = new BMessage(kMsgAddFilter)));
-			msg->AddRef("filter",&ref);
+			menu->AddItem(item = new BMenuItem(name,
+				msg = new BMessage(kMsgAddFilter)));
+			msg->AddRef("filter", &ref);
 		}
 	}
 	menu->SetTargetForItems(this);
 }
 
 
-void FiltersConfigView::AttachedToWindow()
+void
+FiltersConfigView::AttachedToWindow()
 {
 	fChainsField->Menu()->SetTargetForItems(this);
 	fListView->SetTarget(this);
@@ -747,14 +761,14 @@ void FiltersConfigView::AttachedToWindow()
 }
 
 
-void FiltersConfigView::MessageReceived(BMessage *msg)
+void
+FiltersConfigView::MessageReceived(BMessage *msg)
 {
-	switch (msg->what)
-	{
+	switch (msg->what) {
 		case kMsgChainSelected:
 		{
 			BMailChain *chain;
-			if (msg->FindPointer("chain",(void **)&chain) < B_OK)
+			if (msg->FindPointer("chain", (void **)&chain) < B_OK)
 				break;
 
 			SetTo(chain);
@@ -763,12 +777,12 @@ void FiltersConfigView::MessageReceived(BMessage *msg)
 		case kMsgAddFilter:
 		{
 			entry_ref ref;
-			if (msg->FindRef("filter",&ref) < B_OK)
+			if (msg->FindRef("filter", &ref) < B_OK)
 				break;
 
 			BMessage msg;
-			if (fChain->AddFilter(fChain->CountFilters() - fLast, msg, ref) >= B_OK)
-			{
+			if (fChain->AddFilter(fChain->CountFilters() - fLast, msg, ref)
+					>= B_OK) {
 				char name[B_FILE_NAME_LENGTH];
 				BPath path(&ref);
 				GetPrettyDescriptiveName(path, name, &msg);
@@ -783,8 +797,8 @@ void FiltersConfigView::MessageReceived(BMessage *msg)
 				break;
 
 			SelectFilter(-1);
-			if (BStringItem *item = (BStringItem *)fListView->RemoveItem(index))
-			{
+			if (BStringItem *item
+					= (BStringItem *)fListView->RemoveItem(index)) {
 				fChain->RemoveFilter(index + fFirst);
 				delete item;
 			}
@@ -811,37 +825,34 @@ void FiltersConfigView::MessageReceived(BMessage *msg)
 
 			entry_ref ref;
 			BMessage settings;
-			if (fChain->GetFilter(from,&settings,&ref) == B_OK)
-			{
+			if (fChain->GetFilter(from, &settings, &ref) == B_OK) {
 				// disable filter view saving
 				if (fFilterView && fFilterView->fIndex == from)
 					fFilterView->fIndex = -1;
 
 				fChain->RemoveFilter(from);
-				
-				if (fChain->AddFilter(to,settings,ref) < B_OK)
-				{
-					(new BAlert("E-mail",TR (
-					"The filter could not be moved. Deleting filter."
-					),TR("OK")))->Go();
+
+				if (fChain->AddFilter(to, settings, ref) < B_OK) {
+					(new BAlert("E-mail",
+						TR("The filter could not be moved. Deleting filter."),
+						TR("OK")))->Go();
 
 					// the filter view belongs to the moved filter
 					if (fFilterView && fFilterView->fIndex == -1)
 						SelectFilter(-1);
 
 					fListView->RemoveItem(msg->FindInt32("to"));
-				}
-				else if (fFilterView)
-				{
+				} else if (fFilterView) {
 					int32 index = fFilterView->fIndex;
-					if (index == -1)
+					if (index == -1) {
 						// the view belongs to the moved filter
 						fFilterView->fIndex = to;
-					else if (index > from && index < to)
+					} else if (index > from && index < to) {
 						// the view belongs to another filter (between the
 						// 'from' & 'to' positions) - all others can keep
 						// their index value
 						fFilterView->fIndex--;
+					}
 				}
 			}
 			break;
@@ -851,4 +862,3 @@ void FiltersConfigView::MessageReceived(BMessage *msg)
 			break;
 	}
 }
-
