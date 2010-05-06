@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2003-2009, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
@@ -83,19 +83,26 @@ extern BCatalog* be_app_catalog;
 #undef TR
 #define TR(str) \
 	be_catalog->GetString((str), TR_CONTEXT)
+#define B_TRANSLATE(str) \
+	be_catalog->GetString((str), TR_CONTEXT)
 
 #undef TR_CMT
 #define TR_CMT(str, cmt) \
+	be_catalog->GetString((str), TR_CONTEXT, (cmt))
+#define B_TRANSLATE_COMMENT(str, cmt) \
 	be_catalog->GetString((str), TR_CONTEXT, (cmt))
 
 #undef TR_ALL
 #define TR_ALL(str, ctx, cmt) \
 	be_catalog->GetString((str), (ctx), (cmt))
+#define B_TRANSLATE_ALL(str, ctx, cmt) \
+	be_catalog->GetString((str), (ctx), (cmt))
 
 #undef TR_ID
 #define TR_ID(id) \
 	be_catalog->GetString((id))
-
+#define B_TRANSLATE_ID(id) \
+	be_catalog->GetString((id))
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code):
@@ -123,17 +130,25 @@ extern BCatalog* be_app_catalog;
 #undef TR_MARK
 #define TR_MARK(str) \
 	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, "")
+#define B_TRANSLATE_MARK(str) \
+	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, "")
 
 #undef TR_MARK_CMT
 #define TR_MARK_CMT(str, cmt) \
+	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, (cmt))
+#define B_TRANSLATE_MARK_COMMENT(str, cmt) \
 	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, (cmt))
 
 #undef TR_MARK_ALL
 #define TR_MARK_ALL(str, ctx, cmt) \
 	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
+#define B_TRANSLATE_MARK_ALL(str, ctx, cmt) \
+	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
 
 #undef TR_MARK_ID
 #define TR_MARK_ID(id) \
+	BCatalogAddOn::MarkForTranslation((id))
+#define B_TRANSLATE_MARK_ID(id) \
 	BCatalogAddOn::MarkForTranslation((id))
 
 #endif	/* B_AVOID_TRANSLATION_MACROS */
@@ -170,18 +185,18 @@ class BCatalogAddOn {
 							const char *context = NULL,
 							const char *comment = NULL);
 		virtual status_t SetString(int32 id, const char *translated);
-		
+
 		virtual bool CanWriteData() const;
 		virtual status_t SetData(const char *name, BMessage *msg);
 		virtual status_t SetData(uint32 id, BMessage *msg);
-		
+
 		virtual status_t ReadFromFile(const char *path = NULL);
 		virtual status_t ReadFromAttribute(entry_ref *appOrAddOnRef);
 		virtual status_t ReadFromResource(entry_ref *appOrAddOnRef);
 		virtual status_t WriteToFile(const char *path = NULL);
 		virtual status_t WriteToAttribute(entry_ref *appOrAddOnRef);
 		virtual status_t WriteToResource(entry_ref *appOrAddOnRef);
-		
+
 		virtual void MakeEmpty();
 		virtual int32 CountItems() const;
 
@@ -324,18 +339,18 @@ class EditableCatalog : public BCatalog {
 					const char *context = NULL,
 					const char *comment = NULL);
 		status_t SetString(int32 id, const char *translated);
-		
+
 		bool CanWriteData() const;
 		status_t SetData(const char *name, BMessage *msg);
 		status_t SetData(uint32 id, BMessage *msg);
-		
+
 		status_t ReadFromFile(const char *path = NULL);
 		status_t ReadFromAttribute(entry_ref *appOrAddOnRef);
 		status_t ReadFromResource(entry_ref *appOrAddOnRef);
 		status_t WriteToFile(const char *path = NULL);
 		status_t WriteToAttribute(entry_ref *appOrAddOnRef);
 		status_t WriteToResource(entry_ref *appOrAddOnRef);
-		
+
 		void MakeEmpty();
 
 	private:
