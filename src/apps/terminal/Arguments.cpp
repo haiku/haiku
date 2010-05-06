@@ -3,14 +3,20 @@
  * Distributed under the terms of the MIT License.
  */
 
+
+#include "Arguments.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "Arguments.h"
-
 #include <Catalog.h>
 #include <Locale.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Terminal arguments parsing"
+
 
 Arguments::Arguments(int defaultArgsNum, const char * const *defaultArgs)
 	: fUsageRequested(false),
@@ -29,9 +35,6 @@ Arguments::~Arguments()
 {
 	_SetShellArguments(0, NULL);
 }
-
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal arguments parsing"
 
 void
 Arguments::Parse(int argc, const char *const *argv)
