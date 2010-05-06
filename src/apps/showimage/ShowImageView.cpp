@@ -1285,9 +1285,9 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 	if (loop) {
 		// If loop terminated because of a break, there was an error
 		char buffer[512];
-		snprintf(buffer, sizeof(buffer), TR("The file '%s' could not "
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("The file '%s' could not "
 			"be written."), name);
-		BAlert *palert = new BAlert("", buffer, TR("OK"));
+		BAlert *palert = new BAlert("", buffer, B_TRANSLATE("OK"));
 		palert->Go();
 	}
 
@@ -2445,7 +2445,8 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 		int32 orientation = fImageOrientation;
 		if (fInverted) orientation += 256;
 		if (orientation != k0) {
-			node.WriteAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0, &orientation, sizeof(orientation));
+			node.WriteAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0,
+				&orientation, sizeof(orientation));
 		} else {
 			node.RemoveAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE);
 		}

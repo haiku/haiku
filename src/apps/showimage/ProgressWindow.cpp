@@ -26,7 +26,7 @@ static const uint32 kMsgShow = 'show';
 
 ProgressWindow::ProgressWindow(BWindow* referenceWindow, bool center)
 	:
-	BWindow(BRect(0, 0, 250, 100), TR("Progress monitor"),
+	BWindow(BRect(0, 0, 250, 100), B_TRANSLATE("Progress monitor"),
 		B_MODAL_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fRunner(NULL)

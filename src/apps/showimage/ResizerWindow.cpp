@@ -37,7 +37,8 @@
 
 ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	:
-	BWindow(BRect(100, 100, 300, 300), TR("Resize"), B_FLOATING_WINDOW,
+	BWindow(BRect(100, 100, 300, 300), B_TRANSLATE("Resize"),
+		B_FLOATING_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fOriginalWidth(width),
 	fOriginalHeight(height),
@@ -45,26 +46,29 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 {
 	BString widthValue;
 	widthValue << width;
-	fWidth = new BTextControl("width", TR("Width:"), widthValue.String(), NULL);
+	fWidth = new BTextControl("width", B_TRANSLATE("Width:"),
+		widthValue.String(), NULL);
 	fWidth->SetModificationMessage(new BMessage(kWidthModifiedMsg));
 
 	BString heightValue;
-	heightValue << height;	
+	heightValue << height;
 	fHeight = new BTextControl("height",
-		TR("Height:"), heightValue.String(), NULL);
+		B_TRANSLATE("Height:"), heightValue.String(), NULL);
 	fHeight->SetModificationMessage(new BMessage(kHeightModifiedMsg));
 
 	fAspectRatio = new BCheckBox("Ratio",
-		TR("Keep original proportions"), new BMessage(kWidthModifiedMsg));
+		B_TRANSLATE("Keep original proportions"),
+		new BMessage(kWidthModifiedMsg));
 	fAspectRatio->SetValue(B_CONTROL_ON);
 
-	fApply = new BButton("apply", TR("Apply"), new BMessage(kApplyMsg));
+	fApply = new BButton("apply", B_TRANSLATE("Apply"),
+		new BMessage(kApplyMsg));
 	fApply->MakeDefault(true);
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 	const float labelspacing = be_control_look->DefaultLabelSpacing();
-	
-	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(BGridLayoutBuilder(labelspacing, 0)
 				.Add(fWidth->CreateLabelLayoutItem(), 0, 0)
@@ -73,13 +77,13 @@ ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 				.Add(fHeight->CreateTextViewLayoutItem(), 1, 1)
 				)
 		.Add(fAspectRatio)
-		.AddGroup(B_HORIZONTAL, 0) 
-			.AddGlue() 
-			.Add(fApply) 
-		.End() 
-		.SetInsets(spacing, spacing, spacing, spacing) 
-	); 
-	
+		.AddGroup(B_HORIZONTAL, 0)
+			.AddGlue()
+			.Add(fApply)
+		.End()
+		.SetInsets(spacing, spacing, spacing, spacing)
+	);
+
 	fWidth->MakeFocus();
 
 }
@@ -90,7 +94,7 @@ ResizerWindow::~ResizerWindow()
 }
 
 
-void 
+void
 ResizerWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what)
@@ -99,16 +103,16 @@ ResizerWindow::MessageReceived(BMessage* message)
 		case kActivateMsg:
 			Activate();
 			break;
-			
+
 		case kUpdateMsg:
 		{
 			// update aspect ratio, width and height
 			int32 width, height;
 			if (message->FindInt32("width", &width) == B_OK &&
 				message->FindInt32("height", &height) == B_OK) {
-				
+
 				fOriginalWidth = width;
-				fOriginalHeight = height;				
+				fOriginalHeight = height;
 
 				BString widthText, heightText;
 				widthText << width;
@@ -116,12 +120,12 @@ ResizerWindow::MessageReceived(BMessage* message)
 				// here the statement order is important:
 				// in case keep aspect ratio is enabled,
 				// the width should determine the height
-				fHeight->SetText(heightText.String());				
+				fHeight->SetText(heightText.String());
 				fWidth->SetText(widthText.String());
 			}
 			break;
 		}
-			
+
 		// private actions
 		case kResolutionMsg:
 		{

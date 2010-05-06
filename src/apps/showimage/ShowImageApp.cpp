@@ -60,7 +60,7 @@ ShowImageApp::AboutRequested()
 		"Ryan Leavengood",
 		NULL
 	};
-	BAboutWindow about(TR("ShowImage"), 2003, authors);
+	BAboutWindow about(B_TRANSLATE("ShowImage"), 2003, authors);
 	about.Show();
 }
 
@@ -106,7 +106,7 @@ ShowImageApp::Pulse()
 		// quit the application
 		PostMessage(B_QUIT_REQUESTED);
 	}
-}	
+}
 
 
 void
@@ -217,7 +217,7 @@ void
 ShowImageApp::CheckClipboard()
 {
 	// Determines if the contents of the clipboard contain
-	// data that is useful to this application. 
+	// data that is useful to this application.
 	// After checking the clipboard, a message is sent to
 	// all windows indicating that the clipboard has changed
 	// and whether or not the clipboard contains useful data.
@@ -233,7 +233,7 @@ ShowImageApp::CheckClipboard()
 			}
 		}
 
-		be_clipboard->Unlock(); 
+		be_clipboard->Unlock();
 	}
 
 	BMessage msg(MSG_CLIPBOARD_CHANGED);
@@ -250,7 +250,7 @@ ShowImageApp::QuitRequested()
 	if (result)
 		be_clipboard->StopWatching(be_app_messenger);
 			// tell clipboard we don't want anymore notification
-	
+
 	return result;
 }
 

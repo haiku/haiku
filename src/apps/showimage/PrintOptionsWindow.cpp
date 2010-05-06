@@ -80,7 +80,8 @@ PrintOptions::SetHeight(float h)
 PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions* options,
 	BWindow* listener)
 	:
-	BWindow(BRect(at.x, at.y, at.x + 300, at.y + 200), TR("Print options"),
+	BWindow(BRect(at.x, at.y, at.x + 300, at.y + 200),
+		B_TRANSLATE("Print options"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fPrintOptions(options),
@@ -137,41 +138,41 @@ PrintOptionsWindow::Setup()
 	BBox* line;
 	BButton* button;
 
-	rbFit = AddRadioButton("fit_to_page", TR("Fit image to page"),
+	rbFit = AddRadioButton("fit_to_page", B_TRANSLATE("Fit image to page"),
 		kMsgFitToPageSelected, op == PrintOptions::kFitToPage);
 
-	rbZoom = AddRadioButton("zoom_factor", TR("Zoom factor in %:"),
+	rbZoom = AddRadioButton("zoom_factor", B_TRANSLATE("Zoom factor in %:"),
 		kMsgZoomFactorSelected, op == PrintOptions::kZoomFactor);
 
 	fZoomFactor = AddTextControl("zoom_factor_text", "",
 		fCurrentOptions.ZoomFactor() * 100, kMsgZoomFactorChanged);
 
-	rbDpi = AddRadioButton("dpi", TR("DPI:"), kMsgDPISelected,
+	rbDpi = AddRadioButton("dpi", B_TRANSLATE("DPI:"), kMsgDPISelected,
 		op == PrintOptions::kDPI);
 
 	fDPI = AddTextControl("dpi_text", "", fCurrentOptions.DPI(),
 		kMsgDPIChanged);
 
 	rbResize = AddRadioButton("width_and_height",
-		TR("Resize to (in 1/72 inches):"), kMsgWidthAndHeightSelected,
+		B_TRANSLATE("Resize to (in 1/72 inches):"), kMsgWidthAndHeightSelected,
 		op == PrintOptions::kWidth || op == PrintOptions::kHeight);
 
-	fWidth = AddTextControl("width", TR("Width:"),
+	fWidth = AddTextControl("width", B_TRANSLATE("Width:"),
 		fCurrentOptions.Width(), kMsgWidthChanged);
 
-	fHeight = AddTextControl("height", TR("Height: "),
+	fHeight = AddTextControl("height", B_TRANSLATE("Height: "),
 		fCurrentOptions.Height(), kMsgHeightChanged);
 
 	line = new BBox(B_EMPTY_STRING, B_WILL_DRAW | B_FRAME_EVENTS,
 		B_FANCY_BORDER);
 	line->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	button = new BButton("job setup", TR("Job setup"),
+	button = new BButton("job setup", B_TRANSLATE("Job setup"),
 		new BMessage(kMsgJobSetup));
 	SetDefaultButton(button);
 
 	const float spacing = be_control_look->DefaultItemSpacing();
-	
+
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(BGridLayoutBuilder()

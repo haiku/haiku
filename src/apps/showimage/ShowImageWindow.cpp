@@ -188,9 +188,11 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 
 	if (InitCheck() != B_OK) {
 		BAlert* alert;
-		alert = new BAlert(TR("ShowImage"),
-			TR("Could not load image! Either the file or an image translator for it does not exist."),
-			TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
+		alert = new BAlert(
+			B_TRANSLATE("ShowImage"),
+			B_TRANSLATE("Could not load image! Either the file or an image "
+				"translator for it does not exist."),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
 		alert->Go();
 
 		// quit if file could not be opened
@@ -202,7 +204,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 #define TR_CONTEXT "Menus"
 
 	// add View menu here so it can access ShowImageView methods
-	BMenu* menu = new BMenu(TR("View"));
+	BMenu* menu = new BMenu(B_TRANSLATE("View"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
 	_MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
@@ -259,9 +261,9 @@ ShowImageWindow::BuildContextMenu(BMenu* menu)
 void
 ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 {
-	_AddItemMenu(menu, TR("Slide show"), MSG_SLIDE_SHOW, 0, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Slide show"), MSG_SLIDE_SHOW, 0, 0, this);
 	_MarkMenuItem(menu, MSG_SLIDE_SHOW, fImageView->SlideShowStarted());
-	BMenu* delayMenu = new BMenu(TR("Slide delay"));
+	BMenu* delayMenu = new BMenu(B_TRANSLATE("Slide delay"));
 	if (fSlideShowDelay == NULL)
 		fSlideShowDelay = delayMenu;
 
@@ -270,39 +272,44 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 	//		 if slide show delay is too short! (Especially if loading the image
 	//		 takes as long as or longer than the slide show delay). Should load
 	//		 in background thread!
-	_AddDelayItem(delayMenu, TR("3 seconds"), 3);
-	_AddDelayItem(delayMenu, TR("4 seconds"), 4);
-	_AddDelayItem(delayMenu, TR("5 seconds"), 5);
-	_AddDelayItem(delayMenu, TR("6 seconds"), 6);
-	_AddDelayItem(delayMenu, TR("7 seconds"), 7);
-	_AddDelayItem(delayMenu, TR("8 seconds"), 8);
-	_AddDelayItem(delayMenu, TR("9 seconds"), 9);
-	_AddDelayItem(delayMenu, TR("10 seconds"), 10);
-	_AddDelayItem(delayMenu, TR("20 seconds"), 20);
+	_AddDelayItem(delayMenu, B_TRANSLATE("3 seconds"), 3);
+	_AddDelayItem(delayMenu, B_TRANSLATE("4 seconds"), 4);
+	_AddDelayItem(delayMenu, B_TRANSLATE("5 seconds"), 5);
+	_AddDelayItem(delayMenu, B_TRANSLATE("6 seconds"), 6);
+	_AddDelayItem(delayMenu, B_TRANSLATE("7 seconds"), 7);
+	_AddDelayItem(delayMenu, B_TRANSLATE("8 seconds"), 8);
+	_AddDelayItem(delayMenu, B_TRANSLATE("9 seconds"), 9);
+	_AddDelayItem(delayMenu, B_TRANSLATE("10 seconds"), 10);
+	_AddDelayItem(delayMenu, B_TRANSLATE("20 seconds"), 20);
 	menu->AddItem(delayMenu);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, TR("Original size"), MSG_ORIGINAL_SIZE, '1', 0, this);
-	_AddItemMenu(menu, TR("Zoom in"), MSG_ZOOM_IN, '+', 0, this);
-	_AddItemMenu(menu, TR("Zoom out"), MSG_ZOOM_OUT, '-', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Original size"),
+		MSG_ORIGINAL_SIZE, '1', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Zoom in"), MSG_ZOOM_IN, '+', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Zoom out"), MSG_ZOOM_OUT, '-', 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, TR("High-quality zooming"), MSG_SCALE_BILINEAR, 0, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("High-quality zooming"),
+		MSG_SCALE_BILINEAR, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, TR("Shrink to window"), MSG_SHRINK_TO_WINDOW, 0, 0, this);
-	_AddItemMenu(menu, TR("Zoom to window"), MSG_ZOOM_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Shrink to window"),
+		MSG_SHRINK_TO_WINDOW, 0, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Zoom to window"),
+		MSG_ZOOM_TO_WINDOW, 0, 0, this);
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, TR("Full screen"), MSG_FULL_SCREEN, B_ENTER, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Full screen"),
+		MSG_FULL_SCREEN, B_ENTER, 0, this);
 	_MarkMenuItem(menu, MSG_FULL_SCREEN, fFullScreen);
 
-	_AddItemMenu(menu, TR("Show caption in full screen mode"), MSG_SHOW_CAPTION, 0,
-		0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Show caption in full screen mode"),
+		MSG_SHOW_CAPTION, 0, 0, this);
 	_MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
 
 	_MarkMenuItem(menu, MSG_SCALE_BILINEAR, fImageView->GetScaleBilinear());
@@ -321,7 +328,7 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
-		_AddItemMenu(menu, TR("Use as background" B_UTF8_ELLIPSIS),
+		_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
 			MSG_DESKTOP_BACKGROUND, 0, 0, this);
 	}
 }
@@ -330,76 +337,83 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 void
 ShowImageWindow::AddMenus(BMenuBar* bar)
 {
-	BMenu* menu = new BMenu(TR("File"));
-	fOpenMenu = new RecentDocumentsMenu(TR("Open"));
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
+	fOpenMenu = new RecentDocumentsMenu(B_TRANSLATE("Open"));
 	menu->AddItem(fOpenMenu);
 	fOpenMenu->Superitem()->SetTrigger('O');
 	fOpenMenu->Superitem()->SetMessage(new BMessage(MSG_FILE_OPEN));
 	fOpenMenu->Superitem()->SetTarget(be_app);
 	fOpenMenu->Superitem()->SetShortcut('O', 0);
 	menu->AddSeparatorItem();
-	BMenu *pmenuSaveAs = new BMenu(TR("Save as" B_UTF8_ELLIPSIS),
+	BMenu *pmenuSaveAs = new BMenu(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		B_ITEMS_IN_COLUMN);
 	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
 	menu->AddItem(pmenuSaveAs);
-	_AddItemMenu(menu, TR("Close"), B_QUIT_REQUESTED, 'W', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Close"), B_QUIT_REQUESTED, 'W', 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Page setup" B_UTF8_ELLIPSIS),
+	_AddItemMenu(menu, B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		MSG_PAGE_SETUP, 0, 0, this);
-	_AddItemMenu(menu, TR("Print" B_UTF8_ELLIPSIS),
+	_AddItemMenu(menu, B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
 		MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("About ShowImage" B_UTF8_ELLIPSIS),
+	_AddItemMenu(menu, B_TRANSLATE("About ShowImage" B_UTF8_ELLIPSIS),
 		B_ABOUT_REQUESTED, 0, 0, 	be_app);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Quit"), B_QUIT_REQUESTED, 'Q', 0, be_app);
+	_AddItemMenu(menu, B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q', 0, be_app);
 	bar->AddItem(menu);
 
-	menu = new BMenu(TR("Edit"));
-	_AddItemMenu(menu, TR("Undo"), B_UNDO, 'Z', 0, this, false);
+	menu = new BMenu(B_TRANSLATE("Edit"));
+	_AddItemMenu(menu, B_TRANSLATE("Undo"), B_UNDO, 'Z', 0, this, false);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Cut"), B_CUT, 'X', 0, this, false);
-	_AddItemMenu(menu, TR("Copy"), B_COPY, 'C', 0, this, false);
-	_AddItemMenu(menu, TR("Paste"), B_PASTE, 'V', 0, this, false);
-	_AddItemMenu(menu, TR("Clear"), MSG_CLEAR_SELECT, 0, 0, this, false);
+	_AddItemMenu(menu, B_TRANSLATE("Cut"), B_CUT, 'X', 0, this, false);
+	_AddItemMenu(menu, B_TRANSLATE("Copy"), B_COPY, 'C', 0, this, false);
+	_AddItemMenu(menu, B_TRANSLATE("Paste"), B_PASTE, 'V', 0, this, false);
+	_AddItemMenu(menu, B_TRANSLATE("Clear"),
+		MSG_CLEAR_SELECT, 0, 0, this, false);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Select all"), MSG_SELECT_ALL, 'A', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Select all"),
+		MSG_SELECT_ALL, 'A', 0, this);
 	bar->AddItem(menu);
 
-	menu = fBrowseMenu = new BMenu(TR("Browse"));
-	_AddItemMenu(menu, TR("First page"),
+	menu = fBrowseMenu = new BMenu(B_TRANSLATE("Browse"));
+	_AddItemMenu(menu, B_TRANSLATE("First page"),
 		MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, this);
-	_AddItemMenu(menu, TR("Last page"),
+	_AddItemMenu(menu, B_TRANSLATE("Last page"),
 		MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, this);
-	_AddItemMenu(menu, TR("Previous page"), MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
-	_AddItemMenu(menu, TR("Next page"), MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
-	fGoToPageMenu = new BMenu(TR("Go to page"));
+	_AddItemMenu(menu, B_TRANSLATE("Previous page"),
+		MSG_PAGE_PREV, B_LEFT_ARROW, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Next page"),
+		MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, this);
+	fGoToPageMenu = new BMenu(B_TRANSLATE("Go to page"));
 	fGoToPageMenu->SetRadioMode(true);
 	menu->AddItem(fGoToPageMenu);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Previous file"), MSG_FILE_PREV, B_UP_ARROW, 0, this);
-	_AddItemMenu(menu, TR("Next file"), MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Previous file"),
+		MSG_FILE_PREV, B_UP_ARROW, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Next file"),
+		MSG_FILE_NEXT, B_DOWN_ARROW, 0, this);
 	bar->AddItem(menu);
 
-	menu = new BMenu(TR("Image"));
-	_AddItemMenu(menu, TR("Rotate clockwise"), MSG_ROTATE_90, 'R', 0, this);
-	_AddItemMenu(menu, TR("Rotate counterclockwise"),
+	menu = new BMenu(B_TRANSLATE("Image"));
+	_AddItemMenu(menu, B_TRANSLATE("Rotate clockwise"),
+		MSG_ROTATE_90, 'R', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Rotate counterclockwise"),
 		MSG_ROTATE_270, 'R', B_SHIFT_KEY, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Flip left to right"),
+	_AddItemMenu(menu, B_TRANSLATE("Flip left to right"),
 		MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
-	_AddItemMenu(menu, TR("Flip top to bottom"),
+	_AddItemMenu(menu, B_TRANSLATE("Flip top to bottom"),
 		MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Invert colors"), MSG_INVERT, 0, 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Invert colors"), MSG_INVERT, 0, 0, this);
 	menu->AddSeparatorItem();
-	fResizeItem = _AddItemMenu(menu, TR("Resize" B_UTF8_ELLIPSIS),
+	fResizeItem = _AddItemMenu(menu, B_TRANSLATE("Resize" B_UTF8_ELLIPSIS),
 		MSG_OPEN_RESIZER_WINDOW, 0, 0, this);
 	bar->AddItem(menu);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, TR("Use as background" B_UTF8_ELLIPSIS),
+	_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
 		MSG_DESKTOP_BACKGROUND, 0, 0, this);
 }
 
@@ -1019,16 +1033,18 @@ ShowImageWindow::_ClosePrompt()
 
 	if (count > 1) {
 		bs_printf(&prompt,
-			TR("The document '%s' (page %d) has been changed. Do you want to close the document?"),
+			B_TRANSLATE("The document '%s' (page %d) has been changed. Do you "
+				"want to close the document?"),
 			name.String(), page);
 	} else {
 		bs_printf(&prompt,
-			TR("The document '%s' has been changed. Do you want to close the document?"),
+			B_TRANSLATE("The document '%s' has been changed. Do you want to "
+				"close the document?"),
 			name.String());
 	}
-	
-	BAlert* pAlert = new BAlert(TR("Close document"), prompt.String(),
-		TR("Cancel"), TR("Close"));
+
+	BAlert* pAlert = new BAlert(B_TRANSLATE("Close document"), prompt.String(),
+		B_TRANSLATE("Cancel"), B_TRANSLATE("Close"));
 	if (pAlert->Go() == 0) {
 		// Cancel
 		return false;
