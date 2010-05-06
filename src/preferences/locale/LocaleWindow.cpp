@@ -60,13 +60,15 @@ LocaleWindow::LocaleWindow()
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	BButton* button = new BButton(TR("Defaults"), new BMessage(kMsgDefaults));
-	fRevertButton = new BButton(TR("Revert"), new BMessage(kMsgRevert));
+	BButton* button = new BButton(B_TRANSLATE("Defaults"),
+		new BMessage(kMsgDefaults));
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
 	BTabView* tabView = new BTabView("tabview");
 
-	BView* languageTab = new BView(TR("Language"), B_WILL_DRAW);
+	BView* languageTab = new BView(B_TRANSLATE("Language"), B_WILL_DRAW);
 	languageTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
 	// first list: available languages
@@ -111,9 +113,9 @@ LocaleWindow::LocaleWindow()
 		fLanguageListView->FullListSortItems(compare_typed_list_items);
 	} else {
 		BAlert* myAlert = new BAlert("Error",
-			TR("Unable to find the available languages! You can't use this "
-				"preflet!"),
-			TR("OK"), NULL, NULL,
+			B_TRANSLATE("Unable to find the available languages! You can't "
+				"use this preflet!"),
+			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
 		myAlert->Go();
 	}
@@ -150,16 +152,16 @@ LocaleWindow::LocaleWindow()
 
 	languageTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 10)
 		.AddGroup(B_VERTICAL, 10)
-			.Add(new BStringView("", TR("Available languages")))
+			.Add(new BStringView("", B_TRANSLATE("Available languages")))
 			.Add(scrollView)
 			.End()
 		.AddGroup(B_VERTICAL, 10)
-			.Add(new BStringView("", TR("Preferred languages")))
+			.Add(new BStringView("", B_TRANSLATE("Preferred languages")))
 			.Add(scrollViewEnabled)
 			.End()
 		.View());
 
-	BView* countryTab = new BView(TR("Country"), B_WILL_DRAW);
+	BView* countryTab = new BView(B_TRANSLATE("Country"), B_WILL_DRAW);
 	countryTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
 
 	BListView* listView = new BListView("country", B_SINGLE_SELECTION_LIST);
