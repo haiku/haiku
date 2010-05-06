@@ -38,11 +38,12 @@
 static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetHinting = 'hint';
 static const int32 kMsgSetAverageWeight = 'avrg';
-static const char* kSubpixelLabel = TR_MARK("LCD subpixel");
-static const char* kGrayscaleLabel = TR_MARK("Grayscale");
-static const char* kNoHintingLabel = TR_MARK("Off");
-static const char* kMonospacedHintingLabel = TR_MARK("Monospaced fonts only");
-static const char* kFullHintingLabel = TR_MARK("On");
+static const char* kSubpixelLabel = B_TRANSLATE_MARK("LCD subpixel");
+static const char* kGrayscaleLabel = B_TRANSLATE_MARK("Grayscale");
+static const char* kNoHintingLabel = B_TRANSLATE_MARK("Off");
+static const char* kMonospacedHintingLabel =
+	B_TRANSLATE_MARK("Monospaced fonts only");
+static const char* kFullHintingLabel = B_TRANSLATE_MARK("On");
 
 
 // #pragma mark - private libbe API
@@ -86,20 +87,21 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	// antialiasing menu
 	_BuildAntialiasingMenu();
 	fAntialiasingMenuField = new BMenuField("antialiasing",
-		TR("Antialiasing type:"), fAntialiasingMenu, NULL);
+		B_TRANSLATE("Antialiasing type:"), fAntialiasingMenu, NULL);
 
 	// "average weight" in subpixel filtering
 	fAverageWeightControl = new BSlider("averageWeightControl",
-		TR("Reduce colored edges filter strength:"),
+		B_TRANSLATE("Reduce colored edges filter strength:"),
 		new BMessage(kMsgSetAverageWeight), 0, 255, B_HORIZONTAL);
-	fAverageWeightControl->SetLimitLabels(TR("Off"), TR("Strong"));
+	fAverageWeightControl->SetLimitLabels(B_TRANSLATE("Off"),
+		B_TRANSLATE("Strong"));
 	fAverageWeightControl->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAverageWeightControl->SetHashMarkCount(255 / 15);
 	fAverageWeightControl->SetEnabled(false);
 
 	// hinting menu
 	_BuildHintingMenu();
-	fHintingMenuField = new BMenuField("hinting", TR("Glyph hinting:"),
+	fHintingMenuField = new BMenuField("hinting", B_TRANSLATE("Glyph hinting:"),
 		fHintingMenu, NULL);
 
 #ifdef DISABLE_HINTING_CONTROL
@@ -117,11 +119,11 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	BTextView* subpixelAntialiasingDisabledLabel = new BTextView(
 		textBounds, "unavailable label", textBounds, &infoFont, &infoColor,
 		B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
-	subpixelAntialiasingDisabledLabel->SetText(TR("Subpixel based anti-aliasing "
-		"in combination with glyph hinting is not available in this build of "
-		"Haiku to avoid possible patent issues. To enable this feature, you "
-		"have to build Haiku yourself and enable certain options in the "
-		"libfreetype configuration header."));
+	subpixelAntialiasingDisabledLabel->SetText(B_TRANSLATE(
+		"Subpixel based anti-aliasing in combination with glyph hinting is not "
+		"available in this build of Haiku to avoid possible patent issues. To "
+		"enable this feature, you have to build Haiku yourself and enable "
+		"certain options in the libfreetype configuration header."));
 	subpixelAntialiasingDisabledLabel->SetViewColor(
 		ui_color(B_PANEL_BACKGROUND_COLOR));
 	subpixelAntialiasingDisabledLabel->MakeEditable(false);
@@ -228,19 +230,19 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 void
 AntialiasingSettingsView::_BuildAntialiasingMenu()
 {
-	fAntialiasingMenu = new BPopUpMenu(TR("Antialiasing menu"));
+	fAntialiasingMenu = new BPopUpMenu(B_TRANSLATE("Antialiasing menu"));
 
 	BMessage* message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", false);
 
-	BMenuItem* item = new BMenuItem(TR(kGrayscaleLabel), message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE(kGrayscaleLabel), message);
 
 	fAntialiasingMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", true);
 
-	item = new BMenuItem(TR(kSubpixelLabel), message);
+	item = new BMenuItem(B_TRANSLATE(kSubpixelLabel), message);
 
 	fAntialiasingMenu->AddItem(item);
 }
@@ -249,19 +251,22 @@ AntialiasingSettingsView::_BuildAntialiasingMenu()
 void
 AntialiasingSettingsView::_BuildHintingMenu()
 {
-	fHintingMenu = new BPopUpMenu(TR("Hinting menu"));
+	fHintingMenu = new BPopUpMenu(B_TRANSLATE("Hinting menu"));
 
 	BMessage* message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_OFF);
-	fHintingMenu->AddItem(new BMenuItem(TR(kNoHintingLabel), message));
+	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE(kNoHintingLabel),
+		message));
 
 	message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_ON);
-	fHintingMenu->AddItem(new BMenuItem(TR(kFullHintingLabel), message));
+	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE(kFullHintingLabel),
+		message));
 
 	message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_MONOSPACED_ONLY);
-	fHintingMenu->AddItem(new BMenuItem(TR(kMonospacedHintingLabel), message));
+	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE(kMonospacedHintingLabel),
+		message));
 }
 
 
@@ -269,7 +274,9 @@ void
 AntialiasingSettingsView::_SetCurrentAntialiasing()
 {
 	BMenuItem *item = fAntialiasingMenu->FindItem(
-		fCurrentSubpixelAntialiasing ? TR(kSubpixelLabel) : TR(kGrayscaleLabel));
+		fCurrentSubpixelAntialiasing
+		? B_TRANSLATE(kSubpixelLabel)
+		: B_TRANSLATE(kGrayscaleLabel));
 	if (item != NULL)
 		item->SetMarked(true);
 	if (fCurrentSubpixelAntialiasing)
@@ -293,7 +300,7 @@ AntialiasingSettingsView::_SetCurrentHinting()
 			break;
 	}
 
-	BMenuItem *item = fHintingMenu->FindItem(TR(label));
+	BMenuItem *item = fHintingMenu->FindItem(B_TRANSLATE(label));
 	if (item != NULL)
 		item->SetMarked(true);
 }

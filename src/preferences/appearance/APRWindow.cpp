@@ -25,27 +25,28 @@ static const uint32 kMsgSetDefaults = 'dflt';
 static const uint32 kMsgRevert = 'rvrt';
 
 APRWindow::APRWindow(BRect frame)
- :	BWindow(frame, TR("Appearance"), B_TITLED_WINDOW,
+ :	BWindow(frame, B_TRANSLATE("Appearance"), B_TITLED_WINDOW,
  		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS,
  		B_ALL_WORKSPACES)
 {
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fDefaultsButton = new BButton("defaults", TR("Defaults"),
+	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 
-	fRevertButton = new BButton("revert", TR("Revert"),
+	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert), B_WILL_DRAW);
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
-	fAntialiasingSettings = new AntialiasingSettingsView(TR("Antialiasing"));
-	fColorsView = new APRView(TR("Colors"), B_WILL_DRAW);
+	fAntialiasingSettings = new AntialiasingSettingsView(
+		B_TRANSLATE("Antialiasing"));
+	fColorsView = new APRView(B_TRANSLATE("Colors"), B_WILL_DRAW);
 
 	tabView->AddTab(fColorsView);
 	tabView->AddTab(fAntialiasingSettings);
-		
+
 	fDefaultsButton->SetEnabled(fColorsView->IsDefaultable()
 		|| fAntialiasingSettings->IsDefaultable());
 	fRevertButton->SetEnabled(false);

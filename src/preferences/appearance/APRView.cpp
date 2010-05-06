@@ -63,7 +63,7 @@ APRView::APRView(const char *name, uint32 flags)
 			fDecorMenu->AddItem(new BMenuItem(name.String(),
 				new BMessage(DECORATOR_CHANGED)));
 		}
-		
+
 		BMenuField *field = new BMenuField("Window Style", fDecorMenu);
 		// TODO: use this menu field.
 	}
@@ -79,13 +79,13 @@ APRView::APRView(const char *name, uint32 flags)
 
 	// Set up list of color attributes
 	fAttrList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
-	
+
 	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
 	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	for (int32 i = 0; i < color_description_count(); i++) {
-		const ColorDescription& description = *get_color_description(i); 
-		const char* text = TR(description.text);
+		const ColorDescription& description = *get_color_description(i);
+		const char* text = B_TRANSLATE(description.text);
 		color_which which = description.which;
 		fAttrList->AddItem(new ColorWhichItem(text, which));
 	}
@@ -164,8 +164,8 @@ APRView::MessageReceived(BMessage *msg)
 		{
 			// Received from the color fPicker when its color changes
 			rgb_color color = fPicker->ValueAsColor();
-			SetCurrentColor(color);	
-			
+			SetCurrentColor(color);
+
 			Window()->PostMessage(kMsgUpdate);
 			break;
 		}
@@ -225,7 +225,7 @@ void
 APRView::LoadSettings()
 {
 	for (int32 i = 0; i < color_description_count(); i++) {
-		color_which which = get_color_description(i)->which; 
+		color_which which = get_color_description(i)->which;
 		fCurrentSet.SetColor(which, ui_color(which));
 	}
 
@@ -244,7 +244,7 @@ void
 APRView::UpdateAllColors()
 {
 	for (int32 i = 0; i < color_description_count(); i++) {
-		color_which which = get_color_description(i)->which; 
+		color_which which = get_color_description(i)->which;
 		rgb_color color = fCurrentSet.GetColor(which);
 		set_ui_color(which, color);
 	}
