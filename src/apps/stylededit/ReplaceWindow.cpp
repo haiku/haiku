@@ -33,25 +33,28 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler* _handler,
 	bool caseState, bool wrapState, bool backState)
 	: BWindow(frame, "ReplaceWindow", B_MODAL_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS,
-		B_CURRENT_WORKSPACE) 
+		B_CURRENT_WORKSPACE)
 {
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
-	
-	fSearchString = new BTextControl("", TR("Find:"), NULL, NULL);
-	fReplaceString = new BTextControl("", TR("Replace with:"), NULL, NULL);
-	fCaseSensBox = new BCheckBox("", TR("Case-sensitive"), NULL);
-	fWrapBox = new BCheckBox("", TR("Wrap-around search"), NULL);
-	fBackSearchBox = new BCheckBox("", TR("Search backwards"), NULL); 
-	fAllWindowsBox = new BCheckBox("", TR("Replace in all windows"),
+
+	fSearchString = new BTextControl("", B_TRANSLATE("Find:"), NULL, NULL);
+	fReplaceString = new BTextControl("", B_TRANSLATE("Replace with:"),
+		NULL, NULL);
+	fCaseSensBox = new BCheckBox("", B_TRANSLATE("Case-sensitive"), NULL);
+	fWrapBox = new BCheckBox("", B_TRANSLATE("Wrap-around search"), NULL);
+	fBackSearchBox = new BCheckBox("", B_TRANSLATE("Search backwards"), NULL);
+	fAllWindowsBox = new BCheckBox("", B_TRANSLATE("Replace in all windows"),
 		new BMessage(CHANGE_WINDOW));
 	fUIchange = false;
 
-	fReplaceAllButton = new BButton("", TR("Replace all"),
+	fReplaceAllButton = new BButton("", B_TRANSLATE("Replace all"),
 		new BMessage(MSG_REPLACE_ALL));
-	fCancelButton = new BButton("", TR("Cancel"), new BMessage(B_QUIT_REQUESTED));
-	fReplaceButton = new BButton("", TR("Replace"), new BMessage(MSG_REPLACE));
+	fCancelButton = new BButton("", B_TRANSLATE("Cancel"),
+		new BMessage(B_QUIT_REQUESTED));
+	fReplaceButton = new BButton("", B_TRANSLATE("Replace"),
+		new BMessage(MSG_REPLACE));
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 4)
 		.Add(BGridLayoutBuilder(6, 2)
 				.Add(fSearchString->CreateLabelLayoutItem(), 0, 0)
@@ -63,21 +66,21 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler* _handler,
 				.Add(fBackSearchBox, 1, 4)
 				.Add(fAllWindowsBox, 1, 5)
 				)
-		.AddGroup(B_HORIZONTAL, 10) 
-			.Add(fReplaceAllButton) 
-			.AddGlue() 
-			.Add(fCancelButton) 
-			.Add(fReplaceButton) 
-		.End() 
-		.SetInsets(10, 10, 10, 10) 
-	); 
+		.AddGroup(B_HORIZONTAL, 10)
+			.Add(fReplaceAllButton)
+			.AddGlue()
+			.Add(fCancelButton)
+			.Add(fReplaceButton)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	fReplaceButton->MakeDefault(true);
 
 	fHandler = _handler;
 
 	const char* searchtext = searchString->String();
-	const char* replacetext = replaceString->String(); 
+	const char* replacetext = replaceString->String();
 
 	fSearchString->SetText(searchtext);
 	fReplaceString->SetText(replacetext);
@@ -101,11 +104,11 @@ ReplaceWindow::MessageReceived(BMessage* msg)
 			break;
 		case MSG_REPLACE_ALL:
 			_SendMessage(MSG_REPLACE_ALL);
-			break;	
+			break;
 
 		default:
 			BWindow::MessageReceived(msg);
-			break;	
+			break;
 	}
 }
 
@@ -137,7 +140,7 @@ ReplaceWindow::DispatchMessage(BMessage* message, BHandler* handler)
 			if (key == B_ESCAPE) {
 				message->MakeEmpty();
 				message->what = B_QUIT_REQUESTED;
-				
+
 				// This is a hack, but it actually does what is expected,
 				// unlike the hack above. This kind of key filtering probably
 				// ought to be handled by a BMessageFilter, though.

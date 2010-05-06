@@ -36,7 +36,7 @@ StyledEditApp * styled_edit_app;
 BRect gWindowRect(7-15, 26-15, 507, 426);
 
 
-namespace 
+namespace
 {
 	void
 	cascade()
@@ -51,7 +51,7 @@ namespace
 		if (top + gWindowRect.Height() > screenBorder.bottom)
 			top = 26;
 
-		gWindowRect.OffsetTo(BPoint(left, top));	
+		gWindowRect.OffsetTo(BPoint(left, top));
 	}
 
 
@@ -73,7 +73,7 @@ namespace
 			top = top - ((int)left % 15) + 26;
 		}
 
-		gWindowRect.OffsetTo(BPoint(left, top));	
+		gWindowRect.OffsetTo(BPoint(left, top));
 	}
 }
 
@@ -94,7 +94,7 @@ StyledEditApp::StyledEditApp()
 		dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
 
 	fOpenAsEncoding = 0;
-	fOpenPanelEncodingMenu= new BMenu(TR("Encoding"));
+	fOpenPanelEncodingMenu= new BMenu(B_TRANSLATE("Encoding"));
 	menuBar->AddItem(fOpenPanelEncodingMenu);
 	fOpenPanelEncodingMenu->SetRadioMode(true);
 
@@ -103,7 +103,7 @@ StyledEditApp::StyledEditApp()
 	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
 		BString name;
 		if (charset.GetFontID() == B_UNICODE_UTF8)
-			name = TR("Default");
+			name = B_TRANSLATE("Default");
 		else
 			name = charset.GetPrintName();
 
@@ -159,7 +159,7 @@ StyledEditApp::MessageReceived(BMessage* message)
 		default:
 			BApplication::MessageReceived(message);
 			break;
-	} 
+	}
 }
 
 
@@ -181,7 +181,7 @@ StyledEditApp::OpenDocument(entry_ref* ref)
 
 	if (entry.IsDirectory()) {
 		BPath path(&entry);
-		fprintf(stderr, 
+		fprintf(stderr,
 			"Can't open directory \"%s\" for editing.\n",
 			path.Path());
 		return B_ERROR;
@@ -191,7 +191,7 @@ StyledEditApp::OpenDocument(entry_ref* ref)
 	entry.GetParent(&parent);
 
 	if (!entry.Exists() && !parent.Exists()) {
-		fprintf(stderr, 
+		fprintf(stderr,
 			"Can't create file. Missing parent directory.\n");
 		return B_ERROR;
 	}
@@ -253,7 +253,7 @@ void
 StyledEditApp::ArgvReceived(int32 argc, char* argv[])
 {
 	// If StyledEdit is already running and gets invoked again
-	// we need to account for a possible mismatch in current 
+	// we need to account for a possible mismatch in current
 	// working directory. The paths of the new arguments are
 	// relative to the cwd of the invocation, if they are not
 	// absolute. This cwd we find as a string named "cwd" in
@@ -276,9 +276,9 @@ StyledEditApp::ArgvReceived(int32 argc, char* argv[])
 				// patch relative paths only
 		}
 
-		entry_ref ref;	
+		entry_ref ref;
 		get_ref_for_path(path.Path(), &ref);
-		
+
 		status_t status;
 		status = OpenDocument(&ref);
 
@@ -288,8 +288,8 @@ StyledEditApp::ArgvReceived(int32 argc, char* argv[])
 }
 
 
-void 
-StyledEditApp::ReadyToRun() 
+void
+StyledEditApp::ReadyToRun()
 {
 	if (fWindowCount > 0)
 		return;

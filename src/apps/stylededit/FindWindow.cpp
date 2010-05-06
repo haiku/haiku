@@ -33,14 +33,16 @@ FindWindow::FindWindow(BRect frame, BHandler* _handler, BString* searchString,
 {
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
-	fSearchString = new BTextControl("", TR("Find:"), NULL, NULL);
-	fCaseSensBox = new BCheckBox("", TR("Case-sensitive"), NULL);
-	fWrapBox = new BCheckBox("", TR("Wrap-around search"), NULL);
-	fBackSearchBox = new BCheckBox("", TR("Search backwards"), NULL);
-	fCancelButton = new BButton("", TR("Cancel"), new BMessage(B_QUIT_REQUESTED));
-	fSearchButton = new BButton("", TR("Find"), new BMessage(MSG_SEARCH));
+	fSearchString = new BTextControl("", B_TRANSLATE("Find:"), NULL, NULL);
+	fCaseSensBox = new BCheckBox("", B_TRANSLATE("Case-sensitive"), NULL);
+	fWrapBox = new BCheckBox("", B_TRANSLATE("Wrap-around search"), NULL);
+	fBackSearchBox = new BCheckBox("", B_TRANSLATE("Search backwards"), NULL);
+	fCancelButton = new BButton("", B_TRANSLATE("Cancel"),
+		new BMessage(B_QUIT_REQUESTED));
+	fSearchButton = new BButton("", B_TRANSLATE("Find"),
+		new BMessage(MSG_SEARCH));
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 4)
 		.Add(BGridLayoutBuilder(6, 2)
 				.Add(fSearchString->CreateLabelLayoutItem(), 0, 0)
@@ -49,13 +51,13 @@ FindWindow::FindWindow(BRect frame, BHandler* _handler, BString* searchString,
 				.Add(fWrapBox, 1, 2)
 				.Add(fBackSearchBox, 1, 3)
 				)
-		.AddGroup(B_HORIZONTAL, 10) 
-			.AddGlue() 
-			.Add(fCancelButton) 
-			.Add(fSearchButton) 
-		.End() 
-		.SetInsets(10, 10, 10, 10) 
-	); 
+		.AddGroup(B_HORIZONTAL, 10)
+			.AddGlue()
+			.Add(fCancelButton)
+			.Add(fSearchButton)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	fSearchButton->MakeDefault(true);
 	fHandler = _handler;
@@ -84,7 +86,7 @@ FindWindow::MessageReceived(BMessage* msg)
 
 		default:
 			BWindow::MessageReceived(msg);
-			break;	
+			break;
 	}
 }
 
