@@ -45,8 +45,7 @@ enum {
 
 class HEventList : public BColumnListView {
 public:
-								HEventList(BRect rect, 
-									const char* name = "EventList");
+								HEventList(const char* name = "EventList");
 	virtual						~HEventList();
 			void				RemoveAll();
 			void				SetType(const char* type);

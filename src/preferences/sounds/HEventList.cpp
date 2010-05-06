@@ -10,11 +10,17 @@
 #include "HEventList.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <ColumnTypes.h>
 #include <Entry.h>
+#include <Locale.h>
 #include <MediaFiles.h>
 #include <Path.h>
 #include <stdio.h>
+
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "HEventList"
 
 
 HEventRow::HEventRow(const char* name, const char* path)
@@ -37,7 +43,8 @@ HEventRow::SetPath(const char* _path)
 {
 	fPath = _path;
 	BPath path(_path);
-	SetField(new BStringField(_path ? path.Leaf() : "<none>"), kSoundColumn);
+	SetField(new BStringField(_path ? path.Leaf() : TR("<none>")),
+		kSoundColumn);
 }
 
 
@@ -48,14 +55,14 @@ HEventRow::Remove(const char* type)
 }
 
 
-HEventList::HEventList(BRect rect, const char* name)
+HEventList::HEventList(const char* name)
 	:
-	BColumnListView(rect, name, B_FOLLOW_ALL, 0, B_PLAIN_BORDER, true),
+	BColumnListView(name, 0, B_PLAIN_BORDER, true),
 	fType(NULL)
 {
-	AddColumn(new BStringColumn("Event", 150, 50, 500, B_TRUNCATE_MIDDLE),
+	AddColumn(new BStringColumn(TR("Event"), 150, 50, 500, B_TRUNCATE_MIDDLE),
 		kEventColumn);
-	AddColumn(new BStringColumn("Sound", 150, 50, 500, B_TRUNCATE_END),
+	AddColumn(new BStringColumn(TR("Sound"), 150, 50, 500, B_TRUNCATE_END),
 		kSoundColumn);
 }
 
@@ -119,7 +126,7 @@ HEventList::SelectionChanged()
 			printf("name %s\n", ref.name);
 			BMediaFiles().RemoveRefFor(fType, row->Name(), ref);
 			BAlert* alert = new BAlert("alert",
-				"No such file or directory", "OK");
+				TR("No such file or directory"), TR("OK"));
 			alert->Go();
 			return;
 		}

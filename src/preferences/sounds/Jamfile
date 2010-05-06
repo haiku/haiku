@@ -8,6 +8,16 @@ Preference Sounds :
 	HApp.cpp 
 	HWindow.cpp 
 	HEventList.cpp 
-	: be libcolumnlistview.a game tracker libmedia.so $(TARGET_LIBSUPC++)
+	: be libcolumnlistview.a game locale tracker libmedia.so
+		$(TARGET_LIBSUPC++)
 	: Sounds.rdef
+	;
+
+DoCatalogs Sounds :
+	x-vnd.Haiku-Sounds
+	:
+	HApp.cpp
+	HWindow.cpp
+	HEventList.cpp
+	: en.catalog
 	;

@@ -19,8 +19,11 @@
 #include <Beep.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
 #include <fs_attr.h>
+#include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MediaFiles.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -34,21 +37,19 @@
 #include <Sound.h>
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "HWindow"
+
 static const char kSettingsFile[] = "Sounds_Settings";
 
 
 HWindow::HWindow(BRect rect, const char* name)
 	:
-	BWindow(rect, name, B_TITLED_WINDOW, 0),
+	BWindow(rect, name, B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fFilePanel(NULL),
 	fPlayer(NULL)
 {
 	InitGUI();
-	float min_width, min_height, max_width, max_height;
-	GetSizeLimits(&min_width, &max_width, &min_height, &max_height);
-	min_width = 300;
-	min_height = 200;
-	SetSizeLimits(min_width, max_width, min_height, max_height);
 
 	fFilePanel = new BFilePanel();
 	fFilePanel->SetTarget(this);
@@ -91,78 +92,60 @@ HWindow::~HWindow()
 void
 HWindow::InitGUI()
 {
-	BRect rect = Bounds();
-	rect.bottom -= 106;
-	BView* listView = new BView(rect, "", B_FOLLOW_NONE,
-		B_WILL_DRAW | B_PULSE_NEEDED);
-	listView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(listView);
-
-	rect.left += 13;
-	rect.right -= 13;
-	rect.top += 28;
-	rect.bottom -= 7;
-	fEventList = new HEventList(rect);
-	listView->AddChild(fEventList);
+	fEventList = new HEventList();
 	fEventList->SetType(BMediaFiles::B_SOUNDS);
 	fEventList->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 
-	rect = Bounds();
-	rect.top = rect.bottom - 105;
-	BView* view = new BView(rect, "", B_FOLLOW_NONE,
-		B_WILL_DRAW | B_PULSE_NEEDED);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(view);
-	rect = view->Bounds().InsetBySelf(12, 12);
-	BBox* box = new BBox(rect, "", B_FOLLOW_ALL);
-	view->AddChild(box);
-	rect = box->Bounds();
-	rect.top += 10;
-	rect.left += 15;
-	rect.right -= 10;
-	rect.bottom = rect.top + 20;
+	BGroupView* view = new BGroupView();
+	BBox* box = new BBox("", B_WILL_DRAW | B_FRAME_EVENTS
+		| B_NAVIGABLE_JUMP | B_PULSE_NEEDED);
+
 	BMenu* menu = new BMenu("file");
 	menu->SetRadioMode(true);
 	menu->SetLabelFromMarked(true);
 	menu->AddSeparatorItem();
-	
-	menu->AddItem(new BMenuItem("<none>", new BMessage(M_NONE_MESSAGE)));
-	menu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(TR("<none>"), new BMessage(M_NONE_MESSAGE)));
+	menu->AddItem(new BMenuItem(TR("Other" B_UTF8_ELLIPSIS),
 		new BMessage(M_OTHER_MESSAGE)));
-	BMenuField* menuField = new BMenuField(rect, "filemenu", "Sound file:",
-		menu, B_FOLLOW_TOP | B_FOLLOW_LEFT);
-	menuField->SetDivider(menuField->StringWidth("Sound file:") + 10);
-	box->AddChild(menuField);
-	rect.OffsetBy(-2, menuField->Bounds().Height() + 15);
-	BButton* button = new BButton(rect, "stop", "Stop",
-		new BMessage(M_STOP_MESSAGE), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	button->ResizeToPreferred();
-	button->SetEnabled(false);
-	button->MoveTo(box->Bounds().right - button->Bounds().Width() - 15,
-		rect.top);
-	box->AddChild(button);
+	BMenuField* menuField = new BMenuField("filemenu", TR("Sound File:"), menu);
+	menuField->SetDivider(menuField->StringWidth(TR("Sound File:")) + 10);
 
-	rect = button->Frame();
-	view->ResizeTo(view->Bounds().Width(), 24 + rect.bottom + 12);
-	box->ResizeTo(box->Bounds().Width(), rect.bottom + 12);
+	BButton* stopbutton = new BButton("stop", TR("Stop"),
+		new BMessage(M_STOP_MESSAGE));
+	stopbutton->SetEnabled(false);
 
-	button->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	button = new BButton(rect, "play", "Play", new BMessage(M_PLAY_MESSAGE),
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	button->ResizeToPreferred();
-	button->SetEnabled(false);
-	button->MoveTo(rect.left - button->Bounds().Width() - 15, rect.top);
-	box->AddChild(button);
+	BButton* playbutton = new BButton("play", TR("Play"),
+		new BMessage(M_PLAY_MESSAGE));
+	playbutton->SetEnabled(false);
 	
-	view->MoveTo(0, listView->Frame().bottom);
-	ResizeTo(Bounds().Width(),
-		listView->Frame().bottom + view->Bounds().Height());
-	listView->SetResizingMode(B_FOLLOW_ALL);
-	view->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	view->SetLayout(new BGroupLayout(B_HORIZONTAL));
+	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 15)
+		.AddGroup(B_HORIZONTAL)
+			.Add(menuField)
+			.AddGlue()
+		.End()
+		.AddGroup(B_HORIZONTAL, 15)
+			.AddGlue()
+			.Add(playbutton)
+			.Add(stopbutton)
+		.End()
+		.SetInsets(15, 15, 15, 15)
+	);
+
+	box->AddChild(view);
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+		.AddGroup(B_VERTICAL, 20)
+			.Add(fEventList)
+			.Add(box)
+		.End()
+		.SetInsets(12, 28, 12, 12)
+	);
 
 	// setup file menu
 	SetupMenuField();
-	menu->FindItem("<none>")->SetMarked(true);
+	menu->FindItem(TR("<none>"))->SetMarked(true);
 }
 
 
@@ -182,7 +165,7 @@ HWindow::MessageReceived(BMessage* message)
 			if (row != NULL) {
 				BPath path(row->Path());
 				if (path.InitCheck() != B_OK) {
-					BMenuItem* item = menu->FindItem("<none>");
+					BMenuItem* item = menu->FindItem(TR("<none>"));
 					if (item != NULL)
 						item->SetMarked(true);
 				} else {
@@ -218,8 +201,9 @@ HWindow::MessageReceived(BMessage* message)
 				if (superType.Type() == NULL
 					|| strcmp(superType.Type(), "audio") != 0) {
 					beep();
-					BAlert* alert = new BAlert("", "This is not a audio file.",
-						"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					BAlert* alert = new BAlert("", TR("This is not an audio "
+						"file."), TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+						B_STOP_ALERT);
 					alert->Go();
 					break;
 				}
@@ -280,7 +264,7 @@ HWindow::MessageReceived(BMessage* message)
 			if (message->FindString("path", &path) == B_OK) {
 				BPath path(path);
 				if (path.InitCheck() != B_OK) {
-					BMenuItem* item = menu->FindItem("<none>");
+					BMenuItem* item = menu->FindItem(TR("<none>"));
 					if (item != NULL)
 						item->SetMarked(true);
 				} else {

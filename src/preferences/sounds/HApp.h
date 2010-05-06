@@ -12,6 +12,7 @@
 
 
 #include <Application.h>
+#include <Catalog.h>
 
 
 class HApp : public BApplication {
@@ -19,6 +20,9 @@ public:
 								HApp();
 	virtual						~HApp();
 	virtual	void				AboutRequested();
+
+private:
+			BCatalog			fCatalog;
 };
 
 
