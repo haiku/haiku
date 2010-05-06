@@ -155,8 +155,8 @@ BootManagerController::_HasSelectedPartitions()
 	}
 
 	BAlert* alert = new BAlert("info",
-		TR("At least one partition must be selected!"),
-		TR_CMT("OK", "Button"));
+		B_TRANSLATE("At least one partition must be selected!"),
+		B_TRANSLATE_COMMENT("OK", "Button"));
 	alert->Go();
 
 	return false;
@@ -166,10 +166,10 @@ BootManagerController::_HasSelectedPartitions()
 bool
 BootManagerController::_WriteBootMenu()
 {
-		BAlert* alert = new BAlert("confirm", TR("About to write the boot menu "
-			"to disk. Are you sure you want to continue?"),
-			TR_CMT("Write boot menu", "Button"),
-			TR_CMT("Back", "Button"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("confirm", B_TRANSLATE("About to write the "
+			"boot menu to disk. Are you sure you want to continue?"),
+			B_TRANSLATE_COMMENT("Write boot menu", "Button"),
+			B_TRANSLATE_COMMENT("Back", "Button"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 		if (alert->Go() == 1)
 			return false;
@@ -199,15 +199,15 @@ BootManagerController::_RestoreMBR()
 	fSettings.FindString("file", &path);
 
 	BString message;
-	message << TR_CMT("About to restore the Master Boot Record (MBR) of"
-		" %disk from %file. Do you wish to continue?",
+	message << B_TRANSLATE_COMMENT("About to restore the Master Boot Record "
+		"(MBR) of %disk from %file. Do you wish to continue?",
 		"Don't translate the place holders: %disk and %file");
 	message.ReplaceFirst("%disk", disk);
 	message.ReplaceFirst("%file", path);
 
 	BAlert* alert = new BAlert("confirm", message.String(),
-		TR_CMT("Restore MBR", "Button"),
-		TR_CMT("Back", "Button"),
+		B_TRANSLATE_COMMENT("Restore MBR", "Button"),
+		B_TRANSLATE_COMMENT("Back", "Button"),
 		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	if (alert->Go() == 1)
 		return false;
@@ -232,7 +232,7 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 		case kStateErrorEntry:
 			page = _CreateErrorEntryPage(frame);
 			wizard->SetPreviousButtonHidden(true);
-			wizard->SetNextButtonLabel(TR_CMT("Done", "Button"));
+			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Done", "Button"));
 			break;
 		case kStateSaveMBR:
 			page = _CreateSaveMBRPage(frame);
@@ -250,21 +250,21 @@ BootManagerController::CreatePage(int32 state, WizardView* wizard)
 			break;
 		case kStateInstallSummary:
 			page = _CreateInstallSummaryPage(frame);
-			wizard->SetNextButtonLabel(TR_CMT("Next", "Button"));
+			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Next", "Button"));
 			break;
 		case kStateInstalled:
 			page = _CreateInstalledPage(frame);
-			wizard->SetNextButtonLabel(TR_CMT("Done", "Button"));
+			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Done", "Button"));
 			break;
 		case kStateUninstall:
 			page = _CreateUninstallPage(frame);
 			wizard->SetPreviousButtonHidden(false);
-			wizard->SetNextButtonLabel(TR_CMT("Next", "Button"));
+			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Next", "Button"));
 			break;
 		case kStateUninstalled:
 			// TODO prevent overwriting MBR after clicking "Previous"
 			page = _CreateUninstalledPage(frame);
-			wizard->SetNextButtonLabel(TR_CMT("Done", "Button"));
+			wizard->SetNextButtonLabel(B_TRANSLATE_COMMENT("Done", "Button"));
 			break;
 	}
 
@@ -279,15 +279,17 @@ BootManagerController::_CreateErrorEntryPage(BRect frame)
 
 	if (fReadPartitionsStatus == kErrorBootSectorTooSmall)
 		description <<
-			TR_CMT("Partition table not compatible", "Title") << "\n\n" <<
-			TR("The partition table of the first hard disk is not compatible "
-			"with Boot Manager.\n"
+			B_TRANSLATE_COMMENT("Partition table not compatible", "Title") <<
+			"\n\n" <<
+			B_TRANSLATE("The partition table of the first hard disk is not "
+			"compatible with Boot Manager.\n"
 			"Boot Manager needs 2 KB available space before the first "
 			"partition.");
 	else
 		description <<
-			TR_CMT("Error reading partition table", "Title") << "\n\n" <<
-			TR("Boot Manager is unable to read the partition table!");
+			B_TRANSLATE_COMMENT("Error reading partition table", "Title") <<
+			"\n\n" <<
+			B_TRANSLATE("Boot Manager is unable to read the partition table!");
 
 	return new DescriptionPage(frame, "errorEntry", description.String(), true);
 }
@@ -301,8 +303,8 @@ BootManagerController::_CreateSaveMBRPage(BRect frame)
 	fSettings.FindString("disk", &disk);
 
 	description <<
-		TR_CMT("Backup Master Boot Record", "Title") << "\n\n" <<
-		TR("The Master Boot Record (MBR) of the boot device:\n"
+		B_TRANSLATE_COMMENT("Backup Master Boot Record", "Title") << "\n\n" <<
+		B_TRANSLATE("The Master Boot Record (MBR) of the boot device:\n"
 		"\t%s\n"
 		"will now be saved to disk. Please select a file to "
 		"save the MBR into.\n\n"
@@ -326,8 +328,10 @@ BootManagerController::_CreateMBRSavedPage(BRect frame)
 
 	if (fSaveMBRStatus == B_OK) {
 		description <<
-			TR_CMT("Old Master Boot Record saved", "Title") << "\n\n" <<
-			TR("The old Master Boot Record was successfully save to %s.") <<
+			B_TRANSLATE_COMMENT("Old Master Boot Record saved", "Title") <<
+			"\n\n" <<
+			B_TRANSLATE("The old Master Boot Record was successfully save to "
+			"%s.") <<
 			"\n";
 	} else {
 		description <<

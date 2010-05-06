@@ -1,7 +1,7 @@
 /*
  * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -43,7 +43,7 @@
 #define GET_FIRST_BIOS_DRIVE 1
 
 
-class Buffer : public BMallocIO 
+class Buffer : public BMallocIO
 {
 public:
 	Buffer() : BMallocIO() {}
@@ -58,7 +58,7 @@ public:
 
 
 bool
-Buffer::WriteInt8(int8 value) 
+Buffer::WriteInt8(int8 value)
 {
 	return Write(&value, sizeof(value)) == sizeof(value);
 }
@@ -123,12 +123,12 @@ class PartitionRecorder : public BDiskDeviceVisitor
 public:
 	PartitionRecorder(BMessage* settings, int8 drive);
 
-	virtual bool Visit(BDiskDevice* device);	
+	virtual bool Visit(BDiskDevice* device);
 	virtual bool Visit(BPartition* partition, int32 level);
 
-	bool HasPartitions() const;	
+	bool HasPartitions() const;
 	off_t FirstOffset() const;
-	
+
 private:
 	bool _Record(BPartition* partition);
 
@@ -181,7 +181,7 @@ PartitionRecorder::_Record(BPartition* partition)
 {
 	if (partition->ContainsPartitioningSystem())
 		return false;
-	
+
 	BPath partitionPath;
 	partition->GetPath(&partitionPath);
 
@@ -191,17 +191,18 @@ PartitionRecorder::_Record(BPartition* partition)
 		fIndex ++;
 		BString number;
 		number << fIndex;
-		buffer << TR_CMT("Unnamed %d",
+		buffer << B_TRANSLATE_COMMENT("Unnamed %d",
 			"Default name of a partition whose name could not be read from "
 			"disk; characters in codepage 437 are allowed only");
 		buffer.ReplaceFirst("%d", number);
 		name = buffer.String();
 	}
-	
+
 	const char* type = partition->Type();
 	if (type == NULL)
-		type = TR_CMT("Unknown", "Text is shown for an unknown partition type");
-		
+		type = B_TRANSLATE_COMMENT("Unknown", "Text is shown for an unknown "
+			"partition type");
+
 	BMessage message;
 	// Data as required by BootLoader.h
 	message.AddBool("show", true);
@@ -209,16 +210,16 @@ PartitionRecorder::_Record(BPartition* partition)
 	message.AddString("type", type);
 	message.AddString("path", partitionPath.Path());
 	message.AddInt8("drive", fDrive);
-	message.AddInt64("size", partition->Size());	
+	message.AddInt64("size", partition->Size());
 	// Specific data
 	off_t offset = partition->Offset();
 	message.AddInt64("offset", offset);
-	
+
 	fSettings->AddMessage("partition", &message);
 
 	if (offset < fFirstOffset)
 		fFirstOffset = offset;
-	
+
 	return false;
 }
 
@@ -248,42 +249,42 @@ LegacyBootDrive::ReadPartitions(BMessage *settings)
 	BDiskDevice device;
 	bool diskFound = false;
 	while (diskDeviceRoster.GetNextDevice(&device) == B_OK) {
-		
+
 		BPath path;
-		status_t status = device.GetPath(&path); 
+		status_t status = device.GetPath(&path);
 		if (status != B_OK)
 			return status;
-				
+
 		// skip not from BIOS bootable drives
 		int8 drive;
 		if (!_GetBiosDrive(path.Path(), &drive))
 			continue;
-		
+
 		PartitionRecorder recorder(settings, drive);
 		device.VisitEachDescendant(&recorder);
 
 		if (!diskFound) {
 			settings->AddString("disk", path.Path());
 			diskFound = true;
-			
+
 			#if !USE_SECOND_DISK
 				// Enough space to write boot menu to drive?
 				// (ignored in test build)
 				off_t size = sizeof(kBootLoader);
 				if (!recorder.HasPartitions() || recorder.FirstOffset() < size)
 					return kErrorBootSectorTooSmall;
-	
+
 				// TODO remove when booting from all drives works
 				break;
 			#endif
 		}
-	}	
+	}
 
 	#if USE_SECOND_DISK
 		// for testing only write boot menu to second hdd
 		settings->ReplaceString("disk", "/dev/disk/ata/1/master/raw");
 	#endif
-	
+
 	if (diskFound)
 		return B_OK;
 	else
@@ -297,40 +298,40 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 	BString path;
 	if (settings->FindString("disk", &path) != B_OK)
 		return B_BAD_VALUE;
-	
+
 	int32 defaultPartitionIndex;
 	if (settings->FindInt32("defaultPartition", &defaultPartitionIndex) != B_OK)
 		return B_BAD_VALUE;
-	
+
 	int32 timeout;
 	if (settings->FindInt32("timeout", &timeout) != B_OK)
 		return B_BAD_VALUE;
-	
+
 	int fd = open(path.String(), O_RDWR);
 	if (fd < 0)
 		return B_IO_ERROR;
-	
+
 	MasterBootRecord oldMBR;
 	if (read(fd, &oldMBR, sizeof(oldMBR)) != sizeof(oldMBR)) {
 		close(fd);
 		return B_IO_ERROR;
 	}
-	
+
 	if (!_IsValid(&oldMBR)) {
 		close(fd);
 		return B_BAD_VALUE;
 	}
-	
+
 	Buffer newBootLoader;
 	ssize_t size = sizeof(kBootLoader);
 	if (newBootLoader.Write(kBootLoader, size) != size) {
 		close(fd);
 		return B_NO_MEMORY;
 	}
-	
+
 	MasterBootRecord* newMBR = (MasterBootRecord*)newBootLoader.BMallocIO::Buffer();
 	_CopyPartitionTable(newMBR, &oldMBR);
-	
+
 	int menuEntries = 0;
 	int defaultMenuEntry = 0;
 	BMessage partition;
@@ -342,14 +343,14 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 			continue;
 		if (index == defaultPartitionIndex)
 			defaultMenuEntry = menuEntries;
-		
+
 		menuEntries ++;
 	}
 	newBootLoader.WriteInt16(menuEntries);
 	newBootLoader.WriteInt16(defaultMenuEntry);
 	newBootLoader.WriteInt16(timeout);
-	
-	
+
+
 	for (index = 0; settings->FindMessage("partition", index, &partition) == B_OK; index ++) {
 		bool show;
 		BString name;
@@ -364,20 +365,20 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 		partition.FindInt8("drive", &drive);
 		if (!show)
 			continue;
-		
+
 		BString biosName;
 		_ConvertToBIOSText(name.String(), biosName);
 
 		newBootLoader.WriteString(biosName.String());
 		newBootLoader.WriteInt8(drive);
 		newBootLoader.WriteInt64(offset / kBlockSize);
-	}	
+	}
 
 	if (!newBootLoader.Align(kBlockSize)) {
 		close(fd);
 		return B_ERROR;
 	}
-	
+
 	lseek(fd, 0, SEEK_SET);
 	const uint8* buffer = (uint8*)newBootLoader.BMallocIO::Buffer();
 	status_t status = _WriteBlocks(fd, buffer, newBootLoader.Position());
@@ -388,20 +389,20 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 
 status_t
 LegacyBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
-{	
+{
 	BString path;
 
 	if (settings->FindString("disk", &path) != B_OK)
 		return B_BAD_VALUE;
-	
+
 	int fd = open(path.String(), O_RDONLY);
 	if (fd < 0)
 		return B_IO_ERROR;
-	
+
 	ssize_t size = kBlockSize * kNumberOfBootLoaderBlocks;
 	uint8* buffer = new(std::nothrow) uint8[size];
 	if (buffer == NULL) {
-		close(fd);		
+		close(fd);
 		return B_NO_MEMORY;
 	}
 
@@ -410,7 +411,7 @@ LegacyBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
 		close(fd);
 		delete[] buffer;
 		return B_IO_ERROR;
-	}		
+	}
 
 	MasterBootRecord* mbr = (MasterBootRecord*)buffer;
 	if (!_IsValid(mbr)) {
@@ -421,7 +422,7 @@ LegacyBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
 
 	if (file->Write(buffer, size) != size)
 		status = B_IO_ERROR;
-	delete[] buffer;		
+	delete[] buffer;
 	close(fd);
 	return status;
 }
@@ -433,27 +434,27 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 	BString path;
 	if (settings->FindString("disk", &path) != B_OK)
 		return B_BAD_VALUE;
-	
+
 	int fd = open(path.String(), O_RDWR);
 	if (fd < 0)
 		return B_IO_ERROR;
-	
+
 	MasterBootRecord oldMBR;
 	if (read(fd, &oldMBR, sizeof(oldMBR)) != sizeof(oldMBR)) {
 		close(fd);
-		return B_IO_ERROR;	
+		return B_IO_ERROR;
 	}
 	if (!_IsValid(&oldMBR)) {
 		close(fd);
 		return B_BAD_VALUE;
 	}
-	
-	lseek(fd, 0, SEEK_SET);	
-	
+
+	lseek(fd, 0, SEEK_SET);
+
 	size_t size = kBlockSize * kNumberOfBootLoaderBlocks;
 	uint8* buffer = new(std::nothrow) uint8[size];
 	if (buffer == NULL) {
-		close(fd);		
+		close(fd);
 		return B_NO_MEMORY;
 	}
 
@@ -461,7 +462,7 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 		close(fd);
 		delete[] buffer;
 		return B_IO_ERROR;
-	}		
+	}
 
 	MasterBootRecord* newMBR = (MasterBootRecord*)buffer;
 	if (!_IsValid(newMBR)) {
@@ -469,11 +470,11 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 		delete[] buffer;
 		return B_BAD_VALUE;
 	}
-	
+
 	_CopyPartitionTable(newMBR, &oldMBR);
 
 	status_t status = _WriteBlocks(fd, buffer, size);
-	delete[] buffer;		
+	delete[] buffer;
 	close(fd);
 	return status;
 }
@@ -590,7 +591,7 @@ void
 LegacyBootDrive::_CopyPartitionTable(MasterBootRecord* destination,
 		const MasterBootRecord* source)
 {
-	memcpy(destination->diskSignature, source->diskSignature, 
+	memcpy(destination->diskSignature, source->diskSignature,
 		sizeof(source->diskSignature) + sizeof(source->reserved) +
 		sizeof(source->partition));
 }

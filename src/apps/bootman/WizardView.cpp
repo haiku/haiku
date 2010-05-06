@@ -1,7 +1,7 @@
 /*
  * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -49,25 +49,25 @@ WizardView::PageFrame()
 	float right = Bounds().right - kBorderWidth;
 	float top = kBorderHeight;
 	float bottom = fSeparator->Frame().top - kSeparatorDistance - 1;
-	return BRect(left, top, right, bottom);	
+	return BRect(left, top, right, bottom);
 }
 
 
-void 
+void
 WizardView::SetPage(WizardPageView* page)
 {
 	if (fPage == page)
 		return;
-	
+
 	if (fPage != NULL) {
 		RemoveChild(fPage);
 		delete fPage;
 	}
-	
+
 	fPage = page;
 	if (page == NULL)
 		return;
-	
+
 	BRect frame = PageFrame();
 	page->MoveTo(frame.left, frame.top);
 	page->ResizeTo(frame.Width()+1, frame.Height()+1);
@@ -112,12 +112,12 @@ WizardView::SetNextButtonLabel(const char* text)
 	fNext->SetLabel(text);
 	fNext->ResizeToPreferred();
 	BRect newFrame = fNext->Frame();
-	fNext->MoveBy(frame.Width() - newFrame.Width(), 
+	fNext->MoveBy(frame.Width() - newFrame.Width(),
 		frame.Height() - newFrame.Height());
 }
 
 
-void 
+void
 WizardView::SetPreviousButtonHidden(bool hide)
 {
 	if (hide) {
@@ -134,35 +134,36 @@ void
 WizardView::_BuildUI()
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	float width = Bounds().Width();
 	float height = Bounds().Height();
 
-	fSeparator = new BBox(BRect(kBorderWidth, 0, 
-		width - 1 - kBorderWidth, kSeparatorHeight - 1), 
+	fSeparator = new BBox(BRect(kBorderWidth, 0,
+		width - 1 - kBorderWidth, kSeparatorHeight - 1),
 		"separator",
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fSeparator);
-	
+
 	fPrevious = new BButton(BRect(0, 0, 100, 20), "previous",
-		TR_CMT("Previous", "Button"),
-		new BMessage(kMessagePrevious), 
+		B_TRANSLATE_COMMENT("Previous", "Button"),
+		new BMessage(kMessagePrevious),
 		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	AddChild(fPrevious);
 	fPrevious->ResizeToPreferred();
-	
-	fNext = new BButton(BRect(0, 0, 100, 20), "next", TR_CMT("Next", "Button"),
-		new BMessage(kMessageNext), 
+
+	fNext = new BButton(BRect(0, 0, 100, 20), "next",
+		B_TRANSLATE_COMMENT("Next", "Button"),
+		new BMessage(kMessageNext),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fNext);
 	fNext->ResizeToPreferred();
 
 	// layout views
-	float buttonHeight = fPrevious->Bounds().Height();	
+	float buttonHeight = fPrevious->Bounds().Height();
 	float buttonTop = height - 1 - buttonHeight - kBorderHeight;
 	fPrevious->MoveTo(kBorderWidth, buttonTop);
-	
+
 	fSeparator->MoveTo(kBorderWidth, buttonTop - kSeparatorDistance - kSeparatorHeight);
-		
+
 	fNext->MoveTo(width - fNext->Bounds().Width() - kBorderWidth - 1, buttonTop);
 }

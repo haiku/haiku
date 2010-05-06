@@ -66,8 +66,8 @@ EntryPage::_BuildUI()
 
 	BString text;
 	text <<
-		TR_CMT("Install boot menu", "Title") << "\n\n" <<
-		TR("Choose this option to install a boot menu, "
+		B_TRANSLATE_COMMENT("Install boot menu", "Title") << "\n\n" <<
+		B_TRANSLATE("Choose this option to install a boot menu, "
 		"allowing you to select which operating "
 		"system to boot when you turn on your "
 		"computer.") << "\n";
@@ -83,8 +83,8 @@ EntryPage::_BuildUI()
 
 	text.Truncate(0);
 	text <<
-		TR_CMT("Uninstall boot menu", "Title") << "\n\n" <<
-		TR("Choose this option to remove the boot menu "
+		B_TRANSLATE_COMMENT("Uninstall boot menu", "Title") << "\n\n" <<
+		B_TRANSLATE("Choose this option to remove the boot menu "
 		"previously installed by this program.\n");
 	fUninstallText = CreateDescription(textRect, "uninstallText", text);
 	MakeHeading(fUninstallText);

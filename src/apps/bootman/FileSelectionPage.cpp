@@ -1,7 +1,7 @@
 /*
  * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -30,7 +30,7 @@ const uint32 kMsgOpenFilePanel = 'open';
 
 FileSelectionPage::FileSelectionPage(BMessage* settings, BRect frame, const char* name,
 		const char* description, file_panel_mode mode)
-	: WizardPageView(settings, frame, name, B_FOLLOW_ALL, 
+	: WizardPageView(settings, frame, name, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE)
 	, fMode(mode)
 	, fFilePanel(NULL)
@@ -93,16 +93,17 @@ void
 FileSelectionPage::_BuildUI(const char* description)
 {
 	BRect rect(Bounds());
-	
+
 	fDescription = CreateDescription(rect, "description", description);
-	
+
 	MakeHeading(fDescription);
 	AddChild(fDescription);
-	
+
 	BString file;
 	fSettings->FindString("file", &file);
-	
-	fSelect = new BButton(rect, "select", TR_CMT("Select", "Button"),
+
+	fSelect = new BButton(rect, "select",
+		B_TRANSLATE_COMMENT("Select", "Button"),
 		new BMessage(kMsgOpenFilePanel),
 		B_FOLLOW_RIGHT);
 	fSelect->ResizeToPreferred();
@@ -110,14 +111,14 @@ FileSelectionPage::_BuildUI(const char* description)
 	float selectLeft = rect.right - fSelect->Bounds().Width();
 	rect.right = selectLeft - kFileButtonDistance;
 	fFile = new BTextControl(rect, "file",
-		TR_CMT("File:", "Text control label"),
+		B_TRANSLATE_COMMENT("File:", "Text control label"),
 		file.String(), new BMessage());
 	fFile->SetDivider(be_plain_font->StringWidth(fFile->Label()) + 5);
 	AddChild(fFile);
-	
+
 	fSelect->MoveTo(selectLeft, 0);
 	AddChild(fSelect);
-	
+
 	_Layout();
 }
 
@@ -126,7 +127,7 @@ void
 FileSelectionPage::_Layout()
 {
 	LayoutDescriptionVertically(fDescription);
-	
+
 	float left = fFile->Frame().left;
 	float top = fDescription->Frame().bottom + kTextDistance;
 
@@ -144,10 +145,10 @@ FileSelectionPage::_Layout()
 	}
 
 	fFile->MoveTo(left, fileTop);
-	
+
 	float width = fSelect->Frame().left - kFileButtonDistance - left;
 	fFile->ResizeTo(width, fileHeight);
-	
+
 	left = fSelect->Frame().left;
 	fSelect->MoveTo(left, selectTop);
 }
@@ -167,7 +168,7 @@ FileSelectionPage::_OpenFilePanel()
 	if (file.GetParent(&parent) == B_OK &&
 		get_ref_for_path(parent.Path(), &base) == B_OK)
 		directory = &base;
-	
+
 	BMessenger messenger(this);
 	fFilePanel = new BFilePanel(fMode, &messenger, directory,
 		B_FILE_NODE,
@@ -198,7 +199,7 @@ FileSelectionPage::_SetFileFromFilePanelMessage(BMessage* message)
 		BEntry entry(&entryRef);
 		BPath path;
 		if (entry.GetPath(&path) == B_OK)
-			fFile->SetText(path.Path());	
+			fFile->SetText(path.Path());
 	}
 }
 

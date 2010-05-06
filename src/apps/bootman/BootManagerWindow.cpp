@@ -1,7 +1,7 @@
 /*
  * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- * 
+ *
  * Authors:
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
@@ -32,19 +32,20 @@
 
 BootManagerWindow::BootManagerWindow()
 	:
-	BWindow(BRect(100, 100, 500, 400), TR_CMT("Boot Manager", "Window Title"),
+	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_COMMENT("Boot Manager",
+		"Window Title"),
 		B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 	SetSizeLimits(250, maxWidth, 250, maxHeight);
-	
+
 	fWizardView = new WizardView(Bounds(), "wizard", B_FOLLOW_ALL);
 	AddChild(fWizardView);
-	
+
 	fController.Initialize(fWizardView);
-	
+
 	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_ABOUT_REQUESTED));
 
 	CenterOnScreen();
@@ -68,18 +69,18 @@ BootManagerWindow::MessageReceived(BMessage* msg)
 		case kMessageNext:
 			fController.Next(fWizardView);
 			break;
-		
+
 		case kMessagePrevious:
 			fController.Previous(fWizardView);
 			break;
-		
+
 		case B_ABOUT_REQUESTED:
 			be_app_messenger.SendMessage(B_ABOUT_REQUESTED);
 			break;
-		
+
 		default:
 			BWindow::MessageReceived(msg);
-	}	
+	}
 }
 
 
