@@ -168,11 +168,11 @@ PairsView::_ReadRandomIcons()
 		BBitmap* bitmap = ((BBitmap*)bitmaps.RemoveItem(index));
 		if (bitmap == NULL) {
 			char buffer[512];
-			snprintf(buffer, sizeof(buffer), TR("Pairs did not find enough "
-				"vector icons in the system; it needs at least %d."),
+			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Pairs did not find "
+				"enough vector icons in the system; it needs at least %d."),
 				fNumOfCards / 2);
-			BAlert* alert = new BAlert("fatal", buffer, TR("OK"), NULL, NULL,
-				B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
+			BAlert* alert = new BAlert("fatal", buffer, B_TRANSLATE("OK"),
+				NULL, NULL, B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
 			alert->Go();
 			exit(1);
 		}

@@ -39,7 +39,7 @@ const uint32 MENU_QUIT					= 'MGqu';
 
 PairsWindow::PairsWindow()
 	:
-	BWindow(BRect(100, 100, 405, 423), TR("Pairs"), B_TITLED_WINDOW,
+	BWindow(BRect(100, 100, 405, 423), B_TRANSLATE("Pairs"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fPairComparing(NULL),
@@ -71,42 +71,42 @@ PairsWindow::_MakeMenuBar()
 	fMenuBar = new BMenuBar(BRect(0, 0, 0, 0), "menubar");
 	AddChild(fMenuBar);
 
-	BMenu* menu = new BMenu(TR("Game"));
+	BMenu* menu = new BMenu(B_TRANSLATE("Game"));
 	fMenuBar->AddItem(menu);
 
 	BMenuItem* menuItem;
-	menu->AddItem(menuItem = new BMenuItem(TR("New"),
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("New"),
 		new BMessage(MENU_NEW), 'N'));
 
 	menu->AddSeparatorItem();
 
-	BMenu* sizeMenu = new BMenu(TR("Size"));
+	BMenu* sizeMenu = new BMenu(B_TRANSLATE("Size"));
 	sizeMenu->SetRadioMode(true);
 
 	BMessage* sizeMessage = new BMessage(MENU_SIZE);
 	sizeMessage->AddInt32("width", 4);
 	sizeMessage->AddInt32("height", 4);
-	sizeMenu->AddItem(menuItem = new BMenuItem(TR("Beginner (4x4)"),
+	sizeMenu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Beginner (4x4)"),
 		sizeMessage));
 	menuItem->SetMarked(true);
 
 	sizeMessage = new BMessage(MENU_SIZE);
 	sizeMessage->AddInt32("width", 6);
 	sizeMessage->AddInt32("height", 6);
-	sizeMenu->AddItem(menuItem = new BMenuItem(TR("Intermediate (6x6)"),
-		sizeMessage));
+	sizeMenu->AddItem(menuItem = new BMenuItem(
+		B_TRANSLATE("Intermediate (6x6)"), sizeMessage));
 
 	sizeMessage = new BMessage(MENU_SIZE);
 	sizeMessage->AddInt32("width", 8);
 	sizeMessage->AddInt32("height", 8);
-	sizeMenu->AddItem(menuItem = new BMenuItem(TR("Expert (8x8)"),
+	sizeMenu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Expert (8x8)"),
 		sizeMessage));
 
 	menu->AddItem(sizeMenu);
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(menuItem = new BMenuItem(TR("Quit"),
+	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(MENU_QUIT), 'Q'));
 }
 
@@ -223,16 +223,18 @@ PairsWindow::MessageReceived(BMessage* message)
 					BString score;
 					score << fButtonClicks;
 					strAbout
-						<< TR("Pairs\n"
+						<< B_TRANSLATE("Pairs\n"
 						"\twritten by Ralf Schülke\n"
 						"\tCopyright 2008-2010, Haiku Inc.\n"
 						"\n"
 						"You completed the game in %s clicks.\n");
-						
+
 					strAbout.Replace("%s", score.String(), 1);
 
-					BAlert* alert = new BAlert("about", TR(strAbout.String()),
-						TR("New game"), TR("Quit game"));
+					BAlert* alert = new BAlert("about",
+						B_TRANSLATE(strAbout.String()),
+						B_TRANSLATE("New game"),
+						B_TRANSLATE("Quit game"));
 
 					BTextView* view = alert->TextView();
 					BFont font;
