@@ -28,7 +28,8 @@ const uint32 kMsgSelected = 'seld';
 TypeListWindow::TypeListWindow(const char* currentType,
 	uint32 what, BWindow* target)
 	:
-	BWindow(BRect(100, 100, 360, 440), TR("Choose type"), B_MODAL_WINDOW,
+	BWindow(BRect(100, 100, 360, 440), B_TRANSLATE("Choose type"),
+		B_MODAL_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target),
 	fWhat(what)
@@ -38,11 +39,11 @@ TypeListWindow::TypeListWindow(const char* currentType,
 		// padding = be_control_look->DefaultItemSpacing();
 		// seems too big
 
-	fSelectButton = new BButton("select", TR("Done"),
+	fSelectButton = new BButton("select", B_TRANSLATE("Done"),
 		new BMessage(kMsgSelected));
 	fSelectButton->SetEnabled(false);
 
-	BButton* button = new BButton("cancel", TR("Cancel"),
+	BButton* button = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_CANCEL));
 
 	fSelectButton->MakeDefault(true);
@@ -57,14 +58,14 @@ TypeListWindow::TypeListWindow(const char* currentType,
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
 		.Add(scrollView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)		
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
 			.Add(button)
 			.Add(fSelectButton)
 		)
 		.SetInsets(padding, padding, padding, padding)
 	);
 
-	BAlignment buttonAlignment = 
+	BAlignment buttonAlignment =
 		BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_CENTER);
 	button->SetExplicitAlignment(buttonAlignment);
 	fSelectButton->SetExplicitAlignment(buttonAlignment);

@@ -125,7 +125,7 @@ update_preferred_app_menu(BMenu* menu, BMimeType* type, uint32 what,
 	}
 
 	// sort lists
-	
+
 	subList.SortItems(compare_menu_items);
 	superList.SortItems(compare_menu_items);
 
@@ -227,7 +227,7 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 			if (status == B_OK) {
 				if (nodeInfo.GetPreferredApp(preferred) != B_OK)
 					preferred[0] = '\0';
-		
+
 				if (!preferred[0]) {
 					// get MIME type from file
 					char type[B_MIME_TYPE_LENGTH];
@@ -248,14 +248,16 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 	}
 
 	if (status != B_OK) {
-		error_alert(TR("File could not be opened"), status, B_STOP_ALERT);
+		error_alert(B_TRANSLATE("File could not be opened"),
+			status, B_STOP_ALERT);
 		return status;
 	}
 
 	if (!preferred[0]) {
 		error_alert(sameAs
-			? TR("Could not retrieve preferred application of this file")
-			: TR("Could not retrieve application signature"));
+			? B_TRANSLATE("Could not retrieve preferred application of this "
+				"file")
+			: B_TRANSLATE("Could not retrieve application signature"));
 		return B_ERROR;
 	}
 
@@ -283,14 +285,14 @@ retrieve_preferred_app(BMessage* message, bool sameAs, const char* forType,
 			description[0] = '\0';
 
 		char warning[512];
-		snprintf(warning, sizeof(warning), TR("The application \"%s\" does "
-			"not support this file type.\n"
+		snprintf(warning, sizeof(warning), B_TRANSLATE("The application "
+			"\"%s\" does not support this file type.\n"
 			"Are you sure you want to set it anyway?"),
 			description[0] ? description : preferred);
 
-		BAlert* alert = new BAlert(TR("FileTypes request"), warning,
-			TR("Set Preferred Application"), TR("Cancel"), NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert(B_TRANSLATE("FileTypes request"), warning,
+			B_TRANSLATE("Set Preferred Application"), B_TRANSLATE("Cancel"),
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go() == 1)
 			return B_ERROR;
 	}

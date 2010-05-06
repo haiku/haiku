@@ -62,7 +62,7 @@ const uint32 kMsgRemoveType = 'rmtp';
 const uint32 kMsgTypeRemoved = 'tprm';
 
 
-// TextView that filters the tab key to be able to tab-navigate while editing	
+// TextView that filters the tab key to be able to tab-navigate while editing
 class TabFilteringTextView : public BTextView {
 	public:
 		TabFilteringTextView(const char* name);
@@ -161,11 +161,11 @@ SupportedTypeItem::Compare(const void* _a, const void* _b)
 {
 	const SupportedTypeItem* a = *(const SupportedTypeItem**)_a;
 	const SupportedTypeItem* b = *(const SupportedTypeItem**)_b;
-	
+
 	int compare = strcasecmp(a->Text(), b->Text());
 	if (compare != 0)
 		return compare;
-	
+
 	return strcasecmp(a->Type(), b->Type());
 }
 
@@ -197,12 +197,12 @@ SupportedTypeListView::MessageReceived(BMessage* message)
 			BNodeInfo info(&node);
 			if (node.InitCheck() != B_OK || info.InitCheck() != B_OK)
 				continue;
-	
+
 			// TODO: we could identify the file in case it doesn't have a type...
 			char type[B_MIME_TYPE_LENGTH];
 			if (info.GetType(type) != B_OK)
 				continue;
-	
+
 			// check if that type is already in our list
 			bool found = false;
 			for (int32 i = CountItems(); i-- > 0;) {
@@ -212,13 +212,13 @@ SupportedTypeListView::MessageReceived(BMessage* message)
 					break;
 				}
 			}
-	
+
 			if (!found) {
 				// add type
 				AddItem(new SupportedTypeItem(type));
 			}
 		}
-	
+
 		SortItems(&SupportedTypeItem::Compare);
 	} else
 		DropTargetListView::MessageReceived(message);
@@ -236,12 +236,12 @@ SupportedTypeListView::AcceptsDrag(const BMessage* message)
 //	#pragma mark -
 
 
-ApplicationTypeWindow::ApplicationTypeWindow(BPoint position, 
+ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	const BEntry& entry)
 	:
 	BWindow(BRect(0.0f, 0.0f, 250.0f, 340.0f).OffsetBySelf(position),
-		TR("Application type"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | 
+		B_TRANSLATE("Application type"), B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS |
 			B_FRAME_EVENTS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fChangedProperties(0)
 {
@@ -252,32 +252,33 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 			// seems too big
 		labelAlignment = be_control_look->DefaultLabelAlignment();
 	}
-	
+
 	BMenuBar* menuBar = new BMenuBar((char*)NULL);
 	menuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
-	
-	BMenu* menu = new BMenu(TR("File"));
-	fSaveMenuItem = new BMenuItem(TR("Save"), new BMessage(kMsgSave), 'S');
+
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
+	fSaveMenuItem = new BMenuItem(B_TRANSLATE("Save"),
+		new BMessage(kMsgSave), 'S');
 	fSaveMenuItem->SetEnabled(false);
 	menu->AddItem(fSaveMenuItem);
 	BMenuItem* item;
 	menu->AddItem(item = new BMenuItem(
-		TR("Save into resource file" B_UTF8_ELLIPSIS), NULL));
+		B_TRANSLATE("Save into resource file" B_UTF8_ELLIPSIS), NULL));
 	item->SetEnabled(false);
-	
+
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("Close"), new BMessage(B_QUIT_REQUESTED),
-		'W', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
+		new BMessage(B_QUIT_REQUESTED), 'W', B_COMMAND_KEY));
 	menuBar->AddItem(menu);
-	
+
 
 	// Signature
-	
-	fSignatureControl = new BTextControl(TR("Signature:"), NULL, 
+
+	fSignatureControl = new BTextControl(B_TRANSLATE("Signature:"), NULL,
 		new BMessage(kMsgSignatureChanged));
-	fSignatureControl->SetModificationMessage( 
+	fSignatureControl->SetModificationMessage(
 		new BMessage(kMsgSignatureChanged));
-	
+
 	// filter out invalid characters that can't be part of a MIME type name
 	BTextView* textView = fSignatureControl->TextView();
 	textView->SetMaxBytes(B_MIME_TYPE_LENGTH);
@@ -285,41 +286,41 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	for (int32 i = 0; disallowedCharacters[i]; i++) {
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
-	
+
 	// "Application Flags" group
-	
+
 	BBox* flagsBox = new BBox("flagsBox");
 
-	fFlagsCheckBox = new BCheckBox("flags", TR("Application flags"),
+	fFlagsCheckBox = new BCheckBox("flags", B_TRANSLATE("Application flags"),
 		new BMessage(kMsgToggleAppFlags));
 	fFlagsCheckBox->SetValue(B_CONTROL_ON);
-	
-	fSingleLaunchButton = new BRadioButton("single", TR("Single launch"),
-		new BMessage(kMsgAppFlagsChanged));
-	
+
+	fSingleLaunchButton = new BRadioButton("single",
+		B_TRANSLATE("Single launch"), new BMessage(kMsgAppFlagsChanged));
+
 	fMultipleLaunchButton = new BRadioButton("multiple",
-		TR("Multiple launch"), new BMessage(kMsgAppFlagsChanged));
-	
+		B_TRANSLATE("Multiple launch"), new BMessage(kMsgAppFlagsChanged));
+
 	fExclusiveLaunchButton = new BRadioButton("exclusive",
-		TR("Exclusive launch"), new BMessage(kMsgAppFlagsChanged));
-	
-	fArgsOnlyCheckBox = new BCheckBox("args only", TR("Args only"),
+		B_TRANSLATE("Exclusive launch"), new BMessage(kMsgAppFlagsChanged));
+
+	fArgsOnlyCheckBox = new BCheckBox("args only", B_TRANSLATE("Args only"),
 		new BMessage(kMsgAppFlagsChanged));
-	
+
 	fBackgroundAppCheckBox = new BCheckBox("background",
-		TR("Background app"), new BMessage(kMsgAppFlagsChanged));
-	
+		B_TRANSLATE("Background app"), new BMessage(kMsgAppFlagsChanged));
+
 	flagsBox->AddChild(BGridLayoutBuilder(padding, padding)
 		.Add(fSingleLaunchButton, 0, 0).Add(fArgsOnlyCheckBox, 1, 0)
 		.Add(fMultipleLaunchButton, 0, 1).Add(fBackgroundAppCheckBox, 1, 1)
 		.Add(fExclusiveLaunchButton, 0, 2)
 		.SetInsets(padding, padding, padding, padding));
 	flagsBox->SetLabel(fFlagsCheckBox);
-	
+
 	// "Icon" group
-	
+
 	BBox* iconBox = new BBox("IconBox");
-	iconBox->SetLabel(TR("Icon"));
+	iconBox->SetLabel(B_TRANSLATE("Icon"));
 	fIconView = new IconView("icon");
 	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
 	iconBox->AddChild(
@@ -327,29 +328,29 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(fIconView)
 		.SetInsets(padding, padding, padding, padding)
 	);
-	
+
 	// "Supported Types" group
-	
+
 	BBox* typeBox = new BBox("typesBox");
-	typeBox->SetLabel(TR("Supported types"));
-	
-	fTypeListView = new SupportedTypeListView("Suppported Types", 
+	typeBox->SetLabel(B_TRANSLATE("Supported types"));
+
+	fTypeListView = new SupportedTypeListView("Suppported Types",
 		B_SINGLE_SELECTION_LIST);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
-	
+
 	BScrollView* scrollView = new BScrollView("type scrollview", fTypeListView,
 		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	
-	fAddTypeButton = new BButton("add type", TR("Add" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgAddType));
-	
-	fRemoveTypeButton = new BButton("remove type", TR("Remove"),
+
+	fAddTypeButton = new BButton("add type",
+		B_TRANSLATE("Add" B_UTF8_ELLIPSIS), new BMessage(kMsgAddType));
+
+	fRemoveTypeButton = new BButton("remove type", B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveType));
-	
+
 	fTypeIconView = new IconView("type icon");
 	BView* iconHolder = BGroupLayoutBuilder(B_HORIZONTAL).Add(fTypeIconView);
 	fTypeIconView->SetModificationMessage(new BMessage(kMsgTypeIconsChanged));
-	
+
 	typeBox->AddChild(BGridLayoutBuilder(padding, padding)
 		.Add(scrollView, 0, 0, 1, 4)
 		.Add(fAddTypeButton, 1, 0, 1, 2)
@@ -361,46 +362,48 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.SetColumnWeight(2, 1)
 	);
 	iconHolder->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
-	
+
 	// "Version Info" group
-	
+
 	BBox* versionBox = new BBox("versionBox");
-	versionBox->SetLabel(TR("Version info"));
-	
-	fMajorVersionControl = new BTextControl(TR("Version:"), NULL, NULL);
+	versionBox->SetLabel(B_TRANSLATE("Version info"));
+
+	fMajorVersionControl = new BTextControl(B_TRANSLATE("Version:"),
+		NULL, NULL);
 	_MakeNumberTextControl(fMajorVersionControl);
-	
+
 	fMiddleVersionControl = new BTextControl(".", NULL, NULL);
 	_MakeNumberTextControl(fMiddleVersionControl);
-	
+
 	fMinorVersionControl = new BTextControl(".", NULL, NULL);
 	_MakeNumberTextControl(fMinorVersionControl);
-	
+
 	fVarietyMenu = new BPopUpMenu("variety", true, true);
-	fVarietyMenu->AddItem(new BMenuItem(TR("Development"), NULL));
-	fVarietyMenu->AddItem(new BMenuItem(TR("Alpha"), NULL));
-	fVarietyMenu->AddItem(new BMenuItem(TR("Beta"), NULL));
-	fVarietyMenu->AddItem(new BMenuItem(TR("Gamma"), NULL));
-	item = new BMenuItem(TR("Golden master"), NULL);
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Development"), NULL));
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Alpha"), NULL));
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Beta"), NULL));
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Gamma"), NULL));
+	item = new BMenuItem(B_TRANSLATE("Golden master"), NULL);
 	fVarietyMenu->AddItem(item);
 	item->SetMarked(true);
-	fVarietyMenu->AddItem(new BMenuItem(TR("Final"), NULL));
-	
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Final"), NULL));
+
 	BMenuField* varietyField = new BMenuField("", fVarietyMenu);
 	fInternalVersionControl = new BTextControl("/", NULL, NULL);
-	fShortDescriptionControl = 
-		new BTextControl(TR("Short description:"), NULL, NULL);
-	
+	fShortDescriptionControl =
+		new BTextControl(B_TRANSLATE("Short description:"), NULL, NULL);
+
 	// TODO: workaround for a GCC 4.1.0 bug? Or is that really what the standard says?
 	version_info versionInfo;
 	fShortDescriptionControl->TextView()->SetMaxBytes(
 		sizeof(versionInfo.short_info));
-	
-	BStringView* longLabel = new BStringView(NULL, TR("Long description:"));
+
+	BStringView* longLabel = new BStringView(NULL,
+		B_TRANSLATE("Long description:"));
 	longLabel->SetExplicitAlignment(labelAlignment);
 	fLongDescriptionView = new TabFilteringTextView("long desc");
 	fLongDescriptionView->SetMaxBytes(sizeof(versionInfo.long_info));
-	
+
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,
 		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
@@ -408,7 +411,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	BSize minScrollSize = scrollView->ScrollBar(B_VERTICAL)->MinSize();
 	minScrollSize.width+=fLongDescriptionView->MinSize().width;
 	scrollView->SetExplicitMinSize(minScrollSize);
-	
+
 	versionBox->AddChild(BGridLayoutBuilder(padding, padding)
 		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fMajorVersionControl->CreateTextViewLayoutItem(), 1, 0)
@@ -566,7 +569,7 @@ ApplicationTypeWindow::_SetTo(const BEntry& entry)
 	fRemoveTypeButton->SetEnabled(false);
 
 	// version info
-	
+
 	char text[256];
 	snprintf(text, sizeof(text), "%ld", versionInfo.major);
 	fMajorVersionControl->SetText(text);
@@ -979,9 +982,10 @@ bool
 ApplicationTypeWindow::QuitRequested()
 {
 	if (_NeedsSaving(CHECK_ALL) != 0) {
-		BAlert* alert = new BAlert(TR("Save request"), TR("Do you want to "
-			"save the changes?"), TR("Quit, don't save"), TR("Cancel"),
-			TR("Save"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert(B_TRANSLATE("Save request"),
+			B_TRANSLATE("Do you want to save the changes?"),
+			B_TRANSLATE("Quit, don't save"), B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Save"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 choice = alert->Go();
 		switch (choice) {
 			case 0:

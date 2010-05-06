@@ -96,9 +96,9 @@ display_as_parameter(const char* special)
 AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 		AttributeItem* attributeItem)
 	:
-	BWindow(BRect(100, 100, 350, 200), TR("Attribute"), B_MODAL_WINDOW_LOOK,
-		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS
-			| B_ASYNCHRONOUS_CONTROLS),
+	BWindow(BRect(100, 100, 350, 200), B_TRANSLATE("Attribute"),
+		B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target),
 	fMimeType(mimeType.Type())
 {
@@ -109,13 +109,13 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	if (attributeItem != NULL)
 		fAttribute = *attributeItem;
 
-	fPublicNameControl = new BTextControl(TR("Attribute name:"),
+	fPublicNameControl = new BTextControl(B_TRANSLATE("Attribute name:"),
 		fAttribute.PublicName(), NULL);
 	fPublicNameControl->SetModificationMessage(
 		new BMessage(kMsgAttributeUpdated));
 	fPublicNameControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 
-	fAttributeControl = new BTextControl(TR("Internal name:"),
+	fAttributeControl = new BTextControl(B_TRANSLATE("Internal name:"),
 		fAttribute.Name(), NULL);
 	fAttributeControl->SetModificationMessage(
 		new BMessage(kMsgAttributeUpdated));
@@ -141,11 +141,11 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 			item->SetMarked(true);
 	}
 
-	BMenuField* typeMenuField = new BMenuField("types" , TR("Type:"),
+	BMenuField* typeMenuField = new BMenuField("types" , B_TRANSLATE("Type:"),
 		fTypeMenu);
 	typeMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fVisibleCheckBox = new BCheckBox("visible", TR("Visible"),
+	fVisibleCheckBox = new BCheckBox("visible", B_TRANSLATE("Visible"),
 		new BMessage(kMsgVisibilityChanged));
 	fVisibleCheckBox->SetValue(fAttribute.Visible());
 
@@ -167,16 +167,17 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	}
 
 	fDisplayAsMenuField = new BMenuField("display as",
-		TR_CMT("Display as:", "Tracker offers different display modes for "
-			"attributes."), menu);
+		B_TRANSLATE_COMMENT("Display as:",
+			"Tracker offers different display modes for attributes."), menu);
 	fDisplayAsMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fEditableCheckBox = new BCheckBox("editable", TR_CMT("Editable",
-		"If Tracker allows to edit this attribute."),
+	fEditableCheckBox = new BCheckBox("editable",
+		B_TRANSLATE_COMMENT("Editable",
+			"If Tracker allows to edit this attribute."),
 		new BMessage(kMsgAttributeUpdated));
 	fEditableCheckBox->SetValue(fAttribute.Editable());
 
-	fSpecialControl = new BTextControl(TR("Special:"),
+	fSpecialControl = new BTextControl(B_TRANSLATE("Special:"),
 		display_as_parameter(fAttribute.DisplayAs()), NULL);
 	fSpecialControl->SetModificationMessage(
 		new BMessage(kMsgAttributeUpdated));
@@ -185,8 +186,9 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 
 	char text[64];
 	snprintf(text, sizeof(text), "%ld", fAttribute.Width());
-	fWidthControl = new BTextControl(TR_CMT("Width:",
-		"Default column width in Tracker for this attribute."), text, NULL);
+	fWidthControl = new BTextControl(B_TRANSLATE_COMMENT("Width:",
+		"Default column width in Tracker for this attribute."),
+		text, NULL);
 	fWidthControl->SetModificationMessage(
 		new BMessage(kMsgAttributeUpdated));
 	fWidthControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -203,12 +205,12 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 		int32		alignment;
 		const char*	name;
 	} kAlignmentMap[] = {
-		{B_ALIGN_LEFT, TR_CMT("Left", "Attribute column alignment in "
-			"Tracker")},
-		{B_ALIGN_RIGHT, TR_CMT("Right", "Attribute column alignment in "
-			"Tracker")},
-		{B_ALIGN_CENTER, TR_CMT("Center", "Attribute column alignment in "
-			"Tracker")},
+		{B_ALIGN_LEFT, B_TRANSLATE_COMMENT("Left",
+			"Attribute column alignment in Tracker")},
+		{B_ALIGN_RIGHT, B_TRANSLATE_COMMENT("Right",
+			"Attribute column alignment in Tracker")},
+		{B_ALIGN_CENTER, B_TRANSLATE_COMMENT("Center",
+			"Attribute column alignment in Tracker")},
 		{0, NULL}
 	};
 
@@ -225,14 +227,15 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	}
 
 	fAlignmentMenuField = new BMenuField("alignment",
-		TR("Alignment:"), menu);
+		B_TRANSLATE("Alignment:"), menu);
 	fAlignmentMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fAcceptButton = new BButton("add", item ? TR("Done") : TR("Add"),
+	fAcceptButton = new BButton("add", item
+		? B_TRANSLATE("Done") : B_TRANSLATE("Add"),
 		new BMessage(kMsgAccept));
 	fAcceptButton->SetEnabled(false);
 
-	BButton* cancelButton = new BButton("cancel", TR("Cancel"),
+	BButton* cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
 	BBox* visibleBox;
@@ -247,7 +250,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 			.Add(typeMenuField->CreateLabelLayoutItem(), 0, 2)
 			.Add(typeMenuField->CreateMenuBarLayoutItem(), 1, 2)
 		)
-		.Add(visibleBox = new BBox(B_FANCY_BORDER, 
+		.Add(visibleBox = new BBox(B_FANCY_BORDER,
 			BGridLayoutBuilder(padding, padding)
 				.Add(fDisplayAsMenuField->CreateLabelLayoutItem(), 0, 0)
 				.Add(fDisplayAsMenuField->CreateMenuBarLayoutItem(), 1, 0)
@@ -467,7 +470,7 @@ AttributeWindow::MessageReceived(BMessage* message)
 					newAttributes.AddInt32("attr:width", item->Width());
 					newAttributes.AddBool("attr:viewable", item->Visible());
 					newAttributes.AddBool("attr:editable", item->Editable());
-					
+
 					delete item;
 				}
 
@@ -475,7 +478,8 @@ AttributeWindow::MessageReceived(BMessage* message)
 			}
 
 			if (status != B_OK)
-				error_alert(TR("Could not change attributes"), status);
+				error_alert(B_TRANSLATE("Could not change attributes"),
+					status);
 
 			PostMessage(B_QUIT_REQUESTED);
 			break;

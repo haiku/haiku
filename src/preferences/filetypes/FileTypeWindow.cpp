@@ -51,9 +51,9 @@ const uint32 kMsgSamePreferredAppAsOpened = 'spaO';
 FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	:
 	BWindow(BRect(0.0f, 0.0f, 200.0f, 200.0f).OffsetBySelf(position),
-		TR("File type"), B_TITLED_WINDOW,
-		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE |
-		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
+		B_TRANSLATE("File type"), B_TITLED_WINDOW,
+		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE
+			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	float padding = 3.0f;
 	// if (be_control_look)
@@ -62,7 +62,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 
 	// "File Type" group
 	BBox* fileTypeBox = new BBox("file type BBox");
-	fileTypeBox->SetLabel(TR("File type"));
+	fileTypeBox->SetLabel(B_TRANSLATE("File type"));
 
 	fTypeControl = new BTextControl("type", NULL, "Type Control",
 		new BMessage(kMsgTypeEntered));
@@ -75,10 +75,10 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	}
 
 	fSelectTypeButton = new BButton("select type",
-		TR("Select" B_UTF8_ELLIPSIS), new BMessage(kMsgSelectType));
+		B_TRANSLATE("Select" B_UTF8_ELLIPSIS), new BMessage(kMsgSelectType));
 
 	fSameTypeAsButton = new BButton("same type as",
-		TR("Same as" B_UTF8_ELLIPSIS), new BMessage(kMsgSameTypeAs));
+		B_TRANSLATE("Same as" B_UTF8_ELLIPSIS), new BMessage(kMsgSameTypeAs));
 
 	fileTypeBox->AddChild(BGridLayoutBuilder(padding, padding)
 		.Add(fTypeControl, 0, 0, 2, 1)
@@ -90,7 +90,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	// "Icon" group
 
 	BBox* iconBox = new BBox("icon BBox");
-	iconBox->SetLabel(TR("Icon"));
+	iconBox->SetLabel(B_TRANSLATE("Icon"));
 	fIconView = new IconView("icon");
 	iconBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(fIconView)
@@ -99,20 +99,22 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	// "Preferred Application" group
 
 	BBox* preferredBox = new BBox("preferred BBox");
-	preferredBox->SetLabel(TR("Preferred application"));
+	preferredBox->SetLabel(B_TRANSLATE("Preferred application"));
 
 	BMenu* menu = new BPopUpMenu("preferred");
 	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem(TR("Default application"),
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Default application"),
 		new BMessage(kMsgPreferredAppChosen)));
 	item->SetMarked(true);
 
 	fPreferredField = new BMenuField("preferred", NULL, menu);
 
-	fSelectAppButton = new BButton("select app", TR("Select" B_UTF8_ELLIPSIS),
+	fSelectAppButton = new BButton("select app",
+		B_TRANSLATE("Select" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgSelectPreferredApp));
 
-	fSameAppAsButton = new BButton("same app as", TR("Same as" B_UTF8_ELLIPSIS),
+	fSameAppAsButton = new BButton("same app as",
+		B_TRANSLATE("Same as" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgSamePreferredAppAs));
 
 	preferredBox->AddChild(BGridLayoutBuilder(padding, padding)
@@ -173,13 +175,13 @@ FileTypeWindow::_Title(const BMessage& refs)
 		if (same && parent.GetName(name) == B_OK) {
 			char buffer[512];
 			snprintf(buffer, sizeof(buffer),
-				TR("Multiple files from \"%s\" file type"), name);
+				B_TRANSLATE("Multiple files from \"%s\" file type"), name);
 			title = buffer;
 		} else
-			title = TR("[Multiple files] file types");
+			title = B_TRANSLATE("[Multiple files] file types");
 	} else if (refs.FindRef("refs", 0, &ref) == B_OK) {
 		char buffer[512];
-		snprintf(buffer, sizeof(buffer), TR("%s file type"), ref.name);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%s file type"), ref.name);
 		title = buffer;
 	}
 
@@ -265,7 +267,7 @@ FileTypeWindow::_AdoptType(BMessage* message)
 	}
 
 	if (status != B_OK) {
-		error_alert(TR("Could not open file"), status);
+		error_alert(B_TRANSLATE("Could not open file"), status);
 		return;
 	}
 
@@ -362,7 +364,7 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSameTypeAs:
 		{
 			BMessage panel(kMsgOpenFilePanel);
-			panel.AddString("title", TR("Select same type as"));
+			panel.AddString("title", B_TRANSLATE("Select same type as"));
 			panel.AddInt32("message", kMsgSameTypeAsOpened);
 			panel.AddMessenger("target", this);
 
@@ -390,7 +392,8 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		case kMsgSelectPreferredApp:
 		{
 			BMessage panel(kMsgOpenFilePanel);
-			panel.AddString("title", TR("Select preferred application"));
+			panel.AddString("title",
+				B_TRANSLATE("Select preferred application"));
 			panel.AddInt32("message", kMsgPreferredAppOpened);
 			panel.AddMessenger("target", this);
 
@@ -405,7 +408,7 @@ FileTypeWindow::MessageReceived(BMessage* message)
 		{
 			BMessage panel(kMsgOpenFilePanel);
 			panel.AddString("title",
-				TR("Select same preferred application as"));
+				B_TRANSLATE("Select same preferred application as"));
 			panel.AddInt32("message", kMsgSamePreferredAppAsOpened);
 			panel.AddMessenger("target", this);
 

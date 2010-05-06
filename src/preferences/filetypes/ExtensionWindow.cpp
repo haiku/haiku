@@ -112,8 +112,9 @@ replace_extension(BMimeType& type, const char* newExtension,
 
 ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 		const char* extension)
-	: BWindow(BRect(100, 100, 350, 200), TR("Extension"), B_MODAL_WINDOW_LOOK,
-		B_MODAL_SUBSET_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
+	: BWindow(BRect(100, 100, 350, 200), B_TRANSLATE("Extension"),
+		B_MODAL_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target),
 	fMimeType(type.Type()),
@@ -125,8 +126,9 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 	//if (be_control_look)
 		// padding = be_control_look->DefaultItemSpacing();
 			// this seems to be very large!
-	
-	fExtensionControl = new BTextControl(TR("Extension:"), extension, NULL);
+
+	fExtensionControl = new BTextControl(B_TRANSLATE("Extension:"),
+		extension, NULL);
 	fExtensionControl->SetModificationMessage(
 		new BMessage(kMsgExtensionUpdated));
 	fExtensionControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_LEFT);
@@ -138,11 +140,12 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 		textView->DisallowChar(disallowedCharacters[i]);
 	}
 
-	fAcceptButton = new BButton(extension ? TR("Done") : TR("Add"),
+	fAcceptButton = new BButton(extension
+		? B_TRANSLATE("Done") : B_TRANSLATE("Add"),
 		new BMessage(kMsgAccept));
 	fAcceptButton->SetEnabled(false);
 
-	BButton* button = new BButton(TR("Cancel"),
+	BButton* button = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
 	AddChild(BGridLayoutBuilder(padding, padding)
@@ -199,7 +202,8 @@ ExtensionWindow::MessageReceived(BMessage* message)
 			status_t status = replace_extension(fMimeType, newExtension,
 				fExtension.String());
 			if (status != B_OK)
-				error_alert(TR("Could not change file extensions"), status);
+				error_alert(B_TRANSLATE("Could not change file extensions"),
+					status);
 
 			PostMessage(B_QUIT_REQUESTED);
 			break;

@@ -42,9 +42,9 @@ const uint32 kMsgAddType = 'atyp';
 NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 	const char* currentType)
 	:
-	BWindow(BRect(100, 100, 350, 200), TR("New file type"), B_MODAL_WINDOW,
-		B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE | B_ASYNCHRONOUS_CONTROLS 
-		| B_AUTO_UPDATE_SIZE_LIMITS ),
+	BWindow(BRect(100, 100, 350, 200), B_TRANSLATE("New file type"),
+		B_MODAL_WINDOW, B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
+			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS ),
 	fTarget(target)
 {
 	fSupertypesMenu = new BPopUpMenu("supertypes");
@@ -69,17 +69,17 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 			fSupertypesMenu->AddSeparatorItem();
 	}
 
-	fSupertypesMenu->AddItem(new BMenuItem(TR("Add new group"),
+	fSupertypesMenu->AddItem(new BMenuItem(B_TRANSLATE("Add new group"),
 		new BMessage(kMsgNewSupertypeChosen)));
 	BMenuField* typesMenuField = new BMenuField(NULL, fSupertypesMenu);
 
-	BStringView* typesMenuLabel = new BStringView(NULL, TR("Group:"));
+	BStringView* typesMenuLabel = new BStringView(NULL, B_TRANSLATE("Group:"));
 		// Create a separate label view, otherwise things don't line up right
 	typesMenuLabel->SetAlignment(B_ALIGN_LEFT);
 	typesMenuLabel->SetExplicitAlignment(
 		BAlignment(B_ALIGN_LEFT, B_ALIGN_USE_FULL_HEIGHT));
 
-	fNameControl = new BTextControl(TR("Internal name:"), "", NULL);
+	fNameControl = new BTextControl(B_TRANSLATE("Internal name:"), "", NULL);
 	fNameControl->SetModificationMessage(new BMessage(kMsgNameUpdated));
 
 	// filter out invalid characters that can't be part of a MIME type name
@@ -89,7 +89,8 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 		nameControlTextView->DisallowChar(disallowedCharacters[i]);
 	}
 
-	fAddButton = new BButton(TR("Add type"), new BMessage(kMsgAddType));
+	fAddButton = new BButton(B_TRANSLATE("Add type"),
+		new BMessage(kMsgAddType));
 
 	float padding = 3.0f;
 	// if (be_control_look)
@@ -103,7 +104,8 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 		.Add(fNameControl->CreateLabelLayoutItem(), 0, 1)
 		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 1, 2)
 		.Add(BSpaceLayoutItem::CreateGlue(), 0, 2)
-		.Add(new BButton(TR("Cancel"), new BMessage(B_QUIT_REQUESTED)), 1, 2)
+		.Add(new BButton(B_TRANSLATE("Cancel"),
+			new BMessage(B_QUIT_REQUESTED)), 1, 2)
 		.Add(fAddButton, 2, 2)
 		.SetColumnWeight(0, 3)
 		);
@@ -134,15 +136,15 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgSupertypeChosen:
-			fAddButton->SetLabel(TR("Add type"));
-			fNameControl->SetLabel(TR("Internal name:"));
+			fAddButton->SetLabel(B_TRANSLATE("Add type"));
+			fNameControl->SetLabel(B_TRANSLATE("Internal name:"));
 			fNameControl->MakeFocus(true);
 			InvalidateLayout(true);
 			break;
 
 		case kMsgNewSupertypeChosen:
-			fAddButton->SetLabel(TR("Add group"));
-			fNameControl->SetLabel(TR("Group name:"));
+			fAddButton->SetLabel(B_TRANSLATE("Add group"));
+			fNameControl->SetLabel(B_TRANSLATE("Group name:"));
 			fNameControl->MakeFocus(true);
 			InvalidateLayout(true);
 			break;
@@ -173,13 +175,14 @@ NewFileTypeWindow::MessageReceived(BMessage* message)
 
 				BMimeType mimeType(type.String());
 				if (mimeType.IsInstalled()) {
-					error_alert(TR("This file type already exists"));
+					error_alert(B_TRANSLATE("This file type already exists"));
 					break;
 				}
 
 				status_t status = mimeType.Install();
 				if (status != B_OK)
-					error_alert(TR("Could not install file type"), status);
+					error_alert(B_TRANSLATE("Could not install file type"),
+						status);
 				else {
 					BMessage update(kMsgSelectNewType);
 					update.AddString("type", type.String());

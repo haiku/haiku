@@ -139,7 +139,7 @@ Settings::_Open(BFile *file, int32 mode)
 }
 
 
-void 
+void
 Settings::UpdateFrom(BMessage *message)
 {
 	BRect frame;
@@ -216,12 +216,12 @@ FileTypes::RefsReceived(BMessage *message)
 
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
-				TR("Could not open \"%s\":\n"
+				B_TRANSLATE("Could not open \"%s\":\n"
 				"%s"),
 				ref.name, strerror(status));
 
-			(new BAlert(TR("FileTypes request"),
-				buffer, TR("OK"), NULL, NULL,
+			(new BAlert(B_TRANSLATE("FileTypes request"),
+				buffer, B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 
 			message->RemoveData("refs", --index);
@@ -282,7 +282,7 @@ FileTypes::ArgvReceived(int32 argc, char **argv)
 			path.SetTo(&currentDirectory, argv[i]);
 
 		status_t status;
-		entry_ref ref;		
+		entry_ref ref;
 		BEntry entry;
 
 		if ((status = entry.SetTo(path.Path(), false)) != B_OK
@@ -356,7 +356,7 @@ FileTypes::MessageReceived(BMessage *message)
 			// the open file panel sends us a message when it's done
 			const char* subTitle;
 			if (message->FindString("title", &subTitle) != B_OK)
-				subTitle = TR("Open file");
+				subTitle = B_TRANSLATE("Open file");
 
 			int32 what;
 			if (message->FindInt32("message", &what) != B_OK)
@@ -366,7 +366,7 @@ FileTypes::MessageReceived(BMessage *message)
 			if (message->FindMessenger("target", &target) != B_OK)
 				target = be_app_messenger;
 
-			BString title = TR("FileTypes");
+			BString title = B_TRANSLATE("FileTypes");
 			if (subTitle != NULL && subTitle[0]) {
 				title.Append(": ");
 				title.Append(subTitle);
@@ -407,12 +407,12 @@ FileTypes::MessageReceived(BMessage *message)
 void
 FileTypes::AboutRequested()
 {
-	BString aboutText(TR("FileTypes"));
+	BString aboutText(B_TRANSLATE("FileTypes"));
 	int32 titleLength = aboutText.Length();
 	aboutText << "\n";
-	aboutText << TR("\twritten by Axel Dörfler\n"
+	aboutText << B_TRANSLATE("\twritten by Axel Dörfler\n"
 		"\tCopyright 2006-2007, Haiku.\n");
-	BAlert *alert = new BAlert("about", aboutText.String(), TR("OK"));
+	BAlert *alert = new BAlert("about", aboutText.String(), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -420,7 +420,7 @@ FileTypes::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, titleLength, &font);
 
 	alert->Go();
@@ -462,9 +462,9 @@ error_alert(const char* message, status_t status, alert_type type)
 			strerror(status));
 	}
 
-	(new BAlert(TR("FileTypes request"),
+	(new BAlert(B_TRANSLATE("FileTypes request"),
 		status == B_OK ? message : warning,
-		TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
+		B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, type))->Go();
 }
 
 

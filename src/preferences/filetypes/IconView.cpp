@@ -582,7 +582,7 @@ IconView::MessageReceived(BMessage* message)
 			if (message->FindRef("refs", &ref) == B_OK)
 				_SetIcon(&ref);
 		}
-			
+
 		delete large;
 		delete mini;
 
@@ -634,11 +634,11 @@ IconView::MessageReceived(BMessage* message)
 					case B_MIME_TYPE_DELETED:
 						Unset();
 						break;
-	
+
 					case B_ICON_CHANGED:
 						Update();
 						break;
-	
+
 					default:
 						break;
 				}
@@ -819,15 +819,17 @@ IconView::MouseDown(BPoint where)
 
 		bool hasIcon = fHasType ? fSource == kOwnIcon : fIcon != NULL;
 		if (hasIcon) {
-			menu->AddItem(new BMenuItem(TR("Edit icon" B_UTF8_ELLIPSIS),
+			menu->AddItem(new BMenuItem(
+				B_TRANSLATE("Edit icon" B_UTF8_ELLIPSIS),
 				new BMessage(kMsgEditIcon)));
 		} else {
-			menu->AddItem(new BMenuItem(TR("Add icon" B_UTF8_ELLIPSIS),
+			menu->AddItem(new BMenuItem(
+				B_TRANSLATE("Add icon" B_UTF8_ELLIPSIS),
 				new BMessage(kMsgAddIcon)));
 		}
 
-		BMenuItem* item = new BMenuItem(TR("Remove icon"),
-			new BMessage(kMsgRemoveIcon));
+		BMenuItem* item = new BMenuItem(
+			B_TRANSLATE("Remove icon"), new BMessage(kMsgRemoveIcon));
 		if (!hasIcon)
 			item->SetEnabled(false);
 
