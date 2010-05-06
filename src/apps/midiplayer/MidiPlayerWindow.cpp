@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2004 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -44,7 +44,7 @@
 //------------------------------------------------------------------------------
 
 MidiPlayerWindow::MidiPlayerWindow()
-	: BWindow(BRect(0, 0, 1, 1), TR("MidiPlayer"), B_TITLED_WINDOW, 
+	: BWindow(BRect(0, 0, 1, 1), B_TRANSLATE("MidiPlayer"), B_TITLED_WINDOW,
 	          B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	playing = false;
@@ -71,7 +71,7 @@ MidiPlayerWindow::MidiPlayerWindow()
 MidiPlayerWindow::~MidiPlayerWindow()
 {
 	StopSynth();
-	
+
 	//bridge->Unregister();
 	bridge->Release();
 }
@@ -101,31 +101,31 @@ void MidiPlayerWindow::MessageReceived(BMessage* msg)
 		case MSG_INPUT_CHANGED:
 			OnInputChanged(msg);
 			break;
-			
+
 		case MSG_REVERB_NONE:
 			OnReverb(B_REVERB_NONE);
 			break;
-			
+
 		case MSG_REVERB_CLOSET:
 			OnReverb(B_REVERB_CLOSET);
 			break;
-			
+
 		case MSG_REVERB_GARAGE:
 			OnReverb(B_REVERB_GARAGE);
 			break;
-		
+
 		case MSG_REVERB_IGOR:
 			OnReverb(B_REVERB_BALLROOM);
 			break;
-		
+
 		case MSG_REVERB_CAVERN:
 			OnReverb(B_REVERB_CAVERN);
 			break;
-		
+
 		case MSG_REVERB_DUNGEON:
 			OnReverb(B_REVERB_DUNGEON);
 			break;
-		
+
 		case MSG_VOLUME:
 			OnVolume();
 			break;
@@ -163,7 +163,7 @@ void MidiPlayerWindow::MenusBeginning()
 	// marked. However, we won't disconnect it until you choose another one.
 
 	inputOff->SetMarked(inputId == -1);
-	
+
 	int32 id = 0;
 	BMidiEndpoint* endp;
 	while ((endp = BMidiRoster::NextEndpoint(&id)) != NULL)
@@ -178,7 +178,7 @@ void MidiPlayerWindow::MenusBeginning()
 			inputPopUp->AddItem(item);
 			item->SetMarked(inputId == id);
 		}
-		
+
 		endp->Release();
 	}
 }
@@ -193,11 +193,11 @@ void MidiPlayerWindow::CreateInputMenu()
 	msg->what = MSG_INPUT_CHANGED;
 	msg->AddInt32("id", -1);
 
-	inputOff = new BMenuItem(TR("Off"), msg);
+	inputOff = new BMenuItem(B_TRANSLATE("Off"), msg);
 
 	inputPopUp->AddItem(inputOff);
 
-	inputMenu = new BMenuField(TR("Live input:"), inputPopUp, NULL);
+	inputMenu = new BMenuField(B_TRANSLATE("Live input:"), inputPopUp, NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -207,22 +207,22 @@ void MidiPlayerWindow::CreateReverbMenu()
 	BPopUpMenu* reverbPopUp = new BPopUpMenu("reverbPopUp");
 
 	reverbNone = new BMenuItem(
-		TR("None"), new BMessage(MSG_REVERB_NONE));
+		B_TRANSLATE("None"), new BMessage(MSG_REVERB_NONE));
 
 	reverbCloset = new BMenuItem(
-		TR("Closet"), new BMessage(MSG_REVERB_CLOSET));
+		B_TRANSLATE("Closet"), new BMessage(MSG_REVERB_CLOSET));
 
 	reverbGarage = new BMenuItem(
-		TR("Garage"), new BMessage(MSG_REVERB_GARAGE));
+		B_TRANSLATE("Garage"), new BMessage(MSG_REVERB_GARAGE));
 
 	reverbIgor = new BMenuItem(
-		TR("Igor's lab"), new BMessage(MSG_REVERB_IGOR));
+		B_TRANSLATE("Igor's lab"), new BMessage(MSG_REVERB_IGOR));
 
 	reverbCavern = new BMenuItem(
-		TR("Cavern"), new BMessage(MSG_REVERB_CAVERN));
+		B_TRANSLATE("Cavern"), new BMessage(MSG_REVERB_CAVERN));
 
 	reverbDungeon = new BMenuItem(
-		TR("Dungeon"), new BMessage(MSG_REVERB_DUNGEON));
+		B_TRANSLATE("Dungeon"), new BMessage(MSG_REVERB_DUNGEON));
 
 	reverbPopUp->AddItem(reverbNone);
 	reverbPopUp->AddItem(reverbCloset);
@@ -231,7 +231,7 @@ void MidiPlayerWindow::CreateReverbMenu()
 	reverbPopUp->AddItem(reverbCavern);
 	reverbPopUp->AddItem(reverbDungeon);
 
-	reverbMenu = new BMenuField(TR("Reverb:"), reverbPopUp, NULL);
+	reverbMenu = new BMenuField(B_TRANSLATE("Reverb:"), reverbPopUp, NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -241,28 +241,29 @@ void MidiPlayerWindow::CreateViews()
 	// Set up needed views
 	scopeView = new ScopeView;
 
-	showScope = new BCheckBox("showScope", TR("Scope"),
+	showScope = new BCheckBox("showScope", B_TRANSLATE("Scope"),
 		new BMessage(MSG_SHOW_SCOPE));
 	showScope->SetValue(B_CONTROL_ON);
 
 	CreateInputMenu();
 	CreateReverbMenu();
-	
+
 	volumeSlider = new BSlider("volumeSlider", NULL, NULL, 0, 100,
 		B_HORIZONTAL);
 	rgb_color col = { 152, 152, 255 };
 	volumeSlider->UseFillColor(true, &col);
 	volumeSlider->SetModificationMessage(new BMessage(MSG_VOLUME));
 
-	playButton = new BButton("playButton", TR("Play"), new BMessage(MSG_PLAY_STOP));
+	playButton = new BButton("playButton", B_TRANSLATE("Play"),
+		new BMessage(MSG_PLAY_STOP));
 	playButton->SetEnabled(false);
 
 	BBox* divider = new BBox(B_EMPTY_STRING, B_WILL_DRAW | B_FRAME_EVENTS,
-		B_FANCY_BORDER); 
+		B_FANCY_BORDER);
 	divider->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, 1));
 
-	BStringView* volumeLabel = new BStringView(NULL, TR("Volume:"));
+	BStringView* volumeLabel = new BStringView(NULL, B_TRANSLATE("Volume:"));
 	volumeLabel->SetAlignment(B_ALIGN_LEFT);
 	volumeLabel->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
@@ -322,7 +323,7 @@ void MidiPlayerWindow::InitControls()
 	{
 		CenterOnScreen();
 	}
-	
+
 	Unlock();
 }
 
@@ -372,21 +373,21 @@ void MidiPlayerWindow::LoadFile(entry_ref* ref)
 		scopeView->SetPlaying(false);
 		scopeView->Invalidate();
 		UpdateIfNeeded();
-	
+
 		StopSynth();
 	}
 
 	synth.UnloadFile();
-	
+
 	if (synth.LoadFile(ref) == B_OK)
 	{
-		// Ideally, we would call SetVolume() in InitControls(), 
+		// Ideally, we would call SetVolume() in InitControls(),
 		// but for some reason that doesn't work: BMidiSynthFile
 		// will use the default volume instead. So we do it here.
 		synth.SetVolume(volume / 100.0f);
 
 		playButton->SetEnabled(true);
-		playButton->SetLabel(TR("Stop"));
+		playButton->SetLabel(B_TRANSLATE("Stop"));
 		scopeView->SetHaveFile(true);
 		scopeView->SetPlaying(true);
 		scopeView->Invalidate();
@@ -396,13 +397,14 @@ void MidiPlayerWindow::LoadFile(entry_ref* ref)
 	else
 	{
 		playButton->SetEnabled(false);
-		playButton->SetLabel(TR("Play"));
+		playButton->SetLabel(B_TRANSLATE("Play"));
 		scopeView->SetHaveFile(false);
 		scopeView->SetPlaying(false);
 		scopeView->Invalidate();
 
-		(new BAlert(
-			NULL, TR("Could not load song"), TR("OK"), NULL, NULL,
+		(new BAlert(NULL,
+			B_TRANSLATE("Could not load song"),
+			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	}
 }
@@ -446,8 +448,8 @@ void MidiPlayerWindow::StopHook()
 	scopeView->SetPlaying(false);
 	scopeView->Invalidate();
 	playButton->SetEnabled(true);
-	playButton->SetLabel(TR("Play"));
-	
+	playButton->SetLabel(B_TRANSLATE("Play"));
+
 	Unlock();
 }
 
@@ -461,12 +463,12 @@ void MidiPlayerWindow::OnPlayStop()
 		scopeView->SetPlaying(false);
 		scopeView->Invalidate();
 		UpdateIfNeeded();
-		
+
 		StopSynth();
 	}
 	else
 	{
-		playButton->SetLabel(TR("Stop"));
+		playButton->SetLabel(B_TRANSLATE("Stop"));
 		scopeView->SetPlaying(true);
 		scopeView->Invalidate();
 
@@ -492,7 +494,7 @@ void MidiPlayerWindow::OnInputChanged(BMessage* msg)
 	if (msg->FindInt32("id", &newId) == B_OK)
 	{
 		BMidiProducer* endp;
-		
+
 		endp = BMidiRoster::FindProducer(inputId);
 		if (endp != NULL)
 		{
@@ -510,10 +512,10 @@ void MidiPlayerWindow::OnInputChanged(BMessage* msg)
 				scopeView->SetLoading(true);
 				scopeView->Invalidate();
 				UpdateIfNeeded();
-			
+
 				bridge->Init(B_BIG_SYNTH);
 				instrLoaded = true;
-				
+
 				scopeView->SetLoading(false);
 				scopeView->Invalidate();
 			}

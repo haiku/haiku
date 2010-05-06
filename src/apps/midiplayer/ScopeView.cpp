@@ -1,22 +1,22 @@
 /*
  * Copyright (c) 2004 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
@@ -156,7 +156,7 @@ int32 ScopeView::_Thread(void* data)
 
 int32 ScopeView::Thread()
 {
-	// Because Pulse() was too slow, I created a thread that tells the 
+	// Because Pulse() was too slow, I created a thread that tells the
 	// ScopeView to repaint itself. Note that we need to call LockLooper
 	// with a timeout, otherwise we'll deadlock in DetachedFromWindow().
 
@@ -186,7 +186,7 @@ void ScopeView::DrawLoading()
 
 void ScopeView::DrawNoFile()
 {
-	DrawText(TR("Drop MIDI file here"));
+	DrawText(B_TRANSLATE("Drop MIDI file here"));
 }
 
 //------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ void ScopeView::DrawDisabled()
 	SetHighColor(64, 64, 64);
 
 	StrokeLine(
-		BPoint(0, Bounds().Height() / 2), 
+		BPoint(0, Bounds().Height() / 2),
 		BPoint(Bounds().Width(), Bounds().Height() / 2));
 }
 
@@ -207,7 +207,7 @@ void ScopeView::DrawStopped()
 	SetHighColor(0, 130, 0);
 
 	StrokeLine(
-		BPoint(0, Bounds().Height() / 2), 
+		BPoint(0, Bounds().Height() / 2),
 		BPoint(Bounds().Width(), Bounds().Height() / 2));
 }
 
@@ -219,7 +219,7 @@ void ScopeView::DrawPlaying()
 	int32 height = (int32) Bounds().Height();
 
 	// Scope drawing magic based on code by Michael Pfeiffer.
-	
+
 	int32 size = be_synth->GetAudio(leftSamples, rightSamples, sampleCount);
 	if (size > 0)
 	{
