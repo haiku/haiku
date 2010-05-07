@@ -181,7 +181,6 @@ decode_detailed_monitor(edid1_detailed_monitor *monitor,
 	int i, j;
 
 	for (i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i, ++monitor, ++raw) {
-		monitor->monitor_desc_type = EDID1_IS_DETAILED_TIMING;
 
 		// workaround: normally, all four bytes must be zero for detailed
 		// description, but at least some Formac monitors violate that:
@@ -225,7 +224,8 @@ decode_detailed_monitor(edid1_detailed_monitor *monitor,
 					}
 					break;
 			}
-		} else {
+		} else if (raw->detailed_timing.pixel_clock > 0) {
+			monitor->monitor_desc_type = EDID1_IS_DETAILED_TIMING;
 			decode_detailed_timing(&monitor->data.detailed_timing,
 				&raw->detailed_timing);
 		}
