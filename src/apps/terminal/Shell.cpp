@@ -511,23 +511,26 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 		execve(argv[0], (char * const *)argv, environ);
 
-		/*
-		 * Exec failed.
-		 * TODO: This doesn't belong here.
-		 */
+		// Exec failed.
+		// TODO: This doesn't belong here.
 
 		sleep(1);
-		BString knonLocalizedPart = "alert --stop ";
-		const char *kLocalizedPart =
-			B_TRANSLATE("'Cannot execute \"%s\":\n\t%s' 'Use default shell' 'Abort'");
-		const char *spawnAlertMessage = knonLocalizedPart << kLocalizedPart;
-		char errorMessage[256];
-		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, argv[0], strerror(errno));
 
-		int returnValue = system(errorMessage);
-		if (returnValue == 0)
+		BString alertCommand = "alert --stop '";
+		alertCommand += B_TRANSLATE("Cannot execute \"%command\":\n\t%error");
+		alertCommand += "' '";
+		alertCommand += B_TRANSLATE("Use default shell");
+		alertCommand += "' '";
+		alertCommand += B_TRANSLATE("Abort");
+		alertCommand += "'";
+		alertCommand.ReplaceFirst("%command", argv[0]);
+		alertCommand.ReplaceFirst("%error", strerror(errno));
+
+		int returnValue = system(alertCommand.String());
+		if (returnValue == 0) {
 			execl(kDefaultShellCommand[0], kDefaultShellCommand[0],
 				kDefaultShellCommand[1], NULL);
+		}
 
 		exit(1);
 	}
