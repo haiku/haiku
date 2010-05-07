@@ -20,7 +20,7 @@
 
 UninstallWindow::UninstallWindow()
 	:
-	BWindow(BRect(100, 100, 600, 300), TR("Installed packages"),
+	BWindow(BRect(100, 100, 600, 300), B_TRANSLATE("Installed packages"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_QUIT_ON_WINDOW_CLOSE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {

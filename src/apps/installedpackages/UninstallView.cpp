@@ -82,7 +82,7 @@ UninstallView::UninstallView()
 	:
 	BGroupView(B_VERTICAL)
 {
-	fNoPackageSelectedString = TR("No package selected.");
+	fNoPackageSelectedString = B_TRANSLATE("No package selected.");
 	_InitView();
 }
 
@@ -159,7 +159,7 @@ UninstallView::MessageReceived(BMessage* msg)
 				if (fWatcherRunning) {
 					_AddFile(filename.String(), ref);
 				} else {
-					// This most likely means we were waiting for 
+					// This most likely means we were waiting for
 					// the packages/ dir to appear
 					if (filename == "packages") {
 						if (watch_node(&ref, B_WATCH_DIRECTORY, this) == B_OK)
@@ -246,13 +246,15 @@ UninstallView::MessageReceived(BMessage* msg)
 				fDescription->SetText(fNoPackageSelectedString);
 
 				notify = new BAlert("removal_success",
-					TR("The package you selected has been successfully removed "
-					"from your system."), TR("OK"));
+					B_TRANSLATE("The package you selected has been "
+					"successfully removed from your system."),
+					B_TRANSLATE("OK"));
 			} else {
 				notify = new BAlert("removal_failed",
-					TR("The selected package was not removed from your system. "
+					B_TRANSLATE(
+					"The selected package was not removed from your system. "
 					"The given installed package information file might have "
-					"been corrupted."), TR("OK"), NULL, 
+					"been corrupted."), B_TRANSLATE("OK"), NULL,
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			}
 
@@ -276,7 +278,7 @@ UninstallView::_InitView()
 		0, false, true, B_NO_BORDER);
 
 	BStringView* descriptionLabel = new BStringView("desc_label",
-		TR("Package description"));
+		B_TRANSLATE("Package description"));
 	descriptionLabel->SetFont(be_bold_font);
 
 	fDescription = new BTextView("description", B_WILL_DRAW);
@@ -285,7 +287,8 @@ UninstallView::_InitView()
 	fDescription->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fDescription->SetText(fNoPackageSelectedString);
 
-	fButton = new BButton("removal", TR("Remove"), new BMessage(P_MSG_REMOVE));
+	fButton = new BButton("removal", B_TRANSLATE("Remove"),
+		new BMessage(P_MSG_REMOVE));
 	fButton->SetEnabled(false);
 
 	const float spacing = be_control_look->DefaultItemSpacing();
