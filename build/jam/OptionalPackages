@@ -1106,8 +1106,8 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
-				Pe-2.4.2-r597-r1a2-x86-gcc2-2010-05-04.zip
-				: $(baseURL)/Pe-2.4.2-r597-r1a2-x86-gcc2-2010-05-04.zip
+				Pe-2.4.2-r597-r1a2-x86-gcc2-2010-05-06.zip
+				: $(baseURL)/Pe-2.4.2-r597-r1a2-x86-gcc2-2010-05-06.zip
 			;
 		}
 
