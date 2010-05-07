@@ -83,15 +83,17 @@ status_t PrintServerApp::async_thread(void* data)
 					// If no default printer is set, give user
 					// choice of aborting or setting up a printer
 					int32 count = Printer::CountPrinters();
-					BString alertText(TR("There are no printers set up."));
+					BString alertText(
+						B_TRANSLATE("There are no printers set up."));
 					if (count > 0)
-						alertText.SetTo(
-							TR("There is no default printer set up."));
+						alertText.SetTo(B_TRANSLATE(
+							"There is no default printer set up."));
 
 					alertText.Append(" ");
-					alertText.Append(TR("Would you like to set one up now?"));
+					alertText.Append(
+						B_TRANSLATE("Would you like to set one up now?"));
 					BAlert* alert = new BAlert("Info", alertText.String(),
-						TR("No"), TR("Yes"));
+						B_TRANSLATE("No"), B_TRANSLATE("Yes"));
 					if (alert->Go() == 1) {
 						if (count == 0)
 							run_add_printer_panel();
@@ -133,11 +135,11 @@ status_t PrintServerApp::async_thread(void* data)
 						transportPath.String()) == B_OK) {
 						// If printer was created ok,
 						// ask if it needs to be the default
-						BString text(TR("Would you like to make @ "
+						BString text(B_TRANSLATE("Would you like to make @ "
 							"the default printer?"));
 						text.ReplaceFirst("@", printerName.String());
-						BAlert* alert = new BAlert("", text.String(), TR("No"),
-							TR("Yes"));
+						BAlert* alert = new BAlert("", text.String(),
+							B_TRANSLATE("No"), B_TRANSLATE("Yes"));
 						if (alert->Go() == 1)
 							p->app->SelectPrinter(printerName.String());
 					}

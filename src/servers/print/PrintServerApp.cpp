@@ -428,17 +428,19 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 				// the printer exists, but no default at all
 				return B_OK;
 			} else {
-				info.SetTo(TR("There already exists a printer you are going to "
+				info.SetTo(B_TRANSLATE(
+					"There already exists a printer you are going to "
 					"create, but it's driver could not be found! Replace?"));
 			}
 		} else {
-			info.SetTo(TR("There already exists a printer you are going to "
+			info.SetTo(B_TRANSLATE(
+				"There already exists a printer you are going to "
 				"create, but it's not usable at all! Replace?"));
 		}
 
 		if (info.Length() != 0) {
-			BAlert *alert = new BAlert("Info", info.String(), TR("Cancel"),
-				TR("OK"));
+			BAlert *alert = new BAlert("Info", info.String(),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("OK"));
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 0)
 				return rc;

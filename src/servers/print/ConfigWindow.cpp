@@ -68,18 +68,18 @@ static struct PageFormat
 	float height;
 } pageFormat[] =
 {
-	{TR_MARK("Letter"), letter_width, letter_height },
-	{TR_MARK("Legal"),  legal_width,  legal_height  },
-	{TR_MARK("Ledger"), ledger_width, ledger_height  },
-	{TR_MARK("Tabloid"), tabloid_width, tabloid_height  },
-	{TR_MARK("A0"),     a0_width,     a0_height     },
-	{TR_MARK("A1"),     a1_width,     a1_height     },
-	{TR_MARK("A2"),     a2_width,     a2_height     },
-	{TR_MARK("A3"),     a3_width,     a3_height     },
-	{TR_MARK("A4"),     a4_width,     a4_height     },
-	{TR_MARK("A5"),     a5_width,     a5_height     },
-	{TR_MARK("A6"),     a6_width,     a6_height     },
-	{TR_MARK("B5"),     b5_width,     b5_height     },
+	{B_TRANSLATE_MARK("Letter"), letter_width, letter_height },
+	{B_TRANSLATE_MARK("Legal"),  legal_width,  legal_height  },
+	{B_TRANSLATE_MARK("Ledger"), ledger_width, ledger_height  },
+	{B_TRANSLATE_MARK("Tabloid"), tabloid_width, tabloid_height  },
+	{B_TRANSLATE_MARK("A0"),     a0_width,     a0_height     },
+	{B_TRANSLATE_MARK("A1"),     a1_width,     a1_height     },
+	{B_TRANSLATE_MARK("A2"),     a2_width,     a2_height     },
+	{B_TRANSLATE_MARK("A3"),     a3_width,     a3_height     },
+	{B_TRANSLATE_MARK("A4"),     a4_width,     a4_height     },
+	{B_TRANSLATE_MARK("A5"),     a5_width,     a5_height     },
+	{B_TRANSLATE_MARK("A6"),     a6_width,     a6_height     },
+	{B_TRANSLATE_MARK("B5"),     b5_width,     b5_height     },
 };
 
 
@@ -111,7 +111,7 @@ LeftAlign(BView* view)
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BMessage* settings, AutoReply* sender)
-	: BWindow(ConfigWindow::GetWindowFrame(), TR("Page setup"),
+	: BWindow(ConfigWindow::GetWindowFrame(), B_TRANSLATE("Page setup"),
 		B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 	, fKind(kind)
@@ -126,7 +126,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	PrinterForMimeType();
 
 	if (kind == kJobSetup)
-		SetTitle(TR("Print setup"));
+		SetTitle(B_TRANSLATE("Print setup"));
 
 	BView* panel = new BBox(Bounds(), "temporary", B_FOLLOW_ALL, B_WILL_DRAW);
 	AddChild(panel);
@@ -134,10 +134,10 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BRect dummyRect(0, 0, 1, 1);
 
 	// print selection pop up menu
-	BPopUpMenu* menu = new BPopUpMenu(TR("Select a printer"));
+	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Select a printer"));
 	SetupPrintersMenu(menu);
 
-	fPrinters = new BMenuField(TR("Printer:"), menu, NULL);
+	fPrinters = new BMenuField(B_TRANSLATE("Printer:"), menu, NULL);
 
 	// page format button
 	fPageSetup = AddPictureButton(panel, dummyRect, "Paper setup",
@@ -145,7 +145,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 
 	// add description to button
 	BStringView *pageFormatTitle = new BStringView("paperSetupTitle",
-		TR("Paper setup:"));
+		B_TRANSLATE("Paper setup:"));
 	fPageFormatText = new BStringView("paperSetupText", "");
 
 	// page selection button
@@ -155,7 +155,8 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 		fJobSetup = AddPictureButton(panel, dummyRect, "Page setup",
 			"JOB_SETUP_ON", "JOB_SETUP_OFF", MSG_JOB_SETUP);
 		// add description to button
-		jobSetupTitle = new BStringView("jobSetupTitle", TR("Page setup:"));
+		jobSetupTitle = new BStringView("jobSetupTitle",
+			B_TRANSLATE("Page setup:"));
 		fJobSetupText = new BStringView("jobSetupText", "");
 	}
 
@@ -165,9 +166,10 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	// Cancel & OK button
-	BButton* cancel = new BButton(dummyRect, "Cancel", TR("Cancel"),
+	BButton* cancel = new BButton(dummyRect, "Cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
-	fOk = new BButton(dummyRect, "OK", TR("OK"), new BMessage(MSG_OK));
+	fOk = new BButton(dummyRect, "OK", B_TRANSLATE("OK"),
+		new BMessage(MSG_OK));
 
 	RemoveChild(panel);
 
@@ -295,7 +297,8 @@ kAbout =
 void
 ConfigWindow::AboutRequested()
 {
-	BAlert *about = new BAlert("About printer server", kAbout, TR("OK"));
+	BAlert *about = new BAlert("About printer server", kAbout,
+		B_TRANSLATE("OK"));
 	about->Go();
 }
 
@@ -456,10 +459,10 @@ void ConfigWindow::UpdateUI()
 		fPageSetup->SetEnabled(false);
 		if (fJobSetup) {
 			fJobSetup->SetEnabled(false);
-			fJobSetupText->SetText(TR("Undefined"));
+			fJobSetupText->SetText(B_TRANSLATE("Undefined"));
 		}
 		fOk->SetEnabled(false);
-		fPageFormatText->SetText(TR("Undefined"));
+		fPageFormatText->SetText(B_TRANSLATE("Undefined"));
 	} else {
 		fPageSetup->SetEnabled(true);
 
@@ -479,11 +482,11 @@ void ConfigWindow::UpdateUI()
 			int32 orientation = 0;
 			fPageSettings.FindInt32(PSRV_FIELD_ORIENTATION, &orientation);
 			if (orientation == 0)
-				pageFormat << ", " << TR("Portrait");
+				pageFormat << ", " << B_TRANSLATE("Portrait");
 			else
-				pageFormat << ", " << TR("Landscape");
+				pageFormat << ", " << B_TRANSLATE("Landscape");
 		} else {
-			pageFormat << TR("Undefined");
+			pageFormat << B_TRANSLATE("Undefined");
 		}
 		fPageFormatText->SetText(pageFormat.String());
 
@@ -494,18 +497,18 @@ void ConfigWindow::UpdateUI()
 			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
 				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
 				if (first >= 1 && first <= last && last != INT_MAX) {
-					job << TR("Page") << " " << first << " " << TR("to") << " "
-						<< last;
+					job << B_TRANSLATE("Page") << " " << first << " " <<
+						B_TRANSLATE("to") << " " << last;
 				} else {
-					job << TR("All pages");
+					job << B_TRANSLATE("All pages");
 				}
 				int32 copies;
 				if (fJobSettings.FindInt32(PSRV_FIELD_COPIES, &copies)
 					== B_OK && copies > 1) {
-					job << ", " << copies << " " << TR("copies");
+					job << ", " << copies << " " << B_TRANSLATE("copies");
 				}
 			} else {
-				job << TR("Undefined");
+				job << B_TRANSLATE("Undefined");
 			}
 			fJobSetupText->SetText(job.String());
 		}
