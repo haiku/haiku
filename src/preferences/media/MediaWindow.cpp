@@ -33,7 +33,7 @@
 // Images
 #include "iconfile.h"
 
-#define TR_CONTEXT "Media Window"
+#define B_TRANSLATE_CONTEXT "Media Window"
 
 const uint32 ML_SELECTED_NODE = 'MlSN';
 const uint32 ML_INIT_MEDIA = 'MlIM';

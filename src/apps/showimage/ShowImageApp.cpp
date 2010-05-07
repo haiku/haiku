@@ -47,8 +47,8 @@ ShowImageApp::~ShowImageApp()
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "AboutWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AboutWindow"
 
 void
 ShowImageApp::AboutRequested()

@@ -33,7 +33,7 @@
 #include "UnzipEngine.h"
 
 
-#define TR_CONTEXT "InstallProgress"
+#define B_TRANSLATE_CONTEXT "InstallProgress"
 
 
 //#define COPY_TRACE

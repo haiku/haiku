@@ -36,7 +36,7 @@ class CatalogSpeed {
 		void TestIdLookup();
 };
 
-#define TR_CONTEXT "CatalogSpeed"
+#define B_TRANSLATE_CONTEXT "CatalogSpeed"
 
 #define catSig "x-vnd.Be.locale.catalogSpeed"
 #define catName catSig".catalog"
@@ -47,7 +47,7 @@ CatalogSpeed::TestCreation()
 {
 	for (uint32 i = 0; i < kNumStrings; i++) {
 		strs[i] << "native-string#" << 1000000+i;
-		ctxs[i] << TR_CONTEXT;
+		ctxs[i] << B_TRANSLATE_CONTEXT;
 		trls[i] << "translation#" << 4000000+i;
 	}
 

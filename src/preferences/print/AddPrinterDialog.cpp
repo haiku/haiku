@@ -35,8 +35,8 @@
 #include <stdio.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "AddPrinterDialog"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AddPrinterDialog"
 
 
 AddPrinterDialog::AddPrinterDialog(BWindow *parent)

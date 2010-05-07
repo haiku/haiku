@@ -33,8 +33,8 @@ using BPrivate::LocaleBackend;
 #include <binary_compatibility/Interface.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "ColorControl"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ColorControl"
 
 static const uint32 kMsgColorEntered = 'ccol';
 static const uint32 kMinCellSize = 6;

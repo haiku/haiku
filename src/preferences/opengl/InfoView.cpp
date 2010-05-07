@@ -21,7 +21,7 @@
 #include <GL/glut.h>
 
 
-#define TR_CONTEXT "InfoView"
+#define B_TRANSLATE_CONTEXT "InfoView"
 
 
 InfoView::InfoView()

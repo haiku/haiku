@@ -43,8 +43,8 @@ DirectoryRefFilter::Filter(const entry_ref *ref, BNode* node,
 
 //	#pragma mark -
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "DirectoryFilePanel"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DirectoryFilePanel"
 
 
 DirectoryFilePanel::DirectoryFilePanel(file_panel_mode mode, BMessenger* target,

@@ -27,8 +27,8 @@
 
 #include "ScopeView.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Scope View"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Scope View"
 
 
 //------------------------------------------------------------------------------

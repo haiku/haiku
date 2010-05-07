@@ -19,8 +19,8 @@
 #include <stdio.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "HEventList"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "HEventList"
 
 
 HEventRow::HEventRow(const char* name, const char* path)

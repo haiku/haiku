@@ -11,8 +11,8 @@
 #include <TextView.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "VirtualMemoryApp"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "VirtualMemoryApp"
 
 
 VirtualMemory::VirtualMemory()

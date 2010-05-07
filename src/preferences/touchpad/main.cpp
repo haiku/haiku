@@ -35,8 +35,8 @@ public:
 };
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "TouchpadMain"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TouchpadMain"
 
 
 int

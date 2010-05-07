@@ -29,7 +29,7 @@
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 
-#define TR_CONTEXT "Status view"
+#define B_TRANSLATE_CONTEXT "Status view"
 #define MAX_FREQ_STRING "9999MHz"
 
 
@@ -218,20 +218,20 @@ FrequencyMenu::FrequencyMenu(BMenu* menu, BHandler* target,
 {
 	BCatalog catalog("x-vnd.Haiku-CPUFrequencyPref");
 	fDynamicPerformance = new BMenuItem(
-		catalog.GetString("Dynamic performance", TR_CONTEXT),
+		catalog.GetString("Dynamic performance", B_TRANSLATE_CONTEXT),
 		new BMessage(kMsgPolicyDynamic));
 	fHighPerformance = new BMenuItem(
-		catalog.GetString("High performance", TR_CONTEXT),
+		catalog.GetString("High performance", B_TRANSLATE_CONTEXT),
 		new BMessage(kMsgPolicyPerformance));
 	fLowEnergie = new BMenuItem(catalog.GetString("Low energy",
-		TR_CONTEXT), new BMessage(kMsgPolicyLowEnergy));
+		B_TRANSLATE_CONTEXT), new BMessage(kMsgPolicyLowEnergy));
 
 	menu->AddItem(fDynamicPerformance);
 	menu->AddItem(fHighPerformance);
 	menu->AddItem(fLowEnergie);
 
 	fCustomStateMenu = new BMenu(catalog.GetString("Set state",
-		TR_CONTEXT));
+		B_TRANSLATE_CONTEXT));
 
 	StateList* stateList = fInterface->GetCpuFrequencyStates();
 	for (int i = 0; i < stateList->CountItems(); i++) {
@@ -432,8 +432,8 @@ StatusView::_AboutRequested()
 {
 	BAlert *alert = new BAlert("about", fCatalog.GetString("CPUFrequency\n"
 			"\twritten by Clemens Zeidler\n"
-			"\tCopyright 2009, Haiku, Inc.\n", TR_CONTEXT),
-		fCatalog.GetString("Ok", TR_CONTEXT));
+			"\tCopyright 2009, Haiku, Inc.\n", B_TRANSLATE_CONTEXT),
+		fCatalog.GetString("Ok", B_TRANSLATE_CONTEXT));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -514,14 +514,14 @@ StatusView::AttachedToWindow()
 
 	fPreferencesMenu->AddSeparatorItem();
 	fOpenPrefItem = new BMenuItem(fCatalog.GetString(
-			"Open Speedstep preferences" B_UTF8_ELLIPSIS, TR_CONTEXT),
+			"Open Speedstep preferences" B_UTF8_ELLIPSIS, B_TRANSLATE_CONTEXT),
 		new BMessage(kMsgOpenSSPreferences));
 	fPreferencesMenu->AddItem(fOpenPrefItem);
 	fOpenPrefItem->SetTarget(this);
 
 	if (fInDeskbar) {
 		fQuitItem= new BMenuItem(fCatalog.GetString("Quit",
-			TR_CONTEXT), new BMessage(B_QUIT_REQUESTED));
+			B_TRANSLATE_CONTEXT), new BMessage(B_QUIT_REQUESTED));
 		fPreferencesMenu->AddItem(fQuitItem);
 		fQuitItem->SetTarget(this);
 	}

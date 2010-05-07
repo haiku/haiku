@@ -21,7 +21,7 @@
 #include <string.h>
 
 
-#define TR_CONTEXT "Locale Preflet"
+#define B_TRANSLATE_CONTEXT "Locale Preflet"
 
 
 const char* kSignature = "application/x-vnd.Haiku-Locale";

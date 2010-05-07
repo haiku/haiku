@@ -19,8 +19,8 @@
 #include <stdio.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PackageInstall"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PackageInstall"
 
 
 static int32

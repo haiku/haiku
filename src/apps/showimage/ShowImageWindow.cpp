@@ -183,8 +183,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	fImageView->SetImage(ref);
 	fImageView->SetTrackerMessenger(trackerMessenger);
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "LoadAlerts"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "LoadAlerts"
 
 	if (InitCheck() != B_OK) {
 		BAlert* alert;
@@ -200,8 +200,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 		return;
 	}
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Menus"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
 
 	// add View menu here so it can access ShowImageView methods
 	BMenu* menu = new BMenu(B_TRANSLATE("View"));
@@ -255,8 +255,8 @@ ShowImageWindow::BuildContextMenu(BMenu* menu)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Menus"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
 
 void
 ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
@@ -1016,8 +1016,8 @@ bs_printf(BString* string, const char* format, ...)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "ClosePrompt"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ClosePrompt"
 
 bool
 ShowImageWindow::_ClosePrompt()

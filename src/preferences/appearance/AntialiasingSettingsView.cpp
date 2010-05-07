@@ -27,8 +27,8 @@
 
 #include "APRWindow.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "AntialiasingSettingsView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AntialiasingSettingsView"
 
 
 //#define DISABLE_HINTING_CONTROL

@@ -15,7 +15,7 @@
 #include "defs.h"
 
 
-#define TR_CONTEXT "main"
+#define B_TRANSLATE_CONTEXT "main"
 
 BluetoothApplication::BluetoothApplication(void)
  :	BApplication(BLUETOOTH_APP_SIGNATURE)

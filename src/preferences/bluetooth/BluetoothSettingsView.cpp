@@ -26,7 +26,7 @@
 #include "defs.h"
 #include "BluetoothWindow.h"
 
-#define TR_CONTEXT "Settings view"
+#define B_TRANSLATE_CONTEXT "Settings view"
 
 static const int32 kMsgSetAntialiasing = 'anti';
 static const int32 kMsgSetDeviceClassDesktop = 'sDCd';

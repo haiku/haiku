@@ -21,7 +21,7 @@
 #include <GL/glut.h>
 
 
-#define TR_CONTEXT "Capabilities"
+#define B_TRANSLATE_CONTEXT "Capabilities"
 
 
 void

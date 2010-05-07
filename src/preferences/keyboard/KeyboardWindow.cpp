@@ -24,8 +24,8 @@
 #include <Slider.h>
 #include <TextControl.h>
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "KeyboardWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "KeyboardWindow"
 
 KeyboardWindow::KeyboardWindow()
 	: BWindow(BRect(0, 0, 200, 200), B_TRANSLATE("Keyboard"), B_TITLED_WINDOW,

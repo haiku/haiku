@@ -14,7 +14,7 @@
 #include <String.h>
 
 
-#define TR_CONTEXT "Extensions"
+#define B_TRANSLATE_CONTEXT "Extensions"
 
 
 ExtensionRow::ExtensionRow(const char* extensionName)

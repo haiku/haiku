@@ -19,7 +19,7 @@
 #include <Window.h>
 
 
-#define TR_CONTEXT "Image Filepanel"
+#define B_TRANSLATE_CONTEXT "Image Filepanel"
 
 
 ImageFilePanel::ImageFilePanel(file_panel_mode mode, BMessenger* target,

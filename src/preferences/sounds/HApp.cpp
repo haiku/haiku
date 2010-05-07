@@ -17,8 +17,8 @@
 #include <Locale.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "SoundsHApp"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SoundsHApp"
 
 
 HApp::HApp()

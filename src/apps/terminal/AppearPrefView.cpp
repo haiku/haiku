@@ -29,8 +29,8 @@
 #include "TermConst.h"
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal AppearancePrefView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal AppearancePrefView"
 
 
 static bool

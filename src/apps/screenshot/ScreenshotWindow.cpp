@@ -93,8 +93,8 @@ public:
 // #pragma mark - ScreenshotWindow
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "ScreenshotWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ScreenshotWindow"
 
 
 ScreenshotWindow::ScreenshotWindow()

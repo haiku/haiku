@@ -31,8 +31,8 @@
 #include <stdio.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "SettingsWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SettingsWindow"
 
 
 static const uint32 kMsgDefaults = 'dflt';

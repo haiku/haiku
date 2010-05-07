@@ -32,8 +32,8 @@
 #include "ShowImageConstants.h"
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "ResizerWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ResizerWindow"
 
 ResizerWindow::ResizerWindow(BMessenger target, int32 width, int32 height)
 	:

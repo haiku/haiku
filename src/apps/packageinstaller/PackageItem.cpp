@@ -25,8 +25,8 @@
 #include "zlib.h"
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PackageItem"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PackageItem"
 
 enum {
 	P_CHUNK_SIZE = 256
@@ -497,7 +497,7 @@ PackageItem::ParseData(uint8 *buffer, BFile *file, uint64 originalSize,
 // #pragma mark - PackageScript
 
 
-PackageScript::PackageScript(BFile *parent, uint64 offset, uint64 size, 
+PackageScript::PackageScript(BFile *parent, uint64 offset, uint64 size,
 		uint64 originalSize)
 	:
 	PackageItem(parent, NULL, 0, 0, 0, offset, size),
@@ -563,7 +563,7 @@ PackageScript::DoInstall(const char *path, ItemState *state)
 }
 
 
-const uint32 
+const uint32
 PackageScript::ItemKind()
 {
 	return P_KIND_SCRIPT;
@@ -739,7 +739,7 @@ PackageDirectory::DoInstall(const char *path, ItemState *state)
 }
 
 
-const uint32 
+const uint32
 PackageDirectory::ItemKind()
 {
 	return P_KIND_DIRECTORY;
@@ -905,7 +905,7 @@ PackageFile::DoInstall(const char *path, ItemState *state)
 }
 
 
-const uint32 
+const uint32
 PackageFile::ItemKind()
 {
 	return P_KIND_FILE;
@@ -1040,7 +1040,7 @@ PackageLink::DoInstall(const char *path, ItemState *state)
 }
 
 
-const uint32 
+const uint32
 PackageLink::ItemKind()
 {
 	return P_KIND_SYM_LINK;

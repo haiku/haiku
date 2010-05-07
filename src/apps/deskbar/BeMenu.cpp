@@ -52,8 +52,8 @@ All rights reserved.
 #include "StatusView.h"
 #include "tracker_private.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "BeMenu"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BeMenu"
 
 #define ROSTER_SIG "application/x-vnd.Be-ROST"
 

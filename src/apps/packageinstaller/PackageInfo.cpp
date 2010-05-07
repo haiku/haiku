@@ -18,8 +18,8 @@
 #include <kernel/OS.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PackageInfo"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PackageInfo"
 
 #define RETURN_AND_SET_STATUS(err) fStatus = err; \
 	fprintf(stderr, "err at %s():%d: %x\n", __FUNCTION__, __LINE__, err); \

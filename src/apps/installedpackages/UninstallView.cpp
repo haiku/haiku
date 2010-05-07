@@ -34,8 +34,8 @@
 #include <TextView.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "UninstallView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "UninstallView"
 
 
 enum {

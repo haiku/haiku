@@ -17,8 +17,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "EntryPage"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "EntryPage"
 
 
 EntryPage::EntryPage(BMessage* settings, BRect frame, const char* name)

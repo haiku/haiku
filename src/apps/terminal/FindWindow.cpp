@@ -26,8 +26,8 @@ const uint32 MSG_FIND_HIDE = 'Fhid';
 const uint32 TOGGLE_FIND_CONTROL = 'MTFG';
 const BRect kWindowFrame(10, 30, 250, 200);
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal FindWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal FindWindow"
 
 FindWindow::FindWindow(BMessenger messenger, const BString& str,
 		bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)

@@ -17,8 +17,8 @@
 #include <stdlib.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT	"NetworkSetupWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT	"NetworkSetupWindow"
 
 
 // --------------------------------------------------------------

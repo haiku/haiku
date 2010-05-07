@@ -17,7 +17,7 @@
 #include "Support.h"
 
 
-#define TR_CONTEXT "PartitionList"
+#define B_TRANSLATE_CONTEXT "PartitionList"
 
 
 // #pragma mark - BBitmapStringField

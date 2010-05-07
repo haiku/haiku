@@ -14,8 +14,8 @@
 #include <Locale.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "UninstallWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "UninstallWindow"
 
 
 UninstallWindow::UninstallWindow()

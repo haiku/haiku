@@ -21,8 +21,8 @@
 #include <stdio.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "UninstallApplication"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "UninstallApplication"
 
 
 class UninstallApplication : public BApplication {

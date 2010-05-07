@@ -24,7 +24,7 @@
 #include <TextControl.h>
 
 
-#define TR_CONTEXT "InitParamsPanel"
+#define B_TRANSLATE_CONTEXT "InitParamsPanel"
 
 
 class InitParamsPanel::EscapeFilter : public BMessageFilter {

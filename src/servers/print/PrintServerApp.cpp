@@ -37,8 +37,8 @@
 	// for unlink
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PrintServerApp"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrintServerApp"
 
 
 BLocker *gLock = NULL;

@@ -29,8 +29,8 @@
 // #pragma mark - PairsWindow
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PairsWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PairsWindow"
 
 const uint32 MENU_NEW					= 'MGnw';
 const uint32 MENU_SIZE					= 'MGsz';

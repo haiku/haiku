@@ -34,7 +34,7 @@
 #include "TimeFormatSettingsView.h"
 
 
-#define TR_CONTEXT "Locale Preflet Window"
+#define B_TRANSLATE_CONTEXT "Locale Preflet Window"
 
 
 static const uint32 kMsgLanguageInvoked = 'LaIv';

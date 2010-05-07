@@ -40,8 +40,8 @@
 #include <stdio.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Application Types Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Application Types Window"
 
 
 class ProgressWindow : public BWindow {

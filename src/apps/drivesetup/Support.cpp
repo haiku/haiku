@@ -18,7 +18,7 @@
 #include <String.h>
 
 
-#define TR_CONTEXT "Support"
+#define B_TRANSLATE_CONTEXT "Support"
 
 
 void

@@ -64,8 +64,8 @@ focus_follows_mouse_mode_to_index(mode_focus_follows_mouse mode)
 
 //	#pragma mark -
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "SettingsView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SettingsView"
 
 SettingsView::SettingsView(MouseSettings &settings)
 	: BBox("main_view"),

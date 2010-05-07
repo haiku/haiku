@@ -23,8 +23,8 @@
 #include "StringForSize.h"
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PackagesView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PackagesView"
 
 #define ICON_ATTRIBUTE "INSTALLER PACKAGE: ICON"
 

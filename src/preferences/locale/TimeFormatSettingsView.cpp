@@ -33,7 +33,7 @@
 #include <unicode/utypes.h>
 
 
-#define TR_CONTEXT "TimeFormatSettings"
+#define B_TRANSLATE_CONTEXT "TimeFormatSettings"
 
 
 class DateMenuItem: public BMenuItem {

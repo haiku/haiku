@@ -15,8 +15,8 @@
 #include <Alert.h>
 #include <Screen.h>
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "MouseApplication"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MouseApplication"
 
 const char* kSignature = "application/x-vnd.Haiku-Mouse";
 

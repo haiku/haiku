@@ -62,8 +62,8 @@ SmartTabView::SetInsets(float left, float top, float right, float bottom)
 	fInsets.bottom = bottom;
 }
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal SmartTabView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal SmartTabView"
 
 void
 SmartTabView::MouseDown(BPoint point)

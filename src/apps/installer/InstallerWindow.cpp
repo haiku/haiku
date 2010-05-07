@@ -45,8 +45,8 @@
 #include "WorkerThread.h"
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "InstallerWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "InstallerWindow"
 
 #define DRIVESETUP_SIG "application/x-vnd.Haiku-DriveSetup"
 #define BOOTMAN_SIG "application/x-vnd.Haiku-Bootman"

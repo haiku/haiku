@@ -90,8 +90,8 @@ SetupTextControl(BTextControl *control)
 
 //	#pragma mark -
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "EthernetSettingsView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "EthernetSettingsView"
 
 EthernetSettingsView::EthernetSettingsView()
 	: BView("EthernetSettingsView", 0, NULL),

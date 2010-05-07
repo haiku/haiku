@@ -120,8 +120,8 @@ DumpList(BList* itemlist)
 #endif	/* DB_ADDONS */
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Tray"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Tray"
 
 // don't change the name of this view to anything other than "Status"!
 

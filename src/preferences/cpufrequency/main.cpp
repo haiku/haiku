@@ -12,7 +12,7 @@
 #include <Catalog.h>
 #include <Locale.h>
 
-#define TR_CONTEXT "Main window"
+#define B_TRANSLATE_CONTEXT "Main window"
 
 int
 main(int argc, char* argv[])

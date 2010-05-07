@@ -16,8 +16,8 @@
 #include <TextView.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "BootManager"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BootManager"
 
 
 static const char* kSignature = "application/x-vnd.Haiku-bootman";

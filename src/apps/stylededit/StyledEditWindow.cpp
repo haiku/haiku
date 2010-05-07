@@ -50,8 +50,8 @@ const float kLineViewWidth = 30.0;
 const char* kInfoAttributeName = "StyledEdit-info";
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "StyledEditWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "StyledEditWindow"
 
 
 // This is a temporary solution for building BString with printf like format.
@@ -102,8 +102,8 @@ StyledEditWindow::~StyledEditWindow()
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Menus"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
 
 
 void
@@ -866,8 +866,8 @@ StyledEditWindow::Quit()
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "QuitAlert"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "QuitAlert"
 
 
 bool
@@ -898,8 +898,8 @@ StyledEditWindow::QuitRequested()
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "SaveAlert"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SaveAlert"
 
 
 status_t
@@ -979,8 +979,8 @@ StyledEditWindow::Save(BMessage* message)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Open_and_SaveAsPanel"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Open_and_SaveAsPanel"
 
 
 status_t
@@ -1033,8 +1033,8 @@ StyledEditWindow::SaveAs(BMessage* message)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "LoadAlert"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "LoadAlert"
 
 
 status_t
@@ -1128,8 +1128,8 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "RevertToSavedAlert"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "RevertToSavedAlert"
 
 
 void
@@ -1169,8 +1169,8 @@ StyledEditWindow::RevertToSaved()
 	if (_LoadFile(&ref) != B_OK)
 		return;
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Menus"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
 
 	// clear undo modes
 	fUndoItem->SetLabel(B_TRANSLATE("Can't undo"));
@@ -1497,8 +1497,8 @@ StyledEditWindow::SetFontStyle(const char* fontFamily, const char* fontStyle)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Menus"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
 
 
 void

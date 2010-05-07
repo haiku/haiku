@@ -53,8 +53,8 @@
 #include <MDRLanguage.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Config Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Config Window"
 
 
 using std::nothrow;

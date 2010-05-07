@@ -21,8 +21,8 @@
 
 #include <stdio.h>
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Packageinstaller main"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Packageinstaller main"
 
 class PackageInstaller : public BApplication {
 	public:

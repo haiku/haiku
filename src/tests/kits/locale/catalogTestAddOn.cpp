@@ -16,7 +16,7 @@ class CatalogTestAddOn {
 		void Check();
 };
 
-#define TR_CONTEXT "CatalogTestAddOn"
+#define B_TRANSLATE_CONTEXT "CatalogTestAddOn"
 
 #define catSig "add-ons/catalogTest/catalogTestAddOn"
 #define catName catSig".catalog"
@@ -27,7 +27,7 @@ CatalogTestAddOn::Run() {
 	printf("addon...");
 	status_t res;
 	BString s;
-	s << "string" << "\x01" << TR_CONTEXT << "\x01";
+	s << "string" << "\x01" << B_TRANSLATE_CONTEXT << "\x01";
 	size_t hashVal = CatKey::HashFun(s.String());
 	assert(be_locale != NULL);
 	system("mkdir -p ./locale/catalogs/"catSig);
@@ -37,7 +37,7 @@ CatalogTestAddOn::Run() {
 	assert(cat1.InitCheck() == B_OK);
 
 	// ...and populate the catalog with some data:
-	res = cat1.SetString("string", "Schnur_A", TR_CONTEXT);
+	res = cat1.SetString("string", "Schnur_A", B_TRANSLATE_CONTEXT);
 	assert(res == B_OK);
 	res = cat1.SetString(hashVal, "Schnur_id_A");
 		// add a second entry for the same hash-value, but with different translation
@@ -46,13 +46,13 @@ CatalogTestAddOn::Run() {
 	assert(res == B_OK);
 	res = cat1.SetString("string", "Textpuffer_A", "programming", "Deutsches Fachbuch");
 	assert(res == B_OK);
-	res = cat1.SetString("string", "Leine_A", TR_CONTEXT, "Deutsches Fachbuch");
+	res = cat1.SetString("string", "Leine_A", B_TRANSLATE_CONTEXT, "Deutsches Fachbuch");
 	assert(res == B_OK);
 	res = cat1.WriteToFile("./locale/catalogs/"catSig"/german.catalog");
 	assert(res == B_OK);
 
 	// check if we are getting back the correct strings:
-	s = cat1.GetString("string", TR_CONTEXT);
+	s = cat1.GetString("string", B_TRANSLATE_CONTEXT);
 	assert(s == "Schnur_A");
 	s = cat1.GetString(hashVal);
 	assert(s == "Schnur_id_A");
@@ -60,7 +60,7 @@ CatalogTestAddOn::Run() {
 	assert(s == "String_A");
 	s = cat1.GetString("string", "programming", "Deutsches Fachbuch");
 	assert(s == "Textpuffer_A");
-	s = cat1.GetString("string", TR_CONTEXT, "Deutsches Fachbuch");
+	s = cat1.GetString("string", B_TRANSLATE_CONTEXT, "Deutsches Fachbuch");
 	assert(s == "Leine_A");
 
 	// now we create a new (base) catalog and embed this one into the add-on-file:
@@ -73,7 +73,7 @@ CatalogTestAddOn::Run() {
 	res = cat2.SetString(32, "hashed string_A");
 	assert(res == B_OK);
 	// the following string will be hidden by the definition inside the german catalog:
-	res = cat2.SetString("string", "hidden_A", TR_CONTEXT);
+	res = cat2.SetString("string", "hidden_A", B_TRANSLATE_CONTEXT);
 	assert(res == B_OK);
 	entry_ref addOnRef;
 	res = get_add_on_ref(&addOnRef);
@@ -91,7 +91,7 @@ CatalogTestAddOn::Check() {
 	status_t res;
 	printf("addon-check...");
 	BString s;
-	s << "string" << "\x01" << TR_CONTEXT << "\x01";
+	s << "string" << "\x01" << B_TRANSLATE_CONTEXT << "\x01";
 	size_t hashVal = CatKey::HashFun(s.String());
 	// ok, we now try to re-load the catalog that has just been written:
 	//

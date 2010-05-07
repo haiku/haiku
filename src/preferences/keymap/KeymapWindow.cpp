@@ -39,7 +39,7 @@
 #include "KeymapListItem.h"
 
 
-#define TR_CONTEXT "Keymap window"
+#define B_TRANSLATE_CONTEXT "Keymap window"
 
 
 static const uint32 kMsgMenuFileOpen = 'mMFO';

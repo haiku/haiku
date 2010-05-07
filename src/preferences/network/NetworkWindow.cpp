@@ -15,8 +15,8 @@
 
 #include "EthernetSettingsView.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "NetworkWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "NetworkWindow"
 
 NetworkWindow::NetworkWindow()
 	: BWindow(BRect(50, 50, 269, 302), B_TRANSLATE("Network"), B_TITLED_WINDOW,

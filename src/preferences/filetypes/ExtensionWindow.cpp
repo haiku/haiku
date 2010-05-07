@@ -24,8 +24,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Extension Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Extension Window"
 
 
 const uint32 kMsgExtensionUpdated = 'exup';

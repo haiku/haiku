@@ -54,7 +54,7 @@ of their respective holders. All rights reserved.
 #include <mail_encoding.h>
 
 
-#define TR_CONTEXT "Settings"
+#define B_TRANSLATE_CONTEXT "Settings"
 
 
 using namespace BPrivate ;

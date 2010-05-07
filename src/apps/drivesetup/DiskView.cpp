@@ -18,7 +18,7 @@
 #include "MainWindow.h"
 
 
-#define TR_CONTEXT "DiskView"
+#define B_TRANSLATE_CONTEXT "DiskView"
 
 using BPrivate::HashMap;
 using BPrivate::HashKey32;

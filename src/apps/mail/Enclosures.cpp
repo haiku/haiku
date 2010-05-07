@@ -64,7 +64,7 @@ of their respective holders. All rights reserved.
 #include "Messages.h"
 
 
-#define TR_CONTEXT "Mail"
+#define B_TRANSLATE_CONTEXT "Mail"
 
 
 static const float kPlainFontSizeScale = 0.9;

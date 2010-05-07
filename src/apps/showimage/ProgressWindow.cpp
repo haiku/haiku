@@ -20,8 +20,8 @@
 
 static const uint32 kMsgShow = 'show';
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "ProgressWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProgressWindow"
 
 
 ProgressWindow::ProgressWindow(BWindow* referenceWindow, bool center)

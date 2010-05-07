@@ -43,8 +43,8 @@
 #include <StorageKit.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PrinterListView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrinterListView"
 
 
 // #pragma mark -- PrinterListView

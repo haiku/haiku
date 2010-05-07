@@ -15,8 +15,8 @@
 #include <Catalog.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "WizardView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "WizardView"
 
 
 static const float kSeparatorHeight = 2;

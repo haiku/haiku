@@ -23,8 +23,8 @@
 #include "KeyboardMessages.h"
 #include "KeyboardSettings.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "KeyboardView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "KeyboardView"
 
 KeyboardView::KeyboardView()
  :	BGroupView()

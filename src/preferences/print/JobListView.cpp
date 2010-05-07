@@ -44,8 +44,8 @@
 #include <Roster.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "JobListView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "JobListView"
 
 
 // #pragma mark -- JobListView

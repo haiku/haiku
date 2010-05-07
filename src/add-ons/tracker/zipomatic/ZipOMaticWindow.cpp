@@ -33,7 +33,7 @@
 #include "ZipperThread.h"
 
 
-#define TR_CONTEXT "file:ZipOMaticWindow.cpp"
+#define B_TRANSLATE_CONTEXT "file:ZipOMaticWindow.cpp"
 
 
 ZippoWindow::ZippoWindow(BList windowList, bool keepOpen)

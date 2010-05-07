@@ -25,8 +25,8 @@ ExpanderApp::ExpanderApp()
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "About"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "About"
 
 void
 ExpanderApp::AboutRequested()

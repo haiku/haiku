@@ -17,7 +17,7 @@
 #include "ZipOMaticWindow.h"
 
 
-#define TR_CONTEXT "file:ZipOMatic.cpp"
+#define B_TRANSLATE_CONTEXT "file:ZipOMatic.cpp"
 
 
 int

@@ -21,8 +21,8 @@
 #include <String.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "FileSelectionPage"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FileSelectionPage"
 
 
 const uint32 kMsgOpenFilePanel = 'open';

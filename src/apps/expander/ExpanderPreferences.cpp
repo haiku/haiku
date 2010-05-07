@@ -21,8 +21,8 @@ const uint32 MSG_DESTUSE = 'mDeu';
 const uint32 MSG_DESTTEXT = 'mDet';
 const uint32 MSG_DESTSELECT = 'mDes';
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "ExpanderPreferences"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ExpanderPreferences"
 
 ExpanderPreferences::ExpanderPreferences(BMessage *settings)
 	: BWindow(BRect(0, 0, 325, 305), "Expander", B_MODAL_WINDOW,

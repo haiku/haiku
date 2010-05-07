@@ -38,8 +38,8 @@
 #define _W(a) (a->Frame().Width())
 #define _H(a) (a->Frame().Height())
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Main Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Main Window"
 
 //------------------------------------------------------------------------------
 

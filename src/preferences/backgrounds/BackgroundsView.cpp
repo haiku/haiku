@@ -32,7 +32,7 @@
 #include "ImageFilePanel.h"
 
 
-#define TR_CONTEXT "Main View"
+#define B_TRANSLATE_CONTEXT "Main View"
 
 
 static const uint32 kMsgApplySettings = 'aply';

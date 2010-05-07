@@ -31,8 +31,8 @@
 #include <GroupLayoutBuilder.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "ConfigWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ConfigWindow"
 
 
 static const float a0_width = 2380.0;
@@ -90,7 +90,7 @@ static void GetPageFormat(float w, float h, BString& label)
 		struct PageFormat& pf = pageFormat[i];
 		if (pf.width == w && pf.height == h || pf.width == h
 			&& pf.height == w) {
-			label = be_catalog->GetString(pf.label, TR_CONTEXT);
+			label = be_catalog->GetString(pf.label, B_TRANSLATE_CONTEXT);
 			return;
 		}
 	}

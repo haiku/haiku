@@ -22,8 +22,8 @@
 #include <TextControl.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "FindandReplaceWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FindandReplaceWindow"
 
 FindWindow::FindWindow(BRect frame, BHandler* _handler, BString* searchString,
 	bool caseState, bool wrapState, bool backState)

@@ -27,8 +27,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Icon View"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Icon View"
 
 
 using namespace std;

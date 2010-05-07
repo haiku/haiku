@@ -19,7 +19,7 @@
 #include <GL/glu.h>
 
 
-#define TR_CONTEXT "Extensions"
+#define B_TRANSLATE_CONTEXT "Extensions"
 
 
 ExtensionsView::ExtensionsView()

@@ -31,8 +31,8 @@
 #include <stdio.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "FileType Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FileType Window"
 
 
 const uint32 kMsgTypeEntered = 'type';

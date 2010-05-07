@@ -1248,8 +1248,8 @@ ShowImageView::_OutputFormatForType(BBitmap* bitmap, const char* type,
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "SaveToFile"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SaveToFile"
 
 
 void

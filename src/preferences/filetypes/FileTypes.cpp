@@ -26,8 +26,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "FileTypes"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FileTypes"
 
 
 const char *kSignature = "application/x-vnd.Haiku-FileTypes";

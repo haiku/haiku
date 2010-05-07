@@ -28,7 +28,7 @@
 #include <String.h>
 
 
-#define TR_CONTEXT "CreateParamsPanel"
+#define B_TRANSLATE_CONTEXT "CreateParamsPanel"
 
 
 class CreateParamsPanel::EscapeFilter : public BMessageFilter {

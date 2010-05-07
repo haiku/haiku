@@ -24,8 +24,8 @@
 #include <String.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PartitionsPage"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PartitionsPage"
 
 
 const uint32 kMessageShow = 'show';

@@ -23,8 +23,8 @@ enum {
 	P_MSG_DECLINE
 };
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PackageTextViewer"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PackageTextViewer"
 
 
 PackageTextViewer::PackageTextViewer(const char *text, bool disclaimer)

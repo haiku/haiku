@@ -17,8 +17,8 @@
 #include <Locale.h>
 #include <TextView.h>
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "main"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "main"
 
 class FontsApp : public BApplication {
 	public:

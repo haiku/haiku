@@ -68,8 +68,8 @@ enum {
 };
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "TimeView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TimeView"
 
 TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	bool milTime, bool fullDate, bool euroDate, bool)

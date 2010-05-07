@@ -254,8 +254,8 @@ TouchpadView::DrawSliders()
 
 //	#pragma mark - TouchpadPrefView
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "TouchpadPrefView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TouchpadPrefView"
 
 
 TouchpadPrefView::TouchpadPrefView()

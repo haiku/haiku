@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PackageStatus"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PackageStatus"
 
 StopButton::StopButton()
 	:

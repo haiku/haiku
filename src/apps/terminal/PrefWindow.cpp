@@ -23,8 +23,8 @@
 
 #include <stdio.h>
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal PrefWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal PrefWindow"
 
 PrefWindow::PrefWindow(const BMessenger &messenger)
 	: BWindow(BRect(0, 0, 375, 185), B_TRANSLATE("Terminal settings"),

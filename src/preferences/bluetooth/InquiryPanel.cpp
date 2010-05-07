@@ -26,7 +26,7 @@
 #include "DeviceListItem.h"
 #include "InquiryPanel.h"
 
-#define TR_CONTEXT "Inquiry panel"
+#define B_TRANSLATE_CONTEXT "Inquiry panel"
 
 using Bluetooth::DeviceListItem;
 

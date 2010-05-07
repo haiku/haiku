@@ -17,8 +17,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Type List Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Type List Window"
 
 
 const uint32 kMsgTypeSelected = 'tpsl';

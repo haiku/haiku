@@ -43,8 +43,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Application Type Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Application Type Window"
 
 
 const uint32 kMsgSave = 'save';

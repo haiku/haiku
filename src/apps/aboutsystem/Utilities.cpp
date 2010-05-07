@@ -17,8 +17,8 @@
 #include <Message.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Utilities"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Utilities"
 
 
 BString

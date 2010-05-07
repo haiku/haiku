@@ -46,8 +46,8 @@
 #include <FindDirectory.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PrintersWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrintersWindow"
 
 
 PrintersWindow::PrintersWindow(BRect frame)

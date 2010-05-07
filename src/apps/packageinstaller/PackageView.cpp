@@ -35,8 +35,8 @@
 #include <stdio.h> // For debugging
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PackageView"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PackageView"
 
 const float kMaxDescHeight = 125.0f;
 const uint32 kSeparatorIndex = 3;

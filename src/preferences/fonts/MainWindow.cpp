@@ -30,8 +30,8 @@
 
 #include "FontView.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Main window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Main window"
 
 
 static const uint32 kMsgSetDefaults = 'dflt';

@@ -10,8 +10,8 @@
 #include <Catalog.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "InstallProgress"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "InstallProgress"
 
 
 ProgressReporter::ProgressReporter(const BMessenger& messenger,

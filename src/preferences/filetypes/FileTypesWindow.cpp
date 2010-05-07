@@ -47,8 +47,8 @@
 #include <stdlib.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "FileTypes Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FileTypes Window"
 
 
 const uint32 kMsgTypeSelected = 'typs';

@@ -19,8 +19,8 @@
 #include <String.h>
 #include "ColorSet.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Colors tab"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Colors tab"
 
 static ColorDescription sColorDescriptionTable[] =
 {

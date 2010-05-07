@@ -241,8 +241,8 @@ PrefHandler::getFloat(const char *key)
 	return atof(value);
 }
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal getString"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal getString"
 
 const char*
 PrefHandler::getString(const char *key)
@@ -267,8 +267,8 @@ PrefHandler::getBool(const char *key)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal getRGB"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal getRGB"
 
 /** Returns RGB data from given key. */
 

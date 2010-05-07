@@ -25,7 +25,7 @@
 #define MAX_DRAG_HEIGHT		200.0
 #define ALPHA				170
 
-#define TR_CONTEXT "LanguageListView"
+#define B_TRANSLATE_CONTEXT "LanguageListView"
 
 
 LanguageListItem::LanguageListItem(const char* text, const char* id,

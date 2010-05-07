@@ -54,8 +54,8 @@ const static uint32 kIncreaseFontSize = 'InFs';
 const static uint32 kDecreaseFontSize = 'DcFs';
 const static uint32 kSetActiveTab = 'STab';
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal TermWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Terminal TermWindow"
 
 class CustomTermView : public TermView {
 public:

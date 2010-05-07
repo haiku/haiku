@@ -26,7 +26,7 @@
 #include "InquiryPanel.h"
 #include "RemoteDevicesView.h"
 
-#define TR_CONTEXT "Remote devices"
+#define B_TRANSLATE_CONTEXT "Remote devices"
 
 static const uint32 kMsgAddDevices = 'ddDv';
 static const uint32 kMsgRemoveDevice = 'rmDv';

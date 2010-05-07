@@ -37,8 +37,8 @@ enum {
 	MSG_KEYMAP_SELECTED		= 'kmps'
 };
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "BootPromptWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BootPromptWindow"
 
 
 class LanguageItem : public BStringItem {

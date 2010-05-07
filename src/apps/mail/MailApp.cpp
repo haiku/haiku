@@ -87,7 +87,7 @@ using namespace BPrivate ;
 #include "Words.h"
 
 
-#define TR_CONTEXT "Mail"
+#define B_TRANSLATE_CONTEXT "Mail"
 
 
 static const char *kDictDirectory = "word_dictionary";

@@ -35,8 +35,8 @@
 #include <MDRLanguage.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Config Views"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Config Views"
 
 
 // AccountConfigView

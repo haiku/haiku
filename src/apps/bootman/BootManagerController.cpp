@@ -35,7 +35,7 @@
 #include <String.h>
 
 
-#define TR_CONTEXT "BootManagerController"
+#define B_TRANSLATE_CONTEXT "BootManagerController"
 
 
 BootManagerController::BootManagerController()

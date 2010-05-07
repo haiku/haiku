@@ -30,8 +30,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Attribute Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Attribute Window"
 
 
 const uint32 kMsgAttributeUpdated = 'atup';

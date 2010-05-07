@@ -24,8 +24,8 @@
 #include "StatusView.h"
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PreferencesWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PreferencesWindow"
 
 PreferencesWindow::PreferencesWindow(BRect frame)
 	:

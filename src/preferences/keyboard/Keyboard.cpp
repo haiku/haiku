@@ -15,8 +15,8 @@
 
 #include <Alert.h>
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "KeyboardApplication"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "KeyboardApplication"
 
 KeyboardApplication::KeyboardApplication()
 	: BApplication("application/x-vnd.Haiku-Keyboard")

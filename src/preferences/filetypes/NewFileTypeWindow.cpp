@@ -27,8 +27,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "New File Type Window"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "New File Type Window"
 
 
 const uint32 kMsgSupertypeChosen = 'sptc';

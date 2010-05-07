@@ -27,7 +27,7 @@
 #include "ZipOMaticWindow.h"
 
 
-#define TR_CONTEXT "file:ZipperThread.cpp"
+#define B_TRANSLATE_CONTEXT "file:ZipperThread.cpp"
 
 
 ZipperThread::ZipperThread(BMessage* refsMessage, BWindow* window)

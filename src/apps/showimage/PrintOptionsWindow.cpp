@@ -74,8 +74,8 @@ PrintOptions::SetHeight(float h)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "PrintOptionsWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrintOptionsWindow"
 
 PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions* options,
 	BWindow* listener)

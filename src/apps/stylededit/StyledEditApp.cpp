@@ -80,8 +80,8 @@ namespace
 
 //	#pragma mark -
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Open_and_SaveAsPanel"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Open_and_SaveAsPanel"
 
 StyledEditApp::StyledEditApp()
 	: BApplication(APP_SIGNATURE),

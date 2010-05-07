@@ -33,8 +33,8 @@
 #include <MDRLanguage.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Account"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Account"
 
 
 static BList gAccounts;

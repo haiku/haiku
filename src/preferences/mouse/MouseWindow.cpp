@@ -29,8 +29,8 @@
 #include "MouseConstants.h"
 #include "SettingsView.h"
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "MouseWindow"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MouseWindow"
 
 MouseWindow::MouseWindow(BRect _rect)
 	:

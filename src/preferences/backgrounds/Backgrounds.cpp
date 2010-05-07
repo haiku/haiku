@@ -18,7 +18,7 @@
 #include "BackgroundsView.h"
 
 
-#define TR_CONTEXT "Main Window"
+#define B_TRANSLATE_CONTEXT "Main Window"
 
 
 static const char* kSignature = "application/x-vnd.Haiku-Backgrounds";

@@ -85,7 +85,7 @@ of their respective holders. All rights reserved.
 #include "Utilities.h"
 
 
-#define TR_CONTEXT "Mail"
+#define B_TRANSLATE_CONTEXT "Mail"
 
 
 using namespace BPrivate;

@@ -43,7 +43,7 @@
 #include "tracker_private.h"
 
 
-#define TR_CONTEXT "MainWindow"
+#define B_TRANSLATE_CONTEXT "MainWindow"
 
 
 class ListPopulatorVisitor : public BDiskDeviceVisitor {

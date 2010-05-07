@@ -17,8 +17,8 @@
 #include <string.h>
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "UninstallPage"
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "UninstallPage"
 
 
 UninstallPage::UninstallPage(BMessage* settings, BRect frame, const char* name)
