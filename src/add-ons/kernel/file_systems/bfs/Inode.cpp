@@ -1077,7 +1077,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 	// might happen.
 
 	Index index(fVolume);
-	index.SetTo(name);
+	bool hasIndex = index.SetTo(name) == B_OK;
 
 	Inode* attribute = NULL;
 	status_t status = B_OK;
@@ -1131,48 +1131,60 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 	}
 
 	if (attribute != NULL) {
-		// TODO: we need to lock the inode in the transaction, see WriteAt()!
-		if (rw_lock_write_lock(&attribute->fLock) == B_OK) {
+		WriteLocker writeLocker(attribute->fLock);
+
+		if (hasIndex || fVolume->CheckForLiveQuery(name)) {
 			// Save the old attribute data (if this fails, oldLength will
 			// reflect it)
-			if (fVolume->CheckForLiveQuery(name) && attribute->Size() > 0) {
+			while (attribute->Size() > 0) {
+				bigtime_t oldModified = attribute->LastModified();
+				writeLocker.Unlock();
+
 				oldLength = BPLUSTREE_MAX_KEY_LENGTH;
 				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
-			}
 
-			// check if the data fits into the small_data section again
-			NodeGetter node(fVolume, transaction, this);
-			status = _AddSmallData(transaction, node, name, type, pos, buffer,
-				*_length);
+				writeLocker.Lock();
+
+				// Read until the data hasn't changed in between
+				if (oldModified == attribute->LastModified())
+					break;
+
+				oldLength = 0;
+			}
+		}
+
+		// check if the data fits into the small_data section again
+		NodeGetter node(fVolume, transaction, this);
+		status = _AddSmallData(transaction, node, name, type, pos, buffer,
+			*_length);
+
+		if (status == B_OK) {
+			// it does - remove its file
+			writeLocker.Unlock();
+			status = _RemoveAttribute(transaction, name, false, NULL);
+		} else {
+			// The attribute type might have been changed - we need to
+			// adopt the new one
+			attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
+			status = attribute->WriteBack(transaction);
+			writeLocker.Unlock();
 
 			if (status == B_OK) {
-				// it does - remove its file
-				rw_lock_write_unlock(&attribute->fLock);
-				status = _RemoveAttribute(transaction, name, false, NULL);
-			} else {
-				// The attribute type might have been changed - we need to
-				// adopt the new one
-				attribute->Node().type = HOST_ENDIAN_TO_BFS_INT32(type);
-				status = attribute->WriteBack(transaction);
-				rw_lock_write_unlock(&attribute->fLock);
-
-				if (status == B_OK) {
-					status = attribute->WriteAt(transaction, pos, buffer,
-						_length);
-				}
+				status = attribute->WriteAt(transaction, pos, buffer,
+					_length);
 			}
+		}
 
-			if (status == B_OK) {
-				// Update status time on attribute write
-				Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
-					bfs_inode::ToInode(real_time_clock_usecs()));
+		if (status == B_OK) {
+			// Update status time on attribute write
+			Node().status_change_time = HOST_ENDIAN_TO_BFS_INT64(
+				bfs_inode::ToInode(real_time_clock_usecs()));
 
-				status = WriteBack(transaction);
-			}
-		} else
-			status = B_ERROR;
+			status = WriteBack(transaction);
+		}
 
+		attribute->WriteLockInTransaction(transaction);
 		ReleaseAttribute(attribute);
 	}
 
@@ -2629,7 +2641,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	} else if (parent != NULL && (mode & S_ATTR_DIR) == 0) {
 		return B_BAD_VALUE;
 	} else if ((openMode & O_DIRECTORY) != 0) {
-		// TODO: we might need to return B_NOT_A_DIRECTORY here 
+		// TODO: we might need to return B_NOT_A_DIRECTORY here
 		return B_ENTRY_NOT_FOUND;
 	}
 
