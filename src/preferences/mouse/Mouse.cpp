@@ -23,10 +23,10 @@ const char* kSignature = "application/x-vnd.Haiku-Mouse";
 
 MouseApplication::MouseApplication()
 	:
-	BApplication(kSignature)					
+	BApplication(kSignature)
 {
 	be_locale->GetAppCatalog(&fCatalog);
-	
+
 	BRect rect(0, 0, 397, 293);
 	MouseWindow *window = new MouseWindow(rect);
 	window->Show();
@@ -36,8 +36,8 @@ MouseApplication::MouseApplication()
 void
 MouseApplication::AboutRequested()
 {
-	(new BAlert("about", TR("...by Andrew Edward McCall"),
-		TR("Dig Deal")))->Go();
+	(new BAlert("about", B_TRANSLATE("...by Andrew Edward McCall"),
+		B_TRANSLATE("Dig Deal")))->Go();
 }
 
 

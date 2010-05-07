@@ -33,8 +33,8 @@
 #define TR_CONTEXT "MouseWindow"
 
 MouseWindow::MouseWindow(BRect _rect)
-	: 
-		BWindow(_rect, TR("Mouse"), B_TITLED_WINDOW, 
+	:
+		BWindow(_rect, B_TRANSLATE("Mouse"), B_TITLED_WINDOW,
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS |
 				B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -44,11 +44,13 @@ MouseWindow::MouseWindow(BRect _rect)
 	fSettingsBox->AddChild(fSettingsView);
 
 	// Add the "Default" button
-	fDefaultsButton = new BButton(TR("Defaults"), new BMessage(kMsgDefaults));
+	fDefaultsButton = new BButton(B_TRANSLATE("Defaults"),
+		new BMessage(kMsgDefaults));
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 
 	// Add the "Revert" button
-	fRevertButton = new BButton(TR("Revert"), new BMessage(kMsgRevert));
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
 	SetPulseRate(100000);
@@ -91,7 +93,7 @@ bool
 MouseWindow::QuitRequested()
 {
 	fSettings.SetWindowPosition(Frame().LeftTop());
-	be_app->PostMessage(B_QUIT_REQUESTED);	
+	be_app->PostMessage(B_QUIT_REQUESTED);
 
 	return true;
 }
@@ -147,7 +149,7 @@ MouseWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		
+
 		case kMsgFollowsMouseMode:
 		{
 			int32 mode;
@@ -160,7 +162,7 @@ MouseWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		
+
 		case kMsgAcceptFirstClick:
 		{
 			BHandler *handler;

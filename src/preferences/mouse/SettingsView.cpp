@@ -73,53 +73,57 @@ SettingsView::SettingsView(MouseSettings &settings)
 {
 	// Add the "Mouse Type" pop up menu
 	fTypeMenu = new BPopUpMenu("unknown");
-	fTypeMenu->AddItem(new BMenuItem(TR("1-Button"),
+	fTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("1-Button"),
 		new BMessage(kMsgMouseType)));
-	fTypeMenu->AddItem(new BMenuItem(TR("2-Button"),
+	fTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("2-Button"),
 		new BMessage(kMsgMouseType)));
-	fTypeMenu->AddItem(new BMenuItem(TR("3-Button"),
+	fTypeMenu->AddItem(new BMenuItem(B_TRANSLATE("3-Button"),
 		new BMessage(kMsgMouseType)));
 
-	BMenuField *fTypeField = new BMenuField(TR("Mouse type:"),
+	BMenuField *fTypeField = new BMenuField(B_TRANSLATE("Mouse type:"),
 		fTypeMenu, NULL);
 	fTypeField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Create the "Double-click speed slider...
 	fClickSpeedSlider = new BSlider("double_click_speed",
-		TR("Double-click speed"), new BMessage(kMsgDoubleClickSpeed),
+		B_TRANSLATE("Double-click speed"), new BMessage(kMsgDoubleClickSpeed),
 		0, 1000, B_HORIZONTAL);
 	fClickSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fClickSpeedSlider->SetHashMarkCount(5);
-	fClickSpeedSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
+	fClickSpeedSlider->SetLimitLabels(B_TRANSLATE("Slow"),
+		B_TRANSLATE("Fast"));
 
 	// Create the "Mouse Speed" slider...
-	fMouseSpeedSlider = new BSlider("mouse_speed", TR("Mouse speed"), 
+	fMouseSpeedSlider = new BSlider("mouse_speed", B_TRANSLATE("Mouse speed"),
 		new BMessage(kMsgMouseSpeed), 0, 1000, B_HORIZONTAL);
 	fMouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMouseSpeedSlider->SetHashMarkCount(7);
-	fMouseSpeedSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
+	fMouseSpeedSlider->SetLimitLabels(B_TRANSLATE("Slow"),
+		B_TRANSLATE("Fast"));
 
 	// Create the "Mouse Acceleration" slider...
 	fAccelerationSlider = new BSlider("mouse_acceleration",
-		TR("Mouse acceleration"), new BMessage(kMsgAccelerationFactor),
-		0, 1000, B_HORIZONTAL);
+		B_TRANSLATE("Mouse acceleration"),
+		new BMessage(kMsgAccelerationFactor), 0, 1000, B_HORIZONTAL);
 	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fAccelerationSlider->SetHashMarkCount(5);
-	fAccelerationSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
+	fAccelerationSlider->SetLimitLabels(B_TRANSLATE("Slow"),
+		B_TRANSLATE("Fast"));
 
 	// Mouse image...
 	fMouseView = new MouseView(fSettings);
 
 	// Create the "Double-click test area" text box...
 	BTextControl *fDoubleClick = new BTextControl(NULL,
-		TR("Double-click test area"), NULL);
+		B_TRANSLATE("Double-click test area"), NULL);
 	fDoubleClick->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
 
 	// Add the "Mouse focus mode" pop up menu
-	fFocusMenu = new BPopUpMenu(TR("Click to activate"));
-	
-	const char *focusLabels[] = {TR_MARK("Click to activate"),
-		TR_MARK("Click to focus"),TR_MARK("Focus follows mouse")};
+	fFocusMenu = new BPopUpMenu(B_TRANSLATE("Click to activate"));
+
+	const char *focusLabels[] = {B_TRANSLATE_MARK("Click to activate"),
+		B_TRANSLATE_MARK("Click to focus"),
+		B_TRANSLATE_MARK("Focus follows mouse")};
 	const mode_mouse focusModes[] = {B_NORMAL_MOUSE, B_CLICK_TO_FOCUS_MOUSE,
 										B_FOCUS_FOLLOWS_MOUSE};
 
@@ -127,18 +131,19 @@ SettingsView::SettingsView(MouseSettings &settings)
 		BMessage *message = new BMessage(kMsgMouseFocusMode);
 		message->AddInt32("mode", focusModes[i]);
 
-		fFocusMenu->AddItem(new BMenuItem(TR(focusLabels[i]), message));
+		fFocusMenu->AddItem(new BMenuItem(B_TRANSLATE(focusLabels[i]),
+			message));
 	}
 
-	BMenuField *fFocusField = new BMenuField(TR("Focus mode:"),
+	BMenuField *fFocusField = new BMenuField(B_TRANSLATE("Focus mode:"),
 		fFocusMenu, NULL);
 	fFocusField->SetAlignment(B_ALIGN_RIGHT);
-	
+
 	// Add the "Focus follows mouse mode" pop up menu
-	fFocusFollowsMouseMenu = new BPopUpMenu(TR("Normal"));
-	
-	const char *focusFollowsMouseLabels[] = {TR_MARK("Normal"),
-		TR_MARK("Warp"), TR_MARK("Instant warp")};
+	fFocusFollowsMouseMenu = new BPopUpMenu(B_TRANSLATE("Normal"));
+
+	const char *focusFollowsMouseLabels[] = {B_TRANSLATE_MARK("Normal"),
+		B_TRANSLATE_MARK("Warp"), B_TRANSLATE_MARK("Instant warp")};
 	const mode_focus_follows_mouse focusFollowsMouseModes[] =
 		{B_NORMAL_FOCUS_FOLLOWS_MOUSE, B_WARP_FOCUS_FOLLOWS_MOUSE,
 			B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE};
@@ -149,7 +154,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 			focusFollowsMouseModes[i]);
 
 		fFocusFollowsMouseMenu->AddItem(new BMenuItem(
-			TR(focusFollowsMouseLabels[i]), message));
+			B_TRANSLATE(focusFollowsMouseLabels[i]), message));
 	}
 
 	BMenuField *fFocusFollowsMouseField = new BMenuField(
@@ -157,7 +162,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 	fFocusFollowsMouseField->SetAlignment(B_ALIGN_RIGHT);
 
 	// Add the "Click-through" check box
-	fAcceptFirstClickBox = new BCheckBox(TR("Accept first click"),
+	fAcceptFirstClickBox = new BCheckBox(B_TRANSLATE("Accept first click"),
 		new BMessage(kMsgAcceptFirstClick));
 
 	// dividers
@@ -165,7 +170,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 		BRect(0, 0, 1, 1), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
 			B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 	hdivider->SetExplicitMaxSize(BSize(1, B_SIZE_UNLIMITED));
-	
+
 	BBox* vdivider = new BBox(
 		BRect(0, 0, 1, 1), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
 			B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
@@ -231,7 +236,7 @@ SettingsView::AttachedToWindow()
 }
 
 
-void 
+void
 SettingsView::SetMouseType(int32 type)
 {
 	fMouseView->SetMouseType(type);
@@ -245,7 +250,7 @@ SettingsView::MouseMapUpdated()
 }
 
 
-void 
+void
 SettingsView::UpdateFromSettings()
 {
 	int32 value = int32(fSettings.ClickSpeed() / 1000);
@@ -269,7 +274,7 @@ SettingsView::UpdateFromSettings()
 	item = fFocusMenu->ItemAt(mouse_mode_to_index(fSettings.MouseMode()));
 	if (item != NULL)
 		item->SetMarked(true);
-		
+
 	item = fFocusFollowsMouseMenu->ItemAt(
 		focus_follows_mouse_mode_to_index(fSettings.FocusFollowsMouseMode()));
 	if (item != NULL)
@@ -277,7 +282,7 @@ SettingsView::UpdateFromSettings()
 
 	fFocusFollowsMouseMenu->SetEnabled(fSettings.MouseMode()
 		== B_FOCUS_FOLLOWS_MOUSE);
-	
+
 	fAcceptFirstClickBox->SetValue(fSettings.AcceptFirstClick()
 		? B_CONTROL_ON : B_CONTROL_OFF);
 	fAcceptFirstClickBox->SetEnabled(fSettings.MouseMode()
