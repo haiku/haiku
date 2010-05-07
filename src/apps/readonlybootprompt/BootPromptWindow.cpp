@@ -283,10 +283,10 @@ BootPromptWindow::_PopulateLanguages()
 		installedCatalogs.FindString("langs", i, &languageString) == B_OK;
 		i++) {
 		BLanguage* language;
-		if (be_locale_roster->GetLanguage(&language,
-				BString(languageString)) == B_OK) {
+		if (be_locale_roster->GetLanguage(languageString, 
+				&language) == B_OK) {
 			BString name;
-			language->GetName(&name);
+			language->GetName(name);
 			LanguageItem* item = new LanguageItem(name.String(),
 				languageString);
 			fLanguagesListView->AddItem(item);
