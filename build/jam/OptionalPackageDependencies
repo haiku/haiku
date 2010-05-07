@@ -4,27 +4,27 @@
 # For transitive dependencies dependants should be listed before their
 # dependencies.
 
-OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies APR-util : APR Expat ;
 OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL PCRE ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
-OptionalPackageDependencies Development : DevelopmentBase Perl ;
+OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
+OptionalPackageDependencies Development : DevelopmentBase Perl ;
+OptionalPackageDependencies GetText : LibIconv ;
+OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies ICU-devel : Development ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
-OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv ;
-OptionalPackageDependencies OpenSSH : OpenSSL ;
+OptionalPackageDependencies Tar : LibIconv ;
+OptionalPackageDependencies MandatoryPackages : Sed Tar ;
 OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
-OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
-OptionalPackageDependencies Curl : OpenSSL ;
-OptionalPackageDependencies MandatoryPackages : Sed Tar ;
 OptionalPackageDependencies NetFS : UserlandFS ;
+OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv ;
+OptionalPackageDependencies OpenSSH : OpenSSL ;
 OptionalPackageDependencies Pe : PCRE ;
-OptionalPackageDependencies Vim : LibIconv ;
-OptionalPackageDependencies XZ-Utils : Tar ;
-OptionalPackageDependencies Tar : LibIconv ;
-OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
+OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies Transmission : LibEvent GetText Curl OpenSSL LibIconv ;
-OptionalPackageDependencies GetText : LibIconv ;
+OptionalPackageDependencies Vim : LibIconv ;
+OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
+OptionalPackageDependencies XZ-Utils : Tar ;
 
