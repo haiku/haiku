@@ -3,22 +3,30 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <GroupView.h>
 
 
-// constructor
 BGroupView::BGroupView(enum orientation orientation, float spacing)
 	: BView(NULL, 0, new BGroupLayout(orientation, spacing))
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-// destructor
+
+BGroupView::BGroupView(const char* name, enum orientation orientation,
+	float spacing)
+	: BView(name, 0, new BGroupLayout(orientation, spacing))
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
 BGroupView::~BGroupView()
 {
 }
 
-// SetLayout
+
 void
 BGroupView::SetLayout(BLayout* layout)
 {
@@ -29,7 +37,7 @@ BGroupView::SetLayout(BLayout* layout)
 	BView::SetLayout(layout);
 }
 
-// GroupLayout
+
 BGroupLayout*
 BGroupView::GroupLayout() const
 {
