@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "BootPromptWindow.h"
 
 #include <stdio.h>
@@ -24,6 +25,7 @@
 #include <StringItem.h>
 #include <StringView.h>
 #include <TextView.h>
+#include <UnicodeChar.h>
 
 #include "BootPrompt.h"
 #include "Keymap.h"
@@ -279,14 +281,23 @@ BootPromptWindow::_PopulateLanguages()
 	//  limited to catalogs written for this application, which is on purpose!
 
 	const char* languageString;
-	for (int32 i = 0;
-		installedCatalogs.FindString("langs", i, &languageString) == B_OK;
-		i++) {
+	for (int32 i = 0; installedCatalogs.FindString("langs", i, &languageString)
+			== B_OK; i++) {
 		BLanguage* language;
-		if (be_locale_roster->GetLanguage(languageString, 
-				&language) == B_OK) {
+		if (be_locale_roster->GetLanguage(languageString, &language) == B_OK) {
 			BString name;
 			language->GetName(name);
+
+			// TODO: as long as the app_server doesn't support font overlays,
+			// use the translated name if problematic characters are used...
+			const char* string = name.String();
+			while (uint32 code = BUnicodeChar::FromUTF8(&string)) {
+				if (code > 1424) {
+					language->GetTranslatedName(name);
+					break;
+				}
+			}
+
 			LanguageItem* item = new LanguageItem(name.String(),
 				languageString);
 			fLanguagesListView->AddItem(item);
@@ -295,6 +306,8 @@ BootPromptWindow::_PopulateLanguages()
 				fLanguagesListView->Select(
 					fLanguagesListView->CountItems() - 1);
 			}
+
+			delete language;
 		} else
 			printf("failed to get BLanguage for %s\n", languageString);
 	}

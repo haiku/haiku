@@ -169,12 +169,12 @@ TranslationComparator(const void* left, const void* right)
 	BLanguage* language;
 	be_locale_roster->GetLanguage(leftTranslation->languageCode, &language);
 	BString leftName;
-	language->GetName(leftName);
+	language->GetTranslatedName(leftName);
 	delete language;
 
 	be_locale_roster->GetLanguage(rightTranslation->languageCode, &language);
 	BString rightName;
-	language->GetName(rightName);
+	language->GetTranslatedName(rightName);
 	delete language;
 
 	return be_locale->Collator()->Compare(leftName.String(),
@@ -1067,7 +1067,7 @@ AboutView::_CreateCreditsView()
 
 		be_locale_roster->GetLanguage(translation.languageCode, &lang);
 		langName.Truncate(0);
-		lang->GetName(langName);
+		lang->GetTranslatedName(langName);
 		delete lang;
 
 		fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
