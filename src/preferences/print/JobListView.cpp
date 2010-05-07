@@ -223,41 +223,41 @@ JobItem::Update()
 		B_INT32_TYPE, 0, &pages, sizeof(pages)) == sizeof(pages)) {
 		fPages << pages;
 		if (pages > 1)
-			fPages << " " << TR("pages") << ".";
+			fPages << " " << B_TRANSLATE("pages") << ".";
 		else
-			fPages << " " << TR("page") << ".";
+			fPages << " " << B_TRANSLATE("page") << ".";
 	} else {
-		fPages << "??? " << TR("pages") << ".";
+		fPages << "??? " << B_TRANSLATE("pages") << ".";
 	}
 
 	fSize = "";
 	off_t size;
 	if (node.GetSize(&size) == B_OK) {
 		char buffer[80];
-		sprintf(buffer, TR("%.2f KB"), size / 1024.0);
+		sprintf(buffer, B_TRANSLATE("%.2f KB"), size / 1024.0);
 		fSize = buffer;
 	}
 
 	fStatus = "";
 	switch (fJob->Status()) {
 		case kWaiting:
-			fStatus = TR("Waiting");
+			fStatus = B_TRANSLATE("Waiting");
 			break;
 
 		case kProcessing:
-			fStatus = TR("Processing");
+			fStatus = B_TRANSLATE("Processing");
 			break;
 
 		case kFailed:
-			fStatus = TR("Failed");
+			fStatus = B_TRANSLATE("Failed");
 			break;
 
 		case kCompleted:
-			fStatus = TR("Completed");
+			fStatus = B_TRANSLATE("Completed");
 			break;
 
 		default:
-			fStatus = TR("Unknown status");
+			fStatus = B_TRANSLATE("Unknown status");
 	}
 }
 

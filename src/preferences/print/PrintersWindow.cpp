@@ -1,8 +1,8 @@
 /*****************************************************************************/
 // Printers Preference Application.
 //
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
+// This application and all source files used in its construction, except
+// where noted, are licensed under the MIT License, and have been written
 // and are:
 //
 // Copyright (c) 2001-2003 OpenBeOS Project
@@ -10,18 +10,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -52,7 +52,8 @@
 
 PrintersWindow::PrintersWindow(BRect frame)
 	:
-	Inherited(BRect(78.0, 71.0, 561.0, 409.0), TR("Printers"), B_TITLED_WINDOW, 0),
+	Inherited(BRect(78.0, 71.0, 561.0, 409.0), B_TRANSLATE("Printers"),
+		B_TITLED_WINDOW, 0),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
 {
@@ -82,14 +83,16 @@ PrintersWindow::MessageReceived(BMessage* msg)
 				fSelectedPrinter = fPrinterListView->SelectedItem();
 				if (fSelectedPrinter)
 				{
-					fJobsBox->SetLabel((BString(TR("Print jobs for ")) << fSelectedPrinter->Name()).String());
+					fJobsBox->SetLabel((BString(B_TRANSLATE("Print jobs for ")) <<
+						fSelectedPrinter->Name()).String());
 					fMakeDefault->SetEnabled(true);
 					fRemove->SetEnabled(true);
 					fJobListView->SetSpoolFolder(fSelectedPrinter->Folder());
 				}
 				else
 				{
-					fJobsBox->SetLabel(TR("Print jobs: No printer selected"));
+					fJobsBox->SetLabel(
+						B_TRANSLATE("Print jobs: No printer selected"));
 					fMakeDefault->SetEnabled(false);
 					fRemove->SetEnabled(false);
 					fSelectedPrinter = NULL;
@@ -106,7 +109,7 @@ PrintersWindow::MessageReceived(BMessage* msg)
 				new AddPrinterDialog(this);
 			}
 			break;
-	
+
 		case kMsgAddPrinterClosed:
 			fAddingPrinter = false;
 			break;
@@ -183,21 +186,23 @@ PrintersWindow::BuildGUI()
 	BBox* printersBox = new BBox(BRect(boxInset, boxInset, r.Width()-boxInset, (r.Height()/2) - (boxInset/2)),
 		"printersBox", B_FOLLOW_ALL);
 	printersBox->SetFont(be_bold_font);
-	printersBox->SetLabel(TR("Printers"));
+	printersBox->SetLabel(B_TRANSLATE("Printers"));
 	backdrop->AddChild(printersBox);
 
 		// Width of largest button
 	float maxWidth = 0;
 
 		// Add Button
-	BButton* addButton = new BButton(BRect(5,5,5,5), "add", TR("Add …"), new BMessage(kMsgAddPrinter), B_FOLLOW_RIGHT);
+	BButton* addButton = new BButton(BRect(5,5,5,5), "add",
+		B_TRANSLATE("Add …"), new BMessage(kMsgAddPrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(addButton);
 	addButton->ResizeToPreferred();
 
 	maxWidth = addButton->Bounds().Width();
 
 		// Remove button
-	fRemove = new BButton(BRect(5,30,5,30), "remove", TR("Remove"), new BMessage(kMsgRemovePrinter), B_FOLLOW_RIGHT);
+	fRemove = new BButton(BRect(5,30,5,30), "remove",
+		B_TRANSLATE("Remove"), new BMessage(kMsgRemovePrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(fRemove);
 	fRemove->ResizeToPreferred();
 
@@ -205,7 +210,8 @@ PrintersWindow::BuildGUI()
 		maxWidth = fRemove->Bounds().Width();
 
 		// Make Default button
-	fMakeDefault = new BButton(BRect(5,60,5,60), "default", TR("Make default"), new BMessage(kMsgMakeDefaultPrinter), B_FOLLOW_RIGHT);
+	fMakeDefault = new BButton(BRect(5,60,5,60), "default",
+		B_TRANSLATE("Make default"), new BMessage(kMsgMakeDefaultPrinter), B_FOLLOW_RIGHT);
 	printersBox->AddChild(fMakeDefault);
 	fMakeDefault->ResizeToPreferred();
 
@@ -241,11 +247,13 @@ PrintersWindow::BuildGUI()
 	fJobsBox = new BBox(BRect(boxInset, (r.Height()/2)+(boxInset/2), Bounds().Width()-10, Bounds().Height() - boxInset),
 		"jobsBox", B_FOLLOW_LEFT_RIGHT+B_FOLLOW_BOTTOM);
 	fJobsBox->SetFont(be_bold_font);
-	fJobsBox->SetLabel(TR("Print jobs: No printer selected"));
+	fJobsBox->SetLabel(B_TRANSLATE("Print jobs: No printer selected"));
 	backdrop->AddChild(fJobsBox);
 
 		// Cancel Job Button
-	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", TR("Cancel job"), new BMessage(kMsgCancelJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel",
+		B_TRANSLATE("Cancel job"), new BMessage(kMsgCancelJob),
+		B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(cancelButton);
 	cancelButton->ResizeToPreferred();
 	fCancel = cancelButton;
@@ -253,7 +261,9 @@ PrintersWindow::BuildGUI()
 	maxWidth = cancelButton->Bounds().Width();
 
 		// Restart Job button
-	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", TR("Restart job"), new BMessage(kMsgRestartJob), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
+	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart",
+		B_TRANSLATE("Restart job"), new BMessage(kMsgRestartJob),
+		B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(restartButton);
 	restartButton->ResizeToPreferred();
 	fRestart = restartButton;

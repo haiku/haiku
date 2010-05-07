@@ -377,7 +377,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	BPoint driverPt(iconPt + BPoint(x, fntheight * 2.0));
 	BPoint defaultPt(iconPt + BPoint(x, fntheight * 3.0));
 
-	float width = owner->StringWidth(TR("No pending jobs."));
+	float width = owner->StringWidth(B_TRANSLATE("No pending jobs."));
 	BPoint pendingPt(bounds.right - width - 8.0, namePt.y);
 	BPoint transportPt(bounds.right - width - 8.0, driverPt.y);
 	BPoint commentPt(bounds.right - width - 8.0, defaultPt.y);
@@ -393,7 +393,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 		if (sSelectedIcon && sSelectedIcon->IsValid())
 			owner->DrawBitmap(sSelectedIcon, iconPt);
 		else
-			owner->DrawString(TR("Default Printer"), defaultPt);
+			owner->DrawString(B_TRANSLATE("Default Printer"), defaultPt);
 	} else {
 		if (sIcon && sIcon->IsValid())
 			owner->DrawBitmap(sIcon, iconPt);
@@ -459,12 +459,12 @@ PrinterItem::UpdatePendingJobs()
 	if (fFolder) {
 		uint32 pendingJobs = fFolder->CountJobs();
 		if (pendingJobs == 1) {
-			fPendingJobs = TR("1 pending job.");
+			fPendingJobs = B_TRANSLATE("1 pending job.");
 			return;
 		} else if (pendingJobs > 1) {
-			fPendingJobs << pendingJobs << TR(" pending jobs.");
+			fPendingJobs << pendingJobs << B_TRANSLATE(" pending jobs.");
 			return;
 		}
 	}
-	fPendingJobs = TR("No pending jobs.");
+	fPendingJobs = B_TRANSLATE("No pending jobs.");
 }

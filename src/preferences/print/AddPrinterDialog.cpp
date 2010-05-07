@@ -41,7 +41,7 @@
 
 AddPrinterDialog::AddPrinterDialog(BWindow *parent)
 	:
-	Inherited(BRect(78.0, 71.0, 400, 300), TR("Add printer"),
+	Inherited(BRect(78.0, 71.0, 400, 300), B_TRANSLATE("Add printer"),
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fPrintersPrefletMessenger(parent)
@@ -64,29 +64,29 @@ void
 AddPrinterDialog::MessageReceived(BMessage* msg)
 {
 	switch(msg->what) {
-		case B_OK: 
+		case B_OK:
 			AddPrinter(msg);
 			PostMessage(B_QUIT_REQUESTED);
 			break;
-			
+
 		case B_CANCEL:
 			PostMessage(B_QUIT_REQUESTED);
 			break;
-		
+
 		case kNameChangedMsg:
-			fNameText = fName->Text(); 
+			fNameText = fName->Text();
 			Update();
 			break;
-		
+
 		case kPrinterSelectedMsg:
 			StorePrinter(msg);
 			break;
-			
+
 		case kTransportSelectedMsg:
 			HandleChangedTransport(msg);
 			break;
-		
-		
+
+
 		default:
 			Inherited::MessageReceived(msg);
 	}
@@ -99,8 +99,8 @@ AddPrinterDialog::AddPrinter(BMessage *msg)
 	BMessage m(PSRV_MAKE_PRINTER);
 	BMessenger msgr;
 	if (GetPrinterServerMessenger(msgr) != B_OK)
-		return;								
-	
+		return;
+
 	BString transport;
 	BString transportPath;
 	if (fPrinterText != "Preview") {
@@ -108,10 +108,10 @@ AddPrinterDialog::AddPrinter(BMessage *msg)
 		transport = fTransportText;
 		transportPath = fTransportPathText;
 	}
-	
-	m.AddString("driver", fPrinterText.String());			
-	m.AddString("transport", transport.String());			
-	m.AddString("transport path", transportPath.String());			
+
+	m.AddString("driver", fPrinterText.String());
+	m.AddString("transport", transport.String());
+	m.AddString("transport path", transportPath.String());
 	m.AddString("printer name", fNameText.String());
 	m.AddString("connection", "Local");
 	msgr.SendMessage(&m);
@@ -125,7 +125,7 @@ AddPrinterDialog::StorePrinter(BMessage *msg)
 	BString name;
 	if (msg->FindString("name", &name) != B_OK)
 		name = "";
-		
+
 	fPrinterText = name;
 	Update();
 }
@@ -137,9 +137,9 @@ AddPrinterDialog::HandleChangedTransport(BMessage *msg)
 	BString name;
 	if (msg->FindString("name", &name) != B_OK) {
 		name = "";
-	}		
+	}
 	fTransportText = name;
-	
+
 	BString path;
 	if (msg->FindString("path", &path) == B_OK) {
 		// transport path selected
@@ -163,14 +163,14 @@ AddPrinterDialog::HandleChangedTransport(BMessage *msg)
 	} else {
 		// transport selected
 		fTransportPathText = "";
-		
+
 		// remove mark from item in sub menu of transport sub menu
 		for (int32 i = fTransport->CountItems()-1; i >= 0; i --) {
 			BMenu* menu = fTransport->SubmenuAt(i);
 			if (menu != NULL) {
 				BMenuItem* item = menu->FindMarked();
-				if (item != NULL) 
-					item->SetMarked(false);								
+				if (item != NULL)
+					item->SetMarked(false);
 			}
 		}
 	}
@@ -182,32 +182,32 @@ void
 AddPrinterDialog::BuildGUI(int stage)
 {
 	// add a "printer name" input field
-	fName = new BTextControl("printer_name", TR("Printer name:"), B_EMPTY_STRING,
-		NULL);
+	fName = new BTextControl("printer_name", B_TRANSLATE("Printer name:"),
+		B_EMPTY_STRING, NULL);
 	fName->SetFont(be_bold_font);
 	fName->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fName->SetModificationMessage(new BMessage(kNameChangedMsg));
 
 	// add a "driver" popup menu field
-	fPrinter = new BPopUpMenu(TR("<pick one>"));
+	fPrinter = new BPopUpMenu(B_TRANSLATE("<pick one>"));
 	BMenuField *printerMenuField = new BMenuField("drivers_list",
-		TR("Printer type:"), fPrinter);
+		B_TRANSLATE("Printer type:"), fPrinter);
 	printerMenuField->SetAlignment(B_ALIGN_RIGHT);
 	FillMenu(fPrinter, "Print", kPrinterSelectedMsg);
 
 	// add a "connected to" (aka transports list) menu field
-	fTransport = new BPopUpMenu(TR("<pick one>"));
+	fTransport = new BPopUpMenu(B_TRANSLATE("<pick one>"));
 	BMenuField *transportMenuField = new BMenuField("transports_list",
-		TR("Connected to:"), fTransport);
+		B_TRANSLATE("Connected to:"), fTransport);
 	transportMenuField->SetAlignment(B_ALIGN_RIGHT);
 	FillTransportMenu(fTransport);
-	
+
 	// add a "OK" button
-	fOk = new BButton(NULL, TR("Add"), new BMessage((uint32)B_OK),
+	fOk = new BButton(NULL, B_TRANSLATE("Add"), new BMessage((uint32)B_OK),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 
-	// add a "Cancel button	
-	BButton *cancel = new BButton(NULL, TR("Cancel"), new BMessage(B_CANCEL));
+	// add a "Cancel button
+	BButton *cancel = new BButton(NULL, B_TRANSLATE("Cancel"), new BMessage(B_CANCEL));
 
 	SetLayout(new BGridLayout());
 
@@ -230,7 +230,7 @@ AddPrinterDialog::BuildGUI(int stage)
 	fOk->MakeDefault(true);
 
 	fName->MakeFocus(true);
-	
+
 	Update();
 // Stage == 0
 // init_icon 64x114  Add a Local or Network Printer
@@ -298,14 +298,14 @@ AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what)
 		BPath addonPath;
 		if (find_directory(gAddonDirs[i], &addonPath) != B_OK)
 			continue;
-		
-		if (addonPath.Append(path) != B_OK) 
+
+		if (addonPath.Append(path) != B_OK)
 			continue;
-		
+
 		BDirectory dir(addonPath.Path());
-		if (dir.InitCheck() != B_OK) 
+		if (dir.InitCheck() != B_OK)
 			continue;
-		
+
 		BEntry entry;
 		while (dir.GetNextEntry(&entry, true) == B_OK) {
 			if (!entry.IsFile())
@@ -400,9 +400,9 @@ void AddPrinterDialog::FillTransportMenu(BMenu* menu)
 void
 AddPrinterDialog::Update()
 {
-	fOk->SetEnabled(fNameText != "" && fPrinterText != "" && 
+	fOk->SetEnabled(fNameText != "" && fPrinterText != "" &&
 		(fTransportText != "" || fPrinterText == "Preview"));
-	
+
 	fTransport->SetEnabled(fPrinterText != "Preview");
 }
 
