@@ -56,6 +56,9 @@ public:
 	inline						Group(BWindow* window,
 									enum orientation orientation = B_HORIZONTAL,
 									float spacing = 0.0f);
+	inline						Group(BView* window,
+									enum orientation orientation = B_HORIZONTAL,
+									float spacing = 0.0f);
 	inline						Group(BGroupLayout* layout);
 	inline						Group(BGroupView* view);
 
@@ -243,6 +246,16 @@ Group<ParentBuilder>::Group(BWindow* window, enum orientation orientation,
 	fLayout((new BGroupView(orientation, spacing))->GroupLayout())
 {
 	window->SetLayout(fLayout);
+}
+
+
+template<typename ParentBuilder>
+Group<ParentBuilder>::Group(BView* view, enum orientation orientation,
+	float spacing)
+	:
+	fLayout((new BGroupView(orientation, spacing))->GroupLayout())
+{
+	view->SetLayout(fLayout);
 }
 
 
