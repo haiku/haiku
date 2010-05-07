@@ -273,6 +273,36 @@ LocalDevice::GetFriendlyName()
 }
 
 
+status_t
+LocalDevice::SetFriendlyName(BString& name)
+{
+	int8 btStatus = BT_ERROR;
+
+	if (fMessenger == NULL)
+		return btStatus;
+
+	BluetoothCommand<typed_command(hci_write_local_name)>
+		writeName(OGF_CONTROL_BASEBAND, OCF_WRITE_LOCAL_NAME);
+
+	strcpy(writeName->local_name, name.String());
+
+	BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+	BMessage reply;
+
+	request.AddInt32("hci_id", fHid);
+	request.AddData("raw command", B_ANY_TYPE,
+		writeName.Data(), writeName.Size());
+	request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+	request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND,
+		OCF_WRITE_LOCAL_NAME));
+
+	if (fMessenger->SendMessage(&request, &reply) == B_OK)
+		reply.FindInt8("status", &btStatus);
+
+	return btStatus;
+}
+
+
 DeviceClass
 LocalDevice::GetDeviceClass()
 {
@@ -520,6 +550,11 @@ LocalDevice::LocalDevice(hci_id hid)
 	_ReadLocalVersion();
 	_ReadTimeouts();
 	_ReadLinkKeys();
+
+	// Uncomment this if you want your device to have a nicer default name
+	// BString name("HaikuBluetooth");
+	// SetFriendlyName(name);
+
 
 	uint32 value;
 

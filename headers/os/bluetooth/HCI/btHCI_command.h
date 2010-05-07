@@ -96,6 +96,10 @@ struct hci_command_header {
 
 
 	#define OCF_WRITE_LOCAL_NAME		0x0013
+	struct hci_write_local_name {
+		char		local_name[HCI_DEVICE_NAME_SIZE];
+	} __attribute__ ((packed));
+
 	#define OCF_READ_LOCAL_NAME			0x0014
 	struct hci_rp_read_local_name {
 		uint8		status;
