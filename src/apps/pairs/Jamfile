@@ -15,5 +15,6 @@ Application Pairs :
 DoCatalogs Pairs :
 	x-vnd.Haiku-Pairs
 	:
+	PairsView.cpp
 	PairsWindow.cpp
 ;

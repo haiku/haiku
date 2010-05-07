@@ -13,6 +13,7 @@
  *		Bernd Korz
  */
 
+
 #include "ShowImageView.h"
 
 #include <math.h>
@@ -23,11 +24,13 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <BitmapStream.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -1245,11 +1248,15 @@ ShowImageView::_OutputFormatForType(BBitmap* bitmap, const char* type,
 }
 
 
+#undef TR_CONTEXT
+#define TR_CONTEXT "SaveToFile"
+
+
 void
 ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 	const translation_format* format)
 {
-	if (!bitmap) {
+	if (bitmap == NULL) {
 		// If no bitmap is supplied, write out the whole image
 		bitmap = fBitmap;
 	}
@@ -1277,9 +1284,10 @@ ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap,
 	}
 	if (loop) {
 		// If loop terminated because of a break, there was an error
-		BString errText;
-		errText << "Sorry, the file '" << name << "' could not be written.";
-		BAlert *palert = new BAlert(NULL, errText.String(), "OK");
+		char buffer[512];
+		snprintf(buffer, sizeof(buffer), TR("The file '%s' could not "
+			"be written."), name);
+		BAlert *palert = new BAlert("", buffer, TR("OK"));
 		palert->Go();
 	}
 

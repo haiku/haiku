@@ -39,7 +39,7 @@ const uint32 MENU_QUIT					= 'MGqu';
 
 PairsWindow::PairsWindow()
 	:
-	BWindow(BRect(100, 100, 405, 423), "Pairs", B_TITLED_WINDOW,
+	BWindow(BRect(100, 100, 405, 423), TR("Pairs"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
 	fPairComparing(NULL),
@@ -223,11 +223,11 @@ PairsWindow::MessageReceived(BMessage* message)
 					BString score;
 					score << fButtonClicks;
 					strAbout
-						<< "Pairs\n"
+						<< TR("Pairs\n"
 						"\twritten by Ralf Schülke\n"
 						"\tCopyright 2008-2010, Haiku Inc.\n"
 						"\n"
-						"You completed the game in %s clicks.\n";
+						"You completed the game in %s clicks.\n");
 						
 					strAbout.Replace("%s", score.String(), 1);
 

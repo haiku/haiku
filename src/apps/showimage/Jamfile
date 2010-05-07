@@ -25,7 +25,9 @@ DoCatalogs ShowImage :
 	x-vnd.Haiku-ShowImage
 	:
 	PrintOptionsWindow.cpp
+	ProgressWindow.cpp
 	ResizerWindow.cpp
 	ShowImageApp.cpp
+	ShowImageView.cpp
 	ShowImageWindow.cpp
 ;

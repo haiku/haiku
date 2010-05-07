@@ -1681,14 +1681,18 @@ BWindow::Zoom()
 
 	BPoint zoomedLeftTop = screen.Frame().LeftTop() + BPoint(borderWidth,
 		tabHeight + borderWidth);
+	// Center if window cannot be made full screen
+	if (screenWidth > zoomedWidth)
+		zoomedLeftTop.x += (screenWidth - zoomedWidth) / 2;
+	if (screenHeight > zoomedHeight)
+		zoomedLeftTop.y += (screenHeight - zoomedHeight) / 2;
 
 	// Un-Zoom
 
 	if (fPreviousFrame.IsValid()
 		// NOTE: don't check for fFrame.LeftTop() == zoomedLeftTop
 		// -> makes it easier on the user to get a window back into place
-		&& fFrame.Width() == zoomedWidth
-		&& fFrame.Height() == zoomedHeight) {
+		&& fFrame.Width() == zoomedWidth && fFrame.Height() == zoomedHeight) {
 		// already zoomed!
 		Zoom(fPreviousFrame.LeftTop(), fPreviousFrame.Width(),
 			fPreviousFrame.Height());
