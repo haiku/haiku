@@ -109,12 +109,15 @@ Account::Account(BMailChain *inbound, BMailChain *outbound)
 	if (fSettings)
 		label << fSettings->Name();
 	else
-		label << TR("Unnamed");
+		label << B_TRANSLATE("Unnamed");
 	fAccountItem = new AccountItem(label.String(), this, ACCOUNT_ITEM);
 
-	fInboundItem = new AccountItem(TR("   · Incoming"), this, INBOUND_ITEM);
-	fOutboundItem = new AccountItem(TR("   · Outgoing"), this, OUTBOUND_ITEM);
-	fFilterItem = new AccountItem(TR("   · E-mail filters"), this, FILTER_ITEM);
+	fInboundItem =
+		new AccountItem(B_TRANSLATE("   · Incoming"), this, INBOUND_ITEM);
+	fOutboundItem =
+		new AccountItem(B_TRANSLATE("   · Outgoing"), this, OUTBOUND_ITEM);
+	fFilterItem =
+		new AccountItem(B_TRANSLATE("   · E-mail filters"), this, FILTER_ITEM);
 }
 
 
@@ -264,8 +267,9 @@ void
 Account::CreateInbound()
 {
 	if (!(fInbound = NewMailChain())) {
-		(new BAlert(TR("E-mail"), TR("Could not create inbound chain."),
-			TR("OK")))->Go();
+		(new BAlert(B_TRANSLATE("E-mail"),
+			B_TRANSLATE("Could not create inbound chain."),
+			B_TRANSLATE("OK")))->Go();
 		return;
 	}
 	fInbound->SetChainDirection(inbound);
@@ -303,7 +307,7 @@ Account::CreateInbound()
 	// New Mail Notification
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(TR("New mail notification"));
+	path.Append(B_TRANSLATE("New mail notification"));
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
 		path.Append(kSystemFilterAddOnPath);
@@ -333,8 +337,9 @@ void
 Account::CreateOutbound()
 {
 	if (!(fOutbound = NewMailChain())) {
-		(new BAlert(TR("E-mail"), TR("Could not create outbound chain."),
-			TR("OK")))->Go();
+		(new BAlert(B_TRANSLATE("E-mail"),
+			B_TRANSLATE("Could not create outbound chain."),
+			B_TRANSLATE("OK")))->Go();
 		return;
 	}
 	fOutbound->SetChainDirection(outbound);

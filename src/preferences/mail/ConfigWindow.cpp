@@ -276,7 +276,7 @@ ConfigWindow::ConfigWindow()
 	rect = tabView->Bounds();
 	rect.bottom -= tabView->TabHeight() + 4;
 	tabView->AddTab(view = new BView(rect, NULL, B_FOLLOW_ALL, 0));
-	tabView->TabAt(0)->SetLabel(TR("Accounts"));
+	tabView->TabAt(0)->SetLabel(B_TRANSLATE("Accounts"));
 	view->SetViewColor(top->ViewColor());
 
 	// accounts listview
@@ -291,13 +291,16 @@ ConfigWindow::ConfigWindow()
 
 	rect.top = rect.bottom + 8;  rect.bottom = rect.top + height;
 	BRect sizeRect = rect;
-	sizeRect.right = sizeRect.left + 30 + view->StringWidth(TR("Add"));
-	view->AddChild(new BButton(sizeRect, NULL, TR("Add"),
+	sizeRect.right = sizeRect.left + 30 + view->StringWidth(
+		B_TRANSLATE("Add"));
+	view->AddChild(new BButton(sizeRect, NULL, B_TRANSLATE("Add"),
 		new BMessage(kMsgAddAccount), B_FOLLOW_BOTTOM));
 
 	sizeRect.left = sizeRect.right+3;
-	sizeRect.right = sizeRect.left + 30 + view->StringWidth(TR("Remove"));
-	view->AddChild(fRemoveButton = new BButton(sizeRect, NULL, TR("Remove"),
+	sizeRect.right = sizeRect.left + 30 + view->StringWidth(
+		B_TRANSLATE("Remove"));
+	view->AddChild(fRemoveButton = new BButton(
+		sizeRect, NULL, B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveAccount), B_FOLLOW_BOTTOM));
 
 	// accounts config view
@@ -313,32 +316,32 @@ ConfigWindow::ConfigWindow()
 	rect = tabView->Bounds();
 	rect.bottom -= tabView->TabHeight() + 4;
 	tabView->AddTab(view = new CenterContainer(rect));
-	tabView->TabAt(1)->SetLabel(TR("Settings"));
+	tabView->TabAt(1)->SetLabel(B_TRANSLATE("Settings"));
 
 	rect = view->Bounds().InsetByCopy(8, 8);
 	rect.right -= 1;
 	rect.bottom = rect.top + height * 5 + 15;
 	BBox *box = new BBox(rect);
-	box->SetLabel(TR("Mail checking"));
+	box->SetLabel(B_TRANSLATE("Mail checking"));
 	view->AddChild(box);
 
 	rect = box->Bounds().InsetByCopy(8, 8);
 	rect.top += 7;
 	rect.bottom = rect.top + height + 5;
 	BRect tile = rect.OffsetByCopy(0, 1);
-	int32 labelWidth = (int32)view->StringWidth(TR("Check every")) + 6;
+	int32 labelWidth = (int32)view->StringWidth(B_TRANSLATE("Check every")) + 6;
 	tile.right = 80 + labelWidth;
-	fIntervalControl = new BTextControl(tile, "time", TR("Check every"), NULL,
-		NULL);
+	fIntervalControl = new BTextControl(tile, "time",
+		B_TRANSLATE("Check every"), NULL, NULL);
 	fIntervalControl->SetDivider(labelWidth);
 	box->AddChild(fIntervalControl);
 
 	BPopUpMenu *frequencyPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *frequencyStrings[] = {
-		TR("never"),
-		TR("minutes"),
-		TR("hours"),
-		TR("days")};
+		B_TRANSLATE("never"),
+		B_TRANSLATE("minutes"),
+		B_TRANSLATE("hours"),
+		B_TRANSLATE("days")};
 	BMenuItem *item;
 	for (int32 i = 0; i < 4; i++) {
 		frequencyPopUp->AddItem(item = new BMenuItem(frequencyStrings[i],
@@ -357,28 +360,29 @@ ConfigWindow::ConfigWindow()
 	rect.OffsetBy(0,height + 9);
 	rect.bottom -= 2;
 	fPPPActiveCheckBox = new BCheckBox(rect, "ppp active",
-		TR("Only when dial-up is connected"), NULL);
+		B_TRANSLATE("Only when dial-up is connected"), NULL);
 	box->AddChild(fPPPActiveCheckBox);
 
 	rect.OffsetBy(0,height + 9);
 	rect.bottom -= 2;
 	fPPPActiveSendCheckBox = new BCheckBox(rect, "ppp activesend",
-		TR("Schedule outgoing mail when dial-up is disconnected"), NULL);
+		B_TRANSLATE("Schedule outgoing mail when dial-up is disconnected"),
+		NULL);
 	box->AddChild(fPPPActiveSendCheckBox);
 
 	// Miscellaneous settings box
 
 	rect = box->Frame();  rect.bottom = rect.top + 3 * height + 30;
 	box = new BBox(rect);
-	box->SetLabel(TR("Miscellaneous"));
+	box->SetLabel(B_TRANSLATE("Miscellaneous"));
 	view->AddChild(box);
 
 	BPopUpMenu *statusPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *statusModes[] = {
-		TR("Never"),
-		TR("While sending"),
-		TR("While sending and receiving"),
-		TR("Always")};
+		B_TRANSLATE("Never"),
+		B_TRANSLATE("While sending"),
+		B_TRANSLATE("While sending and receiving"),
+		B_TRANSLATE("Always")};
 	BMessage *msg;
 	for (int32 i = 0; i < 4; i++) {
 		statusPopUp->AddItem(item = new BMenuItem(statusModes[i],
@@ -391,16 +395,18 @@ ConfigWindow::ConfigWindow()
 	rect.top += 7;
 	rect.bottom = rect.top + height + 5;
 	labelWidth
-		= (int32)view->StringWidth(TR("Show connection status window:")) + 8;
+		= (int32)view->StringWidth(
+			B_TRANSLATE("Show connection status window:"))	+ 8;
 	fStatusModeField = new BMenuField(rect, "show status",
-		TR("Show connection status window:"), statusPopUp);
+		B_TRANSLATE("Show connection status window:"), statusPopUp);
 	fStatusModeField->SetDivider(labelWidth);
 	box->AddChild(fStatusModeField);
 
 	rect = fStatusModeField->Frame();;
 	rect.OffsetBy(0, rect.Height() + 10);
 	BButton *button = new BButton(rect, B_EMPTY_STRING,
-		TR("Edit mailbox menu…"), msg = new BMessage(B_REFS_RECEIVED));
+		B_TRANSLATE("Edit mailbox menu…"),
+		msg = new BMessage(B_REFS_RECEIVED));
 	button->ResizeToPreferred();
 	box->AddChild(button);
 	button->SetTarget(BMessenger("application/x-vnd.Be-TRAK"));
@@ -420,7 +426,7 @@ ConfigWindow::ConfigWindow()
 	rect = button->Frame();
 	rect.OffsetBy(rect.Width() + 30,0);
 	fAutoStartCheckBox = new BCheckBox(rect, "start daemon",
-		TR("Start mail services on startup"), NULL);
+		B_TRANSLATE("Start mail services on startup"), NULL);
 	fAutoStartCheckBox->ResizeToPreferred();
 	box->AddChild(fAutoStartCheckBox);
 
@@ -431,7 +437,7 @@ ConfigWindow::ConfigWindow()
 	rect = tabView->Frame();
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + height + 5;
-	BButton *saveButton = new BButton(rect, "apply", TR("Apply"),
+	BButton *saveButton = new BButton(rect, "apply", B_TRANSLATE("Apply"),
 		new BMessage(kMsgSaveSettings));
 	float w,h;
 	saveButton->GetPreferredSize(&w, &h);
@@ -439,7 +445,7 @@ ConfigWindow::ConfigWindow()
 	saveButton->MoveTo(rect.right - w, rect.top);
 	top->AddChild(saveButton);
 
-	BButton *revertButton = new BButton(rect, "revert", TR("Revert"),
+	BButton *revertButton = new BButton(rect, "revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertSettings));
 	revertButton->GetPreferredSize(&w, &h);
 	revertButton->ResizeTo(w,h);
@@ -507,7 +513,8 @@ ConfigWindow::MakeHowToView()
 		B_WILL_DRAW);
 	text->SetViewColor(fConfigView->Parent()->ViewColor());
 	text->SetAlignment(B_ALIGN_CENTER);
-	text->SetText(TR("\n\nCreate a new account with the Add button.\n\n"
+	text->SetText(B_TRANSLATE(
+		"\n\nCreate a new account with the Add button.\n\n"
 		"Remove an account with the Remove button on the selected item.\n\n"
 		"Select an item in the list to change its settings."));
 	rect = text->Bounds();
@@ -536,7 +543,7 @@ ConfigWindow::LoadSettings()
 		// move own window
 		MoveTo(settings.ConfigWindowFrame().LeftTop());
 	} else {
-		fprintf(stderr, TR("Error retrieving general settings: %s\n"),
+		fprintf(stderr, B_TRANSLATE("Error retrieving general settings: %s\n"),
 			strerror(status));
 	}
 
@@ -768,7 +775,8 @@ ConfigWindow::RevertToLastSettings()
 	status_t status = SetToGeneralSettings(&settings);
 	if (status != B_OK) {
 		char text[256];
-		sprintf(text, TR("\nThe general settings couldn't be reverted.\n\n"
+		sprintf(text, B_TRANSLATE(
+				"\nThe general settings couldn't be reverted.\n\n"
 				"Error retrieving general settings:\n%s\n"),
 			strerror(status));
 		(new BAlert("Error", text, "OK", NULL, NULL, B_WIDTH_AS_USUAL,

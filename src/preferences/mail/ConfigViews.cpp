@@ -60,7 +60,7 @@ AccountConfigView::AccountConfigView(BRect rect, Account *account)
 	BBox(rect),
 	fAccount(account)
 {
-	SetLabel(TR("Account settings"));
+	SetLabel(B_TRANSLATE("Account settings"));
 
 	rect = Bounds().InsetByCopy(8, 8);
 	rect.top += 10;
@@ -76,31 +76,33 @@ AccountConfigView::AccountConfigView(BRect rect, Account *account)
 	rect = view->Bounds();
 	rect.bottom = height + 5;
 
-	float labelWidth = view->StringWidth(TR("Account name:")) + 6;
+	float labelWidth = view->StringWidth(B_TRANSLATE("Account name:")) + 6;
 
 	view->AddChild(fNameControl = new BTextControl(rect, NULL,
-		TR("Account name:"), NULL, new BMessage(kMsgAccountNameChanged)));
+		B_TRANSLATE("Account name:"), NULL,
+		new BMessage(kMsgAccountNameChanged)));
 	fNameControl->SetDivider(labelWidth);
 	view->AddChild(fRealNameControl = new BTextControl(rect, NULL,
-		TR("Real name:"), NULL, NULL));
+		B_TRANSLATE("Real name:"), NULL, NULL));
 	fRealNameControl->SetDivider(labelWidth);
 	view->AddChild(fReturnAddressControl = new BTextControl(rect, NULL,
-		TR("Return address:"), NULL, NULL));
+		B_TRANSLATE("Return address:"), NULL, NULL));
 	fReturnAddressControl->SetDivider(labelWidth);
 //			control->TextView()->HideTyping(true);
 
 	BPopUpMenu *chainsPopUp = new BPopUpMenu(B_EMPTY_STRING);
 	const char *chainModes[] = {
-		TR("Receive mail only"),
-		TR("Send mail only"),
-		TR("Send and receive mail")};
+		B_TRANSLATE("Receive mail only"),
+		B_TRANSLATE("Send mail only"),
+		B_TRANSLATE("Send and receive mail")};
 	BMenuItem *item;
 	for (int32 i = 0;i < 3;i++) {
 		chainsPopUp->AddItem(item = new BMenuItem(chainModes[i],
 			new BMessage(kMsgAccountTypeChanged)));
 	}
 
-	fTypeField = new BMenuField(rect, NULL, TR("Account type:"), chainsPopUp);
+	fTypeField = new BMenuField(rect, NULL, B_TRANSLATE("Account type:"),
+		chainsPopUp);
 	fTypeField->SetDivider(labelWidth + 3);
 	view->AddChild(fTypeField);
 
@@ -166,7 +168,8 @@ AccountConfigView::UpdateViews()
 	if (!fAccount->Inbound() && !fAccount->Outbound()) {
 		if (BMenuItem *item = fTypeField->Menu()->FindMarked())
 			item->SetMarked(false);
-		fTypeField->Menu()->Superitem()->SetLabel(TR("Select account type"));
+		fTypeField->Menu()->Superitem()->SetLabel(
+			B_TRANSLATE("Select account type"));
 
 		fNameControl->SetEnabled(false);
 		fRealNameControl->SetEnabled(false);
@@ -560,13 +563,15 @@ FiltersConfigView::FiltersConfigView(BRect rect, Account *account)
 	BMenuItem *item;
 	BMessage *msg;
 	if ((fChain = fAccount->Inbound())) {
-		menu->AddItem(item = new BMenuItem(TR("Incoming mail filters"),
+		menu->AddItem(item = new BMenuItem(
+			B_TRANSLATE("Incoming mail filters"),
 			msg = new BMessage(kMsgChainSelected)));
 		msg->AddPointer("chain", fChain);
 		item->SetMarked(true);
 	}
 	if (BMailChain *chain = fAccount->Outbound()) {
-		menu->AddItem(item = new BMenuItem(TR("Outgoing mail filters"),
+		menu->AddItem(item = new BMenuItem(
+			B_TRANSLATE("Outgoing mail filters"),
 			msg = new BMessage(kMsgChainSelected)));
 		msg->AddPointer("chain", chain);
 		if (fChain == NULL) {
@@ -601,9 +606,9 @@ FiltersConfigView::FiltersConfigView(BRect rect, Account *account)
 	rect.bottom = rect.top + height;
 	BRect sizeRect = rect;
 	sizeRect.right = sizeRect.left + 30
-		+ fChainsField->StringWidth(TR("Add filter"));
+		+ fChainsField->StringWidth(B_TRANSLATE("Add filter"));
 
-	menu = new BPopUpMenu(TR("Add filter"));
+	menu = new BPopUpMenu(B_TRANSLATE("Add filter"));
 	menu->SetRadioMode(false);
 
 	fAddField = new BMenuField(rect, NULL, NULL, menu);
@@ -612,9 +617,9 @@ FiltersConfigView::FiltersConfigView(BRect rect, Account *account)
 
 	sizeRect.left = sizeRect.right + 5;
 	sizeRect.right = sizeRect.left + 30
-		+ fChainsField->StringWidth(TR("Remove"));
+		+ fChainsField->StringWidth(B_TRANSLATE("Remove"));
 	sizeRect.top--;
-	AddChild(fRemoveButton = new BButton(sizeRect, NULL, TR("Remove"),
+	AddChild(fRemoveButton = new BButton(sizeRect, NULL, B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveFilter), B_FOLLOW_BOTTOM));
 
 	ResizeTo(Bounds().Width(), sizeRect.bottom + 10);
@@ -834,8 +839,9 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 
 				if (fChain->AddFilter(to, settings, ref) < B_OK) {
 					(new BAlert("E-mail",
-						TR("The filter could not be moved. Deleting filter."),
-						TR("OK")))->Go();
+						B_TRANSLATE("The filter could not be moved. "
+							"Deleting filter."),
+						B_TRANSLATE("OK")))->Go();
 
 					// the filter view belongs to the moved filter
 					if (fFilterView && fFilterView->fIndex == -1)
