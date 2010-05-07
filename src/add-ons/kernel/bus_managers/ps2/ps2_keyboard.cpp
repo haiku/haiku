@@ -234,8 +234,8 @@ read_keyboard_packet(raw_key_info *packet, bool isDebugger)
 		return B_ERROR;
 	}
 
-	TRACE("ps2: read_keyboard_packet: scancode: %x, keydown: %s\n",
-		packet->scancode, packet->is_keydown ? "true" : "false");
+	TRACE("ps2: read_keyboard_packet: keycode: %" B_PRIx32 ", keydown: %s\n",
+		packet->keycode, packet->is_keydown ? "true" : "false");
 
 	return B_OK;
 }
