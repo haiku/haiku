@@ -26,23 +26,6 @@ Application Terminal :
 	TermWindow.cpp
 	VTKeyTbl.c
 	VTPrsTbl.c
-	: be locale tracker textencoding $(TARGET_LIBSUPC++)
+	: be tracker textencoding $(TARGET_LIBSUPC++)
 	: Terminal.rdef
 ;
-
-DoCatalogs Terminal :
-	x-vnd.Haiku-Terminal
-	:
-	AppearPrefView.cpp
-	Arguments.cpp
-	FindWindow.cpp
-	PrefHandler.cpp
-	PrefWindow.cpp
-	Shell.cpp
-	SmartTabView.cpp
-	TermApp.cpp
-	TermParse.cpp
-	TermView.cpp
-	TermWindow.cpp
-	: en.catalog
-	;

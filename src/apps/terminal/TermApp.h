@@ -33,7 +33,6 @@
 
 
 #include <Application.h>
-#include <Catalog.h>
 #include <String.h>
 
 class Arguments;
@@ -77,7 +76,6 @@ class TermApp : public BApplication {
 		BWindow*	fTermWindow;
 		BRect		fTermFrame;
 		Arguments	*fArgs;
-		BCatalog	fAppCatalog;
 };
 
 #endif	// TERM_APP_H

@@ -12,14 +12,12 @@
 #include "PrefHandler.h"
 #include "TermConst.h"
 
-#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Font.h>
 #include <GraphicsDefs.h>
-#include <Locale.h>
 #include <Message.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -241,15 +239,13 @@ PrefHandler::getFloat(const char *key)
 	return atof(value);
 }
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal getString"
 
 const char* 
 PrefHandler::getString(const char *key)
 {
 	const char *buffer;
 	if (fContainer.FindString(key, &buffer) != B_OK)
-		buffer = TR("Error!");
+		buffer = "Error!";
 
 	//printf("%x GET %s: %s\n", this, key, buf);
 	return buffer;
@@ -267,9 +263,6 @@ PrefHandler::getBool(const char *key)
 }
 
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal getRGB"
-
 /** Returns RGB data from given key. */
 
 rgb_color
@@ -281,7 +274,7 @@ PrefHandler::getRGB(const char *key)
 	if (const char *s = fContainer.FindString(key)) {
 		sscanf(s, "%d, %d, %d", &r, &g, &b);
 	} else {
-		fprintf(stderr, TR("PrefHandler::getRGB(%s) - key not found\n"), key);
+		fprintf(stderr, "PrefHandler::getRGB(%s) - key not found\n", key);
 		r = g = b = 0;
 	}
 

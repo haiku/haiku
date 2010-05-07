@@ -18,8 +18,6 @@
 
 #include <Autolock.h>
 #include <Beep.h>
-#include <Catalog.h>
-#include <Locale.h>
 #include <Message.h>
 #include <UTF8.h>
 
@@ -47,8 +45,6 @@ extern int gMbcsTable[];			/* ESC $ */
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal TermParse"
 
 //! Get char from pty reader buffer.
 inline uchar
@@ -291,17 +287,17 @@ TermParse::DumpState(int *groundtable, int *parsestate, uchar c)
 	{ NULL, NULL }
 	};
 	int i;
-	fprintf(stderr, TR("groundtable: "));
+	fprintf(stderr, "groundtable: ");
 	for (i = 0; tables[i].p; i++) {
 		if (tables[i].p == groundtable)
 			fprintf(stderr, "%s\t", tables[i].name);
 	}
-	fprintf(stderr, TR("parsestate: "));
+	fprintf(stderr, "parsestate: ");
 	for (i = 0; tables[i].p; i++) {
 		if (tables[i].p == parsestate)
 			fprintf(stderr, "%s\t", tables[i].name);
 	}
-	fprintf(stderr, TR("char: 0x%02x (%d)\n"), c, c);
+	fprintf(stderr, "char: 0x%02x (%d)\n", c, c);
 }
 
 

@@ -27,13 +27,11 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Beep.h>
-#include <Catalog.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Dragger.h>
 #include <Input.h>
-#include <Locale.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
@@ -83,8 +81,6 @@ enum {
 	SELECT_LINES
 };
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal TermView"
 
 static property_info sPropList[] = {
 	{ "encoding",
@@ -1431,7 +1427,7 @@ TermView::FrameResized(float width, float height)
 	bool hasResizeView = fResizeRunner != NULL;
 	if (!hasResizeView) {
 		// show the current size in a view
-		fResizeView = new BStringView(BRect(100, 100, 300, 140), TR("size"), "");
+		fResizeView = new BStringView(BRect(100, 100, 300, 140), "size", "");
 		fResizeView->SetAlignment(B_ALIGN_CENTER);
 		fResizeView->SetFont(be_bold_font);
 
@@ -1825,12 +1821,12 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 	cpMessage->what = kSecondaryMouseDropAction;
 	cpMessage->AddInt8("action", kCopyFiles);
 
-	BMenuItem* insertItem = new BMenuItem(TR("Insert path"), insertMessage);
-	BMenuItem* cdItem = new BMenuItem(TR("Change directory"), cdMessage);
-	BMenuItem* lnItem = new BMenuItem(TR("Create link here"), lnMessage);
-	BMenuItem* mvItem = new BMenuItem(TR("Move here"), mvMessage);
-	BMenuItem* cpItem = new BMenuItem(TR("Copy here"), cpMessage);
-	BMenuItem* chItem = new BMenuItem(TR("Cancel"), NULL);
+	BMenuItem* insertItem = new BMenuItem("Insert path", insertMessage);
+	BMenuItem* cdItem = new BMenuItem("Change directory", cdMessage);
+	BMenuItem* lnItem = new BMenuItem("Create link here", lnMessage);
+	BMenuItem* mvItem = new BMenuItem("Move here", mvMessage);
+	BMenuItem* cpItem = new BMenuItem("Copy here", cpMessage);
+	BMenuItem* chItem = new BMenuItem("Cancel", NULL);
 
 	// if the refs point to different directorys disable the cd menu item
 	bool differentDirs = false;
@@ -1858,7 +1854,7 @@ TermView::_SecondaryMouseButtonDropped(BMessage* msg)
 	if (differentDirs)
 		cdItem->SetEnabled(false);
 
-	BPopUpMenu *menu = new BPopUpMenu(TR("Secondary mouse button drop menu"));
+	BPopUpMenu *menu = new BPopUpMenu("Secondary Mouse Button Drop Menu");
 	menu->SetAsyncAutoDestruct(true);
 	menu->AddItem(insertItem);
 	menu->AddSeparatorItem();
@@ -2768,10 +2764,10 @@ void
 TermView::AboutRequested()
 {
 	BAlert *alert = new (std::nothrow) BAlert("about",
-		TR("Terminal\n\n"
+		"Terminal\n\n"
 		"written by Kazuho Okui and Takashi Murai\n"
 		"updated by Kian Duffy and others\n\n"
-		"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n"), TR("OK"));
+		"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku.\n", "OK");
 	if (alert != NULL)
 		alert->Go();
 }

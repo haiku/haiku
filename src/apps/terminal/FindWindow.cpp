@@ -10,13 +10,11 @@
 
 #include <Box.h>
 #include <Button.h>
-#include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
-#include <Locale.h>
 #include <RadioButton.h>
 #include <String.h>
 #include <TextControl.h>
@@ -26,13 +24,11 @@ const uint32 MSG_FIND_HIDE = 'Fhid';
 const uint32 TOGGLE_FIND_CONTROL = 'MTFG';
 const BRect kWindowFrame(10, 30, 250, 200);
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal FindWindow"
 
 FindWindow::FindWindow(BMessenger messenger, const BString& str,
 		bool findSelection, bool matchWord, bool matchCase, bool forwardSearch)
 	:
-	BWindow(kWindowFrame, TR("Find"), B_FLOATING_WINDOW,
+	BWindow(kWindowFrame, "Find", B_FLOATING_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
 		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindDlgMessenger(messenger)
@@ -48,16 +44,16 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 	BView* layoutView = BGroupLayoutBuilder(B_VERTICAL, 5.0)
 		.SetInsets(spacing, spacing, spacing, spacing)
 		.Add(BGridLayoutBuilder()
-			.Add(fTextRadio = new BRadioButton(TR("Use text:"),
+			.Add(fTextRadio = new BRadioButton("Use text:",
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 0)
 			.Add(fFindLabel = new BTextControl(NULL, NULL, NULL), 1, 0)
-			.Add(useSelection = new BRadioButton(TR("Use selection"),
+			.Add(useSelection = new BRadioButton("Use selection",
 				new BMessage(TOGGLE_FIND_CONTROL)), 0, 1))
 		.Add(separator)
-		.Add(fForwardSearchBox = new BCheckBox(TR("Search forward")))
-		.Add(fMatchCaseBox = new BCheckBox(TR("Match case")))
-		.Add(fMatchWordBox = new BCheckBox(TR("Match word")))
-		.Add(fFindButton = new BButton(TR("Find"), new BMessage(MSG_FIND)))
+		.Add(fForwardSearchBox = new BCheckBox("Search forward"))
+		.Add(fMatchCaseBox = new BCheckBox("Match case"))
+		.Add(fMatchWordBox = new BCheckBox("Match word"))
+		.Add(fFindButton = new BButton("Find", new BMessage(MSG_FIND)))
 		.End();
 	AddChild(layoutView);
 
