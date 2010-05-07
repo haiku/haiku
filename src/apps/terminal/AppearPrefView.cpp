@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -28,12 +28,48 @@
 #include "PrefHandler.h"
 #include "TermConst.h"
 
-#undef TR_CONTEXT ""
-#define TR_CONTEXT "Terminal ApperPrefView"
+
+#undef TR_CONTEXT
+#define TR_CONTEXT "Terminal AppearancePrefView"
+
+
+static bool
+IsFontUsable(const BFont& font)
+{
+	// TODO: If BFont::IsFullAndHalfFixed() was implemented, we could
+	// use that. But I don't think it's easily implementable using
+	// Freetype.
+
+	if (font.IsFixed())
+		return true;
+
+	// manually check if all applicable chars are the same width
+	char buffer[2] = { ' ', 0 };
+	int firstWidth = (int)ceilf(font.StringWidth(buffer));
+
+	// TODO: Workaround for broken fonts/font_subsystem
+	if (firstWidth <= 0)
+		return false;
+
+	for (int c = ' '+1; c <= 0x7e; c++) {
+		buffer[0] = c;
+		int width = (int)ceilf(font.StringWidth(buffer));
+
+		if (width != firstWidth)
+			return false;
+	}
+
+	return true;
+}
+
+
+// #pragma mark -
+
 
 AppearancePrefView::AppearancePrefView(const char* name,
 		const BMessenger& messenger)
-	: BView(name, B_WILL_DRAW),
+	:
+	BView(name, B_WILL_DRAW),
 	fTerminalMessenger(messenger)
 {
   	const char* kColorTable[] = {
@@ -215,38 +251,7 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 }
 
 
-static bool
-IsFontUsable(const BFont& font)
-{
-	// TODO: If BFont::IsFullAndHalfFixed() was implemented, we could
-	// use that. But I don't think it's easily implementable using
-	// Freetype.
-
-	if (font.IsFixed())
-		return true;
-
-	// manually check if all applicable chars are the same width
-	char buffer[2] = { ' ', 0 };
-	int firstWidth = (int)ceilf(font.StringWidth(buffer));
-
-	// TODO: Workaround for broken fonts/font_subsystem
-	if (firstWidth <= 0)
-		return false;
-
-	for (int c = ' '+1; c <= 0x7e; c++) {
-		buffer[0] = c;
-		int width = (int)ceilf(font.StringWidth(buffer));
-
-		if (width != firstWidth)
-			return false;
-	}
-
-	return true;
-}
-
-
-/* static */
-BMenu*
+/*static*/ BMenu*
 AppearancePrefView::_MakeFontMenu(uint32 command,
 	const char* defaultFamily, const char* defaultStyle)
 {
@@ -289,8 +294,7 @@ AppearancePrefView::_MakeFontMenu(uint32 command,
 }
 
 
-/* static */
-BMenu*
+/*static*/ BMenu*
 AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 {
 	BPopUpMenu* menu = new BPopUpMenu("size");
@@ -327,8 +331,7 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 }
 
 
-/* static */
-BPopUpMenu*
+/*static*/ BPopUpMenu*
 AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
 	const char* defaultItemName)
 {
