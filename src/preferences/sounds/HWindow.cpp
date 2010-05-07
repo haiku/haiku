@@ -53,10 +53,10 @@ HWindow::HWindow(BRect rect, const char* name)
 
 	fFilePanel = new BFilePanel();
 	fFilePanel->SetTarget(this);
-	
+
 	BPath path;
 	BMessage msg;
-	
+
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(kSettingsFile);
 		BFile file(path.Path(), B_READ_ONLY);
@@ -74,7 +74,7 @@ HWindow::~HWindow()
 {
 	delete fFilePanel;
 	delete fPlayer;
-	
+
 	BPath path;
 	BMessage msg;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -104,20 +104,23 @@ HWindow::InitGUI()
 	menu->SetRadioMode(true);
 	menu->SetLabelFromMarked(true);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(TR("<none>"), new BMessage(M_NONE_MESSAGE)));
-	menu->AddItem(new BMenuItem(TR("Other" B_UTF8_ELLIPSIS),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("<none>"),
+		new BMessage(M_NONE_MESSAGE)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Other" B_UTF8_ELLIPSIS),
 		new BMessage(M_OTHER_MESSAGE)));
-	BMenuField* menuField = new BMenuField("filemenu", TR("Sound File:"), menu);
-	menuField->SetDivider(menuField->StringWidth(TR("Sound File:")) + 10);
+	BMenuField* menuField = new BMenuField("filemenu",
+		B_TRANSLATE("Sound File:"), menu);
+	menuField->SetDivider(menuField->StringWidth(B_TRANSLATE("Sound File:"))
+		+ 10);
 
-	BButton* stopbutton = new BButton("stop", TR("Stop"),
+	BButton* stopbutton = new BButton("stop", B_TRANSLATE("Stop"),
 		new BMessage(M_STOP_MESSAGE));
 	stopbutton->SetEnabled(false);
 
-	BButton* playbutton = new BButton("play", TR("Play"),
+	BButton* playbutton = new BButton("play", B_TRANSLATE("Play"),
 		new BMessage(M_PLAY_MESSAGE));
 	playbutton->SetEnabled(false);
-	
+
 	view->SetLayout(new BGroupLayout(B_HORIZONTAL));
 	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 15)
 		.AddGroup(B_HORIZONTAL)
@@ -145,7 +148,7 @@ HWindow::InitGUI()
 
 	// setup file menu
 	SetupMenuField();
-	menu->FindItem(TR("<none>"))->SetMarked(true);
+	menu->FindItem(B_TRANSLATE("<none>"))->SetMarked(true);
 }
 
 
@@ -165,7 +168,7 @@ HWindow::MessageReceived(BMessage* message)
 			if (row != NULL) {
 				BPath path(row->Path());
 				if (path.InitCheck() != B_OK) {
-					BMenuItem* item = menu->FindItem(TR("<none>"));
+					BMenuItem* item = menu->FindItem(B_TRANSLATE("<none>"));
 					if (item != NULL)
 						item->SetMarked(true);
 				} else {
@@ -187,7 +190,7 @@ HWindow::MessageReceived(BMessage* message)
 				BMenuField* menufield
 					= dynamic_cast<BMenuField*>(FindView("filemenu"));
 				if (menufield == NULL)
-					return;	
+					return;
 				BMenu* menu = menufield->Menu();
 
 				// check audio file
@@ -201,9 +204,10 @@ HWindow::MessageReceived(BMessage* message)
 				if (superType.Type() == NULL
 					|| strcmp(superType.Type(), "audio") != 0) {
 					beep();
-					BAlert* alert = new BAlert("", TR("This is not an audio "
-						"file."), TR("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-						B_STOP_ALERT);
+					BAlert* alert = new BAlert("",
+						B_TRANSLATE("This is not an audio file."),
+						B_TRANSLATE("OK"), NULL, NULL,
+						B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->Go();
 					break;
 				}
@@ -264,7 +268,7 @@ HWindow::MessageReceived(BMessage* message)
 			if (message->FindString("path", &path) == B_OK) {
 				BPath path(path);
 				if (path.InitCheck() != B_OK) {
-					BMenuItem* item = menu->FindItem(TR("<none>"));
+					BMenuItem* item = menu->FindItem(B_TRANSLATE("<none>"));
 					if (item != NULL)
 						item->SetMarked(true);
 				} else {
@@ -326,7 +330,7 @@ HWindow::SetupMenuField()
 	BDirectory dir;
 	BEntry entry;
 	BPath item_path;
-	
+
 	status_t err = find_directory(B_BEOS_SOUNDS_DIRECTORY, &path);
 	if (err == B_OK)
 		err = dir.SetTo(path.Path());
@@ -370,7 +374,7 @@ HWindow::SetupMenuField()
 
 	err = find_directory(B_COMMON_SOUNDS_DIRECTORY, &path);
 	if (err == B_OK)
-		err = dir.SetTo(path.Path());	
+		err = dir.SetTo(path.Path());
 	while (err == B_OK) {
 		err = dir.GetNextEntry(&entry, true);
 		if (entry.InitCheck() != B_NO_ERROR)
@@ -439,7 +443,7 @@ bool
 HWindow::QuitRequested()
 {
 	fFrame = Frame();
-	
+
 	fEventList->RemoveAll();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;

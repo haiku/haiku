@@ -43,7 +43,7 @@ HEventRow::SetPath(const char* _path)
 {
 	fPath = _path;
 	BPath path(_path);
-	SetField(new BStringField(_path ? path.Leaf() : TR("<none>")),
+	SetField(new BStringField(_path ? path.Leaf() : B_TRANSLATE("<none>")),
 		kSoundColumn);
 }
 
@@ -60,10 +60,10 @@ HEventList::HEventList(const char* name)
 	BColumnListView(name, 0, B_PLAIN_BORDER, true),
 	fType(NULL)
 {
-	AddColumn(new BStringColumn(TR("Event"), 150, 50, 500, B_TRUNCATE_MIDDLE),
-		kEventColumn);
-	AddColumn(new BStringColumn(TR("Sound"), 150, 50, 500, B_TRUNCATE_END),
-		kSoundColumn);
+	AddColumn(new BStringColumn(B_TRANSLATE("Event"), 150, 50, 500,
+		B_TRUNCATE_MIDDLE), kEventColumn);
+	AddColumn(new BStringColumn(B_TRANSLATE("Sound"), 150, 50, 500,
+		B_TRUNCATE_END), kSoundColumn);
 }
 
 
@@ -82,7 +82,7 @@ HEventList::SetType(const char* type)
 	mfiles.RewindRefs(type);
 	delete fType;
 	fType = strdup(type);
-	
+
 	BString name;
 	entry_ref ref;
 	while (mfiles.GetNextRef(&name,&ref) == B_OK) {
@@ -111,12 +111,12 @@ void
 HEventList::SelectionChanged()
 {
 	BColumnListView::SelectionChanged();
-	
+
 	HEventRow* row = (HEventRow*)CurrentSelection();
 	if (row != NULL) {
 		entry_ref ref;
 		BMediaFiles().GetRefFor(fType, row->Name(), &ref);
-		
+
 		BPath path(&ref);
 		if (path.InitCheck() == B_OK || ref.name == NULL
 			|| strcmp(ref.name, "") == 0) {
@@ -126,7 +126,7 @@ HEventList::SelectionChanged()
 			printf("name %s\n", ref.name);
 			BMediaFiles().RemoveRefFor(fType, row->Name(), ref);
 			BAlert* alert = new BAlert("alert",
-				TR("No such file or directory"), TR("OK"));
+				B_TRANSLATE("No such file or directory"), B_TRANSLATE("OK"));
 			alert->Go();
 			return;
 		}
@@ -147,7 +147,7 @@ HEventList::SetPath(const char* path)
 		BEntry entry(path);
 		entry.GetRef(&ref);
 		BMediaFiles().SetRefFor(fType, row->Name(), ref);
-		
+
 		row->SetPath(path);
 		UpdateRow(row);
 	}

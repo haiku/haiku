@@ -30,7 +30,7 @@ HApp::HApp()
 	BRect rect;
 	rect.Set(200, 150, 590, 570);
 
-	HWindow* window = new HWindow(rect, TR("Sounds"));
+	HWindow* window = new HWindow(rect, B_TRANSLATE("Sounds"));
 	window->Show();
 }
 
@@ -43,14 +43,14 @@ HApp::~HApp()
 void
 HApp::AboutRequested()
 {
-	BAlert* alert = new BAlert(TR("About Sounds"),
-		TR("Sounds\n"
+	BAlert* alert = new BAlert(B_TRANSLATE("About Sounds"),
+		B_TRANSLATE("Sounds\n"
 			"  Brought to you by :\n"
 			"\tOliver Ruiz Dorantes\n"
 			"\tJérôme DUVAL.\n"
 			"  Original work from Atsushi Takamatsu.\n"
 			"Copyright ©2003-2006 Haiku"),
-		TR("OK"));
+		B_TRANSLATE("OK"));
 	alert->Go();
 }
 
