@@ -9,16 +9,15 @@ Preference Locale :
 	Locale.cpp
 	LocaleWindow.cpp
 	TimeFormatSettingsView.cpp
+
 	: be liblocale.so $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libicu-common.so
 		libicu-data.so libshared.a
 	: Locale.rdef
-	;
+;
 
-DoCatalogs Locale		# application name
-	: x-vnd.Haiku-Locale # app MIME signature
-	:					# sources to extract the keys from
+DoCatalogs Locale : x-vnd.Haiku-Locale :
+	LanguageListView.cpp
 	Locale.cpp
 	LocaleWindow.cpp
 	TimeFormatSettingsView.cpp
 ;
-

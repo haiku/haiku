@@ -15,6 +15,7 @@
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
@@ -23,6 +24,7 @@
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TabView.h>
+#include <UnicodeChar.h>
 
 #include <ICUWrapper.h>
 
@@ -33,6 +35,18 @@
 
 
 #define TR_CONTEXT "Locale Preflet Window"
+
+
+static const uint32 kMsgLanguageInvoked = 'LaIv';
+static const uint32 kMsgLanguageDragged = 'LaDr';
+static const uint32 kMsgPreferredLanguageInvoked = 'PLIv';
+static const uint32 kMsgPreferredLanguageDragged = 'PLDr';
+static const uint32 kMsgPreferredLanguageDeleted = 'PLDl';
+static const uint32 kMsgCountrySelection = 'csel';
+static const uint32 kMsgDefaults = 'dflt';
+static const uint32 kMsgRevert = 'revt';
+
+static const uint32 kMsgPreferredLanguagesChanged = 'lang';
 
 
 static int
@@ -50,26 +64,19 @@ compare_typed_list_items(const BListItem* _a, const BListItem* _b)
 
 LocaleWindow::LocaleWindow()
 	:
-	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_NOT_RESIZABLE
-		| B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
-		| B_QUIT_ON_WINDOW_CLOSE),
-	fMsgPrefLanguagesChanged(new BMessage(kMsgPrefLanguagesChanged))
+	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE
+		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BCountry* defaultCountry;
 	be_locale_roster->GetDefaultCountry(&defaultCountry);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	BButton* button = new BButton(B_TRANSLATE("Defaults"),
-		new BMessage(kMsgDefaults));
-	fRevertButton = new BButton(B_TRANSLATE("Revert"),
-		new BMessage(kMsgRevert));
-	fRevertButton->SetEnabled(false);
+	float spacing = be_control_look->DefaultItemSpacing();
 
 	BTabView* tabView = new BTabView("tabview");
-
-	BView* languageTab = new BView(B_TRANSLATE("Language"), B_WILL_DRAW);
-	languageTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
+	BGroupView* languageTab = new BGroupView(B_TRANSLATE("Language"),
+		B_HORIZONTAL, spacing);
 
 	// first list: available languages
 	fLanguageListView = new LanguageListView("available",
@@ -77,34 +84,48 @@ LocaleWindow::LocaleWindow()
 	BScrollView* scrollView = new BScrollView("scroller", fLanguageListView,
 		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-	fLanguageListView->SetInvocationMessage(new BMessage(kMsgLangInvoked));
+	fLanguageListView->SetInvocationMessage(new BMessage(kMsgLanguageInvoked));
+	fLanguageListView->SetDragMessage(new BMessage(kMsgLanguageDragged));
 
 	// Fill the language list from the LocaleRoster data
 	BMessage installedLanguages;
 	if (be_locale_roster->GetInstalledLanguages(&installedLanguages) == B_OK) {
-		BString currentLanguageCode;
-		BString currentLanguageName;
+		BString currentID;
 		LanguageListItem* lastAddedCountryItem = NULL;
 
-		for (int i = 0; installedLanguages.FindString("langs",
-				i, &currentLanguageCode) == B_OK; i++) {
+		for (int i = 0; installedLanguages.FindString("langs", i, &currentID)
+				== B_OK; i++) {
 			// Now get an human-readable, localized name for each language
 			BLanguage* currentLanguage;
-			be_locale_roster->GetLanguage(&currentLanguage,
-				currentLanguageCode.String());
+			be_locale_roster->GetLanguage(currentID.String(),
+				&currentLanguage);
 
-			currentLanguageName.Truncate(0);
-			currentLanguage->GetName(&currentLanguageName);
+			BString name;
+			currentLanguage->GetName(name);
 
-			LanguageListItem* item = new LanguageListItem(currentLanguageName,
-				currentLanguageCode.String());
-			if (currentLanguage->IsCountry()) {
+			// TODO: as long as the app_server doesn't support font overlays,
+			// use the translated name if problematic characters are used...
+			const char* string = name.String();
+			while (uint32 code = BUnicodeChar::FromUTF8(&string)) {
+				if (code > 1424) {
+					currentLanguage->GetTranslatedName(name);
+					break;
+				}
+			}
+
+			LanguageListItem* item = new LanguageListItem(name,
+				currentID.String(), currentLanguage->Code());
+			if (currentLanguage->IsCountrySpecific()
+				&& lastAddedCountryItem != NULL
+				&& lastAddedCountryItem->Code() == item->Code()) {
 				fLanguageListView->AddUnder(item, lastAddedCountryItem);
 			} else {
-				// This is a language without country, add it at top-level
+				// This is a language variant, add it at top-level
 				fLanguageListView->AddItem(item);
-				item->SetExpanded(false);
-				lastAddedCountryItem = item;
+				if (!currentLanguage->IsCountrySpecific()) {
+					item->SetExpanded(false);
+					lastAddedCountryItem = item;
+				}
 			}
 
 			delete currentLanguage;
@@ -112,12 +133,12 @@ LocaleWindow::LocaleWindow()
 
 		fLanguageListView->FullListSortItems(compare_typed_list_items);
 	} else {
-		BAlert* myAlert = new BAlert("Error",
+		BAlert* alert = new BAlert("Error",
 			B_TRANSLATE("Unable to find the available languages! You can't "
 				"use this preflet!"),
 			B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_STOP_ALERT);
-		myAlert->Go();
+		alert->Go();
 	}
 
 	// Second list: active languages
@@ -126,40 +147,23 @@ LocaleWindow::LocaleWindow()
 	BScrollView* scrollViewEnabled = new BScrollView("scroller",
 		fPreferredListView, B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
-	fPreferredListView->SetInvocationMessage(new BMessage(kMsgPrefLangInvoked));
+	fPreferredListView->SetInvocationMessage(
+		new BMessage(kMsgPreferredLanguageInvoked));
+	fPreferredListView->SetDeleteMessage(
+		new BMessage(kMsgPreferredLanguageDeleted));
+	fPreferredListView->SetDragMessage(
+		new BMessage(kMsgPreferredLanguageDragged));
 
-	// get the preferred languages from the Settings. Move them here from
-	// the other list.
-	BMessage msg;
-	be_locale_roster->GetPreferredLanguages(&msg);
-	BString langCode;
-	for (int index = 0; msg.FindString("language", index, &langCode) == B_OK;
-			index++) {
-		for (int listPos = 0; LanguageListItem* item
-				= static_cast<LanguageListItem*>
-					(fLanguageListView->FullListItemAt(listPos));
-				listPos++) {
-			if (langCode == item->LanguageCode()) {
-				// We found the item we were looking for, now move it to
-				// the other list along with all its children
-				static_cast<LanguageListView*>(fPreferredListView)
-					->MoveItemFrom(fLanguageListView,
-						fLanguageListView->FullListIndexOf(item),
-						fLanguageListView->CountItems());
-			}
-		}
-	}
-
-	languageTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 10)
-		.AddGroup(B_VERTICAL, 10)
+	BLayoutBuilder::Group<>(languageTab)
+		.AddGroup(B_VERTICAL, spacing)
 			.Add(new BStringView("", B_TRANSLATE("Available languages")))
 			.Add(scrollView)
 			.End()
-		.AddGroup(B_VERTICAL, 10)
+		.AddGroup(B_VERTICAL, spacing)
 			.Add(new BStringView("", B_TRANSLATE("Preferred languages")))
 			.Add(scrollViewEnabled)
 			.End()
-		.View());
+		.SetInsets(spacing, spacing, spacing, spacing);
 
 	BView* countryTab = new BView(B_TRANSLATE("Country"), B_WILL_DRAW);
 	countryTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
@@ -183,48 +187,56 @@ LocaleWindow::LocaleWindow()
 		countryFullName.toUTF8(sink);
 
 		LanguageListItem* item
-			= new LanguageListItem(string, currentLocale[index].getName());
+			= new LanguageListItem(string, currentLocale[index].getName(),
+				NULL);
 		listView->AddItem(item);
 		if (!strcmp(currentLocale[index].getName(), defaultCountry->Code()))
 			listView->Select(listView->CountItems() - 1);
 	}
 
 	// TODO: find a real solution intead of this hack
-	listView->SetExplicitMinSize(BSize(300, B_SIZE_UNSET));
+	listView->SetExplicitMinSize(
+		BSize(25 * be_plain_font->Size(), B_SIZE_UNSET));
 
 	fFormatView = new FormatView(defaultCountry);
 
-	countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 5)
+	countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
 		.AddGroup(B_VERTICAL, 3)
 			.Add(scrollView)
 			.End()
 		.Add(fFormatView)
-		.View()
-	);
+		.SetInsets(spacing, spacing, spacing, spacing));
 
 	listView->ScrollToSelection();
 
 	tabView->AddTab(languageTab);
 	tabView->AddTab(countryTab);
 
-	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_VERTICAL, 3)
-			.Add(tabView)
-			.AddGroup(B_HORIZONTAL, 3)
-				.Add(button)
-				.Add(fRevertButton)
-				.AddGlue()
-				.End()
-			.SetInsets(5, 5, 5, 5)
-			.End();
+	BButton* button = new BButton(B_TRANSLATE("Defaults"),
+		new BMessage(kMsgDefaults));
+#if 0
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(kMsgRevert));
+	fRevertButton->SetEnabled(false);
+#endif
 
+	BLayoutBuilder::Group<>(this, B_VERTICAL, spacing)
+		.Add(tabView)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(button)
+//			.Add(fRevertButton)
+			.AddGlue()
+			.End()
+		.SetInsets(spacing, spacing, spacing, spacing)
+		.End();
+
+	_UpdatePreferredFromLocaleRoster();
 	CenterOnScreen();
 }
 
 
 LocaleWindow::~LocaleWindow()
 {
-	delete fMsgPrefLanguagesChanged;
 }
 
 
@@ -233,30 +245,86 @@ LocaleWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kMsgDefaults:
-			// TODO
+			_Defaults();
 			break;
 
 		case kMsgRevert:
 			// TODO
 			break;
 
-		case kMsgPrefLanguagesChanged:
+		case kMsgLanguageDragged:
 		{
-			BMessage update(kMsgSettingsChanged);
-			int index = 0;
-			while (index < fPreferredListView->FullListCountItems()) {
-				// only include subitems : we can guess the superitem
-				// from them anyway
-				if (fPreferredListView->Superitem(
-						fPreferredListView->FullListItemAt(index)) != NULL) {
-					LanguageListItem* item = static_cast<LanguageListItem*>(
-						fPreferredListView->FullListItemAt(index));
-					update.AddString("language", item->LanguageCode());
-				}
-				index++;
+			void* target = NULL;
+			if (message->FindPointer("drop_target", &target) != B_OK
+				|| target != fPreferredListView)
+				break;
+
+			// Add from available languages to preferred languages
+			int32 dropIndex;
+			if (message->FindInt32("drop_index", &dropIndex) != B_OK)
+				dropIndex = fPreferredListView->CountItems();
+
+			int32 index = 0;
+			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK;
+					i++) {
+				LanguageListItem* item = static_cast<LanguageListItem*>(
+					fLanguageListView->FullListItemAt(index));
+				_InsertPreferredLanguage(item, dropIndex++);
 			}
-			fLanguageListView->FullListSortItems(compare_typed_list_items);
-			be_app_messenger.SendMessage(&update);
+			break;
+		}
+		case kMsgLanguageInvoked:
+		{
+			int32 index = 0;
+			for (int32 i = 0; message->FindInt32("index", i, &index) == B_OK;
+					i++) {
+				LanguageListItem* item = static_cast<LanguageListItem*>(
+					fLanguageListView->ItemAt(index));
+				_InsertPreferredLanguage(item);
+			}
+			break;
+		}
+
+		case kMsgPreferredLanguageDragged:
+		{
+			void* target = NULL;
+			if (fPreferredListView->CountItems() == 1
+				|| message->FindPointer("drop_target", &target) != B_OK)
+				break;
+
+			if (target == fPreferredListView) {
+				// change ordering
+				int32 dropIndex = message->FindInt32("drop_index");
+				int32 index = 0;
+				if (message->FindInt32("index", &index) == B_OK
+					&& dropIndex != index) {
+					BListItem* item = fPreferredListView->RemoveItem(index);
+					if (dropIndex > index)
+						index--;
+					fPreferredListView->AddItem(item, dropIndex);
+
+					_PreferredLanguagesChanged();
+				}
+				break;
+			}
+
+			// supposed to fall through - remove item
+		}
+		case kMsgPreferredLanguageDeleted:
+		case kMsgPreferredLanguageInvoked:
+		{
+			if (fPreferredListView->CountItems() == 1)
+				break;
+
+			// Remove from preferred languages
+			int32 index = 0;
+			if (message->FindInt32("index", &index) == B_OK) {
+				delete fPreferredListView->RemoveItem(index);
+				_PreferredLanguagesChanged();
+
+				if (message->what == kMsgPreferredLanguageDeleted)
+					fPreferredListView->Select(index);
+			}
 			break;
 		}
 
@@ -274,39 +342,11 @@ LocaleWindow::MessageReceived(BMessage* message)
 			LanguageListItem* item = static_cast<LanguageListItem*>
 				(countryList->ItemAt(countryList->CurrentSelection()));
 			BMessage newMessage(kMsgSettingsChanged);
-			newMessage.AddString("country", item->LanguageCode());
+			newMessage.AddString("country", item->ID());
 			be_app_messenger.SendMessage(&newMessage);
 
-			BCountry* country = new BCountry(item->LanguageCode());
+			BCountry* country = new BCountry(item->ID());
 			fFormatView->SetCountry(country);
-			break;
-		}
-
-		case kMsgLangInvoked:
-		{
-			int32 index = 0;
-			if (message->FindInt32("index", &index) == B_OK) {
-				LanguageListItem* listItem = static_cast<LanguageListItem*>
-					(fLanguageListView->RemoveItem(index));
-				fPreferredListView->AddItem(listItem);
-				fPreferredListView->Invoke(fMsgPrefLanguagesChanged);
-			}
-			break;
-		}
-
-		case kMsgPrefLangInvoked:
-		{
-			if (fPreferredListView->CountItems() == 1)
-				break;
-
-			int32 index = 0;
-			if (message->FindInt32("index", &index) == B_OK) {
-				LanguageListItem* listItem = static_cast<LanguageListItem*>
-					(fPreferredListView->RemoveItem(index));
-				fLanguageListView->AddItem(listItem);
-				fLanguageListView->FullListSortItems(compare_typed_list_items);
-				fPreferredListView->Invoke(fMsgPrefLanguagesChanged);
-			}
 			break;
 		}
 
@@ -317,11 +357,142 @@ LocaleWindow::MessageReceived(BMessage* message)
 }
 
 
-void
-LocaleWindow::FrameMoved(BPoint newPosition)
+bool
+LocaleWindow::QuitRequested()
 {
 	BMessage update(kMsgSettingsChanged);
-	update.AddPoint("window_location", newPosition);
+	update.AddPoint("window_location", Frame().LeftTop());
 	be_app_messenger.SendMessage(&update);
+
+	return true;
 }
 
+
+void
+LocaleWindow::_PreferredLanguagesChanged()
+{
+	BMessage update(kMsgSettingsChanged);
+	int index = 0;
+	while (index < fPreferredListView->FullListCountItems()) {
+		// only include subitems: we can guess the superitem
+		// from them anyway
+		LanguageListItem* item = static_cast<LanguageListItem*>(
+			fPreferredListView->FullListItemAt(index));
+		if (item != NULL)
+			update.AddString("language", item->ID());
+
+		index++;
+	}
+	be_app_messenger.SendMessage(&update);
+
+	_EnableDisableLanguages();
+}
+
+
+void
+LocaleWindow::_EnableDisableLanguages()
+{
+	DisableUpdates();
+
+	for (int32 i = 0; i < fLanguageListView->FullListCountItems(); i++) {
+		LanguageListItem* item = static_cast<LanguageListItem*>(
+			fLanguageListView->FullListItemAt(i));
+
+		bool enable = fPreferredListView->ItemForLanguageID(item->ID()) == NULL;
+		if (item->IsEnabled() != enable) {
+			item->SetEnabled(enable);
+
+			int32 visibleIndex = fLanguageListView->IndexOf(item);
+			if (visibleIndex >= 0) {
+				if (!enable)
+					fLanguageListView->Deselect(visibleIndex);
+				fLanguageListView->InvalidateItem(visibleIndex);
+			}
+		}
+	}
+
+	EnableUpdates();
+}
+
+
+//! Get the preferred languages from the settings.
+void
+LocaleWindow::_UpdatePreferredFromLocaleRoster()
+{
+	DisableUpdates();
+
+	// Delete all existing items
+	for (int32 index = fPreferredListView->CountItems(); index-- > 0; ) {
+		delete fPreferredListView->ItemAt(index);
+	}
+	fPreferredListView->MakeEmpty();
+
+	// Add new ones from the locale roster
+	BMessage preferredLanguages;
+	be_locale_roster->GetPreferredLanguages(&preferredLanguages);
+
+	BString languageID;
+	for (int32 index = 0; preferredLanguages.FindString("language", index,
+			&languageID) == B_OK; index++) {
+		int32 listIndex;
+		LanguageListItem* item
+			= fLanguageListView->ItemForLanguageID(languageID.String(),
+				&listIndex);
+		if (item != NULL) {
+			// We found the item we were looking for, now copy it to
+			// the other list
+			fPreferredListView->AddItem(new LanguageListItem(*item));
+		}
+	}
+
+	_EnableDisableLanguages();
+	EnableUpdates();
+}
+
+
+void
+LocaleWindow::_InsertPreferredLanguage(LanguageListItem* item, int32 atIndex)
+{
+	if (item == NULL || fPreferredListView->ItemForLanguageID(
+			item->ID().String()) != NULL)
+		return;
+
+	if (atIndex == -1)
+		atIndex = fPreferredListView->CountItems();
+
+	BLanguage* language = NULL;
+	be_locale_roster->GetLanguage(item->Code(), &language);
+
+	LanguageListItem* baseItem = NULL;
+	if (language != NULL) {
+		baseItem = fPreferredListView->ItemForLanguageCode(language->Code(),
+			&atIndex);
+		delete language;
+	}
+
+	DisableUpdates();
+
+	fPreferredListView->AddItem(new LanguageListItem(*item), atIndex);
+
+	// Replace other languages with the same base
+
+	if (baseItem != NULL) {
+		fPreferredListView->RemoveItem(baseItem);
+		delete baseItem;
+	}
+
+	_PreferredLanguagesChanged();
+
+	EnableUpdates();
+}
+
+
+void
+LocaleWindow::_Defaults()
+{
+	BMessage update(kMsgSettingsChanged);
+	update.AddString("language", "en");
+
+	be_app_messenger.SendMessage(&update);
+	_UpdatePreferredFromLocaleRoster();
+}

@@ -1,16 +1,14 @@
 /*
-** Copyright 2003, Haiku, Inc.
-** Distributed under the terms of the MIT License.
-*/
-
-
+ * Copyright 2003-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _LANGUAGE_H_
 #define _LANGUAGE_H_
 
 
+#include <LocaleStrings.h>
 #include <String.h>
 #include <SupportDefs.h>
-#include <LocaleStrings.h>
 
 
 // We must not include the icu headers in there as it could mess up binary
@@ -28,29 +26,37 @@ enum script_direction {
 
 
 class BLanguage {
-	public:
-		~BLanguage();
+public:
+								~BLanguage();
 
-		// language name, e.g. "english", "deutsch"
-		status_t GetName(BString* name);
-		// ISO-639 language code, e.g. "en", "de"
-		const char* Code();
-		bool	IsCountry();
+			status_t			GetName(BString& name) const;
+			status_t			GetTranslatedName(BString& name) const;
 
-		uint8 Direction() const;
+			// ISO-639 language code, e.g. "en", "de"
+			const char*			Code() const;
+			const char*			Country() const;
+			const char*			Variant() const;
+			const char*			ID() const;
 
-		// see definitions below
-		const char *GetString(uint32 id) const;
+			bool				IsCountrySpecific() const;
+			bool				IsVariant() const;
 
-	private:
-		friend class BLocaleRoster;
+			uint8				Direction() const;
 
-		BLanguage(const char *language);
-		void Default();
+			// see definitions below
+			const char*			GetString(uint32 id) const;
 
-		char	*fStrings[B_NUM_LANGUAGE_STRINGS];
-		uint8	fDirection;
-		icu_4_2::Locale* fICULocale;
+private:
+			friend class BLocaleRoster;
+
+								BLanguage(const char *language);
+			void				Default();
+
+private:
+			char*				fStrings[B_NUM_LANGUAGE_STRINGS];
+			uint8				fDirection;
+			icu_4_2::Locale*	fICULocale;
 };
 
-#endif	/* _LANGUAGE_H_ */
+
+#endif	// _LANGUAGE_H_

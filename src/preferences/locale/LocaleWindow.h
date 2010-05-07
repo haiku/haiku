@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2010, Axel Dörfler, axeld@pinc-software.de.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LOCALE_WINDOW_H
@@ -8,27 +8,37 @@
 
 #include <Window.h>
 
+
 class BButton;
 class BListView;
-class BOutlineListView;
 class FormatView;
+class LanguageListItem;
+class LanguageListView;
 
 
 class LocaleWindow : public BWindow {
 public:
 								LocaleWindow();
-								~LocaleWindow();
+	virtual						~LocaleWindow();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	void				FrameMoved(BPoint newPosition);
+	virtual	bool				QuitRequested();
+
+private:
+			void				_PreferredLanguagesChanged();
+			void				_EnableDisableLanguages();
+			void				_UpdatePreferredFromLocaleRoster();
+			void				_InsertPreferredLanguage(LanguageListItem* item,
+									int32 atIndex = -1);
+			void				_Defaults();
 
 private:
 			BButton*			fRevertButton;
-			BOutlineListView*	fLanguageListView;
-			BOutlineListView*	fPreferredListView;
+			LanguageListView*	fLanguageListView;
+			LanguageListView*	fPreferredListView;
 			FormatView*			fFormatView;
-			BMessage*			fMsgPrefLanguagesChanged;
 };
+
 
 #endif	// LOCALE_WINDOW_H
 

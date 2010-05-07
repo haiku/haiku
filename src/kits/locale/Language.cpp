@@ -80,10 +80,7 @@ static const char *gBuiltInStrings[] = {
 };
 
 
-//	#pragma mark -
-
-
-BLanguage::BLanguage(const char *language)
+BLanguage::BLanguage(const char* language)
 	:
 	fDirection(B_LEFT_TO_RIGHT)
 {
@@ -123,10 +120,11 @@ BLanguage::Direction() const
 }
 
 
-const char *
+const char*
 BLanguage::GetString(uint32 id) const
 {
-	if (id < B_LANGUAGE_STRINGS_BASE || id > B_LANGUAGE_STRINGS_BASE + B_NUM_LANGUAGE_STRINGS)
+	if (id < B_LANGUAGE_STRINGS_BASE
+		|| id > B_LANGUAGE_STRINGS_BASE + B_NUM_LANGUAGE_STRINGS)
 		return NULL;
 
 	return fStrings[id - B_LANGUAGE_STRINGS_BASE];
@@ -134,30 +132,84 @@ BLanguage::GetString(uint32 id) const
 
 
 status_t
-BLanguage::GetName(BString* name)
+BLanguage::GetName(BString& name) const
 {
-	BMessage preferredLanguage;
-	be_locale_roster->GetPreferredLanguages(&preferredLanguage);
-	BString appLanguage;
-	
-	preferredLanguage.FindString("language", 0, &appLanguage);
-	
-	UnicodeString s;
-   	fICULocale->getDisplayName(Locale(appLanguage), s);
-	BStringByteSink converter(name);
-	s.toUTF8(converter);
+	UnicodeString string;
+	fICULocale->getDisplayName(*fICULocale, string);
+
+	name.Truncate(0);
+	BStringByteSink converter(&name);
+	string.toUTF8(converter);
+
 	return B_OK;
 }
 
+
+status_t
+BLanguage::GetTranslatedName(BString& name) const
+{
+	BMessage preferredLanguage;
+	be_locale_roster->GetPreferredLanguages(&preferredLanguage);
+
+	BString appLanguage;
+	preferredLanguage.FindString("language", 0, &appLanguage);
+
+	UnicodeString string;
+	fICULocale->getDisplayName(Locale(appLanguage), string);
+
+	name.Truncate(0);
+	BStringByteSink converter(&name);
+	string.toUTF8(converter);
+
+	return B_OK;
+}
+
+
 const char*
-BLanguage::Code()
+BLanguage::Code() const
 {
 	return fICULocale->getLanguage();
 }
 
 
-bool
-BLanguage::IsCountry()
+const char*
+BLanguage::Country() const
 {
-	return *(fICULocale->getCountry()) != '\0';
+	const char* country = fICULocale->getCountry();
+	if (country == NULL || country[0] == '\0')
+		return NULL;
+
+	return country;
+}
+
+
+const char*
+BLanguage::Variant() const
+{
+	const char* variant = fICULocale->getVariant();
+	if (variant == NULL || variant[0] == '\0')
+		return NULL;
+
+	return variant;
+}
+
+
+const char*
+BLanguage::ID() const
+{
+	return fICULocale->getName();
+}
+
+
+bool
+BLanguage::IsCountrySpecific() const
+{
+	return Country() != NULL;
+}
+
+
+bool
+BLanguage::IsVariant() const
+{
+	return Variant() != NULL;
 }

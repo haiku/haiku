@@ -5,6 +5,7 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Adrien Destugues <pulkomandy@gmail.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Oliver Tappe <zooey@hirschkaefer.de>
  */
 #ifndef LANGUAGE_LIST_VIEW_H
@@ -19,15 +20,19 @@
 class LanguageListItem : public BStringItem {
 public:
 							LanguageListItem(const char* text,
-								const char* code);
+								const char* id, const char* code);
+							LanguageListItem(const LanguageListItem& other);
 	virtual					~LanguageListItem();
 
-			const BString&	LanguageCode() { return fLanguageCode; }
-			void			DrawItem(BView* owner, BRect frame,
+			const BString&	ID() const { return fID; }
+			const BString&	Code() const { return fCode; }
+
+	virtual	void			DrawItem(BView* owner, BRect frame,
 								bool complete = false);
 
 private:
-			BString			fLanguageCode;
+			BString			fID;
+			BString			fCode;
 			BBitmap*		fIcon;
 };
 
@@ -38,18 +43,29 @@ public:
 								list_view_type type);
 	virtual					~LanguageListView();
 
-			bool 			InitiateDrag(BPoint point, int32 index,
+			LanguageListItem* ItemForLanguageID(const char* code,
+								int32* _index = NULL) const;
+			LanguageListItem* ItemForLanguageCode(const char* code,
+								int32* _index = NULL) const;
+
+			void			SetDeleteMessage(BMessage* message);
+			void			SetDragMessage(BMessage* message);
+
+	virtual	bool 			InitiateDrag(BPoint point, int32 index,
 								bool wasSelected);
-			void 			MouseMoved(BPoint where, uint32 transit,
-								const BMessage* msg);
-			void 			MoveItems(BList& items, int32 index);
-			void 			MoveItemFrom(BOutlineListView* origin, int32 index,
-								int32 dropSpot = 0);
-			void 			AttachedToWindow();
-			void 			MessageReceived (BMessage* message);
+	virtual	void 			MouseMoved(BPoint where, uint32 transit,
+								const BMessage* dragMessage);
+	virtual	void 			AttachedToWindow();
+	virtual	void 			MessageReceived(BMessage* message);
+	virtual	void			KeyDown(const char* bytes, int32 numBytes);
+
+private:
+			bool			_AcceptsDragMessage(const BMessage* message) const;
+
 private:
 			int32			fDropIndex;
-			BMessage*		fMsgPrefLanguagesChanged;
+			BMessage*		fDeleteMessage;
+			BMessage*		fDragMessage;
 };
 
 

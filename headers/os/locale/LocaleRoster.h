@@ -1,3 +1,7 @@
+/*
+ * Copyright 2003-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef _LOCALE_ROSTER_H_
 #define _LOCALE_ROSTER_H_
 
@@ -17,7 +21,7 @@ struct entry_ref;
 
 namespace BPrivate {
 	class EditableCatalog;
-};
+}
 
 enum {
 	B_LOCALE_CHANGED	= '_LCC',
@@ -25,7 +29,6 @@ enum {
 
 
 class BLocaleRoster {
-
 	public:
 		BLocaleRoster();
 		~BLocaleRoster();
@@ -42,7 +45,8 @@ class BLocaleRoster {
 		status_t GetDefaultCountry(BCountry **) const;
 		void SetDefaultCountry(BCountry *) const;
 
-		status_t GetLanguage(BLanguage** language, BString languageCode) const;
+			status_t			GetLanguage(const char* languageCode,
+									BLanguage** _language) const;
 
 		status_t GetPreferredLanguages(BMessage *) const;
 		status_t SetPreferredLanguages(BMessage *);

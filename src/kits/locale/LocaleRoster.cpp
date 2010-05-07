@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Haiku. All rights reserved.
+ * Copyright 2003-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -37,7 +37,34 @@
 #include <unicode/locid.h>
 
 
+/*
+ * several attributes/resource-IDs used within the Locale Kit:
+ */
 static const char *kPriorityAttr = "ADDON:priority";
+
+const char *BLocaleRoster::kCatLangAttr = "BEOS:LOCALE_LANGUAGE";
+	// name of catalog language, lives in every catalog file
+const char *BLocaleRoster::kCatSigAttr = "BEOS:LOCALE_SIGNATURE";
+	// catalog signature, lives in every catalog file
+const char *BLocaleRoster::kCatFingerprintAttr = "BEOS:LOCALE_FINGERPRINT";
+	// catalog fingerprint, may live in catalog file
+
+const char *BLocaleRoster::kCatManagerMimeType
+	= "application/x-vnd.Be.locale.catalog-manager";
+	// signature of catalog managing app
+const char *BLocaleRoster::kCatEditorMimeType
+	= "application/x-vnd.Be.locale.catalog-editor";
+	// signature of catalog editor app
+
+const char *BLocaleRoster::kEmbeddedCatAttr = "BEOS:LOCALE_EMBEDDED_CATALOG";
+	// attribute which contains flattened data of embedded catalog
+	// this may live in an app- or add-on-file
+int32 BLocaleRoster::kEmbeddedCatResId = 0xCADA;
+	// a unique value used to identify the resource (=> embedded CAtalog DAta)
+	// which contains flattened data of embedded catalog.
+	// this may live in an app- or add-on-file
+
+
 
 typedef BCatalogAddOn *(*InstantiateCatalogFunc)(const char *name,
 	const char *language, uint32 fingerprint);
@@ -47,7 +74,7 @@ typedef BCatalogAddOn *(*CreateCatalogFunc)(const char *name,
 
 typedef BCatalogAddOn *(*InstantiateEmbeddedCatalogFunc)(
 	entry_ref *appOrAddOnRef);
-	
+
 typedef status_t (*GetAvailableLanguagesFunc)(BMessage*, const char*,
 	const char*, int32);
 
@@ -211,7 +238,7 @@ RosterData::RosterData()
 				Locale::setDefault(icuLocale,icuError);
 				assert(icuError == U_ZERO_ERROR);
 				fPreferredLanguages.RemoveName("language");
-				for (int i = 0; settingsMessage.FindString("language", i, 
+				for (int i = 0; settingsMessage.FindString("language", i,
 						&langName) == B_OK; i++) {
 					fPreferredLanguages.AddString("language", langName);
 				}
@@ -310,7 +337,7 @@ RosterData::InitializeCatalogAddOns()
 					priority = -1;
 					if (node.ReadAttr(kPriorityAttr, B_INT8_TYPE, 0,
 						&priority, sizeof(int8)) <= 0) {
-						// add-on has no priority-attribute yet, so we load it 
+						// add-on has no priority-attribute yet, so we load it
 						// to fetch the priority from the corresponding
 						// symbol...
 						BString fullAddOnPath(addOnFolderName);
@@ -385,34 +412,9 @@ RosterData::CleanupCatalogAddOns()
 }
 
 
-/*
- * several attributes/resource-IDs used within the Locale Kit:
- */
-const char *BLocaleRoster::kCatLangAttr = "BEOS:LOCALE_LANGUAGE";
-	// name of catalog language, lives in every catalog file
-const char *BLocaleRoster::kCatSigAttr = "BEOS:LOCALE_SIGNATURE";
-	// catalog signature, lives in every catalog file
-const char *BLocaleRoster::kCatFingerprintAttr = "BEOS:LOCALE_FINGERPRINT";
-	// catalog fingerprint, may live in catalog file
+// #pragma mark - BLocaleRoster
 
-const char *BLocaleRoster::kCatManagerMimeType
-	= "application/x-vnd.Be.locale.catalog-manager";
-	// signature of catalog managing app
-const char *BLocaleRoster::kCatEditorMimeType
-	= "application/x-vnd.Be.locale.catalog-editor";
-	// signature of catalog editor app
 
-const char *BLocaleRoster::kEmbeddedCatAttr = "BEOS:LOCALE_EMBEDDED_CATALOG";
-	// attribute which contains flattened data of embedded catalog
-	// this may live in an app- or add-on-file
-int32 BLocaleRoster::kEmbeddedCatResId = 0xCADA;
-	// a unique value used to identify the resource (=> embedded CAtalog DAta)
-	// which contains flattened data of embedded catalog.
-	// this may live in an app- or add-on-file
-
-/*
- * BLocaleRoster, the exported interface to the locale roster data:
- */
 BLocaleRoster::BLocaleRoster()
 {
 }
@@ -473,17 +475,23 @@ BLocaleRoster::GetDefaultCountry(BCountry **country) const
 
 
 status_t
-BLocaleRoster::GetLanguage(BLanguage **language, BString languageCode) const
+BLocaleRoster::GetLanguage(const char* languageCode,
+	BLanguage** _language) const
 {
-	if (!language)
+	if (_language == NULL || languageCode == NULL || languageCode[0] == '\0')
 		return B_BAD_VALUE;
-	*language = new(std::nothrow) BLanguage(languageCode);
+
+	BLanguage* language = new(std::nothrow) BLanguage(languageCode);
+	if (language == NULL)
+		return B_NO_MEMORY;
+
+	*_language = language;
 	return B_OK;
 }
 
 
 void
-BLocaleRoster::SetDefaultCountry(BCountry * newDefault) const
+BLocaleRoster::SetDefaultCountry(BCountry* newDefault) const
 {
 	gRosterData.fCountryCodeName = newDefault->Code();
 	newDefault->DateFormat(gRosterData.fCountryDateFormat, true);
@@ -491,7 +499,7 @@ BLocaleRoster::SetDefaultCountry(BCountry * newDefault) const
 
 
 status_t
-BLocaleRoster::GetPreferredLanguages(BMessage *languages) const
+BLocaleRoster::GetPreferredLanguages(BMessage* languages) const
 {
 	if (!languages)
 		return B_BAD_VALUE;
@@ -548,7 +556,7 @@ BLocaleRoster::GetInstalledCatalogs(BMessage * languageList, const char* sigPatt
 {
 	if (languageList == NULL)
 		return B_BAD_VALUE;
-	
+
 	int32 count = gRosterData.fCatalogAddOnInfos.CountItems();
 	for (int32 i = 0; i < count; ++i) {
 		BCatalogAddOnInfo *info
@@ -556,11 +564,11 @@ BLocaleRoster::GetInstalledCatalogs(BMessage * languageList, const char* sigPatt
 
 		if (!info->MakeSureItsLoaded() || !info->fLanguagesFunc)
 			continue;
-			
+
 		info->fLanguagesFunc(languageList, sigPattern, langPattern,
 			fingerprint);
 	}
-	
+
 	return B_OK;
 }
 
