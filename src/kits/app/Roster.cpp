@@ -843,13 +843,26 @@ BRoster::GetActiveAppInfo(app_info* info) const
 /*!	\brief Finds an application associated with a MIME type.
 
 	The method gets the signature of the supplied type's preferred application
-	or, if it doesn't have a preferred application, the one of its supertype.
-	Then the MIME database is asked which executable is associated with the
+	and the signature of the super type's preferred application. It will also
+	get all supporting applications for the type and super type and build a
+	list of candiate handlers. In the case that a preferred handler is
+	configured for the sub-type, other supporting apps will be inserted in the
+	candidate list before the super-type preferred and supporting handlers,
+	since it is assumed that the super type handlers are not well suited for
+	the sub-type. The following resolving algorithm is performed on each
+	signature of the resulting list:
+	The MIME database is asked which executable is associated with the
 	signature. If the database doesn't have a reference to an exectuable, the
-	boot volume is queried for a file with the signature. If more than one
-	file has been found, the one with the greatest version is picked, or if
-	no file has a version info, the one with the most recent modification
-	date.
+	boot volume is queried for a file with the signature. If more than one file
+	has been found, the one with the greatest version is picked, or if no file
+	has a version info, the one with the most recent modification date. The
+	first application from the signature list which can be successfully
+	resolved by this algorithm is returned. Contrary to BeOS behavior, this
+	means that if the preferred application of the provided MIME type cannot
+	be resolved, or if it does not have a preferred application associated,
+	the method will return other applications with direct support for the MIME
+	type before it resorts to the preferred application or supporting
+	applications of the super type.
 
 	\param mimeType The MIME type for which an application shall be found.
 	\param app A pointer to a pre-allocated entry_ref to be filled with
@@ -859,10 +872,11 @@ BRoster::GetActiveAppInfo(app_info* info) const
 	- \c B_BAD_VALUE: \c NULL \a mimeType or \a app.
 	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor
 	  with its supertype (if the supplied isn't a supertype itself) a
-	  preferred application is associated.
+	  preferred application is associated and no other supporting
+	  applications could be identified.
 	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
 	  its preferred application could not be found.
-	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's only supporting
 	  application is in trash.
 	- other error codes
 */
@@ -2563,11 +2577,11 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 		|| appFile == NULL || strlen(mimeType) >= B_MIME_TYPE_LENGTH)
 		return B_BAD_VALUE;
 
-	// create a BMimeType and check, if the type is installed
+	// Create a BMimeType and check, if the type is installed.
 	BMimeType type;
 	status_t error = type.SetTo(mimeType);
 
-	// get the preferred app
+	// Get the preferred apps from the sub and super type.
 	char primarySignature[B_MIME_TYPE_LENGTH];
 	char secondarySignature[B_MIME_TYPE_LENGTH];
 	primarySignature[0] = '\0';
@@ -2579,12 +2593,9 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 			if (type.GetSupertype(&superType) == B_OK)
 				superType.GetPreferredApp(secondarySignature);
 
-			if (type.GetPreferredApp(primarySignature) != B_OK
-				&& !secondarySignature[0]) {
+			if (type.GetPreferredApp(primarySignature) != B_OK) {
 				// The type is installed, but has no preferred app.
-				// In fact it might be an app signature and even having a
-				// valid app hint. Nevertheless we fail.
-				error = B_LAUNCH_FAILED_NO_PREFERRED_APP;
+				primarySignature[0] = '\0';
 			} else if (!strcmp(primarySignature, secondarySignature)) {
 				// Both types have the same preferred app, there is
 				// no point in testing it twice.
@@ -2596,37 +2607,117 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 		}
 	}
 
+	// We will use this BMessage "signatures" to hold all supporting apps
+	// so we can iterator over them in the preferred order. We include
+	// the supporting apps in such a way that the configured preferred
+	// applications for the MIME type are in front of other supporting
+	// applications for the sub and the super type respectively.
+	const char* kSigField = "applications";
+	BMessage signatures;
+	bool addedSecondarySignature = false;
+	if (error == B_OK) {
+		if (primarySignature[0] != '\0')
+			error = signatures.AddString(kSigField, primarySignature);
+		else {
+			// If there is a preferred app configured for the super type,
+			// but no preferred type for the sub-type, add the preferred
+			// super type handler in front of any other handlers. This way
+			// we fall-back to non-preferred but supporting apps only in the
+			// case when there is a preferred handler for the sub-type but
+			// it cannot be resolved (misconfiguration).
+			if (secondarySignature[0] != '\0') {
+				error = signatures.AddString(kSigField, secondarySignature);
+				addedSecondarySignature = true;
+			}
+		}
+	}
+
+	BMessage supportingSignatures;
+	if (error == B_OK
+		&& type.GetSupportingApps(&supportingSignatures) == B_OK) {
+		int32 subCount;
+		if (supportingSignatures.FindInt32("be:sub", &subCount) != B_OK)
+			subCount = 0;
+		// Add all signatures with direct support for the sub-type.
+		const char* supportingType;
+		if (!addedSecondarySignature) {
+			// Try to add the secondarySignature in front of all other
+			// supporting apps, if we find it among those.
+			for (int32 i = 0; error == B_OK && i < subCount
+					&& supportingSignatures.FindString(kSigField, i,
+						&supportingType) == B_OK; i++) {
+				if (strcmp(primarySignature, supportingType) != 0
+					&& strcmp(secondarySignature, supportingType) == 0) {
+					error = signatures.AddString(kSigField, supportingType);
+					addedSecondarySignature = true;
+					break;
+				}
+			}
+		}
+		for (int32 i = 0; error == B_OK && i < subCount
+				&& supportingSignatures.FindString(kSigField, i,
+					&supportingType) == B_OK; i++) {
+			if (strcmp(primarySignature, supportingType) != 0
+				&& strcmp(secondarySignature, supportingType) != 0) {
+				error = signatures.AddString(kSigField, supportingType);
+			}
+		}
+		// Add the preferred type of the super type here before adding
+		// the other types supporting the super type, but only if we have
+		// not already added it in case there was no preferred app for the
+		// sub-type configured.
+		if (error == B_OK && !addedSecondarySignature
+			&& secondarySignature[0] != '\0') {
+			error = signatures.AddString(kSigField, secondarySignature);
+		}
+		// Add all signatures with support for the super-type.
+		for (int32 i = subCount; error == B_OK
+				&& supportingSignatures.FindString(kSigField, i,
+					&supportingType) == B_OK; i++) {
+			// Don't add the signature if it's one of the preferred apps
+			// already.
+			if (strcmp(primarySignature, supportingType) != 0
+				&& strcmp(secondarySignature, supportingType) != 0) {
+				error = signatures.AddString(kSigField, supportingType);
+			}
+		}
+	} else {
+		// Failed to get supporting apps, just add the preferred apps.
+		if (error == B_OK && secondarySignature[0] != '\0')
+			error = signatures.AddString(kSigField, secondarySignature);
+	}
+
 	if (error != B_OK)
 		return error;
 
-	// see if we can find the application and if it's valid, try
-	// both preferred app signatures, if available (from type and
-	// super type)
+	// Set an error in case we can't resolve a single supporting app.
+	error = B_LAUNCH_FAILED_NO_PREFERRED_APP;
 
-	status_t primaryError = B_OK;
-
-	for (int32 tries = 0; tries < 2; tries++) {
-		const char* signature = tries == 0
-			? primarySignature : secondarySignature;
+	// See if we can find a good application that is valid from the messege.
+	const char* signature;
+	for (int32 i = 0;
+		signatures.FindString(kSigField, i, &signature) == B_OK; i++) {
 		if (signature[0] == '\0')
 			continue;
 
 		error = appMeta->SetTo(signature);
 
-		// check, whether the signature is installed and has an app hint
+		// Check, whether the signature is installed and has an app hint
 		bool appFound = false;
 		if (error == B_OK && appMeta->GetAppHint(appRef) == B_OK) {
-			// resolve symbolic links, if necessary
+			// Resolve symbolic links, if necessary
 			BEntry entry;
 			if (entry.SetTo(appRef, true) == B_OK && entry.IsFile()
 				&& entry.GetRef(appRef) == B_OK) {
 				appFound = true;
-			} else
-				appMeta->SetAppHint(NULL);	// bad app hint -- remove it
+			} else {
+				// Bad app hint -- remove it
+				appMeta->SetAppHint(NULL);
+			}
 		}
 
 		// In case there is no app hint or it is invalid, we need to query for
-		// the app
+		// the app.
 		if (error == B_OK && !appFound)
 			error = query_for_app(appMeta->Type(), appRef);
 		if (error == B_OK)
@@ -2635,12 +2726,7 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 		if (error == B_OK)
 			error = can_app_be_used(appRef);
 
-		if (error != B_OK) {
-			if (tries == 0)
-				primaryError = error;
-			else if (primarySignature[0])
-				error = primaryError;
-		} else
+		if (error == B_OK)
 			break;
 	}
 

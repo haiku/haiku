@@ -46,8 +46,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <jconfig.h>
 #include <jerror.h>
 
-// JPEGTtanslator settings header to get SETTINGS struct
+// JPEGTtanslator settings header to get settings stuff
 #include "JPEGTranslator.h"
+#include "TranslatorSettings.h"
 
 
 // Since Translator doesn't use it's own error table, we can use error_mgr's
@@ -109,16 +110,18 @@ be_output_message (j_common_ptr cinfo)
  */
 
 GLOBAL(struct jpeg_error_mgr *)
-be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings *settings,
+be_jpeg_std_error (struct jpeg_error_mgr * err, TranslatorSettings* settings,
 	const jmp_buf* longJumpBuffer)
 {
+	settings->Acquire();
 	jpeg_std_error(err);
 
 	err->error_exit = be_error_exit;
 	err->output_message = be_output_message;
 
-	err->ShowReadWarnings = settings->ShowReadWarningBox;
+	err->ShowReadWarnings = settings->SetGetBool(JPEG_SET_SHOWREADWARNING, NULL);
 	memcpy(&(err->long_jump_buffer), longJumpBuffer, sizeof(jmp_buf));
 
+	settings->Release();
 	return err;
 }

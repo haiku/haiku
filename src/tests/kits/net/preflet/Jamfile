@@ -5,7 +5,7 @@ SimpleTest NetworkSetup :
 	NetworkSetupWindow.cpp
 	NetworkSetupProfile.cpp
 	NetworkSetupAddOn.cpp
-	: be root $(TARGET_LIBSTDC++)
+	: be root $(TARGET_LIBSTDC++) liblocale.so
 ;
 
 SubInclude HAIKU_TOP src tests kits net preflet InterfacesAddOn ;

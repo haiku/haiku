@@ -1,178 +1,106 @@
+#include "NetworkSetupAddOn.h"
+#include "NetworkSetupWindow.h"
+
+#include <Application.h>
+#include <Catalog.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
+#include <InterfaceKit.h>
+#include <Locale.h>
+#include <Roster.h>
+#include <StorageKit.h>
+#include <SupportKit.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include <app/Application.h>
-#include <app/Roster.h>
-#include <InterfaceKit.h>
-#include <StorageKit.h>
-#include <SupportKit.h>
 
-#include "NetworkSetupAddOn.h"
-#include "NetworkSetupWindow.h"
+#undef TR_CONTEXT
+#define TR_CONTEXT	"NetworkSetupWindow"
+
 
 // --------------------------------------------------------------
 NetworkSetupWindow::NetworkSetupWindow(const char *title)
 	:
-	BWindow(BRect(100, 100, 600, 600), title, B_TITLED_WINDOW,
+	BWindow(BRect(100, 100, 300, 300), title, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BMenu 		*show_menu;
-	BMenu		*profiles_menu;
-	BMenuField 	*menu_field;
-	BBox 		*top_box, *bottom_box, *line;	// *group
-	BButton		*button;
-	BCheckBox 	*check;
-	BRect		r;
-	float		x, w, h;
-	float		size, min_size = 360;
+	BMenu *showPopup = new BPopUpMenu("<please select me!>");
+	_BuildShowMenu(showPopup, SHOW_MSG);
 
-	// TODO: cleanup this mess!
-	show_menu = new BPopUpMenu("<please select me!>");
-	_BuildShowMenu(show_menu, SHOW_MSG);
-	
-#define H_MARGIN	10
-#define V_MARGIN	10
-#define SMALL_MARGIN	3
-
-	// Resize the window to minimal width
-	ResizeTo(fMinAddonViewRect.Width() + 2 * H_MARGIN, Bounds().Height());
-
-	top_box = new BBox(Bounds(), NULL, B_FOLLOW_NONE,
-						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-						B_PLAIN_BORDER);
-	AddChild(top_box); 
-
-	r = top_box->Bounds();
-	r.InsetBy(H_MARGIN, V_MARGIN);
+	BBox *topDivider = new BBox(B_EMPTY_STRING);
+	topDivider->SetBorder(B_PLAIN_BORDER);
 
 	// ---- Profiles section
-	profiles_menu = new BPopUpMenu("<none>");
-	menu_field = new BMenuField(r, "profiles_menu", PROFILE_LABEL, 
-		profiles_menu);
+	BMenu *profilesPopup = new BPopUpMenu("<none>");
+	_BuildProfilesMenu(profilesPopup, SELECT_PROFILE_MSG);
 
-	menu_field->SetFont(be_bold_font);
-	menu_field->SetDivider(be_bold_font->StringWidth(PROFILE_LABEL "#"));
-	top_box->AddChild(menu_field);
-	menu_field->ResizeToPreferred();
-	menu_field->GetPreferredSize(&w, &h);
+	BMenuField *profilesMenuField = new BMenuField("profiles_menu",
+			TR("Profile:"), profilesPopup);
+	profilesMenuField->SetFont(be_bold_font);
 
-	size = w;
-
-	button = new BButton(r, "manage_profiles", MANAGE_PROFILES_LABEL,
-					new BMessage(MANAGE_PROFILES_MSG),
-					B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(r.right - w, r.top);
-	top_box->AddChild(button);
-	
-	size += SMALL_MARGIN + w;
-	
-	min_size = max_c(min_size, (H_MARGIN + size + H_MARGIN));
-	
-	r.top += h + V_MARGIN;
-
-	// ---- Separator line between Profiles section and Settings section
-	line = new BBox(BRect(r.left, r.top, r.right, r.top + 1), NULL,
-						 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
-	top_box->AddChild(line);
-
-	_BuildProfilesMenu(profiles_menu, SELECT_PROFILE_MSG);
-
-	r.top += 2 + V_MARGIN;
+	BButton *button = new BButton("manage_profiles",
+			TR("Manage profiles" B_UTF8_ELLIPSIS),
+			new BMessage(MANAGE_PROFILES_MSG));
 
 	// ---- Settings section
 
 	// Make the show popup field half the whole width and centered
-	menu_field = new BMenuField(r, "show_menu", SHOW_LABEL, show_menu);
-	menu_field->SetFont(be_bold_font);
-	menu_field->SetDivider(be_bold_font->StringWidth(SHOW_LABEL "#"));
-	top_box->AddChild(menu_field);
+	BMenuField *showMenuField = new BMenuField("show_menu", 
+			TR("Show:"), showPopup);
+	showMenuField->SetFont(be_bold_font);
 
-	menu_field->ResizeToPreferred();
-	menu_field->GetPreferredSize(&w, &h);
-	r.top += h+1 + V_MARGIN;
-	
-	min_size = max_c(min_size, (H_MARGIN + w + H_MARGIN));
-	
-
-	r = fMinAddonViewRect.OffsetByCopy(H_MARGIN, r.top);
-	fPanel = new BBox(r, "showview_box", B_FOLLOW_NONE,
-						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-						B_PLAIN_BORDER);
-	top_box->AddChild(fPanel);
-	top_box->ResizeTo(Bounds().Width(), r.bottom + 1 + V_MARGIN);
+	fPanel = new BBox("showview_box");
+	fPanel->SetBorder(B_NO_BORDER);
 
 	// ---- Bottom globals buttons section
-	r = Bounds();
-	r.top = top_box->Frame().bottom + 1;
-	bottom_box = new BBox(r, NULL, B_FOLLOW_NONE,
-						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-						B_PLAIN_BORDER);
-	AddChild(bottom_box); 
+	BBox *bottomDivider = new BBox(B_EMPTY_STRING);
+	bottomDivider->SetBorder(B_PLAIN_BORDER);
 
-	r.OffsetTo(0, 0);
-	r.InsetBy(H_MARGIN, V_MARGIN);
-
-	check = new BCheckBox(r, "dont_touch", DONT_TOUCH_LABEL,
-					new BMessage(DONT_TOUCH_MSG),
-					B_FOLLOW_TOP | B_FOLLOW_LEFT);
-	check->GetPreferredSize(&w, &h);
-	check->ResizeToPreferred();
-	check->SetValue(B_CONTROL_ON);
-	check->MoveTo(H_MARGIN, r.top);
-	bottom_box->AddChild(check);
+	BCheckBox *dontTouchCheckBox = new BCheckBox("dont_touch", 
+			TR("Prevent unwanted changes"), new BMessage(DONT_TOUCH_MSG));
+	dontTouchCheckBox->SetValue(B_CONTROL_ON);
 	
-	size = w;
+	fApplyNowButton = new BButton("apply_now", TR("Apply Now"),
+			new BMessage(APPLY_NOW_MSG));
 
-	button = new BButton(r, "apply_now", APPLY_NOW_LABEL,
-					new BMessage(APPLY_NOW_MSG),
-					B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	x = r.right - w;
-	button->MoveTo(x, r.top);
-	bottom_box->AddChild(button);
-
-	fApplyNowButton = button;
-	
-	size += SMALL_MARGIN + w;
-	
-	button = new BButton(r, "revert", REVERT_LABEL, new BMessage(REVERT_MSG), 
-		B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-		
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(x - w - SMALL_MARGIN, r.top);
-	bottom_box->AddChild(button);
-
-	fRevertButton = button;
+	fRevertButton = new BButton("revert", TR("Revert"), 
+			new BMessage(REVERT_MSG));
 	fRevertButton->SetEnabled(false);
 
-	size += SMALL_MARGIN + w;
-
-	min_size = max_c(min_size, (H_MARGIN + size + H_MARGIN));
-	
-	r.bottom = r.top + h;
-	r.InsetBy(-H_MARGIN, -V_MARGIN);
-	
-	bottom_box->ResizeTo(Bounds().Width(), r.Height());
-
-	// Resize window to enclose top and bottom boxes
-	ResizeTo(Bounds().Width(), bottom_box->Frame().bottom);
-	
 	// Enable boxes resizing modes
-	top_box->SetResizingMode(B_FOLLOW_ALL);
 	fPanel->SetResizingMode(B_FOLLOW_ALL);
-	bottom_box->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
 
-	// Set default/minimal window size
-	ResizeTo(min_size, Bounds().Height());
-	SetSizeLimits(min_size, 20000, Bounds().Height(), 20000);	
-	
+	// Build the layout
+	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.AddGroup(B_HORIZONTAL, 5)
+			.Add(profilesMenuField)
+			.AddGlue()
+			.Add(button)
+		.End()
+		.Add(topDivider)
+		.Add(showMenuField)
+		.Add(fPanel)
+		.Add(bottomDivider)
+		.AddGroup(B_HORIZONTAL, 5)
+			.Add(dontTouchCheckBox)
+			.Add(fRevertButton)
+			.Add(fApplyNowButton)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
+
+	topDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
+	bottomDivider->SetExplicitMaxSize(BSize(B_SIZE_UNSET, 1));
+	fPanel->SetExplicitMinSize(BSize(fMinAddonViewRect.Width(), 
+			fMinAddonViewRect.Height()));
+
 	fAddonView = NULL;
+	
+	
 }
 
 
@@ -195,9 +123,6 @@ NetworkSetupWindow::MessageReceived(BMessage*	msg)
 	switch (msg->what) {
 
 	case NEW_PROFILE_MSG:
-		break;
-		
-	case COPY_PROFILE_MSG:
 		break;
 		
 	case DELETE_PROFILE_MSG: {
@@ -285,11 +210,8 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(NEW_PROFILE_LABEL, 
-		new BMessage(NEW_PROFILE_MSG)));
-		
-	menu->AddItem(new BMenuItem(DELETE_PROFILE_LABEL, 
-		new BMessage(DELETE_PROFILE_MSG)));
+	menu->AddItem(new BMenuItem(TR("New" B_UTF8_ELLIPSIS), new BMessage(NEW_PROFILE_MSG)));
+	menu->AddItem(new BMenuItem(TR("Delete"), new BMessage(DELETE_PROFILE_MSG)));
 
 	if (strlen(current_profile)) {
 		item = menu->FindItem(current_profile);
@@ -301,7 +223,6 @@ NetworkSetupWindow::_BuildProfilesMenu(BMenu* menu, int32 msg_what)
 			item->SetMarked(true);
 		}
 	}
-
 }
 
 

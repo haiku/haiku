@@ -33,10 +33,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <GroupLayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <String.h>
+#include <StringView.h>
+#include <TextView.h>
 #include <Window.h>
 
 #include "SGIImage.h"
@@ -72,14 +76,11 @@ add_menu_item(BMenu* menu,
 //
 // Returns:
 // ---------------------------------------------------------------
-SGIView::SGIView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags, TranslatorSettings *settings)
-	:	BView(frame, name, resize, flags),
-		fSettings(settings)
+SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
+	:
+	BView(name, flags, new BGroupLayout(B_VERTICAL)),
+	fSettings(settings)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
-
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
 	uint32 currentCompression = fSettings->SetGetInt32(SGI_SETTING_COMPRESSION);
@@ -96,35 +97,56 @@ SGIView::SGIView(const BRect &frame, const char *name,
 
 //	add_menu_item(menu, SGI_COMP_ARLE, "Agressive RLE", currentCompression);
 
-	BRect menuFrame = Bounds();
-	menuFrame.bottom = menuFrame.top + menu->Bounds().Height();
-	fCompressionMF = new BMenuField(menuFrame, "compression",
-									"Use compression:", menu, true/*,
-									B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP*/);
-	if (fCompressionMF->MenuBar())
-		fCompressionMF->MenuBar()->ResizeToPreferred();
-	fCompressionMF->ResizeToPreferred();
+	fCompressionMF = new BMenuField("compression", "Use compression:", menu);
 
-	// figure out where the text ends
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-	float xbold, ybold;
-	xbold = fh.descent + 1;
-	ybold = fh.ascent + fh.descent * 2 + fh.leading;
+	BAlignment labelAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL);
 
-	font_height plainh;
-	be_plain_font->GetHeight(&plainh);
-	float yplain;
-	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
+	BStringView* titleView = new BStringView("title", "SGI image translator");
+	titleView->SetFont(be_bold_font);
+	titleView->SetExplicitAlignment(labelAlignment);
 
-	// position the menu field below all the text we draw in Draw()
-	BPoint textOffset(0.0, yplain * 2 + ybold);
-	fCompressionMF->MoveTo(textOffset);
+	char detail[100];
+	sprintf(detail, "Version %d.%d.%d %s",
+		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(SGI_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VERSION(SGI_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(SGI_TRANSLATOR_VERSION)),
+		__DATE__);
+	BStringView* detailView = new BStringView("details", detail);
+	detailView->SetExplicitAlignment(labelAlignment);
 
-	AddChild(fCompressionMF);
+	BTextView* infoView = new BTextView("info");
+	infoView->SetText(BString("written by:\n")
+			.Append(author)
+			.Append("\n\nbased on GIMP SGI plugin v1.5:\n")
+			.Append(kSGICopyright).String());
+	infoView->SetExplicitAlignment(labelAlignment);
+	infoView->SetWordWrap(false);
+	infoView->MakeEditable(false);
+	infoView->MakeResizable(true);
+	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
+	float padding = 5.0f;
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+		.Add(titleView)
+		.Add(detailView)
+		.Add(fCompressionMF)
+		.Add(infoView)
+		.AddGlue()
+		.SetInsets(padding, padding, padding, padding)
+	);
 
-	ResizeToPreferred();
+	BFont font;
+	GetFont(&font);
+ 	SetExplicitPreferredSize(
+		BSize((font.Size() * 390) / 12, (font.Size() * 180) / 12));
+
+	// TODO: remove this workaround for ticket #4217
+	infoView->SetExplicitPreferredSize(
+		BSize(infoView->LineWidth(4), infoView->TextHeight(0, 80)));
+	infoView->SetExplicitMaxSize(infoView->ExplicitPreferredSize());
+	infoView->SetExplicitMinSize(infoView->ExplicitPreferredSize());
 }
+
 
 // ---------------------------------------------------------------
 // Destructor
@@ -192,148 +214,5 @@ void
 SGIView::AllAttached()
 {
 	fCompressionMF->Menu()->SetTargetForItems(this);
-	fCompressionMF->ResizeToPreferred();
-	fCompressionMF->SetDivider(fCompressionMF->StringWidth(fCompressionMF->Label()) + 3);
 }
 
-// ---------------------------------------------------------------
-// AttachedToWindow
-//
-// hack to make the window recognize our size
-//
-// Preconditions:
-//
-// Parameters: area,	not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-void
-SGIView::AttachedToWindow()
-{
-	// Hack for DataTranslations which doesn't resize visible area to requested by view
-	// which makes some parts of bigger than usual translationviews out of visible area
-	// so if it was loaded to DataTranslations resize window if needed
-	BWindow *window = Window();
-	if (!strcmp(window->Name(), "DataTranslations")) {
-		BView *view = Parent();
-		if (view) {
-			BRect frame = view->Frame();
-			float x, y;
-			GetPreferredSize(&x, &y);
-			if (frame.Width() < x || (frame.Height() - 48) < y) {
-				x -= frame.Width();
-				y -= frame.Height() - 48;
-				if (x < 0) x = 0;
-				if (y < 0) y = 0;
-
-				// DataTranslations has main view called "Background"
-				// change it's resizing mode so it will always resize with window
-				// also make sure view will be redrawed after resize
-				view = window->FindView("Background");
-				if (view) {
-					view->SetResizingMode(B_FOLLOW_ALL);
-					view->SetFlags(B_FULL_UPDATE_ON_RESIZE);
-				}
-
-				// The same with "Info..." button, except redrawing, which isn't needed
-				view = window->FindView("Info" B_UTF8_ELLIPSIS);
-				if (view)
-					view->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-
-				window->ResizeBy( x, y);
-			}
-		}
-	}
-}
-
-// ---------------------------------------------------------------
-// Draw
-//
-// Draws information about the SGITranslator to this view.
-//
-// Preconditions:
-//
-// Parameters: area,	not used
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-void
-SGIView::Draw(BRect area)
-{
-	SetFont(be_bold_font);
-	font_height fh;
-	GetFontHeight(&fh);
-	float xbold, ybold;
-	xbold = fh.descent + 1;
-	ybold = fh.ascent + fh.descent * 2 + fh.leading;
-
-	const char* text = "SGI image translator";
-	DrawString(text, BPoint(xbold, ybold));
-
-	SetFont(be_plain_font);
-	font_height plainh;
-	GetFontHeight(&plainh);
-	float yplain;
-	yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-
-	char detail[100];
-	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(SGI_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_MINOR_VERSION(SGI_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVISION_VERSION(SGI_TRANSLATOR_VERSION)),
-		__DATE__);
-	DrawString(detail, BPoint(xbold, yplain + ybold));
-
-	BPoint offset = fCompressionMF->Frame().LeftBottom();
-	offset.x += xbold;
-	offset.y += 2 * ybold;
-
-	text = "written by:";
-	DrawString(text, offset);
-	offset.y += ybold;
-
-	DrawString(author, offset);
-	offset.y += 2 * ybold;
-
-	text = "based on GIMP SGI plugin v1.5:";
-	DrawString(text, offset);
-	offset.y += ybold;
-
-	DrawString(kSGICopyright, offset);
-}
-
-// ---------------------------------------------------------------
-// Draw
-//
-// calculated the preferred size of this view
-//
-// Preconditions:
-//
-// Parameters: width and height
-//
-// Postconditions:
-//
-// Returns: in width and height, the preferred size...
-// ---------------------------------------------------------------
-void
-SGIView::GetPreferredSize(float* width, float* height)
-{
-	*width = fCompressionMF->Bounds().Width();
-	// look at the two biggest strings
-	float width1 = StringWidth(kSGICopyright) + 15.0;
-	if (*width < width1)
-		*width = width1;
-	float width2 = be_plain_font->StringWidth(author) + 15.0;
-	if (*width < width2)
-		*width = width2;
-
-	font_height fh;
-	be_bold_font->GetHeight(&fh);
-	float ybold = fh.ascent + fh.descent * 2 + fh.leading;
-
-	*height = fCompressionMF->Bounds().bottom + 7 * ybold;
-}

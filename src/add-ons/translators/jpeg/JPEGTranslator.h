@@ -50,6 +50,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <jpeglib.h>
 
+#include "BaseTranslator.h"
 
 // Settings
 #define SETTINGS_FILE	"JPEGTranslator"
@@ -76,21 +77,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define	VIEW_LABEL_PHOTOSHOPCMYK "Use CMYK code with 0 for 100% ink coverage"
 #define	VIEW_LABEL_SHOWREADERRORBOX "Show warning messages"
 
+// strings for use in TranslatorSettings
+#define JPEG_SET_SMOOTHING "smoothing"
+#define JPEG_SET_QUALITY "quality"
+#define JPEG_SET_PROGRESSIVE "progressive"
+#define JPEG_SET_OPT_COLORS "optimize"
+#define JPEG_SET_SMALL_FILES "filesSmaller"
+#define JPEG_SET_GRAY1_AS_RGB24 "gray"
+#define JPEG_SET_ALWAYS_RGB32 "always"
+#define JPEG_SET_PHOTOSHOP_CMYK "cmyk"
+#define JPEG_SET_SHOWREADWARNING "readWarning"
 
-//!	Settings storage structure
-struct jpeg_settings {
-	// compression
-	uchar	Smoothing;			// default: 0
-	uchar	Quality;			// default: 95
-	bool	Progressive;		// default: true
-	bool	OptimizeColors;		// default: true
-	bool	SmallerFile;		// default: false	only used if (OptimizeColors == true)
-	bool	B_GRAY1_as_B_RGB24;	// default: false	if false gray1 converted to gray8, else to rgb24
-	// decompression
-	bool	Always_B_RGB32;		// default: true
-	bool	PhotoshopCMYK;		// default: true
-	bool	ShowReadWarningBox;	// default: true
-};
 
 
 /*!
@@ -99,52 +96,75 @@ struct jpeg_settings {
 */
 class SSlider : public BSlider {
 	public:
-				SSlider(BRect frame, const char *name, const char *label,
-					BMessage *message, int32 minValue, int32 maxValue,
-					orientation posture = B_HORIZONTAL,
-					thumb_style thumbType = B_BLOCK_THUMB,
-					uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
-					uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
+		SSlider(const char* name, const char* label,
+			BMessage* message, int32 minValue, int32 maxValue,
+			orientation posture = B_HORIZONTAL,
+			thumb_style thumbType = B_BLOCK_THUMB,
+			uint32 flags = B_NAVIGABLE | B_WILL_DRAW | B_FRAME_EVENTS);
 	virtual const char* UpdateText() const;
-		void	ResizeToPreferred();
 
 	private:
 		mutable char fStatusLabel[12];
 };
 
 
-class SView : public BView {
-public:
-	SView(BRect frame, const char *name);
-	virtual void AttachedToWindow();
-};
-
-//!	Configuration view for reading settings
-class TranslatorReadView : public SView {
+class JPEGTranslator : public BaseTranslator {
 	public:
-		TranslatorReadView(BRect frame, const char* name, jpeg_settings* settings);
+		JPEGTranslator();
+
+		virtual status_t DerivedIdentify(BPositionIO* inSource,
+			const translation_format* inFormat, BMessage* ioExtension,
+			translator_info* outInfo, uint32 outType);
+			
+		virtual status_t DerivedTranslate(BPositionIO* inSource,
+			const translator_info* inInfo, BMessage* ioExtension,
+			uint32 outType, BPositionIO* outDestination, int32 baseType);
+			
+		virtual BView* NewConfigView(TranslatorSettings* settings);
+
+	private:
+	
+		status_t Copy(BPositionIO* in, BPositionIO* out);
+		status_t Compress(BPositionIO* in, BPositionIO* out,
+			const jmp_buf* longJumpBuffer);
+		status_t Decompress(BPositionIO* in, BPositionIO* out,
+			BMessage* ioExtension, const jmp_buf* longJumpBuffer);
+		status_t Error(j_common_ptr cinfo, status_t error = B_ERROR);
+
+		status_t PopulateInfoFromFormat(translator_info* info,
+			uint32 formatType, translator_id id = 0);
+		status_t PopulateInfoFromFormat(translator_info* info,
+			uint32 formatType, const translation_format* formats,
+			int32 formatCount);
+};
+		
+
+class TranslatorReadView : public BView {
+	public:
+		TranslatorReadView(const char* name, TranslatorSettings* settings);
+		virtual ~TranslatorReadView();
 
 		virtual void	AttachedToWindow();
 		virtual void	MessageReceived(BMessage* message);
 
 	private:
-		jpeg_settings*	fSettings;
+		TranslatorSettings* fSettings;
 		BCheckBox*		fAlwaysRGB32;
 		BCheckBox*		fPhotoshopCMYK;
 		BCheckBox*		fShowErrorBox;
 };
 
 
-//! Configuration view for writing settings
-class TranslatorWriteView : public SView {
+class TranslatorWriteView : public BView {
 	public:
-		TranslatorWriteView(BRect frame, const char* name, jpeg_settings* settings);
+		TranslatorWriteView(const char* name, TranslatorSettings* settings);
+		virtual ~TranslatorWriteView();
 
 		virtual void	AttachedToWindow();
 		virtual void	MessageReceived(BMessage* message);
 
 	private:
-		jpeg_settings*	fSettings;
+		TranslatorSettings* fSettings;
 		SSlider*		fQualitySlider;
 		SSlider*		fSmoothingSlider;
 		BCheckBox*		fProgress;
@@ -153,25 +173,21 @@ class TranslatorWriteView : public SView {
 		BCheckBox*		fGrayAsRGB24;
 };
 
-class TranslatorAboutView : public SView {
+
+class TranslatorAboutView : public BView {
 	public:
-		TranslatorAboutView(BRect frame, const char* name);
+		TranslatorAboutView(const char* name);
 };
 
-//!	Configuration view
+
 class TranslatorView : public BTabView {
 	public:
-		TranslatorView(BRect frame, const char *name);
-		virtual ~TranslatorView();
+		TranslatorView(const char* name, TranslatorSettings* settings);
 
 	private:
-		jpeg_settings	fSettings;
-};
-
-//!	Window used for configuration
-class TranslatorWindow : public BWindow {
-	public:
-		TranslatorWindow(bool quitOnClose = true);
+		BView* fAboutView;
+		BView* fReadView;
+		BView* fWriteView;
 };
 
 
@@ -190,7 +206,7 @@ EXTERN(void) be_jpeg_stdio_dest(j_compress_ptr cinfo, BPositionIO *outfile);	// 
 //	(so user can decide to show dialog-boxes or not)
 //---------------------------------------------------
 EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err,
-	jpeg_settings * settings, const jmp_buf* longJumpBuffer);
+	TranslatorSettings * settings, const jmp_buf* longJumpBuffer);
 	// implemented in "be_jerror.cpp"
 
 #endif // _JPEGTRANSLATOR_H_

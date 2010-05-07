@@ -15,16 +15,15 @@
 
 class HVIFView : public BView {
 public:
-							HVIFView(const BRect &frame, const char *name,
-								uint32 resizeMode, uint32 flags,
-								TranslatorSettings *settings);
+	HVIFView(const char *name, uint32 flags, TranslatorSettings *settings);
+	~HVIFView();
 
-virtual	void				AttachedToWindow();
-virtual	void				MessageReceived(BMessage *message);
+	virtual	void	AttachedToWindow();
+	virtual	void	MessageReceived(BMessage *message);
 
 private:
-		BSlider *			fRenderSize;
-		TranslatorSettings *fSettings;
+	BSlider*			fRenderSize;
+	TranslatorSettings* fSettings;
 };
 
 #endif	// HVIF_VIEW_H

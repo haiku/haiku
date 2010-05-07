@@ -146,7 +146,8 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 SGITranslator::SGITranslator()
-	: BaseTranslator("SGI images", "SGI image translator",
+	:
+	BaseTranslator("SGI images", "SGI image translator",
 		SGI_TRANSLATOR_VERSION,
 		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
 		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
@@ -732,6 +733,5 @@ SGITranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 SGITranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new SGIView(BRect(0, 0, 225, 175), "SGITranslator Settings",
-		B_FOLLOW_ALL, B_WILL_DRAW, settings);
+	return new SGIView("SGITranslator Settings", B_WILL_DRAW, settings);
 }

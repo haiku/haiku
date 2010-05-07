@@ -33,8 +33,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "JPEG2000Translator.h"
 #include "jp2_cod.h"
 #include "jpc_cs.h"
+#include "TranslatorWindow.h"
 
+#include <GroupLayoutBuilder.h>
 #include <TabView.h>
+#include <TextView.h>
 
 
 // Set these accordingly
@@ -47,9 +50,8 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define B_TRANSLATOR_BITMAP_MIME_STRING "image/x-be-bitmap"
 #define B_TRANSLATOR_BITMAP_DESCRIPTION "Be Bitmap Format (JPEG2000Translator)"
 
-// Translation Kit required globals
-char translatorName[] = "JPEG2000 images";
-char translatorInfo[] = "©2002-2003, Shard\n"
+const char gTranslatorName[] = "JPEG2000 images";
+const char gTranslatorInfo[] = "©2002-2003, Shard\n"
 	"©2005-2006, Haiku\n"
 	"\n"
 	"Based on JasPer library:\n"
@@ -61,99 +63,40 @@ char translatorInfo[] = "©2002-2003, Shard\n"
 	"ImageMagick's jp2 codec was used as \"tutorial\".\n"
 	"          http://www.imagemagick.org/\n";
 
-int32 translatorVersion = 0x100;
+int32 gTranslatorVersion = B_TRANSLATION_MAKE_VERSION(1, 0, 0);
 
-// Define the formats we know how to read
-translation_format inputFormats[] = {
+translation_format gInputFormats[] = {
 	{ JP2_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JP2_MIME_STRING, JP2_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{},
 };
+const int gInputFormatCount =
+	sizeof(gInputFormats) / sizeof(translation_format);
 
-// Define the formats we know how to write
-translation_format outputFormats[] = {
+translation_format gOutputFormats[] = {
 	{ JP2_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JP2_MIME_STRING, JP2_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{},
 };
+const int gOutputFormatCount =
+	 sizeof(gOutputFormats) / sizeof(translation_format);
 
 
-//!	Make settings to defaults
-void
-LoadDefaultSettings(jpeg_settings *settings)
-{
-	settings->Quality = 25;
-	settings->JPC = false;
-	settings->B_GRAY1_as_B_RGB24 = false;
-	settings->B_GRAY8_as_B_RGB32 = true;
-}
+TranSetting gSettings[] = {
+	{JP2_SET_QUALITY, TRAN_SETTING_INT32, 25},
+	{JP2_SET_JPC, TRAN_SETTING_BOOL, false},
+	{JP2_SET_GRAY1_AS_B_RGB24, TRAN_SETTING_BOOL, false},
+	{JP2_SET_GRAY8_AS_B_RGB32, TRAN_SETTING_BOOL, true}
+};
+const int gSettingsCount = sizeof(gSettings) / sizeof(TranSetting) ;
 
 
-//!	Save settings to config file
-void
-SaveSettings(jpeg_settings *settings)
-{
-	// Make path to settings file
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
-		return;
-
-	path.Append(SETTINGS_FILE);
-
-	// Open settings file (create it if there's no file) and write settings			
-	FILE *file = NULL;
-	if ((file = fopen(path.Path(), "wb+"))) {
-		fwrite(settings, sizeof(jpeg_settings), 1, file);
-		fclose(file);
-	}
-}
-
-
-/*!
-	Load settings from config file
-	If can't find it make them default and try to save
-*/
-void
-LoadSettings(jpeg_settings *settings)
-{
-	// Make path to settings file
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK) {
-		LoadDefaultSettings(settings);
-		return;
-	}
-
-	path.Append(SETTINGS_FILE);
-
-	// Open settings file (create it if there's no file) and write settings			
-	FILE *file = NULL;
-	if ((file = fopen(path.Path(), "rb"))) {
-		if (!fread(settings, sizeof(jpeg_settings), 1, file)) {
-			// settings struct has changed size
-			// Load default settings, and Save them
-			fclose(file);
-			LoadDefaultSettings(settings);
-			SaveSettings(settings);
-		} else
-			fclose(file);
-	} else if ((file = fopen(path.Path(), "wb+"))) {
-		LoadDefaultSettings(settings);
-		fwrite(settings, sizeof(jpeg_settings), 1, file);
-		fclose(file);
-	}
-}
-
-
-//	#pragma mark - conversion routines
-
-
+namespace conversion{
 //!	Make RGB32 scanline from *pixels[3]
 inline void
-read_rgb24_to_rgb32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+read_rgb24_to_rgb32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -169,7 +112,7 @@ read_rgb24_to_rgb32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 
 //!	Make gray scanline from *pixels[1]
 inline void
-read_gray_to_rgb32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+read_gray_to_rgb32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -189,7 +132,7 @@ read_gray_to_rgb32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just read data to scanline)
 */
 inline void
-read_rgba32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+read_rgba32(jas_matrix_t** pixels, jpr_uchar_t *scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -208,7 +151,7 @@ read_rgba32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just read data to scanline)
 */
 inline void
-read_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+read_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	while (x < width) {
@@ -220,7 +163,7 @@ read_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 
 //!	Make *pixels[1] from gray1 scanline
 inline void
-write_gray1_to_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_gray1_to_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -238,11 +181,11 @@ write_gray1_to_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 
 //!	Make *pixels[3] from gray1 scanline
 inline void
-write_gray1_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_gray1_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
-	while (x < (width/8)) {
+	while (x < (width / 8)) {
 		unsigned char c = scanline[x++];
 		for (int b = 128; b; b = b >> 1) {
 			if (c & b) {
@@ -262,9 +205,9 @@ write_gray1_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 
 //!	Make *pixels[3] from cmap8 scanline
 inline void
-write_cmap8_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_cmap8_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
-	const color_map *map = system_colors();
+	const color_map* map = system_colors();
 	int32 x = 0;
 	while (x < width) {
 		rgb_color color = map->color_list[scanline[x]];
@@ -282,7 +225,7 @@ write_cmap8_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_gray(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	while (x < width) {
@@ -297,7 +240,7 @@ write_gray(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb15_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb15_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -306,9 +249,12 @@ write_rgb15_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 		in_pixel = scanline[index] | (scanline[index+1] << 8);
 		index += 2;
 
-		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12));
-		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7));
-		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0x7c00)) >> 7)
+			| (((in_pixel & 0x7c00)) >> 12));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x3e0)) >> 2)
+			| (((in_pixel & 0x3e0)) >> 7));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3)
+			| (((in_pixel & 0x1f)) >> 2));
 		x++;
 	}
 }
@@ -319,18 +265,21 @@ write_rgb15_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb15b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb15b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
 	int16 in_pixel;
 	while (x < width) {
-		in_pixel = scanline[index+1] | (scanline[index] << 8);
+		in_pixel = scanline[index + 1] | (scanline[index] << 8);
 		index += 2;
 
-		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12));
-		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7));
-		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0x7c00)) >> 7)
+			| (((in_pixel & 0x7c00)) >> 12));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x3e0)) >> 2)
+			| (((in_pixel & 0x3e0)) >> 7));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3)
+			| (((in_pixel & 0x1f)) >> 2));
 		x++;
 	}
 }
@@ -341,7 +290,7 @@ write_rgb15b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb16_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb16_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
@@ -350,9 +299,12 @@ write_rgb16_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 		in_pixel = scanline[index] | (scanline[index+1] << 8);
 		index += 2;
 
-		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0x7c00)) >> 12));
-		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9));
-		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0xf800)) >> 8)
+			| (((in_pixel & 0x7c00)) >> 12));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x7e0)) >> 3)
+			| (((in_pixel & 0x7e0)) >> 9));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3)
+			| (((in_pixel & 0x1f)) >> 2));
 		x++;
 	}
 }
@@ -363,18 +315,21 @@ write_rgb16_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb16b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb16b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 x = 0;
 	int32 index = 0;
 	int16 in_pixel;
 	while (x < width) {
-		in_pixel = scanline[index+1] | (scanline[index] << 8);
+		in_pixel = scanline[index + 1] | (scanline[index] << 8);
 		index += 2;
 
-		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0xf800)) >> 13));
-		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9));
-		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2));
+		jas_matrix_setv(pixels[0], x, (char)(((in_pixel & 0xf800)) >> 8)
+			| (((in_pixel & 0xf800)) >> 13));
+		jas_matrix_setv(pixels[1], x, (char)(((in_pixel & 0x7e0)) >> 3)
+			| (((in_pixel & 0x7e0)) >> 9));
+		jas_matrix_setv(pixels[2], x, (char)(((in_pixel & 0x1f)) << 3)
+			| (((in_pixel & 0x1f)) >> 2));
 		x++;
 	}
 }
@@ -385,7 +340,7 @@ write_rgb16b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -403,7 +358,7 @@ write_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb24b(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb24b(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -421,7 +376,7 @@ write_rgb24b(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb32_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb32_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -440,7 +395,7 @@ write_rgb32_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	(just write data to pixels)
 */
 inline void
-write_rgb32b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgb32b_to_rgb24(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -460,7 +415,7 @@ write_rgb32b_to_rgb24(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	!!! UNTESTED !!!
 */
 inline void
-write_rgba32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgba32(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -480,7 +435,7 @@ write_rgba32(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 	!!! UNTESTED !!!
 */
 inline void
-write_rgba32b(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
+write_rgba32b(jas_matrix_t** pixels, jpr_uchar_t* scanline, int width)
 {
 	int32 index = 0;
 	int32 x = 0;
@@ -495,32 +450,35 @@ write_rgba32b(jas_matrix_t **pixels, jpr_uchar_t *scanline, int width)
 }
 
 
+}// end namespace conversion
+
+
 //	#pragma mark -	jasper I/O
 
 
 static int
-Read(jas_stream_obj_t *object, char *buffer, const int length)
+Read(jas_stream_obj_t* object, char* buffer, const int length)
 {
 	return (*(BPositionIO**)object)->Read(buffer, length);
 }
 
 
 static int
-Write(jas_stream_obj_t *object, char *buffer, const int length)
+Write(jas_stream_obj_t* object, char* buffer, const int length)
 {
 	return (*(BPositionIO**)object)->Write(buffer, length);
 }
 
 
 static long
-Seek(jas_stream_obj_t *object, long offset, int origin)
+Seek(jas_stream_obj_t* object, long offset, int origin)
 {
 	return (*(BPositionIO**)object)->Seek(offset, origin);
 }
 
 
 static int
-Close(jas_stream_obj_t *object)
+Close(jas_stream_obj_t* object)
 {
 	return 0;
 }
@@ -534,10 +492,10 @@ static jas_stream_ops_t positionIOops = {
 };
 
 
-static jas_stream_t *
+static jas_stream_t* 
 jas_stream_positionIOopen(BPositionIO *positionIO)
 {
-	jas_stream_t *stream;
+	jas_stream_t* stream;
 
 	stream = (jas_stream_t *)malloc(sizeof(jas_stream_t));
 	if (stream == (jas_stream_t *)NULL)
@@ -564,35 +522,15 @@ jas_stream_positionIOopen(BPositionIO *positionIO)
 }
 
 
-//	#pragma mark - SView
-
-
-SView::SView(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
-{
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
-
-	SetFont(be_plain_font);
-}
-
-
-void
-SView::AttachedToWindow()
-{
-	BView::AttachedToWindow();
-	ResizeTo(Parent()->Bounds().Width(), Parent()->Bounds().Height());
-}
-
-
 //	#pragma mark -
 
 
-SSlider::SSlider(BRect frame, const char *name, const char *label,
-		BMessage *message, int32 minValue, int32 maxValue, orientation posture,
-		thumb_style thumbType, uint32 resizingMode, uint32 flags)
-	: BSlider(frame, name, label, message, minValue, maxValue,
-		posture, thumbType, resizingMode, flags)
+SSlider::SSlider(const char* name, const char* label,
+		BMessage* message, int32 minValue, int32 maxValue, orientation posture,
+		thumb_style thumbType, uint32 flags)
+	:
+	BSlider(name, label, message, minValue, maxValue,
+		posture, thumbType, flags)
 {
 	rgb_color barColor = { 0, 0, 229, 255 };
 	UseFillColor(true, &barColor);
@@ -608,58 +546,53 @@ SSlider::UpdateText() const
 }
 
 
-//!	BSlider::ResizeToPreferred + Resize width if it's too small to show label
-// and status
-void
-SSlider::ResizeToPreferred()
-{
-	int32 width = (int32)ceil(StringWidth(Label()) + StringWidth("9999"));
-	if (width < 230)
-		width = 230;
-
-	float w, h;
-	GetPreferredSize(&w, &h);
-	ResizeTo(width, h);
-}
-
-
 //	#pragma mark -
 
 
-TranslatorReadView::TranslatorReadView(BRect frame, const char *name,
-	jpeg_settings *settings)
-	: SView(frame, name),
+TranslatorReadView::TranslatorReadView(const char* name,
+	TranslatorSettings* settings)
+	:
+	BView(name, 0, new BGroupLayout(B_VERTICAL)),
 	fSettings(settings)
 {
-	fGrayAsRGB32 = new BCheckBox(BRect(10, 10, 40, 40), "grayasrgb32",
-		VIEW_LABEL_GRAYASRGB32, new BMessage(VIEW_MSG_SET_GRAYASRGB32));
-	fGrayAsRGB32->SetFont(be_plain_font);
-	if (fSettings->B_GRAY8_as_B_RGB32)
-		fGrayAsRGB32->SetValue(1);
+	fGrayAsRGB32 = new BCheckBox("grayasrgb32", VIEW_LABEL_GRAYASRGB32,
+		new BMessage(VIEW_MSG_SET_GRAYASRGB32));
+	if (fSettings->SetGetBool(JP2_SET_GRAY8_AS_B_RGB32))
+		fGrayAsRGB32->SetValue(B_CONTROL_ON);
 
-	AddChild(fGrayAsRGB32);
-	fGrayAsRGB32->ResizeToPreferred();
+	float padding = 10.0f;
+	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+		.Add(fGrayAsRGB32)
+		.AddGlue()
+		.SetInsets(padding, padding, padding, padding)
+	);
+}
+
+
+TranslatorReadView::~TranslatorReadView()
+{
+	fSettings->Release();
 }
 
 
 void
 TranslatorReadView::AttachedToWindow()
 {
-	SView::AttachedToWindow();
 	fGrayAsRGB32->SetTarget(this);
 }
 
 
 void
-TranslatorReadView::MessageReceived(BMessage *message)
+TranslatorReadView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case VIEW_MSG_SET_GRAYASRGB32:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				fSettings->B_GRAY8_as_B_RGB32 = value;
-				SaveSettings(fSettings);
+				bool boolValue = value;
+				fSettings->SetGetBool(JP2_SET_GRAY8_AS_B_RGB32, &boolValue);
+				fSettings->SaveSettings();
 			}
 			break;
 		}
@@ -673,53 +606,49 @@ TranslatorReadView::MessageReceived(BMessage *message)
 //	#pragma mark - TranslatorWriteView
 
 
-TranslatorWriteView::TranslatorWriteView(BRect frame, const char *name,
-	jpeg_settings *settings)
-	: SView(frame, name),
+TranslatorWriteView::TranslatorWriteView(const char* name,
+	TranslatorSettings* settings)
+	:
+	BView(name, 0, new BGroupLayout(B_VERTICAL)),
 	fSettings(settings)
 {
-	BRect rect(10, 10, 10, 40);
-	fQualitySlider = new SSlider(rect, "quality",
-		VIEW_LABEL_QUALITY, new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
+	fQualitySlider = new SSlider("quality", VIEW_LABEL_QUALITY,
+		new BMessage(VIEW_MSG_SET_QUALITY), 0, 100);
 	fQualitySlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fQualitySlider->SetHashMarkCount(10);
 	fQualitySlider->SetLimitLabels("Low", "High");
-	fQualitySlider->SetFont(be_plain_font);
-	fQualitySlider->SetValue(fSettings->Quality);
-	AddChild(fQualitySlider);
-	fQualitySlider->ResizeToPreferred();
+	fQualitySlider->SetValue(fSettings->SetGetInt32(JP2_SET_QUALITY));
 
-	rect.OffsetBy(0, fQualitySlider->Bounds().Height() + 10);
-
-	fGrayAsRGB24 = new BCheckBox(rect, "gray1asrgb24",
-		VIEW_LABEL_GRAY1ASRGB24,
+	fGrayAsRGB24 = new BCheckBox("gray1asrgb24", VIEW_LABEL_GRAY1ASRGB24,
 		new BMessage(VIEW_MSG_SET_GRAY1ASRGB24));
-	fGrayAsRGB24->SetFont(be_plain_font);
-	if (fSettings->B_GRAY1_as_B_RGB24)
-		fGrayAsRGB24->SetValue(1);
+	if (fSettings->SetGetBool(JP2_SET_GRAY1_AS_B_RGB24))
+		fGrayAsRGB24->SetValue(B_CONTROL_ON);
 
-	AddChild(fGrayAsRGB24);
-	fGrayAsRGB24->ResizeToPreferred();
-
-	rect.OffsetBy(0, fGrayAsRGB24->Bounds().Height() + 10);
+	fCodeStreamOnly = new BCheckBox("codestreamonly", VIEW_LABEL_JPC,
+		new BMessage(VIEW_MSG_SET_JPC));
+	if (fSettings->SetGetBool(JP2_SET_JPC))
+		fCodeStreamOnly->SetValue(B_CONTROL_ON);
 	
-	fCodeStreamOnly = new BCheckBox(rect, "codestreamonly",
-		VIEW_LABEL_JPC, new BMessage(VIEW_MSG_SET_JPC));
-	fCodeStreamOnly->SetFont(be_plain_font);
-	if (fSettings->JPC)
-		fCodeStreamOnly->SetValue(1);
+	float padding = 10.0f;
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+		.Add(fQualitySlider)
+		.Add(fGrayAsRGB24)
+		.Add(fCodeStreamOnly)
+		.AddGlue()
+		.SetInsets(padding, padding, padding, padding)
+	);
+}
 
-	AddChild(fCodeStreamOnly);
-	
-	fCodeStreamOnly->ResizeToPreferred();
+
+TranslatorWriteView::~TranslatorWriteView()
+{
+	fSettings->Release();
 }
 
 
 void
 TranslatorWriteView::AttachedToWindow()
 {
-	SView::AttachedToWindow();
-	
 	fQualitySlider->SetTarget(this);
 	fGrayAsRGB24->SetTarget(this);
 	fCodeStreamOnly->SetTarget(this);
@@ -727,15 +656,15 @@ TranslatorWriteView::AttachedToWindow()
 
 
 void
-TranslatorWriteView::MessageReceived(BMessage *message)
+TranslatorWriteView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case VIEW_MSG_SET_QUALITY:
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				fSettings->Quality = value;
-				SaveSettings(fSettings);
+				fSettings->SetGetInt32(JP2_SET_QUALITY, &value);
+				fSettings->SaveSettings();
 			}
 			break;
 		}
@@ -743,8 +672,9 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				fSettings->B_GRAY1_as_B_RGB24 = value;
-				SaveSettings(fSettings);
+				bool boolValue = value;
+				fSettings->SetGetBool(JP2_SET_GRAY1_AS_B_RGB24, &boolValue);
+				fSettings->SaveSettings();
 			}
 			break;
 		}
@@ -752,8 +682,9 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 		{
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
-				fSettings->JPC = value;
-				SaveSettings(fSettings);
+				bool boolValue = value;
+				fSettings->SetGetBool(JP2_SET_JPC, &boolValue);
+				fSettings->SaveSettings();
 			}
 			break;
 		}
@@ -767,131 +698,85 @@ TranslatorWriteView::MessageReceived(BMessage *message)
 //	#pragma mark -
 
 
-TranslatorAboutView::TranslatorAboutView(BRect frame, const char *name)
-	: SView(frame, name)
+TranslatorAboutView::TranslatorAboutView(const char* name)
+	:
+	BView(name, 0, new BGroupLayout(B_VERTICAL))
 {
-	BStringView *title = new BStringView(BRect(10, 0, 10, 0), "Title",
-		translatorName);
+	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
+	BStringView* title = new BStringView("Title", gTranslatorName);
 	title->SetFont(be_bold_font);
-
-	AddChild(title);
-	title->ResizeToPreferred();
-
-	BRect rect = title->Bounds();
-	float space = title->StringWidth("    ");
+	title->SetExplicitAlignment(labelAlignment);
 
 	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", (int)(translatorVersion >> 8),
-		(int)((translatorVersion >> 4) & 0xf), (int)(translatorVersion & 0xf));
+	sprintf(versionString, "v%d.%d.%d", (int)(gTranslatorVersion >> 8),
+		(int)((gTranslatorVersion >> 4) & 0xf), (int)(gTranslatorVersion & 0xf));
 
-	BStringView *version = new BStringView(BRect(rect.right+space, rect.top,
-		rect.right+space, rect.top), "Version", versionString);
-	version->SetFont(be_plain_font);
-	version->SetFontSize(9);
-	// Make version be in the same line as title
-	version->ResizeToPreferred();
-	version->MoveBy(0, rect.bottom-version->Frame().bottom);
+	BStringView* version = new BStringView("Version", versionString);
+	version->SetExplicitAlignment(labelAlignment);
 
-	AddChild(version);
+	BTextView* infoView = new BTextView("info");	
+	infoView->SetText(gTranslatorInfo);
+	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	infoView->MakeEditable(false);
 	
-	version->ResizeToPreferred();
-	
-	BRect stringFrame = title->Frame();
-	// Now for each line in translatorInfo add a BStringView
-	char* current = translatorInfo;
-	int32 index = 1;
-	while (current != NULL && current[0]) {
-		char text[128];
-		char* newLine = strchr(current, '\n');
-		if (newLine == NULL) {
-			strlcpy(text, current, sizeof(text));
-			current = NULL;
-		} else {
-			strlcpy(text, current, min_c((int32)sizeof(text),
-				newLine + 1 - current));
-			current = newLine + 1;
-		}
-		
-		stringFrame.OffsetBy(0, stringFrame.Height() + 2);
-		BStringView* string = new BStringView(stringFrame, "copyright",
-			text);
-		if (index > 3)
-			string->SetFontSize(9);
-		AddChild(string);
-		string->ResizeToPreferred();
-
-		index++;
-	}
+	float padding = 10.0f;
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+			.Add(title)
+			.Add(version)
+			.AddGlue()
+		)
+		.Add(infoView)
+		.SetInsets(padding, padding, padding, padding)
+	);
 }
 
 
 //	#pragma mark -
 
 
-TranslatorView::TranslatorView(BRect frame, const char *name)
-	: BTabView(frame, name)
+TranslatorView::TranslatorView(const char* name, TranslatorSettings* settings)
+	:
+	BTabView(name)
 {
-	// Load settings to global settings struct
-	LoadSettings(&fSettings);
-	
-	BRect contentSize = ContainerView()->Bounds();
-	SView *view = new TranslatorWriteView(contentSize, "Write",
-		&fSettings);
-	AddTab(view);
-	view = new TranslatorReadView(contentSize, "Read", &fSettings);
-	AddTab(view);
-	view = new TranslatorAboutView(contentSize, "About");
-	AddTab(view);
-	
-	ResizeToPreferred();
-	
-	// Make TranslatorView resize itself with parent
-	SetFlags(Flags() | B_FOLLOW_ALL);
-}
+	AddTab(new TranslatorWriteView("Write", settings->Acquire()));
+	AddTab(new TranslatorReadView("Read", settings->Acquire()));
+	AddTab(new TranslatorAboutView("About"));
 
+	settings->Release();
 
-TranslatorView::~TranslatorView()
-{
+ 	BFont font;
+ 	GetFont(&font);
+ 	SetExplicitPreferredSize(
+		BSize((font.Size() * 380) / 12, (font.Size() * 250) / 12));
 }
 
 
 //	#pragma mark -
 
-
-TranslatorWindow::TranslatorWindow(bool quitOnClose)
-	: BWindow(BRect(100, 100, 100, 100), "JPEG Settings", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+BView*
+JP2Translator::NewConfigView(TranslatorSettings* settings)
 {
-	BRect extent(0, 0, 0, 0);
-	BView *config = NULL;
-	MakeConfig(NULL, &config, &extent);
-
-	AddChild(config);
-	ResizeTo(extent.Width(), extent.Height());
-
-	// Make application quit after this window close
-	if (quitOnClose)
-		SetFlags(Flags() | B_QUIT_ON_WINDOW_CLOSE);
+	BView* outView = new TranslatorView("TranslatorView", settings);
+	return outView;
 }
 
 
-//	#pragma mark -
-
-
-//!	Hook to create and return our configuration view
-status_t
-MakeConfig(BMessage *ioExtension, BView **outView, BRect *outExtent)
+JP2Translator::JP2Translator()
+	:
+	BaseTranslator(gTranslatorName, gTranslatorInfo, gTranslatorVersion,
+		gInputFormats, gInputFormatCount,
+		gOutputFormats, gOutputFormatCount, JP2_SETTINGS_FILE,
+		gSettings, gSettingsCount, B_TRANSLATOR_BITMAP, JP2_FORMAT)
 {
-	*outView = new TranslatorView(BRect(0, 0, 300, 250), "TranslatorView");
-	*outExtent = (*outView)->Frame();
-	return B_OK;
 }
 
 
 //!	Determine whether or not we can handle this data
 status_t
-Identify(BPositionIO *inSource, const translation_format *inFormat,
-	BMessage *ioExtension, translator_info *outInfo, uint32 outType)
+JP2Translator::DerivedIdentify(BPositionIO* inSource,
+	const translation_format* inFormat, BMessage* ioExtension,
+	translator_info* outInfo, uint32 outType)
 {
 	if ((outType != 0) && (outType != B_TRANSLATOR_BITMAP)
 		&& outType != JP2_FORMAT)
@@ -908,27 +793,16 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 
 	if (B_BENDIAN_TO_HOST_INT32(((TranslatorBitmap *)header)->magic)
 		== B_TRANSLATOR_BITMAP) {
-		outInfo->type = inputFormats[1].type;
-		outInfo->translator = 0;
-		outInfo->group = inputFormats[1].group;
-		outInfo->quality = inputFormats[1].quality;
-		outInfo->capability = inputFormats[1].capability;
-		strcpy(outInfo->name, inputFormats[1].name);
-		strcpy(outInfo->MIME, inputFormats[1].MIME);
+		if (PopulateInfoFromFormat(outInfo, B_TRANSLATOR_BITMAP) != B_OK)
+			return B_NO_TRANSLATOR;
 	} else {
 		if ((((header[4] << 24) | (header[5] << 16) | (header[6] << 8)
 			| header[7]) == JP2_BOX_JP) // JP2
 			|| (header[0] == (JPC_MS_SOC >> 8) && header[1]
 			== (JPC_MS_SOC & 0xff)))	// JPC
 		{
-			outInfo->type = inputFormats[0].type;
-			outInfo->translator = 0;
-			outInfo->group = inputFormats[0].group;
-			outInfo->quality = inputFormats[0].quality;
-			outInfo->capability = inputFormats[0].capability;
-			strcpy(outInfo->name, inputFormats[0].name);
-			strcpy(outInfo->MIME, inputFormats[0].MIME);
-			return B_OK;
+			if (PopulateInfoFromFormat(outInfo, JP2_FORMAT) != B_OK)
+				return B_NO_TRANSLATOR;
 		} else
 			return B_NO_TRANSLATOR;
 	}
@@ -937,10 +811,10 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 }
 
 
-//!	Arguably the most important method in the add-on
 status_t
-Translate(BPositionIO *inSource, const translator_info *inInfo,
-	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
+JP2Translator::DerivedTranslate(BPositionIO* inSource,
+	const translator_info* inInfo, BMessage* ioExtension, uint32 outType,
+	BPositionIO* outDestination, int32 baseType)
 {
 	// If no specific type was requested, convert to the interchange format
 	if (outType == 0)
@@ -960,10 +834,10 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 
 //!	The user has requested the same format for input and output, so just copy
 status_t
-Copy(BPositionIO *in, BPositionIO *out)
+JP2Translator::Copy(BPositionIO* in, BPositionIO* out)
 {
 	int block_size = 65536;
-	void *buffer = malloc(block_size);
+	void* buffer = malloc(block_size);
 	char temp[1024];
 	if (buffer == NULL) {
 		buffer = temp;
@@ -996,11 +870,9 @@ Copy(BPositionIO *in, BPositionIO *out)
 
 //!	Encode into the native format
 status_t
-Compress(BPositionIO *in, BPositionIO *out)
+JP2Translator::Compress(BPositionIO* in, BPositionIO* out)
 {
-	// Load settings
-	jpeg_settings settings;
-	LoadSettings(&settings);
+	using namespace conversion;
 
 	// Read info about bitmap
 	TranslatorBitmap header;
@@ -1024,7 +896,7 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 	// Function pointer to write function
 	// It MUST point to proper function
-	void (*converter)(jas_matrix_t **pixels, jpr_uchar_t *inscanline,
+	void (*converter)(jas_matrix_t** pixels, jpr_uchar_t* inscanline,
 		int width) = write_rgba32;
 
 	// Default color info
@@ -1033,7 +905,7 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 	switch ((color_space)B_BENDIAN_TO_HOST_INT32(header.colors)) {
 		case B_GRAY1:
-			if (settings.B_GRAY1_as_B_RGB24) {
+			if (fSettings->SetGetBool(JP2_SET_GRAY1_AS_B_RGB24)) {
 				converter = write_gray1_to_rgb24;
 			} else {
 				out_color_components = 1;
@@ -1117,9 +989,9 @@ Compress(BPositionIO *in, BPositionIO *out)
 			return B_ERROR;
 	}
 
-	jas_image_t *image;
-	jas_stream_t *outs;
-	jas_matrix_t *pixels[4];
+	jas_image_t* image;
+	jas_stream_t* outs;
+	jas_matrix_t* pixels[4];
 	jas_image_cmptparm_t component_info[4];
 
 	if (jas_init())
@@ -1157,9 +1029,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 	for (y = 0; y < (long)height; y++) {
 		err = in->Read(in_scanline, in_row_bytes);
 		if (err < in_row_bytes) {
-			return (err < B_OK) ?
-				Error(outs, image, pixels, out_color_components, in_scanline,
-					err)
+			return (err < B_OK) ? Error(outs, image, pixels,
+					out_color_components, in_scanline, err)
 				: Error(outs, image, pixels, out_color_components, in_scanline,
 					B_ERROR);
 		}
@@ -1173,10 +1044,14 @@ Compress(BPositionIO *in, BPositionIO *out)
 	}
 
 	char opts[16];
-	sprintf(opts, "rate=%1f", (float)settings.Quality / 100.0);
-	if (jas_image_encode(image, outs, jas_image_strtofmt(settings.JPC ?
-		(char*)"jpc" : (char*)"jp2"), opts)) {
-		return Error(outs, image, pixels, out_color_components, in_scanline, err);
+	sprintf(opts, "rate=%1f",
+		(float)fSettings->SetGetInt32(JP2_SET_QUALITY) / 100.0);
+
+	if (jas_image_encode(image, outs, jas_image_strtofmt(
+			fSettings->SetGetBool(JP2_SET_JPC) ? 
+				(char*)"jpc" : (char*)"jp2"), opts)) {
+		return Error(outs, image, pixels,
+			out_color_components, in_scanline, err);
 	}
 
 	free(in_scanline);
@@ -1194,14 +1069,13 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 //!	Decode the native format
 status_t
-Decompress(BPositionIO *in, BPositionIO *out)
+JP2Translator::Decompress(BPositionIO* in, BPositionIO* out)
 {
-	jpeg_settings settings;
-	LoadSettings(&settings);
+	using namespace conversion;
 
-	jas_image_t *image;
-	jas_stream_t *ins;
-	jas_matrix_t *pixels[4];
+	jas_image_t* image;
+	jas_stream_t* ins;
+	jas_matrix_t* pixels[4];
 
 	if (jas_init())
 		return B_ERROR;
@@ -1219,7 +1093,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 	// Function pointer to read function
 	// It MUST point to proper function
-	void (*converter)(jas_matrix_t **pixels, jpr_uchar_t *outscanline,
+	void (*converter)(jas_matrix_t** pixels, jpr_uchar_t* outscanline,
 		int width) = NULL;
 
 	switch (jas_image_colorspace(image)) {
@@ -1237,7 +1111,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 			}
 			break;
 		case JAS_IMAGE_CS_GRAY:
-			if (settings.B_GRAY8_as_B_RGB32) {
+			if (fSettings->SetGetBool(JP2_SET_GRAY8_AS_B_RGB32)) {
 				out_color_space = B_RGB32;
 				out_color_components = 4;
 				converter = read_gray_to_rgb32;
@@ -1266,7 +1140,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 		// NOTE: things will go wrong if "out_row_bytes" wouldn't fit into 32 bits
 
 	// !!! Initialize this bounds rect to the size of your image
-	BRect bounds(0, 0, width-1, height-1);
+	BRect bounds(0, 0, width - 1, height - 1);
+
 
 	// Fill out the B_TRANSLATOR_BITMAP's header
 	TranslatorBitmap header;
@@ -1294,7 +1169,7 @@ Decompress(BPositionIO *in, BPositionIO *out)
 	for (i = 0; i < (long)in_color_components; i++) {
 		pixels[i] = jas_matrix_create(1, (unsigned int)width);
 		if (pixels[i] == (jas_matrix_t *)NULL)
-			return Error(ins, image, pixels, i+1, out_scanline, B_ERROR);
+			return Error(ins, image, pixels, i + 1, out_scanline, B_ERROR);
 	}
 
 	int32 y = 0;
@@ -1308,9 +1183,8 @@ Decompress(BPositionIO *in, BPositionIO *out)
 
 		err = out->Write(out_scanline, out_row_bytes);
 		if (err < out_row_bytes) {
-			return (err < B_OK) ?
-				Error(ins, image, pixels, in_color_components, out_scanline,
-					err)
+			return (err < B_OK) ? Error(ins, image, pixels, in_color_components,
+				out_scanline, err)
 				: Error(ins, image, pixels, in_color_components, out_scanline,
 					B_ERROR);
 		}
@@ -1329,13 +1203,53 @@ Decompress(BPositionIO *in, BPositionIO *out)
 }
 
 
+/*! searches in both inputFormats & outputFormats */
+status_t
+JP2Translator::PopulateInfoFromFormat(translator_info* info,
+	uint32 formatType, translator_id id)
+{
+	int32 formatCount;
+	const translation_format* formats = OutputFormats(&formatCount);
+
+	for (int i = 0; i <= 1; formats = InputFormats(&formatCount), i++) {
+		if (PopulateInfoFromFormat(info, formatType,
+			formats, formatCount) == B_OK) {
+			info->translator = id;
+			return B_OK;
+		}
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
+JP2Translator::PopulateInfoFromFormat(translator_info* info,
+	uint32 formatType, const translation_format* formats, int32 formatCount)
+{
+	for (int i = 0; i < formatCount; i++) {
+		if (formats[i].type == formatType) {
+			info->type = formatType;
+			info->group = formats[i].group;
+			info->quality = formats[i].quality;
+			info->capability = formats[i].capability;
+			strcpy(info->name, formats[i].name);
+			strcpy(info->MIME,  formats[i].MIME);
+			return B_OK;
+		}
+	}
+
+	return B_ERROR;
+}
+
+
 /*!
 	Frees jpeg alocated memory
 	Returns given error (B_ERROR by default)
 */
 status_t
-Error(jas_stream_t *stream, jas_image_t *image, jas_matrix_t **pixels,
-	int32 pixels_count, jpr_uchar_t *scanline, status_t error)
+Error(jas_stream_t* stream, jas_image_t* image, jas_matrix_t** pixels,
+	int32 pixels_count, jpr_uchar_t* scanline, status_t error)
 {
 	if (pixels) {
 		int32 i;
@@ -1358,16 +1272,24 @@ Error(jas_stream_t *stream, jas_image_t *image, jas_matrix_t **pixels,
 
 //	#pragma mark -
 
+BTranslator*
+make_nth_translator(int32 n, image_id you, uint32 flags, ...)
+{
+	if (!n)
+		return new JP2Translator();
+
+	return NULL;
+}
+
 
 int
 main()
 {
 	BApplication app("application/x-vnd.Haiku-JPEG2000Translator");
+	JP2Translator* translator = new JP2Translator();
+	if (LaunchTranslatorWindow(translator, gTranslatorName) == B_OK)
+		app.Run();
 
-	TranslatorWindow *window = new TranslatorWindow();
-	window->Show();
-
-	app.Run();
 	return 0;
 }
 

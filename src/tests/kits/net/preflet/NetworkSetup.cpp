@@ -1,8 +1,11 @@
-#include <Application.h>
-#include <Window.h>
 #include <Alert.h>
+#include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
+#include <Window.h>
 
 #include "NetworkSetupWindow.h"
+
 
 #define SOFTWARE_EDITOR			"Haiku"
 #define NAME					"NetworkSettings"
@@ -16,6 +19,8 @@ class Application : public BApplication
 		Application();
 
 	public:
+		BCatalog	fCatalog;
+
 		void			ReadyToRun(void);
 };
 
@@ -32,6 +37,7 @@ int main()
 Application::Application()
 	: BApplication(APPLICATION_SIGNATURE)
 {
+	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

@@ -45,8 +45,8 @@ using namespace BPrivate;
 
 
 const float kLineViewWidth = 30.0;
+const char* kInfoAttributeName = "StyledEdit-info";
 
-#define ATTRNAME_SE_INFO "se-info"
 
 #undef TR_CONTEXT
 #define TR_CONTEXT "StyledEditWindow"
@@ -323,9 +323,6 @@ StyledEditWindow::InitWindow(uint32 encoding)
 void
 StyledEditWindow::LoadAttrs()
 {
-	if (!fSaveMessage)
-		return;
-
 	entry_ref dir;
 	const char* name;
 	if (fSaveMessage->FindRef("directory", &dir) != B_OK
@@ -340,7 +337,7 @@ StyledEditWindow::LoadAttrs()
 		return;
 
 	BRect newFrame(Frame());
-	ssize_t bytesRead = documentNode.ReadAttr(ATTRNAME_SE_INFO, B_RECT_TYPE,
+	ssize_t bytesRead = documentNode.ReadAttr(kInfoAttributeName, B_RECT_TYPE,
 		0, &newFrame, sizeof(BRect));
 	if (bytesRead < 0)
 		return;
@@ -370,7 +367,7 @@ StyledEditWindow::SaveAttrs()
 		return;
 
 	BRect frame(Frame());
-	documentNode.WriteAttr(ATTRNAME_SE_INFO, B_RECT_TYPE, 0, &frame,
+	documentNode.WriteAttr(kInfoAttributeName, B_RECT_TYPE, 0, &frame,
 		sizeof(BRect));
 }
 

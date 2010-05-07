@@ -40,20 +40,14 @@ class BMenuField;
 
 class SGIView : public BView {
 public:
-	SGIView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags, TranslatorSettings *settings);
+	SGIView(const char* name, uint32 flags, TranslatorSettings* settings);
 		// sets up the view
 		
 	~SGIView();
 		// releases the SGITranslator settings
 
 	virtual void AllAttached();
-	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage *message);
-
-	virtual	void Draw(BRect area);
-		// draws information about the SGITranslator
-	virtual	void GetPreferredSize(float* width, float* height);
+	virtual void MessageReceived(BMessage* message);
 
 	enum {
 		MSG_COMPRESSION_CHANGED	= 'cmch',
@@ -62,7 +56,7 @@ public:
 private:
 	BMenuField*				fCompressionMF;
 
-	TranslatorSettings *fSettings;
+	TranslatorSettings* fSettings;
 		// the actual settings for the translator,
 		// shared with the translator
 };

@@ -402,13 +402,23 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	owner->SetDrawingMode(B_OP_OVER);
 
 	// left of item
-	owner->DrawString(fName.String(), fName.Length(), namePt);
-	owner->DrawString(fDriverName.String(), fDriverName.Length(), driverPt);
+	BString s = fName;
+	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - namePt.x);
+	owner->DrawString(s.String(), s.Length(), namePt);
+	s = fDriverName.String();
+	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - driverPt.x);
+	owner->DrawString(s.String(), s.Length(), driverPt);
 
 	// right of item
-	owner->DrawString(fPendingJobs.String(), fPendingJobs.Length(), pendingPt);
-	owner->DrawString(fTransport.String(), fTransport.Length(), transportPt);
-	owner->DrawString(fComments.String(), fComments.Length(), commentPt);
+	s = fPendingJobs;
+	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, bounds.Width() - pendingPt.x);
+	owner->DrawString(s.String(), s.Length(), pendingPt);
+	s = fTransport;
+	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, bounds.Width() - transportPt.x);
+	owner->DrawString(s.String(), s.Length(), transportPt);
+	s = fComments;
+	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, bounds.Width() - commentPt.x);
+	owner->DrawString(s.String(), s.Length(), commentPt);
 
 	owner->SetDrawingMode(mode);
 	owner->SetViewColor(oldViewColor);
