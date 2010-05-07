@@ -38,9 +38,9 @@ VirtualMemory::ReadyToRun()
 void
 VirtualMemory::AboutRequested()
 {
-	BAlert* alert = new BAlert("about", TR("VirtualMemory\n"
+	BAlert* alert = new BAlert("about", B_TRANSLATE("VirtualMemory\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2005, Haiku.\n"), TR("OK"));
+		"\tCopyright 2005, Haiku.\n"), B_TRANSLATE("OK"));
 	BTextView* view = alert->TextView();
 	BFont font;
 
@@ -48,7 +48,7 @@ VirtualMemory::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 13, &font);
 
 	alert->Go();

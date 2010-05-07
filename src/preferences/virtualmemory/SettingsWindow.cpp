@@ -64,9 +64,10 @@ byte_string(int64 size)
 	static char string[256];
 
 	if (value < 1024)
-		snprintf(string, sizeof(string), TR("%Ld B"), size);
+		snprintf(string, sizeof(string), B_TRANSLATE("%Ld B"), size);
 	else {
-		static const char *units[] = {TR_MARK("KB"), TR_MARK("MB"), TR_MARK("GB"), NULL};
+		static const char *units[] = {B_TRANSLATE_MARK("KB"),
+			B_TRANSLATE_MARK("MB"), B_TRANSLATE_MARK("GB"), NULL};
 		int32 i = -1;
 
 		do {
@@ -75,7 +76,7 @@ byte_string(int64 size)
 		} while (value >= 1024 && units[i + 1]);
 
 		off_t rounded = off_t(value * 100LL);
-		sprintf(string, "%g %s", rounded / 100.0, TR(units[i]));
+		sprintf(string, "%g %s", rounded / 100.0, B_TRANSLATE(units[i]));
 	}
 
 	return string;
@@ -112,14 +113,14 @@ SizeSlider::UpdateText() const
 
 
 SettingsWindow::SettingsWindow()
-	: BWindow(BRect(0, 0, 269, 172), TR("VirtualMemory"), B_TITLED_WINDOW,
-			B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+	: BWindow(BRect(0, 0, 269, 172), B_TRANSLATE("VirtualMemory"),
+		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
+			| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BView* view = new BGroupView();
 
 	fSwapEnabledCheckBox = new BCheckBox("enable swap",
-		TR("Enable virtual memory"),
+		B_TRANSLATE("Enable virtual memory"),
 		new BMessage(kMsgSwapEnabledUpdate));
 	fSwapEnabledCheckBox->SetValue(fSettings.SwapEnabled());
 
@@ -129,11 +130,11 @@ SettingsWindow::SettingsWindow()
 	system_info info;
 	get_system_info(&info);
 
-	BString string = TR("Physical memory: ");
+	BString string = B_TRANSLATE("Physical memory: ");
 	string << byte_string((off_t)info.max_pages * B_PAGE_SIZE);
 	BStringView* memoryView = new BStringView("physical memory", string.String());
 
-	string = TR("Current swap file size: ");
+	string = B_TRANSLATE("Current swap file size: ");
 	string << byte_string(fSettings.SwapSize());
 	BStringView* swapfileView = new BStringView("current swap size", string.String());
 
@@ -157,23 +158,25 @@ SettingsWindow::SettingsWindow()
 			item->SetMarked(true);
 	}
 
-	BMenuField* field = new BMenuField("devices", TR("Use volume:"), menu);
+	BMenuField* field = new BMenuField("devices", B_TRANSLATE("Use volume:"),
+		menu);
 	field->SetEnabled(false);
 
 	off_t minSize, maxSize;
 	_GetSwapFileLimits(minSize, maxSize);
 
-	fSizeSlider = new SizeSlider("size slider", TR("Requested swap file size:"),
+	fSizeSlider = new SizeSlider("size slider",
+		B_TRANSLATE("Requested swap file size:"),
 		new BMessage(kMsgSliderUpdate), minSize / kMegaByte, maxSize / kMegaByte,
 		B_WILL_DRAW | B_FRAME_EVENTS);
-	fSizeSlider->SetLimitLabels(TR("999 MB"), TR("999 MB"));
+	fSizeSlider->SetLimitLabels(B_TRANSLATE("999 MB"), B_TRANSLATE("999 MB"));
 	fSizeSlider->SetViewColor(255, 0, 255);
 
 	fWarningStringView = new BStringView("", "");
 	fWarningStringView->SetAlignment(B_ALIGN_CENTER);
 
-	view->SetLayout(new BGroupLayout(B_HORIZONTAL)); 
-	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10) 
+	view->SetLayout(new BGroupLayout(B_HORIZONTAL));
+	view->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.AddGroup(B_HORIZONTAL)
 			.Add(memoryView)
 			.AddGlue()
@@ -194,22 +197,24 @@ SettingsWindow::SettingsWindow()
 
 	// Add "Defaults" and "Revert" buttons
 
-	fDefaultsButton = new BButton("defaults", TR("Defaults"), new BMessage(kMsgDefaults));
+	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
+		new BMessage(kMsgDefaults));
 	fDefaultsButton->SetEnabled(fSettings.IsDefaultable());
 
-	fRevertButton = new BButton("revert", TR("Revert"), new BMessage(kMsgRevert));
+	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
+		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL)); 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10) 
-		.Add(box) 
-		.AddGroup(B_HORIZONTAL, 10) 
-			.Add(fDefaultsButton) 
-			.Add(fRevertButton) 
-			.AddGlue() 
-		.End() 
-		.SetInsets(10, 10, 10, 10) 
-	); 
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.Add(box)
+		.AddGroup(B_HORIZONTAL, 10)
+			.Add(fDefaultsButton)
+			.Add(fRevertButton)
+			.AddGlue()
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	_Update();
 
@@ -265,7 +270,8 @@ SettingsWindow::_Update()
 	if (fRevertButton->IsEnabled() != changed) {
 		fRevertButton->SetEnabled(changed);
 		if (changed)
-			fWarningStringView->SetText(TR("Changes will take effect on restart!"));
+			fWarningStringView->SetText(
+				B_TRANSLATE("Changes will take effect on restart!"));
 		else
 			fWarningStringView->SetText("");
 	}
@@ -339,12 +345,13 @@ SettingsWindow::MessageReceived(BMessage* message)
 				//	as Be did, but I thought a proper warning could be helpful
 				//	(for those that want to change that anyway)
 				int32 choice = (new BAlert("VirtualMemory",
-					TR("Disabling virtual memory will have unwanted effects on "
+					B_TRANSLATE(
+					"Disabling virtual memory will have unwanted effects on "
 					"system stability once the memory is used up.\n"
 					"Virtual memory does not affect system performance "
 					"until this point is reached.\n\n"
 					"Are you really sure you want to turn it off?"),
-					TR("Turn off"), TR("Keep enabled"), NULL,
+					B_TRANSLATE("Turn off"), B_TRANSLATE("Keep enabled"), NULL,
 					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 				if (choice == 1) {
 					fSwapEnabledCheckBox->SetValue(1);
