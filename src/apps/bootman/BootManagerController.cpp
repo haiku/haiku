@@ -331,12 +331,12 @@ BootManagerController::_CreateMBRSavedPage(BRect frame)
 			B_TRANSLATE_COMMENT("Old Master Boot Record saved", "Title") <<
 			"\n\n" <<
 			B_TRANSLATE("The old Master Boot Record was successfully save to "
-			"%s.") <<
-			"\n";
+			"%s.") << "\n";
 	} else {
 		description <<
-			TR_CMT("Old Master Boot Record Saved failure", "Title") << "\n\n" <<
-			TR("The old Master Boot Record could not be saved to %s") <<
+			B_TRANSLATE_COMMENT("Old Master Boot Record Saved failure", "Title") <<
+			"\n\n" <<
+			B_TRANSLATE("The old Master Boot Record could not be saved to %s") <<
 			"\n";
 	}
 	description.ReplaceFirst("%s", file);
@@ -353,8 +353,8 @@ BootManagerController::_CreateInstallSummaryPage(BRect frame)
 	fSettings.FindString("disk", &disk);
 
 	description <<
-		TR_CMT("Summary", "Title") << "\n\n" <<
-		TR("About to write the following boot menu to the boot disk "
+		B_TRANSLATE_COMMENT("Summary", "Title") << "\n\n" <<
+		B_TRANSLATE("About to write the following boot menu to the boot disk "
 		"(%s). Please verify the information below before continuing.") <<
 		"\n\n";
 	description.ReplaceFirst("%s", disk);
@@ -389,13 +389,13 @@ BootManagerController::_CreateInstalledPage(BRect frame)
 
 	if (fWriteBootMenuStatus == B_OK) {
 		description <<
-			TR_CMT("Installation of boot menu completed", "Title") << "\n\n" <<
-			TR("The boot manager has been successfully installed "
+			B_TRANSLATE_COMMENT("Installation of boot menu completed", "Title") << "\n\n" <<
+			B_TRANSLATE("The boot manager has been successfully installed "
 				"on your system.");
 	} else {
 		description <<
-			TR_CMT("Installation of boot menu failed", "Title") << "\n\n" <<
-			TR("An error occurred writing the boot menu. "
+			B_TRANSLATE_COMMENT("Installation of boot menu failed", "Title") << "\n\n" <<
+			B_TRANSLATE("An error occurred writing the boot menu. "
 				"The Master Boot Record might be destroyed, "
 				"you should restore the MBR now!");
 	}
@@ -410,8 +410,8 @@ BootManagerController::_CreateUninstallPage(BRect frame)
 	BString description;
 
 	description <<
-		TR_CMT("Uninstall boot manager", "Title") << "\n\n" <<
-		TR("Please locate the Master Boot Record (MBR) save file to "
+		B_TRANSLATE_COMMENT("Uninstall boot manager", "Title") << "\n\n" <<
+		B_TRANSLATE("Please locate the Master Boot Record (MBR) save file to "
 			"restore from. This is the file that was created when the "
 			"boot manager was first installed.");
 
@@ -431,16 +431,16 @@ BootManagerController::_CreateUninstalledPage(BRect frame)
 
 	if (fRestoreMBRStatus == B_OK) {
 		description <<
-			TR_CMT("Uninstallation of boot menu completed", "Title") <<
+			B_TRANSLATE_COMMENT("Uninstallation of boot menu completed", "Title") <<
 			"\n\n" <<
-			TR("The Master Boot Record of the boot device "
+			B_TRANSLATE("The Master Boot Record of the boot device "
 			"(%s) has been successfully restored from %s.");
 		description.ReplaceFirst("%s", disk);
 		description.ReplaceLast("%s", file);
 	} else {
 		description <<
-			TR_CMT("Uninstallation of boot menu failed", "Title") << "\n\n" <<
-			TR("The Master Boot Record could not be restored!");
+			B_TRANSLATE_COMMENT("Uninstallation of boot menu failed", "Title") << "\n\n" <<
+			B_TRANSLATE("The Master Boot Record could not be restored!");
 	}
 
 	return new DescriptionPage(frame, "summary", description.String(), true);
