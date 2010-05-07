@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Rene Gollent
  */
+
 
 #include <ListItem.h>
 
@@ -65,7 +66,7 @@ BListItem::Archive(BMessage* archive, bool deep) const
 	status_t status = BArchivable::Archive(archive, deep);
 	if (status == B_OK && fSelected)
 		status = archive->AddBool("_sel", true);
-	
+
 	if (status == B_OK && !fEnabled)
 		status = archive->AddBool("_disable", true);
 
@@ -178,6 +179,13 @@ uint32
 BListItem::OutlineLevel() const
 {
 	return fLevel;
+}
+
+
+void
+BListItem::SetOutlineLevel(uint32 level)
+{
+	fLevel = level;
 }
 
 

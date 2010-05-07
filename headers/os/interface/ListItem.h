@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIST_ITEM_H
@@ -8,6 +8,7 @@
 
 #include <Archivable.h>
 #include <Rect.h>
+
 
 class BFont;
 class BList;
@@ -44,6 +45,7 @@ public:
 			bool				IsExpanded() const;
 			void				SetExpanded(bool expanded);
 			uint32				OutlineLevel() const;
+			void				SetOutlineLevel(uint32 level);
 
 	virtual	status_t			Perform(perform_code code, void* arg);
 
@@ -83,7 +85,7 @@ private:
 
 
 inline float
-BListItem::Top(void) const 
+BListItem::Top(void) const
 {
 	return fTop;
 }
@@ -98,5 +100,6 @@ BListItem::Bottom(void) const
 
 #include <StringItem.h>
 	// to maintain source compatibility
+
 
 #endif // _LIST_ITEM_H
