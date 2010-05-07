@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -22,7 +22,7 @@ class CatalogTestAddOn {
 #define catName catSig".catalog"
 
 
-void 
+void
 CatalogTestAddOn::Run() {
 	printf("addon...");
 	status_t res;
@@ -86,7 +86,7 @@ CatalogTestAddOn::Run() {
 }
 
 
-void 
+void
 CatalogTestAddOn::Check() {
 	status_t res;
 	printf("addon-check...");
@@ -95,7 +95,7 @@ CatalogTestAddOn::Check() {
 	size_t hashVal = CatKey::HashFun(s.String());
 	// ok, we now try to re-load the catalog that has just been written:
 	//
-	// actually, the following code can be seen as an example of what an 
+	// actually, the following code can be seen as an example of what an
 	// add_on needs in order to translate strings:
 	BCatalog cat;
 	res = get_add_on_catalog(&cat, catSig);
@@ -114,27 +114,27 @@ CatalogTestAddOn::Check() {
 	assert(sig == catSig);
 
 	// now check strings:
-	s = TR_ID(hashVal);
+	s = B_TRANSLATE_ID(hashVal);
 	assert(s == "Schnur_id_A");
-	s = TR_ALL("string", "programming", "");
+	s = B_TRANSLATE_ALL("string", "programming", "");
 	assert(s == "String_A");
-	s = TR_ALL("string", "programming", "Deutsches Fachbuch");
+	s = B_TRANSLATE_ALL("string", "programming", "Deutsches Fachbuch");
 	assert(s == "Textpuffer_A");
-	s = TR_CMT("string", "Deutsches Fachbuch");
+	s = B_TRANSLATE_COMMENT("string", "Deutsches Fachbuch");
 	assert(s == "Leine_A");
 	// the following string should be found in the embedded catalog only:
-	s = TR_ALL("string", "base", "");
+	s = B_TRANSLATE_ALL("string", "base", "");
 	assert(s == "string_A");
 	// the following id should be found in the embedded catalog only:
-	s = TR_ID(32);
+	s = B_TRANSLATE_ID(32);
 	assert(s == "hashed string_A");
 	// the following id doesn't exist anywhere (hopefully):
-	s = TR_ID(-1);
+	s = B_TRANSLATE_ID(-1);
 	assert(s == "");
-	// the following string exists twice, in the embedded as well as in the 
+	// the following string exists twice, in the embedded as well as in the
 	// external catalog. So we should get the external translation (as it should
 	// override the embedded one):
-	s = TR("string");
+	s = B_TRANSLATE("string");
 	assert(s == "Schnur_A");
 
 	// check access to app-catalog from inside add-on:

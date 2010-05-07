@@ -124,27 +124,27 @@ CatalogTest::Check()
 	assert(res == B_OK);
 
 	// now check strings:
-	s = TR_ID(hashVal);
+	s = B_TRANSLATE_ID(hashVal);
 	assert(s == "Schnur_id");
-	s = TR_ALL("string", "programming", "");
+	s = B_TRANSLATE_ALL("string", "programming", "");
 	assert(s == "String");
-	s = TR_ALL("string", "programming", "Deutsches Fachbuch");
+	s = B_TRANSLATE_ALL("string", "programming", "Deutsches Fachbuch");
 	assert(s == "Textpuffer");
-	s = TR_CMT("string", "Deutsches Fachbuch");
+	s = B_TRANSLATE_COMMENT("string", "Deutsches Fachbuch");
 	assert(s == "Leine");
 	// the following string should be found in the embedded catalog only:
-	s = TR_ALL("string", "base", NULL);
+	s = B_TRANSLATE_ALL("string", "base", NULL);
 	assert(s == "string");
 	// the following id should be found in the embedded catalog only:
-	s = TR_ID(32);
+	s = B_TRANSLATE_ID(32);
 	assert(s == "hashed string");
 	// the following id doesn't exist anywhere (hopefully):
-	s = TR_ID(-1);
+	s = B_TRANSLATE_ID(-1);
 	assert(s == "");
 	// the following string exists twice, in the embedded as well as in the
 	// external catalog. So we should get the external translation (as it should
 	// override the embedded one):
-	s = TR("string");
+	s = B_TRANSLATE("string");
 	assert(s == "Schnur");
 
 	// now check if trying to access same catalog by specifying its data works:

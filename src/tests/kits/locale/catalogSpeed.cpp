@@ -95,7 +95,7 @@ CatalogSpeed::TestLookup()
 	watch.Reset();
 	watch.Resume();
 	for (uint32 i = 0; i < kNumStrings; i++) {
-		translated = TR(strs[i].String());
+		translated = B_TRANSLATE(strs[i].String());
 	}
 	watch.Suspend();
 	printf("\tlooked up %lu strings in       %9Ld usecs\n",
@@ -161,7 +161,7 @@ CatalogSpeed::TestIdLookup()
 	watch.Reset();
 	watch.Resume();
 	for (uint32 i = 0; i < kNumStrings; i++) {
-		translated = TR_ID(i);
+		translated = B_TRANSLATE_ID(i);
 	}
 	watch.Suspend();
 	printf("\tlooked up %lu strings in       %9Ld usecs\n",
