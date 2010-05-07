@@ -30,10 +30,10 @@ AddStringView(BView* view, const char* viewName, const char* name,
 {
 	if (!view)
 		return;
-	
+
 	BRect dummyRect(0, 0, 0, 0);
 	const float kSpacer = 5;
-	
+
 	BString tempViewName(viewName);
 	BStringView *nameView = new BStringView(dummyRect, tempViewName.String(),
 		name, B_FOLLOW_NONE);
@@ -63,7 +63,7 @@ AddStringView(BView* view, const char* viewName, const char* name,
 
 
 CapabilitiesView::CapabilitiesView()
-	: BView(TR("Capabilities"), 0, NULL)
+	: BView(B_TRANSLATE("Capabilities"), 0, NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -113,82 +113,85 @@ CapabilitiesView::CapabilitiesView()
 	rootView->SetLayout(new BGroupLayout(B_VERTICAL));
 
 	tempString << (int32) buffers;
-	AddStringView(rootView, "Buffers", TR("Auxiliary buffer(s):"),
+	AddStringView(rootView, "Buffers", B_TRANSLATE("Auxiliary buffer(s):"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) modelStack;
-	AddStringView(rootView, "ModelStack", TR("Model stack size:"),
+	AddStringView(rootView, "ModelStack", B_TRANSLATE("Model stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) projectionStack;
-	AddStringView(rootView, "ProjectionStack", TR("Projection stack size:"),
-		tempString.String(), true);
+	AddStringView(rootView, "ProjectionStack",
+		B_TRANSLATE("Projection stack size:"), tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) textureStack;
-	AddStringView(rootView, "TextureStack", TR("Texture stack size:"),
+	AddStringView(rootView, "TextureStack", B_TRANSLATE("Texture stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) nameStack;
-	AddStringView(rootView, "NameStack", TR("Name stack size:"),
+	AddStringView(rootView, "NameStack", B_TRANSLATE("Name stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) listStack;
-	AddStringView(rootView, "ListStack", TR("List stack size:"),
+	AddStringView(rootView, "ListStack", B_TRANSLATE("List stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) attribStack;
-	AddStringView(rootView, "AttribStack", TR("Attributes stack size:"),
+	AddStringView(rootView, "AttribStack", B_TRANSLATE("Attributes stack size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxTex3d;
-	AddStringView(rootView, "MaxTex3D", TR("Max. 3D texture size:"),
+	AddStringView(rootView, "MaxTex3D", B_TRANSLATE("Max. 3D texture size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxTex2d;
-	AddStringView(rootView, "MaxTex2D", TR("Max. 2D texture size:"),
+	AddStringView(rootView, "MaxTex2D", B_TRANSLATE("Max. 2D texture size:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) textureUnits;
-	AddStringView(rootView, "MaxTexUnits", TR("Max. texture units:"),
+	AddStringView(rootView, "MaxTexUnits", B_TRANSLATE("Max. texture units:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) lights;
-	AddStringView(rootView, "MaxLights", TR("Max. lights:"),
+	AddStringView(rootView, "MaxLights", B_TRANSLATE("Max. lights:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) clippingPlanes;
-	AddStringView(rootView, "MaxClippingPlanes", TR("Max. clipping planes:"),
-		tempString.String(), true);
+	AddStringView(rootView, "MaxClippingPlanes",
+		B_TRANSLATE("Max. clipping planes:"), tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxPoly;
-	AddStringView(rootView, "MaxPoly", TR("Max. evaluators equation order:"),
+	AddStringView(rootView, "MaxPoly",
+		B_TRANSLATE("Max. evaluators equation order:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) convolutionWidth << "x" << convolutionHeight;
-	AddStringView(rootView, "MaxConvultion", TR("Max. convolution:"),
+	AddStringView(rootView, "MaxConvultion", B_TRANSLATE("Max. convolution:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxIndex;
-	AddStringView(rootView, "MaxIndex", TR("Max. recommended index elements:"),
+	AddStringView(rootView, "MaxIndex",
+		B_TRANSLATE("Max. recommended index elements:"),
 		tempString.String(), true);
 
 	tempString.SetTo("");
 	tempString << (int32) maxVertex;
-	AddStringView(rootView, "MaxVertex", TR("Max. recommended vertex elements:"),
+	AddStringView(rootView, "MaxVertex",
+		B_TRANSLATE("Max. recommended vertex elements:"),
 		tempString.String(), true);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
@@ -200,7 +203,7 @@ CapabilitiesView::CapabilitiesView()
 
 CapabilitiesView::~CapabilitiesView()
 {
-	
+
 }
 
 
@@ -210,19 +213,19 @@ CapabilitiesView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		default:
 			BView::MessageReceived(message);
-	}	
+	}
 }
 
 
 void
 CapabilitiesView::AttachedToWindow()
 {
-	
+
 }
 
 
 void
 CapabilitiesView::DetachedFromWindow()
 {
-		
+
 }

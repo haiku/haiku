@@ -23,7 +23,7 @@
 
 
 ExtensionsView::ExtensionsView()
-	: BView(TR("Extensions"), 0, NULL)
+	: BView(B_TRANSLATE("Extensions"), 0, NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -31,7 +31,7 @@ ExtensionsView::ExtensionsView()
 	const float kInset = 10;
 
 	ExtensionsList *extList = new ExtensionsList();
-	
+
 	_AddExtensionsList(extList, (char*) glGetString(GL_EXTENSIONS));
 	_AddExtensionsList(extList, (char*) gluGetString(GLU_EXTENSIONS));
 
@@ -44,7 +44,7 @@ ExtensionsView::ExtensionsView()
 
 ExtensionsView::~ExtensionsView()
 {
-	
+
 }
 
 
@@ -54,21 +54,21 @@ ExtensionsView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		default:
 			BView::MessageReceived(message);
-	}	
+	}
 }
 
 
 void
 ExtensionsView::AttachedToWindow()
 {
-	
+
 }
 
 
 void
 ExtensionsView::DetachedFromWindow()
 {
-		
+
 }
 
 // #pragma mark
@@ -79,7 +79,7 @@ ExtensionsView::_AddExtensionsList(ExtensionsList *extList, char* stringList)
 	if (!stringList)
 		// empty extentions string
 		return;
-		
+
 	while (*stringList) {
 		char extName[255];
 		int n = strcspn(stringList, " ");
@@ -91,4 +91,4 @@ ExtensionsView::_AddExtensionsList(ExtensionsList *extList, char* stringList)
 		stringList += (n + 1); // next !
 	}
 }
-	
+

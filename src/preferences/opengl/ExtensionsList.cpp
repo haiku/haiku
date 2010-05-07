@@ -27,15 +27,15 @@ ExtensionRow::ExtensionRow(const char* extensionName)
 
 ExtensionRow::~ExtensionRow()
 {
-	
+
 }
 
 
 ExtensionsList::ExtensionsList()
 	: BColumnListView("ExtensionsList", B_FOLLOW_ALL)
 {
-	BStringColumn* column = new BStringColumn(TR("Available"), 280, 280, 280,
-		B_TRUNCATE_MIDDLE);
+	BStringColumn* column = new BStringColumn(B_TRANSLATE("Available"),
+		280, 280, 280, B_TRUNCATE_MIDDLE);
 	AddColumn(column, 0);
 	SetSortingEnabled(true);
 	SetSortColumn(column, true, true);
