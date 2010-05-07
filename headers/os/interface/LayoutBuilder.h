@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_BUILDER_H
@@ -54,9 +54,6 @@ public:
 										= B_HORIZONTAL,
 									float spacing = 0.0f);
 	inline						Group(BWindow* window,
-									enum orientation orientation = B_HORIZONTAL,
-									float spacing = 0.0f);
-	inline						Group(BView* window,
 									enum orientation orientation = B_HORIZONTAL,
 									float spacing = 0.0f);
 	inline						Group(BGroupLayout* layout);
@@ -243,19 +240,12 @@ template<typename ParentBuilder>
 Group<ParentBuilder>::Group(BWindow* window, enum orientation orientation,
 	float spacing)
 	:
-	fLayout((new BGroupView(orientation, spacing))->GroupLayout())
+	fLayout(new BGroupLayout(orientation, spacing))
 {
 	window->SetLayout(fLayout);
-}
 
-
-template<typename ParentBuilder>
-Group<ParentBuilder>::Group(BView* view, enum orientation orientation,
-	float spacing)
-	:
-	fLayout((new BGroupView(orientation, spacing))->GroupLayout())
-{
-	view->SetLayout(fLayout);
+	fLayout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		// TODO: we get a white background if we don't do this
 }
 
 
@@ -442,9 +432,12 @@ template<typename ParentBuilder>
 Grid<ParentBuilder>::Grid(BWindow* window, float horizontalSpacing,
 	float verticalSpacing)
 	:
-	fLayout((new BGridView(horizontalSpacing, verticalSpacing))->GridLayout())
+	fLayout(new BGridLayout(horizontalSpacing, verticalSpacing))
 {
 	window->SetLayout(fLayout);
+
+	fLayout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		// TODO: we get a white background if we don't do this
 }
 
 
