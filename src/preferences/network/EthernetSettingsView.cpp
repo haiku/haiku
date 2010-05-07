@@ -126,21 +126,23 @@ EthernetSettingsView::EthernetSettingsView()
 	}
 
 	BPopUpMenu* modeMenu = new  BPopUpMenu("modes");
-	modeMenu->AddItem(new BMenuItem(TR("Static"), new BMessage(kMsgMode)));
-	modeMenu->AddItem(new BMenuItem(TR("DHCP"), new BMessage(kMsgMode)));
+	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
+		new BMessage(kMsgMode)));
+	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("DHCP"),
+		new BMessage(kMsgMode)));
 	//modeMenu->AddSeparatorItem();
 	//BMenuItem* offItem = new BMenuItem("Disabled", NULL);
 	//modeMenu->AddItem(offItem);
 
-	fDeviceMenuField = new BMenuField(TR("Adapter:"), deviceMenu);
+	fDeviceMenuField = new BMenuField(B_TRANSLATE("Adapter:"), deviceMenu);
 	layout->AddItem(fDeviceMenuField->CreateLabelLayoutItem(), 0, 0);
 	layout->AddItem(fDeviceMenuField->CreateMenuBarLayoutItem(), 1, 0);
 
-	fTypeMenuField = new BMenuField(TR("Mode:"), modeMenu);
+	fTypeMenuField = new BMenuField(B_TRANSLATE("Mode:"), modeMenu);
 	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 1);
 	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
 
-	fIPTextControl = new BTextControl(TR("IP address:"), "", NULL);
+	fIPTextControl = new BTextControl(B_TRANSLATE("IP address:"), "", NULL);
 	SetupTextControl(fIPTextControl);
 
 	BLayoutItem* layoutItem = fIPTextControl->CreateTextViewLayoutItem();
@@ -151,29 +153,31 @@ EthernetSettingsView::EthernetSettingsView()
 	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 2);
 	layout->AddItem(layoutItem, 1, 2);
 
-	fNetMaskTextControl = new BTextControl(TR("Netmask:"), "", NULL);
+	fNetMaskTextControl = new BTextControl(B_TRANSLATE("Netmask:"), "", NULL);
 	SetupTextControl(fNetMaskTextControl);
 	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 3);
 	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 3);
 
-	fGatewayTextControl = new BTextControl(TR("Gateway:"), "", NULL);
+	fGatewayTextControl = new BTextControl(B_TRANSLATE("Gateway:"), "", NULL);
 	SetupTextControl(fGatewayTextControl);
 	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 4);
 	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 4);
 
 	// TODO: Replace the DNS text controls by a BListView with add/remove
 	// functionality and so on...
-	fPrimaryDNSTextControl = new BTextControl(TR("DNS #1:"), "", NULL);
+	fPrimaryDNSTextControl = new BTextControl(B_TRANSLATE("DNS #1:"), "",
+		NULL);
 	SetupTextControl(fPrimaryDNSTextControl);
 	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 5);
 	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 5);
 
-	fSecondaryDNSTextControl = new BTextControl(TR("DNS #2:"), "", NULL);
+	fSecondaryDNSTextControl = new BTextControl(B_TRANSLATE("DNS #2:"), "",
+		NULL);
 	SetupTextControl(fSecondaryDNSTextControl);
 	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
 	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
 
-	fDomainTextControl = new BTextControl(TR("Domain:"), "", NULL);
+	fDomainTextControl = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	SetupTextControl(fDomainTextControl);
 	layout->AddItem(fDomainTextControl->CreateLabelLayoutItem(), 0, 7);
 	layout->AddItem(fDomainTextControl->CreateTextViewLayoutItem(), 1, 7);
@@ -189,13 +193,14 @@ EthernetSettingsView::EthernetSettingsView()
 	// enabling/disabling)
 	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL);
 
-	fRevertButton = new BButton(TR("Revert"), new BMessage(kMsgRevert));
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 	buttonGroup->GroupLayout()->AddView(fRevertButton);
 
 	buttonGroup->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-	fApplyButton = new BButton(TR("Apply"), new BMessage(kMsgApply));
+	fApplyButton = new BButton(B_TRANSLATE("Apply"), new BMessage(kMsgApply));
 	buttonGroup->GroupLayout()->AddView(fApplyButton);
 
 	rootLayout->AddView(controlsGroup);
@@ -316,9 +321,9 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		fNetMaskTextControl->SetText(settings->Netmask());
 
 		if (settings->AutoConfigure() == true)
-			item = fTypeMenuField->Menu()->FindItem(TR("DHCP"));
+			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("DHCP"));
 		else
-			item = fTypeMenuField->Menu()->FindItem(TR("Static"));
+			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Static"));
 		if (item)
 			item->SetMarked(true);
 
@@ -363,7 +368,8 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 	fCurrentSettings->SetGateway(fGatewayTextControl->Text());
 
 	fCurrentSettings->SetAutoConfigure(
-		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(), TR("DHCP")) == 0);
+		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(),
+			B_TRANSLATE("DHCP")) == 0);
 
 	fCurrentSettings->NameServers().MakeEmpty();
 	fCurrentSettings->NameServers().AddItem(new BString(
@@ -399,7 +405,7 @@ EthernetSettingsView::_SaveDNSConfiguration()
 
 	BFile file(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
 	if (file.InitCheck() != B_OK) {
-		fprintf(stderr, "failed to open %s for writing: %s\n", path.Path(), 
+		fprintf(stderr, "failed to open %s for writing: %s\n", path.Path(),
 			strerror(file.InitCheck()));
 		return;
 	}
@@ -476,8 +482,8 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 {
 	BMessenger networkServer(kNetServerSignature);
 	if (!networkServer.IsValid()) {
-		(new BAlert("error", TR("The net_server needs to run for the auto "
-			"configuration!"), TR("OK")))->Go();
+		(new BAlert("error", B_TRANSLATE("The net_server needs to run for "
+			"the auto configuration!"), B_TRANSLATE("OK")))->Go();
 		return B_ERROR;
 	}
 
@@ -491,13 +497,14 @@ EthernetSettingsView::_TriggerAutoConfig(const char* device)
 	BMessage reply;
 	status_t status = networkServer.SendMessage(&message, &reply);
 	if (status != B_OK) {
-		BString errorMessage(TR("Sending auto-config message failed: "));
+		BString errorMessage(
+			B_TRANSLATE("Sending auto-config message failed: "));
 		errorMessage << strerror(status);
-		(new BAlert("error", errorMessage.String(), TR("OK")))->Go();
+		(new BAlert("error", errorMessage.String(), B_TRANSLATE("OK")))->Go();
 		return status;
 	} else if (reply.FindInt32("status", &status) == B_OK
 			&& status != B_OK) {
-		BString errorMessage(TR("Auto-configuring failed: "));
+		BString errorMessage(B_TRANSLATE("Auto-configuring failed: "));
 		errorMessage << strerror(status);
 		(new BAlert("error", errorMessage.String(), "OK"))->Go();
 		return status;
@@ -560,7 +567,8 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgMode:
 			if (BMenuItem* item = fTypeMenuField->Menu()->FindMarked())
-				_EnableTextControls(strcmp(item->Label(), TR("DHCP")) != 0);
+				_EnableTextControls(strcmp(item->Label(),
+					B_TRANSLATE("DHCP")) != 0);
 			fApplyButton->SetEnabled(true);
 			fRevertButton->SetEnabled(true);
 			break;

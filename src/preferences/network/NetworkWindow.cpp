@@ -19,7 +19,7 @@
 #define TR_CONTEXT "NetworkWindow"
 
 NetworkWindow::NetworkWindow()
-	: BWindow(BRect(50, 50, 269, 302), TR("Network"), B_TITLED_WINDOW,
+	: BWindow(BRect(50, 50, 269, 302), B_TRANSLATE("Network"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
