@@ -268,6 +268,10 @@ est_support(device_node *parent)
 	if ((sysInfo.cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86)
 		return 0.0;
 
+	// TODO: Make the code SMP safe!
+	if (sysInfo.cpu_count > 1)
+		return 0.0;
+
 	cpuid_info info;
 	if (get_cpuid(&info, 1, cpuNum) != B_OK)
 		return 0.0;
