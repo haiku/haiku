@@ -2,7 +2,7 @@
 //
 //	Copyright (c) 2003, OpenBeOS
 //
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //
 //
@@ -10,7 +10,7 @@
 //  Author:      Sikosis, Jérôme Duval
 //  Description: Media Preferences
 //  Created :    June 25, 2003
-// 
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
@@ -36,17 +36,17 @@
 
 #define TR_CONTEXT "Media views"
 
-BarView::BarView() 
+BarView::BarView()
  : BView ("barView", B_WILL_DRAW ),
  	fDisplay(true)
 {
 }
 
-void 
+void
 BarView::Draw(BRect updateRect)
 {
 	BRect r = Bounds();
-	
+
 	if (fDisplay) {
 		// Display the 3D Look Divider Bar
 		SetHighColor(140,140,140,0);
@@ -68,8 +68,9 @@ SettingsView::SettingsView (bool isVideo)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BBox *defaultsBox = new BBox("defaults");
-	defaultsBox->SetLabel(fIsVideo ? TR("Default nodes") : TR("Defaults"));
-	
+	defaultsBox->SetLabel(fIsVideo ? B_TRANSLATE("Default nodes")
+		: B_TRANSLATE("Defaults"));
+
 	// create the default box
 	BGroupLayout* defaultBoxLayout = new BGroupLayout(B_VERTICAL, 5);
 	defaultBoxLayout->SetInsets(10,10,10,10);
@@ -81,20 +82,22 @@ SettingsView::SettingsView (bool isVideo)
 	defaultsBox->GetLayout()->AddView(inputField);
 	defaultsBox->GetLayout()->AddView(outputField);
 
-	float divider = StringWidth(fIsVideo ? TR("Video output:")
-		: TR("Audio output:")) + 5;
+	float divider = StringWidth(fIsVideo ? B_TRANSLATE("Video output:")
+		: B_TRANSLATE("Audio output:")) + 5;
 	fMenu1 = new BPopUpMenu("<none>");
 	fMenu1->SetLabelFromMarked(true);
 	BMenuField *menuField1 = new BMenuField("menuField1",
-		fIsVideo ? TR("Video input:") : TR("Audio input:"), fMenu1, NULL);
+		fIsVideo ? B_TRANSLATE("Video input:")
+			: B_TRANSLATE("Audio input:"), fMenu1, NULL);
 	menuField1->SetDivider(divider);
-	
+
 	fMenu2 = new BPopUpMenu("<none>");
 	fMenu2->SetLabelFromMarked(true);
 	BMenuField *menuField2 = new BMenuField("menuField2",
-		fIsVideo ? TR("Video output:") : TR("Audio output:"), fMenu2, NULL);
+		fIsVideo ? B_TRANSLATE("Video output:")
+			: B_TRANSLATE("Audio output:"), fMenu2, NULL);
 	menuField2->SetDivider(divider);
-	
+
 	inputField->GroupLayout()->AddView(menuField1);
 	outputField->GroupLayout()->AddView(menuField2);
 
@@ -103,70 +106,75 @@ SettingsView::SettingsView (bool isVideo)
 		fMenu3 = new BPopUpMenu("<none>");
 		fMenu3->SetLabelFromMarked(true);
 		menuField3 = new BMenuField("menuField3",
-			TR("Channel:"), fMenu3, NULL);
+			B_TRANSLATE("Channel:"), fMenu3, NULL);
 		outputField->GroupLayout()->AddView(menuField3);
-		menuField3->SetDivider(StringWidth(TR("Channel:"))+5);
+		menuField3->SetDivider(StringWidth(B_TRANSLATE("Channel:"))+5);
 	}
-	
+
 	rgb_color red_color = {222, 32, 33};
 	fRestartView = new BStringView("restartStringView",
-		TR("Restart the media server to apply changes."));
+		B_TRANSLATE("Restart the media server to apply changes."));
 	fRestartView->SetHighColor(red_color);
 	defaultsBox->AddChild(fRestartView);
 	fRestartView->Hide();
-	
+
 	// create the realtime box
 	BBox *realtimeBox = new BBox("realtime");
-	realtimeBox->SetLabel(TR("Real-time"));
-	
+	realtimeBox->SetLabel(B_TRANSLATE("Real-time"));
+
 	BMessage *message = new BMessage(ML_ENABLE_REAL_TIME);
 	message->AddBool("isVideo", fIsVideo);
 	fRealtimeCheckBox = new BCheckBox("realtimeCheckBox",
-		fIsVideo ? TR("Enable real-time video") : TR("Enable real-time audio"),
+		fIsVideo ? B_TRANSLATE("Enable real-time video")
+			: B_TRANSLATE("Enable real-time audio"),
 		message);
-	
+
 	uint32 flags;
 	BMediaRoster::Roster()->GetRealtimeFlags(&flags);
 	if (flags & (fIsVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO))
 		fRealtimeCheckBox->SetValue(B_CONTROL_ON);
-		
+
 	BTextView *textView = new BTextView("stringView");
-	textView->Insert(fIsVideo ? TR("Enabling real-time video allows system to "
+	textView->Insert(fIsVideo ? B_TRANSLATE(
+		"Enabling real-time video allows system to "
 		"perform video operations as fast and smoothly as possible.  It "
 		"achieves optimum performance by using more RAM."
 		"\n\nOnly enable this feature if you need the lowest latency possible.")
-		: TR("Enabling real-time audio allows system to record and play audio "
+		: B_TRANSLATE(
+		"Enabling real-time audio allows system to record and play audio "
 		"as fast as possible.  It achieves this performance by using more CPU and RAM."
 		"\n\nOnly enable this feature if you need the lowest latency possible."));
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	BGroupLayout* realtimeBoxLayout = new BGroupLayout(B_VERTICAL, 5);
 	realtimeBoxLayout->SetInsets(10,10,10,10);
 	realtimeBox->SetLayout(realtimeBoxLayout);
-	
+
 	realtimeBoxLayout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(5));
 	realtimeBoxLayout->AddView(fRealtimeCheckBox);
 	realtimeBoxLayout->AddView(textView);
 
 	// create the bottom line: volumen in deskbar checkbox and restart button
 	BGroupView* bottomView = new BGroupView(B_HORIZONTAL);
-	BButton *restartButton = new BButton("restartButton", 
-		TR("Restart media services"), new BMessage(ML_RESTART_MEDIA_SERVER));
-	
+	BButton *restartButton = new BButton("restartButton",
+		B_TRANSLATE("Restart media services"),
+		new BMessage(ML_RESTART_MEDIA_SERVER));
+
 	if (!fIsVideo) {
-		fVolumeCheckBox = new BCheckBox("volumeCheckBox", 
-			TR("Show volume control on Deskbar"), new BMessage(ML_SHOW_VOLUME_CONTROL));
+		fVolumeCheckBox = new BCheckBox("volumeCheckBox",
+			B_TRANSLATE("Show volume control on Deskbar"),
+			new BMessage(ML_SHOW_VOLUME_CONTROL));
 		bottomView->GroupLayout()->AddView(fVolumeCheckBox);
 		if (BDeskbar().HasItem("MediaReplicant"))
-			fVolumeCheckBox->SetValue(B_CONTROL_ON);	
+			fVolumeCheckBox->SetValue(B_CONTROL_ON);
 	}
 	else{
 		bottomView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 	}
 	bottomView->GroupLayout()->AddView(restartButton);
-	
+
 	// compose all stuff
 	BGroupLayout* rootlayout = new BGroupLayout(B_VERTICAL, 5);
 	SetLayout(rootlayout);
@@ -198,7 +206,7 @@ void
 SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 {
 	BMenu *menu = isInput ? fMenu1 : fMenu2;
-		
+
 	for (int32 i = 0; i < menu->CountItems(); i++) {
 		SettingsItem *item = static_cast<SettingsItem *>(menu->ItemAt(i));
 		if (item->fInfo && item->fInfo->addon == info.addon && item->fInfo->flavor_id == info.flavor_id) {
@@ -206,7 +214,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 			break;
 		}
 	}
-	
+
 	if (!fIsVideo&&!isInput&&outputID>-1) {
 		BMenuItem *item;
 		while ((item = fMenu3->RemoveItem((int32)0)) != NULL)
@@ -215,12 +223,12 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 		media_node node;
 		media_node_id node_id;
 		status_t err;
-		if (roster->GetInstancesFor(info.addon, info.flavor_id, &node_id)!=B_OK) 
+		if (roster->GetInstancesFor(info.addon, info.flavor_id, &node_id)!=B_OK)
 			err = roster->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
 		else
 			err = roster->GetNodeFor(node_id, &node);
-		
-		if (err == B_OK) {	
+
+		if (err == B_OK) {
 			media_input inputs[16];
 			int32 inputCount = 16;
 			if (roster->GetAllInputsFor(node, inputs, 16, &inputCount)==B_OK) {
@@ -238,12 +246,12 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 	}
 }
 
-SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message, 
+SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message,
 			char shortcut, uint32 modifiers)
 	: BMenuItem(info->name, message, shortcut, modifiers),
 	fInfo(info)
 {
-	
+
 }
 
 
@@ -256,13 +264,13 @@ SettingsItem::Invoke(BMessage *message)
 }
 
 
-Settings2Item::Settings2Item(dormant_node_info *info, media_input *input, BMessage *message, 
+Settings2Item::Settings2Item(dormant_node_info *info, media_input *input, BMessage *message,
 			char shortcut, uint32 modifiers)
 	: BMenuItem(input->name, message, shortcut, modifiers),
 	fInfo(info),
 	fInput(input)
 {
-	
+
 }
 
 
