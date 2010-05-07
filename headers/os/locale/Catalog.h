@@ -60,7 +60,7 @@ extern BCatalog* be_app_catalog;
 // macros for easy catalog-access, define B_AVOID_TRANSLATION_MACROS if
 // you don't want these:
 
-#undef TR_CONTEXT
+#undef B_TRANSLATE_CONTEXT
 	// In a single application, several strings (e.g. 'Ok') will be used
 	// more than once, in different contexts.
 	// As the application programmer can not know if all translations of
@@ -71,43 +71,35 @@ extern BCatalog* be_app_catalog;
 	// same string and tell which strings appears in what context of the
 	// application.
 	// In order to give the translator a useful hint, the application
-	// programmer needs to define TR_CONTEXT with the context he'd like
-	// to be associated with the strings used in this specifc source file.
+	// programmer needs to define B_TRANSLATE_CONTEXT with the context he'd
+	// like to be associated with the strings used in this specifc source file.
 	// example:
-	//		#define TR_CONTEXT "Folder-Window"
+	//		#define B_TRANSLATE_CONTEXT "Folder-Window"
 	// Tip: Use a descriptive name of the class implemented in that
 	//		source-file.
 
 
 // Translation macros which may be used to shorten translation requests:
 #undef TR
-#define TR(str) \
-	be_catalog->GetString((str), TR_CONTEXT)
 #define B_TRANSLATE(str) \
-	be_catalog->GetString((str), TR_CONTEXT)
+	be_catalog->GetString((str), B_TRANSLATE_CONTEXT)
 
 #undef TR_CMT
-#define TR_CMT(str, cmt) \
-	be_catalog->GetString((str), TR_CONTEXT, (cmt))
 #define B_TRANSLATE_COMMENT(str, cmt) \
-	be_catalog->GetString((str), TR_CONTEXT, (cmt))
+	be_catalog->GetString((str), B_TRANSLATE_CONTEXT, (cmt))
 
 #undef TR_ALL
-#define TR_ALL(str, ctx, cmt) \
-	be_catalog->GetString((str), (ctx), (cmt))
 #define B_TRANSLATE_ALL(str, ctx, cmt) \
 	be_catalog->GetString((str), (ctx), (cmt))
 
 #undef TR_ID
-#define TR_ID(id) \
-	be_catalog->GetString((id))
 #define B_TRANSLATE_ID(id) \
 	be_catalog->GetString((id))
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code):
 /* example:
-		#define TR_CONTEXT "MyDecentApp-Menu"
+		#define B_TRANSLATE_CONTEXT "MyDecentApp-Menu"
 
 		static const char *choices[] = {
 			TR_MARK("left"),
@@ -128,26 +120,18 @@ extern BCatalog* be_app_catalog;
 		}
 */
 #undef TR_MARK
-#define TR_MARK(str) \
-	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, "")
 #define B_TRANSLATE_MARK(str) \
-	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, "")
+	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_CONTEXT, "")
 
 #undef TR_MARK_CMT
-#define TR_MARK_CMT(str, cmt) \
-	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, (cmt))
 #define B_TRANSLATE_MARK_COMMENT(str, cmt) \
-	BCatalogAddOn::MarkForTranslation((str), TR_CONTEXT, (cmt))
+	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_CONTEXT, (cmt))
 
 #undef TR_MARK_ALL
-#define TR_MARK_ALL(str, ctx, cmt) \
-	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
 #define B_TRANSLATE_MARK_ALL(str, ctx, cmt) \
 	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
 
 #undef TR_MARK_ID
-#define TR_MARK_ID(id) \
-	BCatalogAddOn::MarkForTranslation((id))
 #define B_TRANSLATE_MARK_ID(id) \
 	BCatalogAddOn::MarkForTranslation((id))
 
