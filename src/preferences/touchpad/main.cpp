@@ -48,7 +48,8 @@ main(int argc, char* argv[])
 	be_locale->GetAppCatalog(&catalog);
 
 	TouchpadPrefWindow* window = new TouchpadPrefWindow(BRect(50, 50, 450, 350),
-		TR("Touchpad"), B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+		B_TRANSLATE("Touchpad"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS);
 	window->SetLayout(new BGroupLayout(B_HORIZONTAL));
 	window->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)

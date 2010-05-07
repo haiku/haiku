@@ -355,37 +355,41 @@ TouchpadPrefView::SetupView()
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	BBox* scrollBox = new BBox("Touchpad");
-	scrollBox->SetLabel(TR("Scrolling"));
+	scrollBox->SetLabel(B_TRANSLATE("Scrolling"));
 
 	fTouchpadView = new TouchpadView(BRect(0, 0, 130, 120));
 	fTouchpadView->SetExplicitMaxSize(BSize(130, 120));
 
 	// Create the "Mouse Speed" slider...
 	fScrollAccelSlider = new BSlider("scroll_accel",
-		TR("Scroll acceleration"), new BMessage(SCROLL_CONTROL_CHANGED),
-		0, 20, B_HORIZONTAL);
+		B_TRANSLATE("Scroll acceleration"),
+		new BMessage(SCROLL_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
 	fScrollAccelSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollAccelSlider->SetHashMarkCount(7);
-	fScrollAccelSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
+	fScrollAccelSlider->SetLimitLabels(B_TRANSLATE("Slow"),
+		B_TRANSLATE("Fast"));
 
 	fScrollStepXSlider = new BSlider("scroll_stepX",
-		TR("Horizontal scroll speed"),
+		B_TRANSLATE("Horizontal scroll speed"),
 		new BMessage(SCROLL_CONTROL_CHANGED),
 		0, 20, B_HORIZONTAL);
 	fScrollStepXSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollStepXSlider->SetHashMarkCount(7);
-	fScrollStepXSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
+	fScrollStepXSlider->SetLimitLabels(B_TRANSLATE("Slow"),
+		B_TRANSLATE("Fast"));
 
 	fScrollStepYSlider = new BSlider("scroll_stepY",
-		TR("Vertical scroll speed"), new BMessage(SCROLL_CONTROL_CHANGED),
-		0, 20, B_HORIZONTAL);
+		B_TRANSLATE("Vertical scroll speed"),
+		new BMessage(SCROLL_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
 	fScrollStepYSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fScrollStepYSlider->SetHashMarkCount(7);
-	fScrollStepYSlider->SetLimitLabels(TR("Slow"), TR("Fast"));
+	fScrollStepYSlider->SetLimitLabels(B_TRANSLATE("Slow"),
+		B_TRANSLATE("Fast"));
 
-	fTwoFingerBox = new BCheckBox(TR("Two finger scrolling"),
+	fTwoFingerBox = new BCheckBox(B_TRANSLATE("Two finger scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
-	fTwoFingerHorizontalBox = new BCheckBox(TR("Horizontal scrolling"),
+	fTwoFingerHorizontalBox = new BCheckBox(
+		B_TRANSLATE("Horizontal scrolling"),
 		new BMessage(SCROLL_CONTROL_CHANGED));
 
 	BGroupView* scrollPrefLeftLayout = new BGroupView(B_VERTICAL);
@@ -412,28 +416,29 @@ TouchpadPrefView::SetupView()
 	scrollPrefLayout->AddView(scrollPrefRightLayout);
 
 	BBox* tapBox = new BBox("tapbox");
-	tapBox->SetLabel(TR("Tap gesture"));
+	tapBox->SetLabel(B_TRANSLATE("Tap gesture"));
 
 	BGroupLayout* tapPrefLayout = new BGroupLayout(B_HORIZONTAL);
 	tapPrefLayout->SetInsets(10, tapBox->TopBorderOffset() * 2 + 10, 10, 10);
 	tapBox->SetLayout(tapPrefLayout);
 
-	fTapSlider = new BSlider("tap_sens", TR("Tap click sensitivity"),
+	fTapSlider = new BSlider("tap_sens", B_TRANSLATE("Tap click sensitivity"),
 		new BMessage(TAP_CONTROL_CHANGED), 0, 20, B_HORIZONTAL);
 	fTapSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fTapSlider->SetHashMarkCount(7);
-	fTapSlider->SetLimitLabels(TR("Off"), TR("High"));
+	fTapSlider->SetLimitLabels(B_TRANSLATE("Off"), B_TRANSLATE("High"));
 
 	tapPrefLayout->AddView(fTapSlider);
 
 	BGroupView* buttonView = new BGroupView(B_HORIZONTAL);
-	fDefaultButton = new BButton(TR("Defaults"),
+	fDefaultButton = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(DEFAULT_SETTINGS));
 
 	buttonView->AddChild(fDefaultButton);
 	buttonView->GetLayout()->AddItem(
 		BSpaceLayoutItem::CreateHorizontalStrut(7));
-	fRevertButton = new BButton(TR("Revert"), new BMessage(REVERT_SETTINGS));
+	fRevertButton = new BButton(B_TRANSLATE("Revert"),
+		new BMessage(REVERT_SETTINGS));
 	fRevertButton->SetEnabled(false);
 	buttonView->AddChild(fRevertButton);
 	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
