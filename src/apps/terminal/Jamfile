@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] ;
 
-Application Terminal : 
+Application Terminal :
 	AppearPrefView.cpp
 	Arguments.cpp
 	BasicTerminalBuffer.cpp
@@ -41,8 +41,7 @@ DoCatalogs Terminal :
 	Shell.cpp
 	SmartTabView.cpp
 	TermApp.cpp
-	TermParse.cpp
 	TermView.cpp
 	TermWindow.cpp
 	: en.catalog
-	;
+;

@@ -1,11 +1,13 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  * Distributed under the terms of the MIT license.
  */
 
+
 //! Escape sequence parse and character encoding.
+
 
 #include "TermParse.h"
 
@@ -43,12 +45,9 @@ extern int gEscIgnoreTable[];		/* ESC ignore table */
 extern int gMbcsTable[];			/* ESC $ */
 
 
-
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
 
-#undef TR_CONTEXT
-#define TR_CONTEXT "Terminal TermParse"
 
 //! Get char from pty reader buffer.
 inline uchar
@@ -276,32 +275,32 @@ TermParse::DumpState(int *groundtable, int *parsestate, uchar c)
 	} tables[] = {
 #define T(t) \
 	{ t, #t }
-	T(gUTF8GroundTable),
-	T(gCS96GroundTable),
-	T(gISO8859GroundTable),
-	T(gSJISGroundTable),
-	T(gEscTable),
-	T(gCsiTable),
-	T(gDecTable),
-	T(gScrTable),
-	T(gIgnoreTable),
-	T(gIesTable),
-	T(gEscIgnoreTable),
-	T(gMbcsTable),
-	{ NULL, NULL }
+		T(gUTF8GroundTable),
+		T(gCS96GroundTable),
+		T(gISO8859GroundTable),
+		T(gSJISGroundTable),
+		T(gEscTable),
+		T(gCsiTable),
+		T(gDecTable),
+		T(gScrTable),
+		T(gIgnoreTable),
+		T(gIesTable),
+		T(gEscIgnoreTable),
+		T(gMbcsTable),
+		{ NULL, NULL }
 	};
 	int i;
-	fprintf(stderr, B_TRANSLATE("groundtable: "));
+	fprintf(stderr, "groundtable: ");
 	for (i = 0; tables[i].p; i++) {
 		if (tables[i].p == groundtable)
 			fprintf(stderr, "%s\t", tables[i].name);
 	}
-	fprintf(stderr, B_TRANSLATE("parsestate: "));
+	fprintf(stderr, "parsestate: ");
 	for (i = 0; tables[i].p; i++) {
 		if (tables[i].p == parsestate)
 			fprintf(stderr, "%s\t", tables[i].name);
 	}
-	fprintf(stderr, B_TRANSLATE("char: 0x%02x (%d)\n"), c, c);
+	fprintf(stderr, "char: 0x%02x (%d)\n", c, c);
 }
 
 
@@ -345,9 +344,7 @@ TermParse::EscParse()
 			//DumpState(groundtable, parsestate, c);
 
 			if (currentEncoding != fBuffer->Encoding()) {
-				/*
-				 * Change coding, change parse table.
-				 */
+				// Change coding, change parse table.
 				switch (fBuffer->Encoding()) {
 					case B_ISO1_CONVERSION:
 					case B_ISO2_CONVERSION:
