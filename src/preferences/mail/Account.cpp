@@ -300,7 +300,7 @@ void Account::CreateInbound()
 	// New Mail Notification
 	path = addOnPath;
 	path.Append(kSystemFilterAddOnPath);
-	path.Append(TR ("New mail notification"));
+	path.Append("New mail notification");
 	if (!BEntry(path.Path()).Exists()) {
 		find_directory(B_BEOS_ADDONS_DIRECTORY,&path);
 		path.Append(kSystemFilterAddOnPath);
