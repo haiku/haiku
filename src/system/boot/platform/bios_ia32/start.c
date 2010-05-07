@@ -127,7 +127,7 @@ _start(void)
 	args.arguments = NULL;
 
 	serial_init();
-	serial_enable();
+//	serial_enable();
 	console_init();
 	cpu_init();
 	mmu_init();
@@ -137,8 +137,8 @@ _start(void)
 	// reading the keyboard doesn't seem to work in graphics mode
 	// (maybe a bochs problem)
 	sBootOptions = check_for_boot_keys();
-//	if (sBootOptions & BOOT_OPTION_DEBUG_OUTPUT)
-//		serial_enable();
+	if (sBootOptions & BOOT_OPTION_DEBUG_OUTPUT)
+		serial_enable();
 
 	apm_init();
 	acpi_init();
