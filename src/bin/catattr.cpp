@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Alexander Shagarov, alexander.shagarov@gmail.com.
  * Copyright 2005, Stephan Aßmus, superstippi@yellowbites.com.
  * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
@@ -14,6 +15,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -244,6 +246,21 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false,
 }
 
 
+static int
+usage(const char* program) {
+	// Issue usage message
+	fprintf(stderr, "usage: %s [-P] [--raw|-r] <attribute-name> <file1> "
+		"[<file2>...]\n"
+		"\t-P : Don't resolve links\n"
+		"\t--raw|-r : Get the raw data of attributes\n", program);
+	// Be's original version -only- returned 1 if the
+	// amount of parameters was wrong, not if the file
+	// or attribute couldn't be found (!)
+	// In all other cases it returned 0
+	return 1;
+}
+
+
 int
 main(int argc, char *argv[])
 {
@@ -253,43 +270,39 @@ main(int argc, char *argv[])
 	else
 		program++;
 
-	if (argc > 2) {
-		int32 attrNameIndex = 1;
-		bool keepRaw = false;
-		bool resolveLinks = true;
+	bool keepRaw = false;
+	bool resolveLinks = true;
+	const struct option longOptions[] = {
+		{"raw", no_argument, NULL, 'r'},
+		{NULL, 0, NULL, 0}
+	};
 
-		if (!strcmp(argv[attrNameIndex], "-P")) {
-			resolveLinks = false;
-			attrNameIndex++;
+	int rez;
+	while ((rez = getopt_long(argc, argv, "rP", longOptions, NULL)) != -1) {
+		switch (rez) {
+			case 'r':
+				keepRaw = true;
+				break;
+			case 'P':
+				resolveLinks = false;
+				break;
+			default:
+				return usage(program);
 		}
-		
-		// see if user wants to get to the raw data of the attribute
-		if (strcmp(argv[attrNameIndex], "--raw") == 0 ||
-			strcmp(argv[attrNameIndex], "-r") == 0) {
-			attrNameIndex++;
-			keepRaw = true;
-		}
+	}
 
-		// Cat the attribute for every file given
-		for (int32 i = attrNameIndex + 1; i < argc; i++) {
-			status_t status = catAttr(argv[attrNameIndex], argv[i], keepRaw,
+	if (optind + 2 > argc)
+		return usage(program);
+
+	const char* attr_name = argv[optind++];
+	while (optind < argc) {
+		const char* file_name = argv[optind++];
+		status_t status = catAttr(attr_name, file_name, keepRaw,
 				resolveLinks);
-			if (status != B_OK) {
-				fprintf(stderr, "%s: \"%s\", attribute \"%s\": %s\n",
-					program, argv[i], argv[attrNameIndex], strerror(status));
-			}
+		if (status != B_OK) {
+			fprintf(stderr, "%s: \"%s\", attribute \"%s\": %s\n",
+					program, file_name, attr_name, strerror(status));
 		}
-	} else {
-		// Issue usage message
-		fprintf(stderr, "usage: %s [-P] [--raw|-r] <attribute-name> <file1> "
-			"[<file2>...]\n"
-			"\t-P : Don't resolve links\n"
-			"\t--raw|-r : Get the raw data of attributes\n", program);
-		// Be's original version -only- returned 1 if the
-		// amount of parameters was wrong, not if the file
-		// or attribute couldn't be found (!)
-		// In all other cases it returned 0
-		return 1;
 	}
 
 	return 0;
