@@ -752,7 +752,7 @@ init_driver(void)
 	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
 		
-	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
+	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
 		if ((info.vendor_id == INTEL_VENDOR_ID &&
 			(info.device_id == INTEL_82443MX_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801AA_AC97_DEVICE_ID
@@ -809,7 +809,6 @@ init_driver(void)
 				num_cards++;
 			}
 		}
-		ix++;
 	}
 	if (!num_cards) {
 		PRINT(("no cards\n"));

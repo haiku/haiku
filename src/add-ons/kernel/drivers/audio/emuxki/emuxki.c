@@ -2921,7 +2921,7 @@ init_driver(void)
 		return ENOSYS;
 	}
 
-	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
+	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
 		if (info.vendor_id == CREATIVELABS_VENDOR_ID &&
 			(info.device_id == CREATIVELABS_SBLIVE_DEVICE_ID 
 #if AUDIGY
@@ -2954,7 +2954,6 @@ init_driver(void)
 				num_cards++;
 			}
 		}
-		ix++;
 	}
 	if (!num_cards) {
 		put_module(B_MPU_401_MODULE_NAME);

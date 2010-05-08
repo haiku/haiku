@@ -585,7 +585,7 @@ init_driver(void)
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 		
-	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
+	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
 		if (info.vendor_id == VIATECH_VENDOR_ID &&
 			(info.device_id == VIATECH_82C686_AC97_DEVICE_ID 
 			|| info.device_id == VIATECH_8233_AC97_DEVICE_ID
@@ -616,7 +616,6 @@ init_driver(void)
 				num_cards++;
 			}
 		}
-		ix++;
 	}
 	if (!num_cards) {
 		PRINT(("no cards\n"));

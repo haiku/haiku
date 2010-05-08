@@ -554,7 +554,7 @@ init_driver(void)
 	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
 		
-	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
+	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
 		ushort card_type = info.u.h0.subsystem_id & 0xfff0;
 		
 		if (info.vendor_id == VENDOR_ID &&
@@ -611,7 +611,6 @@ init_driver(void)
 				num_cards++;
 			}
 		}
-		ix++;
 	}
 	if (!num_cards) {
 		PRINT(("no cards\n"));
