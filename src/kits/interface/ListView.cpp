@@ -616,9 +616,7 @@ BListView::GetPreferredSize(float* _width, float* _height)
 BSize
 BListView::MinSize()
 {
-	// We need a stable min size: the BView implementation uses
-	// GetPreferredSize(), which by default just returns the current size.
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), BSize(10, 10));
+	return BView::MinSize();
 }
 
 
@@ -632,9 +630,7 @@ BListView::MaxSize()
 BSize
 BListView::PreferredSize()
 {
-	// We need a stable preferred size: the BView implementation uses
-	// GetPreferredSize(), which by default just returns the current size.
-	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), BSize(100, 50));
+	return BView::PreferredSize();
 }
 
 
