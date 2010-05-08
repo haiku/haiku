@@ -247,7 +247,8 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false,
 
 
 static int
-usage(const char* program) {
+usage(const char* program)
+{
 	// Issue usage message
 	fprintf(stderr, "usage: %s [-P] [--raw|-r] <attribute-name> <file1> "
 		"[<file2>...]\n"
@@ -294,14 +295,14 @@ main(int argc, char *argv[])
 	if (optind + 2 > argc)
 		return usage(program);
 
-	const char* attr_name = argv[optind++];
+	const char* attrName = argv[optind++];
 	while (optind < argc) {
-		const char* file_name = argv[optind++];
-		status_t status = catAttr(attr_name, file_name, keepRaw,
+		const char* fileName = argv[optind++];
+		status_t status = catAttr(attrName, fileName, keepRaw,
 				resolveLinks);
 		if (status != B_OK) {
 			fprintf(stderr, "%s: \"%s\", attribute \"%s\": %s\n",
-					program, file_name, attr_name, strerror(status));
+					program, fileName, attrName, strerror(status));
 		}
 	}
 
