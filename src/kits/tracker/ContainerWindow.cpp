@@ -2453,6 +2453,7 @@ BContainerWindow::ShowDropContextMenu(BPoint loc)
 		item->SetMessage(new BMessage(kCreateLink));
 	}
 
+	global += BPoint(2, 2);
 	item = fDropContextMenu->Go(global, true, true);
 	if (item)
 		return item->Command();
@@ -2467,6 +2468,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 	ASSERT(IsLocked());
 	BPoint global(loc);
 	PoseView()->ConvertToScreen(&global);
+	global += BPoint(2, 2);
 	PoseView()->CommitActivePose();
 
 	if (ref) {
@@ -2481,10 +2483,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref *ref, BView *)
 			DeleteSubmenu(fNavigationItem);
 	
 			// selected item was trash, show the trash context menu instead
-			BPoint global(loc);
-			PoseView()->ConvertToScreen(&global);
-			PoseView()->CommitActivePose();
-	
+
 			EnableNamedMenuItem(fTrashContextMenu, kEmptyTrash,
 				static_cast<TTracker *>(be_app)->TrashFull());
 	
