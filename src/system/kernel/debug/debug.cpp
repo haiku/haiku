@@ -1411,7 +1411,7 @@ err1:
 static status_t
 syslog_init(struct kernel_args* args)
 {
-	if (!args->keep_debug_output_buffer)
+	if (!args->keep_debug_output_buffer || args->debug_output == NULL)
 		return B_OK;
 
 	sSyslogBuffer = create_ring_buffer_etc(args->debug_output, args->debug_size,
