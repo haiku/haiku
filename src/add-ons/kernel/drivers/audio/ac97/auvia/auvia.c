@@ -576,8 +576,8 @@ status_t
 init_driver(void)
 {
 	pci_info info;
+	status_t err;
 	int ix = 0;
-
 	num_cards = 0;
 
 	PRINT(("init_driver()\n"));
@@ -596,8 +596,21 @@ init_driver(void)
 			}
 			memset(&cards[num_cards], 0, sizeof(auvia_dev));
 			cards[num_cards].info = info;
+#ifdef __HAIKU__
+			if ((err = (*pci->reserve_device)(info.bus, info.device, info.function,
+				DRIVER_NAME, &cards[num_cards])) < B_OK) {
+				dprintf("%s: failed to reserve_device(%d, %d, %d,): %s\n",
+					DRIVER_NAME, info.bus, info.device, info.function,
+					strerror(err));
+				continue;
+			}
+#endif
 			if (auvia_setup(&cards[num_cards])) {
 				PRINT(("Setup of auvia %ld failed\n", num_cards+1));
+#ifdef __HAIKU__
+				(*pci->unreserve_device)(info.bus, info.device, info.function,
+					DRIVER_NAME, &cards[num_cards]);
+#endif
 			}
 			else {
 				num_cards++;

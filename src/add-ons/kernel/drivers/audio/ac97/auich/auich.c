@@ -737,6 +737,7 @@ init_driver(void)
 	int ix = 0;
 	void *settings_handle;
 	pci_info info;
+	status_t err;
 	num_cards = 0;
 		
 	PRINT(("init_driver()\n"));
@@ -788,8 +789,21 @@ init_driver(void)
 			}
 			memset(&cards[num_cards], 0, sizeof(auich_dev));
 			cards[num_cards].info = info;
+#ifdef __HAIKU__
+			if ((err = (*pci->reserve_device)(info.bus, info.device, info.function,
+				DRIVER_NAME, &cards[num_cards])) < B_OK) {
+				dprintf("%s: failed to reserve_device(%d, %d, %d,): %s\n",
+					DRIVER_NAME, info.bus, info.device, info.function,
+					strerror(err));
+				continue;
+			}
+#endif
 			if (auich_setup(&cards[num_cards])) {
 				PRINT(("Setup of auich %ld failed\n", num_cards+1));
+#ifdef __HAIKU__
+				(*pci->unreserve_device)(info.bus, info.device, info.function,
+					DRIVER_NAME, &cards[num_cards]);
+#endif
 			}
 			else {
 				num_cards++;
