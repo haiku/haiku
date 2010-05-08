@@ -293,8 +293,8 @@ UninstallView::_InitView()
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 
-	BGroupLayoutBuilder(GroupLayout())
-		.Add(scrollView)
+	BGroupLayoutBuilder builder(GroupLayout());
+	builder.Add(scrollView)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(BGroupLayoutBuilder(B_VERTICAL)
 			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
