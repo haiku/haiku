@@ -203,10 +203,20 @@ OpenSoundAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry)
 	BList devs;
 	
 	CALLED();
-	
+
+	// make sure directories are scanned in this order
+	BDirectory("/dev/audio/hmulti");
+	BDirectory("/dev/audio/old");
+	// OSS last, to give precedence to native drivers.
+	// If other addons are loaded first it's ok as well.
+	// Also, we must open it to make sure oss_loader is here,
+	// else we don't get /dev/sndstat since we don't have a symlink in dev/.
+	BDirectory("/dev/oss");
+
 	mixer = open(OSS_MIXER_DEV, O_RDWR);
 	if (mixer < 0) {
 		// try to rescan
+		// only works in BeOS
 		BFile fDevFS("/dev/.", B_WRITE_ONLY);
 		const char *drv = "oss_loader";
 		fDevFS.Write(drv, strlen(drv));
