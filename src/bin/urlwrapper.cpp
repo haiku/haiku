@@ -1,10 +1,11 @@
 /*
- * Copyright 2007-2009 Haiku Inc. All rights reserved.
+ * Copyright 2007-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		François Revol, revol@free.fr
  *		Jonas Sundström, jonas@kirilla.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /*
@@ -118,9 +119,9 @@ UrlWrapper::RefsReceived(BMessage* msg)
 					args[1] = (char*)u.String();
 					mimetype = kURLHandlerSigBase;
 					mimetype += u.Proto();
-					err = be_roster->Launch(mimetype.String(), 1, args+1);
-					if (err < B_OK)
-						err = be_roster->Launch(kAppSig, 1, args+1);
+					err = be_roster->Launch(mimetype.String(), 1, args + 1);
+					if (err != B_OK && err != B_ALREADY_RUNNING)
+						err = be_roster->Launch(kAppSig, 1, args + 1);
 					continue;
 				}
 			}
@@ -165,7 +166,8 @@ UrlWrapper::RefsReceived(BMessage* msg)
 								state = 4;
 							break;
 						case 4:
-							if ((s = line.IFindFirst("<string>")) > -1 && (e = line.IFindFirst("</string>")) > s) {
+							if ((s = line.IFindFirst("<string>")) > -1
+								&& (e = line.IFindFirst("</string>")) > s) {
 								state = 5;
 								s += 8;
 								line.MoveInto(url, s, e - s);
@@ -185,9 +187,9 @@ UrlWrapper::RefsReceived(BMessage* msg)
 					args[1] = (char*)u.String();
 					mimetype = kURLHandlerSigBase;
 					mimetype += u.Proto();
-					err = be_roster->Launch(mimetype.String(), 1, args+1);
-					if (err < B_OK)
-						err = be_roster->Launch(kAppSig, 1, args+1);
+					err = be_roster->Launch(mimetype.String(), 1, args + 1);
+					if (err != B_OK && err != B_ALREADY_RUNNING)
+						err = be_roster->Launch(kAppSig, 1, args + 1);
 					continue;
 				}
 			}
@@ -199,9 +201,9 @@ UrlWrapper::RefsReceived(BMessage* msg)
 				args[1] = (char*)u.String();
 				mimetype = kURLHandlerSigBase;
 				mimetype += u.Proto();
-				err = be_roster->Launch(mimetype.String(), 1, args+1);
-				if (err < B_OK)
-					err = be_roster->Launch(kAppSig, 1, args+1);
+				err = be_roster->Launch(mimetype.String(), 1, args + 1);
+				if (err != B_OK && err != B_ALREADY_RUNNING)
+					err = be_roster->Launch(kAppSig, 1, args + 1);
 				continue;
 			}
 		}

@@ -1549,6 +1549,9 @@ BMenu::_Hide()
 }
 
 
+// #pragma mark - mouse tracking
+
+
 const static bigtime_t kOpenSubmenuDelay = 225000;
 const static bigtime_t kNavigationAreaTimeout = 1000000;
 const static bigtime_t kHysteresis = 200000;
@@ -1800,7 +1803,8 @@ BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 		bool inNavAreaRectAbove = navAreaRectAbove.Contains(position);
 		bool inNavAreaRectBelow = navAreaRectBelow.Contains(position);
 
-		if (!inNavAreaRectAbove && !inNavAreaRectBelow) {
+		if (fSelected == NULL
+			|| (!inNavAreaRectAbove && !inNavAreaRectBelow)) {
 			_SelectItem(item, false);
 			navAreaRectAbove = BRect();
 			navAreaRectBelow = BRect();
@@ -1909,6 +1913,9 @@ BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
 		}
 	}
 }
+
+
+// #pragma mark -
 
 
 bool
