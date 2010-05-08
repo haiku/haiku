@@ -1,45 +1,29 @@
-/*****************************************************************************/
-// Printers Preference Application.
-//
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
-// and are:
-//
-// Copyright (c) 2001-2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2001-2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer
+ */
+
 
 #include "Printers.h"
+
+#include <Locale.h>
 
 #include "pr_server.h"
 #include "Messages.h"
 #include "PrintersWindow.h"
 
-#include <Locale.h>
 
-int main()
+int
+main()
 {
 	PrintersApp app;
 	app.Run();	
 	return 0;
 }
+
 
 PrintersApp::PrintersApp()
 	: Inherited(PRINTERS_SIGNATURE)
@@ -47,13 +31,18 @@ PrintersApp::PrintersApp()
 	be_locale->GetAppCatalog(&fCatalog);
 }
 
-void PrintersApp::ReadyToRun()
+
+void
+PrintersApp::ReadyToRun()
 {
-	PrintersWindow* win = new PrintersWindow(BRect(78.0, 71.0, 561.0, 409.0));
+	PrintersWindow* win = new PrintersWindow(BRect(78, 71, 561, 409));
 	win->Show();
 }
 
-void PrintersApp::MessageReceived(BMessage* msg) {
+
+void
+PrintersApp::MessageReceived(BMessage* msg)
+{
 	if (msg->what == B_PRINTER_CHANGED || msg->what == PRINTERS_ADD_PRINTER) {
 			// broadcast message
 		uint32 what = msg->what;
@@ -61,7 +50,7 @@ void PrintersApp::MessageReceived(BMessage* msg) {
 			what = kMsgAddPrinter;
 
 		BWindow* w;
-		for (int32 i = 0; (w = WindowAt(i)) != NULL; i ++) {
+		for (int32 i = 0; (w = WindowAt(i)) != NULL; i++) {
 			BMessenger msgr(NULL, w);
 			msgr.SendMessage(what);
 		}

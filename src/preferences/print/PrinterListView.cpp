@@ -1,46 +1,26 @@
-/*****************************************************************************/
-// Printers Preference Application.
-//
-// This application and all source files used in its construction, except
-// where noted, are licensed under the MIT License, and have been written
-// and are:
-//
-// Copyright (c) 2001-2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2001-2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer
+ */
+
 
 #include "PrinterListView.h"
-#include "pr_server.h"
 
+#include <Bitmap.h>
+#include <Catalog.h>
+#include <Directory.h>
+#include <Mime.h>
+#include <NodeInfo.h>
+#include <String.h>
+
+#include "pr_server.h"
 #include "Messages.h"
 #include "Globals.h"
 #include "PrintersWindow.h"
 #include "SpoolFolder.h"
-
-#include <Messenger.h>
-#include <Bitmap.h>
-#include <Catalog.h>
-#include <String.h>
-#include <Alert.h>
-#include <Mime.h>
-#include <StorageKit.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -85,7 +65,7 @@ PrinterListView::BuildPrinterList()
 	BEntry entry;
 	while(dir.GetNextEntry(&entry) == B_OK) {
 		BDirectory printer(&entry);
-		AddPrinter(printer);
+		_AddPrinter(printer);
 	}
 }
 
@@ -138,14 +118,43 @@ PrinterListView::QuitRequested()
 
 
 void
-PrinterListView::AddPrinter(BDirectory& printer)
+PrinterListView::UpdateItem(PrinterItem* item)
+{
+	item->UpdatePendingJobs();
+	InvalidateItem(IndexOf(item));
+}
+
+
+PrinterItem*
+PrinterListView::ActivePrinter() const
+{
+	return fActivePrinter;
+}
+
+
+void
+PrinterListView::SetActivePrinter(PrinterItem* item)
+{
+	fActivePrinter = item;
+}
+
+
+PrinterItem*
+PrinterListView::SelectedItem() const
+{
+	return dynamic_cast<PrinterItem*>(ItemAt(CurrentSelection()));
+}
+
+
+void
+PrinterListView::_AddPrinter(BDirectory& printer)
 {
 	BString state;
 	node_ref node;
 		// If the entry is a directory
 	if (printer.InitCheck() == B_OK
 		&& printer.GetNodeRef(&node) == B_OK
-		&& FindItem(&node) == NULL
+		&& _FindItem(&node) == NULL
 		&& printer.ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK
 		&& state == "free") {
 			// Check it's Mime type for a spool director
@@ -162,30 +171,30 @@ PrinterListView::AddPrinter(BDirectory& printer)
 
 
 PrinterItem*
-PrinterListView::FindItem(node_ref* node) const
+PrinterListView::_FindItem(node_ref* node) const
 {
-	for (int32 i = CountItems()-1; i >= 0; i --) {
+	for (int32 i = CountItems() - 1; i >= 0; i--) {
 		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
 		node_ref ref;
-		if (item && item->Node()->GetNodeRef(&ref) == B_OK && ref == *node) {
+		if (item && item->Node()->GetNodeRef(&ref) == B_OK && ref == *node)
 			return item;
-		}
 	}
 	return NULL;
 }
 
 
 void
-PrinterListView::EntryCreated(node_ref* node, entry_ref* entry)
+PrinterListView::_EntryCreated(node_ref* node, entry_ref* entry)
 {
 	BDirectory printer(node);
-	AddPrinter(printer);
+	_AddPrinter(printer);
 }
 
 
-void PrinterListView::EntryRemoved(node_ref* node)
+void
+PrinterListView::_EntryRemoved(node_ref* node)
 {
-	PrinterItem* item = FindItem(node);
+	PrinterItem* item = _FindItem(node);
 	if (item) {
 		if (item == fActivePrinter)
 			fActivePrinter = NULL;
@@ -197,40 +206,13 @@ void PrinterListView::EntryRemoved(node_ref* node)
 
 
 void
-PrinterListView::AttributeChanged(node_ref* node)
+PrinterListView::_AttributeChanged(node_ref* node)
 {
 	BDirectory printer(node);
-	AddPrinter(printer);
+	_AddPrinter(printer);
 }
 
 
-void
-PrinterListView::UpdateItem(PrinterItem* item)
-{
-	item->UpdatePendingJobs();
-	InvalidateItem(IndexOf(item));
-}
-
-
-PrinterItem*
-PrinterListView::SelectedItem() const
-{
-	return dynamic_cast<PrinterItem*>(ItemAt(CurrentSelection()));
-}
-
-
-PrinterItem*
-PrinterListView::ActivePrinter() const
-{
-	return fActivePrinter;
-}
-
-
-void
-PrinterListView::SetActivePrinter(PrinterItem* item)
-{
-	fActivePrinter = item;
-}
 
 
 // #pragma mark -- PrinterItem
@@ -262,7 +244,8 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 			sSelectedIcon = new BBitmap(rect, B_RGBA32, true);
 			if (sSelectedIcon && sSelectedIcon->IsValid()) {
 				// draw check mark at bottom left over printer icon
-				BView *view = new BView(rect, "offscreen", B_FOLLOW_ALL, B_WILL_DRAW);
+				BView *view = new BView(rect, "offscreen", B_FOLLOW_ALL,
+					B_WILL_DRAW);
 				float y = rect.Height() - checkMark->Bounds().Height();
 				sSelectedIcon->Lock();
 				sSelectedIcon->AddChild(view);
@@ -279,10 +262,10 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 	}
 
 	// Get Name of printer
-	GetStringProperty(PSRV_PRINTER_ATTR_PRT_NAME, fName);
-	GetStringProperty(PSRV_PRINTER_ATTR_COMMENTS, fComments);
-	GetStringProperty(PSRV_PRINTER_ATTR_TRANSPORT, fTransport);
-	GetStringProperty(PSRV_PRINTER_ATTR_DRV_NAME, fDriverName);
+	_GetStringProperty(PSRV_PRINTER_ATTR_PRT_NAME, fName);
+	_GetStringProperty(PSRV_PRINTER_ATTR_COMMENTS, fComments);
+	_GetStringProperty(PSRV_PRINTER_ATTR_TRANSPORT, fTransport);
+	_GetStringProperty(PSRV_PRINTER_ATTR_DRV_NAME, fDriverName);
 
 	BPath path;
 	if (find_directory(B_USER_PRINTERS_DIRECTORY, &path) != B_OK)
@@ -301,13 +284,6 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 PrinterItem::~PrinterItem()
 {
 	delete fFolder;
-}
-
-
-void
-PrinterItem::GetStringProperty(const char* propName, BString& outString)
-{
-	fNode.ReadAttrString(propName, &outString);
 }
 
 
@@ -338,7 +314,8 @@ bool PrinterItem::Remove(BListView* view)
 }
 
 
-void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
+void
+PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 {
 	BListView* list = dynamic_cast<BListView*>(owner);
 	if (list == NULL)
@@ -468,3 +445,11 @@ PrinterItem::UpdatePendingJobs()
 	}
 	fPendingJobs = B_TRANSLATE("No pending jobs.");
 }
+
+
+void
+PrinterItem::_GetStringProperty(const char* propName, BString& outString)
+{
+	fNode.ReadAttrString(propName, &outString);
+}
+

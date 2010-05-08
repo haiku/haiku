@@ -6,11 +6,12 @@
  *		Michael Pfeiffer
  *		Philippe Houdoin
  */
- 
-#ifndef MESSAGES_H
-#define MESSAGES_H
+#ifndef _MESSAGES_H
+#define _MESSAGES_H
+
 
 #include <SupportDefs.h>
+
 
 const uint32 kMsgAddPrinter         = 'AddP';
 const uint32 kMsgAddPrinterClosed   = 'APCl';
@@ -21,4 +22,4 @@ const uint32 kMsgCancelJob          = 'CncJ';
 const uint32 kMsgRestartJob         = 'RstJ';
 const uint32 kMsgJobSelected        = 'JSel';
 
-#endif
+#endif // _MESSAGES_H

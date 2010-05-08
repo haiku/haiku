@@ -1,47 +1,26 @@
-/*****************************************************************************/
-// Printers Preference Application.
-//
-// This application and all source files used in its construction, except
-// where noted, are licensed under the MIT License, and have been written
-// and are:
-//
-// Copyright (c) 2001-2003 OpenBeOS Project
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2001-2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Michael Pfeiffer
+ */
+
 
 #include "JobListView.h"
 
+#include <stdio.h>
+
+#include <Catalog.h>
+#include <MimeType.h>
+#include <Roster.h>
+#include <Window.h>
+
+#include "pr_server.h"
 #include "Globals.h"
 #include "Jobs.h"
 #include "Messages.h"
-#include "pr_server.h"
 #include "SpoolFolder.h"
-
-#include <stdio.h>
-
-#include <Alert.h>
-#include <Bitmap.h>
-#include <Catalog.h>
-#include <Messenger.h>
-#include <Mime.h>
-#include <Roster.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -52,7 +31,8 @@
 
 
 JobListView::JobListView(BRect frame)
-	: Inherited(frame, "jobs_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
+	: 
+	Inherited(frame, "jobs_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE)
 {
 }
@@ -169,9 +149,10 @@ JobListView::CancelJob()
 
 
 JobItem::JobItem(Job* job)
-	: BListItem(0, false)
-	, fJob(job)
-	, fIcon(NULL)
+	:
+	BListItem(0, false),
+	fJob(job),
+	fIcon(NULL)
 {
 	fJob->Acquire();
 	Update();
@@ -204,10 +185,10 @@ JobItem::Update()
 		be_plain_font->GetHeight(&fontHeight);
 		float height = (fontHeight.ascent + fontHeight.descent
 			+ fontHeight.leading) * 2.0;
-		BRect rect(0.0, 0.0, height, height);
+		BRect rect(0, 0, height, height);
 		fIcon = new BBitmap(rect, B_RGBA32);
 #else
-		BRect rect(0.0, 0.0, B_MINI_ICON - 1, B_MINI_ICON - 1);
+		BRect rect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1);
 		fIcon = new BBitmap(rect, B_CMAP8);
 #endif
 		BMimeType type(mimeType.String());
