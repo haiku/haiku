@@ -99,6 +99,9 @@ static const Translation gTranslations[] =
 		"Jean-Loïc Charroud\n"
 		"Adrien Destugues (PulkoMandy)\n"
 	},
+	{ "da",
+		"Brian Matzon\n"
+	},
 	{ "de",
 		"Colin Günther\n"
 		"leszek\n"
@@ -118,6 +121,7 @@ static const Translation gTranslations[] =
 		"Hironoru Ichimiya\n"
 		"Jorge G. Mare (Koki)\n"
 		"Takashi Murai\n"
+		"Satoshi Eguchi\n"
 		"SHINTA\n"
 		"Hiroyuki Tsutsumi\n"
 		"The JPBE.net user group\n"
