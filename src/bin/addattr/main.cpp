@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Jérôme Duval.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
@@ -6,15 +7,30 @@
  */
 
 
-#include "addAttr.h"
+#include <getopt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <File.h>
 #include <Mime.h>
 #include <TypeConstants.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "addAttr.h"
+
+
+#define ERR(msg, args...)	fprintf(stderr, "%s: " msg, kProgramName, args)
+#define ERR_0(msg)			fprintf(stderr, "%s: " msg, kProgramName)
+
+
+static struct option const kLongOptions[] = {
+	{"help", no_argument, 0, 'h'},
+	{NULL}
+};
+
+
+extern const char *__progname;
+static const char *kProgramName = __progname;
 
 
 // supported types (if you add any, make sure that writeAttr() handles
@@ -46,8 +62,6 @@ const struct {
 };
 const uint32 kNumSupportedTypes = sizeof(kSupportedTypes)
 	/ sizeof(kSupportedTypes[0]);
-
-char *gProgramName;
 
 
 /*!	For the given string that the user specifies as attribute type
@@ -92,24 +106,16 @@ usage(int returnValue)
 		"\tType is one of:\n"
 		"\t\tstring, mime, int, llong, float, double, bool, raw\n"
 		"\t\tor a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n"
-		"\tThe default is \"string\"\n", gProgramName, gProgramName);
+		"\tThe default is \"string\"\n", kProgramName, kProgramName);
 
 	exit(returnValue);
 }
 
 
 void
-assertArgument(int i, int argc)
-{
-	if (i >= argc)
-		usage(1);
-}
-
-
-void
 invalidAttrType(const char *attrTypeName)
 {
-	fprintf(stderr, "%s: attribute type \"%s\" is not valid\n", gProgramName,
+	fprintf(stderr, "%s: attribute type \"%s\" is not valid\n", kProgramName,
 		attrTypeName);
 	fprintf(stderr, "\tTry one of: string, mime, int, llong, float, double,\n");
 	fprintf(stderr, "\t\tbool, raw, or a numeric value (ie. 0x1234, 42, 'ABCD'"
@@ -122,7 +128,7 @@ invalidAttrType(const char *attrTypeName)
 void
 invalidBoolValue(const char *value)
 {
-	fprintf(stderr, "%s: attribute value \"%s\" is not valid\n", gProgramName,
+	fprintf(stderr, "%s: attribute value \"%s\" is not valid\n", kProgramName,
 		value);
 	fprintf(stderr, "\tBool accepts: 0, f, false, disabled, off,\n");
 	fprintf(stderr, "\t\t1, t, true, enabled, on\n");
@@ -134,101 +140,90 @@ invalidBoolValue(const char *value)
 int
 main(int argc, char *argv[])
 {
-	gProgramName = strrchr(argv[0], '/');
-	if (gProgramName == NULL)
-		gProgramName = argv[0];
-	else
-		gProgramName++;
-
-	assertArgument(1, argc);
-	if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h"))
-		usage(0);
-
 	type_code attrType = B_STRING_TYPE;
-
 	char *attrValue = NULL;
 	size_t valueFileLength = 0;
-	int32 i = 1;
 	bool resolveLinks = true;
 
-	if (!strcmp(argv[i], "-f")) {
-		// retrieve attribute value from file
-		BFile file;
-		off_t size;
-		assertArgument(i, argc);
-		status_t status = file.SetTo(argv[i + 1], B_READ_ONLY);
-		if (status < B_OK) {
-			fprintf(stderr, "%s: can't read attribute value from file %s: %s\n",
-				gProgramName, argv[i], strerror(status));
-
-			return 1;
-		}
-
- 		status = file.GetSize(&size);
- 		if (status == B_OK) {
-			if (size == 0) {
-				fprintf(stderr, "%s: attribute value is empty: 0 bytes\n",
-					gProgramName);
-
-				return 1;
+	int c;
+	while ((c = getopt_long(argc, argv, "hf:t:P", kLongOptions, NULL)) != -1) {
+		switch (c) {
+			case 0:
+				break;
+			case 'f':
+			{
+				// retrieve attribute value from file
+				BFile file;
+				off_t size;
+				status_t status = file.SetTo(optarg, B_READ_ONLY);
+				if (status < B_OK) {
+					ERR("can't read attribute value from file %s: %s\n",
+						optarg, strerror(status));
+					return 1;
+				}
+		
+				status = file.GetSize(&size);
+				if (status == B_OK) {
+					if (size == 0) {
+						ERR_0("attribute value is empty: 0 bytes\n");
+						return 1;
+					}
+					if (size > 4 * 1024 * 1024) {
+						ERR("attribute value is too large: %" B_PRIdOFF
+							" bytes\n", size);
+						return 1;
+					}
+					attrValue = (char *)malloc(size);
+					if (attrValue != NULL)
+						status = file.Read(attrValue, size);
+					else
+						status = B_NO_MEMORY;
+				}
+		
+				if (status < B_OK) {
+					ERR("can't read attribute value: %s\n", strerror(status));
+					return 1;
+				}
+		
+				valueFileLength = (size_t)size;
+				break;
 			}
- 			if (size > 4 * 1024 * 1024) {
-				fprintf(stderr, "%s: attribute value is too large: %" B_PRIdOFF
-					" bytes\n", gProgramName, size);
-
-				return 1;
- 			}
- 			attrValue = (char *)malloc(size);
- 			if (attrValue != NULL)
- 				status = file.Read(attrValue, size);
- 			else
- 				status = B_NO_MEMORY;
- 		}
-
-		if (status < B_OK) {
-			fprintf(stderr, "%s: can't read attribute value: %s\n",
-				gProgramName, strerror(status));
-
-			return 1;
+			case 't':
+				// Get the attribute type
+				if (typeForString(optarg, &attrType) != B_OK)
+					invalidAttrType(optarg);
+				break;
+			case 'P':
+				resolveLinks = false;
+				break;
+			case 'h':
+				usage(0);
+				break;
+			default:
+				usage(1);
+				break;
 		}
-
-		valueFileLength = (size_t)size;
-		i += 2;
 	}
+	
+	if (argc - optind < 1)
+		usage(1);
+	const char *attrName = argv[optind++];
 
-	assertArgument(i, argc);
-	if (!strcmp(argv[i], "-t")) {
-		// Get the attribute type
-		assertArgument(i, argc);
-		if (typeForString(argv[i + 1], &attrType) != B_OK)
-			invalidAttrType(argv[i + 1]);
-
-		i += 2;
-	}
-
-	assertArgument(i, argc);
-	if (!strcmp(argv[i], "-P")) {
-		resolveLinks = false;
-		i++;
-	}
-
-	assertArgument(i, argc);
-	const char *attrName = argv[i++];
-
-	assertArgument(i, argc);
+	if (argc - optind < 1)
+		usage(1);
 	if (!valueFileLength)
-		attrValue = argv[i++];
+		attrValue = argv[optind++];
 
-	// no files specified?
-	assertArgument(i, argc);
+	if (argc - optind < 1)
+		usage(1);
 
 	// Now that we gathered all the information proceed
 	// to add the attribute to the file(s)
 
 	int result = 0;
 
-	for (; i < argc; i++) {
-		status_t status = addAttr(argv[i], attrType, attrName, attrValue,
+	for (; optind < argc; optind++) {
+		status_t status = addAttr(argv[optind], attrType, attrName, attrValue,
 			valueFileLength, resolveLinks);
 
 		// special case for bool types
@@ -236,8 +231,8 @@ main(int argc, char *argv[])
 			invalidBoolValue(attrValue);
 
 		if (status != B_OK) {
-			fprintf(stderr, "%s: can't add attribute to file %s: %s\n",
-				gProgramName, argv[i], strerror(status));
+			ERR("can't add attribute to file %s: %s\n", argv[optind],
+				strerror(status));
 
 			// proceed files, but return an error at the end
 			result = 1;
