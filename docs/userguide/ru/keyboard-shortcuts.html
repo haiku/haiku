@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Rustam
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -35,12 +36,13 @@
 <li><a href="../es/keyboard-shortcuts.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/keyboard-shortcuts.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/keyboard-shortcuts.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/keyboard-shortcuts.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/keyboard-shortcuts.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="tracker-add-ons.html">Дополнения для Tracker (Tracker Add-Ons)</a> 
+ «  <a href="tracker-add-ons.html">Дополнения для Tracker (Tracker add-ons)</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
-::  <a href="deskbar.html">Deskbar - Панель задач</a>  »
+::  <a href="deskbar.html">Deskbar</a>  »
 </span></div>
 </div>
 
@@ -50,8 +52,8 @@
 <h1>Горячие клавиши</h1>
 
 <p>По умолчанию в Haiku опциональной клавишей, например для вызова команд меню, является <span class="key">ALT</span>, вместо <span class="key">CTRL</span>. Так исторически сложилось, что BeOS переняла некоторые вещи из MacOS. После того, как вы привыкните, вы действительно ощутите удобство, например, сочетания клавиш <span class="key">ALT</span> <span class="key">C</span> и <span class="key">ALT</span> <span class="key">V</span> запросто можно использовать в оболочке терминала <acronym title="Bourne Again Shell">bash</acronym>, где сочетание клавиш <span class="key">CTRL</span> <span class="key">C</span> привело бы к остановке текущего процесса.</p>
-<p>В любом случае, вы сможете переключить на более привычную клавишу <span class="key">CTRL</span> в настроках <a href="preferences/keymap.html">раскладки</a>. В руководстве пользователя всегду будут описываться примеры с ипользованием стандартной опциональной клавишей <span class="key">ALT</span>.</p>
-<p>If you're in doubt which keys are the <span class="key">OPT</span> or <span class="key">MENU</span> keys on your particular keymap/keyboard-layout, again use the <a href="preferences/keymap.html">Keymap</a> preferences. There you can see what keystroke is sent when you press a key on your keyboard.</p>
+<p>В любом случае, вы сможете переключиться на более привычную клавишу <span class="key">CTRL</span> в настройках <a href="preferences/keymap.html">раскладки</a>. В руководстве пользователя всегда будут описываться примеры с использованием стандартной опциональной клавиши <span class="key">ALT</span>.</p>
+<p>Если вы сомневаетесь, какая клавиша является <span class="key">OPT</span> или <span class="key">MENU</span> на вашем типе клавиатуры/раскладки, воспользуйтесь настройками <a href="preferences/keymap.html">раскладки</a>. В ней вы можете увидеть, какая кнопка будет нажиматься при нажатии на клавишу вашей клавиатуры.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -77,13 +79,13 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tracker-navigation" name="tracker-navigation">Горячие клавиши навигации в Tracker</a></h2>
-<p>В дополнении к основным, несколько горячих клавиш для навигации при помощи Tracker:</p>
+<p>В дополнение к основным, несколько горячих клавиш для навигации при помощи Tracker:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:15px;"></td><td>Открыть родительскую папку.</td></tr>
 <tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> или <span class="key">ENTER</span></td><td></td><td>Открыть выделенную папку.</td></tr>
-<tr><td><span class="key">OPT</span></td><td></td><td>Удерживая при открытии папки, будет автоматически закрыта родительская. Это также работает при навигации мышью.</td></tr>
+<tr><td><span class="key">OPT</span></td><td></td><td>При удерживании этой клавиши при открытии папки, будет автоматически закрыта родительская. Это также работает при навигации мышью.</td></tr>
 <tr><td><span class="key">MENU</span></td><td></td><td>Открыть меню Deskbar (для того, чтобы покинуть, используйте <span class="key">ESC</span>).</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Отменить последнее действие. Помните, это распостраняется только на работу с файлами, изменение атрибутов и прав доступа не могут быть отменены при помощи этих клавиш. Также, если файл удален из <i>Корзины (Trash)</i>, то он удален навсегда.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">Z</span></td><td></td><td>Отменить последнее действие. Помните, это распространяется только на работу с файлами! Изменения атрибутов и прав доступа не могут быть отменены при помощи этих клавиш. Также, если файл удален из <i>Корзины (Trash)</i>, то он удален навсегда.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">Z</span></td><td></td><td>Повторить действие, которое было отменено при помощи <span class="key">ALT</span> <span class="key">Z</span>.</td></tr>
 </table>
 
@@ -95,14 +97,14 @@
 <tr><td><span class="key">ALT</span> <span class="key">T</span></td><td></td><td>Открыть новую сессию терминала в новой вкладке.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">1</span>, <span class="key">2</span>, <span class="key">3</span>...</td><td></td><td>Переключение между соответствующими вкладками.</td></tr>
 <tr><td><span class="key">SHIFT</span> <span class="key">←</span>/<span class="key">→</span></td><td></td><td>Переключение к предыдущей/следующей вкладке.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Переключиться к следующем окну терминала.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">TAB</span></td><td></td><td>Переключиться к следующему окну терминала.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">+</span>, <span class="key">-</span></td><td></td><td>Увеличить/Уменьшить размер шрифта.</td></tr>
 <tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Войти/покинуть полноэкранный режим.</td></tr>
 <tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Прокрутить содержимое терминала вверх/вниз на одну строку.</td></tr>
 <tr><td class="onelinetop"><span class="key"> SHIFT</span> <span class="key">PageUP</span>/<span class="key">PageDOWN</span></td><td></td><td>Прокрутить содержимое терминала вверх/вниз на одну страницу.</td></tr>
 <tr><td><span class="key">TAB</span></td><td></td><td>После ввода нескольких букв имени файла или пути, если нажмете <span class="key">TAB</span>, то название автодополнится. Если будет более одного соответствия, то дополнение остановится в том месте, где начинается различие в названиях, и вам следует ввести ещё несколько букв. Если вы нажмете <span class="key">TAB</span> дважды, то отобразится список всех соответствий.</td></tr>
 <tr><td><span class="key">↑</span>/<span class="key">↓</span></td><td></td><td>Просмотр истории всех ранее введенных команд.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Все комнады, которые вы вводили хранятся в файле <span class="path">~/.bash_history</span>. Нажмите <span class="key">CTRL</span> <span class="key">R</span> и начните вводить команду и вам будет предоставлена первая команда из истории bash, которая соответствует введеной вами. Продолжайте нажимать <span class="key">CTRL</span> <span class="key">R</span> пока не найдете нужную, после того как найдете, просто нажмите <span class="key">ENTER</span> для исполнения.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">R</span></td><td></td><td>Все команды, которые вы вводили, хранятся в файле <span class="path">~/.bash_history</span>. Нажмите <span class="key">CTRL</span> <span class="key">R</span> и начните вводить команду и вам будет предоставлена первая команда из истории bash, которая соответствует введеной вами. Продолжайте нажимать <span class="key">CTRL</span> <span class="key">R</span> пока не найдете нужную. После того как найдете, просто нажмите <span class="key">ENTER</span> для исполнения.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">C</span></td><td></td><td>Остановить запущенную в данный момент команду.</td></tr>
 <tr><td><span class="key">CTRL</span> <span class="key">D</span></td><td></td><td>Закрыть текущую сессию терминала.</td></tr>
 </table>
@@ -110,22 +112,23 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="other-combos" name="other-combos">Другие комбинации клавиш</a></h2>
-<p>Вы можете добавить\удалить элементы в\из выделение удерживая клавиши модификаторы и кликая по элементам.</p>
+<p>Вы можете добавить\удалить элементы в\из выделения, удерживая клавиши-модификаторы и кликая по элементам.</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>Позволяет выделить все элементы, между первым и вторым выделенными элементами.</td></tr>
-<tr><td><span class="key">ALT</span></td><td></td><td>Позволяет добавить или удалить элемент, к уже выделенным, щелкнув по нему мышью.</td></tr>
+<tr><td><span class="key">SHIFT</span></td><td style="width:15px;"></td><td>Позволяет выделить все элементы между первым выделенным и тем, на который вы нажмете.</td></tr>
+<tr><td><span class="key">ALT</span></td><td></td><td>Позволяет добавить или удалить элемент к уже выделенным, щелкнув по нему мышью.</td></tr>
 </table>
-<p>In a Tracker window, if you just start typing, Tracker scrolls to and selects the file that best fits your incremental search. If there's no file starting with your typed letters, files that contain the search string anywhere in their name or other displayed attributes are selected. This search is <i>not</i> case-sensitive.<br />
-The letters you type appear at the bottom-left, where normally the number of items is listed. After a second it reverts back and you could start a new incremental search.</p>
+<p>Если вы начнете набирать текст в окне Tracker, то выделится файл, который больше всего совпадает с набранными символами. Если нет файла, имя которого начинается с набранных вами символов, то будет выделен файл, в имени или атрибуте которого эти символы содержатся  
+(в любой части имени файла). Этот поиск <i>не</i> чувствителен к регистру.<br />
+Символы, которые вы набираете, появляются в левом нижнем углу окна, где обычно указано количество файлов. Через секунду все вернется к исходной позиции, и вы сможете начать новый процесс поиска.</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker-add-ons.html">Дополнения для Tracker (Tracker Add-Ons)</a> 
+ «  <a href="tracker-add-ons.html">Дополнения для Tracker (Tracker add-ons)</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
-::  <a href="deskbar.html">Deskbar - Панель задач</a>  »
+::  <a href="deskbar.html">Deskbar</a>  »
 </span></div>
 </div>
 

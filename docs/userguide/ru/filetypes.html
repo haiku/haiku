@@ -12,6 +12,7 @@
  * Translators:
  *		Rustam
  *		Humdinger
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -36,10 +37,11 @@
 <li><a href="../es/filetypes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/filetypes.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/filetypes.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filetypes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskbar.html">Deskbar - Панель задач</a> 
+ «  <a href="deskbar.html">Deskbar</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="attributes.html">Атрибуты</a>  »
 </span></div>
@@ -51,47 +53,47 @@
 <h1>Типы файлов</h1>
 
 <p>В отличие от Windows, Haiku не определяет тип файла по 3-м буквам расширения (например: .txt, .jpg, .mp3). Этот метод является лишь запасным выходом. Haiku использует <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> типы, как это принято в Интернете. (примечание: MIME - Multipurpose Internet Mail Extension — многоцелевые расширения почты интернета, произносится как «майм»).</p>
-<div class="box-info">While there's no reason to use file extensions in Haiku, remember to add them to files you want to share with users of other operating systems, e.g. over email, uploading to a server or via exchange of an USB drive. Otherwise their system may not recognize the file type.</div>
+<div class="box-info">Хотя и не существует причин использовать расширения в Haiku, не забывайте добавлять их к файлам, которыми вы хотите поделиться с пользователями других операционных систем, например по почте, загружая на сервер или обмениваясь с ними через USB-диск. Иначе их системы могут не распознать типы файлов. </div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="specific-file" name="specific-file">Настройки типа для определенного файла</a></h2>
-<p>Вы можете сменить тип любого файла, его иконку и приложение, которое с ним ассоциируется. Выделите файл, вызовите контекстное меню при помоши правого щелка мышью и выберите <span class="menu">Дополнения | Тип файла (Add-Ons | Filetype add-on)</span>.</p>
+<p>Вы можете сменить тип любого файла, его иконку и приложение, которое с ним ассоциируется. Выделите файл, вызовите контекстное меню при помощи правого щелчка мышью и выберите <span class="menu">Дополнения | Тип файла (Add-ons | Filetype add-on)</span>.</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="filetype" id="filetype">Тип файла</a></h3>
-<p>В нашем случае это PNG-файл, его MIME-строка image/png. Давайте представим, что вы точно знаете, что это не PNG-файл, а GIF-файл. Вы можете изменить тип изменив MIME-строку вручную, либо при помощи любой из двух кнопок расположенных ниже:</p>
+<p>В нашем случае это PNG-файл, его MIME-строка image/png. Давайте представим, что вы точно знаете, что это не PNG-файл, а GIF-файл. Вы можете изменить его тип, изменив MIME-строку вручную, либо при помощи любой из двух кнопок расположенных ниже:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Выбрать (Select)...</span></td><td> </td><td>Показать окно со списоком типов файлов, в котором следует выбрать <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Также как у (Same as)...</span></td><td> </td><td>Открыть диалог, в котором вы можете выбрать файл с типом, который вам нужен.</td></tr>
+<tr><td><span class="button">Выбрать...</span></td><td> </td><td>Показать окно со списком типов файлов, в котором следует выбрать <tt>image | GIF Image</tt>.</td></tr>
+<tr><td><span class="button">Также как...</span></td><td> </td><td>Открыть диалог, в котором вы можете выбрать файл с типом, который вам нужен.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preferred-app" name="preferred-app">Предпочтительное приложение</a></h3>
-<p>Это ниспадающее меню отображает список все приложений, которые могут открыть файл определенного типа. Здесь вы можете выбрать приложение, которое должно открывать файл. Например, вы можете изменить предпочтительное приложение для HTML-файла с браузера на текстовый редактор, пока вы над ним работаете. Однако любой другой HTML-файл будет открываться в браузере.</p>
+<p>Это ниспадающее меню отображает список всех приложений, которые могут открыть файл определенного типа. Здесь вы можете выбрать приложение, которое должно открывать файл. Например, вы можете изменить предпочтительное приложение для HTML-файла с браузера на текстовый редактор, пока вы над ним работаете. Однако любой другой HTML-файл будет открываться в браузере.</p>
 
-<p><span class="menu">Приложение по умолчанию (Default Application)</span>устанавливается глобально для каждого тип файла. Если вы не нашли приложение, которое хотите ассоциировать с этим файлом, в ниспадающем меню, вы можете воспользоваться кнопками <span class="button">Выбрать (Select...)</span> и <span class="button">Такое же как (Same As...)</span> , которые выполняют аналогичные функции, которые описаны выше (см. "Тип файла").</p>
+<p><span class="menu">Приложение по умолчанию</span> устанавливается глобально для каждого тип файла. Если вы не нашли приложение, которое хотите ассоциировать с этим файлом, в ниспадающем меню, вы можете воспользоваться кнопками <span class="button">Выбрать...</span> и <span class="button">Такое же как...</span>, которые выполняют аналогичные функции, которые описаны выше (см. "Тип файла").</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="icon" name="icon">Иконка</a></h3>
-<p>Не стоит удивлялться тому, что место в правом верхнем углу для иконки пустое т.к. иконки по умолчанию наследуются от системных типов файлов. Вы можете открыть файл содержащий иконку при помощи <span class="app">дополнения тип файла (Filetype Add-On)</span> и перетащить иконку. Либо дважды щелкнуть по области иконки и создать свою, либо изменить иконку. Для более изучения подробной информации о создании иконок обратитесь к тему <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+<p>Не стоит удивляться тому, что место в правом верхнем углу для иконки пустое, т.к. иконки по умолчанию наследуются от системных типов файлов. Вы можете открыть файл, содержащий иконку, при помощи дополнения <span class="app">Тип файла (Filetype add-on)</span> и перетащить эту иконку на ваш файл. Также можно дважды щелкнуть по области иконки и создать свою, либо изменить иконку. Для более подробного изучения информации о создании иконок обратитесь к теме <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings-apps" name="settings-apps">Индивидуальная настройка приложений</a></h2>
-<p>Если вы вызовите <span class="app">дополнение Тип файла (Filetype Add-On)</span>для прияложения (мы рассмотрим: <span class="app">StyledEdit</span>), то вы увидите следующее окно:</p>
+<p>Если вы вызовите дополнение<span class="app">Тип файла (Filetype add-on)</span> для приложения (мы рассмотрим: <span class="app">StyledEdit</span>), то вы увидите следующее окно:</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
-<p>Сверху, вместо стандартной MIME-строки вы увидите уникальную сигнатуру приложения. При помощи нее система находит приложение где бы оно ни было установлена.</p>
+<p>Сверху вместо стандартной MIME-строки вы увидите уникальную сигнатуру приложения. С её помощью система находит приложение, где бы оно ни было установлено.</p>
 <p>Ниже расположены настройки поведения приложения:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Одиночный запуск (Single Launch)</span></td><td> </td><td>Только один экземляр приложения может быть запущен из исполняемого файла. Однако если вы имеет две копии приложения, они будут работать бок о бок.</td></tr>
-<tr><td><span class="menu">Множественный запуск (Multiple Launch)</span></td><td> </td><td>Одновременно может быть запущено несколько экземпляров приложения.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Единственный запуск (Exclusive Launch)</span></td><td> </td><td>Может быть запущен действительно только один экземпляр приложения с данной сигнатурой</td></tr>
-<tr><td><span class="menu">Только аргументы (Args Only)</span></td><td> </td><td>Указать приложению не отвечать на сообщения.</td></tr>
-<tr><td><span class="menu">Фоновое приложение (Background App)</span></td><td> </td><td>Приложение не будет отображаться в <a href="twitcher.html">Twitcher</a> и списке запущенных приложений в Deskbar.</td></tr>
+<tr><td><span class="menu">Одиночный запуск</span></td><td> </td><td>Только один экземпляр приложения может быть запущен из исполняемого файла. Однако если вы имеете две копии приложения, они будут работать бок о бок.</td></tr>
+<tr><td><span class="menu">Множественный запуск</span></td><td> </td><td>Одновременно может быть запущено несколько экземпляров приложения.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Единственный запуск</span></td><td> </td><td>Может быть запущен только один экземпляр приложения с данной сигнатурой</td></tr>
+<tr><td><span class="menu">Только аргументы</span></td><td> </td><td>Указать приложению не отвечать на сообщения.</td></tr>
+<tr><td><span class="menu">Фоновое приложение</span></td><td> </td><td>Приложение не будет отображаться в <a href="twitcher.html">Twitcher</a> и списке запущенных приложений в Deskbar.</td></tr>
 </table>
 <p>Ещё ниже расположен список поддерживаемых файлов. Вы можете добавлять (или удалять) типы файлов, если вы думаете, что приложение сможет открыть их. Как следствие, приложение появится в меню предпочтительного приложения, либо в контекстном меню Tracker <span class="menu">Открыть с помощью (Open with...)</span>, которое вызывается правым щелчком мыши по файлу.</p>
 <p>В самом низу отображается информация о версии приложения и авторских правах. Как и сигнатура приложения, эта информация заполняется автором приложения и должна оставаться неизменной.</p>
@@ -100,7 +102,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filetypes-preferences" name="filetypes-preferences">Глобальные настройки типов файла</a></h2>
 <p>Панель настройки <span class="app">Типы файлов (FileTypes)</span> никак не связана настройкой отдельных файлов, она позволяет управлять глобальными настройками типов файлов. Вы можете изменить стандартную иконку, предпочтительное приложение или добавить, удалить, либо изменить атрибуты для всех файлов определенного типа. Вы даже можете создать свой собственный тип файла с нуля.</p>
-<p>Все типы файлов и их настройки хранятся по адресу <span class="path">/boot/home/config/settings/beos_mime/</span>. Перед тем, как вы начнете иксперементировать, было бы разумно сделать резервную копию этой папки...</p>
+<p>Все типы файлов и их настройки хранятся по адресу <span class="path">/boot/home/config/settings/beos_mime/</span>. Перед тем, как вы начнете экспериментировать, было бы разумно сделать резервную копию этой папки...</p>
 <p>Для более подробного изучения панели настройки <span class="app">Типы файлов (FileTypes)</span> обратитесь к теме: <a href="workshop-filetypes+attributes.html">Семинар на тему: типы файлов, атрибуты, индексация и запросы.</a>.</p>
 
 </div>
@@ -108,7 +110,7 @@
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskbar.html">Deskbar - Панель задач</a> 
+ «  <a href="deskbar.html">Deskbar</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="attributes.html">Атрибуты</a>  »
 </span></div>

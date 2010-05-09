@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../../es/applications/installer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/installer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/installer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,7 +52,7 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Installer</span></td></tr>
-<tr><td>Réglages :</td><td></td><td><i>aucun</i></td></tr>
+<tr><td>Réglages :</td><td></td><td><i>aucun</i></td></tr>
 </table>
 <p><br /></p>
 <p>Installer est utilisé pour répliquer Haiku sur un nouveau volume.<br />
@@ -75,7 +76,15 @@ La seconde liste déroulante spécifie la destination de l'installation. Cette p
 <p>Vérifiez une dernière fois la destination que vous avez choisi avant de démarrer le processus d'installation. Cliquez sur <span class="button">Setup partitions...</span> afin d'ouvrir <a href="drivesetup.html">DriveSetup</a>. 
 Vous verrez ainsi le nom et l'emplacement des volumes et partitions disponibles.</p>
 <p><span class="button">Begin</span> commence la procédure d'installation, en copiant tout, à l'exception des dossiers <span class="path">home/</span> et <span class="path">common/</span> sur le volume cible, avant de le rendre bootable.</p>
-<p>Bien que la partition soit automatiquement rendu amorçable à la fin de la procédure d'installation, il peut arriver que certains autres systèmes d'exploitation ou outil de partitionnement remplacent (accidentellement) le secteur de démarrage de votre volume Haïku. Dans ce cas, amorcez votre système à partir de votre CD d'installation et démarrez Installater. Sélectionnez votre partition Haiku à démarrer dans la liste déroulante <span class="menu">Onto: Please Choose Target</span> puis cliquez sur <span class="button">Write Boot Sector</span> pour la rendre à nouveau amorçable.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tools" name="tools">Outils</a></h2>
+<p>Bien que la partition soit automatiquement rendu amorçable à la fin de la procédure d'installation, il peut arriver que certains autres systèmes d'exploitation ou outil de partitionnement remplacent (accidentellement) le secteur d'amorce de votre volume Haïku. Dans ce cas, amorcez votre système à partir de votre CD d'installation et démarrez Installer. Sélectionnez la partition Haiku que vous voulez rendre à nouveau amorçable dans la liste déroulante <span class="menu">Onto: Please Choose Target</span> puis sélectionnez <span class="menu">Write Boot Sector</span> dans le menu <span class="menu">Tools</span>.</p>
+<p>L'autre élément du menu <span class="menu">Tools</span> (outils) est le <span class="menu">Boot Manager</span> (gestionnaire de démarrage) qui insère  un menu dans le secteur d'amorce pour choisir le système d'exploitation à démarrer.<br />
+Vous n'avez pas besoin d'installer le <span class="app">Boot Manager</span> si vous utilisez déjà un gestionnaire d'amorçage comme GRUB, dans ce cas, vous devez ajouter manuellement Haiku (voir ci-dessus), ou si seul Haiku fonctionne sur votre machine.</p>
+<p>Le gestionnaire de démarrage n'est pas encore très bien testé et souffre encore de quelques restrictions dont il pourrait se plaindre si certaines conditions ne sont pas remplies : le menu ne peut être installé que sur votre premier disque dur et il doit y avoir un espace 2Kio après le Master Boot Record (MBR).</p>
+<p>Cependant, ne vous inquiétez pas trop, le MBR est sauvegardé. Pour désinstaller le menu de démarrage, il vous suffit de démarrer à nouveau, depuis le CD d'installation, exécuter le programme d'installation et d'invoquer à nouveau le gestionnaire de démarrage.<br />
+Le panneau de configuration du Gestionnaire de démarrage vous guidera à travers l'installation ou la désinstallation du menu de démarrage.</p>
 
 </div>
 </div>

@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +36,7 @@
 <li><a href="../es/filesystem-layout.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/filesystem-layout.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/filesystem-layout.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/filesystem-layout.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -62,8 +64,8 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">Le dossier système - <span class="path">/boot/system/</span></a></h2>
-<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
-Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <span class="path">/boot/home/</span> hierarchy or, if it's supposed to be for every user, under <span class="path">/boot/common/</span>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
+<p>Sous BeOS, le prédecesseur de Haiku, ce dossier était nommé <span class="path">/boot/beos/</span>. Vous pouvez encore rencontrer cette référence dans d’anciennes documentations (comme le BeBook).<br />
+Dans tous les cas, vous ne devriez pas altérer son contenu. Chaque mise à jour de Haiku est susceptible d’ajouter, de supprimer ou de remplacer tout ce qui se trouve dans ce dossier. Si vous voulez ajouter des fonctionnalités au système, comme des extensions au Tracker, des Translateurs ou des pilotes supplémentaires, installez-les plutôt dans votre hiérarchie personnelle <span class="path">/boot/home/</span>, ou, si l’élément devrait être disponible pour tous les utilisateurs,  <span class="path">/boot/common/</span>. Tant que Haiku ne sera pas multi-utilisateur, cette distinction n’a pas d’effet apparent, puisque qu’il n’y a qu’un utilisateur avec un dossier <i>home</i>. Mais puisque ce support multi-utilisateur sera disponible ultérieurement, il est bon de prendre tout de suite les bonnes habitudes.</p>
 <p>Admettons que vous vouliez installer un nouveau traducteur pour le dernier format d'image. Ne le copiez <b>surtout pas</b> dans le dossier système approprié. Rappelez-vous : vous ne devez pas y toucher !<br />
 Placez le plutôt dans l'une des hiérarchie miroir sous  <span class="path">/boot/common/</span> ou <span class="path">/boot/home/config/</span>.</p>
 <p>Dans notre exemple, l'emplacement des traducteurs dans le système serait le dossier</p>
@@ -89,8 +91,8 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">Le dossier personnel - <span class="path">/boot/home/</span></a></h2>
-<p>This folder belongs to you. Here you can create and delete files and folders as you wish. However, you shouldn't mess too much with the <span class="path">~/config/</span> directory and its subfolders. You <i>could</i> delete e.g. the <span class="path">~/config/settings/</span> folder without damaging the operating system itself, but who wants to lose all his configurations and application settings? In any case, the system warns you with the at the top mentioned alert.</p>
-<p>Besides the <span class="path">~/config/add-ons/</span> folder, which mirrors the system's add-ons folder for additional components as described above, there are a few other folders of interest. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)</p>
+<p>Ce dossier vous appartient. Vous pouvez y créer et supprimer des fichiers et dossier à votre guise. Toutefois, vous ne devriez pas trop modifier le dossier <span class="path">~/config/</span> et ses sous-dossiers. Par exemple, vous <i>pourrier</i> supprimer <span class="path">~/config/settings/</span> sans endommager le système, mais vous y perdriez vos configurations et réglages d’application… C’est pourquoi le système vous préviendra avec l’alerte sus-mentionnée.</p>
+<p>En plus du dossier <span class="path">~/config/add-ons/</span>, qui est l’équivalent du dossier des extensions réservé au système et décrit précédemment, plusieurs autres dossiers méritent un peu d’attention. (Précision : Le tilde (« <tt>~</tt> ») est un raccourci vers votre dossier de départ, pour éviter d’avoir à marquer « <span class="path">/boot/home/</span> » dans le Terminal.)</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
 <td>Par défaut, c'est là que vos mails sont conservés.</td></tr>
@@ -99,13 +101,13 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <td>Par défaut, les <a href="queries.html">Requêtes</a> sont temporairement stockées dans ce dossier pendant 7 jours.</td></tr>
 
 <tr><td><span class="path">~/config/be/</span></td><td> </td>
-<td>Again from our BeOS legacy, the <span class="path">be</span> folder contains what's shown in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>. You can add and remove items by putting files, folders, links or queries into this folder.</td></tr>
+<td>Autre rescapé de BeOS, le dossier <span class="path">be</span> contient ce qui est affiché dans le <a href="deskbar.html#deskbar-menu">menu de la Deskbar</a>. Vous pouvez donc y ajouter et enlever des éléments en mettant des fichiers, dossiers, liens et requêtes dans ce dossier.</td></tr>
 
 <tr><td><span class="path">~/config/bin/</span></td><td> </td>
 <td>Complète le dossier système <span class="path">/boot/system/bin/</span> et contient tous vos programmes en ligne de commande.</td></tr>
 
 <tr><td><span class="path">~/config/boot/</span></td><td> </td>
-<td>This folder is the place for <a href="bash-scripting.html#user-scripts">User Scripts</a> that are executed before or after the system boots up or shuts down.</td></tr>
+<td>Ce dossier permet de rajouter des <a href="bash-scripting.html#user-scripts">Scripts utilisateurs</a> qui sont exécutés lors du démarrage ou de l’extinction du système.</td></tr>
 
 <tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
 <td>Les liens vers les programmes ou les documents contenus dans ce dossier sont automatiquement lancés à chaque démarrage.</td></tr>
@@ -120,7 +122,7 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <td>Dans cette base de données <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, Haiku conserve tous les différents <a href="filetypes.html">types de fichiers</a> et leurs paramètres.</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
-<td>There's one settings file that may be of interest: <span class="cli">kernel</span> offers some low level configurations like disabling <acronym title="Symmetric Multi Processing">SMP</acronym>, activating serial debugging or enabling advanced power management. You activate a configuration line by removing the commentary symbol "<tt>#</tt>". Be careful here!</td></tr>
+<td>Un fichier de réglages contenu dans ce dossier peut être intéressant : <span class="cli">kernel</span> permet de configurer certains aspects bas niveau du système, comme la désactivation du support multi-processeur (<acronym title="Symmetric Multi Processing">SMP</acronym>), l’activation du déboguage série ou de la gestion d’alimentation avancée (APM, ACPI). Vous pouvez activer un ligne de configuration en enlevant le dièse « <tt>#</tt> » au début. Faites très attention à ce que vous faites !</td></tr>
 
 <tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
 <td>En plus des différents fichiers de paramètres du tracker, il y a des sous-dossiers intéressants :</td></tr>
@@ -129,9 +131,9 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Vous pouvez définir la disposition des fenêtres de résultat de requête pour certains types de fichiers. Voir <a href="queries.html#result-window">Requêtes : La fenêtre de résultats</a>.</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Put links to your favorite locations in here to make them available e.g. in open and save panels. See topic <a href="gui.html#favorites-recent">Haiku's GUI: Favorites and recent folders</a>.</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Placez ici des liens vers vos emplacements favoris pour les rendre disponible notamment dans les boîtes de dialogue d’ouverture et de fermeture. Voyez le sujet <a href="gui.html#favorites-recent">Interface graphique de Haiku : Favoris et dossiers récents</a>.</td></tr>
 
-<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Ajouter un modèle pour tout type de fichier. il sera laors disponible dans le menu <span class="menu">File | New...</span> du Tracker. voir le sujet <a href="tracker.html#working-with-files">Tracker : gérer vos fichiers</a>.</td></tr>
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Ajouter un modèle pour tout type de fichier. il sera alors disponible dans le menu <span class="menu">File | New...</span> du Tracker. voir le sujet <a href="tracker.html#working-with-files">Tracker : gérer vos fichiers</a>.</td></tr>
 </table>
 
 </div>

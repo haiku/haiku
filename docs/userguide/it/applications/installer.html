@@ -33,6 +33,7 @@
 <li><a href="../../es/applications/installer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/installer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/installer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -44,6 +45,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/installer-icon_64.png" alt="installer-icon_64.png" width="64" height="64" />Installer</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -71,7 +73,15 @@ The second pop-up menu specifies the target for the installation. This target pa
 <p>Clicking the little expander widget will <i>Show Optional Packages</i>, if available, that you can choose to install in addition to the basic Haiku.</p>
 <p>You should do a last check if you really picked the right target before starting the installation process. Click on <span class="button">Setup partitions...</span> to open <a href="drivesetup.html">DriveSetup</a> and have a look at the naming and layout of the available volumes and partitions.</p>
 <p><span class="button">Begin</span> starts the installation procedure, which basically copies everything but the <span class="path">home/</span> and <span class="path">common/</span> folder onto the target volume and makes it bootable.</p>
-<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please Choose Target</span> menu  and click <span class="button">Write Boot Sector</span> to make it bootable again.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tools" name="tools">Tools</a></h2>
+<p>At the end of the installation procedure, the partition is automatically made bootable. However, it can happen that some other operating system or partitioning tool (accidentally) overwrites the boot sector of your Haiku volume. In this case, boot your installation CD and start the Installer. Select your Haiku boot partition from the <span class="menu">Onto: Please choose target</span> menu and select <span class="menu">Write boot sector</span> from the <span class="menu">Tools</span> menu to make it bootable again.</p>
+<p>The other item in the <span class="menu">Tools</span> menu is the <span class="menu">Boot Manager</span> that puts a menu in the boot sector to choose what operating system to boot.<br />
+You don't need to run the <span class="app">Boot Manager</span> if you already use a bootmanager like Grub, in which case you have to add Haiku manually (see above), or Haiku runs exclusively on your machine.</p>
+<p>Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</p>
+<p>You don't have to worry too much, however, the original MBR is saved. In order to uninstall the boot menu, you'll just boot from the install CD again, run the Installer and invoke the Boot Manager once more.<br />
+The Boot Manager panel will guide you through installing or uninstalling the boot menu.</p>
 
 </div>
 </div>

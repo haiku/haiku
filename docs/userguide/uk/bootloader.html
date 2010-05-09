@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,13 +39,14 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Boot Loader</h1>
 
@@ -53,7 +54,7 @@
 It's also handy after you installed a software component that acts up and prevents you from booting the system to remove it again. The <i>Disable user add-ons</i> option that's mentioned below, will start Haiku without loading user installed components, e.g. a driver.</p>
 <p>To enter the Boot Loader options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
 <p><br /></p>
-<p>Once it's there, you're offered three menus:</p>
+<p>Once it's there, you're offered four menus:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation to start.</td></tr>
 <tr><td><b>Select safe mode options</b><br />
@@ -62,12 +63,21 @@ It's also handy after you installed a software component that acts up and preven
 <i>- Disable user add-ons</i><br />
 <i>- Disable IDE DMA</i><br />
 <i>- Use fail-safe video mode</i><br />
+<i>- Disable IO-APIC</i><br />
+<i>- Disable LOCAL APIC</i><br />
 <i>- Don't call the BIOS</i><br />
 <i>- Disable APM</i><br />
-<i>- Disable ACPI</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i>
+<i>- Disable ACPI</i>
+</p></td></tr>
+<tr><td><b>Select debug options</b><br />
+</td><td> </td><td>Here you'll find several options that help with debugging or getting details for a bug report. Again, a short explanation for each option is displayed at the bottom.
+<p><i>- Enable serial debug output</i><br />
+<i>- Enable on screen debug output</i><br />
+<i>- Enable debug syslog</i>
+</p>
+<p>If "debug syslog" is enabled, a warm reboot after a crash shows these additional options:</p>
+<p><i>- Display syslog from previous session</i><br />
+<i>- Save syslog from previous session</i>
 </p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>If you had to activate the option <i>Use fail-safe video mode</i>, you can set resolution and color depth.</td></tr>
 </table>
@@ -94,7 +104,7 @@ The different symbols roughly correspond to these boot stages:</p>
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>

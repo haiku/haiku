@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +36,7 @@
 <li><a href="../../es/applications/people.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/people.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/people.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/people.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/people.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,20 +53,21 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/People</span></td></tr>
-<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/People_data</span></td></tr>
+<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/People_data</span></td></tr>
 </table>
 <p><br /></p>
-<p>People is a simple contact database using the <a href="../attributes.html">attributes</a> of Haiku's filesystem to store addresses and other contact information. Every contact is saved as one Person file with its data in separate attributes. All are indexed and therefore searchable with a <a href="../queries.html">query</a>.</p>
+<p>People est une base de données simple de contacts utilisant les <a href="../attributes.html">attributs</a> du système de fichier de Haiku pour stocker les adresses et autres informations des contacts. Chaque contact est enregistré dans un fichier de type Person et chaque donnée est placée dans un attribut séparé. Ceux-ci sont tous indexés et peuvent donc être recherchés via une <a href="../queries.html">requête</a>.</p>
 
 <img src="../images/apps-images/people.png" alt="people.png" />
 
-<p>The Group attribute at the bottom allows assigning a person to one or more groups. Useful for "mass mailing" a number of people who, for example, work on a specific project. The pop-up menu offers all currently existing groups. If a person belongs to more than one group, the group names are delimited with a "<tt>,</tt>".</p>
+<p>L’attribut Group (groupe) en bas de la fenêtre permet d’assigner une personne à un ou plusieurs groupes. Utile pour envoyer un courrier à plusieurs personnes qui, par exemple, travaillent sur le même projet. Le menu déroulant affiche tous les groupes créés. Si une personne est dans plusieurs groupes, les noms de groupe sont délimités par des vigules.</p>
 
-<p>These Person files are usually all saved in <span class="path">/boot/home/people/</span>. To get a list of all your contacts, just open your people folder and display all attributes of interest. If you choose to organize your Person files in different folders, just use a query to display them all in one window. </p>
+<p>Ces fichiers Person sont généralement tous enregistrés dans <span class="path">/boot/home/people/</span>. 
+Pour obtenir une liste de tous vos contacts, ouvrez ce dossier et affichez les attributs qui vous intéressent. Si vous choisissez d’organiser vos contacts dans plusieurs dossiers, vous pouvez utiliser une requête pour les obtenir dans une fenêtre unique.</p>
 
 <img src="../images/apps-images/people-files.png" alt="people-files.png" />
 
-<p>You can treat these files like any other: You can sort according to attributes (even a second sorting order by holding <span class="key">SHIFT</span> while clicking) and of course delete, duplicate or rename Person files. Even the contact information can be edited directly: Clicking on an attribute (or <span class="key">ALT</span> <span class="key">E</span>) to edit works just like renaming a file. Once you're in edit mode, <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span> will jump from column to column.</p>
+<p>Vous pouvez manipuler ces fichiers comme tout autre : Vous pouvez les trier suivant un attribut particulier (et même utiliser un tri secondaire en maintenant la touche <span class="key">MAJ</span> tout en cliquant sur un en-tête de colonne) et bien sûr les supprimer, dupliquer ou renommer. Même les informations peuvent être éditées directement, en cliquant sur un attribut (ou en tapant <span class="key">ALT</span> <span class="key">E</span>) et en procédant comme pour renommer un fichier. Une fois en mode édition, <span class="key">TAB</span> et <span class="key">MAJ</span> <span class="key">TAB</span> vous permettront de passer de colonne en colonne.</p>
 
 </div>
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -36,12 +36,13 @@
 <li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Inhalt</a> 
 ::  <a href="filesystem-layout.html">Dateisystem Layout</a>  »
 </span></div>
 </div>
@@ -54,7 +55,7 @@
 <p>Mit dem "Haiku Boot Loader" kann man zum einen unterschiedliche Haiku-Installationen starten, zum anderen hardware-spezifische Probleme umgehen. <br />Ebenso ist es damit möglich, während einer Software-Installation hinzugefügte Systemerweiterungen vorübergehend zu deaktivieren (über den unten bezeichneten Punkt <i>Disable user add-ons</i>), um eventuell aufgetretene Fehler zu beheben.</p>
 <p>Um zum Bildschirm der Boot Loader Optionen zu gelangen, muss man noch vor Beginn des Boot-Prozesses <span class="key">SHIFT</span> gedrückt halten. Ist ein Bootmanager installiert, kann man das bereits tun bevor man dort den Haiku-Eintrag auswählt. Ist Haiku das einzige Betriebssystem auf dem Rechner, kann die Taste schon gehalten werden während noch die BIOS Meldungen zu sehen sind.</p>
 <p><br /></p>
-<p>Im Boot Loader hat man drei Auswahlmöglichkeiten:</p>
+<p>Im Boot Loader hat man vier Auswahlmöglichkeiten:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>Hier wird eine Auswahl an bootfähigen Haiku-Installationen angezeigt.</td></tr>
 <tr><td><b>Select safe mode options</b><br />
@@ -63,12 +64,21 @@
 <i>- Disable user add-ons</i><br />
 <i>- Disable IDE DMA</i><br />
 <i>- Use fail-safe video mode</i><br />
+<i>- Disable IO-APIC</i><br />
+<i>- Disable LOCAL APIC</i><br />
 <i>- Don't call the BIOS</i><br />
 <i>- Disable APM</i><br />
-<i>- Disable ACPI</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i>
+<i>- Disable ACPI</i>
+</p></td></tr>
+<tr><td><b>Select debug options</b><br />
+</td><td> </td><td>Hier befinden sich einige hilfreiche Optionen zum Debuggen bzw. um Details für einen Bugreport zu erhalten. Auch hier wird bei jeder Option unten erklärender Text eingeblendet.
+<p><i>- Enable serial debug output</i><br />
+<i>- Enable on screen debug output</i><br />
+<i>- Enable debug syslog</i>
+</p>
+<p>Ist "debug syslog" aktiviert, werden nach einem Warmstart nach einem Crash noch weitere Optionen angeboten:</p>
+<p><i>- Display syslog from previous session</i><br />
+<i>- Save syslog from previous session</i>
 </p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Falls die Option <i>Use fail-safe video mode</i> gewählt werden muss, um Haiku zu starten, kann man hier die Bildschirmauflösung und Farbtiefe auswählen.</td></tr>
 </table>
@@ -95,7 +105,7 @@ Die unterschiedlichen Symbole repräsentieren die verschiedenen Phasen des Boot-
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Inhalt</a> 
 ::  <a href="filesystem-layout.html">Dateisystem Layout</a>  »
 </span></div>
 </div>

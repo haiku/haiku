@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,7 @@
  *		Oscar Carballal
  *		Humdinger
  *		Jorge G. Mare
+ *		miguel~1.mx
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -37,12 +38,13 @@
 <li><a href="../ru/bootloader.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="filesystem-layout.html">Disposición del sistema de archivos</a>  »
 </span></div>
 </div>
@@ -56,29 +58,38 @@
 También viene muy bien para cuando ha instalado algún componente de software que actúa previniendo el arranque del sistema. para desinstalarlo. La opción <i>Disable user add-ons</i> (Deshabilitar los add-ons de usuario) que se menciona mas abajo, iniciará Haiku sin cargar nunguno de los componentes instalados por el usuario, por ejemplo, un controlador.</p>
 <p>Para visualizar las opciones del cargador de arranque, hay que mantener presionada la techa <span class="key">SHIFT</span> (de mayúsculas) antes del comienzo del proceso de arranque de Haiku. En de haber un administrador de arranque instalado, empiece a presionar la tecla antes de seleccionar Haiku desde el mismo. Si Haiku es el único sistema operativo instalado, empiece a presionar la tecla mientras se viualizan los mensajes de arranque del BIOS.</p>
 <p><br /></p>
-<p>Una vez que esté ahí, se ofrecen tres menús:</p>
+<p>Una vez allí, se le ofrecerán tres menús:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Seleccionar volumen de arranque</b></td><td> </td><td>Elija qué instalación de Haiku desea iniciar.</td></tr>
 <tr><td><b>Seleccionar opciones de modo seguro</b><br />
-</td><td> </td><td>Existen muchas opciones para probar en caso de que tenga un problema de hardware. Mientras se mueve el selector a una opción, una pequeña explicación aparecerá en la parte inferior de la pantalla.
+</td><td> </td><td>Existen muchas opciones para probarse en caso de que tenga un problema de hardware. Al mover la barra de selección a una opción, una pequeña explicación aparecerá en la parte inferior de la pantalla.
 <p><i>- Modo seguro</i><br />
-<i>- Deshabilitar add-ons (extensiones) de usuario</i><br />
-<i>- Deshabilitar IDE DMA</i><br />
+<i>- Deshabilitar extensiones (add-ons) de usuario</i><br />
+<i>- Deshabilitar DMA IDE</i><br />
 <i>- Utilizar modo de vídeo a prueba de fallos</i><br />
+<i>- Deshabilitar IO-APIC</i><br />
+<i>- Deshabilitar LOCAL APIC</i><br />
 <i>- No llamar a la BIOS</i><br />
 <i>- Deshabilitar APM</i><br />
 <i>- Deshabilitar ACPI</i><br />
-<i>- Deshabilitar IO-APIC</i><br />
-<i>- Habilitar la salida de debug en serie</i><br />
-<i>- Habilitar la salida de debug por pantalla</i>
 </p></td></tr>
-<tr><td class="onelinetop"><b>Seleccionar modo de vídeo a prueba de fallos</b></td><td> </td><td>Si ha activado la opción <i>Utilizar modo de vídeo a prueba de fallos</i>, puede configurar la resolución y la profundidad de color.</td></tr>
+<tr><td><b>Selección de opciones de depuración</b><br />
+</td><td> </td><td>Aquí encontrará bastantes opciones que le ayudarán con la depuración o en obtener detalles para un reporte de fallo. De nuevo, una explicación corta de cada opción se despliega abajo.
+<p><i>- Habilitar la salida de depuración serial</i><br />
+<i>- Habilitar la salida de depuración en la pantalla</i><br />
+<i>- Habilitar el historial de eventos ("debug syslog") de sistema de depuración</i>
+</p>
+<p>Si se habilita "historial de eventos de sistema de depuración ("debug syslog"), un reinicio "en caliente" después de un fallo mostrará estas opciones adicionales:</p>
+<p><i>- Desplegar el historial de eventos (syslog) de la sesión previa</i><br />
+<i>- Guardar el historial de eventos del sistema de la sesión previa</i>
+</p></td></tr>
+<tr><td class="onelinetop"><b>Seleccionar modo de vídeo a prueba de fallos</b></td><td> </td><td>Si activó la opción <i>Utilizar modo de vídeo a prueba de fallos</i>, puede configurarse la resolución y la profundidad de color.</td></tr>
 </table>
 <p><br /></p>
-<p>Tras activar una o más opciones, saldrá de nuevo al menú principal y continuará iniciando, que se presentará con esta pantalla de arranque:</p>
+<p>Tras activar una o más opciones, puede regresar de nuevo al menú principal y continuará iniciando, lo cual se presentará con esta pantalla de arranque:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>Si  todo funcionar bien, se deben iluminar un símbolo tras otro rápidamente.<br />
+<p>Si  todo funciona bien, se deben iluminar un símbolo tras otro rápidamente.<br />
 Los deferentes símbolos se corresponden con estas etapas de inicio:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><b>Átomo</b></td><td style="width:10px;"> </td><td>Iniciando módulos.</td></tr>
@@ -97,7 +108,7 @@ Los deferentes símbolos se corresponden con estas etapas de inicio:</p>
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="filesystem-layout.html">Disposición del sistema de archivos</a>  »
 </span></div>
 </div>

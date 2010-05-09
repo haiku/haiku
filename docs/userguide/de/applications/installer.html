@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../es/applications/installer.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/installer.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/installer.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/installer.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/installer.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -74,7 +75,15 @@ Das zweite Auswahlmenü bezeichnet das Ziel der Installation. Dieses Ziel, das b
 <p>Durch einen Klick auf das Dreieck neben <i>Show Optional Packages</i> werden, so vorhanden, zusätzliche Programmpakete angeboten, die mitinstalliert werden können.</p>
 <p>Wie bereits erwähnt, wird die Zielpartition vollständig überschrieben. Man muss daher sicher sein, die richtige Partition gewählt zu haben. Über <span class="button">Setup partitions...</span> wird das Programm <a href="drivesetup.html">DriveSetup</a> aufgerufen, in dem man eine Übersicht über die Partitionen erhält.</p>
 <p>Mit Klick auf <span class="button">Begin</span> wird der eigentliche Installations-Prozess gestartet. Wie oben beschrieben, muss lediglich kopiert und nicht installiert werden. Wenn von einer bestehenden Haiku-Installation aus installiert wird, werden bis auf <span class="path">home/</span> and <span class="path">common/</span> alle Ordner übernommen und die Zielpartition startfähig gemacht.</p>
-<p>Durch die Installation anderer Betriebssysteme kann es vorkommen, dass Haiku nicht mehr startfähig ist, weil der "Boot-Sektor" überschrieben wurde. In diesem Fall kann man - wenn unter <span class="menu">Onto: Please Choose Target</span> die nicht mehr startfähige Haiku-Installation auswählt - über einen Klick auf <span class="button">Write Boot Sector</span> den vorherigen Zustand wieder herstellen.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tools" name="tools">Tools</a></h2>
+<p>Durch die Installation anderer Betriebssysteme kann es vorkommen, dass Haiku nicht mehr startfähig ist, weil der "Boot-Sektor" überschrieben wurde. In diesem Fall kann man von der Installations-CD booten und unter <span class="menu">Onto: Please choose target</span> die nicht mehr startfähige Haiku-Installation einstellen und aus dem <span class="menu">Tools</span> Menü mittels <span class="menu">Write boot sector</span> den vorherigen Zustand wieder herstellen.</p>
+<p>Daneben gibt es im <span class="menu">Tools</span> Menü noch den <span class="menu">Boot Manager</span>, der ein Menü in den Boot-Sektor schreibt, aus dem man das zu bootende Betriebssystem auswählen kann.<br />
+Der <span class="app">Boot Manager</span> wird nicht gebraucht, wenn man bereits einen Bootmanager wie Grub benutzt (siehe oben) oder Haiku als einziges Betriebssystem auf dem Rechner installiert ist.</p>
+<p>Der Boot Manager wurde noch nicht ausgiebig getestet und hat noch einige Beschränkungen, auf die er selbst hinweist, sollte man hineinlaufen: Das Bootmenü kann nur auf der ersten Festplatte installiert werden und nach dem Master Boot Record (MBR) muss noch mindestens 2 KiB Platz sein.</p>
+<p>Aber keine Sorge, der ursprüngliche MBR wird gesichert. Um das Bootmenü wieder zu entfernen, kann man von der Installations-CD booten, den Installer starten und nochmal den Boot Manager aufrufen.<br />
+Im Boot Manager wird man durch alle Schritte geführt, um das Bootmenü zu installieren oder zu deinstallieren.</p>
 
 </div>
 </div>

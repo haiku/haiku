@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -39,9 +39,9 @@
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="keyboard.html">Keyboard</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="media.html">Media</a>  »
+ «  <a href="keyboard.html">Teclado</a> 
+::  <a href="../preferences.html" class="uplink">Preferencias</a> 
+::  <a href="locale.html">Idioma</a>  »
 </span></div>
 </div>
 
@@ -52,37 +52,36 @@
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferencias</span></td></tr>
 <tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/preferences/Keymap</span></td></tr>
-<tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - Location of user modified keymaps.<br />
+<tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/Keymap/*</span> - Ubicación de las combinaciones de teclado modificadas por el usuario.<br />
 <span class="path">~/config/settings/Key_map</span></td></tr>
 </table>
 <p><br /></p>
 <img src="../images/prefs-images/keymap.png" alt="keymap.png" />
-<p>To the right, the Keymap window shows a representation of your keyboard. When you press a key, the corresponding key is darkened and the assigned symbol is entered into the <i>Sample and Clipboard</i> text field at the bottom. From there you can also copy and paste it into a document.<br />
-Thus, the Keymap preferences are not only for configuring your local keymap, but are also useful when looking for a special symbol used in other languages. For example, you can switch the keymap to "French", find the "ç" and copy it into your mail to François. (Though you'll find the "cedil" also in other keymaps...)</p>
-<p>Pressing modifier keys like <span class="key">SHIFT</span>, <span class="key">CONTROL</span> or <span class="key">OPTION</span> changes the displayed keyboard accordingly.</p>
-<p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
-<p>Below the keyboard representation are two more options:</p>
+<p>A la derecha, la ventana Distribución de teclado muestra una representación del teclado. Cuando se presiona una tecla, la correspondiente tecla se oscurece y el símbolo asignado se ingresa dentro del campo de texto <i>Sample and Clipboard</i> (Ejemplo y portapapeles) hasta abajo. Desde allí también se puede copiar y pegar dentro de un documento.<br />
+Así, las preferencias de distribución de teclado no sólo están para configurar su teclado local, sino también es útil cuando se busca un símbolo especial usado en otros idiomas. Por ejemplo, puede intercambiarse el teclado a "French" (francés), encontrar la "ç" y copiarla al correo para François. (Aunque se puede encontrar la "cedil" también en otras distribuciones de teclado...)</p>
+<p>Al presionar las teclas modificadoras como <span class="key">Mayúsculas</span>, <span class="key">Control</span> u <span class="key">Option</span> se cambia el teclado desplegado en conformidad.</p>
+<p>Luego están las teclas que se marcan con un fondo azul. Se llaman <i>Dead Keys</i> (Teclas muertas) que pueden cambiar la tecla que se presiona después de ellas. Si se hace clic en tal tecla azul con el ratón, aquellas teclas modificables se iluminan en amarillo. Haga clic de nuevo y todo regresará a la normalidad. Algunos ejemplos son é, ñ, ó o ë.</p>
+<p>Debajo de la representación del teclado hay dos opciones más:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>for setting the above mentioned blue keys.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
+<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>(Seleccionar teclas muertas) para seleccionar las teclas azules arriba mencionadas.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>(Cambiar tecla de atajos) para usar la tecla de atajos en modo Windows/Linux, p. ej., <span class="key">Control</span> (normalmente <span class="key">Ctrl</span>) o el modo de Haiku, p. ej., <span class="key">Command</span> (normalmente <span class="key">ALT</span>).</td></tr>
 </table>
-<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
-When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
-<p>To better match the Keymap panel to your physical keyboard, there are several different settings available from the <span class="menu">Layout</span> menu.</p>
-<p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
-<p>Finally, there's a <span class="button">Revert</span> button to bring back the settings that were active when you started the Keymap preferences.</p>
+<p>Las listas en la izquierda ofrecen las distribuciones de teclado preconfiguradas disponibles del sistema, y debajo de ellas, si están disponibles, los mapas definidos por el usuario. Puede cambiar una distribución de teclado mediante arrastrar y soltar en la representación del teclado, con dar clic con el botón derecho y arrastrar se intercambian las dos teclas.<br />
+Cuando haya terminado puede guardar el resultado desde el menú <span class="menu">File | Save...</span> (Archivo | Guardar). El mapa modificado aparecerá en la lista definida por el usuario si se almacenó en <span class="path">~/config/settings/Keymap/</span>. De lo contrario, tendrá que cargarla manualmente a través de <span class="menu">File | Open...</span> (Archivo | Abrir).</p>
+<p>Para equiparar mejor el panel Distribución de teclado a su teclado físico, hay algunas configuraciones diferentes disponibles desde el menú <span class="menu">Layout</span> (Disposición).</p>
+<p>El tipo de letra utilizado en la representación del teclado se selecciona desde el menú <span class="menu">Font</span> (Tipografía). Note que puede o no contener todos los símbolos para una Distribución de teclado específica.</p>
+<p>Finalmente, hay un botón <span class="button">Revert</span> (Revertir) para regresar las configuraciones que estaban activas cuando se inició el panel preferencias de Distribución de teclado.</p>
 
-<h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h2>
-<p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
-<p>You can dump the current keymap with a command in Terminal:</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="advanced-keymapping" name="advanced-keymapping">Manipulación avanzada de distribución de teclado</a></h2>
+<p>Hay otro método para personalizar su distribución de teclado además del panel de preferencias Distribución de teclado. Involucra editar un archivo de texto que contiene cargas de valores hexadecimales, lo cual puede parecer intimidante a primera vista, pero realmente no es tan imposible de entender.</p>
+<p>Se puede tirar copia de la distribución de teclado actual con un comando en la Terminal:</p>
 <pre class="terminal">keymap -d MyKeymap</pre>
-<p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
-At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
-<p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
+<p>El archivo de texto generado puede usarse luego en un editor de texto. Asegúrese de usar un tipo de letra monoespaciado en ese editor o nunca se comprenderá intuitivamente ese archivo...<br />
+Al inicio del citado archivo, se encontrará una leyenda del teclado estilizado con el valor hexadecimal correspondiente a cada tecla. Debajo de eso están las asignaciones reales de cada valor. Puede hacer toda la personalización que esté también disponible desde el panel de preferencias Distribución de teclado, y algo más. Esto es, usarlos como teclas ordinarias o como una tecla Option o Control. No será capaz de, por ejemplo, hacer que las teclas multimedia incrementen o decrementen el volumen o iniciar alguna aplicación. Para ello se puede usar, p. ej., a <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
+<p>Cuando termine, guardará el archivo y hará que el sistema cargue la distribución de teclado modificada con este comando:</p>
 <pre class="terminal">keymap -l MyKeymap</pre>
-<p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
+<p>Este es el archivo arrojado (las teclas en extrema derecha del teclado estilizado se cortan para un desplegado más agradable en esta página):</p>
 
 <pre>#!/bin/keymap -l
 #
@@ -364,9 +363,9 @@ TildeTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Opt
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="keyboard.html">Keyboard</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="media.html">Media</a>  »
+ «  <a href="keyboard.html">Teclado</a> 
+::  <a href="../preferences.html" class="uplink">Preferencias</a> 
+::  <a href="locale.html">Idioma</a>  »
 </span></div>
 </div>
 

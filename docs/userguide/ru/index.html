@@ -11,6 +11,8 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Rustam
+ *		Diver
+ *		Michael Smirnov
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +37,7 @@
 <li><a href="../es/index.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/index.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/index.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/index.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/index.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -49,10 +52,10 @@
 
 <h1>Содержание</h1>
 
-<p><a href="attributes.html">Атрибуты</a> и <a href="queries.html">Запросы</a> являются ключевыми особенностями Haiku. Хотя атрибуты и полезны для отображения дополнительной инфомации о файлах, но для поиска по ним, требуется их проиндексировать. Индексы заносится в таблицу поиска, что делает запросы молниеносными..<br />
-Индекс является частью файловой системы и хранятся отдельно для каждого раздела.</p>
+<p><a href="attributes.html">Атрибуты</a> и <a href="queries.html">Запросы</a> являются ключевыми особенностями Haiku. Хотя атрибуты и полезны для отображения дополнительной информации о файлах, но для поиска по ним требуется их проиндексировать. Индексы заносятся в таблицу поиска, что делает запросы мгновенными.<br />
+Индекс является частью файловой системы и хранится отдельно для каждого раздела.</p>
 
-<h2>Индексация при помоши Терминала</h2> 
+<h2>Индексация при помощи Терминала</h2> 
 <p>Ниже приведено несколько команд для управления индексами:</p>
 <ul> 
 <li><b>lsindex</b> - Отображает проиндексированные атрибуты на текущем разделе.<br />
@@ -101,49 +104,48 @@ size
 <ul>
 <li><b>mkindex</b> - Индексирует заданный атрибут на текущем разделе. </li>
 </ul>
-<pre>Usage: mkindex [options] &lt;attribute&gt; 
-Creates a new index for the specified attribute. 
+<pre>Использование: mkindex [опции] &lt;атрибут&gt; 
+Создает новый индекс для указанного атрибута.
  
-  -d, --volume=PATH     a path on the volume to which the index will be added, 
-                        defaults to current volume. 
-  -t, --type=TYPE       the type of the attribute being indexed.  One of "int", 
-                        "llong", "string", "float", or "double". 
+  -d, --volume=PATH     путь к разделу, на который будет добавлен индекс,
+                        по умолчанию на текущий раздел.
+  -t, --type=TYPE       тип индексируемого атрибута. Один из следующих: "int", 
+                        "llong", "string", "float", or "double".
                         Defaults to "string". 
-      --copy-from       path to volume to copy the indexes from. 
-  -v, --verbose         print information about the index being created 
-
-</pre>
-<p>Только <b>новые</b> файлы с заданным атрибутом будут автоматические добавлены в индекс!<br />
+      --copy-from       путь к разделу, с которого нужно скопировать индексы .
+  -v, --verbose         выводит информацию о создаваемом индексе.</pre>
+<p>Только <b>новые</b> файлы с заданным атрибутом будут автоматически добавлены в индекс!<br />
 Уже существующие файлы придется добавлять вручную, путем копирования и удаления оригинала. В качестве альтернативы можно воспользоваться программой <span class="cli">reindex</span>. 
 </p>
 <ul>
 <li><b>reindex</b> - Добавляет атрибуты для уже существующих файлов во вновь созданный индекс на текущем разделе. </li>
 </ul>
-<pre>Usage: reindex [-rvf] attr &lt;list of filenames and/or directories&gt; 
-  -r    enter directories recursively
-  -v    verbose output
-  -f    create/update all indices from the source volume,
-        "attr" is the path to the source volume
+<pre>Использование: reindex [-rvf] attr &lt;список имен файлов и/или каталогов&gt; 
+  -r    вводит каталоги рекурсивно
+  -v    подробный вывод
+  -f    создание/обновление всех индексов с исходного раздела, 
+  "attr" - путь к исходному разделу
+
 
 </pre>
 <ul>
 <li><b>rmindex</b> - Позволяет удалить атрибут из индекса с текущего раздела. </li>
 </ul>
-<pre>Usage: rmindex [OPTION]... INDEX_NAME 
+<pre>Использование: rmindex [ОПЦИЯ]... ИМЯ_ИНДЕКСА 
  
-Removes the index named INDEX_NAME from a disk volume.  Once this has been 
-done, it will no longer be possible to use the query system to search for 
-files with the INDEX_NAME attribute. 
+Удаляет индекс под названием ИМЯ_ИНДЕКСА с раздела. Как только это будет 
+сделано, то больше невозможно будет использовать поисковые запросы для 
+файлов по атрибуту ИМЯ_ИНДЕКСА.
+
  
-  -d, --volume=PATH     a path on the volume from which the index will be 
-                         removed 
-  -h, --help            display this help and exit 
-  -p, --pattern         INDEX_NAME is a pattern 
-  -v, --verbose         print information about the index being removed 
+  -d, --volume=PATH     путь к разделу, с которого будет удален индекс
+  -h, --help            отображает эту справку и закрывает утилиту
+  -p, --pattern         ИМЯ_ИНДЕКСА является шаблоном
+  -v, --verbose         выводит информацию об удаляемом индексе
  
-INDEX_NAME is the name of a file attribute. 
+ИМЯ_ИНДЕКСА - название атрибута файла.
  
-If no volume is specified, the volume of the current directory is assumed.</pre>
+Если раздел не указан, то будет использоваться текущий.</pre>
 
 </div>
 </div>

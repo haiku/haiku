@@ -12,6 +12,7 @@
  * Translators:
  *		Rustam
  *		Vincent Duvert
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -37,12 +38,13 @@
 <li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/applications.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
  «  <a href="workshop-filetypes+attributes.html">Семинар</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
-::  <a href="desktop-applets.html">Приложеница для рабочего стола</a>  »
+::  <a href="desktop-applets.html">Апплеты рабочего стола</a>  »
 </span></div>
 </div>
 
@@ -52,21 +54,21 @@
 <h1>Приложения</h1>
 
 <p>Перед тем как перейти к приложениям, которые идут вместе с Haiku, давайте более детально изучим как установить или удалить приложения, которые вы скачали, например с одного сайтов упомянутых на странице <a href="../../welcome/welcome_ru.html#software">приветствия</a>.</p>
-<div class="box-info">Вам следует просто распаковать архив под Haiku. Если вы сначала извлечете содержимое архива под Linux или Windows, к примеру, и потом просто скопируете в Haiku, то вы лишитесь всех жизненно важных атрибутов, т.к. эти операционные системы обычно не умеют обрабатывать метаданные.</div>
+<div class="box-info">Вам следует распаковывать/устанавливать архивы под Haiku. Если вы сначала извлечете содержимое архива под Linux или Windows, к примеру, а потом просто скопируете его в Haiku, то вы лишитесь всех жизненно важных атрибутов, т.к. эти операционные системы обычно не умеют обрабатывать метаданные.</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="install" name="install">Установка приложений</a></h2>
-<p>Приложения для Haiku всегда поставляются в архиве. В большинстве случаев это ZIP-архивы, однако некоторые старые BeOS приложения поставляются в формате Software Valet's PKG. Software Valet позволял автоматически выполнять сценарии установки, вам нужно было лишь дважды щелкнуть по пакету и выбрать куда произвести установку и больше ни о чем не заботиться.<br />
-Если это ZIP-архив, двойной щелчок мыши запустит <span class="app">Expander</span>, где вы также выбираете куда распаковать и распаковываете. Согласно рекомендациям в теме <a href="filesystem-layout.html">иерархия файловой системы</a>.</p>
+<p>Приложения для Haiku всегда поставляются в архиве. В большинстве случаев это ZIP-архивы, однако некоторые старые BeOS приложения поставляются в формате Software Valet PKG. Software Valet позволял автоматически выполнять сценарии установки, вам нужно было лишь дважды щелкнуть по пакету и выбрать, куда произвести установку и больше ни о чем не заботиться.<br />
+Если это ZIP-архив, двойной щелчок мыши запустит <span class="app">Expander</span>, где вы также выбираете куда распаковать и распаковываете согласно рекомендациям в теме <a href="filesystem-layout.html">иерархия файловой системы</a>.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/common/apps/</span></td><td>   </td><td>для приложений доступных для всех пользователей.</td></tr>
-<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>для приложений доступных толькой для вас.</td></tr>
+<tr><td><span class="path">/boot/home/apps/</span></td><td>   </td><td>для приложений доступных только для вас.</td></tr>
 </table>
 <p>Конечно же, это различие станет актуальным лишь только тогда, когда Haiku станет многопользовательской системой.</p>
-<p>После распаковки архива, было бы неплохо заглянуть внутрь только что созданной папки. Зачастую, внутри помимо самого приложения вы найдете ReadMe-файл и другую документацию.</p>
-<p>После установки некоторые приложения требуют последующей настройки. Например, <a href="tracker-add-ons.html">дополнения для Tracker </a>, <a href="preferences/datatranslations.html">трнасляторы</a> или другие компоненты расширяющие возможности системы. В одном случае вы найдете небольшой файл-сценарий (обычно имеющий расширение <span class="cli">.sh</span>), навроде <span class="cli">install</span>, которые нужно просто запустить двойным щелчком мыши .<br />
-В другом папки, которые ссылаются на нужное место назначения. Они обычно называются "<span class="cli">drag [filename] here...</span>". Таким образом, просто следую этим инструкциям, вы сможете все успешно настроить.</p>
+<p>После распаковки архива было бы неплохо заглянуть внутрь только что созданной папки. Зачастую внутри помимо самого приложения Вы найдете ReadMe-файл и другую документацию.</p>
+<p>После установки некоторые приложения требуют последующей настройки. Например, <a href="tracker-add-ons.html">дополнения для Tracker</a>, <a href="preferences/datatranslations.html">трансляторы</a> или другие компоненты, расширяющие возможности системы. В одном случае вы найдете небольшой файл-сценарий (обычно имеющий расширение <span class="cli">.sh</span>), типа <span class="cli">install</span>, который нужно просто запустить двойным щелчком мыши .<br />
+В другом - папки, которые ссылаются на нужное место назначения. Они обычно называются "<span class="cli">drag [filename] here...</span>". Таким образом, просто следуя этим инструкциям, вы сможете все успешно настроить.</p>
 <p>Однако в большинстве случаев от вас кроме распаковки архива ничего не потребуется.<br />
 В темах <a href="deskbar.html">Deskbar - панель задачи</a> и <a href="desktop-applets/launchbox.html">LaunchBox</a>  описано, как добавить значок для новых приложений.</p>
 
@@ -74,9 +76,9 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="uninstall" name="uninstall">Удаление приложений</a></h2>
 <p>Если для установки был использован сценарий установки, то и для удаления должен существовать сценарий. В этом случае для удаления вам нужно его лишь запустить двойным щелчком мыши.<br />
-В остальных случаях для удаления, просто удалите папку с приложением.</p>
-<p>Это, конечно, оставляет возможность вернуть файлы настроек, которые хранятся в вашей папке по адресу <span class="path">~/config/settings</span>. Это удобно, сохранить их на тот случай, если вы снова установите приложение в будущем. Также сохранятся файлы, при установке которых вам следует перетащить файлы в папку с названием "<span class="cli">drag [filename] here...</span>" (этот  метод описан выше).</p>
-<p>Один из способов быстрой найти все файлы относящиеся к приложению, это сделать запрос по названию программы или его части. Это позволит выявить бинарный файл приложения, папку, где оно установлено и файлы его настроек и т.д. Просто выделите все соответствующие файлы и удалите их.</p>
+В остальных случаях для удаления просто удалите папку с приложением.</p>
+<p>Это, конечно, оставляет возможность вернуть файлы настроек, которые хранятся в вашей папке по адресу <span class="path">~/config/settings</span>. Это удобно - сохранить их на тот случай, если вы снова установите приложение в будущем. Также сохранятся файлы, при установке которых вам следует перетащить их в папку с названием "<span class="cli">drag [filename] here...</span>" (этот  метод описан выше).</p>
+<p>Один из способов быстро найти все файлы, относящиеся к приложению, это сделать запрос по названию программы или его части. Это позволит выявить бинарный файл приложения, папку, где оно установлено и файлы его настроек и т.д. Просто выделите все соответствующие файлы и удалите их.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -88,7 +90,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/cdplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cdplayer.html">CDPlayer</a></td><td> </td>
 		<td valign="top">Проигрыватель CD-дисков.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/charactermap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/charactermap.html">CharacterMap</a></td><td> </td>
-		<td valign="top">Приложение отображающее карту Unicode-символов.</td></tr>
+		<td valign="top">Приложение, отображающее карту Unicode-символов.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/codycam-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/codycam.html">CodyCam</a></td><td> </td>
 		<td valign="top">Приложение для работы с веб-камерой, позволяющее загружать изображения на сервер.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/deskcalc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/deskcalc.html">DeskCalc</a></td><td> </td>
@@ -106,7 +108,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/installer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/installer.html">Installer</a></td><td> </td>
 		<td valign="top">Приложение для установки Haiku на раздел.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/magnify-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/magnify.html">Magnify</a></td><td> </td>
-		<td valign="top">Приложение увеличивает область вокруг указателя мыши (аналог экранной лупы в Windows).</td></tr>
+		<td valign="top">Приложение для увеличения области вокруг указателя мыши (аналог экранной лупы в Windows).</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/mail-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mail.html">Mail</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Email-клиент. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/mediaplayer-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/mediaplayer.html">MediaPlayer</a></td><td> </td>
@@ -120,7 +122,7 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/poorman-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/poorman.html">PoorMan</a></td><td> </td>
 		<td valign="top">Небольшой веб-сервер.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/screenshot-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/screenshot.html">Screenshot</a></td><td> </td>
-		<td valign="top">Приложения для снятие изображений рабочего стола.</td></tr>
+		<td valign="top">Приложение для снятия изображений рабочего стола.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/showimage-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/showimage.html">ShowImage</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Приложение для просмотра изображений. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/soundrecorder-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/soundrecorder.html">SoundRecorder</a></td><td> </td>
@@ -128,28 +130,30 @@
 	<tr><td style="width:24px;"><img src="../images/apps-images/stylededit-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/stylededit.html">StyledEdit</a></td><td> </td>
 		<td valign="top">Небольшой редактор текста.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/terminal-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/terminal.html">Terminal</a></td><td> </td>
-		<td valign="top">Командная строка предоставляет доступ к bash.</td></tr>
+		<td valign="top">Командная строка, предоставляющая доступ к bash.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/textsearch-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/textsearch.html">TextSearch</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Приложение для поиска текстовых файлов. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/tv-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/tv.html">TV</a></td><td> </td>
 		<td valign="top"><span style="color:silver">Приложения для просмотра аналогового ТВ. [<i>Описание все ещё отсутствует</i>]</span></td></tr>
+	<tr><td style="width:24px;"><img src="../images/apps-images/webpositive-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/webpositive.html">WebPositive</a></td><td> </td>
+		<td valign="top">Родной браузер, написанный под Haiku.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-bundled-apps" name="list-of-bundled-apps">Приложения входящие в состав Haiku</a></h2>
-<p>Кроме вышеперечисленных приложений, которые поддерживаются в рамках проекта Haiku, также поставляется несколько других необходимых приложений, которые поддерживаются отдельными людьми. Ошибки и запросы на улучшения, должны посылаться тем людям, которые их сопроваждают.</p>
+<p>Кроме вышеперечисленных приложений, которые поддерживаются в рамках проекта Haiku, также поставляются несколько других необходимых приложений, которые поддерживаются отдельными людьми. Ошибки и запросы на улучшения должны посылаться тем людям, которые сопровождают эти приложения.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td> </td>
 		<td valign="top">Приложения для просмотра <acronym title="Portable Document Format">PDF</acronym>-документов.</td></tr>
-<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
-		<td valign="top">Веб-браузер основанный на исходных кодах Mozilla Firefox.</td></tr>
+<!--	<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="270"><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
+		<td valign="top" _translation_id="271">A web browser based on Mozilla's source code.</td></tr> -->
 	<tr><td style="width:24px;"><img src="../images/apps-images/pe-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/pe.html">Pe</a></td><td> </td>
 		<td valign="top">Расширенный редактор кода с подсветкой синтаксиса и многим другим.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/apps-images/vision-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vision.html">Vision</a></td><td> </td>
 		<td valign="top"><acronym title="Internet Relay Chat">IRC</acronym>-клиент.</td></tr>
-	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/vlc.html">VLC media player</a></td><td> </td>
-		<td valign="top">Медиа проигрыватель от VideoLAN.</td></tr>
+<!--	<tr><td style="width:24px;"><img src="../images/apps-images/vlc-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="276"><a href="applications/vlc.html">VLC media player</a></td><td> </td>
+		<td valign="top" _translation_id="277">VideoLAN's media player.</td></tr> -->
 	<tr><td style="width:24px;"><img src="../images/apps-images/wonderbrush-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/wonderbrush.html">WonderBrush</a></td><td> </td>
 		<td valign="top">Растровый и векторный редактор от YellowBite.</td></tr>
 </table>
@@ -161,7 +165,7 @@
 <div class="inner"><span>
  «  <a href="workshop-filetypes+attributes.html">Семинар</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
-::  <a href="desktop-applets.html">Приложеница для рабочего стола</a>  »
+::  <a href="desktop-applets.html">Апплеты рабочего стола</a>  »
 </span></div>
 </div>
 

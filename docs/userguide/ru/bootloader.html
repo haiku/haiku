@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -43,7 +43,7 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="filesystem-layout.html">Иерархия файловой системы</a>  »
 </span></div>
 </div>
@@ -53,9 +53,9 @@
 
 <h1>Загрузчик (Boot Loader)</h1>
 
-<p>Загрузчик Haiku может помочь решить аппаратные проблемы или выбрать, какую из систем запустить для установки, если у Вас более одной копии Haiku (установочный CD или USB-карта).<br />
-Загрузчик также полезен после установки программного компонента, который препятствует успешной загрузке системы. Опция <i>Запретить загрузку пользовательских дополнений (Disable user add-ons) </i> запустит систему без компонентов, установленных пользователем (например драйвер).</p>
-<p>Для того чтобы зайти в настройки загрузчика, необходимо нажать и удерживать клавишу <span class="key">SHIFT</span> до начала загрузки Haiku. Если загрузчик установлен, то Вы можете начать удерживать <span class="key">SHIFT</span> перед выбором загрузочной записи Haiku, а если она является единственной операционной системой на компьютере, то Вы можете начать удерживать клавишу во время стартовых сообщений BIOS.</p>
+<p>Загрузчик Haiku может помочь решить аппаратные проблемы или выбрать, какую из систем запустить для установки, если у вас более одной копии Haiku (установочный CD или USB-карта).<br />
+Загрузчик также полезен после установки программного компонента, который препятствует успешной загрузке системы. Опция <i>Запретить загрузку пользовательских дополнений (Disable user add-ons)</i> запустит систему без компонентов, установленных пользователем (например драйвер).</p>
+<p>Для того чтобы зайти в настройки загрузчика, необходимо нажать и удерживать клавишу <span class="key">SHIFT</span> до начала загрузки Haiku. Если загрузчик установлен, то вы можете начать удерживать <span class="key">SHIFT</span> перед выбором загрузочной записи Haiku, а если она является единственной операционной системой на компьютере, то вы можете начать удерживать клавишу во время стартовых сообщений BIOS.</p>
 <p><br /></p>
 <p>Вы увидите три пункта меню:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
@@ -66,17 +66,26 @@
 <i>- Disable user add-ons</i><br />
 <i>- Disable IDE DMA</i><br />
 <i>- Use fail-safe video mode</i><br />
+<i>- Disable IO-APIC</i><br />
+<i>- Disable LOCAL APIC</i><br />
 <i>- Don't call the BIOS</i><br />
 <i>- Disable APM</i><br />
-<i>- Disable ACPI</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i>
+<i>- Disable ACPI</i>
 </p></td></tr>
-<tr><td class="onelinetop"><b>Выбор безопасного видео-режима <br />(Select fail safe video mode)</b></td><td> </td><td>Если Вы активировали опцию  <i>Use fail-safe video mode</i>, то сможете выбрать разрешение экрана и глубину цвета.</td></tr>
+<tr><td><b>Выбор опций отладки (Select debug options)</b><br />
+</td><td> </td><td>Здесь вы найдете несколько опций, которые помогут вам при поиске неисправностей или при получении дополнительных сведений при составлении отчета об ошибке. Опять же внизу отображается короткое описание для каждой опции.
+<p><i>- Enable serial debug output</i><br />
+<i>- Enable on screen debug output</i><br />
+<i>- Enable debug syslog</i>
+</p>
+<p>Если активировать меню "debug syslog", то после горячей перезагрузки (после зависания системы) появятся эти дополнительные опции:</p>
+<p><i>- Display syslog from previous session</i><br />
+<i>- Save syslog from previous session</i>
+</p></td></tr>
+<tr><td class="onelinetop"><b>Выбор безопасного видео-режима <br />(Select fail safe video mode)</b></td><td> </td><td>Если вы активировали опцию <i>Use fail-safe video mode</i>, то сможете выбрать разрешение экрана и глубину цвета.</td></tr>
 </table>
 <p><br /></p>
-<p>После активации одной или более опций, вернитесь в главное меню и продолжите загрузку, далее Вы увидите загрузочный экран:</p>
+<p>После активации одной или более опций вернитесь в главное меню и продолжите загрузку. Далее вы увидите загрузочный экран:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
 <p>Если все в порядке, то иконки будут быстро загораться, одна за другой.<br />
@@ -98,7 +107,7 @@
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="filesystem-layout.html">Иерархия файловой системы</a>  »
 </span></div>
 </div>

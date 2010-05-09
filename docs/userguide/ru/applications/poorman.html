@@ -10,7 +10,8 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		michael_s
+ *		Michael Smirnov
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +36,7 @@
 <li><a href="../../es/applications/poorman.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/poorman.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/poorman.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/poorman.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/poorman.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -54,15 +56,15 @@
 <tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/PoorMan Settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>PoorMan - это простейший WEB-сервер с максимально простыми настройками. Он не имеет расширенных северных функций, в отличие от специализированного серверного программного обеспечения, предлагая минимально необходимый функционал.</p>
+<p>PoorMan - это простейший WEB-сервер с максимально простыми настройками. Он не имеет расширенных серверных функций, в отличие от специализированного серверного программного обеспечения, предлагая минимально необходимый функционал.</p>
 <p>При первом запуске PoorMan запросит папку, из которой файлы будут отдаваться в сеть. Если вы нажмёте кнопку <span class="button">Default</span>, то создастся новая папка <span class="path">/boot/home/public_html</span>, в которую следует поместить стартовую HTML страницу с названием по умолчанию <span class="cli">index.html</span>.</p>
 <p>В PoorMan имеется консоль, которая отображает журнал активности, над ней расположена информация о состоянии (запущен сервер или нет), путь к раздаваемой папке, и счетчик посещений. Настройки могут быть изменены в меню <span class="menu">Правка (Edit) | Настройки (Settings)...</span>:</p>
 <p><img id="poorman" src="../images/apps-images/poorman.png" alt="poorman.png" /></p>
 <p>Панель настроек состоит из трех вкладок:</p>
-<p>На вкладке <span class="menu">Сайт (Site)</span> можно выбрать другую раздаваемую паку (<span class="menu">Web Folder</span>), изменить начальную страницу (<span class="menu">Start Page</span>) и отметить опцию, которая отсылает список файлов, если начальная страница отсутствует.<br />
-В <span class="menu">Ведение журнала (Logging)</span> можно включить/выключить вывод сообщений в консоль (<span class="menu">Log to Console</span>), а также активировать их запись в лог-файл (<span class="menu">Log to File</span>).<br />
+<p>На вкладке <span class="menu">Сайт (Site)</span> можно выбрать другую раздаваемую паку (<span class="menu">Web folder</span>), изменить начальную страницу (<span class="menu">Start page</span>) и отметить опцию, которая отсылает список файлов, если начальная страница отсутствует.<br />
+В <span class="menu">Ведение журнала (Logging)</span> можно включить/выключить вывод сообщений в консоль (<span class="menu">Log to console</span>), а также активировать их запись в лог-файл (<span class="menu">Log to file</span>).<br />
 Вкладка <span class="menu">Расширенные настройки (Advanced)</span> позволяет задать максимальное количество одновременных подключений.</p>
-<p>Остальные пункты меню PoorMan очевидны: можно сохранить полностью или частично выводимые в консоль данные (<span class="menu">Save Console...</span>), очистить её или лог-файл (<span class="menu">Clear Console Log/Log File</span>), запустить или остановить сервер (<span class="menu">Run Server</span>) и обнулить счетчик посещений (<span class="menu">Clear Hit Counter</span>).</p>
+<p>Остальные пункты меню PoorMan очевидны: можно сохранить полностью или частично выводимые в консоль данные (<span class="menu">Save console...</span>), очистить её или лог-файл (<span class="menu">Clear console log/Log file</span>), запустить или остановить сервер (<span class="menu">Run server</span>) и обнулить счетчик посещений (<span class="menu">Clear hit counter</span>).</p>
 
 <div class="box-info">Если вы хотите проверить работоспособность PoorMan, то выберите для раздачи папку <span class="path">/boot/apps/BePDF/docs/</span> и файл <span class="cli">index.html</span> как начальную страницу, затем введите в браузере адрес локального компьютера 127.0.0.1.</div>
 

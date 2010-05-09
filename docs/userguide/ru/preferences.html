@@ -4,13 +4,14 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Rustam
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -35,10 +36,11 @@
 <li><a href="../es/preferences.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/preferences.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/preferences.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/preferences.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/preferences.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="desktop-applets.html">Приложеница для рабочего стола</a> 
+ «  <a href="desktop-applets.html">Апплеты рабочего стола</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="bash-scripting.html">Bash и скрипты</a>»  
 </span></div>
@@ -49,7 +51,7 @@
 
 <h1>Настройки</h1>
 
-<p>Хотя ключевой философией Haiku является минимизировать опции и предоставить разумные настройки по умолчанию, есть некоторые вещи, которые нужно настроить и могут быть установлены в связи с индивидуальными предпочтениями. Все панели настроек вы можете найти в меню Deskbar под названием <span class="menu">Настройки (Preferences)</span>.</p>
+<p>Хотя ключевой философией Haiku является минимизировать опции и предоставить разумные настройки по умолчанию, есть некоторые вещи, которые нужно настроить и которые могут быть установлены в связи с индивидуальными предпочтениями. Все панели настроек вы можете найти в меню Deskbar под названием <span class="menu">Настройки (Preferences)</span>.</p>
 <table summary="contents" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td style="width:24px;"><img src="../images/prefs-images/appearance-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/appearance.html">Внешний вид</a></td><td style="width:10px;"> </td>
 		<td valign="top">Настройка некоторых аспектов графического интерфейса.</td></tr>
@@ -69,6 +71,8 @@
 		<td valign="top">Настройка частоты повторения и задержки ввода после нажатия клавиши.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/keymap-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/keymap.html">Раскладка</a></td><td> </td>
 		<td valign="top">Настройка раскладки клавиатуры.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/prefs-images/locale-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/locale.html">Locale</a></td><td> </td>
+		<td valign="top"><span style="color:silver">Настройка языка системы.</span></td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/media-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/media.html">Медиа</a></td><td> </td>
 		<td valign="top">Настройка аудио и видео устройств.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/mouse-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/mouse.html">Мышь</a></td><td> </td>
@@ -78,7 +82,7 @@
 	<tr><td style="width:24px;"><img src="../images/prefs-images/printers-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/printers.html">Принтеры</a></td><td> </td>
 		<td valign="top">Добавление, удаление и настройка принтеров.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/screen-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/screen.html">Экран</a></td><td> </td>
-		<td valign="top">Настройка разрешение, глубины цвета, частоты обновления экрана и установка количества рабочих столов.</td></tr>
+		<td valign="top">Настройка разрешения, глубины цвета, частоты обновления экрана и установка количества рабочих столов.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/screensaver-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/screensaver.html">Заставка</a></td><td> </td>
 		<td valign="top">Добавление, удаление и настройка заставок.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/sounds-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/sounds.html">Звуки</a></td><td> </td>
@@ -87,6 +91,8 @@
 		<td valign="top">Установить время, число и часовой пояс.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/tracker-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/tracker.html">Tracker</a></td><td> </td>
 		<td valign="top">Настройка файлового менеджера Haiku.</td></tr>
+	<tr><td style="width:24px;"><img src="../images/prefs-images/touchpad-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/touchpad.html">Сенсорная панель</a></td><td> </td>
+		<td valign="top">Настройка сенсорной панели.</td></tr>
 	<tr><td style="width:24px;"><img src="../images/prefs-images/virtualmemory-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="preferences/virtualmemory.html">Виртуальная Память</a></td><td> </td>
 		<td valign="top">Установить размер подкачки.</td></tr>
 </table>
@@ -97,7 +103,7 @@
 <!--
 <div class="nav">
 <div class="inner"><span>
- «  <a href="desktop-applets.html">Приложеница для рабочего стола</a> 
+ «  <a href="desktop-applets.html">Апплеты рабочего стола</a> 
 ::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="bash-scripting.html">Bash и скрипты</a>»  
 </span></div>

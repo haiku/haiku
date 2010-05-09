@@ -12,6 +12,7 @@
  * Translators:
  *		Loïc
  *		Humdinger
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +37,7 @@
 <li><a href="../../es/applications/terminal.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/terminal.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/terminal.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/terminal.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -52,44 +54,45 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
-<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
+<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
 <span class="path">~/.profile</span> - ajoute/remplace les paramètres <span class="path">/boot/system/etc/profile</span> par défaut.<br />
 <span class="path">~/.inputrc</span> - ajoute/remplace les paramètres <span class="path">/boot/system/etc/inputrc</span> par défaut.</td></tr>
 </table>
 <p><br /></p>
 <p>Le Terminal est l'interface de Haiku à bash, le Bourne Again Shell.</p>
-<p>Please refer to the topic on <a href="../bash-scripting.html">Scripting</a> for a few links to online tutorials on working in the shell. Here, we'll concentrate on the Terminal application itself.</p>
+<p>Veuillez vous référer à la rubrique sur les <a href="../bash-scripting.html">Scripts</a>, vous y trouverez quelques liens vers des tutoriels en ligne concernant le travail dans le shell. Ici, nous traiterons seulement de l'application Terminal.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="appearance" name="appearance">Apparence</a></h3>
-<p>You can open as many Terminals as needed, either each in it's own window by simply launching more Terminals or with <span class="key">ALT</span> <span class="key">N</span> from an already running Terminal. Or you use Terminal's tabbed view and open another tab with <span class="key">ALT</span> <span class="key">T</span>.</p>
+<p>Vous pouvez ouvrir autant de Terminaux que vous voulez, chacun dans sa fenêtre propre, en lançant plusieurs fois l’application Terminal ou en tapant <span class="key">ALT</span> <span class="key">N</span> depuis un Terminal ouvert. Vous pouvez également utiliser la vue en onglets du Terminal : utilisez la combinaison <span class="key">ALT</span> <span class="key">T</span> pour ouvrir un nouvel onglet.</p>
 <p>Une fenêtre du Terminal peut être redimensionnée comme toute autre fenêtre ou en utilisant le menu <span class="menu">Settings | Window Size</span>. <span class="key">ALT</span> <span class="key">ENTRÉE</span> permet de basculer en mode plein écran.</p>
-<p>Changed window size and text encoding are only kept choosing <span class="menu">Settings | Save as default</span>.</p>
+<p>Les changement de taille de fenêtre ou de police ne sont conservés que si vous faites <span class="menu">Settings | Save as default</span>.</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p><span class="menu">Settings | Preferences</span> opens a panel where you can set font type, font size and the different text and background colors. You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
-Pressing <span class="button">OK</span> will save the current settings as default.</p>
+<p>Le panneau de préférences accessible par le menu <span class="menu">Settings | Preferences</span> ouvre un panneau dans lequel vous pouvez définir la police utilisée, sa taille et les couleurs de texte et de fond. Vous pouvez sauvegarder vos réglages en tant que fichiers de profil, qui ouvriront un Terminal configuré lors d’un double-clic.<br />
+Le bouton <span class="button">OK</span> enregistrera le réglage courant comme réglage par défaut.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="customization" name="customization">Personnalisation du Bash</a></h3>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/etc/</span>.</p>
+<p>Le shell bash lui même, venu du monde Unix, est largement configurable. Deux fichiers en particulier sont intéressants : <span class="cli">.profile</span> et <span class="cli">.inputrc</span><br />
+Ces deux fichiers peuvent être créés dans votre dossier <span class="path">home/</span> et s’ajouter ou remplacer les valeurs par défaut du système configurées dans <span class="path">/boot/system/etc/</span>.</p>
 
 <h4>.profile</h4>
-<p>The <span class="cli">.profile</span> is loaded every time you open a new Terminal. It sets all kinds of aliases and variables that will affect bash's behavior and appearance. You'll find many online resources that will detail all possibilities.</p>
-<p>The Haiku/BeOS Tip Server has quite a few tips to get you started, for example:</p>
+<p>Le fichier <span class="cli">.profile</span> est chargé chaque fois que 
+vous ouvrez un nouveau Terminal. Il configure divers alias et variables qui affectent le comportement et l’apparence de bash. Vous trouverez en ligne de nombreuses ressources qui détaillent les possibilités de configuration.</p>
+<p>« The Haiku/BeOS Tip Server » met à votre disposition quelques astuces pour vous aider à démarrer, comme :</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a></li>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Personnaliser votre invite de commandes</a></li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">Plus de personnalisations de l’invite de commandes</a></li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Améliorer bash</a></li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Raccourcis claviers personnalisés</a></li>
 </ul>
-<p>There are more, <a href="http://betips.net/index.php?s=.profile">have a look</a>.</p>
+<p>Il y en a d’autres, <a href="http://betips.net/index.php?s=.profile">jetez un œil</a>.</p>
 
 <h4>.inputrc</h4>
-<p>The <span class="cli">.inputrc</span> deals with keybindings. Since Haiku provides useful defaults, you probably don't have to mess with these more involved settings. If you do have special needs here, consult one of the many online resources, e.g. <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
+<p>Le fichier <span class="cli">.inputrc</span> permet de configurer des équivalents claviers. Haiku fournit déjà des valeurs par défaut, vous n’aurez donc probablement pas à vous occupez de ces réglages plus compliqués. Si vous avez des besoins spécifiques, consultez des ressources en ligne, comme <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -99,17 +102,17 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hints" name="hints">Conseils pour travailler dans le Terminal</a></h3>
-<ul><li><p>Dragging a file or folder from a Tracker window into the Terminal will insert its path at the location of the cursor. Dragging with the right mouse button offers additional actions in a context menu:</p>
+<ul><li><p>Déplacer un fichier ou dossier d’une fenêtre Tracker vers le Terminal insèrera son chemin à la position du curseur.
+Si le bouton droit de la souris est utilisé, un menu contextuel s’affichera, offrant des options additionnelles :</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Insert Path</span></td><td> </td><td>Inserts the location of the file, same as drag&amp;dropping with the left mouse button.</td></tr>
-<tr><td><span class="menu">Change Directory</span></td><td> </td><td>Changes to the folder of the dragged file.</td></tr>
-<tr><td><span class="menu">Create Link Here</span></td><td> </td><td>Creates a link to the dragged file in the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Move Here</span></td><td> </td><td>Moves the dragged file into the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Copy Here</span></td><td> </td><td>Copies the dragged file into the current working directory of the Terminal.</td></tr>
+<tr><td><span class="menu">Insert Path</span></td><td> </td><td>Insère l’emplacement du fichier, comme pour un glisser-déposer avec le bouton gauche de la souris</td></tr>
+<tr><td><span class="menu">Change Directory</span></td><td> </td><td>Règle le dossier courant du shell sur le dossier déposé</td></tr>
+<tr><td><span class="menu">Create Link Here</span></td><td> </td><td>Crée un lien vers le fichier déposé dans le dossier courant du shell.</td></tr>
+<tr><td><span class="menu">Move Here</span></td><td> </td><td>Déplace le fichier déposé dans le dossier courant du shell.</td></tr>
+<tr><td><span class="menu">Copy Here</span></td><td> </td><td>Copie le fichier déposé dans le dossier courant du shell.</td></tr>
 </table></li>
-<li><p>You can open any file with its preferred application with the command <span class="cli">open <i>[filename]</i></span>. This also works with the representation of the current ("<span class="cli">.</span>") and parent ("<span class="cli">..</span>") folder which then open in a Tracker window. So, to open the current working directory, you type:</p>
-<pre class="terminal">open .</pre>
-</li></ul>
+<li><p>Vous pouvez ouvrir n'importe quel fichier avec son application préférée à l'aide de la commande <span class="cli">open <i>[nom de fichier]</i></span>. Ça fonctionnerait aussi avec les répertoires courant ("<span class="cli">.</span>") et parent ("<span class="cli">..</span>") qui alors s'ouvrent dans un fenêtre du Tracker. Ainsi, pour ouvrir le répertoire de travail actuel, vous pouvez saisir :</p>
+<pre class="terminal">open .</pre></li></ul>
 
 
 </div>

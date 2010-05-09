@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		miguel~1.mx
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Queries</title>
+	<title>Consultas</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -38,8 +40,8 @@
 </ul>
 <span>
  «  <a href="index.html">Índice</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
+::  <a href="contents.html" class="uplink">Contenidos</a> 
+::  <a href="workshop-filetypes+attributes.html">Taller</a>  »
 </span></div>
 </div>
 
@@ -49,108 +51,101 @@
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Índice</td></tr>
-<tr class="index"><td>
-	<a href="#find-window">The Find window</a><br />
-	<a href="#basic-query">Basic queries - "by Name"</a><br />
-	<a href="#adv-query">Advanced queries - "by Attribute"</a><br />
-	<a href="#more-adv-query">Even more advanced queries - "by Formula"</a><br />
-	<a href="#result-window">The result window</a><br />
-	<a href="#query-template">Query Templates</a>
+<tr class="index"><td>	<a href="#find-window">La ventana Encontrar</a><br />
+	<a href="#basic-query">Consultas básicas - "por nombre"</a><br />
+	<a href="#adv-query">Consultas avanzadas - "por atributo"</a><br />
+	<a href="#more-adv-query">Consultas todavía más avanzadas - "por fórmula"</a><br />
+	<a href="#result-window">La ventana de resultados</a><br />
+	<a href="#query-template">Plantillas de consulta</a>
 </td></tr>
 </table>
 
-<h1>Queries</h1>
+<h1>Consultas</h1>
 
-<p>A query is a file search based on file attributes and can be performed within Tracker or in Terminal. Queries are saved in <span class="path">/boot/home/queries/</span> and by default last seven days before being purged. Note, these aren't static result lists of your search, but are the query formulas which trigger a new search whenever you open them.<br />
-Even better, you don't have to double-click to re-do a query. You can <a href="tracker.html#navigating">drill down</a> a saved query just like any folder by right-clicking on it and navigating through the submenus.</p>
+<p>Una consulta es un archivo de búsqueda basado en atributos de archivo y pueden realizarse dentro de Tracker o en la Terminal. Las consultas se guardan en <span class="path">/boot/home/queries/</span> y predeterminadamente duran siete días antes de purgarse. Note, estas no son listas de resultados estáticas de su búsqueda, pero están las fórmulas de consulta las cuales disparan una nueva búsqueda en el momento que se abren.<br />
+Incluso mejor, no tiene que darle doble clic para rehacer una consulta. Se puede <a href="tracker.html#navigating">examinar</a> una consulta guardada así como cualquier carpeta al darle doble clic en ella y navegar a través de sus submenús.</p>
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="find-window" name="find-window">The Find window</a></h2>
-<p>You start a query by invoking the <span class="menu">Find...</span> menu either from the Deskbar menu or any Tracker window or the Desktop (which is actually a fullscreen Tracker window). The shortcut is <span class="key">ALT</span> <span class="key">F</span>. You're presented with the Find window:</p>
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="find-window" name="find-window">La ventana Encontrar</a></h2>
+<p>Se inicia una consulta invocando el menú <span class="menu">Find...</span> (Encontrar) tanto del menú Deskbar o de cualquier ventana del Tracker o el Escritorio (el cual realmente es una ventana de Tracker a pantalla completa). El atajo de teclado es <span class="key">ALT</span> <span class="key">F</span>. Se presenta la ventana Encontrar:</p>
 <img src="images/queries-images/basic-query.png" alt="basic-query.png" />
 <ol>
-<li><p>Select recent or saved queries or save the current search parameters as <a href="#query-template">Query Template</a>.</p></li>
-<li><p>Narrow down your search from <span class="menu">All files and folders</span> to specific file types.</p></li>
-<li>Define the search method:<ul>
-    <li><span class="menu">by Name</span> - a basic search by file or folder name</li>
-    <li><span class="menu">by Attribute</span> - an advanced search, you specify search terms for one or more attributes</li>
-    <li><span class="menu">by Formula</span> - an even more advanced search, you can fine-tune a complex query term</li></ul></li>
-<li><p>Select which drives to search on.</p></li>
-<li><p>Enter the search term.</p></li>
-<li><p>The expander hides/unhides the additional options.</p></li>
-<li><p>Uncheck the <span class="menu">Temporary</span>  checkbox if you don't want this query self-destruct after 7 days.</p></li>
-<li><p>Check if your query is supposed to <span class="menu">Include trash</span>.</p></li>
-<li><p>Optionally, enter a name for this query if you want to save it.</p></li>
-<li><p>You can drag&amp;drop the icon anywhere to save a query. Doing that with the right mouse button, offers the option to save as template.</p></li>
+<li><p>Seleccione consultas recientes o guardadas o guarde los parámetros de búsqueda actuales como una <a href="#query-template">Plantilla de consulta</a>.</p></li>
+<li><p>Reducir la búsqueda de <span class="menu">All files and folders</span> (Todos los archivos y carpetas) a tipos de archivo específicos.</p></li>
+<li>Definir el método de búsqueda:<ul>
+    <li><span class="menu">by Name</span> (por nombre) - una búsqueda básica por el nombre del archivo o carpeta</li>
+    <li><span class="menu">by Attribute</span> (por atributo) - una búsqueda avanzada, se especifican términos de búsqueda para uno o más atributos</li>
+    <li><span class="menu">by Formula</span> (por fórmula) - una búsqueda todavía más avanzada, se puede refinar un término de búsqueda compleja</li></ul></li>
+<li><p>Seleccione en cuáles dispositivos buscar.</p></li>
+<li><p>Ingrese el término de búsqueda.</p></li>
+<li><p>El expansor oculta/muestra las opciones adicionales.</p></li>
+<li><p>Deseleccione la casilla de verificación <span class="menu">Temporary</span> (Temporalmente) si no quiere que esta consulta se autodestruya tras 7 días.</p></li>
+<li><p>Verifique si su búsqueda debiera <span class="menu">Include trash</span> (Incluir la basura).</p></li>
+<li><p>Opcionalmente, ingrese un nombre para esta consulta si desea guardarla.</p></li>
+<li><p>Se puede arrastrar y colocar el icono en cualquier lugar para guardar una consulta. Al hacerlo con el botón derecho del ratón, se ofrece la opción de guardarla como plantilla.</p></li>
 </ol>
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="basic-query" name="basic-query">Basic queries - "by Name"</a></h2>
-<p>If you simply want to find all files and folders on your mounted disks that match a certain pattern, simply leave the search method at <span class="menu">by Name</span>, enter the search term into the text box and press <span class="key">ENTER</span>.</p>
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="basic-query" name="basic-query">Consultas básicas - "por Nombre"</a></h2>
+<p>Si simplemente quiere encontrar todos los archivos y carpetas en los discos montados que concuerdan con un cierto patrón, simplemente deje el método de búsqueda en <span class="menu">by Name</span>, ingrese el término de búsqueda dentro de la caja de texto y presione <span class="key">Enter</span>.</p>
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="adv-query" name="adv-query">Advanced queries - "by Attribute"</a></h2>
-<p>You can create more advanced queries by searching within the attributes of specific file types. For that to work, these attributes have to be <a href="index.html">indexed</a>.</p>
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="adv-query" name="adv-query">Consultas avanzadas - "por Atributo"</a></h2>
+<p>Pueden crearse consultas más avanzadas buscando dentro de los atributos de tipos de archivo específicos. Para que funcione, estos atributos tienen que estar <a href="index.html">indexados</a>.</p>
 <img src="images/queries-images/query-window.png" alt="query-window.png" />
-<p>You start by setting the filetype from <span class="menu">All files and folders</span> to, for example, <span class="menu">Text | E-mail</span> and change the search method to <span class="menu">by Attribute</span>.</p>
-<p>This adds a pop-up menu to the left of the textbox and the buttons <span class="button">Add</span> and <span class="button">Remove</span> under that. From the menu you choose which attribute to query. With <span class="button">Add</span> and <span class="button">Remove</span> you can query additional attributes or remove them again. These attributes can be logically linked with AND/OR.</p>
-<p>Let's do an email query as an example:</p>
+<p>Se comienza seleccionando el tipo de archivo de <span class="menu">All files and folders</span> (Todos los archivos y carpetas) a, por ejemplo, <span class="menu">Text | E-mail</span> (Texto | E-mail) y cambie el método de búsqueda a <span class="menu">by Attribute</span>.</p>
+<p>Esto agrega un menú desplegable a la izquierda de la caja de texto y los botones <span class="button">Add</span> (Agregar) y <span class="button">Remove</span> (Remover) debajo. Del menú se puede seleccionar cuál atributo consultar. Con <span class="button">Add</span> y <span class="button">Remove</span> se pueden consultar atributos adicionales o removerlos de nuevo. Estos atributos pueden enlazarse lógicamente con AND/OR.</p>
+<p>Hagamos una consulta de correo electrónico como ejemplo:</p>
 <img src="images/queries-images/query-window-filled.png" alt="query-window-filled.png" />
-<p>This is your Find window when you're looking for all emails Clara Botters has sent to you in the last two months that had in the subject "vibraphone" or "skepticality".<br />
-As you see, searching through time-based attributes supports some useful phrases: besides for the "last 2 months", you could also use "today", "yesterday", "Monday" or "last Monday" (which would be the Monday last week), or "last 2 minutes/hours/days/weeks".<br />
-A good way to cut down the number of search results.</p>
+<p>Esta es la ventana Encontrar cuando se están buscando todos los correos electrónicos que Clara Botters le ha enviado en el tema "vibraphone" o "skepticality".<br />
+Como se ve, buscando a través de atributos basados en tiempo se soportan algunas frases útiles: además de los "últimos 2 meses", se podría usar "hoy", "ayer", "lunes" o "el lunes pasado" (lo cual sería el lunes de la semana pasada), o "los últimos 2 minutos/horas/días/semanas".<br />
+Una buena manera de reducir el número de resultados de búsqueda.</p>
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="more-adv-query" name="more-adv-query">Even more advanced queries - "by Formula"</a></h2>
-<p>Typing in a formula query by hand is daunting and really quite unpractical. It still has its uses.</p>
-<p>Take the above query by attribute of Clara's mails concerning vibraphones etc. If you have all the attributes and their search terms set, try switching to <span class="menu">by Formula</span> mode and be overwhelmed by this one line query string:</p>
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="more-adv-query" name="more-adv-query">Consultas todavía más avanzadas - "por Fórmula"</a></h2>
+<p>Escribir una consulta de fórmula a mano es intimidante y realmente muy impráctico. No obstante, tiene sus usos.</p>
+<p>Tome la consulta de arriba por atributo de los correos de Clara concernientes a vibraphones, etc. Si tiene todos los atributos y sus términos de búsqueda seleccionados, intente cambiar al modo <span class="menu">by Formula</span> y se asombrará por esta cadena de búsqueda de una línea:</p>
 <img src="images/queries-images/formula-query.png" alt="formula-query.png" />
-<p>Once more as text, edited for readability:</p>
+<p>Una vez más como texto, editado para legibilidad:</p>
 <pre>(((((MAIL:from=="*[cC][lL][aA][rR][aA] [bB][oO][tT][tT][eE][rR][sS]*")
        &amp;&amp;(MAIL:when&gt;=%2 months%))
        &amp;&amp;(MAIL:subject=="*[vV][iI][bB][rR][aA][pP][hH][oO][nN][eE]*"))
        ||(MAIL:subject=="*[sS][kK][eE][pP][tT][iI][cC][aA][lL][iI][tT][yY]*"))
        &amp;&amp;(BEOS:TYPE=="text/x-email"))</pre>
-<p>What's the use?</p>
+<p>¿Cuál es el uso?</p>
 <ul>
-<li><p>You could copy and paste the string into an email, forum or IRC for others to use or debug.</p></li>
-<li><p>You can use this method to construct a query in <span class="menu">Attribute</span> mode and then switch to <span class="menu">Formula</span> mode, to comfortably generate a search string to use for a query in Terminal or a script.</p></li>
-<li><p>You can fine tune your query by inserting parenthesis where needed, make parts case-sensitive or negate logical combinations by changing. e.g. "<tt>==</tt>" to "<tt>!=</tt>" for a NOT AND. All you need is a basic understanding of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">regular expressions</a> and maybe some scripting basics.</p></li>
+<li><p>Podría copiar y pegar la cadena dentro de un correo electrónico, foro o IRC para que otros lo usen o depuren.</p></li>
+<li><p>Se puede usar este método para construir una consulta en modo <span class="menu">Attribute</span> (Atributo) y luego intercambiar al modo <span class="menu">Formula</span>, para generar confortablemente una cadena de búsqueda para uarse en una consulta en la Terminal o en un script.</p></li>
+<li><p>Puede afinarse la búsqueda insertando paréntesis donde se necesite, hacer que partes de ella distingan entre mayúsculas y minúsculas o negociar combinaciones lógicas al cambiar, p. ej., "<tt>==</tt>" por "<tt>!=</tt>" para un NOT AND. Todo lo que se necesita es un entendimiento básico de <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">expresiones regulares</a> y tal vez algo básico de scripting.</p></li>
 </ul>
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="result-window" name="result-window">The result window</a></h2>
-<p>After you start a search, the Find window will be replaced by a result window. Here is an example that queried for "server":</p>
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="result-window" name="result-window">La ventana de resultados</a></h2>
+<p>Después de iniciar una búsqueda, la ventana Encontrar se remplazará por una ventana de resultados. Aquí hay un ejemplo que consultó "server":</p>
 <img src="images/queries-images/result-window.png" alt="result-window.png" />
-<p>Besides the gray background, result windows work exactly like any other Tracker window. Some things are worth noting:</p>
+<p>Además del fondo negro, las ventanas resultantes trabajan exactamente como cualquier otra ventana de Tracker. Algunas cosas valen la pena resaltar:</p>
 <ul>
-<li><p>You can open the location of a file or folder by double clicking on its path attribute.</p></li>
-<li><p>With <span class="menu">File | Edit Query</span> or <span class="key">ALT</span> <span class="key">G</span> you get back to your Find window to refine your query.</p></li>
-<li><p>A query is live, i.e. if a file that matches your search criteria appears or disappears from your system, this change is reflected in your results in real-time.</p></li>
+<li><p>Puede abrirse la ubicación de un archivo o carpeta al darle doble clic en su atributo de ruta.</p></li>
+<li><p>Con <span class="menu">File | Edit Query</span> (Archivo | Editar consulta) o <span class="key">ALT</span> <span class="key">G</span> se puede regresar a la ventana Encontrar para refinar la consulta.</p></li>
+<li><p>Una búsqueda está viva, p. ej., si un archivo que concuerda el criterio de búsqueda aparece o desaparece del sistema, este cambio se refleja en los resultados en tiempo real.</p></li>
 </ul>
-<p>You can assign a sensible attribute layout for query results of a specific filetype. Open a folder containing files of the filetype you'd like to create a template for and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy Layout</span>.</p>
-<p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder named <i>group/filetype</i>, replacing the slash with an underscore, e.g. "audio_x-mp3". Open the new folder and paste in the previously copied layout with <span class="menu">Attributes | Paste Layout</span>.</p>
+<p>Se puede asignar una disposición de atributos sensible para resultados de una consulta o un tipo de archivo específico. Abrir una carpeta que contenga archivos del tipo de archivo de los que le gustaría crear una plantilla y acomodar los atributos como le gustaría tener presentados los resultados de la consulta. Copie esta disposición con <span class="menu">Attributes | Copy Layout</span> (Atributos | Copiar disposición).</p>
+<p>Abra <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, cree una nueva carpeta llamada <i>group/filetype</i>, remplace la diagonal con un guión bajo, p. ej., "audio_x-mp3". Abra la nueva carpeta y pegue en la disposición copiada previamente con <span class="menu">Attributes | Paste Layout</span> (Atributos | Pegar disposición).</p>
 
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-template" name="query-template">Query Templates</a></h2>
-<p>If you double click a saved query, the file search is at once started and the result window opens immediately. However, you may not want to search with these <i>exact</i> search parameters, but use it as starting point to only slightly tweak the formula.<br />
-By using the <span class="menu">Save Query as Template</span> menu item (see <a href="#find-window">(1) in screenshot</a> at the top) or drag&amp;dropping the icon (10) anywhere with the right mouse button, you can create just such a template. Double clicking it won't open a result window, but the Find panel, giving you the opportunity to quickly change search strings or add/remove attributes.</p>
-<p>Wherever you choose to save query templates, they'll be listed in the Find panel's menu of recent queries.</p>
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="query-template" name="query-template">Plantillas de consulta</a></h2>
+<p>Si hace doble clic en una consulta guardada, la búsqueda de archivo está, se inicia e inmediatamente se abre la ventana de resultados. Sin embargo, tal vez no quiere buscar esos <i>exactos</i> parámetros de búsqueda, sino usarlos como punto de inicio para sólo ligeramente ajustar la fórmula.<br />
+Usando el elemento del menú <span class="menu">Save Query as Template</span> (Guardar búsqueda como plantilla) (véase <a href="#find-window">(1) la captura de pantalla</a> al inicio) o arrastrar y soltar el icono (10) en cualquier lugar con el botón derecho del ratón, se puede crear tal plantilla. Al darle doble clic no se abrirá la ventana de resultados, sino el panel Encontrar, dándole la oportunidad de cambiar rápidamente las cadenas de búsqueda o agregar/remover atributos.</p>
+<p>Dondesea que elija guardar las plantillas de búsqueda, se listarán en el menú del panel Encontrar de las consultas recientes.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="index.html">Índice</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workshop-filetypes+attributes.html">Workshop</a>  »
+::  <a href="contents.html" class="uplink">Contenidos</a> 
+::  <a href="workshop-filetypes+attributes.html">Taller</a>  »
 </span></div>
 </div>
 

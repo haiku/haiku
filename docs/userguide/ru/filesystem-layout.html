@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -41,7 +41,7 @@
 </ul>
 <span>
  «  <a href="bootloader.html">Загрузчик (Boot Loader)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="gui.html">Графический интерфейс Haiku</a>  »
 </span></div>
 </div>
@@ -66,17 +66,17 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="system" name="system">Системная папка - <span class="path">/boot/system/</span></a></h2>
 <p>У BeOS, предшественника Haiku, эта папка находилась по следующему адресу <span class="path">/boot/beos/</span>. Вы всё ещё можете её найти в старых документациях (например, в оригинальной BeBook).<br />
-Неважно как она называется, главное ничего не изменять внутри неё. Каждое обновление в Haiku может добавить, удалить или перезаписать что-либо, находящееся в ней. Если Вы хотите расширить функциональность при помощи дополнений для файлового менеджера Tracker или трансляторов, либо драйвера для устройства, Вы должны устанавливать их в свою папку <span class="path">/boot/home/</span>. Однако если они предназначены для всех пользователей, то они должны быть установлены в <span class="path">/boot/common/</span>. Пока Haiku не поддерживает многопользовательский режим, это различие не имеет очевидного эффекта: в данный момент существует один пользователь с единственной <i>домашней (home)</i> папкой. Однако когда появится поддержка многопользовательского режима, это будет иметь значение, так что стоит с самого начала выбрать правильный путь.</p>
-<p>Давайте представим, что Вы хотите установить новый транслятор для нового формата изображения. Тогда Вы <b>не должны</b> копировать его в соответствующую системную папку. Запомните: Не трогать!<br />
-Вместо этого Вы должны скопировать его в аналогичную по назначению папку, находящуюся по адресу <span class="path">/boot/common/</span> или <span class="path">/boot/home/config/</span>.</p>
+Неважно как она называется, главное ничего не изменять внутри неё. Каждое обновление в Haiku может добавить, удалить или перезаписать что-либо, находящееся в ней. Если вы хотите расширить функциональность при помощи дополнений для файлового менеджера Tracker или трансляторов, либо драйвера для устройства, вы должны устанавливать их в свою папку <span class="path">/boot/home/</span>. Однако если они предназначены для всех пользователей, то они должны быть установлены в <span class="path">/boot/common/</span>. Пока Haiku не поддерживает многопользовательский режим, это различие не имеет очевидного эффекта: в данный момент существует один пользователь с единственной <i>домашней (home)</i> папкой. Однако когда появится поддержка многопользовательского режима, это будет иметь значение, так что стоит с самого начала выбрать правильный путь.</p>
+<p>Давайте представим, что вы хотите установить новый транслятор для нового формата изображения. Тогда вы <b>не должны</b> копировать его в соответствующую системную папку. Запомните: Не трогать!<br />
+Вместо этого вы должны скопировать его в аналогичную по назначению папку, находящуюся по адресу <span class="path">/boot/common/</span> или <span class="path">/boot/home/config/</span>.</p>
 <p>В нашем примере расположение трансляторов в системной папке будет</p>
 <p><span class="path">/boot/system/add-ons/Translators/</span></p>
 <p>Аналогичная пользовательская папка находится по адресу</p>
 <p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
 либо<br />
 <span class="path">/boot/common/add-ons/Translators/</span></p>
-<p>Это дает ещё один положительный момент: Если компонент, который Вы установили, работает некорректно (например, драйвер), Вы можете выбрать "<i>Запретить загрузку пользовательских дополнений (Disable User Add-Ons)</i>" в меню <a href="bootloader.html">загрузчика</a> и тогда Вы всегда сможете загрузиться без проблемного компонента..</p>
-<p>В основном Вы не будете иметь дело с подобными вещами, т.к. каждое программное обеспечение, поставляемое из надежного источника, должно уметь делать эти вещи автоматически.<br />
+<p>Это дает ещё один положительный момент: Если компонент, который вы установили, работает некорректно (например, драйвер), вы можете выбрать "<i>Запретить загрузку пользовательских дополнений (Disable User Add-Ons)</i>" в меню <a href="bootloader.html">загрузчика</a> и тогда вы всегда сможете загрузиться без проблемного компонента..</p>
+<p>В основном вы не будете иметь дело с подобными вещами, т.к. каждое программное обеспечение, поставляемое из надежного источника, должно уметь делать эти вещи автоматически.<br />
 <!--
 If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
 </p>
@@ -94,11 +94,11 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="home" name="home">Домашняя папка - <span class="path">/boot/home/</span></a></h2>
-<p>Эта папка принадлежит Вам. Здесь Вы можете создавать и удалять файлы и папки по своему желанию. Тем не менее не стоит засорять папку <span class="path">~/config/</span> и все папки, находящиеся в ней. Вы <i>можете</i> удалить, к примеру, <span class="path">~/config/settings/</span> папку без ущерба для системы, но кто захочет потерять все свои настройки? В любом случае, система предупредит Вас, как показано в примере выше.</p>
+<p>Эта папка принадлежит вам. Здесь вы можете создавать и удалять файлы и папки по своему желанию. Тем не менее не стоит засорять папку <span class="path">~/config/</span> и все папки, находящиеся в ней. Вы <i>можете</i> удалить, к примеру, <span class="path">~/config/settings/</span> папку без ущерба для системы, но кто захочет потерять все свои настройки? В любом случае, система предупредит вас, как показано в примере выше.</p>
 <p>Кроме того, папка <span class="path">~/config/add-ons/</span>, как и системная, предназначена для дополнительных компонентов. (Кстати, знак тильда ("<tt>~</tt>") это ссылка на Вашу домашнюю папку, так что Вам не придется каждый раз писать "<span class="path">/boot/home/</span>" в терминале.)</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>По умолчанию здесь хранится Ваша почта.</td></tr>
+<td>По умолчанию здесь хранится ваша почта.</td></tr>
 
 <tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
 <td>В этой папке хранятся <a href="queries.html">запросы</a> в течении 7-ми дней.</td></tr>
@@ -107,7 +107,7 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <td>Снова наше BeOS наследие, папка <span class="path">be</span>, содержит все что показывается в <a href="deskbar.html#deskbar-menu">в меню панели задач Deskbar (Deskbar menu)</a>. Вы можете добавлять или удалять элементы при помощи панели конфигурации или просто путем копирования файлов, папок или ссылок непосредственно в эту папку.</td></tr>
 
 <tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>Дополняет системную папку <span class="path">/boot/system/bin/</span> и хранит все Ваши приложения для командной строки (терминала).</td></tr>
+<td>Дополняет системную папку <span class="path">/boot/system/bin/</span> и хранит все ваши приложения для командной строки (терминала).</td></tr>
 
 <tr><td><span class="path">~/config/boot/</span></td><td> </td>
 <td>Эта папка для хранения <a href="bash-scripting.html#user-scripts">сценариев пользователя</a>, которые выполняются до или после загрузки/выключения системы.</td></tr>
@@ -116,13 +116,13 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <td>Создайте ссылку на приложение или документ в этой папке, и при каждой загрузке они будут запускаться.</td></tr>
 
 <tr><td><span class="path">~/config/fonts/</span></td><td> </td>
-<td>Просто скопируйте TrueType или Postscript шрифт в эту папку и Вы сможете ими мгновенно воспользоваться.</td></tr>
+<td>Просто скопируйте TrueType или Postscript шрифт в эту папку и вы сможете ими мгновенно воспользоваться.</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
 <td>Эта папка содержит настройки для всех приложений и некоторые настройки системы. Некоторые приложения хранят свои настройки в собственных папках, другие просто хранят конфигурационные файлы прямо здесь.</td></tr>
 
 <tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
-<td>В этой  <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> -базе данных Haiku отслеживает все <a href="filetypes.html">типы файлов</a> и их настройки (примечание: MIME - Multipurpose Internet Mail Extension — многоцелевые расширения интернет-почты, произносится как «майм»).</td></tr>
+<td>В этой <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> -базе данных Haiku отслеживает все <a href="filetypes.html">типы файлов</a> и их настройки (примечание: MIME - Multipurpose Internet Mail Extension — многоцелевые расширения интернет-почты, произносится как «майм»).</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
 <td>Здесь располагается один из файлов с настройками, которые могут быть интересны: файл <span class="cli">kernel</span> предлагает некоторые низкоуровневые настройки, например, отключение <acronym title="Symmetric Multi Processing">SMP</acronym>, активация APM. Вы можете активировать настройки путем удаления символа комментария "<tt>#</tt>". Будьте осторожны!</td></tr>
@@ -130,11 +130,11 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
 <td>Здесь располагаются несколько интересных папок:</td></tr>
 
-<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Показывает и упорядочивает все атрибуты и размеры окна по Вашему вкусу. Каждая новая папка, которую Вы создадите, будет использовать этот шаблон.</td></tr>
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Показывает и упорядочивает все атрибуты и размеры окна по вашему вкусу. Каждая новая папка, которую вы создадите, будет использовать этот шаблон.</td></tr>
 
 <tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>Вы можете определить формат окна результатов поиска для определенных типов файлов. Для более подробного изучения следует обратиться к теме <a href="queries.html#result-window">запросы: Окно результатов поиска.</a>.</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Поместите сюда ссылки на Ваши избранные папки, и Вы их увидите в диалогах открытия и сохранения. Для более подробного изучения следует обратиться к теме <a href="gui.html#favorites-recent">графический интерфейс Haiku: Избранные и недавно открытые папки</a>.</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Поместите сюда ссылки на ваши избранные папки, и вы их увидите в диалогах открытия и сохранения. Для более подробного изучения следует обратиться к теме <a href="gui.html#favorites-recent">графический интерфейс Haiku: Избранные и недавно открытые папки</a>.</td></tr>
 
 <tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Добавьте шаблон для любого типа файла, который впоследствии будет доступен в меню файлового менеджера <span class="menu">Файл | Создать (File | New... )</span> menu. Для более подробного изучения следует обратиться к теме <a href="tracker.html#working-with-files">Tracker - Файловый менеджер: Работа с файлами</a>.</td></tr>
 </table>
@@ -145,7 +145,7 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="bootloader.html">Загрузчик (Boot Loader)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Содержание</a> 
 ::  <a href="gui.html">Графический интерфейс Haiku</a>  »
 </span></div>
 </div>

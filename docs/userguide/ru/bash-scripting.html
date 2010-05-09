@@ -11,7 +11,8 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		mrNoisy
- *		michael_s
+ *		Michael Smirnov
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +37,7 @@
 <li><a href="../es/bash-scripting.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/bash-scripting.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/bash-scripting.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bash-scripting.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -50,8 +52,8 @@
 
 <h1>Bash и скрипты</h1>
 
-<p>"Скриптинг" - это техника автоматизации процедур путем объединения команд и сохранения его в виде текстовых файлов, называемых "скриптами" ("сценариями"). Всякий раз, когда вы запускаете скрипт, команды обрабатываются одна за одной так, будто они были введены вами в <a href="applications/terminal.html">Терминале (Terminal)</a> вручную.<br />
-Скрипты могут варьировать от простейших, выполняющих всего несколько команд в особом порядке, до нетривиальных фрагментов кода, решающих сложные задачи.</p>
+<p>"Скриптинг" - это техника автоматизации процедур путем объединения команд и сохранения их в виде текстовых файлов, называемых "скриптами" ("сценариями"). Всякий раз, когда вы запускаете скрипт, команды обрабатываются одна за одной так, будто они были введены вами в <a href="applications/terminal.html">Терминале (Terminal)</a> вручную.<br />
+Скрипты могут варьироваться от простейших, выполняющих всего несколько команд в особом порядке, до нетривиальных фрагментов кода, решающих сложные задачи.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -61,11 +63,11 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="scripting-bible" name="scripting-bible">Библия скриптинга</a></h2>
-<p>После того, как вы изучили некоторые основы работы в командной строке, пришло время выпускать себя в мир скриптинга. Опять же, множество руководств вы найдете в сети и на полках книжных магазинов. Книга, созданная специально для Haiku, доступна онлайн: <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) от создателя "BeOS Bible" - Скота Хакера (Scot Hacker).</p>
+<p>После того, как вы изучили некоторые основы работы в командной строке, пришло время выпускать себя в мир скриптинга. Опять же, множество руководств вы найдете в сети и на полках книжных магазинов. Книга, созданная специально для Haiku, доступна онлайн: <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900кб</a>) от создателя "BeOS Bible" - Скота Хакера (Scot Hacker).</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Скрипты в Haiku</a></h2>
-<p>Разумеется, в работе Haiku тоже используются скрипты. Загрузка и завершение работы - типичные скриптовые процедуры. Эти четко определенные последовательности могут быть расширены с помощью пользовательских скриптов.<br /> Если они еще не существуют, вам придется создать их самостоятельно. В ином случае, просто добавьте нужные команды туда, где они должны быть выполнены.</p>
+<p>Разумеется, в работе Haiku тоже используются скрипты. Загрузка и завершение работы - типичные скриптовые процедуры. Эти четко определенные последовательности могут быть расширены с помощью пользовательских скриптов.<br /> Если они еще не существуют, вам придется создать их самостоятельно. В ином случае просто добавьте нужные команды туда, где они должны быть выполнены.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -76,14 +78,14 @@
 
 # Запуск Workspaces
 /boot/system/apps/Workspaces &amp;</pre>
-<p>Не забудьте добавить в конце команды знак "<tt>&amp;</tt>", чтобы запустить этот процесс в фоновом режиме, иначе скрипт зависнет, пока эта команда не будет завершена, (в данном случае, когда запущенное приложение будет закрыто).</p>
+<p>Не забудьте добавить в конце команды знак "<tt>&amp;</tt>", чтобы запустить этот процесс в фоновом режиме, иначе скрипт зависнет, пока эта команда не будет завершена (в данном случае, когда запущенное приложение будет закрыто).</p>
 
-<p>Более простая альтернатива для запускающихся приложений во время загрузки - разместить ссылки на необходимые программы в папке<span class="path">/boot/home/config/boot/launch</span>. Это может быть сделано правым кликом по приложению, которое вы хотели бы поместить в автозапуск, затем выбрав <span class="menu">Создать ссылку (Create Link)</span> и, затем, выполните перемещение по папкам используя <a href="tracker.html#navigating">навигацию</a>.</p>
+<p>Более простая альтернатива для запускающихся приложений во время загрузки - разместить ссылки на необходимые программы в папке <span class="path">/boot/home/config/boot/launch</span>. Это может быть сделано правым кликом по приложению, которое вы хотели бы поместить в автозапуск, выбрав меню <span class="menu">Создать ссылку (Create Link)</span> и затем выполнив перемещение по папкам используя <a href="tracker.html#navigating">навигацию</a>.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a></h3>
-<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> будет выполнен в качестве первого этапа в процессе завершения работы. Если скрипт возвращает ненулевой результат по окончанию, завершение работы прекращается.</p>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> будет выполнен в качестве первого этапа в процессе завершения работы. Если скрипт возвращает ненулевой результат по окончании, завершение работы прекращается.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

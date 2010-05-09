@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -40,7 +40,7 @@
 </ul>
 <span>
  «  <a href="teammonitor.html">Monitor de actividad (Team Monitor)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="tracker-add-ons.html">Agregados de Tracker</a>  »
 </span></div>
 </div>
@@ -73,7 +73,7 @@
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
 <p>También hay <span class="menu">Mount Settings</span> (selecciones de montaje) para que no tenga que montar todo manualmente después de cada inicio de sistema.<br />
 Las selecciones de arriba automáticamente montarán cualquier dispositivo de almacenamiento que se haya conectado o insertado y también montará todos los discos al inicio que fueron montados previamente.</p>
-<div class="box-warning">Antes de desconectar, p. ej., un disco duro o una unidad USB, asegúrese que haya desmontado exitosamente el volumen. Esto garantiza que toda la transferencia de información haya terminado. ¡De lo contrario podría perder su información o corromper el disco!</div>
+<div class="box-warning">Antes de desconectar, p. ej., un disco duro o una unidad USB, asegúrese de haber desmontado exitosamente el volumen. Esto garantiza que toda la transferencia de información haya terminado. ¡De lo contrario podría perder su información o corromper el disco!</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -102,6 +102,12 @@ Si hace lo de arriba mientras arrastre un archivo consigo, se moverá adonde eve
 <p>Puede que esté familiarizado con el concepto de administradores de archivos de otros sistemas operativos: al escribir las primeras letras de un nombre de archivo se saltará hacia el primer archivo que concuerde con esos carácteres iniciales. Haiku tomó la idea un paso más adelante. Si no hay un archivo que comience con esos carácteres, saltará al primer archivo que incluya la cadena en cualquier lugar en su nombre. Y si no hay nada con la cadena en su nombre de archivo, se busca enseguida en los atributos.</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
 <p>En el ejemplo de arriba, hay muchos archivos que inician con "Haiku logo", acercamientos más simples que type-ahead son inútiles. En Haiku, sin embargo, escribir "web" salta enseguida a la primera aparición en "Haiku logo - website". Los carácteres que se ingresan aparecen en la esquina inferior izuierda donde normalmente se encuentra el ítem enumerando todos los archivos en la carpeta. Un segundo después de ingresar un carácter, la visualizaciön regresa a la normalidad y está lista para una nueva búsqueda de type-ahead.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="type-ahead-filter" name="type-ahead-filter">Filtrado de Type-ahead</a></h3>
+<p>En lugar de saltar a un archivo mientras se escribe, también está la opción de filtrar todos los los archivos que no concuerden con la cadena de type-ahead. Esto puede mejorar la claridad dramáticamente, en especial cuando se trabaja con carpetas muy pobladas. Al usar <span class="key">MAYÚSCULAS</span> <span class="key">BARRA ESPACIADORA</span> como delimitadores, puede inclusive filtrar sobre múltiples cadenas.<br />
+Al contrario al salto de type-ahead, el filtrado se mantendrá hasta que presione <span class="key">ESC</span> o cierre la ventana (o deje el folder si está utilizando Navegación en una sola ventana).<br />
+Este filtrado de type-ahead se selecciona en las <a href="#tracker-preferences.html">Preferencias de Tracker</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -131,11 +137,12 @@ Si hace lo de arriba mientras arrastre un archivo consigo, se moverá adonde eve
 <br />Así que, en breve, las selecciones no tan obvias:</p>
 <ul>
 <li><p><b>Desktop</b> - Decide si todos los discos montados aparecerán directamente en el escritorio o en una ventana después de dar clic en un solo icono de disco situado en el Escritorio.</p></li>
-<li><p><b>Windows</b> (venatanas) - Puede seleccionarse <span class="menu">Single Window Navigation</span> (navegación en una sola ventana), p. ej., si al dar doble clic en una carpeta no se abre en su propia ventana, sino dentro de la ventana ya abierta, remplazando la vista de su carpeta padre. Esto no es lo mismo que dar clic mientras se mantiene presionada la tecla <span class="key">OPT</span>, como se describió arriba, ya que se perderá la posición y tamaño guardado por cada ventana.
+<li><p><b>Windows</b> (ventanas) - Puede seleccionarse <span class="menu">Single Window Navigation</span> (navegación en una sola ventana), p. ej., si al dar doble clic en una carpeta no se abre en su propia ventana, sino dentro de la ventana ya abierta, remplazando la vista de su carpeta padre. Esto no es lo mismo que dar clic mientras se mantiene presionada la tecla <span class="key">OPT</span>, como se describió arriba, ya que se perderá la posición y tamaño guardado por cada ventana.
 <br /><br />
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
 </p>
-<p>Antes que elija el modo "Single Window Navigation" de Tracker, ya que puede ser más familiar, le recomendamos darle una oportunidad a la exploración basada en menús, porque puede funcionar mucho más rápido tras acostumbrarse. Del otro lado, la navegación en ventana única ofrece un <i>Navegador</i> donde se puede ingresar o copiar y pegar un nombre de ruta y usar los botones atrás, adelante y arriba.</p></li>
+<p>Antes que elija el modo "Single Window Navigation" de Tracker, ya que puede ser más familiar, le recomendamos darle una oportunidad a la exploración basada en menús, porque puede funcionar mucho más rápido tras acostumbrarse. Del otro lado, la navegación en ventana única ofrece un <i>Navegador</i> donde se puede ingresar o copiar y pegar un nombre de ruta y usar los botones atrás, adelante y arriba.</p>
+<p>Activar el filtrado de <span class="menu">Type-ahead</span> filtrará los contenidos de una ventana de Tracker mientras se escribe para desplegar sólo los archivos que concuerden con la cadena en su nombre o cualquier atributo actualmente desplegado. Vea <a href="#type-ahead-filter">arriba</a>.</p></li>
 <li><p><b>Date and Time</b> (Fecha y hora) - Selecciona los formatos de fecha y hora.</p></li>
 <li><p><b>Trash</b> (Basura) - Selecciona el comportamiento cuando se borre un archivo.</p></li>
 <li><p><b>Volume Icons</b> (Iconos de volúmenes) - Seleccione el color de un indicador opcional del espacio libre que se muestra además del icono del disco.</p></li>
@@ -186,7 +193,7 @@ Si hace lo de arriba mientras arrastre un archivo consigo, se moverá adonde eve
 <div class="nav">
 <div class="inner"><span>
  «  <a href="teammonitor.html">Monitor de actividad (Team Monitor)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">Contenidos</a> 
 ::  <a href="tracker-add-ons.html">Agregados de Tracker</a>  »
 </span></div>
 </div>

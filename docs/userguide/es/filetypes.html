@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Oscar Carballal
+ *		miguel~1.mx
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -40,8 +41,8 @@
 </ul>
 <span>
  «  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="attributes.html">Attributes</a>  »
+::  <a href="contents.html" class="uplink">Contenidos</a> 
+::  <a href="attributes.html">Atributos</a>  »
 </span></div>
 </div>
 
@@ -54,8 +55,8 @@
 <div class="box-info">Debido a que no hay razón para utilizar extensiones de archivo en Haiku, deberá recordar ponerlas cuando quiera compartir archivos con usuarios de otros sistemas operativos a través de, por ejemplo, correo electrónico, subiendo el archivo a un servidor o intercambiándolo en una unidad USB. De lo contrario, puede que el sistema no reconozca el tipo de archivo.</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="specific-file" name="specific-file">Setting the filetype of a specific file</a></h2>
-<p>You can change the type of a specific file, its icon and the associated application. Select the file and invoke the <span class="menu">Add-Ons | Filetype add-on</span> from the right-click context menu.</p>
+<a id="specific-file" name="specific-file">Configurar el tipo de un archivo en específico</a></h2>
+<p>Se puede cambiar el tipo de un archivo en específico, su icono y la aplicación asociada al mismo. Seleccione el archivo e invoque el menú <span class="menu">Add-Ons | Filetype add-on</span> del menú contextual del menú derecho del ratón.</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
@@ -63,8 +64,8 @@
 <a name="filetype" id="filetype">El tipo de archivo</a></h3>
 <p>La imagen mostrada arriba es un archivo PNG y su cadena MIME es image/png. Digamos que sabe que no es un PNG, sino un GIF. Puede cambiarlo escribiendo ls cadena MIME correcta a mano, o bien mediante alguno de los dos botones debajo del cuadro de texto.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select... (Seleccionar)</span></td><td> </td><td>muestra una lista jerárquica donde puede navegar hasta <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Same as... (Mismo que)</span></td><td> </td><td>abre un diálogo de archivo donde puede elegir cualquier archivo que ya contenga el tipo que está buscando.</td></tr>
+<tr><td><span class="button">Select...</span></td><td> </td><td>(Seleccionar) Muestra una lista jerárquica donde puede navegar hasta <tt>image | GIF Image</tt>.</td></tr>
+<tr><td><span class="button">Same as... </span></td><td> </td><td>(Mismo que) Abre un diálogo de archivo donde puede elegir cualquier archivo que ya contenga el tipo que está buscando.</td></tr>
 </table>
 
 <h3>
@@ -72,36 +73,35 @@
 <a id="preferred-app" name="preferred-app">La aplicación preferida</a></h3>
 <p>Este menú desplegable muestra una lista de todas las aplicaciones que pueden manejar este tipo de archivo en particular. Aquí se puede seleccionar que aplicación debe abrir el archivo al hacer doble clic sobre él. Se puede, por ejemplo, cambiar la aplicación preferida para abrir HTML de un navegador a un editor de texto mientras se está trabajando en él. Todos los demás ficheros HTML se abrirán todavía con el navegador, sólo este se abrirá en el editor de texto.</p>
 
-<p>La <span class="menu">Default Application (Aplicación preferida)</span> es la única que se configura de forma global para el tipo de archivo. Si no encuentra la aplicación que quiere asociar con este tipo de archivo en el menú desplegable, encontrará de nuevo los botones <span class="button">Select... (Seleccionar)</span> and <span class="button">Same As... (Mismo que)</span> que cumplen las mismas funciones que se decribieron en "El tipo de archivo".</p>
+<p>La <span class="menu">Default Application</span> (Aplicación preferida) es la única que se configura de forma global para el tipo de archivo. Si no se encuentra la aplicación que quiera asociar con este tipo de archivo en el menú desplegable, encontrará de nuevo los botones <span class="button">Select...</span>  (Seleccionar) y <span class="button">Same As...</span> (Mismo que) que cumplen las mismas funciones que se describieron bajo "El tipo de archivo" en la sección de arriba.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">El Icono</a></h3>
-<p>If you're wondering why the icon well on the top right is empty: Icons are normally inherited from the system default for that filetype. You can open the <span class="app">Filetype Add-On</span> of a file that contains an icon and drag&amp;drop it into your file's icon well. Or you double-click the icon well and create or edit your own icon. For more info on icons and how to create your own, see topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+<a id="icon" name="icon">El icono</a></h3>
+<p>Si se pregunta por qué el recuadro de icono en la parte superior derecha está vacío: los iconos normalmente se heredan del predeterminado del sistema para ese tipo de archivo. Puede abrir el <span class="app">Filetype Add-On</span> de un archivo que contenga un icono y arrastrarlo hasta el recuadro de icono de su archivo. O puede hacer doble clic en el recuadro de icono y crear o editar su propio icono. Para más información acerca de iconos y cómo crear uno propio, vea el tema <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="settings-apps" name="settings-apps">Configuraciones especiales para aplicaciones</a></h2>
-<p>If you invoke the <span class="app">Filetype Add-On</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
+<p>Si se invoca el <span class="app">Agregado Tipo de archivo</span> sobre un ejecutable *aquí: <span class="app">StyledEdit</span>), se obtendrá un diálogo diferente:</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
-<p>On top, you'll see, instead of a standardized MIME string, the unique application signature. With it, the system finds the program wherever it's installed.</p>
-<p>Below it are several flags, controlling the app's behaviour:</p>
+<p>Además, en lugar de una cadena MIME estandarizada, verá la firma de aplicación única. Con él, el sistema encuentra el programa dondesea que esté instalado.</p>
+<p>Debajo de él hay varias banderas, controlando el comportamiento de la aplicación:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Single Launch</span></td><td> </td><td>Only one instance of the app can be running per executable file. If you have two copies of that app, however, they can run side by side.</td></tr>
-<tr><td><span class="menu">Multiple Launch</span></td><td> </td><td>Many instances of the app can run simultaneously.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Exclusive Launch</span></td><td> </td><td>Really only one instance with that app's signature is allowed to run at a time.</td></tr>
-<tr><td><span class="menu">Args Only</span></td><td> </td><td>Indicates the app doesn't respond to messages.</td></tr>
-<tr><td><span class="menu">Background App</span></td><td> </td><td>The app won't appear in <a href="twitcher.html">Twitcher</a> or the list of running apps of the Deskbar.</td></tr>
+<tr><td><span class="menu">Single Launch</span></td><td> </td><td>(Ejecución única) Sólo una instancia de la aplicación puede correr por ejecutable. Si tiene dos copias de la aplicación, no obstante, pueden correr lado a lado.</td></tr>
+<tr><td><span class="menu">Multiple Launch</span></td><td> </td><td>(Ejecución múltiple) Muchas instancias de la aplicación pueden correr simultáneamente.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Exclusive Launch</span></td><td> </td><td>(Ejecución exclusiva) En realidad sólo a una instancia con la firma de esa aplicación se le permite correr a la vez.</td></tr>
+<tr><td><span class="menu">Args Only</span></td><td> </td><td>(Sólo args) Indica que la aplicación no responde a los mensajes.</td></tr>
+<tr><td><span class="menu">Background App</span></td><td> </td><td>(Aplicación de fondo) La aplicación no aparecerá en <a href="twitcher.html">Twitcher</a> o en la lista de las aplicaciones que corren del Deskbar.</td></tr>
 </table>
-<p>Then there's the list of supported filetypes. You can add (and remove) filetypes if you think the application can handle them. As a consequence, the app will appear in the menu for preferred applications or Tracker's <span class="menu">Open with...</span> context menu when you right-click on a file of that type.</p>
-<p>At the bottom are version and copyright information. Like the application signature, they are filled in by the app's author and shouldn't be altered.</p>
+<p>Luego está la lista de los tipos de archivo soportados. Se pueden agregar (y remover) tipos de archivo si piensa que la aplicación puede manejarlos. Como consecuencia, la aplicación aparecerá en el menú para las aplicaciones preferidas del menú contextual <span class="menu">Open with...</span> de Tracker cuando se le dé clic derecho en un archivo de ese tipo.</p>
+<p>Hasta abajo están la información de la versión y de derechos reservados. Como con la firma de la aplicación, se llenan por el autor de la aplicación y no deberían alterarse.</p>
 
-<h2>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filetypes-preferences" name="filetypes-preferences">Global settings with the FileTypes Preferences</a></h2>
-<p>The <span class="app">FileTypes</span> preferences don't deal with individual files but with global settings of filetypes. You can change default icons and preferred applications or add, remove, or alter attributes of whole filetypes. You can even create your own filetype from scratch.</p>
-<p>All filetypes and their configurations are stored in <span class="path">/boot/home/config/settings/beos_mime/</span>. Before you start experimenting, it may be prudent to make a backup of that folder...</p>
-<p>To learn more about the <span class="app">FileTypes</span> preferences see the workshop: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>
+<h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="filetypes-preferences" name="filetypes-preferences">Configuración global con las Preferencias de tipos de archivo</a></h2>
+<p>Las preferencias de <span class="app">Tipos de archivo</span> no lidian con archivos individuales, sino con configuraciones globales de tipo de archivo. Pueden cambiarse los iconos predeterminados y las aplicaciones preferidas para agregar, remover o alterar atributos de todos los tipos de archivo. Puede incluso crear un tipo de archivo propio desde cero.</p>
+<p>Todos los tipos de archivo y su configuración se almacenan en <span class="path">/boot/home/config/settings/beos_mime/</span>. Antes que comience a experimentar, sería prudente hacer una copia de respaldo de esa carpeta...</p>
+<p>Para aprender más acerca de las preferencias de <span class="app">Tipos de archivo</span> vea el taller: <a href="workshop-filetypes+attributes.html">Tipos de archivo, atributos, índices y consultas</a>.</p>
 
 </div>
 </div>
@@ -109,8 +109,8 @@
 <div class="nav">
 <div class="inner"><span>
  «  <a href="deskbar.html">Deskbar (Barra de Escritorio)</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="attributes.html">Attributes</a>  »
+::  <a href="contents.html" class="uplink">Contenidos</a> 
+::  <a href="attributes.html">Atributos</a>  »
 </span></div>
 </div>
 

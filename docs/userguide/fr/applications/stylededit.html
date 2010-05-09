@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +36,7 @@
 <li><a href="../../es/applications/stylededit.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/stylededit.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/stylededit.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/stylededit.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/stylededit.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,12 +53,12 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/StyledEdit</span></td></tr>
-<tr><td>Réglages :</td><td></td><td><i>aucun</i></td></tr>
+<tr><td>Réglages :</td><td></td><td><i>aucun</i></td></tr>
 </table>
 <p><br /></p>
-<p>StyledEdit is Haiku's simple text editor. Although it saves files in plain text format, additional attributes are written in order to have limited formatting capabilities when viewed with StyledEdit.</p>
+<p>StyledEdit est un éditeur de texte simple intégré à Haiku. Bien qu’il enregistre les fichiers dans un format texte brut, des attributs supplémentaires sont écrits afin de disposer de capacités de mise en forme lorsque le document est utilisé dans StyledEdit.</p>
 <img src="../images/apps-images/stylededit.png" alt="stylededit.png" />
-<p>If you're interested, this is what those additional attributes look like when examined in Terminal with <span class="cli">listattr</span>:</p>
+<p>Si vous êtes intéressé, voici quels sont ces attributs, listés via la commande Terminal <span class="cli">listattr</span>:</p>
 <pre class="terminal">~&gt; listattr /boot/home/Desktop/test.txt
 File: /boot/home/Desktop/test.txt
   Type         Size                 Name
@@ -68,10 +70,10 @@ MIME String         11  "BEOS:TYPE"
    Raw Data       1048  "styles"
 
 1071 bytes total in attributes.</pre>
-<p>As you can see, all the formatting options from StyledEdit's menu are present: line wrapping (on/off) and alignment (left/center/right), each in one attribute. Styles (font, size, color) of each letter mangled into another.</p>
-<div class="box-info">Because these attributes are a file system feature of BFS, this means that not only other platforms just see a plain text file, it also follows, that the formatting will be lost when a file is stored on a non-BFS partition. The above attributes are simply stripped and what's left is the ordinary, plain text file.</div>
-<p>In any case, it's a nice idea having the possibility of colored text in different fonts and sizes while still being a normal text file. A <span class="cli">ReadMe.txt</span>, for example, is therefore readable in a shell on any platform and still has a bit of style when viewed via double-click from Haiku.</p>
-<p>Actually using StyledEdit is so simple, we'll skip explaining every mundane menu item. Just write down your text then select the words you'd like to format and apply font, size and color from the <span class="menu">Font</span> menu. Line wrapping and alignment from the <span class="menu">Document</span> menu only work on the whole file.</p>
+<p>Comme vous pouvez le voir, toutes les options de mise en forme du menu de StyledEdit sont présentes : retour à la ligne (<i>line wrapping</i>, activé ou non) et alignement (gauche, centré, droite), chacun enregistré dans un attribut. Les styles (police, tailles, couleur) de chaque lettre sont enregistrés dans un autre.</p>
+<div class="box-info">Comme ces attributs sont enregistrés par le système de fichier BFS, les autres systèmes ne verront qu’un fichier texte simple. Ceci signifie aussi que la mise en forme sera perdue si le fichier est enregistré sur une partition non-BFS.</div>
+<p>Dans tous les cas, il est intéressant d’avoir la possibilité d’utiliser du texte coloré dans différentes polices et tailles tout en gardant le format d’un fichier de texte brut. Un fichier <span class="cli">LisezMoi.txt</span>, par exemple, peut être lu dans un Terminal et sous n’importe quel système tout en ayant une apparence agréable lorsque visualisé dans StyledEdit.</p>
+<p>Comme l’utilisation de StyledEdit est très simple, nous ne détaillerons pas chaque élément de menu. Écrivez simplement votre texte puis sélectionnez les mots que vous voulez formattez, puis appliquez une police, taille et couleur à l’aide du menu <span class="menu">Font</span>. Le retour à la ligne automatique et l’alignement du texte se configurent pour tout le fichier depuis le menu <span class="menu">Document</span>.</p>
 
 </div>
 </div>

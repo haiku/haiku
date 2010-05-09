@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +36,7 @@
 <li><a href="../../es/applications/screenshot.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../sv_SE/applications/screenshot.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/applications/screenshot.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/screenshot.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../../en/applications/screenshot.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -51,21 +53,21 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span></td></tr>
-<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
+<tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>Besides normal screenshots taken via <span class="key">PRINT</span>, which puts a PNG of the current screen into <span class="path">/boot/home/</span>, this application provides some useful options.</p>
+<p>En plus de la copie d’écran classique <i>via</i> la touche <span class="key">IMPR ÉCRAN</span>, qui crée une image PNG de l’écran dans <span class="path">/boot/home/</span>, cette application fournit quelques options supplémentaires.</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>Starting Screenshot will take a screenshot as usual, but offers from its main window controls to set filename, format and folder before saving the image.</p>
-<p>The <span class="button">Options</span> dialog has a few more settings:</p>
+<p>Démarrer Screenshot fera une capture d'écran comme d'habitude, mais vous permettra de contrôler depuis la fenêtre principale, le nom, le format et le dossier du fichier avant d'enregistrer l'image.</p>
+<p>La boite de dialogue <span class="button">Options</span> contient quelques paramètres de plus :</p>
 <p><img id="sreenshot-options" src="../images/apps-images/screenshot-options.png" alt="screenshot-options.png" /></p>
-<p>Besides the obvious, toggle between taking the whole screen or just the active window, including the window border and the mouse pointer, you can enter a delay before a screenshot is taken. Of course, this delay takes only effect if you take a new shot by pressing <span class="button">Take Screenshot</span>.</p>
+<p>En plus de permettre le choix entre une capture de l’écran entier (<span class="menu">Capture entire screen</span>) ou de la fenêtre active (<span class="menu">Capture active window</span>), d’inclure ou non la bordure de la fenêtre dans ce second cas (<span class="menu">Include window border</span>), cette fenêtre vous permet aussi d’entrer un délai avant la capture. Bien sûr, ce délai n’est effectif que si la capture est prise en pressant le bouton <span class="button">Take Screenshot</span>.</p>
 
 <h2>
-<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Taking a screenshot from Terminal</h2>
-<p>The Screenshot application is also usable from Terminal or a script.<br />
-<span class="cli">Screenshot --help</span> shows the familiar options as parameters:</p>
+<a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Effectuer un capture d'écran depuis le Terminal</h2>
+<p>L'application Screenshot est aussi utilisable depuis le Terminal ou depuis un script.<br />
+<span class="cli">Screenshot --help</span> 
+affiche les options en paramètres :</p>
 
 <pre class="terminal">~&gt; Screenshot --help
 

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../es/tracker.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/tracker.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/tracker.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/tracker.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -102,6 +103,12 @@ Wenn man bei dieser Art der Navigation zusätzlich noch einen Datei zieht, wird 
 <p>Das Konzept dürfte bereits von anderen Betriebssystemen her bekannt sein: durch Eintippen der ersten Buchstaben springt die Markierung zu der ersten Datei, die dem eingegebenen Text entspricht. In Haiku wurde dieses Konzept noch einen Schritt weiter entwickelt. Falls keine Datei mit den eingegebenen Buchstaben beginnt, wird die Datei markiert, die die Buchstabenreihe in ihrem Namen enthält; sollte dies auch nicht der Fall sein, so werden noch sämtliche Attribute der Dateien nach dieser Buchstabenreihe durchsucht. Zusätzlich wird noch der eingegebene Text unten links im Tracker-Fenster angezeigt. Wenn hier wieder auf die Anzahl-Anzeige umgeschaltet ist, kann eine neue Suche vorgenommen werden.</p>
 <img src="images/tracker-images/window-type-ahead.png" alt="window-type-ahead.png" />
 <p>Im obigen Beispiel wäre ein reine Suche nach den ersten Buchstaben eines Dateinamens nicht sinnvoll, da sehr viele Dateien mit "Haiku logo" beginnen. Unter Haiku jedoch wird nach Eingabe von "web" sofort zum ersten Vorkommen in der Datei " Haiku logo - website" gesprungen.</p>
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="type-ahead-filter" name="type-ahead-filter">Nach Dateien filtern</a></h3>
+<p>Anstatt zu den Dateien zu springen während man lostippt, gibt es auch noch die Möglichkeit alle Dateien rauszufiltern, die die eingegebene Zeichenfolge nicht enthalten. Dadurch werden gerade Verzeichnisse mit Unmengen an Dateien auf einmal sehr übersichtlich.  Mittels <span class="key">SHIFT</span> <span class="key">LEERTASTE</span> als Trenner lassen sich sogar mehrere Zeichenketten als Filter anwenden.<br />
+Im Gegensatz zum Dateien-anspringen bleibt der Filter aktiv, bis <span class="key">ESC</span> gedrückt wird oder das Fenster geschlossen wird (bzw. bei der Nutzung von Single Window Navigation, der Ordner gewechselt wird.)<br />
+Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Tracker Einstellungen</a> aktiviert.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -134,7 +141,10 @@ Wenn man bei dieser Art der Navigation zusätzlich noch einen Datei zieht, wird 
 <br /><br />
 <img src="images/tracker-images/tracker-preferences-navigator.png" alt="tracker-preferences-navigator.png" />
 </p>
-<p>Auch wenn die Ein-Fenster-Navigation sich vielleicht vertrauter anfühlt, sollte man der ursprünglichen Navigation von Haiku eine Chance geben, da es durchaus sein kann, dass man hiermit schneller navigiert. Andererseits bietet nur diese Einstellung die Möglichkeit, einen <i>Navigator</i> einzublenden, in dem man "vor" und "zurück", sowie ein Verzeichnis höher gehen und einen neuen Verzeichnispfad hineinkopieren kann.</p></li>
+<p>Auch wenn die Ein-Fenster-Navigation sich vielleicht vertrauter anfühlt, sollte man der ursprünglichen Navigation von Haiku eine Chance geben, da es durchaus sein kann, dass man hiermit schneller navigiert. Andererseits bietet nur diese Einstellung die Möglichkeit, einen <i>Navigator</i> einzublenden, in dem man "vor" und "zurück", sowie ein Verzeichnis höher gehen und einen neuen Verzeichnispfad hineinkopieren kann.</p>
+<p>Anstatt zu den Dateien zu springen während man lostippt, gibt es auch noch die Möglichkeit alle Dateien rauszufiltern, die die eingegebene Zeichenfolge nicht enthalten. Dadurch werden gerade Verzeichnisse mit Unmengen an Dateien auf einmal sehr übersichtlich.<br />
+Im Gegensatz zum Dateien-anspringen bleibt der Filter aktiv, bis <span class="key">ESC</span> gedrückt wird oder das Fenster geschlossen wird (bzw. bei der Nutzung von Single Window Navigation, der Ordner gewechselt wird.)<br />
+Dieses "type-ahead" filtern wird in den <a href="#tracker-preferences.html">Tracker Einstellungen</a> aktiviert.</p></li>
 <li><p><b>Date and Time</b> - Einstellung des Datumsformats für die Tracker-Fenster.</p></li>
 <li><p><b>Trash</b> - Die Verhaltensweise beim Löschen einer Datei kann hier eingestellt werden.</p></li>
 <li><p><b>Volume Icons</b> - Die Farbe des optionalen Füllstandsanzeigers bei den eingebundenen Datenträger kann hier eingestellt werden.</p></li>

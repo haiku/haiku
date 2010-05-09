@@ -10,20 +10,21 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
- *		michael_s
+ *		Michael Smirnov
  *		Rustam
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Дополнения для Tracker (Tracker Add-Ons)</title>
+	<title>Дополнения для Tracker (Tracker add-ons)</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +37,7 @@
 <li><a href="../es/tracker-add-ons.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/tracker-add-ons.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/tracker-add-ons.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/tracker-add-ons.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -48,33 +50,33 @@
 <div id="content">
 <div>
 
-<h1>Дополнения для Tracker (Tracker Add-Ons)</h1>
+<h1>Дополнения для Tracker (Tracker add-ons)</h1>
 
-<p>Некоторые приложения устанавливают дополнения (<span class="menu">Add-Ons</span>), и они могут быть легко вызваны для выбранных файлов в Tracker-е. В контекстном меню отображаются только те дополнения, которые применимы для выделенного файла (определяются по идентификатору типа), также их можно вызвать через меню File окна Tracker-а. Некоторые дополнения не обязательно нуждаются в файле для работы и присутствуют в меню всегда.</p>
-<p>Дополнения Tracker-а или симлинки на программы, которые могут действовать как дополнения, могут быть установлены в трех различных местоположениях (подробнее см. <a href="filesystem-layout.html">Иерархия файловой системы</a>):</p>
+<p>Некоторые приложения устанавливают дополнения (<span class="menu">Add-ons</span>), и они могут быть легко вызваны для выбранных файлов в Tracker. В контекстном меню отображаются только те дополнения, которые применимы для выделенного файла (определяются по идентификатору типа), также их можно вызвать через меню File окна Tracker. Некоторые дополнения не обязательно нуждаются в файле для работы и присутствуют в меню всегда.</p>
+<p>Дополнения Tracker или ссылки на программы, которые могут действовать как дополнения, могут быть установлены в трех различных местоположениях (подробнее см. <a href="filesystem-layout.html">Иерархия файловой системы</a>):</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, поставляемых с системой.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>для дополнений доступным всем пользователям.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>для дополнений доступных только текущему пользователю.</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных всем пользователям.</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>для дополнений, доступных только текущему пользователю.</td></tr>
 </table>
-<p>К имени файла дополнения может быть добавлено тире с заглавной буквой, и тогда оно станет доступно через горячие клавиши. Например, <span class="app">Open Target Folder-T (Открыть целевую папку)</span> откроется при нажатии <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
-Конечно, вы должны позаботиться о возможных конфликтах, выбирая горячую клавишу, у разных дополнений они должны быть разными.</p>
+<p>К имени файла дополнения может быть добавлено тире с заглавной буквой, и тогда оно станет доступно через горячие клавиши. Например, <span class="app">Open target folder-T (Открыть целевую папку)</span> откроется при нажатии <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
+Конечно, вы должны позаботиться о возможных конфликтах, выбирая горячую клавишу. У разных дополнений они должны быть разными.</p>
 
-<h2><a id="system-add-ons" name="system-add-ons">Дополнения  Tracker-а из Haiku</a></h2>
-<p>Следующие дополнения Tracker-а имеются в каждой установленной Haiku:</p>
+<h2><a id="system-add-ons" name="system-add-ons">Дополнения Tracker из Haiku</a></h2>
+<p>Следующие дополнения Tracker имеются в каждой установленной Haiku:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
 	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">Открывает настройки <a href="preferences/backgrounds.html">фона (Background)</a>, где можно изменить цвет или изображение рабочего стола или любой папки. Если это дополнение вызвано на графическом файле, то это изображение появится в окне предварительного просмотра как потенциальный фон.</td></tr>
+		<td valign="top">Открывает настройки <a href="preferences/backgrounds.html">фона</a>, где можно изменить цвет или изображение рабочего стола или любой папки. Если это дополнение вызвано на графическом файле, то это изображение появится в окне предварительного просмотра как потенциальный фон.</td></tr>
 	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
-		<td valign="top">Запускает приложение <a href="applications/diskusage.html">Использование диска (DiskUsage)</a> на том разделе, где находится текущая директория.</td></tr>
+		<td valign="top">Запускает приложение <a href="applications/diskusage.html">Использование диска</a> на том разделе, где находится текущая директория.</td></tr>
 	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">Если вызвать его на файле, то откроется специфическая панель <a href="filetypes.html">типа этого файла (FileType)</a>, если же файл не выбирать, то запустится это же приложение в стандартном виде.</td></tr>
+		<td valign="top">Если вызвать его на файле, то откроется специфическая панель этого <a href="filetypes.html">типа файла</a>, если же файл не выбирать, то запустится это же приложение в стандартном виде.</td></tr>
 	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
-		<td valign="top">Может использоваться только с симлинками - открывает папку где находится целевой файл.</td></tr>
+		<td valign="top">Может использоваться только с ссылками - открывает папку, где находится целевой файл.</td></tr>
 	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
-		<td valign="top">Запускает приложение <a href="applications/textsearch.html">Текстовый поиск (TextSearch)</a> для поиска строки в выбранной папке (и вложенных в неё папках тоже).</td></tr>
+		<td valign="top">Запускает приложение <a href="applications/textsearch.html">Текстовый поиск</a> для поиска строки в выбранной папке (и вложенных в неё папках тоже).</td></tr>
 	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
-		<td valign="top">Выбранные файлы будут добавлены в zip архив, а дополнение, вызванное без файла, откроет панель, для создания архива путём пертаскивания файов на неё мышкой.</td></tr>
+		<td valign="top">Выбранные файлы будут добавлены в zip архив, а дополнение, вызванное без файла, откроет панель, для создания архива путём перетаскивания файлов на неё мышкой.</td></tr>
 </table>
 
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -36,12 +36,13 @@
 <li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Sommaire</a> 
 ::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
 </span></div>
 </div>
@@ -57,7 +58,7 @@ Il peut également s'avérer utile si un composant logiciel que vous avez instal
 Si un gestionnaire d'amorce est installé, vous pouvez commencer à presser la touche <span class="key">MAJ</span> avant d'invoquer le démarrage d'Haiku.
 Si Haiku est le seul système d'exploitation de votre machine, Vous pouvez commencer à presser la touche même si le BIOS n'a pas fini d'afficher ses messages de démarrage.</p>
 <p><br /></p>
-<p>Ceci fait, vous aurez accès à trois menus :</p>
+<p>Ceci fait, vous aurez accès à quatre menus :</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b></td><td> </td><td>Vous permet de sélectionner l'installation de Haiku à démarrer.</td></tr>
 <tr><td><b>Select safe mode options</b><br />
@@ -66,13 +67,22 @@ Si Haiku est le seul système d'exploitation de votre machine, Vous pouvez comme
 <i>- Disable user add-ons</i> (Désactiver les extensions utilisateur)<br />
 <i>- Disable IDE DMA</i> (Désactiver l'optimisation DMA du bus IDE)<br />
 <i>- Use fail-safe video mode</i> (Mode vidéo sans échec)<br />
+<i>- Disable IO-APIC</i> (Désactiver le gestionnaire d'interruptions IO-APIC)<br />
+<i>- Disable LOCAL APIC</i><br />
 <i>- Don't call the BIOS</i> (Eviter les appels au BIOS)<br />
 <i>- Disable APM</i> (Désactiver la gestion d'énergie APM)<br />
-<i>- Disable ACPI</i> (Désactiver la gestion d'énergie avancée ACPI)<br />
-<i>- Disable IO-APIC</i> (Désactiver le gestionnaire d'interruptions IO-APIC)<br />
-<i>- Enable serial debug output</i> (Envoyer les messages de déboguage sur le port série)<br />
-<i>- Enable on screen debug output</i>
-(Afficher les messages de déboguage sur l'écran)</p></td></tr>
+<i>- Disable ACPI</i> (Désactiver la gestion d'énergie avancée ACPI)
+</p></td></tr>
+<tr><td><b>Select debug options</b><br />
+</td><td> </td><td>Ici, vous trouverez plusieurs options qui vous aideront à déboguer ou à récuperer le détail pour un rapport de bogue.
+Encore une fois, une courte explication pour chaque option est affichée en bas.
+<p><i>- Enable serial debug output</i> (Envoyer les messages de déboguage sur le port série)<br />
+<i>- Enable on screen debug output</i> (Afficher les traces à l'écran)<br />
+<i>- Enable debug syslog</i> (Activer les traces systèmes)</p>
+<p>Si  "syslog debug" est activé, un redémarrage à chaud après un plantage montre les options supplémentaires suivantes :</p>
+<p><i>- Display syslog from previous session</i> (Afficher les traces de la session précédente)<br />
+<i>- Save syslog from previous session</i> (Enregistrer les traces de la session précédente)
+</p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>Si vous avez activé l'option <i>Use fail-safe video mode</i>, vous pouvez utiliser ce menu pour choisir une résolution et une profondeur de couleur.</td></tr>
 </table>
 <p><br /></p>
@@ -98,7 +108,7 @@ Ces symboles correspondent grossièrement aux étapes de démarrage suivantes :
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Sommaire</a> 
 ::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
 </span></div>
 </div>

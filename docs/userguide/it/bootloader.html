@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,18 +35,20 @@
 <li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Boot Loader</h1>
 
@@ -55,20 +57,30 @@ Può tornare anche utile dopo che hai installato un componente software e che ti
 </p>
 <p>To enter the Boot Loader options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
 <p><br /></p>
-<p>Una volta che si è caricato, ti si presenteranno tre menu:</p>
+<p>Once it's there, you're offered four menus:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b>  (seleziona il disco di avvio) </td><td> </td><td>Sceglie quale installazione di Haiku caricare.</td></tr>
 <tr><td><b>Select safe mode options</b> (seleziona le opzioni di modalità sicura)<br />
-</td><td> </td><td>Ci sono diverse opzioni da tentare in caso di problemi con l'hardware. Quando sposti la barra di selezione su un'opzione una breve descrizione compare sul margine inferiore dello schermo.
-<p><i>-Safe mode </i>(modalità sicura)<br />
-<i>-Disable user add-ons</i> (disabilita le aggiunte utente)<br />
-<i>-Disable IDE-DMA</i> (disabilita i DMA dell'IDE)<br />
-<i>-Usa fail-safe video mode</i> (Usa le modalità video sicure)<br />
-<i>-Don't call the BIOS</i> (Non chiamare il BIOS)<br />
-<i>-Disable APM</i> (Disabilita l'APM)<br />
-<i>-Disable ACPI</i> (Disabilita l'ACPI)<br />
-<i>-Disabilita IO-APIC</i> (Disabilita l'IO-APIC)<br />
-<i>-Enable serial bebug output</i> (Abilita i messaggi di debug)<br /><i>- Enable on screen debug output</i> (Abilita lo schermo di output del debug)
+</td><td> </td><td>There are several options to try in case of hardware related trouble. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.
+<p><i>- Safe mode</i><br />
+<i>- Disable user add-ons</i><br />
+<i>- Disable IDE DMA</i><br />
+<i>- Use fail-safe video mode</i><br />
+<i>- Disable IO-APIC</i><br />
+<i>- Disable LOCAL APIC</i><br />
+<i>- Don't call the BIOS</i><br />
+<i>- Disable APM</i><br />
+<i>- Disable ACPI</i>
+</p></td></tr>
+<tr><td><b>Select debug options</b><br />
+</td><td> </td><td>Here you'll find several options that help with debugging or getting details for a bug report. Again, a short explanation for each option is displayed at the bottom.
+<p><i>- Enable serial debug output</i><br />
+<i>- Enable on screen debug output</i><br />
+<i>- Enable debug syslog</i>
+</p>
+<p>If "debug syslog" is enabled, a warm reboot after a crash shows these additional options:</p>
+<p><i>- Display syslog from previous session</i><br />
+<i>- Save syslog from previous session</i>
 </p></td></tr>
 <tr><td class="onelinetop"><b>Select fail safe video mode (Seleziona modalità video sicure)</b></td><td> </td><td>Se devi attivare l'opzione <i>Use fail-safe video mode</i> (Seleziona modalità video sicure), puoi impostare la profondità di colore e la risoluzione video.</td></tr>
 </table>
@@ -96,7 +108,7 @@ Le diverse icone corrispondono approssimativamente a diverse fasi di caricamento
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-<a href="contents.html" class="uplink">Contents</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
