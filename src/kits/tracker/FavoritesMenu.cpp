@@ -298,7 +298,7 @@ FavoritesMenu::ShouldShowModel(const Model *model)
 	if (fIsSavePanel && model->IsFile())
 		return false;
 
-	if (!fRefFilter)
+	if (!fRefFilter || model->Node() == NULL)
 		return true;
 	
 	struct stat_beos statBeOS;
