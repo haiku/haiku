@@ -92,8 +92,11 @@ TouchpadView::MouseUp(BPoint point)
 	fXTracking = false;
 	fYTracking = false;
 
+	const float kSoftScrollLimit = 0.7;
+
 	int32 result = 0;
-	if (GetRightScrollRatio() > 0.7 || GetBottomScrollRatio() > 0.7) {
+	if (GetRightScrollRatio() > kSoftScrollLimit
+		|| GetBottomScrollRatio() > kSoftScrollLimit) {
 		BAlert* alert = new BAlert("ReallyChangeScrollArea",
 			"The new scroll area is very large and may impede "
 			"normal mouse operation. Do you really want to change"
@@ -105,8 +108,10 @@ TouchpadView::MouseUp(BPoint point)
 		BMessage msg(SCROLL_AREA_CHANGED);
 		Invoke(&msg);
 	} else {
-		fXScrollRange = fOldXScrollRange;
-		fYScrollRange = fOldYScrollRange;
+		if (GetRightScrollRatio() > kSoftScrollLimit)
+			fXScrollRange = fOldXScrollRange;
+		if (GetBottomScrollRatio() > kSoftScrollLimit)
+			fYScrollRange = fOldYScrollRange;
 		DrawSliders();
 	}
 }
