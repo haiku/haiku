@@ -30,8 +30,11 @@
 <li class="now"><img src="../images/flags/gb.png" alt="" /> English</li>
 <li><a href="../fr/wifi.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
 <li><a href="../de/wifi.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/wifi.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../ru/wifi.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/wifi.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/wifi.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 </ul>
 
@@ -96,23 +99,23 @@ Addtron AWA-100 PCI
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="wep" rel="nofollow" id="wep">WEP encryption</a></h3>
-<p>WEP encryption is available through a command-line application <span class="cli">setwep</span>. It is a temporary means for joining an unencrypted or WEP encrypted wifi network. <span class="cli">setwep</span> works with 64- and 128-bit WEP and supports both text keys as well as hex digit keys (see <a href="#wep-notes" rel="nofollow">WEP notes</a> below)
+<p>WEP encryption is available through a command-line application <span class="cli">setwep</span>. It is a temporary means for joining an unencrypted or WEP encrypted wifi network. <span class="cli">setwep</span> works with 64- and 128-bit WEP and supports both text keys as well as hex digit keys (see <a href="#wep-notes" rel="nofollow">WEP notes</a> below).
 </p>
-<p>The usage is: <span class="cli">setwep device_path [ssid] [key]</span>. Below are some examples. </p>
-<p>In this example, let us assume your wifi network card is "/dev/net/iprowifi3945/0" and the wireless network is named "haikuwifi".</p>
+<p>The usage is: <span class="cli">setwep device_path [ssid] [key]</span></p>
+<p>Below are two examples. Let us assume your wifi network card is "/dev/net/iprowifi3945/0" and the wireless network is named "haikuwifi".</p>
 <h4>Example 1: Connect with 64-bit WEP encryption using a hex digit key</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi 0x3456789abc
 </pre><h4>Example 2: Connect to an unencrypted wireless network</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi
 </pre><div class="box-info">
-<li>To find out what your device_path is, have a look in Preferences -&gt; Network.</li>
-<li>To make your wifi device connect to a given SSID at each boot, add the setwep command to your home/config/boot/UserBootscript.</li>
+<li>To find out what your device_path is, have a look in Preferences -&gt; Network</li>
+<li>To make your wifi device connect to a given SSID at each boot, add the <tt>setwep</tt> command to your <tt>home/config/boot/UserBootscript</tt></li>
 </div>
 <p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
 <ul>
 <li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
 <li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
-<li>hexadecimal digits = characters 0-9 and A through F (prepended with '0x')</li>
+<li>hexadecimal digits = characters 0-9 and A through F (prepended with "0x" in <tt>setwep</tt>)</li>
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -121,8 +124,8 @@ Addtron AWA-100 PCI
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you'll need to run</p>
-<pre class="terminal">~&gt; install-wifi-firmwares.sh
+<p>To install the firmware for Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<pre class="terminal">install-wifi-firmwares.sh
 </pre>
 <p>The Intel ipw2100 and ipw22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
 <p>People building their own Haiku image can modify their <span class="cli">build/jam/UserBuildConfig</span> accordingly. Details for that and general updates on the wifi topic are found at the <a href="http://www.haiku-os.org/guides/wifi">online version of this document</a>.</p>

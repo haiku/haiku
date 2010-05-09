@@ -10,18 +10,20 @@
  * Authors:
 * 		Matt Madia who wrote http://www.haiku-os.org/guides/wifi 
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Diver
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Wifi</title>
+	<title>Беспроводная сеть Wifi</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -30,7 +32,10 @@
 <li class="now"><img src="../images/flags/ru.png" alt="" /> Русский</li>
 <li><a href="../fr/wifi.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
 <li><a href="../de/wifi.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/wifi.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../es/wifi.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/wifi.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/wifi.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
@@ -43,43 +48,44 @@
 <div id="content">
 <div>
 
-<h2>Wifi in Haiku</h2>
+<h2>Беспроводная сеть Wifi в Haiku</h2>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="hardware" rel="nofollow" id="hardware">Expected supported hardware</a></h3>
-<p>All of FreeBSD 8 wlan drivers should be working. Any PCMCIA, CardBus, ExpressCard, USB or ISA based cards will not work. Only PCI, miniPCI, PCI-Express, miniPci-Express and PCI-X are supposed to work.<br />
-This includes:
+<a name="hardware" rel="nofollow" id="hardware">Поддерживаемое оборудование:</a></h3>
+<p>Должны работать все wlan драйвера, поддерживаемые FreeBSD 8. <br />
+Не поддерживаются все PCMCIA, CardBus, ExpressCard, USB и ISA карты. <br />Поддерживаются только PCI, miniPCI, PCI-Express, miniPci-Express и PCI-X.<br />
+
 </p>
 <ul>
-<li><p><i>aironetwifi</i> supporting at least<br />
+<li><p><i>aironetwifi</i> поддерживает как минимум:<br />
 Cisco Aironet 350 Series<br />
 Aironet PCI4500<br />
 Aironet PCI4800<br />
 </p></li>
-<li><p><i>atheroswifi</i> supporting almost every chipset outthere (though no AR9285 chips)</p></li>
-<li><p><i>broadcom43xx</i> supporting<br />
+<li><p><i>atheroswifi</i> поддерживает почти все существующие чипсеты (кроме чипов AR9285)</p></li>
+<li><p><i>broadcom43xx</i> поддерживает:<br />
 BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
 </p></li>
-<li><p><i>iprowifi2100</i> supporting the 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting<br />
+<li><p><i>iprowifi2100</i> поддерживает 2100 чипсет</p></li>
+<li><p><i>iprowifi2200</i> поддерживает:<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting the 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting the 4965 chips</p></li>
-<li><p><i>marvell88w8335</i> supporting<br />
+<li><p><i>iprowifi3945</i> поддерживает 3945 чипсет</p></li>
+<li><p><i>iprowifi4965</i> поддерживает 4965 чипсет</p></li>
+<li><p><i>marvell88w8335</i> поддерживает:<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
 </p></li>
-<li><p><i>marvell88w8363</i> supporting the 88W8363 chips</p></li>
-<li><p><i>ralinkwifi</i> supporting<br />
+<li><p><i>marvell88w8363</i> поддерживает 88W8363 чипсет</p></li>
+<li><p><i>ralinkwifi</i> поддерживает:<br />
 RT2560<br />
 RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p><i>wavelanwifi</i> supporting at least<br />
+<li><p><i>wavelanwifi</i> поддерживает как минимум:<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
 Intersil Prism3<br />
@@ -95,38 +101,38 @@ Addtron AWA-100 PCI
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wep" rel="nofollow" id="wep">WEP encryption</a></h3>
-<p>WEP encryption is available through a command-line application <span class="cli">setwep</span>. It is a temporary means for joining an unencrypted or WEP encrypted wifi network. <span class="cli">setwep</span> works with 64- and 128-bit WEP and supports both text keys as well as hex digit keys (see <a href="#wep-notes" rel="nofollow">WEP notes</a> below)
+<a name="wep" rel="nofollow" id="wep">WEP шифрование</a></h3>
+<p>WEP шифрование доступно через консольное приложение <span class="cli">setwep</span>. Это временный способ для подключения к незащищенным сетям или к сетям, использующим WEP шифрование. Приложение <span class="cli">setwep</span> работает с 64- и 128-битным WEP шифрованием и поддерживает как текстовые ключи, так и шестнадцатеричные ключи (смотрите <a href="#wep-notes" rel="nofollow">примечание про WEP</a> ниже).
 </p>
-<p>The usage is: <span class="cli">setwep device_path [ssid] [key]</span>. Below are some examples. </p>
-<p>In this example, let us assume your wifi network card is "/dev/net/iprowifi3945/0" and the wireless network is named "haikuwifi".</p>
-<h4>Example 1: Connect with 64-bit WEP encryption using a hex digit key</h4>
+<p>Использование: <span class="cli">setwep device_path [ssid] [key]</span></p>
+<p>Ниже приведены два примера. Допустим, Ваша wifi сетевая карта это "/dev/net/iprowifi3945/0", а беспроводная сеть называется "haikuwifi".</p>
+<h4>Пример 1: Подключение с 64-битным WEP шифрованием, используя шестнадцатеричный ключ</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi 0x3456789abc
-</pre><h4>Example 2: Connect to an unencrypted wireless network</h4>
+</pre><h4>Пример 2: Подключение к незашифрованной беспроводной сети</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi
 </pre><div class="box-info">
-<li>To find out what your device_path is, have a look in Preferences -&gt; Network.</li>
-<li>To make your wifi device connect to a given SSID at each boot, add the setwep command to your home/config/boot/UserBootscript.</li>
+<li>Чтобы узнать какой у Вас device_path is, посмотрите в Preferences -&gt; Network</li>
+<li>Если вы хотите, чтобы Ваше wifi устройство подключалось к данной SSID после каждой загрузке, добавьте команду <tt>setwep</tt> в Ваш <tt>home/config/boot/UserBootscript</tt></li>
 </div>
-<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
+<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>Примечания про WEP</strong></a></p>
 <ul>
-<li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
-<li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
-<li>hexadecimal digits = characters 0-9 and A through F (prepended with '0x')</li>
+<li>64-битное WEP использует 40-битный ключ, что эквивалентно 5 буквам или 10 цифрам</li>
+<li>128-битное WEP использует 104-битный ключ, что эквивалентно 13 буквам или 26 цифрам</li>
+<li>шестнадцатеричная система = цифры  0-9 и буквы от A до F (начинающиеся с "0x" в <tt>setwep</tt>)</li>
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wpa" rel="nofollow" id="wpa">WPA encryption</a></h3>
-<p>At the moment there is no WPA encryption available in Haiku. However, there is some <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">preliminary and unfinished code for implementing WPA</a><span class="ext"></span> available. Some tasks for improving this is to plug it into the wpa_supplicant build process and then fixing compile &amp; runtime issues.</p>
+<a name="wpa" rel="nofollow" id="wpa">WPA шифрование</a></h3>
+<p>В настоящий момент WPA шифрование не поддерживается в Haiku. Однако существует экспериментальный незавершенный код, реализующий поддержку <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">WPA</a><span class="ext"></span>. Этот код потребуется внедрить в процесс сборки wpa_supplicant, а затем ликвидировать  ошибки при компиляции и возможные проблемы при работе.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you'll need to run</p>
+<p>Для установки микропрограмм для Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx и Marvell 88W8335 нужно запустить:</p>
 <pre class="terminal">~&gt; install-wifi-firmwares.sh
 </pre>
-<p>The Intel ipw2100 and ipw22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
-<p>People building their own Haiku image can modify their <span class="cli">build/jam/UserBuildConfig</span> accordingly. Details for that and general updates on the wifi topic are found at the <a href="http://www.haiku-os.org/guides/wifi">online version of this document</a>.</p>
-<p>If you have to download the firmware, but don't have a working internet connection under Haiku, the online version offers a <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell script</a>, which will create a zip file for you to extract to Haiku's <tt>/boot</tt>. After that you'll have all files needed by install-wifi-firmwares.sh.</p>
+<p>Intel ipw2100 и ipw22xx установятся без Интернет-соединения, так как лицензионные условия позволяют Haiku распространять архивы с микропрограммой (firmware). Однако они требуют ознакомления конечного пользователя с условиями лицензии перед их установкой. Broadcom 43xx и Marvell 88W8335 требуют работающего Интернет-соединения, так как файлы, содержащие их микропрограммы (firmwares), не могут распространяться с Haiku.</p>
+<p>Те, кто самостоятельно собирают  собственные образы Haiku, могут соответственным образом изменить свой <span class="cli">build/jam/UserBuildConfig</span>. Описание этого процесса, а также обновление информации по поддержке wifi можно найти в <a href="http://www.haiku-os.org/guides/wifi">онлайн-версии</a> этого документа.</p>
+<p>Если вы скачали микропрограмму (firmware), но не имеете работающего Интернет-соединения в Haiku, то онлайн-версия предлагает <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">скрипт</a>, который создаст для Вас zip файл, который нужно будет извлечь в директорию <tt>/boot</tt>. После этого у Вас будут все файлы, необходимые для запуска install-wifi-firmwares.sh.</p>
 </div>
 </div>
 

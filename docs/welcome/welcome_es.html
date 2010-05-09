@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -33,7 +33,10 @@
 <li class="now"><img src="images/flags/es.png" alt="" /> Español</li>
 <li><a href="welcome_fr.html"><img src="images/flags/fr.png" alt="" />Français</a></li>
 <li><a href="welcome_de.html"><img src="images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="welcome_it.html"><img src="images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="welcome_ru.html"><img src="images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="welcome_sv_SE.html"><img src="images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="welcome_jp.html"><img src="images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="welcome_uk.html"><img src="images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="welcome_en.html"><img src="images/flags/gb.png" alt="" />English</a></li>
 </ul>
@@ -51,19 +54,19 @@
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bugreport" name="bugreport">Cuidado con los bugs</a></h2>
+<a id="bugreport" name="bugreport">Cuidado con los fallos</a></h2>
 <p>Hemos trabajado muy duro para arreglar todos los fallos posibles, aún así, siendo una versión alpha, es muy probable que haya muchos por descubrir.</p>
-<div class="box-warning">No se recomienda el uso de versiones alfa como sistemas de producción. Su información podría alterarse, estropearse o destruirse en algún momento.</div>
+<div class="box-warning">No se recomienda el uso de versiones alfa como sistemas de producción. Su información bien podría alterarse, estropearse o destruirse en algún momento.</div>
 
 <p>Una de las razones principales para liberar una versión alpha es atraer a mucha gente para probar el sistema y descubrir fallos o darnos sugerencias para futuras mejoras. Por favor, archive los fallos y mejoras en nuestro bug tracker después de utilizar su sistema de búsqueda para evitar duplicados.</p>
 <ul>
-	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
+	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Rastreador de fallos de Haiku</a></li>
 	<li><a href="es/bugreports.html">Consejos para un buen informe de error</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">Conociendo el sistema</a></h2>
+<a id="system" name="system">Habituándose al sistema</a></h2>
 <p>Las primeras versiones de Haiku serán muy similares a BeOS R5, el sistema operativo que está recreando. Si nunca lo ha probado, puede mirar estos enlaces:</p>
 <ul>
 	<li><a href="../userguide/es/contents.html">Guía de usuario de Haiku</a></li>
@@ -72,8 +75,8 @@
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="software">Instalando más software</a></h2>
-<p>Because of our binary and source compatibility, many BeOS applications run on Haiku (you may have to install the optional package "beoscompatibility" for some programs, see below). After downloading a package, simply unzip it (double clicking opens <span class="app">Expander</span>) to <span class="path">/boot/apps/</span> and start the application from there.</p>
+<a id="software" name="software">Instalar más software</a></h2>
+<p>Debido a nuestra compatibilidad de código binario y código fuente, muchas aplicaciones de BeOS funcionan en Haiku (tal vez tenga que instalar el paquete "beoscompatibility" para algunos programas, vea debajo). Tras descargar un paquete, tan sólo debe descomprimirlo (dando doble clic se abre <span class="app">Expander</span>) con destino a <span class="path">/boot/apps/</span> y se inicia la aplicación desde ahí).</p>
 
 <p>Repositorios de software populares son:</p>
 <ul>
@@ -88,12 +91,12 @@ Al correrse el siguiente comando en una Terminal: <tt>installoptionalpackage -h<
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="wifi">Wifi in Haiku</a></h2>
-<p>Wifi does work to some extend. At the moment you can only log into unprotected or WEP encrypted wireless networks. Due to several different licensing policies of different vendors, a manual installation process for the firmware may be required. A list of working devices and instructions for installation can be found in our <a href="es/wifi.html">Wifi</a> page (also <a href="http://www.haiku-os.org/guides/wifi">online</a>).</p> 
+<a id="software" name="wifi">Wifi en Haiku</a></h2>
+<p>La red inalámbrica (Wifi) trabaja hasta cierto punto. Al momento se puede conectar a redes inalámbricas con encripción WEP. Debido a políticas de licencias diferentes de fabricantes diferengtes, se puede requerir un proceso de instalación manual del firmware. Una lista de dispositivos funcionando e instrucciones para instalación se pueden encontrar en nuestra página <a href="es/wifi.html">Wifi</a> (también disponible <a href="http://www.haiku-os.org/guides/wifi">en línea</a>).</p> 
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="api" name="api">Conociendo la API</a></h2>
+<a id="api" name="api">Habituándose a la API</a></h2>
 <p>Como Haiku es una reimplementación, la API es la misma que para BeOS R5 (con algunos añadidos). Por lo tanto, la documentación existente en el BeBook es todavía un recurso válido. Gracias a ACCESS, quien tiene los derechos de la antigua Be Inc., se nos permite distribuir una copia del BeBook.</p>
 
 <p>Existen algunos recursos que le pueden ayudar a comenzar:</p>

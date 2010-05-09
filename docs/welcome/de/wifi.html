@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>User Guide</span></div>
 </div>
 
 <div class="nav">
@@ -31,8 +31,11 @@
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/de.png" alt="" /> Deutsch</li>
 <li><a href="../fr/wifi.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../it/wifi.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../ru/wifi.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/wifi.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/wifi.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/wifi.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
@@ -94,21 +97,21 @@ Addtron AWA-100 PCI</p></li>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="wep" rel="nofollow" id="wep">WEP Verschlüsselung</a></h3>
 <p>WEP Verschlüsselung ist durch das Kommandozeilen-Programm <span class="cli">setwep</span> verfügbar. Es ist ein Provisorium, um sich in ein nicht oder per WEP verschlüsseltes Netzwerk einzuklinken. <span class="cli">setwep</span> funktioniert mit 64- und 128-bit WEP und unterstützt Passwörter als Text und Hex-Werte (siehe <a href="#wep-notes" rel="nofollow">WEP Info</a> weiter unten).</p>
-<p>Der Gebrauch ist: <span class="cli">setwep Geräte_Pfad [ssid] [key]</span>. Nachfolgend einige Beispiele.</p>
-<p>In diesen Beispielen gehen wir von einer Netzwerkkarte "/dev/net/iprowifi3945/0" und einem Funknetzwerk mit dem Namen "haikuwifi" aus.</p>
+<p>Der Gebrauch ist: <span class="cli">setwep Geräte_Pfad [ssid] [key]</span>.</p>
+<p>In nachfolgenden Beispielen gehen wir von einer Netzwerkkarte "/dev/net/iprowifi3945/0" und einem Funknetzwerk mit dem Namen "haikuwifi" aus.</p>
 <h4>Beispiel 1: Verbindung mit einer 64-bit WEP Verschlüsselung und einem Hex-Passwort</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi 0x3456789abc
 </pre><h4>Beispiel 2: Verbindung mit einem unverschlüsselten Funknetzwerk</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi
 </pre><div class="box-info">
 <li>Den Pfad zu seinem Gerät findet man unter Preferences -&gt; Network.</li>
-<li>Um sich bei jedem Hochfahren mit dem Netzwerk unter dieser SSID zu verbinden, schreibt man den setwep Befehl ins home/config/boot/UserBootscript.</li>
+<li>Um sich bei jedem Hochfahren mit dem Netzwerk unter dieser SSID zu verbinden, schreibt man den <tt>setwep</tt> Befehl ins <tt>home/config/boot/UserBootscript</tt>.</li>
 </div>
 <p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP Info</strong></a></p>
 <ul>
 <li>64-bit WEP benutzt ein 40-bit Passwort, das sind 5 Buchstaben oder 10 Hex-Werte</li>
 <li>128-bit WEP benutzt ein 104-bit Passwort, das sind 13 Buchstaben oder 26 Hex-Werte</li>
-<li>Hex-Werte sind die Zahlen 0-9 und Buchstaben A bis F (mit einem vorangestellten '0x')</li>
+<li>Hex-Werte sind die Zahlen 0-9 und Buchstaben A bis F (in <tt>setwep</tt> mit einem vorangestellten '0x')</li>
 </ul>
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="wpa" rel="nofollow" id="wpa">WPA Verschlüsselung</a></h3>

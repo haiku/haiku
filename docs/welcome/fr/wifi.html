@@ -10,6 +10,9 @@
  * Authors:
 * 		Matt Madia who wrote http://www.haiku-os.org/guides/wifi 
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *		Vincent Duvert
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -29,8 +32,11 @@
 <ul class="lang-menu">
 <li class="now"><img src="../images/flags/fr.png" alt="" /> Français</li>
 <li><a href="../de/wifi.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/wifi.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
 <li><a href="../ru/wifi.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
 <li><a href="../es/wifi.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/wifi.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
 <li><a href="../en/wifi.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
@@ -43,43 +49,47 @@
 <div id="content">
 <div>
 
-<h2>Wifi in Haiku</h2>
+<h2>Le Wifi dans Haiku</h2>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="hardware" rel="nofollow" id="hardware">Expected supported hardware</a></h3>
-<p>All of FreeBSD 8 wlan drivers should be working. Any PCMCIA, CardBus, ExpressCard, USB or ISA based cards will not work. Only PCI, miniPCI, PCI-Express, miniPci-Express and PCI-X are supposed to work.<br />
-This includes:
-</p>
+<a name="hardware" rel="nofollow" id="hardware">Matériel théoriquement supporté</a></h3>
+<p>Tous les pilotes de réseau sans fil de FreeBSD 8 devraient fonctionner. En revanche, les périphériques PCMCIA, CardBus, ExpressCard, USB, ou ISA ne sont pas supportés. Seules les cartes PCI, MiniPCI, PCI-Express, minipci-Express et PCI-X sont censées fonctionner.<br />
+Cela inclut :</p>
 <ul>
-<li><p><i>aironetwifi</i> supporting at least<br />
+<li><p>Le module <i>aironetwifi</i>, qui supporte au minimum les cartes :<br />
 Cisco Aironet 350 Series<br />
 Aironet PCI4500<br />
 Aironet PCI4800<br />
 </p></li>
-<li><p><i>atheroswifi</i> supporting almost every chipset outthere (though no AR9285 chips)</p></li>
-<li><p><i>broadcom43xx</i> supporting<br />
-BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
-</p></li>
-<li><p><i>iprowifi2100</i> supporting the 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting<br />
+<li><p>Le module <i>atheroswifi</i>, qui supporte la plupart des puces Atheros (à l'exception de la puce AR9285)</p></li>
+<li><p>Le module <i>broadcom43xx</i> qui supporte les cartes :<br />
+BCM4301<br />
+BCM4306<br />
+BCM4307<br />
+BCM4309<br />
+BCM4311<br />
+BCM4312<br />
+BCM4318</p></li>
+<li><p>Le module <i>iprowifi2100</i> qui supporte les puces Intel Pro Wifi 2100</p></li>
+<li><p>Module <i>iprowifi2200</i> qui supporte les cartes :<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting the 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting the 4965 chips</p></li>
-<li><p><i>marvell88w8335</i> supporting<br />
+<li><p>Module <i>iprowifi3945</i> qui supporte les puces 3945 d’Intel</p></li>
+<li><p>Module <i>iprowifi4965</i> qui supporte les puces 4965 d’Intel</p></li>
+<li><p>Module <i>marvell88w8335</i> qui supporte les cartes :<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
 </p></li>
-<li><p><i>marvell88w8363</i> supporting the 88W8363 chips</p></li>
-<li><p><i>ralinkwifi</i> supporting<br />
+<li><p>Module <i>marvell88w8363</i> qui supporte les puces Marvell 88W8363</p></li>
+<li><p>Le module <i>ralinkwifi</i> qui supporte les cartes :<br />
 RT2560<br />
 RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p><i>wavelanwifi</i> supporting at least<br />
+<li><p>Le module <i>wavelanwifi</i> qui supporte au moins les cartes suivantes :<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
 Intersil Prism3<br />
@@ -95,38 +105,39 @@ Addtron AWA-100 PCI
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wep" rel="nofollow" id="wep">WEP encryption</a></h3>
-<p>WEP encryption is available through a command-line application <span class="cli">setwep</span>. It is a temporary means for joining an unencrypted or WEP encrypted wifi network. <span class="cli">setwep</span> works with 64- and 128-bit WEP and supports both text keys as well as hex digit keys (see <a href="#wep-notes" rel="nofollow">WEP notes</a> below)
-</p>
-<p>The usage is: <span class="cli">setwep device_path [ssid] [key]</span>. Below are some examples. </p>
-<p>In this example, let us assume your wifi network card is "/dev/net/iprowifi3945/0" and the wireless network is named "haikuwifi".</p>
-<h4>Example 1: Connect with 64-bit WEP encryption using a hex digit key</h4>
+<a name="wep" rel="nofollow" id="wep">Sécurisation WEP</a></h3>
+<p>Le protocole de sécurité WEP est disponible au travers de l'application en ligne de commande <span class="cli">setwep</span>. 
+Il s’agit une solution temporaire pour accéder à un réseau Wifi non protégé ou en codage WEP. <span class="cli">setwep</span> 
+supporte les clés WEP 64 et 128 bits, indiquées sous forme hexadécimale ou texte. (voir les <a href="#wep-notes" rel="nofollow">remarques concernant le WEP</a> ci-dessous).</p>
+<p>L'usage est le suivant : <span class="cli">setwep chemin_de_périphérique [ssid] [clé]</span> ([ssid] est le nom du réseau à rejoindre)</p>
+<p>Voici deux exemples pour lesquels nous supposerons que votre carte réseau wifi est «/dev/net/iprowifi3945/0» et que le réseau sans fil est nommé «haikuwifi».</p>
+<h4>Exemple 1 : Se connecter avec un cryptage WEP 64 bits et une clé numérique hexadécimale</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi 0x3456789abc
-</pre><h4>Example 2: Connect to an unencrypted wireless network</h4>
+</pre><h4>Exemple 2 : Se connecter à un réseau sans fil non protégé</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi
 </pre><div class="box-info">
-<li>To find out what your device_path is, have a look in Preferences -&gt; Network.</li>
-<li>To make your wifi device connect to a given SSID at each boot, add the setwep command to your home/config/boot/UserBootscript.</li>
-</div>
-<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
+<li>Pour connaître le chemin_du_périphérique, regardez dans les préférences réseau (Preferences -&gt; Network)</li>
+<li>Pour connecter votre adaptateur Wifi à un réseau de SSID donné à chaque démarrage, ajoutez la commande <tt>setwep</tt> a votre script <tt>home/config/boot/UserBootscript</tt></li></div>
+<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>Remarques concernant le WEP</strong></a></p>
 <ul>
-<li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
-<li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
-<li>hexadecimal digits = characters 0-9 and A through F (prepended with '0x')</li>
+<li>Le WEP « 64 bits » utilise une clé de 40 bits, c’est à dire 5 caractères alphanumériques ou 10 chiffres hexadécimaux.</li>
+<li>Le WEP « 128 bits » utilise une clé de 104 bits, c’est à dire 13 caractères alphanumériques ou 26 chiffres hexadécimaux.</li>
+<li>Un chiffre hexadécimal est un chiffre de 0 à 9 ou une lettre de 0 à F. Un nombre hexadécimal doit être précédé de « 0x » lorsqu’il est utilisé dans <tt>setwep</tt>.</li>
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wpa" rel="nofollow" id="wpa">WPA encryption</a></h3>
-<p>At the moment there is no WPA encryption available in Haiku. However, there is some <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">preliminary and unfinished code for implementing WPA</a><span class="ext"></span> available. Some tasks for improving this is to plug it into the wpa_supplicant build process and then fixing compile &amp; runtime issues.</p>
+<a name="wpa" rel="nofollow" id="wpa">Le cryptage WPA</a></h3>
+<p>Pour le moment, le codage WPA n'est pas disponible dans Haiku. Cependant, il existe une ébauche de <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">code pour la mise en œuvre de cette sécurité</a><span class="ext"></span>.
+Il reste notamment à intégrer le processus de construction du gestionnaire wpa_supplicant et à corriger des problèmes de compilation et d’exécution.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you'll need to run</p>
-<pre class="terminal">~&gt; install-wifi-firmwares.sh
+<p>Pour installer le micro-logiciel des cartes Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx et Marvell 88W8335 vous devez exécuter la commande</p>
+<pre class="terminal">install-wifi-firmwares.sh
 </pre>
-<p>The Intel ipw2100 and ipw22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
-<p>People building their own Haiku image can modify their <span class="cli">build/jam/UserBuildConfig</span> accordingly. Details for that and general updates on the wifi topic are found at the <a href="http://www.haiku-os.org/guides/wifi">online version of this document</a>.</p>
-<p>If you have to download the firmware, but don't have a working internet connection under Haiku, the online version offers a <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell script</a>, which will create a zip file for you to extract to Haiku's <tt>/boot</tt>. After that you'll have all files needed by install-wifi-firmwares.sh.</p>
+<p>Les pilotes Intel ipw2100 et ipw22xx pourront être installés sans qu’une connexion Internet soit présente, car la distribution, dans Haiku, des fichiers contenant les micro-logiciels originaux est autorisée par leur licence. En revanche, vous devrez accepter les termes de cette licence avant l’installation. Les pilotes Broadcom 43xx et Marvell 88W8335 nécessiteront une connexion Internet pour s’installer, car les fichiers contenant leurs micro-logiciels respectifs ne peuvent être redistribués avec Haiku.</p>
+<p>Si vous compilez vous-même Haiku, vous pouvez modifier votre fichier <span class="cli">build/jam/UserBuildConfig</span> afin de pouvoir utiliser cet outil. Vous pourrez trouver plus de détails sur le Wifi dans Haiku sur la <a href="http://www.haiku-os.org/guides/wifi">version en ligne de ce document</a> (en anglais).</p>
+<p>Si il vous faut télécharger le micro-logiciel mais que vous n'avez pas de connexion internet qui fonctionne sous Haiku, la version en ligne vous propose aussi un <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">script de commande</a>, qui crée un fichier zip à extraire dans le dossier <tt>/boot</tt> de Haiku. Après cela, vous aurez tous les fichiers nécessaires pour install-wifi-firmwares.sh.</p>
 </div>
 </div>
 
