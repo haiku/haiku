@@ -29,8 +29,14 @@ static struct option const kLongOptions[] = {
 };
 
 
+#ifndef HAIKU_HOST_PLATFORM_SUNOS
 extern const char *__progname;
+#endif
+#ifdef HAIKU_HOST_PLATFORM_SUNOS
+static const char *kProgramName = "addattr";
+#else
 static const char *kProgramName = __progname;
+#endif
 
 
 // supported types (if you add any, make sure that writeAttr() handles
