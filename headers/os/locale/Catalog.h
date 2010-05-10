@@ -80,19 +80,19 @@ extern BCatalog* be_app_catalog;
 
 
 // Translation macros which may be used to shorten translation requests:
-#undef TR
+#undef B_TRANSLATE
 #define B_TRANSLATE(str) \
 	be_catalog->GetString((str), B_TRANSLATE_CONTEXT)
 
-#undef TR_CMT
+#undef B_TRANSLATE_COMMENT
 #define B_TRANSLATE_COMMENT(str, cmt) \
 	be_catalog->GetString((str), B_TRANSLATE_CONTEXT, (cmt))
 
-#undef TR_ALL
+#undef B_TRANSLATE_ALL
 #define B_TRANSLATE_ALL(str, ctx, cmt) \
 	be_catalog->GetString((str), (ctx), (cmt))
 
-#undef TR_ID
+#undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
 	be_catalog->GetString((id))
 
@@ -102,36 +102,36 @@ extern BCatalog* be_app_catalog;
 		#define B_TRANSLATE_CONTEXT "MyDecentApp-Menu"
 
 		static const char *choices[] = {
-			TR_MARK("left"),
-			TR_MARK("right"),
-			TR_MARK("up"),
-			TR_MARK("down")
+			B_TRANSLATE_MARK("left"),
+			B_TRANSLATE_MARK("right"),
+			B_TRANSLATE_MARK("up"),
+			B_TRANSLATE_MARK("down")
 		};
 
 		void MyClass::AddChoices(BMenu *menu) {
 			for (char **ch = choices; *ch; ch++) {
 				menu->AddItem(
 					new BMenuItem(
-						TR(*ch),
+						B_TRANSLATE(*ch),
 						new BMessage(...)
 					)
 				)
 			}
 		}
 */
-#undef TR_MARK
+#undef B_TRANSLATE_MARK
 #define B_TRANSLATE_MARK(str) \
 	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_CONTEXT, "")
 
-#undef TR_MARK_CMT
+#undef B_TRANSLATE_MARK_COMMENT
 #define B_TRANSLATE_MARK_COMMENT(str, cmt) \
 	BCatalogAddOn::MarkForTranslation((str), B_TRANSLATE_CONTEXT, (cmt))
 
-#undef TR_MARK_ALL
+#undef B_TRANSLATE_MARK_ALL
 #define B_TRANSLATE_MARK_ALL(str, ctx, cmt) \
 	BCatalogAddOn::MarkForTranslation((str), (ctx), (cmt))
 
-#undef TR_MARK_ID
+#undef B_TRANSLATE_MARK_ID
 #define B_TRANSLATE_MARK_ID(id) \
 	BCatalogAddOn::MarkForTranslation((id))
 
