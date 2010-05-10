@@ -1302,7 +1302,7 @@ mark_page_range_in_use(addr_t startPage, size_t length, bool wired)
 
 	if (sPhysicalPageOffset > startPage) {
 		dprintf("mark_page_range_in_use(%#" B_PRIxADDR ", %#" B_PRIxSIZE "): "
-			"start page is before free list", startPage, length);
+			"start page is before free list\n", startPage, length);
 		if (sPhysicalPageOffset - startPage >= length)
 			return B_OK;
 		length -= sPhysicalPageOffset - startPage;
@@ -1313,7 +1313,7 @@ mark_page_range_in_use(addr_t startPage, size_t length, bool wired)
 
 	if (startPage + length > sNumPages) {
 		dprintf("mark_page_range_in_use(%#" B_PRIxADDR ", %#" B_PRIxSIZE "): "
-			"range would extend past free list", startPage, length);
+			"range would extend past free list\n", startPage, length);
 		if (startPage >= sNumPages)
 			return B_OK;
 		length = sNumPages - startPage;
