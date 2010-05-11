@@ -206,10 +206,7 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 			SetDevice(25400.0, 20320.0, DEVICE_INTUOS3);
 			break;
 		case 0xB1:
-			// tested:
-			SetDevice(20320.0, 15230.0, DEVICE_INTUOS3);
-			// Frans:
-//			SetDevice(40640.0, 30480.0, DEVICE_INTUOS3);
+			SetDevice(40640.0, 30480.0, DEVICE_INTUOS3);
 			break;
 		case 0xB2:
 			SetDevice(60960.0, 45720.0, DEVICE_INTUOS3);
@@ -295,8 +292,13 @@ TabletDevice::ReadData(const uchar* data, bool& hasContact, uint32& mode,
 		case DEVICE_INTUOS3:
 		case DEVICE_CINTIQ:
 			if ((data[0] == 0x02) && !(((data[1] >> 5) & 0x03) == 0x02)) {
-				xPos = data[2] << 8 | data[3];
-				yPos = data[4] << 8 | data[5];
+				if (fDeviceMode == DEVICE_INTUOS3) {
+					xPos = (data[2] << 9) | (data[3] << 1) | ((data[9] >> 1) & 1);
+					yPos = (data[4] << 9) | (data[5] << 1) | (data[9] & 1);
+				} else {
+					xPos = (data[2] << 8) | data[3];
+					yPos = (data[4] << 8) | data[5];
+				}
 				uint16 pressureData = data[6] << 2 | ((data[7] >> 6) & 0x03);
 				pressure = (float)pressureData / 1023.0;
 
