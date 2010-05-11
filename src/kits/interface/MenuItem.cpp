@@ -365,10 +365,7 @@ BMenuItem::GetContentSize(float *width, float *height)
 	// BFont::Height() caches the value locally
 	MenuPrivate(fSuper).CacheFontInfo();
 
-	if (fSubmenu && fSubmenu->IsLabelFromMarked())
-		fSubmenu->GetPreferredSize(&fCachedWidth, NULL);
-	else
-		fCachedWidth = fSuper->StringWidth(fLabel);
+	fCachedWidth = fSuper->StringWidth(fLabel);
 
 	if (width)
 		*width = (float)ceil(fCachedWidth);
