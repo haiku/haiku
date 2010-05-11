@@ -1732,7 +1732,7 @@ BPoseView::AddPoseToList(PoseList *list, bool visibleList, bool insertionSort,
 		if (viewBounds.Intersects(poseBounds))
  			SynchronousUpdate(poseBounds);
 	}
-	
+
 	if (indexPtr)
 		*indexPtr = poseIndex;
 }
@@ -4637,7 +4637,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 		return;
 
 	ASSERT(srcWindow->PoseView()->TargetModel());
-	
+
 	if (srcWindow->PoseView()->SelectionList()->CountItems() == 0)
 		return;
 
@@ -6184,7 +6184,7 @@ BPoseView::KeyDown(const char *bytes, int32 count)
 			SelectPose(pose, index);
 			break;
 		}
-		
+
 		case B_FUNCTION_KEY:
 		case B_INSERT:
 			break;
@@ -8962,11 +8962,14 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 
 	int32 index;
 	BPose *targetPose = FindPose(mouseLoc, &index);
+	if (targetPose != NULL && DragSelectionContains(targetPose, dragMessage))
+		targetPose = NULL;
 
 	if ((fCursorCheck && targetPose == fDropTarget)
-		|| (trackingContextMenu && !targetPose))
+		|| (trackingContextMenu && !targetPose)) {
 		// no change
 		return false;
+	}
 
 	fCursorCheck = true;
 	if (fDropTarget && !DragSelectionContains(fDropTarget, dragMessage))
@@ -8980,7 +8983,8 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 		targetModel = targetPose->TargetModel();
 	Model tmpTarget;
 	if (targetModel && targetModel->IsSymLink()
-		&& tmpTarget.SetTo(targetPose->TargetModel()->EntryRef(), true, true) == B_OK)
+		&& tmpTarget.SetTo(targetPose->TargetModel()->EntryRef(), true, true)
+			== B_OK)
 		targetModel = &tmpTarget;
 
 	bool ignoreTypes = (modifiers() & B_CONTROL_KEY) != 0;
@@ -9002,7 +9006,7 @@ BPoseView::UpdateDropTarget(BPoint mouseLoc, const BMessage *dragMessage,
 
 	entry_ref srcRef;
 	if (targetModel->IsDirectory() && dragMessage->HasRef("refs")
-			&& dragMessage->FindRef("refs", &srcRef) == B_OK) {
+		&& dragMessage->FindRef("refs", &srcRef) == B_OK) {
 		Model srcModel (&srcRef);
 		if (!CheckDevicesEqual(&srcRef, targetModel)
 			&& !srcModel.IsVolume()
