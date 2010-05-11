@@ -6748,7 +6748,8 @@ BPoseView::DragSelectedPoses(const BPose *pose, BPoint clickPoint)
 
 
 BBitmap *
-BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPoseIndex, BPoint &offset)
+BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint,
+	int32 clickedPoseIndex, BPoint &offset)
 {
 	BRect inner(clickedPoint.x - kTransparentDragThreshold.x / 2,
 		clickedPoint.y - kTransparentDragThreshold.y / 2,
@@ -6756,7 +6757,8 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPose
 		clickedPoint.y + kTransparentDragThreshold.y / 2);
 
 	// (BRect & BRect) doesn't work correctly if the rectangles don't intersect
-	// this catches a bug that is produced somewhere before this function is called
+	// this catches a bug that is produced somewhere before this function is
+	// called
 	if (!inner.Intersects(dragRect))
 		return NULL;
 
@@ -6764,7 +6766,11 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPose
 
 	// If the selection is bigger than the specified limit, the
 	// contents will fade out when they come near the borders
-	bool fadeTop = false, fadeBottom = false, fadeLeft = false, fadeRight = false, fade = false;
+	bool fadeTop = false;
+	bool fadeBottom = false;
+	bool fadeLeft = false;
+	bool fadeRight = false;
+	bool fade = false;
 	if (inner.left > dragRect.left) {
 		inner.left = max(inner.left - 32, dragRect.left);
 		fade = fadeLeft = true;
@@ -6783,7 +6789,7 @@ BPoseView::MakeDragBitmap(BRect dragRect, BPoint clickedPoint, int32 clickedPose
 	}
 
 	// set the offset for the dragged bitmap (for the BView::DragMessage() call)
-	offset = clickedPoint - inner.LeftTop();
+	offset = clickedPoint - BPoint(2, 1) - inner.LeftTop();
 
 	BRect rect(inner);
 	rect.OffsetTo(B_ORIGIN);
