@@ -187,6 +187,7 @@ switch $(HAIKU_DISTRO_COMPATIBILITY) {
 # analyze the gcc machine spec to determine HAIKU_CPU
 switch $(HAIKU_GCC_MACHINE) {
 	case i?86-*		: HAIKU_CPU = x86 ;
+	case x86_64-*		: HAIKU_CPU = x86_64 ;
 	case powerpc-*	: HAIKU_CPU = ppc ;
 	case m68k-*		: HAIKU_CPU = m68k ;
 	case mipsel-*	: HAIKU_CPU = mipsel ;
@@ -239,6 +240,19 @@ switch $(HAIKU_CPU) {
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
 
 		# yasm is required for target arch x86
+		if ! $(HAIKU_YASM) {
+			Exit "HAIKU_YASM not set. Please re-run configure." ;
+		}
+	}
+	case x86_64 :
+	{
+		HAIKU_DEFINES += __x86_64__ ;
+		HAIKU_BOOT_PLATFORM = bios_ia32 ;
+		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
+		# offset in floppy image (>= sizeof(haiku_loader))
+		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 300 ; # in kB
+
+		# yasm is required for target arch x86_64
 		if ! $(HAIKU_YASM) {
 			Exit "HAIKU_YASM not set. Please re-run configure." ;
 		}
@@ -339,6 +353,12 @@ switch $(HAIKU_ARCH) {
 		# Enable use of the gcc built-in atomic functions instead of atomic_*().
 		# The former are inlined and have thus less overhead. They are not
 		# available with gcc 2, but the header will take care of that.
+		HAIKU_DEFINES += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
+	}
+	case x86_64 :
+	{
+		# Enable use of the gcc built-in atomic functions instead of atomic_*().
+		# The former are inlined and have thus less overhead.
 		HAIKU_DEFINES += B_USE_BUILTIN_ATOMIC_FUNCTIONS ;
 	}
 }

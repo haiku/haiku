@@ -14,14 +14,12 @@
    __HAIKU_BIG_ENDIAN	- defined to 1 on big endian architectures
 */
 #ifdef __INTEL__
-#	ifdef __x86_64__
-#		define __HAIKU_ARCH			x86_64
-#		define __HAIKU_ARCH_X86_64	1
-#		define __HAIKU_ARCH_64_BIT	1
-#	else
-#		define __HAIKU_ARCH			x86
-#		define __HAIKU_ARCH_X86		1
-#	endif
+#	define __HAIKU_ARCH			x86
+#	define __HAIKU_ARCH_X86		1
+#elif __x86_64__
+#	define __HAIKU_ARCH			x86_64
+#	define __HAIKU_ARCH_X86_64	1
+#	define __HAIKU_ARCH_64_BIT	1
 #elif __POWERPC__
 #	define __HAIKU_ARCH				ppc
 #	define __HAIKU_ARCH_PPC			1
