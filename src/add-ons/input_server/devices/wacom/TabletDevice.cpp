@@ -293,7 +293,8 @@ TabletDevice::ReadData(const uchar* data, bool& hasContact, uint32& mode,
 		case DEVICE_CINTIQ:
 			if ((data[0] == 0x02) && !(((data[1] >> 5) & 0x03) == 0x02)) {
 				if (fDeviceMode == DEVICE_INTUOS3) {
-					xPos = (data[2] << 9) | (data[3] << 1) | ((data[9] >> 1) & 1);
+					xPos = (data[2] << 9) | (data[3] << 1)
+						| ((data[9] >> 1) & 1);
 					yPos = (data[4] << 9) | (data[5] << 1) | (data[9] & 1);
 				} else {
 					xPos = (data[2] << 8) | data[3];
