@@ -4,9 +4,6 @@
 #
 
 export HOME=/boot/home
-export SHELL=/bin/sh
-export USER=baron
-export GROUP=users
 
 BUILDHOME=/boot/develop
 BETOOLS="$BUILDHOME/tools/gnupro/bin"
