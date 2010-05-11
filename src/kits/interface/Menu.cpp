@@ -1554,10 +1554,6 @@ BMenu::_Hide()
 
 const static bigtime_t kOpenSubmenuDelay = 225000;
 const static bigtime_t kNavigationAreaTimeout = 1000000;
-const static bigtime_t kHysteresis = 200000;
-	// TODO: Test and reduce if needed.
-const static int32 kMouseMotionThreshold = 15;
-	// TODO: Same as above. Actually, we could get rid of the kHysteresis
 
 
 BMenuItem*
@@ -1565,7 +1561,8 @@ BMenu::_Track(int* action, long start)
 {
 	// TODO: cleanup
 	BMenuItem* item = NULL;
-	BRect navAreaRectAbove, navAreaRectBelow;
+	BRect navAreaRectAbove;
+	BRect navAreaRectBelow;
 	bigtime_t selectedTime = system_time();
 	bigtime_t navigationAreaTime = 0;
 
@@ -1580,8 +1577,6 @@ BMenu::_Track(int* action, long start)
 		UnlockLooper();
 	}
 
-	int32 mouseSpeed = 0;
-	bigtime_t pollTime = system_time();
 	bool releasedOnce = buttons == 0;
 	while (fState != MENU_STATE_CLOSED) {
 		if (_CustomTrackingWantsToQuit())
@@ -1677,14 +1672,6 @@ BMenu::_Track(int* action, long start)
 				UnlockLooper();
 			} while (newLocation == location && newButtons == buttons
 				&& !(item && item->Submenu() != NULL));
-			bigtime_t newPollTime = system_time();
-
-			// mouseSpeed in px per ms
-			// (actually point_distance returns the square of the distance,
-			// so it's more px^2 per ms)
-			mouseSpeed = (int32)(point_distance(newLocation, location) * 1000
-				/ (newPollTime - pollTime));
-			pollTime = newPollTime;
 
 			if (newLocation != location || newButtons != buttons) {
 				if (!releasedOnce && newButtons == 0 && buttons != 0)
