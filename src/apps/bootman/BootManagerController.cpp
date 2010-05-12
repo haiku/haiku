@@ -330,7 +330,7 @@ BootManagerController::_CreateMBRSavedPage(BRect frame)
 		description <<
 			B_TRANSLATE_COMMENT("Old Master Boot Record saved", "Title") <<
 			"\n\n" <<
-			B_TRANSLATE("The old Master Boot Record was successfully save to "
+			B_TRANSLATE("The old Master Boot Record was successfully saved to "
 			"%s.") << "\n";
 	} else {
 		description <<
