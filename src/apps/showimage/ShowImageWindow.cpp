@@ -593,11 +593,12 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			int32 pages = fImageView->PageCount();
 			int32 curPage = fImageView->CurrentPage();
 
-			bool benable = (pages > 1) ? true : false;
-			_EnableMenuItem(fBar, MSG_PAGE_FIRST, benable);
-			_EnableMenuItem(fBar, MSG_PAGE_LAST, benable);
-			_EnableMenuItem(fBar, MSG_PAGE_NEXT, benable);
-			_EnableMenuItem(fBar, MSG_PAGE_PREV, benable);
+			bool enable = (pages > 1) ? true : false;
+			_EnableMenuItem(fBar, MSG_PAGE_FIRST, enable);
+			_EnableMenuItem(fBar, MSG_PAGE_LAST, enable);
+			_EnableMenuItem(fBar, MSG_PAGE_NEXT, enable);
+			_EnableMenuItem(fBar, MSG_PAGE_PREV, enable);
+			fGoToPageMenu->SetEnabled(enable);
 
 			_EnableMenuItem(fBar, MSG_FILE_NEXT, fImageView->HasNextFile());
 			_EnableMenuItem(fBar, MSG_FILE_PREV, fImageView->HasPrevFile());
