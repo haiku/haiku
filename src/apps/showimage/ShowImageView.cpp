@@ -2014,7 +2014,7 @@ ShowImageView::_AddWhiteRect(BRect &rect)
 
 
 void
-ShowImageView::_RemoveSelection(bool toClipboard)
+ShowImageView::_RemoveSelection(bool toClipboard, bool neverCutBackground)
 {
 	if (!_HasSelection())
 		return;
@@ -2029,7 +2029,7 @@ ShowImageView::_RemoveSelection(bool toClipboard)
 
 	_SetHasSelection(false);
 
-	if (cutBackground) {
+	if (!neverCutBackground && cutBackground) {
 		// If the user hasn't dragged the selection,
 		// paint a white rectangle where the selection was
 		restore = _CopyFromRect(rect);
@@ -2111,7 +2111,8 @@ ShowImageView::ClearSelection()
 {
 	// Remove the selection,
 	// DON'T copy it to the clipboard
-	_RemoveSelection(false);
+	// or white out the selection
+	_RemoveSelection(false, true);
 }
 
 

@@ -132,7 +132,7 @@ class ShowImageView : public BView {
 		};
 		void _InitPatterns();
 		void _RotatePatterns();
-		void _RemoveSelection(bool bToClipboard);
+		void _RemoveSelection(bool bToClipboard, bool neverCutBackground = false);
 		bool _HasSelection() { return fHasSelection; }
 		void _SetHasSelection(bool bHasSelection);
 		void _AnimateSelection(bool a);
