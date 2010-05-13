@@ -153,6 +153,8 @@ main(int, char **argv)
 
 	if (!atLeastOnePath) {
 		printf(	"usage: desklink { [ --list|--remove|[cmd=title:action ... ] [ path|signature ] } ...\n"
+			"--add-volume: install volume control into Deskbar.\n"
+			"--volume-control: show window with global volume control.\n"
 			"--list: list all Deskbar addons.\n"
 			"--remove: remove all desklink addons.\n"
 			"--remove=name: remove all 'name' addons.\n");
