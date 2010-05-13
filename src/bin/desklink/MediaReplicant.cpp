@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku. All rights reserved.
+ * Copyright 2003-210, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Marcus Overhagen
  *		Jonas Sundström
  *		Axel Dörfler, axeld@pinc-software.de.
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -22,13 +23,13 @@
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <IconUtils.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
 #include <String.h>
 #include <StringView.h>
-
 #include <ToolTip.h>
 #include <ToolTipManager.h>
 
@@ -267,7 +268,7 @@ MediaReplicant::MessageReceived(BMessage* message)
 		case B_ABOUT_REQUESTED:
 			(new BAlert("About Volume Control", "Volume Control\n"
 					"  Brought to you by Jérôme DUVAL.\n\n"
-					"Copyright " B_UTF8_COPYRIGHT "2003-2009, Haiku",
+					"Copyright " B_UTF8_COPYRIGHT "2003-2010, Haiku",
 				"OK"))->Go(NULL);
 			break;
 
@@ -449,8 +450,8 @@ void
 MediaReplicant::_Init()
 {
 	fIcon = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1),
-		B_CMAP8);
-	fIcon->SetBits(kSpeakerBits, kSpeakerWidth * kSpeakerHeight, 0, B_CMAP8);
+		B_RGBA32);
+	BIconUtils::GetVectorIcon(kSpeakerIcon, sizeof(kSpeakerIcon), fIcon);
 
 	_LoadSettings();
 

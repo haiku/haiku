@@ -37,9 +37,9 @@ DeskButton::DeskButton(BRect frame, entry_ref* ref, const char* name,
 	fTitleList(titles)
 {
 #ifdef __HAIKU__
-	fSegments = new BBitmap(BRect(0,0,15,15), B_RGBA32);
+	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
 #else
-	fSegments = new BBitmap(BRect(0,0,15,15), B_CMAP8);
+	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 #endif
 	BNodeInfo::GetTrackerIcon(&fRef, fSegments, B_MINI_ICON);
 }
@@ -60,9 +60,9 @@ DeskButton::DeskButton(BMessage *message)
 	}
 	
 #ifdef __HAIKU__
-	fSegments = new BBitmap(BRect(0,0,15,15), B_RGBA32);
+	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
 #else
-	fSegments = new BBitmap(BRect(0,0,15,15), B_CMAP8);
+	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 #endif
 	BNodeInfo::GetTrackerIcon(&fRef, fSegments, B_MINI_ICON);
 }
