@@ -1021,19 +1021,21 @@ ShowImageView::Draw(BRect updateRect)
 void
 ShowImageView::_DrawSelectionBox()
 {
-	BRect r(fSelectionRect);
-	_ConstrainToImage(r);
-	r = _ImageToView(r);
-	// draw selection box *around* selection
-	r.InsetBy(-1, -1);
-	PushState();
-	rgb_color white = {255, 255, 255};
-	SetLowColor(white);
-	StrokeLine(BPoint(r.left, r.top), BPoint(r.right, r.top), fPatternLeft);
-	StrokeLine(BPoint(r.right, r.top+1), BPoint(r.right, r.bottom-1), fPatternUp);
-	StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.bottom), fPatternRight);
-	StrokeLine(BPoint(r.left, r.top+1), BPoint(r.left, r.bottom-1), fPatternDown);
-	PopState();
+	if (fSelectionRect.Height() > 0.0 && fSelectionRect.Width() > 0.0) {
+		BRect r(fSelectionRect);
+		_ConstrainToImage(r);
+		r = _ImageToView(r);
+		// draw selection box *around* selection
+		r.InsetBy(-1, -1);
+		PushState();
+		rgb_color white = {255, 255, 255};
+		SetLowColor(white);
+		StrokeLine(BPoint(r.left, r.top), BPoint(r.right, r.top), fPatternLeft);
+		StrokeLine(BPoint(r.right, r.top+1), BPoint(r.right, r.bottom-1), fPatternUp);
+		StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.bottom), fPatternRight);
+		StrokeLine(BPoint(r.left, r.top+1), BPoint(r.left, r.bottom-1), fPatternDown);
+		PopState();
+	}
 }
 
 
@@ -1780,15 +1782,17 @@ ShowImageView::_MouseWheelChanged(BMessage *msg)
 void
 ShowImageView::_ShowPopUpMenu(BPoint screen)
 {
-	BPopUpMenu* menu = new PopUpMenu("PopUpMenu", this);
+	if (!fShowingPopUpMenu) {
+	  PopUpMenu* menu = new PopUpMenu("PopUpMenu", this);
 
-	ShowImageWindow* showImage = dynamic_cast<ShowImageWindow*>(Window());
-	if (showImage)
-		showImage->BuildContextMenu(menu);
+	  ShowImageWindow* showImage = dynamic_cast<ShowImageWindow*>(Window());
+	  if (showImage)
+		  showImage->BuildContextMenu(menu);
 
-	screen -= BPoint(10, 10);
-	menu->Go(screen, true, false, true);
-	fShowingPopUpMenu = true;
+	  screen += BPoint(5, 5);
+	  menu->Go(screen, true, true, true);
+	  fShowingPopUpMenu = true;
+	}
 }
 
 
