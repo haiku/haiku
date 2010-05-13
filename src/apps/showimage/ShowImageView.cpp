@@ -1789,7 +1789,7 @@ ShowImageView::_ShowPopUpMenu(BPoint screen)
 	  if (showImage)
 		  showImage->BuildContextMenu(menu);
 
-	  screen += BPoint(5, 5);
+	  screen += BPoint(2, 2);
 	  menu->Go(screen, true, true, true);
 	  fShowingPopUpMenu = true;
 	}
