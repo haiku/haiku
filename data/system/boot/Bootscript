@@ -138,8 +138,10 @@ else
 	launch system/Tracker
 	launch system/Deskbar
 
-	# install ProcessController in the deskbar
-	(sleep 7; /boot/system/apps/ProcessController -deskbar) &
+	# install ProcessController, NetworkStatus & volume control in the Deskbar
+	(sleep 7; /boot/system/apps/ProcessController -deskbar; \
+		 NetworkStatus --deskbar; \
+		/bin/desklink --add-volume) &
 fi
 
 if [ "$SAFEMODE" != "yes" ]; then
