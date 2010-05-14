@@ -350,7 +350,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 	rect.right = rect.left + textView->LineWidth() + 3;
 	// center new width, if necessary
 	if (view->ViewMode() == kIconMode
-		|| view->ViewMode() == kListMode && fAlignment == B_ALIGN_CENTER) {
+		|| (view->ViewMode() == kListMode && fAlignment == B_ALIGN_CENTER)) {
 		rect.OffsetBy(bounds.Width() / 2 - rect.Width() / 2, 0);
 	}
 
