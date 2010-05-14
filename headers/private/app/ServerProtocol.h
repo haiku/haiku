@@ -81,6 +81,8 @@ enum {
 
 	AS_BEGIN_RECT_TRACKING,
 	AS_END_RECT_TRACKING,
+	
+	AS_GET_CURSOR_POSITION,
 
 	// Window definitions
 	AS_SHOW_WINDOW,

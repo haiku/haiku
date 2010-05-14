@@ -7,6 +7,7 @@
  *		Caz <turok2@currantbun.com>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Wim van der Meer <WPJvanderMeer@gmail.com>
  */
 
 
@@ -23,9 +24,10 @@
 #include <ControlLook.h>
 #include <Font.h>
 #include <Menu.h>
+#include <Point.h>
 #include <Roster.h>
-#include <ScrollBar.h>
 #include <Screen.h>
+#include <ScrollBar.h>
 #include <String.h>
 #include <TextView.h>
 
@@ -922,6 +924,42 @@ focus_follows_mouse_mode()
 		link.Read<mode_focus_follows_mouse>(&mode);
 
 	return mode;
+}
+
+
+status_t
+get_mouse(BPoint* screenWhere, uint32* buttons)
+{
+	if (screenWhere == NULL && buttons == NULL)
+		return B_BAD_VALUE;
+
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_CURSOR_POSITION);
+	
+	int32 code;
+	status_t ret = link.FlushWithReply(code);
+	if (ret != B_OK)
+		return ret;
+	if (code != B_OK)
+		return code;
+
+	if (screenWhere != NULL)
+		ret = link.Read<BPoint>(screenWhere);
+	else {
+		BPoint dummy;
+		ret = link.Read<BPoint>(&dummy);
+	}
+	if (ret != B_OK)
+		return ret;
+
+	if (buttons != NULL)
+		ret = link.Read<uint32>(buttons);
+	else {
+		uint32 dummy;
+		ret = link.Read<uint32>(&dummy);
+	}
+
+	return ret;
 }
 
 

@@ -11,6 +11,7 @@
  *		Jérôme Duval, jerome.duval@free.fr
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  *		Philippe Saint-Pierre, stpere@gmail.com
+ *		Wim van der Meer, <WPJvanderMeer@gmail.com>
  */
 
 
@@ -1165,7 +1166,21 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			break;
 		}
-
+		case AS_GET_CURSOR_POSITION:
+		{
+			STRACE(("ServerApp %s: Get Cursor position\n", Signature()));
+			// Returns
+			// 1) BPoint mouse location
+			// 2) int32 button state
+			BPoint where;
+			int32 buttons;
+			fDesktop->GetLastMouseState(&where, &buttons);
+			fLink.StartMessage(B_OK);
+			fLink.Attach<BPoint>(where);
+			fLink.Attach<int32>(buttons);
+			fLink.Flush();
+			break;
+		}
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));

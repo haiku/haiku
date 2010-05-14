@@ -61,6 +61,8 @@ string_for_message_code(uint32 code, BString& string)
 
 		CODE(AS_BEGIN_RECT_TRACKING);
 		CODE(AS_END_RECT_TRACKING);
+		
+		CODE(AS_GET_CURSOR_POSITION);
 
 		// Window definitions
 		CODE(AS_SHOW_WINDOW);
