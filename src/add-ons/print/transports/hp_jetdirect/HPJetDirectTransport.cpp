@@ -77,13 +77,15 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 	} else {
 		BAlert *alert = new BAlert("", "Can't connect to HP JetDirect printer port!", "OK");
 		alert->Go();
+		fReady = B_ERROR;
 	};
 }
 
 
 HPJetDirectPort::~HPJetDirectPort()
 {
-	fEndpoint->Close();
+	if (fEndpoint)
+		fEndpoint->Close();
 	delete fEndpoint;
 }
 
@@ -92,7 +94,9 @@ ssize_t
 HPJetDirectPort::Read(void* buffer, size_t size)
 {
 	// printf("HPJetDirectPort::Read(%ld bytes)\n", size);
-	return (ssize_t) fEndpoint->Receive(buffer, size);
+	if (fEndpoint)
+		return (ssize_t) fEndpoint->Receive(buffer, size);
+	return 0;
 }
 
 
@@ -100,6 +104,8 @@ ssize_t
 HPJetDirectPort::Write(const void* buffer, size_t size)
 {
 	// printf("HPJetDirectPort::Write(%ld bytes)\n", size);
-	return (ssize_t) fEndpoint->Send(buffer, size);
+	if (fEndpoint)
+		return (ssize_t) fEndpoint->Send(buffer, size);
+	return 0;
 }
 
