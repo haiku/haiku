@@ -100,6 +100,7 @@ TransformGradientBox::ObjectChanged(const Observable* object)
 
 	if (object == fShape) {
 		fView->Invalidate(Bounds());
+		fView->UnlockLooper();
 		return;
 	}
 
