@@ -2550,35 +2550,33 @@ BMenu::_SelectNextItem(BMenuItem* item, bool forward)
 BMenuItem*
 BMenu::_NextItem(BMenuItem* item, bool forward) const
 {
-	// go to next item, and skip over disabled items such as separators
-	int32 index = fItems.IndexOf(item);
 	const int32 numItems = fItems.CountItems();
-	if (index < 0) {
-		if (forward)
-			index = -1;
-		else
-			index = numItems;
-	}
-	int32 startIndex = index;
-	do {
+	if (numItems == 0)
+		return NULL;
+
+	int32 index = fItems.IndexOf(item);
+	int32 loopCount = numItems;
+	while (--loopCount) {
+		// Cycle through menu items in the given direction...
 		if (forward)
 			index++;
 		else
 			index--;
 
-		// cycle through menu items
+		// ... wrap around...
 		if (index < 0)
 			index = numItems - 1;
 		else if (index >= numItems)
 			index = 0;
-	} while (!ItemAt(index)->IsEnabled() && index != startIndex);
 
-	if (index == startIndex) {
-		// We are back where we started and no item was enabled.
-		return NULL;
+		// ... and return the first suitable item found.
+		BMenuItem* nextItem = ItemAt(index);
+		if (nextItem->IsEnabled())
+			return nextItem;
 	}
 
-	return ItemAt(index);
+	// If no other suitable item was found, return NULL.
+	return NULL;
 }
 
 
