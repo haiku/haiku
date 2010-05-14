@@ -792,7 +792,7 @@ Keymap::_SaveSourceText(FILE* file)
 	}
 #endif
 
-	int bytes = fprintf(file, "#!/bin/keymap -l\n"
+	int bytes = fprintf(file, "#!/bin/keymap -s\n"
 		"#\n"
 		"#\tRaw key numbering for 101 keyboard...\n");
 
