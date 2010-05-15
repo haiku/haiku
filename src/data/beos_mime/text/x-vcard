@@ -1,0 +1,16 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "text/x-vcard";
+
+resource(2, "META:S:DESC") #'MSDC' "vCard";
+
+resource(2, "META:SNIFF_RULE") #'CSTR' array {
+	"0.50          ([0]\"BEGIN:VCARD\")"
+};
+
+resource(3, "META:EXTENS") message(234) {
+	"extensions" = "vcf",
+	"extensions" = "vcard",
+	"type" = "text/x-vcard"
+};
