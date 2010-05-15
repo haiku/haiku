@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -78,7 +78,9 @@ public:
 
 private:
 			void				_UpdateAutoCheck(bigtime_t interval);
+			bool				_IsPending(BNode& entry) const;
 
+private:
 			BMessageRunner*		fAutoCheckRunner;
 			BMailSettings		fSettingsFile;
 
@@ -467,7 +469,7 @@ MailDaemonApp::GetNewMessages(BMessage* msg)
 	BList list;
 	GetInboundMailChains(&list);
 
-	RunChains(list,msg);
+	RunChains(list, msg);
 }
 
 
@@ -513,8 +515,13 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 				off_t size;
 
 				while (query.GetNextEntry(&entry) == B_OK) {
-					while (node.SetTo(&entry) == B_BUSY) snooze(100);
-					if (node.ReadAttr("MAIL:chain",B_INT32_TYPE,0,&chain,4) < B_OK)
+					while (node.SetTo(&entry) == B_BUSY)
+						snooze(1000);
+					if (!_IsPending(node))
+						continue;
+
+					if (node.ReadAttr("MAIL:chain", B_INT32_TYPE, 0, &chain, 4)
+							< B_OK)
 						chain = defaultChain;
 					entry.GetPath(&path);
 					node.GetSize(&size);
@@ -554,6 +561,9 @@ MailDaemonApp::SendPendingMessages(BMessage* msg)
 
 				while (query.GetNextEntry(&entry) == B_OK) {
 					node.SetTo(&entry);
+					if (!_IsPending(node))
+						continue;
+
 					entry.GetPath(&path);
 					node.GetSize(&size);
 					ids += path.Path();
@@ -591,6 +601,20 @@ MailDaemonApp::Pulse()
 	bigtime_t idle = idle_time();
 	if (fLEDAnimation->IsRunning() && idle < 100000)
 		fLEDAnimation->Stop();
+}
+
+
+/*!	Work-around for a broken index that contains out-of-date information.
+*/
+bool
+MailDaemonApp::_IsPending(BNode& node) const
+{
+	int32 flags;
+	if (node.ReadAttr(B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0, &flags, sizeof(int32))
+			!= (ssize_t)sizeof(int32))
+		return false;
+
+	return (flags & B_MAIL_PENDING) != 0;
 }
 
 
