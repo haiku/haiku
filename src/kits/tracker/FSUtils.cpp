@@ -2888,9 +2888,6 @@ FSCreateTrashDirs()
 		if (volume.IsReadOnly() || !volume.IsPersistent())
 			continue;
 
-		BPath path;
-		find_directory(B_TRASH_DIRECTORY, &path, true, &volume);
-
 		BDirectory trashDir;
 		FSGetTrashDir(&trashDir, volume.Device());
 	}
