@@ -372,7 +372,7 @@ BMenu::AttachedToWindow()
 	// when called on input_server initialization, since it tries
 	// to send a synchronous message to itself (input_server is
 	// a BApplication)
-	
+
 	BMenu::sAltAsCommandKey = true;
 	key_map* keys = NULL;
 	char* chars = NULL;
@@ -505,7 +505,7 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 						BMessenger msgr(Supermenu());
 						msgr.SendMessage(Window()->CurrentMessage());
 					} else
-						Supermenu()->_SelectItem(item, false, false);
+						_QuitTracking();
 				}
 			}
 			break;
@@ -1512,7 +1512,7 @@ BMenu::_Show(bool selectFirstItem)
 		window->Show();
 
 		if (selectFirstItem)
-			_SelectItem(ItemAt(0));
+			_SelectItem(ItemAt(0), false);
 
 		window->Unlock();
 	}
@@ -1652,7 +1652,7 @@ BMenu::_Track(int* action, long start)
 		}
 
 		UnlockLooper();
-		
+
 		if (releasedOnce)
 			_UpdateStateClose(item, location, buttons);
 
