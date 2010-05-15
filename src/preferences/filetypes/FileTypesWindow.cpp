@@ -677,6 +677,7 @@ FileTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 		fRuleControl->SetText(NULL);
 		fPreferredField->Menu()->ItemAt(0)->SetMarked(true);
 		fExtensionListView->SetType(NULL);
+		fAttributeListView->SetTo(NULL);
 	}
 
 	if ((forceUpdate & B_FILE_EXTENSIONS_CHANGED) != 0)
