@@ -13,17 +13,27 @@
 #	information, the user will be limited to the appropriate OptionalPackages
 #	that were available for that specific revision.
 #
-# Disclaimer:
-#   This is a temporary solution for installing OptionalPackages.
-#   In time, there will be an official package manager.
-#   See these URL's for info on the in-development package manager.
-#     http://dev.haiku-os.org/wiki/PackageManagerIdeas
-#     http://dev.haiku-os.org/wiki/PackageFormat
-#
-# Usage: ./installoptionalpackage [-l] [-a "<pkg> [<pkg> ...]"]
-# -l      List installable packages
-# -a      Add one or more packages and all dependencies
+DISCLAIMER="\
+Disclaimer:\n\
+  This is a temporary solution for installing OptionalPackages.\n\
+  In time, there will be an official package manager.\n\
+  See these URL's for information on the in-development package manager.\n\
+    http://dev.haiku-os.org/wiki/PackageManagerIdeas\n\
+    http://dev.haiku-os.org/wiki/PackageFormat\n\
+	"
 
+USAGE="\
+Usage: ./installoptionalpackage [<pkg> [<pkg> ...]]\n\
+  or   ./installoptionalpackage [-a|-s <pkg> [<pkg> ...]]\n\
+  or   ./installoptionalpackage [-f|-h|-l]\n\
+\n\
+Options:\n\
+-a     Add one or more packages and all dependencies\n\
+-s     Show the final list of packages that would be installed\n\
+-f     Remove cached data and list installable packages\n\
+-h     Print this help.\n\
+-l     List installable packages\n\
+	"
 
 declare -A availablePackages
 declare availablePackagesKeys=""
@@ -722,27 +732,8 @@ function ReplaceComparators()
 
 function DisplayUsage()
 {
-	cat << EOF
-
-Disclaimer:
-  This is a temporary solution for installing OptionalPackages.
-  In time, there will be an official package manager.
-  See these URL's for information on the in-development package manager.
-    http://dev.haiku-os.org/wiki/PackageManagerIdeas
-    http://dev.haiku-os.org/wiki/PackageFormat
-
-Usage: ./installoptionalpackage [<pkg> [<pkg> ...]]
-  or   ./installoptionalpackage [-a|-s <pkg> [<pkg> ...]]
-  or   ./installoptionalpackage [-f|-h|-l]
-
-Options:
--a     Add one or more packages and all dependencies
--s     Show the final list of packages that would be installed
--f     Remove cached data and list installable packages
--h     Print this help.
--l     List installable packages
-
-EOF
+	echo -e "$DISCLAIMER"
+	echo -e "$USAGE"
 }
 
 
