@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -718,19 +718,19 @@ computeRelativeUnit(parsed_element& element, struct tm& tm, int* _flags)
 	// adjust value
 
 	if ((element.flags & FLAG_RELATIVE) != 0) {
-		if (element.unit == UNIT_MONTH)
-			tm.tm_mon += element.value;
-		else if (element.unit == UNIT_DAY)
-			tm.tm_mday += element.value;
-		else if (element.unit == UNIT_SECOND) {
-			if (element.modifier == MODIFY_MINUS)
-				tm.tm_sec -= element.value;
-			else
-				tm.tm_sec += element.value;
+		bigtime_t value = element.value;
+		if (element.modifier == MODIFY_MINUS)
+			value = -element.value;
 
+		if (element.unit == UNIT_MONTH)
+			tm.tm_mon += value;
+		else if (element.unit == UNIT_DAY)
+			tm.tm_mday += value;
+		else if (element.unit == UNIT_SECOND) {
+			tm.tm_sec += value;
 			*_flags |= PARSEDATE_MINUTE_RELATIVE_TIME;
 		} else if (element.unit == UNIT_YEAR)
-			tm.tm_year += element.value;
+			tm.tm_year += value;
 	} else if (element.base_type == TYPE_WEEKDAY) {
 		tm.tm_mday += element.value - tm.tm_wday;
 
@@ -890,6 +890,9 @@ computeDate(const char* format, bool* optional, parsed_element* elements,
 }
 
 
+// #pragma mark - public API
+
+
 time_t
 parsedate_etc(const char* dateString, time_t now, int* _flags)
 {
@@ -903,13 +906,15 @@ parsedate_etc(const char* dateString, time_t now, int* _flags)
 	}
 
 #if TRACE_PARSEDATE
+	printf("parsedate(\"%s\", now %ld)\n", dateString, now);
 	for (int32 index = 0; elements[index].type != TYPE_END; index++) {
 		parsed_element e = elements[index];
 
 		printf("  %ld: type = %u, base_type = %u, unit = %u, flags = %u, "
-			"value = %Ld (%s)\n", index, e.type, e.base_type, e.unit, e.flags,
-			e.value, e.value_type == VALUE_NUMERICAL
-			? "numerical" : (e.value_type == VALUE_STRING ? "string" : "char"));
+			"modifier = %u, value = %Ld (%s)\n", index, e.type, e.base_type,
+			e.unit, e.flags, e.modifier, e.value,
+			e.value_type == VALUE_NUMERICAL ? "numerical"
+				: (e.value_type == VALUE_STRING ? "string" : "char"));
 	}
 #endif
 
