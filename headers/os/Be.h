@@ -7,6 +7,7 @@
 #include <GameKit.h>
 #include <InterfaceKit.h>
 #include <KernelKit.h>
+#include <LocaleKit.h>
 #include <MediaKit.h>
 #include <MidiKit.h>
 #include <NetKit.h>
