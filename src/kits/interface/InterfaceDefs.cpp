@@ -16,10 +16,12 @@
 
 #include <InterfaceDefs.h>
 
+#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <Bitmap.h>
 #include <Clipboard.h>
 #include <ControlLook.h>
 #include <Font.h>
@@ -960,6 +962,71 @@ get_mouse(BPoint* screenWhere, uint32* buttons)
 	}
 
 	return ret;
+}
+
+
+status_t
+get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
+{
+	if (bitmap == NULL && hotspot == NULL)
+		return B_BAD_VALUE;
+	
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_CURSOR_BITMAP);
+	
+	int32 code;
+	status_t status = link.FlushWithReply(code);
+	if (status != B_OK)
+		return status;
+	if (code != B_OK)
+		return code;
+	
+	uint32 size = 0;
+	uint32 cursorWidth = 0;
+	uint32 cursorHeight = 0;
+	
+	// if link.Read() returns an error, the same error will be returned on
+	// subsequent calls, so we'll check only the return value of the last call
+	link.Read<uint32>(&size);
+	link.Read<uint32>(&cursorWidth);
+	link.Read<uint32>(&cursorHeight);
+	if (hotspot == NULL) {
+		BPoint dummy;
+		link.Read<BPoint>(&dummy);
+	} else
+		link.Read<BPoint>(hotspot);
+
+	void* data = NULL;
+	if (size > 0)
+		data = malloc(size);
+	if (data == NULL)
+		return B_NO_MEMORY;
+	
+	status = link.Read(data, size);
+	if (status != B_OK) {
+		free(data);
+		return status;
+	}
+	
+	BBitmap* cursorBitmap = new (std::nothrow) BBitmap(BRect(0, 0,
+		cursorWidth - 1, cursorHeight - 1), B_RGBA32);
+	
+	if (cursorBitmap == NULL) {
+		free(data);
+		return B_NO_MEMORY;
+	}
+	status = cursorBitmap->InitCheck();
+	if (status == B_OK)
+		cursorBitmap->SetBits(data, size, 0, B_RGBA32);
+
+	free(data);
+	
+	if (status == B_OK && bitmap != NULL)
+		*bitmap = cursorBitmap;
+	else
+		delete cursorBitmap;
+	
+	return status;
 }
 
 

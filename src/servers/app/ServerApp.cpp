@@ -622,6 +622,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
 			break;
 		}
+		
 		case AS_COUNT_DECORATORS:
 		{
 			fLink.StartMessage(B_OK);
@@ -629,6 +630,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_DECORATOR:
 		{
 			fLink.StartMessage(B_OK);
@@ -636,6 +638,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_DECORATOR_NAME:
 		{
 			int32 index;
@@ -651,6 +654,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_R5_SET_DECORATOR:
 		{
 			// Sort of supports Tracker's nifty Easter Egg. It was easy to do
@@ -671,6 +675,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			break;
 		}
+		
 		case AS_CREATE_BITMAP:
 		{
 			STRACE(("ServerApp %s: Received BBitmap creation request\n",
@@ -737,6 +742,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_DELETE_BITMAP:
 		{
 			STRACE(("ServerApp %s: received BBitmap delete request\n",
@@ -760,6 +766,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fMapLocker.Unlock();
 			break;
 		}
+		
 		case AS_GET_BITMAP_OVERLAY_RESTRICTIONS:
 		{
 			overlay_restrictions restrictions;
@@ -787,6 +794,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_BITMAP_SUPPORT_FLAGS:
 		{
 			uint32 colorSpace;
@@ -962,6 +970,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 			break;
 		}
+		
 		case AS_HIDE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Hide Cursor\n", Signature()));
@@ -969,12 +978,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fDesktop->HWInterface()->SetCursorVisible(fCursorHideLevel == 0);
 			break;
 		}
+		
 		case AS_OBSCURE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Obscure Cursor\n", Signature()));
 			fDesktop->HWInterface()->ObscureCursor();
 			break;
 		}
+		
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
 			STRACE(("ServerApp %s: Received IsCursorHidden request\n",
@@ -984,6 +995,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_SET_CURSOR:
 		{
 			STRACE(("ServerApp %s: SetCursor\n", Signature()));
@@ -1023,6 +1035,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
+		
 		case AS_SET_VIEW_CURSOR:
 		{
 			STRACE(("ServerApp %s: AS_SET_VIEW_CURSOR:\n", Signature()));
@@ -1079,9 +1092,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
+		
 		case AS_CREATE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Create Cursor\n", Signature()));
+
 			// Attached data:
 			// 1) 68 bytes of fAppCursor data
 			// 2) port_id reply port
@@ -1124,11 +1139,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_REFERENCE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Reference BCursor\n", Signature()));
+
 			// Attached data:
 			// 1) int32 token ID of the cursor to reference
+
 			int32 token;
 			if (link.Read<int32>(&token) != B_OK)
 				break;
@@ -1145,11 +1163,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			break;
 		}
+		
 		case AS_DELETE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Delete BCursor\n", Signature()));
+
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
+
 			int32 token;
 			if (link.Read<int32>(&token) != B_OK)
 				break;
@@ -1166,12 +1187,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			break;
 		}
+		
 		case AS_GET_CURSOR_POSITION:
 		{
 			STRACE(("ServerApp %s: Get Cursor position\n", Signature()));
+
 			// Returns
 			// 1) BPoint mouse location
 			// 2) int32 button state
+
 			BPoint where;
 			int32 buttons;
 			fDesktop->GetLastMouseState(&where, &buttons);
@@ -1181,6 +1205,36 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
+		case AS_GET_CURSOR_BITMAP:
+		{
+			STRACE(("ServerApp %s: Get Cursor bitmap\n", Signature()));
+
+			// Returns
+			// 1) uint32 number of data bytes of the bitmap
+			// 2) uint32 cursor width in number of pixels
+			// 3) uint32 cursor height in number of pixels
+			// 4) BPoint cursor hot spot
+			// 5) cursor bitmap data
+			
+			ServerCursorReference cursorRef = fDesktop->Cursor();
+			ServerCursor* cursor = cursorRef.Get();
+			if (cursor != NULL) {
+				uint32 size = cursor->BitsLength();
+				fLink.StartMessage(B_OK);
+				fLink.Attach<uint32>(size);
+				fLink.Attach<uint32>(cursor->Width());
+				fLink.Attach<uint32>(cursor->Height());
+				fLink.Attach<BPoint>(cursor->GetHotSpot());
+				fLink.Attach(cursor->Bits(), size);
+			} else
+				fLink.StartMessage(B_ERROR);
+			
+			fLink.Flush();
+			
+			break;
+		}
+		
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));
@@ -1196,14 +1250,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			} else
 				fLink.StartMessage(B_ERROR);
 
-				fLink.Flush();
+			fLink.Flush();
 			break;
 		}
+		
 		case AS_SET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Set ScrollBar info\n", Signature()));
+
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
+
 			scroll_bar_info info;
 			if (link.Read<scroll_bar_info>(&info) == B_OK) {
 				LockedDesktopSettings settings(fDesktop);
@@ -1233,6 +1290,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_SET_MENU_INFO:
 		{
 			STRACE(("ServerApp %s: Set menu info\n", Signature()));
@@ -1253,8 +1311,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			STRACE(("ServerApp %s: Set Mouse Focus mode\n",
 				Signature()));
+
 			// Attached Data:
 			// 1) enum mode_mouse mouse focus mode
+
 			mode_mouse mouseMode;
 			if (link.Read<mode_mouse>(&mouseMode) == B_OK) {
 				LockedDesktopSettings settings(fDesktop);
@@ -1262,6 +1322,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
+		
 		case AS_GET_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Get Mouse Focus mode\n",
@@ -1280,11 +1341,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_SET_FOCUS_FOLLOWS_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Set Focus Follows Mouse mode\n", Signature()));
+
 			// Attached Data:
 			// 1) enum mode_focus_follows_mouse FFM mouse mode
+
 			mode_focus_follows_mouse focusFollowsMousMode;
 			if (link.Read<mode_focus_follows_mouse>(&focusFollowsMousMode) == B_OK) {
 				LockedDesktopSettings settings(fDesktop);
@@ -1292,6 +1356,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
+		
 		case AS_GET_FOCUS_FOLLOWS_MOUSE_MODE:
 		{
 			STRACE(("ServerApp %s: Get Focus Follows Mouse mode\n", Signature()));
@@ -1310,11 +1375,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_SET_ACCEPT_FIRST_CLICK:
 		{
 			STRACE(("ServerApp %s: Set Accept First Click\n", Signature()));
+
 			// Attached Data:
 			// 1) bool accept_first_click
+
 			bool acceptFirstClick;
 			if (link.Read<bool>(&acceptFirstClick) == B_OK) {
 				LockedDesktopSettings settings(fDesktop);
@@ -1322,6 +1390,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
+		
 		case AS_GET_ACCEPT_FIRST_CLICK:
 		{
 			STRACE(("ServerApp %s: Get Accept First Click\n", Signature()));
@@ -1437,6 +1506,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
+		
 		case AS_GET_SYSTEM_DEFAULT_FONT:
 		{
 			// input:
@@ -1473,6 +1543,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_SYSTEM_FONTS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_SYSTEM_FONTS\n", Signature()));
@@ -1509,10 +1580,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 						font = &fPlainFont;
 						fLink.AttachString("plain");
 						break;
+						
 					case 1:
 						font = &fBoldFont;
 						fLink.AttachString("bold");
 						break;
+						
 					case 2:
 						font = &fFixedFont;
 						fLink.AttachString("fixed");
@@ -1530,6 +1603,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_FONT_LIST_REVISION:
 		{
 			STRACE(("ServerApp %s: AS_GET_FONT_LIST_REVISION\n", Signature()));
@@ -1540,9 +1614,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_FAMILY_AND_STYLES:
 		{
 			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLES\n", Signature()));
+
 			// Attached Data:
 			// 1) int32 the index of the font family to get
 
@@ -1583,9 +1659,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_FAMILY_AND_STYLE:
 		{
 			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1593,6 +1671,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Returns:
 			// 1) font_family The name of the font family
 			// 2) font_style - name of the style
+
 			uint16 familyID, styleID;
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
@@ -1611,6 +1690,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			gFontManager->Unlock();
 			break;
 		}
+		
 		case AS_GET_FAMILY_AND_STYLE_IDS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE_IDS\n",
@@ -1662,9 +1742,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_FONT_FILE_FORMAT:
 		{
 			FTRACE(("ServerApp %s: AS_GET_FONT_FILE_FORMAT\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1689,9 +1771,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_STRING_WIDTHS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTHS\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 ID of family
 			// 2) uint16 ID of style
@@ -1756,10 +1840,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			}
 			break;
 		}
+		
 		case AS_GET_FONT_BOUNDING_BOX:
 		{
 			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX unimplemented\n",
 				Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1772,15 +1858,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_TUNED_COUNT:
 		{
 			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 
 			// Returns:
 			// 1) int32 - number of font strikes available
+
 			uint16 familyID, styleID;
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
@@ -1798,10 +1887,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_TUNED_INFO:
 		{
 			FTRACE(("ServerApp %s: AS_GET_TUNED_INFO unimplmemented\n",
 				Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1810,20 +1901,24 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// Returns:
 			// 1) tuned_font_info - info on the strike specified
 			// ToDo: implement me!
+
 			fLink.StartMessage(B_ERROR);
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_EXTRA_FONT_FLAGS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_EXTRA_FONT_FLAGS\n",
 				Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 
 			// Returns:
 			// 1) uint32 - extra font flags
+
 			uint16 familyID, styleID;
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
@@ -1841,13 +1936,16 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_FONT_HEIGHT:
 		{
 			FTRACE(("ServerApp %s: AS_GET_FONT_HEIGHT\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 family ID
 			// 2) uint16 style ID
 			// 3) float size
+
 			uint16 familyID, styleID;
 			float size;
 			link.Read<uint16>(&familyID);
@@ -1870,9 +1968,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_GLYPH_SHAPES:
 		{
 			FTRACE(("ServerApp %s: AS_GET_GLYPH_SHAPES\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1938,9 +2038,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_HAS_GLYPHS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_HAS_GLYPHS\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1976,9 +2078,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_EDGES:
 		{
 			FTRACE(("ServerApp %s: AS_GET_EDGES\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -2016,9 +2120,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_ESCAPEMENTS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -2110,9 +2216,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_ESCAPEMENTS_AS_FLOATS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_ESCAPEMENTS_AS_FLOATS\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -2120,10 +2228,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 4) uint8 - spacing
 			// 5) float - rotation
 			// 6) uint32 - flags
-
 			// 7) float - additional "nonspace" delta
 			// 8) float - additional "space" delta
-
 			// 9) int32 - numChars
 			// 10) int32 - numBytes
 			// 11) char - the char buffer with size numBytes
@@ -2193,10 +2299,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_GET_BOUNDINGBOXES_CHARS:
 		case AS_GET_BOUNDINGBOXES_STRING:
 		{
 			FTRACE(("ServerApp %s: AS_GET_BOUNDINGBOXES_CHARS\n", Signature()));
+
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -2206,12 +2314,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 6) float - false bold width
 			// 7) uint8 - spacing
 			// 8) uint32 - flags
-
 			// 9) font_metric_mode - mode
 			// 10) bool - string escapement
-
 			// 11) escapement_delta - additional delta
-
 			// 12) int32 - numChars
 			// 13) int32 - numBytes
 			// 14) char - the char buffer with size numBytes
@@ -2284,6 +2389,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			delete[] rectArray;
 			break;
 		}
+		
 		case AS_GET_BOUNDINGBOXES_STRINGS:
 		{
 			FTRACE(("ServerApp %s: AS_GET_BOUNDINGBOXES_STRINGS\n",
@@ -2298,10 +2404,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 6) float - false bold width
 			// 7) uint8 - spacing
 			// 8) uint32 - flags
-
 			// 9) font_metric_mode - mode
 			// 10) int32 numStrings
-
 			// 11) escapement_delta - additional delta (numStrings times)
 			// 12) int32 string length to measure (numStrings times)
 			// 13) string - string (numStrings times)
@@ -2376,6 +2480,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			// Attached data
 			// 1) int32 screen
+
 			int32 id;
 			if (link.Read<int32>(&id) == B_OK
 				&& id == B_MAIN_SCREEN_ID.id)
@@ -2391,6 +2496,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			// Attached data
 			// 1) int32 screen
+
 			int32 id;
 			link.Read<int32>(&id);
 
@@ -2406,6 +2512,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// Attached data
 			// 1) int32 - window client token
+
 			int32 clientToken;
 			if (link.Read<int32>(&clientToken) != B_OK)
 				status = B_BAD_DATA;
@@ -2447,6 +2554,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_SCREEN_GET_MODE:
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_GET_MODE\n", Signature()));
+
 			// Attached data
 			// 1) int32 screen
 			// 2) uint32 workspace index
@@ -2465,9 +2573,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		
 		case AS_SCREEN_SET_MODE:
 		{
 			STRACE(("ServerApp %s: AS_SCREEN_SET_MODE\n", Signature()));
+
 			// Attached data
 			// 1) int32 screen
 			// 2) workspace index
@@ -2561,6 +2671,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_SCREEN_FRAME:
 		{
 			STRACE(("ServerApp %s: AS_GET_SCREEN_FRAME\n", Signature()));
+
 			// Attached data
 			// 1) int32 screen
 			// 2) uint32 workspace index
@@ -2652,9 +2763,11 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_SET_UI_COLOR:
 		{
 			STRACE(("ServerApp %s: Set UI Color\n", Signature()));
+
 			// Attached Data:
 			// 1) color_which which
 			// 2) rgb_color color
+
 			color_which which;
 			rgb_color color;
 
@@ -2747,6 +2860,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_TIMING_CONSTRAINTS:
 		{
 			STRACE(("ServerApp %s: get timing constraints\n", Signature()));
+
 			// We aren't using the screen_id for now...
 			int32 id;
 			link.Read<int32>(&id);
