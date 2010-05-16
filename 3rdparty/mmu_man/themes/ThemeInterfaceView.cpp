@@ -66,7 +66,7 @@ const uint32 kHideSSPulse		= 'TmH1';
 const uint32 kShowSSPulse		= 'TmH2';
 
 static const uint32 skOnlineThemes	= 'TmOL';
-static char* skThemeURL			= "http://www.zeta-os.com/cms/download.php?list.4";
+static const char* skThemeURL		= "http://www.zeta-os.com/cms/download.php?list.4";
 
 #define HIDESS_OFFSET (Bounds().Width()/2 - 130)
 
@@ -436,7 +436,7 @@ ThemeInterfaceView::MessageReceived(BMessage *_msg)
 			break;
 		
 		case skOnlineThemes:
-			be_roster->Launch( "application/x-vnd.Mozilla-Firefox", 1, &skThemeURL);
+			be_roster->Launch( "application/x-vnd.Mozilla-Firefox", 1, (char **)&skThemeURL);
 			break;
 			
 		default:

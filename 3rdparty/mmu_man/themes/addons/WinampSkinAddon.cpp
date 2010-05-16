@@ -147,11 +147,12 @@ WinampSkinThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	else
 		err = SPSkin(&name);
 	/* try the other way round */
-	if (err)
+	if (err) {
 		if (WhichApp() == USE_CL)
 			err = CLSkin(&name, true);
 		else
 			err = SPSkin(&name, true);
+	}
 	if (!err)
 		skin.AddString("winamp:skin", name);
 	err = SetMyMessage(theme, skin);
