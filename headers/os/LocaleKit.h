@@ -1,7 +1,7 @@
 /*
  * Master include file for the Locale Kit.
  *
- * CatalogInddOn.h not included, as it's only required when building an add-on.
+ * CatalogInAddOn.h not included, as it's only required when building an add-on.
  */
 #include <Catlog.h>
 #include <Collator.h>
