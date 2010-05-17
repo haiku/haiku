@@ -298,20 +298,25 @@ UnzipEngine::_ReadLineListing(const BString& line)
 status_t
 UnzipEngine::_ReadLineExtract(const BString& line)
 {
-	char item[1024];
-	char linkTarget[256];
-	const char* kCreatingFormat = "    creating: %s\n";
-	const char* kInflatingFormat = "   inflating: %s\n";
-	const char* kLinkingFormat = "     linking: %s -> %s\n";
-	if (sscanf(line.String(), kCreatingFormat, &item) == 1
-		|| sscanf(line.String(), kInflatingFormat, &item) == 1
-		|| sscanf(line.String(), kLinkingFormat, &item,
-			&linkTarget) == 2) {
+	const char* kCreatingFormat = "   creating:";
+	const char* kInflatingFormat = "  inflating:";
+	const char* kLinkingFormat = "    linking:";
+	if (line.FindFirst(kCreatingFormat) == 0
+		|| line.FindFirst(kInflatingFormat) == 0
+		|| line.FindFirst(kLinkingFormat) == 0) {
 
 		fItemsUncompressed++;
 
-		BString itemPath(item);
-		int pos = itemPath.FindLast('/');
+		BString itemPath;
+
+		int pos = line.FindLast(" -> ");
+		if (pos > 0)
+			line.CopyInto(itemPath, 13, pos - 13);
+		else 
+			line.CopyInto(itemPath, 13, line.CountChars() - 14);
+
+		itemPath.Trim();
+		pos = itemPath.FindLast('/');
 		BString itemName = itemPath.String() + pos + 1;
 		itemPath.Truncate(pos);
 
@@ -326,7 +331,7 @@ UnzipEngine::_ReadLineExtract(const BString& line)
 
 		_UpdateProgress(itemName.String(), itemPath.String());
 	} else {
-//		printf("ignored: %s", line.String());
+//		printf("ignored: '%s'\n", line.String());
 	}
 
 	return B_OK;
