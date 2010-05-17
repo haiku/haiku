@@ -47,6 +47,12 @@ static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
 	// they allow to specify a buffering mode.
 
+static const int64 kNoPTSValue = 0x8000000000000000LL;
+	// NOTE: For some reasons, I have trouble with the avcodec.h define:
+	// #define AV_NOPTS_VALUE          INT64_C(0x8000000000000000)
+	// INT64_C is not defined here.
+
+
 uint32
 avformat_to_beos_format(SampleFormat format)
 {
@@ -712,10 +718,6 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	// for a couple of streams and are in line with the documentation, but
 	// unfortunately, libavformat itself seems to set the time_base and
 	// duration wrongly sometimes. :-(
-	static const int64 kNoPTSValue = 0x8000000000000000LL;
-		// NOTE: For some reasons, I have trouble with the avcodec.h define:
-		// #define AV_NOPTS_VALUE          INT64_C(0x8000000000000000)
-		// INT64_C is not defined here.
 	if ((int64)fStream->duration != kNoPTSValue) {
 		*duration = (bigtime_t)(1000000LL * fStream->duration
 			* fStream->time_base.num / fStream->time_base.den);
@@ -887,6 +889,10 @@ AVFormatReader::StreamCookie::GetNextChunk(const void** chunkBuffer,
 {
 	TRACE_PACKET("AVFormatReader::StreamCookie::GetNextChunk()\n");
 
+	// Get the last stream DTS before reading the next packet, since
+	// then it points to that one.
+	int64 lastStreamDTS = fStream->cur_dts;
+
 	status_t ret = _NextPacket(false);
 	if (ret != B_OK) {
 		*chunkBuffer = NULL;
@@ -912,10 +918,19 @@ AVFormatReader::StreamCookie::GetNextChunk(const void** chunkBuffer,
 		mediaHeader->destination = -1;
 		mediaHeader->time_source = -1;
 		mediaHeader->size_used = fPacket.size;
-//TRACE("  PTS: %lld (time_base.num: %d, .den: %d)\n",
-//fPacket.pts, fStream->time_base.num, fStream->time_base.den);
-		mediaHeader->start_time = (bigtime_t)(1000000.0 * fPacket.pts
-			/ av_q2d(fStream->time_base));
+		if (fPacket.pts != kNoPTSValue) {
+//TRACE("  PTS: %lld (time_base.num: %d, .den: %d), stream DTS: %lld\n",
+//fPacket.pts, fStream->time_base.num, fStream->time_base.den,
+//fStream->cur_dts);
+			mediaHeader->start_time = (bigtime_t)(1000000.0 * fPacket.pts
+				* fStream->time_base.num / fStream->time_base.den);
+		} else {
+//TRACE("  PTS (stream): %lld (time_base.num: %d, .den: %d), stream DTS: %lld\n",
+//lastStreamDTS, fStream->time_base.num, fStream->time_base.den,
+//fStream->cur_dts);
+			mediaHeader->start_time = (bigtime_t)(1000000.0 * lastStreamDTS
+				* fStream->time_base.num / fStream->time_base.den);
+		}
 		mediaHeader->file_pos = fPacket.pos;
 		mediaHeader->data_offset = 0;
 		switch (mediaHeader->type) {
@@ -1032,6 +1047,9 @@ AVFormatReader::StreamCookie::_NextPacket(bool reuse)
 
 	while (true) {
 		if (av_read_frame(fContext, &fPacket) < 0) {
+			// NOTE: Even though we may get the error for a different stream,
+			// av_read_frame() is not going to be successful from here on, so
+			// it doesn't matter
 			fReusePacket = false;
 			return B_LAST_BUFFER_ERROR;
 		}
