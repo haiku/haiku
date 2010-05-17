@@ -4,7 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <Debug.h>
+#include <Locale.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Settings"
 
 
 Settings* settings = NULL;
@@ -229,15 +235,19 @@ BooleanValueSetting::Value() const
 const char*
 BooleanValueSetting::Handle(const char *const *argv)
 {
-	if (!*++argv) 
-		return "on or off expected";
+	if (!*++argv) {
+		return B_TRANSLATE_COMMENT("on or off expected","Do not translate "
+			"'on' and 'off'");
+	}
 
 	if (strcmp(*argv, "on") == 0)
 		fValue = true;
 	else if (strcmp(*argv, "off") == 0)
 		fValue = false;
-	else
-		return "on or off expected";
+	else {
+		return B_TRANSLATE_COMMENT("on or off expected", "Do not translate "
+		"'on' and 'off'");
+	}
 
 	return 0;
 }

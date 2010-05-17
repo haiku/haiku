@@ -16,6 +16,8 @@
 #include <Application.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MediaRoster.h>
 #include <NodeInfo.h>
 #include <scheduler.h>
@@ -23,6 +25,9 @@
 #include <TimeSource.h>
 #include <View.h>
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "VideoConsumer.cpp"
 
 #define M1 ((double)1000000.0)
 #define JITTER		20000
@@ -32,15 +37,19 @@
 #define PROGRESS	printf
 #define LOOP		printf
 
+
 static status_t SetFileType(BFile* file,  int32 translator, uint32 type);
 
-const media_raw_video_format vid_format = {29.97, 1, 0, 239, B_VIDEO_TOP_LEFT_RIGHT,
-	1, 1, {B_RGB16, 320, 240, 320 * 4, 0, 0}};
+const media_raw_video_format vid_format = {29.97, 1, 0, 239,
+	B_VIDEO_TOP_LEFT_RIGHT, 1, 1, {B_RGB16, 320, 240, 320 * 4, 0, 0}};
 
 
-VideoConsumer::VideoConsumer(const char* name, BView* view, BStringView* statusLine,
+VideoConsumer::VideoConsumer(const char* name, BView* view, 
+	BStringView* statusLine,
 	BMediaAddOn* addon, const uint32 internalId)
-	: BMediaNode(name), BMediaEventLooper(), BBufferConsumer(B_MEDIA_RAW_VIDEO),
+	: BMediaNode(name), 
+	BMediaEventLooper(), 
+	BBufferConsumer(B_MEDIA_RAW_VIDEO),
 	fStatusLine(statusLine),
 	fInternalID(internalId),
 	fAddOn(addon),
@@ -86,9 +95,9 @@ VideoConsumer::~VideoConsumer()
 	Quit();
 
 	if (fWindow) {
-		printf("Locking the window\n");
+		printf(B_TRANSLATE("Locking the window\n"));
 		if (fWindow->Lock()) {
-			printf("Closing the window\n");
+			printf(B_TRANSLATE("Closing the window\n"));
 			fWindow->Close();
 			fWindow = 0;
 		}
@@ -652,7 +661,7 @@ VideoConsumer::LocalSave(char* filename, BBitmap* bitmap)
 {
 	BFile* output;
 
-	UpdateFtpStatus("Capturing Image" B_UTF8_ELLIPSIS);
+	UpdateFtpStatus(B_TRANSLATE("Capturing Image" B_UTF8_ELLIPSIS));
 
 	/* save a local copy of the image in the requested format */
 	output = new BFile();
@@ -663,17 +672,17 @@ VideoConsumer::LocalSave(char* filename, BBitmap* bitmap)
         if (err == B_OK) {
         	err = SetFileType(output, fTranslator, fImageFormat);
         	if (err != B_OK)
-        		UpdateFtpStatus("Error setting type of output file");			        		
+        		UpdateFtpStatus(B_TRANSLATE("Error setting type of output file"));
         }
         else
-        	UpdateFtpStatus("Error writing output file");			        		
+        	UpdateFtpStatus(B_TRANSLATE("Error writing output file"));
 
 		input.DetachBitmap(&bitmap);
 		output->Unset();
 		delete output;
 		return B_OK;
     } else {
-		UpdateFtpStatus("Error creating output file");
+		UpdateFtpStatus(B_TRANSLATE("Error creating output file"));
     	return B_ERROR;
     }		        	        
 }
@@ -695,21 +704,23 @@ VideoConsumer::FtpSave(char* filename)
 		case 2:
 			return B_OK;
 		default:
-			fprintf(stderr, "invalid upload client %ld\n", fUploadClient);
+			fprintf(stderr, B_TRANSLATE("invalid upload client %ld\n"), 
+				fUploadClient);
 			return EINVAL;
 	}
 
 	ftp->SetPassive(fPassiveFtp);
 		// ftp the local file to our web site
 
-	UpdateFtpStatus("Logging in" B_UTF8_ELLIPSIS);
-	if (ftp->Connect((string)fServerText, (string)fLoginText, (string)fPasswordText)) {
+	UpdateFtpStatus(B_TRANSLATE("Logging in" B_UTF8_ELLIPSIS));
+	if (ftp->Connect((string)fServerText, (string)fLoginText, 
+		(string)fPasswordText)) {
 		// connect to server
-		UpdateFtpStatus("Connected" B_UTF8_ELLIPSIS);
+		UpdateFtpStatus(B_TRANSLATE("Connected" B_UTF8_ELLIPSIS));
 
 		if (ftp->ChangeDir((string)fDirectoryText)) {
 			// cd to the desired directory
-			UpdateFtpStatus("Transmitting" B_UTF8_ELLIPSIS);
+			UpdateFtpStatus(B_TRANSLATE("Transmitting" B_UTF8_ELLIPSIS));
 
 			if (ftp->PutFile((string)filename, (string)"temp")) {
 				// send the file to the server
@@ -717,13 +728,13 @@ VideoConsumer::FtpSave(char* filename)
 				ftp->Chmod((string)"temp", (string)"644");
 				// make it world readable
 
-				UpdateFtpStatus("Renaming" B_UTF8_ELLIPSIS);
+				UpdateFtpStatus(B_TRANSLATE("Renaming" B_UTF8_ELLIPSIS));
 
 				if (ftp->MoveFile((string)"temp", (string)filename)) {
 					// change to the desired name
 					uint32 time = real_time_clock();
 					char s[80];
-					strcpy(s, "Last Capture: ");
+					strcpy(s, B_TRANSLATE("Last Capture: "));
 					strcat(s, ctime((const long*)&time));
 					s[strlen(s) - 1] = 0;
 					UpdateFtpStatus(s);
@@ -731,16 +742,17 @@ VideoConsumer::FtpSave(char* filename)
 					return B_OK;
 				}
 				else
-					UpdateFtpStatus("Rename failed");
+					UpdateFtpStatus(B_TRANSLATE("Rename failed"));
 			}
 			else
-				UpdateFtpStatus("File transmission failed");
+				UpdateFtpStatus(B_TRANSLATE("File transmission failed"));
 		}
 		else
-			UpdateFtpStatus("Couldn't find requested directory on server");
+			UpdateFtpStatus(B_TRANSLATE("Couldn't find requested directory on "
+				"server"));
 	}
 	else
-		UpdateFtpStatus("Server login failed");
+		UpdateFtpStatus(B_TRANSLATE("Server login failed"));
 
 	delete ftp;
 	return B_ERROR;

@@ -11,7 +11,17 @@ Application CodyCam :
 	Settings.cpp
 	SettingsHandler.cpp
 	VideoConsumer.cpp
-	: be media translation $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+	: be locale media translation $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
 	: CodyCam.rdef
 ;
 
+DoCatalogs CodyCam :
+	x-vnd.Haiku.CodyCam
+	:
+	CodyCam.cpp
+	FtpClient.cpp
+	Settings.cpp
+	SettingsHandler.cpp
+	SftpClient.cpp
+	VideoConsumer.cpp
+;

@@ -9,7 +9,9 @@
 
 #include <Application.h>
 #include <Box.h>
+#include <Catalog.h>
 #include <CheckBox.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <StringView.h>
@@ -59,6 +61,7 @@ enum {
 
 
 const char* kCaptureRate[] = {
+	// NOTE: These are translated once the app catalog is loaded.
 	"Every 15 seconds",
 	"Every 30 seconds",
 	"Every minute",
@@ -77,6 +80,7 @@ const char* kCaptureRate[] = {
 
 
 const char* kUploadClient[] = {
+	// NOTE: These are translated once the app catalog is loaded.
 	"FTP",
 	"SFTP",
 	"Local",
@@ -106,6 +110,7 @@ private:
 			BWindow*		fWindow;
 			port_id			fPort;
 			BWindow*		fVideoControlWindow;
+			BCatalog		fAppCatalog;
 };
 
 

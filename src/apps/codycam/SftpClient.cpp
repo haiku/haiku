@@ -26,10 +26,10 @@ SftpClient::ChangeDir(const string& dir)
 	cmd << " " << dir.c_str() << "\n";
 	SendCommand(cmd.String());
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("sftp>") < 0)
 		return false;
 	rc = true;
@@ -46,10 +46,10 @@ SftpClient::ListDirContents(string& listing)
 	BString reply;
 	do {
 		if ((len = ReadReply(&reply)) < 0) {
-			fprintf(stderr, "read: %d\n", len);
+			fprintf(stderr, _GetReadText(), len);
 			return false;
 		}
-		fprintf(stderr, "reply: '%s'\n", reply.String());
+		fprintf(stderr, _GetReplyText(), reply.String());
 		printf("%s", reply.String());
 		if (reply.FindFirst("sftp>") == 0)
 			return true;
@@ -69,7 +69,8 @@ SftpClient::PrintWorkingDir(string& dir)
 
 
 bool
-SftpClient::Connect(const string& server, const string& login, const string& passwd)
+SftpClient::Connect(const string& server, const string& login, 
+	const string& passwd)
 {
 	bool rc = false;
 	BString cmd("sftp ");
@@ -89,18 +90,18 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 	ssize_t len;
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %ld\n", len);
+		fprintf(stderr, _GetLongReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("Connecting to ") != 0)
 		return false;
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %ld\n", len);
+		fprintf(stderr, _GetLongReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst(/*[pP]*/"assword:") < 0)
 		return false;
 	
@@ -108,18 +109,18 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 	write(OutputPipe(), "\n", 1);
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %ld\n", len);
+		fprintf(stderr, _GetLongReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply != "\n")
 		return false;
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %ld\n", len);
+		fprintf(stderr, _GetLongReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("sftp>") < 0)
 		return false;
 	return rc;
@@ -138,18 +139,18 @@ SftpClient::PutFile(const string& local, const string& remote, ftp_mode mode)
 	BString reply;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("Uploading") < 0)
 		return false;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("sftp>") < 0)
 		return false;
 
@@ -183,19 +184,19 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 	BString reply;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	// we don't care if it worked or not.
 	//if (reply.FindFirst("Removing") != 0 && reply.FindFirst("Couldn't") )
 	//	return false;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("sftp>") < 0)
 		return false;
 
@@ -203,10 +204,10 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 	cmd << " " << oldPath.c_str() << " " << newPath.c_str() << "\n";
 	SendCommand(cmd.String());
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("sftp>") < 0)
 		return false;
 	rc = true;
@@ -226,18 +227,18 @@ SftpClient::Chmod(const string& path, const string& mod)
 	BString reply;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("Changing") < 0)
 		return false;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, _GetReadText(), len);
 		return false;
 	}
-	fprintf(stderr, "reply: '%s'\n", reply.String());
+	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("sftp>") < 0)
 		return false;
 
@@ -249,6 +250,27 @@ SftpClient::Chmod(const string& path, const string& mod)
 void
 SftpClient::SetPassive(bool on)
 {
+}
+
+
+const char*
+SftpClient::_GetLongReadText() const
+{
+	return B_TRANSLATE("read: %ld\n");
+}
+
+
+const char*
+SftpClient::_GetReadText() const
+{
+	return B_TRANSLATE("read: %d\n");
+}
+
+
+const char*
+SftpClient::_GetReplyText() const
+{
+	return B_TRANSLATE("reply: '%s'\n");
 }
 
 

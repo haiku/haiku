@@ -5,13 +5,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Path.h>
 #include <StopWatch.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SettingsHandler"
 
 
 #if 0
@@ -56,7 +62,7 @@ ArgvParser::ArgvParser(const char* name)
 {
 	fFile = fopen(fFileName, "r");
 	if (!fFile) {
-		PRINT(("Error opening %s\n", fFileName));
+		PRINT((B_TRANSLATE("Error opening %s\n"), fFileName));
 		return;
 	}
 	fBuffer = new char [kBufferSize];
@@ -95,7 +101,7 @@ ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void* passThru)
 		fCurrentArgv[fArgc] = 0;
 		const char *result = (argvHandlerFunc)(fArgc, fCurrentArgv, passThru);
 		if (result)
-			printf("File %s; Line %ld # %s", fFileName, fLineNo, result);
+			printf(B_TRANSLATE("File %s; Line %ld # %s"), fFileName, fLineNo, result);
 		MakeArgvEmpty();
 		if (result)
 			return B_ERROR;
@@ -148,7 +154,8 @@ ArgvParser::GetCh()
 
 
 status_t 
-ArgvParser::EachArgv(const char* name, ArgvHandler argvHandlerFunc, void* passThru)
+ArgvParser::EachArgv(const char* name, ArgvHandler argvHandlerFunc, 
+	void* passThru)
 {
 	ArgvParser parser(name);
 	return parser.EachArgvPrivate(name, argvHandlerFunc, passThru);
@@ -166,7 +173,8 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 		if (ch == EOF) {
 			// done with file
 			if (fInDoubleQuote || fInSingleQuote) {
-				printf("File %s # unterminated quote at end of file\n", name);
+				printf(B_TRANSLATE("File %s # unterminated quote at end of "
+					"file\n"), name);
 				result = B_ERROR;
 				break;
 			}
@@ -178,7 +186,8 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 			// handle new line
 			fEatComment = false;
 			if (!fSawBackslash && (fInDoubleQuote || fInSingleQuote)) {
-				printf("File %s ; Line %ld # unterminated quote\n", name, fLineNo);
+				printf(B_TRANSLATE("File %s ; Line %ld # unterminated "
+					"quote\n"), name, fLineNo);
 				result = B_ERROR;
 				break;
 			}
@@ -350,7 +359,7 @@ Settings::_ParseUserSettings(int, const char* const *argv, void* castToThis)
 
 	SettingsArgvDispatcher* handler = settings->_Find(*argv);
 	if (!handler)
-		return "unknown command";
+		return B_TRANSLATE("unknown command");
 	return handler->Handle(argv);
 }
 

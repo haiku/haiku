@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FtpClient"
+
+
 FtpClient::FtpClient()
 	: FileUploadClient(),
 	fState(0),
@@ -373,10 +381,10 @@ FtpClient::Chmod(const string& path, const string& mod)
 	
 	if (path.length() == 0)
 		cmd += '/';
-printf("cmd: '%s'\n", cmd.c_str());
+printf(B_TRANSLATE("cmd: '%s'\n"), cmd.c_str());
 	if (_SendRequest(cmd) == true) {
 		if (_GetReply(replyString, code, codeType) == true) {
-printf("reply: %d, %d\n", code, codeType);
+printf(B_TRANSLATE("reply: %d, %d\n"), code, codeType);
 			if (codeType == 2)
 				rc = true;
 		}
@@ -424,7 +432,7 @@ FtpClient::_SendRequest(const string& cmd)
 	
 	if (fControl != 0) {
 		if (cmd.find("PASS") != string::npos)
-			printf("PASS <suppressed>  (real password sent)\n");
+			printf(B_TRANSLATE("PASS <suppressed>  (real password sent)\n"));
 		else
 			printf("%s\n", ccmd.c_str());
 
@@ -540,7 +548,7 @@ FtpClient::_GetReply(string& outString, int& outCode, int& codeType)
 	}
 	
 	if (!rc && outCode != 421) {
-		outString += "Remote host has closed the connection.\n";
+		outString += B_TRANSLATE("Remote host has closed the connection.\n");
 		outCode = 421;
 	}
 

@@ -25,6 +25,9 @@
 #include <TranslationKit.h>
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "CodyCam"
+
 #define VIDEO_SIZE_X 320
 #define VIDEO_SIZE_Y 240
 
@@ -57,7 +60,7 @@ static status_t AddTranslationItems(BMenu* intoMenu, uint32 fromType);
 static void
 ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 {
-	BAlert *alert = new BAlert("", message, "OK");
+	BAlert *alert = new BAlert("", message, B_TRANSLATE("OK"));
 	if (window != NULL)
 		alert->CenterIn(window->Frame());
 	alert->Go();
@@ -127,8 +130,31 @@ CodyCam::CodyCam()
 	fVideoConsumer(NULL),
 	fWindow(NULL),
 	fPort(0),
-	fVideoControlWindow(NULL)
+	fVideoControlWindow(NULL),
+	fAppCatalog(NULL)
 {
+	be_locale->GetAppCatalog(&fAppCatalog);
+
+	int32 index = 0;
+	kCaptureRate[index++] = B_TRANSLATE("Every 15 seconds");
+	kCaptureRate[index++] = B_TRANSLATE("Every 30 seconds");
+	kCaptureRate[index++] = B_TRANSLATE("Every minute");
+	kCaptureRate[index++] = B_TRANSLATE("Every 5 minutes");
+	kCaptureRate[index++] = B_TRANSLATE("Every 10 minutes");
+	kCaptureRate[index++] = B_TRANSLATE("Every 15 minutes");
+	kCaptureRate[index++] = B_TRANSLATE("Every 30 minutes");
+	kCaptureRate[index++] = B_TRANSLATE("Every hour");
+	kCaptureRate[index++] = B_TRANSLATE("Every 2 hours");
+	kCaptureRate[index++] = B_TRANSLATE("Every 4 hours");
+	kCaptureRate[index++] = B_TRANSLATE("Every 8 hours");
+	kCaptureRate[index++] = B_TRANSLATE("Every 24 hours");
+	kCaptureRate[index++] = B_TRANSLATE("Never");
+
+	index = 0;
+	kUploadClient[index++] = B_TRANSLATE("FTP");
+	kUploadClient[index++] = B_TRANSLATE("SFTP");
+	kUploadClient[index++] = B_TRANSLATE("Local");
+
 	chdir("/boot/home");
 }
 
@@ -152,7 +178,7 @@ void
 CodyCam::ReadyToRun()
 {
 	fWindow = new VideoWindow(BRect(28, 28, 28, 28),
-		(const char*) "CodyCam", B_TITLED_WINDOW,
+		(const char*) B_TRANSLATE("CodyCam"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
 	_SetUpNodes();
@@ -178,7 +204,8 @@ CodyCam::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case msg_start:
 		{
-			BTimeSource* timeSource = fMediaRoster->MakeTimeSourceFor(fTimeSourceNode);
+			BTimeSource* timeSource = fMediaRoster->MakeTimeSourceFor(
+				fTimeSourceNode);
 			bigtime_t real = BTimeSource::RealTime();
 			bigtime_t perf = timeSource->PerformanceTimeFor(real) + 10000;
 			status_t status = fMediaRoster->StartNode(fProducerNode, perf);
@@ -208,16 +235,16 @@ CodyCam::MessageReceived(BMessage *message)
 					BRect(2 * WINDOW_OFFSET_X + WINDOW_SIZE_X, WINDOW_OFFSET_Y,
 					2 * WINDOW_OFFSET_X + WINDOW_SIZE_X + view->Bounds().right,
 					WINDOW_OFFSET_Y + view->Bounds().bottom), view, node);
-				fMediaRoster->StartWatching(BMessenger(NULL, fVideoControlWindow), node,
-					B_MEDIA_WEB_CHANGED);
+				fMediaRoster->StartWatching(BMessenger(NULL, 
+					fVideoControlWindow), node,	B_MEDIA_WEB_CHANGED);
 				fVideoControlWindow->Show();
 			}
 			break;
 		}
 
 		case msg_about:
-			(new BAlert("About CodyCam", "CodyCam\n\nThe Original BeOS webcam",
-				"Close"))->Go();
+			(new BAlert(B_TRANSLATE("About CodyCam"), B_TRANSLATE("CodyCam\n\n"
+				"The Original BeOS webcam"), B_TRANSLATE("Close")))->Go();
 			break;
 
 		case msg_control_win:
@@ -241,14 +268,15 @@ CodyCam::_SetUpNodes()
 	/* find the media roster */
 	fMediaRoster = BMediaRoster::Roster(&status);
 	if (status != B_OK) {
-		ErrorAlert("Cannot find the media roster", status, fWindow);
+		ErrorAlert(B_TRANSLATE("Cannot find the media roster"), status, 
+			fWindow);
 		return status;
 	}
 
 	/* find the time source */
 	status = fMediaRoster->GetTimeSource(&fTimeSourceNode);
 	if (status != B_OK) {
-		ErrorAlert("Cannot get a time source", status, fWindow);
+		ErrorAlert(B_TRANSLATE("Cannot get a time source"), status, fWindow);
 		return status;
 	}
 
@@ -256,43 +284,49 @@ CodyCam::_SetUpNodes()
 	INFO("CodyCam acquiring VideoInput node\n");
 	status = fMediaRoster->GetVideoInput(&fProducerNode);
 	if (status != B_OK) {
-		ErrorAlert("Cannot find a video source. You need a webcam to use CodyCam.", status, fWindow);
+		ErrorAlert(B_TRANSLATE("Cannot find a video source. You need a webcam "
+			"to use CodyCam."), status, fWindow);
 		return status;
 	}
 
 	/* create the video consumer node */
-	fVideoConsumer = new VideoConsumer("CodyCam", ((VideoWindow*)fWindow)->VideoView(),
+	fVideoConsumer = new VideoConsumer("CodyCam", 
+		((VideoWindow*)fWindow)->VideoView(),
 		((VideoWindow*)fWindow)->StatusLine(), NULL, 0);
 	if (!fVideoConsumer) {
-		ErrorAlert("Cannot create a video window", B_ERROR, fWindow);
+		ErrorAlert(B_TRANSLATE("Cannot create a video window"), B_ERROR, 
+			fWindow);
 		return B_ERROR;
 	}
 
 	/* register the node */
 	status = fMediaRoster->RegisterNode(fVideoConsumer);
 	if (status != B_OK) {
-		ErrorAlert("Cannot register the video window", status, fWindow);
+		ErrorAlert(B_TRANSLATE("Cannot register the video window"), status, 
+			fWindow);
 		return status;
 	}
 	fPort = fVideoConsumer->ControlPort();
 
 	/* find free producer output */
 	int32 cnt = 0;
-	status = fMediaRoster->GetFreeOutputsFor(fProducerNode, &fProducerOut, 1,  &cnt,
-		B_MEDIA_RAW_VIDEO);
+	status = fMediaRoster->GetFreeOutputsFor(fProducerNode, &fProducerOut, 1, 
+		&cnt, B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
-		ErrorAlert("Cannot find an available video stream", status, fWindow);
+		ErrorAlert(B_TRANSLATE("Cannot find an available video stream"), 
+			status,	fWindow);
 		return status;
 	}
 
 	/* find free consumer input */
 	cnt = 0;
-	status = fMediaRoster->GetFreeInputsFor(fVideoConsumer->Node(), &fConsumerIn, 1,
-		&cnt, B_MEDIA_RAW_VIDEO);
+	status = fMediaRoster->GetFreeInputsFor(fVideoConsumer->Node(), 
+		&fConsumerIn, 1, &cnt, B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
-		ErrorAlert("Can't find an available connection to the video window", status, fWindow);
+		ErrorAlert(B_TRANSLATE("Can't find an available connection to the "
+			"video window"), status, fWindow);
 		return status;
 	}
 
@@ -304,24 +338,29 @@ CodyCam::_SetUpNodes()
 	format.u.raw_video = vid_format;
 
 	/* connect producer to consumer */
-	status = fMediaRoster->Connect(fProducerOut.source, fConsumerIn.destination,
-				&format, &fProducerOut, &fConsumerIn);
+	status = fMediaRoster->Connect(fProducerOut.source, 
+		fConsumerIn.destination, &format, &fProducerOut, &fConsumerIn);
 	if (status != B_OK) {
-		ErrorAlert("Cannot connect the video source to the video window", status);
+		ErrorAlert(B_TRANSLATE("Cannot connect the video source to the video "
+			"window"), status);
 		return status;
 	}
 
 
 	/* set time sources */
-	status = fMediaRoster->SetTimeSourceFor(fProducerNode.node, fTimeSourceNode.node);
+	status = fMediaRoster->SetTimeSourceFor(fProducerNode.node, 
+		fTimeSourceNode.node);
 	if (status != B_OK) {
-		ErrorAlert("Cannot set the time source for the video source", status);
+		ErrorAlert(B_TRANSLATE("Cannot set the time source for the video "
+			"source"), status);
 		return status;
 	}
 
-	status = fMediaRoster->SetTimeSourceFor(fVideoConsumer->ID(), fTimeSourceNode.node);
+	status = fMediaRoster->SetTimeSourceFor(fVideoConsumer->ID(), 
+		fTimeSourceNode.node);
 	if (status != B_OK) {
-		ErrorAlert("Cannot set the time source for the video window", status);
+		ErrorAlert(B_TRANSLATE("Cannot set the time source for the video "
+			"window"), status);
 		return status;
 	}
 
@@ -334,7 +373,8 @@ CodyCam::_SetUpNodes()
 	bigtime_t initLatency = 0;
 	status = fMediaRoster->GetInitialLatencyFor(fProducerNode, &initLatency);
 	if (status < B_OK) {
-		ErrorAlert("Error getting initial latency for the capture node", status);
+		ErrorAlert(B_TRANSLATE("Error getting initial latency for the capture "
+			"node"), status);
 		return status;
 	}
 
@@ -350,29 +390,30 @@ CodyCam::_SetUpNodes()
 		status = fMediaRoster->StartTimeSource(fTimeSourceNode, real);
 		if (status != B_OK) {
 			timeSource->Release();
-			ErrorAlert("Cannot start time source!", status);
+			ErrorAlert(B_TRANSLATE("Cannot start time source!"), status);
 			return status;
 		}
 		status = fMediaRoster->SeekTimeSource(fTimeSourceNode, 0, real);
 		if (status != B_OK) {
 			timeSource->Release();
-			ErrorAlert("Cannot seek time source!", status);
+			ErrorAlert(B_TRANSLATE("Cannot seek time source!"), status);
 			return status;
 		}
 	}
 
-	bigtime_t perf = timeSource->PerformanceTimeFor(real + latency + initLatency);
+	bigtime_t perf = timeSource->PerformanceTimeFor(real + latency 
+		+ initLatency);
 	timeSource->Release();
 
 	/* start the nodes */
 	status = fMediaRoster->StartNode(fProducerNode, perf);
 	if (status != B_OK) {
-		ErrorAlert("Cannot start the video source", status);
+		ErrorAlert(B_TRANSLATE("Cannot start the video source"), status);
 		return status;
 	}
 	status = fMediaRoster->StartNode(fVideoConsumer->Node(), perf);
 	if (status != B_OK) {
-		ErrorAlert("Cannot start the video window", status);
+		ErrorAlert(B_TRANSLATE("Cannot start the video window"), status);
 		return status;
 	}
 
@@ -436,39 +477,43 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "menu bar");
 
 	BMenuItem* menuItem;
-	BMenu* menu = new BMenu("File");
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 
-	menuItem = new BMenuItem("Video settings", new BMessage(msg_video), 'P');
+	menuItem = new BMenuItem(B_TRANSLATE("Video settings"), 
+		new BMessage(msg_video), 'P');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Start video", new BMessage(msg_start), 'A');
+	menuItem = new BMenuItem(B_TRANSLATE("Start video"), 
+		new BMessage(msg_start), 'A');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
-	menuItem = new BMenuItem("Stop video", new BMessage(msg_stop), 'O');
+	menuItem = new BMenuItem(B_TRANSLATE("Stop video"), 
+		new BMessage(msg_stop), 'O');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("About Codycam" B_UTF8_ELLIPSIS,
+	menuItem = new BMenuItem(B_TRANSLATE("About Codycam" B_UTF8_ELLIPSIS),
 		new BMessage(msg_about), 'B');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
+	menuItem = new BMenuItem(B_TRANSLATE("Quit"), 
+		new BMessage(B_QUIT_REQUESTED), 'Q');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
 	menuBar->AddItem(menu);
 
 	/* give it a gray background view */
-	fView = new BView("Background View", B_WILL_DRAW);
+	fView = new BView(B_TRANSLATE("Background View"), B_WILL_DRAW);
  	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	/* add some controls */
@@ -659,17 +704,17 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 
 	// Capture controls
 	fCaptureSetupBox = new BBox("Capture Controls", B_WILL_DRAW);
-	fCaptureSetupBox->SetLabel("Capture controls");
+	fCaptureSetupBox->SetLabel(B_TRANSLATE("Capture controls"));
 
 	BGridLayout *controlsLayout = new BGridLayout(kXBuffer, 0);
 	controlsLayout->SetInsets(10, 15, 5, 5);
 	fCaptureSetupBox->SetLayout(controlsLayout);
 
-	fFileName = new BTextControl("File Name", "File name:",
+	fFileName = new BTextControl("File Name", B_TRANSLATE("File name:"),
 		fFilenameSetting->Value(), new BMessage(msg_filename));
 	fFileName->SetTarget(BMessenger(NULL, this));
 
-	fImageFormatMenu = new BPopUpMenu("Image Format Menu");
+	fImageFormatMenu = new BPopUpMenu(B_TRANSLATE("Image Format Menu"));
 	AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
 	fImageFormatMenu->SetTargetForItems(this);
 
@@ -682,53 +727,57 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	else
 		fImageFormatMenu->ItemAt(0)->SetMarked(true);
 
-	fImageFormatSelector = new BMenuField("Format", "Format:",
+	fImageFormatSelector = new BMenuField("Format", B_TRANSLATE("Format:"),
 		fImageFormatMenu, NULL);
 
-	fCaptureRateMenu = new BPopUpMenu("Capture Rate Menu");
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 seconds",
+	fCaptureRateMenu = new BPopUpMenu(B_TRANSLATE("Capture Rate Menu"));
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[0],
 		new BMessage(msg_rate_15s)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 30 seconds",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[1],
 		new BMessage(msg_rate_30s)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every minute",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[2],
 		new BMessage(msg_rate_1m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 5 minutes",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[3],
 		new BMessage(msg_rate_5m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 10 minutes",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[4],
 		new BMessage(msg_rate_10m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 15 minutes",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[5],
 		new BMessage(msg_rate_15m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 30 minutes",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[6],
 		new BMessage(msg_rate_30m)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every hour",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[7],
 		new BMessage(msg_rate_1h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 2 hours",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[8],
 		new BMessage(msg_rate_2h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 4 hours",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[9],
 		new BMessage(msg_rate_4h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 8 hours",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[10],
 		new BMessage(msg_rate_8h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Every 24 hours",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[11],
 		new BMessage(msg_rate_24h)));
-	fCaptureRateMenu->AddItem(new BMenuItem("Never",
+	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[12],
 		new BMessage(msg_rate_never)));
 	fCaptureRateMenu->SetTargetForItems(this);
 	fCaptureRateMenu->FindItem(fCaptureRateSetting->Value())->SetMarked(true);
-	fCaptureRateSelector = new BMenuField("Rate", "Rate:",
+	fCaptureRateSelector = new BMenuField("Rate", B_TRANSLATE("Rate:"),
 		fCaptureRateMenu, NULL);
 
 	controlsLayout->AddItem(fFileName->CreateLabelLayoutItem(), 0, 0);
 	controlsLayout->AddItem(fFileName->CreateTextViewLayoutItem(), 1, 0);
-	controlsLayout->AddItem(fImageFormatSelector->CreateLabelLayoutItem(), 0, 1);
-	controlsLayout->AddItem(fImageFormatSelector->CreateMenuBarLayoutItem(), 1, 1);
-	controlsLayout->AddItem(fCaptureRateSelector->CreateLabelLayoutItem(), 0, 2);
-	controlsLayout->AddItem(fCaptureRateSelector->CreateMenuBarLayoutItem(), 1, 2);
+	controlsLayout->AddItem(fImageFormatSelector->CreateLabelLayoutItem(), 0, 
+		1);
+	controlsLayout->AddItem(fImageFormatSelector->CreateMenuBarLayoutItem(), 1,
+		1);
+	controlsLayout->AddItem(fCaptureRateSelector->CreateLabelLayoutItem(), 0,
+		2);
+	controlsLayout->AddItem(fCaptureRateSelector->CreateMenuBarLayoutItem(), 1,
+		2);
 	controlsLayout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, 3, 2);
 
 	// FTP setup box
-	fFtpSetupBox = new BBox("FTP Setup", B_WILL_DRAW);
+	fFtpSetupBox = new BBox(B_TRANSLATE("FTP Setup"), B_WILL_DRAW);
 
-	fUploadClientMenu = new BPopUpMenu("Send to" B_UTF8_ELLIPSIS);
+	fUploadClientMenu = new BPopUpMenu(B_TRANSLATE("Send to" B_UTF8_ELLIPSIS));
 	for (int i = 0; kUploadClient[i]; i++) {
 		BMessage *m = new BMessage(msg_upl_client);
 		m->AddInt32("client", i);
@@ -739,35 +788,35 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	fUploadClientSelector = new BMenuField("UploadClient", NULL,
 		fUploadClientMenu, NULL);
 
-	fFtpSetupBox->SetLabel("Output");
+	fFtpSetupBox->SetLabel(B_TRANSLATE("Output"));
 	// this doesn't work with the layout manager
 	// fFtpSetupBox->SetLabel(fUploadClientSelector);
-	fUploadClientSelector->SetLabel("Type:");
+	fUploadClientSelector->SetLabel(B_TRANSLATE("Type:"));
 
 	BGridLayout *ftpLayout = new BGridLayout(kXBuffer, 0);
 	ftpLayout->SetInsets(10, 15, 5, 5);
 	fFtpSetupBox->SetLayout(ftpLayout);
 
-	fServerName = new BTextControl("Server", "Server:",
+	fServerName = new BTextControl("Server", B_TRANSLATE("Server:"),
 		fServerSetting->Value(), new BMessage(msg_server));
 	fServerName->SetTarget(this);
 
-	fLoginId = new BTextControl("Login", "Login:",
+	fLoginId = new BTextControl("Login", B_TRANSLATE("Login:"),
 		fLoginSetting->Value(), new BMessage(msg_login));
 	fLoginId->SetTarget(this);
 
-	fPassword = new BTextControl("Password", "Password:",
+	fPassword = new BTextControl("Password", B_TRANSLATE("Password:"),
 		fPasswordSetting->Value(), new BMessage(msg_password));
 	fPassword->SetTarget(this);
 	fPassword->TextView()->HideTyping(true);
 	// BeOS HideTyping() seems broken, it empties the text
 	fPassword->SetText(fPasswordSetting->Value());
 
-	fDirectory = new BTextControl("Directory", "Directory:",
+	fDirectory = new BTextControl("Directory", B_TRANSLATE("Directory:"),
 		fDirectorySetting->Value(), new BMessage(msg_directory));
 	fDirectory->SetTarget(this);
 
-	fPassiveFtp = new BCheckBox("Passive FTP", "Passive FTP",
+	fPassiveFtp = new BCheckBox("Passive FTP", B_TRANSLATE("Passive FTP"),
 		new BMessage(msg_passiveftp));
 	fPassiveFtp->SetTarget(this);
 	fPassiveFtp->SetValue(fPassiveFtpSetting->Value());
@@ -784,7 +833,7 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	ftpLayout->AddItem(fDirectory->CreateTextViewLayoutItem(), 1, 4);
 	ftpLayout->AddView(fPassiveFtp, 0, 5, 2);
 
-	fStatusLine = new BStringView("Status Line", "Waiting" B_UTF8_ELLIPSIS);
+	fStatusLine = new BStringView("Status Line", B_TRANSLATE("Waiting" B_UTF8_ELLIPSIS));
 
 	BGroupLayout *groupLayout = new BGroupLayout(B_VERTICAL);
 	groupLayout->SetInsets(kXBuffer, kYBuffer, kXBuffer, kYBuffer);
@@ -834,24 +883,26 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 	fSettings = new Settings(filename, dirname);
 
 	fServerSetting = new StringValueSetting("Server", "ftp.my.server",
-		"server address expected", "");
+		B_TRANSLATE("server address expected"), "");
 	fLoginSetting = new StringValueSetting("Login", "loginID",
-		"login ID expected", "");
-	fPasswordSetting = new StringValueSetting("Password", "password",
-		"password expected", "");
+		B_TRANSLATE("login ID expected"), "");
+	fPasswordSetting = new StringValueSetting("Password", 
+		B_TRANSLATE("password"), B_TRANSLATE("password expected"), "");
 	fDirectorySetting = new StringValueSetting("Directory", "web/images",
-		"destination directory expected", "");
+		B_TRANSLATE("destination directory expected"), "");
 	fPassiveFtpSetting = new BooleanValueSetting("PassiveFtp", 1);
 	fFilenameSetting = new StringValueSetting("StillImageFilename",
-		"codycam.jpg", "still image filename expected", "");
+		"codycam.jpg", B_TRANSLATE("still image filename expected"), "");
 	fImageFormatSettings = new StringValueSetting("ImageFileFormat",
-		"JPEG image", "image file format expected", "");
+		B_TRANSLATE("JPEG image"), B_TRANSLATE("image file format expected"), 
+		"");
 	fCaptureRateSetting = new EnumeratedStringValueSetting("CaptureRate",
-		"Every 5 minutes", kCaptureRate, "capture rate expected",
+		kCaptureRate[3], kCaptureRate, B_TRANSLATE("capture rate expected"),
 		"unrecognized capture rate specified");
 	fUploadClientSetting = new EnumeratedStringValueSetting("UploadClient",
-		"FTP", kUploadClient, "upload client name expected",
-		"unrecognized upload client specified");
+		B_TRANSLATE("FTP"), kUploadClient, 
+		B_TRANSLATE("upload client name expected"),
+		B_TRANSLATE("unrecognized upload client specified"));
 
 	fSettings->Add(fServerSetting);
 	fSettings->Add(fLoginSetting);
@@ -900,8 +951,10 @@ VideoWindow::_QuitSettings()
 //	#pragma mark -
 
 
-ControlWindow::ControlWindow(const BRect& frame, BView* controls, media_node node)
-	: BWindow(frame, "Video settings", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+ControlWindow::ControlWindow(const BRect& frame, BView* controls, 
+	media_node node)
+	: BWindow(frame, B_TRANSLATE("Video settings"), B_TITLED_WINDOW, 
+	B_ASYNCHRONOUS_CONTROLS)
 {
 	fView = controls;
 	fNode = node;
