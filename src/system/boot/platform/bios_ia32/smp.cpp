@@ -165,6 +165,12 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 					continue;
 				}
 
+				// skip if the apic id is too large
+				if (processor->apic_id >= MAX_BOOT_CPUS) {
+					TRACE(("smp: apic id too large (%d)\n", processor->apic_id));
+					continue;
+				}
+
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus]
 					= processor->apic_id;
 				gKernelArgs.arch_args.cpu_os_id[processor->apic_id]
@@ -271,6 +277,12 @@ smp_do_acpi_config(void)
 					localApic->apic_id));
 				if ((localApic->flags & ACPI_LOCAL_APIC_ENABLED) == 0) {
 					TRACE(("smp: APIC is disabled and will not be used\n"));
+					break;
+				}
+
+				// skip if the apic id is too large
+				if (localApic->apic_id >= MAX_BOOT_CPUS) {
+					TRACE(("smp: apic id too large (%d)\n", localApic->apic_id));
 					break;
 				}
 
