@@ -75,6 +75,7 @@ class TabletDevice : public PointingDevice {
 		DEVICE_VOLITO,
 		DEVICE_PENSTATION,
 		DEVICE_CINTIQ,
+		DEVICE_BAMBOO,
 	};
 
 	enum {

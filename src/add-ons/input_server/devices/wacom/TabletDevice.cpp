@@ -134,6 +134,12 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 		case 0x16:	// Graphire 4 6x8 (tested)
 			SetDevice(16704.0, 12064.0, DEVICE_GRAPHIRE);
 			break;
+		case 0x17:	// BambooFun 4x5 (from Linux Wacom Project)
+			SetDevice(14760.0, 9225.0, DEVICE_BAMBOO);
+			break;
+		case 0x18:	// BambooFun 6x8 (from Linux Wacom Project)
+			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO);
+			break;
 		case 0x20:
 			SetDevice(12700.0, 10600.0, DEVICE_INTUOS);
 			break;
@@ -202,6 +208,12 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 //			SetDevice(3450.0, 2100.0, DEVICE_PENSTATION);
 			SetDevice(3248.0, 2320.0, DEVICE_PENSTATION);
 			break;
+		case 0x65:	// Bamboo (from Linux Wacom Project)
+			SetDevice(14760.0, 9225.0, DEVICE_BAMBOO);
+			break;
+		case 0x69:	// Bamboo1 (from Linux Wacom Project)
+			SetDevice(5104.0,  3712.0, DEVICE_BAMBOO);
+			break;
 		case 0xB0:
 			SetDevice(25400.0, 20320.0, DEVICE_INTUOS3);
 			break;
@@ -261,7 +273,9 @@ TabletDevice::ReadData(const uchar* data, bool& hasContact, uint32& mode,
 			hasContact = true;
 			break;
 		}
-		case DEVICE_GRAPHIRE: {
+		case DEVICE_GRAPHIRE:
+		case DEVICE_BAMBOO:
+		{
 			xPos = data[3] << 8 | data[2];
 			yPos = data[5] << 8 | data[4];
 
@@ -661,6 +675,12 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 		case 0x16:
 			*name = "Wacom Graphire4 6x8\" USB";
 			break;
+		case 0x17:
+			*name = "Wacom BambooFun 4x5\" USB";
+			break;
+		case 0x18:
+			*name = "Wacom BambooFun 6x8\" USB";
+			break;
 		case 0x20:
 			*name = "Wacom Intuos 4x5\" USB";
 			break;
@@ -729,6 +749,12 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 			break;
 		case 0x64:
 			*name = "Wacom PenPartner.1 USB";
+			break;
+		case 0x65:
+			*name = "Wacom Bamboo USB";
+			break;
+		case 0x69:
+			*name = "Wacom Bamboo1 USB";
 			break;
 
 		case 0xB0:
