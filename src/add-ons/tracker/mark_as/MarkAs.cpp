@@ -9,39 +9,21 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
+#include <InterfaceDefs.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Node.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <String.h>
-#include <View.h>
-#include <Window.h>
 
 
-/*!	Returns the current mouse position in screen coordinates.
-	Since there is no method to retrieve this in the Be API without a view,
-	this looks a bit more complicated.
-*/
 static BPoint
 mouse_position()
 {
-	BWindow* window = new BWindow(BRect(-1000, -1000, -900, -900), "mouse",
-		B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_AVOID_FRONT | B_AVOID_FOCUS);
-	BView* view = new BView(window->Bounds(), "mouse", B_FOLLOW_ALL, 0);
-	window->AddChild(view);
-	window->Run();
-
-	window->Lock();
-
+	// Returns the mouse position in screen coordinates
 	BPoint position;
-	uint32 buttons;
-	view->GetMouse(&position, &buttons);
-	view->ConvertToScreen(&position);
-
-	window->Quit();
-
+	get_mouse(&position, NULL);
 	return position;
 }
 
