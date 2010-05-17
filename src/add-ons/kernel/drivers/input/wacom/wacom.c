@@ -115,7 +115,7 @@ add_device(usb_device dev)
 
 	// we need these four for a Wacom tablet
 	size_t controlTransferLength;
-	int i;
+	int tryCount;
 	char repData[2] = { 0x02, 0x02 };
 	char retData[2] = { 0x00, 0x00 };
 
@@ -227,7 +227,7 @@ got_one:
 			// absolute mode, pressure data, etc.)
 			controlTransferLength = 2;
 
-			for (i = 0; i < 5; i++) {
+			for (tryCount = 0; tryCount < 5; tryCount++) {
 				// HID Class-Specific Request, Host to device (=0x21):
 				// SET_REPORT (=0x09) type Feature (=3) with ID 2 (=2) of
 				// Interface #0 (=0) to repData (== { 0x02, 0x02 })
@@ -235,8 +235,8 @@ got_one:
 					repData, &controlTransferLength);
 
 				if (st < B_OK) {
-					dprintf(ID "add_device() - control transfer 2 failed: %ld\
-						\n", st);
+					dprintf(ID "add_device() - control transfer 2 failed: %ld"
+						"\n", st);
 				}
 
 				// check if registers are set correctly
@@ -248,20 +248,24 @@ got_one:
 					retData, &controlTransferLength);
 
 				if (st < B_OK) {
-					dprintf(ID "add_device() - control transfer 3 failed: %ld\
-						\n", st);
+					dprintf(ID "add_device() - control transfer 3 failed: %ld"
+						"\n", st);
 				}
 
-				dprintf(ID "retData: %u - %u\n", retData[0], retData[1]);
-				dprintf("====================================\n");
+				DPRINTF_INFO((ID "add_device() - retData: %u - %u\n",
+					retData[0], retData[1]));
 
-				if (retData[0] == repData[0] && retData[1] == repData[1]) break;
-
+				if (retData[0] == repData[0] && retData[1] == repData[1]) {
+					DPRINTF_INFO((ID "add_device() - successfully set "
+						"'Wacom'-mode\n"));
+					break;
+				}
 			}
 
-			dprintf(ID "count: %u\n", i);
+			DPRINTF_INFO((ID "add_device() - number of tries: %u\n",
+				tryCount + 1));
 
-			if (i > 4) {
+			if (tryCount > 4) {
 				dprintf(ID "add_device() - set 'Wacom'-mode failed\n");
 			}
 		}
