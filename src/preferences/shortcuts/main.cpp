@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,14 +7,22 @@
  */
 
 
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "KeyInfos.h"
 #include "ShortcutsApp.h"
 
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
 	InitKeyIndices();
 	ShortcutsApp app;
+	
+	BCatalog appCatalog;
+	be_locale->GetAppCatalog(&appCatalog);
+	
 	app.Run();
 }
 

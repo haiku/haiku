@@ -20,6 +20,16 @@ Preference Shortcuts :
 	PrefilledBitmap.cpp
 	ScrollViewCorner.cpp
 	
-	: be tracker libshortcuts_shared.a $(TARGET_LIBSTDC++)
+	: be locale tracker libshortcuts_shared.a $(TARGET_LIBSTDC++)
 	: Shortcuts.rdef
 ;
+
+
+DoCatalogs Shortcuts :
+	x-vnd.Haiku-Shortcuts
+	:
+	ShortcutsApp.cpp
+	ShortcutsWindow.cpp
+	ShortcutsSpec.cpp
+;
+

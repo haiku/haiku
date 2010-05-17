@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,7 +13,9 @@
 #include <stdio.h>
 
 #include <Beep.h>
+#include <Catalog.h>
 #include <Directory.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Region.h>
@@ -30,30 +32,23 @@
 
 #define CLASS "ShortcutsSpec : "
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ShortcutsSpec"
 
 const float _height = 20.0f;		
 
-static MetaKeyStateMap _metaMaps[ShortcutsSpec::NUM_META_COLUMNS];
-static bool _metaMapsInitialized = false;
+static MetaKeyStateMap sMetaMaps[ShortcutsSpec::NUM_META_COLUMNS];
 
-static bool _fontCached = false;
-static BFont _viewFont;
-static float _fontHeight;
-static BBitmap * _actuatorBitmaps[2];
+static bool sFontCached = false;
+static BFont sViewFont;
+static float sFontHeight;
+static BBitmap* sActuatorBitmaps[2];
 
+const char* ShortcutsSpec::sShiftName;
+const char* ShortcutsSpec::sControlName;
+const char* ShortcutsSpec::sOptionName;
+const char* ShortcutsSpec::sCommandName;
 
-// These meta-keys are pretty standard
-#define SHIFT_NAME		"Shift"
-#define CONTROL_NAME	"Control"
-
-// These meta-keys have different names on an Intel keyboard
-#if __INTEL__
-	#define OPTION_NAME		"Window"
-	#define COMMAND_NAME	"Alt"
-#else
-	#define OPTION_NAME		"Option"
-	#define COMMAND_NAME	"Command"
-#endif
 
 #define ICON_BITMAP_RECT BRect(0.0f, 0.0f, 15.0f, 15.0f)
 #define ICON_BITMAP_SPACE B_COLOR_8_BIT
@@ -61,15 +56,13 @@ static BBitmap * _actuatorBitmaps[2];
 
 // Returns the (pos)'th char in the string, or '\0' if (pos) if off the end of
 // the string
-static char GetLetterAt(const char* str, int pos);
-
-
 static char 
 GetLetterAt(const char* str, int pos)
 {
-	for (int i = 0; i < pos; i++) 
+	for (int i = 0; i < pos; i++) {
 		if (str[i] == '\0') 
 			return '\0';
+	}
 	return str[pos];
 }
 
@@ -99,13 +92,13 @@ SetupStandardMap(MetaKeyStateMap& map, const char* name, uint32 both,
 }
 
 
-MetaKeyStateMap & GetNthKeyMap(int which)
+MetaKeyStateMap&
+GetNthKeyMap(int which)
 {
-	return _metaMaps[which];
+	return sMetaMaps[which];
 }
 
 
-static BBitmap* MakeActuatorBitmap(bool lit);
 static BBitmap* 
 MakeActuatorBitmap(bool lit)
 {
@@ -135,23 +128,30 @@ MakeActuatorBitmap(bool lit)
 }
 
 
-void InitializeMetaMaps()
+/*static*/ void
+ShortcutsSpec::InitializeMetaMaps()
 {
-	_metaMapsInitialized = true;
-	SetupStandardMap(_metaMaps[ShortcutsSpec::SHIFT_COLUMN_INDEX], SHIFT_NAME, 
+	static bool metaMapsInitialized = false;
+	if (metaMapsInitialized)
+		return;
+	metaMapsInitialized = true;
+
+	_InitModifierNames();
+
+	SetupStandardMap(sMetaMaps[ShortcutsSpec::SHIFT_COLUMN_INDEX], sShiftName, 
 		B_SHIFT_KEY, B_LEFT_SHIFT_KEY, B_RIGHT_SHIFT_KEY);
 		
-	SetupStandardMap(_metaMaps[ShortcutsSpec::CONTROL_COLUMN_INDEX], 
-		CONTROL_NAME, B_CONTROL_KEY, B_LEFT_CONTROL_KEY, B_RIGHT_CONTROL_KEY);
+	SetupStandardMap(sMetaMaps[ShortcutsSpec::CONTROL_COLUMN_INDEX], 
+		sControlName, B_CONTROL_KEY, B_LEFT_CONTROL_KEY, B_RIGHT_CONTROL_KEY);
 		
-	SetupStandardMap(_metaMaps[ShortcutsSpec::COMMAND_COLUMN_INDEX], 
-		COMMAND_NAME, B_COMMAND_KEY, B_LEFT_COMMAND_KEY, B_RIGHT_COMMAND_KEY);
+	SetupStandardMap(sMetaMaps[ShortcutsSpec::COMMAND_COLUMN_INDEX], 
+		sCommandName, B_COMMAND_KEY, B_LEFT_COMMAND_KEY, B_RIGHT_COMMAND_KEY);
 		
-	SetupStandardMap(_metaMaps[ShortcutsSpec::OPTION_COLUMN_INDEX], OPTION_NAME
+	SetupStandardMap(sMetaMaps[ShortcutsSpec::OPTION_COLUMN_INDEX], sOptionName
 		, B_OPTION_KEY, B_LEFT_OPTION_KEY, B_RIGHT_OPTION_KEY);
 
-	_actuatorBitmaps[0] = MakeActuatorBitmap(false);
-	_actuatorBitmaps[1] = MakeActuatorBitmap(true);
+	sActuatorBitmaps[0] = MakeActuatorBitmap(false);
+	sActuatorBitmaps[1] = MakeActuatorBitmap(true);
 }
 
 
@@ -203,19 +203,24 @@ ShortcutsSpec::ShortcutsSpec(BMessage* from)
 {
 	const char* temp;	
 	if (from->FindString("command", &temp) != B_NO_ERROR) {
-		printf(CLASS " Error, no command string in archive BMessage!\n");
+		printf(CLASS);
+		printf(" Error, no command string in archive BMessage!\n");
 		temp = "";
 	}
 
 	SetCommand(temp);
 
-	if (from->FindInt32("key", (int32*) &fKey) != B_NO_ERROR)
-		printf(CLASS " Error, no key int32 in archive BMessage!\n");
+	if (from->FindInt32("key", (int32*) &fKey) != B_NO_ERROR) {
+		printf(CLASS);
+		printf(" Error, no key int32 in archive BMessage!\n");
+	}
 
 	for (int i = 0; i < NUM_META_COLUMNS; i++)
 		if (from->FindInt32("mcidx", i, (int32*)&fMetaCellStateIndex[i]) 
-			!= B_NO_ERROR)
-			printf(CLASS " Error, no modifiers int32 in archive BMessage!\n");
+			!= B_NO_ERROR) {
+			printf(CLASS);
+			printf(" Error, no modifiers int32 in archive BMessage!\n");
+		}
 }
 
 
@@ -234,7 +239,7 @@ ShortcutsSpec::SetCommand(const char* command)
 const char*
 ShortcutsSpec::GetColumnName(int i)
 {
-	return _metaMaps[i].GetName();
+	return sMetaMaps[i].GetName();
 }
 
 
@@ -256,7 +261,7 @@ ShortcutsSpec::Archive(BMessage* into, bool deep) const
 	for (int i = 0; i < NUM_META_COLUMNS; i++) {
 		// for easy parsing by prefs applet on load-in
 		into->AddInt32("mcidx", fMetaCellStateIndex[i]);
-		test.AddSlave(_metaMaps[i].GetNthStateTester(fMetaCellStateIndex[i]));
+		test.AddSlave(sMetaMaps[i].GetNthStateTester(fMetaCellStateIndex[i]));
 	}
 
 	BMessage testerMsg;
@@ -283,16 +288,16 @@ static bool IsValidActuatorName(const char* c);
 static bool
 IsValidActuatorName(const char* c)
 {
-	return (strcmp(c, "InsertString") == 0
-		|| strcmp(c, "MoveMouse") == 0
-		|| strcmp(c, "MoveMouseTo")	== 0
-		|| strcmp(c, "MouseButton")	== 0
-		|| strcmp(c, "LaunchHandler") == 0
-		|| strcmp(c, "Multi") == 0
-		|| strcmp(c, "MouseDown") == 0
-		|| strcmp(c, "MouseUp")	== 0
-		|| strcmp(c, "SendMessage")	== 0
-		|| strcmp(c, "Beep") == 0);
+	return (strcmp(c, B_TRANSLATE("InsertString")) == 0
+		|| strcmp(c, B_TRANSLATE("MoveMouse")) == 0
+		|| strcmp(c, B_TRANSLATE("MoveMouseTo")) == 0
+		|| strcmp(c, B_TRANSLATE("MouseButton")) == 0
+		|| strcmp(c, B_TRANSLATE("LaunchHandler")) == 0
+		|| strcmp(c, B_TRANSLATE("Multi")) == 0
+		|| strcmp(c, B_TRANSLATE("MouseDown")) == 0
+		|| strcmp(c, B_TRANSLATE("MouseUp")) == 0
+		|| strcmp(c, B_TRANSLATE("SendMessage")) == 0
+		|| strcmp(c, B_TRANSLATE("Beep")) == 0);
 }
 
 
@@ -323,12 +328,12 @@ ShortcutsSpec::~ShortcutsSpec()
 void
 ShortcutsSpec::_CacheViewFont(BView* owner)
 {
-	if (_fontCached == false) {
-		_fontCached = true;
-		owner->GetFont(&_viewFont);
+	if (sFontCached == false) {
+		sFontCached = true;
+		owner->GetFont(&sViewFont);
 		font_height fh;
-		_viewFont.GetHeight(&fh);
-		_fontHeight = fh.ascent - fh.descent;
+		sViewFont.GetHeight(&fh);
+		sFontHeight = fh.ascent - fh.descent;
 	}
 }
 
@@ -355,7 +360,7 @@ ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 	if (text == NULL)
 		return;
 	
-	float textWidth = _viewFont.StringWidth(text);
+	float textWidth = sViewFont.StringWidth(text);
 	BPoint point;
 	rgb_color lowColor = color;
 
@@ -395,7 +400,7 @@ ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 		_CacheViewFont(owner);
 
 		// How about I draw a nice "key" background for this one?
-		BRect textRect(point.x - KEY_MARGIN, (point.y-_fontHeight) - KEY_MARGIN
+		BRect textRect(point.x - KEY_MARGIN, (point.y-sFontHeight) - KEY_MARGIN
 			, point.x + textWidth + KEY_MARGIN - 2.0f, point.y + KEY_MARGIN);
 		
 		if (column_index == KEY_COLUMN_INDEX)
@@ -439,7 +444,7 @@ ShortcutsSpec::DrawItemColumn(BView* owner, BRect item_column_rect,
 		owner->SetDrawingMode(B_OP_OVER);
 
 		if ((fCommand != NULL) && (fCommand[0] == '*'))
-			owner->DrawBitmap(_actuatorBitmaps[fBitmapValid ? 1 : 0], 
+			owner->DrawBitmap(sActuatorBitmaps[fBitmapValid ? 1 : 0], 
 				ICON_BITMAP_RECT, item_column_rect);
 		else
 			// Draw icon, if any
@@ -469,8 +474,7 @@ const char*
 ShortcutsSpec::GetCellText(int whichColumn) const
 {
 	const char* temp = ""; // default
-	switch(whichColumn)
-	{
+	switch(whichColumn) {
 		case KEY_COLUMN_INDEX:
 		{
 			if ((fKey > 0) && (fKey <= 0xFF)) {
@@ -478,21 +482,21 @@ ShortcutsSpec::GetCellText(int whichColumn) const
 				if (temp == NULL)
 					temp = "";
 			} else if (fKey > 0xFF) {
-				sprintf(fScratch, "#%x", fKey);
+				sprintf(fScratch, "#%lx", fKey);
 				return fScratch;
 			}
+			break;
 		}
-		break;
 
 		case STRING_COLUMN_INDEX:
 			temp = fCommand;
-		break;
+			break;
 
 		default:
 			if ((whichColumn >= 0) && (whichColumn < NUM_META_COLUMNS)) 
-				temp = _metaMaps[whichColumn].GetNthStateDesc(
+				temp = sMetaMaps[whichColumn].GetNthStateDesc(
 							fMetaCellStateIndex[whichColumn]);
-		break;
+			break;
 	}
 	return temp;
 }
@@ -519,7 +523,7 @@ ShortcutsSpec::ProcessColumnTextString(int whichColumn, const char* string)
 		case STRING_COLUMN_INDEX:
 			SetCommand(string);
 			return true;
-		break;
+			break;
 
 		case KEY_COLUMN_INDEX:
 		{
@@ -657,13 +661,13 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 	bool ret = false;
 	switch(whichColumn) {
 		case KEY_COLUMN_INDEX:
-			if (key != -1) {
-				if (fKey != key) {
+			if (key > -1) {
+				if ((int32)fKey != key) {
 					fKey = key;
 					ret = true;
 				}
 			}
-		break;
+			break;
 
 		case STRING_COLUMN_INDEX:
 		{
@@ -694,7 +698,7 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 						bool reAllocString = false;
 						// Make sure we have enough room in our command string 
 						// to add these chars...
-						while (fCommandLen - fCommandNul <= newCharLen) {
+						while ((int)fCommandLen - fCommandNul <= newCharLen) {
 							reAllocString = true;
 							// enough for a while...
 							fCommandLen = (fCommandLen + 10) * 2;
@@ -717,12 +721,12 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 					}
 				}
 			}
+			break;
 		}
-		break;
 
 		default:
 			if ((whichColumn >= 0) && (whichColumn < NUM_META_COLUMNS)) {
-				MetaKeyStateMap * map = &_metaMaps[whichColumn];
+				MetaKeyStateMap * map = &sMetaMaps[whichColumn];
 				int curState = fMetaCellStateIndex[whichColumn];
 				int origState = curState;
 				int numStates = map->GetNumStates();
@@ -732,12 +736,12 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 					case B_RETURN: 
 						// cycle to the previous state
 						curState = (curState + numStates - 1) % numStates;
-					break;
+						break;
 
 					case B_SPACE:
 						// cycle to the next state
 						curState = (curState + 1) % numStates;
-					break;
+						break;
 
 					default:
 					{
@@ -760,17 +764,17 @@ ShortcutsSpec::ProcessColumnKeyStroke(int whichColumn, const char* bytes,
 									break;
 								}
 							} else 
-								printf("Error, NULL state description?\n");
+								printf(B_TRANSLATE("Error, NULL state description?\n"));
 						}
+						break;
 					}
-					break;
 				}
 				fMetaCellStateIndex[whichColumn] = curState;
 				
 				if (curState != origState)
 					ret = true;
 			}
-		break;
+			break;
 	}
 
 	return ret;
@@ -812,8 +816,8 @@ ShortcutsSpec::_UpdateIconBitmap()
 	BString firstWord = ParseArgvZeroFromString(fCommand);
 
 	// Only need to change if the first word has changed...
-	if ((fLastBitmapName == NULL) || (firstWord.Length() == 0) || 
-		(firstWord.Compare(fLastBitmapName))) {
+	if (fLastBitmapName == NULL || firstWord.Length() == 0
+		|| firstWord.Compare(fLastBitmapName)) {
 		if (firstWord.ByteAt(0) == '*')
 			fBitmapValid = IsValidActuatorName(&firstWord.String()[1]);
 		else {
@@ -832,12 +836,35 @@ ShortcutsSpec::_UpdateIconBitmap()
 						BNodeInfo progNodeInfo(&progNode);
 						if ((progNodeInfo.InitCheck() == B_NO_ERROR) 
 						&& (progNodeInfo.GetTrackerIcon(&fBitmap, B_MINI_ICON) 
-						== B_NO_ERROR))
+							== B_NO_ERROR)) {
 							fBitmapValid = fBitmap.IsValid();
+						}
 					}
 				}
 			}
 		}
 	}
+}
+
+
+/*static*/ void
+ShortcutsSpec::_InitModifierNames()
+{
+	sShiftName = B_TRANSLATE_COMMENT("Shift",
+		"Name for modifier on keyboard");
+	sControlName = B_TRANSLATE_COMMENT("Control",
+		"Name for modifier on keyboard");
+// TODO: Wrapping in __INTEL__ define probably won't work to extract catkeys?
+#if __INTEL__
+	sOptionName = B_TRANSLATE_COMMENT("Window",
+		"Name for modifier on keyboard");
+	sCommandName = B_TRANSLATE_COMMENT("Alt",
+		"Name for modifier on keyboard");
+#else
+	sOptionName = B_TRANSLATE_COMMENT("Option",
+		"Name for modifier on keyboard");
+	sCommandName = B_TRANSLATE_COMMENT("Command",
+		"Name for modifier on keyboard");
+#endif
 }
 

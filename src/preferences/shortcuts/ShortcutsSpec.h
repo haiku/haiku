@@ -20,8 +20,6 @@ class MetaKeyStateMap;
 
 
 MetaKeyStateMap & GetNthKeyMap(int which);
-void InitializeMetaMaps();
-
 
 /* Objects of this class represent one hotkey "entry" in the preferences 
  * ListView. Each ShortcutsSpec contains the info necessary to generate both 
@@ -30,6 +28,8 @@ void InitializeMetaMaps();
  */
 class ShortcutsSpec : public CLVListItem {
 public:
+	static	void			InitializeMetaMaps();
+
 							ShortcutsSpec(const char* command);
 							ShortcutsSpec(const ShortcutsSpec& copyMe);
 							ShortcutsSpec(BMessage* from);
@@ -102,6 +102,14 @@ private:
 			bool			fCursorPtsValid;
 	mutable	char			fScratch[50];
 			int32			fSelectedColumn;
+
+private:
+	static	void			_InitModifierNames();
+
+	static	const char*		sShiftName;
+	static	const char*		sControlName;
+	static	const char*		sOptionName;
+	static	const char*		sCommandName;
 };
 
 #endif

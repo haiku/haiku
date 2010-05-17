@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2009 Haiku Inc. All rights reserved.
+ * Copyright 1999-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,10 +15,12 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Input.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -48,6 +50,9 @@
 #define WINDOW_START_X 30
 #define WINDOW_START_Y 100
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ShortcutsWindow"
+
 #define ERROR "Shortcuts error"
 #define WARNING "Shortcuts warning"
 
@@ -57,8 +62,8 @@
 
 // Creates a pop-up-menu that reflects the possible states of the specified 
 // meta-key.
-static BPopUpMenu* CreateMetaPopUp(int col);
-static BPopUpMenu* CreateMetaPopUp(int col)
+static BPopUpMenu*
+CreateMetaPopUp(int col)
 {
 	MetaKeyStateMap& map = GetNthKeyMap(col);
 	BPopUpMenu * popup = new BPopUpMenu(NULL, false);
@@ -72,8 +77,8 @@ static BPopUpMenu* CreateMetaPopUp(int col)
 
 
 // Creates a pop-up that allows the user to choose a key-cap visually
-static BPopUpMenu* CreateKeysPopUp();
-static BPopUpMenu* CreateKeysPopUp()
+static BPopUpMenu*
+CreateKeysPopUp()
 {
 	BPopUpMenu* popup = new BPopUpMenu(NULL, false);
 	int numKeys = GetNumKeyIndices();
@@ -90,33 +95,37 @@ static BPopUpMenu* CreateKeysPopUp()
 ShortcutsWindow::ShortcutsWindow()
 	:
 	BWindow(BRect(WINDOW_START_X, WINDOW_START_Y, WINDOW_START_X + MIN_WIDTH, 
-		WINDOW_START_Y + MIN_HEIGHT * 2), "Shortcuts", B_DOCUMENT_WINDOW, 0L), 
-		fSavePanel(NULL), 
-		fOpenPanel(NULL), 
-		fSelectPanel(NULL), 
-		fKeySetModified(false), 		
-		fLastOpenWasAppend(false)
+		WINDOW_START_Y + MIN_HEIGHT * 2), B_TRANSLATE("Shortcuts"),
+		B_DOCUMENT_WINDOW, 0L), 
+	fSavePanel(NULL), 
+	fOpenPanel(NULL), 
+	fSelectPanel(NULL), 
+	fKeySetModified(false), 		
+	fLastOpenWasAppend(false)
 {
-	InitializeMetaMaps();
+	ShortcutsSpec::InitializeMetaMaps();
+
 	SetSizeLimits(MIN_WIDTH, MAX_WIDTH, MIN_HEIGHT, MAX_HEIGHT);
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "Menu Bar");
 
-	BMenu* fileMenu = new BMenu("File");
-	fileMenu->AddItem(new BMenuItem("Open KeySet...", 
+	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open KeySet" B_UTF8_ELLIPSIS), 
 		new BMessage(OPEN_KEYSET), 'O'));
-	fileMenu->AddItem(new BMenuItem("Append KeySet...", 
+	fileMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("Append KeySet" B_UTF8_ELLIPSIS), 
 		new BMessage(APPEND_KEYSET), 'A'));
-	fileMenu->AddItem(new BMenuItem("Revert to saved", 
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Revert to saved"), 
 		new BMessage(REVERT_KEYSET), 'A'));
 	fileMenu->AddItem(new BSeparatorItem);
-	fileMenu->AddItem(new BMenuItem("Save KeySet as...", 
+	fileMenu->AddItem(new BMenuItem(
+		B_TRANSLATE("Save KeySet as" B_UTF8_ELLIPSIS), 
 		new BMessage(SAVE_KEYSET_AS), 'S'));
 	fileMenu->AddItem(new BSeparatorItem);
-	fileMenu->AddItem(new BMenuItem("About Shortcuts",
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("About Shortcuts"),
 		new BMessage(B_ABOUT_REQUESTED)));
 	fileMenu->AddItem(new BSeparatorItem);
-	fileMenu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 
-		'Q'));
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(fileMenu);
 
 	AddChild(menuBar);
@@ -141,30 +150,36 @@ ShortcutsWindow::ShortcutsWindow()
 	
 	const float metaWidth = 50.0f;
 
-	for (int i = 0; i < ShortcutsSpec::NUM_META_COLUMNS; i++)
+	for (int i = 0; i < ShortcutsSpec::NUM_META_COLUMNS; i++) {
 		fColumnListView->AddColumn(
 			new CLVColumn(ShortcutsSpec::GetColumnName(i), CreateMetaPopUp(i), 
 			metaWidth, CLV_SORT_KEYABLE));
+	}
 
-	fColumnListView->AddColumn(new CLVColumn("Key", CreateKeysPopUp(), 60, 
-		CLV_SORT_KEYABLE));
+	fColumnListView->AddColumn(new CLVColumn(B_TRANSLATE("Key"),
+		CreateKeysPopUp(), 60, CLV_SORT_KEYABLE));
 
 	BPopUpMenu* popup = new BPopUpMenu(NULL, false);
-	popup->AddItem(new BMenuItem("(Choose application with file requester)", NULL));
-	popup->AddItem(new BMenuItem("*InsertString \"Your Text Here\"", NULL));
-	popup->AddItem(new BMenuItem("*MoveMouse +20 +0", NULL));
-	popup->AddItem(new BMenuItem("*MoveMouseTo 50% 50%", NULL));
-	popup->AddItem(new BMenuItem("*MouseButton 1", NULL));
-	popup->AddItem(new BMenuItem("*LaunchHandler text/html", NULL));
 	popup->AddItem(new BMenuItem(
-		"*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"", NULL));
-	popup->AddItem(new BMenuItem("*MouseDown", NULL));
-	popup->AddItem(new BMenuItem("*MouseUp", NULL));
+		B_TRANSLATE("(Choose application with file requester)"), NULL));
 	popup->AddItem(new BMenuItem(
-		"*SendMessage application/x-vnd.Be-TRAK 'Tfnd'", NULL));
-	popup->AddItem(new BMenuItem("*Beep", NULL));
-	fColumnListView->AddColumn(new CLVColumn("Application", popup, 323.0, 
-		CLV_SORT_KEYABLE));
+		B_TRANSLATE("*InsertString \"Your Text Here\""), NULL));
+	popup->AddItem(new BMenuItem(
+		B_TRANSLATE("*MoveMouse +20 +0"), NULL));
+	popup->AddItem(new BMenuItem(B_TRANSLATE("*MoveMouseTo 50% 50%"), NULL));
+	popup->AddItem(new BMenuItem(B_TRANSLATE("*MouseButton 1"), NULL));
+	popup->AddItem(new BMenuItem(
+		B_TRANSLATE("*LaunchHandler text/html"), NULL));
+	popup->AddItem(new BMenuItem(
+		B_TRANSLATE("*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\""),
+		NULL));
+	popup->AddItem(new BMenuItem(B_TRANSLATE("*MouseDown"), NULL));
+	popup->AddItem(new BMenuItem(B_TRANSLATE("*MouseUp"), NULL));
+	popup->AddItem(new BMenuItem(
+		B_TRANSLATE("*SendMessage application/x-vnd.Be-TRAK 'Tfnd'"), NULL));
+	popup->AddItem(new BMenuItem(B_TRANSLATE("*Beep"), NULL));
+	fColumnListView->AddColumn(new CLVColumn(B_TRANSLATE("Application"), popup,
+		323.0, CLV_SORT_KEYABLE));
 
 	fColumnListView->SetSortFunction(ShortcutsSpec::MyCompare);
 	AddChild(containerView);
@@ -174,8 +189,8 @@ ShortcutsWindow::ShortcutsWindow()
 
 	BRect buttonBounds = Bounds();
 	buttonBounds.left += V_SPACING;
-	buttonBounds.right = ((buttonBounds.right - buttonBounds.left) / 2.0f) + 
-		buttonBounds.left;
+	buttonBounds.right = ((buttonBounds.right - buttonBounds.left) / 2.0f)
+		+ buttonBounds.left;
 	buttonBounds.bottom -= V_SPACING * 2;
 	buttonBounds.top = buttonBounds.bottom - vButtonHeight;
 	buttonBounds.right -= B_V_SCROLL_BAR_WIDTH;
@@ -183,11 +198,11 @@ ShortcutsWindow::ShortcutsWindow()
 	buttonBounds.right = (buttonBounds.left + origRight) * 0.40f - 
 		(V_SPACING / 2);
 	AddChild(fAddButton = new ResizableButton(Bounds(), buttonBounds, "add", 
-		"Add new shortcut", new BMessage(ADD_HOTKEY_ITEM)));
+		B_TRANSLATE("Add new shortcut"), new BMessage(ADD_HOTKEY_ITEM)));
 	buttonBounds.left = buttonBounds.right + V_SPACING;
 	buttonBounds.right = origRight;
 	AddChild(fRemoveButton = new ResizableButton(Bounds(), buttonBounds, 
-		"remove", "Remove selected shortcut", 
+		"remove", B_TRANSLATE("Remove selected shortcut"), 
 		new BMessage(REMOVE_HOTKEY_ITEM)));
 	
 	fRemoveButton->SetEnabled(false);
@@ -197,7 +212,7 @@ ShortcutsWindow::ShortcutsWindow()
 	saveButtonBounds.right = Bounds().right - B_V_SCROLL_BAR_WIDTH - offset;
 	saveButtonBounds.left = buttonBounds.right + V_SPACING + offset;
 	AddChild(fSaveButton = new ResizableButton(Bounds(), saveButtonBounds, 
-		"save", "Save & apply", new BMessage(SAVE_KEYSET)));
+		"save", B_TRANSLATE("Save & apply"), new BMessage(SAVE_KEYSET)));
 	
 	fSaveButton->SetEnabled(false);
 
@@ -228,31 +243,33 @@ ShortcutsWindow::QuitRequested()
 
 	if (fKeySetModified) {
 		BAlert* alert = new BAlert(WARNING, 
-			"Really quit without saving your changes?", "Don't save", "Cancel",
-			"Save");
+			B_TRANSLATE("Really quit without saving your changes?"),
+			B_TRANSLATE("Don't save"), B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Save"));
 		switch(alert->Go()) {
 			case 1:
 				ret = false;
-			break;
+				break;
 
 			case 2:
 				// Save: automatically if possible, otherwise go back and open
 				// up the file requester
-				if (fLastSaved.InitCheck() == B_NO_ERROR) {
+				if (fLastSaved.InitCheck() == B_OK) {
 					if (_SaveKeySet(fLastSaved) == false) {
 						(new BAlert(ERROR, 
-							"Shortcuts was unable to save your KeySet file!", 
-							"Oh no"))->Go();
+							B_TRANSLATE("Shortcuts was unable to save your "
+								"KeySet file!"), 
+							B_TRANSLATE("Oh no")))->Go();
 						ret = true; //quit anyway
 					}
 				} else {
 					PostMessage(SAVE_KEYSET);
 					ret = false;
 				}
-			break;
+				break;
 			default:
 				ret = true;
-			break;
+				break;
 		}
 	}
 
@@ -271,7 +288,7 @@ ShortcutsWindow::_GetSettingsFile(entry_ref* eref)
 	else 
 		path.Append(SHORTCUTS_SETTING_FILE_NAME);
 
-	if (BEntry(path.Path(), true).GetRef(eref) == B_NO_ERROR)
+	if (BEntry(path.Path(), true).GetRef(eref) == B_OK)
 		return true;
 	else
 		return false;
@@ -283,20 +300,20 @@ bool
 ShortcutsWindow::_SaveKeySet(BEntry& saveEntry)
 {
 	BFile saveTo(&saveEntry, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if (saveTo.InitCheck() != B_NO_ERROR)
+	if (saveTo.InitCheck() != B_OK)
 		return false;
 
 	BMessage saveMsg;
 	for (int i = 0; i < fColumnListView->CountItems(); i++) {
 		BMessage next;
 		if (((ShortcutsSpec*)fColumnListView->ItemAt(i))->Archive(&next) 
-			== B_NO_ERROR)
+			== B_OK)
 			saveMsg.AddMessage("spec", &next);
 		else
-			printf("Error archiving ShortcutsSpec #%i!\n",i);
+			printf("Error archiving ShortcutsSpec #%i!\n", i);
 	}
 	
-	bool ret = (saveMsg.Flatten(&saveTo) == B_NO_ERROR);
+	bool ret = (saveMsg.Flatten(&saveTo) == B_OK);
 	
 	if (ret) {
 		fKeySetModified = false;
@@ -314,7 +331,7 @@ ShortcutsWindow::_LoadKeySet(const BMessage& loadMsg)
 {
 	int i = 0;
 	BMessage msg;
-	while (loadMsg.FindMessage("spec", i++, &msg) == B_NO_ERROR) {
+	while (loadMsg.FindMessage("spec", i++, &msg) == B_OK) {
 		ShortcutsSpec* spec = (ShortcutsSpec*)ShortcutsSpec::Instantiate(&msg);
 		if (spec != NULL) 
 			fColumnListView->AddItem(spec);
@@ -364,8 +381,8 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 				fOpenPanel->Show();
 			}
 			fOpenPanel->SetButtonLabel(B_DEFAULT_BUTTON, fLastOpenWasAppend ? 
-				"Append" : "Open");
-		break;
+				B_TRANSLATE("Append") : B_TRANSLATE("Open"));
+			break;
 
 		case REVERT_KEYSET:
 		{
@@ -377,8 +394,8 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 			reload.AddRef("refs", &eref);
 			reload.AddString("startupRef", "yeah");
 			PostMessage(&reload);
+			break;
 		}
-		break;
 
 		// Respond to drag-and-drop messages here
 		case B_SIMPLE_DATA:
@@ -386,12 +403,12 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 			int i = 0;
 
 			entry_ref ref;
-			while (msg->FindRef("refs", i++, &ref) == B_NO_ERROR) {
+			while (msg->FindRef("refs", i++, &ref) == B_OK) {
 				BEntry entry(&ref);
-				if (entry.InitCheck() == B_NO_ERROR) {
+				if (entry.InitCheck() == B_OK) {
 					BPath path(&entry);
 					
-					if (path.InitCheck() == B_NO_ERROR) {
+					if (path.InitCheck() == B_OK) {
 						// Add a new item with the given path.
 						BString str(path.Path());
 						DoStandardEscapes(str);
@@ -399,8 +416,8 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 					}
 				}
 			}
+			break;
 		}
-		break;
 
 		// Respond to FileRequester's messages here
 		case B_REFS_RECEIVED:
@@ -408,21 +425,21 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 			// Find file ref
 			entry_ref ref;
 			bool isStartMsg = msg->HasString("startupRef");
-			if (msg->FindRef("refs", &ref) == B_NO_ERROR) {
+			if (msg->FindRef("refs", &ref) == B_OK) {
 				// load the file into (fileMsg)
 				BMessage fileMsg;
 				{
 					BFile file(&ref, B_READ_ONLY);
-					if ((file.InitCheck() != B_NO_ERROR) 
-						|| (fileMsg.Unflatten(&file) != B_NO_ERROR)) {
+					if ((file.InitCheck() != B_OK) 
+						|| (fileMsg.Unflatten(&file) != B_OK)) {
 						if (isStartMsg) {
 							// use this to save to anyway
 							fLastSaved = BEntry(&ref);
 							break;
 						} else {
 							(new BAlert(ERROR, 
-								"Shortcuts was couldn't open your KeySet file!"
-								, "Okay"))->Go(NULL);
+								B_TRANSLATE("Shortcuts was couldn't open your "
+								"KeySet file!"), B_TRANSLATE("OK")))->Go(NULL);
 							break;
 						}
 					}
@@ -430,11 +447,10 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
  
 				if (fLastOpenWasAppend == false) {
 					// Clear the menu...
-					ShortcutsSpec * item;
-					do {
-						delete (item = ((ShortcutsSpec*)
-							fColumnListView->RemoveItem(int32(0))));
-					} while (item);
+					while (ShortcutsSpec* item
+						= ((ShortcutsSpec*)fColumnListView->RemoveItem(0L))) {
+						delete item;
+					}
 				}
 
 				if (_LoadKeySet(fileMsg)) {
@@ -448,13 +464,14 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 					if (ref == eref) fKeySetModified = false;
 				} else {
 					(new BAlert(ERROR, 
-						"Shortcuts was unable to parse your KeySet file!", 
-						"Okay"))->Go(NULL);
+						B_TRANSLATE("Shortcuts was unable to parse your "
+						"KeySet file!"), 
+						B_TRANSLATE("OK")))->Go(NULL);
 					break;
 				}
 			}
+			break;
 		}
-		break;
 
 		// These messages come from the pop-up menu of the Applications column
 		case SELECT_APPLICATION:
@@ -462,11 +479,11 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 			int csel = fColumnListView->CurrentSelection();
 			if (csel >= 0) {
 				entry_ref aref;
-				if (msg->FindRef("refs", &aref) == B_NO_ERROR) {
+				if (msg->FindRef("refs", &aref) == B_OK) {
 					BEntry ent(&aref);
-					if (ent.InitCheck() == B_NO_ERROR) {
+					if (ent.InitCheck() == B_OK) {
 						BPath path;
-						if ((ent.GetPath(&path) == B_NO_ERROR) 
+						if ((ent.GetPath(&path) == B_OK) 
 							&& (((ShortcutsSpec *)
 							fColumnListView->ItemAt(csel))->
 							ProcessColumnTextString(ShortcutsSpec::
@@ -478,8 +495,8 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 					}
 				}
 			}
+			break;
 		}
-		break;
 
 		case SAVE_KEYSET:
 		{
@@ -487,23 +504,24 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 
 			const char * name;
 			entry_ref entry;
-			if ((msg->FindString("name", &name) == B_NO_ERROR) 
-				&& (msg->FindRef("directory", &entry) == B_NO_ERROR)) {
+			if ((msg->FindString("name", &name) == B_OK) 
+				&& (msg->FindRef("directory", &entry) == B_OK)) {
 				BDirectory dir(&entry);
 				BEntry saveTo(&dir, name, true);
-				showSaveError = ((saveTo.InitCheck() != B_NO_ERROR) 
+				showSaveError = ((saveTo.InitCheck() != B_OK) 
 				|| (_SaveKeySet(saveTo) == false));
-			} else if (fLastSaved.InitCheck() == B_NO_ERROR) {
+			} else if (fLastSaved.InitCheck() == B_OK) {
 				// We've saved this before, save over previous file.
 				showSaveError = (_SaveKeySet(fLastSaved) == false);
 			} else PostMessage(SAVE_KEYSET_AS); // open the save requester...
 
 			if (showSaveError) {
-				(new BAlert(ERROR, "Shortcuts wasn't able to save your keyset."
-				, "Okay"))->Go(NULL);
+				(new BAlert(ERROR, 
+					B_TRANSLATE("Shortcuts wasn't able to save your keyset."), 
+					B_TRANSLATE("OK")))->Go(NULL);
 			}
+			break;
 		}
-		break;
 
 		case SAVE_KEYSET_AS:
 		{
@@ -516,16 +534,16 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 					false, &msg);
 				fSavePanel->Show();
 			}
+			break;
 		}
-		break;
 
 		case B_ABOUT_REQUESTED:
 			be_app_messenger.SendMessage(B_ABOUT_REQUESTED);
-		break;
+			break;
 
 		case ADD_HOTKEY_ITEM:
 			_AddNewSpec(NULL);
-		break;
+			break;
 
 		case REMOVE_HOTKEY_ITEM:
 		{
@@ -552,8 +570,8 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 					}
 				}
 			}
+			break;
 		}
-		break;
 
 		// Received when the user clicks on the ColumnListView
 		case HOTKEY_ITEM_SELECTED:
@@ -562,16 +580,16 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 			msg->FindInt32("index", &index);
 			bool validItem = (index >= 0);
 			fRemoveButton->SetEnabled(validItem);
+			break;
 		}
-		break;
 
 		// Received when an entry is to be modified in response to GUI activity
 		case HOTKEY_ITEM_MODIFIED:
 		{
 			int32 row, column;
 
-			if ((msg->FindInt32("row", &row) == B_NO_ERROR) 
-				&& (msg->FindInt32("column", &column) == B_NO_ERROR)) {
+			if ((msg->FindInt32("row", &row) == B_OK) 
+				&& (msg->FindInt32("column", &column) == B_OK)) {
 				int32 key;
 				const char* bytes;
 
@@ -582,17 +600,17 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 
 					if (msg->HasInt32("mouseClick")) {
 						repaintNeeded = item->ProcessColumnMouseClick(column);
-					} else if ((msg->FindString("bytes", &bytes) == B_NO_ERROR)
-						&& (msg->FindInt32("key", &key) == B_NO_ERROR)) {
+					} else if ((msg->FindString("bytes", &bytes) == B_OK)
+						&& (msg->FindInt32("key", &key) == B_OK)) {
 						repaintNeeded = item->ProcessColumnKeyStroke(column, 
 							bytes, key);
 					} else if (msg->FindInt32("unmappedkey", &key) == 
-						B_NO_ERROR) {
+						B_OK) {
 						repaintNeeded = ((column == item->KEY_COLUMN_INDEX) 
 							&& ((key > 0xFF) || (GetKeyName(key) != NULL)) 
 							&& (item->ProcessColumnKeyStroke(column, NULL, 
 							key)));
-					} else if (msg->FindString("text", &bytes) == B_NO_ERROR) {
+					} else if (msg->FindString("text", &bytes) == B_OK) {
 						if ((bytes[0] == '(')&&(bytes[1] == 'C')) {
 							if (fSelectPanel)
 								fSelectPanel->Show();
@@ -604,10 +622,11 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 								fSelectPanel->Show();
 							}
 							fSelectPanel->SetButtonLabel(B_DEFAULT_BUTTON, 
-								"Select");
-						} else 
+								B_TRANSLATE("Select"));
+						} else {
 							repaintNeeded = item->ProcessColumnTextString(
 								column, bytes);
+						}
 					}
 					
 					if (repaintNeeded) {
@@ -616,12 +635,12 @@ ShortcutsWindow::MessageReceived(BMessage* msg)
 					}
 				}
 			}
+			break;
 		}
-		break;
 
 		default:
 			BWindow::MessageReceived(msg);
-		break;
+			break;
 	}
 }
 
@@ -686,7 +705,7 @@ ShortcutsWindow::DispatchMessage(BMessage* msg, BHandler* handler)
 				}
 				be_clipboard->Unlock();
 			}
-		break;
+			break;
 
 		case B_PASTE:
 			if (be_clipboard->Lock()) {
@@ -694,7 +713,7 @@ ShortcutsWindow::DispatchMessage(BMessage* msg, BHandler* handler)
 				const char* text;
 				ssize_t textLen;
 				if (data->FindData("text/plain", B_MIME_TYPE, (const void**) 
-					&text, &textLen) == B_NO_ERROR) {
+					&text, &textLen) == B_OK) {
 					int32 row = fColumnListView->CurrentSelection(); 
 					int32 column = fColumnListView->GetSelectedColumn();
 					if ((row >= 0) 
@@ -713,11 +732,11 @@ ShortcutsWindow::DispatchMessage(BMessage* msg, BHandler* handler)
 				}
 				be_clipboard->Unlock();
 			}
-		break;
+			break;
 		
 		default:
 			BWindow::DispatchMessage(msg, handler);
-		break;
+			break;
 	}
 }
 
