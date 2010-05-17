@@ -42,8 +42,18 @@ static const DemuxerFormat gDemuxerTable[] = {
 		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
 //	{
-//		TODO: untested!
-//		"mov", "MOV (Quicktime Movie)", "video/x-mov",
+//		// Tested and appears to work ok with the one clip I have...
+//		"matroska", "Matroska Movie", "video/x-matroska",
+//		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
+//	},
+//	{
+//		// Plays the limited amount of files I could test with.
+//		"mov", "Quicktime Movie", "video/x-mov",
+//		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+//	},
+//	{
+//		// Plays the limited amount of files I could test with.
+//		"mp4", "MPEG-4 Movie", "video/x-mp4",
 //		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 //	},
 //	{
@@ -64,7 +74,7 @@ static const DemuxerFormat gDemuxerTable[] = {
 		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
 	},
 	{
-		// TODO: Also covers "mpegvideo", plus see above.
+		// TODO: Also covers "mpegvideo", plus see mpegts.
 		"mpeg", "MPEG (Motion Picture Experts Group)", "video/mpeg",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
