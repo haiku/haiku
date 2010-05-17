@@ -14,7 +14,7 @@ resource app_version {
 	internal = 3,
 
 	short_info = "DiskProbe",
-	long_info = "DiskProbe ©2004-2009 Haiku, Inc."
+	long_info = "DiskProbe ©2004-2010 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

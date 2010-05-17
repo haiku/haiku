@@ -12,20 +12,24 @@
 #include "OpenWindow.h"
 #include "FindWindow.h"
 
-#include <Application.h>
-#include <Screen.h>
-#include <Autolock.h>
 #include <Alert.h>
-#include <TextView.h>
-#include <FilePanel.h>
-#include <FindDirectory.h>
+#include <Application.h>
+#include <Autolock.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <FilePanel.h>
+#include <FindDirectory.h>
+#include <Locale.h>
 #include <Path.h>
+#include <Screen.h>
+#include <TextView.h>
 
 #include <stdio.h>
 #include <string.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DiskProbe"
 
 const char *kSignature = "application/x-vnd.Haiku-DiskProbe";
 
@@ -85,6 +89,7 @@ class DiskProbe : public BApplication {
 		uint32		fWindowCount;
 		BRect		fWindowFrame;
 		BMessenger	fFindTarget;
+		BCatalog	fAppCatalog;
 };
 
 
@@ -115,10 +120,14 @@ Settings::Settings()
 	if (file.Read(&settings, sizeof(settings)) == sizeof(settings)) {
 #if B_HOST_IS_BENDIAN
 		// settings are saved in little endian
-		settings.window_frame.left = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.left);
-		settings.window_frame.top = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.top);
-		settings.window_frame.right = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.right);
-		settings.window_frame.bottom = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.bottom);
+		settings.window_frame.left = B_LENDIAN_TO_HOST_FLOAT(
+			settings.window_frame.left);
+		settings.window_frame.top = B_LENDIAN_TO_HOST_FLOAT(
+			settings.window_frame.top);
+		settings.window_frame.right = B_LENDIAN_TO_HOST_FLOAT(
+			settings.window_frame.right);
+		settings.window_frame.bottom = B_LENDIAN_TO_HOST_FLOAT(
+			settings.window_frame.bottom);
 #endif
 		// check if the window frame is on screen at all
 		BScreen screen;
@@ -127,13 +136,18 @@ Settings::Settings()
 			&& settings.window_frame.Height() < screen.Frame().Height())
 			fMessage.ReplaceRect("window_frame", settings.window_frame);
 
-		if (settings.base_type == kHexBase || settings.base_type == kDecimalBase)
-			fMessage.ReplaceInt32("base_type", B_LENDIAN_TO_HOST_INT32(settings.base_type));
+		if (settings.base_type == kHexBase 
+			|| settings.base_type == kDecimalBase)
+			fMessage.ReplaceInt32("base_type", 
+				B_LENDIAN_TO_HOST_INT32(settings.base_type));
 		if (settings.font_size >= 0 && settings.font_size <= 72)
-			fMessage.ReplaceFloat("font_size", float(B_LENDIAN_TO_HOST_INT32(settings.font_size)));
+			fMessage.ReplaceFloat("font_size", 
+				float(B_LENDIAN_TO_HOST_INT32(settings.font_size)));
 
-		fMessage.ReplaceBool("case_sensitive", settings.flags & kCaseSensitive);
-		fMessage.ReplaceInt8("find_mode", settings.flags & kHexFindMode ? kHexMode : kAsciiMode);
+		fMessage.ReplaceBool("case_sensitive", 
+			settings.flags & kCaseSensitive);
+		fMessage.ReplaceInt8("find_mode", 
+			settings.flags & kHexFindMode ? kHexMode : kAsciiMode);
 	}
 }
 
@@ -153,15 +167,22 @@ Settings::~Settings()
 	settings.window_frame = fMessage.FindRect("window_frame");
 #if B_HOST_IS_BENDIAN
 	// settings are saved in little endian
-	settings.window_frame.left = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.left);
-	settings.window_frame.top = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.top);
-	settings.window_frame.right = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.right);
-	settings.window_frame.bottom = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.bottom);
+	settings.window_frame.left = B_HOST_TO_LENDIAN_FLOAT(
+		settings.window_frame.left);
+	settings.window_frame.top = B_HOST_TO_LENDIAN_FLOAT(
+		settings.window_frame.top);
+	settings.window_frame.right = B_HOST_TO_LENDIAN_FLOAT(
+		settings.window_frame.right);
+	settings.window_frame.bottom = B_HOST_TO_LENDIAN_FLOAT(
+		settings.window_frame.bottom);
 #endif
 
-	settings.base_type = B_HOST_TO_LENDIAN_INT32(fMessage.FindInt32("base_type"));
-	settings.font_size = B_HOST_TO_LENDIAN_INT32(int32(fMessage.FindFloat("font_size") + 0.5f));
-	settings.flags = B_HOST_TO_LENDIAN_INT32((fMessage.FindBool("case_sensitive") ? kCaseSensitive : 0)
+	settings.base_type = B_HOST_TO_LENDIAN_INT32(
+		fMessage.FindInt32("base_type"));
+	settings.font_size = B_HOST_TO_LENDIAN_INT32(
+		int32(fMessage.FindFloat("font_size") + 0.5f));
+	settings.flags = B_HOST_TO_LENDIAN_INT32(
+		(fMessage.FindBool("case_sensitive") ? kCaseSensitive : 0)
 		| (fMessage.FindInt8("find_mode") == kHexMode ? kHexFindMode : 0));
 
 	file.Write(&settings, sizeof(settings));
@@ -215,8 +236,10 @@ DiskProbe::DiskProbe()
 	: BApplication(kSignature),
 	fOpenWindow(NULL),
 	fFindWindow(NULL),
-	fWindowCount(0)
+	fWindowCount(0),
+	fAppCatalog(NULL)
 {
+	be_locale->GetAppCatalog(&fAppCatalog);
 	fFilePanel = new BFilePanel();
 	fWindowFrame = fSettings.Message().FindRect("window_frame");
 }
@@ -341,12 +364,12 @@ DiskProbe::RefsReceived(BMessage *message)
 		if (status != B_OK) {
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
-				"Could not open \"%s\":\n"
-				"%s",
+				B_TRANSLATE("Could not open \"%s\":\n"
+				"%s"),
 				ref.name, strerror(status));
 
-			(new BAlert("DiskProbe request",
-				buffer, "OK", NULL, NULL,
+			(new BAlert(B_TRANSLATE("DiskProbe request"),
+				buffer, B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 		}
 	}
@@ -377,7 +400,8 @@ DiskProbe::ArgvReceived(int32 argc, char **argv)
 
 		if ((status = entry.SetTo(path.Path(), false)) != B_OK
 			|| (status = entry.GetRef(&ref)) != B_OK) {
-			fprintf(stderr, "Could not open file \"%s\": %s\n", path.Path(), strerror(status));
+			fprintf(stderr, B_TRANSLATE("Could not open file \"%s\": %s\n"), 
+				path.Path(), strerror(status));
 			continue;
 		}
 
@@ -462,10 +486,10 @@ DiskProbe::MessageReceived(BMessage *message)
 void
 DiskProbe::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "DiskProbe\n"
+	BAlert *alert = new BAlert("about", B_TRANSLATE("DiskProbe\n"
 		"\twritten by Axel Dörfler\n"
 		"\tCopyright 2004-2007, Haiku.\n\n"
-		"Original Be version by Robert Polic\n", "OK");
+		"Original Be version by Robert Polic\n"), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 

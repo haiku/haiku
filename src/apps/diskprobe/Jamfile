@@ -16,7 +16,19 @@ Application DiskProbe :
 	ProbeView.cpp
 	OpenWindow.cpp
 	FindWindow.cpp
-	: be tracker translation libexpression_parser.a libmapm.a 
+	: be locale tracker translation libexpression_parser.a libmapm.a 
 		$(TARGET_LIBSUPC++)
 	: DiskProbe.rdef
-	;
+;
+
+DoCatalogs DiskProbe :
+	x-vnd.Haiku-DiskProbe
+	:
+	AttributeWindow.cpp
+	DiskProbe.cpp
+	FindWindow.cpp
+	FileWindow.cpp
+	OpenWindow.cpp
+	ProbeView.cpp
+	TypeEditors.cpp
+;

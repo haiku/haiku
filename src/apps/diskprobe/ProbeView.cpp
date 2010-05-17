@@ -10,38 +10,40 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Alert.h>
 #include <Application.h>
-#include <Window.h>
-#include <Clipboard.h>
 #include <Autolock.h>
-#include <MessageQueue.h>
-#include <TextControl.h>
-#include <StringView.h>
-#include <Slider.h>
+#include <Beep.h>
 #include <Bitmap.h>
-#include <Button.h>
 #include <Box.h>
+#include <Button.h>
+#include <Catalog.h>
+#include <Clipboard.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <ExpressionParser.h>
+#include <fs_attr.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
-#include <ScrollView.h>
-#include <Alert.h>
-#include <String.h>
-#include <Entry.h>
-#include <Path.h>
+#include <MessageQueue.h>
 #include <NodeInfo.h>
 #include <Node.h>
 #include <NodeMonitor.h>
-#include <Directory.h>
-#include <Volume.h>
-#include <fs_attr.h>
+#include <Path.h>
 #include <PrintJob.h>
-#include <Beep.h>
-
-#include <ExpressionParser.h>
+#include <ScrollView.h>
+#include <StringView.h>
+#include <Slider.h>
+#include <String.h>
+#include <TextControl.h>
+#include <Volume.h>
+#include <Window.h>
 
 #include "DataView.h"
 #include "DiskProbe.h"
 #include "TypeEditors.h"
+
 
 #ifndef __HAIKU__
 #	define DRAW_SLIDER_BAR
@@ -49,6 +51,9 @@
 	// one that looks exactly like the one in the original DiskProbe
 	// (even in Dano/Zeta)
 #endif
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ProbeView"
 
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgPositionUpdate = 'poup';
@@ -495,7 +500,10 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 
 	BStringView *stringView = new BStringView(BRect(50, 6, rect.right, 20),
 		B_EMPTY_STRING, editor.IsAttribute()
-		? "Attribute: " : editor.IsDevice() ? "Device: " : "File: ");
+		? B_TRANSLATE("Attribute: ") 
+		: editor.IsDevice() 
+		? B_TRANSLATE("Device: ") 
+		: B_TRANSLATE("File: "));
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -519,7 +527,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	if (editor.IsAttribute()) {
 		top += 3;
 		stringView = new BStringView(BRect(50, top, frame.right, top + 15),
-			B_EMPTY_STRING, "Attribute type: ");
+			B_EMPTY_STRING, B_TRANSLATE("Attribute type: "));
 		stringView->SetFont(&boldFont);
 		stringView->ResizeToPreferred();
 		AddChild(stringView);
@@ -546,7 +554,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 		fTypeControl = NULL;
 
 	stringView = new BStringView(BRect(50, top, frame.right, top + 15),
-		B_EMPTY_STRING, "Block: ");
+		B_EMPTY_STRING, B_TRANSLATE("Block: "));
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -567,14 +575,14 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect.left = rect.right + 4;
 	rect.right = rect.left + 75;
 	rect.OffsetBy(0, 2);
-	fSizeView = new BStringView(rect, B_EMPTY_STRING, "of 0x0");
+	fSizeView = new BStringView(rect, B_EMPTY_STRING, B_TRANSLATE("of 0x0"));
 	fSizeView->SetFont(&plainFont);
 	AddChild(fSizeView);
 	UpdateFileSizeView();
 
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
-	stringView = new BStringView(rect, B_EMPTY_STRING, "Offset: ");
+	stringView = new BStringView(rect, B_EMPTY_STRING, B_TRANSLATE("Offset: "));
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -590,8 +598,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
 	stringView = new BStringView(rect, B_EMPTY_STRING, editor.IsAttribute()
-		? "Attribute offset: " : editor.IsDevice()
-			? "Device offset: " : "File offset: ");
+		? B_TRANSLATE("Attribute offset: ") : editor.IsDevice()
+			? B_TRANSLATE("Device offset: ") : B_TRANSLATE("File offset: "));
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -729,7 +737,7 @@ void
 HeaderView::UpdateFileSizeView()
 {
 	char buffer[64];
-	strcpy(buffer, "of ");
+	strcpy(buffer, B_TRANSLATE("of "));
 	FormatValue(buffer + 3, sizeof(buffer) - 3,
 		(fFileSize + fBlockSize - 1) / fBlockSize);
 	fSizeView->SetText(buffer);
@@ -1091,8 +1099,8 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
 		if (system_time() > startTime + 8000000LL) {
 			// If the user had to wait more than 8 seconds for the result,
 			// we are trying to please him with a requester...
-			(new BAlert("DiskProbe request",
-				"Could not find search string.", "OK", NULL, NULL,
+			(new BAlert(B_TRANSLATE("DiskProbe request"),
+				B_TRANSLATE("Could not find search string."), B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 		} else
 			beep();
@@ -1119,8 +1127,8 @@ TypeView::TypeView(BRect rect, const char* name, int32 index,
 
 	fTypeEditorView = GetTypeEditorAt(index, Frame(), editor);
 	if (fTypeEditorView == NULL) {
-		AddChild(new BStringView(Bounds(), "Type editor",
-			"Type editor not supported", B_FOLLOW_NONE));
+		AddChild(new BStringView(Bounds(), B_TRANSLATE("Type editor"),
+			B_TRANSLATE("Type editor not supported"), B_FOLLOW_NONE));
 	} else
 		AddChild(fTypeEditorView);
 
@@ -1311,7 +1319,7 @@ ProbeView::_UpdateAttributesMenu(BMenu *menu)
 void
 ProbeView::AddSaveMenuItems(BMenu* menu, int32 index)
 {
-	menu->AddItem(fSaveMenuItem = new BMenuItem("Save",
+	menu->AddItem(fSaveMenuItem = new BMenuItem(B_TRANSLATE("Save"),
 		new BMessage(B_SAVE_REQUESTED), 'S'), index);
 	fSaveMenuItem->SetTarget(this);
 	fSaveMenuItem->SetEnabled(false);
@@ -1323,10 +1331,10 @@ void
 ProbeView::AddPrintMenuItems(BMenu* menu, int32 index)
 {
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Page setup" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgPageSetup)), index++);
 	item->SetTarget(this);
-	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgPrint), 'P'), index++);
 	item->SetTarget(this);
 }
@@ -1340,7 +1348,7 @@ ProbeView::AddViewAsMenuItems()
 	if (bar == NULL)
 		return;
 
-	BMenuItem* item = bar->FindItem("View");
+	BMenuItem* item = bar->FindItem(B_TRANSLATE("View"));
 	BMenu* menu = NULL;
 	if (item != NULL)
 		menu = item->Submenu();
@@ -1352,11 +1360,11 @@ ProbeView::AddViewAsMenuItems()
 
 	menu->AddSeparatorItem();
 
-	BMenu* subMenu = new BMenu("View As");
+	BMenu* subMenu = new BMenu(B_TRANSLATE("View As"));
 	subMenu->SetRadioMode(true);
 
 	BMessage* message = new BMessage(kMsgViewAs);
-	subMenu->AddItem(item = new BMenuItem("Raw", message));
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Raw"), message));
 	item->SetMarked(true);
 
 	const char* name;
@@ -1397,44 +1405,44 @@ ProbeView::AttachedToWindow()
 		ResizeBy(0, -bar->Bounds().Height());
 
 		BMenu *menu = new BMenu(fEditor.IsAttribute()
-			? "Attribute" : fEditor.IsDevice() ? "Device" : "File");
+			? B_TRANSLATE("Attribute") : fEditor.IsDevice() ? B_TRANSLATE("Device") : B_TRANSLATE("File"));
 		AddSaveMenuItems(menu, 0);
 		menu->AddSeparatorItem();
 		AddPrintMenuItems(menu, menu->CountItems());
 		menu->AddSeparatorItem();
 
-		menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_CLOSE_REQUESTED),
 			'W'));
 		bar->AddItem(menu);
 	}
 
 	// "Edit" menu
 
-	BMenu *menu = new BMenu("Edit");
+	BMenu *menu = new BMenu(B_TRANSLATE("Edit"));
 	BMenuItem *item;
-	menu->AddItem(fUndoMenuItem = new BMenuItem("Undo", new BMessage(B_UNDO),
+	menu->AddItem(fUndoMenuItem = new BMenuItem(B_TRANSLATE("Undo"), new BMessage(B_UNDO),
 		'Z'));
 	fUndoMenuItem->SetEnabled(fEditor.CanUndo());
 	fUndoMenuItem->SetTarget(fDataView);
-	menu->AddItem(fRedoMenuItem = new BMenuItem("Redo", new BMessage(B_REDO),
+	menu->AddItem(fRedoMenuItem = new BMenuItem(B_TRANSLATE("Redo"), new BMessage(B_REDO),
 		'Z', B_SHIFT_KEY));
 	fRedoMenuItem->SetEnabled(fEditor.CanRedo());
 	fRedoMenuItem->SetTarget(fDataView);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Copy"), new BMessage(B_COPY), 'C'));
 	item->SetTarget(NULL, Window());
-	menu->AddItem(fPasteMenuItem = new BMenuItem("Paste", new BMessage(B_PASTE),
+	menu->AddItem(fPasteMenuItem = new BMenuItem(B_TRANSLATE("Paste"), new BMessage(B_PASTE),
 		'V'));
 	fPasteMenuItem->SetTarget(NULL, Window());
 	_CheckClipboard();
-	menu->AddItem(item = new BMenuItem("Select all", new BMessage(B_SELECT_ALL),
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"), new BMessage(B_SELECT_ALL),
 		'A'));
 	item->SetTarget(NULL, Window());
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS,
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenFindWindow), 'F'));
 	item->SetTarget(this);
-	menu->AddItem(fFindAgainMenuItem = new BMenuItem("Find again",
+	menu->AddItem(fFindAgainMenuItem = new BMenuItem(B_TRANSLATE("Find again"),
 		new BMessage(kMsgFind), 'G'));
 	fFindAgainMenuItem->SetEnabled(false);
 	fFindAgainMenuItem->SetTarget(this);
@@ -1442,20 +1450,20 @@ ProbeView::AttachedToWindow()
 
 	// "Block" menu
 
-	menu = new BMenu("Block");
+	menu = new BMenu(B_TRANSLATE("Block"));
 	BMessage *message = new BMessage(kMsgPositionUpdate);
 	message->AddInt32("delta", 1);
-	menu->AddItem(item = new BMenuItem("Next", message, B_RIGHT_ARROW));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Next"), message, B_RIGHT_ARROW));
 	item->SetTarget(fHeaderView);
 	message = new BMessage(kMsgPositionUpdate);
 	message->AddInt32("delta", -1);
-	menu->AddItem(item = new BMenuItem("Previous", message, B_LEFT_ARROW));
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Previous"), message, B_LEFT_ARROW));
 	item->SetTarget(fHeaderView);
-	menu->AddItem(item = new BMenuItem("Back", new BMessage(kMsgLastPosition),
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Back"), new BMessage(kMsgLastPosition),
 		'J'));
 	item->SetTarget(fHeaderView);
 
-	BMenu *subMenu = new BMenu("Selection");
+	BMenu *subMenu = new BMenu(B_TRANSLATE("Selection"));
 	message = new BMessage(kMsgPositionUpdate);
 	message->AddInt64("block", 0);
 	subMenu->AddItem(fNativeMenuItem = new BMenuItem("", message, 'K'));
@@ -1467,8 +1475,8 @@ ProbeView::AttachedToWindow()
 	_UpdateSelectionMenuItems(0, 0);
 	menu->AddSeparatorItem();
 
-	fBookmarkMenu = new BMenu("Bookmarks");
-	fBookmarkMenu->AddItem(item = new BMenuItem("Add",
+	fBookmarkMenu = new BMenu(B_TRANSLATE("Bookmarks"));
+	fBookmarkMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Add"),
 		new BMessage(kMsgAddBookmark), 'B'));
 	item->SetTarget(this);
 	menu->AddItem(new BMenuItem(fBookmarkMenu));
@@ -1487,27 +1495,27 @@ ProbeView::AttachedToWindow()
 
 	if (!fEditor.IsAttribute() && volume.InitCheck() == B_OK
 		&& (volume.KnowsMime() || volume.KnowsAttr())) {
-		bar->AddItem(menu = new BMenu("Attributes"));
+		bar->AddItem(menu = new BMenu(B_TRANSLATE("Attributes")));
 		_UpdateAttributesMenu(menu);
 	}
 
 	// "View" menu
 
-	menu = new BMenu("View");
+	menu = new BMenu(B_TRANSLATE("View"));
 
 	// Number Base (hex/decimal)
 
-	subMenu = new BMenu("Base");
+	subMenu = new BMenu(B_TRANSLATE("Base"));
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kDecimalBase);
-	subMenu->AddItem(item = new BMenuItem("Decimal", message, 'D'));
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Decimal"), message, 'D'));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kDecimalBase)
 		item->SetMarked(true);
 
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kHexBase);
-	subMenu->AddItem(item = new BMenuItem("Hex", message, 'H'));
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Hex"), message, 'H'));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kHexBase)
 		item->SetMarked(true);
@@ -1517,14 +1525,14 @@ ProbeView::AttachedToWindow()
 
 	// Block Size
 
-	subMenu = new BMenu("BlockSize");
+	subMenu = new BMenu(B_TRANSLATE("BlockSize"));
 	subMenu->SetRadioMode(true);
 	const uint32 blockSizes[] = {512, 1024, 2048};
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
 		char buffer[32];
 		snprintf(buffer, sizeof(buffer), "%ld%s", blockSizes[i],
 			fEditor.IsDevice() && fEditor.BlockSize() == blockSizes[i]
-			? " (native)" : "");
+			? B_TRANSLATE(" (native)") : "");
 		subMenu->AddItem(item = new BMenuItem(buffer,
 			message = new BMessage(kMsgBlockSize)));
 		message->AddInt32("block_size", blockSizes[i]);
@@ -1534,7 +1542,7 @@ ProbeView::AttachedToWindow()
 	if (subMenu->FindMarked() == NULL) {
 		// if the device has some weird block size, we'll add it here, too
 		char buffer[32];
-		snprintf(buffer, sizeof(buffer), "%ld (native)", fEditor.BlockSize());
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%ld (native)"), fEditor.BlockSize());
 		subMenu->AddItem(item = new BMenuItem(buffer,
 			message = new BMessage(kMsgBlockSize)));
 		message->AddInt32("block_size", fEditor.BlockSize());
@@ -1546,7 +1554,7 @@ ProbeView::AttachedToWindow()
 
 	// Font Size
 
-	subMenu = new BMenu("Font size");
+	subMenu = new BMenu(B_TRANSLATE("Font size"));
 	subMenu->SetRadioMode(true);
 	const int32 fontSizes[] = {9, 10, 11, 12, 13, 14, 18, 24, 36, 48};
 	int32 fontSize = int32(fDataView->FontSize() + 0.5);
@@ -1562,7 +1570,7 @@ ProbeView::AttachedToWindow()
 			item->SetMarked(true);
 	}
 	subMenu->AddSeparatorItem();
-	subMenu->AddItem(item = new BMenuItem("Fit",
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Fit"),
 		message = new BMessage(kMsgFontSize)));
 	message->AddFloat("font_size", 0.0f);
 	if (fontSize == 0)
@@ -1625,9 +1633,9 @@ ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 
 	char buffer[128];
 	if (fDataView->Base() == kHexBase)
-		snprintf(buffer, sizeof(buffer), "Native: 0x%0*Lx", size * 2, position);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: 0x%0*Lx"), size * 2, position);
 	else
-		snprintf(buffer, sizeof(buffer), "Native: %Ld (0x%0*Lx)", position, size * 2, position);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: %Ld (0x%0*Lx)"), position, size * 2, position);
 
 	fNativeMenuItem->SetLabel(buffer);
 	fNativeMenuItem->SetEnabled(position >= 0 && (position * fEditor.BlockSize()) < fEditor.FileSize());
@@ -1635,9 +1643,9 @@ ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 
 	position = B_SWAP_INT64(position) >> (8 * (8 - size));
 	if (fDataView->Base() == kHexBase)
-		snprintf(buffer, sizeof(buffer), "Swapped: 0x%0*Lx", size * 2, position);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: 0x%0*Lx"), size * 2, position);
 	else
-		snprintf(buffer, sizeof(buffer), "Swapped: %Ld (0x%0*Lx)", position, size * 2, position);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: %Ld (0x%0*Lx)"), position, size * 2, position);
 
 	fSwappedMenuItem->SetLabel(buffer);
 	fSwappedMenuItem->SetEnabled(position >= 0 && (position * fEditor.BlockSize()) < fEditor.FileSize());
@@ -1661,9 +1669,9 @@ ProbeView::_UpdateBookmarkMenuItems()
 
 		char buffer[128];
 		if (fDataView->Base() == kHexBase)
-			snprintf(buffer, sizeof(buffer), "Block 0x%Lx", block);
+			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), block);
 		else
-			snprintf(buffer, sizeof(buffer), "Block %Ld (0x%Lx)", block, block);
+			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %Ld (0x%Lx)"), block, block);
 
 		item->SetLabel(buffer);
 	}
@@ -1701,9 +1709,9 @@ ProbeView::_AddBookmark(off_t position)
 
 	char buffer[128];
 	if (fDataView->Base() == kHexBase)
-		snprintf(buffer, sizeof(buffer), "Block 0x%Lx", block);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), block);
 	else
-		snprintf(buffer, sizeof(buffer), "Block %Ld (0x%Lx)", block, block);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %Ld (0x%Lx)"), block, block);
 
 	BMessage *message;
 	item = new BMenuItem(buffer, message = new BMessage(kMsgPositionUpdate));
@@ -1748,7 +1756,7 @@ ProbeView::_SetTypeEditor(int32 index)
 
 		_RemoveTypeEditor();
 
-		fTypeView = new TypeView(Frame(), "type shell", index, fEditor,
+		fTypeView = new TypeView(Frame(), B_TRANSLATE("type shell"), index, fEditor,
 			B_FOLLOW_ALL);
 
 		if (Parent() != NULL)
@@ -1835,13 +1843,13 @@ ProbeView::_Save()
 
 	char buffer[1024];
 	snprintf(buffer, sizeof(buffer),
-		"Writing to the file failed:\n"
+		B_TRANSLATE("Writing to the file failed:\n"
 		"%s\n\n"
-		"All changes will be lost when you quit.",
+		"All changes will be lost when you quit."),
 		strerror(status));
 
-	(new BAlert("DiskProbe request",
-		buffer, "OK", NULL, NULL,
+	(new BAlert(B_TRANSLATE("DiskProbe request"),
+		buffer, B_TRANSLATE("OK"), NULL, NULL,
 		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 
 	return status;
@@ -1856,9 +1864,9 @@ ProbeView::QuitRequested()
 	if (!fEditor.IsModified())
 		return true;
 
-	int32 chosen = (new BAlert("DiskProbe request",
-		"Save changes before closing?", "Don't save", "Cancel", "Save",
-		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+	int32 chosen = (new BAlert(B_TRANSLATE("DiskProbe request"),
+		B_TRANSLATE("Save changes before closing?"), B_TRANSLATE("Don't save"), B_TRANSLATE("Cancel"), 
+		B_TRANSLATE("Save"),	B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 
 	if (chosen == 0)
 		return true;

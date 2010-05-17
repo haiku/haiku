@@ -10,12 +10,18 @@
 #include "ProbeView.h"
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <Directory.h>
 #include <Volume.h>
 #include <be_apps/Tracker/RecentItems.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FileWindow"
 
 
 FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
@@ -43,27 +49,31 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	// add the menu
 
-	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, Bounds().Width(), 8), "menu bar");
+	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, Bounds().Width(), 8), 
+		"menu bar");
 	AddChild(menuBar);
 
-	BMenu *menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS,
+	BMenu *menu = new BMenu(B_TRANSLATE("File"));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("New" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenOpenWindow), 'N', B_COMMAND_KEY));
 
-	BMenu *devicesMenu = new BMenu("Open device");
+	BMenu *devicesMenu = new BMenu(B_TRANSLATE("Open device"));
 	OpenWindow::CollectDevices(devicesMenu);
 	devicesMenu->SetTargetForItems(be_app);
 	menu->AddItem(new BMenuItem(devicesMenu));
 
-	BMenu *recentsMenu = BRecentFilesList::NewFileListMenu("Open file" B_UTF8_ELLIPSIS,
+	BMenu *recentsMenu = BRecentFilesList::NewFileListMenu(
+		B_TRANSLATE("Open file" B_UTF8_ELLIPSIS),
 		NULL, NULL, be_app, 10, false, NULL, kSignature);
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem(recentsMenu, new BMessage(kMsgOpenFilePanel)));
+	menu->AddItem(item = new BMenuItem(recentsMenu, 
+		new BMessage(kMsgOpenFilePanel)));
 	item->SetShortcut('O', B_COMMAND_KEY);
 	menu->AddSeparatorItem();
 
 	// the ProbeView save menu items will be inserted here
-	item = new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY);
+	item = new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_CLOSE_REQUESTED), 
+		'W', B_COMMAND_KEY);
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 
@@ -74,7 +84,8 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), new BMessage(B_QUIT_REQUESTED), 
+		'Q', B_COMMAND_KEY));
 	menu->SetTargetForItems(be_app);
 	item->SetTarget(this);
 	menuBar->AddItem(menu);

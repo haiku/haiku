@@ -11,13 +11,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Alert.h>
+#include <Catalog.h>
+#include <Directory.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
-#include <TabView.h>
 #include <StringView.h>
-#include <Alert.h>
-#include <Directory.h>
+#include <TabView.h>
 #include <Volume.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AttributeWindow"
 
 
 static const uint32 kMsgRemoveAttribute = 'rmat';
@@ -25,8 +31,10 @@ static const uint32 kMsgRemoveAttribute = 'rmat';
 
 class EditorTabView : public BTabView {
 	public:
-		EditorTabView(BRect frame, const char *name, button_width width = B_WIDTH_AS_USUAL,
-			uint32 resizingMode = B_FOLLOW_ALL, uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS);
+		EditorTabView(BRect frame, const char *name, 
+			button_width width = B_WIDTH_AS_USUAL,
+			uint32 resizingMode = B_FOLLOW_ALL, 
+			uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS);
 
 		virtual void FrameResized(float width, float height);
 		virtual void Select(int32 tab);
@@ -53,8 +61,9 @@ EditorTabView::EditorTabView(BRect frame, const char *name, button_width width,
 {
 	ContainerView()->MoveBy(-ContainerView()->Frame().left,
 		TabHeight() + 1 - ContainerView()->Frame().top);
-	fNoEditorView = new BStringView(ContainerView()->Bounds(), "Type editor",
-		"No type editor available", B_FOLLOW_NONE);
+	fNoEditorView = new BStringView(ContainerView()->Bounds(), 
+		B_TRANSLATE("Type editor"), B_TRANSLATE("No type editor available"),
+		B_FOLLOW_NONE);
 	fNoEditorView->ResizeToPreferred();
 	fNoEditorView->SetAlignment(B_ALIGN_CENTER);
 	fTypeEditorView = fNoEditorView;
@@ -128,7 +137,7 @@ EditorTabView::AddRawEditorTab(BView *view)
 
 	fRawTab = CountTabs();
 
-	view = new BView(BRect(0, 0, 5, 5), "Raw editor", B_FOLLOW_NONE, 0);
+	view = new BView(BRect(0, 0, 5, 5), B_TRANSLATE("Raw editor"), B_FOLLOW_NONE, 0);
 	view->SetViewColor(ViewColor());
 	AddTab(view);
 }
@@ -205,16 +214,18 @@ AttributeWindow::AttributeWindow(BRect _rect, entry_ref *ref, const char *attrib
 	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
 	AddChild(menuBar);
 
-	BMenu *menu = new BMenu("Attribute");
+	BMenu *menu = new BMenu(B_TRANSLATE("Attribute"));
 
 	// the ProbeView save menu items will be inserted here
-	menu->AddItem(new BMenuItem("Remove from file", new BMessage(kMsgRemoveAttribute)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Remove from file"), 
+		new BMessage(kMsgRemoveAttribute)));
 	menu->AddSeparatorItem();
 
 	// the ProbeView print menu items will be inserted here
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_CLOSE_REQUESTED), 
+		'W', B_COMMAND_KEY));
 	menu->SetTargetForItems(this);
 	menuBar->AddItem(menu);
 
@@ -268,12 +279,12 @@ AttributeWindow::MessageReceived(BMessage *message)
 		{
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
-				"Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\n"
-				"You cannot undo this action.",
+				B_TRANSLATE("Do you really want to remove the attribute \"%s\" from "
+				"the file \"%s\"?\n\nYou cannot undo this action."),
 				fAttribute, Ref().name);
 
-			int32 chosen = (new BAlert("DiskProbe request",
-				buffer, "Cancel", "Remove", NULL,
+			int32 chosen = (new BAlert(B_TRANSLATE("DiskProbe request"),
+				buffer, B_TRANSLATE("Cancel"), B_TRANSLATE("Remove"), NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 			if (chosen == 1) {
 				BNode node(&Ref());

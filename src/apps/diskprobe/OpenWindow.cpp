@@ -4,14 +4,17 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "OpenWindow.h"
 
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <GroupLayout.h>
 #include <GridLayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Path.h>
@@ -21,12 +24,15 @@
 #include "DiskProbe.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "OpenWindow"
+
 static const uint32 kMsgProbeFile = 'prDv';
 static const uint32 kMsgProbeDevice = 'prFl';
 
 
 OpenWindow::OpenWindow()
-	: BWindow(BRect(0, 0, 35, 10), "DiskProbe", B_TITLED_WINDOW,
+	: BWindow(BRect(0, 0, 35, 10), B_TRANSLATE("DiskProbe"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 			 | B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -35,16 +41,18 @@ OpenWindow::OpenWindow()
 	if (BMenuItem *item = fDevicesMenu->ItemAt(0))
 		item->SetMarked(true);
 
-	BMenuField *field = new BMenuField("Examine device:", fDevicesMenu, NULL);
+	BMenuField *field = new BMenuField(B_TRANSLATE("Examine device:"), fDevicesMenu, 
+		NULL);
 
-	BButton *probeDeviceButton = new BButton("device", "Probe device",
+	BButton *probeDeviceButton = new BButton("device", B_TRANSLATE("Probe device"),
 		new BMessage(kMsgProbeDevice));
 	probeDeviceButton->MakeDefault(true);
 
-	BButton *probeFileButton = new BButton("file", "Probe file" B_UTF8_ELLIPSIS,
+	BButton *probeFileButton = new BButton("file", 
+		B_TRANSLATE("Probe file" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgProbeFile));
 
-	BButton *cancelButton = new BButton("cancel", "Cancel",
+	BButton *cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
 

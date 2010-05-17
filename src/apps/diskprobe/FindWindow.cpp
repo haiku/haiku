@@ -7,17 +7,19 @@
 
 #include "FindWindow.h"
 
-#include "DataView.h"
-#include "DiskProbe.h"
-
-#include <AutoLocker.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <Application.h>
 #include <Autolock.h>
+#include <AutoLocker.h>
 #include <Beep.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Clipboard.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -25,10 +27,12 @@
 #include <ScrollView.h>
 #include <TextView.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "DataView.h"
+#include "DiskProbe.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FindWindow"
 
 static const uint32 kMsgFindMode = 'FMde';
 static const uint32 kMsgStartFind = 'SFnd';
@@ -500,12 +504,12 @@ FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 	fMenu = new BPopUpMenu("mode");
 	BMessage* message;
 	BMenuItem* item;
-	fMenu->AddItem(item = new BMenuItem("Text",
+	fMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Text"),
 		message = new BMessage(kMsgFindMode)));
 	message->AddInt8("mode", kAsciiMode);
 	if (mode == kAsciiMode)
 		item->SetMarked(true);
-	fMenu->AddItem(item = new BMenuItem("Hexadecimal",
+	fMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Hexadecimal"),
 		message = new BMessage(kMsgFindMode)));
 	message->AddInt8("mode", kHexMode);
 	if (mode == kHexMode)
@@ -513,14 +517,14 @@ FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 
 	BRect rect = Bounds().InsetByCopy(5, 5);
 	BMenuField* menuField = new BMenuField(rect, B_EMPTY_STRING,
-		"Mode:", fMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP);
+		B_TRANSLATE("Mode:"), fMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 8);
 	menuField->ResizeToPreferred();
 	view->AddChild(menuField);
 
 	// add the bottom widgets
 
-	BButton* button = new BButton(rect, B_EMPTY_STRING, "Find",
+	BButton* button = new BButton(rect, B_EMPTY_STRING, B_TRANSLATE("Find"),
 		new BMessage(kMsgStartFind), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->MakeDefault(true);
 	button->ResizeToPreferred();
@@ -528,7 +532,7 @@ FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 		rect.bottom - button->Bounds().Height());
 	view->AddChild(button);
 
-	fCaseCheckBox = new BCheckBox(rect, B_EMPTY_STRING, "Case sensitive",
+	fCaseCheckBox = new BCheckBox(rect, B_EMPTY_STRING, B_TRANSLATE("Case sensitive"),
 		NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCaseCheckBox->ResizeToPreferred();
 	fCaseCheckBox->MoveTo(5, button->Frame().top);

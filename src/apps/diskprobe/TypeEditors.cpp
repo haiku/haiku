@@ -7,16 +7,17 @@
 #include "TypeEditors.h"
 #include "DataEditor.h"
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	include <IconUtils.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <Alert.h>
 #include <Autolock.h>
 #include <Bitmap.h>
+#include <Catalog.h>
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#	include <IconUtils.h>
+#endif
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -30,6 +31,9 @@
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TypeEditors"
 
 static const uint32 kMsgValueChanged = 'vlch';
 static const uint32 kMsgScaleChanged = 'scch';
@@ -196,7 +200,7 @@ StringEditor::StringEditor(BRect rect, DataEditor& editor)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BStringView *stringView = new BStringView(BRect(5, 5, rect.right, 20),
-		B_EMPTY_STRING, "Contents:");
+		B_EMPTY_STRING, B_TRANSLATE("Contents:"));
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
@@ -275,12 +279,12 @@ StringEditor::MessageReceived(BMessage *message)
 
 
 MimeTypeEditor::MimeTypeEditor(BRect rect, DataEditor& editor)
-	: TypeEditorView(rect, "MIME type editor", B_FOLLOW_LEFT_RIGHT, 0, editor)
+	: TypeEditorView(rect, B_TRANSLATE("MIME type editor"), B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
-		"MIME type:", NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
+		B_TRANSLATE("MIME type:"), NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
 	fTextControl->SetDivider(StringWidth(fTextControl->Label()) + 8);
 
 	float width, height;
@@ -366,7 +370,7 @@ MimeTypeEditor::MessageReceived(BMessage *message)
 
 
 NumberEditor::NumberEditor(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Number editor", B_FOLLOW_LEFT_RIGHT, 0, editor)
+	: TypeEditorView(rect, B_TRANSLATE("Number editor"), B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -593,35 +597,35 @@ NumberEditor::_TypeLabel()
 {
 	switch (fEditor.Type()) {
 		case B_INT8_TYPE:
-			return "8 bit signed value:";
+			return B_TRANSLATE("8 bit signed value:");
 		case B_UINT8_TYPE:
-			return "8 bit unsigned value:";
+			return B_TRANSLATE("8 bit unsigned value:");
 		case B_INT16_TYPE:
-			return "16 bit signed value:";
+			return B_TRANSLATE("16 bit signed value:");
 		case B_UINT16_TYPE:
-			return "16 bit unsigned value:";
+			return B_TRANSLATE("16 bit unsigned value:");
 		case B_INT32_TYPE:
-			return "32 bit signed value:";
+			return B_TRANSLATE("32 bit signed value:");
 		case B_UINT32_TYPE:
-			return "32 bit unsigned value:";
+			return B_TRANSLATE("32 bit unsigned value:");
 		case B_INT64_TYPE:
-			return "64 bit signed value:";
+			return B_TRANSLATE("64 bit signed value:");
 		case B_UINT64_TYPE:
-			return "64 bit unsigned value:";
+			return B_TRANSLATE("64 bit unsigned value:");
 		case B_FLOAT_TYPE:
-			return "Floating-point value:";
+			return B_TRANSLATE("Floating-point value:");
 		case B_DOUBLE_TYPE:
-			return "Double precision floating-point value:";
+			return B_TRANSLATE("Double precision floating-point value:");
 		case B_SSIZE_T_TYPE:
-			return "32 bit size or status:";
+			return B_TRANSLATE("32 bit size or status:");
 		case B_SIZE_T_TYPE:
-			return "32 bit unsigned size:";
+			return B_TRANSLATE("32 bit unsigned size:");
 		case B_OFF_T_TYPE:
-			return "64 bit signed offset:";
+			return B_TRANSLATE("64 bit signed offset:");
 		case B_POINTER_TYPE:
-			return "32 bit unsigned pointer:";
+			return B_TRANSLATE("32 bit unsigned pointer:");
 		default:
-			return "Number:";
+			return B_TRANSLATE("Number:");
 	}
 }
 
@@ -755,7 +759,7 @@ BooleanEditor::BooleanEditor(BRect rect, DataEditor &editor)
 	message->AddInt8("value", 1);
 
 	BMenuField *menuField = new BMenuField(rect.InsetByCopy(5, 5),
-		B_EMPTY_STRING, "Boolean value:", menu, B_FOLLOW_LEFT_RIGHT);
+		B_EMPTY_STRING, B_TRANSLATE("Boolean value:"), menu, B_FOLLOW_LEFT_RIGHT);
 	menuField->SetDivider(StringWidth(menuField->Label()) + 8);
 	menuField->ResizeToPreferred();
 	ResizeTo(menuField->Bounds().Width() + 10,
@@ -839,16 +843,18 @@ BooleanEditor::MessageReceived(BMessage *message)
 
 
 ImageView::ImageView(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Image view", B_FOLLOW_NONE, B_WILL_DRAW, editor),
+	: TypeEditorView(rect, B_TRANSLATE("Image view"), B_FOLLOW_NONE, 
+	B_WILL_DRAW, editor),
 	fBitmap(NULL),
 	fScaleSlider(NULL)
 {
-	if (editor.Type() == B_MINI_ICON_TYPE || editor.Type() == B_LARGE_ICON_TYPE
+	if (editor.Type() == B_MINI_ICON_TYPE 
+		|| editor.Type() == B_LARGE_ICON_TYPE
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		|| editor.Type() == B_VECTOR_ICON_TYPE
 #endif
 		)
-		SetName("Icon view");
+		SetName(B_TRANSLATE("Icon view"));
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (editor.Type() == B_VECTOR_ICON_TYPE) {
@@ -864,7 +870,8 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 	}
 #endif
 
-	fDescriptionView = new BStringView(Bounds(), "", "Could not read image", B_FOLLOW_NONE);
+	fDescriptionView = new BStringView(Bounds(), "", 
+		B_TRANSLATE("Could not read image"), B_FOLLOW_NONE);
 	fDescriptionView->SetAlignment(B_ALIGN_CENTER);
 
 	AddChild(fDescriptionView);
@@ -1020,20 +1027,20 @@ ImageView::_UpdateImage()
 
 	if (fBitmap != NULL) {
 		char buffer[256];
-		const char *type = "Unknown type";
+		const char *type = B_TRANSLATE("Unknown type");
 		switch (fEditor.Type()) {
 			case B_MINI_ICON_TYPE:
 			case B_LARGE_ICON_TYPE:
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			case B_VECTOR_ICON_TYPE:
 #endif
-				type = "Icon";
+				type = B_TRANSLATE("Icon");
 				break;
 			case B_PNG_FORMAT:
-				type = "PNG format";
+				type = B_TRANSLATE("PNG format");
 				break;
 			case B_MESSAGE_TYPE:
-				type = "Flattened bitmap";
+				type = B_TRANSLATE("Flattened bitmap");
 				break;
 			default:
 				break;
@@ -1042,36 +1049,36 @@ ImageView::_UpdateImage()
 		switch (fBitmap->ColorSpace()) {
 			case B_GRAY1:
 			case B_GRAY8:
-				colorSpace = "Grayscale";
+				colorSpace = B_TRANSLATE("Grayscale");
 				break;
 			case B_CMAP8:
-				colorSpace = "8 bit palette";
+				colorSpace = B_TRANSLATE("8 bit palette");
 				break;
 			case B_RGB32:
 			case B_RGBA32:
 			case B_RGB32_BIG:
 			case B_RGBA32_BIG:
-				colorSpace = "32 bit";
+				colorSpace = B_TRANSLATE("32 bit");
 				break;
 			case B_RGB15:
 			case B_RGBA15:
 			case B_RGB15_BIG:
 			case B_RGBA15_BIG:
-				colorSpace = "15 bit";
+				colorSpace = B_TRANSLATE("15 bit");
 				break;
 			case B_RGB16:
 			case B_RGB16_BIG:
-				colorSpace = "16 bit";
+				colorSpace = B_TRANSLATE("16 bit");
 				break;
 			default:
-				colorSpace = "Unknown format";
+				colorSpace = B_TRANSLATE("Unknown format");
 				break;
 		}
 		snprintf(buffer, sizeof(buffer), "%s, %g x %g, %s", type,
 			fBitmap->Bounds().Width() + 1, fBitmap->Bounds().Height() + 1, colorSpace);
 		fDescriptionView->SetText(buffer);
 	} else
-		fDescriptionView->SetText("Could not read image");
+		fDescriptionView->SetText(B_TRANSLATE("Could not read image"));
 
 	// Update the view size to match the image and its description
 
@@ -1124,7 +1131,7 @@ ImageView::_UpdateImage()
 
 
 MessageView::MessageView(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Message View", B_FOLLOW_ALL, 0, editor)
+	: TypeEditorView(rect, B_TRANSLATE("Message View"), B_FOLLOW_ALL, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -1177,7 +1184,7 @@ MessageView::SetTo(BMessage& message)
 	fTextView->SetText("");
 
 	char text[512];
-	snprintf(text, sizeof(text), "what: '%.4s'\n\n", (char*)&message.what);
+	snprintf(text, sizeof(text), B_TRANSLATE("what: '%.4s'\n\n"), (char*)&message.what);
 	fTextView->Insert(text);
 
 	type_code type;
@@ -1346,11 +1353,11 @@ status_t
 GetNthTypeEditor(int32 index, const char** _name)
 {
 	static const char* kEditors[] = {
-		"Text",
-		"Number",
-		"Boolean",
-		"Message",
-		"Image"
+		B_TRANSLATE("Text"),
+		B_TRANSLATE("Number"),
+		B_TRANSLATE("Boolean"),
+		B_TRANSLATE("Message"),
+		B_TRANSLATE("Image")
 	};
 
 	if (index < 0 || index >= int32(sizeof(kEditors) / sizeof(kEditors[0])))
