@@ -15,9 +15,9 @@ class AVFormatReader : public Reader {
 public:
 								AVFormatReader();
 								~AVFormatReader();
-	
+
 	virtual	const char*			Copyright();
-	
+
 	virtual	status_t			Sniff(int32* streamCount);
 
 	virtual	void				GetFileFormatInfo(media_file_format* mff);
@@ -25,7 +25,7 @@ public:
 	virtual	status_t			AllocateCookie(int32 streamNumber,
 									void** cookie);
 	virtual	status_t			FreeCookie(void* cookie);
-	
+
 	virtual	status_t			GetStreamInfo(void* cookie, int64* frameCount,
 									bigtime_t* duration, media_format* format,
 									const void** infoBuffer,
