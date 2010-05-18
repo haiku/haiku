@@ -3608,6 +3608,10 @@ vm_init(kernel_args* args)
 	VMAddressSpace::Init();
 	reserve_boot_loader_ranges(args);
 
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
+	heap_init_post_area();
+#endif
+
 	// Do any further initialization that the architecture dependant layers may
 	// need now
 	arch_vm_translation_map_init_post_area(args);

@@ -71,6 +71,7 @@ void heap_set_get_caller(heap_allocator* heap, addr_t (*getCaller)());
 #endif
 
 status_t heap_init(addr_t heapBase, size_t heapSize);
+status_t heap_init_post_area();
 status_t heap_init_post_sem();
 status_t heap_init_post_thread();
 

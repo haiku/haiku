@@ -2064,6 +2064,59 @@ heap_init(addr_t base, size_t size)
 
 
 status_t
+heap_init_post_area()
+{
+	void *address = NULL;
+	area_id growHeapArea = create_area("dedicated grow heap", &address,
+		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (growHeapArea < 0) {
+		panic("heap_init_post_area(): couldn't allocate dedicate grow heap "
+			"area");
+		return growHeapArea;
+	}
+
+	sGrowHeap = heap_create_allocator("grow", (addr_t)address,
+		HEAP_DEDICATED_GROW_SIZE, &sHeapClasses[0], false);
+	if (sGrowHeap == NULL) {
+		panic("heap_init_post_area(): failed to create dedicated grow heap\n");
+		return B_ERROR;
+	}
+
+	// create the VIP heap
+	static const heap_class heapClass = {
+		"VIP I/O",					/* name */
+		100,						/* initial percentage */
+		B_PAGE_SIZE / 8,			/* max allocation size */
+		B_PAGE_SIZE,				/* page size */
+		8,							/* min bin size */
+		4,							/* bin alignment */
+		8,							/* min count per page */
+		16							/* max waste per page */
+	};
+
+	area_id vipHeapArea = create_area("VIP heap", &address,
+		B_ANY_KERNEL_ADDRESS, VIP_HEAP_SIZE, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (vipHeapArea < 0) {
+		panic("heap_init_post_area(): couldn't allocate VIP heap area");
+		return B_ERROR;
+	}
+
+	sVIPHeap = heap_create_allocator("VIP heap", (addr_t)address,
+		VIP_HEAP_SIZE, &heapClass, false);
+	if (sVIPHeap == NULL) {
+		panic("heap_init_post_area(): failed to create VIP heap\n");
+		return B_ERROR;
+	}
+
+	dprintf("heap_init_post_area(): created VIP heap: %p\n", sVIPHeap);
+
+	return B_OK;
+}
+
+
+status_t
 heap_init_post_sem()
 {
 #if PARANOID_KERNEL_MALLOC
@@ -2098,23 +2151,6 @@ status_t
 heap_init_post_thread()
 {
 #if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
-	void *address = NULL;
-	area_id growHeapArea = create_area("dedicated grow heap", &address,
-		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (growHeapArea < 0) {
-		panic("heap_init_post_thread(): couldn't allocate dedicate grow heap "
-			"area");
-		return growHeapArea;
-	}
-
-	sGrowHeap = heap_create_allocator("grow", (addr_t)address,
-		HEAP_DEDICATED_GROW_SIZE, &sHeapClasses[0], false);
-	if (sGrowHeap == NULL) {
-		panic("heap_init_post_thread(): failed to create dedicated grow heap\n");
-		return B_ERROR;
-	}
-
 	sHeapGrowThread = spawn_kernel_thread(heap_grow_thread, "heap grower",
 		B_URGENT_PRIORITY, NULL);
 	if (sHeapGrowThread < 0) {
@@ -2145,35 +2181,6 @@ heap_init_post_thread()
 			sHeapCount++;
 		}
 	}
-
-	// create the VIP heap
-	static const heap_class heapClass = {
-		"VIP I/O",					/* name */
-		100,						/* initial percentage */
-		B_PAGE_SIZE / 8,			/* max allocation size */
-		B_PAGE_SIZE,				/* page size */
-		8,							/* min bin size */
-		4,							/* bin alignment */
-		8,							/* min count per page */
-		16							/* max waste per page */
-	};
-
-	area_id vipHeapArea = create_area("VIP heap", &address,
-		B_ANY_KERNEL_ADDRESS, VIP_HEAP_SIZE, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (vipHeapArea < 0) {
-		panic("heap_init_post_thread(): couldn't allocate VIP heap area");
-		return B_ERROR;
-	}
-
-	sVIPHeap = heap_create_allocator("VIP heap", (addr_t)address,
-		VIP_HEAP_SIZE, &heapClass, false);
-	if (sVIPHeap == NULL) {
-		panic("heap_init_post_thread(): failed to create VIP heap\n");
-		return B_ERROR;
-	}
-
-	dprintf("heap_init_post_thread(): created VIP heap: %p\n", sVIPHeap);
 
 	resume_thread(sHeapGrowThread);
 
