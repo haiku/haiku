@@ -408,11 +408,6 @@ SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system data spell_check word_dictionary : $(spellFiles) ;
 
-# Locale kit language files
-local languageDir = [ FDirName $(HAIKU_TOP) src data locale languages ] ;
-local languages = [ Glob $(languageDir) : *.language ] ;
-AddFilesToHaikuImage system data locale languages : $(languages) ;
-
 local etcFiles = bash_completion inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
