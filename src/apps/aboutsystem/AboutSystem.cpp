@@ -92,8 +92,8 @@ static const Translation gTranslations[] =
 		"Travis D. Reed (Dancxjo)\n"
 	},
 	{ "fi",
-		"Jaakko Leikas (Garjala)\n"
 		"Jorma Karvonen (Karvjorm)\n"
+		"Jaakko Leikas (Garjala)\n"
 	},
 	{ "fr",
 		"Jean-Loïc Charroud\n"
@@ -118,10 +118,10 @@ static const Translation gTranslations[] =
 		"Andrea Bernardi\n"
 	},
 	{ "ja",
-		"Hironoru Ichimiya\n"
+		"Satoshi Eguchi\n"
+		"Hironori Ichimiya\n"
 		"Jorge G. Mare (Koki)\n"
 		"Takashi Murai\n"
-		"Satoshi Eguchi\n"
 		"SHINTA\n"
 		"Hiroyuki Tsutsumi\n"
 		"The JPBE.net user group\n"
@@ -130,8 +130,8 @@ static const Translation gTranslations[] =
 		"Algirdas Buckus\n"
 	},
 	{ "pl",
-		"Artur Wyszyński\n"
 		"Hubert Hareńczyk\n"
+		"Artur Wyszyński\n"
 	},
 	{ "pt",
 		"Marcos Alves (Xeon3D)\n"
