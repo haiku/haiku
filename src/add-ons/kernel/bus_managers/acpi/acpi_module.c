@@ -197,7 +197,7 @@ static struct acpi_root_info sACPIRootModule = {
 	install_notify_handler,
 	remove_notify_handler,
 	enable_gpe,
-	set_gpe_type,
+	set_gpe,
 	install_gpe_handler,
 	remove_gpe_handler,
 	install_address_space_handler,

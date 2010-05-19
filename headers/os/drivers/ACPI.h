@@ -170,8 +170,8 @@ struct acpi_module_info {
 
 	status_t	(*enable_gpe)(acpi_handle handle, uint32 gpeNumber,
 					uint32 flags);
-	status_t	(*set_gpe_type)(acpi_handle handle, uint32 gpeNumber,
-					uint8 type);
+	status_t	(*set_gpe)(acpi_handle handle, uint32 gpeNumber,
+					uint8 action);
 	status_t	(*install_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
 					uint32 type, acpi_event_handler handler, void *data);
 	status_t	(*remove_gpe_handler)(acpi_handle handle, uint32 gpeNumber,

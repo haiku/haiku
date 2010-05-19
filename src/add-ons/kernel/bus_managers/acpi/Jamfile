@@ -10,6 +10,8 @@ local events_src =
 	evevent.c
 	evgpe.c
 	evgpeblk.c
+	evgpeinit.c
+	evgpeutil.c
 	evmisc.c
 	evregion.c
 	evrgnini.c
@@ -56,6 +58,7 @@ local executer_src =
 	exconfig.c
 	exconvrt.c
 	excreate.c
+	exdebug.c
 	exdump.c
 	exfield.c
 	exfldio.c

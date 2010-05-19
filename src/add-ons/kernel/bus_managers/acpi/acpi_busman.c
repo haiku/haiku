@@ -267,9 +267,9 @@ enable_gpe(acpi_handle handle, uint32 gpeNumber, uint32 flags)
 
 
 status_t
-set_gpe_type(acpi_handle handle, uint32 gpeNumber, uint8 type)
+set_gpe(acpi_handle handle, uint32 gpeNumber, uint8 action)
 {
-	return AcpiSetGpeType(handle, gpeNumber, type) == AE_OK ? B_OK : B_ERROR;
+	return AcpiSetGpe(handle, gpeNumber, action) == AE_OK ? B_OK : B_ERROR;
 }
 
 
@@ -651,7 +651,7 @@ struct acpi_module_info gACPIModule = {
 	install_notify_handler,
 	remove_notify_handler,
 	enable_gpe,
-	set_gpe_type,
+	set_gpe,
 	install_gpe_handler,
 	remove_gpe_handler,
 	install_address_space_handler,

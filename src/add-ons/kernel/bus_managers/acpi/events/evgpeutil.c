@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: evevent - Fixed Event handling and dispatch
+ * Module Name: evgpeutil - GPE utilities
  *
  *****************************************************************************/
 
@@ -113,318 +113,340 @@
  *
  *****************************************************************************/
 
+
+
 #include "acpi.h"
 #include "accommon.h"
 #include "acevents.h"
 
 #define _COMPONENT          ACPI_EVENTS
-        ACPI_MODULE_NAME    ("evevent")
-
-/* Local prototypes */
-
-static ACPI_STATUS
-AcpiEvFixedEventInitialize (
-    void);
-
-static UINT32
-AcpiEvFixedEventDispatch (
-    UINT32                  Event);
+        ACPI_MODULE_NAME    ("evgpeutil")
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiEvInitializeEvents
+ * FUNCTION:    AcpiEvWalkGpeList
  *
- * PARAMETERS:  None
+ * PARAMETERS:  GpeWalkCallback     - Routine called for each GPE block
+ *              Context             - Value passed to callback
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Initialize global data structures for ACPI events (Fixed, GPE)
+ * DESCRIPTION: Walk the GPE lists.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiEvInitializeEvents (
-    void)
+AcpiEvWalkGpeList (
+    ACPI_GPE_CALLBACK       GpeWalkCallback,
+    void                    *Context)
 {
-    ACPI_STATUS             Status;
+    ACPI_GPE_BLOCK_INFO     *GpeBlock;
+    ACPI_GPE_XRUPT_INFO     *GpeXruptInfo;
+    ACPI_STATUS             Status = AE_OK;
+    ACPI_CPU_FLAGS          Flags;
 
 
-    ACPI_FUNCTION_TRACE (EvInitializeEvents);
+    ACPI_FUNCTION_TRACE (EvWalkGpeList);
 
 
-    /*
-     * Initialize the Fixed and General Purpose Events. This is done prior to
-     * enabling SCIs to prevent interrupts from occurring before the handlers
-     * are installed.
-     */
-    Status = AcpiEvFixedEventInitialize ();
-    if (ACPI_FAILURE (Status))
+    Flags = AcpiOsAcquireLock (AcpiGbl_GpeLock);
+
+    /* Walk the interrupt level descriptor list */
+
+    GpeXruptInfo = AcpiGbl_GpeXruptListHead;
+    while (GpeXruptInfo)
     {
-        ACPI_EXCEPTION ((AE_INFO, Status,
-            "Unable to initialize fixed events"));
-        return_ACPI_STATUS (Status);
+        /* Walk all Gpe Blocks attached to this interrupt level */
+
+        GpeBlock = GpeXruptInfo->GpeBlockListHead;
+        while (GpeBlock)
+        {
+            /* One callback per GPE block */
+
+            Status = GpeWalkCallback (GpeXruptInfo, GpeBlock, Context);
+            if (ACPI_FAILURE (Status))
+            {
+                if (Status == AE_CTRL_END) /* Callback abort */
+                {
+                    Status = AE_OK;
+                }
+                goto UnlockAndExit;
+            }
+
+            GpeBlock = GpeBlock->Next;
+        }
+
+        GpeXruptInfo = GpeXruptInfo->Next;
     }
 
-    Status = AcpiEvGpeInitialize ();
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_EXCEPTION ((AE_INFO, Status,
-            "Unable to initialize general purpose events"));
-        return_ACPI_STATUS (Status);
-    }
-
+UnlockAndExit:
+    AcpiOsReleaseLock (AcpiGbl_GpeLock, Flags);
     return_ACPI_STATUS (Status);
 }
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiEvInstallFadtGpes
+ * FUNCTION:    AcpiEvValidGpeEvent
  *
- * PARAMETERS:  None
+ * PARAMETERS:  GpeEventInfo                - Info for this GPE
+ *
+ * RETURN:      TRUE if the GpeEvent is valid
+ *
+ * DESCRIPTION: Validate a GPE event. DO NOT CALL FROM INTERRUPT LEVEL.
+ *              Should be called only when the GPE lists are semaphore locked
+ *              and not subject to change.
+ *
+ ******************************************************************************/
+
+BOOLEAN
+AcpiEvValidGpeEvent (
+    ACPI_GPE_EVENT_INFO     *GpeEventInfo)
+{
+    ACPI_GPE_XRUPT_INFO     *GpeXruptBlock;
+    ACPI_GPE_BLOCK_INFO     *GpeBlock;
+
+
+    ACPI_FUNCTION_ENTRY ();
+
+
+    /* No need for spin lock since we are not changing any list elements */
+
+    /* Walk the GPE interrupt levels */
+
+    GpeXruptBlock = AcpiGbl_GpeXruptListHead;
+    while (GpeXruptBlock)
+    {
+        GpeBlock = GpeXruptBlock->GpeBlockListHead;
+
+        /* Walk the GPE blocks on this interrupt level */
+
+        while (GpeBlock)
+        {
+            if ((&GpeBlock->EventInfo[0] <= GpeEventInfo) &&
+                (&GpeBlock->EventInfo[GpeBlock->GpeCount] > GpeEventInfo))
+            {
+                return (TRUE);
+            }
+
+            GpeBlock = GpeBlock->Next;
+        }
+
+        GpeXruptBlock = GpeXruptBlock->Next;
+    }
+
+    return (FALSE);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiEvGetGpeXruptBlock
+ *
+ * PARAMETERS:  InterruptNumber      - Interrupt for a GPE block
+ *
+ * RETURN:      A GPE interrupt block
+ *
+ * DESCRIPTION: Get or Create a GPE interrupt block. There is one interrupt
+ *              block per unique interrupt level used for GPEs. Should be
+ *              called only when the GPE lists are semaphore locked and not
+ *              subject to change.
+ *
+ ******************************************************************************/
+
+ACPI_GPE_XRUPT_INFO *
+AcpiEvGetGpeXruptBlock (
+    UINT32                  InterruptNumber)
+{
+    ACPI_GPE_XRUPT_INFO     *NextGpeXrupt;
+    ACPI_GPE_XRUPT_INFO     *GpeXrupt;
+    ACPI_STATUS             Status;
+    ACPI_CPU_FLAGS          Flags;
+
+
+    ACPI_FUNCTION_TRACE (EvGetGpeXruptBlock);
+
+
+    /* No need for lock since we are not changing any list elements here */
+
+    NextGpeXrupt = AcpiGbl_GpeXruptListHead;
+    while (NextGpeXrupt)
+    {
+        if (NextGpeXrupt->InterruptNumber == InterruptNumber)
+        {
+            return_PTR (NextGpeXrupt);
+        }
+
+        NextGpeXrupt = NextGpeXrupt->Next;
+    }
+
+    /* Not found, must allocate a new xrupt descriptor */
+
+    GpeXrupt = ACPI_ALLOCATE_ZEROED (sizeof (ACPI_GPE_XRUPT_INFO));
+    if (!GpeXrupt)
+    {
+        return_PTR (NULL);
+    }
+
+    GpeXrupt->InterruptNumber = InterruptNumber;
+
+    /* Install new interrupt descriptor with spin lock */
+
+    Flags = AcpiOsAcquireLock (AcpiGbl_GpeLock);
+    if (AcpiGbl_GpeXruptListHead)
+    {
+        NextGpeXrupt = AcpiGbl_GpeXruptListHead;
+        while (NextGpeXrupt->Next)
+        {
+            NextGpeXrupt = NextGpeXrupt->Next;
+        }
+
+        NextGpeXrupt->Next = GpeXrupt;
+        GpeXrupt->Previous = NextGpeXrupt;
+    }
+    else
+    {
+        AcpiGbl_GpeXruptListHead = GpeXrupt;
+    }
+    AcpiOsReleaseLock (AcpiGbl_GpeLock, Flags);
+
+    /* Install new interrupt handler if not SCI_INT */
+
+    if (InterruptNumber != AcpiGbl_FADT.SciInterrupt)
+    {
+        Status = AcpiOsInstallInterruptHandler (InterruptNumber,
+                    AcpiEvGpeXruptHandler, GpeXrupt);
+        if (ACPI_FAILURE (Status))
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Could not install GPE interrupt handler at level 0x%X",
+                InterruptNumber));
+            return_PTR (NULL);
+        }
+    }
+
+    return_PTR (GpeXrupt);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiEvDeleteGpeXrupt
+ *
+ * PARAMETERS:  GpeXrupt        - A GPE interrupt info block
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Completes initialization of the FADT-defined GPE blocks
- *              (0 and 1). This causes the _PRW methods to be run, so the HW
- *              must be fully initialized at this point, including global lock
- *              support.
+ * DESCRIPTION: Remove and free a GpeXrupt block. Remove an associated
+ *              interrupt handler if not the SCI interrupt.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiEvInstallFadtGpes (
-    void)
+AcpiEvDeleteGpeXrupt (
+    ACPI_GPE_XRUPT_INFO     *GpeXrupt)
 {
     ACPI_STATUS             Status;
+    ACPI_CPU_FLAGS          Flags;
 
 
-    ACPI_FUNCTION_TRACE (EvInstallFadtGpes);
+    ACPI_FUNCTION_TRACE (EvDeleteGpeXrupt);
 
 
-    /* Namespace must be locked */
+    /* We never want to remove the SCI interrupt handler */
 
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
+    if (GpeXrupt->InterruptNumber == AcpiGbl_FADT.SciInterrupt)
     {
-        return (Status);
+        GpeXrupt->GpeBlockListHead = NULL;
+        return_ACPI_STATUS (AE_OK);
     }
 
-    /* FADT GPE Block 0 */
+    /* Disable this interrupt */
 
-    (void) AcpiEvInitializeGpeBlock (
-                AcpiGbl_FadtGpeDevice, AcpiGbl_GpeFadtBlocks[0]);
+    Status = AcpiOsRemoveInterruptHandler (
+                GpeXrupt->InterruptNumber, AcpiEvGpeXruptHandler);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
 
-    /* FADT GPE Block 1 */
+    /* Unlink the interrupt block with lock */
 
-    (void) AcpiEvInitializeGpeBlock (
-                AcpiGbl_FadtGpeDevice, AcpiGbl_GpeFadtBlocks[1]);
+    Flags = AcpiOsAcquireLock (AcpiGbl_GpeLock);
+    if (GpeXrupt->Previous)
+    {
+        GpeXrupt->Previous->Next = GpeXrupt->Next;
+    }
+    else
+    {
+        /* No previous, update list head */
 
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
+        AcpiGbl_GpeXruptListHead = GpeXrupt->Next;
+    }
+
+    if (GpeXrupt->Next)
+    {
+        GpeXrupt->Next->Previous = GpeXrupt->Previous;
+    }
+    AcpiOsReleaseLock (AcpiGbl_GpeLock, Flags);
+
+    /* Free the block */
+
+    ACPI_FREE (GpeXrupt);
     return_ACPI_STATUS (AE_OK);
 }
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiEvInstallXruptHandlers
+ * FUNCTION:    AcpiEvDeleteGpeHandlers
  *
- * PARAMETERS:  None
+ * PARAMETERS:  GpeXruptInfo        - GPE Interrupt info
+ *              GpeBlock            - Gpe Block info
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Install interrupt handlers for the SCI and Global Lock
+ * DESCRIPTION: Delete all Handler objects found in the GPE data structs.
+ *              Used only prior to termination.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiEvInstallXruptHandlers (
-    void)
+AcpiEvDeleteGpeHandlers (
+    ACPI_GPE_XRUPT_INFO     *GpeXruptInfo,
+    ACPI_GPE_BLOCK_INFO     *GpeBlock,
+    void                    *Context)
 {
-    ACPI_STATUS             Status;
-
-
-    ACPI_FUNCTION_TRACE (EvInstallXruptHandlers);
-
-
-    /* Install the SCI handler */
-
-    Status = AcpiEvInstallSciHandler ();
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_EXCEPTION ((AE_INFO, Status,
-            "Unable to install System Control Interrupt handler"));
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Install the handler for the Global Lock */
-
-    Status = AcpiEvInitGlobalLockHandler ();
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_EXCEPTION ((AE_INFO, Status,
-            "Unable to initialize Global Lock handler"));
-        return_ACPI_STATUS (Status);
-    }
-
-    AcpiGbl_EventsInitialized = TRUE;
-    return_ACPI_STATUS (Status);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiEvFixedEventInitialize
- *
- * PARAMETERS:  None
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Install the fixed event handlers and disable all fixed events.
- *
- ******************************************************************************/
-
-static ACPI_STATUS
-AcpiEvFixedEventInitialize (
-    void)
-{
+    ACPI_GPE_EVENT_INFO     *GpeEventInfo;
     UINT32                  i;
-    ACPI_STATUS             Status;
+    UINT32                  j;
 
 
-    /*
-     * Initialize the structure that keeps track of fixed event handlers and
-     * enable the fixed events.
-     */
-    for (i = 0; i < ACPI_NUM_FIXED_EVENTS; i++)
+    ACPI_FUNCTION_TRACE (EvDeleteGpeHandlers);
+
+
+    /* Examine each GPE Register within the block */
+
+    for (i = 0; i < GpeBlock->RegisterCount; i++)
     {
-        AcpiGbl_FixedEventHandlers[i].Handler = NULL;
-        AcpiGbl_FixedEventHandlers[i].Context = NULL;
+        /* Now look at the individual GPEs in this byte register */
 
-        /* Disable the fixed event */
-
-        if (AcpiGbl_FixedEventInfo[i].EnableRegisterId != 0xFF)
+        for (j = 0; j < ACPI_GPE_REGISTER_WIDTH; j++)
         {
-            Status = AcpiWriteBitRegister (
-                        AcpiGbl_FixedEventInfo[i].EnableRegisterId,
-                        ACPI_DISABLE_EVENT);
-            if (ACPI_FAILURE (Status))
+            GpeEventInfo = &GpeBlock->EventInfo[((ACPI_SIZE) i *
+                ACPI_GPE_REGISTER_WIDTH) + j];
+
+            if ((GpeEventInfo->Flags & ACPI_GPE_DISPATCH_MASK) ==
+                    ACPI_GPE_DISPATCH_HANDLER)
             {
-                return (Status);
+                ACPI_FREE (GpeEventInfo->Dispatch.Handler);
+                GpeEventInfo->Dispatch.Handler = NULL;
+                GpeEventInfo->Flags &= ~ACPI_GPE_DISPATCH_MASK;
             }
         }
     }
 
-    return (AE_OK);
+    return_ACPI_STATUS (AE_OK);
 }
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiEvFixedEventDetect
- *
- * PARAMETERS:  None
- *
- * RETURN:      INTERRUPT_HANDLED or INTERRUPT_NOT_HANDLED
- *
- * DESCRIPTION: Checks the PM status register for active fixed events
- *
- ******************************************************************************/
-
-UINT32
-AcpiEvFixedEventDetect (
-    void)
-{
-    UINT32                  IntStatus = ACPI_INTERRUPT_NOT_HANDLED;
-    UINT32                  FixedStatus;
-    UINT32                  FixedEnable;
-    UINT32                  i;
-
-
-    ACPI_FUNCTION_NAME (EvFixedEventDetect);
-
-
-    /*
-     * Read the fixed feature status and enable registers, as all the cases
-     * depend on their values. Ignore errors here.
-     */
-    (void) AcpiHwRegisterRead (ACPI_REGISTER_PM1_STATUS, &FixedStatus);
-    (void) AcpiHwRegisterRead (ACPI_REGISTER_PM1_ENABLE, &FixedEnable);
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INTERRUPTS,
-        "Fixed Event Block: Enable %08X Status %08X\n",
-        FixedEnable, FixedStatus));
-
-    /*
-     * Check for all possible Fixed Events and dispatch those that are active
-     */
-    for (i = 0; i < ACPI_NUM_FIXED_EVENTS; i++)
-    {
-        /* Both the status and enable bits must be on for this event */
-
-        if ((FixedStatus & AcpiGbl_FixedEventInfo[i].StatusBitMask) &&
-            (FixedEnable & AcpiGbl_FixedEventInfo[i].EnableBitMask))
-        {
-            /* Found an active (signalled) event */
-
-            AcpiFixedEventCount[i]++;
-            IntStatus |= AcpiEvFixedEventDispatch (i);
-        }
-    }
-
-    return (IntStatus);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiEvFixedEventDispatch
- *
- * PARAMETERS:  Event               - Event type
- *
- * RETURN:      INTERRUPT_HANDLED or INTERRUPT_NOT_HANDLED
- *
- * DESCRIPTION: Clears the status bit for the requested event, calls the
- *              handler that previously registered for the event.
- *
- ******************************************************************************/
-
-static UINT32
-AcpiEvFixedEventDispatch (
-    UINT32                  Event)
-{
-
-    ACPI_FUNCTION_ENTRY ();
-
-
-    /* Clear the status bit */
-
-    (void) AcpiWriteBitRegister (
-            AcpiGbl_FixedEventInfo[Event].StatusRegisterId,
-            ACPI_CLEAR_STATUS);
-
-    /*
-     * Make sure we've got a handler. If not, report an error. The event is
-     * disabled to prevent further interrupts.
-     */
-    if (NULL == AcpiGbl_FixedEventHandlers[Event].Handler)
-    {
-        (void) AcpiWriteBitRegister (
-                AcpiGbl_FixedEventInfo[Event].EnableRegisterId,
-                ACPI_DISABLE_EVENT);
-
-        ACPI_ERROR ((AE_INFO,
-            "No installed handler for fixed event [0x%08X]",
-            Event));
-
-        return (ACPI_INTERRUPT_NOT_HANDLED);
-    }
-
-    /* Invoke the Fixed Event handler */
-
-    return ((AcpiGbl_FixedEventHandlers[Event].Handler)(
-                AcpiGbl_FixedEventHandlers[Event].Context));
-}
-
 

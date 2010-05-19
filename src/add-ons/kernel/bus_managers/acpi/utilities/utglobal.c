@@ -625,7 +625,7 @@ AcpiUtGetNodeName (
 
 static const char           *AcpiGbl_DescTypeNames[] =
 {
-    /* 00 */ "Invalid",
+    /* 00 */ "Not a Descriptor",
     /* 01 */ "Cached",
     /* 02 */ "State-Generic",
     /* 03 */ "State-Update",
@@ -656,7 +656,7 @@ AcpiUtGetDescriptorName (
 
     if (ACPI_GET_DESCRIPTOR_TYPE (Object) > ACPI_DESC_TYPE_MAX)
     {
-        return (ACPI_CAST_PTR (char, AcpiGbl_BadType));
+        return ("Not a Descriptor");
     }
 
     return (ACPI_CAST_PTR (char,
@@ -916,6 +916,7 @@ AcpiUtInitGlobals (
 
     /* Miscellaneous variables */
 
+    AcpiGbl_DSDT                        = NULL;
     AcpiGbl_CmSingleStep                = FALSE;
     AcpiGbl_DbTerminateThreads          = FALSE;
     AcpiGbl_Shutdown                    = FALSE;

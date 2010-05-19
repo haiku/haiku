@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Name: acfreebsd.h - OS specific defines, etc.
+ * Module Name: exdebug - Support for stores to the AML Debug Object
  *
  *****************************************************************************/
 
@@ -113,66 +113,238 @@
  *
  *****************************************************************************/
 
-#ifndef __ACFREEBSD_H__
-#define __ACFREEBSD_H__
+#define __EXDEBUG_C__
+
+#include "acpi.h"
+#include "accommon.h"
+#include "acinterp.h"
 
 
-/* FreeBSD uses GCC */
+#define _COMPONENT          ACPI_EXECUTER
+        ACPI_MODULE_NAME    ("exdebug")
 
-#include "acgcc.h"
-#include <sys/types.h>
-#include <machine/acpica_machdep.h>
 
-#define ACPI_UINTPTR_T      uintptr_t
+#ifndef ACPI_NO_ERROR_MESSAGES
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiExDoDebugObject
+ *
+ * PARAMETERS:  SourceDesc          - Object to be output to "Debug Object"
+ *              Level               - Indentation level (used for packages)
+ *              Index               - Current package element, zero if not pkg
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Handles stores to the AML Debug Object. For example:
+ *              Store(INT1, Debug)
+ *
+ * This function is not compiled if ACPI_NO_ERROR_MESSAGES is set.
+ *
+ * This function is only enabled if AcpiGbl_EnableAmlDebugObject is set, or
+ * if ACPI_LV_DEBUG_OBJECT is set in the AcpiDbgLevel. Thus, in the normal
+ * operational case, stores to the debug object are ignored but can be easily
+ * enabled if necessary.
+ *
+ ******************************************************************************/
 
-#define ACPI_USE_DO_WHILE_0
-#define ACPI_USE_LOCAL_CACHE
-#define ACPI_USE_SYSTEM_CLIBRARY
+void
+AcpiExDoDebugObject (
+    ACPI_OPERAND_OBJECT     *SourceDesc,
+    UINT32                  Level,
+    UINT32                  Index)
+{
+    UINT32                  i;
 
-#ifdef _KERNEL
 
-#include <sys/ctype.h>
-#include <sys/param.h>
-#include <sys/systm.h>
-#include <sys/libkern.h>
-#include <machine/stdarg.h>
+    ACPI_FUNCTION_TRACE_PTR (ExDoDebugObject, SourceDesc);
 
-#include "opt_acpi.h"
 
-#define ACPI_THREAD_ID      lwpid_t
-#define ACPI_MUTEX_TYPE     ACPI_OSL_MUTEX
+    /* Output must be enabled via the DebugObject global or the DbgLevel */
 
-#ifdef ACPI_DEBUG
-#define ACPI_DEBUG_OUTPUT   /* for backward compatibility */
-#define ACPI_DISASSEMBLER
+    if (!AcpiGbl_EnableAmlDebugObject &&
+        !(AcpiDbgLevel & ACPI_LV_DEBUG_OBJECT))
+    {
+        return_VOID;
+    }
+
+    /*
+     * Print line header as long as we are not in the middle of an
+     * object display
+     */
+    if (!((Level > 0) && Index == 0))
+    {
+        AcpiOsPrintf ("[ACPI Debug] %*s", Level, " ");
+    }
+
+    /* Display the index for package output only */
+
+    if (Index > 0)
+    {
+       AcpiOsPrintf ("(%.2u) ", Index-1);
+    }
+
+    if (!SourceDesc)
+    {
+        AcpiOsPrintf ("[Null Object]\n");
+        return_VOID;
+    }
+
+    if (ACPI_GET_DESCRIPTOR_TYPE (SourceDesc) == ACPI_DESC_TYPE_OPERAND)
+    {
+        AcpiOsPrintf ("%s ", AcpiUtGetObjectTypeName (SourceDesc));
+
+        if (!AcpiUtValidInternalObject (SourceDesc))
+        {
+           AcpiOsPrintf ("%p, Invalid Internal Object!\n", SourceDesc);
+           return_VOID;
+        }
+    }
+    else if (ACPI_GET_DESCRIPTOR_TYPE (SourceDesc) == ACPI_DESC_TYPE_NAMED)
+    {
+        AcpiOsPrintf ("%s: %p\n",
+            AcpiUtGetTypeName (((ACPI_NAMESPACE_NODE *) SourceDesc)->Type),
+            SourceDesc);
+        return_VOID;
+    }
+    else
+    {
+        return_VOID;
+    }
+
+    /* SourceDesc is of type ACPI_DESC_TYPE_OPERAND */
+
+    switch (SourceDesc->Common.Type)
+    {
+    case ACPI_TYPE_INTEGER:
+
+        /* Output correct integer width */
+
+        if (AcpiGbl_IntegerByteWidth == 4)
+        {
+            AcpiOsPrintf ("0x%8.8X\n",
+                (UINT32) SourceDesc->Integer.Value);
+        }
+        else
+        {
+            AcpiOsPrintf ("0x%8.8X%8.8X\n",
+                ACPI_FORMAT_UINT64 (SourceDesc->Integer.Value));
+        }
+        break;
+
+    case ACPI_TYPE_BUFFER:
+
+        AcpiOsPrintf ("[0x%.2X]\n", (UINT32) SourceDesc->Buffer.Length);
+        AcpiUtDumpBuffer2 (SourceDesc->Buffer.Pointer,
+            (SourceDesc->Buffer.Length < 256) ?
+                SourceDesc->Buffer.Length : 256, DB_BYTE_DISPLAY);
+        break;
+
+    case ACPI_TYPE_STRING:
+
+        AcpiOsPrintf ("[0x%.2X] \"%s\"\n",
+            SourceDesc->String.Length, SourceDesc->String.Pointer);
+        break;
+
+    case ACPI_TYPE_PACKAGE:
+
+        AcpiOsPrintf ("[Contains 0x%.2X Elements]\n",
+            SourceDesc->Package.Count);
+
+        /* Output the entire contents of the package */
+
+        for (i = 0; i < SourceDesc->Package.Count; i++)
+        {
+            AcpiExDoDebugObject (SourceDesc->Package.Elements[i],
+                Level+4, i+1);
+        }
+        break;
+
+    case ACPI_TYPE_LOCAL_REFERENCE:
+
+        AcpiOsPrintf ("[%s] ", AcpiUtGetReferenceName (SourceDesc));
+
+        /* Decode the reference */
+
+        switch (SourceDesc->Reference.Class)
+        {
+        case ACPI_REFCLASS_INDEX:
+
+            AcpiOsPrintf ("0x%X\n", SourceDesc->Reference.Value);
+            break;
+
+        case ACPI_REFCLASS_TABLE:
+
+            /* Case for DdbHandle */
+
+            AcpiOsPrintf ("Table Index 0x%X\n", SourceDesc->Reference.Value);
+            return;
+
+        default:
+            break;
+        }
+
+        AcpiOsPrintf ("  ");
+
+        /* Check for valid node first, then valid object */
+
+        if (SourceDesc->Reference.Node)
+        {
+            if (ACPI_GET_DESCRIPTOR_TYPE (SourceDesc->Reference.Node) !=
+                    ACPI_DESC_TYPE_NAMED)
+            {
+                AcpiOsPrintf (" %p - Not a valid namespace node\n",
+                    SourceDesc->Reference.Node);
+            }
+            else
+            {
+                AcpiOsPrintf ("Node %p [%4.4s] ", SourceDesc->Reference.Node,
+                    (SourceDesc->Reference.Node)->Name.Ascii);
+
+                switch ((SourceDesc->Reference.Node)->Type)
+                {
+                /* These types have no attached object */
+
+                case ACPI_TYPE_DEVICE:
+                    AcpiOsPrintf ("Device\n");
+                    break;
+
+                case ACPI_TYPE_THERMAL:
+                    AcpiOsPrintf ("Thermal Zone\n");
+                    break;
+
+                default:
+                    AcpiExDoDebugObject ((SourceDesc->Reference.Node)->Object,
+                        Level+4, 0);
+                    break;
+                }
+            }
+        }
+        else if (SourceDesc->Reference.Object)
+        {
+            if (ACPI_GET_DESCRIPTOR_TYPE (SourceDesc->Reference.Object) ==
+                    ACPI_DESC_TYPE_NAMED)
+            {
+                AcpiExDoDebugObject (((ACPI_NAMESPACE_NODE *)
+                    SourceDesc->Reference.Object)->Object,
+                    Level+4, 0);
+            }
+            else
+            {
+                AcpiExDoDebugObject (SourceDesc->Reference.Object,
+                    Level+4, 0);
+            }
+        }
+        break;
+
+    default:
+
+        AcpiOsPrintf ("%p\n", SourceDesc);
+        break;
+    }
+
+    ACPI_DEBUG_PRINT_RAW ((ACPI_DB_EXEC, "\n"));
+    return_VOID;
+}
 #endif
 
-#ifdef ACPI_DEBUG_OUTPUT
-#include "opt_ddb.h"
-#ifdef DDB
-#define ACPI_DEBUGGER
-#endif /* DDB */
-#endif /* ACPI_DEBUG_OUTPUT */
 
-#ifdef DEBUGGER_THREADING
-#undef DEBUGGER_THREADING
-#endif /* DEBUGGER_THREADING */
-
-#define DEBUGGER_THREADING  0   /* integrated with DDB */
-
-#else /* _KERNEL */
-
-#if __STDC_HOSTED__
-#include <ctype.h>
-#endif
-
-#define ACPI_THREAD_ID      pthread_t
-
-#define ACPI_USE_STANDARD_HEADERS
-
-#define ACPI_FLUSH_CPU_CACHE()
-#define __cdecl
-
-#endif /* _KERNEL */
-
-#endif /* __ACFREEBSD_H__ */

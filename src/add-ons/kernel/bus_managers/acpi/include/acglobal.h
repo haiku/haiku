@@ -186,6 +186,19 @@ UINT8       ACPI_INIT_GLOBAL (AcpiGbl_LeaveWakeGpesDisabled, TRUE);
  */
 UINT8       ACPI_INIT_GLOBAL (AcpiGbl_UseDefaultRegisterWidths, TRUE);
 
+/*
+ * Optionally enable output from the AML Debug Object.
+ */
+UINT8       ACPI_INIT_GLOBAL (AcpiGbl_EnableAmlDebugObject, FALSE);
+
+/*
+ * Optionally copy the entire DSDT to local memory (instead of simply
+ * mapping it.) There are some BIOSs that corrupt or replace the original
+ * DSDT, creating the need for this option. Default is FALSE, do not copy
+ * the DSDT.
+ */
+UINT8       ACPI_INIT_GLOBAL (AcpiGbl_CopyDsdtLocally, FALSE);
+
 
 /* AcpiGbl_FADT is a local copy of the FADT, converted to a common format. */
 
@@ -203,11 +216,10 @@ ACPI_NAME                   AcpiGbl_TraceMethodName;
  ****************************************************************************/
 
 /*
- * AcpiGbl_RootTableList is the master list of ACPI tables found in the
- * RSDT/XSDT.
- *
+ * AcpiGbl_RootTableList is the master list of ACPI tables that were
+ * found in the RSDT/XSDT.
  */
-ACPI_EXTERN ACPI_INTERNAL_RSDT          AcpiGbl_RootTableList;
+ACPI_EXTERN ACPI_TABLE_LIST             AcpiGbl_RootTableList;
 ACPI_EXTERN ACPI_TABLE_FACS            *AcpiGbl_FACS;
 
 /* These addresses are calculated from the FADT Event Block addresses */
@@ -217,6 +229,11 @@ ACPI_EXTERN ACPI_GENERIC_ADDRESS        AcpiGbl_XPm1aEnable;
 
 ACPI_EXTERN ACPI_GENERIC_ADDRESS        AcpiGbl_XPm1bStatus;
 ACPI_EXTERN ACPI_GENERIC_ADDRESS        AcpiGbl_XPm1bEnable;
+
+/* DSDT information. Used to check for DSDT corruption */
+
+ACPI_EXTERN ACPI_TABLE_HEADER          *AcpiGbl_DSDT;
+ACPI_EXTERN ACPI_TABLE_HEADER           AcpiGbl_OriginalDsdtHeader;
 
 /*
  * Handle both ACPI 1.0 and ACPI 2.0 Integer widths. The integer width is

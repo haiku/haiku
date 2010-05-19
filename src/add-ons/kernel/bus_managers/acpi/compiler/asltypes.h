@@ -188,21 +188,6 @@ typedef struct asl_mapping_entry
 } ASL_MAPPING_ENTRY;
 
 
-/* An entry in the Reserved Name information table */
-
-#define ASL_RSVD_RETURN_VALUE   0x01
-#define ASL_RSVD_RESOURCE_NAME  0x02
-#define ASL_RSVD_SCOPE          0x04
-
-typedef struct asl_reserved_info
-{
-    char                        *Name;
-    UINT8                       NumArguments;
-    UINT8                       Flags;
-
-} ASL_RESERVED_INFO;
-
-
 /* Parse tree walk info structure */
 
 typedef struct asl_walk_info
@@ -435,7 +420,16 @@ typedef enum
     ASL_MSG_SERIALIZED,
     ASL_MSG_COMPILER_RESERVED,
     ASL_MSG_NAMED_OBJECT_IN_WHILE,
-    ASL_MSG_LOCAL_OUTSIDE_METHOD
+    ASL_MSG_LOCAL_OUTSIDE_METHOD,
+    ASL_MSG_ALIGNMENT,
+    ASL_MSG_ISA_ADDRESS,
+    ASL_MSG_INVALID_MIN_MAX,
+    ASL_MSG_INVALID_LENGTH,
+    ASL_MSG_INVALID_LENGTH_FIXED,
+    ASL_MSG_INVALID_GRANULARITY,
+    ASL_MSG_INVALID_GRAN_FIXED,
+    ASL_MSG_INVALID_ACCESS_SIZE,
+    ASL_MSG_INVALID_ADDR_FLAGS
 
 } ASL_MESSAGE_IDS;
 
@@ -522,7 +516,7 @@ char                        *AslMessages [] = {
 /*    ASL_MSG_RESERVED_ARG_COUNT_HI */      "Reserved method has too many arguments",
 /*    ASL_MSG_RESERVED_ARG_COUNT_LO */      "Reserved method has too few arguments",
 /*    ASL_MSG_RESERVED_METHOD */            "Reserved name must be a control method",
-/*    ASL_MSG_RESERVED_OPERAND_TYPE */      "Invalid operand type for reserved name, must be",
+/*    ASL_MSG_RESERVED_OPERAND_TYPE */      "Invalid object type for reserved name",
 /*    ASL_MSG_RESERVED_RETURN_VALUE */      "Reserved method must return a value",
 /*    ASL_MSG_RESERVED_USE */               "Invalid use of reserved name",
 /*    ASL_MSG_RESERVED_WORD */              "Use of reserved name",
@@ -555,7 +549,16 @@ char                        *AslMessages [] = {
 /*    ASL_MSG_SERIALIZED */                 "Control Method marked Serialized",
 /*    ASL_MSG_COMPILER_RESERVED */          "Use of compiler reserved name",
 /*    ASL_MSG_NAMED_OBJECT_IN_WHILE */      "Creating a named object in a While loop",
-/*    ASL_MSG_LOCAL_OUTSIDE_METHOD */       "Local or Arg used outside a control method"
+/*    ASL_MSG_LOCAL_OUTSIDE_METHOD */       "Local or Arg used outside a control method",
+/*    ASL_MSG_ALIGNMENT */                  "Must be a multiple of alignment/granularity value",
+/*    ASL_MSG_ISA_ADDRESS */                "Maximum 10-bit ISA address (0x3FF)",
+/*    ASL_MSG_INVALID_MIN_MAX */            "Address Min is greater than Address Max",
+/*    ASL_MSG_INVALID_LENGTH */             "Length is larger than Min/Max window",
+/*    ASL_MSG_INVALID_LENGTH_FIXED */       "Length is not equal to fixed Min/Max window",
+/*    ASL_MSG_INVALID_GRANULARITY */        "Granularity must be zero or a power of two minus one",
+/*    ASL_MSG_INVALID_GRAN_FIXED */         "Granularity must be zero for fixed Min/Max",
+/*    ASL_MSG_INVALID_ACCESS_SIZE */        "Invalid AccessSize (Maximum is 4 - QWord access)",
+/*    ASL_MSG_INVALID_ADDR_FLAGS */         "Invalid combination of Length and Min/Max fixed flags"
 
 };
 
