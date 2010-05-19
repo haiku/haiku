@@ -75,6 +75,7 @@ class StyleView : public BView,
 			Style*				fStyle;
 			Gradient*			fGradient;
 			bool				fIgnoreCurrentColorNotifications;
+			bool				fIgnoreControlGradientNotifications;
 
 			GradientControl*	fGradientControl;
 			BMenuField*			fStyleType;

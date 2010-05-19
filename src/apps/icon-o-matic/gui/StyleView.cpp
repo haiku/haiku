@@ -31,6 +31,7 @@
 #include "SetGradientCommand.h"
 #include "Style.h"
 
+
 using std::nothrow;
 
 enum {
@@ -47,17 +48,19 @@ enum {
 
 // constructor
 StyleView::StyleView(BRect frame)
+	:
 #ifdef __HAIKU__
-	: BView("style view", 0),
+	BView("style view", 0),
 #else
-	: BView(frame, "style view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_FRAME_EVENTS),
+	BView(frame, "style view", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_FRAME_EVENTS),
 #endif
-	  fCommandStack(NULL),
-	  fCurrentColor(NULL),
-	  fStyle(NULL),
-	  fGradient(NULL),
-	  fIgnoreCurrentColorNotifications(false),
-	  fPreviousBounds(frame.OffsetToCopy(B_ORIGIN))
+	fCommandStack(NULL),
+	fCurrentColor(NULL),
+	fStyle(NULL),
+	fGradient(NULL),
+	fIgnoreCurrentColorNotifications(false),
+	fIgnoreControlGradientNotifications(false),
+	fPreviousBounds(frame.OffsetToCopy(B_ORIGIN))
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -261,13 +264,16 @@ StyleView::ObjectChanged(const Observable* object)
 	if (object == controlGradient) {
 		if (!fGradient)
 			return;
-
-		// make sure we don't fall for changes of the
-		// transformation
-		// TODO: is this really necessary?
-		controlGradient->SetTransform(*fGradient);
+		if (fIgnoreControlGradientNotifications)
+			return;
+		fIgnoreControlGradientNotifications = true;
 
 		if (!fGradient->ColorStepsAreEqual(*controlGradient)) {
+			// Make sure we never apply the transformation from the control
+			// gradient to the style gradient. Setting this here would cause to
+			// re-enter ObjectChanged(), which is prevented to cause harm via
+			// fIgnoreControlGradientNotifications.
+			controlGradient->SetTransform(*fGradient);
 			if (fCommandStack) {
 				fCommandStack->Perform(
 					new (nothrow) SetGradientCommand(
@@ -278,6 +284,8 @@ StyleView::ObjectChanged(const Observable* object)
 			// transfer the current gradient color to the current color
 			_TransferGradientStopColor();
 		}
+
+		fIgnoreControlGradientNotifications = false;
 	} else if (object == fGradient) {
 		if (!fGradient->ColorStepsAreEqual(*controlGradient)) {
 			fGradientControl->SetGradient(fGradient);
