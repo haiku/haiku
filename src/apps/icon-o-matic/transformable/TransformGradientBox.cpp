@@ -16,7 +16,7 @@
 #include "GradientTransformable.h"
 #include "Shape.h"
 #include "StateView.h"
-#include "TransformObjectsCommand.h"
+#include "TransformGradientCommand.h"
 
 using std::nothrow;
 
@@ -104,7 +104,7 @@ TransformGradientBox::ObjectChanged(const Observable* object)
 		return;
 	}
 
-	// any TransformObjectsCommand cannot use the TransformBox
+	// any TransformGradientCommand cannot use the TransformBox
 	// anymore
 	_NotifyDeleted();
 
@@ -179,11 +179,8 @@ TransformGradientBox::ViewSpaceRotation() const
 TransformCommand*
 TransformGradientBox::MakeCommand(const char* commandName, uint32 nameIndex)
 {
-	Transformable* objects[1];
-	objects[0] = fGradient;
-
-	return new TransformObjectsCommand(this, objects, fOriginals, 1, Pivot(),
-	   Translation(), LocalRotation(), LocalXScale(), LocalYScale(), commandName,
-	   nameIndex);
+	return new TransformGradientCommand(this, fGradient, Pivot(),
+	   Translation(), LocalRotation(), LocalXScale(), LocalYScale(),
+	   commandName, nameIndex);
 }
 

@@ -103,7 +103,6 @@ TransformObjectsCommand::_SetTransformation(
 		return B_OK;
 	}
 
-
 	ChannelTransform transform;
 	transform.SetTransformation(pivot, translation,
 								rotation, xScale, yScale);
