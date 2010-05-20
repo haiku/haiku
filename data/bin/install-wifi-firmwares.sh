@@ -20,7 +20,13 @@
 MESSAGE="This script will install firmware for various wireless network cards.
  The Broadcom 43xx and Marvell 88W8335 require an active network connection
  to download additional files before installation. In the absence of internet
- access, only Intel's ipw2100 and ipw2200 will be installed."
+ access, only Intel's ipw2100 and ipw2200 will be installed.
+
+ If you do not have internet access and need to install the other firmwares,
+ goto http://www.haiku-os.org/guides/dailytasks/wireless. This page has
+ instructions on which files to manually download and where to copy them into
+ this OS. It also has different script that can be run on another OS and will
+ prepare a zip archive for easy install. After that, re-run this script."
 VIEW='View licenses'
 ABORT='Abort installation'
 OK='I agree to the licenses. Install firmwares.'
