@@ -53,11 +53,13 @@ sensorsSources =
 	tas5130d1b.cpp
 ;
 
-## how to build header files from sources to include the list of built-in addons.
-# but it doesn't seem to work for some reason...
+## how to build header files from sources to include the list of built-in addons
 
 rule USBWebcamHeaderGen header : macro : sources
 {
+	header = [ FGristFiles $(header) ] ;
+	sources = [ FGristFiles $(sources) ] ;
+
 	SEARCH on $(sources) = $(SEARCH_SOURCE) ;
 
 	Depends $(header) : $(sources) ;
@@ -72,11 +74,10 @@ actions USBWebcamHeaderGen1
 	grep -h $(GREP_DEFINE) $(2) > $(1) ;
 }
 
-USBWebcamHeaderGen [ FGristFiles CamInternalAddons.h ]
-	: B_WEBCAM_MKINTFUNC : $(addonSources) ;
-USBWebcamHeaderGen [ FGristFiles CamInternalSensors.h ]
-	: B_WEBCAM_DECLARE_SENSOR : $(sensorsSources) ;
-USBWebcamHeaderGen [ FGristFiles CamInternalColorSpaceTransforms.h ]
+USBWebcamHeaderGen CamInternalAddons.h : B_WEBCAM_MKINTFUNC : $(addonSources) ;
+USBWebcamHeaderGen CamInternalSensors.h : B_WEBCAM_DECLARE_SENSOR
+	: $(sensorsSources) ;
+USBWebcamHeaderGen CamInternalColorSpaceTransforms.h
 	: B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
 
 Addon usb_webcam.media_addon :
