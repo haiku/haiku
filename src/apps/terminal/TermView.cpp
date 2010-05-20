@@ -208,6 +208,8 @@ TermView::TermView(int rows, int columns, int32 argc, const char** argv,
 	if (status != B_OK)
 		throw status;
 
+	ResizeToPreferred();
+
 	// TODO: Don't show the dragger, since replicant capabilities
 	// don't work very well ATM.
 	/*
@@ -1026,6 +1028,13 @@ TermView::AttachedToWindow()
 {
 	fMouseButtons = 0;
 
+	// update the terminal size because it may have changed while the TermView
+	// was detached from the window. On such conditions FrameResized was not
+	// called when the resize occured
+	int rows;
+	int columns;
+	GetTermSizeFromRect(Bounds(), &rows, &columns);
+	SetTermSize(rows, columns);
 	MakeFocus(true);
 	if (fScrollBar) {
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fRows);

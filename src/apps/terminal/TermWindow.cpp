@@ -805,6 +805,32 @@ TermWindow::_AddTab(Arguments *args)
 		session->windowTitle = fInitialTitle;
 		fSessions.AddItem(session);
 
+		int width, height;
+		view->GetFontSize(&width, &height);
+
+		float minimumHeight = -1;
+		if (fMenubar)
+			minimumHeight += fMenubar->Bounds().Height() + 1;
+		if (fTabView && fTabView->CountTabs() > 0)
+			minimumHeight += fTabView->TabHeight() + 1;
+		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
+			minimumHeight + MIN_ROWS * height - 1,
+			minimumHeight + MAX_ROWS * height - 1);
+			// TODO: The size limit computation is apparently broken, since
+			// the terminal can be resized smaller than MIN_ROWS/MIN_COLS!
+
+		// If it's the first time we're called, setup the window
+		if (fTabView->CountTabs() == 0) {
+			float viewWidth, viewHeight;
+			containerView->GetPreferredSize(&viewWidth, &viewHeight);
+
+			// Resize Window
+			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
+				viewHeight + fMenubar->Bounds().Height() + 1);
+				// NOTE: Width is one pixel too small, since the scroll view
+				// is one pixel wider than its parent.
+		}
+
 		BTab *tab = new BTab;
 		fTabView->AddTab(scrollView, tab);
 		tab->SetLabel(session->name.String());
@@ -822,31 +848,6 @@ TermWindow::_AddTab(Arguments *args)
 
 		_SetTermColors(containerView);
 
-		int width, height;
-		view->GetFontSize(&width, &height);
-
-		float minimumHeight = -1;
-		if (fMenubar)
-			minimumHeight += fMenubar->Bounds().Height() + 1;
-		if (fTabView && fTabView->CountTabs() > 1)
-			minimumHeight += fTabView->TabHeight() + 1;
-		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
-			minimumHeight + MIN_ROWS * height - 1,
-			minimumHeight + MAX_ROWS * height - 1);
-			// TODO: The size limit computation is apparently broken, since
-			// the terminal can be resized smaller than MIN_ROWS/MIN_COLS!
-
-		// If it's the first time we're called, setup the window
-		if (fTabView->CountTabs() == 1) {
-			float viewWidth, viewHeight;
-			containerView->GetPreferredSize(&viewWidth, &viewHeight);
-
-			// Resize Window
-			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
-				viewHeight + fMenubar->Bounds().Height() + 1);
-				// NOTE: Width is one pixel too small, since the scroll view
-				// is one pixel wider than its parent.
-		}
 		// TODO: No fTabView->Select(tab); ?
 		fTabView->Select(fTabView->CountTabs() - 1);
 	} catch (...) {
