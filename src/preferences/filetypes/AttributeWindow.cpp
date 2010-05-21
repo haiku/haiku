@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -102,9 +102,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	fTarget(target),
 	fMimeType(mimeType.Type())
 {
-	float padding = 3.0f;
-	//if (be_control_look)
-		//padding = be_control_look->DefaultItemSpacing();
+	float padding = be_control_look->DefaultItemSpacing();
 
 	if (attributeItem != NULL)
 		fAttribute = *attributeItem;
@@ -162,7 +160,8 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 		item = new BMenuItem(kDisplayAsMap[i].name, message);
 		menu->AddItem(item);
 
-		if (compare_display_as(kDisplayAsMap[i].identifier, fAttribute.DisplayAs()))
+		if (compare_display_as(kDisplayAsMap[i].identifier,
+				fAttribute.DisplayAs()))
 			item->SetMarked(true);
 	}
 
@@ -230,8 +229,8 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 		B_TRANSLATE("Alignment:"), menu);
 	fAlignmentMenuField->SetAlignment(B_ALIGN_RIGHT);
 
-	fAcceptButton = new BButton("add", item
-		? B_TRANSLATE("Done") : B_TRANSLATE("Add"),
+	fAcceptButton = new BButton("add",
+		item ? B_TRANSLATE("Done") : B_TRANSLATE("Add"),
 		new BMessage(kMsgAccept));
 	fAcceptButton->SetEnabled(false);
 
@@ -242,16 +241,15 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
 		.SetInsets(padding, padding, padding, padding)
-		.Add(BGridLayoutBuilder(padding, padding)
+		.Add(BGridLayoutBuilder(padding, padding / 2)
 			.Add(fPublicNameControl->CreateLabelLayoutItem(), 0, 0)
 			.Add(fPublicNameControl->CreateTextViewLayoutItem(), 1, 0)
 			.Add(fAttributeControl->CreateLabelLayoutItem(), 0, 1)
 			.Add(fAttributeControl->CreateTextViewLayoutItem(), 1, 1)
 			.Add(typeMenuField->CreateLabelLayoutItem(), 0, 2)
-			.Add(typeMenuField->CreateMenuBarLayoutItem(), 1, 2)
-		)
+			.Add(typeMenuField->CreateMenuBarLayoutItem(), 1, 2))
 		.Add(visibleBox = new BBox(B_FANCY_BORDER,
-			BGridLayoutBuilder(padding, padding)
+			BGridLayoutBuilder(padding, padding / 2)
 				.Add(fDisplayAsMenuField->CreateLabelLayoutItem(), 0, 0)
 				.Add(fDisplayAsMenuField->CreateMenuBarLayoutItem(), 1, 0)
 				.Add(fEditableCheckBox, 3, 0)
@@ -261,15 +259,12 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 				.Add(fWidthControl->CreateTextViewLayoutItem(), 1, 2, 3)
 				.Add(fAlignmentMenuField->CreateLabelLayoutItem(), 0, 3)
 				.Add(fAlignmentMenuField->CreateMenuBarLayoutItem(), 1, 3, 3)
-				.SetInsets(padding, padding, padding, padding)
-			))
+				.SetInsets(padding, padding, padding, padding)))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
 			.Add(BSpaceLayoutItem::CreateGlue())
 			.Add(BSpaceLayoutItem::CreateGlue())
 			.Add(cancelButton)
-			.Add(fAcceptButton)
-		)
-	);
+			.Add(fAcceptButton)));
 	visibleBox->SetLabel(fVisibleCheckBox);
 
 	fAcceptButton->MakeDefault(true);

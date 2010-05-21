@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -117,6 +117,7 @@ TypeIconView::TypeIconView(const char* name)
 	: IconView(name)
 {
 	ShowEmptyFrame(false);
+	SetIconSize(48);
 }
 
 
@@ -150,7 +151,8 @@ TypeIconView::Draw(BRect updateRect)
 			return;
 	}
 
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DISABLED_LABEL_TINT));
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		B_DISABLED_LABEL_TINT));
 	SetLowColor(ViewColor());
 
 	font_height fontHeight;
@@ -218,7 +220,8 @@ TypeIconView::BitmapRect() const
 
 ExtensionListView::ExtensionListView(const char* name,
 		list_view_type type, uint32 flags)
-	: DropTargetListView(name, type, flags)
+	:
+	DropTargetListView(name, type, flags)
 {
 }
 
@@ -235,7 +238,8 @@ ExtensionListView::MessageReceived(BMessage* message)
 		// create extension list
 		BList list;
 		entry_ref ref;
-		for (int32 index = 0; message->FindRef("refs", index++, &ref) == B_OK; ) {
+		for (int32 index = 0; message->FindRef("refs", index, &ref) == B_OK;
+				index++) {
 			const char* point = strchr(ref.name, '.');
 			if (point != NULL && point[1])
 				list.AddItem(strdup(++point));
@@ -261,7 +265,8 @@ ExtensionListView::AcceptsDrag(const BMessage* message)
 	int32 count = 0;
 	entry_ref ref;
 
-	for (int32 index = 0; message->FindRef("refs", index++, &ref) == B_OK; ) {
+	for (int32 index = 0; message->FindRef("refs", index, &ref) == B_OK;
+			index++) {
 		const char* point = strchr(ref.name, '.');
 		if (point != NULL && point[1])
 			count++;
@@ -298,25 +303,20 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		showRule = false;
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
-	float padding = 3.0f;
-	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	if (be_control_look) {
-		// padding = be_control_look->DefaultItemSpacing();
-			// this seems to be very large!
-		labelAlignment = be_control_look->DefaultLabelAlignment();
-	}
-	BAlignment fullAlignment =
-		BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+
+	float padding = be_control_look->DefaultItemSpacing();
+	BAlignment labelAlignment = be_control_look->DefaultLabelAlignment();
+	BAlignment fullAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 
 	// add the menu
 	BMenuBar* menuBar = new BMenuBar("");
 
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
-	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem(
-		B_TRANSLATE("New resource file" B_UTF8_ELLIPSIS),
-		NULL, 'N', B_COMMAND_KEY));
+	BMenuItem* item = new BMenuItem(
+		B_TRANSLATE("New resource file" B_UTF8_ELLIPSIS), NULL, 'N',
+		B_COMMAND_KEY);
 	item->SetEnabled(false);
+	menu->AddItem(item);
 
 	BMenu* recentsMenu = BRecentFilesList::NewFileListMenu(
 		B_TRANSLATE("Open" B_UTF8_ELLIPSIS), NULL, NULL,
@@ -365,6 +365,7 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 
 	fTypeListView = new MimeTypeListView("typeview", NULL, showIcons, false);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
+	fTypeListView->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
 
 	BScrollView* typeListScrollView = new BScrollView("scrollview",
 		fTypeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
@@ -378,8 +379,7 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.Add(BSpaceLayoutItem::CreateGlue(), 1)
 		.Add(fIconView, 3)
 		.Add(BSpaceLayoutItem::CreateGlue(), 1)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.SetInsets(padding, padding, padding, padding));
 
 	// "File Recognition" group
 
@@ -392,6 +392,8 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 
 	fAddExtensionButton = new BButton("add ext",
 		B_TRANSLATE("Add" B_UTF8_ELLIPSIS), new BMessage(kMsgAddExtension));
+	fAddExtensionButton->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fRemoveExtensionButton = new BButton("remove ext", B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveExtension));
@@ -411,14 +413,13 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fRuleControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fRuleControl->Hide();
 
-	BView* recognitionBoxGrid =
-		BGridLayoutBuilder(padding, padding)
-			.Add(fExtensionLabel->LabelView(), 0, 0)
-			.Add(scrollView, 0, 1, 2, 3)
-			.Add(fAddExtensionButton, 2, 1)
-			.Add(fRemoveExtensionButton, 2, 2)
-			.Add(fRuleControl, 0, 4, 3, 1)
-			.SetInsets(padding, padding, padding, padding);
+	BView* recognitionBoxGrid = BGridLayoutBuilder(padding, padding / 2)
+		.Add(fExtensionLabel->LabelView(), 0, 0)
+		.Add(scrollView, 0, 1, 2, 3)
+		.Add(fAddExtensionButton, 2, 1)
+		.Add(fRemoveExtensionButton, 2, 2)
+		.Add(fRuleControl, 0, 4, 3, 1)
+		.SetInsets(padding, padding, padding, padding);
 
 	recognitionBoxGrid->SetExplicitAlignment(fullAlignment);
 	fRecognitionBox->AddChild(recognitionBoxGrid);
@@ -436,16 +437,14 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fDescriptionControl = new BTextControl("description",
 		B_TRANSLATE("Description:"), "", new BMessage(kMsgDescriptionEntered));
 
-	fDescriptionBox->AddChild(BGridLayoutBuilder(padding, padding)
+	fDescriptionBox->AddChild(BGridLayoutBuilder(padding / 2, padding / 2)
 		.Add(fInternalNameView->LabelView(), 0, 0)
 		.Add(fInternalNameView->TextView(), 1, 0)
 		.Add(fTypeNameControl->CreateLabelLayoutItem(), 0, 1)
 		.Add(fTypeNameControl->CreateTextViewLayoutItem(), 1, 1, 2)
 		.Add(fDescriptionControl->CreateLabelLayoutItem(), 0, 2)
 		.Add(fDescriptionControl->CreateTextViewLayoutItem(), 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding)
-	);
-
+		.SetInsets(padding, padding, padding, padding));
 
 	// "Preferred Application" group
 
@@ -466,20 +465,21 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		B_TRANSLATE("Same as" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgSamePreferredAppAs));
 
-	fPreferredBox->AddChild(
-		BGroupLayoutBuilder(B_HORIZONTAL, padding)
-			.Add(fPreferredField)
-			.Add(fSelectButton)
-			.Add(fSameAsButton)
-			.SetInsets(padding, padding, padding, padding)
-	);
+	fPreferredBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+		.Add(fPreferredField)
+		.Add(fSelectButton)
+		.Add(fSameAsButton)
+		.SetInsets(padding, padding, padding, padding));
 
 	// "Extra Attributes" group
+
 	fAttributeBox = new BBox("Attribute Box");
 	fAttributeBox->SetLabel(B_TRANSLATE("Extra attributes"));
 
 	fAddAttributeButton = new BButton("add attr",
 		"Add" B_UTF8_ELLIPSIS, new BMessage(kMsgAddAttribute));
+	fAddAttributeButton->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fRemoveAttributeButton = new BButton("remove attr", B_TRANSLATE("Remove"),
 		new BMessage(kMsgRemoveAttribute));
@@ -493,32 +493,27 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	BScrollView* attributesScroller = new BScrollView("scrollview attr",
 		fAttributeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	fAttributeBox->AddChild(BGridLayoutBuilder(padding, padding)
+	fAttributeBox->AddChild(BGridLayoutBuilder(padding, padding / 2)
 		.Add(attributesScroller, 0, 0, 2, 3)
 		.Add(fAddAttributeButton, 2, 0)
 		.Add(fRemoveAttributeButton, 2, 1)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.SetInsets(padding, padding, padding, padding));
 
-
-	BView* topView =
-		BGroupLayoutBuilder(B_HORIZONTAL, padding)
+	BView* topView = BGroupLayoutBuilder(B_HORIZONTAL, padding)
 		.SetInsets(padding, padding, padding, padding)
 		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
 			.Add(typeListScrollView)
 			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
-				.Add(addTypeButton).Add(fRemoveTypeButton)
-			)
-		)
+				.Add(addTypeButton)
+				.Add(fRemoveTypeButton)
+				.AddGlue()))
 		// Right side
 		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
 			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
-				.Add(fIconBox, 1).Add(fRecognitionBox, 3)
-			)
+				.Add(fIconBox, 1).Add(fRecognitionBox, 3))
 			.Add(fDescriptionBox)
 			.Add(fPreferredBox)
-			.Add(fAttributeBox, 5)
-		);
+			.Add(fAttributeBox, 5));
 
 	//topView->SetExplicitAlignment(fullAlignment);
 	//topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));

@@ -1,9 +1,8 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
-// TODO: think about adopting Tracker's info window style here (pressable path)
 
 #include "ApplicationTypesWindow.h"
 #include "FileTypes.h"
@@ -20,6 +19,7 @@
 #include <ControlLook.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -40,13 +40,17 @@
 #include <stdio.h>
 
 
+// TODO: think about adopting Tracker's info window style here (pressable path)
+
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Application Types Window"
 
 
 class ProgressWindow : public BWindow {
 	public:
-		ProgressWindow(const char* message, int32 max, volatile bool* signalQuit);
+		ProgressWindow(const char* message, int32 max,
+			volatile bool* signalQuit);
 		virtual ~ProgressWindow();
 
 		virtual void MessageReceived(BMessage* message);
@@ -166,23 +170,19 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 		B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-
-	float padding = 3.0f;
-	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	BAlignment fullWidthTopAlignment =
-		BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_TOP);
-	if (be_control_look) {
-		// padding = be_control_look->DefaultItemSpacing();
-			// seems too big
-		labelAlignment = be_control_look->DefaultLabelAlignment();
-	}
+	float padding = be_control_look->DefaultItemSpacing();
+	BAlignment labelAlignment = be_control_look->DefaultLabelAlignment();
+	BAlignment fullWidthTopAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_TOP);
 
 	// Application list
-	BView* currentView = new BGroupView(B_VERTICAL, padding);
 
 	fTypeListView = new MimeTypeListView("listview", "application", true, true);
 	fTypeListView->SetSelectionMessage(new BMessage(kMsgTypeSelected));
 	fTypeListView->SetInvocationMessage(new BMessage(kMsgTypeInvoked));
+	// TODO: this isn't the perfect solution, but otherwise the window contents
+	// will jump chaotically
+	fTypeListView->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
+	fTypeListView->SetExplicitMaxSize(BSize(250, B_SIZE_UNSET));
 
 	BScrollView* scrollView = new BScrollView("scrollview", fTypeListView,
 		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
@@ -208,16 +208,14 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fPathView->TextView()->SetExplicitAlignment(labelAlignment);
 	fPathView->LabelView()->SetExplicitAlignment(labelAlignment);
 
-	infoBox->AddChild(
-		BGridLayoutBuilder(padding, padding)
-			.Add(fNameView->LabelView(), 0, 0)
-			.Add(fNameView->TextView(), 1, 0, 2)
-			.Add(fSignatureView->LabelView(), 0, 1)
-			.Add(fSignatureView->TextView(), 1, 1, 2)
-			.Add(fPathView->LabelView(), 0, 2)
-			.Add(fPathView->TextView(), 1, 2, 2)
-			.SetInsets(padding, padding, padding, padding)
-	);
+	infoBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fNameView->LabelView(), 0, 0)
+		.Add(fNameView->TextView(), 1, 0, 2)
+		.Add(fSignatureView->LabelView(), 0, 1)
+		.Add(fSignatureView->TextView(), 1, 1, 2)
+		.Add(fPathView->LabelView(), 0, 2)
+		.Add(fPathView->TextView(), 1, 2, 2)
+		.SetInsets(padding, padding, padding, padding));
 
 	// "Version" group
 
@@ -235,15 +233,12 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fDescriptionView->SetLowColor(fDescriptionView->ViewColor());
 	fDescriptionView->MakeEditable(false);
 
-	versionBox->AddChild(currentView =
-		BGridLayoutBuilder(padding, padding)
-			.Add(fVersionView->LabelView(), 0, 0)
-			.Add(fVersionView->TextView(), 1, 0)
-			.Add(fDescriptionLabel->LabelView(), 0, 1)
-			.Add(fDescriptionView, 1, 1, 2, 2)
-			.SetInsets(padding, padding, padding, padding)
-	);
-	currentView->SetExplicitAlignment(fullWidthTopAlignment);
+	versionBox->AddChild(BGridLayoutBuilder(padding, padding)
+		.Add(fVersionView->LabelView(), 0, 0)
+		.Add(fVersionView->TextView(), 1, 0)
+		.Add(fDescriptionLabel->LabelView(), 0, 1)
+		.Add(fDescriptionView, 1, 1, 2, 2)
+		.SetInsets(padding, padding, padding, padding));
 
 	// Launch and Tracker buttons
 
@@ -254,25 +249,27 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fTrackerButton = new BButton(
 		B_TRANSLATE("Show in Tracker" B_UTF8_ELLIPSIS));
 
-	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, padding)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
+	AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, padding)
+		.AddGroup(B_VERTICAL, padding, 3)
 			.Add(scrollView)
-			.Add(button)
-			.SetInsets(padding, padding, padding, padding)
-		, 3)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
+			.AddGroup(B_HORIZONTAL)
+				.Add(button)
+				.AddGlue()
+				.End()
+			.End()
+//			.AddGlue())//, 3)
+		.AddGroup(B_VERTICAL, padding)
 			.Add(infoBox)
 			.Add(versionBox)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
+			.AddGroup(B_HORIZONTAL, padding)
+				.AddGlue()
 				.Add(fEditButton)
 				.Add(fLaunchButton)
 				.Add(fTrackerButton)
-			)
+				.End()
 			.AddGlue()
-			.SetInsets(padding, padding, padding, padding)
-		)
-		.SetInsets(padding, padding, padding, padding)
-	);
+			.End()
+		.SetInsets(padding, padding, padding, padding));
 
 	BMimeType::StartWatching(this);
 	_SetType(NULL);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -122,10 +122,7 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	float padding = 3.0f;
-	//if (be_control_look)
-		// padding = be_control_look->DefaultItemSpacing();
-			// this seems to be very large!
+	float padding = be_control_look->DefaultItemSpacing();
 
 	fExtensionControl = new BTextControl(B_TRANSLATE("Extension:"),
 		extension, NULL);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,7 @@
 #include <File.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -55,10 +56,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		B_NOT_V_RESIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	float padding = 3.0f;
-	// if (be_control_look)
-		// padding = be_control_look->DefaultItemSpacing();
-			// too big!
+	float padding = be_control_look->DefaultItemSpacing();
 
 	// "File Type" group
 	BBox* fileTypeBox = new BBox("file type BBox");
@@ -84,8 +82,7 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		.Add(fTypeControl, 0, 0, 2, 1)
 		.Add(fSelectTypeButton, 0, 1)
 		.Add(fSameTypeAsButton, 1, 1)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.SetInsets(padding, padding, padding, padding));
 
 	// "Icon" group
 
@@ -121,17 +118,15 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		.Add(fPreferredField, 0, 0, 2, 1)
 		.Add(fSelectAppButton, 0, 1)
 		.Add(fSameAppAsButton, 1, 1)
-		.Add(BSpaceLayoutItem::CreateGlue(), 3, 0, 1, 2)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.SetInsets(padding, padding, padding, padding));
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGridLayoutBuilder(padding, padding)
-		.Add(fileTypeBox, 0, 0, 1, 2)
-		.Add(iconBox, 1, 1, 1, 2)
-		.Add(preferredBox, 0, 2, 1, 2)
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, padding)
+		.AddGroup(B_VERTICAL, padding)
+			.Add(fileTypeBox)
+			.Add(preferredBox)
+			.End()
 		.SetInsets(padding, padding, padding, padding)
-	);
+		.Add(iconBox);
 
 	fTypeControl->MakeFocus(true);
 	BMimeType::StartWatching(this);

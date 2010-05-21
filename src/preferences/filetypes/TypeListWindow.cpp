@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,8 +25,8 @@ const uint32 kMsgTypeSelected = 'tpsl';
 const uint32 kMsgSelected = 'seld';
 
 
-TypeListWindow::TypeListWindow(const char* currentType,
-	uint32 what, BWindow* target)
+TypeListWindow::TypeListWindow(const char* currentType, uint32 what,
+		BWindow* target)
 	:
 	BWindow(BRect(100, 100, 360, 440), B_TRANSLATE("Choose type"),
 		B_MODAL_WINDOW,
@@ -34,10 +34,7 @@ TypeListWindow::TypeListWindow(const char* currentType,
 	fTarget(target),
 	fWhat(what)
 {
-	float padding = 3.0f;
-	//if (be_control_look)
-		// padding = be_control_look->DefaultItemSpacing();
-		// seems too big
+	float padding = be_control_look->DefaultItemSpacing();
 
 	fSelectButton = new BButton("select", B_TRANSLATE("Done"),
 		new BMessage(kMsgSelected));

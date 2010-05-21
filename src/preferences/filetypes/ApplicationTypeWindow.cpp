@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+3 * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -245,13 +245,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 			B_FRAME_EVENTS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fChangedProperties(0)
 {
-	float padding = 3.0f;
-	BAlignment labelAlignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
-	if (be_control_look){
-		// padding = be_control_look->DefaultItemSpacing();
-			// seems too big
-		labelAlignment = be_control_look->DefaultLabelAlignment();
-	}
+	float padding = be_control_look->DefaultItemSpacing();
+	BAlignment labelAlignment = be_control_look->DefaultLabelAlignment();
 
 	BMenuBar* menuBar = new BMenuBar((char*)NULL);
 	menuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
@@ -270,7 +265,6 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(B_QUIT_REQUESTED), 'W', B_COMMAND_KEY));
 	menuBar->AddItem(menu);
-
 
 	// Signature
 
@@ -310,7 +304,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	fBackgroundAppCheckBox = new BCheckBox("background",
 		B_TRANSLATE("Background app"), new BMessage(kMsgAppFlagsChanged));
 
-	flagsBox->AddChild(BGridLayoutBuilder(padding, padding)
+	flagsBox->AddChild(BGridLayoutBuilder()
 		.Add(fSingleLaunchButton, 0, 0).Add(fArgsOnlyCheckBox, 1, 0)
 		.Add(fMultipleLaunchButton, 0, 1).Add(fBackgroundAppCheckBox, 1, 1)
 		.Add(fExclusiveLaunchButton, 0, 2)
@@ -323,11 +317,9 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	iconBox->SetLabel(B_TRANSLATE("Icon"));
 	fIconView = new IconView("icon");
 	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
-	iconBox->AddChild(
-		BGroupLayoutBuilder(B_HORIZONTAL)
+	iconBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(fIconView)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.SetInsets(padding, padding, padding, padding));
 
 	// "Supported Types" group
 
@@ -359,9 +351,9 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.SetInsets(padding, padding, padding, padding)
 		.SetColumnWeight(0, 3)
 		.SetColumnWeight(1, 2)
-		.SetColumnWeight(2, 1)
-	);
-	iconHolder->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+		.SetColumnWeight(2, 1));
+	iconHolder->SetExplicitAlignment(
+		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 
 	// "Version Info" group
 
@@ -409,10 +401,10 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 
 	// TODO: remove workaround (bug #5678)
 	BSize minScrollSize = scrollView->ScrollBar(B_VERTICAL)->MinSize();
-	minScrollSize.width+=fLongDescriptionView->MinSize().width;
+	minScrollSize.width += fLongDescriptionView->MinSize().width;
 	scrollView->SetExplicitMinSize(minScrollSize);
 
-	versionBox->AddChild(BGridLayoutBuilder(padding, padding)
+	versionBox->AddChild(BGridLayoutBuilder(padding / 2, padding)
 		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fMajorVersionControl->CreateTextViewLayoutItem(), 1, 0)
 		.Add(fMiddleVersionControl, 2, 0, 2)
@@ -424,8 +416,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(longLabel, 0, 2)
 		.Add(scrollView, 1, 2, 10, 3)
 		.SetInsets(padding, padding, padding, padding)
-		.SetRowWeight(3, 3)
-	);
+		.SetRowWeight(3, 3));
 
 	// put it all together
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -434,12 +425,10 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(fSignatureControl)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
 			.Add(flagsBox, 3)
-			.Add(iconBox, 1)
-		)
+			.Add(iconBox, 1))
 		.Add(typeBox)
 		.Add(versionBox)
-		.SetInsets(padding, padding, padding, padding)
-	);
+		.SetInsets(padding, padding, padding, padding));
 
 	SetKeyMenuBar(menuBar);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -92,9 +92,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 	fAddButton = new BButton(B_TRANSLATE("Add type"),
 		new BMessage(kMsgAddType));
 
-	float padding = 3.0f;
-	// if (be_control_look)
-		// padding = be_control_look->DefaultItemSpacing();
+	float padding = be_control_look->DefaultItemSpacing();
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGridLayoutBuilder(padding, padding)
@@ -107,8 +105,7 @@ NewFileTypeWindow::NewFileTypeWindow(FileTypesWindow* target,
 		.Add(new BButton(B_TRANSLATE("Cancel"),
 			new BMessage(B_QUIT_REQUESTED)), 1, 2)
 		.Add(fAddButton, 2, 2)
-		.SetColumnWeight(0, 3)
-		);
+		.SetColumnWeight(0, 3));
 
 	BAlignment fullSize = BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_USE_FULL_HEIGHT);
