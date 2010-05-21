@@ -1,17 +1,25 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "RTF.h"
 
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <DataIO.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+
+//#define TRACE_RTF
+#ifdef TRACE_RTF
+#	define TRACE(x...) printf(x)
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 static const char *kDestinationControlWords[] = {
@@ -37,7 +45,7 @@ read_char(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
 {
 	char c;
 	ssize_t bytesRead = stream.Read(&c, 1);
-	
+
 	if (bytesRead < B_OK)
 		throw (status_t)bytesRead;
 
@@ -49,7 +57,8 @@ read_char(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
 
 
 static int32
-parse_integer(char first, BDataIO &stream, char &_last, int32 base) throw (status_t)
+parse_integer(char first, BDataIO &stream, char &_last, int32 base)
+	throw (status_t)
 {
 	const char *kDigits = "0123456789abcdef";
 	int32 integer = 0;
@@ -63,7 +72,7 @@ parse_integer(char first, BDataIO &stream, char &_last, int32 base) throw (statu
 	while (true) {
 		int32 pos = 0;
 		for (; pos < base; pos++) {
-			if (kDigits[pos] == digit) {
+			if (kDigits[pos] == tolower(digit)) {
 				integer = integer * base + pos;
 				count++;
 				break;
@@ -478,7 +487,7 @@ Header::Charset() const
 }
 
 
-rgb_color 
+rgb_color
 Header::Color(int32 index)
 {
 	rgb_color color = {0, 0, 0, 255};
@@ -634,6 +643,8 @@ Command::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 	} else
 		fName.SetTo(name, length);
 
+	TRACE("command: %s\n", fName.String());
+
 	// parse numeric option
 
 	if (c == '-')
@@ -654,11 +665,14 @@ Command::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 		// decimal
 		if (isdigit(c))
 			SetOption(parse_integer(c, stream, last));
-	
+
 		// a space delimiter is eaten up by the command
 		if (isspace(last))
 			last = read_char(stream);
 	}
+
+	if (HasOption())
+		TRACE("  option: %ld\n", fOption);
 }
 
 
