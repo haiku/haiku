@@ -1,27 +1,21 @@
 SubDir HAIKU_TOP src add-ons translators rtf ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 # It's called RTF-Translator (with a dash) to differentiate it from the
 # RTFTranslator that comes with Gobe Productive (that doesn't support
 # STXT or plain text files output).
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders shared storage ;
 
 Translator RTF-Translator :
-	# RTFTranslator classes
 	main.cpp
-	RTFTranslator.cpp
 	ConfigView.cpp
-	RTF.cpp
+
 	convert.cpp
+	RTF.cpp
+	RTFTranslator.cpp
+
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
 	: true
 ;
-
-Package haiku-translationkit-cvs :
-	RTF-Translator
-	: boot home config add-ons Translators
-	;
