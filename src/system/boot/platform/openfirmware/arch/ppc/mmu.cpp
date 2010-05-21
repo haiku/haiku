@@ -199,6 +199,7 @@ insert_virtual_allocated_range(void *start, uint32 size)
 }
 
 
+#if 0
 static status_t
 insert_virtual_range_to_keep(void *start, uint32 size)
 {
@@ -206,6 +207,7 @@ insert_virtual_range_to_keep(void *start, uint32 size)
 		gKernelArgs.arch_args.num_virtual_ranges_to_keep,
 		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
 }
+#endif
 
 
 static status_t
@@ -474,10 +476,6 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		}
 		if (map->virtual_address == oldPageTable)
 			keepRange = false;
-		if (!is_physical_memory(map->physical_address)) {
-			keepRange = false;
-				// we only get vm_pages for physical memory
-		}
 
 		// insert range in virtual allocated
 
@@ -494,6 +492,12 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 
 		// insert range in virtual ranges to keep
 
+// TODO: ATM keeping the ranges doesn't make much sense. The OF usually identity
+// maps stuff, which means that RAM will most likely be mapped < 2 GB, which we
+// cannot preserve, since that doesn't lie in the kernel address space. Mappings
+// >= 2 GB are probably memory mapped hardware registers or the frame buffer
+// (i.e. non-RAM), which we don't handle correctly ATM.
+#if 0
 		if (keepRange) {
 			if (insert_virtual_range_to_keep(map->virtual_address,
 					map->length) != B_OK) {
@@ -501,6 +505,7 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 					gKernelArgs.num_virtual_allocated_ranges);
 			}
 		}
+#endif
 
 		total += map->length;
 	}
