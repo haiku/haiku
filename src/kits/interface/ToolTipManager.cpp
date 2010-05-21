@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -42,6 +42,7 @@ public:
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
+	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 
 			void				HideTip();
 			void				ShowTip();
@@ -82,7 +83,7 @@ ToolTipView::~ToolTipView()
 void
 ToolTipView::AttachedToWindow()
 {
-	SetEventMask(B_POINTER_EVENTS, 0);
+	SetEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS, 0);
 	fToolTip->AttachedToWindow();
 }
 
@@ -124,6 +125,14 @@ ToolTipView::MouseMoved(BPoint where, uint32 transit,
 		// close with the preferred delay in case the mouse just moved
 		HideTip();
 	}
+}
+
+
+void
+ToolTipView::KeyDown(const char* bytes, int32 numBytes)
+{
+	if (!fToolTip->IsSticky())
+		HideTip();
 }
 
 
