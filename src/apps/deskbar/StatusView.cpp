@@ -1419,16 +1419,16 @@ TReplicantTray::SetMultiRow(bool state)
 //	#pragma mark -
 
 
-/**	draggable region that is asynchronous so that
- *	dragging does not block other activities
- */
-
+/*!	Draggable region that is asynchronous so that dragging does not block
+	other activities.
+*/
 TDragRegion::TDragRegion(TBarView* parent, BView* child)
-	:	BControl(BRect(0, 0, 0, 0), "", "", NULL, B_FOLLOW_NONE,
-			B_WILL_DRAW | B_FRAME_EVENTS),
-		fBarView(parent),
-		fChild(child),
-		fDragLocation(kAutoPlaceDragRegion)
+	:
+	BControl(BRect(0, 0, 0, 0), "", "", NULL, B_FOLLOW_NONE,
+		B_WILL_DRAW | B_FRAME_EVENTS),
+	fBarView(parent),
+	fChild(child),
+	fDragLocation(kAutoPlaceDragRegion)
 {
 }
 
@@ -1464,8 +1464,8 @@ TDragRegion::GetPreferredSize(float* width, float* height)
 void
 TDragRegion::FrameMoved(BPoint)
 {
-	if (fBarView->Left() && fBarView->Vertical() && fDragLocation
-		!= kNoDragRegion)
+	if (fBarView->Left() && fBarView->Vertical()
+		&& fDragLocation != kNoDragRegion)
 		fChild->MoveTo(5, 2);
 	else
 		fChild->MoveTo(2, 2);

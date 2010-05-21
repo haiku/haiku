@@ -118,7 +118,7 @@ class TBarView : public BView {
 
 		int32 CountItems(DeskbarShelf shelf);
 
-		status_t AddItem(BMessage* , DeskbarShelf shelf, int32* id);
+		status_t AddItem(BMessage* archive, DeskbarShelf shelf, int32* id);
 
 		void RemoveItem(int32 id);
 		void RemoveItem(const char* name, DeskbarShelf shelf);
@@ -134,10 +134,12 @@ class TBarView : public BView {
 
 		TExpandoMenuBar* ExpandoMenuBar() const;
 		TBarMenuBar* BarMenuBar() const;
+		TDragRegion* DragRegion() const { return fDragRegion; }
+
+	private:
 		friend class TBeMenu;
 		friend class PreferencesWindow;
 
-	private:
 		status_t SendDragMessage(const char* signature, entry_ref* ref = NULL);
 
 		void PlaceBeMenu();
