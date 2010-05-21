@@ -86,6 +86,11 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 	fMaxRecentApps(kDefaultRecentAppCount),
 	fLastDragItem(NULL)
 {
+	fReplicantTray = new TReplicantTray(this, fVertical);
+	fDragRegion = new TDragRegion(this, fReplicantTray);
+	fDragRegion->AddChild(fReplicantTray);
+	if (fTrayLocation != 0)
+		AddChild(fDragRegion);
 }
 
 
@@ -103,12 +108,6 @@ TBarView::AttachedToWindow()
 
 	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	SetFont(be_plain_font);
-
-	fReplicantTray = new TReplicantTray(this, fVertical);
-	fDragRegion = new TDragRegion(this, fReplicantTray);
-	fDragRegion->AddChild(fReplicantTray);
-	if (fTrayLocation != 0)
-		AddChild(fDragRegion);
 
 	UpdateAutoRaise();
 	UpdatePlacement();
@@ -575,6 +574,7 @@ TBarView::ShowingClock() const
 
 
 //	#pragma mark - Drag and Drop
+
 
 void
 TBarView::CacheDragData(const BMessage* incoming)
