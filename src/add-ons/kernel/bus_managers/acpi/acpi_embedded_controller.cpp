@@ -374,14 +374,8 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	}
 
 	// Enable runtime GPEs for the handler.
-	status = sc->ec_acpi_module->set_gpe(sc->ec_gpehandle, sc->ec_gpebit,
-		ACPI_GPE_ENABLE);
-	if (status != B_OK) {
-		TRACE("AcpiSetGpeType failed.\n");
-		goto error;
-	}
 	status = sc->ec_acpi_module->enable_gpe(sc->ec_gpehandle, sc->ec_gpebit,
-		ACPI_NOT_ISR);
+		ACPI_GPE_TYPE_RUNTIME);
 	if (status != B_OK) {
 		TRACE("AcpiEnableGpe failed.\n");
 		goto error;
@@ -507,9 +501,9 @@ EcGpeQueryHandler(void* context)
 	// interrupt source since we are edge-triggered.  To prevent the GPE
 	// that may arise from running the query from causing another query
 	// to be queued, we clear the pending flag only after running it.
-	status = EcCommand(sc, EC_COMMAND_QUERY);
+	acpi_status acpi_status = EcCommand(sc, EC_COMMAND_QUERY);
 	sc->ec_sci_pending = FALSE;
-	if (status != B_OK) {
+	if (acpi_status != AE_OK) {
 		EcUnlock(sc);
 		TRACE("GPE query failed.\n");
 		return;
@@ -606,15 +600,16 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 
 	/*
 	 * If booting, check if we need to run the query handler.  If so, we
-	 * we call it directly here since our thread taskq is not active yet.
+	 * we call it directly here as scheduling and dpc might not be up yet.
+	 * (Not sure if it's needed)
 	 */
-	/*
-	if (cold || rebooting || sc->ec_suspending) {
+
+	if (gKernelStartup || sc->ec_suspending) {
 		if ((EC_GET_CSR(sc) & EC_EVENT_SCI)) {
 			//CTR0(KTR_ACPI, "ec running gpe handler directly");
 			EcGpeQueryHandler(sc);
 		}
-	} */
+	}
 
 	// Serialize with EcGpeQueryHandler() at transaction granularity.
 	status = EcLock(sc);
@@ -854,7 +849,7 @@ EcWrite(struct acpi_ec_cookie* sc, uint8 address, uint8* writeData)
 	EC_SET_DATA(sc, address);
 	status = EcWaitEvent(sc, EC_EVENT_INPUT_BUFFER_EMPTY, generationCount);
 	if (status != AE_OK) {
-		TRACE("EcRead: failed waiting for sent address\n");
+		TRACE("EcWrite: failed waiting for sent address\n");
 		return status;
 	}
 
