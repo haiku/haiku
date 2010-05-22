@@ -105,8 +105,8 @@ TBarWindow::DispatchMessage(BMessage* message, BHandler* handler)
 		if (!((TBarApp*)be_app)->Settings()->autoRaise)
 			Activate(true);
 
-		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY))
-				== (B_CONTROL_KEY | B_COMMAND_KEY)) {
+		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
+				| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
 			// The window key was pressed - enter dragging code
 			fBarView->DragRegion()->MouseDown(
 				fBarView->DragRegion()->DragRegion().LeftTop());
