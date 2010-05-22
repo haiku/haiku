@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons video_mixer ;
+
+UsePrivateHeaders media shared ;
+
+Addon video_mixer.media_addon :
+	VideoMixerNode.cpp
+	VideoMixerNodeConsumer.cpp
+	VideoMixerNodeProducer.cpp
+	VideoMixerNodeEventLooper.cpp
+	VideoMixerAddOn.cpp
+	CpuCapabilities.cpp
+	BufferMixer.cpp
+	yuvrgb.nasm
+	: be media
+;
