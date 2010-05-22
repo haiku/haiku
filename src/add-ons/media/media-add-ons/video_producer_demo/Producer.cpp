@@ -131,6 +131,7 @@ VideoProducer::NodeRegistered()
 	BParameterGroup *main = web->MakeGroup(Name());
 	BDiscreteParameter *state = main->MakeDiscreteParameter(
 			P_COLOR, B_MEDIA_RAW_VIDEO, "Color", "Color");
+	state->AddItem(B_HOST_TO_LENDIAN_INT32(0xff000000), "Block");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x00ff0000), "Red");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x0000ff00), "Green");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x000000ff), "Blue");
@@ -258,6 +259,13 @@ VideoProducer::FormatSuggestionRequested(
 
 	TOUCH(quality);
 
+	if (fOutput.format.u.raw_video.display.line_width == 0)
+		fOutput.format.u.raw_video.display.line_width = 320;
+	if (fOutput.format.u.raw_video.display.line_count == 0)
+		fOutput.format.u.raw_video.display.line_count = 240;
+	if (fOutput.format.u.raw_video.field_rate == 0)
+		fOutput.format.u.raw_video.field_rate = 29.97f;
+
 	*format = fOutput.format;
 	return B_OK;
 }
@@ -276,8 +284,8 @@ VideoProducer::FormatProposal(const media_source &output, media_format *format)
 	err = format_is_compatible(*format, fOutput.format) ?
 			B_OK : B_MEDIA_BAD_FORMAT;
 	*format = fOutput.format;
-	return err;
-		
+
+	return err;		
 }
 
 status_t 
@@ -712,12 +720,26 @@ VideoProducer::FrameGenerator()
 		h->u.raw_video.first_active_line = 1;
 		h->u.raw_video.line_count = fConnectedFormat.display.line_count;
 
-		/* Fill in a pattern */
-		uint32 *p = (uint32 *)buffer->Data();
-		for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
-			for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
-				*(p++) = ((((x+y)^0^x)+fFrame) & 0xff) * (0x01010101 & fColor);
+		if (fColor == 0xff000000) {
+			// display a purple block
+			uint32 *p = (uint32 *)buffer->Data();
+			for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
+				for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++) {
+					if (x > 120 && x < 280 && y > 60 && y < 100) {
+						*(p++) = 0xffff00ff;
+					} else {
+						*(p++) = 0xff000000;
+					}
+				}
+		} else {
 
+			/* Fill in a pattern */
+			uint32 *p = (uint32 *)buffer->Data();
+			for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
+				for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
+					*(p++) = ((((x+y)^0^x)+fFrame) & 0xff) * (0x01010101 & fColor);
+		}
+		
 		/* Send the buffer on down to the consumer */
 		if (SendBuffer(buffer, fOutput.source, fOutput.destination) < B_OK) {
 			PRINTF(-1, ("FrameGenerator: Error sending buffer\n"));
