@@ -106,7 +106,7 @@ TBarWindow::DispatchMessage(BMessage* message, BHandler* handler)
 			Activate(true);
 
 		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY))
-				== B_CONTROL_KEY | B_COMMAND_KEY) {
+				== (B_CONTROL_KEY | B_COMMAND_KEY)) {
 			// The window key was pressed - enter dragging code
 			fBarView->DragRegion()->MouseDown(
 				fBarView->DragRegion()->DragRegion().LeftTop());
