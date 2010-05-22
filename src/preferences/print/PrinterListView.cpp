@@ -36,6 +36,8 @@ PrinterListView::PrinterListView(BRect frame)
 	fFolder(NULL),
 	fActivePrinter(NULL)
 {
+	fLayoutData.fLeftColumnMaximumWidth = 100;
+	fLayoutData.fRightColumnMaximumWidth = 100;
 }
 
 
@@ -65,8 +67,10 @@ PrinterListView::BuildPrinterList()
 	BEntry entry;
 	while(dir.GetNextEntry(&entry) == B_OK) {
 		BDirectory printer(&entry);
-		_AddPrinter(printer);
+		_AddPrinter(printer, false);
 	}
+	
+	_LayoutPrinterItems();
 }
 
 
@@ -147,7 +151,7 @@ PrinterListView::SelectedItem() const
 
 
 void
-PrinterListView::_AddPrinter(BDirectory& printer)
+PrinterListView::_AddPrinter(BDirectory& printer, bool calculateLayout)
 {
 	BString state;
 	node_ref node;
@@ -164,9 +168,35 @@ PrinterListView::_AddPrinter(BDirectory& printer)
 		if (info.GetType(buffer) == B_OK
 			&& strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
 				// Yes, it is a printer definition node
-			AddItem(new PrinterItem(dynamic_cast<PrintersWindow*>(Window()), printer));
+			AddItem(new PrinterItem(dynamic_cast<PrintersWindow*>(Window()), 
+				printer, fLayoutData));
+			if (calculateLayout)
+				_LayoutPrinterItems();
 		}
 	}
+}
+
+
+void
+PrinterListView::_LayoutPrinterItems()
+{
+	float& leftColumnMaximumWidth = fLayoutData.fLeftColumnMaximumWidth;
+	float& rightColumnMaximumWidth = fLayoutData.fRightColumnMaximumWidth;
+		
+	for (int32 i = 0; i < CountItems(); i ++) {	
+		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
+
+		float leftColumnWidth = 0;
+		float rightColumnWidth = 0;
+		item->GetColumnWidth(this, leftColumnWidth, rightColumnWidth);
+		
+		leftColumnMaximumWidth = MAX(leftColumnMaximumWidth, 
+			leftColumnWidth);
+		rightColumnMaximumWidth = MAX(rightColumnMaximumWidth, 
+			rightColumnWidth);
+	}
+	
+	Invalidate();
 }
 
 
@@ -187,7 +217,7 @@ void
 PrinterListView::_EntryCreated(node_ref* node, entry_ref* entry)
 {
 	BDirectory printer(node);
-	_AddPrinter(printer);
+	_AddPrinter(printer, true);
 }
 
 
@@ -209,7 +239,7 @@ void
 PrinterListView::_AttributeChanged(node_ref* node)
 {
 	BDirectory printer(node);
-	_AddPrinter(printer);
+	_AddPrinter(printer, true);
 }
 
 
@@ -222,10 +252,12 @@ BBitmap* PrinterItem::sIcon = NULL;
 BBitmap* PrinterItem::sSelectedIcon = NULL;
 
 
-PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
+PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node,
+		PrinterListLayoutData& layoutData)
 	: BListItem(0, false),
 	fFolder(NULL),
-	fNode(node)
+	fNode(node),
+	fLayoutData(layoutData)
 {
 	BRect rect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
 	if (sIcon == NULL) {
@@ -284,6 +316,21 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 PrinterItem::~PrinterItem()
 {
 	delete fFolder;
+}
+
+
+void
+PrinterItem::GetColumnWidth(BView* view, float& leftColumn, float& rightColumn)
+{
+	BFont font;
+	view->GetFont(&font);
+	
+	leftColumn = font.StringWidth(fName.String());
+	leftColumn = MAX(leftColumn, font.StringWidth(fDriverName.String()));
+	
+	rightColumn = font.StringWidth(fPendingJobs.String());
+	rightColumn = MAX(rightColumn, font.StringWidth(fTransport.String()));
+	rightColumn = MAX(rightColumn, font.StringWidth(fComments.String()));
 }
 
 
@@ -348,13 +395,24 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	owner->SetLowColor(oldLowColor);
 	owner->SetHighColor(oldHighColor);
 
-	float x = B_LARGE_ICON + 8.0;
+	float iconColumnWidth = B_LARGE_ICON + 8.0;
+	float x = iconColumnWidth;
 	BPoint iconPt(bounds.LeftTop() + BPoint(2.0, 2.0));
 	BPoint namePt(iconPt + BPoint(x, fntheight));
 	BPoint driverPt(iconPt + BPoint(x, fntheight * 2.0));
 	BPoint defaultPt(iconPt + BPoint(x, fntheight * 3.0));
 
-	float width = owner->StringWidth(B_TRANSLATE("No pending jobs."));
+	float totalWidth = bounds.Width() - iconColumnWidth;
+	float maximumWidth = fLayoutData.fLeftColumnMaximumWidth +
+		fLayoutData.fRightColumnMaximumWidth;
+	float width;
+	if (totalWidth < maximumWidth) {
+		width = fLayoutData.fRightColumnMaximumWidth * totalWidth /
+			maximumWidth;
+	} else {
+		width = fLayoutData.fRightColumnMaximumWidth;
+	}
+		
 	BPoint pendingPt(bounds.right - width - 8.0, namePt.y);
 	BPoint transportPt(bounds.right - width - 8.0, driverPt.y);
 	BPoint commentPt(bounds.right - width - 8.0, defaultPt.y);

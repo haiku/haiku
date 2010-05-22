@@ -25,6 +25,14 @@ class BBitmap;
 class PrintersWindow;
 
 
+struct PrinterListLayoutData
+{
+	float	fLeftColumnMaximumWidth;
+	float	fRightColumnMaximumWidth;
+};
+
+
+
 class PrinterListView : public BListView, public FolderListener {
 public:
 								PrinterListView(BRect frame);
@@ -39,11 +47,12 @@ public:
 
 			PrinterItem 		*ActivePrinter() const;
 			void 				SetActivePrinter(PrinterItem* item);
-
+			
 private:
 		typedef BListView Inherited;
 
-			void 				_AddPrinter(BDirectory &printer);
+			void 				_AddPrinter(BDirectory &printer, bool calculateLayout);
+			void				_LayoutPrinterItems();
 			PrinterItem			*_FindItem(node_ref* node) const;
 
 			void				_EntryCreated(node_ref *node,
@@ -53,15 +62,20 @@ private:
 
 			FolderWatcher 		*fFolder;
 			PrinterItem 		*fActivePrinter;
+			PrinterListLayoutData	fLayoutData;
 };
 
 
 class PrinterItem : public BListItem {
 public:
-								PrinterItem(PrintersWindow *window,
-									const BDirectory &node);
+								PrinterItem(PrintersWindow* window,
+									const BDirectory& node,
+									PrinterListLayoutData& layoutData);
 								~PrinterItem();
 
+			void				GetColumnWidth(BView* view, float& leftColumn, 
+									float& rightColumn);
+	
 			void				DrawItem(BView *owner, BRect bounds,
 									bool complete);
 			void				Update(BView *owner, const BFont *font);
@@ -87,6 +101,7 @@ private:
 			BString				fDriverName;
 			BString				fName;
 			BString				fPendingJobs;
+			PrinterListLayoutData& fLayoutData;
 
 	static	BBitmap 			*sIcon;
 	static	BBitmap 			*sSelectedIcon;
