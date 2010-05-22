@@ -32,7 +32,7 @@
 
 PrintersWindow::PrintersWindow(BRect frame)
 	:
-	Inherited(BRect(78, 71, 561, 409), B_TRANSLATE("Printers"),	B_TITLED_WINDOW,
+	Inherited(BRect(78, 71, 761, 509), B_TRANSLATE("Printers"),	B_TITLED_WINDOW,
 		0),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
