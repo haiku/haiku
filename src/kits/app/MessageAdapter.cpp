@@ -324,7 +324,7 @@ MessageAdapter::_R5FlattenedSize(const BMessage *from)
 #if 0
 		bool miniData = field->dataSize <= 255 && field->count <= 255;
 #else
-		// ToDo: we don't know the R5 dataSize yet (padding)
+		// TODO: we don't know the R5 dataSize yet (padding)
 		bool miniData = false;
 #endif
 
@@ -420,9 +420,9 @@ MessageAdapter::_FlattenR5Message(uint32 format, const BMessage *from,
 
 		if (field->count == 1)
 			flags |= R5_FIELD_FLAG_SINGLE_ITEM;
-		// ToDo: we don't really know the data size now (padding missing)
-		if (field->data_size <= 255 && field->count <= 255)
-			;//flags |= R5_FIELD_FLAG_MINI_DATA;
+		// TODO: we don't really know the data size now (padding missing)
+//		if (field->data_size <= 255 && field->count <= 255)
+//			flags |= R5_FIELD_FLAG_MINI_DATA;
 		if (field->flags & FIELD_FLAG_FIXED_SIZE)
 			flags |= R5_FIELD_FLAG_FIXED_SIZE;
 
