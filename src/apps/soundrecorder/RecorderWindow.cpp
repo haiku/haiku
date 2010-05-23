@@ -416,18 +416,18 @@ RecorderWindow::InitWindow()
 		//	Input selection lists all available physical inputs that produce
 		//	buffers with B_MEDIA_RAW_AUDIO format data.
 		popup = new BPopUpMenu("Input");
-		int max_input_count = 64;
-		dormant_node_info dni[max_input_count];
+		const int maxInputCount = 64;
+		dormant_node_info dni[maxInputCount];
 
-		int32 real_count = max_input_count;
+		int32 real_count = maxInputCount;
 		media_format output_format;
 		output_format.type = B_MEDIA_RAW_AUDIO;
 		output_format.u.raw_audio = media_raw_audio_format::wildcard;
 		error = fRoster->GetDormantNodes(dni, &real_count, 0, &output_format,
 			0, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
-		if (real_count > max_input_count) {
-			WINDOW((stderr, "dropped %ld inputs\n", real_count - max_input_count));
-			real_count = max_input_count;
+		if (real_count > maxInputCount) {
+			WINDOW((stderr, "dropped %ld inputs\n", real_count - maxInputCount));
+			real_count = maxInputCount;
 		}
 		char selected_name[B_MEDIA_NAME_LENGTH] = "Default input";
 		BMessage * msg;
