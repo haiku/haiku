@@ -7,6 +7,8 @@
 #define STACK_H
 
 
+#include <stdlib.h>
+
 #include <SupportDefs.h>
 
 
