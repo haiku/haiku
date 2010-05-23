@@ -447,7 +447,7 @@ OpenHashElementArray<Element>::Add(const Element &newElement)
 {
 	Element *element = Add();
 	if (element)
-		element.Adopt(newElement);
+		element->Adopt(newElement);
 	return element;
 }
 
