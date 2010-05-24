@@ -107,25 +107,29 @@ typedef uint32					perform_code;
 
 
 /* printf() format strings for some standard types */
-/* size_t */
-#define B_PRIuSIZE		B_PRIu32
-#define B_PRIoSIZE		B_PRIo32
-#define B_PRIxSIZE		B_PRIx32
-#define B_PRIXSIZE		B_PRIX32
-/* ssize_t */
-#define B_PRIdSSIZE		B_PRId32
-#define B_PRIiSSIZE		B_PRIi32
-/* addr_t */
+/* addr_t, size_t, ssize_t */
 #ifdef HAIKU_HOST_PLATFORM_64_BIT
 #	define B_PRIuADDR	B_PRIu64
 #	define B_PRIoADDR	B_PRIo64
 #	define B_PRIxADDR	B_PRIx64
 #	define B_PRIXADDR	B_PRIX64
+#	define B_PRIuSIZE	B_PRIu64
+#	define B_PRIoSIZE	B_PRIo64
+#	define B_PRIxSIZE	B_PRIx64
+#	define B_PRIXSIZE	B_PRIX64
+#	define B_PRIdSSIZE	B_PRId64
+#	define B_PRIiSSIZE	B_PRIi64
 #else
 #	define B_PRIuADDR	B_PRIu32
 #	define B_PRIoADDR	B_PRIo32
 #	define B_PRIxADDR	B_PRIx32
 #	define B_PRIXADDR	B_PRIX32
+#	define B_PRIuSIZE	B_PRIu32
+#	define B_PRIoSIZE	B_PRIo32
+#	define B_PRIxSIZE	B_PRIx32
+#	define B_PRIXSIZE	B_PRIX32
+#	define B_PRIdSSIZE	B_PRId32
+#	define B_PRIiSSIZE	B_PRIi32
 #endif
 /* phys_addr_t */
 #ifdef HAIKU_HOST_PLATFORM_64_BIT

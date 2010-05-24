@@ -15,16 +15,18 @@ typedef volatile int64_t	vint64_t;
 #ifdef HAIKU_HOST_PLATFORM_64_BIT
 typedef uint64_t	fssh_addr_t;
 typedef uint64_t	fssh_phys_addr_t;
+typedef uint64_t	fssh_size_t;
+typedef int64_t		fssh_ssize_t;
 #else
 typedef uint32_t	fssh_addr_t;
 typedef uint32_t	fssh_phys_addr_t;
+typedef uint32_t	fssh_size_t;
+typedef int32_t		fssh_ssize_t;
 #endif
 
 typedef int32_t		fssh_dev_t;
 typedef int64_t		fssh_ino_t;
 
-typedef uint32_t	fssh_size_t;
-typedef int32_t		fssh_ssize_t;
 typedef int64_t		fssh_off_t;
 
 typedef int64_t		fssh_bigtime_t;
@@ -95,25 +97,29 @@ typedef int32_t		fssh_pid_t;
 
 
 /* printf() format strings for some standard types */
-/* size_t */
-#define FSSH_B_PRIuSIZE		FSSH_B_PRIu32
-#define FSSH_B_PRIoSIZE		FSSH_B_PRIo32
-#define FSSH_B_PRIxSIZE		FSSH_B_PRIx32
-#define FSSH_B_PRIXSIZE		FSSH_B_PRIX32
-/* ssize_t */
-#define FSSH_B_PRIdSSIZE	FSSH_B_PRId32
-#define FSSH_B_PRIiSSIZE	FSSH_B_PRIi32
-/* addr_t */
+/* addr_t, size_t, ssize_t */
 #ifdef HAIKU_HOST_PLATFORM_64_BIT
 #	define FSSH_B_PRIuADDR	FSSH_B_PRIu64
 #	define FSSH_B_PRIoADDR	FSSH_B_PRIo64
 #	define FSSH_B_PRIxADDR	FSSH_B_PRIx64
 #	define FSSH_B_PRIXADDR	FSSH_B_PRIX64
+#	define FSSH_B_PRIuSIZE	FSSH_B_PRIu64
+#	define FSSH_B_PRIoSIZE	FSSH_B_PRIo64
+#	define FSSH_B_PRIxSIZE	FSSH_B_PRIx64
+#	define FSSH_B_PRIXSIZE	FSSH_B_PRIX64
+#	define FSSH_B_PRIdSSIZE	FSSH_B_PRId64
+#	define FSSH_B_PRIiSSIZE	FSSH_B_PRIi64
 #else
 #	define FSSH_B_PRIuADDR	FSSH_B_PRIu32
 #	define FSSH_B_PRIoADDR	FSSH_B_PRIo32
 #	define FSSH_B_PRIxADDR	FSSH_B_PRIx32
 #	define FSSH_B_PRIXADDR	FSSH_B_PRIX32
+#	define FSSH_B_PRIuSIZE	FSSH_B_PRIu32
+#	define FSSH_B_PRIoSIZE	FSSH_B_PRIo32
+#	define FSSH_B_PRIxSIZE	FSSH_B_PRIx32
+#	define FSSH_B_PRIXSIZE	FSSH_B_PRIX32
+#	define FSSH_B_PRIdSSIZE	FSSH_B_PRId32
+#	define FSSH_B_PRIiSSIZE	FSSH_B_PRIi32
 #endif
 /* phys_addr_t */
 #ifdef HAIKU_HOST_PLATFORM_64_BIT
@@ -142,8 +148,13 @@ typedef int32_t		fssh_pid_t;
 
 
 /* limits */
-#define FSSH_SIZE_MAX		UINT32_MAX
-#define	FSSH_SSIZE_MAX		INT32_MAX
+#ifdef HAIKU_HOST_PLATFORM_64_BIT
+#	define FSSH_SIZE_MAX		UINT64_MAX
+#	define FSSH_SSIZE_MAX		INT64_MAX
+#else
+#	define FSSH_SIZE_MAX		UINT32_MAX
+#	define FSSH_SSIZE_MAX		INT32_MAX
+#endif
 
 
 #endif	// _FSSH_TYPES_H
