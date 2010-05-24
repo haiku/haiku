@@ -1493,6 +1493,7 @@
 #define ulong			fssh_ulong
 
 #define addr_t			fssh_addr_t
+#define phys_addr_t		fssh_phys_addr_t
 
 #define dev_t			fssh_dev_t
 #define ino_t			fssh_ino_t

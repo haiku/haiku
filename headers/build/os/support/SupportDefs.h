@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
@@ -126,6 +126,18 @@ typedef uint32					perform_code;
 #	define B_PRIoADDR	B_PRIo32
 #	define B_PRIxADDR	B_PRIx32
 #	define B_PRIXADDR	B_PRIX32
+#endif
+/* phys_addr_t */
+#ifdef HAIKU_HOST_PLATFORM_64_BIT
+#	define B_PRIuPHYSADDR	B_PRIu64
+#	define B_PRIoPHYSADDR	B_PRIo64
+#	define B_PRIxPHYSADDR	B_PRIx64
+#	define B_PRIXPHYSADDR	B_PRIX64
+#else
+#	define B_PRIuPHYSADDR	B_PRIu32
+#	define B_PRIoPHYSADDR	B_PRIo32
+#	define B_PRIxPHYSADDR	B_PRIx32
+#	define B_PRIXPHYSADDR	B_PRIX32
 #endif
 /* off_t */
 #define B_PRIdOFF		B_PRId64

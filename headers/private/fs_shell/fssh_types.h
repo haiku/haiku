@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2010, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_TYPES_H
@@ -15,8 +15,10 @@ typedef volatile int64_t	vint64_t;
 
 #ifdef HAIKU_HOST_PLATFORM_64_BIT
 typedef uint64_t	fssh_addr_t;
+typedef uint64_t	fssh_phys_addr_t;
 #else
 typedef uint32_t	fssh_addr_t;
+typedef uint32_t	fssh_phys_addr_t;
 #endif
 
 typedef int32_t		fssh_dev_t;
@@ -113,6 +115,18 @@ typedef int32_t		fssh_pid_t;
 #	define FSSH_B_PRIoADDR	FSSH_B_PRIo32
 #	define FSSH_B_PRIxADDR	FSSH_B_PRIx32
 #	define FSSH_B_PRIXADDR	FSSH_B_PRIX32
+#endif
+/* phys_addr_t */
+#ifdef HAIKU_HOST_PLATFORM_64_BIT
+#	define FSSH_B_PRIuPHYSADDR	FSSH_B_PRIu64
+#	define FSSH_B_PRIoPHYSADDR	FSSH_B_PRIo64
+#	define FSSH_B_PRIxPHYSADDR	FSSH_B_PRIx64
+#	define FSSH_B_PRIXPHYSADDR	FSSH_B_PRIX64
+#else
+#	define FSSH_B_PRIuPHYSADDR	FSSH_B_PRIu32
+#	define FSSH_B_PRIoPHYSADDR	FSSH_B_PRIo32
+#	define FSSH_B_PRIxPHYSADDR	FSSH_B_PRIx32
+#	define FSSH_B_PRIXPHYSADDR	FSSH_B_PRIX32
 #endif
 /* off_t */
 #define FSSH_B_PRIdOFF		FSSH_B_PRId64

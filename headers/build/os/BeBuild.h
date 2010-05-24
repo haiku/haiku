@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BE_BUILD_H
@@ -44,8 +44,19 @@
 #endif
 
 
+#define B_HAIKU_BITS					__HAIKU_ARCH_BITS
+#define B_HAIKU_PHYSICAL_BITS			__HAIKU_ARCH_PHYSICAL_BITS
+
 #ifdef __HAIKU_ARCH_64_BIT
 #	define B_HAIKU_64_BIT				1
+#else
+#	define B_HAIKU_32_BIT				1
+#endif
+
+#ifdef __HAIKU_ARCH_PHYSICAL_64_BIT
+#	define B_HAIKU_PHYSICAL_64_BIT		1
+#else
+#	define B_HAIKU_PHYSICAL_32_BIT		1
 #endif
 
 #ifdef __HAIKU_BEOS_COMPATIBLE

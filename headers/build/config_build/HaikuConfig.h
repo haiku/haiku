@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CONFIG_HAIKU_CONFIG_H
@@ -8,18 +8,22 @@
 
 /* Determine the architecture and define macros for some fundamental
    properties:
-   __HAIKU_ARCH			- short name of the architecture (used in paths)
-   __HAIKU_ARCH_<arch>	- defined to 1 for the respective architecture
-   __HAIKU_ARCH_64_BIT	- defined to 1 on 64 bit architectures
-   __HAIKU_BIG_ENDIAN	- defined to 1 on big endian architectures
+   __HAIKU_ARCH					- short name of the architecture (used in paths)
+   __HAIKU_ARCH_<arch>			- defined to 1 for the respective architecture
+   __HAIKU_ARCH_BITS			- defined to 32/64 on 32/64 bit architectures
+   								  (defaults to 32)
+   __HAIKU_ARCH_PHYSICAL_BITS	- defined to 32/64 on architectures with 32/64
+   								  (defaults to __HAIKU_ARCH_BITS)
+   __HAIKU_BIG_ENDIAN			- defined to 1 on big endian architectures
+   								  (defaults to undefined)
 */
 #ifdef __INTEL__
-#	define __HAIKU_ARCH			x86
-#	define __HAIKU_ARCH_X86		1
+#	define __HAIKU_ARCH				x86
+#	define __HAIKU_ARCH_X86			1
 #elif __x86_64__
-#	define __HAIKU_ARCH			x86_64
-#	define __HAIKU_ARCH_X86_64	1
-#	define __HAIKU_ARCH_64_BIT	1
+#	define __HAIKU_ARCH				x86_64
+#	define __HAIKU_ARCH_X86_64		1
+#	define __HAIKU_ARCH_BITS		64
 #elif __POWERPC__
 #	define __HAIKU_ARCH				ppc
 #	define __HAIKU_ARCH_PPC			1
@@ -38,10 +42,43 @@
 #	error Unsupported architecture!
 #endif
 
-/* implied properties */
-#ifndef __HAIKU_ARCH_64_BIT
-#	define	__HAIKU_ARCH_32_BIT		1
+/* implied properties:
+   __HAIKU_ARCH_{32,64}_BIT		- defined to 1 on 32/64 bit architectures, i.e.
+   								  using 32/64 bit virtual addresses
+   __HAIKU_ARCH_PHYSICAL_BITS	- defined to 32/64 on architectures with 32/64
+   								  bit physical addresses
+   __HAIKU_ARCH_PHYSICAL_{32,64}_BIT - defined to 1 on architectures using 64
+   								  bit physical addresses
+   __HAIKU_BIG_ENDIAN			- defined to 1 on big endian architectures
+*/
+
+/* bitness */
+#ifndef __HAIKU_ARCH_BITS
+#	define __HAIKU_ARCH_BITS		32
 #endif
+
+#if __HAIKU_ARCH_BITS == 32
+#	define __HAIKU_ARCH_32_BIT		1
+#elif __HAIKU_ARCH_BITS == 64
+#	define __HAIKU_ARCH_64_BIT		1
+#else
+#	error Unsupported bitness!
+#endif
+
+/* physical bitness */
+#ifndef __HAIKU_ARCH_PHYSICAL_BITS
+#	define __HAIKU_ARCH_PHYSICAL_BITS	__HAIKU_ARCH_BITS
+#endif
+
+#if __HAIKU_ARCH_PHYSICAL_BITS == 32
+#	define __HAIKU_ARCH_PHYSICAL_32_BIT	1
+#elif __HAIKU_ARCH_PHYSICAL_BITS == 64
+#	define __HAIKU_ARCH_PHYSICAL_64_BIT	1
+#else
+#	error Unsupported physical bitness!
+#endif
+
+/* endianess */
 #ifndef __HAIKU_BIG_ENDIAN
 #	define	__HAIKU_LITTLE_ENDIAN	1
 #endif
@@ -50,5 +87,6 @@
 #define __HAIKU_ARCH_HEADER(header)					<arch/__HAIKU_ARCH/header>
 #define __HAIKU_SUBDIR_ARCH_HEADER(subdir, header)	\
 	<subdir/arch/__HAIKU_ARCH/header>
+
 
 #endif	/* _CONFIG_HAIKU_CONFIG_H */
