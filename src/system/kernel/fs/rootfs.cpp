@@ -805,7 +805,7 @@ rootfs_rewind_dir(fs_volume* _volume, fs_vnode* _vnode, void* _cookie)
 
 
 static status_t
-rootfs_ioctl(fs_volume* _volume, fs_vnode* _v, void* _cookie, ulong op,
+rootfs_ioctl(fs_volume* _volume, fs_vnode* _v, void* _cookie, uint32 op,
 	void* buffer, size_t length)
 {
 	TRACE(("rootfs_ioctl: vnode %p, cookie %p, op %d, buf %p, length %d\n",

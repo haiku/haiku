@@ -1490,8 +1490,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_types.h
 
-#define ulong			fssh_ulong
-
 #define addr_t			fssh_addr_t
 #define phys_addr_t		fssh_phys_addr_t
 

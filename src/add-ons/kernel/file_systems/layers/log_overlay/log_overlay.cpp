@@ -200,7 +200,7 @@ overlay_get_file_map(fs_volume *volume, fs_vnode *vnode, off_t offset,
 
 
 static status_t
-overlay_ioctl(fs_volume *volume, fs_vnode *vnode, void *cookie, ulong op,
+overlay_ioctl(fs_volume *volume, fs_vnode *vnode, void *cookie, uint32 op,
 	void *buffer, size_t length)
 {
 	DO_LOG("ioctl cookie: %p; op: %lu; buffer: %p; size: %lu\n", cookie, op,

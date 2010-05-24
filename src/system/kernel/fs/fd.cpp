@@ -506,7 +506,7 @@ dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
 
 
 static status_t
-fd_ioctl(bool kernelFD, int fd, ulong op, void* buffer, size_t length)
+fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 {
 	struct file_descriptor* descriptor;
 	int status;
@@ -842,7 +842,7 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 
 
 status_t
-user_fd_kernel_ioctl(int fd, ulong op, void* buffer, size_t length)
+user_fd_kernel_ioctl(int fd, uint32 op, void* buffer, size_t length)
 {
 	TRACE(("user_fd_kernel_ioctl: fd %d\n", fd));
 
@@ -905,7 +905,7 @@ _user_seek(int fd, off_t pos, int seekType)
 
 
 status_t
-_user_ioctl(int fd, ulong op, void* buffer, size_t length)
+_user_ioctl(int fd, uint32 op, void* buffer, size_t length)
 {
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
@@ -1228,7 +1228,7 @@ _kern_seek(int fd, off_t pos, int seekType)
 
 
 status_t
-_kern_ioctl(int fd, ulong op, void* buffer, size_t length)
+_kern_ioctl(int fd, uint32 op, void* buffer, size_t length)
 {
 	TRACE(("kern_ioctl: fd %d\n", fd));
 

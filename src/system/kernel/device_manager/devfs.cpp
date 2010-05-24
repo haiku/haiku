@@ -1472,7 +1472,7 @@ devfs_rewind_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 	specific functionality, like partitions.
 */
 static status_t
-devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
+devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, uint32 op,
 	void *buffer, size_t length)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;

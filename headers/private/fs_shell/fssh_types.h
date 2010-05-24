@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_TYPES_H
@@ -9,7 +9,6 @@
 #include <inttypes.h>
 
 
-typedef uint32_t			fssh_ulong;
 typedef volatile int32_t	vint32_t;
 typedef volatile int64_t	vint64_t;
 

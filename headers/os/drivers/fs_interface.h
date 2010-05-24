@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_INTERFACE_H
@@ -142,7 +142,7 @@ struct fs_vnode_ops {
 
 	/* common operations */
 	status_t (*ioctl)(fs_volume* volume, fs_vnode* vnode, void* cookie,
-				ulong op, void* buffer, size_t length);
+				uint32 op, void* buffer, size_t length);
 	status_t (*set_flags)(fs_volume* volume, fs_vnode* vnode, void* cookie,
 				int flags);
 	status_t (*select)(fs_volume* volume, fs_vnode* vnode, void* cookie,

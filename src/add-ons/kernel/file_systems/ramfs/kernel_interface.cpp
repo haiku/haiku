@@ -277,7 +277,7 @@ FUNCTION(("node: %Ld\n", ((Node*)_node)->GetID()));
 
 // ramfs_ioctl
 static status_t
-ramfs_ioctl(fs_volume fs, fs_vnode /*node*/, fs_cookie /*cookie*/, ulong cmd,
+ramfs_ioctl(fs_volume fs, fs_vnode /*node*/, fs_cookie /*cookie*/, uint32 cmd,
 	void *buffer, size_t /*length*/)
 
 {

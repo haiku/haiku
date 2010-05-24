@@ -320,7 +320,7 @@ static status_t query_rewind(struct file_descriptor* descriptor);
 static void query_free_fd(struct file_descriptor* descriptor);
 static status_t query_close(struct file_descriptor* descriptor);
 
-static status_t common_ioctl(struct file_descriptor* descriptor, ulong op,
+static status_t common_ioctl(struct file_descriptor* descriptor, uint32 op,
 	void* buffer, size_t length);
 static status_t common_read_stat(struct file_descriptor* descriptor,
 	struct stat* statData);
@@ -5827,7 +5827,7 @@ dir_remove(int fd, char* path, bool kernel)
 
 
 static status_t
-common_ioctl(struct file_descriptor* descriptor, ulong op, void* buffer,
+common_ioctl(struct file_descriptor* descriptor, uint32 op, void* buffer,
 	size_t length)
 {
 	struct vnode* vnode = descriptor->u.vnode;

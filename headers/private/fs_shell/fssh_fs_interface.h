@@ -157,7 +157,7 @@ struct fssh_fs_vnode_ops {
 
 	/* common operations */
 	fssh_status_t (*ioctl)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
-				fssh_fs_cookie cookie, fssh_ulong op, void *buffer,
+				fssh_fs_cookie cookie, uint32_t op, void *buffer,
 				fssh_size_t length);
 	fssh_status_t (*set_flags)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
 				fssh_fs_cookie cookie, int flags);

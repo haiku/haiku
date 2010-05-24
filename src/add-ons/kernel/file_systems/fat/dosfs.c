@@ -1138,7 +1138,7 @@ bi:	UNLOCK_VOL(vol);
 
 
 static status_t
-dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
+dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 	void *buf, size_t len)
 {
 	status_t result = B_OK;

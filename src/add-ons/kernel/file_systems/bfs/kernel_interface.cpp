@@ -610,7 +610,7 @@ bfs_get_vnode_name(fs_volume* _volume, fs_vnode* _node, char* buffer,
 
 
 static status_t
-bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, ulong cmd,
+bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 	void* buffer, size_t bufferLength)
 {
 	FUNCTION_START(("node = %p, cmd = %lu, buf = %p, len = %ld\n", _node, cmd,

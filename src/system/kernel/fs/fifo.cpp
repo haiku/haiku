@@ -891,7 +891,7 @@ fifo_write_stat(fs_volume *volume, fs_vnode *vnode, const struct ::stat *st,
 
 
 static status_t
-fifo_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
+fifo_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, uint32 op,
 	void *buffer, size_t length)
 {
 	TRACE(("fifo_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",

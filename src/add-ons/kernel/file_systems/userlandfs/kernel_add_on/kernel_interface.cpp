@@ -287,7 +287,7 @@ userlandfs_cancel_io(fs_volume* fsVolume, fs_vnode* fsNode, void *cookie,
 
 // userlandfs_ioctl
 static status_t
-userlandfs_ioctl(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, ulong op,
+userlandfs_ioctl(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, uint32 op,
 	void* buffer, size_t length)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;

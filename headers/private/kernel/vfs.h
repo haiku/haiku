@@ -232,7 +232,7 @@ ssize_t		_user_readv(int fd, off_t pos, const iovec *vecs, size_t count);
 ssize_t		_user_write(int fd, off_t pos, const void *buffer,
 				size_t bufferSize);
 ssize_t		_user_writev(int fd, off_t pos, const iovec *vecs, size_t count);
-status_t	_user_ioctl(int fd, ulong cmd, void *data, size_t length);
+status_t	_user_ioctl(int fd, uint32 cmd, void *data, size_t length);
 ssize_t		_user_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 				uint32 maxCount);
 status_t	_user_rewind_dir(int fd);
