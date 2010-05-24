@@ -1770,7 +1770,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 		//	a) also use this direct I/O for writes (otherwise, it would
 		//	   overwrite precious data)
 		//	b) panic if the term below is true (at least for writes)
-		if (size > fileVecs[0].length) {
+		if ((uint64_t)size > (uint64_t)fileVecs[0].length) {
 			//dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
 			size = fileVecs[0].length;
 		}
@@ -1782,7 +1782,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 			return FSSH_B_OK;
 
 		// if we reached the end of the file, we can return as well
-		if (size != fileVecs[0].length) {
+		if ((uint64_t)size != (uint64_t)fileVecs[0].length) {
 			*_numBytes = size;
 			return FSSH_B_OK;
 		}
@@ -1811,7 +1811,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 	for (; fileVecIndex < fileVecCount; fileVecIndex++) {
 		const fssh_file_io_vec &fileVec = fileVecs[fileVecIndex];
 		fssh_off_t fileOffset = fileVec.offset;
-		fssh_off_t fileLeft = fssh_min_c(fileVec.length, bytesLeft);
+		fssh_off_t fileLeft = fssh_min_c((uint64_t)fileVec.length, (uint64_t)bytesLeft);
 
 		TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
 
@@ -1825,7 +1825,7 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 			size = 0;
 
 			// assign what is left of the current fileVec to the tempVecs
-			for (size = 0; size < fileLeft && vecIndex < vecCount
+			for (size = 0; (uint64_t)size < (uint64_t)fileLeft && vecIndex < vecCount
 					&& tempCount < MAX_TEMP_IO_VECS;) {
 				// try to satisfy one iovec per iteration (or as much as
 				// possible)

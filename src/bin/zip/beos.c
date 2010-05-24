@@ -478,7 +478,7 @@ int get_attr_dir( const char *name, char **attr_buff, off_t *total_size )
                 char buff[80];
 
                 sprintf( buff, "read %ld, expected %ld",
-                         (ssize_t)read_bytes, (ssize_t)fa_info.size );
+                         (long)read_bytes, (long)fa_info.size );
                 zipwarn( "attribute size mismatch: ", buff );
             }
 

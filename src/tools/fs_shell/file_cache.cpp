@@ -164,7 +164,7 @@ cache_io(void *_cacheRef, void *cookie, fssh_off_t offset, fssh_addr_t buffer,
 	fssh_size_t size = *_size;
 	offset -= pageOffset;
 
-	if (offset + pageOffset + size > fileSize) {
+	if ((uint64_t)offset + pageOffset + size > (uint64_t)fileSize) {
 		// adapt size to be within the file's offsets
 		size = fileSize - pageOffset - offset;
 		*_size = size;

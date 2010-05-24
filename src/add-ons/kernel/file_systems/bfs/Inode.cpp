@@ -786,7 +786,7 @@ Inode::_AddSmallData(Transaction& transaction, NodeGetter& nodeGetter,
 
 			item->type = HOST_ENDIAN_TO_BFS_INT32(type);
 
-			if (oldDataSize < pos) {
+			if ((uint64)oldDataSize < (uint64)pos) {
 				// Fill gap with zeros
 				memset(item->Data() + oldDataSize, 0, pos - oldDataSize);
 			}
@@ -1199,7 +1199,7 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 		// Update index. Note, Index::Update() may be called even if
 		// initializing the index failed - it will just update the live
 		// queries in this case
-		if (pos < length || pos < oldLength) {
+		if (pos < length || (uint64)pos < (uint64)oldLength) {
 			index.Update(transaction, name, type, oldData, oldLength, buffer,
 				length, this);
 		}
@@ -1555,7 +1555,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	// TODO: support INODE_LOGGED!
 
 	size_t length = *_length;
-	bool changeSize = pos + length > Size();
+	bool changeSize = (uint64)pos + (uint64)length > (uint64)Size();
 
 	// set/check boundaries for pos/length
 	if (pos < 0)
@@ -1571,7 +1571,8 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 
 	// Work around possible race condition: Someone might have shrunken the file
 	// while we had no lock.
-	if (!transaction.IsStarted() && pos + length > Size()) {
+	if (!transaction.IsStarted()
+		&& (uint64)pos + (uint64)length > (uint64)Size()) {
 		writeLocker.Unlock();
 		transaction.Start(fVolume, BlockNumber());
 		writeLocker.Lock();
@@ -1579,7 +1580,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 
 	off_t oldSize = Size();
 
-	if (pos + length > oldSize) {
+	if ((uint64)pos + (uint64)length > (uint64)oldSize) {
 		// let's grow the data stream to the size needed
 		status_t status = SetFileSize(transaction, pos + length);
 		if (status != B_OK) {

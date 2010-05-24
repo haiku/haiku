@@ -363,14 +363,14 @@ FileMap::Translate(fssh_off_t offset, fssh_size_t size, fssh_file_io_vec* vecs,
 	fssh_size_t maxVecs = *_count;
 	fssh_size_t padLastVec = 0;
 
-	if (offset >= Size()) {
+	if ((uint64_t)offset >= (uint64_t)Size()) {
 		*_count = 0;
 		return FSSH_B_OK;
 	}
-	if (offset + size > fSize) {
+	if ((uint64_t)offset + size > (uint64_t)fSize) {
 		if (align > 1) {
 			fssh_off_t alignedSize = (fSize + align - 1) & ~(fssh_off_t)(align - 1);
-			if (offset + size >= alignedSize)
+			if ((uint64_t)offset + size >= (uint64_t)alignedSize)
 				padLastVec = alignedSize - fSize;
 		}
 		size = fSize - offset;
@@ -393,7 +393,7 @@ FileMap::Translate(fssh_off_t offset, fssh_size_t size, fssh_file_io_vec* vecs,
 	vecs[0].offset = fileExtent->disk.offset + offset;
 	vecs[0].length = fileExtent->disk.length - offset;
 
-	if (vecs[0].length >= size) {
+	if ((uint64_t)vecs[0].length >= (uint64_t)size) {
 		vecs[0].length = size + padLastVec;
 		*_count = 1;
 		return FSSH_B_OK;
@@ -409,7 +409,7 @@ FileMap::Translate(fssh_off_t offset, fssh_size_t size, fssh_file_io_vec* vecs,
 
 		vecs[vecIndex++] = fileExtent->disk;
 
-		if (size <= fileExtent->disk.length) {
+		if ((uint64_t)size <= (uint64_t)fileExtent->disk.length) {
 			vecs[vecIndex - 1].length = size + padLastVec;
 			break;
 		}

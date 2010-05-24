@@ -88,7 +88,7 @@ iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
 {
 	Inode* inode = (Inode*)cookie;
 
-	return file_map_translate(inode->Map(), offset, size, vecs, _count, 
+	return file_map_translate(inode->Map(), offset, size, vecs, _count,
 		inode->GetVolume()->BlockSize());
 }
 
@@ -410,7 +410,7 @@ bfs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	while (true) {
 		file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
 			&fileVecCount, 0);
@@ -455,7 +455,7 @@ bfs_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	while (true) {
 		file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 
 		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
 			&fileVecCount, 0);
@@ -529,9 +529,11 @@ bfs_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset, size_t size,
 		vecs[index].length = (run.Length() << blockShift) - offset + fileOffset;
 
 		// are we already done?
-		if (size <= vecs[index].length
-			|| offset + vecs[index].length >= inode->Size()) {
-			if (offset + vecs[index].length > inode->Size()) {
+		if ((uint64)size <= (uint64)vecs[index].length
+			|| (uint64)offset + (uint64)vecs[index].length
+				>= (uint64)inode->Size()) {
+			if ((uint64)offset + (uint64)vecs[index].length
+					> (uint64)inode->Size()) {
 				// make sure the extent ends with the last official file
 				// block (without taking any preallocations into account)
 				vecs[index].length = round_up(inode->Size() - offset,
@@ -1479,7 +1481,7 @@ bfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if ((inode->Flags() & INODE_LONG_SYMLINK) != 0) {
-		if (inode->Size() < *_bufferSize)
+		if ((uint64)inode->Size() < (uint64)*_bufferSize)
 			*_bufferSize = inode->Size();
 
 		status_t status = inode->ReadAt(0, (uint8*)buffer, _bufferSize);
