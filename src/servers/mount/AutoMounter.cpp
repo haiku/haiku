@@ -1,7 +1,8 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "AutoMounter.h"
 
@@ -12,6 +13,7 @@
 
 #include <Alert.h>
 #include <AutoLocker.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <DiskDevice.h>
@@ -22,6 +24,7 @@
 #include <FindDirectory.h>
 #include <fs_info.h>
 #include <fs_volume.h>
+#include <Locale.h>
 #include <Message.h>
 #include <Node.h>
 #include <NodeMonitor.h>
@@ -32,6 +35,10 @@
 
 //#include "AutoMounterSettings.h"
 #include "MountServer.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AutoMounter"
 
 
 static const char* kMountServerSettings = "mount_server";
@@ -163,7 +170,8 @@ AutoMounter::MessageReceived(BMessage* message)
 
 					const char *newName;
 					if (message->FindString("name", &newName) != B_OK) {
-						WRITELOG(("ERROR: Couldn't find name field in update message"));
+						WRITELOG(("ERROR: Couldn't find name field in update "
+							"message"));
 						PRINT_OBJECT(*message);
 						break ;
 					}
@@ -182,16 +190,17 @@ AutoMounter::MessageReceived(BMessage* message)
 					//
 					dev_t parentDevice;
 					if (message->FindInt32("device", &parentDevice) != B_OK) {
-						WRITELOG(("ERROR: Couldn't find 'device' field in update"
-							" message"));
+						WRITELOG(("ERROR: Couldn't find 'device' field in "
+							"update message"));
 						PRINT_OBJECT(*message);
 						break;
 					}
 
 					ino_t toDirectory;
-					if (message->FindInt64("to directory", &toDirectory)!=B_OK){
-						WRITELOG(("ERROR: Couldn't find 'to directory' field in update"
-						  "message"));
+					if (message->FindInt64("to directory", &toDirectory)
+						!= B_OK) {
+						WRITELOG(("ERROR: Couldn't find 'to directory' field "
+							"in update message"));
 						PRINT_OBJECT(*message);
 						break;
 					}
@@ -200,19 +209,20 @@ AutoMounter::MessageReceived(BMessage* message)
 
 					BNode entryNode(&root_entry);
 					if (entryNode.InitCheck() != B_OK) {
-						WRITELOG(("ERROR: Couldn't create mount point entry node: %s/n",
-							strerror(entryNode.InitCheck())));
+						WRITELOG(("ERROR: Couldn't create mount point entry "
+							"node: %s/n", strerror(entryNode.InitCheck())));
 						break;
 					}
 
 					node_ref mountPointNode;
 					if (entryNode.GetNodeRef(&mountPointNode) != B_OK) {
-						WRITELOG(("ERROR: Couldn't get node ref for new mount point"));
+						WRITELOG(("ERROR: Couldn't get node ref for new mount "
+							"point"));
 						break;
 					}
 
-					WRITELOG(("Attempt to rename device %li to %s", mountPointNode.device,
-						newName));
+					WRITELOG(("Attempt to rename device %li to %s",
+						mountPointNode.device, newName));
 
 					Partition *partition = FindPartition(mountPointNode.device);
 					if (partition != NULL) {
@@ -227,8 +237,8 @@ AutoMounter::MessageReceived(BMessage* message)
 						partition->SetVolumeName(newName);
 						break;
 					} else {
-						WRITELOG(("ERROR: Device %li does not appear to be present",
-							mountPointNode.device));
+						WRITELOG(("ERROR: Device %li does not appear to be "
+							"present", mountPointNode.device));
 					}
 				}
 			}
@@ -247,8 +257,8 @@ bool
 AutoMounter::QuitRequested()
 {
 	if (!BootedInSafeMode()) {
-		// don't write out settings in safe mode - this would overwrite the
-		// normal, non-safe mode settings
+		// Don't write out settings in safe mode - this would overwrite the
+		// normal, non-safe mode settings.
 		_WriteSettings();
 	}
 
@@ -328,9 +338,9 @@ AutoMounter::_ScriptReceived(BMessage *message, int32 index,
 	switch (message->what) {
 		case B_EXECUTE_PROPERTY:
 			if (strcmp("InitialScan", property) == 0) {
-printf("performing initial scan.\n");
 				_MountVolumes(fNormalMode, fRemovableMode, true);
-				err = reply.AddString("result", "Previous volumes mounted.");
+				err = reply.AddString("result",
+					B_TRANSLATE("Previous volumes mounted."));
 			}
 			break;
 	}
@@ -378,24 +388,30 @@ suggest_mount_flags(const BPartition* partition, uint32* _flags)
 	if (askReadOnly) {
 		// Suggest to the user to mount read-only until Haiku is more mature.
 		BString string;
-		string << "Mounting volume ";
-		if (partition->ContentName() != NULL)
-			string << "'" << partition->ContentName() << "'\n\n";
-		else
-			string << "<unnamed volume>\n\n";
+		if (partition->ContentName() != NULL) {
+			char buffer[512];
+			snprintf(buffer, sizeof(buffer),
+				B_TRANSLATE("Mounting volume '%s'\n\n"),
+				partition->ContentName());
+			string << buffer;
+		} else
+			string << B_TRANSLATE("Mounting volume <unnamed volume>\n\n");
+
 		// TODO: Use distro name instead of "Haiku"...
 		if (!isBFS) {
-			string << "The file system on this volume is not the Haiku file "
-				"system. It is strongly suggested to mount it in read-only "
-				"mode. ";
+			string << B_TRANSLATE("The file system on this volume is not the "
+				"Haiku file system. It is strongly suggested to mount it in "
+				"read-only mode. This will prevent unintentional data loss "
+				"because of errors in Haiku.");
 		} else {
-			string << "It is suggested to mount all additional Haiku volumes "
-				"in read-only mode. ";
+			string << B_TRANSLATE("It is suggested to mount all additional "
+				"Haiku volumes in read-only mode. This will prevent "
+				"unintentional data loss because of errors in Haiku.");
 		}
-		string << "This will prevent unintentional data loss because of "
-			"errors in Haiku.";
-		BAlert* alert = new BAlert("Mount warning", string.String(),
-			"Mount read/write", "Cancel", "Mount read-only",
+
+		BAlert* alert = new BAlert(B_TRANSLATE("Mount warning"), 
+			string.String(), B_TRANSLATE("Mount read/write"), 
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Mount read-only"),
 			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
 		int32 choice = alert->Go();
@@ -546,9 +562,11 @@ AutoMounter::_MountVolume(const BMessage* message)
 
 	status_t status = partition->Mount(NULL, mountFlags);
 	if (status < B_OK) {
-		BString string;
-		string << "Error mounting volume. (" << strerror(status) << ")";
-			(new BAlert("", string.String(), "OK"))->Go(NULL);
+		char text[512];
+		snprintf(text, sizeof(text),
+			B_TRANSLATE("Error mounting volume:\n\n%s"), strerror(status));
+		(new BAlert(B_TRANSLATE("Mount error"), text,
+			B_TRANSLATE("OK")))->Go(NULL);
 	}
 }
 
@@ -556,15 +574,17 @@ AutoMounter::_MountVolume(const BMessage* message)
 bool
 AutoMounter::_SuggestForceUnmount(const char* name, status_t error)
 {
-	BString text;
-	text << "Could not unmount disk \"" << name << "\":\n\t";
-	text << strerror(error);
-	text << "\n\nShould unmounting be forced?\n\n"
-		"Note: If an application is currently writing to the volume, "
-		"unmounting it now might result in loss of data.\n";
+	char text[1024];
+	snprintf(text, sizeof(text),
+		B_TRANSLATE("Could not unmount disk \"%s\":\n\t%s\n\n"
+			"Should unmounting be forced?\n\n"
+			"Note: If an application is currently writing to the volume, "
+			"unmounting it now might result in loss of data.\n"),
+		name, strerror(error));
 
-	BAlert* alert = new BAlert("", text.String(), "Cancel", "Force unmount",
-		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	BAlert* alert = new BAlert(B_TRANSLATE("Force unmount"), text,
+		B_TRANSLATE("Cancel"), B_TRANSLATE("Force unmount"), NULL,
+		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	alert->SetShortcut(0, B_ESCAPE);
 	int32 choice = alert->Go();
 
@@ -575,12 +595,12 @@ AutoMounter::_SuggestForceUnmount(const char* name, status_t error)
 void
 AutoMounter::_ReportUnmountError(const char* name, status_t error)
 {
-	BString text;
-	text << "Could not unmount disk \"" << name << "\":\n\t";
-	text << strerror(error);
+	char text[512];
+	snprintf(text, sizeof(text), B_TRANSLATE("Could not unmount disk "
+		"\"%s\":\n\t%s"), name, strerror(error));
 
-	(new BAlert("", text.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL,
-		B_WARNING_ALERT))->Go(NULL);
+	(new BAlert(B_TRANSLATE("Unmount error"), text, B_TRANSLATE("OK"),
+		NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 }
 
 
@@ -903,7 +923,11 @@ AutoMounter::_GetSettings(BMessage *message)
 int
 main(int argc, char* argv[])
 {
+	BCatalog appCatalog;
 	AutoMounter app;
+
+	be_locale->GetAppCatalog(&appCatalog);
+
 	app.Run();
 	return 0;
 }

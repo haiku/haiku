@@ -7,8 +7,14 @@ Server mount_server
  	AutoMounter.cpp
 # 	AutoMounterSettings.cpp
 	:
-	libbe.so
+	libbe.so liblocale.so
 	$(TARGET_LIBSTDC++)
 	:
 	mount_server.rdef
+;
+
+DoCatalogs mount_server :
+	x-vnd.Haiku-mount_server
+	:
+	AutoMounter.cpp
 ;
