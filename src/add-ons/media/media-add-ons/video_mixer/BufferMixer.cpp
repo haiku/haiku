@@ -62,7 +62,7 @@ BufferMixer::Merge(BBuffer *input, BBuffer *output) {
 		c1    = *source++;
 		c2    = *source++;
 		c3    = *source++;
-		alpha = 128; source++;
+		alpha = *source++;
 		*destination++ = ALPHABLEND(c1, *destination, alpha);
 		*destination++ = ALPHABLEND(c2, *destination, alpha);
 		*destination++ = ALPHABLEND(c3, *destination, alpha);

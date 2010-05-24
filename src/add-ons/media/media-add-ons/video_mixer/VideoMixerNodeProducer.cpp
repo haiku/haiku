@@ -113,6 +113,7 @@ status_t VideoMixerNode::DisposeOutputCookie(int32 cookie)
 {
 	fprintf(stderr,"VideoMixerNode(BBufferProducer)::DisposeOutputCookie\n");
 	// nothing to do since our cookies are part of the vector iterator
+	return B_OK;
 }
 
 status_t VideoMixerNode::SetBufferGroup(
