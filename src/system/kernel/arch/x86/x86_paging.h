@@ -86,7 +86,7 @@ struct vm_translation_map_arch_info : DeferredDeletable {
 void x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 		size_t size);
 void x86_put_pgtable_in_pgdir(page_directory_entry* entry,
-	addr_t physicalPageTable, uint32 attributes);
+	phys_addr_t physicalPageTable, uint32 attributes);
 void x86_update_all_pgdirs(int index, page_directory_entry entry);
 
 

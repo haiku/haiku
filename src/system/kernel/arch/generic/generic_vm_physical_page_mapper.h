@@ -1,10 +1,10 @@
 /*
- * Copyright 2006-2008, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2006-2010, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef _KERNEL_GENERIC_VM_PHYSICAL_PAGE_MAPPER_H
 #define _KERNEL_GENERIC_VM_PHYSICAL_PAGE_MAPPER_H
+
 
 #include <boot/kernel_args.h>
 
@@ -19,9 +19,9 @@ extern "C" {
 #endif
 
 typedef status_t (*generic_map_iospace_chunk_func)(addr_t virtualAddress,
-	addr_t physicalAddress, uint32 flags);
+	phys_addr_t physicalAddress, uint32 flags);
 
-status_t generic_get_physical_page(addr_t pa, addr_t *va, uint32 flags);
+status_t generic_get_physical_page(phys_addr_t pa, addr_t *va, uint32 flags);
 status_t generic_put_physical_page(addr_t va);
 status_t generic_vm_physical_page_mapper_init(kernel_args *args,
 	generic_map_iospace_chunk_func mapIOSpaceChunk, addr_t *ioSpaceBase,
@@ -32,5 +32,6 @@ status_t generic_vm_physical_page_mapper_init_post_sem(kernel_args *args);
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	// _KERNEL_GENERIC_VM_PHYSICAL_PAGE_MAPPER_H

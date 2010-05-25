@@ -52,7 +52,7 @@ hpet_get_priority()
 	// TODO: Fix HPET in SMP mode.
 	if (smp_get_num_cpus() > 1)
 		return 0;
-	
+
 	// HPET timers, being off-chip, are more expensive to setup
 	// than the LAPIC.
 	return 0;
@@ -84,13 +84,13 @@ hpet_set_hardware_timer(bigtime_t relativeTimeout)
 
 	// enable timer interrupt
 	sTimer->config |= HPET_CONF_TIMER_INT_ENABLE;
-	
+
 	// TODO:
 	if (relativeTimeout < MIN_TIMEOUT)
 		relativeTimeout = MIN_TIMEOUT;
-		
+
 	bigtime_t timerValue = hpet_convert_timeout(relativeTimeout);
-	
+
 	sTimer->u0.comparator64 = timerValue;
 
 	restore_interrupts(state);
@@ -131,7 +131,7 @@ hpet_set_legacy(bool enabled)
 		sHPETRegs->config |= HPET_CONF_MASK_LEGACY;
 	else
 		sHPETRegs->config &= ~HPET_CONF_MASK_LEGACY;
-	
+
 	return B_OK;
 }
 
@@ -141,7 +141,7 @@ static void
 hpet_dump_timer(volatile struct hpet_timer *timer)
 {
 	dprintf("HPET Timer %ld:\n", (timer - sHPETRegs->timer));
-		
+
 	dprintf("\troutable IRQs: ");
 	uint32 interrupts = (uint32)HPET_GET_CAP_TIMER_ROUTE(timer);
 	for (int i = 0; i < 32; i++) {
@@ -157,11 +157,11 @@ hpet_dump_timer(volatile struct hpet_timer *timer)
 	dprintf("\tTimer type: %s\n",
 		timer->config & HPET_CONF_TIMER_TYPE ? "Periodic" : "OneShot");
 	dprintf("\tInterrupt Type: %s\n",
-		timer->config & HPET_CONF_TIMER_INT_TYPE ? "Level" : "Edge");	
-	
+		timer->config & HPET_CONF_TIMER_INT_TYPE ? "Level" : "Edge");
+
 	dprintf("\tconfigured IRQ: %lld\n",
 		HPET_GET_CONF_TIMER_INT_ROUTE(timer));
-		
+
 	if (timer->config & HPET_CONF_TIMER_FSB_ENABLE) {
 		dprintf("\tfsb_route[0]: 0x%llx\n", timer->fsb_route[0]);
 		dprintf("\tfsb_route[1]: 0x%llx\n", timer->fsb_route[1]);
@@ -174,9 +174,9 @@ static void
 hpet_init_timer(volatile struct hpet_timer *timer)
 {
 	sTimer = timer;
-	
+
 	uint32 interrupt = 0;
-	
+
 	sTimer->config |= (interrupt << HPET_CONF_TIMER_INT_ROUTE_SHIFT)
 		& HPET_CONF_TIMER_INT_ROUTE_MASK;
 
@@ -188,7 +188,7 @@ hpet_init_timer(volatile struct hpet_timer *timer)
 
 	// Enable timer
 	sTimer->config |= HPET_CONF_TIMER_INT_ENABLE;
-	
+
 #ifdef TRACE_HPET
 	hpet_dump_timer(sTimer);
 #endif
@@ -201,12 +201,12 @@ hpet_test()
 	uint64 initialValue = sHPETRegs->u0.counter64;
 	spin(10);
 	uint64 finalValue = sHPETRegs->u0.counter64;
-	
+
 	if (initialValue == finalValue) {
 		dprintf("hpet_test: counter does not increment\n");
 		return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 
@@ -225,7 +225,7 @@ hpet_init(struct kernel_args *args)
 		if (vm_map_physical_memory(B_SYSTEM_TEAM, "hpet",
 			(void **)&sHPETRegs, B_EXACT_ADDRESS, B_PAGE_SIZE,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			(addr_t)args->arch_args.hpet_phys, true) < B_OK) {
+			(phys_addr_t)args->arch_args.hpet_phys, true) < B_OK) {
 			// Would it be better to panic here?
 			dprintf("hpet_init: Failed to map memory for the HPET registers.");
 			return B_ERROR;
@@ -241,16 +241,16 @@ hpet_init(struct kernel_args *args)
 	status_t status = hpet_set_enabled(false);
 	if (status != B_OK)
 		return status;
-		
+
 	status = hpet_set_legacy(true);
 	if (status != B_OK)
 		return status;
 
 	uint32 numTimers = HPET_GET_NUM_TIMERS(sHPETRegs) + 1;
-	
+
 	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n",
 		numTimers, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
-	
+
 	TRACE(("hpet_init: configuration: 0x%llx, timer_interrupts: 0x%llx\n",
 		sHPETRegs->config, sHPETRegs->interrupt_status));
 
@@ -258,29 +258,29 @@ hpet_init(struct kernel_args *args)
 		dprintf("hpet_init: HPET does not have at least 3 timers. Skipping.\n");
 		return B_ERROR;
 	}
-		
+
 #ifdef TRACE_HPET
 	for (uint32 c = 0; c < numTimers; c++)
 		hpet_dump_timer(&sHPETRegs->timer[c]);
 #endif
 
 	hpet_init_timer(&sHPETRegs->timer[0]);
-			
+
 	status = hpet_set_enabled(true);
 	if (status != B_OK)
 		return status;
 
-#ifdef TEST_HPET		
+#ifdef TEST_HPET
 	status = hpet_test();
 	if (status != B_OK)
 		return status;
 #endif
-	
+
 	int32 configuredIRQ = HPET_GET_CONF_TIMER_INT_ROUTE(sTimer);
-		
+
 	install_io_interrupt_handler(configuredIRQ, &hpet_timer_interrupt,
 		NULL, B_NO_LOCK_VECTOR);
-	
+
 	return status;
 }
 

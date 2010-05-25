@@ -121,7 +121,8 @@ FUNCTION(x86_write_msr):
 	ret
 FUNCTION_END(x86_write_msr)
 
-/* void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr new_pgdir); */
+/* void i386_context_switch(struct arch_thread *old_state,
+	struct arch_thread *new_state, uint32 new_pgdir); */
 FUNCTION(i386_context_switch):
 	pusha					/* pushes 8 words onto the stack */
 	movl	36(%esp),%eax	/* save old_state->current_stack */
@@ -140,7 +141,7 @@ skip_pgdir_swap:
 	ret
 FUNCTION_END(i386_context_switch)
 
-/* void i386_swap_pgdir(addr new_pgdir); */
+/* void i386_swap_pgdir(uint32 new_pgdir); */
 FUNCTION(i386_swap_pgdir):
 	movl	4(%esp),%eax
 	movl	%eax,%cr3

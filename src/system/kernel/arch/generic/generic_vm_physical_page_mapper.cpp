@@ -54,7 +54,7 @@ static size_t sIOSpaceChunkSize;
 
 
 status_t
-generic_get_physical_page(addr_t pa, addr_t *va, uint32 flags)
+generic_get_physical_page(phys_addr_t pa, addr_t *va, uint32 flags)
 {
 	int index;
 	paddr_chunk_desc *replaced_pchunk;

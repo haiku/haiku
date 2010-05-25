@@ -394,7 +394,7 @@ setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 		if (id != thread_get_current_thread_id()) {
 			// switch to the page directory of the new thread to be
 			// able to follow the stack trace into userland
-			addr_t newPageDirectory = (addr_t)x86_next_page_directory(
+			uint32 newPageDirectory = (uint32)x86_next_page_directory(
 				thread_get_current_thread(), thread);
 
 			if (newPageDirectory != 0) {
@@ -601,7 +601,7 @@ stack_trace(int argc, char **argv)
 
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
 	struct thread *thread = NULL;
-	addr_t oldPageDirectory = 0;
+	uint32 oldPageDirectory = 0;
 	uint32 ebp = x86_read_ebp();
 	int32 num = 0, last = 0;
 
@@ -755,7 +755,7 @@ show_call(int argc, char **argv)
 	}
 
 	struct thread *thread = NULL;
-	addr_t oldPageDirectory = 0;
+	uint32 oldPageDirectory = 0;
 	addr_t ebp = x86_read_ebp();
 	int32 argCount = 0;
 
@@ -929,9 +929,9 @@ cmd_in_context(int argc, char** argv)
 	}
 
 	// switch the page directory, if necessary
-	addr_t oldPageDirectory = 0;
+	uint32 oldPageDirectory = 0;
 	if (thread != thread_get_current_thread()) {
-		addr_t newPageDirectory = (addr_t)x86_next_page_directory(
+		uint32 newPageDirectory = (uint32)x86_next_page_directory(
 			thread_get_current_thread(), thread);
 
 		if (newPageDirectory != 0) {

@@ -1046,7 +1046,7 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 area_id
 vm_create_anonymous_area(team_id team, const char* name, void** address,
 	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
-	addr_t physicalAddress, uint32 flags, bool kernel)
+	phys_addr_t physicalAddress, uint32 flags, bool kernel)
 {
 	VMArea* area;
 	VMCache* cache;
@@ -1294,7 +1294,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			for (addr_t virtualAddress = area->Base();
 					virtualAddress < area->Base() + (area->Size() - 1);
 					virtualAddress += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
-				addr_t physicalAddress;
+				phys_addr_t physicalAddress;
 				uint32 flags;
 				status = map->Query(virtualAddress, &physicalAddress, &flags);
 				if (status < B_OK) {
@@ -1326,7 +1326,8 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			// We have already allocated our continuous pages run, so we can now
 			// just map them in the address space
 			VMTranslationMap* map = addressSpace->TranslationMap();
-			addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE;
+			phys_addr_t physicalAddress
+				= (phys_addr_t)page->physical_page_number * B_PAGE_SIZE;
 			addr_t virtualAddress = area->Base();
 			off_t offset = 0;
 
@@ -1371,7 +1372,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 err1:
 	if (wiring == B_CONTIGUOUS) {
 		// we had reserved the area space upfront...
-		addr_t pageNumber = page->physical_page_number;
+		phys_addr_t pageNumber = page->physical_page_number;
 		int32 i;
 		for (i = size / B_PAGE_SIZE; i-- > 0; pageNumber++) {
 			page = vm_lookup_page(pageNumber);
@@ -1394,8 +1395,8 @@ err0:
 
 area_id
 vm_map_physical_memory(team_id team, const char* name, void** _address,
-	uint32 addressSpec, addr_t size, uint32 protection, addr_t physicalAddress,
-	bool alreadyWired)
+	uint32 addressSpec, addr_t size, uint32 protection,
+	phys_addr_t physicalAddress, bool alreadyWired)
 {
 	VMArea* area;
 	VMCache* cache;
@@ -1956,7 +1957,7 @@ vm_clone_area(team_id team, const char* name, void** address,
 				= sourceArea->address_space->TranslationMap();
 			map->Lock();
 
-			addr_t physicalAddress;
+			phys_addr_t physicalAddress;
 			uint32 oldProtection;
 			map->Query(sourceArea->Base(), &physicalAddress, &oldProtection);
 
@@ -2412,7 +2413,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 
 status_t
-vm_get_page_mapping(team_id team, addr_t vaddr, addr_t* paddr)
+vm_get_page_mapping(team_id team, addr_t vaddr, phys_addr_t* paddr)
 {
 	VMAddressSpace* addressSpace = VMAddressSpace::Get(team);
 	if (addressSpace == NULL)
@@ -2444,7 +2445,7 @@ vm_test_map_modification(vm_page* page)
 		VMArea* area = mapping->area;
 		VMTranslationMap* map = area->address_space->TranslationMap();
 
-		addr_t physicalAddress;
+		phys_addr_t physicalAddress;
 		uint32 flags;
 		map->Lock();
 		map->Query(virtual_page_address(area, page), &physicalAddress, &flags);
@@ -3247,7 +3248,7 @@ unmap_and_free_physical_pages(VMTranslationMap* map, addr_t start, addr_t end)
 	// free all physical pages in the specified range
 
 	for (addr_t current = start; current < end; current += B_PAGE_SIZE) {
-		addr_t physicalAddress;
+		phys_addr_t physicalAddress;
 		uint32 flags;
 
 		if (map->Query(current, &physicalAddress, &flags) == B_OK
@@ -3486,7 +3487,7 @@ allocate_early_virtual(kernel_args* args, size_t size, bool blockAlign)
 
 
 static bool
-is_page_in_physical_memory_range(kernel_args* args, addr_t address)
+is_page_in_physical_memory_range(kernel_args* args, phys_addr_t address)
 {
 	// TODO: horrible brute-force method of determining if the page can be
 	// allocated
@@ -3500,11 +3501,11 @@ is_page_in_physical_memory_range(kernel_args* args, addr_t address)
 }
 
 
-static addr_t
+static phys_addr_t
 allocate_early_physical_page(kernel_args* args)
 {
 	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
-		addr_t nextPage;
+		phys_addr_t nextPage;
 
 		nextPage = args->physical_allocated_range[i].start
 			+ args->physical_allocated_range[i].size;
@@ -3544,7 +3545,7 @@ vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
 
 	// map the pages
 	for (uint32 i = 0; i < PAGE_ALIGN(physicalSize) / B_PAGE_SIZE; i++) {
-		addr_t physicalAddress = allocate_early_physical_page(args);
+		phys_addr_t physicalAddress = allocate_early_physical_page(args);
 		if (physicalAddress == 0)
 			panic("error allocating early page!\n");
 
@@ -4244,7 +4245,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		// check whether there's already a page mapped at the address
 		context.map->Lock();
 
-		addr_t physicalAddress;
+		phys_addr_t physicalAddress;
 		uint32 flags;
 		vm_page* mappedPage = NULL;
 		if (context.map->Query(address, &physicalAddress, &flags) == B_OK
@@ -4337,7 +4338,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 
 status_t
-vm_get_physical_page(addr_t paddr, addr_t* _vaddr, void** _handle)
+vm_get_physical_page(phys_addr_t paddr, addr_t* _vaddr, void** _handle)
 {
 	return sPhysicalPageMapper->GetPage(paddr, _vaddr, _handle);
 }
@@ -4350,7 +4351,8 @@ vm_put_physical_page(addr_t vaddr, void* handle)
 
 
 status_t
-vm_get_physical_page_current_cpu(addr_t paddr, addr_t* _vaddr, void** _handle)
+vm_get_physical_page_current_cpu(phys_addr_t paddr, addr_t* _vaddr,
+	void** _handle)
 {
 	return sPhysicalPageMapper->GetPageCurrentCPU(paddr, _vaddr, _handle);
 }
@@ -4363,7 +4365,7 @@ vm_put_physical_page_current_cpu(addr_t vaddr, void* handle)
 
 
 status_t
-vm_get_physical_page_debug(addr_t paddr, addr_t* _vaddr, void** _handle)
+vm_get_physical_page_debug(phys_addr_t paddr, addr_t* _vaddr, void** _handle)
 {
 	return sPhysicalPageMapper->GetPageDebug(paddr, _vaddr, _handle);
 }
@@ -4473,7 +4475,7 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 
 
 status_t
-vm_set_area_memory_type(area_id id, addr_t physicalBase, uint32 type)
+vm_set_area_memory_type(area_id id, phys_addr_t physicalBase, uint32 type)
 {
 	// NOTE: The caller is responsible for synchronizing calls to this function!
 
@@ -4683,28 +4685,29 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 
 status_t
-vm_memset_physical(addr_t address, int value, size_t length)
+vm_memset_physical(phys_addr_t address, int value, size_t length)
 {
 	return sPhysicalPageMapper->MemsetPhysical(address, value, length);
 }
 
 
 status_t
-vm_memcpy_from_physical(void* to, addr_t from, size_t length, bool user)
+vm_memcpy_from_physical(void* to, phys_addr_t from, size_t length, bool user)
 {
 	return sPhysicalPageMapper->MemcpyFromPhysical(to, from, length, user);
 }
 
 
 status_t
-vm_memcpy_to_physical(addr_t to, const void* _from, size_t length, bool user)
+vm_memcpy_to_physical(phys_addr_t to, const void* _from, size_t length,
+	bool user)
 {
 	return sPhysicalPageMapper->MemcpyToPhysical(to, _from, length, user);
 }
 
 
 void
-vm_memcpy_physical_page(addr_t to, addr_t from)
+vm_memcpy_physical_page(phys_addr_t to, phys_addr_t from)
 {
 	return sPhysicalPageMapper->MemcpyPhysicalPage(to, from);
 }
@@ -4783,7 +4786,7 @@ vm_debug_copy_page_memory(team_id teamID, void* unsafeMemory, void* buffer,
 		return B_UNSUPPORTED;
 
 	// copy from/to physical memory
-	addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE
+	phys_addr_t physicalAddress = page->physical_page_number * B_PAGE_SIZE
 		+ (addr_t)unsafeMemory % B_PAGE_SIZE;
 
 	if (copyToUnsafe) {
@@ -4925,7 +4928,7 @@ vm_wire_page(team_id team, addr_t address, bool writable,
 	cacheChainLocker.LockAllSourceCaches();
 	map->Lock();
 
-	addr_t physicalAddress;
+	phys_addr_t physicalAddress;
 	uint32 flags;
 	vm_page* page;
 	if (map->Query(pageAddress, &physicalAddress, &flags) == B_OK
@@ -4961,8 +4964,9 @@ vm_wire_page(team_id team, addr_t address, bool writable,
 		}
 	}
 
-	info->physicalAddress = page->physical_page_number * B_PAGE_SIZE
-		+ address % B_PAGE_SIZE;
+	info->physicalAddress
+		= (phys_addr_t)page->physical_page_number * B_PAGE_SIZE
+			+ address % B_PAGE_SIZE;
 	info->page = page;
 
 	return B_OK;
@@ -5105,7 +5109,7 @@ lock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 
 		// iterate through the pages and wire them
 		for (; nextAddress != areaEnd; nextAddress += B_PAGE_SIZE) {
-			addr_t physicalAddress;
+			phys_addr_t physicalAddress;
 			uint32 flags;
 
 			vm_page* page;
@@ -5260,7 +5264,7 @@ unlock_memory_etc(team_id team, void* address, size_t numBytes, uint32 flags)
 
 		// iterate through the pages and unwire them
 		for (; nextAddress != areaEnd; nextAddress += B_PAGE_SIZE) {
-			addr_t physicalAddress;
+			phys_addr_t physicalAddress;
 			uint32 flags;
 
 			vm_page* page;
@@ -5330,7 +5334,7 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 	VMAddressSpace* addressSpace;
 	addr_t virtualAddress = (addr_t)address;
 	addr_t pageOffset = virtualAddress & (B_PAGE_SIZE - 1);
-	addr_t physicalAddress;
+	phys_addr_t physicalAddress;
 	status_t status = B_OK;
 	int32 index = -1;
 	addr_t offset = 0;
@@ -5384,7 +5388,7 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 		}
 
 		// need to switch to the next physical_entry?
-		if (index < 0 || (addr_t)table[index].address
+		if (index < 0 || (phys_addr_t)table[index].address
 				!= physicalAddress - table[index].size) {
 			if ((uint32)++index + 1 > numEntries) {
 				// table to small
@@ -5573,7 +5577,7 @@ map_physical_memory(const char* name, void* physicalAddress, size_t numBytes,
 
 	return vm_map_physical_memory(VMAddressSpace::KernelID(), name,
 		_virtualAddress, addressSpec, numBytes, protection,
-		(addr_t)physicalAddress, false);
+		(phys_addr_t)physicalAddress, false);
 }
 
 
@@ -5592,7 +5596,7 @@ clone_area(const char* name, void** _address, uint32 addressSpec,
 area_id
 create_area_etc(team_id team, const char* name, void** address,
 	uint32 addressSpec, uint32 size, uint32 lock, uint32 protection,
-	addr_t physicalAddress, uint32 flags)
+	phys_addr_t physicalAddress, uint32 flags)
 {
 	fix_protection(&protection);
 
@@ -6057,7 +6061,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 			set_area_page_protection(area, pageAddress, protection);
 
-			addr_t physicalAddress;
+			phys_addr_t physicalAddress;
 			uint32 flags;
 
 			status_t error = map->Query(pageAddress, &physicalAddress, &flags);

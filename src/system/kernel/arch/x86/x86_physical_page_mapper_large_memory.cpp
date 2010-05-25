@@ -64,7 +64,7 @@ struct PhysicalPageSlot {
 	PhysicalPageSlotPool*		pool;
 	addr_t						address;
 
-	inline	void				Map(addr_t physicalAddress);
+	inline	void				Map(phys_addr_t physicalAddress);
 };
 
 
@@ -131,12 +131,12 @@ public:
 
 	virtual	void				Delete();
 
-	virtual	page_table_entry*	GetPageTableAt(addr_t physicalAddress);
+	virtual	page_table_entry*	GetPageTableAt(phys_addr_t physicalAddress);
 
 private:
 			struct page_slot {
 				PhysicalPageSlot*	slot;
-				addr_t				physicalAddress;
+				phys_addr_t			physicalAddress;
 				cpu_mask_t			valid;
 			};
 
@@ -159,29 +159,30 @@ public:
 									TranslationMapPhysicalPageMapper** _mapper);
 
 	virtual	page_table_entry*	InterruptGetPageTableAt(
-									addr_t physicalAddress);
+									phys_addr_t physicalAddress);
 
-	virtual	status_t			GetPage(addr_t physicalAddress,
+	virtual	status_t			GetPage(phys_addr_t physicalAddress,
 									addr_t* virtualAddress, void** handle);
 	virtual	status_t			PutPage(addr_t virtualAddress, void* handle);
 
-	virtual	status_t			GetPageCurrentCPU(addr_t physicalAddress,
+	virtual	status_t			GetPageCurrentCPU(phys_addr_t physicalAddress,
 									addr_t* virtualAddress, void** handle);
 	virtual	status_t			PutPageCurrentCPU(addr_t virtualAddress,
 									void* handle);
 
-	virtual	status_t			GetPageDebug(addr_t physicalAddress,
+	virtual	status_t			GetPageDebug(phys_addr_t physicalAddress,
 									addr_t* virtualAddress, void** handle);
 	virtual	status_t			PutPageDebug(addr_t virtualAddress,
 									void* handle);
 
-	virtual	status_t			MemsetPhysical(addr_t address, int value,
-									size_t length);
-	virtual	status_t			MemcpyFromPhysical(void* to, addr_t from,
+	virtual	status_t			MemsetPhysical(phys_addr_t address, int value,
+									phys_size_t length);
+	virtual	status_t			MemcpyFromPhysical(void* to, phys_addr_t from,
 									size_t length, bool user);
-	virtual	status_t			MemcpyToPhysical(addr_t to, const void* from,
-									size_t length, bool user);
-	virtual	void				MemcpyPhysicalPage(addr_t to, addr_t from);
+	virtual	status_t			MemcpyToPhysical(phys_addr_t to,
+									const void* from, size_t length, bool user);
+	virtual	void				MemcpyPhysicalPage(phys_addr_t to,
+									phys_addr_t from);
 
 			status_t			GetSlot(bool canWait,
 									PhysicalPageSlot*& slot);
@@ -212,7 +213,7 @@ static LargeMemoryPhysicalPageMapper sPhysicalPageMapper;
 
 
 inline void
-PhysicalPageSlot::Map(addr_t physicalAddress)
+PhysicalPageSlot::Map(phys_addr_t physicalAddress)
 {
 	page_table_entry& pte = pool->pageTable[
 		(address - pool->virtualBase) / B_PAGE_SIZE];
@@ -420,7 +421,7 @@ LargeMemoryTranslationMapPhysicalPageMapper::Init()
 			return error;
 
 		// set to invalid physical address, so it won't be used accidentally
-		fSlots[i].physicalAddress = ~(addr_t)0;
+		fSlots[i].physicalAddress = ~(phys_addr_t)0;
 	}
 
 	return B_OK;
@@ -436,7 +437,7 @@ LargeMemoryTranslationMapPhysicalPageMapper::Delete()
 
 page_table_entry*
 LargeMemoryTranslationMapPhysicalPageMapper::GetPageTableAt(
-	addr_t physicalAddress)
+	phys_addr_t physicalAddress)
 {
 	ASSERT(physicalAddress % B_PAGE_SIZE == 0);
 
@@ -580,7 +581,8 @@ LargeMemoryPhysicalPageMapper::CreateTranslationMapPhysicalPageMapper(
 
 
 page_table_entry*
-LargeMemoryPhysicalPageMapper::InterruptGetPageTableAt(addr_t physicalAddress)
+LargeMemoryPhysicalPageMapper::InterruptGetPageTableAt(
+	phys_addr_t physicalAddress)
 {
 	ASSERT(physicalAddress % B_PAGE_SIZE == 0);
 
@@ -591,7 +593,7 @@ LargeMemoryPhysicalPageMapper::InterruptGetPageTableAt(addr_t physicalAddress)
 
 
 status_t
-LargeMemoryPhysicalPageMapper::GetPage(addr_t physicalAddress,
+LargeMemoryPhysicalPageMapper::GetPage(phys_addr_t physicalAddress,
 	addr_t* virtualAddress, void** handle)
 {
 	PhysicalPageSlot* slot;
@@ -620,7 +622,7 @@ LargeMemoryPhysicalPageMapper::PutPage(addr_t virtualAddress, void* handle)
 
 
 status_t
-LargeMemoryPhysicalPageMapper::GetPageCurrentCPU(addr_t physicalAddress,
+LargeMemoryPhysicalPageMapper::GetPageCurrentCPU(phys_addr_t physicalAddress,
 	addr_t* virtualAddress, void** handle)
 {
 	// get a slot from the per-cpu user pool
@@ -649,7 +651,7 @@ LargeMemoryPhysicalPageMapper::PutPageCurrentCPU(addr_t virtualAddress,
 
 
 status_t
-LargeMemoryPhysicalPageMapper::GetPageDebug(addr_t physicalAddress,
+LargeMemoryPhysicalPageMapper::GetPageDebug(phys_addr_t physicalAddress,
 	addr_t* virtualAddress, void** handle)
 {
 	fDebugSlot->Map(physicalAddress);
@@ -668,10 +670,10 @@ LargeMemoryPhysicalPageMapper::PutPageDebug(addr_t virtualAddress, void* handle)
 
 
 status_t
-LargeMemoryPhysicalPageMapper::MemsetPhysical(addr_t address, int value,
-	size_t length)
+LargeMemoryPhysicalPageMapper::MemsetPhysical(phys_addr_t address, int value,
+	phys_size_t length)
 {
-	addr_t pageOffset = address % B_PAGE_SIZE;
+	phys_addr_t pageOffset = address % B_PAGE_SIZE;
 
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner _(thread);
@@ -698,11 +700,11 @@ LargeMemoryPhysicalPageMapper::MemsetPhysical(addr_t address, int value,
 
 
 status_t
-LargeMemoryPhysicalPageMapper::MemcpyFromPhysical(void* _to, addr_t from,
+LargeMemoryPhysicalPageMapper::MemcpyFromPhysical(void* _to, phys_addr_t from,
 	size_t length, bool user)
 {
 	uint8* to = (uint8*)_to;
-	addr_t pageOffset = from % B_PAGE_SIZE;
+	phys_addr_t pageOffset = from % B_PAGE_SIZE;
 
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner _(thread);
@@ -738,11 +740,11 @@ LargeMemoryPhysicalPageMapper::MemcpyFromPhysical(void* _to, addr_t from,
 
 
 status_t
-LargeMemoryPhysicalPageMapper::MemcpyToPhysical(addr_t to, const void* _from,
-	size_t length, bool user)
+LargeMemoryPhysicalPageMapper::MemcpyToPhysical(phys_addr_t to,
+	const void* _from, size_t length, bool user)
 {
 	const uint8* from = (const uint8*)_from;
-	addr_t pageOffset = to % B_PAGE_SIZE;
+	phys_addr_t pageOffset = to % B_PAGE_SIZE;
 
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner _(thread);
@@ -778,7 +780,8 @@ LargeMemoryPhysicalPageMapper::MemcpyToPhysical(addr_t to, const void* _from,
 
 
 void
-LargeMemoryPhysicalPageMapper::MemcpyPhysicalPage(addr_t to, addr_t from)
+LargeMemoryPhysicalPageMapper::MemcpyPhysicalPage(phys_addr_t to,
+	phys_addr_t from)
 {
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner _(thread);
@@ -888,7 +891,7 @@ LargeMemoryPhysicalPageMapper::_AllocatePool(PhysicalPageSlotPool*& _pool)
 	memset(data, 0, B_PAGE_SIZE);
 
 	// get the page table's physical address
-	addr_t physicalTable;
+	phys_addr_t physicalTable;
 	X86VMTranslationMap* map = static_cast<X86VMTranslationMap*>(
 		VMAddressSpace::Kernel()->TranslationMap());
 	uint32 dummyFlags;

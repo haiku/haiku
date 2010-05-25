@@ -13,8 +13,8 @@ extern "C" {
 
 void ppc_translation_map_change_asid(VMTranslationMap *map);
 
-status_t ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
-	size_t size);
+status_t ppc_map_address_range(addr_t virtualAddress,
+	phys_addr_t physicalAddress, size_t size);
 void ppc_unmap_address_range(addr_t virtualAddress, size_t size);
 status_t ppc_remap_address_range(addr_t *virtualAddress, size_t size,
 	bool unmap);

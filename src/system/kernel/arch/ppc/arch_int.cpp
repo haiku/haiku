@@ -549,7 +549,7 @@ void
 ppc_set_current_cpu_exception_context(struct ppc_cpu_exception_context *context)
 {
 	// translate to physical address
-	addr_t physicalPage;
+	phys_addr_t physicalPage;
 	addr_t inPageOffset = (addr_t)context & (B_PAGE_SIZE - 1);
 	status_t error = vm_get_page_mapping(VMAddressSpace::KernelID(),
 		(addr_t)context - inPageOffset, &physicalPage);

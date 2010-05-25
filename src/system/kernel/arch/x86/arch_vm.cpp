@@ -740,7 +740,8 @@ arch_vm_unset_memory_type(struct VMArea *area)
 
 
 status_t
-arch_vm_set_memory_type(struct VMArea *area, addr_t physicalBase, uint32 type)
+arch_vm_set_memory_type(struct VMArea *area, phys_addr_t physicalBase,
+	uint32 type)
 {
 	return add_memory_type_range(area->id, physicalBase, area->Size(), type);
 }

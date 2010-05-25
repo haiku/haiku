@@ -70,7 +70,7 @@ typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedPageLink>
 typedef class DoublyLinkedQueue<vm_page_mapping, DoublyLinkedAreaLink>
 	VMAreaMappings;
 
-typedef uint32 page_num_t;
+typedef phys_addr_t page_num_t;
 
 
 struct VMCacheRef {
@@ -84,13 +84,15 @@ struct VMCacheRef {
 struct vm_page {
 	DoublyLinkedListLink<vm_page> queue_link;
 
-	addr_t					physical_page_number;
+	page_num_t				physical_page_number;
 
 private:
 	VMCacheRef*				cache_ref;
 public:
 	page_num_t				cache_offset;
 								// in page size units
+								// TODO: Only 32 bit on 32 bit platforms!
+								// Introduce a new 64 bit type page_off_t!
 
 	SplayTreeLink<vm_page>	cache_link;
 	vm_page*				cache_next;

@@ -88,7 +88,7 @@ arch_vm_unset_memory_type(VMArea* area)
 
 
 status_t
-arch_vm_set_memory_type(VMArea* area, addr_t physicalBase, uint32 type)
+arch_vm_set_memory_type(VMArea* area, phys_addr_t physicalBase, uint32 type)
 {
 #warning IMPLEMENT arch_vm_set_memory_type
 	return B_ERROR;

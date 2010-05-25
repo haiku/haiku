@@ -11,8 +11,8 @@
 extern "C" {
 #endif
 
-status_t mipsel_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
-	size_t size);
+status_t mipsel_map_address_range(addr_t virtualAddress,
+	phys_addr_t physicalAddress, size_t size);
 
 void mipsel_unmap_address_range(addr_t virtualAddress, size_t size);
 

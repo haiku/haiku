@@ -68,8 +68,8 @@ arch_vm_translation_map_init_post_sem(kernel_args* args)
 
 status_t
 arch_vm_translation_map_early_map(kernel_args* ka, addr_t virtualAddress,
-	addr_t physicalAddress, uint8 attributes,
-	addr_t (*get_free_page)(kernel_args* ))
+	phys_addr_t physicalAddress, uint8 attributes,
+	phys_addr_t (*get_free_page)(kernel_args* ))
 {
 #warning IMPLEMENT arch_vm_translation_map_early_map
 	return NULL;
@@ -77,7 +77,7 @@ arch_vm_translation_map_early_map(kernel_args* ka, addr_t virtualAddress,
 
 
 status_t
-arch_vm_translation_map_early_query(addr_t va, addr_t* out_physical)
+arch_vm_translation_map_early_query(addr_t va, phys_addr_t* out_physical)
 {
 #warning IMPLEMENT arch_vm_translation_map_early_query
 	return NULL;
@@ -97,7 +97,7 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 
 
 status_t
-mipsel_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
+mipsel_map_address_range(addr_t virtualAddress, phys_addr_t physicalAddress,
 	size_t size)
 {
 #warning IMPLEMENT mipsel_map_address_range

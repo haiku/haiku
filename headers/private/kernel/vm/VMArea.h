@@ -80,7 +80,7 @@ typedef SinglyLinkedList<VMAreaWiredRange> VMAreaWiredRangeList;
 
 struct VMPageWiringInfo {
 	VMAreaWiredRange	range;
-	addr_t				physicalAddress;
+	phys_addr_t			physicalAddress;
 							// the actual physical address corresponding to
 							// the virtual address passed to vm_wire_page()
 							// (i.e. with in-page offset)

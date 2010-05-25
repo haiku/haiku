@@ -269,12 +269,12 @@ struct arch_thread;
 void __x86_setup_system_time(uint32 conversionFactor,
 	uint32 conversionFactorNsecs, bool conversionFactorNsecsShift);
 void i386_context_switch(struct arch_thread* oldState,
-	struct arch_thread* newState, addr_t newPageDir);
+	struct arch_thread* newState, uint32 newPageDir);
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
 void x86_enter_userspace(addr_t entry, addr_t stackTop);
 void i386_set_tss_and_kstack(addr_t kstack);
-void i386_swap_pgdir(addr_t newPageDir);
+void i386_swap_pgdir(uint32 newPageDir);
 void i386_fnsave(void* fpuState);
 void i386_fxsave(void* fpuState);
 void i386_frstor(const void* fpuState);

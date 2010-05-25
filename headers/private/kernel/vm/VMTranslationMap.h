@@ -33,8 +33,8 @@ struct VMTranslationMap {
 									addr_t end) const = 0;
 
 	virtual	status_t			Map(addr_t virtualAddress,
-									addr_t physicalAddress, uint32 attributes,
-									uint32 memoryType,
+									phys_addr_t physicalAddress,
+									uint32 attributes, uint32 memoryType,
 									vm_page_reservation* reservation) = 0;
 	virtual	status_t			Unmap(addr_t start, addr_t end) = 0;
 
@@ -48,10 +48,10 @@ struct VMTranslationMap {
 									bool ignoreTopCachePageFlags);
 
 	virtual	status_t			Query(addr_t virtualAddress,
-									addr_t* _physicalAddress,
+									phys_addr_t* _physicalAddress,
 									uint32* _flags) = 0;
 	virtual	status_t			QueryInterrupt(addr_t virtualAddress,
-									addr_t* _physicalAddress,
+									phys_addr_t* _physicalAddress,
 									uint32* _flags) = 0;
 
 	virtual	status_t			Protect(addr_t base, addr_t top,
@@ -83,7 +83,7 @@ struct VMPhysicalPageMapper {
 
 	// get/put virtual address for physical page -- will be usuable on all CPUs
 	// (usually more expensive than the *_current_cpu() versions)
-	virtual	status_t			GetPage(addr_t physicalAddress,
+	virtual	status_t			GetPage(phys_addr_t physicalAddress,
 									addr_t* _virtualAddress,
 									void** _handle) = 0;
 	virtual	status_t			PutPage(addr_t virtualAddress,
@@ -92,27 +92,29 @@ struct VMPhysicalPageMapper {
 	// get/put virtual address for physical page -- thread must be pinned the
 	// whole time
 	virtual	status_t			GetPageCurrentCPU(
-									addr_t physicalAddress,
+									phys_addr_t physicalAddress,
 									addr_t* _virtualAddress,
 									void** _handle) = 0;
 	virtual	status_t			PutPageCurrentCPU(addr_t virtualAddress,
 									void* _handle) = 0;
 
 	// get/put virtual address for physical in KDL
-	virtual	status_t			GetPageDebug(addr_t physicalAddress,
+	virtual	status_t			GetPageDebug(phys_addr_t physicalAddress,
 									addr_t* _virtualAddress,
 									void** _handle) = 0;
 	virtual	status_t			PutPageDebug(addr_t virtualAddress,
 									void* handle) = 0;
 
 	// memory operations on pages
-	virtual	status_t			MemsetPhysical(addr_t address, int value,
-									size_t length) = 0;
-	virtual	status_t			MemcpyFromPhysical(void* to, addr_t from,
+	virtual	status_t			MemsetPhysical(phys_addr_t address, int value,
+									phys_size_t length) = 0;
+	virtual	status_t			MemcpyFromPhysical(void* to, phys_addr_t from,
 									size_t length, bool user) = 0;
-	virtual	status_t			MemcpyToPhysical(addr_t to, const void* from,
-									size_t length, bool user) = 0;
-	virtual	void				MemcpyPhysicalPage(addr_t to, addr_t from) = 0;
+	virtual	status_t			MemcpyToPhysical(phys_addr_t to,
+									const void* from, size_t length,
+									bool user) = 0;
+	virtual	void				MemcpyPhysicalPage(phys_addr_t to,
+									phys_addr_t from) = 0;
 };
 
 

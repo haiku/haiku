@@ -146,8 +146,8 @@ struct PPCVMTranslationMap : VMTranslationMap {
 									addr_t end) const;
 
 	virtual	status_t			Map(addr_t virtualAddress,
-									addr_t physicalAddress, uint32 attributes,
-									uint32 memoryType,
+									phys_addr_t physicalAddress,
+									uint32 attributes, uint32 memoryType,
 									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
@@ -155,10 +155,10 @@ struct PPCVMTranslationMap : VMTranslationMap {
 									bool updatePageQueue);
 
 	virtual	status_t			Query(addr_t virtualAddress,
-									addr_t* _physicalAddress,
+									phys_addr_t* _physicalAddress,
 									uint32* _flags);
 	virtual	status_t			QueryInterrupt(addr_t virtualAddress,
-									addr_t* _physicalAddress,
+									phys_addr_t* _physicalAddress,
 									uint32* _flags);
 
 	virtual	status_t			Protect(addr_t base, addr_t top,
@@ -202,7 +202,7 @@ ppc_translation_map_change_asid(VMTranslationMap *map)
 
 static void
 fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
-	addr_t virtualAddress, addr_t physicalAddress, uint8 protection,
+	addr_t virtualAddress, phys_addr_t physicalAddress, uint8 protection,
 	bool secondaryHash)
 {
 	// lower 32 bit - set at once
@@ -289,7 +289,7 @@ PPCVMTranslationMap::RemovePageTableEntry(addr_t virtualAddress)
 
 
 static status_t
-map_iospace_chunk(addr_t va, addr_t pa, uint32 flags)
+map_iospace_chunk(addr_t va, phys_addr_t pa, uint32 flags)
 {
 	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
 	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
@@ -395,7 +395,7 @@ PPCVMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 
 status_t
-PPCVMTranslationMap::Map(addr_t virtualAddress, addr_t physicalAddress,
+PPCVMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 	uint32 attributes, uint32 memoryType, vm_page_reservation* reservation)
 {
 // TODO: Support memory types!
@@ -549,7 +549,8 @@ PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 
 status_t
-PPCVMTranslationMap::Query(addr_t va, addr_t *_outPhysical, uint32 *_outFlags)
+PPCVMTranslationMap::Query(addr_t va, phys_addr_t *_outPhysical,
+	uint32 *_outFlags)
 {
 	page_table_entry *entry;
 
@@ -579,7 +580,7 @@ PPCVMTranslationMap::Query(addr_t va, addr_t *_outPhysical, uint32 *_outFlags)
 
 status_t
 PPCVMTranslationMap::QueryInterrupt(addr_t virtualAddress,
-	addr_t* _physicalAddress, uint32* _flags)
+	phys_addr_t* _physicalAddress, uint32* _flags)
 {
 	return PPCVMTranslationMap::Query(virtualAddress, _physicalAddress, _flags);
 }
@@ -642,7 +643,7 @@ PPCVMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 	RecursiveLocker locker(fLock);
 
 	uint32 flags;
-	addr_t physicalAddress;
+	phys_addr_t physicalAddress;
 	if (Query(address, &physicalAddress, &flags) != B_OK
 		|| (flags & PAGE_PRESENT) == 0) {
 		return false;
@@ -690,7 +691,7 @@ PPCVMTranslationMap::Flush()
 
 
 static status_t
-get_physical_page_tmap(addr_t physicalAddress, addr_t *_virtualAddress,
+get_physical_page_tmap(phys_addr_t physicalAddress, addr_t *_virtualAddress,
 	void **handle)
 {
 	return generic_get_physical_page(physicalAddress, _virtualAddress, 0);
@@ -802,8 +803,9 @@ arch_vm_translation_map_init_post_sem(kernel_args *args)
  */
 
 status_t
-arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress,
-	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
+arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress,
+	phys_addr_t physicalAddress, uint8 attributes,
+	phys_addr_t (*get_free_page)(kernel_args *))
 {
 	uint32 virtualSegmentID = get_sr((void *)virtualAddress) & 0xffffff;
 
@@ -837,7 +839,7 @@ arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t
 // XXX currently assumes this translation map is active
 
 status_t
-arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
+arch_vm_translation_map_early_query(addr_t va, phys_addr_t *out_physical)
 {
 	//PANIC_UNIMPLEMENTED();
 	panic("vm_translation_map_quick_query(): not yet implemented\n");
@@ -849,7 +851,7 @@ arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
 
 
 status_t
-ppc_map_address_range(addr_t virtualAddress, addr_t physicalAddress,
+ppc_map_address_range(addr_t virtualAddress, phys_addr_t physicalAddress,
 	size_t size)
 {
 	addr_t virtualEnd = ROUNDUP(virtualAddress + size, B_PAGE_SIZE);
@@ -913,7 +915,7 @@ ppc_remap_address_range(addr_t *_virtualAddress, size_t size, bool unmap)
 	page_table_entry *entry = map->LookupPageTableEntry(virtualAddress);
 	if (!entry)
 		return B_ERROR;
-	addr_t physicalBase = entry->physical_page_number << 12;
+	phys_addr_t physicalBase = (phys_addr_t)entry->physical_page_number << 12;
 
 	// map the pages
 	error = ppc_map_address_range((addr_t)newAddress, physicalBase, size);

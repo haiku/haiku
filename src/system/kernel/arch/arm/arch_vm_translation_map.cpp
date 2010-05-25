@@ -48,7 +48,7 @@ arch_vm_translation_map_init(kernel_args *args,
 
 status_t
 arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
-{ 
+{
 	return NULL;
 #warning ARM:WRITEME
 }
@@ -100,8 +100,9 @@ arch_vm_translation_map_init_post_sem(kernel_args *args)
  */
 
 status_t
-arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress,
-	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
+arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress,
+	phys_addr_t physicalAddress, uint8 attributes,
+	phys_addr_t (*get_free_page)(kernel_args *))
 {
 	return NULL;
 #warning ARM:WRITEME
@@ -114,7 +115,7 @@ arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress, addr_t
 // XXX currently assumes this translation map is active
 
 status_t
-arch_vm_translation_map_early_query(addr_t va, addr_t *out_physical)
+arch_vm_translation_map_early_query(addr_t va, phys_addr_t *out_physical)
 {
 	return NULL;
 #warning ARM:WRITEME

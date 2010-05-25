@@ -21,7 +21,7 @@ public:
 
 	virtual	void				Delete() = 0;
 
-	virtual	page_table_entry*	GetPageTableAt(addr_t physicalAddress) = 0;
+	virtual	page_table_entry*	GetPageTableAt(phys_addr_t physicalAddress) = 0;
 		// Must be invoked with thread pinned to current CPU.
 };
 
@@ -37,7 +37,7 @@ public:
 										= 0;
 
 	virtual	page_table_entry*	InterruptGetPageTableAt(
-									addr_t physicalAddress) = 0;
+									phys_addr_t physicalAddress) = 0;
 };
 
 

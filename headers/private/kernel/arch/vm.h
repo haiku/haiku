@@ -31,7 +31,7 @@ void arch_vm_aspace_swap(struct VMAddressSpace *from,
 	struct VMAddressSpace *to);
 bool arch_vm_supports_protection(uint32 protection);
 
-status_t arch_vm_set_memory_type(struct VMArea *area, addr_t physicalBase,
+status_t arch_vm_set_memory_type(struct VMArea *area, phys_addr_t physicalBase,
 	uint32 type);
 void arch_vm_unset_memory_type(struct VMArea *area);
 

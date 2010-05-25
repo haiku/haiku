@@ -111,8 +111,8 @@ static VMPageQueue& sActivePageQueue = sPageQueues[PAGE_STATE_ACTIVE];
 static VMPageQueue& sCachedPageQueue = sPageQueues[PAGE_STATE_CACHED];
 
 static vm_page *sPages;
-static addr_t sPhysicalPageOffset;
-static size_t sNumPages;
+static page_num_t sPhysicalPageOffset;
+static page_num_t sNumPages;
 static vint32 sUnreservedFreePages;
 static vint32 sUnsatisfiedPageReservations;
 static vint32 sModifiedTemporaryPages;
@@ -718,7 +718,7 @@ dump_page(int argc, char **argv)
 			size_t pageCount = addressSpace->Size() / B_PAGE_SIZE;
 			for (addr_t address = addressSpace->Base(); pageCount != 0;
 					address += B_PAGE_SIZE, pageCount--) {
-				addr_t physicalAddress;
+				phys_addr_t physicalAddress;
 				uint32 flags = 0;
 				if (addressSpace->TranslationMap()->QueryInterrupt(address,
 						&physicalAddress, &flags) == B_OK
@@ -839,7 +839,7 @@ dump_page_stats(int argc, char **argv)
 	page_run longestFreeRun = { 0, 0 };
 	page_run longestCachedRun = { 0, 0 };
 
-	for (addr_t i = 0; i < sNumPages; i++) {
+	for (page_num_t i = 0; i < sNumPages; i++) {
 		if (sPages[i].State() > 7)
 			panic("page %li at %p has invalid state!\n", i, &sPages[i]);
 
@@ -1295,7 +1295,7 @@ clear_page(struct vm_page *page)
 
 
 static status_t
-mark_page_range_in_use(addr_t startPage, size_t length, bool wired)
+mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 {
 	TRACE(("mark_page_range_in_use: start 0x%lx, len 0x%lx\n",
 		startPage, length));
@@ -1321,7 +1321,7 @@ mark_page_range_in_use(addr_t startPage, size_t length, bool wired)
 
 	WriteLocker locker(sFreePageQueuesLock);
 
-	for (size_t i = 0; i < length; i++) {
+	for (page_num_t i = 0; i < length; i++) {
 		vm_page *page = &sPages[startPage + i];
 		switch (page->State()) {
 			case PAGE_STATE_FREE:
@@ -1700,8 +1700,8 @@ PageWriteTransfer::AddPage(vm_page* page)
 		|| (fMaxPages >= 0 && fPageCount >= (uint32)fMaxPages))
 		return false;
 
-	addr_t nextBase
-		= (addr_t)fVecs[fVecCount - 1].iov_base + fVecs[fVecCount - 1].iov_len;
+	phys_addr_t nextBase = (phys_addr_t)fVecs[fVecCount - 1].iov_base
+		+ fVecs[fVecCount - 1].iov_len;
 
 	if (page->physical_page_number << PAGE_SHIFT == nextBase
 		&& page->cache_offset == fOffset + fPageCount) {
@@ -1711,7 +1711,7 @@ PageWriteTransfer::AddPage(vm_page* page)
 		return true;
 	}
 
-	nextBase = (addr_t)fVecs[0].iov_base - B_PAGE_SIZE;
+	nextBase = (phys_addr_t)fVecs[0].iov_base - B_PAGE_SIZE;
 	if (page->physical_page_number << PAGE_SHIFT == nextBase
 		&& page->cache_offset == fOffset - 1) {
 		// prepend to first iovec and adjust offset
@@ -1754,7 +1754,7 @@ status_t
 PageWriteTransfer::Schedule(uint32 flags)
 {
 	off_t writeOffset = (off_t)fOffset << PAGE_SHIFT;
-	size_t writeLength = fPageCount << PAGE_SHIFT;
+	size_t writeLength = (size_t)fPageCount << PAGE_SHIFT;
 
 	if (fRun != NULL) {
 		return fCache->WriteAsync(writeOffset, fVecs, fVecCount, writeLength,
@@ -2805,7 +2805,7 @@ void
 vm_page_init_num_pages(kernel_args *args)
 {
 	// calculate the size of memory by looking at the physical_memory_range array
-	addr_t physicalPagesEnd = 0;
+	page_num_t physicalPagesEnd = 0;
 	sPhysicalPageOffset = args->physical_memory_range[0].start / B_PAGE_SIZE;
 
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
@@ -2870,10 +2870,10 @@ vm_page_init(kernel_args *args)
 	TRACE(("initialized table\n"));
 
 	// mark the ranges between usable physical memory unused
-	addr_t previousEnd = 0;
+	phys_addr_t previousEnd = 0;
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		addr_t base = args->physical_memory_range[i].start;
-		addr_t size = args->physical_memory_range[i].size;
+		phys_addr_t base = args->physical_memory_range[i].start;
+		phys_size_t size = args->physical_memory_range[i].size;
 		if (base > previousEnd) {
 			mark_page_range_in_use(previousEnd / B_PAGE_SIZE,
 				(base - previousEnd) / B_PAGE_SIZE, false);
@@ -2985,14 +2985,14 @@ vm_page_init_post_thread(kernel_args *args)
 
 
 status_t
-vm_mark_page_inuse(addr_t page)
+vm_mark_page_inuse(page_num_t page)
 {
 	return vm_mark_page_range_inuse(page, 1);
 }
 
 
 status_t
-vm_mark_page_range_inuse(addr_t startPage, addr_t length)
+vm_mark_page_range_inuse(page_num_t startPage, page_num_t length)
 {
 	return mark_page_range_in_use(startPage, length, false);
 }
@@ -3313,10 +3313,10 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 
 
 vm_page *
-vm_page_allocate_page_run(uint32 flags, addr_t base, size_t length,
+vm_page_allocate_page_run(uint32 flags, phys_addr_t base, page_num_t length,
 	int priority)
 {
-	uint32 start = base >> PAGE_SHIFT;
+	page_num_t start = base >> PAGE_SHIFT;
 
 	vm_page_reservation reservation;
 	vm_page_reserve_pages(&reservation, length, priority);
@@ -3349,7 +3349,7 @@ vm_page_allocate_page_run(uint32 flags, addr_t base, size_t length,
 			return NULL;
 		}
 
-		uint32 i;
+		page_num_t i;
 		for (i = 0; i < length; i++) {
 			uint32 pageState = sPages[start + i].State();
 			if (pageState != PAGE_STATE_FREE
@@ -3383,7 +3383,7 @@ vm_page_at_index(int32 index)
 
 
 vm_page *
-vm_lookup_page(addr_t pageNumber)
+vm_lookup_page(page_num_t pageNumber)
 {
 	if (pageNumber < sPhysicalPageOffset)
 		return NULL;
@@ -3482,7 +3482,7 @@ vm_page_requeue(struct vm_page *page, bool tail)
 }
 
 
-size_t
+page_num_t
 vm_page_num_pages(void)
 {
 	return sNumPages;
@@ -3496,14 +3496,14 @@ vm_page_num_pages(void)
 	use by being reclaimed as well (IOW it factors in things like cache pages
 	as available).
 */
-size_t
+page_num_t
 vm_page_num_available_pages(void)
 {
 	return vm_available_memory() / B_PAGE_SIZE;
 }
 
 
-size_t
+page_num_t
 vm_page_num_free_pages(void)
 {
 	int32 count = sUnreservedFreePages + sCachedPageQueue.Count();
@@ -3511,7 +3511,7 @@ vm_page_num_free_pages(void)
 }
 
 
-size_t
+page_num_t
 vm_page_num_unused_pages(void)
 {
 	int32 count = sUnreservedFreePages;

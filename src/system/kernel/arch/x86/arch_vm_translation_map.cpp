@@ -115,9 +115,9 @@ vm_translation_map_arch_info::Delete()
 #if 0
 	// this sanity check can be enabled when corruption due to
 	// overwriting an active page directory is suspected
-	addr_t activePageDirectory;
+	uint32 activePageDirectory;
 	read_cr3(activePageDirectory);
-	if (activePageDirectory == (addr_t)pgdir_phys)
+	if (activePageDirectory == (uint32)pgdir_phys)
 		panic("deleting a still active page directory\n");
 #endif
 
@@ -133,7 +133,7 @@ vm_translation_map_arch_info::Delete()
 
 //! TODO: currently assumes this translation map is active
 static status_t
-early_query(addr_t va, addr_t *_physicalAddress)
+early_query(addr_t va, phys_addr_t *_physicalAddress)
 {
 	if ((sPageHolePageDir[VADDR_TO_PDENT(va)] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
@@ -183,7 +183,7 @@ memory_type_to_pte_flags(uint32 memoryType)
 
 static void
 put_page_table_entry_in_pgtable(page_table_entry* entry,
-	addr_t physicalAddress, uint32 attributes, uint32 memoryType,
+	phys_addr_t physicalAddress, uint32 attributes, uint32 memoryType,
 	bool globalPage)
 {
 	page_table_entry page = (physicalAddress & X86_PTE_ADDRESS_MASK)
@@ -233,7 +233,7 @@ x86_update_all_pgdirs(int index, page_directory_entry e)
 
 void
 x86_put_pgtable_in_pgdir(page_directory_entry *entry,
-	addr_t pgtablePhysical, uint32 attributes)
+	phys_addr_t pgtablePhysical, uint32 attributes)
 {
 	*entry = (pgtablePhysical & X86_PDE_ADDRESS_MASK)
 		| X86_PDE_PRESENT
@@ -263,7 +263,7 @@ x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 
 		for (size_t i = 0; i < (size / (B_PAGE_SIZE * 1024));
 				i++, virtualTable += B_PAGE_SIZE) {
-			addr_t physicalTable = 0;
+			phys_addr_t physicalTable = 0;
 			early_query(virtualTable, &physicalTable);
 			page_directory_entry* entry = &sPageHolePageDir[
 				(address / (B_PAGE_SIZE * 1024)) + i];
@@ -338,7 +338,7 @@ X86VMTranslationMap::Init(bool kernel)
 		}
 		vm_get_page_mapping(VMAddressSpace::KernelID(),
 			(addr_t)fArchData->pgdir_virt,
-			(addr_t*)&fArchData->pgdir_phys);
+			(phys_addr_t*)&fArchData->pgdir_phys);
 	} else {
 		// kernel
 		// get the physical page mapper
@@ -433,7 +433,7 @@ X86VMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 
 status_t
-X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
+X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 	uint32 memoryType, vm_page_reservation* reservation)
 {
 	TRACE("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
@@ -451,7 +451,7 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
 	// check to see if a page table exists for this range
 	uint32 index = VADDR_TO_PDENT(va);
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
-		addr_t pgtable;
+		phys_addr_t pgtable;
 		vm_page *page;
 
 		// we need to allocate a pgtable
@@ -460,7 +460,7 @@ X86VMTranslationMap::Map(addr_t va, addr_t pa, uint32 attributes,
 
 		DEBUG_PAGE_ACCESS_END(page);
 
-		pgtable = page->physical_page_number * B_PAGE_SIZE;
+		pgtable = (phys_addr_t)page->physical_page_number * B_PAGE_SIZE;
 
 		TRACE("map_tmap: asked for free page for pgtable. 0x%lx\n", pgtable);
 
@@ -916,7 +916,7 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 
 
 status_t
-X86VMTranslationMap::Query(addr_t va, addr_t *_physical, uint32 *_flags)
+X86VMTranslationMap::Query(addr_t va, phys_addr_t *_physical, uint32 *_flags)
 {
 	// default the flags to not present
 	*_flags = 0;
@@ -959,7 +959,7 @@ X86VMTranslationMap::Query(addr_t va, addr_t *_physical, uint32 *_flags)
 
 
 status_t
-X86VMTranslationMap::QueryInterrupt(addr_t va, addr_t *_physical,
+X86VMTranslationMap::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 	uint32 *_flags)
 {
 	*_flags = 0;
@@ -1356,16 +1356,18 @@ arch_vm_translation_map_init(kernel_args *args,
 
 	TRACE("physical memory ranges:\n");
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		addr_t start = args->physical_memory_range[i].start;
-		addr_t end = start + args->physical_memory_range[i].size;
-		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
+		phys_addr_t start = args->physical_memory_range[i].start;
+		phys_addr_t end = start + args->physical_memory_range[i].size;
+		TRACE("  %#10" B_PRIxPHYSADDR " - %#10" B_PRIxPHYSADDR "\n", start,
+			end);
 	}
 
 	TRACE("allocated physical ranges:\n");
 	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
-		addr_t start = args->physical_allocated_range[i].start;
-		addr_t end = start + args->physical_allocated_range[i].size;
-		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
+		phys_addr_t start = args->physical_allocated_range[i].start;
+		phys_addr_t end = start + args->physical_allocated_range[i].size;
+		TRACE("  %#10" B_PRIxPHYSADDR " - %#10" B_PRIxPHYSADDR "\n", start,
+			end);
 	}
 
 	TRACE("allocated virtual ranges:\n");
@@ -1444,8 +1446,8 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 // here, and is later unmapped.
 
 status_t
-arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
-	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
+arch_vm_translation_map_early_map(kernel_args *args, addr_t va, phys_addr_t pa,
+	uint8 attributes, phys_addr_t (*get_free_page)(kernel_args *))
 {
 	int index;
 
@@ -1454,7 +1456,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	// check to see if a page table exists for this range
 	index = VADDR_TO_PDENT(va);
 	if ((sPageHolePageDir[index] & X86_PDE_PRESENT) == 0) {
-		addr_t pgtable;
+		phys_addr_t pgtable;
 		page_directory_entry *e;
 		// we need to allocate a pgtable
 		pgtable = get_free_page(args);
@@ -1503,7 +1505,7 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 {
 	// We only trust the kernel team's page directory. So switch to it first.
 	// Always set it to make sure the TLBs don't contain obsolete data.
-	addr_t physicalPageDirectory;
+	uint32 physicalPageDirectory;
 	read_cr3(physicalPageDirectory);
 	write_cr3(sKernelPhysicalPageDirectory);
 
@@ -1511,7 +1513,7 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	page_directory_entry pageDirectoryEntry;
 	uint32 index = VADDR_TO_PDENT(virtualAddress);
 
-	if (physicalPageDirectory == (addr_t)sKernelPhysicalPageDirectory) {
+	if (physicalPageDirectory == (uint32)sKernelPhysicalPageDirectory) {
 		pageDirectoryEntry = sKernelVirtualPageDirectory[index];
 	} else if (sPhysicalPageMapper != NULL) {
 		// map the original page directory and get the entry
@@ -1549,7 +1551,7 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 		pageTableEntry = 0;
 
 	// switch back to the original page directory
-	if (physicalPageDirectory != (addr_t)sKernelPhysicalPageDirectory)
+	if (physicalPageDirectory != (uint32)sKernelPhysicalPageDirectory)
 		write_cr3(physicalPageDirectory);
 
 	if ((pageTableEntry & X86_PTE_PRESENT) == 0)

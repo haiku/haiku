@@ -370,7 +370,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		= cpuData->arch.active_translation_map;
 	VMAddressSpace* toAddressSpace = to->team->address_space;
 
-	addr_t newPageDirectory;
+	uint32 newPageDirectory;
 	vm_translation_map_arch_info* toMap;
 	if (toAddressSpace != NULL
 		&& (toMap = static_cast<X86VMTranslationMap*>(
@@ -389,7 +389,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		cpuData->arch.active_translation_map = toMap;
 
 		// get the new page directory
-		newPageDirectory = (addr_t)toMap->pgdir_phys;
+		newPageDirectory = (uint32)toMap->pgdir_phys;
 	} else {
 		newPageDirectory = 0;
 			// this means no change

@@ -30,8 +30,8 @@ struct X86VMTranslationMap : VMTranslationMap {
 									addr_t end) const;
 
 	virtual	status_t			Map(addr_t virtualAddress,
-									addr_t physicalAddress, uint32 attributes,
-									uint32 memoryType,
+									phys_addr_t physicalAddress,
+									uint32 attributes, uint32 memoryType,
 									vm_page_reservation* reservation);
 	virtual	status_t			Unmap(addr_t start, addr_t end);
 
@@ -44,10 +44,10 @@ struct X86VMTranslationMap : VMTranslationMap {
 									bool ignoreTopCachePageFlags);
 
 	virtual	status_t			Query(addr_t virtualAddress,
-									addr_t* _physicalAddress,
+									phys_addr_t* _physicalAddress,
 									uint32* _flags);
 	virtual	status_t			QueryInterrupt(addr_t virtualAddress,
-									addr_t* _physicalAddress,
+									phys_addr_t* _physicalAddress,
 									uint32* _flags);
 
 	virtual	status_t			Protect(addr_t base, addr_t top,

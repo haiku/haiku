@@ -23,7 +23,7 @@ GenericVMPhysicalPageMapper::~GenericVMPhysicalPageMapper()
 
 
 status_t
-GenericVMPhysicalPageMapper::GetPage(addr_t physicalAddress,
+GenericVMPhysicalPageMapper::GetPage(phys_addr_t physicalAddress,
 	addr_t* _virtualAddress, void** _handle)
 {
 	return generic_get_physical_page(physicalAddress, _virtualAddress, 0);
@@ -38,7 +38,7 @@ GenericVMPhysicalPageMapper::PutPage(addr_t virtualAddress, void* handle)
 
 
 status_t
-GenericVMPhysicalPageMapper::GetPageCurrentCPU(addr_t physicalAddress,
+GenericVMPhysicalPageMapper::GetPageCurrentCPU(phys_addr_t physicalAddress,
 	addr_t* _virtualAddress, void** _handle)
 {
 	// TODO:...
@@ -56,7 +56,7 @@ GenericVMPhysicalPageMapper::PutPageCurrentCPU(addr_t virtualAddress,
 
 
 status_t
-GenericVMPhysicalPageMapper::GetPageDebug(addr_t physicalAddress,
+GenericVMPhysicalPageMapper::GetPageDebug(phys_addr_t physicalAddress,
 	addr_t* _virtualAddress, void** _handle)
 {
 	// TODO:...
@@ -73,15 +73,15 @@ GenericVMPhysicalPageMapper::PutPageDebug(addr_t virtualAddress, void* handle)
 
 
 status_t
-GenericVMPhysicalPageMapper::MemsetPhysical(addr_t address, int value,
-	size_t length)
+GenericVMPhysicalPageMapper::MemsetPhysical(phys_addr_t address, int value,
+	phys_size_t length)
 {
 	return generic_vm_memset_physical(address, value, length);
 }
 
 
 status_t
-GenericVMPhysicalPageMapper::MemcpyFromPhysical(void* to, addr_t from,
+GenericVMPhysicalPageMapper::MemcpyFromPhysical(void* to, phys_addr_t from,
 	size_t length, bool user)
 {
 	return generic_vm_memcpy_from_physical(to, from, length, user);
@@ -89,7 +89,7 @@ GenericVMPhysicalPageMapper::MemcpyFromPhysical(void* to, addr_t from,
 
 
 status_t
-GenericVMPhysicalPageMapper::MemcpyToPhysical(addr_t to, const void* from,
+GenericVMPhysicalPageMapper::MemcpyToPhysical(phys_addr_t to, const void* from,
 	size_t length, bool user)
 {
 	return generic_vm_memcpy_to_physical(to, from, length, user);
@@ -97,7 +97,8 @@ GenericVMPhysicalPageMapper::MemcpyToPhysical(addr_t to, const void* from,
 
 
 void
-GenericVMPhysicalPageMapper::MemcpyPhysicalPage(addr_t to, addr_t from)
+GenericVMPhysicalPageMapper::MemcpyPhysicalPage(phys_addr_t to,
+	phys_addr_t from)
 {
 	generic_vm_memcpy_physical_page(to, from);
 }
