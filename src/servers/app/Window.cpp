@@ -792,25 +792,30 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 	bool windowModifier = (fFlags & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
 		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
 			| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
+	click_type action = CLICK_NONE;
 
-	// default action is to drag the Window
 	if (windowModifier || inBorderRegion) {
 		// clicking Window visible area
 
-		click_type action = CLICK_NONE;
 		int32 buttons = _ExtractButtons(message);
 
-		if (inBorderRegion && fDecorator != NULL)
+		if (inBorderRegion)
 			action = _ActionFor(message, buttons, modifiers);
 		else {
 			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 				action = CLICK_MOVE_TO_BACK;
 			else if ((fFlags & B_NOT_MOVABLE) == 0 && fDecorator != NULL)
 				action = CLICK_DRAG;
+			else {
+				// pass click on to the application
+				windowModifier = false;
+			}
 		}
+	}
 
+	if (windowModifier || inBorderRegion) {
 		if (!desktopSettings.AcceptFirstClick()) {
-			// ignore clicks on decorator buttons if the
+			// Ignore clicks on decorator buttons if the
 			// non-floating window doesn't have focus
 			if (!IsFocus() && !IsFloating() && action != CLICK_MOVE_TO_BACK
 				&& action != CLICK_RESIZE && action != CLICK_SLIDE_TAB)
@@ -868,13 +873,12 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			engine->LockParallelAccess();
 			engine->ConstrainClippingRegion(visibleBorder);
 
-			if (fIsZooming) {
+			if (fIsZooming)
 				fDecorator->SetZoom(true);
-			} else if (fIsClosing) {
+			else if (fIsClosing)
 				fDecorator->SetClose(true);
-			} else if (fIsMinimizing) {
+			else if (fIsMinimizing)
 				fDecorator->SetMinimize(true);
-			}
 
 			engine->UnlockParallelAccess();
 
