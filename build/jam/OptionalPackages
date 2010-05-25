@@ -609,6 +609,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs termcap : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage libs tiff : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
 	# cpp headers
