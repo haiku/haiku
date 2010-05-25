@@ -56,6 +56,9 @@ typedef int64					nanotime_t;
 typedef uint32					type_code;
 typedef uint32					perform_code;
 
+typedef __haiku_phys_addr_t		phys_addr_t;
+typedef phys_addr_t				phys_size_t;
+
 
 /* printf()/scanf() format strings for [u]int* types */
 #define B_PRId8			"d"

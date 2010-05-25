@@ -50,7 +50,6 @@ typedef __haiku_std_int32	nlink_t;
 typedef char*				caddr_t;
 
 typedef __haiku_addr_t		addr_t;
-typedef __haiku_phys_addr_t	phys_addr_t;
 typedef __haiku_int32 		key_t;
 
 #include <null.h>

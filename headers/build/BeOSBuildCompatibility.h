@@ -28,7 +28,6 @@
 
 typedef unsigned long	haiku_build_addr_t;
 #define addr_t			haiku_build_addr_t
-#define phys_addr_t		haiku_build_addr_t
 
 #include <Errors.h>
 

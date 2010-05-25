@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_API_WRAPPER_H
@@ -1492,6 +1492,7 @@
 
 #define addr_t			fssh_addr_t
 #define phys_addr_t		fssh_phys_addr_t
+#define phys_size_t		fssh_phys_size_t
 
 #define dev_t			fssh_dev_t
 #define ino_t			fssh_ino_t

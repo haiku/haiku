@@ -57,6 +57,13 @@ typedef int64					bigtime_t;
 typedef uint32					type_code;
 typedef uint32					perform_code;
 
+#ifdef HAIKU_HOST_PLATFORM_64_BIT
+typedef uint64					phys_addr_t;
+#else
+typedef uint32					phys_addr_t;
+#endif
+typedef phys_addr_t				phys_size_t;
+
 
 /* printf()/scanf() format strings for [u]int* types */
 #define B_PRId8			PRId8

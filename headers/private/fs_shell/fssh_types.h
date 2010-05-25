@@ -23,6 +23,7 @@ typedef uint32_t	fssh_phys_addr_t;
 typedef uint32_t	fssh_size_t;
 typedef int32_t		fssh_ssize_t;
 #endif
+typedef fssh_phys_addr_t	fssh_phys_size_t;
 
 typedef int32_t		fssh_dev_t;
 typedef int64_t		fssh_ino_t;
