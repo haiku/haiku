@@ -18,6 +18,7 @@ public:
 	bool isBufferAvailable();
 	BBuffer *GetOutputBuffer();
 	void AddBuffer(int32 id, BBuffer *buffer, bool isPrimary);
+	void RemoveBuffer(int32 id);
 	void Merge(BBuffer *input, BBuffer *output);
 
 private:

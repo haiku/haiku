@@ -33,7 +33,7 @@ BufferMixer::GetOutputBuffer() {
 	BBuffer *outputBuffer = groupedBuffers[0];
 	groupedBuffers[0] = NULL;
 	
-	map<int32, BBuffer*>::iterator each;
+	std::map<int32, BBuffer*>::iterator each;
 	
 	for (each=groupedBuffers.begin(); each != groupedBuffers.end(); each++) {
 		if (each->second != outputBuffer) {
@@ -85,4 +85,18 @@ BufferMixer::AddBuffer(int32 id, BBuffer *buffer, bool isPrimary) {
 	if (oldBuffer != NULL) {
 		oldBuffer->Recycle();
 	}
+}
+
+void 
+BufferMixer::RemoveBuffer(int32 id) {
+	BBuffer *oldBuffer;
+
+	if (id < groupedBuffers.size()) {
+		oldBuffer = groupedBuffers[id];
+		groupedBuffers[id] = NULL;
+	
+		if (oldBuffer != NULL) {
+			oldBuffer->Recycle();
+		}
+	}	
 }

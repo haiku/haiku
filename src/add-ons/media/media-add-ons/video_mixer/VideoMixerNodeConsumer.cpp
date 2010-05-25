@@ -203,6 +203,8 @@ void VideoMixerNode::Disconnected(
 		return;
 	}
 	
+	bufferMixer.RemoveBuffer(input->destination.id);
+	
 	// disconnected but not deleted (important)
 	input->source = media_source::null;
 	GetInputFormat(&input->format);
