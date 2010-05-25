@@ -2789,12 +2789,17 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			if (link.Read<BPoint>(&where) == B_OK) {
 				ServerPicture* picture = App()->GetPicture(token);
 				if (picture != NULL) {
-					fCurrentView->PushState();
-
+					// Setting the drawing origin outside of the
+					// state makes sure that everything the picture
+					// does is relative to the global picture offset.
+					BPoint origin = fCurrentView->DrawingOrigin();
 					fCurrentView->SetDrawingOrigin(where);
-					picture->Play(fCurrentView);
 
+					fCurrentView->PushState();
+					picture->Play(fCurrentView);
 					fCurrentView->PopState();
+
+					fCurrentView->SetDrawingOrigin(origin);
 
 					picture->ReleaseReference();
 				}
