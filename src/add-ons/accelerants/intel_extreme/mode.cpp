@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
@@ -585,7 +585,8 @@ intel_propose_display_mode(display_mode *target, const display_mode *low,
 status_t
 intel_set_display_mode(display_mode *mode)
 {
-	TRACE(("intel_set_display_mode()\n"));
+	TRACE(("intel_set_display_mode(%ldx%ld)\n", mode->virtual_width,
+		mode->virtual_height));
 
 	if (mode == NULL)
 		return B_BAD_VALUE;

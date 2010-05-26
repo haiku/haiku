@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -214,7 +214,7 @@ intel_init_accelerant(int device)
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
 	}
 
-	TRACE(("head detected: %d\n", gInfo->head_mode));
+	TRACE(("head detected: %#x\n", gInfo->head_mode));
 	TRACE(("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
 		read32(INTEL_DISPLAY_A_ANALOG_PORT),
 		read32(INTEL_DISPLAY_A_DIGITAL_PORT),

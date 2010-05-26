@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -76,7 +76,7 @@ enable_lvds_panel(bool enable)
 {
 	uint32 control = read32(INTEL_PANEL_CONTROL);
 	uint32 panelStatus;
-	
+
 	if (enable) {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) == 0) {
 			write32(INTEL_PANEL_CONTROL, control
@@ -184,7 +184,7 @@ set_display_power_mode(uint32 mode)
 		spin(150);
 	}
 
-	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0)
+	if ((gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0)
 		enable_lvds_panel(mode == B_DPMS_ON);
 
 	read32(INTEL_DISPLAY_A_BASE);
