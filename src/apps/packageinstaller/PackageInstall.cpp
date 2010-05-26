@@ -38,7 +38,8 @@ install_function(void *data)
 
 PackageInstall::PackageInstall(PackageView *parent)
 	: fParent(parent),
-	fThreadId(-1)
+	fThreadId(-1),
+	fCurrentScript(NULL)
 {
 }
 
