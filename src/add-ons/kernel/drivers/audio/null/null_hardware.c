@@ -8,7 +8,7 @@
 #include "driver.h"
 
 
-status_t 
+status_t
 null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 {
 	int i;
@@ -18,15 +18,15 @@ null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 	status_t result;
 	physical_entry pe;
 
-	buffer_size = stream->num_channels 
-				* format_to_sample_size(stream->format) 
+	buffer_size = stream->num_channels
+				* format_to_sample_size(stream->format)
 				* stream->buffer_length;
 	buffer_size = (buffer_size + 127) & (~127);
-	
+
 	area_size = buffer_size * stream->num_buffers;
 	area_size = (area_size + B_PAGE_SIZE - 1) & (~(B_PAGE_SIZE -1));
 
-	stream->buffer_area = create_area("null_audio_buffers", (void**)&buffer, 
+	stream->buffer_area = create_area("null_audio_buffers", (void**)&buffer,
 							B_ANY_KERNEL_ADDRESS, area_size,
 							B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (stream->buffer_area < B_OK)
@@ -35,11 +35,12 @@ null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 	// Get the correct address for setting up the buffers
 	// pointers being passed back to userland
 	result = get_memory_map(buffer, area_size, &pe, 1);
+		// TODO: pe is never used!
 	if (result != B_OK) {
 		delete_area(stream->buffer_area);
 		return result;
 	}
-	
+
 	for (i=0; i < stream->num_buffers; i++) {
 		stream->buffers[i] = buffer + (i*buffer_size);
 	}
@@ -49,11 +50,11 @@ null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 }
 
 
-static int32 
+static int32
 null_fake_interrupt(void* cookie)
 {
 	// This thread is supposed to fake the interrupt
-	// handling done in communication with the 
+	// handling done in communication with the
 	// hardware usually. What it does is nearly the
 	// same like all soundrivers, get the interrupt
 	// exchange the buffer pointer and update the
@@ -104,7 +105,7 @@ null_fake_interrupt(void* cookie)
 }
 
 
-status_t 
+status_t
 null_start_hardware(device_t* device)
 {
 	dprintf("null_audio: %s spawning fake interrupter\n", __func__);
@@ -115,7 +116,7 @@ null_start_hardware(device_t* device)
 }
 
 
-void 
+void
 null_stop_hardware(device_t* device)
 {
 	device->running = false;
