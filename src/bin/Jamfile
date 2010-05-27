@@ -9,6 +9,7 @@ UsePrivateSystemHeaders ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel file_cache ;
 UseLibraryHeaders ncurses ;
 UseLibraryHeaders termcap ;
+UseLibraryHeaders icon ;
 
 local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
 
@@ -156,6 +157,11 @@ StdBinCommands
 StdBinCommands
 	translate.cpp
 	: be translation $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+
+# standard commands that need libbe.so, libtranslation.so, libicon.a, libstdc++.so
+StdBinCommands
+	notify.cpp
+	: be translation libicon.a $(TARGET_LIBSTDC++) : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libmedia.so
 StdBinCommands

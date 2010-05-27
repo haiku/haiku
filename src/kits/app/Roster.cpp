@@ -25,6 +25,7 @@
 
 #include <AppFileInfo.h>
 #include <Application.h>
+#include <Bitmap.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -35,6 +36,8 @@
 #include <Mime.h>
 #include <Node.h>
 #include <NodeInfo.h>
+#include <Notification.h>
+#include <notification/Notifications.h>
 #include <OS.h>
 #include <Path.h>
 #include <Query.h>
@@ -1648,6 +1651,63 @@ BRoster::AddToRecentFolders(const entry_ref* folder, const char* appSig) const
 		err = result;
 	if (err)
 		DBG(OUT("WARNING: BRoster::AddToRecentDocuments() failed with error 0x%lx\n", err));
+}
+
+/*! \brief Sends a notification to the notification_server.
+
+	The notification is delivered synchronously to the notification_server,
+	that will displays it according to its settings and filters.
+
+	\param notification Notification message.
+	\param timeout Seconds after the message fades out.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_PORT_ID: A connection to notification_server could not be
+	  established or the server is not up and running anymore.
+*/
+status_t
+BRoster::Notify(BNotification* notification, int32 timeout) const
+{
+	BMessage msg(kNotificationMessage);
+	msg.AddInt32("type", (int32)notification->Type());
+	msg.AddString("app", notification->Application());
+	msg.AddString("title", notification->Title());
+	msg.AddString("content", notification->Content());
+
+	if (notification->MessageID())
+		msg.AddString("messageID", notification->MessageID());
+
+	if (notification->Type() == B_PROGRESS_NOTIFICATION)
+		msg.AddFloat("progress", notification->Progress());
+
+	if (notification->OnClickApp())
+		msg.AddString("onClickApp", notification->OnClickApp());
+	if (notification->OnClickFile())
+		msg.AddRef("onClickFile", notification->OnClickFile());
+
+	int32 i;
+
+	BList* refs = notification->OnClickRefs();
+	for (i = 0; i < refs->CountItems(); i++)
+		msg.AddRef("onClickRef", (entry_ref*)refs->ItemAt(i));
+
+	BList* argv = notification->OnClickArgv();
+	for (i = 0; i < argv->CountItems(); i++)
+		msg.AddString("onClickArgv", (const char*)argv->ItemAt(i));
+
+	BBitmap* icon = notification->Icon();
+
+	BMessage archive;
+	if (icon && icon->Archive(&archive) == B_OK)
+		msg.AddMessage("icon", &archive);
+
+	// Custom time out
+	if (timeout > 0)
+		msg.AddInt32("timeout", timeout);
+
+	// Send message
+	BMessenger server(kNotificationServerSignature);
+	return server.SendMessage(&msg);
 }
 
 

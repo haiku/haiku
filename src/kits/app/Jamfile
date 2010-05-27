@@ -17,7 +17,7 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-UsePrivateHeaders shared app interface kernel ;
+UsePrivateHeaders shared app interface kernel notification ;
 UsePrivateSystemHeaders ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
@@ -45,6 +45,7 @@ MergeObject <libbe>app_kit.o :
 	MessageRunner.cpp
 	Messenger.cpp
 	MessageUtils.cpp
+	Notification.cpp
 	PropertyInfo.cpp
 	PortLink.cpp
 	RegistrarDefs.cpp

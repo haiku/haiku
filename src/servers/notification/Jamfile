@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src servers notification ;
+
+UsePrivateHeaders notification ;
+UseLibraryHeaders icon ;
+
+Server notification_server :
+	AppGroupView.cpp
+	BorderView.cpp
+	NotificationServer.cpp
+	NotificationView.cpp
+	NotificationWindow.cpp
+	: be $(TARGET_LIBSTDC++) libicon.a libnotification.a
+	: notification_server.rdef
+;
+
+Depends notification_server : libicon.a ;
+Depends notification_server : libnotification.a ;

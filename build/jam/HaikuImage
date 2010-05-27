@@ -44,7 +44,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	listport listres listsem listusb ln locate logger login logname ls lsindex
 	mail2mbox makebootable mbox2mail md5sum merge message mimeset mkdos mkdir
 	mkfifo mkfs mkindex mktemp modifiers mount mount_nfs mountvolume mv
-	netcat netstat nl nohup nproc
+	netcat netstat nl nohup notify nproc
 	od open
 	passwd paste patch pathchk pc ping play playfile playsound playwav pr prio
 	printenv printf profile ps ptx pwd
@@ -70,7 +70,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc Devices
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media
-	Mouse Network OpenGL Printers Screen ScreenSaver Shortcuts Sounds Time
+	Mouse Network Notifications OpenGL Printers Screen ScreenSaver Shortcuts Sounds Time
 	Touchpad <preference>Tracker VirtualMemory
 ;
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
@@ -103,7 +103,7 @@ PRIVATE_SYSTEM_LIBS =
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server
-	print_server registrar syslog_daemon
+	notification_server print_server registrar syslog_daemon
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
