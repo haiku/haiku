@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2010, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -364,8 +364,9 @@ struct ListState : State {
 		size_t size;
 		for (int32 i = 0;
 				resources.GetResourceInfo(i, &type, &id, &name, &size); i++) {
-			printf("'%s' %11" B_PRId32 " %11" B_PRIuSIZE "  %s\n", resource_type(type), id,
-				size, (name && strlen(name) > 0 ? name : "(no name)"));
+			printf("'%s' %11" B_PRId32 " %11" B_PRIuSIZE "  %s\n",
+				resource_type(type), id, size,
+				name != NULL && name[0] != '\0' ? name : "(no name)");
 		}
 	}
 };
@@ -661,7 +662,7 @@ print_usage(bool error)
 			commandName = kArgv[0];
 	}
 
-	if (!commandName || strlen(commandName) == 0)
+	if (!commandName || commandName[0] == '\0')
 		commandName = kCommandName;
 
 	// print usage
