@@ -7,10 +7,8 @@
 
 
 #include <Entry.h>
-
-
-class BBitmap;
-class BList;
+#include <List.h>
+#include <String.h>
 
 
 // notification types
@@ -20,6 +18,8 @@ enum notification_type {
 	B_ERROR_NOTIFICATION,
 	B_PROGRESS_NOTIFICATION
 };
+
+class BBitmap;
 
 
 class BNotification {
@@ -47,29 +47,33 @@ public:
 			const char*			OnClickApp() const;
 			void				SetOnClickApp(const char* app);
 
-			entry_ref*			OnClickFile() const;
-			void				SetOnClickFile(const entry_ref* file);
+			const entry_ref*	OnClickFile() const;
+			status_t			SetOnClickFile(const entry_ref* file);
 
-			BList*				OnClickRefs() const;
-			void				AddOnClickRef(const entry_ref* ref);
+			status_t			AddOnClickRef(const entry_ref* ref);
+			status_t			AddOnClickRef(const entry_ref& ref);
+			int32				CountOnClickRefs() const;
+			const entry_ref*	OnClickRefAt(int32 index) const;
 
-			BList*				OnClickArgv() const;
-			void				AddOnClickArg(const char* arg);
+			status_t			AddOnClickArg(const char* arg);
+			int32				CountOnClickArgs() const;
+			const char*			OnClickArgAt(int32 index) const;
 
-			BBitmap*			Icon() const;
-			void				SetIcon(BBitmap* icon);
+			const BBitmap*		Icon() const;
+			status_t			SetIcon(const BBitmap* icon);
 
 private:
 			notification_type	fType;
-			char*				fAppName;
-			char*				fTitle;
-			char*				fContent;
-			char*				fID;
+			BString				fAppName;
+			BString				fTitle;
+			BString				fContent;
+			BString				fID;
 			float				fProgress;
-			char*				fApp;
+
+			BString				fApp;
 			entry_ref*			fFile;
-			BList*				fRefs;
-			BList*				fArgv;
+			BList				fRefs;
+			BList				fArgv;
 			BBitmap*			fBitmap;
 };
 

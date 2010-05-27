@@ -4,48 +4,40 @@
  *
  * Authors:
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
+
+
+#include <Notification.h>
+
+#include <new>
 
 #include <stdlib.h>
 #include <string.h>
 
 #include <Bitmap.h>
-#include <List.h>
 #include <Message.h>
-#include <Notification.h>
 
 
 BNotification::BNotification(notification_type type)
 	:
 	fType(type),
-	fAppName(NULL),
-	fTitle(NULL),
-	fContent(NULL),
-	fID(NULL),
-	fApp(NULL),
 	fFile(NULL),
 	fBitmap(NULL)
 {
-	fRefs = new BList();
-	fArgv = new BList();
 }
 
 
 BNotification::~BNotification()
 {
-	if (fAppName)
-		free(fAppName);
-	if (fTitle)
-		free(fTitle);
-	if (fContent)
-		free(fContent);
-	if (fID)
-		free(fID);
-	if (fApp)
-		free(fApp);
+	delete fFile;
+	delete fBitmap;
 
-	delete fRefs;
-	delete fArgv;
+	for (int32 i = fRefs.CountItems() - 1; i >= 0; i--)
+		delete (entry_ref*)fRefs.ItemAtFast(i);
+
+	for (int32 i = fArgv.CountItems() - 1; i >= 0; i--)
+		free(fArgv.ItemAtFast(i));
 }
 
 
@@ -66,11 +58,7 @@ BNotification::Application() const
 void
 BNotification::SetApplication(const char* app)
 {
-	free(fAppName);
-	fAppName = NULL;
-
-	if (app)
-		fAppName = strdup(app);
+	fAppName = app;
 }
 
 
@@ -84,11 +72,7 @@ BNotification::Title() const
 void
 BNotification::SetTitle(const char* title)
 {
-	free(fTitle);
-	fTitle = NULL;
-
-	if (title)
-		fTitle = strdup(title);
+	fTitle = title;
 }
 
 
@@ -102,11 +86,7 @@ BNotification::Content() const
 void
 BNotification::SetContent(const char* content)
 {
-	free(fContent);
-	fContent = NULL;
-
-	if (content)
-		fContent = strdup(content);
+	fContent = content;
 }
 
 
@@ -120,11 +100,7 @@ BNotification::MessageID() const
 void
 BNotification::SetMessageID(const char* id)
 {
-	free(fID);
-	fID = NULL;
-
-	if (id)
-		fID = strdup(id);
+	fID = id;
 }
 
 
@@ -152,65 +128,115 @@ BNotification::OnClickApp() const
 void
 BNotification::SetOnClickApp(const char* app)
 {
-	free(fApp);
-	fApp = NULL;
-
-	if (app)
-		fApp = strdup(app);
+	fApp = app;
 }
 
 
-entry_ref*
+const entry_ref*
 BNotification::OnClickFile() const
 {
 	return fFile;
 }
 
 
-void
+status_t
 BNotification::SetOnClickFile(const entry_ref* file)
 {
-	fFile = (entry_ref*)file;
+	delete fFile;
+
+	if (file != NULL) {
+		fFile = new(std::nothrow) entry_ref(*file);
+		if (fFile == NULL)
+			return B_NO_MEMORY;
+	} else
+		fFile = NULL;
+
+	return B_OK;
 }
 
 
-BList*
-BNotification::OnClickRefs() const
-{
-	return fRefs;
-}
-
-
-void
+status_t
 BNotification::AddOnClickRef(const entry_ref* ref)
 {
-	fRefs->AddItem((void*)ref);
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
+	return AddOnClickRef(*ref);
 }
 
 
-BList*
-BNotification::OnClickArgv() const
+int32
+BNotification::CountOnClickRefs() const
 {
-	return fArgv;
+	return fRefs.CountItems();
 }
 
 
-void
+const entry_ref*
+BNotification::OnClickRefAt(int32 index) const
+{
+	return (entry_ref*)fArgv.ItemAt(index);
+}
+
+
+status_t
+BNotification::AddOnClickRef(const entry_ref& ref)
+{
+	entry_ref* clonedRef = new(std::nothrow) entry_ref(ref);
+	if (clonedRef == NULL || !fRefs.AddItem(clonedRef))
+		return B_NO_MEMORY;
+
+	return B_OK;
+}
+
+
+status_t
 BNotification::AddOnClickArg(const char* arg)
 {
-	fArgv->AddItem((void*)arg);
+	if (arg == NULL)
+		return B_BAD_VALUE;
+
+	char* clonedArg = strdup(arg);
+	if (clonedArg == NULL || !fArgv.AddItem(clonedArg))
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
-BBitmap*
+int32
+BNotification::CountOnClickArgs() const
+{
+	return fArgv.CountItems();
+}
+
+
+const char*
+BNotification::OnClickArgAt(int32 index) const
+{
+	return (char*)fArgv.ItemAt(index);
+}
+
+
+const BBitmap*
 BNotification::Icon() const
 {
 	return fBitmap;
 }
 
 
-void
-BNotification::SetIcon(BBitmap* icon)
+status_t
+BNotification::SetIcon(const BBitmap* icon)
 {
-	fBitmap = icon;
+	delete fBitmap;
+
+	if (icon != NULL) {
+		fBitmap = new(std::nothrow) BBitmap(icon);
+		if (fBitmap == NULL)
+			return B_NO_MEMORY;
+		return fBitmap->InitCheck();
+	}
+
+	fBitmap = NULL;
+	return B_OK;
 }

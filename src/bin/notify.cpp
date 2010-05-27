@@ -4,7 +4,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ *		Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include <stdio.h>
@@ -45,20 +46,21 @@ public:
 	virtual void				ReadyToRun();
 	virtual void				ArgvReceived(int32 argc, char** argv);
 
-			bool				GoodArguments() const { return fOk; }
+			bool				HasGoodArguments() const
+									{ return fHasGoodArguments; }
 
 private:
-			bool				fOk;
+			bool				fHasGoodArguments;
 			notification_type	fType;
-			const char*			fAppName;
-			const char*			fTitle;
-			const char*			fMsgId;
+			char*				fAppName;
+			char*				fTitle;
+			char*				fMsgId;
 			float				fProgress;
-			int32				fTimeout;
-			const char*			fIconFile;
+			bigtime_t			fTimeout;
+			char*				fIconFile;
 			entry_ref			fFileRef;
-			const char*			fMessage;
-			const char*			fApp;
+			char*				fMessage;
+			char*				fApp;
 			bool				fHasFile;
 			entry_ref			fFile;
 			BList*				fRefs;
@@ -72,7 +74,7 @@ private:
 NotifyApp::NotifyApp()
 	:
 	BApplication(kSignature),
-	fOk(false),
+	fHasGoodArguments(false),
 	fType(B_INFORMATION_NOTIFICATION),
 	fAppName(NULL),
 	fTitle(NULL),
@@ -91,30 +93,19 @@ NotifyApp::NotifyApp()
 
 NotifyApp::~NotifyApp()
 {
-	if (fAppName)
-		free((void*)fAppName);
-	if (fTitle)
-		free((void*)fTitle);
-	if (fMsgId)
-		free((void*)fMsgId);
-	if (fIconFile)
-		free((void*)fIconFile);
-	if (fMessage)
-		free((void*)fMessage);
-	if (fApp)
-		free((void*)fApp);
+	free(fAppName);
+	free(fTitle);
+	free(fMsgId);
+	free(fIconFile);
+	free(fMessage);
+	free(fApp);
 
-	int32 i;
-	void* item;
-
-	for (i = 0; item = fRefs->ItemAt(i); i++)
-		delete item;
+	for (int32 i = 0; void* item = fRefs->ItemAt(i); i++)
+		delete (BEntry*)item;
 	delete fRefs;
 
-	for (i = 0; item = fArgv->ItemAt(i); i++) {
-		if (item != NULL)
-			free(item);
-	}
+	for (int32 i = 0; void* item = fArgv->ItemAt(i); i++)
+		free(item);
 	delete fArgv;
 }
 
@@ -143,17 +134,17 @@ NotifyApp::ArgvReceived(int32 argc, char** argv)
 					if (strncmp(kTypeNames[i], argument, strlen(argument)) == 0)
 						fType = (notification_type)i;
 				}
-			} else if (strcmp(option, "app") == 0) {
+			} else if (strcmp(option, "app") == 0)
 				fAppName = strdup(argument);
-			} else if (strcmp(option, "title") == 0) {
+			else if (strcmp(option, "title") == 0)
 				fTitle = strdup(argument);
-			} else if (strcmp(option, "messageID") == 0) {
+			else if (strcmp(option, "messageID") == 0)
 				fMsgId = strdup(argument);
-			} else if (strcmp(option, "progress") == 0) {
+			else if (strcmp(option, "progress") == 0)
 				fProgress = atof(argument);
-			} else if (strcmp(option, "timeout") == 0) {
-				fTimeout = atol(argument);
-			} else if (strcmp(option, "icon") == 0) {
+			else if (strcmp(option, "timeout") == 0)
+				fTimeout = atol(argument) * 1000000;
+			else if (strcmp(option, "icon") == 0) {
 				fIconFile = strdup(argument);
 
 				if (get_ref_for_path(fIconFile, &fFileRef) < B_OK) {
@@ -177,17 +168,18 @@ NotifyApp::ArgvReceived(int32 argc, char** argv)
 					return;
 				}
 
-				fRefs->AddItem((void*)new BEntry(&ref));
+				fRefs->AddItem(new BEntry(&ref));
 			} else if (strcmp(option, "onClickArgv") == 0)
-				fArgv->AddItem((void*)strdup(argument));
+				fArgv->AddItem(strdup(argument));
 			else {
 				// Unrecognized option
 				fprintf(stderr, "Unrecognized option --%s\n\n", option);
 				return;
 			}
-		} else
+		} else {
 			// Option doesn't start with '--'
 			break;
+		}
 
 		if (index == kArgCount) {
 			// No text argument provided, only '--' arguments
@@ -197,17 +189,17 @@ NotifyApp::ArgvReceived(int32 argc, char** argv)
 	}
 
 	// Check for missing arguments
-	if (!fAppName) {
+	if (fAppName == NULL) {
 		fprintf(stderr, "Missing --app argument!\n\n");
 		return;
 	}
-	if (!fTitle) {
+	if (fTitle == NULL) {
 		fprintf(stderr, "Missing --title argument!\n\n");
 		return;
 	}
 
 	fMessage = strdup(argv[index]);
-	fOk = true;
+	fHasGoodArguments = true;
 }
 
 void
@@ -262,47 +254,50 @@ NotifyApp::_GetBitmap(const entry_ref* ref) const
 void
 NotifyApp::ReadyToRun()
 {
-	if (GoodArguments()) {
-		BNotification* msg = new BNotification(fType);
-		msg->SetApplication(fAppName);
-		msg->SetTitle(fTitle);
-		msg->SetContent(fMessage);
+	if (HasGoodArguments()) {
+		BNotification notification(fType);
+		notification.SetApplication(fAppName);
+		notification.SetTitle(fTitle);
+		notification.SetContent(fMessage);
 
-		if (fMsgId)
-			msg->SetMessageID(fMsgId);
+		if (fMsgId != NULL)
+			notification.SetMessageID(fMsgId);
 
 		if (fType == B_PROGRESS_NOTIFICATION)
-			msg->SetProgress(fProgress);
+			notification.SetProgress(fProgress);
 
-		if (fIconFile) {
+		if (fIconFile != NULL) {
 			BBitmap* bitmap = _GetBitmap(&fFileRef);
-			if (bitmap)
-				msg->SetIcon(bitmap);
+			if (bitmap) {
+				notification.SetIcon(bitmap);
+				delete bitmap;
+			}
 		}
 
-		if (fApp)
-			msg->SetOnClickApp(fApp);
+		if (fApp != NULL)
+			notification.SetOnClickApp(fApp);
 
 		if (fHasFile)
-			msg->SetOnClickFile(&fFile);
+			notification.SetOnClickFile(&fFile);
 
-		int32 i;
-		void* item;
-
-		for (i = 0; item = fRefs->ItemAt(i); i++) {
+		for (int32 i = 0; void* item = fRefs->ItemAt(i); i++) {
 			BEntry* entry = (BEntry*)item;
 
 			entry_ref ref;
 			if (entry->GetRef(&ref) == B_OK)
-				msg->AddOnClickRef(&ref);
+				notification.AddOnClickRef(&ref);
 		}
 
-		for (i = 0; item = fArgv->ItemAt(i); i++) {
+		for (int32 i = 0; void* item = fArgv->ItemAt(i); i++) {
 			const char* arg = (const char*)item;
-			msg->AddOnClickArg(arg);
+			notification.AddOnClickArg(arg);
 		}
 
-		be_roster->Notify(msg, fTimeout);
+		status_t ret = be_roster->Notify(notification, fTimeout);
+		if (ret != B_OK) {
+			fprintf(stderr, "Failed to deliver notification: %s\n",
+				strerror(ret));
+		}
 	} else
 		_Usage();
 
@@ -318,7 +313,7 @@ main(int argc, char** argv)
 		return kErrorInitFail;
 
 	app.Run();
-	if (!app.GoodArguments())
+	if (!app.HasGoodArguments())
 		return kErrorArgumentsFail;
 
 	return 0;

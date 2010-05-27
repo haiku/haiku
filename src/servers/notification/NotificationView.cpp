@@ -9,6 +9,7 @@
  *		Michael Davidson, slaad@bong.com.au
  *		Mikael Eiman, mikael@eiman.tv
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include <stdlib.h>
@@ -122,14 +123,13 @@ NotificationView::AttachedToWindow()
 {
 	BMessage msg(kRemoveView);
 	msg.AddPointer("view", this);
-	int32 timeout = -1;
+	bigtime_t timeout = -1;
 
-	if (fDetails->FindInt32("timeout", &timeout) != B_OK)
-		timeout = fParent->Timeout();
-	bigtime_t delay = timeout * 1000 * 1000;
-	
-	if (delay > 0)
-		fRunner = new BMessageRunner(BMessenger(Parent()), &msg, delay, 1);
+	if (fDetails->FindInt64("timeout", &timeout) != B_OK)
+		timeout = fParent->Timeout() * 1000000;
+
+	if (timeout > 0)
+		fRunner = new BMessageRunner(BMessenger(Parent()), &msg, timeout, 1);
 }
 
 
