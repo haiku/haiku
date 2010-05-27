@@ -29,7 +29,7 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 {
 	size_t cur_idx;
 	size_t left_len;
-	
+
 	SHOW_FLOW(3, "vec_count=%lu, vec_offset=%lu, len=%lu, max_entries=%lu",
 		vec_count, vec_offset, len, max_entries);
 
@@ -47,7 +47,7 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 		size_t cur_num_entries, cur_mapped_len;
 		uint32 tmp_idx;
 
-		SHOW_FLOW( 3, "left_len=%d, vec_count=%d, cur_idx=%d", 
+		SHOW_FLOW( 3, "left_len=%d, vec_count=%d, cur_idx=%d",
 			(int)left_len, (int)vec_count, (int)cur_idx );
 
 		// map one iovec
@@ -59,7 +59,7 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 
 		vec_offset = 0;
 
-		if ((res = get_memory_map(range_start, range_len, &map[cur_idx], 
+		if ((res = get_memory_map(range_start, range_len, &map[cur_idx],
 				max_entries - cur_idx)) != B_OK) {
 			// according to docu, no error is ever reported - argh!
 			SHOW_ERROR(1, "invalid io_vec passed (%s)", strerror(res));
@@ -69,6 +69,7 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 		// stupid: get_memory_map does neither tell how many sg blocks
 		// are used nor whether there were enough sg blocks at all;
 		// -> determine that manually
+		// TODO: Use get_memory_map_etc()!
 		cur_mapped_len = 0;
 		cur_num_entries = 0;
 
@@ -81,14 +82,14 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 		}
 
 		if (cur_mapped_len == 0) {
-			panic("get_memory_map() returned empty list; left_len=%d, idx=%d/%d", 
+			panic("get_memory_map() returned empty list; left_len=%d, idx=%d/%d",
 				(int)left_len, (int)cur_idx, (int)max_entries);
-			SHOW_ERROR(2, "get_memory_map() returned empty list; left_len=%d, idx=%d/%d", 
+			SHOW_ERROR(2, "get_memory_map() returned empty list; left_len=%d, idx=%d/%d",
 				(int)left_len, (int)cur_idx, (int)max_entries);
 			return B_ERROR;
 		}
 
-		SHOW_FLOW( 3, "cur_num_entries=%d, cur_mapped_len=%x", 
+		SHOW_FLOW( 3, "cur_num_entries=%d, cur_mapped_len=%x",
 			(int)cur_num_entries, (int)cur_mapped_len );
 
 		// try to combine with previous sg block
@@ -113,7 +114,7 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 	*num_entries = cur_idx;
 	*mapped_len = len - left_len;
 
-	SHOW_FLOW( 3, "num_entries=%d, mapped_len=%x", 
+	SHOW_FLOW( 3, "num_entries=%d, mapped_len=%x",
 		(int)*num_entries, (int)*mapped_len );
 
 	return B_OK;
