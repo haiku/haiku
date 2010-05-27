@@ -649,7 +649,7 @@ arch_vm_init_post_area(kernel_args *args)
 	vm_mark_page_range_inuse(0x0, 0xa0000 / B_PAGE_SIZE);
 
 	// map 0 - 0xa0000 directly
-	id = map_physical_memory("dma_region", (void *)0x0, 0xa0000,
+	id = map_physical_memory("dma_region", 0x0, 0xa0000,
 		B_ANY_KERNEL_ADDRESS | B_MTR_WB,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &gDmaAddress);
 	if (id < 0) {

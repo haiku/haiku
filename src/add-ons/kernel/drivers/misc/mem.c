@@ -155,7 +155,7 @@ mem_map_target(off_t position, size_t length, uint32 protection,
 	void **virtualAddress)
 {
 	area_id area;
-	void *physicalAddress;
+	phys_addr_t physicalAddress;
 	size_t offset;
 	size_t size;
 
@@ -164,10 +164,10 @@ mem_map_target(off_t position, size_t length, uint32 protection,
 		return EINVAL;
 
 	/* the first page address */
-	physicalAddress = (void *)(addr_t)(position & ~((off_t)B_PAGE_SIZE - 1));
+	physicalAddress = (phys_addr_t)position & ~((off_t)B_PAGE_SIZE - 1);
 
 	/* offset of target into it */
-	offset = position - (off_t)(addr_t)physicalAddress;
+	offset = position - (off_t)physicalAddress;
 
 	/* size of the whole mapping (page rounded) */
 	size = (offset + length + B_PAGE_SIZE - 1) & ~((size_t)B_PAGE_SIZE - 1);

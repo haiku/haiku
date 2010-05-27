@@ -395,7 +395,7 @@ pci_info *pcii = &(di->pcii);
     * (B_MTR_WC) and the memory mapped registers with B_MTR_UC.
     */
     si->memoryArea = map_physical_memory(buffer,
-        (void *)di->pcii.u.h0.base_registers[0],
+        di->pcii.u.h0.base_registers[0],
         di->pcii.u.h0.base_register_sizes[0],
         B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_UC,
         B_READ_AREA + B_WRITE_AREA,

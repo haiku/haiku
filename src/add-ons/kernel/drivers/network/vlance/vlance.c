@@ -261,7 +261,7 @@ alloc_buffers(dev_info_t *device)
 	/* get physical address of Initialization Block */
 	size = RNDUP(sizeof(dev_info_t), B_PAGE_SIZE);
 	get_memory_map(&(device->init_blk), size, &entry, 1);
-	device->phys_init_blk = (uint32)entry.address;
+	device->phys_init_blk = entry.address;
 
 	TRACE((DEVICE_NAME " init block va=%p pa=%p, size %lx\n",
 		&(device->init_blk), (void *)device->phys_init_blk, size));
@@ -279,7 +279,7 @@ alloc_buffers(dev_info_t *device)
 	}
 	/* get physical address of tx descriptor */
 	get_memory_map(device->tx_desc[0], size, &entry, 1);
-	device->phys_tx_desc = (uint32)(entry.address);
+	device->phys_tx_desc = entry.address;
 
 	TRACE((DEVICE_NAME " create tx desc area va=%p pa=%p sz=%lx\n",
 		device->tx_desc[0], (void *)device->phys_tx_desc, size));
@@ -300,7 +300,7 @@ alloc_buffers(dev_info_t *device)
 
 	/* get physical address of tx buffer */
 	get_memory_map(device->tx_buf[0], size, &entry, 1);
-	device->phys_tx_buf = (uint32)(entry.address);
+	device->phys_tx_buf = entry.address;
 
 	TRACE((DEVICE_NAME " create tx buf area va=%p pa=%08lx sz=%lx\n",
 		device->tx_buf[0], device->tx_desc[0]->s.tbadr, size));
@@ -321,7 +321,7 @@ alloc_buffers(dev_info_t *device)
 	}
 	/* get physical address of rx descriptor */
 	get_memory_map(device->rx_desc[0], size, &entry, 1);
-	device->phys_rx_desc = (uint32)entry.address;
+	device->phys_rx_desc = entry.address;
 
 	TRACE((DEVICE_NAME " create rx desc area va=%p pa=%p sz=%lx\n",
 		device->rx_desc[0], (void *)device->phys_rx_desc, size));
@@ -342,7 +342,7 @@ alloc_buffers(dev_info_t *device)
 	}
 	/* get physical address of rx buffer */
 	get_memory_map(device->rx_buf[0], size, &entry, 1);
-	device->phys_rx_buf = (uint32)(entry.address);
+	device->phys_rx_buf = entry.address;
 
 	TRACE((DEVICE_NAME " create rx buf area va=%p pa=%08lx sz=%lx\n",
 		device->rx_buf[0], device->rx_desc[0]->s.rbadr, size));

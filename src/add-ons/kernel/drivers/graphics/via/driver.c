@@ -115,7 +115,7 @@ static struct {
 	{0x0000, NULL}
 };
 
-static settings current_settings = { // see comments in skel.settings 
+static settings current_settings = { // see comments in skel.settings
 	// for driver
 	DRIVER_PREFIX ".accelerant",
 	false,      // dumprom
@@ -134,7 +134,7 @@ static void dumprom (void *rom, uint32 size)
 {
 	int fd;
 	uint32 cnt;
-	
+
 	fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
 	if (fd < 0) return;
 
@@ -187,7 +187,7 @@ init_hardware(void) {
 	long		pci_index = 0;
 	pci_info	pcii;
 	bool		found_one = false;
-	
+
 	/* choke if we can't find the PCI bus */
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
@@ -202,7 +202,7 @@ init_hardware(void) {
 	/* while there are more pci devices */
 	while ((*pci_bus->get_nth_pci_info)(pci_index, &pcii) == B_NO_ERROR) {
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
 		while (SupportedDevices[vendor].vendor) {
 			if (SupportedDevices[vendor].vendor == pcii.vendor_id) {
@@ -211,7 +211,7 @@ init_hardware(void) {
 				while (*devices) {
 					/* if we match a supported device */
 					if (*devices == pcii.device_id ) {
-						
+
 						found_one = true;
 						goto done;
 					}
@@ -241,7 +241,7 @@ init_driver(void) {
 		const char *item;
 		char       *end;
 		uint32      value;
-		
+
 		// for driver
 		item = get_driver_parameter (settings_handle, "accelerant", "", "");
 		if ((strlen (item) > 0) && (strlen (item) < sizeof (current_settings.accelerant) - 1)) {
@@ -328,7 +328,7 @@ void uninit_driver(void) {
 	put_module(B_ISA_MODULE_NAME);
 
 	/* put the agp module away if it's there */
-	if (agp_bus) 
+	if (agp_bus)
 		put_module(B_AGP_GART_MODULE_NAME);
 }
 
@@ -373,7 +373,7 @@ static status_t map_device(device_info *di)
  	{
  		si->use_clone_bugfix = 0;
  	}
- 
+
 	/* work out a name for the register mapping */
 	sprintf(buffer, DEVICE_FORMAT " regs",
 		di->pcii.vendor_id, di->pcii.device_id,
@@ -383,13 +383,13 @@ static status_t map_device(device_info *di)
 	si->regs_area = map_physical_memory(
 		buffer,
 		/* WARNING: Nvidia needs to map regs as viewed from PCI space! */
-		(void *) di->pcii.u.h0.base_registers_pci[registers],
+		di->pcii.u.h0.base_registers_pci[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
  		(si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
 		(void **)&(di->regs));
  	si->clone_bugfix_regs = (uint32 *) di->regs;
-		
+
 	/* if mapping registers to vmem failed then pass on error */
 	if (si->regs_area < 0) return si->regs_area;
 
@@ -492,7 +492,7 @@ static status_t map_device(device_info *di)
 			B_READ_AREA + B_WRITE_AREA,
 			&(si->framebuffer));
 	}
-		
+
 	/* if there was an error, delete our other areas and pass on error*/
 	if (si->fb_area < 0)
 	{
@@ -505,7 +505,7 @@ static status_t map_device(device_info *di)
 	si->framebuffer_pci = (void *) di->pcii.u.h0.base_registers_pci[frame_buffer];
 
 	// remember settings for use here and in accelerant
-	si->settings = current_settings; 
+	si->settings = current_settings;
 
 	/* in any case, return the result */
 	return si->fb_area;
@@ -536,7 +536,7 @@ static void probe_devices(void) {
 	/* while there are more pci devices */
 	while ((count < MAX_DEVICES) && ((*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_NO_ERROR)) {
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
 		while (SupportedDevices[vendor].vendor) {
 			if (SupportedDevices[vendor].vendor == di->pcii.vendor_id) {
@@ -622,7 +622,7 @@ eng_interrupt(void *data)
 	atomic_and(flags, ~SKD_HANDLER_INSTALLED);
 
 exit0:
-	return handled;				
+	return handled;
 }
 
 static status_t open_hook (const char* name, uint32 flags, void** cookie) {
@@ -725,7 +725,7 @@ mark_as_open:
 
 	/* send the cookie to the opener */
 	*cookie = di;
-	
+
 	goto done;
 
 
@@ -797,7 +797,7 @@ free_hook (void* dev) {
 
 	/* disable and clear any pending interrupts */
 	disable_vbi(regs);
-	
+
 	/* remove interrupt handler */
 	remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, eng_interrupt, di);
 
@@ -838,7 +838,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			strcpy(sig, current_settings.accelerant);
 			result = B_OK;
 		} break;
-		
+
 		/* PRIVATE ioctl from here on */
 		case ENG_GET_PRIVATE_DATA: {
 			eng_get_private_data *gpd = (eng_get_private_data *)buf;

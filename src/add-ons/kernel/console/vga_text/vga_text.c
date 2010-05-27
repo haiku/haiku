@@ -41,7 +41,7 @@ text_init(void)
 		return -1;
 	}
 
-	map_physical_memory("video_mem", (void *)SCREEN_START, SCREEN_END - SCREEN_START,
+	map_physical_memory("video_mem", SCREEN_START, SCREEN_END - SCREEN_START,
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void *)&sOrigin);
 	dprintf("console/text: mapped vid mem to virtual address %p\n", sOrigin);
 

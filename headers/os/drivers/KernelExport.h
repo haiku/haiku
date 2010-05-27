@@ -79,8 +79,8 @@ struct timer {
 #define B_READ_DEVICE	0x00000002
 
 typedef struct {
-	void	*address;	/* address in physical memory */
-	ulong	size;		/* size of block */
+	phys_addr_t	address;	/* address in physical memory */
+	phys_size_t	size;		/* size of block */
 } physical_entry;
 
 /* address specifications for mapping physical memory */
@@ -156,7 +156,7 @@ extern status_t		get_memory_map_etc(team_id team, const void *address,
 extern long			get_memory_map(const void *buffer, ulong size,
 						physical_entry *table, long numEntries);
 extern area_id		map_physical_memory(const char *areaName,
-						void *physicalAddress, size_t size, uint32 flags,
+						phys_addr_t physicalAddress, size_t size, uint32 flags,
 						uint32 protection, void **_mappedAddress);
 
 /* kernel debugging facilities */

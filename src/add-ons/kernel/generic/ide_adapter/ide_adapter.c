@@ -227,7 +227,8 @@ ide_adapter_prepare_dma(ide_adapter_channel_info *channel,
 	int i;
 
 	for (i = sgListCount - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sgList) {
-		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, sgList->address));
+		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
+			(void*)(addr_t)sgList->address));
 		// 0 means 64K - this is done automatically be discarding upper 16 bits
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sgList->size);
 		prd->EOT = i == 0;

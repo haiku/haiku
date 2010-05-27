@@ -101,7 +101,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	offset &= PCI_address_memory_32_mask;
 	TRACE_ALWAYS("iospace offset: 0x%lx\n", offset);
 	fRegisterArea = map_physical_memory("OHCI memory mapped registers",
-		(void *)offset,	B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS,
+		offset,	B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
 		(void **)&fOperationalRegisters);
 	if (fRegisterArea < B_OK) {
@@ -1595,7 +1595,7 @@ OHCI::_CreateDescriptorChain(ohci_general_td **_firstDescriptor,
 			| OHCI_TD_BUFFER_ROUNDING
 			| OHCI_TD_SET_CONDITION_CODE(OHCI_TD_CONDITION_NOT_ACCESSED)
 			| OHCI_TD_SET_DELAY_INTERRUPT(OHCI_TD_INTERRUPT_NONE)
-			| OHCI_TD_TOGGLE_CARRY;		
+			| OHCI_TD_TOGGLE_CARRY;
 
 		// link to previous
 		if (lastDescriptor)

@@ -71,13 +71,13 @@ const static struct mii_chip_info {
 /***************************** helper functions *****************************/
 
 
-static uint32
+static phys_addr_t
 physicalAddress(volatile void *address, uint32 length)
 {
 	physical_entry table;
 
 	get_memory_map((void *)address, length, &table, 1);
-	return (uint32)table.address;
+	return table.address;
 }
 
 
@@ -379,7 +379,7 @@ sis900_initPHYs(struct sis_info *info)
 		dprintf("No MII PHY transceiver found!\n");
 		return B_ENTRY_NOT_FOUND;
 	}
-	
+
 	sis900_selectPHY(info);
 
 	// if the internal PHY is selected, reset it
@@ -554,7 +554,7 @@ sis900_checkMode(struct sis_info *info)
 	} else if (info->currentPHY->types == MII_LAN) {
 		TRACE((DEVICE_NAME ": PHY type is LAN\n"));
 
-		// enable excessive deferral timer 
+		// enable excessive deferral timer
 		write32(address, ~SiS900_MAC_CONFIG_EXCESSIVE_DEFERRAL & read32(address));
 
 		sis900_setAutoNegotiationCapabilities(info);
@@ -562,7 +562,7 @@ sis900_checkMode(struct sis_info *info)
 	} else {
 		TRACE((DEVICE_NAME ": PHY type is not LAN\n"));
 
-		// disable excessive deferral timer 
+		// disable excessive deferral timer
 		write32(address, SiS900_MAC_CONFIG_EXCESSIVE_DEFERRAL | read32(address));
 
 		sis900_setMode(info, LINK_SPEED_HOME | LINK_HALF_DUPLEX);
@@ -602,7 +602,7 @@ sis900_getMACAddress(struct sis_info *info)
 				write32(eepromAccess, SiS96x_EEPROM_CMD_DONE);
 				return true;
 			} else {
-				spin(2);	
+				spin(2);
 				tries++;
 			}
 		}
@@ -633,12 +633,12 @@ sis900_getMACAddress(struct sis_info *info)
 		}
 		return false;
 	} else {
-		/* SiS630 stores the MAC in an eeprom */		
+		/* SiS630 stores the MAC in an eeprom */
 		uint16 signature;
 		int i;
-	
+
 		/* check to see if we have sane EEPROM */
-		signature = eeprom_read(info,SiS900_EEPROM_SIGNATURE);    
+		signature = eeprom_read(info,SiS900_EEPROM_SIGNATURE);
 		if (signature == 0xffff || signature == 0x0000) {
 			dprintf(DEVICE_NAME ": cannot read EEPROM signature\n");
 			return false;
@@ -727,7 +727,7 @@ status_t
 sis900_createRings(struct sis_info *info)
 {
 	uint16 i;
-		
+
 	// create transmit buffer area
 	info->txArea = create_area("sis900 tx buffer", (void **)&info->txBuffer[0],
 		B_ANY_KERNEL_ADDRESS,

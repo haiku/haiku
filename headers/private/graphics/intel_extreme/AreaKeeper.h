@@ -60,8 +60,8 @@ area_id
 AreaKeeper::Map(const char *name, void *physicalAddress, size_t numBytes,
 	uint32 spec, uint32 protection, void **_virtualAddress)
 {
-	fArea = map_physical_memory(name, physicalAddress, numBytes, spec, protection,
-		_virtualAddress);
+	fArea = map_physical_memory(name, (addr_t)physicalAddress, numBytes, spec,
+		protection, _virtualAddress);
 	return fArea;
 }
 

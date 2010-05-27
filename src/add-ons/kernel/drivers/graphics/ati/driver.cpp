@@ -396,7 +396,7 @@ Mach64_GetBiosParameters(DeviceInfo& di, uint8& clockType)
 
 	uint8* romAddr;
 	area_id romArea = map_physical_memory("ATI Mach64 ROM",
-		(void*)0x000c0000,
+		0x000c0000,
 		M64_BIOS_SIZE,
 		B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA,
@@ -475,7 +475,7 @@ Rage128_GetBiosParameters(DeviceInfo& di)
 
 	uint8* romAddr;
 	area_id romArea = map_physical_memory("ATI Rage128 ROM",
-		(void*)0x000c0000,
+		0x000c0000,
 		R128_BIOS_SIZE,
 		B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA,
@@ -573,7 +573,7 @@ MapDevice(DeviceInfo& di)
 
 	si.videoMemArea = map_physical_memory(
 		frameBufferAreaName,
-		(void*)videoRamAddr,
+		videoRamAddr,
 		videoRamSize,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA + B_WRITE_AREA,
@@ -583,7 +583,7 @@ MapDevice(DeviceInfo& di)
 		// Try to map this time without write combining.
 		si.videoMemArea = map_physical_memory(
 			frameBufferAreaName,
-			(void*)videoRamAddr,
+			videoRamAddr,
 			videoRamSize,
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA + B_WRITE_AREA,
@@ -623,7 +623,7 @@ MapDevice(DeviceInfo& di)
 	}
 
 	si.regsArea = map_physical_memory("ATI mmio registers",
-		(void*)regsBase,
+		regsBase,
 		regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
 		0,		// neither read nor write, to hide it from user space apps

@@ -50,11 +50,11 @@ copy_sg_data(scsi_ccb *ccb, uint offset, uint allocationLength,
 		bytes = MIN(bytes, sgList->size);
 
 		if (toBuffer) {
-			vm_memcpy_from_physical(buffer, (addr_t)sgList->address + offset,
-				bytes, false);
+			vm_memcpy_from_physical(buffer, sgList->address + offset, bytes,
+				false);
 		} else {
-			vm_memcpy_to_physical((addr_t)sgList->address + offset, buffer,
-				bytes, false);
+			vm_memcpy_to_physical(sgList->address + offset, buffer, bytes,
+				false);
 		}
 
 		buffer = (char *)buffer + bytes;

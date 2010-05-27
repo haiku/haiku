@@ -128,6 +128,7 @@ status_t
 PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 	void **physicalAddress)
 {
+// TODO: physicalAddress should be a phys_addr_t*!
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		for (int32 i = 0; i < 64; i++) {
@@ -136,7 +137,7 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 				fDebugUseMap |= mask;
 				*logicalAddress = (void *)((uint8 *)fLogicalBase + fDebugBase
 					+ i * fDebugChunkSize);
-				*physicalAddress = (void *)((uint8 *)fPhysicalBase + fDebugBase
+				*physicalAddress = (void *)(fPhysicalBase + fDebugBase
 					+ i * fDebugChunkSize);
 				return B_OK;
 			}
@@ -199,7 +200,7 @@ PhysicalMemoryAllocator::Allocate(size_t size, void **logicalAddress,
 				_Unlock();
 				size_t offset = fBlockSize[arrayToUse] * i;
 				*logicalAddress = (void *)((uint8 *)fLogicalBase + offset);
-				*physicalAddress = (void *)((uint8 *)fPhysicalBase + offset);
+				*physicalAddress = (void *)(fPhysicalBase + offset);
 				return B_OK;
 			}
 		}
@@ -222,6 +223,7 @@ status_t
 PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 	void *physicalAddress)
 {
+// TODO: physicalAddress should be a phys_addr_t!
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (debug_debugger_running()) {
 		uint32 index = ((uint8 *)logicalAddress - (uint8 *)fLogicalBase
@@ -248,7 +250,7 @@ PhysicalMemoryAllocator::Deallocate(size_t size, void *logicalAddress,
 	if (logicalAddress)
 		offset = (uint32)logicalAddress - (uint32)fLogicalBase;
 	else if (physicalAddress)
-		offset = (uint32)physicalAddress - (uint32)fPhysicalBase;
+		offset = (addr_t)physicalAddress - fPhysicalBase;
 	else {
 		TRACE_ERROR(("PMA: no value given for either physical or logical address\n"));
 		return B_BAD_VALUE;

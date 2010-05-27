@@ -92,7 +92,7 @@ struct intel_info {
 	size_t		aperture_size;
 	size_t		aperture_stolen_size;
 
-	addr_t		scratch_page;
+	phys_addr_t	scratch_page;
 	area_id		scratch_area;
 };
 
@@ -165,7 +165,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				break;
 			case G4X_GTT_4M_IVT:
 				gttSize = 4 << 20;
-				break;			
+				break;
 		}
 	} else {
 		// older models have the GTT as large as their frame buffer mapping
@@ -282,7 +282,7 @@ intel_map(intel_info &info)
 		mmioIndex = 0;
 		fbIndex = 2;
 	}
-	
+
 	AreaKeeper mmioMapper;
 	info.registers_area = mmioMapper.Map("intel GMCH mmio",
 		(void *)info.display.u.h0.base_registers[mmioIndex],
@@ -352,7 +352,7 @@ intel_map(intel_info &info)
 	info.aperture_stolen_size = stolenSize;
 	if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
-	
+
 	dprintf("intel_gart: detected %ld MB of stolen memory, aperture "
 		"size %ld MB, GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
 		info.aperture_size >> 20, gttSize >> 10);
@@ -380,7 +380,7 @@ intel_map(intel_info &info)
 		return info.aperture_area;
 	}
 
-	info.scratch_page = (addr_t)entry.address;
+	info.scratch_page = entry.address;
 
 	gttMapper.Detach();
 	mmioMapper.Detach();

@@ -243,7 +243,7 @@ MapDevice(DeviceInfo& di)
 		pciInfo.vendor_id, pciInfo.device_id,
 		pciInfo.bus, pciInfo.device, pciInfo.function);
 
-	si.regsArea = map_physical_memory(areaName, (void*)regsBase, regAreaSize,
+	si.regsArea = map_physical_memory(areaName, regsBase, regAreaSize,
 		B_ANY_KERNEL_ADDRESS,
 		0,		// neither read nor write, to hide it from user space apps
 		(void**)(&(di.regs)));
@@ -259,7 +259,7 @@ MapDevice(DeviceInfo& di)
 
 	si.videoMemArea = map_physical_memory(
 		areaName,
-		(void*)videoRamAddr,
+		videoRamAddr,
 		videoRamSize,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA + B_WRITE_AREA,
@@ -269,7 +269,7 @@ MapDevice(DeviceInfo& di)
 		// Try to map this time without write combining.
 		si.videoMemArea = map_physical_memory(
 			areaName,
-			(void*)videoRamAddr,
+			videoRamAddr,
 			videoRamSize,
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA + B_WRITE_AREA,

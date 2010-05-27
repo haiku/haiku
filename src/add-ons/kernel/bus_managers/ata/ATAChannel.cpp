@@ -974,7 +974,7 @@ ATAChannel::_TransferPIOBlock(ATARequest *request, size_t length,
 		uint32 currentLength = MIN(entry->size - offset, length);
 
 		status_t result = _TransferPIOPhysical(request,
-			(addr_t)entry->address + offset, currentLength, transferred);
+			entry->address + offset, currentLength, transferred);
 		if (result != B_OK) {
 			request->SetSense(SCSIS_KEY_HARDWARE_ERROR,
 				SCSIS_ASC_INTERNAL_FAILURE);

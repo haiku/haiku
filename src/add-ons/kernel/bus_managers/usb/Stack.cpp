@@ -294,6 +294,7 @@ area_id
 Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 	const char *name)
 {
+// TODO: physicalAddress should be a phys_addr_t*!
 	TRACE("allocating %ld bytes for %s\n", size, name);
 
 	void *logAddress;
@@ -319,9 +320,9 @@ Stack::AllocateArea(void **logicalAddress, void **physicalAddress, size_t size,
 		*logicalAddress = logAddress;
 
 	if (physicalAddress)
-		*physicalAddress = physicalEntry.address;
+		*physicalAddress = (void*)(addr_t)physicalEntry.address;
 
-	TRACE("area = %ld, size = %ld, log = %p, phy = %p\n",
+	TRACE("area = %ld, size = %ld, log = %p, phy = %#" B_PRIxPHYSADDR "\n",
 		area, size, logAddress, physicalEntry.address);
 	return area;
 }

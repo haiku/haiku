@@ -7,7 +7,7 @@
  */
 #include <stdio.h> //sprintf
 #include <string.h>
-#include <unistd.h> //posix file i/o - create, write, close 
+#include <unistd.h> //posix file i/o - create, write, close
 #include <driver_settings.h>
 #include "sis7018.h"
 #include "sis7018hw.h"
@@ -44,8 +44,8 @@ static sem_id loglock;
 
 static void reload_sis7018_setting()
 {
-  void *settingshandle; 
-  settingshandle = load_driver_settings(CHIPNAME); 
+  void *settingshandle;
+  settingshandle = load_driver_settings(CHIPNAME);
 #if !DEBUG
   b_log = get_driver_boolean_parameter(settingshandle, "debug_output", b_log, true);
 #endif
@@ -109,14 +109,14 @@ card_type card_types[]=
   {{SPA_PCI_ID}, "SiS 7018"},
 };
 
-#ifdef DEBUG 
-int _assert_(char *a, int b, char *c) 
+#ifdef DEBUG
+int _assert_(char *a, int b, char *c)
 {
   char sz[1024];
   sprintf(sz, CHIPNAME":tripped assertion in %s/%d (%s)", a, b, c);
-  TRACE("tripped assertion in %s/%d (%s)\n", a, b, c); 
-  kernel_debugger(sz); 
-  return 0; 
+  TRACE("tripped assertion in %s/%d (%s)\n", a, b, c);
+  kernel_debugger(sz);
+  return 0;
 }
 #endif
 
@@ -159,17 +159,17 @@ static status_t setup_hardware(  sis7018_dev * card)
 #endif //DO_MIDI
 
   make_device_names(card);
-  
-  command_reg = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, 
-                                            PCI_command, 2); 
+
+  command_reg = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function,
+                                            PCI_command, 2);
 //  TRACE("PCI command config was: %lx\n", command_reg);
-  command_reg |= PCI_command_io | PCI_command_memory | PCI_command_master; 
+  command_reg |= PCI_command_io | PCI_command_memory | PCI_command_master;
   (*pci->write_pci_config)(card->info.bus, card->info.device, card->info.function,
-                            PCI_command, 2, command_reg); 
+                            PCI_command, 2, command_reg);
 //  TRACE("PCI command config set to: %lx\n", command_reg);
-  
+
  if(use_io_regs)
- {  
+ {
   card->io_base = card->info.u.h0.base_registers[0];
   TRACE("%s base at %x\n", card->name, card->io_base);
  }
@@ -177,9 +177,9 @@ static status_t setup_hardware(  sis7018_dev * card)
  {
   TRACE("%s memory %lx length %lx\n", card->name, card->info.u.h0.base_registers[1], card->info.u.h0.base_register_sizes[1]);
   card->regs_area = map_physical_memory("Regs sis7018",
-                          (void *)card->info.u.h0.base_registers[1], 
-                             card->info.u.h0.base_register_sizes[1], 
-                               B_ANY_KERNEL_ADDRESS, 
+                          card->info.u.h0.base_registers[1],
+                             card->info.u.h0.base_register_sizes[1],
+                               B_ANY_KERNEL_ADDRESS,
                                   B_READ_AREA + B_WRITE_AREA,
                                     &card->regs_mem_base);
 
@@ -189,7 +189,7 @@ static status_t setup_hardware(  sis7018_dev * card)
   err = hw_initialize(card);
   return err;
 
-#if DO_MIDI 
+#if DO_MIDI
 bail3:
 #endif //DO_MIDI
   delete_sem(card->pcm.init_sem);
@@ -200,18 +200,18 @@ bail:
 #if DEBUG
 static int debug_sis7018(int argc, char * argv[])
 {
-  int err = (argc < 2 || argc > 3); 
+  int err = (argc < 2 || argc > 3);
   int card_id = 0;
-  
+
   if(!err)
   {
     if(argc == 3)
       card_id = parse_expression(argv[2]);
-    
+
     if(card_id < 0 || card_id > num_cards-1)
     {
-      kprintf("ERROR: Wrong card_id: %d\n", card_id); 
-      kprintf("\n"); 
+      kprintf("ERROR: Wrong card_id: %d\n", card_id);
+      kprintf("\n");
       err = 1;
     }
     else
@@ -227,26 +227,26 @@ static int debug_sis7018(int argc, char * argv[])
        default:
          kprintf("ERROR: Wrong command: %s\n",argv[1]);
          kprintf("\n");
-         err=1; 
+         err=1;
        break;
      }
     }
   }
 
-  if (err) 
-  { 
-    kprintf("Syntax: "CHIPNAME" < command > [card id]\n"); 
-    kprintf(" - where commands is:\n"); 
-    kprintf("    d - dump device info\n"); 
-    kprintf("    i - dump pci_info\n"); 
-    kprintf("    p - dump pcm info\n"); 
-    kprintf("    m - dump midi info\n"); 
-    kprintf("    c - dump playback channel info\n"); 
-    kprintf("    a - dump AC'97 registers info\n"); 
-    kprintf(" - and card id is zero-based id of card to be investigated\n"); 
+  if (err)
+  {
+    kprintf("Syntax: "CHIPNAME" < command > [card id]\n");
+    kprintf(" - where commands is:\n");
+    kprintf("    d - dump device info\n");
+    kprintf("    i - dump pci_info\n");
+    kprintf("    p - dump pcm info\n");
+    kprintf("    m - dump midi info\n");
+    kprintf("    c - dump playback channel info\n");
+    kprintf("    a - dump AC'97 registers info\n");
+    kprintf(" - and card id is zero-based id of card to be investigated\n");
     kprintf("    default card id is 0\n");
-    kprintf("    current cards count is %ld\n", num_cards); 
-    kprintf("\n"); 
+    kprintf("    current cards count is %ld\n", num_cards);
+    kprintf("\n");
   }
 
   return 0;
@@ -265,7 +265,7 @@ status_t init_hardware (void)
   status_t err = ENODEV;
 
   TRACE("init_hardware()\n");
-  
+
   if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
     return ENOSYS;
 
@@ -279,7 +279,7 @@ status_t init_hardware (void)
       }
     ix++;
   }
-    
+
   put_module(B_PCI_MODULE_NAME);
   return err;
 }
@@ -294,7 +294,7 @@ init_driver(void)
 
   reload_sis7018_setting();
   create_log();
-  
+
   TRACE("\n>>> init_driver()\n");
 
   if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
@@ -321,7 +321,7 @@ init_driver(void)
          TRACE_ALWAYS("Too many cards installed! Only %d will be used.\n", NUM_CARDS);
          break;
        }
-       
+
        memset(&cards[num_cards], 0, sizeof(sis7018_dev));
        cards[num_cards].info = info;
        cards[num_cards].type = &card_types[jx];
@@ -331,7 +331,7 @@ init_driver(void)
        }
        else
          num_cards++;
-         
+
        TRACE_ALWAYS("%s <vendor:%x, card:%x> found.\n",
                 card_types[jx].chip_name,
                  card_types[jx].ids.ids.vendor_id,
@@ -339,10 +339,10 @@ init_driver(void)
      }
     ix++;
   }
- 
+
   if (!num_cards)
   {
-#if DO_MIDI  
+#if DO_MIDI
     put_module(B_MPU_401_MODULE_NAME);
 #endif //DO_MIDI
     put_module(B_PCI_MODULE_NAME);
@@ -377,7 +377,7 @@ void uninit_driver (void)
 
   TRACE("<<< uninit_driver()\n\n");
 
-#if DEBUG  
+#if DEBUG
   remove_debugger_command(CHIPNAME, debug_sis7018);
 #endif
 
@@ -389,7 +389,7 @@ void uninit_driver (void)
   memset(&cards, 0, sizeof(cards));
 #if DO_MIDI
   put_module(B_MPU_401_MODULE_NAME);
-#endif // DO_MIDI  
+#endif // DO_MIDI
   put_module(B_PCI_MODULE_NAME);
 }
 
@@ -402,7 +402,7 @@ const char** publish_devices()
 
   for (ix=0; names[ix]; ix++)
     TRACE("publish %s\n", names[ix]);
-  
+
   return (const char **)names;
 }
 
@@ -427,14 +427,14 @@ device_hooks* find_device(const char* name)
     {
       return &pcm_hooks;
     }
-  
+
     if (!strcmp(cards[ix].pcm.oldname, name))
     {
       return &pcm_hooks;
     }
 #endif //DO_PCM
   }
-  
+
   TRACE("find_device(%s) failed\n", name);
   return NULL;
 }

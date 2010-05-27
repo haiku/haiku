@@ -125,7 +125,7 @@ static inline unsigned long vtophys(unsigned long virtual_addr)
 	err = get_memory_map((void *)virtual_addr, 2046, &pe, 1);
 	if (err < 0)
 		panic("ipro1000: get_memory_map failed for %p, error %08lx\n", (void *)virtual_addr, err);
-	return (unsigned long) pe.address;
+	return pe.address;
 }
 
 #define M_DEVBUF 1

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -241,7 +241,7 @@ DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 		return B_ERROR;
 	}
 
-	physicalBase = (addr_t)entry.address;
+	physicalBase = entry.address;
 
 	if (fRestrictions.high_address < physicalBase + size) {
 		delete_area(area);
@@ -440,7 +440,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 					get_memory_map_etc(request->Team(), (void*)base, size,
 						&entry, &count);
 
-					vecs[segmentCount].iov_base = entry.address;
+					vecs[segmentCount].iov_base = (void*)(addr_t)entry.address;
 					vecs[segmentCount].iov_len = entry.size;
 
 					transferLeft -= entry.size;

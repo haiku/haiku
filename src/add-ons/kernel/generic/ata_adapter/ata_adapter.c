@@ -249,12 +249,13 @@ ata_adapter_prepare_dma(ata_adapter_channel_info *channel,
 		writeToDevice ? "write" : "read", sgListCount);
 
 	for (i = sgListCount - 1, prd = channel->prdt; i >= 0; --i, ++prd, ++sgList) {
-		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device, sgList->address));
+		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
+			(void*)(addr_t)sgList->address));
 		// 0 means 64K - this is done automatically be discarding upper 16 bits
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sgList->size);
 		prd->EOT = i == 0;
 
-		TRACE_DMA("ata_adapter: %p, %ld => 0x%08x, %d, %d\n",
+		TRACE_DMA("ata_adapter: %#" B_PRIxPHYSADDR ", %ld => 0x%08x, %d, %d\n",
 			sgList->address, sgList->size, prd->address, prd->count, prd->EOT);
 		SHOW_FLOW( 4, "%x, %x, %d", (int)prd->address, prd->count, prd->EOT);
 	}
@@ -413,7 +414,7 @@ ata_adapter_init_channel(device_node *node,
 	}
 
 	get_memory_map(channel->prdt, prdt_size, pe, 1);
-	channel->prdt_phys = (uint32)pe[0].address;
+	channel->prdt_phys = pe[0].address;
 
 	SHOW_FLOW(3, "virt=%p, phys=%x", channel->prdt, (int)channel->prdt_phys);
 

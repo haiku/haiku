@@ -95,13 +95,13 @@ MapDevice()
 
 	/* Map the frame buffer */
 	si->fbArea = map_physical_memory("VMware frame buffer",
-		si->fbDma, si->fbSize, B_ANY_KERNEL_BLOCK_ADDRESS|B_MTR_WC,
+		(addr_t)si->fbDma, si->fbSize, B_ANY_KERNEL_BLOCK_ADDRESS|B_MTR_WC,
 		B_READ_AREA|B_WRITE_AREA, (void **)&si->fb);
 	if (si->fbArea < 0) {
 		/* Try again without write combining */
 		writeCombined = 0;
 		si->fbArea = map_physical_memory("VMware frame buffer",
-			si->fbDma, si->fbSize, B_ANY_KERNEL_BLOCK_ADDRESS,
+			(addr_t)si->fbDma, si->fbSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA|B_WRITE_AREA, (void **)&si->fb);
 	}
 	if (si->fbArea < 0) {
@@ -114,7 +114,7 @@ MapDevice()
 
 	/* Map the fifo */
 	si->fifoArea = map_physical_memory("VMware fifo",
-		si->fifoDma, si->fifoSize, B_ANY_KERNEL_BLOCK_ADDRESS,
+		(addr_t)si->fifoDma, si->fifoSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_READ_AREA|B_WRITE_AREA, (void **)&si->fifo);
 	if (si->fifoArea < 0) {
 		TRACE("failed to map fifo\n");
@@ -267,7 +267,7 @@ UpdateCursor(SharedInfo *si)
 	WriteReg(SVGA_REG_CURSOR_X, si->cursorX);
 	WriteReg(SVGA_REG_CURSOR_Y, si->cursorY);
 	WriteReg(SVGA_REG_CURSOR_ON, si->cursorShow ? SVGA_CURSOR_ON_SHOW :
-				SVGA_CURSOR_ON_HIDE);			
+				SVGA_CURSOR_ON_HIDE);
 }
 
 
@@ -329,8 +329,8 @@ ControlHook(void *dev, uint32 msg, void *buf, size_t len)
 			for (i = 0; i < 256; i++) {
 				WriteReg(SVGA_PALETTE_BASE + 3 * i, *color++);
 				WriteReg(SVGA_PALETTE_BASE + 3 * i + 1, *color++);
-				WriteReg(SVGA_PALETTE_BASE + 3 * i + 2, *color++);	
-			}		
+				WriteReg(SVGA_PALETTE_BASE + 3 * i + 2, *color++);
+			}
 			return B_OK;
 		}
 
@@ -349,7 +349,7 @@ ControlHook(void *dev, uint32 msg, void *buf, size_t len)
 			UpdateCursor(si);
 			return B_OK;
 		}
-		
+
 		case VMWARE_GET_DEVICE_NAME:
 			dprintf("device: VMWARE_GET_DEVICE_NAME %s\n", gPd->names[0]);
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -360,7 +360,7 @@ ControlHook(void *dev, uint32 msg, void *buf, size_t len)
 			strlcpy((char *)buf, gPd->names[0], B_PATH_NAME_LENGTH);
 #endif
 			return B_OK;
-			
+
 	}
 
 	TRACE("ioctl: %ld, %p, %ld\n", msg, buf, len);

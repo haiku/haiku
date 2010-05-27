@@ -20,7 +20,7 @@
 
 #define kDevName "etherpci"
 #define kDevDir "net/" kDevName "/"
-#define DEVNAME_LENGTH		64			
+#define DEVNAME_LENGTH		64
 #define MAX_CARDS 			 4			/* maximum number of driver instances */
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -76,12 +76,12 @@ device_hooks *find_device(const char *name);
  * register page and it may not be 100% reliable.  The technique used is to
  * make sure all ring headers are zeroed out before packets are received
  * into them.  Then, if you detect a non-zero ring header, you can be pretty
- * sure that it is another packet. 
- * 
+ * sure that it is another packet.
+ *
  * We never read the "might-be-a-packet" immediately.  Instead, we just
  * release a semaphore so that the next read will occur later on enough
  * so that the ring header information should be completely filled in.
- * 
+ *
  */
 #define STAY_ON_PAGE_0	0
 
@@ -131,8 +131,8 @@ typedef struct etherpci_private {
 	/*
 	 * Most recent values of the error statistics to detect any changes in them
 	 */
-	int rerrs_last;	
-	int werrs_last;	
+	int rerrs_last;
+	int werrs_last;
 	int interrs_last;
 	int frame_errs_last;
 	int crc_errs_last;
@@ -157,7 +157,7 @@ typedef struct etherpci_private {
 	int EC_RINGSIZE;
 
 	uint32 debug;
-	
+
 } etherpci_private_t;
 
 
@@ -181,13 +181,13 @@ typedef struct etherpci_private {
 #if __INTEL__
 
 uint8  ether_inb(etherpci_private_t *device, uint32 offset) {
-  	uint8 result;	
+  	uint8 result;
 	result = ((*gPCIModInfo->read_io_8)(device->reg_base + (offset)));
 	ETHER_DEBUG(PCI_IO, device->debug, " inb(%x) %x \n", offset, result);
 	return result;
 };
 uint16  ether_inw(etherpci_private_t *device, uint32 offset) {
-  	uint16 result;	
+  	uint16 result;
 	result = ((*gPCIModInfo->read_io_16)(device->reg_base + (offset)));
 	ETHER_DEBUG(PCI_IO, device->debug, " inw(%x) %x \n", offset, result);
 	return result;
@@ -205,14 +205,14 @@ void  ether_outw(etherpci_private_t *device, uint32 offset, uint16 value) {
 #else /* PPC */
 
 uint8  ether_inb(etherpci_private_t *device, uint32 offset) {
-  	uint8 result;	
+  	uint8 result;
 	result = (*((volatile uint8*) (device->reg_base + (offset)))); __eieio();
 	ETHER_DEBUG(PCI_IO, device->debug, " inb(%x) %x \n", offset, result);
 	return result;
 };
 
 uint16  ether_inw(etherpci_private_t *device, uint32 offset) {
-  	uint16 result;	
+  	uint16 result;
 	result = (*((volatile uint16*) (device->reg_base + (offset)))); __eieio();
 	ETHER_DEBUG(PCI_IO, device->debug, " inw(%x) %x \n", offset, result);
 	return result;
@@ -243,7 +243,7 @@ static int etherpci(int argc, char **argv);
 #endif
 
 /*
- * io_lock gets you exclusive access to the card, except that 
+ * io_lock gets you exclusive access to the card, except that
  * the interrupt handler can still run.
  * There is probably no need to io_lock() a 3com card, so look into
  * removing it for that case.
@@ -484,7 +484,7 @@ wait_for_dma_complete(etherpci_private_t *data, unsigned short addr,
 
 	if (bogus >= MAXBOGUS * 2) {
 		/*
-		 * On some cards, the counters will never clear. 
+		 * On some cards, the counters will never clear.
 		 * So only print this message when debugging.
 		 */
 		dprintf("Bogus alert: waiting for counters to zero\n");
@@ -558,9 +558,9 @@ etherpci_min(etherpci_private_t *data, unsigned char *dst,
 		len++;
 
 	ether_outb(data, EN0_RCNTLO, len & 0xff);
-	ether_outb(data, EN0_RCNTHI, len >> 8); 
-	ether_outb(data, EN0_RADDRLO, src & 0xff); 
-	ether_outb(data, EN0_RADDRHI, src >> 8); 
+	ether_outb(data, EN0_RCNTHI, len >> 8);
+	ether_outb(data, EN0_RADDRLO, src & 0xff);
+	ether_outb(data, EN0_RADDRHI, src >> 8);
 	ether_outb(data, EN_CCMD, ENC_DMAREAD);
 
 	for (i = 0; i < len; i += 2) {
@@ -720,7 +720,7 @@ probe(etherpci_private_t *data)
 
 	reg = ether_inb(data, EN_CCMD);
 	if (reg != (ENC_NODMA|ENC_STOP|ENC_PAGE0)) {
-		dprintf("command register failed: %02x != %02x\n", reg, ENC_NODMA|ENC_STOP); 
+		dprintf("command register failed: %02x != %02x\n", reg, ENC_NODMA|ENC_STOP);
 		return 0;
 	}
 
@@ -819,7 +819,7 @@ init(etherpci_private_t *data)
 
 	/* set multicast address */
 	for (i = 0; i < 8; i++) {
-		ether_outb(data, EN1_MULT+i, 0xff); 
+		ether_outb(data, EN1_MULT+i, 0xff);
 	}
 	data->nmulti = 0;
 
@@ -872,7 +872,7 @@ setboundary(etherpci_private_t *data, unsigned char nextboundary)
 
 
 /*! Start resetting the chip, because of ring overflow */
-static int 
+static int
 reset(etherpci_private_t *data)
 {
 	unsigned char cmd;
@@ -920,8 +920,8 @@ etherpci_interrupt(void *_data)
 	data->ints++;
 
 	ETHER_DEBUG(INTERRUPT, data->debug, "ENTR isr=%x & %x?\n",getisr(data), INTS_WE_CARE_ABOUT);
-	for (INTR_LOCK(data, isr = getisr(data)); 
-			isr & INTS_WE_CARE_ABOUT; 
+	for (INTR_LOCK(data, isr = getisr(data));
+			isr & INTS_WE_CARE_ABOUT;
 			INTR_LOCK(data, isr = getisr(data))) {
 		if (isr & ISR_RECEIVE) {
 			data->rints++;
@@ -1009,7 +1009,7 @@ check_errors(etherpci_private_t *data)
 	DOIT(data->frames_lost, "Frames lost now %d\n");
 #undef DOIT
 #if 0
-	/* 
+	/*
 	 * these are normal errors because collisions are normal
 	 * so don't make a big deal about them.
 	 */
@@ -1103,7 +1103,7 @@ copy_packet(etherpci_private_t *data, unsigned char *ether_buf,
 
 		if (ring.next_packet < data->EC_RXBUF_START_PAGE
 			|| ring.next_packet >= data->EC_RXBUF_END_PAGE) {
-			dprintf("etherpci_read: bad next packet! (%02x,%u,%02x) (%d)\n", 
+			dprintf("etherpci_read: bad next packet! (%02x,%u,%02x) (%d)\n",
 				ring.status, ring.next_packet, ring.count, data->boundary);
 
 			data->rerrs++;
@@ -1115,7 +1115,7 @@ copy_packet(etherpci_private_t *data, unsigned char *ether_buf,
 		len = swapshort(ring.count);
 		rlen = len - 4;
 		if (rlen < ETHER_MIN_SIZE || rlen > ETHER_MAX_SIZE) {
-			dprintf("etherpci_read: bad length! (%02x,%u,%02x) (%d)\n", 
+			dprintf("etherpci_read: bad length! (%02x,%u,%02x) (%d)\n",
 				ring.status, ring.next_packet, ring.count, data->boundary);
 
 			data->rerrs++;
@@ -1187,26 +1187,29 @@ enable_addressing(etherpci_private_t *data)
 	uint32 base, size, offset;
 	base = data->pciInfo->u.h0.base_registers[0];
 	size = data->pciInfo->u.h0.base_register_sizes[0];
-	
+
 	/* Round down to nearest page boundary */
 	base = base & ~(B_PAGE_SIZE-1);
-	
+
 	/* Adjust the size */
 	offset = data->pciInfo->u.h0.base_registers[0] - base;
 	size += offset;
 	size = (size +(B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
 
 	dprintf(kDevName ": PCI base=%x size=%x offset=%x\n", base, size, offset);
-		
-	if ((data->ioarea = map_physical_memory(kDevName "_regs", (void *)base, size, B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, (void **)&data->reg_base)) < 0)
+
+	if ((data->ioarea = map_physical_memory(kDevName "_regs", base, size,
+			B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+			(void **)&data->reg_base)) < 0) {
 		return B_ERROR;
+	}
 
 	data->reg_base = data->reg_base + offset;
 
-#endif	
+#endif
 	dprintf(kDevName ": reg_base=%lx\n", data->reg_base);
-	
-	/* enable pci address access */	
+
+	/* enable pci address access */
 	cmd = (gPCIModInfo->read_pci_config)(data->pciInfo->bus, data->pciInfo->device, data->pciInfo->function, PCI_command, 2);
 	(gPCIModInfo->write_pci_config)(data->pciInfo->bus, data->pciInfo->device, data->pciInfo->function, PCI_command, 2, cmd | PCI_command_io);
 
@@ -1256,8 +1259,8 @@ domulti(etherpci_private_t *data, char *addr)
 static int
 etherpci(int argc, char **argv) {
 	uint16 i,j;
-	const char * usage = "usage: etherpci { Function_calls | PCI_IO | Stats | Rx_trace | Tx_trace }\n";	
-	
+	const char * usage = "usage: etherpci { Function_calls | PCI_IO | Stats | Rx_trace | Tx_trace }\n";
+
 
 	if (argc < 2) {
 		kprintf("%s",usage);	return 0;
@@ -1268,56 +1271,56 @@ etherpci(int argc, char **argv) {
 		case 'F':
 		case 'f':
 			gdev->debug ^= FUNCTION;
-			if (gdev->debug & FUNCTION) 
+			if (gdev->debug & FUNCTION)
 				kprintf("Function() call trace Enabled\n");
-			else 			
+			else
 				kprintf("Function() call trace Disabled\n");
-			break; 
+			break;
 		case 'N':
 		case 'n':
 			gdev->debug ^= SEQ;
-			if (gdev->debug & SEQ) 
+			if (gdev->debug & SEQ)
 				kprintf("Sequence numbers packet trace Enabled\n");
-			else 			
+			else
 				kprintf("Sequence numbers packet trace Disabled\n");
-			break; 
+			break;
 		case 'R':
 		case 'r':
 			gdev->debug ^= RX;
-			if (gdev->debug & RX) 
+			if (gdev->debug & RX)
 				kprintf("Receive packet trace Enabled\n");
-			else 			
+			else
 				kprintf("Receive packet trace Disabled\n");
 			break;
 		case 'T':
 		case 't':
 			gdev->debug ^= TX;
-			if (gdev->debug & TX) 
+			if (gdev->debug & TX)
 				kprintf("Transmit packet trace Enabled\n");
-			else 			
+			else
 				kprintf("Transmit packet trace Disabled\n");
-			break; 
+			break;
 		case 'S':
 		case 's':
-			kprintf(kDevName " statistics\n");			
+			kprintf(kDevName " statistics\n");
 			kprintf("rx_ints %d,  tx_ints %d\n", gdev->rints, gdev->wints);
 			kprintf("resets %d \n", gdev->resets);
 			kprintf("crc_errs %d, frame_errs %d, frames_lost %d\n", gdev->crc_errs, gdev->frame_errs, gdev->frames_lost);
-			break; 
+			break;
 		case 'P':
 		case 'p':
 			gdev->debug ^= PCI_IO;
-			if (gdev->debug & PCI_IO) 
+			if (gdev->debug & PCI_IO)
 				kprintf("PCI IO trace Enabled\n");
-			else 			
+			else
 				kprintf("PCI IO trace Disabled\n");
-			break; 
+			break;
 		default:
 			kprintf("%s",usage);
 			return 0;
 		}
 	}
-	
+
 	return 0;
 }
 #endif /* DEBUGGER_COMMAND */
@@ -1355,13 +1358,13 @@ init_driver(void)
 	char devName[64];
 	int32 i;
 
-	dprintf(kDevName ": init_driver ");	
+	dprintf(kDevName ": init_driver ");
 
 	if ((status = get_module( B_PCI_MODULE_NAME, (module_info **)&gPCIModInfo )) != B_OK) {
 		dprintf(kDevName " Get module failed! %s\n", strerror(status ));
 		return status;
 	}
-		
+
 	/* Find Lan cards*/
 	if ((entries = get_pci_list(gDevList, MAX_CARDS )) == 0) {
 		dprintf("init_driver: " kDevName " not found\n");
@@ -1370,7 +1373,7 @@ init_driver(void)
 		return B_ERROR;
 	}
 	dprintf("\n");
-	
+
 	/* Create device name list*/
 	for (i=0; i<entries; i++ )
 	{
@@ -1379,7 +1382,7 @@ init_driver(void)
 		strcpy(gDevNameList[i], devName);
 	}
 	gDevNameList[i] = NULL;
-	
+
 	return B_OK;
 }
 
@@ -1418,7 +1421,7 @@ find_device(const char *name)
 
 
 const char**
-publish_devices(void) 
+publish_devices(void)
 {
 	dprintf(kDevName ": publish_devices()\n");
 	return (const char **)gDevNameList;
@@ -1429,7 +1432,7 @@ publish_devices(void)
 
 
 /*! Implements the read() system call to the ethernet driver */
-static status_t 
+static status_t
 read_hook(void *_data, off_t pos, void *buf, size_t *len)
 {
 	etherpci_private_t *data = (etherpci_private_t *) _data;
@@ -1491,7 +1494,7 @@ open_hook(const char *name, uint32 flags, void **cookie)
 		goto err0;
 	}
 	memset(data, 0, sizeof(etherpci_private_t));
-	
+
 	/* Setup the cookie */
 	data->pciInfo = gDevList[devID];
 	data->devID = devID;
@@ -1501,12 +1504,12 @@ open_hook(const char *name, uint32 flags, void **cookie)
 
 	data->debug = DEFAULT_DEBUG_FLAGS;
 	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": open %s dev=%p\n", name, data);
-	
+
 #if DEBUGGER_COMMAND
 	gdev = data;
 	add_debugger_command (kDevName, etherpci, "Ethernet driver Info");
 #endif
-	
+
 	/* enable access to the cards address space */
 	if ((status = enable_addressing(data)) != B_OK)
 		goto err1;
@@ -1521,7 +1524,7 @@ open_hook(const char *name, uint32 flags, void **cookie)
 
 	/* Setup interrupts */
 	install_io_interrupt_handler( data->pciInfo->u.h0.interrupt_line, etherpci_interrupt, *cookie, 0 );
-	
+
 	dprintf("Interrupts installed at %x\n", data->pciInfo->u.h0.interrupt_line);
 	/* Init Device */
 	init(data);
@@ -1536,8 +1539,8 @@ err1:
 #if DEBUGGER_COMMAND
 	remove_debugger_command (kDevName, etherpci);
 #endif
-	free(data);	
-	
+	free(data);
+
 err0:
 	atomic_and(&gOpenMask, ~mask);
 	dprintf(kDevName ": open failed!\n");
@@ -1581,21 +1584,21 @@ close_hook(void *_data)
 	/*
 	 * Reset all the statistics
 	 */
-	data->ints = 0;	
-	data->rints = 0;	
-	data->rerrs = 0;	
-	data->wints = 0;	
-	data->werrs = 0;	
-	data->reads = 0;	
-	data->writes = 0;	
+	data->ints = 0;
+	data->rints = 0;
+	data->rerrs = 0;
+	data->wints = 0;
+	data->werrs = 0;
+	data->reads = 0;
+	data->writes = 0;
 	data->interrs = 0;
 	data->resets = 0;
 	data->frame_errs = 0;
 	data->crc_errs = 0;
 	data->frames_lost = 0;
 
-	data->rerrs_last = 0;	
-	data->werrs_last = 0;	
+	data->rerrs_last = 0;
+	data->werrs_last = 0;
 	data->interrs_last = 0;
 	data->frame_errs_last = 0;
 	data->crc_errs_last = 0;
@@ -1648,7 +1651,7 @@ write_hook(void *_data, off_t pos, const void *buf, size_t *len)
 		return B_INTERRUPTED;
 	}
 	/*
-	 * Wait for somebody else (if any) to finish transmitting 
+	 * Wait for somebody else (if any) to finish transmitting
 	 */
 	status = output_wait(data, ETHER_TRANSMIT_TIMEOUT);
 	if (status < B_NO_ERROR || data->interrupted) {
@@ -1675,7 +1678,7 @@ write_hook(void *_data, off_t pos, const void *buf, size_t *len)
 	data->writes++;
 	io_unlock(data);
 	atomic_add(&data->inrw, -1);
-	*len = buflen;	
+	*len = buflen;
 
 	if (data->debug & TX)
 		dump_packet("TX:",(unsigned char *) buf, buflen);

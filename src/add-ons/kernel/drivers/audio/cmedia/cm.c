@@ -96,7 +96,7 @@ PCI_IO_WR (int offset, uint8 val)
 
 
 /* detect presence of our hardware */
-status_t 
+status_t
 init_hardware(void)
 {
 	int ix=0;
@@ -132,7 +132,7 @@ init_hardware(void)
 			io_base = area.address;
 	}
 #endif
-		
+
 	put_module(pci_name);
 
 	return err;
@@ -141,11 +141,11 @@ init_hardware(void)
 
 void set_direct( cmedia_pci_dev * card, int regno, uchar value, uchar mask)
 {
-	if (mask == 0) 
+	if (mask == 0)
 	{
 		return;
 	}
-	if (mask != 0xff) 
+	if (mask != 0xff)
 	{
 		uchar old = PCI_IO_RD(card->enhanced+regno);
 		value = (value&mask)|(old&~mask);
@@ -167,11 +167,11 @@ void set_indirect(cmedia_pci_dev * card, int regno, uchar value, uchar mask)
 {
 	PCI_IO_WR(card->enhanced+0x23, regno);
 	EIEIO();
-	if (mask == 0) 
+	if (mask == 0)
 	{
 		return;
 	}
-	if (mask != 0xff) 
+	if (mask != 0xff)
 	{
 		uchar old = PCI_IO_RD(card->enhanced+0x22);
 		value = (value&mask)|(old&~mask);
@@ -254,7 +254,7 @@ set_default_registers(
 
 		0x1a, 0x00, 0x20,	/* SPD32SEL disable */
 		0x1a, 0x00, 0x10,	/* SPDFLOOPI disable */
-	
+
 		0x1b, 0x04, 0x04,	/* dual channel mode enable */
 		0x1a, 0x00, 0x80,	/* Double DAC structure disable */
 
@@ -352,7 +352,7 @@ find_low_memory(
 			ddprintf(("cmedia_pci: no memory map\n"));
 			goto allocate;
 		}
-		if ((uint32)where.address & 0xff000000) {
+		if ((where.address & ~(phys_addr_t)0xffffff) != 0) {
 			ddprintf(("cmedia_pci: bad physical address\n"));
 			goto allocate;
 		}
@@ -360,7 +360,8 @@ find_low_memory(
 			ddprintf(("cmedia_pci: lock not contiguous\n"));
 			goto allocate;
 		}
-dprintf("cmedia_pci: physical %p  logical %p\n", where.address, ainfo.address);
+dprintf("cmedia_pci: physical %#" B_PRIxPHYSADDR "  logical %p\n",
+where.address, ainfo.address);
 		goto a_o_k;
 	}
 
@@ -371,9 +372,9 @@ allocate:
 	}
 	ddprintf(("cmedia_pci: allocating new low area\n"));
 
-	curarea = create_area(name, &addr, B_ANY_KERNEL_ADDRESS, 
+	curarea = create_area(name, &addr, B_ANY_KERNEL_ADDRESS,
 		trysize, B_LOMEM, B_READ_AREA | B_WRITE_AREA);
-	ddprintf(("cmedia_pci: create_area(%lx) returned %lx logical %p\n", 
+	ddprintf(("cmedia_pci: create_area(%lx) returned %lx logical %p\n",
 		trysize, curarea, addr));
 	if (curarea < 0) {
 		goto oops;
@@ -384,12 +385,12 @@ allocate:
 		goto oops;
 	}
 	ddprintf(("cmedia_pci: physical %p\n", where.address));
-	if ((uint32)where.address & 0xff000000) {
+	if ((where.address & ~(phys_addr_t)0xffffff) != 0) {
 		delete_area(curarea);
 		curarea = B_ERROR;
 		goto oops;
 	}
-	if ((((uint32)where.address)+low_size) & 0xff000000) {
+	if (((where.address + low_size) & ~(phys_addr_t)0xffffff) != 0) {
 		delete_area(curarea);
 		curarea = B_ERROR;
 		goto oops;
@@ -408,7 +409,7 @@ a_o_k:
 	ddprintf(("cmedia_pci: successfully found or created low area!\n"));
 	card->low_size = low_size;
 	card->low_mem = addr;
-	card->low_phys = (vuchar *)where.address;
+	card->low_phys = (vuchar *)(addr_t)where.address;
 	card->map_low = curarea;
 	return B_OK;
 }
@@ -461,7 +462,7 @@ setup_cmedia_pci(
 		dprintf("cmedia pci: can't setup DMA\n");
 		goto bail6;
 	}
-	
+
 	set_default_registers(card);
 
 	//release_spinlock(&card->hardware);
@@ -470,7 +471,7 @@ setup_cmedia_pci(
 	return B_OK;
 
 bail6:
-	//	deallocate low memory	
+	//	deallocate low memory
 bail5:
 	(*gameport->delete_device)(card->joy.driver);
 bail4:
@@ -495,12 +496,12 @@ debug_cmedia(
 		dprintf("cmedia_pci: dude, you gotta watch your syntax!\n");
 		return -1;
 	}
-	dprintf("%s: enhanced registers at 0x%x\n", cards[ix].name, 
+	dprintf("%s: enhanced registers at 0x%x\n", cards[ix].name,
 		cards[ix].enhanced);
-	dprintf("%s: open %ld   dma_a at 0x%x   dma_c 0x%x\n", cards[ix].pcm.name, 
+	dprintf("%s: open %ld   dma_a at 0x%x   dma_c 0x%x\n", cards[ix].pcm.name,
 		cards[ix].pcm.open_count, cards[ix].pcm.dma_a, cards[ix].pcm.dma_c);
 	if (cards[ix].pcm.open_count) {
-		dprintf("    dma_a: 0x%lx+0x%lx   dma_c: 0x%lx+0x%lx\n", 
+		dprintf("    dma_a: 0x%lx+0x%lx   dma_c: 0x%lx+0x%lx\n",
 			PCI_IO_RD_32((int)cards[ix].pcm.dma_a), PCI_IO_RD_32((int)cards[ix].pcm.dma_a+4),
 			PCI_IO_RD_32((int)cards[ix].pcm.dma_c), PCI_IO_RD_32((int)cards[ix].pcm.dma_c+4));
 	}
@@ -741,12 +742,12 @@ cmedia_pci_interrupt(
 	**  But not bother setting the midi interrupt bit in the ISR.
 	**  Thanks a lot, S3.
 	*/
-	if(handled == B_UNHANDLED_INTERRUPT){	
+	if(handled == B_UNHANDLED_INTERRUPT){
 		if (midi_interrupt(card)) {
 			handled = B_INVOKE_SCHEDULER;
 		}
 	}
-	
+
 /*	KTRACE(); / * */
 	release_spinlock(&card->hardware);
 	restore_interrupts(cp);

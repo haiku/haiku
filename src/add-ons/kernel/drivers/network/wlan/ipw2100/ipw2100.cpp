@@ -897,7 +897,7 @@ IPW2100::MapPhysicalMemory(const char *name, uint32 physicalAddress,
 	size = (size + offset + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	void *virtualAddress;
-	area_id area = map_physical_memory(name, (void *)physicalAddress, size,
+	area_id area = map_physical_memory(name, physicalAddress, size,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, &virtualAddress);
 	if (area < B_OK) {
 		TRACE_ALWAYS(("IPW2100: mapping physical address failed\n"));
@@ -918,6 +918,7 @@ area_id
 IPW2100::AllocateContiguous(const char *name, void **logicalAddress,
 	uint32 *physicalAddress, size_t size)
 {
+// TODO: physicalAddress should be phys_addr_t*!
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 	void *virtualAddress = NULL;
 	area_id area = create_area(name, &virtualAddress, B_ANY_KERNEL_ADDRESS,
@@ -933,7 +934,7 @@ IPW2100::AllocateContiguous(const char *name, void **logicalAddress,
 	if (physicalAddress) {
 		physical_entry physicalEntry;
 		get_memory_map(virtualAddress, size, &physicalEntry, 1);
-		*physicalAddress = (uint32)physicalEntry.address;
+		*physicalAddress = physicalEntry.address;
 	}
 
 	return area;

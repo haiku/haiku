@@ -640,7 +640,7 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 	TRACE("bind %ld bytes at %lx\n", size, base);
 
 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
-		addr_t physicalAddress = 0;
+		phys_addr_t physicalAddress = 0;
 		status_t status;
 
 		if (!physical) {
@@ -650,7 +650,7 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 			if (status < B_OK)
 				return status;
 
-			physicalAddress = (addr_t)entry.address;
+			physicalAddress = entry.address;
 		} else {
 #ifdef __HAIKU__
 			uint32 index = offset >> PAGE_SHIFT;
@@ -1008,6 +1008,7 @@ static status_t
 allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 	addr_t *_apertureBase, addr_t *_physicalBase)
 {
+// TODO: _physicalBase should be a phys_addr_t*!
 	if ((flags & ~APERTURE_PUBLIC_FLAGS_MASK) != 0 || _apertureBase == NULL)
 		return B_BAD_VALUE;
 
@@ -1042,7 +1043,7 @@ allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 			return status;
 		}
 
-		*_physicalBase = (addr_t)entry.address;
+		*_physicalBase = entry.address;
 #endif
 	}
 

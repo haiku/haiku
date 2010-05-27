@@ -1,6 +1,6 @@
 /*
 ** $Id: sim_buslogic.c,v 1.8 1998/04/21 00:54:52 swetland Exp $
-** 
+**
 ** SCSI Interface Module for BusLogic MultiMaster Controllers
 ** Copyright 1998, Brian J. Swetland <swetland@frotz.net>
 **
@@ -14,7 +14,7 @@
 #include <KernelExport.h>
 
 /*
-** Debug options: 
+** Debug options:
 */
 #define DEBUG_BUSLOGIC   /* Print Debugging Messages                       */
 #define xDEBUG_TRANSACTIONS
@@ -43,8 +43,8 @@
 #endif
 
 /* TODO:
-**  
-** - endian issues: the MultiMaster is little endian, should use swap() 
+**
+** - endian issues: the MultiMaster is little endian, should use swap()
 **   macro for PPC compatibility whenever exchanging addresses with it (DONE)
 ** - wrap phys addrs with ram_address()
 ** - support scatter-gather in the ccb_scsiio struct (DONE)
@@ -66,7 +66,7 @@
 #include "buslogic.h"
 
 /*
-** Constants for the SIM 
+** Constants for the SIM
 */
 #define SIM_VERSION 0x01
 #define HBA_VERSION 0x01
@@ -119,13 +119,13 @@ scsi_int_dispatch(void *data)
 	if(intstat & BL_INT_RSTS){
 		kprintf("buslogic_irq: BUS RESET\n");
 	}
-	
+
         /* have we got mail? */
     if(intstat & BL_INT_IMBL){
         while(bl->in_boxes[bl->in_nextbox].completion_code){
             bl_ccb = (BL_CCB32 *)
                 PhysToVirt(unLE(bl->in_boxes[bl->in_nextbox].ccb_phys));
-            
+
 #ifdef VERBOSE_IRQ
             kprintf("buslogic_irq: CCB %08x (%08x) done, cc=0x%02x\n",
                     unLE(bl->in_boxes[bl->in_nextbox].ccb_phys), (uint32) bl_ccb,
@@ -141,12 +141,12 @@ scsi_int_dispatch(void *data)
 
         /* acknowledge the irq */
     outb(BL_CONTROL_REG, BL_CONTROL_RINT);
-    
+
     return B_HANDLED_INTERRUPT;
 }
 
 
-/* Execute a command, with optional params send (in[in_len]) and 
+/* Execute a command, with optional params send (in[in_len]) and
 ** results received (out[out_len])
 */
 static int bl_execute(BusLogic *bl, uchar command,
@@ -158,18 +158,18 @@ static int bl_execute(BusLogic *bl, uchar command,
 #ifdef TIMEOUT
 	int timeout;
 #endif
-	
+
     _in = (uchar *) in;
     _out = (uchar *) out;
-    
+
     if(!(inb(BL_STATUS_REG) & BL_STATUS_HARDY)) {
         d_printf("buslogic: command 0x%02x %d/%d, not ready\n",
-                 command, in_len, out_len);        
+                 command, in_len, out_len);
         return 1;
     }
 
     outb(BL_COMMAND_REG, command);
-    
+
 #ifdef TIMEOUT
 	timeout = 100;
 #endif
@@ -197,7 +197,7 @@ static int bl_execute(BusLogic *bl, uchar command,
     }
 
 #ifdef TIMEOUT
-	timeout = 100;    
+	timeout = 100;
 #endif
     while(out_len){
         status = inb(BL_STATUS_REG);
@@ -239,7 +239,7 @@ static int bl_execute(BusLogic *bl, uchar command,
     return 0;
 }
 
-/* Initialize the BT-9X8 and confirm that it is operating as expected 
+/* Initialize the BT-9X8 and confirm that it is operating as expected
 */
 static long init_buslogic(BusLogic *bl)
 {
@@ -247,7 +247,7 @@ static long init_buslogic(BusLogic *bl)
     uchar id[16];
     int i;
     char *str = bl->productname;
-    
+
     d_printf("buslogic: init_buslogic()\n");
 
     dprintf("buslogic: reset: ");
@@ -278,21 +278,21 @@ static long init_buslogic(BusLogic *bl)
         dprintf(" TIMEOUT\n");
         return -1;
     }
-     
+
     if(bl_execute(bl, 0x04, NULL, 0, id, 4)){
         d_printf("buslogic: can't id?\n");
         return B_ERROR;
-    } 
+    }
     d_printf("buslogic: Firmware Rev %c.%c\n",id[2],id[3]);
 
 	id[0]=14;
 	id[14]=id[2];
-	
+
 	if(bl_execute(bl, 0x8d, id, 1, id, 14)){
 		d_printf("buslogic: cannot read extended config\n");
 		return B_ERROR;
-	} 
-	
+	}
+
 	d_printf("buslogic: rev = %c.%c%c%c mb = %d, sgmax = %d, flags = 0x%02x\n",
 			id[14], id[10], id[11], id[12], id[4], id[2] | (id[3]<<8), id[13]);
 	if(id[13] & 0x01) bl->wide = 1;
@@ -316,14 +316,14 @@ static long init_buslogic(BusLogic *bl)
 		*str++ = 0;
 	} else {
 		strcpy(str,"unknown");
-	}	
+	}
 	if(bl_execute(bl, 0x0B, NULL, 0, id, 3)){
 		d_printf("buslogic: cannot read config\n");
 		return B_ERROR;
 	}
 	bl->scsi_id = id[2];
 	d_printf("buslogic: Adapter SCSI ID = %d\n",bl->scsi_id);
-	
+
     if(install_io_interrupt_handler(bl->irq, scsi_int_dispatch, bl, 0)
        == B_ERROR) d_printf("buslogic: can't install irq handler\n");
 
@@ -338,7 +338,7 @@ static long init_buslogic(BusLogic *bl)
         d_printf("buslogic: interrupt test failed\n");
         return B_ERROR;
     }
-    
+
         /* strict round-robin on */
     id[0] = 0;
     if(bl_execute(bl,0x8F, id, 1, NULL, 0)){
@@ -346,7 +346,7 @@ static long init_buslogic(BusLogic *bl)
         return B_ERROR;
     }
 
-    
+
     id[0] = bl->box_count;
 { int mbaddr = toLE(bl->phys_mailboxes);
     memcpy(id + 1, &(mbaddr),4);
@@ -357,7 +357,7 @@ static long init_buslogic(BusLogic *bl)
     }
     d_printf("buslogic: %d mailboxes @ 0x%08xv/0x%08lxp\n",
              bl->box_count, (uint) bl->out_boxes, bl->phys_mailboxes);
-    
+
     return B_NO_ERROR;
 }
 
@@ -376,7 +376,7 @@ static long sim_invalid(BusLogic *bl, CCB_HEADER *ccbh)
 
 
 /* Convert a CCB_SCSIIO into a BL_CCB32 and (possibly SG array).
-** 
+**
 **
 */
 
@@ -392,13 +392,13 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
     physical_entry *scratch;
     uint32 tmp;
     int i,t,req;
-    
+
     ccb = (CCB_SCSIIO *) ccbh;
 
 #ifdef DEBUG_BUSLOGIC
     req = atomic_add(&(bl->reqid),1);
 #endif
-    
+
         /* valid cdb len? */
     cdb_len = ccb->cam_cdb_len;
     if (cdb_len != 6 && cdb_len != 10 && cdb_len != 12) {
@@ -420,10 +420,10 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 
         /* get contiguous area for bl_ccb in the private data area */
     get_memory_map((void *)ccb->cam_sim_priv, 4096, entries, 2);
-    
+
 	priv_phys = (uint32) entries[0].address;
 	priv = (BL_PRIV *) ccb->cam_sim_priv;
-    
+
         /* copy over the CDB */
     if(ccb->cam_ch.cam_flags & CAM_CDB_POINTER) {
         memcpy(bl_ccb->cdb, ccb->cam_cdb_io.cam_cdb_ptr, cdb_len);
@@ -446,7 +446,7 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
         /* okay, this is really disgusting and could potentially
            break if physical_entry{} changes format... we use the
            sg list as a scratchpad.  Disgusting, but a start */
-    
+
     scratch = (physical_entry *) priv->sg;
 
 
@@ -454,12 +454,12 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 		/* we're using scatter gather -- things just got trickier */
 		iovec *iov = (iovec *) ccb->cam_data_ptr;
 		int j,sgcount = 0;
-		
+
 		/* dprintf("buslogic: sg count = %d\n",ccb->cam_sglist_cnt);*/
           /* multiple entries, use SG */
 		bl_ccb->opcode = BL_CCB_OP_INITIATE_RETLEN_SG;
 		bl_ccb->data = toLE(priv_phys + 256);
-		
+
 		/* for each entry in the sglist we were given ... */
 		for(t=0,i=0;i<ccb->cam_sglist_cnt;i++){
 			/* map it ... */
@@ -472,12 +472,12 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 				sgcount++;
 	            dt_printf("buslogic/%d: SG %03d - 0x%08x (%d)\n",req,
 			  j, (uint32) scratch[j].address, scratch[j].size);
-		
+
 	            tmp = priv->sg[j].length;
 	            priv->sg[j].length = toLE(priv->sg[j].phys);
 	            priv->sg[j].phys = toLE(tmp);
 	        }
-	
+
 			if(scratch[j].size) panic("egads! sgseg overrun in BusLogic SIM");
 		}
         if(t != ccb->cam_dxfer_len){
@@ -493,7 +493,7 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
             return B_ERROR;
         }
         /* total bytes in DataSegList */
-        bl_ccb->length_data = toLE(sgcount * 8);  
+        bl_ccb->length_data = toLE(sgcount * 8);
 	} else {
 	    get_memory_map((void *)ccb->cam_data_ptr, ccb->cam_dxfer_len, scratch,
 	                   MAX_SCATTER);
@@ -506,7 +506,7 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 	            t += scratch[i].size;
 	            dt_printf("buslogic/%d: SG %03d - 0x%08x (%d)\n",req,
 						  i, (uint32) scratch[i].address, scratch[i].size);
-	
+
 	            tmp = priv->sg[i].length;
 	            priv->sg[i].length = toLE(priv->sg[i].phys);
 	            priv->sg[i].phys = toLE(tmp);
@@ -514,7 +514,7 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 	        if(t != ccb->cam_dxfer_len){
 	            dt_printf("buslogic/%d: error, %d != %d\n",req,t,ccb->cam_dxfer_len);
 	            ccb->cam_ch.cam_status = CAM_REQ_INVALID;
-	
+
 	                /* put the CCB32 back on the freelist and release our lock */
 	            acquire_sem(bl->ccb_lock);
 	            bl_ccb->next = bl->first_ccb;
@@ -525,7 +525,7 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 	        }
 	            /* total bytes in DataSegList */
 	        bl_ccb->length_data = toLE(i * 8);
-	        
+
 	    } else {
 	        bl_ccb->opcode = BL_CCB_OP_INITIATE_RETLEN;
 	            /* single entry, use direct */
@@ -533,17 +533,17 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 	        bl_ccb->data = toLE((uint32) scratch[0].address);
 	    }
 	}
-	
+
     dt_printf("buslogic/%d: targ %d, dxfr %d, scsi op = 0x%02x\n",req,
 			  bl_ccb->target_id, t, bl_ccb->cdb[0]);
-    
+
     acquire_sem(bl->hw_lock);
 
         /* check for box in use state XXX */
     bl->out_boxes[bl->out_nextbox].ccb_phys = toLE(bl_ccb_phys);
     bl->out_boxes[bl->out_nextbox].action_code = BL_ActionCode_Start;
     bl->out_nextbox++;
-    if(bl->out_nextbox == bl->box_count) bl->out_nextbox = 0;    
+    if(bl->out_nextbox == bl->box_count) bl->out_nextbox = 0;
     outb(BL_COMMAND_REG, 0x02);
 
 #ifndef SERIALIZE_REQS
@@ -554,7 +554,7 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
     acquire_sem(bl_ccb->done);
 /*    d_printf("buslogic/%d: CCB %08x (%08xv) done\n",
 	  req, bl_ccb_phys, (uint32) bl_ccb);*/
-    
+
 #ifdef SERIALIZE_REQS
     release_sem(bl->hw_lock);
 #endif
@@ -579,21 +579,21 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 			ccb->cam_ch.cam_status = CAM_UNCOR_PARITY;
 			break;
 		default:
-	        ccb->cam_ch.cam_status = CAM_REQ_INVALID;		
+	        ccb->cam_ch.cam_status = CAM_REQ_INVALID;
 		}
         dt_printf("buslogic/%d: error stat %02x\n",req,bl_ccb->btstat);
     } else {
         dt_printf("buslogic/%d: data %d/%d, sense %d/%d\n", req,
 				  bl_ccb->length_data, ccb->cam_dxfer_len,
 				  bl_ccb->length_sense, ccb->cam_sense_len);
-        
+
         ccb->cam_resid = bl_ccb->length_data;
 
             /* under what condition should we do this? */
         memcpy(ccb->cam_sense_ptr, priv->sensedata, ccb->cam_sense_len);
 
         ccb->cam_scsi_status = bl_ccb->sdstat;
-        
+
         if(bl_ccb->sdstat == 02){
             ccb->cam_ch.cam_status = CAM_REQ_CMP_ERR | CAM_AUTOSNS_VALID;
             ccb->cam_sense_resid = 0;
@@ -609,10 +609,10 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
             release_sem(bl->ccb_lock);
             release_sem(bl->ccb_count);
             return 0;
-            
+
         }
     }
-    
+
         /* put the CCB32 back on the freelist and release our lock */
     acquire_sem(bl->ccb_lock);
     bl_ccb->next = bl->first_ccb;
@@ -623,16 +623,16 @@ static long sim_execute_scsi_io(BusLogic *bl, CCB_HEADER *ccbh)
 }
 
 
-/* 
+/*
 ** sim_path_inquiry returns info on the target/lun.
 */
 static long sim_path_inquiry(BusLogic *bl, CCB_HEADER *ccbh)
 {
     CCB_PATHINQ	*ccb;
     d_printf("buslogic: sim_path_inquiry()\n");
-    
+
     ccb = (CCB_PATHINQ *) ccbh;
-    
+
     ccb->cam_version_num = SIM_VERSION;
     ccb->cam_target_sprt = 0;
     ccb->cam_hba_eng_cnt = 0;
@@ -655,7 +655,7 @@ static long sim_path_inquiry(BusLogic *bl, CCB_HEADER *ccbh)
 static long sim_extended_path_inquiry(BusLogic *bl, CCB_HEADER *ccbh)
 {
     CCB_EXTENDED_PATHINQ *ccb;
-    
+
     sim_path_inquiry(bl, ccbh);
     ccb = (CCB_EXTENDED_PATHINQ *) ccbh;
     sprintf(ccb->cam_sim_version, "%d.0", SIM_VERSION);
@@ -763,9 +763,9 @@ static long sim_action(BusLogic *bl, CCB_HEADER *ccbh)
         sim_terminate_process	/* terminate an i/o process */
     };
     uchar op;
-    
+
     /* d_printf("buslogic: sim_execute(), op = %d\n", ccbh->cam_func_code); */
-    
+
 		/* check for function codes out of range of dispatch table */
     op = ccbh->cam_func_code;
     if ((op >= sizeof (sim_functions) / sizeof (long (*)())) &&
@@ -774,7 +774,7 @@ static long sim_action(BusLogic *bl, CCB_HEADER *ccbh)
         ccbh->cam_status = CAM_REQ_INVALID;
         return -1;
     }
-    
+
     ccbh->cam_status = CAM_REQ_INPROG;
     if (op == XPT_EXTENDED_PATH_INQ) {
         return sim_extended_path_inquiry(bl, ccbh);
@@ -787,7 +787,7 @@ static long sim_action(BusLogic *bl, CCB_HEADER *ccbh)
 static char *hextab = "0123456789ABCDEF";
 
 /*
-** Allocate the actual memory for the cardinfo object 
+** Allocate the actual memory for the cardinfo object
 */
 static BusLogic *create_cardinfo(int num, int iobase, int irq)
 {
@@ -796,18 +796,18 @@ static BusLogic *create_cardinfo(int num, int iobase, int irq)
     int i;
     physical_entry entries[5];
     char name[9] = { 'b', 'l', '_', 'c', 'c', 'b', '0', '0', 0 };
-    
+
     BusLogic *bl = (BusLogic *) malloc(sizeof(BusLogic));
-   
+
 #ifndef __INTEL__
-	i = map_physical_memory("bl_regs",(void*) iobase,  4096,
+	i = map_physical_memory("bl_regs", iobase,  4096,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, &a);
 	iobase = (uint32) a;
 	if(i < 0) {
 		dprintf("buslogic: can't map registers...\n");
 	}
 #endif
- 
+
     bl->id = num;
     bl->iobase = iobase;
     bl->irq = irq;
@@ -838,19 +838,19 @@ static BusLogic *create_cardinfo(int num, int iobase, int irq)
         return NULL;
     }
     get_memory_map(a, 4096*5, entries, 2);
-#endif 
+#endif
 
         /* figure virtual <-> physical translations */
     bl->phys_to_virt = ((uint) a) - ((uint) entries[0].address);
     bl->virt_to_phys = (((uint) entries[0].address - (uint) a));
-    bl->phys_mailboxes = (uint) entries[0].address;        
+    bl->phys_mailboxes = (uint) entries[0].address;
 
         /* initialize all mailboxes to empty */
     bl->out_boxes = (BL_Out_Mailbox32 *) a;
     bl->in_boxes = (BL_In_Mailbox32 *) (a + (8 * bl->box_count));
     for(i=0;i<bl->box_count;i++){
         bl->out_boxes[i].action_code = BL_ActionCode_NotInUse;
-        bl->in_boxes[i].completion_code = BL_CompletionCode_NotInUse;        
+        bl->in_boxes[i].completion_code = BL_CompletionCode_NotInUse;
     }
 
         /* setup the CCB32 cache */
@@ -858,7 +858,7 @@ static BusLogic *create_cardinfo(int num, int iobase, int irq)
     bl->ccb = (BL_CCB32 *) (((uchar *)a) + 1024);
 #else
     bl->ccb = (BL_CCB32 *) (((uchar *)a) + 4096);
-#endif 
+#endif
     bl->first_ccb = NULL;
     for(i=0;i<bl->box_count;i++){
         name[6] = hextab[(i & 0xF0) >> 4];
@@ -867,12 +867,12 @@ static BusLogic *create_cardinfo(int num, int iobase, int irq)
         bl->ccb[i].next = bl->first_ccb;
         bl->first_ccb = &(bl->ccb[i]);
     }
-    
+
     bl->hw_lock = create_sem(1, "bl_hw_lock");
     bl->ccb_lock = create_sem(1, "bl_ccb_lock");
     bl->ccb_count = create_sem(MAX_CCB_COUNT, "bl_ccb_count");
     bl->reqid = 0;
-    
+
     return bl;
 }
 
@@ -895,7 +895,7 @@ static long sim_action3(CCB_HEADER *ccbh)  { return sim_action(cardinfo[3],ccbh)
 
 
 static long (*sim_init_funcs[MAXCARDS])(void) = {
-    sim_init0, sim_init1, sim_init2, sim_init3 
+    sim_init0, sim_init1, sim_init2, sim_init3
 };
 
 static long (*sim_action_funcs[MAXCARDS])(CCB_HEADER *) = {
@@ -914,7 +914,7 @@ sim_install_buslogic(void)
     int cardcount = 0;
     pci_info h;
     CAM_SIM_ENTRY entry;
-    
+
    /* d_printf("buslogic: sim_install()\n"); */
 
     for (i = 0; ; i++) {
@@ -938,8 +938,8 @@ sim_install_buslogic(void)
     		if((irq == 0) || (irq > 128)) {
 				dprintf("buslogic%d: bad irq %d\n",cardcount,irq);
         		continue;
-    		}        
-               
+    		}
+
             if(cardcount == MAXCARDS){
                 d_printf("buslogic: too many controllers!\n");
                 return cardcount;
@@ -978,12 +978,12 @@ static status_t std_ops(int32 op, ...)
 		put_module(pci_name);
 		put_module(cam_name);
 		return B_ERROR;
-		
+
 	case B_MODULE_UNINIT:
 		put_module(pci_name);
 		put_module(cam_name);
 		return B_OK;
-	
+
 	default:
 		return B_ERROR;
 	}

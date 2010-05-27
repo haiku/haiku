@@ -780,7 +780,7 @@ MM_MapMemBase(PLM_DEVICE_BLOCK pDevice)
 
 	size = ROUND_UP_TO_PAGE(size);
 	pUmDevice->mem_base = map_physical_memory("broadcom_regs",
-		(void *)(pUmDevice->pci_data.u.h0.base_registers[0]), size,
+		pUmDevice->pci_data.u.h0.base_registers[0], size,
 		B_ANY_KERNEL_BLOCK_ADDRESS, 0,
 		(void **)(&pDevice->pMappedMemBase));
 
@@ -897,8 +897,8 @@ MM_AllocateSharedMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	*pMemoryBlockVirt = (PLM_VOID) pvirt;
 
 	get_memory_map(pvirt,BlockSize,&entry,1);
-	pMemoryBlockPhy->Low = (uint32)(entry.address);
-	pMemoryBlockPhy->High = 0;
+	pMemoryBlockPhy->Low = (uint32)entry.address;
+	pMemoryBlockPhy->High = (uint32)(entry.address >> 32);
 		/* We only support 32 bit */
 
 	return LM_STATUS_SUCCESS;

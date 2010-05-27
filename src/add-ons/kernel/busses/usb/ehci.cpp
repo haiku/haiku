@@ -154,7 +154,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fPCIInfo->u.h0.base_register_sizes[0]);
 
 	fRegisterArea = map_physical_memory("EHCI memory mapped registers",
-		(void *)physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
+		physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
 		(void **)&fCapabilityRegisters);
 	if (fRegisterArea < B_OK) {

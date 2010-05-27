@@ -149,7 +149,7 @@ struct hda_stream {
 	uint32		sample_size;
 	uint8*		buffers[STREAM_MAX_BUFFERS];
 					/* Virtual addresses for buffer */
-	uint32		physical_buffers[STREAM_MAX_BUFFERS];
+	phys_addr_t	physical_buffers[STREAM_MAX_BUFFERS];
 					/* Physical addresses for buffer */
 
 	volatile bigtime_t	real_time;

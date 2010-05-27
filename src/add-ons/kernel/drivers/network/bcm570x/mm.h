@@ -42,13 +42,13 @@ typedef vint32 MM_ATOMIC_T;
 #define MM_MEMREADL(ptr) __raw_readl(ptr)
 
 #ifdef __INTEL__
-#define mb()    __asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory") 
+#define mb()    __asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory")
 #else
 #ifdef __HAIKU__
 #define mb()	memory_write_barrier()
 #else
 #warning no memory barrier function defined.
-#define mb()	
+#define mb()
 #endif
 #endif
 #define wmb()    mb()
@@ -72,28 +72,28 @@ extern int b57_Packet_Desc_Size;
 
 struct be_b57_dev {
 	struct _LM_DEVICE_BLOCK lm_dev;
-	
+
 	struct pci_info pci_data;
-	
+
 	sem_id packet_release_sem;
 	//sem_id interrupt_sem;
 	//thread_id interrupt_handler;
-	
+
     LM_RX_PACKET_Q RxPacketReadQ;
-	
+
 	void *mem_list[16];
 	int mem_list_num;
-	
+
 	area_id lockmem_list[16];
 	int lockmem_list_num;
-	
+
 	area_id mem_base;
-	
+
 	vint32 opened;
 	int block;
 	spinlock lock;
 	cpu_status cpu;
-	
+
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	sem_id				linkChangeSem;
 #endif
@@ -101,7 +101,7 @@ struct be_b57_dev {
 
 struct B_UM_PACKET {
 	struct _LM_PACKET pkt;
-	
+
 	void *data;
 	size_t size;
 };
@@ -112,10 +112,10 @@ static inline void MM_MapRxDma(PLM_DEVICE_BLOCK pDevice,
 {
 	physical_entry entry;
 	struct B_UM_PACKET *bpkt = (struct B_UM_PACKET *)(pPacket);
-	
+
 	get_memory_map(bpkt->data,pPacket->u.Rx.RxBufferSize,&entry,1);
-	paddr->Low = (LM_UINT32) entry.address;
-	paddr->High = 0L;
+	paddr->Low = (LM_UINT32)entry.address;
+	paddr->High = (LM_UINT32)(entry.address >> 32);
 }
 
 static inline void MM_MapTxDma(PLM_DEVICE_BLOCK pDevice,
@@ -124,10 +124,10 @@ static inline void MM_MapTxDma(PLM_DEVICE_BLOCK pDevice,
 {
 	struct B_UM_PACKET *pkt = (struct B_UM_PACKET *)pPacket;
 	physical_entry entry;
-	
+
 	get_memory_map(pkt->data,pkt->size,&entry,1);
-	paddr->Low = (LM_UINT32) entry.address;
-	paddr->High = 0L;
+	paddr->Low = (LM_UINT32)entry.address;
+	paddr->High = (LM_UINT32)(entry.address >> 32);
 	*len = pPacket->PacketSize;
 }
 
@@ -154,7 +154,7 @@ static inline void MM_MapTxDma(PLM_DEVICE_BLOCK pDevice,
 #define MM_RELEASE_PHY_LOCK_IN_IRQ(_pDevice) /*\
 	release_spinlock(&(((struct be_b57_dev *)(_pDevice))->lock)); \
 	enable_interrupts(((struct be_b57_dev *)(_pDevice))->cpu);*/
-	
+
 #define MM_PTR(_ptr)   ((unsigned long) (_ptr))
 #define MM_UINT_PTR(_ptr)   ((unsigned long) (_ptr))
 #define printf(fmt, args...) dprintf(fmt, ##args)
@@ -165,5 +165,5 @@ static inline void MM_MapTxDma(PLM_DEVICE_BLOCK pDevice,
 	if (!(expr)) {							\
 		dprintf("ASSERT failed: %s\n", #expr);	\
 	}
-	
+
 #endif

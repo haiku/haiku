@@ -35,6 +35,7 @@ round_to_pagesize(uint32 size)
 static area_id
 alloc_mem(void **phy, void **log, size_t size, const char *name)
 {
+// TODO: phy should be phys_addr_t*!
 	physical_entry pe;
 	void *logadr;
 	area_id areaid;
@@ -57,7 +58,7 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 	if (log)
 		*log = logadr;
 	if (phy)
-		*phy = pe.address;
+		*phy = (void*)(addr_t)pe.address;
 
 	return areaid;
 }
@@ -97,7 +98,7 @@ void *
 ali_mem_alloc(ali_dev *card, size_t size)
 {
 	ali_mem *mem;
-	
+
 	mem = ali_mem_new(card, size);
 	if (!mem)
 		return NULL;
@@ -112,13 +113,13 @@ void
 ali_mem_free(ali_dev *card, void *ptr)
 {
 	ali_mem *mem;
-	
+
 	LIST_FOREACH(mem, &card->mems, next) {
 		if (mem->log_base != ptr)
 			continue;
 
 		LIST_REMOVE(mem, next);
-		
+
 		ali_mem_delete(mem);
 		break;
 	}

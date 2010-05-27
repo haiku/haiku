@@ -94,7 +94,7 @@ typedef struct channel_data {
 
 	area_id				prd_area;
 	prd_entry *			prdt;
-	void *				prdt_phys;
+	phys_addr_t			prdt_phys;
 	uint32 				dma_active;
 	uint32 				lost;
 } channel_data;
@@ -272,9 +272,9 @@ controller_init(device_node *node, void **_controllerCookie)
 
 	FLOW("controller %p\n", controller);
 
-	mmioArea = map_physical_memory("Silicon Image SATA regs",
-		(void *)mmioBase, kASICData[asicIndex].mmio_bar_size,
-		B_ANY_KERNEL_ADDRESS, 0, (void **)&mmioAddr);
+	mmioArea = map_physical_memory("Silicon Image SATA regs", mmioBase,
+		kASICData[asicIndex].mmio_bar_size, B_ANY_KERNEL_ADDRESS, 0,
+		(void **)&mmioAddr);
 	if (mmioArea < B_OK) {
 		TRACE("controller_init: mapping memory failed\n");
 		free(controller);
@@ -683,7 +683,7 @@ dma_prepare(void *channelCookie, const physical_entry *sg_list,
 	for (i = sg_list_count - 1, prd = channel->prdt; i >= 0;
 			--i, ++prd, ++sg_list ) {
 		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
-			sg_list->address));
+			(void*)(addr_t)sg_list->address));
 
 		// 0 means 64K - this is done automatically by discarding upper 16 bits
 		prd->count = B_HOST_TO_LENDIAN_INT16((uint16)sg_list->size);
@@ -695,7 +695,7 @@ dma_prepare(void *channelCookie, const physical_entry *sg_list,
 	// XXX move this to chan init?
 	temp = (*channel->bm_prdt_address) & 3;
 	temp |= B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
-		(void *)channel->prdt_phys)) & ~3;
+		(void *)(addr_t)channel->prdt_phys)) & ~3;
 	*channel->bm_prdt_address = temp;
 
 	*channel->dev_ctrl; // read altstatus to flush

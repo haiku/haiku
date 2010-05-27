@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -1219,6 +1219,7 @@ IORequest::_CopySimple(void* bounceBuffer, void* external, size_t size,
 IORequest::_CopyPhysical(void* bounceBuffer, void* external, size_t size,
 	team_id team, bool copyIn)
 {
+// TODO: The physical address must be phys_addr_t!
 	if (copyIn) {
 		return vm_memcpy_from_physical(bounceBuffer, (addr_t)external, size,
 			false);
@@ -1250,7 +1251,7 @@ IORequest::_CopyUser(void* _bounceBuffer, void* _external, size_t size,
 
 		for (uint32 i = 0; i < count; i++) {
 			const physical_entry& entry = entries[i];
-			error = _CopyPhysical(bounceBuffer, entry.address,
+			error = _CopyPhysical(bounceBuffer, (void*)entry.address,
 				entry.size, team, copyIn);
 			if (error != B_OK)
 				return error;

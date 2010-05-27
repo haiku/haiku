@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -106,7 +106,7 @@ private:
 			uint32				fEntriesEver;
 			spinlock			fLock;
 			char*				fTraceOutputBuffer;
-			addr_t				fPhysicalAddress;
+			phys_addr_t			fPhysicalAddress;
 			uint32				fMagic3;
 };
 
@@ -380,7 +380,7 @@ TracingMetaData::Create(TracingMetaData*& _metaData)
 	physical_entry physicalEntry;
 	if (get_memory_map(metaData->fTraceOutputBuffer, B_PAGE_SIZE,
 			&physicalEntry, 1) == B_OK) {
-		metaData->fPhysicalAddress = (addr_t)physicalEntry.address;
+		metaData->fPhysicalAddress = physicalEntry.address;
 	} else {
 		dprintf("TracingMetaData::Create(): failed to get physical address "
 			"of tracing buffer\n");

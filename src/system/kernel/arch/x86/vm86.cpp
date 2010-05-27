@@ -556,7 +556,7 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 	}
 
 	// copy int vectors and BIOS data area
-	vectors = map_physical_memory("int vectors", (void *)0, 0x502,
+	vectors = map_physical_memory("int vectors", 0, 0x502,
 		B_ANY_KERNEL_BLOCK_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		&address);
 	if (vectors < B_OK) {

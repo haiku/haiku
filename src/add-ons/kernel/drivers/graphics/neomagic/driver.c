@@ -113,7 +113,7 @@ static uint16 nm_device_list[] = {
 	0x0016,	/* MagicMedia 256XL+ (NM2380) */
 	0
 };
- 
+
 static struct {
 	uint16	vendor;
 	uint16	*devices;
@@ -122,7 +122,7 @@ static struct {
 	{0x0000, NULL}
 };
 
-static settings current_settings = { // see comments in nm.settings 
+static settings current_settings = { // see comments in nm.settings
 	// for driver
 	DRIVER_PREFIX ".accelerant",
 	false,      // dumprom
@@ -137,7 +137,7 @@ static void dumprom (void *rom, uint32 size)
 {
 	int fd;
 	uint32 cnt;
-	
+
 	fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
 	if (fd < 0) return;
 
@@ -182,7 +182,7 @@ init_hardware(void) {
 	long		pci_index = 0;
 	pci_info	pcii;
 	bool		found_one = FALSE;
-	
+
 	/* choke if we can't find the PCI bus */
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
@@ -197,7 +197,7 @@ init_hardware(void) {
 	/* while there are more pci devices */
 	while ((*pci_bus->get_nth_pci_info)(pci_index, &pcii) == B_NO_ERROR) {
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
 		while (SupportedDevices[vendor].vendor) {
 			if (SupportedDevices[vendor].vendor == pcii.vendor_id) {
@@ -206,7 +206,7 @@ init_hardware(void) {
 				while (*devices) {
 					/* if we match a supported device */
 					if (*devices == pcii.device_id ) {
-						
+
 						found_one = TRUE;
 						goto done;
 					}
@@ -238,7 +238,7 @@ init_driver(void) {
 		const char *item;
 		char       *end;
 		uint32      value;
-		
+
 		// for driver
 		item = get_driver_parameter (settings_handle, "accelerant", "", "");
 		if ((strlen (item) > 0) && (strlen (item) < sizeof (current_settings.accelerant) - 1)) {
@@ -374,7 +374,7 @@ static status_t map_device(device_info *di)
 		/* get a virtual memory address for the registers*/
 		si->regs_area = map_physical_memory(
 			buffer,
-			(void *) di->pcii.u.h0.base_registers[registers],
+			di->pcii.u.h0.base_registers[registers],
 			di->pcii.u.h0.base_register_sizes[registers],
 			B_ANY_KERNEL_ADDRESS,
  			(si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
@@ -391,7 +391,7 @@ static status_t map_device(device_info *di)
 
 		si->regs2_area = map_physical_memory(
 			buffer,
-			(void *) di->pcii.u.h0.base_registers[registers2],
+			di->pcii.u.h0.base_registers[registers2],
 			di->pcii.u.h0.base_register_sizes[registers2],
 			B_ANY_KERNEL_ADDRESS,
 			(si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
@@ -424,7 +424,7 @@ static status_t map_device(device_info *di)
 
 		rom_area = map_physical_memory(
 			buffer,
-			(void *)di->pcii.u.h0.rom_base_pci,
+			di->pcii.u.h0.rom_base_pci,
 			di->pcii.u.h0.rom_size,
 			B_ANY_KERNEL_ADDRESS,
 			B_READ_AREA,
@@ -447,7 +447,7 @@ static status_t map_device(device_info *di)
 		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
 		rom_area = map_physical_memory(
 			buffer,
-			(void *)0x000c0000,
+			0x000c0000,
 			65536,
 			B_ANY_KERNEL_ADDRESS,
 			B_READ_AREA,
@@ -490,7 +490,7 @@ static status_t map_device(device_info *di)
 	/* map the framebuffer into vmem, using Write Combining*/
 	si->fb_area = map_physical_memory(
 		buffer,
-		(void *) di->pcii.u.h0.base_registers[frame_buffer],
+		di->pcii.u.h0.base_registers[frame_buffer],
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA + B_WRITE_AREA,
@@ -500,13 +500,13 @@ static status_t map_device(device_info *di)
 	if (si->fb_area < 0) {
 		si->fb_area = map_physical_memory(
 			buffer,
-			(void *) di->pcii.u.h0.base_registers[frame_buffer],
+			di->pcii.u.h0.base_registers[frame_buffer],
 			di->pcii.u.h0.base_register_sizes[frame_buffer],
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA + B_WRITE_AREA,
 			&(si->framebuffer));
 	}
-		
+
 	/* if there was an error, delete our other areas and pass on error*/
 	if (si->fb_area < 0)
 	{
@@ -543,7 +543,7 @@ static status_t map_device(device_info *di)
 	si->framebuffer_pci = (void *) di->pcii.u.h0.base_registers_pci[frame_buffer];
 
 	// remember settings for use here and in accelerant
-	si->settings = current_settings; 
+	si->settings = current_settings;
 
 	/* in any case, return the result */
 	return si->fb_area;
@@ -575,7 +575,7 @@ static void probe_devices(void) {
 	/* while there are more pci devices */
 	while ((count < MAX_DEVICES) && ((*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_NO_ERROR)) {
 		int vendor = 0;
-		
+
 		/* if we match a supported vendor */
 		while (SupportedDevices[vendor].vendor) {
 			if (SupportedDevices[vendor].vendor == di->pcii.vendor_id) {
@@ -662,7 +662,7 @@ nm_interrupt(void *data)
 	atomic_and(flags, ~SKD_HANDLER_INSTALLED);
 
 exit0:
-	return handled;				
+	return handled;
 }
 
 static status_t open_hook (const char* name, uint32 flags, void** cookie) {
@@ -768,7 +768,7 @@ mark_as_open:
 
 	/* send the cookie to the opener */
 	*cookie = di;
-	
+
 	goto done;
 
 
@@ -879,7 +879,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			strcpy(sig, current_settings.accelerant);
 			result = B_OK;
 		} break;
-		
+
 		/* PRIVATE ioctl from here on */
 		case NM_GET_PRIVATE_DATA: {
 			nm_get_private_data *gpd = (nm_get_private_data *)buf;

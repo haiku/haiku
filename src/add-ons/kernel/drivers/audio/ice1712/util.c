@@ -48,6 +48,7 @@ round_to_pagesize(uint32 size)
 area_id
 alloc_mem(void **phy, void **log, size_t size, const char *name)
 {
+// TODO: phy should be phys_addr_t*!
 	physical_entry pe;
 	void * logadr;
 	area_id areaid;
@@ -72,7 +73,7 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 	if (log)
 		*log = logadr;
 	if (phy)
-		*phy = pe.address;
+		*phy = (void*)(addr_t)pe.address;
 	TRACE("area = %d, size = %#08X, log = %#08X, phy = %#08X\n", (int)areaid, (int)size, (int)logadr, (int)pe.address);
 	return areaid;
 }

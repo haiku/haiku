@@ -321,7 +321,7 @@ map_device(device_info *di)
 	si->regs_area = map_physical_memory(
 		buffer,
 		/* WARNING: Nvidia needs to map regs as viewed from PCI space! */
-		(void *) di->pcii.u.h0.base_registers_pci[registers],
+		di->pcii.u.h0.base_registers_pci[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
 		B_USER_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
@@ -359,7 +359,7 @@ map_device(device_info *di)
 
 		rom_area = map_physical_memory(
 			buffer,
-			(void *)di->pcii.u.h0.rom_base_pci,
+			di->pcii.u.h0.rom_base_pci,
 			di->pcii.u.h0.rom_size,
 			B_ANY_KERNEL_ADDRESS,
 			B_READ_AREA,
@@ -383,7 +383,7 @@ map_device(device_info *di)
 
 	if (!tmpUlong) {
 		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
-		rom_area = map_physical_memory(buffer, (void *)0x000c0000,
+		rom_area = map_physical_memory(buffer, 0x000c0000,
 			65536, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&(rom_temp));
 	}
 
@@ -419,7 +419,7 @@ map_device(device_info *di)
 	/* map the framebuffer into vmem, using Write Combining*/
 	si->fb_area = map_physical_memory(buffer,
 		/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
-		(void *) di->pcii.u.h0.base_registers_pci[frame_buffer],
+		di->pcii.u.h0.base_registers_pci[frame_buffer],
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA,
@@ -429,7 +429,7 @@ map_device(device_info *di)
 	if (si->fb_area < 0) {
 		si->fb_area = map_physical_memory(buffer,
 			/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
-			(void *) di->pcii.u.h0.base_registers_pci[frame_buffer],
+			di->pcii.u.h0.base_registers_pci[frame_buffer],
 			di->pcii.u.h0.base_register_sizes[frame_buffer],
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA,
@@ -676,18 +676,18 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	 * even on older CPU's. */
 	get_memory_map(unaligned_dma_buffer, B_PAGE_SIZE, map, 1);
 	si->dma_buffer_pci = (void*)
-		((((uint32)(map[0].address)) + net_buf_size - 1) & ~(net_buf_size - 1));
+		((map[0].address + net_buf_size - 1) & ~(net_buf_size - 1));
 
 	/* map the net DMA command buffer into vmem, using Write Combining */
 	si->dma_area = map_physical_memory(
-		"NV aligned DMA cmd buffer", si->dma_buffer_pci, net_buf_size,
+		"NV aligned DMA cmd buffer", (addr_t)si->dma_buffer_pci, net_buf_size,
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA, &(si->dma_buffer));
 	/* if failed with write combining try again without */
 	if (si->dma_area < 0) {
 		si->dma_area = map_physical_memory(
-			"NV aligned DMA cmd buffer", si->dma_buffer_pci, net_buf_size,
-			B_ANY_KERNEL_BLOCK_ADDRESS,
+			"NV aligned DMA cmd buffer", (addr_t)si->dma_buffer_pci,
+			net_buf_size, B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA, &(si->dma_buffer));
 	}
 	/* if there was an error, delete our other areas and pass on error*/

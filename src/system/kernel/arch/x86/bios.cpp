@@ -120,7 +120,7 @@ extern "C" status_t
 bios_init(void)
 {
 	// map BIOS area 0xe0000 - 0xfffff
-	area_id biosArea = map_physical_memory("pc bios", (void *)0xe0000, 0x20000,
+	area_id biosArea = map_physical_memory("pc bios", 0xe0000, 0x20000,
 		B_ANY_KERNEL_ADDRESS | B_MTR_WB,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&gBiosBase);
 	if (biosArea < 0)

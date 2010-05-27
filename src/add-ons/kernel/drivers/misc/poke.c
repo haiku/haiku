@@ -208,7 +208,7 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 			pci_io_args* ioctl = (pci_io_args*)arg;
 			if (ioctl->signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
-			
+
 			ioctl->value = pci->read_pci_config(ioctl->bus, ioctl->device,
 				ioctl->function, ioctl->offset, ioctl->size);
 			return B_OK;
@@ -245,7 +245,8 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 				return B_BAD_VALUE;
 
 			result = get_memory_map(ioctl->address, ioctl->size, &table, 1);
-			ioctl->physical_address = table.address;
+			ioctl->physical_address = (void*)(addr_t)table.address;
+				// TODO: mem_map_args::physical_address should be phys_addr_t!
 			ioctl->size = table.size;
 			return result;
 		}
@@ -257,7 +258,7 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 				return B_BAD_VALUE;
 
 			ioctl->area = map_physical_memory(ioctl->name,
-				ioctl->physical_address, ioctl->size, ioctl->flags,
+				(addr_t)ioctl->physical_address, ioctl->size, ioctl->flags,
 				ioctl->protection, (void**)&ioctl->address);
 			return ioctl->area;
 		}

@@ -47,6 +47,7 @@ area_id
 alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 	const char *name)
 {
+// TODO: phy should be phys_addr_t*!
 	physical_entry pe;
 	void * virtadr;
 	area_id areaid;
@@ -71,7 +72,7 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 	if (virt)
 		*virt = virtadr;
 	if (phy)
-		*phy = pe.address;
+		*phy = (void*)(addr_t)pe.address;
 	LOG(("area = %ld, size = %ld, virt = %p, phy = %p\n", areaid, size, virtadr, pe.address));
 	return areaid;
 }
@@ -95,7 +96,8 @@ map_mem(void **virt, void *phy, size_t size, uint32 protection, const char *name
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = (char *)phy - offset;
 	size = round_to_pagesize(size + offset);
-	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS, protection, &mapadr);
+	area = map_physical_memory(name, (addr_t)phyadr, size,
+		B_ANY_KERNEL_BLOCK_ADDRESS, protection, &mapadr);
 	*virt = (char *)mapadr + offset;
 
 	LOG(("physical = %p, virtual = %p, offset = %ld, phyadr = %p, mapadr = %p, size = %ld, area = 0x%08lx\n",

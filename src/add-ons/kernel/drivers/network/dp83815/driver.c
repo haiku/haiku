@@ -162,7 +162,9 @@ static status_t close_hook( void * );
 
 		TRACE(( kDevName " _open_hook(): PCI base=%lx size=%lx offset=%lx\n", base, size, offset));
 
-		data->ioarea = map_physical_memory(kDevName " Regs", (void *)base, size, B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA, (void **)&data->reg_base);
+		data->ioarea = map_physical_memory(kDevName " Regs", base, size,
+			B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+			(void **)&data->reg_base);
 
 		data->reg_base = data->reg_base + offset;
 	}
@@ -654,10 +656,10 @@ static status_t init_ring_buffers(dp83815_properties_t *data)
 	get_area_info(data->mem_area, &info);
 	get_memory_map(info.address, info.size, map, 4);
 
-	desc_base_phys_addr = (int)map[0].address + NUM_BUFFS*BUFFER_SIZE;
-	desc_base_virt_addr = (info.address + NUM_BUFFS*BUFFER_SIZE);
+	desc_base_phys_addr = map[0].address + NUM_BUFFS*BUFFER_SIZE;
+	desc_base_virt_addr = info.address + NUM_BUFFS*BUFFER_SIZE;
 
-	buff_base_phys_addr = (int)map[0].address;
+	buff_base_phys_addr = map[0].address;
 	buff_base_virt_addr = info.address;
 
 	RxDescRing = desc_base_virt_addr;

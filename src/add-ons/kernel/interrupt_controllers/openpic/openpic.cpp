@@ -44,7 +44,7 @@
 
 
 #define OPENPIC_MODULE_NAME	"interrupt_controllers/openpic/device_v1"
-			
+
 enum {
 	OPENPIC_MIN_REGISTER_SPACE_SIZE	= 0x21000,
 	OPENPIC_MAX_REGISTER_SPACE_SIZE	= 0x40000,
@@ -326,7 +326,7 @@ openpic_register_device(device_node *parent)
   // (driver_module_info**)&pci, (void**)&device); // wtf?
   if (error != B_OK)
     return error;
-  
+
   sDeviceManager->uninit_driver(parent);
 #endif
   device_node *newNode;
@@ -336,10 +336,10 @@ openpic_register_device(device_node *parent)
     //XXX: that's inconsistent with the header!
     //{ B_DEVICE_TYPE, B_STRING_TYPE,
     //	{ string: B_INTERRUPT_CONTROLLER_DRIVER_TYPE }},
-    
+
     {}
   };
-  
+
   // HACK: to get it compiled, I will break anything.
   return sDeviceManager->register_node(parent, NULL, attrs, NULL, &newNode);
 }
@@ -401,11 +401,11 @@ openpic_init_driver(device_node *node, void **cookie)
 	registerSpaceSize -= info->supported_device->register_offset;
 	if (registerSpaceSize > OPENPIC_MAX_REGISTER_SPACE_SIZE)
 		registerSpaceSize = OPENPIC_MAX_REGISTER_SPACE_SIZE;
-	
+
 	// map register space
 	void *virtualRegisterBase = NULL;
 	area_id registerArea = map_physical_memory("openpic registers",
-		(void*)physicalRegisterBase, registerSpaceSize, B_ANY_KERNEL_ADDRESS,
+		physicalRegisterBase, registerSpaceSize, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &virtualRegisterBase);
 	if (registerArea < 0)
 		return info->register_area;
@@ -471,7 +471,7 @@ openpic_get_controller_info(void *cookie, interrupt_controller_info *_info)
 	openpic_info *info = (openpic_info*)cookie;
 
 	*_info = *info;
-	
+
 	return B_OK;
 }
 
@@ -482,7 +482,7 @@ openpic_enable_io_interrupt(void *cookie, int irq, int type)
 	openpic_info *info = (openpic_info*)cookie;
 
 	openpic_enable_irq(info, irq, type);
-	
+
 	return B_OK;
 }
 
@@ -497,7 +497,7 @@ openpic_disable_io_interrupt(void *cookie, int irq)
 	return B_OK;
 }
 
-	
+
 static int
 openpic_acknowledge_io_interrupt(void *cookie)
 {

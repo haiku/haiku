@@ -214,7 +214,7 @@ hda_interrupt_handler(hda_controller* controller)
 						codec->unsol_responses[codec->unsol_response_write++] =
 							response;
 						codec->unsol_response_write %= MAX_CODEC_UNSOL_RESPONSES;
-						release_sem_etc(codec->unsol_response_sem, 1, 
+						release_sem_etc(codec->unsol_response_sem, 1,
 							B_DO_NOT_RESCHEDULE);
 						handled = B_INVOKE_SCHEDULER;
 						continue;
@@ -411,14 +411,17 @@ init_corb_rirb_pos(hda_controller* controller)
 
 	/* Program CORB/RIRB for these locations */
 	controller->Write32(HDAC_CORB_BASE_LOWER, (uint32)pe.address);
-	controller->Write32(HDAC_CORB_BASE_UPPER, 0);
+	controller->Write32(HDAC_CORB_BASE_UPPER,
+		(uint32)((uint64)pe.address >> 32));
 	controller->Write32(HDAC_RIRB_BASE_LOWER, (uint32)pe.address + rirbOffset);
-	controller->Write32(HDAC_RIRB_BASE_UPPER, 0);
+	controller->Write32(HDAC_RIRB_BASE_UPPER,
+		(uint32)(((uint64)pe.address + rirbOffset) >> 32));
 
 	/* Program DMA position update */
 	controller->Write32(HDAC_DMA_POSITION_BASE_LOWER,
 		(uint32)pe.address + posOffset);
-	controller->Write32(HDAC_DMA_POSITION_BASE_UPPER, 0);
+	controller->Write32(HDAC_DMA_POSITION_BASE_UPPER,
+		(uint32)(((uint64)pe.address + posOffset) >> 32));
 
 	controller->stream_positions = (uint32*)
 		((uint8*)controller->corb + posOffset);
@@ -567,7 +570,6 @@ status_t
 hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	const char* desc)
 {
-	uint32 bufferPhysicalAddress;
 	uint32 response[2];
 	physical_entry pe;
 	bdl_entry_t* bufferDescriptors;
@@ -635,7 +637,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		return rc;
 	}
 
-	bufferPhysicalAddress = (uint32)pe.address;
+	phys_addr_t bufferPhysicalAddress = pe.address;
 
 	dprintf("%s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
 		alloc, stream->num_buffers);
@@ -678,8 +680,9 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	uint32 fragments = 0;
 	for (uint32 index = 0; index < stream->num_buffers;
 			index++, bufferDescriptors++) {
-		bufferDescriptors->lower = stream->physical_buffers[index];
-		bufferDescriptors->upper = 0;
+		bufferDescriptors->lower = (uint32)stream->physical_buffers[index];
+		bufferDescriptors->upper
+			= (uint32)((uint64)stream->physical_buffers[index] >> 32);
 		fragments++;
 		bufferDescriptors->length = stream->buffer_size;
 		bufferDescriptors->ioc = 1;
@@ -780,7 +783,7 @@ hda_hw_init(hda_controller* controller)
 
 	/* Map MMIO registers */
 	controller->regs_area = map_physical_memory("hda_hw_regs",
-		(void*)controller->pci_info.u.h0.base_registers[0],
+		controller->pci_info.u.h0.base_registers[0],
 		controller->pci_info.u.h0.base_register_sizes[0], B_ANY_KERNEL_ADDRESS,
 		0, (void**)&controller->regs);
 	if (controller->regs_area < B_OK) {

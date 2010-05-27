@@ -4,7 +4,7 @@
 
    - PPC Port: Andreas Drewke (andreas_dr@gmx.de)
    - Voodoo3Driver 0.02 (c) by Carwyn Jones (2002)
-   
+
 */
 
 /* standard kernel driver stuff */
@@ -133,7 +133,7 @@ static device_hooks graphics_device_hooks =
 static uint16 voodoo_device_list[] =
 {
 	BANSHEE, // Voodoo Banshee
-	VOODOO3, // Voodoo 
+	VOODOO3, // Voodoo
     0
 };
 
@@ -171,9 +171,9 @@ static struct
 
 
 /* TODO */
-#define voodoo3_disableirq() 
-#define voodoo3_enableirq() 
-#define voodoo3_clearirq() 
+#define voodoo3_disableirq()
+#define voodoo3_enableirq()
+#define voodoo3_clearirq()
 #define voodoo3_irqpending() 0
 
 
@@ -189,7 +189,7 @@ init_hardware(void)
     long        pci_index = 0;
     pci_info    pcii;
     bool        found_one = FALSE;
-    
+
     /* choke if we can't find the PCI bus */
     if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
         return B_ERROR;
@@ -198,7 +198,7 @@ init_hardware(void)
     while ((*pci_bus->get_nth_pci_info)(pci_index, &pcii) == B_NO_ERROR)
     {
         int vendor = 0;
-        
+
         ddprintf(("TDFXV3: init_hardware(): checking pci index %ld, device 0x%04x/0x%04x\n", pci_index, pcii.vendor_id, pcii.device_id));
         /* if we match a supported vendor */
         while (SupportedDevices[vendor].vendor)
@@ -212,7 +212,7 @@ init_hardware(void)
                     /* if we match a supported device */
                     if (*devices == pcii.device_id )
                     {
-                        
+
                         ddprintf(("TDFXV3: we support this device\n"));
                         found_one = TRUE;
                         goto done;
@@ -322,30 +322,30 @@ static status_t map_device(device_info *di)
     ddprintf(("TDFXV3: enter map_device\n"));
     /* enable memory mapped IO, disable VGA I/O */
 	tmp = get_pci(PCI_command, 2);
-	tmp |= (PCI_command_memory | PCI_command_io);		
+	tmp |= (PCI_command_memory | PCI_command_io);
 	set_pci(PCI_command, 2, tmp);
 
-    ddprintf (("TDFXV3: regs: 0x%lx, size:0x%lx\n",_regs, _regs_size));    
-    ddprintf (("TDFXV3: io: 0x%lx, size:0x%lx\n",iobase, iobase_size));    
-    ddprintf (("TDFXV3: fb: 0x%lx, size:0x%lx\n",fb, fb_size));    
- 
+    ddprintf (("TDFXV3: regs: 0x%lx, size:0x%lx\n",_regs, _regs_size));
+    ddprintf (("TDFXV3: io: 0x%lx, size:0x%lx\n",iobase, iobase_size));
+    ddprintf (("TDFXV3: fb: 0x%lx, size:0x%lx\n",fb, fb_size));
+
     /* map the areas */
     sprintf(buffer, "%04X_%04X_%02X%02X%02X regs",
         di->pcii.vendor_id, di->pcii.device_id,
         di->pcii.bus, di->pcii.device, di->pcii.function);
     si->regs_area = map_physical_memory(
         buffer,
-        (void *)_regs,
+        _regs,
         _regs_size,
         B_ANY_KERNEL_ADDRESS,
         0, /* B_READ_AREA + B_WRITE_AREA, */ /* neither read nor write, to hide it from user space apps */
         (void **)&(di->regs));
     /* return the error if there was some problem */
     if (si->regs_area < 0) return si->regs_area;
-	
+
 #if __INTEL__
 	iobase_size = (iobase_size+(B_PAGE_SIZE-1))&~(B_PAGE_SIZE-1);
-	
+
     sprintf(buffer, "%04X_%04X_%02X%02X%02X io",
         di->pcii.vendor_id, di->pcii.device_id,
         di->pcii.bus, di->pcii.device, di->pcii.function);
@@ -356,11 +356,11 @@ static status_t map_device(device_info *di)
         B_ANY_KERNEL_ADDRESS,
         B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA,
         (void **)&(si->io));
-    // return the error if there was some problem 
+    // return the error if there was some problem
 
 	/* remember the io_base address for inb, outb */
     si->iobase = iobase;
-    
+
 
 #else
 // PPC comes here
@@ -382,13 +382,13 @@ static status_t map_device(device_info *di)
         B_ANY_KERNEL_ADDRESS,
         B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA,
         (void **)&si->io);
-    // return the error if there was some problem 
+    // return the error if there was some problem
 
 	/* remember the io_base address for inb, outb */
     si->iobase = si->io + offset;
 
-    ddprintf (("TDFXV3: ioppc_3_cor: 0x%x, size:%li\n",iobase+offset, iobase_size));    	
-    ddprintf (("TDFXV3: ioppc_4(vM): 0x%x, size:%li\n",si->iobase, iobase_size));    	
+    ddprintf (("TDFXV3: ioppc_3_cor: 0x%x, size:%li\n",iobase+offset, iobase_size));
+    ddprintf (("TDFXV3: ioppc_4(vM): 0x%x, size:%li\n",si->iobase, iobase_size));
 
 #endif
     if (si->io_area < 0)
@@ -438,7 +438,7 @@ static status_t map_device(device_info *di)
             &(si->framebuffer));
     }
 #endif
-        
+
     /* if there was an error, delete our other areas */
     if (si->fb_area < 0) {
         delete_area(si->regs_area);
@@ -448,7 +448,7 @@ static status_t map_device(device_info *di)
     }
     /* remember the DMA address of the frame buffer for BDirectWindow purposes */
     si->framebuffer_pci = (void *)fb;
-       
+
     /* in any case, return the result */
     ddprintf(("TDFXV3: leave map_device\n"));
     return si->fb_area;
@@ -462,7 +462,7 @@ static void unmap_device(device_info *di)
 
     ddprintf(("TDFXV3: unmap_device(%08lx) begins...\n", (uint32)di));
     ddprintf(("\tregs_area: %ld\n\tfb_area: %ld\n", si->regs_area, si->fb_area));
-    
+
     /* disable memory mapped IO */
     tmp = get_pci(PCI_command, 4);
     tmp &= 0xfffffffc;
@@ -489,7 +489,7 @@ static void probe_devices(void)
     while ((count < MAX_DEVICES) && ((*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_NO_ERROR))
     {
         int vendor = 0;
-        
+
         ddprintf(("TDFXV3: checking pci index %ld, device 0x%04x/0x%04x\n", pci_index, di->pcii.vendor_id, di->pcii.device_id));
         /* if we match a supported vendor */
         while (SupportedDevices[vendor].vendor)
@@ -543,7 +543,7 @@ next_device:
 
 static uint32 thread_interrupt_work(int32 *flags, vuint32 *regs, shared_info *si)
 {
- 
+
     uint32 handled = B_HANDLED_INTERRUPT;
     /* release the vblank semaphore */
     if (si->vblank >= 0)
@@ -600,7 +600,7 @@ voodoo_interrupt(void *data)
     atomic_and(flags, ~SKD_HANDLER_INSTALLED);
 
 exit0:
-    return handled;                
+    return handled;
 }
 
 #if defined(POST_R4_0)
@@ -626,7 +626,7 @@ static int32 timer_interrupt_func(timer *te, uint32 pc)
             /* insert code to sync to interrupts here */
             if (!vbl_status) {
                 when -= si->blank_period - 4;
-            } 
+            }
             /* do the things we do when we notice a vertical retrace */
             result = thread_interrupt_work(flags, regs, si);
 
@@ -652,45 +652,45 @@ static int32 fake_interrupt_thread_func(void *_di)
     shared_info *si = di->si;
     int32 *flags = &(si->flags);
     vuint32 *regs = di->regs;
-    
+
     bigtime_t last_sync;
     bigtime_t this_sync;
     bigtime_t diff_sync;
-    
+
     uint32 counter = 1;
-    
+
     /* a lie, but we have to start somewhen */
-    
+
     last_sync = system_time() - 8333;
-    
+
     ddprintf(("TDFXV3: fake_interrupt_thread_func begins\ndi: 0x%08lx\nsi: 0x%08lx\nflags: 0x%08lx\n", (uint32)di, (uint32)si, (uint32)flags));
-    
+
     /* loop until notified */
-    
+
     while(atomic_and(flags, -1) & SKD_HANDLER_INSTALLED) {
         /* see if "interrupts" are enabled */
-        
+
         if((volatile int32)(di->can_interrupt)) {
             /* poll the retrace flag until set */
-            
+
             /* YOUR CODE HERE */
-            
+
             /* get the system_time */
             this_sync = system_time();
-            
+
             /* do our stuff */
             thread_interrupt_work(flags, regs, si);
         } else {
             /* get the system_time */
             this_sync = system_time();
         }
-        
+
         /* find out how long it took */
         diff_sync = this_sync - last_sync;
-        
+
         /* back off a little so we're sure to catch the retrace */
         diff_sync -= diff_sync / 10;
-        
+
         /*
         impose some limits so we can recover from refresh rate changes
         Supported refresh rates are 48 Hz - 120 Hz, so these limits should
@@ -699,27 +699,27 @@ static int32 fake_interrupt_thread_func(void *_di)
         if(diff_sync < 8000) {
             diff_sync = 8000; /* not less than 1/125th of sec */
         }
-        
+
         if(diff_sync > 16666) {
             diff_sync = 20000; /* not more than 1/40th of sec */
         }
-        
+
         if((counter++ & 0x01ff) == 0) {
             diff_sync >>= 2; /* periodically quarter the wait to resync */
         }
-        
+
         /* update for next go-around */
         last_sync = this_sync;
-        
+
         /* snooze until our next retrace */
-        
+
         snooze_until(this_sync + diff_sync, B_SYSTEM_TIMEBASE);
     }
-    
+
     ddprintf(("TDFXV3: fake_interrupt_thread_func ends with flags = 0x%08lx\n", *flags));
-    
+
     /* gotta return something */
-    
+
     return B_OK;
 }
 #endif
@@ -851,7 +851,7 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie)
         /* bail if we can't add the timer */
         if (result != B_OK) goto delete_the_sem;
 #else
-        /* fake some kind of interrupt with a thread */        
+        /* fake some kind of interrupt with a thread */
         result = di->tid = spawn_kernel_thread(fake_interrupt_thread_func, "SKD fake interrupt", B_REAL_TIME_DISPLAY_PRIORITY, di);
         /* bail if we can't spawn the thread */
         if(result < 0) goto delete_the_sem;
@@ -872,7 +872,7 @@ mark_as_open:
 
     /* send the cookie to the opener */
     *cookie = di;
-    
+
     goto done;
 
 
@@ -949,7 +949,7 @@ free_hook (void* dev) {
     voodoo3_disableirq();
     /* disable and clear any pending interrupts */
     *regs = *regs; /* CHANGE ME */
-    
+
     /* if we were faking the interrupts */
     if ((di->pcii.u.h0.interrupt_pin == 0x00) || (di->pcii.u.h0.interrupt_line == 0xff)){
         /* stop our interrupt faking thread */
@@ -966,7 +966,7 @@ free_hook (void* dev) {
         /* After R4.0 we can do it ourselves, but we'd rather use timers */
 #endif
     /* otherwise */
-    	
+
     } else {
         /* remove interrupt handler */
         remove_io_interrupt_handler(di->pcii.u.h0.interrupt_line, voodoo_interrupt, di);
@@ -1013,7 +1013,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len)
         result = B_OK;
     }
         break;
-        
+
     /* PRIVATE ioctl from here on */
     case VOODOO_GET_PRIVATE_DATA:
     {

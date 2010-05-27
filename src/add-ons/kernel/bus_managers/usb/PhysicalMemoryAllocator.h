@@ -50,7 +50,7 @@ private:
 		mutex						fLock;
 		area_id						fArea;
 		void						*fLogicalBase;
-		void						*fPhysicalBase;
+		phys_addr_t					fPhysicalBase;
 
 		int32						fArrayCount;
 		size_t						*fBlockSize;

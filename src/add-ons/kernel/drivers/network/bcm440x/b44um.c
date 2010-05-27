@@ -108,7 +108,7 @@ init_driver(void)
 		be_b44_dev_cards[sCardsFound].packet_release_sem = create_sem(0,
 			sDeviceNames[sCardsFound]);
 		be_b44_dev_cards[sCardsFound].mem_list_num = 0;
-		be_b44_dev_cards[sCardsFound].lockmem_list_num = 0; 	 	
+		be_b44_dev_cards[sCardsFound].lockmem_list_num = 0;
 		be_b44_dev_cards[sCardsFound].opened = 0;
 		be_b44_dev_cards[sCardsFound].block = 1;
 		be_b44_dev_cards[sCardsFound].lock = 0;
@@ -141,7 +141,7 @@ init_driver(void)
 void
 uninit_driver(void)
 {
-	struct be_b44_dev *pUmDevice; 
+	struct be_b44_dev *pUmDevice;
 	int i, j;
 
 	for (j = 0; j < sCardsFound; j++) {
@@ -150,13 +150,13 @@ uninit_driver(void)
 			free(pUmDevice->mem_list[i]);
 		for (i = 0; i < pUmDevice->lockmem_list_num; i++)
 			delete_area(pUmDevice->lockmem_list[i]);
-		
+
 		delete_area(pUmDevice->mem_base);
-		
+
 		delete_sem(be_b44_dev_cards[j].packet_release_sem);
 		free((void *)sDeviceNames[j]);
 	}
-	
+
 	mempool_exit();
 }
 
@@ -271,7 +271,7 @@ b44_ioctl(void *cookie,uint32 op, void *data, size_t len)
 		case ETHER_GET_LINK_STATE:
 		{
 			ether_link_state_t state;
-			
+
 			if (pUmDevice->lm_dev.corerev < 7) {
 				b44_LM_PollLink(&pUmDevice->lm_dev);
 			}
@@ -295,7 +295,7 @@ b44_ioctl(void *cookie,uint32 op, void *data, size_t len)
 
 			return user_memcpy(data, &state, sizeof(ether_link_state_t));
 		}
-		
+
 		case ETHER_SET_LINK_STATE_SEM:
 		{
 			if (user_memcpy(&pUmDevice->linkChangeSem, data, sizeof(sem_id)) < B_OK) {
@@ -484,7 +484,10 @@ b44_MM_MapMemBase(PLM_DEVICE_BLOCK pDevice)
 		get_module(B_PCI_MODULE_NAME,(module_info **)&pci);
 
 	size = ROUNDUP(size,B_PAGE_SIZE);
-	pUmDevice->mem_base = map_physical_memory("bcm440x_regs",(void *)(pUmDevice->pci_data.u.h0.base_registers[0]),size,B_ANY_KERNEL_BLOCK_ADDRESS,B_READ_AREA | B_WRITE_AREA,(void **)(&pDevice->pMappedMemBase));
+	pUmDevice->mem_base = map_physical_memory("bcm440x_regs",
+		pUmDevice->pci_data.u.h0.base_registers[0], size,
+		B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		(void **)(&pDevice->pMappedMemBase));
 
 	return LM_STATUS_SUCCESS;
 }
@@ -508,7 +511,7 @@ b44_MM_IndicateRxPackets(PLM_DEVICE_BLOCK pDevice)
 {
 	struct be_b44_dev *dev = (struct be_b44_dev *)pDevice;
 	PLM_PACKET pPacket;
-	
+
 	while (1) {
 		pPacket = (PLM_PACKET)
 			QQ_PopHead(&pDevice->RxPacketReceivedQ.Container);
@@ -541,7 +544,7 @@ tx_cleanup_thread(void *us)
 	struct B_UM_PACKET *pUmPacket;
 	cpu_status cpu;
 
-	while (1) { 
+	while (1) {
 		cpu = disable_interrupts();
 		acquire_spinlock(&pUmDevice->lock);
 
@@ -565,7 +568,7 @@ tx_cleanup_thread(void *us)
 	}
 	return LM_STATUS_SUCCESS;
 }
-	
+
 /*LM_STATUS b44_MM_StartTxDma(PLM_DEVICE_BLOCK pDevice, PLM_PACKET pPacket);
 LM_STATUS b44_MM_CompleteTxDma(PLM_DEVICE_BLOCK pDevice, PLM_PACKET pPacket);*/
 
@@ -582,7 +585,7 @@ b44_MM_AllocateMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	*pMemoryBlockVirt = dev->mem_list[(dev->mem_list_num)++] = (void *)malloc(BlockSize);
 	return LM_STATUS_SUCCESS;
 }
-    
+
 
 LM_STATUS
 b44_MM_AllocateSharedMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
@@ -604,7 +607,7 @@ b44_MM_AllocateSharedMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	*pMemoryBlockVirt = (PLM_VOID) pvirt;
 
 	get_memory_map(pvirt,BlockSize,&entry,1);
-	*pMemoryBlockPhy = (LM_PHYSICAL_ADDRESS) entry.address;
+	*pMemoryBlockPhy = entry.address;
 
 	return LM_STATUS_SUCCESS;
 }
@@ -629,7 +632,7 @@ b44_MM_IndicateStatus(PLM_DEVICE_BLOCK pDevice, LM_STATUS Status)
 {
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	struct be_b44_dev *pUmDevice = (struct be_b44_dev *)pDevice;
-	
+
 	if (pUmDevice->linkChangeSem != -1)
 		release_sem_etc(pUmDevice->linkChangeSem, 1,
 			B_DO_NOT_RESCHEDULE);

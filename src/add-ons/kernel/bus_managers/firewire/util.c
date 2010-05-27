@@ -37,6 +37,7 @@ area_id
 alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 	const char *name)
 {
+// TODO: phy should be phys_addr_t*!
 	physical_entry pe;
 	void *virtadr;
 	area_id area;
@@ -61,7 +62,7 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 	if (virt)
 		*virt = virtadr;
 	if (phy)
-		*phy = pe.address;
+		*phy = (void*)(addr_t)pe.address;
 	TRACE("area = %ld, size = %ld, virt = %p, phy = %p\n", area, size, virtadr,
 		pe.address);
 	return area;
@@ -83,8 +84,8 @@ map_mem(void **virt, void *phy, size_t size, uint32 protection,
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = (char *)phy - offset;
 	size = round_to_pagesize(size + offset);
-	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS,
-		protection, &mapadr);
+	area = map_physical_memory(name, (addr_t)phyadr, size,
+		B_ANY_KERNEL_BLOCK_ADDRESS, protection, &mapadr);
 	if (area < B_OK) {
 		ERROR("mapping '%s' failed, error 0x%lx (%s)\n", name, area,
 			strerror(area));

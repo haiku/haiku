@@ -59,13 +59,14 @@ fill_temp_sg(scsi_ccb *ccb)
 
 			// calculate space upto next dma boundary crossing
 			max_len = (dma_boundary + 1) -
-				((addr_t)temp_sg[cur_idx].address & dma_boundary);
+				(temp_sg[cur_idx].address & dma_boundary);
 			// restrict size per sg item
 			max_len = min(max_len, max_sg_block_size);
 
-			SHOW_FLOW(4, "addr=%p, size=%x, max_len=%x, idx=%d, num=%d",
-				temp_sg[cur_idx].address, (int)temp_sg[cur_idx].size,
-				(int)max_len, (int)cur_idx, (int)num_entries);
+			SHOW_FLOW(4, "addr=%#" B_PRIxPHYSADDR ", size=%x, max_len=%x, "
+				"idx=%d, num=%d", temp_sg[cur_idx].address,
+				(int)temp_sg[cur_idx].size, (int)max_len, (int)cur_idx,
+				(int)num_entries);
 
 			if (max_len < temp_sg[cur_idx].size) {
 				// split sg block
@@ -76,7 +77,8 @@ fill_temp_sg(scsi_ccb *ccb)
 					(num_entries - 1 - cur_idx) * sizeof(physical_entry));
 
 				temp_sg[cur_idx].size = max_len;
-				temp_sg[cur_idx + 1].address = (void *)((addr_t)temp_sg[cur_idx + 1].address + max_len);
+				temp_sg[cur_idx + 1].address
+					= temp_sg[cur_idx + 1].address + max_len;
 				temp_sg[cur_idx + 1].size -= max_len;
 			}
 		}

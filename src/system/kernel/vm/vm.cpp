@@ -5388,13 +5388,13 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 		}
 
 		// need to switch to the next physical_entry?
-		if (index < 0 || (phys_addr_t)table[index].address
+		if (index < 0 || table[index].address
 				!= physicalAddress - table[index].size) {
 			if ((uint32)++index + 1 > numEntries) {
 				// table to small
 				break;
 			}
-			table[index].address = (void*)physicalAddress;
+			table[index].address = physicalAddress;
 			table[index].size = bytes;
 		} else {
 			// page does fit in current entry
@@ -5442,7 +5442,7 @@ get_memory_map(const void* address, ulong numBytes, physical_entry* table,
 	if (entriesRead + 1 > (uint32)numEntries)
 		return B_BUFFER_OVERFLOW;
 
-	table[entriesRead].address = NULL;
+	table[entriesRead].address = 0;
 	table[entriesRead].size = 0;
 
 	return B_OK;
@@ -5567,8 +5567,9 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 
 
 area_id
-map_physical_memory(const char* name, void* physicalAddress, size_t numBytes,
-	uint32 addressSpec, uint32 protection, void** _virtualAddress)
+map_physical_memory(const char* name, phys_addr_t physicalAddress,
+	size_t numBytes, uint32 addressSpec, uint32 protection,
+	void** _virtualAddress)
 {
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
@@ -5576,8 +5577,8 @@ map_physical_memory(const char* name, void* physicalAddress, size_t numBytes,
 	fix_protection(&protection);
 
 	return vm_map_physical_memory(VMAddressSpace::KernelID(), name,
-		_virtualAddress, addressSpec, numBytes, protection,
-		(phys_addr_t)physicalAddress, false);
+		_virtualAddress, addressSpec, numBytes, protection, physicalAddress,
+		false);
 }
 
 

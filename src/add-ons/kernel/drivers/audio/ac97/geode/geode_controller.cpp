@@ -39,7 +39,7 @@ geode_codec_wait(geode_controller *controller)
 	int i;
 
 #define GCSCAUDIO_WAIT_READY_CODEC_TIMEOUT	500
-	for (i = GCSCAUDIO_WAIT_READY_CODEC_TIMEOUT; (i >= 0) 
+	for (i = GCSCAUDIO_WAIT_READY_CODEC_TIMEOUT; (i >= 0)
 	    && (controller->Read32(ACC_CODEC_CNTL) & ACC_CODEC_CNTL_CMD_NEW); i--)
 		snooze(10);
 
@@ -53,15 +53,15 @@ geode_codec_read(geode_controller *controller, uint8 regno)
 	uint32 v;
 	ASSERT(regno >= 0);
 
-	controller->Write32(ACC_CODEC_CNTL, 
+	controller->Write32(ACC_CODEC_CNTL,
 		ACC_CODEC_CNTL_READ_CMD | ACC_CODEC_CNTL_CMD_NEW |
 		ACC_CODEC_REG2ADDR(regno));
-	
+
 	if (geode_codec_wait(controller) != B_OK) {
 		dprintf("codec busy (2)\n");
 		return 0xffff;
 	}
-	
+
 #define GCSCAUDIO_READ_CODEC_TIMEOUT	50
 	for (i = GCSCAUDIO_READ_CODEC_TIMEOUT; i >= 0; i--) {
 		v = controller->Read32(ACC_CODEC_STATUS);
@@ -108,7 +108,7 @@ stream_handle_interrupt(geode_controller* controller, geode_stream* stream)
 		return;
 
 	status = stream->Read8(STREAM_STATUS);
-	
+
 	if (status & ACC_BMx_STATUS_BM_EOP_ERR) {
 		dprintf("geode: stream status bus master error\n");
 	}
@@ -140,13 +140,13 @@ geode_interrupt_handler(geode_controller* controller)
 		return B_UNHANDLED_INTERRUPT;
 
 	for (uint32 index = 0; index < GEODE_MAX_STREAMS; index++) {
-		if (controller->streams[index] 
+		if (controller->streams[index]
 			&& (intr & controller->streams[index]->status) != 0) {
 			stream_handle_interrupt(controller,
 				controller->streams[index]);
 		}
 	}
-	
+
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -164,9 +164,9 @@ reset_controller(geode_controller* controller)
 	// stop streams
 
 	// stop DMA
-	
+
 	// reset DMA position buffer
-		
+
 	return B_OK;
 }
 
@@ -246,9 +246,9 @@ geode_stream_start(geode_stream* stream)
 	else
 		value = ACC_BMx_CMD_READ;
 
-	stream->Write8(STREAM_CMD, value | ACC_BMx_CMD_BYTE_ORD_EL 
+	stream->Write8(STREAM_CMD, value | ACC_BMx_CMD_BYTE_ORD_EL
 		| ACC_BMx_CMD_BM_CTL_ENABLE);
-	
+
 	stream->running = true;
 	return B_OK;
 }
@@ -262,7 +262,7 @@ geode_stream_stop(geode_stream* stream)
 {
 	dprintf("geode_stream_stop()\n");
 	stream->Write8(STREAM_CMD, ACC_BMx_CMD_BM_CTL_DISABLE);
-	
+
 	stream->running = false;
 	delete_sem(stream->buffer_ready_sem);
 	stream->buffer_ready_sem = -1;
@@ -274,13 +274,13 @@ geode_stream_stop(geode_stream* stream)
 status_t
 geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 {
-	uint32 bufferSize, bufferPhysicalAddress, alloc;
+	uint32 bufferSize, alloc;
 	uint32 index;
 	physical_entry pe;
 	struct acc_prd* bufferDescriptors;
 	uint8* buffer;
 	status_t rc;
-	
+
 	/* Clear previously allocated memory */
 	if (stream->buffer_area >= B_OK) {
 		delete_area(stream->buffer_area);
@@ -317,7 +317,7 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 		return rc;
 	}
 
-	bufferPhysicalAddress = (uint32)pe.address;
+	phys_addr_t bufferPhysicalAddress = pe.address;
 
 	dprintf("%s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
 		alloc, stream->num_buffers);
@@ -349,7 +349,7 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 		return rc;
 	}
 
-	stream->physical_buffer_descriptors = (uint32)pe.address;
+	stream->physical_buffer_descriptors = pe.address;
 
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, stream->num_buffers);
@@ -390,7 +390,7 @@ geode_hw_init(geode_controller* controller)
 {
 	uint16 cmd;
 	status_t status;
-	
+
 	cmd = (gPci->read_pci_config)(controller->pci_info.bus,
 		controller->pci_info.device, controller->pci_info.function, PCI_command, 2);
 	if (!(cmd & PCI_command_master)) {
@@ -416,12 +416,12 @@ geode_hw_init(geode_controller* controller)
 		goto reset_failed;
 	}
 
-	/* attach the codec */	
-	ac97_attach(&controller->ac97, (codec_reg_read)geode_codec_read, 
+	/* attach the codec */
+	ac97_attach(&controller->ac97, (codec_reg_read)geode_codec_read,
 		(codec_reg_write)geode_codec_write, controller,
 		controller->pci_info.u.h0.subsystem_vendor_id,
 		controller->pci_info.u.h0.subsystem_id);
-		
+
 	snooze(1000);
 
 	controller->multi = (geode_multi*)calloc(1, sizeof(geode_multi));

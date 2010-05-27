@@ -56,29 +56,28 @@ is_sg_list_dma_safe(scsi_ccb *request)
 
 	// argh - controller is a bit picky, so make sure he likes us
 	for (cur_idx = sg_count; cur_idx >= 1; --cur_idx, ++sg_list) {
-		addr_t max_len;
+		phys_addr_t max_len;
 
 		// calculate space upto next dma boundary crossing and
 		// verify that it isn't crossed
-		max_len = (dma_boundary + 1) -
-			((addr_t)sg_list->address & dma_boundary);
+		max_len = (dma_boundary + 1) - (sg_list->address & dma_boundary);
 
 		if (max_len < sg_list->size) {
-			SHOW_FLOW(0, "S/G-entry crosses DMA boundary @0x%x",
-				(int)sg_list->address + (int)max_len);
+			SHOW_FLOW(0, "S/G-entry crosses DMA boundary @%" B_PRIxPHYSADDR,
+				sg_list->address + max_len);
 			return false;
 		}
 
 		// check both begin and end of entry for alignment
-		if (((addr_t)sg_list->address & alignment) != 0) {
-			SHOW_FLOW(0, "S/G-entry has bad alignment @0x%x",
-				(int)sg_list->address);
+		if ((sg_list->address & alignment) != 0) {
+			SHOW_FLOW(0, "S/G-entry has bad alignment @%#" B_PRIxPHYSADDR,
+				sg_list->address);
 			return false;
 		}
 
-		if ((((addr_t)sg_list->address + sg_list->size) & alignment) != 0) {
-			SHOW_FLOW(0, "end of S/G-entry has bad alignment @0x%x",
-				(int)sg_list->address + (int)sg_list->size);
+		if (((sg_list->address + sg_list->size) & alignment) != 0) {
+			SHOW_FLOW(0, "end of S/G-entry has bad alignment @%" B_PRIxPHYSADDR,
+				sg_list->address + sg_list->size);
 			return false;
 		}
 
@@ -118,12 +117,10 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 		bytes = min( size, sg_list->size );
 
 		if (to_buffer) {
-			vm_memcpy_from_physical(buffer_data, (addr_t)sg_list->address,
-				bytes, false);
-		} else {
-			vm_memcpy_to_physical((addr_t)sg_list->address, buffer_data,
-				bytes, false);
-		}
+			vm_memcpy_from_physical(buffer_data, sg_list->address, bytes,
+				false);
+		} else
+			vm_memcpy_to_physical(sg_list->address, buffer_data, bytes, false);
 
 		buffer_data += bytes;
 	}
@@ -345,7 +342,7 @@ dump_sg_table(const physical_entry *sg_list,
 	SHOW_FLOW(1, "count=%d", (int)sg_list_count);
 
 	for (cur_idx = sg_list_count; cur_idx >= 1; --cur_idx, ++sg_list) {
-		SHOW_FLOW(1, "addr=%x, size=%d", (int)sg_list->address,
+		SHOW_FLOW(1, "addr=%" B_PRIxPHYSADDR ", size=%d", sg_list->address,
 			(int)sg_list->size);
 	}
 }

@@ -257,7 +257,7 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 		}
 
 		if (remap) {
-			area_id area = map_physical_memory("vesa frame buffer", (void*)base,
+			area_id area = map_physical_memory("vesa frame buffer", base,
 				size, B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 				(void**)&frameBuffer);
 			if (area < 0)

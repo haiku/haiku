@@ -584,7 +584,7 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 		if (status != B_OK)
 			return status;
 
-		status = AcpiSetFirmwareWakingVector((addr_t)wakeVector.address);
+		status = AcpiSetFirmwareWakingVector(wakeVector.address);
 		if (status != AE_OK)
 			return B_ERROR;
 	}
@@ -626,7 +626,7 @@ reboot(void)
 	status = AcpiReset();
 	if (status == AE_NOT_EXIST)
 		return B_UNSUPPORTED;
-	
+
 	if (status != AE_OK) {
 		ERROR("Reset failed, status = %d\n", status);
 		return B_ERROR;

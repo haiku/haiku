@@ -81,7 +81,7 @@ static void hw_enaint(sis7018_ch *ch, int enable)
   int32 i, reg;
   int bank, chan;
   cpu_status cp;
- 
+
   cp = disable_interrupts();
   acquire_spinlock(&dev->hardware);
 
@@ -172,10 +172,10 @@ static void hw_wrch(sis7018_ch *ch)
     cr[2]=((ch->delta>>8)<<24) | (ch->eso);
     cr[3]|=(ch->alpha<<20) | (ch->fms<<16) | (ch->fmc<<14);
     break;
-  } 
+  }
   cp = disable_interrupts();
   acquire_spinlock(&dev->hardware);
-  
+
   hw_selch(ch);
   for (i=0; i<TR_CHN_REGS; i++)
     hw_write(dev, TR_REG_CHNBASE+(i<<2), cr[i], 4);
@@ -189,7 +189,7 @@ void hw_rdch(sis7018_ch *ch)
   sis7018_dev *dev = ch->card;
   int32 cr[5], i;
   cpu_status cp;
- 
+
   cp = disable_interrupts();
   acquire_spinlock(&dev->hardware);
 
@@ -209,13 +209,13 @@ void hw_rdch(sis7018_ch *ch)
   ch->vol=   (cr[4] & 0x00ff0000) >> 16;
   ch->ctrl=  (cr[4] & 0x0000f000) >> 12;
   ch->ec=    (cr[4] & 0x00000fff);
-  
+
   switch(ch->card->type->ids.chip_id)
   {
   case SPA_PCI_ID:
   case ALI_PCI_ID:
-  case TDX_PCI_ID: 
-  case xDX_PCI_ID: 
+  case TDX_PCI_ID:
+  case xDX_PCI_ID:
     ch->cso=   (cr[0] & 0xffff0000) >> 16;
     ch->alpha= (cr[0] & 0x0000fff0) >> 4;
     ch->fms=   (cr[0] & 0x0000000f);
@@ -238,11 +238,11 @@ status_t hw_pchannel_init(pcm_dev *dev)
   sis7018_ch *ch = &dev->play_channel;
   ch->index = PCHANNEL_ID;
   hw_pchannel_setblocksize(dev, 8192);
-  ch->ctrl = 0x0f; // 16-bit stereo signed + loop mode enabled 
+  ch->ctrl = 0x0f; // 16-bit stereo signed + loop mode enabled
   ch->delta = (48000 << 12 ) / 48000;
   ch->card = dev->card;
   ch->areaid=-1;
-  
+
   ch->wr_lock = 0;
   ch->write_waiting = 0;
   sprintf(name_buf, "WS:%s", dev->name);
@@ -269,7 +269,7 @@ void hw_pchannel_free(pcm_dev *dev)
   if(ch->areaid >= 0){
     delete_area(ch->areaid);
     ch->areaid = -1;
-    
+
     delete_sem(ch->write_sem);
     delete_sem(ch->wr_entry);
     ch->write_sem = -1;
@@ -283,18 +283,18 @@ void hw_start(pcm_dev *dev)
 
   if(ch->active)
     return;
-    
+
     /* start out with a clean slate */
   TRACE("hw_start()\n");
 /*  if (port->config.format == 0x11)
   {
-    memset((void*)port->card->low_mem, 0x80, port->config.play_buf_size + 
+    memset((void*)port->card->low_mem, 0x80, port->config.play_buf_size +
       port->config.rec_buf_size);
   }
   else {*/
-  
+
   // TODO?
-  //  memset((void *)port->card->low_mem, 0, port->config.play_buf_size + 
+  //  memset((void *)port->card->low_mem, 0, port->config.play_buf_size +
   //    port->config.rec_buf_size);
   //}
 
@@ -302,7 +302,7 @@ void hw_start(pcm_dev *dev)
   ch->wr_silence = ch->mem_size;
   ch->was_written = 0;
   ch->wr_total = 0;
-  
+
   ch->fmc = 3;
   ch->fms = 0;
   ch->ec = 0;
@@ -327,7 +327,7 @@ void hw_stop(pcm_dev *dev)
   sis7018_ch *ch = &dev->play_channel;
   if(!ch->active)
     return;
-    
+
   hw_stopch(ch);
   ch->active = 0;
 }
@@ -339,7 +339,7 @@ static int32 hw_interrupt_handler(void * data)
   sis7018_ch *ch;
   int32 handled = B_UNHANDLED_INTERRUPT;
   intrs++;
-  
+
   acquire_spinlock(&card->hardware);
   intsrc = hw_read(card, TR_REG_MISCINT, 4);
 
@@ -396,10 +396,10 @@ void hw_decrement_interrupt_handler(sis7018_dev * card)
 status_t hw_initialize(sis7018_dev *card)
 {
   status_t err = B_OK;
-  
+
   cpu_status cp = disable_interrupts();
   acquire_spinlock(&card->hardware);
-  
+
   switch (card->type->ids.chip_id){
   case SPA_PCI_ID:
     hw_write(card, SPA_REG_GPIO, 0, 4);
@@ -413,7 +413,7 @@ status_t hw_initialize(sis7018_dev *card)
     hw_write(card, TNX_REG_CODECST, TNX_CDC_ON, 4);
     break;
   }
-  
+
   hw_write(card, TR_REG_CIR, TR_CIR_MIDENA | TR_CIR_ADDRENA, 4);
 
   release_spinlock(&card->hardware);
@@ -490,13 +490,13 @@ static status_t hw_find_memory(sis7018_ch *ch, size_t blocksize)
     delete_area(curarea);
     curarea = -1;
   }
-  
+
   TRACE("allocating new area\n");
 
-  curarea = create_area(name, &addr, B_ANY_KERNEL_ADDRESS, 
+  curarea = create_area(name, &addr, B_ANY_KERNEL_ADDRESS,
                           trysize, B_LOMEM, B_READ_AREA | B_WRITE_AREA);
   TRACE("create_area(%lx) returned %lx logical %p\n", trysize, curarea, addr);
-  
+
   if (curarea < 0)
     goto oops;
 
@@ -505,13 +505,13 @@ static status_t hw_find_memory(sis7018_ch *ch, size_t blocksize)
     curarea = B_ERROR;
     goto oops;
   }
-  TRACE("physical %p\n", where.address);
-  if ((uint32)where.address & 0xff000000){
+  TRACE("physical %#" B_PRIxPHYSADDR "\n", where.address);
+  if ((where.address & ~(phys_addr_t)0xffffff) != 0){
     delete_area(curarea);
     curarea = B_ERROR;
     goto oops;
   }
-  if ((((uint32)where.address)+low_size) & 0xff000000){
+  if (((where.address + low_size) & ~(phys_addr_t)0xffffff) != 0){
     delete_area(curarea);
     curarea = B_ERROR;
     goto oops;
@@ -530,19 +530,19 @@ oops:
 
   ch->mem_size = low_size;
   ch->mem_ptr = addr;
-  ch->mem_phys = (vuchar *)where.address;
-  
+  ch->mem_phys = (vuchar *)(adrr_t)where.address;
+
   ch->wr_1 = ch->mem_ptr;
   ch->wr_2 = ch->wr_1+ch->mem_size/2;
   ch->wr_size = ch->mem_size/2;
-  
+
   ch->areaid = curarea;
-  
+
   if(ch->active){
     hw_stop(&ch->card->pcm);
-    hw_start(&ch->card->pcm);   
+    hw_start(&ch->card->pcm);
   }
-  
+
   return B_OK;
 }
 

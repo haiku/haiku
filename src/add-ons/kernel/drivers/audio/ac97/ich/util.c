@@ -66,6 +66,7 @@ round_to_pagesize(uint32 size)
 area_id
 alloc_mem(void **log, void **phy, size_t size, const char *name)
 {
+// TODO: phy should be phys_addr_t*!
 	physical_entry pe;
 	void * logadr;
 	area_id areaid;
@@ -90,7 +91,7 @@ alloc_mem(void **log, void **phy, size_t size, const char *name)
 	if (log)
 		*log = logadr;
 	if (phy)
-		*phy = pe.address;
+		*phy = (void*)(addr_t)pe.address;
 	LOG(("area = %d, size = %d, log = %#08X, phy = %#08X\n",areaid,size,logadr,pe.address));
 	return areaid;
 }
@@ -114,7 +115,8 @@ map_mem(void **log, void *phy, size_t size, const char *name)
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
 	phyadr = (char *)phy - offset;
 	size = round_to_pagesize(size + offset);
-	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &mapadr);
+	area = map_physical_memory(name, (addr_t)phyadr, size,
+		B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &mapadr);
 	*log = (char *)mapadr + offset;
 
 	LOG(("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",

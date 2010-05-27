@@ -360,7 +360,7 @@ static status_t map_device(device_info *di)
 	/* get a virtual memory address for the registers*/
 	si->regs_area = map_physical_memory(
 		buffer,
-		(void *) di->pcii.u.h0.base_registers[registers],
+		di->pcii.u.h0.base_registers[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
  		B_USER_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
@@ -382,7 +382,7 @@ static status_t map_device(device_info *di)
 
 	rom_area = map_physical_memory(
 		buffer,
-		(void *)di->pcii.u.h0.base_registers[frame_buffer],
+		di->pcii.u.h0.base_registers[frame_buffer],
 		32768,
 		B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA,
@@ -451,7 +451,7 @@ static status_t map_device(device_info *di)
 		/* map the pseudo dma into vmem (write-only)*/
 		si->pseudo_dma_area = map_physical_memory(
 			buffer,
-			(void *) di->pcii.u.h0.base_registers[pseudo_dma],
+			di->pcii.u.h0.base_registers[pseudo_dma],
 			di->pcii.u.h0.base_register_sizes[pseudo_dma],
 			B_ANY_KERNEL_ADDRESS,
 			B_WRITE_AREA,
@@ -500,7 +500,7 @@ static status_t map_device(device_info *di)
 	/* map the framebuffer into vmem, using Write Combining*/
 	si->fb_area = map_physical_memory(
 		buffer,
-		(void *) di->pcii.u.h0.base_registers[frame_buffer],
+		di->pcii.u.h0.base_registers[frame_buffer],
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA | B_WRITE_AREA,
@@ -510,7 +510,7 @@ static status_t map_device(device_info *di)
 	if (si->fb_area < 0) {
 		si->fb_area = map_physical_memory(
 			buffer,
-			(void *) di->pcii.u.h0.base_registers[frame_buffer],
+			di->pcii.u.h0.base_registers[frame_buffer],
 			di->pcii.u.h0.base_register_sizes[frame_buffer],
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA | B_WRITE_AREA,
@@ -603,7 +603,7 @@ static void copy_rom(device_info *di)
 
 	rom_area = map_physical_memory(
 		buffer,
-		(void *)di->pcii.u.h0.base_registers[frame_buffer],
+		di->pcii.u.h0.base_registers[frame_buffer],
 		32768,
 		B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA,

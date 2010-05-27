@@ -54,7 +54,8 @@ status_t
 scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 {
 	physical_entry map[1];
-	addr_t unaligned_phys, aligned_phys, aligned_addr, unaligned_addr;
+	phys_addr_t unaligned_phys, aligned_phys;
+	addr_t aligned_addr, unaligned_addr;
 	size_t total_size;
 
 	SHOW_FLOW0(3, "");
@@ -82,7 +83,7 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 	get_memory_map((void *)unaligned_addr, B_PAGE_SIZE, map, 1);
 
 	// get aligned part
-	unaligned_phys = (addr_t)map[0].address;
+	unaligned_phys = map[0].address;
 	aligned_phys = (unaligned_phys + buffer_size - 1) & ~(buffer_size - 1);
 	aligned_addr = unaligned_addr + (aligned_phys - unaligned_phys);
 
@@ -490,14 +491,14 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		bytes = min(bytes, sg_list->size);
 
 		SHOW_FLOW(0, "buffer = %p, virt_addr = %#lx, bytes = %lu, to_buffer = %d",
-			buffer, (addr_t)sg_list->address + offset, bytes, to_buffer);
+			buffer, sg_list->address + offset, bytes, to_buffer);
 
 		if (to_buffer) {
-			vm_memcpy_from_physical(buffer, (addr_t)sg_list->address + offset,
-				bytes, false);
+			vm_memcpy_from_physical(buffer, sg_list->address + offset, bytes,
+				false);
 		} else {
-			vm_memcpy_to_physical((addr_t)sg_list->address + offset, buffer,
-				bytes, false);
+			vm_memcpy_to_physical(sg_list->address + offset, buffer, bytes,
+				false);
 		}
 
 		buffer = (char *)buffer + bytes;

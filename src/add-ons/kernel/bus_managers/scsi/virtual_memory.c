@@ -94,7 +94,8 @@ get_iovec_memory_map(iovec *vec, size_t vec_count, size_t vec_offset, size_t len
 
 		// try to combine with previous sg block
 		if (cur_num_entries > 0 && cur_idx > 0
-			&& map[cur_idx].address == (char *)map[cur_idx - 1].address + map[cur_idx - 1].size) {
+			&& map[cur_idx].address
+				== map[cur_idx - 1].address + map[cur_idx - 1].size) {
 			SHOW_FLOW0( 3, "combine with previous chunk" );
 			map[cur_idx - 1].size += map[cur_idx].size;
 			memcpy(&map[cur_idx], &map[cur_idx + 1], (cur_num_entries - 1) * sizeof(map[0]));

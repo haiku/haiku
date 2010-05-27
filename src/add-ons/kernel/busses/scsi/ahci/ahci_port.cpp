@@ -452,10 +452,11 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
 	*prdCount = 0;
 	while (sgCount > 0 && dataSize > 0) {
 		size_t size = min_c(sgTable->size, dataSize);
-		void *address = sgTable->address;
+		phys_addr_t address = sgTable->address;
 		T_PORT(AHCIPortPrdTable(fController, fIndex, address, size));
-		FLOW("FillPrdTable: sg-entry addr %p, size %lu\n", address, size);
-		if ((uint32)address & 1) {
+		FLOW("FillPrdTable: sg-entry addr %#" B_PRIxPHYSADDR ", size %lu\n",
+			address, size);
+		if (address & 1) {
 			TRACE("AHCIPort::FillPrdTable: data alignment error\n");
 			return B_ERROR;
 		}
@@ -475,7 +476,7 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax,
 			prdTable->dbc  = bytes - 1;
 			*prdCount += 1;
 			prdTable++;
-			address = (char *)address + bytes;
+			address = address + bytes;
 			size -= bytes;
 		}
 		sgTable++;
