@@ -112,7 +112,7 @@ static addr_t
 get_next_physical_address(size_t size)
 {
 	addr_t base;
-	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
+	if (!get_free_physical_address_range(gKernelArgs.physical_allocated_range,
 			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
 			size, &base)) {
 		panic("Out of physical memory!");
@@ -258,10 +258,11 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 }
 
 
+template<typename RangeType>
 static void
-sort_addr_range(addr_range *range, int count)
+sort_addr_range(RangeType *range, int count)
 {
-	addr_range tempRange;
+	RangeType tempRange;
 	bool done;
 	int i;
 
@@ -270,9 +271,9 @@ sort_addr_range(addr_range *range, int count)
 		for (i = 1; i < count; i++) {
 			if (range[i].start < range[i - 1].start) {
 				done = false;
-				memcpy(&tempRange, &range[i], sizeof(addr_range));
-				memcpy(&range[i], &range[i - 1], sizeof(addr_range));
-				memcpy(&range[i - 1], &tempRange, sizeof(addr_range));
+				memcpy(&tempRange, &range[i], sizeof(RangeType));
+				memcpy(&range[i], &range[i - 1], sizeof(RangeType));
+				memcpy(&range[i - 1], &tempRange, sizeof(RangeType));
 			}
 		}
 	} while (!done);
@@ -451,14 +452,14 @@ bool
 mmu_allocate_physical(addr_t base, size_t size)
 {
 	// check whether the physical memory range exists at all
-	if (!is_address_range_covered(gKernelArgs.physical_memory_range,
+	if (!is_physical_address_range_covered(gKernelArgs.physical_memory_range,
 			gKernelArgs.num_physical_memory_ranges, base, size)) {
 		return false;
 	}
 
 	// check whether the physical range is still free
 	addr_t foundBase;
-	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
+	if (!get_free_physical_address_range(gKernelArgs.physical_allocated_range,
 			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
 			size, &foundBase) || foundBase != base) {
 		return false;
@@ -717,7 +718,7 @@ mmu_init(void)
 			size_t size = gKernelArgs.physical_memory_range[i].size;
 			if (size < 64 * 1024) {
 				addr_t start = gKernelArgs.physical_memory_range[i].start;
-				remove_address_range(gKernelArgs.physical_memory_range,
+				remove_physical_address_range(gKernelArgs.physical_memory_range,
 					&gKernelArgs.num_physical_memory_ranges,
 					MAX_PHYSICAL_MEMORY_RANGE, start, size);
 			}

@@ -5,6 +5,8 @@
 
 
 #include <platform_arch.h>
+#include <boot/addr_range.h>
+#include <boot/kernel_args.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
@@ -38,167 +40,6 @@ extern "C" uint8 __text_begin;
 extern "C" uint8 _end;
 
 
-static void
-remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
-{
-	if (index + 1 == numRanges) {
-		// remove last range
-		numRanges--;
-		return;
-	}
-
-	memmove(&ranges[index], &ranges[index + 1],
-		sizeof(addr_range) * (numRanges - 1 - index));
-	numRanges--;
-}
-
-
-static status_t
-insert_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
-	const void *_start, uint32 _size)
-{
-	addr_t start = ROUNDDOWN(addr_t(_start), B_PAGE_SIZE);
-	addr_t end = ROUNDUP(addr_t(_start) + _size, B_PAGE_SIZE);
-	addr_t size = end - start;
-	if (size == 0)
-		return B_OK;
-
-	for (uint32 i = 0; i < numRanges; i++) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeEnd = rangeStart + ranges[i].size;
-
-		if (end < rangeStart || start > rangeEnd) {
-			// ranges don't intersect or touch each other
-			continue;
-		}
-		if (start >= rangeStart && end <= rangeEnd) {
-			// range is already completely covered
-			return B_OK;
-		}
-
-		if (start < rangeStart) {
-			// prepend to the existing range
-			ranges[i].start = start;
-			ranges[i].size += rangeStart - start;
-		}
-		if (end > ranges[i].start + ranges[i].size) {
-			// append to the existing range
-			ranges[i].size = end - ranges[i].start;
-		}
-
-		// join ranges if possible
-
-		for (uint32 j = 0; j < numRanges; j++) {
-			if (i == j)
-				continue;
-
-			rangeStart = ranges[i].start;
-			rangeEnd = rangeStart + ranges[i].size;
-			addr_t joinStart = ranges[j].start;
-			addr_t joinEnd = joinStart + ranges[j].size;
-
-			if (rangeStart <= joinEnd && joinEnd <= rangeEnd) {
-				// join range that used to be before the current one, or
-				// the one that's now entirely included by the current one
-				if (joinStart < rangeStart) {
-					ranges[i].size += rangeStart - joinStart;
-					ranges[i].start = joinStart;
-				}
-
-				remove_range_index(ranges, numRanges, j--);
-			} else if (joinStart <= rangeEnd && joinEnd > rangeEnd) {
-				// join range that used to be after the current one
-				ranges[i].size += joinEnd - rangeEnd;
-
-				remove_range_index(ranges, numRanges, j--);
-			}
-		}
-		return B_OK;
-	}
-
-	// no range matched, we need to create a new one
-
-	if (numRanges >= maxRanges)
-		return B_ENTRY_NOT_FOUND;
-
-	ranges[numRanges].start = (addr_t)start;
-	ranges[numRanges].size = size;
-	numRanges++;
-
-	return B_OK;
-}
-
-
-static status_t
-remove_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
-	const void *_start, uint32 _size)
-{
-	addr_t start = ROUNDDOWN(addr_t(_start), B_PAGE_SIZE);
-	addr_t end = ROUNDUP(addr_t(_start) + _size, B_PAGE_SIZE);
-
-	for (uint32 i = 0; i < numRanges; i++) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeEnd = rangeStart + ranges[i].size;
-
-		if (start <= rangeStart) {
-			if (end <= rangeStart) {
-				// no intersection
-			} else if (end >= rangeEnd) {
-				// remove the complete range
-				remove_range_index(ranges, numRanges, i);
-				i--;
-			} else {
-				// remove the head of the range
-				ranges[i].start = end;
-				ranges[i].size = rangeEnd - end;
-			}
-		} else if (end >= rangeEnd) {
-			if (start < rangeEnd) {
-				// remove the tail
-				ranges[i].size = start - rangeStart;
-			}	// else: no intersection
-		} else {
-			// rangeStart < start < end < rangeEnd
-			// The ugly case: We have to remove something from the middle of
-			// the range. We keep the head of the range and insert its tail
-			// as a new range.
-			ranges[i].size = start - rangeStart;
-			return insert_memory_range(ranges, numRanges, maxRanges,
-				(void*)end, rangeEnd - end);
-		}
-	}
-
-	return B_OK;
-}
-
-
-static status_t
-insert_physical_memory_range(void *start, uint32 size)
-{
-	return insert_memory_range(gKernelArgs.physical_memory_range,
-		gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
-		start, size);
-}
-
-
-static status_t
-insert_physical_allocated_range(void *start, uint32 size)
-{
-	return insert_memory_range(gKernelArgs.physical_allocated_range,
-		gKernelArgs.num_physical_allocated_ranges, MAX_PHYSICAL_ALLOCATED_RANGE,
-		start, size);
-}
-
-
-static status_t
-insert_virtual_allocated_range(void *start, uint32 size)
-{
-	return insert_memory_range(gKernelArgs.virtual_allocated_range,
-		gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,
-		start, size);
-}
-
-
 #if 0
 static status_t
 insert_virtual_range_to_keep(void *start, uint32 size)
@@ -213,9 +54,9 @@ insert_virtual_range_to_keep(void *start, uint32 size)
 static status_t
 remove_virtual_range_to_keep(void *start, uint32 size)
 {
-	return remove_memory_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
-		gKernelArgs.arch_args.num_virtual_ranges_to_keep,
-		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
+	return remove_address_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
+		&gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, (addr_t)start, size);
 }
 
 
@@ -249,8 +90,8 @@ find_physical_memory_ranges(size_t &total)
 
 		total += regions[i].size;
 
-		if (insert_physical_memory_range(regions[i].base, regions[i].size)
-				!= B_OK) {
+		if (insert_physical_memory_range((addr_t)regions[i].base,
+				regions[i].size) != B_OK) {
 			printf("cannot map physical memory range (num ranges = %lu)!\n",
 				gKernelArgs.num_physical_memory_ranges);
 			return B_ERROR;
@@ -262,76 +103,40 @@ find_physical_memory_ranges(size_t &total)
 
 
 static bool
-is_in_range(addr_range *ranges, uint32 numRanges, void *address, size_t size)
-{
-	// Note: This function returns whether any single allocated range
-	// completely contains the given range. If the given range crosses
-	// allocated range boundaries, but is nevertheless covered completely, the
-	// function returns false. But since the range management code joins
-	// touching ranges, this should never happen.
-	addr_t start = (addr_t)address;
-	addr_t end = start + size;
-
-	for (uint32 i = 0; i < numRanges; i++) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeEnd = rangeStart + ranges[i].size;
-
-		if ((start >= rangeStart && start < rangeEnd)
-			|| (end >= rangeStart && end < rangeEnd))
-			return true;
-	}
-	return false;
-}
-
-
-static bool
-intersects_ranges(addr_range *ranges, uint32 numRanges, void *address,
-	size_t size)
-{
-	addr_t start = (addr_t)address;
-	addr_t end = start + size;
-
-	for (uint32 i = 0; i < numRanges; i++) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeEnd = rangeStart + ranges[i].size;
-
-		if ((start >= rangeStart && start < rangeEnd)
-			|| (rangeStart >= start && rangeStart < end)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-
-static bool
 is_virtual_allocated(void *address, size_t size)
 {
-	return intersects_ranges(gKernelArgs.virtual_allocated_range,
-		gKernelArgs.num_virtual_allocated_ranges, address, size);
+	addr_t foundBase;
+	return !get_free_address_range(gKernelArgs.virtual_allocated_range,
+			gKernelArgs.num_virtual_allocated_ranges, (addr_t)address, size,
+			&foundBase)
+		|| foundBase != (addr_t)address;
 }
 
 
 static bool
 is_physical_allocated(void *address, size_t size)
 {
-	return intersects_ranges(gKernelArgs.physical_allocated_range,
-		gKernelArgs.num_physical_allocated_ranges, address, size);
+	phys_addr_t foundBase;
+	return !get_free_physical_address_range(
+			gKernelArgs.physical_allocated_range,
+			gKernelArgs.num_physical_allocated_ranges, (addr_t)address, size,
+			&foundBase)
+		|| foundBase != (addr_t)address;
 }
 
 
 static bool
 is_physical_memory(void *address, size_t size)
 {
-	return is_in_range(gKernelArgs.physical_memory_range,
-		gKernelArgs.num_physical_memory_ranges, address, size);
+	return is_physical_address_range_covered(gKernelArgs.physical_memory_range,
+		gKernelArgs.num_physical_memory_ranges, (addr_t)address, size);
 }
 
 
 static bool
 is_physical_memory(void *address)
 {
-	return is_physical_memory(address, 0);
+	return is_physical_memory(address, 1);
 }
 
 
@@ -453,7 +258,7 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 		// insert range in physical allocated, if it points to physical memory
 
 		if (is_physical_memory(map->physical_address)
-			&& insert_physical_allocated_range(map->physical_address,
+			&& insert_physical_allocated_range((addr_t)map->physical_address,
 					map->length) != B_OK) {
 			printf("cannot map physical allocated range (num ranges = %lu)!\n",
 				gKernelArgs.num_physical_allocated_ranges);
@@ -479,7 +284,7 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 
 		// insert range in virtual allocated
 
-		if (insert_virtual_allocated_range(map->virtual_address,
+		if (insert_virtual_allocated_range((addr_t)map->virtual_address,
 				map->length) != B_OK) {
 			printf("cannot map virtual allocated range (num ranges = %lu)!\n",
 				gKernelArgs.num_virtual_allocated_ranges);
@@ -656,8 +461,8 @@ arch_mmu_allocate(void *_virtualAddress, size_t size, uint8 _protection,
 
 	printf("mmu_alloc: va %p, pa %p, size %u\n", virtualAddress,
 		physicalAddress, size);
-	insert_virtual_allocated_range(virtualAddress, size);
-	insert_physical_allocated_range(physicalAddress, size);
+	insert_virtual_allocated_range((addr_t)virtualAddress, size);
+	insert_physical_allocated_range((addr_t)physicalAddress, size);
 
 	map_range(virtualAddress, physicalAddress, size, protection);
 
@@ -706,14 +511,16 @@ map_callback(struct of_arguments *args)
 	// insert range in physical allocated if needed
 
 	if (is_physical_memory(physicalAddress)
-		&& insert_physical_allocated_range(physicalAddress, length) != B_OK) {
+		&& insert_physical_allocated_range((addr_t)physicalAddress, length)
+			!= B_OK) {
 		error = -1;
 		return OF_FAILED;
 	}
 
 	// insert range in virtual allocated
 
-	if (insert_virtual_allocated_range(virtualAddress, length) != B_OK) {
+	if (insert_virtual_allocated_range((addr_t)virtualAddress, length)
+			!= B_OK) {
 		error = -2;
 		return OF_FAILED;
 	}
@@ -976,16 +783,16 @@ arch_mmu_init(void)
 		//map_range((void *)realBase, (void *)realBase, realSize * 2, PAGE_READ_WRITE);
 		//map_range((void *)(total - realSize), (void *)(total - realSize), realSize, PAGE_READ_WRITE);
 		//map_range((void *)table, (void *)table, tableSize, PAGE_READ_WRITE);
-		insert_physical_allocated_range((void *)realBase, realSize * 2);
-		insert_virtual_allocated_range((void *)realBase, realSize * 2);
-		insert_physical_allocated_range((void *)(total - realSize), realSize);
-		insert_virtual_allocated_range((void *)(total - realSize), realSize);
-		insert_physical_allocated_range((void *)table, tableSize);
-		insert_virtual_allocated_range((void *)table, tableSize);
+		insert_physical_allocated_range(realBase, realSize * 2);
+		insert_virtual_allocated_range(realBase, realSize * 2);
+		insert_physical_allocated_range(total - realSize, realSize);
+		insert_virtual_allocated_range(total - realSize, realSize);
+		insert_physical_allocated_range((addr_t)table, tableSize);
+		insert_virtual_allocated_range((addr_t)table, tableSize);
 
 		// QEMU OpenHackware work-around
-		insert_physical_allocated_range((void *)0x05800000, 0x06000000 - 0x05800000);
-		insert_virtual_allocated_range((void *)0x05800000, 0x06000000 - 0x05800000);
+		insert_physical_allocated_range(0x05800000, 0x06000000 - 0x05800000);
+		insert_virtual_allocated_range(0x05800000, 0x06000000 - 0x05800000);
 
 		physicalTable = table;
 	}

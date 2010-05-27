@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -24,8 +25,9 @@ static void* sLast;
 static size_t sFree = kChunkSize;
 
 
+template<typename RangeType>
 static void
-remove_range_index(addr_range* ranges, uint32& numRanges, uint32 index)
+remove_range_index(RangeType* ranges, uint32& numRanges, uint32 index)
 {
 	if (index + 1 == numRanges) {
 		// remove last range
@@ -34,43 +36,25 @@ remove_range_index(addr_range* ranges, uint32& numRanges, uint32 index)
 	}
 
 	memmove(&ranges[index], &ranges[index + 1],
-		sizeof(addr_range) * (numRanges - 1 - index));
+		sizeof(RangeType) * (numRanges - 1 - index));
 	numRanges--;
 }
 
 
+template<typename RangeType, typename AddressType, typename SizeType>
 static status_t
-add_kernel_args_range(void* start, uint32 size)
-{
-	return insert_address_range(gKernelArgs.kernel_args_range,
-		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
-		(addr_t)start, size);
-}
-
-
-//	#pragma mark - addr_range utility
-
-
-/*!	Inserts the specified (start, size) pair (aka range) in the
-	addr_range array.
-	It will extend existing ranges in order to have as little
-	ranges in the array as possible.
-	Returns B_OK on success, or B_ENTRY_NOT_FOUND if there was
-	no free array entry available anymore.
-*/
-extern "C" status_t
-insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
-	addr_t start, uint32 size)
+insert_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
+	AddressType start, SizeType size)
 {
 	uint32 numRanges = *_numRanges;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	size = ROUNDUP(size, B_PAGE_SIZE);
-	addr_t end = start + size;
+	AddressType end = start + size;
 
 	for (uint32 i = 0; i < numRanges; i++) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeEnd = rangeStart + ranges[i].size;
+		AddressType rangeStart = ranges[i].start;
+		AddressType rangeEnd = rangeStart + ranges[i].size;
 
 		if (end < rangeStart || start > rangeEnd) {
 			// ranges don't intersect or touch each other
@@ -99,8 +83,8 @@ insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 
 			rangeStart = ranges[i].start;
 			rangeEnd = rangeStart + ranges[i].size;
-			addr_t joinStart = ranges[j].start;
-			addr_t joinEnd = joinStart + ranges[j].size;
+			AddressType joinStart = ranges[j].start;
+			AddressType joinEnd = joinStart + ranges[j].size;
 
 			if (rangeStart <= joinEnd && joinEnd <= rangeEnd) {
 				// join range that used to be before the current one, or
@@ -128,7 +112,7 @@ insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 	if (numRanges >= maxRanges)
 		return B_ENTRY_NOT_FOUND;
 
-	ranges[numRanges].start = (addr_t)start;
+	ranges[numRanges].start = (AddressType)start;
 	ranges[numRanges].size = size;
 	(*_numRanges)++;
 
@@ -136,18 +120,19 @@ insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 }
 
 
-extern "C" status_t
-remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
-	addr_t start, uint32 size)
+template<typename RangeType, typename AddressType, typename SizeType>
+static status_t
+remove_range(RangeType* ranges, uint32* _numRanges, uint32 maxRanges,
+	AddressType start, SizeType size)
 {
 	uint32 numRanges = *_numRanges;
 
-	addr_t end = ROUNDUP(start + size, B_PAGE_SIZE);
+	AddressType end = ROUNDUP(start + size, B_PAGE_SIZE);
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 
 	for (uint32 i = 0; i < numRanges; i++) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeEnd = rangeStart + ranges[i].size;
+		AddressType rangeStart = ranges[i].start;
+		AddressType rangeEnd = rangeStart + ranges[i].size;
 
 		if (start <= rangeStart) {
 			if (end <= rangeStart) {
@@ -172,8 +157,8 @@ remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 			// the range. We keep the head of the range and insert its tail
 			// as a new range.
 			ranges[i].size = start - rangeStart;
-			return insert_address_range(ranges, _numRanges, maxRanges,
-				end, rangeEnd - end);
+			return insert_range<RangeType, AddressType, SizeType>(ranges,
+				_numRanges, maxRanges, end, rangeEnd - end);
 		}
 	}
 
@@ -182,11 +167,12 @@ remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
 }
 
 
-bool
-get_free_address_range(addr_range *ranges, uint32 numRanges, addr_t base,
-	size_t size, addr_t *_rangeBase)
+template<typename RangeType, typename AddressType, typename SizeType>
+static bool
+get_free_range(RangeType* ranges, uint32 numRanges, AddressType base,
+	SizeType size, AddressType* _rangeBase)
 {
-	addr_t end = base + size - 1;
+	AddressType end = base + size - 1;
 	if (end < base)
 		return false;
 
@@ -195,8 +181,8 @@ get_free_address_range(addr_range *ranges, uint32 numRanges, addr_t base,
 	// intersects with an existing one.
 
 	for (uint32 i = 0; i < numRanges;) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeEnd = ranges[i].start + ranges[i].size - 1;
+		AddressType rangeStart = ranges[i].start;
+		AddressType rangeEnd = ranges[i].start + ranges[i].size - 1;
 
 		if (base <= rangeEnd && rangeStart <= end) {
 			base = rangeEnd + 1;
@@ -216,20 +202,21 @@ get_free_address_range(addr_range *ranges, uint32 numRanges, addr_t base,
 }
 
 
-bool
-is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
-	size_t size)
+template<typename RangeType, typename AddressType, typename SizeType>
+static bool
+is_range_covered(RangeType* ranges, uint32 numRanges, AddressType base,
+	SizeType size)
 {
 	// Note: We don't assume that the ranges are sorted, so we can't do this
 	// in a simple loop. Instead we restart the loop whenever the start of the
 	// given range intersects with an existing one.
 
 	for (uint32 i = 0; i < numRanges;) {
-		addr_t rangeStart = ranges[i].start;
-		addr_t rangeSize = ranges[i].size;
+		AddressType rangeStart = ranges[i].start;
+		AddressType rangeSize = ranges[i].size;
 
 		if (rangeStart <= base && rangeSize > base - rangeStart) {
-			size_t intersect = std::min(rangeStart + rangeSize - base, size);
+			SizeType intersect = std::min(rangeStart + rangeSize - base, size);
 			base += intersect;
 			size -= intersect;
 			if (size == 0)
@@ -246,26 +233,126 @@ is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
 }
 
 
-status_t
-insert_physical_memory_range(addr_t start, uint32 size)
+// #pragma mark -
+
+
+static status_t
+add_kernel_args_range(void* start, size_t size)
 {
-	return insert_address_range(gKernelArgs.physical_memory_range,
+	return insert_address_range(gKernelArgs.kernel_args_range,
+		&gKernelArgs.num_kernel_args_ranges, MAX_KERNEL_ARGS_RANGE,
+		(addr_t)start, size);
+}
+
+
+// #pragma mark - addr_range utility functions
+
+
+/*!	Inserts the specified (start, size) pair (aka range) in the
+	addr_range array.
+	It will extend existing ranges in order to have as little
+	ranges in the array as possible.
+	Returns B_OK on success, or B_ENTRY_NOT_FOUND if there was
+	no free array entry available anymore.
+*/
+extern "C" status_t
+insert_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
+	addr_t start, size_t size)
+{
+	return insert_range<addr_range, addr_t, size_t>(ranges, _numRanges,
+		maxRanges, start, size);
+}
+
+
+extern "C" status_t
+remove_address_range(addr_range* ranges, uint32* _numRanges, uint32 maxRanges,
+	addr_t start, size_t size)
+{
+	return remove_range<addr_range, addr_t, size_t>(ranges, _numRanges,
+		maxRanges, start, size);
+}
+
+
+bool
+get_free_address_range(addr_range* ranges, uint32 numRanges, addr_t base,
+	size_t size, addr_t* _rangeBase)
+{
+	return get_free_range<addr_range, addr_t, size_t>(ranges, numRanges, base,
+		size, _rangeBase);
+}
+
+
+bool
+is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
+	size_t size)
+{
+	return is_range_covered<addr_range, addr_t, size_t>(ranges, numRanges, base,
+		size);
+}
+
+
+// #pragma mark - phys_addr_range utility functions
+
+
+status_t
+insert_physical_address_range(phys_addr_range* ranges, uint32* _numRanges,
+	uint32 maxRanges, phys_addr_t start, phys_size_t size)
+{
+	return insert_range<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
+		_numRanges, maxRanges, start, size);
+}
+
+
+status_t
+remove_physical_address_range(phys_addr_range* ranges, uint32* _numRanges,
+	uint32 maxRanges, phys_addr_t start, phys_size_t size)
+{
+	return remove_range<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
+		_numRanges, maxRanges, start, size);
+}
+
+
+bool
+get_free_physical_address_range(phys_addr_range* ranges, uint32 numRanges,
+	phys_addr_t base, phys_size_t size, phys_addr_t* _rangeBase)
+{
+	return get_free_range<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
+		numRanges, base, size, _rangeBase);
+}
+
+
+bool
+is_physical_address_range_covered(phys_addr_range* ranges, uint32 numRanges,
+	phys_addr_t base, phys_size_t size)
+{
+	return is_range_covered<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
+		numRanges, base, size);
+}
+
+
+// #pragma mark - kernel args range functions
+
+
+status_t
+insert_physical_memory_range(addr_t start, size_t size)
+{
+	return insert_physical_address_range(gKernelArgs.physical_memory_range,
 		&gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
 		start, size);
 }
 
 
 status_t
-insert_physical_allocated_range(addr_t start, uint32 size)
+insert_physical_allocated_range(addr_t start, size_t size)
 {
-	return insert_address_range(gKernelArgs.physical_allocated_range,
+	return insert_physical_address_range(gKernelArgs.physical_allocated_range,
 		&gKernelArgs.num_physical_allocated_ranges,
 		MAX_PHYSICAL_ALLOCATED_RANGE, start, size);
 }
 
 
 status_t
-insert_virtual_allocated_range(addr_t start, uint32 size)
+insert_virtual_allocated_range(addr_t start, size_t size)
 {
 	return insert_address_range(gKernelArgs.virtual_allocated_range,
 		&gKernelArgs.num_virtual_allocated_ranges, MAX_VIRTUAL_ALLOCATED_RANGE,
@@ -273,7 +360,7 @@ insert_virtual_allocated_range(addr_t start, uint32 size)
 }
 
 
-//	#pragma mark - kernel_args allocations
+// #pragma mark - kernel_args allocations
 
 
 /*!	This function can be used to allocate memory that is going
@@ -329,15 +416,15 @@ kernel_args_malloc(size_t size)
 /*!	Convenience function that copies strdup() functions for the
 	kernel args heap.
 */
-extern "C" char *
-kernel_args_strdup(const char *string)
+extern "C" char*
+kernel_args_strdup(const char* string)
 {
 	if (string == NULL || string[0] == '\0')
 		return NULL;
 
 	size_t length = strlen(string) + 1;
 
-	char *target = (char *)kernel_args_malloc(length);
+	char* target = (char*)kernel_args_malloc(length);
 	if (target == NULL)
 		return NULL;
 
@@ -351,7 +438,7 @@ kernel_args_strdup(const char *string)
 	enough for its current usage in the boot loader, though.
 */
 extern "C" void
-kernel_args_free(void *block)
+kernel_args_free(void* block)
 {
 	if (sLast != block) {
 		// sorry, we're dumb

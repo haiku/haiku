@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -11,26 +12,41 @@
 
 typedef struct addr_range {
 	addr_t start;
-	addr_t size;
+	size_t size;
 } addr_range;
+
+
+typedef struct phys_addr_range {
+	phys_addr_t	start;
+	phys_size_t	size;
+} phys_addr_range;
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-status_t insert_address_range(addr_range *ranges, uint32 *_numRanges,
-	uint32 maxRanges, addr_t start, uint32 size);
-status_t remove_address_range(addr_range *ranges, uint32 *_numRanges,
-	uint32 maxRanges, addr_t start, uint32 size);
-bool get_free_address_range(addr_range *ranges, uint32 numRanges, addr_t base,
-	size_t size, addr_t *_rangeBase);
-bool is_address_range_covered(addr_range *ranges, uint32 numRanges, addr_t base,
+status_t insert_address_range(addr_range* ranges, uint32* _numRanges,
+	uint32 maxRanges, addr_t start, size_t size);
+status_t remove_address_range(addr_range* ranges, uint32* _numRanges,
+	uint32 maxRanges, addr_t start, size_t size);
+bool get_free_address_range(addr_range* ranges, uint32 numRanges, addr_t base,
+	size_t size, addr_t* _rangeBase);
+bool is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
 	size_t size);
 
-status_t insert_physical_memory_range(addr_t start, uint32 size);
-status_t insert_physical_allocated_range(addr_t start, uint32 size);
-status_t insert_virtual_allocated_range(addr_t start, uint32 size);
+status_t insert_physical_address_range(phys_addr_range* ranges,
+	uint32* _numRanges, uint32 maxRanges, phys_addr_t start, phys_size_t size);
+status_t remove_physical_address_range(phys_addr_range* ranges,
+	uint32* _numRanges, uint32 maxRanges, phys_addr_t start, phys_size_t size);
+bool get_free_physical_address_range(phys_addr_range* ranges, uint32 numRanges,
+	phys_addr_t base, phys_size_t size, phys_addr_t* _rangeBase);
+bool is_physical_address_range_covered(phys_addr_range* ranges,
+	uint32 numRanges, phys_addr_t base, phys_size_t size);
+
+status_t insert_physical_memory_range(phys_addr_t start, phys_size_t size);
+status_t insert_physical_allocated_range(phys_addr_t start, phys_size_t size);
+status_t insert_virtual_allocated_range(addr_t start, size_t size);
 
 #ifdef __cplusplus
 }
