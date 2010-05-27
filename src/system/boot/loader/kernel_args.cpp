@@ -233,6 +233,28 @@ is_range_covered(RangeType* ranges, uint32 numRanges, AddressType base,
 }
 
 
+template<typename RangeType>
+static void
+sort_ranges(RangeType* ranges, uint32 count)
+{
+	// TODO: This is a pretty sucky bubble sort implementation!
+	bool done;
+
+	do {
+		done = true;
+		for (uint32 i = 1; i < count; i++) {
+			if (ranges[i].start < ranges[i - 1].start) {
+				done = false;
+				RangeType tempRange;
+				memcpy(&tempRange, &ranges[i], sizeof(RangeType));
+				memcpy(&ranges[i], &ranges[i - 1], sizeof(RangeType));
+				memcpy(&ranges[i - 1], &tempRange, sizeof(RangeType));
+			}
+		}
+	} while (!done);
+}
+
+
 // #pragma mark -
 
 
@@ -291,6 +313,13 @@ is_address_range_covered(addr_range* ranges, uint32 numRanges, addr_t base,
 }
 
 
+void
+sort_address_ranges(addr_range* ranges, uint32 numRanges)
+{
+	sort_ranges(ranges, numRanges);
+}
+
+
 // #pragma mark - phys_addr_range utility functions
 
 
@@ -327,6 +356,13 @@ is_physical_address_range_covered(phys_addr_range* ranges, uint32 numRanges,
 {
 	return is_range_covered<phys_addr_range, phys_addr_t, phys_size_t>(ranges,
 		numRanges, base, size);
+}
+
+
+void
+sort_physical_address_ranges(phys_addr_range* ranges, uint32 numRanges)
+{
+	sort_ranges(ranges, numRanges);
 }
 
 

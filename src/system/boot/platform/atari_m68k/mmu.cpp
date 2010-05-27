@@ -238,27 +238,6 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 
 static void
-sort_addr_range(addr_range *range, int count)
-{
-	addr_range tempRange;
-	bool done;
-	int i;
-
-	do {
-		done = true;
-		for (i = 1; i < count; i++) {
-			if (range[i].start < range[i - 1].start) {
-				done = false;
-				memcpy(&tempRange, &range[i], sizeof(addr_range));
-				memcpy(&range[i], &range[i - 1], sizeof(addr_range));
-				memcpy(&range[i - 1], &tempRange, sizeof(addr_range));
-			}
-		}
-	} while (!done);
-}
-
-
-static void
 init_page_directory(void)
 {
 	TRACE(("init_page_directory\n"));
@@ -524,9 +503,12 @@ mmu_init_for_kernel(void)
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
 	// sort the address ranges
-	sort_addr_range(gKernelArgs.physical_memory_range, gKernelArgs.num_physical_memory_ranges);
-	sort_addr_range(gKernelArgs.physical_allocated_range, gKernelArgs.num_physical_allocated_ranges);
-	sort_addr_range(gKernelArgs.virtual_allocated_range, gKernelArgs.num_virtual_allocated_ranges);
+	sort_physical_address_ranges(gKernelArgs.physical_memory_range,
+		gKernelArgs.num_physical_memory_ranges);
+	sort_physical_address_ranges(gKernelArgs.physical_allocated_range,
+		gKernelArgs.num_physical_allocated_ranges);
+	sort_address_ranges(gKernelArgs.virtual_allocated_range,
+		gKernelArgs.num_virtual_allocated_ranges);
 
 #ifdef TRACE_MMU
 	{
