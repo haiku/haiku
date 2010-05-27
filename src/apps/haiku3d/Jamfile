@@ -22,6 +22,6 @@ Application Haiku3d :
 	BitmapTexture.cpp
 	VideoFileTexture.cpp
 
-	: be game GL media translation $(TARGET_LIBSUPC++)
+	: be game GL media translation $(TARGET_LIBSTDC++)
 	: Haiku3d.rdef
 ;
