@@ -364,7 +364,7 @@ struct ListState : State {
 		size_t size;
 		for (int32 i = 0;
 				resources.GetResourceInfo(i, &type, &id, &name, &size); i++) {
-			printf("'%s' %11" B_PRId32 " %11lu  %s\n", resource_type(type), id,
+			printf("'%s' %11" B_PRId32 " %11" B_PRIuSIZE "  %s\n", resource_type(type), id,
 				size, (name && strlen(name) > 0 ? name : "(no name)"));
 		}
 	}
