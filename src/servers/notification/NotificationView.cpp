@@ -546,7 +546,9 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 
 		// Start a new line if either we didn't start one before,
 		// the current offset
-		BString tempText(line != NULL ? line->text : "");
+		BString tempText;
+		if (line != NULL)
+			tempText.SetTo(line->text);
 		tempText.Append(chunkStart, chunkLength);
 
 		if (line == NULL || chunkStart[0] == '\n'
@@ -605,7 +607,8 @@ NotificationView::SetText(const char* app, const char* title, const char* text,
 			fHeight = minHeight;
 	}
 
-	BMessenger(Parent()).SendMessage(kResizeToFit);
+	BMessenger messenger(Parent());
+	messenger.SendMessage(kResizeToFit);
 }
 
 
