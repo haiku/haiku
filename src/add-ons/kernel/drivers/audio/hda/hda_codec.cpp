@@ -1117,6 +1117,12 @@ hda_codec_switch_handler(hda_codec* codec)
 			hda_send_verbs(audioGroup->codec, &verb, &response, 1);
 			disable = response & PIN_SENSE_PRESENCE_DETECT;
 			TRACE("hda: sensed pin widget %ld, %d\n", widget.node_id, disable);
+
+			uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
+					true);
+			verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
+				VID_SET_PIN_WIDGET_CONTROL, disable ? ctrl : 0);
+			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 			break;
 		}
 
@@ -1137,7 +1143,7 @@ hda_codec_switch_handler(hda_codec* codec)
 					true);
 			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
 				VID_SET_PIN_WIDGET_CONTROL, disable ? 0 : ctrl);
-			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);	
+			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 		}
 	}
 
