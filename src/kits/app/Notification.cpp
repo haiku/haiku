@@ -56,7 +56,7 @@ BNotification::Application() const
 
 
 void
-BNotification::SetApplication(const char* app)
+BNotification::SetApplication(const BString& app)
 {
 	fAppName = app;
 }
@@ -70,7 +70,7 @@ BNotification::Title() const
 
 
 void
-BNotification::SetTitle(const char* title)
+BNotification::SetTitle(const BString& title)
 {
 	fTitle = title;
 }
@@ -84,7 +84,7 @@ BNotification::Content() const
 
 
 void
-BNotification::SetContent(const char* content)
+BNotification::SetContent(const BString& content)
 {
 	fContent = content;
 }
@@ -98,7 +98,7 @@ BNotification::MessageID() const
 
 
 void
-BNotification::SetMessageID(const char* id)
+BNotification::SetMessageID(const BString& id)
 {
 	fID = id;
 }
@@ -126,7 +126,7 @@ BNotification::OnClickApp() const
 
 
 void
-BNotification::SetOnClickApp(const char* app)
+BNotification::SetOnClickApp(const BString& app)
 {
 	fApp = app;
 }
@@ -161,7 +161,11 @@ BNotification::AddOnClickRef(const entry_ref* ref)
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
-	return AddOnClickRef(*ref);
+	entry_ref* clonedRef = new(std::nothrow) entry_ref(*ref);
+	if (clonedRef == NULL || !fRefs.AddItem(clonedRef))
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
@@ -180,23 +184,9 @@ BNotification::OnClickRefAt(int32 index) const
 
 
 status_t
-BNotification::AddOnClickRef(const entry_ref& ref)
+BNotification::AddOnClickArg(const BString& arg)
 {
-	entry_ref* clonedRef = new(std::nothrow) entry_ref(ref);
-	if (clonedRef == NULL || !fRefs.AddItem(clonedRef))
-		return B_NO_MEMORY;
-
-	return B_OK;
-}
-
-
-status_t
-BNotification::AddOnClickArg(const char* arg)
-{
-	if (arg == NULL)
-		return B_BAD_VALUE;
-
-	char* clonedArg = strdup(arg);
+	char* clonedArg = strdup(arg.String());
 	if (clonedArg == NULL || !fArgv.AddItem(clonedArg))
 		return B_NO_MEMORY;
 

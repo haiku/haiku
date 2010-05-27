@@ -30,32 +30,31 @@ public:
 			notification_type	Type() const;
 
 			const char*			Application() const;
-			void				SetApplication(const char* app);
+			void				SetApplication(const BString& app);
 
 			const char*			Title() const;
-			void				SetTitle(const char* title);
+			void				SetTitle(const BString& title);
 
 			const char*			Content() const;
-			void				SetContent(const char* content);
+			void				SetContent(const BString& content);
 
 			const char*			MessageID() const;
-			void				SetMessageID(const char* id);
+			void				SetMessageID(const BString& id);
 
 			float				Progress() const;
 			void				SetProgress(float progress);
 
 			const char*			OnClickApp() const;
-			void				SetOnClickApp(const char* app);
+			void				SetOnClickApp(const BString& app);
 
 			const entry_ref*	OnClickFile() const;
 			status_t			SetOnClickFile(const entry_ref* file);
 
 			status_t			AddOnClickRef(const entry_ref* ref);
-			status_t			AddOnClickRef(const entry_ref& ref);
 			int32				CountOnClickRefs() const;
 			const entry_ref*	OnClickRefAt(int32 index) const;
 
-			status_t			AddOnClickArg(const char* arg);
+			status_t			AddOnClickArg(const BString& arg);
 			int32				CountOnClickArgs() const;
 			const char*			OnClickArgAt(int32 index) const;
 
