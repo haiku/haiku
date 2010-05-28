@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc.
+ * Copyright 2004-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UTF8_FUNCTIONS_H
@@ -24,7 +24,7 @@ UTF8NextCharLenUnsafe(const char *text)
 	do {
 		ptr++;
 	} while (IsInsideGlyph(*ptr));
-				
+
 	return ptr - text;
 }
 
@@ -43,7 +43,7 @@ static inline uint32
 UTF8PreviousCharLen(const char *text, const char *limit)
 {
 	const char *ptr = text;
-	
+
 	if (ptr == NULL || limit == NULL)
 		return 0;
 
@@ -52,7 +52,7 @@ UTF8PreviousCharLen(const char *text, const char *limit)
 			break;
 		ptr--;
 	} while (IsInsideGlyph(*ptr));
-				
+
 	return text - ptr;
 }
 
@@ -96,7 +96,7 @@ UTF8CountChars(const char *bytes, int32 numBytes)
 	uint32 length = 0;
 	const char *last;
 	if (numBytes < 0)
-		last = (const char *)UINT_MAX;
+		last = (const char *)SIZE_MAX;
 	else
 		last = bytes + numBytes - 1;
 
