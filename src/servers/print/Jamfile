@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src servers print ;
 
-SubDirHdrs HAIKU_TOP headers os locale ;
-
 UsePrivateHeaders shared print ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
