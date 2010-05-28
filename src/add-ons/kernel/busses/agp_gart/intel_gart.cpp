@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -253,8 +253,9 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 
 
 static void
-set_gtt_entry(intel_info &info, uint32 offset, addr_t physicalAddress)
+set_gtt_entry(intel_info &info, uint32 offset, phys_addr_t physicalAddress)
 {
+	// TODO: this is not 64-bit safe!
 	write32(info.gtt_base + (offset >> GTT_PAGE_SHIFT),
 		(uint32)physicalAddress | GTT_ENTRY_VALID);
 }
@@ -462,7 +463,7 @@ intel_set_aperture_size(void *aperture, size_t size)
 
 
 static status_t
-intel_bind_page(void *aperture, uint32 offset, addr_t physicalAddress)
+intel_bind_page(void *aperture, uint32 offset, phys_addr_t physicalAddress)
 {
 	//TRACE("bind_page(offset %lx, physical %lx)\n", offset, physicalAddress);
 

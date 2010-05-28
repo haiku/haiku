@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _AGP_H_
@@ -18,17 +18,17 @@ typedef struct agp_info {
 	uchar	class_sub;			/* specific device function */
 	uchar	class_base;			/* device type (display vs host bridge) */
 	struct {
-		uint32	capability_id;	/* AGP capability register as defined in the AGP standard */
-		uint32	status;			/* AGP STATUS register as defined in the AGP standard */
-		uint32	command;		/* AGP COMMAND register as defined in the AGP standard */
+		uint32	capability_id;	/* AGP capability register */
+		uint32	status;			/* AGP status register */
+		uint32	command;		/* AGP command register */
 	} interface;
 } agp_info;
 
 typedef struct aperture_info {
-	addr_t	physical_base;
-	addr_t	base;
-	size_t	size;
-	size_t	reserved_size;	
+	phys_addr_t	physical_base;
+	addr_t		base;
+	size_t		size;
+	size_t		reserved_size;	
 } aperture_info;
 
 /* flags for allocate_memory */
@@ -43,13 +43,13 @@ typedef struct gart_bus_module_info gart_bus_module_info;
 typedef struct agp_gart_module_info {
 	bus_manager_info info;
 
-	// AGP functionality
+	/* AGP functionality */
 	status_t	(*get_nth_agp_info)(uint32 index, agp_info *info);
 	status_t	(*acquire_agp)(void);
 	void		(*release_agp)(void);
 	uint32		(*set_agp_mode)(uint32 command);
 
-	// GART functionality
+	/* GART functionality */
 	aperture_id	(*map_aperture)(uint8 bus, uint8 device, uint8 function,
 					size_t size, addr_t *_apertureBase);
 	aperture_id	(*map_custom_aperture)(gart_bus_module_info *module,
@@ -59,7 +59,7 @@ typedef struct agp_gart_module_info {
 
 	status_t	(*allocate_memory)(aperture_id id, size_t size,
 					size_t alignment, uint32 flags, addr_t *_apertureBase,
-					addr_t *_physicalBase);
+					phys_addr_t *_physicalBase);
 	status_t	(*free_memory)(aperture_id id, addr_t apertureBase);
 	status_t	(*reserve_aperture)(aperture_id id, size_t size,
 					addr_t *_apertureBase);
@@ -90,7 +90,7 @@ struct agp_gart_bus_module_info {
 	status_t	(*get_aperture_info)(void *aperture, aperture_info *info);
 	status_t	(*set_aperture_size)(void *aperture, size_t size);
 	status_t	(*bind_page)(void *aperture, uint32 offset,
-					addr_t physicalAddress);
+					phys_addr_t physicalAddress);
 	status_t	(*unbind_page)(void *aperture, uint32 offset);
 	void		(*flush_tlbs)(void *aperture);
 };
@@ -119,5 +119,6 @@ struct agp_gart_bus_module_info {
 
 /* masks for command register bits */
 #define AGP_ENABLE			0x00000100	/* set to 1 if AGP should be enabled */
+
 
 #endif	/* _AGP_H_ */

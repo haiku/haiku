@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2004-2006, Rudolf Cornelissen. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -660,7 +660,8 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 			else
 				page = memory->pages[index];
 
-			physicalAddress = page->physical_page_number << PAGE_SHIFT;
+			physicalAddress
+				= (phys_addr_t)page->physical_page_number << PAGE_SHIFT;
 #endif
 		}
 
@@ -1006,9 +1007,8 @@ get_aperture_info(aperture_id id, aperture_info *info)
 
 static status_t
 allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
-	addr_t *_apertureBase, addr_t *_physicalBase)
+	addr_t *_apertureBase, phys_addr_t *_physicalBase)
 {
-// TODO: _physicalBase should be a phys_addr_t*!
 	if ((flags & ~APERTURE_PUBLIC_FLAGS_MASK) != 0 || _apertureBase == NULL)
 		return B_BAD_VALUE;
 
@@ -1034,7 +1034,8 @@ allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 
 	if (_physicalBase != NULL && (flags & B_APERTURE_NEED_PHYSICAL) != 0) {
 #if defined(__HAIKU__) && !defined(GART_TEST)
-		*_physicalBase = memory->page->physical_page_number * B_PAGE_SIZE;
+		*_physicalBase
+			= (phys_addr_t)memory->page->physical_page_number * B_PAGE_SIZE;
 #else
 		physical_entry entry;
 		status = get_memory_map((void *)memory->base, B_PAGE_SIZE, &entry, 1);
