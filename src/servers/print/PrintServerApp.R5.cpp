@@ -48,7 +48,9 @@ struct AsyncThreadParams {
 	}
 };
 
-status_t PrintServerApp::async_thread(void* data)
+
+status_t 
+PrintServerApp::async_thread(void* data)
 {
 	AsyncThreadParams* p = (AsyncThreadParams*)data;
 
@@ -153,7 +155,8 @@ status_t PrintServerApp::async_thread(void* data)
 
 
 // Async. processing of received message
-void PrintServerApp::AsyncHandleMessage(BMessage* msg)
+void 
+PrintServerApp::AsyncHandleMessage(BMessage* msg)
 {
 	AsyncThreadParams* data = new AsyncThreadParams(this, fDefaultPrinter, msg);
 
@@ -167,7 +170,9 @@ void PrintServerApp::AsyncHandleMessage(BMessage* msg)
 	}
 }
 
-void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
+
+void 
+PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 {
 	switch(msg->what) {
 			// Get currently selected printer
@@ -218,3 +223,4 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 			break;
 	}
 }
+

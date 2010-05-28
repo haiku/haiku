@@ -14,8 +14,9 @@
 #include <image.h>
 #include <Entry.h>
 
-// ---------------------------------------------------------------
+
 BObjectList<Transport> Transport::sTransports;
+
 
 // ---------------------------------------------------------------
 // Find [static]
@@ -29,7 +30,8 @@ BObjectList<Transport> Transport::sTransports;
 // Returns:
 //    Pointer to Transport object, or NULL if not found.
 // ---------------------------------------------------------------
-Transport* Transport::Find(const BString& name)
+Transport* 
+Transport::Find(const BString& name)
 {
 		// Look in list to find printer definition
 	for (int32 idx=0; idx < sTransports.CountItems(); idx++) {
@@ -42,26 +44,30 @@ Transport* Transport::Find(const BString& name)
 	return NULL;
 }
 
-// ---------------------------------------------------------------
-Transport* Transport::At(int32 idx)
+
+Transport* 
+Transport::At(int32 idx)
 {
 	return sTransports.ItemAt(idx);
 }
 
-// ---------------------------------------------------------------
-void Transport::Remove(Transport* transport)
+
+void 
+Transport::Remove(Transport* transport)
 {
 	sTransports.RemoveItem(transport);
 }
 
-// ---------------------------------------------------------------
-int32 Transport::CountTransports()
+
+int32 
+Transport::CountTransports()
 {
 	return sTransports.CountItems();
 }
 
-// ---------------------------------------------------------------
-status_t Transport::Scan(directory_which which)
+
+status_t 
+Transport::Scan(directory_which which)
 {
 	BDirectory dir;
 	status_t rc;
@@ -97,6 +103,7 @@ status_t Transport::Scan(directory_which which)
 	return B_OK;
 
 }
+
 
 // ---------------------------------------------------------------
 // Transport [constructor]
@@ -141,14 +148,15 @@ Transport::Transport(const BPath& path)
 	sTransports.AddItem(this);
 }
 
-// ---------------------------------------------------------------
+
 Transport::~Transport()
 {
 	sTransports.RemoveItem(this);
 }
 
-// ---------------------------------------------------------------
-status_t Transport::ListAvailablePorts(BMessage* msg)
+
+status_t
+Transport::ListAvailablePorts(BMessage* msg)
 {
 	status_t (*list_ports)(BMessage*);
 	image_id id = fImageID;
@@ -174,6 +182,7 @@ done:
 	return rc;
 }
 
+
 // ---------------------------------------------------------------
 // MessageReceived
 //
@@ -182,7 +191,8 @@ done:
 // Parameters:
 //    msg - message.
 // ---------------------------------------------------------------
-void Transport::MessageReceived(BMessage* msg)
+void 
+Transport::MessageReceived(BMessage* msg)
 {
 	switch(msg->what) {
 		case B_GET_PROPERTY:

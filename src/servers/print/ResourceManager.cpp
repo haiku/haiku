@@ -22,11 +22,14 @@ Resource::Resource(const char* transport, const char* address, const char* conne
 	}
 }
 
+
 Resource::~Resource() {
 	if (fResourceAvailable > 0) delete_sem(fResourceAvailable);
 }
 
-bool Resource::NeedsLocking() {
+
+bool 
+Resource::NeedsLocking() {
 	// TODO R2: Provide API to query that information
 	// ATM: Print jobs are not processed sequentially
 	// if the transport add-on is either "Print To File"
@@ -38,30 +41,39 @@ bool Resource::NeedsLocking() {
 		|| fTransport == ""); 
 }
 
-bool Resource::Equals(const char* transport, const char* address, const char* connection) {
+
+bool 
+Resource::Equals(const char* transport, const char* address, const char* connection) {
 	return fTransport == transport &&
 			fTransportAddress == address &&
 			fConnection == connection;
 }
 
-bool Resource::Lock() {
+
+bool 
+Resource::Lock() {
 	if (fResourceAvailable > 0) {
 		return acquire_sem(fResourceAvailable) == B_NO_ERROR;
 	}
 	return true;
 }
 
-void Resource::Unlock() {
+
+void 
+Resource::Unlock() {
 	if (fResourceAvailable > 0) {
 		release_sem(fResourceAvailable);
 	}
 }
 
+
 ResourceManager::~ResourceManager() {
 	ASSERT(fResources.CountItems() == 0);
 }
 
-Resource* ResourceManager::Find(const char* transport, const char* address, const char* connection) {
+
+Resource* 
+ResourceManager::Find(const char* transport, const char* address, const char* connection) {
 	for (int i = 0; i < fResources.CountItems(); i ++) {
 		Resource* r = fResources.ItemAt(i);
 		if (r->Equals(transport, address, connection)) return r;
@@ -69,7 +81,9 @@ Resource* ResourceManager::Find(const char* transport, const char* address, cons
 	return NULL;
 }
 
-Resource* ResourceManager::Allocate(const char* transport, const char* address, const char* connection) {
+
+Resource* 
+ResourceManager::Allocate(const char* transport, const char* address, const char* connection) {
 	Resource* r = Find(transport, address, connection);
 	if (r == NULL) {
 		r = new Resource(transport, address, connection);
@@ -81,7 +95,8 @@ Resource* ResourceManager::Allocate(const char* transport, const char* address, 
 }
 
 
-void ResourceManager::Free(Resource* r) {
+void 
+ResourceManager::Free(Resource* r) {
 	if (r->Release()) {
 		fResources.RemoveItem(r);
 	}	

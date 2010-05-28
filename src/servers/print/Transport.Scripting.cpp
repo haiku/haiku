@@ -27,7 +27,9 @@ static property_info prop_list[] = {
 	{ 0 } // terminate list 
 };
 
-void Transport::HandleScriptingCommand(BMessage* msg)
+
+void 
+Transport::HandleScriptingCommand(BMessage* msg)
 {
 	status_t rc = B_ERROR;
 	BString propName;
@@ -72,7 +74,9 @@ void Transport::HandleScriptingCommand(BMessage* msg)
 	}
 }
 
-BHandler* Transport::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
+
+BHandler* 
+Transport::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	int32 form, const char* prop)
 {
 	BPropertyInfo prop_info(prop_list);
@@ -88,7 +92,9 @@ BHandler* Transport::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec
 	return rc;
 }
 
-status_t Transport::GetSupportedSuites(BMessage* msg)
+
+status_t 
+Transport::GetSupportedSuites(BMessage* msg)
 {
 	msg->AddString("suites", "application/x-vnd.OpenBeOS-transport");
 	

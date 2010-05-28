@@ -9,6 +9,7 @@
 
 #include <StorageKit.h>
 
+
 // Implementation of AppSettings
 
 AppSettings::AppSettings(const char* mimetype, const char* printer) 
@@ -42,24 +43,33 @@ Settings::Settings()
 {
 }
 
+
 Settings::~Settings() {
 	fSingleton = NULL;
 }
 
-Settings* Settings::GetSettings() {
+
+Settings* 
+Settings::GetSettings() {
 	if (fSingleton == NULL) fSingleton = new Settings();
 	return fSingleton;
 }
 
-void Settings::RemoveAppSettings(int i) {
+
+void 
+Settings::RemoveAppSettings(int i) {
 	delete fApps.RemoveItemAt(i);
 }
 
-void Settings::RemovePrinterSettings(int i) {
+
+void 
+Settings::RemovePrinterSettings(int i) {
 	delete fPrinters.RemoveItemAt(i);
 }
 
-AppSettings* Settings::FindAppSettings(const char* mimeType) {
+
+AppSettings* 
+Settings::FindAppSettings(const char* mimeType) {
 	for (int i = AppSettingsCount()-1; i >= 0; i --) {
 		if (strcmp(AppSettingsAt(i)->GetMimeType(), mimeType) == 0) 
 			return AppSettingsAt(i);
@@ -67,7 +77,9 @@ AppSettings* Settings::FindAppSettings(const char* mimeType) {
 	return NULL;
 }
 
-PrinterSettings* Settings::FindPrinterSettings(const char* printer) {
+
+PrinterSettings* 
+Settings::FindPrinterSettings(const char* printer) {
 	for (int i = PrinterSettingsCount()-1; i >= 0; i --) {
 		if (strcmp(PrinterSettingsAt(i)->GetPrinter(), printer) == 0) 
 			return PrinterSettingsAt(i);
@@ -75,7 +87,9 @@ PrinterSettings* Settings::FindPrinterSettings(const char* printer) {
 	return NULL;
 }
 
-void Settings::Save(BFile* file) {
+
+void 
+Settings::Save(BFile* file) {
 	BMessage m;
 		// store application settings
 	for (int i = 0; i < AppSettingsCount(); i++) {
@@ -97,7 +111,9 @@ void Settings::Save(BFile* file) {
 	m.Flatten(file);
 }
 
-void Settings::Load(BFile* file) {
+
+void 
+Settings::Load(BFile* file) {
 	BMessage m;
 	if (m.Unflatten(file) == B_OK) {
 			// restore application settings

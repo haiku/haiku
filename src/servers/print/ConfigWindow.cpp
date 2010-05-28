@@ -96,7 +96,8 @@ static struct PageFormat
 };
 
 
-static void GetPageFormat(float w, float h, BString& label)
+static void 
+GetPageFormat(float w, float h, BString& label)
 {
 	w = floor(w + 0.5); h = floor(h + 0.5);
 	for (uint i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
@@ -240,6 +241,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	UpdateSettings(true);
 }
 
+
 ConfigWindow::~ConfigWindow()
 {
 	if (fCurrentPrinter)
@@ -248,7 +250,8 @@ ConfigWindow::~ConfigWindow()
 }
 
 
-void ConfigWindow::Go()
+void 
+ConfigWindow::Go()
 {
 	sem_id sid = create_sem(0, "finished");
 	if (sid >= 0) {
@@ -262,7 +265,8 @@ void ConfigWindow::Go()
 }
 
 
-void ConfigWindow::MessageReceived(BMessage* m)
+void 
+ConfigWindow::MessageReceived(BMessage* m)
 {
 	switch (m->what) {
 		case MSG_PAGE_SETUP:
@@ -313,7 +317,8 @@ ConfigWindow::AboutRequested()
 }
 
 
-void ConfigWindow::FrameMoved(BPoint p)
+void 
+ConfigWindow::FrameMoved(BPoint p)
 {
 	BRect frame = GetWindowFrame();
 	frame.OffsetTo(p);
@@ -321,7 +326,8 @@ void ConfigWindow::FrameMoved(BPoint p)
 }
 
 
-BRect ConfigWindow::GetWindowFrame()
+BRect 
+ConfigWindow::GetWindowFrame()
 {
 	BAutolock lock(gLock);
 	if (lock.IsLocked())
@@ -331,7 +337,8 @@ BRect ConfigWindow::GetWindowFrame()
 }
 
 
-void ConfigWindow::SetWindowFrame(BRect r)
+void 
+ConfigWindow::SetWindowFrame(BRect r)
 {
 	BAutolock lock(gLock);
 	if (lock.IsLocked())
@@ -339,7 +346,8 @@ void ConfigWindow::SetWindowFrame(BRect r)
 }
 
 
-BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
+BPictureButton* 
+ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 	const char* name, const char* on, const char* off, uint32 what)
 {
 	BBitmap* onBM = LoadBitmap(on);
@@ -379,7 +387,8 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 }
 
 
-void ConfigWindow::PrinterForMimeType()
+void 
+ConfigWindow::PrinterForMimeType()
 {
 	BAutolock lock(gLock);
 	if (fCurrentPrinter) {
@@ -402,7 +411,8 @@ void ConfigWindow::PrinterForMimeType()
 }
 
 
-void ConfigWindow::SetupPrintersMenu(BMenu* menu)
+void 
+ConfigWindow::SetupPrintersMenu(BMenu* menu)
 {
 	// clear menu
 	while (menu->CountItems() != 0)
@@ -426,7 +436,8 @@ void ConfigWindow::SetupPrintersMenu(BMenu* menu)
 }
 
 
-void ConfigWindow::UpdateAppSettings(const char* mime, const char* printer)
+void 
+ConfigWindow::UpdateAppSettings(const char* mime, const char* printer)
 {
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
@@ -440,7 +451,8 @@ void ConfigWindow::UpdateAppSettings(const char* mime, const char* printer)
 }
 
 
-void ConfigWindow::UpdateSettings(bool read)
+void 
+ConfigWindow::UpdateSettings(bool read)
 {
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
@@ -463,7 +475,8 @@ void ConfigWindow::UpdateSettings(bool read)
 }
 
 
-void ConfigWindow::UpdateUI()
+void 
+ConfigWindow::UpdateUI()
 {
 	if (fCurrentPrinter == NULL) {
 		fPageSetup->SetEnabled(false);
@@ -545,7 +558,8 @@ void ConfigWindow::UpdateUI()
 }
 
 
-void ConfigWindow::Setup(config_setup_kind kind)
+void 
+ConfigWindow::Setup(config_setup_kind kind)
 {
 	if (fCurrentPrinter) {
 		Hide();

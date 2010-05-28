@@ -37,7 +37,8 @@ static property_info prop_list[] = {
 };
 
 
-void Printer::HandleScriptingCommand(BMessage* msg)
+void 
+Printer::HandleScriptingCommand(BMessage* msg)
 {
 	status_t rc = B_ERROR;
 	BString propName;
@@ -82,7 +83,8 @@ void Printer::HandleScriptingCommand(BMessage* msg)
 	}
 }
 
-BHandler* Printer::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
+BHandler* 
+Printer::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	int32 form, const char* prop)
 {
 	BPropertyInfo prop_info(prop_list);
@@ -98,7 +100,8 @@ BHandler* Printer::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	return rc;
 }
 
-status_t Printer::GetSupportedSuites(BMessage* msg)
+status_t 
+Printer::GetSupportedSuites(BMessage* msg)
 {
 	msg->AddString("suites", "application/x-vnd.OpenBeOS-printer");
 

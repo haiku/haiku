@@ -226,7 +226,8 @@ status_t Printer::ConfigurePrinter()
 // Returns:
 //    B_OK if successful or errorcode otherwise.
 // ---------------------------------------------------------------
-status_t Printer::ConfigurePage(BMessage& settings)
+status_t 
+Printer::ConfigurePage(BMessage& settings)
 {
 	status_t rc;
 	image_id id;
@@ -267,7 +268,8 @@ status_t Printer::ConfigurePage(BMessage& settings)
 // Returns:
 //    B_OK if successful or errorcode otherwise.
 // ---------------------------------------------------------------
-status_t Printer::ConfigureJob(BMessage& settings)
+status_t 
+Printer::ConfigureJob(BMessage& settings)
 {
 	status_t rc;
 	image_id id;
@@ -300,7 +302,8 @@ status_t Printer::ConfigureJob(BMessage& settings)
 //
 // Print spooled jobs in a new thread.
 // ---------------------------------------------------------------
-void Printer::HandleSpooledJob()
+void 
+Printer::HandleSpooledJob()
 {
 	BAutolock lock(gLock);
 	if (lock.IsLocked()
@@ -321,7 +324,8 @@ void Printer::HandleSpooledJob()
 // Returns:
 //    B_OK if successful or errorcode otherwise.
 // ---------------------------------------------------------------
-status_t Printer::GetDefaultSettings(BMessage& settings)
+status_t 
+Printer::GetDefaultSettings(BMessage& settings)
 {
 	status_t rc;
 	image_id id;
@@ -348,7 +352,8 @@ status_t Printer::GetDefaultSettings(BMessage& settings)
 }
 
 
-void Printer::AbortPrintThread()
+void 
+Printer::AbortPrintThread()
 {
 	fAbort = true;
 }
@@ -365,7 +370,8 @@ void Printer::AbortPrintThread()
 // Returns:
 //    B_OK if successful or errorcode otherwise.
 // ---------------------------------------------------------------
-status_t Printer::LoadPrinterAddon(image_id& id)
+status_t 
+Printer::LoadPrinterAddon(image_id& id)
 {
 	status_t rc;
 	BString drName;
@@ -400,7 +406,8 @@ status_t Printer::LoadPrinterAddon(image_id& id)
 // Parameters:
 //    msg - message.
 // ---------------------------------------------------------------
-void Printer::AddCurrentPrinter(BMessage& message)
+void 
+Printer::AddCurrentPrinter(BMessage& message)
 {
 	BString name;
 	GetName(name);
@@ -418,7 +425,8 @@ void Printer::AddCurrentPrinter(BMessage& message)
 // Parameters:
 //    name - the name of the printer.
 // ---------------------------------------------------------------
-void Printer::GetName(BString& name)
+void 
+Printer::GetName(BString& name)
 {
 	if (SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name) != B_OK)
 		name = "Unknown Printer";
@@ -430,7 +438,8 @@ void Printer::GetName(BString& name)
 //
 // Reset status of "processing" jobs to "waiting" at print_server start.
 // ---------------------------------------------------------------
-void Printer::ResetJobStatus()
+void 
+Printer::ResetJobStatus()
 {
 	if (fPrinter.Lock()) {
 		const int32 n = fPrinter.CountJobs();
@@ -455,7 +464,8 @@ void Printer::ResetJobStatus()
 // Returns:
 //    true if successful.
 // ---------------------------------------------------------------
-bool Printer::HasCurrentPrinter(BString& name)
+bool 
+Printer::HasCurrentPrinter(BString& name)
 {
 	BMessage settings;
 		// read settings from spool file and get printer name
@@ -478,7 +488,8 @@ bool Printer::HasCurrentPrinter(BString& name)
 // Returns:
 //    true if successful.
 // ---------------------------------------------------------------
-bool Printer::MoveJob(const BString& name)
+bool 
+Printer::MoveJob(const BString& name)
 {
 	BPath file(&fJob->EntryRef());
 	BPath path;
@@ -506,7 +517,8 @@ bool Printer::MoveJob(const BString& name)
 // Returns:
 //    true if there is a job present in fJob.
 // ---------------------------------------------------------------
-bool Printer::FindSpooledJob()
+bool 
+Printer::FindSpooledJob()
 {
 	BString name2;
 	GetName(name2);
@@ -541,7 +553,8 @@ bool Printer::FindSpooledJob()
 // Returns:
 //    B_OK if successful.
 // ---------------------------------------------------------------
-status_t Printer::PrintSpooledJob(BFile* spoolFile)
+status_t 
+Printer::PrintSpooledJob(BFile* spoolFile)
 {
 	status_t rc;
 	image_id id;
@@ -578,7 +591,8 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile)
 // Parameters:
 //    job - the spool job.
 // ---------------------------------------------------------------
-void Printer::PrintThread(Job* job)
+void 
+Printer::PrintThread(Job* job)
 {
 	// Wait until resource is available
 	fResource->Lock();
@@ -615,7 +629,8 @@ void Printer::PrintThread(Job* job)
 // Returns:
 //    0 always.
 // ---------------------------------------------------------------
-status_t Printer::print_thread(void* data)
+status_t 
+Printer::print_thread(void* data)
 {
 	Job* job = static_cast<Job*>(data);
 	job->GetPrinter()->PrintThread(job);
@@ -629,7 +644,8 @@ status_t Printer::print_thread(void* data)
 // Sets the status of the current spool job to "processing" and
 // starts the print_thread.
 // ---------------------------------------------------------------
-void Printer::StartPrintThread()
+void 
+Printer::StartPrintThread()
 {
 	Acquire();
 	thread_id tid = spawn_thread(print_thread, "print", B_NORMAL_PRIORITY, (void*)fJob);

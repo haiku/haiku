@@ -41,16 +41,21 @@
 #define B_TRANSLATE_CONTEXT "PrintServerApp"
 
 
-BLocker *gLock = NULL;
-
-// ---------------------------------------------------------------
 typedef struct _printer_data {
 	char defaultPrinterName[256];
 } printer_data_t;
 
+
 typedef BMessage* (*config_func_t)(BNode*, const BMessage*);
 typedef BMessage* (*take_job_func_t)(BFile*, BNode*, const BMessage*);
 typedef char* (*add_printer_func_t)(const char* printer_name);
+
+
+static const char* kSettingsName = "print_server_settings";
+
+
+BLocker *gLock = NULL;
+
 
 /**
  * Main entry point of print_server.
@@ -70,6 +75,7 @@ main()
 	delete gLock;
 	return rc;
 }
+
 
 /**
  * Constructor for print_server's application class. Retrieves the
@@ -373,6 +379,7 @@ PrintServerApp::MessageReceived(BMessage* msg)
 	}
 }
 
+
 // ---------------------------------------------------------------
 // CreatePrinter(const char* printerName, const char* driverName,
 //               const char* connection, const char* transportName,
@@ -504,6 +511,7 @@ error:
 	return rc;
 }
 
+
 // ---------------------------------------------------------------
 // SelectPrinter(const char* printerName)
 //
@@ -555,6 +563,7 @@ PrintServerApp::SelectPrinter(const char* printerName)
 	return rc;
 }
 
+
 // ---------------------------------------------------------------
 // HandleSpooledJobs()
 //
@@ -570,6 +579,7 @@ PrintServerApp::HandleSpooledJobs()
 		printer->HandleSpooledJob();
 	}
 }
+
 
 // ---------------------------------------------------------------
 // RetrieveDefaultPrinter()
@@ -589,6 +599,7 @@ PrintServerApp::RetrieveDefaultPrinter()
 	fDefaultPrinter = Printer::Find(fSettings->DefaultPrinter());
 	return B_OK;
 }
+
 
 // ---------------------------------------------------------------
 // StoreDefaultPrinter()
@@ -611,6 +622,7 @@ PrintServerApp::StoreDefaultPrinter()
 		fSettings->SetDefaultPrinter("");
 	return B_OK;
 }
+
 
 // ---------------------------------------------------------------
 // FindPrinterNode(const char* name, BNode& node)
@@ -637,6 +649,7 @@ PrintServerApp::FindPrinterNode(const char* name, BNode& node)
 	path.Append(name);
 	return node.SetTo(path.Path());
 }
+
 
 // ---------------------------------------------------------------
 // FindPrinterDriver(const char* name, BPath& outPath)
@@ -667,7 +680,8 @@ PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
 }
 
 
-bool PrintServerApp::OpenSettings(BFile& file, const char* name,
+bool 
+PrintServerApp::OpenSettings(BFile& file, const char* name,
 	bool forReading)
 {
 	BPath path;
@@ -678,9 +692,9 @@ bool PrintServerApp::OpenSettings(BFile& file, const char* name,
 		&& file.SetTo(path.Path(), openMode) == B_OK;
 }
 
-static const char* kSettingsName = "print_server_settings";
 
-void PrintServerApp::LoadSettings() {
+void 
+PrintServerApp::LoadSettings() {
 	BFile file;
 	if (OpenSettings(file, kSettingsName, true)) {
 		fSettings->Load(&file);
@@ -688,7 +702,9 @@ void PrintServerApp::LoadSettings() {
 	}
 }
 
-void PrintServerApp::SaveSettings() {
+
+void 
+PrintServerApp::SaveSettings() {
 	BFile file;
 	if (OpenSettings(file, kSettingsName, false)) {
 		fSettings->SetUseConfigWindow(fUseConfigWindow);

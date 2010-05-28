@@ -41,6 +41,7 @@ static property_info prop_list[] = {
 	{ 0 } // terminate list 
 };
 
+
 void
 PrintServerApp::HandleScriptingCommand(BMessage* msg)
 {
@@ -131,7 +132,9 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 	}
 }
 
-Printer* PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
+
+Printer* 
+PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
 {
 	switch(msg->what) {
 		case B_NAME_SPECIFIER: {
@@ -162,7 +165,9 @@ Printer* PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
 	return NULL;
 }
 
-Transport* PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
+
+Transport* 
+PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
 {
 	switch(msg->what) {
 		case B_NAME_SPECIFIER: {
@@ -192,6 +197,7 @@ Transport* PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
 	
 	return NULL;
 }
+
 
 BHandler*
 PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
@@ -233,6 +239,7 @@ PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	
 	return rc;
 }
+
 
 status_t
 PrintServerApp::GetSupportedSuites(BMessage* msg)
