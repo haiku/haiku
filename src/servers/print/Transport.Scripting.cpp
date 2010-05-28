@@ -8,17 +8,22 @@
 
 #include "Transport.h"
 
-// BeOS API
-#include <PropertyInfo.h>
-#include <Messenger.h>
-#include <Message.h>
 #include <AppDefs.h>
+#include <Catalog.h>
+#include <Locale.h>
+#include <Message.h>
+#include <Messenger.h>
+#include <PropertyInfo.h>
+
+
+#define B_TRANSLATE_CONTEXT "Transport Scripting"
+
 
 static property_info prop_list[] = {
 	{ "Name", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Get name of transport" }, 
+		B_TRANSLATE_MARK("Get name of transport") }, 
 	{ "Ports", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Get currently available ports/devices" },
+		B_TRANSLATE_MARK("Get currently available ports/devices") },
 	{ 0 } // terminate list 
 };
 
@@ -86,6 +91,14 @@ BHandler* Transport::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec
 status_t Transport::GetSupportedSuites(BMessage* msg)
 {
 	msg->AddString("suites", "application/x-vnd.OpenBeOS-transport");
+	
+	static bool localized = false;
+	if (!localized) {
+		localized = true;
+		for (int i = 0; prop_list[i].name != NULL; i ++)
+			prop_list[i].usage = be_catalog->GetString(prop_list[i].usage, 
+				B_TRANSLATE_CONTEXT);
+	}
 	
 	BPropertyInfo prop_info(prop_list);
 	msg->AddFlat("messages", &prop_info);

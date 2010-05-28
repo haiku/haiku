@@ -34,7 +34,10 @@ DoCatalogs print_server :
 	x-vnd.Be-PSRV
 	:
 	ConfigWindow.cpp
+	Printer.Scripting.cpp
 	PrintServerApp.cpp
 	PrintServerApp.R5.cpp
+	PrintServerApp.Scripting.cpp
+	Transport.Scripting.cpp2
 ;
 
