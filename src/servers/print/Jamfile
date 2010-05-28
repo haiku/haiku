@@ -38,6 +38,6 @@ DoCatalogs print_server :
 	PrintServerApp.cpp
 	PrintServerApp.R5.cpp
 	PrintServerApp.Scripting.cpp
-	Transport.Scripting.cpp2
+	Transport.Scripting.cpp
 ;
 
