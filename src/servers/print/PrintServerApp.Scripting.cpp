@@ -11,28 +11,33 @@
 #include "Printer.h"
 
 	// BeOS API
+#include <Catalog.h>
+#include <Locale.h>
 #include <PropertyInfo.h>
 
 	// ANSI C
 #include <stdio.h>
 
+#define B_TRANSLATE_CONTEXT "PrintServerApp Scripting"
+
+
 static property_info prop_list[] = {
 	{ "ActivePrinter", { B_GET_PROPERTY, B_SET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Retrieve or select the active printer" }, 
+		B_TRANSLATE_MARK("Retrieve or select the active printer") }, 
 	{ "Printer", { B_GET_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_REVERSE_INDEX_SPECIFIER },
-		"Retrieve a specific printer" },
+		B_TRANSLATE_MARK("Retrieve a specific printer") },
 	{ "Printer", { B_CREATE_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Create a new printer" },
+		B_TRANSLATE_MARK("Create a new printer") },
 	{ "Printer", { B_DELETE_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_REVERSE_INDEX_SPECIFIER },
-		"Delete a specific printer" },
+		B_TRANSLATE_MARK("Delete a specific printer") },
 	{ "Printers", { B_COUNT_PROPERTIES }, { B_DIRECT_SPECIFIER },
-		"Return the number of available printers" },
+		B_TRANSLATE_MARK("Return the number of available printers") },
 	{ "Transport", { B_GET_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_REVERSE_INDEX_SPECIFIER },
-		"Retrieve a specific transport" },
+		B_TRANSLATE_MARK("Retrieve a specific transport") },
 	{ "Transports", { B_COUNT_PROPERTIES }, { B_DIRECT_SPECIFIER },
-		"Return the number of available transports" },
+		B_TRANSLATE_MARK("Return the number of available transports") },
 	{ "UseConfigWindow", { B_GET_PROPERTY, B_SET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Show configuration window" },
+		B_TRANSLATE_MARK("Show configuration window") },
 	{ 0 } // terminate list 
 };
 
@@ -233,6 +238,14 @@ status_t
 PrintServerApp::GetSupportedSuites(BMessage* msg)
 {
 	msg->AddString("suites", "suite/vnd.OpenBeOS-printserver");
+	
+	static bool localized = false;
+	if (!localized) {
+		localized = true;
+		for (int i = 0; prop_list[i].name != NULL; i ++)
+			prop_list[i].usage = be_catalog->GetString(prop_list[i].usage, 
+				B_TRANSLATE_CONTEXT);
+	}
 	
 	BPropertyInfo prop_info(prop_list);
 	msg->AddFlat("messages", &prop_info);

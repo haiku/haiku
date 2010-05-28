@@ -11,24 +11,31 @@
 #include "pr_server.h"
 
 	// BeOS API
-#include <PropertyInfo.h>
-#include <Messenger.h>
-#include <Message.h>
 #include <AppDefs.h>
+#include <Catalog.h>
+#include <Locale.h>
+#include <Message.h>
+#include <Messenger.h>
+#include <PropertyInfo.h>
+
+
+#define B_TRANSLATE_CONTEXT "Printer Scripting"
+
 
 static property_info prop_list[] = {
 	{ "Name", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Get name of printer" }, 
+		B_TRANSLATE_MARK("Get name of printer") }, 
 	{ "TransportAddon", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Get name of the transport add-on used for this printer" },
+		B_TRANSLATE_MARK("Get name of the transport add-on used for this printer") },
 	{ "TransportConfig", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Get the transport configuration for this printer" },
+		B_TRANSLATE_MARK("Get the transport configuration for this printer") },
 	{ "PrinterAddon", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Get name of the printer add-on used for this printer" },
+		B_TRANSLATE_MARK("Get name of the printer add-on used for this printer") },
 	{ "Comments", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"Get comments about this printer" },
+		B_TRANSLATE_MARK("Get comments about this printer") },
 	{ 0 } // terminate list 
 };
+
 
 void Printer::HandleScriptingCommand(BMessage* msg)
 {
@@ -52,7 +59,7 @@ void Printer::HandleScriptingCommand(BMessage* msg)
 					rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &result);
 				else if (propName == "Comments")
 					rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_COMMENTS, &result);
-				else { // If unknown scripting request, let superclas handle it
+				else { // If unknown scripting request, let super class handle it
 					Inherited::MessageReceived(msg);
 					break;
 				}
@@ -94,7 +101,15 @@ BHandler* Printer::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 status_t Printer::GetSupportedSuites(BMessage* msg)
 {
 	msg->AddString("suites", "application/x-vnd.OpenBeOS-printer");
-	
+
+	static bool localized = false;
+	if (!localized) {
+		localized = true;
+		for (int i = 0; prop_list[i].name != NULL; i ++)
+			prop_list[i].usage = be_catalog->GetString(prop_list[i].usage, 
+				B_TRANSLATE_CONTEXT);
+	}
+		
 	BPropertyInfo prop_info(prop_list);
 	msg->AddFlat("messages", &prop_info);
 	

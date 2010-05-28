@@ -27,6 +27,7 @@
 // Haiku
 #include <Catalog.h>
 #include <Layout.h>
+#include <Locale.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 
@@ -68,18 +69,30 @@ static struct PageFormat
 	float height;
 } pageFormat[] =
 {
-	{B_TRANSLATE_MARK("Letter"), letter_width, letter_height },
-	{B_TRANSLATE_MARK("Legal"),  legal_width,  legal_height  },
-	{B_TRANSLATE_MARK("Ledger"), ledger_width, ledger_height  },
-	{B_TRANSLATE_MARK("Tabloid"), tabloid_width, tabloid_height  },
-	{B_TRANSLATE_MARK("A0"),     a0_width,     a0_height     },
-	{B_TRANSLATE_MARK("A1"),     a1_width,     a1_height     },
-	{B_TRANSLATE_MARK("A2"),     a2_width,     a2_height     },
-	{B_TRANSLATE_MARK("A3"),     a3_width,     a3_height     },
-	{B_TRANSLATE_MARK("A4"),     a4_width,     a4_height     },
-	{B_TRANSLATE_MARK("A5"),     a5_width,     a5_height     },
-	{B_TRANSLATE_MARK("A6"),     a6_width,     a6_height     },
-	{B_TRANSLATE_MARK("B5"),     b5_width,     b5_height     },
+	{B_TRANSLATE_MARK_COMMENT("Letter", "ANSI A (letter), a North American "
+		"paper size"), letter_width, letter_height },
+	{B_TRANSLATE_MARK_COMMENT("Legal", "A North American paper size (216 x 356"
+		" mm, or 8.5 x 14 in)"), legal_width,  legal_height },
+	{B_TRANSLATE_MARK_COMMENT("Ledger", "ANSI B (ledger), a North American "
+		"paper size"), ledger_width, ledger_height },
+	{B_TRANSLATE_MARK_COMMENT("Tabloid", "ANSI B (tabloid), a North American "
+		"paper size"), tabloid_width, tabloid_height },
+	{B_TRANSLATE_MARK_COMMENT("A0", "ISO 216 paper size"), 
+		a0_width, a0_height },
+	{B_TRANSLATE_MARK_COMMENT("A1", "ISO 216 paper size"),
+		a1_width, a1_height },
+	{B_TRANSLATE_MARK_COMMENT("A2", "ISO 216 paper size"), 
+		a2_width, a2_height },
+	{B_TRANSLATE_MARK_COMMENT("A3", "ISO 216 paper size"), 
+		a3_width, a3_height },
+	{B_TRANSLATE_MARK_COMMENT("A4", "ISO 216 paper size"), 
+		a4_width, a4_height },
+	{B_TRANSLATE_MARK_COMMENT("A5", "ISO 216 paper size"), 
+		a5_width, a5_height },
+	{B_TRANSLATE_MARK_COMMENT("A6", "ISO 216 paper size"), 
+		a6_width, a6_height },
+	{B_TRANSLATE_MARK_COMMENT("B5", "ISO 216 paper size"), 
+		b5_width, b5_height },
 };
 
 
@@ -124,7 +137,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 {
 	MimeTypeForSender(settings, fSenderMimeType);
 	PrinterForMimeType();
-
+	
 	if (kind == kJobSetup)
 		SetTitle(B_TRANSLATE("Print setup"));
 
@@ -284,20 +297,17 @@ void ConfigWindow::MessageReceived(BMessage* m)
 }
 
 
-static const char*
-kAbout =
-"Printer server\n"
-"© 2001-2010 Haiku, Inc.\n"
-"\n"
-"\tIthamar R. Adema\n"
-"\tMichael Pfeiffer\n"
-;
-
-
 void
 ConfigWindow::AboutRequested()
 {
-	BAlert *about = new BAlert("About printer server", kAbout,
+	BString text = B_TRANSLATE("Printer server");
+	text <<	"\n"
+		"© 2001-2010 Haiku, Inc.\n"
+		"\n"
+		"\tIthamar R. Adema\n"
+		"\tMichael Pfeiffer\n";
+
+	BAlert *about = new BAlert("About printer server", text.String(),
 		B_TRANSLATE("OK"));
 	about->Go();
 }
@@ -490,26 +500,45 @@ void ConfigWindow::UpdateUI()
 		}
 		fPageFormatText->SetText(pageFormat.String());
 
-			// display information about job
+		// display information about job
 		if (fKind == kJobSetup) {
 			BString job;
-			int32 first, last;
+			int32 first, last, copies;
 			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
 				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
-				if (first >= 1 && first <= last && last != INT_MAX) {
-					job << B_TRANSLATE("Page") << " " << first << " " <<
-						B_TRANSLATE("to") << " " << last;
-				} else {
-					job << B_TRANSLATE("All pages");
-				}
-				int32 copies;
+				
+				bool printRange = first >= 1 && first <= last && last != INT_MAX;
+				char number[12];				
 				if (fJobSettings.FindInt32(PSRV_FIELD_COPIES, &copies)
 					== B_OK && copies > 1) {
-					job << ", " << copies << " " << B_TRANSLATE("copies");
+					if (printRange) {
+						job = B_TRANSLATE("Page %1 to %2, %3 copies");
+						sprintf(number, "%d", (int)first);
+						job.ReplaceFirst("%1", number);
+						sprintf(number, "%d", (int)last);
+						job.ReplaceFirst("%2", number);
+						sprintf(number, "%d", (int)copies);
+						job.ReplaceFirst("%3", number);
+					} else {
+						job = B_TRANSLATE("All pages, %1 copies");
+						sprintf(number, "%d", (int)copies);
+						job.ReplaceFirst("%1", number);
+					}
+				} else {
+					if (printRange) {
+						job = B_TRANSLATE("Page %1 to %2");
+						sprintf(number, "%d", (int)first);
+						job.ReplaceFirst("%1", number);
+						sprintf(number, "%d", (int)last);
+						job.ReplaceFirst("%2", number);
+					} else {
+						job = B_TRANSLATE("All pages");
+					}
 				}
 			} else {
 				job << B_TRANSLATE("Undefined");
 			}
+			
 			fJobSetupText->SetText(job.String());
 		}
 	}
