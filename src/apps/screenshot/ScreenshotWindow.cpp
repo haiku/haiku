@@ -128,6 +128,7 @@ ScreenshotWindow::ScreenshotWindow()
 	settings.FindInt64("delay", &fDelay);
 	settings.FindString("outputFilename", &fOutputFilename);
 
+	_TakeScreenshot(0);
 	_InitWindow(settings);
 	CenterOnScreen();
 	Show();
@@ -146,7 +147,7 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fScreenshot(NULL),
 	fOutputPathPanel(NULL),
 	fLastSelectedPath(NULL),
-	fDelay(delay),
+	fDelay(0),
 	fTabHeight(0),
 	fIncludeBorder(includeBorder),
 	fIncludeMouse(includeMouse),
@@ -158,10 +159,13 @@ ScreenshotWindow::ScreenshotWindow(bigtime_t delay, bool includeBorder,
 	fImageFileType(imageFileType)
 {
 	if (fSaveScreenshotSilent) {
-		_TakeScreenshot(fDelay);
+		_TakeScreenshot(delay);
 		_SaveScreenshot();
 		be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 	} else {
+		if (!fShowConfigWindow)
+			_TakeScreenshot(delay);
+		
 		BMessage settings = _ReadSettings();
 		_InitWindow(settings);
 		CenterOnScreen();
@@ -336,7 +340,6 @@ ScreenshotWindow::_InitWindow(const BMessage& settings)
 	_SetupSecondLayoutItem(layout, settings);
 
 	if (!fShowConfigWindow) {
-		_TakeScreenshot(0);
 		_UpdatePreviewPanel();
 		layout->SetVisibleItem(1L);
 		fSaveScreenshot->MakeDefault(true);
