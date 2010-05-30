@@ -413,10 +413,10 @@ static void
 print_extended_features(uint32 features)
 {
 	static const char *kFeatures[32] = {
-		"SSE3", NULL, NULL, "MONITOR", "DS-CPL", NULL, NULL, "EST",
-		"TM2", NULL, "CNTXT-ID", NULL, NULL, "CMPXCHG16B", NULL, NULL,
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+		"SSE3", "PCLMULDQ", "DTES64", "MONITOR", "DS-CPL", "VMX", "SMX", "EST",
+		"TM2", "SSSE3", "CNTXT-ID", NULL, NULL, "CX16", "xTPR", "PDCM",
+		NULL, NULL, "DCA", "SSE4.1", "SSE4.2", "x2APIC", "MOVEB", "POPCNT",
+		NULL, "AES", "XSAVE", "OSXSAVE", NULL, NULL, NULL, NULL
 	};
 	int32 found = 0;
 	int32 i;
