@@ -48,36 +48,49 @@ static status_t
 get_description(void* cookie, multi_description* data)
 {
 	dprintf("null_audio: %s\n" , __func__ );
-	data->interface_version = B_CURRENT_INTERFACE_VERSION;
-	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
-
-	strcpy(data->friendly_name,"Virtual audio (null_audio)");
-	strcpy(data->vendor_info,"Host/Haiku");
-
-	data->output_channel_count = 2;
-	data->input_channel_count = 2;
-	data->output_bus_channel_count = 2;
-	data->input_bus_channel_count = 2;
-	data->aux_bus_channel_count = 0;
-
-	if (data->request_channel_count >= (int)(sizeof(channel_descriptions) / sizeof(channel_descriptions[0]))) {
-		memcpy(data->channels,&channel_descriptions,sizeof(channel_descriptions));
+	
+	multi_description description;
+	if(user_memcpy(&description, data, sizeof(multi_description)) != B_OK) {
+		return B_BAD_ADDRESS;
 	}
 
-	data->output_rates = B_SR_44100;
-	data->input_rates = B_SR_44100;
+	description.interface_version = B_CURRENT_INTERFACE_VERSION;
+	description.interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	data->max_cvsr_rate = 0;
-	data->min_cvsr_rate = 0;
+	strcpy(description.friendly_name,"Virtual audio (null_audio)");
+	strcpy(description.vendor_info,"Host/Haiku");
 
-	data->output_formats = B_FMT_16BIT;
-	data->input_formats = B_FMT_16BIT;
-	data->lock_sources = B_MULTI_LOCK_INTERNAL;
-	data->timecode_sources = 0;
-	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
-	data->start_latency = 30000;
+	description.output_channel_count = 2;
+	description.input_channel_count = 2;
+	description.output_bus_channel_count = 2;
+	description.input_bus_channel_count = 2;
+	description.aux_bus_channel_count = 0;
 
-	strcpy(data->control_panel,"");
+	description.output_rates = B_SR_44100;
+	description.input_rates = B_SR_44100;
+  
+	description.max_cvsr_rate = 0;
+	description.min_cvsr_rate = 0;
+
+	description.output_formats = B_FMT_16BIT;
+	description.input_formats = B_FMT_16BIT;
+	description.lock_sources = B_MULTI_LOCK_INTERNAL;
+	description.timecode_sources = 0;
+	description.interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
+	description.start_latency = 30000;
+
+	strcpy(description.control_panel,"");
+
+	if(user_memcpy(data, &description, sizeof(multi_description)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	if(description.request_channel_count 
+			>= sizeof(channel_descriptions) / sizeof(channel_descriptions[0])) {
+		if(user_memcpy(data->channels, 
+					&channel_descriptions, sizeof(channel_descriptions)) != B_OK)
+			return B_BAD_ADDRESS;
+	}
 
 	return B_OK;
 }
@@ -255,12 +268,17 @@ get_buffers(device_t* device, multi_buffer_list* data)
 
 
 static status_t
-buffer_exchange(device_t* device, multi_buffer_info* buffer_info)
+buffer_exchange(device_t* device, multi_buffer_info* info)
 {
 	//dprintf("null_audio: %s\n" , __func__ );
 	static int debug_buffers_exchanged = 0;
 	cpu_status status;
 	status_t result;
+
+	multi_buffer_info buffer_info;
+	if(user_memcpy(&buffer_info, info, sizeof(multi_buffer_info)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
 
 	// On first call, we start our fake hardware.
 	// Usually one would jump into his interrupt handler now
@@ -282,13 +300,13 @@ buffer_exchange(device_t* device, multi_buffer_info* buffer_info)
 	status = disable_interrupts();
 	acquire_spinlock(&device->playback_stream.lock);
 
-	buffer_info->playback_buffer_cycle = device->playback_stream.buffer_cycle;
-	buffer_info->played_real_time = device->playback_stream.real_time;
-	buffer_info->played_frames_count = device->playback_stream.frames_count;
+	buffer_info.playback_buffer_cycle = device->playback_stream.buffer_cycle;
+	buffer_info.played_real_time = device->playback_stream.real_time;
+	buffer_info.played_frames_count = device->playback_stream.frames_count;
 
-	buffer_info->record_buffer_cycle = device->record_stream.buffer_cycle;
-	buffer_info->recorded_real_time = device->record_stream.real_time;
-	buffer_info->recorded_frames_count = device->record_stream.frames_count;
+	buffer_info.record_buffer_cycle = device->record_stream.buffer_cycle;
+	buffer_info.recorded_real_time = device->record_stream.real_time;
+	buffer_info.recorded_frames_count = device->record_stream.frames_count;
 
 	release_spinlock(&device->playback_stream.lock);
 	restore_interrupts(status);
@@ -296,6 +314,10 @@ buffer_exchange(device_t* device, multi_buffer_info* buffer_info)
 	debug_buffers_exchanged++;
 	if (((debug_buffers_exchanged % 5000) == 0) ) { //&& debug_buffers_exchanged < 1111) {
 		dprintf("null_audio: %s: %d buffers processed\n", __func__, debug_buffers_exchanged);
+	}
+
+	if(user_memcpy(info, &buffer_info, sizeof(multi_buffer_info)) != B_OK) {
+		return B_BAD_ADDRESS;
 	}
 
 	return B_OK;

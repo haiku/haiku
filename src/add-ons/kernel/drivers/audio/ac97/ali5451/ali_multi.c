@@ -107,36 +107,46 @@ static const multi_channel_info channel_descriptions[] = {
 static status_t
 get_description(void *cookie, multi_description *data)
 {
-	data->interface_version = B_CURRENT_INTERFACE_VERSION;
-	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
-
-	strcpy(data->friendly_name, "ALI M5451");
-	strcpy(data->vendor_info, "Krzysztof Ćwiertnia");
-
-	data->output_channel_count = ALI_SUPPORTED_OUTPUT_CHANNELS;
-	data->input_channel_count = ALI_SUPPORTED_INPUT_CHANNELS;
-	data->output_bus_channel_count = ALI_SUPPORTED_OUTPUT_CHANNELS;
-	data->input_bus_channel_count = ALI_SUPPORTED_INPUT_CHANNELS;
-	data->aux_bus_channel_count = 0;
-
-	if ((int32) (sizeof(channel_descriptions)/sizeof(channel_descriptions[0]))
-			<= data->request_channel_count) {
-		memcpy(data->channels, &channel_descriptions,
-			sizeof(channel_descriptions));
+	multi_description description;
+	if(user_memcpy(&description, data, sizeof(multi_description)) != B_OK) {
+		return B_BAD_ADDRESS;
 	}
 
-	data->output_formats = ALI_VALID_OUTPUT_FORMATS;
-	data->output_rates = ALI_VALID_OUTPUT_SAMPLE_RATES;
+	description.interface_version = B_CURRENT_INTERFACE_VERSION;
+	description.interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	data->input_formats = ALI_VALID_INPUT_FORMATS;
-	data->input_rates = ALI_VALID_INPUT_SAMPLE_RATES;
+	strcpy(description.friendly_name, "ALI M5451");
+	strcpy(description.vendor_info, "Krzysztof Ćwiertnia");
 
-	data->lock_sources = B_MULTI_LOCK_INTERNAL;
-	data->timecode_sources = 0;
-	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK|B_MULTI_INTERFACE_RECORD;
-	data->start_latency = 30000;
+	description.output_channel_count = ALI_SUPPORTED_OUTPUT_CHANNELS;
+	description.input_channel_count = ALI_SUPPORTED_INPUT_CHANNELS;
+	description.output_bus_channel_count = ALI_SUPPORTED_OUTPUT_CHANNELS;
+	description.input_bus_channel_count = ALI_SUPPORTED_INPUT_CHANNELS;
+	description.aux_bus_channel_count = 0;
 
-	strcpy(data->control_panel,"");
+	description.output_formats = ALI_VALID_OUTPUT_FORMATS;
+	description.output_rates = ALI_VALID_OUTPUT_SAMPLE_RATES;
+
+	description.input_formats = ALI_VALID_INPUT_FORMATS;
+	description.input_rates = ALI_VALID_INPUT_SAMPLE_RATES;
+
+	description.lock_sources = B_MULTI_LOCK_INTERNAL;
+	description.timecode_sources = 0;
+	description.interface_flags = B_MULTI_INTERFACE_PLAYBACK|B_MULTI_INTERFACE_RECORD;
+	description.start_latency = 30000;
+
+	strcpy(description.control_panel,"");
+
+	if(user_memcpy(data, &description, sizeof(multi_description)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	if(description.request_channel_count >= 
+			sizeof(channel_descriptions) / sizeof(channel_descriptions[0])) {
+		if(user_memcpy(data->channels, 
+					&channel_descriptions, sizeof(channel_descriptions)) != B_OK)
+			return B_BAD_ADDRESS;
+	}
 
 	return B_OK;
 }
@@ -487,10 +497,15 @@ get_buffers(ali_dev *card, multi_buffer_list *data)
 
 
 static status_t
-buffer_exchange(ali_dev *card, multi_buffer_info *buffer_info)
+buffer_exchange(ali_dev *card, multi_buffer_info *info)
 {
 	status_t res;
 	ali_stream *play_s, *rec_s;
+
+	multi_buffer_info buffer_info;
+	if(user_memcpy(&buffer_info, info, sizeof(multi_buffer_info)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
 
 	play_s = card->playback_stream;
 	rec_s = card->record_stream;
@@ -513,15 +528,19 @@ buffer_exchange(ali_dev *card, multi_buffer_info *buffer_info)
 
 	LOCK(card->lock_sts);
 
-	buffer_info->played_frames_count = play_s->frames_count;
-	buffer_info->played_real_time = play_s->real_time;
-	buffer_info->playback_buffer_cycle = play_s->buffer_cycle;
+	buffer_info.played_frames_count = play_s->frames_count;
+	buffer_info.played_real_time = play_s->real_time;
+	buffer_info.playback_buffer_cycle = play_s->buffer_cycle;
 
-	buffer_info->recorded_frames_count = rec_s->frames_count;
-	buffer_info->recorded_real_time = rec_s->real_time;
-	buffer_info->record_buffer_cycle = rec_s->buffer_cycle;
+	buffer_info.recorded_frames_count = rec_s->frames_count;
+	buffer_info.recorded_real_time = rec_s->real_time;
+	buffer_info.record_buffer_cycle = rec_s->buffer_cycle;
 
 	UNLOCK(card->lock_sts);
+
+	if(user_memcpy(info, &buffer_info, sizeof(multi_buffer_info)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
 
 	return B_OK;
 }
