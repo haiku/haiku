@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
+
 
 //!	Everything doing the real input/output stuff.
 
@@ -46,8 +47,7 @@ prevent_allow(scsi_periph_device_info *device, bool prevent)
 }
 
 
-/** !!!keep this in sync with scsi_raw driver!!! */
-
+/*! Keep this in sync with scsi_raw driver!!! */
 static status_t
 raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 {
@@ -142,10 +142,9 @@ periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 }
 
 
-/*!	kernel daemon
-	once in a minute, it sets a flag so that the next command is executed
-	ordered; this way, we avoid starvation of SCSI commands inside the
-	SCSI queuing system - the ordered command waits for all previous
+/*!	Kernel daemon - once in a minute, it sets a flag so that the next command
+	is executed ordered; this way, we avoid starvation of SCSI commands inside
+	the SCSI queuing system - the ordered command waits for all previous
 	commands and thus no command can starve longer then a minute
 */
 void
@@ -216,9 +215,9 @@ periph_io(scsi_periph_device_info *device, io_operation *operation,
 		request->timeout = device->std_timeout;
 		// see whether daemon instructed us to post an ordered command;
 		// reset flag after read
-		SHOW_FLOW( 3, "flag=%x, next_tag=%x, ordered: %s",
+		SHOW_FLOW(3, "flag=%x, next_tag=%x, ordered: %s",
 			(int)request->flags, (int)device->next_tag_action,
-			(request->flags & SCSI_ORDERED_QTAG) != 0 ? "yes" : "no" );
+			(request->flags & SCSI_ORDERED_QTAG) != 0 ? "yes" : "no");
 
 		// use shortest commands whenever possible
 		if (pos + numBlocks < 0x200000 && numBlocks <= 0x100) {
@@ -265,6 +264,7 @@ periph_io(scsi_periph_device_info *device, io_operation *operation,
 		// ask generic peripheral layer what to do now
 		res = periph_check_error(device, request);
 
+		// TODO: bytes might have been transferred even in the error case!
 		switch (res.action) {
 			case err_act_ok:
 				*_bytesTransferred = numBytes - request->data_resid;
@@ -287,7 +287,7 @@ periph_io(scsi_periph_device_info *device, io_operation *operation,
 					res.action = err_act_fail;
 				break;
 		}
-	} while((res.action == err_act_retry && retries++ < 3)
+	} while ((res.action == err_act_retry && retries++ < 3)
 		|| (res.action == err_act_many_retries && retries++ < 30));
 
 	device->scsi->free_ccb(request);
