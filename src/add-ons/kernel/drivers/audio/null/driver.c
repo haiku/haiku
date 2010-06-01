@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Bek, host.haiku@gmx.de
+ *		Bek, host.haiku@gmx.de
  */
 #include "driver.h"
 
@@ -52,7 +52,7 @@ null_audio_open (const char *name, uint32 flags, void** cookie)
 {
 	dprintf("null_audio: %s\n" , __func__ );
 	*cookie = &device;
-    return B_OK;
+	return B_OK;
 }
 
 
@@ -115,12 +115,12 @@ null_audio_free (void* cookie)
 
 
 device_hooks driver_hooks = {
-        null_audio_open,
-        null_audio_close,
-        null_audio_free,
-        null_audio_control,
-        null_audio_read,
-        null_audio_write
+	null_audio_open,
+	null_audio_close,
+	null_audio_free,
+	null_audio_control,
+	null_audio_read,
+	null_audio_write
 };
 
 

@@ -108,9 +108,8 @@ static status_t
 get_description(void *cookie, multi_description *data)
 {
 	multi_description description;
-	if(user_memcpy(&description, data, sizeof(multi_description)) != B_OK) {
+	if (user_memcpy(&description, data, sizeof(multi_description)) != B_OK)
 		return B_BAD_ADDRESS;
-	}
 
 	description.interface_version = B_CURRENT_INTERFACE_VERSION;
 	description.interface_minimum = B_CURRENT_INTERFACE_VERSION;
@@ -137,13 +136,12 @@ get_description(void *cookie, multi_description *data)
 
 	strcpy(description.control_panel,"");
 
-	if(user_memcpy(data, &description, sizeof(multi_description)) != B_OK) {
+	if (user_memcpy(data, &description, sizeof(multi_description)) != B_OK)
 		return B_BAD_ADDRESS;
-	}
 
-	if(description.request_channel_count >= 
-			sizeof(channel_descriptions) / sizeof(channel_descriptions[0])) {
-		if(user_memcpy(data->channels, 
+	if (description.request_channel_count
+			>= sizeof(channel_descriptions) / sizeof(channel_descriptions[0])) {
+		if (user_memcpy(data->channels,
 					&channel_descriptions, sizeof(channel_descriptions)) != B_OK)
 			return B_BAD_ADDRESS;
 	}
@@ -232,7 +230,7 @@ get_mix_mixer(ali_dev *card, multi_mix_value *mmv, int32 id)
 						* ((ac97_reg_cached_read(card->codec, mixer_info->reg)
 							>> ((gadget_id==ALI_MIX_LEFT_ID)?8:0)) & 0x1f));
 				mmv->u.gain = ((mixer_info->features&ALI_MIX_FT_GAIN)
-					? mixer_info->min_gain+val:mixer_info->max_gain-val);
+					? mixer_info->min_gain + val : mixer_info->max_gain - val);
 			}
 			break;
 
@@ -260,7 +258,7 @@ get_mix(ali_dev *card, multi_mix_value_info *mmvi)
 
 	for (i = 0; i < mmvi->item_count; i++)
 		get_mix_mixer(card, &(mmvi->values[i]),
-			mmvi->values[i].id-MULTI_AUDIO_BASE_ID);
+			mmvi->values[i].id - MULTI_AUDIO_BASE_ID);
 
 	return B_OK;
 }
@@ -289,10 +287,10 @@ set_mix_mixer(ali_dev *card, multi_mix_value *mmv, int32 id)
 			val = ac97_reg_cached_read(card->codec, mixer_info->reg);
 			val &= (gadget_id == ALI_MIX_LEFT_ID) ? 0x805f : 0x9f00;
 			val |= (uint16) (((mixer_info->features&ALI_MIX_FT_GAIN)
-					? mixer_info->min_gain+mmv->u.gain
-					: mixer_info->max_gain-mmv->u.gain)
-						/ ALI_MIXER_GRANULARITY) << 
-							((gadget_id == ALI_MIX_LEFT_ID) ? 8 : 0);
+					? mixer_info->min_gain + mmv->u.gain
+					: mixer_info->max_gain - mmv->u.gain)
+						/ ALI_MIXER_GRANULARITY)
+							<< ((gadget_id == ALI_MIX_LEFT_ID) ? 8 : 0);
 			ac97_reg_cached_write(card->codec, mixer_info->reg, val);
 			break;
 
@@ -317,7 +315,7 @@ set_mix(ali_dev *card, multi_mix_value_info *mmvi)
 
 	for (i = 0; i < mmvi->item_count; i++)
 		set_mix_mixer(card, &(mmvi->values[i]),
-			mmvi->values[i].id-MULTI_AUDIO_BASE_ID);
+			mmvi->values[i].id - MULTI_AUDIO_BASE_ID);
 
 	return B_OK;
 }
@@ -476,7 +474,7 @@ get_buffers(ali_dev *card, multi_buffer_list *data)
 	data->return_playback_channels = card->playback_stream->channels;
 	data->return_playback_buffer_size = card->playback_stream->buf_frames;
 
-	for (buf_ndx=0; buf_ndx<card->playback_stream->buf_count; buf_ndx++)
+	for (buf_ndx = 0; buf_ndx<card->playback_stream->buf_count; buf_ndx++)
 		for (ch_ndx = 0; ch_ndx < card->playback_stream->channels; ch_ndx++)
 			ali_stream_get_buffer_part(card->playback_stream, ch_ndx, buf_ndx,
 				&data->playback_buffers[buf_ndx][ch_ndx].base,
@@ -503,9 +501,8 @@ buffer_exchange(ali_dev *card, multi_buffer_info *info)
 	ali_stream *play_s, *rec_s;
 
 	multi_buffer_info buffer_info;
-	if(user_memcpy(&buffer_info, info, sizeof(multi_buffer_info)) != B_OK) {
+	if (user_memcpy(&buffer_info, info, sizeof(multi_buffer_info)) != B_OK)
 		return B_BAD_ADDRESS;
-	}
 
 	play_s = card->playback_stream;
 	rec_s = card->record_stream;
@@ -538,9 +535,8 @@ buffer_exchange(ali_dev *card, multi_buffer_info *info)
 
 	UNLOCK(card->lock_sts);
 
-	if(user_memcpy(info, &buffer_info, sizeof(multi_buffer_info)) != B_OK) {
+	if (user_memcpy(info, &buffer_info, sizeof(multi_buffer_info)) != B_OK)
 		return B_BAD_ADDRESS;
-	}
 
 	return B_OK;
 }

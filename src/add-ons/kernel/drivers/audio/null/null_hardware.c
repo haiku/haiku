@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Bek, host.haiku@gmx.de
+ *		Bek, host.haiku@gmx.de
  */
 #include "driver.h"
 
@@ -41,8 +41,8 @@ null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 		return result;
 	}
 
-	for (i=0; i < stream->num_buffers; i++) {
-		stream->buffers[i] = buffer + (i*buffer_size);
+	for (i = 0; i < stream->num_buffers; i++) {
+		stream->buffers[i] = buffer + (i * buffer_size);
 	}
 
 	stream->buffer_ready_sem = create_sem(0, name);
@@ -76,7 +76,7 @@ null_fake_interrupt(void* cookie)
 
 	// The time between until we get a new valid buffer
 	// from our soundcard: buffer_length / samplerate
-	sleepTime = (device->playback_stream.buffer_length*1000000LL) / sampleRate;
+	sleepTime = (device->playback_stream.buffer_length * 1000000LL) / sampleRate;
 
 	while (device->running) {
 		cpu_status status;

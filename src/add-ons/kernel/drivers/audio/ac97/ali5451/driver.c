@@ -62,7 +62,7 @@ ali_stream_new(ali_dev *card, bool rec, uint8 buf_count)
 
 	stream->frames_count = 0;
 	stream->real_time = 0;
-	stream->buffer_cycle = (rec?buf_count-1:0);
+	stream->buffer_cycle = (rec ? buf_count - 1 : 0);
 
 	LOCK(card->lock_sts);
 	LIST_INSERT_HEAD(&(card->streams), stream, next);
@@ -256,7 +256,7 @@ exit_:
 static void
 make_device_names(ali_dev *card)
 {
-	sprintf(card->name, DEVFS_PATH_FORMAT, card-gCards+1);
+	sprintf(card->name, DEVFS_PATH_FORMAT, card - gCards + 1);
 }
 
 
@@ -344,7 +344,7 @@ init_hardware(void)
 	if (get_module(B_PCI_MODULE_NAME, (module_info**) &gPCI) != B_OK)
 		return res;
 
-	for (i=0; (*gPCI->get_nth_pci_info)(i, &info) == B_OK; i++) {
+	for (i = 0; (*gPCI->get_nth_pci_info)(i, &info) == B_OK; i++) {
 		if (info.class_base == PCI_multimedia &&
 			info.vendor_id == ALI_VENDOR_ID &&
 			info.device_id == ALI_DEVICE_ID) {
@@ -383,7 +383,7 @@ init_driver(void)
 			memset(&gCards[gCardsCount], 0, sizeof(ali_dev));
 			gCards[gCardsCount].info = info;
 			if (ali_setup(&gCards[gCardsCount]))
-				TRACE("init_driver: setup of ali %ld failed\n", gCardsCount+1);
+				TRACE("init_driver: setup of ali %ld failed\n", gCardsCount + 1);
 			else
 				gCardsCount++;
 		}
@@ -417,7 +417,7 @@ uninit_driver(void)
 const char **
 publish_devices(void)
 {
-	static const char *names[MAX_CARDS+1];
+	static const char *names[MAX_CARDS + 1];
 	int32 i;
 
 	for (i = 0; i < gCardsCount; i++)

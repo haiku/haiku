@@ -62,35 +62,35 @@ extern pci_module_info *gPCI;
 static uint32
 io_read32(ali_dev *card, ulong offset)
 {
-	return (*gPCI->read_io_32)(card->io_base+offset);
+	return (*gPCI->read_io_32)(card->io_base + offset);
 }
 
 
 static uint8
 io_read8(ali_dev *card, ulong offset)
 {
-	return (*gPCI->read_io_8)(card->io_base+offset);
+	return (*gPCI->read_io_8)(card->io_base + offset);
 }
 
 
 static void
 io_write32(ali_dev *card, ulong offset, uint32 value)
 {
-	(*gPCI->write_io_32)(card->io_base+offset, value);
+	(*gPCI->write_io_32)(card->io_base + offset, value);
 }
 
 
 static void
 io_write16(ali_dev *card, ulong offset, uint16 value)
 {
-	(*gPCI->write_io_16)(card->io_base+offset, value);
+	(*gPCI->write_io_16)(card->io_base + offset, value);
 }
 
 
 static void
 io_write8(ali_dev *card, ulong offset, uint8 value)
 {
-	(*gPCI->write_io_8)(card->io_base+offset, value);
+	(*gPCI->write_io_8)(card->io_base + offset, value);
 }
 
 
