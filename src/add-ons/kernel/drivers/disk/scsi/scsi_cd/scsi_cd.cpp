@@ -128,7 +128,7 @@ get_toc(cd_driver_info *info, scsi_toc *toc)
 	status_t res;
 	scsi_cmd_read_toc *cmd;
 	size_t dataLength;
-	scsi_toc_general *short_response = (scsi_toc_general *)toc->toc_data;
+	scsi_toc_general *shortResponse = (scsi_toc_general *)toc->toc_data;
 
 	TRACE("get_toc()\n");
 
@@ -166,12 +166,12 @@ get_toc(cd_driver_info *info, scsi_toc *toc)
 	//  but scsi_toc_toc has already one track, so we get
 	//  last - first extra tracks; finally, we want the lead-out as
 	//  well, so we add an extra track)
-	dataLength = (short_response->last - short_response->first + 1)
+	dataLength = (shortResponse->last - shortResponse->first + 1)
 		* sizeof(scsi_toc_track) + sizeof(scsi_toc_toc);
 	dataLength = min_c(dataLength, sizeof(toc->toc_data));
 
-	TRACE("  tracks: %d - %d, data length %d\n", short_response->first,
-		short_response->last, (int)dataLength);
+	TRACE("  tracks: %d - %d, data length %d\n", shortResponse->first,
+		shortResponse->last, (int)dataLength);
 
 	cmd->allocation_length = B_HOST_TO_BENDIAN_INT16(dataLength);
 
