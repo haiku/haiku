@@ -133,6 +133,16 @@ IOCache::SetDeviceCapacity(off_t deviceCapacity)
 	AutoLocker<VMCache> cacheLocker(fCache);
 
 	fDeviceCapacity = deviceCapacity;
+}
+
+
+void
+IOCache::MediaChanged()
+{
+	TRACE("%p->IOCache::MediaChanged()\n", this);
+
+	MutexLocker serializationLocker(fSerializationLock);
+	AutoLocker<VMCache> cacheLocker(fCache);
 
 	// new media -- burn all cached data
 	while (vm_page* page = fCache->pages.Root()) {

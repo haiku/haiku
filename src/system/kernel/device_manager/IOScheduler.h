@@ -46,6 +46,7 @@ public:
 	virtual	void				SetCallback(io_callback callback, void* data);
 
 	virtual	void				SetDeviceCapacity(off_t deviceCapacity);
+	virtual void				MediaChanged();
 
 	virtual	status_t			ScheduleRequest(IORequest* request) = 0;
 

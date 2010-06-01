@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2010, Haiku, Inc. All rights reserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
+
 
 /*!	Peripheral driver to handle CD-ROM drives. To be more
 	precisely, it supports CD-ROM and WORM drives (well -
@@ -586,12 +587,9 @@ cd_init_device(void* _info, void** _cookie)
 	cd_driver_info* info = (cd_driver_info*)_info;
 
 	// and get (initial) capacity
-	scsi_ccb *request = info->scsi->alloc_ccb(info->scsi_device);
-	if (request == NULL)
-		return B_NO_MEMORY;
-
-	sSCSIPeripheral->check_capacity(info->scsi_periph_device, request);
-	info->scsi->free_ccb(request);
+	status_t status = update_capacity(info);
+	if (status != B_OK)
+		return status;
 
 	*_cookie = info;
 	return B_OK;
@@ -929,6 +927,9 @@ cd_media_changed(cd_driver_info* info, scsi_ccb* request)
 	// do a capacity check
 	// TBD: is this a good idea (e.g. if this is an empty CD)?
 	sSCSIPeripheral->check_capacity(info->scsi_periph_device, request);
+
+	if (info->io_scheduler != NULL)
+		info->io_scheduler->MediaChanged();
 }
 
 

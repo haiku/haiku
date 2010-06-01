@@ -26,6 +26,7 @@ public:
 	virtual	status_t			Init(const char* name);
 
 	virtual	void				SetDeviceCapacity(off_t deviceCapacity);
+	virtual void				MediaChanged();
 
 	virtual	status_t			ScheduleRequest(IORequest* request);
 

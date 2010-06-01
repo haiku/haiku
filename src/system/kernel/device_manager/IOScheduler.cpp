@@ -66,3 +66,9 @@ void
 IOScheduler::SetDeviceCapacity(off_t deviceCapacity)
 {
 }
+
+
+void
+IOScheduler::MediaChanged()
+{
+}
