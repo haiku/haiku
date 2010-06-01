@@ -32,6 +32,7 @@ struct cd_driver_info {
 	DMAResource*			dma_resource;
 
 	uint64					capacity;
+	uint64					original_capacity;
 	uint32					block_size;
 
 	bool					removable;

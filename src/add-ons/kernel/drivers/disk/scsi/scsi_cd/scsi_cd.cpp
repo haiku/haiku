@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <io_requests.h>
 #include <vm/vm_page.h>
 
@@ -81,6 +83,104 @@ update_capacity(cd_driver_info *info)
 	info->scsi->free_ccb(ccb);
 
 	return status;
+}
+
+
+/*!	Iteratively correct the reported capacity by trying to read from the device
+	close to its end.
+*/
+static uint64
+test_capacity(cd_driver_info *info)
+{
+	static const size_t kMaxEntries = 4;
+	const uint32 blockSize = info->block_size;
+	const size_t kBufferSize = blockSize * 4;
+
+	size_t numBlocks = B_PAGE_SIZE / blockSize;
+	uint64 offset = info->original_capacity;
+	if (offset <= numBlocks)
+		return B_OK;
+
+	offset -= numBlocks;
+
+	scsi_ccb *request = info->scsi->alloc_ccb(info->scsi_device);
+	if (request == NULL)
+		return B_NO_MEMORY;
+
+	// Allocate buffer
+
+	physical_entry entries[4];
+	size_t numEntries = 0;
+
+	vm_page_reservation reservation;
+	vm_page_reserve_pages(&reservation,
+		(kBufferSize - 1 + B_PAGE_SIZE) / B_PAGE_SIZE, VM_PRIORITY_SYSTEM);
+
+	for (size_t left = kBufferSize; numEntries < kMaxEntries && left > 0;
+			numEntries++) {
+		size_t bytes = std::min(left, (size_t)B_PAGE_SIZE);
+
+		vm_page* page = vm_page_allocate_page(&reservation,
+			PAGE_STATE_WIRED | VM_PAGE_ALLOC_BUSY);
+
+		entries[numEntries].address = page->physical_page_number * B_PAGE_SIZE;
+		entries[numEntries].size = bytes;;
+
+		left -= bytes;
+	}
+
+	vm_page_unreserve_pages(&reservation);
+
+	// Read close to the end of the device to find out its real end
+
+	info->capacity = info->original_capacity;
+
+	// Only try 1 second before the end (= 75 blocks)
+	while (offset > info->original_capacity - 75) {
+		size_t bytesTransferred;
+		status_t status = sSCSIPeripheral->read_write(info->scsi_periph_device,
+			request, offset, numBlocks, entries, numEntries, false,
+			&bytesTransferred);
+		if (status == B_OK || (request->sense[0] & 0x7f) != 0x70)
+			break;
+
+		switch (request->sense[2]) {
+			case SCSIS_KEY_MEDIUM_ERROR:
+			case SCSIS_KEY_ILLEGAL_REQUEST:
+			case SCSIS_KEY_VOLUME_OVERFLOW:
+			{
+				// find out the problematic sector
+				uint32 errorBlock = (request->sense[3] << 24U)
+					| (request->sense[4] << 16U) | (request->sense[5] << 8U)
+					| request->sense[6];
+				if (errorBlock >= offset)
+					info->capacity = errorBlock - 1;
+				break;
+			}
+
+			default:
+				break;
+		}
+
+		if (numBlocks > offset)
+			break;
+
+		offset -= numBlocks;
+	}
+
+	info->scsi->free_ccb(request);
+
+	for (size_t i = 0; i < numEntries; i++) {
+		vm_page_set_state(vm_lookup_page(entries[i].address / B_PAGE_SIZE),
+			PAGE_STATE_FREE);
+	}
+
+	if (info->capacity != info->original_capacity) {
+		dprintf("scsi_cd: adjusted capacity from %llu to %llu blocks.\n",
+			info->original_capacity, info->capacity);
+	}
+
+	return B_OK;
 }
 
 
@@ -866,8 +966,6 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 	if ((1UL << blockShift) != blockSize)
 		blockShift = 0;
 
-	info->capacity = capacity;
-
 	if (info->block_size != blockSize) {
 		if (capacity == 0) {
 			// there is obviously no medium in the drive, don't try to update
@@ -912,12 +1010,20 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 			panic("initializing IOScheduler failed: %s", strerror(status));
 
 		info->io_scheduler->SetCallback(do_io, info);
+		info->block_size = blockSize;
 	}
 
-	if (info->io_scheduler != NULL)
-		info->io_scheduler->SetDeviceCapacity(capacity * blockSize);
+	if (info->original_capacity != capacity) {
+		info->original_capacity = capacity;
 
-	info->block_size = blockSize;
+		// For CDs, it's obviously relatively normal that they report a larger
+		// capacity than it can actually address. Therefore we'll manually
+		// correct the value here.
+		test_capacity(info);
+
+		if (info->io_scheduler != NULL)
+			info->io_scheduler->SetDeviceCapacity(info->capacity * blockSize);
+	}
 }
 
 
@@ -926,6 +1032,7 @@ cd_media_changed(cd_driver_info* info, scsi_ccb* request)
 {
 	// do a capacity check
 	// TBD: is this a good idea (e.g. if this is an empty CD)?
+	info->original_capacity = 0;
 	sSCSIPeripheral->check_capacity(info->scsi_periph_device, request);
 
 	if (info->io_scheduler != NULL)
