@@ -114,6 +114,8 @@ class IMAP4Client : public BRemoteMailStorageProtocol {
 		bool force_reselect;
 		
 		int32 fLastExists;
+		BString fSentFlag;
+		BString fPendingFlag;
 };
 
 class NoopWorker : public BHandler {
@@ -386,6 +388,7 @@ void IMAP4Client::InitializeMailboxes() {
 		hierarchy_delimiter = dem[2]();
 		if (hierarchy_delimiter == "" || hierarchy_delimiter == "NIL")
 			hierarchy_delimiter = "/";
+		WasCommandOkay(tag);
 	}
 
 	if (mb_root.ByteAt(mb_root.Length() - 1) != hierarchy_delimiter.ByteAt(0)) {
@@ -433,17 +436,33 @@ status_t IMAP4Client::AddMessage(const char *mailbox, BPositionIO *data, BString
 		if (node != NULL) {
 			BString status;
 			node->ReadAttrString(B_MAIL_ATTR_STATUS,&status);
-			/*if (status == "Sent")
-				attributes += " \\Sent";
-			if (status == "Pending")
-				attributes += " \\Sent";*/
+			if (status == "Sent" && fSentFlag.Length())
+				attributes << " " << fSentFlag;
+			if (status == "Pending" && fPendingFlag.Length())
+				attributes << " " << fPendingFlag;
 			if (status == "Replied")
 				attributes += " \\Answered";
 		}
 	}
 
+	BString receivedDate;
+	BFile *file = dynamic_cast<BFile *> (data);
+	time_t creationTime;
+	// actually creation time is reset on file copy, modification time seems better...
+	if (file && file->GetModificationTime(&creationTime) == B_OK) {
+		struct tm tm;
+		localtime_r(&creationTime, &tm);
+		char *buffer = receivedDate.LockBuffer(256);
 
-	command << ((struct mailbox_info *)(box_info.ItemAt(box_index)))->server_mb_name << "\" (" << attributes << ") {" << size << '}';
+		strftime(buffer, 256, "%e-%b-%Y %H:%M:%S %z", &tm);
+		receivedDate.UnlockBuffer();
+		receivedDate.Prepend('"', 1);
+		receivedDate << "\" ";
+	}
+	
+
+	command << ((struct mailbox_info *)(box_info.ItemAt(box_index)))->server_mb_name 
+		<< "\" (" << attributes << ") " << receivedDate << "{" << size << '}';
 	SendCommand(command.String());
 	status_t err = ReceiveLine(command);
 	if (err < B_OK)
@@ -461,7 +480,10 @@ status_t IMAP4Client::AddMessage(const char *mailbox, BPositionIO *data, BString
 		send(net,buffer,size,0);
 		send(net,"\r\n",2,0);
 	}
-	Select(mailbox,false,false,false,true);
+	delete [] buffer;
+
+	force_reselect = true;
+	Select(mailbox,true,false,false,false,false);
 
 	if (((struct mailbox_info *)(box_info.ItemAt(box_index)))->next_uid <= 0) {
 		command = "FETCH ";
@@ -679,7 +701,7 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 
 	const char *real_mb = info->server_mb_name.String();
 
-	if ((selected_mb != real_mb) || (noop) || (no_command)) {
+	if ((selected_mb != real_mb) || (noop) || (no_command) || (reselect)) {
 		if ((selected_mb != "")  && (selected_mb != real_mb)){
 			BString trash;
 			if (SendCommand("CLOSE") < B_OK)
@@ -689,7 +711,7 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 			WasCommandOkay(trash);
 		}
 		BString cmd;
-		if (selected_mb == real_mb)
+		if (selected_mb == real_mb && !reselect)
 			cmd = "NOOP";
 		else
 			cmd << "SELECT \"" << real_mb << '\"';
@@ -720,6 +742,32 @@ status_t IMAP4Client::Select(const char *mb, bool reselect, bool queue_new_messa
 
 			if ((response.CountItems() > 1) && (strcasecmp(response[1](),"RECENT") == 0))
 				recent = atoi(response[0]());
+
+			// search a workable Sent flag.
+			// cf.
+			// http://serverfault.com/questions/115769/which-imap-flags-are-reliably-supported-across-most-mail-servers
+			if (response[0].CountItems() == 2 && strcasecmp(response[0][0](),"PERMANENTFLAGS") == 0) {
+				//PRINT(("PERM FLAGS: '%s'\n", response[0][1]()));
+				for (int i = 0; i < response[0][1].CountItems(); i++) {
+					BString flag(response[0][1][i]());
+					//PRINT(("PERM FLAGS[%d]: '%s'\n", i, response[0][1][i]()));
+					// lucky you
+					if (flag == "\\Sent")
+						fSentFlag = "\\Sent";
+					// the server supports arbitrary flags, define our own;
+					else if (flag == "\\*")
+						fSentFlag = "$Sent";
+					// note $MDNSent is not the same, it's used for delivery notifications...
+
+					if (flag == "\\Pending")
+						fPendingFlag = "\\Pending";
+					// the server supports arbitrary flags, define our own;
+					else if (flag == "\\*")
+						fPendingFlag = "$Pending";
+				}
+				//PRINT(("Sent FLAG: '%s'\n", fSentFlag.String()));
+				//PRINT(("Pending FLAG: '%s'\n", fPendingFlag.String()));
+			}
 		}
 		
 		// Whenever the mailbox is updated, only EXISTS is sent so we have no
@@ -871,11 +919,17 @@ status_t IMAP4Client::GetMessage(const char *mailbox, const char *message, BPosi
 			if (strcmp(response[2][1][i](),"\\Seen") == 0) {
 				headers->AddString("STATUS","Read");
 			}
-			if (strcmp(response[2][1][i](),"\\Sent") == 0) {
+			if (fSentFlag.Length() && strcmp(response[2][1][i](),fSentFlag.String()) == 0) {
 				if (headers->HasString("STATUS"))
 					headers->ReplaceString("STATUS","Sent");
 				else
 					headers->AddString("STATUS","Sent");
+			}
+			if (fPendingFlag.Length() && strcmp(response[2][1][i](),fPendingFlag.String()) == 0) {
+				if (headers->HasString("STATUS"))
+					headers->ReplaceString("STATUS","Pending");
+				else
+					headers->AddString("STATUS","Pending");
 			}
 			if (strcmp(response[2][1][i](),"\\Answered") == 0) {
 				if (headers->HasString("STATUS"))
