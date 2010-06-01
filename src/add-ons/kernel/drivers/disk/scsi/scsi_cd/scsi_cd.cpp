@@ -96,6 +96,12 @@ test_capacity(cd_driver_info *info)
 	const uint32 blockSize = info->block_size;
 	const size_t kBufferSize = blockSize * 4;
 
+	TRACE("test_capacity: read with buffer size %" B_PRIuSIZE ", block size %"
+		B_PRIu32", capacity %llu\n", kBufferSize, blockSize,
+		info->original_capacity);
+
+	info->capacity = info->original_capacity;
+
 	size_t numBlocks = B_PAGE_SIZE / blockSize;
 	uint64 offset = info->original_capacity;
 	if (offset <= numBlocks)
@@ -133,14 +139,16 @@ test_capacity(cd_driver_info *info)
 
 	// Read close to the end of the device to find out its real end
 
-	info->capacity = info->original_capacity;
-
 	// Only try 1 second before the end (= 75 blocks)
 	while (offset > info->original_capacity - 75) {
 		size_t bytesTransferred;
 		status_t status = sSCSIPeripheral->read_write(info->scsi_periph_device,
 			request, offset, numBlocks, entries, numEntries, false,
 			&bytesTransferred);
+
+		TRACE("test_capacity: read from offset %llu: %s\n", offset,
+			strerror(status));
+
 		if (status == B_OK || (request->sense[0] & 0x7f) != 0x70)
 			break;
 
@@ -154,7 +162,7 @@ test_capacity(cd_driver_info *info)
 					| (request->sense[4] << 16U) | (request->sense[5] << 8U)
 					| request->sense[6];
 				if (errorBlock >= offset)
-					info->capacity = errorBlock - 1;
+					info->capacity = errorBlock;
 				break;
 			}
 
@@ -1013,7 +1021,7 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 		info->block_size = blockSize;
 	}
 
-	if (info->original_capacity != capacity) {
+	if (info->original_capacity != capacity && info->io_scheduler != NULL) {
 		info->original_capacity = capacity;
 
 		// For CDs, it's obviously relatively normal that they report a larger
@@ -1021,8 +1029,7 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 		// correct the value here.
 		test_capacity(info);
 
-		if (info->io_scheduler != NULL)
-			info->io_scheduler->SetDeviceCapacity(info->capacity * blockSize);
+		info->io_scheduler->SetDeviceCapacity(info->capacity * blockSize);
 	}
 }
 
@@ -1031,8 +1038,9 @@ static void
 cd_media_changed(cd_driver_info* info, scsi_ccb* request)
 {
 	// do a capacity check
-	// TBD: is this a good idea (e.g. if this is an empty CD)?
+	// TODO: is this a good idea (e.g. if this is an empty CD)?
 	info->original_capacity = 0;
+	info->capacity = 0;
 	sSCSIPeripheral->check_capacity(info->scsi_periph_device, request);
 
 	if (info->io_scheduler != NULL)
@@ -1138,6 +1146,7 @@ cd_init_driver(device_node* node, void** _cookie)
 	info->removable = removable;
 
 	// set capacity to zero, so it get checked on first opened handle
+	info->original_capacity = 0;
 	info->capacity = 0;
 	info->block_size = 0;
 
