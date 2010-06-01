@@ -91,6 +91,9 @@ char *periph_compose_device_name(device_node *device_node, const char *prefix);
 
 // io.c
 
+status_t periph_read_write(scsi_periph_device_info *device, scsi_ccb *request,
+	uint64 offset, size_t numBlocks, physical_entry* vecs, size_t vecCount,
+	bool isWrite, size_t* _bytesTransferred);
 status_t periph_io(scsi_periph_device_info* device, io_operation* operation,
 	size_t *_bytesTransferred);
 status_t periph_ioctl(scsi_periph_handle_info *handle, int op,

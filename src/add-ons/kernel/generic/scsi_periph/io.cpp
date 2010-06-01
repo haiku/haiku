@@ -104,6 +104,140 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 }
 
 
+/*! Universal read/write function */
+static status_t
+read_write(scsi_periph_device_info *device, scsi_ccb *request,
+	io_operation *operation, uint64 offset, size_t originalNumBlocks,
+	physical_entry* vecs, size_t vecCount, bool isWrite,
+	size_t* _bytesTransferred)
+{
+	uint32 blockSize = device->block_size;
+	size_t numBlocks = originalNumBlocks;
+	uint32 pos = offset;
+	err_res res;
+	int retries = 0;
+
+	do {
+		size_t numBytes;
+		bool isReadWrite10;
+
+		request->flags = isWrite ? SCSI_DIR_OUT : SCSI_DIR_IN;
+
+		// make sure we avoid 10 byte commands if they aren't supported
+		if (!device->rw10_enabled || device->preferred_ccb_size == 6) {
+			// restricting transfer is OK - the block manager will
+			// take care of transferring the rest
+			if (numBlocks > 0x100)
+				numBlocks = 0x100;
+
+			// no way to break the 21 bit address limit
+			if (pos > 0x200000)
+				return B_BAD_VALUE;
+
+			// don't allow transfer cross the 24 bit address limit
+			// (I'm not sure whether this is allowed, but this way we
+			// are sure to not ask for trouble)
+			if (pos < 0x100000)
+				numBlocks = min_c(numBlocks, 0x100000 - pos);
+		}
+
+		numBytes = numBlocks * blockSize;
+		if (numBlocks != originalNumBlocks)
+			panic("I/O operation would need to be cut.");
+
+		request->data = NULL;
+		request->sg_list = vecs;
+		request->data_length = numBytes;
+		request->sg_count = vecCount;
+		request->io_operation = operation;
+		request->sort = pos;
+		request->timeout = device->std_timeout;
+		// see whether daemon instructed us to post an ordered command;
+		// reset flag after read
+		SHOW_FLOW(3, "flag=%x, next_tag=%x, ordered: %s",
+			(int)request->flags, (int)device->next_tag_action,
+			(request->flags & SCSI_ORDERED_QTAG) != 0 ? "yes" : "no");
+
+		// use shortest commands whenever possible
+		if (pos + numBlocks < 0x200000 && numBlocks <= 0x100) {
+			scsi_cmd_rw_6 *cmd = (scsi_cmd_rw_6 *)request->cdb;
+
+			isReadWrite10 = false;
+
+			memset(cmd, 0, sizeof(*cmd));
+			cmd->opcode = isWrite ? SCSI_OP_WRITE_6 : SCSI_OP_READ_6;
+			cmd->high_lba = (pos >> 16) & 0x1f;
+			cmd->mid_lba = (pos >> 8) & 0xff;
+			cmd->low_lba = pos & 0xff;
+			cmd->length = numBlocks;
+
+			request->cdb_length = sizeof(*cmd);
+		} else {
+			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
+
+			isReadWrite10 = true;
+
+			memset(cmd, 0, sizeof(*cmd));
+			cmd->opcode = isWrite ? SCSI_OP_WRITE_10 : SCSI_OP_READ_10;
+			cmd->relative_address = 0;
+			cmd->force_unit_access = 0;
+			cmd->disable_page_out = 0;
+			cmd->lba = B_HOST_TO_BENDIAN_INT32(pos);
+			cmd->length = B_HOST_TO_BENDIAN_INT16(numBlocks);
+
+			request->cdb_length = sizeof(*cmd);
+		}
+
+		// TODO: last chance to detect errors that occured during concurrent accesses
+		//status_t status = handle->pending_error;
+		//if (status != B_OK)
+		//	return status;
+
+		device->scsi->async_io(request);
+
+		acquire_sem(request->completion_sem);
+
+		// ask generic peripheral layer what to do now
+		res = periph_check_error(device, request);
+
+		// TODO: bytes might have been transferred even in the error case!
+		switch (res.action) {
+			case err_act_ok:
+				*_bytesTransferred = numBytes - request->data_resid;
+				break;
+
+			case err_act_start:
+				res = periph_send_start_stop(device, request, 1,
+					device->removable);
+				if (res.action == err_act_ok)
+					res.action = err_act_retry;
+				break;
+
+			case err_act_invalid_req:
+				// if this was a 10 byte command, the device probably doesn't
+				// support them, so disable them and retry
+				if (isReadWrite10) {
+					atomic_and(&device->rw10_enabled, 0);
+					res.action = err_act_retry;
+				} else
+					res.action = err_act_fail;
+				break;
+		}
+	} while ((res.action == err_act_retry && retries++ < 3)
+		|| (res.action == err_act_many_retries && retries++ < 30));
+
+	// peripheral layer only created "read" error, so we have to
+	// map them to "write" errors if this was a write request
+	if (res.error_code == B_DEV_READ_ERROR && isWrite)
+		return B_DEV_WRITE_ERROR;
+
+	return res.error_code;
+}
+
+
+// #pragma mark - public functions
+
+
 status_t
 periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer,
 	size_t length)
@@ -157,150 +291,33 @@ periph_sync_queue_daemon(void *arg, int iteration)
 }
 
 
-/*! Universal read/write function */
+status_t
+periph_read_write(scsi_periph_device_info *device, scsi_ccb *request,
+	uint64 offset, size_t numBlocks, physical_entry* vecs, size_t vecCount,
+	bool isWrite, size_t* _bytesTransferred)
+{
+	return read_write(device, request, NULL, offset, numBlocks, vecs, vecCount,
+		isWrite, _bytesTransferred);
+}
+
+
 status_t
 periph_io(scsi_periph_device_info *device, io_operation *operation,
 	size_t* _bytesTransferred)
 {
-	uint32 blockSize = device->block_size;
-	size_t numBlocks = operation->Length() / blockSize;
-	uint32 pos = operation->Offset() / blockSize;
-	scsi_ccb *request;
-	err_res res;
-	int retries = 0;
-	int err;
+	const uint32 blockSize = device->block_size;
 
 	// don't test rw10_enabled restrictions - this flag may get changed
-	request = device->scsi->alloc_ccb(device->scsi_device);
-
+	scsi_ccb *request = device->scsi->alloc_ccb(device->scsi_device);
 	if (request == NULL)
 		return B_NO_MEMORY;
 
-	do {
-		size_t numBytes;
-		bool is_rw10;
-
-		request->flags = operation->IsWrite() ? SCSI_DIR_OUT : SCSI_DIR_IN;
-
-		// make sure we avoid 10 byte commands if they aren't supported
-		if (!device->rw10_enabled || device->preferred_ccb_size == 6) {
-			// restricting transfer is OK - the block manager will
-			// take care of transferring the rest
-			if (numBlocks > 0x100)
-				numBlocks = 0x100;
-
-			// no way to break the 21 bit address limit
-			if (pos > 0x200000) {
-				err = B_BAD_VALUE;
-				goto abort;
-			}
-
-			// don't allow transfer cross the 24 bit address limit
-			// (I'm not sure whether this is allowed, but this way we
-			// are sure to not ask for trouble)
-			if (pos < 0x100000)
-				numBlocks = min_c(numBlocks, 0x100000 - pos);
-		}
-
-		numBytes = numBlocks * blockSize;
-		if (numBytes != operation->Length())
-			panic("I/O operation would need to be cut.");
-
-		request->data = NULL;
-		request->sg_list = (physical_entry*)operation->Vecs();
-		request->data_length = numBytes;
-		request->sg_count = operation->VecCount();
-		request->io_operation = operation;
-		request->sort = pos;
-		request->timeout = device->std_timeout;
-		// see whether daemon instructed us to post an ordered command;
-		// reset flag after read
-		SHOW_FLOW(3, "flag=%x, next_tag=%x, ordered: %s",
-			(int)request->flags, (int)device->next_tag_action,
-			(request->flags & SCSI_ORDERED_QTAG) != 0 ? "yes" : "no");
-
-		// use shortest commands whenever possible
-		if (pos + numBlocks < 0x200000 && numBlocks <= 0x100) {
-			scsi_cmd_rw_6 *cmd = (scsi_cmd_rw_6 *)request->cdb;
-
-			is_rw10 = false;
-
-			memset(cmd, 0, sizeof(*cmd));
-			cmd->opcode = operation->IsWrite()
-				? SCSI_OP_WRITE_6 : SCSI_OP_READ_6;
-			cmd->high_lba = (pos >> 16) & 0x1f;
-			cmd->mid_lba = (pos >> 8) & 0xff;
-			cmd->low_lba = pos & 0xff;
-			cmd->length = numBlocks;
-
-			request->cdb_length = sizeof(*cmd);
-		} else {
-			scsi_cmd_rw_10 *cmd = (scsi_cmd_rw_10 *)request->cdb;
-
-			is_rw10 = true;
-
-			memset(cmd, 0, sizeof(*cmd));
-			cmd->opcode = operation->IsWrite()
-				? SCSI_OP_WRITE_10 : SCSI_OP_READ_10;
-			cmd->relative_address = 0;
-			cmd->force_unit_access = 0;
-			cmd->disable_page_out = 0;
-			cmd->lba = B_HOST_TO_BENDIAN_INT32(pos);
-			cmd->length = B_HOST_TO_BENDIAN_INT16(numBlocks);
-
-			request->cdb_length = sizeof(*cmd);
-		}
-
-		// last chance to detect errors that occured during concurrent accesses
-		err = 0; // TODO: handle->pending_error;
-
-		if (err)
-			goto abort;
-
-		device->scsi->async_io(request);
-
-		acquire_sem(request->completion_sem);
-
-		// ask generic peripheral layer what to do now
-		res = periph_check_error(device, request);
-
-		// TODO: bytes might have been transferred even in the error case!
-		switch (res.action) {
-			case err_act_ok:
-				*_bytesTransferred = numBytes - request->data_resid;
-				break;
-
-			case err_act_start:
-				res = periph_send_start_stop(device, request, 1,
-					device->removable);
-				if (res.action == err_act_ok)
-					res.action = err_act_retry;
-				break;
-
-			case err_act_invalid_req:
-				// if this was a 10 byte command, the device probably doesn't
-				// support them, so disable them and retry
-				if (is_rw10) {
-					atomic_and(&device->rw10_enabled, 0);
-					res.action = err_act_retry;
-				} else
-					res.action = err_act_fail;
-				break;
-		}
-	} while ((res.action == err_act_retry && retries++ < 3)
-		|| (res.action == err_act_many_retries && retries++ < 30));
+	status_t status = read_write(device, request, operation,
+		operation->Offset() / blockSize, operation->Length() / blockSize,
+		(physical_entry *)operation->Vecs(), operation->VecCount(),
+		operation->IsWrite(), _bytesTransferred);
 
 	device->scsi->free_ccb(request);
-
-	// peripheral layer only created "read" error, so we have to
-	// map them to "write" errors if this was a write request
-	if (res.error_code == B_DEV_READ_ERROR && operation->IsWrite())
-		return B_DEV_WRITE_ERROR;
-
-	return res.error_code;
-
-abort:
-	device->scsi->free_ccb(request);
-	return err;
+	return status;
 }
 

@@ -101,6 +101,9 @@ typedef struct scsi_periph_interface {
 	status_t (*handle_free)(scsi_periph_handle handle);
 
 	// *** default implementation for block devices ***
+	status_t (*read_write)(scsi_periph_device_info *device, scsi_ccb *request,
+		uint64 offset, size_t numBlocks, physical_entry* vecs, size_t vecCount,
+		bool isWrite, size_t* _bytesTransferred);
 	status_t (*io)(scsi_periph_device device, io_operation *operation,
 		size_t *_bytesTransferred);
 

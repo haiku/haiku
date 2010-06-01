@@ -131,6 +131,7 @@ static scsi_periph_interface sSCSIPeripheralModule = {
 	periph_handle_close,
 	periph_handle_free,
 
+	periph_read_write,
 	periph_io,
 	periph_ioctl,
 	periph_check_capacity,
