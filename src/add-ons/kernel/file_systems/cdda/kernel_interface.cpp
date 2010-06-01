@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1363,11 +1363,11 @@ Inode::RewindAttrCookie(attr_cookie* cookie)
 static float
 cdda_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
-	scsi_toc_toc* toc = (scsi_toc_toc*)malloc(1024);
+	scsi_toc_toc* toc = (scsi_toc_toc*)malloc(2048);
 	if (toc == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = read_table_of_contents(fd, toc, 1024);
+	status_t status = read_table_of_contents(fd, toc, 2048);
 
 	// there has to be at least a single audio track
 	if (status == B_OK && count_audio_tracks(toc) == 0)

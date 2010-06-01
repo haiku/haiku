@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -588,13 +588,12 @@ read_table_of_contents(int fd, scsi_toc_toc *toc, size_t length)
 	if (status < B_OK)
 		return status;
 
+	// make sure the values in the TOC make sense
+
 	int32 lastTrack = toc->last_track + 1 - toc->first_track;
 	size_t dataLength = B_BENDIAN_TO_HOST_INT16(toc->data_length) + 2;
-	if (dataLength < sizeof(scsi_toc_toc)
-		|| lastTrack <= 0)
+	if (dataLength < sizeof(scsi_toc_toc) || lastTrack <= 0)
 		return B_BAD_DATA;
-
-	// make sure the values in the TOC make sense
 
 	if (length > dataLength)
 		length = dataLength;
