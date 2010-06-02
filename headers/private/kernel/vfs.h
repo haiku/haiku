@@ -33,6 +33,7 @@
 
 struct attr_info;
 struct file_descriptor;
+struct generic_io_vec;
 struct kernel_args;
 struct net_stat;
 struct pollfd;
@@ -58,11 +59,6 @@ typedef struct io_context {
 	uint32		num_monitors;
 	uint32		max_monitors;
 } io_context;
-
-/* macro to allocate a iovec array on the stack */
-#define IOVECS(name, size) \
-	uint8 _##name[sizeof(iovecs) + (size)*sizeof(iovec)]; \
-	iovecs *name = (iovecs *)_##name
 
 
 #ifdef __cplusplus
@@ -100,11 +96,11 @@ void		vfs_acquire_vnode(struct vnode *vnode);
 status_t	vfs_get_cookie_from_fd(int fd, void **_cookie);
 bool		vfs_can_page(struct vnode *vnode, void *cookie);
 status_t	vfs_read_pages(struct vnode *vnode, void *cookie, off_t pos,
-				const iovec *vecs, size_t count, uint32 flags,
-				size_t *_numBytes);
+				const struct generic_io_vec *vecs, size_t count, uint32 flags,
+				generic_size_t *_numBytes);
 status_t	vfs_write_pages(struct vnode *vnode, void *cookie, off_t pos,
-				const iovec *vecs, size_t count, uint32 flags,
-				size_t *_numBytes);
+				const struct generic_io_vec *vecs, size_t count, uint32 flags,
+				generic_size_t *_numBytes);
 status_t	vfs_vnode_io(struct vnode* vnode, void* cookie,
 				io_request* request);
 status_t	vfs_synchronous_io(io_request* request,
@@ -287,12 +283,12 @@ public:
 
 	virtual	void				IOFinished(status_t status,
 									bool partialTransfer,
-									size_t bytesTransferred) = 0;
+									generic_size_t bytesTransferred) = 0;
 
 	static	status_t 			IORequestCallback(void* data,
 									io_request* request, status_t status,
 									bool partialTransfer,
-									size_t transferEndOffset);
+									generic_size_t transferEndOffset);
 };
 
 
@@ -306,12 +302,14 @@ protected:
 
 
 status_t	vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie,
-				off_t pos, const iovec* vecs, size_t count, size_t numBytes,
-				uint32 flags, AsyncIOCallback* callback);
+				off_t pos, const struct generic_io_vec* vecs, size_t count,
+				generic_size_t numBytes, uint32 flags,
+				AsyncIOCallback* callback);
 
 status_t	vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie,
-				off_t pos, const iovec* vecs, size_t count, size_t numBytes,
-				uint32 flags, AsyncIOCallback* callback);
+				off_t pos, const struct generic_io_vec* vecs, size_t count,
+				generic_size_t numBytes, uint32 flags,
+				AsyncIOCallback* callback);
 
 #endif	// __cplusplus
 

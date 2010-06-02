@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -42,15 +42,15 @@ VMVnodeCache::HasPage(off_t offset)
 
 
 status_t
-VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
-	uint32 flags, size_t *_numBytes)
+VMVnodeCache::Read(off_t offset, const generic_io_vec *vecs, size_t count,
+	uint32 flags, generic_size_t *_numBytes)
 {
-	size_t bytesUntouched = *_numBytes;
+	generic_size_t bytesUntouched = *_numBytes;
 
 	status_t status = vfs_read_pages(fVnode, NULL, offset, vecs, count,
 		flags, _numBytes);
 
-	size_t bytesEnd = *_numBytes;
+	generic_size_t bytesEnd = *_numBytes;
 
 	if (offset + bytesEnd > virtual_end)
 		bytesEnd = virtual_end - offset;
@@ -66,13 +66,13 @@ VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
 	// doing this here so that not every file system/device has to implement
 	// this
 	for (int32 i = count; i-- > 0 && bytesUntouched != 0;) {
-		size_t length = min_c(bytesUntouched, vecs[i].iov_len);
+		generic_size_t length = min_c(bytesUntouched, vecs[i].length);
 
-		addr_t address = (addr_t)vecs[i].iov_base + vecs[i].iov_len - length;
+		generic_addr_t address = vecs[i].base + vecs[i].length - length;
 		if ((flags & B_PHYSICAL_IO_REQUEST) != 0)
 			vm_memset_physical(address, 0, length);
 		else
-			memset((void*)address, 0, length);
+			memset((void*)(addr_t)address, 0, length);
 
 		bytesUntouched -= length;
 	}
@@ -82,16 +82,16 @@ VMVnodeCache::Read(off_t offset, const iovec *vecs, size_t count,
 
 
 status_t
-VMVnodeCache::Write(off_t offset, const iovec *vecs, size_t count,
-	uint32 flags, size_t *_numBytes)
+VMVnodeCache::Write(off_t offset, const generic_io_vec *vecs, size_t count,
+	uint32 flags, generic_size_t *_numBytes)
 {
 	return vfs_write_pages(fVnode, NULL, offset, vecs, count, flags, _numBytes);
 }
 
 
 status_t
-VMVnodeCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
-	size_t numBytes, uint32 flags, AsyncIOCallback* callback)
+VMVnodeCache::WriteAsync(off_t offset, const generic_io_vec* vecs, size_t count,
+	generic_size_t numBytes, uint32 flags, AsyncIOCallback* callback)
 {
 	return vfs_asynchronous_write_pages(fVnode, NULL, offset, vecs, count,
 		numBytes, flags, callback);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -44,14 +44,15 @@ public:
 	virtual	bool				HasPage(off_t offset);
 	virtual	bool				DebugHasPage(off_t offset);
 
-	virtual	status_t			Read(off_t offset, const iovec* vecs,
+	virtual	status_t			Read(off_t offset, const generic_io_vec* vecs,
 									size_t count, uint32 flags,
-									size_t* _numBytes);
-	virtual	status_t			Write(off_t offset, const iovec* vecs,
+									generic_size_t* _numBytes);
+	virtual	status_t			Write(off_t offset, const generic_io_vec* vecs,
 									size_t count, uint32 flags,
-									size_t* _numBytes);
-	virtual	status_t			WriteAsync(off_t offset, const iovec* vecs,
-									size_t count, size_t numBytes, uint32 flags,
+									generic_size_t* _numBytes);
+	virtual	status_t			WriteAsync(off_t offset,
+									const generic_io_vec* vecs, size_t count,
+									generic_size_t numBytes, uint32 flags,
 									AsyncIOCallback* callback);
 	virtual	bool				CanWritePage(off_t offset);
 

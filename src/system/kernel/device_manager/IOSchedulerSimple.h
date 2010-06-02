@@ -29,7 +29,8 @@ public:
 	virtual	void				AbortRequest(IORequest* request,
 									status_t status = B_CANCELED);
 	virtual	void				OperationCompleted(IOOperation* operation,
-									status_t status, size_t transferredBytes);
+									status_t status,
+									generic_size_t transferredBytes);
 									// called by the driver when the operation
 									// has been completed successfully or failed
 									// for some reason
@@ -84,7 +85,7 @@ private:
 			RequestOwnerList	fActiveRequestOwners;
 			RequestOwnerList	fUnusedRequestOwners;
 			RequestOwnerHashTable* fRequestOwners;
-			size_t				fBlockSize;
+			generic_size_t		fBlockSize;
 			int32				fPendingOperations;
 			off_t				fIterationBandwidth;
 			off_t				fMinOwnerBandwidth;

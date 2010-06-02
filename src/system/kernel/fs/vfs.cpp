@@ -3892,6 +3892,7 @@ volume_for_vnode(fs_vnode* _vnode)
 }
 
 
+#if 0
 extern "C" status_t
 read_pages(int fd, off_t pos, const iovec* vecs, size_t count,
 	size_t* _numBytes)
@@ -3928,6 +3929,7 @@ write_pages(int fd, off_t pos, const iovec* vecs, size_t count,
 	put_fd(descriptor);
 	return status;
 }
+#endif
 
 
 extern "C" status_t
@@ -4495,14 +4497,15 @@ vfs_can_page(struct vnode* vnode, void* cookie)
 
 
 extern "C" status_t
-vfs_read_pages(struct vnode* vnode, void* cookie, off_t pos, const iovec* vecs,
-	size_t count, uint32 flags, size_t* _numBytes)
+vfs_read_pages(struct vnode* vnode, void* cookie, off_t pos,
+	const generic_io_vec* vecs, size_t count, uint32 flags,
+	generic_size_t* _numBytes)
 {
 	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
 		pos));
 
 #if VFS_PAGES_IO_TRACING
-	size_t bytesRequested = *_numBytes;
+	generic_size_t bytesRequested = *_numBytes;
 #endif
 
 	IORequest request;
@@ -4522,14 +4525,15 @@ vfs_read_pages(struct vnode* vnode, void* cookie, off_t pos, const iovec* vecs,
 
 
 extern "C" status_t
-vfs_write_pages(struct vnode* vnode, void* cookie, off_t pos, const iovec* vecs,
-	size_t count, uint32 flags, size_t* _numBytes)
+vfs_write_pages(struct vnode* vnode, void* cookie, off_t pos,
+	const generic_io_vec* vecs, size_t count, uint32 flags,
+	generic_size_t* _numBytes)
 {
 	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs,
 		pos));
 
 #if VFS_PAGES_IO_TRACING
-	size_t bytesRequested = *_numBytes;
+	generic_size_t bytesRequested = *_numBytes;
 #endif
 
 	IORequest request;

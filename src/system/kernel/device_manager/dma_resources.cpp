@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "dma_resources.h"
 
 #include <device_manager.h>
@@ -24,14 +25,14 @@
 
 extern device_manager_info gDeviceManagerModule;
 
-const size_t kMaxBounceBufferSize = 4 * B_PAGE_SIZE;
+const phys_size_t kMaxBounceBufferSize = 4 * B_PAGE_SIZE;
 
 
 DMABuffer*
 DMABuffer::Create(size_t count)
 {
 	DMABuffer* buffer = (DMABuffer*)malloc(
-		sizeof(DMABuffer) + sizeof(iovec) * (count - 1));
+		sizeof(DMABuffer) + sizeof(generic_io_vec) * (count - 1));
 	if (buffer == NULL)
 		return NULL;
 
@@ -49,11 +50,11 @@ DMABuffer::SetVecCount(uint32 count)
 
 
 void
-DMABuffer::AddVec(void* base, size_t size)
+DMABuffer::AddVec(generic_addr_t base, generic_size_t size)
 {
-	iovec& vec = fVecs[fVecCount++];
-	vec.iov_base = base;
-	vec.iov_len = size;
+	generic_io_vec& vec = fVecs[fVecCount++];
+	vec.base = base;
+	vec.length = size;
 }
 
 
@@ -63,8 +64,8 @@ DMABuffer::UsesBounceBufferAt(uint32 index)
 	if (index >= fVecCount || fBounceBuffer == NULL)
 		return false;
 
-	return (addr_t)fVecs[index].iov_base >= fBounceBuffer->physical_address
-		&& (addr_t)fVecs[index].iov_base
+	return fVecs[index].base >= fBounceBuffer->physical_address
+		&& fVecs[index].base
 				< fBounceBuffer->physical_address + fBounceBuffer->size;
 }
 
@@ -80,7 +81,8 @@ DMABuffer::Dump() const
 	kprintf("  vecs:               %lu\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
-		kprintf("    [%lu] %p, %lu\n", i, fVecs[i].iov_base, fVecs[i].iov_len);
+		kprintf("    [%" B_PRIu32 "] %#" B_PRIxGENADDR ", %" B_PRIuGENADDR "\n",
+			i, fVecs[i].base, fVecs[i].length);
 	}
 }
 
@@ -104,8 +106,8 @@ DMAResource::~DMAResource()
 
 
 status_t
-DMAResource::Init(device_node* node, size_t blockSize, uint32 bufferCount,
-	uint32 bounceBufferCount)
+DMAResource::Init(device_node* node, generic_size_t blockSize,
+	uint32 bufferCount, uint32 bounceBufferCount)
 {
 	dma_restrictions restrictions;
 	memset(&restrictions, 0, sizeof(dma_restrictions));
@@ -138,8 +140,8 @@ DMAResource::Init(device_node* node, size_t blockSize, uint32 bufferCount,
 
 
 status_t
-DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
-	uint32 bufferCount, uint32 bounceBufferCount)
+DMAResource::Init(const dma_restrictions& restrictions,
+	generic_size_t blockSize, uint32 bufferCount, uint32 bounceBufferCount)
 {
 	fRestrictions = restrictions;
 	fBlockSize = blockSize == 0 ? 1 : blockSize;
@@ -148,15 +150,15 @@ DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
 	fBounceBufferSize = 0;
 
 	if (fRestrictions.high_address == 0)
-		fRestrictions.high_address = ~(addr_t)0;
+		fRestrictions.high_address = ~(generic_addr_t)0;
 	if (fRestrictions.max_segment_count == 0)
 		fRestrictions.max_segment_count = 16;
 	if (fRestrictions.alignment == 0)
 		fRestrictions.alignment = 1;
 	if (fRestrictions.max_transfer_size == 0)
-		fRestrictions.max_transfer_size = ~(size_t)0;
+		fRestrictions.max_transfer_size = ~(generic_size_t)0;
 	if (fRestrictions.max_segment_size == 0)
-		fRestrictions.max_segment_size = ~(size_t)0;
+		fRestrictions.max_segment_size = ~(generic_size_t)0;
 
 	if (_NeedsBoundsBuffers()) {
 		fBounceBufferSize = fRestrictions.max_segment_size
@@ -174,8 +176,8 @@ DMAResource::Init(const dma_restrictions& restrictions, size_t blockSize,
 		fRestrictions.boundary, fRestrictions.max_transfer_size,
 		fRestrictions.max_segment_size);
 
-	fScratchVecs = (iovec*)malloc(
-		sizeof(iovec) * fRestrictions.max_segment_count);
+	fScratchVecs = (generic_io_vec*)malloc(
+		sizeof(generic_io_vec) * fRestrictions.max_segment_count);
 	if (fScratchVecs == NULL)
 		return B_NO_MEMORY;
 
@@ -218,9 +220,9 @@ status_t
 DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 {
 	void* bounceBuffer = NULL;
-	addr_t physicalBase = 0;
+	phys_addr_t physicalBase = 0;
 	area_id area = -1;
-	size_t size = ROUNDUP(fBounceBufferSize, B_PAGE_SIZE);
+	phys_size_t size = ROUNDUP(fBounceBufferSize, B_PAGE_SIZE);
 
 	if (fRestrictions.alignment > B_PAGE_SIZE)
 		dprintf("dma buffer restrictions not yet implemented: alignment %lu\n", fRestrictions.alignment);
@@ -264,12 +266,13 @@ DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 
 
 inline void
-DMAResource::_RestrictBoundaryAndSegmentSize(addr_t base, addr_t& length)
+DMAResource::_RestrictBoundaryAndSegmentSize(generic_addr_t base,
+	generic_addr_t& length)
 {
 	if (length > fRestrictions.max_segment_size)
 		length = fRestrictions.max_segment_size;
 	if (fRestrictions.boundary > 0) {
-		addr_t baseBoundary = base / fRestrictions.boundary;
+		generic_addr_t baseBoundary = base / fRestrictions.boundary;
 		if (baseBoundary
 				!= (base + (length - 1)) / fRestrictions.boundary) {
 			length = (baseBoundary + 1) * fRestrictions.boundary - base;
@@ -279,13 +282,13 @@ DMAResource::_RestrictBoundaryAndSegmentSize(addr_t base, addr_t& length)
 
 
 void
-DMAResource::_CutBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
-	size_t& bounceLeft, size_t toCut)
+DMAResource::_CutBuffer(DMABuffer& buffer, phys_addr_t& physicalBounceBuffer,
+	phys_size_t& bounceLeft, generic_size_t toCut)
 {
 	int32 vecCount = buffer.VecCount();
 	for (int32 i = vecCount - 1; toCut > 0 && i >= 0; i--) {
-		iovec& vec = buffer.VecAt(i);
-		size_t length = vec.iov_len;
+		generic_io_vec& vec = buffer.VecAt(i);
+		generic_size_t length = vec.length;
 		bool inBounceBuffer = buffer.UsesBounceBufferAt(i);
 
 		if (length <= toCut) {
@@ -297,7 +300,7 @@ DMAResource::_CutBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
 				physicalBounceBuffer -= length;
 			}
 		} else {
-			vec.iov_len -= toCut;
+			vec.length -= toCut;
 
 			if (inBounceBuffer) {
 				bounceLeft += toCut;
@@ -321,9 +324,10 @@ DMAResource::_CutBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
 	TODO: is that what we want here?
 	\return >0 the number of bytes added to the buffer.
 */
-size_t
-DMAResource::_AddBounceBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
-	size_t& bounceLeft, size_t length, bool fixedLength)
+phys_size_t
+DMAResource::_AddBounceBuffer(DMABuffer& buffer,
+	phys_addr_t& physicalBounceBuffer, phys_size_t& bounceLeft,
+	generic_size_t length, bool fixedLength)
 {
 	if (bounceLeft < length) {
 		if (fixedLength)
@@ -332,27 +336,27 @@ DMAResource::_AddBounceBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
 		length = bounceLeft;
 	}
 
-	size_t bounceUsed = 0;
+	phys_size_t bounceUsed = 0;
 
 	uint32 vecCount = buffer.VecCount();
 	if (vecCount > 0) {
 		// see if we can join the bounce buffer with the previously last vec
-		iovec& vec = buffer.VecAt(vecCount - 1);
-		addr_t vecBase = (addr_t)vec.iov_base;
-		size_t vecLength = vec.iov_len;
+		generic_io_vec& vec = buffer.VecAt(vecCount - 1);
+		generic_addr_t vecBase = vec.base;
+		generic_size_t vecLength = vec.length;
 
 		if (vecBase + vecLength == physicalBounceBuffer) {
 			vecLength += length;
 			_RestrictBoundaryAndSegmentSize(vecBase, vecLength);
 
-			size_t lengthDiff = vecLength - vec.iov_len;
+			generic_size_t lengthDiff = vecLength - vec.length;
 			length -= lengthDiff;
 
 			physicalBounceBuffer += lengthDiff;
 			bounceLeft -= lengthDiff;
 			bounceUsed += lengthDiff;
 
-			vec.iov_len = vecLength;
+			vec.length = vecLength;
 		}
 	}
 
@@ -362,10 +366,10 @@ DMAResource::_AddBounceBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
 		if (vecCount == fRestrictions.max_segment_count)
 			return fixedLength ? 0 : bounceUsed;
 
-		addr_t vecLength = length;
+		generic_addr_t vecLength = length;
 		_RestrictBoundaryAndSegmentSize(physicalBounceBuffer, vecLength);
 
-		buffer.AddVec((void*)physicalBounceBuffer, vecLength);
+		buffer.AddVec(physicalBounceBuffer, vecLength);
 		vecCount++;
 
 		physicalBounceBuffer += vecLength;
@@ -380,18 +384,18 @@ DMAResource::_AddBounceBuffer(DMABuffer& buffer, addr_t& physicalBounceBuffer,
 
 status_t
 DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
-	size_t maxOperationLength)
+	generic_size_t maxOperationLength)
 {
 	IOBuffer* buffer = request->Buffer();
 	off_t originalOffset = request->Offset() + request->Length()
 		- request->RemainingBytes();
 	off_t offset = originalOffset;
-	size_t partialBegin = offset & (fBlockSize - 1);
+	generic_size_t partialBegin = offset & (fBlockSize - 1);
 
 	// current iteration state
 	uint32 vecIndex = request->VecIndex();
 	uint32 vecOffset = request->VecOffset();
-	size_t totalLength = min_c(request->RemainingBytes(),
+	generic_size_t totalLength = min_c(request->RemainingBytes(),
 		fRestrictions.max_transfer_size);
 
 	if (maxOperationLength > 0
@@ -407,7 +411,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 
 	dmaBuffer->SetVecCount(0);
 
-	iovec* vecs = NULL;
+	generic_io_vec* vecs = NULL;
 	uint32 segmentCount = 0;
 
 	TRACE("  offset %Ld, remaining size: %lu, block size %lu -> partial: %lu\n",
@@ -421,14 +425,14 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 		// TODO: !partialOperation || totalLength >= fBlockSize
 		// TODO: Maybe enforce fBounceBufferSize >= 2 * fBlockSize.
 		if (true) {
-			size_t transferLeft = totalLength;
+			generic_size_t transferLeft = totalLength;
 			vecs = fScratchVecs;
 
 			TRACE("  create physical map (for %ld vecs)\n", buffer->VecCount());
 			for (uint32 i = vecIndex; i < buffer->VecCount(); i++) {
-				iovec& vec = buffer->VecAt(i);
-				addr_t base = (addr_t)vec.iov_base + vecOffset;
-				size_t size = vec.iov_len - vecOffset;
+				generic_io_vec& vec = buffer->VecAt(i);
+				generic_addr_t base = vec.base + vecOffset;
+				generic_size_t size = vec.length - vecOffset;
 				vecOffset = 0;
 				if (size > transferLeft)
 					size = transferLeft;
@@ -440,8 +444,8 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 					get_memory_map_etc(request->Team(), (void*)base, size,
 						&entry, &count);
 
-					vecs[segmentCount].iov_base = (void*)(addr_t)entry.address;
-					vecs[segmentCount].iov_len = entry.size;
+					vecs[segmentCount].base = entry.address;
+					vecs[segmentCount].length = entry.size;
 
 					transferLeft -= entry.size;
 					base += entry.size;
@@ -469,8 +473,8 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 #ifdef TRACE_DMA_RESOURCE
 	TRACE("  physical count %lu\n", segmentCount);
 	for (uint32 i = 0; i < segmentCount; i++) {
-		TRACE("    [%lu] %p, %lu\n", i, vecs[vecIndex + i].iov_base,
-			vecs[vecIndex + i].iov_len);
+		TRACE("    [%" B_PRIu32 "] %#" B_PRIxGENADDR ", %" B_PRIxGENADDR "\n",
+			i, vecs[vecIndex + i].base, vecs[vecIndex + i].length);
 	}
 #endif
 
@@ -486,15 +490,15 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 	}
 	dmaBuffer->SetBounceBuffer(bounceBuffer);
 
-	size_t dmaLength = 0;
-	addr_t physicalBounceBuffer = dmaBuffer->PhysicalBounceBufferAddress();
-	size_t bounceLeft = fBounceBufferSize;
-	size_t transferLeft = totalLength;
+	generic_size_t dmaLength = 0;
+	phys_addr_t physicalBounceBuffer = dmaBuffer->PhysicalBounceBufferAddress();
+	phys_size_t bounceLeft = fBounceBufferSize;
+	generic_size_t transferLeft = totalLength;
 
 	// If the offset isn't block-aligned, use the bounce buffer to bridge the
 	// gap to the start of the vec.
 	if (partialBegin > 0) {
-		size_t length;
+		generic_size_t length;
 		if (request->IsWrite()) {
 			// we always need to read in a whole block for the partial write
 			length = fBlockSize;
@@ -511,7 +515,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 
 		dmaLength += length;
 
-		size_t transferred = length - partialBegin;
+		generic_size_t transferred = length - partialBegin;
 		vecOffset += transferred;
 		offset -= partialBegin;
 
@@ -529,18 +533,18 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 		if (dmaBuffer->VecCount() >= fRestrictions.max_segment_count)
 			break;
 
-		const iovec& vec = vecs[i];
-		if (vec.iov_len <= vecOffset) {
-			vecOffset -= vec.iov_len;
+		const generic_io_vec& vec = vecs[i];
+		if (vec.length <= vecOffset) {
+			vecOffset -= vec.length;
 			i++;
 			continue;
 		}
 
-		addr_t base = (addr_t)vec.iov_base + vecOffset;
-		size_t maxLength = vec.iov_len - vecOffset;
+		generic_addr_t base = vec.base + vecOffset;
+		generic_size_t maxLength = vec.length - vecOffset;
 		if (maxLength > transferLeft)
 			maxLength = transferLeft;
-		size_t length = maxLength;
+		generic_size_t length = maxLength;
 
 		// Cut the vec according to transfer size, segment size, and boundary.
 
@@ -551,7 +555,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 		}
 		_RestrictBoundaryAndSegmentSize(base, length);
 
-		size_t useBounceBufferSize = 0;
+		phys_size_t useBounceBufferSize = 0;
 
 		// Check low address: use bounce buffer for range to low address.
 		// Check alignment: if not aligned, use bounce buffer for complete vec.
@@ -599,7 +603,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 			TRACE("  vec %lu: final bounce length: %lu\n", i, length);
 		} else {
 			TRACE("  vec %lu: final length restriction: %lu\n", i, length);
-			dmaBuffer->AddVec((void*)base, length);
+			dmaBuffer->AddVec(base, length);
 		}
 
 		dmaLength += length;
@@ -612,7 +616,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 	// the first phase).
 	off_t requestEnd = request->Offset() + request->Length();
 	if (request->IsWrite()) {
-		size_t diff = dmaLength & (fBlockSize - 1);
+		generic_size_t diff = dmaLength & (fBlockSize - 1);
 
 		// If the transfer length is block aligned and we're writing past the
 		// end of the given data, we still have to check the whether the last
@@ -620,16 +624,16 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 		// have to cut back the complete block and use a bounce buffer for it
 		// entirely.
 		if (diff == 0 && offset + dmaLength > requestEnd) {
-			const iovec& dmaVec = dmaBuffer->VecAt(dmaBuffer->VecCount() - 1);
-			ASSERT((addr_t)dmaVec.iov_base
-					>= dmaBuffer->PhysicalBounceBufferAddress()
-				&& (addr_t)dmaVec.iov_base
+			const generic_io_vec& dmaVec
+				= dmaBuffer->VecAt(dmaBuffer->VecCount() - 1);
+			ASSERT(dmaVec.base >= dmaBuffer->PhysicalBounceBufferAddress()
+				&& dmaVec.base
 					< dmaBuffer->PhysicalBounceBufferAddress()
 						+ fBounceBufferSize);
 				// We can be certain that the last vec is a bounce buffer vec,
 				// since otherwise the DMA buffer couldn't exceed the end of the
 				// request data.
-			if (dmaVec.iov_len < fBlockSize)
+			if (dmaVec.length < fBlockSize)
 				diff = fBlockSize;
 		}
 
@@ -657,7 +661,8 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 	// case only).
 	while ((dmaLength & (fBlockSize - 1)) != 0) {
 		TRACE("  dmaLength not block aligned: %lu\n", dmaLength);
-			size_t length = (dmaLength + fBlockSize - 1) & ~(fBlockSize - 1);
+			generic_size_t length
+				= (dmaLength + fBlockSize - 1) & ~(fBlockSize - 1);
 
 		// If total length > max transfer size, segment count > max segment
 		// count, truncate.
@@ -669,7 +674,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 			// cut the part of dma length
 			TRACE("  can't align length due to max transfer size, segment "
 				"count restrictions, or lacking bounce buffer space\n");
-			size_t toCut = dmaLength
+			generic_size_t toCut = dmaLength
 				& (max_c(fBlockSize, fRestrictions.alignment) - 1);
 			dmaLength -= toCut;
 			if (dmaLength == 0) {
@@ -677,11 +682,11 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 				// and hit the max segment count. In this case we just use the
 				// bounce buffer for as much as possible of the total length.
 				dmaBuffer->SetVecCount(0);
-				addr_t base = dmaBuffer->PhysicalBounceBufferAddress();
+				generic_addr_t base = dmaBuffer->PhysicalBounceBufferAddress();
 				dmaLength = min_c(totalLength, fBounceBufferSize)
 					& ~(max_c(fBlockSize, fRestrictions.alignment) - 1);
 				_RestrictBoundaryAndSegmentSize(base, dmaLength);
-				dmaBuffer->AddVec((void*)base, dmaLength);
+				dmaBuffer->AddVec(base, dmaLength);
 
 				physicalBounceBuffer = base + dmaLength;
 				bounceLeft = fBounceBufferSize - dmaLength;
@@ -745,7 +750,7 @@ DMAResource::_NeedsBoundsBuffers() const
 {
 	return fRestrictions.alignment > 1
 		|| fRestrictions.low_address != 0
-		|| fRestrictions.high_address != ~(addr_t)0
+		|| fRestrictions.high_address != ~(generic_addr_t)0
 		|| fBlockSize > 1;
 }
 

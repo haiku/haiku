@@ -265,7 +265,7 @@ das_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 	size_t length = *_length;
 
 	IORequest request;
-	status_t status = request.Init(pos, buffer, length, false, 0);
+	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
 	if (status != B_OK)
 		return status;
 
@@ -290,7 +290,7 @@ das_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 	size_t length = *_length;
 
 	IORequest request;
-	status_t status = request.Init(pos, (void*)buffer, length, true, 0);
+	status_t status = request.Init(pos, (addr_t)buffer, length, true, 0);
 	if (status != B_OK)
 		return status;
 

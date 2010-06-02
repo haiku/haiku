@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "IORequest.h"
 
 #include <string.h>
@@ -56,18 +57,18 @@ IORequestChunk::~IORequestChunk()
 
 
 struct virtual_vec_cookie {
-	uint32	vec_index;
-	size_t	vec_offset;
-	area_id	mapped_area;
-	void*	physical_page_handle;
-	addr_t	virtual_address;
+	uint32			vec_index;
+	generic_size_t	vec_offset;
+	area_id			mapped_area;
+	void*			physical_page_handle;
+	addr_t			virtual_address;
 };
 
 
 IOBuffer*
 IOBuffer::Create(uint32 count, bool vip)
 {
-	size_t size = sizeof(IOBuffer) + sizeof(iovec) * (count - 1);
+	size_t size = sizeof(IOBuffer) + sizeof(generic_io_vec) * (count - 1);
 	IOBuffer* buffer
 		= (IOBuffer*)(malloc_etc(size, vip ? HEAP_PRIORITY_VIP : 0));
 	if (buffer == NULL)
@@ -95,19 +96,20 @@ IOBuffer::Delete()
 
 
 void
-IOBuffer::SetVecs(size_t firstVecOffset, const iovec* vecs, uint32 count,
-	size_t length, uint32 flags)
+IOBuffer::SetVecs(generic_size_t firstVecOffset, const generic_io_vec* vecs,
+	uint32 count, generic_size_t length, uint32 flags)
 {
-	memcpy(fVecs, vecs, sizeof(iovec) * count);
+	memcpy(fVecs, vecs, sizeof(generic_io_vec) * count);
+
 	if (count > 0 && firstVecOffset > 0) {
-		fVecs[0].iov_base = (uint8*)fVecs[0].iov_base + firstVecOffset;
-		fVecs[0].iov_len -= firstVecOffset;
+		fVecs[0].base += firstVecOffset;
+		fVecs[0].length -= firstVecOffset;
 	}
 
 	fVecCount = count;
 	fLength = length;
 	fPhysical = (flags & B_PHYSICAL_IO_REQUEST) != 0;
-	fUser = !fPhysical && IS_USER_ADDRESS(vecs[0].iov_base);
+	fUser = !fPhysical && IS_USER_ADDRESS(vecs[0].base);
 }
 
 
@@ -141,12 +143,13 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 		return B_BAD_INDEX;
 
 	if (!fPhysical) {
-		vector = fVecs[cookie->vec_index++];
+		vector.iov_base = (void*)(addr_t)fVecs[cookie->vec_index].base;
+		vector.iov_len = fVecs[cookie->vec_index++].length;
 		return B_OK;
 	}
 
 	if (cookie->vec_index == 0
-		&& (fVecCount > 1 || fVecs[0].iov_len > B_PAGE_SIZE)) {
+		&& (fVecCount > 1 || fVecs[0].length > B_PAGE_SIZE)) {
 		void* mappedAddress;
 		addr_t mappedSize;
 
@@ -158,7 +161,7 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, fVecs, fVecCount);
 
 		if (cookie->mapped_area >= 0) {
-			vector.iov_base = (void*)mappedAddress;
+			vector.iov_base = mappedAddress;
 			vector.iov_len = mappedSize;
 			return B_OK;
 		} else
@@ -166,9 +169,9 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 	}
 
 	// fallback to page wise mapping
-	iovec& currentVec = fVecs[cookie->vec_index];
-	addr_t address = (addr_t)currentVec.iov_base + cookie->vec_offset;
-	addr_t pageOffset = address % B_PAGE_SIZE;
+	generic_io_vec& currentVec = fVecs[cookie->vec_index];
+	generic_addr_t address = currentVec.base + cookie->vec_offset;
+	size_t pageOffset = address % B_PAGE_SIZE;
 
 // TODO: This is a potential violation of the VIP requirement, since
 // vm_get_physical_page() may allocate memory without special flags!
@@ -177,14 +180,14 @@ IOBuffer::GetNextVirtualVec(void*& _cookie, iovec& vector)
 	if (result != B_OK)
 		return result;
 
-	size_t length = min_c(currentVec.iov_len - cookie->vec_offset,
+	generic_size_t length = min_c(currentVec.length - cookie->vec_offset,
 		B_PAGE_SIZE - pageOffset);
 
 	vector.iov_base = (void*)(cookie->virtual_address + pageOffset);
 	vector.iov_len = length;
 
 	cookie->vec_offset += length;
-	if (cookie->vec_offset >= currentVec.iov_len) {
+	if (cookie->vec_offset >= currentVec.length) {
 		cookie->vec_index++;
 		cookie->vec_offset = 0;
 	}
@@ -214,8 +217,8 @@ IOBuffer::LockMemory(team_id team, bool isWrite)
 	}
 
 	for (uint32 i = 0; i < fVecCount; i++) {
-		status_t status = lock_memory_etc(team, fVecs[i].iov_base,
-			fVecs[i].iov_len, isWrite ? 0 : B_READ_DEVICE);
+		status_t status = lock_memory_etc(team, (void*)(addr_t)fVecs[i].base,
+			fVecs[i].length, isWrite ? 0 : B_READ_DEVICE);
 		if (status != B_OK) {
 			_UnlockMemory(team, i, isWrite);
 			return status;
@@ -231,7 +234,7 @@ void
 IOBuffer::_UnlockMemory(team_id team, size_t count, bool isWrite)
 {
 	for (uint32 i = 0; i < count; i++) {
-		unlock_memory_etc(team, fVecs[i].iov_base, fVecs[i].iov_len,
+		unlock_memory_etc(team, (void*)(addr_t)fVecs[i].base, fVecs[i].length,
 			isWrite ? 0 : B_READ_DEVICE);
 	}
 }
@@ -262,7 +265,8 @@ IOBuffer::Dump() const
 	kprintf("  vecs:       %lu\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
-		kprintf("    [%lu] %p, %lu\n", i, fVecs[i].iov_base, fVecs[i].iov_len);
+		kprintf("    [%" B_PRIu32 "] %#" B_PRIxGENADDR ", %" B_PRIuGENADDR "\n",
+			i, fVecs[i].base, fVecs[i].length);
 	}
 }
 
@@ -280,7 +284,7 @@ IOOperation::Finish()
 			if (fPhase == PHASE_READ_BEGIN) {
 				TRACE("  phase read begin\n");
 				// repair phase adjusted vec
-				fDMABuffer->VecAt(fSavedVecIndex).iov_len = fSavedVecLength;
+				fDMABuffer->VecAt(fSavedVecIndex).length = fSavedVecLength;
 
 				// partial write: copy partial begin to bounce buffer
 				bool skipReadEndPhase;
@@ -301,10 +305,9 @@ IOOperation::Finish()
 			} else if (fPhase == PHASE_READ_END) {
 				TRACE("  phase read end\n");
 				// repair phase adjusted vec
-				iovec& vec = fDMABuffer->VecAt(fSavedVecIndex);
-				vec.iov_base = (uint8*)vec.iov_base
-					+ vec.iov_len - fSavedVecLength;
-				vec.iov_len = fSavedVecLength;
+				generic_io_vec& vec = fDMABuffer->VecAt(fSavedVecIndex);
+				vec.base += vec.length - fSavedVecLength;
+				vec.length = fSavedVecLength;
 
 				// partial write: copy partial end to bounce buffer
 				status_t error = _CopyPartialEnd(true);
@@ -327,26 +330,27 @@ IOOperation::Finish()
 		TRACE("  read with bounce buffer\n");
 		// copy the bounce buffer segments to the final location
 		uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBufferAddress();
-		addr_t bounceBufferStart = fDMABuffer->PhysicalBounceBufferAddress();
-		addr_t bounceBufferEnd = bounceBufferStart
+		phys_addr_t bounceBufferStart
+			= fDMABuffer->PhysicalBounceBufferAddress();
+		phys_addr_t bounceBufferEnd = bounceBufferStart
 			+ fDMABuffer->BounceBufferSize();
 
-		const iovec* vecs = fDMABuffer->Vecs();
+		const generic_io_vec* vecs = fDMABuffer->Vecs();
 		uint32 vecCount = fDMABuffer->VecCount();
 
 		status_t error = B_OK;
 
 		// We iterate through the vecs we have read, moving offset (the device
-		// offset) as we go. If [offset, offset + vec.iov_len) intersects with
+		// offset) as we go. If [offset, offset + vec.length) intersects with
 		// [startOffset, endOffset) we copy to the final location.
 		off_t offset = fOffset;
 		const off_t startOffset = fOriginalOffset;
 		const off_t endOffset = fOriginalOffset + fOriginalLength;
 
 		for (uint32 i = 0; error == B_OK && i < vecCount; i++) {
-			const iovec& vec = vecs[i];
-			addr_t base = (addr_t)vec.iov_base;
-			size_t length = vec.iov_len;
+			const generic_io_vec& vec = vecs[i];
+			generic_addr_t base = vec.base;
+			generic_size_t length = vec.length;
 
 			if (offset < startOffset) {
 				// If the complete vector is before the start offset, skip it.
@@ -357,7 +361,7 @@ IOOperation::Finish()
 
 				// The vector starts before the start offset, but intersects
 				// with it. Skip the part we aren't interested in.
-				size_t diff = startOffset - offset;
+				generic_size_t diff = startOffset - offset;
 				offset += diff;
 				base += diff;
 				length -= diff;
@@ -408,14 +412,14 @@ IOOperation::Prepare(IORequest* request)
 		if (UsesBounceBuffer()) {
 			TRACE("  write with bounce buffer\n");
 			uint8* bounceBuffer = (uint8*)fDMABuffer->BounceBufferAddress();
-			addr_t bounceBufferStart
+			phys_addr_t bounceBufferStart
 				= fDMABuffer->PhysicalBounceBufferAddress();
-			addr_t bounceBufferEnd = bounceBufferStart
+			phys_addr_t bounceBufferEnd = bounceBufferStart
 				+ fDMABuffer->BounceBufferSize();
 
-			const iovec* vecs = fDMABuffer->Vecs();
+			const generic_io_vec* vecs = fDMABuffer->Vecs();
 			uint32 vecCount = fDMABuffer->VecCount();
-			size_t vecOffset = 0;
+			generic_size_t vecOffset = 0;
 			uint32 i = 0;
 
 			off_t offset = fOffset;
@@ -423,10 +427,10 @@ IOOperation::Prepare(IORequest* request)
 
 			if (HasPartialBegin()) {
 				// skip first block
-				size_t toSkip = fBlockSize;
+				generic_size_t toSkip = fBlockSize;
 				while (toSkip > 0) {
-					if (vecs[i].iov_len <= toSkip) {
-						toSkip -= vecs[i].iov_len;
+					if (vecs[i].length <= toSkip) {
+						toSkip -= vecs[i].length;
 						i++;
 					} else {
 						vecOffset = toSkip;
@@ -439,10 +443,10 @@ IOOperation::Prepare(IORequest* request)
 
 			if (HasPartialEnd()) {
 				// skip last block
-				size_t toSkip = fBlockSize;
+				generic_size_t toSkip = fBlockSize;
 				while (toSkip > 0) {
-					if (vecs[vecCount - 1].iov_len <= toSkip) {
-						toSkip -= vecs[vecCount - 1].iov_len;
+					if (vecs[vecCount - 1].length <= toSkip) {
+						toSkip -= vecs[vecCount - 1].length;
 						vecCount--;
 					} else
 						break;
@@ -452,9 +456,9 @@ IOOperation::Prepare(IORequest* request)
 			}
 
 			for (; i < vecCount; i++) {
-				const iovec& vec = vecs[i];
-				addr_t base = (addr_t)vec.iov_base + vecOffset;
-				size_t length = vec.iov_len - vecOffset;
+				const generic_io_vec& vec = vecs[i];
+				generic_addr_t base = vec.base + vecOffset;
+				generic_size_t length = vec.length - vecOffset;
 				vecOffset = 0;
 
 				if (base >= bounceBufferStart && base < bounceBufferEnd) {
@@ -488,7 +492,7 @@ IOOperation::Prepare(IORequest* request)
 
 
 void
-IOOperation::SetOriginalRange(off_t offset, size_t length)
+IOOperation::SetOriginalRange(off_t offset, generic_size_t length)
 {
 	fOriginalOffset = fOffset = offset;
 	fOriginalLength = fLength = length;
@@ -496,7 +500,7 @@ IOOperation::SetOriginalRange(off_t offset, size_t length)
 
 
 void
-IOOperation::SetRange(off_t offset, size_t length)
+IOOperation::SetRange(off_t offset, generic_size_t length)
 {
 	fOffset = offset;
 	fLength = length;
@@ -510,14 +514,14 @@ IOOperation::Offset() const
 }
 
 
-size_t
+generic_size_t
 IOOperation::Length() const
 {
 	return fPhase == PHASE_DO_ALL ? fLength : fBlockSize;
 }
 
 
-iovec*
+generic_io_vec*
 IOOperation::Vecs() const
 {
 	switch (fPhase) {
@@ -574,34 +578,33 @@ IOOperation::_PrepareVecs()
 {
 	// we need to prepare the vecs for consumption by the drivers
 	if (fPhase == PHASE_READ_BEGIN) {
-		iovec* vecs = fDMABuffer->Vecs();
+		generic_io_vec* vecs = fDMABuffer->Vecs();
 		uint32 vecCount = fDMABuffer->VecCount();
-		size_t vecLength = fBlockSize;
+		generic_size_t vecLength = fBlockSize;
 		for (uint32 i = 0; i < vecCount; i++) {
-			iovec& vec = vecs[i];
-			if (vec.iov_len >= vecLength) {
+			generic_io_vec& vec = vecs[i];
+			if (vec.length >= vecLength) {
 				fSavedVecIndex = i;
-				fSavedVecLength = vec.iov_len;
-				vec.iov_len = vecLength;
+				fSavedVecLength = vec.length;
+				vec.length = vecLength;
 				break;
 			}
-			vecLength -= vec.iov_len;
+			vecLength -= vec.length;
 		}
 	} else if (fPhase == PHASE_READ_END) {
-		iovec* vecs = fDMABuffer->Vecs();
+		generic_io_vec* vecs = fDMABuffer->Vecs();
 		uint32 vecCount = fDMABuffer->VecCount();
-		size_t vecLength = fBlockSize;
+		generic_size_t vecLength = fBlockSize;
 		for (int32 i = vecCount - 1; i >= 0; i--) {
-			iovec& vec = vecs[i];
-			if (vec.iov_len >= vecLength) {
+			generic_io_vec& vec = vecs[i];
+			if (vec.length >= vecLength) {
 				fSavedVecIndex = i;
-				fSavedVecLength = vec.iov_len;
-				vec.iov_base = (uint8*)vec.iov_base
-					+ vec.iov_len - vecLength;
-				vec.iov_len = vecLength;
+				fSavedVecLength = vec.length;
+				vec.base += vec.length - vecLength;
+				vec.length = vecLength;
 				break;
 			}
-			vecLength -= vec.iov_len;
+			vecLength -= vec.length;
 		}
 	}
 }
@@ -610,8 +613,8 @@ IOOperation::_PrepareVecs()
 status_t
 IOOperation::_CopyPartialBegin(bool isWrite, bool& singleBlockOnly)
 {
-	size_t relativeOffset = OriginalOffset() - fOffset;
-	size_t length = fBlockSize - relativeOffset;
+	generic_size_t relativeOffset = OriginalOffset() - fOffset;
+	generic_size_t length = fBlockSize - relativeOffset;
 
 	singleBlockOnly = length >= OriginalLength();
 	if (singleBlockOnly)
@@ -636,14 +639,15 @@ IOOperation::_CopyPartialEnd(bool isWrite)
 {
 	TRACE("_CopyPartialEnd(%s)\n", isWrite ? "write" : "read");
 
-	const iovec& lastVec = fDMABuffer->VecAt(fDMABuffer->VecCount() - 1);
+	const generic_io_vec& lastVec
+		= fDMABuffer->VecAt(fDMABuffer->VecCount() - 1);
 	off_t lastVecPos = fOffset + fLength - fBlockSize;
 	uint8* base = (uint8*)fDMABuffer->BounceBufferAddress()
-		+ ((addr_t)lastVec.iov_base + lastVec.iov_len - fBlockSize
+		+ (lastVec.base + lastVec.length - fBlockSize
 		- fDMABuffer->PhysicalBounceBufferAddress());
 		// NOTE: this won't work if we don't use the bounce buffer contiguously
 		// (because of boundary alignments).
-	size_t length = OriginalOffset() + OriginalLength() - lastVecPos;
+	generic_size_t length = OriginalOffset() + OriginalLength() - lastVecPos;
 
 	if (isWrite)
 		return fParent->CopyData(lastVecPos, base, length);
@@ -716,19 +720,20 @@ IORequest::Create(bool vip)
 
 
 status_t
-IORequest::Init(off_t offset, void* buffer, size_t length, bool write,
-	uint32 flags)
+IORequest::Init(off_t offset, generic_addr_t buffer, generic_size_t length,
+	bool write, uint32 flags)
 {
-	iovec vec;
-	vec.iov_base = buffer;
-	vec.iov_len = length;
+	generic_io_vec vec;
+	vec.base = buffer;
+	vec.length = length;
 	return Init(offset, &vec, 1, length, write, flags);
 }
 
 
 status_t
-IORequest::Init(off_t offset, size_t firstVecOffset, const iovec* vecs,
-	size_t count, size_t length, bool write, uint32 flags)
+IORequest::Init(off_t offset, generic_size_t firstVecOffset,
+	const generic_io_vec* vecs, size_t count, generic_size_t length, bool write,
+	uint32 flags)
 {
 	fBuffer = IOBuffer::Create(count, (flags & B_VIP_IO_REQUEST) != 0);
 	if (fBuffer == NULL)
@@ -763,35 +768,35 @@ IORequest::Init(off_t offset, size_t firstVecOffset, const iovec* vecs,
 
 
 status_t
-IORequest::CreateSubRequest(off_t parentOffset, off_t offset, size_t length,
-	IORequest*& _subRequest)
+IORequest::CreateSubRequest(off_t parentOffset, off_t offset,
+	generic_size_t length, IORequest*& _subRequest)
 {
 	ASSERT(parentOffset >= fOffset && length <= fLength
 		&& parentOffset - fOffset <= fLength - length);
 
 	// find start vec
-	size_t vecOffset = parentOffset - fOffset;
-	iovec* vecs = fBuffer->Vecs();
+	generic_size_t vecOffset = parentOffset - fOffset;
+	generic_io_vec* vecs = fBuffer->Vecs();
 	int32 vecCount = fBuffer->VecCount();
 	int32 startVec = 0;
 	for (; startVec < vecCount; startVec++) {
-		const iovec& vec = vecs[startVec];
-		if (vecOffset < vec.iov_len)
+		const generic_io_vec& vec = vecs[startVec];
+		if (vecOffset < vec.length)
 			break;
 
-		vecOffset -= vec.iov_len;
+		vecOffset -= vec.length;
 	}
 
 	// count vecs
-	size_t currentVecOffset = vecOffset;
+	generic_size_t currentVecOffset = vecOffset;
 	int32 endVec = startVec;
-	size_t remainingLength = length;
+	generic_size_t remainingLength = length;
 	for (; endVec < vecCount; endVec++) {
-		const iovec& vec = vecs[endVec];
-		if (vec.iov_len - currentVecOffset >= remainingLength)
+		const generic_io_vec& vec = vecs[endVec];
+		if (vec.length - currentVecOffset >= remainingLength)
 			break;
 
-		remainingLength -= vec.iov_len - currentVecOffset;
+		remainingLength -= vec.length - currentVecOffset;
 		currentVecOffset = 0;
 	}
 
@@ -925,7 +930,8 @@ IORequest::NotifyFinished()
 	io_request_finished_callback finishedCallback = fFinishedCallback;
 	void* finishedCookie = fFinishedCookie;
 	status_t status = fStatus;
-	size_t lastTransferredOffset = fRelativeParentOffset + fTransferSize;
+	generic_size_t lastTransferredOffset
+		= fRelativeParentOffset + fTransferSize;
 	bool partialTransfer = status != B_OK || fPartialTransfer;
 	bool deleteRequest = (fFlags & B_DELETE_IO_REQUEST) != 0;
 
@@ -984,7 +990,7 @@ IORequest::SetStatusAndNotify(status_t status)
 
 void
 IORequest::OperationFinished(IOOperation* operation, status_t status,
-	bool partialTransfer, size_t transferEndOffset)
+	bool partialTransfer, generic_size_t transferEndOffset)
 {
 	TRACE("IORequest::OperationFinished(%p, %#lx): request: %p\n", operation,
 		status, this);
@@ -1016,7 +1022,7 @@ IORequest::OperationFinished(IOOperation* operation, status_t status,
 
 void
 IORequest::SubRequestFinished(IORequest* request, status_t status,
-	bool partialTransfer, size_t transferEndOffset)
+	bool partialTransfer, generic_size_t transferEndOffset)
 {
 	TRACE("IORequest::SubrequestFinished(%p, %#lx, %d, %lu): request: %p\n",
 		request, status, partialTransfer, transferEndOffset, this);
@@ -1056,7 +1062,8 @@ IORequest::SetUnfinished()
 
 
 void
-IORequest::SetTransferredBytes(bool partialTransfer, size_t transferredBytes)
+IORequest::SetTransferredBytes(bool partialTransfer,
+	generic_size_t transferredBytes)
 {
 	TRACE("%p->IORequest::SetTransferredBytes(%d, %lu)\n", this,
 		partialTransfer, transferredBytes);
@@ -1076,18 +1083,18 @@ IORequest::SetSuppressChildNotifications(bool suppress)
 
 
 void
-IORequest::Advance(size_t bySize)
+IORequest::Advance(generic_size_t bySize)
 {
 	TRACE("IORequest::Advance(%lu): remaining: %lu -> %lu\n", bySize,
 		fRemainingBytes, fRemainingBytes - bySize);
 	fRemainingBytes -= bySize;
 	fTransferSize += bySize;
 
-	iovec* vecs = fBuffer->Vecs();
+	generic_io_vec* vecs = fBuffer->Vecs();
 	uint32 vecCount = fBuffer->VecCount();
 	while (fVecIndex < vecCount
-			&& vecs[fVecIndex].iov_len - fVecOffset <= bySize) {
-		bySize -= vecs[fVecIndex].iov_len - fVecOffset;
+			&& vecs[fVecIndex].length - fVecOffset <= bySize) {
+		bySize -= vecs[fVecIndex].length - fVecOffset;
 		fVecOffset = 0;
 		fVecIndex++;
 	}
@@ -1170,24 +1177,24 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 	}
 
 	// skip bytes if requested
-	iovec* vecs = fBuffer->Vecs();
-	size_t skipBytes = offset - fOffset;
-	size_t vecOffset = 0;
+	generic_io_vec* vecs = fBuffer->Vecs();
+	generic_size_t skipBytes = offset - fOffset;
+	generic_size_t vecOffset = 0;
 	while (skipBytes > 0) {
-		if (vecs[0].iov_len > skipBytes) {
+		if (vecs[0].length > skipBytes) {
 			vecOffset = skipBytes;
 			break;
 		}
 
-		skipBytes -= vecs[0].iov_len;
+		skipBytes -= vecs[0].length;
 		vecs++;
 	}
 
-	// copy iovec-wise
+	// copy vector-wise
 	while (size > 0) {
-		size_t toCopy = min_c(size, vecs[0].iov_len - vecOffset);
+		generic_size_t toCopy = min_c(size, vecs[0].length - vecOffset);
 		status_t error = copyFunction(buffer,
-			(uint8*)vecs[0].iov_base + vecOffset, toCopy, fTeam, copyIn);
+			(uint8*)vecs[0].base + vecOffset, toCopy, fTeam, copyIn);
 		if (error != B_OK)
 			return error;
 

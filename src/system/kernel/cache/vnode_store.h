@@ -20,14 +20,15 @@ public:
 
 	virtual	bool				HasPage(off_t offset);
 
-	virtual	status_t			Read(off_t offset, const iovec *vecs,
+	virtual	status_t			Read(off_t offset, const generic_io_vec *vecs,
 									size_t count, uint32 flags,
-									size_t *_numBytes);
-	virtual	status_t			Write(off_t offset, const iovec *vecs,
+									generic_size_t *_numBytes);
+	virtual	status_t			Write(off_t offset, const generic_io_vec *vecs,
 									size_t count, uint32 flags,
-									size_t *_numBytes);
-	virtual	status_t			WriteAsync(off_t offset, const iovec* vecs,
-									size_t count, size_t numBytes, uint32 flags,
+									generic_size_t *_numBytes);
+	virtual	status_t			WriteAsync(off_t offset,
+									const generic_io_vec* vecs, size_t count,
+									generic_size_t numBytes, uint32 flags,
 									AsyncIOCallback* callback);
 	virtual	bool				CanWritePage(off_t offset);
 

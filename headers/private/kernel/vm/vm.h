@@ -14,7 +14,7 @@
 #include <vm_defs.h>
 
 
-struct iovec;
+struct generic_io_vec;
 struct kernel_args;
 struct ObjectCache;
 struct system_memory_info;
@@ -93,7 +93,7 @@ area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 			phys_addr_t physicalAddress, bool alreadyWired);
 area_id vm_map_physical_memory_vecs(team_id team, const char* name,
 	void** _address, uint32 addressSpec, addr_t* _size, uint32 protection,
-	struct iovec* vecs, uint32 vecCount);
+	struct generic_io_vec* vecs, uint32 vecCount);
 area_id vm_map_file(team_id aid, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping,
 			bool unmapAddressRange, int fd, off_t offset);

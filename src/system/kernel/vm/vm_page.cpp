@@ -1548,7 +1548,7 @@ private:
 	int32				fMaxPages;
 	status_t			fStatus;
 	uint32				fVecCount;
-	iovec				fVecs[32]; // TODO: make dynamic/configurable
+	generic_io_vec		fVecs[32]; // TODO: make dynamic/configurable
 };
 
 
@@ -1685,8 +1685,8 @@ PageWriteTransfer::SetTo(PageWriterRun* run, vm_page* page, int32 maxPages)
 	fMaxPages = maxPages;
 	fStatus = B_OK;
 
-	fVecs[0].iov_base = (void*)(page->physical_page_number << PAGE_SHIFT);
-	fVecs[0].iov_len = B_PAGE_SIZE;
+	fVecs[0].base = (phys_addr_t)page->physical_page_number << PAGE_SHIFT;
+	fVecs[0].length = B_PAGE_SIZE;
 	fVecCount = 1;
 }
 
@@ -1700,23 +1700,23 @@ PageWriteTransfer::AddPage(vm_page* page)
 		|| (fMaxPages >= 0 && fPageCount >= (uint32)fMaxPages))
 		return false;
 
-	phys_addr_t nextBase = (phys_addr_t)fVecs[fVecCount - 1].iov_base
-		+ fVecs[fVecCount - 1].iov_len;
+	phys_addr_t nextBase = fVecs[fVecCount - 1].base
+		+ fVecs[fVecCount - 1].length;
 
 	if (page->physical_page_number << PAGE_SHIFT == nextBase
 		&& page->cache_offset == fOffset + fPageCount) {
 		// append to last iovec
-		fVecs[fVecCount - 1].iov_len += B_PAGE_SIZE;
+		fVecs[fVecCount - 1].length += B_PAGE_SIZE;
 		fPageCount++;
 		return true;
 	}
 
-	nextBase = (phys_addr_t)fVecs[0].iov_base - B_PAGE_SIZE;
+	nextBase = fVecs[0].base - B_PAGE_SIZE;
 	if (page->physical_page_number << PAGE_SHIFT == nextBase
 		&& page->cache_offset == fOffset - 1) {
 		// prepend to first iovec and adjust offset
-		fVecs[0].iov_base = (void*)nextBase;
-		fVecs[0].iov_len += B_PAGE_SIZE;
+		fVecs[0].base = nextBase;
+		fVecs[0].length += B_PAGE_SIZE;
 		fOffset = page->cache_offset;
 		fPageCount++;
 		return true;
@@ -1737,9 +1737,9 @@ PageWriteTransfer::AddPage(vm_page* page)
 		} else
 			vectorIndex = fVecCount;
 
-		fVecs[vectorIndex].iov_base
-			= (void*)(page->physical_page_number << PAGE_SHIFT);
-		fVecs[vectorIndex].iov_len = B_PAGE_SIZE;
+		fVecs[vectorIndex].base
+			= (phys_addr_t)page->physical_page_number << PAGE_SHIFT;
+		fVecs[vectorIndex].length = B_PAGE_SIZE;
 
 		fVecCount++;
 		fPageCount++;
@@ -1754,7 +1754,7 @@ status_t
 PageWriteTransfer::Schedule(uint32 flags)
 {
 	off_t writeOffset = (off_t)fOffset << PAGE_SHIFT;
-	size_t writeLength = (size_t)fPageCount << PAGE_SHIFT;
+	generic_size_t writeLength = (phys_size_t)fPageCount << PAGE_SHIFT;
 
 	if (fRun != NULL) {
 		return fCache->WriteAsync(writeOffset, fVecs, fVecCount, writeLength,

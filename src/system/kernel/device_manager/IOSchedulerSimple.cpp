@@ -284,7 +284,7 @@ IOSchedulerSimple::AbortRequest(IORequest* request, status_t status)
 
 void
 IOSchedulerSimple::OperationCompleted(IOOperation* operation, status_t status,
-	size_t transferredBytes)
+	generic_size_t transferredBytes)
 {
 	InterruptsSpinLocker _(fFinisherLock);
 
@@ -295,7 +295,8 @@ IOSchedulerSimple::OperationCompleted(IOOperation* operation, status_t status,
 	operation->SetStatus(status);
 
 	// set the bytes transferred (of the net data)
-	size_t partialBegin = operation->OriginalOffset() - operation->Offset();
+	generic_size_t partialBegin
+		= operation->OriginalOffset() - operation->Offset();
 	operation->SetTransferredBytes(
 		transferredBytes > partialBegin ? transferredBytes - partialBegin : 0);
 
@@ -353,7 +354,7 @@ IOSchedulerSimple::_Finisher()
 		// notify request and remove operation
 		IORequest* request = operation->Parent();
 		if (request != NULL) {
-			size_t operationOffset = operation->OriginalOffset()
+			generic_size_t operationOffset = operation->OriginalOffset()
 				- request->Offset();
 			request->OperationFinished(operation, operation->Status(),
 				operation->TransferredBytes() < operation->OriginalLength(),

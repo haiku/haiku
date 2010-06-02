@@ -390,7 +390,7 @@ public:
 	}
 
 	virtual void IOFinished(status_t status, bool partialTransfer,
-		size_t bytesTransferred)
+		generic_size_t bytesTransferred)
 	{
 		if (fNewSlot) {
 			if (status == B_OK) {
@@ -568,8 +568,8 @@ VMAnonymousCache::DebugHasPage(off_t offset)
 
 
 status_t
-VMAnonymousCache::Read(off_t offset, const iovec* vecs, size_t count,
-	uint32 flags, size_t* _numBytes)
+VMAnonymousCache::Read(off_t offset, const generic_io_vec* vecs, size_t count,
+	uint32 flags, generic_size_t* _numBytes)
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 
@@ -600,16 +600,16 @@ VMAnonymousCache::Read(off_t offset, const iovec* vecs, size_t count,
 
 
 status_t
-VMAnonymousCache::Write(off_t offset, const iovec* vecs, size_t count,
-	uint32 flags, size_t* _numBytes)
+VMAnonymousCache::Write(off_t offset, const generic_io_vec* vecs, size_t count,
+	uint32 flags, generic_size_t* _numBytes)
 {
 	off_t pageIndex = offset >> PAGE_SHIFT;
 
 	AutoLocker<VMCache> locker(this);
 
-	uint32 totalPages = 0;
+	page_num_t totalPages = 0;
 	for (uint32 i = 0; i < count; i++) {
-		uint32 pageCount = (vecs[i].iov_len + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+		page_num_t pageCount = (vecs[i].length + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
 		swap_addr_t slotIndex = _SwapBlockGetAddress(pageIndex + totalPages);
 		if (slotIndex != SWAP_SLOT_NONE) {
 			swap_slot_dealloc(slotIndex, pageCount);
@@ -627,17 +627,17 @@ VMAnonymousCache::Write(off_t offset, const iovec* vecs, size_t count,
 	fAllocatedSwapSize += totalSize;
 	locker.Unlock();
 
-	uint32 pagesLeft = totalPages;
+	page_num_t pagesLeft = totalPages;
 	totalPages = 0;
 
 	for (uint32 i = 0; i < count; i++) {
-		uint32 pageCount = (vecs[i].iov_len + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
+		page_num_t pageCount = (vecs[i].length + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
 
-		void* vectorBase = vecs[i].iov_base;
-		size_t vectorLength = vecs[i].iov_len;
-		uint32 n = pageCount;
+		generic_addr_t vectorBase = vecs[i].base;
+		generic_size_t vectorLength = vecs[i].length;
+		page_num_t n = pageCount;
 
-		for (uint32 j = 0; j < pageCount; j += n) {
+		for (page_num_t j = 0; j < pageCount; j += n) {
 			swap_addr_t slotIndex;
 			// try to allocate n slots, if fail, try to allocate n/2
 			while ((slotIndex = swap_slot_alloc(n)) == SWAP_SLOT_NONE && n >= 2)
@@ -653,10 +653,10 @@ VMAnonymousCache::Write(off_t offset, const iovec* vecs, size_t count,
 
 			off_t pos = (off_t)(slotIndex - swapFile->first_slot) * B_PAGE_SIZE;
 
-			size_t length = n * B_PAGE_SIZE;
-			iovec vector[1];
-			vector->iov_base = vectorBase;
-			vector->iov_len = length;
+			generic_size_t length = (phys_addr_t)n * B_PAGE_SIZE;
+			generic_io_vec vector[1];
+			vector->base = vectorBase;
+			vector->length = length;
 
 			status_t status = vfs_write_pages(swapFile->vnode, swapFile->cookie,
 				pos, vector, 1, flags, &length);
@@ -673,7 +673,7 @@ VMAnonymousCache::Write(off_t offset, const iovec* vecs, size_t count,
 			pagesLeft -= n;
 
 			if (n != pageCount) {
-				vectorBase = (void*)((addr_t)vectorBase + n * B_PAGE_SIZE);
+				vectorBase = vectorBase + n * B_PAGE_SIZE;
 				vectorLength -= n * B_PAGE_SIZE;
 			}
 		}
@@ -687,8 +687,9 @@ VMAnonymousCache::Write(off_t offset, const iovec* vecs, size_t count,
 
 
 status_t
-VMAnonymousCache::WriteAsync(off_t offset, const iovec* vecs, size_t count,
-	size_t numBytes, uint32 flags, AsyncIOCallback* _callback)
+VMAnonymousCache::WriteAsync(off_t offset, const generic_io_vec* vecs,
+	size_t count, generic_size_t numBytes, uint32 flags,
+	AsyncIOCallback* _callback)
 {
 	// TODO: Currently this method is only used for single pages. Either make
 	// more flexible use of it or change the interface!

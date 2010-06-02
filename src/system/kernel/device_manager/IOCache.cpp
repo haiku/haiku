@@ -113,9 +113,9 @@ IOCache::Init(const char* name)
 	}
 	fCache = area->cache;
 
-	// allocate arrays for pages and iovecs
+	// allocate arrays for pages and io vecs
 	fPages = new(std::nothrow) vm_page*[fPagesPerLine];
-	fVecs = new(std::nothrow) iovec[fPagesPerLine];
+	fVecs = new(std::nothrow) generic_io_vec[fPagesPerLine];
 	if (fPages == NULL || fVecs == NULL)
 		return B_NO_MEMORY;
 
@@ -171,7 +171,7 @@ IOCache::ScheduleRequest(IORequest* request)
 
 	// we completely serialize all I/O in FIFO order
 	MutexLocker serializationLocker(fSerializationLock);
-	size_t bytesTransferred = 0;
+	generic_size_t bytesTransferred = 0;
 	error = _DoRequest(request, bytesTransferred);
 	serializationLocker.Unlock();
 
@@ -200,7 +200,7 @@ IOCache::AbortRequest(IORequest* request, status_t status)
 
 void
 IOCache::OperationCompleted(IOOperation* operation, status_t status,
-	size_t transferredBytes)
+	generic_size_t transferredBytes)
 {
 	if (status == B_OK) {
 		// always fail in case of partial transfers
@@ -220,10 +220,10 @@ IOCache::Dump() const
 
 
 status_t
-IOCache::_DoRequest(IORequest* request, size_t& _bytesTransferred)
+IOCache::_DoRequest(IORequest* request, generic_size_t& _bytesTransferred)
 {
 	off_t offset = request->Offset();
-	size_t length = request->Length();
+	generic_size_t length = request->Length();
 
 	TRACE("%p->IOCache::ScheduleRequest(%p): offset: %" B_PRIdOFF
 		", length: %" B_PRIuSIZE "\n", this, request, offset, length);
@@ -439,7 +439,7 @@ IOCache::_TransferRequestLineUncached(IORequest* request, off_t lineOffset,
 	if (actualRequestOffset < requestOffset)
 		request->Advance(requestOffset - actualRequestOffset);
 
-	size_t requestRemaining = request->RemainingBytes() - requestLength;
+	generic_size_t requestRemaining = request->RemainingBytes() - requestLength;
 
 	// Process single operations until the specified part of the request is
 	// finished or until an error occurs.
@@ -513,23 +513,24 @@ IOCache::_TransferPages(size_t firstPage, size_t pageCount, bool isWrite,
 
 	off_t firstPageOffset = (off_t)fPages[firstPage]->cache_offset
 		* B_PAGE_SIZE;
-	size_t requestLength = std::min(
+	generic_size_t requestLength = std::min(
 			firstPageOffset + (off_t)pageCount * B_PAGE_SIZE, fDeviceCapacity)
 		- firstPageOffset;
 
 	// prepare the I/O vecs
 	size_t vecCount = 0;
 	size_t endPage = firstPage + pageCount;
-	addr_t vecsEndAddress = 0;
+	phys_addr_t vecsEndAddress = 0;
 	for (size_t i = firstPage; i < endPage; i++) {
-		addr_t pageAddress = fPages[i]->physical_page_number * B_PAGE_SIZE;
+		phys_addr_t pageAddress
+			= (phys_addr_t)fPages[i]->physical_page_number * B_PAGE_SIZE;
 		if (vecCount == 0 || pageAddress != vecsEndAddress) {
-			fVecs[vecCount].iov_base = (void*)pageAddress;
-			fVecs[vecCount++].iov_len = B_PAGE_SIZE;
+			fVecs[vecCount].base = pageAddress;
+			fVecs[vecCount++].length = B_PAGE_SIZE;
 			vecsEndAddress = pageAddress + B_PAGE_SIZE;
 		} else {
 			// extend the previous vec
-			fVecs[vecCount - 1].iov_len += B_PAGE_SIZE;
+			fVecs[vecCount - 1].length += B_PAGE_SIZE;
 			vecsEndAddress += B_PAGE_SIZE;
 		}
 	}

@@ -1504,8 +1504,8 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 */
 area_id
 vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
-	uint32 addressSpec, addr_t* _size, uint32 protection, struct iovec* vecs,
-	uint32 vecCount)
+	uint32 addressSpec, addr_t* _size, uint32 protection,
+	struct generic_io_vec* vecs, uint32 vecCount)
 {
 	TRACE(("vm_map_physical_memory_vecs(team = %ld, \"%s\", virtual = %p, "
 		"spec = %ld, _size = %p, protection = %ld, vecs = %p, "
@@ -1526,18 +1526,17 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 
 	addr_t size = 0;
 	for (uint32 i = 0; i < vecCount; i++) {
-		if ((addr_t)vecs[i].iov_base % B_PAGE_SIZE != 0
-			|| vecs[i].iov_len % B_PAGE_SIZE != 0) {
+		if (vecs[i].base % B_PAGE_SIZE != 0
+			|| vecs[i].length % B_PAGE_SIZE != 0) {
 			return B_BAD_VALUE;
 		}
 
-		size += vecs[i].iov_len;
+		size += vecs[i].length;
 	}
 
 	// create a device cache
 	VMCache* cache;
-	status_t result = VMCacheFactory::CreateDeviceCache(cache,
-		(addr_t)vecs[0].iov_base);
+	status_t result = VMCacheFactory::CreateDeviceCache(cache, vecs[0].base);
 	if (result != B_OK)
 		return result;
 
@@ -1573,7 +1572,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
-		while (vecOffset >= vecs[vecIndex].iov_len && vecIndex < vecCount) {
+		while (vecOffset >= vecs[vecIndex].length && vecIndex < vecCount) {
 			vecOffset = 0;
 			vecIndex++;
 		}
@@ -1581,9 +1580,8 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 		if (vecIndex >= vecCount)
 			break;
 
-		map->Map(area->Base() + offset,
-			(addr_t)vecs[vecIndex].iov_base + vecOffset, protection,
-			area->MemoryType(), &reservation);
+		map->Map(area->Base() + offset, vecs[vecIndex].base + vecOffset,
+			protection, area->MemoryType(), &reservation);
 
 		vecOffset += B_PAGE_SIZE;
 	}
@@ -4033,9 +4031,9 @@ fault_get_page(PageFaultContext& context)
 			context.UnlockAll();
 
 			// read the page in
-			iovec vec;
-			vec.iov_base = (void*)(page->physical_page_number * B_PAGE_SIZE);
-			size_t bytesRead = vec.iov_len = B_PAGE_SIZE;
+			generic_io_vec vec;
+			vec.base = (phys_addr_t)page->physical_page_number * B_PAGE_SIZE;
+			generic_size_t bytesRead = vec.length = B_PAGE_SIZE;
 
 			status_t status = cache->Read(context.cacheOffset, &vec, 1,
 				B_PHYSICAL_IO_REQUEST, &bytesRead);

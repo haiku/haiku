@@ -33,7 +33,8 @@ public:
 	virtual	void				AbortRequest(IORequest* request,
 									status_t status = B_CANCELED);
 	virtual	void				OperationCompleted(IOOperation* operation,
-									status_t status, size_t transferredBytes);
+									status_t status,
+									generic_size_t transferredBytes);
 
 	virtual	void				Dump() const;
 
@@ -42,7 +43,7 @@ private:
 
 private:
 			status_t			_DoRequest(IORequest* request,
-									size_t& _bytesTransferred);
+									generic_size_t& _bytesTransferred);
 			status_t			_TransferRequestLine(IORequest* request,
 									off_t lineOffset, size_t lineSize,
 									off_t requestOffset, size_t requestLength);
@@ -76,7 +77,7 @@ private:
 			vm_page_reservation	fMappingReservation;
 			VMCache*			fCache;
 			vm_page**			fPages;
-			iovec*				fVecs;
+			generic_io_vec*		fVecs;
 };
 
 

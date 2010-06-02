@@ -53,8 +53,8 @@ public:
 	virtual	void				AbortRequest(IORequest* request,
 									status_t status = B_CANCELED) = 0;
 	virtual	void				OperationCompleted(IOOperation* operation,
-									status_t status, size_t transferredBytes)
-										= 0;
+									status_t status,
+									generic_size_t transferredBytes) = 0;
 									// called by the driver when the operation
 									// has been completed successfully or failed
 									// for some reason

@@ -1,16 +1,17 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IO_REQUEST_H
 #define IO_REQUEST_H
 
+
 #include <sys/uio.h>
 
 #include <new>
 
-#include <SupportDefs.h>
+#include <fs_interface.h>
 
 #include <condition_variable.h>
 #include <lock.h>
@@ -38,25 +39,25 @@ public:
 			bool				IsPhysical() const { return fPhysical; }
 			bool				IsUser() const { return fUser; }
 
-			void				SetVecs(size_t firstVecOffset,
-									const iovec* vecs, uint32 count,
-									size_t length, uint32 flags);
+			void				SetVecs(generic_size_t firstVecOffset,
+									const generic_io_vec* vecs, uint32 count,
+									generic_size_t length, uint32 flags);
 
 			void				SetPhysical(bool physical)
 									{ fPhysical = physical; }
 			void				SetUser(bool user) { fUser = user; }
-			void				SetLength(size_t length) { fLength = length; }
+			void				SetLength(generic_size_t length)
+									{ fLength = length; }
 			void				SetVecCount(uint32 count) { fVecCount = count; }
 
-			size_t				Length() const { return fLength; }
+			generic_size_t		Length() const { return fLength; }
 
-			iovec*				Vecs() { return fVecs; }
-			iovec&				VecAt(size_t index) { return fVecs[index]; }
+			generic_io_vec*		Vecs() { return fVecs; }
+			generic_io_vec&		VecAt(size_t index) { return fVecs[index]; }
 			size_t				VecCount() const { return fVecCount; }
 			size_t				Capacity() const { return fCapacity; }
 
-			status_t			GetNextVirtualVec(void*& cookie,
-									iovec& vector);
+			status_t			GetNextVirtualVec(void*& cookie, iovec& vector);
 			void				FreeVirtualVecCookie(void* cookie);
 
 			status_t			LockMemory(team_id team, bool isWrite);
@@ -77,10 +78,10 @@ private:
 			bool				fPhysical;
 			bool				fVIP;
 			bool				fMemoryLocked;
-			size_t				fLength;
+			generic_size_t		fLength;
 			size_t				fVecCount;
 			size_t				fCapacity;
-			iovec				fVecs[1];
+			generic_io_vec		fVecs[1];
 };
 
 
@@ -127,26 +128,27 @@ public:
 									// returns true, if it can be recycled
 
 			status_t			Prepare(IORequest* request);
-			void				SetOriginalRange(off_t offset, size_t length);
+			void				SetOriginalRange(off_t offset,
+									generic_size_t length);
 									// also sets range
-			void				SetRange(off_t offset, size_t length);
+			void				SetRange(off_t offset, generic_size_t length);
 
 			void				SetStatus(status_t status)
 									{ IORequestChunk::SetStatus(status); }
 
 			off_t				Offset() const;
-			size_t				Length() const;
+			generic_size_t		Length() const;
 			off_t				OriginalOffset() const
 									{ return fOriginalOffset; }
-			size_t				OriginalLength() const
+			generic_size_t		OriginalLength() const
 									{ return fOriginalLength; }
 
-			size_t				TransferredBytes() const
+			generic_size_t		TransferredBytes() const
 									{ return fTransferredBytes; }
-			void				SetTransferredBytes(size_t bytes)
+			void				SetTransferredBytes(generic_size_t bytes)
 									{ fTransferredBytes = bytes; }
 
-			iovec*				Vecs() const;
+			generic_io_vec*		Vecs() const;
 			uint32				VecCount() const;
 
 			void				SetPartial(bool partialBegin, bool partialEnd);
@@ -157,7 +159,7 @@ public:
 			bool				IsWrite() const;
 			bool				IsRead() const;
 
-			void				SetBlockSize(size_t blockSize)
+			void				SetBlockSize(generic_size_t blockSize)
 									{ fBlockSize  = blockSize; }
 
 			bool				UsesBounceBuffer() const
@@ -180,10 +182,10 @@ protected:
 			DMABuffer*			fDMABuffer;
 			off_t				fOffset;
 			off_t				fOriginalOffset;
-			size_t				fLength;
-			size_t				fOriginalLength;
-			size_t				fTransferredBytes;
-			size_t				fBlockSize;
+			generic_size_t		fLength;
+			generic_size_t		fOriginalLength;
+			generic_size_t		fTransferredBytes;
+			generic_size_t		fBlockSize;
 			uint16				fSavedVecIndex;
 			uint16				fSavedVecLength;
 			uint8				fPhase;
@@ -199,7 +201,7 @@ typedef DoublyLinkedList<IOOperation> IOOperationList;
 typedef struct IORequest io_request;
 typedef status_t (*io_request_finished_callback)(void* data,
 			io_request* request, status_t status, bool partialTransfer,
-			size_t transferEndOffset);
+			generic_size_t transferEndOffset);
 			// TODO: Return type: status_t -> void
 typedef status_t (*io_request_iterate_callback)(void* data,
 			io_request* request, bool* _partialTransfer);
@@ -211,23 +213,26 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 
 	static	IORequest*			Create(bool vip);
 
-			status_t			Init(off_t offset, void* buffer, size_t length,
-									bool write, uint32 flags);
-			status_t			Init(off_t offset, const iovec* vecs,
-									size_t count, size_t length, bool write,
-									uint32 flags)
+			status_t			Init(off_t offset, generic_addr_t buffer,
+									generic_size_t length, bool write,
+									uint32 flags);
+			status_t			Init(off_t offset, const generic_io_vec* vecs,
+									size_t count, generic_size_t length,
+									bool write, uint32 flags)
 									{ return Init(offset, 0, vecs, count,
 										length, write, flags); }
-			status_t			Init(off_t offset, size_t firstVecOffset,
-									const iovec* vecs, size_t count,
-									size_t length, bool write, uint32 flags);
+			status_t			Init(off_t offset,
+									generic_size_t firstVecOffset,
+									const generic_io_vec* vecs, size_t count,
+									generic_size_t length, bool write,
+									uint32 flags);
 
 			void				SetOwner(IORequestOwner* owner)
 									{ fOwner = owner; }
 			IORequestOwner*		Owner() const	{ return fOwner; }
 
 			status_t			CreateSubRequest(off_t parentOffset,
-									off_t offset, size_t length,
+									off_t offset, generic_size_t length,
 									IORequest*& subRequest);
 			void				DeleteSubRequests();
 
@@ -251,20 +256,20 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 
 			void				OperationFinished(IOOperation* operation,
 									status_t status, bool partialTransfer,
-									size_t transferEndOffset);
+									generic_size_t transferEndOffset);
 			void				SubRequestFinished(IORequest* request,
 									status_t status, bool partialTransfer,
-									size_t transferEndOffset);
+									generic_size_t transferEndOffset);
 			void				SetUnfinished();
 
-			size_t				RemainingBytes() const
+			generic_size_t		RemainingBytes() const
 									{ return fRemainingBytes; }
-			size_t				TransferredBytes() const
+			generic_size_t		TransferredBytes() const
 									{ return fTransferSize; }
 			bool				IsPartialTransfer() const
 									{ return fPartialTransfer; }
 			void				SetTransferredBytes(bool partialTransfer,
-									size_t transferredBytes);
+									generic_size_t transferredBytes);
 
 			void				SetSuppressChildNotifications(bool suppress);
 			bool				SuppressChildNotifications() const
@@ -278,14 +283,14 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 
 			IOBuffer*			Buffer() const	{ return fBuffer; }
 			off_t				Offset() const	{ return fOffset; }
-			size_t				Length() const	{ return fLength; }
+			generic_size_t		Length() const	{ return fLength; }
 
 			void				SetOffset(off_t offset)	{ fOffset = offset; }
 
 			uint32				VecIndex() const	{ return fVecIndex; }
-			size_t				VecOffset() const	{ return fVecOffset; }
+			generic_size_t		VecOffset() const	{ return fVecOffset; }
 
-			void				Advance(size_t bySize);
+			void				Advance(generic_size_t bySize);
 
 			IORequest*			FirstSubRequest();
 			IORequest*			NextSubRequest(IORequest* previous);
@@ -315,13 +320,13 @@ private:
 			IORequestOwner*		fOwner;
 			IOBuffer*			fBuffer;
 			off_t				fOffset;
-			size_t				fLength;
-			size_t				fTransferSize;
+			generic_size_t		fLength;
+			generic_size_t		fTransferSize;
 									// After all subrequests/operations have
 									// finished, number of contiguous bytes at
 									// the beginning of the request that have
 									// actually been transferred.
-			size_t				fRelativeParentOffset;
+			generic_size_t		fRelativeParentOffset;
 									// offset of this request relative to its
 									// parent
 			IORequestChunkList	fChildren;
@@ -342,8 +347,8 @@ private:
 
 			// these are for iteration
 			uint32				fVecIndex;
-			size_t				fVecOffset;
-			size_t				fRemainingBytes;
+			generic_size_t		fVecOffset;
+			generic_size_t		fRemainingBytes;
 };
 
 

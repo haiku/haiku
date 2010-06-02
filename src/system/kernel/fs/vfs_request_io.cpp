@@ -27,7 +27,7 @@ AsyncIOCallback::~AsyncIOCallback()
 
 /* static */ status_t
 AsyncIOCallback::IORequestCallback(void* data, io_request* request,
-	status_t status, bool partialTransfer, size_t transferEndOffset)
+	status_t status, bool partialTransfer, generic_size_t transferEndOffset)
 {
 	((AsyncIOCallback*)data)->IOFinished(status, partialTransfer,
 		transferEndOffset);
@@ -259,14 +259,14 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 	iovec vector;
 	void* virtualVecCookie = NULL;
 	off_t offset = request->Offset();
-	size_t length = request->Length();
+	generic_size_t length = request->Length();
 
 	status_t error = B_OK;
 
 	for (; error == B_OK && length > 0
 			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
 		uint8* vecBase = (uint8*)vector.iov_base;
-		size_t vecLength = min_c(vector.iov_len, length);
+		generic_size_t vecLength = min_c(vector.iov_len, length);
 
 		while (error == B_OK && vecLength > 0) {
 			file_io_vec fileVecs[8];
@@ -317,17 +317,17 @@ synchronous_io(io_request* request, DoIO& io)
 	iovec vector;
 	void* virtualVecCookie = NULL;
 	off_t offset = request->Offset();
-	size_t length = request->Length();
+	generic_size_t length = request->Length();
 
 	for (; length > 0
 			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
-		void* vecBase = vector.iov_base;
+		void* vecBase = (void*)(addr_t)vector.iov_base;
 		size_t vecLength = min_c(vector.iov_len, length);
 
 		TRACE_RIO("[%ld]   I/O: offset: %lld, vecBase: %p, length: %lu\n",
 			find_thread(NULL), offset, vecBase, vecLength);
 
-		size_t transferred = vecLength;
+		generic_size_t transferred = vecLength;
 		status_t error = io.IO(offset, vecBase, &transferred);
 		if (error != B_OK) {
 			TRACE_RIO("[%ld]   I/O failed: %#lx\n", find_thread(NULL), error);
@@ -382,7 +382,7 @@ vfs_synchronous_io(io_request* request,
 
 status_t
 vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie, off_t pos,
-	const iovec* vecs, size_t count, size_t numBytes, uint32 flags,
+	const generic_io_vec* vecs, size_t count, size_t numBytes, uint32 flags,
 	AsyncIOCallback* callback)
 {
 	IORequest* request = IORequest::Create((flags & B_VIP_IO_REQUEST) != 0);
@@ -408,7 +408,7 @@ vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie, off_t pos,
 
 status_t
 vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie, off_t pos,
-	const iovec* vecs, size_t count, size_t numBytes, uint32 flags,
+	const generic_io_vec* vecs, size_t count, size_t numBytes, uint32 flags,
 	AsyncIOCallback* callback)
 {
 	IORequest* request = IORequest::Create((flags & B_VIP_IO_REQUEST) != 0);
