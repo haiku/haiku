@@ -166,8 +166,12 @@ status_t
 intel_allocate_memory(intel_info &info, size_t size, size_t alignment,
 	uint32 flags, addr_t *_base, addr_t *_physicalBase)
 {
-	return gGART->allocate_memory(info.aperture, size, alignment,
-		flags, _base, _physicalBase);
+	// TODO: _physicalBase should be phys_addr_t!
+	phys_addr_t physicalBase;
+	status_t error = gGART->allocate_memory(info.aperture, size, alignment,
+		flags, _base, &physicalBase);
+	*_physicalBase = physicalBase;
+	return error;
 }
 
 
@@ -255,7 +259,7 @@ intel_extreme_init(intel_info &info)
 			dprintf("G4x mobile clock gating\n");
 		    dspclk_gate_val |= 1L << 18;
 		}
-		write32(info.registers + 0x6200, dspclk_gate_val)	;	
+		write32(info.registers + 0x6200, dspclk_gate_val)	;
 
 	} else {
 		dprintf("i965 quirk\n");
