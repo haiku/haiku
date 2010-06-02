@@ -657,11 +657,11 @@ dump_page(int argc, char **argv)
 	if (!evaluate_debug_expression(argv[index], &value, false))
 		return 0;
 
-	addr_t pageAddress = (addr_t)value;
+	uint64 pageAddress = value;
 	struct vm_page* page;
 
 	if (addressIsPointer) {
-		page = (struct vm_page *)pageAddress;
+		page = (struct vm_page *)(addr_t)pageAddress;
 	} else {
 		if (!physical) {
 			VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
@@ -670,13 +670,15 @@ dump_page(int argc, char **argv)
 				addressSpace = debug_get_debugged_thread()->team->address_space;
 
 			uint32 flags = 0;
+			phys_addr_t physicalAddress;
 			if (addressSpace->TranslationMap()->QueryInterrupt(pageAddress,
-					&pageAddress, &flags) != B_OK
+					&physicalAddress, &flags) != B_OK
 				|| (flags & PAGE_PRESENT) == 0) {
 				kprintf("Virtual address not mapped to a physical page in this "
 					"address space.\n");
 				return 0;
 			}
+			pageAddress = physicalAddress;
 		}
 
 		page = vm_lookup_page(pageAddress / B_PAGE_SIZE);
@@ -685,9 +687,10 @@ dump_page(int argc, char **argv)
 	kprintf("PAGE: %p\n", page);
 	kprintf("queue_next,prev: %p, %p\n", page->queue_link.next,
 		page->queue_link.previous);
-	kprintf("physical_number: %#lx\n", page->physical_page_number);
+	kprintf("physical_number: %#" B_PRIxPHYSADDR "\n",
+		page->physical_page_number);
 	kprintf("cache:           %p\n", page->Cache());
-	kprintf("cache_offset:    %ld\n", page->cache_offset);
+	kprintf("cache_offset:    %" B_PRIuPHYSADDR "\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
 	kprintf("state:           %s\n", page_state_to_string(page->State()));
 	kprintf("wired_count:     %d\n", page->wired_count);
@@ -777,8 +780,9 @@ dump_page_queue(int argc, char **argv)
 		return 0;
 	}
 
-	kprintf("queue = %p, queue->head = %p, queue->tail = %p, queue->count = %ld\n",
-		queue, queue->Head(), queue->Tail(), queue->Count());
+	kprintf("queue = %p, queue->head = %p, queue->tail = %p, queue->count = %"
+		B_PRIuPHYSADDR "\n", queue, queue->Head(), queue->Tail(),
+		queue->Count());
 
 	if (argc == 3) {
 		struct vm_page *page = queue->Head();
@@ -840,8 +844,10 @@ dump_page_stats(int argc, char **argv)
 	page_run longestCachedRun = { 0, 0 };
 
 	for (page_num_t i = 0; i < sNumPages; i++) {
-		if (sPages[i].State() > 7)
-			panic("page %li at %p has invalid state!\n", i, &sPages[i]);
+		if (sPages[i].State() > 7) {
+			panic("page %" B_PRIuPHYSADDR " at %p has invalid state!\n", i,
+				&sPages[i]);
+		}
 
 		uint32 pageState = sPages[i].State();
 
@@ -877,7 +883,7 @@ dump_page_stats(int argc, char **argv)
 	}
 
 	kprintf("page stats:\n");
-	kprintf("total: %lu\n", sNumPages);
+	kprintf("total: %" B_PRIuPHYSADDR "\n", sNumPages);
 
 	kprintf("active: %" B_PRIuSIZE " (busy: %" B_PRIuSIZE ")\n",
 		counter[PAGE_STATE_ACTIVE], busyCounter[PAGE_STATE_ACTIVE]);
@@ -898,11 +904,11 @@ dump_page_stats(int argc, char **argv)
 	kprintf("unsatisfied page reservations: %" B_PRId32 "\n",
 		sUnsatisfiedPageReservations);
 	kprintf("mapped pages: %lu\n", gMappedPagesCount);
-	kprintf("longest free pages run: %" B_PRIuSIZE " pages (at %" B_PRIuSIZE
-		")\n", longestFreeRun.Length(),
+	kprintf("longest free pages run: %" B_PRIuPHYSADDR " pages (at %"
+		B_PRIuPHYSADDR ")\n", longestFreeRun.Length(),
 		sPages[longestFreeRun.start].physical_page_number);
-	kprintf("longest free/cached pages run: %" B_PRIuSIZE " pages (at %"
-		B_PRIuSIZE ")\n", longestCachedRun.Length(),
+	kprintf("longest free/cached pages run: %" B_PRIuPHYSADDR " pages (at %"
+		B_PRIuPHYSADDR ")\n", longestCachedRun.Length(),
 		sPages[longestCachedRun.start].physical_page_number);
 
 	kprintf("waiting threads:\n");
@@ -914,19 +920,20 @@ dump_page_stats(int argc, char **argv)
 			waiter->missing, waiter->dontTouch);
 	}
 
-	kprintf("\nfree queue: %p, count = %ld\n", &sFreePageQueue,
+	kprintf("\nfree queue: %p, count = %" B_PRIuPHYSADDR "\n", &sFreePageQueue,
 		sFreePageQueue.Count());
-	kprintf("clear queue: %p, count = %ld\n", &sClearPageQueue,
+	kprintf("clear queue: %p, count = %" B_PRIuPHYSADDR "\n", &sClearPageQueue,
 		sClearPageQueue.Count());
-	kprintf("modified queue: %p, count = %ld (%ld temporary, %lu swappable, "
-		"inactive: %lu)\n", &sModifiedPageQueue, sModifiedPageQueue.Count(),
+	kprintf("modified queue: %p, count = %" B_PRIuPHYSADDR " (%" B_PRId32
+		" temporary, %" B_PRIuPHYSADDR " swappable, " "inactive: %"
+		B_PRIuPHYSADDR ")\n", &sModifiedPageQueue, sModifiedPageQueue.Count(),
 		sModifiedTemporaryPages, swappableModified, swappableModifiedInactive);
-	kprintf("active queue: %p, count = %ld\n", &sActivePageQueue,
-		sActivePageQueue.Count());
-	kprintf("inactive queue: %p, count = %ld\n", &sInactivePageQueue,
-		sInactivePageQueue.Count());
-	kprintf("cached queue: %p, count = %ld\n", &sCachedPageQueue,
-		sCachedPageQueue.Count());
+	kprintf("active queue: %p, count = %" B_PRIuPHYSADDR "\n",
+		&sActivePageQueue, sActivePageQueue.Count());
+	kprintf("inactive queue: %p, count = %" B_PRIuPHYSADDR "\n",
+		&sInactivePageQueue, sInactivePageQueue.Count());
+	kprintf("cached queue: %p, count = %" B_PRIuPHYSADDR "\n",
+		&sCachedPageQueue, sCachedPageQueue.Count());
 	return 0;
 }
 
@@ -1301,8 +1308,8 @@ mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 		startPage, length));
 
 	if (sPhysicalPageOffset > startPage) {
-		dprintf("mark_page_range_in_use(%#" B_PRIxADDR ", %#" B_PRIxSIZE "): "
-			"start page is before free list\n", startPage, length);
+		dprintf("mark_page_range_in_use(%#" B_PRIxPHYSADDR ", %#" B_PRIxPHYSADDR
+			"): start page is before free list\n", startPage, length);
 		if (sPhysicalPageOffset - startPage >= length)
 			return B_OK;
 		length -= sPhysicalPageOffset - startPage;
@@ -1312,8 +1319,8 @@ mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 	startPage -= sPhysicalPageOffset;
 
 	if (startPage + length > sNumPages) {
-		dprintf("mark_page_range_in_use(%#" B_PRIxADDR ", %#" B_PRIxSIZE "): "
-			"range would extend past free list\n", startPage, length);
+		dprintf("mark_page_range_in_use(%#" B_PRIxPHYSADDR ", %#" B_PRIxPHYSADDR
+			"): range would extend past free list\n", startPage, length);
 		if (startPage >= sNumPages)
 			return B_OK;
 		length = sNumPages - startPage;
@@ -1349,8 +1356,8 @@ mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 			case PAGE_STATE_CACHED:
 			default:
 				// uh
-				dprintf("mark_page_range_in_use: page 0x%lx in non-free state %d!\n",
-					startPage + i, page->State());
+				dprintf("mark_page_range_in_use: page %#" B_PRIxPHYSADDR
+					" in non-free state %d!\n", startPage + i, page->State());
 				break;
 		}
 	}
@@ -1539,7 +1546,7 @@ public:
 	uint32 PageCount() const { return fPageCount; }
 
 	virtual void IOFinished(status_t status, bool partialTransfer,
-		size_t bytesTransferred);
+		generic_size_t bytesTransferred);
 private:
 	PageWriterRun*		fRun;
 	struct VMCache*		fCache;
@@ -1703,8 +1710,8 @@ PageWriteTransfer::AddPage(vm_page* page)
 	phys_addr_t nextBase = fVecs[fVecCount - 1].base
 		+ fVecs[fVecCount - 1].length;
 
-	if (page->physical_page_number << PAGE_SHIFT == nextBase
-		&& page->cache_offset == fOffset + fPageCount) {
+	if ((phys_addr_t)page->physical_page_number << PAGE_SHIFT == nextBase
+		&& (off_t)page->cache_offset == fOffset + fPageCount) {
 		// append to last iovec
 		fVecs[fVecCount - 1].length += B_PAGE_SIZE;
 		fPageCount++;
@@ -1712,8 +1719,8 @@ PageWriteTransfer::AddPage(vm_page* page)
 	}
 
 	nextBase = fVecs[0].base - B_PAGE_SIZE;
-	if (page->physical_page_number << PAGE_SHIFT == nextBase
-		&& page->cache_offset == fOffset - 1) {
+	if ((phys_addr_t)page->physical_page_number << PAGE_SHIFT == nextBase
+		&& (off_t)page->cache_offset == fOffset - 1) {
 		// prepend to first iovec and adjust offset
 		fVecs[0].base = nextBase;
 		fVecs[0].length += B_PAGE_SIZE;
@@ -1722,12 +1729,12 @@ PageWriteTransfer::AddPage(vm_page* page)
 		return true;
 	}
 
-	if ((page->cache_offset == fOffset + fPageCount
-			|| page->cache_offset == fOffset - 1)
+	if (((off_t)page->cache_offset == fOffset + fPageCount
+			|| (off_t)page->cache_offset == fOffset - 1)
 		&& fVecCount < sizeof(fVecs) / sizeof(fVecs[0])) {
 		// not physically contiguous or not in the right order
 		uint32 vectorIndex;
-		if (page->cache_offset < fOffset) {
+		if ((off_t)page->cache_offset < fOffset) {
 			// we are pre-pending another vector, move the other vecs
 			for (uint32 i = fVecCount; i > 0; i--)
 				fVecs[i] = fVecs[i - 1];
@@ -1783,7 +1790,7 @@ PageWriteTransfer::SetStatus(status_t status, size_t transferred)
 
 void
 PageWriteTransfer::IOFinished(status_t status, bool partialTransfer,
-	size_t bytesTransferred)
+	generic_size_t bytesTransferred)
 {
 	SetStatus(status, bytesTransferred);
 	fRun->PageWritten(this, fStatus, partialTransfer, bytesTransferred);
@@ -2892,7 +2899,7 @@ vm_page_init(kernel_args *args)
 	// reserve, but should be a few more pages, so we don't have to extract
 	// a cached page with each allocation.
 	sFreePagesTarget = VM_PAGE_RESERVE_USER
-		+ std::max((uint32)32, sNumPages / 1024);
+		+ std::max((page_num_t)32, sNumPages / 1024);
 
 	// The target of free + cached and inactive pages. On low-memory machines
 	// keep things tight. free + cached is the pool of immediately allocatable
@@ -3342,7 +3349,7 @@ vm_page_allocate_page_run(uint32 flags, phys_addr_t base, page_num_t length,
 			}
 
 			dprintf("vm_page_allocate_page_run(): Failed to allocate run of "
-				"length %" B_PRIuSIZE " in second iteration!", length);
+				"length %" B_PRIuPHYSADDR " in second iteration!", length);
 
 			freeClearQueueLocker.Unlock();
 			vm_page_unreserve_pages(&reservation);

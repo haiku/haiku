@@ -226,7 +226,7 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 
 static status_t
 do_iterative_fd_io_finish(void* _cookie, io_request* request, status_t status,
-	bool partialTransfer, size_t transferEndOffset)
+	bool partialTransfer, generic_size_t transferEndOffset)
 {
 	iterative_io_cookie* cookie = (iterative_io_cookie*)_cookie;
 
@@ -278,7 +278,7 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 
 			for (uint32 i = 0; i < fileVecCount; i++) {
 				const file_io_vec& fileVec = fileVecs[i];
-				size_t toTransfer = min_c(fileVec.length, length);
+				size_t toTransfer = min_c(fileVec.length, (off_t)length);
 				size_t transferred = toTransfer;
 				error = io.IO(fileVec.offset, vecBase, &transferred);
 				if (error != B_OK)
@@ -327,7 +327,7 @@ synchronous_io(io_request* request, DoIO& io)
 		TRACE_RIO("[%ld]   I/O: offset: %lld, vecBase: %p, length: %lu\n",
 			find_thread(NULL), offset, vecBase, vecLength);
 
-		generic_size_t transferred = vecLength;
+		size_t transferred = vecLength;
 		status_t error = io.IO(offset, vecBase, &transferred);
 		if (error != B_OK) {
 			TRACE_RIO("[%ld]   I/O failed: %#lx\n", find_thread(NULL), error);
@@ -382,8 +382,8 @@ vfs_synchronous_io(io_request* request,
 
 status_t
 vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie, off_t pos,
-	const generic_io_vec* vecs, size_t count, size_t numBytes, uint32 flags,
-	AsyncIOCallback* callback)
+	const generic_io_vec* vecs, size_t count, generic_size_t numBytes,
+	uint32 flags, AsyncIOCallback* callback)
 {
 	IORequest* request = IORequest::Create((flags & B_VIP_IO_REQUEST) != 0);
 	if (request == NULL) {
@@ -408,8 +408,8 @@ vfs_asynchronous_read_pages(struct vnode* vnode, void* cookie, off_t pos,
 
 status_t
 vfs_asynchronous_write_pages(struct vnode* vnode, void* cookie, off_t pos,
-	const generic_io_vec* vecs, size_t count, size_t numBytes, uint32 flags,
-	AsyncIOCallback* callback)
+	const generic_io_vec* vecs, size_t count, generic_size_t numBytes,
+	uint32 flags, AsyncIOCallback* callback)
 {
 	IORequest* request = IORequest::Create((flags & B_VIP_IO_REQUEST) != 0);
 	if (request == NULL) {

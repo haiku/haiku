@@ -1303,8 +1303,8 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 				}
 				page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 				if (page == NULL) {
-					panic("looking up page failed for pa 0x%lx\n",
-						physicalAddress);
+					panic("looking up page failed for pa %#" B_PRIxPHYSADDR
+						"\n", physicalAddress);
 				}
 
 				DEBUG_PAGE_ACCESS_START(page);
@@ -2934,8 +2934,8 @@ dump_caches(int argc, char** argv)
 				: &cache_info_compare_committed);
 	}
 
-	kprintf("total committed memory: %lld, total used pages: %lu\n",
-		totalCommitted, totalPages);
+	kprintf("total committed memory: %" B_PRIdOFF ", total used pages: %"
+		B_PRIuPHYSADDR "\n", totalCommitted, totalPages);
 	kprintf("%lu caches (%lu root caches), sorted by %s per cache "
 		"tree...\n\n", totalCount, rootCount,
 		sortByPageCount ? "page count" : "committed size");
@@ -3021,10 +3021,11 @@ dump_cache(int argc, char** argv)
 		for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
 				vm_page* page = it.Next();) {
 			if (!vm_page_is_dummy(page)) {
-				kprintf("\t%p ppn 0x%lx offset 0x%lx state %u (%s) "
-					"wired_count %u\n", page, page->physical_page_number,
-					page->cache_offset, page->State(),
-					page_state_to_string(page->State()), page->wired_count);
+				kprintf("\t%p ppn %#" B_PRIxPHYSADDR " offset %#" B_PRIxPHYSADDR
+					" state %u (%s) wired_count %u\n", page,
+					page->physical_page_number, page->cache_offset,
+					page->State(), page_state_to_string(page->State()),
+					page->wired_count);
 			} else {
 				kprintf("\t%p DUMMY PAGE state %u (%s)\n",
 					page, page->State(), page_state_to_string(page->State()));
@@ -3174,8 +3175,8 @@ dump_area_list(int argc, char** argv)
 static int
 dump_available_memory(int argc, char** argv)
 {
-	kprintf("Available memory: %Ld/%lu bytes\n",
-		sAvailableMemory, vm_page_num_pages() * B_PAGE_SIZE);
+	kprintf("Available memory: %" B_PRIdOFF "/%" B_PRIuPHYSADDR " bytes\n",
+		sAvailableMemory, (phys_addr_t)vm_page_num_pages() * B_PAGE_SIZE);
 	return 0;
 }
 
@@ -6071,8 +6072,8 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page == NULL) {
-				panic("area %p looking up page failed for pa 0x%lx\n", area,
-					physicalAddress);
+				panic("area %p looking up page failed for pa %#" B_PRIxPHYSADDR
+					"\n", area, physicalAddress);
 				map->Unlock();
 				return B_ERROR;
 			}

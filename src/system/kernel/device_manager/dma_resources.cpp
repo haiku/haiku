@@ -75,9 +75,9 @@ DMABuffer::Dump() const
 {
 	kprintf("DMABuffer at %p\n", this);
 
-	kprintf("  bounce buffer:      %p (physical %#lx)\n",
+	kprintf("  bounce buffer:      %p (physical %#" B_PRIxPHYSADDR ")\n",
 		fBounceBuffer->address, fBounceBuffer->physical_address);
-	kprintf("  bounce buffer size: %lu\n", fBounceBuffer->size);
+	kprintf("  bounce buffer size: %" B_PRIxPHYSADDR "\n", fBounceBuffer->size);
 	kprintf("  vecs:               %lu\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
@@ -169,8 +169,10 @@ DMAResource::Init(const dma_restrictions& restrictions,
 			fBounceBufferSize);
 	}
 
-	dprintf("DMAResource@%p: low/high %lx/%lx, max segment count %lu, align %lu, "
-		"boundary %lu, max transfer %lu, max segment size %lu\n", this,
+	dprintf("DMAResource@%p: low/high %" B_PRIxGENADDR "/%" B_PRIxGENADDR
+		", max segment count %" B_PRIu32 ", align %" B_PRIuGENADDR ", "
+		"boundary %" B_PRIuGENADDR ", max transfer %" B_PRIuGENADDR
+		", max segment size %" B_PRIuGENADDR "\n", this,
 		fRestrictions.low_address, fRestrictions.high_address,
 		fRestrictions.max_segment_count, fRestrictions.alignment,
 		fRestrictions.boundary, fRestrictions.max_transfer_size,
@@ -224,10 +226,14 @@ DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 	area_id area = -1;
 	phys_size_t size = ROUNDUP(fBounceBufferSize, B_PAGE_SIZE);
 
-	if (fRestrictions.alignment > B_PAGE_SIZE)
-		dprintf("dma buffer restrictions not yet implemented: alignment %lu\n", fRestrictions.alignment);
-	if (fRestrictions.boundary > B_PAGE_SIZE)
-		dprintf("dma buffer restrictions not yet implemented: boundary %lu\n", fRestrictions.boundary);
+	if (fRestrictions.alignment > B_PAGE_SIZE) {
+		dprintf("dma buffer restrictions not yet implemented: alignment %"
+			B_PRIuGENADDR "\n", fRestrictions.alignment);
+	}
+	if (fRestrictions.boundary > B_PAGE_SIZE) {
+		dprintf("dma buffer restrictions not yet implemented: boundary %"
+			B_PRIuGENADDR "\n", fRestrictions.boundary);
+	}
 
 	bounceBuffer = (void*)fRestrictions.low_address;
 // TODO: We also need to enforce the boundary restrictions.
@@ -623,7 +629,7 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 		// vec is a bounce buffer segment shorter than the block size. If so, we
 		// have to cut back the complete block and use a bounce buffer for it
 		// entirely.
-		if (diff == 0 && offset + dmaLength > requestEnd) {
+		if (diff == 0 && offset + (off_t)dmaLength > requestEnd) {
 			const generic_io_vec& dmaVec
 				= dmaBuffer->VecAt(dmaBuffer->VecCount() - 1);
 			ASSERT(dmaVec.base >= dmaBuffer->PhysicalBounceBufferAddress()
@@ -708,9 +714,10 @@ DMAResource::TranslateNext(IORequest* request, IOOperation* operation,
 	operation->SetBuffer(dmaBuffer);
 	operation->SetBlockSize(fBlockSize);
 	operation->SetOriginalRange(originalOffset,
-		min_c(offset + dmaLength, requestEnd) - originalOffset);
+		min_c(offset + (off_t)dmaLength, requestEnd) - originalOffset);
 	operation->SetRange(offset, dmaLength);
-	operation->SetPartial(partialBegin != 0, offset + dmaLength > requestEnd);
+	operation->SetPartial(partialBegin != 0,
+		offset + (off_t)dmaLength > requestEnd);
 
 	// If we don't need the bounce buffer, we put it back, otherwise
 	operation->SetUsesBounceBuffer(bounceLeft < fBounceBufferSize);

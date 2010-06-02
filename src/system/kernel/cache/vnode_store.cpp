@@ -52,7 +52,7 @@ VMVnodeCache::Read(off_t offset, const generic_io_vec *vecs, size_t count,
 
 	generic_size_t bytesEnd = *_numBytes;
 
-	if (offset + bytesEnd > virtual_end)
+	if (offset + (off_t)bytesEnd > virtual_end)
 		bytesEnd = virtual_end - offset;
 
 	// If the request could be filled completely, or an error occured,

@@ -370,7 +370,7 @@ sort_physical_address_ranges(phys_addr_range* ranges, uint32 numRanges)
 
 
 status_t
-insert_physical_memory_range(addr_t start, size_t size)
+insert_physical_memory_range(phys_addr_t start, phys_size_t size)
 {
 	return insert_physical_address_range(gKernelArgs.physical_memory_range,
 		&gKernelArgs.num_physical_memory_ranges, MAX_PHYSICAL_MEMORY_RANGE,
@@ -379,7 +379,7 @@ insert_physical_memory_range(addr_t start, size_t size)
 
 
 status_t
-insert_physical_allocated_range(addr_t start, size_t size)
+insert_physical_allocated_range(phys_addr_t start, phys_size_t size)
 {
 	return insert_physical_address_range(gKernelArgs.physical_allocated_range,
 		&gKernelArgs.num_physical_allocated_ranges,

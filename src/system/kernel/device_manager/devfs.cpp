@@ -497,7 +497,7 @@ translate_partition_access(devfs_partition* partition, io_request* request)
 	off_t offset = request->Offset();
 
 	ASSERT(offset >= 0);
-	ASSERT(offset + request->Length() <= partition->info.size);
+	ASSERT(offset + (off_t)request->Length() <= partition->info.size);
 
 	request->SetOffset(offset + partition->info.offset);
 }
@@ -1792,7 +1792,7 @@ devfs_io(fs_volume *volume, fs_vnode *_vnode, void *_cookie,
 	}
 
 	if (vnode->stream.u.dev.partition != NULL) {
-		if (request->Offset() + request->Length()
+		if (request->Offset() + (off_t)request->Length()
 				> vnode->stream.u.dev.partition->info.size) {
 			request->SetStatusAndNotify(B_BAD_VALUE);
 			return B_BAD_VALUE;

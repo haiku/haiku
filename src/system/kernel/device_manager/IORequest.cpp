@@ -260,9 +260,9 @@ IOBuffer::Dump() const
 
 	kprintf("  origin:     %s\n", fUser ? "user" : "kernel");
 	kprintf("  kind:       %s\n", fPhysical ? "physical" : "virtual");
-	kprintf("  length:     %lu\n", fLength);
-	kprintf("  capacity:   %lu\n", fCapacity);
-	kprintf("  vecs:       %lu\n", fVecCount);
+	kprintf("  length:     %" B_PRIuGENADDR "\n", fLength);
+	kprintf("  capacity:   %" B_PRIuSIZE "\n", fCapacity);
+	kprintf("  vecs:       %" B_PRIuSIZE "\n", fVecCount);
 
 	for (uint32 i = 0; i < fVecCount; i++) {
 		kprintf("    [%" B_PRIu32 "] %#" B_PRIxGENADDR ", %" B_PRIuGENADDR "\n",
@@ -354,7 +354,7 @@ IOOperation::Finish()
 
 			if (offset < startOffset) {
 				// If the complete vector is before the start offset, skip it.
-				if (offset + length <= startOffset) {
+				if (offset + (off_t)length <= startOffset) {
 					offset += length;
 					continue;
 				}
@@ -367,7 +367,7 @@ IOOperation::Finish()
 				length -= diff;
 			}
 
-			if (offset + length > endOffset) {
+			if (offset + (off_t)length > endOffset) {
 				// If we're already beyond the end offset, we're done.
 				if (offset >= endOffset)
 					break;
@@ -462,7 +462,7 @@ IOOperation::Prepare(IORequest* request)
 				vecOffset = 0;
 
 				if (base >= bounceBufferStart && base < bounceBufferEnd) {
-					if (offset + length > endOffset)
+					if (offset + (off_t)length > endOffset)
 						length = endOffset - offset;
 					status_t error = fParent->CopyData(offset,
 						bounceBuffer + (base - bounceBufferStart), length);
@@ -666,10 +666,10 @@ IOOperation::Dump() const
 	kprintf("  dma buffer:       %p\n", fDMABuffer);
 	kprintf("  offset:           %-8Ld (original: %Ld)\n", fOffset,
 		fOriginalOffset);
-	kprintf("  length:           %-8lu (original: %lu)\n", fLength,
-		fOriginalLength);
-	kprintf("  transferred:      %lu\n", fTransferredBytes);
-	kprintf("  block size:       %lu\n", fBlockSize);
+	kprintf("  length:           %-8" B_PRIuGENADDR " (original: %"
+		B_PRIuGENADDR ")\n", fLength, fOriginalLength);
+	kprintf("  transferred:      %" B_PRIuGENADDR "\n", fTransferredBytes);
+	kprintf("  block size:       %" B_PRIuGENADDR "\n", fBlockSize);
 	kprintf("  saved vec index:  %u\n", fSavedVecIndex);
 	kprintf("  saved vec length: %u\n", fSavedVecLength);
 	kprintf("  r/w:              %s\n", IsWrite() ? "write" : "read");
@@ -772,7 +772,7 @@ IORequest::CreateSubRequest(off_t parentOffset, off_t offset,
 	generic_size_t length, IORequest*& _subRequest)
 {
 	ASSERT(parentOffset >= fOffset && length <= fLength
-		&& parentOffset - fOffset <= fLength - length);
+		&& parentOffset - fOffset <= (off_t)(fLength - length));
 
 	// find start vec
 	generic_size_t vecOffset = parentOffset - fOffset;
@@ -1160,7 +1160,7 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 
 	uint8* buffer = (uint8*)_buffer;
 
-	if (offset < fOffset || offset + size > fOffset + fLength) {
+	if (offset < fOffset || offset + (off_t)size > fOffset + (off_t)fLength) {
 		panic("IORequest::_CopyData(): invalid range: (%lld, %lu)", offset,
 			size);
 		return B_BAD_VALUE;
@@ -1284,9 +1284,9 @@ IORequest::Dump() const
 	kprintf("  mutex:             %p\n", &fLock);
 	kprintf("  IOBuffer:          %p\n", fBuffer);
 	kprintf("  offset:            %Ld\n", fOffset);
-	kprintf("  length:            %lu\n", fLength);
-	kprintf("  transfer size:     %lu\n", fTransferSize);
-	kprintf("  relative offset:   %lu\n", fRelativeParentOffset);
+	kprintf("  length:            %" B_PRIuGENADDR "\n", fLength);
+	kprintf("  transfer size:     %" B_PRIuGENADDR "\n", fTransferSize);
+	kprintf("  relative offset:   %" B_PRIuGENADDR "\n", fRelativeParentOffset);
 	kprintf("  pending children:  %ld\n", fPendingChildren);
 	kprintf("  flags:             %#lx\n", fFlags);
 	kprintf("  team:              %ld\n", fTeam);
@@ -1296,8 +1296,8 @@ IORequest::Dump() const
 	kprintf("  finished cvar:     %p\n", &fFinishedCondition);
 	kprintf("  iteration:\n");
 	kprintf("    vec index:       %lu\n", fVecIndex);
-	kprintf("    vec offset:      %lu\n", fVecOffset);
-	kprintf("    remaining bytes: %lu\n", fRemainingBytes);
+	kprintf("    vec offset:      %" B_PRIuGENADDR "\n", fVecOffset);
+	kprintf("    remaining bytes: %" B_PRIuGENADDR "\n", fRemainingBytes);
 	kprintf("  callbacks:\n");
 	kprintf("    finished %p, cookie %p\n", fFinishedCallback, fFinishedCookie);
 	kprintf("    iteration %p, cookie %p\n", fIterationCallback,

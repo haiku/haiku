@@ -424,7 +424,7 @@ IOSchedulerSimple::_PrepareRequestOperations(IORequest* request,
 	usedBandwidth = 0;
 
 	if (fDMAResource != NULL) {
-		while (quantum >= fBlockSize && request->RemainingBytes() > 0) {
+		while (quantum >= (off_t)fBlockSize && request->RemainingBytes() > 0) {
 			IOOperation* operation = fUnusedOperations.RemoveHead();
 			if (operation == NULL)
 				return false;
@@ -618,14 +618,14 @@ IOSchedulerSimple::_Scheduler()
 			fActiveRequestOwners.Remove(&marker);
 		}
 
-		if (owner == NULL || quantum < fBlockSize) {
+		if (owner == NULL || quantum < (off_t)fBlockSize) {
 			if (!_NextActiveRequestOwner(owner, quantum)) {
 				// we've been asked to terminate
 				return B_OK;
 			}
 		}
 
-		while (resourcesAvailable && iterationBandwidth >= fBlockSize) {
+		while (resourcesAvailable && iterationBandwidth >= (off_t)fBlockSize) {
 //dprintf("IOSchedulerSimple::_Scheduler(): request owner: %p (thread %ld)\n",
 //owner, owner->thread);
 			// Prepare operations for the owner.
@@ -643,12 +643,14 @@ IOSchedulerSimple::_Scheduler()
 				quantum -= bandwidth;
 				iterationBandwidth -= bandwidth;
 
-				if (quantum < fBlockSize || iterationBandwidth < fBlockSize)
+				if (quantum < (off_t)fBlockSize
+					|| iterationBandwidth < (off_t)fBlockSize) {
 					break;
+				}
 			}
 
-			while (resourcesAvailable && quantum >= fBlockSize
-					&& iterationBandwidth >= fBlockSize) {
+			while (resourcesAvailable && quantum >= (off_t)fBlockSize
+					&& iterationBandwidth >= (off_t)fBlockSize) {
 				IORequest* request = owner->requests.Head();
 				if (request == NULL) {
 					resourcesAvailable = false;

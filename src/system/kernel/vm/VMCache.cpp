@@ -752,8 +752,8 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 	vm_page* otherPage = pages.Lookup(page->cache_offset);
 	if (otherPage != NULL) {
 		panic("VMCache::InsertPage(): there's already page %p with cache "
-			"offset %lu in cache %p; inserting page %p", otherPage,
-			page->cache_offset, this, page);
+			"offset %" B_PRIuPHYSADDR " in cache %p; inserting page %p",
+			otherPage, page->cache_offset, this, page);
 	}
 #endif	// KDEBUG
 

@@ -52,7 +52,7 @@ dump_info(int argc, char **argv)
 		kprintf("  [%ld] %Ld\n", i + 1, gCPU[i].active_time);
 
 	// ToDo: Add page_faults
-	kprintf("pages:\t\t%ld (%ld max)\n",
+	kprintf("pages:\t\t%" B_PRIuPHYSADDR " (%" B_PRIuPHYSADDR " max)\n",
 		vm_page_num_pages() - vm_page_num_free_pages(), vm_page_num_pages());
 
 	kprintf("sems:\t\t%ld (%ld max)\n", sem_used_sems(), sem_max_sems());

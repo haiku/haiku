@@ -111,7 +111,7 @@ get_next_virtual_address(size_t size)
 static addr_t
 get_next_physical_address(size_t size)
 {
-	addr_t base;
+	phys_addr_t base;
 	if (!get_free_physical_address_range(gKernelArgs.physical_allocated_range,
 			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
 			size, &base)) {
@@ -435,7 +435,7 @@ mmu_allocate_physical(addr_t base, size_t size)
 	}
 
 	// check whether the physical range is still free
-	addr_t foundBase;
+	phys_addr_t foundBase;
 	if (!get_free_physical_address_range(gKernelArgs.physical_allocated_range,
 			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
 			size, &foundBase) || foundBase != base) {

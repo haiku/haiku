@@ -49,7 +49,7 @@ public:
 	inline	vm_page*			Previous(vm_page* page) const;
 	inline	vm_page*			Next(vm_page* page) const;
 
-	inline	uint32				Count() const	{ return fCount; }
+	inline	phys_addr_t			Count() const	{ return fCount; }
 
 	inline	Iterator			GetIterator() const;
 
@@ -58,7 +58,7 @@ public:
 protected:
 			const char*			fName;
 			spinlock			fLock;
-			uint32				fCount;
+			phys_addr_t			fCount;
 			PageList			fPages;
 };
 

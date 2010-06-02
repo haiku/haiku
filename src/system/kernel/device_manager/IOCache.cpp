@@ -232,7 +232,7 @@ IOCache::_DoRequest(IORequest* request, generic_size_t& _bytesTransferred)
 		return B_BAD_VALUE;
 
 	// truncate the request to the device capacity
-	if (fDeviceCapacity - offset < length)
+	if (fDeviceCapacity - offset < (off_t)length)
 		length = fDeviceCapacity - offset;
 
 	_bytesTransferred = 0;
@@ -374,8 +374,8 @@ IOCache::_TransferRequestLine(IORequest* request, off_t lineOffset,
 		// request that doesn't cover the complete missing range.
 		if (request->IsRead()
 			|| requestOffset < (off_t)firstMissing * B_PAGE_SIZE
-			|| requestOffset + requestLength
-				> (lastMissing + 1) * B_PAGE_SIZE) {
+			|| requestOffset + (off_t)requestLength
+				> (off_t)(lastMissing + 1) * B_PAGE_SIZE) {
 			status_t error = _TransferPages(firstMissing - firstPageOffset,
 				missingPages, false, isVIP);
 			if (error != B_OK) {

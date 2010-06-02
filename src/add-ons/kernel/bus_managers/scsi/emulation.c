@@ -87,14 +87,15 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 	aligned_phys = (unaligned_phys + buffer_size - 1) & ~(buffer_size - 1);
 	aligned_addr = unaligned_addr + (aligned_phys - unaligned_phys);
 
-	SHOW_FLOW(3, "unaligned_phys = %#lx, aligned_phys = %#lx, unaligned_addr = %#lx, aligned_addr = %#lx",
-		unaligned_phys, aligned_phys, unaligned_addr, aligned_addr);
+	SHOW_FLOW(3, "unaligned_phys = %#" B_PRIxPHYSADDR ", aligned_phys = %#"
+		B_PRIxPHYSADDR ", unaligned_addr = %#" B_PRIxADDR ", aligned_addr = %#"
+		B_PRIxADDR, unaligned_phys, aligned_phys, unaligned_addr, aligned_addr);
 
 	device->buffer = (void *)aligned_addr;
 	device->buffer_size = buffer_size;
 	// s/g list is directly after buffer
 	device->buffer_sg_list = (void *)(aligned_addr + buffer_size);
-	device->buffer_sg_list[0].address = (void *)aligned_phys;
+	device->buffer_sg_list[0].address = aligned_phys;
 	device->buffer_sg_list[0].size = buffer_size;
 	device->buffer_sg_count = 1;
 
@@ -490,8 +491,9 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		bytes = min(size, req_size);
 		bytes = min(bytes, sg_list->size);
 
-		SHOW_FLOW(0, "buffer = %p, virt_addr = %#lx, bytes = %lu, to_buffer = %d",
-			buffer, sg_list->address + offset, bytes, to_buffer);
+		SHOW_FLOW(0, "buffer = %p, virt_addr = %#" B_PRIxPHYSADDR ", bytes = %"
+			B_PRIuSIZE ", to_buffer = %d", buffer, sg_list->address + offset,
+			bytes, to_buffer);
 
 		if (to_buffer) {
 			vm_memcpy_from_physical(buffer, sg_list->address + offset, bytes,
