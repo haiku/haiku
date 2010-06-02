@@ -336,9 +336,11 @@ X86VMTranslationMap::Init(bool kernel)
 			fArchData->page_mapper->Delete();
 			return B_NO_MEMORY;
 		}
+		phys_addr_t physicalPageDir;
 		vm_get_page_mapping(VMAddressSpace::KernelID(),
 			(addr_t)fArchData->pgdir_virt,
-			(phys_addr_t*)&fArchData->pgdir_phys);
+			&physicalPageDir);
+		fArchData->pgdir_phys = (page_directory_entry*)(addr_t)physicalPageDir;
 	} else {
 		// kernel
 		// get the physical page mapper
