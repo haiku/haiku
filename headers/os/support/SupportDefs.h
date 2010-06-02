@@ -59,6 +59,9 @@ typedef uint32					perform_code;
 typedef __haiku_phys_addr_t		phys_addr_t;
 typedef phys_addr_t				phys_size_t;
 
+typedef	__haiku_generic_addr_t	generic_addr_t;
+typedef	generic_addr_t			generic_size_t;
+
 
 /* printf()/scanf() format strings for [u]int* types */
 #define B_PRId8			"d"
@@ -126,6 +129,11 @@ typedef phys_addr_t				phys_size_t;
 #define B_PRIoPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "o"
 #define B_PRIxPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "x"
 #define B_PRIXPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "X"
+/* generic_addr_t */
+#define B_PRIuGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "u"
+#define B_PRIoGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "o"
+#define B_PRIxGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "x"
+#define B_PRIXGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "X"
 /* off_t */
 #define B_PRIdOFF		B_PRId64
 #define B_PRIiOFF		B_PRIi64

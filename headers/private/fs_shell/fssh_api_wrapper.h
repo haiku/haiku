@@ -1493,6 +1493,8 @@
 #define addr_t			fssh_addr_t
 #define phys_addr_t		fssh_phys_addr_t
 #define phys_size_t		fssh_phys_size_t
+#define generic_addr_t	fssh_generic_addr_t
+#define generic_size_t	fssh_generic_size_t
 
 #define dev_t			fssh_dev_t
 #define ino_t			fssh_ino_t
@@ -1573,6 +1575,16 @@
 #define B_PRIoADDR		FSSH_B_PRIoADDR
 #define B_PRIxADDR		FSSH_B_PRIxADDR
 #define B_PRIXADDR		FSSH_B_PRIXADDR
+/* phys_addr_t */
+#define B_PRIuPHYSADDR	FSSH_B_PRIuPHYSADDR
+#define B_PRIoPHYSADDR	FSSH_B_PRIoPHYSADDR
+#define B_PRIxPHYSADDR	FSSH_B_PRIxPHYSADDR
+#define B_PRIXPHYSADDR	FSSH_B_PRIXPHYSADDR
+/* generic_addr_t */
+#define B_PRIuGENADDR	FSSH_B_PRIuGENADDR
+#define B_PRIoGENADDR	FSSH_B_PRIoGENADDR
+#define B_PRIxGENADDR	FSSH_B_PRIxGENADDR
+#define B_PRIXGENADDR	FSSH_B_PRIXGENADDR
 /* off_t */
 #define B_PRIdOFF		FSSH_B_PRIdOFF
 #define B_PRIiOFF		FSSH_B_PRIiOFF

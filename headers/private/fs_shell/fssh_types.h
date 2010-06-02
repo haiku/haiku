@@ -15,15 +15,18 @@ typedef volatile int64_t	vint64_t;
 #ifdef HAIKU_HOST_PLATFORM_64_BIT
 typedef uint64_t	fssh_addr_t;
 typedef uint64_t	fssh_phys_addr_t;
+typedef uint64_t	fssh_generic_addr_t;
 typedef uint64_t	fssh_size_t;
 typedef int64_t		fssh_ssize_t;
 #else
 typedef uint32_t	fssh_addr_t;
 typedef uint32_t	fssh_phys_addr_t;
+typedef uint32_t	fssh_generic_addr_t;
 typedef uint32_t	fssh_size_t;
 typedef int32_t		fssh_ssize_t;
 #endif
 typedef fssh_phys_addr_t	fssh_phys_size_t;
+typedef fssh_generic_addr_t	fssh_generic_size_t;
 
 typedef int32_t		fssh_dev_t;
 typedef int64_t		fssh_ino_t;
@@ -134,6 +137,11 @@ typedef int32_t		fssh_pid_t;
 #	define FSSH_B_PRIxPHYSADDR	FSSH_B_PRIx32
 #	define FSSH_B_PRIXPHYSADDR	FSSH_B_PRIX32
 #endif
+/* generic_addr_t */
+#define FSSH_B_PRIuGENADDR	FSSH_B_PRIuPHYSADDR
+#define FSSH_B_PRIoGENADDR	FSSH_B_PRIoPHYSADDR
+#define FSSH_B_PRIxGENADDR	FSSH_B_PRIxPHYSADDR
+#define FSSH_B_PRIXGENADDR	FSSH_B_PRIXPHYSADDR
 /* off_t */
 #define FSSH_B_PRIdOFF		FSSH_B_PRId64
 #define FSSH_B_PRIiOFF		FSSH_B_PRIi64

@@ -64,6 +64,9 @@ typedef uint32					phys_addr_t;
 #endif
 typedef phys_addr_t				phys_size_t;
 
+typedef	addr_t					generic_addr_t;
+typedef	size_t					generic_size_t;
+
 
 /* printf()/scanf() format strings for [u]int* types */
 #define B_PRId8			PRId8
@@ -150,6 +153,11 @@ typedef phys_addr_t				phys_size_t;
 #	define B_PRIxPHYSADDR	B_PRIx32
 #	define B_PRIXPHYSADDR	B_PRIX32
 #endif
+/* generic_addr_t */
+#define B_PRIuGENADDR	B_PRIuADDR
+#define B_PRIoGENADDR	B_PRIoADDR
+#define B_PRIxGENADDR	B_PRIxADDR
+#define B_PRIXGENADDR	B_PRIXADDR
 /* off_t */
 #define B_PRIdOFF		B_PRId64
 #define B_PRIiOFF		B_PRIi64

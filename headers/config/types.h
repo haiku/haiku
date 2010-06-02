@@ -98,4 +98,16 @@ typedef __haiku_std_uint64	__haiku_uint64;
 #endif
 
 
+/* a generic address type wide enough for virtual and physical addresses */
+#if __HAIKU_ARCH_BITS >= __HAIKU_ARCH_PHYSICAL_BITS
+	typedef __haiku_addr_t					__haiku_generic_addr_t;
+#	define __HAIKU_GENERIC_ADDR_MAX			__HAIKU_ADDR_MAX
+#	define __HAIKU_PRI_PREFIX_GENERIC_ADDR	__HAIKU_PRI_PREFIX_ADDR
+#else
+	typedef __haiku_phys_addr_t				__haiku_generic_addr_t;
+#	define __HAIKU_GENERIC_ADDR_MAX			__HAIKU_PHYS_ADDR_MAX
+#	define __HAIKU_PRI_PREFIX_GENERIC_ADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR
+#endif
+
+
 #endif	/* _CONFIG_TYPES_H */
