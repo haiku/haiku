@@ -37,7 +37,7 @@
 #include <SupportDefs.h>
 
 
-typedef uint32 swap_addr_t;
+typedef uint32 radix_slot_t;
 typedef uint32 bitmap_t;
 
 typedef struct radix_node {
@@ -48,26 +48,26 @@ typedef struct radix_node {
 	int32  big_hint;  // the biggest continuous slots under us
 } radix_node;
 
-// Bitmap which uses radix tree for hinting. 
+// Bitmap which uses radix tree for hinting.
 // The radix tree is stored in an array.
 typedef struct radix_bitmap {
-	swap_addr_t   free_slots;     // # of free slots 
-	swap_addr_t   radix;          // coverage radix
-	swap_addr_t   skip;           // starting skip
-	radix_node    *root;          // root of radix tree, actually it is an array
-	swap_addr_t	  root_size;      // size of the array(# of nodes in the tree)
+	radix_slot_t	free_slots;	// # of free slots
+	radix_slot_t	radix;		// coverage radix
+	radix_slot_t	skip;		// starting skip
+	radix_node		*root;		// root of radix tree, actually it is an array
+	radix_slot_t	root_size;	// size of the array(# of nodes in the tree)
 } radix_bitmap;
 
 
-#define BITMAP_RADIX  (sizeof(swap_addr_t) * 8)
-#define NODE_RADIX    16   
+#define BITMAP_RADIX  (sizeof(radix_slot_t) * 8)
+#define NODE_RADIX    16
 
-#define SWAP_SLOT_NONE ((swap_addr_t)-1)
+#define RADIX_SLOT_NONE	((radix_slot_t)-1)
 
 
 extern radix_bitmap *radix_bitmap_create(uint32 slots);
-extern swap_addr_t radix_bitmap_alloc(radix_bitmap *bmp, uint32 count);
-extern void radix_bitmap_dealloc(radix_bitmap *bmp, swap_addr_t slotIndex, 
+extern radix_slot_t radix_bitmap_alloc(radix_bitmap *bmp, uint32 count);
+extern void radix_bitmap_dealloc(radix_bitmap *bmp, radix_slot_t slotIndex,
 		uint32 count);
 extern void radix_bitmap_destroy(radix_bitmap *bmp);
 

@@ -193,8 +193,8 @@ radix_bitmap_destroy(radix_bitmap *bmp)
 }
 
 
-static swap_addr_t
-radix_leaf_alloc(radix_node *leaf, swap_addr_t slotIndex, int32 count)
+static radix_slot_t
+radix_leaf_alloc(radix_node *leaf, radix_slot_t slotIndex, int32 count)
 {
 	if (count <= (int32)BITMAP_RADIX) {
 		bitmap_t bitmap = ~leaf->u.bitmap;
@@ -212,12 +212,12 @@ radix_leaf_alloc(radix_node *leaf, swap_addr_t slotIndex, int32 count)
 	// we could not allocate count here, update big_hint
 	if (leaf->big_hint >= count)
 		leaf->big_hint = count - 1;
-	return SWAP_SLOT_NONE;
+	return RADIX_SLOT_NONE;
 }
 
 
-static swap_addr_t
-radix_node_alloc(radix_node *node, swap_addr_t slotIndex, int32 count,
+static radix_slot_t
+radix_node_alloc(radix_node *node, radix_slot_t slotIndex, int32 count,
 		uint32 radix, uint32 skip)
 {
 	uint32 next_skip = skip / NODE_RADIX;
@@ -228,13 +228,13 @@ radix_node_alloc(radix_node *node, swap_addr_t slotIndex, int32 count,
 			break;
 
 		if (count <= node[i].big_hint) {
-			swap_addr_t addr = SWAP_SLOT_NONE;
+			radix_slot_t addr = RADIX_SLOT_NONE;
 			if (next_skip == 1)
 				addr = radix_leaf_alloc(&node[i], slotIndex, count);
 			else
 				addr = radix_node_alloc(&node[i], slotIndex, count, radix,
 						next_skip - 1);
-			if (addr != SWAP_SLOT_NONE) {
+			if (addr != RADIX_SLOT_NONE) {
 				node->u.available -= count;
 				if (node->big_hint > node->u.available)
 					node->big_hint = node->u.available;
@@ -248,21 +248,21 @@ radix_node_alloc(radix_node *node, swap_addr_t slotIndex, int32 count,
 	// we could not allocate count in the subtree, update big_hint
 	if (node->big_hint >= count)
 		node->big_hint = count - 1;
-	return SWAP_SLOT_NONE;
+	return RADIX_SLOT_NONE;
 }
 
 
-swap_addr_t
+radix_slot_t
 radix_bitmap_alloc(radix_bitmap *bmp, uint32 count)
 {
-	swap_addr_t addr = SWAP_SLOT_NONE;
+	radix_slot_t addr = RADIX_SLOT_NONE;
 
 	if (bmp->radix == BITMAP_RADIX)
 		addr = radix_leaf_alloc(bmp->root, 0, count);
 	else
 		addr = radix_node_alloc(bmp->root, 0, count, bmp->radix, bmp->skip);
 
-	if (addr != SWAP_SLOT_NONE)
+	if (addr != RADIX_SLOT_NONE)
 		bmp->free_slots -= count;
 
 	return addr;
@@ -270,7 +270,7 @@ radix_bitmap_alloc(radix_bitmap *bmp, uint32 count)
 
 
 static void
-radix_leaf_dealloc(radix_node *leaf, swap_addr_t slotIndex, uint32 count)
+radix_leaf_dealloc(radix_node *leaf, radix_slot_t slotIndex, uint32 count)
 {
 	uint32 n = slotIndex & (BITMAP_RADIX - 1);
 	bitmap_t mask = ((bitmap_t)-1 >> (BITMAP_RADIX - count - n))
@@ -282,8 +282,8 @@ radix_leaf_dealloc(radix_node *leaf, swap_addr_t slotIndex, uint32 count)
 
 
 static void
-radix_node_dealloc(radix_node *node, swap_addr_t slotIndex, uint32 count,
-		uint32 radix, uint32 skip, swap_addr_t index)
+radix_node_dealloc(radix_node *node, radix_slot_t slotIndex, uint32 count,
+		uint32 radix, uint32 skip, radix_slot_t index)
 {
 	node->u.available += count;
 
@@ -317,7 +317,7 @@ radix_node_dealloc(radix_node *node, swap_addr_t slotIndex, uint32 count,
 
 
 void
-radix_bitmap_dealloc(radix_bitmap *bmp, swap_addr_t slotIndex, uint32 count)
+radix_bitmap_dealloc(radix_bitmap *bmp, radix_slot_t slotIndex, uint32 count)
 {
 	if (bmp->radix == BITMAP_RADIX)
 		radix_leaf_dealloc(bmp->root, slotIndex, count);

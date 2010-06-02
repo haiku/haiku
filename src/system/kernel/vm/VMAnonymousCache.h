@@ -15,7 +15,8 @@
 
 #if ENABLE_SWAP_SUPPORT
 
-typedef page_num_t swap_addr_t;
+typedef uint32 swap_addr_t;
+	// TODO: Should be wider, but RadixBitmap supports only a 32 bit type ATM!
 struct swap_block;
 struct system_memory_info;
 

@@ -39,13 +39,12 @@ _delete_unrhdr_buffer_locked(struct unrhdr* idStore)
 int
 _alloc_unr_locked(struct unrhdr* idStore)
 {
-	swap_addr_t slotIndex;
+	radix_slot_t slotIndex;
 	int id = ID_STORE_FULL;
 
 	slotIndex = radix_bitmap_alloc(idStore->idBuffer, 1);
-	if (slotIndex != SWAP_SLOT_NONE) {
+	if (slotIndex != RADIX_SLOT_NONE)
 		id = slotIndex + idStore->idBias;
-	}
 
 	return id;
 }
