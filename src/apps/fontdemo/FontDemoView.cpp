@@ -36,7 +36,7 @@ FontDemoView::FontDemoView(BRect rect)
 	fShapes(NULL)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	SetString("Haiku, inc.");
+	SetString("Haiku, Inc.");
 	SetFontSize(fFontSize);
 	SetAntialiasing(true);
 

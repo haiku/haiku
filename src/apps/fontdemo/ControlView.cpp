@@ -66,7 +66,7 @@ ControlView::AttachedToWindow()
 	float offsetX = 0;
 	float offsetY = 0;
 
-	fTextControl = new BTextControl(rect, "TextInput", "Text:", "Haiku, inc.", NULL);
+	fTextControl = new BTextControl(rect, "TextInput", "Text:", "Haiku, Inc.", NULL);
 	fTextControl->SetDivider(29.0);
 	fTextControl->SetModificationMessage(new BMessage(TEXT_CHANGED_MSG));
 	AddChild(fTextControl);
