@@ -60,7 +60,7 @@ ControlView::AttachedToWindow()
 {
 	BRect rect(Bounds());
 	rect.InsetBySelf(10, 0);
-	rect.bottom = rect.top + 18;	
+	rect.bottom = rect.top + 18;
 	rect.OffsetBy(0, 11);
 
 	float offsetX = 0;
@@ -112,10 +112,10 @@ ControlView::AttachedToWindow()
 		new BMessage(ALIASING_MSG));
 	fAliasingCheckBox->SetValue(B_CONTROL_ON);
 	AddChild(fAliasingCheckBox);
-	
+
 	rect.OffsetBy(0.0, offsetX);
 	fDrawingModeMenu = new BMenu("drawingmodemenu");
-	
+
 	BMessage* drawingMsg = NULL;
 	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
 	drawingMsg->AddInt32("_mode", B_OP_COPY);
@@ -151,9 +151,9 @@ ControlView::AttachedToWindow()
 	drawingMsg = new BMessage(DRAWINGMODE_CHANGED_MSG);
 	drawingMsg->AddInt32("_mode", B_OP_ALPHA);
 	fDrawingModeMenu->AddItem(new BMenuItem("B_OP_ALPHA", drawingMsg));
-	
+
 	fDrawingModeMenu->SetLabelFromMarked(true);
-	
+
 	BMenuField *drawingModeMenuField = new BMenuField(rect, "FontMenuField", "Drawing mode:", fDrawingModeMenu, true);
 	drawingModeMenuField->SetDivider(5+StringWidth("Drawing mode:"));
 	AddChild(drawingModeMenuField);
@@ -190,7 +190,7 @@ ControlView::Draw(BRect updateRect)
 
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
 	StrokeLine(rect.LeftBottom(), rect.RightBottom());
-	StrokeLine(rect.RightBottom(), rect.RightTop());	
+	StrokeLine(rect.RightBottom(), rect.RightTop());
 }
 
 
@@ -266,7 +266,7 @@ ControlView::MessageReceived(BMessage* msg)
 			fMessenger->SendMessage(&msg);
 			break;
 		}
-		
+
 		case ALIASING_MSG:
 		{
 			BMessage msg(ALIASING_MSG);
@@ -319,7 +319,7 @@ ControlView::MessageReceived(BMessage* msg)
 		}
 
 		case CYCLING_FONTS_UPDATE_MSG:
-		{			
+		{
 			int32 familyindex = -1;
 			BMenuItem* currentFamilyItem = fFontFamilyMenu->FindMarked();
 
@@ -403,7 +403,7 @@ ControlView::_UpdateFontmenus(bool setInitialfont)
 			familyMsg->AddString("_family", fontFamilyName);
 			BMenuItem* familyItem = new BMenuItem(stylemenu, familyMsg);
 			fFontFamilyMenu->AddItem(familyItem);
-			 
+
 			for (int32 j = 0; j < styles; j++) {
 				if (get_font_style(fontFamilyName, j, &fontStyleName) == B_OK) {
 					BMessage* fontMsg = new BMessage(FONTSTYLE_CHANGED_MSG);
@@ -538,7 +538,7 @@ ControlView::_DeselectOldItems()
 		if (submenu) {
 			BMenuItem* marked = submenu->FindMarked();
 			if (marked)
-				marked->SetMarked(false);			
+				marked->SetMarked(false);
 		}
 	}
 }

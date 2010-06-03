@@ -56,7 +56,7 @@ class ControlView : public BView {
 		BButton*		fCyclingFontButton;
 		BMenu*			fFontFamilyMenu;
 		BMenu*			fDrawingModeMenu;
-		bool 			fCycleFonts;	
+		bool 			fCycleFonts;
 		int32 			fFontStyleindex;
 };
 

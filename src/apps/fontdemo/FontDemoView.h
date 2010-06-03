@@ -57,7 +57,7 @@ class FontDemoView : public BView {
 
 		BBitmap*	fBitmap;
 		BView*		fBufferView;
-				
+
 		char*		fString;
 		float		fFontSize;
 		float 		fSpacing;

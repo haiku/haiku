@@ -33,7 +33,7 @@ FontDemo::FontDemo()
 
 	controlView->SetTarget(demoView);
 
-	demoWindow->Show();	
+	demoWindow->Show();
 	controlWindow->Show();
 }
 
@@ -46,7 +46,7 @@ FontDemo::~FontDemo()
 void
 FontDemo::ReadyToRun()
 {
-									
+
 }
 
 
