@@ -2,7 +2,8 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers and Producers)
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers 
+ * and Producers)
  */
 
 #include <Bitmap.h>
@@ -56,7 +57,8 @@ BitmapStash::GetBitmap(uint32 signature)
 BitmapStash::~BitmapStash()
 {
 	// delete all the bitmaps
-	for (map<uint32, BBitmap *>::iterator i = stash.begin(); i != stash.end(); i++) 
+	for (map<uint32, BBitmap *>::iterator i = stash.begin(); 
+		i != stash.end(); i++)
 		delete (*i).second;
 }
 
@@ -100,7 +102,8 @@ PeriodicMessageSender *
 PeriodicMessageSender::Launch(BMessenger target, const BMessage *message,
 	bigtime_t period)
 {
-	PeriodicMessageSender *result = new PeriodicMessageSender(target, message, period);
+	PeriodicMessageSender *result = new PeriodicMessageSender(target, 
+		message, period);
 	thread_id thread = spawn_thread(&PeriodicMessageSender::TrackBinder,
 		"ButtonRepeatingThread", B_NORMAL_PRIORITY, result);
 	
@@ -209,7 +212,8 @@ TransportButton::TransportButton(BRect frame, const char *name,
 	BMessage *invokeMessage, BMessage *startPressingMessage,
 	BMessage *pressingMessage, BMessage *donePressingMessage, bigtime_t period,
 	uint32 key, uint32 modifiers, uint32 resizeFlags)
-	:	BControl(frame, name, "", invokeMessage, resizeFlags, B_WILL_DRAW | B_NAVIGABLE),
+	:	BControl(frame, name, "", invokeMessage, resizeFlags, 
+			B_WILL_DRAW | B_NAVIGABLE),
 		bitmaps(new BitmapStash(this)),
 		normalBits(normalBits),
 		pressedBits(pressedBits),
@@ -301,8 +305,8 @@ BBitmap *
 TransportButton::MakeBitmap(uint32 mask)
 {
 	BBitmap *result = new BBitmap(Bounds(), B_CMAP8);
-	result->SetBits(BitsForMask(mask), (Bounds().Width() + 1) * (Bounds().Height() + 1),
-		0, B_CMAP8);
+	result->SetBits(BitsForMask(mask), (Bounds().Width() + 1) 
+		* (Bounds().Height() + 1), 0, B_CMAP8);
 
 	ReplaceTransparentColor(result, Parent()->ViewColor());
 	
@@ -493,7 +497,8 @@ TransportButton::SetPressingPeriod(bigtime_t newTime)
 PlayPauseButton::PlayPauseButton(BRect frame, const char *name,
 	BMessage *invokeMessage, BMessage *blinkMessage,
 	uint32 key, uint32 modifiers, uint32 resizeFlags)
-	:	TransportButton(frame, name, kPlayButtonBitmapBits, kPressedPlayButtonBitmapBits,
+	:	TransportButton(frame, name, kPlayButtonBitmapBits, 
+			kPressedPlayButtonBitmapBits,
 			kDisabledPlayButtonBitmapBits, invokeMessage, NULL,
 			NULL, NULL, 0, key, modifiers, resizeFlags),
 		fState(PlayPauseButton::kStopped),
@@ -616,7 +621,8 @@ PlayPauseButton::DonePressing()
 	} else if (fState == kAboutToPlay) {
 		fState = kPlayingLedOn;
 		if (!fRunner && fBlinkMessage)
-			fRunner = new BMessageRunner(Messenger(), fBlinkMessage, kPlayingBlinkPeriod);
+			fRunner = new BMessageRunner(Messenger(), fBlinkMessage, 
+				kPlayingBlinkPeriod);
 	}
 	
 	_inherited::DonePressing();
@@ -626,7 +632,8 @@ PlayPauseButton::DonePressing()
 RecordButton::RecordButton(BRect frame, const char *name,
 	BMessage *invokeMessage, BMessage *blinkMessage,
 	uint32 key, uint32 modifiers, uint32 resizeFlags)
-	:	TransportButton(frame, name, kRecordButtonBitmapBits, kPressedRecordButtonBitmapBits,
+	:	TransportButton(frame, name, kRecordButtonBitmapBits, 
+			kPressedRecordButtonBitmapBits,
 			kDisabledRecordButtonBitmapBits, invokeMessage, NULL, NULL,
 			NULL, 0, key, modifiers, resizeFlags),
 		fState(RecordButton::kStopped),
@@ -675,7 +682,7 @@ RecordButton::ModeMask() const
 	if (Value())
 		result = kPressedMask;
 
-	if (fState == kAboutToStop || fState == kRecordingLedOn)		
+	if (fState == kAboutToStop || fState == kRecordingLedOn)
 		result |= kRecordingMask;
 	
 	return result;
@@ -729,7 +736,8 @@ RecordButton::DonePressing()
 	} else if (fState == kAboutToRecord) {
 		fState = kRecordingLedOn;
 		if (!fRunner && fBlinkMessage)
-			fRunner = new BMessageRunner(Messenger(), fBlinkMessage, kRecordingBlinkPeriod);
+			fRunner = new BMessageRunner(Messenger(), fBlinkMessage, 
+				kRecordingBlinkPeriod);
 	}
 	
 	_inherited::DonePressing();

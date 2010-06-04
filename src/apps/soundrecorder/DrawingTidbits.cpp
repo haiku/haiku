@@ -2,7 +2,8 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers and Producers)
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers 
+ * and Producers)
  */
 
 #include <Bitmap.h>
@@ -48,7 +49,8 @@ operator!=(const rgb_color &a, const rgb_color &b)
 void
 ReplaceColor(BBitmap *bitmap, rgb_color from, rgb_color to)
 {
-	ASSERT(bitmap->ColorSpace() == B_CMAP8); // other color spaces not implemented yet
+	ASSERT(bitmap->ColorSpace() == B_CMAP8);
+	// other color spaces not implemented yet
 	
 	BScreen screen(B_MAIN_SCREEN_ID);
 	uint32 fromIndex = screen.IndexForColor(from);
@@ -64,7 +66,8 @@ ReplaceColor(BBitmap *bitmap, rgb_color from, rgb_color to)
 void 
 ReplaceTransparentColor(BBitmap *bitmap, rgb_color with)
 {
-	ASSERT(bitmap->ColorSpace() == B_CMAP8); // other color spaces not implemented yet
+	ASSERT(bitmap->ColorSpace() == B_CMAP8);
+	// other color spaces not implemented yet
 	
 	BScreen screen(B_MAIN_SCREEN_ID);
 	uint8 withIndex = screen.IndexForColor(with); 

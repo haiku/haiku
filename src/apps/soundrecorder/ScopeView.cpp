@@ -121,7 +121,8 @@ ScopeView::ComputeRendering()
 	int64 framesCount = fMediaTrack->CountFrames() / SAMPLES_COUNT;
 	if (framesCount <= 0)
 		return;
-	T samples[fPlayFormat.u.raw_audio.buffer_size / (fPlayFormat.u.raw_audio.format 
+	T samples[fPlayFormat.u.raw_audio.buffer_size 
+		/ (fPlayFormat.u.raw_audio.format 
 		& media_raw_audio_format::B_AUDIO_SIZE_MASK)];
 	int64 frames = 0;
 	U sum = 0;
@@ -149,7 +150,8 @@ ScopeView::ComputeRendering()
 				break;
 			
 			if (sumCount >= framesCount) {
-				//TRACE("computing block %ld, sumCount %ld\n", previewIndex, sumCount);
+				// TRACE("computing block %ld, sumCount %ld\n", previewIndex, 
+				// sumCount);
 				fPreview[previewIndex] = (int32)(sum 
 					/ fPlayFormat.u.raw_audio.channel_count / framesCount);
 				if (previewMax < fPreview[previewIndex])
@@ -164,7 +166,8 @@ ScopeView::ComputeRendering()
 	if (previewMax <= 0)
 		return;
 	for (int i = 0; i < SAMPLES_COUNT; i++)
-		fPreview[i] = (int32)(fPreview[i] * 1.0 / previewMax * middle + middle);
+		fPreview[i] = (int32)(fPreview[i] * 1.0 / previewMax 
+			* middle + middle);
 }
 
 

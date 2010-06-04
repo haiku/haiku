@@ -1,4 +1,4 @@
-/*******************************************************************************
+/******************************************************************************
 /
 /	File:			SoundUtils.cpp
 /
@@ -6,7 +6,7 @@
 /
 /	Copyright 1998-1999, Be Incorporated, All Rights Reserved
 /
-*******************************************************************************/
+******************************************************************************/
 
 #include <math.h>
 #include "SoundUtils.h"
@@ -58,13 +58,15 @@ buffer_duration(
 	//	Figuring out duration is easy. We take extra precaution to
 	//	not divide by zero or return irrelevant results.
 	bigtime_t duration = 0;
-	if (format.buffer_size > 0 && format.frame_rate > 0 && bytes_per_frame(format) > 0) {
+	if (format.buffer_size > 0 && format.frame_rate > 0 
+		&& bytes_per_frame(format) > 0) {
 		//	In these kinds of calculations, it's always useful to double-check
 		//	the unit conversions. (Anyone remember high school physics?)
 		//	bytes/(bytes/frame) / frames/sec
 		//	= frames * sec/frames
 		//	= secs                            which is what we want.
-		duration = s_to_us((format.buffer_size / bytes_per_frame(format)) / format.frame_rate);
+		duration = s_to_us((format.buffer_size / bytes_per_frame(format)) 
+			/ format.frame_rate);
 	}
 	return duration;
 }
@@ -87,10 +89,12 @@ buffers_for_duration(
 	const media_raw_audio_format & format, bigtime_t duration)
 {
 	// Double-checking those unit conversions again:
-	// secs * ( (frames/sec) / (frames/buffer) ) = secs * (buffers/sec) = buffers
+	// secs * ( (frames/sec) / (frames/buffer) ) = secs * (buffers/sec) 
+	// = buffers
 	int buffers = 0;
 	if (frames_per_buffer(format) > 0) {
-		buffers = (int) ceil(us_to_s(duration)*(format.frame_rate/frames_per_buffer(format)));
+		buffers = (int) ceil(us_to_s(duration)
+			*(format.frame_rate/frames_per_buffer(format)));
 	}
 	return buffers;
 }

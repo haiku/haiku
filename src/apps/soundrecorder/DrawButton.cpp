@@ -8,8 +8,8 @@
 #include "DrawButton.h"
 #include "DrawingTidbits.h"
 
-DrawButton::DrawButton(BRect frame, const char *name, const unsigned char *on, const unsigned char *off,
-						BMessage *msg, int32 resize, int32 flags)
+DrawButton::DrawButton(BRect frame, const char *name, const unsigned char *on, 
+	const unsigned char *off, BMessage *msg, int32 resize, int32 flags)
 	: BControl(frame, name, "", msg, resize, flags | B_WILL_DRAW),
 		fOn(frame, B_CMAP8),
 		fOff(frame, B_CMAP8),

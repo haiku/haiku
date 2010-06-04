@@ -76,7 +76,8 @@ VUView::Draw(BRect updateRect)
 void
 VUView::_Run()
 {
-	fThreadId = spawn_thread(_RenderLaunch, "VU view", B_NORMAL_PRIORITY, this);
+	fThreadId = spawn_thread(_RenderLaunch, "VU view", B_NORMAL_PRIORITY, 
+		this);
 	if (fThreadId < 0)
 		return;
 	resume_thread(fThreadId);
@@ -138,7 +139,8 @@ VUView::_RenderLoop()
 				} else {
 					SHIFT_UNTIL(levels[i][channel].red, 7, back_color.red);
 					SHIFT_UNTIL(levels[i][channel].blue, 7, back_color.blue);
-					SHIFT_UNTIL(levels[i][channel].green, 14, back_color.green);
+					SHIFT_UNTIL(levels[i][channel].green, 14, 
+						back_color.green);
 				}
 			}
 		}
@@ -173,7 +175,8 @@ VUView::_RenderLoop()
 
 template<typename T>
 T 
-VUView::_ComputeNextLevel(void *data, size_t size, uint32 format, int32 channel)
+VUView::_ComputeNextLevel(void *data, size_t size, uint32 format, 
+	int32 channel)
 {
 	T* samp = (T*)data;
 	

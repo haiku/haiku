@@ -1,4 +1,4 @@
-/*******************************************************************************
+/******************************************************************************
 /
 /	File:			FileUtils.cpp
 /
@@ -6,7 +6,7 @@
 /
 /	Copyright 1998-1999, Be Incorporated, All Rights Reserved
 /
-*******************************************************************************/
+******************************************************************************/
 #include "FileUtils.h"
 
 #include <new>
@@ -102,8 +102,8 @@ CopyAttributes(BNode& dst, BNode& src)
 		}
 		// NOTE: Attributes of size 0 are perfectly valid!
 		while (read >= 0) {
-			ssize_t written = dst.WriteAttr(attrName, info.type, offset, buffer,
-				read);
+			ssize_t written = dst.WriteAttr(attrName, info.type, offset, 
+				buffer, read);
 			if (written != read) {
 				fprintf(stderr, "Error writing attribute '%s'\n", attrName);
 				if (written < 0)

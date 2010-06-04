@@ -2,11 +2,18 @@
  * Copyright 2005, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers and Producers)
+ * Inspired by SoundCapture from Be newsletter (Media Kit Basics: Consumers 
+ * and Producers)
  */
+#include <Catalog.h>
 #include <Entry.h>
+#include <Locale.h>
 
 #include "SoundListView.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "SoundListView"
 
 
 SoundListView::SoundListView(
@@ -36,12 +43,12 @@ SoundListView::Draw(BRect updateRect)
 		SetFont(&font);
 		font_height height;
 		font.GetHeight(&height);
-		float width = font.StringWidth("Drop files here");
+		float width = font.StringWidth(B_TRANSLATE("Drop files here"));
 
 		BPoint pt;
 		pt.x = (Bounds().Width() - width) / 2;
 		pt.y = (Bounds().Height() + height.ascent + height.descent)/ 2;
-		DrawString("Drop files here", pt);
+		DrawString(B_TRANSLATE("Drop files here"), pt);
 	}
 	BListView::Draw(updateRect);
 }

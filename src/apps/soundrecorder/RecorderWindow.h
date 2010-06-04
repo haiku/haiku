@@ -8,10 +8,12 @@
 #ifndef RECORDERWINDOW_H
 #define RECORDERWINDOW_H
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <Locale.h>
 #include <MediaFile.h>
 #include <MediaNode.h>
 #include <MediaTrack.h>
@@ -167,6 +169,7 @@ static	void NotifyPlayFile(void * cookie, BSoundPlayer::sound_player_notificatio
 				
 		void RefsReceived(BMessage *msg);
 		void CopyTarget(BMessage *msg);
+		BCatalog fAppCatalog;
 };
 
 #endif	/*	RECORDERWINDOW_H */
