@@ -3294,7 +3294,6 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 		if (areaStart > end) {
 			// we are done, the area is already beyond of what we have to free
-			end = areaStart - 1;
 			break;
 		}
 
