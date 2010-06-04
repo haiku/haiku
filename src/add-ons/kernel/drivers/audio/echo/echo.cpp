@@ -122,7 +122,7 @@ echo_mem *
 echo_mem_alloc(echo_dev *card, size_t size)
 {
 	echo_mem *mem;
-	
+
 	mem = echo_mem_new(card, size);
 	if (mem == NULL)
 		return (NULL);
@@ -136,12 +136,12 @@ void
 echo_mem_free(echo_dev *card, void *ptr)
 {
 	echo_mem 		*mem;
-	
+
 	LIST_FOREACH(mem, &card->mems, next) {
 		if (mem->log_base != ptr)
 			continue;
 		LIST_REMOVE(mem, next);
-		
+
 		echo_mem_delete(mem);
 		break;
 	}
@@ -161,11 +161,11 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	ECHOGALS_CLOSEAUDIOPARAMETERS  close_params;
 	ECHOGALS_AUDIOFORMAT			format_params;
 	ECHOSTATUS status;
-	
+
 	LOG(("echo_stream_set_audioparms\n"));
-	
+
 	if (stream->pipe >= 0) {
-		close_params.wPipeIndex = stream->pipe;	
+		close_params.wPipeIndex = stream->pipe;
 		status = stream->card->pEG->CloseAudio(&close_params);
 		if (status != ECHOSTATUS_OK && status != ECHOSTATUS_CHANNEL_NOT_OPEN) {
 			PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
@@ -173,13 +173,13 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 			return B_ERROR;
 		}
 	}
-	
+
 	open_params.bIsCyclic = TRUE;
 	open_params.Pipe.nPipe = index;
 	open_params.Pipe.bIsInput = stream->use == ECHO_USE_RECORD ? TRUE : FALSE;
 	open_params.Pipe.wInterleave = channels;
 	open_params.ProcessId = NULL;
-	
+
 	status = stream->card->pEG->OpenAudio(&open_params, &stream->pipe);
 	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : OpenAudio failed\n"));
@@ -197,10 +197,10 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 
 	if (bitsPerSample == 24)
 		bitsPerSample = 32;
-	
-	if ((stream->channels == channels) &&
-		(stream->bitsPerSample == bitsPerSample) && 
-		(stream->sample_rate == sample_rate))
+
+	if ((stream->channels == channels)
+		&& (stream->bitsPerSample == bitsPerSample)
+		&& (stream->sample_rate == sample_rate))
 		return B_OK;
 
 	format_params.wBitsPerSample = bitsPerSample;
@@ -214,14 +214,14 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
-	
+
 	status = stream->card->pEG->SetAudioFormat(stream->pipe, &format_params);
 	if (status != ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when setting\n"));
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
-	
+
 	/* XXXX : setting sample rate is global in this driver */
 	status = stream->card->pEG->QueryAudioSampleRate(sample_rate);
 	if (status != ECHOSTATUS_OK) {
@@ -229,7 +229,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
-		
+
 	/* XXXX : setting sample rate is global in this driver */
 	status = stream->card->pEG->SetAudioSampleRate(sample_rate);
 	if (status != ECHOSTATUS_OK) {
@@ -237,61 +237,61 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
-	
+
 	if (stream->buffer)
 		echo_mem_free(stream->card, stream->buffer->log_base);
-		
+
 	stream->bitsPerSample = bitsPerSample;
 	stream->sample_rate = sample_rate;
 	stream->channels = channels;
-	
+
 	sample_size = stream->bitsPerSample / 8;
 	frame_size = sample_size * stream->channels;
-	
+
 	stream->buffer = echo_mem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
-	
+
 	stream->trigblk = 1;
 	stream->blkmod = stream->bufcount;
 	stream->blksize = stream->bufframes * frame_size;
-	
+
 	CDaffyDuck *duck = stream->card->pEG->GetDaffyDuck(stream->pipe);
 	if (duck == NULL) {
 		PRINT(("echo_stream_set_audioparms : Could not get daffy duck pointer\n"));
 		return B_ERROR;
 	}
-	
+
 	uint32 dwNumFreeEntries = 0;
 
 	for (i = 0; i < stream->bufcount; i++) {
-		duck->AddMapping(((uint32)stream->buffer->phy_base) + 
+		duck->AddMapping(((uint32)stream->buffer->phy_base) +
 			i * stream->blksize, stream->blksize, 0, TRUE, dwNumFreeEntries);
 	}
-	
+
 	duck->Wrap();
-	
+
 	if (stream->card->pEG->GetAudioPositionPtr(stream->pipe, stream->position)!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : Could not get audio position ptr\n"));
 		return B_ERROR;
 	}
-	
+
 	return B_OK;
 }
 
 
 status_t
-echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf, 
+echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf,
 	char** buffer, size_t *stride)
 {
 	uint8 			sample_size, frame_size;
 	LOG(("echo_stream_get_nth_buffer\n"));
-	
+
 	sample_size = stream->bitsPerSample / 8;
 	frame_size = sample_size * stream->channels;
-	
+
 	*buffer = (char*)stream->buffer->log_base + (buf * stream->bufframes * frame_size)
 		+ chan * sample_size;
 	*stride = frame_size;
-	
+
 	return B_OK;
 }
 
@@ -310,16 +310,16 @@ echo_stream_start(echo_stream *stream, void (*inth) (void *), void *inthparam)
 {
 	LOG(("echo_stream_start\n"));
 	ECHOSTATUS status;
-	
+
 	stream->inth = inth;
 	stream->inthparam = inthparam;
-		
+
 	stream->state |= ECHO_STATE_STARTED;
 
 	status = stream->card->pEG->Start(stream->pipe);
 	if (status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_start : Could not start the pipe %s\n", pStatusStrs[status]));
-	}	
+	}
 }
 
 void
@@ -327,13 +327,13 @@ echo_stream_halt(echo_stream *stream)
 {
 	LOG(("echo_stream_halt\n"));
 	ECHOSTATUS status;
-			
+
 	stream->state &= ~ECHO_STATE_STARTED;
-	
+
 	status = stream->card->pEG->Stop(stream->pipe);
 	if (status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_halt : Could not stop the pipe %s\n", pStatusStrs[status]));
-	}	
+	}
 }
 
 echo_stream *
@@ -360,18 +360,18 @@ echo_stream_new(echo_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	stream->blksize = 0;
 	stream->trigblk = 0;
 	stream->blkmod = 0;
-	
+
 	stream->pipe = -1;
-	
+
 	stream->frames_count = 0;
 	stream->real_time = 0;
 	stream->buffer_cycle = 0;
 	stream->update_needed = false;
-	
+
 	status = lock();
 	LIST_INSERT_HEAD((&card->streams), stream, next);
 	unlock(status);
-	
+
 	return stream;
 }
 
@@ -381,25 +381,25 @@ echo_stream_delete(echo_stream *stream)
 	cpu_status status;
 	ECHOGALS_CLOSEAUDIOPARAMETERS close_params;
 	LOG(("echo_stream_delete\n"));
-	
+
 	echo_stream_halt(stream);
-		
+
 	if (stream->pipe >= 0) {
-		close_params.wPipeIndex = stream->pipe;	
+		close_params.wPipeIndex = stream->pipe;
 		status = stream->card->pEG->CloseAudio(&close_params);
 		if (status != ECHOSTATUS_OK && status != ECHOSTATUS_CHANNEL_NOT_OPEN) {
 			PRINT(("echo_stream_set_audioparms : CloseAudio failed\n"));
 			PRINT((" status: %s \n", pStatusStrs[status]));
 		}
 	}
-	
+
 	if (stream->buffer)
 		echo_mem_free(stream->card, stream->buffer->log_base);
-	
+
 	status = lock();
 	LIST_REMOVE(stream, next);
 	unlock(status);
-	
+
 	free(stream);
 }
 
@@ -413,9 +413,9 @@ int32 echo_int(void *arg)
 	ECHOSTATUS err;
 	echo_stream* stream;
 	uint32 curblk;
-			
+
 	err = card->pEG->ServiceIrq(midiReceived);
-	
+
 	if (err != ECHOSTATUS_OK) {
 		return B_UNHANDLED_INTERRUPT;
 	}
@@ -429,7 +429,7 @@ int32 echo_int(void *arg)
 		if ((stream->state & ECHO_STATE_STARTED) == 0 ||
 			(stream->inth == NULL))
 				continue;
-		
+
 		curblk = echo_stream_curaddr(stream);
 		//TRACE(("echo_int stream %p at trigblk %lu at stream->trigblk %lu\n",
 		//	   stream, curblk, stream->trigblk));
@@ -451,14 +451,14 @@ echo_dump_caps(echo_dev *card)
 {
 	PECHOGALS_CAPS caps = &card->caps;
 	PRINT(("name: %s\n", caps->szName));
-	PRINT(("out pipes: %d, in pipes: %d, out busses: %d, in busses: %d, out midi: %d, in midi: %d\n", 
+	PRINT(("out pipes: %d, in pipes: %d, out busses: %d, in busses: %d, out midi: %d, in midi: %d\n",
 		caps->wNumPipesOut, caps->wNumPipesIn, caps->wNumBussesOut, caps->wNumBussesIn, caps->wNumMidiOut, caps->wNumMidiIn));
 
 }
 
 
 /* detect presence of our hardware */
-status_t 
+status_t
 init_hardware(void)
 {
 #ifdef CARDBUS
@@ -467,7 +467,7 @@ init_hardware(void)
 	int ix=0;
 	pci_info info;
 	status_t err = ENODEV;
-	
+
 	LOG_CREATE();
 
 	PRINT(("init_hardware()\n"));
@@ -476,14 +476,14 @@ init_hardware(void)
 		return ENOSYS;
 
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
-		
+
 		ushort card_type = info.u.h0.subsystem_id & 0xfff0;
-		
-		if (info.vendor_id == VENDOR_ID &&
-			((info.device_id == DEVICE_ID_56301)
-			|| (info.device_id == DEVICE_ID_56361)) &&
-			(info.u.h0.subsystem_vendor_id == SUBVENDOR_ID) &&
-			(
+
+		if (info.vendor_id == VENDOR_ID
+			&& ((info.device_id == DEVICE_ID_56301)
+			|| (info.device_id == DEVICE_ID_56361))
+			&& (info.u.h0.subsystem_vendor_id == SUBVENDOR_ID)
+			&& (
 #ifdef ECHOGALS_FAMILY
 			(card_type == DARLA)
 			|| (card_type == GINA)
@@ -509,7 +509,7 @@ init_hardware(void)
 		}
 		ix++;
 	}
-		
+
 	put_module(B_PCI_MODULE_NAME);
 
 	if (err != B_OK) {
@@ -546,22 +546,22 @@ init_driver(void)
 	return B_OK;
 #else
 	int ix=0;
-	
+
 	pci_info info;
 	status_t err;
 	num_cards = 0;
-	
+
 	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
-		
+
 	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
 		ushort card_type = info.u.h0.subsystem_id & 0xfff0;
-		
-		if (info.vendor_id == VENDOR_ID &&
-			((info.device_id == DEVICE_ID_56301)
-			|| (info.device_id == DEVICE_ID_56361)) &&
-			(info.u.h0.subsystem_vendor_id == SUBVENDOR_ID) &&
-			(
+
+		if (info.vendor_id == VENDOR_ID
+			&& ((info.device_id == DEVICE_ID_56301)
+			|| (info.device_id == DEVICE_ID_56361))
+			&& (info.u.h0.subsystem_vendor_id == SUBVENDOR_ID)
+			&& (
 #ifdef ECHOGALS_FAMILY
 			(card_type == DARLA)
 			|| (card_type == GINA)
@@ -582,8 +582,8 @@ init_driver(void)
 #ifdef ECHO3G_FAMILY
 			(card_type == ECHO3G)
 #endif
-			)) {			
-			
+			)) {
+
 			if (num_cards == NUM_CARDS) {
 				PRINT(("Too many "DRIVER_NAME" cards installed!\n"));
 				break;
@@ -618,7 +618,7 @@ init_driver(void)
 		PRINT(("no suitable cards found\n"));
 		return ENODEV;
 	}
-	
+
 	return B_OK;
 #endif
 }
@@ -640,7 +640,7 @@ make_device_names(
 }
 #else
 
-status_t 
+status_t
 cardbus_device_added(pci_info *info, void **cookie) {
 	echo_dev 			* card, *dev;
 	uint32				index;
@@ -657,14 +657,14 @@ cardbus_device_added(pci_info *info, void **cookie) {
 	card->info = *info;
 	card->plugged = true;
 	card->index = 0;
-	
+
 	LIST_FOREACH(dev, &devices, next) {
 		if (dev->index == card->index) {
 			card->index++;
 			dev = LIST_FIRST(&devices);
 		}
 	}
-	
+
 	// Format device name
 	sprintf(card->name, "audio/hmulti/" DRIVER_NAME "/%ld", card->index);
 	// Lock the devices
@@ -672,7 +672,7 @@ cardbus_device_added(pci_info *info, void **cookie) {
 	LIST_INSERT_HEAD((&devices), card, next);
 	// Unlock the devices
 	release_sem(device_lock);
-	
+
 	echo_setup(card);
 	return B_OK;
 }
@@ -680,20 +680,20 @@ cardbus_device_added(pci_info *info, void **cookie) {
 
 // cardbus_device_removed - handle cardbus device removal.
 // status : OK
-void 
+void
 cardbus_device_removed(void *cookie)
 {
 	echo_dev		*card = (echo_dev *) cookie;
-	
+
 	LOG((": cardbus_device_removed\n"));
 	// Check
 	if (card == NULL) {
 		LOG((": null device 0x%.8x\n", card));
 		return;
 	}
-	
+
 	echo_shutdown(card);
-	
+
 	// Lock the devices
 	acquire_sem(device_lock);
 	// Finalize
@@ -718,19 +718,19 @@ echo_setup(echo_dev * card)
 {
 	unsigned char cmd;
 	char *name;
-	
+
 	PRINT(("echo_setup(%p)\n", card));
 
 #ifndef CARDBUS
-	(*pci->write_pci_config)(card->info.bus, card->info.device, 
+	(*pci->write_pci_config)(card->info.bus, card->info.device,
 		card->info.function, PCI_latency, 1, 0xc0 );
-	
+
 	make_device_names(card);
 #endif
 	card->bmbar = card->info.u.h0.base_registers[0];
 	card->irq = card->info.u.h0.interrupt_line;
 
-	card->area_bmbar = map_mem(&card->log_bmbar, (void *)card->bmbar, 
+	card->area_bmbar = map_mem(&card->log_bmbar, card->bmbar,
 		card->info.u.h0.base_register_sizes[0], DRIVER_NAME" bmbar io");
 	if (card->area_bmbar <= B_OK) {
 		LOG(("mapping of bmbar io failed, error = %#x\n",card->area_bmbar));
@@ -801,18 +801,18 @@ echo_setup(echo_dev * card)
 			break;
 #endif
 		default:
-			PRINT(("card type 0x%x not supported by "DRIVER_NAME"\n", 
+			PRINT(("card type 0x%x not supported by "DRIVER_NAME"\n",
 				card->type));
 	}
 
 	if (card->pEG == NULL)
 		goto err2;
-	
+
 #ifndef CARDBUS
-	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, 
+	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device,
 		card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
-	(*pci->write_pci_config)(card->info.bus, card->info.device, 
+	(*pci->write_pci_config)(card->info.bus, card->info.device,
 		card->info.function, PCI_command, 2, cmd | PCI_command_io);
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device,
 		card->info.function, PCI_command, 2);
@@ -830,28 +830,28 @@ echo_setup(echo_dev * card)
 
 	/* Init streams list */
 	LIST_INIT(&(card->streams));
-			
+
 	/* Init mems list */
 	LIST_INIT(&(card->mems));
-	
+
 #ifdef MIDI_SUPPORT
 	card->midi.midi_ready_sem = create_sem(0, "midi sem");
 #endif
-	
+
 	PRINT(("installing interrupt : %x\n", card->irq));
 	status = install_io_interrupt_handler(card->irq, echo_int, card, 0);
 	if (status != B_OK) {
 		PRINT(("failed to install interrupt\n"));
 		goto err2;
 	}
-	
+
 	PRINT(("echo_setup done\n"));
 
 	echo_dump_caps(card);
 
 #ifdef ECHO3G_FAMILY
 	if (card->type == ECHO3G) {
-		strncpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(), 
+		strncpy(card->caps.szName, ((C3g*)card->pEG)->Get3gBoxName(),
 			ECHO_MAXNAMELEN);
 	}
 #endif
@@ -894,10 +894,10 @@ echo_shutdown(echo_dev *card)
 #ifdef MIDI_SUPPORT
 	delete_sem(card->midi.midi_ready_sem);
 #endif
-	
+
 	delete card->pEG;
 	delete card->pOSS;
-	
+
 	delete_area(card->area_bmbar);
 }
 
@@ -907,10 +907,10 @@ void
 uninit_driver(void)
 {
 	PRINT(("uninit_driver()\n"));
-		
+
 #ifdef CARDBUS
 	echo_dev			*dev;
-	
+
 	LIST_FOREACH(dev, &devices, next) {
 		echo_shutdown(dev);
 	}
@@ -921,7 +921,7 @@ uninit_driver(void)
 	for (ix=0; ix<cnt; ix++) {
 		echo_shutdown(&cards[ix]);
 	}
-	
+
 	memset(&cards, 0, sizeof(cards));
 	put_module(B_PCI_MODULE_NAME);
 #endif

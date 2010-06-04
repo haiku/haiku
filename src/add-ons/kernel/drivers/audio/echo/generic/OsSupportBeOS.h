@@ -117,7 +117,7 @@ typedef unsigned long	ECHOSTATUS;
 typedef struct _echo_mem {
 	LIST_ENTRY(_echo_mem) next;
 	void		*log_base;
-	void		*phy_base;
+	phys_addr_t	phy_base;
 	area_id 	area;
 	size_t		size;
 } echo_mem;
@@ -130,8 +130,8 @@ typedef struct _echo_mem {
 //
 //	Define what a physical address is on this OS
 //
-typedef	unsigned long	PHYS_ADDR;			// Define physical addr type
-typedef	unsigned long*	PPHYS_ADDR;			// Define physical addr pointer type
+typedef	phys_addr_t		PHYS_ADDR;			// Define physical addr type
+typedef	phys_addr_t*	PPHYS_ADDR;			// Define physical addr pointer type
 
 typedef echo_mem* PPAGE_BLOCK;
 
@@ -207,7 +207,7 @@ ECHOSTATUS OsFreeNonPaged
 // Since static variables are used in place of globals, an instance must
 //	be constructed and initialized by the OS Interface object prior to
 //	constructing the CEchoGals derived object.  The CEchoGals and
-//	CDspCommObject classes must have access to it during their respective 
+//	CDspCommObject classes must have access to it during their respective
 // construction times.
 //
 class COsSupport
@@ -260,7 +260,7 @@ public:
 		DWORD			dwBytes,
 		PPAGE_BLOCK	&pPageBlock
 	);
-	
+
 	//
 	// Free a block of physical memory
 	//
@@ -269,7 +269,7 @@ public:
 		DWORD			dwBytes,
 		PPAGE_BLOCK	pPageBlock
 	);
-	
+
 	//
 	// Get the virtual address for a page block
 	//
@@ -308,7 +308,7 @@ public:
 	//
 	WORD GetDeviceId()
 		{ return( m_wDeviceId ); }
-		
+
 	//
 	// Return the hardware revision number
 	//
@@ -316,7 +316,7 @@ public:
 	{
 		return m_wCardRev;
 	}
-   
+
 	//
 	// Get the current timestamp for MIDI input data
 	//
@@ -324,9 +324,9 @@ public:
 	{
 		return system_time();
 	}
-		
+
 	//
-	//	Overload new & delete so memory for this object is allocated 
+	//	Overload new & delete so memory for this object is allocated
 	//	from non-paged memory.
 	//
 	PVOID operator new( size_t Size );
@@ -344,7 +344,7 @@ private:
 #ifdef ECHO_DEBUG
 	DWORD					m_dwPageBlockCount;
 #endif
-	
+
 };		// class COsSupport
 
 typedef COsSupport * PCOsSupport;

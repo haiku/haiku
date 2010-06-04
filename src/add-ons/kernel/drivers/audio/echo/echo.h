@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //	EchoGals/Echo24 BeOS Driver for Echo audio cards
-//	
+//
 //  Copyright (c) 2003, Jérôme Duval
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
@@ -57,7 +57,7 @@ typedef struct _midi_dev {
 /*
  * Streams
  */
- 
+
 typedef struct _echo_stream {
 	struct _echo_dev 	*card;
 	uint8        		use;
@@ -67,20 +67,20 @@ typedef struct _echo_stream {
 	uint8				channels;
 	uint32 				bufframes;
 	uint8 				bufcount;
-	
+
 	WORD				pipe;
 	PDWORD				position;
-	
+
 	LIST_ENTRY(_echo_stream)	next;
-	
+
 	void            	(*inth) (void *);
 	void           		*inthparam;
-		
+
 	echo_mem 	*buffer;
 	uint16       blksize;	/* in samples */
 	uint16       trigblk;	/* blk on which to trigger inth */
 	uint16       blkmod;	/* Modulo value to wrap trigblk */
-	
+
 	/* multi_audio */
 	volatile int64	frames_count;	// for play or record
 	volatile bigtime_t real_time;	// for play or record
@@ -93,32 +93,32 @@ typedef struct _echo_stream {
 typedef struct _echo_dev {
 	char		name[DEVNAME];	/* used for resources */
 	pci_info	info;
-	
+
 	uint32	bmbar;
 	void *	log_bmbar;
 	area_id area_bmbar;
 	uint32	irq;
 	uint16	type;
-	
+
 	PCEchoGals	pEG;
 	ECHOGALS_CAPS	caps;
 	NUINT		mixer;
 	PCOsSupport pOSS;
-		
+
 	void	*ptb_log_base;
-	void	*ptb_phy_base;
+	phys_addr_t	ptb_phy_base;
 	area_id ptb_area;
-	
+
 	sem_id buffer_ready_sem;
-	
+
 	LIST_HEAD(, _echo_stream) streams;
 	LIST_HEAD(, _echo_mem) mems;
-	
+
 	echo_stream		*pstream;
 	echo_stream		*rstream;
-	
+
 	/* multi_audio */
-	multi_dev	multi;		
+	multi_dev	multi;
 #ifdef MIDI_SUPPORT
 	midi_dev 	midi;
 #endif
@@ -144,7 +144,7 @@ extern "C" {
 
 status_t echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 			     uint8 bitsPerSample, uint32 sample_ratei, uint8 index);
-status_t echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf, 
+status_t echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf,
 					char** buffer, size_t *stride);
 void echo_stream_start(echo_stream *stream, void (*inth) (void *), void *inthparam);
 void echo_stream_halt(echo_stream *stream);
