@@ -28,7 +28,7 @@
 #include "IOSchedulerSimple.h"
 
 
-//#define TRACE_CD_DISK
+#define TRACE_CD_DISK
 #ifdef TRACE_CD_DISK
 #	define TRACE(x...) dprintf("scsi_cd: " x)
 #else
