@@ -46,6 +46,7 @@
 #define ANALOGDEVICES_VENDORID		0x11d4
 #define CIRRUSLOGIC_VENDORID		0x1013
 #define CONEXANT_VENDORID			0x14f1
+#define IDT_VENDORID				0x111d
 #define REALTEK_VENDORID			0x10ec
 #define SIGMATEL_VENDORID			0x8384
 
@@ -121,10 +122,10 @@ get_widget_location(uint32 location)
 					return "Rear panel";
 				case 8:
 					return "Drive bay";
-				case 0: 
+				case 0:
 				case 1:
 				default:
-					return NULL; 
+					return NULL;
 			}
 		case 1:
 			switch (location & 0xf) {
@@ -777,7 +778,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 					VID_GET_CONFIGURATION_DEFAULT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
 					widget.d.pin.config = resp[0];
-					const char* location = 
+					const char* location =
 						get_widget_location(CONF_DEFAULT_LOCATION(resp[0]));
 					TRACE("\t%s, %s%s%s, %s, %s, Association:%ld\n",
 						kPortConnector[CONF_DEFAULT_CONNECTIVITY(resp[0])],
@@ -818,8 +819,10 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 /*! Find output path for widget */
 static bool
 hda_widget_find_output_path(hda_audio_group* audioGroup, hda_widget* widget,
-	uint32 depth)
+	uint32 depth, bool &alreadyUsed)
 {
+	alreadyUsed = false;
+
 	if (widget == NULL || depth > 16)
 		return false;
 
@@ -833,8 +836,10 @@ TRACE("      %*soutput: added output widget %ld\n", (int)depth * 2, "", widget->
 		case WT_AUDIO_SELECTOR:
 		{
 			// already used
-			if (widget->flags & WIDGET_FLAG_OUTPUT_PATH)
+			if (widget->flags & WIDGET_FLAG_OUTPUT_PATH) {
+				alreadyUsed = true;
 				return false;
+			}
 
 			// search for output in this path
 			bool found = false;
@@ -843,7 +848,7 @@ TRACE("      %*soutput: added output widget %ld\n", (int)depth * 2, "", widget->
 					widget->inputs[i]);
 
 				if (hda_widget_find_output_path(audioGroup, inputWidget,
-						depth + 1)) {
+						depth + 1, alreadyUsed)) {
 					if (widget->active_input == -1)
 						widget->active_input = i;
 
@@ -930,7 +935,8 @@ TRACE("build output tree: %suse mixer\n", useMixer ? "" : "don't ");
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		hda_widget& widget = audioGroup->widgets[i];
 
-		if (widget.type != WT_PIN_COMPLEX || !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
+		if (widget.type != WT_PIN_COMPLEX
+			|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
 			continue;
 
 		int device = CONF_DEFAULT_DEVICE(widget.d.pin.config);
@@ -952,7 +958,12 @@ TRACE("    try widget %ld: %p\n", widget.inputs[j], inputWidget);
 				continue;
 TRACE("    widget %ld is candidate\n", inputWidget->node_id);
 
-			if (hda_widget_find_output_path(audioGroup, inputWidget, 0)) {
+			bool alreadyUsed = false;
+			if (hda_widget_find_output_path(audioGroup, inputWidget, 0,
+				alreadyUsed)
+				|| (device == PIN_DEV_HEAD_PHONE_OUT && alreadyUsed)) {
+				// find the output path to an audio output widget
+				// or for headphones, an already used widget
 TRACE("    add pin widget %ld\n", widget.node_id);
 				if (widget.active_input == -1)
 					widget.active_input = j;
@@ -1044,7 +1055,7 @@ TRACE("build tree!\n");
 
 	// GPIO
 	uint32 gpio = 0;
-	for (int32 i = 0; i < GPIO_COUNT_NUM_GPIO(audioGroup->gpio) 
+	for (uint32 i = 0; i < GPIO_COUNT_NUM_GPIO(audioGroup->gpio)
 		&& i < HDA_QUIRK_GPIO_COUNT; i++) {
 		if (audioGroup->codec->quirks & (1 << i)) {
 			gpio |= (1 << i);
@@ -1104,10 +1115,10 @@ hda_codec_switch_handler(hda_codec* codec)
 
 		for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 			hda_widget& widget = audioGroup->widgets[i];
-			
-			if (widget.type != WT_PIN_COMPLEX 
+
+			if (widget.type != WT_PIN_COMPLEX
 				|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities)
-				|| CONF_DEFAULT_DEVICE(widget.d.pin.config) 
+				|| CONF_DEFAULT_DEVICE(widget.d.pin.config)
 					!= PIN_DEV_HEAD_PHONE_OUT)
 				continue;
 
@@ -1128,8 +1139,8 @@ hda_codec_switch_handler(hda_codec* codec)
 
 		for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 			hda_widget& widget = audioGroup->widgets[i];
-			
-			if (widget.type != WT_PIN_COMPLEX 
+
+			if (widget.type != WT_PIN_COMPLEX
 				|| !PIN_CAP_IS_OUTPUT(widget.d.pin.capabilities))
 				continue;
 
@@ -1138,7 +1149,7 @@ hda_codec_switch_handler(hda_codec* codec)
 				&& device != PIN_DEV_SPEAKER
 				&& device != PIN_DEV_LINE_OUT)
 				continue;
-			
+
 			uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
 					true);
 			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
@@ -1334,7 +1345,9 @@ static const struct {
 	{ HDA_ALL, HDA_ALL, HDA_ALL, HDA_ALL, HDA_QUIRK_IVREF, 0 },
 	{ 0x10de, 0xcb79, CIRRUSLOGIC_VENDORID, 0x4206, HDA_QUIRK_GPIO1 | HDA_QUIRK_GPIO3, 0 },		// MacBook Pro 5.5
 	{ 0x8384, 0x7680, SIGMATEL_VENDORID, 0x7680, HDA_QUIRK_GPIO0 | HDA_QUIRK_GPIO1, 0},	// Apple Intel Mac
+	{ 0x106b, 0x00a1, REALTEK_VENDORID, 0x0885, HDA_QUIRK_GPIO0 | HDA_QUIRK_OVREF50, 0},	// MacBook
 	{ 0x106b, 0x00a3, REALTEK_VENDORID, 0x0885, HDA_QUIRK_GPIO0, 0},	// MacBook
+	{ HDA_ALL, HDA_ALL, IDT_VENDORID, 0x76b2, HDA_QUIRK_GPIO0, 0},
 };
 
 
@@ -1375,7 +1388,7 @@ hda_codec_delete(hda_codec* codec)
 
 	delete_sem(codec->response_sem);
 	delete_sem(codec->unsol_response_sem);
-	
+
 	int32 result;
 	wait_for_thread(codec->unsol_response_thread, &result);
 
@@ -1475,7 +1488,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			}
 		}
 	}
-	
+
 	codec->unsol_response_thread = spawn_kernel_thread(
 		(status_t(*)(void*))hda_codec_switch_handler,
 		"hda_codec_unsol_thread", B_LOW_PRIORITY, codec);
