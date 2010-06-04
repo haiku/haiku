@@ -24,7 +24,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 #ifndef _DEV_PCI_AUICH_H_
 #define _DEV_PCI_AUICH_H_
 
@@ -39,7 +39,7 @@
 #include "multi.h"
 
 #define INTEL_VENDOR_ID		0x8086	/* Intel */
-#define INTEL_82443MX_AC97_DEVICE_ID	0x7195	
+#define INTEL_82443MX_AC97_DEVICE_ID	0x7195
 #define INTEL_82801AA_AC97_DEVICE_ID	0x2415
 #define INTEL_82801AB_AC97_DEVICE_ID	0x2425
 #define INTEL_82801BA_AC97_DEVICE_ID	0x2445
@@ -64,7 +64,7 @@
 #define AMD_AMD8111_AC97_DEVICE_ID		0x764d
 #define AMD_AMD768_AC97_DEVICE_ID		0x7445
 
-#define VERSION "Version alpha 1, Copyright (c) 2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__ 
+#define VERSION "Version alpha 1, Copyright (c) 2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__
 #define DRIVER_NAME "auich"
 #define FRIENDLY_NAME "Auich"
 #define AUTHOR "Jérôme Duval"
@@ -93,7 +93,7 @@ typedef struct _auich_dmalist {
 typedef struct _auich_mem {
 	LIST_ENTRY(_auich_mem) next;
 	void	*log_base;
-	void	*phy_base;
+	phys_addr_t	phy_base;
 	area_id area;
 	size_t	size;
 } auich_mem;
@@ -101,7 +101,7 @@ typedef struct _auich_mem {
 /*
  * Streams
  */
- 
+
 typedef struct _auich_stream {
 	struct _auich_dev 	*card;
 	uint8        		use;
@@ -111,25 +111,25 @@ typedef struct _auich_stream {
 	uint8				channels;
 	uint32 				bufframes;
 	uint8 				bufcount;
-	
+
 	uint32				base;
-	
+
 	LIST_ENTRY(_auich_stream)	next;
-	
+
 	void            	(*inth) (void *);
 	void           		*inthparam;
-	
-	void	*dmaops_log_base;
-	void	*dmaops_phy_base;
+
+	void		*dmaops_log_base;
+	phys_addr_t	dmaops_phy_base;
 	area_id dmaops_area;
-	
+
 	auich_mem *buffer;
 	uint16       blksize;	/* in samples */
 	uint16       trigblk;	/* blk on which to trigger inth */
 	uint16       blkmod;	/* Modulo value to wrap trigblk */
-	
+
 	uint16 		 		sta; /* GLOB_STA int bit */
-	
+
 	/* multi_audio */
 	volatile int64	frames_count;	// for play or record
 	volatile bigtime_t real_time;	// for play or record
@@ -146,22 +146,22 @@ typedef struct _auich_dev {
 	char		name[DEVNAME];	/* used for resources */
 	pci_info	info;
 	device_config config;
-	
+
 	void	*ptb_log_base;
 	void	*ptb_phy_base;
 	area_id ptb_area;
-	
+
 	sem_id buffer_ready_sem;
-	
+
 	uint32			interrupt_mask;
-	
+
 	LIST_HEAD(, _auich_stream) streams;
-	
+
 	LIST_HEAD(, _auich_mem) mems;
-	
+
 	auich_stream	*pstream;
 	auich_stream	*rstream;
-	
+
 	/* multi_audio */
 	multi_dev	multi;
 } auich_dev;
@@ -184,7 +184,7 @@ extern auich_dev cards[NUM_CARDS];
 status_t auich_stream_set_audioparms(auich_stream *stream, uint8 channels,
 			     uint8 b16, uint32 sample_rate);
 status_t auich_stream_commit_parms(auich_stream *stream);
-status_t auich_stream_get_nth_buffer(auich_stream *stream, uint8 chan, uint8 buf, 
+status_t auich_stream_get_nth_buffer(auich_stream *stream, uint8 chan, uint8 buf,
 					char** buffer, size_t *stride);
 void auich_stream_start(auich_stream *stream, void (*inth) (void *), void *inthparam);
 void auich_stream_halt(auich_stream *stream);

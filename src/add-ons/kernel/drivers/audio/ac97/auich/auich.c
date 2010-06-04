@@ -2,7 +2,7 @@
  * Auich BeOS Driver for Intel Southbridge audio
  *
  * Copyright (c) 2003, Jerome Duval (jerome.duval@free.fr)
- 
+
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -24,7 +24,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
- 
+
 #include <KernelExport.h>
 #include <PCI.h>
 #include <driver_settings.h>
@@ -71,7 +71,7 @@ auich_settings current_settings = {
 #define	GET_REG_PICB(x)		(IS_SIS7012(x) ? AUICH_REG_X_SR : AUICH_REG_X_PICB)
 #define	GET_REG_SR(x)		(IS_SIS7012(x) ? AUICH_REG_X_PICB : AUICH_REG_X_SR)
 
-static void 
+static void
 dump_hardware_regs(device_config *config)
 {
 	LOG(("GLOB_CNT = %#08x\n", auich_reg_read_32(config, AUICH_REG_GLOB_CNT)));
@@ -125,7 +125,7 @@ static void *
 auich_mem_alloc(auich_dev *card, size_t size)
 {
 	auich_mem *mem;
-	
+
 	mem = auich_mem_new(card, size);
 	if (mem == NULL)
 		return (NULL);
@@ -140,12 +140,12 @@ static void
 auich_mem_free(auich_dev *card, void *ptr)
 {
 	auich_mem 		*mem;
-	
+
 	LIST_FOREACH(mem, &card->mems, next) {
 		if (mem->log_base != ptr)
 			continue;
 		LIST_REMOVE(mem, next);
-		
+
 		auich_mem_delete(mem);
 		break;
 	}
@@ -160,27 +160,27 @@ auich_stream_set_audioparms(auich_stream *stream, uint8 channels,
 	uint8 			sample_size, frame_size;
 	LOG(("auich_stream_set_audioparms\n"));
 
-	if ((stream->channels == channels) &&
-		(stream->b16 == b16) && 
-		(stream->sample_rate == sample_rate))
+	if ((stream->channels == channels)
+		&& (stream->b16 == b16)
+		&& (stream->sample_rate == sample_rate))
 		return B_OK;
-	
+
 	if (stream->buffer)
 		auich_mem_free(stream->card, stream->buffer->log_base);
-		
+
 	stream->b16 = b16;
 	stream->sample_rate = sample_rate;
 	stream->channels = channels;
-	
+
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * stream->channels;
-	
+
 	stream->buffer = auich_mem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
-	
+
 	stream->trigblk = 0;	/* This shouldn't be needed */
 	stream->blkmod = stream->bufcount;
 	stream->blksize = stream->bufframes * frame_size;
-		
+
 	return B_OK;
 }
 
@@ -191,7 +191,7 @@ auich_stream_commit_parms(auich_stream *stream)
 	uint32      	*page;
 	uint32 			i;
 	LOG(("auich_stream_commit_parms\n"));
-	
+
 	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, 0);
 	snooze(10000); // 10 ms
 
@@ -203,29 +203,29 @@ auich_stream_commit_parms(auich_stream *stream)
 		}
 		spin(1);
 	}
-	
+
 	if (i < 0) {
 		LOG(("channel reset failed after 10ms\n"));
 	}
-	
+
 	page = stream->dmaops_log_base;
-	
+
 	for (i = 0; i < AUICH_DMALIST_MAX; i++) {
-		page[2*i] = ((uint32)stream->buffer->phy_base) + 
-			(i % stream->bufcount) * stream->blksize;
-		page[2*i + 1] = AUICH_DMAF_IOC | (stream->blksize 
+		page[2*i] = ((uint32)stream->buffer->phy_base)
+			+ (i % stream->bufcount) * stream->blksize;
+		page[2*i + 1] = AUICH_DMAF_IOC | (stream->blksize
 			/ (IS_SIS7012(&stream->card->config) ? 1 : 2));
 	}
-			
+
 	// set physical buffer descriptor base address
-	auich_reg_write_32(&stream->card->config, stream->base + AUICH_REG_X_BDBAR, 
+	auich_reg_write_32(&stream->card->config, stream->base + AUICH_REG_X_BDBAR,
 		(uint32)stream->dmaops_phy_base);
-		
+
 	if (stream->use & AUICH_USE_RECORD)
 		auich_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE, (uint16)stream->sample_rate);
 	else
 		auich_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE, (uint16)stream->sample_rate);
-	
+
 	if (stream->use & AUICH_USE_RECORD)
 		LOG(("rate : %d\n", auich_codec_read(&stream->card->config, AC97_PCM_L_R_ADC_RATE)));
 	else
@@ -235,19 +235,19 @@ auich_stream_commit_parms(auich_stream *stream)
 
 
 status_t
-auich_stream_get_nth_buffer(auich_stream *stream, uint8 chan, uint8 buf, 
+auich_stream_get_nth_buffer(auich_stream *stream, uint8 chan, uint8 buf,
 					char** buffer, size_t *stride)
 {
 	uint8 			sample_size, frame_size;
 	LOG(("auich_stream_get_nth_buffer\n"));
-	
+
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * stream->channels;
-	
+
 	*buffer = stream->buffer->log_base + (buf * stream->bufframes * frame_size)
 		+ chan * sample_size;
 	*stride = frame_size;
-	
+
 	return B_OK;
 }
 
@@ -266,17 +266,17 @@ auich_stream_start(auich_stream *stream, void (*inth) (void *), void *inthparam)
 {
 	int32 civ;
 	LOG(("auich_stream_start\n"));
-	
+
 	stream->inth = inth;
 	stream->inthparam = inthparam;
-		
+
 	stream->state |= AUICH_STATE_STARTED;
-	
+
 	civ = auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CIV);
-	
+
 	// step 1: clear status bits
-	auich_reg_write_16(&stream->card->config, 
-		stream->base + GET_REG_SR(&stream->card->config), 
+	auich_reg_write_16(&stream->card->config,
+		stream->base + GET_REG_SR(&stream->card->config),
 		auich_reg_read_16(&stream->card->config, stream->base + GET_REG_SR(&stream->card->config)));
 	auich_reg_read_16(&stream->card->config, stream->base + GET_REG_SR(&stream->card->config));
 	// step 2: prepare buffer transfer
@@ -285,7 +285,7 @@ auich_stream_start(auich_stream *stream, void (*inth) (void *), void *inthparam)
 	// step 3: enable interrupts & busmaster transfer
 	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, CR_RPBM | CR_LVBIE | CR_FEIE | CR_IOCE);
 	auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR);
-	
+
 #ifdef DEBUG
 	dump_hardware_regs(&stream->card->config);
 #endif
@@ -296,10 +296,10 @@ void
 auich_stream_halt(auich_stream *stream)
 {
 	LOG(("auich_stream_halt\n"));
-			
+
 	stream->state &= ~AUICH_STATE_STARTED;
-	
-	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, 
+
+	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR,
 		auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR) & ~CR_RPBM);
 }
 
@@ -328,7 +328,7 @@ auich_stream_new(auich_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	stream->blksize = 0;
 	stream->trigblk = 0;
 	stream->blkmod = 0;
-	
+
 	if (use & AUICH_USE_PLAY) {
 		stream->base = AUICH_REG_PO_BASE;
 		stream->sta = STA_POINT;
@@ -336,26 +336,26 @@ auich_stream_new(auich_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 		stream->base = AUICH_REG_PI_BASE;
 		stream->sta = STA_PIINT;
 	}
-		
+
 	stream->frames_count = 0;
 	stream->real_time = 0;
 	stream->buffer_cycle = 0;
 	stream->update_needed = false;
-	
+
 	/* allocate memory for our dma ops */
-	stream->dmaops_area = alloc_mem(&stream->dmaops_phy_base, &stream->dmaops_log_base, 
+	stream->dmaops_area = alloc_mem(&stream->dmaops_phy_base, &stream->dmaops_log_base,
 		sizeof(auich_dmalist) * AUICH_DMALIST_MAX, "auich dmaops");
-		
+
 	if (stream->dmaops_area < B_OK) {
 		PRINT(("couldn't allocate memory\n"));
 		free(stream);
-		return NULL;	
+		return NULL;
 	}
 
 	status = lock();
 	LIST_INSERT_HEAD((&card->streams), stream, next);
 	unlock(status);
-	
+
 	return stream;
 }
 
@@ -366,9 +366,9 @@ auich_stream_delete(auich_stream *stream)
 	cpu_status status;
 	int32 i;
 	LOG(("auich_stream_delete\n"));
-	
+
 	auich_stream_halt(stream);
-	
+
 	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, 0);
 	snooze(10000); // 10 ms
 
@@ -380,29 +380,29 @@ auich_stream_delete(auich_stream *stream)
 		}
 		spin(1);
 	}
-	
+
 	if (i < 0) {
 		LOG(("channel reset failed after 10ms\n"));
 	}
-	
+
 	auich_reg_write_32(&stream->card->config, stream->base + AUICH_REG_X_BDBAR, 0);
-	
+
 	if (stream->dmaops_area > B_OK)
 		delete_area(stream->dmaops_area);
-		
+
 	if (stream->buffer)
 		auich_mem_free(stream->card, stream->buffer->log_base);
-	
+
 	status = lock();
 	LIST_REMOVE(stream, next);
 	unlock(status);
-	
+
 	free(stream);
 }
 
 /* auich interrupt */
 
-int32 
+int32
 auich_int(void *arg)
 {
 	auich_dev	 	*card = arg;
@@ -411,9 +411,9 @@ auich_int(void *arg)
 	auich_stream 	*stream = NULL;
 	uint32			sta;
 	uint16 			sr;
-	
+
 	// TRACE(("auich_int(%p)\n", card));
-	
+
 	sta = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA) & STA_INTMASK;
 	if (sta & (STA_S0RI | STA_S1RI | STA_S2RI)) {
 		// ignore and clear resume interrupt(s)
@@ -422,41 +422,41 @@ auich_int(void *arg)
 		gotone = true;
 		sta &= ~(STA_S0RI | STA_S1RI | STA_S2RI);
 	}
-	
+
 	if (sta & card->interrupt_mask) {
 		//TRACE(("interrupt !! %x\n", sta));
-		
+
 		LIST_FOREACH(stream, &card->streams, next)
 			if (sta & stream->sta) {
 				sr = auich_reg_read_16(&card->config,
 					stream->base + GET_REG_SR(&stream->card->config));
 				sr &= SR_MASK;
-				
+
 				if (!sr)
 					continue;
-				
+
 				gotone = true;
-								
+
 				if (sr & SR_BCIS) {
 					curblk = auich_stream_curaddr(stream);
-									
+
 					auich_reg_write_8(&card->config, stream->base + AUICH_REG_X_LVI,
 						(curblk + 2) % AUICH_DMALIST_MAX);
-							
+
 					stream->trigblk = (curblk) % stream->blkmod;
-											
+
 					if (stream->inth)
 						stream->inth(stream->inthparam);
 				} else {
 					TRACE(("interrupt !! sta %x, sr %x\n", sta, sr));
 				}
-								
-				auich_reg_write_16(&card->config, 
+
+				auich_reg_write_16(&card->config,
 					stream->base + GET_REG_SR(&stream->card->config), sr);
 				auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, stream->sta);
 				sta &= ~stream->sta;
 			}
-		
+
 		if (sta != 0) {
 			dprintf("global status not fully handled %lx!\n", sta);
 			auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, sta);
@@ -464,7 +464,7 @@ auich_int(void *arg)
 	} else if (sta != 0) {
 		dprintf("interrupt masked %lx, sta %lx\n", card->interrupt_mask, sta);
 	}
-	
+
 	if (gotone)
 		return B_INVOKE_SCHEDULER;
 
@@ -489,20 +489,20 @@ auich_int_thread(void *data)
 
 /*	auich driver functions */
 
-static status_t 
+static status_t
 map_io_memory(device_config *config)
 {
 	if ((config->type & TYPE_ICH4) == 0)
 		return B_OK;
-	
-	config->area_mmbar = map_mem(&config->log_mmbar, (void *)config->mmbar, ICH4_MMBAR_SIZE, "auich mmbar io");
+
+	config->area_mmbar = map_mem(&config->log_mmbar, config->mmbar, ICH4_MMBAR_SIZE, "auich mmbar io");
 	if (config->area_mmbar <= B_OK) {
 		LOG(("mapping of mmbar io failed, error = %#x\n",config->area_mmbar));
 		return B_ERROR;
 	}
 	LOG(("mapping of mmbar: area %#x, phys %#x, log %#x\n", config->area_mmbar, config->mmbar, config->log_mmbar));
 
-	config->area_mbbar = map_mem(&config->log_mbbar, (void *)config->mbbar, ICH4_MBBAR_SIZE, "auich mbbar io");
+	config->area_mbbar = map_mem(&config->log_mbbar, config->mbbar, ICH4_MBBAR_SIZE, "auich mbbar io");
 	if (config->area_mbbar <= B_OK) {
 		LOG(("mapping of mbbar io failed, error = %#x\n",config->area_mbbar));
 		delete_area(config->area_mmbar);
@@ -515,7 +515,7 @@ map_io_memory(device_config *config)
 }
 
 
-static status_t 
+static status_t
 unmap_io_memory(device_config *config)
 {
 	status_t rv;
@@ -527,13 +527,13 @@ unmap_io_memory(device_config *config)
 }
 
 /* detect presence of our hardware */
-status_t 
+status_t
 init_hardware(void)
 {
 	int ix=0;
 	pci_info info;
 	status_t err = ENODEV;
-	
+
 	LOG_CREATE();
 
 	PRINT(("init_hardware()\n"));
@@ -566,7 +566,7 @@ init_hardware(void)
 			|| info.device_id == NVIDIA_CK804_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_MCP51_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_MCP04_AC97_DEVICE_ID
-			)) 
+			))
 		|| (info.vendor_id == AMD_VENDOR_ID &&
 			(info.device_id == AMD_AMD8111_AC97_DEVICE_ID
 			|| info.device_id == AMD_AMD768_AC97_DEVICE_ID
@@ -577,7 +577,7 @@ init_hardware(void)
 		}
 		ix++;
 	}
-		
+
 	put_module(B_PCI_MODULE_NAME);
 
 	return err;
@@ -598,14 +598,14 @@ make_device_names(
 status_t
 auich_init(auich_dev * card)
 {
-	card->interrupt_mask = STA_PIINT | STA_POINT; //STA_INTMASK; 
-		
+	card->interrupt_mask = STA_PIINT | STA_POINT; //STA_INTMASK;
+
 	/* Init streams list */
 	LIST_INIT(&(card->streams));
-	
+
 	/* Init mems list */
 	LIST_INIT(&(card->mems));
-	
+
 	return B_OK;
 }
 
@@ -621,7 +621,7 @@ auich_setup(auich_dev * card)
 	PRINT(("auich_setup(%p)\n", card));
 
 	make_device_names(card);
-	
+
 	card->config.subvendor_id = card->info.u.h0.subsystem_vendor_id;
 	card->config.subsystem_id = card->info.u.h0.subsystem_id;
 	card->config.nabmbar = card->info.u.h0.base_registers[0];
@@ -635,7 +635,7 @@ auich_setup(auich_dev * card)
 		card->config.type |= TYPE_ICH4;
 	if (card->info.device_id == SIS_SI7012_AC97_DEVICE_ID)
 		card->config.type |= TYPE_SIS7012;
-	
+
 	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", card->name, card->info.device_id,
 		card->info.revision, card->info.u.h0.subsystem_id, card->config.nabmbar));
 
@@ -655,7 +655,7 @@ auich_setup(auich_dev * card)
 		PRINT(("mapping of memory IO space failed\n"));
 		return B_ERROR;
 	}
-	
+
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command before: %x\n", cmd));
 	if (IS_ICH4(&card->config)) {
@@ -665,7 +665,7 @@ auich_setup(auich_dev * card)
 	}
 	cmd = (*pci->read_pci_config)(card->info.bus, card->info.device, card->info.function, PCI_command, 2);
 	PRINT(("PCI command after: %x\n", cmd));
-	
+
 	/* do a cold reset */
 	LOG(("cold reset\n"));
 	auich_reg_write_32(&card->config, AUICH_REG_GLOB_CNT, 0);
@@ -676,25 +676,25 @@ auich_setup(auich_dev * card)
 	if ((rv & CNT_COLD) == 0) {
 		LOG(("cold reset failed\n"));
 	}
-	
+
 	for (i = 0; i < 500; i++) {
 		rv = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA);
 		if (rv & STA_S0CR)
 			break;
 		snooze(1000);
 	}
-	
+
 	if (!(rv & STA_S0CR)) { /* reset failure */
 		/* It never return STA_S0CR in some cases */
 		PRINT(("reset failure\n"));
 	}
-	
-	/* attach the codec */	
+
+	/* attach the codec */
 	PRINT(("codec attach\n"));
-	ac97_attach(&card->config.ac97, (codec_reg_read)auich_codec_read, 
+	ac97_attach(&card->config.ac97, (codec_reg_read)auich_codec_read,
 		(codec_reg_write)auich_codec_write, &card->config,
 		card->config.subvendor_id, card->config.subsystem_id);
-	
+
 	/* Print capabilities though there are no supports for now */
 	if ((rv & STA_SAMPLE_CAP) == STA_POM20) {
 		LOG(("20 bit precision support\n"));
@@ -707,7 +707,7 @@ auich_setup(auich_dev * card)
 	}
 
 	if (current_settings.use_thread) {
-		int_thread_id = spawn_kernel_thread(auich_int_thread, 
+		int_thread_id = spawn_kernel_thread(auich_int_thread,
 			"auich interrupt poller", B_REAL_TIME_PRIORITY, card);
 		resume_thread(int_thread_id);
 	} else {
@@ -721,10 +721,10 @@ auich_setup(auich_dev * card)
 			return err;
 		}
 	}
-		
+
 	if ((err = auich_init(card)) != B_OK)
 		return err;
-		
+
 	PRINT(("init_driver done\n"));
 
 	return err;
@@ -739,7 +739,7 @@ init_driver(void)
 	pci_info info;
 	status_t err;
 	num_cards = 0;
-		
+
 	PRINT(("init_driver()\n"));
 
 	// get driver settings
@@ -751,10 +751,10 @@ init_driver(void)
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
 		return ENOSYS;
-		
+
 	while ((*pci->get_nth_pci_info)(ix++, &info) == B_OK) {
-		if ((info.vendor_id == INTEL_VENDOR_ID &&
-			(info.device_id == INTEL_82443MX_AC97_DEVICE_ID
+		if ((info.vendor_id == INTEL_VENDOR_ID
+			&& (info.device_id == INTEL_82443MX_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801AA_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801AB_AC97_DEVICE_ID
 			|| info.device_id == INTEL_82801BA_AC97_DEVICE_ID
@@ -765,11 +765,11 @@ init_driver(void)
 			|| info.device_id == INTEL_82801GB_AC97_DEVICE_ID
 			|| info.device_id == INTEL_6300ESB_AC97_DEVICE_ID
 			))
-		|| (info.vendor_id == SIS_VENDOR_ID &&
-			(info.device_id == SIS_SI7012_AC97_DEVICE_ID
+		|| (info.vendor_id == SIS_VENDOR_ID
+			&& (info.device_id == SIS_SI7012_AC97_DEVICE_ID
 			))
-		|| (info.vendor_id == NVIDIA_VENDOR_ID &&
-			(info.device_id == NVIDIA_nForce_AC97_DEVICE_ID
+		|| (info.vendor_id == NVIDIA_VENDOR_ID
+			&& (info.device_id == NVIDIA_nForce_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_nForce2_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_nForce2_400_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_nForce3_AC97_DEVICE_ID
@@ -777,9 +777,9 @@ init_driver(void)
 			|| info.device_id == NVIDIA_CK804_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_MCP51_AC97_DEVICE_ID
 			|| info.device_id == NVIDIA_MCP04_AC97_DEVICE_ID
-			)) 
-		|| (info.vendor_id == AMD_VENDOR_ID &&
-			(info.device_id == AMD_AMD8111_AC97_DEVICE_ID
+			))
+		|| (info.vendor_id == AMD_VENDOR_ID
+			&& (info.device_id == AMD_AMD8111_AC97_DEVICE_ID
 			|| info.device_id == AMD_AMD768_AC97_DEVICE_ID
 			))
 			) {
@@ -817,7 +817,7 @@ init_driver(void)
 		return ENODEV;
 	}
 
-	
+
 #if DEBUG
 	//add_debugger_command("auich", auich_debug, "auich [card# (1-n)]");
 #endif
@@ -830,16 +830,16 @@ auich_shutdown(auich_dev *card)
 {
 	PRINT(("shutdown(%p)\n", card));
 	ac97_detach(card->config.ac97);
-	
+
 	card->interrupt_mask = 0;
-	
+
 	if (current_settings.use_thread) {
 		status_t exit_value;
 		int_thread_exit = true;
 		wait_for_thread(int_thread_id, &exit_value);
 	} else
 		remove_io_interrupt_handler(card->config.irq, auich_int, card);
-		
+
 	unmap_io_memory(&card->config);
 }
 
