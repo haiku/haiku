@@ -278,14 +278,21 @@ x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 
 
 X86VMTranslationMap::X86VMTranslationMap()
+	:
+	fArchData(NULL),
+	fPageMapper(NULL),
+	fInvalidPagesCount(0)
 {
 }
 
 
 X86VMTranslationMap::~X86VMTranslationMap()
 {
-	if (fArchData->page_mapper != NULL)
-		fArchData->page_mapper->Delete();
+	if (fArchData == NULL)
+		return;
+
+	if (fPageMapper != NULL)
+		fPageMapper->Delete();
 
 	if (fArchData->pgdir_virt != NULL) {
 		// cycle through and free all of the user space pgtables
@@ -317,25 +324,21 @@ X86VMTranslationMap::Init(bool kernel)
 		return B_NO_MEMORY;
 
 	fArchData->active_on_cpus = 0;
-	fArchData->num_invalidate_pages = 0;
-	fArchData->page_mapper = NULL;
 
 	if (!kernel) {
 		// user
 		// allocate a physical page mapper
 		status_t error = sPhysicalPageMapper
-			->CreateTranslationMapPhysicalPageMapper(
-				&fArchData->page_mapper);
+			->CreateTranslationMapPhysicalPageMapper(&fPageMapper);
 		if (error != B_OK)
 			return error;
 
 		// allocate a pgdir
 		fArchData->pgdir_virt = (page_directory_entry *)memalign(
 			B_PAGE_SIZE, B_PAGE_SIZE);
-		if (fArchData->pgdir_virt == NULL) {
-			fArchData->page_mapper->Delete();
+		if (fArchData->pgdir_virt == NULL)
 			return B_NO_MEMORY;
-		}
+
 		phys_addr_t physicalPageDir;
 		vm_get_page_mapping(VMAddressSpace::KernelID(),
 			(addr_t)fArchData->pgdir_virt,
@@ -344,7 +347,7 @@ X86VMTranslationMap::Init(bool kernel)
 	} else {
 		// kernel
 		// get the physical page mapper
-		fArchData->page_mapper = sKernelPhysicalPageMapper;
+		fPageMapper = sKernelPhysicalPageMapper;
 
 		// we already know the kernel pgdir mapping
 		fArchData->pgdir_virt = sKernelVirtualPageDirectory;
@@ -394,7 +397,7 @@ X86VMTranslationMap::Lock()
 	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we were the first one to grab the lock
 		TRACE("clearing invalidated page count\n");
-		fArchData->num_invalidate_pages = 0;
+		fInvalidPagesCount = 0;
 	}
 
 	return true;
@@ -483,7 +486,7 @@ X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
@@ -531,8 +534,8 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
-		pd[index]  & X86_PDE_ADDRESS_MASK);
+	page_table_entry* pt = fPageMapper->GetPageTableAt(
+		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
 			index++, start += B_PAGE_SIZE) {
@@ -551,13 +554,10 @@ restart:
 			// Note, that we only need to invalidate the address, if the
 			// accessed flags was set, since only then the entry could have been
 			// in any TLB.
-			if (fArchData->num_invalidate_pages
-					< PAGE_INVALIDATE_CACHE_SIZE) {
-				fArchData->pages_to_invalidate[
-					fArchData->num_invalidate_pages] = start;
-			}
+			if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+				fInvalidPages[fInvalidPagesCount] = start;
 
-			fArchData->num_invalidate_pages++;
+			fInvalidPagesCount++;
 		}
 	}
 
@@ -588,7 +588,7 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	index = VADDR_TO_PTENT(address);
@@ -607,13 +607,10 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 		// Note, that we only need to invalidate the address, if the
 		// accessed flags was set, since only then the entry could have been
 		// in any TLB.
-		if (fArchData->num_invalidate_pages
-				< PAGE_INVALIDATE_CACHE_SIZE) {
-			fArchData->pages_to_invalidate[fArchData->num_invalidate_pages]
-				= address;
-		}
+		if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+			fInvalidPages[fInvalidPagesCount] = address;
 
-		fArchData->num_invalidate_pages++;
+		fInvalidPagesCount++;
 
 		Flush();
 
@@ -715,8 +712,8 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 		struct thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
-		page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
-			pd[index]  & X86_PDE_ADDRESS_MASK);
+		page_table_entry* pt = fPageMapper->GetPageTableAt(
+			pd[index] & X86_PDE_ADDRESS_MASK);
 
 		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
 				index++, start += B_PAGE_SIZE) {
@@ -730,13 +727,10 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 				// Note, that we only need to invalidate the address, if the
 				// accessed flags was set, since only then the entry could have
 				// been in any TLB.
-				if (fArchData->num_invalidate_pages
-						< PAGE_INVALIDATE_CACHE_SIZE) {
-					fArchData->pages_to_invalidate[
-						fArchData->num_invalidate_pages] = start;
-				}
+				if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+					fInvalidPages[fInvalidPagesCount] = start;
 
-				fArchData->num_invalidate_pages++;
+				fInvalidPagesCount++;
 			}
 
 			if (area->cache_type != CACHE_TYPE_DEVICE) {
@@ -855,7 +849,7 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 
 			ThreadCPUPinner pinner(thread_get_current_thread());
 
-			page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+			page_table_entry* pt = fPageMapper->GetPageTableAt(
 				pd[index] & X86_PDE_ADDRESS_MASK);
 			page_table_entry oldEntry = clear_page_table_entry(
 				&pt[VADDR_TO_PTENT(address)]);
@@ -874,13 +868,10 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				page->accessed = true;
 
 				if (!deletingAddressSpace) {
-					if (fArchData->num_invalidate_pages
-							< PAGE_INVALIDATE_CACHE_SIZE) {
-						fArchData->pages_to_invalidate[
-							fArchData->num_invalidate_pages] = address;
-					}
+					if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+						fInvalidPages[fInvalidPagesCount] = address;
 
-					fArchData->num_invalidate_pages++;
+					fInvalidPagesCount++;
 				}
 			}
 
@@ -934,7 +925,7 @@ X86VMTranslationMap::Query(addr_t va, phys_addr_t *_physical, uint32 *_flags)
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
@@ -1040,7 +1031,7 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
@@ -1070,13 +1061,10 @@ restart:
 			// Note, that we only need to invalidate the address, if the
 			// accessed flag was set, since only then the entry could have been
 			// in any TLB.
-			if (fArchData->num_invalidate_pages
-					< PAGE_INVALIDATE_CACHE_SIZE) {
-				fArchData->pages_to_invalidate[
-					fArchData->num_invalidate_pages] = start;
-			}
+			if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+				fInvalidPages[fInvalidPagesCount] = start;
 
-			fArchData->num_invalidate_pages++;
+			fInvalidPagesCount++;
 		}
 	}
 
@@ -1102,7 +1090,7 @@ X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
@@ -1113,12 +1101,10 @@ X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
 	pinner.Unlock();
 
 	if ((oldEntry & flagsToClear) != 0) {
-		if (fArchData->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE) {
-			fArchData->pages_to_invalidate[
-				fArchData->num_invalidate_pages] = va;
-		}
+		if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+			fInvalidPages[fInvalidPagesCount] = va;
 
-		fArchData->num_invalidate_pages++;
+		fInvalidPagesCount++;
 	}
 
 	return B_OK;
@@ -1144,7 +1130,7 @@ X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	page_table_entry* pt = fArchData->page_mapper->GetPageTableAt(
+	page_table_entry* pt = fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	index = VADDR_TO_PTENT(address);
@@ -1188,13 +1174,10 @@ X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 		// Note, that we only need to invalidate the address, if the
 		// accessed flags was set, since only then the entry could have been
 		// in any TLB.
-		if (fArchData->num_invalidate_pages
-				< PAGE_INVALIDATE_CACHE_SIZE) {
-			fArchData->pages_to_invalidate[fArchData->num_invalidate_pages]
-				= address;
-		}
+		if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+			fInvalidPages[fInvalidPagesCount] = address;
 
-		fArchData->num_invalidate_pages++;
+		fInvalidPagesCount++;
 
 		Flush();
 
@@ -1251,16 +1234,16 @@ X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 void
 X86VMTranslationMap::Flush()
 {
-	if (fArchData->num_invalidate_pages <= 0)
+	if (fInvalidPagesCount <= 0)
 		return;
 
 	struct thread* thread = thread_get_current_thread();
 	thread_pin_to_current_cpu(thread);
 
-	if (fArchData->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
+	if (fInvalidPagesCount > PAGE_INVALIDATE_CACHE_SIZE) {
 		// invalidate all pages
 		TRACE("flush_tmap: %d pages to invalidate, invalidate all\n",
-			fArchData->num_invalidate_pages);
+			fInvalidPagesCount);
 
 		if (IS_KERNEL_MAP(map)) {
 			arch_cpu_global_TLB_invalidate();
@@ -1281,15 +1264,13 @@ X86VMTranslationMap::Flush()
 		}
 	} else {
 		TRACE("flush_tmap: %d pages to invalidate, invalidate list\n",
-			fArchData->num_invalidate_pages);
+			fInvalidPagesCount);
 
-		arch_cpu_invalidate_TLB_list(fArchData->pages_to_invalidate,
-			fArchData->num_invalidate_pages);
+		arch_cpu_invalidate_TLB_list(fInvalidPages, fInvalidPagesCount);
 
 		if (IS_KERNEL_MAP(map)) {
 			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
-				(uint32)fArchData->pages_to_invalidate,
-				fArchData->num_invalidate_pages, 0, NULL,
+				(uint32)fInvalidPages, fInvalidPagesCount, 0, NULL,
 				SMP_MSG_FLAG_SYNC);
 		} else {
 			int cpu = smp_get_current_cpu();
@@ -1297,13 +1278,12 @@ X86VMTranslationMap::Flush()
 				& ~((uint32)1 << cpu);
 			if (cpuMask != 0) {
 				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
-					(uint32)fArchData->pages_to_invalidate,
-					fArchData->num_invalidate_pages, 0, NULL,
+					(uint32)fInvalidPages, fInvalidPagesCount, 0, NULL,
 					SMP_MSG_FLAG_SYNC);
 			}
 		}
 	}
-	fArchData->num_invalidate_pages = 0;
+	fInvalidPagesCount = 0;
 
 	thread_unpin_from_current_cpu(thread);
 }

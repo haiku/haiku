@@ -9,6 +9,9 @@
 #include <vm/VMTranslationMap.h>
 
 
+#define PAGE_INVALIDATE_CACHE_SIZE 64
+
+
 struct X86VMTranslationMap : VMTranslationMap {
 								X86VMTranslationMap();
 	virtual						~X86VMTranslationMap();
@@ -65,6 +68,9 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 protected:
 			vm_translation_map_arch_info* fArchData;
+			TranslationMapPhysicalPageMapper* fPageMapper;
+			int					fInvalidPagesCount;
+			addr_t				fInvalidPages[PAGE_INVALIDATE_CACHE_SIZE];
 };
 
 

@@ -16,8 +16,6 @@
 #include <int.h>
 
 
-#define PAGE_INVALIDATE_CACHE_SIZE 64
-
 #define VADDR_TO_PDENT(va) (((va) / B_PAGE_SIZE) / 1024)
 #define VADDR_TO_PTENT(va) (((va) / B_PAGE_SIZE) % 1024)
 
@@ -66,12 +64,9 @@ typedef uint32 page_directory_entry;
 struct vm_translation_map_arch_info : DeferredDeletable {
 	page_directory_entry*		pgdir_virt;
 	uint32						pgdir_phys;
-	TranslationMapPhysicalPageMapper* page_mapper;
 	vint32						ref_count;
 	vint32						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
-	int							num_invalidate_pages;
-	addr_t						pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
 
 								vm_translation_map_arch_info();
 	virtual						~vm_translation_map_arch_info();
