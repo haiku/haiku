@@ -22,17 +22,18 @@ class BPositionIO;
 
 class StyledEditView : public BTextView {
 	public:
-						StyledEditView(BRect viewframe, BRect textframe, 
+						StyledEditView(BRect viewframe, BRect textframe,
 							BHandler *handler);
 		virtual			~StyledEditView();
 
 		virtual void	Select(int32 start, int32 finish);
 		virtual void	DeleteText(int32 start, int32 finish);
 		virtual void	FrameResized(float width, float height);
-		virtual void	InsertText(const char *text, int32 length, int32 offset, 
+		virtual void	InsertText(const char *text, int32 length, int32 offset,
 							const text_run_array *runs = NULL);
-	
+
 		void		Reset();
+		void		SetSuppressChanges(bool suppressChanges);
 		status_t	GetStyledText(BPositionIO* stream);
 		status_t	WriteStyledEditFile(BFile* file);
 

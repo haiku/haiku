@@ -64,6 +64,13 @@ StyledEditView::Reset()
 }
 
 
+void
+StyledEditView::SetSuppressChanges(bool suppressChanges)
+{
+	fSuppressChanges = suppressChanges;
+}
+
+
 status_t
 StyledEditView::GetStyledText(BPositionIO* stream)
 {

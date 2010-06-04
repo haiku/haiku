@@ -1364,8 +1364,11 @@ StyledEditWindow::Replace(BString findthis, BString replaceWith, bool caseSensit
 		int32 start, finish;
 		fTextView->GetSelection(&start, &finish);
 
+		_UpdateCleanUndoRedoSaveRevert();
+		fTextView->SetSuppressChanges(true);
 		fTextView->Delete(start, start + findthis.Length());
 		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
+		fTextView->SetSuppressChanges(false);
 		fTextView->Select(start, start + replaceWith.Length());
 		fTextView->ScrollToSelection();
 		return true;
@@ -1376,33 +1379,22 @@ StyledEditWindow::Replace(BString findthis, BString replaceWith, bool caseSensit
 
 
 void
-StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSensitive)
+StyledEditWindow::ReplaceAll(BString findthis, BString replaceWith, bool caseSensitive)
 {
-	BString viewText(fTextView->Text());
-	if (caseSensitive)
-		viewText.ReplaceAll(findIt.String(), replaceWith.String());
-	else
-		viewText.IReplaceAll(findIt.String(), replaceWith.String());
+	bool first = true;
+	fTextView->SetSuppressChanges(true);
+	while (Search(findthis, caseSensitive, true, false)) {
+		if (first) {
+			_UpdateCleanUndoRedoSaveRevert();
+			first = false;
+		}
+		int32 start, finish;
+		fTextView->GetSelection(&start, &finish);
 
-	if (viewText.Compare(fTextView->Text()) == 0) {
-		// they are the same
-		return;
+		fTextView->Delete(start, start + findthis.Length());
+		fTextView->Insert(start, replaceWith.String(), replaceWith.Length());
 	}
-
-	int32 textStart, textFinish;
-	fTextView->GetSelection(&textStart, &textFinish);
-
-	fTextView->SetText(viewText.String());
-
-	if (viewText.Length() < textStart)
-		textStart = viewText.Length();
-	if (viewText.Length() < textFinish)
-		textFinish = viewText.Length();
-
-	fTextView->Select(textStart, textFinish);
-	fTextView->ScrollToSelection();
-
-	_UpdateCleanUndoRedoSaveRevert();
+	fTextView->SetSuppressChanges(false);
 }
 
 
