@@ -20,7 +20,7 @@ struct iframe *i386_get_user_iframe(void);
 struct iframe *i386_get_current_iframe(void);
 struct iframe *i386_get_thread_user_iframe(struct thread *thread);
 
-void *x86_next_page_directory(struct thread *from, struct thread *to);
+uint32 x86_next_page_directory(struct thread *from, struct thread *to);
 
 void x86_restart_syscall(struct iframe* frame);
 

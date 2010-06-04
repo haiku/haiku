@@ -189,13 +189,13 @@ i386_get_current_iframe(void)
 }
 
 
-void *
+uint32
 x86_next_page_directory(struct thread *from, struct thread *to)
 {
 	VMAddressSpace* toAddressSpace = to->team->address_space;
 	if (from->team->address_space == toAddressSpace) {
 		// don't change the pgdir, same address space
-		return NULL;
+		return 0;
 	}
 
 	if (toAddressSpace == NULL)
@@ -389,7 +389,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		cpuData->arch.active_translation_map = toMap;
 
 		// get the new page directory
-		newPageDirectory = (uint32)toMap->pgdir_phys;
+		newPageDirectory = toMap->pgdir_phys;
 	} else {
 		newPageDirectory = 0;
 			// this means no change

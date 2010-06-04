@@ -65,7 +65,7 @@ typedef uint32 page_directory_entry;
 
 struct vm_translation_map_arch_info : DeferredDeletable {
 	page_directory_entry*		pgdir_virt;
-	page_directory_entry*		pgdir_phys;
+	uint32						pgdir_phys;
 	TranslationMapPhysicalPageMapper* page_mapper;
 	vint32						ref_count;
 	vint32						active_on_cpus;

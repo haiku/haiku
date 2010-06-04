@@ -43,7 +43,7 @@
 
 static page_table_entry *sPageHole = NULL;
 static page_directory_entry *sPageHolePageDir = NULL;
-static page_directory_entry *sKernelPhysicalPageDirectory = NULL;
+static uint32 sKernelPhysicalPageDirectory = 0;
 static page_directory_entry *sKernelVirtualPageDirectory = NULL;
 
 static X86PhysicalPageMapper* sPhysicalPageMapper;
@@ -117,7 +117,7 @@ vm_translation_map_arch_info::Delete()
 	// overwriting an active page directory is suspected
 	uint32 activePageDirectory;
 	read_cr3(activePageDirectory);
-	if (activePageDirectory == (uint32)pgdir_phys)
+	if (activePageDirectory == pgdir_phys)
 		panic("deleting a still active page directory\n");
 #endif
 
@@ -208,7 +208,7 @@ put_page_table_entry_in_pgtable(page_table_entry* entry,
 //	#pragma mark -
 
 
-void *
+uint32
 i386_translation_map_get_pgdir(VMTranslationMap* map)
 {
 	return static_cast<X86VMTranslationMap*>(map)->PhysicalPageDir();
@@ -340,7 +340,7 @@ X86VMTranslationMap::Init(bool kernel)
 		vm_get_page_mapping(VMAddressSpace::KernelID(),
 			(addr_t)fArchData->pgdir_virt,
 			&physicalPageDir);
-		fArchData->pgdir_phys = (page_directory_entry*)(addr_t)physicalPageDir;
+		fArchData->pgdir_phys = physicalPageDir;
 	} else {
 		// kernel
 		// get the physical page mapper
@@ -1346,15 +1346,14 @@ arch_vm_translation_map_init(kernel_args *args,
 	memset(sPageHolePageDir + FIRST_USER_PGDIR_ENT, 0,
 		sizeof(page_directory_entry) * NUM_USER_PGDIR_ENTS);
 
-	sKernelPhysicalPageDirectory = (page_directory_entry*)
-		args->arch_args.phys_pgdir;
+	sKernelPhysicalPageDirectory = args->arch_args.phys_pgdir;
 	sKernelVirtualPageDirectory = (page_directory_entry*)
 		args->arch_args.vir_pgdir;
 
 #ifdef TRACE_VM_TMAP
 	TRACE("page hole: %p, page dir: %p\n", sPageHole, sPageHolePageDir);
-	TRACE("page dir: %p (physical: %p)\n", sKernelVirtualPageDirectory,
-		sKernelPhysicalPageDirectory);
+	TRACE("page dir: %p (physical: %#" B_PRIx32 ")\n",
+		sKernelVirtualPageDirectory, sKernelPhysicalPageDirectory);
 
 	TRACE("physical memory ranges:\n");
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
@@ -1515,7 +1514,7 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	page_directory_entry pageDirectoryEntry;
 	uint32 index = VADDR_TO_PDENT(virtualAddress);
 
-	if (physicalPageDirectory == (uint32)sKernelPhysicalPageDirectory) {
+	if (physicalPageDirectory == sKernelPhysicalPageDirectory) {
 		pageDirectoryEntry = sKernelVirtualPageDirectory[index];
 	} else if (sPhysicalPageMapper != NULL) {
 		// map the original page directory and get the entry
@@ -1553,7 +1552,7 @@ arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 		pageTableEntry = 0;
 
 	// switch back to the original page directory
-	if (physicalPageDirectory != (uint32)sKernelPhysicalPageDirectory)
+	if (physicalPageDirectory != sKernelPhysicalPageDirectory)
 		write_cr3(physicalPageDirectory);
 
 	if ((pageTableEntry & X86_PTE_PRESENT) == 0)

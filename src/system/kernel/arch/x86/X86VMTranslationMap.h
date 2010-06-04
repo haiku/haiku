@@ -17,7 +17,7 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 	inline	vm_translation_map_arch_info* ArchData() const
 									{ return fArchData; }
-	inline	void*				PhysicalPageDir() const
+	inline	uint32				PhysicalPageDir() const
 									{ return fArchData->pgdir_phys; }
 
 	virtual	status_t			InitPostSem();

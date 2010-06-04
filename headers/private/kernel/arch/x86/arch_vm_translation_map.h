@@ -12,6 +12,6 @@
 #ifdef __cplusplus
 extern "C"
 #endif
-void *i386_translation_map_get_pgdir(VMTranslationMap *map);
+uint32 i386_translation_map_get_pgdir(VMTranslationMap *map);
 
 #endif /* _KERNEL_ARCH_x86_VM_TRANSLATION_MAP_H */
