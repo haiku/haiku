@@ -6,9 +6,6 @@
  */
 
 
-#include "video.h"
-#include "mmu.h"
-
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>

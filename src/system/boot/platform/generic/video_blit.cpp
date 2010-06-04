@@ -6,12 +6,9 @@
  */
 
 
-#include "video.h"
-
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
-#include <boot/menu.h>
 #include <boot/platform/generic/video.h>
 #include <boot/kernel_args.h>
 

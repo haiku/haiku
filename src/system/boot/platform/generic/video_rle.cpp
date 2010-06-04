@@ -6,8 +6,6 @@
  */
 
 
-#include "video.h"
-
 #include <arch/cpu.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
