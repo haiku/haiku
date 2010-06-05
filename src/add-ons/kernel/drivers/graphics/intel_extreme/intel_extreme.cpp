@@ -170,7 +170,8 @@ intel_allocate_memory(intel_info &info, size_t size, size_t alignment,
 	phys_addr_t physicalBase;
 	status_t error = gGART->allocate_memory(info.aperture, size, alignment,
 		flags, _base, &physicalBase);
-	*_physicalBase = physicalBase;
+	if (_physicalBase != NULL)
+		*_physicalBase = physicalBase;
 	return error;
 }
 
