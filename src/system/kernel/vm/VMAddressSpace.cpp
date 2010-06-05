@@ -137,17 +137,6 @@ VMAddressSpace::Init()
 }
 
 
-/*static*/ status_t
-VMAddressSpace::InitPostSem()
-{
-	status_t status = sKernelAddressSpace->fTranslationMap->InitPostSem();
-	if (status != B_OK)
-		return status;
-
-	return B_OK;
-}
-
-
 /*! Deletes all areas in the specified address space, and the address
 	space by decreasing all reference counters. It also marks the
 	address space of being in deletion state, so that no more areas

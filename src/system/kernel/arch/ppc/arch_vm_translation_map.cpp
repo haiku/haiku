@@ -136,8 +136,6 @@ struct PPCVMTranslationMap : VMTranslationMap {
 			page_table_entry*	LookupPageTableEntry(addr_t virtualAddress);
 			bool				RemovePageTableEntry(addr_t virtualAddress);
 
-	virtual	status_t			InitPostSem();
-
 	virtual	bool	 			Lock();
 	virtual	void				Unlock();
 
@@ -361,13 +359,6 @@ PPCVMTranslationMap::Init(bool kernel)
 	release_spinlock(&sVSIDBaseBitmapLock);
 	restore_interrupts(state);
 
-	return B_OK;
-}
-
-
-status_t
-PPCVMTranslationMap::InitPostSem()
-{
 	return B_OK;
 }
 

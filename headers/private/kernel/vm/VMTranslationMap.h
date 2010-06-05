@@ -23,8 +23,6 @@ struct VMTranslationMap {
 								VMTranslationMap();
 	virtual						~VMTranslationMap();
 
-	virtual	status_t			InitPostSem() = 0;
-
 	virtual	bool	 			Lock() = 0;
 	virtual	void				Unlock() = 0;
 

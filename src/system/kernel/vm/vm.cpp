@@ -3713,7 +3713,6 @@ vm_init_post_sem(kernel_args* args)
 	// exists, it isn't that hard to find all of the ones we need to create
 
 	arch_vm_translation_map_init_post_sem(args);
-	VMAddressSpace::InitPostSem();
 
 	slab_init_post_sem();
 

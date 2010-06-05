@@ -27,7 +27,6 @@ public:
 	virtual						~VMAddressSpace();
 
 	static	status_t			Init();
-	static	status_t			InitPostSem();
 
 			team_id				ID() const				{ return fID; }
 			addr_t				Base() const			{ return fBase; }

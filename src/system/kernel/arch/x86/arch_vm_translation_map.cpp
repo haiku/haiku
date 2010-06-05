@@ -378,13 +378,6 @@ X86VMTranslationMap::Init(bool kernel)
 }
 
 
-status_t
-X86VMTranslationMap::InitPostSem()
-{
-	return B_OK;
-}
-
-
 /*!	Acquires the map's recursive lock, and resets the invalidate pages counter
 	in case it's the first locking recursion.
 */

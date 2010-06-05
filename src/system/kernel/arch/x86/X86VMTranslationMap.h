@@ -23,8 +23,6 @@ struct X86VMTranslationMap : VMTranslationMap {
 	inline	uint32				PhysicalPageDir() const
 									{ return fPagingStructures->pgdir_phys; }
 
-	virtual	status_t			InitPostSem();
-
 	virtual	bool 				Lock();
 	virtual	void				Unlock();
 
