@@ -112,8 +112,7 @@ RecorderWindow::RecorderWindow() :
 		fPlayFrames(0),
 		fLooping(false),
 		fSavePanel(NULL),
-		fInitCheck(B_OK),
-		fAppCatalog(NULL)
+		fInitCheck(B_OK)
 {
 	fRoster = NULL;
 	fRecordButton = NULL;
