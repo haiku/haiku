@@ -141,12 +141,12 @@ skip_pgdir_swap:
 	ret
 FUNCTION_END(i386_context_switch)
 
-/* void i386_swap_pgdir(uint32 new_pgdir); */
-FUNCTION(i386_swap_pgdir):
+/* void x86_swap_pgdir(uint32 newPageDir); */
+FUNCTION(x86_swap_pgdir):
 	movl	4(%esp),%eax
 	movl	%eax,%cr3
 	ret
-FUNCTION_END(i386_swap_pgdir)
+FUNCTION_END(x86_swap_pgdir)
 
 /* thread exit stub - is copied to the userspace stack in arch_thread_enter_uspace() */
 	.align 4
