@@ -308,15 +308,6 @@ arch_debug_unset_current_thread(void)
 }
 
 
-void
-arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
-	void (*function)(void*), void* parameter)
-{
-	// TODO: Implement! Most likely in assembly.
-	longjmp(jumpBuffer, 1);
-}
-
-
 bool
 arch_is_debug_variable_defined(const char* variableName)
 {

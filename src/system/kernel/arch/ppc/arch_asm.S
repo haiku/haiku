@@ -7,6 +7,8 @@
  */
 
 
+#include "asm_offsets.h"
+
 #define FUNCTION(x) .global x; .type x,@function; x
 
 #define MSR_EXCEPTIONS_ENABLED 15
@@ -330,3 +332,58 @@ FUNCTION(ppc_kernel_thread_root):
 	li			%r3, 0
 	b			kernel_debugger
 
+
+/*!	\fn void arch_debug_call_with_fault_handler(cpu_ent* cpu,
+		jmp_buf jumpBuffer, void (*function)(void*), void* parameter)
+
+	Called by debug_call_with_fault_handler() to do the dirty work of setting
+	the fault handler and calling the function. If the function causes a page
+	fault, the arch_debug_call_with_fault_handler() calls longjmp() with the
+	given \a jumpBuffer. Otherwise it returns normally.
+
+	debug_call_with_fault_handler() has already saved the CPU's fault_handler
+	and fault_handler_stack_pointer and will reset them later, so
+	arch_debug_call_with_fault_handler() doesn't need to care about it.
+
+	\param cpu The \c cpu_ent for the current CPU.
+	\param jumpBuffer Buffer to be used for longjmp().
+	\param function The function to be called.
+	\param parameter The parameter to be passed to the function to be called.
+*/
+FUNCTION(arch_debug_call_with_fault_handler):
+	// prolog: setup stack frame (16-byte aligned)
+	mflr	%r0
+	stw		%r0, 4(%r1)		// store LR
+	stwu	%r1, -16(%r1)	// store back chain
+	stw		%r4, 8(%r1)		// store jumpBuffer
+
+	// set cpu->fault_handler_stack_pointer
+	stw		%r1, CPU_ENT_fault_handler_stack_pointer(%r3)
+
+	// set cpu->fault_handler
+	lis		%r11, 1f@ha
+	ori		%r11, %r11, 1f@l
+	stw		%r11, CPU_ENT_fault_handler(%r3)
+
+	// call the given function
+	mr		%r3, %r6
+	mtlr	%r5
+	blrl
+	
+	// epilog: restore stack frame
+	lwz		%r0, 16 + 4(%r1)	// load LR
+	mtlr	%r0
+	addi	%r1, %r1, 16		// restore SP
+
+	blr
+
+	// fault -- return via longjmp(jumpBuffer, 1)
+1:
+	lwz		%r3, 8(%r1) 		// load jumpBuffer
+
+	// call longjmp
+	li		%r4, 1
+	lis		%r0, longjmp@ha
+	ori		%r0, %r0, longjmp@l
+	mtlr	%r0
+	blr
