@@ -370,7 +370,6 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		= cpuData->arch.active_paging_structures;
 	VMAddressSpace* toAddressSpace = to->team->address_space;
 
-	uint32 newPageDirectory;
 	X86PagingStructures* toPagingStructures;
 	if (toAddressSpace != NULL
 		&& (toPagingStructures = static_cast<X86VMTranslationMap*>(
@@ -382,23 +381,21 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 			~((uint32)1 << cpu));
 		atomic_or(&toPagingStructures->active_on_cpus, (uint32)1 << cpu);
 
-		activePagingStructures->RemoveReference();
-// TODO: This might cause deferred deletion, which on SMP machines could happen
-// right now on another CPU!
-
 		// assign the new paging structures to the CPU
 		toPagingStructures->AddReference();
 		cpuData->arch.active_paging_structures = toPagingStructures;
 
-		// get the new page directory
-		newPageDirectory = toPagingStructures->pgdir_phys;
-	} else {
-		newPageDirectory = 0;
-			// this means no change
+		// set the page directory, if it changes
+		uint32 newPageDirectory = toPagingStructures->pgdir_phys;
+		if (newPageDirectory != activePagingStructures->pgdir_phys)
+			x86_swap_pgdir(newPageDirectory);
+
+		// This CPU no longer uses the previous paging structures.
+		activePagingStructures->RemoveReference();
 	}
 
 	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
-	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
+	x86_context_switch(&from->arch_info, &to->arch_info);
 }
 
 

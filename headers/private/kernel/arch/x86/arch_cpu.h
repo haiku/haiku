@@ -271,8 +271,8 @@ struct arch_thread;
 
 void __x86_setup_system_time(uint32 conversionFactor,
 	uint32 conversionFactorNsecs, bool conversionFactorNsecsShift);
-void i386_context_switch(struct arch_thread* oldState,
-	struct arch_thread* newState, uint32 newPageDir);
+void x86_context_switch(struct arch_thread* oldState,
+	struct arch_thread* newState);
 void x86_userspace_thread_exit(void);
 void x86_end_userspace_thread_exit(void);
 void x86_enter_userspace(addr_t entry, addr_t stackTop);
