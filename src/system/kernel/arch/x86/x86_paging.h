@@ -61,15 +61,15 @@ typedef uint32 page_table_entry;
 typedef uint32 page_directory_entry;
 
 
-struct vm_translation_map_arch_info : DeferredDeletable {
+struct X86PagingStructures : DeferredDeletable {
 	page_directory_entry*		pgdir_virt;
 	uint32						pgdir_phys;
 	vint32						ref_count;
 	vint32						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
 
-								vm_translation_map_arch_info();
-	virtual						~vm_translation_map_arch_info();
+								X86PagingStructures();
+	virtual						~X86PagingStructures();
 
 	inline	void				AddReference();
 	inline	void				RemoveReference();
@@ -122,14 +122,14 @@ set_page_table_entry_flags(page_table_entry* entry, uint32 flags)
 
 
 inline void
-vm_translation_map_arch_info::AddReference()
+X86PagingStructures::AddReference()
 {
 	atomic_add(&ref_count, 1);
 }
 
 
 inline void
-vm_translation_map_arch_info::RemoveReference()
+X86PagingStructures::RemoveReference()
 {
 	if (atomic_add(&ref_count, -1) == 1)
 		Delete();

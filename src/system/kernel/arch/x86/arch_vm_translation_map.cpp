@@ -51,19 +51,19 @@ static TranslationMapPhysicalPageMapper* sKernelPhysicalPageMapper;
 
 
 // Accessor class to reuse the SinglyLinkedListLink of DeferredDeletable for
-// vm_translation_map_arch_info.
-struct ArchTMapGetLink {
+// X86PagingStructures.
+struct PagingStructuresGetLink {
 private:
-	typedef SinglyLinkedListLink<vm_translation_map_arch_info> Link;
+	typedef SinglyLinkedListLink<X86PagingStructures> Link;
 
 public:
-	inline Link* operator()(vm_translation_map_arch_info* element) const
+	inline Link* operator()(X86PagingStructures* element) const
 	{
 		return (Link*)element->GetSinglyLinkedListLink();
 	}
 
 	inline const Link* operator()(
-		const vm_translation_map_arch_info* element) const
+		const X86PagingStructures* element) const
 	{
 		return (const Link*)element->GetSinglyLinkedListLink();
 	}
@@ -71,12 +71,12 @@ public:
 };
 
 
-typedef SinglyLinkedList<vm_translation_map_arch_info, ArchTMapGetLink>
-	ArchTMapList;
+typedef SinglyLinkedList<X86PagingStructures, PagingStructuresGetLink>
+	PagingStructuresList;
 
 
-static ArchTMapList sTMapList;
-static spinlock sTMapListLock;
+static PagingStructuresList sPagingStructuresList;
+static spinlock sPagingStructuresListLock;
 
 #define CHATTY_TMAP 0
 
@@ -85,11 +85,11 @@ static spinlock sTMapListLock;
 									B_PAGE_SIZE * 1024)))
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
-#define IS_KERNEL_MAP(map)		(fArchData->pgdir_phys \
+#define IS_KERNEL_MAP(map)		(fPagingStructures->pgdir_phys \
 									== sKernelPhysicalPageDirectory)
 
 
-vm_translation_map_arch_info::vm_translation_map_arch_info()
+X86PagingStructures::X86PagingStructures()
 	:
 	pgdir_virt(NULL),
 	ref_count(1)
@@ -97,7 +97,7 @@ vm_translation_map_arch_info::vm_translation_map_arch_info()
 }
 
 
-vm_translation_map_arch_info::~vm_translation_map_arch_info()
+X86PagingStructures::~X86PagingStructures()
 {
 	// free the page dir
 	free(pgdir_virt);
@@ -105,11 +105,11 @@ vm_translation_map_arch_info::~vm_translation_map_arch_info()
 
 
 void
-vm_translation_map_arch_info::Delete()
+X86PagingStructures::Delete()
 {
 	// remove from global list
-	InterruptsSpinLocker locker(sTMapListLock);
-	sTMapList.Remove(this);
+	InterruptsSpinLocker locker(sPagingStructuresListLock);
+	sPagingStructuresList.Remove(this);
 	locker.Unlock();
 
 #if 0
@@ -220,13 +220,13 @@ x86_update_all_pgdirs(int index, page_directory_entry e)
 {
 	unsigned int state = disable_interrupts();
 
-	acquire_spinlock(&sTMapListLock);
+	acquire_spinlock(&sPagingStructuresListLock);
 
-	ArchTMapList::Iterator it = sTMapList.GetIterator();
-	while (vm_translation_map_arch_info* info = it.Next())
+	PagingStructuresList::Iterator it = sPagingStructuresList.GetIterator();
+	while (X86PagingStructures* info = it.Next())
 		info->pgdir_virt[index] = e;
 
-	release_spinlock(&sTMapListLock);
+	release_spinlock(&sPagingStructuresListLock);
 	restore_interrupts(state);
 }
 
@@ -279,7 +279,7 @@ x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 
 X86VMTranslationMap::X86VMTranslationMap()
 	:
-	fArchData(NULL),
+	fPagingStructures(NULL),
 	fPageMapper(NULL),
 	fInvalidPagesCount(0)
 {
@@ -288,18 +288,18 @@ X86VMTranslationMap::X86VMTranslationMap()
 
 X86VMTranslationMap::~X86VMTranslationMap()
 {
-	if (fArchData == NULL)
+	if (fPagingStructures == NULL)
 		return;
 
 	if (fPageMapper != NULL)
 		fPageMapper->Delete();
 
-	if (fArchData->pgdir_virt != NULL) {
+	if (fPagingStructures->pgdir_virt != NULL) {
 		// cycle through and free all of the user space pgtables
 		for (uint32 i = VADDR_TO_PDENT(USER_BASE);
 				i <= VADDR_TO_PDENT(USER_BASE + (USER_SIZE - 1)); i++) {
-			if ((fArchData->pgdir_virt[i] & X86_PDE_PRESENT) != 0) {
-				addr_t address = fArchData->pgdir_virt[i]
+			if ((fPagingStructures->pgdir_virt[i] & X86_PDE_PRESENT) != 0) {
+				addr_t address = fPagingStructures->pgdir_virt[i]
 					& X86_PDE_ADDRESS_MASK;
 				vm_page* page = vm_lookup_page(address / B_PAGE_SIZE);
 				if (!page)
@@ -310,7 +310,7 @@ X86VMTranslationMap::~X86VMTranslationMap()
 		}
 	}
 
-	fArchData->RemoveReference();
+	fPagingStructures->RemoveReference();
 }
 
 
@@ -319,11 +319,11 @@ X86VMTranslationMap::Init(bool kernel)
 {
 	TRACE("X86VMTranslationMap::Init()\n");
 
-	fArchData = new(std::nothrow) vm_translation_map_arch_info;
-	if (fArchData == NULL)
+	fPagingStructures = new(std::nothrow) X86PagingStructures;
+	if (fPagingStructures == NULL)
 		return B_NO_MEMORY;
 
-	fArchData->active_on_cpus = 0;
+	fPagingStructures->active_on_cpus = 0;
 
 	if (!kernel) {
 		// user
@@ -334,43 +334,43 @@ X86VMTranslationMap::Init(bool kernel)
 			return error;
 
 		// allocate a pgdir
-		fArchData->pgdir_virt = (page_directory_entry *)memalign(
+		fPagingStructures->pgdir_virt = (page_directory_entry *)memalign(
 			B_PAGE_SIZE, B_PAGE_SIZE);
-		if (fArchData->pgdir_virt == NULL)
+		if (fPagingStructures->pgdir_virt == NULL)
 			return B_NO_MEMORY;
 
 		phys_addr_t physicalPageDir;
 		vm_get_page_mapping(VMAddressSpace::KernelID(),
-			(addr_t)fArchData->pgdir_virt,
+			(addr_t)fPagingStructures->pgdir_virt,
 			&physicalPageDir);
-		fArchData->pgdir_phys = physicalPageDir;
+		fPagingStructures->pgdir_phys = physicalPageDir;
 	} else {
 		// kernel
 		// get the physical page mapper
 		fPageMapper = sKernelPhysicalPageMapper;
 
 		// we already know the kernel pgdir mapping
-		fArchData->pgdir_virt = sKernelVirtualPageDirectory;
-		fArchData->pgdir_phys = sKernelPhysicalPageDirectory;
+		fPagingStructures->pgdir_virt = sKernelVirtualPageDirectory;
+		fPagingStructures->pgdir_phys = sKernelPhysicalPageDirectory;
 	}
 
 	// zero out the bottom portion of the new pgdir
-	memset(fArchData->pgdir_virt + FIRST_USER_PGDIR_ENT, 0,
+	memset(fPagingStructures->pgdir_virt + FIRST_USER_PGDIR_ENT, 0,
 		NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
 
 	// insert this new map into the map list
 	{
 		int state = disable_interrupts();
-		acquire_spinlock(&sTMapListLock);
+		acquire_spinlock(&sPagingStructuresListLock);
 
 		// copy the top portion of the pgdir from the current one
-		memcpy(fArchData->pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
+		memcpy(fPagingStructures->pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
 			sKernelVirtualPageDirectory + FIRST_KERNEL_PGDIR_ENT,
 			NUM_KERNEL_PGDIR_ENTS * sizeof(page_directory_entry));
 
-		sTMapList.Add(fArchData);
+		sPagingStructuresList.Add(fPagingStructures);
 
-		release_spinlock(&sTMapListLock);
+		release_spinlock(&sPagingStructuresListLock);
 		restore_interrupts(state);
 	}
 
@@ -451,7 +451,7 @@ X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 	dprintf("present bit is %d\n", pgdir[va / B_PAGE_SIZE / 1024].present);
 	dprintf("addr is %d\n", pgdir[va / B_PAGE_SIZE / 1024].addr);
 */
-	page_directory_entry* pd = fArchData->pgdir_virt;
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
 	// check to see if a page table exists for this range
 	uint32 index = VADDR_TO_PDENT(va);
@@ -511,7 +511,7 @@ X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 status_t
 X86VMTranslationMap::Unmap(addr_t start, addr_t end)
 {
-	page_directory_entry *pd = fArchData->pgdir_virt;
+	page_directory_entry *pd = fPagingStructures->pgdir_virt;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 	end = ROUNDUP(end, B_PAGE_SIZE);
@@ -576,7 +576,7 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
-	page_directory_entry* pd = fArchData->pgdir_virt;
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
 	TRACE("X86VMTranslationMap::UnmapPage(%#" B_PRIxADDR ")\n", address);
 
@@ -686,7 +686,7 @@ void
 X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 	bool updatePageQueue)
 {
-	page_directory_entry* pd = fArchData->pgdir_virt;
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
 	addr_t start = base;
 	addr_t end = base + size;
@@ -816,7 +816,7 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 
 	bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
 
-	page_directory_entry* pd = fArchData->pgdir_virt;
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
 	RecursiveLocker locker(fLock);
 
@@ -916,7 +916,7 @@ X86VMTranslationMap::Query(addr_t va, phys_addr_t *_physical, uint32 *_flags)
 	*_physical = 0;
 
 	int index = VADDR_TO_PDENT(va);
-	page_directory_entry *pd = fArchData->pgdir_virt;
+	page_directory_entry *pd = fPagingStructures->pgdir_virt;
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_OK;
@@ -959,7 +959,7 @@ X86VMTranslationMap::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 	*_physical = 0;
 
 	int index = VADDR_TO_PDENT(va);
-	page_directory_entry* pd = fArchData->pgdir_virt;
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_OK;
@@ -999,7 +999,7 @@ status_t
 X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes,
 	uint32 memoryType)
 {
-	page_directory_entry *pd = fArchData->pgdir_virt;
+	page_directory_entry *pd = fPagingStructures->pgdir_virt;
 
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
 
@@ -1078,7 +1078,7 @@ status_t
 X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
 {
 	int index = VADDR_TO_PDENT(va);
-	page_directory_entry* pd = fArchData->pgdir_virt;
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 	if ((pd[index] & X86_PDE_PRESENT) == 0) {
 		// no pagetable here
 		return B_OK;
@@ -1117,7 +1117,7 @@ X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
-	page_directory_entry* pd = fArchData->pgdir_virt;
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
 	TRACE("X86VMTranslationMap::ClearAccessedAndModified(%#" B_PRIxADDR ")\n",
 		address);
@@ -1255,7 +1255,7 @@ X86VMTranslationMap::Flush()
 			restore_interrupts(state);
 
 			int cpu = smp_get_current_cpu();
-			uint32 cpuMask = fArchData->active_on_cpus
+			uint32 cpuMask = fPagingStructures->active_on_cpus
 				& ~((uint32)1 << cpu);
 			if (cpuMask != 0) {
 				smp_send_multicast_ici(cpuMask, SMP_MSG_USER_INVALIDATE_PAGES,
@@ -1274,7 +1274,7 @@ X86VMTranslationMap::Flush()
 				SMP_MSG_FLAG_SYNC);
 		} else {
 			int cpu = smp_get_current_cpu();
-			uint32 cpuMask = fArchData->active_on_cpus
+			uint32 cpuMask = fPagingStructures->active_on_cpus
 				& ~((uint32)1 << cpu);
 			if (cpuMask != 0) {
 				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
@@ -1359,8 +1359,8 @@ arch_vm_translation_map_init(kernel_args *args,
 	}
 #endif
 
-	B_INITIALIZE_SPINLOCK(&sTMapListLock);
-	new (&sTMapList) ArchTMapList;
+	B_INITIALIZE_SPINLOCK(&sPagingStructuresListLock);
+	new (&sPagingStructuresList) PagingStructuresList;
 
 	large_memory_physical_page_ops_init(args, sPhysicalPageMapper,
 		sKernelPhysicalPageMapper);

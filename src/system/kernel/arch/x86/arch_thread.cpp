@@ -366,30 +366,32 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 		set_tls_context(to);
 
 	struct cpu_ent* cpuData = to->cpu;
-	vm_translation_map_arch_info* activeMap
-		= cpuData->arch.active_translation_map;
+	X86PagingStructures* activePagingStructures
+		= cpuData->arch.active_paging_structures;
 	VMAddressSpace* toAddressSpace = to->team->address_space;
 
 	uint32 newPageDirectory;
-	vm_translation_map_arch_info* toMap;
+	X86PagingStructures* toPagingStructures;
 	if (toAddressSpace != NULL
-		&& (toMap = static_cast<X86VMTranslationMap*>(
-				toAddressSpace->TranslationMap())->ArchData()) != activeMap) {
+		&& (toPagingStructures = static_cast<X86VMTranslationMap*>(
+				toAddressSpace->TranslationMap())->PagingStructures())
+					!= activePagingStructures) {
 		// update on which CPUs the address space is used
 		int cpu = cpuData->cpu_num;
-		atomic_and(&activeMap->active_on_cpus, ~((uint32)1 << cpu));
-		atomic_or(&toMap->active_on_cpus, (uint32)1 << cpu);
+		atomic_and(&activePagingStructures->active_on_cpus,
+			~((uint32)1 << cpu));
+		atomic_or(&toPagingStructures->active_on_cpus, (uint32)1 << cpu);
 
-		activeMap->RemoveReference();
-			// this might causes the map to be deferred deleted - ie. it won't
-			// be deleted when it is still in use
+		activePagingStructures->RemoveReference();
+// TODO: This might cause deferred deletion, which on SMP machines could happen
+// right now on another CPU!
 
-		// assign the new map to the CPU
-		toMap->AddReference();
-		cpuData->arch.active_translation_map = toMap;
+		// assign the new paging structures to the CPU
+		toPagingStructures->AddReference();
+		cpuData->arch.active_paging_structures = toPagingStructures;
 
 		// get the new page directory
-		newPageDirectory = toMap->pgdir_phys;
+		newPageDirectory = toPagingStructures->pgdir_phys;
 	} else {
 		newPageDirectory = 0;
 			// this means no change

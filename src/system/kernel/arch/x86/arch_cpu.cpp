@@ -696,9 +696,9 @@ arch_cpu_init_post_vm(kernel_args *args)
 		kDoubleFaultStackSize * smp_get_num_cpus(), B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
 
-	vm_translation_map_arch_info* kernelArchTranslationMap
+	X86PagingStructures* kernelPagingStructures
 		= static_cast<X86VMTranslationMap*>(
-			VMAddressSpace::Kernel()->TranslationMap())->ArchData();
+			VMAddressSpace::Kernel()->TranslationMap())->PagingStructures();
 
 	// setup task-state segments
 	for (i = 0; i < args->num_cpus; i++) {
@@ -716,8 +716,8 @@ arch_cpu_init_post_vm(kernel_args *args)
 		init_double_fault(i);
 
 		// init active translation map
-		gCPU[i].arch.active_translation_map = kernelArchTranslationMap;
-		kernelArchTranslationMap->AddReference();
+		gCPU[i].arch.active_paging_structures = kernelPagingStructures;
+		kernelPagingStructures->AddReference();
 	}
 
 	// set the current hardware task on cpu 0

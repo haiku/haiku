@@ -901,7 +901,7 @@ LargeMemoryPhysicalPageMapper::_AllocatePool(PhysicalPageSlotPool*& _pool)
 
 	// put the page table into the page directory
 	int32 index = (addr_t)virtualBase / (B_PAGE_SIZE * 1024);
-	page_directory_entry* entry = &map->ArchData()->pgdir_virt[index];
+	page_directory_entry* entry = &map->PagingStructures()->pgdir_virt[index];
 	x86_put_pgtable_in_pgdir(entry, physicalTable,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	x86_update_all_pgdirs(index, *entry);

@@ -18,10 +18,10 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 			status_t			Init(bool kernel);
 
-	inline	vm_translation_map_arch_info* ArchData() const
-									{ return fArchData; }
+	inline	X86PagingStructures* PagingStructures() const
+									{ return fPagingStructures; }
 	inline	uint32				PhysicalPageDir() const
-									{ return fArchData->pgdir_phys; }
+									{ return fPagingStructures->pgdir_phys; }
 
 	virtual	status_t			InitPostSem();
 
@@ -67,7 +67,7 @@ struct X86VMTranslationMap : VMTranslationMap {
 	virtual	void				Flush();
 
 protected:
-			vm_translation_map_arch_info* fArchData;
+			X86PagingStructures* fPagingStructures;
 			TranslationMapPhysicalPageMapper* fPageMapper;
 			int					fInvalidPagesCount;
 			addr_t				fInvalidPages[PAGE_INVALIDATE_CACHE_SIZE];

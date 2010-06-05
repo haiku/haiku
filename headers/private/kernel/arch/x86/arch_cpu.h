@@ -102,6 +102,9 @@
 
 #ifndef _ASSEMBLER
 
+struct X86PagingStructures;
+
+
 typedef struct x86_mtrr_info {
 	uint64	base;
 	uint64	size;
@@ -248,7 +251,7 @@ typedef struct arch_cpu_info {
 	int					model;
 	int					extended_model;
 
-	struct vm_translation_map_arch_info* active_translation_map;
+	struct X86PagingStructures* active_paging_structures;
 
 	uint32				dr6;	// temporary storage for debug registers (cf.
 	uint32				dr7;	// x86_exit_user_debug_at_kernel_entry())
