@@ -33,3 +33,5 @@ KernelMergeObject kernel_arch_ppc.o :
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 ;
+
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
