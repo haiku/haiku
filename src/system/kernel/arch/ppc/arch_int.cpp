@@ -124,7 +124,14 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 			bool kernelDebugger = debug_debugger_running();
 
 			if (kernelDebugger) {
-				// if this thread has a fault handler, we're allowed to be here
+				// if this CPU or this thread has a fault handler,
+				// we're allowed to be here
+				cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
+				if (cpu->fault_handler != 0) {
+					iframe->srr0 = cpu->fault_handler;
+					iframe->r1 = cpu->fault_handler_stack_pointer;
+					break;
+				}
 				struct thread *thread = thread_get_current_thread();
 				if (thread && thread->fault_handler != 0) {
 					iframe->srr0 = thread->fault_handler;
