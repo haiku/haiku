@@ -1,10 +1,6 @@
 /*
- * Copyright Karsten Heimrich, host.haiku@gmx.de. All rights reserved.
+ * Copyright 2010 Wim van der Meer <WPJvanderMeer@gmail.com>
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Karsten Heimrich
- *		Fredrik Modéen
  */
 #ifndef SCREENSHOT_H
 #define SCREENSHOT_H
@@ -14,23 +10,29 @@
 #include <Catalog.h>
 
 
+class BBitmap;
+class Utility;
+
+
 class Screenshot : public BApplication {
 public:
 						Screenshot();
-	virtual				~Screenshot();
+						~Screenshot();
 
-	virtual	void		ReadyToRun();
-	virtual	void		RefsReceived(BMessage* message);
-	virtual	void		ArgvReceived(int32 argc, char** argv);
+			void		ReadyToRun();
+			void		ArgvReceived(int32 argc, char** argv);
 
 private:
-			void		_ShowHelp() const;
-			void		_SetImageTypeSilence(const char* name);
+			void		_ShowHelp();
+			void		_New(bigtime_t delay);
+			status_t	_GetActiveWindowFrame();
+			int32		_GetImageType(const char* name) const;
 
-	bool				fArgvReceived;
-	bool				fRefsReceived;
-	int32				fImageFileType;
-	BCatalog				fCatalog;
+			Utility*	fUtility;
+			BCatalog	fCatalog;
+			
+			bool		fLaunchGui;
 };
 
-#endif	/* SCREENSHOT_H */
+
+#endif // SCREENSHOT_H

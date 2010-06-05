@@ -1,19 +1,26 @@
 SubDir HAIKU_TOP src apps screenshot ;
 
-UseLibraryHeaders zlib ;
 UsePrivateHeaders interface ;
 
-Application Screenshot :
-	main.cpp
-	PreviewView.cpp
-	Screenshot.cpp
+Application ScreenshotApp :
+	ScreenshotApp.cpp
 	ScreenshotWindow.cpp
-	: be tracker translation libz.so liblocale.so $(TARGET_LIBSUPC++)
-	: Screenshot.rdef
+	PreviewView.cpp
+	Utility.cpp
+	: be locale tracker translation $(TARGET_LIBSUPC++)
+	: ScreenshotApp.rdef
 ;
 
-DoCatalogs Screenshot :
-	x-vnd.Haiku-Screenshot
+DoCatalogs ScreenshotApp :
+	x-vnd.Haiku-ScreenshotApp
 	:
-		ScreenshotWindow.cpp
+	ScreenshotWindow.cpp
+	Utility.cpp
+;
+
+Application Screenshot :
+	Screenshot.cpp
+	Utility.cpp
+	: be locale translation $(TARGET_LIBSUPC++)
+	: Screenshot.rdef
 ;
