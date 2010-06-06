@@ -51,6 +51,9 @@ int pci_release_msi(device_t dev);
 int pci_msix_count(device_t dev);
 int pci_alloc_msix(device_t dev, int *count);
 
+int pci_get_max_read_req(device_t dev);
+int pci_set_max_read_req(device_t dev, int size);
+
 int pci_get_powerstate(device_t dev);
 int pci_set_powerstate(device_t dev, int newPowerState);
 
