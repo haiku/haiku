@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku Inc. All rights reserved.
+ * Copyright 2009-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _PROPERTY_INFO_H
@@ -10,6 +10,9 @@
 #include <Flattenable.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
+
+
+class BMessage;
 
 
 struct compound_type {
@@ -98,5 +101,5 @@ private:
 			uint32				_reserved[4];
 };
 
-#endif /* _PROPERTY_INFO_H */
 
+#endif	/* _PROPERTY_INFO_H */
