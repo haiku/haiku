@@ -47,7 +47,7 @@ VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 		phys_addr_t physicalAddress;
 		uint32 flags;
 		if (Query(address, &physicalAddress, &flags) == B_OK
-			&& (flags & PAGE_PRESENT) == 0) {
+			&& (flags & PAGE_PRESENT) != 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL) {
 				DEBUG_PAGE_ACCESS_START(page);
@@ -88,7 +88,7 @@ VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 		phys_addr_t physicalAddress;
 		uint32 flags;
 		if (Query(address, &physicalAddress, &flags) == B_OK
-			&& (flags & PAGE_PRESENT) == 0) {
+			&& (flags & PAGE_PRESENT) != 0) {
 			vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 			if (page != NULL) {
 				DEBUG_PAGE_ACCESS_START(page);
