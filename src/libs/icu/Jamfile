@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs icu ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 HAIKU_ICU_API_VERSION = 4.2 ;
 
 SubInclude HAIKU_TOP src libs icu source common ;

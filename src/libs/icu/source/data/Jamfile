@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs icu source data ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 ICU_UNICODE_VERSION = 5.1 ;
 ICU_CLDR_VERSION = $(ICU_GENRB_CLDR_VERSION) ;
 ICU_DAT_FILES = pnames.icu unames.icu cnvalias.icu ucadata.icu invuca.icu ;

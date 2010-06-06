@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs icu source i18n ;
 
+AddSubDirSupportedPlatforms libbe_test ;
+
 UseLibraryHeaders icu ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src libs icu source common ] ;
