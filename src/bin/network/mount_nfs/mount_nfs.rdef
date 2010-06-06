@@ -1,0 +1,8 @@
+resource app_signature "application/x-vnd.Haiku-mount_nfs";
+resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP | B_ARGV_ONLY;
+
+resource(1, "BEOS:FILE_TYPES") message
+{
+	"types" = "application/x-vnd.Be.URL.nfs"
+};
+
