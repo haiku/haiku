@@ -745,7 +745,7 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 	int wiring, int protection, int mapping, VMArea** _area,
 	const char* areaName, uint32 flags, bool kernel)
 {
-	TRACE(("map_backing_store: aspace %p, cache %p, *vaddr %p, offset 0x%Lx, "
+	TRACE(("map_backing_store: aspace %p, cache %p, virtual %p, offset 0x%Lx, "
 		"size %lu, addressSpec %ld, wiring %d, protection %d, area %p, areaName "
 		"'%s'\n", addressSpace, cache, *_virtualAddress, offset, size,
 		addressSpec, wiring, protection, _area, areaName));
@@ -1404,7 +1404,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, "
 		"spec = %ld, size = %lu, protection = %ld, phys = %#lx)\n", team,
-		name, _address, addressSpec, size, protection, physicalAddress));
+		name, *_address, addressSpec, size, protection, physicalAddress));
 
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
@@ -1509,7 +1509,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 {
 	TRACE(("vm_map_physical_memory_vecs(team = %ld, \"%s\", virtual = %p, "
 		"spec = %ld, _size = %p, protection = %ld, vecs = %p, "
-		"vecCount = %ld)\n", team, name, _address, addressSpec, _size,
+		"vecCount = %ld)\n", team, name, *_address, addressSpec, _size,
 		protection, vecs, vecCount));
 
 	if (!arch_vm_supports_protection(protection)
