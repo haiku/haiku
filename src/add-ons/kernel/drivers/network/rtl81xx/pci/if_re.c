@@ -31,7 +31,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/sys/dev/re/if_re.c,v 1.95.2.36 2008/09/19 03:36:53 yongari Exp $");
+__FBSDID("$FreeBSD: src/sys/dev/re/if_re.c,v 1.169 2010/05/07 23:05:27 yongari Exp $");
 
 /*
  * RealTek 8139C+/8169/8169S/8110S/8168/8111/8101E PCI NIC driver
@@ -156,8 +156,10 @@ MODULE_DEPEND(re, miibus, 1, 1, 1);
 #include "miibus_if.h"
 
 /* Tunables. */
-static int msi_disable = 1;
+static int msi_disable = 0;
 TUNABLE_INT("hw.re.msi_disable", &msi_disable);
+static int prefer_iomap = 0;
+TUNABLE_INT("hw.re.prefer_iomap", &prefer_iomap);
 
 #define RE_CSUM_FEATURES    (CSUM_IP | CSUM_TCP | CSUM_UDP)
 
@@ -170,10 +172,9 @@ static struct rl_type re_devs[] = {
 	{ RT_VENDORID, RT_DEVICEID_8139, 0,
 	    "RealTek 8139C+ 10/100BaseTX" },
 	{ RT_VENDORID, RT_DEVICEID_8101E, 0,
-	    "RealTek 8101E/8102E/8102EL PCIe 10/100baseTX" },
+	    "RealTek 8101E/8102E/8102EL/8103E PCIe 10/100baseTX" },
 	/*{ RT_VENDORID, RT_DEVICEID_8168, 0,
-	    "RealTek 8168/8168B/8168C/8168CP/8111B/8111C/8111CP PCIe "
-	    "Gigabit Ethernet" },
+	    "RealTek 8168/8111 B/C/CP/D/DP/E PCIe Gigabit Ethernet" },
 	{ RT_VENDORID, RT_DEVICEID_8169, 0,
 	    "RealTek 8169/8169S/8169SB(L)/8110S/8110SB(L) Gigabit Ethernet" },
 	{ RT_VENDORID, RT_DEVICEID_8169SC, 0,
@@ -199,20 +200,26 @@ static struct rl_hwrev re_hwrevs[] = {
 	{ RL_HWREV_8169, RL_8169, "8169"},
 	{ RL_HWREV_8169S, RL_8169, "8169S"},
 	{ RL_HWREV_8110S, RL_8169, "8110S"},
-	{ RL_HWREV_8169_8110SB, RL_8169, "8169SB"},
-	{ RL_HWREV_8169_8110SC, RL_8169, "8169SC"},
-	{ RL_HWREV_8169_8110SBL, RL_8169, "8169SBL"},
+	{ RL_HWREV_8169_8110SB, RL_8169, "8169SB/8110SB"},
+	{ RL_HWREV_8169_8110SC, RL_8169, "8169SC/8110SC"},
+	{ RL_HWREV_8169_8110SBL, RL_8169, "8169SBL/8110SBL"},
+	{ RL_HWREV_8169_8110SCE, RL_8169, "8169SC/8110SC"},
 	{ RL_HWREV_8100, RL_8139, "8100"},
 	{ RL_HWREV_8101, RL_8139, "8101"},
 	{ RL_HWREV_8100E, RL_8169, "8100E"},
 	{ RL_HWREV_8101E, RL_8169, "8101E"},
 	{ RL_HWREV_8102E, RL_8169, "8102E"},
 	{ RL_HWREV_8102EL, RL_8169, "8102EL"},
+	{ RL_HWREV_8102EL_SPIN1, RL_8169, "8102EL"},
+	{ RL_HWREV_8103E, RL_8169, "8103E"},
 	{ RL_HWREV_8168_SPIN2, RL_8169, "8168"},
 	{ RL_HWREV_8168_SPIN3, RL_8169, "8168"},
 	{ RL_HWREV_8168C, RL_8169, "8168C/8111C"},
 	{ RL_HWREV_8168C_SPIN2, RL_8169, "8168C/8111C"},
 	{ RL_HWREV_8168CP, RL_8169, "8168CP/8111CP"},
+	{ RL_HWREV_8168D, RL_8169, "8168D/8111D"},
+	{ RL_HWREV_8168DP, RL_8169, "8168DP/8111DP"},
+	{ RL_HWREV_8168E, RL_8169, "8168E/8111E"},
 	{ 0, 0, NULL }
 };
 
@@ -220,7 +227,6 @@ static int re_probe		(device_t);
 static int re_attach		(device_t);
 static int re_detach		(device_t);
 
-static struct mbuf *re_defrag	(struct mbuf *, int, int);
 static int re_encap		(struct rl_softc *, struct mbuf **);
 
 static void re_dma_map_addr	(void *, bus_dma_segment_t *, int, int);
@@ -234,11 +240,11 @@ static int re_tx_list_init	(struct rl_softc *);
 static __inline void re_fixup_rx
 				(struct mbuf *);
 #endif
-static int re_rxeof		(struct rl_softc *);
+static int re_rxeof		(struct rl_softc *, int *);
 static void re_txeof		(struct rl_softc *);
 #ifdef DEVICE_POLLING
-static void re_poll		(struct ifnet *, enum poll_cmd, int);
-static void re_poll_locked	(struct ifnet *, enum poll_cmd, int);
+static int re_poll		(struct ifnet *, enum poll_cmd, int);
+static int re_poll_locked	(struct ifnet *, enum poll_cmd, int);
 #endif
 static int re_intr		(void *);
 static void re_tick		(void *);
@@ -266,7 +272,7 @@ static int re_miibus_readreg	(device_t, int, int);
 static int re_miibus_writereg	(device_t, int, int, int);
 static void re_miibus_statchg	(device_t);
 
-static void re_setmulti		(struct rl_softc *);
+static void re_set_rxmode		(struct rl_softc *);
 static void re_reset		(struct rl_softc *);
 static void re_setwol		(struct rl_softc *);
 static void re_clrwol		(struct rl_softc *);
@@ -305,7 +311,6 @@ static driver_t re_driver = {
 static devclass_t re_devclass;
 
 DRIVER_MODULE(re, pci, re_driver, re_devclass, 0, 0);
-DRIVER_MODULE(re, cardbus, re_driver, re_devclass, 0, 0);
 DRIVER_MODULE(miibus, re, miibus_driver, miibus_devclass, 0, 0);
 
 #define EE_SET(x)					\
@@ -419,14 +424,14 @@ re_gmii_readreg(device_t dev, int phy, int reg)
 	CSR_WRITE_4(sc, RL_PHYAR, reg << 16);
 	DELAY(1000);
 
-	for (i = 0; i < RL_TIMEOUT; i++) {
+	for (i = 0; i < RL_PHY_TIMEOUT; i++) {
 		rval = CSR_READ_4(sc, RL_PHYAR);
 		if (rval & RL_PHYAR_BUSY)
 			break;
 		DELAY(100);
 	}
 
-	if (i == RL_TIMEOUT) {
+	if (i == RL_PHY_TIMEOUT) {
 		device_printf(sc->rl_dev, "PHY read failed\n");
 		return (0);
 	}
@@ -447,14 +452,14 @@ re_gmii_writereg(device_t dev, int phy, int reg, int data)
 	    (data & RL_PHYAR_PHYDATA) | RL_PHYAR_BUSY);
 	DELAY(1000);
 
-	for (i = 0; i < RL_TIMEOUT; i++) {
+	for (i = 0; i < RL_PHY_TIMEOUT; i++) {
 		rval = CSR_READ_4(sc, RL_PHYAR);
 		if (!(rval & RL_PHYAR_BUSY))
 			break;
 		DELAY(100);
 	}
 
-	if (i == RL_TIMEOUT) {
+	if (i == RL_PHY_TIMEOUT) {
 		device_printf(sc->rl_dev, "PHY write failed\n");
 		return (0);
 	}
@@ -573,30 +578,59 @@ re_miibus_writereg(device_t dev, int phy, int reg, int data)
 static void
 re_miibus_statchg(device_t dev)
 {
+	struct rl_softc		*sc;
+	struct ifnet		*ifp;
+	struct mii_data		*mii;
 
+	sc = device_get_softc(dev);
+	mii = device_get_softc(sc->rl_miibus);
+	ifp = sc->rl_ifp;
+	if (mii == NULL || ifp == NULL ||
+	    (ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
+		return;
+
+	sc->rl_flags &= ~RL_FLAG_LINK;
+	if ((mii->mii_media_status & (IFM_ACTIVE | IFM_AVALID)) ==
+	    (IFM_ACTIVE | IFM_AVALID)) {
+		switch (IFM_SUBTYPE(mii->mii_media_active)) {
+		case IFM_10_T:
+		case IFM_100_TX:
+			sc->rl_flags |= RL_FLAG_LINK;
+			break;
+		case IFM_1000_T:
+			if ((sc->rl_flags & RL_FLAG_FASTETHER) != 0)
+				break;
+			sc->rl_flags |= RL_FLAG_LINK;
+			break;
+		default:
+			break;
+		}
+	}
+	/*
+	 * RealTek controllers does not provide any interface to
+	 * Tx/Rx MACs for resolved speed, duplex and flow-control
+	 * parameters.
+	 */
 }
 
 /*
- * Program the 64-bit multicast hash filter.
+ * Set the RX configuration and 64-bit multicast hash filter.
  */
 static void
-re_setmulti(struct rl_softc *sc)
+re_set_rxmode(struct rl_softc *sc)
 {
 	struct ifnet		*ifp;
-	int			h = 0;
-	u_int32_t		hashes[2] = { 0, 0 };
 	struct ifmultiaddr	*ifma;
-	u_int32_t		rxfilt;
-	int			mcnt = 0;
+	uint32_t		hashes[2] = { 0, 0 };
+	uint32_t		h, rxfilt;
 
 	RL_LOCK_ASSERT(sc);
 
 	ifp = sc->rl_ifp;
 
+	rxfilt = RL_RXCFG_CONFIG | RL_RXCFG_RX_INDIV | RL_RXCFG_RX_BROAD;
 
-	rxfilt = CSR_READ_4(sc, RL_RXCFG);
-	rxfilt &= ~(RL_RXCFG_RX_ALLPHYS | RL_RXCFG_RX_MULTI);
-	if (ifp->if_flags & IFF_ALLMULTI || ifp->if_flags & IFF_PROMISC) {
+	if (ifp->if_flags & (IFF_ALLMULTI | IFF_PROMISC)) {
 		if (ifp->if_flags & IFF_PROMISC)
 			rxfilt |= RL_RXCFG_RX_ALLPHYS;
 		/*
@@ -605,18 +639,11 @@ re_setmulti(struct rl_softc *sc)
 		 * promiscuous mode.
 		 */
 		rxfilt |= RL_RXCFG_RX_MULTI;
-		CSR_WRITE_4(sc, RL_RXCFG, rxfilt);
-		CSR_WRITE_4(sc, RL_MAR0, 0xFFFFFFFF);
-		CSR_WRITE_4(sc, RL_MAR4, 0xFFFFFFFF);
-		return;
+		hashes[0] = hashes[1] = 0xffffffff;
+		goto done;
 	}
 
-	/* first, zot all the existing hash bits */
-	CSR_WRITE_4(sc, RL_MAR0, 0);
-	CSR_WRITE_4(sc, RL_MAR4, 0);
-
-	/* now program new ones */
-	IF_ADDR_LOCK(ifp);
+	if_maddr_rlock(ifp);
 	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
 		if (ifma->ifma_addr->sa_family != AF_LINK)
 			continue;
@@ -626,31 +653,29 @@ re_setmulti(struct rl_softc *sc)
 			hashes[0] |= (1 << h);
 		else
 			hashes[1] |= (1 << (h - 32));
-		mcnt++;
 	}
-	IF_ADDR_UNLOCK(ifp);
+	if_maddr_runlock(ifp);
 
-	if (mcnt)
+	if (hashes[0] != 0 || hashes[1] != 0) {
+		/*
+		 * For some unfathomable reason, RealTek decided to
+		 * reverse the order of the multicast hash registers
+		 * in the PCI Express parts.  This means we have to
+		 * write the hash pattern in reverse order for those
+		 * devices.
+		 */
+		if ((sc->rl_flags & RL_FLAG_PCIE) != 0) {
+			h = bswap32(hashes[0]);
+			hashes[0] = bswap32(hashes[1]);
+			hashes[1] = h;
+		}
 		rxfilt |= RL_RXCFG_RX_MULTI;
-	else
-		rxfilt &= ~RL_RXCFG_RX_MULTI;
-
-	CSR_WRITE_4(sc, RL_RXCFG, rxfilt);
-
-	/*
-	 * For some unfathomable reason, RealTek decided to reverse
-	 * the order of the multicast hash registers in the PCI Express
-	 * parts. This means we have to write the hash pattern in reverse
-	 * order for those devices.
-	 */
-
-	if ((sc->rl_flags & RL_FLAG_INVMAR) != 0) {
-		CSR_WRITE_4(sc, RL_MAR0, bswap32(hashes[1]));
-		CSR_WRITE_4(sc, RL_MAR4, bswap32(hashes[0]));
-	} else {
-		CSR_WRITE_4(sc, RL_MAR0, hashes[0]);
-		CSR_WRITE_4(sc, RL_MAR4, hashes[1]);
 	}
+
+done:
+	CSR_WRITE_4(sc, RL_MAR0, hashes[0]);
+	CSR_WRITE_4(sc, RL_MAR4, hashes[1]);
+	CSR_WRITE_4(sc, RL_RXCFG, rxfilt);
 }
 
 static void
@@ -670,7 +695,10 @@ re_reset(struct rl_softc *sc)
 	if (i == RL_TIMEOUT)
 		device_printf(sc->rl_dev, "reset never completed!\n");
 
-	CSR_WRITE_1(sc, 0x82, 1);
+	if ((sc->rl_flags & RL_FLAG_MACRESET) != 0)
+		CSR_WRITE_1(sc, 0x82, 1);
+	if (sc->rl_hwrev == RL_HWREV_8169S)
+		re_gmii_writereg(sc->rl_dev, 1, 0x0b, 0);
 }
 
 #ifdef RE_DIAG
@@ -726,7 +754,7 @@ re_diag(struct rl_softc *sc)
 
 	ifp->if_flags |= IFF_PROMISC;
 	sc->rl_testmode = 1;
-	re_reset(sc);
+	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	re_init_locked(sc);
 	sc->rl_flags |= RL_FLAG_LINK;
 	if (sc->rl_type == RL_8169)
@@ -863,7 +891,7 @@ re_probe(device_t dev)
 	uint16_t		devid, vendor;
 	uint16_t		revid, sdevid;
 	int			i;
-	
+
 	vendor = pci_get_vendor(dev);
 	devid = pci_get_device(dev);
 	revid = pci_get_revid(dev);
@@ -1097,25 +1125,35 @@ re_attach(device_t dev)
 	pci_enable_busmaster(dev);
 
 	devid = pci_get_device(dev);
-	/* Prefer memory space register mapping over IO space. */
-	sc->rl_res_id = PCIR_BAR(1);
-	sc->rl_res_type = SYS_RES_MEMORY;
-	/* RTL8168/8101E seems to use different BARs. */
-	if (devid == RT_DEVICEID_8168 || devid == RT_DEVICEID_8101E)
-		sc->rl_res_id = PCIR_BAR(2);
+	/*
+	 * Prefer memory space register mapping over IO space.
+	 * Because RTL8169SC does not seem to work when memory mapping
+	 * is used always activate io mapping.
+	 */
+	if (devid == RT_DEVICEID_8169SC)
+		prefer_iomap = 1;
+	if (prefer_iomap == 0) {
+		sc->rl_res_id = PCIR_BAR(1);
+		sc->rl_res_type = SYS_RES_MEMORY;
+		/* RTL8168/8101E seems to use different BARs. */
+		if (devid == RT_DEVICEID_8168 || devid == RT_DEVICEID_8101E)
+			sc->rl_res_id = PCIR_BAR(2);
+	} else {
+		sc->rl_res_id = PCIR_BAR(0);
+		sc->rl_res_type = SYS_RES_IOPORT;
+	}
 	sc->rl_res = bus_alloc_resource_any(dev, sc->rl_res_type,
 	    &sc->rl_res_id, RF_ACTIVE);
-
-	if (sc->rl_res == NULL) {
+	if (sc->rl_res == NULL && prefer_iomap == 0) {
 		sc->rl_res_id = PCIR_BAR(0);
 		sc->rl_res_type = SYS_RES_IOPORT;
 		sc->rl_res = bus_alloc_resource_any(dev, sc->rl_res_type,
 		    &sc->rl_res_id, RF_ACTIVE);
-		if (sc->rl_res == NULL) {
-			device_printf(dev, "couldn't map ports/memory\n");
-			error = ENXIO;
-			goto fail;
-		}
+	}
+	if (sc->rl_res == NULL) {
+		device_printf(dev, "couldn't map ports/memory\n");
+		error = ENXIO;
+		goto fail;
 	}
 
 	sc->rl_btag = rman_get_bustag(sc->rl_res);
@@ -1123,11 +1161,18 @@ re_attach(device_t dev)
 
 	msic = 0;
 	if (pci_find_extcap(dev, PCIY_EXPRESS, &reg) == 0) {
+		sc->rl_flags |= RL_FLAG_PCIE;
+		if (devid != RT_DEVICEID_8101E) {
+			/* Set PCIe maximum read request size to 2048. */
+			if (pci_get_max_read_req(dev) < 2048)
+				pci_set_max_read_req(dev, 2048);
+		}
 		msic = pci_msi_count(dev);
 		if (bootverbose)
 			device_printf(dev, "MSI count : %d\n", msic);
 	}
-	if (msic == RL_MSI_MESSAGES  && msi_disable == 0) {
+	if (msic > 0 && msi_disable == 0) {
+		msic = 1;
 		if (pci_alloc_msi(dev, &msic) == 0) {
 			if (msic == RL_MSI_MESSAGES) {
 				device_printf(dev, "Using %d MSI messages\n",
@@ -1186,12 +1231,22 @@ re_attach(device_t dev)
 
 	hw_rev = re_hwrevs;
 	hwrev = CSR_READ_4(sc, RL_TXCFG);
-	device_printf(dev, "Chip rev. 0x%08x\n", hwrev & 0x7c800000);
+	switch (hwrev & 0x70000000) {
+	case 0x00000000:
+	case 0x10000000:
+		device_printf(dev, "Chip rev. 0x%08x\n", hwrev & 0xfc800000);
+		hwrev &= (RL_TXCFG_HWREV | 0x80000000);
+		break;
+	default:
+		device_printf(dev, "Chip rev. 0x%08x\n", hwrev & 0x7c800000);
+		hwrev &= RL_TXCFG_HWREV;
+		break;
+	}
 	device_printf(dev, "MAC rev. 0x%08x\n", hwrev & 0x00700000);
-	hwrev &= RL_TXCFG_HWREV;
 	while (hw_rev->rl_desc != NULL) {
 		if (hw_rev->rl_rev == hwrev) {
 			sc->rl_type = hw_rev->rl_type;
+			sc->rl_hwrev = hw_rev->rl_rev;
 			break;
 		}
 		hw_rev++;
@@ -1204,30 +1259,47 @@ re_attach(device_t dev)
 
 	switch (hw_rev->rl_rev) {
 	case RL_HWREV_8139CPLUS:
-		sc->rl_flags |= RL_FLAG_NOJUMBO;
+		sc->rl_flags |= RL_FLAG_NOJUMBO | RL_FLAG_FASTETHER |
+		    RL_FLAG_AUTOPAD;
 		break;
 	case RL_HWREV_8100E:
 	case RL_HWREV_8101E:
-		sc->rl_flags |= RL_FLAG_NOJUMBO | RL_FLAG_INVMAR |
-		    RL_FLAG_PHYWAKE;
+		sc->rl_flags |= RL_FLAG_NOJUMBO | RL_FLAG_PHYWAKE |
+		    RL_FLAG_FASTETHER;
 		break;
 	case RL_HWREV_8102E:
 	case RL_HWREV_8102EL:
-		sc->rl_flags |= RL_FLAG_NOJUMBO | RL_FLAG_INVMAR |
-		    RL_FLAG_PHYWAKE | RL_FLAG_PAR | RL_FLAG_DESCV2 |
-		    RL_FLAG_MACSTAT;
+	case RL_HWREV_8102EL_SPIN1:
+		sc->rl_flags |= RL_FLAG_NOJUMBO | RL_FLAG_PHYWAKE |
+		    RL_FLAG_PAR | RL_FLAG_DESCV2 | RL_FLAG_MACSTAT |
+		    RL_FLAG_FASTETHER | RL_FLAG_CMDSTOP | RL_FLAG_AUTOPAD;
+		break;
+	case RL_HWREV_8103E:
+		sc->rl_flags |= RL_FLAG_NOJUMBO | RL_FLAG_PHYWAKE |
+		    RL_FLAG_PAR | RL_FLAG_DESCV2 | RL_FLAG_MACSTAT |
+		    RL_FLAG_FASTETHER | RL_FLAG_CMDSTOP | RL_FLAG_AUTOPAD |
+		    RL_FLAG_MACSLEEP;
 		break;
 	case RL_HWREV_8168_SPIN1:
 	case RL_HWREV_8168_SPIN2:
+		sc->rl_flags |= RL_FLAG_WOLRXENB;
+		/* FALLTHROUGH */
 	case RL_HWREV_8168_SPIN3:
-		sc->rl_flags |= RL_FLAG_INVMAR | RL_FLAG_PHYWAKE |
-		    RL_FLAG_MACSTAT;
+		sc->rl_flags |= RL_FLAG_PHYWAKE | RL_FLAG_MACSTAT;
 		break;
-	case RL_HWREV_8168C:
 	case RL_HWREV_8168C_SPIN2:
+		sc->rl_flags |= RL_FLAG_MACSLEEP;
+		/* FALLTHROUGH */
+	case RL_HWREV_8168C:
+		if ((hwrev & 0x00700000) == 0x00200000)
+			sc->rl_flags |= RL_FLAG_MACSLEEP;
+		/* FALLTHROUGH */
 	case RL_HWREV_8168CP:
-		sc->rl_flags |= RL_FLAG_INVMAR | RL_FLAG_PHYWAKE |
-		    RL_FLAG_PAR | RL_FLAG_DESCV2 | RL_FLAG_MACSTAT;
+	case RL_HWREV_8168D:
+	case RL_HWREV_8168DP:
+		sc->rl_flags |= RL_FLAG_PHYWAKE | RL_FLAG_PAR |
+		    RL_FLAG_DESCV2 | RL_FLAG_MACSTAT | RL_FLAG_CMDSTOP |
+		    RL_FLAG_AUTOPAD;
 		/*
 		 * These controllers support jumbo frame but it seems
 		 * that enabling it requires touching additional magic
@@ -1240,10 +1312,21 @@ re_attach(device_t dev)
 		 */
 		sc->rl_flags |= RL_FLAG_NOJUMBO;
 		break;
+	case RL_HWREV_8168E:
+		sc->rl_flags |= RL_FLAG_PHYWAKE | RL_FLAG_PHYWAKE_PM |
+		    RL_FLAG_PAR | RL_FLAG_DESCV2 | RL_FLAG_MACSTAT |
+		    RL_FLAG_CMDSTOP | RL_FLAG_AUTOPAD | RL_FLAG_NOJUMBO;
+		break;
 	case RL_HWREV_8169_8110SB:
-	case RL_HWREV_8169_8110SC:
 	case RL_HWREV_8169_8110SBL:
+	case RL_HWREV_8169_8110SC:
+	case RL_HWREV_8169_8110SCE:
 		sc->rl_flags |= RL_FLAG_PHYWAKE;
+		/* FALLTHROUGH */
+	case RL_HWREV_8169:
+	case RL_HWREV_8169S:
+	case RL_HWREV_8110S:
+		sc->rl_flags |= RL_FLAG_MACRESET;
 		break;
 	default:
 		break;
@@ -1306,7 +1389,19 @@ re_attach(device_t dev)
 		goto fail;
 	}
 
+	/* Take controller out of deep sleep mode. */
+	if ((sc->rl_flags & RL_FLAG_MACSLEEP) != 0) {
+		if ((CSR_READ_1(sc, RL_MACDBG) & 0x80) == 0x80)
+			CSR_WRITE_1(sc, RL_GPIO,
+			    CSR_READ_1(sc, RL_GPIO) | 0x01);
+		else
+			CSR_WRITE_1(sc, RL_GPIO,
+			    CSR_READ_1(sc, RL_GPIO) & ~0x01);
+	}
+
 	/* Take PHY out of power down mode. */
+	if ((sc->rl_flags & RL_FLAG_PHYWAKE_PM) != 0)
+		CSR_WRITE_1(sc, RL_PMCH, CSR_READ_1(sc, RL_PMCH) | 0x80);
 	if ((sc->rl_flags & RL_FLAG_PHYWAKE) != 0) {
 		re_gmii_writereg(dev, 1, 0x1f, 0);
 		re_gmii_writereg(dev, 1, 0x0e, 0);
@@ -1343,7 +1438,7 @@ re_attach(device_t dev)
 	 */
 	if ((sc->rl_flags & RL_FLAG_DESCV2) == 0) {
 		ifp->if_hwassist |= CSUM_TSO;
-		ifp->if_capabilities |= IFCAP_TSO4;
+		ifp->if_capabilities |= IFCAP_TSO4 | IFCAP_VLAN_HWTSO;
 	}
 
 	/*
@@ -1367,7 +1462,7 @@ re_attach(device_t dev)
 	 * packets in TSO size.
 	 */
 	ifp->if_hwassist &= ~CSUM_TSO;
-	ifp->if_capenable &= ~IFCAP_TSO4;
+	ifp->if_capenable &= ~(IFCAP_TSO4 | IFCAP_VLAN_HWTSO);
 #ifdef DEVICE_POLLING
 	ifp->if_capabilities |= IFCAP_POLLING;
 #endif
@@ -1723,14 +1818,14 @@ re_rx_list_init(struct rl_softc *sc)
  * across multiple 2K mbuf cluster buffers.
  */
 static int
-re_rxeof(struct rl_softc *sc)
+re_rxeof(struct rl_softc *sc, int *rx_npktsp)
 {
 	struct mbuf		*m;
 	struct ifnet		*ifp;
 	int			i, total_len;
 	struct rl_desc		*cur_rx;
 	u_int32_t		rxstat, rxvlan;
-	int			maxpkt = 16;
+	int			maxpkt = 16, rx_npkts = 0;
 
 	RL_LOCK_ASSERT(sc);
 
@@ -1744,6 +1839,8 @@ re_rxeof(struct rl_softc *sc)
 
 	for (i = sc->rl_ldata.rl_rx_prodidx; maxpkt > 0;
 	    i = RL_RX_DESC_NXT(sc, i)) {
+		if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
+			break;
 		cur_rx = &sc->rl_ldata.rl_rx_list[i];
 		rxstat = le32toh(cur_rx->rl_cmdstat);
 		if ((rxstat & RL_RDESC_STAT_OWN) != 0)
@@ -1913,6 +2010,7 @@ re_rxeof(struct rl_softc *sc)
 		RL_UNLOCK(sc);
 		(*ifp->if_input)(ifp, m);
 		RL_LOCK(sc);
+		rx_npkts++;
 	}
 
 	/* Flush the RX DMA ring */
@@ -1923,6 +2021,8 @@ re_rxeof(struct rl_softc *sc)
 
 	sc->rl_ldata.rl_rx_prodidx = i;
 
+	if (rx_npktsp != NULL)
+		*rx_npktsp = rx_npkts;
 	if (maxpkt)
 		return(EAGAIN);
 
@@ -1984,16 +2084,6 @@ re_txeof(struct rl_softc *sc)
 	/* No changes made to the TX ring, so no flush needed */
 
 	if (sc->rl_ldata.rl_tx_free != sc->rl_ldata.rl_tx_desc_cnt) {
-		/*
-		 * Some chips will ignore a second TX request issued
-		 * while an existing transmission is in progress. If
-		 * the transmitter goes idle but there are still
-		 * packets waiting to be sent, we need to restart the
-		 * channel here to flush them out. This only seems to
-		 * be required with the PCIe devices.
-		 */
-		CSR_WRITE_1(sc, sc->rl_txstart, RL_TXSTART_START);
-
 #ifdef RE_TX_MODERATION
 		/*
 		 * If not all descriptors have been reaped yet, reload
@@ -2012,54 +2102,50 @@ re_tick(void *xsc)
 {
 	struct rl_softc		*sc;
 	struct mii_data		*mii;
-	struct ifnet		*ifp;
 
 	sc = xsc;
-	ifp = sc->rl_ifp;
 
 	RL_LOCK_ASSERT(sc);
 
-	re_watchdog(sc);
-
 	mii = device_get_softc(sc->rl_miibus);
 	mii_tick(mii);
-	if ((sc->rl_flags & RL_FLAG_LINK) != 0) {
-		if (!(mii->mii_media_status & IFM_ACTIVE))
-			sc->rl_flags &= ~RL_FLAG_LINK;
-	} else {
-		if (mii->mii_media_status & IFM_ACTIVE &&
-		    IFM_SUBTYPE(mii->mii_media_active) != IFM_NONE) {
-			sc->rl_flags |= RL_FLAG_LINK;
-			if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
-				taskqueue_enqueue_fast(taskqueue_fast,
-				    &sc->rl_txtask);
-		}
-	}
-
+	if ((sc->rl_flags & RL_FLAG_LINK) == 0)
+		re_miibus_statchg(sc->rl_dev);
+	/*
+	 * Reclaim transmitted frames here. Technically it is not
+	 * necessary to do here but it ensures periodic reclamation
+	 * regardless of Tx completion interrupt which seems to be
+	 * lost on PCIe based controllers under certain situations.
+	 */
+	re_txeof(sc);
+	re_watchdog(sc);
 	callout_reset(&sc->rl_stat_callout, hz, re_tick, sc);
 }
 
 #ifdef DEVICE_POLLING
-static void
+static int
 re_poll(struct ifnet *ifp, enum poll_cmd cmd, int count)
 {
 	struct rl_softc *sc = ifp->if_softc;
+	int rx_npkts = 0;
 
 	RL_LOCK(sc);
 	if (ifp->if_drv_flags & IFF_DRV_RUNNING)
-		re_poll_locked(ifp, cmd, count);
+		rx_npkts = re_poll_locked(ifp, cmd, count);
 	RL_UNLOCK(sc);
+	return (rx_npkts);
 }
 
-static void
+static int
 re_poll_locked(struct ifnet *ifp, enum poll_cmd cmd, int count)
 {
 	struct rl_softc *sc = ifp->if_softc;
+	int rx_npkts;
 
 	RL_LOCK_ASSERT(sc);
 
 	sc->rxcycles = count;
-	re_rxeof(sc);
+	re_rxeof(sc, &rx_npkts);
 	re_txeof(sc);
 
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
@@ -2070,19 +2156,23 @@ re_poll_locked(struct ifnet *ifp, enum poll_cmd cmd, int count)
 
 		status = CSR_READ_2(sc, RL_ISR);
 		if (status == 0xffff)
-			return;
+			return (rx_npkts);
 		if (status)
 			CSR_WRITE_2(sc, RL_ISR, status);
+		if ((status & (RL_ISR_TX_OK | RL_ISR_TX_DESC_UNAVAIL)) &&
+		    (sc->rl_flags & RL_FLAG_PCIE))
+			CSR_WRITE_1(sc, sc->rl_txstart, RL_TXSTART_START);
 
 		/*
 		 * XXX check behaviour on receiver stalls.
 		 */
 
 		if (status & RL_ISR_SYSTEM_ERR) {
-			re_reset(sc);
+			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 			re_init_locked(sc);
 		}
 	}
+	return (rx_npkts);
 }
 #endif /* DEVICE_POLLING */
 
@@ -2134,8 +2224,19 @@ re_int_task(void *arg, int npending)
 #endif
 
 	if (status & (RL_ISR_RX_OK|RL_ISR_RX_ERR|RL_ISR_FIFO_OFLOW))
-		rval = re_rxeof(sc);
+		rval = re_rxeof(sc, NULL);
 
+	/*
+	 * Some chips will ignore a second TX request issued
+	 * while an existing transmission is in progress. If
+	 * the transmitter goes idle but there are still
+	 * packets waiting to be sent, we need to restart the
+	 * channel here to flush them out. This only seems to
+	 * be required with the PCIe devices.
+	 */
+	if ((status & (RL_ISR_TX_OK | RL_ISR_TX_DESC_UNAVAIL)) &&
+	    (sc->rl_flags & RL_FLAG_PCIE))
+		CSR_WRITE_1(sc, sc->rl_txstart, RL_TXSTART_START);
 	if (status & (
 #ifdef RE_TX_MODERATION
 	    RL_ISR_TIMEOUT_EXPIRED|
@@ -2146,13 +2247,8 @@ re_int_task(void *arg, int npending)
 		re_txeof(sc);
 
 	if (status & RL_ISR_SYSTEM_ERR) {
-		re_reset(sc);
+		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 		re_init_locked(sc);
-	}
-
-	if (status & RL_ISR_LINKCHG) {
-		callout_stop(&sc->rl_stat_callout);
-		re_tick(sc);
 	}
 
 	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
@@ -2167,97 +2263,6 @@ re_int_task(void *arg, int npending)
 
 	CSR_WRITE_2(sc, RL_IMR, RL_INTRS_CPLUS);
 }
-
-/*
- * It's copy of ath_defrag(ath(4)).
- *
- * Defragment an mbuf chain, returning at most maxfrags separate
- * mbufs+clusters.  If this is not possible NULL is returned and
- * the original mbuf chain is left in it's present (potentially
- * modified) state.  We use two techniques: collapsing consecutive
- * mbufs and replacing consecutive mbufs by a cluster.
- */
-static struct mbuf *
-re_defrag(m0, how, maxfrags)
-	struct mbuf *m0;
-	int how;
-	int maxfrags;
-{
-	struct mbuf *m, *n, *n2, **prev;
-	u_int curfrags;
-
-	/*
-	 * Calculate the current number of frags.
-	 */
-	curfrags = 0;
-	for (m = m0; m != NULL; m = m->m_next)
-		curfrags++;
-	/*
-	 * First, try to collapse mbufs.  Note that we always collapse
-	 * towards the front so we don't need to deal with moving the
-	 * pkthdr.  This may be suboptimal if the first mbuf has much
-	 * less data than the following.
-	 */
-	m = m0;
-again:
-	for (;;) {
-		n = m->m_next;
-		if (n == NULL)
-			break;
-		if ((m->m_flags & M_RDONLY) == 0 &&
-		    n->m_len < M_TRAILINGSPACE(m)) {
-			bcopy(mtod(n, void *), mtod(m, char *) + m->m_len,
-				n->m_len);
-			m->m_len += n->m_len;
-			m->m_next = n->m_next;
-			m_free(n);
-			if (--curfrags <= maxfrags)
-				return (m0);
-		} else
-			m = n;
-	}
-	KASSERT(maxfrags > 1,
-		("maxfrags %u, but normal collapse failed", maxfrags));
-	/*
-	 * Collapse consecutive mbufs to a cluster.
-	 */
-	prev = &m0->m_next;		/* NB: not the first mbuf */
-	while ((n = *prev) != NULL) {
-		if ((n2 = n->m_next) != NULL &&
-		    n->m_len + n2->m_len < MCLBYTES) {
-			m = m_getcl(how, MT_DATA, 0);
-			if (m == NULL)
-				goto bad;
-			bcopy(mtod(n, void *), mtod(m, void *), n->m_len);
-			bcopy(mtod(n2, void *), mtod(m, char *) + n->m_len,
-				n2->m_len);
-			m->m_len = n->m_len + n2->m_len;
-			m->m_next = n2->m_next;
-			*prev = m;
-			m_free(n);
-			m_free(n2);
-			if (--curfrags <= maxfrags)	/* +1 cl -2 mbufs */
-				return m0;
-			/*
-			 * Still not there, try the normal collapse
-			 * again before we allocate another cluster.
-			 */
-			goto again;
-		}
-		prev = &n->m_next;
-	}
-	/*
-	 * No place where we can collapse to a cluster; punt.
-	 * This can occur if, for example, you request 2 frags
-	 * but the packet requires that both be clusters (we
-	 * never reallocate the first mbuf to avoid moving the
-	 * packet header).
-	 */
-bad:
-	return (NULL);
-}
-
-
 
 static int
 re_encap(struct rl_softc *sc, struct mbuf **m_head)
@@ -2286,7 +2291,7 @@ re_encap(struct rl_softc *sc, struct mbuf **m_head)
 	 * offload is enabled, we always manually pad short frames out
 	 * to the minimum ethernet frame size.
 	 */
-	if ((sc->rl_flags & RL_FLAG_DESCV2) == 0 &&
+	if ((sc->rl_flags & RL_FLAG_AUTOPAD) == 0 &&
 	    (*m_head)->m_pkthdr.len < RL_IP4CSUMTX_PADLEN &&
 	    ((*m_head)->m_pkthdr.csum_flags & CSUM_IP) != 0) {
 		padlen = RL_MIN_FRAMELEN - (*m_head)->m_pkthdr.len;
@@ -2326,7 +2331,7 @@ re_encap(struct rl_softc *sc, struct mbuf **m_head)
 	error = bus_dmamap_load_mbuf_sg(sc->rl_ldata.rl_tx_mtag, txd->tx_dmamap,
 	    *m_head, segs, &nsegs, BUS_DMA_NOWAIT);
 	if (error == EFBIG) {
-		m_new = re_defrag(*m_head, M_DONTWAIT, RL_NTXSEGS);
+		m_new = m_collapse(*m_head, M_DONTWAIT, RL_NTXSEGS);
 		if (m_new == NULL) {
 			m_freem(*m_head);
 			*m_head = NULL;
@@ -2549,7 +2554,7 @@ re_init_locked(struct rl_softc *sc)
 {
 	struct ifnet		*ifp = sc->rl_ifp;
 	struct mii_data		*mii;
-	u_int32_t		rxcfg = 0;
+	uint32_t		reg;
 	uint16_t		cfg;
 	union {
 		uint32_t align_dummy;
@@ -2560,10 +2565,16 @@ re_init_locked(struct rl_softc *sc)
 
 	mii = device_get_softc(sc->rl_miibus);
 
+	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		return;
+
 	/*
 	 * Cancel pending I/O and free all RX/TX buffers.
 	 */
 	re_stop(sc);
+
+	/* Put controller into known state. */
+	re_reset(sc);
 
 	/*
 	 * Enable C+ RX and TX mode, as well as VLAN stripping and
@@ -2582,6 +2593,17 @@ re_init_locked(struct rl_softc *sc)
 	} else
 		cfg |= RL_CPLUSCMD_RXENB | RL_CPLUSCMD_TXENB;
 	CSR_WRITE_2(sc, RL_CPLUS_CMD, cfg);
+	if (sc->rl_hwrev == RL_HWREV_8169_8110SC ||
+	    sc->rl_hwrev == RL_HWREV_8169_8110SCE) {
+		reg = 0x000fff00;
+		if ((CSR_READ_1(sc, RL_CFG2) & RL_CFG2_PCI66MHZ) != 0)
+			reg |= 0x000000ff;
+		if (sc->rl_hwrev == RL_HWREV_8169_8110SCE)
+			reg |= 0x00f00000;
+		CSR_WRITE_4(sc, 0x7c, reg);
+		/* Disable interrupt mitigation. */
+		CSR_WRITE_2(sc, 0xe2, 0);
+	}
 	/*
 	 * Disable TSO if interface MTU size is greater than MSS
 	 * allowed in controller.
@@ -2631,7 +2653,7 @@ re_init_locked(struct rl_softc *sc)
 	CSR_WRITE_1(sc, RL_COMMAND, RL_CMD_TX_ENB|RL_CMD_RX_ENB);
 
 	/*
-	 * Set the initial TX and RX configuration.
+	 * Set the initial TX configuration.
 	 */
 	if (sc->rl_testmode) {
 		if (sc->rl_type == RL_8169)
@@ -2645,32 +2667,10 @@ re_init_locked(struct rl_softc *sc)
 
 	CSR_WRITE_1(sc, RL_EARLY_TX_THRESH, 16);
 
-	CSR_WRITE_4(sc, RL_RXCFG, RL_RXCFG_CONFIG);
-
-	/* Set the individual bit to receive frames for this host only. */
-	rxcfg = CSR_READ_4(sc, RL_RXCFG);
-	rxcfg |= RL_RXCFG_RX_INDIV;
-
-	/* If we want promiscuous mode, set the allframes bit. */
-	if (ifp->if_flags & IFF_PROMISC)
-		rxcfg |= RL_RXCFG_RX_ALLPHYS;
-	else
-		rxcfg &= ~RL_RXCFG_RX_ALLPHYS;
-	CSR_WRITE_4(sc, RL_RXCFG, rxcfg);
-
 	/*
-	 * Set capture broadcast bit to capture broadcast frames.
+	 * Set the initial RX configuration.
 	 */
-	if (ifp->if_flags & IFF_BROADCAST)
-		rxcfg |= RL_RXCFG_RX_BROAD;
-	else
-		rxcfg &= ~RL_RXCFG_RX_BROAD;
-	CSR_WRITE_4(sc, RL_RXCFG, rxcfg);
-
-	/*
-	 * Program the multicast filter, if necessary.
-	 */
-	re_setmulti(sc);
+	re_set_rxmode(sc);
 
 #ifdef DEVICE_POLLING
 	/*
@@ -2744,14 +2744,15 @@ re_ifmedia_upd(struct ifnet *ifp)
 {
 	struct rl_softc		*sc;
 	struct mii_data		*mii;
+	int			error;
 
 	sc = ifp->if_softc;
 	mii = device_get_softc(sc->rl_miibus);
 	RL_LOCK(sc);
-	mii_mediachg(mii);
+	error = mii_mediachg(mii);
 	RL_UNLOCK(sc);
 
-	return (0);
+	return (error);
 }
 
 /*
@@ -2799,6 +2800,7 @@ re_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 		    (ifp->if_capenable & IFCAP_TSO4) != 0) {
 			ifp->if_capenable &= ~IFCAP_TSO4;
 			ifp->if_hwassist &= ~CSUM_TSO;
+			VLAN_CAPABILITIES(ifp);
 		}
 		RL_UNLOCK(sc);
 		break;
@@ -2808,7 +2810,7 @@ re_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
 				if (((ifp->if_flags ^ sc->rl_if_flags)
 				    & (IFF_PROMISC | IFF_ALLMULTI)) != 0)
-					re_setmulti(sc);
+					re_set_rxmode(sc);
 			} else
 				re_init_locked(sc);
 		} else {
@@ -2821,7 +2823,8 @@ re_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 	case SIOCADDMULTI:
 	case SIOCDELMULTI:
 		RL_LOCK(sc);
-		re_setmulti(sc);
+		if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+			re_set_rxmode(sc);
 		RL_UNLOCK(sc);
 		break;
 	case SIOCGIFMEDIA:
@@ -2864,14 +2867,10 @@ re_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 				ifp->if_hwassist &= ~RE_CSUM_FEATURES;
 			reinit = 1;
 		}
-		if (mask & IFCAP_VLAN_HWTAGGING) {
-			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
-			reinit = 1;
-		}
-		if (mask & IFCAP_TSO4) {
+		if ((mask & IFCAP_TSO4) != 0 &&
+		    (ifp->if_capabilities & IFCAP_TSO) != 0) {
 			ifp->if_capenable ^= IFCAP_TSO4;
-			if ((IFCAP_TSO4 & ifp->if_capenable) &&
-			    (IFCAP_TSO4 & ifp->if_capabilities))
+			if ((IFCAP_TSO4 & ifp->if_capenable) != 0)
 				ifp->if_hwassist |= CSUM_TSO;
 			else
 				ifp->if_hwassist &= ~CSUM_TSO;
@@ -2880,6 +2879,17 @@ re_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 				ifp->if_capenable &= ~IFCAP_TSO4;
 				ifp->if_hwassist &= ~CSUM_TSO;
 			}
+		}
+		if ((mask & IFCAP_VLAN_HWTSO) != 0 &&
+		    (ifp->if_capabilities & IFCAP_VLAN_HWTSO) != 0)
+			ifp->if_capenable ^= IFCAP_VLAN_HWTSO;
+		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
+		    (ifp->if_capabilities & IFCAP_VLAN_HWTAGGING) != 0) {
+			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
+			/* TSO over VLAN requires VLAN hardware tagging. */
+			if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) == 0)
+				ifp->if_capenable &= ~IFCAP_VLAN_HWTSO;
+			reinit = 1;
 		}
 #ifdef ENABLE_WOL
 		if ((mask & IFCAP_WOL) != 0 &&
@@ -2892,8 +2902,10 @@ re_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 				ifp->if_capenable ^= IFCAP_WOL_MAGIC;
 		}
 #endif
-		if (reinit && ifp->if_drv_flags & IFF_DRV_RUNNING)
+		if (reinit && ifp->if_drv_flags & IFF_DRV_RUNNING) {
+			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 			re_init(sc);
+		}
 		VLAN_CAPABILITIES(ifp);
 	    }
 		break;
@@ -2908,18 +2920,31 @@ re_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 static void
 re_watchdog(struct rl_softc *sc)
 {
+	struct ifnet		*ifp;
 
 	RL_LOCK_ASSERT(sc);
 
 	if (sc->rl_watchdog_timer == 0 || --sc->rl_watchdog_timer != 0)
 		return;
 
-	device_printf(sc->rl_dev, "watchdog timeout\n");
-	sc->rl_ifp->if_oerrors++;
-
+	ifp = sc->rl_ifp;
 	re_txeof(sc);
-	re_rxeof(sc);
+	if (sc->rl_ldata.rl_tx_free == sc->rl_ldata.rl_tx_desc_cnt) {
+		if_printf(ifp, "watchdog timeout (missed Tx interrupts) "
+		    "-- recovering\n");
+		if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
+			taskqueue_enqueue_fast(taskqueue_fast, &sc->rl_txtask);
+		return;
+	}
+
+	if_printf(ifp, "watchdog timeout\n");
+	ifp->if_oerrors++;
+
+	re_rxeof(sc, NULL);
+	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
 	re_init_locked(sc);
+	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
+		taskqueue_enqueue_fast(taskqueue_fast, &sc->rl_txtask);
 }
 
 /*
@@ -2942,7 +2967,12 @@ re_stop(struct rl_softc *sc)
 	callout_stop(&sc->rl_stat_callout);
 	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
 
-	CSR_WRITE_1(sc, RL_COMMAND, 0x00);
+	if ((sc->rl_flags & RL_FLAG_CMDSTOP) != 0)
+		CSR_WRITE_1(sc, RL_COMMAND, RL_CMD_STOPREQ | RL_CMD_TX_ENB |
+		    RL_CMD_RX_ENB);
+	else
+		CSR_WRITE_1(sc, RL_COMMAND, 0x00);
+	DELAY(1000);
 	CSR_WRITE_2(sc, RL_IMR, 0x0000);
 	CSR_WRITE_2(sc, RL_ISR, 0xFFFF);
 
@@ -2994,7 +3024,9 @@ re_suspend(device_t dev)
 
 	RL_LOCK(sc);
 	re_stop(sc);
+#ifdef ENABLE_WOL
 	re_setwol(sc);
+#endif
 	sc->suspended = 1;
 	RL_UNLOCK(sc);
 
@@ -3017,16 +3049,25 @@ re_resume(device_t dev)
 	RL_LOCK(sc);
 
 	ifp = sc->rl_ifp;
-
-	/* reinitialize interface if necessary */
-	if (ifp->if_flags & IFF_UP)
-		re_init_locked(sc);
+	/* Take controller out of sleep mode. */
+	if ((sc->rl_flags & RL_FLAG_MACSLEEP) != 0) {
+		if ((CSR_READ_1(sc, RL_MACDBG) & 0x80) == 0x80)
+			CSR_WRITE_1(sc, RL_GPIO,
+			    CSR_READ_1(sc, RL_GPIO) | 0x01);
+	}
 
 	/*
 	 * Clear WOL matching such that normal Rx filtering
 	 * wouldn't interfere with WOL patterns.
 	 */
+#ifdef ENABLE_WOL
 	re_clrwol(sc);
+#endif
+
+	/* reinitialize interface if necessary */
+	if (ifp->if_flags & IFF_UP)
+		re_init_locked(sc);
+
 	sc->suspended = 0;
 	RL_UNLOCK(sc);
 
@@ -3052,7 +3093,9 @@ re_shutdown(device_t dev)
 	 * cases.
 	 */
 	sc->rl_ifp->if_flags &= ~IFF_UP;
+#ifdef ENABLE_WOL
 	re_setwol(sc);
+#endif
 	RL_UNLOCK(sc);
 
 	return (0);
@@ -3061,7 +3104,6 @@ re_shutdown(device_t dev)
 static void
 re_setwol(struct rl_softc *sc)
 {
-#ifdef ENABLE_WOL
 	struct ifnet		*ifp;
 	int			pmc;
 	uint16_t		pmstat;
@@ -3073,6 +3115,15 @@ re_setwol(struct rl_softc *sc)
 		return;
 
 	ifp = sc->rl_ifp;
+	/* Put controller into sleep mode. */
+	if ((sc->rl_flags & RL_FLAG_MACSLEEP) != 0) {
+		if ((CSR_READ_1(sc, RL_MACDBG) & 0x80) == 0x80)
+			CSR_WRITE_1(sc, RL_GPIO,
+			    CSR_READ_1(sc, RL_GPIO) & ~0x01);
+	}
+	if ((ifp->if_capenable & IFCAP_WOL) != 0 &&
+	    (sc->rl_flags & RL_FLAG_WOLRXENB) != 0)
+		CSR_WRITE_1(sc, RL_COMMAND, RL_CMD_RX_ENB);
 	/* Enable config register write. */
 	CSR_WRITE_1(sc, RL_EECMD, RL_EE_MODE);
 
@@ -3103,6 +3154,9 @@ re_setwol(struct rl_softc *sc)
 		v |= RL_CFG5_WOL_LANWAKE;
 	CSR_WRITE_1(sc, RL_CFG5, v);
 
+	if ((ifp->if_capenable & IFCAP_WOL) != 0 &&
+	    (sc->rl_flags & RL_FLAG_PHYWAKE_PM) != 0)
+		CSR_WRITE_1(sc, RL_PMCH, CSR_READ_1(sc, RL_PMCH) & ~0x80);
 	/*
 	 * It seems that hardware resets its link speed to 100Mbps in
 	 * power down mode so switching to 100Mbps in driver is not
@@ -3115,13 +3169,11 @@ re_setwol(struct rl_softc *sc)
 	if ((ifp->if_capenable & IFCAP_WOL) != 0)
 		pmstat |= PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE;
 	pci_write_config(sc->rl_dev, pmc + PCIR_POWER_STATUS, pmstat, 2);
-#endif
 }
 
 static void
 re_clrwol(struct rl_softc *sc)
 {
-#ifdef ENABLE_WOL
 	int			pmc;
 	uint8_t			v;
 
@@ -3144,6 +3196,4 @@ re_clrwol(struct rl_softc *sc)
 	v &= ~(RL_CFG5_WOL_BCAST | RL_CFG5_WOL_MCAST | RL_CFG5_WOL_UCAST);
 	v &= ~RL_CFG5_WOL_LANWAKE;
 	CSR_WRITE_1(sc, RL_CFG5, v);
-#endif
 }
-
