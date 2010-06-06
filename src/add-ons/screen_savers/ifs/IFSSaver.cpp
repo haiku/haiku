@@ -190,10 +190,11 @@ IFSSaver::Draw(BView *view, int32 frame)
 		view->FillRect(view->Bounds());
 	}
 	int32 frames = frame - fLastDrawnFrame;
-	if (fIsPreview || fDirectInfo.bits == NULL) {
+	if ((fIsPreview || fDirectInfo.bits == NULL) && fLocker.Lock()) {
 		fIFS->Draw(view, NULL, frames);
 
 		fLastDrawnFrame = frame;
+		fLocker.Unlock();
 	}
 }
 
