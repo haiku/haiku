@@ -40,7 +40,7 @@ struct intel_info {
 extern status_t intel_free_memory(intel_info& info, addr_t offset);
 extern status_t intel_allocate_memory(intel_info& info, size_t size,
 	size_t alignment, uint32 flags, addr_t* _offset,
-	addr_t* _physicalBase = NULL);
+	phys_addr_t* _physicalBase = NULL);
 extern status_t intel_extreme_init(intel_info& info);
 extern void intel_extreme_uninit(intel_info& info);
 

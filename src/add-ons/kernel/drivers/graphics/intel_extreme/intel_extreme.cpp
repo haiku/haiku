@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -164,15 +164,10 @@ intel_free_memory(intel_info &info, addr_t base)
 
 status_t
 intel_allocate_memory(intel_info &info, size_t size, size_t alignment,
-	uint32 flags, addr_t *_base, addr_t *_physicalBase)
+	uint32 flags, addr_t *_base, phys_addr_t *_physicalBase)
 {
-	// TODO: _physicalBase should be phys_addr_t!
-	phys_addr_t physicalBase;
-	status_t error = gGART->allocate_memory(info.aperture, size, alignment,
-		flags, _base, &physicalBase);
-	if (_physicalBase != NULL)
-		*_physicalBase = physicalBase;
-	return error;
+	return gGART->allocate_memory(info.aperture, size, alignment,
+		flags, _base, _physicalBase);
 }
 
 
@@ -255,13 +250,12 @@ intel_extreme_init(intel_info &info)
 		write32(info.registers + 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
 		write32(info.registers + 0x6210, 0);
 
-		uint32 dspclk_gate_val = (1L << 28) | (1L << 3) | (1L << 2);
+		uint32 gateValue = (1L << 28) | (1L << 3) | (1L << 2);
 		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
 			dprintf("G4x mobile clock gating\n");
-		    dspclk_gate_val |= 1L << 18;
+		    gateValue |= 1L << 18;
 		}
-		write32(info.registers + 0x6200, dspclk_gate_val)	;
-
+		write32(info.registers + 0x6200, gateValue);
 	} else {
 		dprintf("i965 quirk\n");
 		write32(info.registers + 0x6204, (1L << 29) | (1L << 23));

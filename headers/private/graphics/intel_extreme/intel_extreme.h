@@ -108,9 +108,9 @@ struct intel_shared_info {
 
 	area_id			registers_area;			// area of memory mapped registers
 	uint8*			status_page;
-	addr_t			physical_status_page;
+	phys_addr_t		physical_status_page;
 	uint8*			graphics_memory;
-	addr_t			physical_graphics_memory;
+	phys_addr_t		physical_graphics_memory;
 	uint32			graphics_memory_size;
 
 	addr_t			frame_buffer;
@@ -124,14 +124,14 @@ struct intel_shared_info {
 	int32			overlay_channel_used;
 	bool			overlay_active;
 	uint32			overlay_token;
-	addr_t			physical_overlay_registers;
+	phys_addr_t		physical_overlay_registers;
 	uint32			overlay_offset;
 
 	bool			hardware_cursor_enabled;
 	sem_id			vblank_sem;
 
 	uint8*			cursor_memory;
-	addr_t			physical_cursor_memory;
+	phys_addr_t		physical_cursor_memory;
 	uint32			cursor_buffer_offset;
 	uint32			cursor_format;
 	bool			cursor_visible;
