@@ -26,17 +26,17 @@ static float sampleX[]= {0,.05,.15,.7,.725,.8,.825,.85,.950,1.0};
 static float sampleY[]= {0,.05,.90,.95,.966,.975,1.0};
 
 
-inline BPoint 
-scale2(int x, int y,BRect area) 
-{ 
-	return scale_direct(sampleX[x],sampleY[y],area); 
+inline BPoint
+scale2(int x, int y,BRect area)
+{
+	return scale_direct(sampleX[x],sampleY[y],area);
 }
 
 
-inline BRect 
-scale2(int x1, int x2, int y1, int y2,BRect area) 
-{ 
-	return scale_direct(sampleX[x1],sampleX[x2],sampleY[y1],sampleY[y2],area); 
+inline BRect
+scale2(int x1, int x2, int y1, int y2,BRect area)
+{
+	return scale_direct(sampleX[x1],sampleX[x2],sampleY[y1],sampleY[y2],area);
 }
 
 
@@ -50,7 +50,7 @@ PreviewView::PreviewView(BRect frame, const char *name)
 
 PreviewView::~PreviewView()
 {
-} 
+}
 
 
 BView*
@@ -72,7 +72,9 @@ PreviewView::RemovePreview()
 	if (fSaverView != NULL)
 		RemoveChild(fSaverView);
 
-	return fSaverView;
+	BView* saverView = fSaverView;
+	fSaverView = NULL;
+	return saverView;
 }
 
 
@@ -99,4 +101,3 @@ PreviewView::Draw(BRect update)
 	SetHighColor(96,96,96);
 	FillRect(scale2(5,6,4,5,Bounds()));
 }
-
