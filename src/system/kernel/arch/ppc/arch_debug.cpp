@@ -279,8 +279,8 @@ arch_debug_contains_call(struct thread *thread, const char *symbol,
 void *
 arch_debug_get_caller(void)
 {
-	// TODO: implement me
-	return (void *)&arch_debug_get_caller;
+	struct stack_frame *frame = get_current_stack_frame()->previous;
+	return (void *)frame->previous->return_address;
 }
 
 
