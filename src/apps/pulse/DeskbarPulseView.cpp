@@ -12,12 +12,18 @@
 #include "Common.h"
 #include "Prefs.h"
 #include <app/Application.h>
+#include <Catalog.h>
 #include <interface/Deskbar.h>
 #include <interface/Alert.h>
+#include <Locale.h>
 #include <Roster.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DeskbarPulseView"
+
 
 DeskbarPulseView::DeskbarPulseView(BRect rect) : MiniPulseView(rect, "DeskbarPulseView") {
 	messagerunner = NULL;
@@ -26,11 +32,11 @@ DeskbarPulseView::DeskbarPulseView(BRect rect) : MiniPulseView(rect, "DeskbarPul
 }
 
 DeskbarPulseView::DeskbarPulseView(BMessage *message) : MiniPulseView(message) {
-	mode1->SetLabel("Normal mode");
+	mode1->SetLabel(B_TRANSLATE("Normal mode"));
 	mode1->SetMessage(new BMessage(PV_NORMAL_MODE));
-	mode2->SetLabel("Mini mode");
+	mode2->SetLabel(B_TRANSLATE("Mini mode"));
 	mode2->SetMessage(new BMessage(PV_MINI_MODE));
-	quit = new BMenuItem("Quit", new BMessage(PV_QUIT), 0, 0);
+	quit = new BMenuItem(B_TRANSLATE("Quit"), new BMessage(PV_QUIT), 0, 0);
 	popupmenu->AddSeparatorItem();
 	popupmenu->AddItem(quit);
 
@@ -118,8 +124,9 @@ void DeskbarPulseView::MessageReceived(BMessage *message) {
 			prefswindow->Show();
 			break;
 		case PV_ABOUT: {
-			BAlert *alert = new BAlert("Info", "Pulse\n\nBy David Ramsey and "
-				"Arve Hjønnevåg\nRevised by Daniel Switkin", "OK");
+			BAlert *alert = new BAlert(B_TRANSLATE("Info"), 
+				B_TRANSLATE("Pulse\n\nBy David Ramsey and Arve Hjønnevåg\n"
+				"Revised by Daniel Switkin"), B_TRANSLATE("OK"));
 			alert->Go(NULL);
 			break;
 		}
@@ -169,8 +176,9 @@ void DeskbarPulseView::Remove() {
 	status_t err = deskbar->RemoveItem("DeskbarPulseView");
 	if (err != B_OK) {
 		char temp[255];
-		sprintf(temp, "Remove(): %s", strerror(err));
-		BAlert *alert = new BAlert("Info", temp, "OK");
+		sprintf(temp, B_TRANSLATE("Remove(): %s"), strerror(err));
+		BAlert *alert = new BAlert(B_TRANSLATE("Info"), temp, 
+			B_TRANSLATE("OK"));
 		alert->Go(NULL);
 	}
 	delete deskbar;

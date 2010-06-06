@@ -23,6 +23,20 @@ Application Pulse :
 	PulseView.cpp
 	PulseWindow.cpp
 
-	: be $(TARGET_LIBSUPC++)
+	: be locale $(TARGET_LIBSUPC++)
 	: Pulse.rdef
+;
+
+DoCatalogs Pulse :
+	x-vnd.Haiku-Pulse
+	:
+	PulseApp.cpp
+	PulseView.cpp
+	ConfigView.cpp
+	CPUButton.cpp
+	DeskbarPulseView.cpp
+	MiniPulseView.cpp
+	NormalPulseView.cpp
+	PrefsWindow.cpp
+	PulseWindow.cpp
 ;

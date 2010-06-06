@@ -1,4 +1,4 @@
-//****************************************************************************************
+//*****************************************************************************
 //
 //	File:		CPUButton.cpp
 //
@@ -6,8 +6,7 @@
 //
 //	Copyright 1999, Be Incorporated
 //
-//****************************************************************************************
-
+//*****************************************************************************
 
 #include "CPUButton.h"
 
@@ -15,7 +14,9 @@
 #include <string.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Dragger.h>
+#include <Locale.h>
 #include <PopUpMenu.h>
 
 #include <ViewPrivate.h>
@@ -25,6 +26,9 @@
 #include "PulseApp.h"
 #include "PulseView.h"
 #include "Common.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "CPUButton"
 
 
 CPUButton::CPUButton(BRect rect, const char *name, const char *label, BMessage *message)
@@ -195,11 +199,11 @@ CPUButton::MouseDown(BPoint point)
 		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 	} else if ((B_SECONDARY_MOUSE_BUTTON & mouseButtons) != 0
 		&& fReplicantInDeskbar) {
-		BPopUpMenu *menu = new BPopUpMenu("Deskbar menu");
-		menu->AddItem(new BMenuItem("About Pulse" B_UTF8_ELLIPSIS,
+		BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Deskbar menu"));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("About Pulse" B_UTF8_ELLIPSIS),
 			new BMessage(B_ABOUT_REQUESTED)));
 		menu->AddSeparatorItem();
-		menu->AddItem(new BMenuItem("Remove replicant",
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Remove replicant"),
 			new BMessage(kDeleteReplicant)));
 		menu->SetTargetForItems(this);
 
@@ -237,7 +241,8 @@ CPUButton::Invoke(BMessage *message)
 	if (!LastEnabledCPU(fCPU)) {
 		_kern_set_cpu_enabled(fCPU, Value());
 	} else {
-		BAlert *alert = new BAlert(NULL, "You can't disable the last active CPU.", "OK");
+		BAlert *alert = new BAlert(NULL, B_TRANSLATE("You can't disable the "
+			"last active CPU."), B_TRANSLATE("OK"));
 		alert->Go(NULL);
 		SetValue(!Value());
 	}
@@ -271,7 +276,9 @@ CPUButton::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case B_ABOUT_REQUESTED: {
-			BAlert *alert = new BAlert("Info", "Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin", "OK");
+			BAlert *alert = new BAlert(B_TRANSLATE("Info"), 
+				B_TRANSLATE("Pulse\n\nBy David Ramsey and Arve Hjønnevåg\n"
+				"Revised by Daniel Switkin"), B_TRANSLATE("OK"));
 			// Use the asynchronous version so we don't block the window's thread
 			alert->Go(NULL);
 			break;
@@ -313,7 +320,7 @@ CPUButton::AttachedToWindow()
 	fReplicantInDeskbar = false;
 
 	if (fReplicant) {
-		if (strcmp(Window()->Title(), "Deskbar")) {
+		if (strcmp(Window()->Title(), B_TRANSLATE("Deskbar")) == 0) {
 			// Make room for dragger
 			ResizeBy(4, 4);
 

@@ -1,4 +1,4 @@
-//****************************************************************************************
+//*****************************************************************************
 //
 //	File:		ProgressBar.cpp
 //
@@ -6,14 +6,15 @@
 //
 //	Copyright 1999, Be Incorporated
 //
-//****************************************************************************************
+//*****************************************************************************
 
 
 #include "ProgressBar.h"
 #include "PulseApp.h"
 
 
-ProgressBar::ProgressBar(BRect r, char *name) :	BView(r, name, B_FOLLOW_NONE, B_WILL_DRAW)
+ProgressBar::ProgressBar(BRect r, char *name) :	BView(r, name, B_FOLLOW_NONE, 
+	B_WILL_DRAW)
 {	
 	previous_value = current_value = 0;
 
@@ -43,9 +44,12 @@ ProgressBar::UpdateColors(int32 color, bool fade)
 		unsigned char blue_base = blue / 3;
 
 		for (int x = 0; x < 20; x++) {
-			segments[x].color.red = (uint8)(red_base + ((red - red_base) * ((float)x / 19.0)));
-			segments[x].color.green = (uint8)(green_base + ((green - green_base) * ((float)x / 19.0)));
-			segments[x].color.blue = (uint8)(blue_base + ((blue - blue_base) * ((float)x / 19.0)));
+			segments[x].color.red = (uint8)(red_base + ((red - red_base) 
+				* ((float)x / 19.0)));
+			segments[x].color.green = (uint8)(green_base 
+				+ ((green - green_base) * ((float)x / 19.0)));
+			segments[x].color.blue = (uint8)(blue_base + ((blue - blue_base) 
+				* ((float)x / 19.0)));
 			segments[x].color.alpha = 0xff;
 		}
 	} else {
@@ -151,15 +155,22 @@ ProgressBar::Draw(BRect rect)
 	SetHighColor(dkgray, dkgray, dkgray);
 	BRect frame = Bounds();
 	StrokeLine(BPoint(frame.left, frame.top), BPoint(frame.right, frame.top));
-	StrokeLine(BPoint(frame.left, frame.top + 1), BPoint(frame.right, frame.top + 1));
-	StrokeLine(BPoint(frame.left, frame.top), BPoint(frame.left, frame.bottom));
-	StrokeLine(BPoint(frame.left + 1, frame.top), BPoint(frame.left + 1, frame.bottom));
+	StrokeLine(BPoint(frame.left, frame.top + 1), BPoint(frame.right, 
+		frame.top + 1));
+	StrokeLine(BPoint(frame.left, frame.top), BPoint(frame.left, 
+		frame.bottom));
+	StrokeLine(BPoint(frame.left + 1, frame.top), 
+		BPoint(frame.left + 1, frame.bottom));
 
 	SetHighColor(ltgray, ltgray, ltgray);
-	StrokeLine(BPoint(frame.right-1, frame.top + 2), BPoint(frame.right - 1, frame.bottom));
-	StrokeLine(BPoint(frame.right, frame.top + 1), BPoint(frame.right, frame.bottom));
-	StrokeLine(BPoint(frame.left+1, frame.bottom - 1), BPoint(frame.right - 1, frame.bottom - 1));
-	StrokeLine(BPoint(frame.left, frame.bottom), BPoint(frame.right, frame.bottom));
+	StrokeLine(BPoint(frame.right-1, frame.top + 2), 
+		BPoint(frame.right - 1, frame.bottom));
+	StrokeLine(BPoint(frame.right, frame.top + 1), 
+		BPoint(frame.right, frame.bottom));
+	StrokeLine(BPoint(frame.left+1, frame.bottom - 1), 
+		BPoint(frame.right - 1, frame.bottom - 1));
+	StrokeLine(BPoint(frame.left, frame.bottom), 
+		BPoint(frame.right, frame.bottom));
 
 	Render(true);
 }

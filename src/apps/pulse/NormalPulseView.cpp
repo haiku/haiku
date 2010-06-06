@@ -1,4 +1,4 @@
-//****************************************************************************************
+//*****************************************************************************
 //
 //	File:		NormalPulseView.cpp
 //
@@ -6,15 +6,17 @@
 //
 //	Copyright 1999, Be Incorporated
 //
-//****************************************************************************************
+//*****************************************************************************
 
 
 #include "NormalPulseView.h"
 #include "Common.h"
 #include "Pictures"
 
+#include <Catalog.h>
 #include <Bitmap.h>
 #include <Dragger.h>
+#include <Locale.h>
 #include <Window.h>
 
 #include <stdlib.h>
@@ -22,6 +24,9 @@
 #include <string.h>
 
 #include <cpu_type.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "NormalPulseView"
 
 
 float
@@ -50,9 +55,9 @@ NormalPulseView::NormalPulseView(BRect rect)
 	SetViewColor(color);
 	SetLowColor(color);
 
-	mode1->SetLabel("Mini mode");
+	mode1->SetLabel(B_TRANSLATE("Mini mode"));
 	mode1->SetMessage(new BMessage(PV_MINI_MODE));
-	mode2->SetLabel("Deskbar mode");
+	mode2->SetLabel(B_TRANSLATE("Deskbar mode"));
 	mode2->SetMessage(new BMessage(PV_DESKBAR_MODE));
 	
 	DetermineVendorAndProcessor();
@@ -69,7 +74,8 @@ NormalPulseView::NormalPulseView(BRect rect)
 		BRect r(PROGRESS_MLEFT, PROGRESS_MTOP + ITEM_OFFSET * x,
 			PROGRESS_MLEFT + ProgressBar::PROGRESS_WIDTH,
 			PROGRESS_MTOP + ITEM_OFFSET * x + ProgressBar::PROGRESS_HEIGHT);
-		fProgressBars[x] = new ProgressBar(r, "CPU progress bar");
+		char* str2 = (char *)B_TRANSLATE("CPU progress bar");
+		fProgressBars[x] = new ProgressBar(r, str2);
 		AddChild(fProgressBars[x]);
 
 		r.Set(CPUBUTTON_MLEFT, CPUBUTTON_MTOP + ITEM_OFFSET * x,
@@ -77,7 +83,7 @@ NormalPulseView::NormalPulseView(BRect rect)
 			CPUBUTTON_MTOP + ITEM_OFFSET * x + CPUBUTTON_HEIGHT + 7);
 		char temp[4];
 		sprintf(temp, "%d", x + 1);
-		fCpuButtons[x] = new CPUButton(r, "Pulse", temp, NULL);
+		fCpuButtons[x] = new CPUButton(r, B_TRANSLATE("Pulse"), temp, NULL);
 		AddChild(fCpuButtons[x]);
 	}
 

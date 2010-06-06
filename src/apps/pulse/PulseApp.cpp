@@ -19,14 +19,19 @@
 #include <getopt.h>
 
 #include <Alert.h>
-#include <Rect.h>
+#include <Catalog.h>
 #include <Deskbar.h>
+#include <Locale.h>
+#include <Rect.h>
 
 #include <syscalls.h>
 
 #include "Common.h"
 #include "PulseWindow.h"
 #include "DeskbarPulseView.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PulseApp"
 
 
 PulseApp::PulseApp(int argc, char **argv)
@@ -197,9 +202,9 @@ GetMinimumViewWidth()
 void
 Usage()
 {
-	printf("Usage: Pulse [--mini] [-w width] [--width=width]\n"
+	printf(B_TRANSLATE("Usage: Pulse [--mini] [-w width] [--width=width]\n"
 	       "\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n"
-	       "\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n");
+	       "\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n"));
 	exit(0);
 }
 
@@ -229,7 +234,7 @@ LoadInDeskbar()
 	delete replicant;
 	delete deskbar;
 	if (err != B_OK) {
-		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+		BAlert *alert = new BAlert(NULL, strerror(err), B_TRANSLATE("OK"));
 		alert->Go(NULL);
 		return false;
 	}
@@ -241,6 +246,10 @@ LoadInDeskbar()
 int
 main(int argc, char **argv)
 {
+	BCatalog fAppCatalog;
+	
+	be_locale->GetAppCatalog(&fAppCatalog);
+
 	PulseApp *pulseapp = new PulseApp(argc, argv);
 	pulseapp->Run();
 	delete pulseapp;

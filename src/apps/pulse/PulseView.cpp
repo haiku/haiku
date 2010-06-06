@@ -15,11 +15,16 @@
 #include <string.h>
 
 #include <Alert.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 #include <syscalls.h>
 
 #include "Common.h"
 #include "PulseApp.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PulseView"
 
 
 PulseView::PulseView(BRect rect, const char *name) :
@@ -50,8 +55,10 @@ void PulseView::Init() {
 	popupmenu->SetFont(be_plain_font);
 	mode1 = new BMenuItem("", NULL, 0, 0);
 	mode2 = new BMenuItem("", NULL, 0, 0);
-	preferences = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(PV_PREFERENCES), 0, 0);
-	about = new BMenuItem("About Pulse" B_UTF8_ELLIPSIS, new BMessage(PV_ABOUT), 0, 0);
+	preferences = new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), 
+		new BMessage(PV_PREFERENCES), 0, 0);
+	about = new BMenuItem(B_TRANSLATE("About Pulse" B_UTF8_ELLIPSIS), 
+		new BMessage(PV_ABOUT), 0, 0);
 
 	popupmenu->AddItem(mode1);
 	popupmenu->AddItem(mode2);
@@ -121,7 +128,8 @@ void PulseView::ChangeCPUState(BMessage *message) {
 	if (!LastEnabledCPU(which)) {
 		_kern_set_cpu_enabled(which, (int)!cpu_menu_items[which]->IsMarked());
 	} else {
-		BAlert *alert = new BAlert(NULL, "You can't disable the last active CPU.", "OK");
+		BAlert *alert = new BAlert(NULL, B_TRANSLATE("You can't disable the "
+			"last active CPU."), B_TRANSLATE("OK"));
 		alert->Go(NULL);
 	}
 }

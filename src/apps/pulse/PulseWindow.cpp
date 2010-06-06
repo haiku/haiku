@@ -1,4 +1,4 @@
-//****************************************************************************************
+//*****************************************************************************
 //
 //	File:		PulseWindow.cpp
 //
@@ -6,7 +6,7 @@
 //
 //	Copyright 1999, Be Incorporated
 //
-//****************************************************************************************
+//*****************************************************************************
 
 
 #include "PulseWindow.h"
@@ -15,11 +15,16 @@
 #include "DeskbarPulseView.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Deskbar.h>
+#include <Locale.h>
 #include <Screen.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PulseWindow"
 
 
 PulseWindow::PulseWindow(BRect rect) :
@@ -27,12 +32,15 @@ PulseWindow::PulseWindow(BRect rect) :
 {
 	SetPulseRate(200000);
 
+	SetTitle(B_TRANSLATE("Pulse"));
+	
 	PulseApp *pulseapp = (PulseApp *)be_app;
 	BRect bounds = Bounds();
 	fNormalPulseView = new NormalPulseView(bounds);
 	AddChild(fNormalPulseView);
 
-	fMiniPulseView = new MiniPulseView(bounds, "MiniPulseView", pulseapp->prefs);
+	fMiniPulseView = new MiniPulseView(bounds, "MiniPulseView", 
+		pulseapp->prefs);
 	AddChild(fMiniPulseView);
 
 	fMode = pulseapp->prefs->window_mode;
@@ -89,12 +97,15 @@ PulseWindow::MessageReceived(BMessage *message)
 			// Otherwise launch a new preferences window
 			PulseApp *pulseapp = (PulseApp *)be_app;
 			fPrefsWindow = new PrefsWindow(pulseapp->prefs->prefs_window_rect,
-				"Pulse settings", new BMessenger(this), pulseapp->prefs);
+				B_TRANSLATE("Pulse settings"), new BMessenger(this), 
+				pulseapp->prefs);
 			fPrefsWindow->Show();
 			break;
 		}
 		case PV_ABOUT: {
-			BAlert *alert = new BAlert("Info", "Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin", "OK");
+			BAlert *alert = new BAlert(B_TRANSLATE("Info"), 
+				B_TRANSLATE("Pulse\n\nBy David Ramsey and Arve Hjønnevåg\n"
+				"Revised by Daniel Switkin"), B_TRANSLATE("OK"));
 			// Use the asynchronous version so we don't block the window's thread
 			alert->Go(NULL);
 			break;

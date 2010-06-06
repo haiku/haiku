@@ -14,15 +14,21 @@
 #include "PulseApp.h"
 #include "ConfigView.h"
 
+#include <Catalog.h>
 #include <Button.h>
+#include <Locale.h>
 #include <TabView.h>
 #include <TextControl.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrefsWindow"
 
-PrefsWindow::PrefsWindow(BRect frame, const char *name, BMessenger *messenger, Prefs *prefs)
+
+PrefsWindow::PrefsWindow(BRect frame, const char *name, 
+	BMessenger *messenger, Prefs *prefs)
 	: BWindow(frame, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fTarget(*messenger),
@@ -43,16 +49,16 @@ PrefsWindow::PrefsWindow(BRect frame, const char *name, BMessenger *messenger, P
 	BRect rect = fTabView->ContainerView()->Bounds();
 	rect.InsetBy(5, 5);
 
-	ConfigView *normalView = new ConfigView(rect, "Normal mode",
+	ConfigView *normalView = new ConfigView(rect, B_TRANSLATE("Normal mode"),
 		PRV_NORMAL_CHANGE_COLOR, fTarget, prefs);
 	fTabView->AddTab(normalView);
 
-	ConfigView *miniView = new ConfigView(rect, "Mini mode", PRV_MINI_CHANGE_COLOR,
-		fTarget, prefs);
+	ConfigView *miniView = new ConfigView(rect, B_TRANSLATE("Mini mode"), 
+		PRV_MINI_CHANGE_COLOR, fTarget, prefs);
 	fTabView->AddTab(miniView);
 
-	ConfigView *deskbarView = new ConfigView(rect, "Deskbar mode", PRV_DESKBAR_CHANGE_COLOR,
-		fTarget, prefs);
+	ConfigView *deskbarView = new ConfigView(rect, B_TRANSLATE("Deskbar mode"),
+		PRV_DESKBAR_CHANGE_COLOR, fTarget, prefs);
 	fTabView->AddTab(deskbarView);
 
 	float width, height;
@@ -62,18 +68,20 @@ PrefsWindow::PrefsWindow(BRect frame, const char *name, BMessenger *messenger, P
 	deskbarView->ResizeTo(width, height);
 
 	fTabView->Select(0L);
-	fTabView->ResizeTo(deskbarView->Bounds().Width() + 16.0f, deskbarView->Bounds().Height()
-		+ fTabView->ContainerView()->Frame().top + 16.0f);
+	fTabView->ResizeTo(deskbarView->Bounds().Width() + 16.0f, 
+		deskbarView->Bounds().Height() + 
+		fTabView->ContainerView()->Frame().top + 16.0f);
 
-	BButton *okButton = new BButton(rect, "ok", "OK", new BMessage(PRV_BOTTOM_OK),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	BButton *okButton = new BButton(rect, "ok", B_TRANSLATE("OK"), 
+		new BMessage(PRV_BOTTOM_OK), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	okButton->ResizeToPreferred();
 	okButton->MoveTo(Bounds().Width() - 8.0f - okButton->Bounds().Width(),
 		Bounds().Height() - 8.0f - okButton->Bounds().Height());
 	topView->AddChild(okButton);
 
-	BButton *defaultsButton = new BButton(okButton->Frame(), "defaults", "Defaults",
-		new BMessage(PRV_BOTTOM_DEFAULTS), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	BButton *defaultsButton = new BButton(okButton->Frame(), "defaults", 
+		B_TRANSLATE("Defaults"), new BMessage(PRV_BOTTOM_DEFAULTS), 
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	defaultsButton->ResizeToPreferred();
 	defaultsButton->MoveBy(-defaultsButton->Bounds().Width() - 10.0f, 0.0f);
 	topView->AddChild(defaultsButton);
@@ -102,7 +110,8 @@ PrefsWindow::MessageReceived(BMessage *message)
 			Hide();
 
 			fTabView->Select(2);
-			ConfigView *deskbar = (ConfigView *)FindView("Deskbar mode");
+			ConfigView *deskbar = (ConfigView *)FindView(
+				B_TRANSLATE("Deskbar mode"));
 			deskbar->UpdateDeskbarIconWidth();
 
 			PostMessage(B_QUIT_REQUESTED);
