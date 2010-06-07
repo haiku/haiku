@@ -74,7 +74,7 @@ struct X86PagingStructures : DeferredDeletable {
 	inline	void				AddReference();
 	inline	void				RemoveReference();
 
-			void				Delete();
+	virtual	void				Delete() = 0;
 };
 
 

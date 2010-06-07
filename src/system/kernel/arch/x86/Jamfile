@@ -40,6 +40,8 @@ KernelMergeObject kernel_arch_x86.o :
 	x86_physical_page_mapper.cpp
 	x86_physical_page_mapper_large_memory.cpp
 	x86_syscalls.cpp
+	X86PagingMethod.cpp
+	X86PagingMethod32Bit.cpp
 
 	x86_apic.cpp
 	x86_hpet.cpp
