@@ -10,6 +10,7 @@
 #include <CheckBox.h>
 #include <ColorControl.h>
 #include <ColumnListView.h>
+#include <ColumnTypes.h>
 #include <ControlLook.h>
 #include <FilePanel.h>
 #include <GridLayoutBuilder.h>
@@ -281,6 +282,16 @@ main(int argc, char** argv)
 	// BColumnListView
 	BColumnListView* columnListView = new BColumnListView("clv", 0,
 		B_FANCY_BORDER);
+//		B_PLAIN_BORDER);
+//		B_NO_BORDER);
+
+	columnListView->AddColumn(new BTitledColumn("Short",
+		150, 50, 500, B_ALIGN_LEFT), 0);
+	columnListView->AddColumn(new BTitledColumn("Medium Length",
+		100, 50, 500, B_ALIGN_CENTER), 1);
+	columnListView->AddColumn(new BTitledColumn("Some Long Column Name",
+		130, 50, 500, B_ALIGN_RIGHT), 2);
+
 //	for (int32 i = 0; i < 20; i++) {
 //		BString itemLabel("List Item ");
 //		itemLabel << i + 1;
