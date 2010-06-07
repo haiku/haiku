@@ -29,6 +29,7 @@
 #include <vm/VMCache.h>
 
 #include "x86_physical_page_mapper.h"
+#include "x86_physical_page_mapper_large_memory.h"
 #include "X86VMTranslationMap.h"
 
 
@@ -38,6 +39,12 @@
 #else
 #	define TRACE(x...) ;
 #endif
+
+
+using X86LargePhysicalPageMapper::PhysicalPageSlot;
+
+
+static const size_t kPageTableAlignment = 1024 * B_PAGE_SIZE;
 
 
 static X86PagingMethod32Bit sMethod;
@@ -474,7 +481,7 @@ X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fPageMapper->GetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
@@ -522,7 +529,7 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fPageMapper->GetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
@@ -576,7 +583,7 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	page_table_entry* pt = fPageMapper->GetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	index = VADDR_TO_PTENT(address);
@@ -700,7 +707,7 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 		struct thread* thread = thread_get_current_thread();
 		ThreadCPUPinner pinner(thread);
 
-		page_table_entry* pt = fPageMapper->GetPageTableAt(
+		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 			pd[index] & X86_PDE_ADDRESS_MASK);
 
 		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
@@ -837,8 +844,9 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 
 			ThreadCPUPinner pinner(thread_get_current_thread());
 
-			page_table_entry* pt = fPageMapper->GetPageTableAt(
-				pd[index] & X86_PDE_ADDRESS_MASK);
+			page_table_entry* pt
+				= (page_table_entry*)fPageMapper->GetPageTableAt(
+					pd[index] & X86_PDE_ADDRESS_MASK);
 			page_table_entry oldEntry = clear_page_table_entry(
 				&pt[VADDR_TO_PTENT(address)]);
 
@@ -913,7 +921,7 @@ X86VMTranslationMap::Query(addr_t va, phys_addr_t *_physical, uint32 *_flags)
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fPageMapper->GetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
@@ -954,8 +962,9 @@ X86VMTranslationMap::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 	}
 
 	// map page table entry
-	page_table_entry* pt = sPhysicalPageMapper->InterruptGetPageTableAt(
-		pd[index] & X86_PDE_ADDRESS_MASK);
+	page_table_entry* pt
+		= (page_table_entry*)sPhysicalPageMapper->InterruptGetPageTableAt(
+			pd[index] & X86_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
 	*_physical = entry & X86_PDE_ADDRESS_MASK;
@@ -1019,7 +1028,7 @@ restart:
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fPageMapper->GetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
@@ -1078,7 +1087,7 @@ X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
 	struct thread* thread = thread_get_current_thread();
 	ThreadCPUPinner pinner(thread);
 
-	page_table_entry* pt = fPageMapper->GetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 	index = VADDR_TO_PTENT(va);
 
@@ -1118,7 +1127,7 @@ X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	page_table_entry* pt = fPageMapper->GetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
 		pd[index] & X86_PDE_ADDRESS_MASK);
 
 	index = VADDR_TO_PTENT(address);
@@ -1277,6 +1286,205 @@ X86VMTranslationMap::Flush()
 }
 
 
+// #pragma mark - X86PagingMethod32Bit::PhysicalPageSlotPool
+
+
+struct X86PagingMethod32Bit::PhysicalPageSlotPool
+	: X86LargePhysicalPageMapper::PhysicalPageSlotPool {
+public:
+	virtual						~PhysicalPageSlotPool();
+
+			status_t			InitInitial(kernel_args* args);
+			status_t			InitInitialPostArea(kernel_args* args);
+
+			void				Init(area_id dataArea, void* data,
+									area_id virtualArea, addr_t virtualBase);
+
+	virtual	status_t			AllocatePool(
+									X86LargePhysicalPageMapper
+										::PhysicalPageSlotPool*& _pool);
+	virtual	void				Map(phys_addr_t physicalAddress,
+									addr_t virtualAddress);
+
+public:
+	static	PhysicalPageSlotPool sInitialPhysicalPagePool;
+
+private:
+	area_id					fDataArea;
+	area_id					fVirtualArea;
+	addr_t					fVirtualBase;
+	page_table_entry*		fPageTable;
+};
+
+
+X86PagingMethod32Bit::PhysicalPageSlotPool
+	X86PagingMethod32Bit::PhysicalPageSlotPool::sInitialPhysicalPagePool;
+
+
+X86PagingMethod32Bit::PhysicalPageSlotPool::~PhysicalPageSlotPool()
+{
+}
+
+
+status_t
+X86PagingMethod32Bit::PhysicalPageSlotPool::InitInitial(kernel_args* args)
+{
+	// We reserve more, so that we can guarantee to align the base address
+	// to page table ranges.
+	addr_t virtualBase = vm_allocate_early(args,
+		1024 * B_PAGE_SIZE + kPageTableAlignment - B_PAGE_SIZE, 0, 0, false);
+	if (virtualBase == 0) {
+		panic("LargeMemoryPhysicalPageMapper::Init(): Failed to reserve "
+			"physical page pool space in virtual address space!");
+		return B_ERROR;
+	}
+	virtualBase = (virtualBase + kPageTableAlignment - 1)
+		/ kPageTableAlignment * kPageTableAlignment;
+
+	// allocate memory for the page table and data
+	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
+	page_table_entry* pageTable = (page_table_entry*)vm_allocate_early(args,
+		areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
+
+	// prepare the page table
+	x86_early_prepare_page_tables(pageTable, virtualBase,
+		1024 * B_PAGE_SIZE);
+
+	// init the pool structure and add the initial pool
+	Init(-1, pageTable, -1, (addr_t)virtualBase);
+
+	return B_OK;
+}
+
+
+status_t
+X86PagingMethod32Bit::PhysicalPageSlotPool::InitInitialPostArea(
+	kernel_args* args)
+{
+	// create an area for the (already allocated) data
+	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
+	void* temp = fPageTable;
+	area_id area = create_area("physical page pool", &temp,
+		B_EXACT_ADDRESS, areaSize, B_ALREADY_WIRED,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < B_OK) {
+		panic("LargeMemoryPhysicalPageMapper::InitPostArea(): Failed to "
+			"create area for physical page pool.");
+		return area;
+	}
+	fDataArea = area;
+
+	// create an area for the virtual address space
+	temp = (void*)fVirtualBase;
+	area = vm_create_null_area(VMAddressSpace::KernelID(),
+		"physical page pool space", &temp, B_EXACT_ADDRESS,
+		1024 * B_PAGE_SIZE, 0);
+	if (area < B_OK) {
+		panic("LargeMemoryPhysicalPageMapper::InitPostArea(): Failed to "
+			"create area for physical page pool space.");
+		return area;
+	}
+	fVirtualArea = area;
+
+	return B_OK;
+}
+
+
+void
+X86PagingMethod32Bit::PhysicalPageSlotPool::Init(area_id dataArea, void* data,
+	area_id virtualArea, addr_t virtualBase)
+{
+	fDataArea = dataArea;
+	fVirtualArea = virtualArea;
+	fVirtualBase = virtualBase;
+	fPageTable = (page_table_entry*)data;
+
+	// init slot list
+	fSlots = (PhysicalPageSlot*)(fPageTable + 1024);
+	addr_t slotAddress = virtualBase;
+	for (int32 i = 0; i < 1024; i++, slotAddress += B_PAGE_SIZE) {
+		PhysicalPageSlot* slot = &fSlots[i];
+		slot->next = slot + 1;
+		slot->pool = this;
+		slot->address = slotAddress;
+	}
+
+	fSlots[1023].next = NULL;
+		// terminate list
+}
+
+
+void
+X86PagingMethod32Bit::PhysicalPageSlotPool::Map(phys_addr_t physicalAddress,
+	addr_t virtualAddress)
+{
+	page_table_entry& pte = fPageTable[
+		(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
+	pte = (physicalAddress & X86_PTE_ADDRESS_MASK)
+		| X86_PTE_WRITABLE | X86_PTE_GLOBAL | X86_PTE_PRESENT;
+
+	invalidate_TLB(virtualAddress);
+}
+
+
+status_t
+X86PagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
+	X86LargePhysicalPageMapper::PhysicalPageSlotPool*& _pool)
+{
+	// create the pool structure
+	PhysicalPageSlotPool* pool = new(std::nothrow) PhysicalPageSlotPool;
+	if (pool == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<PhysicalPageSlotPool> poolDeleter(pool);
+
+	// create an area that can contain the page table and the slot
+	// structures
+	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
+	void* data;
+	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
+		&data, B_ANY_KERNEL_ADDRESS, PAGE_ALIGN(areaSize), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
+	if (dataArea < 0)
+		return dataArea;
+
+	// create the null area for the virtual address space
+	void* virtualBase;
+	area_id virtualArea = vm_create_null_area(
+		VMAddressSpace::KernelID(), "physical page pool space",
+		&virtualBase, B_ANY_KERNEL_BLOCK_ADDRESS, 1024 * B_PAGE_SIZE,
+		CREATE_AREA_PRIORITY_VIP);
+	if (virtualArea < 0) {
+		delete_area(dataArea);
+		return virtualArea;
+	}
+
+	// prepare the page table
+	memset(data, 0, B_PAGE_SIZE);
+
+	// get the page table's physical address
+	phys_addr_t physicalTable;
+	X86VMTranslationMap* map = static_cast<X86VMTranslationMap*>(
+		VMAddressSpace::Kernel()->TranslationMap());
+	uint32 dummyFlags;
+	cpu_status state = disable_interrupts();
+	map->QueryInterrupt((addr_t)data, &physicalTable, &dummyFlags);
+	restore_interrupts(state);
+
+	// put the page table into the page directory
+	int32 index = (addr_t)virtualBase / (B_PAGE_SIZE * 1024);
+	page_directory_entry* entry = &map->PagingStructures()->pgdir_virt[index];
+	x86_put_pgtable_in_pgdir(entry, physicalTable,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	x86_update_all_pgdirs(index, *entry);
+
+	// init the pool structure
+	pool->Init(dataArea, data, virtualArea, (addr_t)virtualBase);
+	poolDeleter.Detach();
+	_pool = pool;
+	return B_OK;
+}
+
+
 // #pragma mark - X86PagingMethod32Bit
 
 
@@ -1326,7 +1534,19 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 	B_INITIALIZE_SPINLOCK(&sPagingStructuresListLock);
 	new (&sPagingStructuresList) PagingStructuresList;
 
-	large_memory_physical_page_ops_init(args, sPhysicalPageMapper,
+	// create the initial pool for the physical page mapper
+	PhysicalPageSlotPool* pool
+		= new(&PhysicalPageSlotPool::sInitialPhysicalPagePool)
+			PhysicalPageSlotPool;
+	status_t error = pool->InitInitial(args);
+	if (error != B_OK) {
+		panic("X86PagingMethod32Bit::Init(): Failed to create initial pool "
+			"for physical page mapper!");
+		return error;
+	}
+
+	// create physical page mapper
+	large_memory_physical_page_ops_init(args, pool, sPhysicalPageMapper,
 		sKernelPhysicalPageMapper);
 		// TODO: Select the best page mapper!
 
@@ -1364,7 +1584,8 @@ X86PagingMethod32Bit::InitPostArea(kernel_args* args)
 	if (area < B_OK)
 		return area;
 
-	error = sPhysicalPageMapper->InitPostArea(args);
+	error = PhysicalPageSlotPool::sInitialPhysicalPagePool
+		.InitInitialPostArea(args);
 	if (error != B_OK)
 		return error;
 

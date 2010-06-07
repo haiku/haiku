@@ -40,6 +40,9 @@ public:
 
 	virtual	bool				IsKernelPageAccessible(addr_t virtualAddress,
 									uint32 protection);
+
+private:
+			struct PhysicalPageSlotPool;
 };
 
 
