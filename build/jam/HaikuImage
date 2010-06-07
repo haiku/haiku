@@ -593,6 +593,11 @@ CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
 	: licenses : -x .svn ;
 
+# Copy documentation as per DiskUsage's license requirement.
+CopyDirectoryToHaikuImage system documentation
+	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]
+	: diskusage : -x .svn ;
+
 # Copy documentation as per PDFlib Lite's license requirement.
 CopyDirectoryToHaikuImage system documentation
 	: [ FDirName $(HAIKU_TOP) src libs pdflib doc ]
