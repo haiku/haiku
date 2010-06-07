@@ -24,6 +24,7 @@
 #include <map>
 #include <new>
 #include <set>
+#include <stdio.h>
 
 #undef TRACE
 //#define TRACE_PATH_MONITOR
@@ -124,6 +125,8 @@ class PathHandler : public BHandler {
 		status_t _AddFile(BEntry& entry, bool notify = false);
 		status_t _RemoveFile(const node_ref& nodeRef);
 		status_t _RemoveFile(BEntry& entry);
+
+		void _RemoveEntriesRecursively(BDirectory& directory);
 
 		BPath			fPath;
 		int32			fPathLength;
@@ -771,8 +774,20 @@ PathHandler::_RemoveDirectory(const node_ref& nodeRef, ino_t directoryNode)
 
 	fDirectories.erase(iterator);
 
-	// TODO: stop watching subdirectories and their files when in recursive
-	// mode!
+	// stop watching subdirectories and their files when in recursive mode
+	if (_WatchRecursively()) {
+		BDirectory entryDirectory(&nodeRef);
+		if (entryDirectory.InitCheck() == B_OK) {
+			// The directory still exists, but was moved outside our watched
+			// folder hierarchy.
+			_RemoveEntriesRecursively(entryDirectory);
+		} else {
+			// Actually, it shouldn't be possible to remove non-empty
+			// folders so for this case we don't need to do anything. We should
+			// have received remove notifications for all affected files and
+			// folders that used to live in this directory.
+		}
+	}
 
 	return B_OK;
 }
@@ -886,6 +901,57 @@ PathHandler::_RemoveFile(BEntry& entry)
 		return status;
 
 	return _RemoveFile(nodeRef);
+}
+
+
+void
+PathHandler::_RemoveEntriesRecursively(BDirectory& directory)
+{
+	node_ref directoryNode;
+	directory.GetNodeRef(&directoryNode);
+
+	BMessage message(B_PATH_MONITOR);
+	message.AddInt32("opcode", B_ENTRY_REMOVED);
+		// TODO: B_ENTRY_MOVED could be regarded as more correct,
+		// but then we would definitely need more information in this
+		// function.
+	message.AddInt32("device", directoryNode.device);
+	message.AddInt64("directory", directoryNode.node);
+	message.AddInt64("node", 0LL);
+		// dummy node, will be replaced by real node
+
+	// NOTE: The _NotifyTarget() gets the node id, but constructs
+	// the path to the previous location of the entry according to the file
+	// or folder in our sets. This makes it more expensive of course, but
+	// I have no inspiration for improvement at the moment.
+
+	BEntry entry;
+	while (directory.GetNextEntry(&entry) == B_OK) {
+		node_ref nodeRef;
+		if (entry.GetNodeRef(&nodeRef) != B_OK) {
+			fprintf(stderr, "PathHandler::_RemoveEntriesRecursively() - "
+				"failed to get node_ref\n");
+			continue;
+		}
+
+		message.ReplaceInt64("node", nodeRef.node);
+
+		if (entry.IsDirectory()) {
+			// notification
+			if (!_WatchFilesOnly())
+				_NotifyTarget(&message, nodeRef);
+
+			_RemoveDirectory(nodeRef, directoryNode.node);
+			BDirectory subDirectory(&entry);
+			_RemoveEntriesRecursively(subDirectory);
+		} else {
+			// notification
+			if (!_WatchFoldersOnly())
+				_NotifyTarget(&message, nodeRef);
+
+			_RemoveFile(nodeRef);
+		}
+	}
 }
 
 
