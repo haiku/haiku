@@ -11,16 +11,6 @@
 #include "paging/X86PagingStructures.h"
 
 
-struct X86PagingStructures32Bit : X86PagingStructures {
-	page_directory_entry*		pgdir_virt;
-
-								X86PagingStructures32Bit();
-	virtual						~X86PagingStructures32Bit();
-
-	virtual	void				Delete();
-};
-
-
 class X86PagingMethod32Bit : public X86PagingMethod {
 public:
 								X86PagingMethod32Bit();

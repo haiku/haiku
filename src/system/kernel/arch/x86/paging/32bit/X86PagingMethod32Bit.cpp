@@ -16,7 +16,6 @@
 #include <AutoDeleter.h>
 
 #include <arch_system_info.h>
-#include <heap.h>
 #include <int.h>
 #include <thread.h>
 #include <slab/Slab.h>
@@ -28,6 +27,7 @@
 #include <vm/VMAddressSpace.h>
 #include <vm/VMCache.h>
 
+#include "paging/32bit/X86PagingStructures32Bit.h"
 #include "paging/32bit/X86VMTranslationMap32Bit.h"
 #include "paging/x86_physical_page_mapper.h"
 #include "paging/x86_physical_page_mapper_large_memory.h"
@@ -56,79 +56,6 @@ static page_directory_entry *sKernelVirtualPageDirectory = NULL;
 
 static X86PhysicalPageMapper* sPhysicalPageMapper;
 static TranslationMapPhysicalPageMapper* sKernelPhysicalPageMapper;
-
-
-// Accessor class to reuse the SinglyLinkedListLink of DeferredDeletable for
-// X86PagingStructures32Bit.
-struct PagingStructuresGetLink {
-private:
-	typedef SinglyLinkedListLink<X86PagingStructures32Bit> Link;
-
-public:
-	inline Link* operator()(X86PagingStructures32Bit* element) const
-	{
-		return (Link*)element->GetSinglyLinkedListLink();
-	}
-
-	inline const Link* operator()(
-		const X86PagingStructures32Bit* element) const
-	{
-		return (const Link*)element->GetSinglyLinkedListLink();
-	}
-};
-
-
-typedef SinglyLinkedList<X86PagingStructures32Bit, PagingStructuresGetLink>
-	PagingStructuresList;
-
-
-static PagingStructuresList sPagingStructuresList;
-static spinlock sPagingStructuresListLock;
-
-
-#define FIRST_USER_PGDIR_ENT    (VADDR_TO_PDENT(USER_BASE))
-#define NUM_USER_PGDIR_ENTS     (VADDR_TO_PDENT(ROUNDUP(USER_SIZE, \
-									B_PAGE_SIZE * 1024)))
-#define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
-#define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
-
-
-X86PagingStructures32Bit::X86PagingStructures32Bit()
-	:
-	pgdir_virt(NULL)
-{
-}
-
-
-X86PagingStructures32Bit::~X86PagingStructures32Bit()
-{
-	// free the page dir
-	free(pgdir_virt);
-}
-
-
-void
-X86PagingStructures32Bit::Delete()
-{
-	// remove from global list
-	InterruptsSpinLocker locker(sPagingStructuresListLock);
-	sPagingStructuresList.Remove(this);
-	locker.Unlock();
-
-#if 0
-	// this sanity check can be enabled when corruption due to
-	// overwriting an active page directory is suspected
-	uint32 activePageDirectory;
-	read_cr3(activePageDirectory);
-	if (activePageDirectory == pgdir_phys)
-		panic("deleting a still active page directory\n");
-#endif
-
-	if (are_interrupts_enabled())
-		delete this;
-	else
-		deferred_delete(this);
-}
 
 
 //	#pragma mark -
@@ -209,22 +136,6 @@ put_page_table_entry_in_pgtable(page_table_entry* entry,
 
 
 //	#pragma mark -
-
-
-void
-x86_update_all_pgdirs(int index, page_directory_entry e)
-{
-	unsigned int state = disable_interrupts();
-
-	acquire_spinlock(&sPagingStructuresListLock);
-
-	PagingStructuresList::Iterator it = sPagingStructuresList.GetIterator();
-	while (X86PagingStructures32Bit* info = it.Next())
-		info->pgdir_virt[index] = e;
-
-	release_spinlock(&sPagingStructuresListLock);
-	restore_interrupts(state);
-}
 
 
 void
@@ -319,8 +230,6 @@ X86VMTranslationMap32Bit::Init(bool kernel)
 	if (fPagingStructures == NULL)
 		return B_NO_MEMORY;
 
-	fPagingStructures->active_on_cpus = 0;
-
 	if (!kernel) {
 		// user
 		// allocate a physical page mapper
@@ -329,46 +238,27 @@ X86VMTranslationMap32Bit::Init(bool kernel)
 		if (error != B_OK)
 			return error;
 
-		// allocate a pgdir
-		fPagingStructures->pgdir_virt = (page_directory_entry *)memalign(
+		// allocate the page directory
+		page_directory_entry* virtualPageDir = (page_directory_entry*)memalign(
 			B_PAGE_SIZE, B_PAGE_SIZE);
-		if (fPagingStructures->pgdir_virt == NULL)
+		if (virtualPageDir == NULL)
 			return B_NO_MEMORY;
 
+		// look up the page directory's physical address
 		phys_addr_t physicalPageDir;
 		vm_get_page_mapping(VMAddressSpace::KernelID(),
-			(addr_t)fPagingStructures->pgdir_virt,
-			&physicalPageDir);
-		fPagingStructures->pgdir_phys = physicalPageDir;
+			(addr_t)virtualPageDir, &physicalPageDir);
+
+		fPagingStructures->Init(virtualPageDir, physicalPageDir,
+			sKernelVirtualPageDirectory);
 	} else {
 		// kernel
 		// get the physical page mapper
 		fPageMapper = sKernelPhysicalPageMapper;
 
 		// we already know the kernel pgdir mapping
-		fPagingStructures->pgdir_virt = sKernelVirtualPageDirectory;
-		fPagingStructures->pgdir_phys = sKernelPhysicalPageDirectory;
-	}
-
-	// zero out the bottom portion of the new pgdir
-	memset(fPagingStructures->pgdir_virt + FIRST_USER_PGDIR_ENT, 0,
-		NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
-
-	// insert this new map into the map list
-	{
-		int state = disable_interrupts();
-		acquire_spinlock(&sPagingStructuresListLock);
-
-		// copy the top portion of the pgdir from the current one
-		memcpy(fPagingStructures->pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
-			sKernelVirtualPageDirectory + FIRST_KERNEL_PGDIR_ENT,
-			NUM_KERNEL_PGDIR_ENTS * sizeof(page_directory_entry));
-
-		sPagingStructuresList.Add(
-			static_cast<X86PagingStructures32Bit*>(fPagingStructures));
-
-		release_spinlock(&sPagingStructuresListLock);
-		restore_interrupts(state);
+		fPagingStructures->Init(sKernelVirtualPageDirectory,
+			sKernelPhysicalPageDirectory, NULL);
 	}
 
 	return B_OK;
@@ -429,8 +319,9 @@ X86VMTranslationMap32Bit::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 
 		// update any other page directories, if it maps kernel space
 		if (index >= FIRST_KERNEL_PGDIR_ENT
-			&& index < (FIRST_KERNEL_PGDIR_ENT + NUM_KERNEL_PGDIR_ENTS))
-			x86_update_all_pgdirs(index, pd[index]);
+			&& index < (FIRST_KERNEL_PGDIR_ENT + NUM_KERNEL_PGDIR_ENTS)) {
+			X86PagingStructures32Bit::UpdateAllPageDirs(index, pd[index]);
+		}
 
 		fMapCount++;
 	}
@@ -1378,7 +1269,7 @@ X86PagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
 		= &map->PagingStructures32Bit()->pgdir_virt[index];
 	x86_put_pgtable_in_pgdir(entry, physicalTable,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	x86_update_all_pgdirs(index, *entry);
+	X86PagingStructures32Bit::UpdateAllPageDirs(index, *entry);
 
 	// init the pool structure
 	pool->Init(dataArea, data, virtualArea, (addr_t)virtualBase);
@@ -1434,8 +1325,7 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 		sKernelVirtualPageDirectory, sKernelPhysicalPageDirectory);
 #endif
 
-	B_INITIALIZE_SPINLOCK(&sPagingStructuresListLock);
-	new (&sPagingStructuresList) PagingStructuresList;
+	X86PagingStructures32Bit::StaticInit();
 
 	// create the initial pool for the physical page mapper
 	PhysicalPageSlotPool* pool

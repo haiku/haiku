@@ -13,6 +13,7 @@
 #include <SupportDefs.h>
 
 #include <int.h>
+#include <kernel.h>
 
 
 #define VADDR_TO_PDENT(va) (((va) / B_PAGE_SIZE) / 1024)
@@ -52,6 +53,12 @@
 #define X86_PTE_MEMORY_TYPE_MASK	(X86_PTE_WRITE_THROUGH \
 										| X86_PTE_CACHING_DISABLED)
 
+#define FIRST_USER_PGDIR_ENT    (VADDR_TO_PDENT(USER_BASE))
+#define NUM_USER_PGDIR_ENTS     (VADDR_TO_PDENT(ROUNDUP(USER_SIZE, \
+									B_PAGE_SIZE * 1024)))
+#define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
+#define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
+
 
 typedef uint32 page_table_entry;
 typedef uint32 page_directory_entry;
@@ -61,7 +68,6 @@ void x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 		size_t size);
 void x86_put_pgtable_in_pgdir(page_directory_entry* entry,
 	phys_addr_t physicalPageTable, uint32 attributes);
-void x86_update_all_pgdirs(int index, page_directory_entry entry);
 
 
 static inline page_table_entry
