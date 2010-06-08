@@ -3,7 +3,7 @@
  *
  * CatalogInAddOn.h not included, as it's only required when building an add-on.
  */
-#include <Catlog.h>
+#include <Catalog.h>
 #include <Collator.h>
 #include <Country.h>
 #include <Currency.h>
