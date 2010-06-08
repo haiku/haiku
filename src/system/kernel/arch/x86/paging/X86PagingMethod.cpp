@@ -7,6 +7,9 @@
 #include "paging/X86PagingMethod.h"
 
 
+X86PagingMethod* gX86PagingMethod;
+
+
 X86PagingMethod::~X86PagingMethod()
 {
 }

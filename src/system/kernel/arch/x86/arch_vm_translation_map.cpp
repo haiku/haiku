@@ -21,7 +21,10 @@
 #endif
 
 
-static X86PagingMethod* sPagingMethod;
+static union {
+	uint64	align;
+	char	thirty_two[sizeof(X86PagingMethod32Bit)];
+} sPagingMethodBuffer;
 
 
 // #pragma mark - VM API
@@ -30,7 +33,7 @@ static X86PagingMethod* sPagingMethod;
 status_t
 arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
 {
-	return sPagingMethod->CreateTranslationMap(kernel, _map);
+	return gX86PagingMethod->CreateTranslationMap(kernel, _map);
 }
 
 
@@ -65,9 +68,9 @@ arch_vm_translation_map_init(kernel_args *args,
 	}
 #endif
 
-	sPagingMethod = X86PagingMethod32Bit::Create();
+	gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod32Bit;
 
-	return sPagingMethod->Init(args, _physicalPageMapper);
+	return gX86PagingMethod->Init(args, _physicalPageMapper);
 }
 
 
@@ -83,7 +86,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 {
 	TRACE("vm_translation_map_init_post_area: entry\n");
 
-	return sPagingMethod->InitPostArea(args);
+	return gX86PagingMethod->InitPostArea(args);
 }
 
 
@@ -93,7 +96,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, phys_addr_t pa,
 {
 	TRACE("early_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
 
-	return sPagingMethod->MapEarly(args, va, pa, attributes, get_free_page);
+	return gX86PagingMethod->MapEarly(args, va, pa, attributes, get_free_page);
 }
 
 
@@ -113,5 +116,5 @@ bool
 arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	uint32 protection)
 {
-	return sPagingMethod->IsKernelPageAccessible(virtualAddress, protection);
+	return gX86PagingMethod->IsKernelPageAccessible(virtualAddress, protection);
 }

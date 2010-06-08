@@ -11,12 +11,14 @@
 #include "paging/X86PagingStructures.h"
 
 
+class TranslationMapPhysicalPageMapper;
+class X86PhysicalPageMapper;
+
+
 class X86PagingMethod32Bit : public X86PagingMethod {
 public:
 								X86PagingMethod32Bit();
 	virtual						~X86PagingMethod32Bit();
-
-	static	X86PagingMethod*	Create();
 
 	virtual	status_t			Init(kernel_args* args,
 									VMPhysicalPageMapper** _physicalPageMapper);
@@ -34,9 +36,40 @@ public:
 	virtual	bool				IsKernelPageAccessible(addr_t virtualAddress,
 									uint32 protection);
 
+	inline	page_table_entry*	PageHole() const
+									{ return fPageHole; }
+	inline	page_directory_entry* PageHolePageDir() const
+									{ return fPageHolePageDir; }
+	inline	uint32				KernelPhysicalPageDirectory() const
+									{ return fKernelPhysicalPageDirectory; }
+	inline	page_directory_entry* KernelVirtualPageDirectory() const
+									{ return fKernelVirtualPageDirectory; }
+	inline	X86PhysicalPageMapper* PhysicalPageMapper() const
+									{ return fPhysicalPageMapper; }
+	inline	TranslationMapPhysicalPageMapper* KernelPhysicalPageMapper() const
+									{ return fKernelPhysicalPageMapper; }
+
+	static	X86PagingMethod32Bit* Method();
+
 private:
 			struct PhysicalPageSlotPool;
+
+private:
+			page_table_entry*	fPageHole;
+			page_directory_entry* fPageHolePageDir;
+			uint32				fKernelPhysicalPageDirectory;
+			page_directory_entry* fKernelVirtualPageDirectory;
+
+			X86PhysicalPageMapper* fPhysicalPageMapper;
+			TranslationMapPhysicalPageMapper* fKernelPhysicalPageMapper;
 };
+
+
+/*static*/ inline X86PagingMethod32Bit*
+X86PagingMethod32Bit::Method()
+{
+	return static_cast<X86PagingMethod32Bit*>(gX86PagingMethod);
+}
 
 
 #endif	// KERNEL_ARCH_X86_PAGING_32_BIT_X86_PAGING_METHOD_32_BIT_H

@@ -38,4 +38,7 @@ public:
 };
 
 
+extern X86PagingMethod* gX86PagingMethod;
+
+
 #endif	// KERNEL_ARCH_X86_PAGING_X86_PAGING_METHOD_H

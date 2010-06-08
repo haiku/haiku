@@ -47,17 +47,6 @@ using X86LargePhysicalPageMapper::PhysicalPageSlot;
 static const size_t kPageTableAlignment = 1024 * B_PAGE_SIZE;
 
 
-static X86PagingMethod32Bit sMethod;
-
-static page_table_entry *sPageHole = NULL;
-static page_directory_entry *sPageHolePageDir = NULL;
-static uint32 sKernelPhysicalPageDirectory = 0;
-static page_directory_entry *sKernelVirtualPageDirectory = NULL;
-
-static X86PhysicalPageMapper* sPhysicalPageMapper;
-static TranslationMapPhysicalPageMapper* sKernelPhysicalPageMapper;
-
-
 //	#pragma mark -
 
 
@@ -65,12 +54,14 @@ static TranslationMapPhysicalPageMapper* sKernelPhysicalPageMapper;
 static status_t
 early_query(addr_t va, phys_addr_t *_physicalAddress)
 {
-	if ((sPageHolePageDir[VADDR_TO_PDENT(va)] & X86_PDE_PRESENT) == 0) {
+	X86PagingMethod32Bit* method = X86PagingMethod32Bit::Method();
+	if ((method->PageHolePageDir()[VADDR_TO_PDENT(va)] & X86_PDE_PRESENT)
+			== 0) {
 		// no pagetable here
 		return B_ERROR;
 	}
 
-	page_table_entry* pentry = sPageHole + va / B_PAGE_SIZE;
+	page_table_entry* pentry = method->PageHole() + va / B_PAGE_SIZE;
 	if ((*pentry & X86_PTE_PRESENT) == 0) {
 		// page mapping not valid
 		return B_ERROR;
@@ -168,11 +159,14 @@ x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 	{
 		addr_t virtualTable = (addr_t)pageTables;
 
+		page_directory_entry* pageHolePageDir
+			= X86PagingMethod32Bit::Method()->PageHolePageDir();
+
 		for (size_t i = 0; i < (size / (B_PAGE_SIZE * 1024));
 				i++, virtualTable += B_PAGE_SIZE) {
 			phys_addr_t physicalTable = 0;
 			early_query(virtualTable, &physicalTable);
-			page_directory_entry* entry = &sPageHolePageDir[
+			page_directory_entry* entry = &pageHolePageDir[
 				(address / (B_PAGE_SIZE * 1024)) + i];
 			x86_put_pgtable_in_pgdir(entry, physicalTable,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -230,10 +224,12 @@ X86VMTranslationMap32Bit::Init(bool kernel)
 	if (fPagingStructures == NULL)
 		return B_NO_MEMORY;
 
+	X86PagingMethod32Bit* method = X86PagingMethod32Bit::Method();
+
 	if (!kernel) {
 		// user
 		// allocate a physical page mapper
-		status_t error = sPhysicalPageMapper
+		status_t error = method->PhysicalPageMapper()
 			->CreateTranslationMapPhysicalPageMapper(&fPageMapper);
 		if (error != B_OK)
 			return error;
@@ -250,15 +246,15 @@ X86VMTranslationMap32Bit::Init(bool kernel)
 			(addr_t)virtualPageDir, &physicalPageDir);
 
 		fPagingStructures->Init(virtualPageDir, physicalPageDir,
-			sKernelVirtualPageDirectory);
+			method->KernelVirtualPageDirectory());
 	} else {
 		// kernel
 		// get the physical page mapper
-		fPageMapper = sKernelPhysicalPageMapper;
+		fPageMapper = method->KernelPhysicalPageMapper();
 
 		// we already know the kernel pgdir mapping
-		fPagingStructures->Init(sKernelVirtualPageDirectory,
-			sKernelPhysicalPageDirectory, NULL);
+		fPagingStructures->Init(method->KernelVirtualPageDirectory(),
+			method->KernelPhysicalPageDirectory(), NULL);
 	}
 
 	return B_OK;
@@ -813,8 +809,8 @@ X86VMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 	}
 
 	// map page table entry
-	page_table_entry* pt
-		= (page_table_entry*)sPhysicalPageMapper->InterruptGetPageTableAt(
+	page_table_entry* pt = (page_table_entry*)X86PagingMethod32Bit::Method()
+		->PhysicalPageMapper()->InterruptGetPageTableAt(
 			pd[index] & X86_PDE_ADDRESS_MASK);
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
@@ -1283,19 +1279,19 @@ X86PagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
 
 
 X86PagingMethod32Bit::X86PagingMethod32Bit()
+	:
+	fPageHole(NULL),
+	fPageHolePageDir(NULL),
+	fKernelPhysicalPageDirectory(0),
+	fKernelVirtualPageDirectory(NULL),
+	fPhysicalPageMapper(NULL),
+	fKernelPhysicalPageMapper(NULL)
 {
 }
 
 
 X86PagingMethod32Bit::~X86PagingMethod32Bit()
 {
-}
-
-
-/*static*/ X86PagingMethod*
-X86PagingMethod32Bit::Create()
-{
-	return new(&sMethod) X86PagingMethod32Bit;
 }
 
 
@@ -1306,23 +1302,23 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 	TRACE("vm_translation_map_init: entry\n");
 
 	// page hole set up in stage2
-	sPageHole = (page_table_entry *)args->arch_args.page_hole;
+	fPageHole = (page_table_entry*)args->arch_args.page_hole;
 	// calculate where the pgdir would be
-	sPageHolePageDir = (page_directory_entry*)
+	fPageHolePageDir = (page_directory_entry*)
 		(((addr_t)args->arch_args.page_hole)
 			+ (B_PAGE_SIZE * 1024 - B_PAGE_SIZE));
 	// clear out the bottom 2 GB, unmap everything
-	memset(sPageHolePageDir + FIRST_USER_PGDIR_ENT, 0,
+	memset(fPageHolePageDir + FIRST_USER_PGDIR_ENT, 0,
 		sizeof(page_directory_entry) * NUM_USER_PGDIR_ENTS);
 
-	sKernelPhysicalPageDirectory = args->arch_args.phys_pgdir;
-	sKernelVirtualPageDirectory = (page_directory_entry*)
+	fKernelPhysicalPageDirectory = args->arch_args.phys_pgdir;
+	fKernelVirtualPageDirectory = (page_directory_entry*)
 		args->arch_args.vir_pgdir;
 
 #ifdef TRACE_X86_PAGING_METHOD_32_BIT
-	TRACE("page hole: %p, page dir: %p\n", sPageHole, sPageHolePageDir);
+	TRACE("page hole: %p, page dir: %p\n", fPageHole, fPageHolePageDir);
 	TRACE("page dir: %p (physical: %#" B_PRIx32 ")\n",
-		sKernelVirtualPageDirectory, sKernelPhysicalPageDirectory);
+		fKernelVirtualPageDirectory, fKernelPhysicalPageDirectory);
 #endif
 
 	X86PagingStructures32Bit::StaticInit();
@@ -1339,8 +1335,8 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 	}
 
 	// create physical page mapper
-	large_memory_physical_page_ops_init(args, pool, sPhysicalPageMapper,
-		sKernelPhysicalPageMapper);
+	large_memory_physical_page_ops_init(args, pool, fPhysicalPageMapper,
+		fKernelPhysicalPageMapper);
 		// TODO: Select the best page mapper!
 
 	// enable global page feature if available
@@ -1352,7 +1348,7 @@ X86PagingMethod32Bit::Init(kernel_args* args,
 
 	TRACE("vm_translation_map_init: done\n");
 
-	*_physicalPageMapper = sPhysicalPageMapper;
+	*_physicalPageMapper = fPhysicalPageMapper;
 	return B_OK;
 }
 
@@ -1367,11 +1363,11 @@ X86PagingMethod32Bit::InitPostArea(kernel_args* args)
 	area_id area;
 
 	// unmap the page hole hack we were using before
-	sKernelVirtualPageDirectory[1023] = 0;
-	sPageHolePageDir = NULL;
-	sPageHole = NULL;
+	fKernelVirtualPageDirectory[1023] = 0;
+	fPageHolePageDir = NULL;
+	fPageHole = NULL;
 
-	temp = (void *)sKernelVirtualPageDirectory;
+	temp = (void*)fKernelVirtualPageDirectory;
 	area = create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, B_PAGE_SIZE,
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (area < B_OK)
@@ -1418,7 +1414,7 @@ X86PagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 
 	// check to see if a page table exists for this range
 	int index = VADDR_TO_PDENT(virtualAddress);
-	if ((sPageHolePageDir[index] & X86_PDE_PRESENT) == 0) {
+	if ((fPageHolePageDir[index] & X86_PDE_PRESENT) == 0) {
 		phys_addr_t pgtable;
 		page_directory_entry *e;
 		// we need to allocate a pgtable
@@ -1430,23 +1426,23 @@ X86PagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 			"pgtable. %#" B_PRIxPHYSADDR "\n", pgtable);
 
 		// put it in the pgdir
-		e = &sPageHolePageDir[index];
+		e = &fPageHolePageDir[index];
 		x86_put_pgtable_in_pgdir(e, pgtable, attributes);
 
 		// zero it out in it's new mapping
-		memset((unsigned int*)((addr_t)sPageHole
+		memset((unsigned int*)((addr_t)fPageHole
 				+ (virtualAddress / B_PAGE_SIZE / 1024) * B_PAGE_SIZE),
 			0, B_PAGE_SIZE);
 	}
 
 	ASSERT_PRINT(
-		(sPageHole[virtualAddress / B_PAGE_SIZE] & X86_PTE_PRESENT) == 0,
+		(fPageHole[virtualAddress / B_PAGE_SIZE] & X86_PTE_PRESENT) == 0,
 		"virtual address: %#" B_PRIxADDR ", pde: %#" B_PRIx32
-		", existing pte: %#" B_PRIx32, virtualAddress, sPageHolePageDir[index],
-		sPageHole[virtualAddress / B_PAGE_SIZE]);
+		", existing pte: %#" B_PRIx32, virtualAddress, fPageHolePageDir[index],
+		fPageHole[virtualAddress / B_PAGE_SIZE]);
 
 	// now, fill in the pentry
-	put_page_table_entry_in_pgtable(sPageHole + virtualAddress / B_PAGE_SIZE,
+	put_page_table_entry_in_pgtable(fPageHole + virtualAddress / B_PAGE_SIZE,
 		physicalAddress, attributes, 0, IS_KERNEL_ADDRESS(virtualAddress));
 
 	return B_OK;
@@ -1461,25 +1457,24 @@ X86PagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 	// Always set it to make sure the TLBs don't contain obsolete data.
 	uint32 physicalPageDirectory;
 	read_cr3(physicalPageDirectory);
-	write_cr3(sKernelPhysicalPageDirectory);
+	write_cr3(fKernelPhysicalPageDirectory);
 
 	// get the page directory entry for the address
 	page_directory_entry pageDirectoryEntry;
 	uint32 index = VADDR_TO_PDENT(virtualAddress);
 
-	if (physicalPageDirectory == sKernelPhysicalPageDirectory) {
-		pageDirectoryEntry = sKernelVirtualPageDirectory[index];
-	} else if (sPhysicalPageMapper != NULL) {
+	if (physicalPageDirectory == fKernelPhysicalPageDirectory) {
+		pageDirectoryEntry = fKernelVirtualPageDirectory[index];
+	} else if (fPhysicalPageMapper != NULL) {
 		// map the original page directory and get the entry
 		void* handle;
 		addr_t virtualPageDirectory;
-		status_t error = sPhysicalPageMapper->GetPageDebug(
+		status_t error = fPhysicalPageMapper->GetPageDebug(
 			physicalPageDirectory, &virtualPageDirectory, &handle);
 		if (error == B_OK) {
 			pageDirectoryEntry
 				= ((page_directory_entry*)virtualPageDirectory)[index];
-			sPhysicalPageMapper->PutPageDebug(virtualPageDirectory,
-				handle);
+			fPhysicalPageMapper->PutPageDebug(virtualPageDirectory, handle);
 		} else
 			pageDirectoryEntry = 0;
 	} else
@@ -1490,22 +1485,22 @@ X86PagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 	index = VADDR_TO_PTENT(virtualAddress);
 
 	if ((pageDirectoryEntry & X86_PDE_PRESENT) != 0
-			&& sPhysicalPageMapper != NULL) {
+			&& fPhysicalPageMapper != NULL) {
 		void* handle;
 		addr_t virtualPageTable;
-		status_t error = sPhysicalPageMapper->GetPageDebug(
+		status_t error = fPhysicalPageMapper->GetPageDebug(
 			pageDirectoryEntry & X86_PDE_ADDRESS_MASK, &virtualPageTable,
 			&handle);
 		if (error == B_OK) {
 			pageTableEntry = ((page_table_entry*)virtualPageTable)[index];
-			sPhysicalPageMapper->PutPageDebug(virtualPageTable, handle);
+			fPhysicalPageMapper->PutPageDebug(virtualPageTable, handle);
 		} else
 			pageTableEntry = 0;
 	} else
 		pageTableEntry = 0;
 
 	// switch back to the original page directory
-	if (physicalPageDirectory != sKernelPhysicalPageDirectory)
+	if (physicalPageDirectory != fKernelPhysicalPageDirectory)
 		write_cr3(physicalPageDirectory);
 
 	if ((pageTableEntry & X86_PTE_PRESENT) == 0)
