@@ -4,7 +4,7 @@
  */
 
 
-#include "X86PagingMethod.h"
+#include "paging/X86PagingMethod.h"
 
 
 X86PagingMethod::~X86PagingMethod()

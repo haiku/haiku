@@ -2,13 +2,13 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef KERNEL_ARCH_X86_X86_PAGING_METHOD_32_BIT_H
-#define KERNEL_ARCH_X86_X86_PAGING_METHOD_32_BIT_H
+#ifndef KERNEL_ARCH_X86_PAGING_32_BIT_X86_PAGING_METHOD_32_BIT_H
+#define KERNEL_ARCH_X86_PAGING_32_BIT_X86_PAGING_METHOD_32_BIT_H
 
 
-#include "x86_paging.h"
-#include "X86PagingMethod.h"
-#include "X86PagingStructures.h"
+#include "paging/32bit/paging.h"
+#include "paging/X86PagingMethod.h"
+#include "paging/X86PagingStructures.h"
 
 
 struct X86PagingStructures32Bit : X86PagingStructures {
@@ -49,4 +49,4 @@ private:
 };
 
 
-#endif	// KERNEL_ARCH_X86_X86_PAGING_METHOD_32_BIT_H
+#endif	// KERNEL_ARCH_X86_PAGING_32_BIT_X86_PAGING_METHOD_32_BIT_H

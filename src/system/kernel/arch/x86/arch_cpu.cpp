@@ -30,8 +30,8 @@
 #include <boot/kernel_args.h>
 
 #include "interrupts.h"
-#include "X86PagingStructures.h"
-#include "X86VMTranslationMap.h"
+#include "paging/X86PagingStructures.h"
+#include "paging/X86VMTranslationMap.h"
 
 
 #define DUMP_FEATURE_STRING 1

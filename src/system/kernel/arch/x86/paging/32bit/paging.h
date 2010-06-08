@@ -6,8 +6,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_ARCH_X86_PAGING_H
-#define _KERNEL_ARCH_X86_PAGING_H
+#ifndef _KERNEL_ARCH_X86_PAGING_32_BIT_PAGING_H
+#define _KERNEL_ARCH_X86_PAGING_32_BIT_PAGING_H
 
 
 #include <SupportDefs.h>
@@ -17,9 +17,6 @@
 
 #define VADDR_TO_PDENT(va) (((va) / B_PAGE_SIZE) / 1024)
 #define VADDR_TO_PTENT(va) (((va) / B_PAGE_SIZE) % 1024)
-
-
-class TranslationMapPhysicalPageMapper;
 
 
 // page directory entry bits
@@ -103,4 +100,4 @@ set_page_table_entry_flags(page_table_entry* entry, uint32 flags)
 }
 
 
-#endif	// _KERNEL_ARCH_X86_PAGING_H
+#endif	// _KERNEL_ARCH_X86_PAGING_32_BIT_PAGING_H

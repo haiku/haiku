@@ -2,8 +2,8 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef KERNEL_ARCH_X86_X86_PAGING_METHOD_H
-#define KERNEL_ARCH_X86_X86_PAGING_METHOD_H
+#ifndef KERNEL_ARCH_X86_PAGING_X86_PAGING_METHOD_H
+#define KERNEL_ARCH_X86_PAGING_X86_PAGING_METHOD_H
 
 
 #include <SupportDefs.h>
@@ -38,4 +38,4 @@ public:
 };
 
 
-#endif	// KERNEL_ARCH_X86_X86_PAGING_METHOD_H
+#endif	// KERNEL_ARCH_X86_PAGING_X86_PAGING_METHOD_H

@@ -2,11 +2,11 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef KERNEL_ARCH_X86_X86_VM_TRANSLATION_MAP_32_BIT_H
-#define KERNEL_ARCH_X86_X86_VM_TRANSLATION_MAP_32_BIT_H
+#ifndef KERNEL_ARCH_X86_PAGING_32_BIT_X86_VM_TRANSLATION_MAP_32_BIT_H
+#define KERNEL_ARCH_X86_PAGING_32_BIT_X86_VM_TRANSLATION_MAP_32_BIT_H
 
 
-#include "X86VMTranslationMap.h"
+#include "paging/X86VMTranslationMap.h"
 
 
 struct X86PagingStructures32Bit;
@@ -62,4 +62,4 @@ private:
 };
 
 
-#endif	// KERNEL_ARCH_X86_X86_VM_TRANSLATION_MAP_32_BIT_H
+#endif	// KERNEL_ARCH_X86_PAGING_32_BIT_X86_VM_TRANSLATION_MAP_32_BIT_H

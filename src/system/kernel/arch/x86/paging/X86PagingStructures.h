@@ -6,8 +6,8 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef KERNEL_ARCH_X86_PAGING_STRUCTURES_H
-#define KERNEL_ARCH_X86_PAGING_STRUCTURES_H
+#ifndef KERNEL_ARCH_X86_PAGING_X86_PAGING_STRUCTURES_H
+#define KERNEL_ARCH_X86_PAGING_X86_PAGING_STRUCTURES_H
 
 
 #include <SupportDefs.h>
@@ -46,4 +46,4 @@ X86PagingStructures::RemoveReference()
 }
 
 
-#endif	// KERNEL_ARCH_X86_PAGING_STRUCTURES_H
+#endif	// KERNEL_ARCH_X86_PAGING_X86_PAGING_STRUCTURES_H

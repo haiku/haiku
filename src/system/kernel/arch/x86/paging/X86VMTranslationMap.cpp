@@ -8,12 +8,12 @@
  */
 
 
-#include "X86VMTranslationMap.h"
+#include "paging/X86VMTranslationMap.h"
 
 #include <thread.h>
 #include <smp.h>
 
-#include "X86PagingStructures.h"
+#include "paging/X86PagingStructures.h"
 
 
 //#define TRACE_X86_VM_TRANSLATION_MAP

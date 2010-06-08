@@ -4,7 +4,7 @@
  */
 
 
-#include "X86PagingStructures.h"
+#include "paging/X86PagingStructures.h"
 
 
 X86PagingStructures::X86PagingStructures()

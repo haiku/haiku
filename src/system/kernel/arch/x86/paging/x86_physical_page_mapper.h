@@ -2,8 +2,8 @@
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _KERNEL_ARCH_X86_PHYSICAL_PAGE_MAPPER_H
-#define _KERNEL_ARCH_X86_PHYSICAL_PAGE_MAPPER_H
+#ifndef KERNEL_ARCH_X86_PAGING_X86_PHYSICAL_PAGE_MAPPER_H
+#define KERNEL_ARCH_X86_PAGING_X86_PHYSICAL_PAGE_MAPPER_H
 
 
 #include <vm/VMTranslationMap.h>
@@ -37,4 +37,4 @@ public:
 };
 
 
-#endif	// _KERNEL_ARCH_X86_PHYSICAL_PAGE_MAPPER_H
+#endif	// KERNEL_ARCH_X86_PAGING_X86_PHYSICAL_PAGE_MAPPER_H

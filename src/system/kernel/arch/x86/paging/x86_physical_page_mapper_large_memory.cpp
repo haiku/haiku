@@ -23,7 +23,7 @@
 */
 
 
-#include "x86_physical_page_mapper_large_memory.h"
+#include "paging/x86_physical_page_mapper_large_memory.h"
 
 #include <new>
 
@@ -37,9 +37,9 @@
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
-#include "x86_physical_page_mapper.h"
-#include "X86PagingStructures.h"
-#include "X86VMTranslationMap.h"
+#include "paging/x86_physical_page_mapper.h"
+#include "paging/X86PagingStructures.h"
+#include "paging/X86VMTranslationMap.h"
 
 
 // The number of slots we reserve per translation map from mapping page tables.

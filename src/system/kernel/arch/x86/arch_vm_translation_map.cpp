@@ -10,7 +10,7 @@
 
 #include <arch/vm_translation_map.h>
 
-#include "X86PagingMethod32Bit.h"
+#include "paging/32bit/X86PagingMethod32Bit.h"
 
 
 //#define TRACE_VM_TMAP

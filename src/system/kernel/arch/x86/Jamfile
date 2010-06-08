@@ -8,7 +8,10 @@ SubDirHdrs $(SUBDIR) timers ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
+
 
 KernelMergeObject kernel_arch_x86.o :
 	arch_commpage.cpp
@@ -37,13 +40,17 @@ KernelMergeObject kernel_arch_x86.o :
 	msi.cpp
 	syscall.S
 	vm86.cpp
+
+	# paging
 	x86_physical_page_mapper.cpp
 	x86_physical_page_mapper_large_memory.cpp
 	x86_syscalls.cpp
 	X86PagingMethod.cpp
-	X86PagingMethod32Bit.cpp
 	X86PagingStructures.cpp
 	X86VMTranslationMap.cpp
+
+	# paging/32bit
+	X86PagingMethod32Bit.cpp
 
 	x86_apic.cpp
 	x86_hpet.cpp

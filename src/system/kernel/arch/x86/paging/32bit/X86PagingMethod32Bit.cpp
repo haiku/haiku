@@ -8,7 +8,7 @@
  */
 
 
-#include "X86PagingMethod32Bit.h"
+#include "paging/32bit/X86PagingMethod32Bit.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -28,9 +28,9 @@
 #include <vm/VMAddressSpace.h>
 #include <vm/VMCache.h>
 
-#include "x86_physical_page_mapper.h"
-#include "x86_physical_page_mapper_large_memory.h"
-#include "X86VMTranslationMap32Bit.h"
+#include "paging/32bit/X86VMTranslationMap32Bit.h"
+#include "paging/x86_physical_page_mapper.h"
+#include "paging/x86_physical_page_mapper_large_memory.h"
 
 
 //#define TRACE_X86_PAGING_METHOD_32_BIT

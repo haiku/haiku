@@ -2,8 +2,8 @@
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-#ifndef KERNEL_ARCH_X86_X86_PHYSICAL_PAGE_MAPPER_LARGE_MEMORY_H
-#define KERNEL_ARCH_X86_X86_PHYSICAL_PAGE_MAPPER_LARGE_MEMORY_H
+#ifndef KERNEL_ARCH_X86_PAGING_X86_PHYSICAL_PAGE_MAPPER_LARGE_MEMORY_H
+#define KERNEL_ARCH_X86_PAGING_X86_PHYSICAL_PAGE_MAPPER_LARGE_MEMORY_H
 
 
 #include <OS.h>
@@ -58,4 +58,4 @@ status_t large_memory_physical_page_ops_init(kernel_args* args,
 	TranslationMapPhysicalPageMapper*& _kernelPageMapper);
 
 
-#endif	// KERNEL_ARCH_X86_X86_PHYSICAL_PAGE_MAPPER_LARGE_MEMORY_H
+#endif	// KERNEL_ARCH_X86_PAGING_X86_PHYSICAL_PAGE_MAPPER_LARGE_MEMORY_H
