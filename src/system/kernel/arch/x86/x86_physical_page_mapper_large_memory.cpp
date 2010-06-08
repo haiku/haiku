@@ -37,8 +37,8 @@
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
-#include "x86_paging.h"
 #include "x86_physical_page_mapper.h"
+#include "X86PagingStructures.h"
 #include "X86VMTranslationMap.h"
 
 

@@ -8,9 +8,12 @@
 
 #include "x86_paging.h"
 #include "X86PagingMethod.h"
+#include "X86PagingStructures.h"
 
 
 struct X86PagingStructures32Bit : X86PagingStructures {
+	page_directory_entry*		pgdir_virt;
+
 								X86PagingStructures32Bit();
 	virtual						~X86PagingStructures32Bit();
 

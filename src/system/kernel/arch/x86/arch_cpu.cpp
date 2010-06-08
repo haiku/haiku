@@ -30,7 +30,7 @@
 #include <boot/kernel_args.h>
 
 #include "interrupts.h"
-#include "x86_paging.h"
+#include "X86PagingStructures.h"
 #include "X86VMTranslationMap.h"
 
 

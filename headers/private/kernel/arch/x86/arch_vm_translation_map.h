@@ -5,13 +5,5 @@
 #ifndef _KERNEL_ARCH_x86_VM_TRANSLATION_MAP_H
 #define _KERNEL_ARCH_x86_VM_TRANSLATION_MAP_H
 
-#include <arch/vm_translation_map.h>
-
-
-// quick function to return the physical pgdir of a mapping, needed for a context switch
-#ifdef __cplusplus
-extern "C"
-#endif
-uint32 i386_translation_map_get_pgdir(VMTranslationMap *map);
 
 #endif /* _KERNEL_ARCH_x86_VM_TRANSLATION_MAP_H */

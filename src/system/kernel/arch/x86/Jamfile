@@ -42,6 +42,8 @@ KernelMergeObject kernel_arch_x86.o :
 	x86_syscalls.cpp
 	X86PagingMethod.cpp
 	X86PagingMethod32Bit.cpp
+	X86PagingStructures.cpp
+	X86VMTranslationMap.cpp
 
 	x86_apic.cpp
 	x86_hpet.cpp

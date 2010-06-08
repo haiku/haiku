@@ -30,7 +30,7 @@
 
 #include "x86_physical_page_mapper.h"
 #include "x86_physical_page_mapper_large_memory.h"
-#include "X86VMTranslationMap.h"
+#include "X86VMTranslationMap32Bit.h"
 
 
 //#define TRACE_X86_PAGING_METHOD_32_BIT
@@ -91,17 +91,19 @@ static spinlock sPagingStructuresListLock;
 									B_PAGE_SIZE * 1024)))
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
-#define IS_KERNEL_MAP(map)		(fPagingStructures->pgdir_phys \
-									== sKernelPhysicalPageDirectory)
 
 
 X86PagingStructures32Bit::X86PagingStructures32Bit()
+	:
+	pgdir_virt(NULL)
 {
 }
 
 
 X86PagingStructures32Bit::~X86PagingStructures32Bit()
 {
+	// free the page dir
+	free(pgdir_virt);
 }
 
 
@@ -209,13 +211,6 @@ put_page_table_entry_in_pgtable(page_table_entry* entry,
 //	#pragma mark -
 
 
-uint32
-i386_translation_map_get_pgdir(VMTranslationMap* map)
-{
-	return static_cast<X86VMTranslationMap*>(map)->PhysicalPageDir();
-}
-
-
 void
 x86_update_all_pgdirs(int index, page_directory_entry e)
 {
@@ -278,16 +273,14 @@ x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 // #pragma mark - VM ops
 
 
-X86VMTranslationMap::X86VMTranslationMap()
+X86VMTranslationMap32Bit::X86VMTranslationMap32Bit()
 	:
-	fPagingStructures(NULL),
-	fPageMapper(NULL),
-	fInvalidPagesCount(0)
+	fPagingStructures(NULL)
 {
 }
 
 
-X86VMTranslationMap::~X86VMTranslationMap()
+X86VMTranslationMap32Bit::~X86VMTranslationMap32Bit()
 {
 	if (fPagingStructures == NULL)
 		return;
@@ -316,9 +309,11 @@ X86VMTranslationMap::~X86VMTranslationMap()
 
 
 status_t
-X86VMTranslationMap::Init(bool kernel)
+X86VMTranslationMap32Bit::Init(bool kernel)
 {
-	TRACE("X86VMTranslationMap::Init()\n");
+	TRACE("X86VMTranslationMap32Bit::Init()\n");
+
+	X86VMTranslationMap::Init(kernel);
 
 	fPagingStructures = new(std::nothrow) X86PagingStructures32Bit;
 	if (fPagingStructures == NULL)
@@ -380,45 +375,8 @@ X86VMTranslationMap::Init(bool kernel)
 }
 
 
-/*!	Acquires the map's recursive lock, and resets the invalidate pages counter
-	in case it's the first locking recursion.
-*/
-bool
-X86VMTranslationMap::Lock()
-{
-	TRACE("%p->X86VMTranslationMap::Lock()\n", this);
-
-	recursive_lock_lock(&fLock);
-	if (recursive_lock_get_recursion(&fLock) == 1) {
-		// we were the first one to grab the lock
-		TRACE("clearing invalidated page count\n");
-		fInvalidPagesCount = 0;
-	}
-
-	return true;
-}
-
-
-/*!	Unlocks the map, and, if we are actually losing the recursive lock,
-	flush all pending changes of this map (ie. flush TLB caches as
-	needed).
-*/
-void
-X86VMTranslationMap::Unlock()
-{
-	TRACE("%p->X86VMTranslationMap::Unlock()\n", this);
-
-	if (recursive_lock_get_recursion(&fLock) == 1) {
-		// we're about to release it for the last time
-		X86VMTranslationMap::Flush();
-	}
-
-	recursive_lock_unlock(&fLock);
-}
-
-
 size_t
-X86VMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
+X86VMTranslationMap32Bit::MaxPagesNeededToMap(addr_t start, addr_t end) const
 {
 	// If start == 0, the actual base address is not yet known to the caller and
 	// we shall assume the worst case.
@@ -433,7 +391,7 @@ X86VMTranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 
 
 status_t
-X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
+X86VMTranslationMap32Bit::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 	uint32 memoryType, vm_page_reservation* reservation)
 {
 	TRACE("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
@@ -490,7 +448,7 @@ X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 		pt[index]);
 
 	put_page_table_entry_in_pgtable(&pt[index], pa, attributes, memoryType,
-		IS_KERNEL_MAP(map));
+		fIsKernelMap);
 
 	pinner.Unlock();
 
@@ -504,7 +462,7 @@ X86VMTranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 
 
 status_t
-X86VMTranslationMap::Unmap(addr_t start, addr_t end)
+X86VMTranslationMap32Bit::Unmap(addr_t start, addr_t end)
 {
 	page_directory_entry *pd = fPagingStructures->pgdir_virt;
 
@@ -566,14 +524,14 @@ restart:
 	This object shouldn't be locked.
 */
 status_t
-X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
+X86VMTranslationMap32Bit::UnmapPage(VMArea* area, addr_t address,
 	bool updatePageQueue)
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
 	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
-	TRACE("X86VMTranslationMap::UnmapPage(%#" B_PRIxADDR ")\n", address);
+	TRACE("X86VMTranslationMap32Bit::UnmapPage(%#" B_PRIxADDR ")\n", address);
 
 	RecursiveLocker locker(fLock);
 
@@ -678,7 +636,7 @@ X86VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 
 void
-X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
+X86VMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 	bool updatePageQueue)
 {
 	page_directory_entry* pd = fPagingStructures->pgdir_virt;
@@ -686,7 +644,7 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 	addr_t start = base;
 	addr_t end = base + size;
 
-	TRACE("X86VMTranslationMap::UnmapPages(%p, %#" B_PRIxADDR ", %#"
+	TRACE("X86VMTranslationMap32Bit::UnmapPages(%p, %#" B_PRIxADDR ", %#"
 		B_PRIxADDR ")\n", area, start, end);
 
 	VMAreaMappings queue;
@@ -801,11 +759,12 @@ X86VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 
 
 void
-X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
+X86VMTranslationMap32Bit::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	bool ignoreTopCachePageFlags)
 {
 	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
-		X86VMTranslationMap::UnmapPages(area, area->Base(), area->Size(), true);
+		X86VMTranslationMap32Bit::UnmapPages(area, area->Base(), area->Size(),
+			true);
 		return;
 	}
 
@@ -905,7 +864,8 @@ X86VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 
 
 status_t
-X86VMTranslationMap::Query(addr_t va, phys_addr_t *_physical, uint32 *_flags)
+X86VMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
+	uint32 *_flags)
 {
 	// default the flags to not present
 	*_flags = 0;
@@ -948,7 +908,7 @@ X86VMTranslationMap::Query(addr_t va, phys_addr_t *_physical, uint32 *_flags)
 
 
 status_t
-X86VMTranslationMap::QueryInterrupt(addr_t va, phys_addr_t *_physical,
+X86VMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 	uint32 *_flags)
 {
 	*_flags = 0;
@@ -985,15 +945,8 @@ X86VMTranslationMap::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 }
 
 
-addr_t
-X86VMTranslationMap::MappedSize() const
-{
-	return fMapCount;
-}
-
-
 status_t
-X86VMTranslationMap::Protect(addr_t start, addr_t end, uint32 attributes,
+X86VMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 	uint32 memoryType)
 {
 	page_directory_entry *pd = fPagingStructures->pgdir_virt;
@@ -1072,7 +1025,7 @@ restart:
 
 
 status_t
-X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
+X86VMTranslationMap32Bit::ClearFlags(addr_t va, uint32 flags)
 {
 	int index = VADDR_TO_PDENT(va);
 	page_directory_entry* pd = fPagingStructures->pgdir_virt;
@@ -1109,15 +1062,15 @@ X86VMTranslationMap::ClearFlags(addr_t va, uint32 flags)
 
 
 bool
-X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
+X86VMTranslationMap32Bit::ClearAccessedAndModified(VMArea* area, addr_t address,
 	bool unmapIfUnaccessed, bool& _modified)
 {
 	ASSERT(address % B_PAGE_SIZE == 0);
 
 	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
-	TRACE("X86VMTranslationMap::ClearAccessedAndModified(%#" B_PRIxADDR ")\n",
-		address);
+	TRACE("X86VMTranslationMap32Bit::ClearAccessedAndModified(%#" B_PRIxADDR
+		")\n", address);
 
 	RecursiveLocker locker(fLock);
 
@@ -1228,61 +1181,10 @@ X86VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 }
 
 
-void
-X86VMTranslationMap::Flush()
+X86PagingStructures*
+X86VMTranslationMap32Bit::PagingStructures() const
 {
-	if (fInvalidPagesCount <= 0)
-		return;
-
-	struct thread* thread = thread_get_current_thread();
-	thread_pin_to_current_cpu(thread);
-
-	if (fInvalidPagesCount > PAGE_INVALIDATE_CACHE_SIZE) {
-		// invalidate all pages
-		TRACE("flush_tmap: %d pages to invalidate, invalidate all\n",
-			fInvalidPagesCount);
-
-		if (IS_KERNEL_MAP(map)) {
-			arch_cpu_global_TLB_invalidate();
-			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0,
-				NULL, SMP_MSG_FLAG_SYNC);
-		} else {
-			cpu_status state = disable_interrupts();
-			arch_cpu_user_TLB_invalidate();
-			restore_interrupts(state);
-
-			int cpu = smp_get_current_cpu();
-			uint32 cpuMask = fPagingStructures->active_on_cpus
-				& ~((uint32)1 << cpu);
-			if (cpuMask != 0) {
-				smp_send_multicast_ici(cpuMask, SMP_MSG_USER_INVALIDATE_PAGES,
-					0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
-			}
-		}
-	} else {
-		TRACE("flush_tmap: %d pages to invalidate, invalidate list\n",
-			fInvalidPagesCount);
-
-		arch_cpu_invalidate_TLB_list(fInvalidPages, fInvalidPagesCount);
-
-		if (IS_KERNEL_MAP(map)) {
-			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
-				(uint32)fInvalidPages, fInvalidPagesCount, 0, NULL,
-				SMP_MSG_FLAG_SYNC);
-		} else {
-			int cpu = smp_get_current_cpu();
-			uint32 cpuMask = fPagingStructures->active_on_cpus
-				& ~((uint32)1 << cpu);
-			if (cpuMask != 0) {
-				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
-					(uint32)fInvalidPages, fInvalidPagesCount, 0, NULL,
-					SMP_MSG_FLAG_SYNC);
-			}
-		}
-	}
-	fInvalidPagesCount = 0;
-
-	thread_unpin_from_current_cpu(thread);
+	return fPagingStructures;
 }
 
 
@@ -1463,7 +1365,7 @@ X86PagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
 
 	// get the page table's physical address
 	phys_addr_t physicalTable;
-	X86VMTranslationMap* map = static_cast<X86VMTranslationMap*>(
+	X86VMTranslationMap32Bit* map = static_cast<X86VMTranslationMap32Bit*>(
 		VMAddressSpace::Kernel()->TranslationMap());
 	uint32 dummyFlags;
 	cpu_status state = disable_interrupts();
@@ -1472,7 +1374,8 @@ X86PagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
 
 	// put the page table into the page directory
 	int32 index = (addr_t)virtualBase / (B_PAGE_SIZE * 1024);
-	page_directory_entry* entry = &map->PagingStructures()->pgdir_virt[index];
+	page_directory_entry* entry
+		= &map->PagingStructures32Bit()->pgdir_virt[index];
 	x86_put_pgtable_in_pgdir(entry, physicalTable,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	x86_update_all_pgdirs(index, *entry);
@@ -1596,7 +1499,7 @@ X86PagingMethod32Bit::InitPostArea(kernel_args* args)
 status_t
 X86PagingMethod32Bit::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 {
-	X86VMTranslationMap* map = new(std::nothrow) X86VMTranslationMap;
+	X86VMTranslationMap32Bit* map = new(std::nothrow) X86VMTranslationMap32Bit;
 	if (map == NULL)
 		return B_NO_MEMORY;
 

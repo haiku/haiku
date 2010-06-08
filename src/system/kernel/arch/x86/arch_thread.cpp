@@ -25,8 +25,8 @@
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 
-#include "x86_paging.h"
 #include "x86_syscalls.h"
+#include "X86PagingStructures.h"
 #include "X86VMTranslationMap.h"
 
 
@@ -201,7 +201,8 @@ x86_next_page_directory(struct thread *from, struct thread *to)
 	if (toAddressSpace == NULL)
 		toAddressSpace = VMAddressSpace::Kernel();
 
-	return i386_translation_map_get_pgdir(toAddressSpace->TranslationMap());
+	return static_cast<X86VMTranslationMap*>(toAddressSpace->TranslationMap())
+		->PagingStructures()->pgdir_phys;
 }
 
 

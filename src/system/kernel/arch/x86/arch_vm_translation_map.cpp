@@ -24,24 +24,6 @@
 static X86PagingMethod* sPagingMethod;
 
 
-// #pragma mark - X86PagingStructures
-
-
-X86PagingStructures::X86PagingStructures()
-	:
-	pgdir_virt(NULL),
-	ref_count(1)
-{
-}
-
-
-X86PagingStructures::~X86PagingStructures()
-{
-	// free the page dir
-	free(pgdir_virt);
-}
-
-
 // #pragma mark - VM API
 
 

@@ -12,7 +12,6 @@
 
 #include <SupportDefs.h>
 
-#include <heap.h>
 #include <int.h>
 
 
@@ -61,23 +60,6 @@ typedef uint32 page_table_entry;
 typedef uint32 page_directory_entry;
 
 
-struct X86PagingStructures : DeferredDeletable {
-	page_directory_entry*		pgdir_virt;
-	uint32						pgdir_phys;
-	vint32						ref_count;
-	vint32						active_on_cpus;
-		// mask indicating on which CPUs the map is currently used
-
-								X86PagingStructures();
-	virtual						~X86PagingStructures();
-
-	inline	void				AddReference();
-	inline	void				RemoveReference();
-
-	virtual	void				Delete() = 0;
-};
-
-
 void x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
 		size_t size);
 void x86_put_pgtable_in_pgdir(page_directory_entry* entry,
@@ -118,21 +100,6 @@ static inline page_table_entry
 set_page_table_entry_flags(page_table_entry* entry, uint32 flags)
 {
 	return atomic_or((int32*)entry, flags);
-}
-
-
-inline void
-X86PagingStructures::AddReference()
-{
-	atomic_add(&ref_count, 1);
-}
-
-
-inline void
-X86PagingStructures::RemoveReference()
-{
-	if (atomic_add(&ref_count, -1) == 1)
-		Delete();
 }
 
 
