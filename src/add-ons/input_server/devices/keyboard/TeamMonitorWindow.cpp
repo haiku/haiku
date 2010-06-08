@@ -115,16 +115,17 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 	fRestartButton = new BButton("restart", "Restart the Desktop",
 		new BMessage(TM_RESTART_DESKTOP));
-	fRestartButton->Hide();
+	SetDefaultButton(fRestartButton);
 	groupView->GroupLayout()->AddView(fRestartButton);
 
 	glue = BSpaceLayoutItem::CreateGlue();
 	glue->SetExplicitMinSize(BSize(inset, -1));
 	groupView->GroupLayout()->AddItem(glue);
 
-	BButton *cancel = new BButton("cancel", "Cancel",
+	fCancelButton = new BButton("cancel", "Cancel",
 		new BMessage(TM_CANCEL));
-	groupView->GroupLayout()->AddView(cancel);
+	SetDefaultButton(fCancelButton);
+	groupView->GroupLayout()->AddView(fCancelButton);
 
 	BSize preferredSize = layout->View()->PreferredSize();
 	if (preferredSize.width > Bounds().Width())
@@ -142,6 +143,8 @@ TeamMonitorWindow::TeamMonitorWindow()
 
 	SetSizeLimits(Bounds().Width(), Bounds().Width() * 2,
 		Bounds().Height(), screenFrame.Height());
+
+	fRestartButton->Hide();
 
 	AddShortcut('T', B_COMMAND_KEY | B_OPTION_KEY,
 		new BMessage(kMsgLaunchTerminal));
@@ -181,6 +184,7 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 		case TM_FORCE_REBOOT:
 			_kern_shutdown(true);
 			break;
+			
 		case TM_KILL_APPLICATION:
 		{
 			TeamListItem* item = (TeamListItem*)fListView->ItemAt(
@@ -197,6 +201,8 @@ TeamMonitorWindow::MessageReceived(BMessage *msg)
 				be_roster->Launch(kTrackerSignature);
 			if (!be_roster->IsRunning(kDeskbarSignature))
 				be_roster->Launch(kDeskbarSignature);
+			fRestartButton->Hide();
+			SetDefaultButton(fCancelButton);
 			break;
 		}
 		case TM_SELECTED_TEAM:
@@ -281,6 +287,7 @@ TeamMonitorWindow::UpdateList()
 		&& be_roster->IsRunning(kDeskbarSignature);
 	if (!desktopRunning && fRestartButton->IsHidden()) {
 		fRestartButton->Show();
+		SetDefaultButton(fRestartButton);
 		fRestartButton->Parent()->Layout(true);
 	}
 

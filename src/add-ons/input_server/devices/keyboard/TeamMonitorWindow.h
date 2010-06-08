@@ -37,6 +37,7 @@ private:
 			bool			fQuitting;
 			BMessageRunner*	fUpdateRunner;
 			BListView*		fListView;
+			BButton*		fCancelButton;
 			BButton*		fKillButton;
 			BButton*		fRestartButton;
 			TeamDescriptionView*		fDescriptionView;
