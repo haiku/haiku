@@ -10,6 +10,7 @@ UsePrivateHeaders shared ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) paging pae ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
 
@@ -54,6 +55,12 @@ KernelMergeObject kernel_arch_x86.o :
 	X86PagingStructures32Bit.cpp
 	X86VMTranslationMap32Bit.cpp
 
+	# paging/pae
+	X86PagingMethodPAE.cpp
+	X86PagingStructuresPAE.cpp
+	X86VMTranslationMapPAE.cpp
+
+	# timers
 	x86_apic.cpp
 	x86_hpet.cpp
 	x86_pit.cpp

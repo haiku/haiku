@@ -11,6 +11,7 @@
 #include <arch/vm_translation_map.h>
 
 #include "paging/32bit/X86PagingMethod32Bit.h"
+#include "paging/pae/X86PagingMethodPAE.h"
 
 
 //#define TRACE_VM_TMAP
@@ -24,6 +25,9 @@
 static union {
 	uint64	align;
 	char	thirty_two[sizeof(X86PagingMethod32Bit)];
+#if B_HAIKU_PHYSICAL_BITS == 64
+	char	pae[sizeof(X86PagingMethodPAE)];
+#endif
 } sPagingMethodBuffer;
 
 
@@ -68,7 +72,12 @@ arch_vm_translation_map_init(kernel_args *args,
 	}
 #endif
 
-	gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod32Bit;
+#if B_HAIKU_PHYSICAL_BITS == 64
+	if (true /* TODO: If needed! */)
+		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethodPAE;
+	else
+#endif
+		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod32Bit;
 
 	return gX86PagingMethod->Init(args, _physicalPageMapper);
 }
