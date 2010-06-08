@@ -73,9 +73,10 @@ arch_vm_translation_map_init(kernel_args *args,
 #endif
 
 #if B_HAIKU_PHYSICAL_BITS == 64
-	if (true /* TODO: If needed! */)
+	if (x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON)
+			/* TODO: && if needed */) {
 		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethodPAE;
-	else
+	} else
 #endif
 		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod32Bit;
 
