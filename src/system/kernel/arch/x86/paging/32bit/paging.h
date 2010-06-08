@@ -64,46 +64,4 @@ typedef uint32 page_table_entry;
 typedef uint32 page_directory_entry;
 
 
-void x86_early_prepare_page_tables(page_table_entry* pageTables, addr_t address,
-		size_t size);
-void x86_put_pgtable_in_pgdir(page_directory_entry* entry,
-	phys_addr_t physicalPageTable, uint32 attributes);
-
-
-static inline page_table_entry
-set_page_table_entry(page_table_entry* entry, page_table_entry newEntry)
-{
-	return atomic_set((int32*)entry, newEntry);
-}
-
-
-static inline page_table_entry
-test_and_set_page_table_entry(page_table_entry* entry,
-	page_table_entry newEntry, page_table_entry oldEntry)
-{
-	return atomic_test_and_set((int32*)entry, newEntry, oldEntry);
-}
-
-
-static inline page_table_entry
-clear_page_table_entry(page_table_entry* entry)
-{
-	return set_page_table_entry(entry, 0);
-}
-
-
-static inline page_table_entry
-clear_page_table_entry_flags(page_table_entry* entry, uint32 flags)
-{
-	return atomic_and((int32*)entry, ~flags);
-}
-
-
-static inline page_table_entry
-set_page_table_entry_flags(page_table_entry* entry, uint32 flags)
-{
-	return atomic_or((int32*)entry, flags);
-}
-
-
 #endif	// _KERNEL_ARCH_X86_PAGING_32_BIT_PAGING_H
