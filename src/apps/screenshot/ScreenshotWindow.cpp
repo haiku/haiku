@@ -332,7 +332,7 @@ ScreenshotWindow::_NewScreenshot()
 	delay.CopyInto(argv[2], 0, charCount);
 	argv[2][charCount] = '\0';
 
-	be_roster->Launch("application/x-vnd.Haiku-Screenshot", argc, argv);
+	be_roster->Launch("application/x-vnd.haiku-screenshot-cli", argc, argv);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 }
 

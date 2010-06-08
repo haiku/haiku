@@ -3618,7 +3618,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 		if ((modifiers & B_SHIFT_KEY) != 0 || (modifiers & B_OPTION_KEY) != 0)
 			message.ReplaceBool("silent", false);
 
-		be_roster->Launch("application/x-vnd.haiku-screenshot", &message);
+		be_roster->Launch("application/x-vnd.haiku-screenshot-cli", &message);
 		return true;
 	}
 

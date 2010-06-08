@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src apps screenshot ;
 
 UsePrivateHeaders interface ;
 
-Application ScreenshotApp :
+Application Screenshot :
 	ScreenshotApp.cpp
 	ScreenshotWindow.cpp
 	PreviewView.cpp
@@ -11,14 +11,14 @@ Application ScreenshotApp :
 	: ScreenshotApp.rdef
 ;
 
-DoCatalogs ScreenshotApp :
-	x-vnd.Haiku-ScreenshotApp
+DoCatalogs Screenshot :
+	x-vnd.haiku-screenshot
 	:
 	ScreenshotWindow.cpp
 	Utility.cpp
 ;
 
-Application Screenshot :
+Application screenshot :
 	Screenshot.cpp
 	Utility.cpp
 	: be locale translation $(TARGET_LIBSUPC++)

@@ -31,7 +31,7 @@
 
 Screenshot::Screenshot()
 	:
-	BApplication("application/x-vnd.Haiku-Screenshot"),
+	BApplication("application/x-vnd.haiku-screenshot-cli"),
 	fUtility(new Utility()),
 	fLaunchGui(true)
 {
@@ -151,7 +151,7 @@ Screenshot::ReadyToRun()
 			message.AddRect("tabFrame", fUtility->tabFrame);
 			message.AddFloat("borderSize", fUtility->borderSize);
 
-			be_roster->Launch("application/x-vnd.Haiku-ScreenshotApp",
+			be_roster->Launch("application/x-vnd.haiku-screenshot",
 				&message);
 		}
 	}

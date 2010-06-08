@@ -51,7 +51,7 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	query quit
 	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
 	rmindex rmdir roster route
-	safemode screen_blanker screenmode sdiff setdecor settype setversion
+	safemode screen_blanker screenmode screenshot sdiff setdecor settype setversion
 	setvolume setwep seq sha1sum shar shred shuf shutdown sleep sort spamdbm
 	split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
@@ -66,8 +66,7 @@ SYSTEM_APPS = AboutSystem ActivityMonitor CharacterMap CodyCam DeskCalc Devices
 	DiskProbe DiskUsage DriveSetup CDPlayer Expander Icon-O-Matic Installer
 	LaunchBox Magnify Mail MediaConverter MediaPlayer MidiPlayer NetworkStatus
 	PackageInstaller People PoorMan PowerStatus ProcessController Screenshot
-	ScreenshotApp ShowImage SoundRecorder StyledEdit Terminal TextSearch TV
-	Workspaces
+	ShowImage SoundRecorder StyledEdit Terminal TextSearch TV	Workspaces
 ;
 SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	<preference>Deskbar E-mail FileTypes Fonts Keyboard Keymap Locale Media

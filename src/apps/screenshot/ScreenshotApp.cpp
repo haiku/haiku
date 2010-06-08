@@ -21,7 +21,7 @@
 
 ScreenshotApp::ScreenshotApp()
 	:
-	BApplication("application/x-vnd.Haiku-ScreenshotApp"),
+	BApplication("application/x-vnd.haiku-screenshot"),
 	fUtility(new Utility)
 {
 	be_locale->GetAppCatalog(&fCatalog);
