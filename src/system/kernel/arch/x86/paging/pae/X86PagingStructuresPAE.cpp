@@ -26,7 +26,7 @@ void
 X86PagingStructuresPAE::Init()
 {
 // TODO: Implement!
-	panic("unsupported");
+	panic("X86PagingStructuresPAE::Init(): not implemented");
 }
 
 
@@ -34,7 +34,7 @@ void
 X86PagingStructuresPAE::Delete()
 {
 // TODO: Implement!
-	panic("unsupported");
+	panic("X86PagingStructuresPAE::Delete(): not implemented");
 }
 
 
@@ -42,7 +42,7 @@ X86PagingStructuresPAE::Delete()
 X86PagingStructuresPAE::StaticInit()
 {
 // TODO: Implement!
-	panic("unsupported");
+	panic("X86PagingStructuresPAE::StaticInit(): not implemented");
 }
 
 
