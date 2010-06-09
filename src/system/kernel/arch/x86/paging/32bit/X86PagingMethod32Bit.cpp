@@ -38,9 +38,6 @@
 using X86LargePhysicalPageMapper::PhysicalPageSlot;
 
 
-static const size_t kPageTableAlignment = 1024 * B_PAGE_SIZE;
-
-
 // #pragma mark - X86PagingMethod32Bit::PhysicalPageSlotPool
 
 

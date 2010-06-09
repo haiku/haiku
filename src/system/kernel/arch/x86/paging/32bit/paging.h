@@ -60,6 +60,9 @@
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
 
 
+static const size_t kPageTableAlignment = 1024 * B_PAGE_SIZE;
+
+
 typedef uint32 page_table_entry;
 typedef uint32 page_directory_entry;
 
