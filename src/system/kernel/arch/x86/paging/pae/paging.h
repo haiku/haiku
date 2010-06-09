@@ -6,7 +6,7 @@
 #define KERNEL_ARCH_X86_PAGING_PAE_PAGING_H
 
 
-#include <SupportDefs.h>
+#include <OS.h>
 
 
 #if B_HAIKU_PHYSICAL_BITS == 64
@@ -53,6 +53,11 @@
 											| X86_PAE_PTE_USER)
 #define X86_PAE_PTE_MEMORY_TYPE_MASK	(X86_PAE_PTE_WRITE_THROUGH \
 											| X86_PAE_PTE_CACHING_DISABLED)
+
+
+static const uint32 kPAEPageDirEntryCount = 512;
+static const uint32 kPAEPageTableEntryCount = 512;
+static const size_t kPAEPageTableRange = kPAEPageTableEntryCount * B_PAGE_SIZE;
 
 
 typedef uint64 pae_page_directory_pointer_table_entry;
