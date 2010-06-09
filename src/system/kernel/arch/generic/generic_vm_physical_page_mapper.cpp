@@ -248,29 +248,24 @@ generic_vm_physical_page_mapper_init(kernel_args *args,
 	sIOSpaceChunkSize = ioSpaceChunkSize;
 
 	// reserve virtual space for the IO space
-	// We reserve (ioSpaceChunkSize - B_PAGE_SIZE) bytes more, so that we
-	// can guarantee to align the base address to ioSpaceChunkSize.
-	sIOSpaceBase = vm_allocate_early(args,
-		sIOSpaceSize + ioSpaceChunkSize - B_PAGE_SIZE, 0, 0, false);
+	sIOSpaceBase = vm_allocate_early(args, sIOSpaceSize, 0, 0,
+		ioSpaceChunkSize);
 	if (sIOSpaceBase == 0) {
 		panic("generic_vm_physical_page_mapper_init(): Failed to reserve IO "
 			"space in virtual address space!");
 		return B_ERROR;
 	}
 
-	// align the base address to chunk size
-	sIOSpaceBase = (sIOSpaceBase + ioSpaceChunkSize - 1) / ioSpaceChunkSize
-		* ioSpaceChunkSize;
 	*ioSpaceBase = sIOSpaceBase;
 
 	// allocate some space to hold physical page mapping info
 	paddr_desc = (paddr_chunk_desc *)vm_allocate_early(args,
 		sizeof(paddr_chunk_desc) * 1024, ~0L,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
 	num_virtual_chunks = sIOSpaceSize / sIOSpaceChunkSize;
 	virtual_pmappings = (paddr_chunk_desc **)vm_allocate_early(args,
 		sizeof(paddr_chunk_desc *) * num_virtual_chunks, ~0L,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
 
 	TRACE(("paddr_desc %p, virtual_pmappings %p"/*", iospace_pgtables %p"*/"\n",
 		paddr_desc, virtual_pmappings/*, iospace_pgtables*/));

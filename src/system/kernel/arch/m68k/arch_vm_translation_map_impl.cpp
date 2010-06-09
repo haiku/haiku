@@ -1262,7 +1262,7 @@ m68k_vm_translation_map_init(kernel_args *args)
 
 	iospace_pgtables = (page_table_entry *)vm_allocate_early(args,
 		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * NUM_PAGEENT_PER_TBL * NUM_PAGETBL_PER_PAGE)), ~0L,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
 
 	TRACE(("iospace_pgtables %p\n", iospace_pgtables));
 

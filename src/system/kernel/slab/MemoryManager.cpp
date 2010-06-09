@@ -1212,7 +1212,8 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 	} else {
 		// no areas yet -- allocate raw memory
 		area = (Area*)vm_allocate_early(sKernelArgs, SLAB_AREA_SIZE,
-			SLAB_AREA_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, true);
+			SLAB_AREA_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			SLAB_AREA_SIZE);
 		if (area == NULL) {
 			mutex_lock(&sLock);
 			return B_NO_MEMORY;

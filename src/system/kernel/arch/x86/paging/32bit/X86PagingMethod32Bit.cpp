@@ -84,22 +84,19 @@ X86PagingMethod32Bit::PhysicalPageSlotPool::~PhysicalPageSlotPool()
 status_t
 X86PagingMethod32Bit::PhysicalPageSlotPool::InitInitial(kernel_args* args)
 {
-	// We reserve more, so that we can guarantee to align the base address
-	// to page table ranges.
-	addr_t virtualBase = vm_allocate_early(args,
-		1024 * B_PAGE_SIZE + kPageTableAlignment - B_PAGE_SIZE, 0, 0, false);
+	// allocate a virtual address range for the pages to be mapped into
+	addr_t virtualBase = vm_allocate_early(args, 1024 * B_PAGE_SIZE, 0, 0,
+		kPageTableAlignment);
 	if (virtualBase == 0) {
 		panic("LargeMemoryPhysicalPageMapper::Init(): Failed to reserve "
 			"physical page pool space in virtual address space!");
 		return B_ERROR;
 	}
-	virtualBase = (virtualBase + kPageTableAlignment - 1)
-		/ kPageTableAlignment * kPageTableAlignment;
 
 	// allocate memory for the page table and data
 	size_t areaSize = B_PAGE_SIZE + sizeof(PhysicalPageSlot[1024]);
 	page_table_entry* pageTable = (page_table_entry*)vm_allocate_early(args,
-		areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
+		areaSize, ~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
 
 	// prepare the page table
 	_EarlyPreparePageTables(pageTable, virtualBase, 1024 * B_PAGE_SIZE);

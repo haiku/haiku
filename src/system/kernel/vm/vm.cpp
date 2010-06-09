@@ -3432,7 +3432,7 @@ reserve_boot_loader_ranges(kernel_args* args)
 
 
 static addr_t
-allocate_early_virtual(kernel_args* args, size_t size, bool blockAlign)
+allocate_early_virtual(kernel_args* args, size_t size, addr_t alignment)
 {
 	size = PAGE_ALIGN(size);
 
@@ -3443,8 +3443,8 @@ allocate_early_virtual(kernel_args* args, size_t size, bool blockAlign)
 		addr_t previousRangeEnd = args->virtual_allocated_range[i - 1].start
 			+ args->virtual_allocated_range[i - 1].size;
 
-		addr_t base = blockAlign
-			? ROUNDUP(previousRangeEnd, size) : previousRangeEnd;
+		addr_t base = alignment > 0
+			? ROUNDUP(previousRangeEnd, alignment) : previousRangeEnd;
 
 		if (base >= KERNEL_BASE && base < rangeStart
 				&& rangeStart - base >= size) {
@@ -3459,7 +3459,8 @@ allocate_early_virtual(kernel_args* args, size_t size, bool blockAlign)
 	int lastEntryIndex = args->num_virtual_allocated_ranges - 1;
 	addr_t lastRangeEnd = args->virtual_allocated_range[lastEntryIndex].start
 		+ args->virtual_allocated_range[lastEntryIndex].size;
-	addr_t base = blockAlign ? ROUNDUP(lastRangeEnd, size) : lastRangeEnd;
+	addr_t base = alignment > 0
+		? ROUNDUP(lastRangeEnd, alignment) : lastRangeEnd;
 	if (KERNEL_BASE + (KERNEL_SIZE - 1) - base >= size) {
 		args->virtual_allocated_range[lastEntryIndex].size
 			+= base + size - lastRangeEnd;
@@ -3470,8 +3471,8 @@ allocate_early_virtual(kernel_args* args, size_t size, bool blockAlign)
 	addr_t rangeStart = args->virtual_allocated_range[0].start;
 	if (rangeStart > KERNEL_BASE && rangeStart - KERNEL_BASE >= size) {
 		base = rangeStart - size;
-		if (blockAlign)
-			base = ROUNDDOWN(base, size);
+		if (alignment > 0)
+			base = ROUNDDOWN(base, alignment);
 
 		if (base >= KERNEL_BASE) {
 			args->virtual_allocated_range[0].start = base;
@@ -3532,13 +3533,13 @@ allocate_early_physical_page(kernel_args* args)
 */
 addr_t
 vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
-	uint32 attributes, bool blockAlign)
+	uint32 attributes, addr_t alignment)
 {
 	if (physicalSize > virtualSize)
 		physicalSize = virtualSize;
 
 	// find the vaddr to allocate at
-	addr_t virtualBase = allocate_early_virtual(args, virtualSize, blockAlign);
+	addr_t virtualBase = allocate_early_virtual(args, virtualSize, alignment);
 	//dprintf("vm_allocate_early: vaddr 0x%lx\n", virtualAddress);
 
 	// map the pages
@@ -3587,7 +3588,7 @@ vm_init(kernel_args* args)
 #if	!USE_SLAB_ALLOCATOR_FOR_MALLOC
 	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
 	TRACE(("heap at 0x%lx\n", heapBase));
 	heap_init(heapBase, heapSize);
 #endif
