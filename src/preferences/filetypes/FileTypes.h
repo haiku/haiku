@@ -30,6 +30,7 @@ static const uint32 kMsgSettingsChanged = 'SeCh';
 // exported functions
 
 extern bool is_application(BFile& file);
+extern bool is_resource(BFile& file);
 extern void error_alert(const char* message, status_t status = B_OK,
 	alert_type type = B_WARNING_ALERT);
 

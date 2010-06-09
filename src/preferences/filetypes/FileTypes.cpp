@@ -21,6 +21,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <Path.h>
+#include <Resources.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -228,7 +229,7 @@ FileTypes::RefsReceived(BMessage *message)
 			continue;
 		}
 
-		if (!is_application(file)) {
+		if (!is_application(file) && !is_resource(file)) {
 			if (entry.GetRef(&ref) == B_OK)
 				message->ReplaceRef("refs", index - 1, &ref);
 			continue;
@@ -447,6 +448,23 @@ is_application(BFile& file)
 	char type[B_MIME_TYPE_LENGTH];
 	if (appInfo.GetType(type) != B_OK
 		|| strcasecmp(type, B_APP_MIME_TYPE))
+		return false;
+
+	return true;
+}
+
+
+bool
+is_resource(BFile& file)
+{
+	BResources resources(&file);
+	if (resources.InitCheck() != B_OK)
+		return false;
+	
+	BNodeInfo nodeInfo(&file);
+	char type[B_MIME_TYPE_LENGTH];
+	if (nodeInfo.GetType(type) != B_OK
+		|| strcasecmp(type, B_RESOURCE_MIME_TYPE))
 		return false;
 
 	return true;
