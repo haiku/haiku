@@ -84,6 +84,7 @@
 #define IA32_FEATURE_AMD_EXT_3DNOW		(1 << 31)	// 3DNow!
 
 // cr4 flags
+#define IA32_CR4_PAE					(1UL << 5)
 #define IA32_CR4_GLOBAL_PAGES			(1UL << 7)
 
 // Memory type ranges
