@@ -3500,8 +3500,8 @@ is_page_in_physical_memory_range(kernel_args* args, phys_addr_t address)
 }
 
 
-static phys_addr_t
-allocate_early_physical_page(kernel_args* args)
+page_num_t
+vm_allocate_early_physical_page(kernel_args* args)
 {
 	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
 		phys_addr_t nextPage;
@@ -3544,7 +3544,7 @@ vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
 
 	// map the pages
 	for (uint32 i = 0; i < PAGE_ALIGN(physicalSize) / B_PAGE_SIZE; i++) {
-		phys_addr_t physicalAddress = allocate_early_physical_page(args);
+		page_num_t physicalAddress = vm_allocate_early_physical_page(args);
 		if (physicalAddress == 0)
 			panic("error allocating early page!\n");
 
@@ -3552,7 +3552,7 @@ vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
 
 		arch_vm_translation_map_early_map(args, virtualBase + i * B_PAGE_SIZE,
 			physicalAddress * B_PAGE_SIZE, attributes,
-			&allocate_early_physical_page);
+			&vm_allocate_early_physical_page);
 	}
 
 	return virtualBase;
