@@ -10,6 +10,7 @@
  *		Clemens Zeidler	<czeidler@gmx.de>
  */
 
+
 /*!	PS/2 mouse device driver
 
 	A PS/2 mouse is connected to the IBM 8042 controller, and gets its
@@ -300,8 +301,8 @@ probe_standard_mouse(ps2_dev * dev)
 		}
 	}
 
-	if ((deviceId == PS2_DEV_ID_STANDARD) ||
-		(deviceId == PS2_DEV_ID_TOUCHPAD_RICATECH)) {
+	if (deviceId == PS2_DEV_ID_STANDARD
+		|| deviceId == PS2_DEV_ID_TOUCHPAD_RICATECH) {
 		INFO("ps2: probe_mouse Standard PS/2 mouse found\n");
 		dev->name = kStandardMousePath[dev->idx];
 		dev->packet_size = PS2_PACKET_STANDARD;
