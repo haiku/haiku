@@ -70,8 +70,6 @@ X86VMTranslationMapPAE::Init(bool kernel)
 			method->KernelPhysicalPageDirPointerTable(),
 			method->KernelVirtualPageDirs(), method->KernelPhysicalPageDirs());
 	} else {
-panic("X86VMTranslationMapPAE::Init(): user init not implemented");
-#if 0
 		// user
 		// allocate a physical page mapper
 		status_t error = method->PhysicalPageMapper()
@@ -79,20 +77,55 @@ panic("X86VMTranslationMapPAE::Init(): user init not implemented");
 		if (error != B_OK)
 			return error;
 
-		// allocate the page directory
-		page_directory_entry* virtualPageDir = (page_directory_entry*)memalign(
-			B_PAGE_SIZE, B_PAGE_SIZE);
-		if (virtualPageDir == NULL)
+		// The following code assumes that the kernel address space occupies the
+		// upper half of the virtual address space. This simplifies things a
+		// lot, since it allows us to just use the upper two page directories
+		// of the kernel and create two new lower page directories for the
+		// userland.
+		STATIC_ASSERT(KERNEL_BASE == 0x80000000 && KERNEL_SIZE == 0x80000000);
+
+		// allocate the page directories (both at once)
+		pae_page_directory_entry* virtualPageDirs[4];
+		phys_addr_t physicalPageDirs[4];
+		virtualPageDirs[0] = (pae_page_directory_entry*)memalign(B_PAGE_SIZE,
+			2 * B_PAGE_SIZE);
+		if (virtualPageDirs[0] == NULL)
 			return B_NO_MEMORY;
+		virtualPageDirs[1] = virtualPageDirs[0] + kPAEPageTableEntryCount;
 
-		// look up the page directory's physical address
-		phys_addr_t physicalPageDir;
-		vm_get_page_mapping(VMAddressSpace::KernelID(),
-			(addr_t)virtualPageDir, &physicalPageDir);
+		// clear the userland page directories
+		memset(virtualPageDirs[0], 0, 2 * B_PAGE_SIZE);
 
-		fPagingStructures->Init(virtualPageDir, physicalPageDir,
-			method->KernelVirtualPageDirectory());
-#endif
+		// use the upper two kernel page directories
+		for (int32 i = 2; i < 4; i++) {
+			virtualPageDirs[i] = method->KernelVirtualPageDirs()[i];
+			physicalPageDirs[i] = method->KernelPhysicalPageDirs()[i];
+		}
+
+		// look up the page directories' physical addresses
+		for (int32 i = 0; i < 2; i++) {
+			vm_get_page_mapping(VMAddressSpace::KernelID(),
+				(addr_t)virtualPageDirs[i], &physicalPageDirs[i]);
+		}
+
+		// allocate the PDPT -- needs to have a 32 bit physical address
+		phys_addr_t physicalPDPT;
+		void* pdptHandle;
+		pae_page_directory_pointer_table_entry* pdpt
+			= (pae_page_directory_pointer_table_entry*)
+				method->Allocate32BitPage(physicalPDPT, pdptHandle);
+		if (pdpt == NULL)
+			free(virtualPageDirs[0]);
+
+		// init the PDPT entries
+		for (int32 i = 0; i < 4; i++) {
+			pdpt[i] = (physicalPageDirs[i] & X86_PAE_PDPTE_ADDRESS_MASK)
+				| X86_PAE_PDPTE_PRESENT;
+		}
+
+		// init the paging structures
+		fPagingStructures->Init(pdpt, physicalPDPT, virtualPageDirs,
+			physicalPageDirs);
 	}
 
 	return B_OK;
