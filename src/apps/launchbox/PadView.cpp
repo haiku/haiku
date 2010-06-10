@@ -297,7 +297,10 @@ PadView::RemoveButton(LaunchButton* button)
 LaunchButton*
 PadView::ButtonAt(int32 index) const
 {
-	return dynamic_cast<LaunchButton*>(ChildAt(index));
+	BLayoutItem* item = fButtonLayout->ItemAt(index);
+	if (item == NULL)
+		return NULL;
+	return dynamic_cast<LaunchButton*>(item->View());
 }
 
 
