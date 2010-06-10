@@ -53,6 +53,13 @@
 #	define ASSERT_PRINT(x, format, args...)	do { } while(0)
 #endif
 
+#define STATIC_ASSERT(x)								\
+	do {												\
+		struct __staticAssertStruct__ {					\
+			char __static_assert_failed__[2*(x) - 1];	\
+		};												\
+	} while (false)
+
 #if KDEBUG
 #	define KDEBUG_ONLY(x)				x
 #else
