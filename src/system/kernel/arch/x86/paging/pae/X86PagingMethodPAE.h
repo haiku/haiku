@@ -8,6 +8,9 @@
 
 #include <KernelExport.h>
 
+#include <lock.h>
+#include <vm/vm_types.h>
+
 #include "paging/pae/paging.h"
 #include "paging/X86PagingMethod.h"
 #include "paging/X86PagingStructures.h"
@@ -40,6 +43,12 @@ public:
 
 	virtual	bool				IsKernelPageAccessible(addr_t virtualAddress,
 									uint32 protection);
+
+			void*				Allocate32BitPage(
+									phys_addr_t& _physicalAddress,
+									void*& _handle);
+			void				Free32BitPage(void* address,
+									phys_addr_t physicalAddress, void* handle);
 
 	inline	X86PhysicalPageMapper* PhysicalPageMapper() const
 									{ return fPhysicalPageMapper; }
@@ -108,6 +117,10 @@ private:
 			phys_addr_t			fKernelPhysicalPageDirs[4];
 			addr_t				fFreeVirtualSlot;
 			pae_page_table_entry* fFreeVirtualSlotPTE;
+
+			mutex				fFreePagesLock;
+			vm_page*			fFreePages;
+			page_num_t			fFreePagesCount;
 };
 
 

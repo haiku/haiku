@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <util/AutoLock.h>
 #include <vm/vm.h>
+#include <vm/vm_page.h>
 #include <vm/VMAddressSpace.h>
 
 #include "paging/32bit/paging.h"
@@ -36,6 +38,10 @@
 
 
 using X86LargePhysicalPageMapper::PhysicalPageSlot;
+
+
+// number of 32 bit pages that will be cached
+static const page_num_t kMaxFree32BitPagesCount = 32;
 
 
 // #pragma mark - ToPAESwitcher
@@ -472,8 +478,11 @@ X86PagingMethodPAE::PhysicalPageSlotPool::AllocatePool(
 X86PagingMethodPAE::X86PagingMethodPAE()
 	:
 	fPhysicalPageMapper(NULL),
-	fKernelPhysicalPageMapper(NULL)
+	fKernelPhysicalPageMapper(NULL),
+	fFreePages(NULL),
+	fFreePagesCount(0)
 {
+	mutex_init(&fFreePagesLock, "x86 PAE free pages");
 }
 
 
@@ -527,6 +536,14 @@ X86PagingMethodPAE::InitPostArea(kernel_args* args)
 		.InitInitialPostArea(args);
 	if (error != B_OK)
 		return error;
+
+	// The early physical page mapping mechanism is no longer needed. Unmap the
+	// slot.
+	*fFreeVirtualSlotPTE = 0;
+	invalidate_TLB(fFreeVirtualSlot);
+
+	fFreeVirtualSlotPTE = NULL;
+	fFreeVirtualSlot = 0;
 
 	return B_OK;
 }
@@ -642,6 +659,71 @@ X86PagingMethodPAE::PutPageTableEntryInTable(pae_page_table_entry* entry,
 
 	// put it in the page table
 	*(volatile pae_page_table_entry*)entry = page;
+}
+
+
+void*
+X86PagingMethodPAE::Allocate32BitPage(phys_addr_t& _physicalAddress,
+	void*& _handle)
+{
+	// get a free page
+	MutexLocker locker(fFreePagesLock);
+	vm_page* page;
+	if (fFreePages != NULL) {
+		page = fFreePages;
+		fFreePages = page->cache_next;
+		fFreePagesCount--;
+		locker.Unlock();
+	} else {
+		// no pages -- allocate one
+		locker.Unlock();
+		page = vm_page_allocate_page_run(PAGE_STATE_UNUSED, 0, 0x100000000LL, 1,
+			VM_PRIORITY_SYSTEM);
+		DEBUG_PAGE_ACCESS_END(page);
+		if (page == NULL)
+			return NULL;
+	}
+
+	// map the page
+	phys_addr_t physicalAddress
+		= (phys_addr_t)page->physical_page_number * B_PAGE_SIZE;
+	addr_t virtualAddress;
+	if (fPhysicalPageMapper->GetPage(physicalAddress, &virtualAddress, &_handle)
+			!= B_OK) {
+		// mapping failed -- free page
+		locker.Lock();
+		page->cache_next = fFreePages;
+		fFreePages = page;
+		fFreePagesCount++;
+		return NULL;
+	}
+
+	_physicalAddress = physicalAddress;
+	return (void*)virtualAddress;
+}
+
+
+void
+X86PagingMethodPAE::Free32BitPage(void* address, phys_addr_t physicalAddress,
+	void* handle)
+{
+	// unmap the page
+	fPhysicalPageMapper->PutPage((addr_t)address, handle);
+
+	// free it
+	vm_page* page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+	MutexLocker locker(fFreePagesLock);
+	if (fFreePagesCount < kMaxFree32BitPagesCount) {
+		// cache not full yet -- cache it
+		page->cache_next = fFreePages;
+		fFreePages = page;
+		fFreePagesCount++;
+	} else {
+		// cache full -- free it
+		locker.Unlock();
+		DEBUG_PAGE_ACCESS_START(page);
+		vm_page_free(NULL, page);
+	}
 }
 
 
