@@ -540,7 +540,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 
 	if ((flags & B_APERTURE_NEED_PHYSICAL) != 0) {
 		memory->page = vm_page_allocate_page_run(
-			PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR, 0, count,
+			PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR, 0, 0, count,
 			VM_PRIORITY_SYSTEM);
 		if (memory->page == NULL)
 			return B_NO_MEMORY;

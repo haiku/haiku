@@ -1181,7 +1181,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
 		page = vm_page_allocate_page_run(PAGE_STATE_WIRED | pageAllocFlags,
-			physicalAddress, size / B_PAGE_SIZE, priority);
+			physicalAddress, 0, size / B_PAGE_SIZE, priority);
 		if (page == NULL) {
 			status = B_NO_MEMORY;
 			goto err0;

@@ -3319,11 +3319,30 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 }
 
 
-vm_page *
-vm_page_allocate_page_run(uint32 flags, phys_addr_t base, page_num_t length,
-	int priority)
+/*! Allocate a physically contiguous range of pages.
+
+	\param flags Page allocation flags. Encodes the state the function shall
+		set the allocated pages to, whether the pages shall be marked busy
+		(VM_PAGE_ALLOC_BUSY), and whether the pages shall be cleared
+		(VM_PAGE_ALLOC_CLEAR).
+	\param base The first acceptable physical address where the page run may
+		start.
+	\param limit The last acceptable physical address where the page run may
+		end (i.e. it must hold runStartAddress + runSize <= limit). If \c 0,
+		the limit is ignored.
+	\param length The number of contiguous pages to allocate.
+	\param priority The page reservation priority (as passed to
+		vm_page_reserve_pages()).
+	\return The first page of the allocated page run on success; \c NULL
+		when the allocation failed.
+*/
+vm_page*
+vm_page_allocate_page_run(uint32 flags, phys_addr_t base, phys_addr_t limit,
+	page_num_t length, int priority)
 {
-	page_num_t start = base >> PAGE_SHIFT;
+	page_num_t start = base / B_PAGE_SIZE;
+	page_num_t end = std::min(limit > 0 ? limit / B_PAGE_SIZE : sNumPages,
+		sNumPages);
 
 	vm_page_reservation reservation;
 	vm_page_reserve_pages(&reservation, length, priority);
@@ -3338,8 +3357,7 @@ vm_page_allocate_page_run(uint32 flags, phys_addr_t base, page_num_t length,
 	int useCached = freePages > 0 && (page_num_t)freePages > 2 * length ? 0 : 1;
 
 	for (;;) {
-		bool foundRun = true;
-		if (start + length > sNumPages) {
+		if (start + length > end) {
 			if (useCached == 0) {
 				// The first iteration with free pages only was unsuccessful.
 				// Try again also considering cached pages.
@@ -3356,6 +3374,7 @@ vm_page_allocate_page_run(uint32 flags, phys_addr_t base, page_num_t length,
 			return NULL;
 		}
 
+		bool foundRun = true;
 		page_num_t i;
 		for (i = 0; i < length; i++) {
 			uint32 pageState = sPages[start + i].State();
