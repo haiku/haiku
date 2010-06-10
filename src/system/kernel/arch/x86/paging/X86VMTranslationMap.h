@@ -31,12 +31,24 @@ struct X86VMTranslationMap : VMTranslationMap {
 
 	virtual	X86PagingStructures* PagingStructures() const = 0;
 
+	inline	void				InvalidatePage(addr_t address);
+
 protected:
 			TranslationMapPhysicalPageMapper* fPageMapper;
 			int					fInvalidPagesCount;
 			addr_t				fInvalidPages[PAGE_INVALIDATE_CACHE_SIZE];
 			bool				fIsKernelMap;
 };
+
+
+void
+X86VMTranslationMap::InvalidatePage(addr_t address)
+{
+	if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+		fInvalidPages[fInvalidPagesCount] = address;
+
+	fInvalidPagesCount++;
+}
 
 
 #endif	// KERNEL_ARCH_X86_X86_VM_TRANSLATION_MAP_H
