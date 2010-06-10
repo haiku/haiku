@@ -71,6 +71,7 @@
 // mouse device IDs
 #define PS2_DEV_ID_STANDARD				0
 #define PS2_DEV_ID_INTELLIMOUSE			3
+#define PS2_DEV_ID_TOUCHPAD_RICATECH	4
 
 // packet sizes
 #define PS2_PACKET_STANDARD				3
