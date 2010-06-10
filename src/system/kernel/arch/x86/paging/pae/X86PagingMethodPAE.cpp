@@ -1,6 +1,10 @@
 /*
- * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
  */
 
 
@@ -57,9 +61,11 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 			fPageHolePageDir, fPhysicalPageDir);
 	}
 
-	void Switch(void*& _pageStructures, size_t& _pageStructuresSize,
-		pae_page_directory_entry** pageDirs, phys_addr_t* physicalPageDirs,
-		addr_t& _freeVirtualSlot, pae_page_table_entry*& _freeVirtualSlotPTE)
+	void Switch(pae_page_directory_pointer_table_entry*& _virtualPDPT,
+		phys_addr_t& _physicalPDPT, void*& _pageStructures,
+		size_t& _pageStructuresSize, pae_page_directory_entry** pageDirs,
+		phys_addr_t* physicalPageDirs, addr_t& _freeVirtualSlot,
+		pae_page_table_entry*& _freeVirtualSlotPTE)
 	{
 		// count the page tables we have to translate
 		uint32 pageTableCount = 0;
@@ -134,6 +140,8 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
 
 		// set return values
+		_virtualPDPT = pdpt;
+		_physicalPDPT = physicalPDPT;
 		_pageStructures = fAllocatedPages;
 		_pageStructuresSize = (size_t)fUsedPagesCount * B_PAGE_SIZE;
 		memcpy(pageDirs, fPageDirs, sizeof(fPageDirs));
@@ -439,8 +447,12 @@ void
 X86PagingMethodPAE::PhysicalPageSlotPool::Map(phys_addr_t physicalAddress,
 	addr_t virtualAddress)
 {
-// TODO: Implement!
-	panic("X86PagingMethodPAE::PhysicalPageSlotPool::Map(): not implemented");
+	pae_page_table_entry& pte = fPageTable[
+		(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
+	pte = (physicalAddress & X86_PAE_PTE_ADDRESS_MASK)
+		| X86_PAE_PTE_WRITABLE | X86_PAE_PTE_GLOBAL | X86_PAE_PTE_PRESENT;
+
+	invalidate_TLB(virtualAddress);
 }
 
 
@@ -475,9 +487,10 @@ X86PagingMethodPAE::Init(kernel_args* args,
 	VMPhysicalPageMapper** _physicalPageMapper)
 {
 	// switch to PAE
-	ToPAESwitcher(args).Switch(fEarlyPageStructures, fEarlyPageStructuresSize,
-		fKernelVirtualPageDirs, fKernelPhysicalPageDirs, fFreeVirtualSlot,
-		fFreeVirtualSlotPTE);
+	ToPAESwitcher(args).Switch(fKernelVirtualPageDirPointerTable,
+		fKernelPhysicalPageDirPointerTable, fEarlyPageStructures,
+		fEarlyPageStructuresSize, fKernelVirtualPageDirs,
+		fKernelPhysicalPageDirs, fFreeVirtualSlot, fFreeVirtualSlotPTE);
 
 	// create the initial pool for the physical page mapper
 	PhysicalPageSlotPool* pool
@@ -502,18 +515,38 @@ X86PagingMethodPAE::Init(kernel_args* args,
 status_t
 X86PagingMethodPAE::InitPostArea(kernel_args* args)
 {
-// TODO: Implement!
-	panic("X86PagingMethodPAE::InitPostArea(): not implemented");
-	return B_UNSUPPORTED;
+	// wrap the kernel paging structures in an area
+	area_id area = create_area("kernel paging structs", &fEarlyPageStructures,
+		B_EXACT_ADDRESS, fEarlyPageStructuresSize, B_ALREADY_WIRED,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < B_OK)
+		return area;
+
+	// let the initial page pool create areas for its structures
+	status_t error = PhysicalPageSlotPool::sInitialPhysicalPagePool
+		.InitInitialPostArea(args);
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
 }
 
 
 status_t
 X86PagingMethodPAE::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 {
-// TODO: Implement!
-	panic("X86PagingMethodPAE::CreateTranslationMap(): not implemented");
-	return B_UNSUPPORTED;
+	X86VMTranslationMapPAE* map = new(std::nothrow) X86VMTranslationMapPAE;
+	if (map == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = map->Init(kernel);
+	if (error != B_OK) {
+		delete map;
+		return error;
+	}
+
+	*_map = map;
+	return B_OK;
 }
 
 
@@ -533,7 +566,7 @@ X86PagingMethodPAE::MapEarly(kernel_args* args, addr_t virtualAddress,
 		TRACE("X86PagingMethodPAE::MapEarly(): asked for free page for "
 			"page table: %#" B_PRIxPHYSADDR "\n", physicalPageTable);
 
-		// put it in the pgdir
+		// put it in the page dir
 		PutPageTableInPageDir(pageDirEntry, physicalPageTable, attributes);
 
 		// zero it out

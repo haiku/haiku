@@ -6,6 +6,8 @@
 
 #include "paging/pae/X86PagingStructuresPAE.h"
 
+#include <string.h>
+
 #include <KernelExport.h>
 
 
@@ -19,14 +21,21 @@ X86PagingStructuresPAE::X86PagingStructuresPAE()
 
 X86PagingStructuresPAE::~X86PagingStructuresPAE()
 {
+// TODO: Implement!
+	panic("X86PagingStructuresPAE::~X86PagingStructuresPAE(): not implemented");
 }
 
 
 void
-X86PagingStructuresPAE::Init()
+X86PagingStructuresPAE::Init(
+	pae_page_directory_pointer_table_entry* virtualPDPT,
+	phys_addr_t physicalPDPT, pae_page_directory_entry* const* virtualPageDirs,
+	const phys_addr_t* physicalPageDirs)
 {
-// TODO: Implement!
-	panic("X86PagingStructuresPAE::Init(): not implemented");
+	fPageDirPointerTable = virtualPDPT;
+	pgdir_phys = physicalPDPT;
+	memcpy(fVirtualPageDirs, virtualPageDirs, sizeof(fVirtualPageDirs));
+	memcpy(fPhysicalPageDirs, physicalPageDirs, sizeof(fPhysicalPageDirs));
 }
 
 
@@ -35,14 +44,6 @@ X86PagingStructuresPAE::Delete()
 {
 // TODO: Implement!
 	panic("X86PagingStructuresPAE::Delete(): not implemented");
-}
-
-
-/*static*/ void
-X86PagingStructuresPAE::StaticInit()
-{
-// TODO: Implement!
-	panic("X86PagingStructuresPAE::StaticInit(): not implemented");
 }
 
 

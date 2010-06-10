@@ -17,11 +17,22 @@ struct X86PagingStructuresPAE : X86PagingStructures {
 								X86PagingStructuresPAE();
 	virtual						~X86PagingStructuresPAE();
 
-			void				Init();
+			void				Init(pae_page_directory_pointer_table_entry*
+										virtualPDPT,
+									 phys_addr_t physicalPDPT,
+									 pae_page_directory_entry* const*
+									 	virtualPageDirs,
+									 const phys_addr_t* physicalPageDirs);
 
 	virtual	void				Delete();
 
-	static	void				StaticInit();
+			pae_page_directory_entry* const* VirtualPageDirs() const
+									{ return fVirtualPageDirs; }
+
+private:
+			pae_page_directory_pointer_table_entry* fPageDirPointerTable;
+			pae_page_directory_entry* fVirtualPageDirs[4];
+			phys_addr_t			fPhysicalPageDirs[4];
 };
 
 

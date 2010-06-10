@@ -46,8 +46,13 @@ public:
 	inline	TranslationMapPhysicalPageMapper* KernelPhysicalPageMapper() const
 									{ return fKernelPhysicalPageMapper; }
 
+	inline	pae_page_directory_pointer_table_entry*
+									KernelVirtualPageDirPointerTable() const;
+	inline	phys_addr_t			KernelPhysicalPageDirPointerTable() const;
 	inline	pae_page_directory_entry* const* KernelVirtualPageDirs() const
 									{ return fKernelVirtualPageDirs; }
+	inline	const phys_addr_t*	KernelPhysicalPageDirs() const
+									{ return fKernelPhysicalPageDirs; }
 
 	static	X86PagingMethodPAE*	Method();
 
@@ -60,6 +65,18 @@ public:
 									phys_addr_t physicalAddress,
 									uint32 attributes, uint32 memoryType,
 									bool globalPage);
+	static	pae_page_table_entry SetPageTableEntry(pae_page_table_entry* entry,
+									pae_page_table_entry newEntry);
+	static	pae_page_table_entry SetPageTableEntryFlags(
+									pae_page_table_entry* entry, uint64 flags);
+	static	pae_page_table_entry TestAndSetPageTableEntry(
+									pae_page_table_entry* entry,
+									pae_page_table_entry newEntry,
+									pae_page_table_entry oldEntry);
+	static	pae_page_table_entry ClearPageTableEntry(
+									pae_page_table_entry* entry);
+	static	pae_page_table_entry ClearPageTableEntryFlags(
+									pae_page_table_entry* entry, uint64 flags);
 
 	static	pae_page_directory_entry* PageDirEntryForAddress(
 									pae_page_directory_entry* const* pdpt,
@@ -84,11 +101,28 @@ private:
 
 			void*				fEarlyPageStructures;
 			size_t				fEarlyPageStructuresSize;
+			pae_page_directory_pointer_table_entry*
+									fKernelVirtualPageDirPointerTable;
+			phys_addr_t			fKernelPhysicalPageDirPointerTable;
 			pae_page_directory_entry* fKernelVirtualPageDirs[4];
 			phys_addr_t			fKernelPhysicalPageDirs[4];
 			addr_t				fFreeVirtualSlot;
 			pae_page_table_entry* fFreeVirtualSlotPTE;
 };
+
+
+pae_page_directory_pointer_table_entry*
+X86PagingMethodPAE::KernelVirtualPageDirPointerTable() const
+{
+	return fKernelVirtualPageDirPointerTable;
+}
+
+
+phys_addr_t
+X86PagingMethodPAE::KernelPhysicalPageDirPointerTable() const
+{
+	return fKernelPhysicalPageDirPointerTable;
+}
 
 
 /*static*/ inline X86PagingMethodPAE*
@@ -104,6 +138,45 @@ X86PagingMethodPAE::PageDirEntryForAddress(
 {
 	return pdpt[address >> 30]
 		+ (address / kPAEPageTableRange) % kPAEPageDirEntryCount;
+}
+
+
+/*static*/ inline pae_page_table_entry
+X86PagingMethodPAE::SetPageTableEntry(pae_page_table_entry* entry,
+	pae_page_table_entry newEntry)
+{
+	return atomic_set64((int64*)entry, newEntry);
+}
+
+
+/*static*/ inline pae_page_table_entry
+X86PagingMethodPAE::SetPageTableEntryFlags(pae_page_table_entry* entry,
+	uint64 flags)
+{
+	return atomic_or64((int64*)entry, flags);
+}
+
+
+/*static*/ inline pae_page_table_entry
+X86PagingMethodPAE::TestAndSetPageTableEntry(pae_page_table_entry* entry,
+	pae_page_table_entry newEntry, pae_page_table_entry oldEntry)
+{
+	return atomic_test_and_set64((int64*)entry, newEntry, oldEntry);
+}
+
+
+/*static*/ inline pae_page_table_entry
+X86PagingMethodPAE::ClearPageTableEntry(pae_page_table_entry* entry)
+{
+	return SetPageTableEntry(entry, 0);
+}
+
+
+/*static*/ inline pae_page_table_entry
+X86PagingMethodPAE::ClearPageTableEntryFlags(pae_page_table_entry* entry,
+	uint64 flags)
+{
+	return atomic_and64((int64*)entry, ~flags);
 }
 
 
