@@ -24,6 +24,10 @@
 #include "ShowImageConstants.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "PrintOptionsWindow"
+
+
 PrintOptions::PrintOptions()
 	:
 	fOption(kFitToPage),
@@ -73,9 +77,6 @@ PrintOptions::SetHeight(float h)
 	fHeight = h;
 }
 
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "PrintOptionsWindow"
 
 PrintOptionsWindow::PrintOptionsWindow(BPoint at, PrintOptions* options,
 	BWindow* listener)

@@ -150,7 +150,7 @@ class ShowImageView : public BView {
 		void _MergeSelection();
 		void _DeleteScaler();
 		void _DeleteBitmap();
-		void _DeleteSelBitmap();
+		void _DeleteSelectionBitmap();
 		int32 _BytesPerPixel(color_space cs) const;
 		void _CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR,
 				uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);

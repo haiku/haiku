@@ -28,6 +28,9 @@
 
 #define WINDOWS_TO_IGNORE 1
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "AboutWindow"
+
 extern const char* kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
 
 
@@ -46,9 +49,6 @@ ShowImageApp::~ShowImageApp()
 {
 }
 
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "AboutWindow"
 
 void
 ShowImageApp::AboutRequested()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2010, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -11,6 +11,7 @@
  *		Ryan Leavengood
  *		yellowTAB GmbH
  *		Bernd Korz
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -460,7 +461,7 @@ void
 ShowImageView::_DeleteBitmap()
 {
 	_DeleteScaler();
-	_DeleteSelBitmap();
+	_DeleteSelectionBitmap();
 
 	if (fDisplayBitmap != fBitmap)
 		delete fDisplayBitmap;
@@ -472,7 +473,7 @@ ShowImageView::_DeleteBitmap()
 
 
 void
-ShowImageView::_DeleteSelBitmap()
+ShowImageView::_DeleteSelectionBitmap()
 {
 	delete fSelBitmap;
 	fSelBitmap = NULL;
@@ -539,8 +540,6 @@ ShowImageView::SetImage(const entry_ref *ref)
 	fMakesSelection = false;
 	_DeleteBitmap();
 	fBitmap = newBitmap;
-	fDisplayBitmap = NULL;
-	newBitmap = NULL;
 	fCurrentRef = *ref;
 
 	// prepare the display bitmap
@@ -951,7 +950,7 @@ ShowImageView::_GetScaler(BRect rect)
 void
 ShowImageView::_DrawImage(BRect rect)
 {
-	if (fScaleBilinear || fDither) {
+	if (fDither) {
 #if DELAYED_SCALING
 		Scaler* scaler = fScaler;
 		if (scaler != NULL && !scaler->Matches(rect, fDither)) {
@@ -974,7 +973,8 @@ ShowImageView::_DrawImage(BRect rect)
 	if (!fDisplayBitmap)
 		fDisplayBitmap = fBitmap;
 
-	DrawBitmap(fDisplayBitmap, fDisplayBitmap->Bounds(), rect);
+	uint32 options = fScaleBilinear ? B_FILTER_BITMAP_BILINEAR : 0;
+	DrawBitmap(fDisplayBitmap, fDisplayBitmap->Bounds(), rect, options);
 }
 
 
@@ -2021,8 +2021,8 @@ ShowImageView::_RemoveSelection(bool toClipboard, bool neverCutBackground)
 
 	BRect rect = fSelectionRect;
 	bool cutBackground = (fSelBitmap) ? false : true;
-	BBitmap *selection, *restore = NULL;
-	selection = _CopySelection();
+	BBitmap* selection = _CopySelection();
+	BBitmap* restore = NULL;
 
 	if (toClipboard)
 		CopySelectionToClipboard();
@@ -2100,7 +2100,8 @@ void
 ShowImageView::SelectAll()
 {
 	_SetHasSelection(true);
-	fCopyFromRect.Set(0, 0, fBitmap->Bounds().Width(), fBitmap->Bounds().Height());
+	fCopyFromRect.Set(0, 0, fBitmap->Bounds().Width(),
+		fBitmap->Bounds().Height());
 	fSelectionRect = fCopyFromRect;
 	Invalidate();
 }
@@ -2117,10 +2118,10 @@ ShowImageView::ClearSelection()
 
 
 void
-ShowImageView::_SetHasSelection(bool bHasSelection)
+ShowImageView::_SetHasSelection(bool hasSelection)
 {
-	_DeleteSelBitmap();
-	fHasSelection = bHasSelection;
+	_DeleteSelectionBitmap();
+	fHasSelection = hasSelection;
 
 	_UpdateStatusText();
 
@@ -2133,31 +2134,34 @@ ShowImageView::_SetHasSelection(bool bHasSelection)
 void
 ShowImageView::CopySelectionToClipboard()
 {
-	if (_HasSelection() && be_clipboard->Lock()) {
-		be_clipboard->Clear();
-		BMessage *clip = NULL;
-		if ((clip = be_clipboard->Data()) != NULL) {
-			BMessage data;
-			BBitmap* bitmap = _CopySelection();
-			if (bitmap != NULL) {
-				#if 0
-				// According to BeBook and Becasso, Gobe Productive do the following.
-				// Paste works in Productive, but not in Becasso and original ShowImage.
-				BMessage msg(B_OK); // Becasso uses B_TRANSLATOR_BITMAP, BeBook says its unused
-				bitmap->Archive(&msg);
-				clip->AddMessage("image/x-be-bitmap", &msg);
-				#else
-				// original ShowImage performs this. Paste works with original ShowImage.
-				bitmap->Archive(clip);
-				// original ShowImage uses be:location for insertion point
-				clip->AddPoint("be:location", BPoint(fSelectionRect.left, fSelectionRect.top));
-				#endif
-				delete bitmap;
-				be_clipboard->Commit();
-			}
+	if (!_HasSelection() || !be_clipboard->Lock())
+		return;
+
+	be_clipboard->Clear();
+
+	BMessage* data = be_clipboard->Data();
+	if (data != NULL) {
+		BBitmap* bitmap = _CopySelection();
+		if (bitmap != NULL) {
+#if 0
+			// According to BeBook and Becasso, Gobe Productive do the
+			// following. Paste works in Productive, but not in Becasso and
+			// original ShowImage.
+			BMessage msg(B_OK);
+				// Becasso uses B_TRANSLATOR_BITMAP, BeBook says its unused.
+			bitmap->Archive(&msg);
+			data->AddMessage("image/x-be-bitmap", &msg);
+#else
+			// Original ShowImage performs this.
+			bitmap->Archive(data);
+			// original ShowImage uses be:location for insertion point
+			data->AddPoint("be:location", fSelectionRect.LeftTop());
+#endif
+			delete bitmap;
+			be_clipboard->Commit();
 		}
-		be_clipboard->Unlock();
 	}
+	be_clipboard->Unlock();
 }
 
 
