@@ -376,6 +376,11 @@ LaunchButton::SetIgnoreDoubleClick(bool refuse)
 void
 LaunchButton::_UpdateToolTip()
 {
+	// TODO: This works around a bug in the tool tip management.
+	// Remove when fixed (although no harm done...)
+	HideToolTip();
+	SetToolTip(static_cast<BToolTip*>(NULL));
+
 	if (fRef) {
 		BString helper(fRef->name);
 		if (fDescription.CountChars() > 0) {
