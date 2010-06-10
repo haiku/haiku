@@ -101,12 +101,12 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 	dma_buffer *buffer = request->dma_buffer;
 	const physical_entry *sg_list = buffer->sg_list_orig;
 	uint32 num_vecs = buffer->sg_count_orig;
-	char *buffer_data = buffer->address;
+	uchar *buffer_data = buffer->address;
 
 	SHOW_FLOW(1, "to_buffer=%d, %d bytes", to_buffer, (int)size);
 
 	// survive even if controller returned invalid data size
-	size = min(size, request->data_length);
+	size = min_c(size, request->data_length);
 
 	// we have to use S/G list to original data; the DMA buffer
 	// was allocated in kernel and is thus visible even if the thread
@@ -114,7 +114,7 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 	for (; size > 0 && num_vecs > 0; ++sg_list, --num_vecs) {
 		size_t bytes;
 
-		bytes = min( size, sg_list->size );
+		bytes = min_c( size, sg_list->size );
 
 		if (to_buffer) {
 			vm_memcpy_from_physical(buffer_data, sg_list->address, bytes,
@@ -495,7 +495,7 @@ scsi_release_dma_buffer(scsi_ccb *request)
 void
 scsi_dma_buffer_daemon(void *dev, int counter)
 {
-	scsi_device_info *device = dev;
+	scsi_device_info *device = (scsi_device_info*)dev;
 	dma_buffer *buffer;
 
 	ACQUIRE_BEN(&device->dma_buffer_lock);

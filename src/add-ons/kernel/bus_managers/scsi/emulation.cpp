@@ -71,8 +71,8 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 
 	// to satisfy alignment, we must allocate a buffer twice its required size
 	// and find the properly aligned part of it, ouch!
-	device->buffer_area = create_area("ATAPI buffer", (void *)&unaligned_addr, B_ANY_KERNEL_ADDRESS,
-								2 * total_size, B_CONTIGUOUS, 0);
+	device->buffer_area = create_area("ATAPI buffer", (void**)&unaligned_addr,
+		B_ANY_KERNEL_ADDRESS, 2 * total_size, B_CONTIGUOUS, 0);
 	if (device->buffer_area < 0) {
 		SHOW_ERROR( 1, "cannot create DMA buffer (%s)", strerror(device->buffer_area));
 
@@ -91,10 +91,10 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 		B_PRIxPHYSADDR ", unaligned_addr = %#" B_PRIxADDR ", aligned_addr = %#"
 		B_PRIxADDR, unaligned_phys, aligned_phys, unaligned_addr, aligned_addr);
 
-	device->buffer = (void *)aligned_addr;
+	device->buffer = (char*)aligned_addr;
 	device->buffer_size = buffer_size;
 	// s/g list is directly after buffer
-	device->buffer_sg_list = (void *)(aligned_addr + buffer_size);
+	device->buffer_sg_list = (physical_entry*)(aligned_addr + buffer_size);
 	device->buffer_sg_list[0].address = aligned_phys;
 	device->buffer_sg_list[0].size = buffer_size;
 	device->buffer_sg_count = 1;
@@ -482,14 +482,14 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		return 0;
 
 	// remaining bytes we are allowed to copy from/to request
-	req_size = min(allocation_length, request->data_length) - offset;
+	req_size = min_c(allocation_length, request->data_length) - offset;
 
 	// copy one S/G entry at a time
 	for (; size > 0 && req_size > 0 && sg_count > 0; ++sg_list, --sg_count) {
 		size_t bytes;
 
-		bytes = min(size, req_size);
-		bytes = min(bytes, sg_list->size);
+		bytes = min_c(size, req_size);
+		bytes = min_c(bytes, sg_list->size);
 
 		SHOW_FLOW(0, "buffer = %p, virt_addr = %#" B_PRIxPHYSADDR ", bytes = %"
 			B_PRIuSIZE ", to_buffer = %d", buffer, sg_list->address + offset,

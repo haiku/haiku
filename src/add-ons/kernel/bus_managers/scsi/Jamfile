@@ -14,9 +14,9 @@ KernelAddon scsi :
 	ccb.c
 	device_scan.c
 	devices.c
-	dma_buffer.c
+	dma_buffer.cpp
 	dpc.c
-	emulation.c
+	emulation.cpp
 	queuing.c
 	scsi.c
 	scsi_io.c

@@ -7,6 +7,7 @@
 
 //!	Internal structures/definitions
 
+#include <sys/cdefs.h>
 
 #include <bus/SCSI.h>
 #include <scsi_cmds.h>
@@ -110,7 +111,7 @@ typedef struct scsi_bus_info {
 
 	device_node *node;		// pnp node of bus
 
-	dma_params dma_params;		// dma restrictions of controller
+	struct dma_params dma_params;	// dma restrictions of controller
 
 	scsi_path_inquiry inquiry_data;	// inquiry data as read on init
 } scsi_bus_info;
@@ -176,7 +177,7 @@ typedef struct scsi_device_info {
 
 	struct mutex dma_buffer_lock;	// lock between DMA buffer user and clean-up daemon
 	sem_id dma_buffer_owner;	// to be acquired before using DMA buffer
-	dma_buffer dma_buffer;		// DMA buffer
+	struct dma_buffer dma_buffer;	// DMA buffer
 
 	// buffer used for emulating SCSI commands
 	char *buffer;
@@ -211,7 +212,7 @@ enum {
 	SCSI_STATE_QUEUED = 2,
 	SCSI_STATE_SENT = 3,
 	SCSI_STATE_FINISHED = 5,
-} scsi_state;
+};
 
 
 extern locked_pool_interface *locked_pool;
@@ -222,6 +223,8 @@ extern scsi_bus_interface scsi_bus_module;
 extern scsi_device_interface scsi_device_module;
 extern struct device_module_info gSCSIBusRawModule;
 
+
+__BEGIN_DECLS
 
 
 // busses.c
@@ -297,5 +300,9 @@ bool scsi_start_emulation(scsi_ccb *request);
 void scsi_finish_emulation(scsi_ccb *request);
 void scsi_free_emulation_buffer(scsi_device_info *device);
 status_t scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size);
+
+
+__END_DECLS
+
 
 #endif	/* _SCSI_INTERNAL_H */

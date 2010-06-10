@@ -21,7 +21,7 @@ local events_src =
 	evxfregn.c
 	;
 
-local hardware_src = 
+local hardware_src =
 	hwacpi.c
 	hwgpe.c
 	hwregs.c
@@ -158,7 +158,7 @@ local utilities_src =
 	utresrc.c
 	utstate.c
 	uttrack.c
-	utxface.c 
+	utxface.c
 	;
 
 StaticLibrary libacpi_ca.a :
@@ -184,7 +184,7 @@ SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons
 SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi parser ] ;
 
 KernelAddon acpi :
-	oshaiku.c
+	oshaiku.cpp
 	acpi_busman.c
 	acpi_module.c
 	acpi_device.c

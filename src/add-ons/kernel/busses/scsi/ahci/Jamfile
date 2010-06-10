@@ -11,5 +11,5 @@ KernelAddon ahci :
 	ahci_port.cpp
 	ahci_sim.cpp
 	sata_request.cpp
-	util.c
+	util.cpp
 ;

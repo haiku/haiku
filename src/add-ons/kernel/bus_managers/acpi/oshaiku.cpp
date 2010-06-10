@@ -114,8 +114,8 @@
  *****************************************************************************/
 
 
-
 #include <stdio.h>
+#include <sys/cdefs.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -131,11 +131,13 @@
 #	include <vm/vm.h>
 #endif
 
+__BEGIN_DECLS
 #include "acpi.h"
 #include "accommon.h"
 #include "amlcode.h"
 #include "acparser.h"
 #include "acdebug.h"
+__END_DECLS
 
 
 ACPI_MODULE_NAME("Haiku ACPI Module")
@@ -318,7 +320,7 @@ void
 AcpiOsRedirectOutput(void *destination)
 {
 	DEBUG_FUNCTION();
-	AcpiGbl_OutputFile = destination;
+	AcpiGbl_OutputFile = (FILE*)destination;
 }
 
 
@@ -890,7 +892,7 @@ AcpiOsReadPciConfiguration(ACPI_PCI_ID *pciId, UINT32 reg, void *value,
 		UINT32 width)
 {
 	uint32 *val;
-	val = value;
+	val = (uint32*)value;
 #ifdef _KERNEL_MODE
 	DEBUG_FUNCTION();
 
@@ -1198,7 +1200,7 @@ AcpiOsSignal(UINT32 function, void *info)
 	switch (function) {
 		case ACPI_SIGNAL_FATAL:
 #ifdef _KERNEL_MODE
-			panic(info == NULL ? "AcpiOsSignal: fatal" : info);
+			panic(info == NULL ? "AcpiOsSignal: fatal" : (const char*)info);
 			break;
 #endif
 		case ACPI_SIGNAL_BREAKPOINT:
@@ -1234,16 +1236,16 @@ AcpiOsSignal(UINT32 function, void *info)
 int
 AcpiOsAcquireGlobalLock(uint32 *lock)
 {
-	uint32 new;
-	uint32 old;
+	uint32 newValue;
+	uint32 oldValue;
 
 	do {
-		old = *lock;
-		new = ((old & ~GL_BIT_MASK) | GL_BIT_OWNED) |
-				((old >> 1) & GL_BIT_PENDING);
-		atomic_test_and_set(lock, new, old);
-	} while (*lock == old);
-	return ((new < GL_BIT_MASK) ? GL_ACQUIRED : GL_BUSY);
+		oldValue = *lock;
+		newValue = ((oldValue & ~GL_BIT_MASK) | GL_BIT_OWNED) |
+				((oldValue >> 1) & GL_BIT_PENDING);
+		atomic_test_and_set((int32*)lock, newValue, oldValue);
+	} while (*lock == oldValue);
+	return ((newValue < GL_BIT_MASK) ? GL_ACQUIRED : GL_BUSY);
 }
 
 
@@ -1257,15 +1259,15 @@ AcpiOsAcquireGlobalLock(uint32 *lock)
 int
 AcpiOsReleaseGlobalLock(uint32 *lock)
 {
-	uint32 new;
-	uint32 old;
+	uint32 newValue;
+	uint32 oldValue;
 
 	do {
-		old = *lock;
-		new = old & ~GL_BIT_MASK;
-		atomic_test_and_set(lock, new, old);
-	} while (*lock == old);
-	return (old & GL_BIT_PENDING);
+		oldValue = *lock;
+		newValue = oldValue & ~GL_BIT_MASK;
+		atomic_test_and_set((int32*)lock, newValue, oldValue);
+	} while (*lock == oldValue);
+	return (oldValue & GL_BIT_PENDING);
 }
 
 

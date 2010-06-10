@@ -50,7 +50,8 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 		*virt = virtadr;
 	if (phy)
 		*phy = (void*)(addr_t)pe.address;
-	TRACE("area = %ld, size = %ld, virt = %p, phy = %p\n", areaid, size, virtadr, pe.address);
+	TRACE("area = %ld, size = %ld, virt = %p, phy = %#" B_PRIxPHYSADDR "\n",
+		areaid, size, virtadr, pe.address);
 	return areaid;
 }
 
@@ -110,7 +111,7 @@ sg_memcpy(const physical_entry *sgTable, int sgCount, const void *data,
 void
 swap_words(void *data, size_t size)
 {
-	uint16 *word = data;
+	uint16 *word = (uint16*)data;
 	size_t count = size / 2;
 	while (count--) {
 		*word = (*word << 8) | (*word >> 8);
