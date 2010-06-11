@@ -149,6 +149,7 @@ Settings::ReadConfiguration()
 		flags = request.ifr_flags;
 
 	fAuto = (flags & IFF_AUTO_CONFIGURED) != 0;
+	fDisabled = (flags & IFF_UP) == 0;
 
 	// read resolv.conf for the dns.
 	fNameServers.MakeEmpty();
