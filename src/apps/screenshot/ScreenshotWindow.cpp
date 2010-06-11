@@ -356,7 +356,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 
 	fPreview->ClearViewBitmap();
 	fPreview->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
-		fPreview->Bounds(), B_FOLLOW_ALL, 0);
+		fPreview->Bounds(), B_FOLLOW_ALL, B_FILTER_BITMAP_BILINEAR);
 }
 
 
