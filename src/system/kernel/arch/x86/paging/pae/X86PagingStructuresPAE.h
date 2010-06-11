@@ -19,7 +19,7 @@ struct X86PagingStructuresPAE : X86PagingStructures {
 
 			void				Init(pae_page_directory_pointer_table_entry*
 										virtualPDPT,
-									 phys_addr_t physicalPDPT,
+									 phys_addr_t physicalPDPT, void* pdptHandle,
 									 pae_page_directory_entry* const*
 									 	virtualPageDirs,
 									 const phys_addr_t* physicalPageDirs);
@@ -31,6 +31,7 @@ struct X86PagingStructuresPAE : X86PagingStructures {
 
 private:
 			pae_page_directory_pointer_table_entry* fPageDirPointerTable;
+			void*				fPageDirPointerTableHandle;
 			pae_page_directory_entry* fVirtualPageDirs[4];
 			phys_addr_t			fPhysicalPageDirs[4];
 };

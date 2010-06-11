@@ -43,7 +43,40 @@ X86VMTranslationMapPAE::X86VMTranslationMapPAE()
 
 X86VMTranslationMapPAE::~X86VMTranslationMapPAE()
 {
-// TODO: Implement!
+	if (fPagingStructures == NULL)
+		return;
+
+	if (fPageMapper != NULL)
+		fPageMapper->Delete();
+
+	// cycle through and free all of the user space page tables
+
+	STATIC_ASSERT(KERNEL_BASE == 0x80000000 && KERNEL_SIZE == 0x80000000);
+		// assuming 1-1 split of the address space
+
+	for (uint32 k = 0; k < 2; k++) {
+		pae_page_directory_entry* pageDir
+			= fPagingStructures->VirtualPageDirs()[k];
+		if (pageDir == NULL)
+			continue;
+
+		for (uint32 i = 0; i < kPAEPageDirEntryCount; i++) {
+			if ((pageDir[i] & X86_PAE_PDE_PRESENT) != 0) {
+				phys_addr_t address = pageDir[i] & X86_PAE_PDE_ADDRESS_MASK;
+				vm_page* page = vm_lookup_page(address / B_PAGE_SIZE);
+				if (page == NULL)
+					panic("X86VMTranslationMapPAE::~X86VMTranslationMapPAE: "
+						"didn't find page table page: page address: %#"
+						B_PRIxPHYSADDR ", virtual base: %#" B_PRIxADDR "\n",
+						address,
+						(k * kPAEPageDirEntryCount + i) * kPAEPageTableRange);
+				DEBUG_PAGE_ACCESS_START(page);
+				vm_page_set_state(page, PAGE_STATE_FREE);
+			}
+		}
+	}
+
+	fPagingStructures->RemoveReference();
 }
 
 
@@ -67,7 +100,7 @@ X86VMTranslationMapPAE::Init(bool kernel)
 
 		// we already know the kernel pgdir mapping
 		fPagingStructures->Init(method->KernelVirtualPageDirPointerTable(),
-			method->KernelPhysicalPageDirPointerTable(),
+			method->KernelPhysicalPageDirPointerTable(), NULL,
 			method->KernelVirtualPageDirs(), method->KernelPhysicalPageDirs());
 	} else {
 		// user
@@ -124,7 +157,7 @@ X86VMTranslationMapPAE::Init(bool kernel)
 		}
 
 		// init the paging structures
-		fPagingStructures->Init(pdpt, physicalPDPT, virtualPageDirs,
+		fPagingStructures->Init(pdpt, physicalPDPT, pdptHandle, virtualPageDirs,
 			physicalPageDirs);
 	}
 
@@ -455,12 +488,48 @@ X86VMTranslationMapPAE::Query(addr_t virtualAddress,
 
 
 status_t
-X86VMTranslationMapPAE::QueryInterrupt(addr_t va, phys_addr_t *_physical,
-	uint32 *_flags)
+X86VMTranslationMapPAE::QueryInterrupt(addr_t virtualAddress,
+	phys_addr_t* _physicalAddress, uint32* _flags)
 {
-// TODO: Implement!
-	panic("X86VMTranslationMapPAE::QueryInterrupt(): not implemented");
-	return B_UNSUPPORTED;
+	// default the flags to not present
+	*_flags = 0;
+	*_physicalAddress = 0;
+
+	// get the page directory entry
+	pae_page_directory_entry* pageDirEntry
+		= X86PagingMethodPAE::PageDirEntryForAddress(
+			fPagingStructures->VirtualPageDirs(), virtualAddress);
+	if ((*pageDirEntry & X86_PAE_PDE_PRESENT) == 0) {
+		// no pagetable here
+		return B_OK;
+	}
+
+	// get the page table entry
+	pae_page_table_entry* pageTable
+		= (pae_page_table_entry*)X86PagingMethodPAE::Method()
+			->PhysicalPageMapper()->InterruptGetPageTableAt(
+				*pageDirEntry & X86_PAE_PDE_ADDRESS_MASK);
+	pae_page_table_entry entry
+		= pageTable[virtualAddress / B_PAGE_SIZE % kPAEPageTableEntryCount];
+
+	*_physicalAddress = entry & X86_PAE_PTE_ADDRESS_MASK;
+
+	// translate the page state flags
+	if ((entry & X86_PAE_PTE_USER) != 0) {
+		*_flags |= ((entry & X86_PAE_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
+			| B_READ_AREA;
+	}
+
+	*_flags |= ((entry & X86_PAE_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
+		| B_KERNEL_READ_AREA
+		| ((entry & X86_PAE_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
+		| ((entry & X86_PAE_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
+		| ((entry & X86_PAE_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
+
+	TRACE("X86VMTranslationMapPAE::Query(%#" B_PRIxADDR ") -> %#"
+		B_PRIxPHYSADDR ":\n", *_physicalAddress, virtualAddress);
+
+	return B_OK;
 }
 
 
