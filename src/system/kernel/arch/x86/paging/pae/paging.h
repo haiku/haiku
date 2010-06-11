@@ -58,6 +58,8 @@
 static const uint32 kPAEPageDirEntryCount = 512;
 static const uint32 kPAEPageTableEntryCount = 512;
 static const size_t kPAEPageTableRange = kPAEPageTableEntryCount * B_PAGE_SIZE;
+static const size_t kPAEPageDirRange
+	= kPAEPageDirEntryCount * kPAEPageTableRange;
 
 
 typedef uint64 pae_page_directory_pointer_table_entry;
