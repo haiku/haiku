@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AutoDeleter.h>
+
 #include <util/AutoLock.h>
 #include <vm/vm.h>
 #include <vm/vm_page.h>
@@ -466,9 +468,59 @@ status_t
 X86PagingMethodPAE::PhysicalPageSlotPool::AllocatePool(
 	X86LargePhysicalPageMapper::PhysicalPageSlotPool*& _pool)
 {
-// TODO: Implement!
-	panic("X86PagingMethodPAE::PhysicalPageSlotPool::AllocatePool(): not implemented");
-	return B_UNSUPPORTED;
+	// create the pool structure
+	PhysicalPageSlotPool* pool = new(std::nothrow) PhysicalPageSlotPool;
+	if (pool == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<PhysicalPageSlotPool> poolDeleter(pool);
+
+	// create an area that can contain the page table and the slot
+	// structures
+	size_t areaSize = B_PAGE_SIZE
+		+ sizeof(PhysicalPageSlot[kPAEPageTableEntryCount]);
+	void* data;
+	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
+		&data, B_ANY_KERNEL_ADDRESS, PAGE_ALIGN(areaSize), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
+	if (dataArea < 0)
+		return dataArea;
+
+	// create the null area for the virtual address space
+	void* virtualBase;
+	area_id virtualArea = vm_create_null_area(
+		VMAddressSpace::KernelID(), "physical page pool space",
+		&virtualBase, B_ANY_KERNEL_BLOCK_ADDRESS, kPAEPageTableRange,
+		CREATE_AREA_PRIORITY_VIP);
+	if (virtualArea < 0) {
+		delete_area(dataArea);
+		return virtualArea;
+	}
+
+	// prepare the page table
+	memset(data, 0, B_PAGE_SIZE);
+
+	// get the page table's physical address
+	phys_addr_t physicalTable;
+	X86VMTranslationMapPAE* map = static_cast<X86VMTranslationMapPAE*>(
+		VMAddressSpace::Kernel()->TranslationMap());
+	uint32 dummyFlags;
+	cpu_status state = disable_interrupts();
+	map->QueryInterrupt((addr_t)data, &physicalTable, &dummyFlags);
+	restore_interrupts(state);
+
+	// put the page table into the page directory
+	pae_page_directory_entry* pageDirEntry
+		= X86PagingMethodPAE::PageDirEntryForAddress(
+			map->PagingStructuresPAE()->VirtualPageDirs(), (addr_t)virtualBase);
+	PutPageTableInPageDir(pageDirEntry, physicalTable,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+
+	// init the pool structure
+	pool->Init(dataArea, (pae_page_table_entry*)data, virtualArea,
+		(addr_t)virtualBase);
+	poolDeleter.Detach();
+	_pool = pool;
+	return B_OK;
 }
 
 
@@ -615,8 +667,74 @@ bool
 X86PagingMethodPAE::IsKernelPageAccessible(addr_t virtualAddress,
 	uint32 protection)
 {
-// TODO: Implement!
-	return false;
+	// we can't check much without the physical page mapper
+	if (fPhysicalPageMapper == NULL)
+		return false;
+
+	// We only trust the kernel team's page directories. So switch to the
+	// kernel PDPT first. Always set it to make sure the TLBs don't contain
+	// obsolete data.
+	uint32 physicalPDPT;
+	read_cr3(physicalPDPT);
+	write_cr3(fKernelPhysicalPageDirPointerTable);
+
+	// get the PDPT entry for the address
+	pae_page_directory_pointer_table_entry pdptEntry = 0;
+	if (physicalPDPT == fKernelPhysicalPageDirPointerTable) {
+		pdptEntry = fKernelVirtualPageDirPointerTable[
+			virtualAddress / kPAEPageDirRange];
+	} else {
+		// map the original PDPT and get the entry
+		void* handle;
+		addr_t virtualPDPT;
+		status_t error = fPhysicalPageMapper->GetPageDebug(physicalPDPT,
+			&virtualPDPT, &handle);
+		if (error == B_OK) {
+			pdptEntry = ((pae_page_directory_pointer_table_entry*)
+				virtualPDPT)[virtualAddress / kPAEPageDirRange];
+			fPhysicalPageMapper->PutPageDebug(virtualPDPT, handle);
+		}
+	}
+
+	// map the page dir and get the entry
+	pae_page_directory_entry pageDirEntry = 0;
+	if ((pdptEntry & X86_PAE_PDPTE_PRESENT) != 0) {
+		void* handle;
+		addr_t virtualPageDir;
+		status_t error = fPhysicalPageMapper->GetPageDebug(
+			pdptEntry & X86_PAE_PDPTE_ADDRESS_MASK, &virtualPageDir, &handle);
+		if (error == B_OK) {
+			pageDirEntry = ((pae_page_directory_entry*)virtualPageDir)[
+				virtualAddress / kPAEPageTableRange % kPAEPageDirEntryCount];
+			fPhysicalPageMapper->PutPageDebug(virtualPageDir, handle);
+		}
+	}
+
+	// map the page table and get the entry
+	pae_page_table_entry pageTableEntry = 0;
+	if ((pageDirEntry & X86_PAE_PDE_PRESENT) != 0) {
+		void* handle;
+		addr_t virtualPageTable;
+		status_t error = fPhysicalPageMapper->GetPageDebug(
+			pageDirEntry & X86_PAE_PDE_ADDRESS_MASK, &virtualPageTable,
+			&handle);
+		if (error == B_OK) {
+			pageTableEntry = ((pae_page_table_entry*)virtualPageTable)[
+				virtualAddress / B_PAGE_SIZE % kPAEPageTableEntryCount];
+			fPhysicalPageMapper->PutPageDebug(virtualPageTable, handle);
+		}
+	}
+
+	// switch back to the original page directory
+	if (physicalPDPT != fKernelPhysicalPageDirPointerTable)
+		write_cr3(physicalPDPT);
+
+	if ((pageTableEntry & X86_PAE_PTE_PRESENT) == 0)
+		return false;
+
+	// present means kernel-readable, so check for writable
+	return (protection & B_KERNEL_WRITE_AREA) == 0
+		|| (pageTableEntry & X86_PAE_PTE_WRITABLE) != 0;
 }
 
 
