@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -42,7 +42,7 @@ const static settings_template kInterfaceAddressTemplate[] = {
 
 const static settings_template kInterfaceTemplate[] = {
 	{B_STRING_TYPE, "device", NULL, true},
-	{B_BOOL_TYPE,	"disabled", NULL},
+	{B_BOOL_TYPE, "disabled", NULL},
 	{B_MESSAGE_TYPE, "address", kInterfaceAddressTemplate},
 	{B_INT32_TYPE, "flags", NULL},
 	{B_INT32_TYPE, "metric", NULL},
@@ -87,8 +87,6 @@ const static settings_template kServicesTemplate[] = {
 
 
 Settings::Settings()
-	:
-	fUpdated(false)
 {
 	_Load();
 }
@@ -96,15 +94,6 @@ Settings::Settings()
 
 Settings::~Settings()
 {
-	// only save the settings if something has changed
-	if (!fUpdated)
-		return;
-
-#if 0
-	BFile file;
-	if (_Open(&file, B_CREATE_FILE | B_WRITE_ONLY) != B_OK)
-		return;
-#endif
 }
 
 
@@ -260,8 +249,10 @@ Settings::_ConvertFromDriverSettings(const char* name,
 		return B_ENTRY_NOT_FOUND;
 
 	const driver_settings* settings = get_driver_settings(handle);
-	if (settings != NULL)
-		status = _ConvertFromDriverSettings(*settings, settingsTemplate, message);
+	if (settings != NULL) {
+		status = _ConvertFromDriverSettings(*settings, settingsTemplate,
+			message);
+	}
 
 	unload_driver_settings(handle);
 	return status;
