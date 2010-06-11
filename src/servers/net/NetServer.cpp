@@ -56,6 +56,8 @@ public:
 private:
 			bool				_IsValidInterface(int socket, const char* name);
 			void				_RemoveInvalidInterfaces(int socket);
+			status_t			_RemoveInterface(int socket, const char* name);
+			status_t			_DisableInterface(int socket, const char* name);
 			bool				_TestForInterface(int socket, const char* name);
 			status_t			_ConfigureInterface(int socket,
 									BMessage& interface,
@@ -461,14 +463,7 @@ NetServer::_RemoveInvalidInterfaces(int socket)
 	for (uint32 i = 0; i < count; i++) {
 		if (!_IsValidInterface(socket, interface->ifr_name)) {
 			// remove invalid interface
-			ifreq request;
-			if (!prepare_request(request, interface->ifr_name))
-				break;
-
-			if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
-				fprintf(stderr, "%s: Could not delete interface %s: %s\n",
-					Name(), interface->ifr_name, strerror(errno));
-			}
+			_RemoveInterface(socket, interface->ifr_name);
 		}
 
 		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
@@ -524,6 +519,50 @@ NetServer::_TestForInterface(int socket, const char* name)
 
 	free(buffer);
 	return success;
+}
+
+
+status_t
+NetServer::_RemoveInterface(int socket, const char* name)
+{
+	ifreq request;
+	if (!prepare_request(request, name))
+		return B_ERROR;
+		
+	if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
+		fprintf(stderr, "%s: Could not delete interface %s: %s\n",
+			Name(), name, strerror(errno));
+		return B_ERROR;
+	}
+	
+	return B_OK;
+}
+
+
+status_t
+NetServer::_DisableInterface(int socket, const char* name)
+{
+	ifreq request;
+	if (!prepare_request(request, name))
+		return B_ERROR;
+
+	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
+		fprintf(stderr, "%s: Getting flags failed: %s\n", Name(), 
+			strerror(errno));
+		return B_ERROR;
+	}
+	// Set interface down
+	request.ifr_flags &= ~(IFF_UP | IFF_AUTO_CONFIGURED | IFF_CONFIGURING);
+
+	if (ioctl(socket, SIOCSIFFLAGS, &request, sizeof(struct ifreq)) < 0) {
+		fprintf(stderr, "%s: Setting flags failed: %s\n", Name(), 
+			strerror(errno));
+		return B_ERROR;
+	}
+
+	fprintf(stderr, "%s: set %s interface down...\n", Name(), name); 
+	
+	return B_OK;
 }
 
 
@@ -823,7 +862,6 @@ NetServer::_ConfigureDevices(int socket, const char* startPath,
 		struct stat stat;
 		BPath path;
 		if (entry.GetName(name) != B_OK
-			|| !strcmp(name, "stack")
 			|| entry.GetPath(&path) != B_OK
 			|| entry.GetStat(&stat) != B_OK)
 			continue;
@@ -852,6 +890,13 @@ NetServer::_ConfigureInterfaces(int socket, BMessage* _missingDevice)
 		const char *device;
 		if (interface.FindString("device", &device) != B_OK)
 			continue;
+			
+		bool disabled = false;
+		if (interface.FindBool("disabled", &disabled) == B_OK && disabled) {
+			// disabled by user request
+			_DisableInterface(socket, device);
+			continue;
+		}
 
 		if (!strncmp(device, "/dev/net/", 9)) {
 			// it's a kernel device, check if it's present
@@ -943,16 +988,8 @@ NetServer::_HandleDeviceMonitor(int socket, BMessage* message)
 		
 	if (opcode == B_ENTRY_CREATED)
 		_ConfigureDevice(socket, path);
-	else {
-		ifreq request;
-		if (!prepare_request(request, path))
-			return;
-		
-		if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
-			fprintf(stderr, "%s: Could not delete interface %s: %s\n",
-				Name(), path, strerror(errno));
-		}
-	}
+	else
+		_RemoveInterface(socket, path);
 }
 
 

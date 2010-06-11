@@ -74,7 +74,9 @@ static const uint32 kMsgRevert = 'rvrt';
 static const uint32 kMsgClose = 'clse';
 static const uint32 kMsgField = 'fild';
 static const uint32 kMsgInfo = 'info';
-static const uint32 kMsgMode = 'mode';
+static const uint32 kMsgStaticMode = 'stcm';
+static const uint32 kMsgDHCPMode = 'dynm';
+static const uint32 kMsgDisabledMode = 'disa';
 static const uint32	kMsgChange = 'chng';
 
 
@@ -127,12 +129,12 @@ EthernetSettingsView::EthernetSettingsView()
 
 	BPopUpMenu* modeMenu = new  BPopUpMenu("modes");
 	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("Static"),
-		new BMessage(kMsgMode)));
+		new BMessage(kMsgStaticMode)));
 	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("DHCP"),
-		new BMessage(kMsgMode)));
-	//modeMenu->AddSeparatorItem();
-	//BMenuItem* offItem = new BMenuItem("Disabled", NULL);
-	//modeMenu->AddItem(offItem);
+		new BMessage(kMsgDHCPMode)));
+	modeMenu->AddSeparatorItem();
+	modeMenu->AddItem(new BMenuItem(B_TRANSLATE("Disabled"),
+		new BMessage(kMsgDisabledMode)));
 
 	fDeviceMenuField = new BMenuField(B_TRANSLATE("Adapter:"), deviceMenu);
 	layout->AddItem(fDeviceMenuField->CreateLabelLayoutItem(), 0, 0);
@@ -320,14 +322,18 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		fGatewayTextControl->SetText(settings->Gateway());
 		fNetMaskTextControl->SetText(settings->Netmask());
 
-		if (settings->AutoConfigure() == true)
+		enableControls = false;
+		
+		if (settings->IsDisabled())
+			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Disabled"));
+		else if (settings->AutoConfigure() == true)
 			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("DHCP"));
-		else
+		else {
 			item = fTypeMenuField->Menu()->FindItem(B_TRANSLATE("Static"));
+			enableControls = true;
+		}
 		if (item)
 			item->SetMarked(true);
-
-		enableControls = settings->AutoConfigure() == false;
 
 		if (settings->NameServers().CountItems() >= 2) {
 			fSecondaryDNSTextControl->SetText(
@@ -370,6 +376,10 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 	fCurrentSettings->SetAutoConfigure(
 		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(),
 			B_TRANSLATE("DHCP")) == 0);
+
+	fCurrentSettings->SetDisabled(
+		strcmp(fTypeMenuField->Menu()->FindMarked()->Label(),
+			B_TRANSLATE("Disabled")) == 0);
 
 	fCurrentSettings->NameServers().MakeEmpty();
 	fCurrentSettings->NameServers().AddItem(new BString(
@@ -444,7 +454,9 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	// loop over all adapters. open the settings file only once,
 	// append the settins of each non-autoconfiguring adapter
 	for (int i = 0; i < fSettings.CountItems(); i++) {
-		if (fSettings.ItemAt(i)->AutoConfigure())
+		Settings* settings = fSettings.ItemAt(i);
+		
+		if (settings->AutoConfigure())
 			continue;
 
 		if (fp == NULL) {
@@ -456,16 +468,20 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 			}
 		}
 
-		fprintf(fp, "interface %s {\n\t\taddress {\n",
-			fSettings.ItemAt(i)->Name());
-		fprintf(fp, "\t\t\tfamily\tinet\n");
-		fprintf(fp, "\t\t\taddress\t%s\n",
-			fSettings.ItemAt(i)->IP());
-		fprintf(fp, "\t\t\tgateway\t%s\n",
-			fSettings.ItemAt(i)->Gateway());
-		fprintf(fp, "\t\t\tmask\t%s\n",
-			fSettings.ItemAt(i)->Netmask());
-		fprintf(fp, "\t\t}\n}\n\n");
+		fprintf(fp, "interface %s {\n",
+			settings->Name());
+			
+		if (settings->IsDisabled())
+			fprintf(fp, "\tdisabled\ttrue\n");
+		else {	
+			fprintf(fp, "\taddress {\n");
+			fprintf(fp, "\t\tfamily\tinet\n");
+			fprintf(fp, "\t\taddress\t%s\n", settings->IP());
+			fprintf(fp, "\t\tgateway\t%s\n", settings->Gateway());
+			fprintf(fp, "\t\tmask\t%s\n", settings->Netmask());
+			fprintf(fp, "\t}\n");
+		}
+		fprintf(fp, "}\n\n");
 	}
 	if (fp) {
 		printf("%s saved.\n", path.Path());
@@ -565,10 +581,10 @@ void
 EthernetSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgMode:
-			if (BMenuItem* item = fTypeMenuField->Menu()->FindMarked())
-				_EnableTextControls(strcmp(item->Label(),
-					B_TRANSLATE("DHCP")) != 0);
+		case kMsgStaticMode:
+		case kMsgDHCPMode:
+		case kMsgDisabledMode:
+			_EnableTextControls(message->what == kMsgStaticMode);
 			fApplyButton->SetEnabled(true);
 			fRevertButton->SetEnabled(true);
 			break;

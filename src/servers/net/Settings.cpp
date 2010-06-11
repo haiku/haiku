@@ -42,6 +42,7 @@ const static settings_template kInterfaceAddressTemplate[] = {
 
 const static settings_template kInterfaceTemplate[] = {
 	{B_STRING_TYPE, "device", NULL, true},
+	{B_BOOL_TYPE,	"disabled", NULL},
 	{B_MESSAGE_TYPE, "address", kInterfaceAddressTemplate},
 	{B_INT32_TYPE, "flags", NULL},
 	{B_INT32_TYPE, "metric", NULL},

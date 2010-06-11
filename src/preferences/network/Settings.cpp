@@ -32,7 +32,8 @@
 
 Settings::Settings(const char* name)
 	:
-	fAuto(true),
+	fAuto(true), 
+	fDisabled(false),
 	fNameServers(5, true)
 {
 	fSocket = socket(AF_INET, SOCK_DGRAM, 0);

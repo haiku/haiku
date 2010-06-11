@@ -25,6 +25,8 @@ public:
 			void				SetDomain(BString domain) { fDomain = domain; }
 			void				SetAutoConfigure(bool autoConfigure)
 									{ fAuto = autoConfigure; }
+			void				SetDisabled(bool disabled) 
+									{ fDisabled = disabled; }
 
 			const char*			IP()  { return fIP.String(); }
 			const char*			Gateway()  { return fGateway.String(); }
@@ -32,6 +34,7 @@ public:
 			const char*			Name()  { return fName.String(); }
 			const char*			Domain() { return fDomain.String(); }
 			bool				AutoConfigure() { return fAuto; }
+			bool				IsDisabled() { return fDisabled; }
 
 			BObjectList<BString>& NameServers() { return fNameServers; }
 
@@ -47,6 +50,7 @@ private:
 			BString				fDomain;
 			int					fSocket;
 			bool				fAuto;
+			bool				fDisabled;
 			BObjectList<BString> fNameServers;
 };
 
