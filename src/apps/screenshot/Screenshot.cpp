@@ -128,7 +128,7 @@ Screenshot::ReadyToRun()
 		// Launch the GUI application
 		if (fUtility->wholeScreen == NULL) {
 			// No command line parameters were given
-			be_roster->Launch("application/x-vnd.Haiku-ScreenshotApp");
+			be_roster->Launch("application/x-vnd.haiku-screenshot");
 		} else {
 			// Send the utility data and the command line settings to the GUI
 			BMessage message;
