@@ -859,6 +859,11 @@ ThemeInterfaceView::SetScreenshot(BBitmap *shot)
 	fScreenshotPane->ClearViewBitmap();
 	if (shot)
 	{
+#ifdef __HAIKU__
+		fScreenshotPane->SetViewBitmap(shot, shot->Bounds(),
+			fScreenshotPane->Bounds(), B_FOLLOW_ALL, B_FILTER_BITMAP_BILINEAR);
+
+#else
 		BBitmap scaled(fScreenshotPane->Bounds(), B_RGB32);
 		status_t err = ENOSYS;
 #ifdef B_ZETA_VERSION
@@ -870,8 +875,10 @@ ThemeInterfaceView::SetScreenshot(BBitmap *shot)
 		}
 		else
 		{
-			fScreenshotPane->SetViewBitmap(shot, shot->Bounds(), fScreenshotPane->Bounds());
+			fScreenshotPane->SetViewBitmap(shot, shot->Bounds(),
+				fScreenshotPane->Bounds());
 		}
+#endif
 	}
 	
 	fScreenshotPane->Invalidate(fScreenshotPane->Bounds());
