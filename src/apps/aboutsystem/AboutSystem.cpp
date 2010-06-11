@@ -1673,8 +1673,8 @@ static const char*
 MemUsageToString(char string[], size_t size, system_info* info)
 {
 	snprintf(string, size, B_TRANSLATE("%d MB total, %d MB used (%d%%)"),
-			int(info->max_pages / 256.0f + 0.5f),
-			int(info->used_pages / 256.0f + 0.5f),
+			int(info->max_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f),
+			int(info->used_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f),
 			int(100 * info->used_pages / info->max_pages));
 
 	return string;
