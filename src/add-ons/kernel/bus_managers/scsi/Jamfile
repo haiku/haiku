@@ -6,6 +6,7 @@ UsePrivateKernelHeaders ;
 # disable debug output, if debugging is disabled
 if $(DEBUG) = 0 {
 	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
+	SubDirC++Flags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
 }
 
 KernelAddon scsi :
