@@ -4674,6 +4674,10 @@ BView::DoLayout()
 void
 BView::SetToolTip(const char* text)
 {
+	// TODO: temporary work-around for bug #5669
+	HideToolTip();
+	SetToolTip(static_cast<BToolTip*>(NULL));
+
 	if (BTextToolTip* tip = dynamic_cast<BTextToolTip*>(fToolTip))
 		tip->SetText(text);
 	else
