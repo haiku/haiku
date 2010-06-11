@@ -18,26 +18,28 @@
    								  (defaults to undefined)
 */
 #ifdef __INTEL__
-#	define __HAIKU_ARCH				x86
-#	define __HAIKU_ARCH_X86			1
+#	define __HAIKU_ARCH					x86
+#	define __HAIKU_ARCH_X86				1
+/*#	define __HAIKU_ARCH_PHYSICAL_BITS	64*/
+	/* enables PAE */
 #elif __x86_64__
-#	define __HAIKU_ARCH				x86_64
-#	define __HAIKU_ARCH_X86_64		1
-#	define __HAIKU_ARCH_BITS		64
+#	define __HAIKU_ARCH					x86_64
+#	define __HAIKU_ARCH_X86_64			1
+#	define __HAIKU_ARCH_BITS			64
 #elif __POWERPC__
-#	define __HAIKU_ARCH				ppc
-#	define __HAIKU_ARCH_PPC			1
-#	define __HAIKU_BIG_ENDIAN		1
+#	define __HAIKU_ARCH					ppc
+#	define __HAIKU_ARCH_PPC				1
+#	define __HAIKU_BIG_ENDIAN			1
 #elif __M68K__
-#	define __HAIKU_ARCH				m68k
-#	define __HAIKU_ARCH_M68K		1
-#	define __HAIKU_BIG_ENDIAN		1
+#	define __HAIKU_ARCH					m68k
+#	define __HAIKU_ARCH_M68K			1
+#	define __HAIKU_BIG_ENDIAN			1
 #elif __MIPSEL__
-#	define __HAIKU_ARCH				mipsel
-#	define __HAIKU_ARCH_MIPSEL		1
+#	define __HAIKU_ARCH					mipsel
+#	define __HAIKU_ARCH_MIPSEL			1
 #elif __ARM__
-#	define __HAIKU_ARCH				arm
-#	define __HAIKU_ARCH_ARM			1
+#	define __HAIKU_ARCH					arm
+#	define __HAIKU_ARCH_ARM				1
 #else
 #	error Unsupported architecture!
 #endif
