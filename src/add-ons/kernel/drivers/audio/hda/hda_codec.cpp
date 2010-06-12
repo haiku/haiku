@@ -653,6 +653,8 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	corb_t verbs[3];
 	uint32 resp[3];
 
+	hda_codec* codec = audioGroup->codec;
+	uint32 codec_id = (codec->vendor_id << 16) | codec->product_id;
 	hda_widget_get_stream_support(audioGroup, &audioGroup->widget);
 	hda_widget_get_pm_support(audioGroup, &audioGroup->widget);
 	hda_widget_get_amplifier_capabilities(audioGroup, &audioGroup->widget);
@@ -707,7 +709,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			>> AUDIO_CAP_TYPE_SHIFT);
 
 		/* Check specific node ids declared as inputs as beepers */
-		switch ((audioGroup->codec->vendor_id << 16) | audioGroup->codec->product_id) {
+		switch (codec_id) {
 			case 0x11d41882:
 			case 0x11d41883:
 			case 0x11d41884:
@@ -811,6 +813,19 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	}
 
 	hda_widget_get_associations(audioGroup);
+
+	// init the codecs
+	switch (codec_id) {
+		case 0x10ec0888: {
+			hda_verb_write(codec, 0x20, VID_SET_COEFFICIENT_INDEX, 0x0);
+			uint32 tmp;
+			hda_verb_read(codec, 0x20, VID_GET_PROCESSING_COEFFICIENT, &tmp);
+			hda_verb_write(codec, 0x20, VID_SET_COEFFICIENT_INDEX, 0x7);
+			hda_verb_write(codec, 0x20, VID_SET_PROCESSING_COEFFICIENT, 
+				(tmp & 0xf0) == 0x20 ? 0x830 : 0x3030);
+			break;
+		}
+	}
 
 	return B_OK;
 }

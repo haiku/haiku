@@ -774,6 +774,22 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 }
 
 
+status_t
+hda_verb_write(hda_codec* codec, uint32 nid, uint32 vid, uint8 payload)
+{
+	corb_t verb = MAKE_VERB(codec->addr, nid, vid, payload);
+	return hda_send_verbs(codec, &verb, NULL, 1);
+}
+
+
+status_t
+hda_verb_read(hda_codec* codec, uint32 nid, uint32 vid, uint32 *response)
+{
+	corb_t verb = MAKE_VERB(codec->addr, nid, vid, 0);
+	return hda_send_verbs(codec, &verb, response, 1);
+}
+
+
 /*! Setup hardware for use; detect codecs; etc */
 status_t
 hda_hw_init(hda_controller* controller)
