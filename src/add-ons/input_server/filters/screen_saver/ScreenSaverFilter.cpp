@@ -14,6 +14,7 @@
 
 #include <Application.h>
 #include <Autolock.h>
+#include <FindDirectory.h>
 #include <MessageRunner.h>
 #include <NodeMonitor.h>
 #include <OS.h>
@@ -172,7 +173,7 @@ ScreenSaverFilter::_WatchSettings()
 void
 ScreenSaverFilter::_Invoke()
 {
-	if (fCurrentCorner == fNeverBlankCorner && fNeverBlankCorner != NO_CORNER
+	if ((fCurrentCorner == fNeverBlankCorner && fNeverBlankCorner != NO_CORNER)
 		|| (fSettings.TimeFlags() & ENABLE_SAVER) == 0
 		|| fIsRunning
 		|| be_roster->IsRunning(SCREEN_BLANKER_SIG))
@@ -181,6 +182,21 @@ ScreenSaverFilter::_Invoke()
 	if (be_roster->Launch(SCREEN_BLANKER_SIG) == B_OK) {
 		// Already set the running state to avoid launching
 		// the blanker twice in any case.
+		fIsRunning = true;
+	}
+
+	// Try really hard to launch it. It's very likely that this fails,
+	// when we run from the CD and there is only an incomplete mime
+	// database for example...
+	BPath path;
+	if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
+		|| path.Append("screen_blanker") != B_OK) {
+		path.SetTo("/boot/system/bin/screen_blanker");
+	}
+	BEntry entry(path.Path());
+	entry_ref ref;
+	if (entry.GetRef(&ref) == B_OK 
+		&& be_roster->Launch(&ref) == B_OK) {
 		fIsRunning = true;
 	}
 }
