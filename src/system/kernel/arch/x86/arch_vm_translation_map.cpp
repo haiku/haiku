@@ -73,12 +73,28 @@ arch_vm_translation_map_init(kernel_args *args,
 #endif
 
 #if B_HAIKU_PHYSICAL_BITS == 64
-	if (x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON)
-			/* TODO: && if needed */) {
+	bool paeAvailable = x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON);
+	bool paeNeeded = false;
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+		phys_addr_t end = args->physical_memory_range[i].start
+			+ args->physical_memory_range[i].size;
+		if (end > 0x100000000LL) {
+			paeNeeded = true;
+			break;
+		}
+	}
+
+	if (paeAvailable && paeNeeded) {
+		dprintf("using PAE paging\n");
 		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethodPAE;
-	} else
-#endif
+	} else {
+		dprintf("using 32 bit paging (PAE not %s)\n",
+			paeNeeded ? "available" : "needed");
 		gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod32Bit;
+	}
+#else
+	gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod32Bit;
+#endif
 
 	return gX86PagingMethod->Init(args, _physicalPageMapper);
 }
