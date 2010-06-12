@@ -189,7 +189,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fDocumentCount(1),
 	fBitmap(NULL),
 	fDisplayBitmap(NULL),
-	fSelBitmap(NULL),
+	fSelectionBitmap(NULL),
 	fZoom(1.0),
 	fScaleBilinear(true),
 	fScaler(NULL),
@@ -475,8 +475,8 @@ ShowImageView::_DeleteBitmap()
 void
 ShowImageView::_DeleteSelectionBitmap()
 {
-	delete fSelBitmap;
-	fSelBitmap = NULL;
+	delete fSelectionBitmap;
+	fSelectionBitmap = NULL;
 }
 
 
@@ -1007,11 +1007,12 @@ ShowImageView::Draw(BRect updateRect)
 		_DrawCaption();
 
 	if (_HasSelection()) {
-		if (fSelBitmap) {
-			BRect srcBits, destRect;
-			_GetSelMergeRects(srcBits, destRect);
-			destRect = _ImageToView(destRect);
-			DrawBitmap(fSelBitmap, srcBits, destRect);
+		if (fSelectionBitmap != NULL) {
+			BRect srcRect;
+			BRect dstRect;
+			_GetSelectionMergeRects(srcRect, dstRect);
+			dstRect = _ImageToView(dstRect);
+			DrawBitmap(fSelectionBitmap, srcRect, dstRect);
 		}
 		_DrawSelectionBox();
 	}
@@ -1098,7 +1099,8 @@ ShowImageView::_CopySelection(uchar alpha, bool imageSize)
 		rect.bottom = floorf((rect.bottom + 1.0) * fZoom - 1.0);
 	}
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new(nothrow) BBitmap(rect, hasAlpha ? B_RGBA32 : fBitmap->ColorSpace(), true);
+	BBitmap* bitmap = new(nothrow) BBitmap(rect, hasAlpha ? B_RGBA32
+		: fBitmap->ColorSpace(), true);
 	if (bitmap == NULL || !bitmap->IsValid()) {
 		delete bitmap;
 		return NULL;
@@ -1106,15 +1108,33 @@ ShowImageView::_CopySelection(uchar alpha, bool imageSize)
 
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
-		if (fSelBitmap)
-			view.DrawBitmap(fSelBitmap, fSelBitmap->Bounds(), rect);
-		else
+#ifdef __HAIKU__
+		// On Haiku, B_OP_SUBSTRACT does not affect alpha like it did on BeOS.
+		// Don't know if it's better to fix it or not (stippi).
+		if (hasAlpha) {
+			view.SetHighColor(0, 0, 0, 0);
+			view.FillRect(view.Bounds());
+			view.SetDrawingMode(B_OP_ALPHA);
+			view.SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
+			view.SetHighColor(0, 0, 0, alpha);
+		}
+		if (fSelectionBitmap) {
+			view.DrawBitmap(fSelectionBitmap,
+				fSelectionBitmap->Bounds().OffsetToCopy(B_ORIGIN), rect);
+		} else
+			view.DrawBitmap(fBitmap, fCopyFromRect, rect);
+#else
+		if (fSelectionBitmap) {
+			view.DrawBitmap(fSelectionBitmap,
+				fSelectionBitmap->Bounds().OffsetToCopy(B_ORIGIN), rect);
+		} else
 			view.DrawBitmap(fBitmap, fCopyFromRect, rect);
 		if (hasAlpha) {
 			view.SetDrawingMode(B_OP_SUBTRACT);
-			view.SetHighColor(0, 0, 0, 255-alpha);
+			view.SetHighColor(0, 0, 0, 255 - alpha);
 			view.FillRect(rect, B_SOLID_HIGH);
 		}
+#endif
 		view.Sync();
 		bitmap->RemoveChild(&view);
 		bitmap->Unlock();
@@ -1383,47 +1403,41 @@ ShowImageView::_GetMouseButtons()
 
 
 void
-ShowImageView::_GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits,
-	BRect &destRect)
+ShowImageView::_GetMergeRects(BBitmap* merge, BRect selection, BRect& srcRect,
+	BRect& dstRect)
 {
-	destRect = selection;
-	_ConstrainToImage(destRect);
+	// Constrain dstRect to target image size and apply the same edge offsets
+	// to the srcRect.
 
-	srcBits = selection;
-	if (srcBits.left < 0)
-		srcBits.left = -(srcBits.left);
-	else
-		srcBits.left = 0;
+	dstRect = selection;
 
-	if (srcBits.top < 0)
-		srcBits.top = -(srcBits.top);
-	else
-		srcBits.top = 0;
+	BRect clippedDstRect(dstRect);
+	_ConstrainToImage(clippedDstRect);
 
-	if (srcBits.right > fBitmap->Bounds().right)
-		srcBits.right = srcBits.left + destRect.Width();
-	else
-		srcBits.right = merge->Bounds().right;
+	srcRect = merge->Bounds().OffsetToCopy(B_ORIGIN);
 
-	if (srcBits.bottom > fBitmap->Bounds().bottom)
-		srcBits.bottom = srcBits.top + destRect.Height();
-	else
-		srcBits.bottom = merge->Bounds().bottom;
+	srcRect.left += clippedDstRect.left - dstRect.left;
+	srcRect.top += clippedDstRect.top - dstRect.top;
+	srcRect.right += clippedDstRect.right - dstRect.right;
+	srcRect.bottom += clippedDstRect.bottom - dstRect.bottom;
+
+	dstRect = clippedDstRect;
 }
 
 
 void
-ShowImageView::_GetSelMergeRects(BRect &srcBits, BRect &destRect)
+ShowImageView::_GetSelectionMergeRects(BRect& srcRect, BRect& dstRect)
 {
-	_GetMergeRects(fSelBitmap, fSelectionRect, srcBits, destRect);
+	_GetMergeRects(fSelectionBitmap, fSelectionRect, srcRect, dstRect);
 }
 
 
 void
-ShowImageView::_MergeWithBitmap(BBitmap *merge, BRect selection)
+ShowImageView::_MergeWithBitmap(BBitmap* merge, BRect selection)
 {
 	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new(nothrow) BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
+	BBitmap* bitmap = new(nothrow) BBitmap(fBitmap->Bounds(),
+		fBitmap->ColorSpace(), true);
 	if (bitmap == NULL || !bitmap->IsValid()) {
 		delete bitmap;
 		return;
@@ -1432,9 +1446,10 @@ ShowImageView::_MergeWithBitmap(BBitmap *merge, BRect selection)
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
 		view.DrawBitmap(fBitmap, fBitmap->Bounds());
-		BRect srcBits, destRect;
-		_GetMergeRects(merge, selection, srcBits, destRect);
-		view.DrawBitmap(merge, srcBits, destRect);
+		BRect srcRect;
+		BRect dstRect;
+		_GetMergeRects(merge, selection, srcRect, dstRect);
+		view.DrawBitmap(merge, srcRect, dstRect);
 
 		view.Sync();
 		bitmap->RemoveChild(&view);
@@ -1455,17 +1470,17 @@ ShowImageView::_MergeSelection()
 	if (!_HasSelection())
 		return;
 
-	if (!fSelBitmap) {
-		// Even though the merge will not change
-		// the background image, I still need to save
-		// some undo information here
+	if (fSelectionBitmap == NULL) {
+		// Even though the merge will not change the background image,
+		// undo information still needs to be saved here.
 		fUndo.SetTo(fSelectionRect, NULL, _CopySelection());
 		return;
 	}
 
 	// Merge selection with background
-	fUndo.SetTo(fSelectionRect, _CopyFromRect(fSelectionRect), _CopySelection());
-	_MergeWithBitmap(fSelBitmap, fSelectionRect);
+	fUndo.SetTo(fSelectionRect, _CopyFromRect(fSelectionRect),
+		_CopySelection());
+	_MergeWithBitmap(fSelectionBitmap, fSelectionRect);
 }
 
 
@@ -1481,8 +1496,8 @@ ShowImageView::MouseDown(BPoint position)
 
 	if (_HasSelection() && fSelectionRect.Contains(point)
 		&& (buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
-		if (!fSelBitmap)
-			fSelBitmap = _CopySelection();
+		if (!fSelectionBitmap)
+			fSelectionBitmap = _CopySelection();
 
 		BPoint sourcePoint = point;
 		_BeginDrag(sourcePoint);
@@ -1966,14 +1981,14 @@ ShowImageView::Undo()
 	BBitmap *undoSelection;
 	undoSelection = fUndo.GetSelectionBitmap();
 		// NOTE: ShowImageView is responsible for deleting this bitmap
-		// (Which it will, as it would with a fSelBitmap that it allocated itself)
+		// (Which it will, as it would with a fSelectionBitmap that it allocated itself)
 	if (!undoSelection)
 		_SetHasSelection(false);
 	else {
 		fCopyFromRect = BRect();
 		fSelectionRect = fUndo.GetRect();
 		_SetHasSelection(true);
-		fSelBitmap = undoSelection;
+		fSelectionBitmap = undoSelection;
 	}
 
 	fUndo.Undo(undoneSelRect, NULL, undoneSelection);
@@ -2020,7 +2035,7 @@ ShowImageView::_RemoveSelection(bool toClipboard, bool neverCutBackground)
 		return;
 
 	BRect rect = fSelectionRect;
-	bool cutBackground = (fSelBitmap) ? false : true;
+	bool cutBackground = (fSelectionBitmap) ? false : true;
 	BBitmap* selection = _CopySelection();
 	BBitmap* restore = NULL;
 
@@ -2051,48 +2066,60 @@ ShowImageView::Cut()
 
 
 status_t
-ShowImageView::_PasteBitmap(BBitmap *bitmap, BPoint point)
+ShowImageView::_PasteBitmap(BBitmap* bitmap, BPoint point)
 {
-	if (bitmap && bitmap->IsValid()) {
-		_MergeSelection();
+	if (bitmap == NULL || !bitmap->IsValid())
+		return B_BAD_VALUE;
 
-		fCopyFromRect = BRect();
-		fSelectionRect = bitmap->Bounds();
-		_SetHasSelection(true);
-		fSelBitmap = bitmap;
+	_MergeSelection();
 
-		BRect offsetRect = fSelectionRect;
-		offsetRect.OffsetBy(point);
-		if (fBitmap->Bounds().Intersects(offsetRect))
-			// Move the selection rectangle to desired origin,
-			// but only if the resulting selection rectangle
-			// intersects with the background bitmap rectangle
-			fSelectionRect = offsetRect;
+	fCopyFromRect = BRect();
+	fSelectionRect = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
+	_SetHasSelection(true);
+	delete fSelectionBitmap;
+	fSelectionBitmap = bitmap;
 
-		Invalidate();
-
-		return B_OK;
+	BRect offsetRect(fSelectionRect.OffsetToCopy(point));
+	if (fBitmap->Bounds().Intersects(offsetRect)) {
+		// Move the selection rectangle to desired origin,
+		// but only if the resulting selection rectangle
+		// intersects with the background bitmap rectangle
+		fSelectionRect = offsetRect;
 	}
+printf("bitmap: "); bitmap->Bounds().PrintToStream();
+printf("selection: "); fSelectionRect.PrintToStream();
+printf("point: "); point.PrintToStream();
 
-	return B_ERROR;
+	Invalidate();
+
+	return B_OK;
 }
 
 
 void
 ShowImageView::Paste()
 {
-	if (be_clipboard->Lock()) {
-		BMessage *pclip;
-		if ((pclip = be_clipboard->Data()) != NULL) {
-			BPoint point(0, 0);
-			pclip->FindPoint("be:location", &point);
-			BBitmap *pbits;
-			pbits = dynamic_cast<BBitmap *>(BBitmap::Instantiate(pclip));
-			_PasteBitmap(pbits, point);
-		}
+	if (!be_clipboard->Lock())
+		return;
 
-		be_clipboard->Unlock();
+	BMessage* data = be_clipboard->Data();
+	if (data != NULL) {
+		BMessage bitmapArchive;
+		if (data->FindMessage("image/bitmap", &bitmapArchive) == B_OK
+			|| data->FindMessage("image/x-be-bitmap", &bitmapArchive)
+				== B_OK) {
+			BBitmap* bitmap = dynamic_cast<BBitmap*>(
+				BBitmap::Instantiate(&bitmapArchive));
+			if (bitmap != NULL) {
+				BPoint point;
+				if (data->FindPoint("be:location", &point) != B_OK)
+					point = bitmap->Bounds().LeftTop();
+				_PasteBitmap(bitmap, point);
+			}
+		}
 	}
+
+	be_clipboard->Unlock();
 }
 
 
@@ -2143,21 +2170,16 @@ ShowImageView::CopySelectionToClipboard()
 	if (data != NULL) {
 		BBitmap* bitmap = _CopySelection();
 		if (bitmap != NULL) {
-#if 0
-			// According to BeBook and Becasso, Gobe Productive do the
-			// following. Paste works in Productive, but not in Becasso and
-			// original ShowImage.
-			BMessage msg(B_OK);
-				// Becasso uses B_TRANSLATOR_BITMAP, BeBook says its unused.
-			bitmap->Archive(&msg);
-			data->AddMessage("image/x-be-bitmap", &msg);
-#else
-			// Original ShowImage performs this.
-			bitmap->Archive(data);
-			// original ShowImage uses be:location for insertion point
+			BMessage bitmapArchive;
+			bitmap->Archive(&bitmapArchive);
+			// NOTE: Possibly "image/x-be-bitmap" is more correct.
+			// This works with WonderBrush, though, which in turn had been
+			// tested with other apps.
+			data->AddMessage("image/bitmap", &bitmapArchive);
 			data->AddPoint("be:location", fSelectionRect.LeftTop());
-#endif
+
 			delete bitmap;
+
 			be_clipboard->Commit();
 		}
 	}

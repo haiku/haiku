@@ -143,7 +143,7 @@ class ShowImageView : public BView {
 		void _AddToRecentDocuments();
 		void _AddWhiteRect(BRect &rect);
 		void _GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect);
-		void _GetSelMergeRects(BRect &srcBits, BRect &destRect);
+		void _GetSelectionMergeRects(BRect &srcBits, BRect &destRect);
 		status_t _SetSelection(const entry_ref *pref, BPoint point);
 		status_t _PasteBitmap(BBitmap *bitmap, BPoint point);
 		void _MergeWithBitmap(BBitmap *merge, BRect selection);
@@ -211,7 +211,7 @@ class ShowImageView : public BView {
 		BBitmap *fDisplayBitmap;
 			// the image to be displayed
 			// (== fBitmap if the bitmap can be displayed as is)
-		BBitmap *fSelBitmap;		// the bitmap in the selection
+		BBitmap *fSelectionBitmap;		// the bitmap in the selection
 		float fZoom;				// factor to be used to display the image
 		bool fScaleBilinear;		// use bilinear scaling?
 		Scaler* fScaler;			// holds the scaled image if bilinear scaling is enabled

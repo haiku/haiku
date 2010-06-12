@@ -226,11 +226,8 @@ ShowImageApp::CheckClipboard()
 	if (be_clipboard->Lock()) {
 		BMessage* clip = be_clipboard->Data();
 		if (clip != NULL) {
-			BString className;
-			if (clip->FindString("class", &className) == B_OK) {
-				if (className == "BBitmap")
-					dataAvailable = true;
-			}
+			dataAvailable = clip->HasMessage("image/bitmap")
+				|| clip->HasMessage("image/x-be-bitmap");
 		}
 
 		be_clipboard->Unlock();
