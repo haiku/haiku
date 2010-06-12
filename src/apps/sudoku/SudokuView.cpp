@@ -480,9 +480,7 @@ SudokuView::CopyToClipboard()
 			// first as bitmap as we need to archive to the message
 			if (SaveTo(mio, kExportAsBitmap) >= B_OK) {
 				mio.Seek(0LL, SEEK_SET);
-				// ShowImage wants this... nasty
-				clip->Unflatten(&mio);
-				// ArtPaint uses that
+				// ShowImage, ArtPaint & WonderBrush use that
 				clip->AddData("image/bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
 				// Becasso uses that ?
 				clip->AddData("image/x-be-bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
