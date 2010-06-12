@@ -172,5 +172,6 @@ SubInclude HAIKU_TOP src tests kits interface bshelf ;
 SubInclude HAIKU_TOP src tests kits interface flatten_picture ;
 SubInclude HAIKU_TOP src tests kits interface layout ;
 SubInclude HAIKU_TOP src tests kits interface look ;
+SubInclude HAIKU_TOP src tests kits interface menu menuworld ;
 SubInclude HAIKU_TOP src tests kits interface picture ;
 SubInclude HAIKU_TOP src tests kits interface pictureprint ;
