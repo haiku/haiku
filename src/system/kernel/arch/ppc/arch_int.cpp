@@ -27,6 +27,7 @@
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
+#include <PCI.h>
 
 #include <string.h>
 
@@ -515,16 +516,13 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 	// iterate through the tree again and get an interrupt controller node
 	iterator.Rewind();
 	while (device_node *node = iterator.Next()) {
-		const char *deviceType;
-		if (deviceManager->get_attr_string(node, B_DEVICE_TYPE,
-				&deviceType, false) == B_OK) {
-			bool isPIC = false;
-
-			/*
-			bool isPIC
-				= (strcmp(deviceType, B_INTERRUPT_CONTROLLER_DRIVER_TYPE) == 0);
-			free(deviceType);
-			*/
+		uint16 pciBaseClass, pciSubType;
+		if (deviceManager->get_attr_uint16(node, B_DEVICE_TYPE,
+				&pciBaseClass, false) == B_OK &&
+			deviceManager->get_attr_uint16(node, B_DEVICE_SUB_TYPE,
+				&pciSubType, false) == B_OK) {
+			bool isPIC = (pciBaseClass == PCI_base_peripheral)
+				&& (pciSubType == PCI_pic);
 
 			if (isPIC) {
 				driver_module_info *driver;
