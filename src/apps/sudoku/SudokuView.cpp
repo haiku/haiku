@@ -470,48 +470,69 @@ SudokuView::SaveTo(BDataIO& stream, uint32 exportAs)
 status_t
 SudokuView::CopyToClipboard()
 {
-	status_t status = EINVAL;
-	BMessage *clip;
-	if (be_clipboard->Lock()) {
-		BMallocIO mio;
-		be_clipboard->Clear();
-		clip = be_clipboard->Data();
-		if (clip) {
-			// first as bitmap as we need to archive to the message
-			if (SaveTo(mio, kExportAsBitmap) >= B_OK) {
-				mio.Seek(0LL, SEEK_SET);
-				// ShowImage, ArtPaint & WonderBrush use that
-				clip->AddData("image/bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
-				// Becasso uses that ?
-				clip->AddData("image/x-be-bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
-				// Gobe Productive uses that...
-				// QuickRes as well, with a rect field.
-				clip->AddData("image/x-vnd.Be-bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
-			}
-			mio.Seek(0LL, SEEK_SET);
-			mio.SetSize(0LL);
-			
-			if (SaveTo(mio, kExportAsHTML) >= B_OK)
-				clip->AddData("text/html", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
-			mio.Seek(0LL, SEEK_SET);
-			mio.SetSize(0LL);
-			
-			if (SaveTo(mio, kExportAsText) >= B_OK)
-				clip->AddData("text/plain", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
-			mio.Seek(0LL, SEEK_SET);
-			mio.SetSize(0LL);
+	status_t status = B_ERROR;
+	if (!be_clipboard->Lock())
+		return status;
 
-			// flattened BPicture, anyone handles that ?
-			if (SaveTo(mio, kExportAsPicture) >= B_OK) {
-				clip->AddData("image/x-vnd.Be-picture", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
-				
-			}
-			mio.SetSize(0LL);
+	be_clipboard->Clear();
 
-			be_clipboard->Commit();
-		}
+	BMessage* clip = be_clipboard->Data();
+	if (clip == NULL) {
 		be_clipboard->Unlock();
+		return status;
 	}
+
+	// As BBitmap
+	BMallocIO mio;
+	status = SaveTo(mio, kExportAsBitmap);
+	if (status >= B_OK) {
+		mio.Seek(0LL, SEEK_SET);
+		// ShowImage, ArtPaint & WonderBrush use that
+		status = clip->AddData("image/bitmap", B_MESSAGE_TYPE,
+			mio.Buffer(), mio.BufferLength());
+		// Becasso uses that ?
+		clip->AddData("image/x-be-bitmap", B_MESSAGE_TYPE, mio.Buffer(),
+			mio.BufferLength());
+		// Gobe Productive uses that...
+		// QuickRes as well, with a rect field.
+		clip->AddData("image/x-vnd.Be-bitmap", B_MESSAGE_TYPE, mio.Buffer(),
+			mio.BufferLength());
+	}
+	mio.Seek(0LL, SEEK_SET);
+	mio.SetSize(0LL);
+
+	// As HTML
+	if (status >= B_OK)
+		status = SaveTo(mio, kExportAsHTML);
+	if (status >= B_OK) {
+		status = clip->AddData("text/html", B_MIME_TYPE, mio.Buffer(),
+			mio.BufferLength());
+	}
+	mio.Seek(0LL, SEEK_SET);
+	mio.SetSize(0LL);
+
+	// As plain text
+	if (status >= B_OK)
+		SaveTo(mio, kExportAsText);
+	if (status >= B_OK) {
+		status = clip->AddData("text/plain", B_MIME_TYPE, mio.Buffer(),
+			mio.BufferLength());
+	}
+	mio.Seek(0LL, SEEK_SET);
+	mio.SetSize(0LL);
+
+	// As flattened BPicture, anyone handles that ?
+	if (status >= B_OK)
+		status = SaveTo(mio, kExportAsPicture);
+	if (status >= B_OK) {
+		status = clip->AddData("image/x-vnd.Be-picture", B_MIME_TYPE,
+			mio.Buffer(), mio.BufferLength());
+	}
+	mio.SetSize(0LL);
+
+	be_clipboard->Commit();
+	be_clipboard->Unlock();
+
 	return status;
 }
 
@@ -789,7 +810,7 @@ SudokuView::MouseDown(BPoint where)
 	uint32 field = x + y * fField->Size();
 	_PushUndo();
 
-	if (clicks == 2 && fLastHintValue == value && fLastField == field
+	if ((clicks == 2 && fLastHintValue == value && fLastField == field)
 		|| (buttons & (B_SECONDARY_MOUSE_BUTTON
 				| B_TERTIARY_MOUSE_BUTTON)) != 0) {
 		// double click or other buttons set a value
@@ -852,7 +873,7 @@ SudokuView::MouseMoved(BPoint where, uint32 transit,
 	}
 	if (!isField
 		|| (fField->FlagsAt(x, y) & kInitialValue) != 0
-		|| !fShowCursor && fField->ValueAt(x, y) != 0) {
+		|| (!fShowCursor && fField->ValueAt(x, y) != 0)) {
 		_RemoveHint();
 		return;
 	}
@@ -1184,9 +1205,9 @@ SudokuView::Draw(BRect /*updateRect*/)
 
 	for (uint32 y = 0; y < size; y++) {
 		for (uint32 x = 0; x < size; x++) {
-			if ((fShowCursor && x == fShowHintX && y == fShowHintY
-					|| fShowKeyboardFocus && x == fKeyboardX
-						&& y == fKeyboardY)
+			if (((fShowCursor && x == fShowHintX && y == fShowHintY)
+					|| (fShowKeyboardFocus && x == fKeyboardX
+						&& y == fKeyboardY))
 				&& (fField->FlagsAt(x, y) & kInitialValue) == 0) {
 				//SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 				SetLowColor(255, 255, 210);
