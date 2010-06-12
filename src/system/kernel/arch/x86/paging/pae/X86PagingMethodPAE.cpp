@@ -143,9 +143,8 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		TRACE("free virtual slot: %#" B_PRIxADDR ", PTE: %p\n",
 			fFreeVirtualSlot, fFreeVirtualSlotPTE);
 
-		// switch to PAE
-		write_cr3((uint32)physicalPDPT);
-		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
+		// enable PAE on all CPUs
+		call_all_cpus_sync(&_EnablePAE, (void*)(addr_t)physicalPDPT);
 
 		// set return values
 		_virtualPDPT = pdpt;
@@ -160,6 +159,12 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 	}
 
 private:
+	static void _EnablePAE(void* physicalPDPT, int cpu)
+	{
+		write_cr3((addr_t)physicalPDPT);
+		x86_write_cr4(x86_read_cr4() | IA32_CR4_PAE | IA32_CR4_GLOBAL_PAGES);
+	}
+
 	void _TranslatePageTable(addr_t virtualBase)
 	{
 		page_table_entry* entry = &fPageHole[virtualBase / B_PAGE_SIZE];
