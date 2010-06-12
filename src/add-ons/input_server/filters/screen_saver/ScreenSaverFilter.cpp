@@ -183,6 +183,7 @@ ScreenSaverFilter::_Invoke()
 		// Already set the running state to avoid launching
 		// the blanker twice in any case.
 		fIsRunning = true;
+		return;
 	}
 
 	// Try really hard to launch it. It's very likely that this fails,
