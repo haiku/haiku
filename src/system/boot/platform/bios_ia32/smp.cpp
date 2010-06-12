@@ -78,8 +78,13 @@ smp_get_current_cpu(void)
 	if (gKernelArgs.arch_args.apic == NULL)
 		return 0;
 
-	return gKernelArgs.arch_args.cpu_os_id[
-		(apic_read(APIC_ID) & 0xffffffff) >> 24];
+	uint8_t apic_id = (apic_read(APIC_ID) & 0xffffffff) >> 24;
+	for (int i = 0; i < gKernelArgs.num_cpus; i++) {
+		if (gKernelArgs.arch_args.cpu_apic_id[i] == apic_id)
+			return i;
+	}
+
+	return 0;
 }
 
 
@@ -165,16 +170,8 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 					continue;
 				}
 
-				// skip if the apic id is too large
-				if (processor->apic_id >= MAX_BOOT_CPUS) {
-					TRACE(("smp: apic id too large (%d)\n", processor->apic_id));
-					continue;
-				}
-
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus]
 					= processor->apic_id;
-				gKernelArgs.arch_args.cpu_os_id[processor->apic_id]
-					= gKernelArgs.num_cpus;
 				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus]
 					= processor->apic_version;
 
@@ -280,16 +277,8 @@ smp_do_acpi_config(void)
 					break;
 				}
 
-				// skip if the apic id is too large
-				if (localApic->apic_id >= MAX_BOOT_CPUS) {
-					TRACE(("smp: apic id too large (%d)\n", localApic->apic_id));
-					break;
-				}
-
 				gKernelArgs.arch_args.cpu_apic_id[gKernelArgs.num_cpus]
 					= localApic->apic_id;
-				gKernelArgs.arch_args.cpu_os_id[localApic->apic_id]
-					= gKernelArgs.num_cpus;
 				// TODO: how to find out? putting 0x10 in to indicate a local apic
 				gKernelArgs.arch_args.cpu_apic_version[gKernelArgs.num_cpus]
 					= 0x10;

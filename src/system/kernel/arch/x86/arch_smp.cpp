@@ -34,7 +34,6 @@
 #endif
 
 static uint32 sCPUAPICIds[B_MAX_CPU_COUNT];
-static uint32 sCPUOSIds[B_MAX_CPU_COUNT];
 static uint32 sAPICVersions[B_MAX_CPU_COUNT];
 
 extern "C" void init_sse(void);
@@ -84,7 +83,6 @@ arch_smp_init(kernel_args *args)
 
 	// setup some globals
 	memcpy(sCPUAPICIds, args->arch_args.cpu_apic_id, sizeof(args->arch_args.cpu_apic_id));
-	memcpy(sCPUOSIds, args->arch_args.cpu_os_id, sizeof(args->arch_args.cpu_os_id));
 	memcpy(sAPICVersions, args->arch_args.cpu_apic_version, sizeof(args->arch_args.cpu_apic_version));
 
 	// set up the local apic on the boot cpu

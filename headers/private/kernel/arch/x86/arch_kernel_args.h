@@ -38,7 +38,6 @@ typedef struct {
 	uint32	ioapic_phys;
 	uint32	*ioapic;
 	uint32	cpu_apic_id[MAX_BOOT_CPUS];
-	uint32	cpu_os_id[MAX_BOOT_CPUS];
 	uint32	cpu_apic_version[MAX_BOOT_CPUS];
 	// hpet stuff
 	uint32	hpet_phys;
