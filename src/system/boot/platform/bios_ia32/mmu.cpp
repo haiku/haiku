@@ -660,9 +660,12 @@ mmu_init(void)
 				base = ROUNDUP(base, B_PAGE_SIZE);
 				end = ROUNDDOWN(end, B_PAGE_SIZE);
 
-				// we ignore all memory beyond 4 GB
-				if (end > 0x100000000ULL)
-					end = 0x100000000ULL;
+				// We ignore all memory beyond 4 GB, if phys_addr_t is only
+				// 32 bit wide.
+				#if B_HAIKU_PHYSICAL_BITS == 32
+					if (end > 0x100000000ULL)
+						end = 0x100000000ULL;
+				#endif
 
 				// Also ignore memory below 1 MB. Apparently some BIOSes fail to
 				// provide the correct range type for some ranges (cf. #1925).
