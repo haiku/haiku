@@ -775,7 +775,7 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 
 
 status_t
-hda_verb_write(hda_codec* codec, uint32 nid, uint32 vid, uint8 payload)
+hda_verb_write(hda_codec* codec, uint32 nid, uint32 vid, uint16 payload)
 {
 	corb_t verb = MAKE_VERB(codec->addr, nid, vid, payload);
 	return hda_send_verbs(codec, &verb, NULL, 1);

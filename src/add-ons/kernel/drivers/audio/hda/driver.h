@@ -354,7 +354,7 @@ void hda_hw_stop(hda_controller* controller);
 void hda_hw_uninit(hda_controller* controller);
 status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses,
 	uint32 count);
-status_t hda_verb_write(hda_codec* codec, uint32 nid, uint32 vid, uint8 payload);
+status_t hda_verb_write(hda_codec* codec, uint32 nid, uint32 vid, uint16 payload);
 status_t hda_verb_read(hda_codec* codec, uint32 nid, uint32 vid, uint32 *response);
 
 /* hda_controller.c: Stream support */
