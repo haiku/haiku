@@ -69,7 +69,11 @@ struct smp_msg {
 #define MAILBOX_LOCAL 1
 #define MAILBOX_BCAST 2
 
-static spinlock boot_cpu_spin[SMP_MAX_CPUS] = { };
+static vint32 sBootCPUSpin = 0;
+
+static vint32 sEarlyCPUCall = 0;
+static void (*sEarlyCPUCallFunction)(void*, int);
+void* sEarlyCPUCallCookie;
 
 static struct smp_msg *sFreeMessages = NULL;
 static volatile int sFreeMessageCount = 0;
@@ -778,6 +782,35 @@ spinlock_contention_syscall(const char* subsystem, uint32 function,
 #endif	// B_DEBUG_SPINLOCK_CONTENTION
 
 
+static void
+process_early_cpu_call(int32 cpu)
+{
+	sEarlyCPUCallFunction(sEarlyCPUCallCookie, cpu);
+	atomic_and(&sEarlyCPUCall, ~(uint32)(1 << cpu));
+}
+
+
+static void
+call_all_cpus_early(void (*function)(void*, int), void* cookie)
+{
+	if (sNumCPUs > 1) {
+		sEarlyCPUCallFunction = function;
+		sEarlyCPUCallCookie = cookie;
+
+		uint32 cpuMask = (1 << sNumCPUs) - 2;
+			// all CPUs but the boot cpu
+
+		sEarlyCPUCall = cpuMask;
+
+		// wait for all CPUs to finish
+		while ((sEarlyCPUCall & cpuMask) != 0)
+			PAUSE();
+	}
+
+	function(cookie, 0);
+}
+
+
 //	#pragma mark -
 
 
@@ -1059,9 +1092,15 @@ smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 		return true;
 	}
 
-	acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
 	smp_cpu_rendezvous(rendezVous, cpu);
-	acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
+
+	while (sBootCPUSpin == 0) {
+		if ((sEarlyCPUCall & (1 << cpu)) != 0)
+			process_early_cpu_call(cpu);
+
+		PAUSE();
+	}
+
 	return false;
 }
 
@@ -1069,16 +1108,12 @@ smp_trap_non_boot_cpus(int32 cpu, uint32* rendezVous)
 void
 smp_wake_up_non_boot_cpus()
 {
-	int i;
-
 	// ICIs were previously being ignored
 	if (sNumCPUs > 1)
 		sICIEnabled = true;
 
 	// resume non boot CPUs
-	for (i = 1; i < sNumCPUs; i++) {
-		release_spinlock(&boot_cpu_spin[i]);
-	}
+	sBootCPUSpin = 1;
 }
 
 
@@ -1197,6 +1232,12 @@ smp_get_current_cpu(void)
 void
 call_all_cpus(void (*func)(void *, int), void *cookie)
 {
+	// if inter-CPU communication is not yet enabled, use the early mechanism
+	if (!sICIEnabled) {
+		call_all_cpus_early(func, cookie);
+		return;
+	}
+
 	cpu_status state = disable_interrupts();
 
 	if (smp_get_num_cpus() > 1) {
@@ -1213,6 +1254,12 @@ call_all_cpus(void (*func)(void *, int), void *cookie)
 void
 call_all_cpus_sync(void (*func)(void *, int), void *cookie)
 {
+	// if inter-CPU communication is not yet enabled, use the early mechanism
+	if (!sICIEnabled) {
+		call_all_cpus_early(func, cookie);
+		return;
+	}
+
 	cpu_status state = disable_interrupts();
 
 	if (smp_get_num_cpus() > 1) {
