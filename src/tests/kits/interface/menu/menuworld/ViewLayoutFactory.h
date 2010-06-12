@@ -14,6 +14,7 @@
 #ifndef _ViewLayoutFactory_h
 #define _ViewLayoutFactory_h
 
+#include <InterfaceKit.h>
 #include <SupportDefs.h>
 
 typedef enum { CORNER_TOPLEFT, CORNER_BOTTOMLEFT,

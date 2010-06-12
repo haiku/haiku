@@ -18,7 +18,7 @@
 #include <TextControl.h>
 #include <View.h>
 #include <List.h>
-#include <algobase.h>
+#include <algorithm>
 #include <assert.h>
 #include <stdio.h>
 
@@ -250,8 +250,8 @@ void ViewLayoutFactory::ResizeAroundChildren(BView& view, BPoint margin)
 		BView* childView = view.ChildAt(i);
 		if (childView) {
 			BRect r = childView->Frame();
-			fMax_x = max(fMax_x, r.right);
-			fMax_y = max(fMax_y, r.bottom);
+			fMax_x = std::max(fMax_x, r.right);
+			fMax_y = std::max(fMax_y, r.bottom);
 		}
 	}
 	
