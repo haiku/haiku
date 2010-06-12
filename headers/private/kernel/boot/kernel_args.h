@@ -54,6 +54,7 @@ typedef struct kernel_args {
 	addr_range		virtual_allocated_range[MAX_VIRTUAL_ALLOCATED_RANGE];
 	uint32			num_kernel_args_ranges;
 	addr_range		kernel_args_range[MAX_KERNEL_ARGS_RANGE];
+	uint64			ignored_physical_memory;
 
 	uint32		num_cpus;
 	addr_range	cpu_kstack[MAX_BOOT_CPUS];

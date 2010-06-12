@@ -653,7 +653,8 @@ mmu_init(void)
 			// Type 1 is available memory
 			if (extMemoryBlock[i].type == 1) {
 				uint64 base = extMemoryBlock[i].base_addr;
-				uint64 end = base + extMemoryBlock[i].length;
+				uint64 length = extMemoryBlock[i].length;
+				uint64 end = base + length;
 
 				// round everything up to page boundaries, exclusive of pages
 				// it partially occupies
@@ -675,6 +676,9 @@ mmu_init(void)
 				if (base < 0x100000)
 					base = 0x100000;
 
+				gKernelArgs.ignored_physical_memory
+					+= length - (max_c(end, base) - base);
+
 				if (end <= base)
 					continue;
 
@@ -682,6 +686,9 @@ mmu_init(void)
 					panic("mmu_init(): Failed to add physical memory range "
 						"%#" B_PRIx64 " - %#" B_PRIx64 "\n", base, end);
 				}
+			} else if (extMemoryBlock[i].type == 3) {
+				// ACPI reclaim -- physical memory we could actually use later
+				gKernelArgs.ignored_physical_memory += extMemoryBlock[i].length;
 			}
 		}
 
