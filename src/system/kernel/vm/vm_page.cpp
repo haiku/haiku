@@ -113,6 +113,11 @@ static VMPageQueue& sCachedPageQueue = sPageQueues[PAGE_STATE_CACHED];
 static vm_page *sPages;
 static page_num_t sPhysicalPageOffset;
 static page_num_t sNumPages;
+static page_num_t sNonExistingPages;
+	// pages in the sPages array that aren't backed by physical memory
+static uint64 sIgnoredPages;
+	// pages of physical memory ignored by the boot loader (and thus not
+	// available here)
 static vint32 sUnreservedFreePages;
 static vint32 sUnsatisfiedPageReservations;
 static vint32 sModifiedTemporaryPages;
@@ -2812,12 +2817,19 @@ void
 vm_page_init_num_pages(kernel_args *args)
 {
 	// calculate the size of memory by looking at the physical_memory_range array
-	page_num_t physicalPagesEnd = 0;
 	sPhysicalPageOffset = args->physical_memory_range[0].start / B_PAGE_SIZE;
+	page_num_t physicalPagesEnd = sPhysicalPageOffset
+		+ args->physical_memory_range[0].size / B_PAGE_SIZE;
+
+	sNonExistingPages = 0;
+	sIgnoredPages = args->ignored_physical_memory / B_PAGE_SIZE;
 
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		physicalPagesEnd = (args->physical_memory_range[i].start
-			+ args->physical_memory_range[i].size) / B_PAGE_SIZE;
+		page_num_t start = args->physical_memory_range[i].start / B_PAGE_SIZE;
+		if (start > physicalPagesEnd)
+			sNonExistingPages += start - physicalPagesEnd;
+		physicalPagesEnd = start
+			+ args->physical_memory_range[i].size / B_PAGE_SIZE;
 	}
 
 	TRACE(("first phys page = 0x%lx, end 0x%lx\n", sPhysicalPageOffset,
@@ -2899,7 +2911,7 @@ vm_page_init(kernel_args *args)
 	// reserve, but should be a few more pages, so we don't have to extract
 	// a cached page with each allocation.
 	sFreePagesTarget = VM_PAGE_RESERVE_USER
-		+ std::max((page_num_t)32, sNumPages / 1024);
+		+ std::max((page_num_t)32, (sNumPages - sNonExistingPages) / 1024);
 
 	// The target of free + cached and inactive pages. On low-memory machines
 	// keep things tight. free + cached is the pool of immediately allocatable
@@ -3511,7 +3523,7 @@ vm_page_requeue(struct vm_page *page, bool tail)
 page_num_t
 vm_page_num_pages(void)
 {
-	return sNumPages;
+	return sNumPages - sNonExistingPages;
 }
 
 
@@ -3562,10 +3574,10 @@ vm_page_get_stats(system_info *info)
 	// can't really be freed in a low memory situation.
 	page_num_t blockCachePages = block_cache_used_memory() / B_PAGE_SIZE;
 
-	info->max_pages = sNumPages;
-	info->used_pages = gMappedPagesCount - blockCachePages;
-	info->cached_pages = sNumPages >= (uint32)free + info->used_pages
-		? sNumPages - free - info->used_pages : 0;
+	info->max_pages = sNumPages - sNonExistingPages;
+	info->used_pages = gMappedPagesCount - blockCachePages + sIgnoredPages;
+	info->cached_pages = info->max_pages >= free + info->used_pages
+		? info->max_pages - free - info->used_pages : 0;
 	info->page_faults = vm_num_page_faults();
 
 	// TODO: We don't consider pages used for page directories/tables yet.
