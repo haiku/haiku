@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src tests kits interface menu menuworld ;
+
+Application MenuWorld :
+	BitmapMenuItem.cpp
+	constants.cpp
+	main.cpp
+	MenuApp.cpp
+	MenuView.cpp
+	MenuWindow.cpp
+	PostDispatchInvoker.cpp
+	stddlg.cpp
+	TestMenuBuilder.cpp
+	ViewLayoutFactory.cpp
+	: be $(TARGET_LIBSUPC++)
+	;
