@@ -312,44 +312,28 @@ openpic_supports_device(device_node *parent)
 static status_t
 openpic_register_device(device_node *parent)
 {
-#if 0 //XXX: what do I do ?
-  // get interface to PCI device
-  pci_device_module_info *pci;
-  pci_device *device;
-  driver_module_info *driver;
-  void *cookie;
-  status_t error;
-  error = sDeviceManager->get_driver(parent, &driver, &cookie);
-  if (error < B_OK)
-    return error;
-  error = driver->init_driver(parent, cookie);
-  // (driver_module_info**)&pci, (void**)&device); // wtf?
-  if (error != B_OK)
-    return error;
+	device_node *newNode;
+	device_attr attrs[] = {
+		// info about ourself
+		{ B_DEVICE_TYPE, B_UINT16_TYPE, { ui16: PCI_base_peripheral }},
+		{ B_DEVICE_SUB_TYPE, B_UINT16_TYPE, { ui16: PCI_pic }},
+		// TODO How do we identify ourselves as OpenPIC?
+		{ B_DEVICE_INTERFACE, B_UINT16_TYPE, { ui16: PCI_pic_8259 }},
+		{}
+	};
+	io_resource resources[] = {
+		// TODO Fill in whatever necessary
+		{}
+	};
 
-  sDeviceManager->uninit_driver(parent);
-#endif
-  device_node *newNode;
-  device_attr attrs[] = {
-    // info about ourself
-    //{ B_DRIVER_MODULE, B_STRING_TYPE, { string: OPENPIC_MODULE_NAME }},
-    //XXX: that's inconsistent with the header!
-    //{ B_DEVICE_TYPE, B_STRING_TYPE,
-    //	{ string: B_INTERRUPT_CONTROLLER_DRIVER_TYPE }},
-
-    {}
-  };
-
-  // HACK: to get it compiled, I will break anything.
-  return sDeviceManager->register_node(parent, NULL, attrs, NULL, &newNode);
+	return sDeviceManager->register_node(parent, OPENPIC_MODULE_NAME,
+		attrs, resources, &newNode);
 }
 
 
 static status_t
 openpic_init_driver(device_node *node, void **cookie)
 {
-	// OK, this module is broken for now. But it compiles.
-	return B_ERROR;
 	openpic_info *info = new(nothrow) openpic_info;
 	if (!info)
 		return B_NO_MEMORY;
@@ -359,20 +343,12 @@ openpic_init_driver(device_node *node, void **cookie)
 
 	// get interface to PCI device
 	void *aCookie;
-	void *anotherCookie; // possibly the same cookie.
-	driver_module_info *driver;
 	status_t status = sDeviceManager->get_driver(sDeviceManager->get_parent_node(node),
-												 &driver, &aCookie);
+												 (driver_module_info**)&info->pci, &aCookie);
 	if (status != B_OK)
 		return status;
 
-	driver->init_driver(node, &anotherCookie);
-
-	/* status = sDeviceManager->init_driver(
-		sDeviceManager->get_parent(node), NULL,
-		(driver_module_info**)&info->pci, (void**)&info->device);
-		if (status != B_OK)
-		return status; */
+	info->pci->info.init_driver(node, (void**)&info->device);
 
 	// get the pci info for the device
 	pci_info pciInfo;
@@ -439,24 +415,25 @@ openpic_uninit_driver(void *cookie)
 }
 
 
+static status_t
+openpic_register_child_devices(void *cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+openpic_rescan_child_devices(void *cookie)
+{
+	return B_OK;
+}
+
+
 static void
 openpic_device_removed(void *driverCookie)
 {
 	// TODO: ...
 }
-
-
-// FIXME: I don't think this is needed...
-/*static void
-openpic_get_paths(const char **_bus, const char **_device)
-{
-	static const char *kBus[] = { "pci", NULL };
-//	static const char *kDevice[] = { "drivers/dev/disk/ide", NULL };
-
-	*_bus = kBus;
-//	*_device = kDevice;
-	*_device = NULL;
-}*/
 
 
 // #pragma mark - interrupt_controller interface
@@ -530,8 +507,8 @@ static interrupt_controller_module_info sControllerModuleInfo = {
 		openpic_register_device,
 		openpic_init_driver,
 		openpic_uninit_driver,
-		NULL, // HACK: register_child_devices
-		NULL, // HACK: rescan_child_devices
+		openpic_register_child_devices,
+		openpic_rescan_child_devices,
 		openpic_device_removed,
 		NULL,	// suspend
 		NULL // resume
