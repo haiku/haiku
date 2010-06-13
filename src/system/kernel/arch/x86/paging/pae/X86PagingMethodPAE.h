@@ -91,7 +91,7 @@ public:
 									pae_page_directory_entry* const* pdpt,
 									addr_t address);
 
-	static	uint32				MemoryTypeToPageTableEntryFlags(
+	static	uint64				MemoryTypeToPageTableEntryFlags(
 									uint32 memoryType);
 
 private:
@@ -193,7 +193,7 @@ X86PagingMethodPAE::ClearPageTableEntryFlags(pae_page_table_entry* entry,
 }
 
 
-/*static*/ inline uint32
+/*static*/ inline uint64
 X86PagingMethodPAE::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 {
 	// ATM we only handle the uncacheable and write-through type explicitly. For
