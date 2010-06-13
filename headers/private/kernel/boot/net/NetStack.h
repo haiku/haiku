@@ -26,6 +26,7 @@ private:
 public:
 	static status_t CreateDefault();
 	static NetStack *Default();
+	static status_t ShutDown();
 
 	status_t AddEthernetInterface(EthernetInterface *interface);
 
@@ -53,6 +54,7 @@ private:
 // afterwards, which is supposed to add network interfaces.
 status_t net_stack_init();
 status_t platform_net_stack_init();
+status_t net_stack_cleanup();
 
 
 #endif	// _BOOT_NET_STACK_H
