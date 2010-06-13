@@ -91,7 +91,7 @@ EthernetService::Init(EthernetInterface *interface)
 	fInterface = interface;
 
 	fSendBuffer = fInterface->AllocateSendReceiveBuffer(
-		2 * SEND_BUFFER_SIZE);
+		SEND_BUFFER_SIZE + RECEIVE_BUFFER_SIZE);
 	if (!fSendBuffer)
 		return B_NO_MEMORY;
 	fReceiveBuffer = (uint8*)fSendBuffer + SEND_BUFFER_SIZE;
