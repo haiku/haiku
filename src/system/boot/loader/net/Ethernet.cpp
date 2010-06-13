@@ -77,8 +77,6 @@ EthernetService::~EthernetService()
 {
 	if (fSendBuffer)
 		fInterface->FreeSendReceiveBuffer(fSendBuffer);
-
-	delete fInterface;
 }
 
 // Init
