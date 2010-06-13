@@ -365,7 +365,7 @@ X86VMTranslationMapPAE::UnmapPage(VMArea* area, addr_t address,
 	// get the page
 	vm_page* page = vm_lookup_page(
 		(oldEntry & X86_PAE_PTE_ADDRESS_MASK) / B_PAGE_SIZE);
-	ASSERT(page != NULL);
+	ASSERT_PRINT(page != NULL, "page: %p, pte: %#" B_PRIx64, page, oldEntry);
 
 	// transfer the accessed/dirty flags to the page
 	if ((oldEntry & X86_PAE_PTE_ACCESSED) != 0)
@@ -388,7 +388,8 @@ X86VMTranslationMapPAE::UnmapPage(VMArea* area, addr_t address,
 			}
 		}
 
-		ASSERT(mapping != NULL);
+		ASSERT_PRINT(mapping != NULL, "page: %p, pte: %#" B_PRIx64, page,
+			oldEntry);
 	} else
 		page->wired_count--;
 
