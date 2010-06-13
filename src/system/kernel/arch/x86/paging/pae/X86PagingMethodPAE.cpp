@@ -766,7 +766,7 @@ X86PagingMethodPAE::PutPageTableEntryInTable(pae_page_table_entry* entry,
 	phys_addr_t physicalAddress, uint32 attributes, uint32 memoryType,
 	bool globalPage)
 {
-	page_table_entry page = (physicalAddress & X86_PAE_PTE_ADDRESS_MASK)
+	pae_page_table_entry page = (physicalAddress & X86_PAE_PTE_ADDRESS_MASK)
 		| X86_PAE_PTE_PRESENT | (globalPage ? X86_PAE_PTE_GLOBAL : 0)
 		| MemoryTypeToPageTableEntryFlags(memoryType);
 
