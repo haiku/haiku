@@ -3,10 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*!
-	\file session.cpp
+
+/*!	\file session.cpp
 	\brief Disk device manager partition module for CD/DVD sessions.
 */
+
 
 #include <unistd.h>
 
@@ -45,12 +46,12 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 
 	device_geometry geometry;
 	float result = -1;
-	if (partition->flags & B_PARTITION_IS_DEVICE
+	if ((partition->flags & B_PARTITION_IS_DEVICE) != 0
 		&& partition->block_size == 2048
 		&& ioctl(fd, B_GET_GEOMETRY, &geometry) == 0
 		&& geometry.device_type == B_CD) {
-		Disc *disc = new Disc(fd);
-		if (disc && disc->InitCheck() == B_OK) {
+		Disc *disc = new(std::nothrow) Disc(fd);
+		if (disc != NULL && disc->InitCheck() == B_OK) {
 			*cookie = static_cast<void*>(disc);
 			result = 0.7;
 		} else
