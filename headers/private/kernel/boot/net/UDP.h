@@ -52,6 +52,7 @@ public:
 	uint16 Port() const			{ return fPort; }
 
 	status_t Bind(ip_addr_t address, uint16 port);
+	void Detach();
 
 	status_t Send(ip_addr_t destinationAddress, uint16 destinationPort,
 		ChainBuffer *buffer);

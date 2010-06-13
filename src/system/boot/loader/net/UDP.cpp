@@ -175,6 +175,15 @@ UDPSocket::Bind(ip_addr_t address, uint16 port)
 }
 
 
+void
+UDPSocket::Detach()
+{
+	fUDPService = NULL;
+		// This will lead to subsequent methods returning B_NO_INIT
+}
+
+
+
 status_t
 UDPSocket::Send(ip_addr_t destinationAddress, uint16 destinationPort,
 	ChainBuffer *buffer)
@@ -264,6 +273,12 @@ UDPService::UDPService(IPService *ipService)
 
 UDPService::~UDPService()
 {
+	int count = fSockets.Count();
+	for (int i = 0; i < count; i++) {
+		UDPSocket *socket = fSockets.ElementAt(i);
+		socket->Detach();
+	}
+
 	if (fIPService != NULL)
 		fIPService->UnregisterIPSubService(this);
 }
