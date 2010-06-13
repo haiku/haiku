@@ -132,6 +132,13 @@ platform_get_boot_partitions(struct stage2_args *args, Node *device,
 }
 
 
+void
+platform_cleanup_devices()
+{
+	net_stack_cleanup();
+}
+
+
 #define DUMPED_BLOCK_SIZE 16
 
 void

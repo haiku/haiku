@@ -1238,3 +1238,8 @@ platform_register_boot_device(Node *device)
 	return B_OK;
 }
 
+
+void
+platform_cleanup_devices()
+{
+}
