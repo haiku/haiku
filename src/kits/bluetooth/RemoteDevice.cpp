@@ -130,7 +130,7 @@ RemoteDevice::Authenticate()
 	BluetoothCommand<typed_command(hci_cp_create_conn)>
 		createConnection(OGF_LINK_CONTROL, OCF_CREATE_CONN);
 
-	bacpy(&createConnection->bdaddr, &fBdaddr);
+	bdaddrUtils::Copy(&createConnection->bdaddr, &fBdaddr);
 	createConnection->pscan_rep_mode = fPageRepetitionMode;
 	createConnection->pscan_mode = fScanMode; // Reserved in spec 2.1
 	createConnection->clock_offset = fClockOffset | 0x8000; // substract!

@@ -24,7 +24,6 @@
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/L2CAP/btL2CAP.h>
 #include <bluetooth/bluetooth.h>
-#include <bluetooth/bluetooth_util.h>
 
 #include "BluetoothServer.h"
 #include "DeskbarReplicant.h"

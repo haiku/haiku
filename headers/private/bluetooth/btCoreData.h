@@ -143,7 +143,7 @@ struct bluetooth_core_data_module_info {
 	// status_t				(*RemoveConnection)(bdaddr_t destination, hci_id hid);
 	status_t				(*RemoveConnection)(uint16 handle, hci_id hid);
 
-	hci_id					(*RouteConnection)(bdaddr_t* destination);
+	hci_id					(*RouteConnection)(const bdaddr_t* destination);
 
 	void					(*SetAclBuffer)(struct HciConnection* conn,
 								net_buffer* nbuf);
@@ -155,7 +155,7 @@ struct bluetooth_core_data_module_info {
 	bool					(*AclOverFlowed)(struct HciConnection* conn);
 
 	struct HciConnection*	(*ConnectionByHandle)(uint16 handle, hci_id hid);
-	struct HciConnection*	(*ConnectionByDestination)(bdaddr_t* destination,
+	struct HciConnection*	(*ConnectionByDestination)(const bdaddr_t* destination,
 								hci_id hid);
 
 	struct L2capChannel*	(*AddChannel)(struct HciConnection* conn,

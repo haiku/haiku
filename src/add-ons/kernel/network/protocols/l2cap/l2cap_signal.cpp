@@ -101,7 +101,7 @@ status_t
 l2cap_process_signal_cmd(HciConnection* conn, net_buffer* buffer)
 {
 	net_buffer* m = buffer;
-	
+
 	debugf("Signal size=%ld\n", buffer->size);
 
 	while (m != NULL) {
@@ -317,9 +317,10 @@ l2cap_process_con_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 		cmd->channel->dcid = dcid;
 		btCoreData->TimeoutSignal(cmd, bluetooth_l2cap_ertx_timeout);
 
-		//INDICATION error = ng_l2cap_l2ca_con_rsp(cmd->channel, cmd->token,	result, status);
-		if (error != B_OK)
-			btCoreData->RemoveChannel(conn, cmd->channel->scid);
+		// TODO:
+		// INDICATION error = ng_l2cap_l2ca_con_rsp(cmd->channel, cmd->token,	result, status);
+		// if (error != B_OK)
+		//  btCoreData->RemoveChannel(conn, cmd->channel->scid);
 
 	} else {
 
@@ -333,16 +334,15 @@ l2cap_process_con_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 
 			cmd->channel->dcid = dcid;
 			cmd->channel->state = L2CAP_CHAN_CONFIG;
-		} else {
-			/* There was an error, so close the channel */
-			debugf("failed to open L2CAP channel, result=%d, status=%d\n", result, status);
 		}
 
-		error = l2cap_upper_con_rsp(conn, cmd->channel);
+		error = l2cap_con_rsp_ind(conn, cmd->channel);
 
 		/* XXX do we have to remove the channel on error? */
-		if (error != 0 || result != L2CAP_SUCCESS)
+		if (error != 0 || result != L2CAP_SUCCESS) {
+			debugf("failed to open L2CAP channel, result=%d, status=%d\n", result, status);
 			btCoreData->RemoveChannel(conn, cmd->channel->scid);
+		}
 
 		btCoreData->AcknowledgeSignal(cmd);
 	}
@@ -534,7 +534,7 @@ l2cap_process_cfg_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 		/* Send L2CA_ConfigInd event to the upper layer protocol */
 		channel->cfgState |= L2CAP_CFG_IN;
 		channel->ident = ident; // sent ident to reply
-		error = l2cap_l2ca_cfg_rsp_ind(channel);
+		error = l2cap_cfg_req_ind(channel);
 		if (error != 0)
 			btCoreData->RemoveChannel(conn, channel->scid);
 	}
@@ -656,7 +656,7 @@ l2cap_process_cfg_rsp(HciConnection *conn, uint8 ident, net_buffer *buffer)
 		btCoreData->TimeoutSignal(cmd, bluetooth_l2cap_rtx_timeout);
 	else {
 		/* Send L2CA_Config response to the upper layer protocol */
-		error = l2cap_upper_cfg_rsp(cmd->channel /*, cmd->token, result*/);
+		error = l2cap_cfg_rsp_ind(cmd->channel /*, cmd->token, result*/);
 		if (error != 0) {
 			/*
 			 * XXX FIXME what to do here? we were not able to send

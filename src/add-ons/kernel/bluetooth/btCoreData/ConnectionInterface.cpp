@@ -8,7 +8,7 @@
 #include <KernelExport.h>
 
 #include <bluetooth/bluetooth.h>
-#include <bluetooth/bluetooth_util.h>
+#include <bluetooth/bdaddrUtils.h>
 
 #define BT_DEBUG_THIS_MODULE
 #define SUBMODULE_NAME "Connection"
@@ -49,19 +49,19 @@ AddConnection(uint16 handle, int type, bdaddr_t* dst, hci_id hid)
 	if (conn == NULL)
 		goto bail;
 
-	//memset(conn, 0, sizeof(HciConnection));
+	// memset(conn, 0, sizeof(HciConnection));
 
 	conn->currentRxPacket = NULL;
 	conn->currentRxExpectedLength = 0;
 update:
 	// fill values
-	bacpy(&conn->destination, dst);
-	conn->type   	= type;
-	conn->handle   = handle;
-	conn->Hid   	= hid;
-	conn->status  	= HCI_CONN_OPEN;
-	conn->mtu	 	= L2CAP_MTU_MINIMUM; // TODO: give the mtu to the connection
-	conn->lastCid   = L2CAP_FIRST_CID;
+	bdaddrUtils::Copy(&conn->destination, dst);
+	conn->type = type;
+	conn->handle = handle;
+	conn->Hid = hid;
+	conn->status = HCI_CONN_OPEN;
+	conn->mtu = L2CAP_MTU_MINIMUM; // TODO: give the mtu to the connection
+	conn->lastCid = L2CAP_FIRST_CID;
 	conn->lastIdent = L2CAP_FIRST_IDENT;
 
 	sConnectionList.Add(conn);
@@ -76,11 +76,14 @@ RemoveConnection(bdaddr_t* destination, hci_id hid)
 {
 	HciConnection*	conn;
 
-	DoublyLinkedList<HciConnection>::Iterator iterator = sConnectionList.GetIterator();
+	DoublyLinkedList<HciConnection>::Iterator iterator
+		= sConnectionList.GetIterator();
+
 	while (iterator.HasNext()) {
 
 		conn = iterator.Next();
-		if (conn->Hid == hid && bacmp(&conn->destination, destination)==0) {
+		if (conn->Hid == hid
+			&& bdaddrUtils::Compare(&conn->destination, destination)) {
 
 			// if the device is still part of the list, remove it
 			if (conn->GetDoublyLinkedListLink()->next != NULL
@@ -102,7 +105,8 @@ RemoveConnection(uint16 handle, hci_id hid)
 {
 	HciConnection*	conn;
 
-	DoublyLinkedList<HciConnection>::Iterator iterator = sConnectionList.GetIterator();
+	DoublyLinkedList<HciConnection>::Iterator iterator
+		= sConnectionList.GetIterator();
 	while (iterator.HasNext()) {
 
 		conn = iterator.Next();
@@ -125,15 +129,16 @@ RemoveConnection(uint16 handle, hci_id hid)
 
 
 hci_id
-RouteConnection(bdaddr_t* destination) {
+RouteConnection(const bdaddr_t* destination) {
 
-	HciConnection*	conn;
+	HciConnection* conn;
 
-	DoublyLinkedList<HciConnection>::Iterator iterator = sConnectionList.GetIterator();
+	DoublyLinkedList<HciConnection>::Iterator iterator
+		= sConnectionList.GetIterator();
 	while (iterator.HasNext()) {
 
 		conn = iterator.Next();
-		if (bacmp(&conn->destination, destination)==0) {
+		if (bdaddrUtils::Compare(&conn->destination, destination)) {
 			return conn->Hid;
 		}
 	}
@@ -147,11 +152,12 @@ ConnectionByHandle(uint16 handle, hci_id hid)
 {
 	HciConnection*	conn;
 
-	DoublyLinkedList<HciConnection>::Iterator iterator = sConnectionList.GetIterator();
+	DoublyLinkedList<HciConnection>::Iterator iterator
+		= sConnectionList.GetIterator();
 	while (iterator.HasNext()) {
 
 		conn = iterator.Next();
-		if (conn->Hid == hid && conn->handle==handle) {
+		if (conn->Hid == hid && conn->handle == handle) {
 			return conn;
 		}
 	}
@@ -161,21 +167,24 @@ ConnectionByHandle(uint16 handle, hci_id hid)
 
 
 HciConnection*
-ConnectionByDestination(bdaddr_t* destination, hci_id hid)
+ConnectionByDestination(const bdaddr_t* destination, hci_id hid)
 {
 	HciConnection*	conn;
 
-	DoublyLinkedList<HciConnection>::Iterator iterator = sConnectionList.GetIterator();
+	DoublyLinkedList<HciConnection>::Iterator iterator
+		= sConnectionList.GetIterator();
 	while (iterator.HasNext()) {
 
 		conn = iterator.Next();
-		if (conn->Hid == hid && bacmp(&conn->destination, destination)==0) {
+		if (conn->Hid == hid
+			&& bdaddrUtils::Compare(&conn->destination, destination)) {
 			return conn;
 		}
 	}
 
 	return NULL;
 }
+
 
 #if 0
 #pragma mark - ACL helper funcs
@@ -214,6 +223,7 @@ AclOverFlowed(HciConnection* conn)
 {
 	return conn->currentRxExpectedLength < 0;
 }
+
 
 #if 0
 #pragma mark - private funcs

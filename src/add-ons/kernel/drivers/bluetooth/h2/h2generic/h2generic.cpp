@@ -16,8 +16,6 @@
 
 #include "snet_buffer.h"
 
-#include <bluetooth/bluetooth_util.h>
-
 #define BT_DEBUG_THIS_MODULE
 #define SUBMODULE_NAME BLUETOOTH_DEVICE_DEVFS_NAME
 #define SUBMODULE_COLOR 35
@@ -278,7 +276,7 @@ device_added(usb_device* dev, void** cookie)
 	/*
 	else if ( desc->vendor_id == YOUR_VENDOR_HERE
 		&& desc->product_id == YOUR_PRODUCT_HERE ) {
-		 YOUR_SPECIAL_FLAGS_HERE
+		YOUR_SPECIAL_FLAGS_HERE
 	}
 	*/
 

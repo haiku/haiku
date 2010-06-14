@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -19,9 +19,9 @@
 
 extern net_stack_module_info* gStackModule;
 
-class L2capEndpoint : public net_protocol, 
-					  public ProtocolSocket,
-                      public DoublyLinkedListLinkImpl<L2capEndpoint> {
+class L2capEndpoint : public net_protocol,
+	public ProtocolSocket,
+	public DoublyLinkedListLinkImpl<L2capEndpoint> {
 
 public:
 	L2capEndpoint(net_socket* socket);
@@ -44,17 +44,17 @@ public:
 		mutex_unlock(&fLock);
 	}
 
-	status_t	Bind(const struct sockaddr *_address);
+	status_t	Bind(const struct sockaddr* _address);
 	status_t	Unbind();
 	status_t	Listen(int backlog);
-	status_t	Connect(const struct sockaddr *address);
-	status_t	Accept(net_socket **_acceptedSocket);
+	status_t	Connect(const struct sockaddr* address);
+	status_t	Accept(net_socket** _acceptedSocket);
 
-	ssize_t		Send(const iovec *vecs, size_t vecCount, 
-					ancillary_data_container *ancillaryData);
-	ssize_t		Receive(const iovec *vecs, size_t vecCount,	
-					ancillary_data_container **_ancillaryData, 
-					struct sockaddr *_address, socklen_t *_addressLength);
+	ssize_t		Send(const iovec* vecs, size_t vecCount,
+					ancillary_data_container* ancillaryData);
+	ssize_t		Receive(const iovec* vecs, size_t vecCount,
+					ancillary_data_container** _ancillaryData,
+					struct sockaddr* _address, socklen_t* _addressLength);
 
 	ssize_t ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer);
 	ssize_t Sendable();
@@ -68,24 +68,25 @@ public:
 	void 		BindToChannel(L2capChannel* channel);
 	status_t	MarkEstablished();
 	status_t	MarkClosed();
-	
+
 	static L2capEndpoint* ForPsm(uint16 psm);
-	
+
 	bool RequiresConfiguration()
 	{
 		return fConfigurationSet;
 	}
-	
-	ChannelConfiguration 	fConfiguration;	
+
+	ChannelConfiguration 	fConfiguration;
 	bool 					fConfigurationSet;
 	net_fifo		fReceivingFifo;
-	
+
 private:
 	typedef enum {
 		// establishing a connection
 		CLOSED,
 		BOUND,
 		LISTEN,
+		CONNECTING,
 		ESTABLISHED,
 
 		// peer closes the connection

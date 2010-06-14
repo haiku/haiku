@@ -7,9 +7,9 @@
 #define _BDADDR_UTILS_H
 
 #include <stdio.h>
+#include <string.h>
 
 #include <bluetooth/bluetooth.h>
-#include <bluetooth/bluetooth_util.h>
 
 namespace Bluetooth {
 
@@ -34,11 +34,16 @@ public:
 	}
 
 
-	static bool Compare(bdaddr_t *ba1, bdaddr_t *ba2)
+	static bool Compare(const bdaddr_t* ba1, const bdaddr_t* ba2)
 	{
-		return (bacmp(ba1, ba2) == 0);
+		return (memcmp(ba1, ba2, sizeof(bdaddr_t)) == 0);
 	}
 
+
+	static void Copy(bdaddr_t* dst, const bdaddr_t* src)
+	{
+		memcpy(dst, src, sizeof(bdaddr_t));
+	}
 
 	static char* ToString(const bdaddr_t bdaddr)
 	{
@@ -58,7 +63,7 @@ public:
 
 		if (addr != NULL) {
 			size_t count = sscanf(addr, "%2X:%2X:%2X:%2X:%2X:%2X",
-						&b0, &b1, &b2, &b3, &b4, &b5);
+						&b5, &b4, &b3, &b2, &b1, &b0);
 
 			if (count == 6)
 				return ((bdaddr_t) {{b0, b1, b2, b3, b4, b5}});
@@ -70,6 +75,7 @@ public:
 };
 
 }
+
 
 #ifndef _BT_USE_EXPLICIT_NAMESPACE
 using Bluetooth::bdaddrUtils;

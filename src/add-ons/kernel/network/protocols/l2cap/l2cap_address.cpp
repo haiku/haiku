@@ -6,7 +6,6 @@
  *		Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  */
 
-
 #include <net_datalink.h>
 
 #include <ByteOrder.h>
@@ -18,15 +17,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <bluetooth/bluetooth_util.h>
+#include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/L2CAP/btL2CAP.h>
 
 #define L2CAP_CHECKSUM(address) (address.b[0]+\
-                                 address.b[1]+\
-                                 address.b[2]+\
-                                 address.b[3]+\
-                                 address.b[4]+\
-                                 address.b[5])
+								address.b[1]+\
+								address.b[2]+\
+								address.b[3]+\
+								address.b[4]+\
+								address.b[5])
 
 /*!
 	Routing utility function: copies address \a from into a new address
@@ -75,7 +74,8 @@ l2cap_copy_address(const sockaddr *from, sockaddr **to,
 	\return B_BAD_VALUE if \a address or \a mask is NULL
 */
 static status_t
-l2cap_mask_address(const sockaddr *address, const sockaddr *mask, sockaddr *result)
+l2cap_mask_address(const sockaddr *address, const sockaddr *mask,
+	sockaddr *result)
 {
 	if (address == NULL || result == NULL)
 		return B_BAD_VALUE;
@@ -96,9 +96,11 @@ l2cap_is_empty_address(const sockaddr *address, bool checkPort)
 	if (address == NULL || address->sa_len == 0)
 		return true;
 
-	return ((bacmp(&((sockaddr_l2cap *)address)->l2cap_bdaddr, BDADDR_NULL)==0)
-		&& (!checkPort || ((sockaddr_l2cap *)address)->l2cap_psm == 0) );
+	return ((bdaddrUtils::Compare(
+		&((const sockaddr_l2cap *)address)->l2cap_bdaddr, BDADDR_NULL)==0)
+		&& (!checkPort || ((sockaddr_l2cap *)address)->l2cap_psm == 0));
 }
+
 
 /*!	Checks if the given \a address is L2CAP address.
 	\return false if \a address is NULL, or with family different from AF_BLUETOOTH
@@ -127,8 +129,8 @@ l2cap_equal_addresses(const sockaddr *a, const sockaddr *b)
 	if (a == NULL && b != NULL)
 		return l2cap_is_empty_address(b, false);
 
-	return (bacmp(&((sockaddr_l2cap*)a)->l2cap_bdaddr,
-	              &((sockaddr_l2cap*)b)->l2cap_bdaddr)==0);
+	return bdaddrUtils::Compare(&((const sockaddr_l2cap*)a)->l2cap_bdaddr,
+		&((sockaddr_l2cap*)b)->l2cap_bdaddr);
 }
 
 
@@ -160,7 +162,8 @@ l2cap_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
 	if (a == NULL && b != NULL)
 		return l2cap_is_empty_address(b, true);
 
-	return (bacmp(&((sockaddr_l2cap*)a)->l2cap_bdaddr,&((sockaddr_l2cap *)b)->l2cap_bdaddr)==0)
+	return (bdaddrUtils::Compare(&((const sockaddr_l2cap *)a)->l2cap_bdaddr,
+		&((const sockaddr_l2cap *)b)->l2cap_bdaddr))
 		&& ((sockaddr_l2cap *)a)->l2cap_psm == ((sockaddr_l2cap *)b)->l2cap_psm;
 }
 
@@ -232,15 +235,18 @@ l2cap_print_address_buffer(const sockaddr *_address, char *buffer,
 	if (address == NULL)
 		strlcpy(buffer, "<none>", bufferSize);
 	else {
-	    bdaddr_t addr = address->l2cap_bdaddr;
+		bdaddr_t addr = address->l2cap_bdaddr;
 		if (printPort) {
-			snprintf(buffer, bufferSize, "%2X:%2X:%2X:%2X:%2X:%2X|%u", addr.b[0],
-			  addr.b[1],addr.b[2],addr.b[3],addr.b[4],addr.b[5],address->l2cap_psm);
-	    }
+			snprintf(buffer, bufferSize,
+				"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X|%u", addr.b[0],
+				addr.b[1],addr.b[2],addr.b[3],addr.b[4],addr.b[5],
+				address->l2cap_psm);
+		}
 		else {
-			snprintf(buffer, bufferSize, "%2X:%2X:%2X:%2X:%2X:%2X",addr.b[0],
-			  addr.b[1],addr.b[2],addr.b[3],addr.b[4],addr.b[5]);
-	    }
+			snprintf(buffer, bufferSize,
+				"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",addr.b[0],
+				addr.b[1],addr.b[2],addr.b[3],addr.b[4],addr.b[5]);
+		}
 	}
 
 	return B_OK;
@@ -333,7 +339,7 @@ l2cap_update_to(sockaddr *_address, const sockaddr *_from)
 	if (address->l2cap_psm == 0)
 		address->l2cap_psm = from->l2cap_psm;
 
-	if (bacmp(&address->l2cap_bdaddr, BDADDR_BROADCAST)==0)
+	if (bdaddrUtils::Compare(&address->l2cap_bdaddr, BDADDR_BROADCAST))
 		address->l2cap_bdaddr = from->l2cap_bdaddr;
 
 	return B_OK;
@@ -378,7 +384,8 @@ l2cap_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 	const sockaddr_l2cap *peer = (const sockaddr_l2cap *)peerAddress;
 
 	return ((our ? our->l2cap_psm : 0) | ((peer ? peer->l2cap_psm : 0) << 16))
- 		^ (our ? L2CAP_CHECKSUM(our->l2cap_bdaddr) : 0) ^ (peer ? L2CAP_CHECKSUM(peer->l2cap_bdaddr) : 0);
+		^ (our ? L2CAP_CHECKSUM(our->l2cap_bdaddr) : 0)
+		^ (peer ? L2CAP_CHECKSUM(peer->l2cap_bdaddr) : 0);
 }
 
 
