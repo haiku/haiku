@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src tests kits bluetooth l2capClient ;
+
+UseLibraryHeaders bluetooth ;
+
+SimpleTest L2capClient :
+	l2capClient.cpp
+	: be bluetooth network $(TARGET_LIBSUPC++)
+	;
