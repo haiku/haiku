@@ -443,14 +443,14 @@ public:
 			*this = other;
 		}
 
-		ConstIterator(Tree* tree)
+		ConstIterator(const Tree* tree)
 			:
 			fTree(tree)
 		{
 			Rewind();
 		}
 
-		ConstIterator(Tree* tree, Node* next)
+		ConstIterator(const Tree* tree, Node* next)
 			:
 			fTree(tree),
 			fNext(next)
@@ -483,8 +483,8 @@ public:
 		}
 
 	private:
-		Tree*	fTree;
-		Node*	fNext;
+		const Tree*	fTree;
+		Node*		fNext;
 	};
 
 	IteratableSplayTree()
