@@ -352,10 +352,8 @@ VMAddressSpace::_DumpListCommand(int argc, char** argv)
 		off_t areaSize = 0;
 		for (VMAddressSpace::AreaIterator areaIt = space->GetAreaIterator();
 				VMArea* area = areaIt.Next();) {
-			if (area->cache->type != CACHE_TYPE_NULL) {
-				areaCount++;
-				areaSize += area->Size();
-			}
+			areaCount++;
+			areaSize += area->Size();
 		}
 		kprintf("%p  %6" B_PRId32 "   %#010" B_PRIxADDR "   %#10" B_PRIxADDR
 			"   %10" B_PRId32 "   %10" B_PRIdOFF "\n", space, space->ID(),
