@@ -34,6 +34,17 @@ DavicomDevice *gDavicomDevices[MAX_DEVICES];
 char *gDeviceNames[MAX_DEVICES + 1];
 usb_module_info *gUSBModule = NULL;
 
+usb_support_descriptor gSupportedDevices[] = {
+	{ 0, 0, 0, 0x0fe6, 0x8101}, // "Sunrising JP108"
+	{ 0, 0, 0, 0x07aa, 0x9601}, // "Corega FEther USB-TXC"
+	{ 0, 0, 0, 0x0a46, 0x9601}, // "Davicom USB-100"
+	{ 0, 0, 0, 0x0a46, 0x6688}, // "ZT6688 USB NIC"
+	{ 0, 0, 0, 0x0a46, 0x0268}, // "ShanTou ST268 USB NIC"
+	{ 0, 0, 0, 0x0a46, 0x8515}, // "ADMtek ADM8515 USB NIC"
+	{ 0, 0, 0, 0x0a47, 0x9601}, // "Hirose USB-100"
+	{ 0, 0, 0, 0x0a46, 0x9000}	// "DM9000E"
+};
+
 mutex gDriverLock;
 // auto-release helper class
 class DriverSmartLock {
@@ -41,7 +52,6 @@ public:
 	DriverSmartLock()  { mutex_lock(&gDriverLock);   }
 	~DriverSmartLock() { mutex_unlock(&gDriverLock); }
 };
-
 
 DavicomDevice *
 create_davicom_device(usb_device device)
@@ -184,7 +194,8 @@ init_driver()
 		&usb_davicom_device_removed
 	};
 
-	gUSBModule->register_driver(DRIVER_NAME, 0, 0, NULL);
+	gUSBModule->register_driver(DRIVER_NAME, gSupportedDevices, 
+		sizeof(gSupportedDevices)/sizeof(usb_support_descriptor), NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
 }

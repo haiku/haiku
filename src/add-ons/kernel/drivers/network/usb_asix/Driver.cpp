@@ -40,6 +40,38 @@ public:
 	~DriverSmartLock() { mutex_unlock(&gDriverLock); }
 };
 
+usb_support_descriptor gSupportedDevices[] = {
+	// AX88172
+	{ 0, 0, 0, 0x0b95, 0x1720}, // "ASIX 88172 10/100"
+	{ 0, 0, 0, 0x07b8, 0x420a}, // "ABOCOM UF200"
+	{ 0, 0, 0, 0x1189, 0x0893}, // "Acer C&M EP-1427X-2"
+	{ 0, 0, 0, 0x0557, 0x2009}, // "ATEN UC-210T"
+	{ 0, 0, 0, 0x08dd, 0x90ff}, // "Billionton USB2AR"
+	{ 0, 0, 0, 0x07aa, 0x0017}, // "Corega USB2TX"
+	{ 0, 0, 0, 0x2001, 0x1A00}, // "D-Link DUB-E100"
+	{ 0, 0, 0, 0x1631, 0x6200}, // "GoodWay USB2Ethernet"
+	{ 0, 0, 0, 0x04f1, 0x3008}, // "JVC MP-PRX1"
+	{ 0, 0, 0, 0x077b, 0x2226}, // "LinkSys USB 2.0"
+	{ 0, 0, 0, 0x0411, 0x003d}, // "Melco LUA-U2-KTX"
+	{ 0, 0, 0, 0x0846, 0x1040}, // "NetGear USB 2.0 Ethernet"
+	{ 0, 0, 0, 0x086e, 0x1920}, // "System TALKS SGC-X2UL"
+	{ 0, 0, 0, 0x6189, 0x182d}, // "Sitecom LN-029"
+	// AX88772
+	{ 0, 0, 0, 0x0b95, 0x7720}, // "ASIX 88772 10/100"
+	{ 0, 0, 0, 0x13b1, 0x0018}, // "Linksys USB200M rev.2"
+	{ 0, 0, 0, 0x07d1, 0x3c05}, // alternate D-Link DUB-E100 rev. B1
+	{ 0, 0, 0, 0x2001, 0x3c05}, // "D-Link DUB-E100 rev.B1"
+	{ 0, 0, 0, 0x1557, 0x7720}, // "OQO 01+ Ethernet"
+	{ 0, 0, 0, 0x05ac, 0x1402}, // "Apple A1277"
+	// AX88178
+	{ 0, 0, 0, 0x0b95, 0x1780}, // "ASIX 88178 10/100/1000"
+	{ 0, 0, 0, 0x050d, 0x5055}, // "Belkin F5D5055"
+	{ 0, 0, 0, 0x04bb, 0x0930}, // "I/O Data ETG-US2"
+	{ 0, 0, 0, 0x1737, 0x0039}, // "LinkSys 1000"
+	{ 0, 0, 0, 0x14ea, 0xab11}, // "Planex GU-1000T"
+	{ 0, 0, 0, 0x0df6, 0x061c}  // "Sitecom LN-028"
+};
+
 
 ASIXDevice *
 create_asix_device(usb_device device)
@@ -203,7 +235,8 @@ init_driver()
 		&usb_asix_device_removed
 	};
 
-	gUSBModule->register_driver(DRIVER_NAME, 0, 0, NULL);
+	gUSBModule->register_driver(DRIVER_NAME, gSupportedDevices, 
+		sizeof(gSupportedDevices)/sizeof(usb_support_descriptor), NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
 }
