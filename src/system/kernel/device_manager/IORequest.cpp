@@ -1168,7 +1168,7 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 
 	// If we can, we directly copy from/to the virtual buffer. The memory is
 	// locked in this case.
-	status_t (*copyFunction)(void*, void*, size_t, team_id, bool);
+	status_t (*copyFunction)(void*, generic_addr_t, size_t, team_id, bool);
 	if (fBuffer->IsPhysical()) {
 		copyFunction = &IORequest::_CopyPhysical;
 	} else {
@@ -1193,8 +1193,8 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 	// copy vector-wise
 	while (size > 0) {
 		generic_size_t toCopy = min_c(size, vecs[0].length - vecOffset);
-		status_t error = copyFunction(buffer,
-			(uint8*)vecs[0].base + vecOffset, toCopy, fTeam, copyIn);
+		status_t error = copyFunction(buffer, vecs[0].base + vecOffset, toCopy,
+			fTeam, copyIn);
 		if (error != B_OK)
 			return error;
 
@@ -1209,39 +1209,36 @@ IORequest::_CopyData(void* _buffer, off_t offset, size_t size, bool copyIn)
 
 
 /* static */ status_t
-IORequest::_CopySimple(void* bounceBuffer, void* external, size_t size,
+IORequest::_CopySimple(void* bounceBuffer, generic_addr_t external, size_t size,
 	team_id team, bool copyIn)
 {
-	TRACE("  IORequest::_CopySimple(%p, %p, %lu, %d)\n", bounceBuffer, external,
-		size, copyIn);
+	TRACE("  IORequest::_CopySimple(%p, %#" B_PRIxGENADDR ", %lu, %d)\n",
+		bounceBuffer, external, size, copyIn);
 	if (copyIn)
-		memcpy(bounceBuffer, external, size);
+		memcpy(bounceBuffer, (void*)(addr_t)external, size);
 	else
-		memcpy(external, bounceBuffer, size);
+		memcpy((void*)(addr_t)external, bounceBuffer, size);
 	return B_OK;
 }
 
 
 /* static */ status_t
-IORequest::_CopyPhysical(void* bounceBuffer, void* external, size_t size,
-	team_id team, bool copyIn)
+IORequest::_CopyPhysical(void* bounceBuffer, generic_addr_t external,
+	size_t size, team_id team, bool copyIn)
 {
-// TODO: The physical address must be phys_addr_t!
-	if (copyIn) {
-		return vm_memcpy_from_physical(bounceBuffer, (addr_t)external, size,
-			false);
-	}
+	if (copyIn)
+		return vm_memcpy_from_physical(bounceBuffer, external, size, false);
 
-	return vm_memcpy_to_physical((addr_t)external, bounceBuffer, size, false);
+	return vm_memcpy_to_physical(external, bounceBuffer, size, false);
 }
 
 
 /* static */ status_t
-IORequest::_CopyUser(void* _bounceBuffer, void* _external, size_t size,
+IORequest::_CopyUser(void* _bounceBuffer, generic_addr_t _external, size_t size,
 	team_id team, bool copyIn)
 {
 	uint8* bounceBuffer = (uint8*)_bounceBuffer;
-	uint8* external = (uint8*)_external;
+	uint8* external = (uint8*)(addr_t)_external;
 
 	while (size > 0) {
 		static const int32 kEntryCount = 8;
@@ -1258,8 +1255,8 @@ IORequest::_CopyUser(void* _bounceBuffer, void* _external, size_t size,
 
 		for (uint32 i = 0; i < count; i++) {
 			const physical_entry& entry = entries[i];
-			error = _CopyPhysical(bounceBuffer, (void*)entry.address,
-				entry.size, team, copyIn);
+			error = _CopyPhysical(bounceBuffer, entry.address, entry.size, team,
+				copyIn);
 			if (error != B_OK)
 				return error;
 
