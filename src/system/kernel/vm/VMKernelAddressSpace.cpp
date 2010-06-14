@@ -164,17 +164,20 @@ VMKernelAddressSpace::LookupArea(addr_t address) const
 	You need to hold the VMAddressSpace write lock.
 */
 status_t
-VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
-	size_t size, VMArea* _area, uint32 allocationFlags)
+VMKernelAddressSpace::InsertArea(VMArea* _area, size_t size,
+	const virtual_address_restrictions* addressRestrictions,
+	uint32 allocationFlags, void** _address)
 {
 	TRACE("VMKernelAddressSpace::InsertArea(%p, %" B_PRIu32 ", %#" B_PRIxSIZE
-		", %p \"%s\")\n", *_address, addressSpec, size, _area, _area->name);
+		", %p \"%s\")\n", addressRestrictions->address,
+		addressRestrictions->address_specification, size, _area, _area->name);
 
 	VMKernelArea* area = static_cast<VMKernelArea*>(_area);
 
 	Range* range;
-	status_t error = _AllocateRange((addr_t)*_address, addressSpec, size,
-		addressSpec == B_EXACT_ADDRESS, allocationFlags, range);
+	status_t error = _AllocateRange(addressRestrictions, size,
+		addressRestrictions->address_specification == B_EXACT_ADDRESS,
+		allocationFlags, range);
 	if (error != B_OK)
 		return error;
 
@@ -184,7 +187,8 @@ VMKernelAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 	area->SetBase(range->base);
 	area->SetSize(range->size);
 
-	*_address = (void*)area->Base();
+	if (_address != NULL)
+		*_address = (void*)area->Base();
 	fFreeSpace -= area->Size();
 
 	PARANOIA_CHECK_STRUCTURES();
@@ -356,11 +360,13 @@ VMKernelAddressSpace::ShrinkAreaTail(VMArea* area, size_t newSize,
 
 
 status_t
-VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
-	size_t size, uint32 flags, uint32 allocationFlags)
+VMKernelAddressSpace::ReserveAddressRange(size_t size,
+	const virtual_address_restrictions* addressRestrictions,
+	uint32 flags, uint32 allocationFlags, void** _address)
 {
 	TRACE("VMKernelAddressSpace::ReserveAddressRange(%p, %" B_PRIu32 ", %#"
-		B_PRIxSIZE ", %#" B_PRIx32 ")\n", *_address, addressSpec, size, flags);
+		B_PRIxSIZE ", %#" B_PRIx32 ")\n", addressRestrictions->address,
+		addressRestrictions->address_specification, size, flags);
 
 	// Don't allow range reservations, if the address space is about to be
 	// deleted.
@@ -368,7 +374,7 @@ VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 		return B_BAD_TEAM_ID;
 
 	Range* range;
-	status_t error = _AllocateRange((addr_t)*_address, addressSpec, size, false,
+	status_t error = _AllocateRange(addressRestrictions, size, false,
 		allocationFlags, range);
 	if (error != B_OK)
 		return error;
@@ -377,7 +383,8 @@ VMKernelAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 	range->reserved.base = range->base;
 	range->reserved.flags = flags;
 
-	*_address = (void*)range->base;
+	if (_address != NULL)
+		*_address = (void*)range->base;
 
 	Get();
 	PARANOIA_CHECK_STRUCTURES();
@@ -529,19 +536,23 @@ VMKernelAddressSpace::_RemoveRange(Range* range)
 
 
 status_t
-VMKernelAddressSpace::_AllocateRange(addr_t address, uint32 addressSpec,
+VMKernelAddressSpace::_AllocateRange(
+	const virtual_address_restrictions* addressRestrictions,
 	size_t size, bool allowReservedRange, uint32 allocationFlags,
 	Range*& _range)
 {
-	TRACE("  VMKernelAddressSpace::_AllocateRange(address: %#" B_PRIxADDR
-		", size: %#" B_PRIxSIZE ", addressSpec: %#" B_PRIx32 ", reserved "
-		"allowed: %d)\n", address, size, addressSpec, allowReservedRange);
+	TRACE("  VMKernelAddressSpace::_AllocateRange(address: %p, size: %#"
+		B_PRIxSIZE ", addressSpec: %#" B_PRIx32 ", reserved allowed: %d)\n",
+		addressRestrictions->address, size,
+		addressRestrictions->address_specification, allowReservedRange);
 
 	// prepare size, alignment and the base address for the range search
+	addr_t address = (addr_t)addressRestrictions->address;
 	size = ROUNDUP(size, B_PAGE_SIZE);
-	size_t alignment = B_PAGE_SIZE;
+	size_t alignment = addressRestrictions->alignment != 0
+		? addressRestrictions->alignment : B_PAGE_SIZE;
 
-	switch (addressSpec) {
+	switch (addressRestrictions->address_specification) {
 		case B_EXACT_ADDRESS:
 		{
 			if (address % B_PAGE_SIZE != 0)
@@ -574,10 +585,13 @@ VMKernelAddressSpace::_AllocateRange(addr_t address, uint32 addressSpec,
 	}
 
 	// find a range
-	Range* range = _FindFreeRange(address, size, alignment, addressSpec,
-		allowReservedRange, address);
-	if (range == NULL)
-		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
+	Range* range = _FindFreeRange(address, size, alignment,
+		addressRestrictions->address_specification, allowReservedRange,
+		address);
+	if (range == NULL) {
+		return addressRestrictions->address_specification == B_EXACT_ADDRESS
+			? B_BAD_VALUE : B_NO_MEMORY;
+	}
 
 	TRACE("  VMKernelAddressSpace::_AllocateRange() found range:(%p (%#"
 		B_PRIxADDR ", %#" B_PRIxSIZE ", %d)\n", range, range->base, range->size,

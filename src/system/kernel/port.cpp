@@ -645,9 +645,12 @@ port_init(kernel_args *args)
 	size_t size = sizeof(struct port_entry) * sMaxPorts;
 
 	// create and initialize ports table
-	sPortArea = create_area_etc(B_SYSTEM_TEAM, "port_table", (void**)&sPorts,
-		B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	sPortArea = create_area_etc(B_SYSTEM_TEAM, "port_table", size, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		&virtualRestrictions, &physicalRestrictions, (void**)&sPorts);
 	if (sPortArea < 0) {
 		panic("unable to allocate kernel port table!\n");
 		return sPortArea;

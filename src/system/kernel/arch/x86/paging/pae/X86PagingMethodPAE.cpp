@@ -484,9 +484,13 @@ X86PagingMethodPAE::PhysicalPageSlotPool::AllocatePool(
 	size_t areaSize = B_PAGE_SIZE
 		+ sizeof(PhysicalPageSlot[kPAEPageTableEntryCount]);
 	void* data;
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
 	area_id dataArea = create_area_etc(B_SYSTEM_TEAM, "physical page pool",
-		&data, B_ANY_KERNEL_ADDRESS, PAGE_ALIGN(areaSize), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
+		PAGE_ALIGN(areaSize), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		&virtualRestrictions, &physicalRestrictions, &data);
 	if (dataArea < 0)
 		return dataArea;
 
@@ -800,11 +804,15 @@ X86PagingMethodPAE::Allocate32BitPage(phys_addr_t& _physicalAddress,
 	} else {
 		// no pages -- allocate one
 		locker.Unlock();
-		page = vm_page_allocate_page_run(PAGE_STATE_UNUSED, 0, 0x100000000LL, 1,
+
+		physical_address_restrictions restrictions = {};
+		restrictions.high_address = 0x100000000LL;
+		page = vm_page_allocate_page_run(PAGE_STATE_UNUSED, 1, &restrictions,
 			VM_PRIORITY_SYSTEM);
-		DEBUG_PAGE_ACCESS_END(page);
 		if (page == NULL)
 			return NULL;
+
+		DEBUG_PAGE_ACCESS_END(page);
 	}
 
 	// map the page

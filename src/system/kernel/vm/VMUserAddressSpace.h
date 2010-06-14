@@ -25,9 +25,10 @@ public:
 									uint32 protection, uint32 allocationFlags);
 	virtual	void				DeleteArea(VMArea* area,
 									uint32 allocationFlags);
-	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
-									size_t size, VMArea* area,
-									uint32 allocationFlags);
+	virtual	status_t			InsertArea(VMArea* area, size_t size,
+									const virtual_address_restrictions*
+										addressRestrictions,
+									uint32 allocationFlags, void** _address);
 	virtual	void				RemoveArea(VMArea* area,
 									uint32 allocationFlags);
 
@@ -39,9 +40,11 @@ public:
 	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize,
 									uint32 allocationFlags);
 
-	virtual	status_t			ReserveAddressRange(void** _address,
-									uint32 addressSpec, size_t size,
-									uint32 flags, uint32 allocationFlags);
+	virtual	status_t			ReserveAddressRange(size_t size,
+									const virtual_address_restrictions*
+										addressRestrictions,
+									uint32 flags, uint32 allocationFlags,
+									void** _address);
 	virtual	status_t			UnreserveAddressRange(addr_t address,
 									size_t size, uint32 allocationFlags);
 	virtual	void				UnreserveAllAddressRanges(
@@ -55,7 +58,8 @@ private:
 									uint32 allocationFlags);
 			status_t			_InsertAreaSlot(addr_t start, addr_t size,
 									addr_t end, uint32 addressSpec,
-									VMUserArea* area, uint32 allocationFlags);
+									size_t alignment, VMUserArea* area,
+									uint32 allocationFlags);
 
 private:
 			VMUserAreaList		fAreas;

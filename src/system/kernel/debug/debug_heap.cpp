@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de
  * Distributed under the terms of the MIT License.
  */
 
@@ -291,9 +291,13 @@ debug_heap_init()
 {
 	// create the heap area
 	void* base;
-	area_id area = create_area_etc(B_SYSTEM_TEAM, "kdebug heap", (void**)&base,
-		B_ANY_KERNEL_ADDRESS, KDEBUG_HEAP, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	area_id area = create_area_etc(B_SYSTEM_TEAM, "kdebug heap", KDEBUG_HEAP,
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		CREATE_AREA_DONT_WAIT, &virtualRestrictions, &physicalRestrictions,
+		(void**)&base);
 	if (area < 0)
 		return;
 

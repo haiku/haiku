@@ -11,6 +11,7 @@
 
 #include <kernel.h>
 #include <util/AutoLock.h>
+#include <vm/vm.h>
 
 #include "IORequest.h"
 
@@ -117,19 +118,19 @@ DMAResource::Init(device_node* node, generic_size_t blockSize,
 	uint32 value;
 	if (gDeviceManagerModule.get_attr_uint32(node,
 			B_DMA_ALIGNMENT, &value, true) == B_OK)
-		restrictions.alignment = value + 1;
+		restrictions.alignment = (generic_size_t)value + 1;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
 			B_DMA_BOUNDARY, &value, true) == B_OK)
-		restrictions.boundary = value + 1;
+		restrictions.boundary = (generic_size_t)value + 1;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
 			B_DMA_MAX_SEGMENT_BLOCKS, &value, true) == B_OK)
-		restrictions.max_segment_size = value * blockSize;
+		restrictions.max_segment_size = (generic_size_t)value * blockSize;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
 			B_DMA_MAX_TRANSFER_BLOCKS, &value, true) == B_OK)
-		restrictions.max_transfer_size = value * blockSize;
+		restrictions.max_transfer_size = (generic_size_t)value * blockSize;
 
 	if (gDeviceManagerModule.get_attr_uint32(node,
 			B_DMA_MAX_SEGMENT_COUNT, &value, true) == B_OK)
@@ -226,19 +227,16 @@ DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 	area_id area = -1;
 	phys_size_t size = ROUNDUP(fBounceBufferSize, B_PAGE_SIZE);
 
-	if (fRestrictions.alignment > B_PAGE_SIZE) {
-		dprintf("dma buffer restrictions not yet implemented: alignment %"
-			B_PRIuGENADDR "\n", fRestrictions.alignment);
-	}
-	if (fRestrictions.boundary > B_PAGE_SIZE) {
-		dprintf("dma buffer restrictions not yet implemented: boundary %"
-			B_PRIuGENADDR "\n", fRestrictions.boundary);
-	}
-
-	bounceBuffer = (void*)fRestrictions.low_address;
-// TODO: We also need to enforce the boundary restrictions.
-	area = create_area("dma buffer", &bounceBuffer, B_PHYSICAL_BASE_ADDRESS,
-		size, B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	physicalRestrictions.low_address = fRestrictions.low_address;
+	physicalRestrictions.high_address = fRestrictions.high_address;
+	physicalRestrictions.alignment = fRestrictions.alignment;
+	physicalRestrictions.boundary = fRestrictions.boundary;
+	area = create_area_etc(B_SYSTEM_TEAM, "dma buffer", size, B_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, &virtualRestrictions,
+		&physicalRestrictions, &bounceBuffer);
 	if (area < B_OK)
 		return area;
 
@@ -251,10 +249,7 @@ DMAResource::CreateBounceBuffer(DMABounceBuffer** _buffer)
 
 	physicalBase = entry.address;
 
-	if (fRestrictions.high_address < physicalBase + size) {
-		delete_area(area);
-		return B_NO_MEMORY;
-	}
+	ASSERT(fRestrictions.high_address >= physicalBase + size);
 
 	DMABounceBuffer* buffer = new(std::nothrow) DMABounceBuffer;
 	if (buffer == NULL) {

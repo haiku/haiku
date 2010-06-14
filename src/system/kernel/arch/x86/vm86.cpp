@@ -546,9 +546,14 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 	if (ramSize < VM86_MIN_RAM_SIZE)
 		ramSize = VM86_MIN_RAM_SIZE;
 
-	void *address = (void *)0;
-	state->ram_area = create_area_etc(team->id, "dos", &address,
-		B_EXACT_ADDRESS, ramSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA, 0, 0);
+	void *address;
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address = NULL;
+	virtualRestrictions.address_specification = B_EXACT_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	state->ram_area = create_area_etc(team->id, "dos", ramSize, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA, 0, &virtualRestrictions,
+		&physicalRestrictions, &address);
 	if (state->ram_area < B_OK) {
 		ret = state->ram_area;
 		TRACE("Could not create RAM area\n");

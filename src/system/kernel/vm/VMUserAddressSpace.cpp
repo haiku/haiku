@@ -121,22 +121,23 @@ VMUserAddressSpace::LookupArea(addr_t address) const
 	You need to hold the VMAddressSpace write lock.
 */
 status_t
-VMUserAddressSpace::InsertArea(void** _address, uint32 addressSpec,
-	size_t size, VMArea* _area, uint32 allocationFlags)
+VMUserAddressSpace::InsertArea(VMArea* _area, size_t size,
+	const virtual_address_restrictions* addressRestrictions,
+	uint32 allocationFlags, void** _address)
 {
 	VMUserArea* area = static_cast<VMUserArea*>(_area);
 
 	addr_t searchBase, searchEnd;
 	status_t status;
 
-	switch (addressSpec) {
+	switch (addressRestrictions->address_specification) {
 		case B_EXACT_ADDRESS:
-			searchBase = (addr_t)*_address;
-			searchEnd = (addr_t)*_address + (size - 1);
+			searchBase = (addr_t)addressRestrictions->address;
+			searchEnd = (addr_t)addressRestrictions->address + (size - 1);
 			break;
 
 		case B_BASE_ADDRESS:
-			searchBase = (addr_t)*_address;
+			searchBase = (addr_t)addressRestrictions->address;
 			searchEnd = fEndAddress;
 			break;
 
@@ -155,10 +156,12 @@ VMUserAddressSpace::InsertArea(void** _address, uint32 addressSpec,
 			return B_BAD_VALUE;
 	}
 
-	status = _InsertAreaSlot(searchBase, size, searchEnd, addressSpec, area,
-		allocationFlags);
+	status = _InsertAreaSlot(searchBase, size, searchEnd,
+		addressRestrictions->address_specification,
+		addressRestrictions->alignment, area, allocationFlags);
 	if (status == B_OK) {
-		*_address = (void*)area->Base();
+		if (_address != NULL)
+			*_address = (void*)area->Base();
 		fFreeSpace -= area->Size();
 	}
 
@@ -276,8 +279,9 @@ VMUserAddressSpace::ShrinkAreaTail(VMArea* area, size_t size,
 
 
 status_t
-VMUserAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
-	size_t size, uint32 flags, uint32 allocationFlags)
+VMUserAddressSpace::ReserveAddressRange(size_t size,
+	const virtual_address_restrictions* addressRestrictions,
+	uint32 flags, uint32 allocationFlags, void** _address)
 {
 	// check to see if this address space has entered DELETE state
 	if (fDeleting) {
@@ -290,8 +294,8 @@ VMUserAddressSpace::ReserveAddressRange(void** _address, uint32 addressSpec,
 	if (area == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = InsertArea(_address, addressSpec, size, area,
-		allocationFlags);
+	status_t status = InsertArea(area, size, addressRestrictions,
+		allocationFlags, _address);
 	if (status != B_OK) {
 		area->~VMUserArea();
 		free_etc(area, allocationFlags);
@@ -453,7 +457,8 @@ VMUserAddressSpace::_InsertAreaIntoReservedRegion(addr_t start, size_t size,
 /*!	Must be called with this address space's write lock held */
 status_t
 VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
-	uint32 addressSpec, VMUserArea* area, uint32 allocationFlags)
+	uint32 addressSpec, size_t alignment, VMUserArea* area,
+	uint32 allocationFlags)
 {
 	VMUserArea* last = NULL;
 	VMUserArea* next;
@@ -480,7 +485,8 @@ VMUserAddressSpace::_InsertAreaSlot(addr_t start, addr_t size, addr_t end,
 		// TODO: this could be further optimized.
 	}
 
-	size_t alignment = B_PAGE_SIZE;
+	if (alignment == 0)
+		alignment = B_PAGE_SIZE;
 	if (addressSpec == B_ANY_KERNEL_BLOCK_ADDRESS) {
 		// align the memory to the next power of two of the size
 		while (alignment < size)

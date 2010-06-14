@@ -30,6 +30,30 @@ struct VMCacheRef;
 typedef DoublyLinkedListLink<vm_page_mapping> vm_page_mapping_link;
 
 
+struct virtual_address_restrictions {
+	void*	address;
+				// base or exact address, depending on address_specification
+	uint32	address_specification;
+				// address specification as passed to create_area()
+	size_t	alignment;
+				// address alignment; overridden when
+				// address_specification == B_ANY_KERNEL_BLOCK_ADDRESS
+};
+
+struct physical_address_restrictions {
+	phys_addr_t	low_address;
+					// lowest acceptable address
+	phys_addr_t	high_address;
+					// lowest no longer acceptable address; for ranges: the
+					// highest acceptable non-inclusive end address
+	phys_size_t	alignment;
+					// address alignment
+	phys_size_t	boundary;
+					// multiples of which may not be crossed by the address
+					// range
+};
+
+
 typedef struct vm_page_mapping {
 	vm_page_mapping_link page_link;
 	vm_page_mapping_link area_link;

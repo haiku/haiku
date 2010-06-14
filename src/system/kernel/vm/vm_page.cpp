@@ -3337,24 +3337,56 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 		set the allocated pages to, whether the pages shall be marked busy
 		(VM_PAGE_ALLOC_BUSY), and whether the pages shall be cleared
 		(VM_PAGE_ALLOC_CLEAR).
-	\param base The first acceptable physical address where the page run may
-		start.
-	\param limit The last acceptable physical address where the page run may
-		end (i.e. it must hold runStartAddress + runSize <= limit). If \c 0,
-		the limit is ignored.
 	\param length The number of contiguous pages to allocate.
+	\param restrictions Restrictions to the physical addresses of the page run
+		to allocate, including \c low_address, the first acceptable physical
+		address where the page run may start, \c high_address, the last
+		acceptable physical address where the page run may end (i.e. it must
+		hold \code runStartAddress + length <= high_address \endcode),
+		\c alignment, the alignment of the page run start address, and
+		\c boundary, multiples of which the page run must not cross.
+		Values set to \c 0 are ignored.
 	\param priority The page reservation priority (as passed to
 		vm_page_reserve_pages()).
 	\return The first page of the allocated page run on success; \c NULL
 		when the allocation failed.
 */
 vm_page*
-vm_page_allocate_page_run(uint32 flags, phys_addr_t base, phys_addr_t limit,
-	page_num_t length, int priority)
+vm_page_allocate_page_run(uint32 flags, page_num_t length,
+	const physical_address_restrictions* restrictions, int priority)
 {
-	page_num_t start = base / B_PAGE_SIZE;
-	page_num_t end = std::min(limit > 0 ? limit / B_PAGE_SIZE : sNumPages,
-		sNumPages);
+	// compute start and end page index
+	page_num_t requestedStart
+		= std::max(restrictions->low_address / B_PAGE_SIZE, sPhysicalPageOffset)
+			- sPhysicalPageOffset;
+	page_num_t start = requestedStart;
+	page_num_t end;
+	if (restrictions->high_address > 0) {
+		end = std::max(restrictions->high_address / B_PAGE_SIZE,
+				sPhysicalPageOffset)
+			- sPhysicalPageOffset;
+	} else
+		end = sNumPages;
+
+	// compute alignment mask
+	page_num_t alignmentMask
+		= std::max(restrictions->alignment / B_PAGE_SIZE, (phys_addr_t)1) - 1;
+	ASSERT(((alignmentMask + 1) & alignmentMask) == 0);
+		// alignment must be a power of 2
+
+	// compute the boundary shift
+	uint32 boundaryShift = 0;
+	if (restrictions->boundary != 0) {
+		page_num_t boundary = restrictions->boundary / B_PAGE_SIZE;
+		// boundary must be a power of two and not less than alignment and
+		// length
+		ASSERT(((boundary - 1) & boundary) == 0);
+		ASSERT(boundary >= alignmentMask + 1);
+		ASSERT(boundary >= length);
+
+		while ((boundary >>= 1) > 0)
+			boundaryShift++;
+	}
 
 	vm_page_reservation reservation;
 	vm_page_reserve_pages(&reservation, length, priority);
@@ -3369,12 +3401,31 @@ vm_page_allocate_page_run(uint32 flags, phys_addr_t base, phys_addr_t limit,
 	int useCached = freePages > 0 && (page_num_t)freePages > 2 * length ? 0 : 1;
 
 	for (;;) {
+		if (alignmentMask != 0 || boundaryShift != 0) {
+			page_num_t offsetStart = start + sPhysicalPageOffset;
+
+			// enforce alignment
+			if ((offsetStart & alignmentMask) != 0) {
+				offsetStart = ((offsetStart + alignmentMask) & ~alignmentMask)
+					- sPhysicalPageOffset;
+			}
+
+			// enforce boundary
+			if (offsetStart << boundaryShift
+					!= (offsetStart + length - 1) << boundaryShift) {
+				offsetStart = (offsetStart + length - 1) << boundaryShift
+					>> boundaryShift;
+			}
+
+			start = offsetStart - sPhysicalPageOffset;
+		}
+
 		if (start + length > end) {
 			if (useCached == 0) {
 				// The first iteration with free pages only was unsuccessful.
 				// Try again also considering cached pages.
 				useCached = 1;
-				start = base >> PAGE_SHIFT;
+				start = requestedStart;
 				continue;
 			}
 

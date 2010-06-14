@@ -267,9 +267,10 @@ static status_t vm_soft_fault(VMAddressSpace* addressSpace, addr_t address,
 	bool isWrite, bool isUser, vm_page** wirePage,
 	VMAreaWiredRange* wiredRange = NULL);
 static status_t map_backing_store(VMAddressSpace* addressSpace,
-	VMCache* cache, void** _virtualAddress, off_t offset, addr_t size,
-	uint32 addressSpec, int wiring, int protection, int mapping,
-	VMArea** _area, const char* areaName, uint32 flags, bool kernel);
+	VMCache* cache, off_t offset, const char* areaName, addr_t size, int wiring,
+	int protection, int mapping, uint32 flags,
+	const virtual_address_restrictions* addressRestrictions, bool kernel,
+	VMArea** _area, void** _virtualAddress);
 
 
 //	#pragma mark -
@@ -670,12 +671,14 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// first cache to it and resize the first cache.
 
 	// map the second area
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = (void*)secondBase;
+	addressRestrictions.address_specification = B_EXACT_ADDRESS;
 	VMArea* secondArea;
-	void* secondBaseAddress = (void*)secondBase;
-	error = map_backing_store(addressSpace, cache, &secondBaseAddress,
-		area->cache_offset + (secondBase - area->Base()), secondSize,
-		B_EXACT_ADDRESS, area->wiring, area->protection, REGION_NO_PRIVATE_MAP,
-		&secondArea, area->name, 0, kernel);
+	error = map_backing_store(addressSpace, cache,
+		area->cache_offset + (secondBase - area->Base()), area->name,
+		secondSize, area->wiring, area->protection, REGION_NO_PRIVATE_MAP, 0,
+		&addressRestrictions, kernel, &secondArea, NULL);
 	if (error != B_OK) {
 		addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
 		return error;
@@ -740,15 +743,16 @@ unmap_address_range(VMAddressSpace* addressSpace, addr_t address, addr_t size,
 	\a size) is wired.
 */
 static status_t
-map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
-	void** _virtualAddress, off_t offset, addr_t size, uint32 addressSpec,
-	int wiring, int protection, int mapping, VMArea** _area,
-	const char* areaName, uint32 flags, bool kernel)
+map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
+	const char* areaName, addr_t size, int wiring, int protection, int mapping,
+	uint32 flags, const virtual_address_restrictions* addressRestrictions,
+	bool kernel, VMArea** _area, void** _virtualAddress)
 {
 	TRACE(("map_backing_store: aspace %p, cache %p, virtual %p, offset 0x%Lx, "
 		"size %lu, addressSpec %ld, wiring %d, protection %d, area %p, areaName "
-		"'%s'\n", addressSpace, cache, *_virtualAddress, offset, size,
-		addressSpec, wiring, protection, _area, areaName));
+		"'%s'\n", addressSpace, cache, addressRestrictions->address, offset,
+		size, addressRestrictions->address_specification, wiring, protection,
+		_area, areaName));
 	cache->AssertLocked();
 
 	uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
@@ -808,16 +812,16 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache,
 		goto err2;
 	}
 
-	if (addressSpec == B_EXACT_ADDRESS
+	if (addressRestrictions->address_specification == B_EXACT_ADDRESS
 			&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0) {
-		status = unmap_address_range(addressSpace, (addr_t)*_virtualAddress,
-			size, kernel);
+		status = unmap_address_range(addressSpace,
+			(addr_t)addressRestrictions->address, size, kernel);
 		if (status != B_OK)
 			goto err2;
 	}
 
-	status = addressSpace->InsertArea(_virtualAddress, addressSpec, size, area,
-		allocationFlags);
+	status = addressSpace->InsertArea(area, size, addressRestrictions,
+		allocationFlags, _virtualAddress);
 	if (status != B_OK) {
 		// TODO: wait and try again once this is working in the backend
 #if 0
@@ -995,10 +999,12 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 	cache->Lock();
 
 	VMArea* area;
-	void* areaAddress = address;
-	status = map_backing_store(addressSpace, cache, &areaAddress, 0, size,
-		B_EXACT_ADDRESS, B_ALREADY_WIRED, 0, REGION_NO_PRIVATE_MAP, &area, name,
-		0, true);
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = address;
+	addressRestrictions.address_specification = B_EXACT_ADDRESS;
+	status = map_backing_store(addressSpace, cache, 0, name, size,
+		B_ALREADY_WIRED, B_ALREADY_WIRED, REGION_NO_PRIVATE_MAP, 0,
+		&addressRestrictions, true, &area, NULL);
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
 		return status;
@@ -1035,18 +1041,23 @@ vm_reserve_address_range(team_id team, void** _address, uint32 addressSpec,
 	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
 
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = *_address;
+	addressRestrictions.address_specification = addressSpec;
 	VMAddressSpace* addressSpace = locker.AddressSpace();
-	return addressSpace->ReserveAddressRange(_address, addressSpec,
-		size, flags,
+	return addressSpace->ReserveAddressRange(size, &addressRestrictions, flags,
 		addressSpace == VMAddressSpace::Kernel()
-			? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0);
+			? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0,
+		_address);
 }
 
 
 area_id
-vm_create_anonymous_area(team_id team, const char* name, void** address,
-	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
-	phys_addr_t physicalAddress, uint32 flags, bool kernel)
+vm_create_anonymous_area(team_id team, const char *name, addr_t size,
+	uint32 wiring, uint32 protection, uint32 flags,
+	const virtual_address_restrictions* virtualAddressRestrictions,
+	const physical_address_restrictions* physicalAddressRestrictions,
+	bool kernel, void** _address)
 {
 	VMArea* area;
 	VMCache* cache;
@@ -1075,24 +1086,22 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 #endif
 
 	// check parameters
-	switch (addressSpec) {
+	switch (virtualAddressRestrictions->address_specification) {
 		case B_ANY_ADDRESS:
 		case B_EXACT_ADDRESS:
 		case B_BASE_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 			break;
-		case B_PHYSICAL_BASE_ADDRESS:
-			physicalAddress = (addr_t)*address;
-			addressSpec = B_ANY_KERNEL_ADDRESS;
-			break;
 
 		default:
 			return B_BAD_VALUE;
 	}
 
-	if (physicalAddress != 0)
+	if (physicalAddressRestrictions->low_address != 0
+		&& physicalAddressRestrictions->high_address != 0) {
 		wiring = B_CONTIGUOUS;
+	}
 
 	bool doReserveMemory = false;
 	switch (wiring) {
@@ -1181,7 +1190,7 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 		// we try to allocate the page run here upfront as this may easily
 		// fail for obvious reasons
 		page = vm_page_allocate_page_run(PAGE_STATE_WIRED | pageAllocFlags,
-			physicalAddress, 0, size / B_PAGE_SIZE, priority);
+			size / B_PAGE_SIZE, physicalAddressRestrictions, priority);
 		if (page == NULL) {
 			status = B_NO_MEMORY;
 			goto err0;
@@ -1197,10 +1206,11 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 			goto err1;
 
 		addressSpace = locker.AddressSpace();
-	} while (addressSpec == B_EXACT_ADDRESS
+	} while (virtualAddressRestrictions->address_specification
+			== B_EXACT_ADDRESS
 		&& (flags & CREATE_AREA_UNMAP_ADDRESS_RANGE) != 0
-		&& wait_if_address_range_is_wired(addressSpace, (addr_t)*address, size,
-			&locker));
+		&& wait_if_address_range_is_wired(addressSpace,
+			(addr_t)virtualAddressRestrictions->address, size, &locker));
 
 	// create an anonymous cache
 	// if it's a stack, make sure that two pages are available at least
@@ -1232,9 +1242,9 @@ vm_create_anonymous_area(team_id team, const char* name, void** address,
 
 	cache->Lock();
 
-	status = map_backing_store(addressSpace, cache, address, 0, size,
-		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name,
-		flags, kernel);
+	status = map_backing_store(addressSpace, cache, 0, name, size, wiring,
+		protection, REGION_NO_PRIVATE_MAP, flags, virtualAddressRestrictions,
+		kernel, &area, _address);
 
 	if (status != B_OK) {
 		cache->ReleaseRefAndUnlock();
@@ -1432,9 +1442,12 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 
 	cache->Lock();
 
-	status = map_backing_store(locker.AddressSpace(), cache, _address,
-		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
-		REGION_NO_PRIVATE_MAP, &area, name, 0, true);
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = *_address;
+	addressRestrictions.address_specification = addressSpec & ~B_MTR_MASK;
+	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
+		B_FULL_LOCK, protection, REGION_NO_PRIVATE_MAP, 0, &addressRestrictions,
+		true, &area, _address);
 
 	if (status < B_OK)
 		cache->ReleaseRefLocked();
@@ -1547,9 +1560,12 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	cache->Lock();
 
 	VMArea* area;
-	result = map_backing_store(locker.AddressSpace(), cache, _address,
-		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
-		REGION_NO_PRIVATE_MAP, &area, name, 0, true);
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = *_address;
+	addressRestrictions.address_specification = addressSpec & ~B_MTR_MASK;
+	result = map_backing_store(locker.AddressSpace(), cache, 0, name,
+		size, B_FULL_LOCK, protection, REGION_NO_PRIVATE_MAP, 0,
+		&addressRestrictions, true, &area, _address);
 
 	if (result != B_OK)
 		cache->ReleaseRefLocked();
@@ -1631,9 +1647,12 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	cache->Lock();
 
 	VMArea* area;
-	status = map_backing_store(locker.AddressSpace(), cache, address, 0, size,
-		addressSpec, B_LAZY_LOCK, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP,
-		&area, name, flags, true);
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = *address;
+	addressRestrictions.address_specification = addressSpec;
+	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
+		B_LAZY_LOCK, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, flags,
+		&addressRestrictions, true, &area, address);
 
 	if (status < B_OK) {
 		cache->ReleaseRefAndUnlock();
@@ -1713,8 +1732,13 @@ _vm_map_file(team_id team, const char* name, void** _address,
 
 	if (fd < 0) {
 		uint32 flags = unmapAddressRange ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0;
-		return vm_create_anonymous_area(team, name, _address, addressSpec, size,
-			B_NO_LOCK, protection, 0, flags, kernel);
+		virtual_address_restrictions virtualRestrictions = {};
+		virtualRestrictions.address = *_address;
+		virtualRestrictions.address_specification = addressSpec;
+		physical_address_restrictions physicalRestrictions = {};
+		return vm_create_anonymous_area(team, name, size, B_NO_LOCK, protection,
+			flags, &virtualRestrictions, &physicalRestrictions, kernel,
+			_address);
 	}
 
 	// get the open flags of the FD
@@ -1795,9 +1819,13 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	cache->Lock();
 
 	VMArea* area;
-	status = map_backing_store(locker.AddressSpace(), cache, _address,
-		offset, size, addressSpec, 0, protection, mapping, &area, name,
-		unmapAddressRange ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0, kernel);
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = *_address;
+	addressRestrictions.address_specification = addressSpec;
+	status = map_backing_store(locker.AddressSpace(), cache, offset, name, size,
+		0, protection, mapping,
+		unmapAddressRange ? CREATE_AREA_UNMAP_ADDRESS_RANGE : 0,
+		&addressRestrictions, kernel, &area, _address);
 
 	if (status != B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
@@ -1936,9 +1964,13 @@ vm_clone_area(team_id team, const char* name, void** address,
 	if (sourceArea->cache_type == CACHE_TYPE_NULL)
 		status = B_NOT_ALLOWED;
 	else {
-		status = map_backing_store(targetAddressSpace, cache, address,
-			sourceArea->cache_offset, sourceArea->Size(), addressSpec,
-			sourceArea->wiring, protection, mapping, &newArea, name, 0, kernel);
+		virtual_address_restrictions addressRestrictions = {};
+		addressRestrictions.address = *address;
+		addressRestrictions.address_specification = addressSpec;
+		status = map_backing_store(targetAddressSpace, cache,
+			sourceArea->cache_offset, name, sourceArea->Size(),
+			sourceArea->wiring, protection, mapping, 0, &addressRestrictions,
+			kernel, &newArea, address);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
 		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
@@ -2227,10 +2259,14 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	// existing one, if this is a shared area.
 
 	VMArea* target;
-	status = map_backing_store(targetAddressSpace, cache, _address,
-		source->cache_offset, source->Size(), addressSpec, source->wiring,
-		protection, sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
-		&target, name, writableCopy ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY, true);
+	virtual_address_restrictions addressRestrictions = {};
+	addressRestrictions.address = *_address;
+	addressRestrictions.address_specification = addressSpec;
+	status = map_backing_store(targetAddressSpace, cache, source->cache_offset,
+		name, source->Size(), source->wiring, protection,
+		sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
+		writableCopy ? 0 : CREATE_AREA_DONT_COMMIT_MEMORY,
+		&addressRestrictions, true, &target, _address);
 	if (status < B_OK)
 		return status;
 
@@ -3659,11 +3695,14 @@ vm_init(kernel_args* args)
 
 #if DEBUG_CACHE_LIST
 	if (vm_page_num_free_pages() >= 200 * 1024 * 1024 / B_PAGE_SIZE) {
+		virtual_address_restrictions virtualRestrictions = {};
+		virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+		physical_address_restrictions physicalRestrictions = {};
 		create_area_etc(VMAddressSpace::KernelID(), "cache info table",
-			(void**)&sCacheInfoTable, B_ANY_KERNEL_ADDRESS,
 			ROUNDUP(kCacheInfoTableCount * sizeof(cache_info), B_PAGE_SIZE),
-			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
-			CREATE_AREA_DONT_WAIT);
+			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			CREATE_AREA_DONT_WAIT, &virtualRestrictions, &physicalRestrictions,
+			(void**)&sCacheInfoTable);
 	}
 #endif	// DEBUG_CACHE_LIST
 
@@ -5593,14 +5632,17 @@ clone_area(const char* name, void** _address, uint32 addressSpec,
 
 
 area_id
-create_area_etc(team_id team, const char* name, void** address,
-	uint32 addressSpec, uint32 size, uint32 lock, uint32 protection,
-	phys_addr_t physicalAddress, uint32 flags)
+create_area_etc(team_id team, const char* name, uint32 size, uint32 lock,
+	uint32 protection, uint32 flags,
+	const virtual_address_restrictions* virtualAddressRestrictions,
+	const physical_address_restrictions* physicalAddressRestrictions,
+	void** _address)
 {
 	fix_protection(&protection);
 
-	return vm_create_anonymous_area(team, (char*)name, address, addressSpec,
-		size, lock, protection, physicalAddress, flags, true);
+	return vm_create_anonymous_area(team, name, size, lock, protection, flags,
+		virtualAddressRestrictions, physicalAddressRestrictions, true,
+		_address);
 }
 
 
@@ -5610,8 +5652,13 @@ create_area(const char* name, void** _address, uint32 addressSpec, size_t size,
 {
 	fix_protection(&protection);
 
-	return vm_create_anonymous_area(VMAddressSpace::KernelID(), (char*)name,
-		_address, addressSpec, size, lock, protection, 0, 0, true);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address = *_address;
+	virtualRestrictions.address_specification = addressSpec;
+	physical_address_restrictions physicalRestrictions = {};
+	return vm_create_anonymous_area(VMAddressSpace::KernelID(), name, size,
+		lock, protection, 0, &virtualRestrictions, &physicalRestrictions, true,
+		_address);
 }
 
 
@@ -5849,9 +5896,13 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 
 	fix_protection(&protection);
 
-	area_id area = vm_create_anonymous_area(VMAddressSpace::CurrentID(),
-		(char*)name, &address, addressSpec, size, lock, protection, 0, 0,
-		false);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address = address;
+	virtualRestrictions.address_specification = addressSpec;
+	physical_address_restrictions physicalRestrictions = {};
+	area_id area = vm_create_anonymous_area(VMAddressSpace::CurrentID(), name,
+		size, lock, protection, 0, &virtualRestrictions, &physicalRestrictions,
+		false, &address);
 
 	if (area >= B_OK
 		&& user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {

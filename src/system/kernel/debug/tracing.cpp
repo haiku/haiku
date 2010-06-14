@@ -369,10 +369,14 @@ TracingMetaData::Create(TracingMetaData*& _metaData)
 	if (error != B_OK)
 		return error;
 
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
 	area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
-		(void**)&metaData->fTraceOutputBuffer, B_ANY_KERNEL_ADDRESS,
 		kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		&virtualRestrictions, &physicalRestrictions,
+		(void**)&metaData->fTraceOutputBuffer);
 	if (area < 0)
 		return area;
 
@@ -411,13 +415,18 @@ TracingMetaData::_CreateMetaDataArea(bool findPrevious, area_id& _area,
 {
 	// search meta data in memory (from previous session)
 	TracingMetaData* metaData;
-	addr_t metaDataAddress = kMetaDataBaseAddress;
+	phys_addr_t metaDataAddress = kMetaDataBaseAddress;
 	for (; metaDataAddress <= kMetaDataBaseEndAddress;
 			metaDataAddress += kMetaDataAddressIncrement) {
-		area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing metadata",
-			(void**)&metaData, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE,
+		virtual_address_restrictions virtualRestrictions = {};
+		virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+		physical_address_restrictions physicalRestrictions = {};
+		physicalRestrictions.low_address = metaDataAddress;
+		physicalRestrictions.high_address = metaDataAddress + B_PAGE_SIZE;
+		area_id create_area_etc(B_SYSTEM_TEAM, "tracing metadata", B_PAGE_SIZE,
 			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-			metaDataAddress, CREATE_AREA_DONT_CLEAR);
+			CREATE_AREA_DONT_CLEAR, &virtualRestrictions, &physicalRestrictions,
+			(void**)&metaData);
 		if (area < 0)
 			continue;
 
@@ -463,11 +472,17 @@ TracingMetaData::_InitPreviousTracingData()
 	}
 
 	// re-map the previous tracing buffer
-	void* buffer = fTraceOutputBuffer;
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address = fTraceOutputBuffer;
+	virtualRestrictions.address_specification = B_EXACT_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	physicalRestrictions.low_address = fPhysicalAddress;
+	physicalRestrictions.high_address = fPhysicalAddress
+		+ ROUNDUP(kTraceOutputBufferSize + MAX_TRACE_SIZE);
 	area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
-		&buffer, B_EXACT_ADDRESS, kTraceOutputBufferSize + MAX_TRACE_SIZE,
-		B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
-		fPhysicalAddress, CREATE_AREA_DONT_CLEAR);
+		kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_CLEAR,
+		&virtualRestrictions, &physicalRestrictions, NULL);
 	if (area < 0) {
 		dprintf("Failed to init tracing meta data: Mapping tracing log "
 			"buffer failed: %s\n", strerror(area));
@@ -475,7 +490,7 @@ TracingMetaData::_InitPreviousTracingData()
 	}
 
 	dprintf("ktrace: Remapped tracing buffer at %p, size: %" B_PRIuSIZE "\n",
-		buffer, kTraceOutputBufferSize + MAX_TRACE_SIZE);
+		fTraceOutputBuffer, kTraceOutputBufferSize + MAX_TRACE_SIZE);
 
 	// verify/repair the tracing entry list
 	uint32 errorCount = 0;

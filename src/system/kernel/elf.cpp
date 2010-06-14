@@ -1881,9 +1881,13 @@ elf_load_user_image(const char *path, struct team *team, int flags,
 				snprintf(regionName, B_OS_NAME_LENGTH, "%s_bss%d", baseName, i);
 
 				regionAddress += fileUpperBound;
-				id = create_area_etc(team->id, regionName,
-					(void **)&regionAddress, B_EXACT_ADDRESS, bssSize,
-					B_NO_LOCK, B_READ_AREA | B_WRITE_AREA, 0, 0);
+				virtual_address_restrictions virtualRestrictions = {};
+				virtualRestrictions.address = regionAddress;
+				virtualRestrictions.address_specification = B_EXACT_ADDRESS;
+				physical_address_restrictions physicalRestrictions = {};
+				id = create_area_etc(team->id, regionName, bssSize, B_NO_LOCK,
+					B_READ_AREA | B_WRITE_AREA, 0, &virtualRestrictions,
+					&physicalRestrictions, (void**)&regionAddress);
 				if (id < B_OK) {
 					dprintf("error allocating bss area: %s!\n", strerror(id));
 					status = B_NOT_AN_EXECUTABLE;

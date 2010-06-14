@@ -27,9 +27,10 @@ public:
 									uint32 protection, uint32 allocationFlags);
 	virtual	void				DeleteArea(VMArea* area,
 									uint32 allocationFlags);
-	virtual	status_t			InsertArea(void** _address, uint32 addressSpec,
-									size_t size, VMArea* area,
-									uint32 allocationFlags);
+	virtual	status_t			InsertArea(VMArea* area, size_t size,
+									const virtual_address_restrictions*
+										addressRestrictions,
+									uint32 allocationFlags, void** _address);
 	virtual	void				RemoveArea(VMArea* area,
 									uint32 allocationFlags);
 
@@ -41,9 +42,11 @@ public:
 	virtual	status_t			ShrinkAreaTail(VMArea* area, size_t newSize,
 									uint32 allocationFlags);
 
-	virtual	status_t			ReserveAddressRange(void** _address,
-									uint32 addressSpec, size_t size,
-									uint32 flags, uint32 allocationFlags);
+	virtual	status_t			ReserveAddressRange(size_t size,
+									const virtual_address_restrictions*
+										addressRestrictions,
+									uint32 flags, uint32 allocationFlags,
+									void** _address);
 	virtual	status_t			UnreserveAddressRange(addr_t address,
 									size_t size, uint32 allocationFlags);
 	virtual	void				UnreserveAllAddressRanges(
@@ -67,9 +70,10 @@ private:
 			void				_InsertRange(Range* range);
 			void				_RemoveRange(Range* range);
 
-			status_t			_AllocateRange(addr_t address,
-									uint32 addressSpec, size_t size,
-									bool allowReservedRange,
+			status_t			_AllocateRange(
+									const virtual_address_restrictions*
+										addressRestrictions,
+									size_t size, bool allowReservedRange,
 									uint32 allocationFlags, Range*& _range);
 			Range*				_FindFreeRange(addr_t start, size_t size,
 									size_t alignment, uint32 addressSpec,

@@ -554,10 +554,15 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 
 			snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_stack",
 				attributes.name, thread->id);
+			virtual_address_restrictions virtualRestrictions = {};
+			virtualRestrictions.address = (void*)thread->user_stack_base;
+			virtualRestrictions.address_specification = B_BASE_ADDRESS;
+			physical_address_restrictions physicalRestrictions = {};
 			thread->user_stack_area = create_area_etc(team->id, stack_name,
-					(void **)&thread->user_stack_base, B_BASE_ADDRESS,
-					thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
-					B_READ_AREA | B_WRITE_AREA | B_STACK_AREA, 0, 0);
+				thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
+				B_READ_AREA | B_WRITE_AREA | B_STACK_AREA, 0,
+				&virtualRestrictions, &physicalRestrictions,
+				(void**)&thread->user_stack_base);
 			if (thread->user_stack_area < B_OK
 				|| arch_thread_init_tls(thread) < B_OK) {
 				// great, we have a fully running thread without a (usable)

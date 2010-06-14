@@ -598,14 +598,18 @@ MemoryManager::AllocateRaw(size_t size, uint32 flags, void*& _pages)
 		if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0)
 			return B_WOULD_BLOCK;
 
+		virtual_address_restrictions virtualRestrictions = {};
+		virtualRestrictions.address_specification
+			= (flags & CACHE_ALIGN_ON_SIZE) != 0
+				? B_ANY_KERNEL_BLOCK_ADDRESS : B_ANY_KERNEL_ADDRESS;
+		physical_address_restrictions physicalRestrictions = {};
 		area_id area = create_area_etc(VMAddressSpace::KernelID(),
-			"slab large raw allocation", &_pages,
-			(flags & CACHE_ALIGN_ON_SIZE) != 0
-				? B_ANY_KERNEL_BLOCK_ADDRESS : B_ANY_KERNEL_ADDRESS,
-			size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
+			"slab large raw allocation", size, B_FULL_LOCK,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			((flags & CACHE_DONT_WAIT_FOR_MEMORY) != 0
 					? CREATE_AREA_DONT_WAIT : 0)
-				| CREATE_AREA_DONT_CLEAR);
+				| CREATE_AREA_DONT_CLEAR,
+			&virtualRestrictions, &physicalRestrictions, &_pages);
 		return area >= 0 ? B_OK : area;
 	}
 

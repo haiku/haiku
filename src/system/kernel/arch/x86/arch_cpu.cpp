@@ -691,10 +691,14 @@ arch_cpu_init_post_vm(kernel_args *args)
 	//i386_selector_init(gGDT);  // pass the new gdt
 
 	// allocate an area for the double fault stacks
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
 	create_area_etc(B_SYSTEM_TEAM, "double fault stacks",
-		(void**)&sDoubleFaultStacks, B_ANY_KERNEL_ADDRESS,
 		kDoubleFaultStackSize * smp_get_num_cpus(), B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, CREATE_AREA_DONT_WAIT);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_WAIT,
+		&virtualRestrictions, &physicalRestrictions,
+		(void**)&sDoubleFaultStacks);
 
 	X86PagingStructures* kernelPagingStructures
 		= static_cast<X86VMTranslationMap*>(

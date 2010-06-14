@@ -865,10 +865,15 @@ delete_team_struct(struct team* team)
 static status_t
 create_team_user_data(struct team* team)
 {
-	void* address = (void*)KERNEL_USER_DATA_BASE;
+	void* address;
 	size_t size = 4 * B_PAGE_SIZE;
-	team->user_data_area = create_area_etc(team->id, "user area", &address,
-		B_BASE_ADDRESS, size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, 0);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address = (void*)KERNEL_USER_DATA_BASE;
+	virtualRestrictions.address_specification = B_BASE_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	team->user_data_area = create_area_etc(team->id, "user area", size,
+		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA, 0, &virtualRestrictions,
+		&physicalRestrictions, &address);
 	if (team->user_data_area < 0)
 		return team->user_data_area;
 
@@ -1048,9 +1053,13 @@ team_create_thread_start(void* args)
 		// the exact location at the end of the user stack area
 
 	sprintf(userStackName, "%s_main_stack", team->name);
-	thread->user_stack_area = create_area_etc(team->id, userStackName,
-		(void**)&thread->user_stack_base, B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK,
-		B_READ_AREA | B_WRITE_AREA | B_STACK_AREA, 0, 0);
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address = (void*)thread->user_stack_base;
+	virtualRestrictions.address_specification = B_EXACT_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	thread->user_stack_area = create_area_etc(team->id, userStackName, sizeLeft,
+		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_STACK_AREA, 0,
+		&virtualRestrictions, &physicalRestrictions, NULL);
 	if (thread->user_stack_area < 0) {
 		dprintf("team_create_thread_start: could not create default user stack "
 			"region: %s\n", strerror(thread->user_stack_area));
