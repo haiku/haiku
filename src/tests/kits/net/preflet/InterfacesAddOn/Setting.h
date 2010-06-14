@@ -21,12 +21,14 @@ class Setting {
 		void SetGateway(BString ip) {fGateway = ip; }
 		void SetNetmask(BString ip) {fNetmask = ip; }
 		void SetAutoConfigure(bool t) {fAuto = t; }
+		void Enable(bool enable) { fEnabled = enable; }
 		
 		const char* IP()  {return fIP.String(); }
 		const char* Gateway()  {return fGateway.String(); }		
 		const char* Netmask()  {return fNetmask.String(); }
 		const char* Name()  {return fName.String(); }
 		bool 		AutoConfigured() {return fAuto; }
+		bool		Enabled()	{ return fEnabled; }
 		int			Media()		{ return fMedia; }
 		BObjectList<BString> fNameservers;
 		void ReadConfiguration();
@@ -41,6 +43,7 @@ class Setting {
 		BString fNetmask;
 		BString fName;
 		bool 	fAuto;
+		bool	fEnabled;
 		int		fMedia;
 };
 

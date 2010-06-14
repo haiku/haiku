@@ -80,9 +80,8 @@ our_image(image_info& image)
 InterfaceListItem::InterfaceListItem(const char* name)
 	: 
 	BListItem(0, false),
-	fEnabled(true),
 	fIcon(NULL), 	
-	fSetting(new Setting(name))
+	fSettings(new Setting(name))
 {
 	_InitIcon();
 }
@@ -143,7 +142,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	BPoint commentPt = iconPt + BPoint(32+8, fntheight*3);
 		
 	drawing_mode mode = owner->DrawingMode();
-	if (fEnabled)
+	if (fSettings->Enabled())
 		owner->SetDrawingMode(B_OP_OVER);
 	else {
 		owner->SetDrawingMode(B_OP_ALPHA);
@@ -153,23 +152,21 @@ InterfaceListItem::DrawItem(BView* owner, BRect /*bounds*/, bool complete)
 	
 	owner->DrawBitmapAsync(fIcon, iconPt);
 
-	if (!fEnabled)
+	if (!fSettings->Enabled())
 		owner->SetHighColor(tint_color(oldcolor, B_LIGHTEN_1_TINT));
 
 	owner->SetFont(be_bold_font);
 	owner->DrawString(Name(), namePt);
 	owner->SetFont(be_plain_font);
 
-	if (fEnabled) {
+	if (fSettings->Enabled()) {
 		BString str("Enabled, IPv4 address: ");
-		str << fSetting->IP();
+		str << fSettings->IP();
 		owner->DrawString(str.String(), driverPt);
-		if (fSetting->AutoConfigured())
+		if (fSettings->AutoConfigured())
 			owner->DrawString("DHCP enabled", commentPt);
 		else
 			owner->DrawString("DHCP disabled, use static IP address", commentPt);
-
-		
 	} else 
 		owner->DrawString("Disabled.", driverPt);
 
@@ -184,7 +181,7 @@ InterfaceListItem::_InitIcon()
 	BBitmap* icon = NULL;
 	
 	const char* mediaTypeName = "";
-	int media = fSetting->Media();
+	int media = fSettings->Media();
 	printf("%s media = 0x%x\n", Name(), media);
 	switch (IFM_TYPE(media)) {
 		case IFM_ETHER:
@@ -273,8 +270,7 @@ InterfacesListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_NETWORK_MONITOR:
-			message->PrintToStream();
-			_UpdateList();
+			_HandleNetworkMessage(message);
 			break;
 
 		default:
@@ -331,10 +327,10 @@ InterfacesListView::_InitList()
 	MakeEmpty();
 
 	for (uint32 i = 0; i < count; i++) {
-		// if (strcmp(interface->ifr_name, "loop") != 0) {
+		if (strcmp(interface->ifr_name, "loop") != 0) {
 			AddItem(new InterfaceListItem(interface->ifr_name));
 	//		printf("Name = %s\n", interface->ifr_name);
-		// }
+		}
 		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE 
 			+ interface->ifr_addr.sa_len);
 	}	
@@ -349,3 +345,44 @@ InterfacesListView::_UpdateList()
 	return B_OK;
 }
 
+void 
+InterfacesListView::_HandleNetworkMessage(BMessage* message)
+{
+	const char* name;
+	int32 opcode;
+	
+	message->PrintToStream();
+	
+	if (message->FindInt32("opcode", &opcode) != B_OK)
+		return;
+		
+	if (message->FindString("interface", &name) != B_OK
+		&& message->FindString("device", &name) != B_OK)
+		return;
+
+	InterfaceListItem* item = FindItem(name);
+	if (!item)
+		printf("InterfaceListItem %s not found!\n", name);
+
+	switch (opcode) {
+		case B_NETWORK_INTERFACE_CHANGED:
+		case B_NETWORK_DEVICE_LINK_CHANGED:
+			if (item)
+				InvalidateItem(IndexOf(item));
+			break;
+		
+		case B_NETWORK_INTERFACE_ADDED:
+			if (item)
+				InvalidateItem(IndexOf(item));
+			else
+				AddItem(new InterfaceListItem(name));
+			break;
+			
+		case B_NETWORK_INTERFACE_REMOVED:
+			if (item) {
+				RemoveItem(item);
+				delete item;
+			}
+			break;
+	}
+}

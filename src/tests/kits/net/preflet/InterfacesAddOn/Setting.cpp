@@ -34,7 +34,8 @@
 
 Setting::Setting(const char *name)
 	:
-	fAuto(true)
+	fAuto(true),
+	fEnabled(false)
 {
 	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	fName = name;
@@ -149,6 +150,7 @@ Setting::ReadConfiguration()
 		flags = request.ifr_flags;
 
 	fAuto = (flags & IFF_AUTO_CONFIGURED) != 0;
+	fEnabled = (flags & IFF_UP) != 0;
 	
 	if (ioctl(fSocket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) == 0)
 		fMedia = request.ifr_media;

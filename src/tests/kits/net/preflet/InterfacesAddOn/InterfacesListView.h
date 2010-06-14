@@ -31,17 +31,16 @@ public:
 	void DrawItem(BView* owner, BRect bounds, bool complete);
 	void Update(BView* owner, const BFont* font);
 		
-	inline const char*		Name()			{ return fSetting->Name(); }
-	inline bool				Enabled()		{ return fEnabled; } 
-	inline void				SetEnabled(bool enable){ fEnabled = enable; }
-	inline Setting*			GetSetting()	{ return fSetting; } 
+	inline const char*		Name()			{ return fSettings->Name(); }
+	inline bool				Enabled()		{ return fSettings->Enabled(); } 
+	inline void				SetEnabled(bool enable){ fSettings->Enable(enable); }
+	inline Setting*			GetSetting()	{ return fSettings; } 
 
 private:
 	void 					_InitIcon();
 
-	bool					fEnabled;
 	BBitmap* 				fIcon;
-	Setting*				fSetting;
+	Setting*				fSettings;
 };
 
 
@@ -62,6 +61,7 @@ protected:
 private:
 	status_t	_InitList();
 	status_t	_UpdateList();
+	void		_HandleNetworkMessage(BMessage* message);
 };
 
 #endif /*INTERFACES_LIST_VIEW_H*/
