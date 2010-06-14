@@ -85,6 +85,8 @@ area_id create_area_etc(team_id team, const char *name, uint32 size,
 area_id transfer_area(area_id id, void** _address, uint32 addressSpec,
 			team_id target, bool kernel);
 
+const char* vm_cache_type_to_string(int32 type);
+
 status_t vm_block_address_range(const char* name, void* address, addr_t size);
 status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,

@@ -155,3 +155,12 @@ VMVnodeCache::ReleaseStoreRef()
 	vfs_put_vnode(fVnode);
 }
 
+
+void
+VMVnodeCache::Dump(bool showPages) const
+{
+	VMCache::Dump(showPages);
+
+	kprintf("  vnode:        %p <%" B_PRIdDEV ", %" B_PRIdINO ">\n", fVnode,
+		fDevice, fInode);
+}

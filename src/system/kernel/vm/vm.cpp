@@ -2818,8 +2818,8 @@ dump_cache_tree(int argc, char** argv)
 }
 
 
-static const char*
-cache_type_to_string(int32 type)
+const char*
+vm_cache_type_to_string(int32 type)
 {
 	switch (type) {
 		case CACHE_TYPE_RAM:
@@ -2884,7 +2884,7 @@ dump_caches_recursively(VMCache* cache, cache_info& info, int level)
 		kprintf("  ");
 
 	kprintf("%p: type: %s, base: %lld, size: %lld, pages: %lu", cache,
-		cache_type_to_string(cache->type), cache->virtual_base,
+		vm_cache_type_to_string(cache->type), cache->virtual_base,
 		cache->virtual_end, cache->page_count);
 
 	if (level == 0)
@@ -3023,52 +3023,7 @@ dump_cache(int argc, char** argv)
 
 	cache = (VMCache*)address;
 
-	kprintf("CACHE %p:\n", cache);
-	kprintf("  ref_count:    %ld\n", cache->RefCount());
-	kprintf("  source:       %p\n", cache->source);
-	kprintf("  type:         %s\n", cache_type_to_string(cache->type));
-	kprintf("  virtual_base: 0x%Lx\n", cache->virtual_base);
-	kprintf("  virtual_end:  0x%Lx\n", cache->virtual_end);
-	kprintf("  temporary:    %ld\n", cache->temporary);
-	kprintf("  scan_skip:    %ld\n", cache->scan_skip);
-	kprintf("  lock:         %p\n", cache->GetLock());
-#if KDEBUG
-	kprintf("  lock.holder:  %ld\n", cache->GetLock()->holder);
-#endif
-	kprintf("  areas:\n");
-
-	for (VMArea* area = cache->areas; area != NULL; area = area->cache_next) {
-		kprintf("    area 0x%lx, %s\n", area->id, area->name);
-		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->Base(),
-			area->Size());
-		kprintf("\tprotection: 0x%lx\n", area->protection);
-		kprintf("\towner:      0x%lx\n", area->address_space->ID());
-	}
-
-	kprintf("  consumers:\n");
-	VMCache* consumer = NULL;
-	while ((consumer = (VMCache*)list_get_next_item(&cache->consumers,
-				consumer)) != NULL) {
-		kprintf("\t%p\n", consumer);
-	}
-
-	kprintf("  pages:\n");
-	if (showPages) {
-		for (VMCachePagesTree::Iterator it = cache->pages.GetIterator();
-				vm_page* page = it.Next();) {
-			if (!vm_page_is_dummy(page)) {
-				kprintf("\t%p ppn %#" B_PRIxPHYSADDR " offset %#" B_PRIxPHYSADDR
-					" state %u (%s) wired_count %u\n", page,
-					page->physical_page_number, page->cache_offset,
-					page->State(), page_state_to_string(page->State()),
-					page->wired_count);
-			} else {
-				kprintf("\t%p DUMMY PAGE state %u (%s)\n",
-					page, page->State(), page_state_to_string(page->State()));
-			}
-		}
-	} else
-		kprintf("\t%ld in cache\n", cache->page_count);
+	cache->Dump(showPages);
 
 	set_debug_variable("_sourceCache", (addr_t)cache->source);
 
@@ -3089,7 +3044,7 @@ dump_area_struct(VMArea* area, bool mappings)
 	kprintf("wiring:\t\t0x%x\n", area->wiring);
 	kprintf("memory_type:\t%#" B_PRIx32 "\n", area->MemoryType());
 	kprintf("cache:\t\t%p\n", area->cache);
-	kprintf("cache_type:\t%s\n", cache_type_to_string(area->cache_type));
+	kprintf("cache_type:\t%s\n", vm_cache_type_to_string(area->cache_type));
 	kprintf("cache_offset:\t0x%Lx\n", area->cache_offset);
 	kprintf("cache_next:\t%p\n", area->cache_next);
 	kprintf("cache_prev:\t%p\n", area->cache_prev);

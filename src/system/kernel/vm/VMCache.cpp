@@ -29,6 +29,7 @@
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 #include <vm/vm_types.h>
+#include <vm/VMAddressSpace.h>
 #include <vm/VMArea.h>
 
 
@@ -1268,6 +1269,58 @@ vm_page*
 VMCache::DebugLookupPage(off_t offset)
 {
 	return pages.Lookup((page_num_t)(offset >> PAGE_SHIFT));
+}
+
+
+void
+VMCache::Dump(bool showPages) const
+{
+	kprintf("CACHE %p:\n", this);
+	kprintf("  ref_count:    %ld\n", RefCount());
+	kprintf("  source:       %p\n", source);
+	kprintf("  type:         %s\n", vm_cache_type_to_string(type));
+	kprintf("  virtual_base: 0x%Lx\n", virtual_base);
+	kprintf("  virtual_end:  0x%Lx\n", virtual_end);
+	kprintf("  temporary:    %ld\n", temporary);
+	kprintf("  scan_skip:    %ld\n", scan_skip);
+	kprintf("  lock:         %p\n", &fLock);
+#if KDEBUG
+	kprintf("  lock.holder:  %ld\n", fLock.holder);
+#endif
+	kprintf("  areas:\n");
+
+	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+		kprintf("    area 0x%lx, %s\n", area->id, area->name);
+		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->Base(),
+			area->Size());
+		kprintf("\tprotection: 0x%lx\n", area->protection);
+		kprintf("\towner:      0x%lx\n", area->address_space->ID());
+	}
+
+	kprintf("  consumers:\n");
+	VMCache* consumer = NULL;
+	while ((consumer = (VMCache*)list_get_next_item((list*)&consumers,
+			consumer)) != NULL) {
+		kprintf("\t%p\n", consumer);
+	}
+
+	kprintf("  pages:\n");
+	if (showPages) {
+		for (VMCachePagesTree::ConstIterator it = pages.GetIterator();
+				vm_page* page = it.Next();) {
+			if (!vm_page_is_dummy(page)) {
+				kprintf("\t%p ppn %#" B_PRIxPHYSADDR " offset %#" B_PRIxPHYSADDR
+					" state %u (%s) wired_count %u\n", page,
+					page->physical_page_number, page->cache_offset,
+					page->State(), page_state_to_string(page->State()),
+					page->wired_count);
+			} else {
+				kprintf("\t%p DUMMY PAGE state %u (%s)\n",
+					page, page->State(), page_state_to_string(page->State()));
+			}
+		}
+	} else
+		kprintf("\t%ld in cache\n", page_count);
 }
 
 

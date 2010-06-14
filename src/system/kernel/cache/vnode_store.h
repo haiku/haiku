@@ -39,6 +39,8 @@ public:
 	virtual	void				AcquireStoreRef();
 	virtual	void				ReleaseStoreRef();
 
+	virtual	void				Dump(bool showPages) const;
+
 			void				SetFileCacheRef(file_cache_ref* ref)
 									{ fFileCacheRef = ref; }
 			file_cache_ref*		FileCacheRef() const
