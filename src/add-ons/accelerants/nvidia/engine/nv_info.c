@@ -2645,7 +2645,7 @@ static void setup_output_matrix()
 	}
 
 	/* force widescreen types if requested */
-	if (si->settings.force_ws) si->ps.crtc1_screen.aspect = 1.60;
+	if (si->settings.force_ws) si->ps.crtc1_screen.aspect = 1.78;
 
 	/* setup output devices and heads */
 	if (si->ps.secondary_head)
@@ -2727,7 +2727,7 @@ static void setup_output_matrix()
 				memcpy(&(si->ps.crtc2_screen), &(si->ps.con2_screen), sizeof(si->ps.crtc2_screen));
 			}
 			/* force widescreen types if requested */
-			if (si->settings.force_ws) si->ps.crtc2_screen.aspect = 1.60;
+			if (si->settings.force_ws) si->ps.crtc2_screen.aspect = 1.78;
 
 			/* setup correct output and head use */
 			//fixme? add TVout (only, so no CRT(s) connected) support...
@@ -2865,7 +2865,7 @@ static void setup_output_matrix()
 			/* (DDC or load sense analog monitor on secondary connector is impossible on NV11) */
 
 			/* force widescreen types if requested */
-			if (si->settings.force_ws) si->ps.crtc2_screen.aspect = 1.60;
+			if (si->settings.force_ws) si->ps.crtc2_screen.aspect = 1.78;
 
 			/* setup correct output and head use */
 			//fixme? add TVout (only, so no CRT(s) connected) support...
