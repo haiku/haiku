@@ -229,7 +229,7 @@ BMenu::BMenu(const char* name, menu_layout layout)
 
 BMenu::BMenu(const char* name, float width, float height)
 	:
-	BView(BRect(0.0f, width, 0.0f, height), name, 0, B_WILL_DRAW),
+	BView(BRect(0.0f, 0.0f, 0.0f, 0.0f), name, 0, B_WILL_DRAW),
 	fChosenItem(NULL),
 	fSelected(NULL),
 	fCachedMenuWindow(NULL),
