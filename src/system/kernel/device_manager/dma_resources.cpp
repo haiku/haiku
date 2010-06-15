@@ -136,6 +136,17 @@ DMAResource::Init(device_node* node, generic_size_t blockSize,
 			B_DMA_MAX_SEGMENT_COUNT, &value, true) == B_OK)
 		restrictions.max_segment_count = value;
 
+	uint64 value64;
+	if (gDeviceManagerModule.get_attr_uint64(node,
+			B_DMA_LOW_ADDRESS, &value64, true) == B_OK) {
+		restrictions.low_address = value64;
+	}
+
+	if (gDeviceManagerModule.get_attr_uint64(node,
+			B_DMA_HIGH_ADDRESS, &value64, true) == B_OK) {
+		restrictions.high_address = value64;
+	}
+
 	return Init(restrictions, blockSize, bufferCount, bounceBufferCount);
 }
 
