@@ -38,6 +38,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	friss					- RSS/ATOM/... feeds reader
 #	GetText					- a framework to help produce multi-lingual messages.
 #	Git						- the distributed version control system
+#	GPerf					- the perfect hash function generator.
 #	ICU-devel				- the headers for ICU (for development)
 #	KeymapSwitcher			- Easy to use keymap switcher
 #	LibEvent				- An event notification library
@@ -698,6 +699,30 @@ if [ IsOptionalHaikuImagePackageAdded Git ] {
 			:
 			: true
 		;
+	}
+}
+
+
+# GPerf
+if [ IsOptionalHaikuImagePackageAdded GPerf ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package GPerf available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			InstallOptionalHaikuImagePackage
+				gperf-3.0.4-x86-gcc4-2010-06-15.zip
+				: $(baseURL)/gperf-3.0.4-x86-gcc4-2010-06-15.zip
+				:
+				: true
+			;
+		} else {
+			InstallOptionalHaikuImagePackage
+				gperf-3.0.4-x86-gcc2-2010-06-15.zip
+				: $(baseURL)/gperf-3.0.4-x86-gcc2-2010-06-15.zip
+				:
+				: true
+			;
+		}
 	}
 }
 
