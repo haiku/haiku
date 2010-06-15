@@ -486,6 +486,9 @@ pegasus_device_read(driver_cookie *cookie, off_t position, void *buffer, size_t 
 		return B_BAD_VALUE;
 	}
 
+	if (dev->aue_dying)
+		return B_DEVICE_NOT_FOUND;		/* already unplugged */
+
 	blockFlag = dev->nonblocking ? B_TIMEOUT : 0;
 
 	// block until receive is available (if blocking is allowed)
@@ -552,6 +555,9 @@ pegasus_device_write(driver_cookie *cookie, off_t position,	const void *buffer, 
 		DPRINTF_ERR("EINVAL\n");
 		return EINVAL;
 	}
+
+	if (dev->aue_dying)
+		return B_DEVICE_NOT_FOUND;		/* already unplugged */
 	
 		// block until a free tx descriptor is available
 	if ((status = acquire_sem_etc(dev->tx_sem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT)) < B_NO_ERROR) {
@@ -623,7 +629,7 @@ pegasus_device_control(driver_cookie *cookie, uint32 op,
 	DPRINTF_INFO("ioctl(0x%x)\n", (int)op);
 
 	if (device->aue_dying)
-		return B_ERROR;		/* already unplugged */
+		return B_DEVICE_NOT_FOUND;		/* already unplugged */
 
 	switch (op) {
 		case ETHER_INIT:

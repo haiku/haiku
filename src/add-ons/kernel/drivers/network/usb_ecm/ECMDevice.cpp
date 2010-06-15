@@ -178,7 +178,7 @@ ECMDevice::Read(uint8 *buffer, size_t *numBytes)
 {
 	if (fRemoved) {
 		*numBytes = 0;
-		return B_ERROR;
+		return B_DEVICE_NOT_FOUND;
 	}
 
 	status_t result = gUSBModule->queue_bulk(fReadEndpoint, buffer, *numBytes,
@@ -215,7 +215,7 @@ ECMDevice::Write(const uint8 *buffer, size_t *numBytes)
 {
 	if (fRemoved) {
 		*numBytes = 0;
-		return B_ERROR;
+		return B_DEVICE_NOT_FOUND;
 	}
 
 	status_t result = gUSBModule->queue_bulk(fWriteEndpoint, (uint8 *)buffer,

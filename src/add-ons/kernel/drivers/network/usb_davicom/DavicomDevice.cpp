@@ -235,7 +235,7 @@ DavicomDevice::Read(uint8 *buffer, size_t *numBytes)
 	if (fRemoved) {
 		TRACE_ALWAYS("Error of receiving %d bytes from removed device.\n", 
 			numBytesToRead);
-		return B_ERROR;
+		return B_DEVICE_NOT_FOUND;
 	}
 
 	TRACE_FLOW("Request %d bytes.\n", numBytesToRead);
@@ -305,7 +305,7 @@ DavicomDevice::Write(const uint8 *buffer, size_t *numBytes)
 	if (fRemoved) {
 		TRACE_ALWAYS("Error of writing %d bytes to removed device.\n", 
 			numBytesToWrite);
-		return B_ERROR;
+		return B_DEVICE_NOT_FOUND;
 	}
 
 	if (!fHasConnection) {
