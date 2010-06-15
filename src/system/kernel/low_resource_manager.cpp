@@ -181,13 +181,13 @@ compute_state(void)
 	size_t maxSpace = KERNEL_SIZE;
 	size_t freeSpace = vm_kernel_address_space_left();
 
-	if (freeSpace < maxSpace >> 16)
+	if (freeSpace < maxSpace >> 16) {
 		sLowSpaceState = B_LOW_RESOURCE_CRITICAL;
-	if (freeSpace < maxSpace >> 8)
+	} else if (freeSpace < maxSpace >> 8) {
 		sLowSpaceState = B_LOW_RESOURCE_WARNING;
-	if (freeSpace < maxSpace >> 4)
+	} else if (freeSpace < maxSpace >> 4) {
 		sLowSpaceState = B_LOW_RESOURCE_NOTE;
-	else {
+	} else {
 		sLowSpaceState = B_NO_LOW_RESOURCE;
 		sLowResources &= ~B_KERNEL_RESOURCE_ADDRESS_SPACE;
 	}
@@ -272,10 +272,11 @@ dump_handlers(int argc, char** argv)
 			&symbol, NULL, NULL);
 
 		char resources[16];
-		snprintf(resources, sizeof(resources), "%c %c %c",
+		snprintf(resources, sizeof(resources), "%c %c %c %c",
 			handler->resources & B_KERNEL_RESOURCE_PAGES ? 'p' : ' ',
 			handler->resources & B_KERNEL_RESOURCE_MEMORY ? 'm' : ' ',
-			handler->resources & B_KERNEL_RESOURCE_SEMAPHORES ? 's' : ' ');
+			handler->resources & B_KERNEL_RESOURCE_SEMAPHORES ? 's' : ' ',
+			handler->resources & B_KERNEL_RESOURCE_ADDRESS_SPACE ? 'a' : ' ');
 
 		kprintf("%p  %p   %s      %4ld  %s\n", handler->function, handler->data,
 			resources, handler->priority, symbol);
