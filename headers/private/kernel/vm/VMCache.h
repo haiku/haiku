@@ -120,8 +120,6 @@ public:
 									// long as the lock is owned.
 
 			// for debugging only
-			mutex*				GetLock()
-									{ return &fLock; }
 			int32				RefCount() const
 									{ return fRefCount; }
 
@@ -157,6 +155,8 @@ public:
 
 	virtual	bool				DebugHasPage(off_t offset);
 			vm_page*			DebugLookupPage(off_t offset);
+
+	virtual	void				Dump(bool showPages) const;
 
 public:
 			VMArea*				areas;
