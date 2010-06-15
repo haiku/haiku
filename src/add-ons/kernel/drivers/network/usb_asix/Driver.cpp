@@ -236,7 +236,7 @@ init_driver()
 	};
 
 	gUSBModule->register_driver(DRIVER_NAME, gSupportedDevices, 
-		sizeof(gSupportedDevices)/sizeof(usb_support_descriptor), NULL);
+		sizeof(gSupportedDevices) / sizeof(usb_support_descriptor), NULL);
 	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
 	return B_OK;
 }
