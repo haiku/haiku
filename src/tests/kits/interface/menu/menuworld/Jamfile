@@ -12,4 +12,5 @@ Application MenuWorld :
 	TestMenuBuilder.cpp
 	ViewLayoutFactory.cpp
 	: be $(TARGET_LIBSUPC++)
+	: MenuWorld.rsrc
 	;
