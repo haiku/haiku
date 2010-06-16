@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-9/2009.
+	Rudolf Cornelissen 3/2002-6/2010.
 */
 
 
@@ -105,225 +105,226 @@ static uint16 nvidia_device_list[] = {
 	0x002d, /* Nvidia TNT2-M64 (Pro) */
 	0x002e, /* Nvidia NV06 Vanta */
 	0x002f, /* Nvidia NV06 Vanta */
-	0x0040, /* Nvidia GeForce FX 6800 Ultra */
-	0x0041, /* Nvidia GeForce FX 6800 */
-	0x0042, /* Nvidia GeForce FX 6800LE */
-	0x0043, /* Nvidia GeForce 6800 XE */
-	0x0045, /* Nvidia GeForce FX 6800 GT */
-	0x0046, /* Nvidia GeForce FX 6800 GT */
-	0x0047, /* Nvidia GeForce 6800 GS */
-	0x0048, /* Nvidia GeForce FX 6800 XT */
+	0x0040, /* Nvidia Geforce FX 6800 Ultra */
+	0x0041, /* Nvidia Geforce FX 6800 */
+	0x0042, /* Nvidia Geforce FX 6800LE */
+	0x0043, /* Nvidia Geforce 6800 XE */
+	0x0045, /* Nvidia Geforce FX 6800 GT */
+	0x0046, /* Nvidia Geforce FX 6800 GT */
+	0x0047, /* Nvidia Geforce 6800 GS */
+	0x0048, /* Nvidia Geforce FX 6800 XT */
 	0x0049, /* Nvidia unknown FX */
 	0x004d, /* Nvidia Quadro FX 4400 */
 	0x004e, /* Nvidia Quadro FX 4000 */
-	0x0091, /* Nvidia GeForce 7800 GTX PCIe */
+	0x0091, /* Nvidia Geforce 7800 GTX PCIe */
 	0x0092, /* Nvidia Geforce 7800 GT PCIe */
 	0x0098, /* Nvidia Geforce 7800 Go PCIe */
 	0x0099, /* Nvidia Geforce 7800 GTX Go PCIe */
 	0x009d, /* Nvidia Quadro FX 4500 */
 	0x00a0, /* Nvidia Aladdin TNT2 */
-	0x00c0,	/* Nvidia GeForce 6800 GS */
-	0x00c1, /* Nvidia GeForce FX 6800 */
-	0x00c2, /* Nvidia GeForce FX 6800LE */
-	0x00c3, /* Nvidia GeForce FX 6800 XT */
-	0x00c8, /* Nvidia GeForce FX 6800 Go */
-	0x00c9, /* Nvidia GeForce FX 6800 Ultra Go */
+	0x00c0,	/* Nvidia Geforce 6800 GS */
+	0x00c1, /* Nvidia Geforce FX 6800 */
+	0x00c2, /* Nvidia Geforce FX 6800LE */
+	0x00c3, /* Nvidia Geforce FX 6800 XT */
+	0x00c8, /* Nvidia Geforce FX 6800 Go */
+	0x00c9, /* Nvidia Geforce FX 6800 Ultra Go */
 	0x00cc, /* Nvidia Quadro FX 1400 Go */
 	0x00cd, /* Nvidia Quadro FX 3450/4000 SDI */
 	0x00ce, /* Nvidia Quadro FX 1400 */
-	0x00f0, /* Nvidia GeForce FX 6800 (Ultra) AGP(?) */
-	0x00f1, /* Nvidia GeForce FX 6600 GT AGP */
-	0x00f2, /* Nvidia GeForce FX 6600 AGP */
-	0x00f3, /* Nvidia GeForce 6200 */
-	0x00f4, /* Nvidia GeForce 6600 LE */
-	0x00f5, /* Nvidia GeForce FX 7800 GS AGP */
-	0x00f6, /* Nvidia GeForce 6800 GS */
+	0x00f0, /* Nvidia Geforce FX 6800 (Ultra) AGP(?) */
+	0x00f1, /* Nvidia Geforce FX 6600 GT AGP */
+	0x00f2, /* Nvidia Geforce FX 6600 AGP */
+	0x00f3, /* Nvidia Geforce 6200 */
+	0x00f4, /* Nvidia Geforce 6600 LE */
+	0x00f5, /* Nvidia Geforce FX 7800 GS AGP */
+	0x00f6, /* Nvidia Geforce 6800 GS */
 	0x00f8, /* Nvidia Quadro FX 3400/4400 PCIe */
-	0x00f9,	/* Nvidia GeForce PCX 6800 PCIe */
-	0x00fa,	/* Nvidia GeForce PCX 5750 PCIe */
-	0x00fb,	/* Nvidia GeForce PCX 5900 PCIe */
-	0x00fc, /* Nvidia GeForce PCX 5300 PCIe */
+	0x00f9,	/* Nvidia Geforce PCX 6800 PCIe */
+	0x00fa,	/* Nvidia Geforce PCX 5750 PCIe */
+	0x00fb,	/* Nvidia Geforce PCX 5900 PCIe */
+	0x00fc, /* Nvidia Geforce PCX 5300 PCIe */
 	0x00fd,	/* Nvidia Quadro PCX PCIe */
 	0x00fe,	/* Nvidia Quadro FX 1300 PCIe(?) */
-	0x00ff, /* Nvidia GeForce PCX 4300 PCIe */
-	0x0100, /* Nvidia GeForce256 SDR */
-	0x0101, /* Nvidia GeForce256 DDR */
-	0x0102, /* Nvidia GeForce256 Ultra */
+	0x00ff, /* Nvidia Geforce PCX 4300 PCIe */
+	0x0100, /* Nvidia Geforce256 SDR */
+	0x0101, /* Nvidia Geforce256 DDR */
+	0x0102, /* Nvidia Geforce256 Ultra */
 	0x0103, /* Nvidia Quadro */
-	0x0110, /* Nvidia GeForce2 MX/MX400 */
-	0x0111, /* Nvidia GeForce2 MX100/MX200 DDR */
-	0x0112, /* Nvidia GeForce2 Go */
+	0x0110, /* Nvidia Geforce2 MX/MX400 */
+	0x0111, /* Nvidia Geforce2 MX100/MX200 DDR */
+	0x0112, /* Nvidia Geforce2 Go */
 	0x0113, /* Nvidia Quadro2 MXR/EX/Go */
-	0x0140, /* Nvidia GeForce FX 6600 GT */
-	0x0141, /* Nvidia GeForce FX 6600 */
-	0x0142, /* Nvidia GeForce FX 6600LE */
-	0x0143, /* Nvidia GeForce 6600 VE */
-	0x0144, /* Nvidia GeForce FX 6600 Go */
-	0x0145, /* Nvidia GeForce FX 6610 XL */
-	0x0146, /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
-	0x0147, /* Nvidia GeForce FX 6700 XL */
-	0x0148, /* Nvidia GeForce FX 6600 Go */
-	0x0149, /* Nvidia GeForce FX 6600 GT Go */
+	0x0140, /* Nvidia Geforce FX 6600 GT */
+	0x0141, /* Nvidia Geforce FX 6600 */
+	0x0142, /* Nvidia Geforce FX 6600LE */
+	0x0143, /* Nvidia Geforce 6600 VE */
+	0x0144, /* Nvidia Geforce FX 6600 Go */
+	0x0145, /* Nvidia Geforce FX 6610 XL */
+	0x0146, /* Nvidia Geforce FX 6600 TE Go / 6200 TE Go */
+	0x0147, /* Nvidia Geforce FX 6700 XL */
+	0x0148, /* Nvidia Geforce FX 6600 Go */
+	0x0149, /* Nvidia Geforce FX 6600 GT Go */
 	0x014b, /* Nvidia unknown FX */
 	0x014c, /* Nvidia Quadro FX 540 MXM */
 	0x014d, /* Nvidia unknown FX */
 	0x014e, /* Nvidia Quadro FX 540 */
-	0x014f, /* Nvidia GeForce 6200 PCIe (128Mb) */
-	0x0150, /* Nvidia GeForce2 GTS/Pro */
-	0x0151, /* Nvidia GeForce2 Ti DDR */
-	0x0152, /* Nvidia GeForce2 Ultra */
+	0x014f, /* Nvidia Geforce 6200 PCIe (128Mb) */
+	0x0150, /* Nvidia Geforce2 GTS/Pro */
+	0x0151, /* Nvidia Geforce2 Ti DDR */
+	0x0152, /* Nvidia Geforce2 Ultra */
 	0x0153, /* Nvidia Quadro2 Pro */
-	0x0160, /* Nvidia GeForce 6500 Go */
-	0x0161, /* Nvidia GeForce 6200 TurboCache */
-	0x0162, /* Nvidia GeForce 6200SE TurboCache */
-	0x0163, /* Nvidia GeForce 6200LE */
-	0x0164, /* Nvidia GeForce FX 6200 Go */
+	0x0160, /* Nvidia Geforce 6500 Go */
+	0x0161, /* Nvidia Geforce 6200 TurboCache */
+	0x0162, /* Nvidia Geforce 6200SE TurboCache */
+	0x0163, /* Nvidia Geforce 6200LE */
+	0x0164, /* Nvidia Geforce FX 6200 Go */
 	0x0165, /* Nvidia Quadro FX NVS 285 */
-	0x0166, /* Nvidia GeForce 6400 Go */
-	0x0167, /* Nvidia GeForce 6200 Go */
-	0x0168, /* Nvidia GeForce 6400 Go */
-	0x0169, /* Nvidia GeForce 6250 Go */
+	0x0166, /* Nvidia Geforce 6400 Go */
+	0x0167, /* Nvidia Geforce 6200 Go */
+	0x0168, /* Nvidia Geforce 6400 Go */
+	0x0169, /* Nvidia Geforce 6250 Go */
 	0x016a, /* Nvidia Geforce 7100 GS */
 	0x016b, /* Nvidia unknown FX Go */
 	0x016c, /* Nvidia unknown FX Go */
 	0x016d, /* Nvidia unknown FX Go */
 	0x016e, /* Nvidia unknown FX */
-	0x0170, /* Nvidia GeForce4 MX 460 */
-	0x0171, /* Nvidia GeForce4 MX 440 */
-	0x0172, /* Nvidia GeForce4 MX 420 */
-	0x0173, /* Nvidia GeForce4 MX 440SE */
-	0x0174, /* Nvidia GeForce4 440 Go */
-	0x0175, /* Nvidia GeForce4 420 Go */
-	0x0176, /* Nvidia GeForce4 420 Go 32M */
-	0x0177, /* Nvidia GeForce4 460 Go */
+	0x0170, /* Nvidia Geforce4 MX 460 */
+	0x0171, /* Nvidia Geforce4 MX 440 */
+	0x0172, /* Nvidia Geforce4 MX 420 */
+	0x0173, /* Nvidia Geforce4 MX 440SE */
+	0x0174, /* Nvidia Geforce4 440 Go */
+	0x0175, /* Nvidia Geforce4 420 Go */
+	0x0176, /* Nvidia Geforce4 420 Go 32M */
+	0x0177, /* Nvidia Geforce4 460 Go */
 	0x0178, /* Nvidia Quadro4 500 XGL/550 XGL */
-	0x0179, /* Nvidia GeForce4 440 Go 64M (PPC: GeForce4 MX) */
+	0x0179, /* Nvidia Geforce4 440 Go 64M (PPC: Geforce4 MX) */
 	0x017a, /* Nvidia Quadro4 200 NVS/400 NVS */
 	0x017c, /* Nvidia Quadro4 500 GoGL */
-	0x017d, /* Nvidia GeForce4 410 Go 16M */
-	0x0181, /* Nvidia GeForce4 MX 440 AGP8X */
-	0x0182, /* Nvidia GeForce4 MX 440SE AGP8X */
-	0x0183, /* Nvidia GeForce4 MX 420 AGP8X */
-	0x0185, /* Nvidia GeForce4 MX 4000 AGP8X */
-	0x0186, /* Nvidia GeForce4 448 Go */
-	0x0187, /* Nvidia GeForce4 488 Go */
+	0x017d, /* Nvidia Geforce4 410 Go 16M */
+	0x0181, /* Nvidia Geforce4 MX 440 AGP8X */
+	0x0182, /* Nvidia Geforce4 MX 440SE AGP8X */
+	0x0183, /* Nvidia Geforce4 MX 420 AGP8X */
+	0x0185, /* Nvidia Geforce4 MX 4000 AGP8X */
+	0x0186, /* Nvidia Geforce4 448 Go */
+	0x0187, /* Nvidia Geforce4 488 Go */
 	0x0188, /* Nvidia Quadro4 580 XGL */
-	0x0189,	/* Nvidia GeForce4 MX AGP8X (PPC) */
+	0x0189,	/* Nvidia Geforce4 MX AGP8X (PPC) */
 	0x018a, /* Nvidia Quadro4 280 NVS AGP8X */
 	0x018b, /* Nvidia Quadro4 380 XGL */
 	0x018c, /* Nvidia Quadro4 NVS 50 PCI */
-	0x018d, /* Nvidia GeForce4 448 Go */
-	0x01a0, /* Nvidia GeForce2 Integrated GPU */
-	0x01d1, /* Nvidia GeForce 7300 LE */
-	0x01d3, /* Nvidia GeForce 7300 SE */
-	0x01d7,	/* Nvidia Quadro NVS 110M/GeForce 7300 Go */
-	0x01d8,	/* Nvidia GeForce 7400 GO */
-	0x01dd, /* Nvidia GeForce 7500 LE */
-	0x01df, /* Nvidia GeForce 7300 GS */
-	0x01f0, /* Nvidia GeForce4 MX Integrated GPU */
-	0x0200, /* Nvidia GeForce3 */
-	0x0201, /* Nvidia GeForce3 Ti 200 */
-	0x0202, /* Nvidia GeForce3 Ti 500 */
+	0x018d, /* Nvidia Geforce4 448 Go */
+	0x01a0, /* Nvidia Geforce2 Integrated GPU */
+	0x01d1, /* Nvidia Geforce 7300 LE */
+	0x01d3, /* Nvidia Geforce 7300 SE */
+	0x01d7,	/* Nvidia Quadro NVS 110M/Geforce 7300 Go */
+	0x01d8,	/* Nvidia Geforce 7400 GO */
+	0x01dd, /* Nvidia Geforce 7500 LE */
+	0x01df, /* Nvidia Geforce 7300 GS */
+	0x01f0, /* Nvidia Geforce4 MX Integrated GPU */
+	0x0200, /* Nvidia Geforce3 */
+	0x0201, /* Nvidia Geforce3 Ti 200 */
+	0x0202, /* Nvidia Geforce3 Ti 500 */
 	0x0203, /* Nvidia Quadro DCC */
-	0x0211, /* Nvidia GeForce FX 6800 */
-	0x0212, /* Nvidia GeForce FX 6800LE */
-	0x0215, /* Nvidia GeForce FX 6800 GT */
-	0x0218, /* Nvidia GeForce 6800 XT */
+	0x0211, /* Nvidia Geforce FX 6800 */
+	0x0212, /* Nvidia Geforce FX 6800LE */
+	0x0215, /* Nvidia Geforce FX 6800 GT */
+	0x0218, /* Nvidia Geforce 6800 XT */
 	0x0220, /* Nvidia unknown FX */
-	0x0221, /* Nvidia GeForce 6200 AGP (256Mb - 128bit) */
+	0x0221, /* Nvidia Geforce 6200 AGP (256Mb - 128bit) */
 	0x0222, /* Nvidia unknown FX */
 	0x0228, /* Nvidia unknown FX Go */
-	0x0240, /* Nvidia GeForce 6150 (NFORCE4 Integr.GPU) */
-	0x0241, /* Nvidia GeForce 6150 LE (NFORCE4 Integr.GPU) */
-	0x0242, /* Nvidia GeForce 6100 (NFORCE4 Integr.GPU) */
-	0x0244, /* Nvidia GeForce Go 6150 (NFORCE4 Integr.GPU) */
-	0x0245, /* Nvidia Quadro NVS 210S / GeForce 6150LE */
-	0x0247, /* Nvidia GeForce 6100 Go (NFORCE4 Integr.GPU) */
-	0x0250, /* Nvidia GeForce4 Ti 4600 */
-	0x0251, /* Nvidia GeForce4 Ti 4400 */
-	0x0252, /* Nvidia GeForce4 Ti 4600 */
-	0x0253, /* Nvidia GeForce4 Ti 4200 */
+	0x0240, /* Nvidia Geforce 6150 (NFORCE4 Integr.GPU) */
+	0x0241, /* Nvidia Geforce 6150 LE (NFORCE4 Integr.GPU) */
+	0x0242, /* Nvidia Geforce 6100 (NFORCE4 Integr.GPU) */
+	0x0244, /* Nvidia Geforce Go 6150 (NFORCE4 Integr.GPU) */
+	0x0245, /* Nvidia Quadro NVS 210S / Geforce 6150LE */
+	0x0247, /* Nvidia Geforce 6100 Go (NFORCE4 Integr.GPU) */
+	0x0250, /* Nvidia Geforce4 Ti 4600 */
+	0x0251, /* Nvidia Geforce4 Ti 4400 */
+	0x0252, /* Nvidia Geforce4 Ti 4600 */
+	0x0253, /* Nvidia Geforce4 Ti 4200 */
 	0x0258, /* Nvidia Quadro4 900 XGL */
 	0x0259, /* Nvidia Quadro4 750 XGL */
 	0x025b, /* Nvidia Quadro4 700 XGL */
-	0x0280, /* Nvidia GeForce4 Ti 4800 AGP8X */
-	0x0281, /* Nvidia GeForce4 Ti 4200 AGP8X */
-	0x0282, /* Nvidia GeForce4 Ti 4800SE */
-	0x0286, /* Nvidia GeForce4 4200 Go */
+	0x0280, /* Nvidia Geforce4 Ti 4800 AGP8X */
+	0x0281, /* Nvidia Geforce4 Ti 4200 AGP8X */
+	0x0282, /* Nvidia Geforce4 Ti 4800SE */
+	0x0286, /* Nvidia Geforce4 4200 Go */
 	0x0288, /* Nvidia Quadro4 980 XGL */
 	0x0289, /* Nvidia Quadro4 780 XGL */
 	0x028c, /* Nvidia Quadro4 700 GoGL */
-	0x0290, /* Nvidia GeForce 7900 GTX */
-	0x0291, /* Nvidia GeForce 7900 GT */
-	0x0293, /* Nvidia GeForce 7900 GX2 */
-	0x0294, /* Nvidia GeForce 7950 GX2 */
-	0x0295, /* Nvidia GeForce 7950 GT */
-	0x0298, /* Nvidia GeForce Go 7900 GS */
-	0x0299, /* Nvidia GeForce Go 7900 GTX */
+	0x0290, /* Nvidia Geforce 7900 GTX */
+	0x0291, /* Nvidia Geforce 7900 GT */
+	0x0293, /* Nvidia Geforce 7900 GX2 */
+	0x0294, /* Nvidia Geforce 7950 GX2 */
+	0x0295, /* Nvidia Geforce 7950 GT */
+	0x0298, /* Nvidia Geforce Go 7900 GS */
+	0x0299, /* Nvidia Geforce Go 7900 GTX */
 	0x029c, /* Nvidia Quadro FX 5500 */
 	0x029f, /* Nvidia Quadro FX 4500 X2 */
-	0x02a0, /* Nvidia GeForce3 Integrated GPU */
-	0x02e0,	/* Nvidia GeForce 7600 GT */
-	0x02e1,	/* Nvidia GeForce 7600 GS */
-	0x0301, /* Nvidia GeForce FX 5800 Ultra */
-	0x0302, /* Nvidia GeForce FX 5800 */
+	0x02a0, /* Nvidia Geforce3 Integrated GPU */
+	0x02e0,	/* Nvidia Geforce 7600 GT */
+	0x02e1,	/* Nvidia Geforce 7600 GS */
+	0x0301, /* Nvidia Geforce FX 5800 Ultra */
+	0x0302, /* Nvidia Geforce FX 5800 */
 	0x0308, /* Nvidia Quadro FX 2000 */
 	0x0309, /* Nvidia Quadro FX 1000 */
-	0x0311, /* Nvidia GeForce FX 5600 Ultra */
-	0x0312, /* Nvidia GeForce FX 5600 */
+	0x0311, /* Nvidia Geforce FX 5600 Ultra */
+	0x0312, /* Nvidia Geforce FX 5600 */
 	0x0313, /* Nvidia unknown FX */
-	0x0314, /* Nvidia GeForce FX 5600XT */
+	0x0314, /* Nvidia Geforce FX 5600XT */
 	0x0316, /* Nvidia unknown FX Go */
 	0x0317, /* Nvidia unknown FX Go */
-	0x031a, /* Nvidia GeForce FX 5600 Go */
-	0x031b, /* Nvidia GeForce FX 5650 Go */
+	0x031a, /* Nvidia Geforce FX 5600 Go */
+	0x031b, /* Nvidia Geforce FX 5650 Go */
 	0x031c, /* Nvidia Quadro FX 700 Go */
 	0x031d, /* Nvidia unknown FX Go */
 	0x031e, /* Nvidia unknown FX Go */
 	0x031f, /* Nvidia unknown FX Go */
-	0x0320, /* Nvidia GeForce FX 5200 */
-	0x0321, /* Nvidia GeForce FX 5200 Ultra */
-	0x0322, /* Nvidia GeForce FX 5200 */
-	0x0323, /* Nvidia GeForce FX 5200LE */
-	0x0324, /* Nvidia GeForce FX 5200 Go */
-	0x0325, /* Nvidia GeForce FX 5250 Go */
-	0x0326, /* Nvidia GeForce FX 5500 */
-	0x0327, /* Nvidia GeForce FX 5100 */
-	0x0328, /* Nvidia GeForce FX 5200 Go 32M/64M */
-	0x0329, /* Nvidia GeForce FX 5200 (PPC) */
+	0x0320, /* Nvidia Geforce FX 5200 */
+	0x0321, /* Nvidia Geforce FX 5200 Ultra */
+	0x0322, /* Nvidia Geforce FX 5200 */
+	0x0323, /* Nvidia Geforce FX 5200LE */
+	0x0324, /* Nvidia Geforce FX 5200 Go */
+	0x0325, /* Nvidia Geforce FX 5250 Go */
+	0x0326, /* Nvidia Geforce FX 5500 */
+	0x0327, /* Nvidia Geforce FX 5100 */
+	0x0328, /* Nvidia Geforce FX 5200 Go 32M/64M */
+	0x0329, /* Nvidia Geforce FX 5200 (PPC) */
 	0x032a, /* Nvidia Quadro NVS 280 PCI */
 	0x032b, /* Nvidia Quadro FX 500/600 PCI */
-	0x032c, /* Nvidia GeForce FX 5300 Go */
-	0x032d, /* Nvidia GeForce FX 5100 Go */
+	0x032c, /* Nvidia Geforce FX 5300 Go */
+	0x032d, /* Nvidia Geforce FX 5100 Go */
 	0x032e, /* Nvidia unknown FX Go */
 	0x032f, /* Nvidia unknown FX Go */
-	0x0330, /* Nvidia GeForce FX 5900 Ultra */
-	0x0331, /* Nvidia GeForce FX 5900 */
-	0x0332, /* Nvidia GeForce FX 5900 XT */
-	0x0333, /* Nvidia GeForce FX 5950 Ultra */
-	0x0334, /* Nvidia GeForce FX 5900 ZT */
+	0x0330, /* Nvidia Geforce FX 5900 Ultra */
+	0x0331, /* Nvidia Geforce FX 5900 */
+	0x0332, /* Nvidia Geforce FX 5900 XT */
+	0x0333, /* Nvidia Geforce FX 5950 Ultra */
+	0x0334, /* Nvidia Geforce FX 5900 ZT */
 	0x0338, /* Nvidia Quadro FX 3000 */
 	0x033f, /* Nvidia Quadro FX 700 */
-	0x0341, /* Nvidia GeForce FX 5700 Ultra */
-	0x0342, /* Nvidia GeForce FX 5700 */
-	0x0343, /* Nvidia GeForce FX 5700LE */
-	0x0344, /* Nvidia GeForce FX 5700VE */
+	0x0341, /* Nvidia Geforce FX 5700 Ultra */
+	0x0342, /* Nvidia Geforce FX 5700 */
+	0x0343, /* Nvidia Geforce FX 5700LE */
+	0x0344, /* Nvidia Geforce FX 5700VE */
 	0x0345, /* Nvidia unknown FX */
-	0x0347, /* Nvidia GeForce FX 5700 Go */
-	0x0348, /* Nvidia GeForce FX 5700 Go */
+	0x0347, /* Nvidia Geforce FX 5700 Go */
+	0x0348, /* Nvidia Geforce FX 5700 Go */
 	0x0349, /* Nvidia unknown FX Go */
 	0x034b, /* Nvidia unknown FX Go */
 	0x034c, /* Nvidia Quadro FX 1000 Go */
 	0x034e, /* Nvidia Quadro FX 1100 */
 	0x034f, /* Nvidia unknown FX */
-	0x0391, /* Nvidia GeForce 7600 GT */
-	0x0392, /* Nvidia GeForce 7600 GS */
-	0x0393, /* Nvidia GeForce 7300 GT */
-	0x0394, /* Nvidia GeForce 7600 LE */
-	0x0398, /* Nvidia GeForce 7600 GO */
-	0x03d0, /* Nvidia GeForce 6100 nForce 430 */
-	0x03d1, /* Nvidia GeForce 6100 nForce 405 */
-	0x03d2, /* Nvidia GeForce 6100 nForce 400 */
+	0x0391, /* Nvidia Geforce 7600 GT */
+	0x0392, /* Nvidia Geforce 7600 GS */
+	0x0393, /* Nvidia Geforce 7300 GT */
+	0x0394, /* Nvidia Geforce 7600 LE */
+	0x0398, /* Nvidia Geforce 7600 GO */
+	0x03d0, /* Nvidia Geforce 6100 nForce 430 */
+	0x03d1, /* Nvidia Geforce 6100 nForce 405 */
+	0x03d2, /* Nvidia Geforce 6100 nForce 400 */
+	0x07e1, /* Nvidia Geforce 7100 / nForce 630i */
 	0
 };
 
@@ -347,8 +348,8 @@ static uint16 nvstbsgs_device_list[] = {
 };
 
 static uint16 varisys_device_list[] = {
-	0x3503, /* Varisys GeForce4 MX440 */
-	0x3505, /* Varisys GeForce4 Ti 4200 */
+	0x3503, /* Varisys Geforce4 MX440 */
+	0x3505, /* Varisys Geforce4 Ti 4200 */
 	0
 };
 
@@ -964,7 +965,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	 * unified memory architecture (UMA) */
 	switch ((((uint32)(si->device_id)) << 16) | si->vendor_id)
 	{
-	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
+	case 0x01a010de: /* Nvidia Geforce2 Integrated GPU */
 		/* device at bus #0, device #0, function #1 holds value at byte-index 0x7C */
 		mem_size = 1024 * 1024 *
 			(((((*pci_bus->read_pci_config)(0, 0, 1, 0x7c, 4)) & 0x000007c0) >> 6) + 1);
@@ -973,7 +974,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 		/* last 64kB RAM is used for the BIOS (or something else?) */
 		si->ps.memory_size -= (64 * 1024);
 		break;
-	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
+	case 0x01f010de: /* Nvidia Geforce4 MX Integrated GPU */
 		/* device at bus #0, device #0, function #1 holds value at byte-index 0x84 */
 		mem_size = 1024 * 1024 *
 			(((((*pci_bus->read_pci_config)(0, 0, 1, 0x84, 4)) & 0x000007f0) >> 4) + 1);
