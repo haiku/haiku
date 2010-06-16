@@ -206,7 +206,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fZoomToBounds(false),
 	fShrinkOrZoomToBounds(false),
 	fFullScreen(false),
-	fDraggingBitmap(false),
+	fScrollingBitmap(false),
 	fCreatingSelection(false),
 	fFirstPoint(0.0, 0.0),
 	fAnimateSelection(true),
@@ -1370,7 +1370,7 @@ ShowImageView::_HandleDrop(BMessage* msg)
 
 
 void
-ShowImageView::_MoveImage()
+ShowImageView::_ScrollBitmap()
 {
 	BPoint point, delta;
 	uint32 buttons;
@@ -1383,7 +1383,7 @@ ShowImageView::_MoveImage()
 
 	// in case we miss MouseUp
 	if ((_GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0)
-		fDraggingBitmap = false;
+		fScrollingBitmap = false;
 }
 
 
@@ -1550,7 +1550,7 @@ ShowImageView::MouseDown(BPoint position)
 	} else if (buttons == B_TERTIARY_MOUSE_BUTTON) {
 		// move image in window
 		SetMouseEventMask(B_POINTER_EVENTS);
-		fDraggingBitmap = true;
+		fScrollingBitmap = true;
 		fFirstPoint = ConvertToScreen(position);
 	}
 }
@@ -1591,8 +1591,8 @@ ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *message)
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
 	if (fCreatingSelection) {
 		_UpdateSelectionRect(point, false);
-	} else if (fDraggingBitmap) {
-		_MoveImage();
+	} else if (fScrollingBitmap) {
+		_ScrollBitmap();
 	}
 }
 
@@ -1603,9 +1603,9 @@ ShowImageView::MouseUp(BPoint point)
 	if (fCreatingSelection) {
 		_UpdateSelectionRect(point, true);
 		fCreatingSelection = false;
-	} else if (fDraggingBitmap) {
-		_MoveImage();
-		fDraggingBitmap = false;
+	} else if (fScrollingBitmap) {
+		_ScrollBitmap();
+		fScrollingBitmap = false;
 	}
 	_AnimateSelection(true);
 }

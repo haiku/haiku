@@ -210,7 +210,7 @@ private:
 									const char* type,
 									translation_format* format);
 			void				_HandleDrop(BMessage* message);
-			void				_MoveImage();
+			void				_ScrollBitmap();
 			uint32				_GetMouseButtons();
 			void				_UpdateSelectionRect(BPoint point, bool final);
 			void				_DrawBorder(BRect border);
@@ -266,7 +266,7 @@ private:
 			bool				fZoomToBounds;
 			bool				fShrinkOrZoomToBounds;
 			bool				fFullScreen;
-			bool				fDraggingBitmap;
+			bool				fScrollingBitmap;
 			bool				fCreatingSelection;
 			BPoint				fFirstPoint;
 				// first point in image space of selection
