@@ -797,17 +797,23 @@ status_t nv_general_powerup()
 		status = nvxx_general_powerup();
 		break;
 	case 0x024010de: /* Nvidia Geforce 6150 (NFORCE4 Integr.GPU) */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia Geforce 6150, C51PV");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
 	case 0x024110de: /* Nvidia Geforce 6150 LE (NFORCE4 Integr.GPU) */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia Geforce 6150");
+		sprintf(si->adi.name, "Nvidia Geforce 6150, C51");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x024210de: /* Nvidia Geforce 6100 (NFORCE4 Integr.GPU) */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia Geforce 6100");
+		sprintf(si->adi.name, "Nvidia Geforce 6100, C51G");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
@@ -815,14 +821,14 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		sprintf(si->adi.name, "Nvidia Geforce 6150 Go");
+		sprintf(si->adi.name, "Nvidia Geforce 6150 Go, C51");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
 	case 0x024510de: /* Nvidia Quadro NVS 210S / NVIDIA Geforce 6150LE (NFORCE4 Integr.GPU) */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia Geforce 6150");
+		sprintf(si->adi.name, "Nvidia Geforce 6150, C51");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
@@ -830,7 +836,7 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		si->ps.laptop = true;
-		sprintf(si->adi.name, "Nvidia Geforce 6100 Go");
+		sprintf(si->adi.name, "Nvidia Geforce 6100 Go, C51");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
@@ -1261,9 +1267,10 @@ status_t nv_general_powerup()
 	case 0x03d010de: /* Nvidia Geforce 6100 nForce 430 */
 	case 0x03d110de: /* Nvidia Geforce 6100 nForce 405 */
 	case 0x03d210de: /* Nvidia Geforce 6100 nForce 400 */
+	case 0x03d510de: /* Nvidia Geforce 6100 nForce 420 */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
-		sprintf(si->adi.name, "Nvidia Geforce 6100 nForce");
+		sprintf(si->adi.name, "Nvidia Geforce 6100 nForce, C61");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
