@@ -184,34 +184,37 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 		uint32 flags)
 	:
 	BView(rect, name, resizingMode, flags),
-	fDither(BScreen().ColorSpace() == B_CMAP8),
 	fDocumentIndex(1),
 	fDocumentCount(1),
 	fBitmap(NULL),
 	fDisplayBitmap(NULL),
 	fSelectionBitmap(NULL),
+
 	fZoom(1.0),
+
+	fDither(BScreen().ColorSpace() == B_CMAP8),
 	fScaleBilinear(true),
 	fScaler(NULL),
+#if DELAYED_SCALING
+	fScalingCountDown(SCALING_DELAY_TIME),
+#endif
+	fInverted(false),
+
+	fBitmapLocationInView(0.0, 0.0),
+
 	fShrinkToBounds(false),
 	fZoomToBounds(false),
 	fShrinkOrZoomToBounds(false),
 	fFullScreen(false),
-	fLeft(0.0),
-	fTop(0.0),
-	fMovesImage(false),
-	fMakesSelection(false),
+	fDraggingBitmap(false),
+	fCreatingSelection(false),
 	fFirstPoint(0.0, 0.0),
 	fAnimateSelection(true),
 	fHasSelection(false),
 	fSlideShow(false),
 	fSlideShowDelay(3 * 10), // 3 seconds
 	fSlideShowCountDown(0),
-#if DELAYED_SCALING
-	fScalingCountDown(SCALING_DELAY_TIME),
-#endif
 	fShowCaption(false),
-	fInverted(false),
 	fShowingPopUpMenu(false),
 	fHideCursorCountDown(HIDE_CURSOR_DELAY_TIME),
 	fIsActiveWin(true),
@@ -253,11 +256,10 @@ ShowImageView::_InitPatterns()
 	for (int i = 0; i <= 7; i ++) {
 		fPatternLeft.data[i] = p1;
 		fPatternRight.data[i] = p2;
-		if ((i / 2) % 2 == 0) {
+		if ((i / 2) % 2 == 0)
 			p = 255;
-		} else {
+		else
 			p = 0;
-		}
 		fPatternUp.data[i] = p;
 		fPatternDown.data[i] = ~p;
 	}
@@ -267,37 +269,33 @@ ShowImageView::_InitPatterns()
 void
 ShowImageView::_RotatePatterns()
 {
-	int i;
-	uchar p;
-	bool set;
-
 	// rotate up
-	p = fPatternUp.data[0];
-	for (i = 0; i <= 6; i ++) {
-		fPatternUp.data[i] = fPatternUp.data[i+1];
-	}
+	uchar p = fPatternUp.data[0];
+	for (int i = 0; i <= 6; i ++)
+		fPatternUp.data[i] = fPatternUp.data[i + 1];
 	fPatternUp.data[7] = p;
 
 	// rotate down
 	p = fPatternDown.data[7];
-	for (i = 7; i >= 1; i --) {
-		fPatternDown.data[i] = fPatternDown.data[i-1];
-	}
+	for (int i = 7; i >= 1; i --)
+		fPatternDown.data[i] = fPatternDown.data[i - 1];
 	fPatternDown.data[0] = p;
 
 	// rotate to left
 	p = fPatternLeft.data[0];
-	set = (p & 0x80) != 0;
+	bool set = (p & 0x80) != 0;
 	p <<= 1;
 	p &= 0xfe;
-	if (set) p |= 1;
+	if (set)
+		p |= 1;
 	memset(fPatternLeft.data, p, 8);
 
 	// rotate to right
 	p = fPatternRight.data[0];
 	set = (p & 1) != 0;
 	p >>= 1;
-	if (set) p |= 0x80;
+	if (set)
+		p |= 0x80;
 	memset(fPatternRight.data, p, 8);
 }
 
@@ -313,7 +311,7 @@ void
 ShowImageView::Pulse()
 {
 	// animate marching ants
-	if (_HasSelection() && fAnimateSelection && fIsActiveWin) {
+	if (fHasSelection && fAnimateSelection && fIsActiveWin) {
 		_RotatePatterns();
 		_DrawSelectionBox();
 	}
@@ -328,7 +326,7 @@ ShowImageView::Pulse()
 	}
 
 	// Hide cursor in full screen mode
-	if (fFullScreen && !_HasSelection() && !fShowingPopUpMenu && fIsActiveWin) {
+	if (fFullScreen && !fHasSelection && !fShowingPopUpMenu && fIsActiveWin) {
 		if (fHideCursorCountDown <= 0)
 			be_app->ObscureCursor();
 		else
@@ -537,7 +535,7 @@ ShowImageView::SetImage(const entry_ref *ref)
 	// and clear everything
 	fUndo.Clear();
 	_SetHasSelection(false);
-	fMakesSelection = false;
+	fCreatingSelection = false;
 	_DeleteBitmap();
 	fBitmap = newBitmap;
 	fCurrentRef = *ref;
@@ -818,17 +816,17 @@ ShowImageView::_AlignBitmap()
 void
 ShowImageView::_Setup(BRect rect)
 {
-	fLeft = floorf(rect.left);
-	fTop = floorf(rect.top);
-	fZoom = (rect.Width()+1.0) / (fBitmap->Bounds().Width()+1.0);
+	fBitmapLocationInView.x = floorf(rect.left);
+	fBitmapLocationInView.y = floorf(rect.top);
+	fZoom = (rect.Width() + 1.0) / (fBitmap->Bounds().Width() + 1.0);
 }
 
 
 BPoint
 ShowImageView::_ImageToView(BPoint p) const
 {
-	p.x = floorf(fZoom * p.x + fLeft);
-	p.y = floorf(fZoom * p.y + fTop);
+	p.x = floorf(fZoom * p.x + fBitmapLocationInView.x);
+	p.y = floorf(fZoom * p.y + fBitmapLocationInView.y);
 	return p;
 }
 
@@ -836,8 +834,8 @@ ShowImageView::_ImageToView(BPoint p) const
 BPoint
 ShowImageView::_ViewToImage(BPoint p) const
 {
-	p.x = floorf((p.x - fLeft) / fZoom);
-	p.y = floorf((p.y - fTop) / fZoom);
+	p.x = floorf((p.x - fBitmapLocationInView.x) / fZoom);
+	p.y = floorf((p.y - fBitmapLocationInView.y) / fZoom);
 	return p;
 }
 
@@ -1006,7 +1004,7 @@ ShowImageView::Draw(BRect updateRect)
 	if (fShowCaption)
 		_DrawCaption();
 
-	if (_HasSelection()) {
+	if (fHasSelection) {
 		if (fSelectionBitmap != NULL) {
 			BRect srcRect;
 			BRect dstRect;
@@ -1022,21 +1020,25 @@ ShowImageView::Draw(BRect updateRect)
 void
 ShowImageView::_DrawSelectionBox()
 {
-	if (fSelectionRect.Height() > 0.0 && fSelectionRect.Width() > 0.0) {
-		BRect r(fSelectionRect);
-		_ConstrainToImage(r);
-		r = _ImageToView(r);
-		// draw selection box *around* selection
-		r.InsetBy(-1, -1);
-		PushState();
-		rgb_color white = {255, 255, 255};
-		SetLowColor(white);
-		StrokeLine(BPoint(r.left, r.top), BPoint(r.right, r.top), fPatternLeft);
-		StrokeLine(BPoint(r.right, r.top+1), BPoint(r.right, r.bottom-1), fPatternUp);
-		StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.bottom), fPatternRight);
-		StrokeLine(BPoint(r.left, r.top+1), BPoint(r.left, r.bottom-1), fPatternDown);
-		PopState();
-	}
+	if (fSelectionRect.Height() <= 0.0 || fSelectionRect.Width() <= 0.0)
+		return;
+
+	BRect r(fSelectionRect);
+	_ConstrainToImage(r);
+	r = _ImageToView(r);
+	// draw selection box *around* selection
+	r.InsetBy(-1, -1);
+	PushState();
+	SetLowColor(255, 255, 255);
+	StrokeLine(BPoint(r.left, r.top), BPoint(r.right, r.top),
+		fPatternLeft);
+	StrokeLine(BPoint(r.right, r.top + 1), BPoint(r.right, r.bottom - 1),
+		fPatternUp);
+	StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.bottom),
+		fPatternRight);
+	StrokeLine(BPoint(r.left, r.top + 1), BPoint(r.left, r.bottom - 1),
+		fPatternDown);
+	PopState();
 }
 
 
@@ -1089,7 +1091,7 @@ ShowImageView::_CopySelection(uchar alpha, bool imageSize)
 {
 	bool hasAlpha = alpha != 255;
 
-	if (!_HasSelection())
+	if (!fHasSelection)
 		return NULL;
 
 	BRect rect(0, 0, fSelectionRect.Width(), fSelectionRect.Height());
@@ -1381,7 +1383,7 @@ ShowImageView::_MoveImage()
 
 	// in case we miss MouseUp
 	if ((_GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0)
-		fMovesImage = false;
+		fDraggingBitmap = false;
 }
 
 
@@ -1467,7 +1469,7 @@ ShowImageView::_MergeWithBitmap(BBitmap* merge, BRect selection)
 void
 ShowImageView::_MergeSelection()
 {
-	if (!_HasSelection())
+	if (!fHasSelection)
 		return;
 
 	if (fSelectionBitmap == NULL) {
@@ -1494,7 +1496,7 @@ ShowImageView::MouseDown(BPoint position)
 	point = _ViewToImage(position);
 	buttons = _GetMouseButtons();
 
-	if (_HasSelection() && fSelectionRect.Contains(point)
+	if (fHasSelection && fSelectionRect.Contains(point)
 		&& (buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
 		if (!fSelectionBitmap)
 			fSelectionBitmap = _CopySelection();
@@ -1536,7 +1538,7 @@ ShowImageView::MouseDown(BPoint position)
 
 		// begin new selection
 		_SetHasSelection(true);
-		fMakesSelection = true;
+		fCreatingSelection = true;
 		SetMouseEventMask(B_POINTER_EVENTS);
 		_ConstrainToImage(point);
 		fFirstPoint = point;
@@ -1548,7 +1550,7 @@ ShowImageView::MouseDown(BPoint position)
 	} else if (buttons == B_TERTIARY_MOUSE_BUTTON) {
 		// move image in window
 		SetMouseEventMask(B_POINTER_EVENTS);
-		fMovesImage = true;
+		fDraggingBitmap = true;
 		fFirstPoint = ConvertToScreen(position);
 	}
 }
@@ -1573,7 +1575,7 @@ ShowImageView::_UpdateSelectionRect(BPoint point, bool final)
 	} else
 		_UpdateStatusText();
 
-	if (oldSelection != fCopyFromRect || !_HasSelection()) {
+	if (oldSelection != fCopyFromRect || !fHasSelection) {
 		BRect updateRect;
 		updateRect = oldSelection | fCopyFromRect;
 		updateRect = _ImageToView(updateRect);
@@ -1587,9 +1589,9 @@ void
 ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *message)
 {
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
-	if (fMakesSelection) {
+	if (fCreatingSelection) {
 		_UpdateSelectionRect(point, false);
-	} else if (fMovesImage) {
+	} else if (fDraggingBitmap) {
 		_MoveImage();
 	}
 }
@@ -1598,12 +1600,12 @@ ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *message)
 void
 ShowImageView::MouseUp(BPoint point)
 {
-	if (fMakesSelection) {
+	if (fCreatingSelection) {
 		_UpdateSelectionRect(point, true);
-		fMakesSelection = false;
-	} else if (fMovesImage) {
+		fCreatingSelection = false;
+	} else if (fDraggingBitmap) {
 		_MoveImage();
-		fMovesImage = false;
+		fDraggingBitmap = false;
 	}
 	_AnimateSelection(true);
 }
@@ -2031,7 +2033,7 @@ ShowImageView::_AddWhiteRect(BRect &rect)
 void
 ShowImageView::_RemoveSelection(bool toClipboard, bool neverCutBackground)
 {
-	if (!_HasSelection())
+	if (!fHasSelection)
 		return;
 
 	BRect rect = fSelectionRect;
@@ -2161,7 +2163,7 @@ ShowImageView::_SetHasSelection(bool hasSelection)
 void
 ShowImageView::CopySelectionToClipboard()
 {
-	if (!_HasSelection() || !be_clipboard->Lock())
+	if (!fHasSelection || !be_clipboard->Lock())
 		return;
 
 	be_clipboard->Clear();
