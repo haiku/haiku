@@ -265,6 +265,7 @@ static uint16 nvidia_device_list[] = {
 	0x02a0, /* Nvidia Geforce3 Integrated GPU */
 	0x02e0,	/* Nvidia Geforce 7600 GT */
 	0x02e1,	/* Nvidia Geforce 7600 GS */
+	0x02e2, /* Nvidia Geforce 7300 GT */
 	0x0301, /* Nvidia Geforce FX 5800 Ultra */
 	0x0302, /* Nvidia Geforce FX 5800 */
 	0x0308, /* Nvidia Quadro FX 2000 */

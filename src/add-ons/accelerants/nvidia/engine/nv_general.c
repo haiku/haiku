@@ -947,6 +947,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "G73");
 		status = nvxx_general_powerup();
 		break;
+	case 0x02e210de: /* Nvidia Geforce 7300 GT */
+		si->ps.card_type = G73;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia GeForce 7300 GT");
+		sprintf(si->adi.chipset, "G73");
+		status = nvxx_general_powerup();
+		break;
 	case 0x030110de: /* Nvidia Geforce FX 5800 Ultra */
 	case 0x030210de: /* Nvidia Geforce FX 5800 */
 		si->ps.card_type = NV30;
