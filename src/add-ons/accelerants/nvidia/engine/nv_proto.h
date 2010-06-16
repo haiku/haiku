@@ -111,6 +111,53 @@ status_t nv_crtc2_stop_tvout(void);
 status_t nv_crtc2_start_tvout(void);
 
 /* acceleration functions */
+//offscreen_buffer_config, cliprect and clipped_scaled_blit_params are here temporary..
+typedef struct {
+	void*	buffer;						/* pointer to first byte of frame */
+										/* buffer in virtual memory */
+
+	void*	buffer_dma;					/* pointer to first byte of frame */
+										/* buffer in physical memory for DMA */
+
+	uint32	bytes_per_row;				/* number of bytes in one */
+										/* virtual_width line */
+										/* not neccesarily the same as */
+										/* virtual_width * byte_per_pixel */
+
+	uint32	space;						/* pixel configuration */
+} offscreen_buffer_config;
+
+typedef struct {
+	uint16	left;						/* offset */
+	uint16	top;
+	uint16	width;						/* 0 to N, where zero means one */
+										/* pixel, one means two pixels, */
+										/* etc. */
+	uint16	height;						/* 0 to M, where zero means one */
+										/* line, one means two lines, etc. */
+} cliprect;
+
+typedef struct {
+	uint16		src_left;				/* offset within source rectangle */
+	uint16		src_top;
+	uint16		src_width;				/* 0 to N, where zero means one */
+										/* pixel, one means two pixels, */
+										/* etc. */
+	uint16		src_height;				/* 0 to M, where zero means one */
+										/* line, one means two lines, etc. */
+	uint16		dest_left;				/* output reference, only the cliplist is displayed */
+	uint16		dest_top;
+	uint16		dest_width;				/* 0 to N, where zero means one */
+										/* pixel, one means two pixels, etc. */
+	uint16		dest_height;			/* 0 to M, where zero means one */
+										/* line, one means two lines, etc. */
+
+	cliprect*	dest_cliplist;			/* rectangle(s) to draw in destination */
+										/* guaranteed constrained to */
+										/* virtual width and height */
+	uint16		dest_clipcount;			/* number of rectangles to draw */
+} clipped_scaled_blit_params;
+
 status_t check_acc_capability(uint32 feature);
 status_t nv_acc_init(void);
 void nv_acc_assert_fifo(void);
@@ -131,6 +178,8 @@ void nv_acc_assert_fifo_dma(void);
 void SCREEN_TO_SCREEN_BLIT_DMA(engine_token *et, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_TRANSPARENT_BLIT_DMA(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count);
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_params *list, uint32 count);
+void OFFSCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(
+	engine_token *et, offscreen_buffer_config *config, clipped_scaled_blit_params *list, uint32 count);
 void FILL_RECTANGLE_DMA(engine_token *et, uint32 color, fill_rect_params *list, uint32 count);
 void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count);
 void FILL_SPAN_DMA(engine_token *et, uint32 color, uint16 *list, uint32 count);

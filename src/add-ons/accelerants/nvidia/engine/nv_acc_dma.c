@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-5/2009.
+   Rudolf Cornelissen 8/2003-6/2010.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -1869,6 +1869,185 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 		 * executed before. */
 		nv_start_dma();
 	}
+
+	/* reset surface depth settings so the other engine commands works as intended */
+	if (si->dm.space == B_RGB15_LITTLE)
+	{
+		/* wait for room in fifo for surface setup cmd if needed */
+		if (nv_acc_fifofree_dma(2) != B_OK) return;
+		/* now setup 2D surface (writing 1 32bit word) */
+		nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 1);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000004; /* Format */
+
+		/* tell the engine to fetch the commands in the DMA buffer that where not
+		 * executed before. */
+		nv_start_dma();
+	}
+
+	/* tell 3D add-ons that they should reload their rendering states and surfaces */
+	si->engine.threeD.reload = 0xffffffff;
+}
+
+/* scaled and filtered screen to screen blit - i.e. video playback without overlay */
+/* note: source and destination may not overlap. */
+//fixme? checkout NV5 and NV10 version of cmd: faster?? (or is 0x77 a 'autoselect' version?)
+void OFFSCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(
+	engine_token *et, offscreen_buffer_config *config, clipped_scaled_blit_params *list, uint32 count)
+{
+	uint32 i = 0;
+	uint32 cmd_depth;
+	uint8 bpp;
+
+	LOG(4,("ACC_DMA: offscreen src buffer location $%08x\n", (uint32)((uint8*)(config->buffer))));
+
+	/*** init acc engine for scaled filtered blit function ***/
+	/* Set pixel width */
+	switch(config->space)
+	{
+	case B_RGB15_LITTLE:
+		cmd_depth = 0x00000002;
+		bpp = 2;
+		break;
+	case B_RGB16_LITTLE:
+		cmd_depth = 0x00000007;
+		bpp = 2;
+		break;
+	case B_RGB32_LITTLE:
+	case B_RGBA32_LITTLE:
+		cmd_depth = 0x00000004;
+		bpp = 4;
+		break;
+	/* fixme sometime:
+	 * we could do the spaces below if this function would be modified to be able
+	 * to use a source outside of the desktop, i.e. using offscreen bitmaps... */
+	case B_YCbCr422:
+		cmd_depth = 0x00000005;
+		bpp = 2;
+		break;
+	case B_YUV422:
+		cmd_depth = 0x00000006;
+		bpp = 2;
+		break;
+	default:
+		/* note: this function does not support src or dest in the B_CMAP8 space! */
+		//fixme: the NV10 version of this cmd supports B_CMAP8 src though... (checkout)
+		LOG(8,("ACC_DMA: scaled_filtered_blit, invalid bit depth\n"));
+		return;
+	}
+
+	/* modify surface depth settings for 15-bit colorspace so command works as intended */
+	if (si->dm.space == B_RGB15_LITTLE)
+	{
+		/* wait for room in fifo for surface setup cmd if needed */
+		if (nv_acc_fifofree_dma(2) != B_OK) return;
+		/* now setup 2D surface (writing 1 32bit word) */
+		nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 1);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000002; /* Format */
+	}
+
+	/* TNT1 has fixed operation mode 'SRCcopy' while the rest can be programmed: */
+	if (si->ps.card_type != NV04)
+	{
+		/* wait for room in fifo for cmds if needed. */
+		if (nv_acc_fifofree_dma(5) != B_OK) return;
+		/* now setup source bitmap colorspace */
+		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 2);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+		/* now setup operation mode to SRCcopy */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000003; /* SetOperation */
+	}
+	else
+	{
+		/* wait for room in fifo for cmd if needed. */
+		if (nv_acc_fifofree_dma(4) != B_OK) return;
+		/* now setup source bitmap colorspace */
+		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 1);
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+		/* TNT1 has fixed operation mode SRCcopy */
+	}
+	/* now setup fill color (writing 2 32bit words) */
+	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000000; /* Color1A */
+
+	/*** do each blit ***/
+	while (count--)
+	{
+		uint32 j = 0;
+		uint16 clipcnt = list[i].dest_clipcount;
+
+		LOG(4,("ACC_DMA: offscreen src left %d, top %d\n", list[i].src_left, list[i].src_top));
+		LOG(4,("ACC_DMA: offscreen src width %d, height %d\n", list[i].src_width + 1, list[i].src_height + 1));
+		LOG(4,("ACC_DMA: offscreen dest left %d, top %d\n", list[i].dest_left, list[i].dest_top));
+		LOG(4,("ACC_DMA: offscreen dest width %d, height %d\n", list[i].dest_width + 1, list[i].dest_height + 1));
+
+		/* wait for room in fifo for blit cmd if needed. */
+		if (nv_acc_fifofree_dma(9 + (5 * clipcnt)) != B_OK) return;
+
+		/* now setup blit (writing 12 32bit words) */
+		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCEORG + 8, 4);
+		/* setup destination location and size for blit */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			((list[i].dest_top << 16) | list[i].dest_left); /* DestTopLeftOutputRect */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			(((list[i].dest_height + 1) << 16) | (list[i].dest_width + 1)); /* DestHeightWidthOutputRect */
+		/* setup scaling */
+		//fixme: findout scaling limits... (although the current cmd interface doesn't support them.)
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			(((list[i].src_width + 1) << 20) / (list[i].dest_width + 1)); /* HorInvScale (in 12.20 format) */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			(((list[i].src_height + 1) << 20) / (list[i].dest_height + 1)); /* VerInvScale (in 12.20 format) */
+
+		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCESIZE, 3);
+		/* setup horizontal and vertical source (fetching) ends.
+		 * note:
+		 * horizontal granularity is 2 pixels, vertical granularity is 1 pixel.
+		 * look at Matrox or Neomagic bes engines code for usage example. */
+		//fixme: tested 15, 16 and 32-bit RGB depth, verify other depths...
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			(((list[i].src_height + 1) << 16) |
+			 (((list[i].src_width + 1) + 0x0001) & ~0x0001)); /* SourceHeightWidth */
+		/* setup source pitch (b0-15). Set 'format origin center' (b16-17) and
+		 * select 'format interpolator foh (bilinear filtering)' (b24). */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			(config->bytes_per_row | (1 << 16) | (1 << 24)); /* SourcePitch */
+
+		/* setup source surface location */
+		((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+			(uint32)((uint8*)config->buffer - (uint8*)si->framebuffer +
+			(list[i].src_top * config->bytes_per_row) +	(list[i].src_left * bpp)); /* Offset */
+
+		while (clipcnt--)
+		{
+			LOG(4,("ACC_DMA: offscreen clip left %d, top %d\n",
+				list[i].dest_cliplist[j].left, list[i].dest_cliplist[j].top));
+			LOG(4,("ACC_DMA: offscreen clip width %d, height %d\n",
+				list[i].dest_cliplist[j].width + 1, list[i].dest_cliplist[j].height + 1));
+
+			/* now setup blit (writing 12 32bit words) */
+			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCEORG, 2);
+			/* setup dest clipping rect for blit (b0-15 = left, b16-31 = top) */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+					(list[i].dest_cliplist[j].top << 16) | list[i].dest_cliplist[j].left; /* DestTopLeftClipRect */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+					((list[i].dest_cliplist[j].height + 1) << 16) | (list[i].dest_cliplist[j].width + 1); /* DestHeightWidthClipRect */
+
+			nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SOURCESIZE + 12, 1);
+			/* setup source start: first (sub)pixel contributing to output picture */
+			/* note:
+			 * clipping is not asked for.
+			 * look at nVidia NV10+ bes engine code for useage example. */
+			((uint32*)(si->dma_buffer))[si->engine.dma.current++] =
+				0; /* SourceRef (b0-15 = hor, b16-31 = ver: both in 12.4 format) */
+
+			j++;
+		}
+
+		i++;
+	}
+
+	/* tell the engine to fetch the commands in the DMA buffer that where not
+	 * executed before. */
+	nv_start_dma();
 
 	/* reset surface depth settings so the other engine commands works as intended */
 	if (si->dm.space == B_RGB15_LITTLE)
