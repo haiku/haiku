@@ -86,6 +86,9 @@ public:
 			void				GetIconFrame(BMessage* message);
 
 private:
+			bool				_IsFocusMessage(BMessage* message);
+
+private:
 	static	TBeMenu*			sBeMenu;
 			TBarView*			fBarView;
 };

@@ -55,6 +55,8 @@ All rights reserved.
 #include "StatusView.h"
 #include "tracker_private.h"
 
+#include <MessagePrivate.h>
+
 
 // This is a very ugly hack to be able to call the private BMenuBar::StartMenuBar()
 // method from the TBarWindow::ShowBeMenu() method.
@@ -105,8 +107,9 @@ TBarWindow::DispatchMessage(BMessage* message, BHandler* handler)
 		if (!((TBarApp*)be_app)->Settings()->autoRaise)
 			Activate(true);
 
-		if ((modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
-				| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
+		if (_IsFocusMessage(message)
+			&& (modifiers() & (B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY
+					| B_SHIFT_KEY)) == (B_CONTROL_KEY | B_COMMAND_KEY)) {
 			// The window key was pressed - enter dragging code
 			fBarView->DragRegion()->MouseDown(
 				fBarView->DragRegion()->DragRegion().LeftTop());
@@ -614,3 +617,18 @@ TBarWindow::GetIconFrame(BMessage* message)
 	message->SendReply(&reply);
 }
 
+
+bool
+TBarWindow::_IsFocusMessage(BMessage* message)
+{
+	BMessage::Private messagePrivate(message);
+	if (!messagePrivate.UsePreferredTarget())
+		return false;
+
+	bool feedFocus;
+	if (message->HasInt32("_token")
+		&& (message->FindBool("_feed_focus", &feedFocus) != B_OK || !feedFocus))
+		return false;
+
+	return true;
+}
