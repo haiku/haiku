@@ -220,8 +220,6 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fIsActiveWin(true),
 	fProgressWindow(NULL)
 {
-	_InitPatterns();
-
 	ShowImageSettings* settings;
 	settings = my_app->Settings();
 	if (settings->Lock()) {
@@ -246,60 +244,6 @@ ShowImageView::~ShowImageView()
 }
 
 
-//! Use patterns to simulate marching ants for selection
-void
-ShowImageView::_InitPatterns()
-{
-	uchar p;
-	uchar p1 = 0x33;
-	uchar p2 = 0xCC;
-	for (int i = 0; i <= 7; i ++) {
-		fPatternLeft.data[i] = p1;
-		fPatternRight.data[i] = p2;
-		if ((i / 2) % 2 == 0)
-			p = 255;
-		else
-			p = 0;
-		fPatternUp.data[i] = p;
-		fPatternDown.data[i] = ~p;
-	}
-}
-
-
-void
-ShowImageView::_RotatePatterns()
-{
-	// rotate up
-	uchar p = fPatternUp.data[0];
-	for (int i = 0; i <= 6; i ++)
-		fPatternUp.data[i] = fPatternUp.data[i + 1];
-	fPatternUp.data[7] = p;
-
-	// rotate down
-	p = fPatternDown.data[7];
-	for (int i = 7; i >= 1; i --)
-		fPatternDown.data[i] = fPatternDown.data[i - 1];
-	fPatternDown.data[0] = p;
-
-	// rotate to left
-	p = fPatternLeft.data[0];
-	bool set = (p & 0x80) != 0;
-	p <<= 1;
-	p &= 0xfe;
-	if (set)
-		p |= 1;
-	memset(fPatternLeft.data, p, 8);
-
-	// rotate to right
-	p = fPatternRight.data[0];
-	set = (p & 1) != 0;
-	p >>= 1;
-	if (set)
-		p |= 0x80;
-	memset(fPatternRight.data, p, 8);
-}
-
-
 void
 ShowImageView::_AnimateSelection(bool enabled)
 {
@@ -312,8 +256,8 @@ ShowImageView::Pulse()
 {
 	// animate marching ants
 	if (fHasSelection && fAnimateSelection && fIsActiveWin) {
-		_RotatePatterns();
-		_DrawSelectionBox();
+		fSelectionBox.Animate();
+		fSelectionBox.Draw(this, Bounds());
 	}
 	if (fSlideShow) {
 		fSlideShowCountDown --;
@@ -424,8 +368,8 @@ ShowImageView::_UpdateStatusText()
 	if (fHasSelection) {
 		char size[50];
 		sprintf(size, " (%.0fx%.0f)",
-			fSelectionRect.Width()+1.0,
-			fSelectionRect.Height()+1.0);
+			fSelectionBox.Bounds().Width() + 1.0,
+			fSelectionBox.Bounds().Height() + 1.0);
 		status_to_send << size;
 	}
 
@@ -609,6 +553,50 @@ ShowImageView::SetImage(const entry_ref *ref)
 
 	_Notify();
 	return B_OK;
+}
+
+
+BPoint
+ShowImageView::ImageToView(BPoint p) const
+{
+	p.x = floorf(fZoom * p.x + fBitmapLocationInView.x);
+	p.y = floorf(fZoom * p.y + fBitmapLocationInView.y);
+	return p;
+}
+
+
+BPoint
+ShowImageView::ViewToImage(BPoint p) const
+{
+	p.x = floorf((p.x - fBitmapLocationInView.x) / fZoom);
+	p.y = floorf((p.y - fBitmapLocationInView.y) / fZoom);
+	return p;
+}
+
+
+BRect
+ShowImageView::ImageToView(BRect r) const
+{
+	BPoint leftTop(ImageToView(BPoint(r.left, r.top)));
+	BPoint rightBottom(r.right, r.bottom);
+	rightBottom += BPoint(1, 1);
+	rightBottom = ImageToView(rightBottom);
+	rightBottom -= BPoint(1, 1);
+	return BRect(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
+}
+
+
+void
+ShowImageView::ConstrainToImage(BPoint& point) const
+{
+	point.ConstrainTo(fBitmap->Bounds());
+}
+
+
+void
+ShowImageView::ConstrainToImage(BRect& rect) const
+{
+	rect = rect & fBitmap->Bounds();
 }
 
 
@@ -822,36 +810,6 @@ ShowImageView::_Setup(BRect rect)
 }
 
 
-BPoint
-ShowImageView::_ImageToView(BPoint p) const
-{
-	p.x = floorf(fZoom * p.x + fBitmapLocationInView.x);
-	p.y = floorf(fZoom * p.y + fBitmapLocationInView.y);
-	return p;
-}
-
-
-BPoint
-ShowImageView::_ViewToImage(BPoint p) const
-{
-	p.x = floorf((p.x - fBitmapLocationInView.x) / fZoom);
-	p.y = floorf((p.y - fBitmapLocationInView.y) / fZoom);
-	return p;
-}
-
-
-BRect
-ShowImageView::_ImageToView(BRect r) const
-{
-	BPoint leftTop(_ImageToView(BPoint(r.left, r.top)));
-	BPoint rightBottom(r.right, r.bottom);
-	rightBottom += BPoint(1, 1);
-	rightBottom = _ImageToView(rightBottom);
-	rightBottom -= BPoint(1, 1);
-	return BRect(leftTop.x, leftTop.y, rightBottom.x, rightBottom.y);
-}
-
-
 void
 ShowImageView::_DrawBorder(BRect border)
 {
@@ -1009,36 +967,11 @@ ShowImageView::Draw(BRect updateRect)
 			BRect srcRect;
 			BRect dstRect;
 			_GetSelectionMergeRects(srcRect, dstRect);
-			dstRect = _ImageToView(dstRect);
+			dstRect = ImageToView(dstRect);
 			DrawBitmap(fSelectionBitmap, srcRect, dstRect);
 		}
-		_DrawSelectionBox();
+		fSelectionBox.Draw(this, updateRect);
 	}
-}
-
-
-void
-ShowImageView::_DrawSelectionBox()
-{
-	if (fSelectionRect.Height() <= 0.0 || fSelectionRect.Width() <= 0.0)
-		return;
-
-	BRect r(fSelectionRect);
-	_ConstrainToImage(r);
-	r = _ImageToView(r);
-	// draw selection box *around* selection
-	r.InsetBy(-1, -1);
-	PushState();
-	SetLowColor(255, 255, 255);
-	StrokeLine(BPoint(r.left, r.top), BPoint(r.right, r.top),
-		fPatternLeft);
-	StrokeLine(BPoint(r.right, r.top + 1), BPoint(r.right, r.bottom - 1),
-		fPatternUp);
-	StrokeLine(BPoint(r.left, r.bottom), BPoint(r.right, r.bottom),
-		fPatternRight);
-	StrokeLine(BPoint(r.left, r.top + 1), BPoint(r.left, r.bottom - 1),
-		fPatternDown);
-	PopState();
 }
 
 
@@ -1046,20 +979,6 @@ void
 ShowImageView::FrameResized(float /* width */, float /* height */)
 {
 	FixupScrollBars();
-}
-
-
-void
-ShowImageView::_ConstrainToImage(BPoint &point)
-{
-	point.ConstrainTo(fBitmap->Bounds());
-}
-
-
-void
-ShowImageView::_ConstrainToImage(BRect &rect)
-{
-	rect = rect & fBitmap->Bounds();
 }
 
 
@@ -1094,7 +1013,7 @@ ShowImageView::_CopySelection(uchar alpha, bool imageSize)
 	if (!fHasSelection)
 		return NULL;
 
-	BRect rect(0, 0, fSelectionRect.Width(), fSelectionRect.Height());
+	BRect rect = fSelectionBox.Bounds().OffsetToCopy(B_ORIGIN);
 	if (!imageSize) {
 		// scale image to view size
 		rect.right = floorf((rect.right + 1.0) * fZoom - 1.0);
@@ -1211,7 +1130,7 @@ ShowImageView::_BeginDrag(BPoint sourcePoint)
 	drag.AddString("be:clip_name", "Bitmap Clip");
 	// ShowImage specific fields
 	drag.AddPoint("be:_source_point", sourcePoint);
-	drag.AddRect("be:_frame", fSelectionRect);
+	drag.AddRect("be:_frame", fSelectionBox.Bounds());
 	if (_AddSupportedTypes(&drag, bitmap)) {
 		// we also support "Passing Data via File" protocol
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
@@ -1219,9 +1138,10 @@ ShowImageView::_BeginDrag(BPoint sourcePoint)
 		_AnimateSelection(false);
 		// only use a transparent bitmap on selections less than 400x400
 		// (taking into account zooming)
-		if ((fSelectionRect.Width() * fZoom) < 400.0
-			&& (fSelectionRect.Height() * fZoom) < 400.0) {
-			sourcePoint -= fSelectionRect.LeftTop();
+		BRect selectionRect = fSelectionBox.Bounds();
+		if ((selectionRect.Width() * fZoom) < 400.0
+			&& (selectionRect.Height() * fZoom) < 400.0) {
+			sourcePoint -= selectionRect.LeftTop();
 			sourcePoint.x *= fZoom;
 			sourcePoint.y *= fZoom;
 			// DragMessage takes ownership of bitmap
@@ -1230,8 +1150,8 @@ ShowImageView::_BeginDrag(BPoint sourcePoint)
 		} else {
 			delete bitmap;
 			// Offset and scale the rect
-			BRect rect(fSelectionRect);
-			rect = _ImageToView(rect);
+			BRect rect(selectionRect);
+			rect = ImageToView(rect);
 			rect.InsetBy(-1, -1);
 			DragMessage(&drag, rect);
 		}
@@ -1414,7 +1334,7 @@ ShowImageView::_GetMergeRects(BBitmap* merge, BRect selection, BRect& srcRect,
 	dstRect = selection;
 
 	BRect clippedDstRect(dstRect);
-	_ConstrainToImage(clippedDstRect);
+	ConstrainToImage(clippedDstRect);
 
 	srcRect = merge->Bounds().OffsetToCopy(B_ORIGIN);
 
@@ -1430,7 +1350,7 @@ ShowImageView::_GetMergeRects(BBitmap* merge, BRect selection, BRect& srcRect,
 void
 ShowImageView::_GetSelectionMergeRects(BRect& srcRect, BRect& dstRect)
 {
-	_GetMergeRects(fSelectionBitmap, fSelectionRect, srcRect, dstRect);
+	_GetMergeRects(fSelectionBitmap, fSelectionBox.Bounds(), srcRect, dstRect);
 }
 
 
@@ -1475,14 +1395,14 @@ ShowImageView::_MergeSelection()
 	if (fSelectionBitmap == NULL) {
 		// Even though the merge will not change the background image,
 		// undo information still needs to be saved here.
-		fUndo.SetTo(fSelectionRect, NULL, _CopySelection());
+		fUndo.SetTo(fSelectionBox.Bounds(), NULL, _CopySelection());
 		return;
 	}
 
 	// Merge selection with background
-	fUndo.SetTo(fSelectionRect, _CopyFromRect(fSelectionRect),
+	fUndo.SetTo(fSelectionBox.Bounds(), _CopyFromRect(fSelectionBox.Bounds()),
 		_CopySelection());
-	_MergeWithBitmap(fSelectionBitmap, fSelectionRect);
+	_MergeWithBitmap(fSelectionBitmap, fSelectionBox.Bounds());
 }
 
 
@@ -1493,10 +1413,10 @@ ShowImageView::MouseDown(BPoint position)
 	uint32 buttons;
 	MakeFocus(true);
 
-	point = _ViewToImage(position);
+	point = ViewToImage(position);
 	buttons = _GetMouseButtons();
 
-	if (fHasSelection && fSelectionRect.Contains(point)
+	if (fHasSelection && fSelectionBox.Bounds().Contains(point)
 		&& (buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
 		if (!fSelectionBitmap)
 			fSelectionBitmap = _CopySelection();
@@ -1515,19 +1435,11 @@ ShowImageView::MouseDown(BPoint position)
 		if (Bounds().Contains(point)) {
 			// If selection stayed inside this view
 			// (Some of the selection may be in the border area, which can be OK)
-			BPoint last, diff;
-			last = _ViewToImage(point);
-			diff = last - sourcePoint;
+			BPoint last = ViewToImage(point);
+			BPoint diff = last - sourcePoint;
 
-			BRect newSelection = fSelectionRect;
-			newSelection.OffsetBy(diff);
-
-			if (fBitmap->Bounds().Intersects(newSelection)) {
-				// Do not accept the new selection box location
-				// if it does not intersect with the bitmap rectangle
-				fSelectionRect = newSelection;
-				Invalidate();
-			}
+			fSelectionBox.SetBounds(this,
+				fSelectionBox.Bounds().OffsetByCopy(diff));
 		}
 
 		_AnimateSelection(true);
@@ -1540,10 +1452,10 @@ ShowImageView::MouseDown(BPoint position)
 		_SetHasSelection(true);
 		fCreatingSelection = true;
 		SetMouseEventMask(B_POINTER_EVENTS);
-		_ConstrainToImage(point);
+		ConstrainToImage(point);
 		fFirstPoint = point;
 		fCopyFromRect.Set(point.x, point.y, point.x, point.y);
-		fSelectionRect = fCopyFromRect;
+		fSelectionBox.SetBounds(this, fCopyFromRect);
 		Invalidate();
 	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		_ShowPopUpMenu(ConvertToScreen(position));
@@ -1560,13 +1472,13 @@ void
 ShowImageView::_UpdateSelectionRect(BPoint point, bool final)
 {
 	BRect oldSelection = fCopyFromRect;
-	point = _ViewToImage(point);
-	_ConstrainToImage(point);
+	point = ViewToImage(point);
+	ConstrainToImage(point);
 	fCopyFromRect.left = min_c(fFirstPoint.x, point.x);
 	fCopyFromRect.right = max_c(fFirstPoint.x, point.x);
 	fCopyFromRect.top = min_c(fFirstPoint.y, point.y);
 	fCopyFromRect.bottom = max_c(fFirstPoint.y, point.y);
-	fSelectionRect = fCopyFromRect;
+	fSelectionBox.SetBounds(this, fCopyFromRect);
 
 	if (final) {
 		// selection must be at least 2 pixels wide or 2 pixels tall
@@ -1578,7 +1490,7 @@ ShowImageView::_UpdateSelectionRect(BPoint point, bool final)
 	if (oldSelection != fCopyFromRect || !fHasSelection) {
 		BRect updateRect;
 		updateRect = oldSelection | fCopyFromRect;
-		updateRect = _ImageToView(updateRect);
+		updateRect = ImageToView(updateRect);
 		updateRect.InsetBy(-PEN_SIZE, -PEN_SIZE);
 		Invalidate(updateRect);
 	}
@@ -1853,7 +1765,7 @@ ShowImageView::MessageReceived(BMessage *message)
 					if (message->FindRef("refs", 0, &ref) == B_OK) {
 						BPoint point = message->DropPoint();
 						point = ConvertFromScreen(point);
-						point = _ViewToImage(point);
+						point = ViewToImage(point);
 						_SetSelection(&ref, point);
 					}
 				} else {
@@ -1878,7 +1790,7 @@ ShowImageView::MessageReceived(BMessage *message)
 								point.y - (sourcePoint.y - sourceRect.top));
 								// adjust drop point before scaling is factored in
 							point = ConvertFromScreen(point);
-							point = _ViewToImage(point);
+							point = ViewToImage(point);
 
 							_PasteBitmap(bitmap, point);
 						}
@@ -1969,7 +1881,7 @@ ShowImageView::Undo()
 	// backup current selection
 	BRect undoneSelRect;
 	BBitmap *undoneSelection;
-	undoneSelRect = fSelectionRect;
+	undoneSelRect = fSelectionBox.Bounds();
 	undoneSelection = _CopySelection();
 
 	if (undoType == UNDO_UNDO) {
@@ -1988,7 +1900,7 @@ ShowImageView::Undo()
 		_SetHasSelection(false);
 	else {
 		fCopyFromRect = BRect();
-		fSelectionRect = fUndo.GetRect();
+		fSelectionBox.SetBounds(this, fUndo.GetRect());
 		_SetHasSelection(true);
 		fSelectionBitmap = undoSelection;
 	}
@@ -2036,7 +1948,7 @@ ShowImageView::_RemoveSelection(bool toClipboard, bool neverCutBackground)
 	if (!fHasSelection)
 		return;
 
-	BRect rect = fSelectionRect;
+	BRect rect = fSelectionBox.Bounds();
 	bool cutBackground = (fSelectionBitmap) ? false : true;
 	BBitmap* selection = _CopySelection();
 	BBitmap* restore = NULL;
@@ -2076,21 +1988,19 @@ ShowImageView::_PasteBitmap(BBitmap* bitmap, BPoint point)
 	_MergeSelection();
 
 	fCopyFromRect = BRect();
-	fSelectionRect = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
+	BRect selectionRect = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
 	_SetHasSelection(true);
 	delete fSelectionBitmap;
 	fSelectionBitmap = bitmap;
 
-	BRect offsetRect(fSelectionRect.OffsetToCopy(point));
+	BRect offsetRect(selectionRect.OffsetToCopy(point));
 	if (fBitmap->Bounds().Intersects(offsetRect)) {
 		// Move the selection rectangle to desired origin,
 		// but only if the resulting selection rectangle
 		// intersects with the background bitmap rectangle
-		fSelectionRect = offsetRect;
+		selectionRect = offsetRect;
 	}
-printf("bitmap: "); bitmap->Bounds().PrintToStream();
-printf("selection: "); fSelectionRect.PrintToStream();
-printf("point: "); point.PrintToStream();
+	fSelectionBox.SetBounds(this, selectionRect);
 
 	Invalidate();
 
@@ -2131,7 +2041,7 @@ ShowImageView::SelectAll()
 	_SetHasSelection(true);
 	fCopyFromRect.Set(0, 0, fBitmap->Bounds().Width(),
 		fBitmap->Bounds().Height());
-	fSelectionRect = fCopyFromRect;
+	fSelectionBox.SetBounds(this, fCopyFromRect);
 	Invalidate();
 }
 
@@ -2178,7 +2088,7 @@ ShowImageView::CopySelectionToClipboard()
 			// This works with WonderBrush, though, which in turn had been
 			// tested with other apps.
 			data->AddMessage("image/bitmap", &bitmapArchive);
-			data->AddPoint("be:location", fSelectionRect.LeftTop());
+			data->AddPoint("be:location", fSelectionBox.Bounds().LeftTop());
 
 			delete bitmap;
 

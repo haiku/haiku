@@ -16,6 +16,7 @@
 
 
 #include "Filter.h"
+#include "SelectionBox.h"
 #include "ShowImageUndo.h"
 
 #include <Bitmap.h>
@@ -63,6 +64,12 @@ public:
 									const BMessenger& trackerMessenger);
 			status_t			SetImage(const entry_ref* ref);
 			const entry_ref*	Image() const { return &fCurrentRef; }
+
+			BPoint				ImageToView(BPoint p) const;
+			BPoint				ViewToImage(BPoint p) const;
+			BRect				ImageToView(BRect r) const;
+			void				ConstrainToImage(BPoint& point) const;
+			void				ConstrainToImage(BRect& rect) const;
 
 			void				SaveToFile(BDirectory* dir, const char* name,
 									BBitmap* bitmap,
@@ -141,8 +148,6 @@ private:
 				kNumberOfOrientations,
 			};
 
-			void				_InitPatterns();
-			void				_RotatePatterns();
 			void				_RemoveSelection(bool bToClipboard,
 									bool neverCutBackground = false);
 			void				_SetHasSelection(bool bHasSelection);
@@ -183,9 +188,6 @@ private:
 									bool quiet = false);
 			BRect				_AlignBitmap();
 			void				_Setup(BRect r);
-			BPoint				_ImageToView(BPoint p) const;
-			BPoint				_ViewToImage(BPoint p) const;
-			BRect				_ImageToView(BRect r) const;
 			bool				_IsImage(const entry_ref* pref);
 	static	int					_CompareEntries(const void* a, const void* b);
 			void				_FreeEntries(BList* entries);
@@ -195,8 +197,6 @@ private:
 									bool rewind);
 			bool				_ShowNextImage(bool next, bool rewind);
 			bool				_FirstFile();
-			void				_ConstrainToImage(BPoint& point);
-			void				_ConstrainToImage(BRect& rect);
 			BBitmap*			_CopyFromRect(BRect srcRect);
 			BBitmap*			_CopySelection(uchar alpha = 255,
 									bool imageSize = true);
@@ -218,7 +218,6 @@ private:
 									BRect& background);
 			void				_DrawCaption();
 			void				_UpdateCaption();
-			void				_DrawSelectionBox();
 
 			Scaler*				_GetScaler(BRect rect);
 			void				_DrawImage(BRect rect);
@@ -272,16 +271,11 @@ private:
 				// first point in image space of selection
 			bool				fAnimateSelection;
 			bool				fHasSelection;
-			BRect				fSelectionRect;
+			SelectionBox		fSelectionBox;
 			BRect				fCopyFromRect;
 				// the portion of the background bitmap the selection is made
 				// from
 
-			pattern				fPatternUp;
-			pattern				fPatternDown;
-			pattern				fPatternLeft;
-			pattern				fPatternRight;
-	
 			bool				fSlideShow;
 			int					fSlideShowDelay;
 				// in pulse rate units

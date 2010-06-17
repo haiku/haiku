@@ -5,17 +5,18 @@ UsePrivateHeaders tracker shared ;
 UsePublicHeaders [ FDirName be_apps Tracker ] ;
 
 Application ShowImage :
+	EntryMenuItem.cpp
+	Filter.cpp
+	PrintOptionsWindow.cpp
+	ProgressWindow.cpp
+	ResizerWindow.cpp
+	SelectionBox.cpp
 	ShowImageApp.cpp
 	ShowImageSettings.cpp
 	ShowImageStatusView.cpp
 	ShowImageUndo.cpp
 	ShowImageView.cpp
 	ShowImageWindow.cpp
-	PrintOptionsWindow.cpp
-	Filter.cpp
-	EntryMenuItem.cpp
-	ProgressWindow.cpp
-	ResizerWindow.cpp
 	: libshared.a
 	be tracker translation liblocale.so $(TARGET_LIBSUPC++)
 	: ShowImage.rdef
