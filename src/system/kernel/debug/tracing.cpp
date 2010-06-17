@@ -423,8 +423,8 @@ TracingMetaData::_CreateMetaDataArea(bool findPrevious, area_id& _area,
 		physical_address_restrictions physicalRestrictions = {};
 		physicalRestrictions.low_address = metaDataAddress;
 		physicalRestrictions.high_address = metaDataAddress + B_PAGE_SIZE;
-		area_id create_area_etc(B_SYSTEM_TEAM, "tracing metadata", B_PAGE_SIZE,
-			B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing metadata",
+			B_PAGE_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			CREATE_AREA_DONT_CLEAR, &virtualRestrictions, &physicalRestrictions,
 			(void**)&metaData);
 		if (area < 0)
@@ -478,7 +478,7 @@ TracingMetaData::_InitPreviousTracingData()
 	physical_address_restrictions physicalRestrictions = {};
 	physicalRestrictions.low_address = fPhysicalAddress;
 	physicalRestrictions.high_address = fPhysicalAddress
-		+ ROUNDUP(kTraceOutputBufferSize + MAX_TRACE_SIZE);
+		+ ROUNDUP(kTraceOutputBufferSize + MAX_TRACE_SIZE, B_PAGE_SIZE);
 	area_id area = create_area_etc(B_SYSTEM_TEAM, "tracing log",
 		kTraceOutputBufferSize + MAX_TRACE_SIZE, B_CONTIGUOUS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, CREATE_AREA_DONT_CLEAR,
