@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, David McPaul
+ * Copyright (c) 2010, David McPaul
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -22,33 +22,69 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _CHUNK_INDEX_H
-#define _CHUNK_INDEX_H
 
-#include <SupportDefs.h>
+#include "BitParser.h"
 
-#include <map>
+#include <math.h>
 
+BitParser::BitParser(uint8 *bits, uint32 bitLength) {
+	this->bits = bits;
+	this->bitLength = bitLength;
+	this->index = 0;
+}
 
-struct ChunkIndex {
-	uint32	stream;
-	uint32	chunkid;
-	off_t	chunk_start;
-};
+BitParser::BitParser() {
+	bits = NULL;
+	bitLength = 0;
+	index = 1;
+}
 
-typedef ChunkIndex* ChunkIndexPtr;
-typedef std::map<off_t, ChunkIndexPtr, std::less<off_t> > ChunkIndexArray;
+BitParser::~BitParser() {
+	bits = NULL;
+}
 
-class ChunkSuperIndex {
-public:
-			ChunkSuperIndex();
-	virtual	~ChunkSuperIndex();
+void
+BitParser::Init(uint8 *bits, uint32 bitLength) {
+	this->bits = bits;
+	this->bitLength = bitLength;
+	this->index = 1;
+}
+
+void
+BitParser::Skip(uint8 length) {
+	if (bitLength >= length) {
+
+		while (length-- > 0) {
+			index++;
+			bitLength--;
+
+			if (index > 8) {
+				index = 1;
+				bits++;
+			}
+		}
+	}
+}
+
+uint32
+BitParser::GetValue(uint8 length) {
+	uint32 result = 0;
 	
-	void	AddChunkIndex(uint32 stream, uint32 chunkid, off_t chunk_start);
-	uint32	getChunkSize(uint32 stream, uint32 chunkid, off_t chunk_start);
+	if (bitLength < length) {
+		return 0;
+	}
 	
-private:
-	ChunkIndexArray	theChunkIndexArray;
-};
+	while (length-- > 0) {
+		result = result << 1;
+		result += (*bits) & (uint8)(pow(2, 8-index)) ? 1 : 0;
+		index++;
+		bitLength--;
 
-#endif // _CHUNK_INDEX_H
+		if (index > 8) {
+			index = 1;
+			bits++;
+		}
+	}
+	
+	return result;
+}

@@ -33,7 +33,7 @@
 #include <iostream>
 
 
-extern AtomBase *getAtom(BPositionIO *pStream);
+extern AtomBase *GetAtom(BPositionIO *pStream);
 
 
 MP4FileReader::MP4FileReader(BPositionIO *pStream)
@@ -63,13 +63,11 @@ MP4FileReader::IsEndOfData(off_t pPosition)
 	AtomBase* aAtomBase;
 
 	// check all mdat atoms to make sure pPosition is within one of them
-
-	for (uint32 index=0;index<CountChildAtoms('mdat');index++) {
+	for (uint32 index=0; index < CountChildAtoms('mdat'); index++) {
 		aAtomBase = GetChildAtom(uint32('mdat'),index);
-		if ((aAtomBase) && (aAtomBase->getAtomSize() > 8)) {
+		if ((aAtomBase) && (aAtomBase->GetAtomSize() > 8)) {
 			MDATAtom *aMDATAtom = dynamic_cast<MDATAtom *>(aAtomBase);
-			if (pPosition >= aMDATAtom->getAtomOffset() && pPosition <= aMDATAtom->getEOF()) {
-//				printf("IsEndOfData %Ld,%Ld,%Ld\n",pPosition,aMDATAtom->getAtomOffset(),aMDATAtom->getEOF());
+			if (pPosition >= aMDATAtom->GetAtomOffset() && pPosition <= aMDATAtom->GetEOF()) {
 				return false;
 			}
 		}
@@ -143,9 +141,33 @@ MP4FileReader::CountChildAtoms(uint32 patomType)
 	return count;
 }
 
+TRAKAtom *
+MP4FileReader::GetTrack(uint32 streamIndex) 
+{
+	if (tracks[streamIndex] == NULL) {
+		AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
+		if (aAtomBase) {
+			tracks[streamIndex] = (dynamic_cast<TRAKAtom *>(aAtomBase));
+		}
+	}
+	
+	if (tracks[streamIndex] != NULL) {
+		return tracks[streamIndex];
+	}
+
+	#ifdef DEBUG
+		char msg[100]; sprintf(msg, "Bad Stream Index %ld\n", streamIndex);
+		DEBUGGER(msg);
+	#endif
+
+	TRESPASS();
+	
+	return NULL;	// Never to happen
+}
+
 
 MVHDAtom*
-MP4FileReader::getMVHDAtom()
+MP4FileReader::GetMVHDAtom()
 {
 	AtomBase *aAtomBase;
 
@@ -159,46 +181,22 @@ MP4FileReader::getMVHDAtom()
 }
 
 
-void
-MP4FileReader::BuildSuperIndex()
-{
-	AtomBase *aAtomBase;
-
-	for (uint32 stream=0;stream<getStreamCount();stream++) {
-		aAtomBase = GetChildAtom(uint32('trak'),stream);
-		if (aAtomBase) {
-			TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
-			for (uint32 chunkid=1;chunkid<=aTrakAtom->getTotalChunks();chunkid++) {
-				theChunkSuperIndex.AddChunkIndex(stream,chunkid,aTrakAtom->getOffsetForChunk(chunkid));
-			}
-		}
-	}
-
-	// Add end of file to index
-	aAtomBase = GetChildAtom(uint32('mdat'),0);
-	if (aAtomBase) {
-		MDATAtom *aMdatAtom = dynamic_cast<MDATAtom *>(aAtomBase);
-		theChunkSuperIndex.AddChunkIndex(0,0,aMdatAtom->getEOF());
-	}
-}
-
-
 uint32
-MP4FileReader::getMovieTimeScale()
+MP4FileReader::GetMovieTimeScale()
 {
-	return getMVHDAtom()->getTimeScale();
+	return GetMVHDAtom()->GetTimeScale();
 }
 
 
 bigtime_t
-MP4FileReader::getMovieDuration()
+MP4FileReader::GetMovieDuration()
 {
-	return bigtime_t((getMVHDAtom()->getDuration() * 1000000.0) / getMovieTimeScale());
+	return bigtime_t((GetMVHDAtom()->GetDuration() * 1000000.0) / GetMovieTimeScale());
 }
 
 
 uint32
-MP4FileReader::getStreamCount()
+MP4FileReader::GetStreamCount()
 {
 	// count the number of tracks in the file
 	return CountChildAtoms(uint32('trak'));
@@ -206,59 +204,54 @@ MP4FileReader::getStreamCount()
 
 
 bigtime_t
-MP4FileReader::getVideoDuration(uint32 streamIndex)
+MP4FileReader::GetVideoDuration(uint32 streamIndex)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
+	if (IsVideo(streamIndex)) {
+		return GetTrack(streamIndex)->Duration(1);
+	}
+	
+	return 0;
+}
 
-	if (aAtomBase && dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo())
-		return dynamic_cast<TRAKAtom *>(aAtomBase)->Duration(1);
+
+bigtime_t
+MP4FileReader::GetAudioDuration(uint32 streamIndex)
+{
+	if (IsAudio(streamIndex)) {
+		return GetTrack(streamIndex)->Duration(1);
+	}
 
 	return 0;
 }
 
 
 bigtime_t
-MP4FileReader::getAudioDuration(uint32 streamIndex)
+MP4FileReader::GetMaxDuration()
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
-
-	if (aAtomBase && dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())
-		return dynamic_cast<TRAKAtom *>(aAtomBase)->Duration(1);
-
-	return 0;
-}
-
-
-bigtime_t
-MP4FileReader::getMaxDuration()
-{
-	AtomBase *aAtomBase;
 	int32 videoIndex = -1;
 	int32 audioIndex = -1;
 
 	// find the active video and audio tracks
-	for (uint32 i = 0; i < getStreamCount(); i++) {
-		aAtomBase = GetChildAtom(uint32('trak'), i);
-
-		if ((aAtomBase) && (dynamic_cast<TRAKAtom *>(aAtomBase)->IsActive())) {
-			if (dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio()) {
+	for (uint32 i = 0; i < GetStreamCount(); i++) {
+		if (GetTrack(i)->IsActive()) {
+			if (GetTrack(i)->IsAudio()) {
 				audioIndex = int32(i);
 			}
-			if (dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo()) {
+			if (GetTrack(i)->IsVideo()) {
 				videoIndex = int32(i);
 			}
 		}
 	}
 
 	if (videoIndex >= 0 && audioIndex >= 0) {
-		return max_c(getVideoDuration(videoIndex),
-			getAudioDuration(audioIndex));
+		return max_c(GetVideoDuration(videoIndex),
+			GetAudioDuration(audioIndex));
 	}
 	if (videoIndex < 0 && audioIndex >= 0) {
-		return getAudioDuration(audioIndex);
+		return GetAudioDuration(audioIndex);
 	}
 	if (videoIndex >= 0 && audioIndex < 0) {
-		return getVideoDuration(videoIndex);
+		return GetVideoDuration(videoIndex);
 	}
 
 	return 0;
@@ -266,24 +259,17 @@ MP4FileReader::getMaxDuration()
 
 
 uint32
-MP4FileReader::getFrameCount(uint32 streamIndex)
+MP4FileReader::GetFrameCount(uint32 streamIndex)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
-
-	if (aAtomBase) {
-		return dynamic_cast<TRAKAtom *>(aAtomBase)->FrameCount();
-	}
-
-	return 1;
+	return GetTrack(streamIndex)->FrameCount();
 }
 
 uint32
-MP4FileReader::getAudioChunkCount(uint32 streamIndex)
+MP4FileReader::GetAudioChunkCount(uint32 streamIndex)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
-
-	if (aAtomBase && dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())
-		return dynamic_cast<TRAKAtom *>(aAtomBase)->getTotalChunks();
+	if (IsAudio(streamIndex)) {
+		return GetTrack(streamIndex)->GetTotalChunks();
+	}
 	
 	return 0;
 }
@@ -291,111 +277,82 @@ MP4FileReader::getAudioChunkCount(uint32 streamIndex)
 bool
 MP4FileReader::IsVideo(uint32 streamIndex)
 {
-	// Look for a 'trak' with a vmhd atom
-
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
-	if (aAtomBase)
-		return dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo();
-
-	// No track
-	return false;
+	return GetTrack(streamIndex)->IsVideo();
 }
 
 
 bool
 MP4FileReader::IsAudio(uint32 streamIndex)
 {
-	// Look for a 'trak' with a smhd atom
-
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
-
-	if (aAtomBase)
-		return dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio();
-
-	// No track
-	return false;
+	return GetTrack(streamIndex)->IsAudio();
 }
 
 
 uint32
-MP4FileReader::getFirstFrameInChunk(uint32 streamIndex, uint32 pChunkID)
+MP4FileReader::GetFirstFrameInChunk(uint32 streamIndex, uint32 pChunkIndex)
 {
-	// Find Track
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
-	if (aAtomBase) {
-		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
-
-		return aTrakAtom->getFirstSampleInChunk(pChunkID);
-	}
-
-	return 0;
+	return GetTrack(streamIndex)->GetFirstSampleInChunk(pChunkIndex);
 }
 
 
 uint32
-MP4FileReader::getNoFramesInChunk(uint32 streamIndex, uint32 pFrameNo)
+MP4FileReader::GetNoFramesInChunk(uint32 streamIndex, uint32 pChunkIndex)
 {
-	// Find Track
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
-	if (aAtomBase) {
-		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
-		uint32 ChunkNo = 1;
+	return GetTrack(streamIndex)->GetNoSamplesInChunk(pChunkIndex);
+}
 
-		uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-
-		uint32 OffsetInChunk;
-		ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
-
-		return aTrakAtom->getNoSamplesInChunk(ChunkNo);
-	}
-	
-	return 0;
+uint32
+MP4FileReader::GetChunkForFrame(uint32 streamIndex, uint32 pFrameNo) {
+	uint32 OffsetInChunk;
+	return GetTrack(streamIndex)->GetChunkForSample(pFrameNo, &OffsetInChunk);	
 }
 
 
 uint64
-MP4FileReader::getOffsetForFrame(uint32 streamIndex, uint32 pFrameNo)
+MP4FileReader::GetOffsetForFrame(uint32 streamIndex, uint32 pFrameNo)
 {
-	// Find Track
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
-	if (aAtomBase) {
-		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
+	TRAKAtom *aTrakAtom = GetTrack(streamIndex);
+	
+	if (pFrameNo < aTrakAtom->FrameCount()) {
+		// Get time for Frame
+		bigtime_t Time = aTrakAtom->GetTimeForFrame(pFrameNo);
+		
+		// Get Sample for Time
+		uint32 SampleNo = aTrakAtom->GetSampleForTime(Time);
+		
+		// Get Chunk For Sample and the offset for the frame within that chunk
+		uint32 OffsetInChunk;
+		uint32 ChunkIndex = aTrakAtom->GetChunkForSample(SampleNo, &OffsetInChunk);
+		// Get Offset For Chunk
+		uint64 OffsetNo = aTrakAtom->GetOffsetForChunk(ChunkIndex);
 
-		if (pFrameNo < aTrakAtom->FrameCount()) {
-			// Get time for Frame
-			bigtime_t Time = aTrakAtom->getTimeForFrame(pFrameNo);
-			
-			// Get Sample for Time
-			uint32 SampleNo = aTrakAtom->getSampleForTime(Time);
-			
-			// Get Chunk For Sample and the offset for the frame within that chunk
-			uint32 OffsetInChunk;
-			uint32 ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
-			// Get Offset For Chunk
-			uint64 OffsetNo = aTrakAtom->getOffsetForChunk(ChunkNo);
-
-			if (ChunkNo != 0) {
-				uint32 SizeForSample;
-				// Adjust the Offset for the Offset in the chunk
-				if (aTrakAtom->IsSingleSampleSize()) {
-					SizeForSample = aTrakAtom->getSizeForSample(SampleNo);
-					OffsetNo = OffsetNo + (OffsetInChunk * SizeForSample);
-				} else {
-					// This is bad news performance wise
-					for (uint32 i=1;i<=OffsetInChunk;i++) {
-						SizeForSample = aTrakAtom->getSizeForSample(SampleNo-i);
-						OffsetNo = OffsetNo + SizeForSample;
-					}
+		if (ChunkIndex != 0) {
+			uint32 SizeForSample;
+			// Adjust the Offset for the Offset in the chunk
+			if (aTrakAtom->IsSingleSampleSize()) {
+				SizeForSample = aTrakAtom->GetSizeForSample(SampleNo);
+				OffsetNo = OffsetNo + (OffsetInChunk * SizeForSample);
+			} else {
+				// This is bad news performance wise
+				for (uint32 i=1;i<=OffsetInChunk;i++) {
+					SizeForSample = aTrakAtom->GetSizeForSample(SampleNo-i);
+					OffsetNo = OffsetNo + SizeForSample;
 				}
 			}
-		
-//			printf("frame %ld, time %Ld, sample %ld, Chunk %ld, OffsetInChunk %ld, Offset %Ld\n",pFrameNo, Time, SampleNo, ChunkNo, OffsetInChunk, OffsetNo);
-
-			return OffsetNo;
 		}
+		
+//		printf("frame %ld, time %Ld, sample %ld, Chunk %ld, OffsetInChunk %ld, Offset %Ld\n",pFrameNo, Time, SampleNo, ChunkNo, OffsetInChunk, OffsetNo);
+
+		return OffsetNo;
 	}
 
 	return 0;
+}
+
+uint64
+MP4FileReader::GetOffsetForChunk(uint32 streamIndex, uint32 pChunkIndex)
+{
+	return GetTrack(streamIndex)->GetOffsetForChunk(pChunkIndex);
 }
 
 
@@ -404,18 +361,18 @@ MP4FileReader::ParseFile()
 {
 	AtomBase *aChild;
 	while (IsEndOfFile() == false) {
-		aChild = getAtom(theStream);
+		aChild = GetAtom(theStream);
 		if (AddChild(aChild)) {
 			aChild->ProcessMetaData();
 		}
 	}
 
+#ifdef DEBUG
 	// Debug info
 	for (uint32 i=0;i<TotalChildren;i++) {
 		atomChildren[i]->DisplayAtoms();
 	}
-	
-	BuildSuperIndex();
+#endif
 	
 	return B_OK;
 }
@@ -424,7 +381,7 @@ MP4FileReader::ParseFile()
 const mp4_main_header*
 MP4FileReader::MovMainHeader()
 {
-	// Fill In theMainHeader
+// Fill In theMainHeader
 //	uint32 micro_sec_per_frame;
 //	uint32 max_bytes_per_sec;
 //	uint32 padding_granularity;
@@ -438,7 +395,7 @@ MP4FileReader::MovMainHeader()
 
 	uint32 videoStream = 0;
 
-	theMainHeader.streams = getStreamCount();
+	theMainHeader.streams = GetStreamCount();
 	theMainHeader.flags = 0;
 	theMainHeader.initial_frames = 0;
 
@@ -458,7 +415,7 @@ MP4FileReader::MovMainHeader()
 	} else {
 		theMainHeader.width = VideoFormat(videoStream)->width;
 		theMainHeader.height = VideoFormat(videoStream)->height;
-		theMainHeader.total_frames = getFrameCount(videoStream);
+		theMainHeader.total_frames = GetFrameCount(videoStream);
 		theMainHeader.suggested_buffer_size = theMainHeader.width * theMainHeader.height * VideoFormat(videoStream)->bit_count / 8;
 		theMainHeader.micro_sec_per_frame = uint32(1000000.0 / VideoFormat(videoStream)->FrameRate);
 	}
@@ -484,7 +441,7 @@ MP4FileReader::AudioFormat(uint32 streamIndex, size_t *size)
 				STSDAtom *aSTSDAtom = dynamic_cast<STSDAtom *>(aAtomBase);
 
 				// Fill in the AudioMetaData structure
-				AudioDescription aAudioDescription = aSTSDAtom->getAsAudio();
+				AudioDescription aAudioDescription = aSTSDAtom->GetAsAudio();
 
 				theAudio.compression = aAudioDescription.codecid;
 				theAudio.codecSubType = aAudioDescription.codecSubType;
@@ -498,7 +455,7 @@ MP4FileReader::AudioFormat(uint32 streamIndex, size_t *size)
 					theAudio.SampleSize = aAudioDescription.theAudioSampleEntry.SampleSize;
 				}
 				
-				theAudio.SampleRate = aAudioDescription.theAudioSampleEntry.SampleRate / 65536;	// Convert from fixed point decimal to float
+				theAudio.SampleRate = aAudioDescription.theAudioSampleEntry.SampleRate;
 				theAudio.FrameSize = aAudioDescription.FrameSize;
 				if (aAudioDescription.BufferSize == 0) {
 					theAudio.BufferSize = uint32((theAudio.SampleSize * theAudio.NoOfChannels * theAudio.FrameSize) / 8);
@@ -531,7 +488,7 @@ MP4FileReader::VideoFormat(uint32 streamIndex)
 			aAtomBase = aTrakAtom->GetChildAtom(uint32('stsd'),0);
 			if (aAtomBase) {
 				STSDAtom *aSTSDAtom = dynamic_cast<STSDAtom *>(aAtomBase);
-				VideoDescription aVideoDescription = aSTSDAtom->getAsVideo();
+				VideoDescription aVideoDescription = aSTSDAtom->GetAsVideo();
 
 				theVideo.compression = aVideoDescription.codecid;
 				theVideo.codecSubType = aVideoDescription.codecSubType;
@@ -553,7 +510,7 @@ MP4FileReader::VideoFormat(uint32 streamIndex)
 				if (aAtomBase) {
 					STTSAtom *aSTTSAtom = dynamic_cast<STTSAtom *>(aAtomBase);
 
-					theVideo.FrameRate = ((aSTTSAtom->getSUMCounts() * 1000000.0) / aTrakAtom->Duration(1));
+					theVideo.FrameRate = ((aSTTSAtom->GetSUMCounts() * 1000000.0) / aTrakAtom->Duration(1));
 
 					return &theVideo;
 				}
@@ -578,13 +535,13 @@ MP4FileReader::StreamFormat(uint32 streamIndex)
 	if (IsVideo(streamIndex)) {
 		theStreamHeader.rate = uint32(1000000.0*VideoFormat(streamIndex)->FrameRate);
 		theStreamHeader.scale = 1000000L;
-		theStreamHeader.length = getFrameCount(streamIndex);
+		theStreamHeader.length = GetFrameCount(streamIndex);
 	}
 
 	if (IsAudio(streamIndex)) {
 		theStreamHeader.rate = uint32(AudioFormat(streamIndex)->SampleRate);
 		theStreamHeader.scale = 1;
-		theStreamHeader.length = getFrameCount(streamIndex);
+		theStreamHeader.length = GetFrameCount(streamIndex);
 		theStreamHeader.sample_size = AudioFormat(streamIndex)->SampleSize;
 		theStreamHeader.suggested_buffer_size =	AudioFormat(streamIndex)->BufferSize;
 	}
@@ -594,50 +551,140 @@ MP4FileReader::StreamFormat(uint32 streamIndex)
 
 
 uint32
-MP4FileReader::getChunkSize(uint32 streamIndex, uint32 pFrameNo)
+MP4FileReader::GetFrameSize(uint32 streamIndex, uint32 pFrameNo)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
-	if (aAtomBase) {
-		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
-
-		if (pFrameNo < aTrakAtom->FrameCount()) {
-			uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-			return aTrakAtom->getSizeForSample(SampleNo);
-		}
+	if (pFrameNo < GetTrack(streamIndex)->FrameCount()) {
+		uint32 SampleNo = GetTrack(streamIndex)->GetSampleForFrame(pFrameNo);
+		return GetTrack(streamIndex)->GetSizeForSample(SampleNo);
 	}
 
 	return 0;
+}
+
+bool
+MP4FileReader::isValidFrame(uint32 streamIndex, uint32 pFrameNo) {
+	return (pFrameNo < GetTrack(streamIndex)->FrameCount());
+}
+
+bool
+MP4FileReader::isValidChunkIndex(uint32 streamIndex, uint32 pChunkIndex) {
+	return (pChunkIndex > 0 && pChunkIndex <= GetTrack(streamIndex)->ChunkCount());
+}
+
+
+uint32
+MP4FileReader::GetChunkSize(uint32 streamIndex, uint32 pChunkIndex)
+{
+	return GetTrack(streamIndex)->GetChunkSize(pChunkIndex);
 }
 
 
 bool
 MP4FileReader::IsKeyFrame(uint32 streamIndex, uint32 pFrameNo)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
-	if (aAtomBase) {
-		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
-
-		return aTrakAtom->IsSyncSample(pFrameNo);
+	if (IsAudio(streamIndex)) {
+		return true;
 	}
+	
+	return GetTrack(streamIndex)->IsSyncSample(pFrameNo);
+}
 
-	return false;
+bigtime_t
+MP4FileReader::GetTimeForFrame(uint32 streamIndex, uint32 pFrameNo) {
+	// Calculate PTS
+	return GetTrack(streamIndex)->GetTimeForFrame(pFrameNo);
+}
+
+
+uint32
+MP4FileReader::GetFrameForTime(uint32 streamIndex, bigtime_t time) {
+	return GetTrack(streamIndex)->GetFrameForTime(time);
+}
+
+
+uint32
+MP4FileReader::GetFrameForSample(uint32 streamIndex, uint32 sample) {
+	if (IsVideo(streamIndex)) {
+		return sample;		// frame = sample for video
+	}
+	
+	if (IsAudio(streamIndex)) {
+		bigtime_t time = bigtime_t((sample * 1000000.0) / GetTrack(streamIndex)->GetSampleRate());
+		return GetTrack(streamIndex)->GetFrameForTime(time);
+	}
+	
+	return 0;
+}
+
+
+uint32
+MP4FileReader::GetSampleForTime(uint32 streamIndex, bigtime_t time) {
+	return GetTrack(streamIndex)->GetSampleForTime(time);
+}
+
+
+uint32
+MP4FileReader::GetTimeForSample(uint32 streamIndex, uint32 sample) {
+	return GetTimeForFrame(streamIndex, GetFrameForSample(streamIndex, sample));
 }
 
 
 bool
-MP4FileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
-	off_t *start, uint32 *size, bool *keyframe)
-{
-	*start = getOffsetForFrame(streamIndex, pFrameNo);
-	*size = getChunkSize(streamIndex, pFrameNo);
+MP4FileReader::GetBufferForChunk(uint32 streamIndex, uint32 pChunkIndex, off_t *start, uint32 *size, bool *keyframe, bigtime_t *time, uint32 *framesInBuffer) {
+	
+	if (isValidChunkIndex(streamIndex, pChunkIndex) == false) {
+		*start = 0;
+		*size = 0;
+		*keyframe = false;
+		*time = 0;
+		*framesInBuffer = 0;
+		return false;
+	}
+
+	*start = GetOffsetForChunk(streamIndex, pChunkIndex);
+	*size = GetChunkSize(streamIndex, pChunkIndex);
+	
+	uint32 frameNo = GetFirstFrameInChunk(streamIndex, pChunkIndex);
+	
+	if ((*start > 0) && (*size > 0)) {
+		*keyframe = IsKeyFrame(streamIndex, frameNo);
+	}
+	
+	*framesInBuffer = GetNoFramesInChunk(streamIndex, pChunkIndex);
+	*time = GetTimeForFrame(streamIndex, frameNo);
+		
+	if (IsEndOfFile(*start + *size) || IsEndOfData(*start + *size)) {
+		return false;
+	}
+	
+	return *start > 0 && *size > 0;
+}
+
+
+bool
+MP4FileReader::GetBufferForFrame(uint32 streamIndex, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe, bigtime_t *time, uint32 *framesInBuffer) {
+	// Get the offset for a given frame and the size of the remaining bytes in the chunk
+	// framesInBuffer is how many frames there are in the buffer.
+
+	if (isValidFrame(streamIndex, pFrameNo) == false) {
+		*start = 0;
+		*size = 0;
+		*keyframe = false;
+		*time = 0;
+		*framesInBuffer = 0;
+		return false;
+	}
+	
+	*start = GetOffsetForFrame(streamIndex, pFrameNo);
+	*size = GetFrameSize(streamIndex, pFrameNo);
 
 	if ((*start > 0) && (*size > 0)) {
 		*keyframe = IsKeyFrame(streamIndex, pFrameNo);
 	}
 
-//	printf("frame %ld start %Ld, size %ld, eof %s, eod %s\n",pFrameNo,*start,*size, IsEndOfFile(*start + *size) ? "true" : "false", IsEndOfData(*start + *size) ? "true" : "false");
-
-	// TODO need a better method for detecting End of Data Note ChunkSize of 0 seems to be it.
+	*framesInBuffer = 1;
+	*time = GetTimeForFrame(streamIndex, pFrameNo);
+	
 	if (IsEndOfFile(*start + *size) || IsEndOfData(*start + *size)) {
 		return false;
 	}
@@ -649,12 +696,12 @@ MP4FileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 bool
 MP4FileReader::IsActive(uint32 streamIndex)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
+	// Don't use helper method streamIndex is likely invalid
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
 	if (aAtomBase) {
-		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
-		return aTrakAtom->IsActive();
+		return dynamic_cast<TRAKAtom *>(aAtomBase)->IsActive();
 	}
-
+	
 	return false;
 }
 
@@ -663,7 +710,7 @@ MP4FileReader::IsActive(uint32 streamIndex)
 bool
 MP4FileReader::IsSupported(BPositionIO *source)
 {
-	AtomBase *aAtom = getAtom(source);
+	AtomBase *aAtom = GetAtom(source);
 	if (aAtom) {
 		if (dynamic_cast<FTYPAtom *>(aAtom)) {
 			aAtom->ProcessMetaData();

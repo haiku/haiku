@@ -7,5 +7,5 @@ StaticLibrary libmp4reader.a :
 	MP4FileReader.cpp
 	MP4Atom.cpp
 	MP4TrakAtom.cpp
-	ChunkSuperIndex.cpp
+	BitParser.cpp
 ;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, David McPaul
+ * Copyright (c) 2010, David McPaul
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -22,43 +22,28 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
-#include "ChunkSuperIndex.h"
- 
-ChunkSuperIndex::ChunkSuperIndex()
-{
-}
+#ifndef _BIT_PARSER_H
+#define _BIT_PARSER_H
 
-ChunkSuperIndex::~ChunkSuperIndex()
-{
-	theChunkIndexArray.erase(theChunkIndexArray.begin(),theChunkIndexArray.end());
-}
+#include <SupportDefs.h>
 
-void	ChunkSuperIndex::AddChunkIndex(uint32 stream, uint32 chunkid, off_t chunk_start)
-{
-	ChunkIndexPtr	aChunkIndexPtr;
-	aChunkIndexPtr = new ChunkIndex;
-	aChunkIndexPtr->stream = stream;
-	aChunkIndexPtr->chunkid = chunkid;
-	aChunkIndexPtr->chunk_start = chunk_start;
-	
-	theChunkIndexArray[chunk_start] = aChunkIndexPtr;
-}
+class BitParser {
+	/*
+		A class to pull out arbitary values from a sequence of bits.
+	*/
+public:
+			BitParser();
+			BitParser(uint8 *bits, uint32 bitLength);
+	virtual	~BitParser();
 
-uint32	ChunkSuperIndex::getChunkSize(uint32 stream, uint32 chunkid, off_t chunk_start)
-{
-	ChunkIndexPtr	aChunkIndexPtr = theChunkIndexArray[chunk_start];
-	
-	if (aChunkIndexPtr) {
-		// Find next chunkIndex
-		ChunkIndexPtr	nextChunkIndex;
-		
-		nextChunkIndex = theChunkIndexArray.upper_bound(chunk_start)->second;
-		
-		// Assert stream
-		// Assert chunkid
-		return (nextChunkIndex->chunk_start - aChunkIndexPtr->chunk_start);
-	}
-	
-	return 0;
-}
+	void	Init(uint8 *bits, uint32 bitLength);
+	uint32	GetValue(uint8 length);
+	void	Skip(uint8 length);
+
+private:
+	uint8* bits;
+	uint32 bitLength;
+	uint8 index;
+};
+
+#endif // _BIT_PARSER_H

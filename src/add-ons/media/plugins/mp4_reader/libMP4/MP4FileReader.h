@@ -31,7 +31,6 @@
 #include <SupportDefs.h>
 
 #include "MP4Parser.h"
-#include "ChunkSuperIndex.h"
 
 // MP4 file reader 
 class MP4FileReader {
@@ -45,7 +44,9 @@ private:
 	AtomBase *GetChildAtom(uint32 patomType, uint32 offset=0);
 	uint32	CountChildAtoms(uint32 patomType);
 	
-	uint32		getMovieTimeScale();
+	TRAKAtom *GetTrack(uint32 streamIndex);
+	
+	uint32		GetMovieTimeScale();
 
 	// Add a atom to the children array (return false on failure)
 	bool	AddChild(AtomBase *pChildAtom);
@@ -56,17 +57,14 @@ private:
 	mp4_main_header theMainHeader;	
 	
 	MVHDAtom	*theMVHDAtom;
-
-	ChunkSuperIndex	theChunkSuperIndex;
+	std::map<uint32, TRAKAtom*, std::less<uint32> > tracks;
 	
-	void	BuildSuperIndex();
-
 public:
 			MP4FileReader(BPositionIO *pStream);
 	virtual	~MP4FileReader();
 
 	// getter for MVHDAtom
-	MVHDAtom	*getMVHDAtom();
+	MVHDAtom	*GetMVHDAtom();
 
 	bool	IsEndOfFile(off_t pPosition);
 	bool	IsEndOfFile();
@@ -76,40 +74,56 @@ public:
 	static bool	IsSupported(BPositionIO *source);
 	
 	// How many tracks in file
-	uint32		getStreamCount();
+	uint32		GetStreamCount();
 	
 	// Duration defined by the movie header
-	bigtime_t	getMovieDuration();
+	bigtime_t	GetMovieDuration();
 	
 	// The first video track duration indexed by streamIndex
-	bigtime_t	getVideoDuration(uint32 streamIndex);
+	bigtime_t	GetVideoDuration(uint32 streamIndex);
 	// the first audio track duration indexed by streamIndex
-	bigtime_t	getAudioDuration(uint32 streamIndex);
+	bigtime_t	GetAudioDuration(uint32 streamIndex);
 	// the max of all active audio or video durations
-	bigtime_t	getMaxDuration();
+	bigtime_t	GetMaxDuration();
 
 	// The no of frames in the video track indexed by streamIndex
-	uint32		getFrameCount(uint32 streamIndex);
+	uint32		GetFrameCount(uint32 streamIndex);
 	// The no of chunks in the audio track indexed by streamIndex
-	uint32		getAudioChunkCount(uint32 streamIndex);
+	uint32		GetAudioChunkCount(uint32 streamIndex);
 	// Is stream (track) a video track
 	bool		IsVideo(uint32 streamIndex);
 	// Is stream (track) a audio track
 	bool		IsAudio(uint32 streamIndex);
 
-	uint32	getNoFramesInChunk(uint32 streamIndex, uint32 pFrameNo);
-	uint32	getFirstFrameInChunk(uint32 streamIndex, uint32 pChunkID);
+	// Frame functions
+	uint64	GetOffsetForFrame(uint32 streamIndex, uint32 pFrameNo);
+	uint32	GetChunkForFrame(uint32 streamIndex, uint32 pFrameNo);
+	uint32	GetFrameSize(uint32 streamIndex, uint32 pFrameNo);
 
-	uint64	getOffsetForFrame(uint32 streamIndex, uint32 pFrameNo);
-	uint32	getChunkSize(uint32 streamIndex, uint32 pFrameNo);
+	// Chunk functions
+	uint64	GetOffsetForChunk(uint32 streamIndex, uint32 pChunkIndex);
+	uint32	GetFirstFrameInChunk(uint32 streamIndex, uint32 pChunkIndex);
+	uint32	GetChunkSize(uint32 streamIndex, uint32 pChunkIndex);
+	uint32	GetNoFramesInChunk(uint32 streamIndex, uint32 pChunkIndex);
+	
+	bool	isValidChunkIndex(uint32 streamIndex, uint32 pChunkIndex);
+	bool	isValidFrame(uint32 streamIndex, uint32 pFrameNo);
 	bool	IsKeyFrame(uint32 streamIndex, uint32 pFrameNo);
 
+	bigtime_t GetTimeForFrame(uint32 streamIndex, uint32 pFrameNo);
+	uint32	GetFrameForTime(uint32 streamIndex, bigtime_t time);
+	uint32	GetFrameForSample(uint32 streamIndex, uint32 sample);
+
+	uint32	GetSampleForTime(uint32 streamIndex, bigtime_t time);
+	uint32	GetTimeForSample(uint32 streamIndex, uint32 sample);
+	
 	status_t	ParseFile();
 	BPositionIO *Source() {return theStream;};
 
 	bool	IsActive(uint32 streamIndex);
 
-	bool	GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe);
+	bool	GetBufferForChunk(uint32 streamIndex, uint32 pChunkIndex, off_t *start, uint32 *size, bool *keyframe, bigtime_t *time, uint32 *framesInBuffer);
+	bool	GetBufferForFrame(uint32 streamIndex, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe, bigtime_t *time, uint32 *framesInBuffer);
 	
 	// Return all Audio Meta Data
 	const 	AudioMetaData 		*AudioFormat(uint32 streamIndex, size_t *size = 0);

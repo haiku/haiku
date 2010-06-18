@@ -28,9 +28,9 @@ TRAKAtom::TRAKAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, 
 {
 	theTKHDAtom = NULL;
 	theMDHDAtom = NULL;
-	framecount = 0;
-	bytespersample = 0;
-	timescale = 1;
+	frameCount = 0;
+	bytesPerSample = 0;
+	timeScale = 1;
 }
 
 TRAKAtom::~TRAKAtom()
@@ -46,7 +46,7 @@ char *TRAKAtom::OnGetAtomName()
 	return "MPEG-4 Track Atom";
 }
 
-TKHDAtom	*TRAKAtom::getTKHDAtom()
+TKHDAtom	*TRAKAtom::GetTKHDAtom()
 {
 	if (theTKHDAtom) {
 		return theTKHDAtom;
@@ -59,7 +59,7 @@ TKHDAtom	*TRAKAtom::getTKHDAtom()
 	return theTKHDAtom;
 }
 
-MDHDAtom	*TRAKAtom::getMDHDAtom()
+MDHDAtom	*TRAKAtom::GetMDHDAtom()
 {
 	if (theMDHDAtom) {
 		return theMDHDAtom;
@@ -76,21 +76,21 @@ MDHDAtom	*TRAKAtom::getMDHDAtom()
 bigtime_t	TRAKAtom::Duration(uint32 TimeScale)
 {
 	if (IsAudio() || IsVideo()) {
-		return getMDHDAtom()->getDuration();
+		return GetMDHDAtom()->GetDuration();
 	}
 	
-	return bigtime_t(getTKHDAtom()->getDuration() * 1000000.0) / TimeScale;
+	return bigtime_t(GetTKHDAtom()->GetDuration() * 1000000.0) / TimeScale;
 }
 
 void TRAKAtom::OnChildProcessingComplete()
 {
-	timescale = getMDHDAtom()->getTimeScale();
+	timeScale = GetMDHDAtom()->GetTimeScale();
 
 	STTSAtom *aSTTSAtom = dynamic_cast<STTSAtom *>(GetChildAtom(uint32('stts'),0));
 
 	if (aSTTSAtom) {
-		framecount = aSTTSAtom->getSUMCounts();
-		aSTTSAtom->setFrameRate(getFrameRate());
+		frameCount = aSTTSAtom->GetSUMCounts();
+		aSTTSAtom->SetFrameRate(GetFrameRate());
 	}
 
 }
@@ -110,24 +110,24 @@ bool TRAKAtom::IsAudio()
 }
 
 // frames per us
-float	TRAKAtom::getFrameRate() 
+float	TRAKAtom::GetFrameRate() 
 {
 	if (IsAudio()) {
 		AtomBase *aAtomBase = GetChildAtom(uint32('stsd'),0);
 		if (aAtomBase) {
 			STSDAtom *aSTSDAtom = dynamic_cast<STSDAtom *>(aAtomBase);
 
-			AudioDescription aAudioDescription = aSTSDAtom->getAsAudio();
-			return (aAudioDescription.theAudioSampleEntry.SampleRate / 65536.0) / aAudioDescription.FrameSize;
+			AudioDescription aAudioDescription = aSTSDAtom->GetAsAudio();
+			return (aAudioDescription.theAudioSampleEntry.SampleRate) / aAudioDescription.FrameSize;
 		}
 	} else if (IsVideo()) {
-		return (framecount * 1000000.0) / Duration();
+		return (frameCount * 1000000.0) / Duration();
 	}
 	
 	return 0.0;
 }
 
-float	TRAKAtom::getSampleRate() 
+float	TRAKAtom::GetSampleRate() 
 {
 	// Only valid for Audio
 	if (IsAudio()) {
@@ -135,91 +135,109 @@ float	TRAKAtom::getSampleRate()
 		if (aAtomBase) {
 			STSDAtom *aSTSDAtom = dynamic_cast<STSDAtom *>(aAtomBase);
 
-			AudioDescription aAudioDescription = aSTSDAtom->getAsAudio();
-			return aAudioDescription.theAudioSampleEntry.SampleRate / 65536;
+			AudioDescription aAudioDescription = aSTSDAtom->GetAsAudio();
+			return aAudioDescription.theAudioSampleEntry.SampleRate;
 		}
 	}
 	
 	return 0.0;
 }
 
-bigtime_t	TRAKAtom::getTimeForFrame(uint32 pFrame)
-{
-	return bigtime_t((pFrame * 1000000.0) / getFrameRate());
+uint32
+TRAKAtom::GetFrameForTime(bigtime_t time) {
+	// time / duration * frameCount?
+	//return uint32(time * GetFrameRate() / 1000000LL);
+	return time * frameCount / Duration();
 }
 
-uint32	TRAKAtom::getSampleForTime(bigtime_t pTime)
+bigtime_t	TRAKAtom::GetTimeForFrame(uint32 pFrame)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('stts'),0);
-	
-	if (aAtomBase) {
-		return (dynamic_cast<STTSAtom *>(aAtomBase))->getSampleForTime(pTime);
-	}
-	
-	return 0;
+	return bigtime_t((pFrame * 1000000LL) / GetFrameRate());
 }
 
-uint32	TRAKAtom::getSampleForFrame(uint32 pFrame)
+uint32	TRAKAtom::GetSampleForTime(bigtime_t pTime)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stts'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STTSAtom *>(aAtomBase))->getSampleForTime(getTimeForFrame(pFrame));
+		return (dynamic_cast<STTSAtom *>(aAtomBase))->GetSampleForTime(pTime);
 	}
 	
 	return 0;
 }
 
-uint32	TRAKAtom::getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
+uint32	TRAKAtom::GetSampleForFrame(uint32 pFrame)
+{
+	AtomBase *aAtomBase = GetChildAtom(uint32('stts'),0);
+	
+	if (aAtomBase) {
+		return (dynamic_cast<STTSAtom *>(aAtomBase))->GetSampleForTime(GetTimeForFrame(pFrame));
+	}
+	
+	return 0;
+}
+
+uint32	TRAKAtom::GetChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stsc'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STSCAtom *>(aAtomBase))->getChunkForSample(pSample, pOffsetInChunk);
+		return (dynamic_cast<STSCAtom *>(aAtomBase))->GetChunkForSample(pSample, pOffsetInChunk);
 	}
 	
 	return 0;
 }
 
-uint32	TRAKAtom::getNoSamplesInChunk(uint32 pChunkID)
+uint32	TRAKAtom::GetNoSamplesInChunk(uint32 pChunkIndex)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stsc'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STSCAtom *>(aAtomBase))->getNoSamplesInChunk(pChunkID);
+		return (dynamic_cast<STSCAtom *>(aAtomBase))->GetNoSamplesInChunk(pChunkIndex);
 	}
 	
 	return 0;
 }
 
-uint32	TRAKAtom::getSizeForSample(uint32 pSample)
+uint32	TRAKAtom::GetSizeForSample(uint32 pSample)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stsz'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STSZAtom *>(aAtomBase))->getSizeForSample(pSample);
+		return (dynamic_cast<STSZAtom *>(aAtomBase))->GetSizeForSample(pSample);
 	}
 	
 	return 0;
 }
 
-uint64	TRAKAtom::getOffsetForChunk(uint32 pChunkID)
+uint64	TRAKAtom::GetOffsetForChunk(uint32 pChunkIndex)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stco'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STCOAtom *>(aAtomBase))->getOffsetForChunk(pChunkID);
+		return (dynamic_cast<STCOAtom *>(aAtomBase))->GetOffsetForChunk(pChunkIndex);
 	}
 	
 	return 0;
 }
 
-uint32	TRAKAtom::getFirstSampleInChunk(uint32 pChunkID)
+uint32 TRAKAtom::ChunkCount() {
+	AtomBase *aAtomBase = GetChildAtom(uint32('stco'),0);
+	
+	if (aAtomBase) {
+		return (dynamic_cast<STCOAtom *>(aAtomBase))->GetTotalChunks();
+	}
+	
+	return 0;
+}
+
+
+uint32	TRAKAtom::GetFirstSampleInChunk(uint32 pChunkIndex)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stsc'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STSCAtom *>(aAtomBase))->getFirstSampleInChunk(pChunkID);
+		return (dynamic_cast<STSCAtom *>(aAtomBase))->GetFirstSampleInChunk(pChunkIndex);
 	}
 	
 	return 0;
@@ -250,15 +268,15 @@ bool	TRAKAtom::IsSingleSampleSize()
 
 bool	TRAKAtom::IsActive()
 {
-	return getTKHDAtom()->IsActive();
+	return GetTKHDAtom()->IsActive();
 }
 
-uint32	TRAKAtom::getBytesPerSample()
+uint32	TRAKAtom::GetBytesPerSample()
 {
 AtomBase *aAtomBase;
 
-	if (bytespersample > 0) {
-		return bytespersample;
+	if (bytesPerSample > 0) {
+		return bytesPerSample;
 	}
 	
 	// calculate bytes per sample and cache it
@@ -269,21 +287,44 @@ AtomBase *aAtomBase;
 		if (aAtomBase) {
 			STSDAtom *aSTSDAtom = dynamic_cast<STSDAtom *>(aAtomBase);
 
-			AudioDescription aAudioDescription = aSTSDAtom->getAsAudio();
+			AudioDescription aAudioDescription = aSTSDAtom->GetAsAudio();
 
-			bytespersample = aAudioDescription.theAudioSampleEntry.SampleSize / 8;
+			bytesPerSample = aAudioDescription.theAudioSampleEntry.SampleSize / 8;
 		}
 	}
 	
-	return bytespersample;	
+	return bytesPerSample;	
 }
 
-uint32	TRAKAtom::getTotalChunks()
+uint32
+TRAKAtom::GetChunkSize(uint32 pChunkIndex)
+{
+	uint32 totalSamples = GetNoSamplesInChunk(pChunkIndex);
+	
+	if (IsSingleSampleSize()) {
+		return totalSamples * GetBytesPerSample();
+	} else {
+		uint32 SampleNo = GetFirstSampleInChunk(pChunkIndex);
+		uint32 ChunkSize = 0;
+		
+		if (SampleNo >= 0) {
+			while (totalSamples-- > 0) {
+				ChunkSize += GetSizeForSample(SampleNo++);
+			}
+		}
+		
+		return ChunkSize;
+	}
+	
+	return 0;
+}
+
+uint32	TRAKAtom::GetTotalChunks()
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('stco'),0);
 	
 	if (aAtomBase) {
-		return (dynamic_cast<STCOAtom *>(aAtomBase))->getTotalChunks();
+		return (dynamic_cast<STCOAtom *>(aAtomBase))->GetTotalChunks();
 	}
 	
 	return 0;

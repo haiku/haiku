@@ -89,32 +89,32 @@ public:
 	virtual bool IsContainer() {return false;};
 
 	virtual BPositionIO *OnGetStream();
-	BPositionIO *getStream();
+	BPositionIO *GetStream();
 
 	bool IsExtended() {return false;};
-	bool IsEndOfAtom() {return (getStream()->Position() >= off_t(streamOffset + atomSize));};
+	bool IsEndOfAtom() {return (GetStream()->Position() >= off_t(streamOffset + atomSize));};
 	
 	// Is this a known atom type
 	bool IsKnown();
 	
 	virtual void	DisplayAtoms(uint32 pindent);
 	
-	uint64	getAtomSize() {return atomSize;};
-	uint32	getAtomType() {return atomType;};
-	char	*getAtomTypeAsFourcc();
-	off_t	getAtomOffset() { return atomOffset; };
-	off_t	getStreamOffset() { return streamOffset; };
+	uint64	GetAtomSize() {return atomSize;};
+	uint32	GetAtomType() {return atomType;};
+	char	*GetAtomTypeAsFourcc();
+	off_t	GetAtomOffset() { return atomOffset; };
+	off_t	GetStreamOffset() { return streamOffset; };
 	
-	uint64	getDataSize() { return atomSize - 8;};
+	uint64	GetDataSize() { return atomSize - 8;};
 	
-	uint64	getBytesRemaining();
+	uint64	GetBytesRemaining();
 	
 	bool	IsType(uint32 patomType) { return patomType == atomType; };
 	
-	void	setAtomOffset(off_t patomOffset) { atomOffset = patomOffset; };
-	void	setStreamOffset(off_t pstreamOffset) { streamOffset = pstreamOffset; };
+	void	SetAtomOffset(off_t patomOffset) { atomOffset = patomOffset; };
+	void	SetStreamOffset(off_t pstreamOffset) { streamOffset = pstreamOffset; };
 	
-	char 	*getAtomName();
+	char 	*GetAtomName();
 	
 	virtual char	*OnGetAtomName();
 	
@@ -133,8 +133,8 @@ public:
 	// Many atoms use an array header
 	void	ReadArrayHeader(array_header *pHeader);
 	
-	void	setParent(AtomBase *pParent) {parentAtom = pParent;};
-	AtomBase *getParent() { return parentAtom;};
+	void	SetParent(AtomBase *pParent) {parentAtom = pParent;};
+	AtomBase *GetParent() { return parentAtom;};
 
 	void	Read(uint64	*value);
 	void	Read(uint32	*value);
@@ -154,10 +154,10 @@ public:
 	virtual	~FullAtom();
 
 	virtual void	OnProcessMetaData();
-	uint8	getVersion() {return Version;};
-	uint8	getFlags1()	{return Flags1;};
-	uint8	getFlags2()	{return Flags2;};
-	uint8	getFlags3()	{return Flags3;};
+	uint8	GetVersion() {return Version;};
+	uint8	GetFlags1()	{return Flags1;};
+	uint8	GetFlags2()	{return Flags2;};
+	uint8	GetFlags3()	{return Flags3;};
 	
 private:
 	uint8	Version;
@@ -202,6 +202,6 @@ public:
 	virtual void	OnChildProcessingComplete() {};
 };
 
-extern AtomBase *getAtom(BPositionIO *pStream);
+extern AtomBase *GetAtom(BPositionIO *pStream);
 
 #endif // _MP4_ATOM_H

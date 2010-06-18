@@ -40,23 +40,23 @@ typedef std::map<uint32, CompTimeToSamplePtr, std::less<uint32> > CompTimeToSamp
 typedef TimeToSample* TimeToSamplePtr;
 typedef std::map<uint32, TimeToSamplePtr, std::less<uint32> > TimeToSampleArray;
 typedef SampleToChunk* SampleToChunkPtr;
-typedef std::map<uint32, SampleToChunkPtr, std::less<uint32> > SampleToChunkArray;
+typedef std::vector<SampleToChunkPtr> SampleToChunkArray;
 typedef ChunkToOffset* ChunkToOffsetPtr;
 typedef std::map<uint32, ChunkToOffsetPtr, std::less<uint32> > ChunkToOffsetArray;
 typedef SyncSample* SyncSamplePtr;
-typedef std::map<uint32, SyncSamplePtr, std::less<uint32> > SyncSampleArray;
+typedef std::vector<SyncSamplePtr> SyncSampleArray;
 typedef SampleSizeEntry* SampleSizePtr;
-typedef std::map<uint32, SampleSizePtr, std::less<uint32> > SampleSizeArray;
+typedef std::vector<SampleSizePtr> SampleSizeArray;
 
 // Atom class for reading the movie header atom
 class MVHDAtom : public FullAtom {
 public:
-			MVHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			MVHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~MVHDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
-	uint32	getTimeScale() {return theHeader.TimeScale;};
-	uint32	getDuration() {return theHeader.Duration;};
+	uint32	GetTimeScale() {return theHeader.TimeScale;};
+	uint32	GetDuration() {return theHeader.Duration;};
 private:
 	mvhdV1	theHeader;
 };
@@ -64,12 +64,12 @@ private:
 // Atom class for reading the moov atom
 class MOOVAtom : public AtomContainer {
 public:
-			MOOVAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			MOOVAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~MOOVAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	MVHDAtom	*getMVHDAtom();
+	MVHDAtom	*GetMVHDAtom();
 private:
 	MVHDAtom	*theMVHDAtom;
 };
@@ -77,7 +77,7 @@ private:
 // Atom class for reading the cmov atom
 class CMOVAtom : public AtomContainer {
 public:
-			CMOVAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			CMOVAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~CMOVAtom();
 
 	BPositionIO *OnGetStream();
@@ -92,11 +92,11 @@ private:
 // Atom class for reading the dcom atom
 class DCOMAtom : public AtomBase {
 public:
-			DCOMAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			DCOMAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~DCOMAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
-	uint32	getCompressionID() {return compressionID;};
+	uint32	GetCompressionID() {return compressionID;};
 private:
 	uint32	compressionID;
 };
@@ -104,13 +104,13 @@ private:
 // Atom class for reading the cmvd atom
 class CMVDAtom : public AtomBase {
 public:
-			CMVDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			CMVDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~CMVDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
-	uint32	getUncompressedSize() {return UncompressedSize;};
-	uint8	*getCompressedData() {return Buffer;};
-	uint32	getBufferSize() {return BufferSize;};
+	uint32	GetUncompressedSize() {return UncompressedSize;};
+	uint8	*GetCompressedData() {return Buffer;};
+	uint32	GetBufferSize() {return BufferSize;};
 private:
 	uint32	UncompressedSize;
 	uint32	BufferSize;
@@ -120,7 +120,7 @@ private:
 // Atom class for reading the ftyp atom
 class FTYPAtom : public AtomBase {
 public:
-			FTYPAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			FTYPAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~FTYPAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -136,7 +136,7 @@ private:
 // Atom class for reading the wide atom
 class WIDEAtom : public AtomBase {
 public:
-			WIDEAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			WIDEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~WIDEAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -146,7 +146,7 @@ public:
 // Atom class for reading the free atom
 class FREEAtom : public AtomBase {
 public:
-			FREEAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			FREEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~FREEAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -156,7 +156,7 @@ public:
 // Atom class for reading the preview atom
 class PNOTAtom : public AtomBase {
 public:
-			PNOTAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			PNOTAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~PNOTAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -166,16 +166,16 @@ public:
 // Atom class for reading the time to sample atom
 class STTSAtom : public FullAtom {
 public:
-			STTSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STTSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STTSAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint64	getSUMCounts() { return SUMCounts; };
-	bigtime_t	getSUMDurations() { return SUMDurations; };
-	uint32	getSampleForTime(bigtime_t pTime);
-	uint32	getSampleForFrame(uint32 pFrame);
-	void	setFrameRate(float pFrameRate) { FrameRate = pFrameRate; };
+	uint64	GetSUMCounts() { return SUMCounts; };
+	bigtime_t	GetSUMDurations() { return SUMDurations; };
+	uint32	GetSampleForTime(bigtime_t pTime);
+	uint32	GetSampleForFrame(uint32 pFrame);
+	void	SetFrameRate(float pFrameRate) { FrameRate = pFrameRate; };
 	
 private:
 	array_header		theHeader;
@@ -188,7 +188,7 @@ private:
 // Atom class for reading the composition time to sample atom
 class CTTSAtom : public FullAtom {
 public:
-			CTTSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			CTTSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~CTTSAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -201,14 +201,14 @@ private:
 // Atom class for reading the sample to chunk atom
 class STSCAtom : public FullAtom {
 public:
-			STSCAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STSCAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STSCAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint32	getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk);
-	uint32	getFirstSampleInChunk(uint32 pChunkID);
-	uint32	getNoSamplesInChunk(uint32 pChunkID);
+	uint32	GetChunkForSample(uint32 pSample, uint32 *pOffsetInChunk);
+	uint32	GetFirstSampleInChunk(uint32 pChunkIndex);
+	uint32	GetNoSamplesInChunk(uint32 pChunkIndex);
 private:
 	array_header		theHeader;
 	SampleToChunkArray	theSampleToChunkArray;
@@ -217,13 +217,13 @@ private:
 // Atom class for reading the chunk to offset atom
 class STCOAtom : public FullAtom {
 public:
-			STCOAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STCOAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STCOAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint64	getOffsetForChunk(uint32 pChunkID);
-	uint32	getTotalChunks() {return theHeader.NoEntries;};
+	uint64	GetOffsetForChunk(uint32 pChunkIndex);
+	uint32	GetTotalChunks() {return theHeader.NoEntries;};
 
 protected:
 	// Read a single chunk offset from Stream
@@ -237,7 +237,7 @@ private:
 // Atom class for reading the sync sample atom
 class STSSAtom : public FullAtom {
 public:
-			STSSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STSSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STSSAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -251,12 +251,12 @@ private:
 // Atom class for reading the sample size atom
 class STSZAtom : public FullAtom {
 public:
-			STSZAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STSZAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STSZAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint32	getSizeForSample(uint32 pSampleNo);
+	uint32	GetSizeForSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();	
 private:
 	uint32	SampleSize;
@@ -268,12 +268,12 @@ private:
 // Atom class for reading the sample size 2 atom
 class STZ2Atom : public FullAtom {
 public:
-			STZ2Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STZ2Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STZ2Atom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint32	getSizeForSample(uint32 pSampleNo);
+	uint32	GetSizeForSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();	
 private:
 	uint32	SampleSize;
@@ -286,7 +286,7 @@ private:
 // Atom class for reading the skip atom
 class SKIPAtom : public AtomBase {
 public:
-			SKIPAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			SKIPAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~SKIPAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -296,18 +296,18 @@ public:
 // Atom class for reading the media data atom
 class MDATAtom : public AtomBase {
 public:
-			MDATAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			MDATAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~MDATAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
-	off_t	getEOF();
+	off_t	GetEOF();
 };
 
 // Subclass for handling special decoder config atoms like ESDS, ALAC, AVCC, AMR
 // ESDS is actually a FullAtom but others are not :-(
 class DecoderConfigAtom : public AtomBase {
 public:
-			DecoderConfigAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			DecoderConfigAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~DecoderConfigAtom();
 	virtual	void	OnProcessMetaData();
 	virtual	char	*OnGetAtomName();
@@ -321,8 +321,8 @@ public:
 	virtual void	OnOverrideVideoDescription(VideoDescription *pVideoDescription) {} ;
 	bool 			SkipTag(uint8 *ESDS, uint8 Tag, uint32 *offset);
 	
-	uint8	*getDecoderConfig();
-	size_t	getDecoderConfigSize() { return DecoderConfigSize; } ;
+	uint8	*GetDecoderConfig();
+	size_t	GetDecoderConfigSize() { return DecoderConfigSize; } ;
 private:
 	uint8	*theDecoderConfig;
 	size_t	DecoderConfigSize;
@@ -331,7 +331,7 @@ private:
 // Atom class for reading the ESDS decoder config atom
 class ESDSAtom : public DecoderConfigAtom {
 public:
-			ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			ESDSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~ESDSAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -349,7 +349,7 @@ private:
 // Atom class for reading the ALAC decoder config atom
 class ALACAtom : public DecoderConfigAtom {
 public:
-			ALACAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			ALACAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~ALACAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -360,7 +360,7 @@ public:
 // Atom class for reading the WAVE atom for mp3 decoder config
 class WAVEAtom : public DecoderConfigAtom {
 public:
-			WAVEAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			WAVEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~WAVEAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -371,16 +371,16 @@ public:
 // Atom class for reading the Sample Description atom
 class STSDAtom : public FullAtom {
 public:
-			STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STSDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STSDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	VideoDescription getAsVideo();
-	AudioDescription getAsAudio();
+	VideoDescription GetAsVideo();
+	AudioDescription GetAsAudio();
 	
 private:
-	uint32	getMediaHandlerType();
+	uint32	GetMediaHandlerType();
 
 	void	ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigSize, AudioDescription *pAudioDescription, VideoDescription *pVideoDescription);
 	void	ReadSoundDescription();
@@ -398,12 +398,12 @@ private:
 // Atom class for reading the track header atom
 class TKHDAtom : public FullAtom {
 public:
-			TKHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			TKHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~TKHDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 
-	uint32	getDuration() {return theHeader.Duration;};		// duration is in the scale of the media
+	uint32	GetDuration() {return theHeader.Duration;};		// duration is in the scale of the media
 	
 	// Flags3 should contain the following
 	// 0x001 Track enabled
@@ -411,7 +411,7 @@ public:
 	// 0x004 Track in Preview
 	// 0x008 Track in Poster
 	
-	bool	IsActive() {return ((getFlags3() && 0x01) || (getFlags3() && 0x0f));};
+	bool	IsActive() {return ((GetFlags3() && 0x01) || (GetFlags3() && 0x0f));};
 	
 private:
 	tkhdV1	theHeader;
@@ -421,14 +421,14 @@ private:
 // Atom class for reading the media header atom
 class MDHDAtom : public FullAtom {
 public:
-			MDHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			MDHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~MDHDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 
 	// return duration in ms
-	bigtime_t	getDuration();
-	uint32		getTimeScale();
+	bigtime_t	GetDuration();
+	uint32		GetTimeScale();
 	
 private:
 	mdhdV1	theHeader;
@@ -438,7 +438,7 @@ private:
 // Atom class for reading the video media header atom
 class VMHDAtom : public FullAtom {
 public:
-			VMHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			VMHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~VMHDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -451,7 +451,7 @@ private:
 // Atom class for reading the sound media header atom
 class SMHDAtom : public FullAtom {
 public:
-			SMHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			SMHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~SMHDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -462,87 +462,90 @@ private:
 // Atom class for reading the track atom
 class TRAKAtom : public AtomContainer {
 public:
-			TRAKAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			TRAKAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~TRAKAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	void	OnChildProcessingComplete();
 
 	bigtime_t	Duration(uint32 TimeScale);	// Return duration of track
-	bigtime_t	Duration() { return Duration(timescale); }
-	uint32		FrameCount() { return framecount; };
+	bigtime_t	Duration() { return Duration(timeScale); }
+	uint32		FrameCount() { return frameCount; };
 	bool		IsVideo();	// Is this a video track
 	bool		IsAudio();	// Is this a audio track
-	// GetAudioMetaData()	// If this is a audio track get the audio meta data
-	// GetVideoMetaData()	// If this is a video track get the video meta data	
+	// GetAudioMetaData()	// If this is a audio track Get the audio meta data
+	// GetVideoMetaData()	// If this is a video track Get the video meta data	
 	
-	bigtime_t	getTimeForFrame(uint32 pFrame);
-	uint32	getSampleForTime(bigtime_t pTime);
-	uint32	getSampleForFrame(uint32 pFrame);
-	uint32	getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk);
-	uint64	getOffsetForChunk(uint32 pChunkID);
-	uint32	getFirstSampleInChunk(uint32 pChunkID);
-	uint32	getSizeForSample(uint32 pSample);
-	uint32	getNoSamplesInChunk(uint32 pChunkID);
-	uint32	getTotalChunks();
+	bigtime_t	GetTimeForFrame(uint32 pFrame);
+	uint32	GetFrameForTime(bigtime_t time);
+	uint32	GetSampleForTime(bigtime_t pTime);
+	uint32	GetSampleForFrame(uint32 pFrame);
+	uint32	GetChunkForSample(uint32 pSample, uint32 *pOffsetInChunk);
+	uint64	GetOffsetForChunk(uint32 pChunkIndex);
+	uint32	GetFirstSampleInChunk(uint32 pChunkIndex);
+	uint32	GetSizeForSample(uint32 pSample);
+	uint32	GetNoSamplesInChunk(uint32 pChunkIndex);
+	uint32	GetTotalChunks();
+	uint32	GetChunkSize(uint32 pChunkIndex);
+	uint32	ChunkCount();
 	
-	float	getSampleRate();
-	float	getFrameRate();
+	float	GetSampleRate();
+	float	GetFrameRate();
 	
 	bool	IsSyncSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();
 	bool	IsActive();
 	
-	uint32	getBytesPerSample();
+	uint32	GetBytesPerSample();
 
-	TKHDAtom	*getTKHDAtom();
-	MDHDAtom	*getMDHDAtom();
+	TKHDAtom	*GetTKHDAtom();
+	MDHDAtom	*GetMDHDAtom();
 private:
 	TKHDAtom	*theTKHDAtom;
 	MDHDAtom	*theMDHDAtom;
 	
-	uint32		framecount;
-	uint32		bytespersample;
-	uint32		timescale;
+	uint32		frameCount;
+	uint32		bytesPerSample;
+	uint32		timeScale;
 };
 
 // Atom class for reading the media container atom
 class MDIAAtom : public AtomContainer {
 public:
-			MDIAAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			MDIAAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~MDIAAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 
-	uint32	getMediaHandlerType();
+	uint32	GetMediaHandlerType();
 };
 
 // Atom class for reading the media information atom
 class MINFAtom : public AtomContainer {
 public:
-			MINFAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			MINFAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~MINFAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint32	getMediaHandlerType();
+	uint32	GetMediaHandlerType();
 };
 
 // Atom class for reading the stbl atom
 class STBLAtom : public AtomContainer {
 public:
-			STBLAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			STBLAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~STBLAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint32	getMediaHandlerType();
+	uint32	GetMediaHandlerType();
 };
 
 // Atom class for reading the dinf atom
 class DINFAtom : public AtomContainer {
 public:
-			DINFAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			DINFAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~DINFAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -551,7 +554,7 @@ public:
 // Atom class for reading the tmcd atom
 class TMCDAtom : public AtomBase {
 public:
-			TMCDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			TMCDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~TMCDAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -561,7 +564,7 @@ public:
 // Atom class for reading the dac3 atom
 class DAC3Atom : public DecoderConfigAtom {
 public:
-			DAC3Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			DAC3Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~DAC3Atom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -572,7 +575,7 @@ public:
 // Atom class for reading the dec3 atom
 class DEC3Atom : public DecoderConfigAtom {
 public:
-			DEC3Atom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			DEC3Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~DEC3Atom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
@@ -583,14 +586,14 @@ public:
 // Atom class for reading the Media Handler atom
 class HDLRAtom : public FullAtom {
 public:
-			HDLRAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+			HDLRAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize);
 	virtual	~HDLRAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 
 	bool	IsVideoHandler();
 	bool	IsAudioHandler();
-	uint32	getMediaHandlerType();
+	uint32	GetMediaHandlerType();
 
 private:
 	hdlr	theHeader;

@@ -41,7 +41,7 @@ AtomBase::~AtomBase()
 	parentAtom = NULL;
 }
 
-char	*AtomBase::getAtomTypeAsFourcc()
+char	*AtomBase::GetAtomTypeAsFourcc()
 {
 	fourcc[0] = (char)((atomType >> 24) & 0xff);
 	fourcc[1] = (char)((atomType >> 16) & 0xff);
@@ -52,7 +52,7 @@ char	*AtomBase::getAtomTypeAsFourcc()
 	return fourcc;
 }
 
-char *AtomBase::getAtomName()
+char *AtomBase::GetAtomName()
 {
 	char *_result;
 	_result = OnGetAtomName();
@@ -80,7 +80,7 @@ void AtomBase::ProcessMetaData()
 //				- Calls ProcessMetaData on each child atom
 //				(ensures stream is correct for child via offset)
 {
-	setAtomOffset(getStream()->Position());
+	SetAtomOffset(GetStream()->Position());
 	
 	OnProcessMetaData();
 
@@ -96,16 +96,16 @@ bool AtomBase::MoveToEnd()
 {
 	off_t NewPosition = streamOffset + atomSize;
 
-	if (getStream()->Position() != NewPosition) {
-		return (getStream()->Seek(NewPosition,0) > 0);
+	if (GetStream()->Position() != NewPosition) {
+		return (GetStream()->Seek(NewPosition,0) > 0);
 	}
 	return true;
 }
 
-uint64	AtomBase::getBytesRemaining()
+uint64	AtomBase::GetBytesRemaining()
 {
 	off_t EndPosition = streamOffset + atomSize;
-	off_t CurrPosition = getStream()->Position();
+	off_t CurrPosition = GetStream()->Position();
 	
 	if (CurrPosition > EndPosition) {
 		printf("ERROR: Read past atom boundary by %Ld bytes\n",CurrPosition - EndPosition);
@@ -124,7 +124,7 @@ void	AtomBase::DisplayAtoms()
 void	AtomBase::DisplayAtoms(uint32 pindent)
 {
 	Indent(pindent);
-	printf("(%s)\n",getAtomName());
+	printf("(%s)\n",GetAtomName());
 }
 
 void	AtomBase::Indent(uint32 pindent)
@@ -150,7 +150,7 @@ BPositionIO *AtomBase::OnGetStream()
 	return theStream;
 }
 
-BPositionIO *AtomBase::getStream()
+BPositionIO *AtomBase::GetStream()
 {
 	return OnGetStream();
 }
@@ -159,7 +159,7 @@ void	AtomBase::Read(uint64	*value)
 {
 	uint32	bytes_read;
 	
-	bytes_read = getStream()->Read(value,sizeof(uint64));
+	bytes_read = GetStream()->Read(value,sizeof(uint64));
 	
 	// Assert((bytes_read == sizeof(uint64),"Read Error");
 	
@@ -170,7 +170,7 @@ void	AtomBase::Read(uint32	*value)
 {
 	uint32	bytes_read;
 	
-	bytes_read = getStream()->Read(value,sizeof(uint32));
+	bytes_read = GetStream()->Read(value,sizeof(uint32));
 	
 	// Assert((bytes_read == sizeof(uint32),"Read Error");
 	
@@ -181,7 +181,7 @@ void	AtomBase::Read(int32	*value)
 {
 	uint32	bytes_read;
 	
-	bytes_read = getStream()->Read(value,sizeof(int32));
+	bytes_read = GetStream()->Read(value,sizeof(int32));
 	
 	// Assert((bytes_read == sizeof(int32),"Read Error");
 	
@@ -192,7 +192,7 @@ void	AtomBase::Read(uint16	*value)
 {
 	uint32	bytes_read;
 	
-	bytes_read = getStream()->Read(value,sizeof(uint16));
+	bytes_read = GetStream()->Read(value,sizeof(uint16));
 	
 	// Assert((bytes_read == sizeof(uint16),"Read Error");
 	
@@ -203,7 +203,7 @@ void	AtomBase::Read(uint8	*value)
 {
 	uint32	bytes_read;
 	
-	bytes_read = getStream()->Read(value,sizeof(uint8));
+	bytes_read = GetStream()->Read(value,sizeof(uint8));
 	
 	// Assert((bytes_read == sizeof(uint8),"Read Error");
 }
@@ -212,7 +212,7 @@ void	AtomBase::Read(char	*value, uint32 maxread)
 {
 	uint32	bytes_read;
 	
-	bytes_read = getStream()->Read(value,maxread);
+	bytes_read = GetStream()->Read(value,maxread);
 
 	// Assert((bytes_read == maxread,"Read Error");
 }
@@ -221,7 +221,7 @@ void	AtomBase::Read(uint8 *value, uint32 maxread)
 {
 	uint32	bytes_read;
 	
-	bytes_read = getStream()->Read(value,maxread);
+	bytes_read = GetStream()->Read(value,maxread);
 
 	// Assert((bytes_read == maxread,"Read Error");
 }
@@ -233,8 +233,6 @@ uint64	AtomBase::GetBits(uint64 buffer, uint8 startBit, uint8 totalBits)
 		// Ok pull from the buffer the bits wanted.
 		buffer = buffer << startBit;
 		buffer = buffer >> (64 - (totalBits + startBit) + startBit);
-		
-		printf("buffer = %Ld\n",buffer);
 		
 		return buffer;
 	}
@@ -284,7 +282,7 @@ AtomContainer::~AtomContainer()
 void	AtomContainer::DisplayAtoms(uint32 pindent)
 {
 	Indent(pindent);
-	printf("%ld:(%s)\n",TotalChildren,getAtomName());
+	printf("%ld:(%s)\n",TotalChildren,GetAtomName());
 	pindent++;
 	// for each child
 	for (uint32 i = 0;i < TotalChildren;i++) {
@@ -295,13 +293,13 @@ void	AtomContainer::DisplayAtoms(uint32 pindent)
 
 void	AtomContainer::ProcessMetaData()
 {
-	setAtomOffset(getStream()->Position());
+	SetAtomOffset(GetStream()->Position());
 	
 	OnProcessMetaData();
 
 	AtomBase *aChild;
 	while (IsEndOfAtom() == false) {
-		aChild = getAtom(getStream());
+		aChild = GetAtom(GetStream());
 		if (AddChild(aChild)) {
 			aChild->ProcessMetaData();
 		}
@@ -315,7 +313,7 @@ void	AtomContainer::ProcessMetaData()
 bool	AtomContainer::AddChild(AtomBase *pChildAtom)
 {
 	if (pChildAtom) {
-		pChildAtom->setParent(this);
+		pChildAtom->SetParent(this);
 		atomChildren.push_back(pChildAtom);
 		TotalChildren++;
 		return true;
