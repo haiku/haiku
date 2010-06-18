@@ -141,6 +141,7 @@ void vm_get_info(struct system_memory_info *info);
 uint32 vm_num_page_faults(void);
 off_t vm_available_memory(void);
 off_t vm_available_not_needed_memory(void);
+off_t vm_available_not_needed_memory_debug(void);
 size_t vm_kernel_address_space_left(void);
 
 status_t vm_memset_physical(phys_addr_t address, int value, size_t length);

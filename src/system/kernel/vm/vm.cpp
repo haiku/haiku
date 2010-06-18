@@ -4406,6 +4406,16 @@ vm_available_not_needed_memory(void)
 }
 
 
+/*!	Like vm_available_not_needed_memory(), but only for use in the kernel
+	debugger.
+*/
+off_t
+vm_available_not_needed_memory_debug(void)
+{
+	return sAvailableMemory - sNeededMemory;
+}
+
+
 size_t
 vm_kernel_address_space_left(void)
 {
