@@ -115,6 +115,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 
 	object_cache*	buffer_cache;
 	block_list		unused_blocks;
+	uint32			unused_block_count;
 
 	ConditionVariable busy_reading_condition;
 	uint32			busy_reading_count;
@@ -1260,6 +1261,7 @@ BlockWriter::_BlockDone(cached_block* block, hash_iterator* iterator)
 		// the block is no longer used
 		block->unused = true;
 		fCache->unused_blocks.Add(block);
+		fCache->unused_block_count++;
 	}
 
 	TB2(BlockData(fCache, block, "after write"));
@@ -1297,6 +1299,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	last_transaction(NULL),
 	transaction_hash(NULL),
 	buffer_cache(NULL),
+	unused_block_count(0),
 	busy_reading_count(0),
 	busy_reading_waiters(false),
 	busy_writing_count(0),
@@ -1363,12 +1366,6 @@ block_cache::Free(void* buffer)
 void*
 block_cache::Allocate()
 {
-	if (low_resource_state(B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
-			| B_KERNEL_RESOURCE_ADDRESS_SPACE) != B_NO_LOW_RESOURCE) {
-		// recycle existing before allocating a new one
-		RemoveUnusedBlocks(2);
-	}
-
 	void* block = object_cache_alloc(buffer_cache, 0);
 	if (block != NULL)
 		return block;
@@ -1483,6 +1480,7 @@ block_cache::RemoveUnusedBlocks(int32 count, int32 minSecondsOld)
 
 		// remove block from lists
 		iterator.Remove();
+		unused_block_count--;
 		RemoveBlock(block);
 
 		if (--count <= 0)
@@ -1529,26 +1527,26 @@ block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 	// free some blocks according to the low memory state
 	// (if there is enough memory left, we don't free any)
 
+	block_cache* cache = (block_cache*)data;
 	int32 free = 0;
 	int32 secondsOld = 0;
 	switch (level) {
 		case B_NO_LOW_RESOURCE:
 			return;
 		case B_LOW_RESOURCE_NOTE:
-			free = 50;
+			free = cache->unused_block_count / 8;
 			secondsOld = 120;
 			break;
 		case B_LOW_RESOURCE_WARNING:
-			free = 200;
+			free = cache->unused_block_count / 4;
 			secondsOld = 10;
 			break;
 		case B_LOW_RESOURCE_CRITICAL:
-			free = 10000;
+			free = cache->unused_block_count / 2;
 			secondsOld = 0;
 			break;
 	}
 
-	block_cache* cache = (block_cache*)data;
 	MutexLocker locker(&cache->lock);
 
 	if (!locker.IsLocked()) {
@@ -1558,7 +1556,14 @@ block_cache::_LowMemoryHandler(void* data, uint32 resources, int32 level)
 		return;
 	}
 
+#ifdef TRACE_BLOCK_CACHE
+	uint32 oldUnused = cache->unused_block_count;
+#endif
+
 	cache->RemoveUnusedBlocks(free, secondsOld);
+
+	TRACE(("block_cache::_LowMemoryHandler(): %p: unused: %lu -> %lu\n", cache,
+		oldUnused, cache->unused_block_count));
 }
 
 
@@ -1576,6 +1581,7 @@ block_cache::_GetUnusedBlock()
 
 		// remove block from lists
 		iterator.Remove();
+		unused_block_count--;
 		hash_remove(hash, block);
 
 		// TODO: see if parent/compare data is handled correctly here!
@@ -1748,6 +1754,7 @@ put_cached_block(block_cache* cache, cached_block* block)
 			ASSERT(block->original_data == NULL
 				&& block->parent_data == NULL);
 			cache->unused_blocks.Add(block);
+			cache->unused_block_count++;
 		}
 	}
 }
@@ -1816,6 +1823,7 @@ retry:
 		//TRACE(("remove block %Ld from unused\n", blockNumber));
 		block->unused = false;
 		cache->unused_blocks.Remove(block);
+		cache->unused_block_count--;
 	}
 
 	if (*_allocated && readBlock) {
@@ -2193,8 +2201,8 @@ dump_cache(int argc, char** argv)
 	}
 
 	kprintf(" %ld blocks total, %ld dirty, %ld discarded, %ld referenced, %ld "
-		"busy, %ld in unused.\n", count, dirty, discarded, referenced,
-		cache->busy_reading_count, cache->unused_blocks.Count());
+		"busy, %" B_PRIu32 " in unused.\n", count, dirty, discarded, referenced,
+		cache->busy_reading_count, cache->unused_block_count);
 
 	hash_close(cache->hash, &iterator, false);
 	return 0;
@@ -3377,6 +3385,7 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 
 		if (block->unused) {
 			cache->unused_blocks.Remove(block);
+			cache->unused_block_count--;
 			cache->RemoveBlock(block);
 		} else {
 			if (block->transaction != NULL && block->parent_data != NULL
