@@ -453,6 +453,7 @@ object_cache_low_memory(void* dummy, uint32 resources, int32 level)
 		switch (level) {
 			case B_LOW_RESOURCE_NOTE:
 				minimumAllowed = cache->pressure / 2 + 1;
+				cache->pressure -= cache->pressure / 8;
 				break;
 
 			case B_LOW_RESOURCE_WARNING:
