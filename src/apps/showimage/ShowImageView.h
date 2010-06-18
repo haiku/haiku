@@ -156,7 +156,6 @@ private:
 			void				_SendMessageToWindow(uint32 code);
 			void				_Notify();
 			void				_UpdateStatusText();
-			void				_AddToRecentDocuments();
 			void				_AddWhiteRect(BRect& rect);
 			void				_GetMergeRects(BBitmap* merge,
 									BRect selection, BRect& srcRect,

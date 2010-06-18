@@ -379,13 +379,6 @@ ShowImageView::_UpdateStatusText()
 
 
 void
-ShowImageView::_AddToRecentDocuments()
-{
-	be_roster->AddToRecentDocuments(&fCurrentRef, kApplicationSignature);
-}
-
-
-void
 ShowImageView::_DeleteScaler()
 {
 	if (fScaler) {
@@ -549,7 +542,7 @@ ShowImageView::SetImage(const entry_ref *ref)
 	fCaption << ", " << fImageType;
 	fZoom = 1.0;
 
-	_AddToRecentDocuments();
+	be_roster->AddToRecentDocuments(&fCurrentRef, kApplicationSignature);
 
 	_Notify();
 	return B_OK;
