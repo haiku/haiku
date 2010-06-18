@@ -1325,7 +1325,8 @@ static void
 free_unused_vnodes()
 {
 	free_unused_vnodes(
-		low_resource_state(B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY));
+		low_resource_state(B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
+			| B_KERNEL_RESOURCE_ADDRESS_SPACE));
 }
 
 
@@ -4481,7 +4482,9 @@ extern "C" void
 vfs_free_unused_vnodes(int32 level)
 {
 	vnode_low_resource_handler(NULL,
-		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, level);
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
+			| B_KERNEL_RESOURCE_ADDRESS_SPACE,
+		level);
 }
 
 
@@ -5091,7 +5094,9 @@ vfs_init(kernel_args* args)
 #endif
 
 	register_low_resource_handler(&vnode_low_resource_handler, NULL,
-		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY, 0);
+		B_KERNEL_RESOURCE_PAGES | B_KERNEL_RESOURCE_MEMORY
+			| B_KERNEL_RESOURCE_ADDRESS_SPACE,
+		0);
 
 	file_map_init();
 
