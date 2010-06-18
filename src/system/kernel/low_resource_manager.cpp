@@ -1,5 +1,5 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2005-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -58,6 +58,11 @@ static off_t sNoteMemoryLimit;
 static off_t sWarnMemoryLimit;
 static off_t sCriticalMemoryLimit;
 
+// address space limits
+static const off_t kMinNoteSpaceLimit		= 128 * 1024 * 1024;
+static const off_t kMinWarnSpaceLimit		= 64 * 1024 * 1024;
+static const off_t kMinCriticalSpaceLimit	= 32 * 1024 * 1024;
+
 
 static int32 sLowPagesState = B_NO_LOW_RESOURCE;
 static int32 sLowMemoryState = B_NO_LOW_RESOURCE;
@@ -72,6 +77,23 @@ static sem_id sLowResourceWaitSem;
 static HandlerList sLowResourceHandlers;
 
 static ConditionVariable sLowResourceWaiterCondition;
+
+
+static const char*
+state_to_string(uint32 state)
+{
+	switch (state) {
+		case B_LOW_RESOURCE_CRITICAL:
+			return "critical";
+		case B_LOW_RESOURCE_WARNING:
+			return "warning";
+		case B_LOW_RESOURCE_NOTE:
+			return "note";
+
+		default:
+			return "normal";
+	}
+}
 
 
 static int32
@@ -136,6 +158,7 @@ compute_state(void)
 	// free pages state
 	uint32 freePages = vm_page_num_free_pages();
 
+	int32 oldState = sLowPagesState;
 	if (freePages < kCriticalPagesLimit) {
 		sLowPagesState = B_LOW_RESOURCE_CRITICAL;
 	} else if (freePages < kWarnPagesLimit) {
@@ -147,9 +170,15 @@ compute_state(void)
 		sLowResources &= ~B_KERNEL_RESOURCE_PAGES;
 	}
 
+	if (sLowPagesState != oldState) {
+		dprintf("low resource pages: %s -> %s\n", state_to_string(oldState),
+			state_to_string(sLowPagesState));
+	}
+
 	// free memory state
 	off_t freeMemory = vm_available_not_needed_memory();
 
+	oldState = sLowMemoryState;
 	if (freeMemory < sCriticalMemoryLimit) {
 		sLowMemoryState = B_LOW_RESOURCE_CRITICAL;
 	} else if (freeMemory < sWarnMemoryLimit) {
@@ -161,10 +190,16 @@ compute_state(void)
 		sLowResources &= ~B_KERNEL_RESOURCE_MEMORY;
 	}
 
+	if (sLowMemoryState != oldState) {
+		dprintf("low resource memory: %s -> %s\n", state_to_string(oldState),
+			state_to_string(sLowMemoryState));
+	}
+
 	// free semaphores state
 	uint32 maxSems = sem_max_sems();
 	uint32 freeSems = maxSems - sem_used_sems();
 
+	oldState = sLowSemaphoresState;
 	if (freeSems < maxSems >> 16) {
 		sLowSemaphoresState = B_LOW_RESOURCE_CRITICAL;
 	} else if (freeSems < maxSems >> 8) {
@@ -176,20 +211,30 @@ compute_state(void)
 		sLowResources &= ~B_KERNEL_RESOURCE_SEMAPHORES;
 	}
 
+	if (sLowSemaphoresState != oldState) {
+		dprintf("low resource semaphores: %s -> %s\n",
+			state_to_string(oldState), state_to_string(sLowSemaphoresState));
+	}
+
 	// free kernel address space state
 	// TODO: this should take fragmentation into account
-	size_t maxSpace = KERNEL_SIZE;
 	size_t freeSpace = vm_kernel_address_space_left();
 
-	if (freeSpace < maxSpace >> 16) {
+	oldState = sLowSpaceState;
+	if (freeSpace < kMinCriticalSpaceLimit) {
 		sLowSpaceState = B_LOW_RESOURCE_CRITICAL;
-	} else if (freeSpace < maxSpace >> 8) {
+	} else if (freeSpace < kMinWarnSpaceLimit) {
 		sLowSpaceState = B_LOW_RESOURCE_WARNING;
-	} else if (freeSpace < maxSpace >> 4) {
+	} else if (freeSpace < kMinNoteSpaceLimit) {
 		sLowSpaceState = B_LOW_RESOURCE_NOTE;
 	} else {
 		sLowSpaceState = B_NO_LOW_RESOURCE;
 		sLowResources &= ~B_KERNEL_RESOURCE_ADDRESS_SPACE;
+	}
+
+	if (sLowSpaceState != oldState) {
+		dprintf("low resource address space: %s -> %s\n",
+			state_to_string(oldState), state_to_string(sLowSpaceState));
 	}
 }
 
@@ -231,23 +276,6 @@ low_resource_manager(void*)
 }
 
 
-static const char*
-state_to_string(uint32 state)
-{
-	switch (state) {
-		case B_LOW_RESOURCE_CRITICAL:
-			return "critical";
-		case B_LOW_RESOURCE_WARNING:
-			return "warning";
-		case B_LOW_RESOURCE_NOTE:
-			return "note";
-
-		default:
-			return "normal";
-	}
-}
-
-
 static int
 dump_handlers(int argc, char** argv)
 {
@@ -256,10 +284,14 @@ dump_handlers(int argc, char** argv)
 		(sLowResources & B_KERNEL_RESOURCE_MEMORY) != 0 ? 'm' : '-',
 		(sLowResources & B_KERNEL_RESOURCE_SEMAPHORES) != 0 ? 's' : '-',
 		(sLowResources & B_KERNEL_RESOURCE_ADDRESS_SPACE) != 0 ? 'a' : '-');
-	kprintf("  pages:  %s\n", state_to_string(sLowPagesState));
-	kprintf("  memory: %s\n", state_to_string(sLowMemoryState));
-	kprintf("  sems:   %s\n", state_to_string(sLowSemaphoresState));
-	kprintf("  aspace: %s\n\n", state_to_string(sLowSpaceState));
+	kprintf("  pages:  %s (%" B_PRIu64 ")\n", state_to_string(sLowPagesState),
+		(uint64)vm_page_num_free_pages());
+	kprintf("  memory: %s (%" B_PRIdOFF ")\n", state_to_string(sLowMemoryState),
+		vm_available_not_needed_memory_debug());
+	kprintf("  sems:   %s (%" B_PRIu32 ")\n",
+		state_to_string(sLowSemaphoresState), sem_max_sems() - sem_used_sems());
+	kprintf("  aspace: %s (%" B_PRIuSIZE ")\n\n",
+		state_to_string(sLowSpaceState), vm_kernel_address_space_left());
 
 	HandlerList::Iterator iterator = sLowResourceHandlers.GetIterator();
 	kprintf("function    data         resources  prio  function-name\n");
