@@ -12,9 +12,6 @@ else
 	CPU = $(MACHINE)
 endif
 
-#	set the directory where object files and binaries will be created
-	OBJ_DIR		:= obj.$(CPU)
-
 #	create some default settings
 ifeq ($(NAME), )
 	NAME = NameThisApp
@@ -27,15 +24,6 @@ endif
 ifeq ($(DRIVER_PATH), )
 	DRIVER_PATH = misc
 endif
-
-# 	specify the directory the binary should be created in by default
-ifeq ($(TARGET_DIR), )
-	TARGET_DIR	:= $(OBJ_DIR)
-endif
-
-# NOTE: make doesn't find the target if its name is enclosed in
-#       quotation marks
-	TARGET		:= $(TARGET_DIR)/$(NAME)
 
 #	specify the mimeset tool
 	MIMESET		:= mimeset
@@ -108,6 +96,24 @@ endif
 	endif
 	endif
 
+#	guess compiler version
+	CC_VER_DMP = $(subst -, , $(subst ., , $(shell $(CC) -dumpversion)))
+	CC_VER_MAJ = $(word 1, $(CC_VER_DMP))
+	CC_VER_MIN = $(word 2, $(CC_VER_DMP))
+	CC_VER_MIC = $(word 3, $(CC_VER_DMP))
+	CC_VER = $(CC_VER_MAJ).$(CC_VER_MIN).$(CC_VER_MIC)
+
+#	set the directory where object files and binaries will be created
+	OBJ_DIR		:= obj.$(CPU).$(CC)-$(CC_VER)
+
+# 	specify the directory the binary should be created in by default
+ifeq ($(TARGET_DIR), )
+	TARGET_DIR	:= $(OBJ_DIR)
+endif
+
+# NOTE: make doesn't find the target if its name is enclosed in
+#       quotation marks
+	TARGET		:= $(TARGET_DIR)/$(NAME)
 
 # psuedo-function for converting a list of source files in SRCS variable
 # to a corresponding list of object files in $(OBJ_DIR)/xxx.o
@@ -137,17 +143,24 @@ VPATH += $(addprefix :, $(subst  ,:, $(filter-out $($(subst, :, ,$(VPATH))), $(S
 #	SETTING: build the local and system include paths
 ifeq ($(CPU), x86)
 	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
-	SYS_INCLUDES += -I-
-	SYS_INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
+ ifeq ($(CC_VER_MAJ), 2)
+	INCLUDES = $(LOC_INCLUDES)
+	INCLUDES += -I-
+ else
+	INCLUDES = -iquote./
+	INCLUDES += $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -iquote, $(path)))
+ endif
+	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
 else
 ifeq ($(CPU), ppc)
 	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
 	SYS_INCLUDES += -i-
 	SYS_INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -i , $(path)))
+	
+	INCLUDES = $(LOC_INCLUDES) $(SYS_INCLUDES)
 endif
 endif
 
-INCLUDES = $(LOC_INCLUDES) $(SYS_INCLUDES)
 
 # SETTING: add the -L prefix to all library paths to search
 LINK_PATHS = $(foreach path, $(SRC_PATHS) $(LIBPATHS), \
@@ -292,7 +305,7 @@ USER_DEV_PATH = /boot/home/config/add-ons/kernel/drivers/dev
 
 driverinstall :: default
 ifeq ($(TYPE), DRIVER)
-	copyattr --data $(OBJ_DIR)/$(NAME) $(USER_BIN_PATH)/$(NAME)
+	copyattr --data $(TARGET) $(USER_BIN_PATH)/$(NAME)
 	mkdir -p $(USER_DEV_PATH)/$(DRIVER_PATH)
 	ln -sf $(USER_BIN_PATH)/$(NAME) $(USER_DEV_PATH)/$(DRIVER_PATH)/$(NAME)
 endif
