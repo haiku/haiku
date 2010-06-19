@@ -97,14 +97,10 @@ endif
 	endif
 
 #	guess compiler version
-	CC_VER_DMP = $(subst -, , $(subst ., , $(shell $(CC) -dumpversion)))
-	CC_VER_MAJ = $(word 1, $(CC_VER_DMP))
-	CC_VER_MIN = $(word 2, $(CC_VER_DMP))
-	CC_VER_MIC = $(word 3, $(CC_VER_DMP))
-	CC_VER = $(CC_VER_MAJ).$(CC_VER_MIN).$(CC_VER_MIC)
+	CC_VER = $(word 1, $(subst -, , $(subst ., , $(shell $(CC) -dumpversion))))
 
 #	set the directory where object files and binaries will be created
-	OBJ_DIR		:= obj.$(CPU).$(CC)-$(CC_VER)
+	OBJ_DIR		:= objects.$(CPU)-$(CC)$(CC_VER)-$(if $(DEBUGGER),debug,release)
 
 # 	specify the directory the binary should be created in by default
 ifeq ($(TARGET_DIR), )
@@ -143,14 +139,15 @@ VPATH += $(addprefix :, $(subst  ,:, $(filter-out $($(subst, :, ,$(VPATH))), $(S
 #	SETTING: build the local and system include paths
 ifeq ($(CPU), x86)
 	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
- ifeq ($(CC_VER_MAJ), 2)
+ ifeq ($(CC_VER), 2)
 	INCLUDES = $(LOC_INCLUDES)
 	INCLUDES += -I-
+	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
  else
 	INCLUDES = -iquote./
 	INCLUDES += $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -iquote, $(path)))
+	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -isystem, $(path)))
  endif
-	INCLUDES += $(foreach path, $(SYSTEM_INCLUDE_PATHS), $(addprefix -I, $(path)))
 else
 ifeq ($(CPU), ppc)
 	LOC_INCLUDES = $(foreach path, $(SRC_PATHS) $(LOCAL_INCLUDE_PATHS), $(addprefix -I, $(path)))
