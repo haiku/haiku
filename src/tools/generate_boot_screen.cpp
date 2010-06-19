@@ -1,6 +1,6 @@
 /*
  *	Copyright (c) 2008, Haiku, Inc. All rights reserved.
- *	Distributed under the terms of the MIT license. 
+ *	Distributed under the terms of the MIT license.
  *
  *	Authors:
  *		Artur Wyszynski <harakash@gmail.com>
@@ -68,12 +68,12 @@ read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 	fread(header, 1, 8, input);
 	if (png_sig_cmp((png_byte *)header, 0, 8 ))
 		error("[read_png] File %s is not recognized as a PNG file", filename);
-	
+
 	pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
 		NULL, NULL, NULL);
 	if (!pngPtr)
 		error("[read_png] png_create_read_struct failed");
-	
+
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr)
 		error("[read_png] png_create_info_struct failed");
@@ -139,7 +139,7 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 	fprintf(sOutput, "static const uint16 %sWidth = %d;\n", baseName, width);
 	fprintf(sOutput, "static const uint16 %sHeight = %d;\n", baseName, height);
 	fprintf(sOutput, "#ifndef __BOOTSPLASH_KERNEL__\n");
-	
+
 	int buffer[128];
 	// buffer[0] stores count, buffer[1..127] holds the actual values
 
@@ -153,7 +153,7 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 		int currentValue = rowPtrs[0][c];
 		int count = 0;
 
-		// When bufferActive == true, we store the number rather than writing 
+		// When bufferActive == true, we store the number rather than writing
 		// them directly; we use this to store numbers until we find a pair..
 		bool bufferActive = false;
 
@@ -167,11 +167,11 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 						bufferActive = false;
 						count = 2;
 						if (buffer[0] > 1) {
-							fprintf(sOutput, "%d, ", 
+							fprintf(sOutput, "%d, ",
 								128 + buffer[0] - 1);
 							new_line_if_required();
 							for (int i = 1; i < buffer[0] ; i++) {
-								fprintf(sOutput, "%d, ", 
+								fprintf(sOutput, "%d, ",
 									buffer[i]);
 								new_line_if_required();
 							}
@@ -189,9 +189,9 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 				} else {
 					if (bufferActive) {
 						if (buffer[0] == 127) {
-							// we don't have enough room, 
+							// we don't have enough room,
 							// flush the buffer
-							fprintf(sOutput, "%d, ", 
+							fprintf(sOutput, "%d, ",
 								128 + buffer[0] - 1);
 							new_line_if_required();
 							for (int i = 1; i < buffer[0]; i++) {
@@ -229,7 +229,7 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 		} else {
 			fprintf(sOutput, "%d, %d, ", count, currentValue);
 			new_line_if_required();
-		}		
+		}
 		// we put a terminating zero for the next byte that indicates
 		// a "count", just to indicate the end of the channel
 		fprintf(sOutput, "0");
@@ -245,7 +245,7 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 
 static void
 write_8bit_image(const char* baseName, int width, int height, unsigned char** rowPtrs)
-{	
+{
 	int buffer[128];
 	// buffer[0] stores count, buffer[1..127] holds the actual values
 
@@ -257,7 +257,7 @@ write_8bit_image(const char* baseName, int width, int height, unsigned char** ro
 	unsigned char currentValue = rowPtrs[0][0];
 	int count = 0;
 
-	// When bufferActive == true, we store the number rather than writing 
+	// When bufferActive == true, we store the number rather than writing
 	// them directly; we use this to store numbers until we find a pair..
 	bool bufferActive = false;
 
@@ -270,11 +270,11 @@ write_8bit_image(const char* baseName, int width, int height, unsigned char** ro
 					bufferActive = false;
 					count = 2;
 					if (buffer[0] > 1) {
-						fprintf(sOutput, "%d, ", 
+						fprintf(sOutput, "%d, ",
 							128 + buffer[0] - 1);
 						new_line_if_required();
 						for (int i = 1; i < buffer[0] ; i++) {
-							fprintf(sOutput, "%d, ", 
+							fprintf(sOutput, "%d, ",
 								buffer[i]);
 							new_line_if_required();
 						}
@@ -292,9 +292,9 @@ write_8bit_image(const char* baseName, int width, int height, unsigned char** ro
 			} else {
 				if (bufferActive) {
 					if (buffer[0] == 127) {
-						// we don't have enough room, 
+						// we don't have enough room,
 						// flush the buffer
-						fprintf(sOutput, "%d, ", 
+						fprintf(sOutput, "%d, ",
 							128 + buffer[0] - 1);
 						new_line_if_required();
 						for (int i = 1; i < buffer[0]; i++) {
@@ -332,7 +332,7 @@ write_8bit_image(const char* baseName, int width, int height, unsigned char** ro
 	} else {
 		fprintf(sOutput, "%d, %d, ", count, currentValue);
 		new_line_if_required();
-	}		
+	}
 	// we put a terminating zero for the next byte that indicates
 	// a "count", to indicate the end
 	fprintf(sOutput, "0");
@@ -373,7 +373,7 @@ create_8bit_images(const char* logoBaseName, int logoWidth, int logoHeight,
 
 	RGBA palette[256];
 	quantizer.GetColorTable(palette);
-	
+
 	// convert 24-bit logo image to 8-bit indexed color
 	uint8* logoIndexedImageRows[logoHeight];
 	for (int y = 0; y < logoHeight; y++) {
@@ -385,7 +385,7 @@ create_8bit_images(const char* logoBaseName, int logoWidth, int logoHeight,
 	}
 
 	// convert 24-bit icons image to 8-bit indexed color
-	uint8* iconsIndexedImageRows[iconsHeight];	
+	uint8* iconsIndexedImageRows[iconsHeight];
 	for (int y = 0; y < iconsHeight; y++) {
 		iconsIndexedImageRows[y] = new uint8[iconsWidth];
 		for (int x = 0; x < iconsWidth; x++)	{
@@ -393,7 +393,7 @@ create_8bit_images(const char* logoBaseName, int logoWidth, int logoHeight,
 				palette);
 		}
 	}
-	
+
 
 	fprintf(sOutput, "#ifndef __BOOTSPLASH_KERNEL__\n");
 
@@ -415,7 +415,7 @@ create_8bit_images(const char* logoBaseName, int logoWidth, int logoHeight,
 	// free memory
 	for (int y = 0; y < logoHeight; y++)
 		delete[] logoIndexedImageRows[y];
-	
+
 	for (int y = 0; y < iconsHeight; y++)
 		delete[] iconsIndexedImageRows[y];
 }
@@ -435,27 +435,27 @@ parse_images(const char* logoFilename, const char* logoBaseName,
 	int iconsHeight;
 	png_bytep* iconsRowPtrs = NULL;
 	png_structp iconsPngPtr;
-	png_infop iconsInfoPtr;	
+	png_infop iconsInfoPtr;
 
 	read_png(logoFilename, logoWidth, logoHeight, logoRowPtrs, logoPngPtr,
 		logoInfoPtr);
 	read_png(iconsFilename, iconsWidth, iconsHeight, iconsRowPtrs, iconsPngPtr,
 		iconsInfoPtr);
 
-	// write 24-bit images	
+	// write 24-bit images
 	write_24bit_image(logoBaseName, logoWidth, logoHeight, logoRowPtrs);
 	write_24bit_image(iconsBaseName, iconsWidth, iconsHeight, iconsRowPtrs);
-	
+
 	// write 8-bit index color images
 	create_8bit_images(logoBaseName, logoWidth, logoHeight, logoRowPtrs,
 		iconsBaseName, iconsWidth, iconsHeight, iconsRowPtrs);
-	
+
 	// free resources
 	png_destroy_read_struct(&logoPngPtr, &logoInfoPtr, NULL);
 	for (int y = 0; y < logoHeight; y++)
 		free(logoRowPtrs[y]);
 	free(logoRowPtrs);
-	
+
 	png_destroy_read_struct(&iconsPngPtr, &iconsInfoPtr, NULL);
 	for (int y = 0; y < iconsHeight; y++)
 		free(iconsRowPtrs[y]);
