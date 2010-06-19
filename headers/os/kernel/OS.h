@@ -699,8 +699,8 @@ typedef struct {
 	int64			bus_clock_speed;	/* bus clock speed (Hz) */
 	enum platform_types platform_type;	/* type of machine we're on */
 
-	int32			max_pages;			/* total # physical pages */
-	int32			used_pages;			/* # physical pages in use */
+	int32			max_pages;			/* total # of accessible pages */
+	int32			used_pages;			/* # of accessible pages in use */
 	int32			page_faults;		/* # of page faults */
 	int32			max_sems;
 	int32			used_sems;
@@ -717,11 +717,11 @@ typedef struct {
 	int64			kernel_version;
 
 	bigtime_t		_busy_wait_time;	/* reserved for whatever */
+
 	int32			cached_pages;
-
 	uint32			abi;				/* the system API */
-
-	int32			pad[2];
+	int32			ignored_pages;		/* # of ignored/inaccessible pages */
+	int32			pad;
 } system_info;
 
 /* system private, use macro instead */

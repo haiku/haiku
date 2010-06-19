@@ -3625,11 +3625,12 @@ vm_page_get_stats(system_info *info)
 	// can't really be freed in a low memory situation.
 	page_num_t blockCachePages = block_cache_used_memory() / B_PAGE_SIZE;
 
-	info->max_pages = sNumPages - sNonExistingPages + sIgnoredPages;
-	info->used_pages = gMappedPagesCount - blockCachePages + sIgnoredPages;
+	info->max_pages = sNumPages - sNonExistingPages;
+	info->used_pages = gMappedPagesCount - blockCachePages;
 	info->cached_pages = info->max_pages >= free + info->used_pages
 		? info->max_pages - free - info->used_pages : 0;
 	info->page_faults = vm_num_page_faults();
+	info->ignored_pages = sIgnoredPages;
 
 	// TODO: We don't consider pages used for page directories/tables yet.
 }
