@@ -91,7 +91,7 @@ read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 	// also make sure the alpha channel is stripped, in the end, we
 	// expect 24 bits BGR data
 	png_set_expand(pngPtr);
-	png_set_gray_1_2_4_to_8(pngPtr);
+	png_set_expand_gray_1_2_4_to_8(pngPtr);
 	png_set_palette_to_rgb(pngPtr);
 	png_set_gray_to_rgb(pngPtr);
 	png_set_strip_alpha(pngPtr);
