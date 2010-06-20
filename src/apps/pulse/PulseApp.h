@@ -12,19 +12,23 @@
 #define PULSEAPP_H
 
 
-#include <app/Application.h>
+#include <Application.h>
+#include <Catalog.h>
+
 #include "Prefs.h"
 
 
 class PulseApp : public BApplication {
-	public:
-		PulseApp(int argc, char **argv);
-		~PulseApp();
+public:
+						PulseApp(int argc, char **argv);
+						~PulseApp();
 
-		Prefs *prefs;
+			Prefs*		prefs;
 
-	private:
-		void BuildPulse();
+private:
+			void		BuildPulse();
+		
+			BCatalog	fCatalog;
 };
 
 extern bool LastEnabledCPU(int cpu);
