@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2005-2009, Haiku, Inc.
+ * Copyright (c) 2005-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		René Gollent
+ *		Wim van der Meer <WPJvanderMeer@gmail.com>
  */
 
 
@@ -65,8 +66,11 @@
 
 
 static const char* UptimeToString(char string[], size_t size);
+static const char* MemSizeToString(char string[], size_t size,
+	system_info* info);
 static const char* MemUsageToString(char string[], size_t size,
 	system_info* info);
+
 
 static const rgb_color kDarkGrey = { 100, 100, 100, 255 };
 static const rgb_color kHaikuGreen = { 42, 131, 36, 255 };
@@ -537,6 +541,10 @@ AboutView::AboutView()
 		B_ALIGN_VERTICAL_UNSET));
 
 	// RAM
+	BStringView *memSizeView = new BStringView("ramsizetext",
+		MemSizeToString(string, sizeof(string), &systemInfo));
+	memSizeView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 	fMemView = new BStringView("ramtext",
 		MemUsageToString(string, sizeof(string), &systemInfo));
 	fMemView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
@@ -576,6 +584,7 @@ AboutView::AboutView()
 				.Add(frequencyView)
 				.AddStrut(offset)
 				.Add(_CreateLabel("memlabel", B_TRANSLATE("Memory:")))
+				.Add(memSizeView)
 				.Add(fMemView)
 				.AddStrut(offset)
 				.Add(_CreateLabel("kernellabel", B_TRANSLATE("Kernel:")))
@@ -1670,12 +1679,29 @@ AboutView::_AddPackageCredit(const PackageCredit& package)
 
 
 static const char*
+MemSizeToString(char string[], size_t size, system_info* info)
+{
+	int inaccessibleMemory = int(info->ignored_pages
+		* (B_PAGE_SIZE / 1048576.0f) + 0.5f);
+	if (inaccessibleMemory > 0) {
+		snprintf(string, size, B_TRANSLATE("%d MiB total, %d MiB inaccessible"),
+			int((info->max_pages + info->ignored_pages)
+			* (B_PAGE_SIZE / 1048576.0f) + 0.5f), inaccessibleMemory);
+	} else {
+		snprintf(string, size, B_TRANSLATE("%d MiB total"),
+			int(info->max_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f));
+	}
+
+	return string;
+}
+
+
+static const char*
 MemUsageToString(char string[], size_t size, system_info* info)
 {
-	snprintf(string, size, B_TRANSLATE("%d MB total, %d MB used (%d%%)"),
-			int(info->max_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f),
-			int(info->used_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f),
-			int(100 * info->used_pages / info->max_pages));
+	snprintf(string, size, B_TRANSLATE("%d MiB used (%d%%)"),
+		int(info->used_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f),
+		int(100 * info->used_pages / info->max_pages));
 
 	return string;
 }
