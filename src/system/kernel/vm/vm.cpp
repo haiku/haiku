@@ -1096,8 +1096,11 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 			return B_BAD_VALUE;
 	}
 
+	// If low or high physical address restrictions are given, we force
+	// B_CONTIGUOUS wiring, since only then we'll use
+	// vm_page_allocate_page_run() which deals with those restrictions.
 	if (physicalAddressRestrictions->low_address != 0
-		&& physicalAddressRestrictions->high_address != 0) {
+		|| physicalAddressRestrictions->high_address != 0) {
 		wiring = B_CONTIGUOUS;
 	}
 
@@ -1135,6 +1138,14 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		}
 		default:
 			return B_BAD_VALUE;
+	}
+
+	// Optimization: For a single-page contiguous allocation without low/high
+	// memory restriction B_FULL_LOCK wiring suffices.
+	if (wiring == B_CONTIGUOUS && size == B_PAGE_SIZE
+		&& physicalAddressRestrictions->low_address == 0
+		&& physicalAddressRestrictions->high_address == 0) {
+		wiring = B_FULL_LOCK;
 	}
 
 	// For full lock or contiguous areas we're also going to map the pages and
