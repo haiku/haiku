@@ -1101,6 +1101,7 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		wiring = B_CONTIGUOUS;
 	}
 
+	physical_address_restrictions stackPhysicalRestrictions;
 	bool doReserveMemory = false;
 	switch (wiring) {
 		case B_NO_LOCK:
@@ -1113,11 +1114,25 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		case B_ALREADY_WIRED:
 			break;
 		case B_LOMEM:
-		//case B_SLOWMEM:
-			dprintf("B_LOMEM/SLOWMEM is not yet supported!\n");
-			wiring = B_FULL_LOCK;
+		{
+			stackPhysicalRestrictions = *physicalAddressRestrictions;
+			stackPhysicalRestrictions.high_address = 16 * 1024 * 1024;
+			physicalAddressRestrictions = &stackPhysicalRestrictions;
+			wiring = B_CONTIGUOUS;
 			doReserveMemory = true;
 			break;
+		}
+		case B_32_BIT_MEMORY:
+		{
+			#if B_HAIKU_PHYSICAL_BITS > 32
+				stackPhysicalRestrictions = *physicalAddressRestrictions;
+				stackPhysicalRestrictions.high_address = 0x100000000LL;
+				physicalAddressRestrictions = &stackPhysicalRestrictions;
+			#endif
+			wiring = B_CONTIGUOUS;
+			doReserveMemory = true;
+			break;
+		}
 		default:
 			return B_BAD_VALUE;
 	}
