@@ -789,7 +789,6 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 
 		newCache->Lock();
 		newCache->temporary = 1;
-		newCache->scan_skip = cache->scan_skip;
 		newCache->virtual_base = offset;
 		newCache->virtual_end = offset + size;
 
@@ -995,7 +994,6 @@ vm_block_address_range(const char* name, void* address, addr_t size)
 
 	cache->temporary = 1;
 	cache->virtual_end = size;
-	cache->scan_skip = 1;
 	cache->Lock();
 
 	VMArea* area;
@@ -1228,18 +1226,6 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		// TODO: This should be done via a method.
 	reservedMemory = 0;
 
-	switch (wiring) {
-		case B_LAZY_LOCK:
-		case B_FULL_LOCK:
-		case B_CONTIGUOUS:
-		case B_ALREADY_WIRED:
-			cache->scan_skip = 1;
-			break;
-		case B_NO_LOCK:
-			cache->scan_skip = 0;
-			break;
-	}
-
 	cache->Lock();
 
 	status = map_backing_store(addressSpace, cache, 0, name, size, wiring,
@@ -1436,8 +1422,6 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	if (status != B_OK)
 		return status;
 
-	// tell the page scanner to skip over this area, it's pages are special
-	cache->scan_skip = 1;
 	cache->virtual_end = size;
 
 	cache->Lock();
@@ -1553,8 +1537,6 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	if (result != B_OK)
 		return result;
 
-	// tell the page scanner to skip over this area, it's pages are special
-	cache->scan_skip = 1;
 	cache->virtual_end = size;
 
 	cache->Lock();
@@ -1639,9 +1621,6 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	if (status != B_OK)
 		return status;
 
-	// tell the page scanner to skip over this area, no pages will be mapped
-	// here
-	cache->scan_skip = 1;
 	cache->temporary = 1;
 	cache->virtual_end = size;
 
@@ -2162,7 +2141,6 @@ vm_copy_on_write_area(VMCache* lowerCache)
 	upperCache->Lock();
 
 	upperCache->temporary = 1;
-	upperCache->scan_skip = lowerCache->scan_skip;
 	upperCache->virtual_base = lowerCache->virtual_base;
 	upperCache->virtual_end = lowerCache->virtual_end;
 

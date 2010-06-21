@@ -593,7 +593,6 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 	virtual_end = 0;
 	committed_size = 0;
 	temporary = 0;
-	scan_skip = 0;
 	page_count = 0;
 	type = cacheType;
 	fPageEventWaiters = NULL;
@@ -1282,7 +1281,6 @@ VMCache::Dump(bool showPages) const
 	kprintf("  virtual_base: 0x%Lx\n", virtual_base);
 	kprintf("  virtual_end:  0x%Lx\n", virtual_end);
 	kprintf("  temporary:    %ld\n", temporary);
-	kprintf("  scan_skip:    %ld\n", scan_skip);
 	kprintf("  lock:         %p\n", &fLock);
 #if KDEBUG
 	kprintf("  lock.holder:  %ld\n", fLock.holder);
