@@ -569,28 +569,36 @@ get_irq_routing_table(acpi_handle busDeviceHandle, acpi_data *retBuffer)
 static status_t
 prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 {
-	ACPI_STATUS status;
+	ACPI_STATUS acpiStatus;
 
 	TRACE("prepare_sleep_state %d, %p, %ld\n", state, wakeFunc, size);
 
 	if (state != ACPI_POWER_STATE_OFF) {
 		physical_entry wakeVector;
+		status_t status;
 
-		status = lock_memory(&wakeFunc, size, 0);
+		// Note: The supplied code must already be locked into memory.
+		status = get_memory_map(wakeFunc, size, &wakeVector, 1);
 		if (status != B_OK)
 			return status;
 
-		status = get_memory_map(&wakeFunc, size, &wakeVector, 1);
-		if (status != B_OK)
-			return status;
-
-		status = AcpiSetFirmwareWakingVector(wakeVector.address);
-		if (status != AE_OK)
+#if ACPI_MACHINE_WIDTH == 32
+#	if B_HAIKU_PHYSICAL_BITS > 32
+		if (wakeVector.address >= 0x100000000LL) {
+			ERROR("prepare_sleep_state(): ACPI_MACHINE_WIDTH == 32, but we "
+				"have a physical address >= 4 GB\n");
+		}
+#	endif
+		acpiStatus = AcpiSetFirmwareWakingVector(wakeVector.address);
+#else
+		acpiStatus = AcpiSetFirmwareWakingVector64(wakeVector.address);
+#endif
+		if (acpiStatus != AE_OK)
 			return B_ERROR;
 	}
 
-	status = AcpiEnterSleepStatePrep(state);
-	if (status != AE_OK)
+	acpiStatus = AcpiEnterSleepStatePrep(state);
+	if (acpiStatus != AE_OK)
 		return B_ERROR;
 
 	return B_OK;
