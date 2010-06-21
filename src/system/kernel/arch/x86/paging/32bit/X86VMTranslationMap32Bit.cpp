@@ -332,26 +332,27 @@ void
 X86VMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 	bool updatePageQueue)
 {
-	page_directory_entry* pd = fPagingStructures->pgdir_virt;
+	if (size == 0)
+		return;
 
 	addr_t start = base;
-	addr_t end = base + size;
+	addr_t end = base + size - 1;
 
 	TRACE("X86VMTranslationMap32Bit::UnmapPages(%p, %#" B_PRIxADDR ", %#"
 		B_PRIxADDR ")\n", area, start, end);
+
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
 
 	VMAreaMappings queue;
 
 	RecursiveLocker locker(fLock);
 
-	while (start < end) {
+	do {
 		int index = VADDR_TO_PDENT(start);
 		if ((pd[index] & X86_PDE_PRESENT) == 0) {
 			// no page table here, move the start up to access the next page
 			// table
-			start = ROUNDUP(start + 1, B_PAGE_SIZE * 1024);
-			if (start == 0)
-				break;
+			start = ROUNDUP(start + 1, kPageTableAlignment);
 			continue;
 		}
 
@@ -429,9 +430,7 @@ X86VMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 
 		Flush();
 			// flush explicitly, since we directly use the lock
-
-		pinner.Unlock();
-	}
+	} while (start != 0 && start < end);
 
 	// TODO: As in UnmapPage() we can lose page dirty flags here. ATM it's not
 	// really critical here, as in all cases this method is used, the unmapped
