@@ -48,9 +48,10 @@ multi_channel_info channel_descriptions[] = {
 static status_t
 get_description(void* cookie, multi_description* data)
 {
-	dprintf("null_audio: %s\n" , __func__ );
-	
 	multi_description description;
+
+	dprintf("null_audio: %s\n" , __func__ );
+
 	if (user_memcpy(&description, data, sizeof(multi_description)) != B_OK) {
 		return B_BAD_ADDRESS;
 	}
@@ -84,7 +85,7 @@ get_description(void* cookie, multi_description* data)
 
 	if (user_memcpy(data, &description, sizeof(multi_description)) != B_OK)
 		return B_BAD_ADDRESS;
-	
+
 	if (description.request_channel_count
 			>= sizeof(channel_descriptions) / sizeof(channel_descriptions[0])) {
 		if (user_memcpy(data->channels,
@@ -156,7 +157,7 @@ create_group_control(multi_mix_control* multi, int32 idx, int32 parent,
 	multi->string = string;
 	if (name)
 		strcpy(multi->name, name);
- 
+
 	return multi->id;
 }
 
@@ -202,7 +203,7 @@ get_buffers(device_t* device, multi_buffer_list* data)
  	status_t result;
 
 	dprintf("null_audio: %s\n" , __func__ );
- 
+
 	// Workaround for Haiku multi_audio API, since it prefers
 	// to let the driver pick values, while the BeOS multi_audio
 	// actually gives the user's defaults.
