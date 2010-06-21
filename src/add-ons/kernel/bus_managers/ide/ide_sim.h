@@ -14,7 +14,10 @@
 #define __IDE_SIM_H__
 
 
+#include <sys/cdefs.h>
+
 #include "scsi_cmds.h"
+
 
 extern scsi_for_sim_interface *scsi;
 extern scsi_sim_interface ide_sim_module;
@@ -72,7 +75,11 @@ start_request(ide_device_info *device, ide_qrequest *qrequest)
 }
 
 
+__BEGIN_DECLS
+
 void create_sense(ide_device_info *device, scsi_sense *sense);
+
+__END_DECLS
 
 
 #endif

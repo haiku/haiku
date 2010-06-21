@@ -168,7 +168,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 
 		SHOW_FLOW(4, "page_left=%d", page_left);
 
-		cur_len = min(page_left, length);
+		cur_len = min_c(page_left, length);
 
 		SHOW_FLOW(4, "cur_len=%d", cur_len);
 
@@ -205,7 +205,7 @@ transfer_PIO_block(ide_device_info *device, int length, bool write, int *transfe
 		// we might have transmitted part of a scatter/entry already!
 		left_bytes = device->cur_sg_elem->size - device->cur_sg_ofs;
 
-		cur_len = min(left_bytes, length);
+		cur_len = min_c(left_bytes, length);
 
 		err = transfer_PIO_physcont(device,
 			(addr_t)device->cur_sg_elem->address + device->cur_sg_ofs,
@@ -249,7 +249,7 @@ write_discard_PIO(ide_device_info *device, int length)
 
 		// if device asks for odd number of bytes, append an extra byte to
 		// make length even (this is the "length + 1" term)
-		cur_len = min(length + 1, (int)(sizeof(buffer))) / 2;
+		cur_len = min_c(length + 1, (int)(sizeof(buffer))) / 2;
 
 		bus->controller->write_pio(bus->channel_cookie, (uint16 *)buffer, cur_len, false);
 
@@ -270,7 +270,7 @@ read_discard_PIO(ide_device_info *device, int length)
 		int cur_len;
 
 		// read extra byte if length is odd (that's the "length + 1")
-		cur_len = min(length + 1, (int)sizeof(buffer)) / 2;
+		cur_len = min_c(length + 1, (int)sizeof(buffer)) / 2;
 
 		bus->controller->read_pio(bus->channel_cookie, (uint16 *)buffer, cur_len, false);
 

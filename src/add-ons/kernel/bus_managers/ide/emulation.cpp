@@ -38,8 +38,8 @@ ide_request_sense(ide_device_info *device, ide_qrequest *qrequest)
 	// reset sense information on read
 	device->combined_sense = 0;
 
-	transferSize = min(sizeof(sense), cmd->allocation_length);
-	transferSize = min(transferSize, request->data_length);
+	transferSize = min_c(sizeof(sense), cmd->allocation_length);
+	transferSize = min_c(transferSize, request->data_length);
 
 	request->data_resid = request->data_length - transferSize;
 
@@ -82,14 +82,14 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocationLength,
 		return 0;
 
 	// remaining bytes we are allowed to copy from/to request
-	requestSize = min(allocationLength, request->data_length) - offset;
+	requestSize = min_c(allocationLength, request->data_length) - offset;
 
 	// copy one S/G entry at a time
 	for (; size > 0 && requestSize > 0 && sgCount > 0; ++sgList, --sgCount) {
 		size_t bytes;
 
-		bytes = min(size, requestSize);
-		bytes = min(bytes, sgList->size);
+		bytes = min_c(size, requestSize);
+		bytes = min_c(bytes, sgList->size);
 
 		SHOW_FLOW(4, "buffer=%p, virt_addr=%p, bytes=%d, to_buffer=%d",
 			buffer, (void *)(sgList->address + offset), (int)bytes, toBuffer);

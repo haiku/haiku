@@ -10,10 +10,10 @@ KernelAddon ide :
 	channels.c
 	devices.c
 	dma.c
-	emulation.c
+	emulation.cpp
 	ide.c
 	ide_sim.c
-	pio.c
+	pio.cpp
 	queuing.c
 	scsi2ata.c
 	sync.c

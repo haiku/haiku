@@ -6,6 +6,8 @@
 #define __IDE_INTERNAL_H__
 
 
+#include <sys/cdefs.h>
+
 #include <bus/IDE.h>
 #include <bus/SCSI.h>
 #include "ide_device_infoblock.h"
@@ -289,6 +291,9 @@ device_released_bus(ide_device_info *device)
 }
 
 
+__BEGIN_DECLS
+
+
 // ata.c
 
 bool check_rw_error(ide_device_info *device, ide_qrequest *qrequest);
@@ -397,6 +402,9 @@ void access_finished(ide_bus_info *bus, ide_device_info *device);
 
 status_t ide_irq_handler(ide_bus_info *bus, uint8 status);
 status_t ide_timeout(timer *arg);
+
+
+__END_DECLS
 
 
 #endif	/* __IDE_INTERNAL_H__ */
