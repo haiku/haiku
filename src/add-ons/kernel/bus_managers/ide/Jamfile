@@ -17,6 +17,4 @@ KernelAddon ide :
 	queuing.c
 	scsi2ata.c
 	sync.c
-	virtual_memory.c
-	;
-
+;
