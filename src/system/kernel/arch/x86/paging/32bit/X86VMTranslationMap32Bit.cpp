@@ -211,57 +211,53 @@ X86VMTranslationMap32Bit::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 status_t
 X86VMTranslationMap32Bit::Unmap(addr_t start, addr_t end)
 {
-	page_directory_entry *pd = fPagingStructures->pgdir_virt;
-
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
-	end = ROUNDUP(end, B_PAGE_SIZE);
-
-	TRACE("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end);
-
-restart:
 	if (start >= end)
 		return B_OK;
 
-	int index = VADDR_TO_PDENT(start);
-	if ((pd[index] & X86_PDE_PRESENT) == 0) {
-		// no pagetable here, move the start up to access the next page table
-		start = ROUNDUP(start + 1, B_PAGE_SIZE * 1024);
-		if (start == 0)
-			return B_OK;
-		goto restart;
-	}
+	TRACE("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end);
 
-	struct thread* thread = thread_get_current_thread();
-	ThreadCPUPinner pinner(thread);
+	page_directory_entry *pd = fPagingStructures->pgdir_virt;
 
-	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
-		pd[index] & X86_PDE_ADDRESS_MASK);
-
-	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
-			index++, start += B_PAGE_SIZE) {
-		if ((pt[index] & X86_PTE_PRESENT) == 0) {
-			// page mapping not valid
+	do {
+		int index = VADDR_TO_PDENT(start);
+		if ((pd[index] & X86_PDE_PRESENT) == 0) {
+			// no page table here, move the start up to access the next page
+			// table
+			start = ROUNDUP(start + 1, kPageTableAlignment);
 			continue;
 		}
 
-		TRACE("unmap_tmap: removing page 0x%lx\n", start);
+		struct thread* thread = thread_get_current_thread();
+		ThreadCPUPinner pinner(thread);
 
-		page_table_entry oldEntry
-			= X86PagingMethod32Bit::ClearPageTableEntryFlags(&pt[index],
-				X86_PTE_PRESENT);
-		fMapCount--;
+		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
+			pd[index] & X86_PDE_ADDRESS_MASK);
 
-		if ((oldEntry & X86_PTE_ACCESSED) != 0) {
-			// Note, that we only need to invalidate the address, if the
-			// accessed flags was set, since only then the entry could have been
-			// in any TLB.
-			InvalidatePage(start);
+		for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end);
+				index++, start += B_PAGE_SIZE) {
+			if ((pt[index] & X86_PTE_PRESENT) == 0) {
+				// page mapping not valid
+				continue;
+			}
+
+			TRACE("unmap_tmap: removing page 0x%lx\n", start);
+
+			page_table_entry oldEntry
+				= X86PagingMethod32Bit::ClearPageTableEntryFlags(&pt[index],
+					X86_PTE_PRESENT);
+			fMapCount--;
+
+			if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+				// Note, that we only need to invalidate the address, if the
+				// accessed flags was set, since only then the entry could have
+				// been in any TLB.
+				InvalidatePage(start);
+			}
 		}
-	}
+	} while (start != 0 && start < end);
 
-	pinner.Unlock();
-
-	goto restart;
+	return B_OK;
 }
 
 
@@ -641,9 +637,9 @@ status_t
 X86VMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 	uint32 memoryType)
 {
-	page_directory_entry *pd = fPagingStructures->pgdir_virt;
-
 	start = ROUNDDOWN(start, B_PAGE_SIZE);
+	if (start >= end)
+		return B_OK;
 
 	TRACE("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end,
 		attributes);
@@ -657,62 +653,60 @@ X86VMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
 		newProtectionFlags = X86_PTE_WRITABLE;
 
-restart:
-	if (start >= end)
-		return B_OK;
+	page_directory_entry *pd = fPagingStructures->pgdir_virt;
 
-	int index = VADDR_TO_PDENT(start);
-	if ((pd[index] & X86_PDE_PRESENT) == 0) {
-		// no pagetable here, move the start up to access the next page table
-		start = ROUNDUP(start + 1, B_PAGE_SIZE * 1024);
-		if (start == 0)
-			return B_OK;
-		goto restart;
-	}
-
-	struct thread* thread = thread_get_current_thread();
-	ThreadCPUPinner pinner(thread);
-
-	page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
-		pd[index] & X86_PDE_ADDRESS_MASK);
-
-	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
-			index++, start += B_PAGE_SIZE) {
-		page_table_entry entry = pt[index];
-		if ((entry & X86_PTE_PRESENT) == 0) {
-			// page mapping not valid
+	do {
+		int index = VADDR_TO_PDENT(start);
+		if ((pd[index] & X86_PDE_PRESENT) == 0) {
+			// no page table here, move the start up to access the next page
+			// table
+			start = ROUNDUP(start + 1, kPageTableAlignment);
 			continue;
 		}
 
-		TRACE("protect_tmap: protect page 0x%lx\n", start);
+		struct thread* thread = thread_get_current_thread();
+		ThreadCPUPinner pinner(thread);
 
-		// set the new protection flags -- we want to do that atomically,
-		// without changing the accessed or dirty flag
-		page_table_entry oldEntry;
-		while (true) {
-			oldEntry = X86PagingMethod32Bit::TestAndSetPageTableEntry(
-				&pt[index],
-				(entry & ~(X86_PTE_PROTECTION_MASK | X86_PTE_MEMORY_TYPE_MASK))
-					| newProtectionFlags
-					| X86PagingMethod32Bit::MemoryTypeToPageTableEntryFlags(
-						memoryType),
-				entry);
-			if (oldEntry == entry)
-				break;
-			entry = oldEntry;
+		page_table_entry* pt = (page_table_entry*)fPageMapper->GetPageTableAt(
+			pd[index] & X86_PDE_ADDRESS_MASK);
+
+		for (index = VADDR_TO_PTENT(start); index < 1024 && start < end;
+				index++, start += B_PAGE_SIZE) {
+			page_table_entry entry = pt[index];
+			if ((entry & X86_PTE_PRESENT) == 0) {
+				// page mapping not valid
+				continue;
+			}
+
+			TRACE("protect_tmap: protect page 0x%lx\n", start);
+
+			// set the new protection flags -- we want to do that atomically,
+			// without changing the accessed or dirty flag
+			page_table_entry oldEntry;
+			while (true) {
+				oldEntry = X86PagingMethod32Bit::TestAndSetPageTableEntry(
+					&pt[index],
+					(entry & ~(X86_PTE_PROTECTION_MASK
+							| X86_PTE_MEMORY_TYPE_MASK))
+						| newProtectionFlags
+						| X86PagingMethod32Bit::MemoryTypeToPageTableEntryFlags(
+							memoryType),
+					entry);
+				if (oldEntry == entry)
+					break;
+				entry = oldEntry;
+			}
+
+			if ((oldEntry & X86_PTE_ACCESSED) != 0) {
+				// Note, that we only need to invalidate the address, if the
+				// accessed flag was set, since only then the entry could have
+				// been in any TLB.
+				InvalidatePage(start);
+			}
 		}
+	} while (start != 0 && start < end);
 
-		if ((oldEntry & X86_PTE_ACCESSED) != 0) {
-			// Note, that we only need to invalidate the address, if the
-			// accessed flag was set, since only then the entry could have been
-			// in any TLB.
-			InvalidatePage(start);
-		}
-	}
-
-	pinner.Unlock();
-
-	goto restart;
+	return B_OK;
 }
 
 
