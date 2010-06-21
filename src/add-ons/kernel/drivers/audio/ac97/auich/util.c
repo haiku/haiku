@@ -74,8 +74,10 @@ alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name)
 	LOG(("allocating %d bytes for %s\n",size,name));
 
 	size = round_to_pagesize(size);
-	area = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS,
-		B_READ_AREA | B_WRITE_AREA);
+	area = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
+		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
+		// TODO: The rest of the code doesn't deal correctly with physical
+		// addresses > 4 GB, so we have to force 32 bit addresses here.
 	if (area < B_OK) {
 		PRINT(("couldn't allocate area %s\n", name));
 		return B_ERROR;

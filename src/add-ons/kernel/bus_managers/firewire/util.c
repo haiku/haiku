@@ -46,8 +46,10 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 	TRACE("allocating %ld bytes for %s\n", size, name);
 
 	size = round_to_pagesize(size);
-	area = create_area(name, &virtadr, B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS,
-		protection);
+	area = create_area(name, &virtadr, B_ANY_KERNEL_ADDRESS, size,
+		B_32_BIT_MEMORY, protection);
+		// TODO: The rest of the code doesn't deal correctly with physical
+		// addresses > 4 GB, so we have to force 32 bit addresses here.
 	if (area < B_OK) {
 		ERROR("couldn't allocate area %s\n", name);
 		return B_ERROR;
