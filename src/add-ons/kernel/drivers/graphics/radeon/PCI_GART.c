@@ -90,6 +90,8 @@ static status_t createGARTBuffer( GART_info *gart, size_t size )
 	gart->buffer.unaligned_area = create_area( "Radeon PCI GART buffer",
 		&unaligned_addr, B_ANY_KERNEL_ADDRESS,
 		2 * size, B_CONTIGUOUS/*B_FULL_LOCK*/, B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA );
+		// TODO: Physical aligning can be done without waste using the
+		// private create_area_etc().
 	if (gart->buffer.unaligned_area < 0) {
 		SHOW_ERROR( 1, "cannot create PCI GART buffer (%s)",
 			strerror( gart->buffer.unaligned_area ));
@@ -146,11 +148,13 @@ static status_t initGATT( GART_info *gart )
 
 	num_pages = (gart->buffer.size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	// GART must be contignuous
+	// GART must be contiguous
 	gart->GATT.area = create_area("Radeon GATT", (void **)&gart->GATT.ptr,
 		B_ANY_KERNEL_ADDRESS,
 		(num_pages * sizeof( uint32 ) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1),
-		B_CONTIGUOUS,
+		B_32_BIT_MEMORY,
+			// TODO: Physical address is cast to 32 bit below! Use B_CONTIGUOUS,
+			// when that is (/can be) fixed!
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		// TODO: really user read/write?
 		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA
@@ -182,7 +186,10 @@ static status_t initGATT( GART_info *gart )
 		map_area_size = ((map_area_size / B_PAGE_SIZE) + 1) * B_PAGE_SIZE;
 
 	// temporary area where we fill in the memory map (deleted below)
-	map_area = create_area("pci_gart_map_area", (void **)&map, B_ANY_ADDRESS, map_area_size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	map_area = create_area("pci_gart_map_area", (void **)&map, B_ANY_ADDRESS,
+		map_area_size, B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
+		// TODO: Physical addresses are cast to 32 bit below! Use B_FULL_LOCK,
+		// when that is (/can be) fixed!
 	dprintf("pci_gart_map_area: %ld\n", map_area);
 
 	get_memory_map( gart->buffer.ptr, gart->buffer.size, map, map_count );
