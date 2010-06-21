@@ -129,20 +129,6 @@ scsi_copy_dma_buffer(scsi_ccb *request, uint32 size, bool to_buffer)
 }
 
 
-static int
-log2(uint32 x)
-{
-	int y;
-
-	for (y = 31; y >= 0; --y) {
-		if (x == ((uint32)1 << y))
-			break;
-	}
-
-	return y;
-}
-
-
 static void
 scsi_free_dma_buffer(dma_buffer *buffer)
 {
@@ -173,7 +159,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 	// free old buffer first
 	scsi_free_dma_buffer( buffer );
 
-	// just in case alignment is redicuously huge
+	// just in case alignment is ridiculously huge
 	size = (size + dma_params->alignment) & ~dma_params->alignment;
 
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
@@ -183,62 +169,54 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 	if (size / B_PAGE_SIZE > dma_params->max_sg_blocks
 		|| size / B_PAGE_SIZE > MAX_TEMP_SG_FRAGMENTS) {
 		uint32 boundary = dma_params->dma_boundary;
-		uchar *dma_buffer_address_unaligned;
 
 		// alright - a contiguous buffer is required to keep S/G table short
 		SHOW_INFO(1, "need to setup contiguous DMA buffer of size %d",
 			(int)size);
 
 		// verify that we don't get problems with dma boundary
-		if (boundary != ~0UL) {
+		if (boundary != ~(uint32)0) {
 			if (size > boundary + 1) {
 				SHOW_ERROR(2, "data is longer then maximum DMA transfer len (%d/%d bytes)",
 					(int)size, (int)boundary + 1);
 				return false;
 			}
-
-			// round up to next power of two and allocate a buffer double the
-			// needed size so we can cut out an area that doesn't cross
-			// dma boundary
-			size = (1 << log2( size )) * 2;
 		}
 
-		buffer->area = create_area("DMA buffer",
-			(void **)&dma_buffer_address_unaligned,
-			B_ANY_KERNEL_ADDRESS, size, B_CONTIGUOUS, 0);
+		virtual_address_restrictions virtualRestrictions = {};
+		virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+		physical_address_restrictions physicalRestrictions = {};
+		if (dma_params->alignment != ~(uint32)0)
+			physicalRestrictions.alignment = dma_params->alignment + 1;
+		if (boundary != ~(uint32)0)
+			physicalRestrictions.boundary = boundary + 1;
+#if B_HAIKU_PHYSICAL_BITS > 32
+		physicalRestrictions.high_address = 0x100000000ULL;
+			// TODO: Use 64 bit addresses, if possible!
+#endif
+		buffer->area = create_area_etc(B_SYSTEM_TEAM, "DMA buffer", size,
+			B_CONTIGUOUS, 0, 0, &virtualRestrictions, &physicalRestrictions,
+			(void**)&buffer->address);
+
 		if (buffer->area < 0) {
 			SHOW_ERROR(2, "Cannot create contignous DMA buffer of %d bytes",
 				(int)size);
 			return false;
 		}
 
-		if (boundary != ~0UL) {
-			uchar *next_boundary;
-
-			// boundary case: cut out piece aligned on "size"
-			buffer->address = (uchar *)(
-				((addr_t)dma_buffer_address_unaligned + size - 1) & ~(size - 1));
-
-			// determine how many bytes are available until next DMA boundary
-			next_boundary = (uchar *)(((addr_t)buffer->address + boundary - 1) &
-				~(boundary - 1));
-
-			// adjust next boundary if outside allocated area
-			if( next_boundary > dma_buffer_address_unaligned + size )
-				next_boundary = dma_buffer_address_unaligned + size;
-
-			buffer->size = next_boundary - buffer->address;
-		} else {
-			// non-boundary case: use buffer directly
-			buffer->address = dma_buffer_address_unaligned;
-			buffer->size = size;
-		}
+		buffer->size = size;
 	} else {
 		// we can live with a fragmented buffer - very nice
-		buffer->area = create_area( "DMA buffer",
+		buffer->area = create_area("DMA buffer",
 			(void **)&buffer->address,
 			B_ANY_KERNEL_ADDRESS, size,
-			B_FULL_LOCK, 0 );
+#if B_HAIKU_PHYSICAL_BITS > 32
+			B_32_BIT_MEMORY,
+				// TODO: Use B_FULL_LOCK, if possible!
+#else
+			B_FULL_LOCK,
+#endif
+			0);
 		if (buffer->area < 0) {
 			SHOW_ERROR(2, "Cannot create DMA buffer of %d bytes",
 				(int)size);
@@ -255,9 +233,14 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 	sg_list_size = (sg_list_size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	buffer->sg_list_area = create_area("DMA buffer S/G table",
-		(void **)&buffer->sg_list,
-		B_ANY_KERNEL_ADDRESS, sg_list_size,
-		B_FULL_LOCK, 0);
+		(void **)&buffer->sg_list, B_ANY_KERNEL_ADDRESS, sg_list_size,
+#if B_HAIKU_PHYSICAL_BITS > 32
+		B_32_BIT_MEMORY,
+			// TODO: Use B_FULL_LOCK, if possible!
+#else
+		B_FULL_LOCK,
+#endif
+		0);
 	if (buffer->sg_list_area < 0) {
 		SHOW_ERROR( 2, "Cannot craete DMA buffer S/G list of %d bytes",
 			(int)sg_list_size );
