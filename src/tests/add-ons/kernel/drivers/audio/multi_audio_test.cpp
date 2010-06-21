@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 
 #ifdef HAIKU_MULTI_AUDIO
 #	include <hmulti_audio.h>
@@ -29,7 +30,7 @@ const uint32 kSampleRates[] = {
 };
 const struct {
 	uint32	type;
-	char*	name;
+	const char*	name;
 } kFormats[] = {
 	{B_FMT_8BIT_S, "8bit"},
 	{B_FMT_8BIT_U, "8bit-unsigned"},
@@ -44,9 +45,9 @@ const struct {
 
 
 struct cmd_entry {
-	char*	name;
-	void	(*func)(int argc, char **argv);
-	char*	help;
+	const char*	name;
+	void		(*func)(int argc, char **argv);
+	const char*	help;
 };
 
 
