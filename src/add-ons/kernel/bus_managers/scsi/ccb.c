@@ -69,10 +69,7 @@ ccb_low_alloc_hook(void *block, void *arg)
 	scsi_ccb *ccb = (scsi_ccb *)block;
 	scsi_bus_info *bus = (scsi_bus_info *)arg;
 	status_t res;
-	physical_entry map[2];
 
-	get_memory_map(ccb, sizeof(*ccb), map, 2);
-		// TODO: Since map is not used, this is useless!
 	ccb->bus = bus;
 	ccb->path_id = bus->path_id;
 	ccb->state = SCSI_STATE_FREE;
