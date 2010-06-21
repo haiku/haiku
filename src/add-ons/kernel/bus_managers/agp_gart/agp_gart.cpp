@@ -540,6 +540,11 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 
 	if ((flags & B_APERTURE_NEED_PHYSICAL) != 0) {
 		physical_address_restrictions restrictions = {};
+#if B_HAIKU_PHYSICAL_BITS > 32
+		restrictions.high_address = (phys_addr_t)1 << 32;
+			// TODO: Work-around until intel_gart can deal with physical
+			// addresses > 4 GB.
+#endif
 		memory->page = vm_page_allocate_page_run(
 			PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR, count, &restrictions,
 			VM_PRIORITY_SYSTEM);
@@ -551,6 +556,20 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 		if (memory->pages == NULL)
 			return B_NO_MEMORY;
 
+#if B_HAIKU_PHYSICAL_BITS > 32
+		// TODO: Work-around until intel_gart can deal with physical
+		// addresses > 4 GB.
+		physical_address_restrictions restrictions = {};
+		restrictions.high_address = (phys_addr_t)1 << 32;
+		vm_page* page = vm_page_allocate_page_run(
+			PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR, count, &restrictions,
+			VM_PRIORITY_SYSTEM);
+		if (page == NULL)
+			return B_NO_MEMORY;
+
+		for (uint32 i = 0; i < count; i++)
+			memory->pages[i] = page + i;
+#else
 		vm_page_reservation reservation;
 		vm_page_reserve_pages(&reservation, count, VM_PRIORITY_SYSTEM);
 		for (uint32 i = 0; i < count; i++) {
@@ -558,6 +577,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 				PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
 		}
 		vm_page_unreserve_pages(&reservation);
+#endif
 	}
 
 #ifdef DEBUG_PAGE_ACCESS
