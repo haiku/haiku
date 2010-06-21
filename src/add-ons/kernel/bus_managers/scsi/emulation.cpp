@@ -54,8 +54,6 @@ status_t
 scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 {
 	physical_entry map[1];
-	phys_addr_t unaligned_phys, aligned_phys;
-	addr_t aligned_addr, unaligned_addr;
 	size_t total_size;
 
 	SHOW_FLOW0(3, "");
@@ -67,12 +65,19 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 	}
 
 	// we append S/G list to buffer as it must be locked as well
-	total_size = (buffer_size + sizeof(physical_entry) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	total_size = (buffer_size + sizeof(physical_entry) + B_PAGE_SIZE - 1)
+		& ~(B_PAGE_SIZE - 1);
 
-	// to satisfy alignment, we must allocate a buffer twice its required size
-	// and find the properly aligned part of it, ouch!
-	device->buffer_area = create_area("ATAPI buffer", (void**)&unaligned_addr,
-		B_ANY_KERNEL_ADDRESS, 2 * total_size, B_CONTIGUOUS, 0);
+	void* address;
+	virtual_address_restrictions virtualRestrictions = {};
+	virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+	physical_address_restrictions physicalRestrictions = {};
+	physicalRestrictions.alignment = buffer_size;
+	device->buffer_area = create_area_etc(B_SYSTEM_TEAM, "ATAPI buffer",
+		total_size, B_32_BIT_MEMORY, 0, 0, &virtualRestrictions,
+		&physicalRestrictions, &address);
+		// TODO: Use B_CONTIGUOUS, if possible!
+
 	if (device->buffer_area < 0) {
 		SHOW_ERROR( 1, "cannot create DMA buffer (%s)", strerror(device->buffer_area));
 
@@ -80,22 +85,19 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 		return device->buffer_area;
 	}
 
-	get_memory_map((void *)unaligned_addr, B_PAGE_SIZE, map, 1);
+	get_memory_map(address, B_PAGE_SIZE, map, 1);
 
 	// get aligned part
-	unaligned_phys = map[0].address;
-	aligned_phys = (unaligned_phys + buffer_size - 1) & ~(buffer_size - 1);
-	aligned_addr = unaligned_addr + (aligned_phys - unaligned_phys);
+	phys_addr_t physicalAddress = map[0].address;
 
-	SHOW_FLOW(3, "unaligned_phys = %#" B_PRIxPHYSADDR ", aligned_phys = %#"
-		B_PRIxPHYSADDR ", unaligned_addr = %#" B_PRIxADDR ", aligned_addr = %#"
-		B_PRIxADDR, unaligned_phys, aligned_phys, unaligned_addr, aligned_addr);
+	SHOW_FLOW(3, "physical = %#" B_PRIxPHYSADDR ", address = %p",
+		physicalAddress, address);
 
-	device->buffer = (char*)aligned_addr;
+	device->buffer = (char*)address;
 	device->buffer_size = buffer_size;
 	// s/g list is directly after buffer
-	device->buffer_sg_list = (physical_entry*)(aligned_addr + buffer_size);
-	device->buffer_sg_list[0].address = aligned_phys;
+	device->buffer_sg_list = (physical_entry*)((char*)address + buffer_size);
+	device->buffer_sg_list[0].address = physicalAddress;
 	device->buffer_sg_list[0].size = buffer_size;
 	device->buffer_sg_count = 1;
 
