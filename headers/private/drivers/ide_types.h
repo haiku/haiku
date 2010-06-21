@@ -222,14 +222,14 @@ enum {
 
 	// packet
 	ide_mask_byte_count			= 0x18,
-	
+
 	// packet and dma queued result
 	ide_mask_error				= 0x01,
 	ide_mask_ireason			= 0x02,
 
 	ide_mask_device_head		= 0x20,
 	ide_mask_command			= 0x40,
-	
+
 	ide_mask_status				= 0x40,
 
 	// for 48 bits, the following flags tell which registers to load twice
@@ -238,7 +238,7 @@ enum {
 	ide_mask_LBA_low_48			= 0x200 | ide_mask_LBA_low,
 	ide_mask_LBA_mid_48			= 0x400 | ide_mask_LBA_mid,
 	ide_mask_LBA_high_48		= 0x800 | ide_mask_LBA_high,
-	
+
 	ide_mask_HOB				= 0xf80
 }; // ide_reg_mask
 
@@ -256,7 +256,7 @@ enum {
 	ide_status_df		= 0x20,		// packet: disk failure
 	ide_status_drdy		= 0x40,		// device ready
 	ide_status_bsy		= 0x80		// busy
-} ide_status_mask;
+}; // ide_status_mask
 
 // device control register
 enum {
@@ -266,7 +266,7 @@ enum {
 	ide_devctrl_bit3	= 0x08,		// don't know, but must be set
 									// bits inbetween are reserved
 	ide_devctrl_hob		= 0x80		// read high order byte (for 48-bit lba)
-} ide_devcntrl_mask;
+}; // ide_devcntrl_mask
 
 // error register - most bits are command specific
 enum {
@@ -286,7 +286,7 @@ enum {
 	ide_error_idnf		= 0x10,		// CHS translation not init./ invalid CHS address
 	ide_error_mcr		= 0x08,		// media change requested
 	ide_error_nm		= 0x02,		// no media (for removable media devices)
-} ide_error_mask;
+}; // ide_error_mask
 
 
 typedef struct ide_channel_info *ide_channel_cookie;
