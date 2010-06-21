@@ -99,7 +99,7 @@ class DCRaw {
 		void _PreInterpolate();
 		void _CameraToCIELab(ushort cam[4], float lab[3]);
 		void _CameraXYZCoefficients(double cam_xyz[4][3]);
-		void _AdobeCoefficients(char* manufacturer, char* model);
+		void _AdobeCoefficients(const char *manufacturer, const char *model);
 		void _BorderInterpolate(uint32 border);
 		void _AHDInterpolate();
 		void _PseudoInverse(double (*in)[3], double (*out)[3], uint32 size);

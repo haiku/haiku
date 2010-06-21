@@ -1348,7 +1348,7 @@ DCRaw::_CameraXYZCoefficients(double cameraXYZ[4][3])
 /*!	Thanks to Adobe for providing these excellent CAM -> XYZ matrices!
 */
 void
-DCRaw::_AdobeCoefficients(char *make, char *model)
+DCRaw::_AdobeCoefficients(const char *make, const char *model)
 {
 	static const struct {
 		const char *prefix;
