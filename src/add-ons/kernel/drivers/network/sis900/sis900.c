@@ -152,8 +152,10 @@ sis900_txInterrupt(struct sis_info *info)
 			struct buffer_desc *descriptor = (void *)read32(info->registers + SiS900_MAC_Tx_DESCR);
 			int16 that;
 			for (that = 0;
-				that < NUM_Tx_DESCR && (void *)physicalAddress(&info->txDescriptor[that],
-					sizeof(struct buffer_desc)) != descriptor; that++) {
+				that < NUM_Tx_DESCR
+					&& physicalAddress(&info->txDescriptor[that],
+						sizeof(struct buffer_desc)) != (addr_t)descriptor;
+				that++) {
 			}
 			if (that == NUM_Tx_DESCR)
 				that = 0;
@@ -732,7 +734,9 @@ sis900_createRings(struct sis_info *info)
 	info->txArea = create_area("sis900 tx buffer", (void **)&info->txBuffer[0],
 		B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Tx_DESCR),
-		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
+			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
+			// be necessary here!
 	if (info->txArea < B_OK)
 		return info->txArea;
 
@@ -755,7 +759,9 @@ sis900_createRings(struct sis_info *info)
 	info->rxArea = create_area("sis900 rx buffer", (void **)&info->rxBuffer[0],
 		B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Rx_DESCR),
-		B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
+			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
+			// be necessary here!
 	if (info->rxArea < B_OK) {
 		delete_area(info->txArea);
 		return info->rxArea;

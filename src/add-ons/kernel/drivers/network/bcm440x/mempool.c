@@ -1,7 +1,7 @@
 /* Intel PRO/1000 Family Driver
  * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
  *
- * Permission to use, copy, modify and distribute this software and its 
+ * Permission to use, copy, modify and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
  * that the above copyright notice appear in all copies, and that both the
  * copyright notice and this permission notice appear in supporting documentation.
@@ -29,9 +29,13 @@ area_malloc(size_t size)
 {
 	void *p;
 	size = ROUNDUP(size, B_PAGE_SIZE);
-	
-	if (create_area("area_malloc", &p, B_ANY_KERNEL_ADDRESS, size, B_FULL_LOCK, 0) < 0)
+
+	if (create_area("area_malloc", &p, B_ANY_KERNEL_ADDRESS, size,
+			B_32_BIT_MEMORY, 0) < 0) {
+		// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
+		// be necessary here!
 		return 0;
+	}
 	return p;
 }
 
@@ -47,18 +51,18 @@ mempool_init(int count)
 	int chunk_size = 2048;
 
 	int chunk_alloc_size = chunk_size * (count + 1);
-	
+
 	char *chunk_base;
-	
+
 	int i;
-		
+
 	chunk_pool = area_malloc(chunk_alloc_size);
 	if (!chunk_pool) {
 		return -1;
 	}
 
 	chunk_base = (char *)ROUNDUP((unsigned long)chunk_pool, 2048);
-	
+
 	for (i = 0; i < count; i++) {
 		chunk_pool_put(chunk_base + i * chunk_size);
 	}

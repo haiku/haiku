@@ -599,7 +599,9 @@ b44_MM_AllocateSharedMemory(PLM_DEVICE_BLOCK pDevice, LM_UINT32 BlockSize,
 	dev = (struct be_b44_dev *)(pDevice);
 	area_desc = dev->lockmem_list[dev->lockmem_list_num++] = create_area("broadcom_shared_mem",
 		&pvirt, B_ANY_KERNEL_ADDRESS, ROUND_UP_TO_PAGE(BlockSize),
-		/*B_CONTIGUOUS*/ B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
+		// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
+		// be necessary here!
 	if (area_desc < B_OK)
 		return LM_STATUS_FAILURE;
 

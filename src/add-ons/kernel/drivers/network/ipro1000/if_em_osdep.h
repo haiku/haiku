@@ -114,7 +114,7 @@ typedef ipro1000_device * device_t;
 void *contigmalloc(int size, int p1, int p2, int p3, int p4, int p5, int p6);
 void contigfree(void *p, int p1, int p2);
 
-static inline unsigned long vtophys(unsigned long virtual_addr)
+static inline u_int64_t vtophys(unsigned long virtual_addr)
 {
 	physical_entry pe;
 	status_t err;
