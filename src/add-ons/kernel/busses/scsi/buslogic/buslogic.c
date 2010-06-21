@@ -832,7 +832,7 @@ static BusLogic *create_cardinfo(int num, int iobase, int irq)
 #else
     bl->box_count = MAX_CCB_COUNT;
     aid = create_area("bl_workspace", (void **)&a, B_ANY_KERNEL_ADDRESS, 4096*5,
-                      B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+                      B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
     if(aid == B_ERROR || aid == B_BAD_VALUE || aid == B_NO_MEMORY) {
         free(bl);
         return NULL;
