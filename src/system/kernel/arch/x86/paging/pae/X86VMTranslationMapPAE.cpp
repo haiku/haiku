@@ -359,61 +359,12 @@ X86VMTranslationMapPAE::UnmapPage(VMArea* area, addr_t address,
 		// (cf. pmap_remove_all()), unless I've missed something.
 	}
 
-	if (area->cache_type == CACHE_TYPE_DEVICE)
-		return B_OK;
+	locker.Detach();
+		// PageUnmapped() will unlock for us
 
-	// get the page
-	vm_page* page = vm_lookup_page(
-		(oldEntry & X86_PAE_PTE_ADDRESS_MASK) / B_PAGE_SIZE);
-	ASSERT_PRINT(page != NULL, "page: %p, pte: %#" B_PRIx64, page, oldEntry);
-
-	// transfer the accessed/dirty flags to the page
-	if ((oldEntry & X86_PAE_PTE_ACCESSED) != 0)
-		page->accessed = true;
-	if ((oldEntry & X86_PAE_PTE_DIRTY) != 0)
-		page->modified = true;
-
-	// TODO: Here comes a lot of paging method and even architecture independent
-	// code. Refactor!
-
-	// remove the mapping object/decrement the wired_count of the page
-	vm_page_mapping* mapping = NULL;
-	if (area->wiring == B_NO_LOCK) {
-		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
-		while ((mapping = iterator.Next()) != NULL) {
-			if (mapping->area == area) {
-				area->mappings.Remove(mapping);
-				page->mappings.Remove(mapping);
-				break;
-			}
-		}
-
-		ASSERT_PRINT(mapping != NULL, "page: %p, pte: %#" B_PRIx64, page,
-			oldEntry);
-	} else
-		page->wired_count--;
-
-	locker.Unlock();
-
-	if (page->wired_count == 0 && page->mappings.IsEmpty()) {
-		atomic_add(&gMappedPagesCount, -1);
-
-		if (updatePageQueue) {
-			if (page->Cache()->temporary)
-				vm_page_set_state(page, PAGE_STATE_INACTIVE);
-			else if (page->modified)
-				vm_page_set_state(page, PAGE_STATE_MODIFIED);
-			else
-				vm_page_set_state(page, PAGE_STATE_CACHED);
-		}
-	}
-
-	if (mapping != NULL) {
-		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-		object_cache_free(gPageMappingsObjectCache, mapping,
-			CACHE_DONT_WAIT_FOR_MEMORY
-				| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
-	}
+	PageUnmapped(area, (oldEntry & X86_PAE_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
+		(oldEntry & X86_PAE_PTE_ACCESSED) != 0,
+		(oldEntry & X86_PAE_PTE_DIRTY) != 0, updatePageQueue);
 
 	return B_OK;
 }
@@ -728,44 +679,11 @@ X86VMTranslationMapPAE::ClearAccessedAndModified(VMArea* area, addr_t address,
 
 	fMapCount--;
 
-	if (area->cache_type == CACHE_TYPE_DEVICE)
-		return false;
+	locker.Detach();
+		// UnaccessedPageUnmapped() will unlock for us
 
-	// get the page
-	vm_page* page = vm_lookup_page(
+	UnaccessedPageUnmapped(area,
 		(oldEntry & X86_PAE_PTE_ADDRESS_MASK) / B_PAGE_SIZE);
-	ASSERT(page != NULL);
-
-	// TODO: Here comes a lot of paging method and even architecture independent
-	// code. Refactor!
-
-	// remove the mapping object/decrement the wired_count of the page
-	vm_page_mapping* mapping = NULL;
-	if (area->wiring == B_NO_LOCK) {
-		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
-		while ((mapping = iterator.Next()) != NULL) {
-			if (mapping->area == area) {
-				area->mappings.Remove(mapping);
-				page->mappings.Remove(mapping);
-				break;
-			}
-		}
-
-		ASSERT(mapping != NULL);
-	} else
-		page->wired_count--;
-
-	locker.Unlock();
-
-	if (page->wired_count == 0 && page->mappings.IsEmpty())
-		atomic_add(&gMappedPagesCount, -1);
-
-	if (mapping != NULL) {
-		object_cache_free(gPageMappingsObjectCache, mapping,
-			CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
-			// Since this is called by the page daemon, we never want to lock
-			// the kernel address space.
-	}
 
 	return false;
 }
