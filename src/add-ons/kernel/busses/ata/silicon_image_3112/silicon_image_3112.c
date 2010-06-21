@@ -449,9 +449,11 @@ channel_init(device_node *node, void **_channelCookie)
 	TRACE("mmio_addr %p\n", (void *)controller->mmio_addr);
 
 	// PRDT must be contiguous, dword-aligned and must not cross 64K boundary
+// TODO: Where's the handling for the 64 K boundary? create_area_etc() can be
+// used.
 	prdtSize = (ATA_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
 	channel->prd_area = create_area("prd", (void **)&channel->prdt,
-		B_ANY_KERNEL_ADDRESS, prdtSize, B_CONTIGUOUS, 0);
+		B_ANY_KERNEL_ADDRESS, prdtSize, B_32_BIT_MEMORY, 0);
 	if (channel->prd_area < B_OK) {
 		TRACE("creating prd_area failed\n");
 		goto err;
