@@ -88,6 +88,15 @@ static status_t Radeon_PrepareDMA(
 			if( contig_size == 0 )
 				break;
 
+#if B_HAIKU_PHYSICAL_BITS > 32
+			if (address + contig_size > (phys_addr_t)1 << 32) {
+				SHOW_ERROR(2, "Physical address > 4 GB: %#" B_PRIxPHYSADDR
+					"size: %#" B_PRIxSIZE, address, size);
+				res = B_BAD_VALUE;
+				goto err;
+			}
+#endif
+
 			target += contig_size;
 
 			while( contig_size > 0 ) {
