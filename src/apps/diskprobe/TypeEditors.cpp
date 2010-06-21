@@ -195,7 +195,7 @@ TypeEditorView::TypeMatches()
 
 
 StringEditor::StringEditor(BRect rect, DataEditor& editor)
-	: TypeEditorView(rect, "String editor", B_FOLLOW_ALL, 0, editor)
+	: TypeEditorView(rect, B_TRANSLATE("String editor"), B_FOLLOW_ALL, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -746,7 +746,7 @@ NumberEditor::MessageReceived(BMessage *message)
 
 
 BooleanEditor::BooleanEditor(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Boolean editor", B_FOLLOW_NONE, 0, editor)
+	: TypeEditorView(rect, B_TRANSLATE("Boolean editor"), B_FOLLOW_NONE, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -843,7 +843,8 @@ BooleanEditor::MessageReceived(BMessage *message)
 
 
 ImageView::ImageView(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, B_TRANSLATE("Image view"), B_FOLLOW_NONE, 
+	: TypeEditorView(rect, B_TRANSLATE_COMMENT("Image view", "Image means "
+		"here a picture file, not a disk image."), B_FOLLOW_NONE, 
 	B_WILL_DRAW, editor),
 	fBitmap(NULL),
 	fScaleSlider(NULL)
@@ -871,7 +872,8 @@ ImageView::ImageView(BRect rect, DataEditor &editor)
 #endif
 
 	fDescriptionView = new BStringView(Bounds(), "", 
-		B_TRANSLATE("Could not read image"), B_FOLLOW_NONE);
+		B_TRANSLATE_COMMENT("Could not read image", "Image means "
+		"here a picture file, not a disk image."), B_FOLLOW_NONE);
 	fDescriptionView->SetAlignment(B_ALIGN_CENTER);
 
 	AddChild(fDescriptionView);
@@ -1075,10 +1077,12 @@ ImageView::_UpdateImage()
 				break;
 		}
 		snprintf(buffer, sizeof(buffer), "%s, %g x %g, %s", type,
-			fBitmap->Bounds().Width() + 1, fBitmap->Bounds().Height() + 1, colorSpace);
+			fBitmap->Bounds().Width() + 1, fBitmap->Bounds().Height() + 1, 
+			colorSpace);
 		fDescriptionView->SetText(buffer);
 	} else
-		fDescriptionView->SetText(B_TRANSLATE("Could not read image"));
+		fDescriptionView->SetText(B_TRANSLATE_COMMENT("Could not read image", 
+			"Image means here a picture file, not a disk image."));
 
 	// Update the view size to match the image and its description
 
@@ -1184,7 +1188,9 @@ MessageView::SetTo(BMessage& message)
 	fTextView->SetText("");
 
 	char text[512];
-	snprintf(text, sizeof(text), B_TRANSLATE("what: '%.4s'\n\n"), (char*)&message.what);
+	snprintf(text, sizeof(text), B_TRANSLATE_COMMENT("what: '%.4s'\n\n", 
+		"'What' is a message specifier that defines the type of the message."),
+		(char*)&message.what);
 	fTextView->Insert(text);
 
 	type_code type;
@@ -1353,11 +1359,11 @@ status_t
 GetNthTypeEditor(int32 index, const char** _name)
 {
 	static const char* kEditors[] = {
-		B_TRANSLATE("Text"),
-		B_TRANSLATE("Number"),
-		B_TRANSLATE("Boolean"),
-		B_TRANSLATE("Message"),
-		B_TRANSLATE("Image")
+		B_TRANSLATE_COMMENT("Text", "This is the type of editor"),
+		B_TRANSLATE_COMMENT("Number", "This is the type of editor"),
+		B_TRANSLATE_COMMENT("Boolean", "This is the type of editor"),
+		B_TRANSLATE_COMMENT("Message", "This is the type of view"),
+		B_TRANSLATE_COMMENT("Image", "This is the type of view")
 	};
 
 	if (index < 0 || index >= int32(sizeof(kEditors) / sizeof(kEditors[0])))

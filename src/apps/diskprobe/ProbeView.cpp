@@ -490,8 +490,9 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	plainFont.SetSize(10.0);
 
 	BRect rect = Bounds();
-	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, "Stop",
-		new BMessage(kMsgStopFind), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, 
+		B_TRANSLATE("Stop"), new BMessage(kMsgStopFind), 
+		B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fStopButton->SetFont(&plainFont);
 	fStopButton->ResizeToPreferred();
 	fStopButton->MoveTo(rect.right - 4 - fStopButton->Bounds().Width(), 4);
@@ -575,7 +576,10 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect.left = rect.right + 4;
 	rect.right = rect.left + 75;
 	rect.OffsetBy(0, 2);
-	fSizeView = new BStringView(rect, B_EMPTY_STRING, B_TRANSLATE("of 0x0"));
+	fSizeView = new BStringView(rect, B_EMPTY_STRING, B_TRANSLATE_COMMENT("of "
+		"0x0", "This is a part of \"Block 0xXXXX of 0x0026\" message. In "
+		"languages without 'of' structure it can be replaced simply "
+		"with '/'."));
 	fSizeView->SetFont(&plainFont);
 	AddChild(fSizeView);
 	UpdateFileSizeView();
@@ -1100,8 +1104,9 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
 			// If the user had to wait more than 8 seconds for the result,
 			// we are trying to please him with a requester...
 			(new BAlert(B_TRANSLATE("DiskProbe request"),
-				B_TRANSLATE("Could not find search string."), B_TRANSLATE("OK"), NULL, NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+				B_TRANSLATE("Could not find search string."), 
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, 
+				B_WARNING_ALERT))->Go(NULL);
 		} else
 			beep();
 	}
@@ -1307,7 +1312,8 @@ ProbeView::_UpdateAttributesMenu(BMenu *menu)
 	if (menu->CountItems() == 0) {
 		// if there are no attributes, add an item to the menu
 		// that says so
-		BMenuItem *item = new BMenuItem("none", NULL);
+		BMenuItem *item = new BMenuItem(B_TRANSLATE_COMMENT("none", 
+			"No attributes"), NULL);
 		item->SetEnabled(false);
 		menu->AddItem(item);
 	}
@@ -1501,21 +1507,29 @@ ProbeView::AttachedToWindow()
 
 	// "View" menu
 
-	menu = new BMenu(B_TRANSLATE("View"));
+	menu = new BMenu(B_TRANSLATE_COMMENT("View", 
+		"This is the last menubar item \"File Edit Block View\""));
 
 	// Number Base (hex/decimal)
 
-	subMenu = new BMenu(B_TRANSLATE("Base"));
+	subMenu = new BMenu(B_TRANSLATE_COMMENT("Base", "A menu item, the number "
+		"that is basis for a system of calculation. The base 10 system is a "
+		"decimal system. This is in the same menu window than \"Font size\" "
+		"and \"BlockSize\""));
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kDecimalBase);
-	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Decimal"), message, 'D'));
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Decimal", 
+		"A menu item, as short as possible, noun is recommended if it is "
+		"shorter than adjective."), message, 'D'));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kDecimalBase)
 		item->SetMarked(true);
 
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kHexBase);
-	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Hex"), message, 'H'));
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Hex", 
+		"A menu item, as short as possible, noun is recommended if it is "
+		"shorter than adjective."), message, 'H'));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kHexBase)
 		item->SetMarked(true);
@@ -1525,7 +1539,9 @@ ProbeView::AttachedToWindow()
 
 	// Block Size
 
-	subMenu = new BMenu(B_TRANSLATE("BlockSize"));
+	subMenu = new BMenu(B_TRANSLATE_COMMENT("BlockSize", "A menu item, a "
+		"shortened form from \"block size\". This is in the same menu window"
+		"than \"Base\" and \"Font size\""));
 	subMenu->SetRadioMode(true);
 	const uint32 blockSizes[] = {512, 1024, 2048};
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
@@ -1570,7 +1586,8 @@ ProbeView::AttachedToWindow()
 			item->SetMarked(true);
 	}
 	subMenu->AddSeparatorItem();
-	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE("Fit"),
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Fit", 
+		"Size of fonts, fits to available room"), 
 		message = new BMessage(kMsgFontSize)));
 	message->AddFloat("font_size", 0.0f);
 	if (fontSize == 0)
@@ -1756,7 +1773,7 @@ ProbeView::_SetTypeEditor(int32 index)
 
 		_RemoveTypeEditor();
 
-		fTypeView = new TypeView(Frame(), B_TRANSLATE("type shell"), index, fEditor,
+		fTypeView = new TypeView(Frame(), "type shell", index, fEditor,
 			B_FOLLOW_ALL);
 
 		if (Parent() != NULL)

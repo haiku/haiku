@@ -364,8 +364,10 @@ DiskProbe::RefsReceived(BMessage *message)
 		if (status != B_OK) {
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
-				B_TRANSLATE("Could not open \"%s\":\n"
-				"%s"),
+				B_TRANSLATE_COMMENT("Could not open \"%s\":\n"
+				"%s", "Opening of entry reference buffer for a DiskProbe "
+				"request Alert message. The name of entry reference and "
+				"error message is shown."),
 				ref.name, strerror(status));
 
 			(new BAlert(B_TRANSLATE("DiskProbe request"),
