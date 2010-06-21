@@ -33,7 +33,9 @@
 #include "ActiveTranslatorsWindow.h"
 #include "TranslatorItem.h"
 #include <Application.h>
+#include <Catalog.h>
 #include <ScrollView.h>
+#include <Locale.h>
 #include <Message.h>
 #include <String.h>
 #include <stdlib.h>
@@ -41,6 +43,9 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
+
+#define B_TRANSLATE_CONTEXT "ActiveTranslatorsWindow"
+
 
 ActiveTranslatorsWindow::ActiveTranslatorsWindow(BRect rect, const char *name,
 	BList *plist)
@@ -52,9 +57,9 @@ ActiveTranslatorsWindow::ActiveTranslatorsWindow(BRect rect, const char *name,
 	fpListView = new BOutlineListView(rctframe, "translators_list",
 		B_MULTIPLE_SELECTION_LIST);
 
-	fpListView->AddItem(fpUserItem = new BStringItem("User Translators"));
+	fpListView->AddItem(fpUserItem = new BStringItem(B_TRANSLATE("User Translators")));
 	fpUserItem->SetEnabled(false);
-	fpListView->AddItem(fpSystemItem = new BStringItem("System Translators"));
+	fpListView->AddItem(fpSystemItem = new BStringItem(B_TRANSLATE("System Translators")));
 	fpSystemItem->SetEnabled(false);
 	AddTranslatorsToList(plist, USER_TRANSLATOR, fpUserItem);
 	AddTranslatorsToList(plist, SYSTEM_TRANSLATOR, fpSystemItem);

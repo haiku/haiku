@@ -11,5 +11,14 @@ Application Inspector :
 	ImageWindow.cpp
 	InspectorApp.cpp ;
 
-LinkAgainst Inspector : be tracker translation $(TARGET_LIBSUPC++) ;
+DoCatalogs Inspector :
+	x.vnd.OBOS-Inspector
+	:
+	InspectorApp.cpp
+	ImageWindow.cpp
+	ImageView.cpp
+	ActiveTranslatorsWindow.cpp
+;
+
+LinkAgainst Inspector : be tracker locale translation $(TARGET_LIBSUPC++) ;
 

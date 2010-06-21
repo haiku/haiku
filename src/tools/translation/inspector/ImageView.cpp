@@ -37,7 +37,9 @@
 #include "InspectorApp.h"
 #include "TranslatorItem.h"
 #include <Application.h>
+#include <Catalog.h>
 #include <Message.h>
+#include <Locale.h>
 #include <List.h>
 #include <String.h>
 #include <TranslationUtils.h>
@@ -59,6 +61,9 @@
 #define BORDER_HEIGHT 16
 #define PEN_SIZE 1.0f
 
+#define B_TRANSLATE_CONTEXT "ImageView"
+
+
 ImageView::ImageView(BRect rect, const char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
 {
@@ -71,17 +76,20 @@ ImageView::ImageView(BRect rect, const char *name)
 	SetPenSize(PEN_SIZE);
 }
 
+
 ImageView::~ImageView()
 {
 	delete fpbitmap;
 	fpbitmap = NULL;
 }
 
+
 void
 ImageView::AttachedToWindow()
 {
 	AdjustScrollBars();
 }
+
 
 void
 ImageView::Draw(BRect rect)
@@ -98,11 +106,13 @@ ImageView::Draw(BRect rect)
 	}
 }
 
+
 void
 ImageView::ReDraw()
 {
 	Draw(Bounds());
 }
+
 
 void
 ImageView::FrameResized(float width, float height)
@@ -112,6 +122,7 @@ ImageView::FrameResized(float width, float height)
 	if (!HasImage())
 		Invalidate();
 }
+
 
 void
 ImageView::MouseDown(BPoint point)
@@ -139,15 +150,18 @@ ImageView::MouseDown(BPoint point)
 	DragMessage(&msg, Bounds());
 }
 
+
 void
 ImageView::MouseMoved(BPoint point, uint32 state, const BMessage *pmsg)
 {
 }
 
+
 void
 ImageView::MouseUp(BPoint point)
 {
 }
+
 
 void
 ImageView::MessageReceived(BMessage *pmsg)
@@ -162,6 +176,7 @@ ImageView::MessageReceived(BMessage *pmsg)
 			break;
 	}
 }
+
 
 void
 ImageView::SaveImageAtDropLocation(BMessage *pmsg)
@@ -189,12 +204,14 @@ ImageView::SaveImageAtDropLocation(BMessage *pmsg)
 
 	} catch (StatusNotOKException) {
 		BAlert *palert = new BAlert(NULL,
-			"Sorry, unable to write the image file.", "OK");
+			B_TRANSLATE("Sorry, unable to write the image file."), 
+			B_TRANSLATE("OK"));
 		palert->Go();
 	}
 	
 	stream.DetachBitmap(&fpbitmap);
 }
+
 
 void
 ImageView::AdjustScrollBars()
@@ -227,11 +244,13 @@ ImageView::AdjustScrollBars()
 	}
 }
 
+
 struct ColorSpaceName { 
 	color_space id;
 	const char *name;
 };
 #define COLORSPACENAME(id) {id, #id}
+
 
 // convert colorspace numerical value to
 // a string value
@@ -293,8 +312,9 @@ get_color_space_name(color_space colors)
 			return kcolorspaces[i].name;
 	}
 
-	return "Unknown";
+	return B_TRANSLATE("Unknown");
 }
+
 
 // return a string of the passed number formated
 // as a hexadecimal number in lowercase with a leading "0x"
@@ -306,6 +326,7 @@ hex_format(uint32 num)
 	
 	return str;
 }
+
 
 // convert passed number to a string of 4 characters
 // and return that string
@@ -319,21 +340,39 @@ char_format(uint32 num)
 	return str;
 }
 
+
 void
 dump_translation_formats(BString &bstr, const translation_format *pfmts,
 	int32 nfmts)
 {
+	BString *str1 = NULL;
 	for (int i = 0; i < nfmts; i++) {
-		bstr << "\nType: '" << char_format(pfmts[i].type) << "' (" <<
-			hex_format(pfmts[i].type) << ")\n";
-		bstr << "Group: '" << char_format(pfmts[i].group) << "' (" <<
-			hex_format(pfmts[i].group) << ")\n";
-		bstr << "Quality: " << pfmts[i].quality << "\n";
-		bstr << "Capability: " << pfmts[i].capability << "\n";
-		bstr << "MIME Type: " << pfmts[i].MIME << "\n";
-		bstr << "Name: " << pfmts[i].name << "\n";
+		BString string = B_TRANSLATE("\nType: '%1' (%2)\n"
+			"Group: '%3' (%4)\n"
+			"Quality: %5\n"
+			"Capability: %6\n"
+			"MIME Type: %7\n"
+			"Name: %8\n");
+		string.ReplaceFirst("%1", char_format(pfmts[i].type));
+		string.ReplaceFirst("%2", hex_format(pfmts[i].type));
+		string.ReplaceFirst("%3", char_format(pfmts[i].group));
+		string.ReplaceFirst("%4", hex_format(pfmts[i].group));
+		char str2[127] = { 0 };
+		sprintf(str2, "%f", pfmts[i].quality);
+		string.ReplaceFirst("%5", str2 );
+		str2[0] = '\0';
+		sprintf(str2, "%f", pfmts[i].capability);
+		string.ReplaceFirst("%6",  str2 );
+		string.ReplaceFirst("%7", pfmts[i].MIME);
+		string.ReplaceFirst("%8", pfmts[i].name);
+		if (i == 0)
+			str1 = new BString(string);
+		else
+			str1->Append(string);
 	}
+	bstr = str1->String();
 }
+
 
 // Send information about the currently open image to the
 // BApplication object so it can send it to the InfoWindow
@@ -343,65 +382,123 @@ ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
 {
 	BMessage msg(M_INFO_WINDOW_TEXT);
 	BString bstr;
-	
-	// Bitmap Info
-	bstr << "Image: " << path.Path() << "\n";
+
+	bstr = B_TRANSLATE("Image: %1\n"
+		"Color Space: %2 (%3)\n"
+		"Dimensions: %4 x %5\n"
+		"Bytes per Row: %6\n"
+		"Total Bytes: %7\n"
+		"\nIdentify Info:\n"
+		"ID String: %8\n"
+		"MIME Type: %9\n"
+		"Type: '%10' (%11)\n"
+		"Translator ID: %12\n"
+		"Group: '%13' (%14)\n"
+		"Quality: %15\n"
+		"Capability: %16\n"
+		"\nExtension Info:\n");
+	bstr.ReplaceFirst("%1", path.Path());
 	color_space cs = fpbitmap->ColorSpace();
-	bstr << "Color Space: " << get_color_space_name(cs) << " (" << 
-		hex_format(static_cast<uint32>(cs)) << ")\n";
-	bstr << "Dimensions: " << fpbitmap->Bounds().IntegerWidth() + 1 << " x " <<
-		fpbitmap->Bounds().IntegerHeight() + 1 << "\n";
-	bstr << "Bytes per Row: " << fpbitmap->BytesPerRow() << "\n";
-	bstr << "Total Bytes: " << fpbitmap->BitsLength() << "\n";
+	bstr.ReplaceFirst("%2", get_color_space_name(cs));
+	bstr.ReplaceFirst("%3", hex_format(static_cast<uint32>(cs)));
+	char str2[127] = { 0 };
+	sprintf(str2, "%ld", fpbitmap->Bounds().IntegerWidth() + 1);
+	bstr.ReplaceFirst("%4", str2);
+	str2[0] = '\0';
+	sprintf(str2, "%ld", fpbitmap->Bounds().IntegerHeight() + 1);
+	bstr.ReplaceFirst("%5", str2);
+	str2[0] = '\0';
+	sprintf(str2, "%ld", fpbitmap->BytesPerRow());
+	bstr.ReplaceFirst("%6", str2);
+	str2[0] = '\0';
+	sprintf(str2, "%ld", fpbitmap->BitsLength());
+	bstr.ReplaceFirst("%7", str2);
+	bstr.ReplaceFirst("%8", tinfo.name);
+	bstr.ReplaceFirst("%9", tinfo.MIME);
+	bstr.ReplaceFirst("%10", char_format(tinfo.type));
+	bstr.ReplaceFirst("%11", hex_format(tinfo.type));
+	str2[0] = '\0';
+	sprintf(str2, "%ld", tinfo.translator);
+	bstr.ReplaceFirst("%12", str2);
+	bstr.ReplaceFirst("%13", char_format(tinfo.group));
+	bstr.ReplaceFirst("%14", hex_format(tinfo.group));
+	str2[0] = '\0';
+	sprintf(str2, "%f", tinfo.quality);
+	bstr.ReplaceFirst("%15", str2);
+	str2[0] = '\0';
+	sprintf(str2, "%f", tinfo.capability);
+	bstr.ReplaceFirst("%16", str2);
 	
-	// Identify Info
-	bstr << "\nIdentify Info:\n";
-	bstr << "ID String: " << tinfo.name << "\n";
-	bstr << "MIME Type: " << tinfo.MIME << "\n";
-	bstr << "Type: '" << char_format(tinfo.type) << "' (" <<
-		hex_format(tinfo.type) << ")\n";
-	bstr << "Translator ID: " << tinfo.translator << "\n";
-	bstr << "Group: '" << char_format(tinfo.group) << "' (" <<
-		hex_format(tinfo.group) << ")\n";
-	bstr << "Quality: " << tinfo.quality << "\n";
-	bstr << "Capability: " << tinfo.capability << "\n";
-	
-	// Extension Info
-	bstr << "\nExtension Info:\n";
 	int32 document_count = 0, document_index = 0;
-	if (ioExtension.FindInt32("/documentCount", &document_count) == B_OK)
-		bstr << "Number of Documents: " << document_count << "\n";
-	if (ioExtension.FindInt32("/documentIndex", &document_index) == B_OK)
-		bstr << "Selected Document: " << document_index << "\n";
-	
 	// Translator Info
 	const char *tranname = NULL, *traninfo = NULL;
 	int32 tranversion = 0;
-	if (proster->GetTranslatorInfo(tinfo.translator, &tranname, &traninfo,
-		&tranversion) == B_OK) {
-		bstr << "\nTranslator Used:\n";
-		bstr << "Name: " << tranname << "\n";
-		bstr << "Info: " << traninfo << "\n";
-		bstr << "Version: " << tranversion << "\n";
+
+	if (ioExtension.FindInt32("/documentCount", &document_count) == B_OK) {
+		BString str = B_TRANSLATE("Number of Documents: %1\n"
+			"\nTranslator Used:\n"
+			"Name: %2\n"
+			"Info: %3\n"
+			"Version: %4\n");
+		char str2[127] = { 0 };
+		sprintf(str2, "%ld", document_count);
+		str.ReplaceFirst("%1", str2);
+		str.ReplaceFirst("%2", tranname);
+		str.ReplaceFirst("%3", traninfo);
+		str2[0] = '\0';
+		sprintf(str2, "%d", (int)tranversion);
+		str.ReplaceFirst("%4", str2);
+		bstr.Append(str.String());
 	}
-		
+	else
+		if (ioExtension.FindInt32("/documentIndex", &document_index) == B_OK) {
+			BString str = B_TRANSLATE("Selected Document: %1\n"
+				"\nTranslator Used:\n"
+				"Name: %2\n"
+				"Info: %3\n"
+				"Version: %4\n");
+			char str2[127] = { 0 };
+			sprintf(str2, "%ld", document_index);
+			str.ReplaceFirst("%1", str2);
+			str.ReplaceFirst("%2", tranname);
+			str.ReplaceFirst("%3", traninfo);
+			str2[0] = '\0';
+			sprintf(str2, "%d", (int)tranversion);
+			str.ReplaceFirst("%4", str2);
+			bstr.Append(str.String());
+		}
+		else
+			if (proster->GetTranslatorInfo(tinfo.translator, &tranname, 
+				&traninfo, &tranversion) == B_OK) {
+					BString str = B_TRANSLATE("\nTranslator Used:\n"
+						"Name: %1\n"
+						"Info: %2\n"
+						"Version: %3\n");
+					str.ReplaceFirst("%1", tranname);
+					str.ReplaceFirst("%2", traninfo);
+					char str2[127] = { 0 };
+					sprintf(str2, "%d", (int)tranversion);
+					str.ReplaceFirst("%3", str2);
+					bstr.Append(str.String());
+			}
+
 	// Translator Input / Output Formats
 	int32 nins = 0, nouts = 0;
 	const translation_format *pins = NULL, *pouts = NULL;
 	if (proster->GetInputFormats(tinfo.translator, &pins, &nins) == B_OK) {
-		bstr << "\nInput Formats:";
+		bstr << B_TRANSLATE("\nInput Formats:");
 		dump_translation_formats(bstr, pins, nins);
 		pins = NULL;
 	}
 	if (proster->GetOutputFormats(tinfo.translator, &pouts, &nouts) == B_OK) {
-		bstr << "\nOutput Formats:";
+		bstr << B_TRANSLATE("\nOutput Formats:");
 		dump_translation_formats(bstr, pouts, nouts);
 		pouts = NULL;
 	}
-	
 	msg.AddString("text", bstr);
 	be_app->PostMessage(&msg);
 }
+
 
 BTranslatorRoster *
 ImageView::SelectTranslatorRoster(BTranslatorRoster &roster)
@@ -430,6 +527,7 @@ ImageView::SelectTranslatorRoster(BTranslatorRoster &roster)
 		return &roster;
 }
 
+
 void
 ImageView::SetImage(BMessage *pmsg)
 {
@@ -454,7 +552,6 @@ ImageView::SetImage(BMessage *pmsg)
 		if (!proster)
 			// throw exception
 			chk = B_ERROR;
-		
 		// determine what type the image is
 		translator_info tinfo;
 		BMessage ioExtension;
@@ -494,9 +591,8 @@ ImageView::SetImage(BMessage *pmsg)
 				pwin->SetTitle(IMAGEWINDOW_TITLE);
 		} else
 			pwin->SetTitle(IMAGEWINDOW_TITLE);
-			
 		UpdateInfoWindow(path, ioExtension, tinfo, proster);
-		
+
 		// Resize parent window and set size limits to 
 		// reflect the size of the new bitmap
 		float width, height;
@@ -504,7 +600,6 @@ ImageView::SetImage(BMessage *pmsg)
 		width = fpbitmap->Bounds().Width() + B_V_SCROLL_BAR_WIDTH + (BORDER_WIDTH * 2);
 		height = fpbitmap->Bounds().Height() +
 			pbar->Bounds().Height() + B_H_SCROLL_BAR_HEIGHT + (BORDER_HEIGHT * 2) + 1;
-			
 		BScreen *pscreen = new BScreen(pwin);
 		BRect rctscreen = pscreen->Frame();
 		if (width > rctscreen.Width())
@@ -514,9 +609,8 @@ ImageView::SetImage(BMessage *pmsg)
 		pwin->SetSizeLimits(B_V_SCROLL_BAR_WIDTH * 4, width,
 			pbar->Bounds().Height() + (B_H_SCROLL_BAR_HEIGHT * 4) + 1, height);
 		pwin->SetZoomLimits(width, height);
-		
 		AdjustScrollBars();
-		
+
 		//pwin->Zoom();
 			// Perform all of the hard work of resizing the
 			// window while taking into account the size of
@@ -531,10 +625,12 @@ ImageView::SetImage(BMessage *pmsg)
 
 	} catch (StatusNotOKException) {
 		BAlert *palert = new BAlert(NULL,
-			"Sorry, unable to load the image.", "OK");
+			B_TRANSLATE("Sorry, unable to load the image."), 
+			B_TRANSLATE("OK"));
 		palert->Go();
 	}
 }
+
 
 void
 ImageView::FirstPage()
@@ -545,6 +641,7 @@ ImageView::FirstPage()
 	}
 }
 
+
 void
 ImageView::LastPage()
 {
@@ -554,6 +651,7 @@ ImageView::LastPage()
 	}
 }
 
+
 void
 ImageView::NextPage()
 {
@@ -562,6 +660,7 @@ ImageView::NextPage()
 		SetImage(NULL);
 	}
 }
+
 
 void
 ImageView::PrevPage()

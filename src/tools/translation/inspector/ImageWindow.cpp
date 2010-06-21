@@ -32,11 +32,16 @@
 #include "ImageWindow.h"
 #include "Constants.h"
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Menu.h>
 #include <ScrollView.h>
 #include <Alert.h>
+
+#define B_TRANSLATE_CONTEXT "ImageWindow"
+
 
 ImageWindow::ImageWindow(BRect rect, const char *name)
 	: BWindow(rect, name, B_DOCUMENT_WINDOW, 0)
@@ -45,14 +50,14 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	BRect rctbar(0, 0, 100, 10);
 	BMenuBar *pbar = new BMenuBar(rctbar, "MenuBar");
 
-	BMenu *pmnufile = new BMenu("File");
-	BMenuItem *pitmopen = new BMenuItem("Open...",
+	BMenu *pmnufile = new BMenu(B_TRANSLATE("File"));
+	BMenuItem *pitmopen = new BMenuItem(B_TRANSLATE("Open..."),
 		new BMessage(M_OPEN_IMAGE), 'O', 0);
 
-	BMenuItem *pitmsave = new BMenuItem("Save...",
+	BMenuItem *pitmsave = new BMenuItem(B_TRANSLATE("Save..."),
 		new BMessage(M_SAVE_IMAGE), 'S', 0);
 
-	BMenuItem *pitmquit = new BMenuItem("Quit",
+	BMenuItem *pitmquit = new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q', 0);
 
 	pmnufile->AddItem(pitmopen);
@@ -61,17 +66,17 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	pmnufile->AddItem(pitmquit);
 	pbar->AddItem(pmnufile);
 
-	BMenu *pmnuview = new BMenu("View");
-	BMenuItem *pitmfirst = new BMenuItem("First Page",
+	BMenu *pmnuview = new BMenu(B_TRANSLATE("View"));
+	BMenuItem *pitmfirst = new BMenuItem(B_TRANSLATE("First Page"),
 		new BMessage(M_VIEW_FIRST_PAGE), 'F', 0);
 
-	BMenuItem *pitmlast = new BMenuItem("Last Page",
+	BMenuItem *pitmlast = new BMenuItem(B_TRANSLATE("Last Page"),
 		new BMessage(M_VIEW_LAST_PAGE), 'L', 0);
 
-	BMenuItem *pitmnext = new BMenuItem("Next Page",
+	BMenuItem *pitmnext = new BMenuItem(B_TRANSLATE("Next Page"),
 		new BMessage(M_VIEW_NEXT_PAGE), 'N', 0);
 
-	BMenuItem *pitmprev = new BMenuItem("Previous Page",
+	BMenuItem *pitmprev = new BMenuItem(B_TRANSLATE("Previous Page"),
 		new BMessage(M_VIEW_PREV_PAGE), 'P', 0);
 
 	pmnuview->AddItem(pitmfirst);
@@ -81,12 +86,12 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	pbar->AddItem(pmnuview);
 
 
-	BMenu *pmnuwindow = new BMenu("Window");
-	BMenuItem *pitmactives = new BMenuItem("Active Translators",
+	BMenu *pmnuwindow = new BMenu(B_TRANSLATE("Window"));
+	BMenuItem *pitmactives = new BMenuItem(B_TRANSLATE("Active Translators"),
 		new BMessage(M_ACTIVE_TRANSLATORS_WINDOW), 'T', 0);
 	pitmactives->SetTarget(be_app);
 
-	BMenuItem *pitminfo = new BMenuItem("Info",
+	BMenuItem *pitminfo = new BMenuItem(B_TRANSLATE("Info"),
 		new BMessage(M_INFO_WINDOW), 'I', 0);
 	pitminfo->SetTarget(be_app);
 
@@ -133,11 +138,13 @@ ImageWindow::MessageReceived(BMessage *pmsg)
 		case M_SAVE_IMAGE:
 			if (fpimageView->HasImage()) {
 				BAlert *palert = new BAlert(NULL,
-					"Save feature not implemented yet.", "Bummer");
+					B_TRANSLATE("Save feature not implemented yet."), 
+					B_TRANSLATE("Bummer"));
 				palert->Go();
 			} else {
 				BAlert *palert = new BAlert(NULL,
-					"No image available to save.", "OK");
+					B_TRANSLATE("No image available to save."), 
+					B_TRANSLATE("OK"));
 				palert->Go();
 			}
 			break;

@@ -30,20 +30,27 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include "InspectorApp.h"
 #include "Constants.h"
+#include "InspectorApp.h"
 #include "ImageWindow.h"
 #include "TranslatorItem.h"
-#include <Window.h>
+
+#include <Directory.h>
 #include <Message.h>
 #include <String.h>
-#include <Directory.h>
+#include <Window.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "InspectorApp"
+
 
 InspectorApp::InspectorApp()
 	: BApplication(APP_SIG)
 {
 	fpActivesWin = NULL;
 	fpInfoWin = NULL;
+	
+	be_locale->GetAppCatalog(&fAppCatalog);
 	
 	AddToTranslatorsList("/system/add-ons/Translators",
 		SYSTEM_TRANSLATOR);
@@ -79,7 +86,8 @@ InspectorApp::MessageReceived(BMessage *pmsg)
 		case M_ACTIVE_TRANSLATORS_WINDOW:
 			if (!fpActivesWin)
 				fpActivesWin = new ActiveTranslatorsWindow(
-					BRect(625, 350, 800, 600), "Active Translators",
+					BRect(625, 350, 800, 600), 
+					B_TRANSLATE("Active Translators"),
 					GetTranslatorsList());
 			break;
 		case M_ACTIVE_TRANSLATORS_WINDOW_QUIT:
@@ -89,7 +97,9 @@ InspectorApp::MessageReceived(BMessage *pmsg)
 		case M_INFO_WINDOW:
 			if (!fpInfoWin)
 				fpInfoWin = new InfoWindow(BRect(625, 50, 800, 300),
-					"Info Win", fbstrInfo.String());
+					B_TRANSLATE_COMMENT("Info Win", 
+					"This is a quite narrow info window and title 'Info Win' "
+					"is therefore shortened."), fbstrInfo.String());
 			break;
 		case M_INFO_WINDOW_QUIT:
 			fpInfoWin = NULL;
@@ -126,6 +136,7 @@ InspectorApp::GetTranslatorsList()
 int main(int argc, char **argv)
 {
 	InspectorApp *papp = new InspectorApp();
+	
 	papp->Run();
 	
 	delete papp;

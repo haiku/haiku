@@ -36,8 +36,11 @@
 #include "ActiveTranslatorsWindow.h"
 #include "InfoWindow.h"
 #include <Application.h>
-#include <String.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <List.h>
+#include <String.h>
+
 
 class InspectorApp : public BApplication {
 public:
@@ -54,6 +57,7 @@ private:
 	BList flstTranslators;
 	ActiveTranslatorsWindow *fpActivesWin;
 	InfoWindow *fpInfoWin;
+	BCatalog fAppCatalog;
 };
 
 #endif // #ifndef INSPECTORAPP_H
