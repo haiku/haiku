@@ -293,8 +293,6 @@ X86VMTranslationMapPAE::Unmap(addr_t start, addr_t end)
 				InvalidatePage(start);
 			}
 		}
-
-		pinner.Unlock();
 	} while (start != 0 && start < end);
 
 	return B_OK;
@@ -542,7 +540,7 @@ X86VMTranslationMapPAE::Protect(addr_t start, addr_t end, uint32 attributes,
 				oldEntry = X86PagingMethodPAE::TestAndSetPageTableEntry(
 					&pageTable[index],
 					(entry & ~(X86_PAE_PTE_PROTECTION_MASK
-						| X86_PAE_PTE_MEMORY_TYPE_MASK))
+							| X86_PAE_PTE_MEMORY_TYPE_MASK))
 						| newProtectionFlags
 						| X86PagingMethodPAE::MemoryTypeToPageTableEntryFlags(
 							memoryType),
@@ -559,8 +557,6 @@ X86VMTranslationMapPAE::Protect(addr_t start, addr_t end, uint32 attributes,
 				InvalidatePage(start);
 			}
 		}
-
-		pinner.Unlock();
 	} while (start != 0 && start < end);
 
 	return B_OK;
