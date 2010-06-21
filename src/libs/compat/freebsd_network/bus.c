@@ -61,11 +61,11 @@ static int32 intr_wrapper(void *data);
 
 
 static area_id
-map_mem(void **virtualAddr, void *_phy, size_t size, uint32 protection,
+map_mem(void **virtualAddr, phys_addr_t _phy, size_t size, uint32 protection,
 	const char *name)
 {
-	uint32 offset = (uint32)_phy & (B_PAGE_SIZE - 1);
-	void *physicalAddr = (uint8 *)_phy - offset;
+	uint32 offset = _phy & (B_PAGE_SIZE - 1);
+	phys_addr_t physicalAddr = _phy - offset;
 	area_id area;
 
 	size = ROUNDUP(size + offset, B_PAGE_SIZE);
@@ -102,7 +102,7 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, int regid)
 	uint32 size = 128 * 1024; /* XXX */
 	void *virtualAddr;
 
-	res->r_mapped_area = map_mem(&virtualAddr, (void *)addr, size, 0,
+	res->r_mapped_area = map_mem(&virtualAddr, addr, size, 0,
 		"bus_alloc_resource(MEMORY)");
 	if (res->r_mapped_area < B_OK)
 		return -1;
