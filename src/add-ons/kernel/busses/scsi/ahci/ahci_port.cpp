@@ -75,9 +75,9 @@ AHCIPort::Init1()
 		+ sizeof(prd) * PRD_TABLE_ENTRY_COUNT;
 
 	char *virtAddr;
-	char *physAddr;
+	phys_addr_t physAddr;
 
-	fArea = alloc_mem((void **)&virtAddr, (void **)&physAddr, size, 0,
+	fArea = alloc_mem((void **)&virtAddr, &physAddr, size, 0,
 		"some AHCI port");
 	if (fArea < B_OK) {
 		TRACE("failed allocating memory for port %d\n", fIndex);

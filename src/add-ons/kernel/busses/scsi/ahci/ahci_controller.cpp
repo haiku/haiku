@@ -105,11 +105,12 @@ AHCIController::Init()
 		return B_ERROR;
 	}
 
-	void *addr = (void *)pciInfo.u.h0.base_registers[5];
+	phys_addr_t addr = pciInfo.u.h0.base_registers[5];
 	size_t size = pciInfo.u.h0.base_register_sizes[5];
 
-	TRACE("registers at %p, size %#lx\n", addr, size);
-	if (!addr) {
+	TRACE("registers at %#" B_PRIxPHYSADDR ", size %#" B_PRIxSIZE "\n", addr,
+		size);
+	if (addr == 0) {
 		TRACE("PCI base address register 5 not assigned\n");
 		return B_ERROR;
 	}
