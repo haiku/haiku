@@ -70,6 +70,13 @@ struct VMTranslationMap {
 	virtual	void				Flush() = 0;
 
 protected:
+			void				PageUnmapped(VMArea* area,
+									page_num_t pageNumber, bool accessed,
+									bool modified, bool updatePageQueue);
+			void				UnaccessedPageUnmapped(VMArea* area,
+									page_num_t pageNumber);
+
+protected:
 			recursive_lock		fLock;
 			int32				fMapCount;
 };

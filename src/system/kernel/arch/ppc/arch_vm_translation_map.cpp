@@ -489,51 +489,10 @@ PPCVMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	fMapCount--;
 
-	// get the page
-	vm_page* page = vm_lookup_page(pageNumber);
-	ASSERT(page != NULL);
+	locker.Detach();
+		// PageUnmapped() will unlock for us
 
-	// transfer the accessed/dirty flags to the page
-	page->accessed |= accessed;
-	page->modified |= modified;
-
-	// remove the mapping object/decrement the wired_count of the page
-	vm_page_mapping* mapping = NULL;
-	if (area->wiring == B_NO_LOCK) {
-		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
-		while ((mapping = iterator.Next()) != NULL) {
-			if (mapping->area == area) {
-				area->mappings.Remove(mapping);
-				page->mappings.Remove(mapping);
-				break;
-			}
-		}
-
-		ASSERT(mapping != NULL);
-	} else
-		page->wired_count--;
-
-	locker.Unlock();
-
-	if (page->wired_count == 0 && page->mappings.IsEmpty()) {
-		atomic_add(&gMappedPagesCount, -1);
-
-		if (updatePageQueue) {
-			if (page->Cache()->temporary)
-				vm_page_set_state(page, PAGE_STATE_INACTIVE);
-			else if (page->modified)
-				vm_page_set_state(page, PAGE_STATE_MODIFIED);
-			else
-				vm_page_set_state(page, PAGE_STATE_CACHED);
-		}
-	}
-
-	if (mapping != NULL) {
-		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-		object_cache_free(gPageMappingsObjectCache, mapping,
-			CACHE_DONT_WAIT_FOR_MEMORY
-				| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
-	}
+	PageUnmapped(area, pageNumber, accessed, modified, updatePageQueue);
 
 	return B_OK;
 }

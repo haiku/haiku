@@ -6,9 +6,12 @@
 
 #include <vm/VMTranslationMap.h>
 
+#include <slab/Slab.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
+#include <vm/VMAddressSpace.h>
 #include <vm/VMArea.h>
+#include <vm/VMCache.h>
 
 
 // #pragma mark - VMTranslationMap
@@ -102,6 +105,117 @@ VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	for (; address != end; address += B_PAGE_SIZE)
 		UnmapPage(area, address, true);
 #endif
+}
+
+
+/*!	Called by UnmapPage() after performing the architecture specific part.
+	Looks up the page, updates its flags, removes the page-area mapping, and
+	requeues the page, if necessary.
+*/
+void
+VMTranslationMap::PageUnmapped(VMArea* area, page_num_t pageNumber,
+	bool accessed, bool modified, bool updatePageQueue)
+{
+	if (area->cache_type == CACHE_TYPE_DEVICE) {
+		recursive_lock_unlock(&fLock);
+		return;
+	}
+
+	// get the page
+	vm_page* page = vm_lookup_page(pageNumber);
+	ASSERT_PRINT(page != NULL, "page number: %#" B_PRIxPHYSADDR
+		", accessed: %d, modified: %d", pageNumber, accessed, modified);
+
+	// transfer the accessed/dirty flags to the page
+	page->accessed |= accessed;
+	page->modified |= modified;
+
+	// remove the mapping object/decrement the wired_count of the page
+	vm_page_mapping* mapping = NULL;
+	if (area->wiring == B_NO_LOCK) {
+		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+		while ((mapping = iterator.Next()) != NULL) {
+			if (mapping->area == area) {
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+				break;
+			}
+		}
+
+		ASSERT_PRINT(mapping != NULL, "page: %p, page number: %#"
+			B_PRIxPHYSADDR ", accessed: %d, modified: %d", page,
+			pageNumber, accessed, modified);
+	} else
+		page->wired_count--;
+
+	recursive_lock_unlock(&fLock);
+
+	if (page->wired_count == 0 && page->mappings.IsEmpty()) {
+		atomic_add(&gMappedPagesCount, -1);
+
+		if (updatePageQueue) {
+			if (page->Cache()->temporary)
+				vm_page_set_state(page, PAGE_STATE_INACTIVE);
+			else if (page->modified)
+				vm_page_set_state(page, PAGE_STATE_MODIFIED);
+			else
+				vm_page_set_state(page, PAGE_STATE_CACHED);
+		}
+	}
+
+	if (mapping != NULL) {
+		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
+		object_cache_free(gPageMappingsObjectCache, mapping,
+			CACHE_DONT_WAIT_FOR_MEMORY
+				| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
+	}
+}
+
+
+/*!	Called by ClearAccessedAndModified() after performing the architecture
+	specific part.
+	Looks up the page and removes the page-area mapping.
+*/
+void
+VMTranslationMap::UnaccessedPageUnmapped(VMArea* area, page_num_t pageNumber)
+{
+	if (area->cache_type == CACHE_TYPE_DEVICE) {
+		recursive_lock_unlock(&fLock);
+		return;
+	}
+
+	// get the page
+	vm_page* page = vm_lookup_page(pageNumber);
+	ASSERT_PRINT(page != NULL, "page number: %#" B_PRIxPHYSADDR, pageNumber);
+
+	// remove the mapping object/decrement the wired_count of the page
+	vm_page_mapping* mapping = NULL;
+	if (area->wiring == B_NO_LOCK) {
+		vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+		while ((mapping = iterator.Next()) != NULL) {
+			if (mapping->area == area) {
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+				break;
+			}
+		}
+
+		ASSERT_PRINT(mapping != NULL, "page: %p, page number: %#"
+			B_PRIxPHYSADDR, page, pageNumber);
+	} else
+		page->wired_count--;
+
+	recursive_lock_unlock(&fLock);
+
+	if (page->wired_count == 0 && page->mappings.IsEmpty())
+		atomic_add(&gMappedPagesCount, -1);
+
+	if (mapping != NULL) {
+		object_cache_free(gPageMappingsObjectCache, mapping,
+			CACHE_DONT_WAIT_FOR_MEMORY | CACHE_DONT_LOCK_KERNEL_SPACE);
+			// Since this is called by the page daemon, we never want to lock
+			// the kernel address space.
+	}
 }
 
 
