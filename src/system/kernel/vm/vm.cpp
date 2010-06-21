@@ -1642,6 +1642,7 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	// tell the page scanner to skip over this area, no pages will be mapped
 	// here
 	cache->scan_skip = 1;
+	cache->temporary = 1;
 	cache->virtual_end = size;
 
 	cache->Lock();
