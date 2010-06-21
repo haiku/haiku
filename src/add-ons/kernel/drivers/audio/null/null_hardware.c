@@ -15,8 +15,6 @@ null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 	int buffer_size;
 	int area_size;
 	uint8* buffer;
-	status_t result;
-	physical_entry pe;
 
 	buffer_size = stream->num_channels
 				* format_to_sample_size(stream->format)
@@ -34,16 +32,8 @@ null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 
 	// Get the correct address for setting up the buffers
 	// pointers being passed back to userland
-	result = get_memory_map(buffer, area_size, &pe, 1);
-		// TODO: pe is never used!
-	if (result != B_OK) {
-		delete_area(stream->buffer_area);
-		return result;
-	}
-
-	for (i = 0; i < stream->num_buffers; i++) {
+	for (i = 0; i < stream->num_buffers; i++)
 		stream->buffers[i] = buffer + (i * buffer_size);
-	}
 
 	stream->buffer_ready_sem = create_sem(0, name);
 	return B_OK;
