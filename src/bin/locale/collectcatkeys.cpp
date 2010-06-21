@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku.
+ * Copyright 2003-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -64,11 +64,13 @@ bool
 fetchStr(const char *&in, BString &str, bool lookForID)
 {
 	int parLevel = 0;
+
 	while (isspace(*in) || *in == '(') {
 		if (*in == '(')
 			parLevel++;
 		in++;
 	}
+
 	if (*in == '"') {
 		bool inString = true;
 		bool quoted = false;
@@ -77,7 +79,7 @@ fetchStr(const char *&in, BString &str, bool lookForID)
 		{
 			// Collect string content until we find a quote marking end of
 			// string (skip escaped quotes)
-			while (*in != '"' || !quoted)
+			while (*in != '"' || quoted)
 			{
 				str.Append(in,1);
 				if (*in == '\\' && !quoted)
@@ -251,6 +253,7 @@ main(int argc, char **argv)
 				usage();
 		}
 	}
+
 	if (!outputFile.Length() && inputFile) {
 		// generate default output-file from input-file by replacing
 		// the extension with '.catkeys':
@@ -270,6 +273,7 @@ main(int argc, char **argv)
 			strerror(res));
 		exit(-1);
 	}
+
 	off_t sz;
 	inFile.GetSize(&sz);
 	if (sz > 0) {
