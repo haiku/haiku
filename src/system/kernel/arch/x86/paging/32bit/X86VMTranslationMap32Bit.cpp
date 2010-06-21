@@ -255,10 +255,7 @@ restart:
 			// Note, that we only need to invalidate the address, if the
 			// accessed flags was set, since only then the entry could have been
 			// in any TLB.
-			if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
-				fInvalidPages[fInvalidPagesCount] = start;
-
-			fInvalidPagesCount++;
+			InvalidatePage(start);
 		}
 	}
 
@@ -309,11 +306,7 @@ X86VMTranslationMap32Bit::UnmapPage(VMArea* area, addr_t address,
 		// Note, that we only need to invalidate the address, if the
 		// accessed flags was set, since only then the entry could have been
 		// in any TLB.
-		if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
-			fInvalidPages[fInvalidPagesCount] = address;
-
-		fInvalidPagesCount++;
-
+		InvalidatePage(address);
 		Flush();
 
 		// NOTE: Between clearing the page table entry and Flush() other
@@ -385,10 +378,7 @@ X86VMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 				// Note, that we only need to invalidate the address, if the
 				// accessed flags was set, since only then the entry could have
 				// been in any TLB.
-				if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
-					fInvalidPages[fInvalidPagesCount] = start;
-
-				fInvalidPagesCount++;
+				InvalidatePage(start);
 			}
 
 			if (area->cache_type != CACHE_TYPE_DEVICE) {
@@ -528,12 +518,8 @@ X86VMTranslationMap32Bit::UnmapArea(VMArea* area, bool deletingAddressSpace,
 			if ((oldEntry & X86_PTE_ACCESSED) != 0) {
 				page->accessed = true;
 
-				if (!deletingAddressSpace) {
-					if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
-						fInvalidPages[fInvalidPagesCount] = address;
-
-					fInvalidPagesCount++;
-				}
+				if (!deletingAddressSpace)
+					InvalidatePage(address);
 			}
 
 			if ((oldEntry & X86_PTE_DIRTY) != 0)
@@ -720,10 +706,7 @@ restart:
 			// Note, that we only need to invalidate the address, if the
 			// accessed flag was set, since only then the entry could have been
 			// in any TLB.
-			if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
-				fInvalidPages[fInvalidPagesCount] = start;
-
-			fInvalidPagesCount++;
+			InvalidatePage(start);
 		}
 	}
 
@@ -760,12 +743,8 @@ X86VMTranslationMap32Bit::ClearFlags(addr_t va, uint32 flags)
 
 	pinner.Unlock();
 
-	if ((oldEntry & flagsToClear) != 0) {
-		if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
-			fInvalidPages[fInvalidPagesCount] = va;
-
-		fInvalidPagesCount++;
-	}
+	if ((oldEntry & flagsToClear) != 0)
+		InvalidatePage(va);
 
 	return B_OK;
 }
@@ -834,10 +813,7 @@ X86VMTranslationMap32Bit::ClearAccessedAndModified(VMArea* area, addr_t address,
 		// Note, that we only need to invalidate the address, if the
 		// accessed flags was set, since only then the entry could have been
 		// in any TLB.
-		if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
-			fInvalidPages[fInvalidPagesCount] = address;
-
-		fInvalidPagesCount++;
+		InvalidatePage(address);
 
 		Flush();
 
