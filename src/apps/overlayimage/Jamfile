@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps overlayimage ;
+
+Application OverlayImage :
+	OverlayApp.cpp
+	OverlayView.cpp
+	OverlayWindow.cpp
+
+	: be liblocale.so libtranslation.so $(TARGET_LIBSTDC++)
+	: OverlayImage.rdef
+;
+
+DoCatalogs OverlayImage :
+	x-vnd.Haiku-OverlayImage
+	:
+	OverlayWindow.cpp
+;

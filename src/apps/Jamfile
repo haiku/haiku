@@ -36,6 +36,7 @@ HaikuSubInclude mediaconverter ;
 HaikuSubInclude mediaplayer ;
 HaikuSubInclude midiplayer ;
 HaikuSubInclude networkstatus ;
+HaikuSubInclude overlayimage ;
 HaikuSubInclude packageinstaller ;
 HaikuSubInclude pairs ;
 HaikuSubInclude people ;
