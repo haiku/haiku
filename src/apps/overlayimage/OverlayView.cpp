@@ -141,6 +141,6 @@ OverlayView::OverlayAboutRequested()
 	view->GetFont(&font);
 	font.SetSize(font.Size() + 4);
 	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 9, &font);
+	view->SetFontAndColor(0, 12, &font);
 	alert->Go();
 }
