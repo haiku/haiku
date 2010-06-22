@@ -17,6 +17,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	callout.c
 	clock.c
 	compat.c
+	compat_cpp.cpp
 	condvar.c
 	Condvar.cpp
 	device.c

@@ -22,6 +22,8 @@
 
 #include <compat/dev/mii/miivar.h>
 
+#include "compat_cpp.h"
+
 
 spinlock __haiku_intr_spinlock;
 
@@ -587,24 +589,8 @@ _kernel_contigmalloc(const char *file, int line, size_t size, int flags,
 	vm_paddr_t low, vm_paddr_t high, unsigned long alignment,
 	unsigned long boundary)
 {
-	char name[256];
-	area_id area;
-	void *addr;
-
-	snprintf(name, sizeof(name), "contig:%s:%d", file, line);
-
-	area = create_area(name, &addr, B_ANY_KERNEL_ADDRESS, size,
-		B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
-	if (area < 0)
-		return NULL;
-
-	if (flags & M_ZERO)
-		memset(addr, 0, size);
-
-	//driver_printf("(%s) addr = %p, area = %ld, size = %lu\n",
-	//	name, addr, area, size);
-
-	return addr;
+	return _kernel_contigmalloc_cpp(file, line, size, low, high,
+		alignment, boundary, (flags & M_ZERO) != 0, (flags & M_NOWAIT) != 0);
 }
 
 
