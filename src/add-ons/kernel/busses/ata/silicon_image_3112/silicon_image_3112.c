@@ -222,6 +222,7 @@ controller_probe(device_node *parent)
 			{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
 			{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
 				{ ui32: ATA_ADAPTER_MAX_SG_COUNT }},
+			{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
 
 			// private data to find controller
 			{ "silicon_image_3112/asic_index", B_UINT32_TYPE,

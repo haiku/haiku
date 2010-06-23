@@ -675,6 +675,7 @@ ide_adapter_publish_controller(device_node *parent, uint16 bus_master_base,
 			{ ui32: max_sg_block_size/*0x10000*/ }},
 		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
 			{ ui32: IDE_ADAPTER_MAX_SG_COUNT }},
+		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
 
 		// private data to find controller
 		{ IDE_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { ui16: bus_master_base }},

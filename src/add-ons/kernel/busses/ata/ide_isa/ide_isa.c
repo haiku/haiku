@@ -75,6 +75,7 @@ publish_channel(device_node *parent, uint16 command_block_base,
 		// the ata bus manager handles that very efficiently, but why
 		// not use the block device manager for doing that?
 		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
+		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
 
 		// private data to identify device
 		{ ATA_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
