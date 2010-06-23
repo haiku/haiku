@@ -44,6 +44,7 @@ page_num_t vm_page_num_free_pages(void);
 page_num_t vm_page_num_available_pages(void);
 page_num_t vm_page_num_unused_pages(void);
 void vm_page_get_stats(system_info *info);
+phys_addr_t vm_page_max_address();
 
 status_t vm_page_write_modified_page_range(struct VMCache *cache,
 	uint32 firstPage, uint32 endPage);

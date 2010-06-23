@@ -3634,3 +3634,15 @@ vm_page_get_stats(system_info *info)
 
 	// TODO: We don't consider pages used for page directories/tables yet.
 }
+
+
+/*!	Returns the greatest address within the last page of accessible physical
+	memory.
+	The value is inclusive, i.e. in case of a 32 bit phys_addr_t 0xffffffff
+	means the that the last page ends at exactly 4 GB.
+*/
+phys_addr_t
+vm_page_max_address()
+{
+	return ((phys_addr_t)sPhysicalPageOffset + sNumPages) * B_PAGE_SIZE - 1;
+}
