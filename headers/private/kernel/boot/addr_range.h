@@ -49,6 +49,7 @@ void sort_physical_address_ranges(phys_addr_range* ranges, uint32 numRanges);
 status_t insert_physical_memory_range(phys_addr_t start, phys_size_t size);
 status_t insert_physical_allocated_range(phys_addr_t start, phys_size_t size);
 status_t insert_virtual_allocated_range(addr_t start, size_t size);
+void ignore_physical_memory_ranges_beyond_4gb();
 
 #ifdef __cplusplus
 }

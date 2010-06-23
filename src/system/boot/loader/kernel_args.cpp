@@ -396,6 +396,46 @@ insert_virtual_allocated_range(addr_t start, size_t size)
 }
 
 
+#if B_HAIKU_PHYSICAL_BITS > 32
+
+void
+ignore_physical_memory_ranges_beyond_4gb()
+{
+	// sort
+	sort_physical_address_ranges(gKernelArgs.physical_memory_range,
+		gKernelArgs.num_physical_memory_ranges);
+
+	static const phys_addr_t kLimit = (phys_addr_t)1 << 32;
+
+	// remove everything past 4 GB
+	for (uint32 i = gKernelArgs.num_physical_memory_ranges; i > 0; i--) {
+		phys_addr_range& range = gKernelArgs.physical_memory_range[i - 1];
+		if (range.start >= kLimit) {
+			// the complete range is beyond the limit
+			dprintf("ignore_physical_memory_ranges_beyond_4gb(): ignoring "
+				"range: %#" B_PRIxPHYSADDR " - %#" B_PRIxPHYSADDR "\n",
+				range.start, range.start + range.size);
+			gKernelArgs.ignored_physical_memory += range.size;
+			gKernelArgs.num_physical_memory_ranges = i - 1;
+			continue;
+		}
+
+		if (kLimit - range.start < range.size) {
+			// the range is partially beyond the limit
+			dprintf("ignore_physical_memory_ranges_beyond_4gb(): ignoring "
+				"range: %#" B_PRIxPHYSADDR " - %#" B_PRIxPHYSADDR "\n", kLimit,
+				range.start + range.size);
+			gKernelArgs.ignored_physical_memory
+				+= range.size - (kLimit - range.start);
+		}
+
+		break;
+	}
+}
+
+#endif	// B_HAIKU_PHYSICAL_BITS > 32
+
+
 // #pragma mark - kernel_args allocations
 
 
