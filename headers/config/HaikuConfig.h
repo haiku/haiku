@@ -20,8 +20,7 @@
 #ifdef __INTEL__
 #	define __HAIKU_ARCH					x86
 #	define __HAIKU_ARCH_X86				1
-/*#	define __HAIKU_ARCH_PHYSICAL_BITS	64*/
-	/* enables PAE */
+#	define __HAIKU_ARCH_PHYSICAL_BITS	64
 #elif __x86_64__
 #	define __HAIKU_ARCH					x86_64
 #	define __HAIKU_ARCH_X86_64			1
