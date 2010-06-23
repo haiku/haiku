@@ -6330,7 +6330,7 @@ DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__create_area_haiku", "create_area@@",
 
 
 DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__get_memory_map_haiku",
-	"get_memory_map@", "BASE");
+	"get_memory_map@@", "BASE");
 DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__map_physical_memory_haiku",
 	"map_physical_memory@@", "BASE");
 DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__create_area_haiku", "create_area@@",
