@@ -38,10 +38,12 @@ Options:\n\
 declare -A availablePackages
 declare availablePackagesKeys=""
 declare wantsToInstall=""
+declare alreadyInstalled=""
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
-declare packageIgnoreList='Bluetooth Development DevelopmentMin \
-DevelopmentBase MandatoryPackages UserlandFS Welcome WifiFirmwareScriptData'
+declare packageIgnoreList="Bluetooth Development DevelopmentMin \
+DevelopmentBase MandatoryPackages UserlandFS Welcome WifiFirmwareScriptData "
+installedPackagesFile="`finddir B_COMMON_DATA_DIRECTORY`/InstalledPackages"
 
 
 function CreateInstallerScript()
@@ -345,6 +347,7 @@ function Init()
 
 	DetectSystemConfiguration
 	DownloadAllBuildFiles
+	ReadInstalledPackagesIntoMemory
 	ReadPackageNamesIntoMemory
 }
 
@@ -399,6 +402,15 @@ function DetectSystemConfiguration()
 	if [ `uname -m` == "BePC" ] ; then
 		TARGET_ARCH='x86'
 	fi
+}
+
+
+function ReadInstalledPackagesIntoMemory()
+{
+	while read line ; do
+		alreadyInstalled="${alreadyInstalled} $line"
+		packageIgnoreList=${packageIgnoreList/"${line} "/' '}
+	done < ${installedPackagesFile}
 }
 
 
@@ -526,9 +538,10 @@ function AddPackages()
 
 		ConvertJamToBash "${tmpDir}/optpkg.jam"
 		rm "${tmpDir}/optpkg.jam"
-	CreateInstallerScript
-	sh ${tmpDir}/install-optpkg.sh
-	rm ${tmpDir}/install-optpkg.sh
+		CreateInstallerScript
+		sh ${tmpDir}/install-optpkg.sh
+		rm ${tmpDir}/install-optpkg.sh
+		RecordInstalledPackages
 	fi
 }
 
@@ -550,12 +563,27 @@ function BuildFinalListOfPackagesToInstall()
 			proceedWithInstallation=true
 		fi
 	done
-	if [ $proceedWithInstallation ] ; then
-		echo "To be installed: ${packagesToInstall}"
-		return 0
-	else
+	# pad the variable
+	packagesToInstall="${packagesToInstall} "
+	# remove entries that are already installed
+	for skip in ${alreadyInstalled}; do
+		packagesToInstall=${packagesToInstall/"${skip} "/}
+	done
+	# strip double spaces
+	packagesToInstall=${packagesToInstall/"  "/" "}
+
+	if ! [ ${#string} -gt 1 ]; then
+		echo "... no packages need to be installed."
+		echo "If you wish to re-install a package, edit $installedPackagesFile"
+		proceedWithInstallation=false
+	fi
+	if ! $proceedWithInstallation ; then
+		echo 'Not proceeding with installation.'
 		return 1
 	fi
+	exit
+	echo "To be installed: ${packagesToInstall}"
+	return 0
 }
 
 
@@ -568,6 +596,12 @@ function IsPackageNameValid()
 		fi
 	done
 	return 1
+}
+
+
+function RecordInstalledPackages()
+{
+	echo -e ${packagesToInstall} | tr '\ ' '\n'  >> ${installedPackagesFile}
 }
 
 
