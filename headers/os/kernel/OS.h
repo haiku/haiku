@@ -69,7 +69,8 @@ typedef struct area_info {
 #define B_FULL_LOCK				2
 #define B_CONTIGUOUS			3
 #define	B_LOMEM					4	/* B_CONTIGUOUS, < 16 MB physical address */
-#define	B_32_BIT_MEMORY			5	/* B_CONTIGUOUS, < 4 GB physical address */
+#define	B_32_BIT_FULL_LOCK		5	/* B_FULL_LOCK, < 4 GB physical addresses */
+#define	B_32_BIT_CONTIGUOUS		6	/* B_CONTIGUOUS, < 4 GB physical address */
 
 /* address spec for create_area(), and clone_area() */
 #define B_ANY_ADDRESS			0

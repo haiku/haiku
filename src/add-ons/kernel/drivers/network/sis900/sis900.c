@@ -734,9 +734,7 @@ sis900_createRings(struct sis_info *info)
 	info->txArea = create_area("sis900 tx buffer", (void **)&info->txBuffer[0],
 		B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Tx_DESCR),
-		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (info->txArea < B_OK)
 		return info->txArea;
 
@@ -759,9 +757,7 @@ sis900_createRings(struct sis_info *info)
 	info->rxArea = create_area("sis900 rx buffer", (void **)&info->rxBuffer[0],
 		B_ANY_KERNEL_ADDRESS,
 		ROUND_TO_PAGE_SIZE(BUFFER_SIZE * NUM_Rx_DESCR),
-		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (info->rxArea < B_OK) {
 		delete_area(info->txArea);
 		return info->rxArea;

@@ -269,10 +269,8 @@ alloc_buffers(dev_info_t *device)
 	/* create tx descriptor area */
 	size = RNDUP(sizeof(trns_desc_t) * TX_BUFFERS, B_PAGE_SIZE);
 	device->tx_desc_area = create_area(DEVICE_NAME " tx descriptors",
-		(void **)device->tx_desc, B_ANY_KERNEL_ADDRESS, size, B_32_BIT_MEMORY,
-		B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+		(void **)device->tx_desc, B_ANY_KERNEL_ADDRESS, size,
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (device->tx_desc_area < 0)
 		return device->tx_desc_area;
 
@@ -290,9 +288,7 @@ alloc_buffers(dev_info_t *device)
 	size = RNDUP(BUFFER_SIZE * TX_BUFFERS, B_PAGE_SIZE);
 	device->tx_buf_area = create_area(DEVICE_NAME " tx buffers",
 		(void **)device->tx_buf, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (device->tx_buf_area < 0) {
 		delete_area(device->tx_desc_area);	// sensitive to alloc ordering
 		return device->tx_buf_area;
@@ -313,9 +309,7 @@ alloc_buffers(dev_info_t *device)
 	size = RNDUP( sizeof(recv_desc_t) * RX_BUFFERS, B_PAGE_SIZE);
 	device->rx_desc_area = create_area(DEVICE_NAME " rx descriptors",
 		(void **)device->rx_desc, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (device->rx_desc_area < 0) {
 		delete_area(device->tx_desc_area);
 		delete_area(device->tx_buf_area);	// sensitive to alloc ordering
@@ -336,9 +330,7 @@ alloc_buffers(dev_info_t *device)
 	size = RNDUP(BUFFER_SIZE * RX_BUFFERS, B_PAGE_SIZE);
 	device->rx_buf_area = create_area(DEVICE_NAME " rx buffers",
 		(void **)device->rx_buf, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+		B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (device->rx_buf_area < 0) {
 		delete_area(device->tx_desc_area);
 		delete_area(device->tx_buf_area);

@@ -525,9 +525,7 @@ wb_create_rings(struct wb_device *device)
 
 	device->rxArea = create_area("wb840 rx buffer", (void **)&device->rxBuffer[0],
 			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_RX_LIST_CNT),
-			B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+			B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (device->rxArea < B_OK)
 		return device->rxArea;
 
@@ -547,9 +545,7 @@ wb_create_rings(struct wb_device *device)
 
 	device->txArea = create_area("wb840 tx buffer", (void **)&device->txBuffer[0],
 			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_TX_LIST_CNT),
-			B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-			// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-			// be necessary here!
+			B_32_BIT_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (device->txArea < B_OK) {
 		delete_area(device->rxArea);
 		return device->txArea;

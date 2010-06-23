@@ -53,9 +53,9 @@ enum {
 };
 
 enum {
-	// ToDo: these are here only temporarily - it's a private
-	//	addition to the BeOS create_area() lock flags
-	B_ALREADY_WIRED	= 6,
+	// TODO: these are here only temporarily - it's a private
+	// addition to the BeOS create_area() lock flags
+	B_ALREADY_WIRED	= 7,
 };
 
 #define MEMORY_TYPE_SHIFT		28

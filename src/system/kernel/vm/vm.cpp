@@ -1117,16 +1117,21 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		case B_ALREADY_WIRED:
 			break;
 		case B_LOMEM:
-		{
 			stackPhysicalRestrictions = *physicalAddressRestrictions;
 			stackPhysicalRestrictions.high_address = 16 * 1024 * 1024;
 			physicalAddressRestrictions = &stackPhysicalRestrictions;
 			wiring = B_CONTIGUOUS;
 			doReserveMemory = true;
 			break;
-		}
-		case B_32_BIT_MEMORY:
-		{
+		case B_32_BIT_FULL_LOCK:
+			#if B_HAIKU_PHYSICAL_BITS <= 32
+				wiring = B_FULL_LOCK;
+				doReserveMemory = true;
+				break;
+			#endif
+			// TODO: We don't really support this mode efficiently. Just fall
+			// through for now ...
+		case B_32_BIT_CONTIGUOUS:
 			#if B_HAIKU_PHYSICAL_BITS > 32
 				stackPhysicalRestrictions = *physicalAddressRestrictions;
 				stackPhysicalRestrictions.high_address = 0x100000000LL;
@@ -1135,7 +1140,6 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 			wiring = B_CONTIGUOUS;
 			doReserveMemory = true;
 			break;
-		}
 		default:
 			return B_BAD_VALUE;
 	}

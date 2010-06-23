@@ -1107,7 +1107,7 @@ static Symbios *create_cardinfo(int num, pci_info *pi, int flags)
 		uchar *a;
 		physical_entry entries[2];
 		aid = create_area(name, (void **)&a, B_ANY_KERNEL_ADDRESS, 4096*5,
-		                  B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
+			B_32_BIT_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 		if(aid == B_ERROR || aid == B_BAD_VALUE || aid == B_NO_MEMORY){
 			free(s);
 		    return NULL;

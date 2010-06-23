@@ -81,7 +81,7 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 
 	size = ROUNDUP(size, B_PAGE_SIZE);
 	areaid = create_area(name, &virtadr, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_MEMORY, protection);
+		B_32_BIT_CONTIGUOUS, protection);
 		// TODO: The rest of the code doesn't deal correctly with physical
 		// addresses > 4 GB, so we have to force 32 bit addresses here.
 	if (areaid < B_OK) {

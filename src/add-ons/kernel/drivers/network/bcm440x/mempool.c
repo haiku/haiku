@@ -31,9 +31,7 @@ area_malloc(size_t size)
 	size = ROUNDUP(size, B_PAGE_SIZE);
 
 	if (create_area("area_malloc", &p, B_ANY_KERNEL_ADDRESS, size,
-			B_32_BIT_MEMORY, 0) < 0) {
-		// TODO: B_32_BIT_MEMORY implies contiguous, although that wouldn't
-		// be necessary here!
+			B_32_BIT_FULL_LOCK, 0) < 0) {
 		return 0;
 	}
 	return p;

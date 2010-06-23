@@ -906,7 +906,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 			(void **)&unaligned_dma_buffer,
 			B_ANY_KERNEL_ADDRESS,
 			2 * net_buf_size, /* take twice the net size so we can have MTRR-WC even on old systems */
-			B_32_BIT_MEMORY, /* GPU always needs access */
+			B_32_BIT_CONTIGUOUS, /* GPU always needs access */
 			B_USER_CLONEABLE_AREA | B_READ_AREA | B_WRITE_AREA);
 			// TODO: Physical aligning can be done without waste using the
 			// private create_area_etc().

@@ -152,7 +152,7 @@ static status_t initGATT( GART_info *gart )
 	gart->GATT.area = create_area("Radeon GATT", (void **)&gart->GATT.ptr,
 		B_ANY_KERNEL_ADDRESS,
 		(num_pages * sizeof( uint32 ) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1),
-		B_32_BIT_MEMORY,
+		B_32_BIT_CONTIGUOUS,
 			// TODO: Physical address is cast to 32 bit below! Use B_CONTIGUOUS,
 			// when that is (/can be) fixed!
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -187,9 +187,9 @@ static status_t initGATT( GART_info *gart )
 
 	// temporary area where we fill in the memory map (deleted below)
 	map_area = create_area("pci_gart_map_area", (void **)&map, B_ANY_ADDRESS,
-		map_area_size, B_32_BIT_MEMORY, B_READ_AREA | B_WRITE_AREA);
-		// TODO: Physical addresses are cast to 32 bit below! Use B_FULL_LOCK,
-		// when that is (/can be) fixed!
+		map_area_size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+		// TODO: We actually have a working malloc() in the kernel. Why create
+		// an area?
 	dprintf("pci_gart_map_area: %ld\n", map_area);
 
 	get_memory_map( gart->buffer.ptr, gart->buffer.size, map, map_count );

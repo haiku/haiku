@@ -208,15 +208,9 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 	} else {
 		// we can live with a fragmented buffer - very nice
 		buffer->area = create_area("DMA buffer",
-			(void **)&buffer->address,
-			B_ANY_KERNEL_ADDRESS, size,
-#if B_HAIKU_PHYSICAL_BITS > 32
-			B_32_BIT_MEMORY,
+			(void **)&buffer->address, B_ANY_KERNEL_ADDRESS, size,
+			B_32_BIT_FULL_LOCK, 0);
 				// TODO: Use B_FULL_LOCK, if possible!
-#else
-			B_FULL_LOCK,
-#endif
-			0);
 		if (buffer->area < 0) {
 			SHOW_ERROR(2, "Cannot create DMA buffer of %d bytes",
 				(int)size);
@@ -234,13 +228,8 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 
 	buffer->sg_list_area = create_area("DMA buffer S/G table",
 		(void **)&buffer->sg_list, B_ANY_KERNEL_ADDRESS, sg_list_size,
-#if B_HAIKU_PHYSICAL_BITS > 32
-		B_32_BIT_MEMORY,
+		B_32_BIT_FULL_LOCK, 0);
 			// TODO: Use B_FULL_LOCK, if possible!
-#else
-		B_FULL_LOCK,
-#endif
-		0);
 	if (buffer->sg_list_area < 0) {
 		SHOW_ERROR( 2, "Cannot craete DMA buffer S/G list of %d bytes",
 			(int)sg_list_size );

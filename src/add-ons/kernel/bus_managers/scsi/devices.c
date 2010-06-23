@@ -219,7 +219,7 @@ scsi_create_autosense_request(scsi_device_info *device)
 
 	// allocate buffer for space sense data and S/G list
 	device->auto_sense_area = create_area("auto_sense", (void**)&buffer,
-		B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_32_BIT_MEMORY, 0);
+		B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_32_BIT_FULL_LOCK, 0);
 		// TODO: Use B_FULL_LOCK, if addresses >= 4 GB are supported!
 	if (device->auto_sense_area < 0)
 		goto err;

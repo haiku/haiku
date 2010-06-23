@@ -648,7 +648,7 @@ static status_t init_ring_buffers(dp83815_properties_t *data)
 	pages = pages_needed(2*MAX_DESC*sizeof(descriptor_t) + NUM_BUFFS*BUFFER_SIZE);
 
 	data->mem_area = create_area(kDevName " desc buffer", (void**)&RxDescRing,
-		B_ANY_KERNEL_ADDRESS, pages * B_PAGE_SIZE, B_32_BIT_MEMORY,
+		B_ANY_KERNEL_ADDRESS, pages * B_PAGE_SIZE, B_32_BIT_CONTIGUOUS,
 		B_READ_AREA | B_WRITE_AREA);
 	if( data->mem_area < 0 )
 		return -1;
