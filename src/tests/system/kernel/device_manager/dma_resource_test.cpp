@@ -9,11 +9,11 @@
 
 #include <device_manager.h>
 
-#include <vm.h>
+#include <vm/vm.h>
 
 #include "dma_resources.h"
 #include "io_requests.h"
-#include "IOScheduler.h"
+#include "IOSchedulerSimple.h"
 
 
 #define DMA_TEST_BLOCK_SIZE				512
@@ -83,7 +83,7 @@ private:
 			size_t			fLength;
 			bool			fIsWrite;
 			uint32			fFlags;
-			iovec			fSourceVecs[32];
+			generic_io_vec	fSourceVecs[32];
 			uint32			fSourceCount;
 
 			struct target_t {
@@ -113,13 +113,14 @@ public:
 		fContext(context)
 	{
 		dprintf("----- Run \"%s\" tests ---------------------------\n", name);
-		dprintf("  DMA restrictions: address %#lx - %#lx, align %lu, boundary "
-			"%lu,\n    max transfer %lu, max segs %lu, max seg size %lu, "
-			"flags %lx\n\n", restrictions.low_address,
-			restrictions.high_address, restrictions.alignment,
-			restrictions.boundary, restrictions.max_transfer_size,
-			restrictions.max_segment_count, restrictions.max_segment_size,
-			restrictions.flags);
+		dprintf("  DMA restrictions: address %#" B_PRIxGENADDR " - %#"
+			B_PRIxGENADDR ", align %" B_PRIuGENADDR ", boundary %" B_PRIuGENADDR
+			",\n    max transfer %" B_PRIuGENADDR ", max segs %" B_PRIx32
+			", max seg size %" B_PRIxGENADDR ", flags %" B_PRIx32 "\n\n",
+			restrictions.low_address, restrictions.high_address,
+			restrictions.alignment, restrictions.boundary,
+			restrictions.max_transfer_size, restrictions.max_segment_count,
+			restrictions.max_segment_size, restrictions.flags);
 
 		status_t status = fDMAResource.Init(restrictions, blockSize, 10, 10);
 		if (status != B_OK)
@@ -186,9 +187,9 @@ do_io(void* data, IOOperation* operation)
 	off_t offset = operation->Offset();
 
 	for (uint32 i = 0; i < operation->VecCount(); i++) {
-		const iovec& vec = operation->Vecs()[i];
-		addr_t base = (addr_t)vec.iov_base;
-		size_t length = vec.iov_len;
+		const generic_io_vec& vec = operation->Vecs()[i];
+		generic_addr_t base = vec.base;
+		generic_size_t length = vec.length;
 
 		if (operation->IsWrite())
 			vm_memcpy_from_physical(disk + offset, base, length, false);
@@ -253,7 +254,8 @@ TestSuiteContext::Init(size_t size, bool contiguous)
 				fPhysicalDataBase = (addr_t)entry[0].address;
 				fSecondPhysicalDataBase = (addr_t)entry[1].address;
 
-				dprintf("DMA Test area %p, physical %p, second physical %p\n",
+				dprintf("DMA Test area %p, physical %#" B_PRIxPHYSADDR
+					", second physical %#" B_PRIxPHYSADDR "\n",
 					(void*)fDataBase, entry[0].address, entry[1].address);
 				break;
 			}
@@ -274,8 +276,8 @@ TestSuiteContext::Init(size_t size, bool contiguous)
 		fPhysicalDataBase = (addr_t)entry.address;
 		fSecondPhysicalDataBase = 0;
 
-		dprintf("DMA Test area %p, physical %p\n", (void*)fDataBase,
-			entry.address);
+		dprintf("DMA Test area %p, physical %#" B_PRIxPHYSADDR "\n",
+			(void*)fDataBase, entry.address);
 	}
 
 	fCompareArea = create_area("compare buffer", (void**)&fCompareBase,
@@ -311,14 +313,14 @@ Test::AddSource(addr_t address, size_t length)
 {
 	if (fSuite.IsContiguous() || (fFlags & B_PHYSICAL_IO_REQUEST) != 0
 		|| address < B_PAGE_SIZE) {
-		fSourceVecs[fSourceCount].iov_base
-			= (void*)(((fFlags & B_PHYSICAL_IO_REQUEST) == 0
-				? fSuite.DataBase() : fSuite.PhysicalDataBase()) + address);
+		fSourceVecs[fSourceCount].base
+			= ((fFlags & B_PHYSICAL_IO_REQUEST) == 0
+				? fSuite.DataBase() : fSuite.PhysicalDataBase()) + address;
 	} else {
-		fSourceVecs[fSourceCount].iov_base
-			= (void*)(fSuite.SecondPhysicalDataBase() + address);
+		fSourceVecs[fSourceCount].base
+			= fSuite.SecondPhysicalDataBase() + address;
 	}
-	fSourceVecs[fSourceCount].iov_len = length;
+	fSourceVecs[fSourceCount].length = length;
 	fSourceCount++;
 
 	return *this;
@@ -401,9 +403,8 @@ Test::_Prepare()
 		size_t length = fLength;
 
 		for (uint32 i = 0; i < fSourceCount; i++) {
-			uint8* data = (uint8*)_SourceToVirtual(
-				(addr_t)fSourceVecs[i].iov_base);
-			size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+			uint8* data = (uint8*)_SourceToVirtual(fSourceVecs[i].base);
+			size_t vecLength = min_c(fSourceVecs[i].length, length);
 
 			for (uint32 j = 0; j < vecLength; j++) {
 				data[j] = (offset + j) % 10 + '0';
@@ -423,12 +424,10 @@ Test::_Prepare()
 		size_t length = fLength;
 
 		for (uint32 i = 0; i < fSourceCount; i++) {
-			uint8* compare = (uint8*)_SourceToCompare(
-				(addr_t)fSourceVecs[i].iov_base);
-			size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+			uint8* compare = (uint8*)_SourceToCompare(fSourceVecs[i].base);
+			size_t vecLength = min_c(fSourceVecs[i].length, length);
 
-			memcpy(compare,
-				(void*)_SourceToVirtual((addr_t)fSourceVecs[i].iov_base),
+			memcpy(compare, (void*)_SourceToVirtual(fSourceVecs[i].base),
 				vecLength);
 			offset += vecLength;
 			length -= vecLength;
@@ -439,9 +438,8 @@ Test::_Prepare()
 		size_t length = fLength;
 
 		for (uint32 i = 0; i < fSourceCount; i++) {
-			uint8* compare = (uint8*)_SourceToCompare(
-				(addr_t)fSourceVecs[i].iov_base);
-			size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+			uint8* compare = (uint8*)_SourceToCompare(fSourceVecs[i].base);
+			size_t vecLength = min_c(fSourceVecs[i].length, length);
 
 			memcpy(compare, disk + offset, vecLength);
 			offset += vecLength;
@@ -504,9 +502,8 @@ Test::_CheckWrite()
 	size_t length = fLength;
 
 	for (uint32 i = 0; i < fSourceCount; i++) {
-		uint8* data = (uint8*)_SourceToVirtual(
-			(addr_t)fSourceVecs[i].iov_base);
-		size_t vecLength = min_c(fSourceVecs[i].iov_len, length);
+		uint8* data = (uint8*)_SourceToVirtual(fSourceVecs[i].base);
+		size_t vecLength = min_c(fSourceVecs[i].length, length);
 
 		for (uint32 j = 0; j < vecLength; j++) {
 			if (disk[offset + j] != data[j]) {
@@ -571,20 +568,23 @@ Test::Run(DMAResource& resource)
 
 		DMABuffer* buffer = operation.Buffer();
 
-		dprintf("IOOperation: offset %Ld, length %lu (%Ld/%lu)\n",
-			operation.Offset(), operation.Length(), operation.OriginalOffset(),
+		dprintf("IOOperation: offset %" B_PRIdOFF ", length %" B_PRIuGENADDR
+			" (%" B_PRIdOFF "/%" B_PRIuGENADDR ")\n", operation.Offset(),
+			operation.Length(), operation.OriginalOffset(),
 			operation.OriginalLength());
 		dprintf("  DMABuffer %p, %lu vecs, bounce buffer: %p (%p) %s\n", buffer,
 			buffer->VecCount(), buffer->BounceBufferAddress(),
 			(void*)buffer->PhysicalBounceBufferAddress(),
 			operation.UsesBounceBuffer() ? "used" : "unused");
 		for (uint32 i = 0; i < buffer->VecCount(); i++) {
-			dprintf("    [%lu] base %p, length %lu%s\n", i,
-				buffer->VecAt(i).iov_base, buffer->VecAt(i).iov_len,
+			dprintf("    [%" B_PRIu32 "] base %#" B_PRIxGENADDR ", length %"
+				B_PRIuGENADDR "%s\n", i, buffer->VecAt(i).base,
+				buffer->VecAt(i).length,
 				buffer->UsesBounceBufferAt(i) ? ", bounce" : "");
 		}
 
-		dprintf("  remaining bytes: %lu\n", request.RemainingBytes());
+		dprintf("  remaining bytes: %" B_PRIuGENADDR "\n",
+			request.RemainingBytes());
 
 		// check results
 
@@ -594,25 +594,25 @@ Test::Run(DMAResource& resource)
 
 		for (uint32 i = 0; i < result.count; i++) {
 			const target_t& target = result.targets[i];
-			const iovec& vec = buffer->VecAt(i);
+			const generic_io_vec& vec = buffer->VecAt(i);
 
-			if (target.length != vec.iov_len)
+			if (target.length != vec.length)
 				_Panic("[%lu] length differs", i);
 
-			void* address;
+			generic_addr_t address;
 			if (target.uses_bounce_buffer) {
-				address = (void*)(target.address
-					+ (addr_t)buffer->PhysicalBounceBufferAddress());
+				address = target.address
+					+ (addr_t)buffer->PhysicalBounceBufferAddress();
 			} else if (fSuite.IsContiguous() || target.address < B_PAGE_SIZE) {
-				address = (void*)(target.address + fSuite.PhysicalDataBase());
+				address = target.address + fSuite.PhysicalDataBase();
 			} else {
-				address = (void*)(target.address - B_PAGE_SIZE
-					+ fSuite.SecondPhysicalDataBase());
+				address = target.address - B_PAGE_SIZE
+					+ fSuite.SecondPhysicalDataBase();
 			}
 
-			if (address != vec.iov_base) {
-				_Panic("[%lu] address differs: %p, should be %p", i,
-					vec.iov_base, address);
+			if (address != vec.base) {
+				_Panic("[%" B_PRIu32 "] address differs: %#" B_PRIxGENADDR
+					", should be %#" B_PRIuGENADDR "", i, vec.base, address);
 			}
 		}
 
@@ -674,8 +674,8 @@ Test::_Panic(const char* message,...)
 	dprintf("  flags:   %#lx\n", fFlags);
 	dprintf("  sources:\n");
 	for (uint32 i = 0; i < fSourceCount; i++) {
-		dprintf("    [%p, %lu]\n", fSourceVecs[i].iov_base,
-			fSourceVecs[i].iov_len);
+		dprintf("    [%#" B_PRIxGENADDR ", %" B_PRIuGENADDR "]\n",
+			fSourceVecs[i].base, fSourceVecs[i].length);
 	}
 	for (uint32 i = 0; i < fResultCount; i++) {
 		const result_t& result = fResults[i];
@@ -1175,7 +1175,7 @@ dma_test_init_device(void *driverCookie, void **_deviceCookie)
 		return status;
 	}
 
-	sIOScheduler = new(std::nothrow) IOScheduler(sDMAResource);
+	sIOScheduler = new(std::nothrow) IOSchedulerSimple(sDMAResource);
 	if (sIOScheduler == NULL) {
 		delete sDMAResource;
 		return B_NO_MEMORY;
@@ -1233,7 +1233,7 @@ dma_test_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 
 #if 1
 	IORequest request;
-	status_t status = request.Init(pos, buffer, length, false, 0);
+	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
 	if (status != B_OK)
 		return status;
 
@@ -1265,7 +1265,7 @@ dma_test_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 
 #if 1
 	IORequest request;
-	status_t status = request.Init(pos, (void*)buffer, length, true, 0);
+	status_t status = request.Init(pos, (addr_t)buffer, length, true, 0);
 	if (status != B_OK)
 		return status;
 
