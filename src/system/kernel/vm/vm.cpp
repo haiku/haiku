@@ -23,6 +23,8 @@
 
 #include <AutoDeleter.h>
 
+#include <symbol_versioning.h>
+
 #include <arch/cpu.h>
 #include <arch/vm.h>
 #include <boot/elf.h>
@@ -5438,9 +5440,9 @@ get_memory_map_etc(team_id team, const void* address, size_t numBytes,
 /*!	According to the BeBook, this function should always succeed.
 	This is no longer the case.
 */
-long
-get_memory_map(const void* address, ulong numBytes, physical_entry* table,
-	long numEntries)
+extern "C" int32
+__get_memory_map_haiku(const void* address, size_t numBytes,
+	physical_entry* table, int32 numEntries)
 {
 	uint32 entriesRead = numEntries;
 	status_t error = get_memory_map_etc(B_CURRENT_TEAM, address, numBytes,
@@ -5581,8 +5583,8 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 }
 
 
-area_id
-map_physical_memory(const char* name, phys_addr_t physicalAddress,
+extern "C" area_id
+__map_physical_memory_haiku(const char* name, phys_addr_t physicalAddress,
 	size_t numBytes, uint32 addressSpec, uint32 protection,
 	void** _virtualAddress)
 {
@@ -5624,9 +5626,9 @@ create_area_etc(team_id team, const char* name, uint32 size, uint32 lock,
 }
 
 
-area_id
-create_area(const char* name, void** _address, uint32 addressSpec, size_t size,
-	uint32 lock, uint32 protection)
+extern "C" area_id
+__create_area_haiku(const char* name, void** _address, uint32 addressSpec,
+	size_t size, uint32 lock, uint32 protection)
 {
 	fix_protection(&protection);
 
@@ -6215,3 +6217,124 @@ _user_memory_advice(void* address, size_t size, uint32 advice)
 	// TODO: Implement!
 	return B_OK;
 }
+
+
+// #pragma mark -- compatibility
+
+
+#if defined(__INTEL__) && B_HAIKU_PHYSICAL_BITS > 32
+
+
+struct physical_entry_beos {
+	uint32	address;
+	uint32	size;
+};
+
+
+/*!	The physical_entry structure has changed. We need to translate it to the
+	old one.
+*/
+extern "C" int32
+__get_memory_map_beos(const void* _address, size_t numBytes,
+	physical_entry_beos* table, int32 numEntries)
+{
+	if (numEntries <= 0)
+		return B_BAD_VALUE;
+
+	const uint8* address = (const uint8*)_address;
+
+	int32 count = 0;
+	while (numBytes > 0 && count < numEntries) {
+		physical_entry entry;
+		status_t result = __get_memory_map_haiku(address, numBytes, &entry, 1);
+		if (result < 0) {
+			if (result != B_BUFFER_OVERFLOW)
+				return result;
+		}
+
+		if (entry.address >= (phys_addr_t)1 << 32) {
+			panic("get_memory_map(): Address is greater 4 GB!");
+			return B_ERROR;
+		}
+
+		table[count].address = entry.address;
+		table[count++].size = entry.size;
+
+		address += entry.size;
+		numBytes -= entry.size;
+	}
+
+	// null-terminate the table, if possible
+	if (count < numEntries) {
+		table[count].address = 0;
+		table[count].size = 0;
+	}
+
+	return B_OK;
+}
+
+
+/*!	The type of the \a physicalAddress parameter has changed from void* to
+	phys_addr_t.
+*/
+extern "C" area_id
+__map_physical_memory_beos(const char* name, void* physicalAddress,
+	size_t numBytes, uint32 addressSpec, uint32 protection,
+	void** _virtualAddress)
+{
+	return __map_physical_memory_haiku(name, (addr_t)physicalAddress, numBytes,
+		addressSpec, protection, _virtualAddress);
+}
+
+
+/*! The caller might not be able to deal with physical addresses >= 4 GB, so
+	we meddle with the \a lock parameter to force 32 bit.
+*/
+extern "C" area_id
+__create_area_beos(const char* name, void** _address, uint32 addressSpec,
+	size_t size, uint32 lock, uint32 protection)
+{
+	switch (lock) {
+		case B_NO_LOCK:
+			break;
+		case B_FULL_LOCK:
+		case B_LAZY_LOCK:
+			lock = B_32_BIT_FULL_LOCK;
+			break;
+		case B_CONTIGUOUS:
+			lock = B_32_BIT_CONTIGUOUS;
+			break;
+	}
+
+	return __create_area_haiku(name, _address, addressSpec, size, lock,
+		protection);
+}
+
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__get_memory_map_beos", "get_memory_map@",
+	"BASE");
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__map_physical_memory_beos",
+	"map_physical_memory@", "BASE");
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__create_area_beos", "create_area@",
+	"BASE");
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__get_memory_map_haiku",
+	"get_memory_map@@", "1_ALPHA3");
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__map_physical_memory_haiku",
+	"map_physical_memory@@", "1_ALPHA3");
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__create_area_haiku", "create_area@@",
+	"1_ALPHA3");
+
+
+#else
+
+
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__get_memory_map_haiku",
+	"get_memory_map@", "BASE");
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__map_physical_memory_haiku",
+	"map_physical_memory@@", "BASE");
+DEFINE_LIBROOT_KERNEL_SYMBOL_VERSION("__create_area_haiku", "create_area@@",
+	"BASE");
+
+
+#endif	// defined(__INTEL__) && B_HAIKU_PHYSICAL_BITS > 32
