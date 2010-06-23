@@ -18,8 +18,9 @@
 #include <OS.h>
 #include <Path.h>
 
+#include <SHA256.h>
+
 #include "AdaptiveBuffering.h"
-#include "SHA256.h"
 
 
 //#define TRACE(x...) printf(x)
@@ -211,7 +212,7 @@ main(int argc, char** argv)
 		file_entry entry;
 		read(file, entry.hash, SHA_DIGEST_LENGTH);
 		read(file, &entry.node, sizeof(ino_t));
-		
+
 		int length;
 		read(file, &length, sizeof(int));
 		read(file, buffer, length + 1);

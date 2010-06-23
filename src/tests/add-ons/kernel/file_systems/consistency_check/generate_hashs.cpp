@@ -18,8 +18,9 @@
 #include <OS.h>
 #include <Path.h>
 
+#include <SHA256.h>
+
 #include "AdaptiveBuffering.h"
-#include "SHA256.h"
 
 
 //#define TRACE(x...) printf(x)
