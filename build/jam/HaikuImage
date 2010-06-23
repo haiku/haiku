@@ -317,6 +317,10 @@ AddFilesToHaikuImage system bin			: installoptionalpackage ;
 SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToHaikuImage system bin			: install-wifi-firmwares.sh ;
 
+# Record the installed optional packages. To be used by installoptionalpackage.
+AddDirectoryToHaikuImage common data optional-packages ;
+AddInstalledPackagesFileToHaikuImage ;
+
 AddSymlinkToHaikuImage system bin : bash : sh ;
 AddSymlinkToHaikuImage system bin : trash : untrash ;
 
