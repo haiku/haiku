@@ -29,7 +29,7 @@ user_strlcpy(char *to, const char *from, size_t size)
 }
 
 
-size_t
+page_num_t
 vm_page_num_pages(void)
 {
 	return 65536;
