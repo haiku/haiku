@@ -13,6 +13,8 @@
 #include <OS.h>
 #include <drivers/driver_settings.h>
 
+#include <safemode_defs.h>
+
 #include <boot/driver_settings.h>
 #include <boot/kernel_args.h>
 #include <boot/stage2.h>
@@ -55,6 +57,20 @@ load_driver_settings_file(Directory* directory, const char* name)
 	gKernelArgs.driver_settings = file;
 
 	return B_OK;
+}
+
+
+static void
+apply_boot_settings(void* kernelSettings, void* safemodeSettings)
+{
+#if B_HAIKU_PHYSICAL_BITS > 32
+	if (get_driver_boolean_parameter(kernelSettings, "4gb_memory_limit", false,
+			false)
+		|| get_driver_boolean_parameter(safemodeSettings,
+			B_SAFEMODE_4_GB_MEMORY_LIMIT, false, false)) {
+		ignore_physical_memory_ranges_beyond_4gb();
+	}
+#endif
 }
 
 
@@ -132,4 +148,19 @@ add_safe_mode_settings(char* settings)
 	gKernelArgs.driver_settings = file;
 
 	return B_OK;
+}
+
+
+void
+apply_boot_settings()
+{
+	void* kernelSettings = load_driver_settings("kernel");
+	void* safemodeSettings = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
+
+	apply_boot_settings(kernelSettings, safemodeSettings);
+
+	if (safemodeSettings != NULL)
+		unload_driver_settings(safemodeSettings);
+	if (kernelSettings)
+		unload_driver_settings(kernelSettings);
 }

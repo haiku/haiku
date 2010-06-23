@@ -113,6 +113,9 @@ main(stage2_args *args)
 			load_modules(args, volume);
 			load_driver_settings(args, volume);
 
+			// apply boot settings
+			apply_boot_settings();
+
 			// set up kernel args version info
 			gKernelArgs.kernel_args_size = sizeof(kernel_args);
 			gKernelArgs.version = CURRENT_KERNEL_ARGS_VERSION;

@@ -673,6 +673,28 @@ add_safe_mode_menu()
     item->SetHelpText("Disables IDE DMA, increasing IDE compatibilty "
 		"at the expense of performance.");
 
+#if B_HAIKU_PHYSICAL_BITS > 32
+	// check whether we have memory beyond 4 GB
+	bool hasMemoryBeyond4GB = false;
+	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+		phys_addr_range& range = gKernelArgs.physical_memory_range[i];
+		if (range.start >= (phys_addr_t)1 << 32) {
+			hasMemoryBeyond4GB = true;
+			break;
+		}
+	}
+
+	// ... add the menu, if so
+	if (hasMemoryBeyond4GB) {
+		safeMenu->AddItem(
+			item = new(nothrow) MenuItem("Ignore memory beyond 4 GiB"));
+		item->SetData(B_SAFEMODE_4_GB_MEMORY_LIMIT);
+		item->SetType(MENU_ITEM_MARKABLE);
+		item->SetHelpText("Ignores all memory beyond the 4 GiB address limit, "
+			"overriding the setting in the kernel settings file.");
+	}
+#endif
+
 	platform_add_menus(safeMenu);
 
 	safeMenu->AddSeparatorItem();
