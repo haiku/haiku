@@ -16,6 +16,7 @@
 #include <string>
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include <ColorQuantizer.h>
 

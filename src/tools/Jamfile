@@ -17,6 +17,7 @@ local tools =
 	<build>settype
 	<build>setversion
 	<build>xres
+	<build>generate_boot_screen
 ;
 
 USES_BE_API on $(tools) = true ;
