@@ -28,7 +28,7 @@
 #include "paging/x86_physical_page_mapper_large_memory.h"
 
 
-#define TRACE_X86_PAGING_METHOD_PAE
+//#define TRACE_X86_PAGING_METHOD_PAE
 #ifdef TRACE_X86_PAGING_METHOD_PAE
 #	define TRACE(x...) dprintf(x)
 #else
@@ -222,12 +222,10 @@ private:
 		for (uint32 i = 0; i < oldPageTableCount; i++) {
 			// allocate a page
 			phys_addr_t physicalTable =_AllocatePage32Bit();
-TRACE("allocated page table: %#" B_PRIxPHYSADDR "\n", physicalTable);
 
 			// put the page into the page dir
 			page_directory_entry* entry = &fPageHolePageDir[
 				virtualBase / B_PAGE_SIZE / 1024 + i];
-TRACE("  -> mapping in pde %p (%#lx)\n", entry, *entry);
 			X86PagingMethod32Bit::PutPageTableInPageDir(entry, physicalTable,
 				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
@@ -244,11 +242,9 @@ TRACE("  -> mapping in pde %p (%#lx)\n", entry, *entry);
 		for (uint32 i = 0; i < pagesNeeded; i++) {
 			// allocate a page
 			phys_addr_t physicalAddress =_AllocatePage32Bit();
-//TRACE("allocated page: %#" B_PRIxPHYSADDR "\n", physicalAddress);
 
 			// put the page into the page table
 			page_table_entry* entry = fPageHole + virtualBase / B_PAGE_SIZE + i;
-//TRACE("  -> mapping in pte %p (%#lx)\n", entry, *entry);
 			X86PagingMethod32Bit::PutPageTableEntryInTable(entry,
 				physicalAddress, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0,
 				true);
