@@ -242,6 +242,10 @@ ahci_register_device(device_node *parent)
 		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
 		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
 			{ ui32: 32 /* whatever... */ }},
+		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
+			// TODO: We don't know at this point whether 64 bit addressing is
+			// supported. That's indicated by a capability flag. Play it safe
+			// for now.
 		{ NULL }
 	};
 
