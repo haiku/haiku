@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel drivers graphics 3dfx ;
+
+UsePrivateHeaders [ FDirName graphics 3dfx ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders graphics kernel ;
+
+KernelAddon 3dfx :
+	driver.cpp
+;

@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons accelerants 3dfx ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics 3dfx ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+Addon 3dfx.accelerant :
+	accelerant.cpp
+	cursor.cpp
+	engine.cpp
+	hooks.cpp
+	mode.cpp
+	overlay.cpp
+		
+	3dfx_cursor.cpp
+	3dfx_dpms.cpp
+	3dfx_draw.cpp
+	3dfx_edid.cpp
+	3dfx_init.cpp
+	3dfx_mode.cpp
+	3dfx_overlay.cpp
+
+	: be libaccelerantscommon.a
+;
