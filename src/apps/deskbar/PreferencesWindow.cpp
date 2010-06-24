@@ -58,8 +58,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsExpandNew = new BCheckBox(B_TRANSLATE("Expand new applications"),
 		new BMessage(kExpandNewTeams));
 
-	fClock24Hours = new BCheckBox(B_TRANSLATE("24 hour clock"),
-		new BMessage(kMilTime));
 	fClockSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
 		new BMessage(kShowSeconds));
 	fClockEuropeanDate = new BCheckBox(B_TRANSLATE("European date"),
@@ -124,13 +122,11 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	TReplicantTray* replicantTray = barApp->BarView()->fReplicantTray;
 
-	fClock24Hours->SetValue(replicantTray->ShowingMiltime());
 	fClockSeconds->SetValue(replicantTray->ShowingSeconds());
 	fClockEuropeanDate->SetValue(replicantTray->ShowingEuroDate());
 	fClockFullDate->SetValue(replicantTray->ShowingFullDate());
 
 	bool showingClock = barApp->BarView()->ShowingClock();
-	fClock24Hours->SetEnabled(showingClock);
 	fClockSeconds->SetEnabled(showingClock);
 	fClockEuropeanDate->SetEnabled(showingClock);
 	fClockFullDate->SetEnabled(replicantTray->CanShowFullDate());
@@ -145,7 +141,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsSortTrackerFirst->SetTarget(be_app);
 	fAppsExpandNew->SetTarget(be_app);
 
-	fClock24Hours->SetTarget(replicantTray);
 	fClockSeconds->SetTarget(replicantTray);
 	fClockEuropeanDate->SetTarget(replicantTray);
 	fClockFullDate->SetTarget(replicantTray);
@@ -203,7 +198,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 1)
-			.Add(fClock24Hours)
 			.Add(fClockSeconds)
 			.Add(fClockEuropeanDate)
 			.Add(fClockFullDate)

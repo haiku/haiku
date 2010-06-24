@@ -104,7 +104,6 @@ struct desk_settings {
 	int32 recentAppsCount;		// version 3
 	int32 recentDocsCount;
 	bool timeShowSeconds;		// version 4
-	bool timeShowMil;
 	int32 recentFoldersCount;	// version 5
 	bool timeShowEuro;			// version 6
 	bool alwaysOnTop;
@@ -126,7 +125,7 @@ const uint32 kValidSettingsSize1 = 5 * sizeof(bool) + sizeof(uint32)
 	+ sizeof(float);
 const uint32 kValidSettingsSize2 = sizeof(BPoint) + kValidSettingsSize1;
 const uint32 kValidSettingsSize3 = 2 * sizeof(int32) + kValidSettingsSize2;
-const uint32 kValidSettingsSize4 = 2 * sizeof(bool) + kValidSettingsSize3;
+const uint32 kValidSettingsSize4 = sizeof(bool) + kValidSettingsSize3;
 const uint32 kValidSettingsSize5 = sizeof(int32) + kValidSettingsSize4;
 const uint32 kValidSettingsSize6 = 2 * sizeof(bool) + kValidSettingsSize5;
 const uint32 kValidSettingsSize7 = sizeof(bool) + kValidSettingsSize6;

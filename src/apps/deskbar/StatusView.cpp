@@ -199,7 +199,6 @@ TReplicantTray::RememberClockSettings()
 		desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 		settings->timeShowSeconds = fClock->ShowingSeconds();
-		settings->timeShowMil = fClock->ShowingMilTime();
 		settings->timeShowEuro = fClock->ShowingEuroDate();
 		settings->timeFullDate = fClock->ShowingFullDate();
 	}
@@ -211,15 +210,6 @@ TReplicantTray::ShowingSeconds()
 {
 	if (fClock)
 		return fClock->ShowingSeconds();
-	return false;
-}
-
-
-bool
-TReplicantTray::ShowingMiltime()
-{
-	if (fClock)
-		return fClock->ShowingMilTime();
 	return false;
 }
 
@@ -261,8 +251,8 @@ TReplicantTray::DealWithClock(bool showClock)
 			desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 			fClock = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
-				settings->timeShowSeconds, settings->timeShowMil,
-				settings->timeFullDate,	settings->timeShowEuro, false);
+				settings->timeShowSeconds, settings->timeFullDate,
+				settings->timeShowEuro, false);
 			AddChild(fClock);
 
 			fClock->MoveTo(Bounds().right - fClock->Bounds().Width() - 1, 2);
@@ -385,7 +375,6 @@ TReplicantTray::MessageReceived(BMessage* message)
 			break;
 
 		case kShowSeconds:
-		case kMilTime:
 		case kEuroDate:
 		case kFullDate:
 			if (fClock != NULL)

@@ -38,8 +38,10 @@ All rights reserved.
 #include <string.h>
 
 #include <Catalog.h>
+#include <Country.h>
 #include <Debug.h>
 #include <Locale.h>
+#include <LocaleRoster.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
@@ -72,7 +74,7 @@ enum {
 #define B_TRANSLATE_CONTEXT "TimeView"
 
 TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
-	bool milTime, bool fullDate, bool euroDate, bool)
+	bool fullDate, bool euroDate, bool)
 	:
 	BView(BRect(-100,-100,-90,-90), "_deskbar_tv_",
 	B_FOLLOW_RIGHT | B_FOLLOW_TOP,
@@ -80,7 +82,6 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	fParent(NULL),
 	fShowInterval(true), // ToDo: defaulting this to true until UI is in place
 	fShowSeconds(showSeconds),
-	fMilTime(milTime),
 	fFullDate(fullDate),
 	fCanShowFullDate(false),
 	fEuroDate(euroDate),
@@ -104,7 +105,6 @@ TTimeView::TTimeView(BMessage* data)
 {
 	fTime = fLastTime = time(NULL);
 	data->FindBool("seconds", &fShowSeconds);
-	data->FindBool("miltime", &fMilTime);
 	data->FindBool("fulldate", &fFullDate);
 	data->FindBool("eurodate", &fEuroDate);
 	data->FindBool("interval", &fInterval);
@@ -135,7 +135,6 @@ TTimeView::Archive(BMessage* data, bool deep) const
 {
 	BView::Archive(data, deep);
 	data->AddBool("seconds", fShowSeconds);
-	data->AddBool("miltime", fMilTime);
 	data->AddBool("fulldate", fFullDate);
 	data->AddBool("eurodate", fEuroDate);
 	data->AddBool("interval", fInterval);
@@ -218,10 +217,6 @@ TTimeView::MessageReceived(BMessage* message)
 
 		case kShowSeconds:
 			ShowSeconds(!ShowingSeconds());
-			break;
-
-		case kMilTime:
-			ShowMilTime(!ShowingMilTime());
 			break;
 
 		case kEuroDate:
@@ -315,28 +310,18 @@ TTimeView::StopLongClickNotifier()
 void
 TTimeView::GetCurrentTime()
 {
-	char tmp[64];
+	// TODO : should this be another function ?
 	tm time = *localtime(&fTime);
-
-	if (fMilTime) {
-		strftime(tmp, 64, fShowSeconds ? "%H:%M:%S" : "%H:%M", &time);
-	} else {
-		if (fShowInterval)
-			strftime(tmp, 64, fShowSeconds ? "%I:%M:%S %p" : "%I:%M %p", &time);
-		else
-			strftime(tmp, 64, fShowSeconds ? "%I:%M:%S" : "%I:%M", &time);
-	}
-
-	//	remove leading 0 from time when hour is less than 10
-	const char* str = tmp;
-	if (str[0] == '0')
-		str++;
-
-	strcpy(fTimeStr, str);
-
+	
 	fSeconds = time.tm_sec;
 	fMinute = time.tm_min;
 	fHour = time.tm_hour;
+	
+	
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	
+	here->FormatTime(fTimeStr, 64, fTime, fShowSeconds);	
 }
 
 
@@ -461,14 +446,6 @@ void
 TTimeView::ShowSeconds(bool on)
 {
 	fShowSeconds = on;
-	Update();
-}
-
-
-void
-TTimeView::ShowMilTime(bool on)
-{
-	fMilTime = on;
 	Update();
 }
 

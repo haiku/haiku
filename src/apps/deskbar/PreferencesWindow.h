@@ -52,7 +52,6 @@ private:
 			BCheckBox*		fAppsShowExpanders;
 			BCheckBox*		fAppsExpandNew;
 
-			BCheckBox*		fClock24Hours;
 			BCheckBox*		fClockSeconds;
 			BCheckBox*		fClockEuropeanDate;
 			BCheckBox*		fClockFullDate;

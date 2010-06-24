@@ -164,7 +164,7 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 	// short, medium, long, and full. Our bool parameter is not enough...
 	icu_4_2::DateFormat* timeFormatter;
  	timeFormatter = DateFormat::createTimeInstance(
-		longFormat ? DateFormat::FULL : DateFormat::SHORT,
+		longFormat ? DateFormat::MEDIUM : DateFormat::SHORT,
 		*fICULocale);
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);

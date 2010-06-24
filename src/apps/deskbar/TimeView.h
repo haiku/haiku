@@ -54,7 +54,7 @@ class _EXPORT	TTimeView;
 class TTimeView : public BView {
 	public:
 		TTimeView(float maxWidth, float height, bool showSeconds = false,
-			bool milTime = false, bool fullDate = false, bool euroDate = false,
+			bool fullDate = false, bool euroDate = false,
 			bool showInterval = false);
 		TTimeView(BMessage* data);
 		~TTimeView();
@@ -76,8 +76,6 @@ class TTimeView : public BView {
 
 		bool		ShowingSeconds() 	{ return fShowSeconds; }
 		void		ShowSeconds(bool);
-		bool		ShowingMilTime()	{ return fMilTime; }
-		void		ShowMilTime(bool);
 		bool		ShowingDate()		{ return fShowingDate; }
 		void		ShowDate(bool);
 		bool		ShowingFullDate()	{ return fFullDate; }
@@ -120,7 +118,6 @@ class TTimeView : public BView {
 
 		bool		fShowInterval;
 		bool		fShowSeconds;
-		bool		fMilTime;
 		bool		fShowingDate;
 		bool		fFullDate;
 		bool		fCanShowFullDate;
