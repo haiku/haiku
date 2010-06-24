@@ -1024,8 +1024,8 @@ void
 IORequest::SubRequestFinished(IORequest* request, status_t status,
 	bool partialTransfer, generic_size_t transferEndOffset)
 {
-	TRACE("IORequest::SubrequestFinished(%p, %#lx, %d, %lu): request: %p\n",
-		request, status, partialTransfer, transferEndOffset, this);
+	TRACE("IORequest::SubrequestFinished(%p, %#" B_PRIx32 ", %d, %"
+		B_PRIuGENADDR "): request: %p\n", request, status, partialTransfer, transferEndOffset, this);
 
 	MutexLocker locker(fLock);
 
@@ -1065,7 +1065,7 @@ void
 IORequest::SetTransferredBytes(bool partialTransfer,
 	generic_size_t transferredBytes)
 {
-	TRACE("%p->IORequest::SetTransferredBytes(%d, %lu)\n", this,
+	TRACE("%p->IORequest::SetTransferredBytes(%d, %" B_PRIuGENADDR ")\n", this,
 		partialTransfer, transferredBytes);
 
 	MutexLocker _(fLock);
@@ -1085,8 +1085,9 @@ IORequest::SetSuppressChildNotifications(bool suppress)
 void
 IORequest::Advance(generic_size_t bySize)
 {
-	TRACE("IORequest::Advance(%lu): remaining: %lu -> %lu\n", bySize,
-		fRemainingBytes, fRemainingBytes - bySize);
+	TRACE("IORequest::Advance(%" B_PRIuGENADDR "): remaining: %" B_PRIuGENADDR
+		" -> %" B_PRIuGENADDR "\n", bySize, fRemainingBytes,
+		fRemainingBytes - bySize);
 	fRemainingBytes -= bySize;
 	fTransferSize += bySize;
 
