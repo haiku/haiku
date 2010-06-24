@@ -41,7 +41,6 @@ All rights reserved.
 
 
 const uint32 kShowSeconds = 'ShSc';
-const uint32 kMilTime = 'MilT';
 const uint32 kFullDate = 'FDat';
 const uint32 kEuroDate = 'EDat';
 
