@@ -14,7 +14,8 @@
 
 
 
-AccelerantInfo gInfo;		// global data used by various source files of accelerant.
+AccelerantInfo gInfo;		// global data used by various source files of 
+							// accelerant.
 
 
 
@@ -33,8 +34,9 @@ InitCommon(int fileDesc)
 	if (result != B_OK)
 		return result;
 
-	gInfo.sharedInfoArea = clone_area("3DFX shared info", (void**)&(gInfo.sharedInfo),
-		B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, sharedArea);
+	gInfo.sharedInfoArea = clone_area("3DFX shared info", 
+		(void**)&(gInfo.sharedInfo), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		 sharedArea);
 	if (gInfo.sharedInfoArea < 0)
 		return gInfo.sharedInfoArea;	// sharedInfoArea has error code
 

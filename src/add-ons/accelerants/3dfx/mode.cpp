@@ -30,7 +30,8 @@ IsThereEnoughFBMemory(const display_mode* mode, uint32 bitsPerPixel)
 
 	uint32 bytesPerPixel = (bitsPerPixel + 7) / 8;
 
-	return (maxWidth * maxHeight * bytesPerPixel < gInfo.sharedInfo->maxFrameBufferSize);
+	return (maxWidth * maxHeight * bytesPerPixel 
+		< gInfo.sharedInfo->maxFrameBufferSize);
 }
 
 
@@ -128,8 +129,8 @@ CreateModeList(bool (*checkMode)(const display_mode* mode))
 
 
 status_t
-ProposeDisplayMode(display_mode *target, const display_mode *low,
-	const display_mode *high)
+ProposeDisplayMode(display_mode* target, const display_mode* low,
+	const display_mode* high)
 {
 	(void)low;		// avoid compiler warning for unused arg
 	(void)high;		// avoid compiler warning for unused arg
@@ -189,7 +190,8 @@ SetDisplayMode(display_mode* pMode)
 	if ( ! IsThereEnoughFBMemory(&mode, mode.bitsPerPixel))
 		return B_NO_MEMORY;
 
-	TRACE("Set display mode: %dx%d  virtual size: %dx%d  color depth: %d bits/pixel\n",
+	TRACE("Set display mode: %dx%d  virtual size: %dx%d  "
+		"color depth: %d bits/pixel\n",
 		mode.timing.h_display, mode.timing.v_display,
 		mode.virtual_width, mode.virtual_height, mode.bitsPerPixel);
 
@@ -258,7 +260,8 @@ GetModeList(display_mode* dmList)
 	// Copy the list of supported video modes to the location pointed at
 	// by dmList.
 
-	memcpy(dmList, gInfo.modeList, gInfo.sharedInfo->modeCount * sizeof(display_mode));
+	memcpy(dmList, gInfo.modeList, 
+		gInfo.sharedInfo->modeCount * sizeof(display_mode));
 	return B_OK;
 }
 
@@ -276,9 +279,12 @@ GetFrameBufferConfig(frame_buffer_config* pFBC)
 {
 	SharedInfo& si = *gInfo.sharedInfo;
 
-	pFBC->frame_buffer = (void*)((addr_t)si.videoMemAddr + si.frameBufferOffset);
-	pFBC->frame_buffer_dma = (void*)((addr_t)si.videoMemPCI + si.frameBufferOffset);
-	pFBC->bytes_per_row = si.displayMode.virtual_width * si.displayMode.bytesPerPixel;
+	pFBC->frame_buffer = (void*)((addr_t)si.videoMemAddr 
+		+ si.frameBufferOffset);
+	pFBC->frame_buffer_dma = (void*)((addr_t)si.videoMemPCI 
+		+ si.frameBufferOffset);
+	pFBC->bytes_per_row = si.displayMode.virtual_width 
+		* si.displayMode.bytesPerPixel;
 
 	return B_OK;
 }

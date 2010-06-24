@@ -59,7 +59,8 @@ TDFX_Init(void)
 	si.maxFrameBufferSize = si.videoMemSize - si.frameBufferOffset;
 
 	TRACE("Video Memory size: %d MB\n", si.videoMemSize / 1024 / 1024);
-	TRACE("frameBufferOffset: 0x%x  cursorOffset: 0x%x\n", si.frameBufferOffset, si.cursorOffset);
+	TRACE("frameBufferOffset: 0x%x  cursorOffset: 0x%x\n", 
+		si.frameBufferOffset, si.cursorOffset);
 
 	switch (si.chipType) {
 		case BANSHEE:

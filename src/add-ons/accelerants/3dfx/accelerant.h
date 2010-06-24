@@ -31,7 +31,8 @@ extern "C" void  _sPrintf(const char* format, ...);
 struct AccelerantInfo {
 	int			deviceFileDesc;		// file descriptor of kernel driver
 
-	SharedInfo*	sharedInfo;			// address of info shared between accelerants & driver
+	SharedInfo*	sharedInfo;			// address of info shared between 
+									// accelerants & driver
 	area_id		sharedInfoArea;		// shared info area ID
 
 	uint8*		regs;				// base address of MMIO register area
@@ -68,14 +69,14 @@ status_t GetAccelerantDeviceInfo(accelerant_device_info* adi);
 uint32	 AccelerantModeCount(void);
 status_t GetModeList(display_mode* dm);
 status_t ProposeDisplayMode(display_mode* target, const display_mode* low,
-				const display_mode* high);
+			const display_mode* high);
 status_t SetDisplayMode(display_mode* mode_to_set);
 status_t GetDisplayMode(display_mode* current_mode);
 status_t GetFrameBufferConfig(frame_buffer_config* a_frame_buffer);
 status_t GetPixelClockLimits(display_mode* dm, uint32* low, uint32* high);
 status_t MoveDisplay(uint16 h_display_start, uint16 v_display_start);
 void	 TDFX_SetIndexedColors(uint count, uint8 first, uint8* color_data,
-				uint32 flags);
+			uint32 flags);
 status_t GetEdidInfo(void* info, size_t size, uint32* _version);
 
 // DPMS
@@ -85,14 +86,14 @@ status_t TDFX_SetDPMSMode(uint32 dpms_flags);
 
 // Cursor
 status_t SetCursorShape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y,
-						uint8* andMask, uint8* xorMask);
+			uint8* andMask, uint8* xorMask);
 void	 MoveCursor(uint16 x, uint16 y);
 void	 TDFX_ShowCursor(bool bShow);
 
 // Engine Management
 uint32	 AccelerantEngineCount(void);
 status_t AcquireEngine(uint32 capabilities, uint32 max_wait, sync_token* st,
-				engine_token** et);
+			engine_token** et);
 status_t ReleaseEngine(engine_token* et, sync_token* st);
 void	 WaitEngineIdle(void);
 status_t GetSyncToken(engine_token* et, sync_token* st);
@@ -100,24 +101,27 @@ status_t SyncToToken(sync_token* st);
 
 // 2D acceleration
 void	 TDFX_FillRectangle(engine_token* et, uint32 color,
-				fill_rect_params* list, uint32 count);
-void	 TDFX_FillSpan(engine_token* et, uint32 color, uint16* list, uint32 count);
-void	 TDFX_InvertRectangle(engine_token* et, fill_rect_params* list, uint32 count);
-void	 TDFX_ScreenToScreenBlit(engine_token* et, blit_params* list, uint32 count);
+			fill_rect_params* list, uint32 count);
+void	 TDFX_FillSpan(engine_token* et, uint32 color, uint16* list, 
+			uint32 count);
+void	 TDFX_InvertRectangle(engine_token* et, fill_rect_params* list, 
+			uint32 count);
+void	 TDFX_ScreenToScreenBlit(engine_token* et, blit_params* list, 
+			uint32 count);
 
 // Video_overlay
-uint32		OverlayCount(const display_mode *dm);
+uint32		OverlayCount(const display_mode* dm);
 const uint32* OverlaySupportedSpaces(const display_mode *dm);
 uint32		OverlaySupportedFeatures(uint32 a_color_space);
 const overlay_buffer* AllocateOverlayBuffer(color_space cs, uint16 width,
-					uint16 height);
-status_t	ReleaseOverlayBuffer(const overlay_buffer *ob);
-status_t	GetOverlayConstraints(const display_mode *dm,
-					const overlay_buffer *ob, overlay_constraints *oc);
+				uint16 height);
+status_t	ReleaseOverlayBuffer(const overlay_buffer* ob);
+status_t	GetOverlayConstraints(const display_mode* dm,
+				const overlay_buffer* ob, overlay_constraints* oc);
 overlay_token AllocateOverlay(void);
 status_t	ReleaseOverlay(overlay_token ot);
-status_t	ConfigureOverlay(overlay_token ot, const overlay_buffer *ob,
-					const overlay_window *ow, const overlay_view *ov);
+status_t	ConfigureOverlay(overlay_token ot, const overlay_buffer* ob,
+				const overlay_window* ow, const overlay_view* ov);
 
 #if defined(__cplusplus)
 }
@@ -136,7 +140,7 @@ bool	 IsModeUsable(const display_mode* mode);
 // 3dfx functions.
 
 bool	 TDFX_DisplayOverlay(const overlay_window* window,
-				const overlay_buffer* buffer, const overlay_view* view);
+			const overlay_buffer* buffer, const overlay_view* view);
 void	 TDFX_StopOverlay(void);
 
 status_t TDFX_Init(void);
@@ -146,7 +150,8 @@ bool	 TDFX_GetEdidInfo(edid1_info& edidInfo);
 void	 TDFX_EngineReset(void);
 void	 TDFX_EngineInit(const DisplayModeEx& mode);
 
-bool	 TDFX_LoadCursorImage(int width, int height, uint8* and_mask, uint8* xor_mask);
+bool	 TDFX_LoadCursorImage(int width, int height, uint8* and_mask, 
+			uint8* xor_mask);
 void	 TDFX_SetCursorPosition(int x, int y);
 
 void	 TDFX_AdjustFrame(const DisplayModeEx& mode);

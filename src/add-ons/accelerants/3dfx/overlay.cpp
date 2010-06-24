@@ -203,7 +203,7 @@ ReleaseOverlayBuffer(const overlay_buffer* buffer)
 
 status_t
 GetOverlayConstraints(const display_mode* mode, const overlay_buffer* buffer,
-					overlay_constraints *constraints)
+					overlay_constraints* constraints)
 {
 	if ((mode == NULL) || (buffer == NULL) || (constraints == NULL))
 		return B_ERROR;
@@ -260,11 +260,10 @@ AllocateOverlay(void)
 	// There is only a single overlay channel;  thus, check if it is already
 	// allocated.
 
-	if( atomic_or(&si.overlayAllocated, 1) != 0) {
+	if (atomic_or(&si.overlayAllocated, 1) != 0) {
 		TRACE("AllocateOverlay() overlay channel already in use\n");
 		return NULL;
 	}
-
 	TRACE("AllocateOverlay() Overlay allocated, overlayToken: %d\n",
 		si.overlayToken);
 	return (overlay_token)++si.overlayToken;

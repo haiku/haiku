@@ -358,7 +358,6 @@ TDFX_SetDisplayMode(const DisplayModeEx& mode)
 }
 
 
-
 void
 TDFX_AdjustFrame(const DisplayModeEx& mode)
 {

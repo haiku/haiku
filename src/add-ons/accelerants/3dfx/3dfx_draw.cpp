@@ -21,9 +21,9 @@ static const uint32 fmtColorDepth[] = {
 };
 
 
-
 void
-TDFX_FillRectangle(engine_token *et, uint32 color, fill_rect_params *list, uint32 count)
+TDFX_FillRectangle(engine_token* et, uint32 color, fill_rect_params* list, 
+	uint32 count)
 {
 	(void)et;		// avoid compiler warning for unused arg
 
@@ -52,7 +52,7 @@ TDFX_FillRectangle(engine_token *et, uint32 color, fill_rect_params *list, uint3
 
 
 void
-TDFX_FillSpan(engine_token *et, uint32 color, uint16 *list, uint32 count)
+TDFX_FillSpan(engine_token* et, uint32 color, uint16* list, uint32 count)
 {
 	(void)et;		// avoid compiler warning for unused arg
 
@@ -81,7 +81,7 @@ TDFX_FillSpan(engine_token *et, uint32 color, uint16 *list, uint32 count)
 
 
 void
-TDFX_InvertRectangle(engine_token *et, fill_rect_params *list, uint32 count)
+TDFX_InvertRectangle(engine_token* et, fill_rect_params* list, uint32 count)
 {
 	(void)et;		// avoid compiler warning for unused arg
 
@@ -108,7 +108,7 @@ TDFX_InvertRectangle(engine_token *et, fill_rect_params *list, uint32 count)
 
 
 void
-TDFX_ScreenToScreenBlit(engine_token *et, blit_params *list, uint32 count)
+TDFX_ScreenToScreenBlit(engine_token* et, blit_params* list, uint32 count)
 {
 	(void)et;		// avoid compiler warning for unused arg
 
