@@ -17,6 +17,7 @@
 #include "ZipOMaticWindow.h"
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "file:ZipOMatic.cpp"
 
 
@@ -84,13 +85,14 @@ ZipOMatic::MessageReceived(BMessage* message)
 		case ZIPPO_QUIT_OR_CONTINUE:
 		{
 			int32 button;
-			if (message->FindInt32("which", &button) == B_OK)
+			if (message->FindInt32("which", &button) == B_OK) {
 				if (button == 0) {
 					_StopZipping();
 				} else {
 					if (CountWindows() == 0)
 						Quit();
 				}
+			}
 			break;
 		}
 

@@ -27,6 +27,7 @@
 #include "ZipOMaticWindow.h"
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "file:ZipperThread.cpp"
 
 
