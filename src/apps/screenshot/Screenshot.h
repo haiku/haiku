@@ -27,7 +27,7 @@ private:
 			void		_New(bigtime_t delay);
 			status_t	_GetActiveWindowFrame();
 			int32		_GetImageType(const char* name) const;
-
+			
 			Utility*	fUtility;
 			BCatalog	fCatalog;
 			

@@ -32,14 +32,16 @@ class Utility;
 
 class ScreenshotWindow : public BWindow {
 public:
-							ScreenshotWindow(const Utility& utility);
+							ScreenshotWindow(const Utility& utility,
+								bool silent, bool clipboard);
 							~ScreenshotWindow();
 
 			void			MessageReceived(BMessage* message);
 			void			Quit();
 
 private:
-			void			_NewScreenshot();
+			void			_NewScreenshot(bool silent = false,
+								bool clipboard = false);
 			void			_UpdatePreviewPanel();
 			void			_DisallowChar(BTextView* textView);
 			void			_SetupOutputPathMenu(const BMessage& settings);

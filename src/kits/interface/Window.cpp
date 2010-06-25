@@ -3608,17 +3608,30 @@ BWindow::_HandleKeyDown(BMessage* event)
 		return true;
 	}
 
+	// PrtScr key takes a screenshot
 	if (key == B_FUNCTION_KEY && rawKey == B_PRINT_KEY) {
-		BMessage message(B_REFS_RECEIVED);
-		message.AddBool("silent", true);
+		// With no modifier keys the best way to get a screenshot is by
+		// calling the screenshot CLI
+		if (modifiers == 0) {
+			be_roster->Launch("application/x-vnd.haiku-screenshot-cli");
+			return true;
+		}
 
-		if ((modifiers & B_CONTROL_KEY) != 0)
-			message.AddBool("window", true);
-
-		if ((modifiers & B_SHIFT_KEY) != 0 || (modifiers & B_OPTION_KEY) != 0)
-			message.ReplaceBool("silent", false);
-
-		be_roster->Launch("application/x-vnd.haiku-screenshot-cli", &message);
+		// Prepare a message based on the modifier keys pressed and launch the
+		// screenshot GUI
+		BMessage message(B_ARGV_RECEIVED);
+		int32 argc = 1;
+		message.AddString("argv", "Screenshot");
+		if ((modifiers & B_CONTROL_KEY) != 0) {
+			argc++;
+			message.AddString("argv", "--clipboard");
+		}
+		if ((modifiers & B_SHIFT_KEY) != 0) {
+			argc++;
+			message.AddString("argv", "--silent");
+		}
+		message.AddInt32("argc", argc);
+		be_roster->Launch("application/x-vnd.haiku-screenshot", &message);
 		return true;
 	}
 

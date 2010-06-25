@@ -24,3 +24,9 @@ Application screenshot :
 	: be locale translation $(TARGET_LIBSUPC++)
 	: Screenshot.rdef
 ;
+
+DoCatalogs screenshot :
+	x-vnd.haiku-screenshot-cli
+	:
+	Utility.cpp
+;

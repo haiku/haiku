@@ -22,11 +22,14 @@ public:
 						~ScreenshotApp();
 
 			void		MessageReceived(BMessage* message);
+			void		ArgvReceived(int32 argc, char** argv);
 			void		ReadyToRun();
 
 private:
 			BCatalog	fCatalog;
 			Utility*	fUtility;
+			bool		fSilent;
+			bool		fClipboard;
 };
 
 

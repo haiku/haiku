@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Locale.h>
 #include <Roster.h>
 
@@ -22,7 +23,9 @@
 ScreenshotApp::ScreenshotApp()
 	:
 	BApplication("application/x-vnd.haiku-screenshot"),
-	fUtility(new Utility)
+	fUtility(new Utility),
+	fSilent(false),
+	fClipboard(false)
 {
 	be_locale->GetAppCatalog(&fCatalog);
 }
@@ -92,9 +95,23 @@ ScreenshotApp::MessageReceived(BMessage* message)
 
 
 void
+ScreenshotApp::ArgvReceived(int32 argc, char** argv)
+{
+	for (int32 i = 0; i < argc; i++) {
+		if (strcmp(argv[i], "-s") == 0 
+			|| strcmp(argv[i], "--silent") == 0)
+			fSilent = true;
+		else if (strcmp(argv[i], "-c") == 0 
+			|| strcmp(argv[i], "--clipboard") == 0)
+			fClipboard = true;			
+	}
+}
+
+
+void
 ScreenshotApp::ReadyToRun()
 {
-	new ScreenshotWindow(*fUtility);
+	new ScreenshotWindow(*fUtility, fSilent, fClipboard);
 }
 
 

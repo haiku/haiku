@@ -27,6 +27,7 @@
 #include <FindDirectory.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -71,7 +72,8 @@ public:
 #define B_TRANSLATE_CONTEXT "ScreenshotWindow"
 
 
-ScreenshotWindow::ScreenshotWindow(const Utility& utility)
+ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
+	bool clipboard)
 	:
 	BWindow(BRect(0, 0, 200.0, 100.0), B_TRANSLATE("Screenshot"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_AVOID_FRONT
@@ -90,17 +92,22 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility)
 	fExtension(""),
 	fImageFileType(B_PNG_FORMAT)
 {
-	// Check if fUtility contains valid data
-	if (fUtility.wholeScreen == NULL) {
-		// New screenshot using zero delay
-		_NewScreenshot();
-		return;
-	}
-	
 	// _ReadSettings() needs a valid fOutputPathMenu
 	fOutputPathMenu = new BMenu(B_TRANSLATE("Please select"));
 	_ReadSettings();
 
+	// _NewScreenshot() needs a valid fNameControl
+	BString name(B_TRANSLATE(fUtility.sDefaultFileNameBase));
+	name << 1;
+	name = _FindValidFileName(name.String());
+	fNameControl = new BTextControl("", B_TRANSLATE("Name:"), name, NULL);
+
+	// Check if fUtility contains valid data
+	if (fUtility.wholeScreen == NULL) {
+		_NewScreenshot(silent, clipboard);
+		return;
+	}
+	
 	fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fGrabActiveWindow,
 		fIncludeBorder);
 
@@ -129,11 +136,6 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility)
 	fDelayControl->TextView()->SetAlignment(B_ALIGN_RIGHT);
 	BStringView* seconds = new BStringView("", B_TRANSLATE("seconds"));
 	seconds->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-
-	BString name(fUtility.sDefaultFileNameBase);
-	name << 1;
-	name = _FindValidFileName(name.String());
-	fNameControl = new BTextControl("", B_TRANSLATE("Name:"), name, NULL);
 
 	BMenuField* menuField2 = new BMenuField(B_TRANSLATE("Save in:"),
 		fOutputPathMenu);
@@ -318,21 +320,49 @@ ScreenshotWindow::Quit()
 
 
 void
-ScreenshotWindow::_NewScreenshot()
+ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard)
 {
+	BMessage message(B_ARGV_RECEIVED);
 	int32 argc = 3;
-	char* argv[3];
-	argv[0] = "Screenshot";
-	argv[1] = "--delay";
-
 	BString delay;
 	delay << fDelay / 1000000;
-	int32 charCount = delay.Length();
-	argv[2] = (char*)malloc(charCount + 1);
-	delay.CopyInto(argv[2], 0, charCount);
-	argv[2][charCount] = '\0';
+	message.AddString("argv", "screenshot");
+	message.AddString("argv", "--delay");
+	message.AddString("argv", delay);
+	
+	if (silent || clipboard) {
+		if (silent) {
+			argc++;
+			message.AddString("argv", "--silent");
+		}
+		if (clipboard) {
+			argc++;
+			message.AddString("argv", "--clipboard");
+		}
+		if (fIncludeBorder) {
+			argc++;
+			message.AddString("argv", "--border");
+		}
+		if (fIncludeCursor) {
+			argc++;
+			message.AddString("argv", "--mouse-pointer");
+		}
+		if (fGrabActiveWindow) {
+			argc++;
+			message.AddString("argv", "--window");
+		}
+		if (fLastSelectedPath) {
+			BPath path(_GetDirectory());
+			if (path != NULL) {
+				path.Append(fNameControl->Text());
+				argc++;
+				message.AddString("argv", path.Path());
+			}
+		}
+	}
+	message.AddInt32("argc", argc);
 
-	be_roster->Launch("application/x-vnd.haiku-screenshot-cli", argc, argv);
+	be_roster->Launch("application/x-vnd.haiku-screenshot-cli", &message);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 }
 
@@ -538,7 +568,7 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 	if (!BEntry(outputPath.Path()).Exists())
 		return fileName;
 
-	if (baseName.FindFirst(fUtility.sDefaultFileNameBase) == 0)
+	if (baseName.FindFirst(B_TRANSLATE(fUtility.sDefaultFileNameBase)) == 0)
 		baseName.SetTo(fUtility.sDefaultFileNameBase);
 
 	BEntry entry;

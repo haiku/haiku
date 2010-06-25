@@ -20,6 +20,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Looper.h>
 #include <MimeType.h>
 #include <NodeInfo.h>
@@ -96,7 +97,7 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 		BString extension = GetFileNameExtension(imageType);
 		do {
 			fileNameString.SetTo(homePath.Path());
-			fileNameString << "/" << sDefaultFileNameBase << index++ 
+			fileNameString << "/" << B_TRANSLATE(sDefaultFileNameBase) << index++ 
 				<< extension;
 			entry.SetTo(fileNameString.String());
 		} while (entry.Exists());
@@ -204,7 +205,7 @@ Utility::GetFileNameExtension(uint32 imageType) const
 const char*
 Utility::_GetMimeString(uint32 imageType) const
 {
-	char dummy[] = "";
+	const char *dummy = "";
 	translator_id* translators = NULL;
 	int32 numTranslators = 0;
 	BTranslatorRoster* roster = BTranslatorRoster::Default();

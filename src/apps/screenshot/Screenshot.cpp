@@ -19,6 +19,7 @@
 
 #include <AppDefs.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Locale.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -27,6 +28,10 @@
 #include <WindowInfo.h>
 
 #include "Utility.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Screenshot"
 
 
 Screenshot::Screenshot()
@@ -56,7 +61,6 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 	bool saveScreenshotSilent = false;
 	bool copyToClipboard = false;
 	uint32 imageFileType = B_PNG_FORMAT;
-
 	for (int32 i = 0; i < argc; i++) {
 		if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
 			_ShowHelp();
@@ -98,8 +102,7 @@ Screenshot::ArgvReceived(int32 argc, char** argv)
 			outputFilename = argv[i];
 	}
 
-	if (argc > 1)
-		_New(delay);
+	_New(delay);
 
 	if (copyToClipboard || saveScreenshotSilent) {
 		fLaunchGui = false;
@@ -125,35 +128,32 @@ void
 Screenshot::ReadyToRun()
 {
 	if (fLaunchGui) {
-		// Launch the GUI application
-		if (fUtility->wholeScreen == NULL) {
-			// No command line parameters were given
-			be_roster->Launch("application/x-vnd.haiku-screenshot");
-		} else {
-			// Send the utility data and the command line settings to the GUI
-			BMessage message;
-			message.what = SS_UTILITY_DATA;
+		// Get a screenshot if we don't have one
+		if (fUtility->wholeScreen == NULL)
+			_New(0);
 
-			BMessage* bitmap = new BMessage();
-			fUtility->wholeScreen->Archive(bitmap);
-			message.AddMessage("wholeScreen", bitmap);
+		// Send the screenshot data to the GUI
+		BMessage message;
+		message.what = SS_UTILITY_DATA;
 
-			bitmap = new BMessage();
-			fUtility->cursorBitmap->Archive(bitmap);
-			message.AddMessage("cursorBitmap", bitmap);
+		BMessage* bitmap = new BMessage();
+		fUtility->wholeScreen->Archive(bitmap);
+		message.AddMessage("wholeScreen", bitmap);
 
-			bitmap = new BMessage();
-			fUtility->cursorAreaBitmap->Archive(bitmap);
-			message.AddMessage("cursorAreaBitmap", bitmap);
+		bitmap = new BMessage();
+		fUtility->cursorBitmap->Archive(bitmap);
+		message.AddMessage("cursorBitmap", bitmap);
 
-			message.AddPoint("cursorPosition", fUtility->cursorPosition);
-			message.AddRect("activeWindowFrame", fUtility->activeWindowFrame);
-			message.AddRect("tabFrame", fUtility->tabFrame);
-			message.AddFloat("borderSize", fUtility->borderSize);
+		bitmap = new BMessage();
+		fUtility->cursorAreaBitmap->Archive(bitmap);
+		message.AddMessage("cursorAreaBitmap", bitmap);
 
-			be_roster->Launch("application/x-vnd.haiku-screenshot",
-				&message);
-		}
+		message.AddPoint("cursorPosition", fUtility->cursorPosition);
+		message.AddRect("activeWindowFrame", fUtility->activeWindowFrame);
+		message.AddRect("tabFrame", fUtility->tabFrame);
+		message.AddFloat("borderSize", fUtility->borderSize);
+
+		be_roster->Launch("application/x-vnd.haiku-screenshot",	&message);
 	}
 
 	be_app->PostMessage(B_QUIT_REQUESTED);
