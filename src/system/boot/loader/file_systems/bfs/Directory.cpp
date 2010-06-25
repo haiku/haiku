@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "Directory.h"
@@ -21,6 +21,7 @@ extern Node *get_node_from(int fd);
 
 
 namespace BFS {
+
 
 Directory::Directory(Volume &volume, block_run run)
 	:
@@ -170,11 +171,12 @@ Directory::IsEmpty()
 	char name[BPLUSTREE_MAX_KEY_LENGTH];
 	uint16 length;
 	off_t id;
-	while (iterator.GetNextEntry(name, &length, B_FILE_NAME_LENGTH, &id) == B_OK) {
+	while (iterator.GetNextEntry(name, &length, B_FILE_NAME_LENGTH, &id)
+			== B_OK) {
 		if (fStream.Mode() & (S_ATTR_DIR | S_INDEX_DIR))
 			return false;
 
-		if (++count > 2 || strcmp(".", name) && strcmp("..", name))
+		if (++count > 2 || (strcmp(".", name) && strcmp("..", name)))
 			return false;
 	}
 	return true;
@@ -198,5 +200,6 @@ Directory::Inode() const
 {
 	return fStream.ID();
 }
+
 
 }	// namespace BFS
