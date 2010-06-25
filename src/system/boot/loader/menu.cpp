@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -347,7 +347,7 @@ Menu::RemoveItem(MenuItem* item)
 void
 Menu::AddShortcut(char key, shortcut_hook function)
 {
-	Menu::shortcut* shortcut = new(std::nothrow) struct Menu::shortcut;
+	Menu::shortcut* shortcut = new(std::nothrow) Menu::shortcut;
 	if (shortcut == NULL)
 		return;
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -79,7 +79,7 @@ smp_get_current_cpu(void)
 		return 0;
 
 	uint8_t apic_id = (apic_read(APIC_ID) & 0xffffffff) >> 24;
-	for (int i = 0; i < gKernelArgs.num_cpus; i++) {
+	for (uint32 i = 0; i < gKernelArgs.num_cpus; i++) {
 		if (gKernelArgs.arch_args.cpu_apic_id[i] == apic_id)
 			return i;
 	}
