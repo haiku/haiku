@@ -1,5 +1,6 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, François Revol, revol@free.fr. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,11 +28,11 @@ extern void (*__ctor_end)(void);
 extern uint8 __bss_start;
 extern uint8 _end;
 
-extern int main(stage2_args *args);
-void _start(void);
+extern "C" int main(stage2_args *args);
+extern "C" void _start(void);
 
 
-uint32 sBootOptions;
+static uint32 sBootOptions;
 
 
 static void
@@ -52,7 +53,7 @@ call_ctors(void)
 }
 
 
-uint32
+extern "C" uint32
 platform_boot_options(void)
 {
 #if 0
@@ -63,14 +64,15 @@ platform_boot_options(void)
 }
 
 
-void
+extern "C" void
 platform_start_kernel(void)
 {
 	static struct kernel_args *args = &gKernelArgs;
 		// something goes wrong when we pass &gKernelArgs directly
 		// to the assembler inline below - might be a bug in GCC
 		// or I don't see something important...
-	addr_t stackTop = gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
+	addr_t stackTop
+		= gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
 	//smp_init_other_cpus();
 	//serial_cleanup();
@@ -79,7 +81,8 @@ platform_start_kernel(void)
 
 #warning M68K: stop ints
 	
-	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
+	dprintf("kernel entry at %lx\n",
+		gKernelArgs.kernel_image.elf_header.e_entry);
 
 	asm volatile (
 		"move.l	%0,%%sp;	"			// move stack out of way
@@ -106,21 +109,20 @@ platform_start_kernel(void)
 }
 
 
-void
+extern "C" void
 platform_exit(void)
 {
 	// Terminate
-	// XXX: Puntaes() instead ?
+	// TODO: Puntaes() instead ?
 	Pterm0();
 }
 
 
-void
+extern "C" void
 _start(void)
 {
 	stage2_args args;
 	Bconout(DEV_CON, 'H');
-
 
 	//asm("cld");			// Ain't nothing but a GCC thang.
 	//asm("fninit");		// initialize floating point unit
@@ -141,11 +143,11 @@ _start(void)
 	Bconout(DEV_CON, 'K');
 	console_init();
 	Bconout(DEV_CON, 'U');
-	dprintf("membot  = %p\n", *TOSVAR_membot);
-	dprintf("memtop  = %p\n", *TOSVAR_memtop);
-	dprintf("v_bas_ad= %p\n", *TOSVAR_v_bas_ad);
-	dprintf("phystop = %p\n", *TOSVARphystop);
-	dprintf("ramtop  = %p\n", *TOSVARramtop);
+	dprintf("membot   = %p\n", (void*)*TOSVAR_membot);
+	dprintf("memtop   = %p\n", (void*)*TOSVAR_memtop);
+	dprintf("v_bas_ad = %p\n", *TOSVAR_v_bas_ad);
+	dprintf("phystop  = %p\n", (void*)*TOSVARphystop);
+	dprintf("ramtop   = %p\n", (void*)*TOSVARramtop);
 	cpu_init();
 	mmu_init();
 
@@ -161,4 +163,3 @@ _start(void)
 	//smp_init();
 	main(&args);
 }
-

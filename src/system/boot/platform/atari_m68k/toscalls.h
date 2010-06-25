@@ -5,9 +5,9 @@
  * Author:
  *		François Revol, revol@free.fr.
  */
-
 #ifndef _TOSCALLS_H
 #define _TOSCALLS_H
+
 
 #ifdef __cplusplus
 extern "C" {

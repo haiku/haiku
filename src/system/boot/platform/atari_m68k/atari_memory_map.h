@@ -5,6 +5,7 @@
 #ifndef ATARI_MEMORY_MAP_H
 #define ATARI_MEMORY_MAP_H
 
+
 /* the DMA-accessible RAM */
 /*#define ATARI_CHIPRAM_BASE			0x00000000*/
 /* actually, the first 2kB aren't usable */

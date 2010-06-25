@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, François Revol, revol@free.fr. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,15 +13,17 @@
 
 #include "toscalls.h"
 
+
 void *gXHDIEntryPoint = NULL;
 uint32 gXHDIVersion = 0;
 
 NatFeatCookie *gNatFeatCookie = NULL;
 uint32 gDebugPrintfNatFeatID = 0;
 
+
 /*! Maps TOS error codes to native errors
  */
-status_t
+extern "C" status_t
 toserror(int32 err)
 {
 	// generated from:
@@ -112,7 +114,7 @@ toserror(int32 err)
 /*! Maps XHDI error codes to native errors
  * cf. http://toshyp.atari.org/010008.htm#XHDI_20error_20codes
  */
-status_t
+extern "C" status_t
 xhdierror(int32 err)
 {
 	if (err <= -456) {
@@ -163,15 +165,18 @@ xhdierror(int32 err)
 	return toserror(err);
 }
 
+
 static void
 dump_tos_cookie(const struct tos_cookie *c)
 {
-	if (c)
-		dprintf("%4.4s: 0x%08lx, %ld\n", (const char *)&c->cookie, c->ivalue, c->ivalue);
+	if (c != NULL) {
+		dprintf("%4.4s: 0x%08lx, %ld\n", (const char *)&c->cookie, c->ivalue,
+			c->ivalue);
+	}
 }
 
 
-void
+extern "C" void
 dump_tos_cookies(void)
 {
 	const tos_cookie *c = COOKIE_JAR;
@@ -182,7 +187,7 @@ dump_tos_cookies(void)
 }
 
 
-status_t
+extern "C" status_t
 init_xhdi(void)
 {
 	const struct tos_cookie *c;
@@ -201,7 +206,7 @@ init_xhdi(void)
 }
 
 
-status_t
+extern "C" status_t
 init_nat_features(void)
 {
 	gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_get_id = NULL;
@@ -221,7 +226,8 @@ init_nat_features(void)
 	return nat_features() ? B_OK : ENOENT;
 }
 
-void
+
+extern "C" void
 nat_feat_debugprintf(const char *str)
 {
 	if (gDebugPrintfNatFeatID)
