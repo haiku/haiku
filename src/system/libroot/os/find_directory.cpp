@@ -150,7 +150,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	struct fs_info fsInfo;
 	struct stat st;
 	char *buffer = NULL;
-	char *home = NULL;
+	const char *home = NULL;
 	const char *templatePath = NULL;
 
 	/* as with the R5 version, no on-stack buffer */
