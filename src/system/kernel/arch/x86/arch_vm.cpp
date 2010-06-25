@@ -17,6 +17,7 @@
 
 #include <KernelExport.h>
 
+#include <boot/kernel_args.h>
 #include <smp.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>

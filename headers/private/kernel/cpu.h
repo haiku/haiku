@@ -13,7 +13,6 @@
 
 #include <smp.h>
 #include <timer.h>
-#include <boot/kernel_args.h>
 #include <arch/cpu.h>
 
 
@@ -23,6 +22,7 @@
 #endif
 
 
+struct kernel_args;
 struct thread;
 
 
@@ -55,7 +55,8 @@ typedef struct cpu_ent {
 } cpu_ent __attribute__((aligned(64)));
 
 
-extern cpu_ent gCPU[MAX_BOOT_CPUS];
+//extern cpu_ent gCPU[MAX_BOOT_CPUS];
+extern cpu_ent gCPU[];
 
 
 #ifdef __cplusplus
@@ -64,7 +65,7 @@ extern "C" {
 
 status_t cpu_preboot_init_percpu(struct kernel_args *args, int curr_cpu);
 status_t cpu_init(struct kernel_args *args);
-status_t cpu_init_percpu(kernel_args *ka, int curr_cpu);
+status_t cpu_init_percpu(struct kernel_args *ka, int curr_cpu);
 status_t cpu_init_post_vm(struct kernel_args *args);
 status_t cpu_init_post_modules(struct kernel_args *args);
 bigtime_t cpu_get_active_time(int32 cpu);

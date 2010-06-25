@@ -20,6 +20,7 @@
 #include <ctype.h>
 
 #include <AutoDeleter.h>
+#include <boot/kernel_args.h>
 #include <debug.h>
 #include <image_defs.h>
 #include <kernel.h>

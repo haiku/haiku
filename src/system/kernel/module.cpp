@@ -22,6 +22,7 @@
 
 #include <boot_device.h>
 #include <boot/elf.h>
+#include <boot/kernel_args.h>
 #include <elf.h>
 #include <fs/KPath.h>
 #include <fs/node_monitor.h>

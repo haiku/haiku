@@ -24,7 +24,7 @@ struct kernel_args;
 
 status_t arch_int_init(struct kernel_args* args);
 status_t arch_int_init_post_vm(struct kernel_args* args);
-status_t arch_int_init_io(kernel_args* args);
+status_t arch_int_init_io(struct kernel_args* args);
 status_t arch_int_init_post_device_manager(struct kernel_args* args);
 
 void arch_int_enable_interrupts(void);

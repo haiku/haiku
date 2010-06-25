@@ -10,20 +10,23 @@
 
 
 #include <OS.h>
-#include <boot/kernel_args.h>
 
 
 #define PAGE_ALIGN(x) (((x) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1))
 
+
+struct kernel_args;
+
+
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
-status_t arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu);
-status_t arch_cpu_init(kernel_args *args);
-status_t arch_cpu_init_percpu(kernel_args *args, int curr_cpu);
-status_t arch_cpu_init_post_vm(kernel_args *args);
-status_t arch_cpu_init_post_modules(kernel_args *args);
+status_t arch_cpu_preboot_init_percpu(struct kernel_args *args, int curr_cpu);
+status_t arch_cpu_init(struct kernel_args *args);
+status_t arch_cpu_init_percpu(struct kernel_args *args, int curr_cpu);
+status_t arch_cpu_init_post_vm(struct kernel_args *args);
+status_t arch_cpu_init_post_modules(struct kernel_args *args);
 status_t arch_cpu_shutdown(bool reboot);
 
 void arch_cpu_invalidate_TLB_range(addr_t start, addr_t end);
@@ -47,7 +50,7 @@ void arch_cpu_memory_write_barrier(void);
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #include <arch_cpu.h>
 

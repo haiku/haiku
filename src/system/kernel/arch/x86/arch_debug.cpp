@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <TypeConstants.h>
+
 #include <cpu.h>
 #include <debug.h>
 #include <debug_heap.h>

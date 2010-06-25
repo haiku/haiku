@@ -15,6 +15,7 @@
 
 #include <AutoDeleter.h>
 
+#include <boot/kernel_args.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
 #include <vm/vm_page.h>

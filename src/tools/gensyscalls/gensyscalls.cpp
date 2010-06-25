@@ -420,6 +420,10 @@ public:
 		file << "#ifndef _ASSEMBLER" << endl;
 		file << endl;
 
+		// includes
+		file << "#include <TypeConstants.h>" << endl;
+		file << endl;
+
 		// output syscall count
 		file << "const int kSyscallCount = SYSCALL_COUNT;" << endl;
 		file << endl;

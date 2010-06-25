@@ -16,6 +16,7 @@
 #include <AutoDeleter.h>
 
 #include <arch_system_info.h>
+#include <boot/kernel_args.h>
 #include <int.h>
 #include <thread.h>
 #include <vm/vm.h>

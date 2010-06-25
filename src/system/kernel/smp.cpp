@@ -20,6 +20,7 @@
 #include <arch/debug.h>
 #include <arch/int.h>
 #include <arch/smp.h>
+#include <boot/kernel_args.h>
 #include <cpu.h>
 #include <generic_syscall.h>
 #include <int.h>

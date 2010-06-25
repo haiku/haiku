@@ -10,6 +10,8 @@
 
 #include <arch/vm_translation_map.h>
 
+#include <boot/kernel_args.h>
+
 #include "paging/32bit/X86PagingMethod32Bit.h"
 #include "paging/pae/X86PagingMethodPAE.h"
 

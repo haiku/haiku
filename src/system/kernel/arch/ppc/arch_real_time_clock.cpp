@@ -6,6 +6,7 @@
 #include <arch/real_time_clock.h>
 
 #include <arch_platform.h>
+#include <boot/kernel_args.h>
 #include <real_time_data.h>
 #include <smp.h>
 

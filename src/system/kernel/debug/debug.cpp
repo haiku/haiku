@@ -15,6 +15,7 @@
 
 #include <algorithm>
 
+#include <boot/kernel_args.h>
 #include <cpu.h>
 #include <debug.h>
 #include <debug_heap.h>

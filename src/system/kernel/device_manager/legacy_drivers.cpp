@@ -16,6 +16,7 @@
 #include <NodeMonitor.h>
 
 #include <boot_device.h>
+#include <boot/kernel_args.h>
 #include <elf.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
@@ -714,7 +715,7 @@ handle_driver_events(void */*_fs*/, int /*iteration*/)
 					driver->binary_updated = true;
 				break;
 			}
-			
+
 			case kRemoveDriver:
 			{
 				// Mark removed drivers as updated

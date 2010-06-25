@@ -21,7 +21,6 @@
 #include <AutoDeleter.h>
 
 #include <Notifications.h>
-#include <util/KMessage.h>
 
 #include "ErrorOutput.h"
 #include "FDCloser.h"
