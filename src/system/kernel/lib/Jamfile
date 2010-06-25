@@ -5,16 +5,16 @@ UsePrivateHeaders shared ;
 # kernel libroot os files
 
 KernelMergeObject kernel_os_main.o :
-	driver_settings.c
-	find_directory.c
+	driver_settings.cpp
+	find_directory.cpp
 	fs_info.c
 	wait_for_objects.cpp
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
 SEARCH on [ FGristFiles
-	driver_settings.c
-	find_directory.c
+	driver_settings.cpp
+	find_directory.cpp
 	fs_info.c
 	wait_for_objects.cpp
 	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;

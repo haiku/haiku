@@ -151,7 +151,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	struct stat st;
 	char *buffer = NULL;
 	char *home = NULL;
-	const char *template = NULL;
+	const char *templatePath = NULL;
 
 	/* as with the R5 version, no on-stack buffer */
 	buffer = (char *)malloc(pathLength);
@@ -196,14 +196,14 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		/* Per volume directories */
 		case B_DESKTOP_DIRECTORY:
 			if (device == bootDevice || !strcmp(fsInfo.fsh_name, "bfs"))
-				template = "$h/Desktop";
+				templatePath = "$h/Desktop";
 			break;
 		case B_TRASH_DIRECTORY:
 			// TODO: eventually put that into the file system API?
 			if (device == bootDevice || !strcmp(fsInfo.fsh_name, "bfs"))
-				template = "trash"; // TODO: add suffix for current user
+				templatePath = "trash"; // TODO: add suffix for current user
 			else if (!strcmp(fsInfo.fsh_name, "fat"))
-				template = "RECYCLED/_BEOS_";
+				templatePath = "RECYCLED/_BEOS_";
 			break;
 
 		/* Haiku system directories */
@@ -223,7 +223,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_SYSTEM_MEDIA_NODES_DIRECTORY:
 		case B_SYSTEM_SOUNDS_DIRECTORY:
 		case B_SYSTEM_DATA_DIRECTORY:
-			template = kSystemDirectories[which - B_SYSTEM_DIRECTORY];
+			templatePath = kSystemDirectories[which - B_SYSTEM_DIRECTORY];
 			break;
 
 		/* Common directories, shared among users */
@@ -247,7 +247,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_COMMON_MEDIA_NODES_DIRECTORY:
 		case B_COMMON_SOUNDS_DIRECTORY:
 		case B_COMMON_DATA_DIRECTORY:
-			template = kCommonDirectories[which - B_COMMON_DIRECTORY];
+			templatePath = kCommonDirectories[which - B_COMMON_DIRECTORY];
 			break;
 
 		/* User directories */
@@ -265,18 +265,18 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		case B_USER_SOUNDS_DIRECTORY:
 		case B_USER_DATA_DIRECTORY:
 		case B_USER_CACHE_DIRECTORY:
-			template = kUserDirectories[which - B_USER_DIRECTORY];
+			templatePath = kUserDirectories[which - B_USER_DIRECTORY];
 			break;
 
 		/* Global directories */
 		case B_APPS_DIRECTORY:
-			template = "apps";
+			templatePath = "apps";
 			break;
 		case B_PREFERENCES_DIRECTORY:
-			template = "preferences";
+			templatePath = "preferences";
 			break;
 		case B_UTILITIES_DIRECTORY:
-			template = "utilities";
+			templatePath = "utilities";
 			break;
 
 		default:
@@ -285,8 +285,8 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	}
 
 	err = B_OK;
-	if (template) {
-		if (!strncmp(template, "$h", 2)) {
+	if (templatePath) {
+		if (!strncmp(templatePath, "$h", 2)) {
 			if (bootDevice > -1 && device != bootDevice) {
 				int l = pathLength - strlen(buffer);
 				if (l > 5)
@@ -312,13 +312,14 @@ find_directory(directory_which which, dev_t device, bool createIt,
 					home = "/boot/home";
 				strncpy(buffer, home, pathLength);
 			}
-			template += 2;
+			templatePath += 2;
 		} else
 			strlcat(buffer, "/", pathLength);
 
-		if (!err && strlen(buffer) + 2 + strlen(template) < (uint32)pathLength)
-			strcat(buffer, template);
-		else
+		if (!err && strlen(buffer) + 2 + strlen(templatePath)
+				< (uint32)pathLength) {
+			strcat(buffer, templatePath);
+		} else
 			err = err ? err : E2BIG;
 	} else
 		err = err ? err : ENOENT;

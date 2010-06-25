@@ -11,8 +11,8 @@ MergeObject os_main.o :
 	area.c
 	atomic.c
 	debug.c
-	driver_settings.c
-	find_directory.c
+	driver_settings.cpp
+	find_directory.cpp
 	fs_attr.cpp
 	fs_index.c
 	fs_info.c

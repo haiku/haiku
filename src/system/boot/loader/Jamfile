@@ -66,7 +66,7 @@ KernelStaticLibrary boot_loader :
 	vm.cpp
 
 	# libroot
-	driver_settings.c
+	driver_settings.cpp
 
 	# utils
 	kernel_cpp.cpp
@@ -102,7 +102,7 @@ SEARCH on [ FGristFiles KMessage.cpp ]
 SEARCH on [ FGristFiles safemode_settings.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
 
-SEARCH on [ FGristFiles driver_settings.c ]
+SEARCH on [ FGristFiles driver_settings.cpp ]
     = [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
 SEARCH on [ FGristFiles amiga_rdb.cpp ]

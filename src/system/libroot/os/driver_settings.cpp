@@ -284,8 +284,8 @@ parse_parameter(struct driver_parameter *parameter, char **_pos, int32 level)
 
 			// enlarge value array and save the value
 
-			newArray = realloc(parameter->values, (parameter->value_count + 1)
-				* sizeof(char *));
+			newArray = (char**)realloc(parameter->values,
+				(parameter->value_count + 1) * sizeof(char *));
 			if (newArray == NULL)
 				return B_NO_MEMORY;
 
@@ -318,7 +318,7 @@ parse_parameters(struct driver_parameter **_parameters, int *_count,
 		if (status != NO_PARAMETER) {
 			driver_parameter *newParameter;
 
-			newArray = realloc(*_parameters, (*_count + 1)
+			newArray = (driver_parameter*)realloc(*_parameters, (*_count + 1)
 				* sizeof(struct driver_parameter));
 			if (newArray == NULL)
 				return B_NO_MEMORY;
@@ -395,10 +395,10 @@ free_settings(settings_handle *handle)
 }
 
 
-static void *
+static settings_handle *
 new_settings(char *buffer, const char *driverName)
 {
-	settings_handle *handle = malloc(sizeof(settings_handle));
+	settings_handle *handle = (settings_handle*)malloc(sizeof(settings_handle));
 	if (handle == NULL)
 		return NULL;
 
@@ -506,7 +506,7 @@ put_string(char **_buffer, size_t *_bufferSize, char *string)
 
 
 static bool
-put_chars(char **_buffer, size_t *_bufferSize, char *chars)
+put_chars(char **_buffer, size_t *_bufferSize, const char *chars)
 {
 	char *buffer = *_buffer;
 	size_t length;
@@ -610,7 +610,8 @@ find_driver_settings(const char *name)
 
 	ASSERT_LOCKED_MUTEX(&sLock);
 
-	while ((handle = list_get_next_item(&sHandles, handle)) != NULL) {
+	while ((handle = (settings_handle*)list_get_next_item(&sHandles, handle))
+			!= NULL) {
 		if (!strcmp(handle->name, name))
 			return handle;
 	}
@@ -629,12 +630,13 @@ driver_settings_init(kernel_args *args)
 	list_init(&sHandles);
 
 	while (settings != NULL) {
-		settings_handle *handle = malloc(sizeof(settings_handle));
+		settings_handle *handle
+			= (settings_handle*)malloc(sizeof(settings_handle));
 		if (handle == NULL)
 			return B_NO_MEMORY;
 
 		if (settings->size != 0) {
-			handle->text = malloc(settings->size + 1);
+			handle->text = (char*)malloc(settings->size + 1);
 			if (handle->text == NULL) {
 				free(handle);
 				return B_NO_MEMORY;
@@ -746,7 +748,7 @@ load_driver_settings(const char *driverName)
 			if (!strcmp(settings->name, driverName)) {
 				// we have it - since the buffer is clobbered, we have to
 				// copy its contents, though
-				char *text = malloc(settings->size + 1);
+				char *text = (char*)malloc(settings->size + 1);
 				if (text == NULL)
 					return NULL;
 
@@ -845,7 +847,8 @@ parse_driver_settings_string(const char *settingsString)
 	// we simply copy the whole string to use it as our internal buffer
 	char *text = strdup(settingsString);
 	if (settingsString == NULL || text != NULL) {
-		settings_handle *handle = malloc(sizeof(settings_handle));
+		settings_handle *handle
+			= (settings_handle*)malloc(sizeof(settings_handle));
 		if (handle != NULL) {
 			handle->magic = SETTINGS_MAGIC;
 			handle->text = text;
@@ -903,9 +906,10 @@ get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize,
 	Also returns "unknownValue" if the handle passed in was not valid.
 */
 bool
-get_driver_boolean_parameter(void *handle, const char *keyName,
+get_driver_boolean_parameter(void *_handle, const char *keyName,
 	bool unknownValue, bool noArgValue)
 {
+	settings_handle *handle = (settings_handle*)_handle;
 	driver_parameter *parameter;
 	char *boolean;
 
@@ -943,9 +947,10 @@ get_driver_boolean_parameter(void *handle, const char *keyName,
 
 
 const char *
-get_driver_parameter(void *handle, const char *keyName,
+get_driver_parameter(void *_handle, const char *keyName,
 	const char *unknownValue, const char *noArgValue)
 {
+	settings_handle* handle = (settings_handle*)_handle;
 	struct driver_parameter *parameter;
 
 	if (!check_handle(handle))
@@ -966,7 +971,7 @@ get_driver_parameter(void *handle, const char *keyName,
 const driver_settings *
 get_driver_settings(void *handle)
 {
-	if (!check_handle(handle))
+	if (!check_handle((settings_handle*)handle))
 		return NULL;
 
 	return &((settings_handle *)handle)->settings;
@@ -975,5 +980,6 @@ get_driver_settings(void *handle)
 
 // this creates an alias of the above function
 // unload_driver_settings() is the same as delete_driver_settings()
-extern __typeof(unload_driver_settings) delete_driver_settings __attribute__ ((alias ("unload_driver_settings")));
+extern "C" __typeof(unload_driver_settings) delete_driver_settings
+	__attribute__((alias ("unload_driver_settings")));
 
