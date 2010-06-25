@@ -4,7 +4,7 @@ SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
 
 KernelMergeObject boot_platform_openfirmware.o :
 	console.cpp
-	debug.c
+	debug.cpp
 	devices.cpp
 	Handle.cpp
 	heap.cpp
@@ -12,7 +12,7 @@ KernelMergeObject boot_platform_openfirmware.o :
 	mmu.cpp
 	network.cpp
 	real_time_clock.cpp
-	start.c
+	start.cpp
 	support.cpp
 	video.cpp
 

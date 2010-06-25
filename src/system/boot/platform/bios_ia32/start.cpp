@@ -35,8 +35,8 @@ extern void (*__ctor_end)(void);
 extern uint8 __bss_start;
 extern uint8 _end;
 
-extern int main(stage2_args *args);
-void _start(void);
+extern "C" int main(stage2_args *args);
+extern "C" void _start(void);
 
 
 uint32 sBootOptions;
@@ -60,7 +60,7 @@ call_ctors(void)
 }
 
 
-uint32
+extern "C" uint32
 platform_boot_options(void)
 {
 #if 0
@@ -71,7 +71,7 @@ platform_boot_options(void)
 }
 
 
-void
+extern "C" void
 platform_start_kernel(void)
 {
 	static struct kernel_args *args = &gKernelArgs;
@@ -103,7 +103,7 @@ platform_start_kernel(void)
 }
 
 
-void
+extern "C" void
 platform_exit(void)
 {
 	// reset the system using the keyboard controller
@@ -111,7 +111,7 @@ platform_exit(void)
 }
 
 
-void
+extern "C" void
 _start(void)
 {
 	stage2_args args;

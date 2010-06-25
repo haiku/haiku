@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,8 +21,9 @@
 #define HEAP_SIZE 65536
 
 
-void _start(uint32 _unused1, uint32 _unused2, void *openFirmwareEntry);
-void start(void *openFirmwareEntry);
+extern "C" void _start(uint32 _unused1, uint32 _unused2,
+	void *openFirmwareEntry);
+extern "C" void start(void *openFirmwareEntry);
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
@@ -79,7 +80,7 @@ determine_machine(void)
 }
 
 
-void
+extern "C" void
 platform_start_kernel(void)
 {
 	addr_t kernelEntry = gKernelArgs.kernel_image.elf_header.e_entry;
@@ -100,14 +101,14 @@ platform_start_kernel(void)
 }
 
 
-void
+extern "C" void
 platform_exit(void)
 {
 	of_interpret("reset-all", 0, 0);
 }
 
 
-uint32
+extern "C" uint32
 platform_boot_options(void)
 {
 	// ToDo: implement me!
@@ -115,7 +116,7 @@ platform_boot_options(void)
 }
 
 
-void
+extern "C" void
 _start(uint32 _unused1, uint32 _unused3, void *openFirmwareEntry)
 {
 	// According to the PowerPC bindings, OpenFirmware should have created
@@ -129,7 +130,7 @@ _start(uint32 _unused1, uint32 _unused3, void *openFirmwareEntry)
 }
 
 
-void
+extern "C" void
 start(void *openFirmwareEntry)
 {
 	char bootargs[512];
@@ -139,7 +140,7 @@ start(void *openFirmwareEntry)
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;
 
-	of_init(openFirmwareEntry);
+	of_init((int (*)(void*))openFirmwareEntry);
 
 	// check for arguments
 	if (of_getprop(gChosen, "bootargs", bootargs, sizeof(bootargs)) != OF_FAILED) {
@@ -169,4 +170,3 @@ start(void *openFirmwareEntry)
 
 	of_exit();
 }
-

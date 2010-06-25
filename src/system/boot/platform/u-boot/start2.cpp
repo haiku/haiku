@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,7 @@
 #include "serial.h"
 #include "console.h"
 #include "cpu.h"
+#include "mmu.h"
 #include "smp.h"
 #include "uimage.h"
 #include "keyboard.h"
@@ -17,11 +18,23 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 
-
 #include <string.h>
 
 
 #define HEAP_SIZE (128 * 1024)
+
+
+typedef struct uboot_arm_gd {
+	struct board_data *bd;
+	uint32 flags;
+	uint32 baudrate;
+	uint32 have_console;
+	uint32 reloc_off;
+	uint32 env_addr;
+	uint32 env_valid;
+	uint32 fb_base;
+} uboot_arm_gd;
+
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
@@ -29,14 +42,19 @@ extern void (*__ctor_end)(void);
 extern uint8 __bss_start;
 extern uint8 _end;
 
-extern int main(stage2_args *args);
-extern void _start(void);
-extern int start_raw(int argc, char **argv);
-extern void dump_uimage(struct image_header *image);
+extern "C" int main(stage2_args *args);
+extern "C" void _start(void);
+extern "C" int start_raw(int argc, const char **argv);
+extern "C" void dump_uimage(struct image_header *image);
+
 extern struct image_header *gUImage;
+extern uboot_arm_gd *gUBootGlobalData;
+extern uint8 gUBootOS;
 
 
-uint32 sBootOptions;
+register volatile uboot_arm_gd *gGD asm ("r8");
+
+static uint32 sBootOptions;
 
 
 static void
@@ -58,14 +76,14 @@ call_ctors(void)
 
 
 /* needed for libgcc unwind XXX */
-void
+extern "C" void
 abort(void)
 {
 	panic("abort");
 }
 
 
-void
+extern "C" void
 platform_start_kernel(void)
 {
 	static struct kernel_args *args = &gKernelArgs;
@@ -83,11 +101,11 @@ platform_start_kernel(void)
 	dprintf("kernel entry at %lx\n",
 		gKernelArgs.kernel_image.elf_header.e_entry);
 
-	
-        asm( "MOV sp, %[adr]"::[adr] "r" (stackTop)  );
-	asm( "MOV r0, %[args]"::[args] "r" (args) );
-	asm( "MOV r1, #0"::);
-	asm( "MOV pc, %[entry]"::[entry] "r" (gKernelArgs.kernel_image.elf_header.e_entry));
+	asm("MOV sp, %[adr]"::[adr] "r" (stackTop));
+	asm("MOV r0, %[args]"::[args] "r" (args));
+	asm("MOV r1, #0"::);
+	asm("MOV pc, %[entry]"::[entry] "r"
+		(gKernelArgs.kernel_image.elf_header.e_entry));
 
 /*	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
@@ -103,47 +121,34 @@ platform_start_kernel(void)
 }
 
 
-void
+extern "C" void
 platform_exit(void)
 {
 }
 
 
-typedef struct uboot_arm_gd {
-	struct board_data *bd;
-	uint32 flags;
-	uint32 baudrate;
-	uint32 have_console;
-	uint32 reloc_off;
-	uint32 env_addr;
-	uint32 env_valid;
-	uint32 fb_base;
-} uboot_arm_gd;
-
-register volatile uboot_arm_gd *gGD asm ("r8");
-extern uboot_arm_gd *gUBootGlobalData;
-extern uint8 gUBootOS;
-
-int
-start_netbsd(struct board_info *bd, struct image_header *image, const char *consdev,
-	const char *cmdline)
+extern "C" int
+start_netbsd(struct board_info *bd, struct image_header *image,
+	const char *consdev, const char *cmdline)
 {
 	const char *argv[] = { "haiku", cmdline };
 	int argc = 1;
 	if (cmdline)
 		argc++;
 	gUImage = image;
-	start_raw(argc, argv);
+	return start_raw(argc, argv);
 }
 
-int
+
+extern "C" int
 start_linux(int argc, int archnum, void *atags)
 {
+	return 1;
 }
 
 
-int
-start_raw(int argc, char **argv)
+extern "C" int
+start_raw(int argc, const char **argv)
 {
 	stage2_args args;
 
@@ -154,18 +159,18 @@ start_raw(int argc, char **argv)
 	args.arguments = NULL;
 	args.platform.boot_tgz_data = NULL;
 	args.platform.boot_tgz_size = 0;
-	
-
 
 	serial_init();
 	console_init();
 	cpu_init();
 
 	// if we get passed a uimage, try to find the second blob
-	if (gUImage && image_multi_getimg(gUImage, 1, &args.platform.boot_tgz_data,
-		&args.platform.boot_tgz_size))
-		dprintf("Found boot tgz @ %p, %d bytes\n", args.platform.boot_tgz_data,
-			args.platform.boot_tgz_size);
+	if (gUImage != NULL
+		&& image_multi_getimg(gUImage, 1, (uint32*)&args.platform.boot_tgz_data,
+			&args.platform.boot_tgz_size)) {
+		dprintf("Found boot tgz @ %p, %" B_PRIu32 " bytes\n",
+			args.platform.boot_tgz_data, args.platform.boot_tgz_size);
+	}
 
 	{ //DEBUG:
 		int i;
@@ -175,7 +180,7 @@ start_raw(int argc, char **argv)
 		dprintf("os: %d\n", gUBootOS);
 		dprintf("gd @ %p\n", gGD);
 		dprintf("gd->bd @ %p\n", gGD->bd);
-		dprintf("fb_base %p\n", gGD->fb_base);
+		dprintf("fb_base %p\n", (void*)gGD->fb_base);
 		dprintf("uimage @ %p\n", gUImage);
 		if (gUImage)
 			dump_uimage(gUImage);
@@ -193,9 +198,11 @@ start_raw(int argc, char **argv)
 		serial_enable();
 
 	main(&args);
+	return 0;
 }
 
-uint32
+
+extern "C" uint32
 platform_boot_options(void)
 {
 	return sBootOptions;

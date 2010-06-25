@@ -9,7 +9,7 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
-# XXX: FIXME! move this to arch/arm !
+# TODO: move this to arch/arm !
 
 UsePrivateHeaders [ FDirName kernel arch arm board $(TARGET_BOOT_BOARD) ] ;
 
@@ -36,8 +36,8 @@ local genericPlatformSources =
 
 KernelMergeObject boot_platform_u-boot.o :
 	shell.S
-	start2.c
-	debug.c
+	start2.cpp
+	debug.cpp
 	console.cpp
 	serial.cpp
 	devices.cpp

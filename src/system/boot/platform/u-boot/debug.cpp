@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,8 +14,8 @@
 
 /*!	This works only after console_init() was called.
 */
-void
-panic(const char *format, ...)
+extern "C" void
+panic(const char* format, ...)
 {
 	va_list list;
 
@@ -35,8 +35,8 @@ panic(const char *format, ...)
 }
 
 
-void
-dprintf(const char *format, ...)
+extern "C" void
+dprintf(const char* format, ...)
 {
 	char buffer[512];
 	va_list list;
@@ -54,4 +54,3 @@ dprintf(const char *format, ...)
 	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
 		fprintf(stderr, "%s", buffer);
 }
-

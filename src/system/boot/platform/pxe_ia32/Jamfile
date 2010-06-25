@@ -25,7 +25,7 @@ local genericPlatformSources =
 ;
 
 local bios_ia32_src =
-	start.c
+	start.cpp
 	debug.cpp
 	bios.S
 	console.cpp
