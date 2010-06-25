@@ -10,6 +10,8 @@
 #include "debug_builtin_commands.h"
 
 #include <ctype.h>
+#include <string.h>
+
 #include <debug.h>
 #include <kernel.h>
 

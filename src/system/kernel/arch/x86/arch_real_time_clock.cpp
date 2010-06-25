@@ -8,6 +8,7 @@
 
 #include <arch/real_time_clock.h>
 #include <arch/cpu.h>
+#include <boot/kernel_args.h>
 
 #include <real_time_clock.h>
 #include <real_time_data.h>
@@ -214,7 +215,7 @@ arch_rtc_set_hw_time(uint32 seconds)
 
 	secs_to_cmos(seconds, &cmos);
 	write_cmos_clock(&cmos);
-}	
+}
 
 
 void
