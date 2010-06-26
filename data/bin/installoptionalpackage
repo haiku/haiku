@@ -572,7 +572,7 @@ function BuildFinalListOfPackagesToInstall()
 	# strip double spaces
 	packagesToInstall=${packagesToInstall/"  "/" "}
 
-	if ! [ ${#string} -gt 1 ]; then
+	if ! [ ${#packagesToInstall} -gt 1 ]; then
 		echo "... no packages need to be installed."
 		echo "If you wish to re-install a package, edit $installedPackagesFile"
 		proceedWithInstallation=false
@@ -581,7 +581,6 @@ function BuildFinalListOfPackagesToInstall()
 		echo 'Not proceeding with installation.'
 		return 1
 	fi
-	exit
 	echo "To be installed: ${packagesToInstall}"
 	return 0
 }
