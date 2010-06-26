@@ -186,7 +186,8 @@ struct addrinfo {
 #define	EAI_SYSTEM		11	/* system error returned in errno */
 #define EAI_BADHINTS	12
 #define EAI_PROTOCOL	13
-#define EAI_MAX			14
+#define EAI_OVERFLOW	14
+#define EAI_MAX			15
 
 /*
  * Flag values for getaddrinfo()
@@ -194,15 +195,19 @@ struct addrinfo {
 #define	AI_PASSIVE		0x00000001
 #define	AI_CANONNAME	0x00000002
 #define AI_NUMERICHOST	0x00000004
-#define	AI_MASK			0x00000007
+#define AI_NUMERICSERV	0x00000008
+#define	AI_MASK			\
+	(AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_NUMERICSERV \
+		| AI_ADDRCONFIG)
 
 /*
  * Flag values for getipnodebyname()
  */
-#define AI_V4MAPPED		0x00000008
-#define AI_ALL			0x00000010
-#define AI_ADDRCONFIG	0x00000020
-#define AI_DEFAULT		(AI_V4MAPPED|AI_ADDRCONFIG)
+#define AI_ALL			0x00000100
+#define AI_V4MAPPED_CFG	0x00000200
+#define AI_ADDRCONFIG	0x00000400
+#define AI_V4MAPPED		0x00000800
+#define AI_DEFAULT		(AI_V4MAPPED_CFG | AI_ADDRCONFIG)
 
 /*
  * Constants for getnameinfo()
