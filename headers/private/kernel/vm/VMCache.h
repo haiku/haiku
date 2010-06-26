@@ -12,6 +12,7 @@
 
 #include <debug.h>
 #include <kernel.h>
+#include <util/list.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
 
