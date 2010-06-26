@@ -2751,9 +2751,6 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 bool
 BMenu::_AddDynamicItems()
 {
-	if (fDynamicItemsAdded)
-		return false;
-		
 	bool attachAborted = false;
 	BMenuItem* superItem = Superitem();
 	BMenu* superMenu = Supermenu();
@@ -2767,9 +2764,6 @@ BMenu::_AddDynamicItems()
 			}
 		} while (AddDynamicItem(B_PROCESSING));
 	}
-	
-	if (!attachAborted)
-		fDynamicItemsAdded = true;
 	
 	return attachAborted;
 }
