@@ -183,7 +183,8 @@ private:
 			BMenu&				operator=(const BMenu& other);
 
 			void				_InitData(BMessage* archive);
-			bool				_Show(bool selectFirstItem = false);
+			bool				_Show(bool selectFirstItem = false,
+									bool keyDown = false);
 			void				_Hide();
 			BMenuItem*			_Track(int* action, long start = -1);
 
@@ -235,18 +236,22 @@ private:
 			void				_Uninstall();
 			void				_SelectItem(BMenuItem* item,
 									bool showSubmenu = true,
-									bool selectFirstItem = false);
+									bool selectFirstItem = false,
+									bool keyDown = false);
 			bool				_SelectNextItem(BMenuItem* item, bool forward);
 			BMenuItem*			_NextItem(BMenuItem* item, bool forward) const;
 			void				_SetIgnoreHidden(bool on);
 			void				_SetStickyMode(bool on);
 			bool				_IsStickyMode() const;
+			void				_GetIsAltCommandKey(bool &value) const;
 			void				_CalcTriggers();
 			bool				_ChooseTrigger(const char* title, int32& index,
 									uint32& trigger,
 									BPrivate::TriggerList& triggers);
 			void				_UpdateWindowViewSize(const bool &updatePosition);
-			bool				_OkToProceed(BMenuItem* item);
+			bool				_AddDynamicItems();
+			bool				_OkToProceed(BMenuItem* item,
+									bool keyDown = false);
 
 			bool				_CustomTrackingWantsToQuit();
 
@@ -277,7 +282,10 @@ private:
 
 			LayoutData*			fLayoutData;
 
-			int32				_reserved;
+			bool				fDynamicItemsAdded;
+			bool				_reserved1;
+			bool				_reserved2;
+			bool				_reserved3;
 
 			char				fTrigger;
 			bool				fResizeToFit;

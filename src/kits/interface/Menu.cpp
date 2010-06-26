@@ -210,6 +210,7 @@ BMenu::BMenu(const char* name, menu_layout layout)
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
+	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(true),
 	fUseCachedMenuLayout(false),
@@ -244,6 +245,7 @@ BMenu::BMenu(const char* name, float width, float height)
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
+	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(true),
 	fUseCachedMenuLayout(false),
@@ -279,6 +281,7 @@ BMenu::BMenu(BMessage* archive)
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
+	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(true),
 	fUseCachedMenuLayout(false),
@@ -367,35 +370,11 @@ BMenu::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	// TODO: Move into init_interface_kit().
-	// Currently we can't do that, as get_key_map() blocks forever
-	// when called on input_server initialization, since it tries
-	// to send a synchronous message to itself (input_server is
-	// a BApplication)
+	_GetIsAltCommandKey(sAltAsCommandKey);
+		
+	bool attachAborted = _AddDynamicItems();
 
-	BMenu::sAltAsCommandKey = true;
-	key_map* keys = NULL;
-	char* chars = NULL;
-	get_key_map(&keys, &chars);
-	if (keys == NULL || keys->left_command_key != 0x5d
-		|| keys->left_control_key != 0x5c)
-		BMenu::sAltAsCommandKey = false;
-	free(chars);
-	free(keys);
-
-	BMenuItem* superItem = Superitem();
-	BMenu* superMenu = Supermenu();
-	if (AddDynamicItem(B_INITIAL_ADD)) {
-		do {
-			if (superMenu != NULL && !superMenu->_OkToProceed(superItem)) {
-				AddDynamicItem(B_ABORT);
-				fAttachAborted = true;
-				break;
-			}
-		} while (AddDynamicItem(B_PROCESSING));
-	}
-
-	if (!fAttachAborted) {
+	if (!attachAborted) {
 		_CacheFontInfo();
 		_LayoutItems(0);
 		_UpdateWindowViewSize(false);
@@ -515,7 +494,11 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 				_SelectNextItem(fSelected, true);
 			else {
 				if (fSelected && fSelected->Submenu()) {
-					_SelectItem(fSelected, true, true);
+					fSelected->Submenu()->_SetStickyMode(true); 
+						// fix me: this shouldn't be needed but dynamic menus 
+						// aren't getting it set correctly when keyboard 
+						// navigating, which aborts the attach 
+					_SelectItem(fSelected, true, true, true);
 				} else if (dynamic_cast<BMenuBar*>(Supermenu())) {
 					// if we have no submenu and we're an
 					// item in the top menu below the menubar,
@@ -1261,6 +1244,7 @@ BMenu::BMenu(BRect frame, const char* name, uint32 resizingMode, uint32 flags,
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
+	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(resizeToFit),
 	fUseCachedMenuLayout(false),
@@ -1462,7 +1446,7 @@ BMenu::_InitData(BMessage* archive)
 
 
 bool
-BMenu::_Show(bool selectFirstItem)
+BMenu::_Show(bool selectFirstItem, bool keyDown)
 {
 	// See if the supermenu has a cached menuwindow,
 	// and use that one if possible.
@@ -1486,7 +1470,19 @@ BMenu::_Show(bool selectFirstItem)
 		return false;
 
 	if (window->Lock()) {
+		bool attachAborted = false;
+		if (keyDown)
+			attachAborted = _AddDynamicItems();	
+		
+		if (attachAborted) {
+			if (ourWindow)
+				window->Quit();
+			else
+				window->Unlock();
+			return false;
+		}
 		fAttachAborted = false;
+		
 		window->AttachMenu(this);
 
 		if (ItemAt(0) != NULL) {
@@ -2499,7 +2495,8 @@ BMenu::_Uninstall()
 
 
 void
-BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
+BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu,
+	bool selectFirstItem, bool keyDown)
 {
 	// Avoid deselecting and then reselecting the same item
 	// which would cause flickering
@@ -2519,7 +2516,7 @@ BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
 	if (fSelected != NULL && showSubmenu) {
 		BMenu* subMenu = fSelected->Submenu();
 		if (subMenu != NULL && subMenu->Window() == NULL) {
-			if (!subMenu->_Show(selectFirstItem)) {
+			if (!subMenu->_Show(selectFirstItem, keyDown)) {
 				// something went wrong, deselect the item
 				fSelected->Select(false);
 				fSelected = NULL;
@@ -2616,6 +2613,29 @@ bool
 BMenu::_IsStickyMode() const
 {
 	return fStickyMode;
+}
+
+
+void
+BMenu::_GetIsAltCommandKey(bool &value) const
+{
+	// TODO: Move into init_interface_kit().
+	// Currently we can't do that, as get_key_map() blocks forever
+	// when called on input_server initialization, since it tries
+	// to send a synchronous message to itself (input_server is
+	// a BApplication)
+
+	bool altAsCommand = true;
+	key_map* keys = NULL;
+	char* chars = NULL;
+	get_key_map(&keys, &chars);
+	if (keys == NULL || keys->left_command_key != 0x5d
+		|| keys->left_control_key != 0x5c)
+		altAsCommand = false;
+	free(chars);
+	free(keys);
+
+	value = altAsCommand;
 }
 
 
@@ -2729,7 +2749,34 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 
 
 bool
-BMenu::_OkToProceed(BMenuItem* item)
+BMenu::_AddDynamicItems()
+{
+	if (fDynamicItemsAdded)
+		return false;
+		
+	bool attachAborted = false;
+	BMenuItem* superItem = Superitem();
+	BMenu* superMenu = Supermenu();
+	if (AddDynamicItem(B_INITIAL_ADD)) {
+		do {
+			if (superMenu != NULL
+				&& !superMenu->_OkToProceed(superItem)) {
+				AddDynamicItem(B_ABORT);
+				attachAborted = true;
+				break;
+			}
+		} while (AddDynamicItem(B_PROCESSING));
+	}
+	
+	if (!attachAborted)
+		fDynamicItemsAdded = true;
+	
+	return attachAborted;
+}
+
+
+bool
+BMenu::_OkToProceed(BMenuItem* item, bool keyDown)
 {
 	BPoint where;
 	ulong buttons;
@@ -2743,7 +2790,8 @@ BMenu::_OkToProceed(BMenuItem* item)
 	// Deskbar, though.
 	if ((buttons != 0 && stickyMode)
 		|| ((dynamic_cast<BMenuBar*>(this) == NULL
-			&& (buttons == 0 && !stickyMode)) || _HitTestItems(where) != item))
+			&& (buttons == 0 && !stickyMode))
+		|| ((_HitTestItems(where) != item) && !keyDown)))
 		return false;
 
 	return true;
