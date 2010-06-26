@@ -43,11 +43,12 @@ typedef struct acpi_device_cookie {
 typedef struct acpi_root_info {
 	driver_module_info info;
 
-	status_t	(*get_handle)(acpi_handle parent, char* pathname,
-					acpi_handle* retHandle);
+	status_t	(*get_handle)(acpi_handle parent, char *pathname,
+					acpi_handle *retHandle);
 
 	/* Global Lock */
-	status_t	(*acquire_global_lock)(uint16 timeout, uint32* handle);
+
+	status_t	(*acquire_global_lock)(uint16 timeout, uint32 *handle);
 	status_t	(*release_global_lock)(uint32 handle);
 
 	/* Notify Handler */
@@ -65,60 +66,69 @@ typedef struct acpi_root_info {
 	status_t	(*set_gpe)(acpi_handle handle, uint32 gpeNumber,
 					uint8 action);
 	status_t	(*install_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
-					uint32 type, acpi_event_handler handler, void* data);
+					uint32 type, acpi_event_handler handler, void *data);
 	status_t	(*remove_gpe_handler)(acpi_handle handle, uint32 gpeNumber,
 					acpi_event_handler address);
 
 	/* Address Space Handler */
 
 	status_t	(*install_address_space_handler)(acpi_handle handle,
-					uint32 spaceID, acpi_adr_space_handler handler,
-					acpi_adr_space_setup setup,	void* data);
+					uint32 spaceId,
+					acpi_adr_space_handler handler,
+					acpi_adr_space_setup setup,	void *data);
 	status_t	(*remove_address_space_handler)(acpi_handle handle,
-					uint32 spaceID, acpi_adr_space_handler handler);
+					uint32 spaceId,
+					acpi_adr_space_handler handler);
 
 	/* Fixed Event Management */
 
 	void		(*enable_fixed_event)(uint32 event);
 	void		(*disable_fixed_event)(uint32 event);
 
-	uint32		(*fixed_event_status)(uint32 event);
+	uint32		(*fixed_event_status) (uint32 event);
 					/* Returns 1 if event set, 0 otherwise */
-	void		(*reset_fixed_event)(uint32 event);
+	void		(*reset_fixed_event) (uint32 event);
 
 	status_t	(*install_fixed_event_handler)(uint32 event,
-					interrupt_handler* handler, void* data);
+					interrupt_handler *handler, void *data);
 	status_t	(*remove_fixed_event_handler)(uint32 event,
-					interrupt_handler* handler);
+					interrupt_handler *handler);
 
 	/* Namespace Access */
 
-	status_t	(*get_next_entry)(uint32 object_type, const char* base,
- 					char* result, size_t len, void** counter);
-	status_t	(*get_device)(const char* hid, uint32 index, char* result,
+	status_t	(*get_next_entry)(uint32 objectType, const char *base,
+					char *result, size_t length, void **_counter);
+	status_t	(*get_device)(const char *hid, uint32 index, char *result,
 					size_t resultLength);
 
-	status_t	(*get_device_hid)(const char* path, char* hid,
+	status_t	(*get_device_hid)(const char *path, char *hid,
 					size_t hidLength);
-	uint32		(*get_object_type)(const char* path);
-	status_t	(*get_object)(const char* path,
-					acpi_object_type** _returnValue);
-	status_t	(*get_object_typed)(const char* path,
-					acpi_object_type** _returnValue, uint32 objectType);
+	uint32		(*get_object_type)(const char *path);
+	status_t	(*get_object)(const char *path,
+					acpi_object_type **_returnValue);
+	status_t	(*get_object_typed)(const char *path,
+					acpi_object_type **_returnValue, uint32 objectType);
 	status_t	(*ns_handle_to_pathname)(acpi_handle targetHandle,
-					acpi_data* buffer);
+					acpi_data *buffer);
 
 	/* Control method execution and data acquisition */
 
 	status_t	(*evaluate_object)(const char* object,
-					acpi_object_type* returnValue, size_t bufferLength);
-	status_t	(*evaluate_method)(acpi_handle handle, const char* method,
-					acpi_objects* args, acpi_data* returnValue);
+					acpi_object_type *returnValue, size_t bufferLength);
+	status_t	(*evaluate_method)(acpi_handle handle, const char *method,
+					acpi_objects *args, acpi_data *returnValue);
 
 	/* Resource info */
 
 	status_t	(*get_irq_routing_table)(acpi_handle busDeviceHandle,
-					acpi_data* returnValue);
+					acpi_data *retBuffer);
+
+	/* Power state setting */
+
+	status_t	(*prepare_sleep_state)(uint8 state, void (*wakeFunc)(void),
+					size_t size);
+	status_t	(*enter_sleep_state)(uint8 state);
+	status_t	(*reboot)(void);
 } acpi_root_info;
 
 
@@ -183,6 +193,11 @@ status_t evaluate_method(acpi_handle handle, const char* method,
 
 status_t get_irq_routing_table(acpi_handle busDeviceHandle,
 	acpi_data* returnValue);
+
+status_t prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size);
+status_t enter_sleep_state(uint8 state);
+
+status_t reboot(void);
 __END_DECLS
 
 

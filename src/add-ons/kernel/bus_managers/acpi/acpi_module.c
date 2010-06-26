@@ -217,6 +217,10 @@ static struct acpi_root_info sACPIRootModule = {
 	ns_handle_to_pathname,
 	evaluate_object,
 	evaluate_method,
+	get_irq_routing_table,
+	prepare_sleep_state,
+	enter_sleep_state,
+	reboot
 };
 
 

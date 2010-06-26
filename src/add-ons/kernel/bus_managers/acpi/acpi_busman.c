@@ -566,7 +566,7 @@ get_irq_routing_table(acpi_handle busDeviceHandle, acpi_data *retBuffer)
 }
 
 
-static status_t
+status_t
 prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 {
 	ACPI_STATUS acpiStatus;
@@ -605,7 +605,7 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 }
 
 
-static status_t
+status_t
 enter_sleep_state(uint8 state)
 {
 	ACPI_STATUS status;
@@ -624,7 +624,7 @@ enter_sleep_state(uint8 state)
 }
 
 
-static status_t
+status_t
 reboot(void)
 {
 	ACPI_STATUS status;
