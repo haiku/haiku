@@ -440,7 +440,9 @@ function GeneratePackageNames()
 	echo "Generating a list of Package Names ..."
 
 	local file="${baseDir}/OptionalPackageNames"
-	touch ${file}
+	if [ -e "${file}" ]; then
+		rm "${file}"
+	fi
 
 	local regExp='/^if\ \[\ IsOptionalHaikuImagePackageAdded/p'
 	sed -n -e "$regExp" ${baseDir}/OptionalPackages > ${file}.temp
@@ -451,8 +453,10 @@ function GeneratePackageNames()
 		nonRepeatingDeps=""
 		GetPackageDependencies "$pkg"
 		local lowerCasePkg=`echo ${pkg} | tr '[A-Z]' '[a-z]'`
-		if IsPackageAndDepsOkToInstall ${pkg} ; then
-			echo "${lowerCasePkg} : ${pkg} ${nonRepeatingDeps}"  >> ${file}
+		if ! ContainsSubstring "${alreadyInstalled} " "${pkg} " ; then
+			if IsPackageAndDepsOkToInstall ${pkg} ; then
+				echo "${lowerCasePkg} : ${pkg} ${nonRepeatingDeps}"  >> ${file}
+			fi
 		fi
 
 	done < ${file}.temp
@@ -496,12 +500,12 @@ function IsPackageAndDepsOkToInstall()
 {
 	# IsPackageAndDepsOkToInstall <pkg>
 	if ContainsSubstring "${packageIgnoreList}" "${1}"; then
-		echo "...warning: ${1} cannot be installed"
+		#echo "...warning: ${1} cannot be installed"
 		return 1
 	fi
 	for foo in ${nonRepeatingDeps} ; do
 		if ContainsSubstring "${packageIgnoreList}" "${foo}"; then
-			echo "...warning: ${1} cannot be installed because of ${foo}"
+			#echo "...warning: ${1} cannot be installed because of ${foo}"
 			return 1
 		fi
 	done
@@ -541,7 +545,12 @@ function AddPackages()
 		CreateInstallerScript
 		sh ${tmpDir}/install-optpkg.sh
 		rm ${tmpDir}/install-optpkg.sh
+
+		# update files to account for the newly installed packages
+		alreadyInstalled="${alreadyInstalled} ${packagesToInstall} "
 		RecordInstalledPackages
+		GeneratePackageNames
+		echo "... done."
 	fi
 }
 
@@ -600,7 +609,7 @@ function IsPackageNameValid()
 
 function RecordInstalledPackages()
 {
-	echo -e ${packagesToInstall} | tr '\ ' '\n'  >> ${installedPackagesFile}
+	echo -e ${alreadyInstalled} | tr '\ ' '\n' | sort > ${installedPackagesFile}
 }
 
 
@@ -791,8 +800,12 @@ function ListPackages()
 {
 	# ListPackages
 	echo ""
+	echo "Optional Packages that have been installed:"
+	echo ${alreadyInstalled}
+
 	echo ""
-	echo "Available Optional Packages:"
+	echo ""
+	echo "Installable Optional Packages:"
 
 	# single line:
 	echo ${availablePackagesKeys}
