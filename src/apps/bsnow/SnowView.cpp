@@ -1,23 +1,29 @@
+#include "SnowView.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
 #include <Alert.h>
 #include <Debug.h>
 #include <Message.h>
 #include <MessageRunner.h>
-#include <OS.h>
-#include <Screen.h>
-#include "SnowView.h"
-#include "Flakes.h"
-#include <Region.h>
-
 #include <MessageFilter.h>
+#include <OS.h>
+#include <Region.h>
+#include <Screen.h>
+
+#include "Flakes.h"
+
 
 #define FORWARD_TO_PARENT
 
+
 SnowView::SnowView()
- : BView(BRect(SNOW_VIEW_RECT), "BSnow", B_FOLLOW_NONE, B_WILL_DRAW|B_PULSE_NEEDED)
+	:
+	BView(BRect(SNOW_VIEW_RECT), "BSnow", B_FOLLOW_NONE,
+	B_WILL_DRAW | B_PULSE_NEEDED)
 {
 	fAttached = false;
 	fMsgRunner = NULL;
@@ -79,7 +85,7 @@ SnowView::SnowView(BMessage *archive)
 	SetFlags(Flags() & ~B_PULSE_NEEDED); /* it's only used when in the app */
 	get_system_info(&si);
 	fNumFlakes = ((int32)(si.cpu_clock_speed/1000000)) * si.cpu_count / 3; //;
-	printf("BSnow: using %d flakes\n", fNumFlakes);
+	printf("BSnow: using %ld flakes\n", fNumFlakes);
 	for (int i = 0; i < WORKSPACES_COUNT; i++) {
 		fFlakes[i] = new flake[fNumFlakes];
 		memset(fFlakes[i], 0, fNumFlakes * sizeof(flake));
@@ -545,8 +551,6 @@ void SnowView::KeyUp(const char *bytes, int32 numBytes)
 int32 SnowView::SnowMakerThread(void *p_this)
 {
 	SnowView *_this = (SnowView *)p_this;
-	bigtime_t nextDraw = 0LL;
-	int current=0;
 	BView *p = _this->Parent();
 	BRect portion(0,0,(_this->fCachedWsWidth/PORTION_GRAN)-1, (_this->fCachedWsHeight/PORTION_GRAN)-1);
 	int nf = _this->fNumFlakes;
