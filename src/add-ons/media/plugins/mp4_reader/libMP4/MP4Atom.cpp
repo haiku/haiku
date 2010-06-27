@@ -22,11 +22,15 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <stdio.h>
+
 
 #include "MP4Atom.h"
 
-AtomBase::AtomBase(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize)
+#include <stdio.h>
+
+
+AtomBase::AtomBase(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType,
+	uint64 patomSize)
 {
 	theStream = pStream;
 	streamOffset = pstreamOffset;
@@ -35,13 +39,16 @@ AtomBase::AtomBase(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, 
 	parentAtom = NULL;
 }
 
+
 AtomBase::~AtomBase()
 {
 	theStream = NULL;
 	parentAtom = NULL;
 }
 
-char	*AtomBase::GetAtomTypeAsFourcc()
+
+char *
+AtomBase::GetAtomTypeAsFourcc()
 {
 	fourcc[0] = (char)((atomType >> 24) & 0xff);
 	fourcc[1] = (char)((atomType >> 16) & 0xff);
@@ -52,9 +59,11 @@ char	*AtomBase::GetAtomTypeAsFourcc()
 	return fourcc;
 }
 
-char *AtomBase::GetAtomName()
+
+const char *
+AtomBase::GetAtomName()
 {
-	char *_result;
+	const char *_result;
 	_result = OnGetAtomName();
 	if (_result) {
 		return _result;
@@ -69,12 +78,16 @@ char *AtomBase::GetAtomName()
 	return fourcc;
 }
 
-char *AtomBase::OnGetAtomName()
+
+const char *
+AtomBase::OnGetAtomName()
 {
 	return NULL;
 }
 
-void AtomBase::ProcessMetaData()
+
+void
+AtomBase::ProcessMetaData()
 //	ProcessMetaData() - Reads in the basic Atom Meta Data
 //				- Calls OnProcessMetaData()
 //				- Calls ProcessMetaData on each child atom
@@ -87,12 +100,16 @@ void AtomBase::ProcessMetaData()
 	MoveToEnd();
 }
 
-void AtomBase::OnProcessMetaData()
+
+void
+AtomBase::OnProcessMetaData()
 {
 	MoveToEnd();
 }
 
-bool AtomBase::MoveToEnd()
+
+bool
+AtomBase::MoveToEnd()
 {
 	off_t NewPosition = streamOffset + atomSize;
 
@@ -102,60 +119,79 @@ bool AtomBase::MoveToEnd()
 	return true;
 }
 
-uint64	AtomBase::GetBytesRemaining()
+
+uint64
+AtomBase::GetBytesRemaining()
 {
 	off_t EndPosition = streamOffset + atomSize;
 	off_t CurrPosition = GetStream()->Position();
 	
 	if (CurrPosition > EndPosition) {
-		printf("ERROR: Read past atom boundary by %Ld bytes\n",CurrPosition - EndPosition);
+		printf("ERROR: Read past atom boundary by %Ld bytes\n",
+			CurrPosition - EndPosition);
 		return 0;
 	}
 	
 	return (EndPosition - CurrPosition);
 }
 
-void	AtomBase::DisplayAtoms()
+
+void
+AtomBase::DisplayAtoms()
 {
 	uint32 aindent = 0;
 	DisplayAtoms(aindent);
 }
 
-void	AtomBase::DisplayAtoms(uint32 pindent)
+
+void
+AtomBase::DisplayAtoms(uint32 pindent)
 {
 	Indent(pindent);
 	printf("(%s)\n",GetAtomName());
 }
 
-void	AtomBase::Indent(uint32 pindent)
+
+void
+AtomBase::Indent(uint32 pindent)
 {
 	for (uint32 i=0;i<pindent;i++) {
 		printf("-");
 	}
 }
 
-bool AtomBase::IsKnown()
+
+bool
+AtomBase::IsKnown()
 {
 	return (OnGetAtomName() != NULL);
 }
 
-void AtomBase::ReadArrayHeader(array_header *pHeader)
+
+void
+AtomBase::ReadArrayHeader(array_header *pHeader)
 {
 	Read(&pHeader->NoEntries);
 }
 
-BPositionIO *AtomBase::OnGetStream()
+
+BPositionIO *
+AtomBase::OnGetStream()
 {
 	// default implementation
 	return theStream;
 }
 
-BPositionIO *AtomBase::GetStream()
+
+BPositionIO *
+AtomBase::GetStream()
 {
 	return OnGetStream();
 }
 
-void	AtomBase::Read(uint64	*value)
+
+void
+AtomBase::Read(uint64	*value)
 {
 	uint32	bytes_read;
 	
@@ -166,7 +202,9 @@ void	AtomBase::Read(uint64	*value)
 	*value = B_BENDIAN_TO_HOST_INT64(*value);
 }
 
-void	AtomBase::Read(uint32	*value)
+
+void
+AtomBase::Read(uint32	*value)
 {
 	uint32	bytes_read;
 	
@@ -177,7 +215,9 @@ void	AtomBase::Read(uint32	*value)
 	*value = B_BENDIAN_TO_HOST_INT32(*value);
 }
 
-void	AtomBase::Read(int32	*value)
+
+void
+AtomBase::Read(int32	*value)
 {
 	uint32	bytes_read;
 	
@@ -188,7 +228,9 @@ void	AtomBase::Read(int32	*value)
 	*value = B_BENDIAN_TO_HOST_INT32(*value);
 }
 
-void	AtomBase::Read(uint16	*value)
+
+void
+AtomBase::Read(uint16	*value)
 {
 	uint32	bytes_read;
 	
@@ -199,7 +241,9 @@ void	AtomBase::Read(uint16	*value)
 	*value = B_BENDIAN_TO_HOST_INT16(*value);
 }
 
-void	AtomBase::Read(uint8	*value)
+
+void
+AtomBase::Read(uint8	*value)
 {
 	uint32	bytes_read;
 	
@@ -208,7 +252,9 @@ void	AtomBase::Read(uint8	*value)
 	// Assert((bytes_read == sizeof(uint8),"Read Error");
 }
 
-void	AtomBase::Read(char	*value, uint32 maxread)
+
+void
+AtomBase::Read(char	*value, uint32 maxread)
 {
 	uint32	bytes_read;
 	
@@ -217,7 +263,9 @@ void	AtomBase::Read(char	*value, uint32 maxread)
 	// Assert((bytes_read == maxread,"Read Error");
 }
 
-void	AtomBase::Read(uint8 *value, uint32 maxread)
+
+void
+AtomBase::Read(uint8 *value, uint32 maxread)
 {
 	uint32	bytes_read;
 	
@@ -226,10 +274,13 @@ void	AtomBase::Read(uint8 *value, uint32 maxread)
 	// Assert((bytes_read == maxread,"Read Error");
 }
 
-uint64	AtomBase::GetBits(uint64 buffer, uint8 startBit, uint8 totalBits)
+
+uint64
+AtomBase::GetBits(uint64 buffer, uint8 startBit, uint8 totalBits)
 {
 	// startBit should range from 0-63, totalBits should range from 1-64
-	if ((startBit < 64) && (totalBits > 0) && (totalBits <= 64) && (startBit + totalBits <= 64)) {
+	if ((startBit < 64) && (totalBits > 0) && (totalBits <= 64) 
+		&& (startBit + totalBits <= 64)) {
 		// Ok pull from the buffer the bits wanted.
 		buffer = buffer << startBit;
 		buffer = buffer >> (64 - (totalBits + startBit) + startBit);
@@ -240,10 +291,13 @@ uint64	AtomBase::GetBits(uint64 buffer, uint8 startBit, uint8 totalBits)
 	return 0L;
 }
 
-uint32	AtomBase::GetBits(uint32 buffer, uint8 startBit, uint8 totalBits)
+
+uint32
+AtomBase::GetBits(uint32 buffer, uint8 startBit, uint8 totalBits)
 {
 	// startBit should range from 0-31, totalBits should range from 1-32
-	if ((startBit < 32) && (totalBits > 0) && (totalBits <= 32) && (startBit + totalBits <= 32)) {
+	if ((startBit < 32) && (totalBits > 0) && (totalBits <= 32)
+		&& (startBit + totalBits <= 32)) {
 		// Ok pull from the buffer the bits wanted.
 		buffer = buffer << startBit;
 		buffer = buffer >> (32 - (startBit + totalBits) + startBit);
@@ -254,15 +308,22 @@ uint32	AtomBase::GetBits(uint32 buffer, uint8 startBit, uint8 totalBits)
 	return 0;
 }
 
-FullAtom::FullAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+
+FullAtom::FullAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType,
+	uint64 patomSize)
+	:
+	AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 }
+
 
 FullAtom::~FullAtom()
 {
 }
 
-void	FullAtom::OnProcessMetaData()
+
+void
+FullAtom::OnProcessMetaData()
 {
 	Read(&Version);
 	Read(&Flags1);
@@ -270,16 +331,23 @@ void	FullAtom::OnProcessMetaData()
 	Read(&Flags3);
 }
 
-AtomContainer::AtomContainer(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+
+AtomContainer::AtomContainer(BPositionIO *pStream, off_t pstreamOffset,
+	uint32 patomType, uint64 patomSize)
+	:
+	AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
 	TotalChildren = 0;
 }
+
 
 AtomContainer::~AtomContainer()
 {
 }
 
-void	AtomContainer::DisplayAtoms(uint32 pindent)
+
+void
+AtomContainer::DisplayAtoms(uint32 pindent)
 {
 	Indent(pindent);
 	printf("%ld:(%s)\n",TotalChildren,GetAtomName());
@@ -291,7 +359,9 @@ void	AtomContainer::DisplayAtoms(uint32 pindent)
 
 }
 
-void	AtomContainer::ProcessMetaData()
+
+void
+AtomContainer::ProcessMetaData()
 {
 	SetAtomOffset(GetStream()->Position());
 	
@@ -310,7 +380,9 @@ void	AtomContainer::ProcessMetaData()
 	MoveToEnd();
 }
 
-bool	AtomContainer::AddChild(AtomBase *pChildAtom)
+
+bool
+AtomContainer::AddChild(AtomBase *pChildAtom)
 {
 	if (pChildAtom) {
 		pChildAtom->SetParent(this);
@@ -320,6 +392,7 @@ bool	AtomContainer::AddChild(AtomBase *pChildAtom)
 	}
 	return false;
 }
+
 
 AtomBase *AtomContainer::GetChildAtom(uint32 patomType, uint32 offset)
 {
@@ -334,7 +407,8 @@ AtomBase *AtomContainer::GetChildAtom(uint32 patomType, uint32 offset)
 		} else {
 			if (atomChildren[i]->IsContainer()) {
 				// search container
-				AtomBase *aAtomBase = (dynamic_cast<AtomContainer *>(atomChildren[i])->GetChildAtom(patomType, offset));
+				AtomBase *aAtomBase = dynamic_cast<AtomContainer *>
+					(atomChildren[i])->GetChildAtom(patomType, offset);
 				if (aAtomBase) {
 					// found in container
 					return aAtomBase;
@@ -346,6 +420,8 @@ AtomBase *AtomContainer::GetChildAtom(uint32 patomType, uint32 offset)
 	return NULL;
 }
 
-void	AtomContainer::OnProcessMetaData()
+
+void
+AtomContainer::OnProcessMetaData()
 {
 }

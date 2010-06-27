@@ -22,19 +22,23 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+
+#include "MP4Parser.h"
+
 #include <stdio.h>
 
 #include <DataIO.h>
-#include <SupportKit.h>
 #include <MediaFormats.h>
+#include <SupportKit.h>
 
 #include <zlib.h>
 
-#include "MP4Parser.h"
 #include "BitParser.h"
 
-//static 
-AtomBase *GetAtom(BPositionIO *pStream)
+
+AtomBase *
+GetAtom(BPositionIO *pStream)
 {
 	uint32 aAtomType;
 	uint32 aAtomSize;
@@ -62,193 +66,171 @@ AtomBase *GetAtom(BPositionIO *pStream)
 		aRealAtomSize = aAtomSize;
 	}
 
-	if (aAtomType == uint32('moov')) {
+	if (aAtomType == uint32('moov'))
 		return new MOOVAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 	
-	if (aAtomType == uint32('mvhd')) {
+	if (aAtomType == uint32('mvhd'))
 		return new MVHDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('trak')) {
+	if (aAtomType == uint32('trak'))
 		return new TRAKAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('tkhd')) {
+	if (aAtomType == uint32('tkhd'))
 		return new TKHDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('free')) {
+	if (aAtomType == uint32('free'))
 		return new FREEAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('skip')) {
+	if (aAtomType == uint32('skip'))
 		return new SKIPAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('wide')) {
+	if (aAtomType == uint32('wide'))
 		return new WIDEAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('mdat')) {
+	if (aAtomType == uint32('mdat'))
 		return new MDATAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('mdia')) {
+	if (aAtomType == uint32('mdia'))
 		return new MDIAAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('mdhd')) {
+	if (aAtomType == uint32('mdhd'))
 		return new MDHDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('hdlr')) {
+	if (aAtomType == uint32('hdlr'))
 		return new HDLRAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('minf')) {
+	if (aAtomType == uint32('minf'))
 		return new MINFAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('vmhd')) {
+	if (aAtomType == uint32('vmhd'))
 		return new VMHDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('smhd')) {
+	if (aAtomType == uint32('smhd'))
 		return new SMHDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('dinf')) {
+	if (aAtomType == uint32('dinf'))
 		return new DINFAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stbl')) {
+	if (aAtomType == uint32('stbl'))
 		return new STBLAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stsd')) {
+	if (aAtomType == uint32('stsd'))
 		return new STSDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('tmcd')) {
+	if (aAtomType == uint32('tmcd'))
 		return new TMCDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stts')) {
+	if (aAtomType == uint32('stts'))
 		return new STTSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('pnot')) {
+	if (aAtomType == uint32('pnot'))
 		return new PNOTAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stsc')) {
+	if (aAtomType == uint32('stsc'))
 		return new STSCAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stco')) {
+	if (aAtomType == uint32('stco'))
 		return new STCOAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stss')) {
+	if (aAtomType == uint32('stss'))
 		return new STSSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('ctts')) {
+	if (aAtomType == uint32('ctts'))
 		return new CTTSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stsz')) {
+	if (aAtomType == uint32('stsz'))
 		return new STSZAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('stz2')) {
+	if (aAtomType == uint32('stz2'))
 		return new STZ2Atom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('ftyp')) {
+	if (aAtomType == uint32('ftyp'))
 		return new FTYPAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('cmov')) {
+	if (aAtomType == uint32('cmov'))
 		return new CMOVAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('dcom')) {
+	if (aAtomType == uint32('dcom'))
 		return new DCOMAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('cmvd')) {
+	if (aAtomType == uint32('cmvd'))
 		return new CMVDAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('esds')) {
+	if (aAtomType == uint32('esds'))
 		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('alac')) {
+	if (aAtomType == uint32('alac'))
 		return new ALACAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 	
-	if (aAtomType == uint32('wave')) {
+	if (aAtomType == uint32('wave'))
 		return new WAVEAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('dac3')) {
+	if (aAtomType == uint32('dac3'))
 		return new DAC3Atom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('dec3')) {
+	if (aAtomType == uint32('dec3'))
 		return new DEC3Atom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
 
-	if (aAtomType == uint32('avcC')) {
-		return new DecoderConfigAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	}
+	if (aAtomType == uint32('avcC'))
+		return new DecoderConfigAtom(pStream, aStreamOffset, aAtomType,
+			aRealAtomSize);
 
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
-	
 }
 
-MOOVAtom::MOOVAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+MOOVAtom::MOOVAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType,
+	pAtomSize)
 {
 	theMVHDAtom = NULL;
 }
+
 
 MOOVAtom::~MOOVAtom()
 {
 	theMVHDAtom = NULL;
 }
 
-void MOOVAtom::OnProcessMetaData()
+
+void
+MOOVAtom::OnProcessMetaData()
 {
 }
 
-char *MOOVAtom::OnGetAtomName()
+const char *
+MOOVAtom::OnGetAtomName()
 {
 	return "MPEG-4 Movie";
 }
 
-CMOVAtom::CMOVAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+CMOVAtom::CMOVAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType,
+	pAtomSize)
 {
 	theUncompressedStream = NULL;
 }
+
 
 CMOVAtom::~CMOVAtom()
 {
 }
 
-BPositionIO *CMOVAtom::OnGetStream()
+
+BPositionIO *
+CMOVAtom::OnGetStream()
 {
 	// Use the decompressed stream instead of file stream
-	if (theUncompressedStream) {
+	if (theUncompressedStream)
 		return theUncompressedStream;
-	}
 	
 	return theStream;
 }
 
-void CMOVAtom::OnProcessMetaData()
+
+void
+CMOVAtom::OnProcessMetaData()
 {
 	BMallocIO *theUncompressedData;
 	uint8 *outBuffer;
@@ -327,7 +309,9 @@ void CMOVAtom::OnProcessMetaData()
 
 }
 
-void CMOVAtom::OnChildProcessingComplete()
+
+void
+CMOVAtom::OnChildProcessingComplete()
 {
 	// revert back to file stream once all children have finished
 	if (theUncompressedStream) {
@@ -336,44 +320,61 @@ void CMOVAtom::OnChildProcessingComplete()
 	theUncompressedStream = NULL;
 }
 
-char *CMOVAtom::OnGetAtomName()
+
+const char *
+CMOVAtom::OnGetAtomName()
 {
 	return "Compressed MPEG-4 Movie";
 }
 
-DCOMAtom::DCOMAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+DCOMAtom::DCOMAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 DCOMAtom::~DCOMAtom()
 {
 }
 
-void DCOMAtom::OnProcessMetaData()
+
+void
+DCOMAtom::OnProcessMetaData()
 {
 	Read(&compressionID);
 }
 
-char *DCOMAtom::OnGetAtomName()
+
+const char *
+DCOMAtom::OnGetAtomName()
 {
 	return "Decompression Atom";
 }
 
-CMVDAtom::CMVDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+CMVDAtom::CMVDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	Buffer = NULL;
 	UncompressedSize = 0;
 	BufferSize = 0;
 }
 
+
 CMVDAtom::~CMVDAtom()
 {
-	if (Buffer) {
+	if (Buffer)
 		free(Buffer);
-	}
 }
 
-void CMVDAtom::OnProcessMetaData()
+
+void
+CMVDAtom::OnProcessMetaData()
 {
 	Read(&UncompressedSize);
 
@@ -384,20 +385,29 @@ void CMVDAtom::OnProcessMetaData()
 	}
 }
 
-char *CMVDAtom::OnGetAtomName()
+
+const char *
+CMVDAtom::OnGetAtomName()
 {
 	return "Compressed Movie Data";
 }
 
-MVHDAtom::MVHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+MVHDAtom::MVHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 MVHDAtom::~MVHDAtom()
 {
 }
 
-void MVHDAtom::OnProcessMetaData()
+
+void
+MVHDAtom::OnProcessMetaData()
 {
 	FullAtom::OnProcessMetaData();
 
@@ -452,14 +462,18 @@ void MVHDAtom::OnProcessMetaData()
 	}
 }
 
-char *MVHDAtom::OnGetAtomName()
+
+const char *
+MVHDAtom::OnGetAtomName()
 {
 	return "MPEG-4 Movie Header";
 }
 
-MVHDAtom *MOOVAtom::GetMVHDAtom()
+
+MVHDAtom *
+MOOVAtom::GetMVHDAtom()
 {
-AtomBase *aAtomBase;
+	AtomBase *aAtomBase;
 
 	if (theMVHDAtom == NULL) {
 		aAtomBase = GetChildAtom(uint32('mvhd'));
@@ -470,12 +484,17 @@ AtomBase *aAtomBase;
 	return theMVHDAtom;
 }
 
-STTSAtom::STTSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+STTSAtom::STTSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	theHeader.NoEntries = 0;
 	SUMDurations = 0;
 	SUMCounts = 0;
 }
+
 
 STTSAtom::~STTSAtom()
 {
@@ -485,9 +504,11 @@ STTSAtom::~STTSAtom()
 	}
 }
 
-void STTSAtom::OnProcessMetaData()
+
+void
+STTSAtom::OnProcessMetaData()
 {
-TimeToSample	*aTimeToSample;
+	TimeToSample	*aTimeToSample;
 
 	FullAtom::OnProcessMetaData();
 
@@ -500,47 +521,60 @@ TimeToSample	*aTimeToSample;
 		Read(&aTimeToSample->Duration);
 
 		theTimeToSampleArray[i] = aTimeToSample;
-		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
+		SUMDurations += (theTimeToSampleArray[i]->Duration
+			* theTimeToSampleArray[i]->Count);
 		SUMCounts += theTimeToSampleArray[i]->Count;
 	}
 }
 
-char *STTSAtom::OnGetAtomName()
+
+const char *
+STTSAtom::OnGetAtomName()
 {
 	return "Time to Sample Atom";
 }
 
-uint32	STTSAtom::GetSampleForTime(bigtime_t pTime)
+
+uint32
+STTSAtom::GetSampleForTime(bigtime_t pTime)
 {
 	// Sample for time is this calc, how does STTS help us?
 	return uint32((pTime * FrameRate + 50) / 1000000.0);
-
 
 // TODO this is too slow.  PreCalc when loading this?
 /*	bigtime_t TotalDuration = 0;
 	uint64 TotalCount = 0;
 	
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		TotalDuration += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
+		TotalDuration += (theTimeToSampleArray[i]->Duration
+			* theTimeToSampleArray[i]->Count);
 		TotalCount += theTimeToSampleArray[i]->Count;
 		if ((TotalDuration * 44100) > pTime) {
 			return uint32((pTime * FrameRate + 50) / 1000000.0);
 		}
 	}
 
-	return 0; */
+	return 0;
+*/
 }
 
-uint32	STTSAtom::GetSampleForFrame(uint32 pFrame)
+
+uint32
+STTSAtom::GetSampleForFrame(uint32 pFrame)
 {
 	// Convert frame to time and call GetSampleForTime()
 	return pFrame;
 }
 
-CTTSAtom::CTTSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+CTTSAtom::CTTSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	theHeader.NoEntries = 0;
 }
+
 
 CTTSAtom::~CTTSAtom()
 {
@@ -550,9 +584,11 @@ CTTSAtom::~CTTSAtom()
 	}
 }
 
-void CTTSAtom::OnProcessMetaData()
+
+void
+CTTSAtom::OnProcessMetaData()
 {
-CompTimeToSample	*aCompTimeToSample;
+	CompTimeToSample* aCompTimeToSample;
 
 	FullAtom::OnProcessMetaData();
 
@@ -568,15 +604,22 @@ CompTimeToSample	*aCompTimeToSample;
 	}
 }
 
-char *CTTSAtom::OnGetAtomName()
+
+const char *
+CTTSAtom::OnGetAtomName()
 {
 	return "Composition Time to Sample Atom";
 }
 
-STSCAtom::STSCAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+STSCAtom::STSCAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	theHeader.NoEntries = 0;
 }
+
 
 STSCAtom::~STSCAtom()
 {
@@ -586,9 +629,11 @@ STSCAtom::~STSCAtom()
 	}
 }
 
-void STSCAtom::OnProcessMetaData()
+
+void
+STSCAtom::OnProcessMetaData()
 {
-SampleToChunk	*aSampleToChunk;
+	SampleToChunk	*aSampleToChunk;
 
 	FullAtom::OnProcessMetaData();
 
@@ -614,12 +659,16 @@ SampleToChunk	*aSampleToChunk;
 	}
 }
 
-char *STSCAtom::OnGetAtomName()
+
+const char *
+STSCAtom::OnGetAtomName()
 {
 	return "Sample to Chunk Atom";
 }
 
-uint32	STSCAtom::GetNoSamplesInChunk(uint32 pChunkID)
+
+uint32
+STSCAtom::GetNoSamplesInChunk(uint32 pChunkID)
 {
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		if (theSampleToChunkArray[i]->FirstChunk > pChunkID) {
@@ -630,30 +679,37 @@ uint32	STSCAtom::GetNoSamplesInChunk(uint32 pChunkID)
 	return theSampleToChunkArray[theHeader.NoEntries-1]->SamplesPerChunk;
 }
 
-uint32	STSCAtom::GetFirstSampleInChunk(uint32 pChunkID)
+
+uint32
+STSCAtom::GetFirstSampleInChunk(uint32 pChunkID)
 {
-uint32 Diff;
+	uint32 Diff;
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		if (theSampleToChunkArray[i]->FirstChunk > pChunkID) {
 			Diff = pChunkID - theSampleToChunkArray[i-1]->FirstChunk;
-			return ((Diff * theSampleToChunkArray[i-1]->SamplesPerChunk) + theSampleToChunkArray[i-1]->TotalPrevSamples);
+			return ((Diff * theSampleToChunkArray[i-1]->SamplesPerChunk)
+				+ theSampleToChunkArray[i-1]->TotalPrevSamples);
 		}
 	}
 	
 	Diff = pChunkID - theSampleToChunkArray[theHeader.NoEntries-1]->FirstChunk;
-	return ((Diff * theSampleToChunkArray[theHeader.NoEntries-1]->SamplesPerChunk) + theSampleToChunkArray[theHeader.NoEntries-1]->TotalPrevSamples);
+	return Diff * theSampleToChunkArray[theHeader.NoEntries-1]->SamplesPerChunk
+		+ theSampleToChunkArray[theHeader.NoEntries-1]->TotalPrevSamples;
 }
 
-uint32	STSCAtom::GetChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
+
+uint32
+STSCAtom::GetChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
 {
 	uint32 ChunkID = 0;
 
 	for (int32 i=theHeader.NoEntries-1;i>=0;i--) {
 		if (pSample >= theSampleToChunkArray[i]->TotalPrevSamples) {
 			// Found chunk now calculate offset
-			ChunkID = ((pSample - theSampleToChunkArray[i]->TotalPrevSamples) / theSampleToChunkArray[i]->SamplesPerChunk)
-					+ theSampleToChunkArray[i]->FirstChunk;
+			ChunkID = ((pSample - theSampleToChunkArray[i]->TotalPrevSamples)
+				/ theSampleToChunkArray[i]->SamplesPerChunk)
+				+ theSampleToChunkArray[i]->FirstChunk;
 
 			*pOffsetInChunk = (pSample - theSampleToChunkArray[i]->TotalPrevSamples) % theSampleToChunkArray[i]->SamplesPerChunk;
 			
@@ -665,10 +721,15 @@ uint32	STSCAtom::GetChunkForSample(uint32 pSample, uint32 *pOffsetInChunk)
 	return theSampleToChunkArray[theHeader.NoEntries-1]->FirstChunk;
 }
 
-STSSAtom::STSSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+STSSAtom::STSSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	theHeader.NoEntries = 0;
 }
+
 
 STSSAtom::~STSSAtom()
 {
@@ -678,9 +739,11 @@ STSSAtom::~STSSAtom()
 	}
 }
 
-void STSSAtom::OnProcessMetaData()
+
+void
+STSSAtom::OnProcessMetaData()
 {
-SyncSample	*aSyncSample;
+	SyncSample	*aSyncSample;
 
 	FullAtom::OnProcessMetaData();
 
@@ -690,18 +753,22 @@ SyncSample	*aSyncSample;
 		aSyncSample = new SyncSample;
 		
 		Read(&aSyncSample->SyncSampleNo);
-		aSyncSample->SyncSampleNo--;	// First frame is 0 for haiku
+		aSyncSample->SyncSampleNo--; // First frame is 0 for haiku
 
 		theSyncSampleArray.push_back(aSyncSample);
 	}
 }
 
-char *STSSAtom::OnGetAtomName()
+
+const char *
+STSSAtom::OnGetAtomName()
 {
 	return "Sync Sample Atom";
 }
 
-bool	STSSAtom::IsSyncSample(uint32 pSampleNo)
+
+bool
+STSSAtom::IsSyncSample(uint32 pSampleNo)
 {
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
@@ -717,10 +784,15 @@ bool	STSSAtom::IsSyncSample(uint32 pSampleNo)
 	return false;
 }
 
-STSZAtom::STSZAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+STSZAtom::STSZAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	SampleCount = 0;
 }
+
 
 STSZAtom::~STSZAtom()
 {
@@ -730,14 +802,17 @@ STSZAtom::~STSZAtom()
 	}
 }
 
-void STSZAtom::OnProcessMetaData()
+
+void
+STSZAtom::OnProcessMetaData()
 {
 	FullAtom::OnProcessMetaData();
 
 	Read(&SampleSize);
 	Read(&SampleCount);
 
-	// If the sample size is constant there is no array and NoEntries seems to contain bad values
+	// If the sample size is constant there is no array and NoEntries seems to
+	// contain bad values
 	if (SampleSize == 0) {
 		SampleSizePtr	aSampleSizePtr;
 	
@@ -751,12 +826,16 @@ void STSZAtom::OnProcessMetaData()
 	}
 }
 
-char *STSZAtom::OnGetAtomName()
+
+const char *
+STSZAtom::OnGetAtomName()
 {
 	return "Sample Size Atom";
 }
 
-uint32	STSZAtom::GetSizeForSample(uint32 pSampleNo)
+
+uint32
+STSZAtom::GetSizeForSample(uint32 pSampleNo)
 {
 	if (SampleSize > 0) {
 		// All samples are the same size
@@ -772,15 +851,22 @@ uint32	STSZAtom::GetSizeForSample(uint32 pSampleNo)
 	return 0;
 }
 
-bool	STSZAtom::IsSingleSampleSize()
+
+bool
+STSZAtom::IsSingleSampleSize()
 {
 	return (SampleSize > 0);
 }
 
-STZ2Atom::STZ2Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+STZ2Atom::STZ2Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	SampleCount = 0;
 }
+
 
 STZ2Atom::~STZ2Atom()
 {
@@ -790,7 +876,9 @@ STZ2Atom::~STZ2Atom()
 	}
 }
 
-void STZ2Atom::OnProcessMetaData()
+
+void
+STZ2Atom::OnProcessMetaData()
 {
 	FullAtom::OnProcessMetaData();
 
@@ -831,16 +919,20 @@ void STZ2Atom::OnProcessMetaData()
 	}
 }
 
-char *STZ2Atom::OnGetAtomName()
+
+const char *
+STZ2Atom::OnGetAtomName()
 {
 	return "Compressed Sample Size Atom";
 }
 
-uint32	STZ2Atom::GetSizeForSample(uint32 pSampleNo)
-{
-// THIS CODE NEEDS SOME TESTING, never seen a STZ2 atom
 
-uint32	index;
+uint32
+STZ2Atom::GetSizeForSample(uint32 pSampleNo)
+{
+	// THIS CODE NEEDS SOME TESTING, never seen a STZ2 atom
+
+	uint32	index;
 
 	switch (FieldSize) {
 		case 4:
@@ -866,15 +958,22 @@ uint32	index;
 	return theSampleSizeArray[pSampleNo]->EntrySize;
 }
 
-bool	STZ2Atom::IsSingleSampleSize()
+
+bool
+STZ2Atom::IsSingleSampleSize()
 {
 	return false;
 }
 
-STCOAtom::STCOAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+STCOAtom::STCOAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	theHeader.NoEntries = 0;
 }
+
 
 STCOAtom::~STCOAtom()
 {
@@ -884,7 +983,9 @@ STCOAtom::~STCOAtom()
 	}
 }
 
-uint64 STCOAtom::OnGetChunkOffset()
+
+uint64
+STCOAtom::OnGetChunkOffset()
 {
 	uint32 Offset;
 
@@ -894,9 +995,11 @@ uint64 STCOAtom::OnGetChunkOffset()
 	return uint64(Offset);
 }
 
-void STCOAtom::OnProcessMetaData()
+
+void
+STCOAtom::OnProcessMetaData()
 {
-ChunkToOffset	*aChunkToOffset;
+	ChunkToOffset	*aChunkToOffset;
 
 	FullAtom::OnProcessMetaData();
 
@@ -911,32 +1014,42 @@ ChunkToOffset	*aChunkToOffset;
 	}
 }
 
-char *STCOAtom::OnGetAtomName()
+
+const char *
+STCOAtom::OnGetAtomName()
 {
 	return "Chunk to Offset Atom";
 }
 
-uint64	STCOAtom::GetOffsetForChunk(uint32 pChunkIndex)
+
+uint64
+STCOAtom::GetOffsetForChunk(uint32 pChunkIndex)
 {
 	// Chunk Indexes start at 1 
 	if ((pChunkIndex > 0) && (pChunkIndex <= theHeader.NoEntries)) {
 		return theChunkToOffsetArray[pChunkIndex - 1]->Offset;
 	}
 	
-	#ifdef DEBUG
-		char msg[100]; sprintf(msg, "Bad Chunk ID %ld / %ld\n", pChunkIndex, theHeader.NoEntries);
-		DEBUGGER(msg);
-	#endif
+#ifdef DEBUG
+	char msg[100]; sprintf(msg, "Bad Chunk ID %ld / %ld\n", pChunkIndex,
+		theHeader.NoEntries);
+	DEBUGGER(msg);
+#endif
 
 	TRESPASS();
 	return 0LL;
 }
 
-DecoderConfigAtom::DecoderConfigAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+DecoderConfigAtom::DecoderConfigAtom(BPositionIO *pStream, off_t pStreamOffset,
+	uint32 pAtomType, uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	theDecoderConfig = NULL;
 	DecoderConfigSize = 0;
 }
+
 
 DecoderConfigAtom::~DecoderConfigAtom()
 {
@@ -944,6 +1057,7 @@ DecoderConfigAtom::~DecoderConfigAtom()
 		free(theDecoderConfig);
 	}
 }
+
 
 void DecoderConfigAtom::OnProcessMetaData()
 {
@@ -953,12 +1067,17 @@ void DecoderConfigAtom::OnProcessMetaData()
 	Read(theDecoderConfig,DecoderConfigSize);
 }
 
-uint8 *DecoderConfigAtom::GetDecoderConfig()
+
+uint8 *
+DecoderConfigAtom::GetDecoderConfig()
 {
 	return theDecoderConfig;
 }
 
-bool DecoderConfigAtom::SkipTag(uint8 *ESDS, uint8 Tag, uint32 *offset) {
+
+bool
+DecoderConfigAtom::SkipTag(uint8 *ESDS, uint8 Tag, uint32 *offset)
+{
 	uint8 byte;
 
 	byte = ESDS[(*offset)++];
@@ -971,7 +1090,6 @@ bool DecoderConfigAtom::SkipTag(uint8 *ESDS, uint8 Tag, uint32 *offset) {
 			numBytes++;
 			length = (length << 7) | (byte & 0x7F);
 		} while ((byte & 0x80) && numBytes < 4);
-
 	} else {
 		// go back Tag not found
 		(*offset)--;
@@ -981,12 +1099,16 @@ bool DecoderConfigAtom::SkipTag(uint8 *ESDS, uint8 Tag, uint32 *offset) {
 	return true;
 }
 
-char *DecoderConfigAtom::OnGetAtomName()
+
+const char *
+DecoderConfigAtom::OnGetAtomName()
 {
 	return "Decoder Config Atom - Unknown type";
 }
 
-void DecoderConfigAtom::OverrideAudioDescription(AudioDescription *pAudioDescription)
+
+void
+DecoderConfigAtom::OverrideAudioDescription(AudioDescription *pAudioDescription)
 {
 	if (pAudioDescription) {
 		pAudioDescription->DecoderConfigSize = DecoderConfigSize;
@@ -996,7 +1118,9 @@ void DecoderConfigAtom::OverrideAudioDescription(AudioDescription *pAudioDescrip
 	}
 }
 
-void DecoderConfigAtom::OverrideVideoDescription(VideoDescription *pVideoDescription)
+
+void
+DecoderConfigAtom::OverrideVideoDescription(VideoDescription *pVideoDescription)
 {
 	if (pVideoDescription) {
 		pVideoDescription->DecoderConfigSize = DecoderConfigSize;
@@ -1006,15 +1130,22 @@ void DecoderConfigAtom::OverrideVideoDescription(VideoDescription *pVideoDescrip
 	}
 }
 
-ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 ESDSAtom::~ESDSAtom()
 {
 }
 
-void ESDSAtom::OnProcessMetaData()
+
+void
+ESDSAtom::OnProcessMetaData()
 {
 	// Read 4 bytes because this is really a FullAtom
 	uint32 version;
@@ -1022,12 +1153,15 @@ void ESDSAtom::OnProcessMetaData()
 	DecoderConfigAtom::OnProcessMetaData();
 }
 
-char *ESDSAtom::OnGetAtomName()
+
+const char *
+ESDSAtom::OnGetAtomName()
 {
 	return "Extended Sample Description Atom";
 }
 
-char *obj_type_names[]=
+
+const char * obj_type_names[]=
 {
 	"Unknown",
 	"Main-AAC",
@@ -1038,13 +1172,16 @@ char *obj_type_names[]=
 	"HE-AAC(disabled)"
 };
 
+
 int aac_sampling_rate[16] = 
 {
 	96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
 	16000, 12000, 11025, 8000, 7350, 0, 0, 0
 };
 
-void	ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+
+void
+ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 {
 	// decode for aac and check for HE-AAC which uses a framesize of 2048
 	// also check for MP3 which has an ESDS
@@ -1058,7 +1195,8 @@ void	ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 	}
 
 	if (SkipTag(pAudioDescription->theDecoderConfig, 0x04, &offset)) {
-		parser.Init(&pAudioDescription->theDecoderConfig[offset], (pAudioDescription->DecoderConfigSize-offset) * 8);
+		parser.Init(&pAudioDescription->theDecoderConfig[offset],
+			(pAudioDescription->DecoderConfigSize - offset) * 8);
 
 		ESDSType = parser.GetValue(8);
 		StreamType = parser.GetValue(6);
@@ -1082,46 +1220,50 @@ void	ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 
 	switch (ESDSType) {
 		case 64:	// AAC so use AAC Header details to override ESDS values
-		parser.Init(&pAudioDescription->theDecoderConfig[offset], (pAudioDescription->DecoderConfigSize-offset) * 8);
-		
-		// 5 bits are decoder type
-		theAACHeader.objTypeIndex = parser.GetValue(5);
-		if (theAACHeader.objTypeIndex == 31) {
-			theAACHeader.objTypeIndex = 32 + parser.GetValue(6);
-		}
-		// 4 bits are frequency index
-		theAACHeader.sampleRateIndex = parser.GetValue(4);
-		if (theAACHeader.sampleRateIndex == 15) {
-			// Direct encoding of SampleRate
-			SampleRate = parser.GetValue(24);
-		} else {
-			SampleRate = aac_sampling_rate[theAACHeader.sampleRateIndex];
-		}
+			parser.Init(&pAudioDescription->theDecoderConfig[offset],
+				(pAudioDescription->DecoderConfigSize - offset) * 8);
 
-		// 4 bits are channels
-		theAACHeader.totalChannels = parser.GetValue(4);
-		// 1 bit determines small frame size
-		smallFrameSize = (parser.GetValue(1) == 1);
-		
-		if (theAACHeader.objTypeIndex < 3) {
-			pAudioDescription->codecSubType = 'mp4a';
-			pAudioDescription->FrameSize = 1024;
-			if (smallFrameSize) {
-				pAudioDescription->FrameSize = 960;
+			// 5 bits are decoder type
+			theAACHeader.objTypeIndex = parser.GetValue(5);
+			if (theAACHeader.objTypeIndex == 31) {
+				theAACHeader.objTypeIndex = 32 + parser.GetValue(6);
 			}
-		} else {
-			pAudioDescription->codecSubType = 'haac';
-			pAudioDescription->FrameSize = 2048;
-		}
+			// 4 bits are frequency index
+			theAACHeader.sampleRateIndex = parser.GetValue(4);
+			if (theAACHeader.sampleRateIndex == 15) {
+				// Direct encoding of SampleRate
+				SampleRate = parser.GetValue(24);
+			} else {
+				SampleRate = aac_sampling_rate[theAACHeader.sampleRateIndex];
+			}
+
+			// 4 bits are channels
+			theAACHeader.totalChannels = parser.GetValue(4);
+			// 1 bit determines small frame size
+			smallFrameSize = (parser.GetValue(1) == 1);
+		
+			if (theAACHeader.objTypeIndex < 3) {
+				pAudioDescription->codecSubType = 'mp4a';
+				pAudioDescription->FrameSize = 1024;
+				if (smallFrameSize) {
+					pAudioDescription->FrameSize = 960;
+				}
+			} else {
+				pAudioDescription->codecSubType = 'haac';
+				pAudioDescription->FrameSize = 2048;
+			}
 	
-		// Override STSD
-		pAudioDescription->theAudioSampleEntry.SampleRate = SampleRate;
-		pAudioDescription->theAudioSampleEntry.ChannelCount = theAACHeader.totalChannels;
+			// Override STSD
+			pAudioDescription->theAudioSampleEntry.SampleRate = SampleRate;
+			pAudioDescription->theAudioSampleEntry.ChannelCount =
+				theAACHeader.totalChannels;
 		
-		// Reset decoder Config memory
-		memcpy(pAudioDescription->theDecoderConfig, &pAudioDescription->theDecoderConfig[extendedAudioConfig], pAudioDescription->DecoderConfigSize-extendedAudioConfig+1);
+			// Reset decoder Config memory
+			memcpy(pAudioDescription->theDecoderConfig,
+				&pAudioDescription->theDecoderConfig[extendedAudioConfig],
+				pAudioDescription->DecoderConfigSize - extendedAudioConfig + 1);
 		
-		break;
+			break;
 		
 		case 107:	// MP3
 			pAudioDescription->codecSubType = '.mp3';
@@ -1135,128 +1277,185 @@ void	ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 	}
 }
 
-void	ESDSAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+
+void
+ESDSAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
 {
 	// Nothing to override
 }
 
-ALACAtom::ALACAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+ALACAtom::ALACAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 ALACAtom::~ALACAtom()
 {
 }
 
-void ALACAtom::OnProcessMetaData()
+
+void
+ALACAtom::OnProcessMetaData()
 {
 	DecoderConfigAtom::OnProcessMetaData();
 }
 
-char *ALACAtom::OnGetAtomName()
+
+const char *
+ALACAtom::OnGetAtomName()
 {
 	return "ALAC Decoder Config Atom";
 }
 
-void ALACAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+
+void
+ALACAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 {
 	pAudioDescription->codecSubType = 'alac';
 	pAudioDescription->FrameSize = 4096;
 }
 
-void	ALACAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+
+void
+ALACAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
 {
 	// Nothing to override
 }
 
-WAVEAtom::WAVEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+WAVEAtom::WAVEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 WAVEAtom::~WAVEAtom()
 {
 }
 
-void WAVEAtom::OnProcessMetaData()
+
+void
+WAVEAtom::OnProcessMetaData()
 {
 }
 
-char *WAVEAtom::OnGetAtomName()
+
+const char *
+WAVEAtom::OnGetAtomName()
 {
 	return "WAVE Decoder Config Atom";
 }
 
-void WAVEAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+
+void 
+WAVEAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 {
 	pAudioDescription->codecSubType = '.mp3';
 	pAudioDescription->FrameSize = 1;
 }
 
-void	WAVEAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+
+void
+WAVEAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
 {
 	// Nothing to override
 }
 
-DAC3Atom::DAC3Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+DAC3Atom::DAC3Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 DAC3Atom::~DAC3Atom()
 {
 }
 
-void DAC3Atom::OnProcessMetaData()
+
+void
+DAC3Atom::OnProcessMetaData()
 {
 	DecoderConfigAtom::OnProcessMetaData();
 }
 
-void DAC3Atom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+
+void
+DAC3Atom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 {
 	pAudioDescription->codecSubType = 'dac3';
 	pAudioDescription->FrameSize = 1536;
 }
 
-void	DAC3Atom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+
+void
+DAC3Atom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
 {
 	// Nothing to override
 }
 
-char *DAC3Atom::OnGetAtomName()
+
+const char *
+DAC3Atom::OnGetAtomName()
 {
 	return "Digital AC3";
 }
 
-DEC3Atom::DEC3Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+DEC3Atom::DEC3Atom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	DecoderConfigAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 DEC3Atom::~DEC3Atom()
 {
 }
 
-void DEC3Atom::OnProcessMetaData()
+
+void
+DEC3Atom::OnProcessMetaData()
 {
 	DecoderConfigAtom::OnProcessMetaData();
 }
 
-void DEC3Atom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+
+void
+DEC3Atom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 {
 	pAudioDescription->codecSubType = 'dec3';
 	pAudioDescription->FrameSize = 1536;
 }
 
-void	DEC3Atom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+
+void
+DEC3Atom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
 {
 	// Nothing to override
 }
 
-char *DEC3Atom::OnGetAtomName()
+
+const char *
+DEC3Atom::OnGetAtomName()
 {
 	return "Digital EAC3";
 }
 
 
-STSDAtom::STSDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+STSDAtom::STSDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	theHeader.NoEntries = 0;
 	theAudioDescription.codecid = 0;
@@ -1267,6 +1466,7 @@ STSDAtom::STSDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, 
 	theAudioDescription.theDecoderConfig = NULL;
 	theVideoDescription.theDecoderConfig = NULL;
 }
+
 
 STSDAtom::~STSDAtom()
 {
@@ -1281,17 +1481,23 @@ STSDAtom::~STSDAtom()
 	}
 }
 
-uint32	STSDAtom::GetMediaHandlerType()
+
+uint32
+STSDAtom::GetMediaHandlerType()
 {
 	return dynamic_cast<STBLAtom *>(GetParent())->GetMediaHandlerType();
 }
 
-void STSDAtom::ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigSize, AudioDescription *pAudioDescription, VideoDescription *pVideoDescription)
+
+void
+STSDAtom::ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigSize,
+	AudioDescription *pAudioDescription, VideoDescription *pVideoDescription)
 {
 	// Check for a Decoder Config and if it exists copy it back to the caller
-	// MPEG-4 video/audio use the various decoder config structures to pass additional
-	// decoder information to the decoder.  The extractor sometimes needs to decode the data
-	// to work out how to properly construct the decoder
+	// MPEG-4 video/audio use the various decoder config structures to pass
+	// additional decoder information to the decoder.  The extractor sometimes
+	// needs to decode the data to work out how to properly construct the
+	// decoder
 	
 	// First make sure we have a something
 	if (GetBytesRemaining() > 0) {
@@ -1303,7 +1509,8 @@ void STSDAtom::ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigS
 
 		if (dynamic_cast<DecoderConfigAtom *>(aAtomBase)) {
 			// DecoderConfig atom good
-			DecoderConfigAtom *aDecoderConfigAtom = dynamic_cast<DecoderConfigAtom *>(aAtomBase);
+			DecoderConfigAtom *aDecoderConfigAtom = 
+				dynamic_cast<DecoderConfigAtom *>(aAtomBase);
 			aDecoderConfigAtom->OverrideAudioDescription(pAudioDescription);
 			aDecoderConfigAtom->OverrideVideoDescription(pVideoDescription);
 
@@ -1316,7 +1523,9 @@ void STSDAtom::ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigS
 	}
 }
 
-void STSDAtom::ReadSoundDescription()
+
+void
+STSDAtom::ReadSoundDescription()
 {
 	Read(&theAudioDescription.theAudioSampleEntry.Reserved[1]);
 	Read(&theAudioDescription.theAudioSampleEntry.Reserved[2]);
@@ -1326,12 +1535,17 @@ void STSDAtom::ReadSoundDescription()
 	Read(&theAudioDescription.theAudioSampleEntry.reserved);
 	Read(&theAudioDescription.theAudioSampleEntry.SampleRate);
 	
-	theAudioDescription.theAudioSampleEntry.SampleRate = theAudioDescription.theAudioSampleEntry.SampleRate / 65536; 	// Convert from fixed point decimal to float
+	theAudioDescription.theAudioSampleEntry.SampleRate =
+		theAudioDescription.theAudioSampleEntry.SampleRate / 65536;
+		// Convert from fixed point decimal to float
 	
-	ReadDecoderConfig(&theAudioDescription.theDecoderConfig, &theAudioDescription.DecoderConfigSize, &theAudioDescription, NULL);
+	ReadDecoderConfig(&theAudioDescription.theDecoderConfig,
+		&theAudioDescription.DecoderConfigSize, &theAudioDescription, NULL);
 }
 
-void STSDAtom::ReadVideoDescription()
+
+void
+STSDAtom::ReadVideoDescription()
 {
 	Read(&theVideoDescription.theVideoSampleEntry.pre_defined1);
 	Read(&theVideoDescription.theVideoSampleEntry.reserved1);
@@ -1350,9 +1564,11 @@ void STSDAtom::ReadVideoDescription()
 	// convert from pascal string (first bytes size) to C string (null terminated)
 	uint8 size = (uint8)(theVideoDescription.theVideoSampleEntry.CompressorName[0]);
 	if (size > 0 && size < 32) {
-		memmove(&theVideoDescription.theVideoSampleEntry.CompressorName[0],&theVideoDescription.theVideoSampleEntry.CompressorName[1],size);
+		memmove(&theVideoDescription.theVideoSampleEntry.CompressorName[0],
+			&theVideoDescription.theVideoSampleEntry.CompressorName[1],size);
 		theVideoDescription.theVideoSampleEntry.CompressorName[size] = '\0';
-		printf("Compressed using %s\n",theVideoDescription.theVideoSampleEntry.CompressorName);
+		printf("Compressed using %s\n",
+			theVideoDescription.theVideoSampleEntry.CompressorName);
 	}
 	
 	Read(&theVideoDescription.theVideoSampleEntry.Depth);
@@ -1361,9 +1577,10 @@ void STSDAtom::ReadVideoDescription()
 	ReadDecoderConfig(&theVideoDescription.theDecoderConfig, &theVideoDescription.DecoderConfigSize, NULL, &theVideoDescription);
 }
 
-void STSDAtom::OnProcessMetaData()
-{
 
+void
+STSDAtom::OnProcessMetaData()
+{
 	FullAtom::OnProcessMetaData();
 
 	ReadArrayHeader(&theHeader);
@@ -1396,11 +1613,14 @@ void STSDAtom::OnProcessMetaData()
 	}
 }
 
-VideoDescription STSDAtom::GetAsVideo()
+
+VideoDescription
+STSDAtom::GetAsVideo()
 {
 	// Assert IsVideo
 	return theVideoDescription;
 }
+
 
 AudioDescription STSDAtom::GetAsAudio()
 {
@@ -1408,55 +1628,82 @@ AudioDescription STSDAtom::GetAsAudio()
 	return theAudioDescription;
 }
 
-char *STSDAtom::OnGetAtomName()
+
+const char *
+STSDAtom::OnGetAtomName()
 {
 	return "Sample Description Atom";
 }
 
-TMCDAtom::TMCDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+TMCDAtom::TMCDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 TMCDAtom::~TMCDAtom()
 {
 }
 
-void TMCDAtom::OnProcessMetaData()
+
+void
+TMCDAtom::OnProcessMetaData()
 {
 }
 
-char *TMCDAtom::OnGetAtomName()
+
+const char *
+TMCDAtom::OnGetAtomName()
 {
 	return "TimeCode Atom";
 }
 
-WIDEAtom::WIDEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+WIDEAtom::WIDEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 WIDEAtom::~WIDEAtom()
 {
 }
 
-void WIDEAtom::OnProcessMetaData()
+
+void
+WIDEAtom::OnProcessMetaData()
 {
 }
 
-char *WIDEAtom::OnGetAtomName()
+
+const char *
+WIDEAtom::OnGetAtomName()
 {
 	return "WIDE Atom";
 }
 
-FTYPAtom::FTYPAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+FTYPAtom::FTYPAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	total_brands = 0;
 }
+
 
 FTYPAtom::~FTYPAtom()
 {
 }
 
-void FTYPAtom::OnProcessMetaData()
+
+void
+FTYPAtom::OnProcessMetaData()
 {
 	Read(&major_brand);
 	Read(&minor_version);
@@ -1473,12 +1720,15 @@ void FTYPAtom::OnProcessMetaData()
 
 }
 
-char *FTYPAtom::OnGetAtomName()
+
+const char *
+FTYPAtom::OnGetAtomName()
 {
 	return "File type Atom";
 }
 
-bool	FTYPAtom::HasBrand(uint32 brand)
+bool
+FTYPAtom::HasBrand(uint32 brand)
 {
 
 	if (major_brand == brand) {
@@ -1495,149 +1745,225 @@ bool	FTYPAtom::HasBrand(uint32 brand)
 	return false;	
 }
 
-FREEAtom::FREEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+FREEAtom::FREEAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 FREEAtom::~FREEAtom()
 {
 }
 
-void FREEAtom::OnProcessMetaData()
+
+void
+FREEAtom::OnProcessMetaData()
 {
 }
 
-char *FREEAtom::OnGetAtomName()
+
+const char *
+FREEAtom::OnGetAtomName()
 {
 	return "Free Atom";
 }
 
-PNOTAtom::PNOTAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+PNOTAtom::PNOTAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 PNOTAtom::~PNOTAtom()
 {
 }
 
-void PNOTAtom::OnProcessMetaData()
+
+void
+PNOTAtom::OnProcessMetaData()
 {
 }
 
-char *PNOTAtom::OnGetAtomName()
+
+const char *
+PNOTAtom::OnGetAtomName()
 {
 	return "Preview Atom";
 }
 
-SKIPAtom::SKIPAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+SKIPAtom::SKIPAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 SKIPAtom::~SKIPAtom()
 {
 }
 
-void SKIPAtom::OnProcessMetaData()
+
+void
+SKIPAtom::OnProcessMetaData()
 {
 }
 
-char *SKIPAtom::OnGetAtomName()
+
+const char *
+SKIPAtom::OnGetAtomName()
 {
 	return "Skip Atom";
 }
 
-MDATAtom::MDATAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+MDATAtom::MDATAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomBase(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 MDATAtom::~MDATAtom()
 {
 }
 
-void MDATAtom::OnProcessMetaData()
+
+void
+MDATAtom::OnProcessMetaData()
 {
 }
 
-char *MDATAtom::OnGetAtomName()
+
+const char *
+MDATAtom::OnGetAtomName()
 {
 	return "Media Data Atom";
 }
 
-off_t	MDATAtom::GetEOF()
+
+off_t
+MDATAtom::GetEOF()
 {
 	return GetAtomOffset() + GetAtomSize() - 8;
 }
 
-MINFAtom::MINFAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+MINFAtom::MINFAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 MINFAtom::~MINFAtom()
 {
 }
 
-void MINFAtom::OnProcessMetaData()
+
+void
+MINFAtom::OnProcessMetaData()
 {
 }
 
-char *MINFAtom::OnGetAtomName()
+
+const char *
+MINFAtom::OnGetAtomName()
 {
 	return "MPEG-4 Media Information Atom";
 }
 
-uint32 MINFAtom::GetMediaHandlerType()
+
+uint32
+MINFAtom::GetMediaHandlerType()
 {
 	return dynamic_cast<MDIAAtom *>(GetParent())->GetMediaHandlerType();
 }
 
-STBLAtom::STBLAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+STBLAtom::STBLAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 STBLAtom::~STBLAtom()
 {
 }
 
-void STBLAtom::OnProcessMetaData()
+
+void
+STBLAtom::OnProcessMetaData()
 {
 }
 
-char *STBLAtom::OnGetAtomName()
+
+const char *
+STBLAtom::OnGetAtomName()
 {
 	return "MPEG-4 Sample Table Atom";
 }
 
-uint32 STBLAtom::GetMediaHandlerType()
+
+uint32
+STBLAtom::GetMediaHandlerType()
 {
 	return dynamic_cast<MINFAtom *>(GetParent())->GetMediaHandlerType();
 }
 
-DINFAtom::DINFAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+DINFAtom::DINFAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 DINFAtom::~DINFAtom()
 {
 }
 
-void DINFAtom::OnProcessMetaData()
+
+void
+DINFAtom::OnProcessMetaData()
 {
 }
 
-char *DINFAtom::OnGetAtomName()
+
+const char *
+DINFAtom::OnGetAtomName()
 {
 	return "MPEG-4 Data Information Atom";
 }
 
-TKHDAtom::TKHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+TKHDAtom::TKHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 TKHDAtom::~TKHDAtom()
 {
 }
 
-void TKHDAtom::OnProcessMetaData()
+
+void
+TKHDAtom::OnProcessMetaData()
 {
 
 	FullAtom::OnProcessMetaData();
@@ -1674,7 +2000,6 @@ void TKHDAtom::OnProcessMetaData()
 		theHeader.Volume = aHeaderV0.Volume;
 		theHeader.TrackWidth = aHeaderV0.TrackWidth;
 		theHeader.TrackHeight = aHeaderV0.TrackHeight;
-
 	} else {
 		Read(&theHeader.CreationTime);
 		Read(&theHeader.ModificationTime);
@@ -1688,39 +2013,50 @@ void TKHDAtom::OnProcessMetaData()
 		Read(&theHeader.Volume);
 		Read(&theHeader.Reserved3);
 
-		for (uint32 i=0;i<9;i++) {
+		for (uint32 i=0;i<9;i++)
 			Read(&theHeader.MatrixStructure[i]);
-		}
 
 		Read(&theHeader.TrackWidth);
 		Read(&theHeader.TrackHeight);
 	}
-
 }
 
-char *TKHDAtom::OnGetAtomName()
+
+const char *
+TKHDAtom::OnGetAtomName()
 {
 	return "MPEG-4 Track Header";
 }
 
-MDIAAtom::MDIAAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+MDIAAtom::MDIAAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	AtomContainer(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 MDIAAtom::~MDIAAtom()
 {
 }
 
-void MDIAAtom::OnProcessMetaData()
+
+void
+MDIAAtom::OnProcessMetaData()
 {
 }
 
-char *MDIAAtom::OnGetAtomName()
+
+const char *
+MDIAAtom::OnGetAtomName()
 {
 	return "MPEG-4 Media Atom";
 }
 
-uint32 MDIAAtom::GetMediaHandlerType()
+
+uint32
+MDIAAtom::GetMediaHandlerType()
 {
 	// Get child atom hdlr
 	HDLRAtom *aHDLRAtom;
@@ -1733,15 +2069,22 @@ uint32 MDIAAtom::GetMediaHandlerType()
 	return 0;
 }
 
-MDHDAtom::MDHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+MDHDAtom::MDHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 MDHDAtom::~MDHDAtom()
 {
 }
 
-void MDHDAtom::OnProcessMetaData()
+
+void
+MDHDAtom::OnProcessMetaData()
 {
 	FullAtom::OnProcessMetaData();
 
@@ -1770,25 +2113,36 @@ void MDHDAtom::OnProcessMetaData()
 	}
 }
 
-char *MDHDAtom::OnGetAtomName()
+
+const char *
+MDHDAtom::OnGetAtomName()
 {
 	return "MPEG-4 Media Header";
 }
 
-bigtime_t	MDHDAtom::GetDuration() 
+
+bigtime_t
+MDHDAtom::GetDuration() 
 {
 	return bigtime_t((theHeader.Duration * 1000000.0) / theHeader.TimeScale);
 }
 
-uint32		MDHDAtom::GetTimeScale()
+
+uint32
+MDHDAtom::GetTimeScale()
 {
 	return theHeader.TimeScale;
 }
 
-HDLRAtom::HDLRAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+HDLRAtom::HDLRAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 	name = NULL;
 }
+
 
 HDLRAtom::~HDLRAtom()
 {
@@ -1797,7 +2151,9 @@ HDLRAtom::~HDLRAtom()
 	}
 }
 
-void HDLRAtom::OnProcessMetaData()
+
+void
+HDLRAtom::OnProcessMetaData()
 {
 	FullAtom::OnProcessMetaData();
 
@@ -1812,35 +2168,50 @@ void HDLRAtom::OnProcessMetaData()
 	Read(name,GetBytesRemaining());
 }
 
-char *HDLRAtom::OnGetAtomName()
+
+const char *
+HDLRAtom::OnGetAtomName()
 {
 	return "MPEG-4 Handler Reference Atom ";
 }
 
-bool HDLRAtom::IsVideoHandler()
+
+bool
+HDLRAtom::IsVideoHandler()
 {
 	return (theHeader.handler_type == 'vide');
 }
 
-bool HDLRAtom::IsAudioHandler()
+
+bool
+HDLRAtom::IsAudioHandler()
 {
 	return (theHeader.handler_type == 'soun');
 }
 
-uint32 HDLRAtom::GetMediaHandlerType()
+
+uint32
+HDLRAtom::GetMediaHandlerType()
 {
 	return theHeader.handler_type;
 }
 
-VMHDAtom::VMHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+VMHDAtom::VMHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 VMHDAtom::~VMHDAtom()
 {
 }
 
-void VMHDAtom::OnProcessMetaData()
+
+void
+VMHDAtom::OnProcessMetaData()
 {
 	FullAtom::OnProcessMetaData();
 
@@ -1850,20 +2221,29 @@ void VMHDAtom::OnProcessMetaData()
 	Read(&theHeader.OpColour[2]);
 }
 
-char *VMHDAtom::OnGetAtomName()
+
+const char *
+VMHDAtom::OnGetAtomName()
 {
 	return "MPEG-4 Video Media Header";
 }
 
-SMHDAtom::SMHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType, uint64 pAtomSize) : FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
+
+SMHDAtom::SMHDAtom(BPositionIO *pStream, off_t pStreamOffset, uint32 pAtomType,
+	uint64 pAtomSize)
+	:
+	FullAtom(pStream, pStreamOffset, pAtomType, pAtomSize)
 {
 }
+
 
 SMHDAtom::~SMHDAtom()
 {
 }
 
-void SMHDAtom::OnProcessMetaData()
+
+void
+SMHDAtom::OnProcessMetaData()
 {
 	FullAtom::OnProcessMetaData();
 
@@ -1871,7 +2251,9 @@ void SMHDAtom::OnProcessMetaData()
 	Read(&theHeader.Reserved);
 }
 
-char *SMHDAtom::OnGetAtomName()
+
+const char *
+SMHDAtom::OnGetAtomName()
 {
 	return "MPEG-4 Sound Media Header";
 }
