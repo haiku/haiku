@@ -124,7 +124,8 @@ stack_trace(int argc, char **argv)
 
 	if (argc < 2) {
 		thread = thread_get_current_thread();
-		framePointer = (addr_t)get_current_stack_frame()->previous;
+		int32 cpu = smp_get_current_cpu();
+		framePointer = debug_get_debug_registers(cpu)->r1;
 	} else {
 // TODO: Add support for stack traces of other threads.
 /*		thread_id id = strtoul(argv[1], NULL, 0);
