@@ -114,7 +114,7 @@ PartitionMapAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
 {
 	if (!CanInitialize(partition)
-		|| parameters != NULL && strlen(parameters) > 0) {
+		|| (parameters != NULL && strlen(parameters) > 0)) {
 		return B_BAD_VALUE;
 	}
 
@@ -132,8 +132,8 @@ PartitionMapAddOn::Initialize(BMutablePartition* partition, const char* name,
 	const char* parameters, BPartitionHandle** _handle)
 {
 	if (!CanInitialize(partition)
-		|| name != NULL && strlen(name) > 0
-		|| parameters != NULL && strlen(parameters) > 0) {
+		|| (name != NULL && strlen(name) > 0)
+		|| (parameters != NULL && strlen(parameters) > 0)) {
 		return B_BAD_VALUE;
 	}
 
@@ -382,8 +382,8 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 		info.GetPartitionableSpaceAt(i, &spaceOffset, &spaceSize);
 		off_t spaceEnd = spaceOffset + spaceSize;
 
-		if (spaceOffset >= offset && spaceOffset < end
-			|| offset >= spaceOffset && offset < spaceEnd) {
+		if ((spaceOffset >= offset && spaceOffset < end)
+			|| (offset >= spaceOffset && offset < spaceEnd)) {
 			spaceIndex = i;
 			break;
 		}
