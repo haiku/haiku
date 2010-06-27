@@ -35,7 +35,7 @@ class GLRendererRoster;
 
 class BGLView : public BView {
 public:
-					BGLView(BRect rect, char* name,
+					BGLView(BRect rect, const char* name,
 						ulong resizingMode, ulong mode,
 						ulong options);
 	virtual			~BGLView();
