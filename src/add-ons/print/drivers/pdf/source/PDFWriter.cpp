@@ -420,7 +420,7 @@ status_t
 PDFWriter::DeclareFonts()
 {
 	char buffer[1024];
-	char *parameter_name;
+	const char *parameter_name;
 
 	for (int i = 0; i < fFonts->Length(); i++) {
 		FontFile* f = fFonts->At(i);

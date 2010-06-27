@@ -74,7 +74,7 @@ class WebLink : public Link {
 
 	enum kind  fKind;
 
-	static char* fURLPrefix[];
+	static const char* fURLPrefix[];
 
 	bool IsValidStart(const char* cp);
 	bool IsValidChar(const char* cp);

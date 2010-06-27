@@ -78,7 +78,7 @@ Link::Do() {
 }
 
 // TODO: check this list and add more prefixes
-char* WebLink::fURLPrefix[] = {
+const char* WebLink::fURLPrefix[] = {
 	"http://",
 	"https://",
 	"ftp://",
@@ -128,7 +128,7 @@ bool
 WebLink::DetectUrlWithPrefix(int start)
 {
 	int pos = INT_MAX;
-	char* prefix = NULL;
+	const char* prefix = NULL;
 	const char* utf8 = fUtf8->String();
 
 	// search prefix with smallest position

@@ -34,15 +34,17 @@ THE SOFTWARE.
 #include <Message.h>
 #include <Box.h>
 
+
 static const uint32 kCancelMsg = 'cncl';
 static const uint32 kProgressMsg = 'prgs'; 
 
-// --------------------------------------------------
+
 StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd) 
-	:	HWindow(BRect(100, 100, 700, 600), "PDF Writer", 
-			B_TITLED_WINDOW, 
-			B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_NOT_CLOSABLE|B_FRAME_EVENTS,
-			B_CURRENT_WORKSPACE, kCancelMsg) 
+	:
+	HWindow(BRect(100, 100, 700, 600), "PDF Writer", 
+	B_TITLED_WINDOW, 
+	B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_NOT_CLOSABLE|B_FRAME_EVENTS,
+	B_CURRENT_WORKSPACE, kCancelMsg) 
 {
 	fPass = 0;
 	fPages = pages;
@@ -52,19 +54,20 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 	fCloseSem = -1;
 	int32 closeOption;
 
-	if (pd->JobMsg()->FindInt32("close_option", &closeOption) != B_OK) closeOption = kNever;
+	if (pd->JobMsg()->FindInt32("close_option", &closeOption) != B_OK)
+		closeOption = kNever;
 	fCloseOption = (CloseOption)closeOption;
 	
 	BRect r(0, 0, Frame().Width(), Frame().Height());
 
 	// view for the background color
 	BView *fPanel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
-					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-					B_PLAIN_BORDER);
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
 	AddChild(fPanel);
 
 	r.Set(10, 12, Frame().Width()-5, 22);
-	fPageLabel = new BStringView(r, "page_text", "Page", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fPageLabel = new BStringView(r, "page_text", "Page",
+		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 	fPanel->AddChild(fPageLabel);
 
 	r.Set(10, 15, 300-10, 10);
@@ -76,8 +79,8 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 	// add a "Cancel" button
 	int32 x = 110;
 	int32 y = 55;
-	fCancel 	= new BButton(BRect(x, y, x + 100, y + 20), NULL, "Cancel", 
-				new BMessage(kCancelMsg), B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS);
+	fCancel	= new BButton(BRect(x, y, x + 100, y + 20), NULL, "Cancel", 
+		new BMessage(kCancelMsg), B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS);
 	fCancel->ResizeToPreferred();
 	fPanel->AddChild(fCancel);
 
@@ -94,7 +97,7 @@ StatusWindow::StatusWindow(int32 passes, int32 pages, PrinterDriver *pd)
 	Show();
 }
 
-// --------------------------------------------------
+
 void 
 StatusWindow::MessageReceived(BMessage *msg) 
 {
@@ -108,7 +111,7 @@ StatusWindow::MessageReceived(BMessage *msg)
 				release_sem(fCloseSem);
 			}
 			break;
-			
+
 		case kProgressMsg:
 			fPage = "";
 			if (fPass == 0) 
@@ -124,13 +127,16 @@ StatusWindow::MessageReceived(BMessage *msg)
 			fPageStatus->Update(1);
 			UpdateReport();
 			break;
+
 		default:
 			inherited::MessageReceived(msg);
 	}
 }
 
 
-void StatusWindow::UpdateReport() {
+void
+StatusWindow::UpdateReport()
+{
 	Report* r = Report::Instance();
 	const int32 n = r->CountItems();
 	const bool update = fReportIndex < n;
@@ -173,19 +179,24 @@ void StatusWindow::UpdateReport() {
 	}
 }
 
+
 void
-StatusWindow::NextPage() {
+StatusWindow::NextPage()
+{
 	PostMessage(kProgressMsg);
 }
 
+
 void 
-StatusWindow::WaitForClose() {
+StatusWindow::WaitForClose()
+{
 	fCloseSem = create_sem(0, "close_sem");
 	
 	Lock();
 		Report* r = Report::Instance();
 		char b[80];
-		sprintf(b, "%d Infos, %d Warnings, %d Errors", r->Count(kInfo), r->Count(kWarning), r->Count(kError)); 
+		sprintf(b, "%d Infos, %d Warnings, %d Errors", r->Count(kInfo),
+			r->Count(kWarning), r->Count(kError)); 
 		fPageLabel->SetText(b);
 		fCancel->SetLabel("Close");
 		fCancel->SetEnabled(true);
@@ -195,10 +206,11 @@ StatusWindow::WaitForClose() {
 		bool hasErrorsOrWarnings = hasErrors || r->Count(kWarning);
 		bool hasErrorsWarningsOrInfo = hasErrorsOrWarnings || r->Count(kInfo);
 		
-		if (fCloseOption == kAlways || 
-			fCloseOption == kNoErrors && !hasErrors ||
-			fCloseOption == kNoErrorsOrWarnings && !hasErrorsOrWarnings ||
-			fCloseOption == kNoErrorsWarningsOrInfo && !hasErrorsWarningsOrInfo) {
+		if (fCloseOption == kAlways
+			|| (fCloseOption == kNoErrors && !hasErrors)
+			|| (fCloseOption == kNoErrorsOrWarnings && !hasErrorsOrWarnings)
+			|| (fCloseOption == kNoErrorsWarningsOrInfo 
+			&& !hasErrorsWarningsOrInfo)) {
 			PostMessage(kCancelMsg);
 		}
 	Unlock();
