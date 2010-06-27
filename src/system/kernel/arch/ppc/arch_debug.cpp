@@ -258,6 +258,9 @@ return 0;
 void
 arch_debug_save_registers(struct arch_debug_registers* registers)
 {
+	// get the caller's frame pointer
+	stack_frame* frame = (stack_frame*)get_current_stack_frame();
+	registers->r1 = (addr_t)frame->previous;
 }
 
 

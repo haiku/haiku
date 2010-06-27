@@ -10,6 +10,7 @@
 
 
 struct arch_debug_registers {
+	addr_t r1;
 };
 
 
