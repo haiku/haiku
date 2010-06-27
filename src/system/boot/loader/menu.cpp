@@ -670,7 +670,7 @@ add_safe_mode_menu()
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable IDE DMA"));
 	item->SetData(B_SAFEMODE_DISABLE_IDE_DMA);
 	item->SetType(MENU_ITEM_MARKABLE);
-    item->SetHelpText("Disables IDE DMA, increasing IDE compatibilty "
+    item->SetHelpText("Disables IDE DMA, increasing IDE compatibility "
 		"at the expense of performance.");
 
 #if B_HAIKU_PHYSICAL_BITS > 32
