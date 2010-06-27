@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-extern void fatalerror(char *);
+extern void fatalerror(const char *);
 
 #define DEBUGGING 1
 

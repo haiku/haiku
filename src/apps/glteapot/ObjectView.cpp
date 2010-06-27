@@ -127,7 +127,8 @@ simonThread(void* cookie)
 }
 
 
-ObjectView::ObjectView(BRect rect, char *name, ulong resizingMode, ulong options)
+ObjectView::ObjectView(BRect rect, const char *name, ulong resizingMode,
+	ulong options)
 	: BGLView(rect, name, resizingMode, 0, options),
 	fHistEntries(0),
 	fOldestEntry(0),

@@ -53,8 +53,8 @@ struct TrackingInfo {
 
 class ObjectView : public BGLView {
 	public:
-						ObjectView(BRect rect, char* name, ulong resizingMode,
-							ulong options);
+						ObjectView(BRect rect, const char* name,
+							ulong resizingMode, ulong options);
 						~ObjectView();
 
 		virtual	void	MouseDown(BPoint point);

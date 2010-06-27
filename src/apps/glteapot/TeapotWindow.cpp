@@ -11,8 +11,10 @@
 
 #include "TeapotWindow.h"
 
-TeapotWindow::TeapotWindow(BRect rect, char* name, window_type wt, ulong something)
-	: BDirectWindow(rect, name, wt, something)
+TeapotWindow::TeapotWindow(BRect rect, const char* name, window_type wt,
+	ulong something)
+	:
+	BDirectWindow(rect, name, wt, something)
 {
 	GLenum type = BGL_RGB | BGL_DEPTH | BGL_DOUBLE;
 	
