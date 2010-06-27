@@ -55,6 +55,8 @@ clear_bss(void)
 static void 
 determine_machine(void)
 {
+	gMachine = MACHINE_UNKNOWN;
+
 	int root = of_finddevice("/");
 	char buffer[64];
 	int length;
@@ -63,8 +65,6 @@ determine_machine(void)
 	buffer[length] = '\0';
 
 	// ToDo: add more, and be as generic as possible
-
-	gMachine = MACHINE_UNKNOWN;
 
 	if (!strcasecmp("chrp", buffer))
 		gMachine = MACHINE_CHRP;
