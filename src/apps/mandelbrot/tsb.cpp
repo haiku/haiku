@@ -94,7 +94,7 @@ void	TShowBit::set_iter(long it)
 
 void	TShowBit::set_palette(long code)
 {
-	rgb_color	c;
+	rgb_color	c = {0, 0, 0, 255};
 	long		i;
 	
 	BScreen screen( Window() );
@@ -327,7 +327,7 @@ void	TShowBit::mandb(double vx, double vy, double sx, double sy)
 	long	x, y;
 	long	bx;
 	double	cx, cy;
-	char	v;
+	int		v;
 	uchar	*bits = (uchar *)the_bitmap->Bits();
 	uchar	*b0;
 	long	y12;
@@ -390,7 +390,7 @@ void	TShowBit::manda(double vx, double vy, double sx, double sy)
 	long	x, y;
 	long	bx;
 	double	cx, cy;
-	char	v;
+	int		v;
 	uchar	*bits = (uchar *)the_bitmap->Bits();
 	uchar	*b0;
 	long	y12;

@@ -29,7 +29,7 @@
 
 class TMainWindow : public BWindow {
 	public:
-		TMainWindow(BRect bound, char* name, window_type type,
+		TMainWindow(BRect bound, const char* name, window_type type,
 			long flags);
 		virtual ~TMainWindow();
 
@@ -44,7 +44,8 @@ class TMainWindow : public BWindow {
 };
 
 
-TMainWindow::TMainWindow(BRect bound, char* name, window_type type, long flags)
+TMainWindow::TMainWindow(BRect bound, const char* name, window_type type,
+	long flags)
 	: BWindow(bound, name, type, flags)
 {
 	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 1000, 15), "MB");
