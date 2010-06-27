@@ -559,7 +559,8 @@ of_milliseconds(void)
 		int			milliseconds;
 	} args = {"milliseconds", 0, 1, 0};
 
-	gCallOpenFirmware(&args);
+	if (gCallOpenFirmware(&args) == OF_FAILED)
+		return OF_FAILED;
 
 	return args.milliseconds;
 }
