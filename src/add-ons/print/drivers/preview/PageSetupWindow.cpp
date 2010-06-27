@@ -56,7 +56,7 @@
 
 static struct
 {
-	char  *label;
+	const char * label;
 	float width;
 	float height;
 } pageFormat[] =
@@ -79,7 +79,7 @@ static struct
 
 static struct
 {
-	char  *label;
+	const char * label;
 	int32 orientation;
 } orientation[] =
 {
