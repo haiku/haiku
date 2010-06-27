@@ -180,7 +180,7 @@ Prefs::GetMiniWindowRect()
 
 
 bool
-Prefs::GetInt(char *name, int *value, int *defaultvalue)
+Prefs::GetInt(const char *name, int *value, int *defaultvalue)
 {
 	status_t err = fFile->ReadAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err == B_ENTRY_NOT_FOUND) {
@@ -199,7 +199,7 @@ Prefs::GetInt(char *name, int *value, int *defaultvalue)
 
 
 bool
-Prefs::GetBool(char *name, bool *value, bool *defaultvalue)
+Prefs::GetBool(const char *name, bool *value, bool *defaultvalue)
 {
 	status_t err = fFile->ReadAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err == B_ENTRY_NOT_FOUND) {
@@ -218,7 +218,7 @@ Prefs::GetBool(char *name, bool *value, bool *defaultvalue)
 
 
 bool
-Prefs::GetRect(char *name, BRect *value, BRect *defaultvalue)
+Prefs::GetRect(const char *name, BRect *value, BRect *defaultvalue)
 {
 	status_t err = fFile->ReadAttr(name, B_RECT_TYPE, 0, value, sizeof(BRect));
 	if (err == B_ENTRY_NOT_FOUND) {
@@ -237,7 +237,7 @@ Prefs::GetRect(char *name, BRect *value, BRect *defaultvalue)
 
 
 bool
-Prefs::PutInt(char *name, int *value)
+Prefs::PutInt(const char *name, int *value)
 {
 	status_t err = fFile->WriteAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err < 0) {
@@ -250,7 +250,7 @@ Prefs::PutInt(char *name, int *value)
 
 
 bool
-Prefs::PutBool(char *name, bool *value)
+Prefs::PutBool(const char *name, bool *value)
 {
 	status_t err = fFile->WriteAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err < 0) {
@@ -263,7 +263,7 @@ Prefs::PutBool(char *name, bool *value)
 
 
 bool
-Prefs::PutRect(char *name, BRect *value)
+Prefs::PutRect(const char *name, BRect *value)
 {
 	status_t err = fFile->WriteAttr(name, B_RECT_TYPE, 0, value, sizeof(BRect));
 	if (err < 0) {
