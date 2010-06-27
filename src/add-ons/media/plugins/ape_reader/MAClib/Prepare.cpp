@@ -47,7 +47,8 @@ const uint32 CRC32_TABLE[256] = {0u,1996959894u,3993919788u,2567524794u,
 	1567103746u,711928724u,3020668471u,3272380065u,1510334235u,755167117u};
 
 
-int CPrepare::Prepare(const unsigned char* pRawData, int nBytes,
+int
+CPrepare::Prepare(const unsigned char* pRawData, int nBytes,
 	const WAVEFORMATEX* pWaveFormatEx, int* pOutputX, int* pOutputY,
 	unsigned int* pCRC, int* pSpecialCodes, int* pPeakLevel)
 {
@@ -255,7 +256,8 @@ int CPrepare::Prepare(const unsigned char* pRawData, int nBytes,
 }
 
 
-void CPrepare::Unprepare(int X, int Y, const WAVEFORMATEX* pWaveFormatEx,
+void
+CPrepare::Unprepare(int X, int Y, const WAVEFORMATEX* pWaveFormatEx,
 	unsigned char* pOutput, unsigned int* pCRC)
 {
 	#define CALCULATE_CRC_BYTE    *pCRC = (*pCRC >> 8) ^ CRC32_TABLE[(*pCRC & 0xFF) ^ *pOutput++];
@@ -352,7 +354,8 @@ void CPrepare::Unprepare(int X, int Y, const WAVEFORMATEX* pWaveFormatEx,
 
 
 #ifdef BACKWARDS_COMPATIBILITY
-int CPrepare::UnprepareOld(int* pInputX, int* pInputY, int nBlocks,
+int
+CPrepare::UnprepareOld(int* pInputX, int* pInputY, int nBlocks,
 	const WAVEFORMATEX* pWaveFormatEx, unsigned char* pRawData,
 	unsigned int* pCRC, int* pSpecialCodes, int nFileVersion)
 {

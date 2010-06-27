@@ -1,6 +1,8 @@
 #ifndef APE_PREPARE_H
 #define APE_PREPARE_H
 
+#include "NoWindows.h"
+
 #define SPECIAL_FRAME_MONO_SILENCE              1
 #define SPECIAL_FRAME_LEFT_SILENCE              1
 #define SPECIAL_FRAME_RIGHT_SILENCE             2
