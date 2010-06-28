@@ -55,15 +55,8 @@ struct glview_direct_info {
 };
 
 
-// Altough the BeBook has the name parameter as a const char*, the R5 header
-// doesn't have the const keyword
-#ifdef _BEOS_R5_COMPATIBLE_
-BGLView::BGLView(BRect rect, char* name, ulong resizingMode, ulong mode,
-	ulong options)
-#else
 BGLView::BGLView(BRect rect, const char* name, ulong resizingMode, ulong mode,
 	ulong options)
-#endif
 	:
 	BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS),
 		//  | B_FULL_UPDATE_ON_RESIZE)

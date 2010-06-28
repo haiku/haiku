@@ -35,17 +35,9 @@ class GLRendererRoster;
 
 class BGLView : public BView {
 public:
-// Altough the BeBook has the name parameter as a const char*, the R5 header
-// doesn't have the const keyword
-#ifdef _BEOS_R5_COMPATIBLE_
-					BGLView(BRect rect, char* name,
-						ulong resizingMode, ulong mode,
-						ulong options);
-#else
 					BGLView(BRect rect, const char* name,
 						ulong resizingMode, ulong mode,
 						ulong options);
-#endif
 	virtual			~BGLView();
 	
 			void	LockGL();
