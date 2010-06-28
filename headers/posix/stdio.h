@@ -161,7 +161,7 @@ extern char		*ctermid(char *controllingTerminal);
 extern char		*cuserid(char *s);
 
 /* temporary files */
-extern char		*tempnam(char *path, char *prefix);
+extern char		*tempnam(char const *path, char const *prefix);
 extern FILE		*tmpfile(void);
 extern char 	*tmpnam(char *nameBuffer);
 extern char 	*tmpnam_r(char *nameBuffer);
