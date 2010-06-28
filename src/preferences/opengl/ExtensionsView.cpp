@@ -19,6 +19,7 @@
 #include <GL/glu.h>
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Extensions"
 
 
