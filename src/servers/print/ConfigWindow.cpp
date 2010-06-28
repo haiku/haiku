@@ -6,30 +6,28 @@
  *		Michael Pfeiffer
  */
 
-#include "pr_server.h"
-#include "Printer.h"
-#include "PrintServerApp.h"
-#include "ConfigWindow.h"
-#include "PrintUtils.h"
 
-// posix
+#include "ConfigWindow.h"
+
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-// BeOS
 #include <Application.h>
 #include <Autolock.h>
-#include <Debug.h>
-#include <Window.h>
-
-// Haiku
 #include <Catalog.h>
-#include <Layout.h>
-#include <Locale.h>
+#include <Debug.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Layout.h>
+#include <Locale.h>
+#include <Window.h>
+
+#include "pr_server.h"
+#include "Printer.h"
+#include "PrintServerApp.h"
+#include "PrintUtils.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -102,8 +100,8 @@ GetPageFormat(float w, float h, BString& label)
 	w = floor(w + 0.5); h = floor(h + 0.5);
 	for (uint i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
 		struct PageFormat& pf = pageFormat[i];
-		if (pf.width == w && pf.height == h || pf.width == h
-			&& pf.height == w) {
+		if ((pf.width == w && pf.height == h) || (pf.width == h
+			&& pf.height == w)) {
 			label = be_catalog->GetString(pf.label, B_TRANSLATE_CONTEXT);
 			return;
 		}
@@ -125,16 +123,17 @@ LeftAlign(BView* view)
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BMessage* settings, AutoReply* sender)
-	: BWindow(ConfigWindow::GetWindowFrame(), B_TRANSLATE("Page setup"),
+	:
+	BWindow(ConfigWindow::GetWindowFrame(), B_TRANSLATE("Page setup"),
 		B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
-	, fKind(kind)
-	, fDefaultPrinter(defaultPrinter)
-	, fSettings(settings)
-	, fSender(sender)
-	, fCurrentPrinter(NULL)
-	, fPageFormatText(NULL)
-	, fJobSetupText(NULL)
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fKind(kind),
+	fDefaultPrinter(defaultPrinter),
+	fSettings(settings),
+	fSender(sender),
+	fCurrentPrinter(NULL),
+	fPageFormatText(NULL),
+	fJobSetupText(NULL)
 {
 	MimeTypeForSender(settings, fSenderMimeType);
 	PrinterForMimeType();
@@ -275,16 +274,16 @@ ConfigWindow::MessageReceived(BMessage* m)
 		case MSG_JOB_SETUP:
 			Setup(kJobSetup);
 			break;
-		case MSG_PRINTER_SELECTED: {
-				BString printer;
-				if (m->FindString("name", &printer) == B_OK) {
-					UpdateAppSettings(fSenderMimeType.String(),
-						printer.String());
-					PrinterForMimeType();
-					UpdateSettings(true);
-				}
+		case MSG_PRINTER_SELECTED:
+		{
+			BString printer;
+			if (m->FindString("name", &printer) == B_OK) {
+				UpdateAppSettings(fSenderMimeType.String(), printer.String());
+				PrinterForMimeType();
+				UpdateSettings(true);
 			}
 			break;
+		}
 		case MSG_OK:
 			UpdateSettings(false);
 			if (fKind == kPageSetup)
@@ -399,11 +398,10 @@ ConfigWindow::PrinterForMimeType()
 	if (lock.IsLocked()) {
 		Settings* s = Settings::GetSettings();
 		AppSettings* app = s->FindAppSettings(fSenderMimeType.String());
-		if (app) {
+		if (app)
 			fPrinterName = app->GetPrinter();
-		} else {
+		else
 			fPrinterName = fDefaultPrinter ? fDefaultPrinter->Name() : "";
-		}
 		fCurrentPrinter = Printer::Find(fPrinterName);
 		if (fCurrentPrinter)
 			fCurrentPrinter->Acquire();
@@ -493,8 +491,8 @@ ConfigWindow::UpdateUI()
 			fJobSetup->SetEnabled(fKind == kJobSetup
 				&& !fPageSettings.IsEmpty());
 
-		fOk->SetEnabled(fKind == kJobSetup && !fJobSettings.IsEmpty() ||
-			fKind == kPageSetup && !fPageSettings.IsEmpty());
+		fOk->SetEnabled((fKind == kJobSetup && !fJobSettings.IsEmpty())
+			|| (fKind == kPageSetup && !fPageSettings.IsEmpty()));
 
 		// display information about page format
 		BRect paperRect;
@@ -508,17 +506,18 @@ ConfigWindow::UpdateUI()
 				pageFormat << ", " << B_TRANSLATE("Portrait");
 			else
 				pageFormat << ", " << B_TRANSLATE("Landscape");
-		} else {
+		} else
 			pageFormat << B_TRANSLATE("Undefined");
-		}
+
 		fPageFormatText->SetText(pageFormat.String());
 
 		// display information about job
 		if (fKind == kJobSetup) {
 			BString job;
 			int32 first, last, copies;
-			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
-				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
+			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK
+				&& fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) ==
+				B_OK) {
 				
 				bool printRange = first >= 1 && first <= last && last != INT_MAX;
 				char number[12];				
@@ -544,13 +543,11 @@ ConfigWindow::UpdateUI()
 						job.ReplaceFirst("%1", number);
 						sprintf(number, "%d", (int)last);
 						job.ReplaceFirst("%2", number);
-					} else {
+					} else
 						job = B_TRANSLATE("All pages");
-					}
 				}
-			} else {
+			} else
 				job << B_TRANSLATE("Undefined");
-			}
 			
 			fJobSetupText->SetText(job.String());
 		}

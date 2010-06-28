@@ -5,38 +5,45 @@
  * Authors:
  *		Ithamar R. Adema
  */
+
+
 #include "PrintServerApp.h"
 
-#include "Transport.h"
-#include "Printer.h"
+#include <stdio.h>
 
-	// BeOS API
 #include <Catalog.h>
 #include <Locale.h>
 #include <PropertyInfo.h>
 
-	// ANSI C
-#include <stdio.h>
+#include "Transport.h"
+#include "Printer.h"
 
+
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "PrintServerApp Scripting"
 
 
 static property_info prop_list[] = {
-	{ "ActivePrinter", { B_GET_PROPERTY, B_SET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		B_TRANSLATE_MARK("Retrieve or select the active printer") }, 
-	{ "Printer", { B_GET_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_REVERSE_INDEX_SPECIFIER },
+	{ "ActivePrinter", { B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		B_TRANSLATE_MARK("Retrieve or select the active printer") },
+	{ "Printer", { B_GET_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER,
+		B_REVERSE_INDEX_SPECIFIER },
 		B_TRANSLATE_MARK("Retrieve a specific printer") },
 	{ "Printer", { B_CREATE_PROPERTY }, { B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Create a new printer") },
-	{ "Printer", { B_DELETE_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_REVERSE_INDEX_SPECIFIER },
+	{ "Printer", { B_DELETE_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER,
+		B_REVERSE_INDEX_SPECIFIER },
 		B_TRANSLATE_MARK("Delete a specific printer") },
 	{ "Printers", { B_COUNT_PROPERTIES }, { B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Return the number of available printers") },
-	{ "Transport", { B_GET_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_REVERSE_INDEX_SPECIFIER },
+	{ "Transport", { B_GET_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER,
+		B_REVERSE_INDEX_SPECIFIER },
 		B_TRANSLATE_MARK("Retrieve a specific transport") },
 	{ "Transports", { B_COUNT_PROPERTIES }, { B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Return the number of available transports") },
-	{ "UseConfigWindow", { B_GET_PROPERTY, B_SET_PROPERTY }, { B_DIRECT_SPECIFIER },
+	{ "UseConfigWindow", { B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Show configuration window") },
 	{ 0 } // terminate list 
 };
@@ -55,12 +62,14 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 			case B_GET_PROPERTY:
 				if (propName == "ActivePrinter") {
 					BMessage reply(B_REPLY);
-					reply.AddString("result", fDefaultPrinter ? fDefaultPrinter->Name() : "");
+					reply.AddString("result", fDefaultPrinter 
+						? fDefaultPrinter->Name() : "");
 					reply.AddInt32("error", B_OK);
 					msg->SendReply(&reply);
 				} else if (propName == "UseConfigWindow") {
 					BMessage reply(B_REPLY);
-					reply.AddString("result", fUseConfigWindow ? "true" : "false");
+					reply.AddString("result", fUseConfigWindow 
+						? "true" : "false");
 					reply.AddInt32("error", B_OK);
 					msg->SendReply(&reply);
 				}
@@ -71,7 +80,8 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 					BString newActivePrinter;
 					if (msg->FindString("data", &newActivePrinter) == B_OK) {
 						BMessage reply(B_REPLY);
-						reply.AddInt32("error", SelectPrinter(newActivePrinter.String()));
+						reply.AddInt32("error",
+							SelectPrinter(newActivePrinter.String()));
 						msg->SendReply(&reply);
 					}
 				} else if (propName == "UseConfigWindow") {
@@ -89,13 +99,14 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 				if (propName == "Printer") {
 					BString name, driver, transport, config;
 
-					if (msg->FindString("name", &name) == B_OK &&
-						msg->FindString("driver", &driver) == B_OK &&
-						msg->FindString("transport", &transport) == B_OK &&
-						msg->FindString("config", &config) == B_OK) {
+					if (msg->FindString("name", &name) == B_OK
+						&& msg->FindString("driver", &driver) == B_OK
+						&& msg->FindString("transport", &transport) == B_OK
+						&& msg->FindString("config", &config) == B_OK) {
 						BMessage reply(B_REPLY);
-						reply.AddInt32("error", CreatePrinter(name.String(), driver.String(),
-													"Local", transport.String(), config.String()));
+						reply.AddInt32("error", CreatePrinter(name.String(),
+							driver.String(), "Local", transport.String(),
+							config.String()));
 						msg->SendReply(&reply);
 					}
 				}
@@ -105,9 +116,8 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 					Printer* printer = GetPrinterFromSpecifier(&spec);
 					status_t rc = B_BAD_VALUE;
 
-					if (printer != NULL) {
+					if (printer != NULL)
 						rc=printer->Remove();
-					}
 					
 					BMessage reply(B_REPLY);
 					reply.AddInt32("error", rc);
@@ -137,27 +147,27 @@ Printer*
 PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
 {
 	switch(msg->what) {
-		case B_NAME_SPECIFIER: {
+		case B_NAME_SPECIFIER:
+		{
 			BString name;
-			if (msg->FindString("name", &name) == B_OK) {
+			if (msg->FindString("name", &name) == B_OK)
 				return Printer::Find(name.String());
-			}
 			break;
 		}
 		
-		case B_INDEX_SPECIFIER: {
+		case B_INDEX_SPECIFIER:
+		{
 			int32 idx;
-			if (msg->FindInt32("index", &idx) == B_OK) {
+			if (msg->FindInt32("index", &idx) == B_OK)
 				return Printer::At(idx);
-			}
 			break;
 		}
 
-		case B_REVERSE_INDEX_SPECIFIER: {
+		case B_REVERSE_INDEX_SPECIFIER:
+		{
 			int32 idx;
-			if (msg->FindInt32("index", &idx) == B_OK) {
+			if (msg->FindInt32("index", &idx) == B_OK)
 				return Printer::At(Printer::CountPrinters() - idx);
-			}
 			break;
 		}
 	}
@@ -170,27 +180,27 @@ Transport*
 PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
 {
 	switch(msg->what) {
-		case B_NAME_SPECIFIER: {
+		case B_NAME_SPECIFIER:
+		{
 			BString name;
-			if (msg->FindString("name", &name) == B_OK) {
+			if (msg->FindString("name", &name) == B_OK)
 				return Transport::Find(name);
-			}
 			break;
 		}
 		
-		case B_INDEX_SPECIFIER: {
+		case B_INDEX_SPECIFIER:
+		{
 			int32 idx;
-			if (msg->FindInt32("index", &idx) == B_OK) {
+			if (msg->FindInt32("index", &idx) == B_OK)
 				return Transport::At(idx);
-			}
 			break;
 		}
 
-		case B_REVERSE_INDEX_SPECIFIER: {
+		case B_REVERSE_INDEX_SPECIFIER:
+		{
 			int32 idx;
-			if (msg->FindInt32("index", &idx) == B_OK) {
+			if (msg->FindInt32("index", &idx) == B_OK)
 				return Transport::At(Transport::CountTransports() - idx);
-			}
 			break;
 		}
 	}
@@ -211,8 +221,8 @@ PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 		case B_ERROR:
 			rc = Inherited::ResolveSpecifier(msg,index,spec,form,prop);
 
-			// GET Printer [arg]
 		case 1:
+			// GET Printer [arg]
 			if ((rc=GetPrinterFromSpecifier(spec)) == NULL) {		
 				BMessage reply(B_REPLY);
 				reply.AddInt32("error", B_BAD_INDEX);
@@ -222,8 +232,8 @@ PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 				msg->PopSpecifier();
 			break;
 
-			// GET Transport [arg]
 		case 5:
+			// GET Transport [arg]
 			if ((rc=GetTransportFromSpecifier(spec)) == NULL) {
 				BMessage reply(B_REPLY);
 				reply.AddInt32("error", B_BAD_INDEX);
@@ -250,7 +260,7 @@ PrintServerApp::GetSupportedSuites(BMessage* msg)
 	if (!localized) {
 		localized = true;
 		for (int i = 0; prop_list[i].name != NULL; i ++)
-			prop_list[i].usage = be_catalog->GetString(prop_list[i].usage, 
+			prop_list[i].usage = be_catalog->GetString(prop_list[i].usage,
 				B_TRANSLATE_CONTEXT);
 	}
 	

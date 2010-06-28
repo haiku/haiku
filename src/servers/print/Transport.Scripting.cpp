@@ -6,6 +6,7 @@
  *		Ithamar R. Adema
  */
 
+
 #include "Transport.h"
 
 #include <AppDefs.h>
@@ -16,6 +17,7 @@
 #include <PropertyInfo.h>
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Transport Scripting"
 
 
@@ -37,21 +39,22 @@ Transport::HandleScriptingCommand(BMessage* msg)
 	BMessage spec;
 	int32 idx;
 
-	if ((rc=msg->GetCurrentSpecifier(&idx,&spec)) == B_OK &&
-		(rc=spec.FindString("property",&propName)) == B_OK) {
+	if ((rc=msg->GetCurrentSpecifier(&idx,&spec)) == B_OK
+		&& (rc=spec.FindString("property",&propName)) == B_OK) {
 		switch(msg->what) {
 			case B_GET_PROPERTY:
 				if (propName == "Name")
 					result = Name();
 				else if (propName == "Ports") {
-					// Need to duplicate messaging code, as our result is a complex
-					// bmessage, not a string :(
+					// Need to duplicate messaging code, as our result is a
+					// complex bmessage, not a string :(
 					BMessage reply(B_REPLY);
 					rc = ListAvailablePorts(&reply);
 					reply.AddInt32("error", rc);
 					msg->SendReply(&reply);
 					break;
-				} else { // If unknown scripting request, let superclas handle it
+				} else {
+					// If unknown scripting request, let superclas handle it
 					Inherited::MessageReceived(msg);
 					break;
 				}
@@ -62,9 +65,8 @@ Transport::HandleScriptingCommand(BMessage* msg)
 				msg->SendReply(&reply);
 				break;
 		}
-	}
-	else {
-			// If GetSpecifier failed
+	} else {
+		// If GetSpecifier failed
 		if (idx == -1) {
 			BMessage reply(B_REPLY);
 			reply.AddMessenger("result", BMessenger(this));
@@ -83,7 +85,7 @@ Transport::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	BHandler* rc = this;
 	
 	int32 idx;
-	switch( idx=prop_info.FindMatch(msg,0,spec,form,prop) ) {
+	switch (idx=prop_info.FindMatch(msg,0,spec,form,prop)) {
 		case B_ERROR:
 			rc = Inherited::ResolveSpecifier(msg,index,spec,form,prop);
 			break;
