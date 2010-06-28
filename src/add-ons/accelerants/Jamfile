@@ -12,7 +12,6 @@ SubInclude HAIKU_TOP src add-ons accelerants nvidia ;
 SubInclude HAIKU_TOP src add-ons accelerants radeon ;
 SubInclude HAIKU_TOP src add-ons accelerants radeon_hd ;
 SubInclude HAIKU_TOP src add-ons accelerants s3 ;
-SubInclude HAIKU_TOP src add-ons accelerants tdfx ;
 SubInclude HAIKU_TOP src add-ons accelerants vesa ;
 SubInclude HAIKU_TOP src add-ons accelerants via ;
 SubInclude HAIKU_TOP src add-ons accelerants vmware ;

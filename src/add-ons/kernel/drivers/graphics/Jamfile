@@ -13,7 +13,6 @@ SubInclude HAIKU_TOP src add-ons kernel drivers graphics radeon ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics radeon_hd ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics s3 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics skeleton ;
-SubInclude HAIKU_TOP src add-ons kernel drivers graphics tdfx ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics vesa ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics via ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics vmware ;

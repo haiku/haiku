@@ -1,9 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers graphics tdfx ;
-
-UsePrivateHeaders graphics ;
-UsePrivateHeaders [ FDirName graphics tdfx ] ;
-
-KernelAddon tdfx.driver :
-	driver.c
-;
-
