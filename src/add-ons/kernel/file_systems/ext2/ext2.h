@@ -86,6 +86,8 @@ struct ext2_super_block {
 	uint32	_reserved5[162];
 
 	uint16 Magic() const { return B_LENDIAN_TO_HOST_INT16(magic); }
+	uint16 State() const { return B_LENDIAN_TO_HOST_INT16(state); }
+	uint32 RevisionLevel() const { return B_LENDIAN_TO_HOST_INT16(revision_level); }
 	uint32 BlockShift() const { return B_LENDIAN_TO_HOST_INT32(block_shift) + 10; }
 	uint32 NumInodes() const { return B_LENDIAN_TO_HOST_INT32(num_inodes); }
 	uint32 NumBlocks() const { return B_LENDIAN_TO_HOST_INT32(num_blocks); }
@@ -106,6 +108,8 @@ struct ext2_super_block {
 		{ return B_LENDIAN_TO_HOST_INT32(read_only_features); }
 	uint32 IncompatibleFeatures() const
 		{ return B_LENDIAN_TO_HOST_INT32(incompatible_features); }
+	uint32 HashSeed(uint8 i) const
+		{ return B_LENDIAN_TO_HOST_INT32(hash_seed[i]); }
 
 	bool IsValid();
 		// implemented in Volume.cpp
@@ -113,6 +117,12 @@ struct ext2_super_block {
 
 #define EXT2_OLD_REVISION		0
 #define EXT2_DYNAMIC_REVISION	1
+
+#define EXT2_MAX_REVISION		EXT2_DYNAMIC_REVISION
+
+#define EXT2_FS_STATE_VALID		1	// File system was cleanly unmounted
+#define EXT2_FS_STATE_ERROR		2	// File system has errors
+#define EXT2_FS_STATE_ORPHAN	3	// Orphans are being recovered
 
 // compatible features
 #define EXT2_FEATURE_DIRECTORY_PREALLOCATION	0x0001
@@ -249,6 +259,7 @@ struct ext2_inode {
 #define EXT2_INODE_DO_NOT_COMPRESS		0x00000400
 #define EXT2_INODE_COMPRESSION_ERROR	0x00000800
 #define EXT2_INODE_BTREE				0x00001000
+#define EXT2_INODE_INDEXED				0x00001000
 
 #define EXT2_NAME_LENGTH	255
 
@@ -308,7 +319,7 @@ struct ext2_xattr_header {
 	}
 
 	void Dump() const {
-		for (int i = 0; i < Length(); i++)
+		for (unsigned int i = 0; i < Length(); i++)
 			dprintf("%02x ", ((uint8 *)this)[i]);
 		dprintf("\n");
 	}
@@ -347,7 +358,7 @@ struct ext2_xattr_entry {
 	}
 
 	void Dump(bool full=false) const {
-		for (int i = 0; i < (full ? sizeof(this) : MinimumSize()); i++)
+		for (unsigned int i = 0; i < (full ? sizeof(this) : MinimumSize()); i++)
 			dprintf("%02x ", ((uint8 *)this)[i]);
 		dprintf("\n");
 	}

@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include "HTree.h"
 #include "Inode.h"
 
 
@@ -35,8 +36,10 @@ DirectoryIterator::~DirectoryIterator()
 status_t
 DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 {
-	if (fOffset + sizeof(ext2_dir_entry) >= fInode->Size())
+	if (fOffset + sizeof(ext2_dir_entry) >= fInode->Size()) {
+		TRACE("DirectoryIterator::GetNext() out of entries\n");
 		return B_ENTRY_NOT_FOUND;
+	}
 
 	ext2_dir_entry entry;
 
@@ -54,6 +57,7 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 			break;
 
 		fOffset += entry.Length();
+		TRACE("DirectoryIterator::GetNext() skipping entry\n");
 	}
 
 	TRACE("offset %Ld: entry ino %lu, length %u, name length %u, type %u\n",

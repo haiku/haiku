@@ -15,6 +15,9 @@ KernelAddon ext2 :
 	Inode.cpp
 	AttributeIterator.cpp
 	DirectoryIterator.cpp
+	IndexedDirectoryIterator.cpp
+	HTree.cpp
+	HTreeEntryIterator.cpp
 
 	kernel_interface.cpp
 ;

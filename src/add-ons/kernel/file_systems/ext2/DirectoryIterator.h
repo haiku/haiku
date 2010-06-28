@@ -14,18 +14,18 @@ class Inode;
 class DirectoryIterator {
 public:
 						DirectoryIterator(Inode* inode);
-						~DirectoryIterator();
+	virtual				~DirectoryIterator();
 
-			status_t	GetNext(char* name, size_t* _nameLength, ino_t* id);
+	virtual	status_t	GetNext(char* name, size_t* _nameLength, ino_t* id);
 
-			status_t	Rewind();
+	virtual	status_t	Rewind();
 
 private:
 						DirectoryIterator(const DirectoryIterator&);
 						DirectoryIterator &operator=(const DirectoryIterator&);
 							// no implementation
 
-private:
+protected:
 	Inode*				fInode;
 	off_t				fOffset;
 };

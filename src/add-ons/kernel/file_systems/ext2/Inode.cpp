@@ -202,10 +202,13 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	size_t length = *_length;
 
 	// set/check boundaries for pos/length
-	if (pos < 0)
+	if (pos < 0) {
+		TRACE("inode %Ld: ReadAt failed(pos %Ld, length %lu)\n", ID(), pos, length);
 		return B_BAD_VALUE;
+	}
 
 	if (pos >= Size() || length == 0) {
+		TRACE("inode %Ld: ReadAt 0 (pos %Ld, length %lu)\n", ID(), pos, length);
 		*_length = 0;
 		return B_NO_ERROR;
 	}

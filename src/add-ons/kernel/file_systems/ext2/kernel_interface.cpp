@@ -8,12 +8,14 @@
 #include <util/kernel_cpp.h>
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <fs_info.h>
 
 #include "AttributeIterator.h"
 #include "DirectoryIterator.h"
 #include "ext2.h"
+#include "HTree.h"
 #include "Inode.h"
 
 
@@ -292,6 +294,7 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		if (size <= vecs[index - 1].length || offset >= inode->Size()) {
 			// We're done!
 			*_count = index;
+			TRACE("ext2_get_file_map for inode %ld\n", inode->ID());
 			return B_OK;
 		}
 	}
@@ -316,13 +319,22 @@ ext2_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	if (status < B_OK)
 		return status;
 
-	DirectoryIterator iterator(directory);
+	HTree htree(volume, directory);
+	DirectoryIterator* iterator;
+	
+	status = htree.Lookup(name, &iterator);
+	if (status != B_OK)
+		return status;
+	
+	ObjectDeleter<DirectoryIterator> iteratorDeleter(iterator);
+
 	while (true) {
 		char buffer[B_FILE_NAME_LENGTH];
 		size_t length = sizeof(buffer);
-		status = iterator.GetNext(buffer, &length, _vnodeID);
+		status = iterator->GetNext(buffer, &length, _vnodeID);
 		if (status != B_OK)
 			return status;
+		TRACE("ext2_lookup() %s\n", buffer);
 
 		if (!strcmp(buffer, name))
 			break;

@@ -55,6 +55,10 @@ public:
 			uint32				InodeBlockIndex(ino_t id) const;
 			status_t			GetBlockGroup(int32 index,
 									ext2_block_group** _group);
+			
+			bool				IndexedDirectories() const
+									{ return (fSuperBlock.CompatibleFeatures()
+										& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
 
 			// cache access
 			void*				BlockCache() { return fBlockCache; }
