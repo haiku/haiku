@@ -118,6 +118,12 @@ private:
 		
 		void	_LockDraw();
 		void	_UnlockDraw();
+		
+// BeOS compatibility
+private:
+					BGLView(BRect rect, char* name,
+						ulong resizingMode, ulong mode,
+						ulong options);
 };
 
 

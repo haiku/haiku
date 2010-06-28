@@ -29,7 +29,7 @@ OpenGLView::OpenGLView()
 	const float kInset = 10;
 	BRect dummy(0, 0, 2, 2);
 
-	fGLView = new BGLView(dummy, (char*) "gl info", B_FOLLOW_NONE, 0,
+	fGLView = new BGLView(dummy, "gl info", B_FOLLOW_NONE, 0,
 		BGL_RGB | BGL_DOUBLE);
 	fGLView->Hide();
 	AddChild(fGLView);

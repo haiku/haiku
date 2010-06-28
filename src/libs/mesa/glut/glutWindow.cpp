@@ -72,7 +72,7 @@ __glutDefaultReshape(int width, int height)
 GlutWindow::GlutWindow(GlutWindow *nparent, const char *name,
 		int x, int y, int width, int height, ulong options)
 	: BGLView(nparent != NULL ? BRect(x, y, x + width - 1, y + height - 1)
-			: BRect(0, 0, width - 1, height - 1), const_cast<char*>(name),
+			: BRect(0, 0, width - 1, height - 1), name,
 		nparent != NULL ? B_FOLLOW_NONE : B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED,
 		options)

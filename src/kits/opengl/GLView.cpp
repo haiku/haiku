@@ -461,6 +461,25 @@ void BGLView::_ReservedGLView8() {}
 // #pragma mark -
 
 
+// BeOS compatibility
+BGLView::BGLView(BRect rect, char* name, ulong resizingMode, ulong mode,
+	ulong options)
+	:
+	BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS),
+	fGc(NULL),
+	fOptions(options),
+	fDitherCount(0),
+	fDrawLock("BGLView draw lock"),
+	fDisplayLock("BGLView display lock"),
+	fClipInfo(NULL),
+	fRenderer(NULL),
+	fRoster(NULL),
+	fDitherMap(NULL)
+{
+	fRoster = new GLRendererRoster(this, options);
+}
+
+
 #if 0
 
 

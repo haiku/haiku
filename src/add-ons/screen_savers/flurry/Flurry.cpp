@@ -52,7 +52,7 @@ using namespace BPrivate;
 
 
 FlurryView::FlurryView(BRect bounds)
-	: BGLView(bounds, NULL, B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW,
+	: BGLView(bounds, (const char *)NULL, B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW,
 		BGL_RGB | BGL_ALPHA | BGL_DEPTH | BGL_DOUBLE),
 	  fOldFrameTime(-1.0),
 	  fFlurryInfo_t(NULL)
