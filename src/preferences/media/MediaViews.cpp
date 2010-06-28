@@ -34,7 +34,10 @@
 
 #include "MediaViews.h"
 
+
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Media views"
+
 
 BarView::BarView()
  : BView ("barView", B_WILL_DRAW ),
