@@ -18,7 +18,10 @@
 #include <MenuField.h>
 #include <SpaceLayoutItem.h>
 
+
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "CPU Frequency View"
+
 
 const char* kCPUFreqPreferencesFile = "CPUFrequency";
 const char* kPrefSignature = "application/x-vnd.Haiku-CPUFrequencyPref";

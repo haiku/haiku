@@ -6,13 +6,18 @@
  *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
-#include "PreferencesWindow.h"
-#include "CPUFrequencyView.h"
+
 #include <Application.h>
 #include <Catalog.h>
 #include <Locale.h>
 
+#include "CPUFrequencyView.h"
+#include "PreferencesWindow.h"
+
+
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Main window"
+
 
 int
 main(int argc, char* argv[])
