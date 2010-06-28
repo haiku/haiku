@@ -18,6 +18,7 @@
 #include <String.h>
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Support"
 
 

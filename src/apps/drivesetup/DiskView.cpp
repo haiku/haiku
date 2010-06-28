@@ -18,6 +18,7 @@
 #include "MainWindow.h"
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "DiskView"
 
 using BPrivate::HashMap;
