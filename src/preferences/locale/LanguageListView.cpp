@@ -25,6 +25,7 @@
 #define MAX_DRAG_HEIGHT		200.0
 #define ALPHA				170
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "LanguageListView"
 
 
