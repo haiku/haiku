@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src tests system kernel file_corruption disk_system ;
+
+
+UsePrivateHeaders shared storage ;
+
+UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+
+Addon <disk_system>checksumfs :
+	checksumfs.cpp
+
+	: be $(TARGET_LIBSTDC++)
+;
