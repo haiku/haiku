@@ -365,6 +365,7 @@ ModulesView::MessageReceived(BMessage* message)
 		}
 
 		case kMsgTestSaver:
+		{
 			SaveState();
 			fSettings.Save();
 
@@ -372,10 +373,25 @@ ModulesView::MessageReceived(BMessage* message)
 
 			be_roster->StartWatching(BMessenger(this, this->Looper()),
 				B_REQUEST_QUIT);
-			be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(),
-				&fScreenSaverTestTeamId);
+			if (be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(),
+				&fScreenSaverTestTeamId) == B_OK)
+				break;
+			
+			// Try really hard to launch it. It's very likely that this fails,
+			// when we run from the CD and there is only an incomplete mime
+			// database for example...
+			BPath path;
+			if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
+				|| path.Append("screen_blanker") != B_OK) {
+				path.SetTo("/boot/system/bin/screen_blanker");
+			}
+			BEntry entry(path.Path());
+			entry_ref ref;
+			if (entry.GetRef(&ref) == B_OK)
+				be_roster->Launch(&ref, &fSettings.Message(),
+					&fScreenSaverTestTeamId);
 			break;
-
+		}
 		case kMsgAddSaver:
 			fFilePanel->Show();
 			break;
