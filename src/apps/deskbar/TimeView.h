@@ -44,11 +44,13 @@ const uint32 kShowSeconds = 'ShSc';
 const uint32 kFullDate = 'FDat';
 const uint32 kEuroDate = 'EDat';
 
+class BCountry;
 class BMessageRunner;
 
 #ifdef AS_REPLICANT
 class _EXPORT	TTimeView;
 #endif
+
 
 class TTimeView : public BView {
 	public:
@@ -130,6 +132,8 @@ class TTimeView : public BView {
 
 		BMessenger	fCalendarWindow;
 		BMessageRunner*	fLongClickMessageRunner;
+		
+		BCountry* fHere; // For date and time localizing purposes
 };
 
 

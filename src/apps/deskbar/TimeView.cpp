@@ -96,6 +96,8 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
+	
+	be_locale_roster->GetDefaultCountry(&fHere);
 }
 
 
@@ -109,6 +111,8 @@ TTimeView::TTimeView(BMessage* data)
 	data->FindBool("eurodate", &fEuroDate);
 	data->FindBool("interval", &fInterval);
 	fShowingDate = false;
+	
+	be_locale_roster->GetDefaultCountry(&fHere);
 }
 #endif
 
@@ -317,11 +321,7 @@ TTimeView::GetCurrentTime()
 	fMinute = time.tm_min;
 	fHour = time.tm_hour;
 	
-	
-	BCountry* here;
-	be_locale_roster->GetDefaultCountry(&here);
-	
-	here->FormatTime(fTimeStr, 64, fTime, fShowSeconds);	
+	fHere->FormatTime(fTimeStr, 64, fTime, fShowSeconds);	
 }
 
 
