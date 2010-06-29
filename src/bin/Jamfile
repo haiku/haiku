@@ -118,7 +118,6 @@ if $(TARGET_PLATFORM) = libbe_test {
 # standard commands that need libbe.so and libsupc++.so
 StdBinCommands
 	alert.cpp
-	dstcheck.cpp
 	hey.cpp
 	reindex.cpp
 	resattr.cpp
@@ -126,6 +125,11 @@ StdBinCommands
 	spybmessage.cpp
 	urlwrapper.cpp
 	: be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
+	
+# commands that need libbe.so, libsupc++.so and liblocale.so
+StdBinCommands
+	dstcheck.cpp
+	: be $(TARGET_LIBSUPC++) liblocale.so : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so
 if $(TARGET_PLATFORM) = haiku {
