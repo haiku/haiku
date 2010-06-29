@@ -24,6 +24,13 @@ Application TextSearch :
 
 	$(additionalBeOSSources)
 
-	: be tracker textencoding libshared.a $(TARGET_LIBSUPC++)
+	: be locale tracker textencoding libshared.a $(TARGET_LIBSUPC++)
 	: TextSearch.rdef
+;
+
+DoCatalogs TextSearch :
+	x-vnd.Haiku.TextSearch
+	:
+	GrepWindow.cpp
+	Grepper.cpp
 ;

@@ -22,8 +22,10 @@
 #ifndef GREP_WINDOW_H
 #define GREP_WINDOW_H
 
+#include <Catalog.h>
 #include <InterfaceKit.h>
 #include <FilePanel.h>
+#include <Locale.h>
 
 #include "Model.h"
 #include "GrepListView.h"
@@ -143,6 +145,7 @@ private:
 			BMessageRunner*		fChangesPulse;
 
 			BFilePanel*			fFilePanel;
+			BCatalog			fAppCatalog;
 };
 
 #endif // GREP_WINDOW_H

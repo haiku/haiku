@@ -28,14 +28,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <Directory.h>
 #include <List.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <UTF8.h>
 
 #include "FileIterator.h"
 #include "Model.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Grepper"
+
 
 using std::nothrow;
 
@@ -203,8 +209,8 @@ Grepper::_GrepperThread()
 		}
 
 		if (!_EscapeSpecialChars(fileName, B_PATH_NAME_LENGTH)) {
-			sprintf(tempString, "%s: Not enough room to escape the filename.",
-				fileName);
+			sprintf(tempString, B_TRANSLATE("%s: Not enough room to escape "
+				"the filename."), fileName);
 
 			message.MakeEmpty();
 			message.what = MSG_REPORT_ERROR;
@@ -240,7 +246,7 @@ Grepper::_GrepperThread()
 			}
 		}
 
-		sprintf(tempString, "%s: There was a problem running grep.", fileName);
+		sprintf(tempString, B_TRANSLATE("%s: There was a problem running grep."), fileName);
 
 		message.MakeEmpty();
 		message.what = MSG_REPORT_ERROR;

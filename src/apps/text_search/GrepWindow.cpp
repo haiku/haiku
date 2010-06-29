@@ -46,6 +46,10 @@
 #include "InitialIterator.h"
 #include "Translation.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "GrepWindow"
+
+
 using std::nothrow;
 
 static const bigtime_t kChangesPulseInterval = 150000;
@@ -123,11 +127,14 @@ GrepWindow::GrepWindow(BMessage* message)
 	  fChangesIterator(NULL),
 	  fChangesPulse(NULL),
 
-	  fFilePanel(NULL)
+	  fFilePanel(NULL),
+	  fAppCatalog(NULL)
 {
 	if (fModel == NULL)
 		return;
 
+	be_locale->GetAppCatalog(&fAppCatalog);
+	
 	entry_ref directory;
 	_InitRefsReceived(&directory, message);
 
@@ -399,11 +406,11 @@ GrepWindow::_SetWindowTitle()
 	if (entry.InitCheck() == B_OK) {
 		BPath path;
 		if (entry.GetPath(&path) == B_OK)
-			title << APP_NAME << ": " << path.Path();
+			title << B_TRANSLATE(APP_NAME) << ": " << path.Path();
 	}
 
 	if (!title.Length())
-		title = APP_NAME;
+		title = B_TRANSLATE(APP_NAME);
 
 	SetTitle(title.String());
 }
@@ -414,68 +421,68 @@ GrepWindow::_CreateMenus()
 {
 	fMenuBar = new BMenuBar(BRect(0,0,1,1), "menubar");
 
-	fFileMenu = new BMenu(_T("File"));
-	fActionMenu = new BMenu(_T("Actions"));
-	fPreferencesMenu = new BMenu(_T("Settings"));
-	fHistoryMenu = new BMenu(_T("History"));
-	fEncodingMenu = new BMenu(_T("Encoding"));
+	fFileMenu = new BMenu(B_TRANSLATE("File"));
+	fActionMenu = new BMenu(B_TRANSLATE("Actions"));
+	fPreferencesMenu = new BMenu(B_TRANSLATE("Settings"));
+	fHistoryMenu = new BMenu(B_TRANSLATE("History"));
+	fEncodingMenu = new BMenu(B_TRANSLATE("Encoding"));
 
 	fNew = new BMenuItem(
-		_T("New window"), new BMessage(MSG_NEW_WINDOW), 'N');
+		B_TRANSLATE("New window"), new BMessage(MSG_NEW_WINDOW), 'N');
 
 	fOpen = new BMenuItem(
-		_T("Set which files to search"), new BMessage(MSG_OPEN_PANEL), 'F');
+		B_TRANSLATE("Set which files to search"), new BMessage(MSG_OPEN_PANEL), 'F');
 
 	fClose = new BMenuItem(
-		_T("Close"), new BMessage(B_QUIT_REQUESTED), 'W');
+		B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED), 'W');
 
 	fAbout = new BMenuItem(
-		_T("About TextSearch" B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED));
+		B_TRANSLATE("About TextSearch" B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED));
 
 	fQuit = new BMenuItem(
-		_T("Quit"), new BMessage(MSG_QUIT_NOW), 'Q');
+		B_TRANSLATE("Quit"), new BMessage(MSG_QUIT_NOW), 'Q');
 
 	fSearch = new BMenuItem(
-		_T("Search"), new BMessage(MSG_START_CANCEL), 'S');
+		B_TRANSLATE("Search"), new BMessage(MSG_START_CANCEL), 'S');
 
 	fSelectAll = new BMenuItem(
-		_T("Select all"), new BMessage(MSG_SELECT_ALL), 'A');
+		B_TRANSLATE("Select all"), new BMessage(MSG_SELECT_ALL), 'A');
 
 	fTrimSelection = new BMenuItem(
-		_T("Trim to selection"), new BMessage(MSG_TRIM_SELECTION), 'T');
+		B_TRANSLATE("Trim to selection"), new BMessage(MSG_TRIM_SELECTION), 'T');
 
 	fOpenSelection = new BMenuItem(
-		_T("Open selection"), new BMessage(MSG_OPEN_SELECTION), 'O');
+		B_TRANSLATE("Open selection"), new BMessage(MSG_OPEN_SELECTION), 'O');
 
 	fSelectInTracker = new BMenuItem(
-		_T("Show files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
+		B_TRANSLATE("Show files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
 
 	fCopyText = new BMenuItem(
-		_T("Copy text to clipboard"), new BMessage(MSG_COPY_TEXT), 'B');
+		B_TRANSLATE("Copy text to clipboard"), new BMessage(MSG_COPY_TEXT), 'B');
 
 	fRecurseLinks = new BMenuItem(
-		_T("Follow symbolic links"), new BMessage(MSG_RECURSE_LINKS));
+		B_TRANSLATE("Follow symbolic links"), new BMessage(MSG_RECURSE_LINKS));
 
 	fRecurseDirs = new BMenuItem(
-		_T("Look in sub-folders"), new BMessage(MSG_RECURSE_DIRS));
+		B_TRANSLATE("Look in sub-folders"), new BMessage(MSG_RECURSE_DIRS));
 
 	fSkipDotDirs = new BMenuItem(
-		_T("Skip sub-folders starting with a dot"), new BMessage(MSG_SKIP_DOT_DIRS));
+		B_TRANSLATE("Skip sub-folders starting with a dot"), new BMessage(MSG_SKIP_DOT_DIRS));
 
 	fCaseSensitive = new BMenuItem(
-		_T("Case-sensitive"), new BMessage(MSG_CASE_SENSITIVE));
+		B_TRANSLATE("Case-sensitive"), new BMessage(MSG_CASE_SENSITIVE));
 
 	fEscapeText = new BMenuItem(
-		_T("Escape search text"), new BMessage(MSG_ESCAPE_TEXT));
+		B_TRANSLATE("Escape search text"), new BMessage(MSG_ESCAPE_TEXT));
 
 	fTextOnly = new BMenuItem(
-		_T("Text files only"), new BMessage(MSG_TEXT_ONLY));
+		B_TRANSLATE("Text files only"), new BMessage(MSG_TEXT_ONLY));
 
 	fInvokePe = new BMenuItem(
-		_T("Open files in Pe"), new BMessage(MSG_INVOKE_PE));
+		B_TRANSLATE("Open files in Pe"), new BMessage(MSG_INVOKE_PE));
 
 	fShowLinesMenuitem = new BMenuItem(
-		_T("Show lines"), new BMessage(MSG_MENU_SHOW_LINES), 'L');
+		B_TRANSLATE("Show lines"), new BMessage(MSG_MENU_SHOW_LINES), 'L');
 	fShowLinesMenuitem->SetMarked(true);
 
 	fUTF8 = new BMenuItem("UTF8", new BMessage('utf8'));
@@ -553,7 +560,7 @@ GrepWindow::_CreateViews()
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
 
 	fButton = new BButton(
-		BRect(0, 1, 80, 1), "Button", _T("Search"),
+		BRect(0, 1, 80, 1), "Button", B_TRANSLATE("Search"),
 		new BMessage(MSG_START_CANCEL), B_FOLLOW_RIGHT);
 
 	fButton->MakeDefault(true);
@@ -561,7 +568,7 @@ GrepWindow::_CreateViews()
 	fButton->SetEnabled(false);
 
 	fShowLinesCheckbox = new BCheckBox(
-		BRect(0, 0, 1, 1), "ShowLines", _T("Show lines"),
+		BRect(0, 0, 1, 1), "ShowLines", B_TRANSLATE("Show lines"),
 		new BMessage(MSG_CHECKBOX_SHOW_LINES), B_FOLLOW_LEFT);
 
 	fShowLinesCheckbox->SetValue(B_CONTROL_ON);
@@ -792,7 +799,7 @@ GrepWindow::_OnStartCancel()
 		fSearchText->SetEnabled(false);
 
 		fButton->MakeFocus(true);
-		fButton->SetLabel(_T("Cancel"));
+		fButton->SetLabel(B_TRANSLATE("Cancel"));
 		fSearch->SetEnabled(false);
 
 		// We need to remember the search pattern, because during
@@ -842,7 +849,7 @@ GrepWindow::_OnSearchFinished()
 	fHistoryMenu->SetEnabled(true);
 	fEncodingMenu->SetEnabled(true);
 
-	fButton->SetLabel(_T("Search"));
+	fButton->SetLabel(B_TRANSLATE("Search"));
 	fButton->SetEnabled(true);
 	fSearch->SetEnabled(true);
 
@@ -1280,11 +1287,11 @@ GrepWindow::_OnTrimSelection()
 {
 	if (fSearchResults->CurrentSelection() < 0) {
 		BString text;
-		text << _T("Please select the files you wish to keep searching.");
+		text << B_TRANSLATE("Please select the files you wish to keep searching.");
 		text << "\n";
-		text << _T("The unselected files will be removed from the list.");
+		text << B_TRANSLATE("The unselected files will be removed from the list.");
 		text << "\n";
-		BAlert* alert = new BAlert(NULL, text.String(), _T("OK"), NULL, NULL,
+		BAlert* alert = new BAlert(NULL, text.String(), B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(NULL);
 		return;
@@ -1375,9 +1382,9 @@ GrepWindow::_OnSelectInTracker()
 {
 	if (fSearchResults->CurrentSelection() < 0) {
 		BAlert* alert = new BAlert("Info",
-			_T("Please select the files you wish to have selected for you in "
+			B_TRANSLATE("Please select the files you wish to have selected for you in "
 				"Tracker."),
-			_T("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->Go(NULL);
 		return;
 	}
@@ -1437,10 +1444,11 @@ GrepWindow::_OnSelectInTracker()
 	}
 
 	if (!_AreAllFoldersOpenInTracker(&folderList)) {
-		BAlert* alert = new BAlert(NULL,
-			_T(APP_NAME " couldn't open one or more folders,"),
-			_T("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
-			B_STOP_ALERT);
+		BString str1;
+		str1 << B_TRANSLATE("%APP_NAME couldn't open one or more folders.");
+		str1.ReplaceFirst("%APP_NAME",APP_NAME);
+		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"), 
+			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go(NULL);
 		goto out;
 	}
@@ -1469,15 +1477,15 @@ void
 GrepWindow::_OnAboutRequested()
 {
 	BString text;
-	text << APP_NAME << " " << "\n\n";
+	text << B_TRANSLATE(APP_NAME) << " " << "\n\n";
 	int32 titleLength = text.Length();
-	text << _T("Created by Matthijs Hollemans.") << "\n\n";
-	text << _T("Contributed to by ");
-	text << _T("Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, "
-		"Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.");
-	text << "\n";
+	text << B_TRANSLATE("Created by Matthijs Hollemans." "\n\n"
+	"Contributed to by "
+	"Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, "
+	"Oliver Tappe, Jonas Sundström, Luc Schrijvers and"
+	" momoziro.\n");
 
-	BAlert* alert = new BAlert("TextSearch", text.String(), _T("OK"), NULL,
+	BAlert* alert = new BAlert("TextSearch", text.String(), B_TRANSLATE("OK"), NULL,
 		NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
 
 	BTextView* view = alert->TextView();

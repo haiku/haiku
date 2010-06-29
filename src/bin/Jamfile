@@ -208,6 +208,12 @@ StdBinCommands
 StdBinCommands
 	watch.c
 	: libncurses.a : $(haiku-utils_rsrc) ;
+	
+# Localization of some applications
+DoCatalogs dstcheck :
+	x-vnd.Haiku-cmd-dstconfig
+	: dstcheck.cpp
+;
 
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bash ;
