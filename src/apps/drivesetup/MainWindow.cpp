@@ -828,17 +828,6 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 	}
 
-
-	// allow BFS only, since our parameter string
-	// construction only handles BFS at the moment
-	if (diskSystemName != "Be File System"
-		&& diskSystemName != "Intel Partition Map"
-		&& diskSystemName != "Intel Extended Partition") {
-		_DisplayPartitionError(B_TRANSLATE("Don't know how to gather "
-			"initialization parameters for this disk system."));
-		return;
-	}
-
 	ModificationPreparer modificationPreparer(disk);
 	status_t ret = modificationPreparer.ModificationStatus();
 	if (ret != B_OK) {
