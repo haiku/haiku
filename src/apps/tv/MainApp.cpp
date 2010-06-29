@@ -33,14 +33,21 @@
 #include "config.h"
 #include "DeviceRoster.h"
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "MainApp"
+
+
 MainApp *gMainApp;
 
 bool gOverlayDisabled = false;
 
 MainApp::MainApp()
- :	BApplication(APP_SIG)
+ :
+ BApplication(APP_SIG)
 {
 	InitPrefs();
+	
+	be_locale->GetAppCatalog(&fAppCatalog);
 	
 	gDeviceRoster = new DeviceRoster;
 	

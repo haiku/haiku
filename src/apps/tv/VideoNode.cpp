@@ -37,14 +37,16 @@
 #include "VideoView.h"
 
 void
-overlay_copy(uint32 lines, void *dst, uint32 dst_bpr, const void *src, uint32 src_bpr)
+overlay_copy(uint32 lines, void *dst, uint32 dst_bpr, const void *src, 
+	uint32 src_bpr)
 {
 //	bigtime_t start = system_time();
 	int len = min_c(dst_bpr, src_bpr);
 //	int len4 = len / 4;
 	while (lines--) {
 /*
-		// this does not copy the last few bytes, if length is not aligned to 4 bytes
+		// this does not copy the last few bytes, if length is not aligned 
+		// to 4 bytes
 		asm ("rep\n\t""movsl"
 		     : 
 		     : "c" (len4), "S" (src), "D" (dst)
@@ -161,6 +163,10 @@ VideoNode::	HandleMessage(int32 message,
 						  const void *data,
 						  size_t size)
 {
+	if (BBufferConsumer::HandleMessage(message, data, size) == B_OK
+		|| BMediaEventLooper::HandleMessage(message, data, size) == B_OK)
+		return B_OK;
+
 	return B_ERROR;
 }
 
@@ -174,7 +180,9 @@ VideoNode::HandleEvent(const media_timed_event *event,
 		case BTimedEventQueue::B_START:
 			break;
 		case BTimedEventQueue::B_STOP:
-			EventQueue()->FlushEvents(event->event_time, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
+			EventQueue()->FlushEvents(event->event_time, 
+				BTimedEventQueue::B_ALWAYS, true, 
+				BTimedEventQueue::B_HANDLE_BUFFER);
 			break;
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 			HandleBuffer((BBuffer *)event->pointer);
@@ -182,7 +190,7 @@ VideoNode::HandleEvent(const media_timed_event *event,
 		default:
 			printf("VideoNode::HandleEvent unknown event");
 			break;
-	}			
+	}
 }
 
 
@@ -258,13 +266,15 @@ VideoNode::Connected(const media_source &src,
 		fInput.format.u.raw_video.field_rate = 25.0;
 
 	color_space colorspace = format.u.raw_video.display.format;
-	BRect		frame(0, 0, format.u.raw_video.display.line_width - 1, format.u.raw_video.display.line_count - 1);
+	BRect		frame(0, 0, format.u.raw_video.display.line_width - 1, 
+		format.u.raw_video.display.line_count - 1);
 	status_t	err;
 
 	DeleteBuffers();
 	err = CreateBuffers(frame, colorspace, fOverlayEnabled);
 	if (err) {
-		printf("VideoNode::Connected failed, fOverlayEnabled = %d\n", fOverlayEnabled);
+		printf("VideoNode::Connected failed, fOverlayEnabled = %d\n", 
+			fOverlayEnabled);
 		return err;
 	}	
 
@@ -304,7 +314,8 @@ VideoNode::FormatChanged(const media_source &src,
 		return B_MEDIA_BAD_DESTINATION;
 
 	color_space colorspace = format.u.raw_video.display.format;
-	BRect		frame(0, 0, format.u.raw_video.display.line_width - 1, format.u.raw_video.display.line_count - 1);
+	BRect		frame(0, 0, format.u.raw_video.display.line_width - 1, 
+		format.u.raw_video.display.line_count - 1);
 	status_t	err;
 
 	DeleteBuffers();
@@ -312,7 +323,8 @@ VideoNode::FormatChanged(const media_source &src,
 		fVideoView->RemoveOverlay();
 		err = CreateBuffers(frame, colorspace, true); // try overlay
 		if (err) {
-			printf("VideoNode::FormatChanged creating overlay buffer failed\n");
+			printf("VideoNode::FormatChanged creating overlay buffer "
+				"failed\n");
 			err = CreateBuffers(frame, colorspace, false); // no overlay
 		}
 	} else {
@@ -343,11 +355,13 @@ VideoNode::HandleBuffer(BBuffer *buffer)
 
 //				memcpy(fBitmap->Bits(), buffer->Data(), fBitmap->BitsLength());
 
-//				fBitmap->SetBits(buffer->Data(), fBitmap->BitsLength(), 0, fInput.format.u.raw_video.display.format);
+//				fBitmap->SetBits(buffer->Data(), fBitmap->BitsLength(), 0, 
+//					fInput.format.u.raw_video.display.format);
 
 				overlay_copy(fBitmap->Bounds().IntegerHeight() + 1, 
 							 fBitmap->Bits(), fBitmap->BytesPerRow(), 
-							 buffer->Data(), fInput.format.u.raw_video.display.bytes_per_row);
+							 buffer->Data(), 
+							 fInput.format.u.raw_video.display.bytes_per_row);
 
 							
 				fBitmap->UnlockBits();
@@ -357,7 +371,8 @@ VideoNode::HandleBuffer(BBuffer *buffer)
 
 			overlay_copy(fBitmap->Bounds().IntegerHeight() + 1, 
 						 fBitmap->Bits(), fBitmap->BytesPerRow(), 
-						 buffer->Data(), fInput.format.u.raw_video.display.bytes_per_row);
+						 buffer->Data(), 
+						 fInput.format.u.raw_video.display.bytes_per_row);
 		}
 //		printf("overlay copy: %Ld usec\n", system_time() - start);
 	}
@@ -407,8 +422,9 @@ VideoNode::IsOverlayActive()
 status_t
 VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 {
-	printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, overlay %d\n", 
-		int(frame.left), int(frame.top), int(frame.right), int(frame.bottom), int(cspace), overlay);
+	printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, "
+		"overlay %d\n", int(frame.left), int(frame.top), int(frame.right), 
+		int(frame.bottom), int(cspace), overlay);
 
 //	int32 bytesPerRow = B_ANY_BYTES_PER_ROW;
 //	if (cspace == B_YCbCr422)
@@ -418,7 +434,8 @@ VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 
 	LockBitmap();
 	ASSERT(fBitmap == 0);
-	uint32 flags = overlay ? (B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL) : 0;
+	uint32 flags = overlay ? (B_BITMAP_WILL_OVERLAY 
+		| B_BITMAP_RESERVE_OVERLAY_CHANNEL) : 0;
 //	fBitmap = new BBitmap(frame, flags, cspace, bytesPerRow);
 	fBitmap = new BBitmap(frame, flags, cspace);
 	if (!(fBitmap && fBitmap->InitCheck() == B_OK && fBitmap->IsValid())) {
@@ -429,7 +446,8 @@ VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 		printf("VideoNode::CreateBuffers failed\n");
 		return B_ERROR;
 	}
-	printf("overlay bitmap: got: bytes per row: %ld\n", fBitmap->BytesPerRow());
+	printf("overlay bitmap: got: bytes per row: %ld\n", 
+		fBitmap->BytesPerRow());
 	fOverlayActive = overlay;
 	UnlockBitmap();
 	printf("VideoNode::CreateBuffers success\n");

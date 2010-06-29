@@ -25,10 +25,13 @@
 #ifndef __MAIN_WIN_H
 #define __MAIN_WIN_H
 
-#include <Window.h>
-#include <Menu.h>
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
+#include <Menu.h>
 #include <Slider.h>
+#include <Window.h>
+
 #include "Controller.h"
 #include "VideoView.h"
 

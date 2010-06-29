@@ -38,9 +38,11 @@ DeviceRoster::DeviceRoster()
 	live_node_info info[MAX_DEVICE_COUNT];
 	int32 info_count = MAX_DEVICE_COUNT;
 	status_t err;
-	err = MediaRoster()->GetLiveNodes(info, &info_count, NULL, NULL, "DVB*", B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
+	err = MediaRoster()->GetLiveNodes(info, &info_count, NULL, NULL, "DVB*", 
+		B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
 	if (err != B_OK || info_count < 1) { 
-		printf("Can't find live DVB node. Found %ld nodes, error %08lx (%s)\n", info_count, err, strerror(err));
+		printf("Can't find live DVB node. Found %ld nodes, error %08lx (%s)\n",
+			info_count, err, strerror(err));
 		fDeviceCount = 0;
 	} else {
 		fDeviceCount = info_count;
@@ -89,7 +91,8 @@ DeviceRoster::IsRawAudioOutputFree(int i)
 	int32			count;
 	status_t		err;
 
-	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, &count, B_MEDIA_RAW_AUDIO);
+	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, 
+		&count, B_MEDIA_RAW_AUDIO);
 	return (err == B_OK) && (count == 1);
 }
 
@@ -103,7 +106,8 @@ DeviceRoster::IsEncAudioOutputFree(int i)
 	int32			count;
 	status_t		err;
 
-	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, &count, B_MEDIA_ENCODED_AUDIO);
+	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, 
+		&count, B_MEDIA_ENCODED_AUDIO);
 	return (err == B_OK) && (count == 1);
 }
 
@@ -117,7 +121,8 @@ DeviceRoster::IsRawVideoOutputFree(int i)
 	int32			count;
 	status_t		err;
 
-	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, &count, B_MEDIA_RAW_VIDEO);
+	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, 
+		&count, B_MEDIA_RAW_VIDEO);
 	return (err == B_OK) && (count == 1);
 }
 
@@ -131,7 +136,8 @@ DeviceRoster::IsEncVideoOutputFree(int i)
 	int32			count;
 	status_t		err;
 
-	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, &count, B_MEDIA_ENCODED_VIDEO);
+	err = MediaRoster()->GetFreeOutputsFor(fDeviceInfo[i].node, &output, 1, 
+		&count, B_MEDIA_ENCODED_VIDEO);
 	return (err == B_OK) && (count == 1);
 }
 

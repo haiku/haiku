@@ -37,7 +37,8 @@ ConvertBitmap(BBitmap *dst, const BBitmap *src)
 	if (dst->Bounds() != src->Bounds())
 		return B_BAD_VALUE;
 	
-	if (dst->ColorSpace() == src->ColorSpace() && dst->BytesPerRow() == src->BytesPerRow() ) {
+	if (dst->ColorSpace() == src->ColorSpace() 
+		&& dst->BytesPerRow() == src->BytesPerRow() ) {
 		memcpy(dst->Bits(), src->Bits(), src->BitsLength());
 		return B_OK;
 	}
