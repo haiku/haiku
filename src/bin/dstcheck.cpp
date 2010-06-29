@@ -6,7 +6,10 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
 #include <MessageRunner.h>
 #include <Roster.h>
 #include <String.h>
@@ -15,6 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "dstcheck"
 
 
 const uint32 TIMEDALERT_UPDATE = 'taup';
@@ -67,19 +74,24 @@ TimedAlert::MessageReceived(BMessage *msg)
 void
 TimedAlert::GetLabel(BString &string)
 {
-	string = "Attention!\n\nBecause of the switch from daylight saving time, "
-		"your computer's clock may be an hour off. Currently, your computer "
-		"thinks it is ";
+	string = B_TRANSLATE("Attention!\n\nBecause of the switch from daylight "
+		"saving time, your computer's clock may be an hour off. Currently, "
+		"your computer thinks it is ");
 
 	time_t t;
 	struct tm tm;
 	char timestring[15];
 	time(&t);
 	localtime_r(&t, &tm);
-	strftime(timestring, 15, "%I:%M %p", &tm);
+	
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	
+	here->FormatTime(timestring, 15, t, false);
+	
 	string += timestring;
 
-	string += ".\n\nIs this the correct time?";
+	string += B_TRANSLATE(".\n\nIs this the correct time?");
 }
 
 
@@ -89,6 +101,7 @@ TimedAlert::GetLabel(BString &string)
 int
 main(int argc, char **argv)
 {
+	BCatalog fCatalog;
 	time_t t;
 	struct tm tm;
 	tzset();
@@ -121,20 +134,24 @@ main(int argc, char **argv)
 		dst = tm.tm_isdst;
 	}
 
-	if (dst != tm.tm_isdst) {
-		BApplication app("application/x-vnd.Haiku-cmd-dstconfig");	
+	if (dst != tm.tm_isdst || argc > 1) {
+		BApplication app("application/x-vnd.Haiku-cmd-dstconfig");
+		be_locale->GetAppCatalog(&fCatalog);
 
 		BString string;
 		TimedAlert::GetLabel(string);
 
-		int32 index = (new TimedAlert("timedAlert", string.String(), "Ask me later", "Yes", "No"))->Go();
+		int32 index = (new TimedAlert("timedAlert", string.String(),
+			B_TRANSLATE("Ask me later"), B_TRANSLATE("Yes"),
+			B_TRANSLATE("No")))->Go();
 		if (index == 0)
 			exit(0);
 
 		if (index == 2) {
 			index = (new BAlert("dstcheck",
-				"Would you like to set the clock using the Time and\nDate preference utility?", 
-				"No", "Yes"))->Go();
+				B_TRANSLATE("Would you like to set the clock using the Time and"
+				"\nDate preference utility?"), 
+				B_TRANSLATE("No"), B_TRANSLATE("Yes")))->Go();
 
 			if (index == 1)
 				be_roster->Launch("application/x-vnd.Haiku-Time");
