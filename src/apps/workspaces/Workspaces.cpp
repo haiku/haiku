@@ -13,10 +13,12 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Dragger.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <PopUpMenu.h>
@@ -33,6 +35,9 @@
 #include <InterfacePrivate.h>
 #include <ViewPrivate.h>
 #include <WindowPrivate.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Workspaces"
 
 
 static const char* kSignature = "application/x-vnd.Be-WORK";
@@ -144,6 +149,7 @@ class WorkspacesApp : public BApplication {
 
 	private:
 		WorkspacesWindow*	fWindow;
+		BCatalog			fAppCatalog;
 };
 
 
@@ -387,11 +393,16 @@ WorkspacesView::Archive(BMessage* archive, bool deep) const
 void
 WorkspacesView::_AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Workspaces\n"
-		"written by François Revol, Axel Dörfler, and Matt Madia.\n\n"
-		"Copyright 2002-2008, Haiku.\n\n"
+	BString text = B_TRANSLATE("Workspaces\n"
+		"written by %1, and %2.\n\n"
+		"Copyright %3, Haiku.\n\n"
 		"Send windows behind using the Option key. "
-		"Move windows to front using the Control key.\n", "OK");
+		"Move windows to front using the Control key.\n");
+	text.ReplaceFirst("%1", "François Revol, Axel Dörfler");
+	text.ReplaceFirst("%2", "Matt Madia");
+	text.ReplaceFirst("%3", "2002-2008");
+		
+	BAlert *alert = new BAlert("about", text.String(), B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -537,8 +548,8 @@ WorkspacesView::MouseDown(BPoint where)
 	menu->SetFont(be_plain_font);
 
 	// TODO: alternatively change the count here directly?
-	BMenuItem* changeItem = new BMenuItem("Change workspace count"
-		B_UTF8_ELLIPSIS, new BMessage(kMsgChangeCount));
+	BMenuItem* changeItem = new BMenuItem(B_TRANSLATE("Change workspace count"
+		B_UTF8_ELLIPSIS), new BMessage(kMsgChangeCount));
 	menu->AddItem(changeItem);
 
 	WorkspacesWindow* window = dynamic_cast<WorkspacesWindow*>(Window());
@@ -546,30 +557,31 @@ WorkspacesView::MouseDown(BPoint where)
 		BMenuItem* item;
 
 		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem("Show window title",
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show window title"),
 			new BMessage(kMsgToggleTitle)));
 		if (window->Look() == B_TITLED_WINDOW_LOOK)
 			item->SetMarked(true);
-		menu->AddItem(item = new BMenuItem("Show window border",
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show window border"),
 			new BMessage(kMsgToggleBorder)));
 		if (window->Look() == B_TITLED_WINDOW_LOOK
 			|| window->Look() == B_MODAL_WINDOW_LOOK)
 			item->SetMarked(true);
 
 		menu->AddSeparatorItem();
-		menu->AddItem(item = new BMenuItem("Always on top",
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Always on top"),
 			new BMessage(kMsgToggleAlwaysOnTop)));
 		if (window->Feel() == B_FLOATING_ALL_WINDOW_FEEL)
 			item->SetMarked(true);
-		menu->AddItem(item = new BMenuItem("Auto-raise",
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Auto-raise"),
 			new BMessage(kMsgToggleAutoRaise)));
 		if (window->IsAutoRaising())
 			item->SetMarked(true);
 
 		menu->AddSeparatorItem();
-		menu->AddItem(new BMenuItem("About Workspaces" B_UTF8_ELLIPSIS,
-			new BMessage(B_ABOUT_REQUESTED)));
-		menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("About Workspaces" 
+			B_UTF8_ELLIPSIS), new BMessage(B_ABOUT_REQUESTED)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+			new BMessage(B_QUIT_REQUESTED)));
 		menu->SetTargetForItems(window);
 	}
 
@@ -583,9 +595,9 @@ WorkspacesView::MouseDown(BPoint where)
 
 
 WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
-	: BWindow(settings->WindowFrame(), "Workspaces", B_TITLED_WINDOW_LOOK,
- 			B_NORMAL_WINDOW_FEEL, B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK,
- 			B_ALL_WORKSPACES),
+	: BWindow(settings->WindowFrame(), B_TRANSLATE("Workspaces"), 
+		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_AVOID_FRONT 
+		| B_WILL_ACCEPT_FIRST_CLICK, B_ALL_WORKSPACES),
  	fSettings(settings),
  	fAutoRaising(false)
 {
@@ -733,7 +745,8 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 			else
 				SetLook(B_MODAL_WINDOW_LOOK);
 
-			// No matter what the setting for title, we must force the border on
+			// No matter what the setting for title, 
+			// we must force the border on
 			fSettings->SetHasBorder(true);
 			fSettings->SetHasTitle(enable);
 			break;
@@ -796,6 +809,7 @@ WorkspacesWindow::SetAutoRaise(bool enable)
 WorkspacesApp::WorkspacesApp()
 	: BApplication(kSignature)
 {
+	be_locale->GetAppCatalog(&fAppCatalog);
 	fWindow = new WorkspacesWindow(new WorkspacesSettings());
 }
 
@@ -815,16 +829,19 @@ WorkspacesApp::AboutRequested()
 void
 WorkspacesApp::Usage(const char *programName)
 {
-	printf("Usage: %s [options] [workspace]\n"
+	printf(B_TRANSLATE("Usage: %s [options] [workspace]\n"
 		"where \"options\" is one of:\n"
 		"  --notitle\t\ttitle bar removed.  border and resize kept.\n"
 		"  --noborder\t\ttitle, border, and resize removed.\n"
-		"  --avoidfocus\t\tprevents the window from being the target of keyboard events.\n"
+		"  --avoidfocus\t\tprevents the window from being the target of "
+		"keyboard events.\n"
 		"  --alwaysontop\t\tkeeps window on top\n"
 		"  --notmovable\t\twindow can't be moved around\n"
-		"  --autoraise\t\tauto-raise the workspace window when it's at the screen corner\n"
+		"  --autoraise\t\tauto-raise the workspace window when it's at the "
+		"screen corner\n"
 		"  --help\t\tdisplay this help and exit\n"
-		"and \"workspace\" is the number of the Workspace to which to switch (0-31)\n",
+		"and \"workspace\" is the number of the Workspace to which to switch "
+		"(0-31)\n"),
 		programName);
 
 	// quit only if we aren't running already
@@ -878,7 +895,7 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 				Quit();
 		} else {
 			// some unknown arguments were specified
-			fprintf(stderr, "Invalid argument: %s\n", argv[i]);
+			fprintf(stderr, B_TRANSLATE("Invalid argument: %s\n"), argv[i]);
 
 			if (IsLaunching())
 				Quit();

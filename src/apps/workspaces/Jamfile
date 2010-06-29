@@ -7,7 +7,7 @@ UsePrivateHeaders app interface ;
 
 Application Workspaces :
 	Workspaces.cpp 
-	: be $(TARGET_LIBSUPC++)
+	: be locale $(TARGET_LIBSUPC++)
 	: Workspaces.rdef 
 	;
 
@@ -15,3 +15,9 @@ if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : Workspaces
 		: tests!apps ;
 }
+
+DoCatalogs Workspaces :
+	x-vnd.Be-WORK
+	:
+	Workspaces.cpp
+;
