@@ -13,6 +13,7 @@
 #include "itab.h"
 #include "input.h"
 #include "decode.h"
+#include "extern.h"
 
 /* The max number of prefixes to an instruction */
 #define MAX_PREFIXES    15
