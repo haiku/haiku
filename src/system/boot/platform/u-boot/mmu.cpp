@@ -21,7 +21,7 @@
 
 #include <string.h>
 
-
+#include <board_config.h>
 
 
 
@@ -81,19 +81,19 @@ struct memblock {
 //Memory map of the whole memory
 static struct memblock MEMORYMAP[] = {
         {
-                "ROM\0", 0x00000000, 0x12345467, MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+                "ROM", 0x00000000, 0x12345467, MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
         },
         {
-                "devices\0",
+                "devices",
 		0x48000000,
 		0x48FFFFFF,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_B,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_B,
         },
         {
-                "RAM\0",
+                "RAM",
 		0x80000000,
 		0x9FFFFFFF,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
         },
 };
 
@@ -102,91 +102,91 @@ static struct memblock MEMORYMAP[] = {
 /*
 static struct memblock LOADER_MEMORYMAP[] = {
         {
-                "vectors\0",//interrupt vectors
+                "vectors",//interrupt vectors
 		0x00000000,
 		0x00000fff,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_B,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_B,
         },
         {
-                "devices\0",
+                "devices",
 		0x48000000,
 		0x48FFFFFF,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_B,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_B,
         },
         {
-                "RAM_image\0",//15MB for the initrd should be enough..
+                "RAM_image",//15MB for the initrd should be enough..
 		0x80000000,
 		0x80ffffff,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
         },
         {
-                "RAM_loader\0",//1MB loader
+                "RAM_loader",//1MB loader
 		0x81000000,
 		0x810fffff,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
         },
         {
-                "RAM_pt\0",//Page Table 1MB
+                "RAM_pt",//Page Table 1MB
 		0x81100000,
 		0x811FFFFF,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
         },
         {
-                "RAM_free\0",//14MB free RAM (actually more but we don't identity map it automaticaly)
+                "RAM_free",//14MB free RAM (actually more but we don't identity map it automaticaly)
 		0x81200000,
 		0x82000000,
-		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
         },
 
 };
 */
 static struct memblock LOADER_MEMORYMAP[] = {
         {
-                "vectors\0",//interrupt vectors
+                "vectors",//interrupt vectors
 		0x00000000,
 		0x00000fff,
 		MMU_L2_FLAG_B,
         },
         {
-                "devices\0",
+                "devices",
 		0x40000000,
 		0x44FFFFFF,
 		MMU_L2_FLAG_B,
         },
 /*        {
-                "RAM_image\0",//15MB for the initrd should be enough..
+                "RAM_image",//15MB for the initrd should be enough..
 		0xA0000000,
 		0xA1ffffff,
 		MMU_L2_FLAG_C,
         },*/
         {
-                "RAM_loader\0",//1MB loader
-		0xA2000000,
-		0xA20fffff,
+                "RAM_loader",//1MB loader
+		SDRAM_BASE + 0,
+		SDRAM_BASE + 0x0fffff,
 		MMU_L2_FLAG_C,
         },
         {
-                "RAM_pt\0",//Page Table 1MB
-		0xA2100000,
-		0xA21FFFFF,
+                "RAM_pt",//Page Table 1MB
+		SDRAM_BASE + 0x100000,
+		SDRAM_BASE + 0x1FFFFF,
 		MMU_L2_FLAG_C,
         },
         {
-                "RAM_free\0",//16MB free RAM (actually more but we don't identity map it automaticaly)
-		0xA2200000,
-		0xA31FFFFF,
+                "RAM_free",//16MB free RAM (actually more but we don't identity map it automaticaly)
+		SDRAM_BASE + 0x0200000,
+		SDRAM_BASE + 0x11FFFFF,
 		MMU_L2_FLAG_C,
         },
         {
-                "RAM_stack\0",//stack
-		0xA3200000,
-		0xA4000000,
+                "RAM_stack",//stack
+		SDRAM_BASE + 0x1200000,
+		SDRAM_BASE + 0x2000000,
 		MMU_L2_FLAG_C,
         },
         {
-                "RAM_initrd\0",//stack
-		0xA4000000,
-		0xA4500000,
+                "RAM_initrd",//stack
+		SDRAM_BASE + 0x2000000,
+		SDRAM_BASE + 0x2500000,
 		MMU_L2_FLAG_C,
         },
 
@@ -409,7 +409,7 @@ init_page_directory()
         /* set up the domain access register */
         mmu_write_DACR(0xFFFFFFFF);
 
-	dprintf("hallo1");
+	dprintf("hallo1\n");
 
 
         /* turn on the mmu */
@@ -417,7 +417,7 @@ init_page_directory()
 
 
 
-	dprintf("hallo");
+	dprintf("hallo\n");
 }
 
 /*!     Adds a new page table for the specified base address */
