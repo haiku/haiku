@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,6 +20,7 @@
 #include <Slider.h>
 #include <ListView.h>
 
+
 class BButton;
 class BTabView;
 
@@ -28,46 +29,51 @@ class ScreenCornerSelector;
 class ScreenSaverRunner;
 class TimeSlider;
 
+
 class ScreenSaverWindow : public BWindow {
-	public:
-		ScreenSaverWindow();
-		virtual ~ScreenSaverWindow();
+public:
+								ScreenSaverWindow();
+	virtual						~ScreenSaverWindow();
 
-		virtual void MessageReceived(BMessage *message);
-		virtual void ScreenChanged(BRect frame, color_space colorSpace);
-		virtual bool QuitRequested();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				ScreenChanged(BRect frame, color_space space);
+	virtual	bool				QuitRequested();
 
-		void LoadSettings();
-		void SetMinimalSizeLimit(float width, float height);
+			void				LoadSettings();
+			void				SetMinimalSizeLimit(float width, float height);
 
-	private:
-		void _SetupFadeTab(BRect frame);
-		void _UpdateTurnOffScreen();
-		void _UpdateStatus();
+private:
+			void				_SetupFadeTab(BRect frame);
+			void				_UpdateTurnOffScreen();
+			void				_UpdateStatus();
 
-		float			fMinWidth, fMinHeight;
-		ScreenSaverSettings fSettings;
-		uint32			fTurnOffScreenFlags;
+private:
+			float				fMinWidth;
+			float				fMinHeight;
+			ScreenSaverSettings	fSettings;
+			uint32				fTurnOffScreenFlags;
 
-		BView*			fFadeView;
-		ModulesView*	fModulesView;
-		BTabView*		fTabView;
+			BView*				fFadeView;
+			ModulesView*		fModulesView;
+			BTabView*			fTabView;
 
-		BCheckBox*		fEnableCheckBox;
-		TimeSlider*		fRunSlider;
+			BCheckBox*			fEnableCheckBox;
+			TimeSlider*			fRunSlider;
 
-		BCheckBox*		fTurnOffCheckBox;
-		TimeSlider*		fTurnOffSlider;
+			BCheckBox*			fTurnOffCheckBox;
+			TimeSlider*			fTurnOffSlider;
 
-		BCheckBox*		fPasswordCheckBox;
-		TimeSlider*		fPasswordSlider;
-		BButton*		fPasswordButton;
-		PasswordWindow*	fPasswordWindow;
+			BCheckBox*			fPasswordCheckBox;
+			TimeSlider*			fPasswordSlider;
+			BButton*			fPasswordButton;
+			PasswordWindow*		fPasswordWindow;
 
-		ScreenCornerSelector* fFadeNow;
-		ScreenCornerSelector* fFadeNever;
+			ScreenCornerSelector* fFadeNow;
+			ScreenCornerSelector* fFadeNever;
 };
 
+
 static const int32 kMsgUpdateList = 'UPDL';
+
 
 #endif	// SCREEN_SAVER_WINDOW_H

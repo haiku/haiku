@@ -62,63 +62,73 @@ const int32 kMsgNeverFadeCornerChanged = 'nfcc';
 
 
 class TimeSlider : public BSlider {
-	public:
-		TimeSlider(BRect frame, const char* name, uint32 changedMessage,
-			uint32 updateMessage);
-		virtual ~TimeSlider();
+public:
+								TimeSlider(BRect frame, const char* name,
+									uint32 changedMessage,
+									uint32 updateMessage);
+	virtual						~TimeSlider();
 
-		virtual void AttachedToWindow();
-		virtual void SetValue(int32 value);
+	virtual	void				AttachedToWindow();
+	virtual	void				SetValue(int32 value);
 
-		void SetTime(bigtime_t useconds);
-		bigtime_t Time();
+			void				SetTime(bigtime_t useconds);
+			bigtime_t			Time() const;
 
-	private:
-		void _TimeToString(bigtime_t useconds, BString& string);
+private:
+			void				_TimeToString(bigtime_t useconds,
+									BString& string);
 };
+
 
 class FadeView : public BView {
-	public:
-		FadeView(BRect frame, const char* name, ScreenSaverSettings& settings);
+public:
+								FadeView(BRect frame, const char* name,
+									ScreenSaverSettings& settings);
 
-		virtual void AttachedToWindow();
+	virtual	void				AttachedToWindow();
 };
+
 
 class ModulesView : public BView {
-	public:
-		ModulesView(BRect frame, const char* name, ScreenSaverSettings& settings);
-		virtual ~ModulesView();
+public:
+								ModulesView(BRect frame, const char* name,
+									ScreenSaverSettings& settings);
+	virtual						~ModulesView();
 
-		virtual void DetachedFromWindow();
-		virtual void AttachedToWindow();
-		virtual void AllAttached();
-		virtual void MessageReceived(BMessage* message);
+	virtual	void				DetachedFromWindow();
+	virtual	void				AttachedToWindow();
+	virtual	void				AllAttached();
+	virtual	void				MessageReceived(BMessage* message);
 
-		void PopulateScreenSaverList();
-		void SaveState();
+			void				PopulateScreenSaverList();
+			void				SaveState();
 
-	private:
-		static int _CompareScreenSaverItems(const void* left, const void* right);
-		BScreenSaver* _ScreenSaver();
-		void _CloseSaver();
-		void _OpenSaver();
+private:
+	static	int					_CompareScreenSaverItems(const void* left,
+									const void* right);
 
-		BFilePanel*		fFilePanel;
-		BListView*		fListView;
-		BButton*		fTestButton;
-		BButton*		fAddButton;
+			BScreenSaver*		_ScreenSaver();
+			void				_CloseSaver();
+			void				_OpenSaver();
 
-		ScreenSaverSettings& fSettings;
-		ScreenSaverRunner* fSaverRunner;
-		BString			fCurrentName;
+private:
+			BFilePanel*			fFilePanel;
+			BListView*			fListView;
+			BButton*			fTestButton;
+			BButton*			fAddButton;
 
-		BBox*			fSettingsBox;
-		BView*			fSettingsView;
+			ScreenSaverSettings& fSettings;
+			ScreenSaverRunner*	fSaverRunner;
+			BString				fCurrentName;
 
-		PreviewView*	fPreviewView;
+			BBox*				fSettingsBox;
+			BView*				fSettingsView;
 
-		team_id			fScreenSaverTestTeamId;
+			PreviewView*		fPreviewView;
+
+			team_id				fScreenSaverTestTeam;
 };
+
 
 static const int32 kTimeInUnits[] = {
 	30,    60,   90,
@@ -131,12 +141,14 @@ static const int32 kTimeInUnits[] = {
 	7200,  9000, 10800,
 	14400, 18000
 };
-static const int32 kTimeUnitCount = sizeof(kTimeInUnits) / sizeof(kTimeInUnits[0]);
+static const int32 kTimeUnitCount
+	= sizeof(kTimeInUnits) / sizeof(kTimeInUnits[0]);
 
 
 TimeSlider::TimeSlider(BRect frame, const char* name, uint32 changedMessage,
 		uint32 updateMessage)
-	: BSlider(frame, name, "30 seconds", new BMessage(changedMessage),
+	:
+	BSlider(frame, name, "30 seconds", new BMessage(changedMessage),
 		0, kTimeUnitCount - 1, B_TRIANGLE_THUMB, B_FOLLOW_LEFT_RIGHT)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -185,7 +197,7 @@ TimeSlider::SetTime(bigtime_t useconds)
 
 
 bigtime_t
-TimeSlider::Time()
+TimeSlider::Time() const
 {
 	return 1000000LL * kTimeInUnits[Value()];
 }
@@ -228,7 +240,8 @@ TimeSlider::_TimeToString(bigtime_t useconds, BString& string)
 
 
 FadeView::FadeView(BRect rect, const char* name, ScreenSaverSettings& settings)
-	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
+	:
+	BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -248,16 +261,19 @@ FadeView::AttachedToWindow()
 //	#pragma mark -
 
 
-ModulesView::ModulesView(BRect rect, const char* name, ScreenSaverSettings& settings)
-	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
+ModulesView::ModulesView(BRect rect, const char* name,
+		ScreenSaverSettings& settings)
+	:
+	BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW),
 	fSettings(settings),
 	fSaverRunner(NULL),
-	fSettingsView(NULL)
+	fSettingsView(NULL),
+	fScreenSaverTestTeam(-1)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fTestButton = new BButton(rect, "TestButton", "Test", new BMessage(kMsgTestSaver),
-		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fTestButton = new BButton(rect, "TestButton", "Test",
+		new BMessage(kMsgTestSaver), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	float width, height;
 	fTestButton->GetPreferredSize(&width, &height);
 	fTestButton->ResizeTo(width + 16, height);
@@ -291,7 +307,8 @@ ModulesView::ModulesView(BRect rect, const char* name, ScreenSaverSettings& sett
 
 	rect = Bounds().InsetByCopy(8, 8);
 	rect.left = fAddButton->Frame().right + 8;
-	AddChild(fSettingsBox = new BBox(rect, "SettingsBox", B_FOLLOW_ALL, B_WILL_DRAW));
+	AddChild(fSettingsBox = new BBox(rect, "SettingsBox", B_FOLLOW_ALL,
+		B_WILL_DRAW));
 	fSettingsBox->SetLabel("Module settings");
 
 	PopulateScreenSaverList();
@@ -348,7 +365,8 @@ ModulesView::MessageReceived(BMessage* message)
 			if (selection < 0)
 				break;
 
-			ScreenSaverItem* item = (ScreenSaverItem *)fListView->ItemAt(selection);
+			ScreenSaverItem* item
+				= (ScreenSaverItem*)fListView->ItemAt(selection);
 			if (item == NULL)
 				break;
 
@@ -371,41 +389,42 @@ ModulesView::MessageReceived(BMessage* message)
 
 			_CloseSaver();
 
-			be_roster->StartWatching(BMessenger(this, this->Looper()),
+			be_roster->StartWatching(BMessenger(this, Looper()),
 				B_REQUEST_QUIT);
 			if (be_roster->Launch(SCREEN_BLANKER_SIG, &fSettings.Message(),
-				&fScreenSaverTestTeamId) == B_OK)
+					&fScreenSaverTestTeam) == B_OK)
 				break;
-			
-			// Try really hard to launch it. It's very likely that this fails,
-			// when we run from the CD and there is only an incomplete mime
+
+			// Try really hard to launch it. It's very likely that this fails
+			// when we run from the CD, and there is only an incomplete mime
 			// database for example...
 			BPath path;
 			if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
-				|| path.Append("screen_blanker") != B_OK) {
+				|| path.Append("screen_blanker") != B_OK)
 				path.SetTo("/boot/system/bin/screen_blanker");
-			}
+
 			BEntry entry(path.Path());
 			entry_ref ref;
-			if (entry.GetRef(&ref) == B_OK)
+			if (entry.GetRef(&ref) == B_OK) {
 				be_roster->Launch(&ref, &fSettings.Message(),
-					&fScreenSaverTestTeamId);
+					&fScreenSaverTestTeam);
+			}
 			break;
 		}
 		case kMsgAddSaver:
 			fFilePanel->Show();
 			break;
 
-		case B_SOME_APP_QUIT: {
-				team_id team;
-				if (message->FindInt32("be:team", &team) == B_OK) {
-					if (team == fScreenSaverTestTeamId) {
-						be_roster->StopWatching(this);
-						_OpenSaver();
-					}
-				}
+		case B_SOME_APP_QUIT:
+		{
+			team_id team;
+			if (message->FindInt32("be:team", &team) == B_OK
+				&& team == fScreenSaverTestTeam) {
+				be_roster->StopWatching(this);
+				_OpenSaver();
 			}
 			break;
+		}
 
 		default:
 			BView::MessageReceived(message);
@@ -430,7 +449,8 @@ void
 ModulesView::PopulateScreenSaverList()
 {
  	fListView->DeselectAll();
-	while (ScreenSaverItem* item = (ScreenSaverItem *)fListView->RemoveItem((int32)0)) {
+	while (ScreenSaverItem* item
+			= (ScreenSaverItem*)fListView->RemoveItem((int32)0)) {
 		delete item;
 	}
 
@@ -439,7 +459,8 @@ ModulesView::PopulateScreenSaverList()
 
 	// Iterate over add-on directories, and add their files to the list view
 
-	directory_which which[] = {B_BEOS_ADDONS_DIRECTORY, B_USER_ADDONS_DIRECTORY};
+	directory_which which[] = {
+		B_BEOS_ADDONS_DIRECTORY, B_USER_ADDONS_DIRECTORY};
 	ScreenSaverItem* selectItem = NULL;
 
 	for (uint32 i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
@@ -474,7 +495,7 @@ ModulesView::PopulateScreenSaverList()
 }
 
 
-//! sorting function for ScreenSaverItems
+//! Sorting function for ScreenSaverItems
 int
 ModulesView::_CompareScreenSaverItems(const void* left, const void* right)
 {
@@ -566,19 +587,23 @@ ModulesView::_OpenSaver()
 	while ((view = fSettingsView->ChildAt(i++)) != NULL) {
 		// very simple heuristic...
 		float viewRight = view->Frame().right;
-		if ((view->ResizingMode() & _rule_(0, 0xf, 0, 0xf)) == B_FOLLOW_LEFT_RIGHT) {
+		if ((view->ResizingMode() & _rule_(0, 0xf, 0, 0xf))
+				== B_FOLLOW_LEFT_RIGHT) {
 			float width, height;
 			view->GetPreferredSize(&width, &height);
 			viewRight = view->Frame().left + width / 2;
-		} else if ((view->ResizingMode() & _rule_(0, 0xf, 0, 0xf)) == B_FOLLOW_RIGHT)
+		} else if ((view->ResizingMode() & _rule_(0, 0xf, 0, 0xf))
+				== B_FOLLOW_RIGHT)
 			viewRight = 8 + view->Frame().Width();
 
 		float viewBottom = view->Frame().bottom;
-		if ((view->ResizingMode() & _rule_(0xf, 0, 0xf, 0)) == B_FOLLOW_TOP_BOTTOM) {
+		if ((view->ResizingMode() & _rule_(0xf, 0, 0xf, 0))
+				== B_FOLLOW_TOP_BOTTOM) {
 			float width, height;
 			view->GetPreferredSize(&width, &height);
 			viewBottom = view->Frame().top + height;
-		} else if ((view->ResizingMode() & _rule_(0xf, 0, 0xf, 0)) == B_FOLLOW_BOTTOM)
+		} else if ((view->ResizingMode() & _rule_(0xf, 0, 0xf, 0))
+				== B_FOLLOW_BOTTOM)
 			viewBottom = 8 + view->Frame().Height();
 
 		if (viewRight > right)
@@ -604,8 +629,9 @@ ModulesView::_OpenSaver()
 
 
 ScreenSaverWindow::ScreenSaverWindow()
-	: BWindow(BRect(50, 50, 496, 375), "ScreenSaver",
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/)
+	:
+	BWindow(BRect(50, 50, 496, 375), "ScreenSaver",
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	fSettings.Load();
 
@@ -639,7 +665,8 @@ ScreenSaverWindow::ScreenSaverWindow()
 	MoveTo(fSettings.WindowFrame().left, fSettings.WindowFrame().top);
 	ResizeTo(fSettings.WindowFrame().Width(), fSettings.WindowFrame().Height());
 
-	fEnableCheckBox->SetValue(fSettings.TimeFlags() & ENABLE_SAVER ? B_CONTROL_ON : B_CONTROL_OFF);
+	fEnableCheckBox->SetValue(
+		fSettings.TimeFlags() & ENABLE_SAVER ? B_CONTROL_ON : B_CONTROL_OFF);
 	fRunSlider->SetTime(fSettings.BlankTime());
 	fTurnOffSlider->SetTime(fSettings.OffTime() + fSettings.BlankTime());
 	fFadeNow->SetCorner(fSettings.BlankCorner());
@@ -680,7 +707,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
 
 	// taken from BRadioButton:
-	float radioButtonOffset = 2 * floorf(textHeight / 2 - 2) + floorf(textHeight / 2);
+	float radioButtonOffset = 2 * floorf(textHeight / 2 - 2)
+		+ floorf(textHeight / 2);
 
 	fEnableCheckBox = new BCheckBox(BRect(0, 0, 1, 1), "EnableCheckBox",
 		"Enable screen saver", new BMessage(kMsgEnableScreenSaverBox));
@@ -737,8 +765,9 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 
 	rect.OffsetBy(0, fTurnOffSlider->Bounds().Height() + 4.0f);
 	rect.left = rect.right;
-	fPasswordButton = new BButton(rect, "PasswordButton", "Password" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgChangePassword), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+	fPasswordButton = new BButton(rect, "PasswordButton",
+		"Password" B_UTF8_ELLIPSIS, new BMessage(kMsgChangePassword),
+		B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fPasswordButton->ResizeToPreferred();
 	fPasswordButton->MoveBy(-fPasswordButton->Bounds().Width(), 0);
 	box->AddChild(fPasswordButton);
@@ -774,7 +803,8 @@ ScreenSaverWindow::_SetupFadeTab(BRect rect)
 	rect.right = rect.left + monitorWidth;
 	rect.bottom = rect.top + monitorHeight;
 	box->AddChild(fFadeNever = new ScreenCornerSelector(rect, "FadeNever",
-		new BMessage(kMsgNeverFadeCornerChanged), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
+		new BMessage(kMsgNeverFadeCornerChanged),
+		B_FOLLOW_LEFT | B_FOLLOW_BOTTOM));
 
 	rect.OffsetBy(monitorWidth + 10, 0);
 	stringView = new BStringView(rect, NULL,"Don't fade when",
@@ -901,7 +931,8 @@ ScreenSaverWindow::MessageReceived(BMessage *msg)
 		// "Fade" tab
 
 		case kMsgTurnOffCheckBox:
-			fTurnOffSlider->SetEnabled(fTurnOffCheckBox->Value() == B_CONTROL_ON);
+			fTurnOffSlider->SetEnabled(
+				fTurnOffCheckBox->Value() == B_CONTROL_ON);
 			break;
 
 		case kMsgRunSliderChanged:
