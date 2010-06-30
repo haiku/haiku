@@ -10,6 +10,9 @@
 #include <fs_volume.h>
 
 
+class BlockAllocator;
+
+
 class Volume {
 public:
 								Volume(uint32 flags);
@@ -25,6 +28,8 @@ public:
 	inline	uint64				TotalBlocks() const	{ return fTotalBlocks; }
 	inline	void*				BlockCache() const	{ return fBlockCache; }
 	inline	const char*			Name() const		{ return fName; }
+	inline	BlockAllocator*		GetBlockAllocator() const
+									{ return fBlockAllocator; }
 
 private:
 			status_t			_Init(uint64 totalBlocks);
@@ -35,6 +40,7 @@ private:
 			void*				fBlockCache;
 			uint64				fTotalBlocks;
 			char*				fName;
+			BlockAllocator*		fBlockAllocator;
 };
 
 

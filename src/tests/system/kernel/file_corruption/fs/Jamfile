@@ -1,12 +1,14 @@
 SubDir HAIKU_TOP src tests system kernel file_corruption fs ;
 
 
+UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 
 KernelAddon checksumfs :
+	BlockAllocator.cpp
 	checksumfs.cpp
 	SuperBlock.cpp
 	Volume.cpp

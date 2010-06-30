@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include "BlockAllocator.h"
 #include "Volume.h"
 
 
@@ -38,8 +39,8 @@ SuperBlock::Initialize(Volume* volume)
 
 	version = kCheckSumFSVersion;
 	totalBlocks = volume->TotalBlocks();
-//	freeBlocks = volume->BlockAllocator()->FreeBlocks();
-//	blockBitmap = volume->BlockAllocator()->BlockBitmap();
+	freeBlocks = volume->GetBlockAllocator()->FreeBlocks();
+	blockBitmap = volume->GetBlockAllocator()->BaseBlock();
 //	rootDir = volume->RootDirBlock();
 	strlcpy(name, volume->Name(), kCheckSumFSNameLength);
 }

@@ -13,9 +13,12 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <new>
+
 #include <fs_cache.h>
 
 #include "Block.h"
+#include "BlockAllocator.h"
 #include "checksumfs.h"
 #include "SuperBlock.h"
 
@@ -26,13 +29,16 @@ Volume::Volume(uint32 flags)
 	fFlags(flags),
 	fBlockCache(NULL),
 	fTotalBlocks(0),
-	fName(NULL)
+	fName(NULL),
+	fBlockAllocator(NULL)
 {
 }
 
 
 Volume::~Volume()
 {
+	delete fBlockAllocator;
+
 	if (fBlockCache != NULL)
 		block_cache_delete(fBlockCache, false);
 
@@ -86,6 +92,10 @@ Volume::Initialize(const char* name)
 	if (fName == NULL)
 		return B_NO_MEMORY;
 
+	status_t error = fBlockAllocator->Initialize();
+	if (error != B_OK)
+		return error;
+
 	Block block;
 	if (!block.GetZero(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE))
 		return B_ERROR;
@@ -110,6 +120,11 @@ Volume::_Init(uint64 totalBlocks)
 	fBlockCache = block_cache_create(fFD, fTotalBlocks, B_PAGE_SIZE,
 		IsReadOnly());
 	if (fBlockCache == NULL)
+		return B_NO_MEMORY;
+
+	// create the block allocator
+	fBlockAllocator = new(std::nothrow) BlockAllocator(this);
+	if (fBlockAllocator == NULL)
 		return B_NO_MEMORY;
 
 	return B_OK;
