@@ -149,6 +149,7 @@ rule BuildUBootSDImage image : files
 		"0,$(HAIKU_BOARD_SDIMAGE_FAT_SIZE),0c,-\\\n,,eb\\\n\\\n" ;
 	SDIMAGE_FDISK_H on $(image) = 255 ;
 	SDIMAGE_FDISK_S on $(image) = 63 ;
+	SDIMAGE_FDISK_C on $(image) = ;
 	SDIMAGE_FDISK_UNIT on $(image) = M ;
 	BuildUBootSDImage1 $(image) : $(files) ;
 }
@@ -167,6 +168,7 @@ actions BuildUBootSDImage1
 	printf '$(SDIMAGE_FDISK_SCRIPT)' | $(SDIMAGE_FDISK) -f -D \
 		-H $(SDIMAGE_FDISK_H) -S $(SDIMAGE_FDISK_S) \
 		-u$(SDIMAGE_FDISK_UNIT) $(<)
+		#-H $(SDIMAGE_FDISK_H) -S $(SDIMAGE_FDISK_S) -C \\\$(( $(SDIMAGE_SIZE) * 1024 * 1024 / $(SDIMAGE_FDISK_H) / $(SDIMAGE_FDISK_S))) \
 	# generate mtools config
 	echo 'drive i: file="$(<)" partition=1' > $(<).mtools
 	# format the image
