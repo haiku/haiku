@@ -14,6 +14,7 @@
 #ifndef OVERLAY_WINDOW_H
 #define OVERLAY_WINDOW_H
 
+#include <TextView.h>
 #include <Window.h>
 
 

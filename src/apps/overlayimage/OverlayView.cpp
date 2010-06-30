@@ -13,8 +13,14 @@
 
 #include "OverlayView.h"
 
+#include <Catalog.h>
 #include <InterfaceDefs.h>
+#include <Locale.h>
+#include <String.h>
 #include <TextView.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Main window"
 
 const float kDraggerSize = 7;
 	
@@ -25,13 +31,26 @@ OverlayView::OverlayView(BRect frame)
 {
 	fBitmap = NULL;
 	fReplicated = false;
-
+	
 	frame.left = frame.right - kDraggerSize;
 	frame.top = frame.bottom - kDraggerSize;
 	BDragger *dragger = new BDragger(frame, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
+	
+	fText = new BTextView(Bounds(), "bgView", Bounds(), B_FOLLOW_ALL, B_WILL_DRAW);
+	fText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(fText);
+	BString text;
+	text << B_TRANSLATE(
+		"Enable \"Show replicants\" in Deskbar.\n"
+		"Drag & drop an image.\n"
+		"Drag the replicant to the Desktop.");
+	fText->SetText(text);
+	fText->SetAlignment(B_ALIGN_CENTER);
+	fText->MakeSelectable(false);
+	fText->MoveBy(0, (Bounds().bottom - fText->TextRect().bottom) / 2);
 }
 
 
@@ -69,7 +88,7 @@ OverlayView::MessageReceived(BMessage *msg)
 		{
 			if (fReplicated)
 				break;
-
+			
 			entry_ref ref;
 			msg->FindRef("refs", &ref);
 			BEntry entry(&ref);
@@ -79,6 +98,11 @@ OverlayView::MessageReceived(BMessage *msg)
 			fBitmap = BTranslationUtils::GetBitmap(path.Path());
 			
 			if (fBitmap != NULL) {
+				if (fText != NULL) {
+					RemoveChild(fText);
+					fText = NULL;
+				}
+				
 				BRect rect = fBitmap->Bounds();
 				if (!fReplicated)
 					Window()->ResizeTo(rect.right, rect.bottom);
@@ -129,18 +153,19 @@ OverlayView::OverlayAboutRequested()
 {
 	BAlert *alert = new BAlert("about",
 		"OverlayImage\n"
-		"Copyright 1999-2010" "\n\n\t"
-		"originally by Seth Flaxman" "\n\t"
-		"modified by Hartmuth Reh" "\n\t"
-		"further modified by Humdinger" "\n",
+		"Copyright 1999-2010\n\n\t"
+		"originally by Seth Flaxman\n\t"
+		"modified by Hartmuth Reh\n\t"
+		"further modified by Humdinger\n",
 		"OK");
 
 	BTextView *view = alert->TextView();
 	BFont font;
 	view->SetStylable(true);
 	view->GetFont(&font);
-	font.SetSize(font.Size() + 4);
+	font.SetSize(font.Size() + 7.0f);
 	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 12, &font);
+	
 	alert->Go();
 }

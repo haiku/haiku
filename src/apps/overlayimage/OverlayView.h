@@ -42,6 +42,7 @@ public:
 private:
 	BBitmap				*fBitmap;
 	bool				fReplicated;
+	BTextView			*fText;
 };
 
 #endif // OVERLAY_VIEW_H
