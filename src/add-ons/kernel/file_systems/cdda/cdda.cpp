@@ -524,7 +524,7 @@ read_cdtext(int fd, struct cdtext &cdtext)
 
 	while (true) {
 		size_t length = sizeof(text);
-		uint8 id, track;
+		uint8 id = 0, track = 0;
 
 		if (!parse_pack_data(pack, packLength, lastPack, id, track,
 				state, text, length))
