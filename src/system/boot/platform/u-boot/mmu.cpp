@@ -17,6 +17,8 @@
 #include <arm_mmu.h>
 #include <kernel.h>
 
+#include <board_config.h>
+
 #include <OS.h>
 
 #include <string.h>
@@ -99,7 +101,7 @@ static struct memblock MEMORYMAP[] = {
 
 
 //memory used by the loader that should be identity mapped
-/*
+#if 0/*BOARD_CPU_OMAP3*/
 static struct memblock LOADER_MEMORYMAP[] = {
         {
                 "vectors",//interrupt vectors
@@ -138,27 +140,25 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		MMU_L2_FLAG_AP_RW | MMU_L2_FLAG_C,
         },
 
+
+
 };
-*/
+
+#else
+
 static struct memblock LOADER_MEMORYMAP[] = {
         {
                 "vectors",//interrupt vectors
-		0x00000000,
-		0x00000fff,
+		VECT_BASE,
+		VECT_BASE + VECT_SIZE - 1,
 		MMU_L2_FLAG_B,
         },
         {
                 "devices",
-		0x40000000,
-		0x44FFFFFF,
+		DEVICE_BASE,
+		DEVICE_BASE + DEVICE_SIZE - 1,
 		MMU_L2_FLAG_B,
         },
-/*        {
-                "RAM_image",//15MB for the initrd should be enough..
-		0xA0000000,
-		0xA1ffffff,
-		MMU_L2_FLAG_C,
-        },*/
         {
                 "RAM_loader",//1MB loader
 		SDRAM_BASE + 0,
@@ -190,7 +190,18 @@ static struct memblock LOADER_MEMORYMAP[] = {
 		MMU_L2_FLAG_C,
         },
 
+#ifdef FB_BASE
+        {
+                "framebuffer",//2MB framebuffer ram
+		FB_BASE,
+		FB_BASE + FB_SIZE - 1,
+		MMU_L2_FLAG_AP_RW|MMU_L2_FLAG_C,
+        },
+#endif
+
+
 };
+#endif
 
 
 
@@ -350,6 +361,14 @@ get_next_page_table(uint32 type)
 void
 init_page_directory()
 {
+	uint32 smalltype;
+
+	// see if subpages disabled
+	if (mmu_read_C1() & (1<<23))
+		smalltype = MMU_L2_TYPE_SMALLNEW;
+	else
+		smalltype = MMU_L2_TYPE_SMALLEXT;
+
         TRACE(("init_page_directory\n"));
 
         gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
@@ -368,7 +387,7 @@ init_page_directory()
 		addr_t pos = LOADER_MEMORYMAP[i].start;
 		int c=0;
 		while(pos< LOADER_MEMORYMAP[i].end){
-			pageTable[c]=pos |  LOADER_MEMORYMAP[i].flags | MMU_L2_TYPE_SMALLEXT;
+			pageTable[c]=pos |  LOADER_MEMORYMAP[i].flags | smalltype;
 //			TRACE(("PAGE TABLE: %lx = [%lx] \n",c, pageTable[c]));				
 			c++;
 			if(c>255){ //we filled a pagetable => we need a new one

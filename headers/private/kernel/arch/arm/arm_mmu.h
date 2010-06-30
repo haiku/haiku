@@ -37,6 +37,9 @@
  */
 
 #define MMU_L2_TYPE_SMALLEXT 0x3
+/* for new format entries (cortex-a8) */
+#define MMU_L2_TYPE_SMALLNEW 0x2
+
 // for B C and TEX see ARM arm B4-11
 #define MMU_L2_FLAG_B 0x4
 #define MMU_L2_FLAG_C 0x8
