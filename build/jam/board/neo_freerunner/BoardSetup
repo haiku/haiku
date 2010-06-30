@@ -26,7 +26,7 @@ HAIKU_BOARD_LOADER_STACK_BASE = 0x34000000 ;
 # XXX: Locate it somehow (for now just put it in generated/)
 #HAIKU_BOARD_UBOOT_IMAGE ?= u-boot-verdex-400-r1604.bin ;
 #HAIKU_BOARD_UBOOT_IMAGE_URL = 
-	http://www.gumstix.net/feeds/u-boot/u-boot-verdex-400-r1604.bin ;
+#	http://www.gumstix.net/feeds/u-boot/u-boot-verdex-400-r1604.bin ;
 
 
 #
@@ -44,12 +44,13 @@ HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 #HAIKU_BOARD_SDIMAGE_BFS_OFFSET = ;
 
 # autoboot script
-HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = gumstix-factory.script ;
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = uImage.bin ;
 
 HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
-setenv bootargs debug_screen true; \
 if mmcinit; then \
+	neo backlight off; \
 	fatload mmc 0 $(HAIKU_BOARD_LOADER_UIBASE) haiku_loader_nbsd.ub; \
+	neo backlight on; \
 	bootm $(HAIKU_BOARD_LOADER_UIBASE); \
 fi" ;
 
