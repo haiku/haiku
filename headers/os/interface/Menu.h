@@ -249,7 +249,7 @@ private:
 									uint32& trigger,
 									BPrivate::TriggerList& triggers);
 			void				_UpdateWindowViewSize(const bool &updatePosition);
-			bool				_AddDynamicItems();
+			bool				_AddDynamicItems(bool keyDown = false);
 			bool				_OkToProceed(BMenuItem* item,
 									bool keyDown = false);
 
@@ -282,10 +282,7 @@ private:
 
 			LayoutData*			fLayoutData;
 
-			bool				fDynamicItemsAdded;
-			bool				_reserved1;
-			bool				_reserved2;
-			bool				_reserved3;
+			int32				_reserved;
 
 			char				fTrigger;
 			bool				fResizeToFit;

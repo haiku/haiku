@@ -210,7 +210,6 @@ BMenu::BMenu(const char* name, menu_layout layout)
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
-	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(true),
 	fUseCachedMenuLayout(false),
@@ -245,7 +244,6 @@ BMenu::BMenu(const char* name, float width, float height)
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
-	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(true),
 	fUseCachedMenuLayout(false),
@@ -281,7 +279,6 @@ BMenu::BMenu(BMessage* archive)
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
-	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(true),
 	fUseCachedMenuLayout(false),
@@ -1244,7 +1241,6 @@ BMenu::BMenu(BRect frame, const char* name, uint32 resizingMode, uint32 flags,
 	fMaxContentWidth(0.0f),
 	fInitMatrixSize(NULL),
 	fExtraMenuData(NULL),
-	fDynamicItemsAdded(false),
 	fTrigger(0),
 	fResizeToFit(resizeToFit),
 	fUseCachedMenuLayout(false),
@@ -1472,7 +1468,7 @@ BMenu::_Show(bool selectFirstItem, bool keyDown)
 	if (window->Lock()) {
 		bool attachAborted = false;
 		if (keyDown)
-			attachAborted = _AddDynamicItems();	
+			attachAborted = _AddDynamicItems(keyDown);	
 		
 		if (attachAborted) {
 			if (ourWindow)
@@ -2749,7 +2745,7 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 
 
 bool
-BMenu::_AddDynamicItems()
+BMenu::_AddDynamicItems(bool keyDown)
 {
 	bool attachAborted = false;
 	BMenuItem* superItem = Superitem();
@@ -2757,7 +2753,7 @@ BMenu::_AddDynamicItems()
 	if (AddDynamicItem(B_INITIAL_ADD)) {
 		do {
 			if (superMenu != NULL
-				&& !superMenu->_OkToProceed(superItem)) {
+				&& !superMenu->_OkToProceed(superItem, keyDown)) {
 				AddDynamicItem(B_ABORT);
 				attachAborted = true;
 				break;
