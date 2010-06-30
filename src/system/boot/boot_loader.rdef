@@ -9,5 +9,5 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Boot Loader",
-	long_info = "Boot Loader ©2002-2007 Haiku Inc."
+	long_info = "Boot Loader ©2002-2010 Haiku Inc."
 };
