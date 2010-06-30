@@ -25,6 +25,16 @@
 
 #define SDRAM_BASE 0x80000000
 
+#define VECT_BASE 0x00000000
+#define VECT_SIZE 0x1000
+
+#define DEVICE_BASE 0x48000000
+#define DEVICE_SIZE 0x2000000
+
+/* framebuffer */
+#define FB_BASE 0x88000000
+#define FB_SIZE 0x200000
+
 #define L4_BASE     0x48000000
 #define L4_WKUP_BASE    0x48300000
 #define L4_PER_BASE 0x49000000

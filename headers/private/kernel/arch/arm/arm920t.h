@@ -26,6 +26,16 @@
 
 #define SDRAM_BASE 0x30000000
 
+#define VECT_BASE 0x40200000
+#define VECT_SIZE 0x10000
+
+#define DEVICE_BASE 0x48000000
+#define DEVICE_SIZE 0x2000000
+
+/* framebuffer */
+#define FB_BASE 0x88000000
+#define FB_SIZE 0x200000
+
 /* UART */
 #define UART0_BASE    0x50000000
 #define UART1_BASE    0x50004000
