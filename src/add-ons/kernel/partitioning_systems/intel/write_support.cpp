@@ -1723,8 +1723,8 @@ check_partition_location_ep(partition_data* partition, off_t offset,
 
 	// partition does not lie within extended partition
 	if (offset < partition->offset
-		|| offset > partition->offset + partition->size
-		&& offset + size <= partition->offset + partition->size)
+		|| (offset > partition->offset + partition->size
+		&& offset + size <= partition->offset + partition->size))
 		return false;
 
 	// check if the new partition table is within an existing partition
@@ -1738,8 +1738,8 @@ check_partition_location_ep(partition_data* partition, off_t offset,
 		if (ptsOffset > logical->Offset()
 			&& ptsOffset < logical->Offset() + logical->Size())
 			return false;
-		if (logical->PartitionTableOffset() >= offset
-			&& logical->PartitionTableOffset() < offset + size
+		if ((logical->PartitionTableOffset() >= offset
+			&& logical->PartitionTableOffset() < offset + size)
 			|| logical->PartitionTableOffset() == ptsOffset)
 			return false;
 	}
