@@ -67,9 +67,8 @@ ScreenSaverController::MessageReceived(BMessage *message)
 		{
 			const char *signature;
 			if (message->FindString("be:signature", &signature) == B_OK
-				&& strcasecmp(signature, SCREEN_BLANKER_SIG) == 0) {
+				&& strcasecmp(signature, SCREEN_BLANKER_SIG) == 0)
 				fFilter->SetIsRunning(message->what == B_SOME_APP_LAUNCHED);
-			}
 			break;
 		}
 
@@ -191,15 +190,13 @@ ScreenSaverFilter::_Invoke()
 	// database for example...
 	BPath path;
 	if (find_directory(B_SYSTEM_BIN_DIRECTORY, &path) != B_OK
-		|| path.Append("screen_blanker") != B_OK) {
+		|| path.Append("screen_blanker") != B_OK)
 		path.SetTo("/boot/system/bin/screen_blanker");
-	}
 	BEntry entry(path.Path());
 	entry_ref ref;
 	if (entry.GetRef(&ref) == B_OK 
-		&& be_roster->Launch(&ref) == B_OK) {
+		&& be_roster->Launch(&ref) == B_OK)
 		fIsRunning = true;
-	}
 }
 
 
@@ -237,9 +234,8 @@ ScreenSaverFilter::ReloadSettings()
 	BMessage check(kMsgCheckTime);
 	fRunner = new (std::nothrow) BMessageRunner(fController, &check,
 		fSnoozeTime);
-	if (fRunner == NULL || fRunner->InitCheck() != B_OK) {
+	if (fRunner == NULL || fRunner->InitCheck() != B_OK)
 		syslog(LOG_ERR, "screen saver filter runner init failed\n");
-	}
 }
 
 
