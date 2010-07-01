@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2004-2009, Haiku Inc. All rights reserved.
+ * Copyright 2004-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <TypeConstants.h>
 
 #include <arch_config.h>
 #include <arch/system_info.h>
