@@ -765,7 +765,7 @@ publish_devices()
 {
 	TRACE((DRIVER_NAME": publish_devices()\n"));
 	if (gDeviceNames) {
-		for (int32 i = 1; gDeviceNames[i]; i++)
+		for (int32 i = 0; gDeviceNames[i]; i++)
 			free(gDeviceNames[i]);
 		free(gDeviceNames);
 		gDeviceNames = NULL;
