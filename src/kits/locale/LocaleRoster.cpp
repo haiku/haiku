@@ -16,6 +16,7 @@
 #include <stdio.h>		// for debug only
 #include <syslog.h>
 
+#include <AppFileInfo.h>
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Collator.h>
@@ -177,8 +178,8 @@ BCatalogAddOnInfo::UnloadIfPossible()
 		fInstantiateEmbeddedFunc = NULL;
 		fCreateFunc = NULL;
 		fLanguagesFunc = NULL;
-		log_team(LOG_DEBUG, "catalog-add-on %s has been unloaded",
-			fName.String());
+//		log_team(LOG_DEBUG, "catalog-add-on %s has been unloaded",
+//			fName.String());
 	}
 }
 
@@ -364,9 +365,6 @@ RosterData::InitializeCatalogAddOns()
 						}
 					}
 
-					log_team(LOG_ERR, "Found : %s priority: %d\n",
-						dent->d_name,priority);
-
 					if (priority >= 0) {
 						// add-ons with priority < 0 will be ignored
 						BCatalogAddOnInfo* addOnInfo
@@ -386,10 +384,6 @@ RosterData::InitializeCatalogAddOns()
 	for (int32 i=0; i<fCatalogAddOnInfos.CountItems(); ++i) {
 		BCatalogAddOnInfo *info
 			= static_cast<BCatalogAddOnInfo*>(fCatalogAddOnInfos.ItemAt(i));
-		log_team(LOG_INFO,
-			"roster uses catalog-add-on %s/%s with priority %d",
-			info->fIsEmbedded ? "(embedded)" : info->fPath.String(),
-			info->fName.String(), info->fPriority);
 	}
 }
 
@@ -425,10 +419,65 @@ BLocaleRoster::~BLocaleRoster()
 }
 
 
+BCatalog*
+BLocaleRoster::GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
+{
+	// This function is used in the translation macros, so it can't return a
+	// status_t. Maybe it could throw exceptions ?
+	
+	if (catalog == NULL) {
+		log_team(LOG_ERR, "GetCatalog called with a NULL catalog!");
+		return catalog;
+	}
+
+	if (*catalogInitStatus == true) {
+		// Catalog already loaded - nothing else to do
+		return catalog;
+	}
+
+	// figure out image (shared object) from catalog address
+	image_info info;
+	int32 cookie = 0;
+	bool found = false;
+
+	while (get_next_image_info(0, &cookie, &info) == B_OK) {
+		if ((char*)info.data < (char*)catalog && (char*)info.data+info.data_size
+				> (char*)catalog) {
+			found = true;
+			break;
+		}
+	}
+
+	if (!found) {
+		log_team(LOG_DEBUG, "Catalog %x doesn't belong to any image !",catalog);
+		return catalog;
+	}
+	// figure out mimetype from image
+	BFile objectFile(info.name, B_READ_ONLY);
+	BAppFileInfo objectInfo(&objectFile);
+	char objectSignature[B_MIME_TYPE_LENGTH];
+	objectInfo.GetSignature(objectSignature);
+
+	// drop supertype from mimetype (should be "application/"):
+	char* stripSignature = objectSignature;
+	while(*(stripSignature++)!='/');
+
+	log_team(LOG_DEBUG,
+		"Image %s (address %x) requested catalog with mimetype %s",
+		info.name, catalog, stripSignature);
+
+	// load the catalog for this mimetype and return it to the app
+	catalog->SetCatalog(stripSignature, 0);
+	*catalogInitStatus = true;
+
+	return catalog;
+}
+
+
 status_t
 BLocaleRoster::GetSystemCatalog(BCatalogAddOn **catalog) const
 {
-	if(!catalog)
+	if (!catalog)
 		return B_BAD_VALUE;
 	*catalog = be_locale_roster->LoadCatalog("system");
 	return B_OK;

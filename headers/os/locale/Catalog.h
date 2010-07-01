@@ -33,6 +33,8 @@ class BCatalog {
 		status_t GetLanguage(BString *lang);
 		status_t GetFingerprint(uint32 *fp);
 
+		status_t SetCatalog(const char* signature, uint32 fingerprint);
+
 		status_t InitCheck() const;
 		int32 CountItems() const;
 
@@ -55,6 +57,21 @@ class BCatalog {
 
 extern BCatalog* be_catalog;
 extern BCatalog* be_app_catalog;
+
+
+// Proxy class for handling a "shared object local" catalog.
+// This must be included (statically linked) into each shared object needing
+// a catalog on its own (application, add-on, library, ...). The shared object
+// must also have a mimetype so that the catalog can be identified.
+class BCatalogStub {
+	private:
+		static BCatalog	sCatalog;
+		static vint32	sCatalogInitOnce;
+
+	public:
+		static BCatalog* GetCatalog();
+};
+
 
 #ifndef B_AVOID_TRANSLATION_MACROS
 // macros for easy catalog-access, define B_AVOID_TRANSLATION_MACROS if
@@ -79,8 +96,24 @@ extern BCatalog* be_app_catalog;
 	//		source-file.
 
 
+#ifdef B_TRANSLATE_USE_NEW_MACROS
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
+#define B_TRANSLATE(str) \
+	BCatalogStub::GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT)
+
+#undef B_TRANSLATE_COMMENT
+#define B_TRANSLATE_COMMENT(str, cmt) \
+	BCatalogStub::GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT, (cmt))
+
+#undef B_TRANSLATE_ALL
+#define B_TRANSLATE_ALL(str, ctx, cmt) \
+	BCatalogStub::GetCatalog()->GetString((str), (ctx), (cmt))
+
+#undef B_TRANSLATE_ID
+#define B_TRANSLATE_ID(id) \
+	BCatalogStub::GetCatalog()->GetString((id))
+#else
 #define B_TRANSLATE(str) \
 	be_catalog->GetString((str), B_TRANSLATE_CONTEXT)
 
@@ -95,6 +128,7 @@ extern BCatalog* be_app_catalog;
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
 	be_catalog->GetString((id))
+#endif
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code):

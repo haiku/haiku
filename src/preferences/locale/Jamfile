@@ -10,8 +10,8 @@ Preference Locale :
 	LocaleWindow.cpp
 	TimeFormatSettingsView.cpp
 
-	: be liblocale.so $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libicu-common.so
-		libicu-data.so libshared.a
+	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libicu-common.so
+		libicu-data.so libshared.a $(HAIKU_LOCALE_LIBS)
 	: Locale.rdef
 ;
 

@@ -41,6 +41,10 @@ SharedLibrary liblocale.so
 	: be $(TARGET_LIBSTDC++) libicu-common.so libicu-i18n.so
 	;
 
+StaticLibrary liblocalestub.a
+	: CatalogStub.cpp
+	;
+
 SEARCH on [ FGristFiles StringForSize.cpp ] += [ FDirName $(HAIKU_TOP) src kits shared ] ;
 SEARCH on [ FGristFiles ColorControl.cpp ] += [ FDirName $(HAIKU_TOP) src kits interface ] ;
 

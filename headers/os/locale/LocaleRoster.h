@@ -36,6 +36,7 @@ class BLocaleRoster {
 //		status_t GetCatalog(BLocale *,const char *mimeType, BCatalog *catalog);
 //		status_t GetCatalog(const char *mimeType, BCatalog *catalog);
 //		status_t SetCatalog(BLocale *,const char *mimeType, BCatalog *catalog);
+		BCatalog* GetCatalog(BCatalog* catalog, vint32* catalogInitStatus);
 
 //		status_t GetLocaleFor(const char *langCode, const char *countryCode);
 

@@ -4,6 +4,9 @@
  */
 
 
+#define B_TRANSLATE_USE_NEW_MACROS
+
+
 #include "Locale.h"
 #include "LocaleWindow.h"
 
@@ -57,7 +60,6 @@ public:
 private:
 				Settings	fSettings;
 				LocaleWindow*	fLocaleWindow;
-				BCatalog	fCatalog;
 };
 
 
@@ -140,8 +142,6 @@ LocalePreflet::LocalePreflet()
 	:
 	BApplication(kSignature)
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	fLocaleWindow = new LocaleWindow();
 
 	if (fSettings.Message().HasPoint("window_location")) {

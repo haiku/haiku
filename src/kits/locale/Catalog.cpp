@@ -103,6 +103,21 @@ BCatalog::GetData(uint32 id, BMessage *msg)
 
 
 status_t
+BCatalog::SetCatalog(const char* signature, uint32 fingerprint)
+{
+	// TODO: The previous fCatalog is leaked here. (The whole chain, it
+	// looks like.) We should take care that internal members are always
+	// properly maintained.
+	// No other method should touch fCatalog directly, either (constructor for
+	// example)
+	fCatalog
+		= be_locale_roster->LoadCatalog(signature, NULL, fingerprint);
+
+	return B_OK;
+}
+
+
+status_t
 BCatalog::GetAppCatalog(BCatalog* catalog)
 {
 	app_info appInfo;
@@ -120,14 +135,9 @@ BCatalog::GetAppCatalog(BCatalog* catalog)
 	BNode appNode(&appInfo.ref);
 	appNode.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE, 0,
 		&fingerprint, sizeof(uint32));
+	catalog->SetCatalog(sig.String(), fingerprint);
 	// try to load catalog (with given fingerprint):
-	// TODO: Not so nice C++ design here, leading to such bugs: The previous
-	// fCatalog is leaked here. (The whole chain, it looks like.) There should
-	// be a SetCatalog() method (it can be private), and that should take care
-	// that internal members are always properly maintained.
-	catalog->fCatalog
-		= be_locale_roster->LoadCatalog(sig.String(), NULL,	fingerprint);
-
+	
 	// load native embedded id-based catalog. If such a catalog exists,
 	// we can fall back to native strings for id-based access, too.
 	BCatalogAddOn *embeddedCatalog

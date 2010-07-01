@@ -456,10 +456,16 @@ if $(HAIKU_SHARED_LIBSUPC++) {
 	HAIKU_LIBSUPC++ = $(HAIKU_SHARED_LIBSUPC++) ;
 }
 
+
 # network libraries
 HAIKU_NETWORK_LIBS = network ;
 HAIKU_NETAPI_LIB = bnetapi ;
 HAIKU_SELECT_UNAME_ETC_LIB = ;	# libroot, against which we link anyway
+
+
+# locale libraries
+HAIKU_LOCALE_LIBS = liblocale.so liblocalestub.a ;
+
 
 # library and executable glue code
 local commonGlueCode =
