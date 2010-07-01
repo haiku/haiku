@@ -776,7 +776,7 @@ publish_devices()
 	if (!gDeviceNames)
 		return NULL;
 
-	gDeviceNames[index++] = DEVICE_NAME;
+	gDeviceNames[index++] = strdup(DEVICE_NAME);
 
 	mutex_lock(&gDeviceListLock);
 	raw_device *element = gDeviceList;
