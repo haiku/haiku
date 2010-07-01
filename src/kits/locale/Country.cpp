@@ -173,6 +173,8 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
+	
+	delete timeFormatter;
 }
 
 
