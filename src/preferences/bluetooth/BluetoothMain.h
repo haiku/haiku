@@ -20,8 +20,6 @@ public:
 
 private:
 	BluetoothWindow*	fWindow;
-	BCatalog		fCatalog;
-
 };
 
 #endif
