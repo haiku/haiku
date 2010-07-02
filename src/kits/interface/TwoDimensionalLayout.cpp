@@ -539,7 +539,7 @@ BTwoDimensionalLayout::CompoundLayouter::AbsorbCompoundLayouter(
 		return;
 
 	int32 count = other->fLocalLayouters.CountItems();
-	for (int32 i = 0; i < count; i++) {
+	for (int32 i = count - 1; i >= 0; i--) {
 		LocalLayouter* layouter
 			= (LocalLayouter*)other->fLocalLayouters.ItemAt(i);
 		AddLocalLayouter(layouter);
@@ -1169,7 +1169,7 @@ BTwoDimensionalLayout::LocalLayouter::SetCompoundLayouter(
 		fHLayouter = compoundLayouter;
 	} else {
 		oldCompoundLayouter = fVLayouter;
-		fVLayouter = (VerticalCompoundLayouter*)compoundLayouter;
+		fVLayouter = static_cast<VerticalCompoundLayouter*>(compoundLayouter);
 	}
 
 	if (compoundLayouter == oldCompoundLayouter)
