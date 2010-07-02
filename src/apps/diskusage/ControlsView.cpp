@@ -34,7 +34,7 @@ public:
 
 			BVolume*	Volume() const
 							{ return fVolume; }
-			status_t	Invoke()
+			status_t	Invoke(BMessage* mesage = NULL)
 							{ return BMenuItem::Invoke(); }
 
 private:
