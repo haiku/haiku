@@ -91,7 +91,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 {
 	BCountry* here;
 	be_locale_roster->GetDefaultCountry(&here);
-	BPrivate::week_start startOfWeek = /*here->StartOfWeek()*/ B_WEEK_START_MONDAY;
+	BPrivate::week_start startOfWeek = here->StartOfWeek();
 
 	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
