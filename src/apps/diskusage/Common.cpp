@@ -6,6 +6,8 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #define ASSIGN_RESOURCES
 #include "Common.h"
 
@@ -87,7 +89,6 @@ read_resources(const char* appSignature)
 		entry.GetRef(&kHelpFileRef);
 	} else
 		kFoundHelpFile = false;
-		
 
 	return r;
 }
@@ -99,7 +100,7 @@ size_to_string(off_t byteCount, char* name)
 	struct {
 		off_t		limit;
 		float		divisor;
-		char*		format;
+		const char*	format;
 	} scale[] = {
 		{ 0x100000,				1024.0,					"%.2f KB" },
 		{ 0x40000000,			1048576.0,				"%.2f MB" },
@@ -117,4 +118,3 @@ size_to_string(off_t byteCount, char* name)
 		sprintf(name, scale[i].format, byteCount / scale[i].divisor);
 	}
 }
-
