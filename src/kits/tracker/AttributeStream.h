@@ -396,7 +396,7 @@ template<class Type>
 int32 
 AttributeStreamConstValue<Type>::Find(const char *name, uint32 type) const
 {
-	if (strcmp(fAttr.Name(), name) == 0 && type = fAttr.Type())
+	if (strcmp(fAttr.Name(), name) == 0 && type == fAttr.Type())
 		return 0;
 
 	return -1;
