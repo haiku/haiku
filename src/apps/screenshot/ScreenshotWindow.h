@@ -50,6 +50,7 @@ private:
 			void			_UpdateFilenameSelection();
 			void			_SetupTranslatorMenu();
 			status_t		_SaveScreenshot();
+			void			_ShowSettings();
 			BString			_FindValidFileName(const char* name);
 			BPath			_GetDirectory();
 			void			_ReadSettings();

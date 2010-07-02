@@ -37,6 +37,7 @@
 #include <StringView.h>
 #include <TextControl.h>
 #include <TranslationUtils.h>
+#include <TranslatorRoster.h>
 
 #include "PreviewView.h"
 #include "Utility.h"
@@ -50,7 +51,8 @@ enum {
 	kImageFormat,
 	kLocationChanged,
 	kChooseLocation,
-	kSaveScreenshot
+	kSaveScreenshot,
+	kSettings
 };
 
 
@@ -158,6 +160,8 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 0)
 		.Add(menuField->CreateLabelLayoutItem(), 0, 1)
 		.Add(menuField->CreateMenuBarLayoutItem(), 1, 1)
+		.Add(new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS), 
+			new BMessage(kSettings)), 2, 1)
 		.Add(menuField2->CreateLabelLayoutItem(), 0, 2)
 		.Add(menuField2->CreateMenuBarLayoutItem(), 1, 2);
 	gridLayout->SetMinColumnWidth(1,
@@ -302,6 +306,10 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		case B_COPY:
 			fUtility.CopyToClipboard(fScreenshot);
 			break;
+			
+		case kSettings:
+			_ShowSettings();
+			break;
 
 		default:
 			BWindow::MessageReceived(message);
@@ -317,6 +325,9 @@ ScreenshotWindow::Quit()
 		_WriteSettings();
 	BWindow::Quit();
 }
+
+
+// #pragma - private
 
 
 void
@@ -540,6 +551,56 @@ ScreenshotWindow::_SaveScreenshot()
 	}
 
 	return fUtility.Save(&fScreenshot, path.Path(), fImageFileType);
+}
+
+
+void
+ScreenshotWindow::_ShowSettings()
+{
+	// Find a translator
+	translator_id translator = 0;
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	translator_id* translators = NULL;
+	int32 numTranslators = 0;
+	if (roster->GetAllTranslators(&translators, &numTranslators) != B_OK)
+		return;
+	bool foundTranslator = false;
+	for (int32 x = 0; x < numTranslators; x++) {
+		const translation_format* formats = NULL;
+		int32 numFormats;
+		if (roster->GetOutputFormats(translators[x], &formats, &numFormats) == B_OK) {
+			for (int32 i = 0; i < numFormats; ++i) {
+				if (formats[i].type == static_cast<uint32>(fImageFileType)) {
+					translator = translators[x];
+					foundTranslator = true;
+					break;
+				}
+			}
+		}
+		if (foundTranslator)
+			break;
+	}
+	delete [] translators;
+	if (!foundTranslator)
+		return;
+
+	// Create a window with a configuration view	
+	BView *view;
+	BRect rect(0, 0, 239, 239);
+
+	status_t err = roster->MakeConfigurationView(translator, NULL, &view,
+		&rect);
+	if (err < B_OK || view == NULL) {
+		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
+		alert->Go();
+	} else {
+		BWindow* window = new BWindow(rect, "Translator Settings",
+			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
+		window->AddChild(view);
+		window->CenterOnScreen();
+		window->Show();
+	}
 }
 
 
