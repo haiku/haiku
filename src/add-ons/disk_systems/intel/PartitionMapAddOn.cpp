@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "CreationParameterEditor.h"
 #include "PartitionMapAddOn.h"
 
@@ -21,9 +22,9 @@
 //#define TRACE_PARTITION_MAP_ADD_ON
 #undef TRACE
 #ifdef TRACE_PARTITION_MAP_ADD_ON
-# define TRACE(x...) printf(x)
+#	define TRACE(x...) printf(x)
 #else
-# define TRACE(x...) do {} while (false)
+#	define TRACE(x...) do {} while (false)
 #endif
 
 
@@ -55,20 +56,18 @@ static const uint32 kDiskSystemFlags =
 // #pragma mark - PartitionMapAddOn
 
 
-// constructor
 PartitionMapAddOn::PartitionMapAddOn()
-	: BDiskSystemAddOn(kPartitionTypeIntel, kDiskSystemFlags)
+	:
+	BDiskSystemAddOn(kPartitionTypeIntel, kDiskSystemFlags)
 {
 }
 
 
-// destructor
 PartitionMapAddOn::~PartitionMapAddOn()
 {
 }
 
 
-// CreatePartitionHandle
 status_t
 PartitionMapAddOn::CreatePartitionHandle(BMutablePartition* partition,
 	BPartitionHandle** _handle)
@@ -88,7 +87,6 @@ PartitionMapAddOn::CreatePartitionHandle(BMutablePartition* partition,
 }
 
 
-// CanInitialize
 bool
 PartitionMapAddOn::CanInitialize(const BMutablePartition* partition)
 {
@@ -97,7 +95,6 @@ PartitionMapAddOn::CanInitialize(const BMutablePartition* partition)
 }
 
 
-// GetInitializationParameterEditor
 status_t
 PartitionMapAddOn::GetInitializationParameterEditor(
 	const BMutablePartition* partition, BPartitionParameterEditor** editor)
@@ -108,7 +105,6 @@ PartitionMapAddOn::GetInitializationParameterEditor(
 }
 
 
-// ValidateInitialize
 status_t
 PartitionMapAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
@@ -126,7 +122,6 @@ PartitionMapAddOn::ValidateInitialize(const BMutablePartition* partition,
 }
 
 
-// Initialize
 status_t
 PartitionMapAddOn::Initialize(BMutablePartition* partition, const char* name,
 	const char* parameters, BPartitionHandle** _handle)
@@ -163,20 +158,18 @@ PartitionMapAddOn::Initialize(BMutablePartition* partition, const char* name,
 // #pragma mark - PartitionMapHandle
 
 
-// constructor
 PartitionMapHandle::PartitionMapHandle(BMutablePartition* partition)
-	: BPartitionHandle(partition)
+	:
+	BPartitionHandle(partition)
 {
 }
 
 
-// destructor
 PartitionMapHandle::~PartitionMapHandle()
 {
 }
 
 
-// Init
 status_t
 PartitionMapHandle::Init()
 {
@@ -220,7 +213,6 @@ PartitionMapHandle::Init()
 }
 
 
-// SupportedOperations
 uint32
 PartitionMapHandle::SupportedOperations(uint32 mask)
 {
@@ -232,7 +224,7 @@ PartitionMapHandle::SupportedOperations(uint32 mask)
 		| B_DISK_SYSTEM_SUPPORTS_INITIALIZING;
 
 	// creating child
-	if (mask & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) {
+	if ((mask & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) != 0) {
 		BPartitioningInfo info;
 		if (partition->CountChildren() < 4
 			&& GetPartitioningInfo(&info) == B_OK
@@ -245,7 +237,6 @@ PartitionMapHandle::SupportedOperations(uint32 mask)
 }
 
 
-// SupportedChildOperations
 uint32
 PartitionMapHandle::SupportedChildOperations(const BMutablePartition* child,
 	uint32 mask)
@@ -257,7 +248,6 @@ PartitionMapHandle::SupportedChildOperations(const BMutablePartition* child,
 }
 
 
-// GetNextSupportedType
 status_t
 PartitionMapHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
@@ -286,7 +276,6 @@ PartitionMapHandle::GetNextSupportedType(const BMutablePartition* child,
 }
 
 
-// GetPartitioningInfo
 status_t
 PartitionMapHandle::GetPartitioningInfo(BPartitioningInfo* info)
 {
@@ -312,7 +301,6 @@ PartitionMapHandle::GetPartitioningInfo(BPartitioningInfo* info)
 }
 
 
-// GetChildCreationParameterEditor
 status_t
 PartitionMapHandle::GetChildCreationParameterEditor(const char* type,
 	BPartitionParameterEditor** editor)
@@ -328,7 +316,6 @@ PartitionMapHandle::GetChildCreationParameterEditor(const char* type,
 }
 
 
-// ValidateCreateChild
 status_t
 PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	const char* typeString, BString* name, const char* parameters)
@@ -444,7 +431,6 @@ PartitionMapHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 }
 
 
-// CreateChild
 status_t
 PartitionMapHandle::CreateChild(off_t offset, off_t size,
 	const char* typeString, const char* name, const char* parameters,
@@ -533,7 +519,6 @@ PartitionMapHandle::CreateChild(off_t offset, off_t size,
 }
 
 
-// DeleteChild
 status_t
 PartitionMapHandle::DeleteChild(BMutablePartition* child)
 {

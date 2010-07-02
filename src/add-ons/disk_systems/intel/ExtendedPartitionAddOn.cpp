@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ExtendedPartitionAddOn.h"
 
 #include <new>
@@ -16,15 +17,17 @@
 
 #include "IntelDiskSystem.h"
 
+
 //#define TRACE_EXTENDED_PARTITION_ADD_ON
 #undef TRACE
 #ifdef TRACE_EXTENDED_PARTITION_ADD_ON
-# define TRACE(x...) printf(x)
+#	define TRACE(x...) printf(x)
 #else
-# define TRACE(x...) do {} while (false)
+#	define TRACE(x...) do {} while (false)
 #endif
 
 #define PTS_OFFSET (63 * Partition()->BlockSize())
+
 
 using std::nothrow;
 
@@ -54,20 +57,18 @@ static const uint32 kDiskSystemFlags =
 // #pragma mark - ExtendedPartitionAddOn
 
 
-// constructor
 ExtendedPartitionAddOn::ExtendedPartitionAddOn()
-	: BDiskSystemAddOn(kPartitionTypeIntelExtended, kDiskSystemFlags)
+	:
+	BDiskSystemAddOn(kPartitionTypeIntelExtended, kDiskSystemFlags)
 {
 }
 
 
-// destructor
 ExtendedPartitionAddOn::~ExtendedPartitionAddOn()
 {
 }
 
 
-// CreatePartitionHandle
 status_t
 ExtendedPartitionAddOn::CreatePartitionHandle(BMutablePartition* partition,
 	BPartitionHandle** _handle)
@@ -88,7 +89,6 @@ ExtendedPartitionAddOn::CreatePartitionHandle(BMutablePartition* partition,
 }
 
 
-// CanInitialize
 bool
 ExtendedPartitionAddOn::CanInitialize(const BMutablePartition* partition)
 {
@@ -97,7 +97,6 @@ ExtendedPartitionAddOn::CanInitialize(const BMutablePartition* partition)
 }
 
 
-// GetInitializationParameterEditor
 status_t
 ExtendedPartitionAddOn::GetInitializationParameterEditor(
 	const BMutablePartition* partition, BPartitionParameterEditor** editor)
@@ -108,7 +107,6 @@ ExtendedPartitionAddOn::GetInitializationParameterEditor(
 }
 
 
-// ValidateInitialize
 status_t
 ExtendedPartitionAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
@@ -126,7 +124,6 @@ ExtendedPartitionAddOn::ValidateInitialize(const BMutablePartition* partition,
 }
 
 
-// Initialize
 status_t
 ExtendedPartitionAddOn::Initialize(BMutablePartition* partition,
 	const char* name, const char* parameters, BPartitionHandle** _handle)
@@ -164,20 +161,18 @@ ExtendedPartitionAddOn::Initialize(BMutablePartition* partition,
 // #pragma mark - ExtendedPartitionHandle
 
 
-// constructor
 ExtendedPartitionHandle::ExtendedPartitionHandle(BMutablePartition* partition)
-	: BPartitionHandle(partition)
+	:
+	BPartitionHandle(partition)
 {
 }
 
 
-// destructor
 ExtendedPartitionHandle::~ExtendedPartitionHandle()
 {
 }
 
 
-// Init
 status_t
 ExtendedPartitionHandle::Init()
 {
@@ -234,14 +229,13 @@ ExtendedPartitionHandle::Init()
 }
 
 
-// SupportedOperations
 uint32
 ExtendedPartitionHandle::SupportedOperations(uint32 mask)
 {
 	uint32 flags = 0;
 
 	// creating child
-	if (mask & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) {
+	if ((mask & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD) != 0) {
 		BPartitioningInfo info;
 		if (GetPartitioningInfo(&info) == B_OK
 			&& info.CountPartitionableSpaces() > 1) {
@@ -253,7 +247,6 @@ ExtendedPartitionHandle::SupportedOperations(uint32 mask)
 }
 
 
-// SupportedChildOperations
 uint32
 ExtendedPartitionHandle::SupportedChildOperations(
 	const BMutablePartition* child, uint32 mask)
@@ -262,7 +255,6 @@ ExtendedPartitionHandle::SupportedChildOperations(
 }
 
 
-// GetNextSupportedType
 status_t
 ExtendedPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
@@ -290,7 +282,6 @@ ExtendedPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 }
 
 
-// GetPartitioningInfo
 status_t
 ExtendedPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 {
@@ -325,7 +316,6 @@ ExtendedPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 }
 
 
-// GetChildCreationParameterEditor
 status_t
 ExtendedPartitionHandle::GetChildCreationParameterEditor(const char* type,
 	BPartitionParameterEditor** editor)
@@ -335,7 +325,6 @@ ExtendedPartitionHandle::GetChildCreationParameterEditor(const char* type,
 }
 
 
-// ValidateCreateChild
 status_t
 ExtendedPartitionHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 	const char* typeString, BString* name, const char* parameters)
@@ -436,7 +425,6 @@ ExtendedPartitionHandle::ValidateCreateChild(off_t* _offset, off_t* _size,
 }
 
 
-// CreateChild
 status_t
 ExtendedPartitionHandle::CreateChild(off_t offset, off_t size,
 	const char* typeString, const char* name, const char* _parameters,
@@ -500,7 +488,6 @@ ExtendedPartitionHandle::CreateChild(off_t offset, off_t size,
 }
 
 
-// DeleteChild
 status_t
 ExtendedPartitionHandle::DeleteChild(BMutablePartition* child)
 {
@@ -509,4 +496,3 @@ ExtendedPartitionHandle::DeleteChild(BMutablePartition* child)
 
 	return error;
 }
-
