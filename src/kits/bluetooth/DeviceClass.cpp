@@ -5,15 +5,25 @@
 
 #include <bluetooth/DeviceClass.h>
 
+#include <Catalog.h>
+#include <Locale.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "DeviceClass"
+
+
 namespace Bluetooth {
 
 void
 DeviceClass::GetServiceClass(BString& serviceClass)
 {
-	static const char *services[] = { "Positioning", "Networking",
-				"Rendering", "Capturing", "Object transfer",
-				"Audio", "Telephony", "Information" };
-
+	static const char *services[] = { B_TRANSLATE_MARK("Positioning"), 
+		B_TRANSLATE_MARK("Networking"), B_TRANSLATE_MARK("Rendering"), 
+		B_TRANSLATE_MARK("Capturing"), B_TRANSLATE_MARK("Object transfer"),
+		B_TRANSLATE_MARK("Audio"), B_TRANSLATE_MARK("Telephony"), 
+		B_TRANSLATE_MARK("Information") };
+		
 	if (ServiceClass() != 0) {
 		bool first = true;
 
@@ -30,7 +40,7 @@ DeviceClass::GetServiceClass(BString& serviceClass)
 		}
 
 	} else
-		serviceClass << "Unspecified";
+		serviceClass << B_TRANSLATE("Unspecified");
 
 }
 
@@ -38,11 +48,14 @@ DeviceClass::GetServiceClass(BString& serviceClass)
 void
 DeviceClass::GetMajorDeviceClass(BString& majorClass)
 {
-	static const char *major_devices[] = { "Miscellaneous", "Computer", "Phone",
-				"LAN access", "Audio/Video", "Peripheral", "Imaging", "Uncategorized" };
+	static const char *major_devices[] = { B_TRANSLATE_MARK("Miscellaneous"), 
+		B_TRANSLATE_MARK("Computer"), B_TRANSLATE_MARK("Phone"), 
+		B_TRANSLATE_MARK("LAN access"), B_TRANSLATE_MARK("Audio/Video"), 
+		B_TRANSLATE_MARK("Peripheral"), B_TRANSLATE_MARK("Imaging"), 
+		B_TRANSLATE_MARK("Uncategorized") };
 
 	if (MajorDeviceClass() >= sizeof(major_devices) / sizeof(*major_devices))
-		majorClass << "Invalid device class!\n";
+		majorClass << B_TRANSLATE("Invalid device class!\n");
 	else
 		majorClass << major_devices[MajorDeviceClass()];
 
@@ -62,139 +75,141 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 		case 1:	/* computer */
 			switch(minor) {
 				case 0:
-					minorClass << "Uncategorized";
+					minorClass << B_TRANSLATE("Uncategorized");
 					break;	
 				case 1:
-					minorClass << "Desktop workstation";
+					minorClass << B_TRANSLATE("Desktop workstation");
 					break;	
 				case 2:
-					minorClass << "Server";
+					minorClass << B_TRANSLATE("Server");
 					break;
 				case 3:
-					minorClass << "Laptop";
+					minorClass << B_TRANSLATE("Laptop");
 					break;
 				case 4:
-					minorClass << "Handheld";
+					minorClass << B_TRANSLATE("Handheld");
 					break;
 				case 5:
-					minorClass << "Palm";
+					minorClass << B_TRANSLATE_COMMENT("Palm", 
+						"A palm-held device");
 					break;
 				case 6:
-					minorClass << "Wearable";
+					minorClass << B_TRANSLATE_COMMENT("Wearable",
+						"A wearable computer");
 					break;
 				}
 			break;
 		case 2:	/* phone */
 			switch(minor) {
 				case 0:
-					minorClass << "Uncategorized";
+					minorClass << B_TRANSLATE("Uncategorized");
 					break;
 				case 1:
-					minorClass << "Cellular";
+					minorClass << B_TRANSLATE("Cellular");
 					break;
 				case 2:
-					minorClass << "Cordless";
+					minorClass << B_TRANSLATE("Cordless");
 					break;
 				case 3:
-					minorClass << "Smart phone";
+					minorClass << B_TRANSLATE("Smart phone");
 					break;
 				case 4:
-					minorClass << "Wired modem or voice gateway";
+					minorClass << B_TRANSLATE("Wired modem or voice gateway");
 					break;
 				case 5:
-					minorClass << "Common ISDN access";
+					minorClass << B_TRANSLATE("Common ISDN access");
 					break;
 				case 6:
-					minorClass << "SIM card reader";
+					minorClass << B_TRANSLATE("SIM card reader");
 					break;
 			}
 			break;
 		case 3:	/* lan access */
 			if (minor == 0) {
-				minorClass << "Uncategorized";
+				minorClass << B_TRANSLATE("Uncategorized");
 				break;
 			}
 			switch(minor / 8) {
 				case 0:
-					minorClass << "Fully available";
+					minorClass << B_TRANSLATE("Fully available");
 					break;
 				case 1:
-					minorClass << "1-17% utilized";
+					minorClass << B_TRANSLATE("1-17% utilized");
 					break;
 				case 2:
-					minorClass << "17-33% utilized";
+					minorClass << B_TRANSLATE("17-33% utilized");
 					break;
 				case 3:
-					minorClass << "33-50% utilized";
+					minorClass << B_TRANSLATE("33-50% utilized");
 					break;
 				case 4:
-					minorClass << "50-67% utilized";
+					minorClass << B_TRANSLATE("50-67% utilized");
 					break;
 				case 5:
-					minorClass << "67-83% utilized";
+					minorClass << B_TRANSLATE("67-83% utilized");
 					break;
 				case 6:
-					minorClass << "83-99% utilized";
+					minorClass << B_TRANSLATE("83-99% utilized");
 					break;
 				case 7:
-					minorClass << "No service available";
+					minorClass << B_TRANSLATE("No service available");
 					break;
 			}
 			break;
 		case 4:	/* audio/video */
 			switch(minor) {
 				case 0:
-					minorClass << "Uncategorized";
+					minorClass << B_TRANSLATE("Uncategorized");
 					break;
 				case 1:
-					minorClass << "Device conforms to the headset profile";
+					minorClass << B_TRANSLATE("Device conforms to the headset profile");
 					break;
 				case 2:
-					minorClass << "Hands-free";
+					minorClass << B_TRANSLATE("Hands-free");
 					break;
 					/* 3 is reserved */
 				case 4:
-					minorClass << "Microphone";
+					minorClass << B_TRANSLATE("Microphone");
 					break;
 				case 5:
-					minorClass << "Loudspeaker";
+					minorClass << B_TRANSLATE("Loudspeaker");
 					break;
 				case 6:
-					minorClass << "Headphones";
+					minorClass << B_TRANSLATE("Headphones");
 					break;
 				case 7:
-					minorClass << "Portable audio";
+					minorClass << B_TRANSLATE("Portable audio");
 					break;
 				case 8:
-					minorClass << "Car audio";
+					minorClass << B_TRANSLATE("Car audio");
 					break;
 				case 9:
-					minorClass << "Set-top box";
+					minorClass << B_TRANSLATE("Set-top box");
 					break;
 				case 10:
-					minorClass << "HiFi audio device";
+					minorClass << B_TRANSLATE("HiFi audio device");
 					break;
 				case 11:
-					minorClass << "VCR";
+					minorClass << B_TRANSLATE("VCR");
 					break;
 				case 12:
-					minorClass << "Video camera";
+					minorClass << B_TRANSLATE("Video camera");
 					break;
 				case 13:
-					minorClass << "Camcorder";
+					minorClass << B_TRANSLATE("Camcorder");
 					break;
 				case 14:
-					minorClass << "Video monitor";
+					minorClass << B_TRANSLATE("Video monitor");
 					break;
 				case 15:
-					minorClass << "Video display and loudspeaker";
+					minorClass << B_TRANSLATE("Video display and loudspeaker");
 					break;
 				case 16:
-					minorClass << "Video conferencing";
+					minorClass << B_TRANSLATE("Video conferencing");
 					break;
 					/* 17 is reserved */
 				case 18:
-					minorClass << "Gaming/Toy";
+					minorClass << B_TRANSLATE("Gaming/Toy");
 					break;
 			}
 			break;
@@ -202,17 +217,17 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 		{		
 			switch(minor & 48) {
 				case 16:
-					minorClass << "Keyboard";
+					minorClass << B_TRANSLATE("Keyboard");
 					if (minor & 15)
 						minorClass << "/";
 					break;
 				case 32:
-					minorClass << "Pointing device";
+					minorClass << B_TRANSLATE("Pointing device");
 					if (minor & 15)
 						minorClass << "/";
 					break;
 				case 48:
-					minorClass << "Combo keyboard/pointing device";
+					minorClass << B_TRANSLATE("Combo keyboard/pointing device");
 					if (minor & 15)
 						minorClass << "/";							
 					break;
@@ -222,74 +237,75 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 				case 0:
 					break;
 				case 1:
-					minorClass << "Joystick";
+					minorClass << B_TRANSLATE("Joystick");
 					break;
 				case 2:
-					minorClass << "Gamepad";
+					minorClass << B_TRANSLATE("Gamepad");
 					break;
 				case 3:
-					minorClass << "Remote control";
+					minorClass << B_TRANSLATE("Remote control");
 					break;
 				case 4:
-					minorClass << "Sensing device";
+					minorClass << B_TRANSLATE("Sensing device");
 					break;
 				case 5:
-					minorClass << "Digitizer tablet";
+					minorClass << B_TRANSLATE("Digitizer tablet");
 					break;
 				case 6:
-					minorClass << "Card reader";
+					minorClass << B_TRANSLATE("Card reader");
 					break;
 				default:
-					minorClass << "(reserved)";
+					minorClass << B_TRANSLATE("(reserved)");
 					break;
 			}
 			break;
 		}
 		case 6:	/* imaging */
 			if (minor & 4)
-				minorClass << "Display";
+				minorClass << B_TRANSLATE("Display");
 			if (minor & 8)
-				minorClass << "Camera";
+				minorClass << B_TRANSLATE("Camera");
 			if (minor & 16)
-				minorClass << "Scanner";
+				minorClass << B_TRANSLATE("Scanner");
 			if (minor & 32)
-				minorClass << "Printer";
+				minorClass << B_TRANSLATE("Printer");
 			break;
 		case 7: /* wearable */
 			switch(minor) {
 				case 1:
-					minorClass << "Wrist watch";
+					minorClass << B_TRANSLATE("Wrist watch");
 					break;
 				case 2:
-					minorClass << "Pager";
+					minorClass << B_TRANSLATE_COMMENT("Pager",
+					"A small radio device to receive short text messages");
 					break;
 				case 3:
-					minorClass << "Jacket";
+					minorClass << B_TRANSLATE("Jacket");
 					break;
 				case 4:
-					minorClass << "Helmet";
+					minorClass << B_TRANSLATE("Helmet");
 					break;
 				case 5:
-					minorClass << "Glasses";
+					minorClass << B_TRANSLATE("Glasses");
 					break;
 			}
 			break;
 		case 8: /* toy */
 			switch(minor) {
 				case 1:
-					minorClass << "Robot";
+					minorClass << B_TRANSLATE("Robot");
 					break;	
 				case 2:
-					minorClass << "Vehicle";
+					minorClass << B_TRANSLATE("Vehicle");
 					break;
 				case 3:
-					minorClass << "Doll/Action figure";
+					minorClass << B_TRANSLATE("Doll/Action figure");
 					break;
 				case 4:
-					minorClass << "Controller";
+					minorClass << B_TRANSLATE("Controller");
 					break;
 				case 5:
-					minorClass << "Game";
+					minorClass << B_TRANSLATE("Game");
 					break;
 			}
 			break;
@@ -297,7 +313,7 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 			minorClass << "";
 			break;
 		default:
-			minorClass << "Unknown (reserved) minor device class";
+			minorClass << B_TRANSLATE("Unknown (reserved) minor device class");
 			break;
 	}
 }
@@ -306,13 +322,13 @@ DeviceClass::GetMinorDeviceClass(BString& minorClass)
 void
 DeviceClass::DumpDeviceClass(BString& string)
 {
-	string << "Service classes: ";
+	string << B_TRANSLATE("Service classes: ");
 	GetServiceClass(string);
 	string << " | ";
-	string << "Major class: ";
+	string << B_TRANSLATE("Major class: ");
 	GetMajorDeviceClass(string);
 	string << " | ";
-	string << "Minor class: ";
+	string << B_TRANSLATE("Minor class: ");
 	GetMinorDeviceClass(string);
 	string << ".";
 }

@@ -16,10 +16,15 @@
 
 #include <bluetooth/bluetooth_error.h>
 
+#include <Catalog.h>
 #include <CommandManager.h>
+#include <Locale.h>
 #include <bluetoothserver_p.h>
 
 #include "KitSupport.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "RemoteDevice"
 
 
 namespace Bluetooth {
@@ -40,14 +45,14 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 	if (!alwaysAsk) {
 		// Check if the name is already retrieved
 		// TODO: Check if It is known from a KnownDevicesList
-		return BString("Not implemented");
+		return BString(B_TRANSLATE("Not implemented"));
 	}
 
 	if (fDiscovererLocalDevice == NULL)
-		return BString("#NoOwnerError#Not Valid name");
+		return BString(B_TRANSLATE("#NoOwnerError#Not Valid name"));
 
 	if (fMessenger == NULL)
-		return BString("#ServerNotReady#Not Valid name");
+		return BString(B_TRANSLATE("#ServerNotReady#Not Valid name"));
 
 	void* remoteNameCommand = NULL;
 	size_t size;
@@ -85,11 +90,11 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 
 		} else {
 			// seems we got a negative event
-			return BString("#CommandFailed#Not Valid name");
+			return BString(B_TRANSLATE("#CommandFailed#Not Valid name"));
 		}
 	}
 
-	return BString("#NotCompletedRequest#Not Valid name");
+	return BString(B_TRANSLATE("#NotCompletedRequest#Not Valid name"));
 }
 
 

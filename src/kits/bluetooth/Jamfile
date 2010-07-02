@@ -24,5 +24,13 @@ SharedLibrary libbluetooth.so :
 	#UI
 	PincodeWindow.cpp
 	ConnectionIncoming.cpp
-	: be $(TARGET_LIBSTDC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSTDC++)
+;
+
+DoCatalogs libbluetooth.so :
+	x-vnd.Haiku-Bluetooth
+	:
+	DeviceClass.cpp
+	RemoteDevice.cpp
+	LocaleCatalog.cpp
 ;
