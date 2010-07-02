@@ -7,11 +7,14 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #include "PieView.h"
 
 #include <fs_info.h>
 #include <math.h>
 
+#include <Alert.h>
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Entry.h>
@@ -23,7 +26,6 @@
 #include <Roster.h>
 #include <String.h>
 #include <Volume.h>
-#include <Alert.h>
 
 #include <tracker_private.h>
 
@@ -42,7 +44,7 @@ static const int32 kIdxRescan = 3;
 // TODO: It would be nice to make a common base class for AppMenuItem and
 // VolMenuItem (menu items that include an icon).
 
-class AppMenuItem: public BMenuItem {
+class AppMenuItem : public BMenuItem {
 public:
 								AppMenuItem(const char* appSig, int category);
 	virtual						~AppMenuItem();
@@ -65,8 +67,12 @@ private:
 };
 
 
-AppMenuItem::AppMenuItem(const char* appSig, int category):
-	BMenuItem(kEmptyStr, NULL), fCategory(category), fIcon(NULL), fIsValid(false)
+AppMenuItem::AppMenuItem(const char* appSig, int category)
+	:
+	BMenuItem(kEmptyStr, NULL),
+	fCategory(category),
+	fIcon(NULL),
+	fIsValid(false)
 {
 	if (be_roster->FindApp(appSig, &fAppRef) == B_NO_ERROR) {
 		fIcon = new BBitmap(BRect(0.0, 0.0, 15.0, 15.0), B_RGBA32);
@@ -120,14 +126,15 @@ AppMenuItem::DrawContent()
 
 
 PieView::PieView(BRect frame, MainWindow* window)
-	: BView(frame, NULL, B_FOLLOW_ALL,
+	:
+	BView(frame, NULL, B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_SUBPIXEL_PRECISE),
-	  fWindow(window),
-	  fScanners(),
-	  fCurrentVolume(NULL),
-	  fMouseOverInfo(),
-	  fClicked(false),
-	  fDragging(false)
+	fWindow(window),
+	fScanners(),
+	fCurrentVolume(NULL),
+	fMouseOverInfo(),
+	fClicked(false),
+	fDragging(false)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(kWindowColor);
@@ -849,5 +856,3 @@ PieView::_OpenInfo(FileInfo* info, BPoint p)
 		tracker.SendMessage(&message);
 	}
 }
-
-

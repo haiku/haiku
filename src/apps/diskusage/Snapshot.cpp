@@ -6,6 +6,8 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #include "Snapshot.h"
 
 #include <stdio.h>
@@ -24,11 +26,12 @@ static const char* kVolumeType = "application/x-vnd.Be-volume";
 
 
 FileInfo::FileInfo()
-	: pseudo(false),
-	  size(0),
-	  count(0),
-	  parent(NULL),
-	  children()
+	:
+	pseudo(false),
+	size(0),
+	count(0),
+	parent(NULL),
+	children()
 {
 }
 
@@ -124,4 +127,3 @@ VolumeSnapshot::~VolumeSnapshot()
 	delete rootDir;
 	delete freeSpace;
 }
-

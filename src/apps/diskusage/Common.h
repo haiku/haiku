@@ -9,6 +9,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+
 #include <Entry.h>
 #include <GraphicsDefs.h>
 #include <Resources.h>
@@ -100,4 +101,3 @@ BResources* read_resources(const char* appSignature);
 void size_to_string(off_t byteCount, char* name);
 
 #endif // COMMON_H
-

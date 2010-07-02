@@ -6,6 +6,8 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #include "StatusView.h"
 
 #include <math.h>
@@ -21,8 +23,9 @@
 
 
 StatusView::StatusView(BRect rect)
-	: BView(rect, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW),
-	  fCurrentFileInfo(NULL)
+	:
+	BView(rect, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW),
+	fCurrentFileInfo(NULL)
 {
 	SetViewColor(kWindowColor);
 
@@ -130,5 +133,3 @@ StatusView::Show(const FileInfo* info)
 		fCountView->SetText(kEmptyStr);
 	}
 }
-
-

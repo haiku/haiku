@@ -9,6 +9,7 @@
 #ifndef INFO_WINDOW_H
 #define INFO_WINDOW_H
 
+
 #include <Window.h>
 
 
@@ -16,22 +17,21 @@ struct FileInfo;
 
 class LeftView: public BView {
 public:
-								LeftView(BRect frame, BBitmap* icon);
-	virtual						~LeftView();
+						LeftView(BRect frame, BBitmap* icon);
+	virtual				~LeftView();
 
-	virtual	void				Draw(BRect updateRect);
+	virtual	void		Draw(BRect updateRect);
 
 private:
-			BBitmap*			fIcon;
+			BBitmap*	fIcon;
 };
 
 
 class InfoWin: public BWindow {
 public:
-								InfoWin(BPoint location, FileInfo* info,
-									BWindow* parent);
-	virtual						~InfoWin();
+						InfoWin(BPoint location, FileInfo* info,
+							BWindow* parent);
+	virtual				~InfoWin();
 };
 
 #endif // INFO_WINDOW_H
-

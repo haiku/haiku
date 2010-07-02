@@ -6,6 +6,8 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #include "InfoWindow.h"
 
 #include <stdio.h>
@@ -25,9 +27,11 @@ using std::string;
 using std::vector;
 using std::pair;
 
+
 LeftView::LeftView(BRect frame, BBitmap* icon)
-	: BView(frame, NULL, B_FOLLOW_NONE, B_WILL_DRAW),
-	  fIcon(icon)
+	:
+	BView(frame, NULL, B_FOLLOW_NONE, B_WILL_DRAW),
+	fIcon(icon)
 {
 	SetViewColor(tint_color(kWindowColor, B_LIGHTEN_1_TINT));
 }
@@ -174,5 +178,3 @@ InfoWin::InfoWin(BPoint p, FileInfo *f, BWindow* parent)
 InfoWin::~InfoWin()
 {
 }
-
-

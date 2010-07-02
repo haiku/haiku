@@ -9,6 +9,7 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 
+
 #include <string>
 
 #include <Looper.h>
@@ -22,6 +23,7 @@
 class BDirectory;
 
 using std::string;
+
 
 class Scanner: public BLooper {
 public:
@@ -70,4 +72,3 @@ private:
 };
 
 #endif // SCANNER_H
-

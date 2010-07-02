@@ -6,6 +6,8 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #include "ControlsView.h"
 
 #include <Bitmap.h>
@@ -24,27 +26,28 @@
 
 class VolumeMenuItem: public BMenuItem {
 public:
-								VolumeMenuItem(BVolume* volume, BMessage* message);
-	virtual						~VolumeMenuItem();
+						VolumeMenuItem(BVolume* volume, BMessage* message);
+	virtual				~VolumeMenuItem();
 
-	virtual	void				GetContentSize(float* width, float* height);
-	virtual	void				DrawContent();
+	virtual	void		GetContentSize(float* width, float* height);
+	virtual	void		DrawContent();
 
-			BVolume*			Volume() const
-									{ return fVolume; }
-			status_t			Invoke()
-									{ return BMenuItem::Invoke(); }
+			BVolume*	Volume() const
+							{ return fVolume; }
+			status_t	Invoke()
+							{ return BMenuItem::Invoke(); }
 
 private:
-			BBitmap*			fIcon;
-			BVolume*			fVolume;
+			BBitmap*	fIcon;
+			BVolume*	fVolume;
 };
 
 
 VolumeMenuItem::VolumeMenuItem(BVolume* volume, BMessage* message)
-	: BMenuItem(kEmptyStr, message),
-	  fIcon(new BBitmap(BRect(0, 0, 15, 15), B_RGBA32)),
-	  fVolume(volume)
+	:
+	BMenuItem(kEmptyStr, message),
+	fIcon(new BBitmap(BRect(0, 0, 15, 15), B_RGBA32)),
+	fVolume(volume)
 {
 	char name[B_PATH_NAME_LENGTH];
 	fVolume->GetName(name);
@@ -117,8 +120,9 @@ private:
 
 
 ControlsView::VolumePopup::VolumePopup(BRect r)
-	: BMenuField(r, NULL, kVolMenuLabel, new BPopUpMenu(kVolMenuDefault),
-		false, B_FOLLOW_LEFT)
+	:
+	BMenuField(r, NULL, kVolMenuLabel, new BPopUpMenu(kVolMenuDefault), false,
+		B_FOLLOW_LEFT)
 {
 	SetViewColor(kWindowColor);
 	SetLowColor(kWindowColor);
@@ -295,5 +299,3 @@ ControlsView::FindDeviceFor(dev_t device, bool invoke)
 {
 	return fVolumePopup->FindDeviceFor(device, invoke);
 }
-
-

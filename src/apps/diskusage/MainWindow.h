@@ -10,6 +10,7 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 
+
 #include <Window.h>
 
 
@@ -18,6 +19,7 @@ class ControlsView;
 struct FileInfo;
 class PieView;
 class StatusView;
+
 
 class MainWindow: public BWindow {
 public:

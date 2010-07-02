@@ -9,6 +9,7 @@
 #ifndef CONTROLS_VIEW_H
 #define CONTROLS_VIEW_H
 
+
 #include <Button.h>
 #include <View.h>
 
@@ -27,7 +28,7 @@ public:
 									bool invoke = false);
 			
 private:
-			class VolumePopup;
+			class				VolumePopup;
 
 			VolumePopup*		fVolumePopup; 
 			BButton*			fRescanButton;
@@ -35,4 +36,3 @@ private:
 
 
 #endif // CONTROLS_VIEW_H
-

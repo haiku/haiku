@@ -22,10 +22,10 @@
 
 
 App::App()
-	: BApplication(kAppSignature),
-	  fResources(read_resources(kAppSignature)),
-	  fMainWindow(NULL),
-	  fSavedRefsReceived(NULL)
+	:
+	BApplication(kAppSignature),
+	fResources(read_resources(kAppSignature)),
+	fMainWindow(NULL), fSavedRefsReceived(NULL)
 {
 }
 
@@ -118,4 +118,3 @@ App::QuitRequested()
 
 	return BApplication::QuitRequested();
 }
-

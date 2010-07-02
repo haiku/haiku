@@ -7,6 +7,8 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #include "MainWindow.h"
 
 #include <Application.h>
@@ -24,7 +26,8 @@ const float kMinWinSize = 275.0;
 
 
 MainWindow::MainWindow(BRect pieRect)
-	: BWindow(pieRect, "DiskUsage", B_TITLED_WINDOW,
+	:
+	BWindow(pieRect, "DiskUsage", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
 	BRect r = Bounds();
@@ -57,7 +60,8 @@ MainWindow::MainWindow(BRect pieRect)
 	// this bug, and Be said it's not a bug -- the Matrox driver actually uses
 	// a resolution of 1152x900 in that mode.  Oh well.
 	Lock();
-	float extraHeight = fControlsView->Bounds().Height() + fStatusView->Bounds().Height();
+	float extraHeight = fControlsView->Bounds().Height()
+		+ fStatusView->Bounds().Height();
 	float minHeight = kMinWinSize + extraHeight;
 	float maxHeight = BScreen(this).Frame().Height();
 	float maxWidth = maxHeight - extraHeight;

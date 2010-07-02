@@ -10,6 +10,7 @@
 #ifndef PIE_VIEW_H
 #define PIE_VIEW_H
 
+
 #include <View.h>
 
 #include <map>
@@ -28,6 +29,7 @@ class MainWindow;
 
 using std::map;
 using std::vector;
+
 
 class PieView: public BView {
 public:
@@ -92,4 +94,3 @@ private:
 };
 
 #endif // PIE_VIEW_H
-

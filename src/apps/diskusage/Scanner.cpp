@@ -6,6 +6,8 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
+
+
 #include "Scanner.h"
 
 #include <stdlib.h>
@@ -17,18 +19,19 @@
 
 using std::vector;
 
-Scanner::Scanner(BVolume *v, BHandler *handler)
-	: BLooper(),
-	  fListener(handler),
-	  fDoneMessage(kScanDone),
-	  fProgressMessage(kScanProgress),
 
-	  fVolume(v),
-	  fSnapshot(NULL),
-	  fDesiredPath(),
-	  fTask(),
-	  fBusy(false),
-	  fQuitRequested(false)
+Scanner::Scanner(BVolume *v, BHandler *handler)
+	:
+	BLooper(),
+	fListener(handler),
+	fDoneMessage(kScanDone),
+	fProgressMessage(kScanProgress),
+	fVolume(v),
+	fSnapshot(NULL),
+	fDesiredPath(),
+	fTask(),
+	fBusy(false),
+	fQuitRequested(false)
 {
 	fDoneMessage.AddPointer(kNameVolPtr, fVolume);
 	fProgressMessage.AddPointer(kNameVolPtr, fVolume);
@@ -271,5 +274,3 @@ Scanner::_ChangeToDesired()
 	free(workPath);
 	fDesiredPath.erase();
 }
-
-

@@ -9,6 +9,7 @@
 #ifndef STATUS_VIEW_H
 #define STATUS_VIEW_H
 
+
 #include <View.h>
 #include <StringView.h>
 #include <Rect.h>
@@ -32,4 +33,3 @@ private:
 
 
 #endif // STATUS_VIEW_H
-

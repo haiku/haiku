@@ -9,6 +9,7 @@
 #ifndef SNAPSHOT_H
 #define SNAPSHOT_H
 
+
 #include <string>
 #include <vector>
 
@@ -20,6 +21,7 @@ class BVolume;
 
 using std::string;
 using std::vector;
+
 
 struct FileInfo {
 								FileInfo();
@@ -53,4 +55,3 @@ struct VolumeSnapshot {
 };
 
 #endif // SNAPSHOT_H
-
