@@ -15,7 +15,7 @@ resource app_version {
 
 resource app_flags B_EXCLUSIVE_LAUNCH;
 
-resource(1, "haikulogo.png") #'PNG ' import "haikulogo.png";
+resource(1, "haikulogo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - installer.png";
 
 resource vector_icon {
 	$"6E6369660F0500020006023861093AA03CBD302A3AE36E4A1739473BE7009A9A"
