@@ -454,6 +454,14 @@ TracingMetaData::_CreateMetaDataArea(bool findPrevious, area_id& _area,
 bool
 TracingMetaData::_InitPreviousTracingData()
 {
+	// TODO: ATM re-attaching the previous tracing buffer doesn't work very
+	// well. The entries should checked more thoroughly for validity -- e.g. the
+	// pointers to the entries' vtable pointers could be invalid, which can
+	// make the "traced" command quite unusable. The validity of the entries
+	// could be checked in a safe environment (i.e. with a fault handler) with
+	// typeid() and call of a virtual function.
+	return false;
+
 	addr_t bufferStart
 		= (addr_t)fTraceOutputBuffer + kTraceOutputBufferSize;
 	addr_t bufferEnd = bufferStart + MAX_TRACE_SIZE;
