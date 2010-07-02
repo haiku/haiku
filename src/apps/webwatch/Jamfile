@@ -10,7 +10,12 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 Application WebWatch :
 	WatchApp.cpp
 	WatchView.cpp
-	: be $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: WebWatch.rdef
 ;
 
+DoCatalogs WebWatch :
+	x-vnd.mahlzeit.webwatch
+	:
+	WatchView.cpp
+;

@@ -23,6 +23,8 @@
 #ifndef WATCHVIEW_H
 #define WATCHVIEW_H
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <View.h>
 
 class WatchView : public BView 
