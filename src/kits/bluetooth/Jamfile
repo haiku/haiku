@@ -32,5 +32,4 @@ DoCatalogs libbluetooth.so :
 	:
 	DeviceClass.cpp
 	RemoteDevice.cpp
-	LocaleCatalog.cpp
 ;
