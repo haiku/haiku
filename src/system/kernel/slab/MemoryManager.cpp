@@ -20,6 +20,8 @@
 #include <vm/VMCache.h>
 #include <vm/VMTranslationMap.h>
 
+#include "kernel_debug_config.h"
+
 #include "ObjectCache.h"
 #include "slab_private.h"
 
@@ -29,6 +31,12 @@
 #	define TRACE(x...)	dprintf(x)
 #else
 #	define TRACE(x...)	do {} while (false)
+#endif
+
+#if DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS
+#	define PARANOID_CHECKS_ONLY(x)	x
+#else
+#	define PARANOID_CHECKS_ONLY(x)
 #endif
 
 
@@ -49,7 +57,6 @@ MemoryManager::MetaChunkList MemoryManager::sPartialMetaChunksMedium;
 MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryCanWait;
 MemoryManager::AllocationEntry* MemoryManager::sAllocationEntryDontWait;
 bool MemoryManager::sMaintenanceNeeded;
-
 
 
 // #pragma mark - kernel tracing
@@ -991,6 +998,8 @@ MemoryManager::_GetChunks(MetaChunkList* metaChunkList, size_t chunkSize,
 	// update the free range
 	metaChunk->firstFreeChunk += chunkCount;
 
+	PARANOID_CHECKS_ONLY(_CheckMetaChunk(metaChunk));
+
 	_chunk = firstChunk;
 	_metaChunk = metaChunk;
 
@@ -1037,6 +1046,8 @@ MemoryManager::_GetChunk(MetaChunkList* metaChunkList, size_t chunkSize,
 	_chunk = _pop(metaChunk->freeChunks);
 	_metaChunk = metaChunk;
 
+	_chunk->reference = 1;
+
 	// update the free range
 	uint32 chunkIndex = _chunk - metaChunk->chunks;
 	if (chunkIndex >= metaChunk->firstFreeChunk
@@ -1047,6 +1058,8 @@ MemoryManager::_GetChunk(MetaChunkList* metaChunkList, size_t chunkSize,
 		} else
 			metaChunk->lastFreeChunk = chunkIndex - 1;
 	}
+
+	PARANOID_CHECKS_ONLY(_CheckMetaChunk(metaChunk));
 
 	T(AllocateChunk(chunkSize, metaChunk, _chunk));
 
@@ -1072,6 +1085,7 @@ MemoryManager::_FreeChunk(Area* area, MetaChunk* metaChunk, Chunk* chunk,
 	uint32 chunkIndex = chunk - metaChunk->chunks;
 
 	// free the meta chunk, if it is unused now
+	PARANOID_CHECKS_ONLY(bool areaDeleted = false;)
 	ASSERT(metaChunk->usedChunkCount > 0);
 	if (--metaChunk->usedChunkCount == 0) {
 		T(FreeMetaChunk(metaChunk));
@@ -1093,8 +1107,10 @@ MemoryManager::_FreeChunk(Area* area, MetaChunk* metaChunk, Chunk* chunk,
 
 		// free the area, if it is unused now
 		ASSERT(area->usedMetaChunkCount > 0);
-		if (--area->usedMetaChunkCount == 0)
+		if (--area->usedMetaChunkCount == 0) {
 			_FreeArea(area, false, flags);
+			PARANOID_CHECKS_ONLY(areaDeleted = true;)
+		}
 	} else if (metaChunk->usedChunkCount == metaChunk->chunkCount - 1) {
 		// the meta chunk was full before -- add it back to its partial chunk
 		// list
@@ -1125,6 +1141,11 @@ MemoryManager::_FreeChunk(Area* area, MetaChunk* metaChunk, Chunk* chunk,
 			metaChunk->lastFreeChunk = lastFree;
 		}
 	}
+
+	PARANOID_CHECKS_ONLY(
+		if (!areaDeleted)
+			_CheckMetaChunk(metaChunk);
+	)
 }
 
 
@@ -1150,6 +1171,8 @@ MemoryManager::_PrepareMetaChunk(MetaChunk* metaChunk, size_t chunkSize)
 
 	metaChunk->firstFreeChunk = 0;
 	metaChunk->lastFreeChunk = metaChunk->chunkCount - 1;
+
+	PARANOID_CHECKS_ONLY(_CheckMetaChunk(metaChunk));
 }
 
 
@@ -1495,6 +1518,140 @@ MemoryManager::_RequestMaintenance()
 }
 
 
+/*static*/ bool
+MemoryManager::_IsChunkInFreeList(const MetaChunk* metaChunk,
+	const Chunk* chunk)
+{
+	Chunk* freeChunk = metaChunk->freeChunks;
+	while (freeChunk != NULL) {
+		if (freeChunk == chunk)
+			return true;
+		freeChunk = freeChunk->next;
+	}
+
+	return false;
+}
+
+
+#if DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS
+
+/*static*/ void
+MemoryManager::_CheckMetaChunk(MetaChunk* metaChunk)
+{
+	Area* area = metaChunk->GetArea();
+	int32 metaChunkIndex = metaChunk - area->metaChunks;
+	if (metaChunkIndex < 0 || metaChunkIndex >= SLAB_META_CHUNKS_PER_AREA) {
+		panic("invalid meta chunk %p!", metaChunk);
+		return;
+	}
+
+	switch (metaChunk->chunkSize) {
+		case 0:
+			// unused
+			return;
+		case SLAB_CHUNK_SIZE_SMALL:
+		case SLAB_CHUNK_SIZE_MEDIUM:
+		case SLAB_CHUNK_SIZE_LARGE:
+			break;
+		default:
+			panic("meta chunk %p has invalid chunk size: %" B_PRIuSIZE,
+				metaChunk, metaChunk->chunkSize);
+			return;
+	}
+
+	if (metaChunk->totalSize > SLAB_CHUNK_SIZE_LARGE) {
+		panic("meta chunk %p has invalid total size: %" B_PRIuSIZE,
+			metaChunk, metaChunk->totalSize);
+		return;
+	}
+
+	addr_t expectedBase = (addr_t)area + metaChunkIndex * SLAB_CHUNK_SIZE_LARGE;
+	if (metaChunk->chunkBase < expectedBase
+		|| metaChunk->chunkBase - expectedBase + metaChunk->totalSize
+			> SLAB_CHUNK_SIZE_LARGE) {
+		panic("meta chunk %p has invalid base address: %" B_PRIxADDR, metaChunk,
+			metaChunk->chunkBase);
+		return;
+	}
+
+	if (metaChunk->chunkCount != metaChunk->totalSize / metaChunk->chunkSize) {
+		panic("meta chunk %p has invalid chunk count: %u", metaChunk,
+			metaChunk->chunkCount);
+		return;
+	}
+
+	if (metaChunk->usedChunkCount > metaChunk->chunkCount) {
+		panic("meta chunk %p has invalid unused chunk count: %u", metaChunk,
+			metaChunk->usedChunkCount);
+		return;
+	}
+
+	if (metaChunk->firstFreeChunk > metaChunk->chunkCount) {
+		panic("meta chunk %p has invalid first free chunk: %u", metaChunk,
+			metaChunk->firstFreeChunk);
+		return;
+	}
+
+	if (metaChunk->lastFreeChunk >= metaChunk->chunkCount) {
+		panic("meta chunk %p has invalid last free chunk: %u", metaChunk,
+			metaChunk->lastFreeChunk);
+		return;
+	}
+
+	// check free list for structural sanity
+	uint32 freeChunks = 0;
+	for (Chunk* chunk = metaChunk->freeChunks; chunk != NULL;
+			chunk = chunk->next) {
+		if ((addr_t)chunk % sizeof(Chunk) != 0 || chunk < metaChunk->chunks
+			|| chunk >= metaChunk->chunks + metaChunk->chunkCount) {
+			panic("meta chunk %p has invalid element in free list, chunk: %p",
+				metaChunk, chunk);
+			return;
+		}
+
+		if (++freeChunks > metaChunk->chunkCount) {
+			panic("meta chunk %p has cyclic free list", metaChunk);
+			return;
+		}
+	}
+
+	if (freeChunks + metaChunk->usedChunkCount > metaChunk->chunkCount) {
+		panic("meta chunk %p has mismatching free/used chunk counts: total: "
+			"%u, used: %u, free: %" B_PRIu32, metaChunk, metaChunk->chunkCount,
+			metaChunk->usedChunkCount, freeChunks);
+		return;
+	}
+
+	// count used chunks by looking at their reference/next field
+	uint32 usedChunks = 0;
+	for (uint32 i = 0; i < metaChunk->chunkCount; i++) {
+		if (!_IsChunkFree(metaChunk, metaChunk->chunks + i))
+			usedChunks++;
+	}
+
+	if (usedChunks != metaChunk->usedChunkCount) {
+		panic("meta chunk %p has used chunks that appear free: total: "
+			"%u, used: %u, appearing used: %" B_PRIu32, metaChunk,
+			metaChunk->chunkCount, metaChunk->usedChunkCount, usedChunks);
+		return;
+	}
+
+	// check free range
+	for (uint32 i = metaChunk->firstFreeChunk; i < metaChunk->lastFreeChunk;
+			i++) {
+		if (!_IsChunkFree(metaChunk, metaChunk->chunks + i)) {
+			panic("meta chunk %p has used chunk in free range, chunk: %p (%"
+				B_PRIu32 ", free range: %u - %u)", metaChunk,
+				metaChunk->chunks + i, i, metaChunk->firstFreeChunk,
+				metaChunk->lastFreeChunk);
+			return;
+		}
+	}
+}
+
+#endif	// DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS
+
+
 /*static*/ int
 MemoryManager::_DumpRawAllocations(int argc, char** argv)
 {
@@ -1585,8 +1742,14 @@ MemoryManager::_DumpMetaChunk(MetaChunk* metaChunk, bool printChunks,
 		Chunk* chunk = metaChunk->chunks + i;
 
 		// skip free chunks
-		if (_IsChunkFree(metaChunk, chunk))
+		if (_IsChunkFree(metaChunk, chunk)) {
+			if (!_IsChunkInFreeList(metaChunk, chunk)) {
+				kprintf("%5" B_PRIu32 "  %p  appears free, but isn't in free "
+					"list!\n", i, (void*)_ChunkAddress(metaChunk, chunk));
+			}
+
 			continue;
+		}
 
 		addr_t reference = chunk->reference;
 		if ((reference & 1) == 0) {

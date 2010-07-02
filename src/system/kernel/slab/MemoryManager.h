@@ -24,7 +24,7 @@ struct VMArea;
 #define SLAB_CHUNK_SIZE_MEDIUM	(16 * B_PAGE_SIZE)
 #define SLAB_CHUNK_SIZE_LARGE	(128 * B_PAGE_SIZE)
 #define SLAB_AREA_SIZE			(2048 * B_PAGE_SIZE)
-	// TODO: These sizes have been chosen with 4 KB pages is mind.
+	// TODO: These sizes have been chosen with 4 KB pages in mind.
 
 #define SLAB_META_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_LARGE)
 #define SLAB_SMALL_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_SMALL)
@@ -164,6 +164,9 @@ private:
 									const Chunk* chunk);
 	static	bool				_IsChunkFree(const MetaChunk* metaChunk,
 									const Chunk* chunk);
+	static	bool				_IsChunkInFreeList(const MetaChunk* metaChunk,
+									const Chunk* chunk);
+	static	void				_CheckMetaChunk(MetaChunk* metaChunk);
 
 	static	int					_DumpRawAllocations(int argc, char** argv);
 	static	void				_PrintMetaChunkTableHeader(bool printChunks);

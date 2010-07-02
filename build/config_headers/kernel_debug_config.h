@@ -101,6 +101,9 @@
 // Use the slab allocator as generic memory allocator (malloc()/free()).
 #define USE_SLAB_ALLOCATOR_FOR_MALLOC	1
 
+// Enables additional sanity checks in the slab allocator's memory manager.
+#define DEBUG_SLAB_MEMORY_MANAGER_PARANOID_CHECKS	0
+
 // When set limits the amount of available RAM (in MB).
 //#define LIMIT_AVAILABLE_MEMORY		256
 
