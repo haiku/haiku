@@ -461,6 +461,7 @@ BLocaleRoster::GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 	char* stripSignature = objectSignature;
 	while(*stripSignature != '/')
 		stripSignature ++;
+	stripSignature ++;
 
 	log_team(LOG_DEBUG,
 		"Image %s (address %x) requested catalog with mimetype %s",

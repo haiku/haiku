@@ -22,11 +22,13 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Bitmap.h>
 #include <Deskbar.h>
 #include <Dragger.h>
 #include <Drivers.h>
 #include <IconUtils.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
@@ -41,12 +43,16 @@
 #include "NetworkStatusIcons.h"
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "NetworkStatusView"
+
+
 static const char *kStatusDescriptions[] = {
-	"Unknown",
-	"No link",
-	"No stateful configuration",
-	"Configuring",
-	"Ready"
+	B_TRANSLATE_MARK("Unknown"),
+	B_TRANSLATE_MARK("No link"),
+	B_TRANSLATE_MARK("No stateful configuration"),
+	B_TRANSLATE_MARK("Configuring"),
+	B_TRANSLATE_MARK("Ready")
 };
 
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
@@ -314,8 +320,16 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 	if (!_PrepareRequest(request, name))
 		return;
 
-	BString text = name;
-	text += " information:\n";
+	BString text = NULL;
+	if (strncmp("Address", name, strlen(name)) == 0)
+		text = B_TRANSLATE("Address information:\n");
+
+	if (strncmp("Broadcast", name, strlen(name)) == 0)
+		text = B_TRANSLATE("Broadcast information:\n");
+		
+	if (strncmp("Netmask", name, strlen(name)) == 0)
+		text = B_TRANSLATE("Netmask information:\n");
+
 	size_t boldLength = text.Length();
 
 	for (int i = 0; kInformationEntries[i].label; i++) {
@@ -341,12 +355,24 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 		}
 
 		text += "\n";
-		text += kInformationEntries[i].label;
+		
+		if (strncmp("Address", kInformationEntries[i].label, 
+			strlen(kInformationEntries[i].label)) == 0)
+			text += B_TRANSLATE("Address");
+
+		if (strncmp("Broadcast", kInformationEntries[i].label, 
+			strlen(kInformationEntries[i].label)) == 0)
+			text += B_TRANSLATE("Broadcast");
+		
+		if (strncmp("Netmask", kInformationEntries[i].label, 
+			strlen(kInformationEntries[i].label)) == 0)
+			text += B_TRANSLATE("Netmask");
+
 		text += ": ";
 		text += address;
 	}
 
-	BAlert* alert = new BAlert(name, text.String(), "OK");
+	BAlert* alert = new BAlert(name, text.String(), B_TRANSLATE("OK"));
 	BTextView* view = alert->TextView();
 	BFont font;
 
@@ -380,13 +406,16 @@ NetworkStatusView::MouseDown(BPoint point)
 	}
 
 	menu->AddSeparatorItem();
-	//menu->AddItem(new BMenuItem("About NetworkStatus" B_UTF8_ELLIPSIS,
-	//	new BMessage(B_ABOUT_REQUESTED)));
-	menu->AddItem(new BMenuItem("Open network preferences" B_UTF8_ELLIPSIS,
+	//menu->AddItem(new BMenuItem(B_TRANSLATE(
+	// "About NetworkStatus" B_UTF8_ELLIPSIS),
+	// new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE(
+		"Open network preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgOpenNetworkPreferences)));
 
 	if (fInDeskbar)
-		menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+			new BMessage(B_QUIT_REQUESTED)));
 	menu->SetTargetForItems(this);
 
 	ConvertToScreen(&point);
@@ -397,9 +426,14 @@ NetworkStatusView::MouseDown(BPoint point)
 void
 NetworkStatusView::_AboutRequested()
 {
-	BAlert* alert = new BAlert("about", "NetworkStatus\n"
-		"\twritten by Axel Dörfler and Hugo Santos\n"
-		"\tCopyright 2007, Haiku, Inc.\n", "OK");
+	BString _about = B_TRANSLATE(
+		"NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n"
+		);
+	_about.ReplaceFirst("%1", "Axel Dörfler");
+		// Append a new developer here
+	_about.ReplaceFirst("%2", "Copyright 2007-2010");
+		// Append a new year here
+	BAlert* alert = new BAlert("about", _about, B_TRANSLATE("OK"));
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -512,11 +546,11 @@ NetworkStatusView::_OpenNetworksPreferences()
 {
 	status_t status = be_roster->Launch("application/x-vnd.Haiku-Network");
 	if (status != B_OK && status != B_ALREADY_RUNNING) {
-		BString errorMessage("Launching the network preflet failed.\n\n"
-			"Error: ");
+		BString errorMessage(B_TRANSLATE("Launching the network preflet "
+			"failed.\n\nError: "));
 		errorMessage << strerror(status);
 		BAlert* alert = new BAlert("launch error", errorMessage.String(),
-			"OK");
+			B_TRANSLATE("OK"));
 
 		// asynchronous alert in order to not block replicant host application
 		alert->Go(NULL);

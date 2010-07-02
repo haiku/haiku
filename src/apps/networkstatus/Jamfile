@@ -14,6 +14,15 @@ Application NetworkStatus :
 	NetworkStatusWindow.cpp
 	NetworkStatusView.cpp
 	NetworkStatus.cpp
-	: be $(icon_libs) $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) $(icon_libs) $(TARGET_NETWORK_LIBS)
+		$(TARGET_LIBSUPC++)
 	: NetworkStatus.rdef NetworkStatusIcons.rdef
 	;
+
+DoCatalogs NetworkStatus :
+	x-vnd.Haiku-NetworkStatus
+	:
+	NetworkStatus.cpp
+	NetworkStatusWindow.cpp
+	NetworkStatusView
+;

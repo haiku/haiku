@@ -13,12 +13,18 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Deskbar.h>
 #include <Entry.h>
+#include <Locale.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "NetworkStatus"
 
 
 class NetworkStatus : public BApplication {
@@ -80,9 +86,10 @@ NetworkStatus::ArgvReceived(int32 argc, char** argv)
 
 	if (strcmp(argv[1], "--help") == 0
 		|| strcmp(argv[1], "-h") == 0) {
-		printf("NetworkStatus options:\n");
-		printf("   --deskbar      automatically add replicant to Deskbar\n");
-		printf("   --help         print this info and exit\n");
+		const char* str = B_TRANSLATE("NetworkStatus options:\n"
+			"\t--deskbar\tautomatically add replicant to Deskbar\n"
+			"\t--help\t\tprint this info and exit\n");
+		printf(str);
 		fQuitImmediately = true;
 		return;
 	}
@@ -144,9 +151,9 @@ NetworkStatus::ReadyToRun()
 	}
 
 	if (isDeskbarRunning && !isInstalled) {
-		BAlert* alert = new BAlert("", "Do you want NetworkStatus to live in "
-			"the Deskbar?", "Don't", "Install", NULL, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
+		BAlert* alert = new BAlert("", B_TRANSLATE("Do you want NetworkStatus "
+			"to live in the Deskbar?"), B_TRANSLATE("Don't"), 
+			B_TRANSLATE("Install"), NULL, B_WIDTH_AS_USUAL,	B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() == 1) {

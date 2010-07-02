@@ -11,11 +11,16 @@
 #include "NetworkStatusView.h"
 
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "NetworkStatusWindow"
 
 
 NetworkStatusWindow::NetworkStatusWindow()
-	: BWindow(BRect(150, 150, 249, 249), "NetworkStatus", B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(BRect(150, 150, 249, 249), B_TRANSLATE("NetworkStatus"), 
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
