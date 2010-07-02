@@ -12,6 +12,8 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
 #include <Screen.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
@@ -77,7 +79,7 @@ enum {
 };
 
 
-CalendarMenuWindow::CalendarMenuWindow(BPoint where, bool euroDate)
+CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	:
 	BWindow(BRect(0.0, 0.0, 100.0, 130.0), "", B_BORDERED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_ASYNCHRONOUS_CONTROLS | B_CLOSE_ON_ESCAPE
@@ -87,6 +89,10 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where, bool euroDate)
 	fCalendarView(NULL),
 	fSuppressFirstClose(true)
 {
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	BPrivate::week_start startOfWeek = /*here->StartOfWeek()*/ B_WEEK_START_MONDAY;
+
 	RemoveShortcut('H', B_COMMAND_KEY | B_CONTROL_KEY);
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
@@ -97,7 +103,7 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where, bool euroDate)
 	fMonthLabel->SetFontSize(10.0);
 
 	fCalendarView = new BCalendarView(Bounds(), "calendar",
-		euroDate ? B_WEEK_START_MONDAY : B_WEEK_START_SUNDAY, B_FOLLOW_ALL);
+		startOfWeek, B_FOLLOW_ALL);
 	fCalendarView->SetInvocationMessage(new BMessage(kInvokationMessage));
 	fCalendarView->SetFontSize(10.0);
 

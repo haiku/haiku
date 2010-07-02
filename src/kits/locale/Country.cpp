@@ -9,6 +9,7 @@
 
 #include <assert.h>
 
+#include <CalendarView.h>
 #include <IconUtils.h>
 #include <Resources.h>
 #include <String.h>
@@ -22,6 +23,10 @@
 
 #include <monetary.h>
 #include <stdarg.h>
+
+
+using BPrivate::B_WEEK_START_MONDAY;
+using BPrivate::B_WEEK_START_SUNDAY;
 
 
 const char* gStrings[] = {
@@ -228,6 +233,23 @@ BCountry::TimeFormat(BString& format, bool longFormat) const
 	ICUString.toUTF8(stringConverter);
 
 	return true;
+}
+
+
+int
+BCountry::StartOfWeek()
+{
+	UErrorCode err = U_ZERO_ERROR;
+	Calendar* c = Calendar::createInstance(*fICULocale, err);
+
+	if (err == U_ZERO_ERROR && c->getFirstDayOfWeek(err) == UCAL_SUNDAY) {
+		delete c;
+		return B_WEEK_START_SUNDAY;
+	} else {
+		delete c;
+		// Might be another day, but BeAPI will not handle it
+		return B_WEEK_START_MONDAY;
+	}
 }
 
 

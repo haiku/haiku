@@ -42,7 +42,6 @@ All rights reserved.
 
 const uint32 kShowSeconds = 'ShSc';
 const uint32 kFullDate = 'FDat';
-const uint32 kEuroDate = 'EDat';
 
 class BCountry;
 class BMessageRunner;
@@ -55,8 +54,7 @@ class _EXPORT	TTimeView;
 class TTimeView : public BView {
 	public:
 		TTimeView(float maxWidth, float height, bool showSeconds = false,
-			bool fullDate = false, bool euroDate = false,
-			bool showInterval = false);
+			bool fullDate = false, bool showInterval = false);
 		TTimeView(BMessage* data);
 		~TTimeView();
 
@@ -83,8 +81,6 @@ class TTimeView : public BView {
 		void		ShowFullDate(bool);
 		bool		CanShowFullDate() const { return fCanShowFullDate; }
 		void		AllowFullDate(bool);
-		bool		ShowingEuroDate()	{return fEuroDate; }
-		void		ShowEuroDate(bool);
 		void		ShowCalendar(BPoint where);
 		void		StartLongClickNotifier(BPoint where);
 		void		StopLongClickNotifier();
@@ -122,7 +118,6 @@ class TTimeView : public BView {
 		bool		fShowingDate;
 		bool		fFullDate;
 		bool		fCanShowFullDate;
-		bool		fEuroDate;
 
 		float		fMaxWidth;
 		float		fHeight;

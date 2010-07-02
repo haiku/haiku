@@ -49,6 +49,8 @@ class BCountry {
 		const char*	DateSeparator() const;
 		const char*	TimeSeparator() const;
 
+		int			StartOfWeek();
+
 		// numbers
 
 		virtual void FormatNumber(char* string, size_t maxSize, double value);

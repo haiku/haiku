@@ -192,7 +192,6 @@ TBarApp::SaveSettings()
 		fSettingsFile->Write(&fSettings.recentDocsCount, sizeof(int32));
 		fSettingsFile->Write(&fSettings.timeShowSeconds, sizeof(bool));
 		fSettingsFile->Write(&fSettings.recentFoldersCount, sizeof(int32));
-		fSettingsFile->Write(&fSettings.timeShowEuro, sizeof(bool));
 		fSettingsFile->Write(&fSettings.alwaysOnTop, sizeof(bool));
 		fSettingsFile->Write(&fSettings.timeFullDate, sizeof(bool));
 		fSettingsFile->Write(&fSettings.trackerAlwaysFirst, sizeof(bool));
@@ -223,7 +222,6 @@ TBarApp::InitSettings()
 	settings.recentDocsCount = 10;
 	settings.timeShowSeconds = false;
 	settings.recentFoldersCount = 10;
-	settings.timeShowEuro = false;
 	settings.alwaysOnTop = false;
 	settings.timeFullDate = false;
 	settings.trackerAlwaysFirst = false;
@@ -278,7 +276,6 @@ TBarApp::InitSettings()
 				fSettingsFile->Read(&settings.recentFoldersCount,
 					sizeof(int32));
 			if (size >= kValidSettingsSize6) {
-				fSettingsFile->Read(&settings.timeShowEuro, sizeof(bool));
 				fSettingsFile->Read(&settings.alwaysOnTop, sizeof(bool));
 			}
 			if (size >= kValidSettingsSize7)

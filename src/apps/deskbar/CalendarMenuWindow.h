@@ -22,7 +22,7 @@ using BPrivate::BCalendarView;
 
 class CalendarMenuWindow : public BWindow {
 public:
-					CalendarMenuWindow(BPoint where, bool euroDate);
+					CalendarMenuWindow(BPoint where);
 	virtual			~CalendarMenuWindow();
 
 	virtual	void	Show();

@@ -52,11 +52,6 @@ All rights reserved.
 #include "CalendarMenuWindow.h"
 
 
-const char* kShortDateFormat = "%m/%d/%y";
-const char* kShortEuroDateFormat = "%d/%m/%y";
-const char* kLongDateFormat = "%a, %B %d, %Y";
-const char* kLongEuroDateFormat = "%a, %d %B, %Y";
-
 static const char*  const kMinString = "99:99 AM";
 static const float kHMargin = 2.0;
 
@@ -74,7 +69,7 @@ enum {
 #define B_TRANSLATE_CONTEXT "TimeView"
 
 TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
-	bool fullDate, bool euroDate, bool)
+	bool fullDate, bool)
 	:
 	BView(BRect(-100,-100,-90,-90), "_deskbar_tv_",
 	B_FOLLOW_RIGHT | B_FOLLOW_TOP,
@@ -84,7 +79,6 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	fShowSeconds(showSeconds),
 	fFullDate(fullDate),
 	fCanShowFullDate(false),
-	fEuroDate(euroDate),
 	fMaxWidth(maxWidth),
 	fHeight(height),
 	fOrientation(true),
@@ -108,7 +102,6 @@ TTimeView::TTimeView(BMessage* data)
 	fTime = fLastTime = time(NULL);
 	data->FindBool("seconds", &fShowSeconds);
 	data->FindBool("fulldate", &fFullDate);
-	data->FindBool("eurodate", &fEuroDate);
 	data->FindBool("interval", &fInterval);
 	fShowingDate = false;
 	
@@ -140,7 +133,6 @@ TTimeView::Archive(BMessage* data, bool deep) const
 	BView::Archive(data, deep);
 	data->AddBool("seconds", fShowSeconds);
 	data->AddBool("fulldate", fFullDate);
-	data->AddBool("eurodate", fEuroDate);
 	data->AddBool("interval", fInterval);
 	data->AddInt32("deskbar:private_align", B_ALIGN_RIGHT);
 
@@ -223,10 +215,6 @@ TTimeView::MessageReceived(BMessage* message)
 			ShowSeconds(!ShowingSeconds());
 			break;
 
-		case kEuroDate:
-			ShowEuroDate(!ShowingEuroDate());
-			break;
-
 		case kChangeClock:
 			// launch the time prefs app
 			be_roster->Launch("application/x-vnd.Haiku-Time");
@@ -279,7 +267,7 @@ TTimeView::ShowCalendar(BPoint where)
 	if (where.y >= BScreen().Frame().bottom)
 		where.y -= (Bounds().Height() + 4.0);
 
-	CalendarMenuWindow* window = new CalendarMenuWindow(where, fEuroDate);
+	CalendarMenuWindow* window = new CalendarMenuWindow(where);
 	fCalendarWindow = BMessenger(window);
 
 	window->Show();
@@ -329,14 +317,8 @@ void
 TTimeView::GetCurrentDate()
 {
 	char tmp[64];
-	tm time = *localtime(&fTime);
 
-	if (fFullDate && CanShowFullDate())
-		strftime(tmp, 64, fEuroDate ? kLongEuroDateFormat : kLongDateFormat,
-			&time);
-	else
-		strftime(tmp, 64, fEuroDate ? kShortEuroDateFormat : kShortDateFormat,
-			&time);
+	fHere->FormatDate(tmp, 64, fTime, fFullDate && CanShowFullDate()); 
 
 	//	remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	//  or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -462,14 +444,6 @@ void
 TTimeView::ShowFullDate(bool on)
 {
 	fFullDate = on;
-	Update();
-}
-
-
-void
-TTimeView::ShowEuroDate(bool on)
-{
-	fEuroDate = on;
 	Update();
 }
 

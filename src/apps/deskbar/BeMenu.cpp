@@ -371,7 +371,6 @@ TBeMenu::ResetTargets()
 				case kConfigShow:
 				case kAlwaysTop:
 				case kShowSeconds:
-				case kEuroDate:
 				case kRebootSystem:
 				case kSuspendSystem:
 				case kShutdownSystem:

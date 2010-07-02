@@ -113,7 +113,6 @@ public:
 
 	bool ShowingSeconds(void);
 	bool ShowingMiltime(void);
-	bool ShowingEuroDate(void);
 	bool ShowingFullDate(void);
 	bool CanShowFullDate(void);
 
