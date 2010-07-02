@@ -114,7 +114,7 @@ ExtendedPartitionAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
 {
 	if (!CanInitialize(partition)
-		|| (parameters != NULL && strlen(parameters) > 0)) {
+		|| (parameters != NULL && parameters[0] != '\0')) {
 		return B_BAD_VALUE;
 	}
 
@@ -132,8 +132,8 @@ ExtendedPartitionAddOn::Initialize(BMutablePartition* partition,
 	const char* name, const char* parameters, BPartitionHandle** _handle)
 {
 	if (!CanInitialize(partition)
-		|| (name != NULL && strlen(name) > 0)
-		|| (parameters != NULL && strlen(parameters) > 0)) {
+		|| (name != NULL && name[0] != '\0')
+		|| (parameters != NULL && parameters[0] != '\0')) {
 		return B_BAD_VALUE;
 	}
 
@@ -448,7 +448,7 @@ ExtendedPartitionHandle::CreateChild(off_t offset, off_t size,
 		return B_BAD_VALUE;
 
 	// check name
-	if (name && strlen(name) > 0)
+	if (name != NULL && name[0] != '\0')
 		return B_BAD_VALUE;
 
 	// offset properly aligned?
