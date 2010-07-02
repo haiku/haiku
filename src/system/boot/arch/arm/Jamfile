@@ -19,6 +19,9 @@ KernelMergeObject boot_arch_$(TARGET_ARCH).o :
 	uart.cpp
 	arch_elf.cpp
 	arch_video.cpp
+	arch_video_920.cpp
+	arch_video_pxa.cpp
+	arch_video_omap3.cpp
 	$(librootArchObjects)
 	: -fno-pic
 	:
