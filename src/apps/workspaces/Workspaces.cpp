@@ -149,7 +149,6 @@ class WorkspacesApp : public BApplication {
 
 	private:
 		WorkspacesWindow*	fWindow;
-		BCatalog			fAppCatalog;
 };
 
 
@@ -809,7 +808,6 @@ WorkspacesWindow::SetAutoRaise(bool enable)
 WorkspacesApp::WorkspacesApp()
 	: BApplication(kSignature)
 {
-	be_locale->GetAppCatalog(&fAppCatalog);
 	fWindow = new WorkspacesWindow(new WorkspacesSettings());
 }
 

@@ -16,10 +16,6 @@
 APRApplication::APRApplication(void)
  :	BApplication(APPEARANCE_APP_SIGNATURE)
 {
-	// Do this now because we need to call BWindow constructor with a translated
-	// string.
-	be_locale->GetAppCatalog(&fCatalog);
-
 	fWindow = new APRWindow(BRect(100, 100, 550, 420));
 	fWindow->Show();
 }

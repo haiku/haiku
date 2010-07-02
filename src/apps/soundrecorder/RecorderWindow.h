@@ -169,7 +169,6 @@ static	void NotifyPlayFile(void * cookie, BSoundPlayer::sound_player_notificatio
 				
 		void RefsReceived(BMessage *msg);
 		void CopyTarget(BMessage *msg);
-		BCatalog fAppCatalog;
 };
 
 #endif	/*	RECORDERWINDOW_H */

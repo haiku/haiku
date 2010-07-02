@@ -87,8 +87,6 @@ StyledEditApp::StyledEditApp()
 	: BApplication(APP_SIGNATURE),
 	fOpenPanel(NULL)
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	fOpenPanel = new BFilePanel();
 	BMenuBar* menuBar =
 		dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));

@@ -15,7 +15,7 @@ Preference Media :
 	MediaViews.cpp
 	MediaListItem.cpp
 	MediaAlert.cpp 
-	: media be liblocale.so $(TARGET_LIBSUPC++)
+	: media be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: media.rdef 
 	;
 

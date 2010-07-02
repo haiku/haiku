@@ -117,8 +117,6 @@ TMailApp::TMailApp()
 	fMailCharacterSet(B_MS_WINDOWS_CONVERSION),
 	fContentFont(be_fixed_font)
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	// set default values
 	fContentFont.SetSize(12.0);
 	fAutoMarkRead = true;

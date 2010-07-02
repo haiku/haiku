@@ -22,9 +22,6 @@ public:
 								PrintersApp();
 			void				ReadyToRun();
 			void				MessageReceived(BMessage* msg);
-
-private:
-			BCatalog			fCatalog;
 };
 
 #endif // _PRINTERS_H

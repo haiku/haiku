@@ -95,7 +95,6 @@ class PrintServerApp : public BApplication, public FolderListener {
 		Settings *fSettings;
 		bool fUseConfigWindow;
 		FolderWatcher *fFolder;
-		BCatalog fCatalog;
 };
 
 #endif

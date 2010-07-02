@@ -5,9 +5,6 @@
  */
 
 
-#define B_TRANSLATE_USE_NEW_MACROS
-
-
 #include "Locale.h"
 #include "LocaleWindow.h"
 #include "LanguageListView.h"

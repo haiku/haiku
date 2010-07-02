@@ -77,8 +77,6 @@ class FileTypes : public BApplication {
 		BWindow		*fApplicationTypesWindow;
 		uint32		fWindowCount;
 		uint32		fTypeWindowCount;
-
-		BCatalog	fCatalog;
 };
 
 
@@ -172,7 +170,6 @@ FileTypes::FileTypes()
 	fWindowCount(0),
 	fTypeWindowCount(0)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	fFilePanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL,
 		B_FILE_NODE | B_DIRECTORY_NODE, false);
 }

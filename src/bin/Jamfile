@@ -129,7 +129,7 @@ StdBinCommands
 # commands that need libbe.so, libsupc++.so and liblocale.so
 StdBinCommands
 	dstcheck.cpp
-	: be $(TARGET_LIBSUPC++) liblocale.so : $(haiku-utils_rsrc) ;
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) : $(haiku-utils_rsrc) ;
 
 # Haiku-specific apps which need libbe.so
 if $(TARGET_PLATFORM) = haiku {

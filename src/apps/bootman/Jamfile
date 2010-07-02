@@ -21,7 +21,7 @@ Application bootman :
 	be 
 	textencoding
 	tracker
-	liblocale.so 
+	$(HAIKU_LOCALE_LIBS)
 	$(TARGET_LIBSUPC++)
 	: 
 	bootman.rdef

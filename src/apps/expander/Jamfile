@@ -9,7 +9,7 @@ Application Expander :
 	ExpanderPreferences.cpp
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
-	: be tracker liblocale.so $(TARGET_LIBSUPC++)
+	: be tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: Expander.rdef
 ;
 

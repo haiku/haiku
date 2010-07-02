@@ -101,7 +101,6 @@ TimedAlert::GetLabel(BString &string)
 int
 main(int argc, char **argv)
 {
-	BCatalog fCatalog;
 	time_t t;
 	struct tm tm;
 	tzset();
@@ -136,7 +135,6 @@ main(int argc, char **argv)
 
 	if (dst != tm.tm_isdst || argc > 1) {
 		BApplication app("application/x-vnd.Haiku-cmd-dstconfig");
-		be_locale->GetAppCatalog(&fCatalog);
 
 		BString string;
 		TimedAlert::GetLabel(string);

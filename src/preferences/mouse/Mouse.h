@@ -21,8 +21,6 @@ public:
 		MouseApplication();
 
 		virtual void AboutRequested();
-private:
-		BCatalog fCatalog;
 };
 
 #endif	/* MOUSE_H */

@@ -40,18 +40,15 @@ class PackageInstaller : public BApplication {
 	private:
 		BFilePanel	*fOpen;
 		uint32		fWindowCount;
-		BCatalog	fAppCatalog;
 };
 
 
 PackageInstaller::PackageInstaller()
 	:	BApplication("application/x-vnd.Haiku-PackageInstaller"),
 	fOpen(NULL),
-	fWindowCount(0),
-	fAppCatalog(NULL)
+	fWindowCount(0)
 {
 	fOpen = new BFilePanel(B_OPEN_PANEL);
-	be_locale->GetAppCatalog(&fAppCatalog);
 }
 
 

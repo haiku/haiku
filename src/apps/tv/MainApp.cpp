@@ -47,8 +47,6 @@ MainApp::MainApp()
 {
 	InitPrefs();
 	
-	be_locale->GetAppCatalog(&fAppCatalog);
-	
 	gDeviceRoster = new DeviceRoster;
 	
 	fMainWindow = NewWindow();

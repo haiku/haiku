@@ -24,9 +24,6 @@ main(int argc, char* argv[])
 {
 	BApplication	*app = new BApplication(kPrefSignature);
 
-	BCatalog cat;
-	be_locale->GetAppCatalog(&cat);
-
 	PreferencesWindow<freq_preferences> *window;
 	window = new PreferencesWindow<freq_preferences>(
 												B_TRANSLATE("CPU Frequency"),

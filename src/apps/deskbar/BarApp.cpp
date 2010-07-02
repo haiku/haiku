@@ -95,7 +95,6 @@ TBarApp::TBarApp()
 	InitSettings();
 	InitIconPreloader();
 
-	be_locale->GetAppCatalog(&fCatalog);
 	be_roster->StartWatching(this);
 
 	sBarTeamInfoList.MakeEmpty();

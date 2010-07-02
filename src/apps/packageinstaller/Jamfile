@@ -16,7 +16,7 @@ Application PackageInstaller :
 	PackageTextViewer.cpp
 	PackageImageViewer.cpp
 	InstalledPackageInfo.cpp
-	: be locale tracker translation z $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) tracker translation z $(TARGET_LIBSUPC++)
 	: PackageInstaller.rdef
 ;
 

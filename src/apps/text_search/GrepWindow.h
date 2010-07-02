@@ -145,7 +145,6 @@ private:
 			BMessageRunner*		fChangesPulse;
 
 			BFilePanel*			fFilePanel;
-			BCatalog			fAppCatalog;
 };
 
 #endif // GREP_WINDOW_H

@@ -28,8 +28,6 @@ private:
 
 			bool			fGotRefs;
 			BInvoker*		fInvoker;
-							
-			BCatalog		fCatalog;
 };
 
 #endif // _ZIPOMATIC_H_

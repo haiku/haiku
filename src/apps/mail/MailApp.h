@@ -129,8 +129,6 @@ class TMailApp : public BApplication {
 				int32			fUseAccountFrom;
 				uint32			fMailCharacterSet;
 				BFont			fContentFont;
-
-				BCatalog		fCatalog;
 };
 
 

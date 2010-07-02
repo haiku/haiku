@@ -25,8 +25,6 @@ HApp::HApp()
 	:
 	BApplication("application/x-vnd.Haiku-Sounds")
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	BRect rect;
 	rect.Set(200, 150, 590, 570);
 

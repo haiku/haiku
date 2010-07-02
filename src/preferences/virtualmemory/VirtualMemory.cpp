@@ -18,7 +18,6 @@
 VirtualMemory::VirtualMemory()
 	: BApplication("application/x-vnd.Haiku-VirtualMemory")
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

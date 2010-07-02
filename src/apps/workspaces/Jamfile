@@ -7,7 +7,7 @@ UsePrivateHeaders app interface ;
 
 Application Workspaces :
 	Workspaces.cpp 
-	: be locale $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: Workspaces.rdef 
 	;
 

@@ -45,18 +45,12 @@ class BCatalog {
 		const BCatalog& operator= (const BCatalog&);
 			// hide assignment and copy-constructor
 
-		static status_t GetAppCatalog(BCatalog*);
-
 		BCatalogAddOn *fCatalog;
 
 	private:
 		friend class BLocale;
 		friend status_t get_add_on_catalog(BCatalog*, const char *);
 };
-
-
-extern BCatalog* be_catalog;
-extern BCatalog* be_app_catalog;
 
 
 // Proxy class for handling a "shared object local" catalog.
@@ -70,6 +64,9 @@ class BCatalogStub {
 
 	public:
 		static BCatalog* GetCatalog();
+		static void ForceReload();
+			// Use this to force re-initialisation of the catalog (when there
+			// is a locale change for example)
 };
 
 
@@ -96,7 +93,6 @@ class BCatalogStub {
 	//		source-file.
 
 
-#ifdef B_TRANSLATE_USE_NEW_MACROS
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \
@@ -113,22 +109,6 @@ class BCatalogStub {
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
 	BCatalogStub::GetCatalog()->GetString((id))
-#else
-#define B_TRANSLATE(str) \
-	be_catalog->GetString((str), B_TRANSLATE_CONTEXT)
-
-#undef B_TRANSLATE_COMMENT
-#define B_TRANSLATE_COMMENT(str, cmt) \
-	be_catalog->GetString((str), B_TRANSLATE_CONTEXT, (cmt))
-
-#undef B_TRANSLATE_ALL
-#define B_TRANSLATE_ALL(str, ctx, cmt) \
-	be_catalog->GetString((str), (ctx), (cmt))
-
-#undef B_TRANSLATE_ID
-#define B_TRANSLATE_ID(id) \
-	be_catalog->GetString((id))
-#endif
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code):

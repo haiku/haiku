@@ -8,7 +8,7 @@ Preference CPUFrequency :
 	DriverInterface.cpp
 	main.cpp
 	StatusView.cpp
-	: be $(TARGET_LIBSUPC++) liblocale.so
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: cpufrequency.rdef
 	;
 

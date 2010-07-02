@@ -130,11 +130,8 @@ CodyCam::CodyCam()
 	fVideoConsumer(NULL),
 	fWindow(NULL),
 	fPort(0),
-	fVideoControlWindow(NULL),
-	fAppCatalog(NULL)
+	fVideoControlWindow(NULL)
 {
-	be_locale->GetAppCatalog(&fAppCatalog);
-
 	int32 index = 0;
 	kCaptureRate[index++] = B_TRANSLATE("Every 15 seconds");
 	kCaptureRate[index++] = B_TRANSLATE("Every 30 seconds");

@@ -4,9 +4,6 @@
  */
 
 
-#define B_TRANSLATE_USE_NEW_MACROS
-
-
 #include "TimeFormatSettingsView.h"
 
 #include <Alert.h>

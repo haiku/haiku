@@ -25,16 +25,12 @@ class FontsApp : public BApplication {
 		FontsApp();
 
 		virtual void AboutRequested();
-
-	private:
-		BCatalog fCatalog;
 };
 
 
 FontsApp::FontsApp()
 	: BApplication("application/x-vnd.Haiku-Fonts")
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	MainWindow *window = new MainWindow();
 	window->Show();
 }

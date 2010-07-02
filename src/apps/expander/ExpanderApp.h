@@ -48,7 +48,6 @@ class ExpanderApp : public BApplication {
 		void UpdateSettingsFrom(BMessage *message);
 	private:
 		ExpanderWindow *fWindow;
-		BCatalog				fCatalog;
 };
 
 #endif /* _ExpanderApp_h */

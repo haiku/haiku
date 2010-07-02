@@ -102,7 +102,7 @@ GetPageFormat(float w, float h, BString& label)
 		struct PageFormat& pf = pageFormat[i];
 		if ((pf.width == w && pf.height == h) || (pf.width == h
 			&& pf.height == w)) {
-			label = be_catalog->GetString(pf.label, B_TRANSLATE_CONTEXT);
+			label = B_TRANSLATE(pf.label);
 			return;
 		}
 	}

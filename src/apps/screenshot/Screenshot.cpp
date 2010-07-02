@@ -40,7 +40,6 @@ Screenshot::Screenshot()
 	fUtility(new Utility()),
 	fLaunchGui(true)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

@@ -24,8 +24,6 @@ public:
 
 private:
 			PairsWindow* 	fWindow;
-			BCatalog		fCatalog;
-
 };
 
 #endif	// PAIRS_H

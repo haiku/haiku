@@ -89,7 +89,6 @@ class DiskProbe : public BApplication {
 		uint32		fWindowCount;
 		BRect		fWindowFrame;
 		BMessenger	fFindTarget;
-		BCatalog	fAppCatalog;
 };
 
 
@@ -236,10 +235,8 @@ DiskProbe::DiskProbe()
 	: BApplication(kSignature),
 	fOpenWindow(NULL),
 	fFindWindow(NULL),
-	fWindowCount(0),
-	fAppCatalog(NULL)
+	fWindowCount(0)
 {
-	be_locale->GetAppCatalog(&fAppCatalog);
 	fFilePanel = new BFilePanel();
 	fWindowFrame = fSettings.Message().FindRect("window_frame");
 }

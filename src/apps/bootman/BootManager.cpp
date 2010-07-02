@@ -30,16 +30,12 @@ public:
 	virtual void ReadyToRun();
 
 	virtual void AboutRequested();
-
-private:
-	BCatalog fCatalog;
 };
 
 
 BootManager::BootManager()
 	: BApplication(kSignature)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

@@ -100,7 +100,6 @@ PrintServerApp::PrintServerApp(status_t* err)
 	fUseConfigWindow(true),
 	fFolder(NULL)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	fSettings = Settings::GetSettings();
 	LoadSettings();
 

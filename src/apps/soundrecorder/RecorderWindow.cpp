@@ -128,8 +128,6 @@ RecorderWindow::RecorderWindow() :
 
 	CalcSizes(MIN_WIDTH, MIN_HEIGHT);
 
-	be_locale->GetAppCatalog(&fAppCatalog);
-	
 	SetTitle(B_TRANSLATE("SoundRecorder"));
 	
 	fInitCheck = InitWindow();

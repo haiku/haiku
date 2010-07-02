@@ -37,8 +37,6 @@
 PulseApp::PulseApp(int argc, char **argv)
 	: BApplication(APP_SIGNATURE)
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	prefs = new Prefs();
 
 	int mini = false, deskbar = false, normal = false;

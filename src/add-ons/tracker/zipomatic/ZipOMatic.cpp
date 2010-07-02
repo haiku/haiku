@@ -37,7 +37,6 @@ ZipOMatic::ZipOMatic()
 	fGotRefs(false),
 	fInvoker(new BInvoker(new BMessage(ZIPPO_QUIT_OR_CONTINUE), NULL, this))
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

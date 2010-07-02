@@ -178,12 +178,7 @@ void
 BootPromptWindow::_InitCatalog(bool saveSettings)
 {
 	// Initilialize the Locale Kit
-	// TODO: The below code is a work-around for not being able to
-	// call GetAppCatalog() more than once.
-	be_catalog = be_app_catalog = NULL;
-	// NOTE: be_catalog and be_app_catalog will point fo &fCatalog!
-
-	be_locale->GetAppCatalog(&fCatalog);
+	BCatalogStub::ForceReload();
 
 	// Generate a settings file
 	// TODO: This should not be necessary.
@@ -191,6 +186,7 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 	if (!saveSettings)
 		return;
 
+	/*
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK
 		|| path.Append("Locale settings") != B_OK) {
@@ -204,7 +200,7 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 		settings.Unflatten(&file);
 
 	BString language;
-	if (fCatalog.GetLanguage(&language) == B_OK) {
+	if (fCatalog->GetLanguage(&language) == B_OK) {
 		settings.RemoveName("language");
 		settings.AddString("language", language.String());
 	}
@@ -218,6 +214,7 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 		|| settings.Flatten(&file) != B_OK) {
 		fprintf(stderr, "Failed to write Local Kit settings!\n");
 	}
+	*/
 }
 
 

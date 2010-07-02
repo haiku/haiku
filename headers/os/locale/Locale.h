@@ -45,8 +45,6 @@ class BLocale {
 
 		void GetSortKey(const char *string, BString *key);
 
-		status_t GetAppCatalog(BCatalog *);
-
 	protected:
 		BCollator	*fCollator;
 		BLanguage	*fLanguage;

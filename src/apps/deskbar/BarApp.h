@@ -178,8 +178,6 @@ class TBarApp : public BApplication {
 		static BLocker sSubscriberLock;
 		static BList sBarTeamInfoList;
 		static BList sSubscribers;
-
-		BCatalog fCatalog;
 };
 
 #endif	// BAR_APP_H

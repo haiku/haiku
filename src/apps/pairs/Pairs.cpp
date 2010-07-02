@@ -20,7 +20,6 @@ Pairs::Pairs()
 	BApplication(kSignature),
 	fWindow(NULL)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

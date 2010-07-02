@@ -11,7 +11,8 @@ Preference OpenGL :
 	ExtensionsView.cpp
 	InfoView.cpp
 	LogoView.cpp
-	: be GL translation libcolumnlistview.a liblocale.so $(TARGET_LIBSUPC++)
+	: be GL translation libcolumnlistview.a $(HAIKU_LOCALE_LIBS)
+		$(TARGET_LIBSUPC++)
 	: OpenGL.rdef
 	;
 

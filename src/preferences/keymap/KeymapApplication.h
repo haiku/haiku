@@ -28,7 +28,6 @@ class KeymapApplication : public BApplication {
 
 	private:
 		KeymapWindow* fWindow;
-		BCatalog fCatalog;
 };
 
 #endif // KEYMAP_APPLICATION_H

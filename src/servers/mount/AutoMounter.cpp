@@ -923,10 +923,7 @@ AutoMounter::_GetSettings(BMessage *message)
 int
 main(int argc, char* argv[])
 {
-	BCatalog appCatalog;
 	AutoMounter app;
-
-	be_locale->GetAppCatalog(&appCatalog);
 
 	app.Run();
 	return 0;

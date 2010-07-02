@@ -32,7 +32,6 @@ private:
 			MainWindow*			fWindow;
 
 			BMessage			fSettings;
-			BCatalog			fCatalog;
 };
 
 

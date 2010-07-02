@@ -49,7 +49,6 @@ class StyledEditApp : public BApplication {
 		int32			fWindowCount;
 		int32			fNextUntitledWindow;
 		bool			fBadArguments;
-		BCatalog		fCatalog;
 };
 
 extern StyledEditApp* styled_edit_app;

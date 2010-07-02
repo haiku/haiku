@@ -191,9 +191,7 @@ TranslationComparator(const void* left, const void* right)
 
 class AboutApp : public BApplication {
 public:
-								AboutApp();
-private:
-			BCatalog		fCatalog;
+							AboutApp();
 };
 
 
@@ -292,7 +290,6 @@ private:
 AboutApp::AboutApp()
 	: BApplication("application/x-vnd.Haiku-About")
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	AboutWindow *window = new(std::nothrow) AboutWindow();
 	if (window)
 		window->Show();

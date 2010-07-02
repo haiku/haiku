@@ -260,8 +260,7 @@ PrintServerApp::GetSupportedSuites(BMessage* msg)
 	if (!localized) {
 		localized = true;
 		for (int i = 0; prop_list[i].name != NULL; i ++)
-			prop_list[i].usage = be_catalog->GetString(prop_list[i].usage,
-				B_TRANSLATE_CONTEXT);
+			prop_list[i].usage = B_TRANSLATE(prop_list[i].usage);
 	}
 	
 	BPropertyInfo prop_info(prop_list);

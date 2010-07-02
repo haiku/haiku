@@ -99,9 +99,6 @@ InstallerApp::AboutRequested()
 void
 InstallerApp::ReadyToRun()
 {
-	// Initilialize the Locale Kit
-	be_locale->GetAppCatalog(&fCatalog);
-
 	const char* infoText = B_TRANSLATE(
 		"Welcome to the Haiku Installer!\n\n"
 

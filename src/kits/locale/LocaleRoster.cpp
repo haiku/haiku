@@ -425,11 +425,6 @@ BLocaleRoster::GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 	// This function is used in the translation macros, so it can't return a
 	// status_t. Maybe it could throw exceptions ?
 	
-	if (catalog == NULL) {
-		log_team(LOG_ERR, "GetCatalog called with a NULL catalog!");
-		return catalog;
-	}
-
 	if (*catalogInitStatus == true) {
 		// Catalog already loaded - nothing else to do
 		return catalog;
@@ -456,11 +451,16 @@ BLocaleRoster::GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 	BFile objectFile(info.name, B_READ_ONLY);
 	BAppFileInfo objectInfo(&objectFile);
 	char objectSignature[B_MIME_TYPE_LENGTH];
-	objectInfo.GetSignature(objectSignature);
+	if (objectInfo.GetSignature(objectSignature) != B_OK) {
+		log_team(LOG_ERR, "File %s has no mimesignature, so it can't use"
+			"localization.", info.name);
+		return catalog;
+	}
 
 	// drop supertype from mimetype (should be "application/"):
 	char* stripSignature = objectSignature;
-	while(*(stripSignature++)!='/');
+	while(*stripSignature != '/')
+		stripSignature ++;
 
 	log_team(LOG_DEBUG,
 		"Image %s (address %x) requested catalog with mimetype %s",

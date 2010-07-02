@@ -6,7 +6,7 @@ Preference VirtualMemory :
 	Settings.cpp
 	$(DRIVER_SETTINGS)
 
-	: be $(TARGET_LIBSTDC++) liblocale.so
+	: be $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: VirtualMemory.rdef
 	;
 

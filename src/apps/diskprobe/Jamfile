@@ -16,8 +16,8 @@ Application DiskProbe :
 	ProbeView.cpp
 	OpenWindow.cpp
 	FindWindow.cpp
-	: be locale tracker translation libexpression_parser.a libmapm.a 
-		$(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) tracker translation libexpression_parser.a
+		libmapm.a $(TARGET_LIBSUPC++)
 	: DiskProbe.rdef
 ;
 

@@ -26,7 +26,6 @@ public:
 			void		ReadyToRun();
 
 private:
-			BCatalog	fCatalog;
 			Utility*	fUtility;
 			bool		fSilent;
 			bool		fClipboard;

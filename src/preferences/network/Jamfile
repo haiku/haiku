@@ -9,7 +9,7 @@ Preference Network :
 	EthernetSettingsView.cpp
 	Settings.cpp
 
-	: be $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSUPC++) liblocale.so
+	: be $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Network.rdef
 ;
 

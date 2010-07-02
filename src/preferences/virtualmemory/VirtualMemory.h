@@ -25,7 +25,6 @@ class VirtualMemory : public BApplication {
 		void GetCurrentSettings(bool& enabled, off_t& size);
 
 		VMSettings *fSettings;	
-		BCatalog fCatalog;
 };
 	
 #endif	/* VIRTUAL_MEMORY_H */

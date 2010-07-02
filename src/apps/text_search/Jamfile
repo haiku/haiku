@@ -24,7 +24,8 @@ Application TextSearch :
 
 	$(additionalBeOSSources)
 
-	: be locale tracker textencoding libshared.a $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) tracker textencoding libshared.a
+		$(TARGET_LIBSUPC++)
 	: TextSearch.rdef
 ;
 

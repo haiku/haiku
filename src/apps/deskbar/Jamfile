@@ -39,7 +39,7 @@ Application Deskbar :
 	ResourceSet.cpp
 	Switcher.cpp
 	$(targetSource)
-	: be tracker liblocale.so $(targetLib) $(TARGET_LIBSUPC++)
+	: be tracker $(HAIKU_LOCALE_LIBS) $(targetLib) $(TARGET_LIBSUPC++)
 	;
 
 DoCatalogs Deskbar :

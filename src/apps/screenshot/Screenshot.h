@@ -29,7 +29,6 @@ private:
 			int32		_GetImageType(const char* name) const;
 			
 			Utility*	fUtility;
-			BCatalog	fCatalog;
 			
 			bool		fLaunchGui;
 };

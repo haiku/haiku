@@ -44,9 +44,6 @@ main(int argc, char* argv[])
 {
 	BApplication* app = new BApplication("application/x-vnd.Haiku-Touchpad");
 
-	BCatalog catalog;
-	be_locale->GetAppCatalog(&catalog);
-
 	TouchpadPrefWindow* window = new TouchpadPrefWindow(BRect(50, 50, 450, 350),
 		B_TRANSLATE("Touchpad"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE

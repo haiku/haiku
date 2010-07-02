@@ -43,7 +43,6 @@ private:
 			BFilePanel			*fOpenPanel;
 			bool				fPulseStarted;
 			ShowImageSettings	fSettings;
-			BCatalog		fCatalog;
 };
 
 

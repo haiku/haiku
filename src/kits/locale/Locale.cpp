@@ -43,15 +43,3 @@ BLocale::GetString(uint32 id)
 
 	return fCountry->GetString(id);
 }
-
-status_t 
-BLocale::GetAppCatalog(BCatalog *catalog)
-{
-	if (!catalog)
-		return B_BAD_VALUE;
-	// TODO: This is not so nice, and I don't know why it is here, but how
-	// is it envisioned to switch languages on the fly?
-	if (be_catalog)
-		debugger( "GetAppCatalog() has been called while be_catalog != NULL");
-	return BCatalog::GetAppCatalog(catalog);
-}

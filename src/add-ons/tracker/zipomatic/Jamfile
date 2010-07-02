@@ -9,7 +9,7 @@ Application ZipOMatic-Z :
 	ZipOMaticWindow.cpp
 	ZipperThread.cpp
 
-	: be tracker $(TARGET_LIBSUPC++) liblocale.so
+	: be tracker $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: ZipOMatic.rdef
 ;
 

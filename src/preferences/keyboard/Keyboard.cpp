@@ -21,7 +21,6 @@
 KeyboardApplication::KeyboardApplication()
 	: BApplication("application/x-vnd.Haiku-Keyboard")
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	new KeyboardWindow();
 }
 

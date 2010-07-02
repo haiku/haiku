@@ -104,13 +104,6 @@ BCatalog::GetData(uint32 id, BMessage *msg)
 }
 
 
-status_t 
-BCatalog::GetAppCatalog(BCatalog* catalog) 
-{
-	return B_NOT_SUPPORTED;
-}
-
-
 //#pragma mark - BCatalogAddOn
 BCatalogAddOn::BCatalogAddOn(const char *signature, const char *language,
 	uint32 fingerprint)

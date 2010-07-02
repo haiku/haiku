@@ -25,8 +25,6 @@ MouseApplication::MouseApplication()
 	:
 	BApplication(kSignature)
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	BRect rect(0, 0, 397, 293);
 	MouseWindow *window = new MouseWindow(rect);
 	window->Show();
@@ -45,7 +43,7 @@ MouseApplication::AboutRequested()
 
 
 int
-main(int /*argc*/, char **/*argv*/)
+main(int /*argc*/, char ** /*argv*/)
 {
 	MouseApplication app;
 	app.Run();

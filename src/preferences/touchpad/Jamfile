@@ -6,7 +6,7 @@ Preference Touchpad :
 	TouchpadPref.cpp
 	TouchpadPrefView.cpp
 	main.cpp
-	: be $(TARGET_LIBSUPC++) liblocale.so
+	: be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Touchpad.rdef
 	;
 

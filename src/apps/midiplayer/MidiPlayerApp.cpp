@@ -34,7 +34,6 @@
 MidiPlayerApp::MidiPlayerApp()
 	: BApplication(MIDI_PLAYER_SIGNATURE)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	window = new MidiPlayerWindow;
 }
 

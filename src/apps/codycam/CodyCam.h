@@ -110,7 +110,6 @@ private:
 			BWindow*		fWindow;
 			port_id			fPort;
 			BWindow*		fVideoControlWindow;
-			BCatalog		fAppCatalog;
 };
 
 

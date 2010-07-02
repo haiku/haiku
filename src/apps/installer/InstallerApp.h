@@ -21,7 +21,6 @@ public:
 
 private:
 			BWindow*			fEULAWindow;
-			BCatalog			fCatalog;
 };
 
 #endif // INSTALLER_APP_H

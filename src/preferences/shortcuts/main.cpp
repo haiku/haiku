@@ -20,9 +20,6 @@ main(int argc, char** argv)
 	InitKeyIndices();
 	ShortcutsApp app;
 	
-	BCatalog appCatalog;
-	be_locale->GetAppCatalog(&appCatalog);
-	
 	app.Run();
 }
 

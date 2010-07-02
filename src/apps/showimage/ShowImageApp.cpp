@@ -38,8 +38,6 @@ ShowImageApp::ShowImageApp()
 	:
 	BApplication(kApplicationSignature)
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	fPulseStarted = false;
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL);
 }

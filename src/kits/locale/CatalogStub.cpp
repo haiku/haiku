@@ -8,9 +8,6 @@
 #define __CATALOG_STUB_H__
 
 
-#define B_TRANSLATE_USE_NEW_MACROS
-
-
 #include <Catalog.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
@@ -23,6 +20,13 @@ vint32 BCatalogStub::sCatalogInitOnce = false;
 BCatalogStub::GetCatalog()
 {
 	return be_locale_roster->GetCatalog(&sCatalog, &sCatalogInitOnce);
+}
+
+
+/* static */ void
+BCatalogStub::ForceReload()
+{
+	sCatalogInitOnce = false;
 }
 
 

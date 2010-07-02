@@ -21,9 +21,6 @@ public:
 	
 	void	MessageReceived(BMessage* message);
 	void	AboutRequested(void);
-	
-private:
-	BCatalog fCatalog;
 };
 
 #endif

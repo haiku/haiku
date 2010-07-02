@@ -15,7 +15,7 @@ Preference Printers :
 	translation 
 	libprintutils.a
 	$(TARGET_LIBSUPC++)
-	liblocale.so
+	$(HAIKU_LOCALE_LIBS)
 	: 
 	Printers.rdef
 	;

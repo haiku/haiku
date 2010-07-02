@@ -27,8 +27,6 @@ public:
 
 private:
 			void		BuildPulse();
-		
-			BCatalog	fCatalog;
 };
 
 extern bool LastEnabledCPU(int cpu);

@@ -61,8 +61,7 @@ TermApp::TermApp()
 	fStartFullscreen(false),
 	fWindowNumber(-1),
 	fTermWindow(NULL),
-	fArgs(NULL),
-	fAppCatalog(NULL)
+	fArgs(NULL)
 {
 	const char *defaultArgs[2];
 	defaultArgs[0] = kDefaultShell;
@@ -75,8 +74,6 @@ TermApp::TermApp()
 			sizeof(stringBuffer), &passwdResult)) {
 		defaultArgs[0] = passwdStruct.pw_shell;
 	}
-
-	be_locale->GetAppCatalog(&fAppCatalog);
 
 	fArgs = new Arguments(2, defaultArgs);
 

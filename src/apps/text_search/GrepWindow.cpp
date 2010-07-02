@@ -127,14 +127,11 @@ GrepWindow::GrepWindow(BMessage* message)
 	  fChangesIterator(NULL),
 	  fChangesPulse(NULL),
 
-	  fFilePanel(NULL),
-	  fAppCatalog(NULL)
+	  fFilePanel(NULL)
 {
 	if (fModel == NULL)
 		return;
 
-	be_locale->GetAppCatalog(&fAppCatalog);
-	
 	entry_ref directory;
 	_InitRefsReceived(&directory, message);
 

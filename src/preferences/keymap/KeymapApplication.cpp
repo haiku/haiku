@@ -13,7 +13,6 @@
 KeymapApplication::KeymapApplication()
 	: BApplication("application/x-vnd.Haiku-Keymap")
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	// create the window
 	fWindow = new KeymapWindow();
 	fWindow->Show();

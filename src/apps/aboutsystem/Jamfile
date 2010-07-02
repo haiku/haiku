@@ -19,7 +19,7 @@ Application AboutSystem :
 	HyperTextActions.cpp
 	HyperTextView.cpp
 	Utilities.cpp
-	: $(TARGET_LIBSTDC++) be translation liblocale.so
+	: $(TARGET_LIBSTDC++) be translation $(HAIKU_LOCALE_LIBS)
 	: AboutSystem.rdef
 ;
 

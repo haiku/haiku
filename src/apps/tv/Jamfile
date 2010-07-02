@@ -8,7 +8,7 @@ Application TV :
 	MainWin.cpp
 	VideoNode.cpp
 	VideoView.cpp
-	: be locale media $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) media $(TARGET_LIBSUPC++)
 	: tv.rdef
 ;
 

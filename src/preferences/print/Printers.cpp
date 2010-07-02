@@ -28,7 +28,6 @@ main()
 PrintersApp::PrintersApp()
 	: Inherited(PRINTERS_SIGNATURE)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

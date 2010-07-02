@@ -24,8 +24,6 @@ Media::Media()
 {
 	BRect rect(32,64,637,462);
 
-	be_locale->GetAppCatalog(&fCatalog);
-
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(SETTINGS_FILE);

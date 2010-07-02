@@ -15,13 +15,6 @@
 #include <Roster.h>
 
 
-BCatalog* be_catalog = NULL;
-	// catalog used by translation macros
-BCatalog* be_app_catalog = NULL;
-	// app-catalog (useful for accessing app's catalog from inside an add-on,
-	// since in an add-on, be_catalog will hold the add-on's catalog.
-
-
 //#pragma mark - BCatalog
 BCatalog::BCatalog()
 	:
@@ -39,8 +32,6 @@ BCatalog::BCatalog(const char *signature, const char *language,
 
 BCatalog::~BCatalog()
 {
-	if (be_catalog == this)
-		be_app_catalog = be_catalog = NULL;
 	be_locale_roster->UnloadCatalog(fCatalog);
 }
 
@@ -114,51 +105,6 @@ BCatalog::SetCatalog(const char* signature, uint32 fingerprint)
 		= be_locale_roster->LoadCatalog(signature, NULL, fingerprint);
 
 	return B_OK;
-}
-
-
-status_t
-BCatalog::GetAppCatalog(BCatalog* catalog)
-{
-	app_info appInfo;
-	if (!be_app || be_app->GetAppInfo(&appInfo) != B_OK)
-		return B_ENTRY_NOT_FOUND;
-	BString sig(appInfo.signature);
-
-	// drop supertype from mimetype (should be "application/"):
-	int32 pos = sig.FindFirst('/');
-	if (pos >= 0)
-		sig.Remove(0, pos+1);
-
-	// try to fetch fingerprint from app-file (attribute):
-	uint32 fingerprint = 0;
-	BNode appNode(&appInfo.ref);
-	appNode.ReadAttr(BLocaleRoster::kCatFingerprintAttr, B_UINT32_TYPE, 0,
-		&fingerprint, sizeof(uint32));
-	catalog->SetCatalog(sig.String(), fingerprint);
-	// try to load catalog (with given fingerprint):
-	
-	// load native embedded id-based catalog. If such a catalog exists,
-	// we can fall back to native strings for id-based access, too.
-	BCatalogAddOn *embeddedCatalog
-		= be_locale_roster->LoadEmbeddedCatalog(&appInfo.ref);
-	if (embeddedCatalog) {
-		if (!catalog->fCatalog)
-			// embedded catalog is the only catalog that was found:
-			catalog->fCatalog = embeddedCatalog;
-		else {
-			// append embedded catalog to list of loaded catalogs:
-			BCatalogAddOn *currCat = catalog->fCatalog;
-			while (currCat->fNext)
-				currCat = currCat->fNext;
-			currCat->fNext = embeddedCatalog;
-		}
-	}
-
-	// make app-catalog the current catalog for translation-macros:
-	be_app_catalog = be_catalog = catalog;
-
-	return catalog->InitCheck();
 }
 
 

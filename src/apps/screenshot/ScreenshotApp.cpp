@@ -27,7 +27,6 @@ ScreenshotApp::ScreenshotApp()
 	fSilent(false),
 	fClipboard(false)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 

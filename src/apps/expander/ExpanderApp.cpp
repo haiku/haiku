@@ -15,8 +15,6 @@
 ExpanderApp::ExpanderApp()
 	: BApplication("application/x-vnd.Haiku-Expander")
 {
-	be_locale->GetAppCatalog(&fCatalog);
-
 	BPoint windowPosition = fSettings.Message().FindPoint("window_position");
 	BRect windowFrame(0, 0, 450, 120);
 	windowFrame.OffsetBy(windowPosition);

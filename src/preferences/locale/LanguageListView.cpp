@@ -16,7 +16,6 @@
 
 #include <new>
 
-#define B_TRANSLATE_USE_NEW_MACROS
 #include <Bitmap.h>
 #include <Country.h>
 #include <Catalog.h>

@@ -22,7 +22,7 @@ Preference Appearance :
 	#FontMenu.cpp
 	#MenuView.cpp
 	
-	: be $(TARGET_LIBSTDC++) liblocale.so
+	: be $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: Appearance.rdef
 	;
 

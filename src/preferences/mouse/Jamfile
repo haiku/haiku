@@ -8,7 +8,7 @@ Preference Mouse :
 	MouseWindow.cpp
 	MouseView.cpp 
 	SettingsView.cpp
-	: translation be $(TARGET_LIBSUPC++) liblocale.so
+	: translation be $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Mouse.rdef
 	;
 

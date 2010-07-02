@@ -27,7 +27,6 @@ class Media : public BApplication {
 
 	private:
 		MediaWindow* fWindow;
-		BCatalog fCatalog;
 };
 
 #endif	// MEDIA_H

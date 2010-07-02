@@ -38,7 +38,6 @@ public:
 
 private:	
 	BWindow *		fMainWindow;
-	BCatalog		fAppCatalog;
 };
 
 extern MainApp *gMainApp;

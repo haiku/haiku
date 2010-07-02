@@ -48,7 +48,6 @@ public:
 
 private:
 			BackgroundsWindow*	fWindow;
-			BCatalog			fCatalog;
 };
 
 
@@ -60,7 +59,6 @@ BackgroundsApplication::BackgroundsApplication()
 	BApplication(kSignature),
 	fWindow(NULL)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 	fWindow = new BackgroundsWindow();
 	fWindow->Show();
 }

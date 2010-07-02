@@ -12,7 +12,7 @@ Preference Keymap :
 	KeymapListItem.cpp
 	KeymapWindow.cpp
 
-	: be tracker liblocale.so libshared.a $(TARGET_LIBSTDC++)
+	: be tracker $(HAIKU_LOCALE_LIBS) libshared.a $(TARGET_LIBSTDC++)
 	: Keymap.rdef
 ;
 

@@ -39,7 +39,6 @@ class MidiPlayerApp : public BApplication {
 
 	private:
 		typedef BApplication super;
-		BCatalog fCatalog;
 		MidiPlayerWindow* window;
 };
 

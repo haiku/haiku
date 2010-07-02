@@ -33,11 +33,6 @@ class BLocaleRoster {
 		BLocaleRoster();
 		~BLocaleRoster();
 
-//		status_t GetCatalog(BLocale *,const char *mimeType, BCatalog *catalog);
-//		status_t GetCatalog(const char *mimeType, BCatalog *catalog);
-//		status_t SetCatalog(BLocale *,const char *mimeType, BCatalog *catalog);
-		BCatalog* GetCatalog(BCatalog* catalog, vint32* catalogInitStatus);
-
 //		status_t GetLocaleFor(const char *langCode, const char *countryCode);
 
 		status_t GetSystemCatalog(BCatalogAddOn **) const;
@@ -73,6 +68,7 @@ class BLocaleRoster {
 		static int32 kEmbeddedCatResId;
 
 	private:
+		BCatalog* GetCatalog(BCatalog* catalog, vint32* catalogInitStatus);
 
 		BCatalogAddOn* LoadCatalog(const char *signature,
 			const char *language = NULL, int32 fingerprint = 0);
@@ -83,6 +79,7 @@ class BLocaleRoster {
 			const char *signature, const char *language);
 
 		friend class BCatalog;
+		friend class BCatalogStub;
 		friend class BPrivate::EditableCatalog;
 		friend status_t get_add_on_catalog(BCatalog*, const char *);
 };

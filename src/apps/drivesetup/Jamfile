@@ -13,7 +13,8 @@ Preference DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 
-	: be liblocale.so libcolumnlistview.a libshared.a $(TARGET_LIBSUPC++)
+	: be $(HAIKU_LOCALE_LIBS) libcolumnlistview.a libshared.a
+		$(TARGET_LIBSUPC++)
 	: DriveSetup.rdef
 ;
 
