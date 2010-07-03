@@ -175,19 +175,10 @@ WidthBuffer::FindTable(const BFont *inStyle, int32 *outIndex)
 	if (inStyle == NULL)
 		return false;
 
-	float fontSize = inStyle->Size();
-	int32 fontCode = inStyle->FamilyAndStyle();
 	int32 tableIndex = -1;
 
 	for (int32 i = 0; i < fItemCount; i++) {
-
-#if USE_DANO_WIDTHBUFFER
-		if (*inStyle == fBuffer[i].font)
-#else
-		if (fontSize == fBuffer[i].fontSize
-			&& fontCode == fBuffer[i].fontCode)
-#endif
-		{
+		if (*inStyle == fBuffer[i].font) {
 			tableIndex = i;
 			break;
 		}
@@ -208,13 +199,7 @@ WidthBuffer::InsertTable(const BFont *font)
 {
 	_width_table_ table;
 
-#if USE_DANO_WIDTHBUFFER
 	table.font = *font;
-#else
-	table.fontSize = font->Size();
-	table.fontCode = font->FamilyAndStyle();
-#endif
-
 	table.hashCount = 0;
 	table.tableCount = kTableCount;
 	table.widths = new hashed_escapement[kTableCount];
