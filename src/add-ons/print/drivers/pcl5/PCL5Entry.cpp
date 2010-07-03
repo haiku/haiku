@@ -4,9 +4,11 @@
  * Copyright 2003 Michael Pfeiffer.
  */
 
+
 #include "PCL5.h"
 #include "PCL5Cap.h"
 #include "PrinterDriver.h"
+
 
 class PCL5PrinterDriver : public PrinterDriver
 {
@@ -23,7 +25,7 @@ public:
 		return "PCL5 compatible"; 
 	}
 	
-	const char* GetVersion() const    
+	const char* GetVersion() const
 	{ 
 		return "1.0"; 
 	}
@@ -38,11 +40,13 @@ public:
 		return new PCL5Cap(printerData);
 	}
 	
-	GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings, PrinterData* printerData, PrinterCap* printerCap)
+	GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings,
+		PrinterData* printerData, PrinterCap* printerCap)
 	{
 		return new PCL5Driver(settings, printerData, printerCap);
 	}
 };
+
 
 PrinterDriver* instantiate_printer_driver(BNode* printerFolder)
 {

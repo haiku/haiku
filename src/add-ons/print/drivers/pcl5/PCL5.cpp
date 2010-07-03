@@ -4,19 +4,24 @@
  * Copyright 2003 Michael Pfeiffer.
  */
 
+
+#include "PCL5.h"
+
+#include <memory>
+
 #include <Alert.h>
 #include <Bitmap.h>
 #include <File.h>
-#include <memory>
-#include "PCL5.h"
-#include "UIDriver.h"
-#include "JobData.h"
-#include "PrinterData.h"
-#include "PCL5Cap.h"
-#include "PackBits.h"
-#include "Halftone.h"
-#include "ValidRect.h"
+
 #include "DbgMsg.h"
+#include "Halftone.h"
+#include "JobData.h"
+#include "PackBits.h"
+#include "PCL5Cap.h"
+#include "PrinterData.h"
+#include "UIDriver.h"
+#include "ValidRect.h"
+
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
@@ -24,41 +29,54 @@ using namespace std;
 #define std
 #endif
 
-PCL5Driver::PCL5Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: GraphicsDriver(msg, printer_data, printer_cap)
+
+PCL5Driver::PCL5Driver(BMessage* msg, PrinterData* printer_data,
+	const PrinterCap* printer_cap)
+	:
+	GraphicsDriver(msg, printer_data, printer_cap)
 {
 	fHalftone = NULL;
 }
 
-bool PCL5Driver::startDoc()
+
+bool
+PCL5Driver::startDoc()
 {
 	try {
 		jobStart();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma(), getJobData()->getInkDensity(), getJobData()->getDitherType());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(),
+			getJobData()->getGamma(), getJobData()->getInkDensity(),
+			getJobData()->getDitherType());
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool PCL5Driver::startPage(int)
+
+bool
+PCL5Driver::startPage(int)
 {
 	return true;
 }
 
-bool PCL5Driver::endPage(int)
+
+bool
+PCL5Driver::endPage(int)
 {
 	try {
 		writeSpoolChar('\014');
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool PCL5Driver::endDoc(bool)
+
+bool
+PCL5Driver::endDoc(bool)
 {
 	try {
 		if (fHalftone) {
@@ -67,12 +85,14 @@ bool PCL5Driver::endDoc(bool)
 		jobEnd();
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
+
+bool
+PCL5Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 
@@ -80,9 +100,9 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 		BRect bounds = bitmap->Bounds();
 
 		RECT rc;
-		rc.left   = (int)bounds.left;
-		rc.top    = (int)bounds.top;
-		rc.right  = (int)bounds.right;
+		rc.left = (int)bounds.left;
+		rc.top = (int)bounds.top;
+		rc.right = (int)bounds.right;
 		rc.bottom = (int)bounds.bottom;
 
 		int height = rc.bottom - rc.top + 1;
@@ -92,9 +112,8 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 		int page_height = getPageHeight();
 
-		if (y + height > page_height) {
+		if (y + height > page_height)
 			height = page_height - y;
-		}
 
 		rc.bottom = height - 1;
 
@@ -111,11 +130,12 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			y += rc.top;
 
 			int width = rc.right - rc.left + 1;
-			int widthByte = (width + 7) / 8;	/* byte boundary */
-			int height    = rc.bottom - rc.top + 1;
-			int in_size   = widthByte;
-			int out_size  = (widthByte * 6 + 4) / 5;
-			int delta     = bitmap->BytesPerRow();
+			int widthByte = (width + 7) / 8;
+				// byte boundary
+			int height = rc.bottom - rc.top + 1;
+			int in_size = widthByte;
+			int out_size = (widthByte * 6 + 4) / 5;
+			int delta = bitmap->BytesPerRow();
 
 			DBGMSG(("width = %d\n", width));
 			DBGMSG(("widthByte = %d\n", widthByte));
@@ -125,16 +145,16 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("delta = %d\n", delta));
 			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
 
-			uchar *ptr = (uchar *)bitmap->Bits()
+			uchar* ptr = static_cast<uchar*>(bitmap->Bits())
 						+ rc.top * delta
 						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
-			const uchar *buffer;
+			const uchar* buffer;
 
-			uchar *in_buffer  = new uchar[in_size];
-			uchar *out_buffer = new uchar[out_size];
+			uchar* in_buffer  = new uchar[in_size];
+			uchar* out_buffer = new uchar[out_size];
 
 			auto_ptr<uchar> _in_buffer (in_buffer);
 			auto_ptr<uchar> _out_buffer(out_buffer);
@@ -160,7 +180,8 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 							
 					compressed_size = pack_bits(out_buffer, in_buffer, in_size);
 					
-					if (compressed_size + bytesToEnterCompressionMethod(2) < in_size + bytesToEnterCompressionMethod(0)) {
+					if (compressed_size + bytesToEnterCompressionMethod(2) 
+						< in_size + bytesToEnterCompressionMethod(0)) {
 						compression_method = 2; // back bits
 						buffer = out_buffer;
 					} else {
@@ -183,28 +204,28 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 			endRasterGraphics();
 
-		} else {
+		} else
 			DBGMSG(("band bitmap is clean.\n"));
-		}
 
 		if (y >= page_height) {
 			offset->x = -1.0;
 			offset->y = -1.0;
-		} else {
+		} else
 			offset->y += height;
-		}
 
 		DBGMSG(("< nextBand\n"));
 		return true;
 	}
-	catch (TransportException &err) {
-		BAlert *alert = new BAlert("", err.what(), "OK");
+	catch (TransportException& err) {
+		BAlert* alert = new BAlert("", err.what(), "OK");
 		alert->Go();
 		return false;
 	} 
 }
 
-void PCL5Driver::jobStart()
+
+void
+PCL5Driver::jobStart()
 {
 	const bool color = getJobData()->getColor() == JobData::kColor;
 	// enter PCL5
@@ -233,7 +254,9 @@ void PCL5Driver::jobStart()
 	// writeSpoolString("\033&l%ldL", getJobData()->getCopies());
 }
 
-void PCL5Driver::startRasterGraphics(int width, int height)
+
+void
+PCL5Driver::startRasterGraphics(int width, int height)
 {
 	// width
 	writeSpoolString("\033*r%dS", width);
@@ -244,47 +267,52 @@ void PCL5Driver::startRasterGraphics(int width, int height)
 	fCompressionMethod = -1;
 }
 
-void PCL5Driver::endRasterGraphics()
+
+void
+PCL5Driver::endRasterGraphics()
 {
 	writeSpoolString("\033*rB");
 }
 
-void PCL5Driver::rasterGraphics(
-	int compression_method,
-	const uchar *buffer,
-	int size,
-	bool lastPlane)
+
+void
+PCL5Driver::rasterGraphics(int compression_method, const uchar* buffer,
+	int size, bool lastPlane)
 {
 	if (fCompressionMethod != compression_method) {
 		writeSpoolString("\033*b%dM", compression_method);
 		fCompressionMethod = compression_method;
 	}
 	writeSpoolString("\033*b%d", size);
-	if (lastPlane) {
+	if (lastPlane)
 		writeSpoolString("W");
-	} else {
+	else
 		writeSpoolString("V");
-	}
+
 	writeSpoolData(buffer, size);
 }
 
-void PCL5Driver::jobEnd()
+
+void
+PCL5Driver::jobEnd()
 {
 	writeSpoolString("\033&l1T");
 	writeSpoolString("\033E");
 }
 
-void PCL5Driver::move(int x, int y)
+
+void
+PCL5Driver::move(int x, int y)
 {
-	writeSpoolString("\033*p%dx%dY", x, y+75);
+	writeSpoolString("\033*p%dx%dY", x, y + 75);
 }
 
-int PCL5Driver::bytesToEnterCompressionMethod(int compression_method)
+
+int
+PCL5Driver::bytesToEnterCompressionMethod(int compression_method)
 {
-	if (fCompressionMethod == compression_method) {
+	if (fCompressionMethod == compression_method)
 		return 0;
-	} else {
+	else
 		return 5;
-	}
 }
-
