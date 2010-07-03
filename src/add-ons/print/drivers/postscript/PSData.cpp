@@ -6,11 +6,13 @@
 *		Ithamar R. Adema <ithamar.adema@team-embedded.nl>
 */
 
+
 #include "PSData.h"
 
 #include <Node.h>
 
 #define PD_PPD_PATH	"ps:ppd_path"
+
 
 void
 PSData::load()
@@ -18,6 +20,7 @@ PSData::load()
 	PrinterData::load();
 	fNode->ReadAttrString(PD_PPD_PATH, &fPPD);
 }
+
 
 void
 PSData::save()

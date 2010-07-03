@@ -5,11 +5,12 @@
 * Authors:
 *		Ithamar R. Adema <ithamar.adema@team-embedded.nl>
 */
-
 #ifndef PSDATA_H
 #define PSDATA_H
 
+
 #include "PrinterData.h"
+
 #include <String.h>
 
 
@@ -18,14 +19,17 @@ class BNode;
 
 class PSData : public PrinterData {
 public:
-	PSData(BNode *node) : PrinterData(node) {}
+					PSData(BNode* node)
+					:
+					PrinterData(node)
+					{
+					}
 
 	// PrinterData overrides
-	virtual void load();
-	virtual void save();
+	virtual	void	load();
+	virtual	void	save();
 
 	BString fPPD;
 };
 
-
-#endif /* PSDATA_H */
+#endif // PSDATA_H

@@ -3,8 +3,10 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
-#include "PrinterData.h"
+
 #include "PSCap.h"
+
+#include "PrinterData.h"
 
 #define TO72DPI(a)	(a * 72.0f / 600.0f)
 
@@ -66,11 +68,11 @@ const PaperCap legal(
 
 const PaperSourceCap autobin("Auto",  true,  JobData::kAuto);
 
-const ResolutionCap dpi300("300dpi",   true, 300,  300);
-const ResolutionCap dpi600("600dpi",  false, 600,  600);
+const ResolutionCap dpi300("300dpi", true, 300,  300);
+const ResolutionCap dpi600("600dpi", false, 600,  600);
 const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
 
-const PaperCap *papers[] = {
+const PaperCap* papers[] = {
 	&a4,
 	&a3,
 	&a5,
@@ -80,11 +82,11 @@ const PaperCap *papers[] = {
 	&legal
 };
 
-const PaperSourceCap *papersources[] = {
+const PaperSourceCap* papersources[] = {
 	&autobin,
 };
 
-const ResolutionCap *resolutions[] = {
+const ResolutionCap* resolutions[] = {
 	&dpi300,
 	&dpi600,
 	&dpi1200,
@@ -93,57 +95,64 @@ const ResolutionCap *resolutions[] = {
 const ColorCap color("Color", false, JobData::kColor);
 const ColorCap monochrome("Monochrome", true, JobData::kMonochrome);
 
-const ColorCap *colors[] = {
+const ColorCap* colors[] = {
 	&color,
 	&monochrome
 };
 
-PSCap::PSCap(const PrinterData *printer_data)
-	: PrinterCap(printer_data)
+PSCap::PSCap(const PrinterData* printer_data)
+	:
+	PrinterCap(printer_data)
 {
 }
 
-int PSCap::countCap(CapID capid) const
+
+int
+PSCap::countCap(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-		return sizeof(papers) / sizeof(papers[0]);
-	case kPaperSource:
-		return sizeof(papersources) / sizeof(papersources[0]);
-	case kResolution:
-		return sizeof(resolutions) / sizeof(resolutions[0]);
-	case kColor:
-		return sizeof(colors) / sizeof(colors[0]);
-	default:
-		return 0;
+		case kPaper:
+			return sizeof(papers) / sizeof(papers[0]);
+		case kPaperSource:
+			return sizeof(papersources) / sizeof(papersources[0]);
+		case kResolution:
+			return sizeof(resolutions) / sizeof(resolutions[0]);
+		case kColor:
+			return sizeof(colors) / sizeof(colors[0]);
+		default:
+			return 0;
 	}
 }
 
-const BaseCap **PSCap::enumCap(CapID capid) const
+
+const BaseCap**
+PSCap::enumCap(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-		return (const BaseCap **)papers;
-	case kPaperSource:
-		return (const BaseCap **)papersources;
-	case kResolution:
-		return (const BaseCap **)resolutions;
-	case kColor:
-		return (const BaseCap **)colors;
-	default:
-		return NULL;
-	}
+		case kPaper:
+			return (const BaseCap **)papers;
+		case kPaperSource:
+			return (const BaseCap **)papersources;
+		case kResolution:
+			return (const BaseCap **)resolutions;
+		case kColor:
+			return (const BaseCap **)colors;
+		default:
+			return NULL;
+		}
 }
 
-bool PSCap::isSupport(CapID capid) const
+
+bool
+PSCap::isSupport(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-	case kPaperSource:
-	case kResolution:
-	case kColor:
-		return true;
-	default:
-		return false;
+		case kPaper:
+		case kPaperSource:
+		case kResolution:
+		case kColor:
+			return true;
+		default:
+			return false;
 	}
 }

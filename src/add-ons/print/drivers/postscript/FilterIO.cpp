@@ -6,27 +6,31 @@
 *		Ithamar R. Adema <ithamar.adema@team-embedded.nl>
 */
 
+
 #include "FilterIO.h"
 
-#include <String.h>
-#include <image.h>
-
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <image.h>
+
+#include <String.h>
+
 
 FilterIO::FilterIO(const BString& cmdline)
-	: BDataIO()
+	:
+	BDataIO()
 {
 	BString cmd(cmdline);
-	const char *argv[4];
+	const char* argv[4];
 
 	argv[0] = strdup("/bin/sh");
 	argv[1] = strdup("-c");
 	argv[2] = strdup(cmd.String());
 	argv[3] = NULL;
 
-	InitData(3,argv);
+	InitData(3, argv);
 
 	free((void*)argv[0]);
 	free((void*)argv[1]);
@@ -35,18 +39,17 @@ FilterIO::FilterIO(const BString& cmdline)
 
 
 FilterIO::FilterIO(int argc, const char **argv, const char **envp)
-	: BDataIO()
+	:
+	BDataIO()
 {
-	InitData(argc,argv,envp);
+	InitData(argc, argv, envp);
 }
 
 
 status_t
-FilterIO::InitData(int argc, const char **argv, const char **envp)
+FilterIO::InitData(int argc, const char** argv, const char** envp)
 {
-	fStdIn =
-	fStdOut =
-	fStdErr = -1;
+	fStdIn = fStdOut = fStdErr = -1;
 	fInitErr = B_OK;
 
 	fThreadId = PipeCommand(argc, argv, fStdIn, fStdOut, fStdErr, envp);
@@ -70,21 +73,22 @@ FilterIO::~FilterIO()
 
 
 ssize_t
-FilterIO::Read(void *buffer, size_t size)
+FilterIO::Read(void* buffer, size_t size)
 {
 	return ::read(fStdOut, buffer, size);
 }
 
 
 ssize_t
-FilterIO::Write(const void *buffer, size_t size)
+FilterIO::Write(const void* buffer, size_t size)
 {
 	return ::write(fStdIn, buffer, size);
 }
 
 
 thread_id
-FilterIO::PipeCommand(int argc, const char **argv, int &in, int &out, int &err, const char **envp)
+FilterIO::PipeCommand(int argc, const char** argv, int& in, int& out, int& err,
+	const char** envp)
 {
 	// This function written by Peter Folk <pfolk@uni.uiuc.edu>
 	// and published in the BeDevTalk FAQ
@@ -100,7 +104,7 @@ FilterIO::PipeCommand(int argc, const char **argv, int &in, int &out, int &err, 
 
 	int filedes[2];
 
-	/* Create new pipe FDs as stdin, stdout, stderr */
+	// Create new pipe FDs as stdin, stdout, stderr
 	pipe(filedes);  dup2(filedes[0], 0); close(filedes[0]);
 	in = filedes[1];  // Write to in, appears on cmd's stdin
 	pipe(filedes);  dup2(filedes[1], 1); close(filedes[1]);
