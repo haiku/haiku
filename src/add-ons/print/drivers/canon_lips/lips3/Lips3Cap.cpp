@@ -3,10 +3,12 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
-#include "PrinterData.h"
 #include "Lips3Cap.h"
 
+#include "PrinterData.h"
+
 #define TO72DPI(a)	(a * 72.0f / 600.0f)
+
 
 const PaperCap a3(
 	"A3",
@@ -71,7 +73,7 @@ const PaperSourceCap lower("Lower",   false, JobData::kLower);
 
 const ResolutionCap dpi300("300dpi",   true, 300,  300);
 
-const PaperCap *papers[] = {
+const PaperCap* papers[] = {
 	&a4,
 	&a3,
 	&a5,
@@ -81,31 +83,35 @@ const PaperCap *papers[] = {
 	&legal
 };
 
-const PaperSourceCap *papersources[] = {
+const PaperSourceCap* papersources[] = {
 	&autobin,
 	&manual,
 	&upper,
 	&lower
 };
 
-const ResolutionCap *resolutions[] = {
+const ResolutionCap* resolutions[] = {
 	&dpi300
 };
 
 const ColorCap color("Color", false, JobData::kColor);
 const ColorCap monochrome("Shades of Gray", true, JobData::kMonochrome);
 
-const ColorCap *colors[] = {
+const ColorCap* colors[] = {
 	&color,
 	&monochrome
 };
 
-Lips3Cap::Lips3Cap(const PrinterData *printer_data)
-	: PrinterCap(printer_data)
+
+Lips3Cap::Lips3Cap(const PrinterData* printer_data)
+	:
+	PrinterCap(printer_data)
 {
 }
 
-int Lips3Cap::countCap(CapID capid) const
+
+int
+Lips3Cap::countCap(CapID capid) const
 {
 	switch (capid) {
 	case kPaper:
@@ -121,7 +127,9 @@ int Lips3Cap::countCap(CapID capid) const
 	}
 }
 
-const BaseCap **Lips3Cap::enumCap(CapID capid) const
+
+const
+BaseCap **Lips3Cap::enumCap(CapID capid) const
 {
 	switch (capid) {
 	case kPaper:
@@ -137,7 +145,9 @@ const BaseCap **Lips3Cap::enumCap(CapID capid) const
 	}
 }
 
-bool Lips3Cap::isSupport(CapID capid) const
+
+bool
+Lips3Cap::isSupport(CapID capid) const
 {
 	switch (capid) {
 	case kPaper:

@@ -3,9 +3,11 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
+
 #include "Lips3.h"
 #include "Lips3Cap.h"
 #include "PrinterDriver.h"
+
 
 class Lips3PrinterDriver : public PrinterDriver
 {
@@ -22,7 +24,7 @@ public:
 		return "Canon LIPS3 compatible"; 
 	}
 	
-	const char* GetVersion() const    
+	const char* GetVersion() const
 	{ 
 		return "0.9.4"; 
 	}
@@ -37,14 +39,15 @@ public:
 		return new Lips3Cap(printerData);
 	}
 	
-	GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings, PrinterData* printerData, PrinterCap* printerCap)
+	GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings,
+		PrinterData* printerData, PrinterCap* printerCap)
 	{
 		return new LIPS3Driver(settings, printerData, printerCap);
 	}
 };
 
+
 PrinterDriver* instantiate_printer_driver(BNode* printerFolder)
 {
 	return new Lips3PrinterDriver(printerFolder);
 }
-

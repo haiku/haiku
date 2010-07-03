@@ -3,7 +3,8 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
-//#define DBG_CON_STREAM
+
+// #define DBG_CON_STREAM
 
 #ifdef DBG_CON_STREAM
 #include <fstream>
@@ -14,15 +15,17 @@ using namespace std;
 
 #define PACK_TYPE	2
 
-int compress3(unsigned char *pOut, unsigned char *pIn, int n)
+
+int
+compress3(unsigned char* pOut, unsigned char* pIn, int n)
 {
 	int count;
 	int count_byte;
-	unsigned char *pBase;
-	unsigned char *pLast;
+	unsigned char* pBase;
+	unsigned char* pLast;
 	unsigned char keep;
 
-	count      = 0;
+	count = 0;
 	count_byte = 0;
 
 	keep   = ~(*pIn);
@@ -56,32 +59,32 @@ int compress3(unsigned char *pOut, unsigned char *pIn, int n)
 			*pOut++ = keep;
 			*pOut++ = count - PACK_TYPE;
 			count_byte += 2;
-		} else {
+		} else
 			count_byte = n;
-		}
 	}
 
 	return count_byte;
 }
 
+
 #ifdef DBG_CON_STREAM
-int main(int argc, char **argv)
+
+int
+main(int argc, char **argv)
 {
-	if (argc < 2) {
+	if (argc < 2)
 		return -1;
-	}
 
 	ifstream ifs(*++argv, ios::binary | ios::nocreate);
-	if (!ifs) {
+	if (!ifs)
 		return -1;
-	}
 
 	ifs.seekg(0, ios::end);
 	long size = ifs.tellg();
 	ifs.seekg(0, ios::beg);
 
-	unsigned char *pIn  = new unsigned char[size];
-	unsigned char *pOut = new unsigned char[size * 3];
+	unsigned char* pIn  = new unsigned char[size];
+	unsigned char* pOut = new unsigned char[size * 3];
 
 	ifs.read(pIn, size);
 
@@ -94,4 +97,5 @@ int main(int argc, char **argv)
 	delete [] pOut;
 
 }
+
 #endif

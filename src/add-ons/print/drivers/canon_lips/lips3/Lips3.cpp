@@ -3,19 +3,24 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
+
+#include "Lips3.h"
+
+#include <memory>
+
 #include <Alert.h>
 #include <Bitmap.h>
 #include <File.h>
-#include <memory>
-#include "Lips3.h"
-#include "UIDriver.h"
+
 #include "Compress3.h"
-#include "JobData.h"
-#include "PrinterData.h"
-#include "Lips3Cap.h"
-#include "Halftone.h"
-#include "ValidRect.h"
 #include "DbgMsg.h"
+#include "Halftone.h"
+#include "JobData.h"
+#include "Lips3Cap.h"
+#include "PrinterData.h"
+#include "UIDriver.h"
+#include "ValidRect.h"
+
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
@@ -23,13 +28,18 @@ using namespace std;
 #define std
 #endif
 
-LIPS3Driver::LIPS3Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: GraphicsDriver(msg, printer_data, printer_cap)
+
+LIPS3Driver::LIPS3Driver(BMessage *msg, PrinterData *printer_data,
+	const PrinterCap *printer_cap)
+	:
+	GraphicsDriver(msg, printer_data, printer_cap)
 {
 	fHalftone = NULL;
 }
 
-bool LIPS3Driver::startDoc()
+
+bool
+LIPS3Driver::startDoc()
 {
 	try {
 		beginTextMode();
@@ -41,15 +51,19 @@ bool LIPS3Driver::startDoc()
 		paperFeedMode();
 		disableAutoFF();
 		setNumberOfCopies();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma(), getJobData()->getInkDensity(), getJobData()->getDitherType());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(),
+			getJobData()->getGamma(), getJobData()->getInkDensity(),
+			getJobData()->getDitherType());
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS3Driver::startPage(int)
+
+bool
+LIPS3Driver::startPage(int)
 {
 	try {
 		fCurrentX = 0;
@@ -57,23 +71,27 @@ bool LIPS3Driver::startPage(int)
 		memorizedPosition();
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS3Driver::endPage(int)
+
+bool
+LIPS3Driver::endPage(int)
 {
 	try {
 		formFeed();
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS3Driver::endDoc(bool)
+
+bool
+LIPS3Driver::endDoc(bool)
 {
 	try {
 		if (fHalftone) {
@@ -82,12 +100,14 @@ bool LIPS3Driver::endDoc(bool)
 		jobEnd();
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
+
+bool
+LIPS3Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 
@@ -95,9 +115,9 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 		BRect bounds = bitmap->Bounds();
 
 		RECT rc;
-		rc.left   = (int)bounds.left;
-		rc.top    = (int)bounds.top;
-		rc.right  = (int)bounds.right;
+		rc.left = (int)bounds.left;
+		rc.top = (int)bounds.top;
+		rc.right = (int)bounds.right;
 		rc.bottom = (int)bounds.bottom;
 
 		int height = rc.bottom - rc.top + 1;
@@ -107,9 +127,8 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 		int page_height = getPageHeight();
 
-		if (y + height > page_height) {
+		if (y + height > page_height)
 			height = page_height - y;
-		}
 
 		rc.bottom = height - 1;
 
@@ -126,11 +145,12 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			y += rc.top;
 
 			int width = rc.right - rc.left + 1;
-			int widthByte = (width + 7) / 8;	/* byte boundary */
-			int height    = rc.bottom - rc.top + 1;
-			int in_size   = widthByte * height;
-			int out_size  = (in_size * 6 + 4) / 5;
-			int delta     = bitmap->BytesPerRow();
+			int widthByte = (width + 7) / 8;
+				// byte boundary
+			int height = rc.bottom - rc.top + 1;
+			int in_size = widthByte * height;
+			int out_size = (in_size * 6 + 4) / 5;
+			int delta = bitmap->BytesPerRow();
 
 			DBGMSG(("width = %d\n", width));
 			DBGMSG(("widthByte = %d\n", widthByte));
@@ -138,23 +158,24 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("in_size = %d\n", in_size));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
+			DBGMSG(("renderobj->get_pixel_depth() = %d\n",
+				fHalftone->getPixelDepth()));
 
-			uchar *ptr = (uchar *)bitmap->Bits()
+			uchar* ptr = static_cast<uchar*>(bitmap->Bits())
 						+ rc.top * delta
 						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
-			const uchar *buffer;
+			const uchar* buffer;
 
-			uchar *in_buffer  = new uchar[in_size];
-			uchar *out_buffer = new uchar[out_size];
+			uchar* in_buffer = new uchar[in_size];
+			uchar* out_buffer = new uchar[out_size];
 
 			auto_ptr<uchar> _in_buffer (in_buffer);
 			auto_ptr<uchar> _out_buffer(out_buffer);
 
-			uchar *ptr2 = (uchar *)in_buffer;
+			uchar* ptr2 = static_cast<uchar*>(in_buffer);
 
 			DBGMSG(("move\n"));
 
@@ -170,10 +191,12 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			compressed_size = compress3(out_buffer, in_buffer, in_size);
 
 			if (compressed_size < in_size) {
-				compression_method = 9;		/* compress3 */
+				compression_method = 9;
+					// compress3
 				buffer = out_buffer;
 			} else if (compressed_size > out_size) {
-				BAlert *alert = new BAlert("memory overrun!!!", "warning", "OK");
+				BAlert* alert = new BAlert("memory overrun!!!", "warning",
+					"OK");
 				alert->Go();
 				return false;
 			} else {
@@ -194,53 +217,63 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 				compression_method,
 				buffer);
 
-		} else {
+		} else
 			DBGMSG(("band bitmap is clean.\n"));
-		}
 
 		if (y >= page_height) {
 			offset->x = -1.0;
 			offset->y = -1.0;
-		} else {
+		} else
 			offset->y += height;
-		}
 
 		DBGMSG(("< nextBand\n"));
 		return true;
 	}
-	catch (TransportException &err) {
-		BAlert *alert = new BAlert("", err.what(), "OK");
+	catch (TransportException& err) {
+		BAlert* alert = new BAlert("", err.what(), "OK");
 		alert->Go();
 		return false;
 	} 
 }
 
-void LIPS3Driver::beginTextMode()
+
+void
+LIPS3Driver::beginTextMode()
 {
 	writeSpoolString("\033%%@");
 }
 
-void LIPS3Driver::jobStart()
+
+void
+LIPS3Driver::jobStart()
 {
 	writeSpoolString("\033P31;300;1J\033\\");
 }
 
-void LIPS3Driver::softReset()
+
+void
+LIPS3Driver::softReset()
 {
 	writeSpoolString("\033<");
 }
 
-void LIPS3Driver::sizeUnitMode()
+
+void
+LIPS3Driver::sizeUnitMode()
 {
 	writeSpoolString("\033[11h");
 }
 
-void LIPS3Driver::selectSizeUnit()
+
+void
+LIPS3Driver::selectSizeUnit()
 {
 	writeSpoolString("\033[7 I");
 }
 
-void LIPS3Driver::selectPageFormat()
+
+void
+LIPS3Driver::selectPageFormat()
 {
 	int i;
 	int width  = 0;
@@ -301,14 +334,15 @@ void LIPS3Driver::selectPageFormat()
 	if (JobData::kLandscape == getJobData()->getOrientation())
 		i++;
 
-	if (i < 80) {
+	if (i < 80)
 		writeSpoolString("\033[%d;;p", i);
-	} else {
+	else
 		writeSpoolString("\033[%d;%d;%dp", i, height, width);
-	}
 }
 
-void LIPS3Driver::paperFeedMode()
+
+void
+LIPS3Driver::paperFeedMode()
 {
 	// 0 auto
 	// --------------
@@ -328,92 +362,103 @@ void LIPS3Driver::paperFeedMode()
 	int i;
 
 	switch (getJobData()->getPaperSource()) {
-	case JobData::kManual:
-		i = 1;
-		break;
-	case JobData::kLower:
-		i = 2;
-		break;
-	case JobData::kUpper:
-		i = 3;
-		break;
-	case JobData::kAuto:
-	default:
-		i = 0;
-		break;
+		case JobData::kManual:
+			i = 1;
+			break;
+		case JobData::kLower:
+			i = 2;
+			break;
+		case JobData::kUpper:
+			i = 3;
+			break;
+		case JobData::kAuto:
+		default:
+			i = 0;
+			break;
 	}
 
 	writeSpoolString("\033[%dq", i);
 }
 
-void LIPS3Driver::disableAutoFF()
+
+void
+LIPS3Driver::disableAutoFF()
 {
 	writeSpoolString("\033[?2h");
 }
 
-void LIPS3Driver::setNumberOfCopies()
+
+void
+LIPS3Driver::setNumberOfCopies()
 {
 	writeSpoolString("\033[%ldv", getJobData()->getCopies());
 }
 
-void LIPS3Driver::memorizedPosition()
+
+void
+LIPS3Driver::memorizedPosition()
 {
 	writeSpoolString("\033[0;1;0x");
 }
 
-void LIPS3Driver::moveAbsoluteHorizontal(int x)
+
+void
+LIPS3Driver::moveAbsoluteHorizontal(int x)
 {
 	writeSpoolString("\033[%d`", x);
 }
 
-void LIPS3Driver::carriageReturn()
+
+void
+LIPS3Driver::carriageReturn()
 {
 	writeSpoolChar('\x0d');
 }
 
-void LIPS3Driver::moveDown(int dy)
+
+void
+LIPS3Driver::moveDown(int dy)
 {
 	writeSpoolString("\033[%de", dy);
 }
 
-void LIPS3Driver::rasterGraphics(
-	int compression_size,
-	int widthbyte,
-	int height,
-	int compression_method,
-	const uchar *buffer)
+
+void
+LIPS3Driver::rasterGraphics( int compression_size, int widthbyte, int height,
+	int compression_method,	const uchar *buffer)
 {
 //  0 RAW
 //  9 compress-3
-	writeSpoolString(
-		"\033[%d;%d;%d;%d;%d.r",
-		compression_size,
-		widthbyte,
-		getJobData()->getXres(),
-		compression_method,
-		height);
+	writeSpoolString("\033[%d;%d;%d;%d;%d.r", compression_size, widthbyte,
+		getJobData()->getXres(), compression_method, height);
 
 	writeSpoolData(buffer, compression_size);
 }
 
-void LIPS3Driver::formFeed()
+
+void
+LIPS3Driver::formFeed()
 {
 	writeSpoolChar('\014');
 }
 
-void LIPS3Driver::jobEnd()
+
+void
+LIPS3Driver::jobEnd()
 {
 	writeSpoolString("\033P0J\033\\");
 }
 
-void LIPS3Driver::move(int x, int y)
+
+void
+LIPS3Driver::move(int x, int y)
 {
 	if (fCurrentX != x) {
-		if (x) {
+		if (x)
 			moveAbsoluteHorizontal(x);
-		} else {
+		else
 			carriageReturn();
-		}
+
 		fCurrentX = x;
 	}
 	if (fCurrentY != y) {
