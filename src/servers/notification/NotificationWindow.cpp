@@ -11,6 +11,9 @@
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  */
 
+
+#include "NotificationWindow.h"
+
 #include <algorithm>
 
 #include <Alert.h>
@@ -23,15 +26,19 @@
 #include "AppGroupView.h"
 #include "AppUsage.h"
 #include "BorderView.h"
-#include "NotificationWindow.h"
+
 
 property_info main_prop_list[] = {
-	{ "message", {B_GET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0}, "get a message"},
-	{ "message", {B_COUNT_PROPERTIES, 0}, {B_DIRECT_SPECIFIER, 0}, "count messages"},
-	{ "message", {B_CREATE_PROPERTY, 0}, {B_DIRECT_SPECIFIER, 0}, "create a message"},
-	{ "message", {B_SET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0 }, "modify a message" },
-	0
+	{"message", {B_GET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0}, "get a message"},
+	{"message", {B_COUNT_PROPERTIES, 0}, {B_DIRECT_SPECIFIER, 0},
+		"count messages"},
+	{"message", {B_CREATE_PROPERTY, 0}, {B_DIRECT_SPECIFIER, 0},
+		"create a message"},
+	{"message", {B_SET_PROPERTY, 0}, {B_INDEX_SPECIFIER, 0},
+		"modify a message"},
+	{0}
 };
+
 
 const float kCloseSize				= 8;
 const float kExpandSize				= 8;
@@ -142,12 +149,14 @@ NotificationWindow::MessageReceived(BMessage* message)
 				messageOkay = false;
 			if (message->FindString("title", &title) != B_OK)
 				messageOkay = false;
-			if (message->FindString("app", &app) != B_OK && message->FindString("appTitle", &app) != B_OK)
+			if (message->FindString("app", &app) != B_OK 
+				&& message->FindString("appTitle", &app) != B_OK)
 				messageOkay = false;
 
 			if (messageOkay) {
-				NotificationView* view = new NotificationView(this, (notification_type)type, app,
-					title, content, new BMessage(*message));
+				NotificationView* view = new NotificationView(this,
+					(notification_type)type, app, title, content,
+					new BMessage(*message));
 
 				appfilter_t::iterator fIt = fAppFilters.find(app);
 				bool allow = false;
@@ -170,14 +179,14 @@ NotificationWindow::MessageReceived(BMessage* message)
 
 				if (allow) {
 					appview_t::iterator aIt = fAppViews.find(app);
-					AppGroupView *group = NULL;
+					AppGroupView* group = NULL;
 					if (aIt == fAppViews.end()) {
 						group = new AppGroupView(this, app);
 						fAppViews[app] = group;
 						fBorder->AddChild(group);
-					} else {
+					} else
 						group = aIt->second;
-					};
+
 					group->AddInfo(view);
 						
 					ResizeAll();
@@ -220,8 +229,8 @@ NotificationWindow::MessageReceived(BMessage* message)
 
 
 BHandler*
-NotificationWindow::ResolveSpecifier(BMessage *msg, int32 index,
-	BMessage *spec, int32 form, const char *prop)
+NotificationWindow::ResolveSpecifier(BMessage* msg, int32 index,
+	BMessage* spec, int32 form, const char* prop)
 {
 	BPropertyInfo prop_info(main_prop_list);
 	BHandler* handler = NULL;
@@ -279,7 +288,6 @@ NotificationWindow::Timeout()
 }
 
 
-
 infoview_layout
 NotificationWindow::Layout()
 {
@@ -307,7 +315,7 @@ NotificationWindow::ResizeAll()
 	bool shouldHide = true;
 
 	for (aIt = fAppViews.begin(); aIt != fAppViews.end(); aIt++) {
-		AppGroupView *app = aIt->second;
+		AppGroupView* app = aIt->second;
 		if (app->HasChildren()) {
 			shouldHide = false;
 			break;
@@ -365,43 +373,43 @@ NotificationWindow::PopupAnimation(float width, float height)
 		case B_DESKBAR_TOP:
 			// Put it just under, top right corner
 			sx = frame.right;
-			sy = frame.bottom+pad;
+			sy = frame.bottom + pad;
 			y = sy;
-			x = sx-width-pad;
+			x = sx - width - pad;
 			break;
 		case B_DESKBAR_BOTTOM:
 			// Put it just above, lower left corner
 			sx = frame.right;
-			sy = frame.top-height-pad;
+			sy = frame.top - height - pad;
 			y = sy;
-			x = sx - width-pad;
+			x = sx - width - pad;
 			break;
 		case B_DESKBAR_LEFT_TOP:
 			// Put it just to the right of the deskbar
-			sx = frame.right+pad;
-			sy = frame.top-height;
+			sx = frame.right + pad;
+			sy = frame.top - height;
 			x = sx;
-			y = frame.top+pad;
+			y = frame.top + pad;
 			break;
 		case B_DESKBAR_RIGHT_TOP:
 			// Put it just to the left of the deskbar
-			sx = frame.left-width-pad;
-			sy = frame.top-height;
+			sx = frame.left - width - pad;
+			sy = frame.top - height;
 			x = sx;
-			y = frame.top+pad;
+			y = frame.top + pad;
 			break;
 		case B_DESKBAR_LEFT_BOTTOM:
 			// Put it to the right of the deskbar.
-			sx = frame.right+pad;
+			sx = frame.right + pad;
 			sy = frame.bottom;
 			x = sx;
-			y = sy-height-pad;
+			y = sy - height - pad;
 			break;
 		case B_DESKBAR_RIGHT_BOTTOM:
 			// Put it to the left of the deskbar.
-			sx = frame.left-width-pad;
+			sx = frame.left - width - pad;
 			sy = frame.bottom;
-			y = sy-height-pad;
+			y = sy - height - pad;
 			x = sx;
 			break;	
 		default:
@@ -412,7 +420,7 @@ NotificationWindow::PopupAnimation(float width, float height)
 	
 	if (IsHidden() && fViews.size() != 0)
 		Show();
-	//Activate();// it hides floaters from apps :-(
+	// Activate();// it hides floaters from apps :-(
 }
 
 
