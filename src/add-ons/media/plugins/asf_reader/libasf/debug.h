@@ -1,5 +1,5 @@
 /*  libasf - An Advanced Systems Format media file parser
- *  Copyright (C) 2006-2007 Juho Vähä-Herttua
+ *  Copyright (C) 2006-2010 Juho Vähä-Herttua
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,23 +22,24 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#ifdef __GNUC__
-# define INLINE static __inline__
-#else
-# define INLINE
-#endif
+#include "asfint.h"
 
-INLINE void
+
+#if defined(WIN32) && defined(DEBUG)
+# define debug_printf printf
+#else
+static void
 debug_printf(char *fmt, ...)
 {
-#ifdef DEBUG
+# ifdef DEBUG
 	va_list argp;
 
 	va_start(argp, fmt);
 	vfprintf(stderr, fmt, argp);
 	va_end(argp);
 	fprintf(stderr, "\n");
-#endif
+# endif
 }
+#endif
 
 #endif

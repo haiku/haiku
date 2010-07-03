@@ -1,5 +1,5 @@
 /*  libasf - An Advanced Systems Format media file parser
- *  Copyright (C) 2006-2007 Juho Vähä-Herttua
+ *  Copyright (C) 2006-2010 Juho Vähä-Herttua
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,6 @@
 #include "asf.h"
 #include "asfint.h"
 #include "byteio.h"
-#include "utf.h"
 #include "header.h"
 #include "guid.h"
 #include "debug.h"
@@ -36,9 +35,9 @@
 static void
 asf_parse_read_object(asfint_object_t *obj, uint8_t *data)
 {
-	asf_byteio_getGUID(&obj->guid, data);
+	GetGUID(data, &obj->guid);
 	obj->type = asf_guid_get_type(&obj->guid);
-	obj->size = asf_byteio_getQWLE(data + 16);
+	obj->size = GetQWLE(data + 16);
 	obj->full_data = data;
 	obj->datalen = 0;
 	obj->data = NULL;
@@ -66,13 +65,13 @@ asf_parse_headerext(asf_object_headerext_t *header, uint8_t *buf, uint64_t bufle
 
 	if (header->size < 46) {
 		/* invalide size for headerext */
-		return ASF_ERROR_OBJECT_SIZE;
+		return ASF_ERROR_INVALID_OBJECT_SIZE;
 	}
 
 	/* Read reserved and datalen fields from the buffer */
-	asf_byteio_getGUID(&header->reserved1, buf + 24);
-	header->reserved2 = asf_byteio_getWLE(buf + 40);
-	header->datalen = asf_byteio_getDWLE(buf + 42);
+	GetGUID(buf + 24, &header->reserved1);
+	header->reserved2 = GetWLE(buf + 40);
+	header->datalen = GetDWLE(buf + 42);
 
 	if (header->datalen != header->size - 46) {
 		/* invalid header extension data length value */
@@ -149,7 +148,7 @@ asf_parse_header(asf_file_t *file)
 
 	/* object minimum is 24 bytes and header needs to have
 	 * the subobject count field and two reserved fields */
-	tmp = asf_byteio_read(hdata, 30, iostream);
+	tmp = asf_byteio_read(iostream, hdata, 30);
 	if (tmp < 0) {
 		/* not enough data to read the header object */
 		return tmp;
@@ -165,11 +164,11 @@ asf_parse_header(asf_file_t *file)
 	asf_parse_read_object((asfint_object_t *) header, hdata);
 	if (header->size < 30) {
 		/* invalid size for header object */
-		return ASF_ERROR_OBJECT_SIZE;
+		return ASF_ERROR_INVALID_OBJECT_SIZE;
 	}
 
 	/* read header object specific compulsory fields */
-	header->subobjects = asf_byteio_getDWLE(hdata + 24);
+	header->subobjects = GetDWLE(hdata + 24);
 	header->reserved1 = hdata[28];
 	header->reserved2 = hdata[29];
 
@@ -185,7 +184,7 @@ asf_parse_header(asf_file_t *file)
 		return ASF_ERROR_OUTOFMEM;
 	}
 
-	tmp = asf_byteio_read(header->data, header->datalen, iostream);
+	tmp = asf_byteio_read(iostream, header->data, header->datalen);
 	if (tmp < 0) {
 		return tmp;
 	}
@@ -300,7 +299,7 @@ asf_parse_data(asf_file_t *file)
 
 	/* object minimum is 24 bytes and data object needs to have
 	 * 26 additional bytes for its internal fields */
-	tmp = asf_byteio_read(ddata, 50, iostream);
+	tmp = asf_byteio_read(iostream, ddata, 50);
 	if (tmp < 0) {
 		return tmp;
 	}
@@ -315,22 +314,22 @@ asf_parse_data(asf_file_t *file)
 	asf_parse_read_object((asfint_object_t *) data, ddata);
 	if (data->size < 50) {
 		/* invalid size for data object */
-		return ASF_ERROR_OBJECT_SIZE;
+		return ASF_ERROR_INVALID_OBJECT_SIZE;
 	}
 
 	/* read data object specific compulsory fields */
-	asf_byteio_getGUID(&data->file_id, ddata + 24);
-	data->total_data_packets = asf_byteio_getQWLE(ddata + 40);
-	data->reserved = asf_byteio_getWLE(ddata + 48);
+	GetGUID(ddata + 24, &data->file_id);
+	data->total_data_packets = GetQWLE(ddata + 40);
+	data->reserved = GetWLE(ddata + 48);
 	data->packets_position = file->position + 50;
 
 	/* If the file_id GUID in data object doesn't match the
 	 * file_id GUID in headers, the file is corrupted */
-	if (!asf_guid_match(&data->file_id, &file->file_id)) {
+	if (!asf_guid_equals(&data->file_id, &file->file_id)) {
 		return ASF_ERROR_INVALID_VALUE;
 	}
 
-	/* if data->total_data_packets is non-zero (not a iostream) and
+	/* if data->total_data_packets is non-zero (not a stream) and
 	   the data packets count doesn't match, return error */
 	if (data->total_data_packets &&
 	    data->total_data_packets != file->data_packets_count) {
@@ -361,7 +360,7 @@ asf_parse_index(asf_file_t *file)
 	iostream = &file->iostream;
 
 	/* read the raw data of an index header */
-	tmp = asf_byteio_read(idata, 56, iostream);
+	tmp = asf_byteio_read(iostream, idata, 56);
 	if (tmp < 0) {
 		printf("Could not read index header\n");
 		return tmp;
@@ -385,13 +384,13 @@ asf_parse_index(asf_file_t *file)
 	if (index->size < 56) {
 		/* invalid size for index object */
 		free(index);
-		return ASF_ERROR_OBJECT_SIZE;
+		return ASF_ERROR_INVALID_OBJECT_SIZE;
 	}
 
-	asf_byteio_getGUID(&index->file_id, idata + 24);
-	index->entry_time_interval = asf_byteio_getQWLE(idata + 40);
-	index->max_packet_count = asf_byteio_getDWLE(idata + 48);
-	index->entry_count = asf_byteio_getDWLE(idata + 52);
+	GetGUID(idata + 24, &index->file_id);
+	index->entry_time_interval = GetQWLE(idata + 40);
+	index->max_packet_count = GetDWLE(idata + 48);
+	index->entry_count = GetDWLE(idata + 52);
 
 	printf("INDEX\n");
 	printf("Total Index Entries %d\n",index->entry_count);
@@ -416,8 +415,7 @@ asf_parse_index(asf_file_t *file)
 		free(index);
 		return ASF_ERROR_OUTOFMEM;
 	}
-		
-	tmp = asf_byteio_read(entry_data, entry_data_size, iostream);
+	tmp = asf_byteio_read(iostream, entry_data, entry_data_size);
 	if (tmp < 0) {
 		printf("Could not read entry data\n");
 		free(index);
@@ -433,8 +431,8 @@ asf_parse_index(asf_file_t *file)
 	}
 
 	for (i=0; i<index->entry_count; i++) {
-		index->entries[i].packet_index = asf_byteio_getDWLE(entry_data + i*6);
-		index->entries[i].packet_count = asf_byteio_getWLE(entry_data + i*6 + 4);
+		index->entries[i].packet_index = GetDWLE(entry_data + i*6);
+		index->entries[i].packet_count = GetWLE(entry_data + i*6 + 4);
 	}
 
 	free(entry_data);

@@ -1,5 +1,5 @@
 /*  libasf - An Advanced Systems Format media file parser
- *  Copyright (C) 2006-2007 Juho Vähä-Herttua
+ *  Copyright (C) 2006-2010 Juho Vähä-Herttua
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,28 @@
 #ifndef ASFINT_H
 #define ASFINT_H
 
+#include <string.h>
+
 #include "asf.h"
 #include "guid.h"
+#include "compat.h"
+
+static INLINE void
+GetGUID(const void *pointer, asf_guid_t *guid)
+{
+	const uint8_t *data = pointer;
+	guid->v1 = GetDWLE(data);
+	guid->v2 = GetWLE(data + 4);
+	guid->v3 = GetWLE(data + 6);
+	memcpy(guid->v4, data + 8, 8);
+}
+
+#define GETLEN2b(bits) (((bits) == 0x03) ? 4 : bits)
+#define GETVALUE2b(bits, data) \
+	(((bits) != 0x03) ? ((bits) != 0x02) ? ((bits) != 0x01) ? \
+	0 : *((uint8_t *)data) : GetWLE(data) : GetDWLE(data))
+
+
 
 /* DO NOT MODIFY THE FIRST 3 VARIABLES, BECAUSE THEY ARE
  * ALSO DEFINED IN asf.h HEADER AND WILL BREAK THINGS */

@@ -6,9 +6,7 @@ StaticLibrary libasfreader.a :
 	asf.c
 	byteio.c
 	data.c
-	fileio.c
 	guid.c
 	header.c
 	parse.c
-	utf.c
 ;

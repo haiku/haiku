@@ -184,9 +184,9 @@ ASFFileReader::getVideoFormat(uint32 streamIndex, ASFVideoFormat *format)
 			format->extraData = videoHeader->data;
 			
 			if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
-				format->FrameScale = stream->extended->avg_time_per_frame;
+				format->FrameScale = stream->extended_properties->avg_time_per_frame;
 				format->FrameRate = 10000000L;
-				printf("num avg time per frame for video %Ld\n",stream->extended->avg_time_per_frame);
+				printf("num avg time per frame for video %Ld\n",stream->extended_properties->avg_time_per_frame);
 			}
 		
 			return true;
@@ -210,9 +210,9 @@ ASFFileReader::getStreamDuration(uint32 streamIndex)
 	
 	if (stream) {
 		if (stream->flags & ASF_STREAM_FLAG_EXTENDED) {
-			printf("STREAM %ld end time %Ld, start time %Ld\n",streamIndex, stream->extended->end_time, stream->extended->start_time);
-			if (stream->extended->end_time - stream->extended->start_time > 0) {
-				return stream->extended->end_time - stream->extended->start_time;
+			printf("STREAM %ld end time %Ld, start time %Ld\n",streamIndex, stream->extended_properties->end_time, stream->extended_properties->start_time);
+			if (stream->extended_properties->end_time - stream->extended_properties->start_time > 0) {
+				return stream->extended_properties->end_time - stream->extended_properties->start_time;
 			}
 		}
 	}

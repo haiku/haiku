@@ -1,5 +1,5 @@
 /*  libasf - An Advanced Systems Format media file parser
- *  Copyright (C) 2006-2007 Juho Vähä-Herttua
+ *  Copyright (C) 2006-2010 Juho Vähä-Herttua
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -103,7 +103,7 @@ static const asf_guid_t asf_guid_stream_type_extended_audio =
 
 
 int
-asf_guid_match(const asf_guid_t *guid1, const asf_guid_t *guid2)
+asf_guid_equals(const asf_guid_t *guid1, const asf_guid_t *guid2)
 {
 	if((guid1->v1 != guid2->v1) ||
 	   (guid1->v2 != guid2->v2) ||
@@ -120,41 +120,41 @@ asf_guid_get_object_type(const asf_guid_t *guid)
 {
 	guid_type_t ret = GUID_UNKNOWN;
 
-	if (asf_guid_match(guid, &asf_guid_header))
+	if (asf_guid_equals(guid, &asf_guid_header))
 		ret = GUID_HEADER;
-	else if (asf_guid_match(guid, &asf_guid_data))
+	else if (asf_guid_equals(guid, &asf_guid_data))
 		ret = GUID_DATA;
-	else if (asf_guid_match(guid, &asf_guid_index))
+	else if (asf_guid_equals(guid, &asf_guid_index))
 		ret = GUID_INDEX;
 
-	else if (asf_guid_match(guid, &asf_guid_file_properties))
+	else if (asf_guid_equals(guid, &asf_guid_file_properties))
 		ret = GUID_FILE_PROPERTIES;
-	else if (asf_guid_match(guid, &asf_guid_stream_properties))
+	else if (asf_guid_equals(guid, &asf_guid_stream_properties))
 		ret = GUID_STREAM_PROPERTIES;
-	else if (asf_guid_match(guid, &asf_guid_content_description))
+	else if (asf_guid_equals(guid, &asf_guid_content_description))
 		ret = GUID_CONTENT_DESCRIPTION;
-	else if (asf_guid_match(guid, &asf_guid_header_extension))
+	else if (asf_guid_equals(guid, &asf_guid_header_extension))
 		ret = GUID_HEADER_EXTENSION;
-	else if (asf_guid_match(guid, &asf_guid_marker))
+	else if (asf_guid_equals(guid, &asf_guid_marker))
 		ret = GUID_MARKER;
-	else if (asf_guid_match(guid, &asf_guid_codec_list))
+	else if (asf_guid_equals(guid, &asf_guid_codec_list))
 		ret = GUID_CODEC_LIST;
-	else if (asf_guid_match(guid, &asf_guid_stream_bitrate_properties))
+	else if (asf_guid_equals(guid, &asf_guid_stream_bitrate_properties))
 		ret = GUID_STREAM_BITRATE_PROPERTIES;
-	else if (asf_guid_match(guid, &asf_guid_padding))
+	else if (asf_guid_equals(guid, &asf_guid_padding))
 		ret = GUID_PADDING;
-	else if (asf_guid_match(guid, &asf_guid_extended_content_description))
+	else if (asf_guid_equals(guid, &asf_guid_extended_content_description))
 		ret = GUID_EXTENDED_CONTENT_DESCRIPTION;
 
-	else if (asf_guid_match(guid, &asf_guid_metadata))
+	else if (asf_guid_equals(guid, &asf_guid_metadata))
 		ret = GUID_METADATA;
-	else if (asf_guid_match(guid, &asf_guid_language_list))
+	else if (asf_guid_equals(guid, &asf_guid_language_list))
 		ret = GUID_LANGUAGE_LIST;
-	else if (asf_guid_match(guid, &asf_guid_extended_stream_properties))
+	else if (asf_guid_equals(guid, &asf_guid_extended_stream_properties))
 		ret = GUID_EXTENDED_STREAM_PROPERTIES;
-	else if (asf_guid_match(guid, &asf_guid_advanced_mutual_exclusion))
+	else if (asf_guid_equals(guid, &asf_guid_advanced_mutual_exclusion))
 		ret = GUID_ADVANCED_MUTUAL_EXCLUSION;
-	else if (asf_guid_match(guid, &asf_guid_stream_prioritization))
+	else if (asf_guid_equals(guid, &asf_guid_stream_prioritization))
 		ret = GUID_STREAM_PRIORITIZATION;
 
 	return ret;
@@ -165,15 +165,15 @@ asf_guid_get_stream_type(const asf_guid_t *guid)
 {
 	guid_type_t ret = GUID_UNKNOWN;
 
-	if (asf_guid_match(guid, &asf_guid_stream_type_audio))
+	if (asf_guid_equals(guid, &asf_guid_stream_type_audio))
 		ret = GUID_STREAM_TYPE_AUDIO;
-	else if (asf_guid_match(guid, &asf_guid_stream_type_video))
+	else if (asf_guid_equals(guid, &asf_guid_stream_type_video))
 		ret = GUID_STREAM_TYPE_VIDEO;
-	else if (asf_guid_match(guid, &asf_guid_stream_type_command))
+	else if (asf_guid_equals(guid, &asf_guid_stream_type_command))
 		ret = GUID_STREAM_TYPE_COMMAND;
-	else if (asf_guid_match(guid, &asf_guid_stream_type_extended))
+	else if (asf_guid_equals(guid, &asf_guid_stream_type_extended))
 		ret = GUID_STREAM_TYPE_EXTENDED;
-	else if (asf_guid_match(guid, &asf_guid_stream_type_extended_audio))
+	else if (asf_guid_equals(guid, &asf_guid_stream_type_extended_audio))
 		ret = GUID_STREAM_TYPE_EXTENDED_AUDIO;
 
 	return ret;

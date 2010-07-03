@@ -1,5 +1,5 @@
 /*  libasf - An Advanced Systems Format media file parser
- *  Copyright (C) 2006-2007 Juho Vähä-Herttua
+ *  Copyright (C) 2006-2010 Juho Vähä-Herttua
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,15 @@
 
 #include "asf.h"
 
-enum guid_type_e {
+struct asf_guid_s {
+	uint32_t v1;
+	uint32_t v2;
+	uint16_t v3;
+	uint8_t  v4[8];
+};
+typedef struct asf_guid_s asf_guid_t;
+
+typedef enum {
 	GUID_UNKNOWN,
 
 	GUID_HEADER,
@@ -49,11 +57,10 @@ enum guid_type_e {
 	GUID_STREAM_TYPE_COMMAND,
 	GUID_STREAM_TYPE_EXTENDED,
 	GUID_STREAM_TYPE_EXTENDED_AUDIO
-};
-typedef enum guid_type_e guid_type_t;
+} guid_type_t;
 
 
-int asf_guid_match(const asf_guid_t *guid1, const asf_guid_t *guid2);
+int asf_guid_equals(const asf_guid_t *guid1, const asf_guid_t *guid2);
 guid_type_t asf_guid_get_object_type(const asf_guid_t *guid);
 guid_type_t asf_guid_get_stream_type(const asf_guid_t *guid);
 guid_type_t asf_guid_get_type(const asf_guid_t *guid);
