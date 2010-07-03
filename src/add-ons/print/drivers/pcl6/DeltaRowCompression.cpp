@@ -1,21 +1,28 @@
 /* 
 ** DeltaRowCompression.cpp
-** Copyright 2005, Michael Pfeiffer, laplace@users.sourceforge.net. All rights reserved.
+** Copyright 2005, Michael Pfeiffer, laplace@users.sourceforge.net.
+** All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
-#include "DeltaRowCompression.h"
 
-#include <SupportDefs.h>
+
+#include "DeltaRowCompression.h"
 
 #include <memory.h>
 
-AbstractDeltaRowCompressor::AbstractDeltaRowCompressor(int rowSize, uchar initialSeed)
-	: fSeedRow(new uchar[rowSize])
-	, fSize(rowSize)
-	, fInitialSeed(initialSeed)
+#include <SupportDefs.h>
+
+
+AbstractDeltaRowCompressor::AbstractDeltaRowCompressor(int rowSize,
+	uchar initialSeed)
+	:
+	fSeedRow(new uchar[rowSize]),
+	fSize(rowSize),
+	fInitialSeed(initialSeed)
 {
 	Reset();
 }
+
 
 AbstractDeltaRowCompressor::~AbstractDeltaRowCompressor()
 {
@@ -23,23 +30,28 @@ AbstractDeltaRowCompressor::~AbstractDeltaRowCompressor()
 	fSeedRow = NULL;
 }
 
-status_t AbstractDeltaRowCompressor::InitCheck()
+
+status_t
+AbstractDeltaRowCompressor::InitCheck()
 {
-	if (fSeedRow != NULL) {
+	if (fSeedRow != NULL)
 		return B_OK;
-	} else {
+	else
 		return B_NO_MEMORY;
-	}
 }
 
-void AbstractDeltaRowCompressor::Reset()
+
+void
+AbstractDeltaRowCompressor::Reset()
 {
-	if (fSeedRow != NULL) {
+	if (fSeedRow != NULL)
 		memset(fSeedRow, fInitialSeed, fSize);
-	}
 }
 
-int AbstractDeltaRowCompressor::CompressRaw(const uchar* row, bool updateSeedRow, bool updateDeltaRow)
+
+int
+AbstractDeltaRowCompressor::CompressRaw(const uchar* row, bool updateSeedRow,
+	bool updateDeltaRow)
 {
 	int index = DiffersIndex(row, 0);
 	if (index == -1) {
@@ -56,24 +68,21 @@ int AbstractDeltaRowCompressor::CompressRaw(const uchar* row, bool updateSeedRow
 		
 		// delta starts at index and contains length bytes
 		do {
-			
 			// control byte limits data bytes to 8 bytes
 			int deltaBytes = length;
-			if (length > 8) {
+			if (length > 8)
 				deltaBytes = 8;
-			}
-			
+
 			// calculate offset
 			int totalOffset = index - seedRowIndex;
 			bool needsOffsetBytes = totalOffset > 30;
 			int offset = totalOffset;
 			// control byte limits offset value to 31
-			if (needsOffsetBytes) {
+			if (needsOffsetBytes)
 				offset = 31;
-			}
 			
 			// write control byte (delta bytes bits 5-7; offset bits 0-4)
-			Put(((deltaBytes-1) << 5) | offset);
+			Put(((deltaBytes - 1) << 5) | offset);
 			
 			if (needsOffsetBytes) {
 				// write additional offset bytes after control byte	
@@ -112,18 +121,25 @@ int AbstractDeltaRowCompressor::CompressRaw(const uchar* row, bool updateSeedRow
 	return fDeltaRowIndex;
 }
 
-int AbstractDeltaRowCompressor::CalculateSize(const uchar* row, bool updateSeedRow)
+
+int
+AbstractDeltaRowCompressor::CalculateSize(const uchar* row, bool updateSeedRow)
 {
 	return CompressRaw(row, updateSeedRow, false);
 }
 
-void AbstractDeltaRowCompressor::Compress(const uchar* row)
+
+void
+AbstractDeltaRowCompressor::Compress(const uchar* row)
 {
 	CompressRaw(row, true, true);
 }
 
+
 #ifdef TEST_DELTA_ROW_COMPRESSION
-void test(AbstractDeltaRowCompressor* compressor, uchar* row) {
+
+void
+test(AbstractDeltaRowCompressor* compressor, uchar* row) {
 	int size = compressor->CalculateSize(row);
 	printf("size %d\n", size);
 
@@ -139,7 +155,9 @@ void test(AbstractDeltaRowCompressor* compressor, uchar* row) {
 	printf("\n");
 }
 
-int main(int argc, char *argv[])
+
+int
+main(int argc, char* argv[])
 {
 	int n = 5;
 	uchar row1[] = {0, 0, 0, 0, 0};
@@ -152,4 +170,4 @@ int main(int argc, char *argv[])
 	test(&compressor, row3);
 }
 
-#endif
+#endif // TEST_DELTA_ROW_COMPRESSION

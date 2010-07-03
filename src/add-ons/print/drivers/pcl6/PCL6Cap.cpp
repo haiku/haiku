@@ -3,8 +3,8 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  * Copyright 2003-2007 Michael Pfeiffer.
  */
-
 #include "PCL6Cap.h"
+
 #include "PCL6Config.h"
 #include "PCL6Writer.h"
 #include "PrinterData.h"
@@ -133,58 +133,65 @@ const PaperCap b4(
 // since 2.1
 
 // since 1.1
-const PaperSourceCap defaultSource("Default",  false,  JobData::kCassette1);
-const PaperSourceCap autobin("Auto",  true,  JobData::kAuto);
-const PaperSourceCap manualFeed("Manual Feed",  false,  JobData::kManual);
-const PaperSourceCap multiPurposeTray("Multi Purpose Tray",  false,  JobData::kCassette3);
-const PaperSourceCap upperCassette("Upper Cassette",  false,  JobData::kUpper);
-const PaperSourceCap lowerCassette("Lower Cassette",  false,  JobData::kLower);
-const PaperSourceCap envelopeTray("Envelope Tray",  false,  JobData::kCassette2);
+const PaperSourceCap defaultSource("Default", false, JobData::kCassette1);
+const PaperSourceCap autobin("Auto", true, JobData::kAuto);
+const PaperSourceCap manualFeed("Manual Feed", false, JobData::kManual);
+const PaperSourceCap multiPurposeTray("Multi Purpose Tray", false,
+	JobData::kCassette3);
+const PaperSourceCap upperCassette("Upper Cassette", false, JobData::kUpper);
+const PaperSourceCap lowerCassette("Lower Cassette", false, JobData::kLower);
+const PaperSourceCap envelopeTray("Envelope Tray", false,
+	JobData::kCassette2);
 // since 2.0:
 const PaperSourceCap thridCassette("Thrid Cassette",  false,  JobData::kMiddle);
 
-const ResolutionCap dpi150("150dpi",   false, 150,  150);
-const ResolutionCap dpi300("300dpi",   true, 300,  300);
-const ResolutionCap dpi600("600dpi",  false, 600,  600);
+const ResolutionCap dpi150("150dpi", false, 150, 150);
+const ResolutionCap dpi300("300dpi", true, 300, 300);
+const ResolutionCap dpi600("600dpi", false, 600, 600);
 const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
 
 const PrintStyleCap simplex("Simplex", true, JobData::kSimplex);
 const PrintStyleCap duplex("Duplex", false, JobData::kDuplex);
 
-const ProtocolClassCap pc1_1("PCL 6 Protocol Class 1.1", true, PCL6Writer::kProtocolClass1_1, 
-"The printer driver supports the following features of protocol class 1.1:\n"
-"* Monochrome and Color Printing.\n"
-"* Paper Formats: Letter, Legal, A4, A3, A5 and Japanese Postcard.\n"
-"* Paper Sources: Auto, Default, Manual Feed, Multi-Purpose Tray, Upper and Lower Cassette and Envelope Tray.\n"
-"* Resolutions: 150, 300, 600 and 1200 DPI."
+const ProtocolClassCap pc1_1("PCL 6 Protocol Class 1.1", true,
+	PCL6Writer::kProtocolClass1_1,
+	"The printer driver supports the following features of protocol class 1.1:"
+	"\n"
+	"* Monochrome and Color Printing.\n"
+	"* Paper Formats: Letter, Legal, A4, A3, A5 and Japanese Postcard.\n"
+	"* Paper Sources: Auto, Default, Manual Feed, Multi-Purpose Tray, Upper "
+	"and Lower Cassette and Envelope Tray.\n"
+	"* Resolutions: 150, 300, 600 and 1200 DPI."
 #if ENABLE_RLE_COMPRESSION
-"\n* Compression Method: RLE."
+	"\n* Compression Method: RLE."
 #else
-"\n* Compression Method: None."
+	"\n* Compression Method: None."
 #endif
 );
 
-const ProtocolClassCap pc2_0("PCL 6 Protocol Class 2.0", false, PCL6Writer::kProtocolClass2_0, 
-"In addition to features of protocol class 1.1, the printer driver supports the "
-"following features of protocol class 2.0:\n"
-"* Additonal Paper Source: Third Cassette."
-// "\n* JPEG compression (not implemented yet)"
+const ProtocolClassCap pc2_0("PCL 6 Protocol Class 2.0", false,
+	PCL6Writer::kProtocolClass2_0,
+	"In addition to features of protocol class 1.1, the printer driver "
+	"supports the following features of protocol class 2.0:\n"
+	"* Additonal Paper Source: Third Cassette."
+//	"\n* JPEG compression (not implemented yet)"
 );
 
-const ProtocolClassCap pc2_1("PCL 6 Protocol Class 2.1", false, PCL6Writer::kProtocolClass2_1, 
-"In addition to features of previous protocol classes, the printer driver supports the "
-"following features of protocol class 2.1:\n"
-"* Additional Paper Format: B5."
+const ProtocolClassCap pc2_1("PCL 6 Protocol Class 2.1", false,
+	PCL6Writer::kProtocolClass2_1, 
+	"In addition to features of previous protocol classes, the printer driver "
+	"supports the following features of protocol class 2.1:\n"
+	"* Additional Paper Format: B5."
 #if ENABLE_DELTA_ROW_COMPRESSION
-"\n* Additional Compression Method: Delta Row Compression."
+	"\n* Additional Compression Method: Delta Row Compression."
 #endif
 );
 
 // Disable until driver supports new features of protocol class 3.0
-//const ProtocolClassCap pc3_0("PCL 6 Protocol Class 3.0", false, PCL6Writer::kProtocolClass3_0, 
-//"Protocol Class 3.0");
+//	const ProtocolClassCap pc3_0("PCL 6 Protocol Class 3.0", false,
+//		PCL6Writer::kProtocolClass3_0, "Protocol Class 3.0");
 
-const PaperCap *papers1_1[] = {
+const PaperCap* papers1_1[] = {
 	&letter,
 	&legal,
 	&a4,
@@ -194,7 +201,7 @@ const PaperCap *papers1_1[] = {
 	&japanese_postcard
 };
 
-const PaperCap *papers2_1[] = {
+const PaperCap* papers2_1[] = {
 	&letter,
 	&legal,
 	&a4,
@@ -205,7 +212,7 @@ const PaperCap *papers2_1[] = {
 	&japanese_postcard
 };
 
-const PaperSourceCap *paperSources1_1[] = {
+const PaperSourceCap* paperSources1_1[] = {
 	&autobin,
 	&defaultSource,
 	&envelopeTray,
@@ -215,7 +222,7 @@ const PaperSourceCap *paperSources1_1[] = {
 	&multiPurposeTray
 };
 
-const PaperSourceCap *paperSources2_0[] = {
+const PaperSourceCap* paperSources2_0[] = {
 	&autobin,
 	&defaultSource,
 	&envelopeTray,
@@ -226,19 +233,19 @@ const PaperSourceCap *paperSources2_0[] = {
 	&multiPurposeTray
 };
 
-const ResolutionCap *resolutions[] = {
+const ResolutionCap* resolutions[] = {
 	&dpi150,
 	&dpi300,
 	&dpi600,
 	&dpi1200,
 };
 
-const PrintStyleCap *printStyles[] = {
+const PrintStyleCap* printStyles[] = {
 	&simplex,
 	&duplex
 };
 
-const ProtocolClassCap *protocolClasses[] = {
+const ProtocolClassCap* protocolClasses[] = {
 	&pc1_1,
 	&pc2_0,
 	&pc2_1
@@ -247,84 +254,89 @@ const ProtocolClassCap *protocolClasses[] = {
 };
 
 const ColorCap color("Color", false, JobData::kColor);
-const ColorCap colorCompressionDisabled("Color (No Compression)", false, JobData::kColorCompressionDisabled);
+const ColorCap colorCompressionDisabled("Color (No Compression)", false,
+	JobData::kColorCompressionDisabled);
 const ColorCap monochrome("Shades of Gray", true, JobData::kMonochrome);
 
-const ColorCap *colors[] = {
+const ColorCap* colors[] = {
 	&color,
 	&colorCompressionDisabled,
 	&monochrome
 };
 
-PCL6Cap::PCL6Cap(const PrinterData *printer_data)
-	: PrinterCap(printer_data)
+
+PCL6Cap::PCL6Cap(const PrinterData* printer_data)
+	:
+	PrinterCap(printer_data)
 {
 }
 
-int PCL6Cap::countCap(CapID capid) const
+
+int
+PCL6Cap::countCap(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1) {
-			return sizeof(papers2_1) / sizeof(papers2_1[0]);
-		}
-		return sizeof(papers1_1) / sizeof(papers1_1[0]);
-	case kPaperSource:
-		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0) {
-			return sizeof(paperSources2_0) / sizeof(paperSources2_0[0]);
-		}
-		return sizeof(paperSources1_1) / sizeof(paperSources1_1[0]);
-	case kResolution:
-		return sizeof(resolutions) / sizeof(resolutions[0]);
-	case kColor:
-		return sizeof(colors) / sizeof(colors[0]);
-	case kPrintStyle:
-		return sizeof(printStyles) / sizeof(printStyles[0]);
-	case kProtocolClass:
-		return sizeof(protocolClasses) / sizeof(protocolClasses[0]);
-	default:
-		return 0;
+		case kPaper:
+			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1)
+				return sizeof(papers2_1) / sizeof(papers2_1[0]);
+			return sizeof(papers1_1) / sizeof(papers1_1[0]);
+		case kPaperSource:
+			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0)
+				return sizeof(paperSources2_0) / sizeof(paperSources2_0[0]);
+			return sizeof(paperSources1_1) / sizeof(paperSources1_1[0]);
+		case kResolution:
+			return sizeof(resolutions) / sizeof(resolutions[0]);
+		case kColor:
+			return sizeof(colors) / sizeof(colors[0]);
+		case kPrintStyle:
+			return sizeof(printStyles) / sizeof(printStyles[0]);
+		case kProtocolClass:
+			return sizeof(protocolClasses) / sizeof(protocolClasses[0]);
+		default:
+			return 0;
 	}
 }
 
-const BaseCap **PCL6Cap::enumCap(CapID capid) const
+
+const BaseCap**
+PCL6Cap::enumCap(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1) {
-			return (const BaseCap **)papers2_1;
-		}
-		return (const BaseCap **)papers1_1;
-	case kPaperSource:
-		if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0) {
-			return (const BaseCap **)paperSources2_0;
-		}
-		return (const BaseCap **)paperSources1_1;
-	case kResolution:
-		return (const BaseCap **)resolutions;
-	case kColor:
-		return (const BaseCap **)colors;
-	case kPrintStyle:
-		return (const BaseCap **)printStyles;
-	case kProtocolClass:
-		return (const BaseCap **)protocolClasses;
-	default:
-		return NULL;
+		case kPaper:
+			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_1)
+				return (const BaseCap **)papers2_1;
+			return (const BaseCap**)papers1_1;
+		case kPaperSource:
+			if (getProtocolClass() >= PCL6Writer::kProtocolClass2_0)
+				return (const BaseCap **)paperSources2_0;
+			return (const BaseCap**)paperSources1_1;
+		case kResolution:
+			return (const BaseCap**)resolutions;
+		case kColor:
+			return (const BaseCap**)colors;
+		case kPrintStyle:
+			return (const BaseCap**)printStyles;
+		case kProtocolClass:
+			return (const BaseCap**)protocolClasses;
+		default:
+			return NULL;
 	}
 }
 
-bool PCL6Cap::isSupport(CapID capid) const
+
+bool
+PCL6Cap::isSupport(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-	case kPaperSource:
-	case kResolution:
-	case kColor:
-	case kCopyCommand:
-	case kPrintStyle:
-	case kProtocolClass:
-		return true;
-	default:
-		return false;
+		case kPaper:
+		case kPaperSource:
+		case kResolution:
+		case kColor:
+		case kCopyCommand:
+		case kPrintStyle:
+		case kProtocolClass:
+			return true;
+		default:
+			return false;
 	}
 }

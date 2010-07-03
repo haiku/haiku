@@ -2,28 +2,32 @@
 
 #include <stdio.h>
 
+
 Rasterizer::Rasterizer(Halftone* halftone)
-	: fHalftone(halftone)
-	, fIndex(-1)
+	:
+	fHalftone(halftone),
+	fIndex(-1)
 {
 	fBounds.bottom = -2;
 }
+
 
 Rasterizer::~Rasterizer()
 {
 }
 
+
 bool 
-Rasterizer::SetBitmap(int x, int y, BBitmap *bitmap, int pageHeight)
+Rasterizer::SetBitmap(int x, int y, BBitmap* bitmap, int pageHeight)
 {
 	fX = x; 
 	fY = y;
 	
 	BRect bounds = bitmap->Bounds();
 
-	fBounds.left   = (int)bounds.left;
-	fBounds.top    = (int)bounds.top;
-	fBounds.right  = (int)bounds.right;
+	fBounds.left = (int)bounds.left;
+	fBounds.top = (int)bounds.top;
+	fBounds.right = (int)bounds.right;
 	fBounds.bottom = (int)bounds.bottom;
 
 	int height = fBounds.bottom - fBounds.top + 1;	
@@ -33,9 +37,8 @@ Rasterizer::SetBitmap(int x, int y, BBitmap *bitmap, int pageHeight)
 		fBounds.bottom = fBounds.top + height - 1;
 	}
 		
-	if (!get_valid_rect(bitmap, &fBounds)) {
+	if (!get_valid_rect(bitmap, &fBounds))
 		return false;
-	}
 
 	fWidth = fBounds.right - fBounds.left + 1;
 	fHeight = fBounds.bottom - fBounds.top + 1;	
@@ -52,20 +55,21 @@ Rasterizer::SetBitmap(int x, int y, BBitmap *bitmap, int pageHeight)
 	return true;
 }
 
+
 bool 
 Rasterizer::HasNextLine()
 {
 	return fIndex <= fBounds.bottom;
 }
 
+
 const void* 
 Rasterizer::RasterizeNextLine()
 {
-	if (!HasNextLine()) {
+	if (!HasNextLine())
 		return NULL;
-	}
 
-	const void *result;
+	const void* result;
 	result = RasterizeLine(fX, fY, (const ColorRGB32Little*)fBits);
 	fBits += fBPR;
 	fY ++;
@@ -73,10 +77,10 @@ Rasterizer::RasterizeNextLine()
 	return result;
 }
 
+
 void
 Rasterizer::RasterizeBitmap()
 {
-	while (HasNextLine()) {
+	while (HasNextLine())
 		RasterizeNextLine();
-	}
 }

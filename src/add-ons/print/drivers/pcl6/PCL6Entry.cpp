@@ -4,14 +4,19 @@
  * Copyright 2003 Michael Pfeiffer.
  */
 
+
 #include "PCL6.h"
 #include "PCL6Cap.h"
 #include "PrinterDriver.h"
 
+
 class PCL6PrinterDriver : public PrinterDriver
 {
 public:
-	PCL6PrinterDriver(BNode* printerFolder) : PrinterDriver(printerFolder) {}
+	PCL6PrinterDriver(BNode* printerFolder)
+	:
+	PrinterDriver(printerFolder)
+	{}
 	
 	const char* GetSignature() const  
 	{
@@ -23,7 +28,7 @@ public:
 		return "PCL6 compatible"; 
 	}
 	
-	const char* GetVersion() const    
+	const char* GetVersion() const
 	{ 
 		return "0.2"; 
 	}
@@ -38,14 +43,16 @@ public:
 		return new PCL6Cap(printerData);
 	}
 	
-	GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings, PrinterData* printerData, PrinterCap* printerCap)
+	GraphicsDriver* InstantiateGraphicsDriver(BMessage* settings,
+		PrinterData* printerData, PrinterCap* printerCap)
 	{
 		return new PCL6Driver(settings, printerData, printerCap);
 	}
 };
 
-PrinterDriver* instantiate_printer_driver(BNode* printerFolder)
+
+PrinterDriver*
+instantiate_printer_driver(BNode* printerFolder)
 {
 	return new PCL6PrinterDriver(printerFolder);
 }
-

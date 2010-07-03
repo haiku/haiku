@@ -1,16 +1,19 @@
 /* 
 ** PCL6Rasterizer.cpp
-** Copyright 2005, Michael Pfeiffer, laplace@users.sourceforge.net. All rights reserved.
+** Copyright 2005, Michael Pfeiffer, laplace@users.sourceforge.net.
+** All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
+
+
 #include "PCL6Rasterizer.h"
 
 #include <stdio.h>
 
 #ifdef _PCL6_RASTERIZER_TEST_
 
-static void dump(uchar *buffer, int size);
-static void dump_bits(uchar *buffer, int size);
+static void dump(uchar* buffer, int size);
+static void dump_bits(uchar* buffer, int size);
 
 #define DUMP(text, buffer, size) { fprintf text; dump(buffer, size); }
 #define DUMP_BITS(text, buffer, size) { fprintf text; dump_bits(buffer, size); }
@@ -22,17 +25,22 @@ static void dump_bits(uchar *buffer, int size);
 
 #endif
 
-// MonochromeRasterizer
 
-MonochromeRasterizer::MonochromeRasterizer(Halftone *halftone) 
-	: PCL6Rasterizer(halftone) 
-	, fOutBuffer(NULL)
-{ }
+// #pragma - MonochromeRasterizer
+
+
+MonochromeRasterizer::MonochromeRasterizer(Halftone* halftone) 
+	:
+	PCL6Rasterizer(halftone),
+	fOutBuffer(NULL)
+{}
+
 	
 void 
-MonochromeRasterizer::InitializeBuffer() {
+MonochromeRasterizer::InitializeBuffer()
+{
 	fWidthByte = RowBufferSize(GetWidth(), 1, 1);
-	 /* line length is a multiple of 4 bytes */
+	// line length is a multiple of 4 bytes
 	fOutRowSize = RowBufferSize(GetWidth(), 1, 4);
 	fPadBytes = fOutRowSize - fWidthByte;
 	// Total size
@@ -41,38 +49,42 @@ MonochromeRasterizer::InitializeBuffer() {
 	fCurrentLine = GetOutBuffer();
 }
 
-const void *
-MonochromeRasterizer::RasterizeLine(int x, int y, const ColorRGB32Little* source) {
+
+const void*
+MonochromeRasterizer::RasterizeLine(int x, int y,
+	const ColorRGB32Little* source)
+{
 	GetHalftone()->dither(fCurrentLine, (const uchar*)source, x, y, GetWidth());
 	
-	uchar *out = fCurrentLine;
+	uchar* out = fCurrentLine;
 
 	// invert pixels
-	for (int w = fWidthByte; w > 0; w --, out ++) {
+	for (int w = fWidthByte; w > 0; w --, out ++)
 		*out = ~*out;
-	}
 
-	// pad with 0s
-	for (int w = fPadBytes; w > 0; w --, out ++) {
+	// pad with zeros
+	for (int w = fPadBytes; w > 0; w --, out ++)
 		*out = 0;
-	}
 	
-	void *result = fCurrentLine;
+	void* result = fCurrentLine;
 	fCurrentLine += fOutRowSize;
 	return result;
 }
 
 
-// ColorRGBRasterizer
+// #pragma - ColorRGBRasterizer
 
-ColorRGBRasterizer::ColorRGBRasterizer(Halftone *halftone) 
-	: PCL6Rasterizer(halftone) 
-{ }
+
+ColorRGBRasterizer::ColorRGBRasterizer(Halftone* halftone) 
+	:
+	PCL6Rasterizer(halftone) 
+{}
+
 
 void 
 ColorRGBRasterizer::InitializeBuffer() {
 	fWidthByte = RowBufferSize(GetWidth(), 24, 1);
-	 // line length is a multiple of 4 bytes 
+	// line length is a multiple of 4 bytes 
 	fOutRowSize = RowBufferSize(GetWidth(), 24, 4);
 	fPadBytes = fOutRowSize - fWidthByte;
 	// Total size
@@ -81,10 +93,12 @@ ColorRGBRasterizer::InitializeBuffer() {
 	fCurrentLine = GetOutBuffer();
 }
 
-const void *
-ColorRGBRasterizer::RasterizeLine(int x, int y, const ColorRGB32Little* source) {
-	
-	uchar *out = fCurrentLine;
+
+const void*
+ColorRGBRasterizer::RasterizeLine(int x, int y,
+	const ColorRGB32Little* source)
+{
+	uchar* out = fCurrentLine;
 	int width = GetWidth();
 	for (int w = width; w > 0; w --) {
 		*out++ = source->red;
@@ -94,28 +108,29 @@ ColorRGBRasterizer::RasterizeLine(int x, int y, const ColorRGB32Little* source) 
 	}
 	
 	// pad with 0s
-	for (int w = fPadBytes; w > 0; w --, out ++) {
+	for (int w = fPadBytes; w > 0; w --, out ++)
 		*out = 0;
-	}
 
-	void *result = fCurrentLine;
+	void* result = fCurrentLine;
 	fCurrentLine += fOutRowSize;
 	return result;
 }
 
 
-// ColorRasterizer
+// #pragma - ColorRasterizer
 
-ColorRasterizer::ColorRasterizer::ColorRasterizer(Halftone *halftone) 
-	: PCL6Rasterizer(halftone) 
-{ 
-	for (int plane = 0; plane < 3; plane ++) {
+
+ColorRasterizer::ColorRasterizer::ColorRasterizer(Halftone* halftone) 
+	:
+	PCL6Rasterizer(halftone) 
+{
+	for (int plane = 0; plane < 3; plane ++)
 		fPlaneBuffers[plane] = NULL;
-	}
 
 	halftone->setPlanes(Halftone::kPlaneRGB1);
 	halftone->setBlackValue(Halftone::kLowValueMeansBlack);
 }
+
 
 ColorRasterizer::~ColorRasterizer() {
 	for (int plane = 0; plane < 3; plane ++) {
@@ -124,10 +139,11 @@ ColorRasterizer::~ColorRasterizer() {
 	}
 }
 
+
 void 
 ColorRasterizer::InitializeBuffer() {
 	fWidthByte = RowBufferSize(GetWidth(), 3, 1);
-	 // line length is a multiple of 4 bytes 
+	// line length is a multiple of 4 bytes 
 	fOutRowSize = RowBufferSize(GetWidth(), 3, 4);
 	fPadBytes = fOutRowSize - fWidthByte;
 	// Total size
@@ -141,21 +157,24 @@ ColorRasterizer::InitializeBuffer() {
 	}
 }
 
+
 enum {
 	kRed = 1,
 	kGreen = 2,
 	kBlue = 4,
 };
 
-const void *
-ColorRasterizer::RasterizeLine(int x, int y, const ColorRGB32Little* source) {
-	
-	DUMP((stderr, "\nRGB32 row at x %d y %d:\n", x, y), (uchar*)source, GetWidth() * 4);
+
+const void*
+ColorRasterizer::RasterizeLine(int x, int y, const ColorRGB32Little* source)
+{
+	DUMP((stderr, "\nRGB32 row at x %d y %d:\n", x, y), (uchar*)source,
+		GetWidth() * 4);
 	
 	// dither each color component
-	for (int plane = 0; plane < 3; plane ++) {
-		GetHalftone()->dither(fPlaneBuffers[plane], (const uchar*)source, x, y, GetWidth());
-	}
+	for (int plane = 0; plane < 3; plane ++)
+		GetHalftone()->dither(fPlaneBuffers[plane], (const uchar*)source, x, y,
+			GetWidth());
 	
 	DUMP_BITS((stderr, "red   "), fPlaneBuffers[0], fPlaneBufferSize);
 	DUMP_BITS((stderr, "green "), fPlaneBuffers[1], fPlaneBufferSize);
@@ -166,56 +185,57 @@ ColorRasterizer::RasterizeLine(int x, int y, const ColorRGB32Little* source) {
 	DUMP_BITS((stderr, "merged\n"), fCurrentLine, fOutRowSize);
 	DUMP((stderr, "\n"), fCurrentLine, fOutRowSize);
 
-	void *result = fCurrentLine;
+	void* result = fCurrentLine;
 	fCurrentLine += fOutRowSize;
 	return result;
 }
+
 
 void
 ColorRasterizer::MergePlaneBuffersToCurrentLine()
 {
 	// merge the three planes into output buffer
 	int remainingPixels = GetWidth();
-	uchar *out = fCurrentLine;
+	uchar* out = fCurrentLine;
 	uchar value = 0;
 	uchar outMask = 0x80; // current bit mask (1 << (8 - bit)) in output buffer
 	
 	// iterate over the three plane buffers
 	for (int i = 0; i < fPlaneBufferSize; i ++) {
 		int pixels = 8;
-		if (remainingPixels < 8) {
+		if (remainingPixels < 8)
 			pixels = remainingPixels;
-		}
+
 		remainingPixels -= pixels;
 
 		if (remainingPixels >= 8) {
 			register const uchar
-				red   = fPlaneBuffers[0][i],
+				red = fPlaneBuffers[0][i],
 				green = fPlaneBuffers[1][i],
-				blue  = fPlaneBuffers[2][i];
+				blue = fPlaneBuffers[2][i];
 
 			register uchar value = 0;
-			if (red   & 0x80) value =  0x80;
-			if (red   & 0x40) value |=  0x10;
-			if (red   & 0x20) value |=  0x02;
+			if (red & 0x80) value =  0x80;
+			if (red & 0x40) value |=  0x10;
+			if (red & 0x20) value |=  0x02;
 
 			if (green & 0x80) value |= 0x40;
 			if (green & 0x40) value |= 0x08;
 			if (green & 0x20) value |= 0x01;			
 
-			if (blue  & 0x80) value |= 0x20;
-			if (blue  & 0x40) value |= 0x04;
+			if (blue & 0x80) value |= 0x20;
+			if (blue & 0x40) value |= 0x04;
 
 			*out++ = value;
 			
 			value = 0;
-			if (blue  & 0x20) value =  0x80;
-			if (blue  & 0x10) value |=  0x10;
-			if (blue  & 0x08) value |=  0x02;
+			if (blue & 0x20) value =  0x80;
+			if (blue & 0x10) value |=  0x10;
+			if (blue & 0x08) value |=  0x02;
 
-			if (red   & 0x10) value |= 0x40;
-			if (red   & 0x08) value |= 0x08;
-			if (red   & 0x04) value |= 0x01;
+			if (red & 0x10) value |= 0x40;
+			if (red & 0x08) value |= 0x08;
+			if (red & 0x04) value |= 0x01;
 
 			if (green & 0x10) value |= 0x20;
 			if (green & 0x08) value |= 0x04;
@@ -226,39 +246,35 @@ ColorRasterizer::MergePlaneBuffersToCurrentLine()
 			if (green & 0x02) value |=  0x10;
 			if (green & 0x01) value |=  0x02;
 
-			if (blue  & 0x04) value |= 0x40;
-			if (blue  & 0x02) value |= 0x08;
-			if (blue  & 0x01) value |= 0x01;
+			if (blue & 0x04) value |= 0x40;
+			if (blue & 0x02) value |= 0x08;
+			if (blue & 0x01) value |= 0x01;
 
-			if (red   & 0x02) value |= 0x20;
-			if (red   & 0x01) value |= 0x04;
+			if (red & 0x02) value |= 0x20;
+			if (red & 0x01) value |= 0x04;
 			*out++ = value;
 	
 		} else {
 			register const uchar
-				red   = fPlaneBuffers[0][i],
+				red = fPlaneBuffers[0][i],
 				green = fPlaneBuffers[1][i],
-				blue  = fPlaneBuffers[2][i];
+				blue = fPlaneBuffers[2][i];
 			// for each bit in the current byte of each plane	
 			uchar mask = 0x80;
 			for (; pixels > 0; pixels --) {			
 				int rgb = 0;
 				
-				if (red & mask) {
+				if (red & mask)
 					rgb |= kRed;
-				}
-				if (green & mask) {
+				if (green & mask)
 					rgb |= kGreen;
-				}
-				if (blue & mask) {
+				if (blue & mask)
 					rgb |= kBlue;
-				}
 				
 				for (int plane = 0; plane < 3; plane ++) {
 					// copy pixel value to output value
-					if (rgb & (1 << plane)) {
+					if (rgb & (1 << plane))
 						value |= outMask;
-					}
 				
 					// increment output mask
 					if (outMask == 0x01) {
@@ -267,9 +283,8 @@ ColorRasterizer::MergePlaneBuffersToCurrentLine()
 						*out = value;
 						out ++;
 						value = 0;
-					} else {
+					} else
 						outMask >>= 1;
-					}
 				}
 				mask >>= 1;
 			}	
@@ -287,19 +302,19 @@ ColorRasterizer::MergePlaneBuffersToCurrentLine()
 		out ++;
 	}
 	
-	if (out - fCurrentLine != fWidthByte) {
-		fprintf(stderr, "Error buffer overflow: %d != %d\n", fWidthByte, (int)(out - fCurrentLine));
-	}
+	if (out - fCurrentLine != fWidthByte)
+		fprintf(stderr, "Error buffer overflow: %d != %d\n", fWidthByte,
+			static_cast<int>(out - fCurrentLine));
 	
-	// pad with 0s
-	for (int w = fPadBytes; w > 0; w --, out ++) {
+	// pad with zeros
+	for (int w = fPadBytes; w > 0; w --, out ++)
 		*out = 0xff;
-	}
 	
-	if (out - fCurrentLine != fOutRowSize) {
-		fprintf(stderr, "Error buffer overflow: %d != %d\n", fOutRowSize, (int)(out - fCurrentLine));
-	}
+	if (out - fCurrentLine != fOutRowSize)
+		fprintf(stderr, "Error buffer overflow: %d != %d\n", fOutRowSize,
+			static_cast<int>(out - fCurrentLine));
 }
+
 
 #ifdef _PCL6_RASTERIZER_TEST_
 #include <Application.h>
@@ -309,7 +324,9 @@ ColorRasterizer::MergePlaneBuffersToCurrentLine()
 #define COLUMNS 40
 #define BIT_COLUMNS 6
 
-static void dump(uchar *buffer, int size)
+
+static void
+dump(uchar* buffer, int size)
 {
 	int x = 0;
 	for (int i = 0; i < size; i ++) {
@@ -328,7 +345,9 @@ static void dump(uchar *buffer, int size)
 	fprintf(stderr, "\n");
 }
 
-static void dump_bits(uchar *buffer, int size)
+
+static void
+dump_bits(uchar* buffer, int size)
 {
 	int x = 0;
 	for (int i = 0; i < size; i ++) {
@@ -354,25 +373,29 @@ static void dump_bits(uchar *buffer, int size)
 	fprintf(stderr, "\n");		
 }
 
-static void fill(uchar *_row, int width, ColorRGB32Little color)
+
+static void
+fill(uchar* _row, int width, ColorRGB32Little color)
 {
-	ColorRGB32Little *row = (ColorRGB32Little *)_row;
+	ColorRGB32Little* row = static_cast<ColorRGB32Little*>(_row);
 	for (int i = 0; i < width; i ++) {
 		*row = color;
 		row ++;
 	}
 }
 
-static void initializeBitmap(BBitmap *bitmap, int width, int height)
+
+static void
+initializeBitmap(BBitmap* bitmap, int width, int height)
 {
 	int bpr = bitmap->BytesPerRow();
-	uchar *row = (uchar*)bitmap->Bits();
+	uchar* row = (uchar*)bitmap->Bits();
 	// BGRA
 	ColorRGB32Little black = {0, 0, 0, 0};
 	ColorRGB32Little white = {255, 255, 255, 0};
-	ColorRGB32Little red   = {0, 0, 255, 0};
+	ColorRGB32Little red = {0, 0, 255, 0};
 	ColorRGB32Little green = {0, 255, 0, 0};
-	ColorRGB32Little blue  = {255, 0, 0, 0};
+	ColorRGB32Little blue = {255, 0, 0, 0};
 
 	fprintf(stderr, "black row\n");
 	fill(row, width, black);
@@ -387,7 +410,7 @@ static void initializeBitmap(BBitmap *bitmap, int width, int height)
 	row += bpr;
 	
 	fprintf(stderr, "red green blue pattern");
-	ColorRGB32Little *color = (ColorRGB32Little*)row;
+	ColorRGB32Little* color = (ColorRGB32Little*)row;
 	for (int i = 0; i < width; i++) {
 		switch (i % 3) {
 			case 0: 
@@ -404,7 +427,9 @@ static void initializeBitmap(BBitmap *bitmap, int width, int height)
 	}
 }
 
-int main() 
+
+int
+main() 
 {
 	const int width = 10;
 	const int height = 4;
@@ -417,7 +442,7 @@ int main()
 	Halftone halftone(B_RGB32, 0.25f, 0.0f, Halftone::kTypeFloydSteinberg);
 #endif
 	ColorRasterizer rasterizer(&halftone);
-	BBitmap bitmap(BRect(0, 0, width-1, height-1), B_RGB32);
+	BBitmap bitmap(BRect(0, 0, width - 1, height - 1), B_RGB32);
 
 	initializeBitmap(&bitmap, width, height);
 
@@ -428,4 +453,4 @@ int main()
 	}
 }
 
-#endif
+#endif // _PCL6_RASTERIZER_TEST_
