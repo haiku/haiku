@@ -3,6 +3,7 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
+
 #include "Lips4Cap.h"
 
 #define TO72DPI(a)	(a * 72.0f / 600.0f)
@@ -105,12 +106,16 @@ const PrintStyleCap simplex("Simplex", true,  JobData::kSimplex);
 const PrintStyleCap duplex("Duplex",   false, JobData::kDuplex);
 const PrintStyleCap booklet("Booklet", false, JobData::kBooklet);
 
-const BindingLocationCap longedge1("Long Edge (left)",     true,  JobData::kLongEdgeLeft);
-const BindingLocationCap longedge2("Long Edge (right)",    false, JobData::kLongEdgeRight);
-const BindingLocationCap shortedge1("Short Edge (top)",    false, JobData::kShortEdgeTop);
-const BindingLocationCap shortedge2("Short Edge (bottom)", false, JobData::kShortEdgeBottom);
+const BindingLocationCap longedge1("Long Edge (left)",     true,
+	JobData::kLongEdgeLeft);
+const BindingLocationCap longedge2("Long Edge (right)",    false,
+	JobData::kLongEdgeRight);
+const BindingLocationCap shortedge1("Short Edge (top)",    false,
+	JobData::kShortEdgeTop);
+const BindingLocationCap shortedge2("Short Edge (bottom)", false,
+	JobData::kShortEdgeBottom);
 
-const PaperCap *papers[] = {
+const PaperCap* papers[] = {
 	&a4,
 	&a3,
 	&a5,
@@ -124,7 +129,7 @@ const PaperCap *papers[] = {
 	&japanese_envelope_you4
 };
 
-const PaperSourceCap *papersources[] = {
+const PaperSourceCap* papersources[] = {
 	&autobin,
 	&manual,
 	&upper,
@@ -132,13 +137,13 @@ const PaperSourceCap *papersources[] = {
 	&lower
 };
 
-const ResolutionCap *resolutions[] = {
+const ResolutionCap* resolutions[] = {
 	&dpi1200,
 	&dpi600,
 	&dpi300
 };
 
-const PrintStyleCap *printstyles[] = {
+const PrintStyleCap* printstyles[] = {
 	&simplex,
 	&duplex,
 	&booklet
@@ -154,64 +159,69 @@ const BindingLocationCap *bindinglocations[] = {
 const ColorCap color("Color", false, JobData::kColor);
 const ColorCap monochrome("Shades of Gray", true, JobData::kMonochrome);
 
-const ColorCap *colors[] = {
+const ColorCap* colors[] = {
 	&color,
 	&monochrome
 };
 
 
-int Lips4Cap::countCap(CapID capid) const
+int
+Lips4Cap::countCap(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-		return sizeof(papers) / sizeof(papers[0]);
-	case kPaperSource:
-		return sizeof(papersources) / sizeof(papersources[0]);
-	case kResolution:
-		return sizeof(resolutions) / sizeof(resolutions[0]);
-	case kPrintStyle:
-		return sizeof(printstyles) / sizeof(printstyles[0]);
-	case kBindingLocation:
-		return sizeof(bindinglocations) / sizeof(bindinglocations[0]);
-	case kColor:
-		return sizeof(colors) / sizeof(colors[0]);
-	default:
-		return 0;
+		case kPaper:
+			return sizeof(papers) / sizeof(papers[0]);
+		case kPaperSource:
+			return sizeof(papersources) / sizeof(papersources[0]);
+		case kResolution:
+			return sizeof(resolutions) / sizeof(resolutions[0]);
+		case kPrintStyle:
+			return sizeof(printstyles) / sizeof(printstyles[0]);
+		case kBindingLocation:
+			return sizeof(bindinglocations) / sizeof(bindinglocations[0]);
+		case kColor:
+			return sizeof(colors) / sizeof(colors[0]);
+		default:
+			return 0;
+		}
+}
+
+
+const BaseCap**
+Lips4Cap::enumCap(CapID capid) const
+{
+	switch (capid) {
+		case kPaper:
+			return (const BaseCap **)papers;
+		case kPaperSource:
+			return (const BaseCap **)papersources;
+		case kResolution:
+			return (const BaseCap **)resolutions;
+		case kPrintStyle:
+			return (const BaseCap **)printstyles;
+		case kBindingLocation:
+			return (const BaseCap **)bindinglocations;
+		case kColor:
+			return (const BaseCap **)colors;
+		default:
+			return NULL;
 	}
 }
 
-const BaseCap **Lips4Cap::enumCap(CapID capid) const
-{
-	switch (capid) {
-	case kPaper:
-		return (const BaseCap **)papers;
-	case kPaperSource:
-		return (const BaseCap **)papersources;
-	case kResolution:
-		return (const BaseCap **)resolutions;
-	case kPrintStyle:
-		return (const BaseCap **)printstyles;
-	case kBindingLocation:
-		return (const BaseCap **)bindinglocations;
-	case kColor:
-		return (const BaseCap **)colors;
-	default:
-		return NULL;
-	}
-}
 
-bool Lips4Cap::isSupport(CapID capid) const
+bool
+Lips4Cap::isSupport(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-	case kPaperSource:
-	case kResolution:
-	case kPrintStyle:
-	case kBindingLocation:
-	case kColor:
-	case kCopyCommand:
-		return true;
-	default:
-		return false;
-	}
+		case kPaper:
+		case kPaperSource:
+		case kResolution:
+		case kPrintStyle:
+		case kBindingLocation:
+		case kColor:
+		case kCopyCommand:
+			return true;
+		default:
+			return false;
+		}
 }

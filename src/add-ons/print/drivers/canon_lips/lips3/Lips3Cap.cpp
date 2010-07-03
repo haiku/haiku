@@ -3,12 +3,12 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
+
 #include "Lips3Cap.h"
 
 #include "PrinterData.h"
 
 #define TO72DPI(a)	(a * 72.0f / 600.0f)
-
 
 const PaperCap a3(
 	"A3",
@@ -114,16 +114,16 @@ int
 Lips3Cap::countCap(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-		return sizeof(papers) / sizeof(papers[0]);
-	case kPaperSource:
-		return sizeof(papersources) / sizeof(papersources[0]);
-	case kResolution:
-		return sizeof(resolutions) / sizeof(resolutions[0]);
-	case kColor:
-		return sizeof(colors) / sizeof(colors[0]);
-	default:
-		return 0;
+		case kPaper:
+			return sizeof(papers) / sizeof(papers[0]);
+		case kPaperSource:
+			return sizeof(papersources) / sizeof(papersources[0]);
+		case kResolution:
+			return sizeof(resolutions) / sizeof(resolutions[0]);
+		case kColor:
+			return sizeof(colors) / sizeof(colors[0]);
+		default:
+			return 0;
 	}
 }
 
@@ -132,16 +132,16 @@ const
 BaseCap **Lips3Cap::enumCap(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-		return (const BaseCap **)papers;
-	case kPaperSource:
-		return (const BaseCap **)papersources;
-	case kResolution:
-		return (const BaseCap **)resolutions;
-	case kColor:
-		return (const BaseCap **)colors;
-	default:
-		return NULL;
+		case kPaper:
+			return (const BaseCap **)papers;
+		case kPaperSource:
+			return (const BaseCap **)papersources;
+		case kResolution:
+			return (const BaseCap **)resolutions;
+		case kColor:
+			return (const BaseCap **)colors;
+		default:
+			return NULL;
 	}
 }
 
@@ -150,13 +150,13 @@ bool
 Lips3Cap::isSupport(CapID capid) const
 {
 	switch (capid) {
-	case kPaper:
-	case kPaperSource:
-	case kResolution:
-	case kColor:
-	case kCopyCommand:
-		return true;
-	default:
-		return false;
+		case kPaper:
+		case kPaperSource:
+		case kResolution:
+		case kColor:
+		case kCopyCommand:
+			return true;
+		default:
+			return false;
 	}
 }

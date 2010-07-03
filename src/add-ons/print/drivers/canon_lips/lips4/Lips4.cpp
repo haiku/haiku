@@ -3,18 +3,22 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
+
+#include "Lips4Cap.h"
+
+#include <memory>
+
 #include <Alert.h>
 #include <Bitmap.h>
 #include <File.h>
-#include <memory>
+
+#include "DbgMsg.h"
+#include "Halftone.h"
+#include "JobData.h"
 #include "Lips4.h"
 #include "PackBits.h"
-#include "JobData.h"
 #include "PrinterData.h"
-#include "Lips4Cap.h"
-#include "Halftone.h"
 #include "ValidRect.h"
-#include "DbgMsg.h"
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
@@ -22,13 +26,18 @@ using namespace std;
 #define std
 #endif
 
-LIPS4Driver::LIPS4Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: GraphicsDriver(msg, printer_data, printer_cap)
+
+LIPS4Driver::LIPS4Driver(BMessage* msg, PrinterData* printer_data,
+	const PrinterCap *printer_cap)
+	:
+	GraphicsDriver(msg, printer_data, printer_cap)
 {
 	fHalftone = NULL;
 }
 
-bool LIPS4Driver::startDoc()
+
+bool
+LIPS4Driver::startDoc()
 {
 	try {
 		beginTextMode();
@@ -43,15 +52,19 @@ bool LIPS4Driver::startDoc()
 		setNumberOfCopies();
 		sidePrintingControl();
 		setBindingMargin();
-		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma(), getJobData()->getInkDensity(), getJobData()->getDitherType());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(),
+			getJobData()->getGamma(), getJobData()->getInkDensity(),
+			getJobData()->getDitherType());
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS4Driver::startPage(int)
+
+bool
+LIPS4Driver::startPage(int)
 {
 	try {
 		fCurrentX = 0;
@@ -59,37 +72,43 @@ bool LIPS4Driver::startPage(int)
 		memorizedPosition();
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS4Driver::endPage(int)
+
+bool
+LIPS4Driver::endPage(int)
 {
 	try {
 		formFeed();
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS4Driver::endDoc(bool)
+
+bool
+LIPS4Driver::endDoc(bool)
 {
 	try {
-		if (fHalftone) {
+		if (fHalftone)
 			delete fHalftone;
-		}
+
 		jobEnd();
 		return true;
 	}
-	catch (TransportException &err) {
+	catch (TransportException& err) {
 		return false;
 	} 
 }
 
-bool LIPS4Driver::nextBand(BBitmap *bitmap, BPoint *offset)
+
+bool
+LIPS4Driver::nextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 
@@ -106,9 +125,9 @@ bool LIPS4Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 		BRect bounds = bitmap->Bounds();
 
 		RECT rc;
-		rc.left   = (int)bounds.left;
-		rc.top    = (int)bounds.top;
-		rc.right  = (int)bounds.right;
+		rc.left = (int)bounds.left;
+		rc.top = (int)bounds.top;
+		rc.right = (int)bounds.right;
 		rc.bottom = (int)bounds.bottom;
 
 		int height = rc.bottom - rc.top + 1;
@@ -118,9 +137,8 @@ bool LIPS4Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 		int page_height = getPageHeight();
 
-		if (y + height > page_height) {
+		if (y + height > page_height)
 			height = page_height - y;
-		}
 
 		rc.bottom = height - 1;
 
@@ -136,12 +154,12 @@ bool LIPS4Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			x = rc.left;
 			y += rc.top;
 
-			int width     = rc.right - rc.left + 1;
+			int width = rc.right - rc.left + 1;
 			int widthByte = (width + 7) / 8;
-			int height    = rc.bottom - rc.top + 1;
-			int in_size   = widthByte * height;
-			int out_size  = (in_size * 6 + 4) / 5;
-			int delta     = bitmap->BytesPerRow();
+			int height = rc.bottom - rc.top + 1;
+			int in_size = widthByte * height;
+			int out_size = (in_size * 6 + 4) / 5;
+			int delta = bitmap->BytesPerRow();
 
 			DBGMSG(("width = %d\n", width));
 			DBGMSG(("widthByte = %d\n", widthByte));
@@ -149,23 +167,24 @@ bool LIPS4Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("in_size = %d\n", in_size));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("fHalftone_engine->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
+			DBGMSG(("fHalftone_engine->get_pixel_depth() = %d\n",
+				fHalftone->getPixelDepth()));
 
-			uchar *ptr = (uchar *)bitmap->Bits()
+			uchar* ptr = static_cast<uchar*>(bitmap->Bits())
 						+ rc.top * delta
 						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
-			const uchar *buffer;
+			const uchar* buffer;
 
-			uchar *in_buffer  = new uchar[in_size];
-			uchar *out_buffer = new uchar[out_size];
+			uchar* in_buffer  = new uchar[in_size];
+			uchar* out_buffer = new uchar[out_size];
 
 			auto_ptr<uchar> _in_buffer (in_buffer);
 			auto_ptr<uchar> _out_buffer(out_buffer);
 
-			uchar *ptr2 = (uchar *)in_buffer;
+			uchar* ptr2 = static_cast<uchar *>(in_buffer);
 
 			DBGMSG(("move\n"));
 
@@ -186,7 +205,7 @@ bool LIPS4Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 				compression_method = 11;
 				buffer = out_buffer;
 			} else if (compressed_size > out_size) {
-				BAlert *alert = new BAlert("memory overrun!!!", "warning", "OK");
+				BAlert* alert = new BAlert("memory overrun!!!", "warning", "OK");
 				alert->Go();
 				return false;
 			} else {
@@ -207,38 +226,42 @@ bool LIPS4Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 				compression_method,
 				buffer);
 
-		} else {
+		} else
 			DBGMSG(("band bitmap is clean.\n"));
-		}
 
 		if (y >= page_height) {
 			offset->x = -1.0;
 			offset->y = -1.0;
-		} else {
+		} else
 			offset->y += height;
-		}
 
 		DBGMSG(("< nextBand\n"));
 		return true;
 	}
-	catch (TransportException &err) {
-		BAlert *alert = new BAlert("", err.what(), "OK");
+	catch (TransportException& err) {
+		BAlert* alert = new BAlert("", err.what(), "OK");
 		alert->Go();
 		return false;
 	} 
 }
 
-void LIPS4Driver::beginTextMode()
+
+void
+LIPS4Driver::beginTextMode()
 {
 	writeSpoolString("\033%%@");
 }
 
-void LIPS4Driver::jobStart()
+
+void
+LIPS4Driver::jobStart()
 {
 	writeSpoolString("\033P41;%d;1J\033\\", getJobData()->getXres());
 }
 
-void LIPS4Driver::colorModeDeclaration()
+
+void
+LIPS4Driver::colorModeDeclaration()
 {
 //	if (color)
 //		writeSpoolString("\033[1\"p");
@@ -246,22 +269,30 @@ void LIPS4Driver::colorModeDeclaration()
 		writeSpoolString("\033[0\"p");
 }
 
-void LIPS4Driver::softReset()
+
+void
+LIPS4Driver::softReset()
 {
 	writeSpoolString("\033<");
 }
 
-void LIPS4Driver::sizeUnitMode()
+
+void
+LIPS4Driver::sizeUnitMode()
 {
 	writeSpoolString("\033[11h");
 }
 
-void LIPS4Driver::selectSizeUnit()
+
+void
+LIPS4Driver::selectSizeUnit()
 {
 	writeSpoolString("\033[?7;%d I", getJobData()->getXres());
 }
 
-void LIPS4Driver::paperFeedMode()
+
+void
+LIPS4Driver::paperFeedMode()
 {
 	// 0 auto
 	// --------------
@@ -281,79 +312,81 @@ void LIPS4Driver::paperFeedMode()
 	int i;
 
 	switch (getJobData()->getPaperSource()) {
-	case JobData::kManual:
-		i = 10;
-		break;
-	case JobData::kUpper:
-		i = 11;
-		break;
-	case JobData::kMiddle:
-		i = 12;
-		break;
-	case JobData::kLower:
-		i = 13;
-		break;
-	case JobData::kAuto:
-	default:
-		i = 0;
-		break;
+		case JobData::kManual:
+			i = 10;
+			break;
+		case JobData::kUpper:
+			i = 11;
+			break;
+		case JobData::kMiddle:
+			i = 12;
+			break;
+		case JobData::kLower:
+			i = 13;
+			break;
+		case JobData::kAuto:
+		default:
+			i = 0;
+			break;
 	}
 
 	writeSpoolString("\033[%dq", i);
 }
 
-void LIPS4Driver::selectPageFormat()
+
+void
+LIPS4Driver::selectPageFormat()
 {
 	int i;
 
 	switch (getJobData()->getPaper()) {
-	case JobData::kA3:
-		i = 12;
-		break;
+		case JobData::kA3:
+			i = 12;
+			break;
 
-	case JobData::kA4:
-		i = 14;
-		break;
+		case JobData::kA4:
+			i = 14;
+			break;
 
-	case JobData::kA5:
-		i = 16;
-		break;
+		case JobData::kA5:
+			i = 16;
+			break;
 
-	case JobData::kJapanesePostcard:
-		i = 18;
-		break;
+		case JobData::kJapanesePostcard:
+			i = 18;
+			break;
 
-	case JobData::kB4:
-		i = 24;
-		break;
+		case JobData::kB4:
+			i = 24;
+			break;
 
-	case JobData::kB5:
-		i = 26;
-		break;
+		case JobData::kB5:
+			i = 26;
+			break;
 
-	case JobData::kLetter:
-		i = 30;
-		break;
+		case JobData::kLetter:
+			i = 30;
+			break;
 
-	case JobData::kLegal:
-		i = 32;
-		break;
+		case JobData::kLegal:
+			i = 32;
+			break;
 
-	case JobData::kExecutive:
-		i = 40;
-		break;
+		case JobData::kExecutive:
+			i = 40;
+			break;
 
-	case JobData::kJEnvYou4:
-		i = 50;
-		break;
+		case JobData::kJEnvYou4:
+			i = 50;
+			break;
 
-	case JobData::kUser:
-		i = 90;
-		break;
+		case JobData::kUser:
+			i = 90;
+			break;
 
-	default:
-		i = 0;
-		break;
+		default:
+			i = 0;
+			break;
 	}
 
 	if (JobData::kLandscape == getJobData()->getOrientation())
@@ -362,17 +395,23 @@ void LIPS4Driver::selectPageFormat()
 	writeSpoolString("\033[%d;;p", i);
 }
 
-void LIPS4Driver::disableAutoFF()
+
+void
+LIPS4Driver::disableAutoFF()
 {
 	writeSpoolString("\033[?2h");
 }
 
-void LIPS4Driver::setNumberOfCopies()
+
+void
+LIPS4Driver::setNumberOfCopies()
 {
 	writeSpoolString("\033[%ldv", getJobData()->getCopies());
 }
 
-void LIPS4Driver::sidePrintingControl()
+
+void
+LIPS4Driver::sidePrintingControl()
 {
 	if (getJobData()->getPrintStyle() == JobData::kSimplex)
 		writeSpoolString("\033[0#x");
@@ -380,7 +419,9 @@ void LIPS4Driver::sidePrintingControl()
 		writeSpoolString("\033[2;0#x");
 }
 
-void LIPS4Driver::setBindingMargin()
+
+void
+LIPS4Driver::setBindingMargin()
 {
 	if (getJobData()->getPrintStyle() == JobData::kDuplex) {
 		int i;
@@ -402,32 +443,38 @@ void LIPS4Driver::setBindingMargin()
 	}
 }
 
-void LIPS4Driver::memorizedPosition()
+
+void
+LIPS4Driver::memorizedPosition()
 {
 	writeSpoolString("\033[0;1;0x");
 }
 
-void LIPS4Driver::moveAbsoluteHorizontal(int x)
+
+void
+LIPS4Driver::moveAbsoluteHorizontal(int x)
 {
 	writeSpoolString("\033[%ld`", x);
 }
 
-void LIPS4Driver::carriageReturn()
+
+void
+LIPS4Driver::carriageReturn()
 {
 	writeSpoolChar('\x0d');
 }
 
-void LIPS4Driver::moveDown(int dy)
+
+void
+LIPS4Driver::moveDown(int dy)
 {
 	writeSpoolString("\033[%lde", dy);
 }
 
-void LIPS4Driver::rasterGraphics(
-	int compression_size,
-	int widthbyte,
-	int height,
-	int compression_method,
-	const uchar *buffer)
+
+void
+LIPS4Driver::rasterGraphics(int compression_size, int widthbyte, int height,
+	int compression_method, const uchar* buffer)
 {
 // 0  RAW
 // 10 RLE
@@ -444,17 +491,23 @@ void LIPS4Driver::rasterGraphics(
 	writeSpoolData(buffer, compression_size);
 }
 
-void LIPS4Driver::formFeed()
+
+void
+LIPS4Driver::formFeed()
 {
 	writeSpoolChar('\014');
 }
 
-void LIPS4Driver::jobEnd()
+
+void
+LIPS4Driver::jobEnd()
 {
 	writeSpoolString("\033P0J\033\\");
 }
 
-void LIPS4Driver::move(int x, int y)
+
+void
+LIPS4Driver::move(int x, int y)
 {
 	if (fCurrentX != x) {
 		if (x) {

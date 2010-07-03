@@ -39,12 +39,8 @@ private:
 			void		moveAbsoluteHorizontal(int x);
 			void		carriageReturn();
 			void		moveDown(int dy);
-			void		rasterGraphics(
-			int			size,
-			int			widthbyte,
-			int			height,
-			int			compression_method,
-			const uchar* buffer);
+			void		rasterGraphics(int size, int widthbyte, int	height,
+							int compression_method, const uchar* buffer);
 			void		formFeed();
 			void		jobEnd();
 
