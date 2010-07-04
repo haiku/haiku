@@ -554,6 +554,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ] && $(TARGET_ARCH) = x86 {
 
 	# static libraries
 	AddFilesToHaikuHybridImage $(abiDirTokens) lib : libncurses.a ;
+	AddFilesToHaikuHybridImage $(abiDirTokens) lib : liblocalestub.a ;
 
 	# the POSIX error code mapper library
 	AddFilesToHaikuHybridImage $(abiDirTokens) lib : libposix_error_mapper.a ;

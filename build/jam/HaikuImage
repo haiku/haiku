@@ -85,7 +85,6 @@ SYSTEM_LIBS =
 	libgame.so libGL.so libgnu.so
 	libjpeg.so
 	liblocale.so
-	liblocalestub.a
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	libpng.so
