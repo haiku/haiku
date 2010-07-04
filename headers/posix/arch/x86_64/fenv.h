@@ -34,15 +34,15 @@
 
 typedef struct {
 	struct {
-		__uint32_t	__control;
-		__uint32_t	__status;
-		__uint32_t	__tag;
+		uint32	__control;
+		uint32	__status;
+		uint32	__tag;
 		char		__other[16];
 	} __x87;
-	__uint32_t		__mxcsr;
+	uint32		__mxcsr;
 } fenv_t;
 
-typedef	__uint16_t	fexcept_t;
+typedef	uint16	fexcept_t;
 
 /* Exception flags */
 #define	FE_INVALID	0x01

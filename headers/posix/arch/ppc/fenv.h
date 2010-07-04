@@ -95,7 +95,7 @@ extern const fenv_t	__fe_dfl_env;
 union __fpscr {
 	double __d;
 	struct {
-		__uint32_t __junk;
+		uint32 __junk;
 		fenv_t __reg;
 	} __bits;
 };
