@@ -106,19 +106,16 @@ read_device_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 	if (status != B_OK)
 		return status;
 
-	acpi_object_type* object = (acpi_object_type*)buffer.pointer;
-	if (object->object_type != ACPI_TYPE_PACKAGE) {
-		free(buffer.pointer);
-		return B_ERROR;
-	}
-
 	irq_routing_entry irqEntry;
 	acpi_pci_routing_table* acpiTable
 		= (acpi_pci_routing_table*)buffer.pointer;
 	while (acpiTable->length) {
 		irqEntry.device_address = acpiTable->address;
 		irqEntry.pin = acpiTable->pin;
-		irqEntry.source = acpiTable->source;
+		acpi_handle source;
+		if (acpi->get_handle(device, acpiTable->source, &source) != B_OK)
+			continue;
+		irqEntry.source = source;
 		irqEntry.source_index = acpiTable->sourceIndex;
 
 		// connect to pci device
