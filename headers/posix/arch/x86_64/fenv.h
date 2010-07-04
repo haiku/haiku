@@ -42,7 +42,7 @@ typedef struct {
 	uint32_t		__mxcsr;
 } fenv_t;
 
-typedef	uint16	fexcept_t;
+typedef	uint16_t	fexcept_t;
 
 /* Exception flags */
 #define	FE_INVALID	0x01
