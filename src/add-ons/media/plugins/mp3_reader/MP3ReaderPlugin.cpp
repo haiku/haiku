@@ -1099,7 +1099,7 @@ mp3Reader::IsValidStream(uint8 *buffer, int size)
 
 	int version_index2 = (buffer[length1 + 1] >> 3) & 0x03;
 	int layer_index2 = (buffer[length1 + 1] >> 1) & 0x03;
-	if (version_index1 != version_index2 || layer_index1 != layer_index1)
+	if (version_index1 != version_index2 || layer_index1 != layer_index2)
 		return false;
 
 	int length3 = GetFrameLength(buffer + length1 + length2);
