@@ -589,6 +589,9 @@ ioapic_init(kernel_args* args)
 		return;
 	}
 
+// disable io apic for now
+return;
+
 	// load acpi module
 	status_t status;
 	acpi_module_info* acpiModule;
@@ -670,7 +673,15 @@ ioapic_init(kernel_args* args)
 		uint32 config = 0;
 		config |= irqDescriptor.polarity;
 		config |= irqDescriptor.interrupt_mode;
-		ioapic_configure_io_interrupt(irqDescriptor.irq, config);
+		
+		int32 num = -1;
+		for (int a = 0; a < 16; a++) {
+			if (irqDescriptor.irq >> i & 0x01) {
+				num = a;
+				break;
+			}
+		}
+		ioapic_configure_io_interrupt(num, config);
 	}
 
 	// prefer the ioapic over the normal pic
