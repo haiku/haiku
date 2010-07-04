@@ -34,12 +34,12 @@
 
 typedef struct {
 	struct {
-		uint32	__control;
-		uint32	__status;
-		uint32	__tag;
+		uint32_t	__control;
+		uint32_t	__status;
+		uint32_t	__tag;
 		char		__other[16];
 	} __x87;
-	uint32		__mxcsr;
+	uint32_t		__mxcsr;
 } fenv_t;
 
 typedef	uint16	fexcept_t;

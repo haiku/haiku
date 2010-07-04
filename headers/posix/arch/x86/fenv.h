@@ -38,11 +38,11 @@
  * mxcsr into some reserved fields, rather than changing sizeof(fenv_t).
  */
 typedef struct {
-	uint16	__control;
-	uint16  __mxcsr_hi;
-	uint16	__status;
-	uint16  __mxcsr_lo;
-	uint32	__tag;
+	uint16_t	__control;
+	uint16_t  __mxcsr_hi;
+	uint16_t	__status;
+	uint16_t  __mxcsr_lo;
+	uint32_t	__tag;
 	char	__other[16];
 } fenv_t;
 
@@ -53,7 +53,7 @@ typedef struct {
 	(env).__mxcsr_lo = (uint16)(x);			\
 } while (0)
 
-typedef	uint16	fexcept_t;
+typedef	uint16_t	fexcept_t;
 
 /* Exception flags */
 #define	FE_INVALID	0x01

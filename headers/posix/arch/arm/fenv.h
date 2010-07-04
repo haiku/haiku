@@ -33,8 +33,8 @@
 #include <sys/types.h>
 #include <SupportDefs.h>
 
-typedef	uint32	fenv_t;
-typedef	uint32	fexcept_t;
+typedef	uint32_t	fenv_t;
+typedef	uint32_t	fexcept_t;
 
 /* Exception flags */
 #define	FE_INVALID	0x0001

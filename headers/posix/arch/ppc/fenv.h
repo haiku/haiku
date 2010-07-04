@@ -33,8 +33,8 @@
 #include <sys/types.h>
 #include <SupportDefs.h>
 
-typedef	uint32	fenv_t;
-typedef	uint32	fexcept_t;
+typedef	uint32_t	fenv_t;
+typedef	uint32_t	fexcept_t;
 
 /* Exception flags */
 #define	FE_INEXACT	0x02000000
@@ -95,7 +95,7 @@ extern const fenv_t	__fe_dfl_env;
 union __fpscr {
 	double __d;
 	struct {
-		uint32 __junk;
+		uint32_t __junk;
 		fenv_t __reg;
 	} __bits;
 };
