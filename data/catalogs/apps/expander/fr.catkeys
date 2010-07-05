@@ -20,7 +20,7 @@ Settings	ExpanderMenu		Paramètres
 Settings…	ExpanderMenu		Paramètres…
 Expander: Choose destination	DirectoryFilePanel		Décompresseur : Choix de la destination
 Show contents	ExpanderWindow		Montrer le contenu
-Expanding file 	ExpanderWindow		Décompression du fichier
+Expanding file 	ExpanderWindow		Décompression du fichier 
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Le dossier a été renommé, déplacé, ou\ninsupportable.
 The file doesn't exist	ExpanderWindow		Le fichier n'existe pas
 Stop	ExpanderMenu		Arrêt
