@@ -24,7 +24,7 @@ AddResources checkitout : checkitout.rdef ;
 
 # standard commands that don't need any additional library
 StdBinCommands
-	badblocks.c
+	badblocks.cpp
 	cal.c
 	chop.c
 	clear.c
@@ -125,7 +125,7 @@ StdBinCommands
 	spybmessage.cpp
 	urlwrapper.cpp
 	: be $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
-	
+
 # commands that need libbe.so, libsupc++.so and liblocale.so
 StdBinCommands
 	dstcheck.cpp
@@ -208,7 +208,7 @@ StdBinCommands
 StdBinCommands
 	watch.c
 	: libncurses.a : $(haiku-utils_rsrc) ;
-	
+
 # Localization of some applications
 DoCatalogs dstcheck :
 	x-vnd.Haiku-cmd-dstconfig

@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 // for R5:
@@ -10,7 +13,7 @@ int blockSize = 1024;
 int group = 64;
 int progress = 1;
 int verbose = 0;
-FILE *outputFile = stdout;
+FILE *outputFile = NULL;
 
 int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 {
@@ -34,7 +37,7 @@ int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 	// Check size
 
 	if (verbose)
-		fprintf(stderr, "Scanning '%s', %d * %d bytes at once\n", 
+		fprintf(stderr, "Scanning '%s', %d * %d bytes at once\n",
 			dev, group, blockSize);
 
 	if (progress)
@@ -49,7 +52,7 @@ int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 			continue;
 		if (got >= 0) {
 			if (verbose)
-				fprintf(stderr, "block %Ld (offset %Ld): got %d < %d\n", 
+				fprintf(stderr, "block %Ld (offset %Ld): got %d < %zd\n",
 					block, at, got, len);
 			break;
 		}
@@ -71,7 +74,7 @@ int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 				if (got < 0)
 					fprintf(stderr, "block %Ld: error: %s\n", block + i, strerror(errno));
 				else
-					fprintf(stderr, "block %Ld: read % bytes\n", block + i, got);
+					fprintf(stderr, "block %Ld: read %d bytes\n", block + i, got);
 				fprintf(outputFile, "%Ld\n", block + i);
 				fflush(stdout);
 			}
@@ -81,7 +84,6 @@ int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 	free(buffer);
 	return 0;
 
-err2:
 	close(fd);
 err1:
 	free(buffer);
@@ -100,6 +102,7 @@ int main(int argc, char **argv)
 	int ch;
 	off_t startBlock = 0LL;
 	off_t endBlock = INT64_MAX;
+	outputFile = stdout;
 	if (argc < 2)
 		return usage(1);
 
@@ -133,6 +136,6 @@ int main(int argc, char **argv)
 		startBlock = atoll(argv[2]);
 	if (argc > 1)
 		endBlock = atoll(argv[1]);
-		
+
 	return scan_device(argv[0], startBlock, endBlock);
 }
