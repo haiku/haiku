@@ -38,4 +38,34 @@ struct checksumfs_super_block {
 } _PACKED;
 
 
+struct checksumfs_node {
+	uint32	mode;				// node type + permissions
+	uint32	attributeType;		// attribute type (attributes only)
+	uint32	uid;				// owning user ID
+	uint32	gid;				// owning group ID
+	uint64	creationTime;		// in ns since the epoche
+	uint64	modificationTime;	//
+	uint64	changeTime;			//
+	uint64	hardLinks;			// number of references to the node
+	uint64	content;			// block index of the content (0 if empty)
+	uint64	size;				// content size in bytes
+	uint64	parentDirectory;	// block index of the parent directory
+								// (directories and attributes only)
+	uint64	attributeDirectory;	// block index of the attribute directory (0 if
+								// empty)
+} _PACKED;
+
+
+struct checksumfs_dir_entry_block {
+	uint16	entryCount;
+	uint16	nameEnds[0];		// end (in-block) offsets of the names,
+								// e.g. nameEnds[0] == length of first name
+	// char	names[];			// string of all (unterminated) names,
+								// directly follows the nameEnds array
+	// ...
+	// uint64	nodes[];
+		// node array ends at the end of the block
+};
+
+
 #endif	// CHECK_SUM_FS_H

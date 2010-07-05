@@ -58,4 +58,46 @@ private:
 };
 
 
+class AllocatedBlock {
+public:
+	AllocatedBlock(BlockAllocator* allocator)
+		:
+		fAllocator(allocator),
+		fIndex(0)
+	{
+	}
+
+	~AllocatedBlock()
+	{
+		if (fIndex > 0)
+			fAllocator->Free(fIndex, 1);
+	}
+
+	uint64 Index() const
+	{
+		return fIndex;
+	}
+
+	status_t Allocate(uint64 baseHint = 0)
+	{
+		uint64 allocatedBlocks;
+		status_t error = fAllocator->Allocate(0, 1, fIndex, allocatedBlocks);
+		if (error != B_OK)
+			fIndex = 0;
+		return error;
+	}
+
+	uint64 Detach()
+	{
+		uint64 index = fIndex;
+		fIndex = 0;
+		return index;
+	}
+
+private:
+	BlockAllocator*	fAllocator;
+	uint64			fIndex;
+};
+
+
 #endif	// BLOCK_ALLOCATOR_H

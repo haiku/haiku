@@ -20,23 +20,30 @@
 #include "Block.h"
 #include "BlockAllocator.h"
 #include "checksumfs.h"
+#include "checksumfs_private.h"
+#include "DebugSupport.h"
+#include "Directory.h"
 #include "SuperBlock.h"
 
 
 Volume::Volume(uint32 flags)
 	:
+	fFSVolume(NULL),
 	fFD(-1),
-	fFlags(flags),
+	fFlags(B_FS_IS_PERSISTENT
+		| (flags & B_FS_IS_READONLY != 0 ? B_FS_IS_READONLY : 0)),
 	fBlockCache(NULL),
 	fTotalBlocks(0),
 	fName(NULL),
-	fBlockAllocator(NULL)
+	fBlockAllocator(NULL),
+	fRootDirectory(NULL)
 {
 }
 
 
 Volume::~Volume()
 {
+	delete fRootDirectory;
 	delete fBlockAllocator;
 
 	if (fBlockCache != NULL)
@@ -62,7 +69,27 @@ Volume::Init(const char* device)
 	if (fstat(fFD, &st) < 0)
 		return errno;
 
-	return _Init(st.st_size / B_PAGE_SIZE);
+	off_t size;
+	switch (st.st_mode & S_IFMT) {
+		case S_IFREG:
+			size = st.st_size;
+			break;
+		case S_IFCHR:
+		case S_IFBLK:
+		{
+			device_geometry geometry;
+			if (ioctl(fFD, B_GET_GEOMETRY, &geometry, sizeof(geometry)) < 0)
+				return errno;
+
+			size = (off_t)geometry.bytes_per_sector * geometry.sectors_per_track
+				* geometry.cylinder_count * geometry.head_count;
+			break;
+		}
+		default:
+			return B_BAD_VALUE;
+	}
+
+	return _Init(size / B_PAGE_SIZE);
 }
 
 
@@ -71,17 +98,68 @@ Volume::Init(int fd, uint64 totalBlocks)
 {
 	fFD = dup(fd);
 	if (fFD < 0)
-		return errno;
+		RETURN_ERROR(errno);
 
 	return _Init(totalBlocks);
 }
 
 
 status_t
-Volume::Mount()
+Volume::Mount(fs_volume* fsVolume)
 {
-	// TODO:...
-	return B_UNSUPPORTED;
+	fFSVolume = fsVolume;
+
+	// load the superblock
+	Block block;
+	if (!block.GetReadable(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE))
+		RETURN_ERROR(B_ERROR);
+
+	SuperBlock* superBlock = (SuperBlock*)block.Data();
+	if (!superBlock->Check(fTotalBlocks))
+		RETURN_ERROR(B_BAD_DATA);
+
+	// copy the volume name
+	fName = strdup(superBlock->Name());
+	if (fName == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+
+	// init the block allocator
+	status_t error = fBlockAllocator->Init(superBlock->BlockBitmap(),
+		superBlock->FreeBlocks());
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// load the root directory
+	Node* rootNode;
+	error = ReadNode(superBlock->RootDirectory(), rootNode);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	fRootDirectory = dynamic_cast<Directory*>(rootNode);
+	if (fRootDirectory == NULL) {
+		delete rootNode;
+		RETURN_ERROR(B_BAD_DATA);
+	}
+
+	error = PublishNode(fRootDirectory, 0);
+	if (error != B_OK) {
+		delete fRootDirectory;
+		fRootDirectory = NULL;
+		return error;
+	}
+
+	return B_OK;
+}
+
+
+void
+Volume::Unmount()
+{
+	status_t error = block_cache_sync(fBlockCache);
+	if (error != B_OK) {
+		dprintf("checksumfs: Error: Failed to sync block cache when "
+			"unmounting!\n");
+	}
 }
 
 
@@ -96,6 +174,17 @@ Volume::Initialize(const char* name)
 	if (error != B_OK)
 		return error;
 
+	// create the root directory
+	error = CreateDirectory(S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
+		fRootDirectory);
+	if (error != B_OK)
+		return error;
+
+	error = fRootDirectory->Flush();
+	if (error != B_OK)
+		return error;
+
+	// write the super block
 	Block block;
 	if (!block.GetZero(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE))
 		return B_ERROR;
@@ -109,23 +198,117 @@ Volume::Initialize(const char* name)
 }
 
 
+void
+Volume::GetInfo(fs_info& info)
+{
+	info.flags = fFlags;
+	info.block_size = B_PAGE_SIZE;
+	info.io_size = B_PAGE_SIZE * 16;	// random value
+	info.total_blocks = fTotalBlocks;
+	info.free_blocks = fBlockAllocator->FreeBlocks();
+	info.total_nodes = 1;	// phew, who cares?
+	info.free_nodes = info.free_blocks;
+	strlcpy(info.volume_name, fName, sizeof(info.volume_name));
+		// TODO: We need locking once we are able to change the name!
+}
+
+
+status_t
+Volume::PublishNode(Node* node, uint32 flags)
+{
+	return publish_vnode(fFSVolume, node->BlockIndex(), node,
+		&gCheckSumFSVnodeOps, node->Mode(), flags);
+}
+
+
+status_t
+Volume::GetNode(uint64 blockIndex, Node*& _node)
+{
+	return get_vnode(fFSVolume, blockIndex, (void**)&_node);
+}
+
+
+status_t
+Volume::PutNode(Node* node)
+{
+	return put_vnode(fFSVolume, node->BlockIndex());
+}
+
+
+status_t
+Volume::ReadNode(uint64 blockIndex, Node*& _node)
+{
+	if (blockIndex == 0 || blockIndex >= fTotalBlocks)
+		return B_BAD_VALUE;
+
+	// load the node's block
+	Block block;
+	if (!block.GetReadable(this, blockIndex))
+		return B_ERROR;
+
+	checksumfs_node* nodeData = (checksumfs_node*)block.Data();
+
+	// create the Node object
+	Node* node;
+	switch (nodeData->mode & S_IFMT) {
+			// TODO: Don't directly access mode!
+		case S_IFDIR:
+			node = new(std::nothrow) Directory(this, blockIndex, *nodeData);
+			break;
+		default:
+			node = new(std::nothrow) Node(this, blockIndex, *nodeData);
+			break;
+	}
+
+	if (node == NULL)
+		return B_NO_MEMORY;
+
+	// TODO: Sanity check the node!
+
+	_node = node;
+	return B_OK;
+}
+
+
+status_t
+Volume::CreateDirectory(mode_t mode, Directory*& _directory)
+{
+	// allocate a free block
+	AllocatedBlock allocatedBlock(fBlockAllocator);
+	status_t error = allocatedBlock.Allocate();
+	if (error != B_OK)
+		return error;
+
+	// create the directory
+	Directory* directory = new(std::nothrow) Directory(this,
+		allocatedBlock.Index(), (mode & ~(mode_t)S_IFMT) | S_IFDIR);
+	if (directory == NULL)
+		return B_NO_MEMORY;
+
+	allocatedBlock.Detach();
+	_directory = directory;
+
+	return B_OK;
+}
+
+
 status_t
 Volume::_Init(uint64 totalBlocks)
 {
 	fTotalBlocks = totalBlocks;
 	if (fTotalBlocks * B_PAGE_SIZE < kCheckSumFSMinSize)
-		return B_BAD_VALUE;
+		RETURN_ERROR(B_BAD_VALUE);
 
 	// create a block cache
 	fBlockCache = block_cache_create(fFD, fTotalBlocks, B_PAGE_SIZE,
 		IsReadOnly());
 	if (fBlockCache == NULL)
-		return B_NO_MEMORY;
+		RETURN_ERROR(B_NO_MEMORY);
 
 	// create the block allocator
 	fBlockAllocator = new(std::nothrow) BlockAllocator(this);
 	if (fBlockAllocator == NULL)
-		return B_NO_MEMORY;
+		RETURN_ERROR(B_NO_MEMORY);
 
 	return B_OK;
 }
