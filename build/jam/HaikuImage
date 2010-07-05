@@ -413,16 +413,11 @@ SEARCH on $(spellFiles)
 	= [ FDirName $(HAIKU_TOP) src apps mail ] ;
 AddFilesToHaikuImage system data spell_check word_dictionary : $(spellFiles) ;
 
-local etcFiles = bash_completion inputrc profile ;
+local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
 etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
 AddFilesToHaikuImage common etc : $(etcFiles) ;
-
-SEARCH on <bash_completion>subversion =
-	[ FDirName $(HAIKU_TOP) data etc bash_completion.d ] ;
-AddFilesToHaikuImage common etc bash_completion.d :
-	<bash_completion>subversion ;
 
 local dataFiles = teapot.data ;
 dataFiles = $(dataFiles:G=data) ;
