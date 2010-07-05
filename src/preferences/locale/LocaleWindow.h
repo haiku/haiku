@@ -9,6 +9,9 @@
 #include <Window.h>
 
 
+static const uint32 kMsgRevert = 'revt';
+
+
 class BButton;
 class BListView;
 class FormatView;
@@ -24,6 +27,9 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
+			void				SettingsChanged();
+			void				SettingsReverted();
+
 private:
 			void				_PreferredLanguagesChanged();
 			void				_EnableDisableLanguages();
@@ -32,7 +38,6 @@ private:
 									int32 atIndex = -1);
 			void				_Defaults();
 
-private:
 			BButton*			fRevertButton;
 			LanguageListView*	fLanguageListView;
 			LanguageListView*	fPreferredListView;

@@ -45,7 +45,6 @@ static const uint32 kMsgPreferredLanguageDragged = 'PLDr';
 static const uint32 kMsgPreferredLanguageDeleted = 'PLDl';
 static const uint32 kMsgCountrySelection = 'csel';
 static const uint32 kMsgDefaults = 'dflt';
-static const uint32 kMsgRevert = 'revt';
 
 static const uint32 kMsgPreferredLanguagesChanged = 'lang';
 
@@ -215,23 +214,23 @@ LocaleWindow::LocaleWindow()
 
 	BButton* button = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(kMsgDefaults));
-#if 0
+
 	fRevertButton = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
-#endif
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, spacing)
 		.Add(tabView)
 		.AddGroup(B_HORIZONTAL, spacing)
 			.Add(button)
-//			.Add(fRevertButton)
+			.Add(fRevertButton)
 			.AddGlue()
 			.End()
 		.SetInsets(spacing, spacing, spacing, spacing)
 		.End();
 
 	_UpdatePreferredFromLocaleRoster();
+	SettingsReverted();
 	CenterOnScreen();
 }
 
@@ -250,7 +249,8 @@ LocaleWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kMsgRevert:
-			// TODO
+			be_app_messenger.SendMessage(message);
+			_UpdatePreferredFromLocaleRoster();
 			break;
 
 		case kMsgLanguageDragged:
@@ -345,6 +345,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 			BMessage newMessage(kMsgSettingsChanged);
 			newMessage.AddString("country", item->ID());
 			be_app_messenger.SendMessage(&newMessage);
+			SettingsChanged();
 
 			BCountry* country = new BCountry(item->ID());
 			fFormatView->SetCountry(country);
@@ -361,11 +362,21 @@ LocaleWindow::MessageReceived(BMessage* message)
 bool
 LocaleWindow::QuitRequested()
 {
-	BMessage update(kMsgSettingsChanged);
-	update.AddPoint("window_location", Frame().LeftTop());
-	be_app_messenger.SendMessage(&update);
-
 	return true;
+}
+
+
+void
+LocaleWindow::SettingsChanged()
+{
+	fRevertButton->SetEnabled(true);
+}
+
+
+void
+LocaleWindow::SettingsReverted()
+{
+	fRevertButton->SetEnabled(false);
 }
 
 
@@ -411,6 +422,8 @@ LocaleWindow::_EnableDisableLanguages()
 			}
 		}
 	}
+
+	SettingsChanged();
 
 	EnableUpdates();
 }
@@ -495,5 +508,7 @@ LocaleWindow::_Defaults()
 	update.AddString("language", "en");
 
 	be_app_messenger.SendMessage(&update);
+	SettingsChanged();
 	_UpdatePreferredFromLocaleRoster();
 }
+
