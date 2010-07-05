@@ -29,9 +29,9 @@
 #ifndef	_FENV_H_
 #define	_FENV_H_
 
+#include <stdint.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#include <SupportDefs.h>
 
 typedef	uint32_t	fenv_t;
 typedef	uint32_t	fexcept_t;

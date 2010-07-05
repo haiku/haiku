@@ -29,11 +29,11 @@
 #ifndef	_FENV_H_
 #define	_FENV_H_
 
+#include <stdint.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
-#include <SupportDefs.h>
 
-/*                   
+/*
  * To preserve binary compatibility with FreeBSD 5.3, we pack the
  * mxcsr into some reserved fields, rather than changing sizeof(fenv_t).
  */
@@ -49,8 +49,8 @@ typedef struct {
 #define	__get_mxcsr(env)	(((env).__mxcsr_hi << 16) |	\
 				 ((env).__mxcsr_lo))
 #define	__set_mxcsr(env, x)	do {				\
-	(env).__mxcsr_hi = (uint32)(x) >> 16;		\
-	(env).__mxcsr_lo = (uint16)(x);			\
+	(env).__mxcsr_hi = (uint32_t)(x) >> 16;		\
+	(env).__mxcsr_lo = (uint16_t)(x);			\
 } while (0)
 
 typedef	uint16_t	fexcept_t;
