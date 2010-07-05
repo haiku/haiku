@@ -40,7 +40,7 @@ BAbstractLayoutItem::MaxSize()
 BSize
 BAbstractLayoutItem::PreferredSize()
 {
-	return BLayoutUtils::ComposeSize(fMaxSize, BaseMaxSize());
+	return BLayoutUtils::ComposeSize(fMaxSize, BasePreferredSize());
 }
 
 // Alignment
