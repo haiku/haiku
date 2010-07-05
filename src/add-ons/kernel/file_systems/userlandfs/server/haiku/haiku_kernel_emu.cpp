@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,6 +27,28 @@
 #include "HaikuKernelNode.h"
 #include "HaikuKernelVolume.h"
 #include "vfs.h"
+
+
+// When GCC 2 compiles inline functions in debug mode, it doesn't throw away
+// the generated non-inlined functions, if they aren't used. So we have to
+// provide the dependencies referenced by inline functions in private kernel
+// headers.
+#if __GNUC__ == 2
+
+#include <cpu.h>
+#include <smp.h>
+
+cpu_ent gCPU[1];
+
+
+int32
+smp_get_current_cpu(void)
+{
+	return 0;
+}
+
+
+#endif	// __GNUC__ == 2
 
 
 // #pragma mark - Notifications
