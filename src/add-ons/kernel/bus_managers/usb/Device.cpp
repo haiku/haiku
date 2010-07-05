@@ -143,6 +143,11 @@ Device::Device(Object *parent, int8 hubAddress, uint8 hubPort,
 					TRACE("\tinterface_protocol:.0x%02x\n", interfaceDescriptor->interface_protocol);
 					TRACE("\tinterface:..........%d\n", interfaceDescriptor->interface);
 
+					if (interfaceDescriptor->interface_number >= fConfigurations[i].interface_count) {
+						interfaceDescriptor->interface_number = fConfigurations[i].interface_count -1;
+						TRACE_ERROR("Corrected invalid interface_number!\n");
+					}
+
 					usb_interface_list *interfaceList
 						= &fConfigurations[i].interface[interfaceDescriptor->interface_number];
 
