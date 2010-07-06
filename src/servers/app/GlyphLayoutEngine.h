@@ -13,6 +13,7 @@
 
 #include "FontCache.h"
 #include "FontCacheEntry.h"
+#include "FontManager.h"
 #include "ServerFont.h"
 
 #include <ctype.h>
@@ -95,6 +96,7 @@ GlyphLayoutEngine::IsWhiteSpace(uint32 charCode)
 	return false;
 }
 
+
 // LayoutGlyphs
 template<class GlyphConsumer>
 inline bool
@@ -107,6 +109,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 	// TODO: implement spacing modes
 
 	FontCacheEntry* entry = NULL;
+	FontCacheEntry* fallbackEntry = NULL;
 	bool needsWriteLock = false;
 	if (cacheReference) {
 		entry = cacheReference->Entry();
@@ -171,11 +174,51 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 		const GlyphCache* glyph = entry->Glyph(charCode);
 		if (glyph == NULL) {
-			fprintf(stderr, "failed to load glyph for 0x%04lx (%c)\n", charCode,
-				isprint(charCode) ? (char)charCode : '-');
+			// Try to find a suitable glyph in another font
+			FontCache* cache = FontCache::Default();
+			bool needsWriteLock = false;
+			ServerFont f(*(gFontManager->GetStyleByIndex("VL Gothic",0)));
+				// We always try to get the glyph from VL Gothic, so we can display
+				// japanese character. Other scripts (indian, ...) should be handled
+				// too, perhaps with a charcode > font mapping.
+			fallbackEntry = cache->FontCacheEntryFor(f);
+			if (!fallbackEntry || !fallbackEntry->ReadLock()) {
+				cache->Recycle(fallbackEntry);
+				continue;
+			}
 
-			consumer.ConsumeEmptyGlyph(index, charCode, x, y);
-			continue;
+			needsWriteLock = !fallbackEntry->HasGlyphs(utf8String, length);
+
+			if (needsWriteLock) {
+				fallbackEntry->ReadUnlock();
+				if (!fallbackEntry->WriteLock()) {
+					cache->Recycle(fallbackEntry);
+					continue;
+				}
+			}
+
+			bool consumed = true;
+			glyph = fallbackEntry->Glyph(charCode);
+			if (glyph != NULL && !consumer.ConsumeGlyph(index, charCode, glyph, fallbackEntry, x, y)) {
+				advanceX = 0;
+				advanceY = 0;
+				consumed = false;
+			}
+
+			if (needsWriteLock)
+				fallbackEntry->WriteUnlock();
+			else
+				fallbackEntry->ReadUnlock();
+
+			FontCache::Default()->Recycle(fallbackEntry);
+
+			if (glyph == NULL) {
+				consumer.ConsumeEmptyGlyph(index, charCode, x, y);
+				continue;
+			}
+
+			if (!consumed)
+				break;
 		}
 
 		if (!consumer.ConsumeGlyph(index, charCode, glyph, entry, x, y)) {
