@@ -1309,8 +1309,8 @@ clear_page(struct vm_page *page)
 static status_t
 mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 {
-	TRACE(("mark_page_range_in_use: start 0x%lx, len 0x%lx\n",
-		startPage, length));
+	TRACE(("mark_page_range_in_use: start %#" B_PRIxPHYSADDR ", len %#"
+		B_PRIxPHYSADDR "\n", startPage, length));
 
 	if (sPhysicalPageOffset > startPage) {
 		dprintf("mark_page_range_in_use(%#" B_PRIxPHYSADDR ", %#" B_PRIxPHYSADDR
@@ -2832,8 +2832,8 @@ vm_page_init_num_pages(kernel_args *args)
 			+ args->physical_memory_range[i].size / B_PAGE_SIZE;
 	}
 
-	TRACE(("first phys page = 0x%lx, end 0x%lx\n", sPhysicalPageOffset,
-		physicalPagesEnd));
+	TRACE(("first phys page = %#" B_PRIxPHYSADDR ", end %#" B_PRIxPHYSADDR "\n",
+		sPhysicalPageOffset, physicalPagesEnd));
 
 	sNumPages = physicalPagesEnd - sPhysicalPageOffset;
 
@@ -2863,8 +2863,9 @@ vm_page_init(kernel_args *args)
 	sPages = (vm_page *)vm_allocate_early(args, sNumPages * sizeof(vm_page),
 		~0L, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0);
 
-	TRACE(("vm_init: putting free_page_table @ %p, # ents %ld (size 0x%x)\n",
-		sPages, sNumPages, (unsigned int)(sNumPages * sizeof(vm_page))));
+	TRACE(("vm_init: putting free_page_table @ %p, # ents %" B_PRIuPHYSADDR
+		" (size %#" B_PRIxPHYSADDR ")\n", sPages, sNumPages,
+		(phys_addr_t)(sNumPages * sizeof(vm_page))));
 
 	// initialize the free page table
 	for (uint32 i = 0; i < sNumPages; i++) {
