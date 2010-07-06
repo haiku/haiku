@@ -991,6 +991,12 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *symbol,
 			newSymbol = elf_find_symbol(sharedImage, symbolName, versionInfo,
 				false);
 			if (newSymbol == NULL) {
+				// Weak undefined symbols get a value of 0, if unresolved.
+				if (ELF32_ST_BIND(symbol->st_info) == STB_WEAK) {
+					*_symbolAddress = 0;
+					return B_OK;
+				}
+
 				dprintf("\"%s\": could not resolve symbol '%s'\n",
 					image->name, symbolName);
 				return B_MISSING_SYMBOL;
