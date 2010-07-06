@@ -1965,6 +1965,8 @@ load_kernel_add_on(const char *path)
 	size_t reservedSize;
 	status_t status;
 	ssize_t length;
+	bool textSectionWritable = false;
+	int executableHeaderCount = 0;
 
 	TRACE(("elf_load_kspace: entry path '%s'\n", path));
 
@@ -2066,6 +2068,9 @@ load_kernel_add_on(const char *path)
 			B_PAGE_SIZE);
 		if (end > reservedSize)
 			reservedSize = end;
+
+		if (programHeaders[i].IsExecutable())
+			executableHeaderCount++;
 	}
 
 	// Check whether the segments have an unreasonable amount of unused space
@@ -2105,7 +2110,16 @@ load_kernel_add_on(const char *path)
 		}
 
 		// we're here, so it must be a PT_LOAD segment
-		if (programHeaders[i].IsReadWrite()) {
+
+		// Usually add-ons have two PT_LOAD headers: one for .data one or .text.
+		// x86 and PPC may differ in permission bits for .data's PT_LOAD header
+		// x86 is usually RW, PPC is RWE
+
+		// Some add-ons may have .text and .data concatenated in a single
+		// PT_LOAD RWE header and we must map that to .text.
+		if (programHeaders[i].IsReadWrite()
+			&& (!programHeaders[i].IsExecutable()
+				|| executableHeaderCount > 1)) {
 			// this is the writable segment
 			if (image->data_region.size != 0) {
 				// we've already created this segment
@@ -2122,6 +2136,9 @@ load_kernel_add_on(const char *path)
 			}
 			region = &image->text_region;
 
+			// some programs may have .text and .data concatenated in a
+			// single PT_LOAD section which is readable/writable/executable
+			textSectionWritable = programHeaders[i].IsReadWrite();
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", fileName);
 		} else {
 			dprintf("%s: weird program header flags 0x%lx\n", fileName,
@@ -2191,9 +2208,12 @@ load_kernel_add_on(const char *path)
 		goto error5;
 
 	// We needed to read in the contents of the "text" area, but
-	// now we can protect it read-only/execute
+	// now we can protect it read-only/execute, unless this is a
+	// special image with concatenated .text and .data, when it
+	// will also need write access.
 	set_area_protection(image->text_region.id,
-		B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA
+		| (textSectionWritable ? B_KERNEL_WRITE_AREA : 0));
 
 	// There might be a hole between the two segments, and we don't need to
 	// reserve this any longer

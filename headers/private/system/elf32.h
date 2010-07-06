@@ -367,7 +367,7 @@ Elf32_Phdr::IsReadWrite() const
 inline bool
 Elf32_Phdr::IsExecutable() const
 {
-	return (p_flags & PF_PROTECTION_MASK) == (PF_READ | PF_EXECUTE);
+	return (p_flags & PF_EXECUTE) != 0;
 }
 
 
