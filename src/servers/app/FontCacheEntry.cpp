@@ -192,7 +192,7 @@ const GlyphCache*
 FontCacheEntry::Glyph(uint32 glyphCode)
 {
 	uint32 glyphIndex = fEngine.GlyphIndexForGlyphCode(glyphCode);
-	if (glyphIndex==0)
+	if (glyphIndex == 0)
 		return NULL;
 	const GlyphCache* glyph = fGlyphCache->FindGlyph(glyphIndex);
 	if (glyph) {

@@ -177,39 +177,46 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 			// Try to find a suitable glyph in another font
 			FontCache* cache = FontCache::Default();
 			bool needsWriteLock = false;
-			ServerFont f(*(gFontManager->GetStyleByIndex("VL Gothic",0)));
-				// We always try to get the glyph from VL Gothic, so we can display
-				// japanese character. Other scripts (indian, ...) should be handled
-				// too, perhaps with a charcode > font mapping.
-			fallbackEntry = cache->FontCacheEntryFor(f);
-			if (!fallbackEntry || !fallbackEntry->ReadLock()) {
-				cache->Recycle(fallbackEntry);
-				continue;
-			}
-
-			needsWriteLock = !fallbackEntry->HasGlyphs(utf8String, length);
-
-			if (needsWriteLock) {
-				fallbackEntry->ReadUnlock();
-				if (!fallbackEntry->WriteLock()) {
+			ServerFont fallbackFont(*(gFontManager->GetStyleByIndex("VL Gothic",
+				0)));
+				// We always try to get the glyph from VL Gothic, so we can
+				// display japanese characters. Other scripts (indian, ...)
+				// should be handled too, perhaps with a charcode > font
+				// mapping.
+				// TODO : the font should not be hardcoded, but somehow derived
+				// from the one that missed a glyph.
+			bool consumed = true;
+			fallbackEntry = cache->FontCacheEntryFor(fallbackFont);
+			if (fallbackEntry != entry)
+			{
+				if (!fallbackEntry || !fallbackEntry->ReadLock()) {
 					cache->Recycle(fallbackEntry);
 					continue;
 				}
+
+				needsWriteLock = !fallbackEntry->HasGlyphs(utf8String, length);
+
+				if (needsWriteLock) {
+					fallbackEntry->ReadUnlock();
+					if (!fallbackEntry->WriteLock()) {
+						cache->Recycle(fallbackEntry);
+						continue;
+					}
+				}
+
+				glyph = fallbackEntry->Glyph(charCode);
+				if (glyph != NULL && !consumer.ConsumeGlyph(index, charCode,
+						glyph, fallbackEntry, x, y)) {
+					advanceX = 0;
+					advanceY = 0;
+					consumed = false;
+				}
+
+				if (needsWriteLock)
+					fallbackEntry->WriteUnlock();
+				else
+					fallbackEntry->ReadUnlock();
 			}
-
-			bool consumed = true;
-			glyph = fallbackEntry->Glyph(charCode);
-			if (glyph != NULL && !consumer.ConsumeGlyph(index, charCode, glyph, fallbackEntry, x, y)) {
-				advanceX = 0;
-				advanceY = 0;
-				consumed = false;
-			}
-
-			if (needsWriteLock)
-				fallbackEntry->WriteUnlock();
-			else
-				fallbackEntry->ReadUnlock();
-
 			FontCache::Default()->Recycle(fallbackEntry);
 
 			if (glyph == NULL) {
