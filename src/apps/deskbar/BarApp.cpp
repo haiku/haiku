@@ -180,28 +180,44 @@ TBarApp::SaveSettings()
 {
 	if (fSettingsFile->InitCheck() == B_OK) {
 		fSettingsFile->Seek(0, SEEK_SET);
-		fSettingsFile->Write(&fSettings.vertical, sizeof(bool));
-		fSettingsFile->Write(&fSettings.left, sizeof(bool));
-		fSettingsFile->Write(&fSettings.top, sizeof(bool));
-		fSettingsFile->Write(&fSettings.ampmMode, sizeof(bool));
-		fSettingsFile->Write(&fSettings.state, sizeof(uint32));
-		fSettingsFile->Write(&fSettings.width, sizeof(float));
-		fSettingsFile->Write(&fSettings.showTime, sizeof(bool));
-		fSettingsFile->Write(&fSettings.switcherLoc, sizeof(BPoint));
-		fSettingsFile->Write(&fSettings.recentAppsCount, sizeof(int32));
-		fSettingsFile->Write(&fSettings.recentDocsCount, sizeof(int32));
-		fSettingsFile->Write(&fSettings.timeShowSeconds, sizeof(bool));
-		fSettingsFile->Write(&fSettings.recentFoldersCount, sizeof(int32));
-		fSettingsFile->Write(&fSettings.alwaysOnTop, sizeof(bool));
-		fSettingsFile->Write(&fSettings.timeFullDate, sizeof(bool));
-		fSettingsFile->Write(&fSettings.trackerAlwaysFirst, sizeof(bool));
-		fSettingsFile->Write(&fSettings.sortRunningApps, sizeof(bool));
-		fSettingsFile->Write(&fSettings.superExpando, sizeof(bool));
-		fSettingsFile->Write(&fSettings.expandNewTeams, sizeof(bool));
-		fSettingsFile->Write(&fSettings.autoRaise, sizeof(bool));
-		fSettingsFile->Write(&fSettings.recentAppsEnabled, sizeof(bool));
-		fSettingsFile->Write(&fSettings.recentDocsEnabled, sizeof(bool));
-		fSettingsFile->Write(&fSettings.recentFoldersEnabled, sizeof(bool));
+		BMessage storedSettings;
+		storedSettings.AddBool("vertical", fSettings.vertical);
+		storedSettings.AddBool("left", fSettings.left);
+		storedSettings.AddBool("top", fSettings.top);
+		storedSettings.AddBool("ampmMode", fSettings.ampmMode);
+
+		storedSettings.AddInt32("state", fSettings.state);
+		storedSettings.AddFloat("width", fSettings.width);
+		storedSettings.AddBool("showTime", fSettings.showTime);
+		storedSettings.AddPoint("switcherLoc", fSettings.switcherLoc);
+		storedSettings.AddInt32("recentAppsCount",
+			fSettings.recentAppsCount);
+		storedSettings.AddInt32("recentDocsCount",
+			fSettings.recentDocsCount);
+		storedSettings.AddBool("timeShowSeconds",
+			fSettings.timeShowSeconds);
+		storedSettings.AddInt32("recentFoldersCount",
+			fSettings.recentFoldersCount);
+		storedSettings.AddBool("alwaysOnTop", fSettings.alwaysOnTop);
+		storedSettings.AddBool("timeFullDate", fSettings.timeFullDate);
+		storedSettings.AddBool("trackerAlwaysFirst",
+			fSettings.trackerAlwaysFirst);
+		storedSettings.AddBool("sortRunningApps",
+			fSettings.sortRunningApps);
+		storedSettings.AddBool("superExpando",
+			fSettings.superExpando);
+		storedSettings.AddBool("expandNewTeams",
+			fSettings.expandNewTeams);
+		storedSettings.AddBool("autoRaise",
+			fSettings.autoRaise);
+		storedSettings.AddBool("recentAppsEnabled",
+			fSettings.recentAppsEnabled);
+		storedSettings.AddBool("recentDocsEnabled",
+			fSettings.recentDocsEnabled);
+		storedSettings.AddBool("recentFoldersEnabled",
+			fSettings.recentFoldersEnabled);
+
+		storedSettings.Flatten(fSettingsFile);
 	}
 }
 
@@ -249,57 +265,44 @@ TBarApp::InitSettings()
 				theDir.CreateFile(settingsFileName, fSettingsFile);
 		}
 
-		if (fSettingsFile->InitCheck() == B_OK) {
-			off_t size = 0;
-			fSettingsFile->GetSize(&size);
+		BMessage storedSettings;
+		if (fSettingsFile->InitCheck() == B_OK
+			&& storedSettings.Unflatten(fSettingsFile) == B_OK) {
+			storedSettings.FindBool("vertical", &settings.vertical);
+			storedSettings.FindBool("left", &settings.left);
+			storedSettings.FindBool("top", &settings.top);
+			storedSettings.FindBool("ampmMode", &settings.ampmMode);
 
-			if (size >= kValidSettingsSize1) {
-				fSettingsFile->Seek(0, SEEK_SET);
-				fSettingsFile->Read(&settings.vertical, sizeof(bool));
-				fSettingsFile->Read(&settings.left, sizeof(bool));
-				fSettingsFile->Read(&settings.top, sizeof(bool));
-				fSettingsFile->Read(&settings.ampmMode, sizeof(bool));
-				fSettingsFile->Read(&settings.state, sizeof(uint32));
-				fSettingsFile->Read(&settings.width, sizeof(float));
-				fSettingsFile->Read(&settings.showTime, sizeof(bool));
-			}
-			if (size >= kValidSettingsSize2)
-				fSettingsFile->Read(&settings.switcherLoc, sizeof(BPoint));
-			if (size >= kValidSettingsSize3) {
-				fSettingsFile->Read(&settings.recentAppsCount, sizeof(int32));
-				fSettingsFile->Read(&settings.recentDocsCount, sizeof(int32));
-			}
-			if (size >= kValidSettingsSize4) {
-				fSettingsFile->Read(&settings.timeShowSeconds, sizeof(bool));
-			}
-			if (size >= kValidSettingsSize5)
-				fSettingsFile->Read(&settings.recentFoldersCount,
-					sizeof(int32));
-			if (size >= kValidSettingsSize6) {
-				fSettingsFile->Read(&settings.alwaysOnTop, sizeof(bool));
-			}
-			if (size >= kValidSettingsSize7)
-				fSettingsFile->Read(&settings.timeFullDate, sizeof(bool));
-			if (size >= kValidSettingsSize8) {
-				fSettingsFile->Read(&settings.trackerAlwaysFirst, sizeof(bool));
-				fSettingsFile->Read(&settings.sortRunningApps, sizeof(bool));
-			}
-			if (size >= kValidSettingsSize9) {
-				fSettingsFile->Read(&settings.superExpando, sizeof(bool));
-				fSettingsFile->Read(&settings.expandNewTeams, sizeof(bool));
-			}
-			if (size >= kValidSettingsSize10)
-				fSettingsFile->Read(&settings.autoRaise, sizeof(bool));
-
-			if (size >= kValidSettingsSize11) {
-				fSettingsFile->Read(&settings.recentAppsEnabled, sizeof(bool));
-				fSettingsFile->Read(&settings.recentDocsEnabled, sizeof(bool));
-				fSettingsFile->Read(&settings.recentFoldersEnabled, sizeof(bool));
-			} else {
-				settings.recentAppsEnabled = settings.recentAppsCount > 0;
-				settings.recentDocsEnabled = settings.recentDocsCount > 0;
-				settings.recentFoldersEnabled = settings.recentFoldersCount > 0;
-			}
+			storedSettings.FindInt32("state", (int32*)&settings.state);
+			storedSettings.FindFloat("width", &settings.width);
+			storedSettings.FindBool("showTime", &settings.showTime);
+			storedSettings.FindPoint("switcherLoc", &settings.switcherLoc);
+			storedSettings.FindInt32("recentAppsCount",
+				&settings.recentAppsCount);
+			storedSettings.FindInt32("recentDocsCount",
+				&settings.recentDocsCount);
+			storedSettings.FindBool("timeShowSeconds",
+				&settings.timeShowSeconds);
+			storedSettings.FindInt32("recentFoldersCount",
+				&settings.recentFoldersCount);
+			storedSettings.FindBool("alwaysOnTop", &settings.alwaysOnTop);
+			storedSettings.FindBool("timeFullDate", &settings.timeFullDate);
+			storedSettings.FindBool("trackerAlwaysFirst",
+				&settings.trackerAlwaysFirst);
+			storedSettings.FindBool("sortRunningApps",
+				&settings.sortRunningApps);
+			storedSettings.FindBool("superExpando",
+				&settings.superExpando);
+			storedSettings.FindBool("expandNewTeams",
+				&settings.expandNewTeams);
+			storedSettings.FindBool("autoRaise",
+				&settings.autoRaise);
+			storedSettings.FindBool("recentAppsEnabled",
+				&settings.recentAppsEnabled);
+			storedSettings.FindBool("recentDocsEnabled",
+				&settings.recentDocsEnabled);
+			storedSettings.FindBool("recentFoldersEnabled",
+				&settings.recentFoldersEnabled);
 		}
 	}
 
