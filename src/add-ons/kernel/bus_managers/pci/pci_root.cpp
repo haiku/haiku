@@ -75,7 +75,7 @@ dprintf("FAILED!!!!\n");
 			{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
 
 			// location on PCI bus
-			{B_PCI_DEVICE_DOMAIN, B_UINT32_TYPE, {ui8: domain}},
+			{B_PCI_DEVICE_DOMAIN, B_UINT32_TYPE, {ui32: domain}},
 			{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {ui8: bus}},
 			{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {ui8: info.device}},
 			{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {ui8: info.function}},
