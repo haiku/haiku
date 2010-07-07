@@ -507,7 +507,6 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		setenv("TERM", "xterm", true);
 		setenv("TTY", ttyName, true);
 		setenv("TTYPE", encoding, true);
-		setenv("SHELL", argv[0], true);
 
 		execve(argv[0], (char * const *)argv, environ);
 
