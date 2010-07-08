@@ -6,6 +6,7 @@ UsePrivateHeaders app interface media shared support ;
 
 MergeObject <libbe>support_kit.o :
 	Archivable.cpp
+	ArchivingManagers.cpp
 	Beep.cpp
 	BlockCache.cpp
 	ByteOrder.cpp

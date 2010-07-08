@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku Inc. All rights reserved.
+ * Copyright 2005-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -189,6 +189,20 @@ class BMessage::Private {
 		{
 			return fMessage->_SendMessage(port, portOwner, token,
 				reply, sendTimeout, replyTimeout);
+		}
+
+
+		void*
+		ArchivingPointer()
+		{
+			return fMessage->fArchivingPointer;
+		}
+
+
+		void
+		SetArchivingPointer(void* pointer)
+		{
+			fMessage->fArchivingPointer = pointer;
 		}
 
 		// static methods

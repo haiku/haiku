@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -320,7 +320,9 @@ class BMessage {
 		BMessage*		fQueueLink;
 			// fQueueLink is used by BMessageQueue to build a linked list
 
-		uint32			fReserved[9];
+		void*			fArchivingPointer;
+
+		uint32			fReserved[8];
 
 						// deprecated
 						BMessage(BMessage *message);

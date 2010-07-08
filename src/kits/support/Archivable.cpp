@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2001-2008, Haiku, Inc.
+ * Copyright (c) 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Erik Jaesler (erik@cgsoftware.com)
+ *		Alex Wilson (yourpalal2@gmail.com)
  */
 
 /*!	BArchivable mix-in class defines the archiving protocol.
@@ -29,9 +30,15 @@
 #include <Roster.h>
 #include <String.h>
 
+#include <binary_compatibility/Support.h>
+
+#include "ArchivingManagers.h"
+
 
 using std::string;
 using std::vector;
+
+using namespace BPrivate::Archiving;
 
 const char* B_CLASS_FIELD = "class";
 const char* B_ADD_ON_FIELD = "add_on";
@@ -61,7 +68,7 @@ demangle_class_name(const char* name, BString& out)
 
 			namespaceCount = strtoul(name, (char**)&name, 10);
 			if (name[0] != '_')
-				return B_BAD_VALUE;	
+				return B_BAD_VALUE;
 		} else
 			namespaceCount = name[0] - '0';
 
@@ -69,7 +76,7 @@ demangle_class_name(const char* name, BString& out)
 
 		for (int i = 0; i < namespaceCount - 1; i++) {
 			if (!isdigit(name[0]))
-				return B_BAD_VALUE;	
+				return B_BAD_VALUE;
 
 			int nameLength = strtoul(name, (char**)&name, 10);
 			out.Append(name, nameLength);
@@ -209,6 +216,10 @@ BArchivable::BArchivable()
 
 BArchivable::BArchivable(BMessage* from)
 {
+	if (BUnarchiver::IsArchiveManaged(from)) {
+		BUnarchiver::PrepareArchive(from);
+		BUnarchiver(from).RegisterArchivable(this);
+	}
 }
 
 
@@ -224,6 +235,9 @@ BArchivable::Archive(BMessage* into, bool deep) const
 		// TODO: logging/other error reporting?
 		return B_BAD_VALUE;
 	}
+
+	if (BManagerBase::ArchiveManager(into))
+		BArchiver(into).RegisterArchivable(this);
 
 	BString name;
 	status_t status = demangle_class_name(typeid(*this).name(), name);
@@ -245,14 +259,269 @@ BArchivable::Instantiate(BMessage* from)
 status_t
 BArchivable::Perform(perform_code d, void* arg)
 {
-	// TODO: Check against original
-	return B_ERROR;
+	switch (d) {
+		case PERFORM_CODE_ALL_UNARCHIVED:
+		{
+			perform_data_all_unarchived* data =
+				(perform_data_all_unarchived*)arg;
+
+			data->return_value = BArchivable::AllUnarchived(data->archive);
+			return B_OK;
+		}
+
+		case PERFORM_CODE_ALL_ARCHIVED:
+		{
+			perform_data_all_archived* data =
+				(perform_data_all_archived*)arg;
+
+			data->return_value = BArchivable::AllArchived(data->archive);
+			return B_OK;
+		}
+	}
+	return B_NAME_NOT_FOUND;
 }
 
 
-void BArchivable::_ReservedArchivable1() {}
-void BArchivable::_ReservedArchivable2() {}
-void BArchivable::_ReservedArchivable3() {}
+status_t
+BArchivable::AllUnarchived(const BMessage* archive)
+{
+	return B_OK;
+}
+
+
+status_t
+BArchivable::AllArchived(BMessage* archive) const
+{
+	return B_OK;
+}
+
+// #pragma mark -
+
+BArchiver::BArchiver(BMessage* archive)
+	:
+	fManager(BManagerBase::ArchiveManager(archive)),
+	fArchive(archive),
+	fFinished(false)
+{
+	if (!fManager)
+		fManager = new BArchiveManager(this);
+}
+
+
+BArchiver::~BArchiver()
+{
+	if (!fFinished)
+		fManager->ArchiverLeaving(this);
+}
+
+
+status_t
+BArchiver::AddArchivable(const char* name, BArchivable* archivable, bool deep)
+{
+	int32 token;
+	status_t err = GetTokenForArchivable(archivable, token, deep);
+
+	if (err != B_OK)
+		return err;
+
+	return fArchive->AddInt32(name, token);
+}
+
+
+status_t
+BArchiver::GetTokenForArchivable(BArchivable* archivable,
+	int32& _token, bool deep)
+{
+	status_t err = B_OK;
+
+	if (!IsArchived(archivable))
+		err = fManager->ArchiveObject(archivable, deep);
+
+	if (err == B_OK)
+		return fManager->GetTokenForArchivable(archivable, _token);
+
+	return err;
+}
+
+
+bool
+BArchiver::IsArchived(BArchivable* archivable)
+{
+	return fManager->IsArchived(archivable);
+}
+
+
+status_t
+BArchiver::Finish()
+{
+	if (fFinished)
+		debugger("Finish() called multiple times on same BArchiver.");
+
+	fFinished = true;
+	return fManager->ArchiverLeaving(this);
+}
+
+
+BMessage*
+BArchiver::ArchiveMessage() const
+{
+	return fArchive;
+}
+
+
+void
+BArchiver::RegisterArchivable(const BArchivable* archivable)
+{
+	fManager->RegisterArchivable(archivable);
+}
+
+
+// #pragma mark -
+
+
+BUnarchiver::BUnarchiver(const BMessage* archive)
+	:
+	fManager(BManagerBase::UnarchiveManager(archive)),
+	fArchive(archive),
+	fFinished(false)
+{
+}
+
+
+BUnarchiver::~BUnarchiver()
+{
+	if (!fFinished && fManager)
+		fManager->UnarchiverLeaving(this);
+}
+
+
+status_t
+BUnarchiver::GetArchivable(int32 token, BArchivable** archivable)
+{
+	_CallDebuggerIfManagerNull();
+
+	if (archivable == NULL)
+		return B_BAD_VALUE;
+
+	return fManager->ArchivableForToken(archivable, token);
+}
+
+
+status_t
+BUnarchiver::FindArchivable(const char* name, BArchivable** archivable)
+{
+	return FindArchivable(name, 0, archivable);
+}
+
+
+status_t
+BUnarchiver::FindArchivable(const char* name,
+	int32 index, BArchivable** archivable)
+{
+
+	int32 token;
+	status_t err = fArchive->FindInt32(name, index, &token);
+	if (err != B_OK)
+		return err;
+
+	return GetArchivable(token, archivable);
+}
+
+
+status_t
+BUnarchiver::EnsureUnarchived(const char* name, int32 index)
+{
+	BArchivable* dummy;
+	return FindArchivable(name, index, &dummy);
+}
+
+
+status_t
+BUnarchiver::EnsureUnarchived(int32 token)
+{
+	BArchivable* dummy;
+	return GetArchivable(token, &dummy);
+}
+
+
+bool
+BUnarchiver::IsInstantiated(int32 token)
+{
+	return fManager->IsInstantiated(token);
+}
+
+bool
+BUnarchiver::IsInstantiated(const char* field, int32 index)
+{
+	int32 token;
+	if (fArchive->FindInt32(field, index, &token) == B_OK)
+		return IsInstantiated(token);
+	return false;
+}
+
+status_t
+BUnarchiver::Finish()
+{
+	if (fFinished)
+		debugger("Finish() called multiple times on same BArchiver.");
+
+	fFinished = true;
+	return fManager->UnarchiverLeaving(this);
+}
+
+
+const BMessage*
+BUnarchiver::ArchiveMessage() const
+{
+	return fArchive;
+}
+
+
+bool
+BUnarchiver::IsArchiveManaged(BMessage* archive)
+{
+	// managed child archives will return here
+	if (BManagerBase::ManagerPointer(archive))
+		return true;
+
+	// managed top level archives return here
+	int32 dummy;
+	if (archive->FindInt32(kArchiveCountField, &dummy) == B_OK)
+		return true;
+
+	return false;
+}
+
+
+BMessage*
+BUnarchiver::PrepareArchive(BMessage*& archive)
+{
+	// this check allows PrepareArchive to be
+	// called on new or old-style archives
+	if (BUnarchiver::IsArchiveManaged(archive)) {
+		BUnarchiveManager* manager = BManagerBase::UnarchiveManager(archive);
+		if (!manager)
+			manager = new BUnarchiveManager(archive);
+		manager->Acquire();
+	}
+	return archive;
+}
+
+
+void
+BUnarchiver::RegisterArchivable(BArchivable* archivable)
+{
+	_CallDebuggerIfManagerNull();
+	fManager->RegisterArchivable(archivable);
+}
+
+
+void
+BUnarchiver::_CallDebuggerIfManagerNull()
+{
+	if (!fManager)
+		debugger("BUnarchiver used with legacy or unprepared archive.");
+}
 
 
 // #pragma mark -
@@ -474,4 +743,62 @@ find_instantiation_func(BMessage* archive)
 
 	return find_instantiation_func(name, signature);
 }
+
+// BArchivable binary compatability
+#if __GNUC__ == 2
+
+extern "C" status_t
+_ReservedArchivable1__11BArchivable(BArchivable* archivable,
+	const BMessage* archive)
+{
+	// AllUnarchived
+	perform_data_all_unarchived performData;
+	performData.archive = archive;
+
+	archivable->Perform(PERFORM_CODE_ALL_UNARCHIVED, &performData);
+	return performData.return_value;
+}
+
+extern "C" status_t
+_ReservedArchivable2__11BArchivable(BArchivable* archivable,
+	BMessage* archive)
+{
+	// AllArchived
+	perform_data_all_archived performData;
+	performData.archive = archive;
+
+	archivable->Perform(PERFORM_CODE_ALL_ARCHIVED, &performData);
+	return performData.return_value;
+}
+
+#elif __GNUC__ > 2
+
+extern "C" status_t
+_ZN11BArchivable20_ReservedArchivable1Ev(BArchivable* archivable,
+	const BMessage* archive)
+{
+	// AllUnarchived
+	perform_data_all_unarchived performData;
+	performData.archive = archive;
+
+	archivable->Perform(PERFORM_CODE_ALL_UNARCHIVED, &performData);
+	return performData.return_value;
+}
+
+extern "C" status_t
+_ZN11BArchivable20_ReservedArchivable2Ev(BArchivable* archivable,
+	BMessage* archive)
+{
+	// AllArchived
+	perform_data_all_archived performData;
+	performData.archive = archive;
+
+	archivable->Perform(PERFORM_CODE_ALL_ARCHIVED, &performData);
+	return performData.return_value;
+}
+
+#endif // _GNUC__ > 2
+
+void BArchivable::_ReservedArchivable3() {}
+
 

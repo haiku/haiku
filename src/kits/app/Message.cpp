@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2009, Haiku Inc. All rights reserved.
+ * Copyright 2005-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -333,6 +333,8 @@ BMessage::_InitCommon(bool initHeader)
 	fOriginal = NULL;
 	fQueueLink = NULL;
 
+	fArchivingPointer = NULL;
+
 	if (initHeader)
 		return _InitHeader();
 
@@ -393,6 +395,8 @@ BMessage::_Clear()
 	fFields = NULL;
 	free(fData);
 	fData = NULL;
+
+	fArchivingPointer = NULL;
 
 	fFieldsAvailable = 0;
 	fDataAvailable = 0;
