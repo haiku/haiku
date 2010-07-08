@@ -5,13 +5,16 @@
 #ifndef	_LAYOUT_ITEM_H
 #define	_LAYOUT_ITEM_H
 
+
 #include <Alignment.h>
 #include <Archivable.h>
 #include <Rect.h>
 #include <Size.h>
 
+
 class BLayout;
 class BView;
+
 
 class BLayoutItem: public BArchivable {
 public:
@@ -53,8 +56,7 @@ public:
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual status_t			AllArchived(BMessage* into) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
-	
-	
+
 private:
 			friend class BLayout;
 
@@ -63,5 +65,6 @@ private:
 			BLayout*			fLayout;
 			void*				fLayoutData;
 };
+
 
 #endif	// _LAYOUT_ITEM_H

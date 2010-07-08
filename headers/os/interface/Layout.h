@@ -5,16 +5,18 @@
 #ifndef	_LAYOUT_H
 #define	_LAYOUT_H
 
+
 #include <Alignment.h>
 #include <Archivable.h>
 #include <List.h>
 #include <Size.h>
 
+
 class BLayoutItem;
 class BView;
 
 
-class BLayout: public BArchivable {
+class BLayout : public BArchivable {
 public:
 								BLayout();
 								BLayout(BMessage* archive);
@@ -58,12 +60,10 @@ public:
 									BLayoutItem* item);
 
 protected:
-
 // TODO: Since memory allocations can fail, we should return a bool and
 // undo the addition, if false.
 	virtual	void				ItemAdded(BLayoutItem* item);
 	virtual	void				ItemRemoved(BLayoutItem* item);
-
 
 private:
 			friend class BView;
@@ -73,5 +73,6 @@ private:
 			BView*				fView;
 			BList				fItems;
 };
+
 
 #endif	//	_LAYOUT_H
