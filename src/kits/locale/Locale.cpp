@@ -38,8 +38,5 @@ BLocale::GetString(uint32 id)
 
 		return "";
 	}
-	if (id >= B_LANGUAGE_STRINGS_BASE)
-		return fLanguage->GetString(id);
-
-	return fCountry->GetString(id);
+	return fLanguage->GetString(id);
 }

@@ -30,6 +30,7 @@ enum FormatSeparator {
 };
 
 const uint32 kSettingsContentsModified = 'Scmo';
+const uint32 kClockFormatChange = 'cfmc';
 const uint32 kMenuMessage = 'FRMT';
 
 

@@ -54,6 +54,14 @@ BCountry::BCountry(const char* languageCode, const char* countryCode)
 	fStrings(gStrings)
 {
 	fICULocale = new icu_4_2::Locale(languageCode, countryCode);
+	fICULongDateFormatter = DateFormat::createDateInstance(
+		DateFormat::FULL, *fICULocale);
+ 	fICUShortDateFormatter = DateFormat::createDateInstance(
+		DateFormat::SHORT, *fICULocale);
+	fICULongTimeFormatter = DateFormat::createTimeInstance(
+		DateFormat::MEDIUM, *fICULocale);
+ 	fICUShortTimeFormatter = DateFormat::createTimeInstance(
+		DateFormat::SHORT, *fICULocale);
 }
 
 
@@ -66,11 +74,19 @@ BCountry::BCountry(const char* languageAndCountryCode)
 		DateFormat::FULL, *fICULocale);
  	fICUShortDateFormatter = DateFormat::createDateInstance(
 		DateFormat::SHORT, *fICULocale);
+	fICULongTimeFormatter = DateFormat::createTimeInstance(
+		DateFormat::MEDIUM, *fICULocale);
+ 	fICUShortTimeFormatter = DateFormat::createTimeInstance(
+		DateFormat::SHORT, *fICULocale);
 }
 
 
 BCountry::~BCountry()
 {
+	delete fICULongTimeFormatter;
+	delete fICUShortTimeFormatter;
+	delete fICULongDateFormatter;
+	delete fICUShortDateFormatter;
 	delete fICULocale;
 }
 
@@ -168,9 +184,7 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
 	icu_4_2::DateFormat* timeFormatter;
- 	timeFormatter = DateFormat::createTimeInstance(
-		longFormat ? DateFormat::MEDIUM : DateFormat::SHORT,
-		*fICULocale);
+ 	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
 
@@ -178,8 +192,6 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
-	
-	delete timeFormatter;
 }
 
 
@@ -215,13 +227,24 @@ BCountry::SetDateFormat(const char* formatString, bool longFormat)
 }
 
 
+void
+BCountry::SetTimeFormat(const char* formatString, bool longFormat)
+{
+	icu_4_2::DateFormat* dateFormatter
+		= longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
+	SimpleDateFormat* dateFormatterImpl
+		= static_cast<SimpleDateFormat*>(dateFormatter);
+
+	UnicodeString pattern(formatString);
+	dateFormatterImpl->applyPattern(pattern);
+}
+
+
 bool
 BCountry::TimeFormat(BString& format, bool longFormat) const
 {
 	icu_4_2::DateFormat* dateFormatter;
- 	dateFormatter = DateFormat::createTimeInstance(
-		longFormat ? DateFormat::FULL : DateFormat::SHORT,
-		*fICULocale);
+ 	dateFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	SimpleDateFormat* dateFormatterImpl
 		= static_cast<SimpleDateFormat*>(dateFormatter);
 

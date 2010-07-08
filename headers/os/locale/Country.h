@@ -45,6 +45,8 @@ class BCountry {
 		bool		DateFormat(BString&, bool longFormat) const;
 		void		SetDateFormat(const char* formatString,
 						bool longFormat = true);
+		void		SetTimeFormat(const char* formatString,
+						bool longFormat = true);
 		bool		TimeFormat(BString&, bool longFormat) const;
 		const char*	DateSeparator() const;
 		const char*	TimeSeparator() const;
@@ -85,6 +87,8 @@ class BCountry {
 	private:
 		icu_4_2::DateFormat* fICULongDateFormatter;
 		icu_4_2::DateFormat* fICUShortDateFormatter;
+		icu_4_2::DateFormat* fICULongTimeFormatter;
+		icu_4_2::DateFormat* fICUShortTimeFormatter;
 		const char**	fStrings;
 		icu_4_2::Locale* fICULocale;
 };

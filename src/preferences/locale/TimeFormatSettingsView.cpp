@@ -6,6 +6,8 @@
 
 #include "TimeFormatSettingsView.h"
 
+#include <iostream>
+
 #include <Alert.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -139,7 +141,6 @@ IsSpecialDateChar(char charToTest)
 	return false;
 }
 
-
 // #pragma mark -
 
 
@@ -182,10 +183,17 @@ FormatView::FormatView(BCountry* country)
 	clockBox->SetLabel(B_TRANSLATE("Clock"));
 
 	f24HrRadioButton = new BRadioButton("", B_TRANSLATE("24 hour"),
-		new BMessage(kSettingsContentsModified));
+		new BMessage(kClockFormatChange));
 
 	f12HrRadioButton = new BRadioButton("", B_TRANSLATE("12 hour"),
-		new BMessage(kSettingsContentsModified));
+		new BMessage(kClockFormatChange));
+
+	BString timeFormat;
+	fCountry->TimeFormat(timeFormat, false);
+	if (timeFormat.FindFirst(" a"))
+		f12HrRadioButton->SetValue(1);
+	else
+		f24HrRadioButton->SetValue(1);
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
@@ -414,7 +422,8 @@ FormatView::MessageReceived(BMessage* message)
 				if (item) {
 					separator = fSeparatorMenuField->Menu()->IndexOf(item);
 					if (separator >= 0)
-						//settings.SetTimeFormatSeparator((FormatSeparator)separator);
+						//settings.SetTimeFormatSeparator(
+						//	(FormatSeparator)separator);
 						;
 				}
 
@@ -427,13 +436,49 @@ FormatView::MessageReceived(BMessage* message)
 				notificationMessage.AddInt32("TimeFormatSeparator", separator);
 				notificationMessage.AddBool("24HrClock",
 					f24HrRadioButton->Value() == 1);
-				// tracker->SendNotices(kDateFormatChanged, &notificationMessage);
+				// tracker->SendNotices(kDateFormatChanged,
+				// 	&notificationMessage);
 
 				_UpdateExamples();
 
 				Window()->PostMessage(kSettingsContentsModified);
 				break;
 			}
+
+		case kClockFormatChange:
+		{
+			BString timeFormat;
+			fCountry->TimeFormat(timeFormat, false);
+			if (f24HrRadioButton->Value() == 1) {
+				timeFormat.ReplaceAll("k","h");
+				timeFormat.ReplaceAll("K","H");
+				timeFormat.RemoveAll(" a");
+			} else {
+				timeFormat.ReplaceAll("h","k");
+				timeFormat.ReplaceAll("H","K");
+				timeFormat.Append(" a");
+				f12HrRadioButton->SetValue(true);
+			}
+			std::cout << timeFormat.String() << std::endl;
+			fCountry->SetTimeFormat(timeFormat.String(), false);
+
+			timeFormat.Truncate(0);
+
+			fCountry->TimeFormat(timeFormat, true);
+			if (f24HrRadioButton->Value() == 1) {
+				timeFormat.ReplaceAll("k","h");
+				timeFormat.ReplaceAll("K","H");
+				timeFormat.RemoveAll(" a");
+			} else {
+				timeFormat.ReplaceAll("h","k");
+				timeFormat.ReplaceAll("H","K");
+				timeFormat.Append(" a");
+			}
+			fCountry->SetTimeFormat(timeFormat.String(), true);
+			_UpdateExamples();
+			Window()->PostMessage(kSettingsContentsModified);
+			break;
+		}
 
 		default:
 			BView::MessageReceived(message);
