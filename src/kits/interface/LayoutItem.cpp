@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Haiku, Inc.
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -9,26 +10,36 @@
 #include <LayoutUtils.h>
 
 
-// constructor
 BLayoutItem::BLayoutItem()
-	: fLayout(NULL),
-	  fLayoutData(NULL)
+	:
+	fLayout(NULL),
+	fLayoutData(NULL)
 {
 }
 
-// destructor
+
+BLayoutItem::BLayoutItem(BMessage* from)
+	:
+	BArchivable(BUnarchiver::PrepareArchive(from)),
+	fLayout(NULL),
+	fLayoutData(NULL)
+{
+	BUnarchiver(from).Finish();
+}
+
+
 BLayoutItem::~BLayoutItem()
 {
 }
 
-// Layout
+
 BLayout*
 BLayoutItem::Layout() const
 {
 	return fLayout;
 }
 
-// HasHeightForWidth
+
 bool
 BLayoutItem::HasHeightForWidth()
 {
@@ -36,7 +47,7 @@ BLayoutItem::HasHeightForWidth()
 	return false;
 }
 
-// GetHeightForWidth
+
 void
 BLayoutItem::GetHeightForWidth(float width, float* min, float* max,
 	float* preferred)
@@ -44,14 +55,14 @@ BLayoutItem::GetHeightForWidth(float width, float* min, float* max,
 	// no "height for width" by default
 }
 
-// View
+
 BView*
 BLayoutItem::View()
 {
 	return NULL;
 }
 
-// InvalidateLayout
+
 void
 BLayoutItem::InvalidateLayout()
 {
@@ -59,21 +70,21 @@ BLayoutItem::InvalidateLayout()
 		fLayout->InvalidateLayout();
 }
 
-// LayoutData
+
 void*
 BLayoutItem::LayoutData() const
 {
 	return fLayoutData;
 }
 
-// SetLayoutData
+
 void
 BLayoutItem::SetLayoutData(void* data)
 {
 	fLayoutData = data;
 }
 
-// AlignInFrame
+
 void
 BLayoutItem::AlignInFrame(BRect frame)
 {
@@ -101,7 +112,35 @@ BLayoutItem::AlignInFrame(BRect frame)
 	SetFrame(BLayoutUtils::AlignInFrame(frame, maxSize, alignment));
 }
 
-// SetLayout
+
+status_t
+BLayoutItem::Archive(BMessage* into, bool deep) const
+{
+	BArchiver archiver(into);
+	status_t err = BArchivable::Archive(into, deep);
+
+	if (err == B_OK)
+		err = archiver.Finish();
+
+	return err;
+}
+
+
+status_t
+BLayoutItem::AllArchived(BMessage* into) const
+{
+	BArchiver archiver(into);
+	return BArchivable::AllArchived(into);
+}
+
+
+status_t
+BLayoutItem::AllUnarchived(const BMessage* from)
+{
+	return BArchivable::AllUnarchived(from);
+}
+
+
 void
 BLayoutItem::SetLayout(BLayout* layout)
 {

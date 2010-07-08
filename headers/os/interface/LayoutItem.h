@@ -1,20 +1,22 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_ITEM_H
 #define	_LAYOUT_ITEM_H
 
 #include <Alignment.h>
+#include <Archivable.h>
 #include <Rect.h>
 #include <Size.h>
 
 class BLayout;
 class BView;
 
-class BLayoutItem {
+class BLayoutItem: public BArchivable {
 public:
 								BLayoutItem();
+								BLayoutItem(BMessage* from);
 	virtual						~BLayoutItem();
 
 			BLayout*			Layout() const;
@@ -47,6 +49,11 @@ public:
 			void				SetLayoutData(void* data);
 
 			void				AlignInFrame(BRect frame);
+
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
+	
 	
 private:
 			friend class BLayout;

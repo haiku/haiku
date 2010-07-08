@@ -1,11 +1,12 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_LAYOUT_H
 #define	_LAYOUT_H
 
 #include <Alignment.h>
+#include <Archivable.h>
 #include <List.h>
 #include <Size.h>
 
@@ -13,9 +14,10 @@ class BLayoutItem;
 class BView;
 
 
-class BLayout {
+class BLayout: public BArchivable {
 public:
 								BLayout();
+								BLayout(BMessage* archive);
 	virtual						~BLayout();
 
 			BView*				View() const;
@@ -32,7 +34,7 @@ public:
 
 			BLayoutItem*		ItemAt(int32 index) const;
 			int32				CountItems() const;
-			int32				IndexOfItem(BLayoutItem* item) const;
+			int32				IndexOfItem(const BLayoutItem* item) const;
 			int32				IndexOfView(BView* child) const;
 
 	virtual	BSize				MinSize() = 0;
@@ -48,7 +50,15 @@ public:
 
 	virtual	void				LayoutView() = 0;
 
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
+	virtual status_t			ArchiveLayoutData(BMessage* into,
+									const BLayoutItem* of) const;
+	virtual status_t			RestoreItemAndData(const BMessage* from,
+									BLayoutItem* item);
+
 protected:
+
 // TODO: Since memory allocations can fail, we should return a bool and
 // undo the addition, if false.
 	virtual	void				ItemAdded(BLayoutItem* item);
