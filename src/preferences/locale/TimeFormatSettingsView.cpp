@@ -6,8 +6,6 @@
 
 #include "TimeFormatSettingsView.h"
 
-#include <iostream>
-
 #include <Alert.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -459,7 +457,6 @@ FormatView::MessageReceived(BMessage* message)
 				timeFormat.Append(" a");
 				f12HrRadioButton->SetValue(true);
 			}
-			std::cout << timeFormat.String() << std::endl;
 			fCountry->SetTimeFormat(timeFormat.String(), false);
 
 			timeFormat.Truncate(0);
