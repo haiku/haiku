@@ -25,51 +25,52 @@ using BPrivate::Archiving::BUnarchiveManager;
 
 class BArchivable {
 public:
-							BArchivable(BMessage* from);
-							BArchivable();
-	virtual 				~BArchivable();	
+								BArchivable(BMessage* from);
+								BArchivable();
+	virtual 					~BArchivable();
 
-	virtual	status_t 		Archive(BMessage* into, bool deep = true) const;
-	static 	BArchivable*	Instantiate(BMessage* archive);
+	virtual	status_t 			Archive(BMessage* into, bool deep = true) const;
+	static 	BArchivable*		Instantiate(BMessage* archive);
 
-	virtual status_t		Perform(perform_code d, void* arg);
+	virtual status_t			Perform(perform_code d, void* arg);
 
-	virtual	status_t 		AllUnarchived(const BMessage* archive);
-	virtual	status_t 		AllArchived(BMessage* archive) const;
+	virtual	status_t 			AllUnarchived(const BMessage* archive);
+	virtual	status_t 			AllArchived(BMessage* archive) const;
 
 private:
-	virtual	void _ReservedArchivable3();
+	virtual	void				_ReservedArchivable3();
 
-	uint32 _reserved[2];
+			uint32				_reserved[2];
 };
 
 
 class BArchiver {
 public:
-							BArchiver(BMessage* archive);
-							~BArchiver();
+								BArchiver(BMessage* archive);
+								~BArchiver();
 
-		status_t			AddArchivable(const char* name,
-								BArchivable* archivable, bool deep = true);
+			status_t			AddArchivable(const char* name,
+									BArchivable* archivable, bool deep = true);
 
-		status_t			GetTokenForArchivable(BArchivable* archivable,
-								int32& _token, bool deep = true);
+			status_t			GetTokenForArchivable(BArchivable* archivable,
+									int32& _token, bool deep = true);
 
-		bool				IsArchived(BArchivable* archivable);
-		status_t			Finish();
-		BMessage*			ArchiveMessage() const;
+			bool				IsArchived(BArchivable* archivable);
+			status_t			Finish();
+			BMessage*			ArchiveMessage() const;
 
 private:
 	friend class BArchivable;
 
-							BArchiver(); // not defined
-							BArchiver(const BArchiver&); // not defined
+								BArchiver(); // not defined
+								BArchiver(const BArchiver&); // not defined
 
-		void				RegisterArchivable(const BArchivable* archivable);
+			void				RegisterArchivable(
+									const BArchivable* archivable);
 
-		BArchiveManager*	fManager;
-		BMessage*			fArchive;
-		bool				fFinished;
+			BArchiveManager*	fManager;
+			BMessage*			fArchive;
+			bool				fFinished;
 };
 
 
@@ -100,6 +101,7 @@ public:
 
 	static	bool				IsArchiveManaged(BMessage* archive);
 	static	BMessage*			PrepareArchive(BMessage*& archive);
+
 private:
 	friend class BArchivable;
 

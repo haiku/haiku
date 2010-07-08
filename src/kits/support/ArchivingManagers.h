@@ -14,12 +14,14 @@
 
 #include <Archivable.h>
 
+
 namespace BPrivate {
 namespace Archiving {
 
 extern const char* kArchiveCountField;
 extern const char* kArchivableField;
 extern const char* kTokenField;
+
 
 class BManagerBase {
 public:
@@ -80,11 +82,12 @@ public:
 	static 	BUnarchiveManager*	UnarchiveManager(const BMessage* archive);
 
 protected:
-
 	~BManagerBase()
 	{
 		UnmarkArchive(fTopLevelArchive);
 	}
+
+protected:
 			BMessage*			fTopLevelArchive;
 			manager_type		fType;
 };
@@ -92,21 +95,23 @@ protected:
 
 class BArchiveManager: public BManagerBase {
 public:
-						BArchiveManager(const BArchiver* creator);
+								BArchiveManager(const BArchiver* creator);
 
-			status_t	GetTokenForArchivable(BArchivable* archivable,
-							int32& _token);
+			status_t			GetTokenForArchivable(BArchivable* archivable,
+									int32& _token);
 
-			status_t	ArchiveObject(BArchivable* archivable, bool deep);
+			status_t			ArchiveObject(BArchivable* archivable,
+									bool deep);
 
-			bool		IsArchived(BArchivable* archivable);
+			bool				IsArchived(BArchivable* archivable);
 
-			status_t	ArchiverLeaving(const BArchiver* archiver);
-			void		Acquire();
-			void		RegisterArchivable(const BArchivable* archivable);
+			status_t			ArchiverLeaving(const BArchiver* archiver);
+			void				Acquire();
+			void				RegisterArchivable(
+									const BArchivable* archivable);
 
 private:
-						~BArchiveManager();
+								~BArchiveManager();
 
 			struct ArchiveInfo;
 			typedef std::map<const BArchivable*, ArchiveInfo> TokenMap;
@@ -120,27 +125,29 @@ private:
 
 class BUnarchiveManager: public BManagerBase {
 public:
-					BUnarchiveManager(BMessage* topLevelArchive);
+								BUnarchiveManager(BMessage* topLevelArchive);
 
-	status_t		ArchivableForToken(BArchivable** archivable,
-						int32 token);
+			status_t			ArchivableForToken(BArchivable** archivable,
+									int32 token);
 
-	bool			IsInstantiated(int32 token);
+			bool				IsInstantiated(int32 token);
 
-	void			RegisterArchivable(BArchivable* archivable);
-	status_t		UnarchiverLeaving(const BUnarchiver* archiver);
-	void			Acquire();
+			void				RegisterArchivable(BArchivable* archivable);
+			status_t			UnarchiverLeaving(const BUnarchiver* archiver);
+			void				Acquire();
 
 private:
-					~BUnarchiveManager();
-	status_t		_ExtractArchiveAt(int32 index);
-	status_t		_InstantiateObjectForToken(int32 token);
+								~BUnarchiveManager();
 
-	struct ArchiveInfo;
-	ArchiveInfo*			fObjects;
-	int32					fObjectCount;
-	int32					fTokenInProgress;
-	int32					fRefCount;
+			status_t			_ExtractArchiveAt(int32 index);
+			status_t			_InstantiateObjectForToken(int32 token);
+
+			struct ArchiveInfo;
+
+			ArchiveInfo*		fObjects;
+			int32				fObjectCount;
+			int32				fTokenInProgress;
+			int32				fRefCount;
 };
 
 

@@ -191,13 +191,11 @@ class BMessage::Private {
 				reply, sendTimeout, replyTimeout);
 		}
 
-
 		void*
 		ArchivingPointer()
 		{
 			return fMessage->fArchivingPointer;
 		}
-
 
 		void
 		SetArchivingPointer(void* pointer)

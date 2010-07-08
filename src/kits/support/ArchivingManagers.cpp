@@ -18,7 +18,8 @@ namespace Archiving {
 	const char* kArchiveCountField = "_managed_archive_count";
 	const char* kArchivableField = "_managed_archivable";
 	const char* kTokenField = "_managed_token";
-} }
+}
+}
 
 
 using namespace BPrivate::Archiving;
@@ -111,6 +112,7 @@ BArchiveManager::GetTokenForArchivable(BArchivable* archivable, int32& _token)
 	return B_OK;
 }
 
+
 status_t
 BArchiveManager::ArchiveObject(BArchivable* archivable, bool deep)
 {
@@ -127,9 +129,10 @@ BArchiveManager::ArchiveObject(BArchivable* archivable, bool deep)
 	MarkArchive(info.archive);
 	status_t err = archivable->Archive(info.archive, deep);
 
-	if (err != B_OK)
+	if (err != B_OK) {
 		fTokenMap.erase(archivable);
 			// info.archive gets deleted here
+	}
 
 	return err;
 }
@@ -141,7 +144,7 @@ BArchiveManager::IsArchived(BArchivable* archivable)
 	if (!archivable)
 		return true;
 
-	return (fTokenMap.find(archivable) != fTokenMap.end());
+	return fTokenMap.find(archivable) != fTokenMap.end();
 }
 
 
@@ -149,14 +152,12 @@ status_t
 BArchiveManager::ArchiverLeaving(const BArchiver* archiver)
 {
 	if (archiver == fCreator) {
-
 		// first, we must sort the objects into the order they were archived in
-		typedef std::pair<BMessage*, const BArchivable*> archivePair ;
-		archivePair pairs[fTokenMap.size()];
+		typedef std::pair<BMessage*, const BArchivable*> ArchivePair;
+		ArchivePair pairs[fTokenMap.size()];
 
 		for(TokenMap::iterator it = fTokenMap.begin(), end = fTokenMap.end();
-			it != end; it++) {
-
+				it != end; it++) {
 			ArchiveInfo& info = it->second;
 			pairs[info.token].first = info.archive;
 			pairs[info.token].second = it->first;
@@ -169,8 +170,7 @@ BArchiveManager::ArchiverLeaving(const BArchiver* archiver)
 		status_t err = B_ERROR;
 		int32 count = fTokenMap.size();
 		for (int32 i = 0; i < count; i++) {
-
-			const archivePair& pair = pairs[i];
+			const ArchivePair& pair = pairs[i];
 			err = pair.second->AllArchived(pair.first);
 
 			if (err == B_OK && i > 0) {
@@ -227,6 +227,7 @@ struct BUnarchiveManager::ArchiveInfo {
 
 
 // #pragma mark -
+
 
 BUnarchiveManager::BUnarchiveManager(BMessage* archive)
 	:
@@ -308,7 +309,6 @@ status_t
 BUnarchiveManager::UnarchiverLeaving(const BUnarchiver* unarchiver)
 {
 	if (--fRefCount == 0) {
-
 		fRefCount = -1;
 			// make sure we de not end up here again!
 

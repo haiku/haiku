@@ -295,7 +295,9 @@ BArchivable::AllArchived(BMessage* archive) const
 	return B_OK;
 }
 
+
 // #pragma mark -
+
 
 BArchiver::BArchiver(BMessage* archive)
 	:
@@ -744,8 +746,10 @@ find_instantiation_func(BMessage* archive)
 	return find_instantiation_func(name, signature);
 }
 
+
 // BArchivable binary compatability
 #if __GNUC__ == 2
+
 
 extern "C" status_t
 _ReservedArchivable1__11BArchivable(BArchivable* archivable,
@@ -759,6 +763,7 @@ _ReservedArchivable1__11BArchivable(BArchivable* archivable,
 	return performData.return_value;
 }
 
+
 extern "C" status_t
 _ReservedArchivable2__11BArchivable(BArchivable* archivable,
 	BMessage* archive)
@@ -771,7 +776,9 @@ _ReservedArchivable2__11BArchivable(BArchivable* archivable,
 	return performData.return_value;
 }
 
+
 #elif __GNUC__ > 2
+
 
 extern "C" status_t
 _ZN11BArchivable20_ReservedArchivable1Ev(BArchivable* archivable,
@@ -785,6 +792,7 @@ _ZN11BArchivable20_ReservedArchivable1Ev(BArchivable* archivable,
 	return performData.return_value;
 }
 
+
 extern "C" status_t
 _ZN11BArchivable20_ReservedArchivable2Ev(BArchivable* archivable,
 	BMessage* archive)
@@ -797,7 +805,9 @@ _ZN11BArchivable20_ReservedArchivable2Ev(BArchivable* archivable,
 	return performData.return_value;
 }
 
+
 #endif // _GNUC__ > 2
+
 
 void BArchivable::_ReservedArchivable3() {}
 
