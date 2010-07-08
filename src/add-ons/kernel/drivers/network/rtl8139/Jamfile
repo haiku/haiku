@@ -1,4 +1,4 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
 
-SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 dev ;
-SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 pci ;
+HaikuSubInclude dev ;
+HaikuSubInclude pci ;

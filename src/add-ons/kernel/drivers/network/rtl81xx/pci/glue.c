@@ -1,3 +1,9 @@
+/*
+ * Copyright 2008-2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include <sys/bus.h>
 #include <sys/mutex.h>
 #include <sys/systm.h>
@@ -7,9 +13,11 @@
 
 #include <pci/if_rlreg.h>
 
+
 HAIKU_FBSD_DRIVER_GLUE(rtl81xx, re, pci);
-HAIKU_FBSD_MII_DRIVER(rlphy);
+HAIKU_FBSD_MII_DRIVER(rgephy);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE);
+
 
 int
 HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
@@ -40,4 +48,3 @@ HAIKU_REENABLE_INTERRUPTS(device_t dev)
 	CSR_WRITE_2(sc, RL_IMR, RL_INTRS);
 	RL_UNLOCK(sc);
 }
-
