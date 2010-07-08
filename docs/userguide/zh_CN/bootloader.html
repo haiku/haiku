@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Boot Loader</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../fr/bootloader.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bootloader.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bootloader.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bootloader.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bootloader.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bootloader.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/bootloader.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bootloader.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../pt_PT/bootloader.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../en/bootloader.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h1>Boot Loader</h1>
+
+<p>Haiku 的 Boot Loader 可以在您遇到硬件问题，或者选择启动 Haiku 安装程序时（可以是 Haiku 的安装 CD 或者 USB 介质），给予您极大地帮助。<br />同时，如果某个软件组件导致了系统无法启动，您也可以方便地对其进行移除。下面提到的<i>Disable user add-ons</i> 选项，它可以启动 Haiku，但是不加载用户安装组件，例如：驱动程序。</p>
+<p>为了进入 Boot Loader 选项，您需要在Haiku的启动进程开始时，持续按下 <span class="key">SHIFT</span> 键。如果已经安装了启动管理软件，您可以在进入Haiku启动调用之前开始按下 <span class="key">SHIFT</span> 键。如果Haiku是唯一的操作系统，您可以在BIOS中显示启动消息时就开始按下该按键。</p>
+<p><br /></p>
+<p>进入选项之后，出现了下面四个菜单：</p>
+<table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
+<tr><td><b>Select boot volume</b></td><td> </td><td>选择Haiku的安装介质。</td></tr>
+<tr><td><b>Select safe mode options</b><br />
+</td><td> </td><td>在系统引导中遇到硬件问题时，可以尝试下面的几个选项。当选择条移动到某个选项时，在屏幕底部会显示相应的简短说明。
+<p><i>- Safe mode</i><br />
+<i>- Disable user add-ons</i><br />
+<i>- Disable IDE DMA</i><br />
+<i>- Use fail-safe video mode</i><br />
+<i>- Disable IO-APIC</i><br />
+<i>- Disable LOCAL APIC</i><br />
+<i>- Don't call the BIOS</i><br />
+<i>- Disable APM</i><br />
+<i>- Disable ACPI</i>
+</p></td></tr>
+<tr><td><b>Select debug options</b><br />
+</td><td> </td><td>在这里，你会发现几个选项，它们用于调试或者获取错误报告的详细情况。同时，对于每个选项，在屏幕底部也都会出现相关的说明。
+<p><i>- Enable serial debug output</i><br />
+<i>- Enable on screen debug output</i><br />
+<i>- Enable debug syslog</i>
+</p>
+<p>如果使用了 “debug syslog” 选项，在崩溃，重启之后，系统会显示下面的附加选项：</p>
+<p><i>- Display syslog from previous session</i><br />
+<i>- Save syslog from previous session</i>
+</p></td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>如果你启动了 <i>Use fail-safe video mode</i> 选项， 您可以设置屏幕的分辨率和颜色深度。</td></tr>
+</table>
+<p><br /></p>
+<p>在激活几个选项之后，返回主菜单，继续系统引导。开机界面如下：</p>
+<img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
+
+<p>如果一切运行正常，那么所有的图标都将依此点亮。<br />
+这些不同的符号大致对应了下面的启动步骤：</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>系统组件初始化。</td></tr>
+	<tr><td><b>Disk + magnifier</b></td><td> </td><td>创建文件系统 (<span class="path">/</span>) 和挂载硬件驱动 (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Plug-in card</b></td><td> </td><td>硬件管理初始化。</td></tr>
+	<tr><td><b>Boot disk</b></td><td> </td><td>挂载启动磁盘。</td></tr>
+	<tr><td><b>Chip</b></td><td> </td><td>CPU特定模块加载</td></tr>
+	<tr><td><b>Folder</b></td><td> </td><td>子系统初始化。</td></tr>
+	<tr><td><b>Rocket</b></td><td> </td><td>加载系统启动脚本。</td></tr>
+</table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+    <!-- «  <a href="installation.html">Installing Haiku</a> 
+::  -->
+    <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

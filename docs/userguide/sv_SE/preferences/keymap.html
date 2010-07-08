@@ -34,6 +34,8 @@
 <li><a href="../../es/preferences/keymap.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/keymap.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/keymap.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/keymap.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -76,14 +78,17 @@ When you're done you can save the result from the menu <span class="menu">File |
 <a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h2>
 <p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
 <p>You can dump the current keymap with a command in Terminal:</p>
-<pre class="terminal">keymap -d MyKeymap</pre>
+<pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
 At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
 <p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
-<pre class="terminal">keymap -l MyKeymap</pre>
+<pre class="terminal">keymap -s &lt; MyKeymap</pre>
+<p>If you'd like to import this keymap into the Keymap panel, you have to compile it first to a binary format:</p>
+<pre class="terminal">keymap -c &lt; MyKeymap</pre>
+<p>This will produce a file <span class="cli">keymap.out</span> which you can load into Keymap via its <span class="menu">Open...</span> menu. By the way, the keymap command is able to load this binary format as well: <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
 
-<pre>#!/bin/keymap -l
+<pre>#!/bin/keymap -s
 #
 #	Raw key numbering for 101 keyboard...
 #                                                                                    
@@ -194,7 +199,7 @@ Key 0x2e = 'i'      'I'      0x09     ' '      ''       'I'      'i'      ' '   
 Key 0x2f = 'o'      'O'      0x0f     ' '      ''       'O'      'o'      ' '      ''       
 Key 0x30 = 'p'      'P'      0x10     ' '      ''       'P'      'p'      ' '      ''       
 Key 0x31 = 0xc3bc   0xc39c   0x1b     ' '      ''       0xc39c   0xc3bc   ' '      ''       
-Key 0x32 = '+'      '*'      0x1d     '~'      ''       '*'      '+'      '~'      ''       
+Key 0x32 = ' '      '*'      0x1d     '~'      ''       '*'      ' '      '~'      ''       
 Key 0x33 = '#'      '\''     0x1c     ' '      ''       '\''     '#'      ' '      ''       
 Key 0x34 = 0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     0x7f     
 Key 0x35 = 0x04     0x04     0x04     0x04     0x04     0x04     0x04     0x04     0x04     
@@ -202,7 +207,7 @@ Key 0x36 = 0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c     0x0c  
 Key 0x37 = 0x01     '7'      0x01     0x01     '7'      0x01     '7'      0x01     '7'      
 Key 0x38 = 0x1e     '8'      0x1e     0x1e     '8'      0x1e     '8'      0x1e     '8'      
 Key 0x39 = 0x0b     '9'      0x0b     0x0b     '9'      0x0b     '9'      0x0b     '9'      
-Key 0x3a = '+'      '+'      '+'      '+'      '+'      '+'      '+'      '+'      '+'      
+Key 0x3a = ' '      ' '      ' '      ' '      ' '      ' '      ' '      ' '      ' '      
 Key 0x3b = ''       ''       ''       ''       ''       ''       ''       ''       ''       
 Key 0x3c = 'a'      'A'      0x01     ' '      ''       'A'      'a'      ' '      ''       
 Key 0x3d = 's'      'S'      0x13     ' '      ''       'S'      's'      ' '      ''       

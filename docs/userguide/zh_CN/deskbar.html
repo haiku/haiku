@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Deskbar（桌面栏）</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../fr/deskbar.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/deskbar.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/deskbar.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/deskbar.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/deskbar.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/deskbar.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/deskbar.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/deskbar.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../pt_PT/deskbar.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../en/deskbar.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filetypes.html">Filetypes</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>索引</td></tr>
+<tr class="index"><td>
+	<a href="#deskbar-menu">桌面栏菜单</a><br />
+	<a href="#tray">托盘</a><br />
+	<a href="#list-of-apps">运行程序列表</a>
+</td></tr>
+</table>
+
+<h1>Deskbar（桌面栏）</h1>
+
+<p>桌面栏是默认放置在屏幕右上角的小面板。它类似于windows的带着开始菜单的任务栏。它包含了桌面栏菜单，而通过它您可以启动应用程序和设置程序，时钟托盘和其他托盘程序程序，以及当前正在运行程序得列表。</p>
+<img src="../images/deskbar-images/positions.png" alt="positions" />
+<p>你通过把鼠标点击在系统托盘有纹饰的一侧，然后进行拖拽，把桌面栏移动到屏幕的任意角落或者展开放置在屏幕的顶部和底部边界；你也自己设计一个更紧凑的菜单布局，然后把它拖拽至桌面栏菜单。</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="deskbar-menu" name="deskbar-menu">桌面栏菜单</a></h2>
+<p>点击桌面栏顶部会打开一个菜单：</p>
+<img src="images/deskbar-images/deskbar.png" alt="deskbar.png" />
+<ul>
+<li><p><b>About This System...</b> - 展示了有关Haiku操作系统，Haiku项目的许可证和致谢名单等的基本信息。</p></li>
+
+<li><p><b>Find...</b> - 打开 <a href="queries.html">查询</a> 会话框。</p></li>
+<li><p><b>Show Replicants</b> - 显示或者隐藏  <a href="gui.html#replicants">Replicant</a> 微控件，您可以对它进行随意的拖动，删除或者访问它的快捷菜单。</p></li>
+<li><p><b>Mount</b> - 提供了和右键点击桌面时相同的选项。（详细介绍请查阅 <a href="tracker.html#mounting-volumes">挂载磁卷</a>）。</p></li>
+<li><p><b>Deskbar Preferences...</b> - 打开桌面栏的首选项面板（详情见下面的介绍）。</p></li>
+<li><p><b>Shutdown</b> - 提供了<span class="menu">重启</span> 和 <span class="menu">关机</span> 选项。</p></li>
+<li><p><b>Recent Documents, Folders, Applications</b> - 显示最近打开的文档，文件夹和应用程序 (详情见下面的 <span class="menu">桌面栏首选项</span> 介绍)。</p></li>
+<li><p><b>Applications, Demos, Deskbar Applets, Preferences</b> - 分别列出了所有安装的应用程序，演示程序，小程序和首选项（详情见下面的 <span class="menu">桌面栏首选项</span> 介绍）。</p></li>
+</ul>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>桌面栏首选项</h3>
+<img src="images/deskbar-images/configure.png" alt="configure.png" />
+<ul>
+<li><p><b>菜单</b><br />
+Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
+The button <span class="button">Edit Menu...</span> opens the folder <span class="path">/boot/home/config/be/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar Applets</span>, and <span class="menu">Preferences</span>.<br />
+You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p></li>
+<li><p><b>窗口</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Always on Top（置顶）</span></td><td> </td><td>桌面栏将会总是置顶放置。</td></tr>
+<tr><td><span class="menu">Auto Raise（自动）</span></td><td> </td><td>鼠标点击之后桌面栏在前端显示。</td></tr>
+</table></li>
+<li><p><b>应用程序</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">Sort Running Applications</span></td><td> </td><td>Sorts the list of running programs alphabetically.</td></tr>
+<tr><td><span class="menu">Tracker always First</span></td><td> </td><td>Even if you sort alphabetically, the Tracker entry always stays first in the list.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Show Application Expander</span></td><td> </td><td>Provides a small widget to show/hide all windows of a program directly under its entry in the Deskbar.</td></tr>
+<tr><td><span class="menu">Expand New Applications</span></td><td> </td><td>Newly launched programs have their windows automatically expanded under their entry in the Deskbar.</td></tr>
+</table></li>
+<li><p><b>时钟</b></p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+<tr><td><span class="menu">24 Hour Clock</span></td><td> </td><td>Toggles between 24 and 12 hour clock.</td></tr>
+<tr><td><span class="menu">Show Seconds</span></td><td> </td><td>Adds the display of seconds to the clock.</td></tr>
+<tr><td><span class="menu">European Date</span></td><td> </td><td>Shows the date in European format: day-month-year</td></tr>
+<tr><td><span class="menu">Full Date</span></td><td> </td><td>Shows a long version of the date. Only available when the Deskbar is placed as a bar along the top or bottom edge of the screen.</td></tr>
+</table></li>
+</ul>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tray" name="tray">系统托盘</a></h2>
+<img src="images/deskbar-images/calendar.png" alt="calendar.png" />
+<p>Among other things, the tray is housing the clock. Left-click it to toggle between date and time. Right-click it to hide/show it or launch the <a href="preferences/time.html">Time</a> preferences to set it.<br />
+Here you can also launch a calendar that also appears, when you hold down the left mouse button on the clock for a little time.</p>
+<p>Any program can install an icon in the tray to provide an interface to the user. The email system, for instance, shows a different symbol when there's unread mail and offers a context menu to e.g. create or check for new mail. <span class="app">ProcessController</span> is another example that uses its icon in the tray to provide information (CPU/memory usage) and to offer a context menu.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="list-of-apps" name="list-of-apps">运行程序</a></h2>
+<img src="images/deskbar-images/list-of-apps.png" alt="list-of-apps.png" />
+<p>You can change to a specific running application by clicking on its entry in the Deskbar and choosing (one of) its windows, from the submenu. By right-clicking you can minimize or close a window or the entire application.</p>
+<p>If you activated Expanders in the Deskbar settings, you can expand/collapse the list of windows directly under an application's entry.</p>
+<p>In front of every application's windows is a symbol providing info on its state. A bright symbol means a window is visible, a dark one that it's minimized. Three lines in front of a symbol shows that it's not on the current workspace.</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="tracker-add-ons.html">Tracker Add-Ons</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="filetypes.html">Filetypes</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

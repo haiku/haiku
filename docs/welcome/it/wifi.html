@@ -10,6 +10,8 @@
  * Authors:
 * 		Matt Madia who wrote http://www.haiku-os.org/guides/wifi 
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		MichaelPeppers
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -21,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guida dell'utente</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +37,8 @@
 <li><a href="../sv_SE/wifi.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../jp/wifi.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/wifi.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/wifi.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/wifi.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../en/wifi.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -45,45 +49,45 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
-<h2>Wifi in Haiku</h2>
+<h2>Il Wifi in Haiku</h2>
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="hardware" rel="nofollow" id="hardware">Expected supported hardware</a></h3>
-<p>All of FreeBSD 8 wlan drivers should be working. Any PCMCIA, CardBus, ExpressCard, USB or ISA based cards will not work. Only PCI, miniPCI, PCI-Express, miniPci-Express and PCI-X are supposed to work.<br />
-This includes:
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="indice" /></a>
+<a name="hardware" rel="nofollow" id="hardware">Hardware che dovrebbe essere supportato</a></h3>
+<p>Tutti i driver wlan forniti da FreeBSD 8 dovrebbero funzionare. Qualunque scheda basata su PCMCIA, CardBus, ExpressCard, USB o ISA non funzionerà. Solo PCI, miniPCI, PCI-Express, miniPci-Express e PCI-X sono probabilmente funzionanti.<br />
+I driver disponibili includono:
 </p>
 <ul>
-<li><p><i>aironetwifi</i> supporting at least<br />
-Cisco Aironet 350 Series<br />
+<li><p><i>aironetwifi</i>, supporta almeno<br />
+La serie Cisco Aironet 350<br />
 Aironet PCI4500<br />
 Aironet PCI4800<br />
 </p></li>
-<li><p><i>atheroswifi</i> supporting almost every chipset outthere (though no AR9285 chips)</p></li>
-<li><p><i>broadcom43xx</i> supporting<br />
-BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
+<li><p><i>atheroswifi</i>, supporta quasi tutti i chipset Atheros in commercio (ma non i chip AR9285)</p></li>
+<li><p><i>broadcom43xx</i>, supporta i chipset<br />
+BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 e BCM4318
 </p></li>
-<li><p><i>iprowifi2100</i> supporting the 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting<br />
+<li><p><i>iprowifi2100</i>, supporta i chip 2100</p></li>
+<li><p><i>iprowifi2200</i>, supporta<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting the 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting the 4965 chips</p></li>
-<li><p><i>marvell88w8335</i> supporting<br />
+<li><p><i>iprowifi3945</i>, supporta i chip 3945</p></li>
+<li><p><i>iprowifi4965</i>, supporta i chip 4965</p></li>
+<li><p><i>marvell88w8335</i>, supporta<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
 </p></li>
-<li><p><i>marvell88w8363</i> supporting the 88W8363 chips</p></li>
-<li><p><i>ralinkwifi</i> supporting<br />
+<li><p><i>marvell88w8363</i>, supporta i chip 88W8363</p></li>
+<li><p><i>ralinkwifi</i>, supporta<br />
 RT2560<br />
 RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p><i>wavelanwifi</i> supporting at least<br />
+<li><p><i>wavelanwifi</i>, supporta almeno<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
 Intersil Prism3<br />
@@ -123,9 +127,9 @@ Addtron AWA-100 PCI
 <a name="wpa" rel="nofollow" id="wpa">WPA encryption</a></h3>
 <p>At the moment there is no WPA encryption available in Haiku. However, there is some <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">preliminary and unfinished code for implementing WPA</a><span class="ext"></span> available. Some tasks for improving this is to plug it into the wpa_supplicant build process and then fixing compile &amp; runtime issues.</p>
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="indice" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<p>Per installare il firmware per le schede ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, dovete far partire lo script</p>
 <pre class="terminal">install-wifi-firmwares.sh
 </pre>
 <p>The Intel ipw2100 and ipw22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>

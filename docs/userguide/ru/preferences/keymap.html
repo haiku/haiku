@@ -12,6 +12,8 @@
  * Translators:
  *		Michael Smirnov
  *		Diver
+ *		Humdinger
+ *		Rustam Islamov
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,6 +39,8 @@
 <li><a href="../../sv_SE/preferences/keymap.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/keymap.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/keymap.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/keymap.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -64,8 +68,8 @@
 <p>Кроме того, имеются знаковые клавиши, которые отмечены синим фоном, их называют <i>"мёртвыми" клавишами</i> - они могут изменить вид следующих вводимых после них символов. Если кликнуть по "мертвой" клавише мышкой, то клавиши, на которые она влияет, подсветятся желтым цветом, а второй клик вернёт их в обычное состояние. Примеры: é, ñ, ó или ë.</p>
 <p>Под клавиатурой представлены еще две опции:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Выбор мёртвых клавиш (Select dead keys)</span></td><td> </td><td>для настройки вышеупомянутых знаковых синих клавиш.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Переключение горячих клавиш (Switch shortcut key)...</span></td><td> </td><td>для использования горячих клавиш в Windows/Linux  режиме (клавише <span class="key">CONTROL</span> соответствует <span class="key">CTRL</span>) или в Haiku режиме (клавише <span class="key">COMMAND</span> соответствует <span class="key">ALT</span>).</td></tr>
+<tr><td><span class="menu">Выбор мёртвых клавиш</span></td><td> </td><td>для настройки вышеупомянутых знаковых синих клавиш.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Переключить раскладку в режим...</span></td><td> </td><td>для использования горячих клавиш в Windows/Linux  режиме (клавише <span class="key">CONTROL</span> соответствует <span class="key">CTRL</span>) или в Haiku режиме (клавише <span class="key">COMMAND</span> соответствует <span class="key">ALT</span>).</td></tr>
 </table>
 <p>В списке слева доступны предварительно сконфигурированные системные раскладки, а под ними, если такие имеются, пользовательские. Вы можете изменять раскладку, перетаскивая мышкой клавиши на клавиатуре - левой кнопкой клавиша скопируется, а правой -  поменяется местами.<br />
 Когда все изменения произведены, то результат можно сохранить через меню <span class="menu">Файл | Сохранить... </span>, и ваша пользовательская раскладка появится в соответствующем списке, если сохраненние произведено в папку <span class="path">~/config/settings/Keymap/</span>, иначе нужно вручную открыть её через меню <span class="menu">Файл | Открыть...</span>.</p>
@@ -82,10 +86,13 @@
 <p>Сгенерированный текстовый файл может быть открыт в любом текстовом редакторе, в котором используется моноширный шрифт, иначе файл будет нечитабельным.<br />
 Вначале этого файла вы увидите приблизительное изображение клавиатуры с HEX значениями для каждой клавиши, а ниже находится их фактическая привязка. Вы можете менять все настройки, которые доступны через панель настроек клавиатурной раскладки, но также и много других. Если у вас на клавиатуре имеются дополнительные клавиши, то вы можете активировать их и использовать в качестве обычных клавиш или как опциональную или контрольную клавишу. Например, можно с помощью мультимедийных клавиш уменьшать/увеличивать громкость или же запускать какое-либо приложение. Для этого рекомендуется использовать программу <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
 <p>После окончания правки и сохранения файла загрузите в систему измененную раскладку следующей командой:</p>
-<pre class="terminal">keymap -l MyKeymap</pre>
+<pre class="terminal">keymap -s &lt; MyKeymap</pre>
+<p>Если вы хотите использовать её в настройках Раскладки, вам сначала следует скомпилировать её в бинарный формат, следующей командой:</p>
+<pre class="terminal">keymap -c &lt; MyKeymap</pre>
+<p>После этого появится файлы <span class="cli">keymap.out</span>, который можно загрузить в настройке Раскладки при помощи пункта меню <span class="menu">Открыть... (Open...)</span>. Также, раскладку возможно загрузить из командной строки, следующей командой: <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>Далее представлен сформированный файл раскладки (на изображении клавиатуры клавиши младшего разряда исключены для более лучшего восприятия на этой странице):</p>
 
-<pre>#!/bin/keymap -l
+<pre>#!/bin/keymap -s
 #
 #	Raw key numbering for 101 keyboard...
 #                                                                                    

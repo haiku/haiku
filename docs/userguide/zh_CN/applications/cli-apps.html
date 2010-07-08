@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Commandline Applications（命令行程序）</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../../fr/applications/cli-apps.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/applications/cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/cli-apps.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../pt_PT/applications/cli-apps.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+<a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Commandline applications（命令行程序）</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>位置：</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+</table>
+<p><br /></p>
+<p>所有Haiku附带的命令行程序都放置在 <span class="path">/boot/system/bin</span> 或者 <span class="path">/boot/common/bin</span> 目录。您自己的或另行安装的命令行程序应该放置在 <span class="path">~/config/bin</span> 目录。所有这些位置都是 PATH 变量的一部分，而且是自动查询的。<br />
+下面给出的列表并没有包含所有的用于 Haiku 的命令行程序，它只是给出了最常用的几个以方便您的尝试使用。您需要勇敢地去探索 <span class="path">bin/</span> 文件夹中的命令。以 <tt>--help</tt> 参数来运行命令行程序，这样会给出该命令的用途和相应的参数选项。</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-attributes" name="cli-attributes">关于文件属性的命令： <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>这些命令用于显示，读取，添加和删除文件的属性；需要注意的是，这些元数据仅仅可用于BFS格式的磁盘和分区，而且移动文件到其他的文件系统将会把其相关的属性移除！<br />
+上面的命令在 <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a> 会有相关的描述。</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-index" name="cli-index">关于文件索引的命令：<span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>利用这些命令，您可以 list, make, reindex and remove attributes to BFS' index. 每个卷都有自己的索引，所以在不同的卷之间拷贝文件时尤其要注意。<br />上述这些命令在 <a href="../index.html">Index</a> 主题中会有详细的描述。</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-scripting" name="cli-scripting">有用的脚本命令</a></h3>
+<p>下面是一些非常有用的命令行工具，尤其适用于撰写脚本（详情请参阅 <a href="../bash-scripting.html">Bash and Scripting</a>）。</p>
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
+<p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+<pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+</td></tr>
+<tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
+</td></tr></table>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-other" name="cli-other">Other commands</a></h3>
+
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
+		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add the volume or device name and it'll run through every file and correct inconsistencies where possible.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+</td></tr>
+<tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add <span class="app">Screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+<pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
+"cmd=Remove replicant:desklink --remove=Screenshot" /boot/system/apps/Screenshot
+</pre>
+<p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
+</td></tr></table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+<a href="../applications.html#cli-apps" class="uplink">应用程序</a> 
+</span></div>
+</div>
+
+</body>
+</html>

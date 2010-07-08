@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		miguel~1.mx
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -36,6 +37,8 @@
 <li><a href="../../sv_SE/preferences/keymap.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/keymap.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/keymap.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/keymap.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -80,10 +83,13 @@ Cuando haya terminado puede guardar el resultado desde el menú <span class="men
 <p>El archivo de texto generado puede usarse luego en un editor de texto. Asegúrese de usar un tipo de letra monoespaciado en ese editor o nunca se comprenderá intuitivamente ese archivo...<br />
 Al inicio del citado archivo, se encontrará una leyenda del teclado estilizado con el valor hexadecimal correspondiente a cada tecla. Debajo de eso están las asignaciones reales de cada valor. Puede hacer toda la personalización que esté también disponible desde el panel de preferencias Distribución de teclado, y algo más. Esto es, usarlos como teclas ordinarias o como una tecla Option o Control. No será capaz de, por ejemplo, hacer que las teclas multimedia incrementen o decrementen el volumen o iniciar alguna aplicación. Para ello se puede usar, p. ej., a <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
 <p>Cuando termine, guardará el archivo y hará que el sistema cargue la distribución de teclado modificada con este comando:</p>
-<pre class="terminal">keymap -l MyKeymap</pre>
+<pre class="terminal">keymap -s &lt; MyKeymap</pre>
+<p>Si quisiera importar esta distribución dentro del panel Distribución de teclado, tiene que compilarla primero en un formato binario:</p>
+<pre class="terminal">keymap -c &lt; MyKeymap</pre>
+<p>Esto producirá un archivo <span class="cli">keymap.out</span> el cual se puede cargar mediante el menú <span class="menu">Open...</span> (Abrir). Por cierto, el comando keymap es capaz de cargar también este formato binario: <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>Este es el archivo arrojado (las teclas en extrema derecha del teclado estilizado se cortan para un desplegado más agradable en esta página):</p>
 
-<pre>#!/bin/keymap -l
+<pre>#!/bin/keymap -s
 #
 #	Raw key numbering for 101 keyboard...
 #                                                                                    

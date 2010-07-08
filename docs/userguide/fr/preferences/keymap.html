@@ -12,6 +12,7 @@
  * Translators:
  *		Loïc
  *		Vincent Duvert
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,6 +38,8 @@
 <li><a href="../../sv_SE/preferences/keymap.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/keymap.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/keymap.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/keymap.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -78,14 +81,17 @@ Quand vous aurez fini, vous pourrez enregistrer le fichier résultant avec le me
 <a id="advanced-keymapping" name="advanced-keymapping">Manipulation avancées sur la disposition du clavier</a></h2>
 <p>Il existe une autre méthode pour personnaliser votre disposition de clavier. Vous devez pour cela éditer un fichier contenant un grand nombre de valeurs hexadécimales, ce qui peut apparaître compliqué au premier abord, mais qui n’est pas impossible à réaliser.</p>
 <p>Vous pouvez décompiler la disposition courante de clavier à l’aide ce cette commande de Terminal :</p>
-<pre class="terminal">keymap -d MyKeymap</pre>
+<pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>Le fichier généré peut être ouvert dans un éditeur de texte. Utilisez de préférence une police de pas fixe pour l’affichage…<br />
 Au début de ce fichier, vous trouverez une représentation de clavier avec les valeurs hexadécimales correspondant à chaque touche. À la suite sont indiquées les assignations de touches pour chaque valeur. Vous pouvez donc y effectuer toutes les personnalisations disponibles depuis le panneau de préférences Keymap, et bien plus. Si vous avez des touches spéciales sur votre clavier, vous devriez pouvoir les faire fonctionner en éditant ce fichier. Toutefois, elle fonctionneront comme des touches ordinaires ou comme touches modificatrices. Vous ne pourrez pas, par exemple, utiliser vos touches multimédia pour augmenter/réduire le volume ou lancer des applications. Pour cela, vous aurez besoin de <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
 <p>Lorsque vous avez terminé, vous pouvez enregistrer le fichier, et activer la nouvelle disposition du clavier avec cette commande :</p>
-<pre class="terminal">keymap -l MyKeymap</pre>
+<pre class="terminal">keymap -s &lt; MyKeymap</pre>
+<p>Si vous voulez importer cette disposition de clavier dans le panneau de préférence Keymap, vous devez au préalable le compiler dans un format binaire :</p>
+<pre class="terminal">keymap -c &lt; MyKeymap</pre>
+<p>Le fichier <span class="cli">keymap.out</span> ainsi généré pourra être chargé dans Keymap via le menu <span class="menu">Open...</span>. Soit dit en passant, la commande keymap peut aussi charger ce fichier binaire : <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>Voici un fichier décompilé (les touches les plus à droite du clavier représenté ont été coupées pour améliorer l’affichage de cette page) :</p>
 
-<pre>#!/bin/keymap -l
+<pre>#!/bin/keymap -s
 #
 #	Raw key numbering for 101 keyboard...
 #                                                                                    

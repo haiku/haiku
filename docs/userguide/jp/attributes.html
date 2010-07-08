@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -34,6 +36,8 @@
 <li><a href="../es/attributes.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../sv_SE/attributes.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../uk/attributes.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/attributes.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/attributes.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../en/attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -74,7 +78,7 @@
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
 <p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
-<pre>usage: listattr 'filename' ['filename' ...]</pre>
+<pre>使い方: listattr 'filename' ['filename' ...]</pre>
 <p>From our screenshot example above:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
@@ -111,7 +115,7 @@ MIME String         21  "BEOS:TYPE"
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="catattr" name="catattr">catattr</a></h3>
 <p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
-<pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
+<pre>使い方: catattr [--raw|-r] attr_name file1 [file2...]</pre>
 <p>Again our example:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
 Clara Botters : string : Whelton</pre>
@@ -120,13 +124,13 @@ Clara Botters : string : Whelton</pre>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
 <p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
-<pre>usage: addattr [-t type] attr value file1 [file2...]
-    or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
+<pre>使い方: addattr [-t type] attr value file1 [file2...]
+    または: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
-         Type is one of:
+         タイプは次のうちのいずれか1つです:
                  string, mime, int, llong, float, double, bool, raw
-                 or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
-         The default is "string"</pre>
+                 または数値です（例: 0x1234, 42, 'ABCD', ...)
+         デフォルトは"string"です。</pre>
 <p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
@@ -135,9 +139,9 @@ Clara Botters : string : Whelton</pre>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
 <p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
 
-<pre>usage: rmattr [-p] attr filename1 [filename2...]
-         'attr' is the name of an attribute of the file
-         If '-p' is specified, 'attr' is regarded as a pattern.</pre>
+<pre>使い方: rmattr [-p] attr filename1 [filename2...]
+         'attr'はそのファイル属性の名前です。
+         '-p'が指定されると、'attr'はパターンとみなされます。</pre>
 <p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
@@ -145,7 +149,7 @@ Clara Botters : string : Whelton</pre>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
 <p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
-<pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
+<pre>使い方: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
 <p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
 

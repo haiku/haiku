@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2009, Haiku. All rights reserved.
+ * Copyright 2008-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,8 @@
 <li><a href="../es/applications.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
 <li><a href="../jp/applications.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../uk/applications.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../zh_CN/applications.html"><img src="../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../pt_PT/applications.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../en/applications.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -77,7 +79,7 @@ Topics <a href="deskbar.html">Deskbar</a> or <a href="desktop-applets/launchbox.
 <a id="uninstall" name="uninstall">Att avinstallera applikationer</a></h2>
 <p>Om installationen sköttes av ett installationsskript finns det troligtvis ett avinstallationsskript också. I så fall, dubbelklicka på det så är det klart.<br />
 Annars avinstalleras applikationen enkelt genom att radera dess mapp.</p>
-<p>This, of course, leaves back possible configuration files in your <span class="path">~/config/settings</span> folder. This may be on purpose, if you want to keep those settings in case you'll install the program again in the future. Also, when the installation involved those "<span class="cli">drag [filename] here...</span>" folders, those files are also left behind.</p>
+<p>Detta kan eventuellt lämna kvar konfigurations filer i din <span class="path">~/config/settings</span> mapp. Detta kan vara med avsikt, ifall du vill spara inställningarna om en framtida installation av programmet önskas. Även när installationen visar dessa "<span class="cli">drag [filename] here...</span>" mappar, lämnas dessa filer kvar.</p>
 <p>One method to quickly get to all the app's files is to do a quick query for a significant part of the application's name. This will reveal the app's binary, its installation folder and its settings as well as possible links in the Deskbar etc. Simply select all relevant files and delete them.</p>
 
 <h2>
@@ -141,10 +143,18 @@ Annars avinstalleras applikationen enkelt genom att radera dess mapp.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-apps" name="cli-apps">Haiku's commandline applications</a></h2>
+<p>Besides the normal commandline tools coming with the bash shell or are necessary to be POSIX compliant, there are a few Haiku-specific commandline applications worth mentioning. These commands are often useful for scripting purposes, see also topic <a href="bash-scripting.html">Bash and Scripting</a>.</p>
+<table summary="layout" border="0" cellpadding="2" cellspacing="0">
+		<tr><td style="width:24px;"><img src="../images/apps-images/cli-app-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/cli-apps.html">Commandline applications</a></td><td> </td></tr>
+</table>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list-of-bundled-apps" name="list-of-bundled-apps">Medskickade applikationer</a></h2>
 <p>Förutom applikationerna i listan ovan, som alla utvecklas av Haikuprojektet, finns det några få viktiga applikationer som skickas med som standard i en Haikuinstallation. Buggrapporter och förslag på funktioner för dessa måste skickas till respektive utvecklare.</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td> </td>
+		<tr><td style="width:24px;"><img src="../images/apps-images/bepdf-icon_16.png" alt="icon" width="16" height="16" /></td><td><a href="applications/bepdf.html">BePDF</a></td><td style="width:10px;"> </td>
 		<td valign="top">En <acronym title="Portable Document Format">PDF</acronym>-läsare.</td></tr>
 <!--	<tr><td style="width:24px;"><img src="../images/apps-images/bezillabrowser-icon_16.png" alt="icon" width="16" height="16" /></td><td _translation_id="270"><a href="applications/bezillabrowser.html">BeZillaBrowser</a></td><td> </td>
 		<td valign="top" _translation_id="271">A web browser based on Mozilla's source code.</td></tr> -->

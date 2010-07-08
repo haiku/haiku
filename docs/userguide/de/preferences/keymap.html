@@ -36,6 +36,8 @@
 <li><a href="../../sv_SE/preferences/keymap.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
 <li><a href="../../jp/preferences/keymap.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
 <li><a href="../../uk/preferences/keymap.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/keymap.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/keymap.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
 <li><a href="../../en/preferences/keymap.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
@@ -77,14 +79,17 @@ Abschließend lässt sich das Ergebnis mittels <span class="menu">File | Save...
 <a id="advanced-keymapping" name="advanced-keymapping">Fortgeschrittene Änderungen von Tastaturlayouts</a></h2>
 <p>Neben dem Keymap Panel existiert noch eine weitere Möglichkeit sein Tastaturlayout zu individualisieren. Dabei wird eine Textdatei mit einer Unmenge HEX-Werten bearbeitet, was auf den ersten Blick erstmal erschreckt, aber grundsätzlich begreifbar ist.</p>
 <p>Das aktuelle Layout lässt sich mit einem Befehl im Terminal ausgeben:</p>
-<pre class="terminal">keymap -d MyKeymap</pre>
+<pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>Die so generierte Textdatei lässt sich anschließend in einem Texteditor öffnen. Hier sollte man auf alle Fälle eine Schrift mit fester Breite verwenden, sonst findet man sich hier bestimmt nicht zurecht...<br />
 Am Anfang der Datei befindet sich die Legende für eine stilisierte Tastatur mit den entsprechenden HEX-Werten für jede Taste. Darunter folgen die eigentlichen Zuweisungen der einzelnen Werte. Hiermit lässt sich all das ändern, was auch mit den Keymap Einstellungen möglich ist, und noch mehr. Besitzt die eigene Tastatur spezielle Tasten, lassen sie sich hier u.U. aktivieren. Zumindest als normale Tasten oder weitere Option- oder Control-Taste. Dadurch kann man immer noch nicht z.B. Multimediatasten zum lauter/leiser machen benutzen oder um bestimmte Anwendungen zu starten. Dazu existiert z.B. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
 <p>Ist man fertig, wird die Datei abgespeichert und das geänderte Layout mit diesem Befehl geladen:</p>
-<pre class="terminal">keymap -l MyKeymap</pre>
+<pre class="terminal">keymap -s &lt; MyKeymap</pre>
+<p>Möchte man dieses Layout in der Keymap Anwendung importieren, muss es erst in ein Binärformat konvertiert werden:</p>
+<pre class="terminal">keymap -c &lt; MyKeymap</pre>
+<p>Das erzeugt eine Datei <span class="cli">keymap.out</span> die man in Keymap über das <span class="menu">Open...</span> Menü öffnen kann. Der Konsolenbefehl keymap kann so eine Binärdatei übrigends auch laden: <span class="cli">keymap -l &lt; keymap.out</span></p>
 <p>So sieht die ausgegebene Datei aus (die ganz rechten Tasten wurden hier ausgeblendet, damit es besser auf die Seite passt):</p>
 
-<pre>#!/bin/keymap -l
+<pre>#!/bin/keymap -s
 #
 #	Raw key numbering for 101 keyboard...
 #                                                                                    

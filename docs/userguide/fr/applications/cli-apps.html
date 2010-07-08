@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 
+ *
+ * Copyright 2010, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Loïc
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Programmes en ligne de commande</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Guide de l’utilisateur</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/fr.png" alt="" /> Français</li>
+<li><a href="../../de/applications/cli-apps.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/applications/cli-apps.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/applications/cli-apps.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/applications/cli-apps.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/applications/cli-apps.html"><img src="../../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../../jp/applications/cli-apps.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/applications/cli-apps.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/applications/cli-apps.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/applications/cli-apps.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../en/applications/cli-apps.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+<a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">Cette page n'est pas encore entièrement traduite. Les parties non encore traduites seront en anglais.</div>
+
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Programmes en ligne de commande</h2>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Localisation :</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+</table>
+<p><br /></p>
+<p>Vous trouverez tous les programmes en ligne de commande livrés avec Haiku soit 
+dans <span class="path">/boot/system/bin</span>, soit dans  <span class="path">/boot/common/bin</span>.
+Ces répertoires faisant tous partie de la variable PATH, l'emplacement d'un programme est donc automatiquement détecté.<br /> Ce qui suit n'est pas une liste exhaustive de tous les programmes en ligne de commande spécifiques à Haiku, mais juste un mise en évidence des quelques commandes les plus utiles pour vous en donnez un aperçu. N'hésitez pas à explorer le contenu du dossier <span class="path">bin/</span>. En exécutant un programme avec le paramètre <tt>--help</tt>, vous verrez comment utiliser cette commande, ainsi que le détail de toutes ses différentes options.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-attributes" name="cli-attributes">Concernant les attributs : <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>Ces commandes sont utilisées pour afficher, lire, ajouter et supprimer des attributs de fichiers. Rappelez-vous que ces méta-données ne sont actuellement disponibles que sur les volumes formatés en BFS. Si vous déplacez un fichier vers un autre systèmes de fichiers, vous perdrez tous les attributs !<br />
+Toutes ces commandes sont décrites dans le sujet consacré aux <a href="../attributes.html#attributes-terminal">attributs dans le Terminal</a>.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-index" name="cli-index">Concernant les index : <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>Avec ces commandes vous pouvez lister, créer, ré-indexer et retirer des attributs au mécanisme d'indexation BFS. Chaque volume a son propre index, souvenez-vous en quand copiez des fichiers d'un volume à l'autre.<br />
+Ces commandes sont décrites dans le sujet qui traite des <a href="../index.html">Index</a>.</p>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-scripting" name="cli-scripting">Commandes utiles dans les scripts</a></h3>
+<p>Voici quelques outils en ligne de commande qui sont particulièrement utiles pour les scripts (voir aussi le sujet sur <a href="../bash-scripting.html">le Bash et les Scripts</a>).</p>
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">alert</span> invoque la fenêtre d'alerte typique avec une icône ad-hoc, un texte explicatif et jusqu'à trois boutons. le titre du bouton pressé sera renvoyé avec un code d'état (commençant à 0). Voici un exemple et son résultat :</p>
+<pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
+Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
+<p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p></td></tr>
+<tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">filepanel</span> affiche une boite de dialogue pour ouvrir ou enregistrer un fichier en permettant à l'utilisateur de choisir un fichier ou un emplacement. Vous obtiendrez comme valeur de retour, le fichier choisi ou le chemin du dossier.
+Parmi les paramètres disponibles, vous pouvez définir un répertoire de départ, un titre de fenêtre, un nom par défaut pour le fichier à enregistrer ou des restrictions aux types de fichiers autorisés. En voici un exemple :</p>
+<pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
+<p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
+</td></tr>
+<tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">waitfor</span> est une méthode élégante pour attendre qu'une application ou une tâche particulière soit démarrée, ou terminée.</p>
+</td></tr>
+<tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">query</span> est la version ligne de commande de la fenêtre de recherche. En fait, une façon rapide de créer une expression de recherche, est de construire une requête dans la fenêtre de recherche, de basculer vers les formules (<span class="menu">by formula</span>), et de copier le tout entre doubles quottes (<tt>"</tt>) en paramètre à la commande <span class="cli">query</span> que vous appelez à partir du Terminal ou de votre script.</p></td></tr></table>
+
+<h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="cli-other" name="cli-other">Autres commandes</a></h3>
+
+<table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
+	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
+		<td><p><span class="cli">checkfs</span> est un outil important pour détecter les erreurs dans votre système de fichiers. Il suffit d'ajouter le nom du volume ou du périphérique, et il va parcourir tous les fichiers et si possible, corriger des incohérences.</p>
+</td></tr>
+<tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">open</span> est un petit outils très pratique pour ouvrir n'importe quel fichier avec son application préférée, ou pour démarrer une application particulière à partir de sa signature sans avoir besoin de connaître son emplacement exact. Ça fonctionne également avec les URLs, et même avec les dossiers "virtuels" <tt>.</tt> et <tt>..</tt> qui représentent respectivement le dossier courant et le dossier parent, qui seront ainsi ouvert dans le Tracker.</p></td></tr>
+<tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add <span class="app">Screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+<pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
+"cmd=Remove replicant:desklink --remove=Screenshot" /boot/system/apps/Screenshot
+</pre>
+<p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
+</td></tr></table>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+<a href="../applications.html#cli-apps" class="uplink">Applications</a> 
+</span></div>
+</div>
+
+</body>
+</html>

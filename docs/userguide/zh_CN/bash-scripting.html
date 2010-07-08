@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2009, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Bash 和脚本撰写</title>
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../images/flags/zh_CN.png" alt="" />  中文 ［中文］</li>
+<li><a href="../fr/bash-scripting.html"><img src="../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../de/bash-scripting.html"><img src="../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../it/bash-scripting.html"><img src="../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../ru/bash-scripting.html"><img src="../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../es/bash-scripting.html"><img src="../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../sv_SE/bash-scripting.html"><img src="../images/flags/sv_SE.png" alt="" />Svensk</a></li>
+<li><a href="../jp/bash-scripting.html"><img src="../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../uk/bash-scripting.html"><img src="../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../pt_PT/bash-scripting.html"><img src="../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../en/bash-scripting.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+<span>
+ «  <a href="preferences.html">Preferences</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+
+<h1>Bash 和脚本撰写</h1>
+
+<p>“撰写脚本”就是把命令组织成可以自动执行的程序，然后把它保存为文本文件，而该文件就称为“脚本”。每次执行脚本时，这些命令则依次执行，和您在 <a href="applications/terminal.html">Terminal</a> 中输入命令的顺序相同。<br />
+脚本既可以用于执行一些简单的命令，也可以通过构建成熟的代码来解决复杂的任务。</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="bash" name="bash">Bash</a></h2>
+<p>由于脚本非常依赖于它们的解释器Shell，所以您必须非常地了解Haiku所使用的BASH。Bash的使用非常广泛，所以网上的资源也非常多。其中 Johan Jansson 的 <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>就是一个非常好的文档。</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="scripting-bible" name="scripting-bible">脚本圣经</a></h2>
+<p>在您了解了Shell的基础之后，您可以慢慢的让自己融入脚本的世界。同时，您会在网上或者书店里找到许多相关的教程和参考资料。 其中有一个非常好的介绍资料就是 Scot Hacker的BeOS圣经 中的 <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a>（<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>），它是专为 Haiku 系统所定制的。</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Haiku中的脚本</a></h2>
+<p>在Haiku系统中，当然也会用到脚本；其中系统的启动和关闭就是典型的脚本程序。这些确定的命令可以由用户脚本来进行扩充。<br />如果它们已经存在，您就需要自己来创建所需的文件。当然，你可以在脚本中适当的位置添加自己希望运行的命令。</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="userbootscript" name="userbootscript">UserBootscript</a> 脚本</h3>
+<p><span class="path">/boot/home/config/boot/UserBootscript</span> 脚本会在系统完成启动进程之后开始运行。例如，您可以在该脚本中添加一些命令来实现相关程序的自动启动：</p>
+<pre># Start LaunchBox
+/boot/system/apps/LaunchBox &amp;
+
+# Start Workspaces Applet
+/boot/system/apps/Workspaces &amp;</pre>
+<p>需要注意的是，要在命令之后添加 "<tt>&amp;</tt>" 字符，使其作为后台进程运行，否则该脚本将会中止运行直到该命令完成 （这种情况下：已启动的程序将会被关闭）。</p>
+
+<p>对于上述的启动程序，另一种方式是把它们的快捷方式放入 <span class="path">/boot/home/config/boot/launch</span> 目录。右键点击你希望自动启动的程序，选择 <span class="menu">Create Link</span> ，然后 <a href="tracker.html#navigating">navigating（导航）</a> 至上述目录。</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a> 脚本</h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownScript</span> 是系统关机进程的第一个步骤。如果该脚本返回一个非零的结束状态，则系统关闭失败。</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript</a> 脚本</h3>
+<p><span class="path">/boot/home/config/boot/UserShutdownFinishScript</span> 是结束进程的最后一个步骤。需要注意的是，在该脚本执行之前，大部分的系统进程已经终止。</p>
+
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="preferences.html">Preferences</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
+</span></div>
+</div>
+
+</body>
+</html>
