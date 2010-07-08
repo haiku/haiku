@@ -92,9 +92,9 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 		*/
 		dayMenu->AddItem(new DateMenuItem(
 			B_TRANSLATE("Day of week"), "e", *field));
-		//dayMenu->AddItem(new DateMenuItem("Day of week (short text)", "eee",
+		// dayMenu->AddItem(new DateMenuItem("Day of week (short text)", "eee",
 		//	*field));
-		//dayMenu->AddItem(new DateMenuItem("Day of week (full text)", "eeee",
+		// dayMenu->AddItem(new DateMenuItem("Day of week (full text)", "eeee",
 		//	*field));
 		dayMenu->AddItem(new DateMenuItem(
 			B_TRANSLATE("Day of week (short name)"), "E", *field));
@@ -102,9 +102,9 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 			B_TRANSLATE("Day of week (name)"), "EEEE", *field));
 		dayMenu->AddItem(new DateMenuItem(
 			B_TRANSLATE("Day of week in month"), "F", *field));
-		//dayMenu->AddItem(new DateMenuItem(
+		// dayMenu->AddItem(new DateMenuItem(
 		//	B_TRANSLATE("julian day"), "g", *field));
-		//dayMenu->AddItem(new BMenuItem("c", msg));
+		// dayMenu->AddItem(new BMenuItem("c", msg));
 	BPopUpMenu* monthMenu = new BPopUpMenu(B_TRANSLATE("Month"));
 	menu->AddItem(monthMenu);
 		monthMenu->AddItem(new DateMenuItem(
@@ -113,7 +113,7 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 			B_TRANSLATE("Month number (2 digits)"), "MM", *field));
 		monthMenu->AddItem(new DateMenuItem(
 			B_TRANSLATE("Month name"), "MMMM", *field));
-		//monthMenu->AddItem(new DateMenuItem("L", "L", *field));
+		// monthMenu->AddItem(new DateMenuItem("L", "L", *field));
 	BPopUpMenu* yearMenu = new BPopUpMenu(B_TRANSLATE("Year"));
 	menu->AddItem(yearMenu);
 		// And here is some ICU kludge... sorry about that.
@@ -126,8 +126,8 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 		}
 		yearMenu->AddItem(new DateMenuItem(
 			B_TRANSLATE("Year (2 digits)"), "yy", *field));
-		//yearMenu->AddItem(new DateMenuItem("Y", "Y", *field));
-		//yearMenu->AddItem(new DateMenuItem("u", "u", *field));
+		// yearMenu->AddItem(new DateMenuItem("Y", "Y", *field));
+		// yearMenu->AddItem(new DateMenuItem("u", "u", *field));
 }
 
 
@@ -217,7 +217,7 @@ FormatView::FormatView(BCountry* country)
 	BCheckBox* numberLeadingZero = new BCheckBox("", B_TRANSLATE("Leading 0"),
 		new BMessage(kSettingsContentsModified));
 	BTextControl* numberList = new BTextControl("",
-		B_TRANSLATE("List separator: "),"",
+		B_TRANSLATE("List separator: "), "",
 		new BMessage(kSettingsContentsModified));
 	// Unit system (US/Metric) (radio)
 
@@ -407,7 +407,7 @@ FormatView::MessageReceived(BMessage* message)
 				}
 			}
 
-			message->FindPointer("source",&pointerFromMessage);
+			message->FindPointer("source", &pointerFromMessage);
 			BMenuItem* menuItem = static_cast<BMenuItem*>(pointerFromMessage);
 
 			menuField->MenuItem()->SetLabel(menuItem->Label());
@@ -422,7 +422,7 @@ FormatView::MessageReceived(BMessage* message)
 				if (item) {
 					separator = fSeparatorMenuField->Menu()->IndexOf(item);
 					if (separator >= 0)
-						//settings.SetTimeFormatSeparator(
+						// settings.SetTimeFormatSeparator(
 						//	(FormatSeparator)separator);
 						;
 				}
@@ -450,12 +450,12 @@ FormatView::MessageReceived(BMessage* message)
 			BString timeFormat;
 			fCountry->TimeFormat(timeFormat, false);
 			if (f24HrRadioButton->Value() == 1) {
-				timeFormat.ReplaceAll("k","h");
-				timeFormat.ReplaceAll("K","H");
+				timeFormat.ReplaceAll("k", "h");
+				timeFormat.ReplaceAll("K", "H");
 				timeFormat.RemoveAll(" a");
 			} else {
-				timeFormat.ReplaceAll("h","k");
-				timeFormat.ReplaceAll("H","K");
+				timeFormat.ReplaceAll("h", "k");
+				timeFormat.ReplaceAll("H", "K");
 				timeFormat.Append(" a");
 				f12HrRadioButton->SetValue(true);
 			}
@@ -466,12 +466,12 @@ FormatView::MessageReceived(BMessage* message)
 
 			fCountry->TimeFormat(timeFormat, true);
 			if (f24HrRadioButton->Value() == 1) {
-				timeFormat.ReplaceAll("k","h");
-				timeFormat.ReplaceAll("K","H");
+				timeFormat.ReplaceAll("k", "h");
+				timeFormat.ReplaceAll("K", "H");
 				timeFormat.RemoveAll(" a");
 			} else {
-				timeFormat.ReplaceAll("h","k");
-				timeFormat.ReplaceAll("H","K");
+				timeFormat.ReplaceAll("h", "k");
+				timeFormat.ReplaceAll("H", "K");
 				timeFormat.Append(" a");
 			}
 			fCountry->SetTimeFormat(timeFormat.String(), true);
@@ -529,7 +529,7 @@ FormatView::Revert()
 	settings.SetClockTo24Hr(f24HrClock);
 	*/
 
-	//ShowCurrentSettings();
+	// ShowCurrentSettings();
 	_SendNotices();
 }
 
@@ -584,7 +584,7 @@ FormatView::IsRevertable() const
 
 	// TODO generate ICU string and compare to the initial one
 	BString dateFormat ;
-		//fYMDRadioButton->Value() ? kYMDFormat :
+		// fYMDRadioButton->Value() ? kYMDFormat :
 		//(fDMYRadioButton->Value() ? kDMYFormat : kMDYFormat);
 
 	return f24HrClock != (f24HrRadioButton->Value() > 0)
@@ -625,8 +625,10 @@ FormatView::_SendNotices()
 	// Make the notification message and send it to the tracker:
 	/*
 	BMessage notificationMessage;
-	notificationMessage.AddInt32("TimeFormatSeparator", (int32)settings.TimeFormatSeparator());
-	notificationMessage.AddInt32("DateOrderFormat", (int32)settings.DateOrderFormat());
+	notificationMessage.AddInt32("TimeFormatSeparator",
+		(int32)settings.TimeFormatSeparator());
+	notificationMessage.AddInt32("DateOrderFormat",
+		(int32)settings.DateOrderFormat());
 	notificationMessage.AddBool("24HrClock", settings.ClockIs24Hr());
 	tracker->SendNotices(kDateFormatChanged, &notificationMessage);
 	*/
