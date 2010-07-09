@@ -431,8 +431,8 @@ BSoftSynth::_Init()
 	_Done();
 
 	fSettings = new_fluid_settings();
-	fluid_settings_setnum(fSettings, "synth.sample-rate", fSampleRate);
-	fluid_settings_setint(fSettings, "synth.polyphony", fMaxVoices);
+	fluid_settings_setnum(fSettings, (char*)"synth.sample-rate", fSampleRate);
+	fluid_settings_setint(fSettings, (char*)"synth.polyphony", fMaxVoices);
 
 	fSynth = new_fluid_synth(fSettings);
 	if (!fSynth)
