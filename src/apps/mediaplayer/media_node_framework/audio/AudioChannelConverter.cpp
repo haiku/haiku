@@ -88,7 +88,7 @@ AudioChannelConverter::~AudioChannelConverter()
 bigtime_t
 AudioChannelConverter::InitialLatency() const
 {
-	fSource->InitialLatency();
+	return fSource->InitialLatency();
 }
 
 
