@@ -18,7 +18,6 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 }
 
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	local defines = [ FDefines COMPILE_FOR_R5 ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 }
