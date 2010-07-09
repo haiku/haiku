@@ -555,7 +555,7 @@ BNetEndpoint::Send(const void* buffer, size_t length, int flags)
 int32
 BNetEndpoint::Send(BNetBuffer& buffer, int flags)
 {
-	return Send(buffer.Data(), buffer.BytesRemaining(), flags);
+	return Send(buffer.Data(), buffer.Size(), flags);
 }
 
 
@@ -583,7 +583,7 @@ int32
 BNetEndpoint::SendTo(BNetBuffer& buffer,
 	const BNetAddress& address, int flags)
 {
-	return SendTo(buffer.Data(), buffer.BytesRemaining(), address, flags);
+	return SendTo(buffer.Data(), buffer.Size(), address, flags);
 }
 
 

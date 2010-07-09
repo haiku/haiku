@@ -115,14 +115,14 @@ DynamicBuffer::Data() const
 size_t
 DynamicBuffer::Size() const
 {
-	return fBufferSize;
+	return fDataEnd - fDataStart;
 }
 
 
 size_t
 DynamicBuffer::BytesRemaining() const
 {
-	return fDataEnd - fDataStart;
+	return fBufferSize -fDataEnd;
 }
 
 

@@ -990,6 +990,7 @@ AboutView::_CreateCreditsView()
 		"Matthijs Hollemans\n"
 		"Mathew Hounsell\n"
 		"Morgan Howe\n"
+		"Christophe Huriaux\n"
 		"Ma Jie\n"
 		"Carwyn Jones\n"
 		"Vasilis Kaoutsis\n"
