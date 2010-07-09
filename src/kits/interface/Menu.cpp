@@ -369,9 +369,9 @@ BMenu::AttachedToWindow()
 
 	_GetIsAltCommandKey(sAltAsCommandKey);
 		
-	bool attachAborted = _AddDynamicItems();
+	fAttachAborted = _AddDynamicItems();
 
-	if (!attachAborted) {
+	if (!fAttachAborted) {
 		_CacheFontInfo();
 		_LayoutItems(0);
 		_UpdateWindowViewSize(false);
@@ -1466,11 +1466,11 @@ BMenu::_Show(bool selectFirstItem, bool keyDown)
 		return false;
 
 	if (window->Lock()) {
-		bool attachAborted = false;
+		bool addAborted = false;
 		if (keyDown)
-			attachAborted = _AddDynamicItems(keyDown);	
+			addAborted = _AddDynamicItems(keyDown);	
 		
-		if (attachAborted) {
+		if (addAborted) {
 			if (ourWindow)
 				window->Quit();
 			else
@@ -2747,21 +2747,21 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 bool
 BMenu::_AddDynamicItems(bool keyDown)
 {
-	bool attachAborted = false;
-	BMenuItem* superItem = Superitem();
-	BMenu* superMenu = Supermenu();
+	bool addAborted = false;
 	if (AddDynamicItem(B_INITIAL_ADD)) {
 		do {
+			BMenuItem* superItem = Superitem();
+			BMenu* superMenu = Supermenu();
 			if (superMenu != NULL
 				&& !superMenu->_OkToProceed(superItem, keyDown)) {
 				AddDynamicItem(B_ABORT);
-				attachAborted = true;
+				addAborted = true;
 				break;
 			}
 		} while (AddDynamicItem(B_PROCESSING));
 	}
 	
-	return attachAborted;
+	return addAborted;
 }
 
 
