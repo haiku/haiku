@@ -2749,9 +2749,9 @@ BMenu::_AddDynamicItems(bool keyDown)
 {
 	bool addAborted = false;
 	if (AddDynamicItem(B_INITIAL_ADD)) {
+		BMenuItem* superItem = Superitem();
+		BMenu* superMenu = Supermenu();
 		do {
-			BMenuItem* superItem = Superitem();
-			BMenu* superMenu = Supermenu();
 			if (superMenu != NULL
 				&& !superMenu->_OkToProceed(superItem, keyDown)) {
 				AddDynamicItem(B_ABORT);
