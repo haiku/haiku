@@ -1175,12 +1175,14 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons kernel file_systems userlandfs ;
 	EnableWerror src bin package ;
 	EnableWerror src kits app ;
+	EnableWerror src kits device ;
 	EnableWerror src kits interface ;
 	EnableWerror src kits midi ;
 	EnableWerror src kits midi2 ;
 	EnableWerror src kits print ;
 	EnableWerror src kits storage ;
 	EnableWerror src kits support ;
+	EnableWerror src kits translation ;
 	EnableWerror src system kernel ;
 	EnableWerror src system runtime_loader ;
 }
