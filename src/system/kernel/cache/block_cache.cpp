@@ -2768,8 +2768,9 @@ cache_end_transaction(void* _cache, int32 id,
 
 	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED);
 
-	if (add_transaction_listener(cache, transaction, TRANSACTION_WRITTEN, hook,
-			data) != B_OK) {
+	if (hook != NULL
+		&& add_transaction_listener(cache, transaction, TRANSACTION_WRITTEN,
+			hook, data) != B_OK) {
 		return B_NO_MEMORY;
 	}
 
