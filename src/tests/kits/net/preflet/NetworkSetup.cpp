@@ -13,14 +13,12 @@
 
 #define APPLICATION_SIGNATURE	"application/x-vnd." SOFTWARE_EDITOR "-" NAME
 
-class Application : public BApplication 
+class Application : public BApplication
 {
 	public:
 		Application();
 
 	public:
-		BCatalog	fCatalog;
-
 		void			ReadyToRun(void);
 };
 
@@ -37,7 +35,6 @@ int main()
 Application::Application()
 	: BApplication(APPLICATION_SIGNATURE)
 {
-	be_locale->GetAppCatalog(&fCatalog);
 }
 
 
