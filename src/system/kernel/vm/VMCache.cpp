@@ -594,6 +594,7 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 	committed_size = 0;
 	temporary = 0;
 	page_count = 0;
+	fWiredPagesCount = 0;
 	type = cacheType;
 	fPageEventWaiters = NULL;
 
@@ -634,7 +635,7 @@ VMCache::Delete()
 
 	// free all of the pages in the cache
 	while (vm_page* page = pages.Root()) {
-		if (!page->mappings.IsEmpty() || page->wired_count != 0) {
+		if (!page->mappings.IsEmpty() || page->WiredCount() != 0) {
 			panic("remove page %p from cache %p: page still has mappings!\n",
 				page, this);
 		}
@@ -758,6 +759,9 @@ VMCache::InsertPage(vm_page* page, off_t offset)
 #endif	// KDEBUG
 
 	pages.Insert(page);
+
+	if (page->WiredCount() > 0)
+		IncrementWiredPagesCount();
 }
 
 
@@ -781,6 +785,9 @@ VMCache::RemovePage(vm_page* page)
 	pages.Remove(page);
 	page_count--;
 	page->SetCacheRef(NULL);
+
+	if (page->WiredCount() > 0)
+		DecrementWiredPagesCount();
 }
 
 
@@ -804,6 +811,12 @@ VMCache::MovePage(vm_page* page)
 	pages.Insert(page);
 	page_count++;
 	page->SetCacheRef(fCacheRef);
+
+	if (page->WiredCount() > 0) {
+		IncrementWiredPagesCount();
+		oldCache->DecrementWiredPagesCount();
+	}
+
 	T2(InsertPage(this, page, page->cache_offset << PAGE_SHIFT));
 }
 
@@ -821,6 +834,8 @@ VMCache::MoveAllPages(VMCache* fromCache)
 	std::swap(fromCache->pages, pages);
 	page_count = fromCache->page_count;
 	fromCache->page_count = 0;
+	fWiredPagesCount = fromCache->fWiredPagesCount;
+	fromCache->fWiredPagesCount = 0;
 
 	// swap the VMCacheRefs
 	mutex_lock(&sCacheListLock);
@@ -1077,7 +1092,7 @@ VMCache::Resize(off_t newSize, int priority)
 			// remove the page and put it into the free queue
 			DEBUG_PAGE_ACCESS_START(page);
 			vm_remove_all_page_mappings(page);
-			ASSERT(page->wired_count == 0);
+			ASSERT(page->WiredCount() == 0);
 				// TODO: Find a real solution! If the page is wired
 				// temporarily (e.g. by lock_memory()), we actually must not
 				// unmap it!
@@ -1123,7 +1138,7 @@ VMCache::FlushAndRemoveAllPages()
 				continue;
 
 			// We can't remove mapped pages.
-			if (page->wired_count > 0 || !page->mappings.IsEmpty())
+			if (page->IsMapped())
 				return B_BUSY;
 
 			DEBUG_PAGE_ACCESS_START(page);
@@ -1311,7 +1326,7 @@ VMCache::Dump(bool showPages) const
 					" state %u (%s) wired_count %u\n", page,
 					page->physical_page_number, page->cache_offset,
 					page->State(), page_state_to_string(page->State()),
-					page->wired_count);
+					page->WiredCount());
 			} else {
 				kprintf("\t%p DUMMY PAGE state %u (%s)\n",
 					page, page->State(), page_state_to_string(page->State()));

@@ -146,11 +146,11 @@ VMTranslationMap::PageUnmapped(VMArea* area, page_num_t pageNumber,
 			B_PRIxPHYSADDR ", accessed: %d, modified: %d", page,
 			pageNumber, accessed, modified);
 	} else
-		page->wired_count--;
+		page->DecrementWiredCount();
 
 	recursive_lock_unlock(&fLock);
 
-	if (page->wired_count == 0 && page->mappings.IsEmpty()) {
+	if (!page->IsMapped()) {
 		atomic_add(&gMappedPagesCount, -1);
 
 		if (updatePageQueue) {
@@ -203,11 +203,11 @@ VMTranslationMap::UnaccessedPageUnmapped(VMArea* area, page_num_t pageNumber)
 		ASSERT_PRINT(mapping != NULL, "page: %p, page number: %#"
 			B_PRIxPHYSADDR, page, pageNumber);
 	} else
-		page->wired_count--;
+		page->DecrementWiredCount();
 
 	recursive_lock_unlock(&fLock);
 
-	if (page->wired_count == 0 && page->mappings.IsEmpty())
+	if (!page->IsMapped())
 		atomic_add(&gMappedPagesCount, -1);
 
 	if (mapping != NULL) {

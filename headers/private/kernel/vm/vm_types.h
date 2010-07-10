@@ -10,6 +10,8 @@
 #define _KERNEL_VM_VM_TYPES_H
 
 
+#include <new>
+
 #include <arch/vm_types.h>
 #include <condition_variable.h>
 #include <kernel.h>
@@ -142,7 +144,8 @@ public:
 	uint8					unused : 1;
 
 	uint8					usage_count;
-	uint16					wired_count;
+
+	inline void Init(page_num_t pageNumber);
 
 	VMCacheRef* CacheRef() const			{ return cache_ref; }
 	void SetCacheRef(VMCacheRef* cacheRef)	{ this->cache_ref = cacheRef; }
@@ -151,11 +154,19 @@ public:
 		{ return cache_ref != NULL ? cache_ref->cache : NULL; }
 
 	bool IsMapped() const
-		{ return wired_count > 0 || !mappings.IsEmpty(); }
+		{ return fWiredCount > 0 || !mappings.IsEmpty(); }
 
 	uint8 State() const				{ return state; }
 	void InitState(uint8 newState);
 	void SetState(uint8 newState);
+
+	inline uint16 WiredCount() const	{ return fWiredCount; }
+	inline void IncrementWiredCount();
+	inline void DecrementWiredCount();
+		// both implemented in VMCache.h to avoid inclusion here
+
+private:
+	uint16					fWiredCount;
 };
 
 
@@ -178,6 +189,25 @@ enum {
 #define VM_PAGE_ALLOC_STATE	0x00000007
 #define VM_PAGE_ALLOC_CLEAR	0x00000010
 #define VM_PAGE_ALLOC_BUSY	0x00000020
+
+
+inline void
+vm_page::Init(page_num_t pageNumber)
+{
+	physical_page_number = pageNumber;
+	InitState(PAGE_STATE_FREE);
+	new(&mappings) vm_page_mappings();
+	fWiredCount = 0;
+	usage_count = 0;
+	busy_writing = false;
+	SetCacheRef(NULL);
+	#if DEBUG_PAGE_QUEUE
+		queue = NULL;
+	#endif
+	#if DEBUG_PAGE_ACCESS
+		accessing_thread = -1;
+	#endif
+}
 
 
 #if DEBUG_PAGE_ACCESS

@@ -409,9 +409,9 @@ X86VMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 					page->mappings.Remove(mapping);
 					queue.Add(mapping);
 				} else
-					page->wired_count--;
+					page->DecrementWiredCount();
 
-				if (page->wired_count == 0 && page->mappings.IsEmpty()) {
+				if (!page->IsMapped()) {
 					atomic_add(&gMappedPagesCount, -1);
 
 					if (updatePageQueue) {
@@ -475,7 +475,7 @@ X86VMTranslationMap32Bit::UnmapArea(VMArea* area, bool deletingAddressSpace,
 		VMCache* cache = page->Cache();
 
 		bool pageFullyUnmapped = false;
-		if (page->wired_count == 0 && page->mappings.IsEmpty()) {
+		if (!page->IsMapped()) {
 			atomic_add(&gMappedPagesCount, -1);
 			pageFullyUnmapped = true;
 		}

@@ -406,8 +406,9 @@ private:
 static inline void
 increment_page_wired_count(vm_page* page)
 {
-	if (page->wired_count++ == 0 && page->mappings.IsEmpty())
+	if (!page->IsMapped())
 		atomic_add(&gMappedPagesCount, 1);
+	page->IncrementWiredCount();
 }
 
 
@@ -416,7 +417,8 @@ increment_page_wired_count(vm_page* page)
 static inline void
 decrement_page_wired_count(vm_page* page)
 {
-	if (--page->wired_count == 0 && page->mappings.IsEmpty())
+	page->DecrementWiredCount();
+	if (!page->IsMapped())
 		atomic_add(&gMappedPagesCount, -1);
 }
 
@@ -486,7 +488,7 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 {
 	VMTranslationMap* map = area->address_space->TranslationMap();
 
-	bool wasMapped = page->wired_count > 0 || !page->mappings.IsEmpty();
+	bool wasMapped = page->IsMapped();
 
 	if (area->wiring == B_NO_LOCK) {
 		DEBUG_PAGE_ACCESS_CHECK(page);
@@ -508,7 +510,7 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 			area->MemoryType(), reservation);
 
 		// insert mapping into lists
-		if (page->mappings.IsEmpty() && page->wired_count == 0)
+		if (!page->IsMapped())
 			atomic_add(&gMappedPagesCount, 1);
 
 		page->mappings.Add(mapping);
@@ -1341,8 +1343,8 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 
 				DEBUG_PAGE_ACCESS_START(page);
 
-				increment_page_wired_count(page);
 				cache->InsertPage(page, offset);
+				increment_page_wired_count(page);
 				vm_page_set_state(page, PAGE_STATE_WIRED);
 				page->busy = false;
 
@@ -1377,8 +1379,8 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 				if (status < B_OK)
 					panic("couldn't map physical page in page run\n");
 
-				increment_page_wired_count(page);
 				cache->InsertPage(page, offset);
+				increment_page_wired_count(page);
 
 				DEBUG_PAGE_ACCESS_END(page);
 			}
@@ -2152,14 +2154,22 @@ vm_delete_area(team_id team, area_id id, bool kernel)
 
 /*!	Creates a new cache on top of given cache, moves all areas from
 	the old cache to the new one, and changes the protection of all affected
-	areas' pages to read-only.
+	areas' pages to read-only. If requested, wired pages are moved up to the
+	new cache and copies are added to the old cache in their place.
 	Preconditions:
 	- The given cache must be locked.
 	- All of the cache's areas' address spaces must be read locked.
-	- None of the cache's areas must have any wired ranges.
+	- Either the cache must not have any wired ranges or a page reservation for
+	  all wired pages must be provided, so they can be copied.
+
+	\param lowerCache The cache on top of which a new cache shall be created.
+	\param wiredPagesReservation If \c NULL there must not be any wired pages
+		in \a lowerCache. Otherwise as many pages must be reserved as the cache
+		has wired page. The wired pages are copied in this case.
 */
 static status_t
-vm_copy_on_write_area(VMCache* lowerCache)
+vm_copy_on_write_area(VMCache* lowerCache,
+	vm_page_reservation* wiredPagesReservation)
 {
 	VMCache* upperCache;
 
@@ -2187,20 +2197,64 @@ vm_copy_on_write_area(VMCache* lowerCache)
 
 	lowerCache->AddConsumer(upperCache);
 
-	// We now need to remap all pages from all of the cache's areas read-only, so
-	// that a copy will be created on next write access
+	// We now need to remap all pages from all of the cache's areas read-only,
+	// so that a copy will be created on next write access. If there are wired
+	// pages, we keep their protection, move them to the upper cache and create
+	// copies for the lower cache.
+	if (wiredPagesReservation != NULL) {
+		// We need to handle wired pages -- iterate through the cache's pages.
+		for (VMCachePagesTree::Iterator it = lowerCache->pages.GetIterator();
+				vm_page* page = it.Next();) {
+			if (page->WiredCount() > 0) {
+				// allocate a new page and copy the wired one
+				vm_page* copiedPage = vm_page_allocate_page(
+					wiredPagesReservation, PAGE_STATE_ACTIVE);
 
-	for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
-			tempArea = tempArea->cache_next) {
-		// The area must be readable in the same way it was previously writable
-		uint32 protection = B_KERNEL_READ_AREA;
-		if ((tempArea->protection & B_READ_AREA) != 0)
-			protection |= B_READ_AREA;
+				vm_memcpy_physical_page(
+					copiedPage->physical_page_number * B_PAGE_SIZE,
+					page->physical_page_number * B_PAGE_SIZE);
 
-		VMTranslationMap* map = tempArea->address_space->TranslationMap();
-		map->Lock();
-		map->ProtectArea(tempArea, protection);
-		map->Unlock();
+				// move the wired page to the upper cache (note: removing is OK
+				// with the SplayTree iterator) and insert the copy
+				upperCache->MovePage(page);
+				lowerCache->InsertPage(copiedPage,
+					page->cache_offset * B_PAGE_SIZE);
+
+				DEBUG_PAGE_ACCESS_END(copiedPage);
+			} else {
+				// Change the protection of this page in all areas.
+				for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
+						tempArea = tempArea->cache_next) {
+					// The area must be readable in the same way it was
+					// previously writable.
+					uint32 protection = B_KERNEL_READ_AREA;
+					if ((tempArea->protection & B_READ_AREA) != 0)
+						protection |= B_READ_AREA;
+
+					VMTranslationMap* map
+						= tempArea->address_space->TranslationMap();
+					map->Lock();
+					map->ProtectPage(tempArea,
+						virtual_page_address(tempArea, page), protection);
+					map->Unlock();
+				}
+			}
+		}
+	} else {
+		// just change the protection of all areas
+		for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
+				tempArea = tempArea->cache_next) {
+			// The area must be readable in the same way it was previously
+			// writable.
+			uint32 protection = B_KERNEL_READ_AREA;
+			if ((tempArea->protection & B_READ_AREA) != 0)
+				protection |= B_READ_AREA;
+
+			VMTranslationMap* map = tempArea->address_space->TranslationMap();
+			map->Lock();
+			map->ProtectArea(tempArea, protection);
+			map->Unlock();
+		}
 	}
 
 	vm_area_put_locked_cache(upperCache);
@@ -2232,6 +2286,9 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	status_t status;
 	bool sharedArea;
 
+	page_num_t wiredPages = 0;
+	vm_page_reservation wiredPagesReservation;
+
 	bool restart;
 	do {
 		restart = false;
@@ -2249,21 +2306,47 @@ vm_copy_area(team_id team, const char* name, void** _address,
 
 		sharedArea = (source->protection & B_SHARED_AREA) != 0;
 
-		// Make sure the source area (respectively, if not shared, all areas of
-		// the cache) doesn't have any wired ranges.
-		if (sharedArea) {
-			if (wait_if_area_is_wired(source, &locker, &cacheLocker))
+		page_num_t oldWiredPages = wiredPages;
+		wiredPages = 0;
+
+		// If the source area isn't shared, count the number of wired pages in
+		// the cache and reserve as many pages.
+		if (!sharedArea) {
+			wiredPages = cache->WiredPagesCount();
+
+			if (wiredPages > oldWiredPages) {
+				cacheLocker.Unlock();
+				locker.Unlock();
+
+				if (oldWiredPages > 0)
+					vm_page_unreserve_pages(&wiredPagesReservation);
+
+				vm_page_reserve_pages(&wiredPagesReservation, wiredPages,
+					VM_PRIORITY_USER);
+
 				restart = true;
-		} else {
-			for (VMArea* area = cache->areas; area != NULL;
-					area = area->cache_next) {
-				if (wait_if_area_is_wired(area, &locker, &cacheLocker)) {
-					restart = true;
-					break;
-				}
 			}
-		}
+		} else if (oldWiredPages > 0)
+			vm_page_unreserve_pages(&wiredPagesReservation);
 	} while (restart);
+
+	// unreserve pages later
+	struct PagesUnreserver {
+		PagesUnreserver(vm_page_reservation* reservation)
+			:
+			fReservation(reservation)
+		{
+		}
+
+		~PagesUnreserver()
+		{
+			if (fReservation != NULL)
+				vm_page_unreserve_pages(fReservation);
+		}
+
+	private:
+		vm_page_reservation*	fReservation;
+	} pagesUnreserver(wiredPages > 0 ? &wiredPagesReservation : NULL);
 
 	if (addressSpec == B_CLONE_ADDRESS) {
 		addressSpec = B_EXACT_ADDRESS;
@@ -2296,8 +2379,10 @@ vm_copy_area(team_id team, const char* name, void** _address,
 	if (!sharedArea) {
 		if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0) {
 			// TODO: do something more useful if this fails!
-			if (vm_copy_on_write_area(cache) < B_OK)
+			if (vm_copy_on_write_area(cache,
+					wiredPages > 0 ? &wiredPagesReservation : NULL) < B_OK) {
 				panic("vm_copy_on_write_area() failed!\n");
+			}
 		}
 	}
 
@@ -2409,7 +2494,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 			// There are consumers -- we have to insert a new cache. Fortunately
 			// vm_copy_on_write_area() does everything that's needed.
 			changePageProtection = false;
-			status = vm_copy_on_write_area(cache);
+			status = vm_copy_on_write_area(cache, NULL);
 		} else {
 			// No consumers, so we don't need to insert a new one.
 			if (cache->source != NULL && cache->temporary) {
@@ -2593,7 +2678,7 @@ vm_clear_page_mapping_accessed_flags(struct vm_page *page)
 int32
 vm_remove_all_page_mappings_if_unaccessed(struct vm_page *page)
 {
-	ASSERT(page->wired_count == 0);
+	ASSERT(page->WiredCount() == 0);
 
 	if (page->accessed)
 		return vm_clear_page_mapping_accessed_flags(page);

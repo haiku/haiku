@@ -1382,7 +1382,7 @@ MemoryManager::_MapChunk(VMArea* vmArea, addr_t address, size_t size,
 		vm_page* page = vm_page_allocate_page(&reservation, PAGE_STATE_WIRED);
 		cache->InsertPage(page, offset);
 
-		page->wired_count++;
+		page->IncrementWiredCount();
 		atomic_add(&gMappedPagesCount, 1);
 		DEBUG_PAGE_ACCESS_END(page);
 
@@ -1435,7 +1435,7 @@ MemoryManager::_UnmapChunk(VMArea* vmArea, addr_t address, size_t size,
 
 		DEBUG_PAGE_ACCESS_START(page);
 
-		page->wired_count--;
+		page->DecrementWiredCount();
 
 		cache->RemovePage(page);
 			// the iterator is remove-safe

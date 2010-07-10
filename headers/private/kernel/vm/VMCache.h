@@ -101,6 +101,10 @@ public:
 			void				MovePage(vm_page* page);
 			void				MoveAllPages(VMCache* fromCache);
 
+	inline	page_num_t			WiredPagesCount() const;
+	inline	void				IncrementWiredPagesCount();
+	inline	void				DecrementWiredPagesCount();
+
 			void				AddConsumer(VMCache* consumer);
 
 			status_t			InsertAreaLocked(VMArea* area);
@@ -197,6 +201,7 @@ private:
 			PageEventWaiter*	fPageEventWaiters;
 			void*				fUserData;
 			VMCacheRef*			fCacheRef;
+			page_num_t			fWiredPagesCount;
 };
 
 
@@ -305,6 +310,49 @@ VMCache::MarkPageUnbusy(vm_page* page)
 	ASSERT(page->busy);
 	page->busy = false;
 	NotifyPageEvents(page, PAGE_EVENT_NOT_BUSY);
+}
+
+
+page_num_t
+VMCache::WiredPagesCount() const
+{
+	return fWiredPagesCount;
+}
+
+
+void
+VMCache::IncrementWiredPagesCount()
+{
+	ASSERT(fWiredPagesCount < page_count);
+
+	fWiredPagesCount++;
+}
+
+
+void
+VMCache::DecrementWiredPagesCount()
+{
+	ASSERT(fWiredPagesCount > 0);
+
+	fWiredPagesCount--;
+}
+
+
+// vm_page methods implemented here to avoid VMCache.h inclusion in vm_types.h
+
+inline void
+vm_page::IncrementWiredCount()
+{
+	if (fWiredCount++ == 0)
+		cache_ref->cache->IncrementWiredPagesCount();
+}
+
+
+inline void
+vm_page::DecrementWiredCount()
+{
+	if (--fWiredCount == 0)
+		cache_ref->cache->DecrementWiredPagesCount();
 }
 
 

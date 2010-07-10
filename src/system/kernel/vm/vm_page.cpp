@@ -495,7 +495,7 @@ class SetPageState : public AbstractTraceEntry {
 			fOldState(page->State()),
 			fNewState(newState),
 			fBusy(page->busy),
-			fWired(page->wired_count > 0),
+			fWired(page->WiredCount() > 0),
 			fMapped(!page->mappings.IsEmpty()),
 			fAccessed(page->accessed),
 			fModified(page->modified)
@@ -698,7 +698,7 @@ dump_page(int argc, char **argv)
 	kprintf("cache_offset:    %" B_PRIuPHYSADDR "\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
 	kprintf("state:           %s\n", page_state_to_string(page->State()));
-	kprintf("wired_count:     %d\n", page->wired_count);
+	kprintf("wired_count:     %d\n", page->WiredCount());
 	kprintf("usage_count:     %d\n", page->usage_count);
 	kprintf("busy:            %d\n", page->busy);
 	kprintf("busy_writing:    %d\n", page->busy_writing);
@@ -818,7 +818,7 @@ dump_page_queue(int argc, char **argv)
 		for (i = 0; page; i++, page = queue->Next(page)) {
 			kprintf("%p  %p  %-7s %8s  %5d  %5d\n", page, page->Cache(),
 				type, page_state_to_string(page->State()),
-				page->wired_count, page->usage_count);
+				page->WiredCount(), page->usage_count);
 		}
 	}
 	return 0;
@@ -862,7 +862,7 @@ dump_page_stats(int argc, char **argv)
 
 		if (pageState == PAGE_STATE_MODIFIED
 			&& sPages[i].Cache() != NULL
-			&& sPages[i].Cache()->temporary && sPages[i].wired_count == 0) {
+			&& sPages[i].Cache()->temporary && sPages[i].WiredCount() == 0) {
 			swappableModified++;
 			if (sPages[i].usage_count == 0)
 				swappableModifiedInactive++;
@@ -948,7 +948,7 @@ dump_page_stats(int argc, char **argv)
 static void
 track_page_usage(vm_page* page)
 {
-	if (page->wired_count == 0) {
+	if (page->WiredCount() == 0) {
 		sNextPageUsage[(int32)page->usage_count + 128]++;
 		sNextPageUsagePageCount++;
 	}
@@ -1981,7 +1981,7 @@ page_writer(void* /*unused*/)
 			DEBUG_PAGE_ACCESS_START(page);
 
 			// Don't write back wired (locked) pages.
-			if (page->wired_count > 0) {
+			if (page->WiredCount() > 0) {
 				set_page_state(page, PAGE_STATE_ACTIVE);
 				DEBUG_PAGE_ACCESS_END(page);
 				continue;
@@ -2073,7 +2073,7 @@ free_page_swap_space(int32 index)
 	DEBUG_PAGE_ACCESS_START(page);
 
 	VMCache* cache = page->Cache();
-	if (cache->temporary && page->wired_count == 0
+	if (cache->temporary && page->WiredCount() == 0
 			&& cache->HasPage(page->cache_offset << PAGE_SHIFT)
 			&& page->usage_count > 0) {
 		// TODO: how to judge a page is highly active?
@@ -2242,9 +2242,10 @@ idle_scan_active_pages(page_stats& pageStats)
 		// wouldn't notice when those would become unused and could thus be
 		// moved to the cached list.
 		int32 usageCount;
-		if (page->wired_count > 0 || page->usage_count > 0 || !cache->temporary)
+		if (page->WiredCount() > 0 || page->usage_count > 0
+			|| !cache->temporary) {
 			usageCount = vm_clear_page_mapping_accessed_flags(page);
-		else
+		} else
 			usageCount = vm_remove_all_page_mappings_if_unaccessed(page);
 
 		if (usageCount > 0) {
@@ -2333,7 +2334,7 @@ full_scan_inactive_pages(page_stats& pageStats, int32 despairLevel)
 		// Get the accessed count, clear the accessed/modified flags and
 		// unmap the page, if it hasn't been accessed.
 		int32 usageCount;
-		if (page->wired_count > 0)
+		if (page->WiredCount() > 0)
 			usageCount = vm_clear_page_mapping_accessed_flags(page);
 		else
 			usageCount = vm_remove_all_page_mappings_if_unaccessed(page);
@@ -2869,19 +2870,7 @@ vm_page_init(kernel_args *args)
 
 	// initialize the free page table
 	for (uint32 i = 0; i < sNumPages; i++) {
-		sPages[i].physical_page_number = sPhysicalPageOffset + i;
-		sPages[i].InitState(PAGE_STATE_FREE);
-		new(&sPages[i].mappings) vm_page_mappings();
-		sPages[i].wired_count = 0;
-		sPages[i].usage_count = 0;
-		sPages[i].busy_writing = false;
-		sPages[i].SetCacheRef(NULL);
-		#if DEBUG_PAGE_QUEUE
-			sPages[i].queue = NULL;
-		#endif
-		#if DEBUG_PAGE_ACCESS
-			sPages[i].accessing_thread = -1;
-		#endif
+		sPages[i].Init(sPhysicalPageOffset + i);
 		sFreePageQueue.Append(&sPages[i]);
 	}
 
