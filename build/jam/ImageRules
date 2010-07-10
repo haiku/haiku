@@ -934,7 +934,7 @@ rule AddInstalledPackagesFileToHaikuImage
 	Always $(file) ;
 	MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
 	BuildHaikuImageInstalledPackagesFile $(file) ;
-	AddFilesToHaikuImage common data : $(file) ;
+	AddFilesToHaikuImage common data optional-packages : $(file) ;
 }
 
 actions BuildHaikuImageInstalledPackagesFile

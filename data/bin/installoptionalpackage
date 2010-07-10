@@ -43,7 +43,6 @@ declare alreadyInstalled=""
 # as they require either the source code or compiled binaries
 declare packageIgnoreList="Bluetooth Development DevelopmentMin \
 DevelopmentBase MandatoryPackages UserlandFS Welcome WifiFirmwareScriptData "
-installedPackagesFile="`finddir B_COMMON_DATA_DIRECTORY`/InstalledPackages"
 
 
 function CreateInstallerScript()
@@ -336,6 +335,8 @@ function Init()
 	baseDir=`finddir B_COMMON_DATA_DIRECTORY`/optional-packages
 	tmpDir=`finddir B_COMMON_TEMP_DIRECTORY`
 	libDir=`finddir B_SYSTEM_LIB_DIRECTORY`
+
+	installedPackagesFile="${baseDir}/InstalledPackages"
 
 	# Make sure these files are empty.
 	echo "" > ${tmpDir}/optpkg.jam
@@ -783,8 +784,8 @@ function RemoveCachedFiles()
 {
 	# RemoveCachedFiles
 	echo "Removing cached files ..."
-	if [ -d ${baseDir} ]; then
-		rm -rf ${baseDir}
+	if [ -e ${baseDir}/OptionalPackageNames ]; then
+		rm ${baseDir}/OptionalPackageNames
 	fi
 
 	# Unset variables, which prevents duplicate entries.
