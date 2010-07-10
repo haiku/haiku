@@ -64,18 +64,15 @@ BaseTranslator::BaseTranslator(const char *name, const char *info,
 	:
 	BTranslator()
 {
-	const char* _name = NULL;
-	const char* _info = NULL;
-	
 	fSettings = new TranslatorSettings(settingsFile, defaults, defCount);
 	fSettings->LoadSettings();
 		// load settings from the Base Translator settings file
 
 	fVersion = version;
-	fName = new char[strlen(_name) + 1];
-	strcpy(fName, _name);
-	fInfo = new char[strlen(_info) + 41];
-	sprintf(fInfo, "%s v%d.%d.%d %s", _info,
+	fName = new char[strlen(name) + 1];
+	strcpy(fName, name);
+	fInfo = new char[strlen(info) + 41];
+	sprintf(fInfo, "%s v%d.%d.%d %s", info,
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(fVersion)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(fVersion)),
 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(fVersion)),
