@@ -18,8 +18,6 @@
 OverlayApp::OverlayApp()
 	: BApplication("application/x-vnd.Haiku-OverlayImage")
 {
-	be_locale->GetAppCatalog(&fCatalog);
-	
 	OverlayWindow *theWindow = new OverlayWindow();
 	theWindow->Show();
 }

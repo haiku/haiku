@@ -22,8 +22,6 @@
 class OverlayApp : public BApplication {
 public:
 					OverlayApp();
-private:
-		BCatalog	fCatalog;
 };
 
 #endif // OVERLAY_APP_H
