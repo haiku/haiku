@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <Application.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <Messenger.h>
 #include <Window.h>
 #include <storage/Entry.h>
@@ -24,6 +26,10 @@
 #include <storage/Path.h>
 
 #define APP_SIG "application/x-vnd.mmu_man.filepanel"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "FilePanelApp"
+
 
 volatile int return_code = 0;
 
@@ -36,10 +42,12 @@ public:
 	virtual void RefsReceived(BMessage *message);
 };
 
+
 FilePanelApp::FilePanelApp()
 	:BApplication(APP_SIG)
 {
 }
+
 
 void 
 FilePanelApp::MessageReceived(BMessage *message)
@@ -68,6 +76,7 @@ FilePanelApp::MessageReceived(BMessage *message)
 	}
 }
 
+
 void 
 FilePanelApp::RefsReceived(BMessage *message)
 {
@@ -84,32 +93,44 @@ FilePanelApp::RefsReceived(BMessage *message)
 	be_app_messenger.SendMessage(B_QUIT_REQUESTED);
 }
 
+
 int
 usage(char *pname, int error)
 {
-	fprintf(stderr, "display a load/save file panel\n");
-	fprintf(stderr, "usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n", pname);
-	fprintf(stderr, "usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n", pname);
-	fprintf(stderr, "options:\n");
-	fprintf(stderr, "short\tlong\tdescription\n");
-	fprintf(stderr, "-h\t--help\tdisplay usage\n");
-	fprintf(stderr, "-d\t--directory\topen at <folder>\n");
-	fprintf(stderr, "-l\t--load\tuse a load FilePanel (default)\n");
-	fprintf(stderr, "-s\t--save\tuse a save FilePanel\n");
-	fprintf(stderr, "-n\t--name\tset the default name for saving\n");
-	fprintf(stderr, "-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n");
-	fprintf(stderr, "-t\t--title\tset the FilePanel window title\n");
-	fprintf(stderr, "-1\t--single\tallow only 1 file to be selected\n");
-	fprintf(stderr, "-m\t--modal\tmakes the FilePanel modal\n");
+	fprintf(stderr, B_TRANSLATE("display a load/save file panel\n"));
+	fprintf(stderr, B_TRANSLATE("usage: %s [--help] [--directory folder] "
+		"[--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] "
+		"[--forbid pattern]\n"), pname);
+	fprintf(stderr, B_TRANSLATE("usage: %s [-h]     [-d folder]              "
+		"[-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      "
+		"[-f pattern]\n"), pname);
+	fprintf(stderr, B_TRANSLATE("options:\n"));
+	fprintf(stderr, B_TRANSLATE("short\tlong\tdescription\n"));
+	fprintf(stderr, B_TRANSLATE("-h\t--help\tdisplay usage\n"));
+	fprintf(stderr, B_TRANSLATE("-d\t--directory\topen at <folder>\n"));
+	fprintf(stderr, B_TRANSLATE("-l\t--load\tuse a load FilePanel "
+		"(default)\n"));
+	fprintf(stderr, B_TRANSLATE("-s\t--save\tuse a save FilePanel\n"));
+	fprintf(stderr, B_TRANSLATE("-n\t--name\tset the default name for "
+		"saving\n"));
+	fprintf(stderr, B_TRANSLATE("-k\t--kind\tkind of entries that can be "
+		"opened (flavour): any combination of f, d, s (file (default), "
+		"directory, symlink)\n"));
+	fprintf(stderr, B_TRANSLATE("-t\t--title\tset the FilePanel window "
+		"title\n"));
+	fprintf(stderr, B_TRANSLATE("-1\t--single\tallow only 1 file to be "
+		"selected\n"));
+	fprintf(stderr, B_TRANSLATE("-m\t--modal\tmakes the FilePanel modal\n"));
 #ifndef USE_FNMATCH
-	fprintf(stderr, "-a\t--allow\tunimplemented\n");
-	fprintf(stderr, "-f\t--forbid\tunimplemented\n");
+	fprintf(stderr, B_TRANSLATE("-a\t--allow\tunimplemented\n"));
+	fprintf(stderr, B_TRANSLATE("-f\t--forbid\tunimplemented\n"));
 #else
-	fprintf(stderr, "-a\t--allow\tunimplemented\n");
-	fprintf(stderr, "-f\t--forbid\tunimplemented\n");
+	fprintf(stderr, B_TRANSLATE("-a\t--allow\tunimplemented\n"));
+	fprintf(stderr, B_TRANSLATE("-f\t--forbid\tunimplemented\n"));
 #endif
 	return error;
 }
+
 
 int
 main(int argc, char **argv)
@@ -124,15 +145,17 @@ main(int argc, char **argv)
 	const char *defaultName = NULL;
 
 	for (i = 1; i < argc; i++) {
-		if (strncmp(argv[i], "--", 2) && ((*(argv[i]) == '-' && strlen(argv[i]) != 2) || *(argv[i]) != '-')) {
-			fprintf(stderr, "%s not a valid option\n", argv[i]);
+		if (strncmp(argv[i], "--", 2) && ((*(argv[i]) == '-' && 
+			strlen(argv[i]) != 2) || *(argv[i]) != '-')) {
+			fprintf(stderr, B_TRANSLATE("%s not a valid option\n"), argv[i]);
 			return usage(argv[0], 2);
 		}
 		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
 			return usage(argv[0], 0);
 		} else if (!strcmp(argv[i], "--directory") || !strcmp(argv[i], "-d")) {
 			if (++i >= argc) {
-				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
+				fprintf(stderr, B_TRANSLATE("%s: this option requires a "
+					"parameter\n"), argv[i-1]);
 				return usage(argv[0], 2);
 			}
 			openAt = argv[i];
@@ -142,13 +165,15 @@ main(int argc, char **argv)
 			fpMode = B_SAVE_PANEL;
 		} else if (!strcmp(argv[i], "--name") || !strcmp(argv[i], "-n")) {
 			if (++i >= argc) {
-				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
+				fprintf(stderr, B_TRANSLATE("%s: this option requires a "
+					"parameter\n"), argv[i-1]);
 				return usage(argv[0], 2);
 			}
 			defaultName = (const char *)argv[i];
 		} else if (!strcmp(argv[i], "--kind") || !strcmp(argv[i], "-k")) {
 			if (++i >= argc) {
-				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
+				fprintf(stderr, B_TRANSLATE("%s: this option requires a "
+					"parameter\n"), argv[i-1]);
 				return usage(argv[0], 2);
 			}
 			if (strchr(argv[i], 'f')) nodeFlavour |= B_FILE_NODE;
@@ -156,7 +181,8 @@ main(int argc, char **argv)
 			if (strchr(argv[i], 's')) nodeFlavour |= B_SYMLINK_NODE;
 		} else if (!strcmp(argv[i], "--title") || !strcmp(argv[i], "-t")) {
 			if (++i >= argc) {
-				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
+				fprintf(stderr, B_TRANSLATE("%s: this option requires a "
+					"parameter\n"), argv[i-1]);
 				return usage(argv[0], 2);
 			}
 			windowTitle = argv[i];
@@ -166,25 +192,29 @@ main(int argc, char **argv)
 			makeModal = true;
 		} else if (!strcmp(argv[i], "--allow") || !strcmp(argv[i], "-a")) {
 			if (++i >= argc) {
-				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
+				fprintf(stderr, B_TRANSLATE("%s: this option requires a "
+					"parameter\n"), argv[i-1]);
 				return usage(argv[0], 2);
 			}
-			fprintf(stderr, "%s: UNIMPLEMENTED\n", argv[i-1]);
+			fprintf(stderr, B_TRANSLATE("%s: UNIMPLEMENTED\n"), argv[i-1]);
 		} else if (!strcmp(argv[i], "--forbid") || !strcmp(argv[i], "-f")) {
 			if (++i >= argc) {
-				fprintf(stderr, "%s: this option requires a parameter\n", argv[i-1]);
+				fprintf(stderr, B_TRANSLATE("%s: this option requires a "
+					"parameter\n"), argv[i-1]);
 				return usage(argv[0], 2);
 			}
-			fprintf(stderr, "%s: UNIMPLEMENTED\n", argv[i-1]);
+			fprintf(stderr, B_TRANSLATE("%s: UNIMPLEMENTED\n"), argv[i-1]);
 		} else {
-			fprintf(stderr, "%s not a valid option\n", argv[i]);
+			fprintf(stderr, B_TRANSLATE("%s not a valid option\n"), argv[i]);
 			return usage(argv[0], 2);
 		}
 	}
 	new FilePanelApp;
 	entry_ref panelDir;
-// THIS LINE makes main() return always 0 no matter which value on return of exit() ???
-	BFilePanel *fPanel = new BFilePanel(fpMode, NULL, NULL, nodeFlavour, allowMultiSelect, NULL, NULL, makeModal);
+// THIS LINE makes main() return always 0 no matter which value on return of 
+// exit() ???
+	BFilePanel *fPanel = new BFilePanel(fpMode, NULL, NULL, nodeFlavour, 
+		allowMultiSelect, NULL, NULL, makeModal);
 /**/
 	if (openAt)
 		fPanel->SetPanelDirectory(openAt);
