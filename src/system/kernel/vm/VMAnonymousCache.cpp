@@ -1017,8 +1017,7 @@ VMAnonymousCache::_MergePagesSmallerSource(VMAnonymousCache* source)
 		if (consumerPage == NULL) {
 			// the page is not yet in the consumer cache - move it upwards
 			ASSERT_PRINT(!page->busy, "page: %p", page);
-			source->RemovePage(page);
-			InsertPage(page, (off_t)page->cache_offset << PAGE_SHIFT);
+			MovePage(page);
 		}
 	}
 }
