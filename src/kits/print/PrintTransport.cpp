@@ -2,12 +2,12 @@
 
 PrintTransport
 
-Copyright (c) 2004 OpenBeOS. 
+Copyright (c) 2004 OpenBeOS.
 
 Authors:
 	Philippe Houdoin
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -50,7 +50,7 @@ PrintTransport::~PrintTransport()
 		(*fExitProc)();
 		fExitProc = NULL;
 	}
-	
+
 	if (fAddOnID >= 0) {
 		unload_add_on(fAddOnID);
 		fAddOnID = -1;
@@ -63,20 +63,20 @@ status_t PrintTransport::Open(BNode* printerFolder)
 	if (fDataIO != NULL) {
 		return B_ERROR;
 	}
-	
+
 	// retrieve transport add-on name from printer folder attribute
 	BString transportName;
 	if (printerFolder->ReadAttrString("transport", &transportName) != B_OK) {
 		return B_ERROR;
 	}
-	
+
 	// try first in user add-ons directory
 	BPath path;
 	find_directory(B_USER_ADDONS_DIRECTORY, &path);
 	path.Append("Print/transport");
 	path.Append(transportName.String());
 	fAddOnID = load_add_on(path.Path());
-	
+
 	if (fAddOnID < 0) {
 		// on failure try in system add-ons directory
 		find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
@@ -103,14 +103,14 @@ status_t PrintTransport::Open(BNode* printerFolder)
 	// now, initialize the transport add-on
 	node_ref   ref;
 	BDirectory dir;
-	
+
 	printerFolder->GetNodeRef(&ref);
 	dir.SetTo(&ref);
-	
+
 	if (path.SetTo(&dir, NULL) != B_OK) {
 		return B_ERROR;
 	}
-	
+
 	// request BDataIO object from transport add-on
 	BMessage input('TRIN');
 	input.AddString("printer_file", path.Path());
