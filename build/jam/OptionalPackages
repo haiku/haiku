@@ -1284,13 +1284,11 @@ if [ IsOptionalHaikuImagePackageAdded Transmission ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
 			InstallOptionalHaikuImagePackage
-				transmission-1.93-x86-gcc4-2010-05-06.zip
-				: $(baseURL)/transmission-1.93-x86-gcc4-2010-05-06.zip
+				transmission-2.01-x86-gcc4-2010-07-10.zip
+				: $(baseURL)/transmission-2.01-x86-gcc4-2010-07-10.zip
 				:
 				: true
 			;
-			InstallSourceArchive transmission-1.93_haiku-2010-05-06.tar.xz
-				: $(baseSourceURL)/transmission-1.93_haiku-2010-05-06.tar.xz ;
 		} else {
 			Echo "No optional package Transmission available for $(TARGET_ARCH)-gcc2" ;
 		}
