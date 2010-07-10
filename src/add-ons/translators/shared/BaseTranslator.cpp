@@ -32,7 +32,15 @@
 
 #include <string.h>
 #include <stdio.h>
+
+#include <Catalog.h>
+#include <Locale.h>
+
 #include "BaseTranslator.h"
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "BaseTranslator"
+
 
 // ---------------------------------------------------------------
 // Constructor
@@ -53,17 +61,21 @@ BaseTranslator::BaseTranslator(const char *name, const char *info,
 	int32 inCount, const translation_format *outFormats, int32 outCount,
 	const char *settingsFile, TranSetting *defaults, int32 defCount,
 	uint32 tranGroup, uint32 tranType)
-	:	BTranslator()
+	:
+	BTranslator()
 {
+	const char* _name = NULL;
+	const char* _info = NULL;
+	
 	fSettings = new TranslatorSettings(settingsFile, defaults, defCount);
 	fSettings->LoadSettings();
 		// load settings from the Base Translator settings file
 
 	fVersion = version;
-	fName = new char[strlen(name) + 1];
-	strcpy(fName, name);
-	fInfo = new char[strlen(info) + 41];
-	sprintf(fInfo, "%s v%d.%d.%d %s", info,
+	fName = new char[strlen(_name) + 1];
+	strcpy(fName, _name);
+	fInfo = new char[strlen(_info) + 41];
+	sprintf(fInfo, "%s v%d.%d.%d %s", _info,
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(fVersion)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(fVersion)),
 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(fVersion)),
@@ -76,6 +88,7 @@ BaseTranslator::BaseTranslator(const char *name, const char *info,
 	fTranGroup = tranGroup;
 	fTranType = tranType;
 }
+
 
 // ---------------------------------------------------------------
 // Destructor
@@ -100,6 +113,7 @@ BaseTranslator::~BaseTranslator()
 	delete[] fInfo;
 }
 
+
 // ---------------------------------------------------------------
 // TranslatorName
 //
@@ -118,6 +132,7 @@ BaseTranslator::TranslatorName() const
 {
 	return fName;
 }
+
 
 // ---------------------------------------------------------------
 // TranslatorInfo
@@ -139,6 +154,7 @@ BaseTranslator::TranslatorInfo() const
 	return fInfo;
 }
 
+
 // ---------------------------------------------------------------
 // TranslatorVersion
 //
@@ -158,6 +174,7 @@ BaseTranslator::TranslatorVersion() const
 {
 	return fVersion;
 }
+
 
 // ---------------------------------------------------------------
 // InputFormats
@@ -184,6 +201,7 @@ BaseTranslator::InputFormats(int32 *out_count) const
 		return NULL;
 }
 
+
 // ---------------------------------------------------------------
 // OutputFormats
 //
@@ -208,6 +226,7 @@ BaseTranslator::OutputFormats(int32 *out_count) const
 	} else
 		return NULL;
 }
+
 
 // ---------------------------------------------------------------
 // identify_bits_header
@@ -289,7 +308,7 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 		outInfo->group = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.2;
 		outInfo->capability = 0.2;
-		strcpy(outInfo->name, "Be Bitmap Format");
+		strcpy(outInfo->name, B_TRANSLATE("Be Bitmap Format"));
 		strcpy(outInfo->MIME, "image/x-be-bitmap");
 		
 		// Look for quality / capability info in fInputFormats
@@ -314,6 +333,7 @@ BaseTranslator::identify_bits_header(BPositionIO *inSource,
 	
 	return B_OK;
 }
+
 
 // ---------------------------------------------------------------
 // BitsCheck
@@ -386,6 +406,7 @@ BaseTranslator::BitsCheck(BPositionIO *inSource, BMessage *ioExtension,
 	return B_OK + 1;
 }
 
+
 status_t
 BaseTranslator::BitsIdentify(BPositionIO *inSource,
 	const translation_format *inFormat, BMessage *ioExtension,
@@ -406,6 +427,7 @@ BaseTranslator::BitsIdentify(BPositionIO *inSource,
 	}
 	return result;
 }
+
 
 // ---------------------------------------------------------------
 // Identify
@@ -459,6 +481,7 @@ BaseTranslator::Identify(BPositionIO *inSource,
 				outInfo, outType);
 	}
 }
+
 
 // ---------------------------------------------------------------
 // translate_from_bits_to_bits
@@ -539,6 +562,7 @@ BaseTranslator::translate_from_bits_to_bits(BPositionIO *inSource,
 		return B_NO_TRANSLATOR;
 }
 
+
 status_t
 BaseTranslator::BitsTranslate(BPositionIO *inSource,
 	const translator_info *inInfo, BMessage *ioExtension, uint32 outType,
@@ -555,6 +579,7 @@ BaseTranslator::BitsTranslate(BPositionIO *inSource,
 	}
 	return result;
 }
+
 
 // ---------------------------------------------------------------
 // Translate
@@ -603,12 +628,14 @@ BaseTranslator::Translate(BPositionIO *inSource,
 	}
 }
 
+
 // returns the current translator settings into ioExtension
 status_t
 BaseTranslator::GetConfigurationMessage(BMessage *ioExtension)
 {
 	return fSettings->GetConfigurationMessage(ioExtension);
 }
+
 
 // ---------------------------------------------------------------
 // MakeConfigurationView
@@ -656,11 +683,13 @@ BaseTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 			outExtent);
 }
 
+
 TranslatorSettings *
 BaseTranslator::AcquireSettings()
 {
 	return fSettings->Acquire();
 }
+
 
 ///////////////////////////////////////////////////////////
 // Functions to be implemented by derived classes
@@ -672,6 +701,7 @@ BaseTranslator::DerivedIdentify(BPositionIO *inSource,
 {
 	return B_NO_TRANSLATOR;
 }
+
 
 status_t
 BaseTranslator::DerivedTranslate(BPositionIO *inSource,
@@ -694,6 +724,7 @@ BaseTranslator::NewConfigView(TranslatorSettings *settings)
 {
 	return NULL;
 }
+
 
 void
 translate_direct_copy(BPositionIO *inSource, BPositionIO *outDestination)

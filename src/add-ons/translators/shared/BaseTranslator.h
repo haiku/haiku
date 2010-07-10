@@ -33,13 +33,13 @@
 #ifndef BASE_TRANSLATOR_H
 #define BASE_TRANSLATOR_H
 
+#include <ByteOrder.h>
+#include <DataIO.h>
+#include <GraphicsDefs.h>
+#include <InterfaceDefs.h>
 #include <Translator.h>
 #include <TranslatorFormats.h>
 #include <TranslationDefs.h>
-#include <GraphicsDefs.h>
-#include <InterfaceDefs.h>
-#include <DataIO.h>
-#include <ByteOrder.h>
 #include <View.h>
 #include "TranslatorSettings.h"
 

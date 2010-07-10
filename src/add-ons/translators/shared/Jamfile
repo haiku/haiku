@@ -7,4 +7,11 @@ StaticLibrary libtranslatorsutils.a :
 	StreamBuffer.cpp
 	TranslatorSettings.cpp
 	TranslatorWindow.cpp
-	;
+	: $(HAIKU_LOCALE_LIBS)
+;
+
+DoCatalogs libtranslatorsutils.a :
+	:
+	BaseTranslator.cpp
+	TranslatorWindow.cpp
+;

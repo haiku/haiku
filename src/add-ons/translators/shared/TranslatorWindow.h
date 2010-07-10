@@ -33,10 +33,13 @@
 #define TRANSLATORWINDOW_H
 
 #include <Application.h>
-#include <Window.h>
-#include <View.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <Rect.h>
 #include <Translator.h>
+#include <View.h>
+#include <Window.h>
+
 
 class TranslatorWindow : public BWindow {
 public:
@@ -46,6 +49,7 @@ public:
 	~TranslatorWindow();
 		// Posts a quit message so that the application closes properly
 };
+
 
 status_t
 LaunchTranslatorWindow(BTranslator *translator, const char *title,

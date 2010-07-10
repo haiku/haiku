@@ -34,6 +34,11 @@
 #include <GroupLayout.h>
 #include "TranslatorWindow.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "TranslatorWindow"
+
+
 // ---------------------------------------------------------------
 // Constructor
 //
@@ -56,6 +61,7 @@ TranslatorWindow::TranslatorWindow(BRect area, const char *title)
 		// Do nothing for a non-layout window
 }
 
+
 // ---------------------------------------------------------------
 // Destructor
 //
@@ -74,13 +80,14 @@ TranslatorWindow::~TranslatorWindow()
 	be_app->PostMessage(B_QUIT_REQUESTED);
 }
 
+
 status_t
 LaunchTranslatorWindow(BTranslator *translator, const char *title, BRect rect)
 {
 	BView *view = NULL;
 	if (translator->MakeConfigurationView(NULL, &view, &rect)) {
-		BAlert *err = new BAlert("Error",
-			"Unable to create the view.", "OK");
+		BAlert *err = new BAlert(B_TRANSLATE("Error"),
+			B_TRANSLATE("Unable to create the view."), B_TRANSLATE("OK"));
 		err->Go();
 		return B_ERROR;
 	}
