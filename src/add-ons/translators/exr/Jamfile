@@ -13,7 +13,8 @@ Translator EXRTranslator :
 	EXRGamma.cpp
 	EXRTranslator.cpp
 	IStreamWrapper.cpp
-	: be translation libilmimf.so $(TARGET_LIBSTDC++) libtranslatorsutils.a
+	: be translation libilmimf.so $(TARGET_LIBSTDC++) libtranslatorsutils.a 
+	$(HAIKU_LOCALE_LIBS)
 	: true
 ;
 

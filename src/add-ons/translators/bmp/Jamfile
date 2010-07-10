@@ -9,7 +9,8 @@ Translator BMPTranslator :
 	BMPTranslator.cpp
 	BMPView.cpp
 
-	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	: be translation libtranslatorsutils.a $(HAIKU_LOCALE_LIBS)
+	$(TARGET_LIBSUPC++)
 	: true
 ;
 

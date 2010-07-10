@@ -11,6 +11,7 @@ Translator PNGTranslator :
 	PNGView.cpp
 
 	: be translation libpng.a z libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	$(HAIKU_LOCALE_LIBS)
 	: true
 ;
 

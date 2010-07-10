@@ -17,6 +17,7 @@ Translator JPEGTranslator :
 	exif_parser.cpp
 	JPEGTranslator.cpp
 	: be translation libtranslatorsutils.a libjpeg.so $(TARGET_LIBSTDC++)
+	$(HAIKU_LOCALE_LIBS)
 	: true
 ;
 

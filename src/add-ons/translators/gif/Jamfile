@@ -16,7 +16,7 @@ Translator GIFTranslator :
 	SavePalette.cpp
 	SFHash.cpp
 	:
-	be translation $(TARGET_LIBSUPC++)
+	be translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: true
 ;
 

@@ -22,6 +22,7 @@ Translator WonderBrushTranslator :
 	lab_convert.cpp
 
 	: be translation z libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	$(HAIKU_LOCALE_LIBS)
 	: true
 ;
 

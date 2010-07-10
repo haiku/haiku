@@ -9,6 +9,7 @@ Translator TGATranslator :
 	TGATranslator.cpp
 	TGAView.cpp
 	: be translation libtranslatorsutils.a $(TARGET_LIBSUPC++)
+	$(HAIKU_LOCALE_LIBS)
 	: true
 ;
 
