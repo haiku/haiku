@@ -67,7 +67,7 @@
 	#define MIDI	0	// disabled MIDI for the time being on R5
 #endif
 
-#define VERSION "Version alpha 7, Copyright (c) 2002,2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__ 
+#define VERSION "Version alpha 7, Copyright (c) 2002,2003 Jérôme Duval, compiled on " __DATE__ " " __TIME__ 
 #define DRIVER_NAME "emuxki"
 #define FRIENDLY_NAME "Emuxki"
 #define FRIENDLY_NAME_LIVE FRIENDLY_NAME" SB Live"
