@@ -35,7 +35,7 @@ l2cap_l2ca_con_ind(L2capChannel* channel)
 	}
 
 	// Pair Channel with endpoint
-	endpoint->BindToChannel(channel);
+	endpoint->BindNewEnpointToChannel(channel);
 
 	net_buffer* buf = l2cap_con_rsp(channel->ident, channel->scid, channel->dcid,
 		L2CAP_SUCCESS, L2CAP_NO_INFO);
@@ -58,12 +58,73 @@ l2cap_l2ca_con_ind(L2capChannel* channel)
 status_t
 l2cap_con_rsp_ind(HciConnection* conn, L2capChannel* channel)
 {
+	uint16* flush_timo = NULL;
+	uint16* mtu = NULL;
+	l2cap_flow_t* flow = NULL;
+
 	flowf("\n");
 
 	// We received a configuration response, connection process
 	// is a step further but still configuration pending
 
+	// Check channel state
+	if (channel->state != L2CAP_CHAN_OPEN && channel->state != L2CAP_CHAN_CONFIG) {
+		debugf("unexpected L2CA_Config request message. Invalid channel" \
+		" state, state=%d, lcid=%d\n", channel->state, channel->scid);
+		return EINVAL;
+	}
+
+	// Set requested channel configuration options
+	net_buffer* options = NULL;
+
+	if (channel->endpoint->fConfigurationSet) {
+		// Compare channel settings with defaults
+		if (channel->configuration->imtu != L2CAP_MTU_DEFAULT)
+			mtu = &channel->configuration->imtu;
+		if (channel->configuration->flush_timo != L2CAP_FLUSH_TIMO_DEFAULT)
+			flush_timo = &channel->configuration->flush_timo;
+		if (memcmp(&default_qos, &channel->configuration->oflow,
+			sizeof(channel->configuration->oflow)) != 0)
+			flow = &channel->configuration->oflow;
+
+			// Create configuration options
+			if (mtu != NULL || flush_timo != NULL || flow!=NULL)
+				options = l2cap_build_cfg_options(mtu, flush_timo, flow);
+
+			if (options == NULL)
+				return ENOBUFS;
+	}
+
 	// Send Configuration Request
+
+	// Create L2CAP command descriptor
+	channel->ident = btCoreData->ChannelAllocateIdent(conn);
+	if (channel->ident == L2CAP_NULL_IDENT)
+		return EIO;
+
+	net_buffer* buffer = l2cap_cfg_req(channel->ident, channel->dcid, 0, options);
+	if (buffer == NULL)
+		return ENOBUFS;
+
+	L2capFrame* command = btCoreData->SpawnSignal(conn, channel, buffer,
+		channel->ident, L2CAP_CFG_REQ);
+	if (command == NULL) {
+		gBufferModule->free(buffer);
+		channel->state = L2CAP_CHAN_CLOSED;
+		return ENOMEM;
+	}
+
+	channel->cfgState |= L2CAP_CFG_IN_SENT;
+
+	/* Adjust channel state for re-configuration */
+	if (channel->state == L2CAP_CHAN_OPEN) {
+		channel->state = L2CAP_CHAN_CONFIG;
+		channel->cfgState = 0;
+	}
+
+	flowf("Sending cfg req\n");
+	// Link command to the queue
+	SchedConnectionPurgeThread(channel->conn);
 
 	return B_OK;
 }
@@ -74,7 +135,6 @@ l2cap_cfg_rsp_ind(L2capChannel* channel)
 {
 	channel->cfgState |= L2CAP_CFG_OUT;
 	if ((channel->cfgState & L2CAP_CFG_BOTH) == L2CAP_CFG_BOTH) {
-		channel->state = L2CAP_CHAN_OPEN;
 		return channel->endpoint->MarkEstablished();
 	}
 
@@ -116,10 +176,9 @@ l2cap_cfg_req_ind(L2capChannel* channel)
 
 	if ((channel->cfgState & L2CAP_CFG_BOTH) == L2CAP_CFG_BOTH) {
 		// Channel can be declared open
-		channel->state = L2CAP_CHAN_OPEN;
 		channel->endpoint->MarkEstablished();
 
-	} else {
+	} else if ((channel->cfgState & L2CAP_CFG_IN_SENT) == 0) {
 		// send configuration Request by our side
 		if (channel->endpoint->RequiresConfiguration()) {
 			// TODO: define complete configuration packet

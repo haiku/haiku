@@ -155,7 +155,7 @@ l2cap_getsockopt(net_protocol* protocol, int level, int option,
 {
 	flowf("\n");
 
-	return EOPNOTSUPP;
+	return B_OK;
 }
 
 
@@ -167,7 +167,7 @@ l2cap_setsockopt(net_protocol* protocol, int level, int option,
 
 	((L2capEndpoint*)protocol)->fConfigurationSet = true;
 
-	return EOPNOTSUPP;
+	return B_OK;
 }
 
 
@@ -210,7 +210,7 @@ l2cap_send_data(net_protocol* protocol, net_buffer* buffer)
 {
 	flowf("\n");
 
-	return protocol->next->module->send_data(protocol->next, buffer);
+	return EOPNOTSUPP;
 }
 
 
@@ -220,7 +220,7 @@ l2cap_send_routed_data(net_protocol* protocol, struct net_route* route,
 {
 	flowf("\n");
 
-	return protocol->next->module->send_routed_data(protocol->next, route, buffer);
+	return EOPNOTSUPP;
 }
 
 

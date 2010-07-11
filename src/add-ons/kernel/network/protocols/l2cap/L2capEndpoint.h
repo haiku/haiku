@@ -65,6 +65,7 @@ public:
 
 	status_t Shutdown(int direction);
 
+	void 		BindNewEnpointToChannel(L2capChannel* channel);
 	void 		BindToChannel(L2capChannel* channel);
 	status_t	MarkEstablished();
 	status_t	MarkClosed();
@@ -102,7 +103,7 @@ private:
 
 	mutex			fLock;
 	State    		fState;
-	sem_id			fAcceptSemaphore;
+	sem_id			fEstablishSemaphore;
 	L2capEndpoint*	fPeerEndpoint;
 	L2capChannel* 	fChannel;
 

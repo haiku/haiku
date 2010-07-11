@@ -165,7 +165,7 @@ purge_connection(HciConnection* conn)
 		} // TODO: someone put it
 
 
-		debugf("dev %p frame %p tolower\n", conn->ndevice, frame->buffer);
+		debugf("code=%d frame %p tolower\n", frame->code, frame->buffer);
 
 		frame->buffer->type = conn->handle;
 		btDevices->PostACL(conn->ndevice->index, frame->buffer);

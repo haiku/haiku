@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -26,6 +26,9 @@ l2cap_cfg_req(uint8 _ident, uint16 _dcid, uint16 _flags, net_buffer* _data);
 
 net_buffer*
 l2cap_cfg_rsp(uint8 _ident, uint16 _scid, uint16 _flags, uint16 _result, net_buffer* _data);
+
+net_buffer*
+l2cap_build_cfg_options(uint16* _mtu, uint16* _flush_timo, l2cap_flow_t* _flow);
 
 net_buffer*
 l2cap_discon_req(uint8 _ident, uint16 _dcid, uint16 _scid);

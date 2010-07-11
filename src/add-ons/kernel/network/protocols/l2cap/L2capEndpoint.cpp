@@ -35,7 +35,7 @@ L2capEndpoint::L2capEndpoint(net_socket* socket)
 	:
 	ProtocolSocket(socket),
 	fConfigurationSet(false),
-	fAcceptSemaphore(-1),
+	fEstablishSemaphore(-1),
 	fPeerEndpoint(NULL),
 	fChannel(NULL)
 {
@@ -99,10 +99,10 @@ L2capEndpoint::Close()
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
 
-	if (fAcceptSemaphore != -1) {
+	if (fEstablishSemaphore != -1) {
 		debugf("server socket not handling any channel %p\n", this);
 
-		delete_sem(fAcceptSemaphore);
+		delete_sem(fEstablishSemaphore);
 		// TODO: Clean needed stuff
 		// Unbind?
 		return B_OK;
@@ -191,8 +191,8 @@ L2capEndpoint::Listen(int backlog)
 		return B_BAD_VALUE;
 	}
 
-	fAcceptSemaphore = create_sem(0, "l2cap serv accept");
-	if (fAcceptSemaphore < B_OK) {
+	fEstablishSemaphore = create_sem(0, "l2cap serv accept");
+	if (fEstablishSemaphore < B_OK) {
 		flowf("Semaphore could not be created\n");
 		return ENOBUFS;
 	}
@@ -247,7 +247,19 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 		if (l2cap_upper_con_req(channel) == B_OK) {
 			fState = CONNECTING;
 
-			return B_OK;
+			BindToChannel(channel);
+
+			fEstablishSemaphore = create_sem(0, "l2cap client");
+			if (fEstablishSemaphore < B_OK) {
+				flowf("Semaphore could not be created\n");
+				return ENOBUFS;
+			}
+
+			bigtime_t timeout = absolute_timeout(300 * 1000 * 1000);
+
+			return acquire_sem_etc(fEstablishSemaphore, 1,
+				B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+
 		} else {
 			return ECONNREFUSED;
 		}
@@ -270,7 +282,7 @@ L2capEndpoint::Accept(net_socket** _acceptedSocket)
 	do {
 		// locker.Unlock();
 
-		status = acquire_sem_etc(fAcceptSemaphore, 1, B_ABSOLUTE_TIMEOUT
+		status = acquire_sem_etc(fEstablishSemaphore, 1, B_ABSOLUTE_TIMEOUT
 			| B_CAN_INTERRUPT, timeout);
 
 		if (status != B_OK)
@@ -380,7 +392,7 @@ L2capEndpoint::ForPsm(uint16 psm)
 
 
 void
-L2capEndpoint::BindToChannel(L2capChannel* channel)
+L2capEndpoint::BindNewEnpointToChannel(L2capChannel* channel)
 {
 	net_socket* newSocket;
 	status_t error = gSocketModule->spawn_pending_socket(socket, &newSocket);
@@ -411,18 +423,39 @@ L2capEndpoint::BindToChannel(L2capChannel* channel)
 }
 
 
+void
+L2capEndpoint::BindToChannel(L2capChannel* channel)
+{
+	this->fChannel = channel;
+	channel->endpoint = this;
+
+	// Provide the channel the configuration set by the user socket
+	channel->configuration = &fConfiguration;
+
+	// no parent to give feedback
+	fPeerEndpoint = NULL;
+}
+
+
 status_t
 L2capEndpoint::MarkEstablished()
 {
+	status_t error = B_OK;
 	debugf("Endpoint %p for psm %d, schannel %x dchannel %x\n", this,
 		fChannel->psm, fChannel->scid, fChannel->dcid);
 
-	status_t error = gSocketModule->set_connected(socket);
-	if (error == B_OK) {
-		release_sem(fPeerEndpoint->fAcceptSemaphore);
-	} else {
-		debugf("Could not set child Endpoint %p %s\n", this, strerror(error));
-	}
+	fChannel->state = L2CAP_CHAN_OPEN;
+
+	if (fPeerEndpoint != NULL) {
+
+		error = gSocketModule->set_connected(socket);
+		if (error == B_OK) {
+			release_sem(fPeerEndpoint->fEstablishSemaphore);
+		} else {
+			debugf("Could not set child Endpoint %p %s\n", this, strerror(error));
+		}
+	} else
+		release_sem(fEstablishSemaphore);
 
 	return error;
 }
