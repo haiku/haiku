@@ -23,6 +23,7 @@
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "SuperBlock.h"
+#include "SymLink.h"
 #include "Transaction.h"
 #include "Volume.h"
 
@@ -425,6 +426,83 @@ checksumfs_remove_vnode(fs_volume* fsVolume, fs_vnode* vnode, bool reenter)
 
 
 // #pragma mark - common operations
+
+
+static status_t
+checksumfs_read_symlink(fs_volume* fsVolume, fs_vnode* vnode, char* buffer,
+	size_t* _bufferSize)
+{
+	SymLink* symLink = dynamic_cast<SymLink*>((Node*)vnode->private_node);
+	if (symLink == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	status_t error = check_access(symLink, R_OK);
+	if (error != B_OK)
+		return error;
+
+	return symLink->Read(buffer, *_bufferSize, *_bufferSize);
+}
+
+
+static status_t
+checksumfs_create_symlink(fs_volume* fsVolume, fs_vnode* parent,
+	const char* name, const char* path, int mode)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Directory* directory
+		= dynamic_cast<Directory*>((Node*)parent->private_node);
+	if (directory == NULL)
+		return B_NOT_A_DIRECTORY;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	status_t error = check_access(directory, W_OK);
+	if (error != B_OK)
+		return error;
+
+	// start a transaction
+	Transaction transaction(volume);
+	error = transaction.Start();
+	if (error != B_OK)
+		return error;
+
+	// attach the directory to the transaction (write locks it, too)
+	error = transaction.AddNode(directory);
+	if (error != B_OK)
+		return error;
+
+	// create a symlink node
+	SymLink* newSymLink;
+	error = volume->CreateSymLink(mode, transaction, newSymLink);
+	if (error != B_OK)
+		return error;
+
+	// write it
+	error = newSymLink->Write(path, strlen(path), transaction);
+	if (error != B_OK)
+		return error;
+
+	// insert the new symlink
+	error = directory->InsertEntry(name, newSymLink->BlockIndex(), transaction);
+	if (error != B_OK)
+		return error;
+
+	// update stat data
+	newSymLink->SetHardLinks(1);
+
+	directory->Touched(NODE_MODIFIED);
+
+	// commit the transaction
+	return transaction.Commit();
+}
+
+
+static status_t
+checksumfs_unlink(fs_volume* fsVolume, fs_vnode* dir, const char* name)
+{
+	return remove_entry(fsVolume, dir, name, false);
+}
 
 
 static status_t
@@ -869,11 +947,11 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 	NULL,	// checksumfs_deselect,
 	NULL,	// checksumfs_fsync,
 
-	NULL,	// checksumfs_read_symlink,
-	NULL,	// checksumfs_create_symlink,
+	checksumfs_read_symlink,
+	checksumfs_create_symlink,
 
 	NULL,	// checksumfs_link,
-	NULL,	// checksumfs_unlink,
+	checksumfs_unlink,
 	NULL,	// checksumfs_rename,
 
 	NULL,	// checksumfs_access,

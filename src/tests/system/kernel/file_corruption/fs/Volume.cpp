@@ -24,6 +24,7 @@
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "SuperBlock.h"
+#include "SymLink.h"
 
 
 Volume::Volume(uint32 flags)
@@ -276,6 +277,9 @@ Volume::ReadNode(uint64 blockIndex, Node*& _node)
 		case S_IFDIR:
 			node = new(std::nothrow) Directory(this, blockIndex, *nodeData);
 			break;
+		case S_IFLNK:
+			node = new(std::nothrow) SymLink(this, blockIndex, *nodeData);
+			break;
 		default:
 			node = new(std::nothrow) Node(this, blockIndex, *nodeData);
 			break;
@@ -316,6 +320,35 @@ Volume::CreateDirectory(mode_t mode, Transaction& transaction,
 
 	allocatedBlock.Detach();
 	_directory = directory;
+
+	return B_OK;
+}
+
+
+status_t
+Volume::CreateSymLink(mode_t mode, Transaction& transaction, SymLink*& _symLink)
+{
+	// allocate a free block
+	AllocatedBlock allocatedBlock(fBlockAllocator, transaction);
+	status_t error = allocatedBlock.Allocate();
+	if (error != B_OK)
+		return error;
+
+	// create the symlink
+	SymLink* symLink = new(std::nothrow) SymLink(this, allocatedBlock.Index(),
+		(mode & ~(mode_t)S_IFMT) | S_IFLNK);
+	if (symLink == NULL)
+		return B_NO_MEMORY;
+
+	// attach the directory to the transaction
+	error = transaction.AddNode(symLink, TRANSACTION_DELETE_NODE);
+	if (error != B_OK) {
+		delete symLink;
+		return error;
+	}
+
+	allocatedBlock.Detach();
+	_symLink = symLink;
 
 	return B_OK;
 }

@@ -16,6 +16,7 @@
 class BlockAllocator;
 class Directory;
 class Node;
+class SymLink;
 class Transaction;
 
 
@@ -44,6 +45,9 @@ public:
 			status_t			CreateDirectory(mode_t mode,
 									Transaction& transaction,
 									Directory*& _directory);
+			status_t			CreateSymLink(mode_t mode,
+									Transaction& transaction,
+									SymLink*& _symLink);
 			status_t			DeleteNode(Node* node);
 
 	inline	void				TransactionStarted();
