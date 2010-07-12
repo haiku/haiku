@@ -463,7 +463,7 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage
 			gcc-2.95.3-r1a2-x86-gcc2-2010-07-12.zip
-			: $(baseURL)/gcc-2.95.3-r1a2-x86-gcc2-2010-07-12.zip ;
+			: $(baseURL)/gcc-2.95.3-x86-gcc2-2010-07-12.zip ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 2 {
