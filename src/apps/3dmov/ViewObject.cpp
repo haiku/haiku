@@ -77,7 +77,7 @@ void MediaSource :: SetVideo(Video *video)
 	DESCRIPTION:	Constructor
 */
 ViewObject :: ViewObject(BRect frame)
-	: BGLView(frame, (char *) "3Dmov_view", B_FOLLOW_ALL_SIDES, 0, BGL_RGB | BGL_DOUBLE | BGL_DEPTH)
+	: BGLView(frame, "3Dmov_view", B_FOLLOW_ALL_SIDES, 0, BGL_RGB | BGL_DOUBLE | BGL_DEPTH)
 {
 	sCountViewObjects++;
 		

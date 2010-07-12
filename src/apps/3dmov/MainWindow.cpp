@@ -70,6 +70,7 @@ MainWindow :: MainWindow(BRect frame, SHAPE shape)
 		case BOOK:		AddChild(fCurrentView = new ViewBook(frame));	break;
 		case CUBE:		AddChild(fCurrentView = new ViewCube(frame));	break;
 		case SPHERE:	AddChild(fCurrentView = new ViewSphere(frame));	break;
+		case NUMBER_OF_SHAPES: break;
 	}
 
 	//AddShortcut('f', B_COMMAND_KEY, new BMessage(MSG_FULLSCREEN));
