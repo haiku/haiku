@@ -38,6 +38,7 @@ Volume::Volume(uint32 flags)
 	fBlockAllocator(NULL),
 	fRootDirectory(NULL)
 {
+	mutex_init(&fTransactionLock, "checksumfs transaction");
 }
 
 
@@ -53,6 +54,8 @@ Volume::~Volume()
 		close(fFD);
 
 	free(fName);
+
+	mutex_destroy(&fTransactionLock);
 }
 
 
@@ -170,29 +173,40 @@ Volume::Initialize(const char* name)
 	if (fName == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = fBlockAllocator->Initialize();
+	Transaction transaction(this);
+	status_t error = transaction.Start();
+	if (error != B_OK)
+		return error;
+
+	error = fBlockAllocator->Initialize(transaction);
 	if (error != B_OK)
 		return error;
 
 	// create the root directory
 	error = CreateDirectory(S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
-		fRootDirectory);
+		transaction, fRootDirectory);
 	if (error != B_OK)
 		return error;
 
-	error = fRootDirectory->Flush();
-	if (error != B_OK)
-		return error;
+	transaction.KeepNode(fRootDirectory);
+	fRootDirectory->SetHardLinks(1);
 
 	// write the super block
 	Block block;
-	if (!block.GetZero(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE))
+	if (!block.GetZero(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE,
+			transaction)) {
 		return B_ERROR;
+	}
 
 	SuperBlock* superBlock = (SuperBlock*)block.Data();
 	superBlock->Initialize(this);
 
 	block.Put();
+
+	// commit the transaction and flush the block cache
+	error = transaction.Commit();
+	if (error != B_OK)
+		return error;
 
 	return block_cache_sync(fBlockCache);
 }
@@ -236,6 +250,13 @@ Volume::PutNode(Node* node)
 
 
 status_t
+Volume::RemoveNode(Node* node)
+{
+	return remove_vnode(fFSVolume, node->BlockIndex());
+}
+
+
+status_t
 Volume::ReadNode(uint64 blockIndex, Node*& _node)
 {
 	if (blockIndex == 0 || blockIndex >= fTotalBlocks)
@@ -271,10 +292,11 @@ Volume::ReadNode(uint64 blockIndex, Node*& _node)
 
 
 status_t
-Volume::CreateDirectory(mode_t mode, Directory*& _directory)
+Volume::CreateDirectory(mode_t mode, Transaction& transaction,
+	Directory*& _directory)
 {
 	// allocate a free block
-	AllocatedBlock allocatedBlock(fBlockAllocator);
+	AllocatedBlock allocatedBlock(fBlockAllocator, transaction);
 	status_t error = allocatedBlock.Allocate();
 	if (error != B_OK)
 		return error;
@@ -285,10 +307,44 @@ Volume::CreateDirectory(mode_t mode, Directory*& _directory)
 	if (directory == NULL)
 		return B_NO_MEMORY;
 
+	// attach the directory to the transaction
+	error = transaction.AddNode(directory, TRANSACTION_DELETE_NODE);
+	if (error != B_OK) {
+		delete directory;
+		return error;
+	}
+
 	allocatedBlock.Detach();
 	_directory = directory;
 
 	return B_OK;
+}
+
+
+status_t
+Volume::DeleteNode(Node* node)
+{
+	Transaction transaction(this);
+	status_t error = transaction.Start();
+	if (error == B_OK) {
+		error = fBlockAllocator->Free(node->BlockIndex(), 1, transaction);
+		if (error == B_OK) {
+			error = transaction.Commit();
+			if (error != B_OK) {
+				ERROR("Failed to commit transaction for delete node at %"
+					B_PRIu64 "\n", node->BlockIndex());
+			}
+		} else {
+			ERROR("Failed to free block for node at %" B_PRIu64 "\n",
+				node->BlockIndex());
+		}
+	} else {
+		ERROR("Failed to start transaction for delete node at %" B_PRIu64 "\n",
+			node->BlockIndex());
+	}
+
+	delete node;
+	return error;
 }
 
 

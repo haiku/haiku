@@ -10,10 +10,13 @@
 #include <fs_interface.h>
 #include <fs_volume.h>
 
+#include <lock.h>
+
 
 class BlockAllocator;
 class Directory;
 class Node;
+class Transaction;
 
 
 class Volume {
@@ -34,11 +37,17 @@ public:
 			status_t			PublishNode(Node* node, uint32 flags);
 			status_t			GetNode(uint64 blockIndex, Node*& _node);
 			status_t			PutNode(Node* node);
+			status_t			RemoveNode(Node* node);
 
 			status_t			ReadNode(uint64 blockIndex, Node*& _node);
 
 			status_t			CreateDirectory(mode_t mode,
+									Transaction& transaction,
 									Directory*& _directory);
+			status_t			DeleteNode(Node* node);
+
+	inline	void				TransactionStarted();
+	inline	void				TransactionFinished();
 
 	inline	dev_t				ID() const			{ return fFSVolume->id; }
 	inline	bool				IsReadOnly() const;
@@ -62,7 +71,22 @@ private:
 			char*				fName;
 			BlockAllocator*		fBlockAllocator;
 			Directory*			fRootDirectory;
+			mutex				fTransactionLock;
 };
+
+
+void
+Volume::TransactionStarted()
+{
+	mutex_lock(&fTransactionLock);
+}
+
+
+void
+Volume::TransactionFinished()
+{
+	mutex_unlock(&fTransactionLock);
+}
 
 
 bool

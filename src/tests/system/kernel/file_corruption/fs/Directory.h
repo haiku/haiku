@@ -16,6 +16,17 @@ public:
 								Directory(Volume* volume, uint64 blockIndex,
 									mode_t mode);
 	virtual						~Directory();
+
+			status_t			LookupEntry(const char* name,
+									uint64& _blockIndex);
+			status_t			LookupNextEntry(const char* name,
+									char* foundName, size_t& _foundNameLength,
+									uint64& _blockIndex);
+
+			status_t			InsertEntry(const char* name, uint64 blockIndex,
+									Transaction& transaction);
+			status_t			RemoveEntry(const char* name,
+									Transaction& transaction);
 };
 
 

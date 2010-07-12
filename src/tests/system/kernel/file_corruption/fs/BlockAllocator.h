@@ -9,6 +9,7 @@
 #include <lock.h>
 
 
+struct Transaction;
 struct Volume;
 
 
@@ -22,29 +23,40 @@ public:
 			uint64				FreeBlocks() const	{ return fFreeBlocks; }
 
 			status_t			Init(uint64 blockBitmap, uint64 freeBlocks);
-			status_t			Initialize();
+			status_t			Initialize(Transaction& transaction);
 
 			status_t			Allocate(uint64 baseHint, uint64 count,
+									Transaction& transaction,
 									uint64& _allocatedBase,
 									uint64& _allocatedCount);
 			status_t			AllocateExactly(uint64 base,
-									uint64 count);
-			status_t			Free(uint64 base, uint64 count);
+									uint64 count, Transaction& transaction);
+			status_t			Free(uint64 base, uint64 count,
+									Transaction& transaction);
+
+			void				ResetFreeBlocks(uint64 count);
+									// interface for Transaction only
 
 private:
 			status_t			_Allocate(uint64 base, uint64 searchEnd,
-									uint64 count, uint64* _allocatedBase,
+									uint64 count, Transaction& transaction,
+									uint64* _allocatedBase,
 									uint64& _allocatedCount);
 			status_t			_AllocateInGroup(uint64 base, uint64 searchEnd,
-									uint32 count, uint64* _allocatedBase,
+									uint32 count, Transaction& transaction,
+									uint64* _allocatedBase,
 									uint32& _allocatedCount);
 			status_t			_AllocateInBitmapBlock(uint64 base,
-									uint32 count, uint64* _allocatedBase,
+									uint32 count, Transaction& transaction,
+									uint64* _allocatedBase,
 									uint32& _allocatedCount);
 
-			status_t			_Free(uint64 base, uint64 count);
-			status_t			_FreeInGroup(uint64 base, uint32 count);
-			status_t			_FreeInBitmapBlock(uint64 base, uint32 count);
+			status_t			_Free(uint64 base, uint64 count,
+									Transaction& transaction);
+			status_t			_FreeInGroup(uint64 base, uint32 count,
+									Transaction& transaction);
+			status_t			_FreeInBitmapBlock(uint64 base, uint32 count,
+									Transaction& transaction);
 
 private:
 			mutex				fLock;
@@ -60,9 +72,10 @@ private:
 
 class AllocatedBlock {
 public:
-	AllocatedBlock(BlockAllocator* allocator)
+	AllocatedBlock(BlockAllocator* allocator, Transaction& transaction)
 		:
 		fAllocator(allocator),
+		fTransaction(transaction),
 		fIndex(0)
 	{
 	}
@@ -70,7 +83,7 @@ public:
 	~AllocatedBlock()
 	{
 		if (fIndex > 0)
-			fAllocator->Free(fIndex, 1);
+			fAllocator->Free(fIndex, 1, fTransaction);
 	}
 
 	uint64 Index() const
@@ -81,7 +94,8 @@ public:
 	status_t Allocate(uint64 baseHint = 0)
 	{
 		uint64 allocatedBlocks;
-		status_t error = fAllocator->Allocate(0, 1, fIndex, allocatedBlocks);
+		status_t error = fAllocator->Allocate(0, 1, fTransaction, fIndex,
+			allocatedBlocks);
 		if (error != B_OK)
 			fIndex = 0;
 		return error;
@@ -96,6 +110,7 @@ public:
 
 private:
 	BlockAllocator*	fAllocator;
+	Transaction&	fTransaction;
 	uint64			fIndex;
 };
 

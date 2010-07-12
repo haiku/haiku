@@ -17,6 +17,9 @@ DEFINES += DEBUG_APP="\\\"checksumfs\\\"" ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 
+SubDirC++Flags -Werror ;
+
+
 Addon <userland>checksumfs :
 	$(HAIKU_CHECKSUM_FS_SOURCES)
 

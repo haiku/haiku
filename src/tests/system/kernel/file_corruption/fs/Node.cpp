@@ -8,8 +8,19 @@
 
 #include <string.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #include "Block.h"
+
+
+static inline uint64
+current_time_nanos()
+{
+	timeval time;
+	gettimeofday(&time, NULL);
+
+	return (uint64)time.tv_sec * 1000000000 + (uint64)time.tv_usec * 1000;
+}
 
 
 Node::Node(Volume* volume, uint64 blockIndex, const checksumfs_node& nodeData)
@@ -20,6 +31,8 @@ Node::Node(Volume* volume, uint64 blockIndex, const checksumfs_node& nodeData)
 	fNodeDataDirty(false)
 {
 	_Init();
+
+	fAccessedTime = ModificationTime();
 }
 
 
@@ -35,14 +48,18 @@ Node::Node(Volume* volume, uint64 blockIndex, mode_t mode)
 
 	fNode.mode = mode;
 
+	// set user/group
+	fNode.uid = geteuid();
+	fNode.gid = getegid();
+
 	// set the times
 	timeval time;
 	gettimeofday(&time, NULL);
 
-	fNode.creationTime = (uint64)time.tv_sec * 1000000000
-		+ (uint64)time.tv_usec * 1000;
-	fNode.modificationTime = fNode.creationTime;
-	fNode.changeTime = fNode.creationTime;
+	fAccessedTime = current_time_nanos();
+	fNode.creationTime = fAccessedTime;
+	fNode.modificationTime = fAccessedTime;
+	fNode.changeTime = fAccessedTime;
 }
 
 
@@ -52,14 +69,62 @@ Node::~Node()
 }
 
 
+void
+Node::SetParentDirectory(uint32 blockIndex)
+{
+	fNode.parentDirectory = blockIndex;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetHardLinks(uint32 value)
+{
+	fNode.hardLinks = value;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetSize(uint64 size)
+{
+	fNode.size = size;
+}
+
+
+void
+Node::Touched(int32 mode)
+{
+	fAccessedTime = current_time_nanos();
+
+	switch (mode) {
+		default:
+		case NODE_MODIFIED:
+			fNode.modificationTime = fAccessedTime;
+		case NODE_STAT_CHANGED:
+			fNode.changeTime = fAccessedTime;
+		case NODE_ACCESSED:
+			break;
+	}
+}
+
+
+void
+Node::RevertNodeData(const checksumfs_node& nodeData)
+{
+	fNode = nodeData;
+	fNodeDataDirty = false;
+}
+
+
 status_t
-Node::Flush()
+Node::Flush(Transaction& transaction)
 {
 	if (!fNodeDataDirty)
 		return B_OK;
 
 	Block block;
-	if (!block.GetWritable(fVolume, fBlockIndex))
+	if (!block.GetWritable(fVolume, fBlockIndex, transaction))
 		return B_ERROR;
 
 	memcpy(block.Data(), &fNode, sizeof(fNode));

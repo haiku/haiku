@@ -77,7 +77,7 @@ BlockAllocator::Init(uint64 blockBitmap, uint64 freeBlocks)
 
 
 status_t
-BlockAllocator::Initialize()
+BlockAllocator::Initialize(Transaction& transaction)
 {
 	status_t error = Init(kCheckSumFSSuperBlockOffset / B_PAGE_SIZE + 1,
 		fTotalBlocks);
@@ -93,7 +93,7 @@ dprintf("fBitmapBlockCount:     %llu\n", fBitmapBlockCount);
 	// clear the block bitmap
 	for (uint64 i = 0; i < fBitmapBlockCount; i++) {
 		Block block;
-		if (!block.GetZero(fVolume, fBitmapBlock + i))
+		if (!block.GetZero(fVolume, fBitmapBlock + i, transaction))
 			return B_ERROR;
 	}
 
@@ -102,8 +102,10 @@ dprintf("fBitmapBlockCount:     %llu\n", fBitmapBlockCount);
 	uint32 partialBitmapBlock = fTotalBlocks % kBlocksPerBitmapBlock;
 	if (partialBitmapBlock != 0) {
 		Block block;
-		if (!block.GetZero(fVolume, fBitmapBlock + fBitmapBlockCount - 1))
+		if (!block.GetZero(fVolume, fBitmapBlock + fBitmapBlockCount - 1,
+				transaction)) {
 			return B_ERROR;
+		}
 
 		// set full uint32s
 		uint32* bits = (uint32*)block.Data();
@@ -121,7 +123,7 @@ dprintf("fBitmapBlockCount:     %llu\n", fBitmapBlockCount);
 	uint32 partialGroup = fTotalBlocks % kBlocksPerGroup;
 	for (uint64 i = 0; i < fAllocationGroupCount; i++) {
 		Block block;
-		if (!block.GetZero(fVolume, fAllocationGroupBlock + i))
+		if (!block.GetZero(fVolume, fAllocationGroupBlock + i, transaction))
 			return B_ERROR;
 
 		uint16* counts = (uint16*)block.Data();
@@ -143,7 +145,7 @@ dprintf("fBitmapBlockCount:     %llu\n", fBitmapBlockCount);
 	}
 
 	// mark all blocks we already use used
-	error = AllocateExactly(0, fBitmapBlock + fBitmapBlockCount);
+	error = AllocateExactly(0, fBitmapBlock + fBitmapBlockCount, transaction);
 	if (error != B_OK)
 		return error;
 
@@ -159,8 +161,8 @@ dprintf("fBitmapBlockCount:     %llu\n", fBitmapBlockCount);
 
 
 status_t
-BlockAllocator::Allocate(uint64 baseHint, uint64 count, uint64& _allocatedBase,
-	uint64& _allocatedCount)
+BlockAllocator::Allocate(uint64 baseHint, uint64 count,
+	Transaction& transaction, uint64& _allocatedBase, uint64& _allocatedCount)
 {
 	MutexLocker locker(fLock);
 dprintf("BlockAllocator::Allocate(%llu, %llu)\n", baseHint, count);
@@ -172,29 +174,32 @@ dprintf("BlockAllocator::Allocate(%llu, %llu)\n", baseHint, count);
 		baseHint = 0;
 
 	// search from base hint to end
-	status_t error = _Allocate(baseHint, fTotalBlocks, count, &_allocatedBase,
-		_allocatedCount);
+	status_t error = _Allocate(baseHint, fTotalBlocks, count, transaction,
+		&_allocatedBase, _allocatedCount);
 	if (error == B_OK || baseHint == 0)
 		return error;
 
 	// search from 0 to hint
-	return _Allocate(0, baseHint, count, &_allocatedBase, _allocatedCount);
+	return _Allocate(0, baseHint, count, transaction, &_allocatedBase,
+		_allocatedCount);
 }
 
 
 status_t
-BlockAllocator::AllocateExactly(uint64 base, uint64 count)
+BlockAllocator::AllocateExactly(uint64 base, uint64 count,
+	Transaction& transaction)
 {
 	MutexLocker locker(fLock);
 dprintf("BlockAllocator::AllocateExactly(%llu, %llu)\n", base, count);
 
 	uint64 allocated;
-	status_t error = _Allocate(base, fTotalBlocks, count, NULL, allocated);
+	status_t error = _Allocate(base, fTotalBlocks, count, transaction, NULL,
+		allocated);
 	if (error != B_OK)
 		return error;
 
 	if (allocated < count) {
-		_Free(base, allocated);
+		_Free(base, allocated, transaction);
 		return B_BUSY;
 	}
 
@@ -203,11 +208,20 @@ dprintf("BlockAllocator::AllocateExactly(%llu, %llu)\n", base, count);
 
 
 status_t
-BlockAllocator::Free(uint64 base, uint64 count)
+BlockAllocator::Free(uint64 base, uint64 count, Transaction& transaction)
 {
 	MutexLocker locker(fLock);
 
-	return _Free(base, count);
+	return _Free(base, count, transaction);
+}
+
+
+void
+BlockAllocator::ResetFreeBlocks(uint64 count)
+{
+	MutexLocker locker(fLock);
+
+	fFreeBlocks = count;
 }
 
 
@@ -231,7 +245,7 @@ BlockAllocator::Free(uint64 base, uint64 count)
 */
 status_t
 BlockAllocator::_Allocate(uint64 base, uint64 searchEnd, uint64 count,
-	uint64* _allocatedBase, uint64& _allocatedCount)
+	Transaction& transaction, uint64* _allocatedBase, uint64& _allocatedCount)
 {
 	ASSERT(base <= fTotalBlocks);
 	ASSERT(searchEnd <= fTotalBlocks);
@@ -249,7 +263,7 @@ BlockAllocator::_Allocate(uint64 base, uint64 searchEnd, uint64 count,
 
 			uint32 allocated;
 			status_t error = _AllocateInGroup(base, searchEnd, toAllocate,
-				_allocatedBase, allocated);
+				transaction, _allocatedBase, allocated);
 			if (error == B_OK) {
 				fFreeBlocks -= toAllocate;
 
@@ -281,8 +295,8 @@ BlockAllocator::_Allocate(uint64 base, uint64 searchEnd, uint64 count,
 	while (remaining > 0 && base < searchEnd) {
 		uint64 toAllocate = std::min(remaining, kBlocksPerGroup - groupOffset);
 		uint32 allocated;
-		status_t error = _AllocateInGroup(base, searchEnd, toAllocate, NULL,
-			allocated);
+		status_t error = _AllocateInGroup(base, searchEnd, toAllocate,
+			transaction, NULL, allocated);
 		if (error != B_OK)
 			break;
 
@@ -327,7 +341,7 @@ BlockAllocator::_Allocate(uint64 base, uint64 searchEnd, uint64 count,
 */
 status_t
 BlockAllocator::_AllocateInGroup(uint64 base, uint64 searchEnd, uint32 count,
-	uint64* _allocatedBase, uint32& _allocatedCount)
+	Transaction& transaction, uint64* _allocatedBase, uint32& _allocatedCount)
 {
 dprintf("BlockAllocator::_AllocateInGroup(%llu, %lu)\n", base, count);
 	ASSERT(count <= kBlocksPerGroup);
@@ -338,7 +352,7 @@ dprintf("BlockAllocator::_AllocateInGroup(%llu, %lu)\n", base, count);
 
 	Block block;
 	if (!block.GetWritable(fVolume,
-			fAllocationGroupBlock + base / kBlocksPerGroup)) {
+			fAllocationGroupBlock + base / kBlocksPerGroup, transaction)) {
 		return B_ERROR;
 	}
 
@@ -354,8 +368,8 @@ dprintf("BlockAllocator::_AllocateInGroup(%llu, %lu)\n", base, count);
 		if (inBlockOffset != 0) {
 			if (counts[blockIndex] < kBlocksPerBitmapBlock) {
 				uint32 allocated;
-				if (_AllocateInBitmapBlock(base, count, _allocatedBase,
-						allocated) == B_OK) {
+				if (_AllocateInBitmapBlock(base, count, transaction,
+						_allocatedBase, allocated) == B_OK) {
 					if (inBlockOffset + allocated < kBlocksPerBitmapBlock
 						|| allocated == remaining) {
 						_allocatedCount = allocated;
@@ -407,7 +421,7 @@ dprintf("BlockAllocator::_AllocateInGroup(%llu, %lu)\n", base, count);
 			kBlocksPerBitmapBlock - inBlockOffset);
 
 		uint32 allocated;
-		status_t error = _AllocateInBitmapBlock(base, toAllocate,
+		status_t error = _AllocateInBitmapBlock(base, toAllocate, transaction,
 			_allocatedBase, allocated);
 		if (error != B_OK)
 			break;
@@ -453,7 +467,7 @@ dprintf("BlockAllocator::_AllocateInGroup(%llu, %lu)\n", base, count);
 */
 status_t
 BlockAllocator::_AllocateInBitmapBlock(uint64 base, uint32 count,
-	uint64* _allocatedBase, uint32& _allocatedCount)
+	Transaction& transaction, uint64* _allocatedBase, uint32& _allocatedCount)
 {
 dprintf("BlockAllocator::_AllocateInBitmapBlock(%llu, %lu)\n", base, count);
 	ASSERT(count <= kBlocksPerBitmapBlock);
@@ -461,7 +475,7 @@ dprintf("BlockAllocator::_AllocateInBitmapBlock(%llu, %lu)\n", base, count);
 
 	Block block;
 	if (!block.GetWritable(fVolume,
-			fBitmapBlock + base / kBlocksPerBitmapBlock)) {
+			fBitmapBlock + base / kBlocksPerBitmapBlock, transaction)) {
 		return B_ERROR;
 	}
 
@@ -546,7 +560,7 @@ dprintf("BlockAllocator::_AllocateInBitmapBlock(%llu, %lu)\n", base, count);
 
 
 status_t
-BlockAllocator::_Free(uint64 base, uint64 count)
+BlockAllocator::_Free(uint64 base, uint64 count, Transaction& transaction)
 {
 	if (count == 0)
 		return B_OK;
@@ -561,11 +575,11 @@ dprintf("BlockAllocator::_Free(%llu, %llu)\n", base, count);
 
 	while (remaining > 0) {
 		uint64 toFree = std::min(remaining, kBlocksPerGroup - groupOffset);
-		status_t error = _FreeInGroup(base, toFree);
+		status_t error = _FreeInGroup(base, toFree, transaction);
 		if (error != B_OK)
 			return error;
 
-		fFreeBlocks -= toFree;
+		fFreeBlocks += toFree;
 		remaining -= toFree;
 		base += toFree;
 		groupOffset = 0;
@@ -576,7 +590,8 @@ dprintf("BlockAllocator::_Free(%llu, %llu)\n", base, count);
 
 
 status_t
-BlockAllocator::_FreeInGroup(uint64 base, uint32 count)
+BlockAllocator::_FreeInGroup(uint64 base, uint32 count,
+	Transaction& transaction)
 {
 	if (count == 0)
 		return B_OK;
@@ -587,7 +602,7 @@ dprintf("BlockAllocator::_FreeInGroup(%llu, %lu)\n", base, count);
 
 	Block block;
 	if (!block.GetWritable(fVolume,
-			fAllocationGroupBlock + base / kBlocksPerGroup)) {
+			fAllocationGroupBlock + base / kBlocksPerGroup, transaction)) {
 		return B_ERROR;
 	}
 
@@ -604,7 +619,7 @@ dprintf("BlockAllocator::_FreeInGroup(%llu, %lu)\n", base, count);
 		if (counts[blockIndex] + toFree > kBlocksPerBitmapBlock)
 			return B_BAD_VALUE;
 
-		status_t error = _FreeInBitmapBlock(base, toFree);
+		status_t error = _FreeInBitmapBlock(base, toFree, transaction);
 		if (error != B_OK)
 			return error;
 
@@ -620,7 +635,8 @@ dprintf("BlockAllocator::_FreeInGroup(%llu, %lu)\n", base, count);
 
 
 status_t
-BlockAllocator::_FreeInBitmapBlock(uint64 base, uint32 count)
+BlockAllocator::_FreeInBitmapBlock(uint64 base, uint32 count,
+	Transaction& transaction)
 {
 dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 	ASSERT(count <= kBlocksPerBitmapBlock);
@@ -628,7 +644,7 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 
 	Block block;
 	if (!block.GetWritable(fVolume,
-			fBitmapBlock + base / kBlocksPerBitmapBlock)) {
+			fBitmapBlock + base / kBlocksPerBitmapBlock, transaction)) {
 		return B_ERROR;
 	}
 

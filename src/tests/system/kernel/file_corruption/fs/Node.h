@@ -8,12 +8,22 @@
 
 #include <sys/types.h>
 
+#include <AutoLocker.h>
+
 #include <lock.h>
 
 #include "checksumfs.h"
 
 
+class Transaction;
 class Volume;
+
+
+enum {
+	NODE_ACCESSED,
+	NODE_STAT_CHANGED,
+	NODE_MODIFIED
+};
 
 
 class Node {
@@ -24,6 +34,7 @@ public:
 									mode_t mode);
 	virtual						~Node();
 
+	inline	const checksumfs_node& NodeData() const	{ return fNode; }
 	inline	Volume*				GetVolume() const	{ return fVolume; }
 	inline	uint64				BlockIndex() const	{ return fBlockIndex; }
 	inline	uint32				Mode() const		{ return fNode.mode; }
@@ -32,16 +43,25 @@ public:
 	inline	uint32				UID() const			{ return fNode.uid; }
 	inline	uint32				GID() const			{ return fNode.gid; }
 	inline	uint64				Size() const		{ return fNode.size; }
+	inline	uint64				AccessedTime() const { return fAccessedTime; }
 	inline	uint64				CreationTime() const;
 	inline	uint64				ModificationTime() const;
 	inline	uint64				ChangeTime() const;
+
+			void				SetParentDirectory(uint32 blockIndex);
+			void				SetHardLinks(uint32 value);
+			void				SetSize(uint64 size);
+
+			void				Touched(int32 mode);
 
 	inline	bool				ReadLock();
 	inline	void				ReadUnlock();
 	inline	bool				WriteLock();
 	inline	void				WriteUnlock();
 
-			status_t			Flush();
+			void				RevertNodeData(const checksumfs_node& nodeData);
+
+			status_t			Flush(Transaction& transaction);
 
 private:
 			void				_Init();
@@ -50,6 +70,7 @@ private:
 			rw_lock				fLock;
 			Volume*				fVolume;
 			uint64				fBlockIndex;
+			uint64				fAccessedTime;
 			checksumfs_node		fNode;
 			bool				fNodeDataDirty;
 };
@@ -109,6 +130,10 @@ Node::WriteUnlock()
 {
 	rw_lock_write_unlock(&fLock);
 }
+
+
+typedef AutoLocker<Node, AutoLockerReadLocking<Node> > NodeReadLocker;
+typedef AutoLocker<Node, AutoLockerWriteLocking<Node> > NodeWriteLocker;
 
 
 #endif	// NODE_H

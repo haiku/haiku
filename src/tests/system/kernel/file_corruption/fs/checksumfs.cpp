@@ -6,18 +6,24 @@
 
 #include <dirent.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <new>
 
 #include <fs_interface.h>
 
 #include <AutoDeleter.h>
+#include <AutoLocker.h>
+
+#include <debug.h>
 
 #include "checksumfs.h"
 #include "checksumfs_private.h"
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "SuperBlock.h"
+#include "Transaction.h"
 #include "Volume.h"
 
 
@@ -31,6 +37,166 @@ set_timespec(timespec& time, uint64 nanos)
 {
 	time.tv_sec = nanos / 1000000000;
 	time.tv_nsec = nanos % 1000000000;
+}
+
+
+struct PutNode {
+	inline void operator()(Node* node)
+	{
+		if (node != NULL)
+			node->GetVolume()->PutNode(node);
+	}
+};
+
+typedef BPrivate::AutoDeleter<Node, PutNode> NodePutter;
+
+
+static bool
+is_user_in_group(gid_t gid)
+{
+	gid_t groups[NGROUPS_MAX];
+	int groupCount = getgroups(NGROUPS_MAX, groups);
+	for (int i = 0; i < groupCount; i++) {
+		if (gid == groups[i])
+			return true;
+	}
+
+	return gid == getegid();
+}
+
+
+static status_t
+check_access(Node* node, uint32 accessFlags)
+{
+	// Note: we assume that the access flags are compatible with the permission
+	// bits.
+	STATIC_ASSERT(R_OK == S_IROTH && W_OK == S_IWOTH && X_OK == S_IXOTH);
+
+	// get node permissions
+	int userPermissions = (node->Mode() & S_IRWXU) >> 6;
+	int groupPermissions = (node->Mode() & S_IRWXG) >> 3;
+	int otherPermissions = node->Mode() & S_IRWXO;
+
+	// get the permissions for this uid/gid
+	int permissions = 0;
+	uid_t uid = geteuid();
+
+	if (uid == 0) {
+		// user is root
+		// root has always read/write permission, but at least one of the
+		// X bits must be set for execute permission
+		permissions = userPermissions | groupPermissions | otherPermissions
+			| R_OK | W_OK;
+	} else if (uid == node->UID()) {
+		// user is node owner
+		permissions = userPermissions;
+	} else if (is_user_in_group(node->GID())) {
+		// user is in owning group
+		permissions = groupPermissions;
+	} else {
+		// user is one of the others
+		permissions = otherPermissions;
+	}
+
+	return (accessFlags & ~permissions) == 0 ? B_OK : B_NOT_ALLOWED;
+}
+
+
+status_t
+remove_entry(fs_volume* fsVolume, fs_vnode* parent, const char* name,
+	bool removeDirectory)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Directory* directory
+		= dynamic_cast<Directory*>((Node*)parent->private_node);
+	if (directory == NULL)
+		return B_NOT_A_DIRECTORY;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	// Since we need to lock both nodes (the directory and the entry's), this
+	// is a bit cumbersome. We first look up the entry while having the
+	// directory read-locked, then drop the read lock, write-lock both nodes
+	// and check whether anything has changed.
+	Transaction transaction(volume);
+	Node* childNode;
+	NodePutter childNodePutter;
+
+	while (true) {
+		// look up the entry
+		NodeReadLocker directoryLocker(directory);
+
+		uint64 blockIndex;
+		status_t error = directory->LookupEntry(name, blockIndex);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		directoryLocker.Unlock();
+
+		// get the entry's node
+		error = volume->GetNode(blockIndex, childNode);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+		childNodePutter.SetTo(childNode);
+
+		// start the transaction
+		error = transaction.Start();
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// write-lock the nodes
+		error = transaction.AddNodes(directory, childNode);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// check the situation again
+		error = directory->LookupEntry(name, blockIndex);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+		if (blockIndex != childNode->BlockIndex()) {
+			transaction.Abort();
+			continue;
+		}
+
+		break;
+	}
+
+	// check permissions
+	status_t error = check_access(directory, W_OK);
+	if (error != B_OK)
+		return error;
+
+	// check whether the child node type agrees with our caller
+	if (removeDirectory) {
+		if (!S_ISDIR(childNode->Mode()))
+			RETURN_ERROR(B_NOT_A_DIRECTORY);
+
+		// directory must be empty
+		if (childNode->Size() > 0)
+			RETURN_ERROR(B_DIRECTORY_NOT_EMPTY);
+	} else if (S_ISDIR(childNode->Mode()))
+		RETURN_ERROR(B_IS_A_DIRECTORY);
+
+	// remove the entry
+	error = directory->RemoveEntry(name, transaction);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// update stat data
+	childNode->SetHardLinks(childNode->HardLinks() - 1);
+
+	directory->Touched(NODE_MODIFIED);
+
+	// remove the child node, if no longer referenced
+	if (childNode->HardLinks() == 0) {
+		error = volume->RemoveNode(childNode);
+		if (error != B_OK)
+			return error;
+	}
+
+	// commit the transaction
+	return transaction.Commit();
 }
 
 
@@ -211,6 +377,12 @@ checksumfs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* name,
 	if (directory == NULL)
 		return B_NOT_A_DIRECTORY;
 
+	status_t error = check_access(directory, X_OK);
+	if (error != B_OK)
+		return error;
+
+	NodeReadLocker nodeLocker(node);
+
 	uint64 blockIndex;
 
 	if (strcmp(name, ".") == 0) {
@@ -218,13 +390,14 @@ checksumfs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* name,
 	} else if (strcmp(name, "..") == 0) {
 		blockIndex = directory->ParentDirectory();
 	} else {
-		// TODO: Implement!
-		return B_ENTRY_NOT_FOUND;
+		status_t error = directory->LookupEntry(name, blockIndex);
+		if (error != B_OK)
+			return error;
 	}
 
 	// get the node
 	Node* childNode;
-	status_t error = volume->GetNode(blockIndex, childNode);
+	error = volume->GetNode(blockIndex, childNode);
 	if (error != B_OK)
 		return error;
 
@@ -242,6 +415,15 @@ checksumfs_put_vnode(fs_volume* fsVolume, fs_vnode* vnode, bool reenter)
 }
 
 
+static status_t
+checksumfs_remove_vnode(fs_volume* fsVolume, fs_vnode* vnode, bool reenter)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)vnode->private_node;
+	return volume->DeleteNode(node);
+}
+
+
 // #pragma mark - common operations
 
 
@@ -249,6 +431,8 @@ static status_t
 checksumfs_read_stat(fs_volume* fsVolume, fs_vnode* vnode, struct stat* st)
 {
 	Node* node = (Node*)vnode->private_node;
+
+	NodeReadLocker nodeLocker(node);
 
     st->st_mode = node->Mode();
     st->st_nlink = node->HardLinks();
@@ -259,12 +443,11 @@ checksumfs_read_stat(fs_volume* fsVolume, fs_vnode* vnode, struct stat* st)
     set_timespec(st->st_mtim, node->ModificationTime());
     set_timespec(st->st_ctim, node->ChangeTime());
     set_timespec(st->st_crtim, node->CreationTime());
-    st->st_atim = st->st_ctim;
-		// we don't support access time
+    set_timespec(st->st_atim, node->AccessedTime());
     st->st_type = 0;        /* attribute/index type */
     st->st_blocks = 1 + (st->st_size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 		// TODO: That does neither count management structures for the content
-		// nor attributes.
+		// (for files) nor attributes.
 
 	return B_OK;
 }
@@ -288,7 +471,35 @@ static status_t
 checksumfs_open(fs_volume* fsVolume, fs_vnode* vnode, int openMode,
 	void** _cookie)
 {
-	// TODO: Check permissions!
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)vnode->private_node;
+
+	NodeReadLocker nodeLocker(node);
+
+	// check the open mode and permissions
+	uint32 accessFlags = 0;
+	switch (openMode & O_RWMASK) {
+		case O_RDONLY:
+			accessFlags = R_OK;
+			break;
+		case O_WRONLY:
+			accessFlags = W_OK;
+			break;
+		case O_RDWR:
+			accessFlags = R_OK | W_OK;
+			break;
+	}
+
+	if ((accessFlags & W_OK) != 0) {
+		if (S_ISDIR(node->Mode()))
+			return B_IS_A_DIRECTORY;
+		if (volume->IsReadOnly())
+			return B_READ_ONLY_DEVICE;
+	}
+
+	status_t error = check_access(node, accessFlags);
+	if (error != B_OK)
+		return error;
 
 	FileCookie* cookie = new(std::nothrow) FileCookie(openMode);
 	if (cookie == NULL)
@@ -319,55 +530,65 @@ checksumfs_free_cookie(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie)
 
 
 struct DirCookie {
-	enum {
-		DOT,
-		DOT_DOT,
-		OTHERS
-	};
-
-	Directory*	directory;
-	int			iterationState;
-
 	DirCookie(Directory* directory)
 		:
-		directory(directory),
-		iterationState(DOT)
+		fDirectory(directory)
 	{
+		Rewind();
+	}
+
+	Directory* GetDirectory() const
+	{
+		return fDirectory;
 	}
 
 	status_t ReadNextEntry(struct dirent* buffer, size_t size,
 		uint32& _countRead)
 	{
 		const char* name;
+		size_t nameLength;
 		uint64 blockIndex;
 
 		int nextIterationState = OTHERS;
-		switch (iterationState) {
+		switch (fIterationState) {
 			case DOT:
 				name = ".";
-				blockIndex = directory->BlockIndex();
+				nameLength = 1;
+				blockIndex = fDirectory->BlockIndex();
 				nextIterationState = DOT_DOT;
 				break;
 			case DOT_DOT:
 				name = "..";
-				blockIndex = directory->ParentDirectory();
+				nameLength = 2;
+				blockIndex = fDirectory->ParentDirectory();
 				break;
 			default:
-				// TODO: Implement!
-				_countRead = 0;
-				return B_OK;
+			{
+				status_t error = fDirectory->LookupNextEntry(fEntryName,
+					fEntryName, nameLength, blockIndex);
+				if (error != B_OK) {
+					if (error != B_ENTRY_NOT_FOUND)
+						return error;
+
+					_countRead = 0;
+					return B_OK;
+				}
+
+				name = fEntryName;
+				break;
+			}
 		}
 
-		size_t entrySize = sizeof(dirent) + strlen(name);
+		size_t entrySize = sizeof(dirent) + nameLength;
 		if (entrySize > size)
 			return B_BUFFER_OVERFLOW;
 
-		buffer->d_dev = directory->GetVolume()->ID();
+		buffer->d_dev = fDirectory->GetVolume()->ID();
 		buffer->d_ino = blockIndex;
 		buffer->d_reclen = entrySize;
 		strcpy(buffer->d_name, name);
 
-		iterationState = nextIterationState;
+		fIterationState = nextIterationState;
 
 		_countRead = 1;
 		return B_OK;
@@ -375,9 +596,79 @@ struct DirCookie {
 
 	void Rewind()
 	{
-		iterationState = DOT;
+		fIterationState = DOT;
+		fEntryName[0] = '\0';
 	}
+
+private:
+	enum {
+		DOT,
+		DOT_DOT,
+		OTHERS
+	};
+
+	Directory*	fDirectory;
+	int			fIterationState;
+	char		fEntryName[kCheckSumFSNameLength + 1];
 };
+
+
+status_t
+checksumfs_create_dir(fs_volume* fsVolume, fs_vnode* parent, const char* name,
+	int perms)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Directory* directory
+		= dynamic_cast<Directory*>((Node*)parent->private_node);
+	if (directory == NULL)
+		return B_NOT_A_DIRECTORY;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	status_t error = check_access(directory, W_OK);
+	if (error != B_OK)
+		return error;
+
+	// start a transaction
+	Transaction transaction(volume);
+	error = transaction.Start();
+	if (error != B_OK)
+		return error;
+
+	// attach the directory to the transaction (write locks it, too)
+	error = transaction.AddNode(directory);
+	if (error != B_OK)
+		return error;
+
+	// create a directory node
+	Directory* newDirectory;
+	error = volume->CreateDirectory(perms, transaction, newDirectory);
+	if (error != B_OK)
+		return error;
+
+	// insert the new directory
+	error = directory->InsertEntry(name, newDirectory->BlockIndex(),
+		transaction);
+	if (error != B_OK)
+		return error;
+
+	// update stat data
+	newDirectory->SetHardLinks(1);
+	newDirectory->SetParentDirectory(directory->BlockIndex());
+
+	directory->Touched(NODE_MODIFIED);
+
+	// commit the transaction
+	return transaction.Commit();
+}
+
+
+status_t
+checksumfs_remove_dir(fs_volume* volume, fs_vnode* parent, const char* name)
+{
+	return remove_entry(volume, parent, name, true);
+}
 
 
 static status_t
@@ -386,6 +677,10 @@ checksumfs_open_dir(fs_volume* fsVolume, fs_vnode* vnode, void** _cookie)
 	Directory* directory = dynamic_cast<Directory*>((Node*)vnode->private_node);
 	if (directory == NULL)
 		return B_NOT_A_DIRECTORY;
+
+	status_t error = check_access(directory, R_OK);
+	if (error != B_OK)
+		return error;
 
 	DirCookie* cookie = new(std::nothrow) DirCookie(directory);
 	if (cookie == NULL)
@@ -420,6 +715,9 @@ checksumfs_read_dir(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie,
 		return B_OK;
 
 	DirCookie* cookie = (DirCookie*)_cookie;
+
+	NodeReadLocker nodeLocker(cookie->GetDirectory());
+
 	return cookie->ReadNextEntry(buffer, bufferSize, *_num);
 }
 
@@ -428,6 +726,9 @@ static status_t
 checksumfs_rewind_dir(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie)
 {
 	DirCookie* cookie = (DirCookie*)_cookie;
+
+	NodeReadLocker nodeLocker(cookie->GetDirectory());
+
 	cookie->Rewind();
 	return B_OK;
 }
@@ -547,7 +848,7 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 	NULL,	// get_vnode_name
 
 	checksumfs_put_vnode,
-	NULL,	// checksumfs_remove_vnode,
+	checksumfs_remove_vnode,
 
 	/* VM file access */
 	NULL,	// can_page
@@ -588,8 +889,8 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 	NULL,	// checksumfs_write,
 
 	/* directory operations */
-	NULL,	// checksumfs_create_dir,
-	NULL,	// checksumfs_remove_dir,
+	checksumfs_create_dir,
+	checksumfs_remove_dir,
 	checksumfs_open_dir,
 	checksumfs_close_dir,
 	checksumfs_free_dir_cookie,

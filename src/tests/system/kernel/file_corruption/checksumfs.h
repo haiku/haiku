@@ -56,9 +56,17 @@ struct checksumfs_node {
 } _PACKED;
 
 
+static const uint32 kCheckSumFSMaxDirEntryTreeDepth		= 24;
+
+struct checksumfs_dir_entry_tree {
+	uint16	depth;
+} _PACKED;
+
+
 struct checksumfs_dir_entry_block {
 	uint16	entryCount;
-	uint16	nameEnds[0];		// end (in-block) offsets of the names,
+	uint16	nameEnds[0];		// end offsets of the names (relative to the
+								// start of the first name),
 								// e.g. nameEnds[0] == length of first name
 	// char	names[];			// string of all (unterminated) names,
 								// directly follows the nameEnds array
