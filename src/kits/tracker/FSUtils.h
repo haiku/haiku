@@ -296,7 +296,7 @@ class WellKnowEntryList {
 
 			node_ref node;
 			directory_which which;
-			const char *name;
+			BString name;
 		};
 
 		static directory_which Match(const node_ref *);
