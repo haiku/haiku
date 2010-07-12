@@ -5,6 +5,7 @@
 #include "L2capEndpoint.h"
 #include "l2cap_address.h"
 #include "l2cap_upper.h"
+#include "l2cap_lower.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -99,28 +100,36 @@ L2capEndpoint::Close()
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
 
-	if (fEstablishSemaphore != -1) {
-		debugf("server socket not handling any channel %p\n", this);
-
-		delete_sem(fEstablishSemaphore);
-		// TODO: Clean needed stuff
-		// Unbind?
-		return B_OK;
+	if (fChannel == NULL) {
+		// TODO: Parent socket
 
 	} else {
-		// Client endpoint
-		if (fState == CLOSING) {
+		// Child Socket
+		if (fState == CLOSED) {
 			debugf("Already closed by peer %p\n", this);
 			// TODO: Clean needed stuff
-
 			return B_OK;
 		} else {
 			// Issue Disconnection request over the channel
-			fState = CLOSED;
-			return l2cap_upper_dis_req(fChannel);
+			MarkClosed();
+
+			bigtime_t timeout = absolute_timeout(300 * 1000 * 1000);
+
+			status_t error = l2cap_upper_dis_req(fChannel);
+
+			if (error != B_OK)
+				return error;
+
+			return acquire_sem_etc(fEstablishSemaphore, 1,
+				B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 		}
 	}
 
+	if (fEstablishSemaphore != -1) {
+		delete_sem(fEstablishSemaphore);
+	}
+
+	return B_OK;
 }
 
 
@@ -352,6 +361,25 @@ L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 
 ssize_t
+L2capEndpoint::SendData(net_buffer* buffer)
+{
+	debugf("size=%ld\n", buffer->size);
+
+	if (fState != ESTABLISHED) {
+		debugf("Invalid State %p\n", this);
+		return B_BAD_VALUE;
+	}
+
+	btCoreData->SpawnFrame(fChannel->conn, fChannel, buffer, L2CAP_B_FRAME);
+
+	SchedConnectionPurgeThread(fChannel->conn);
+
+	// TODO: Report bytes sent?
+	return B_OK;
+}
+
+
+ssize_t
 L2capEndpoint::Sendable()
 {
 	debugf("[%ld] %p\n", find_thread(NULL), this);
@@ -445,6 +473,7 @@ L2capEndpoint::MarkEstablished()
 		fChannel->psm, fChannel->scid, fChannel->dcid);
 
 	fChannel->state = L2CAP_CHAN_OPEN;
+	fState = ESTABLISHED;
 
 	if (fPeerEndpoint != NULL) {
 
@@ -465,8 +494,11 @@ status_t
 L2capEndpoint::MarkClosed()
 {
 	flowf("\n");
+	if (fState == CLOSED) {
+		release_sem(fEstablishSemaphore);
+	}
+
 	fState = CLOSED;
 
 	return B_OK;
 }
-

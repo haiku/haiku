@@ -101,7 +101,11 @@ l2cap_open(net_protocol* protocol)
 status_t
 l2cap_close(net_protocol* protocol)
 {
+	L2capEndpoint* endpoint = static_cast<L2capEndpoint*>(protocol);
+
 	flowf("\n");
+
+	endpoint->Close();
 
 	return B_OK;
 }
@@ -210,7 +214,10 @@ l2cap_send_data(net_protocol* protocol, net_buffer* buffer)
 {
 	flowf("\n");
 
-	return EOPNOTSUPP;
+	if (buffer == NULL)
+		return ENOBUFS;
+
+	return ((L2capEndpoint*)protocol)->SendData(buffer);
 }
 
 

@@ -120,19 +120,19 @@ l2cap_process_signal_cmd(HciConnection* conn, net_buffer* buffer)
 			return ENOBUFS;
 		}
 
-		commandHeader->length = le16toh(commandHeader->length);
+		uint8 processingCode = commandHeader->code;
+		uint8 processingIdent = commandHeader->ident;
+		uint16 processingLength = le16toh(commandHeader->length);
 
 		/* Verify command length */
-		if (buffer->size < commandHeader->length) {
+		if (buffer->size < processingLength) {
 			debugf("invalid L2CAP signaling command, code=%#x, ident=%d,"
-				" length=%d, buffer size=%ld\n", commandHeader->code,
-				commandHeader->ident, commandHeader->length, buffer->size);
+				" length=%d, buffer size=%ld\n", processingCode,
+				processingIdent, processingLength, buffer->size);
 			gBufferModule->free(buffer);
 			return (EMSGSIZE);
 		}
 
-		uint8 processingCode = commandHeader->code;
-		uint16 processingIdent = commandHeader->ident;
 
 		commandHeader.Remove(); // pulling the header of the command
 
@@ -761,7 +761,7 @@ l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 
 	// inform upper if we were not actually already waiting
 	if (channel->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
-		l2cap_l2ca_discon_ind(channel); // do not care about result
+		l2cap_discon_req_ind(channel); // do not care about result
 	}
 
 	/* Send L2CAP_DisconnectRsp */
@@ -772,8 +772,6 @@ l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
 
 	/* Link command to the queue */
 	SchedConnectionPurgeThread(conn);
-
-	btCoreData->RemoveChannel(conn, channel->scid);
 
 	return B_OK;
 
@@ -816,7 +814,7 @@ l2cap_process_discon_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	}
 
 	/* Verify channel state, do nothing if invalid */
-	if (cmd->channel->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
+	if (cmd->channel->state != L2CAP_CHAN_W4_L2CA_DISCON_RSP) {
 		debugf("unexpected L2CAP_DisconnectRsp. Invalid state, cid=%d, "
 		"state=%d\n", scid, cmd->channel->state);
 		goto out;
@@ -839,7 +837,7 @@ l2cap_process_discon_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	if ((error = btCoreData->UnTimeoutSignal(cmd)) != 0)
 		goto out;
 
-	//INDICATION = ng_l2cap_l2ca_discon_rsp(cmd->channel, cmd->token, NG_L2CAP_SUCCESS);
+	l2cap_discon_rsp_ind(cmd->channel/* results? */);
 	btCoreData->RemoveChannel(conn, scid); /* this will free commands too */
 
 out:
@@ -1014,6 +1012,8 @@ l2cap_process_cmd_rej(HciConnection* conn, uint8 ident, net_buffer* buffer)
 	}
 
 	command->reason = le16toh(command->reason);
+
+	debugf("reason=%d\n", command->reason);
 
 	command.Remove();
 

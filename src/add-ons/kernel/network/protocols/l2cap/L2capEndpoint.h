@@ -57,6 +57,7 @@ public:
 					struct sockaddr* _address, socklen_t* _addressLength);
 
 	ssize_t ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer);
+	ssize_t SendData(net_buffer* buffer);
 	ssize_t Sendable();
 	ssize_t Receivable();
 

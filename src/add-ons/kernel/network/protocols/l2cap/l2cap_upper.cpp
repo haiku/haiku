@@ -209,10 +209,24 @@ l2cap_cfg_req_ind(L2capChannel* channel)
 
 
 status_t
-l2cap_l2ca_discon_ind(L2capChannel* channel)
+l2cap_discon_req_ind(L2capChannel* channel)
 {
 	return channel->endpoint->MarkClosed();
 }
+
+
+status_t
+l2cap_discon_rsp_ind(L2capChannel* channel)
+{
+	if (channel->state == L2CAP_CHAN_W4_L2CA_DISCON_RSP) {
+		channel->endpoint->MarkClosed();
+	}
+
+	return B_OK;
+}
+
+
+
 
 
 #if 0
@@ -247,8 +261,8 @@ l2cap_upper_dis_req(L2capChannel* channel)
 {
 	channel->ident = btCoreData->ChannelAllocateIdent(channel->conn);
 
-	net_buffer* buf = l2cap_discon_req(channel->ident, channel->scid,
-		channel->dcid);
+	net_buffer* buf = l2cap_discon_req(channel->ident, channel->dcid,
+		channel->scid);
 	L2capFrame* cmd = btCoreData->SpawnSignal(channel->conn, channel, buf,
 		channel->ident, L2CAP_DISCON_REQ);
 	if (cmd == NULL) {
@@ -273,7 +287,7 @@ l2cap_upper_dis_req(L2capChannel* channel)
 status_t
 l2cap_co_receive(HciConnection* conn, net_buffer* buffer, uint16 dcid)
 {
-	debugf("Handle %d To dcid %d\n", conn->handle, dcid);
+	debugf("Handle %d To dcid %x size=%ld\n", conn->handle, dcid, buffer->size);
 
 	L2capChannel* channel = btCoreData->ChannelBySourceID(conn, dcid);
 
@@ -306,3 +320,6 @@ l2cap_cl_receive(HciConnection* conn, net_buffer* buffer, uint16 psm)
 	return gStackModule->fifo_enqueue_buffer(
 		&endpoint->fReceivingFifo, buffer);
 }
+
+
+

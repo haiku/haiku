@@ -43,6 +43,15 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 	uint16 dcid;
 	uint16 length;
 
+#ifdef DUMP_L2CAP_FRAME
+	flowf("DUMP:");
+	for (uint i = 0; i < buffer->size; i++) {
+		uint8 c = 0;
+		gBufferModule->read(buffer, i, &c, 1);
+		dprintf("[%x]", c);
+	}
+	dprintf("\n");
+#endif
 	// Check packet
 	if (buffer->size < sizeof(l2cap_hdr_t)) {
 		debugf("invalid L2CAP packet. Packet too small, len=%ld\n", buffer->size);
@@ -60,6 +69,8 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 
 	length = bufferHeader->length = le16toh(bufferHeader->length);
 	dcid = bufferHeader->dcid = le16toh(bufferHeader->dcid);
+
+	debugf("len=%d cid=%x\n", length, dcid);
 
 	bufferHeader.Remove(); // pulling
 
@@ -165,7 +176,8 @@ purge_connection(HciConnection* conn)
 		} // TODO: someone put it
 
 
-		debugf("code=%d frame %p tolower\n", frame->code, frame->buffer);
+		debugf("type=%d, code=%d frame %p tolower\n", frame->type, frame->code,
+			frame->buffer);
 
 		frame->buffer->type = conn->handle;
 		btDevices->PostACL(conn->ndevice->index, frame->buffer);

@@ -9,12 +9,15 @@
 
 status_t l2cap_l2ca_con_ind(L2capChannel* channel);
 status_t l2cap_cfg_req_ind(L2capChannel* channel);
-status_t l2cap_l2ca_discon_ind(L2capChannel* channel);
+status_t l2cap_discon_req_ind(L2capChannel* channel);
+status_t l2cap_discon_rsp_ind(L2capChannel* channel);
+
 status_t l2cap_con_rsp_ind(HciConnection* conn, L2capChannel* channel);
 status_t l2cap_cfg_rsp_ind(L2capChannel* channel);
 
 status_t l2cap_upper_con_req(L2capChannel* channel);
 status_t l2cap_upper_dis_req(L2capChannel* channel);
+
 
 
 status_t l2cap_co_receive(HciConnection* conn, net_buffer* buffer, uint16 dcid);
