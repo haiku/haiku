@@ -56,9 +56,9 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 	isHybridBuild = 1 ;
 }
 if $(HAIKU_GCC_VERSION[1]) < 4 && !isHybridBuild) {
-	HAIKU_ICU_PACKAGE = icu-4.4.1-r1a2-x86-gcc2-2010-07-13-a.zip ;
+	HAIKU_ICU_PACKAGE = icu-4.4.1-r1a2-x86-gcc2-2010-07-13-b.zip ;
 } else {
-	HAIKU_ICU_PACKAGE = icu-4.4.1-r1a2-x86-gcc4-2010-07-13-a.zip ;
+	HAIKU_ICU_PACKAGE = icu-4.4.1-r1a2-x86-gcc4-2010-07-13-b.zip ;
 }
 
 HAIKU_ICU_URL = $(baseURL)/$(HAIKU_ICU_PACKAGE) ;
@@ -79,13 +79,13 @@ if $(TARGET_ARCH) != x86 {
 
 	HAIKU_ICU_LIBS = [ ExtractArchive $(HAIKU_ICU_DIR)
 		:
-		system/lib/libicudata.so
-		system/lib/libicui18n.so
-		system/lib/libicuio.so
-		system/lib/libicule.so
-		system/lib/libiculx.so
-		system/lib/libicutu.so
-		system/lib/libicuuc.so
+		system/lib/libicudata.so.44
+		system/lib/libicui18n.so.44
+		system/lib/libicuio.so.44
+		system/lib/libicule.so.44
+		system/lib/libiculx.so.44
+		system/lib/libicutu.so.44
+		system/lib/libicuuc.so.44
 		: $(zipFile)
 	] ;
 
