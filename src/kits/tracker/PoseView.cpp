@@ -140,12 +140,6 @@ const BPoint kTransparentDragThreshold(256, 192);
 	// maximum size of the transparent drag bitmap, use a drag rect
 	// if larger in any direction
 
-const char *kNoCopyToTrashStr = "Sorry, you can't copy items to the Trash.";
-const char *kNoLinkToTrashStr = "Sorry, you can't create links in the Trash.";
-const char *kNoCopyToRootStr = "You must drop items on one of the disk icons "
-	"in the \"Disks\" window.";
-const char *kOkToMoveStr = "Are you sure you want to move or copy the selected "
-	"item(s) to this folder?";
 
 struct AddPosesResult {
 	~AddPosesResult();
@@ -579,12 +573,12 @@ BPoseView::SetUpDefaultColumnsIfNeeded()
 	if (fColumnList->CountItems() != 0)
 		return;
 
-	fColumnList->AddItem(new BColumn("Name", kColumnStart, 145, B_ALIGN_LEFT,
-		kAttrStatName, B_STRING_TYPE, true, true));
-	fColumnList->AddItem(new BColumn("Size", 200, 80, B_ALIGN_RIGHT,
-		kAttrStatSize, B_OFF_T_TYPE, true, false));
-	fColumnList->AddItem(new BColumn("Modified", 295, 150, B_ALIGN_LEFT,
-		kAttrStatModified, B_TIME_TYPE, true, false));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), kColumnStart, 145,
+		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Size"), 200, 80,
+		B_ALIGN_RIGHT, kAttrStatSize, B_OFF_T_TYPE, true, false));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Modified"), 295, 150,
+		B_ALIGN_LEFT, kAttrStatModified, B_TIME_TYPE, true, false));
 
 	if (!IsWatchingDateFormatChange())
 		StartWatchDateFormatChange();
@@ -2515,8 +2509,8 @@ BPoseView::RemoveColumn(BColumn *columnToRemove, bool runAlert)
 	if (CountColumns() == 1) {
 		if (runAlert) {
 			BAlert *alert = new BAlert("",
-				"You must have at least one attribute showing.",
-				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				B_TRANSLATE("You must have at least one attribute showing."),
+				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();
 		}
@@ -4725,8 +4719,10 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	bool okToMove = true;
 
 	if (destFolder->IsRoot()) {
-		BAlert *alert = new BAlert("", kNoCopyToRootStr, "Cancel",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert *alert = new BAlert("",
+			B_TRANSLATE("You must drop items on one of the disk icons "
+			"in the \"Disks\" window."), B_TRANSLATE("Cancel"),	NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		okToMove = false;
@@ -4734,8 +4730,10 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 
 	// can't copy items into the trash
 	if (forceCopy && destIsTrash) {
-		BAlert *alert = new BAlert("", kNoCopyToTrashStr, "Cancel",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert *alert = new BAlert("",
+			B_TRANSLATE("Sorry, you can't copy items to the Trash."),
+			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		okToMove = false;
@@ -4743,8 +4741,10 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 
 	// can't create symlinks into the trash
 	if (createLink && destIsTrash) {
-		BAlert *alert = new BAlert("", kNoLinkToTrashStr, "Cancel",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert *alert = new BAlert("",
+			B_TRANSLATE("Sorry, you can't create links in the Trash."),
+			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		okToMove = false;
@@ -4754,8 +4754,10 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	if (srcWindow->TargetModel()->IsQuery()
 		&& !forceCopy && !destIsTrash && !createLink) {
 		srcWindow->UpdateIfNeeded();
-		BAlert *alert = new BAlert("", kOkToMoveStr, "Cancel",
-			"Move", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert *alert = new BAlert("", 
+			B_TRANSLATE("Are you sure you want to move or copy the selected "
+			"item(s) to this folder?"),	B_TRANSLATE("Cancel"),
+			B_TRANSLATE("Move"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		okToMove = alert->Go() == 1;
 	}
@@ -5615,9 +5617,10 @@ CheckVolumeReadOnly(const entry_ref *ref)
 {
 	BVolume volume (ref->device);
 	if (volume.IsReadOnly()) {
-		BAlert *alert = new BAlert ("", "Files cannot be moved or "
-			"deleted from a read-only volume.", "Cancel", NULL,
-			NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		BAlert *alert = new BAlert ("",
+			B_TRANSLATE("Files cannot be moved or deleted from a read-only "
+			"volume."),	B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
+			B_STOP_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		return false;
@@ -5655,18 +5658,19 @@ BPoseView::MoveSelectionOrEntryToTrash(const entry_ref *ref, bool selectNext)
 	}
 
 	if (entriesToDeleteOnTheSpot->CountItems()) {
-		const char *alertText;
+		BString alertText;
 		if (ref) {
-			alertText = "The selected item cannot be moved to the Trash. "
-				"Would you like to delete it instead? (This operation cannot "
-				"be reverted.)";
+			alertText.SetTo(B_TRANSLATE("The selected item cannot be moved to "
+				"the Trash. Would you like to delete it instead? "
+				"(This operation cannot be reverted.)"));
 		} else {
-			alertText = "Some of the selected items cannot be moved to the Trash. "
-				"Would you like to delete them instead? (This operation cannot "
-				"be reverted.)";
+			alertText.SetTo(B_TRANSLATE("Some of the selected items cannot be "
+				"moved to the Trash. Would you like to delete them instead? "
+				"(This operation cannot be reverted.)"));
 		}
 
-		BAlert *alert = new BAlert("", alertText, "Cancel", "Delete");
+		BAlert *alert = new BAlert("", alertText.String(),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Delete"));
 		alert->SetShortcut(0, B_ESCAPE);
 		if (alert->Go() == 0)
 			return;
@@ -5955,10 +5959,10 @@ BPoseView::SelectMatchingEntries(const BMessage *message)
 
 		if (regExpression.InitCheck() != B_OK) {
 			BString message;
-			message << "Error in regular expression:\n\n'";
+			message << B_TRANSLATE("Error in regular expression:\n\n'");
 			message << regExpression.ErrorString() << "'";
-			(new BAlert("", message.String(), "OK", NULL, NULL, B_WIDTH_AS_USUAL,
-				B_STOP_ALERT))->Go();
+			(new BAlert("", message.String(), B_TRANSLATE("OK"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 			return 0;
 		}
 	}
@@ -7874,9 +7878,10 @@ BPoseView::OpenInfoWindows()
 {
 	BMessenger tracker(kTrackerSignature);
 	if (!tracker.IsValid()) {
-		BAlert *alert = new BAlert("", "The Tracker must be running "
-			"to see Info windows.", "Cancel", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert *alert = new BAlert("",
+			B_TRANSLATE("The Tracker must be running to see Info windows."),
+			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		return;
@@ -7890,9 +7895,10 @@ BPoseView::SetDefaultPrinter()
 {
 	BMessenger tracker(kTrackerSignature);
 	if (!tracker.IsValid()) {
-		BAlert *alert = new BAlert("", "The Tracker must be running "
-			"to see set the default printer.", "Cancel", NULL,
-			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert *alert = new BAlert("",
+			B_TRANSLATE("The Tracker must be running to see set the default "
+			"printer."), B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		return;
