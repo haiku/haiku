@@ -40,7 +40,9 @@ All rights reserved.
 
 #include <Alert.h>
 #include <AppFileInfo.h>
+#include <Catalog.h>
 #include <Debug.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <TextView.h>
@@ -59,6 +61,11 @@ All rights reserved.
 #include "Utilities.h"
 #include "ViewState.h"
 #include "WidgetAttributeText.h"
+
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 
 const int32 kGenericReadBufferSize = 1024;
@@ -208,6 +215,8 @@ TruncFileSizeBase(BString *result, int64 value, const View *view, float width)
 	// ToDo:
 	// if slow, replace float divisions with shifts
 	// if fast enough, try fitting more decimal places
+	
+	// TODO: reuse libshared's string_for_size
 
 	// format file size value
 	char buffer[1024];
@@ -215,24 +224,24 @@ TruncFileSizeBase(BString *result, int64 value, const View *view, float width)
 		*result = "-";
 		return view->StringWidth("-");
 	} else if (value < kKBSize) {
-		sprintf(buffer, "%Ld bytes", value);
+		sprintf(buffer, B_TRANSLATE("%Ld bytes"), value);
 		if (view->StringWidth(buffer) > width)
-			sprintf(buffer, "%Ld B", value);
+			sprintf(buffer, B_TRANSLATE("%Ld B"), value);
 	} else {
 		const char *suffix;
 		float floatValue;
 		if (value >= kTBSize) {
-			suffix = "TiB";
+			suffix = B_TRANSLATE("TiB");
 			floatValue = (float)value / kTBSize;
 		} else if (value >= kGBSize) {
-			suffix = "GiB";
+			suffix = B_TRANSLATE("GiB");
 			floatValue = (float)value / kGBSize;
 		} else if (value >= kMBSize) {
-			suffix = "MiB";
+			suffix = B_TRANSLATE("MiB");
 			floatValue = (float)value / kMBSize;
 		} else {
 			ASSERT(value >= kKBSize);
-			suffix = "KiB";
+			suffix = B_TRANSLATE("KiB");
 			floatValue = (float)value / kKBSize;
 		}
 
@@ -751,7 +760,7 @@ KindAttributeText::ReadValue(BString *result)
 
 	// get the mime type
 	if (mime.SetType(fModel->MimeType()) != B_OK)
-		*result = "Unknown";
+		*result = B_TRANSLATE("Unknown");
 	// get the short mime type description
 	else if (mime.GetShortDescription(desc) == B_OK)
 		*result = desc;
@@ -872,9 +881,12 @@ NameAttributeText::CommitEditedTextFlavor(BTextView *textView)
 
 	bool removeExisting = false;
 	if (parent.Contains(text)) {
-		BAlert *alert = new BAlert("", "That name is already taken. "
-				"Please type another one.", "Replace other file", "OK", NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("That name is already taken. "
+			"Please type another one."),
+			B_TRANSLATE("Replace other file"),
+			B_TRANSLATE("OK"),
+			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 
 		alert->SetShortcut(0, 'r');
 
@@ -1592,8 +1604,10 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 		&& type != B_DOUBLE_TYPE
 		&& type != B_CHAR_TYPE
 		&& type != B_BOOL_TYPE) {
-		BAlert *alert = new BAlert("", "Sorry, you cannot edit that attribute.",
-			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("Sorry, you cannot edit that attribute."),
+			B_TRANSLATE("Cancel"),
+			0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		return false;
@@ -1626,9 +1640,11 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 				sscanf(textView->Text(), "%c", &ch);
 				//Check if we read the start of a multi-byte glyph:
 				if (!isprint(ch)) {
-					BAlert *alert = new BAlert("", "Sorry, the 'Character' "
-						"attribute cannot store a multi-byte glyph.",
-						"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+					BAlert* alert = new BAlert("",
+						B_TRANSLATE("Sorry, the 'Character' "
+						"attribute cannot store a multi-byte glyph."),
+						B_TRANSLATE("Cancel"),
+						0, 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
 					alert->Go();
 					return false;
@@ -1727,9 +1743,10 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView *textView)
 	}
 
 	if (size < 0) {
-		BAlert *alert = new BAlert("",
-			"There was an error writing the attribute.",
-			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("There was an error writing the attribute."),
+			B_TRANSLATE("Cancel"),
+			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 

@@ -43,6 +43,8 @@ All rights reserved.
 
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <ColorControl.h>
 #include <NodeMonitor.h>
@@ -77,6 +79,9 @@ send_bool_notices(uint32 what, const char *name, bool value)
 
 //	#pragma mark -
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 SettingsView::SettingsView(BRect rect, const char *name)
 	: BView(rect, name, B_FOLLOW_ALL, 0)
@@ -164,7 +169,8 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 	: SettingsView(rect, "DesktopSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fShowDisksIconRadioButton = new BRadioButton(rect, "", "Show Disks icon",
+	fShowDisksIconRadioButton = new BRadioButton(rect, "",
+		B_TRANSLATE("Show Disks icon"),
 		new BMessage(kShowDisksIconChanged));
 	fShowDisksIconRadioButton->ResizeToPreferred();
 	AddChild(fShowDisksIconRadioButton);
@@ -173,14 +179,16 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 	rect.OffsetBy(0, itemSpacing);
 
 	fMountVolumesOntoDesktopRadioButton = new BRadioButton(rect, "",
-		"Show volumes on Desktop", new BMessage(kVolumesOnDesktopChanged));
+		B_TRANSLATE("Show volumes on Desktop"),
+		new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountVolumesOntoDesktopRadioButton);
 	fMountVolumesOntoDesktopRadioButton->ResizeToPreferred();
 
 	rect.OffsetBy(20, itemSpacing);
 
 	fMountSharedVolumesOntoDesktopCheckBox = new BCheckBox(rect, "",
-		"Show shared volumes on Desktop", new BMessage(kVolumesOnDesktopChanged));
+		B_TRANSLATE("Show shared volumes on Desktop"),
+		new BMessage(kVolumesOnDesktopChanged));
 	AddChild(fMountSharedVolumesOntoDesktopCheckBox);
 	fMountSharedVolumesOntoDesktopCheckBox->ResizeToPreferred();
 
@@ -188,7 +196,8 @@ DesktopSettingsView::DesktopSettingsView(BRect rect)
 
 	rect = Bounds();
 	rect.top = rect.bottom;
-	fMountButton = new BButton(rect, "", "Mount settings" B_UTF8_ELLIPSIS,
+	fMountButton = new BButton(rect, "",
+		B_TRANSLATE("Mount settings" B_UTF8_ELLIPSIS),
 		new BMessage(kRunAutomounterSettings), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fMountButton->ResizeToPreferred();
 	fMountButton->MoveBy(0, -fMountButton->Bounds().Height());
@@ -409,7 +418,8 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 	: SettingsView(rect, "WindowsSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "", "Show folder location in title tab",
+	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Show folder location in title tab"),
 		new BMessage(kWindowsShowFullPathChanged));
 	fShowFullPathInTitleBarCheckBox->ResizeToPreferred();
 	AddChild(fShowFullPathInTitleBarCheckBox);
@@ -417,35 +427,40 @@ WindowsSettingsView::WindowsSettingsView(BRect rect)
 	const float itemSpacing = fShowFullPathInTitleBarCheckBox->Bounds().Height() + kItemExtraSpacing;
 	rect.OffsetBy(0, itemSpacing);
 
-	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "", "Single window navigation",
+	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Single window navigation"),
 		new BMessage(kSingleWindowBrowseChanged));
 	fSingleWindowBrowseCheckBox->ResizeToPreferred();
 	AddChild(fSingleWindowBrowseCheckBox);
 
 	rect.OffsetBy(20, itemSpacing);
 
-	fShowNavigatorCheckBox = new BCheckBox(rect, "", "Show navigator",
+	fShowNavigatorCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Show navigator"),
 		new BMessage(kShowNavigatorChanged));
 	fShowNavigatorCheckBox->ResizeToPreferred();
 	AddChild(fShowNavigatorCheckBox);
 
 	rect.OffsetBy(-20, itemSpacing);
 
-	fOutlineSelectionCheckBox = new BCheckBox(rect, "", "Outline selection rectangle only",
+	fOutlineSelectionCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Outline selection rectangle only"),
 		new BMessage(kTransparentSelectionChanged));
 	fOutlineSelectionCheckBox->ResizeToPreferred();
 	AddChild(fOutlineSelectionCheckBox);
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "", "List folders first",
+	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("List folders first"),
 		new BMessage(kSortFolderNamesFirstChanged));
 	fSortFolderNamesFirstCheckBox->ResizeToPreferred();
 	AddChild(fSortFolderNamesFirstCheckBox);
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fTypeAheadFilteringCheckBox = new BCheckBox(rect, "", "Enable type-ahead filtering",
+	fTypeAheadFilteringCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Enable type-ahead filtering"),
 		new BMessage(kTypeAheadFilteringChanged));
 	fTypeAheadFilteringCheckBox->ResizeToPreferred();
 	AddChild(fTypeAheadFilteringCheckBox);
@@ -714,12 +729,13 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 
 	rect.bottom = ceilf(fontHeight.ascent + fontHeight.descent) + 10;
 	BBox *clockBox = new BBox(rect, "Clock");
-	clockBox->SetLabel("Clock");
+	clockBox->SetLabel(B_TRANSLATE("Clock"));
 	AddChild(clockBox);
 
 	rect.left = 8;
 	rect.top = rect.bottom - 8;
-	f24HrRadioButton = new BRadioButton(rect, "", "24 hour",
+	f24HrRadioButton = new BRadioButton(rect, "",
+		B_TRANSLATE("24 hour"),
 		new BMessage(kSettingsContentsModified));
 	f24HrRadioButton->ResizeToPreferred();
 	clockBox->AddChild(f24HrRadioButton);
@@ -727,7 +743,8 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 	const float itemSpacing = f24HrRadioButton->Bounds().Height() + kItemExtraSpacing;
 	rect.OffsetBy(0, itemSpacing);
 
-	f12HrRadioButton = new BRadioButton(rect, "", "12 hour",
+	f12HrRadioButton = new BRadioButton(rect, "",
+		B_TRANSLATE("12 hour"),
 		new BMessage(kSettingsContentsModified));
 	f12HrRadioButton->ResizeToPreferred();
 	clockBox->AddChild(f12HrRadioButton);
@@ -739,25 +756,28 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 	rect = clockBox->Frame();
 	rect.OffsetBy(rect.Width() + 8, 0);
 	BBox *dateFormatBox = new BBox(rect, "Date order");
-	dateFormatBox->SetLabel("Date order");
+	dateFormatBox->SetLabel(B_TRANSLATE("Date order"));
 	AddChild(dateFormatBox);
 
 	rect = f24HrRadioButton->Frame();
-	fYMDRadioButton = new BRadioButton(rect, "", "Year-month-day",
+	fYMDRadioButton = new BRadioButton(rect, "",
+		B_TRANSLATE("Year-month-day"),
 		new BMessage(kSettingsContentsModified));
 	fYMDRadioButton->ResizeToPreferred();
 	dateFormatBox->AddChild(fYMDRadioButton);
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fDMYRadioButton = new BRadioButton(rect, "", "Day-month-year",
+	fDMYRadioButton = new BRadioButton(rect, "",
+		B_TRANSLATE("Day-month-year"),
 		new BMessage(kSettingsContentsModified));
 	fDMYRadioButton->ResizeToPreferred();
 	dateFormatBox->AddChild(fDMYRadioButton);
 
 	rect.OffsetBy(0, itemSpacing);
 
-	fMDYRadioButton = new BRadioButton(rect, "", "Month-day-year",
+	fMDYRadioButton = new BRadioButton(rect, "",
+		B_TRANSLATE("Month-day-year"),
 		new BMessage(kSettingsContentsModified));
 	fMDYRadioButton->ResizeToPreferred();
 	dateFormatBox->AddChild(fMDYRadioButton);
@@ -766,8 +786,10 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 		dateFormatBox->Bounds().Height());
 
 	BPopUpMenu *menu = new BPopUpMenu("Separator");
-	menu->AddItem(new BMenuItem("None", new BMessage(kSettingsContentsModified)));
-	menu->AddItem(new BMenuItem("Space", new BMessage(kSettingsContentsModified)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("None"),
+		new BMessage(kSettingsContentsModified)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Space"),
+		new BMessage(kSettingsContentsModified)));
 	menu->AddItem(new BMenuItem("-", new BMessage(kSettingsContentsModified)));
 	menu->AddItem(new BMenuItem("/", new BMessage(kSettingsContentsModified)));
 	menu->AddItem(new BMenuItem("\\", new BMessage(kSettingsContentsModified)));
@@ -785,7 +807,7 @@ TimeFormatSettingsView::TimeFormatSettingsView(BRect rect)
 
 	rect.OffsetBy(0, itemSpacing + 10);
 
-	BStringView *exampleView = new BStringView(rect, "", "Examples:");
+	BStringView* exampleView = new BStringView(rect, "", B_TRANSLATE("Examples:"));
 	exampleView->ResizeToPreferred();
 	AddChild(exampleView);
 
@@ -1052,7 +1074,8 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	: SettingsView(rect, "SpaceBarSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fSpaceBarShowCheckBox = new BCheckBox(rect, "", "Show space bars on volumes",
+	fSpaceBarShowCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Show space bars on volumes"),
 		new BMessage(kUpdateVolumeSpaceBar));
 	fSpaceBarShowCheckBox->ResizeToPreferred();
 	AddChild(fSpaceBarShowCheckBox);
@@ -1064,11 +1087,17 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 	menu->SetFont(be_plain_font);
 
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Used space color", new BMessage(kSpaceBarSwitchColor)));
+	menu->AddItem(item = new BMenuItem(
+		B_TRANSLATE("Used space color"),
+		new BMessage(kSpaceBarSwitchColor)));
 	item->SetMarked(true);
 	fCurrentColor = 0;
-	menu->AddItem(new BMenuItem("Free space color", new BMessage(kSpaceBarSwitchColor)));
-	menu->AddItem(new BMenuItem("Warning space color", new BMessage(kSpaceBarSwitchColor)));
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Free space color"),
+		new BMessage(kSpaceBarSwitchColor)));
+	menu->AddItem(new BMenuItem(
+		B_TRANSLATE("Warning space color"),
+		new BMessage(kSpaceBarSwitchColor)));
 
 	BBox *box = new BBox(rect);
 	box->SetLabel(fColorPicker = new BMenuField(rect, NULL, NULL, menu));
@@ -1302,7 +1331,8 @@ TrashSettingsView::TrashSettingsView(BRect rect)
 	: SettingsView(rect, "TrashSettingsView")
 {
 	rect.OffsetTo(B_ORIGIN);
-	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "", "Don't move files to Trash",
+	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Don't move files to Trash"),
 			new BMessage(kDontMoveFilesToTrashChanged));
 	fDontMoveFilesToTrashCheckBox->ResizeToPreferred();
 	AddChild(fDontMoveFilesToTrashCheckBox);
@@ -1310,7 +1340,8 @@ TrashSettingsView::TrashSettingsView(BRect rect)
 	rect = fDontMoveFilesToTrashCheckBox->Frame();
 	rect.OffsetBy(0, fDontMoveFilesToTrashCheckBox->Bounds().Height() + kItemExtraSpacing);
 
-	fAskBeforeDeleteFileCheckBox = new BCheckBox(rect, "", "Ask before delete",
+	fAskBeforeDeleteFileCheckBox = new BCheckBox(rect, "",
+		B_TRANSLATE("Ask before delete"),
 			new BMessage(kAskBeforeDeleteFileChanged));
 	fAskBeforeDeleteFileCheckBox->ResizeToPreferred();
 	AddChild(fAskBeforeDeleteFileCheckBox);

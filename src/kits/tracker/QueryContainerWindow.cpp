@@ -32,6 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <Catalog.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Path.h>
@@ -44,6 +46,9 @@ All rights reserved.
 #include "QueryContainerWindow.h"
 #include "QueryPoseView.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow> *windowList,
 	uint32 containerWindowFlags, window_look look,
@@ -85,23 +90,28 @@ BQueryContainerWindow::AddWindowMenu(BMenu *menu)
 {
 	BMenuItem *item;
 
-	item = new BMenuItem("Resize to fit", new BMessage(kResizeToFit), 'Y');
+	item = new BMenuItem(B_TRANSLATE("Resize to fit"),
+		new BMessage(kResizeToFit), 'Y');
 	item->SetTarget(this);
 	menu->AddItem(item);
 
-	item = new BMenuItem("Select"B_UTF8_ELLIPSIS, new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY);
+	item = new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
+		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY);
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A');
+	item = new BMenuItem(B_TRANSLATE("Select all"),	new BMessage(B_SELECT_ALL),
+		'A');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Invert selection", new BMessage(kInvertSelection), 'S');
+	item = new BMenuItem(B_TRANSLATE("Invert selection"),
+		new BMessage(kInvertSelection), 'S');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W');
+	item = new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED),
+		'W');
 	item->SetTarget(this);
 	menu->AddItem(item);
 }
@@ -110,12 +120,14 @@ BQueryContainerWindow::AddWindowMenu(BMenu *menu)
 void 
 BQueryContainerWindow::AddWindowContextMenus(BMenu *menu)
 {
-	BMenuItem *resizeItem = new BMenuItem("Resize to Fit",
+	BMenuItem* resizeItem = new BMenuItem(B_TRANSLATE("Resize to Fit"),
 		new BMessage(kResizeToFit), 'Y');
 	menu->AddItem(resizeItem);
-	menu->AddItem(new BMenuItem("Select"B_UTF8_ELLIPSIS, new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
-	BMenuItem *closeItem = new BMenuItem("Close",
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
+		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A'));
+	BMenuItem* closeItem = new BMenuItem(B_TRANSLATE("Close"),
 		new BMessage(B_QUIT_REQUESTED), 'W');
 	menu->AddItem(closeItem);
 	// target items as needed

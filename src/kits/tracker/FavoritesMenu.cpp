@@ -37,8 +37,10 @@ All rights reserved.
 #include <compat/sys/stat.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
 #include <FilePanel.h>
+#include <Locale.h>
 #include <Message.h>
 #include <Path.h>
 #include <Query.h>
@@ -55,6 +57,10 @@ All rights reserved.
 #include "Tracker.h"
 #include "Utilities.h"
 
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 FavoritesMenu::FavoritesMenu(const char *title, BMessage *openFolderMessage,
 	BMessage *openFileMessage, const BMessenger &target,
@@ -166,7 +172,7 @@ FavoritesMenu::AddNextItem()
 
 			if (!fAddedSeparatorForSection) {
 				fAddedSeparatorForSection = true;
-				AddItem(new TitledSeparatorItem("Favorites"));
+				AddItem(new TitledSeparatorItem(B_TRANSLATE("Favorites")));
 			}
 			fUniqueRefCheck.push_back(*model.EntryRef());
 			AddItem(item);
@@ -211,7 +217,8 @@ FavoritesMenu::AddNextItem()
 				if (item) {
 					if (!fAddedSeparatorForSection) {
 						fAddedSeparatorForSection = true;
-						AddItem(new TitledSeparatorItem("Recent documents"));
+						AddItem(new TitledSeparatorItem(
+							B_TRANSLATE("Recent documents")));
 					}
 					AddItem(item);
 					fSectionItemCount++;
@@ -253,13 +260,14 @@ FavoritesMenu::AddNextItem()
 
 			if (!ShouldShowModel(&model))
 				return true;
-			
+
 			BMenuItem *item = BNavMenu::NewModelItem(&model, fOpenFolderMessage,
 				fTarget, true);
 			if (item) {
 				if (!fAddedSeparatorForSection) {
 					fAddedSeparatorForSection = true;
-					AddItem(new TitledSeparatorItem("Recent folders"));
+					AddItem(new TitledSeparatorItem(
+						B_TRANSLATE("Recent folders")));
 				}
 				AddItem(item);
 				item->SetEnabled(true);
@@ -436,7 +444,7 @@ RecentsMenu::DoneBuildingItemList()
 	//
 
 	if (CountItems() <= 0) {
-		BMenuItem *item = new BMenuItem("<No recent items>", 0);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("<No recent items>"), 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	} else

@@ -42,7 +42,9 @@ All rights reserved.
 
 #include <StopWatch.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Directory.h>
+#include <Locale.h>
 #include <Query.h>
 #include <Path.h>
 #include <Screen.h>
@@ -79,7 +81,7 @@ SpringLoadedFolderCompareMessages(const BMessage *incoming, const BMessage *drag
 {
 	if (!dragmessage || !incoming)
 		return false;
-		
+
 	bool retvalue=false;
 	for (int32 inIndex=0; incoming->HasRef("refs", inIndex); inIndex++) {
 		entry_ref inRef;
@@ -137,7 +139,7 @@ SpringLoadedFolderSetMenuStates(const BMenu* menu, const BObjectList<BString> *t
 		ModelMenuItem *item = dynamic_cast<ModelMenuItem *>(menu->ItemAt(index));
 		if (!item)
 			continue;
-			
+
 		const Model *model = item->TargetModel();
 		if (!model)
 			continue;
@@ -243,6 +245,9 @@ SpringLoadedFolderCacheDragData(const BMessage *incoming, BMessage **message, BO
 
 //	#pragma mark -
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 BNavMenu::BNavMenu(const char *title, uint32 message, const BHandler *target,
 	BWindow *parentWindow, const BObjectList<BString> *list)
@@ -574,7 +579,7 @@ BNavMenu::NewModelItem(Model *model, const BMessage *invokeMessage,
 					
 			PoseInfo poseInfo;
 			ssize_t size = -1;
-			
+
 			if (result->Node()) 
 				size = result->Node()->ReadAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
 					&poseInfo, sizeof(poseInfo));
@@ -722,7 +727,7 @@ BNavMenu::DoneBuildingItemList()
 	fItemList->MakeEmpty();
 
 	if (!count) {
-		BMenuItem *item = new BMenuItem("Empty folder", 0);
+		BMenuItem *item = new BMenuItem(B_TRANSLATE("Empty folder"), 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	}

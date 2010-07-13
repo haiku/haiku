@@ -35,12 +35,14 @@ All rights reserved.
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
@@ -73,6 +75,10 @@ All rights reserved.
 #include "Tracker.h"
 #include "Utilities.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
 const char *kAllMimeTypes = "mime/ALLTYPES";
 
 const BRect kInitialRect(100, 100, 530, 210);
@@ -85,8 +91,12 @@ const uint32 kNameModifiedMessage = 'nmmd';
 const uint32 kSwitchToQueryTemplate = 'swqt';
 const uint32 kRunSaveAsTemplatePanel = 'svtm';
 
-const char *kDragNDropTypes [] = { B_QUERY_MIMETYPE, B_QUERY_TEMPLATE_MIMETYPE };
-const char *kDragNDropActionSpecifiers [] = { "Create a Query", "Create a Query template" };
+const char* kDragNDropTypes [] = {
+	B_QUERY_MIMETYPE,
+	B_QUERY_TEMPLATE_MIMETYPE };
+static const char *kDragNDropActionSpecifiers [] = {
+	B_TRANSLATE_MARK("Create a Query"),
+	B_TRANSLATE_MARK("Create a Query template") };
 
 const uint32 kAttachFile = 'attf';
 
@@ -162,12 +172,14 @@ MoreOptionsStruct::QueryTemporary(const BNode *node)
 //	#pragma mark -
 
 
-FindWindow::FindWindow(const entry_ref *newRef, bool editIfTemplateOnly)
-	:	BWindow(kInitialRect, "Find", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
-		fFile(TryOpening(newRef)),
-		fFromTemplate(false),
-		fEditTemplateOnly(false),
-		fSaveAsTemplatePanel(NULL)
+FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
+	:
+	BWindow(kInitialRect, B_TRANSLATE("Find"), B_TITLED_WINDOW, B_NOT_RESIZABLE
+		| B_NOT_ZOOMABLE),
+	fFile(TryOpening(newRef)),
+	fFromTemplate(false),
+	fEditTemplateOnly(false),
+	fSaveAsTemplatePanel(NULL)
 {
 	if (fFile) {
 		fRef = *newRef;
@@ -176,7 +188,7 @@ FindWindow::FindWindow(const entry_ref *newRef, bool editIfTemplateOnly)
 			if (BNodeInfo(fFile).GetType(type) == B_OK
 				&& strcasecmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0) {
 				fEditTemplateOnly = true;
-				SetTitle("Edit Query template");
+				SetTitle(B_TRANSLATE("Edit Query template"));
 			}
 		}
 	} else {
@@ -625,8 +637,10 @@ FindWindow::MessageReceived(BMessage *message)
 			else {
 				BMessenger panel(BackgroundView());
 				fSaveAsTemplatePanel = new BFilePanel(B_SAVE_PANEL, &panel);
-				fSaveAsTemplatePanel->SetSaveText("Query template");
-				fSaveAsTemplatePanel->Window()->SetTitle("Save as Query template:");
+				fSaveAsTemplatePanel->SetSaveText(
+					B_TRANSLATE("Query template"));
+				fSaveAsTemplatePanel->Window()->SetTitle(
+					B_TRANSLATE("Save as Query template:"));
 				fSaveAsTemplatePanel->Show();
 			}
 			break;
@@ -666,7 +680,7 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 
 	BMessenger self(this);
 	fRecentQueries = new BPopUpMenu("RecentQueries");
-	FindPanel::AddRecentQueries(fRecentQueries, true, &self, kSwitchToQueryTemplate);
+	FindPanel::AddRecentQueries(fRecentQueries,	true, &self, kSwitchToQueryTemplate);
 
 	AddChild(new MiniMenuField(rect, "RecentQueries", fRecentQueries));
 
@@ -680,14 +694,17 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	rect.right = rect.left + 150;
 	fMimeTypeField = new BMenuField(rect, "MimeTypeMenu", "", fMimeTypeMenu);
 	fMimeTypeField->SetDivider(0.0f);
-	fMimeTypeField->MenuItem()->SetLabel("All files and folders");
+	fMimeTypeField->MenuItem()->SetLabel(B_TRANSLATE("All files and folders"));
 	AddChild(fMimeTypeField);
 
 	// add popup for search criteria
 	fSearchModeMenu = new BPopUpMenu("searchMode");
-	fSearchModeMenu->AddItem(new BMenuItem("by name", new BMessage(kByNameItem)));
-	fSearchModeMenu->AddItem(new BMenuItem("by attribute", new BMessage(kByAttributeItem)));
-	fSearchModeMenu->AddItem(new BMenuItem("by formula", new BMessage(kByFormulaItem)));
+	fSearchModeMenu->AddItem(new BMenuItem(B_TRANSLATE("by name"),
+		new BMessage(kByNameItem)));
+	fSearchModeMenu->AddItem(new BMenuItem(B_TRANSLATE("by attribute"),
+		new BMessage(kByAttributeItem)));
+	fSearchModeMenu->AddItem(new BMenuItem(B_TRANSLATE("by formula"),
+		new BMessage(kByFormulaItem)));
 
 	fSearchModeMenu->ItemAt(initialMode == kByNameItem ? 0 :
 		(initialMode == kByAttributeItem ? 1 : 2))->SetMarked(true);
@@ -703,7 +720,7 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	rect.right = bounds.right - 15;
 	rect.left = rect.right - 100;
 	fVolMenu = new BPopUpMenu("", false, false);	// don't radioMode
-	menuField = new BMenuField(rect, "", "On", fVolMenu);
+	menuField = new BMenuField(rect, "", B_TRANSLATE("On"),	fVolMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 8);
 	AddChild(menuField);
 	AddVolumes(fVolMenu);
@@ -715,8 +732,10 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 		dragNDropMessage.AddString("be:types", B_FILE_MIME_TYPE);
 		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[0]);
 		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[1]);
-		dragNDropMessage.AddString("be:actionspecifier", kDragNDropActionSpecifiers[0]);
-		dragNDropMessage.AddString("be:actionspecifier", kDragNDropActionSpecifiers[1]);
+		dragNDropMessage.AddString("be:actionspecifier",
+			B_TRANSLATE(kDragNDropActionSpecifiers[0]));
+		dragNDropMessage.AddString("be:actionspecifier",
+			B_TRANSLATE(kDragNDropActionSpecifiers[1]));
 
 		BMessenger self(this);
 		fDraggableIcon = new DraggableQueryIcon(DraggableIcon::PreferredRect(draggableIconOrigin,
@@ -747,7 +766,8 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	rect = expandedBounds;
 	rect.right = rect.left + 200;
 	rect.bottom = rect.top + 20;;
-	fQueryName = new BTextControl(rect, "queryName", "Query name:", "", 0);
+	fQueryName = new BTextControl(rect, "queryName", B_TRANSLATE("Query name:"),
+		"", 0);
 	fQueryName->SetDivider(fQueryName->StringWidth(fQueryName->Label()) + 5);
 	fMoreOptionsPane->AddItem(fQueryName, 1);
 	FillCurrentQueryName(fQueryName, parent);
@@ -755,12 +775,14 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	rect.top = rect.bottom + 6;
 	rect.bottom = rect.top + 16;
 	rect.right = rect.left + 100;
-	fSearchTrashCheck = new BCheckBox(rect, "searchTrash", "Include trash", 0);
+	fSearchTrashCheck = new BCheckBox(rect, "searchTrash",
+		B_TRANSLATE("Include trash"), 0);
 	fSearchTrashCheck->ResizeToPreferred();
 	fMoreOptionsPane->AddItem(fSearchTrashCheck, 1);
 
 	rect.OffsetBy(fSearchTrashCheck->Bounds().Width() + 8, 0);
-	fTemporaryCheck = new BCheckBox(rect, "temporary", "Temporary", 0);
+	fTemporaryCheck = new BCheckBox(rect, "temporary",
+		B_TRANSLATE("Temporary"), 0);
 	fMoreOptionsPane->AddItem(fTemporaryCheck, 1);
 	fTemporaryCheck->SetValue(1);
 
@@ -788,13 +810,13 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 	rect.right = rect.left + 60;
 	rect.bottom = rect.top + 20;
 	BButton *button;
-	if (editTemplateOnly)
-		button = new BButton(rect, "save", "Save",
+	if (editTemplateOnly) {
+		button = new BButton(rect, "save", B_TRANSLATE("Save"),
 			new BMessage(kSaveButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-	else
-		button = new BButton(rect, "find", "Search",
+	} else {
+		button = new BButton(rect, "find", B_TRANSLATE("Search"),
 			new BMessage(kFindButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-
+	}
 	AddChild(button);
 	button->MakeDefault(true);
 }
@@ -956,7 +978,7 @@ FindPanel::ShowVolumeMenuLabel()
 	} else if (countSelected > 1)
 		// if more than two disks selected, don't use the disk name
 		// as a label
-		PopUpMenuSetTitle(fVolMenu, "multiple disks");
+		PopUpMenuSetTitle(fVolMenu,	B_TRANSLATE("multiple disks"));
 	else {
 		ASSERT(tmpItem);
 		PopUpMenuSetTitle(fVolMenu, tmpItem->Label());
@@ -1109,14 +1131,17 @@ FindPanel::MessageReceived(BMessage *message)
 					bool queryTemplate = false;
 
 					if (actionSpecifier
-						&& strcasecmp(actionSpecifier, kDragNDropActionSpecifiers[0]) == 0)
+						&& strcasecmp(actionSpecifier,
+							B_TRANSLATE(kDragNDropActionSpecifiers[0])) == 0) {
 						query = true;
-					else if (actionSpecifier
-						&& strcasecmp(actionSpecifier, kDragNDropActionSpecifiers[1]) == 0)
+					} else if (actionSpecifier
+						&& strcasecmp(actionSpecifier,
+							B_TRANSLATE(kDragNDropActionSpecifiers[1])) == 0) {
 						queryTemplate = true;
-					else if (mimeType && strcasecmp(mimeType, kDragNDropTypes[0]) == 0)
+					} else if (mimeType && strcasecmp(mimeType,
+							kDragNDropTypes[0]) == 0) {
 						query = true;
-					else if (mimeType && strcasecmp(mimeType, kDragNDropTypes[1]) == 0)
+					} else if (mimeType && strcasecmp(mimeType, kDragNDropTypes[1]) == 0)
 						queryTemplate = true;
 
 					if (query || queryTemplate)
@@ -1320,11 +1345,15 @@ FindPanel::GetDefaultName(BString &result) const
 	BTextControl *textControl = dynamic_cast<BTextControl *>(FindView("TextControl"));
 	switch (Mode()) {
 		case kByNameItem:
-			result << "Name = " << textControl->TextView()->Text();
+			result.SetTo(B_TRANSLATE_COMMENT("Name = %name",
+				"FindResultTitle"));
+			result.ReplaceFirst("%name", textControl->TextView()->Text());
 			break;
 
 		case kByFormulaItem:
-			result << "Formula " << textControl->TextView()->Text();
+			result.SetTo(B_TRANSLATE_COMMENT("Formula %formula",
+				"FindResultTitle"));
+			result.ReplaceFirst("%formula", textControl->TextView()->Text());
 			break;
 
 		case kByAttributeItem:
@@ -1593,7 +1622,8 @@ FindPanel::AddMimeTypesToMenu()
 {
 	BMessage *itemMessage = new BMessage(kMIMETypeItem);
 	itemMessage->AddString("mimetype", kAllMimeTypes);
-	MimeTypeMenu()->AddItem(new BMenuItem("All files and folders", itemMessage));
+	MimeTypeMenu()->AddItem(new BMenuItem(B_TRANSLATE("All files and folders"),
+		itemMessage));
 	MimeTypeMenu()->AddSeparatorItem();
 	MimeTypeMenu()->ItemAt(0)->SetMarked(true);
 
@@ -1673,9 +1703,9 @@ FindPanel::AddVolumes(BMenu *menu)
 
 	BMessage *message = new BMessage(kVolumeItem);
 	message->AddInt32("device", -1);
-	menu->AddItem(new BMenuItem("All disks", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("All disks"), message));
 	menu->AddSeparatorItem();
-	PopUpMenuSetTitle(menu, "All disks");
+	PopUpMenuSetTitle(menu, B_TRANSLATE("All disks"));
 
 	BVolumeRoster roster;
 	BVolume volume;
@@ -1813,7 +1843,8 @@ FindPanel::AddRecentQueries(BMenu *menu, bool addSaveAsItem, const BMessenger *t
 			menu->AddSeparatorItem();
 
 		BMessage *message = new BMessage(kRunSaveAsTemplatePanel);
-		BMenuItem *item = new BMenuItem("Save Query as template"B_UTF8_ELLIPSIS, message);
+		BMenuItem* item = new BMenuItem(
+			B_TRANSLATE("Save Query as template"B_UTF8_ELLIPSIS), message);
 		menu->AddItem(item);
 	}
 }
@@ -1840,17 +1871,19 @@ FindPanel::SetUpAddRemoveButtons(BBox *box)
 		BRect rect = box->Bounds();
 		rect.InsetBy(5, 10);
 		rect.top = rect.bottom - 20;
-		rect.right = rect.left + 22 + be_plain_font->StringWidth("Add");
+		rect.right = rect.left + 22
+			+ be_plain_font->StringWidth(B_TRANSLATE("Add"));
 
-		button = new BButton(rect, "add", "Add", new BMessage(kAddItem),
-			B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
+		button = new BButton(rect, "add", B_TRANSLATE("Add"),
+			new BMessage(kAddItem),	B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 		button->SetTarget(this);
 		box->AddChild(button);
 
 		rect.OffsetBy(rect.Width() + 6, 0);
-		rect.right = rect.left + 22 + be_plain_font->StringWidth("Remove");
-		button = new BButton(rect, "remove", "Remove", new BMessage(kRemoveItem),
-			B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
+		rect.right = rect.left + 22
+			+ be_plain_font->StringWidth(B_TRANSLATE("Remove"));
+		button = new BButton(rect, "remove", B_TRANSLATE("Remove"),
+			new BMessage(kRemoveItem), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 
 		button->SetEnabled(false);
 		button->SetTarget(this);
@@ -2333,7 +2366,7 @@ TAttrView::TAttrView(BRect frame, int32 index)
 	BPopUpMenu *menu = new BPopUpMenu("PopUp");
 
 	// add NAME attribute to popup
-	BMenu *submenu = new BMenu("Name");
+	BMenu* submenu = new BMenu(B_TRANSLATE("Name"));
 	submenu->SetRadioMode(true);
 	submenu->SetFont(be_plain_font);
 	BMessage *message = new BMessage(kAttributeItemMain);
@@ -2342,13 +2375,24 @@ TAttrView::TAttrView(BRect frame, int32 index)
 	BMenuItem *item = new BMenuItem(submenu, message);
 	menu->AddItem(item);
 
-	const int32 operators[] = {B_CONTAINS, B_EQ, B_NE, B_BEGINS_WITH, B_ENDS_WITH};
-	const char *operatorLabels[] = {"contains", "is", "is not", "starts with", "ends with"};
+	const int32 operators[] = {
+		B_CONTAINS,
+		B_EQ,
+		B_NE,
+		B_BEGINS_WITH,
+		B_ENDS_WITH};
+	static const char *operatorLabels[] = {
+		B_TRANSLATE_MARK("contains"),
+		B_TRANSLATE_MARK("is"),
+		B_TRANSLATE_MARK("is not"),
+		B_TRANSLATE_MARK("starts with"),
+		B_TRANSLATE_MARK("ends with")};
 
-	for (int32 i = 0;i < 5;i++) {
+	for (int32 i = 0; i < 5; i++) {
 		message = new BMessage(kAttributeItem);
 		message->AddInt32("operator", operators[i]);
-		submenu->AddItem(new BMenuItem(operatorLabels[i], message));
+		submenu->AddItem(new BMenuItem(B_TRANSLATE(operatorLabels[i]),
+			message));
 	}
 
 	// mark first item
@@ -2356,7 +2400,7 @@ TAttrView::TAttrView(BRect frame, int32 index)
 	submenu->ItemAt(0)->SetMarked(true);
 
 	// add SIZE attribute
-	submenu = new BMenu("Size");
+	submenu = new BMenu(B_TRANSLATE("Size"));
 	submenu->SetRadioMode(true);
 	submenu->SetFont(be_plain_font);
 	message = new BMessage(kAttributeItemMain);
@@ -2367,18 +2411,18 @@ TAttrView::TAttrView(BRect frame, int32 index)
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_GE);
-	submenu->AddItem(new BMenuItem("greater than", message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE("greater than"), message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_LE);
-	submenu->AddItem(new BMenuItem("less than", message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE("less than"), message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_EQ);
-	submenu->AddItem(new BMenuItem("is", message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
 
 	// add "modified" field
-	submenu = new BMenu("Modified");
+	submenu = new BMenu(B_TRANSLATE("Modified"));
 	submenu->SetRadioMode(true);
 	submenu->SetFont(be_plain_font);
 	message = new BMessage(kAttributeItemMain);
@@ -2389,11 +2433,11 @@ TAttrView::TAttrView(BRect frame, int32 index)
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_LE);
-	submenu->AddItem(new BMenuItem("before", message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE("before"), message));
 
 	message = new BMessage(kAttributeItem);
 	message->AddInt32("operator", B_GE);
-	submenu->AddItem(new BMenuItem("after", message));
+	submenu->AddItem(new BMenuItem(B_TRANSLATE("after"), message));
 
 	BRect bounds(Bounds());
 	bounds.right = bounds.left + 100;
@@ -2518,14 +2562,14 @@ TAttrView::AddLogicMenu(bool selectAnd)
 	BPopUpMenu *menu = new BPopUpMenu("");
 	BMessage *message = new BMessage();
 	message->AddInt32("combine", B_AND);
-	BMenuItem *item = new BMenuItem("And", message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("And"), message);
 	menu->AddItem(item);
 	if (selectAnd)
 		item->SetMarked(true);
 
 	message = new BMessage();
 	message->AddInt32("combine", B_OR);
-	item = new BMenuItem("Or", message);
+	item = new BMenuItem(B_TRANSLATE("Or"), message);
 	menu->AddItem(item);
 	if (!selectAnd)
 		item->SetMarked(true);
@@ -2654,25 +2698,28 @@ TAttrView::AddAttributes(BMenu *menu, const BMimeType &mimeType)
 			case B_STRING_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_CONTAINS);
-				submenu->AddItem(new BMenuItem("contains", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("contains"),
+					message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_EQ);
-				submenu->AddItem(new BMenuItem("is", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_NE);
-				submenu->AddItem(new BMenuItem("is not", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("is not"), message));
 				submenu->SetTargetForItems(this);
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_BEGINS_WITH);
-				submenu->AddItem(new BMenuItem("starts with", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("starts with"),
+					message));
 				submenu->SetTargetForItems(this);
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_ENDS_WITH);
-				submenu->AddItem(new BMenuItem("ends with", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("ends with"),
+					message));
 				break;
 
 			case B_BOOL_TYPE:
@@ -2689,25 +2736,27 @@ TAttrView::AddAttributes(BMenu *menu, const BMimeType &mimeType)
 			case B_DOUBLE_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_EQ);
-				submenu->AddItem(new BMenuItem("is", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("is"), message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_GE);
-				submenu->AddItem(new BMenuItem("greater than", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("greater than"),
+					message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_LE);
-				submenu->AddItem(new BMenuItem("less than", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("less than"),
+					message));
 				break;
 
 			case B_TIME_TYPE:
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_LE);
-				submenu->AddItem(new BMenuItem("before", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("before"), message));
 
 				message = new BMessage(kAttributeItem);
 				message->AddInt32("operator", B_GE);
-				submenu->AddItem(new BMenuItem("after", message));
+				submenu->AddItem(new BMenuItem(B_TRANSLATE("after"), message));
 				break;
 		}
 		submenu->SetTargetForItems(this);
@@ -2990,7 +3039,8 @@ DraggableQueryIcon::DragStarted(BMessage *dragMessage)
 	ASSERT(window);
 	dragMessage->AddString("be:clip_name",
 		window->BackgroundView()->UserSpecifiedName() ?
-			window->BackgroundView()->UserSpecifiedName() : "New Query");
+			window->BackgroundView()->UserSpecifiedName()
+			: B_TRANSLATE("New Query"));
 
 	return true;
 }

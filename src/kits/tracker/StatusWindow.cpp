@@ -39,8 +39,10 @@ All rights reserved.
 
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <Debug.h>
+#include <Locale.h>
 #include <MessageFilter.h>
 #include <StringView.h>
 #include <String.h>
@@ -182,11 +184,14 @@ public:
 // #pragma mark - BStatusWindow
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
+
 BStatusWindow::BStatusWindow()
 	:
-	BWindow(kStatusRect, "Tracker status", B_TITLED_WINDOW,
-		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE,
-		B_ALL_WORKSPACES),
+	BWindow(kStatusRect, B_TRANSLATE("Tracker status"),	B_TITLED_WINDOW,
+		B_NOT_CLOSABLE | B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
 	fRetainDesktopFocus(false)
 {
 	SetSizeLimits(0, 100000, 0, 100000);
@@ -446,41 +451,41 @@ BStatusView::BStatusView(BRect bounds, thread_id thread,
 	rect.top += 6;
 	rect.bottom = rect.top + 15;
 
-	const char* caption = NULL;
+	BString caption;
 	int32 id = 0;
 
 	switch (type) {
 		case kCopyState:
-			caption = "Preparing to copy items" B_UTF8_ELLIPSIS;
+			caption = B_TRANSLATE("Preparing to copy items" B_UTF8_ELLIPSIS);
 			id = R_CopyStatusBitmap;
 			break;
 
 		case kMoveState:
-			caption = "Preparing to move items" B_UTF8_ELLIPSIS;
+			caption = B_TRANSLATE("Preparing to move items" B_UTF8_ELLIPSIS);
 			id = R_MoveStatusBitmap;
 			break;
 
 		case kCreateLinkState:
-			caption = "Preparing to create links" B_UTF8_ELLIPSIS;
+			caption = B_TRANSLATE("Preparing to create links" B_UTF8_ELLIPSIS);
 			id = R_MoveStatusBitmap;
 			break;
 
 		case kTrashState:
-			caption = "Preparing to empty Trash" B_UTF8_ELLIPSIS;
+			caption = B_TRANSLATE("Preparing to empty Trash" B_UTF8_ELLIPSIS);
 			id = R_TrashStatusBitmap;
 			break;
 
 		case kVolumeState:
-			caption = "Searching for disks to mount" B_UTF8_ELLIPSIS;
+			caption = B_TRANSLATE("Searching for disks to mount" B_UTF8_ELLIPSIS);
 			break;
 
 		case kDeleteState:
-			caption = "Preparing to delete items" B_UTF8_ELLIPSIS;
+			caption = B_TRANSLATE("Preparing to delete items" B_UTF8_ELLIPSIS);
 			id = R_TrashStatusBitmap;
 			break;
 
 		case kRestoreFromTrashState:
-			caption = "Preparing to restore items" B_UTF8_ELLIPSIS;
+			caption = B_TRANSLATE("Preparing to restore items" B_UTF8_ELLIPSIS);
 			break;
 
 		default:
@@ -488,8 +493,8 @@ BStatusView::BStatusView(BRect bounds, thread_id thread,
 			break;
 	}
 
-	if (caption != NULL) {
-		fStatusBar = new BStatusBar(rect, "StatusBar", caption);
+	if (caption.Length() != 0) {
+		fStatusBar = new BStatusBar(rect, "StatusBar", caption.String());
 		fStatusBar->SetBarHeight(12);
 		float width, height;
 		fStatusBar->GetPreferredSize(&width, &height);
@@ -572,33 +577,37 @@ BStatusView::InitStatus(int32 totalItems, off_t totalSize,
 	}
 
 	BString buffer;
-	if (totalItems > 0)
-		buffer << "of " << totalItems;
+	if (totalItems > 0) {
+		char totalStr[32];
+		buffer.SetTo(B_TRANSLATE("of %items"));
+		snprintf(totalStr, sizeof(totalStr), "%ld", totalItems);
+		buffer.ReplaceFirst("%items", totalStr);
+	}
 
 	switch (fType) {
 		case kCopyState:
-			fStatusBar->Reset("Copying: ", buffer.String());
+			fStatusBar->Reset(B_TRANSLATE("Copying: "),	buffer.String());
 			break;
 
 		case kCreateLinkState:
-			fStatusBar->Reset("Creating links: ", buffer.String());
+			fStatusBar->Reset(B_TRANSLATE("Creating links: "), buffer.String());
 			break;
 
 		case kMoveState:
-			fStatusBar->Reset("Moving: ", buffer.String());
+			fStatusBar->Reset(B_TRANSLATE("Moving: "), buffer.String());
 			break;
 
 		case kTrashState:
-			fStatusBar->Reset("Emptying Trash" B_UTF8_ELLIPSIS " ",
+			fStatusBar->Reset(B_TRANSLATE("Emptying Trash" B_UTF8_ELLIPSIS " "),
 				buffer.String());
 			break;
 
 		case kDeleteState:
-			fStatusBar->Reset("Deleting: ", buffer.String());
+			fStatusBar->Reset(B_TRANSLATE("Deleting: "), buffer.String());
 			break;
 
 		case kRestoreFromTrashState:
-			fStatusBar->Reset("Restoring: ", buffer.String());
+			fStatusBar->Reset(B_TRANSLATE("Restoring: "), buffer.String());
 			break;
 
 		default:
@@ -650,7 +659,7 @@ BStatusView::Draw(BRect updateRect)
 	tp.y += ceilf(fh.leading) + ceilf(fh.ascent);
 
 	if (IsPaused())
-		DrawString("Paused: click to resume or stop", tp);
+		DrawString(B_TRANSLATE("Paused: click to resume or stop"), tp);
 	else if (fDestDir.Length()) {
 		BString buffer;
 		buffer << "To: " << fDestDir;
@@ -714,40 +723,48 @@ BStatusView::Draw(BRect updateRect)
 			// TODO: Localization of time string...
 			if (now < finishTime - secondsPerDay) {
 				// process is going to take more than a day!
-				sprintf(timeText, "%0*d:%0*d %0*d/%0*d/%ld",
+				snprintf(timeText, sizeof(timeText), "%0*d:%0*d %0*d/%0*d/%ld",
 					2, time->tm_hour, 2, time->tm_min,
 					2, time->tm_mon + 1, 2, time->tm_mday, year);
 			} else {
-				sprintf(timeText, "%0*d:%0*d",
+				snprintf(timeText, sizeof(timeText), "%0*d:%0*d",
 					2, time->tm_hour, 2, time->tm_min);
 			}
 
-			BString buffer1("Finish: ");
-			buffer1 << timeText;
 			finishTime -= now;
 			time = gmtime(&finishTime);
+			char finishStr[32];
 
-			BString buffer2;
-			if (finishTime > secondsPerDay)
-				buffer2 << "Over " << finishTime / secondsPerDay << " days";
-			else if (finishTime > 60 * 60)
-				buffer2 << "Over " << finishTime / (60 * 60) << " hours";
-			else if (finishTime > 60)
-				buffer2 << finishTime / 60 << " minutes";
-			else
-				buffer2 << finishTime << " seconds";
+			if (finishTime > secondsPerDay) {
+				buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
+					"days left)"));
+				snprintf(finishStr, sizeof(finishStr), "%ld",
+					finishTime / secondsPerDay);
+			} else if (finishTime > 60 * 60) {
+				buffer.SetTo(B_TRANSLATE("(Finish: %time - Over %finishtime "
+					"hours left)"));
+				snprintf(finishStr, sizeof(finishStr), "%ld",
+					finishTime / (60 * 60));
+			} else if (finishTime > 60) {
+				buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime minutes "
+					"left)"));
+				snprintf(finishStr, sizeof(finishStr), "%ld", finishTime / 60);
+			} else {
+				buffer.SetTo(B_TRANSLATE("(Finish: %time - %finishtime seconds "
+					"left)"));
+				snprintf(finishStr, sizeof(finishStr), "%ld", finishTime);
+			}
 
-			buffer2 << " left";
+			buffer.ReplaceFirst("%time", timeText);
+			buffer.ReplaceFirst("%finishtime", finishStr);
 
-			buffer = "(";
-			buffer << buffer1 << " - " << buffer2 << ")";
 			tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
 			if (tp.x > rightDivider)
 				DrawString(buffer.String(), tp);
 			else {
 				// complete string too wide, try with shorter version
-				buffer = "(";
-				buffer << buffer1 << ")";
+				buffer.SetTo(B_TRANSLATE("(Finish: %time)"));
+				buffer.ReplaceFirst("%time", timeText);
 				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
 				if (tp.x > rightDivider)
 					DrawString(buffer.String(), tp);

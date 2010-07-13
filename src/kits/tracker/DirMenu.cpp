@@ -35,8 +35,10 @@ All rights reserved.
 // ToDo:
 // get rid of fMenuBar, SetMenuBar and related mess
 
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <Path.h>
 #include <Volume.h>
@@ -51,6 +53,9 @@ All rights reserved.
 #include "TrackerSettings.h"
 #include "Utilities.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 BDirMenu::BDirMenu(BMenuBar *bar, uint32 command, const char *entryName)
 	:	BPopUpMenu("directories"),
@@ -249,7 +254,8 @@ BDirMenu::AddDisksIconToMenu(bool atEnd)
 	BMessage *message = new BMessage(fCommand);
 	message->AddRef(fEntryName.String(), model.EntryRef());
 
-	ModelMenuItem *item = new ModelMenuItem(&model, "Disks", message);
+	ModelMenuItem* item = new ModelMenuItem(&model,	B_TRANSLATE("Disks"),
+		message);
 	if (atEnd)
 		AddItem(item);
 	else

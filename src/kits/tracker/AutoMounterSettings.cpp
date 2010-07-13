@@ -37,10 +37,12 @@ All rights reserved.
 #include <Alert.h>
 #include <Box.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <CheckBox.h>
 #include <Debug.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <SpaceLayoutItem.h>
 #include <SeparatorView.h>
 #include <Message.h>
@@ -54,6 +56,8 @@ const uint32 kAutomountSettingsChanged = 'achg';
 const uint32 kBootMountSettingsChanged = 'bchg';
 const uint32 kEjectWhenUnmountingChanged = 'ejct';
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 class AutomountSettingsPanel : public BBox {
 public:
@@ -103,51 +107,56 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 
 	BBox* autoMountBox = new BBox("autoMountBox", B_WILL_DRAW | B_FRAME_EVENTS
 		| B_PULSE_NEEDED | B_NAVIGABLE_JUMP);
-	autoMountBox->SetLabel("Automatic disk mounting");
+	autoMountBox->SetLabel(B_TRANSLATE("Automatic disk mounting"));
 	BGroupLayout* autoMountLayout = new BGroupLayout(B_VERTICAL, spacing);
 	autoMountBox->SetLayout(autoMountLayout);
 	autoMountLayout->SetInsets(spacing,
 		autoMountBox->InnerFrame().top + spacing, spacing, spacing);
 
-	fScanningDisabledCheck = new BRadioButton("scanningOff", "Don't automount",
+	fScanningDisabledCheck = new BRadioButton("scanningOff",
+		B_TRANSLATE("Don't automount"),
 		new BMessage(kAutomountSettingsChanged));
 
-	fAutoMountAllBFSCheck = new BRadioButton("autoBFS", "All BeOS disks",
-		new BMessage(kAutomountSettingsChanged));
+	fAutoMountAllBFSCheck = new BRadioButton("autoBFS",
+		B_TRANSLATE("All BeOS disks"), new BMessage(kAutomountSettingsChanged));
 
-	fAutoMountAllCheck = new BRadioButton("autoAll", "All disks",
-		new BMessage(kAutomountSettingsChanged));
+	fAutoMountAllCheck = new BRadioButton("autoAll",
+		B_TRANSLATE("All disks"), new BMessage(kAutomountSettingsChanged));
 
 	// "Disk Mounting During Boot" group
 
 	BBox* bootMountBox = new BBox("", B_WILL_DRAW | B_FRAME_EVENTS
 		| B_PULSE_NEEDED | B_NAVIGABLE_JUMP);
-	bootMountBox->SetLabel("Disk mounting during boot");
+	bootMountBox->SetLabel(B_TRANSLATE("Disk mounting during boot"));
 	BGroupLayout* bootMountLayout = new BGroupLayout(B_VERTICAL, spacing);
 	bootMountBox->SetLayout(bootMountLayout);
 	bootMountLayout->SetInsets(spacing,
 		bootMountBox->InnerFrame().top + spacing, spacing, spacing);
 
 	fInitialDontMountCheck = new BRadioButton("initialNone",
-		"Only the boot disk", new BMessage(kBootMountSettingsChanged));
+		B_TRANSLATE("Only the boot disk"),
+		new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountRestoreCheck = new BRadioButton("initialRestore",
-		"Previously mounted disks", new BMessage(kBootMountSettingsChanged));
+		B_TRANSLATE("Previously mounted disks"),
+		new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountAllBFSCheck = new BRadioButton("initialBFS",
-		"All BeOS disks", new BMessage(kBootMountSettingsChanged));
+		B_TRANSLATE("All BeOS disks"),
+		new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountAllCheck = new BRadioButton("initialAll",
-		"All disks", new BMessage(kBootMountSettingsChanged));
+		B_TRANSLATE("All disks"), new BMessage(kBootMountSettingsChanged));
 
 	fEjectWhenUnmountingCheckBox = new BCheckBox("ejectWhenUnmounting",
-		"Eject when unmounting", new BMessage(kEjectWhenUnmountingChanged));
+		B_TRANSLATE("Eject when unmounting"),
+		new BMessage(kEjectWhenUnmountingChanged));
 
 	// Buttons
 
-	fDone = new BButton("Done", new BMessage(B_QUIT_REQUESTED));
+	fDone = new BButton(B_TRANSLATE("Done"), new BMessage(B_QUIT_REQUESTED));
 
-	fMountAllNow = new BButton("mountAll", "Mount all disks now",
+	fMountAllNow = new BButton("mountAll", B_TRANSLATE("Mount all disks now"),
 		new BMessage(kMountAllNow));
 
 	fDone->MakeDefault(true);
@@ -292,9 +301,9 @@ AutomountSettingsPanel::_SendSettings(bool rescan)
 AutomountSettingsDialog::AutomountSettingsDialog(BMessage* settings,
 		const BMessenger& target)
 	:
-	BWindow(BRect(100, 100, 320, 370), "Disk mount settings",
+	BWindow(BRect(100, 100, 320, 370), B_TRANSLATE("Disk mount settings"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS)
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	BView* view = new AutomountSettingsPanel(settings, target);
@@ -325,9 +334,10 @@ AutomountSettingsDialog::RunAutomountSettings(const BMessenger& target)
 	BMessage reply;
 	status_t ret = target.SendMessage(&message, &reply, 2500000);
 	if (ret != B_OK) {
-		(new BAlert("Mount server error", "The mount server could not be "
-			"contacted.", "OK", NULL, NULL, B_WIDTH_AS_USUAL,
-			B_STOP_ALERT))->Go();
+		(new BAlert(B_TRANSLATE("Mount server error"),
+			B_TRANSLATE("The mount server could not be  contacted."),
+			B_TRANSLATE("OK"),
+			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 		return;
 	}
 

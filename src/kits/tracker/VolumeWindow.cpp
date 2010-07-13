@@ -32,7 +32,9 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <Catalog.h>
 #include <Debug.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -46,6 +48,10 @@ All rights reserved.
 #include "PoseView.h"
 #include "MountMenu.h"
 
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 BVolumeWindow::BVolumeWindow(LockingList<BWindow> *windowList, uint32 openFlags)
 	:	BContainerWindow(windowList, openFlags)
@@ -79,7 +85,7 @@ BVolumeWindow::MenusBeginning()
 		}
 	}
 
-	BMenuItem *item = fMenuBar->FindItem("Unmount");
+	BMenuItem* item = fMenuBar->FindItem(B_TRANSLATE("Unmount"));
 	if (item)
 		item->SetEnabled(ejectableVolumeSelected);
 }
@@ -88,23 +94,27 @@ BVolumeWindow::MenusBeginning()
 void
 BVolumeWindow::AddFileMenu(BMenu *menu)
 {
-	menu->AddItem(new BMenuItem("Find"B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Find"B_UTF8_ELLIPSIS),
 		new BMessage(kFindButton), 'F'));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Open", new BMessage(kOpenSelection), 'O'));
-	menu->AddItem(new BMenuItem("Get info", new BMessage(kGetInfo), 'I'));
-	menu->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Open"),
+		new BMessage(kOpenSelection), 'O'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"),
+		new BMessage(kGetInfo), 'I'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
+		new BMessage(kEditItem), 'E'));
 
-	BMenuItem *item = new BMenuItem("Unmount", new BMessage(kUnmountVolume), 'U');
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("Unmount"),
+		new BMessage(kUnmountVolume), 'U');
 	item->SetEnabled(false);
 	menu->AddItem(item);
 
-	menu->AddItem(new BMenuItem("Mount settings" B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Mount settings" B_UTF8_ELLIPSIS),
 		new BMessage(kRunAutomounterSettings)));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenu(kAddOnsMenuName));
+	menu->AddItem(new BMenu(B_TRANSLATE("Add-ons")));
 	menu->SetTargetForItems(PoseView());
 }
 
@@ -118,26 +128,35 @@ BVolumeWindow::AddWindowContextMenus(BMenu *menu)
 		return;
 	}
 
-	menu->AddItem(new BMenuItem("Icon view", new BMessage(kIconMode)));
-	menu->AddItem(new BMenuItem("Mini icon view", new BMessage(kMiniIconMode)));
-	menu->AddItem(new BMenuItem("List view", new BMessage(kListMode)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Icon view"),
+		new BMessage(kIconMode)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Mini icon view"),
+		new BMessage(kMiniIconMode)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("List view"),
+		new BMessage(kListMode)));
 	menu->AddSeparatorItem();
 
-	BMenuItem *resizeItem = new BMenuItem("Resize to fit",new BMessage(kResizeToFit), 'Y');
+	BMenuItem* resizeItem = new BMenuItem(B_TRANSLATE("Resize to fit"),
+		new BMessage(kResizeToFit), 'Y');
 	menu->AddItem(resizeItem);
-	menu->AddItem(new BMenuItem("Clean up", new BMessage(kCleanup), 'K'));
-	menu->AddItem(new BMenuItem("Select"B_UTF8_ELLIPSIS, new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
-	menu->AddItem(new BMenuItem("Invert selection", new BMessage(kInvertSelection), 'S'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Clean up"),
+		new BMessage(kCleanup), 'K'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
+		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Invert selection"),
+		new BMessage(kInvertSelection), 'S'));
 
-	BMenuItem *closeItem = new BMenuItem("Close",new BMessage(B_QUIT_REQUESTED), 'W');
+	BMenuItem* closeItem = new BMenuItem(B_TRANSLATE("Close"),
+		new BMessage(B_QUIT_REQUESTED), 'W');
 	menu->AddItem(closeItem);
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new MountMenu("Mount"));
+	menu->AddItem(new MountMenu(B_TRANSLATE("Mount")));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenu(kAddOnsMenuName));
+	menu->AddItem(new BMenu(B_TRANSLATE("Add-ons")));
 
 	// target items as needed
 	menu->SetTargetForItems(PoseView());

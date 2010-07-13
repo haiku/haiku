@@ -35,10 +35,13 @@ All rights reserved.
 #include "FSClipboard.h"
 #include <Clipboard.h>
 #include <Alert.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <NodeMonitor.h>
 #include "Commands.h"
 #include "FSUtils.h"
 #include "Tracker.h"
+
 
 // prototypes
 static void MakeNodeFromName(node_ref *node, char *name);
@@ -46,12 +49,6 @@ static inline void MakeRefName(char *refName, const node_ref *node);
 static inline void MakeModeName(char *modeName, const node_ref *node);
 static inline void MakeModeNameFromRefName(char *modeName, char *refName);
 static inline bool CompareModeAndRefName(const char *modeName, const char *refName);
-
-
-//these are from PoseView.cpp
-extern const char *kNoCopyToTrashStr;
-extern const char *kNoCopyToRootStr;
-extern const char *kOkToMoveStr;
 
 /*
 static bool
@@ -110,6 +107,9 @@ CompareModeAndRefName(const char *modeName, const char *refName)
 
 //	#pragma mark -
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 bool
 FSClipboardHasRefs()
@@ -468,8 +468,10 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 
 	// can't copy/paste to root('/') directory
 	if (model->IsRoot()) {
-		BAlert *alert = new BAlert("", kNoCopyToRootStr, "Cancel", 
-			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("You must drop items on one of the disk icons "
+			"in the \"Disks\" window."), B_TRANSLATE("Cancel"),	NULL, NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		okToMove = false;			
@@ -480,8 +482,10 @@ FSClipboardPaste(Model *model, uint32 linksMode)
 
 	// can't copy items into the trash
 	if (copyList->CountItems() > 0 && model->IsTrash()) {
-		BAlert *alert = new BAlert("", kNoCopyToTrashStr, "Cancel",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("Sorry, you can't copy items to the Trash."),
+			B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		okToMove = false;

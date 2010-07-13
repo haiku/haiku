@@ -34,7 +34,9 @@ All rights reserved.
 
 // MountMenu implements a context menu used for mounting/unmounting volumes
 
+#include <Catalog.h>
 #include <Debug.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <InterfaceDefs.h>
@@ -154,6 +156,9 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 //	#pragma mark -
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
 MountMenu::MountMenu(const char *name)
 	: BMenu(name)
 {
@@ -214,10 +219,11 @@ MountMenu::AddDynamicItem(add_state)
 
 	AddSeparatorItem();
 
-	BMenuItem *mountAll = new BMenuItem("Mount all",
+	BMenuItem* mountAll = new BMenuItem(B_TRANSLATE("Mount all"),
 		new BMessage(kMountAllNow));
 	AddItem(mountAll);
-	BMenuItem *mountSettings = new BMenuItem("Settings" B_UTF8_ELLIPSIS,
+	BMenuItem* mountSettings = new BMenuItem(
+		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
 		new BMessage(kRunAutomounterSettings));
 	AddItem(mountSettings);
 

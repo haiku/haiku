@@ -37,17 +37,23 @@ All rights reserved.
 #include "CountView.h"
 
 #include <Application.h>
+#include <Catalog.h>
 #include <ControlLook.h>
+#include <Locale.h>
 
 #include "AutoLock.h"
 #include "Bitmaps.h"
 #include "ContainerWindow.h"
 #include "DirMenu.h"
 #include "PoseView.h"
+#include "Utilities.h"
 
 
 const bigtime_t kBarberPoleDelay = 500000;
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 BCountView::BCountView(BRect bounds, BPoseView* view)
 	: BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,
@@ -217,17 +223,20 @@ BCountView::Draw(BRect updateRect)
 		itemString << fLastCount << " " << Filter();
 	} else {
 		if (fLastCount == 0)
-			itemString << "no items";
+			itemString << B_TRANSLATE("no items");
 		else if (fLastCount == 1)
-			itemString << "1 item";
-		else
-			itemString << fLastCount << " items";
+			itemString << B_TRANSLATE("1 item");
+		else {
+			itemString.SetTo(B_TRANSLATE("%num items"));
+			char numString[256];
+			snprintf(numString, sizeof(numString), "%ld", fLastCount);
+			itemString.ReplaceFirst("%num", numString);
+		}
 	}
 
-	BString string(itemString);
 	BRect textRect(TextInvalRect());
 
-	TruncateString(&string, IsTypingAhead() ? B_TRUNCATE_BEGINNING
+	TruncateString(&itemString, IsTypingAhead() ? B_TRUNCATE_BEGINNING
 			: IsFiltering() ? B_TRUNCATE_MIDDLE : B_TRUNCATE_END,
 		textRect.Width());
 
@@ -238,7 +247,7 @@ BCountView::Draw(BRect updateRect)
 		SetHighColor(0, 0, 0);
 
 	MovePenTo(textRect.LeftBottom());
-	DrawString(string.String());
+	DrawString(itemString.String());
 
 	bounds.top++;
 

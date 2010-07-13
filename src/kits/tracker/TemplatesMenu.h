@@ -46,7 +46,7 @@ extern const char* kTemplatesMenuName;
 class TemplatesMenu : public BMenu {
 public:
 	TemplatesMenu(const BMessenger &target,
-		const char *label = kTemplatesMenuName);
+		const char *label);
 	virtual ~TemplatesMenu();
 
 

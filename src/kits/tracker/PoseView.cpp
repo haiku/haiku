@@ -43,6 +43,7 @@ All rights reserved.
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <Dragger.h>
@@ -51,6 +52,7 @@ All rights reserved.
 #include <Screen.h>
 #include <Query.h>
 #include <List.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -92,6 +94,9 @@ All rights reserved.
 #include "WidgetAttributeText.h"
 #include "WidthBuffer.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 using std::min;
 using std::max;
@@ -4083,24 +4088,23 @@ RunMimeTypeDestinationMenu(const char *actionText, const BObjectList<BString> *t
 		} else if (types)
 			description = embedTypeAs;
 
-		const char *labelText;
-		char text[1024];
+		BString labelText;
 		if (actionText) {
 			int32 length = 1024 - 1 - (int32)strlen(actionText);
 			if (length > 0) {
 				description.Truncate(length);
-				sprintf(text, actionText, description.String());
-				labelText = text;
+				labelText.SetTo(actionText);
+				labelText.ReplaceFirst("%s", description.String());
 			} else
-				labelText = "label too long";
+				labelText.SetTo(B_TRANSLATE("label too long"));
 		} else
-			labelText = description.String();
+			labelText = description;
 
-		menu->AddItem(new BMenuItem(labelText, 0));
+		menu->AddItem(new BMenuItem(labelText.String(), 0));
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Cancel", 0));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Cancel"), 0));
 
 	int32 result = -1;
 	BMenuItem *resultingItem = menu->Go(where, false, true);
@@ -4254,7 +4258,8 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 						if (specificActionIndex == -1)
 							return false;
 					} else if (types.CountItems() > 0) {
-						specificTypeIndex = RunMimeTypeDestinationMenu("Create %s clipping",
+						specificTypeIndex = RunMimeTypeDestinationMenu(
+							B_TRANSLATE("Create %s clipping"),
 							&types, &typeNames, view->ConvertToScreen(dropPt));
 
 						if (specificTypeIndex == -1)

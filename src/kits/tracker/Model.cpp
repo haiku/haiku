@@ -46,10 +46,12 @@ All rights reserved.
 
 #include <AppDefs.h>
 #include <Bitmap.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -82,6 +84,9 @@ _IMPEXP_BE
 bool CheckNodeIconHintPrivate(const BNode *, bool);
 }
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 Model::Model()
 	:
@@ -328,20 +333,23 @@ Model::CompareFolderNamesFirst(const Model *compareModel) const
 const char *
 Model::Name() const
 {
+	static const char* kRootNodeName = B_TRANSLATE_MARK("Disks");
+	static const char* kTrashNodeName = B_TRANSLATE_MARK("Trash");
+	static const char* kDesktopNodeName = B_TRANSLATE_MARK("Desktop");
+
 	switch (fBaseType) {
 		case kRootNode:
-			return "Disks";
+			return B_TRANSLATE(kRootNodeName);
 			
 		case kVolumeNode:
 			if (fVolumeName)
 				return fVolumeName;
 			break;
-				
 		case kTrashNode:
-			return "Trash";
+			return B_TRANSLATE(kTrashNodeName);
 		
 		case kDesktopNode:
-			return "Desktop";
+			return B_TRANSLATE(kDesktopNodeName);
 			
 		default:
 			break;

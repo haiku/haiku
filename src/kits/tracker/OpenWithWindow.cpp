@@ -44,6 +44,8 @@ All rights reserved.
 
 #include <Alert.h>
 #include <Button.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -54,6 +56,7 @@ All rights reserved.
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 
 const char *kDefaultOpenWithTemplate = "OpenWithSettings";
 
@@ -69,6 +72,9 @@ const int32 kDocumentKnobWidth = 16;
 const int32 kOpenAndMakeDefault = 'OpDf';
 const rgb_color kOpenWithDefaultColor = { 0xFF, 0xFF, 0xCC, 255};
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 		LockingList<BWindow> *windowList, window_look look, window_feel feel,
@@ -92,7 +98,7 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 
 	// add buttons
 
-	fLaunchButton = new BButton(rect, "ok", "Open",
+	fLaunchButton = new BButton(rect, "ok",	B_TRANSLATE("Open"),
 		new BMessage(kDefaultButton), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fLaunchButton->ResizeToPreferred();
 	fLaunchButton->MoveTo(rect.right - 10 - kDocumentKnobWidth
@@ -102,7 +108,7 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 
 	BRect buttonRect = fLaunchButton->Frame();
 	fLaunchAndMakeDefaultButton = new BButton(buttonRect, "make default",
-		"Open and make preferred", new BMessage(kOpenAndMakeDefault),
+		B_TRANSLATE("Open and make preferred"),	new BMessage(kOpenAndMakeDefault),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	// wide button, have to resize to fit text
 	fLaunchAndMakeDefaultButton->ResizeToPreferred();
@@ -112,7 +118,7 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 	fLaunchAndMakeDefaultButton->SetEnabled(false);
 
 	buttonRect = fLaunchAndMakeDefaultButton->Frame();
-	BButton *button = new BButton(buttonRect, "cancel", "Cancel",
+	BButton *button = new BButton(buttonRect, "cancel",	B_TRANSLATE("Cancel"),
 		new BMessage(kCancelButton), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->MoveBy(- 10 - button->Bounds().Width(), 0);
@@ -147,7 +153,7 @@ OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 		SetTitle(buffer.String());
 	} else
 		// use generic title
-		SetTitle("Open selection with:");
+		SetTitle(B_TRANSLATE("Open selection with:"));
 
 	AddCommonFilter(new BMessageFilter(B_KEY_DOWN, &OpenWithContainerWindow::KeyDownFilter));
 }
@@ -377,7 +383,7 @@ OpenWithContainerWindow::NewAttributeMenu(BMenu *menu)
 	message->AddInt32("attr_align", B_ALIGN_LEFT);
 	message->AddBool("attr_editable", false);
 	message->AddBool("attr_statfield", false);
-	BMenuItem *item = new BMenuItem("Relation", message);
+	BMenuItem *item = new BMenuItem(B_TRANSLATE("Relation"), message);
 	menu->AddItem(item);
 	message = new BMessage(kAttributeItem);
 	message->AddString("attr_name", kAttrAppVersion);
@@ -387,7 +393,7 @@ OpenWithContainerWindow::NewAttributeMenu(BMenu *menu)
 	message->AddInt32("attr_align", B_ALIGN_LEFT);
 	message->AddBool("attr_editable", false);
 	message->AddBool("attr_statfield", false);
-	item = new BMenuItem("Version", message);
+	item = new BMenuItem(B_TRANSLATE("Version"), message);
 	menu->AddItem(item);
 }
 
@@ -662,8 +668,8 @@ OpenWithPoseView::OpenSelection(BPose *pose, int32 *)
 		errorString << "Could not find application \""
 			<< pose->TargetModel()->Name() << "\"";
 
-		(new BAlert("", errorString.String(), "OK", 0, 0, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT))->Go();
+		(new BAlert("", errorString.String(), B_TRANSLATE("OK"), 0, 0,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 		return;
 	}
 
@@ -677,8 +683,9 @@ OpenWithPoseView::OpenSelection(BPose *pose, int32 *)
 				"publisher of the application and ask them to update their application "
 				"to list the type of your document as supported.";
 
-			BAlert *alert = new BAlert("", warning.String(),
-				"Cancel", "Open", 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			BAlert* alert = new BAlert("", warning.String(),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Open"),	0, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 0)
 				return;
@@ -756,16 +763,16 @@ OpenWithPoseView::SetUpDefaultColumnsIfNeeded()
 	if (fColumnList->CountItems() != 0)
 		return;
 
-	BColumn *nameColumn = new BColumn("Name", kColumnStart, 125, B_ALIGN_LEFT,
-		kAttrStatName, B_STRING_TYPE, true, true);
+	BColumn *nameColumn = new BColumn(B_TRANSLATE("Name"), kColumnStart, 125,
+		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true);
 	fColumnList->AddItem(nameColumn);
-	BColumn *relationColumn = new BColumn("Relation", 180, 100, B_ALIGN_LEFT,
-		kAttrOpenWithRelation, B_STRING_TYPE, false, false);
+	BColumn *relationColumn = new BColumn(B_TRANSLATE("Relation"), 180, 100,
+		B_ALIGN_LEFT, kAttrOpenWithRelation, B_STRING_TYPE, false, false);
 	fColumnList->AddItem(relationColumn);
-	fColumnList->AddItem(new BColumn("Location", 290, 225, B_ALIGN_LEFT,
-		kAttrPath, B_STRING_TYPE, true, false));
-	fColumnList->AddItem(new BColumn("Version", 525, 70, B_ALIGN_LEFT,
-		kAttrAppVersion, B_STRING_TYPE, false, false));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Location"), 290, 225,
+		B_ALIGN_LEFT, kAttrPath, B_STRING_TYPE, true, false));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Version"), 525, 70,
+		B_ALIGN_LEFT, kAttrAppVersion, B_STRING_TYPE, false, false));
 
 	// sort by relation and by name
 	SetPrimarySort(relationColumn->AttrHash());
@@ -1152,7 +1159,7 @@ OpenWithMenu::DoneBuildingItemList()
 		SetTargetForItems(fMessenger);
 
 	if (!CountItems()) {
-		BMenuItem *item = new BMenuItem("no supporting apps", 0);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("no supporting apps"), 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	}

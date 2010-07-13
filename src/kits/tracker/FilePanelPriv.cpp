@@ -53,9 +53,11 @@ All rights reserved.
 #include <Alert.h>
 #include <Application.h>
 #include <Button.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -132,6 +134,9 @@ key_down_filter(BMessage *message, BHandler **, BMessageFilter *filter)
 
 //	#pragma mark -
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 TFilePanel::TFilePanel(file_panel_mode mode, BMessenger *target,
 		const BEntry *startDir, uint32 nodeFlavors, bool multipleSelection,
@@ -441,8 +446,8 @@ TFilePanel::SetRefFilter(BRefFilter *filter)
 	fPoseView->SetRefFilter(filter);
 	fPoseView->CommitActivePose();
 	fPoseView->Refresh();
-	FavoritesMenu *menu = dynamic_cast<FavoritesMenu *>(
-		fMenuBar->FindItem("Favorites")->Submenu());
+	FavoritesMenu* menu = dynamic_cast<FavoritesMenu *>
+		(fMenuBar->FindItem(B_TRANSLATE("Favorites"))->Submenu());
 	if (menu)
 		menu->SetRefFilter(filter);
 }
@@ -498,7 +503,7 @@ TFilePanel::AdjustButton()
 
 	BTextControl *textControl = dynamic_cast<BTextControl *>(FindView("text view"));
 	BObjectList<BPose> *selectionList = fPoseView->SelectionList();
-	const char *buttonText = fButtonText.String();
+	BString buttonText = fButtonText;
 	bool enabled = false;
 
 	if (fIsSavePanel && textControl) {
@@ -509,7 +514,7 @@ TFilePanel::AdjustButton()
 				Model *model = selectionList->FirstItem()->TargetModel();
 				if (model->ResolveIfLink()->IsDirectory()) {
 					enabled = true;
-					buttonText = "Open";
+					buttonText = B_TRANSLATE("Open");
 				} else {
 					// insert the name of the selected model into the text field
 					textControl->SetText(model->Name());
@@ -546,7 +551,7 @@ TFilePanel::AdjustButton()
 		}
 	}
 
-	button->SetLabel(buttonText);
+	button->SetLabel(buttonText.String());
 	button->SetEnabled(enabled);
 }
 
@@ -597,24 +602,25 @@ TFilePanel::Init(const BMessage *)
 	AddMenus();
 	AddContextMenus();
 
-	FavoritesMenu *favorites = new FavoritesMenu("Favorites",
+	FavoritesMenu* favorites = new FavoritesMenu(B_TRANSLATE("Favorites"),
 		new BMessage(kSwitchDirectory), new BMessage(B_REFS_RECEIVED),
 		BMessenger(this), IsSavePanel(), fPoseView->RefFilter());
-	favorites->AddItem(new BMenuItem("Add current folder",
+	favorites->AddItem(new BMenuItem(B_TRANSLATE("Add current folder"),
 		new BMessage(kAddCurrentDir)));
-	favorites->AddItem(new BMenuItem("Edit favorites"B_UTF8_ELLIPSIS,
+	favorites->AddItem(new BMenuItem(
+		B_TRANSLATE("Edit favorites"B_UTF8_ELLIPSIS),
 		new BMessage(kEditFavorites)));
 
 	fMenuBar->AddItem(favorites);
 
 	// configure menus
-	BMenuItem *item = fMenuBar->FindItem("Window");
+	BMenuItem* item = fMenuBar->FindItem(B_TRANSLATE("Window"));
 	if (item) {
 		fMenuBar->RemoveItem(item);
 		delete item;
 	}
 
-	item = fMenuBar->FindItem("File");
+	item = fMenuBar->FindItem(B_TRANSLATE("File"));
 	if (item) {
 		BMenu *menu = item->Submenu();
 		if (menu) {
@@ -627,7 +633,7 @@ TFilePanel::Init(const BMessage *)
 				delete item;
 
 			// remove add-ons menu, identifier menu, separator
-			item = menu->FindItem(kAddOnsMenuName);
+			item = menu->FindItem(B_TRANSLATE("Add-ons"));
 			if (item) {
 				int32 index = menu->IndexOf(item);
 				delete menu->RemoveItem(index);
@@ -683,7 +689,8 @@ TFilePanel::Init(const BMessage *)
 		rect.right = rect.left + 170;
 		rect.bottom = rect.top + 13;
 
-		fTextControl = new BTextControl(rect, "text view",  "save text", "", NULL,
+		fTextControl = new BTextControl(rect, "text view",
+			B_TRANSLATE("save text"), "", NULL,
 			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 		DisallowMetaKeys(fTextControl->TextView());
 		DisallowFilenameKeys(fTextControl->TextView());
@@ -691,9 +698,9 @@ TFilePanel::Init(const BMessage *)
 		fTextControl->SetDivider(0.0f);
 		fTextControl->TextView()->SetMaxBytes(B_FILE_NAME_LENGTH - 1);
 
-		fButtonText = "Save";
+		fButtonText.SetTo(B_TRANSLATE("Save"));
 	} else
-		fButtonText = "Open";
+		fButtonText.SetTo(B_TRANSLATE("Open"));
 
 	rect = windRect;
 	rect.OffsetTo(10, fDirMenuField->Frame().bottom + 10);
@@ -741,11 +748,12 @@ TFilePanel::Init(const BMessage *)
 	fBackView->AddChild(default_button);
 
 	rect.right = rect.left -= 10;
-	float cancel_width = be_plain_font->StringWidth("Cancel") + 20;
+	float cancel_width = be_plain_font->StringWidth(B_TRANSLATE("Cancel")) + 20;
 	rect.left = (cancel_width > 75) ? (rect.right - cancel_width) : (rect.right - 75);
 
-	BButton *cancel_button = new BButton(rect, "cancel button", "Cancel",
-		new BMessage(kCancelButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
+	BButton* cancel_button = new BButton(rect, "cancel button",
+		B_TRANSLATE("Cancel"), new BMessage(kCancelButton),
+		B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 	fBackView->AddChild(cancel_button);
 
 	if (!fIsSavePanel)
@@ -847,14 +855,19 @@ TFilePanel::RestoreWindowState(const BMessage &message)
 void
 TFilePanel::AddFileContextMenus(BMenu *menu)
 {
-	menu->AddItem(new BMenuItem("Get info", new BMessage(kGetInfo), 'I'));
-	menu->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
-	menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash() ?
-			"Delete" : "Move to Trash",
-			new BMessage(kMoveToTrash), 'T'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"),
+		new BMessage(kGetInfo), 'I'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
+		new BMessage(kEditItem), 'E'));
+	menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
+		? B_TRANSLATE("Delete")
+		: B_TRANSLATE("Move to Trash"),
+		new BMessage(kMoveToTrash), 'T'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Cut", new BMessage(B_CUT), 'X'));
-	menu->AddItem(new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Cut"),
+		new BMessage(B_CUT), 'X'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
 //	menu->AddItem(pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
 
 	menu->SetTargetForItems(PoseView());
@@ -864,12 +877,16 @@ TFilePanel::AddFileContextMenus(BMenu *menu)
 void
 TFilePanel::AddVolumeContextMenus(BMenu *menu)
 {
-	menu->AddItem(new BMenuItem("Open", new BMessage(kOpenSelection), 'O'));
-	menu->AddItem(new BMenuItem("Get info", new BMessage(kGetInfo), 'I'));
-	menu->AddItem(new BMenuItem("Edit name", new BMessage(kEditItem), 'E'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Open"),
+		new BMessage(kOpenSelection), 'O'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"),
+		new BMessage(kGetInfo), 'I'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
+		new BMessage(kEditItem), 'E'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Cut", new BMessage(B_CUT), 'X'));
-	menu->AddItem(new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Cut"), new BMessage(B_CUT), 'X'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C'));
 //	menu->AddItem(pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
 
 	menu->SetTargetForItems(PoseView());
@@ -879,30 +896,34 @@ TFilePanel::AddVolumeContextMenus(BMenu *menu)
 void
 TFilePanel::AddWindowContextMenus(BMenu *menu)
 {
-	BMenuItem *item = new BMenuItem("New folder", new BMessage(kNewFolder), 'N');
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("New folder"),
+		new BMessage(kNewFolder), 'N');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem("Paste", new BMessage(B_PASTE), 'V');
+	item = new BMenuItem(B_TRANSLATE("Paste"), new BMessage(B_PASTE), 'V');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 
-	item = new BMenuItem("Select"B_UTF8_ELLIPSIS, new BMessage(kShowSelectionWindow),
-		'A', B_SHIFT_KEY);
+	item = new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
+		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY);
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A');
+	item = new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Invert selection", new BMessage(kInvertSelection), 'S');
+	item = new BMenuItem(B_TRANSLATE("Invert selection"),
+		new BMessage(kInvertSelection), 'S');
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem("Go to parent", new BMessage(kOpenParentDir), B_UP_ARROW);
+	item = new BMenuItem(B_TRANSLATE("Go to parent"),
+		new BMessage(kOpenParentDir), B_UP_ARROW);
 	item->SetTarget(this);
 	menu->AddItem(item);
 }
@@ -1051,8 +1072,9 @@ TFilePanel::MessageReceived(BMessage *message)
 
 							// Don't allow saves of multiple files
 							if (count > 1) {
-								ShowCenteredAlert("Sorry, saving more than one item is not allowed.",
-									"Cancel");
+								ShowCenteredAlert(
+									B_TRANSLATE("Sorry, saving more than one item is not allowed."),
+									B_TRANSLATE("Cancel"));
 							} else {
 								// if we are a savepanel, set up the filepanel correctly
 								// then pass control so we follow the same path as if the user
@@ -1341,40 +1363,48 @@ TFilePanel::HandleSaveButton()
 	BDirectory dir;
 
 	if (TargetModel()->IsRoot()) {
-		ShowCenteredAlert("Sorry, you can't save things at the root of "
-			"your system.", "Cancel");
+		ShowCenteredAlert(
+			B_TRANSLATE("Sorry, you can't save things at the root of "
+			"your system."),
+			B_TRANSLATE("Cancel"));
 		return;
 	}
 
 	// check for some illegal file names
 	if (strcmp(fTextControl->Text(), ".") == 0
 		|| strcmp(fTextControl->Text(), "..") == 0) {
-		ShowCenteredAlert("The specified name is illegal. Please choose "
-			"another name.", "Cancel");
+		ShowCenteredAlert(
+			B_TRANSLATE("The specified name is illegal. Please choose "
+			"another name."),
+			B_TRANSLATE("Cancel"));
 		fTextControl->TextView()->SelectAll();
 		return;
 	}
 
 	if (dir.SetTo(TargetModel()->EntryRef()) != B_OK) {
-		ShowCenteredAlert("There was a problem trying to save in the folder "
-			"you specified. Please try another one.", "Cancel");
+		ShowCenteredAlert(
+			B_TRANSLATE("There was a problem trying to save in the folder "
+			"you specified. Please try another one."),
+			B_TRANSLATE("Cancel"));
 		return;
 	}
 
 	if (dir.Contains(fTextControl->Text())) {
 		if (dir.Contains(fTextControl->Text(), B_DIRECTORY_NODE)) {
-			ShowCenteredAlert("The specified name is already used as the name "
-				"of a folder. Please choose another name.", "Cancel");
+			ShowCenteredAlert(
+				B_TRANSLATE("The specified name is already used as the name "
+				"of a folder. Please choose another name."),
+				B_TRANSLATE("Cancel"));
 			fTextControl->TextView()->SelectAll();
 			return;
 		} else {
 			// if this was invoked by a dbl click, it is an explicit replacement
 			// of the file.
-			BString str;
-			str << "The file \"" << fTextControl->Text() << "\" already exists in the "
-				"specified folder. Do you want to replace it?";
+			BString str(B_TRANSLATE("The file \"%name\" already exists in the specified folder. Do you want to replace it?"));
+			str.ReplaceFirst("%name", fTextControl->Text());
 
-			if (ShowCenteredAlert(str.String(), "Cancel", "Replace") == 0) {
+			if (ShowCenteredAlert(str.String(),	B_TRANSLATE("Cancel"),
+					B_TRANSLATE("Replace"))	== 0) {
 				// user canceled
 				fTextControl->TextView()->SelectAll();
 				return;

@@ -35,6 +35,8 @@ All rights reserved.
 #include <BeBuild.h>
 #include <Alert.h>
 #include <Box.h>
+#include <Catalog.h>
+#include <Locale.h>
 #include <MenuItem.h>
 
 #include "AutoLock.h"
@@ -47,8 +49,12 @@ const int frameThickness = 9;
 
 const uint32 kSelectButtonPressed = 'sbpr';
 
-SelectionWindow::SelectionWindow(BContainerWindow *window)
-	: BWindow(BRect(0, 0, 270, 0), "Select", B_TITLED_WINDOW,
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
+SelectionWindow::SelectionWindow(BContainerWindow* window)
+	:
+	BWindow(BRect(0, 0, 270, 0), B_TRANSLATE("Select"),	B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_V_RESIZABLE
 		| B_NO_WORKSPACE_ACTIVATION | B_ASYNCHRONOUS_CONTROLS
 		| B_NOT_ANCHORED_ON_ACTIVATE),
@@ -67,11 +73,13 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 	AddChild(backgroundView);
 
 	BMenu *menu = new BPopUpMenu("");
-	menu->AddItem(new BMenuItem("starts with", NULL));
-	menu->AddItem(new BMenuItem("ends with", NULL));
-	menu->AddItem(new BMenuItem("contains", NULL));
-	menu->AddItem(new BMenuItem("matches wildcard expression", NULL));
-	menu->AddItem(new BMenuItem("matches regular expression", NULL));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("starts with"),	NULL));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("ends with"), NULL));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("contains"), NULL));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("matches wildcard expression"),
+		NULL));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("matches regular expression"),
+		NULL));
 
 	menu->SetLabelFromMarked(true);
 	menu->ItemAt(3)->SetMarked(true);
@@ -79,9 +87,10 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 
 	// Set up the menu field
 	fMatchingTypeMenuField = new BMenuField(BRect(7, 6, Bounds().right - 5, 0),
-		NULL, "Name", menu);
+		NULL, B_TRANSLATE("Name"), menu);
 	backgroundView->AddChild(fMatchingTypeMenuField);
-	fMatchingTypeMenuField->SetDivider(fMatchingTypeMenuField->StringWidth("Name") + 8);
+	fMatchingTypeMenuField->SetDivider(fMatchingTypeMenuField->StringWidth(
+		B_TRANSLATE("Name")) + 8);
 	fMatchingTypeMenuField->ResizeToPreferred();
 
 	// Set up the expression text control
@@ -93,20 +102,23 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 	fExpressionTextControl->MakeFocus(true);
 
 	// Set up the Invert checkbox
-	fInverseCheckBox = new BCheckBox(BRect(7, fExpressionTextControl->Frame().bottom
-		+ 6, 6, 6), NULL, "Invert", NULL);
+	fInverseCheckBox = new BCheckBox(
+		BRect(7, fExpressionTextControl->Frame().bottom + 6, 6, 6),	NULL,
+		B_TRANSLATE("Invert"), NULL);
 	backgroundView->AddChild(fInverseCheckBox);
 	fInverseCheckBox->ResizeToPreferred();
 
 	// Set up the Ignore Case checkbox
-	fIgnoreCaseCheckBox = new BCheckBox(BRect(fInverseCheckBox->Frame().right + 10,
-		fInverseCheckBox->Frame().top, 6, 6), NULL, "Ignore case", NULL);
+	fIgnoreCaseCheckBox = new BCheckBox(
+		BRect(fInverseCheckBox->Frame().right + 10,
+		fInverseCheckBox->Frame().top, 6, 6), NULL,	B_TRANSLATE("Ignore case"),
+		NULL);
 	fIgnoreCaseCheckBox->SetValue(1);
 	backgroundView->AddChild(fIgnoreCaseCheckBox);
 	fIgnoreCaseCheckBox->ResizeToPreferred();
 
 	// Set up the Select button
-	fSelectButton = new BButton(BRect(0, 0, 5, 5), NULL, "Select",
+	fSelectButton = new BButton(BRect(0, 0, 5, 5), NULL, B_TRANSLATE("Select"),
 		new BMessage(kSelectButtonPressed), B_FOLLOW_RIGHT);
 
 	backgroundView->AddChild(fSelectButton);
@@ -126,11 +138,13 @@ SelectionWindow::SelectionWindow(BContainerWindow *window)
 		(fSelectButton->Bounds().Height() / 2 -
 		(fh.ascent + fh.descent + fh.leading + 4) / 2) + fSelectButton->Frame().top;
 	fInverseCheckBox->MoveTo(fInverseCheckBox->Frame().left, topMiddleButton);
-	fIgnoreCaseCheckBox->MoveTo(fIgnoreCaseCheckBox->Frame().left, topMiddleButton);
+	fIgnoreCaseCheckBox->MoveTo(fIgnoreCaseCheckBox->Frame().left,
+		topMiddleButton);
 
 	float bottomMinWidth = 32 + fSelectButton->Bounds().Width() +
 		fInverseCheckBox->Bounds().Width() + fIgnoreCaseCheckBox->Bounds().Width();
-	float topMinWidth = be_plain_font->StringWidth("Name matches wildcard expression:###");
+	float topMinWidth = be_plain_font->StringWidth(
+		B_TRANSLATE("Name matches wildcard expression:###"));
 	float minWidth = bottomMinWidth > topMinWidth ? bottomMinWidth : topMinWidth;
 
 	Run();

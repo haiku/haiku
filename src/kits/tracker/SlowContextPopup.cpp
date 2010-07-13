@@ -38,7 +38,9 @@ All rights reserved.
 #include <Debug.h>
 
 #include <Application.h>
+#include <Catalog.h>
 #include <Directory.h>
+#include <Locale.h>
 #include <Path.h>
 #include <Query.h>
 #include <StopWatch.h>
@@ -59,6 +61,9 @@ All rights reserved.
 #include "Thread.h"
 #include "Tracker.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 BSlowContextMenu::BSlowContextMenu(const char *title)
 	:	BPopUpMenu(title, false, false),
@@ -486,7 +491,7 @@ BSlowContextMenu::DoneBuildingItemList()
 	fItemList->MakeEmpty();
 
 	if (!count) {
-		BMenuItem *item = new BMenuItem("Empty folder", 0);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE("Empty folder"), 0);
 		item->SetEnabled(false);
 		AddItem(item);
 	}

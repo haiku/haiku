@@ -40,11 +40,13 @@ All rights reserved.
 
 #include <Alert.h>
 #include <Autolock.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <FindDirectory.h>
 #include <fs_attr.h>
 #include <fs_info.h>
 #include <image.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -205,6 +207,9 @@ GetVolumeFlags(Model *model)
 
 //	#pragma mark -
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 TTracker::TTracker()
 	:	BApplication(kTrackerSignature),
@@ -663,9 +668,9 @@ TTracker::OpenRef(const entry_ref *ref, const node_ref *nodeToClose,
 
 		if (!brokenLinkWithSpecificHandler) {
 			delete model;
-			BAlert *alert = new BAlert("",
-				"There was an error resolving the link.",
-				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			BAlert* alert = new BAlert("",
+				B_TRANSLATE("There was an error resolving the link."),
+				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();
 			return result;

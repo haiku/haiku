@@ -51,10 +51,12 @@ respective holders. All rights reserved.
 
 #include <Alert.h>
 #include <Application.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <NodeInfo.h>
 #include <Path.h>
 #include <Roster.h>
@@ -99,6 +101,9 @@ enum ConflictCheckResult {
 
 namespace BPrivate {
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
 static status_t FSDeleteFolder(BEntry *, CopyLoopControl *, bool updateStatus,
 	bool deleteTopDir = true, bool upateFileNameInStatus = false);
 static status_t MoveEntryToTrash(BEntry *, BPoint *, Undo &undo);
@@ -137,40 +142,54 @@ status_t empty_trash(void *);
 #endif
 
 
-const char *kDeleteConfirmationStr = "Are you sure you want to delete the "
-	"selected item(s)? This operation cannot be reverted.";
+static const char* kDeleteConfirmationStr =
+	B_TRANSLATE_MARK("Are you sure you want to delete the "
+	"selected item(s)? This operation cannot be reverted.");
 
-const char *kReplaceStr = "You are trying to replace the item:\n"
-	"\t%s%s\n"
+static const char* kReplaceStr =
+	B_TRANSLATE_MARK("You are trying to replace the item:\n"
+	"\t%name%dest\n"
 	"with:\n"
-	"\t%s%s\n\n"
-	"Would you like to replace it with the one you are %s?";
+	"\t%name%src\n\n"
+	"Would you like to replace it with the one you are %movemode?");
 
-const char *kDirectoryReplaceStr = "An item named \"%s\" already exists in "
+static const char* kDirectoryReplaceStr =
+	B_TRANSLATE_MARK("An item named \"%name\" already exists in "
 	"this folder, and may contain\nitems with the same names. Would you like "
-	"to replace them with those contained in the folder you are %s?";
+	"to replace them with those contained in the folder you are %verb?");
 
-const char *kSymLinkReplaceStr = "An item named \"%s\" already exists in this "
+static const char* kSymLinkReplaceStr =
+	B_TRANSLATE_MARK("An item named \"%name\" already exists in this "
 	"folder. Would you like to replace it with the symbolic link you are "
-	"creating?";
+	"creating?");
 
-const char *kNoFreeSpace = "Sorry, there is not enough free space on the "
-	"destination volume to copy the selection.";
+static const char* kNoFreeSpace =
+	B_TRANSLATE_MARK("Sorry, there is not enough free space on the "
+	"destination volume to copy the selection.");
 
-const char *kFileErrorString = "Error copying file \"%s\":\n\t%s\n\nWould "
-	"you like to continue?";
-const char *kFolderErrorString = "Error copying folder \"%s\":\n\t%s\n\nWould "
-	"you like to continue?";
-const char *kFileDeleteErrorString = "There was an error deleting \"%s\""
-	":\n\t%s";
-const char *kReplaceManyStr = "Some items already exist in this folder with "
-	"the same names as the items you are %s.\n \nWould you like to replace "
-	"them with the ones you are %s or be prompted for each one?";
+static const char* kFileErrorString =
+	B_TRANSLATE_MARK("Error copying file \"%name\":\n\t%error\n\n"
+	"Would you like to continue?");
 
-const char *kFindAlternativeStr = "Would you like to find some other suitable "
-	"application?";
-const char *kFindApplicationStr = "Would you like to find a suitable "
-	"application to open the file?";
+static const char* kFolderErrorString =
+	B_TRANSLATE_MARK("Error copying folder \"%name\":\n\t%error\n\n"
+	"Would you like to continue?");
+
+static const char* kFileDeleteErrorString =
+	B_TRANSLATE_MARK("There was an error deleting \"%name\""
+	":\n\t%error");
+
+static const char* kReplaceManyStr =
+	B_TRANSLATE_MARK("Some items already exist in this folder with "
+	"the same names as the items you are %verb.\n \nWould you like to replace "
+	"them with the ones you are %verb or be prompted for each one?");
+
+static const char* kFindAlternativeStr =
+	B_TRANSLATE_MARK("Would you like to find some other suitable application?");
+
+static const char *kFindApplicationStr =
+	B_TRANSLATE_MARK("Would you like to find a suitable application "
+	"to open the file?");
 
 // Skip these attributes when copying in Tracker
 const char *kSkipAttributes[] = {
@@ -326,17 +345,18 @@ bool
 TrackerCopyLoopControl::FileError(const char *message, const char *name,
 	status_t error, bool allowContinue)
 {
-	char buffer[512];
-	sprintf(buffer, message, name, strerror(error));
+	BString buffer(message);
+	buffer.ReplaceFirst("%name", name);
+	buffer.ReplaceFirst("%error", strerror(error));
 
 	if (allowContinue) {
-		BAlert *alert = new BAlert("", buffer, "Cancel", "OK", 0,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"),
+			B_TRANSLATE("OK"), 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		return alert->Go() != 0;
 	}
 
-	BAlert *alert = new BAlert("", buffer, "Cancel", 0, 0,
+	BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"), 0, 0,
 		B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	alert->SetShortcut(0, B_ESCAPE);
 	alert->Go();
@@ -608,18 +628,20 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 		// quick way out
 		return true;
 
-	const char *warning = NULL;
+	BString warning;
 	bool requireOverride = true;
 
 	if (DirectoryMatchesOrContains(entry, B_BEOS_DIRECTORY)) {
-		warning = "If you %s the system folder or its contents, you "
+		warning.SetTo(
+			B_TRANSLATE("If you %action the system folder or its contents, you "
 			"won't be able to boot " OS_NAME "! Are you sure you want to do "
-			"this? To %s the system folder or its contents anyway, hold down "
-			"the Shift key and click \"Do it\".";
+			"this? To %action the system folder or its contents anyway, hold down "
+			"the Shift key and click \"Do it\"."));
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
-		warning = "If you %s the home folder, " OS_NAME " may not "
+		warning .SetTo(
+			B_TRANSLATE("If you %action the home folder, " OS_NAME " may not "
 			"behave properly! Are you sure you want to do this? "
-			"To %s the home anyway, click \"Do it\".";
+			"To %action the home anyway, click \"Do it\"."));
 		requireOverride = false;
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
 		|| DirectoryMatchesOrContains(entry, B_COMMON_SETTINGS_DIRECTORY)) {
@@ -628,25 +650,28 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 				B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
 				B_COMMON_SETTINGS_DIRECTORY)) {
-			warning = "If you %s the mime settings, " OS_NAME " may not "
-				"behave properly! Are you sure you want to do this? "
-				"To %s the mime settings anyway, click \"Do it\".";
+			warning.SetTo(
+				B_TRANSLATE("If you %action the mime settings, " OS_NAME
+				" may not behave properly! Are you sure you want to do this? "
+				"To %action the mime settings anyway, click \"Do it\"."));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
-			warning = "If you %s the config folder, " OS_NAME " may not "
-				"behave properly! Are you sure you want to do this? "
-				"To %s the config folder anyway, click \"Do it\".";
+			warning.SetTo(
+				B_TRANSLATE("If you %action the config folder, " OS_NAME
+				" may not behave properly! Are you sure you want to do this? "
+				"To %action the config folder anyway, click \"Do it\"."));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_COMMON_SETTINGS_DIRECTORY)) {
-			warning = "If you %s the settings folder, " OS_NAME " may not "
-				"behave properly! Are you sure you want to do this? "
-				"To %s the settings folder anyway, click \"Do it\".";
+			warning.SetTo(
+				B_TRANSLATE("If you %action the settings folder, " OS_NAME
+				" may not behave properly! Are you sure you want to do this? "
+				"To %action the settings folder anyway, click \"Do it\"."));
 			requireOverride = false;
 		}
 	}
 
-	if (!warning)
+	if (!warning.Length())
 		return true;
 
 	if (dontAsk)
@@ -657,13 +682,11 @@ ConfirmChangeIfWellKnownDirectory(const BEntry *entry, const char *action,
 		// we already warned about moving home this time around
 		return true;
 
-	char buffer[256];
-	sprintf(buffer, warning, action, action);
+	warning.ReplaceAll("%action", action);
 
-	if ((new OverrideAlert("", buffer, "Do it", (requireOverride
-			? B_SHIFT_KEY : 0),
-			"Cancel", 0, NULL, 0, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT))->Go() == 1) {
+	if ((new OverrideAlert("", warning.String(), B_TRANSLATE("Do it"),
+			(requireOverride ? B_SHIFT_KEY : 0), B_TRANSLATE("Cancel"),	0, NULL,
+			0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go() == 1) {
 		if (confirmedAlready)
 			*confirmedAlready = kNotConfirmed;
 		return false;
@@ -687,9 +710,9 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 	int32 *collisionCount, ConflictCheckResult *preflightResult)
 {
 	if (dstVol->IsReadOnly()) {
-		BAlert *alert = new BAlert("",
-			"You can't move or copy items to read-only volumes.",
-			"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("You can't move or copy items to read-only volumes."),
+			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 		return B_ERROR;
@@ -702,21 +725,25 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 		// the copy loops, except it takes forever to call CalcItemsAndSize
 		BEntry entry((entry_ref *)srcList->ItemAt(index));
 		if (IsDisksWindowIcon(&entry)) {
-			const char *errorStr;
-			if (moveMode == kCreateLink)
-				errorStr = "You cannot create a link to the root directory.";
-			else
-				errorStr = "You cannot copy or move the root directory.";
+			BString errorStr;
+			if (moveMode == kCreateLink) {
+				errorStr.SetTo(
+					B_TRANSLATE("You cannot create a link to the root "
+					"directory."));
+			} else {
+				errorStr.SetTo(
+					B_TRANSLATE("You cannot copy or move the root directory."));
+			}
 
-			BAlert *alert = new BAlert("", errorStr, "Cancel", 0, 0,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			BAlert* alert = new BAlert("", errorStr.String(),
+				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();
 			return B_ERROR;
 		}
 		if (moveMode == kMoveSelectionTo
-			&& !ConfirmChangeIfWellKnownDirectory(&entry, "move", false,
-				&askOnceOnly)) {
+			&& !ConfirmChangeIfWellKnownDirectory(&entry, B_TRANSLATE("move"),
+				false, &askOnceOnly)) {
 			return B_ERROR;
 		}
 	}
@@ -753,7 +780,8 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 
 					// check for free space before starting copy
 					if ((totalSize + (4 * kKBSize)) >= dstVol->FreeBytes()) {
-						BAlert *alert = new BAlert("", kNoFreeSpace, "Cancel",
+						BAlert* alert = new BAlert("",
+							B_TRANSLATE(kNoFreeSpace), B_TRANSLATE("Cancel"),
 							0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 						alert->SetShortcut(0, B_ESCAPE);
 						alert->Go();
@@ -923,10 +951,11 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 
 			BEntry sourceEntry(srcRef);
 			if (sourceEntry.InitCheck() != B_OK) {
-				BString error;
-				error << "Error moving \"" << srcRef->name << "\".";
-				BAlert *alert = new BAlert("", error.String(), "Cancel", 0, 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				BString error(B_TRANSLATE("Error moving \"%name\"."));
+				error.ReplaceFirst("%name", srcRef->name);
+				BAlert* alert = new BAlert("", error.String(),
+					B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
+					B_WARNING_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				alert->Go();
 				break;
@@ -939,11 +968,12 @@ MoveTask(BObjectList<entry_ref> *srcList, BEntry *destEntry, BList *pointList,
 
 				result = MoveEntryToTrash(&sourceEntry, loc, undo);
 				if (result != B_OK) {
-					BString error;
-					error << "Error moving \"" << srcRef->name
-						<< "\" to Trash. (" << strerror(result) << ")";
-					BAlert *alert = new BAlert("", error.String(), "Cancel",
-						0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+					BString error(B_TRANSLATE("Error moving \"%name\" to Trash. (%error)"));
+					error.ReplaceFirst("%name", srcRef->name);
+					error.ReplaceFirst("%error", strerror(result));
+					BAlert* alert = new BAlert("", error.String(),
+						B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
+						B_WARNING_ALERT);
 					alert->SetShortcut(0, B_ESCAPE);
 					alert->Go();
 					break;
@@ -1054,7 +1084,8 @@ CopyFile(BEntry *srcFile, StatStruct *srcStat, BDirectory *destDir,
 
 	// check for free space first
 	if ((srcStat->st_size + kKBSize) >= volume.FreeBytes()) {
-		loopControl->FileError(kNoFreeSpace, "", B_DEVICE_FULL, false);
+		loopControl->FileError(B_TRANSLATE(kNoFreeSpace), "", B_DEVICE_FULL,
+			false);
 		throw (status_t)B_DEVICE_FULL;
 	}
 
@@ -1066,7 +1097,9 @@ CopyFile(BEntry *srcFile, StatStruct *srcStat, BDirectory *destDir,
 	loopControl->UpdateStatus(destName, ref, 1024, true);
 
 	if (makeOriginalName) {
-		FSMakeOriginalName(destName, destDir, " copy");
+		BString suffix(" ");
+		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
+		FSMakeOriginalName(destName, destDir, suffix.String());
 		undo.UpdateEntry(srcFile, destName);
 	}
 
@@ -1098,8 +1131,8 @@ CopyFile(BEntry *srcFile, StatStruct *srcStat, BDirectory *destDir,
 			throw (status_t)err;
 
 		if (err != B_OK) {
-			if (!loopControl->FileError(kFileErrorString, destName, err,
-					true)) {
+			if (!loopControl->FileError(B_TRANSLATE(kFileErrorString), destName,
+				err, true)) {
 				throw (status_t)err;
 			} else {
 				// user selected continue in spite of error, update status bar
@@ -1371,7 +1404,9 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 	loopControl->UpdateStatus(ref.name, ref, 1024, true);
 
 	if (makeOriginalName) {
-		FSMakeOriginalName(destName, destDir, " copy");
+		BString suffix(" ");
+		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
+		FSMakeOriginalName(destName, destDir, suffix.String());
 		undo.UpdateEntry(srcEntry, destName);
 	}
 
@@ -1417,9 +1452,9 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 	 			err = destDir->CreateDirectory(destName, &newDir);
 	 	}
 #endif
-	 	if (err != B_OK) {
-			if (!loopControl->FileError(kFolderErrorString, destName, err,
-					true)) {
+		if (err != B_OK) {
+			if (!loopControl->FileError(B_TRANSLATE(kFolderErrorString),
+				destName, err, true)) {
 				throw err;
 			}
 
@@ -1536,7 +1571,9 @@ MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
 			strcpy(name, ref.name);
 
 			BSymLink link;
-			FSMakeOriginalName(name, destDir, " link");
+			BString suffix(" ");
+			suffix << B_TRANSLATE_COMMENT("link", "filename link"),
+			FSMakeOriginalName(name, destDir, suffix.String());
 			undo.UpdateEntry(entry, name);
 
 			BPath path;
@@ -1616,11 +1653,13 @@ MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
 				err = destDir->CreateSymLink(name, path.Path(), &link);
 
 			if (err == B_UNSUPPORTED) {
-				throw FailWithAlert(err, "The target disk does not support "
-					"creating links.", NULL);
+				throw FailWithAlert(err,
+					B_TRANSLATE("The target disk does not support "
+					"creating links."), NULL);
 			}
 
-			FailWithAlert::FailOnError(err, "Error creating link to \"%s\".",
+			FailWithAlert::FailOnError(err,
+				B_TRANSLATE("Error creating link to \"%name\"."),
 				ref.name);
 
 			if (loc && loc != (BPoint *)-1) {
@@ -1659,19 +1698,19 @@ MoveItem(BEntry *entry, BDirectory *destDir, BPoint *loc, uint32 moveMode,
 		// no alert, was already taken care of before
 		return error;
 	} catch (MoveError error) {
-		BString errorString;
-		errorString << "Error moving \"" << ref.name << '"';
-		(new BAlert("", errorString.String(), "OK", 0, 0, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT))->Go();
+		BString errorString(B_TRANSLATE("Error moving \"%name\""));
+		errorString.ReplaceFirst("%name", ref.name);
+		(new BAlert("", errorString.String(), B_TRANSLATE("OK"), 0, 0,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 		return error.fError;
 	} catch (FailWithAlert error) {
-		char buffer[256];
+		BString buffer(error.fString);
 		if (error.fName)
-			sprintf(buffer, error.fString, error.fName);
+			buffer.ReplaceFirst("%name", error.fName);
 		else
-			strcpy(buffer, error.fString);
-		(new BAlert("", buffer, "OK", 0, 0, B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT))->Go();
+			buffer <<  error.fString;
+		(new BAlert("", buffer.String(), B_TRANSLATE("OK"),	0, 0,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 
 		return error.fError;
 	}
@@ -1803,11 +1842,11 @@ MoveEntryToTrash(BEntry *entry, BPoint *loc, Undo &undo)
 			if (volume == boot) {
 				char name[B_FILE_NAME_LENGTH];
 				volume.GetName(name);
-				char buffer[256];
-				sprintf(buffer, "Cannot unmount the boot volume \"%s\".",
-					name);
-				BAlert *alert = new BAlert("", buffer, "Cancel", 0, 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+				BString buffer(B_TRANSLATE("Cannot unmount the boot volume \"%name\"."));
+				buffer.ReplaceFirst("%name", name);
+				BAlert* alert = new BAlert("", buffer.String(),
+					B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
+					B_WARNING_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				alert->Go();
 			} else {
@@ -1828,9 +1867,11 @@ MoveEntryToTrash(BEntry *entry, BPoint *loc, Undo &undo)
 		trash_dir.GetEntry(&trashEntry);
 
 		if (dir == trash_dir || dir.Contains(&trashEntry)) {
-			(new BAlert("", "You cannot put the Trash, home or Desktop "
-				"directory into the trash.", "OK", 0, 0,
-					B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			(new BAlert("",
+				B_TRANSLATE("You cannot put the Trash, home or Desktop "
+				"directory into the trash."),
+				B_TRANSLATE("OK"),
+				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 
 			// return no error so we don't get two dialogs
 			return B_OK;
@@ -1854,7 +1895,9 @@ MoveEntryToTrash(BEntry *entry, BPoint *loc, Undo &undo)
 	char name[B_FILE_NAME_LENGTH];
 	strcpy(name, ref.name);
 	if (trash_dir.Contains(name)) {
-		FSMakeOriginalName(name, &trash_dir, " copy");
+		BString suffix(" ");
+		suffix << B_TRANSLATE_COMMENT("copy", "filename copy"),
+		FSMakeOriginalName(name, &trash_dir, suffix.String());
 		undo.UpdateEntry(entry, name);
 	}
 
@@ -1911,13 +1954,14 @@ PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
 	// prompt user only if there is more than one collision, otherwise the
 	// single collision case will be handled as a "Prompt" case by CheckName
 	if (*collisionCount > 1) {
-		const char *verb = (moveMode == kMoveSelectionTo) ? "moving"
-			: "copying";
-		char replaceMsg[256];
-		sprintf(replaceMsg, kReplaceManyStr, verb, verb);
+		const char* verb = (moveMode == kMoveSelectionTo)
+			? B_TRANSLATE("moving")	: B_TRANSLATE("copying");
+		BString replaceMsg(B_TRANSLATE(kReplaceManyStr));
+		replaceMsg.ReplaceAll("%verb", verb);
 
-		BAlert *alert = new BAlert("", replaceMsg,
-			"Cancel", "Prompt", "Replace all");
+		BAlert* alert = new BAlert("", replaceMsg.String(),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Prompt"),
+			B_TRANSLATE("Replace all"));
 		alert->SetShortcut(0, B_ESCAPE);
 		switch (alert->Go()) {
 			case 0:
@@ -1974,17 +2018,19 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry,
 			&& moveMode != kCreateRelativeLink
 			&& (srcDirectory == *destDir
 				|| srcDirectory.Contains(&destEntry))) {
-			(new BAlert("", "You can't move a folder into itself "
-				"or any of its own sub-folders.", "OK", 0, 0,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			(new BAlert("",
+				B_TRANSLATE("You can't move a folder into itself "
+				"or any of its own sub-folders."), B_TRANSLATE("OK"),
+				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 			return B_ERROR;
 		}
 	}
 
 	if (FSIsTrashDir(sourceEntry) && moveMode != kCreateLink
 		&& moveMode != kCreateRelativeLink) {
-		(new BAlert("", "You can't move or copy the trash.",
-			"OK", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		(new BAlert("",
+			B_TRANSLATE("You can't move or copy the trash."),
+			B_TRANSLATE("OK"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 		return B_ERROR;
 	}
 
@@ -2007,9 +2053,11 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry,
 	if (destIsDir) {
 		BDirectory test_dir(&entry);
 		if (test_dir.Contains(sourceEntry)) {
-			(new BAlert("", "You can't replace a folder "
-				"with one of its sub-folders.", "OK", 0, 0,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			(new BAlert("",
+				B_TRANSLATE("You can't replace a folder "
+				"with one of its sub-folders."),
+				B_TRANSLATE("OK"),
+				0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
 			return B_ERROR;
 		}
 	}
@@ -2019,25 +2067,30 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry,
 		&& moveMode != kCreateRelativeLink
 		&& destIsDir != sourceIsDirectory) {
 			(new BAlert("", sourceIsDirectory
-				? "You cannot replace a file with a folder or a symbolic "
-					"link."
-				: "You cannot replace a folder or a symbolic link with a "
-					"file.", "OK", 0, 0, B_WIDTH_AS_USUAL,
-					B_WARNING_ALERT))->Go();
+				? B_TRANSLATE("You cannot replace a file with a folder or a "
+				"symbolic link.")
+				: B_TRANSLATE("You cannot replace a folder or a symbolic link "
+				"with a file."), B_TRANSLATE("OK"),	0, 0, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT))->Go();
 			return B_ERROR;
 		}
 
 	if (replaceAll != kReplaceAll) {
 		// prompt user to determine whether to replace or not
 
-		char replaceMsg[512];
+		BString replaceMsg;
 
-		if (moveMode == kCreateLink || moveMode == kCreateRelativeLink)
-			sprintf(replaceMsg, kSymLinkReplaceStr, name);
-		else if (sourceEntry->IsDirectory())
-			sprintf(replaceMsg, kDirectoryReplaceStr, name,
-				moveMode == kMoveSelectionTo ? "moving" : "copying");
-		else {
+		if (moveMode == kCreateLink || moveMode == kCreateRelativeLink) {
+			replaceMsg.SetTo(B_TRANSLATE(kSymLinkReplaceStr));
+			replaceMsg.ReplaceFirst("%name", name);
+		} else if (sourceEntry->IsDirectory()) {
+			replaceMsg.SetTo(B_TRANSLATE(kDirectoryReplaceStr));
+			replaceMsg.ReplaceFirst("%name", name);
+			replaceMsg.ReplaceFirst("%verb",
+				moveMode == kMoveSelectionTo
+				? B_TRANSLATE("moving")
+				: B_TRANSLATE("copying"));
+		} else {
 			char sourceBuffer[96], destBuffer[96];
 			StatStruct statBuffer;
 
@@ -2052,17 +2105,24 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry,
 			else
 				destBuffer[0] = '\0';
 
-			sprintf(replaceMsg, kReplaceStr, name, destBuffer, name,
-				sourceBuffer, moveMode == kMoveSelectionTo ? "moving"
-					: "copying");
+			replaceMsg.SetTo(B_TRANSLATE(kReplaceStr));
+			replaceMsg.ReplaceAll("%name", name);
+			replaceMsg.ReplaceFirst("%dest", destBuffer);
+			replaceMsg.ReplaceFirst("%src", sourceBuffer);
+			replaceMsg.ReplaceFirst("%movemode",
+				moveMode == kMoveSelectionTo
+				? B_TRANSLATE("moving")
+				: B_TRANSLATE("copying"));
 		}
 
 		// special case single collision (don't need Replace All shortcut)
 		BAlert *alert;
-		if (multipleCollisions || sourceIsDirectory)
-			alert = new BAlert("", replaceMsg, "Skip", "Replace all");
-		else {
-			alert = new BAlert("", replaceMsg, "Cancel", "Replace");
+		if (multipleCollisions || sourceIsDirectory) {
+			alert = new BAlert("", replaceMsg.String(),
+				B_TRANSLATE("Skip"), B_TRANSLATE("Replace all"));
+		} else {
+			alert = new BAlert("", replaceMsg.String(),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Replace"));
 			alert->SetShortcut(0, B_ESCAPE);
 		}
 		switch (alert->Go()) {
@@ -2086,11 +2146,10 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry,
 		return B_OK;
 
 	if (err != B_OK) {
-		BString error;
-		error << "There was a problem trying to replace \""
-			<< name << "\". The item might be open or busy.";
-		BAlert *alert = new BAlert("", error.String(), "Cancel", 0, 0,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BString error(B_TRANSLATE("There was a problem trying to replace \"%name\". The item might be open or busy."));
+		error.ReplaceFirst("%name", name);;
+		BAlert* alert = new BAlert("", error.String(),
+			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
 	}
@@ -2136,8 +2195,8 @@ FSDeleteFolder(BEntry *dir_entry, CopyLoopControl *loopControl,
 		else if (err == B_OK)
 			dir.Rewind();
 		else {
-			loopControl->FileError(kFileDeleteErrorString, ref.name, err,
-				false);
+			loopControl->FileError(B_TRANSLATE(kFileDeleteErrorString),
+				ref.name, err, false);
 		}
 	}
 
@@ -2705,8 +2764,9 @@ empty_trash(void *)
 	}
 
 	if (err != B_OK && err != kTrashCanceled && err != kUserCanceled) {
-		(new BAlert("", "Error emptying Trash!", "OK", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+		(new BAlert("",	B_TRANSLATE("Error emptying Trash!"),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT))->Go();
 	}
 
 	return B_OK;
@@ -2720,9 +2780,10 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 		bool dontMoveToTrash = TrackerSettings().DontMoveFilesToTrash();
 
 		if (!dontMoveToTrash) {
-			BAlert *alert = new BAlert("", kDeleteConfirmationStr,
-				"Cancel", "Move to Trash", "Delete", B_WIDTH_AS_USUAL,
-				B_OFFSET_SPACING, B_WARNING_ALERT);
+			BAlert* alert = new BAlert("",
+				B_TRANSLATE(kDeleteConfirmationStr), B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Move to Trash"), B_TRANSLATE("Delete"),
+				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->SetShortcut(1, 'm');
@@ -2737,9 +2798,10 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 					return B_OK;
 			}
 		} else {
-			BAlert *alert = new BAlert("", kDeleteConfirmationStr,
-				"Cancel", "Delete", NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-				B_WARNING_ALERT);
+			BAlert* alert = new BAlert("",
+				B_TRANSLATE(kDeleteConfirmationStr), B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Delete"), NULL, B_WIDTH_AS_USUAL,
+				B_OFFSET_SPACING, B_WARNING_ALERT);
 
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->SetShortcut(1, 'd');
@@ -2774,8 +2836,9 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 		}
 
 		if (err != kTrashCanceled && err != kUserCanceled && err != B_OK)
-			(new BAlert("", "Error deleting items", "OK", NULL, NULL,
-				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			(new BAlert("",	B_TRANSLATE("Error deleting items"),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT))->Go();
 	}
 
 	delete list;
@@ -2930,17 +2993,20 @@ FSCreateNewFolderIn(const node_ref *dirNode, entry_ref *newRef,
 	status_t result = dir.InitCheck();
 	if (result == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
-		strcpy(name, "New folder");
+		strcpy(name, B_TRANSLATE("New folder"));
 
 		int32 fnum = 1;
 		while (dir.Contains(name)) {
 			// if base name already exists then add a number
 			// ToDo:
 			// move this logic ot FSMakeOriginalName
-			if (++fnum > 9)
-				sprintf(name, "New folder%ld", fnum);
-			else
-				sprintf(name, "New folder %ld", fnum);
+			if (++fnum > 9) {
+				snprintf(name, sizeof(name), B_TRANSLATE("New folder%ld"),
+					fnum);
+			} else {
+				snprintf(name, sizeof(name), B_TRANSLATE("New folder %ld"),
+					fnum);
+			}
 		}
 
 		BDirectory newDir;
@@ -2960,8 +3026,9 @@ FSCreateNewFolderIn(const node_ref *dirNode, entry_ref *newRef,
 		}
 	}
 
-	BAlert *alert = new BAlert("", "Sorry, could not create a new folder.",
-		"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	BAlert* alert = new BAlert("",
+		B_TRANSLATE("Sorry, could not create a new folder."),
+		B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	alert->SetShortcut(0, B_ESCAPE);
 	alert->Go();
 	return result;
@@ -3120,18 +3187,20 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs,
 		if (nodeToClose)
 			dynamic_cast<TTracker *>(be_app)->CloseParent(*nodeToClose);
 	} else {
-		alertString << "Could not open \"" << appRef->name << "\" ("
-			<< strerror(error) << "). ";
+		alertString.SetTo(B_TRANSLATE("Could not open \"%name\" (%error). "));
+		alertString.ReplaceFirst("%name", appRef->name);
+		alertString.ReplaceFirst("%error", strerror(error));
 		if (refs && openWithOK && error != B_SHUTTING_DOWN) {
-			alertString << kFindAlternativeStr;
-			BAlert *alert = new BAlert("", alertString.String(),
-				"Cancel", "Find", 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			alertString << B_TRANSLATE(kFindAlternativeStr);
+			BAlert* alert = new BAlert("", alertString.String(),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Find"),	0, B_WIDTH_AS_USUAL,
+				B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 1)
 				error = TrackerOpenWith(refs);
 		} else {
-			BAlert *alert = new BAlert("", alertString.String(),
-				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			BAlert* alert = new BAlert("", alertString.String(),
+				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();
 		}
@@ -3274,10 +3343,12 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 		}
 
 		if (error != B_OK) {
-			alertString << "Could not find an application to open \""
-				<< documentRef.name << "\" (" << strerror(error) << "). ";
+			alertString.SetTo(B_TRANSLATE("Could not find an application to "
+				"open \"%name\" (%error). "));
+			alertString.ReplaceFirst("%name", documentRef.name);
+			alertString.ReplaceFirst("%error", strerror(error));
 			if (openWithOK)
-				alternative = kFindApplicationStr;
+				alternative = B_TRANSLATE(kFindApplicationStr);
 
 			break;
 		} else {
@@ -3325,16 +3396,17 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 		}
 
 		if (error == B_LAUNCH_FAILED_EXECUTABLE && !refsToPass) {
-			alertString << "Could not open \"" << app.name
-				<< "\". The file is mistakenly marked as executable. ";
+			alertString.SetTo(B_TRANSLATE("Could not open \"%name\". "
+				"The file is mistakenly marked as executable. "));
+			alertString.ReplaceFirst("%name", app.name);
 
 			if (!openWithOK) {
 				// offer the possibility to change the permissions
 
-				alertString << "\nShould this be fixed?";
-				BAlert *alert = new BAlert("", alertString.String(),
-					"Cancel", "Proceed", 0,	B_WIDTH_AS_USUAL,
-					B_WARNING_ALERT);
+				alertString << B_TRANSLATE("\nShould this be fixed?");
+				BAlert* alert = new BAlert("", alertString.String(),
+					B_TRANSLATE("Cancel"), B_TRANSLATE("Proceed"), 0,
+					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
 				if (alert->Go() == 1) {
 					BEntry entry(&documentRef);
@@ -3350,44 +3422,66 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 						_TrackerLaunchDocuments(NULL, refs, false);
 						return;
 					} else {
-						alertString = "Could not update permissions of "
-							"file \"";
-						alertString << app.name << "\". " << strerror(error);
+						alertString.SetTo(B_TRANSLATE("Could not update "
+							"permissions of file \"%name\". %error"));
+						alertString.ReplaceFirst("%name", app.name);
+						alertString.ReplaceFirst("%error", strerror(error));
 					}
 				} else
 					return;
 			}
 
-			alternative = kFindApplicationStr;
+			alternative = B_TRANSLATE(kFindApplicationStr);
 		} else if (error == B_LAUNCH_FAILED_APP_IN_TRASH) {
-			alertString << "Could not open \"" << documentRef.name
-				<< "\" because application \"" << app.name << "\" is in the "
-					"Trash. ";
-			alternative = kFindAlternativeStr;
+			alertString.SetTo(B_TRANSLATE("Could not open \"%document\" "
+				"because application \"%app\" is in the Trash. "));
+			alertString.ReplaceFirst("%document", documentRef.name);
+			alertString.ReplaceFirst("%app", app.name);
+			alternative = B_TRANSLATE(kFindAlternativeStr);
 		} else if (error == B_LAUNCH_FAILED_APP_NOT_FOUND) {
-			alertString << "Could not open \"" << documentRef.name << "\" "
-				<< "(" << strerror(error) << "). ";
-			alternative = kFindAlternativeStr;
+			alertString.SetTo(
+				B_TRANSLATE("Could not open \"%name\" (%error). "));
+			alertString.ReplaceFirst("%name", documentRef.name);
+			alertString.ReplaceFirst("%error", strerror(error));
+			alternative = B_TRANSLATE(kFindAlternativeStr);
 		} else if (error == B_MISSING_SYMBOL
 			&& LoaderErrorDetails(&app, loaderErrorString) == B_OK) {
-			alertString << "Could not open \"" << documentRef.name << "\" ";
-			if (openedDocuments)
-				alertString << "with application \"" << app.name << "\" ";
-			alertString << "(Missing symbol: " << loaderErrorString << "). \n";
-			alternative = kFindAlternativeStr;
+			if (openedDocuments) {
+				alertString.SetTo(B_TRANSLATE("Could not open \"%document\" "
+					"with application \"%app\" (Missing symbol: %symbol). \n"));
+				alertString.ReplaceFirst("%document", documentRef.name);
+				alertString.ReplaceFirst("%app", app.name);
+				alertString.ReplaceFirst("%symbol", loaderErrorString.String());
+			} else {
+				alertString.SetTo(B_TRANSLATE("Could not open \"%document\" "
+					"(Missing symbol: %symbol). \n"));
+				alertString.ReplaceFirst("%document", documentRef.name);
+				alertString.ReplaceFirst("%symbol", loaderErrorString.String());
+			}
+			alternative = B_TRANSLATE(kFindAlternativeStr);
 		} else if (error == B_MISSING_LIBRARY
 			&& LoaderErrorDetails(&app, loaderErrorString) == B_OK) {
-			alertString << "Could not open \"" << documentRef.name << "\" ";
-			if (openedDocuments)
-				alertString << "with application \"" << app.name << "\" ";
-			alertString << "(Missing libraries: " << loaderErrorString
-				<< "). \n";
-			alternative = kFindAlternativeStr;
+			if (openedDocuments) {
+				alertString.SetTo(B_TRANSLATE("Could not open \"%document\" "
+					"with application \"%app\" (Missing libraries: %library). "
+					"\n"));
+				alertString.ReplaceFirst("%document", documentRef.name);
+				alertString.ReplaceFirst("%app", app.name);
+				alertString.ReplaceFirst("%library", loaderErrorString.String());
+			} else {
+				alertString.SetTo(B_TRANSLATE("Could not open \"%document\" "
+					"(Missing libraries: %library). \n"));
+				alertString.ReplaceFirst("%document", documentRef.name);
+				alertString.ReplaceFirst("%library", loaderErrorString.String());
+			}
+			alternative = B_TRANSLATE(kFindAlternativeStr);
 		} else {
-			alertString << "Could not open \"" << documentRef.name
-				<< "\" with application \"" << app.name << "\" ("
-				<< strerror(error) << "). ";
-			alternative = kFindAlternativeStr;
+			alertString.SetTo(B_TRANSLATE("Could not open \"%document\" with "
+				"application \"%app\" (%error). "));
+				alertString.ReplaceFirst("%document", documentRef.name);
+				alertString.ReplaceFirst("%app", app.name);
+				alertString.ReplaceFirst("%error", strerror(error));
+			alternative = B_TRANSLATE(kFindAlternativeStr);
 		}
 	}
 
@@ -3395,15 +3489,15 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 		if (openWithOK) {
 			ASSERT(alternative);
 			alertString << alternative;
-			BAlert *alert = new BAlert("", alertString.String(),
-				"Cancel", "Find", 0, B_WIDTH_AS_USUAL,
+			BAlert* alert = new BAlert("", alertString.String(),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Find"),	0, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 1)
 				error = TrackerOpenWith(refs);
 		} else {
-			BAlert *alert = new BAlert("", alertString.String(),
-				"Cancel", 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			BAlert* alert = new BAlert("", alertString.String(),
+				B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->Go();
 		}

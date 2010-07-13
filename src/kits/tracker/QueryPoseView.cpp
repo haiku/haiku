@@ -35,7 +35,9 @@ All rights reserved.
 
 #include <new>
 
+#include <Catalog.h>
 #include <Debug.h>
+#include <Locale.h>
 #include <NodeMonitor.h>
 #include <Query.h>
 #include <Volume.h>
@@ -53,6 +55,10 @@ All rights reserved.
 #include "Tracker.h"
 
 #include <fs_attr.h>
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 using std::nothrow;
 
@@ -113,14 +119,14 @@ BQueryPoseView::SetUpDefaultColumnsIfNeeded()
 	if (fColumnList->CountItems() != 0)
 		return;
 
-	fColumnList->AddItem(new BColumn("Name", kColumnStart, 145, B_ALIGN_LEFT,
-		kAttrStatName, B_STRING_TYPE, true, true));
-	fColumnList->AddItem(new BColumn("Location", 200, 225, B_ALIGN_LEFT,
-		kAttrPath, B_STRING_TYPE, true, false));
-	fColumnList->AddItem(new BColumn("Size", 440, 80, B_ALIGN_RIGHT,
-		kAttrStatSize, B_OFF_T_TYPE, true, false));
-	fColumnList->AddItem(new BColumn("Modified", 535, 150, B_ALIGN_LEFT,
-		kAttrStatModified, B_TIME_TYPE, true, false));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), kColumnStart, 145,
+		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Location"), 200, 225,
+		B_ALIGN_LEFT, kAttrPath, B_STRING_TYPE, true, false));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Size"), 440, 80,
+		B_ALIGN_RIGHT, kAttrStatSize, B_OFF_T_TYPE, true, false));
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Modified"), 535, 150,
+		B_ALIGN_LEFT, kAttrStatModified, B_TIME_TYPE, true, false));
 }
 
 

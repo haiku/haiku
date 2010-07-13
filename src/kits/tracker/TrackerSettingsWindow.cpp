@@ -32,6 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <Catalog.h>
+#include <Locale.h>
 
 #include "SettingsViews.h"
 #include "TrackerSettings.h"
@@ -63,10 +65,15 @@ const uint32 kDefaultsButtonPressed = 'Apbp';
 const uint32 kRevertButtonPressed = 'Rebp';
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
 TrackerSettingsWindow::TrackerSettingsWindow()
-	: BWindow(BRect(80, 80, 450, 350), "Tracker preferences", B_TITLED_WINDOW,
-		B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | B_NO_WORKSPACE_ACTIVATION
-		| B_NOT_ANCHORED_ON_ACTIVATE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+	:
+	BWindow(BRect(80, 80, 450, 350), B_TRANSLATE("Tracker preferences"),
+		B_TITLED_WINDOW, B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
+		| B_NO_WORKSPACE_ACTIVATION	| B_NOT_ANCHORED_ON_ACTIVATE
+		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	BRect rect = Bounds();
 	BView *topView = new BView(rect, "Background", B_FOLLOW_ALL, 0);
@@ -74,8 +81,8 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	AddChild(topView);
 
 	rect.InsetBy(10, 10);
-	rect.right = rect.left + be_plain_font->StringWidth("Volume Icons")
-		+ (float)B_V_SCROLL_BAR_WIDTH + 40.0f;
+	rect.right = be_plain_font->StringWidth(B_TRANSLATE("Volume Icons"))
+		+ rect.left + (float)B_V_SCROLL_BAR_WIDTH + 40.0f;
 	fSettingsTypeListView = new BListView(rect, "List View", B_SINGLE_SELECTION_LIST,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
 	BScrollView* scrollView = new BScrollView("scrollview", fSettingsTypeListView,
@@ -85,7 +92,7 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	rect = scrollView->Frame();
 	rect.left = rect.right + 10;
 	rect.top = rect.bottom;
-	fDefaultsButton = new BButton(rect, "Defaults", "Defaults",
+	fDefaultsButton = new BButton(rect, "Defaults",	B_TRANSLATE("Defaults"),
 		new BMessage(kDefaultsButtonPressed), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fDefaultsButton->ResizeToPreferred();
 	fDefaultsButton->SetEnabled(false);
@@ -93,7 +100,7 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 
 	rect = fDefaultsButton->Frame();
 	rect.left = rect.right + 10;
-	fRevertButton = new BButton(rect, "Revert", "Revert",
+	fRevertButton = new BButton(rect, "Revert",	B_TRANSLATE("Revert"),
 		new BMessage(kRevertButtonPressed), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fRevertButton->SetEnabled(false);
 	fRevertButton->ResizeToPreferred();
@@ -109,15 +116,15 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 
 	rect = _SettingsFrame();
 
-	fSettingsTypeListView->AddItem(new SettingsItem("Desktop",
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Desktop"),
 		new DesktopSettingsView(rect)));
-	fSettingsTypeListView->AddItem(new SettingsItem("Windows",
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Windows"),
 		new WindowsSettingsView(rect)));
-	fSettingsTypeListView->AddItem(new SettingsItem("Date & Time",
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Date & Time"),
 		new TimeFormatSettingsView(rect)));
-	fSettingsTypeListView->AddItem(new SettingsItem("Trash",
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Trash"),
 		new TrashSettingsView(rect)));
-	fSettingsTypeListView->AddItem(new SettingsItem("Volume icons",
+	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Volume icons"),
 		new SpaceBarSettingsView(rect)));
 
 	// compute preferred view size

@@ -7,7 +7,7 @@ UsePrivateHeaders interface mount shared storage tracker ;
 
 UseLibraryHeaders icon ;
 
-AddResources libtracker.so : TrackerIcons.rdef ;
+AddResources libtracker.so : TrackerIcons.rdef libtracker.rdef ;
 
 SubDirC++Flags
 	-D_BUILDING_tracker=1 -DOPEN_TRACKER=1
@@ -91,9 +91,44 @@ SharedLibrary libtracker.so :
 	VolumeWindow.cpp
 	WidgetAttributeText.cpp
 
-	: be translation $(vector_icon_libs) $(TARGET_LIBSTDC++) libshared.a
-
+	: be translation $(vector_icon_libs) $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS) libshared.a
 	;
+
+DoCatalogs libtracker.so :
+	x-vnd.Haiku-libtracker
+	:
+	Tracker.cpp
+	AutoMounterSettings.cpp
+	ContainerWindow.cpp
+	CountView.cpp
+	DeskWindow.cpp
+	DirMenu.cpp
+	FavoritesMenu.cpp
+	FilePanelPriv.cpp
+	FilePermissionsView.cpp
+	FindPanel.cpp
+	FSClipboard.cpp
+	FSUtils.cpp
+	InfoWindow.cpp
+	Model.cpp
+	MountMenu.cpp
+	NavMenu.cpp
+	OpenWithWindow.cpp
+	PoseView.cpp
+	QueryContainerWindow.cpp
+	QueryPoseView.cpp
+	SelectionWindow.cpp
+	SettingsViews.cpp
+	SlowContextPopup.cpp
+	StatusWindow.cpp
+	TemplatesMenu.cpp
+	Tracker.cpp
+	TrackerInitialState.cpp
+	TrackerSettingsWindow.cpp
+	VolumeWindow.cpp
+	WidgetAttributeText.cpp
+;
+
 
 if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_LIB_DIR) : libtracker.so

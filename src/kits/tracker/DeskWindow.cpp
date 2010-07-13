@@ -32,8 +32,10 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include <Catalog.h>
 #include <Debug.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PopUpMenu.h>
@@ -103,6 +105,8 @@ AddOneShortcut(const Model *model, const char *, uint32 shortcut, bool /*primary
 
 // #pragma mark -
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 BDeskWindow::BDeskWindow(LockingList<BWindow> *windowList)
 	:
@@ -266,7 +270,8 @@ BDeskWindow::CreatePoseView(Model *model)
 void
 BDeskWindow::AddWindowContextMenus(BMenu *menu)
 {
-	TemplatesMenu *tempateMenu = new TemplatesMenu(PoseView());
+	TemplatesMenu* tempateMenu = new TemplatesMenu(PoseView(),
+		B_TRANSLATE("New"));
 
 	menu->AddItem(tempateMenu);
 	tempateMenu->SetTargetForItems(PoseView());
@@ -274,32 +279,32 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 
 	menu->AddSeparatorItem();
 
-	BMenu* iconSizeMenu = new BMenu("Icon view");
+	BMenu* iconSizeMenu = new BMenu(B_TRANSLATE("Icon view"));
 
 	BMessage* message = new BMessage(kIconMode);
 	message->AddInt32("size", 32);
-	BMenuItem* item = new BMenuItem("32 x 32", message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("32 x 32"), message);
 	item->SetMarked(PoseView()->IconSizeInt() == 32);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("size", 40);
-	item = new BMenuItem("40 x 40", message);
+	item = new BMenuItem(B_TRANSLATE("40 x 40"), message);
 	item->SetMarked(PoseView()->IconSizeInt() == 40);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("size", 48);
-	item = new BMenuItem("48 x 48", message);
+	item = new BMenuItem(B_TRANSLATE("48 x 48"), message);
 	item->SetMarked(PoseView()->IconSizeInt() == 48);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("size", 64);
-	item = new BMenuItem("64 x 64", message);
+	item = new BMenuItem(B_TRANSLATE("64 x 64"), message);
 	item->SetMarked(PoseView()->IconSizeInt() == 64);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
@@ -308,13 +313,13 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("scale", 0);
-	item = new BMenuItem("Decrease size", message, '-');
+	item = new BMenuItem(B_TRANSLATE("Decrease size"), message, '-');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("scale", 1);
-	item = new BMenuItem("Increase size", message, '+');
+	item = new BMenuItem(B_TRANSLATE("Increase size"), message, '+');
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
@@ -325,27 +330,31 @@ BDeskWindow::AddWindowContextMenus(BMenu *menu)
 	iconSizeMenu->Superitem()->SetTarget(PoseView());
 	iconSizeMenu->Superitem()->SetMarked(PoseView()->ViewMode() == kIconMode);
 
-	item = new BMenuItem("Mini icon view", new BMessage(kMiniIconMode), '2');
+	item = new BMenuItem(B_TRANSLATE("Mini icon view"),
+		new BMessage(kMiniIconMode), '2');
 	item->SetMarked(PoseView()->ViewMode() == kMiniIconMode);
 	menu->AddItem(item);
 
 	menu->AddSeparatorItem();
 
 #ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
-	BMenuItem *pasteItem;
-	menu->AddItem(pasteItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
+	BMenuItem* pasteItem = new BMenuItem(B_TRANSLATE("Paste"),
+		new BMessage(B_PASTE), 'V'));
+	menu->AddItem(pasteItem);
 	menu->AddSeparatorItem();
 #endif
-	menu->AddItem(new BMenuItem("Clean up", new BMessage(kCleanup), 'K'));
-	menu->AddItem(new BMenuItem("Select"B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Clean up"), new BMessage(kCleanup),
+		'K'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
 		new BMessage(kShowSelectionWindow), 'A', B_SHIFT_KEY));
-	menu->AddItem(new BMenuItem("Select all", new BMessage(B_SELECT_ALL), 'A'));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
+		new BMessage(B_SELECT_ALL), 'A'));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new MountMenu("Mount"));
+	menu->AddItem(new MountMenu(B_TRANSLATE("Mount")));
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenu(kAddOnsMenuName));
+	menu->AddItem(new BMenu(B_TRANSLATE("Add-ons")));
 
 	// target items as needed
 	menu->SetTargetForItems(PoseView());

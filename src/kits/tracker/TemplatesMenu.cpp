@@ -33,9 +33,11 @@ All rights reserved.
 */
 
 #include <Application.h>
+#include <Catalog.h>
 #include <FindDirectory.h>
 #include <Directory.h>
 #include <NodeInfo.h>
+#include <Locale.h>
 #include <Mime.h>
 #include <Message.h>
 #include <Path.h>
@@ -50,12 +52,15 @@ All rights reserved.
 #include "IconMenuItem.h"
 #include "MimeTypes.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
+
 namespace BPrivate {
 
 const char *kTemplatesDirectory = "Tracker/Tracker New Templates";
-const char *kTemplatesMenuName = "New";
 
-static const char *kOpenTemplatesMenuName = "Edit templates"B_UTF8_ELLIPSIS;
 
 }
 
@@ -112,8 +117,8 @@ TemplatesMenu::BuildMenu(bool addItems)
 		delete RemoveItem(0L);
 
 	// Add the Folder
-	IconMenuItem *menuItem = new IconMenuItem("New folder", new BMessage(kNewFolder),
-		B_DIR_MIMETYPE,B_MINI_ICON);
+	IconMenuItem* menuItem = new IconMenuItem(B_TRANSLATE("New folder"),
+		new BMessage(kNewFolder), B_DIR_MIMETYPE, B_MINI_ICON);
 	AddItem(menuItem);
 	menuItem->SetShortcut('N', 0);
 
@@ -172,7 +177,8 @@ TemplatesMenu::BuildMenu(bool addItems)
 	message->AddRef("refs", &dirRef);
 	
 	// Add item to show templates folder.
-	fOpenItem = new BMenuItem(kOpenTemplatesMenuName, message);
+	fOpenItem =	new BMenuItem(B_TRANSLATE("Edit templates" B_UTF8_ELLIPSIS),
+			message);
 	AddItem(fOpenItem);
 	if (dirRef == entry_ref())
 		fOpenItem->SetEnabled(false);

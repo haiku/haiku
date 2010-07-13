@@ -38,12 +38,17 @@ All rights reserved.
 #include <stdlib.h>
 
 #include <Beep.h>
+#include <Catalog.h>
+#include <Locale.h>
 
 
 const uint32 kPermissionsChanged = 'prch';
 const uint32 kNewOwnerEntered = 'nwow';
 const uint32 kNewGroupEntered = 'nwgr';
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 	:	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
@@ -63,15 +68,17 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 	strView->SetFontSize(kAttribFontHeight);
 
 	strView = new BStringView(BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
-		+ kColumnLabelSpacing, kColumnLabelTop, kColumnLabelMiddle + kColumnLabelWidth / 2
-		+ kColumnLabelSpacing, kColumnLabelBottom), "", "Group");
+		+ kColumnLabelSpacing, kColumnLabelTop,
+		kColumnLabelMiddle + kColumnLabelWidth / 2 + kColumnLabelSpacing,
+		kColumnLabelBottom), "", B_TRANSLATE("Group"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 
 	strView = new BStringView(BRect(kColumnLabelMiddle - kColumnLabelWidth / 2
-		+ 2 * kColumnLabelSpacing, kColumnLabelTop, kColumnLabelMiddle + kColumnLabelWidth / 2
-		+ 2 * kColumnLabelSpacing, kColumnLabelBottom), "", "Other");
+		+ 2 * kColumnLabelSpacing, kColumnLabelTop,
+		kColumnLabelMiddle + kColumnLabelWidth / 2 + 2 * kColumnLabelSpacing,
+		kColumnLabelBottom), "", B_TRANSLATE("Other"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
@@ -82,21 +89,24 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 		- kColumnLabelWidth / 2 - 5, kRowLabelHeight = 14;
 
 	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop, kRowLabelRight,
-		kRowLabelTop + kRowLabelHeight), "", "Read");
+		kRowLabelTop + kRowLabelHeight),
+		"", B_TRANSLATE("Read"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_RIGHT);
 	strView->SetFontSize(kAttribFontHeight);
 
 	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop
 		+ kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
-		+ kRowLabelVerticalSpacing + kRowLabelHeight), "", "Write");
+		+ kRowLabelVerticalSpacing + kRowLabelHeight),
+		"", B_TRANSLATE("Write"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_RIGHT);
 	strView->SetFontSize(kAttribFontHeight);
 
 	strView = new BStringView(BRect(kRowLabelLeft, kRowLabelTop
 		+ 2 * kRowLabelVerticalSpacing, kRowLabelRight, kRowLabelTop
-		+ 2 * kRowLabelVerticalSpacing + kRowLabelHeight), "", "Execute");
+		+ 2 * kRowLabelVerticalSpacing + kRowLabelHeight),
+		"", B_TRANSLATE("Execute"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_RIGHT);
 	strView->SetFontSize(kAttribFontHeight);
@@ -126,8 +136,9 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 	const float kTextControlLeft = 170, kTextControlRight = 270,
 		kTextControlTop = kColumnLabelTop, kTextControlHeight = 14, kTextControlSpacing = 16;
 
-	strView = new BStringView(BRect(kTextControlLeft, kTextControlTop, kTextControlRight,
-		kTextControlTop + kTextControlHeight), "", "Owner");
+	strView = new BStringView(BRect(kTextControlLeft, kTextControlTop,
+		kTextControlRight, kTextControlTop + kTextControlHeight), "",
+		B_TRANSLATE("Owner"));
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 	AddChild(strView);
@@ -138,9 +149,11 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 	fOwnerTextControl->SetDivider(0);
 	AddChild(fOwnerTextControl);
 
-	strView = new BStringView(BRect(kTextControlLeft, kTextControlTop + 5
-		+ 2 * kTextControlSpacing, kTextControlRight, kTextControlTop + 2
-		+ 2 * kTextControlSpacing + kTextControlHeight), "", "Group");
+	strView = new BStringView(BRect(kTextControlLeft,
+		kTextControlTop + 5 + 2 * kTextControlSpacing,
+		kTextControlRight,
+		kTextControlTop + 2 + 2 * kTextControlSpacing + kTextControlHeight),
+		"", B_TRANSLATE("Group"));
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
 	AddChild(strView);

@@ -37,8 +37,10 @@ All rights reserved.
 // important sniffer rules
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Directory.h>
 #include <InterfaceDefs.h>
+#include <Locale.h>
 #include <Message.h>
 #include <Node.h>
 #include <Path.h>
@@ -330,6 +332,9 @@ AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
 // #pragma mark -
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
+
 bool
 TTracker::InstallMimeIfNeeded(const char *type, int32 bitsID,
 	const char *shortDescription, const char *longDescription,
@@ -592,12 +597,13 @@ TTracker::InstallTemporaryBackgroundImages()
 	BPath path;
 	status_t status = find_directory(B_SYSTEM_DATA_DIRECTORY, &path);
 	if (status < B_OK) {
-		BString errorMessage;
-		errorMessage << "At " << __PRETTY_FUNCTION__ << "\n";
-		errorMessage << "find_directory() failed. \nReason: ";
-		errorMessage << strerror(status);
-		(new BAlert("AlertError", errorMessage.String(), "OK", NULL, NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		// TODO: this error shouldn't be shown to the regular user
+		BString errorMessage(B_TRANSLATE("At %func \nfind_directory() failed. "
+			"\nReason: %error"));
+		errorMessage.ReplaceFirst("%func", __PRETTY_FUNCTION__);
+		errorMessage.ReplaceFirst("%error", strerror(status));
+		(new BAlert("AlertError", errorMessage.String(), B_TRANSLATE("OK"),
+			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 		return;
 	}
 	path.Append("artwork");
