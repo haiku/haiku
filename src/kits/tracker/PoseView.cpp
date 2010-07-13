@@ -4721,7 +4721,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	if (destFolder->IsRoot()) {
 		BAlert *alert = new BAlert("",
 			B_TRANSLATE("You must drop items on one of the disk icons "
-			"in the \"Disks\" window."), B_TRANSLATE("Cancel"),	NULL, NULL,
+			"in the \"Disks\" window."), B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
@@ -4756,7 +4756,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 		srcWindow->UpdateIfNeeded();
 		BAlert *alert = new BAlert("", 
 			B_TRANSLATE("Are you sure you want to move or copy the selected "
-			"item(s) to this folder?"),	B_TRANSLATE("Cancel"),
+			"item(s) to this folder?"), B_TRANSLATE("Cancel"),
 			B_TRANSLATE("Move"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		okToMove = alert->Go() == 1;
@@ -5619,7 +5619,7 @@ CheckVolumeReadOnly(const entry_ref *ref)
 	if (volume.IsReadOnly()) {
 		BAlert *alert = new BAlert ("",
 			B_TRANSLATE("Files cannot be moved or deleted from a read-only "
-			"volume."),	B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
+			"volume."), B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_STOP_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->Go();
