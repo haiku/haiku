@@ -1,7 +1,7 @@
 /*
 ******************************************************************************
 *
-*   Copyright (C) 1996-2006, International Business Machines
+*   Copyright (C) 1996-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 *
 ******************************************************************************
@@ -180,6 +180,8 @@
 U_NAMESPACE_BEGIN
 class U_COMMON_API Locale : public UObject {
 public:
+    /** Useful constant for the Root locale. @draft ICU 4.4 */
+    static const Locale &U_EXPORT2 getRoot(void);
     /** Useful constant for this language. @stable ICU 2.0 */
     static const Locale &U_EXPORT2 getEnglish(void);
     /** Useful constant for this language. @stable ICU 2.0 */
@@ -425,8 +427,9 @@ public:
     /**
      * Gets the list of keywords for the specified locale.
      *
-     * @return pointer to StringEnumeration class. Client must dispose of it by calling delete.
-     * @param status Returns any error information while performing this operation.
+     * @param status the status code
+     * @return pointer to StringEnumeration class, or NULL if there are no keywords. 
+     * Client must dispose of it by calling delete.
      * @stable ICU 2.8
      */
     StringEnumeration * createKeywords(UErrorCode &status) const;
@@ -435,14 +438,27 @@ public:
      * Get the value for a keyword.
      *
      * @param keywordName name of the keyword for which we want the value. Case insensitive.
-     * @param status Returns any error information while performing this operation.
      * @param buffer The buffer to receive the keyword value.
      * @param bufferCapacity The capacity of receiving buffer
-     * @return the length of keyword value
+     * @param status Returns any error information while performing this operation.
+     * @return the length of the keyword value
      *
      * @stable ICU 2.8
      */
     int32_t getKeywordValue(const char* keywordName, char *buffer, int32_t bufferCapacity, UErrorCode &status) const;
+
+    /**
+     * Set the value for a keyword.
+     *
+     * @param keywordName name of the keyword to be set. Case insensitive.
+     * @param keywordValue value of the keyword to be set. If 0-length or
+     *  NULL, will result in the keyword being removed. No error is given if
+     *  that keyword does not exist.
+     * @param status Returns any error information while performing this operation.
+     *
+     * @internal 
+     */
+    void setKeywordValue(const char* keywordName, const char* keywordValue, UErrorCode &status);
 
     /**
      * returns the locale's three-letter language code, as specified
@@ -633,7 +649,7 @@ public:
     static const Locale* U_EXPORT2 getAvailableLocales(int32_t& count);
 
     /**
-     * Gets a list of all available 2-letter country codes defined in ISO 639.  This is a
+     * Gets a list of all available 2-letter country codes defined in ISO 3166.  This is a
      * pointer to an array of pointers to arrays of char.  All of these pointers are
      * owned by ICU-- do not delete them, and do not write through them.  The array is
      * terminated with a null pointer.
@@ -745,7 +761,8 @@ Locale::getScript() const
 inline const char *
 Locale::getVariant() const
 {
-    return &fullName[variantBegin];
+    getBaseName(); // lazy init
+    return &baseName[variantBegin];
 }
 
 inline const char *
@@ -762,4 +779,3 @@ Locale::isBogus(void) const {
 U_NAMESPACE_END
 
 #endif
-

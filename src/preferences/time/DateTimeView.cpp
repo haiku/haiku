@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,11 +45,12 @@ extern "C" void _kset_tzfilename_(const char *name, size_t length, bool isGMT);
 
 
 DateTimeView::DateTimeView(BRect frame)
-	: BView(frame, "dateTimeView", B_FOLLOW_NONE, B_WILL_DRAW | B_NAVIGABLE_JUMP),
-	  fGmtTime(NULL),
-	  fUseGmtTime(false),
-	  fInitialized(false),
-	  fSystemTimeAtStart(system_time())
+	: BView(frame, "dateTimeView", B_FOLLOW_NONE, B_WILL_DRAW
+		| B_NAVIGABLE_JUMP),
+	fGmtTime(NULL),
+	fUseGmtTime(false),
+	fInitialized(false),
+	fSystemTimeAtStart(system_time())
 {
 	_ReadRTCSettings();
 	_InitView();
@@ -86,7 +87,7 @@ DateTimeView::Draw(BRect /*updateRect*/)
 	rgb_color dark = tint_color(viewcolor, B_DARKEN_4_TINT);
 	rgb_color light = tint_color(viewcolor, B_LIGHTEN_MAX_TINT);
 
-	//draw a separator line
+	// draw a separator line
 	BRect bounds(Bounds());
 	BPoint start(bounds.Width() / 2.0f, bounds.top + 5.0f);
 	BPoint end(bounds.Width() / 2.0, bounds.bottom - 5.0f);

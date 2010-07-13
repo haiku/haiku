@@ -25,6 +25,9 @@
 #include <unicode/locid.h>
 
 
+#define ICU_VERSION icu_44
+
+
 static const char *gBuiltInStrings[] = {
 	"Yesterday",
 	"Today",
@@ -84,7 +87,7 @@ BLanguage::BLanguage(const char* language)
 	:
 	fDirection(B_LEFT_TO_RIGHT)
 {
-	fICULocale = new icu_4_2::Locale(language);
+	fICULocale = new ICU_VERSION::Locale(language);
 
 	for (int32 i = B_NUM_LANGUAGE_STRINGS;i-- > 0;)
 		fStrings[i] = NULL;
@@ -103,7 +106,7 @@ BLanguage::~BLanguage()
 void
 BLanguage::Default()
 {
-	fICULocale = new icu_4_2::Locale("en");
+	fICULocale = new ICU_VERSION::Locale("en");
 	fDirection = B_LEFT_TO_RIGHT;
 
 	for (int32 i = B_NUM_LANGUAGE_STRINGS;i-- > 0;) {

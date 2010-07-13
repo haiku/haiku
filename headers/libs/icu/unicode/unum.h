@@ -1,6 +1,6 @@
 /*
 *******************************************************************************
-* Copyright (C) 1997-2009, International Business Machines Corporation and others.
+* Copyright (C) 1997-2010, International Business Machines Corporation and others.
 * All Rights Reserved.
 * Modification History:
 *
@@ -16,6 +16,7 @@
 
 #if !UCONFIG_NO_FORMATTING
 
+#include "unicode/localpointer.h"
 #include "unicode/uloc.h"
 #include "unicode/umisc.h"
 #include "unicode/parseerr.h"
@@ -254,6 +255,25 @@ unum_open(  UNumberFormatStyle    style,
 U_STABLE void U_EXPORT2 
 unum_close(UNumberFormat* fmt);
 
+#if U_SHOW_CPLUSPLUS_API
+
+U_NAMESPACE_BEGIN
+
+/**
+ * \class LocalUNumberFormatPointer
+ * "Smart pointer" class, closes a UNumberFormat via unum_close().
+ * For most methods see the LocalPointerBase base class.
+ *
+ * @see LocalPointerBase
+ * @see LocalPointer
+ * @draft ICU 4.4
+ */
+U_DEFINE_LOCAL_OPEN_POINTER(LocalUNumberFormatPointer, UNumberFormat, unum_close);
+
+U_NAMESPACE_END
+
+#endif
+
 /**
  * Open a copy of a UNumberFormat.
  * This function performs a deep copy.
@@ -348,6 +368,40 @@ unum_formatInt64(const UNumberFormat *fmt,
 U_STABLE int32_t U_EXPORT2 
 unum_formatDouble(    const    UNumberFormat*  fmt,
             double          number,
+            UChar*          result,
+            int32_t         resultLength,
+            UFieldPosition  *pos, /* 0 if ignore */
+            UErrorCode*     status);
+
+/**
+* Format a decimal number using a UNumberFormat.
+* The number will be formatted according to the UNumberFormat's locale.
+* The syntax of the input number is a "numeric string"
+* as defined in the Decimal Arithmetic Specification, available at
+* http://speleotrove.com/decimal
+* @param fmt The formatter to use.
+* @param number The number to format.
+* @param length The length of the input number, or -1 if the input is nul-terminated.
+* @param result A pointer to a buffer to receive the formatted number.
+* @param resultLength The maximum size of result.
+* @param pos    A pointer to a UFieldPosition.  On input, position->field
+*               is read.  On output, position->beginIndex and position->endIndex indicate
+*               the beginning and ending indices of field number position->field, if such
+*               a field exists.  This parameter may be NULL, in which case it is ignored.
+* @param status A pointer to an UErrorCode to receive any errors
+* @return The total buffer size needed; if greater than resultLength, the output was truncated.
+* @see unum_format
+* @see unum_formatInt64
+* @see unum_parse
+* @see unum_parseInt64
+* @see unum_parseDouble
+* @see UFieldPosition
+* @draft ICU 4.4 
+*/
+U_DRAFT int32_t U_EXPORT2 
+unum_formatDecimal(    const    UNumberFormat*  fmt,
+            const char *    number,
+            int32_t         length,
             UChar*          result,
             int32_t         resultLength,
             UFieldPosition  *pos, /* 0 if ignore */
@@ -454,6 +508,41 @@ unum_parseDouble(    const   UNumberFormat*  fmt,
             int32_t         textLength,
             int32_t         *parsePos /* 0 = start */,
             UErrorCode      *status);
+
+
+/**
+* Parse a number from a string into an unformatted numeric string using a UNumberFormat.
+* The input string will be parsed according to the UNumberFormat's locale.
+* The syntax of the output is a "numeric string"
+* as defined in the Decimal Arithmetic Specification, available at
+* http://speleotrove.com/decimal
+* @param fmt The formatter to use.
+* @param text The text to parse.
+* @param textLength The length of text, or -1 if null-terminated.
+* @param parsePos If not 0, on input a pointer to an integer specifying the offset at which
+*                 to begin parsing.  If not 0, on output the offset at which parsing ended.
+* @param outBuf A (char *) buffer to receive the parsed number as a string.  The output string
+*               will be nul-terminated if there is sufficient space.
+* @param outBufLength The size of the output buffer.  May be zero, in which case
+*               the outBuf pointer may be NULL, and the function will return the
+*               size of the output string.
+* @param status A pointer to an UErrorCode to receive any errors
+* @return the length of the output string, not including any terminating nul.
+* @see unum_parse
+* @see unum_parseInt64
+* @see unum_format
+* @see unum_formatInt64
+* @see unum_formatDouble
+* @draft ICU 4.4
+*/
+U_DRAFT int32_t U_EXPORT2 
+unum_parseDecimal(const   UNumberFormat*  fmt,
+                 const   UChar*          text,
+                         int32_t         textLength,
+                         int32_t         *parsePos /* 0 = start */,
+                         char            *outBuf,
+                         int32_t         outBufLength,
+                         UErrorCode      *status);
 
 /**
  * Parse a string into a double and a currency using a UNumberFormat.

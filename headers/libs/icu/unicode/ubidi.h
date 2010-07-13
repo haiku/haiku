@@ -1,7 +1,7 @@
 /*
 ******************************************************************************
 *
-*   Copyright (C) 1999-2008, International Business Machines
+*   Copyright (C) 1999-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 *
 ******************************************************************************
@@ -19,6 +19,7 @@
 
 #include "unicode/utypes.h"
 #include "unicode/uchar.h"
+#include "unicode/localpointer.h"
 
 /**
  *\file
@@ -519,6 +520,25 @@ ubidi_openSized(int32_t maxLength, int32_t maxRunCount, UErrorCode *pErrorCode);
 U_STABLE void U_EXPORT2
 ubidi_close(UBiDi *pBiDi);
 
+#if U_SHOW_CPLUSPLUS_API
+
+U_NAMESPACE_BEGIN
+
+/**
+ * \class LocalUBiDiPointer
+ * "Smart pointer" class, closes a UBiDi via ubidi_close().
+ * For most methods see the LocalPointerBase base class.
+ *
+ * @see LocalPointerBase
+ * @see LocalPointer
+ * @draft ICU 4.4
+ */
+U_DEFINE_LOCAL_OPEN_POINTER(LocalUBiDiPointer, UBiDi, ubidi_close);
+
+U_NAMESPACE_END
+
+#endif
+
 /**
  * Modify the operation of the Bidi algorithm such that it
  * approximates an "inverse Bidi" algorithm. This function
@@ -791,12 +811,10 @@ typedef enum UBiDiReorderingMode {
  *
  * <li>When the reordering mode is set to
  * <code>#UBIDI_REORDER_INVERSE_FOR_NUMBERS_SPECIAL</code>, the Logical to Visual
- * Bidi algorithm used in Windows XP is used as an approximation of an
- * "inverse Bidi" algorithm.
+ * Bidi algorithm used in Windows XP is used as an approximation of an "inverse Bidi" algorithm.
  * <br>
  * For example, an LTR paragraph with the content "abc FED123" (where
- * upper case represents RTL characters) will be transformed to
- * "abc 123DEF.</li>
+ * upper case represents RTL characters) will be transformed to "abc 123DEF."</li>
  * </ul>
  *
  * <p>In all the reordering modes specifying an "inverse Bidi" algorithm

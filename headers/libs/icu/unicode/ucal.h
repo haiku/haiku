@@ -1,6 +1,6 @@
 /*
  *******************************************************************************
- * Copyright (C) 1996-2009, International Business Machines Corporation and
+ * Copyright (C) 1996-2010, International Business Machines Corporation and
  * others. All Rights Reserved.
  *******************************************************************************
  */
@@ -11,6 +11,7 @@
 #include "unicode/utypes.h"
 #include "unicode/uenum.h"
 #include "unicode/uloc.h"
+#include "unicode/localpointer.h"
 
 #if !UCONFIG_NO_FORMATTING
 
@@ -156,15 +157,15 @@ enum UCalendarType {
    */
   UCAL_TRADITIONAL,
   /**
-   * Unambiguously designates the Gregorian calendar for the locale.
-   * @stable ICU 2.0
-   */
-  UCAL_GREGORIAN,
-  /**
    * A better name for UCAL_TRADITIONAL.
    * @draft ICU 4.2
    */
-  UCAL_DEFAULT = UCAL_TRADITIONAL
+  UCAL_DEFAULT = UCAL_TRADITIONAL,
+  /**
+   * Unambiguously designates the Gregorian calendar for the locale.
+   * @stable ICU 2.0
+   */
+  UCAL_GREGORIAN
 };
 
 /** @stable ICU 2.0 */
@@ -644,6 +645,25 @@ ucal_open(const UChar*   zoneID,
 U_STABLE void U_EXPORT2 
 ucal_close(UCalendar *cal);
 
+#if U_SHOW_CPLUSPLUS_API
+
+U_NAMESPACE_BEGIN
+
+/**
+ * \class LocalUCalendarPointer
+ * "Smart pointer" class, closes a UCalendar via ucal_close().
+ * For most methods see the LocalPointerBase base class.
+ *
+ * @see LocalPointerBase
+ * @see LocalPointer
+ * @draft ICU 4.4
+ */
+U_DEFINE_LOCAL_OPEN_POINTER(LocalUCalendarPointer, UCalendar, ucal_close);
+
+U_NAMESPACE_END
+
+#endif
+
 /**
  * Open a copy of a UCalendar.
  * This function performs a deep copy.
@@ -652,7 +672,7 @@ ucal_close(UCalendar *cal);
  * @return A pointer to a UCalendar identical to cal.
  * @stable ICU 4.0
  */
-U_DRAFT UCalendar* U_EXPORT2 
+U_STABLE UCalendar* U_EXPORT2 
 ucal_clone(const UCalendar* cal,
            UErrorCode*      status);
 
@@ -1121,7 +1141,7 @@ ucal_getLocaleByType(const UCalendar *cal, ULocDataLocaleType type, UErrorCode* 
  * @return the version string, such as "2007f"
  * @stable ICU 3.8
  */
-U_DRAFT const char * U_EXPORT2
+U_STABLE const char * U_EXPORT2
 ucal_getTZDataVersion(UErrorCode* status);
 
 /**
@@ -1142,7 +1162,7 @@ ucal_getTZDataVersion(UErrorCode* status);
  *                  null.
  * @stable ICU 4.0
  */
-U_DRAFT int32_t U_EXPORT2
+U_STABLE int32_t U_EXPORT2
 ucal_getCanonicalTimeZoneID(const UChar* id, int32_t len,
                             UChar* result, int32_t resultCapacity, UBool *isSystemID, UErrorCode* status);
 /**
@@ -1150,9 +1170,9 @@ ucal_getCanonicalTimeZoneID(const UChar* id, int32_t len,
  * @param cal The UCalendar to query.
  * @param status The error code for the operation.
  * @return The resource keyword value string.
- * @draft ICU 4.2
+ * @stable ICU 4.2
  */
-U_DRAFT const char * U_EXPORT2
+U_STABLE const char * U_EXPORT2
 ucal_getType(const UCalendar *cal, UErrorCode* status);
 
 /**
@@ -1169,13 +1189,91 @@ ucal_getType(const UCalendar *cal, UErrorCode* status);
  *                      it will return all the available values for the locale.
  * @param status error status
  * @return a string enumeration over keyword values for the given key and the locale.
- * @draft ICU 4.2
+ * @stable ICU 4.2
  */
-U_DRAFT UEnumeration* U_EXPORT2
+U_STABLE UEnumeration* U_EXPORT2
 ucal_getKeywordValuesForLocale(const char* key,
                                const char* locale,
                                UBool commonlyUsed,
                                UErrorCode* status);
+
+
+/** Weekday types, as returned by ucal_getDayOfWeekType().
+ * @draft ICU 4.4
+ */
+enum UCalendarWeekdayType {
+  /**
+   * Designates a full weekday (no part of the day is included in the weekend).
+   */
+  UCAL_WEEKDAY,
+  /**
+   * Designates a full weekend day (the entire day is included in the weekend).
+   */
+  UCAL_WEEKEND,
+  /**
+   * Designates a day that starts as a weekday and transitions to the weekend.
+   * Call ucal_getWeekendTransition() to get the time of transition.
+   */
+  UCAL_WEEKEND_ONSET,
+  /**
+   * Designates a day that starts as the weekend and transitions to a weekday.
+   * Call ucal_getWeekendTransition() to get the time of transition.
+   */
+  UCAL_WEEKEND_CEASE
+};
+
+/** @draft ICU 4.4 */
+typedef enum UCalendarWeekdayType UCalendarWeekdayType;
+
+/**
+ * Returns whether the given day of the week is a weekday, a
+ * weekend day, or a day that transitions from one to the other,
+ * in this calendar system. If a transition occurs at midnight,
+ * then the days before and after the transition will have the
+ * type UCAL_WEEKDAY or UCAL_WEEKEND. If a transition occurs at a time
+ * other than midnight, then the day of the transition will have
+ * the type UCAL_WEEKEND_ONSET or UCAL_WEEKEND_CEASE. In this case, the
+ * method getWeekendTransition() will return the point of
+ * transition.
+ * @param cal The UCalendar to query.
+ * @param dayOfWeek The day of the week whose type is desired (UCAL_SUNDAY..UCAL_SATURDAY).
+ * @param status The error code for the operation.
+ * @return The UCalendarWeekdayType for the day of the week.
+ * @draft ICU 4.4
+ */
+U_DRAFT UCalendarWeekdayType U_EXPORT2
+ucal_getDayOfWeekType(const UCalendar *cal, UCalendarDaysOfWeek dayOfWeek, UErrorCode* status);
+
+/**
+ * Returns the time during the day at which the weekend begins or ends in
+ * this calendar system.  If ucal_getDayOfWeekType() rerturns UCAL_WEEKEND_ONSET
+ * for the specified dayOfWeek, return the time at which the weekend begins.
+ * If ucal_getDayOfWeekType() returns UCAL_WEEKEND_CEASE for the specified dayOfWeek,
+ * return the time at which the weekend ends. If ucal_getDayOfWeekType() returns
+ * some other UCalendarWeekdayType for the specified dayOfWeek, is it an error condition
+ * (U_ILLEGAL_ARGUMENT_ERROR).
+ * @param cal The UCalendar to query.
+ * @param dayOfWeek The day of the week for which the weekend transition time is
+ * desired (UCAL_SUNDAY..UCAL_SATURDAY).
+ * @param status The error code for the operation.
+ * @return The milliseconds after midnight at which the weekend begins or ends.
+ * @draft ICU 4.4
+ */
+U_DRAFT int32_t U_EXPORT2
+ucal_getWeekendTransition(const UCalendar *cal, UCalendarDaysOfWeek dayOfWeek, UErrorCode *status);
+
+/**
+ * Returns TRUE if the given UDate is in the weekend in
+ * this calendar system.
+ * @param cal The UCalendar to query.
+ * @param date The UDate in question.
+ * @param status The error code for the operation.
+ * @return TRUE if the given UDate is in the weekend in
+ * this calendar system, FALSE otherwise.
+ * @draft ICU 4.4
+ */
+U_DRAFT UBool U_EXPORT2
+ucal_isWeekend(const UCalendar *cal, UDate date, UErrorCode *status);
 
 
 #endif /* #if !UCONFIG_NO_FORMATTING */

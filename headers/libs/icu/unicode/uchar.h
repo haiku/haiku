@@ -1,6 +1,6 @@
 /*
 **********************************************************************
-*   Copyright (C) 1997-2009, International Business Machines
+*   Copyright (C) 1997-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 **********************************************************************
 *
@@ -39,7 +39,7 @@ U_CDECL_BEGIN
  * @see u_getUnicodeVersion
  * @stable ICU 2.0
  */
-#define U_UNICODE_VERSION "5.1"
+#define U_UNICODE_VERSION "5.2"
 
 /**
  * \file
@@ -321,51 +321,29 @@ typedef enum UProperty {
     /** Binary property NFD_Inert.
         ICU-specific property for characters that are inert under NFD,
         i.e., they do not interact with adjacent characters.
-        Used for example in normalizing transforms in incremental mode
-        to find the boundary of safely normalizable text despite possible
-        text additions.
-
-        There is one such property per normalization form.
-        These properties are computed as follows - an inert character is:
-        a) unassigned, or ALL of the following:
-        b) of combining class 0.
-        c) not decomposed by this normalization form.
-        AND if NFC or NFKC,
-        d) can never compose with a previous character.
-        e) can never compose with a following character.
-        f) can never change if another character is added.
-           Example: a-breve might satisfy all but f, but if you
-           add an ogonek it changes to a-ogonek + breve
-
-        See also com.ibm.text.UCD.NFSkippable in the ICU4J repository,
-        and icu/source/common/unormimp.h .
+        See the documentation for the Normalizer2 class and the
+        Normalizer2::isInert() method.
         @stable ICU 3.0 */
     UCHAR_NFD_INERT=37,
     /** Binary property NFKD_Inert.
         ICU-specific property for characters that are inert under NFKD,
         i.e., they do not interact with adjacent characters.
-        Used for example in normalizing transforms in incremental mode
-        to find the boundary of safely normalizable text despite possible
-        text additions.
-        @see UCHAR_NFD_INERT
+        See the documentation for the Normalizer2 class and the
+        Normalizer2::isInert() method.
         @stable ICU 3.0 */
     UCHAR_NFKD_INERT=38,
     /** Binary property NFC_Inert.
         ICU-specific property for characters that are inert under NFC,
         i.e., they do not interact with adjacent characters.
-        Used for example in normalizing transforms in incremental mode
-        to find the boundary of safely normalizable text despite possible
-        text additions.
-        @see UCHAR_NFD_INERT
+        See the documentation for the Normalizer2 class and the
+        Normalizer2::isInert() method.
         @stable ICU 3.0 */
     UCHAR_NFC_INERT=39,
     /** Binary property NFKC_Inert.
         ICU-specific property for characters that are inert under NFKC,
         i.e., they do not interact with adjacent characters.
-        Used for example in normalizing transforms in incremental mode
-        to find the boundary of safely normalizable text despite possible
-        text additions.
-        @see UCHAR_NFD_INERT
+        See the documentation for the Normalizer2 class and the
+        Normalizer2::isInert() method.
         @stable ICU 3.0 */
     UCHAR_NFKC_INERT=40,
     /** Binary Property Segment_Starter.
@@ -373,7 +351,7 @@ typedef enum UProperty {
         Unicode normalization and combining character sequences.
         They have ccc=0 and do not occur in non-initial position of the
         canonical decomposition of any character
-        (like " in NFD(a-umlaut) and a Jamo T in an NFD(Hangul LVT)).
+        (like a-umlaut in NFD and a Jamo T in an NFD(Hangul LVT)).
         ICU uses this property for segmenting a string for generating a set of
         canonically equivalent strings, e.g. for canonical closure while
         processing collation tailoring rules.
@@ -414,8 +392,24 @@ typedef enum UProperty {
         See the uchar.h file documentation.
         @stable ICU 3.4 */
     UCHAR_POSIX_XDIGIT=48,
+    /** Binary property Cased. For Lowercase, Uppercase and Titlecase characters. @draft ICU 4.4 */
+    UCHAR_CASED=49,
+    /** Binary property Case_Ignorable. Used in context-sensitive case mappings. @draft ICU 4.4 */
+    UCHAR_CASE_IGNORABLE=50,
+    /** Binary property Changes_When_Lowercased. @draft ICU 4.4 */
+    UCHAR_CHANGES_WHEN_LOWERCASED=51,
+    /** Binary property Changes_When_Uppercased. @draft ICU 4.4 */
+    UCHAR_CHANGES_WHEN_UPPERCASED=52,
+    /** Binary property Changes_When_Titlecased. @draft ICU 4.4 */
+    UCHAR_CHANGES_WHEN_TITLECASED=53,
+    /** Binary property Changes_When_Casefolded. @draft ICU 4.4 */
+    UCHAR_CHANGES_WHEN_CASEFOLDED=54,
+    /** Binary property Changes_When_Casemapped. @draft ICU 4.4 */
+    UCHAR_CHANGES_WHEN_CASEMAPPED=55,
+    /** Binary property Changes_When_NFKC_Casefolded. @draft ICU 4.4 */
+    UCHAR_CHANGES_WHEN_NFKC_CASEFOLDED=56,
     /** One more than the last constant for binary Unicode properties. @stable ICU 2.1 */
-    UCHAR_BINARY_LIMIT=49,
+    UCHAR_BINARY_LIMIT=57,
 
     /** Enumerated property Bidi_Class.
         Same as u_charDirection, returns UCharDirection values. @stable ICU 2.2 */
@@ -1291,8 +1285,63 @@ enum UBlockCode {
     /** @stable ICU 4.0 */
     UBLOCK_DOMINO_TILES = 171, /*[1F030]*/
 
+    /* New blocks in Unicode 5.2 */
+
+    /** @draft ICU 4.4 */
+    UBLOCK_SAMARITAN = 172, /*[0800]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS_EXTENDED = 173, /*[18B0]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_TAI_THAM = 174, /*[1A20]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_VEDIC_EXTENSIONS = 175, /*[1CD0]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_LISU = 176, /*[A4D0]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_BAMUM = 177, /*[A6A0]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_COMMON_INDIC_NUMBER_FORMS = 178, /*[A830]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_DEVANAGARI_EXTENDED = 179, /*[A8E0]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_HANGUL_JAMO_EXTENDED_A = 180, /*[A960]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_JAVANESE = 181, /*[A980]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_MYANMAR_EXTENDED_A = 182, /*[AA60]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_TAI_VIET = 183, /*[AA80]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_MEETEI_MAYEK = 184, /*[ABC0]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_HANGUL_JAMO_EXTENDED_B = 185, /*[D7B0]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_IMPERIAL_ARAMAIC = 186, /*[10840]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_OLD_SOUTH_ARABIAN = 187, /*[10A60]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_AVESTAN = 188, /*[10B00]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_INSCRIPTIONAL_PARTHIAN = 189, /*[10B40]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_INSCRIPTIONAL_PAHLAVI = 190, /*[10B60]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_OLD_TURKIC = 191, /*[10C00]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_RUMI_NUMERAL_SYMBOLS = 192, /*[10E60]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_KAITHI = 193, /*[11080]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_EGYPTIAN_HIEROGLYPHS = 194, /*[13000]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_ENCLOSED_ALPHANUMERIC_SUPPLEMENT = 195, /*[1F100]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_ENCLOSED_IDEOGRAPHIC_SUPPLEMENT = 196, /*[1F200]*/
+    /** @draft ICU 4.4 */
+    UBLOCK_CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C = 197, /*[2A700]*/
+
     /** @stable ICU 2.0 */
-    UBLOCK_COUNT = 172,
+    UBLOCK_COUNT = 198,
 
     /** @stable ICU 2.0 */
     UBLOCK_INVALID_CODE=-1
@@ -1337,6 +1386,7 @@ typedef enum UCharNameChoice {
     U_UNICODE_CHAR_NAME,
     U_UNICODE_10_CHAR_NAME,
     U_EXTENDED_CHAR_NAME,
+    U_CHAR_NAME_ALIAS,          /**< Corrected name from NameAliases.txt. @draft ICU 4.4 */
     U_CHAR_NAME_CHOICE_COUNT
 } UCharNameChoice;
 
@@ -1465,6 +1515,8 @@ typedef enum UJoiningGroup {
     U_JG_KHAPH,     /**< @stable ICU 2.6 */
     U_JG_ZHAIN,     /**< @stable ICU 2.6 */
     U_JG_BURUSHASKI_YEH_BARREE, /**< @stable ICU 4.0 */
+    U_JG_FARSI_YEH, /**< @draft ICU 4.4 */
+    U_JG_NYA,       /**< @draft ICU 4.4 */
     U_JG_COUNT
 } UJoiningGroup;
 
@@ -1584,7 +1636,8 @@ typedef enum ULineBreak {
     U_LB_JL = 33,                /*[JL]*/
     U_LB_JT = 34,                /*[JT]*/
     U_LB_JV = 35,                /*[JV]*/
-    U_LB_COUNT = 36
+    U_LB_CLOSE_PARENTHESIS = 36, /*[CP]*/ /* new in Unicode 5.2/ICU 4.4 */
+    U_LB_COUNT = 37
 } ULineBreak;
 
 /**
@@ -2126,8 +2179,8 @@ u_isJavaSpaceChar(UChar32 c);
  * A character is considered to be a Java whitespace character if and only
  * if it satisfies one of the following criteria:
  *
- * - It is a Unicode separator (categories "Z"), but is not
- *      a no-break space (U+00A0 NBSP or U+2007 Figure Space or U+202F Narrow NBSP).
+ * - It is a Unicode Separator character (categories "Z" = "Zs" or "Zl" or "Zp"), but is not
+ *      also a non-breaking space (U+00A0 NBSP or U+2007 Figure Space or U+202F Narrow NBSP).
  * - It is U+0009 HORIZONTAL TABULATION.
  * - It is U+000A LINE FEED.
  * - It is U+000B VERTICAL TABULATION.
@@ -2137,9 +2190,15 @@ u_isJavaSpaceChar(UChar32 c);
  * - It is U+001D GROUP SEPARATOR.
  * - It is U+001E RECORD SEPARATOR.
  * - It is U+001F UNIT SEPARATOR.
- * - It is U+0085 NEXT LINE.
  *
- * Same as java.lang.Character.isWhitespace() except that Java omits U+0085.
+ * This API tries to sync with the semantics of Java's
+ * java.lang.Character.isWhitespace(), but it may not return
+ * the exact same results because of the Unicode version
+ * difference.
+ *
+ * Note: Unicode 4.0.1 changed U+200B ZERO WIDTH SPACE from a Space Separator (Zs)
+ * to a Format Control (Cf). Since then, isWhitespace(0x200b) returns false.
+ * See http://www.unicode.org/versions/Unicode4.0.1/
  *
  * Note: There are several ICU whitespace functions; please see the uchar.h
  * file documentation for a detailed comparison.
@@ -2457,6 +2516,9 @@ u_charName(UChar32 code, UCharNameChoice nameChoice,
  * The ISO 10646 comment is an informative field in the Unicode Character
  * Database (UnicodeData.txt field 11) and is from the ISO 10646 names list.
  *
+ * Note: Unicode 5.2 removes all ISO comment data, resulting in empty strings
+ * returned for all characters.
+ *
  * @param c The character (code point) for which to get the ISO comment.
  *             It must be <code>0<=c<=0x10ffff</code>.
  * @param dest Destination address for copying the comment.
@@ -2687,7 +2749,7 @@ u_getPropertyValueName(UProperty property,
  *
  * @return a value integer or UCHAR_INVALID_CODE if the given name
  *         does not match any value of the given property, or if the
- *         property is invalid.  Note: U CHAR_GENERAL_CATEGORY values
+ *         property is invalid.  Note: UCHAR_GENERAL_CATEGORY_MASK values
  *         are not values of UCharCategory, but rather mask values
  *         produced by U_GET_GC_MASK().  This allows grouped
  *         categories such as [:L:] to be represented.
@@ -2749,11 +2811,9 @@ u_isIDPart(UChar32 c);
  * according to Java.
  * True for characters with general category "Cf" (format controls) as well as
  * non-whitespace ISO controls
- * (U+0000..U+0008, U+000E..U+001B, U+007F..U+0084, U+0086..U+009F).
+ * (U+0000..U+0008, U+000E..U+001B, U+007F..U+009F).
  *
- * Same as java.lang.Character.isIdentifierIgnorable()
- * except that Java also returns TRUE for U+0085 Next Line
- * (it omits U+0085 from whitespace ISO controls).
+ * Same as java.lang.Character.isIdentifierIgnorable().
  *
  * Note that Unicode just recommends to ignore Cf (format controls).
  *
@@ -3032,6 +3092,7 @@ u_charAge(UChar32 c, UVersionInfo versionArray);
 U_STABLE void U_EXPORT2
 u_getUnicodeVersion(UVersionInfo versionArray);
 
+#if !UCONFIG_NO_NORMALIZATION
 /**
  * Get the FC_NFKC_Closure property string for a character.
  * See Unicode Standard Annex #15 for details, search for "FC_NFKC_Closure"
@@ -3055,6 +3116,9 @@ u_getUnicodeVersion(UVersionInfo versionArray);
  */
 U_STABLE int32_t U_EXPORT2
 u_getFC_NFKC_Closure(UChar32 c, UChar *dest, int32_t destCapacity, UErrorCode *pErrorCode);
+
+#endif
+
 
 U_CDECL_END
 

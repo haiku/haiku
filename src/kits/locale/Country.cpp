@@ -25,6 +25,9 @@
 #include <stdarg.h>
 
 
+#define ICU_VERSION icu_44
+
+
 using BPrivate::B_WEEK_START_MONDAY;
 using BPrivate::B_WEEK_START_SUNDAY;
 
@@ -53,7 +56,7 @@ BCountry::BCountry(const char* languageCode, const char* countryCode)
 	:
 	fStrings(gStrings)
 {
-	fICULocale = new icu_4_2::Locale(languageCode, countryCode);
+	fICULocale = new ICU_VERSION::Locale(languageCode, countryCode);
 	fICULongDateFormatter = DateFormat::createDateInstance(
 		DateFormat::FULL, *fICULocale);
  	fICUShortDateFormatter = DateFormat::createDateInstance(
@@ -69,7 +72,7 @@ BCountry::BCountry(const char* languageAndCountryCode)
 	:
 	fStrings(gStrings)
 {
-	fICULocale = new icu_4_2::Locale(languageAndCountryCode);
+	fICULocale = new ICU_VERSION::Locale(languageAndCountryCode);
 	fICULongDateFormatter = DateFormat::createDateInstance(
 		DateFormat::FULL, *fICULocale);
  	fICUShortDateFormatter = DateFormat::createDateInstance(
@@ -157,7 +160,7 @@ BCountry::FormatDate(BString *string, time_t time, bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
-	icu_4_2::DateFormat* dateFormatter
+	ICU_VERSION::DateFormat* dateFormatter
 		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	UnicodeString ICUString;
 	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
@@ -183,8 +186,8 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
-	icu_4_2::DateFormat* timeFormatter;
- 	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
+	ICU_VERSION::DateFormat* timeFormatter;
+	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
 
@@ -195,10 +198,19 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 }
 
 
+void
+BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
+	time_t time)
+{
+	// TODO : this needs ICU 4.4 functions
+	FormatTime(string, time, false);
+}
+
+
 bool
 BCountry::DateFormat(BString& format, bool longFormat) const
 {
-	icu_4_2::DateFormat* dateFormatter
+	ICU_VERSION::DateFormat* dateFormatter
 		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	SimpleDateFormat* dateFormatterImpl
 		= static_cast<SimpleDateFormat*>(dateFormatter);
@@ -217,7 +229,7 @@ BCountry::DateFormat(BString& format, bool longFormat) const
 void
 BCountry::SetDateFormat(const char* formatString, bool longFormat)
 {
-	icu_4_2::DateFormat* dateFormatter
+	ICU_VERSION::DateFormat* dateFormatter
 		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	SimpleDateFormat* dateFormatterImpl
 		= static_cast<SimpleDateFormat*>(dateFormatter);
@@ -230,7 +242,7 @@ BCountry::SetDateFormat(const char* formatString, bool longFormat)
 void
 BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 {
-	icu_4_2::DateFormat* dateFormatter
+	ICU_VERSION::DateFormat* dateFormatter
 		= longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	SimpleDateFormat* dateFormatterImpl
 		= static_cast<SimpleDateFormat*>(dateFormatter);
@@ -243,7 +255,7 @@ BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 bool
 BCountry::TimeFormat(BString& format, bool longFormat) const
 {
-	icu_4_2::DateFormat* dateFormatter;
+	ICU_VERSION::DateFormat* dateFormatter;
  	dateFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	SimpleDateFormat* dateFormatterImpl
 		= static_cast<SimpleDateFormat*>(dateFormatter);

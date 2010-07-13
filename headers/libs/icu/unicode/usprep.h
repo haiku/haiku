@@ -1,7 +1,7 @@
 /*
  *******************************************************************************
  *
- *   Copyright (C) 2003-2009, International Business Machines
+ *   Copyright (C) 2003-2010, International Business Machines
  *   Corporation and others.  All Rights Reserved.
  *
  *******************************************************************************
@@ -23,6 +23,8 @@
  */
 
 #include "unicode/utypes.h"
+#include "unicode/localpointer.h"
+
 /**
  *
  * StringPrep API implements the StingPrep framework as described by RFC 3454.
@@ -86,78 +88,78 @@ typedef struct UStringPrepProfile UStringPrepProfile;
  * enums for the standard stringprep profile types
  * supported by usprep_openByType.
  * @see usprep_openByType
- * @draft ICU 4.2
+ * @stable ICU 4.2
  */
 typedef enum UStringPrepProfileType {
     /**
      * RFC3491 Nameprep
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     USPREP_RFC3491_NAMEPREP,
     /**
      * RFC3530 nfs4_cs_prep
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3530_NFS4_CS_PREP,
     /**
      * RFC3530 nfs4_cs_prep with case insensitive option
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3530_NFS4_CS_PREP_CI,
     /**
      * RFC3530 nfs4_cis_prep
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3530_NFS4_CIS_PREP,
     /**
      * RFC3530 nfs4_mixed_prep for prefix
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3530_NFS4_MIXED_PREP_PREFIX,
     /**
      * RFC3530 nfs4_mixed_prep for suffix
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3530_NFS4_MIXED_PREP_SUFFIX,
     /**
      * RFC3722 iSCSI
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3722_ISCSI,
     /**
      * RFC3920 XMPP Nodeprep
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3920_NODEPREP,
     /**
      * RFC3920 XMPP Resourceprep
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC3920_RESOURCEPREP,
     /**
      * RFC4011 Policy MIB Stringprep
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC4011_MIB,
     /**
      * RFC4013 SASLprep
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     USPREP_RFC4013_SASLPREP,
     /**
      * RFC4505 trace
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC4505_TRACE,
     /**
      * RFC4518 LDAP
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC4518_LDAP,
     /**
      * RFC4518 LDAP for case ignore, numeric and stored prefix
      * matching rules
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
 	USPREP_RFC4518_LDAP_CI
 } UStringPrepProfileType;
@@ -191,9 +193,9 @@ usprep_open(const char* path,
  * @return          Pointer to UStringPrepProfile that is opened. Should be closed by
  *                  calling usprep_close()
  * @see usprep_close()
- * @draft ICU 4.2
+ * @stable ICU 4.2
  */
-U_DRAFT UStringPrepProfile* U_EXPORT2
+U_STABLE UStringPrepProfile* U_EXPORT2
 usprep_openByType(UStringPrepProfileType type,
 				  UErrorCode* status);
 
@@ -205,6 +207,24 @@ usprep_openByType(UStringPrepProfileType type,
 U_STABLE void U_EXPORT2
 usprep_close(UStringPrepProfile* profile);
 
+#if U_SHOW_CPLUSPLUS_API
+
+U_NAMESPACE_BEGIN
+
+/**
+ * \class LocalUStringPrepProfilePointer
+ * "Smart pointer" class, closes a UStringPrepProfile via usprep_close().
+ * For most methods see the LocalPointerBase base class.
+ *
+ * @see LocalPointerBase
+ * @see LocalPointer
+ * @draft ICU 4.4
+ */
+U_DEFINE_LOCAL_OPEN_POINTER(LocalUStringPrepProfilePointer, UStringPrepProfile, usprep_close);
+
+U_NAMESPACE_END
+
+#endif
 
 /**
  * Prepare the input buffer for use in applications with the given profile. This operation maps, normalizes(NFKC),

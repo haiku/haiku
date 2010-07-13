@@ -42,7 +42,8 @@ class TSection {
 
 class TSectionEdit: public BControl {
 	public:
-						TSectionEdit(BRect frame, const char *name, uint32 sections);
+						TSectionEdit(BRect frame, const char *name,
+							uint32 sections);
 		virtual			~TSectionEdit();
 
 		virtual void 	AttachedToWindow();

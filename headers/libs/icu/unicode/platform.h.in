@@ -1,8 +1,12 @@
 /*
 ******************************************************************************
 *
-*   Copyright (C) 1997-2009, International Business Machines
+*   Copyright (C) 1997-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
+*
+******************************************************************************
+*
+* Note: autoconf creates platform.h from platform.h.in at configure time.
 *
 ******************************************************************************
 *
@@ -24,14 +28,32 @@
  * \brief Basic types for the platform 
  */
 
-/* Define the platform we're on. */
+/* This file should be included before uvernum.h. */
+#if defined(UVERNUM_H)
+# error Do not include unicode/uvernum.h before #including unicode/platform.h.  Instead of unicode/uvernum.h, #include unicode/uversion.h
+#endif
+
+/**
+ * Determine wheter to enable auto cleanup of libraries. 
+ * @draft ICU 4.4
+ */
+#ifndef UCLN_NO_AUTO_CLEANUP
+#define UCLN_NO_AUTO_CLEANUP @UCLN_NO_AUTO_CLEANUP@
+#endif
+
+/* Need platform.h when using CYGWINMSVC to get definitions above. Ignore everything else. */
+#ifndef CYGWINMSVC
+
+/** Define the platform we're on. */
 #ifndef @platform@
 #define @platform@
 #endif
 
 /**
  * \def U_HAVE_DIRENT_H
- * Define whether dirent.h is available */
+ * Define whether dirent.h is available 
+ * @internal
+ */
 #ifndef U_HAVE_DIRENT_H
 #define U_HAVE_DIRENT_H @U_HAVE_DIRENT_H@
 #endif
@@ -61,7 +83,7 @@
 
 /**
  * \def U_HAVE_STD_STRING
- * Define whether the standard C++ (STL) <string> header is available.
+ * Define whether the standard C++ (STL) &lt;string&gt; header is available.
  * For platforms that do not use platform.h and do not define this constant
  * in their platform-specific headers, std_string.h defaults
  * U_HAVE_STD_STRING to 1.
@@ -107,75 +129,7 @@
 /** @} */
 
 /*===========================================================================*/
-/** @{ Generic data types                                                        */
-/*===========================================================================*/
-
-#include <sys/types.h>
-
-/* If your platform does not have the <inttypes.h> header, you may
-   need to edit the typedefs below. */
-#if U_HAVE_INTTYPES_H
-
-/* autoconf 2.13 sometimes can't properly find the data types in <inttypes.h> */
-/* os/390 needs <inttypes.h>, but it doesn't have int8_t, and it sometimes */
-/* doesn't have uint8_t depending on the OS version. */
-/* So we have this work around. */
-#ifdef OS390
-/* The features header is needed to get (u)int64_t sometimes. */
-#include <features.h>
-#if ! U_HAVE_INT8_T
-typedef signed char int8_t;
-#endif
-#if !defined(__uint8_t)
-#define __uint8_t 1
-typedef unsigned char uint8_t;
-#endif
-#endif /* OS390 */
-
-#include <inttypes.h>
-
-#else /* U_HAVE_INTTYPES_H */
-
-#if ! U_HAVE_INT8_T
-typedef signed char int8_t;
-#endif
-
-#if ! U_HAVE_UINT8_T
-typedef unsigned char uint8_t;
-#endif
-
-#if ! U_HAVE_INT16_T
-typedef signed short int16_t;
-#endif
-
-#if ! U_HAVE_UINT16_T
-typedef unsigned short uint16_t;
-#endif
-
-#if ! U_HAVE_INT32_T
-typedef signed int int32_t;
-#endif
-
-#if ! U_HAVE_UINT32_T
-typedef unsigned int uint32_t;
-#endif
-
-#if ! U_HAVE_INT64_T
-    typedef signed long long int64_t;
-/* else we may not have a 64-bit type */
-#endif
-
-#if ! U_HAVE_UINT64_T
-    typedef unsigned long long uint64_t;
-/* else we may not have a 64-bit type */
-#endif
-
-#endif
-
-/** @} */
-
-/*===========================================================================*/
-/** @{ Compiler and environment features                                         */
+/** @{ Compiler and environment features                                     */
 /*===========================================================================*/
 
 /* Define whether namespace is supported */
@@ -193,7 +147,9 @@ typedef unsigned int uint32_t;
 #endif
 
 /* 1 or 0 to enable or disable threads.  If undefined, default is: enable threads. */
+#ifndef ICU_USE_THREADS 
 #define ICU_USE_THREADS @ICU_USE_THREADS@
+#endif
 
 /* On strong memory model CPUs (e.g. x86 CPUs), we use a safe & quick double check lock. */
 #if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
@@ -228,15 +184,27 @@ typedef unsigned int uint32_t;
 #define U_ENABLE_TRACING @U_ENABLE_TRACING@
 #endif
 
-/* Do we allow ICU users to use the draft APIs by default? */
+/**
+ * Whether to enable Dynamic loading in ICU
+ * @draft ICU 4.4
+ */
+#ifndef U_ENABLE_DYLOAD
+#define U_ENABLE_DYLOAD @U_ENABLE_DYLOAD@
+#endif
+
+/**
+ * Whether to test Dynamic loading as an OS capabilty
+ * @draft ICU 4.4
+ */
+#ifndef U_CHECK_DYLOAD
+#define U_CHECK_DYLOAD @U_CHECK_DYLOAD@
+#endif
+
+
+/** Do we allow ICU users to use the draft APIs by default? */
 #ifndef U_DEFAULT_SHOW_DRAFT
 #define U_DEFAULT_SHOW_DRAFT @U_DEFAULT_SHOW_DRAFT@
 #endif
-
-/* Define the library suffix in a C syntax. */
-#define U_HAVE_LIB_SUFFIX @U_HAVE_LIB_SUFFIX@
-#define U_LIB_SUFFIX_C_NAME @ICULIBSUFFIXCNAME@
-#define U_LIB_SUFFIX_C_NAME_STRING "@ICULIBSUFFIXCNAME@"
 
 /** @} */
 
@@ -274,11 +242,18 @@ typedef unsigned int uint32_t;
  * Do not use this macro. Use the UNICODE_STRING or U_STRING_DECL macros
  * instead.
  * @internal
+ *
+ * \def U_GNUC_UTF16_STRING
+ * @internal
  */
+#ifndef U_GNUC_UTF16_STRING
+#define U_GNUC_UTF16_STRING @U_CHECK_GNUC_UTF16_STRING@
+#endif
 #if @U_CHECK_UTF16_STRING@ || defined(U_CHECK_UTF16_STRING)
 #if (defined(__xlC__) && defined(__IBM_UTF_LITERAL) && U_SIZEOF_WCHAR_T != 2) \
     || (defined(__HP_aCC) && __HP_aCC >= 035000) \
-    || (defined(__HP_cc) && __HP_cc >= 111106)
+    || (defined(__HP_cc) && __HP_cc >= 111106) \
+    || U_GNUC_UTF16_STRING
 #define U_DECLARE_UTF16(string) u ## string
 #elif (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x550)
 /* || (defined(__SUNPRO_C) && __SUNPRO_C >= 0x580) */
@@ -338,7 +313,7 @@ typedef unsigned int uint32_t;
 #define U_EXPORT2
 
 /* cygwin needs to export/import data */
-#ifdef U_CYGWIN
+#if defined(U_CYGWIN) && !defined(__GNUC__)
 #define U_IMPORT __declspec(dllimport)
 #else
 #define U_IMPORT 
@@ -365,6 +340,20 @@ typedef unsigned int uint32_t;
 /** @} */
 
 /*===========================================================================*/
+/** @{ GCC built in functions for atomic memory operations                       */
+/*===========================================================================*/
+
+/**
+ * \def U_HAVE_GCC_ATOMICS
+ * @internal
+ */
+#ifndef U_HAVE_GCC_ATOMICS
+#define U_HAVE_GCC_ATOMICS @U_HAVE_GCC_ATOMICS@
+#endif
+
+/** @} */
+
+/*===========================================================================*/
 /** @{ Programs used by ICU code                                                 */
 /*===========================================================================*/
 
@@ -377,5 +366,36 @@ typedef unsigned int uint32_t;
 #endif
 
 /** @} */
+
+#endif /* CYGWINMSVC */
+
+/*===========================================================================*/
+/* Custom icu entry point renaming                                                  */
+/*===========================================================================*/
+
+/**
+ * Define the library suffix with C syntax.
+ * @internal
+ */
+# define U_LIB_SUFFIX_C_NAME @ICULIBSUFFIXCNAME@
+/**
+ * Define the library suffix as a string with C syntax
+ * @internal
+ */
+# define U_LIB_SUFFIX_C_NAME_STRING "@ICULIBSUFFIXCNAME@"
+/**
+ * 1 if a custom library suffix is set
+ * @internal
+ */
+# define U_HAVE_LIB_SUFFIX @U_HAVE_LIB_SUFFIX@
+
+#if U_HAVE_LIB_SUFFIX
+# ifndef U_ICU_ENTRY_POINT_RENAME
+/* Renaming pattern:    u_strcpy_41_suffix */
+#  define U_ICU_ENTRY_POINT_RENAME(x)    x ## _ ## @LIB_VERSION_MAJOR@ ## @ICULIBSUFFIXCNAME@
+#  define U_DEF_ICUDATA_ENTRY_POINT(major, minor) icudt##@ICULIBSUFFIXCNAME@##major##minor##_dat
+
+# endif
+#endif
 
 #endif

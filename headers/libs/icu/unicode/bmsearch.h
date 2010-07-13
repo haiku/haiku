@@ -1,6 +1,6 @@
 /*
  ******************************************************************************
- *   Copyright (C) 1996-2009, International Business Machines                 *
+ *   Copyright (C) 1996-2010, International Business Machines                 *
  *   Corporation and others.  All Rights Reserved.                            *
  ******************************************************************************
  */
@@ -16,7 +16,7 @@
 
 #include "unicode/utypes.h"
 
-#if !UCONFIG_NO_COLLATION
+#if !UCONFIG_NO_COLLATION && !UCONFIG_NO_BREAK_ITERATION
 
 #include "unicode/uobject.h"
 #include "unicode/ucol.h"
@@ -202,10 +202,12 @@ public:
 
     /**
      * UObject glue...
+     * @internal ICU 4.0.1 technology preview
      */
     virtual UClassID getDynamicClassID() const;
     /**
      * UObject glue...
+     * @internal ICU 4.0.1 technology preview
      */
     static UClassID getStaticClassID();
     

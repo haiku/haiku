@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src build icu ;
-
-SubInclude HAIKU_TOP src build icu common ;
-SubInclude HAIKU_TOP src build icu i18n ;
-SubInclude HAIKU_TOP src build icu stubdata ;
-SubInclude HAIKU_TOP src build icu toolutil ;
-

@@ -114,7 +114,6 @@ SubInclude HAIKU_TOP src tools fixup_tos_boot_checksum ;
 SubInclude HAIKU_TOP src tools fs_shell ;
 SubInclude HAIKU_TOP src tools gensyscalls ;
 SubInclude HAIKU_TOP src tools hack_coff ;
-SubInclude HAIKU_TOP src tools icu ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools locale ;
 SubInclude HAIKU_TOP src tools makebootable ;

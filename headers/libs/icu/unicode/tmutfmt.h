@@ -1,6 +1,6 @@
 /*
  *******************************************************************************
- * Copyright (C) 2008, Google, International Business Machines Corporation and *
+ * Copyright (C) 2010, Google, International Business Machines Corporation and *
  * others. All Rights Reserved.                                                *
  *******************************************************************************
  */
@@ -33,16 +33,6 @@ union UHashTok;
 
 U_NAMESPACE_BEGIN
 
-U_CDECL_BEGIN
-
-/**
- * @internal ICU 4.2
- */
-static UBool U_CALLCONV hashTableValueComparator(UHashTok val1, UHashTok val2) ;
-
-U_CDECL_END
-
-
 class Hashtable;
 
 
@@ -50,7 +40,7 @@ class Hashtable;
  * Format or parse a TimeUnitAmount, using plural rules for the units where available.
  *
  * <P>
- * Code Sample: 
+ * Code Sample:
  * <pre>
  *   // create time unit amount instance - a combination of Number and time unit
  *   UErrorCode status = U_ZERO_ERROR;
@@ -66,7 +56,7 @@ class Hashtable;
  *       Formattable result;
  *       ((Format*)format)->parseObject(formatted, result, status);
  *       if (U_SUCCESS(status)) {
- *           assert (result == formattable); 
+ *           assert (result == formattable);
  *       }
  *   }
  * </pre>
@@ -91,17 +81,17 @@ public:
         kAbbreviate = 1,
         kTotal = kAbbreviate + 1
     };
-    
+
     /**
-     * Create TimeUnitFormat with default locale, and full name style. 
+     * Create TimeUnitFormat with default locale, and full name style.
      * Use setLocale and/or setFormat to modify.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     TimeUnitFormat(UErrorCode& status);
 
     /**
      * Create TimeUnitFormat given locale, and full name style.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     TimeUnitFormat(const Locale& locale, UErrorCode& status);
 
@@ -113,13 +103,13 @@ public:
 
     /**
      * Copy constructor.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     TimeUnitFormat(const TimeUnitFormat&);
 
     /**
      * deconstructor
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     virtual ~TimeUnitFormat();
 
@@ -127,13 +117,13 @@ public:
      * Clone this Format object polymorphically. The caller owns the result and
      * should delete it when done.
      * @return    A copy of the object.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     virtual Format* clone(void) const;
 
     /**
      * Assignment operator
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     TimeUnitFormat& operator=(const TimeUnitFormat& other);
 
@@ -143,16 +133,16 @@ public:
      * of different subclasses are considered unequal.
      * @param other    the object to be compared with.
      * @return         true if the given Format objects are semantically equal.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     virtual UBool operator==(const Format& other) const;
 
     /**
-     * Return true if the given Format objects are not semantically equal. 
+     * Return true if the given Format objects are not semantically equal.
      * Objects of different subclasses are considered unequal.
      * @param other the object to be compared with.
      * @return      true if the given Format objects are not semantically equal.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     UBool operator!=(const Format& other) const;
 
@@ -160,18 +150,21 @@ public:
      * Set the locale used for formatting or parsing.
      * @param locale  the locale to be set
      * @param status  output param set to success/failure code on exit
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     void setLocale(const Locale& locale, UErrorCode& status);
 
 
     /**
-     * Set the number format used for formatting or parsing. 
+     * Set the number format used for formatting or parsing.
      * @param format  the number formatter to be set
      * @param status  output param set to success/failure code on exit
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     void setNumberFormat(const NumberFormat& format, UErrorCode& status);
+
+
+    // using MeasureFormat::format;
 
     /**
      * Format a TimeUnitAmount.
@@ -179,19 +172,19 @@ public:
      * or the number in time unit amount is not a double type or long type
      * numeric, it returns a failing status: U_ILLEGAL_ARGUMENT_ERROR.
      * @see Format#format(const Formattable&, UnicodeString&, FieldPosition&,  UErrorCode&) const
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
-    virtual UnicodeString& format(const Formattable& obj, 
+    virtual UnicodeString& format(const Formattable& obj,
                                   UnicodeString& toAppendTo,
-                                  FieldPosition& pos, 
-                                  UErrorCode& status) const; 
+                                  FieldPosition& pos,
+                                  UErrorCode& status) const;
 
     /**
      * Parse a TimeUnitAmount.
      * @see Format#parseObject(const UnicodeString&, Formattable&, ParsePosition&) const;
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
-    virtual void parseObject(const UnicodeString& source, 
+    virtual void parseObject(const UnicodeString& source,
                              Formattable& result,
                              ParsePosition& pos) const;
 
@@ -204,7 +197,7 @@ public:
      * .       erived::getStaticClassID()) ...
      * </pre>
      * @return          The class ID for all objects of this class.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     static UClassID U_EXPORT2 getStaticClassID(void);
 
@@ -217,7 +210,7 @@ public:
      * @return          The class ID for this object. All objects of a
      *                  given class have the same class ID.  Objects of
      *                  other classes have different class IDs.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     virtual UClassID getDynamicClassID(void) const;
 
@@ -228,14 +221,12 @@ private:
     PluralRules*  fPluralRules;
     EStyle           fStyle;
 
-    friend UBool U_CALLCONV hashTableValueComparator(UHashTok val1, UHashTok val2);
-    
     void create(const Locale& locale, EStyle style, UErrorCode& status);
 
     // it might actually be simpler to make them Decimal Formats later.
     // initialize all private data members
-    void setup(UErrorCode& status); 
- 
+    void setup(UErrorCode& status);
+
     // initialize data member without fill in data for fTimeUnitToCountToPattern
     void initDataMembers(UErrorCode& status);
 
@@ -247,8 +238,8 @@ private:
     void checkConsistency(EStyle style, const char* key, UErrorCode& status);
 
     // fill in fTimeUnitToCountToPatterns from locale fall-back chain
-    void searchInLocaleChain(EStyle style, const char* key, 
-                             TimeUnit::UTimeUnitFields field, const char*, 
+    void searchInLocaleChain(EStyle style, const char* key,
+                             TimeUnit::UTimeUnitFields field, const char*,
                              const char*, Hashtable*, UErrorCode&);
 
     // initialize hash table

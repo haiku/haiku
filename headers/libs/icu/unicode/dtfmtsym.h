@@ -1,6 +1,6 @@
 /*  
 ********************************************************************************
-*   Copyright (C) 1997-2008, International Business Machines
+*   Copyright (C) 1997-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 ********************************************************************************
 *
@@ -214,11 +214,11 @@ public:
     void setEraNames(const UnicodeString* eraNames, int32_t count);
 
     /**
-     * Gets narrow era strings. For example: A" and "D".
+     * Gets narrow era strings. For example: "A" and "B".
      *
      * @param count    Filled in with length of the array.
      * @return         the narrow era strings.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     const UnicodeString* getNarrowEras(int32_t& count) const;
 
@@ -226,7 +226,7 @@ public:
      * Sets narrow era strings. For example: "A" and "B".
      * @param narrowEras  Array of narrow era strings (DateFormatSymbols retains ownership.)
      * @param count Filled in with length of the array.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     void setNarrowEras(const UnicodeString* narrowEras, int32_t count);
 
@@ -590,7 +590,41 @@ private:
     int32_t         fStandaloneShortQuartersCount;
 
     /**
-     * The format data of all the timezones in this locale.
+     * Localized names of time zones in this locale.  This is a
+     * two-dimensional array of strings of size n by m,
+     * where m is at least 5 and up to 7.  Each of the n rows is an
+     * entry containing the localized names for a single TimeZone.
+     *
+     * Each such row contains (with i ranging from 0..n-1):
+     * 
+     * zoneStrings[i][0] - time zone ID
+     *  example: America/Los_Angeles
+     * zoneStrings[i][1] - long name of zone in standard time
+     *  example: Pacific Standard Time
+     * zoneStrings[i][2] - short name of zone in standard time
+     *  example: PST
+     * zoneStrings[i][3] - long name of zone in daylight savings time
+     *  example: Pacific Daylight Time
+     * zoneStrings[i][4] - short name of zone in daylight savings time
+     *  example: PDT
+     * zoneStrings[i][5] - location name of zone
+     *  example: United States (Los Angeles)
+     * zoneStrings[i][6] - long generic name of zone
+     *  example: Pacific Time
+     * zoneStrings[i][7] - short generic of zone
+     *  example: PT
+     *
+     * The zone ID is not localized; it corresponds to the ID
+     * value associated with a system time zone object.  All other entries
+     * are localized names.  If a zone does not implement daylight savings
+     * time, the daylight savings time names are ignored.
+     *
+     * Note:CLDR 1.5 introduced metazone and its historical mappings.
+     * This simple two-dimensional array is no longer sufficient to represent
+     * localized names and its historic changes.  Since ICU 3.8.1, localized
+     * zone names extracted from ICU locale data is stored in a ZoneStringFormat
+     * instance.  But we still need to support the old way of customizing
+     * localized zone names, so we keep this field for the purpose.
      */
     UnicodeString   **fZoneStrings;         // Zone string array set by setZoneStrings
     UnicodeString   **fLocaleZoneStrings;   // Zone string array created by the locale

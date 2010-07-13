@@ -59,8 +59,7 @@ TTimeEdit::KeyDown(const char* bytes, int32 numBytes)
 		if (_IsValidDoubleDigi(doubleDigi))
 			number = doubleDigi;
 		fLastKeyDownTime = 0;
-	}
-	else {
+	} else {
 		fLastKeyDownTime = currentTime;
 		fLastKeyDownInt = number;
 	}
@@ -97,6 +96,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 
 	BRect bounds = section->Frame();
 	uint32 value = _SectionValue(index);
+	time_t time = fTime.Hour() * 3600 + fTime.Minute() * 60 + fTime.Second();
 
 	SetLowColor(ViewColor());
 	if (hasFocus) {
@@ -105,7 +105,31 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	}
 
 	BString text;
-	switch (index) {
+	int* fieldPositions;
+	int fieldCount;
+
+	// be_locale_roster->GetDefaultCountry->FormatTime(&text, fieldPositions,
+	// 	fieldCount, time);
+
+	// calc and center text in section rect
+	float width = be_plain_font->StringWidth(text.String());
+
+	BPoint offset(-((bounds.Width()- width) / 2.0) -1.0,
+		bounds.Height() / 2.0 -6.0);
+
+	SetHighColor(0, 0, 0, 255);
+	FillRect(bounds, B_SOLID_LOW);
+
+	BString field;
+	field.SetTo(text.String()+fieldPositions[index * 2],
+		fieldPositions[index * 2 + 1] - fieldPositions[index * 2]);
+	DrawString(field.String(), bounds.LeftBottom() - offset);
+
+	free(fieldPositions);
+}
+
+
+#if 0
 		case 0:
 			// hour
 			if (value > 12) {
@@ -138,21 +162,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 			else
 				text << "AM";
 			break;
-
-		default:
-			return;
-	}
-
-	// calc and center text in section rect
-	float width = be_plain_font->StringWidth(text.String());
-
-	BPoint offset(-((bounds.Width()- width) / 2.0) -1.0,
-		bounds.Height() / 2.0 -6.0);
-
-	SetHighColor(0, 0, 0, 255);
-	FillRect(bounds, B_SOLID_LOW);
-	DrawString(text.String(), bounds.LeftBottom() - offset);
-}
+#endif
 
 
 void

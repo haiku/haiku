@@ -38,7 +38,7 @@ SharedLibrary liblocale.so
 	  PropertyFile.cpp
 	  TimeFormat.cpp
 	  UnicodeChar.cpp
-	: be $(TARGET_LIBSTDC++) libicu-common.so libicu-i18n.so
+	: be $(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
 	;
 
 StaticLibrary liblocalestub.a

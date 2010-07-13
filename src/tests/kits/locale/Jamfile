@@ -36,7 +36,7 @@ LocaleTest formatTest.cpp ;
 
 Application ICUTest : 
 	ICUTest.cpp :
-	be libicu-common.so libicu-i18n.so libicu-data.so $(TARGET_LIBSUPC++) ;
+	be $(TARGET_LIBSUPC++) ;
 
 Addon catalogTestAddOn 
 	: catalogTestAddOn.cpp 

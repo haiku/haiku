@@ -1,6 +1,6 @@
 /*
  *******************************************************************************
- * Copyright (C) 1996-2009, International Business Machines
+ * Copyright (C) 1996-2010, International Business Machines
  * Corporation and others. All Rights Reserved.
  *******************************************************************************
 */
@@ -12,6 +12,7 @@
 
 #if !UCONFIG_NO_FORMATTING
 
+#include "unicode/localpointer.h"
 #include "unicode/ucal.h"
 #include "unicode/unum.h"
 /**
@@ -219,7 +220,8 @@ typedef enum UDateFormatStyle {
  * Below are a set of pre-defined skeletons that 
  * have pre-defined interval patterns in resource files.
  * Users are encouraged to use them in date interval format factory methods.
- *
+ * 
+ * @stable ICU 4.0
  */
 #define UDAT_HOUR_MINUTE                "hm"
 #define UDAT_YEAR                       "y"
@@ -443,15 +445,15 @@ typedef enum UDateFormatField {
     UDAT_TIMEZONE_GENERIC_FIELD = 24,
     /**
      * FieldPosition selector for 'c' field alignment,
-     * corresponding to the {@link #UCAL_DATE} field. 
+     * corresponding to the {@link #UCAL_DOW_LOCAL} field.
      * This displays the stand alone day name, if available.
      * @stable ICU 3.4
      */
     UDAT_STANDALONE_DAY_FIELD = 25,
-    
+
     /**
      * FieldPosition selector for 'L' field alignment,
-     * corresponding to the {@link #UCAL_MONTH} field.  
+     * corresponding to the {@link #UCAL_MONTH} field.
      * This displays the stand alone month name, if available.
      * @stable ICU 3.4
      */
@@ -483,7 +485,7 @@ typedef enum UDateFormatField {
     UDAT_TIMEZONE_SPECIAL_FIELD = 29,
 
    /**
-     * Number of FieldPosition and UFieldPosition selectors for 
+     * Number of FieldPosition and UFieldPosition selectors for
      * DateFormat and UDateFormat.
      * Valid selectors range from 0 to UDAT_FIELD_COUNT-1.
      * This value is subject to change if new fields are defined
@@ -493,6 +495,19 @@ typedef enum UDateFormatField {
     UDAT_FIELD_COUNT = 30
 
 } UDateFormatField;
+
+
+/**
+ * Maps from a UDateFormatField to the corresponding UCalendarDateFields.
+ * Note: since the mapping is many-to-one, there is no inverse mapping.
+ * @param field the UDateFormatField.
+ * @return the UCalendarDateField.  This will be UCAL_FIELD_COUNT in case
+ * of error (e.g., the input field is UDAT_FIELD_COUNT).
+ * @draft ICU 4.4
+ */
+U_DRAFT UCalendarDateFields U_EXPORT2
+udat_toCalendarDateField(UDateFormatField field);
+
 
 /**
  * Open a new UDateFormat for formatting and parsing dates and times.
@@ -534,6 +549,25 @@ udat_open(UDateFormatStyle  timeStyle,
 */
 U_STABLE void U_EXPORT2 
 udat_close(UDateFormat* format);
+
+#if U_SHOW_CPLUSPLUS_API
+
+U_NAMESPACE_BEGIN
+
+/**
+ * \class LocalUDateFormatPointer
+ * "Smart pointer" class, closes a UDateFormat via udat_close().
+ * For most methods see the LocalPointerBase base class.
+ *
+ * @see LocalPointerBase
+ * @see LocalPointer
+ * @draft ICU 4.4
+ */
+U_DEFINE_LOCAL_OPEN_POINTER(LocalUDateFormatPointer, UDateFormat, udat_close);
+
+U_NAMESPACE_END
+
+#endif
 
 /**
  * Open a copy of a UDateFormat.
@@ -956,6 +990,7 @@ udat_applyPatternRelative(UDateFormat *format,
                           const UChar *timePattern,
                           int32_t     timePatternLength,
                           UErrorCode  *status);
+
 
 #endif /* #if !UCONFIG_NO_FORMATTING */
 

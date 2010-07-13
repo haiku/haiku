@@ -1,6 +1,6 @@
 /*
 *******************************************************************************
-* Copyright (c) 1996-2009, International Business Machines Corporation and others.
+* Copyright (c) 1996-2010, International Business Machines Corporation and others.
 * All Rights Reserved.
 *******************************************************************************
 */
@@ -13,6 +13,7 @@
 #if !UCONFIG_NO_COLLATION
 
 #include "unicode/unorm.h"
+#include "unicode/localpointer.h"
 #include "unicode/parseerr.h"
 #include "unicode/uloc.h"
 #include "unicode/uset.h"
@@ -220,7 +221,11 @@ typedef enum {
      UCOL_HIRAGANA_QUATERNARY_MODE,
      /** When turned on, this attribute generates a collation key
       * for the numeric value of substrings of digits.
-      * This is a way to get '100' to sort AFTER '2'. */
+      * This is a way to get '100' to sort AFTER '2'. Note that the longest
+      * digit substring that can be treated as a single collation element is
+      * 254 digits (not counting leading zeros). If a digit substring is
+      * longer than that, the digits beyond the limit will be treated as a
+      * separate digit substring associated with a separate collation element. */
      UCOL_NUMERIC_COLLATION, 
      UCOL_ATTRIBUTE_COUNT
 } UColAttribute;
@@ -374,6 +379,25 @@ ucol_getContractionsAndExpansions( const UCollator *coll,
  */
 U_STABLE void U_EXPORT2 
 ucol_close(UCollator *coll);
+
+#if U_SHOW_CPLUSPLUS_API
+
+U_NAMESPACE_BEGIN
+
+/**
+ * \class LocalUCollatorPointer
+ * "Smart pointer" class, closes a UCollator via ucol_close().
+ * For most methods see the LocalPointerBase base class.
+ *
+ * @see LocalPointerBase
+ * @see LocalPointer
+ * @draft ICU 4.4
+ */
+U_DEFINE_LOCAL_OPEN_POINTER(LocalUCollatorPointer, UCollator, ucol_close);
+
+U_NAMESPACE_END
+
+#endif
 
 /**
  * Compare two strings.
@@ -592,9 +616,9 @@ ucol_getKeywordValues(const char *keyword, UErrorCode *status);
  *                      it will return all the available values for the locale.
  * @param status error status
  * @return a string enumeration over keyword values for the given key and the locale.
- * @draft ICU 4.2
+ * @stable ICU 4.2
  */
-U_DRAFT UEnumeration* U_EXPORT2
+U_STABLE UEnumeration* U_EXPORT2
 ucol_getKeywordValuesForLocale(const char* key,
                                const char* locale,
                                UBool commonlyUsed,

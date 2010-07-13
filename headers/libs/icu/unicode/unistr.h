@@ -1,6 +1,6 @@
 /*
 **********************************************************************
-*   Copyright (C) 1998-2009, International Business Machines
+*   Copyright (C) 1998-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 **********************************************************************
 *
@@ -1567,13 +1567,40 @@ public:
 #endif
 
   /**
+   * Create a temporary substring for the specified range.
+   * Unlike the substring constructor and setTo() functions,
+   * the object returned here will be a read-only alias (using getBuffer())
+   * rather than copying the text.
+   * As a result, this substring operation is much faster but requires
+   * that the original string not be modified or deleted during the lifetime
+   * of the returned substring object.
+   * @param start offset of the first character visible in the substring
+   * @param length length of the substring
+   * @return a read-only alias UnicodeString object for the substring
+   * @draft ICU 4.4
+   */
+  UnicodeString tempSubString(int32_t start=0, int32_t length=INT32_MAX) const;
+
+  /**
+   * Create a temporary substring for the specified range.
+   * Same as tempSubString(start, length) except that the substring range
+   * is specified as a (start, limit) pair (with an exclusive limit index)
+   * rather than a (start, length) pair.
+   * @param start offset of the first character visible in the substring
+   * @param limit offset immediately following the last character visible in the substring
+   * @return a read-only alias UnicodeString object for the substring
+   * @draft ICU 4.4
+   */
+  inline UnicodeString tempSubStringBetween(int32_t start, int32_t limit=INT32_MAX) const;
+
+  /**
    * Convert the UnicodeString to UTF-8 and write the result
    * to a ByteSink. This is called by toUTF8String().
    * Unpaired surrogates are replaced with U+FFFD.
    * Calls u_strToUTF8WithSub().
    *
    * @param sink A ByteSink to which the UTF-8 version of the string is written.
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    * @see toUTF8String
    */
   void toUTF8(ByteSink &sink) const;
@@ -1586,10 +1613,10 @@ public:
    * Unpaired surrogates are replaced with U+FFFD.
    * Calls toUTF8().
    *
-   * @param A standard string (or a compatible object)
+   * @param result A standard string (or a compatible object)
    *        to which the UTF-8 version of the string is appended.
    * @return The string object.
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    * @see toUTF8
    */
   template<typename StringClass>
@@ -1614,7 +1641,7 @@ public:
    *                  function chaining. (See User Guide for details.)
    * @return The length of the UTF-32 string.
    * @see fromUTF32
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   int32_t toUTF32(UChar32 *utf32, int32_t capacity, UErrorCode &errorCode) const;
 
@@ -1701,9 +1728,10 @@ public:
 
   /**
    * Determine if this object contains a valid string.
-   * A bogus string has no value. It is different from an empty string.
-   * It can be used to indicate that no string value is available.
-   * getBuffer() and getTerminatedBuffer() return NULL, and
+   * A bogus string has no value. It is different from an empty string,
+   * although in both cases isEmpty() returns TRUE and length() returns 0.
+   * setToBogus() and isBogus() can be used to indicate that no string value is available.
+   * For a bogus string, getBuffer() and getTerminatedBuffer() return NULL, and
    * length() returns 0.
    *
    * @return TRUE if the string is valid, FALSE otherwise
@@ -2396,6 +2424,16 @@ public:
   inline UnicodeString& removeBetween(int32_t start,
                                       int32_t limit = (int32_t)INT32_MAX);
 
+  /**
+   * Retain only the characters in the range
+   * [<code>start</code>, <code>limit</code>) from the UnicodeString object.
+   * Removes characters before <code>start</code> and at and after <code>limit</code>.
+   * @param start the offset of the first character to retain
+   * @param limit the offset immediately following the range to retain
+   * @return a reference to this
+   * @draft ICU 4.4
+   */
+  inline UnicodeString &retainBetween(int32_t start, int32_t limit = INT32_MAX);
 
   /* Length operations */
 
@@ -3012,7 +3050,7 @@ public:
    * @return A UnicodeString with equivalent UTF-16 contents.
    * @see toUTF8
    * @see toUTF8String
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   static UnicodeString fromUTF8(const StringPiece &utf8);
 
@@ -3025,7 +3063,7 @@ public:
    * @param length Length of the input string, or -1 if NUL-terminated.
    * @return A UnicodeString with equivalent UTF-16 contents.
    * @see toUTF32
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   static UnicodeString fromUTF32(const UChar32 *utf32, int32_t length);
 
@@ -3045,7 +3083,7 @@ public:
    *
    * \\a => U+0007, \\b => U+0008, \\t => U+0009, \\n => U+000A,
    * \\v => U+000B, \\f => U+000C, \\r => U+000D, \\e => U+001B,
-   * \\" => U+0022, \\' => U+0027, \\? => U+003F, \\\\ => U+005C
+   * \\&quot; => U+0022, \\' => U+0027, \\? => U+003F, \\\\ => U+005C
    *
    * Anything else following a backslash is generically escaped.  For
    * example, "[a\\-z]" returns "[a-z]".
@@ -3242,7 +3280,6 @@ private:
   // None of the following does releaseArray().
   inline void setLength(int32_t len);        // sets only fShortLength and fLength
   inline void setToEmpty();                  // sets fFlags=kShortString
-  inline void setToStackBuffer(int32_t len); // sets fFlags=kShortString
   inline void setArray(UChar *array, int32_t len, int32_t capacity); // does not set fFlags
 
   // allocate the array; result may be fStackBuffer
@@ -4048,7 +4085,13 @@ UnicodeString::extract(int32_t start,
 
 {
   // This dstSize value will be checked explicitly
+#if defined(__GNUC__)
+  // Ticket #7039: Clip length to the maximum valid length to the end of addressable memory given the starting address
+  // This is only an issue when using GCC and certain optimizations are turned on.
+  return extract(start, _length, dst, dst!=0 ? ((dst >= (char*)((size_t)-1) - UINT32_MAX) ? (((char*)UINT32_MAX) - dst) : UINT32_MAX) : 0, codepage);
+#else
   return extract(start, _length, dst, dst!=0 ? 0xffffffff : 0, codepage);
+#endif
 }
 
 #endif
@@ -4061,6 +4104,11 @@ UnicodeString::extractBetween(int32_t start,
   pinIndex(start);
   pinIndex(limit);
   doExtract(start, limit - start, dst, dstStart);
+}
+
+inline UnicodeString
+UnicodeString::tempSubStringBetween(int32_t start, int32_t limit) const {
+    return tempSubString(start, limit - start);
 }
 
 inline UChar
@@ -4143,12 +4191,6 @@ UnicodeString::setToEmpty() {
 }
 
 inline void
-UnicodeString::setToStackBuffer(int32_t len) {
-  fShortLength = (int8_t)len;
-  fFlags = kShortString;
-}
-
-inline void
 UnicodeString::setArray(UChar *array, int32_t len, int32_t capacity) {
   setLength(len);
   fUnion.fFields.fArray = array;
@@ -4162,12 +4204,32 @@ UnicodeString::getTerminatedBuffer() {
   } else {
     UChar *array = getArrayStart();
     int32_t len = length();
-#ifndef U_VALGRIND
-    if(len < getCapacity() && array[len] == 0) {
+    if(len < getCapacity() && ((fFlags&kRefCounted) == 0 || refCount() == 1)) {
+      /*
+       * kRefCounted: Do not write the NUL if the buffer is shared.
+       * That is mostly safe, except when the length of one copy was modified
+       * without copy-on-write, e.g., via truncate(newLength) or remove(void).
+       * Then the NUL would be written into the middle of another copy's string.
+       */
+      if(!(fFlags&kBufferIsReadonly)) {
+        /*
+         * We must not write to a readonly buffer, but it is known to be
+         * NUL-terminated if len<capacity.
+         * A shared, allocated buffer (refCount()>1) must not have its contents
+         * modified, but the NUL at [len] is beyond the string contents,
+         * and multiple string objects and threads writing the same NUL into the
+         * same location is harmless.
+         * In all other cases, the buffer is fully writable and it is anyway safe
+         * to write the NUL.
+         *
+         * Note: An earlier version of this code tested whether there is a NUL
+         * at [len] already, but, while safe, it generated lots of warnings from
+         * tools like valgrind and Purify.
+         */
+        array[len] = 0;
+      }
       return array;
-    }
-#endif
-    if(cloneArrayIfNeeded(len+1)) {
+    } else if(cloneArrayIfNeeded(len+1)) {
       array = getArrayStart();
       array[len] = 0;
       return array;
@@ -4319,10 +4381,12 @@ inline UnicodeString&
 UnicodeString::remove()
 {
   // remove() of a bogus string makes the string empty and non-bogus
-  if(isBogus()) {
-    unBogus();
+  // we also un-alias a read-only alias to deal with NUL-termination
+  // issues with getTerminatedBuffer()
+  if(fFlags & (kIsBogus|kBufferIsReadonly)) {
+    setToEmpty();
   } else {
-    setLength(0);
+    fShortLength = 0;
   }
   return *this;
 }
@@ -4343,6 +4407,12 @@ UnicodeString::removeBetween(int32_t start,
                 int32_t limit)
 { return doReplace(start, limit - start, NULL, 0, 0); }
 
+inline UnicodeString &
+UnicodeString::retainBetween(int32_t start, int32_t limit) {
+  truncate(limit);
+  return doReplace(0, start, NULL, 0, 0);
+}
+
 inline UBool
 UnicodeString::truncate(int32_t targetLength)
 {
@@ -4352,6 +4422,9 @@ UnicodeString::truncate(int32_t targetLength)
     return FALSE;
   } else if((uint32_t)targetLength < (uint32_t)length()) {
     setLength(targetLength);
+    if(fFlags&kBufferIsReadonly) {
+      fUnion.fFields.fCapacity = targetLength;  // not NUL-terminated any more
+    }
     return TRUE;
   } else {
     return FALSE;

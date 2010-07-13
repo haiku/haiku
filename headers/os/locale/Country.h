@@ -9,10 +9,11 @@
 
 class BBitmap;
 
-namespace icu_4_2 {
+namespace icu_44 {
 	class DateFormat;
 	class Locale;
 }
+
 
 enum {
 	B_METRIC = 0,
@@ -41,6 +42,8 @@ class BCountry {
 			bool longFormat);
 		virtual void FormatTime(BString* string, time_t time,
 			bool longFormat);
+		virtual void FormatTime(BString* string, int*& fieldPositions,
+			int& fieldCount, time_t time);
 
 		bool		DateFormat(BString&, bool longFormat) const;
 		void		SetDateFormat(const char* formatString,
@@ -85,12 +88,12 @@ class BCountry {
 		virtual int32	MonFracDigits() const;
 
 	private:
-		icu_4_2::DateFormat* fICULongDateFormatter;
-		icu_4_2::DateFormat* fICUShortDateFormatter;
-		icu_4_2::DateFormat* fICULongTimeFormatter;
-		icu_4_2::DateFormat* fICUShortTimeFormatter;
+		icu_44::DateFormat* fICULongDateFormatter;
+		icu_44::DateFormat* fICUShortDateFormatter;
+		icu_44::DateFormat* fICULongTimeFormatter;
+		icu_44::DateFormat* fICUShortTimeFormatter;
 		const char**	fStrings;
-		icu_4_2::Locale* fICULocale;
+		icu_44::Locale* fICULocale;
 };
 
 #endif	/* _COUNTRY_H_ */

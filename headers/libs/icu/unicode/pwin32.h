@@ -1,7 +1,7 @@
 /*
  ******************************************************************************
  *
- *   Copyright (C) 1997-2009, International Business Machines
+ *   Copyright (C) 1997-2010, International Business Machines
  *   Corporation and others.  All Rights Reserved.
  *
  ******************************************************************************
@@ -181,7 +181,14 @@ typedef unsigned int uint32_t;
 #define U_IS_BIG_ENDIAN 0
 
 /** 1 or 0 to enable or disable threads.  If undefined, default is: enable threads. */
+#ifndef ICU_USE_THREADS
 #define ICU_USE_THREADS 1
+#endif
+
+/** 0 or 1 to enable or disable auto cleanup of libraries. If undefined, default is: disabled. */
+#ifndef UCLN_NO_AUTO_CLEANUP
+#define UCLN_NO_AUTO_CLEANUP 1
+#endif
 
 /* On strong memory model CPUs (e.g. x86 CPUs), we use a safe & quick double check mutex lock. */
 /**
@@ -240,9 +247,15 @@ Intel can define _M_IX86 or _M_X64
 #endif
 
 /** @{ Define the library suffix in a C syntax. */
+#ifndef U_HAVE_LIB_SUFFIX
 #define U_HAVE_LIB_SUFFIX 0
-#define U_LIB_SUFFIX_C_NAME 
+#endif
+#ifndef U_LIB_SUFFIX_C_NAME
+#define U_LIB_SUFFIX_C_NAME
+#endif
+#ifndef U_LIB_SUFFIX_C_NAME_STRING
 #define U_LIB_SUFFIX_C_NAME_STRING ""
+#endif
 /** @} */
 
 /*===========================================================================*/
@@ -270,21 +283,38 @@ Intel can define _M_IX86 or _M_X64
 /** @{ Information about POSIX support                                           */
 /*===========================================================================*/
 
+/**
+ * @internal 
+ */
 #if 1
 #define U_TZSET         _tzset
 #endif
+/**
+ * @internal 
+ */
 #if 1
 #define U_TIMEZONE      _timezone
 #endif
+/**
+ * @internal 
+ */
 #if 1
 #define U_TZNAME        _tzname
 #endif
+/**
+ * @internal 
+ */
 #if 1
 #define U_DAYLIGHT      _daylight
 #endif
 
 #define U_HAVE_MMAP 0
 #define U_HAVE_POPEN 0
+
+#ifndef U_ENABLE_DYLOAD
+#define U_ENABLE_DYLOAD 1
+#endif
+
 
 /** @} */
 

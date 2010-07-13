@@ -12,7 +12,6 @@ SubInclude HAIKU_TOP src libs freetype2 ;
 SubInclude HAIKU_TOP src libs gnu ;
 SubInclude HAIKU_TOP src libs icon ;
 SubInclude HAIKU_TOP src libs iconv ;
-SubInclude HAIKU_TOP src libs icu ;
 SubInclude HAIKU_TOP src libs jpeg ;
 SubInclude HAIKU_TOP src libs libtelnet ;
 SubInclude HAIKU_TOP src libs linprog ;

@@ -77,8 +77,6 @@ SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
 	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku
 ;
-ICU_LIBS = libicu-common.so libicu-data.so libicu-i18n.so
-;
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
 	libdebug.so libdevice.so
@@ -100,7 +98,6 @@ PRIVATE_SYSTEM_LIBS =
 	libfluidsynth.so
 	libilmimf.so
 	liblinprog.so liblpsolve55.so
-	$(ICU_LIBS)
 ;
 SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 	media_addon_server media_server midi_server mount_server net_server

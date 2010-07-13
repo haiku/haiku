@@ -1,6 +1,6 @@
 /*
 **********************************************************************
-*   Copyright (C) 1996-2009, International Business Machines
+*   Copyright (C) 1996-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 **********************************************************************
 *
@@ -38,12 +38,41 @@
 #include "unicode/uversion.h"
 #include "unicode/uconfig.h"
 
+/*!
+ * \file
+ * \brief Basic definitions for ICU, for both C and C++ APIs
+ *
+ * This file defines basic types, constants, and enumerations directly or
+ * indirectly by including other header files, especially utf.h for the
+ * basic character and string definitions and umachine.h for consistent
+ * integer and other types.
+ */
+
+
+/**
+ * \def U_SHOW_CPLUSPLUS_API
+ * @internal
+ */
+#ifdef XP_CPLUSPLUS
+#   ifndef U_SHOW_CPLUSPLUS_API
+#       define U_SHOW_CPLUSPLUS_API 1
+#   endif
+#else
+#   undef U_SHOW_CPLUSPLUS_API
+#   define U_SHOW_CPLUSPLUS_API 0
+#endif
+
+/** @{ API visibility control */
+
 /**
  * \def U_HIDE_DRAFT_API
  * Define this to 1 to request that draft API be "hidden"
  */
 #if !U_DEFAULT_SHOW_DRAFT && !defined(U_SHOW_DRAFT_API)
 #define U_HIDE_DRAFT_API 1
+#endif
+#if !U_DEFAULT_SHOW_DRAFT && !defined(U_SHOW_INTERNAL_API)
+#define U_HIDE_INTERNAL_API 1
 #endif
 
 #ifdef U_HIDE_DRAFT_API
@@ -66,15 +95,8 @@
 #include "unicode/usystem.h"
 #endif
 
-/*!
- * \file
- * \brief Basic definitions for ICU, for both C and C++ APIs
- *
- * This file defines basic types, constants, and enumerations directly or
- * indirectly by including other header files, especially utf.h for the
- * basic character and string definitions and umachine.h for consistent
- * integer and other types.
- */
+/** @} */
+
 
 /*===========================================================================*/
 /* char Character set family                                                 */
@@ -210,8 +232,9 @@
  * ICU 1.8.x on EBCDIC, etc..
  * @stable ICU 2.0
  */
-#define U_ICUDATA_NAME    "icudt" U_ICU_VERSION_SHORT U_ICUDATA_TYPE_LETTER
-
+#define U_ICUDATA_NAME    "icudt" U_ICU_VERSION_SHORT U_ICUDATA_TYPE_LETTER  /**< @internal */
+#define U_USRDATA_NAME    "usrdt" U_ICU_VERSION_SHORT U_ICUDATA_TYPE_LETTER  /**< @internal */
+#define U_USE_USRDATA     1  /**< @internal */
 
 /**
  *  U_ICU_ENTRY_POINT is the name of the DLL entry point to the ICU data library.
@@ -235,7 +258,10 @@
  * Do not use.
  * @internal
  */
+#ifndef U_DEF_ICUDATA_ENTRY_POINT
+/* affected by symbol renaming. See platform.h */
 #define U_DEF_ICUDATA_ENTRY_POINT(major, minor) icudt##major##minor##_dat
+#endif
 
 /**
  * \def U_CALLCONV
@@ -248,7 +274,7 @@
  * you must use the U_CAPI and U_EXPORT2 qualifiers.
  * @stable ICU 2.0
  */
-#if defined(OS390) && (__COMPILER_VER__ < 0x41020000) && defined(XP_CPLUSPLUS)
+#if defined(OS390) && defined(XP_CPLUSPLUS)
 #    define U_CALLCONV __cdecl
 #else
 #    define U_CALLCONV U_EXPORT2
@@ -613,6 +639,8 @@ typedef enum UErrorCode {
     U_AMBIGUOUS_ALIAS_WARNING = -122,   /**< This converter alias can go to different converter implementations */
 
     U_DIFFERENT_UCA_VERSION = -121,     /**< ucol_open encountered a mismatch between UCA version and collator image version, so the collator was constructed from rules. No impact to further function */
+    
+    U_PLUGIN_CHANGED_LEVEL_WARNING = -120, /**< A plugin caused a level change. May not be an error, but later plugins may not load. */
 
     U_ERROR_WARNING_LIMIT,              /**< This must always be the last warning value to indicate the limit for UErrorCode warnings (last warning code +1) */
 
@@ -712,8 +740,9 @@ typedef enum UErrorCode {
     U_UNSUPPORTED_ATTRIBUTE,          /**< UNUSED as of ICU 2.4 */
     U_ARGUMENT_TYPE_MISMATCH,         /**< Argument name and argument index mismatch in MessageFormat functions */
     U_DUPLICATE_KEYWORD,              /**< Duplicate keyword in PluralFormat */
-    U_UNDEFINED_KEYWORD,              /**< Undefined Pluarl keyword */
+    U_UNDEFINED_KEYWORD,              /**< Undefined Plural keyword */
     U_DEFAULT_KEYWORD_MISSING,        /**< Missing DEFAULT rule in plural rules */
+    U_DECIMAL_NUMBER_SYNTAX_ERROR,    /**< Decimal number syntax error */
     U_FMT_PARSE_ERROR_LIMIT,          /**< The limit for format library errors */
 
     /*
@@ -782,9 +811,16 @@ typedef enum UErrorCode {
     U_STRINGPREP_PROHIBITED_ERROR = U_IDNA_PROHIBITED_ERROR,
     U_STRINGPREP_UNASSIGNED_ERROR = U_IDNA_UNASSIGNED_ERROR,
     U_STRINGPREP_CHECK_BIDI_ERROR = U_IDNA_CHECK_BIDI_ERROR,
+    
+    /*
+     * The error code in the range 0x10500-0x105ff are reserved for Plugin related error codes
+     */
+    U_PLUGIN_ERROR_START=0x10500,         /**< Start of codes indicating plugin failures */
+    U_PLUGIN_TOO_HIGH=0x10500,            /**< The plugin's level is too high to be loaded right now. */
+    U_PLUGIN_DIDNT_SET_LEVEL,             /**< The plugin didn't call uplug_setPlugLevel in response to a QUERY */
+    U_PLUGIN_ERROR_LIMIT,                 /**< This must always be the last value to indicate the limit for plugin errors */
 
-
-    U_ERROR_LIMIT=U_IDNA_ERROR_LIMIT      /**< This must always be the last value to indicate the limit for UErrorCode (last error code +1) */
+    U_ERROR_LIMIT=U_PLUGIN_ERROR_LIMIT      /**< This must always be the last value to indicate the limit for UErrorCode (last error code +1) */
 } UErrorCode;
 
 /* Use the following to determine if an UErrorCode represents */

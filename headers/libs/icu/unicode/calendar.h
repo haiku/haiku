@@ -1,6 +1,6 @@
 /*
 ********************************************************************************
-*   Copyright (C) 1997-2009, International Business Machines
+*   Copyright (C) 1997-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 ********************************************************************************
 *
@@ -173,6 +173,12 @@ public:
      */
     enum EDateFields {
 #ifndef U_HIDE_DEPRECATED_API
+/*
+ * ERA may be defined on other platforms. To avoid any potential problems undefined it here.
+ */
+#ifdef ERA
+#undef ERA
+#endif
         ERA,                  // Example: 0..1
         YEAR,                 // Example: 1..big number
         MONTH,                // Example: 0..11
@@ -192,11 +198,11 @@ public:
         DST_OFFSET,           // Example: 0 or U_MILLIS_PER_HOUR
         YEAR_WOY,             // 'Y' Example: 1..big number - Year of Week of Year
         DOW_LOCAL,            // 'e' Example: 1..7 - Day of Week / Localized
-		
-		EXTENDED_YEAR,
-		JULIAN_DAY,
-		MILLISECONDS_IN_DAY,
-		IS_LEAP_MONTH,
+        
+        EXTENDED_YEAR,
+        JULIAN_DAY,
+        MILLISECONDS_IN_DAY,
+        IS_LEAP_MONTH,
 
         FIELD_COUNT = UCAL_FIELD_COUNT // See ucal.h for other fields.
 #endif /* U_HIDE_DEPRECATED_API */
@@ -374,7 +380,7 @@ public:
      *                      it will return all the available values for the locale.
      * @param status        ICU Error Code
      * @return a string enumeration over keyword values for the given key and the locale.
-     * @draft ICU 4.2
+     * @stable ICU 4.2
      */
     static StringEnumeration* U_EXPORT2 getKeywordValuesForLocale(const char* key,
                     const Locale& locale, UBool commonlyUsed, UErrorCode& status);
@@ -1184,6 +1190,59 @@ public:
      */
     virtual const char * getType() const = 0;
 
+    /**
+     * Returns whether the given day of the week is a weekday, a
+     * weekend day, or a day that transitions from one to the other,
+     * in this calendar system. If a transition occurs at midnight,
+     * then the days before and after the transition will have the
+     * type UCAL_WEEKDAY or UCAL_WEEKEND. If a transition occurs at a time
+     * other than midnight, then the day of the transition will have
+     * the type UCAL_WEEKEND_ONSET or UCAL_WEEKEND_CEASE. In this case, the
+     * method getWeekendTransition() will return the point of
+     * transition.
+     * @param dayOfWeek The day of the week whose type is desired (UCAL_SUNDAY..UCAL_SATURDAY).
+     * @param status The error code for the operation.
+     * @return The UCalendarWeekdayType for the day of the week.
+     * @draft ICU 4.4
+     */
+    virtual UCalendarWeekdayType getDayOfWeekType(UCalendarDaysOfWeek dayOfWeek, UErrorCode &status) const;
+
+    /**
+     * Returns the time during the day at which the weekend begins or ends in
+     * this calendar system.  If getDayOfWeekType() rerturns UCAL_WEEKEND_ONSET
+     * for the specified dayOfWeek, return the time at which the weekend begins.
+     * If getDayOfWeekType() returns UCAL_WEEKEND_CEASE for the specified dayOfWeek,
+     * return the time at which the weekend ends. If getDayOfWeekType() returns
+     * some other UCalendarWeekdayType for the specified dayOfWeek, is it an error condition
+     * (U_ILLEGAL_ARGUMENT_ERROR).
+     * @param dayOfWeek The day of the week for which the weekend transition time is
+     * desired (UCAL_SUNDAY..UCAL_SATURDAY).
+     * @param status The error code for the operation.
+     * @return The milliseconds after midnight at which the weekend begins or ends.
+     * @draft ICU 4.4
+     */
+    virtual int32_t getWeekendTransition(UCalendarDaysOfWeek dayOfWeek, UErrorCode &status) const;
+
+    /**
+     * Returns TRUE if the given UDate is in the weekend in
+     * this calendar system.
+     * @param date The UDate in question.
+     * @param status The error code for the operation.
+     * @return TRUE if the given UDate is in the weekend in
+     * this calendar system, FALSE otherwise.
+     * @draft ICU 4.4
+     */
+    virtual UBool isWeekend(UDate date, UErrorCode &status) const;
+
+    /**
+     * Returns TRUE if this Calendar's current date-time is in the weekend in
+     * this calendar system.
+     * @return TRUE if this Calendar's current date-time is in the weekend in
+     * this calendar system, FALSE otherwise.
+     * @draft ICU 4.4
+     */
+    virtual UBool isWeekend(void) const;
+
 protected:
 
      /**
@@ -1903,6 +1962,10 @@ private:
      */
     UCalendarDaysOfWeek fFirstDayOfWeek;
     uint8_t     fMinimalDaysInFirstWeek;
+    UCalendarDaysOfWeek fWeekendOnset;
+    int32_t fWeekendOnsetMillis;
+    UCalendarDaysOfWeek fWeekendCease;
+    int32_t fWeekendCeaseMillis;
 
     /**
      * Sets firstDayOfWeek and minimalDaysInFirstWeek. Called at Calendar construction
@@ -1914,7 +1977,7 @@ private:
      *                       the resource for the given locale. Returns U_ZERO_ERROR if
      *                       constructed successfully.
      */
-    void        setWeekCountData(const Locale& desiredLocale, const char *type, UErrorCode& success);
+    void        setWeekData(const Locale& desiredLocale, const char *type, UErrorCode& success);
 
     /**
      * Recompute the time and update the status fields isTimeSet
@@ -1965,7 +2028,7 @@ private:
      */
     void computeGregorianAndDOWFields(int32_t julianDay, UErrorCode &ec);
 
-	protected:
+protected:
 
     /**
      * Compute the Gregorian calendar year, month, and day of month from the
@@ -1976,7 +2039,7 @@ private:
      */
     void computeGregorianFields(int32_t julianDay, UErrorCode &ec);
 
-	private:
+private:
 
     /**
      * Compute the fields WEEK_OF_YEAR, YEAR_WOY, WEEK_OF_MONTH,

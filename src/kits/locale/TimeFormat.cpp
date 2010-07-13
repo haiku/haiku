@@ -10,6 +10,8 @@
 #include <unicode/utypes.h>
 #include <ICUWrapper.h>
 
+#define ICU_VERSION icu_44
+
 status_t BTimeFormat::Format(int64 number, BString* buffer) const
 {
 	// create time unit amount instance - a combination of Number and time unit
@@ -43,7 +45,7 @@ status_t BTimeFormat::Format(int64 number, BString* buffer) const
 			TimeUnit::UTIMEUNIT_DAY, status);
 
 		formattable.adoptObject(daysAmount);
-		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+		formatted = ((ICU_VERSION::Format*)format)->format(formattable, formatted,
 			status);
 	}
 
@@ -54,7 +56,7 @@ status_t BTimeFormat::Format(int64 number, BString* buffer) const
 		formattable.adoptObject(hoursAmount);
 		if (days)
 			formatted.append(", ");
-		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+		formatted = ((ICU_VERSION::Format*)format)->format(formattable, formatted,
 			status);
 	}
 
@@ -65,7 +67,7 @@ status_t BTimeFormat::Format(int64 number, BString* buffer) const
 		formattable.adoptObject(minutesAmount);
 		if (days || hours)
 			formatted.append(", ");
-		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+		formatted = ((ICU_VERSION::Format*)format)->format(formattable, formatted,
 			status);
 	}
 
@@ -77,7 +79,7 @@ status_t BTimeFormat::Format(int64 number, BString* buffer) const
 		formattable.adoptObject(secondsAmount);
 		if (days || hours || minutes)
 			formatted.append(", ");
-		formatted = ((icu_4_2::Format*)format)->format(formattable, formatted,
+		formatted = ((ICU_VERSION::Format*)format)->format(formattable, formatted,
 			status);
 	}
 	formatted.toUTF8(bbs);

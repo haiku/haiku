@@ -20,7 +20,8 @@
 
 class TTimeEdit : public TSectionEdit {
 	public:
-						TTimeEdit(BRect frame, const char *name, uint32 sections);
+						TTimeEdit(BRect frame, const char *name,
+							uint32 sections);
 		virtual			~TTimeEdit();
 		virtual	void	KeyDown(const char* bytes, int32 numBytes);
 
@@ -53,7 +54,8 @@ class TTimeEdit : public TSectionEdit {
 
 class TDateEdit : public TSectionEdit {
 	public:
-						TDateEdit(BRect frame, const char *name, uint32 sections);
+						TDateEdit(BRect frame, const char *name,
+							uint32 sections);
 		virtual			~TDateEdit();
 		virtual	void	KeyDown(const char* bytes, int32 numBytes);
 

@@ -1,6 +1,6 @@
 /*
 ********************************************************************************
-*   Copyright (C) 1997-2006, International Business Machines
+*   Copyright (C) 1997-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 ********************************************************************************
 *
@@ -17,6 +17,8 @@
 
 #include "unicode/utypes.h"
 #include "unicode/unistr.h"
+#include "unicode/stringpiece.h"
+
 /**
  * \file 
  * \brief C++ API: Formattable is a thin wrapper for primitive numeric types.
@@ -25,6 +27,9 @@
 #if !UCONFIG_NO_FORMATTING
 
 U_NAMESPACE_BEGIN
+
+class   DecimalNumberString;
+class   DigitList;
 
 /**
  * Formattable objects can be passed to the Format class or
@@ -101,6 +106,21 @@ public:
      */
     Formattable(const char* strToCopy);
 #endif
+
+    /**
+     * Creates a Formattable object of an appropriate numeric type from a
+     * a decimal number in string form.  The Formattable will retain the
+     * full precision of the input in decimal format, even when it exceeds
+     * what can be represented by a double of int64_t.
+     *
+     * @param number  the unformatted (not localized) string representation
+     *                     of the Decimal number.
+     * @param status  the error code.  Possible errors include U_INVALID_FORMAT_ERROR
+     *                if the format of the string does not conform to that of a
+     *                decimal number.
+     * @draft ICU 4.4
+     */
+    Formattable(const StringPiece &number, UErrorCode &status);
 
     /**
      * Creates a Formattable object with a UnicodeString object to copy from.
@@ -246,7 +266,7 @@ public:
     
     /**
      * Returns TRUE if the data type of this Formattable object
-     * is kDouble, kLong, or kInt64.
+     * is kDouble, kLong, kInt64 or kDecimalNumber.
      * @return TRUE if this is a pure numeric object
      * @stable ICU 3.0
      */
@@ -262,7 +282,7 @@ public:
 
     /**
      * Gets the double value of this object. If this object is of type
-     * long or int64 then a casting conversion is peformed, with
+     * long, int64 or Decimal Number then a conversion is peformed, with
      * possible loss of precision.  If the type is kObject and the
      * object is a Measure, then the result of
      * getNumber().getDouble(status) is returned.  If this object is
@@ -288,7 +308,7 @@ public:
      * as appropriate, is returned and the status is set to
      * U_INVALID_FORMAT_ERROR.  If this object is of type kInt64 and
      * it fits within a long, then no precision is lost.  If it is of
-     * type kDouble, then a casting conversion is peformed, with
+     * type kDouble or kDecimalNumber, then a conversion is peformed, with
      * truncation of any fractional part.  If the type is kObject and
      * the object is a Measure, then the result of
      * getNumber().getLong(status) is returned.  If this object is
@@ -309,8 +329,8 @@ public:
     int64_t         getInt64(void) const { return fValue.fInt64; }
 
     /**
-     * Gets the int64 value of this object. If this object is of type
-     * kDouble and the magnitude is too large to fit in an int64, then
+     * Gets the int64 value of this object. If this object is of a numeric
+     * type and the magnitude is too large to fit in an int64, then
      * the maximum or minimum int64 value, as appropriate, is returned
      * and the status is set to U_INVALID_FORMAT_ERROR.  If the
      * magnitude fits in an int64, then a casting conversion is
@@ -441,6 +461,26 @@ public:
     const UObject*  getObject() const;
 
     /**
+     * Returns a numeric string representation of the number contained within this
+     * formattable, or NULL if this object does not contain numeric type.
+     * For values obtained by parsing, the returned decimal number retains
+     * the full precision and range of the original input, unconstrained by
+     * the limits of a double floating point or a 64 bit int.
+     * 
+     * This function is not thread safe, and therfore is not declared const,
+     * even though it is logically const.
+     *
+     * Possible errors include U_MEMORY_ALLOCATION_ERROR, and
+     * U_INVALID_STATE if the formattable object has not been set to
+     * a numeric type.
+     *
+     * @param status the error code.
+     * @return the unformatted string representation of a number.
+     * @draft ICU 4.4
+     */
+    StringPiece getDecimalNumber(UErrorCode &status);
+
+     /**
      * Sets the double value of this object and changes the type to
      * kDouble.
      * @param d    the new double value to be set.
@@ -514,6 +554,23 @@ public:
     void            adoptObject(UObject* objectToAdopt);
 
     /**
+     * Sets the the numeric value from a decimal number string, and changes
+     * the type to to a numeric type appropriate for the number.  
+     * The syntax of the number is a "numeric string"
+     * as defined in the Decimal Arithmetic Specification, available at
+     * http://speleotrove.com/decimal
+     * The full precision and range of the input number will be retained,
+     * even when it exceeds what can be represented by a double or an int64.
+     *
+     * @param numberString  a string representation of the unformatted decimal number.
+     * @param status        the error code.  Set to U_INVALID_FORMAT_ERROR if the
+     *                      incoming string is not a valid decimal number.
+     * @draft ICU 4.4
+     */
+    void             setDecimalNumber(const StringPiece &numberString,
+                                      UErrorCode &status);
+
+    /**
      * ICU "poor man's RTTI", returns a UClassID for the actual class.
      *
      * @stable ICU 2.2
@@ -535,12 +592,36 @@ public:
      */ 
     inline int32_t getLong(UErrorCode* status) const;
 
+    /**
+     * Internal function, do not use.
+     * TODO:  figure out how to make this be non-public.
+     *        NumberFormat::format(Formattable, ...
+     *        needs to get at the DigitList, if it exists, for
+     *        big decimal formatting.
+     *  @internal
+     */
+    DigitList *getDigitList() const { return fDecimalNum;};
+
+    /**
+     *  Adopt, and set value from, a DigitList
+     *     Internal Function, do not use.
+     *  @param dl the Digit List to be adopted
+     *  @param status reports errors
+     *  @internal
+     */
+    void adoptDigitList(DigitList *dl);
+
 private:
     /**
      * Cleans up the memory for unwanted values.  For example, the adopted
      * string or array objects.
      */
     void            dispose(void);
+    
+    /**
+     * Common initialization, for use by constructors.
+     */
+    void            init();
 
     UnicodeString* getBogus() const;
 
@@ -555,6 +636,9 @@ private:
           int32_t       fCount;
         }               fArrayAndCount;
     } fValue;
+
+    DecimalNumberString  *fDecimalStr;
+    DigitList            *fDecimalNum;
 
     Type                fType;
     UnicodeString       fBogus; // Bogus string when it's needed.

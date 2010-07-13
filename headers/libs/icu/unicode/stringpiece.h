@@ -1,4 +1,4 @@
-// Copyright (C) 2009, International Business Machines
+// Copyright (C) 2010, International Business Machines
 // Corporation and others. All Rights Reserved.
 //
 // Copyright 2001 and onwards Google Inc.
@@ -47,7 +47,7 @@ U_NAMESPACE_BEGIN
  * Systematic usage of StringPiece is encouraged as it will reduce unnecessary
  * conversions from "const char*" to "string" and back again.
  *
- * @draft ICU 4.2
+ * @stable ICU 4.2
  */
 class U_COMMON_API StringPiece : public UMemory {
  private:
@@ -57,19 +57,19 @@ class U_COMMON_API StringPiece : public UMemory {
  public:
   /**
    * Default constructor, creates an empty StringPiece.
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   StringPiece() : ptr_(NULL), length_(0) { }
   /**
    * Constructs from a NUL-terminated const char * pointer.
    * @param str a NUL-terminated const char * pointer
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   StringPiece(const char* str);
 #if U_HAVE_STD_STRING
   /**
    * Constructs from a std::string.
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   StringPiece(const U_STD_NSQ string& str)
     : ptr_(str.data()), length_(static_cast<int32_t>(str.size())) { }
@@ -78,14 +78,14 @@ class U_COMMON_API StringPiece : public UMemory {
    * Constructs from a const char * pointer and a specified length.
    * @param offset a const char * pointer (need not be terminated)
    * @param len the length of the string; must be non-negative
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   StringPiece(const char* offset, int32_t len) : ptr_(offset), length_(len) { }
   /**
    * Substring of another StringPiece.
    * @param x the other StringPiece
    * @param pos start position in x; must be non-negative and <= x.length().
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   StringPiece(const StringPiece& x, int32_t pos);
   /**
@@ -94,7 +94,7 @@ class U_COMMON_API StringPiece : public UMemory {
    * @param pos start position in x; must be non-negative and <= x.length().
    * @param len length of the substring;
    *            must be non-negative and will be pinned to at most x.length() - pos.
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   StringPiece(const StringPiece& x, int32_t pos, int32_t len);
 
@@ -106,38 +106,53 @@ class U_COMMON_API StringPiece : public UMemory {
    * typically a mistake to pass data() to a routine that expects a NUL
    * terminated string.
    * @return the string pointer
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   const char* data() const { return ptr_; }
   /**
    * Returns the string length. Same as length().
    * @return the string length
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   int32_t size() const { return length_; }
   /**
    * Returns the string length. Same as size().
    * @return the string length
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   int32_t length() const { return length_; }
   /**
    * Returns whether the string is empty.
    * @return TRUE if the string is empty
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   UBool empty() const { return length_ == 0; }
 
   /**
    * Sets to an empty string.
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   void clear() { ptr_ = NULL; length_ = 0; }
 
   /**
+   * Reset the stringpiece to refer to new data.
+   * @param data pointer the new string data.  Need not be nul terminated.
+   * @param len the length of the new data
+   * @internal
+   */
+  void set(const char* data, int32_t len) { ptr_ = data; length_ = len; }
+
+  /**
+   * Reset the stringpiece to refer to new data.
+   * @param str a pointer to a NUL-terminated string. 
+   * @internal
+   */
+  void set(const char* str);
+
+  /**
    * Removes the first n string units.
    * @param n prefix length, must be non-negative and <=length()
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   void remove_prefix(int32_t n) {
     if (n >= 0) {
@@ -152,7 +167,7 @@ class U_COMMON_API StringPiece : public UMemory {
   /**
    * Removes the last n string units.
    * @param n suffix length, must be non-negative and <=length()
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   void remove_suffix(int32_t n) {
     if (n >= 0) {
@@ -166,7 +181,7 @@ class U_COMMON_API StringPiece : public UMemory {
 
   /**
    * Maximum integer, used as a default value for substring methods.
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   static const int32_t npos = 0x7fffffff;
 
@@ -176,12 +191,33 @@ class U_COMMON_API StringPiece : public UMemory {
    * @param len length of the substring;
    *            must be non-negative and will be pinned to at most length() - pos.
    * @return the substring StringPiece
-   * @draft ICU 4.2
+   * @stable ICU 4.2
    */
   StringPiece substr(int32_t pos, int32_t len = npos) const {
     return StringPiece(*this, pos, len);
   }
 };
+
+/**
+ * Global operator == for StringPiece
+ * @param x The first StringPiece to compare.
+ * @param y The second StringPiece to compare.
+ * @return TRUE if the string data is equal
+ * @internal
+ */
+U_EXPORT UBool U_EXPORT2 
+operator==(const StringPiece& x, const StringPiece& y);
+
+/**
+ * Global operator != for StringPiece
+ * @param x The first StringPiece to compare.
+ * @param y The second StringPiece to compare.
+ * @return TRUE if the string data is not equal
+ * @internal
+ */
+inline UBool operator!=(const StringPiece& x, const StringPiece& y) {
+  return !(x == y);
+}
 
 U_NAMESPACE_END
 

@@ -13,7 +13,7 @@
 
 // We must not include the icu headers in there as it could mess up binary
 // compatibility.
-namespace icu_4_2 {
+namespace icu_44 {
 	class Locale;
 }
 
@@ -55,7 +55,7 @@ private:
 private:
 			char*				fStrings[B_NUM_LANGUAGE_STRINGS];
 			uint8				fDirection;
-			icu_4_2::Locale*	fICULocale;
+			icu_44::Locale*	fICULocale;
 };
 
 

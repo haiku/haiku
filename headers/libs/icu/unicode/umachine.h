@@ -1,7 +1,7 @@
 /*
 ******************************************************************************
 *
-*   Copyright (C) 1999-2008, International Business Machines
+*   Copyright (C) 1999-2010, International Business Machines
 *   Corporation and others.  All Rights Reserved.
 *
 ******************************************************************************
@@ -44,9 +44,12 @@
 #if defined(U_PALMOS)
 #   include "unicode/ppalmos.h"
 #elif defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
+#ifdef CYGWINMSVC
+#   include "unicode/platform.h"
+#endif
 #   include "unicode/pwin32.h"
 #else
-#   include "unicode/platform.h"
+#   include "unicode/ptypes.h" /* platform.h is included in ptypes.h */
 #endif
 
 /*
@@ -102,10 +105,18 @@
 #   define U_CDECL_END
 #endif
 
-/** This is used for GCC specific attributes*/
+/**
+ * \def U_ATTRIBUTE_DEPRECATED
+ *  This is used for GCC specific attributes
+ * @internal
+ */
 #if defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 2))
 #    define U_ATTRIBUTE_DEPRECATED __attribute__ ((deprecated))
-/** This is used for Visual C++ specific attributes */
+/**
+ * \def U_ATTRIBUTE_DEPRECATED
+ * This is used for Visual C++ specific attributes 
+ * @internal
+ */
 #elif defined(U_WINDOWS) && defined(_MSC_VER) && (_MSC_VER >= 1400)
 #    define U_ATTRIBUTE_DEPRECATED __declspec(deprecated)
 #else
@@ -284,17 +295,23 @@ typedef int8_t UBool;
 /**
  * \var UChar
  * Define UChar to be wchar_t if that is 16 bits wide; always assumed to be unsigned.
- * If wchar_t is not 16 bits wide, then define UChar to be uint16_t.
+ * If wchar_t is not 16 bits wide, then define UChar to be uint16_t or char16_t because GCC >=4.4
+ * can handle UTF16 string literals.
  * This makes the definition of UChar platform-dependent
  * but allows direct string type compatibility with platforms with
  * 16-bit wchar_t types.
  *
- * @stable ICU 2.0
+ * @draft ICU 4.4
  */
 
 /* Define UChar to be compatible with wchar_t if possible. */
 #if U_SIZEOF_WCHAR_T==2
     typedef wchar_t UChar;
+#elif U_GNUC_UTF16_STRING
+#if defined _GCC_
+    typedef __CHAR16_TYPE__ char16_t;
+#endif
+    typedef char16_t UChar;
 #else
     typedef uint16_t UChar;
 #endif

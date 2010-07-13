@@ -18,8 +18,9 @@
 #define __UENUM_H
 
 #include "unicode/utypes.h"
+#include "unicode/localpointer.h"
 
-#ifdef XP_CPLUSPLUS
+#if U_SHOW_CPLUSPLUS_API
 #include "unicode/strenum.h"
 #endif
 
@@ -46,6 +47,25 @@ typedef struct UEnumeration UEnumeration;
  */
 U_STABLE void U_EXPORT2
 uenum_close(UEnumeration* en);
+
+#if U_SHOW_CPLUSPLUS_API
+
+U_NAMESPACE_BEGIN
+
+/**
+ * \class LocalUEnumerationPointer
+ * "Smart pointer" class, closes a UEnumeration via uenum_close().
+ * For most methods see the LocalPointerBase base class.
+ *
+ * @see LocalPointerBase
+ * @see LocalPointer
+ * @draft ICU 4.4
+ */
+U_DEFINE_LOCAL_OPEN_POINTER(LocalUEnumerationPointer, UEnumeration, uenum_close);
+
+U_NAMESPACE_END
+
+#endif
 
 /**
  * Returns the number of elements that the iterator traverses.  If
@@ -135,7 +155,7 @@ uenum_next(UEnumeration* en,
 U_STABLE void U_EXPORT2
 uenum_reset(UEnumeration* en, UErrorCode* status);
 
-#ifdef XP_CPLUSPLUS
+#if U_SHOW_CPLUSPLUS_API
 
 /**
  * Given a StringEnumeration, wrap it in a UEnumeration.  The
