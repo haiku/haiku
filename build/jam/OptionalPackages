@@ -426,8 +426,8 @@ if [ IsOptionalHaikuImagePackageAdded CVS ] {
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ] && $(TARGET_ARCH) = x86 {
 	# autotools
-	InstallOptionalHaikuImagePackage autoconf-2.66-x86-gcc2-2010-07-03.zip
-		: $(baseURL)/autoconf-2.66-x86-gcc2-2010-07-03.zip
+	InstallOptionalHaikuImagePackage autoconf-2.65-r1a2-x86-gcc2-2010-04-21-a.zip
+		: $(baseURL)/autoconf-2.65-r1a2-x86-gcc2-2010-04-21-a.zip
 		:
 		: true
 	;
