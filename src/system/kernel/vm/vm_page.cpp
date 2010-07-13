@@ -2016,6 +2016,11 @@ page_writer(void* /*unused*/)
 			}
 
 			run.AddPage(page);
+				// TODO: We're possibly adding pages of different caches and
+				// thus maybe of different underlying file systems here. This
+				// is a potential problem for loop file systems/devices, since
+				// we could mark a page busy that would need to be accessed
+				// when writing back another page, thus causing a deadlock.
 
 			DEBUG_PAGE_ACCESS_END(page);
 
