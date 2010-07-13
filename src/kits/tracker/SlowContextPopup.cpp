@@ -152,9 +152,7 @@ BSlowContextMenu::NeedsToRebuild() const
 void
 BSlowContextMenu::ClearMenu()
 {
-	int32 count = CountItems();
-	for (int32 index = count - 1; index >= 0; index--) 
-		delete RemoveItem(index);
+	RemoveItems(0, CountItems(), true);
 
 	fMenuBuilt = false;
 }
@@ -169,9 +167,7 @@ BSlowContextMenu::ClearMenuBuildingState()
 	// item list is non-owning, need to delete the items because
 	// they didn't get added to the menu
 	if (fItemList) {
-		int32 count = fItemList->CountItems();
-		for (int32 index = count - 1; index >= 0; index--)
-			delete RemoveItem(index);
+		RemoveItems(0, fItemList->CountItems(), true);
 		delete fItemList;
 		fItemList = NULL;
 	}
