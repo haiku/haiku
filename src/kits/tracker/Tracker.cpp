@@ -86,9 +86,6 @@ All rights reserved.
 #include "Utilities.h"
 #include "VolumeWindow.h"
 
-// PPC binary compatibility.
-#include "AboutBox.cpp"
-
 // prototypes for some private kernel calls that will some day be public
 #ifndef _IMPEXP_ROOT
 #	define _IMPEXP_ROOT
