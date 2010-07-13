@@ -290,7 +290,7 @@ RosterData::InitializeCatalogAddOns()
 	// add info about embedded default catalog:
 	BCatalogAddOnInfo *defaultCatalogAddOnInfo
 		= new(std::nothrow) BCatalogAddOnInfo("Default", "",
-			 DefaultCatalog::kDefaultCatalogAddOnPriority);
+			DefaultCatalog::kDefaultCatalogAddOnPriority);
 	if (!defaultCatalogAddOnInfo)
 		return;
 
@@ -309,10 +309,26 @@ RosterData::InitializeCatalogAddOns()
 	BDirectory addOnFolder;
 	char buf[4096];
 	status_t err;
-	for (int f=0; folders[f]>=0; ++f) {
+	for (int f = 0; folders[f]>=0; ++f) {
 		find_directory(folders[f], &addOnPath);
 		BString addOnFolderName(addOnPath.Path());
 		addOnFolderName << "/locale/catalogs";
+
+		system_info info;
+		if (get_system_info(&info) == B_OK
+				&& (info.abi & B_HAIKU_ABI_MAJOR)
+				!= (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR)) {
+			switch (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) {
+				case B_HAIKU_ABI_GCC_2:
+					addOnFolderName << "/gcc2";
+					break;
+				case B_HAIKU_ABI_GCC_4:
+					addOnFolderName << "/gcc4";
+					break;
+			}
+		}
+
+
 		err = addOnFolder.SetTo(addOnFolderName.String());
 		if (err != B_OK)
 			continue;

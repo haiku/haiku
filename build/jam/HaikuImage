@@ -51,8 +51,9 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	query quit
 	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
 	rmindex rmdir roster route
-	safemode screen_blanker screenmode screenshot sdiff setdecor settype setversion
-	setvolume setwep seq sha1sum shar shred shuf shutdown sleep sort spamdbm
+	safemode screen_blanker screenmode screenshot sdiff setdecor settype
+	setversion setvolume setwep seq sha1sum shar shred shuf shutdown sleep sort
+	spamdbm
 	split stat strace stty su sum sync sysinfo
 	tac tail tcpdump tcptester tee telnet telnetd test timeout top touch
 	tput tr traceroute translate trash true truncate tsort tty
@@ -518,6 +519,8 @@ AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons locale catalogs
 	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
+AddFilesToHaikuHybridImage system add-ons locale catalogs
+	: $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) : : true ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_protocols : POP3 IMAP ;
 AddFilesToHaikuImage system add-ons mail_daemon outbound_protocols : SMTP ;
 AddFilesToHaikuImage system add-ons mail_daemon inbound_filters
