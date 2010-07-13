@@ -684,7 +684,7 @@ arch_set_watchpoint(void *address, uint32 type, int32 length)
 status_t
 arch_clear_watchpoint(void *address)
 {
-	return clear_breakpoint(address, false);
+	return clear_breakpoint(address, true);
 }
 
 
