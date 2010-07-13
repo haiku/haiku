@@ -29,27 +29,6 @@ Depends MailKit :
 	spamdbm
 ;
 
-# Pseudo-target to build the network kit only
-NotFile NetworkingKit ;
-Depends NetworkingKit :
-	net_stack_driver net_server_driver
-	core
-	ethernet loopback ppp
-	raw route ipv4 icmp udp tcp
-	libnet.so libnetapi.so libbind.so libsocket.so
-	ping ifconfig <bin>route traceroute arp pppconfig
-
-	# network drivers:
-	sis900 rtl8139 rtl8169 via-rhine ipro1000 wb840 bcm440x bcm570x
-
-	# PPP devices:
-	modem pppoe
-	# PPP protocols:
-	ipcp
-	# PPP authenticators:
-	pap
-;
-
 # Pseudo-target to build the media stuffs only
 NotFile MediaKit ;
 Depends MediaKit :
