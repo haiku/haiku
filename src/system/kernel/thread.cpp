@@ -1389,11 +1389,11 @@ thread_exit(void)
 	// Cancel previously installed alarm timer, if any
 	cancel_timer(&thread->alarm);
 
-	// delete the user stack area first, we won't need it anymore
+	// remember the user stack area -- we will delete it below
+	area_id userStackArea = -1;
 	if (team->address_space != NULL && thread->user_stack_area >= 0) {
-		area_id area = thread->user_stack_area;
+		userStackArea = thread->user_stack_area;
 		thread->user_stack_area = -1;
-		vm_delete_area(team->id, area, true);
 	}
 
 	struct job_control_entry *death = NULL;
@@ -1586,6 +1586,20 @@ thread_exit(void)
 		restore_interrupts(state);
 
 		delete_sem(cachedExitSem);
+	}
+
+	// delete the user stack, if this was a user thread
+	if (!deleteTeam && userStackArea >= 0) {
+		// We postponed deleting the user stack until now, since this way all
+		// notifications for the thread's death are out already and all other
+		// threads waiting for this thread's death and some object on its stack
+		// will wake up before we (try to) delete the stack area. Of most
+		// relevance is probably the case where this is the main thread and
+		// other threads use objects on its stack -- so we want them terminated
+		// first.
+		// When the team is deleted, all areas are deleted anyway, so we don't
+		// need to do that explicitly in that case.
+		vm_delete_area(teamID, userStackArea, true);
 	}
 
 	// notify the debugger
