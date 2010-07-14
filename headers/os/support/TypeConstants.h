@@ -14,6 +14,7 @@
 
 enum {
 	B_AFFINE_TRANSFORM_TYPE			= 'AMTX',
+	B_ALIGNMENT_TYPE				= 'ALGN',
 	B_ANY_TYPE						= 'ANYT',
 	B_ATOM_TYPE						= 'ATOM',
 	B_ATOMREF_TYPE					= 'ATMR',
@@ -47,6 +48,7 @@ enum {
 	B_REF_TYPE						= 'RREF',
 	B_RGB_32_BIT_TYPE				= 'RGBB',
 	B_RGB_COLOR_TYPE				= 'RGBC',
+	B_SIZE_TYPE						= 'SIZE',
 	B_SIZE_T_TYPE					= 'SIZT',
 	B_SSIZE_T_TYPE					= 'SSZT',
 	B_STRING_TYPE					= 'CSTR',

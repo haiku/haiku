@@ -17,6 +17,7 @@
 #include <TokenSpace.h>
 #include <util/KMessage.h>
 
+#include <Alignment.h>
 #include <Application.h>
 #include <AppMisc.h>
 #include <BlockCache.h>
@@ -2382,6 +2383,7 @@ BMessage::Has##typeName(const char *name, int32 index) const				\
 
 DEFINE_FUNCTIONS(BPoint, Point, B_POINT_TYPE);
 DEFINE_FUNCTIONS(BRect, Rect, B_RECT_TYPE);
+DEFINE_FUNCTIONS(BSize, Size, B_SIZE_TYPE);
 DEFINE_FUNCTIONS(int8, Int8, B_INT8_TYPE);
 DEFINE_FUNCTIONS(uint8, UInt8, B_UINT8_TYPE);
 DEFINE_FUNCTIONS(int16, Int16, B_INT16_TYPE);
@@ -2403,6 +2405,7 @@ BMessage::Has##typeName(const char *name, int32 index) const				\
 	return HasData(name, typeCode, index);									\
 }
 
+DEFINE_HAS_FUNCTION(Alignment, B_ALIGNMENT_TYPE);
 DEFINE_HAS_FUNCTION(String, B_STRING_TYPE);
 DEFINE_HAS_FUNCTION(Pointer, B_POINTER_TYPE);
 DEFINE_HAS_FUNCTION(Messenger, B_MESSENGER_TYPE);
@@ -2432,6 +2435,14 @@ DEFINE_LAZY_FIND_FUNCTION(float, Float, 0);
 DEFINE_LAZY_FIND_FUNCTION(double, Double, 0);
 
 #undef DEFINE_LAZY_FIND_FUNCTION
+
+status_t
+BMessage::AddAlignment(const char* name, const BAlignment& alignment)
+{
+	int32 data[2] = {alignment.horizontal, alignment.vertical};
+	return AddData(name, B_ALIGNMENT_TYPE, data, sizeof(data));
+}
+
 
 status_t
 BMessage::AddString(const char *name, const char *string)
@@ -2535,6 +2546,38 @@ BMessage::AddFlat(const char *name, BFlattenable *object, int32 count)
 		free(buffer);
 
 	return error;
+}
+
+
+status_t
+BMessage::FindAlignment(const char* name, BAlignment* alignment) const
+{
+	return FindAlignment(name, 0, alignment);
+}
+
+
+status_t
+BMessage::FindAlignment(const char* name, int32 index,
+	BAlignment* alignment) const
+{
+	if (!alignment)
+		return B_BAD_VALUE;
+
+	int32* data;
+	ssize_t bytes;
+
+	status_t err = FindData(name, B_ALIGNMENT_TYPE, index,
+		(const void**)&data, &bytes);
+
+	if (err == B_OK) {
+		if (bytes != sizeof(int32[2]))
+			return B_ERROR;
+
+		alignment->horizontal = (enum alignment)(*data);
+		alignment->vertical = (vertical_alignment)*(data + 1);
+	}
+
+	return err;
 }
 
 
@@ -2715,6 +2758,23 @@ BMessage::FindData(const char *name, type_code type, const void **data,
 	ssize_t *numBytes) const
 {
 	return FindData(name, type, 0, data, numBytes);
+}
+
+
+status_t
+BMessage::ReplaceAlignment(const char* name, const BAlignment& alignment)
+{
+	int32 data[2] = {alignment.horizontal, alignment.vertical};
+	return ReplaceData(name, B_ALIGNMENT_TYPE, 0, data, sizeof(data));
+}
+
+
+status_t
+BMessage::ReplaceAlignment(const char* name, int32 index,
+	const BAlignment& alignment)
+{
+	int32 data[2] = {alignment.horizontal, alignment.vertical};
+	return ReplaceData(name, B_ALIGNMENT_TYPE, index, data, sizeof(data));
 }
 
 

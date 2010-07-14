@@ -18,6 +18,7 @@
 #include <AppDefs.h>		/* For convenience */
 #include <TypeConstants.h>	/* For convenience */
 
+class BAlignment;
 class BBlockCache;
 class BMessenger;
 class BHandler;
@@ -114,8 +115,11 @@ class BMessage {
 		status_t		PopSpecifier();
 
 		// Adding data
+		status_t		AddAlignment(const char* name,
+							const BAlignment& alignment);
 		status_t		AddRect(const char *name, BRect aRect);
 		status_t		AddPoint(const char *name, BPoint aPoint);
+		status_t		AddSize(const char* name, BSize aSize);
 		status_t		AddString(const char *name, const char *aString);
 		status_t		AddString(const char *name, const BString &aString);
 		status_t		AddInt8(const char *name, int8 value);
@@ -145,10 +149,20 @@ class BMessage {
 		status_t		MakeEmpty();
 
 		// Finding data
+		status_t		FindAlignment(const char* name,
+							BAlignment* alignment) const;
+		status_t		FindAlignment(const char* name, int32 index,
+							BAlignment* alignment) const;
+
 		status_t		FindRect(const char *name, BRect *rect) const;
 		status_t		FindRect(const char *name, int32 index, BRect *rect) const;
 		status_t		FindPoint(const char *name, BPoint *point) const;
 		status_t		FindPoint(const char *name, int32 index, BPoint *point) const;
+
+		status_t		FindSize(const char *name, BSize* size) const;
+		status_t		FindSize(const char *name,
+							int32 index, BSize* size) const;
+
 		status_t		FindString(const char *name, const char **string) const;
 		status_t		FindString(const char *name, int32 index, const char **string) const;
 		status_t		FindString(const char *name, BString *string) const;
@@ -191,10 +205,19 @@ class BMessage {
 							const void **data, ssize_t *numBytes) const;
 
 		// Replacing data
+		status_t		ReplaceAlignment(const char* name,
+							const BAlignment& alignment);
+		status_t		ReplaceAlignment(const char* name, int32 index,
+							const BAlignment& alignment);
+
 		status_t		ReplaceRect(const char *name, BRect aRect);
 		status_t		ReplaceRect(const char *name, int32 index, BRect aRect);
+
 		status_t		ReplacePoint(const char *name, BPoint aPoint);
 		status_t		ReplacePoint(const char *name, int32 index, BPoint aPoint);
+		status_t		ReplaceSize(const char* name, BSize aSize);
+		status_t		ReplaceSize(const char* name, int32 index, BSize aSize);
+
 		status_t		ReplaceString(const char *name, const char *aString);
 		status_t		ReplaceString(const char *name, int32 index, const char *aString);
 		status_t		ReplaceString(const char *name, const BString &aString);
@@ -245,8 +268,10 @@ class BMessage {
 		void			operator delete(void *pointer, size_t size);
 
 		// Private, reserved, or obsolete
+		bool			HasAlignment(const char*, int32 n = 0) const;
 		bool			HasRect(const char *, int32 n = 0) const;
 		bool			HasPoint(const char *, int32 n = 0) const;
+		bool			HasSize(const char*, int32 n = 0) const;
 		bool			HasString(const char *, int32 n = 0) const;
 		bool			HasInt8(const char *, int32 n = 0) const;
 		bool			HasUInt8(const char *, int32 n = 0) const;
