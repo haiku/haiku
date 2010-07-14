@@ -17,7 +17,9 @@ class Volume;
 
 
 enum {
-	TRANSACTION_DELETE_NODE	= 0x1
+	TRANSACTION_DELETE_NODE			= 0x1,
+	TRANSACTION_NODE_ALREADY_LOCKED	= 0x2,
+	TRANSACTION_KEEP_NODE_LOCKED	= 0x4
 };
 
 
@@ -29,6 +31,7 @@ public:
 			int32				ID() const	{ return fID; }
 
 			status_t			Start();
+			status_t			StartAndAddNode(Node* node, uint32 flags = 0);
 			status_t			Commit();
 			void				Abort();
 

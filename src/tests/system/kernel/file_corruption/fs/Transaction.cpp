@@ -60,6 +60,17 @@ Transaction::Start()
 
 
 status_t
+Transaction::StartAndAddNode(Node* node, uint32 flags = 0)
+{
+	status_t error = Start();
+	if (error != B_OK)
+		return error;
+
+	return AddNode(node, flags);
+}
+
+
+status_t
 Transaction::Commit()
 {
 	ASSERT(fID >= 0);
@@ -128,7 +139,8 @@ Transaction::AddNode(Node* node, uint32 flags)
 	if (info == NULL)
 		return B_NO_MEMORY;
 
-	node->WriteLock();
+	if ((flags & TRANSACTION_NODE_ALREADY_LOCKED) == 0)
+		node->WriteLock();
 
 	info->node = node;
 	info->oldNodeData = node->NodeData();
@@ -189,7 +201,7 @@ Transaction::_DeleteNodeInfosAndUnlock(bool failed)
 	while (NodeInfo* info = fNodeInfos.RemoveHead()) {
 		if ((info->flags & TRANSACTION_DELETE_NODE) != 0)
 			delete info->node;
-		else
+		else if ((info->flags & TRANSACTION_KEEP_NODE_LOCKED) == 0)
 			info->node->WriteUnlock();
 		delete info;
 	}
