@@ -89,6 +89,6 @@ if $(TARGET_ARCH) != x86 {
 		: $(zipFile)
 	] ;
 
-	HAIKU_ICU_HEADERS
-		= [ FDirName $(HAIKU_ICU_DIR) common include ] ;
+	#HAIKU_ICU_HEADERS
+	#	= [ FDirName $(HAIKU_ICU_DIR) common include ] ;
 }

@@ -749,6 +749,21 @@ if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
 }
 
 
+# ICU
+if [ IsOptionalHaikuImagePackageAdded ICU ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package ICU available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage $(HAIKU_ICU_PACKAGE)
+			: $(HAIKU_ICU_URL)
+			:
+			:
+			: true
+		;
+	}
+}
+
+
 # KeymapSwitcher
 if [ IsOptionalHaikuImagePackageAdded KeymapSwitcher ] {
 	if $(TARGET_ARCH) != x86 {

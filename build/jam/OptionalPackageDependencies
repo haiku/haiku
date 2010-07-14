@@ -15,7 +15,7 @@ OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies ICU-devel : Development ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies Tar : LibIconv ;
-OptionalPackageDependencies MandatoryPackages : Sed Tar ;
+OptionalPackageDependencies MandatoryPackages : ICU Sed Tar ;
 OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
 OptionalPackageDependencies NetFS : UserlandFS ;

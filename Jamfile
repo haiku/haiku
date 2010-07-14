@@ -147,6 +147,8 @@ if $(HAIKU_OPENSSL_ENABLED) {
 	AddOptionalHaikuImagePackages OpenSSL ;
 }
 
+AddOptionalHaikuImagePackages ICU ;
+
 # Evaluate optional package dependencies 
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ; 
 
