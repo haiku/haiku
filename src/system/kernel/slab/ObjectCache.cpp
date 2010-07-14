@@ -203,6 +203,16 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 
 	ParanoiaChecker _(source);
 
+#if KDEBUG >= 1
+	uint8* objectsStart = (uint8*)source->pages + source->offset;
+	if (object < objectsStart
+		|| object >= objectsStart + source->size * object_size
+		|| ((uint8*)object - objectsStart) % object_size != 0) {
+		panic("object_cache: tried to free invalid object pointer");
+		return;
+	}
+#endif // KDEBUG
+
 	object_link* link = object_to_link(object, object_size);
 
 	TRACE_CACHE(this, "returning %p (%p) to %p, %lu used (%lu empty slabs).",
