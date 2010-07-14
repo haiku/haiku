@@ -311,7 +311,7 @@ class ConditionalAllAppsIterator : public EntryListBase {
 
 	private:
 		SearchForSignatureEntryList *fParent;
-		WALKER_NS::TWalker *fWalker;
+		BTrackerPrivate::TWalker *fWalker;
 };
 
 } // namespace BPrivate

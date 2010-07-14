@@ -72,7 +72,7 @@ protected:
 class TWalkerWrapper : public EntryListBase {
 	// this is to be able to use TWalker polymorfically as BEntryListBase
 public:
-	TWalkerWrapper(WALKER_NS::TWalker *walker);
+	TWalkerWrapper(BTrackerPrivate::TWalker *walker);
 	virtual ~TWalkerWrapper();
 
 	virtual status_t InitCheck() const;
@@ -84,7 +84,7 @@ public:
 	virtual int32 CountEntries();
 
 protected:
-	WALKER_NS::TWalker *fWalker;
+	BTrackerPrivate::TWalker *fWalker;
 	status_t fStatus;
 };
 

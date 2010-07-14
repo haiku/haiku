@@ -343,7 +343,7 @@ class DeleteTransientQueriesTask {
 		bool ProcessOneRef(Model *);
 
 	private:
-		WALKER_NS::TNodeWalker *fWalker;
+		BTrackerPrivate::TNodeWalker *fWalker;
 };
 
 

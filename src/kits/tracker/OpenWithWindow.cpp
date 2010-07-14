@@ -1277,7 +1277,7 @@ SearchForSignatureEntryList::Rewind()
 	ASSERT(predicateString.Length());
 // 	PRINT(("query predicate %s\n", predicateString.String()));
 	fIteratorList->AddItem(new TWalkerWrapper(
-		new WALKER_NS::TQueryWalker(predicateString.String())));
+		new BTrackerPrivate::TQueryWalker(predicateString.String())));
 	fIteratorList->AddItem(new ConditionalAllAppsIterator(this));
 
 	return fIteratorList->Rewind();
@@ -1609,7 +1609,7 @@ ConditionalAllAppsIterator::Instantiate()
 	BString lookForAppsPredicate;
 	lookForAppsPredicate << "(" << kAttrAppSignature << " = \"*\" ) && ( "
 		<< kAttrMIMEType << " = " << B_APP_MIME_TYPE << " ) ";
-	fWalker = new WALKER_NS::TQueryWalker(lookForAppsPredicate.String());
+	fWalker = new BTrackerPrivate::TQueryWalker(lookForAppsPredicate.String());
 }
 
 

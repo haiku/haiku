@@ -6,7 +6,7 @@ SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 AddResources Deskbar : Deskbar.rdef icon-freelogo.rdef icons.rdef ;
 
-SubDirC++Flags -DDB_ADDONS -DOPEN_TRACKER=1
+SubDirC++Flags -DDB_ADDONS
 	-D_INCLUDES_CLASS_DEVICE_MAP=1
 	-D_SUPPORTS_RESOURCES=1
 	-D_SUPPORTS_FEATURE_SCRIPTING=1 ;

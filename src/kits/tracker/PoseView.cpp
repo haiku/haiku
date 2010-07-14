@@ -75,7 +75,6 @@ All rights reserved.
 #include "DeskWindow.h"
 #include "DesktopPoseView.h"
 #include "DirMenu.h"
-#include "EntryIterator.h"
 #include "FilePanelPriv.h"
 #include "FSClipboard.h"
 #include "FSUtils.h"

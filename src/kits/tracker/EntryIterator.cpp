@@ -44,7 +44,7 @@ All rights reserved.
 #include "ObjectList.h"
 
 
-TWalkerWrapper::TWalkerWrapper(WALKER_NS::TWalker *walker)
+TWalkerWrapper::TWalkerWrapper(BTrackerPrivate::TWalker *walker)
 	:
 	fWalker(walker),
 	fStatus(B_OK)

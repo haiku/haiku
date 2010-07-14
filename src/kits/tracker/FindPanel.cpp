@@ -2866,7 +2866,7 @@ DeleteTransientQueriesTask::Initialize()
 		state = kError;
 		return;
 	}
-	fWalker = new WALKER_NS::TNodeWalker(path.Path());
+	fWalker = new BTrackerPrivate::TNodeWalker(path.Path());
 	state = kAllocatedWalker;
 }
 

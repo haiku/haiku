@@ -49,14 +49,12 @@ All rights reserved.
 #include <functional>
 #include <algorithm>
 
-#include "EntryIterator.h"
 #include "IconMenuItem.h"
 #include "NavMenu.h"
 #include "PoseView.h"
 #include "QueryPoseView.h"
 #include "Tracker.h"
 #include "Utilities.h"
-
 
 
 #undef B_TRANSLATE_CONTEXT

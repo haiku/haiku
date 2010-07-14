@@ -32,14 +32,6 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#if !OPEN_TRACKER
-
-#include <private/storage/walker.h>
-
-#define WALKER_NS
-
-#else
-
 #ifndef WALKER_H
 #define WALKER_H
 
@@ -57,7 +49,6 @@ All rights reserved.
 #include "ObjectList.h"
 
 namespace BTrackerPrivate {
-#define WALKER_NS BTrackerPrivate
 
 
 class TWalker : public BEntryList {
@@ -185,5 +176,3 @@ private:
 using namespace BTrackerPrivate;
 
 #endif	// WALKER_H
-
-#endif	// B_BEOS_VERSION_DANO
