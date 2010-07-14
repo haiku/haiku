@@ -26,7 +26,7 @@ typedef enum {
 	B_HOUR,
 	B_MINUTE,
 	B_SECOND
-} BDateField;
+} BDateElement;
 
 
 class BCountry {
@@ -53,7 +53,7 @@ class BCountry {
 			bool longFormat);
 		status_t		FormatTime(BString* string, int*& fieldPositions,
 			int& fieldCount, time_t time, bool longFormat);
-		status_t		TimeFields(BDateField*& fields, int& fieldCount,
+		status_t		TimeFields(BDateElement*& fields, int& fieldCount,
 			bool longFormat);
 
 		bool		DateFormat(BString&, bool longFormat) const;

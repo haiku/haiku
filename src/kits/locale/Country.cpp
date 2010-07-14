@@ -241,7 +241,7 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 
 
 status_t
-BCountry::TimeFields(BDateField*& fields, int& fieldCount, bool longFormat)
+BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 {
 	fields = NULL;
 	UErrorCode error = U_ZERO_ERROR;
@@ -264,7 +264,7 @@ BCountry::TimeFields(BDateField*& fields, int& fieldCount, bool longFormat)
 		fieldCount ++;
 	}
 
-	fields = (BDateField*) malloc(fieldCount * sizeof(BDateField));
+	fields = (BDateElement*) malloc(fieldCount * sizeof(BDateElement));
 
 	for (int i = 0 ; i < fieldCount ; i++ ) {
 		switch (fieldPosStorage[i]) {

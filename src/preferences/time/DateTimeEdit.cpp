@@ -269,7 +269,7 @@ TTimeEdit::BuildDispatch(BMessage *message)
 
 	message->AddBool("time", true);
 
-	BDateField* dateFormat;
+	BDateElement* dateFormat;
 	int fieldCount;
 	BCountry* here;
 	be_locale_roster->GetDefaultCountry(&here);
@@ -297,7 +297,7 @@ void
 TTimeEdit::_CheckRange()
 {
 	int32 value = fHoldValue;
-	BDateField* fields;
+	BDateElement* fields;
 	int fieldCount;
 	BCountry* here;
 	be_locale_roster->GetDefaultCountry(&here);
@@ -363,7 +363,7 @@ bool
 TTimeEdit::_IsValidDoubleDigi(int32 value)
 {
 	bool isInRange = false;
-	BDateField* fields;
+	BDateElement* fields;
 	int fieldCount;
 	BCountry* here;
 	be_locale_roster->GetDefaultCountry(&here);
@@ -402,7 +402,7 @@ int32
 TTimeEdit::_SectionValue(int32 index) const
 {
 	int32 value;
-	BDateField* fields;
+	BDateElement* fields;
 	int fieldCount;
 	BCountry* here;
 	be_locale_roster->GetDefaultCountry(&here);
