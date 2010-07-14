@@ -14,6 +14,8 @@
 
 
 #include <List.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
 #include <String.h>
 #include <Window.h>
 
@@ -108,69 +110,40 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	int* fieldPositions;
 	int fieldCount;
 
-	// be_locale_roster->GetDefaultCountry->FormatTime(&text, fieldPositions,
-	// 	fieldCount, time);
+	BCountry* country;
+	be_locale_roster->GetDefaultCountry(&country);
+	country->FormatTime(&text, fieldPositions, fieldCount, time, true);
+		// TODO : this should be cached somehow to not redo it for each field
+
+	if (index * 2 + 1 > fieldCount) {
+		free(fieldPositions);
+		return;
+	}
+
+	BString field;
+	// TODO : the following calculations assume chars are 8-bit. The
+	// fieldPositions are character index, not byte index.
+	field.SetTo(text.String()+fieldPositions[index * 2],
+		fieldPositions[index * 2 + 1] - fieldPositions[index * 2]);
+
+	free(fieldPositions);
 
 	// calc and center text in section rect
-	float width = be_plain_font->StringWidth(text.String());
+	float width = be_plain_font->StringWidth(field.String());
 
 	BPoint offset(-((bounds.Width()- width) / 2.0) -1.0,
 		bounds.Height() / 2.0 -6.0);
 
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-
-	BString field;
-	field.SetTo(text.String()+fieldPositions[index * 2],
-		fieldPositions[index * 2 + 1] - fieldPositions[index * 2]);
 	DrawString(field.String(), bounds.LeftBottom() - offset);
 
-	free(fieldPositions);
 }
-
-
-#if 0
-		case 0:
-			// hour
-			if (value > 12) {
-				if (value < 22)
-					text << "0";
-				text << value - 12;
-			} else if (value == 0) {
-				text << "12";
-			} else {
-				if (value < 10)
-					text << "0";
-				text << value;
-			}
-			break;
-
-		case 1:
-		case 2:
-			// minute
-			// second
-			if (value < 10)
-				text << "0";
-			text << value;
-			break;
-
-		case 3:
-			// am/pm
-			value = fTime.Hour();
-			if (value >= 12)
-				text << "PM";
-			else
-				text << "AM";
-			break;
-#endif
 
 
 void
 TTimeEdit::DrawSeparator(uint32 index)
 {
-	if (index == 3)
-		return;
-
 	TSection *section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 
@@ -180,13 +153,32 @@ TTimeEdit::DrawSeparator(uint32 index)
 	BRect bounds = section->Frame();
 	float sepWidth = SeparatorWidth();
 
-	const char* sep = ":";
-	if (index == 2)
-		sep = "-";
+	BString text;
+	int* fieldPositions;
+	int fieldCount;
 
-	float width = be_plain_font->StringWidth(sep);
+	BCountry* country;
+	be_locale_roster->GetDefaultCountry(&country);
+	time_t time = fTime.Hour() * 3600 + fTime.Minute() * 60 + fTime.Second();
+	country->FormatTime(&text, fieldPositions, fieldCount, time, true);
+		// TODO : this should be cached somehow to not redo it for each field
+
+	if (index * 2 + 2 > fieldCount) {
+		free(fieldPositions);
+		return;
+	}
+
+	BString field;
+	// TODO : the following calculations assume chars are 8-bit. The
+	// fieldPositions are character index, not byte index.
+	field.SetTo(text.String()+fieldPositions[index * 2  + 1],
+		fieldPositions[index * 2 + 2] - fieldPositions[index * 2 + 1]);
+
+	free(fieldPositions);
+
+	float width = be_plain_font->StringWidth(field);
 	BPoint offset(-((sepWidth - width) / 2.0) -1.0, bounds.Height() / 2.0 -6.0);
-	DrawString(sep, bounds.RightBottom() - offset);
+	DrawString(field, bounds.RightBottom() - offset);
 }
 
 
