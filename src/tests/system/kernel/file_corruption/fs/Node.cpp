@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "Block.h"
+#include "DebugSupport.h"
 
 
 static inline uint64
@@ -69,6 +70,41 @@ Node::~Node()
 }
 
 
+status_t
+Node::InitForVFS()
+{
+	return B_OK;
+}
+
+
+status_t
+Node::DeletingNode(Transaction& transaction)
+{
+	return B_OK;
+}
+
+
+status_t
+Node::Resize(uint64 newSize, bool fillWithZeroes, Transaction& transaction)
+{
+	RETURN_ERROR(B_BAD_VALUE);
+}
+
+
+status_t
+Node::Read(off_t pos, void* buffer, size_t size, size_t& _bytesRead)
+{
+	RETURN_ERROR(B_BAD_VALUE);
+}
+
+
+status_t
+Node::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten)
+{
+	RETURN_ERROR(B_BAD_VALUE);
+}
+
+
 void
 Node::SetParentDirectory(uint32 blockIndex)
 {
@@ -86,9 +122,57 @@ Node::SetHardLinks(uint32 value)
 
 
 void
+Node::SetUID(uint32 uid)
+{
+	fNode.uid = uid;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetGID(uint32 gid)
+{
+	fNode.gid = gid;
+	fNodeDataDirty = true;
+}
+
+
+void
 Node::SetSize(uint64 size)
 {
 	fNode.size = size;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetAccessedTime(uint64 time)
+{
+	fAccessedTime = time;
+}
+
+
+void
+Node::SetCreationTime(uint64 time)
+{
+	fNode.creationTime = time;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetModificationTime(uint64 time)
+{
+	fNode.modificationTime = time;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetChangeTime(uint64 time)
+{
+	fNode.changeTime = time;
+	fNodeDataDirty = true;
 }
 
 

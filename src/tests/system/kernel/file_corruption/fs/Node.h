@@ -34,6 +34,16 @@ public:
 									mode_t mode);
 	virtual						~Node();
 
+	virtual	status_t			InitForVFS();
+	virtual	status_t			DeletingNode(Transaction& transaction);
+
+	virtual	status_t			Resize(uint64 newSize, bool fillWithZeroes,
+									Transaction& transaction);
+	virtual	status_t			Read(off_t pos, void* buffer, size_t size,
+									size_t& _bytesRead);
+	virtual	status_t			Write(off_t pos, const void* buffer,
+									size_t size, size_t& _bytesWritten);
+
 	inline	const checksumfs_node& NodeData() const	{ return fNode; }
 	inline	Volume*				GetVolume() const	{ return fVolume; }
 	inline	uint64				BlockIndex() const	{ return fBlockIndex; }
@@ -50,7 +60,13 @@ public:
 
 			void				SetParentDirectory(uint32 blockIndex);
 			void				SetHardLinks(uint32 value);
+			void				SetUID(uint32 uid);
+			void				SetGID(uint32 gid);
 			void				SetSize(uint64 size);
+			void				SetAccessedTime(uint64 time);
+			void				SetCreationTime(uint64 time);
+			void				SetModificationTime(uint64 time);
+			void				SetChangeTime(uint64 time);
 
 			void				Touched(int32 mode);
 
@@ -59,7 +75,7 @@ public:
 	inline	bool				WriteLock();
 	inline	void				WriteUnlock();
 
-			void				RevertNodeData(const checksumfs_node& nodeData);
+	virtual	void				RevertNodeData(const checksumfs_node& nodeData);
 
 			status_t			Flush(Transaction& transaction);
 
