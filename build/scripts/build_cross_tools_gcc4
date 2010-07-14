@@ -27,6 +27,10 @@ esac
 export MAKE
 
 case $haikuMachine in
+x86_64-*)
+	binutilsConfigureArgs="--enable-multilib"
+	gccConfigureArgs="--enable-multilib"
+	;;
 m68k-*)
 	binutilsConfigureArgs="--enable-multilib"
 	gccConfigureArgs="--enable-multilib"
