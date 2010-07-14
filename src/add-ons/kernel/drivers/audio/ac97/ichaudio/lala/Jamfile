@@ -1,12 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
 
-# R5KernelStaticLibrary liblala.a :
-# 	driver.c
-# ;
 
-KernelMergeObject lala.o :
+KernelMergeObject ichaudio_lala.o :
 	driver.c
 	util.c
-	: 
-	-fno-pic -D_KERNEL_MODE
-	;
+;

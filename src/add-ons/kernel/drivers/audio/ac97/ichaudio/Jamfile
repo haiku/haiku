@@ -1,26 +1,14 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ichaudio ;
 
-# UsePrivateHeaders media ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons lala ] ;
 
-KernelMergeObject ichaudio_driver.o : 
+
+KernelAddon ichaudio :
 	ichaudio.c
 	io.c
-	:
-	-fno-pic -Wno-unused -D_KERNEL_MODE
-	;
+	: ichaudio_lala.o
+;
 
-KernelLd ichaudio :
-	ichaudio_driver.o
-	lala.o
-	/boot/beos/system/kernel_intel
-	:
-	$(HAIKU_TOP)/src/kernel/ldscripts/$(TARGET_ARCH)/add-on.ld
-	:
-	-Bdynamic -shared
-	:
-	:
-	;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
