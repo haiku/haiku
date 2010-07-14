@@ -37,7 +37,7 @@ SymLink::~SymLink()
 
 
 status_t
-SymLink::Read(char* buffer, size_t toRead, size_t& _bytesRead)
+SymLink::ReadSymLink(char* buffer, size_t toRead, size_t& _bytesRead)
 {
 	uint64 size = Size();
 	if (size > kMaxSymLinkSize)
@@ -65,7 +65,8 @@ SymLink::Read(char* buffer, size_t toRead, size_t& _bytesRead)
 
 
 status_t
-SymLink::Write(const char* buffer, size_t toWrite, Transaction& transaction)
+SymLink::WriteSymLink(const char* buffer, size_t toWrite,
+	Transaction& transaction)
 {
 	uint64 size = Size();
 	if (size > kMaxSymLinkSize)

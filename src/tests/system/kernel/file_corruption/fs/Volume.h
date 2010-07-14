@@ -15,6 +15,7 @@
 
 class BlockAllocator;
 class Directory;
+class File;
 class Node;
 class SymLink;
 class Transaction;
@@ -35,6 +36,7 @@ public:
 
 			void				GetInfo(fs_info& info);
 
+			status_t			NewNode(Node* node);
 			status_t			PublishNode(Node* node, uint32 flags);
 			status_t			GetNode(uint64 blockIndex, Node*& _node);
 			status_t			PutNode(Node* node);
@@ -45,6 +47,8 @@ public:
 			status_t			CreateDirectory(mode_t mode,
 									Transaction& transaction,
 									Directory*& _directory);
+			status_t			CreateFile(mode_t mode,
+									Transaction& transaction, File*& _file);
 			status_t			CreateSymLink(mode_t mode,
 									Transaction& transaction,
 									SymLink*& _symLink);
@@ -54,6 +58,7 @@ public:
 	inline	void				TransactionFinished();
 
 	inline	dev_t				ID() const			{ return fFSVolume->id; }
+	inline	int					FD() const			{ return fFD; }
 	inline	bool				IsReadOnly() const;
 	inline	uint64				TotalBlocks() const	{ return fTotalBlocks; }
 	inline	void*				BlockCache() const	{ return fBlockCache; }

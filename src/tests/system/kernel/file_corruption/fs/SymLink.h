@@ -17,9 +17,9 @@ public:
 									mode_t mode);
 	virtual						~SymLink();
 
-			status_t			Read(char* buffer, size_t toRead,
+			status_t			ReadSymLink(char* buffer, size_t toRead,
 									size_t& _bytesRead);
-			status_t			Write(const char* buffer, size_t toWrite,
+			status_t			WriteSymLink(const char* buffer, size_t toWrite,
 									Transaction& transaction);
 };
 

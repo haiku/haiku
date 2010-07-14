@@ -23,6 +23,7 @@
 #include "checksumfs_private.h"
 #include "DebugSupport.h"
 #include "Directory.h"
+#include "File.h"
 #include "SuperBlock.h"
 #include "SymLink.h"
 
@@ -229,6 +230,13 @@ Volume::GetInfo(fs_info& info)
 
 
 status_t
+Volume::NewNode(Node* node)
+{
+	return new_vnode(fFSVolume, node->BlockIndex(), node, &gCheckSumFSVnodeOps);
+}
+
+
+status_t
 Volume::PublishNode(Node* node, uint32 flags)
 {
 	return publish_vnode(fFSVolume, node->BlockIndex(), node,
@@ -277,6 +285,9 @@ Volume::ReadNode(uint64 blockIndex, Node*& _node)
 		case S_IFDIR:
 			node = new(std::nothrow) Directory(this, blockIndex, *nodeData);
 			break;
+		case S_IFREG:
+			node = new(std::nothrow) File(this, blockIndex, *nodeData);
+			break;
 		case S_IFLNK:
 			node = new(std::nothrow) SymLink(this, blockIndex, *nodeData);
 			break;
@@ -307,7 +318,7 @@ Volume::CreateDirectory(mode_t mode, Transaction& transaction,
 
 	// create the directory
 	Directory* directory = new(std::nothrow) Directory(this,
-		allocatedBlock.Index(), (mode & ~(mode_t)S_IFMT) | S_IFDIR);
+		allocatedBlock.Index(), (mode & S_IUMSK) | S_IFDIR);
 	if (directory == NULL)
 		return B_NO_MEMORY;
 
@@ -326,6 +337,35 @@ Volume::CreateDirectory(mode_t mode, Transaction& transaction,
 
 
 status_t
+Volume::CreateFile(mode_t mode, Transaction& transaction, File*& _file)
+{
+	// allocate a free block
+	AllocatedBlock allocatedBlock(fBlockAllocator, transaction);
+	status_t error = allocatedBlock.Allocate();
+	if (error != B_OK)
+		return error;
+
+	// create the file
+	File* file = new(std::nothrow) File(this, allocatedBlock.Index(),
+		(mode & S_IUMSK) | S_IFREG);
+	if (file == NULL)
+		return B_NO_MEMORY;
+
+	// attach the file to the transaction
+	error = transaction.AddNode(file, TRANSACTION_DELETE_NODE);
+	if (error != B_OK) {
+		delete file;
+		return error;
+	}
+
+	allocatedBlock.Detach();
+	_file = file;
+
+	return B_OK;
+}
+
+
+status_t
 Volume::CreateSymLink(mode_t mode, Transaction& transaction, SymLink*& _symLink)
 {
 	// allocate a free block
@@ -336,11 +376,11 @@ Volume::CreateSymLink(mode_t mode, Transaction& transaction, SymLink*& _symLink)
 
 	// create the symlink
 	SymLink* symLink = new(std::nothrow) SymLink(this, allocatedBlock.Index(),
-		(mode & ~(mode_t)S_IFMT) | S_IFLNK);
+		(mode & S_IUMSK) | S_IFLNK);
 	if (symLink == NULL)
 		return B_NO_MEMORY;
 
-	// attach the directory to the transaction
+	// attach the symlink to the transaction
 	error = transaction.AddNode(symLink, TRANSACTION_DELETE_NODE);
 	if (error != B_OK) {
 		delete symLink;
@@ -360,6 +400,12 @@ Volume::DeleteNode(Node* node)
 	Transaction transaction(this);
 	status_t error = transaction.Start();
 	if (error == B_OK) {
+		error = node->DeletingNode(transaction);
+		if (error != B_OK) {
+			ERROR("Preparing deletion of failed for node at %" B_PRIu64 "\n",
+				node->BlockIndex());
+		}
+
 		error = fBlockAllocator->Free(node->BlockIndex(), 1, transaction);
 		if (error == B_OK) {
 			error = transaction.Commit();

@@ -20,6 +20,7 @@ HAIKU_CHECKSUM_FS_SOURCES =
 	BlockAllocator.cpp
 	checksumfs.cpp
 	Directory.cpp
+	File.cpp
 	Node.cpp
 	SuperBlock.cpp
 	SymLink.cpp
