@@ -14,6 +14,7 @@
 
 #include "Block.h"
 #include "checksumfs.h"
+#include "DebugSupport.h"
 #include "Volume.h"
 
 
@@ -577,7 +578,7 @@ dprintf("BlockAllocator::_Free(%llu, %llu)\n", base, count);
 		uint64 toFree = std::min(remaining, kBlocksPerGroup - groupOffset);
 		status_t error = _FreeInGroup(base, toFree, transaction);
 		if (error != B_OK)
-			return error;
+			RETURN_ERROR(error);
 
 		fFreeBlocks += toFree;
 		remaining -= toFree;
@@ -603,7 +604,7 @@ dprintf("BlockAllocator::_FreeInGroup(%llu, %lu)\n", base, count);
 	Block block;
 	if (!block.GetWritable(fVolume,
 			fAllocationGroupBlock + base / kBlocksPerGroup, transaction)) {
-		return B_ERROR;
+		RETURN_ERROR(B_ERROR);
 	}
 
 	uint16* counts = (uint16*)block.Data();
@@ -617,11 +618,11 @@ dprintf("BlockAllocator::_FreeInGroup(%llu, %lu)\n", base, count);
 			kBlocksPerBitmapBlock - inBlockOffset);
 
 		if (counts[blockIndex] + toFree > kBlocksPerBitmapBlock)
-			return B_BAD_VALUE;
+			RETURN_ERROR(B_BAD_VALUE);
 
 		status_t error = _FreeInBitmapBlock(base, toFree, transaction);
 		if (error != B_OK)
-			return error;
+			RETURN_ERROR(error);
 
 		counts[blockIndex] += toFree;
 		remaining -= toFree;
@@ -645,7 +646,7 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 	Block block;
 	if (!block.GetWritable(fVolume,
 			fBitmapBlock + base / kBlocksPerBitmapBlock, transaction)) {
-		return B_ERROR;
+		RETURN_ERROR(B_ERROR);
 	}
 
 	uint32* bits = (uint32*)block.Data() + base % kBlocksPerBitmapBlock / 32;
@@ -662,7 +663,7 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 
 		if ((*bits & mask) != mask) {
 			block.Discard();
-			return B_BAD_VALUE;
+			RETURN_ERROR(B_BAD_VALUE);
 		}
 
 		*bits &= ~mask;
@@ -673,7 +674,7 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 	while (remaining >= 32) {
 		if (*bits != 0xffffffff) {
 			block.Discard();
-			return B_BUSY;
+			RETURN_ERROR(B_BUSY);
 		}
 
 		*bits = 0;
