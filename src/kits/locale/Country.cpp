@@ -8,6 +8,7 @@
 #include <Country.h>
 
 #include <assert.h>
+#include <iostream>
 #include <stdlib.h>
 #include <vector>
 
@@ -234,6 +235,61 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
+
+	return B_OK;
+}
+
+
+status_t
+BCountry::TimeFields(BDateField*& fields, int& fieldCount, bool longFormat)
+{
+	fields = NULL;
+	UErrorCode error = U_ZERO_ERROR;
+	ICU_VERSION::DateFormat* timeFormatter;
+	ICU_VERSION::FieldPositionIterator positionIterator;
+	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
+	UnicodeString ICUString;
+	time_t now;
+	ICUString = timeFormatter->format((UDate)time(&now) * 1000, ICUString,
+		&positionIterator, error);
+
+	if (error != U_ZERO_ERROR)
+		return B_ERROR;
+
+	ICU_VERSION::FieldPosition field;
+	std::vector<int> fieldPosStorage;
+	fieldCount  = 0;
+	while (positionIterator.next(field)) {
+		fieldPosStorage.push_back(field.getField());
+		fieldCount ++;
+	}
+
+	fields = (BDateField*) malloc(fieldCount * sizeof(BDateField));
+
+	for (int i = 0 ; i < fieldCount ; i++ ) {
+		switch (fieldPosStorage[i]) {
+			case UDAT_HOUR_OF_DAY1_FIELD:
+			case UDAT_HOUR_OF_DAY0_FIELD:
+			case UDAT_HOUR1_FIELD:
+			case UDAT_HOUR0_FIELD:
+				fields[i] = B_HOUR;
+				break;
+			case UDAT_MINUTE_FIELD:
+				fields[i] = B_MINUTE;
+				break;
+			case UDAT_SECOND_FIELD:
+				fields[i] = B_SECOND;
+				break;
+			case UDAT_AM_PM_FIELD:
+				fields[i] = B_AM_PM;
+				break;
+			default:
+				std::cout << "invalid field id " << fieldPosStorage[i] 
+					<< std::endl;
+				fields[i] = B_INVALID;
+				break;
+		}
+	}
 
 	return B_OK;
 }

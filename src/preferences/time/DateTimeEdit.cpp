@@ -115,15 +115,13 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	country->FormatTime(&text, fieldPositions, fieldCount, time, true);
 		// TODO : this should be cached somehow to not redo it for each field
 
-	if (index * 2 + 1 > fieldCount) {
+	if (index * 2 + 1 >= fieldCount) {
 		free(fieldPositions);
 		return;
 	}
 
 	BString field;
-	// TODO : the following calculations assume chars are 8-bit. The
-	// fieldPositions are character index, not byte index.
-	field.SetTo(text.String()+fieldPositions[index * 2],
+	text.CopyCharsInto(field, fieldPositions[index * 2],
 		fieldPositions[index * 2 + 1] - fieldPositions[index * 2]);
 
 	free(fieldPositions);
@@ -136,8 +134,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-	DrawString(field.String(), bounds.LeftBottom() - offset);
-
+	DrawString(field, bounds.LeftBottom() - offset);
 }
 
 
@@ -169,9 +166,7 @@ TTimeEdit::DrawSeparator(uint32 index)
 	}
 
 	BString field;
-	// TODO : the following calculations assume chars are 8-bit. The
-	// fieldPositions are character index, not byte index.
-	field.SetTo(text.String()+fieldPositions[index * 2  + 1],
+	text.CopyCharsInto(field, fieldPositions[index * 2 + 1],
 		fieldPositions[index * 2 + 2] - fieldPositions[index * 2 + 1]);
 
 	free(fieldPositions);
@@ -274,14 +269,27 @@ TTimeEdit::BuildDispatch(BMessage *message)
 
 	message->AddBool("time", true);
 
+	BDateField* dateFormat;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->TimeFields(dateFormat, fieldCount, true);
+	if (fFocus > fieldCount) {
+		free(dateFormat);
+		return;
+	}
+
 	for (int32 index = 0; index < fSectionList->CountItems() -1; ++index) {
 		uint32 data = _SectionValue(index);
 
 		if (fFocus == index)
 			data = fHoldValue;
 
-		message->AddInt32(fields[index], data);
+		if (dateFormat[index] < 3)
+			message->AddInt32(fields[dateFormat[index]], data);
 	}
+
+	free(dateFormat);
 }
 
 
@@ -289,9 +297,17 @@ void
 TTimeEdit::_CheckRange()
 {
 	int32 value = fHoldValue;
-	switch (fFocus) {
-		case 0:
-			// hour
+	BDateField* fields;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->TimeFields(fields, fieldCount, true);
+	if (fFocus > fieldCount) {
+		free(fields);
+		return;
+	}
+	switch (fields[fFocus]) {
+		case B_HOUR:
 			if (value > 23)
 				value = 0;
 			else if (value < 0)
@@ -300,8 +316,7 @@ TTimeEdit::_CheckRange()
 			fTime.SetTime(value, fTime.Minute(), fTime.Second());
 			break;
 
-		case 1:
-			// minute
+		case B_MINUTE:
 			if (value> 59)
 				value = 0;
 			else if (value < 0)
@@ -310,8 +325,7 @@ TTimeEdit::_CheckRange()
 			fTime.SetTime(fTime.Hour(), value, fTime.Second());
 			break;
 
-		case 2:
-			// second
+		case B_SECOND:
 			if (value > 59)
 				value = 0;
 			else if (value < 0)
@@ -320,8 +334,7 @@ TTimeEdit::_CheckRange()
 			fTime.SetTime(fTime.Hour(), fTime.Minute(), value);
 			break;
 
-		case 3:
-			// AM/PM
+		case B_AM_PM:
 			value = fTime.Hour();
 			if (value < 13)
 				value += 12;
@@ -335,8 +348,11 @@ TTimeEdit::_CheckRange()
 			break;
 
 		default:
+			free(fields);
 			return;
 	}
+
+	free(fields);
 
 	fHoldValue = value;
 	Invalidate(Bounds());
@@ -347,29 +363,37 @@ bool
 TTimeEdit::_IsValidDoubleDigi(int32 value)
 {
 	bool isInRange = false;
-	switch (fFocus) {
-		case 0:
-			// hour
+	BDateField* fields;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->TimeFields(fields, fieldCount, true);
+	if (fFocus > fieldCount) {
+		free(fields);
+		return false;
+	}
+	switch (fields[fFocus]) {
+		case B_HOUR:
 			if (value <= 23)
 				isInRange = true;
 			break;
 
-		case 1:
-			// minute
+		case B_MINUTE:
 			if (value <= 59)
 				isInRange = true;
 			break;
 
-		case 2:
-			// second
+		case B_SECOND:
 			if (value <= 59)
 				isInRange = true;
 			break;
 
 		default:
+			free(fields);
 			return isInRange;
 	}
 
+	free(fields);
 	return isInRange;
 }
 
@@ -378,16 +402,25 @@ int32
 TTimeEdit::_SectionValue(int32 index) const
 {
 	int32 value;
-	switch (index) {
-		case 0:
+	BDateField* fields;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->TimeFields(fields, fieldCount, true);
+	if (index > fieldCount) {
+		free(fields);
+		return 0;
+	}
+	switch (fields[index]) {
+		case B_HOUR:
 			value = fTime.Hour();
 			break;
 
-		case 1:
+		case B_MINUTE:
 			value = fTime.Minute();
 			break;
 
-		case 2:
+		case B_SECOND:
 			value = fTime.Second();
 			break;
 
@@ -396,6 +429,7 @@ TTimeEdit::_SectionValue(int32 index) const
 			break;
 	}
 
+	free(fields);
 	return value;
 }
 

@@ -20,6 +20,14 @@ enum {
 	B_US
 };
 
+typedef enum {
+	B_INVALID = B_BAD_DATA,
+	B_AM_PM = 0,
+	B_HOUR,
+	B_MINUTE,
+	B_SECOND
+} BDateField;
+
 
 class BCountry {
 	public:
@@ -44,7 +52,9 @@ class BCountry {
 		virtual void	FormatTime(BString* string, time_t time,
 			bool longFormat);
 		status_t		FormatTime(BString* string, int*& fieldPositions,
-			int& fieldCount, time_t time, bool LongFormat);
+			int& fieldCount, time_t time, bool longFormat);
+		status_t		TimeFields(BDateField*& fields, int& fieldCount,
+			bool longFormat);
 
 		bool		DateFormat(BString&, bool longFormat) const;
 		void		SetDateFormat(const char* formatString,
