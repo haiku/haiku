@@ -35,15 +35,16 @@ class BCountry {
 
 		// date & time
 
-		virtual void FormatDate(char* string, size_t maxSize, time_t time,
+		virtual void	FormatDate(char* string, size_t maxSize, time_t time,
 			bool longFormat);
-		virtual void FormatDate(BString* string, time_t time, bool longFormat);
-		virtual void FormatTime(char* string, size_t maxSize, time_t time,
+		virtual void	FormatDate(BString* string, time_t time,
 			bool longFormat);
-		virtual void FormatTime(BString* string, time_t time,
+		virtual void	FormatTime(char* string, size_t maxSize, time_t time,
 			bool longFormat);
-		virtual void FormatTime(BString* string, int*& fieldPositions,
-			int& fieldCount, time_t time);
+		virtual void	FormatTime(BString* string, time_t time,
+			bool longFormat);
+		status_t		FormatTime(BString* string, int*& fieldPositions,
+			int& fieldCount, time_t time, bool LongFormat);
 
 		bool		DateFormat(BString&, bool longFormat) const;
 		void		SetDateFormat(const char* formatString,

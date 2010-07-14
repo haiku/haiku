@@ -8,6 +8,8 @@
 #include <Country.h>
 
 #include <assert.h>
+#include <stdlib.h>
+#include <vector>
 
 #include <CalendarView.h>
 #include <IconUtils.h>
@@ -198,12 +200,42 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 }
 
 
-void
+status_t
 BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
-	time_t time)
+	time_t time, bool longFormat)
 {
-	// TODO : this needs ICU 4.4 functions
-	FormatTime(string, time, false);
+	fieldPositions = NULL;
+	UErrorCode error = U_ZERO_ERROR;
+	ICU_VERSION::DateFormat* timeFormatter;
+	ICU_VERSION::FieldPositionIterator positionIterator;
+	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
+	UnicodeString ICUString;
+	ICUString = timeFormatter->format((UDate)time * 1000, ICUString,
+		&positionIterator, error);
+
+	if (error != U_ZERO_ERROR)
+		return B_ERROR;
+
+	ICU_VERSION::FieldPosition field;
+	std::vector<int> fieldPosStorage;
+	fieldCount  = 0;
+	while (positionIterator.next(field)) {
+		fieldPosStorage.push_back(field.getBeginIndex());
+		fieldPosStorage.push_back(field.getEndIndex());
+		fieldCount += 2;
+	}
+
+	fieldPositions = (int*) malloc(fieldCount * sizeof(int));
+
+	for (int i = 0 ; i < fieldCount ; i++ )
+		fieldPositions[i] = fieldPosStorage[i];
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
+
+	return B_OK;
 }
 
 
