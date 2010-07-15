@@ -248,6 +248,16 @@ complete protocol that included additional information, such as vendor/model
 names, copyright/version info, category, etc., but they never got around to it.
 
 <TABLE BORDER="1">
+<TR><TD>property</TD><TD>Vector icon (raw data)</TD></TR>
+<TR><TD>field name</TD><TD>"icon"</TD></TR>
+<TR><TD>field type</TD><TD>'VICN'</TD></TR>
+</TABLE>
+
+This vector icon is available under Haiku only, and comes as raw data, not a BBitmap. 
+Before being able to display it, you first must render the vector icon in the size of 
+your choice.
+
+<TABLE BORDER="1">
 <TR><TD>property</TD><TD>Large (32x32) icon</TD></TR>
 <TR><TD>field name</TD><TD>"be:large_icon"</TD></TR>
 <TR><TD>field type</TD><TD>'ICON'</TD></TR>
