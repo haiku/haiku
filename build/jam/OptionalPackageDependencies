@@ -12,10 +12,9 @@ OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
 OptionalPackageDependencies GetText : LibIconv ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
-OptionalPackageDependencies ICU-devel : Development ;
+OptionalPackageDependencies ICU-devel : DevelopmentBase ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
 OptionalPackageDependencies Tar : LibIconv ;
-OptionalPackageDependencies MandatoryPackages : ICU Sed Tar ;
 OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
 OptionalPackageDependencies NetFS : UserlandFS ;
@@ -28,3 +27,4 @@ OptionalPackageDependencies Vim : LibIconv ;
 OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 
+OptionalPackageDependencies MandatoryPackages : ICU Sed Tar ;

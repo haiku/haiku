@@ -4,40 +4,50 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders libbe locale shared ;
 UsePublicHeaders locale storage icon ;
-UseLibraryHeaders icu icon ;
+UseLibraryHeaders icon ;
+
+local sources =
+	cat.cpp
+	Catalog.cpp
+	Collator.cpp
+	Country.cpp
+	Currency.cpp
+	DefaultCatalog.cpp
+	FloatFormat.cpp
+	FloatFormatImpl.cpp
+	FloatFormatParameters.cpp
+	Format.cpp
+	FormatImpl.cpp
+	FormatParameters.cpp
+	GenericNumberFormat.cpp
+	HashMapCatalog.cpp
+	IntegerFormat.cpp
+	IntegerFormatImpl.cpp
+	IntegerFormatParameters.cpp
+	langinfo.cpp
+	Language.cpp
+	LibbeLocaleBackend.cpp
+	LibraryInit.cpp
+	Locale.cpp
+	LocaleRoster.cpp
+	NumberFormat.cpp
+	NumberFormatImpl.cpp
+	NumberFormatParameters.cpp
+	PropertyFile.cpp
+	TimeFormat.cpp
+	UnicodeChar.cpp
+	;
+
+
+SubDirSysHdrs $(HAIKU_ICU_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
 
 AddResources liblocale.so : CountryFlags.rdef ;
 
 SharedLibrary liblocale.so
-	: cat.cpp
-	  Catalog.cpp
-	  Collator.cpp
-	  Country.cpp
-	  Currency.cpp
-	  DefaultCatalog.cpp
-	  FloatFormat.cpp
-	  FloatFormatImpl.cpp
-	  FloatFormatParameters.cpp
-	  Format.cpp
-	  FormatImpl.cpp
-	  FormatParameters.cpp
-	  GenericNumberFormat.cpp
-	  HashMapCatalog.cpp
-	  IntegerFormat.cpp
-	  IntegerFormatImpl.cpp
-	  IntegerFormatParameters.cpp
-	  langinfo.cpp
-	  Language.cpp
-	  LibbeLocaleBackend.cpp
-	  LibraryInit.cpp
-	  Locale.cpp
-	  LocaleRoster.cpp
-	  NumberFormat.cpp
-	  NumberFormatImpl.cpp
-	  NumberFormatParameters.cpp
-	  PropertyFile.cpp
-	  TimeFormat.cpp
-	  UnicodeChar.cpp
+	: $(sources)
 	: be $(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
 	;
 
@@ -54,4 +64,4 @@ DoCatalogs liblocale.so :
 	  ColorControl.cpp
 	:
 	: '"(gLocaleBackend\\s*->\\s*GetString\\s*|BCatalogAddOn\\s*::\\s*MarkForTranslation\\s*)"'
-;
+	;

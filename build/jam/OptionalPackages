@@ -39,7 +39,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	GetText					- a framework to help produce multi-lingual messages.
 #	Git						- the distributed version control system
 #	GPerf					- the perfect hash function generator.
-#	ICU-devel				- the headers for ICU (for development)
+#	ICU-devel				- the headers and lib-links for ICU (for development)
 #	KeymapSwitcher			- Easy to use keymap switcher
 #	LibEvent				- An event notification library
 #	LibIconv				- text encoding conversion library
@@ -727,28 +727,6 @@ if [ IsOptionalHaikuImagePackageAdded GPerf ] {
 }
 
 
-# ICU-devel
-if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
-	InstallOptionalHaikuImagePackage icu-devel-4.2-2010-01-26.zip
-		: $(baseURL)/icu-devel-4.2-2010-01-26.zip
-	;
-	local arch = $(TARGET_ARCH) ;
-	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
-	local libs = common data i18n ;
-	for lib in $(libs) {
-		lib = libicu-$(lib).so ;
-		local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
-		if $(abiVersion) {
-			local abiVersionedLib = $(lib).$(abiVersion) ;
-			AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
-				: /system/lib $(abiVersionedLib) : : true ;
-		}
-		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
-			: /system/lib $(lib) : : true ;
-	}
-}
-
-
 # ICU
 if [ IsOptionalHaikuImagePackageAdded ICU ] {
 	if $(TARGET_ARCH) != x86 {
@@ -779,6 +757,25 @@ if [ IsOptionalHaikuImagePackageAdded ICU ] {
 				;
 			}
 		}
+	}
+}
+
+
+# ICU-devel
+if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
+	InstallOptionalHaikuImagePackage icu-devel-4.4.1-2010-07-15.zip
+		: $(baseURL)/icu-devel-4.4.1-2010-07-15.zip
+	;
+
+	local arch = $(TARGET_ARCH) ;
+	local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
+	for abiVersionedLib in $(HAIKU_ICU_LIBS) {
+		abiVersionedLib = $(abiVersionedLib:G=) ;
+		local lib = $(abiVersionedLib:B) ;
+		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
+			: /system/lib $(abiVersionedLib) : : true ;
+		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
+			: $(abiVersionedLib) : $(lib) ;
 	}
 }
 
