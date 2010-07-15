@@ -31,7 +31,7 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "AboutWindow"
 
-extern const char* kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
+const char* kApplicationSignature = "application/x-vnd.Haiku-ShowImage";
 
 
 ShowImageApp::ShowImageApp()
