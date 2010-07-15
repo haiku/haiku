@@ -754,12 +754,31 @@ if [ IsOptionalHaikuImagePackageAdded ICU ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package ICU available for $(TARGET_ARCH)" ;
 	} else {
-		InstallOptionalHaikuImagePackage $(HAIKU_ICU_PACKAGE)
-			: $(HAIKU_ICU_URL)
-			:
-			:
-			: true
-		;
+		if $(HAIKU_GCC_VERSION[1]) = 2 {
+			# unzip gcc2
+			InstallOptionalHaikuImagePackage $(HAIKU_ICU_GCC_2_PACKAGE)
+				: $(baseURL)/$(HAIKU_ICU_GCC_2_PACKAGE)
+				: system lib ;
+			if $(isHybridBuild) {
+				# unzip gcc4 to gcc4 subdir
+				InstallOptionalHaikuImagePackage $(HAIKU_ICU_GCC_4_PACKAGE)
+					: $(baseURL)/$(HAIKU_ICU_GCC_4_PACKAGE)
+					: system lib gcc4
+				;
+			}
+		} else {
+			# unzip gcc4
+			InstallOptionalHaikuImagePackage $(HAIKU_ICU_GCC_4_PACKAGE)
+				: $(baseURL)/$(HAIKU_ICU_GCC_4_PACKAGE)
+				: system lib ;
+			if $(isHybridBuild) {
+				# unzip gcc2 to gcc2 subdir
+				InstallOptionalHaikuImagePackage $(HAIKU_ICU_GCC_2_PACKAGE)
+					: $(baseURL)/$(HAIKU_ICU_GCC_2_PACKAGE)
+					: system lib gcc2
+				;
+			}
+		}
 	}
 }
 
