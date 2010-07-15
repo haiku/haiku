@@ -223,6 +223,13 @@ ServerApp::InitCheck()
 }
 
 
+void
+ServerApp::Quit()
+{
+	Quit(-1);
+}
+
+
 /*!	\brief This quits the application and deletes it. You're not supposed
 		to call its destructor directly.
 
