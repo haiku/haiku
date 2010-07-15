@@ -33,6 +33,7 @@ class Desktop;
 class DrawingEngine;
 class EventDispatcher;
 class Screen;
+class WindowBehaviour;
 class WorkspacesView;
 
 // TODO: move this into a proper place
@@ -169,10 +170,12 @@ public:
 
 			void				SetCurrentWorkspace(int32 index)
 									{ fCurrentWorkspace = index; }
+			int32				CurrentWorkspace() const
+									{ return fCurrentWorkspace; }
 			bool				IsVisible() const;
 
-			bool				IsDragging() const { return fIsDragging; }
-			bool				IsResizing() const { return fIsResizing; }
+			bool				IsDragging() const;
+			bool				IsResizing() const;
 
 			void				SetSizeLimits(int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
@@ -244,6 +247,7 @@ public:
 	static	uint32				ValidWindowFlags();
 	static	uint32				ValidWindowFlags(window_feel feel);
 
+			BRegion&			BorderRegion() { return fBorderRegion; }
 protected:
 			void				_ShiftPartOfRegion(BRegion* region,
 									BRegion* regionToShift, int32 xOffset,
@@ -260,19 +264,8 @@ protected:
 
 			void				_UpdateContentRegion();
 
-			int32				_ExtractButtons(
-									const BMessage* message) const;
-			int32				_ExtractModifiers(
-									const BMessage* message) const;
-			click_type			_ActionFor(const BMessage* message) const;
-			click_type			_ActionFor(const BMessage* message,
-									int32 buttons, int32 modifiers) const;
-
 			void				_ObeySizeLimits();
 			void				_PropagatePosition();
-
-			void				_AlterDeltaForSnap(BPoint& delta,
-									bigtime_t now);
 
 			BString				fTitle;
 			// TODO: no fp rects anywhere
@@ -309,25 +302,12 @@ protected:
 
 			BObjectList<Window> fSubsets;
 
-// TODO: remove those some day (let the decorator handle that stuff)
-			bool				fIsClosing : 1;
-			bool				fIsMinimizing : 1;
-			bool				fIsZooming : 1;
-			bool				fIsResizing : 1;
-			bool				fIsSlidingTab : 1;
-			bool				fIsDragging : 1;
-			bool				fActivateOnMouseUp : 1;
-
+			WindowBehaviour*	fWindowBehaviour;
 			::Decorator*		fDecorator;
 			View*				fTopView;
 			::ServerWindow*		fWindow;
 			DrawingEngine*		fDrawingEngine;
 			::Desktop*			fDesktop;
-
-			BPoint				fLastMousePosition;
-			float				fMouseMoveDistance;
-			bigtime_t			fLastMoveTime;
-			bigtime_t			fLastSnapTime;
 
 			// The synchronization, which client drawing commands
 			// belong to the redraw of which dirty region is handled

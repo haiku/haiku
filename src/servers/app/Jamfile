@@ -21,6 +21,7 @@ Server app_server :
 	DecorManager.cpp
 	Decorator.cpp
 	DefaultDecorator.cpp
+	DefaultWindowBehaviour.cpp
 	Desktop.cpp
 	DesktopSettings.cpp
 	DirectWindowInfo.cpp
@@ -57,6 +58,7 @@ Server app_server :
 	View.cpp
 	VirtualScreen.cpp
 	Window.cpp
+	WindowBehaviour.cpp
 	WindowList.cpp
 	Workspace.cpp
 	WorkspacesView.cpp
