@@ -79,12 +79,10 @@ Window::Window(const BRect& frame, const char *name,
 	fDirtyRegion(),
 	fDirtyCause(0),
 
-	fBorderRegion(),
 	fContentRegion(),
 	fEffectiveDrawingRegion(),
 
 	fVisibleContentRegionValid(false),
-	fBorderRegionValid(false),
 	fContentRegionValid(false),
 	fEffectiveDrawingRegionValid(false),
 
@@ -221,16 +219,10 @@ Window::GetBorderRegion(BRegion* region)
 	// TODO: if someone needs to call this from
 	// the outside, the clipping needs to be readlocked!
 
-	if (!fBorderRegionValid) {
-		if (fDecorator)
-			fDecorator->GetFootprint(&fBorderRegion);
-		else
-			fBorderRegion.MakeEmpty();
-
-		fBorderRegionValid = true;
-	}
-
-	*region = fBorderRegion;
+	if (fDecorator)
+		*region = fDecorator->GetFootprint();
+	else
+		region->MakeEmpty();
 }
 
 
@@ -293,8 +285,6 @@ Window::MoveBy(int32 x, int32 y)
 	// processed yet
 	fDirtyRegion.OffsetBy(x, y);
 
-	if (fBorderRegionValid)
-		fBorderRegion.OffsetBy(x, y);
 	if (fContentRegionValid)
 		fContentRegion.OffsetBy(x, y);
 
@@ -351,7 +341,6 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	fFrame.right += x;
 	fFrame.bottom += y;
 
-	fBorderRegionValid = false;
 	fContentRegionValid = false;
 	fEffectiveDrawingRegionValid = false;
 
@@ -765,10 +754,6 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 {
 	DesktopSettings desktopSettings(fDesktop);
 
-	// TODO: move into Decorator
-	if (!fBorderRegionValid)
-		GetBorderRegion(&fBorderRegion);
-
 	bool eventEaten = fWindowBehaviour->MouseDown(message, where);
 	if (!eventEaten) {
 		// click was inside the window contents
@@ -898,12 +883,8 @@ Window::SetTitle(const char* name, BRegion& dirty)
 
 	fTitle = name;
 
-	if (fDecorator) {
+	if (fDecorator)
 		fDecorator->SetTitle(name, &dirty);
-
-		fBorderRegionValid = false;
-			// the border very likely changed
-	}
 }
 
 
@@ -915,7 +896,9 @@ Window::SetFocus(bool focus)
 	// so the window thread cannot be
 	// accessing fIsFocus
 
-	BRegion* dirty = fRegionPool.GetRegion(fBorderRegion);
+	BRegion* dirty = NULL;
+	if (fDecorator)
+		dirty = fRegionPool.GetRegion(fDecorator->GetFootprint());
 	if (dirty) {
 		dirty->IntersectWith(&fVisibleRegion);
 		fDesktop->MarkDirty(*dirty);
@@ -1028,13 +1011,10 @@ Window::GetSizeLimits(int32* minWidth, int32* maxWidth,
 bool
 Window::SetTabLocation(float location, BRegion& dirty)
 {
-	bool ret = false;
-	if (fDecorator) {
-		ret = fDecorator->SetTabLocation(location, &dirty);
-		// the border region changed if ret is true
-		fBorderRegionValid = fBorderRegionValid && !ret;
-	}
-	return ret;
+	if (fDecorator)
+		return fDecorator->SetTabLocation(location, &dirty);
+		
+	return false;
 }
 
 
@@ -1050,13 +1030,9 @@ Window::TabLocation() const
 bool
 Window::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
 {
-	bool ret = false;
-	if (fDecorator) {
-		ret = fDecorator->SetSettings(settings, &dirty);
-		// the border region changed if ret is true
-		fBorderRegionValid = fBorderRegionValid && !ret;
-	}
-	return ret;
+	if (fDecorator)
+		return fDecorator->SetSettings(settings, &dirty);
+	return false;
 }
 
 
@@ -1076,7 +1052,6 @@ Window::FontsChanged(BRegion* updateRegion)
 	if (fDecorator != NULL) {
 		DesktopSettings settings(fDesktop);
 		fDecorator->FontsChanged(settings, updateRegion);
-		fBorderRegionValid = false;
 	}
 }
 
@@ -1094,8 +1069,6 @@ Window::SetLook(window_look look, BRegion* updateRegion)
 
 	fLook = look;
 
-	fBorderRegionValid = false;
-		// the border very likely changed
 	fContentRegionValid = false;
 		// mabye a resize handle was added...
 	fEffectiveDrawingRegionValid = false;
@@ -1159,9 +1132,6 @@ Window::SetFlags(uint32 flags, BRegion* updateRegion)
 		return;
 
 	fDecorator->SetFlags(flags, updateRegion);
-
-	fBorderRegionValid = false;
-		// the border might have changed (smaller/larger tab)
 
 	// we might need to resize the window!
 	if (fDecorator) {
@@ -1829,12 +1799,8 @@ Window::_UpdateContentRegion()
 	fContentRegion.Set(fFrame);
 
 	// resize handle
-	if (fDecorator) {
-		if (!fBorderRegionValid)
-			GetBorderRegion(&fBorderRegion);
-
-		fContentRegion.Exclude(&fBorderRegion);
-	}
+	if (fDecorator)
+		fContentRegion.Exclude(&fDecorator->GetFootprint());
 
 	fContentRegionValid = true;
 }

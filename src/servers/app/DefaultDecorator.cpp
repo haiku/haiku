@@ -144,291 +144,6 @@ DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
 }
 
 
-void
-DefaultDecorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
-{
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	_UpdateFont(settings);
-	_InvalidateBitmaps();
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-DefaultDecorator::SetLook(DesktopSettings& settings, window_look look,
-	BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	fLook = look;
-
-	_UpdateFont(settings);
-	_InvalidateBitmaps();
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-DefaultDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	Decorator::SetFlags(flags, updateRegion);
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-DefaultDecorator::MoveBy(BPoint offset)
-{
-	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n", offset.x, offset.y));
-	// Move all internal rectangles the appropriate amount
-	fFrame.OffsetBy(offset);
-	fCloseRect.OffsetBy(offset);
-	fTabRect.OffsetBy(offset);
-	fResizeRect.OffsetBy(offset);
-	fZoomRect.OffsetBy(offset);
-	fBorderRect.OffsetBy(offset);
-
-	fLeftBorder.OffsetBy(offset);
-	fRightBorder.OffsetBy(offset);
-	fTopBorder.OffsetBy(offset);
-	fBottomBorder.OffsetBy(offset);
-}
-
-
-void
-DefaultDecorator::ResizeBy(BPoint offset, BRegion* dirty)
-{
-	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n", offset.x, offset.y));
-	// Move all internal rectangles the appropriate amount
-	fFrame.right += offset.x;
-	fFrame.bottom += offset.y;
-
-	// Handle invalidation of resize rect
-	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
-		BRect realResizeRect;
-		switch (fLook) {
-			case B_DOCUMENT_WINDOW_LOOK:
-				realResizeRect = fResizeRect;
-				// Resize rect at old location
-				dirty->Include(realResizeRect);
-				realResizeRect.OffsetBy(offset);
-				// Resize rect at new location
-				dirty->Include(realResizeRect);
-				break;
-			case B_TITLED_WINDOW_LOOK:
-			case B_FLOATING_WINDOW_LOOK:
-			case B_MODAL_WINDOW_LOOK:
-			case kLeftTitledWindowLook:
-				// The bottom border resize line
-				realResizeRect.Set(fRightBorder.right - kBorderResizeLength, fBottomBorder.top,
-					fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1);
-				// Old location
-				dirty->Include(realResizeRect);
-				realResizeRect.OffsetBy(offset);
-				// New location
-				dirty->Include(realResizeRect);
-
-				// The right border resize line
-				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength,
-					fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength);
-				// Old location
-				dirty->Include(realResizeRect);
-				realResizeRect.OffsetBy(offset);
-				// New location
-				dirty->Include(realResizeRect);
-				break;
-			default:
-				break;
-		}
-	}
-
-	fResizeRect.OffsetBy(offset);
-
-	fBorderRect.right += offset.x;
-	fBorderRect.bottom += offset.y;
-
-	fLeftBorder.bottom += offset.y;
-	fTopBorder.right += offset.x;
-
-	fRightBorder.OffsetBy(offset.x, 0.0);
-	fRightBorder.bottom	+= offset.y;
-
-	fBottomBorder.OffsetBy(0.0, offset.y);
-	fBottomBorder.right	+= offset.x;
-
-	if (dirty) {
-		if (offset.x > 0.0) {
-			BRect t(fRightBorder.left - offset.x, fTopBorder.top,
-				fRightBorder.right, fTopBorder.bottom);
-			dirty->Include(t);
-			t.Set(fRightBorder.left - offset.x, fBottomBorder.top,
-				fRightBorder.right, fBottomBorder.bottom);
-			dirty->Include(t);
-			dirty->Include(fRightBorder);
-		} else if (offset.x < 0.0) {
-			dirty->Include(BRect(fRightBorder.left, fTopBorder.top,
-				fRightBorder.right, fBottomBorder.bottom));
-		}
-		if (offset.y > 0.0) {
-			BRect t(fLeftBorder.left, fLeftBorder.bottom - offset.y,
-				fLeftBorder.right, fLeftBorder.bottom);
-			dirty->Include(t);
-			t.Set(fRightBorder.left, fRightBorder.bottom - offset.y,
-				fRightBorder.right, fRightBorder.bottom);
-			dirty->Include(t);
-			dirty->Include(fBottomBorder);
-		} else if (offset.y < 0.0) {
-			dirty->Include(fBottomBorder);
-		}
-	}
-
-	// resize tab and layout tab items
-	if (fTabRect.IsValid()) {
-		BRect oldTabRect(fTabRect);
-
-		float tabSize;
-		float maxLocation;
-		if (fLook != kLeftTitledWindowLook) {
-			tabSize = fRightBorder.right - fLeftBorder.left;
-		} else {
-			tabSize = fBottomBorder.bottom - fTopBorder.top;
-		}
-		maxLocation = tabSize - fMaxTabSize;
-		if (maxLocation < 0)
-			maxLocation = 0;
-
-		float tabOffset = floorf(fTabLocation * maxLocation);
-		float delta = tabOffset - fTabOffset;
-		fTabOffset = (uint32)tabOffset;
-		if (fLook != kLeftTitledWindowLook)
-			fTabRect.OffsetBy(delta, 0.0);
-		else
-			fTabRect.OffsetBy(0.0, delta);
-
-		if (tabSize < fMinTabSize)
-			tabSize = fMinTabSize;
-		if (tabSize > fMaxTabSize)
-			tabSize = fMaxTabSize;
-
-		if (fLook != kLeftTitledWindowLook && tabSize != fTabRect.Width()) {
-			fTabRect.right = fTabRect.left + tabSize;
-		} else if (fLook == kLeftTitledWindowLook
-			&& tabSize != fTabRect.Height()) {
-			fTabRect.bottom = fTabRect.top + tabSize;
-		}
-
-		if (oldTabRect != fTabRect) {
-			_LayoutTabItems(fTabRect);
-
-			if (dirty) {
-				// NOTE: the tab rect becoming smaller only would
-				// handled be the Desktop anyways, so it is sufficient
-				// to include it into the dirty region in it's
-				// final state
-				BRect redraw(fTabRect);
-				if (delta != 0.0) {
-					redraw = redraw | oldTabRect;
-					if (fLook != kLeftTitledWindowLook)
-						redraw.bottom++;
-					else
-						redraw.right++;
-				}
-				dirty->Include(redraw);
-			}
-		}
-	}
-}
-
-
-bool
-DefaultDecorator::SetTabLocation(float location, BRegion* updateRegion)
-{
-	STRACE(("DefaultDecorator: Set Tab Location(%.1f)\n", location));
-	if (!fTabRect.IsValid())
-		return false;
-
-	if (location < 0)
-		location = 0;
-
-	float maxLocation
-		= fRightBorder.right - fLeftBorder.left - fTabRect.Width();
-	if (location > maxLocation)
-		location = maxLocation;
-
-	float delta = location - fTabOffset;
-	if (delta == 0.0)
-		return false;
-
-	// redraw old rect (1 pix on the border also must be updated)
-	BRect trect(fTabRect);
-	trect.bottom++;
-	updateRegion->Include(trect);
-
-	fTabRect.OffsetBy(delta, 0);
-	fTabOffset = (int32)location;
-	_LayoutTabItems(fTabRect);
-
-	fTabLocation = maxLocation > 0.0 ? fTabOffset / maxLocation : 0.0;
-
-	// redraw new rect as well
-	trect = fTabRect;
-	trect.bottom++;
-	updateRegion->Include(trect);
-	return true;
-}
-
-
-bool
-DefaultDecorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
-{
-	float tabLocation;
-	if (settings.FindFloat("tab location", &tabLocation) == B_OK)
-		return SetTabLocation(tabLocation, updateRegion);
-
-	return false;
-}
-
-
 bool
 DefaultDecorator::GetSettings(BMessage* settings) const
 {
@@ -486,40 +201,6 @@ DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 	if (fResizeRect.IsValid()) {
 		*minHeight = (int32)roundf(max_c(*minHeight,
 			fResizeRect.Height() - fBorderWidth));
-	}
-}
-
-
-void
-DefaultDecorator::GetFootprint(BRegion* region)
-{
-	STRACE(("DefaultDecorator: Get Footprint\n"));
-	// This function calculates the decorator's footprint in coordinates
-	// relative to the view. This is most often used to set a Window
-	// object's visible region.
-	if (!region)
-		return;
-
-	region->MakeEmpty();
-
-	if (fLook == B_NO_BORDER_WINDOW_LOOK)
-		return;
-
-	region->Include(fTopBorder);
-	region->Include(fLeftBorder);
-	region->Include(fRightBorder);
-	region->Include(fBottomBorder);
-
-	if (fLook == B_BORDERED_WINDOW_LOOK)
-		return;
-
-	region->Include(fTabRect);
-
-	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
-		// include the rectangular resize knob on the bottom right
-		float knobSize = kResizeKnobSize - fBorderWidth;
-		region->Include(BRect(fFrame.right - knobSize, fFrame.bottom - knobSize,
-			fFrame.right, fFrame.bottom));
 	}
 }
 
@@ -1086,6 +767,58 @@ DefaultDecorator::_DrawZoom(BRect rect)
 
 
 void
+DefaultDecorator::_FontsChanged(DesktopSettings& settings,
+	BRegion* updateRegion)
+{
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_UpdateFont(settings);
+	_InvalidateBitmaps();
+	_DoLayout();
+
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
+DefaultDecorator::_SetLook(DesktopSettings& settings, window_look look,
+	BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_UpdateFont(settings);
+	_InvalidateBitmaps();
+	_DoLayout();
+
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
+DefaultDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_DoLayout();
+
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
 DefaultDecorator::_SetFocus()
 {
 	// SetFocus() performs necessary duties for color swapping and
@@ -1119,6 +852,253 @@ void
 DefaultDecorator::_SetColors()
 {
 	_SetFocus();
+}
+
+
+void
+DefaultDecorator::_MoveBy(BPoint offset)
+{
+	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n", offset.x, offset.y));
+	// Move all internal rectangles the appropriate amount
+	fFrame.OffsetBy(offset);
+	fCloseRect.OffsetBy(offset);
+	fTabRect.OffsetBy(offset);
+	fResizeRect.OffsetBy(offset);
+	fZoomRect.OffsetBy(offset);
+	fBorderRect.OffsetBy(offset);
+
+	fLeftBorder.OffsetBy(offset);
+	fRightBorder.OffsetBy(offset);
+	fTopBorder.OffsetBy(offset);
+	fBottomBorder.OffsetBy(offset);
+}
+
+
+void
+DefaultDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
+{
+	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n", offset.x, offset.y));
+	// Move all internal rectangles the appropriate amount
+	fFrame.right += offset.x;
+	fFrame.bottom += offset.y;
+
+	// Handle invalidation of resize rect
+	if (dirty && !(fFlags & B_NOT_RESIZABLE)) {
+		BRect realResizeRect;
+		switch (fLook) {
+			case B_DOCUMENT_WINDOW_LOOK:
+				realResizeRect = fResizeRect;
+				// Resize rect at old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(offset);
+				// Resize rect at new location
+				dirty->Include(realResizeRect);
+				break;
+			case B_TITLED_WINDOW_LOOK:
+			case B_FLOATING_WINDOW_LOOK:
+			case B_MODAL_WINDOW_LOOK:
+			case kLeftTitledWindowLook:
+				// The bottom border resize line
+				realResizeRect.Set(fRightBorder.right - kBorderResizeLength, fBottomBorder.top,
+					fRightBorder.right - kBorderResizeLength, fBottomBorder.bottom - 1);
+				// Old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(offset);
+				// New location
+				dirty->Include(realResizeRect);
+
+				// The right border resize line
+				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - kBorderResizeLength,
+					fRightBorder.right - 1, fBottomBorder.bottom - kBorderResizeLength);
+				// Old location
+				dirty->Include(realResizeRect);
+				realResizeRect.OffsetBy(offset);
+				// New location
+				dirty->Include(realResizeRect);
+				break;
+			default:
+				break;
+		}
+	}
+
+	fResizeRect.OffsetBy(offset);
+
+	fBorderRect.right += offset.x;
+	fBorderRect.bottom += offset.y;
+
+	fLeftBorder.bottom += offset.y;
+	fTopBorder.right += offset.x;
+
+	fRightBorder.OffsetBy(offset.x, 0.0);
+	fRightBorder.bottom	+= offset.y;
+
+	fBottomBorder.OffsetBy(0.0, offset.y);
+	fBottomBorder.right	+= offset.x;
+
+	if (dirty) {
+		if (offset.x > 0.0) {
+			BRect t(fRightBorder.left - offset.x, fTopBorder.top,
+				fRightBorder.right, fTopBorder.bottom);
+			dirty->Include(t);
+			t.Set(fRightBorder.left - offset.x, fBottomBorder.top,
+				fRightBorder.right, fBottomBorder.bottom);
+			dirty->Include(t);
+			dirty->Include(fRightBorder);
+		} else if (offset.x < 0.0) {
+			dirty->Include(BRect(fRightBorder.left, fTopBorder.top,
+				fRightBorder.right, fBottomBorder.bottom));
+		}
+		if (offset.y > 0.0) {
+			BRect t(fLeftBorder.left, fLeftBorder.bottom - offset.y,
+				fLeftBorder.right, fLeftBorder.bottom);
+			dirty->Include(t);
+			t.Set(fRightBorder.left, fRightBorder.bottom - offset.y,
+				fRightBorder.right, fRightBorder.bottom);
+			dirty->Include(t);
+			dirty->Include(fBottomBorder);
+		} else if (offset.y < 0.0) {
+			dirty->Include(fBottomBorder);
+		}
+	}
+
+	// resize tab and layout tab items
+	if (fTabRect.IsValid()) {
+		BRect oldTabRect(fTabRect);
+
+		float tabSize;
+		float maxLocation;
+		if (fLook != kLeftTitledWindowLook) {
+			tabSize = fRightBorder.right - fLeftBorder.left;
+		} else {
+			tabSize = fBottomBorder.bottom - fTopBorder.top;
+		}
+		maxLocation = tabSize - fMaxTabSize;
+		if (maxLocation < 0)
+			maxLocation = 0;
+
+		float tabOffset = floorf(fTabLocation * maxLocation);
+		float delta = tabOffset - fTabOffset;
+		fTabOffset = (uint32)tabOffset;
+		if (fLook != kLeftTitledWindowLook)
+			fTabRect.OffsetBy(delta, 0.0);
+		else
+			fTabRect.OffsetBy(0.0, delta);
+
+		if (tabSize < fMinTabSize)
+			tabSize = fMinTabSize;
+		if (tabSize > fMaxTabSize)
+			tabSize = fMaxTabSize;
+
+		if (fLook != kLeftTitledWindowLook && tabSize != fTabRect.Width()) {
+			fTabRect.right = fTabRect.left + tabSize;
+		} else if (fLook == kLeftTitledWindowLook
+			&& tabSize != fTabRect.Height()) {
+			fTabRect.bottom = fTabRect.top + tabSize;
+		}
+
+		if (oldTabRect != fTabRect) {
+			_LayoutTabItems(fTabRect);
+
+			if (dirty) {
+				// NOTE: the tab rect becoming smaller only would
+				// handled be the Desktop anyways, so it is sufficient
+				// to include it into the dirty region in it's
+				// final state
+				BRect redraw(fTabRect);
+				if (delta != 0.0) {
+					redraw = redraw | oldTabRect;
+					if (fLook != kLeftTitledWindowLook)
+						redraw.bottom++;
+					else
+						redraw.right++;
+				}
+				dirty->Include(redraw);
+			}
+		}
+	}
+}
+
+
+bool
+DefaultDecorator::_SetTabLocation(float location, BRegion* updateRegion)
+{
+	STRACE(("DefaultDecorator: Set Tab Location(%.1f)\n", location));
+	if (!fTabRect.IsValid())
+		return false;
+
+	if (location < 0)
+		location = 0;
+
+	float maxLocation
+		= fRightBorder.right - fLeftBorder.left - fTabRect.Width();
+	if (location > maxLocation)
+		location = maxLocation;
+
+	float delta = location - fTabOffset;
+	if (delta == 0.0)
+		return false;
+
+	// redraw old rect (1 pix on the border also must be updated)
+	BRect trect(fTabRect);
+	trect.bottom++;
+	updateRegion->Include(trect);
+
+	fTabRect.OffsetBy(delta, 0);
+	fTabOffset = (int32)location;
+	_LayoutTabItems(fTabRect);
+
+	fTabLocation = maxLocation > 0.0 ? fTabOffset / maxLocation : 0.0;
+
+	// redraw new rect as well
+	trect = fTabRect;
+	trect.bottom++;
+	updateRegion->Include(trect);
+	return true;
+}
+
+
+bool
+DefaultDecorator::_SetSettings(const BMessage& settings, BRegion* updateRegion)
+{
+	float tabLocation;
+	if (settings.FindFloat("tab location", &tabLocation) == B_OK)
+		return SetTabLocation(tabLocation, updateRegion);
+
+	return false;
+}
+
+
+void
+DefaultDecorator::_GetFootprint(BRegion *region)
+{
+	STRACE(("DefaultDecorator: Get Footprint\n"));
+	// This function calculates the decorator's footprint in coordinates
+	// relative to the view. This is most often used to set a Window
+	// object's visible region.
+	if (!region)
+		return;
+
+	region->MakeEmpty();
+
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
+		return;
+
+	region->Include(fTopBorder);
+	region->Include(fLeftBorder);
+	region->Include(fRightBorder);
+	region->Include(fBottomBorder);
+
+	if (fLook == B_BORDERED_WINDOW_LOOK)
+		return;
+
+	region->Include(fTabRect);
+
+	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
+		// include the rectangular resize knob on the bottom right
+		float knobSize = kResizeKnobSize - fBorderWidth;
+		region->Include(BRect(fFrame.right - knobSize, fFrame.bottom - knobSize,
+			fFrame.right, fFrame.bottom));
+	}
 }
 
 

@@ -49,7 +49,9 @@ Decorator::Decorator(DesktopSettings& settings, BRect rect, window_look look,
 	fZoomPressed(false),
 	fMinimizePressed(false),
 	fIsFocused(false),
-	fTitle("")
+	fTitle(""),
+
+	fFootprintValid(false)
 {
 }
 
@@ -97,6 +99,10 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 		flags |= B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE;
 
 	fFlags = flags;
+
+	fFootprintValid = false;
+		// the border might have changed (smaller/larger tab)
+	_SetFlags(flags, updateRegion);
 }
 
 
@@ -105,6 +111,8 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 void
 Decorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 {
+	fFootprintValid = false;
+	_FontsChanged(settings, updateRegion);
 }
 
 
@@ -116,6 +124,10 @@ Decorator::SetLook(DesktopSettings& settings, window_look look,
 	BRegion* updateRect)
 {
 	fLook = look;
+
+	fFootprintValid = false;
+		// the border very likely changed
+	_SetLook(settings, look, updateRect);
 }
 
 
@@ -176,6 +188,12 @@ Decorator::SetTitle(const char* string, BRegion* updateRegion)
 {
 	fTitle.SetTo(string);
 	_DoLayout();
+
+	fFootprintValid = false;
+		// the border very likely changed
+
+	_SetTitle(string, updateRegion);
+
 	// TODO: redraw?
 }
 
@@ -286,16 +304,16 @@ Decorator::SetFocus(bool active)
 //	#pragma mark - virtual methods
 
 
-/*!	\brief Returns the "footprint" of the entire window, including decorator
-
-	This function is required by all subclasses.
-
-	\param region Region to be changed to represent the window's screen
-		footprint
+/*!	\brief Returns a cached footprint if available otherwise recalculate it
 */
-void
-Decorator::GetFootprint(BRegion *region)
+const BRegion&
+Decorator::GetFootprint()
 {
+	if (!fFootprintValid) {
+		_GetFootprint(&fFootprint);
+		fFootprintValid = true;
+	}
+	return fFootprint;
 }
 
 
@@ -366,14 +384,10 @@ Decorator::MoveBy(float x, float y)
 void
 Decorator::MoveBy(BPoint offset)
 {
-	fZoomRect.OffsetBy(offset);
-	fCloseRect.OffsetBy(offset);
-	fMinimizeRect.OffsetBy(offset);
-	fMinimizeRect.OffsetBy(offset);
-	fTabRect.OffsetBy(offset);
-	fFrame.OffsetBy(offset);
-	fResizeRect.OffsetBy(offset);
-	fBorderRect.OffsetBy(offset);
+	if (fFootprintValid)
+		fFootprint.OffsetBy(offset.x, offset.y);
+
+	_MoveBy(offset);
 }
 
 
@@ -394,9 +408,32 @@ Decorator::ResizeBy(float x, float y, BRegion* dirty)
 }
 
 
+void
+Decorator::ResizeBy(BPoint offset, BRegion* dirty)
+{
+	fFootprintValid = false;
+	_ResizeBy(offset, dirty);
+}
+
+
+bool
+Decorator::SetTabLocation(float location, BRegion* updateRegion)
+{
+	if (_SetTabLocation(location, updateRegion)) {
+		fFootprintValid = false;
+		return true;
+	}
+	return false;
+}
+
+
 bool
 Decorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 {
+	if (_SetSettings(settings, updateRegion)) {
+		fFootprintValid = false;
+		return true;
+	}
 	return false;
 }
 
@@ -578,5 +615,64 @@ Decorator::_DrawMinimize(BRect rect)
 //! Hook function called when the decorator changes focus
 void
 Decorator::_SetFocus()
+{
+}
+
+
+void
+Decorator::_FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
+{
+}
+
+
+void
+Decorator::_SetLook(DesktopSettings& settings, window_look look,
+	BRegion* updateRect)
+{
+}
+
+
+void
+Decorator::_SetFlags(uint32 flags, BRegion* updateRegion)
+{
+}
+
+
+void
+Decorator::_SetTitle(const char* string, BRegion* updateRegion)
+{
+}
+
+
+void
+Decorator::_MoveBy(BPoint offset)
+{
+	fZoomRect.OffsetBy(offset);
+	fCloseRect.OffsetBy(offset);
+	fMinimizeRect.OffsetBy(offset);
+	fMinimizeRect.OffsetBy(offset);
+	fTabRect.OffsetBy(offset);
+	fFrame.OffsetBy(offset);
+	fResizeRect.OffsetBy(offset);
+	fBorderRect.OffsetBy(offset);
+}
+
+
+bool
+Decorator::_SetSettings(const BMessage& settings, BRegion* updateRegion)
+{
+	return false;
+}
+
+
+/*!	\brief Returns the "footprint" of the entire window, including decorator
+
+	This function is required by all subclasses.
+
+	\param region Region to be changed to represent the window's screen
+		footprint
+*/
+void
+Decorator::_GetFootprint(BRegion *region)
 {
 }

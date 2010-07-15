@@ -247,7 +247,6 @@ public:
 	static	uint32				ValidWindowFlags();
 	static	uint32				ValidWindowFlags(window_feel feel);
 
-			BRegion&			BorderRegion() { return fBorderRegion; }
 protected:
 			void				_ShiftPartOfRegion(BRegion* region,
 									BRegion* regionToShift, int32 xOffset,
@@ -289,12 +288,10 @@ protected:
 			uint32				fDirtyCause;
 
 			// caching local regions
-			BRegion				fBorderRegion;
 			BRegion				fContentRegion;
 			BRegion				fEffectiveDrawingRegion;
 
 			bool				fVisibleContentRegionValid : 1;
-			bool				fBorderRegionValid : 1;
 			bool				fContentRegionValid : 1;
 			bool				fEffectiveDrawingRegionValid : 1;
 
@@ -344,8 +341,6 @@ protected:
 				bool				fInUse;
 				uint8				fCause;
 	};
-
-			BRegion				fDecoratorRegion;
 
 			UpdateSession		fUpdateSessions[2];
 			UpdateSession*		fCurrentUpdateSession;

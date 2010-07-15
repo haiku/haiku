@@ -48,7 +48,9 @@ bool
 DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 {
 	int32 modifiers = _ExtractModifiers(message);
-	bool inBorderRegion = fWindow->BorderRegion().Contains(where);
+	bool inBorderRegion = false;
+	if (fWindow->Decorator())
+		inBorderRegion = fWindow->Decorator()->GetFootprint().Contains(where);
 	bool windowModifier =
 		(fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
 		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
@@ -457,9 +459,7 @@ DefaultWindowBehaviour::_AlterDeltaForSnap(BPoint& delta, bigtime_t now)
 	BRect screenFrame = fWindow->Screen()->Frame();
 
 	if (fDecorator) {
-		BRegion reg;
-		fDecorator->GetFootprint(&reg);
-		frame = reg.Frame();
+		frame = fDecorator->GetFootprint().Frame();
 		offsetWithinFrame.x = fWindow->Frame().left - frame.left;
 		offsetWithinFrame.y = fWindow->Frame().top - frame.top;
 	}

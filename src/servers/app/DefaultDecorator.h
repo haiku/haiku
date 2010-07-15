@@ -27,24 +27,10 @@ public:
 
 	virtual	void				SetTitle(const char* string,
 									BRegion* updateRegion = NULL);
-	virtual void				FontsChanged(DesktopSettings& settings,
-									BRegion* updateRegion);
-	virtual void				SetLook(DesktopSettings& settings,
-									window_look look,
-									BRegion* updateRegion = NULL);
-	virtual void				SetFlags(uint32 flags,
-									BRegion* updateRegion = NULL);
 
-	virtual	void				MoveBy(BPoint offset);
-	virtual	void				ResizeBy(BPoint offset, BRegion* dirty);
-
-	virtual bool				SetTabLocation(float location,
-									BRegion* updateRegion = NULL);
 	virtual float				TabLocation() const
 									{ return (float)fTabOffset; }
 
-	virtual	bool				SetSettings(const BMessage& settings,
-									BRegion* updateRegion = NULL);
 	virtual	bool				GetSettings(BMessage* settings) const;
 
 	virtual	void				Draw(BRect updateRect);
@@ -52,8 +38,6 @@ public:
 
 	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
 									int32* maxWidth, int32* maxHeight) const;
-
-	virtual	void				GetFootprint(BRegion* region);
 
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
 									int32 modifiers);
@@ -68,8 +52,27 @@ protected:
 	virtual void				_DrawTitle(BRect r);
 	virtual void				_DrawZoom(BRect r);
 
+	virtual void				_FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion);
+	virtual void				_SetLook(DesktopSettings& settings,
+									window_look look,
+									BRegion* updateRegion = NULL);
+	virtual void				_SetFlags(uint32 flags,
+									BRegion* updateRegion = NULL);
+
 	virtual void				_SetFocus();
 	virtual void				_SetColors();
+
+	virtual	void				_MoveBy(BPoint offset);
+	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);
+
+	virtual bool				_SetTabLocation(float location,
+									BRegion* updateRegion = NULL);
+
+	virtual	bool				_SetSettings(const BMessage& settings,
+									BRegion* updateRegion = NULL);
+
+	virtual	void				_GetFootprint(BRegion *region);
 
 private:
 			void				_UpdateFont(DesktopSettings& settings);

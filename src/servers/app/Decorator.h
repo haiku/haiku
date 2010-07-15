@@ -54,18 +54,18 @@ public:
 	inline	DrawingEngine*	GetDrawingEngine() const
 								{ return fDrawingEngine; }
 
-	virtual void			FontsChanged(DesktopSettings& settings,
+			void			FontsChanged(DesktopSettings& settings,
 								BRegion* updateRegion = NULL);
-	virtual void			SetLook(DesktopSettings& settings, window_look look,
+			void			SetLook(DesktopSettings& settings, window_look look,
 								BRegion* updateRegion = NULL);
-	virtual void			SetFlags(uint32 flags,
+			void			SetFlags(uint32 flags,
 								BRegion* updateRegion = NULL);
 
 			void			SetClose(bool pressed);
 			void			SetMinimize(bool pressed);
 			void			SetZoom(bool pressed);
 
-	virtual	void			SetTitle(const char* string,
+			void			SetTitle(const char* string,
 								BRegion* updateRegion = NULL);
 
 			window_look		Look() const;
@@ -87,26 +87,25 @@ public:
 			bool			IsFocus()
 								{ return fIsFocused; };
 
-	virtual	void			GetFootprint(BRegion *region);
+			const BRegion&	GetFootprint();
 
 	virtual	click_type		Clicked(BPoint where, int32 buttons,
 								int32 modifiers);
 
 			void			MoveBy(float x, float y);
-	virtual	void			MoveBy(BPoint offset);
+			void			MoveBy(BPoint offset);
 			void			ResizeBy(float x, float y, BRegion* dirty);
-	virtual	void			ResizeBy(BPoint offset, BRegion* dirty) = 0;
+			void			ResizeBy(BPoint offset, BRegion* dirty);
 
 	/*! \return true if tab location updated, false if out of bounds
 		or unsupported
 	*/
-	virtual	bool			SetTabLocation(float location,
-								BRegion* /*updateRegion*/ = NULL)
-								{ return false; }
+			bool			SetTabLocation(float location,
+								BRegion* /*updateRegion*/ = NULL);
 	virtual	float			TabLocation() const
 								{ return 0.0; }
 
-	virtual	bool			SetSettings(const BMessage& settings,
+			bool			SetSettings(const BMessage& settings,
 								BRegion* updateRegion = NULL);
 	virtual	bool			GetSettings(BMessage* settings) const;
 
@@ -135,7 +134,28 @@ protected:
 	virtual	void			_DrawZoom(BRect rect);
 	virtual	void			_DrawMinimize(BRect rect);
 
+	virtual void			_FontsChanged(DesktopSettings& settings,
+								BRegion* updateRegion = NULL);
+	virtual void			_SetLook(DesktopSettings& settings,
+								window_look look, BRegion* updateRegion = NULL);
+	virtual void			_SetFlags(uint32 flags,
+								BRegion* updateRegion = NULL);
+
+	virtual	void			_SetTitle(const char* string,
+								BRegion* updateRegion = NULL);
+
 	virtual	void			_SetFocus();
+	virtual void			_MoveBy(BPoint offset);
+	virtual	void			_ResizeBy(BPoint offset, BRegion* dirty) = 0;
+
+	virtual	bool			_SetTabLocation(float location,
+								BRegion* /*updateRegion*/ = NULL)
+								{ return false; }
+
+	virtual bool			_SetSettings(const BMessage& settings,
+								BRegion* updateRegion = NULL);
+
+	virtual	void			_GetFootprint(BRegion *region);
 
 			DrawingEngine*	fDrawingEngine;
 			DrawState		fDrawState;
@@ -159,6 +179,9 @@ private:
 			bool			fIsFocused : 1;
 
 			BString			fTitle;
+
+			BRegion			fFootprint;
+			bool			fFootprintValid : 1;
 };
 
 #endif	// DECORATOR_H
