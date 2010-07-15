@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,20 +7,18 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *		Clemens <mail@Clemens-Zeidler.de>
- *
+ *		Adrien Destugues <pulkomandy@pulkomandy.cx>
  */
 
 #include "DateTimeEdit.h"
 
+#include <stdlib.h>
 
 #include <List.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
 #include <String.h>
 #include <Window.h>
-
-
-#include <stdlib.h>
 
 
 using BPrivate::B_LOCAL_TIME;
@@ -89,7 +87,6 @@ TTimeEdit::InitView()
 void
 TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 {
-	// user defined section drawing
 	TSection *section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 
@@ -97,14 +94,12 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 		return;
 
 	BRect bounds = section->Frame();
-	uint32 value = _SectionValue(index);
 	time_t time = fTime.Hour() * 3600 + fTime.Minute() * 60 + fTime.Second();
 
 	SetLowColor(ViewColor());
-	if (hasFocus) {
+	BString field;
+	if (hasFocus)
 		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		value = fHoldValue;
-	}
 
 	BString text;
 	int* fieldPositions;
@@ -115,12 +110,11 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	country->FormatTime(&text, fieldPositions, fieldCount, time, true);
 		// TODO : this should be cached somehow to not redo it for each field
 
-	if (index * 2 + 1 >= fieldCount) {
+	if (index * 2 + 1 > fieldCount) {
 		free(fieldPositions);
 		return;
 	}
 
-	BString field;
 	text.CopyCharsInto(field, fieldPositions[index * 2],
 		fieldPositions[index * 2 + 1] - fieldPositions[index * 2]);
 
@@ -285,8 +279,18 @@ TTimeEdit::BuildDispatch(BMessage *message)
 		if (fFocus == index)
 			data = fHoldValue;
 
-		if (dateFormat[index] < 3)
-			message->AddInt32(fields[dateFormat[index]], data);
+		switch(dateFormat[index]) {
+			case B_HOUR:
+				message->AddInt32(fields[0], data);
+				break;
+			case B_MINUTE:
+				message->AddInt32(fields[1], data);
+				break;
+			case B_SECOND:
+				message->AddInt32(fields[2], data);
+			default:
+				break;
+		}
 	}
 
 	free(dateFormat);
@@ -470,8 +474,7 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 		if (_IsValidDoubleDigi(doubleDigi))
 			number = doubleDigi;
 		fLastKeyDownTime = 0;
-	}
-	else {
+	} else {
 		fLastKeyDownTime = currentTime;
 		fLastKeyDownInt = number;
 	}
