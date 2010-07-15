@@ -1,3 +1,11 @@
+/*
+ * Copyright 2010, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ */
+
 #ifndef WINDOW_BEHAVIOUR_H
 #define WINDOW_BEHAVIOUR_H
 

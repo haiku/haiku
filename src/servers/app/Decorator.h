@@ -5,7 +5,9 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
+
 #ifndef DECORATOR_H
 #define DECORATOR_H
 

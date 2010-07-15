@@ -7,6 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Philippe Saint-Pierre, stpere@gmail.com
  *		Ryan Leavengood <leavengood@gmail.com>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
 

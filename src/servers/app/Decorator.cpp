@@ -5,6 +5,7 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
 /*!	Base class for window decorators */

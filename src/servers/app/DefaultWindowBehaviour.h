@@ -1,3 +1,16 @@
+/*
+ * Copyright 2001-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adi Oanca <adioanca@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler <axeld@pinc-software.de>
+ *		Brecht Machiels <brecht@mos6581.org>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ */
+
 #ifndef DEFAULT_WINDOW_BEHAVIOUR_H
 #define DEFAULT_WINDOW_BEHAVIOUR_H
 

@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler <axeld@pinc-software.de>
  *		Brecht Machiels <brecht@mos6581.org>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
 
