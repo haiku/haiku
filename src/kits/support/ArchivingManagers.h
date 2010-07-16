@@ -15,12 +15,13 @@
 #include <Archivable.h>
 
 
+#define NULL_TOKEN -42
+
+
 namespace BPrivate {
 namespace Archiving {
 
-extern const char* kArchiveCountField;
-extern const char* kArchivableField;
-extern const char* kTokenField;
+extern const char* kManagedField;
 
 
 class BManagerBase {
@@ -101,11 +102,13 @@ public:
 									int32& _token);
 
 			status_t			ArchiveObject(BArchivable* archivable,
-									bool deep);
+									bool deep, int32& _token);
 
 			bool				IsArchived(BArchivable* archivable);
 
-			status_t			ArchiverLeaving(const BArchiver* archiver);
+			status_t			ArchiverLeaving(const BArchiver* archiver,
+									status_t err);
+
 			void				Acquire();
 			void				RegisterArchivable(
 									const BArchivable* archivable);
@@ -118,6 +121,7 @@ private:
 
 			TokenMap			fTokenMap;
 			const BArchiver*	fCreator;
+			status_t			fError;
 };
 
 
@@ -127,20 +131,23 @@ class BUnarchiveManager: public BManagerBase {
 public:
 								BUnarchiveManager(BMessage* topLevelArchive);
 
-			status_t			ArchivableForToken(BArchivable** archivable,
-									int32 token);
+			status_t			GetArchivableForToken(int32 token,
+									BUnarchiver::ownership_policy owning, 
+									BArchivable*& _archivable);
 
 			bool				IsInstantiated(int32 token);
 
 			void				RegisterArchivable(BArchivable* archivable);
-			status_t			UnarchiverLeaving(const BUnarchiver* archiver);
+			status_t			UnarchiverLeaving(const BUnarchiver* archiver,
+									status_t err);
 			void				Acquire();
 
+			void				RelinquishOwnership(BArchivable* archivable);
+			void				AssumeOwnership(BArchivable* archivable);
 private:
 								~BUnarchiveManager();
 
 			status_t			_ExtractArchiveAt(int32 index);
-			status_t			_InstantiateObjectForToken(int32 token);
 
 			struct ArchiveInfo;
 
@@ -148,6 +155,7 @@ private:
 			int32				fObjectCount;
 			int32				fTokenInProgress;
 			int32				fRefCount;
+			status_t			fError;
 };
 
 

@@ -54,11 +54,11 @@ public:
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
-	virtual status_t			ArchiveLayoutData(BMessage* into,
-									const BLayoutItem* of) const;
-	virtual status_t			RestoreItemAndData(const BMessage* from,
-									BLayoutItem* item);
 
+	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
+									int32 index) const;
+	virtual	status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
 protected:
 // TODO: Since memory allocations can fail, we should return a bool and
 // undo the addition, if false.

@@ -4,7 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BINARY_COMPATIBILITY_GLOBAL_H_
-#define _BINARY_COMPATIBILITY__GLOBAL_H_
+#define _BINARY_COMPATIBILITY_GLOBAL_H_
 
 
 // method codes
@@ -24,7 +24,6 @@ enum {
 	PERFORM_CODE_GET_TOOL_TIP_AT		= 1009,
 
 	// support kit
-
 	PERFORM_CODE_ALL_ARCHIVED			= 1010,
 	PERFORM_CODE_ALL_UNARCHIVED			= 1011
 };

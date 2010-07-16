@@ -7,6 +7,7 @@
 
 #include <Layout.h>
 
+#include <syslog.h>
 #include <new>
 
 #include <Message.h>
@@ -19,11 +20,9 @@ using std::nothrow;
 
 namespace {
 	const char* kLayoutItemField = "BLayout:_items";
-	const char* kLayoutDataField = "BLayout:_data";
 }
 
 
-// constructor
 BLayout::BLayout()
 	:
 	fView(NULL),
@@ -211,77 +210,64 @@ BLayout::Archive(BMessage* into, bool deep) const
 	BArchiver archiver(into);
 	status_t err = BArchivable::Archive(into, deep);
 
-	if (err != B_OK)
-		return err;
-	
 	if (deep) {
 		int32 count = CountItems();
-		for (int32 i = 0; i < count; i++) {
-			err = archiver.AddArchivable(kLayoutItemField, ItemAt(i), deep);
+		for (int32 i = 0; i < count && err == B_OK; i++) {
+			BLayoutItem* item = ItemAt(i);
+			err = archiver.AddArchivable(kLayoutItemField, item, deep);
 
 			if (err == B_OK) {
-				BMessage data;
-				err = ArchiveLayoutData(&data, ItemAt(i));
-				if (err == B_OK)
-					err = into->AddMessage(kLayoutDataField, &data);
+				err = ItemArchived(into, item, i);
+				if (err != B_OK)
+					syslog(LOG_ERR, "ItemArchived() failed at index: %d.", i);
 			}
-
-			if (err != B_OK)
-				return err;
 		}
 	}
 
-	return archiver.Finish();
+	return archiver.Finish(err);
 }
 
 
 status_t
 BLayout::AllUnarchived(const BMessage* from)
 {
-	status_t err = BArchivable::AllUnarchived(from);
 	BUnarchiver unarchiver(from);
+	status_t err = BArchivable::AllUnarchived(from);
 
 	if (err != B_OK)
 		return err;
 
-	for (int32 i = 0; ; i++) {
-		BArchivable* retriever;
-		err = unarchiver.FindArchivable(kLayoutItemField, i, &retriever);
+	int32 itemCount;
+	unarchiver.ArchiveMessage()->GetInfo(kLayoutItemField, NULL, &itemCount);
+	for (int32 i = 0; i < itemCount && err == B_OK; i++) {
+		BLayoutItem* item;
+		err = unarchiver.FindObject(kLayoutItemField, i, item);
 
-		if (err == B_BAD_INDEX)
-			break;
-
-		if (err == B_OK) {
-			BMessage layoutData;
-			err = from->FindMessage(kLayoutDataField, i, &layoutData);
-
-			if (err == B_OK) {
-				BLayoutItem* item = dynamic_cast<BLayoutItem*>(retriever);
-				err = RestoreItemAndData(&layoutData, item);
-			}
+		if (err == B_OK && item) {
+			if (fItems.AddItem(item)) {
+				ItemAdded(item);
+				item->SetLayout(this);
+				err = ItemUnarchived(from, item, i);
+			} else
+				err = B_NO_MEMORY;
 		}
-
-		if (err != B_OK)
-			return err;
 	}
 
-	return B_OK;
+	return err;
 }
 
 
 status_t
-BLayout::ArchiveLayoutData(BMessage* into, const BLayoutItem* of) const
+BLayout::ItemArchived(BMessage* into, BLayoutItem* of, int32 index) const
 {
 	return B_OK;
 }
 
 
 status_t
-BLayout::RestoreItemAndData(const BMessage* from, BLayoutItem* item)
+BLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item, int32 index)
 {
-	if (item && AddItem(item))
-		return B_OK;
-	return B_ERROR;
+	return B_OK;
 }
 
 

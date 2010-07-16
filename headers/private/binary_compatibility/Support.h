@@ -2,8 +2,8 @@
  * Copyright 2010, Haiku, Inc. 
  * Distributed under the terms of the MIT License.
  */
-#ifndef _BINARY_COMPATIBILITY_SUPPORT_H
-#define _BINARY_COMPATIBILITY_SUPPORT_H
+#ifndef _BINARY_COMPATIBILITY_SUPPORT_H_
+#define _BINARY_COMPATIBILITY_SUPPORT_H_
 
 
 #include <binary_compatibility/Global.h>
@@ -20,4 +20,4 @@ struct perform_data_all_archived {
 	status_t	return_value;
 };
 
-#endif /* _BINARY_COMPATIBILITY_INTERFACE_H_ */
+#endif /* _BINARY_COMPATIBILITY_SUPPORT_H_ */

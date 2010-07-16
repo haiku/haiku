@@ -6,18 +6,16 @@
  *		Alex Wilson (yourpalal2@gmail.com)
  */
 
+#include "ArchivingManagers.h"
 
 #include <syslog.h>
 #include <typeinfo>
 
-#include "ArchivingManagers.h"
-
 
 namespace BPrivate {
 namespace Archiving {
-	const char* kArchiveCountField = "_managed_archive_count";
 	const char* kArchivableField = "_managed_archivable";
-	const char* kTokenField = "_managed_token";
+	const char* kManagedField = "_managed_archive";
 }
 }
 
@@ -50,7 +48,7 @@ BManagerBase::UnarchiveManager(const BMessage* archive)
 	if (manager->fType == UNARCHIVE_MANAGER)
 		return static_cast<BUnarchiveManager*>(manager);
 
-	debugger("More calls to BUnarchiver::PrepareMessage()"
+	debugger("More calls to BUnarchiver::PrepareArchive()"
 		" than BUnarchivers created.");
 
 	return NULL;
@@ -84,14 +82,15 @@ BArchiveManager::BArchiveManager(const BArchiver* creator)
 	:
 	BManagerBase(creator->ArchiveMessage(), BManagerBase::ARCHIVE_MANAGER),
 	fTokenMap(),
-	fCreator(creator)
+	fCreator(creator),
+	fError(B_OK)
 {
 }
 
 
 BArchiveManager::~BArchiveManager()
 {
-	fTopLevelArchive->AddInt32(kArchiveCountField, fTokenMap.size());
+	fTopLevelArchive->AddBool(kManagedField, true);
 }
 
 
@@ -99,7 +98,7 @@ status_t
 BArchiveManager::GetTokenForArchivable(BArchivable* archivable, int32& _token)
 {
 	if (!archivable) {
-		_token = -42;
+		_token = NULL_TOKEN;
 		return B_OK;
 	}
 
@@ -114,25 +113,32 @@ BArchiveManager::GetTokenForArchivable(BArchivable* archivable, int32& _token)
 
 
 status_t
-BArchiveManager::ArchiveObject(BArchivable* archivable, bool deep)
+BArchiveManager::ArchiveObject(BArchivable* archivable,
+	bool deep, int32& _token)
 {
-	if (IsArchived(archivable)){
-		debugger("BArchivable requested to be archived"
-			" was previously archived.");
+	if (!archivable) {
+		_token = NULL_TOKEN;
+		return B_OK;
 	}
 
 	ArchiveInfo& info = fTokenMap[archivable];
 
-	info.archive = new BMessage();
-	info.token = fTokenMap.size() - 1;
+	status_t err = B_OK;
 
-	MarkArchive(info.archive);
-	status_t err = archivable->Archive(info.archive, deep);
+	if (!info.archive) {
+		info.archive = new BMessage();
+		info.token = fTokenMap.size() - 1;
+
+		MarkArchive(info.archive);
+		err = archivable->Archive(info.archive, deep);
+	}
 
 	if (err != B_OK) {
 		fTokenMap.erase(archivable);
 			// info.archive gets deleted here
-	}
+		_token = NULL_TOKEN;
+	} else
+		_token = info.token;
 
 	return err;
 }
@@ -149,9 +155,12 @@ BArchiveManager::IsArchived(BArchivable* archivable)
 
 
 status_t
-BArchiveManager::ArchiverLeaving(const BArchiver* archiver)
+BArchiveManager::ArchiverLeaving(const BArchiver* archiver, status_t err)
 {
-	if (archiver == fCreator) {
+	if (fError == B_OK)
+		fError = err;
+
+	if (archiver == fCreator && fError == B_OK) {
 		// first, we must sort the objects into the order they were archived in
 		typedef std::pair<BMessage*, const BArchivable*> ArchivePair;
 		ArchivePair pairs[fTokenMap.size()];
@@ -167,29 +176,28 @@ BArchiveManager::ArchiverLeaving(const BArchiver* archiver)
 				info.archive = NULL;
 		}
 
-		status_t err = B_ERROR;
 		int32 count = fTokenMap.size();
 		for (int32 i = 0; i < count; i++) {
 			const ArchivePair& pair = pairs[i];
-			err = pair.second->AllArchived(pair.first);
+			fError = pair.second->AllArchived(pair.first);
 
-			if (err == B_OK && i > 0) {
-				err = fTopLevelArchive->AddMessage(kArchivableField,
+			if (fError == B_OK && i > 0) {
+				fError = fTopLevelArchive->AddMessage(kArchivableField,
 					pair.first);
 			}
 
-			if (err != B_OK) {
+			if (fError != B_OK) {
 				syslog(LOG_ERR, "AllArchived failed for object of type %s.",
 					typeid(*pairs[i].second).name());
 				break;
 			}
 		}
-
-		delete this;
-		return err;
 	}
 
-	return B_OK;
+	if (archiver == fCreator)
+		delete this;
+
+	return fError;
 }
 
 
@@ -211,7 +219,8 @@ struct BUnarchiveManager::ArchiveInfo {
 	ArchiveInfo()
 		:
 		archivable(NULL),
-		archive()
+		archive(),
+		adopted(false)
 	{
 	}
 
@@ -223,6 +232,7 @@ struct BUnarchiveManager::ArchiveInfo {
 
 	BArchivable*	archivable;
 	BMessage		archive;
+	bool			adopted;
 };
 
 
@@ -235,9 +245,12 @@ BUnarchiveManager::BUnarchiveManager(BMessage* archive)
 	fObjects(NULL),
 	fObjectCount(0),
 	fTokenInProgress(0),
-	fRefCount(0)
+	fRefCount(0),
+	fError(B_OK)
 {
-	archive->FindInt32(kArchiveCountField, &fObjectCount);
+	archive->GetInfo(kArchivableField, NULL, &fObjectCount);
+	fObjectCount++;
+		// root object needs a spot too
 	fObjects = new ArchiveInfo[fObjectCount];
 
 	// fObjects[0] is a placeholder for the object that started
@@ -260,28 +273,37 @@ BUnarchiveManager::~BUnarchiveManager()
 
 
 status_t
-BUnarchiveManager::ArchivableForToken(BArchivable** _archivable, int32 token)
+BUnarchiveManager::GetArchivableForToken(int32 token,
+	BUnarchiver::ownership_policy owning, BArchivable*& _archivable)
 {
-	if (!_archivable || token > fObjectCount)
+	if (token >= fObjectCount)
 		return B_BAD_VALUE;
 
 	if (token < 0) {
-		*_archivable = NULL;
+		_archivable = NULL;
 		return B_OK;
 	}
 
 	status_t err = B_OK;
-	if (!fObjects[token].archivable) {
-		if (fRefCount > 0)
-			err = _InstantiateObjectForToken(token);
-		else {
+	ArchiveInfo& info = fObjects[token];
+	if (!info.archivable) {
+		if (fRefCount > 0) {
+			fTokenInProgress = token;
+			if(!instantiate_object(&info.archive))
+				err = B_ERROR;
+		} else {
 			syslog(LOG_ERR, "Object requested from AllUnarchived()"
 				" was not previously instantiated");
 			err = B_ERROR;
 		}
 	}
 
-	*_archivable = fObjects[token].archivable;
+	if (!info.adopted && owning == BUnarchiver::B_ASSUME_OWNERSHIP)
+		info.adopted = true;
+	else if (info.adopted && owning == BUnarchiver::B_ASSUME_OWNERSHIP)
+		debugger("Cannot assume ownership of an object that is already owned");
+
+	_archivable = info.archivable;
 	return err;
 }
 
@@ -302,37 +324,84 @@ BUnarchiveManager::RegisterArchivable(BArchivable* archivable)
 		debugger("Cannot register NULL pointer");
 
 	fObjects[fTokenInProgress].archivable = archivable;
+	archivable->fArchivingToken = fTokenInProgress;
 }
 
 
 status_t
-BUnarchiveManager::UnarchiverLeaving(const BUnarchiver* unarchiver)
+BUnarchiveManager::UnarchiverLeaving(const BUnarchiver* unarchiver,
+	status_t err)
 {
-	if (--fRefCount == 0) {
-		fRefCount = -1;
-			// make sure we de not end up here again!
+	if (--fRefCount >= 0 && fError == B_OK)
+		fError = err;
 
+	if (fRefCount != 0)
+		return fError;
+
+	if (fError == B_OK) {
 		BArchivable* archivable = fObjects[0].archivable;
-		status_t err = archivable->AllUnarchived(fTopLevelArchive);
+		if (archivable) {
+			fError = archivable->AllUnarchived(fTopLevelArchive);
+			archivable->fArchivingToken = NULL_TOKEN;
+		}
 
-		for (int32 i = 1; i < fObjectCount; i++) {
-			if (err != B_OK)
-				break;
-
+		for (int32 i = 1; i < fObjectCount && fError == B_OK; i++) {
 			archivable = fObjects[i].archivable;
-			err = archivable->AllUnarchived(&fObjects[i].archive);
+			if (archivable) {
+				fError = archivable->AllUnarchived(&fObjects[i].archive);
+				archivable->fArchivingToken = NULL_TOKEN;
+			}
 		}
-
-		if (err != B_OK) {
-			syslog(LOG_ERR, "AllUnarchived failed for object of type %s.",
-				typeid(*archivable).name());
+		if (fError != B_OK) {
+			syslog(LOG_ERR, "Error in AllUnarchived"
+				" method of object of type %s", typeid(*archivable).name());
 		}
-
-		delete this;
-		return err;
 	}
 
-	return B_OK;
+	if (fError != B_OK) {
+		syslog(LOG_ERR, "An error occured during unarchival, cleaning up.");
+		for (int32 i = 1; i < fObjectCount; i++) {
+			if (!fObjects[i].adopted)
+				delete fObjects[i].archivable;
+		}
+	}
+
+	delete this;
+	return fError;
+}
+
+
+void
+BUnarchiveManager::RelinquishOwnership(BArchivable* archivable)
+{
+	int32 token = NULL_TOKEN;
+	if (archivable)
+		token = archivable->fArchivingToken;
+
+	if (token < 0 || token >= fObjectCount
+		|| fObjects[token].archivable != archivable)
+		return;
+
+	fObjects[token].adopted = false;
+}
+
+
+void
+BUnarchiveManager::AssumeOwnership(BArchivable* archivable)
+{
+	int32 token = NULL_TOKEN;
+	if (archivable)
+		token = archivable->fArchivingToken;
+
+	if (token < 0 || token >= fObjectCount
+		|| fObjects[token].archivable != archivable)
+		return;
+
+	if (!fObjects[token].adopted)
+		fObjects[token].adopted = true;
+	else {
+		debugger("Cannot assume ownership of an object that is already owned");
+	}
 }
 
 
@@ -342,14 +411,3 @@ BUnarchiveManager::Acquire()
 	if (fRefCount >= 0)
 		fRefCount++;
 }
-
-
-status_t
-BUnarchiveManager::_InstantiateObjectForToken(int32 token)
-{
-	fTokenInProgress = token;
-	if(!instantiate_object(&fObjects[token].archive))
-		return B_ERROR;
-	return B_OK;
-}
-

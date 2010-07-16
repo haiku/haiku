@@ -210,11 +210,15 @@ check_signature(const char* signature, image_info& info)
 
 
 BArchivable::BArchivable()
+	:
+	fArchivingToken(NULL_TOKEN)
 {
 }
 
 
 BArchivable::BArchivable(BMessage* from)
+	:
+	fArchivingToken(NULL_TOKEN)
 {
 	if (BUnarchiver::IsArchiveManaged(from)) {
 		BUnarchiver::PrepareArchive(from);
@@ -313,7 +317,7 @@ BArchiver::BArchiver(BMessage* archive)
 BArchiver::~BArchiver()
 {
 	if (!fFinished)
-		fManager->ArchiverLeaving(this);
+		fManager->ArchiverLeaving(this, B_OK);
 }
 
 
@@ -321,7 +325,7 @@ status_t
 BArchiver::AddArchivable(const char* name, BArchivable* archivable, bool deep)
 {
 	int32 token;
-	status_t err = GetTokenForArchivable(archivable, token, deep);
+	status_t err = GetTokenForArchivable(archivable, deep, token);
 
 	if (err != B_OK)
 		return err;
@@ -332,17 +336,9 @@ BArchiver::AddArchivable(const char* name, BArchivable* archivable, bool deep)
 
 status_t
 BArchiver::GetTokenForArchivable(BArchivable* archivable,
-	int32& _token, bool deep)
+	bool deep, int32& _token)
 {
-	status_t err = B_OK;
-
-	if (!IsArchived(archivable))
-		err = fManager->ArchiveObject(archivable, deep);
-
-	if (err == B_OK)
-		return fManager->GetTokenForArchivable(archivable, _token);
-
-	return err;
+	return fManager->ArchiveObject(archivable, deep, _token);
 }
 
 
@@ -354,13 +350,14 @@ BArchiver::IsArchived(BArchivable* archivable)
 
 
 status_t
-BArchiver::Finish()
+BArchiver::Finish(status_t err)
 {
 	if (fFinished)
 		debugger("Finish() called multiple times on same BArchiver.");
 
 	fFinished = true;
-	return fManager->ArchiverLeaving(this);
+
+	return fManager->ArchiverLeaving(this, err);
 }
 
 
@@ -393,56 +390,32 @@ BUnarchiver::BUnarchiver(const BMessage* archive)
 BUnarchiver::~BUnarchiver()
 {
 	if (!fFinished && fManager)
-		fManager->UnarchiverLeaving(this);
+		fManager->UnarchiverLeaving(this, B_OK);
 }
 
 
+template<>
 status_t
-BUnarchiver::GetArchivable(int32 token, BArchivable** archivable)
+BUnarchiver::GetObject<BArchivable>(int32 token,
+	ownership_policy owning, BArchivable*& object)
 {
 	_CallDebuggerIfManagerNull();
-
-	if (archivable == NULL)
-		return B_BAD_VALUE;
-
-	return fManager->ArchivableForToken(archivable, token);
+	return fManager->GetArchivableForToken(token, owning, object);
 }
 
 
+template<>
 status_t
-BUnarchiver::FindArchivable(const char* name, BArchivable** archivable)
+BUnarchiver::FindObject<BArchivable>(const char* name,
+	int32 index, ownership_policy owning, BArchivable*& archivable)
 {
-	return FindArchivable(name, 0, archivable);
-}
-
-
-status_t
-BUnarchiver::FindArchivable(const char* name,
-	int32 index, BArchivable** archivable)
-{
-
+	archivable = NULL;
 	int32 token;
 	status_t err = fArchive->FindInt32(name, index, &token);
 	if (err != B_OK)
 		return err;
 
-	return GetArchivable(token, archivable);
-}
-
-
-status_t
-BUnarchiver::EnsureUnarchived(const char* name, int32 index)
-{
-	BArchivable* dummy;
-	return FindArchivable(name, index, &dummy);
-}
-
-
-status_t
-BUnarchiver::EnsureUnarchived(int32 token)
-{
-	BArchivable* dummy;
-	return GetArchivable(token, &dummy);
+	return GetObject(token, owning, archivable);
 }
 
 
@@ -451,6 +424,7 @@ BUnarchiver::IsInstantiated(int32 token)
 {
 	return fManager->IsInstantiated(token);
 }
+
 
 bool
 BUnarchiver::IsInstantiated(const char* field, int32 index)
@@ -461,14 +435,18 @@ BUnarchiver::IsInstantiated(const char* field, int32 index)
 	return false;
 }
 
+
 status_t
-BUnarchiver::Finish()
+BUnarchiver::Finish(status_t err)
 {
 	if (fFinished)
 		debugger("Finish() called multiple times on same BArchiver.");
 
 	fFinished = true;
-	return fManager->UnarchiverLeaving(this);
+	if (fManager)
+		return fManager->UnarchiverLeaving(this, err);
+	else
+		return B_OK;
 }
 
 
@@ -476,6 +454,22 @@ const BMessage*
 BUnarchiver::ArchiveMessage() const
 {
 	return fArchive;
+}
+
+
+void
+BUnarchiver::AssumeOwnership(BArchivable* archivable)
+{
+	_CallDebuggerIfManagerNull();
+	fManager->AssumeOwnership(archivable);
+}
+
+
+void
+BUnarchiver::RelinquishOwnership(BArchivable* archivable)
+{
+	_CallDebuggerIfManagerNull();
+	fManager->RelinquishOwnership(archivable);
 }
 
 
@@ -487,11 +481,22 @@ BUnarchiver::IsArchiveManaged(BMessage* archive)
 		return true;
 
 	// managed top level archives return here
-	int32 dummy;
-	if (archive->FindInt32(kArchiveCountField, &dummy) == B_OK)
+	bool dummy;
+	if (archive->FindBool(kManagedField, &dummy) == B_OK)
 		return true;
 
 	return false;
+}
+
+
+template<>
+status_t
+BUnarchiver::InstantiateObject<BArchivable>(BMessage* from,
+	BArchivable*& object)
+{
+	BUnarchiver unarchiver(BUnarchiver::PrepareArchive(from));
+	object = instantiate_object(from);
+	return unarchiver.Finish();
 }
 
 
