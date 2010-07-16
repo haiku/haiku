@@ -74,7 +74,7 @@ size_to_index(size_t size)
 void*
 block_alloc(size_t size, size_t alignment, uint32 flags)
 {
-	if (alignment > 8) {
+	if (alignment > kMinObjectAlignment) {
 		// Make size >= alignment and a power of two. This is sufficient, since
 		// all of our object caches with power of two sizes are aligned. We may
 		// waste quite a bit of memory, but memalign() is very rarely used
@@ -173,16 +173,15 @@ block_allocator_init_boot()
 		size_t size = kBlockSizes[index];
 
 		// align the power of two objects to their size
-		if ((size & (size - 1)) == 0)
-			flags |= CACHE_ALIGN_ON_SIZE;
+		size_t alignment = (size & (size - 1)) == 0 ? size : 0;
 
 		// For the larger allocation sizes disable the object depot, so we don't
 		// keep lot's of unused objects around.
 		if (size > 2048)
 			flags |= CACHE_NO_DEPOT;
 
-		sBlockCaches[index] = create_object_cache_etc(name, size, 0, 0, 0, 0,
-			flags, NULL, NULL, NULL, NULL);
+		sBlockCaches[index] = create_object_cache_etc(name, size, alignment, 0,
+			0, 0, flags, NULL, NULL, NULL, NULL);
 		if (sBlockCaches[index] == NULL)
 			panic("allocator: failed to init block cache");
 	}

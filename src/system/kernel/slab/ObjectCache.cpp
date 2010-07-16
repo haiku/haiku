@@ -17,9 +17,6 @@
 #include "slab_private.h"
 
 
-static const size_t kCacheColorPeriod = 8;
-
-
 static void
 object_cache_return_object_wrapper(object_depot* depot, void* cookie,
 	void* object, uint32 flags)
@@ -52,6 +49,9 @@ ObjectCache::Init(const char* name, size_t objectSize, size_t alignment,
 	if (objectSize < sizeof(object_link))
 		objectSize = sizeof(object_link);
 
+	if (alignment < kMinObjectAlignment)
+		alignment = kMinObjectAlignment;
+
 	if (alignment > 0 && (objectSize & (alignment - 1)))
 		object_size = objectSize + alignment - (objectSize & (alignment - 1));
 	else
@@ -60,6 +60,7 @@ ObjectCache::Init(const char* name, size_t objectSize, size_t alignment,
 	TRACE_CACHE(this, "init %lu, %lu -> %lu", objectSize, alignment,
 		object_size);
 
+	this->alignment = alignment;
 	cache_color_cycle = 0;
 	total_objects = 0;
 	used_count = 0;
@@ -123,15 +124,11 @@ ObjectCache::InitSlab(slab* slab, void* pages, size_t byteCount, uint32 flags)
 
 	size_t spareBytes = byteCount - (slab->size * object_size);
 
-	if ((this->flags & CACHE_ALIGN_ON_SIZE) != 0) {
-		slab->offset = cache_color_cycle;
+	slab->offset = cache_color_cycle;
 
-		if (slab->offset > spareBytes)
-			cache_color_cycle = slab->offset = 0;
-		else
-			cache_color_cycle += kCacheColorPeriod;
-	} else
-		slab->offset = 0;
+	cache_color_cycle += alignment;
+	if (cache_color_cycle > spareBytes)
+		cache_color_cycle = 0;
 
 	TRACE_CACHE(this, "  %lu objects, %lu spare bytes, offset %lu",
 		slab->size, spareBytes, slab->offset);

@@ -208,17 +208,18 @@ dump_slab(::slab* slab)
 static int
 dump_slabs(int argc, char* argv[])
 {
-	kprintf("%10s %22s %8s %8s %6s %8s %8s %8s\n", "address", "name",
-		"objsize", "usage", "empty", "usedobj", "total", "flags");
+	kprintf("%10s %22s %8s %8s %8s %6s %8s %8s %8s\n", "address", "name",
+		"objsize", "align", "usage", "empty", "usedobj", "total", "flags");
 
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 	while (it.HasNext()) {
 		ObjectCache* cache = it.Next();
 
-		kprintf("%p %22s %8lu %8lu %6lu %8lu %8lu %8lx\n", cache, cache->name,
-			cache->object_size, cache->usage, cache->empty_count,
-			cache->used_count, cache->total_objects, cache->flags);
+		kprintf("%p %22s %8lu %8" B_PRIuSIZE " %8lu %6lu %8lu %8lu %8lx\n",
+			cache, cache->name, cache->object_size, cache->alignment,
+			cache->usage, cache->empty_count, cache->used_count,
+			cache->total_objects, cache->flags);
 	}
 
 	return 0;
@@ -238,6 +239,7 @@ dump_cache_info(int argc, char* argv[])
 	kprintf("name:              %s\n", cache->name);
 	kprintf("lock:              %p\n", &cache->lock);
 	kprintf("object_size:       %lu\n", cache->object_size);
+	kprintf("alignment:         %" B_PRIuSIZE "\n", cache->alignment);
 	kprintf("cache_color_cycle: %lu\n", cache->cache_color_cycle);
 	kprintf("total_objects:     %lu\n", cache->total_objects);
 	kprintf("used_count:        %lu\n", cache->used_count);

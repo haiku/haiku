@@ -41,6 +41,7 @@ struct ObjectCache : DoublyLinkedListLinkImpl<ObjectCache> {
 			char				name[32];
 			mutex				lock;
 			size_t				object_size;
+			size_t				alignment;
 			size_t				cache_color_cycle;
 			SlabList			empty;
 			SlabList			partial;

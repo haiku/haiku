@@ -26,6 +26,11 @@
 #define COMPONENT_PARANOIA_LEVEL	OBJECT_CACHE_PARANOIA
 #include <debug_paranoia.h>
 
+
+
+static const size_t kMinObjectAlignment = 8;
+
+
 struct ObjectCache;
 struct object_depot;
 
