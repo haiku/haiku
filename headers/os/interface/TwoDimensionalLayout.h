@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TWO_DIMENSIONAL_LAYOUT_H
@@ -14,6 +14,7 @@ class BLayoutContext;
 class BTwoDimensionalLayout : public BLayout {
 public:
 								BTwoDimensionalLayout();
+								BTwoDimensionalLayout(BMessage* from);
 	virtual						~BTwoDimensionalLayout();
 
 			void				SetInsets(float left, float top, float right,
@@ -36,6 +37,10 @@ public:
 	virtual	void				InvalidateLayout();
 
 	virtual	void				LayoutView();
+
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
 
 protected:
 			struct ColumnRowConstraints {
@@ -66,7 +71,7 @@ protected:
 									enum orientation orientation,
 									int32 index,
 									ColumnRowConstraints* constraints) = 0;
-	virtual	void	 			GetItemDimensions(BLayoutItem* item,
+	virtual	void				GetItemDimensions(BLayoutItem* item,
 									Dimensions* dimensions) = 0;
 
 private:

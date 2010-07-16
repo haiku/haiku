@@ -12,6 +12,7 @@
 #include <LayoutItem.h>
 #include <LayoutUtils.h>
 #include <List.h>
+#include <Message.h>
 #include <View.h>
 
 #include <Referenceable.h>
@@ -19,6 +20,13 @@
 #include "ComplexLayouter.h"
 #include "OneElementLayouter.h"
 #include "SimpleLayouter.h"
+
+
+// Archiving constants
+namespace {
+	const char* kHAlignedLayoutField = "B2DLayout:halignedlayout";
+	const char* kVAlignedLayoutField = "B2DLayout:valignedlayout";
+}
 
 
 // Some words of explanation:
@@ -66,6 +74,9 @@ public:
 			void				AddLocalLayouter(LocalLayouter* localLayouter);
 			void				RemoveLocalLayouter(
 									LocalLayouter* localLayouter);
+
+			status_t			AddAlignedLayoutsToArchive(BArchiver* archiver,
+									LocalLayouter* requestedBy);
 
 			void				AbsorbCompoundLayouter(CompoundLayouter* other);
 
@@ -164,6 +175,14 @@ public:
 			void				AlignWith(LocalLayouter* other,
 									enum orientation orientation);
 
+	// Archiving stuff
+			status_t			AddAlignedLayoutsToArchive(BArchiver* archiver);
+			status_t			AddOwnerToArchive(BArchiver* archiver,
+									CompoundLayouter* requestedBy,
+									bool& _wasAvailable);
+			status_t			AlignLayoutsFromArchive(BUnarchiver* unarchiver,
+									orientation posture);
+
 
 	// interface for the compound layout context
 
@@ -197,7 +216,7 @@ public:
 
 	// implementation private
 private:
-			BTwoDimensionalLayout*	fLayout;
+			BTwoDimensionalLayout* fLayout;
 			CompoundLayouter*	fHLayouter;
 			VerticalCompoundLayouter* fVLayouter;
 			BList				fHeightForWidthItems;
@@ -217,6 +236,16 @@ private:
 
 // #pragma mark -
 
+// archiving constants
+namespace {
+	const char* kLeftInsetField = "B2Dlayout:leftInset";
+	const char* kRightInsetField = "B2Dlayout:rightInset";
+	const char* kTopInsetField = "B2Dlayout:topInset";
+	const char* kBottomInsetField = "B2Dlayout:bottomInset";
+	const char* kHSpacingField = "B2Dlayout:hspacing";
+	const char* kVSpacingField = "B2Dlayout:vspacing";
+}
+
 
 BTwoDimensionalLayout::BTwoDimensionalLayout()
 	:
@@ -228,6 +257,32 @@ BTwoDimensionalLayout::BTwoDimensionalLayout()
 	fVSpacing(0),
 	fLocalLayouter(new LocalLayouter(this))
 {
+}
+
+
+BTwoDimensionalLayout::BTwoDimensionalLayout(BMessage* from)
+	:
+	BLayout(from),
+	fLeftInset(0),
+	fRightInset(0),
+	fTopInset(0),
+	fBottomInset(0),
+	fHSpacing(0),
+	fVSpacing(0),
+	fLocalLayouter(new LocalLayouter(this))
+{
+	float leftInset;
+	float rightInset;
+	float topInset;
+	float bottomInset;
+	if (from->FindFloat(kLeftInsetField, &leftInset) == B_OK
+		&& from->FindFloat(kRightInsetField, &rightInset) == B_OK
+		&& from->FindFloat(kTopInsetField, &topInset) == B_OK
+		&& from->FindFloat(kBottomInsetField, &bottomInset) == B_OK)
+		SetInsets(leftInset, topInset, rightInset, bottomInset);
+
+	from->FindFloat(kHSpacingField, &fHSpacing);
+	from->FindFloat(kVSpacingField, &fVSpacing);
 }
 
 
@@ -393,6 +448,62 @@ frame.PrintToStream();
 }
 
 
+status_t
+BTwoDimensionalLayout::Archive(BMessage* into, bool deep) const
+{
+	BArchiver archiver(into);
+	status_t err = BLayout::Archive(into, deep);
+
+	if (err == B_OK)
+		err = into->AddFloat(kLeftInsetField, fLeftInset);
+
+	if (err == B_OK)
+		err = into->AddFloat(kRightInsetField, fRightInset);
+
+	if (err == B_OK)
+		err = into->AddFloat(kTopInsetField, fTopInset);
+
+	if (err == B_OK)
+		err = into->AddFloat(kBottomInsetField, fBottomInset);
+
+	if (err == B_OK)
+		err = into->AddFloat(kHSpacingField, fHSpacing);
+
+	if (err == B_OK)
+		err = into->AddFloat(kVSpacingField, fVSpacing);
+
+	return archiver.Finish(err);
+}
+
+
+status_t
+BTwoDimensionalLayout::AllArchived(BMessage* into) const
+{
+	BArchiver archiver(into);
+
+	status_t err = BLayout::AllArchived(into);
+	if (err == B_OK)
+		err = fLocalLayouter->AddAlignedLayoutsToArchive(&archiver);
+	return err;
+}
+
+
+status_t
+BTwoDimensionalLayout::AllUnarchived(const BMessage* from)
+{
+	status_t err = BLayout::AllUnarchived(from);
+	if (err != B_OK)
+		return err;
+
+	BUnarchiver unarchiver(from);
+	err = fLocalLayouter->AlignLayoutsFromArchive(&unarchiver, B_HORIZONTAL);
+	if (err == B_OK)
+		err = fLocalLayouter->AlignLayoutsFromArchive(&unarchiver, B_VERTICAL);
+
+	return err;
+}
+
+
 BSize
 BTwoDimensionalLayout::AddInsets(BSize size)
 {
@@ -528,6 +639,28 @@ BTwoDimensionalLayout::CompoundLayouter::RemoveLocalLayouter(
 {
 	if (fLocalLayouters.RemoveItem(localLayouter))
 		InvalidateLayout();
+}
+
+
+status_t
+BTwoDimensionalLayout::CompoundLayouter::AddAlignedLayoutsToArchive(
+	BArchiver* archiver, LocalLayouter* requestedBy)
+{
+	// The LocalLayouter* that really owns us is at index 0, layouts
+	// at other indices are aligned to this one.
+	if (requestedBy != fLocalLayouters.ItemAt(0))
+		return B_OK;
+
+	status_t err;
+	for (int32 i = fLocalLayouters.CountItems() - 1; i > 0; i--) {
+		LocalLayouter* layouter = (LocalLayouter*)fLocalLayouters.ItemAt(i);
+
+		bool wasAvailable;
+		err = layouter->AddOwnerToArchive(archiver, this, wasAvailable);
+		if (err != B_OK && wasAvailable)
+			return err;
+	}
+	return B_OK;
 }
 
 
@@ -1010,6 +1143,60 @@ BTwoDimensionalLayout::LocalLayouter::AlignWith(LocalLayouter* other,
 		other->fHLayouter->AbsorbCompoundLayouter(fHLayouter);
 	else
 		other->fVLayouter->AbsorbCompoundLayouter(fVLayouter);
+}
+
+
+status_t
+BTwoDimensionalLayout::LocalLayouter::AddAlignedLayoutsToArchive(
+	BArchiver* archiver)
+{
+	status_t err = fHLayouter->AddAlignedLayoutsToArchive(archiver, this);
+
+	if (err == B_OK)
+		err = fVLayouter->AddAlignedLayoutsToArchive(archiver, this);
+
+	return err;
+}
+
+
+status_t
+BTwoDimensionalLayout::LocalLayouter::AddOwnerToArchive(BArchiver* archiver,
+	CompoundLayouter* requestedBy, bool& _wasAvailable)
+{
+	const char* field = kHAlignedLayoutField;
+	if (requestedBy == fVLayouter)
+		field = kVAlignedLayoutField;
+
+	if ((_wasAvailable = archiver->IsArchived(fLayout)))
+		return archiver->AddArchivable(field, fLayout);
+
+	return B_NAME_NOT_FOUND;
+}
+
+
+status_t
+BTwoDimensionalLayout::LocalLayouter::AlignLayoutsFromArchive(
+	BUnarchiver* unarchiver, orientation posture)
+{
+	const char* field = kHAlignedLayoutField;
+	if (posture == B_VERTICAL)
+		field = kVAlignedLayoutField;
+
+	int32 count;
+	status_t err = unarchiver->ArchiveMessage()->GetInfo(field, NULL, &count);
+	if (err == B_NAME_NOT_FOUND)
+		return B_OK;
+
+	BTwoDimensionalLayout* retriever;
+	for (int32 i = 0; i < count && err == B_OK; i++) {
+		err = unarchiver->FindObject(field, i,
+			BUnarchiver::B_DONT_ASSUME_OWNERSHIP, retriever);
+
+		if (err == B_OK)
+			retriever->AlignLayoutWith(fLayout, posture);
+	}
+
+	return err;
 }
 
 
