@@ -8,6 +8,7 @@ Application Terminal :
 	AppearPrefView.cpp
 	Arguments.cpp
 	BasicTerminalBuffer.cpp
+	Colors.cpp
 	Encoding.cpp
 	FindWindow.cpp
 	Globals.cpp

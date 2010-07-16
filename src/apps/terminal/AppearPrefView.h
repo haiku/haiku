@@ -19,6 +19,8 @@ const ulong MSG_FULL_FONT_CHANGED	= 'mcff';
 const ulong MSG_FULL_SIZE_CHANGED	= 'mcfs';
 const ulong MSG_COLOR_FIELD_CHANGED	= 'mccf';
 const ulong MSG_COLOR_CHANGED		= 'mcbc';
+const ulong MSG_COLOR_SCHEMA_CHANGED		= 'mccs';
+
 
 const ulong MSG_COLS_CHANGED            = 'mccl';
 const ulong MSG_ROWS_CHANGED            = 'mcrw';
@@ -27,6 +29,7 @@ const ulong MSG_HISTORY_CHANGED         = 'mhst';
 const ulong MSG_PREF_MODIFIED		= 'mpmo';
 
 
+struct color_schema;
 class BColorControl;
 class BMenu;
 class BMenuField;
@@ -45,6 +48,11 @@ public:
 									float *_height);
 
 private:
+			void				_EnableCustomColors(bool enable);
+
+			void				_ChangeColorSchema(color_schema *schema);
+			void				_SetCurrentColorSchema(BMenuField *field);
+
 	static	BMenu*				_MakeFontMenu(uint32 command,
 									const char *defaultFamily,
 									const char *defaultStyle);
@@ -52,11 +60,15 @@ private:
 									uint8 defaultSize);
 	
 	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char **items,
-									const char *defaultItemName);
+										const char *defaultItem);
+
+	static	BPopUpMenu*			_MakeColorSchemaMenu(uint32 msg, const color_schema **schemas,
+									const color_schema *defaultItemName);
 			
 			BMenuField			*fFont;
 			BMenuField			*fFontSize;
 
+			BMenuField			*fColorSchemaField;
 			BMenuField			*fColorField;
 			BColorControl		*fColorControl;
 
