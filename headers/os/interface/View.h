@@ -143,6 +143,8 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
+	virtual	status_t			AllUnarchived(const BMessage* archive);
+	virtual status_t			AllArchived(BMessage* archive) const;
 
 	virtual	void				AttachedToWindow();
 	virtual	void				AllAttached();
