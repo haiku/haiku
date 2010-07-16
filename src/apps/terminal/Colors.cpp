@@ -42,10 +42,14 @@ const color_schema *gPredefinedSchemas[] = {
 
 
 bool
-color_schema::operator==(const color_schema &color)
+color_schema::operator==(const color_schema &schema)
 {
-	if (text_fore_color == color.text_fore_color
-		&& text_back_color == color.text_back_color)
+	if (text_fore_color == schema.text_fore_color
+		&& text_back_color == schema.text_back_color
+		&& cursor_fore_color == schema.cursor_fore_color
+		&& cursor_back_color == schema.cursor_back_color
+		&& select_fore_color == schema.select_fore_color
+		&& select_back_color == schema.select_back_color)
 		return true;
 
 	return false;
