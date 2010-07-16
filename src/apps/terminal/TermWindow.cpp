@@ -580,6 +580,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_COLOR_CHANGED:
+		case MSG_COLOR_SCHEMA_CHANGED:
 		{
 			_SetTermColors(_ActiveTermViewContainerView());
 			_ActiveTermViewContainerView()->Invalidate();
