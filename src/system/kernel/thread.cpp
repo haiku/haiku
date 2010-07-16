@@ -14,6 +14,7 @@
 #include <thread.h>
 
 #include <errno.h>
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +35,7 @@
 #include <ksignal.h>
 #include <Notifications.h>
 #include <real_time_clock.h>
+#include <slab/Slab.h>
 #include <smp.h>
 #include <syscalls.h>
 #include <syscall_restart.h>
@@ -114,10 +116,8 @@ static ConditionVariable sUndertakerCondition;
 static ThreadNotificationService sNotificationService;
 
 
-// The dead queue is used as a pool from which to retrieve and reuse previously
-// allocated thread structs when creating a new thread. It should be gone once
-// the slab allocator is in.
-static struct thread_queue dead_q;
+// object cache to allocate thread structures from
+static object_cache* sThreadCache;
 
 static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
@@ -203,45 +203,29 @@ reset_signals(struct thread *thread)
 }
 
 
-/*!	Allocates and fills in thread structure (or reuses one from the
-	dead queue).
+/*!	Allocates and fills in thread structure.
 
 	\param threadID The ID to be assigned to the new thread. If
 		  \code < 0 \endcode a fresh one is allocated.
 	\param thread initialize this thread struct if nonnull
 */
-
 static struct thread *
 create_thread_struct(struct thread *inthread, const char *name,
 	thread_id threadID, struct cpu_ent *cpu)
 {
 	struct thread *thread;
-	cpu_status state;
 	char temp[64];
-	bool recycled = false;
 
 	if (inthread == NULL) {
-		// try to recycle one from the dead queue first
-		state = disable_interrupts();
-		GRAB_THREAD_LOCK();
-		thread = thread_dequeue(&dead_q);
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
+		thread = (struct thread*)object_cache_alloc(sThreadCache, 0);
+		if (thread == NULL)
+			return NULL;
 
-		// if not, create a new one
-		if (thread == NULL) {
-			thread = (struct thread *)malloc(sizeof(struct thread));
-			if (thread == NULL)
-				return NULL;
-		} else {
-			recycled = true;
-		}
-	} else {
-		thread = inthread;
-	}
-
-	if (!recycled)
 		scheduler_on_thread_create(thread);
+			// TODO: We could use the object cache object
+			// constructor/destructor!
+	} else
+		thread = inthread;
 
 	if (name != NULL)
 		strlcpy(thread->name, name, B_OS_NAME_LENGTH);
@@ -313,7 +297,7 @@ err1:
 	// ToDo: put them in the dead queue instead?
 	if (inthread == NULL) {
 		scheduler_on_thread_destroy(thread);
-		free(thread);
+		object_cache_free(sThreadCache, thread, 0);
 	}
 
 	return NULL;
@@ -328,9 +312,7 @@ delete_thread_struct(struct thread *thread)
 	delete_sem(thread->msg.read_sem);
 
 	scheduler_on_thread_destroy(thread);
-
-	// ToDo: put them in the dead queue instead?
-	free(thread);
+	object_cache_free(sThreadCache, thread, 0);
 }
 
 
@@ -629,9 +611,7 @@ undertaker(void* /*args*/)
 			// needed for the debugger notification below
 
 		// free the thread structure
-		locker.Lock();
-		thread_enqueue(thread, &dead_q);
-			// TODO: Use the slab allocator!
+		delete_thread_struct(thread);
 	}
 
 	// never can get here
@@ -2125,8 +2105,12 @@ thread_init(kernel_args *args)
 	sThreadHash = hash_init(15, offsetof(struct thread, all_next),
 		&thread_struct_compare, &thread_struct_hash);
 
-	// zero out the dead thread structure q
-	memset(&dead_q, 0, sizeof(dead_q));
+	// create the thread structure object cache
+	sThreadCache = create_object_cache("threads", sizeof(thread), 16, NULL,
+		NULL, NULL);
+		// Note: The x86 port requires 16 byte alignment of thread structures.
+	if (sThreadCache == NULL)
+		panic("thread_init(): failed to allocate thread object cache!");
 
 	if (arch_thread_init(args) < B_OK)
 		panic("arch_thread_init() failed!\n");
