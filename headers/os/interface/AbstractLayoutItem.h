@@ -13,6 +13,7 @@
 class BAbstractLayoutItem : public BLayoutItem {
 public:
 								BAbstractLayoutItem();
+								BAbstractLayoutItem(BMessage* from);
 	virtual						~BAbstractLayoutItem();
 
 	virtual	BSize				MinSize();
@@ -29,6 +30,8 @@ public:
 	virtual	BSize				BaseMaxSize();
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
+
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 
 private:
 			BSize				fMinSize;
