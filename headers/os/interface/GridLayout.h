@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_GRID_LAYOUT_H
@@ -8,11 +8,11 @@
 #include <TwoDimensionalLayout.h>
 
 
-
 class BGridLayout : public BTwoDimensionalLayout {
 public:
 								BGridLayout(float horizontal = 0.0f,
 									float vertical = 0.0f);
+								BGridLayout(BMessage* from);
 	virtual						~BGridLayout();
 
 			int32				CountColumns() const;
@@ -54,6 +54,14 @@ public:
 									int32 row, int32 columnCount = 1,
 									int32 rowCount = 1);
 
+	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
+
+	virtual status_t			ItemArchived(BMessage* into,
+									BLayoutItem* item, int32 index) const;
+	virtual status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
+
 protected:	
 	virtual	void				ItemAdded(BLayoutItem* item);
 	virtual	void				ItemRemoved(BLayoutItem* item);
@@ -67,7 +75,7 @@ protected:
 									enum orientation orientation,
 									int32 index,
 									ColumnRowConstraints* constraints);
-	virtual	void	 			GetItemDimensions(BLayoutItem* item,
+	virtual	void				GetItemDimensions(BLayoutItem* item,
 									Dimensions* dimensions);
 
 private:	
@@ -78,7 +86,8 @@ private:
 			bool				_IsGridCellEmpty(int32 column, int32 row);
 			bool				_AreGridCellsEmpty(int32 column, int32 row,
 									int32 columnCount, int32 rowCount);
-	
+
+			bool				_InsertItemIntoGrid(BLayoutItem* item);
 			bool				_ResizeGrid(int32 columnCount, int32 rowCount);
 
 			ItemLayoutData*		_LayoutDataForItem(BLayoutItem* item) const;
