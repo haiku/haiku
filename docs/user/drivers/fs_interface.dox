@@ -1227,13 +1227,13 @@
 	\fn status_t (*fs_vnode_ops::create)(fs_volume *volume, fs_vnode *dir,
 			const char *name, int openMode, int perms, void **_cookie,
 			ino_t *_newVnodeID)
-	\brief Create a new file.
+	\brief Creates and opens a new file.
 
-	If an entry with the name \a name already exists in the given directory,
-	the function shall fail.
-
-	If creating the file succeeds, it also needs to be opened. See
-	\link fs_vnode_ops::open() open() \endlink.
+	The hook is similar to \link fs_vnode_ops::open() open() \endlink, with the
+	difference that, if an entry with the name \a name does not already exist
+	in the given directory, a new file with that name is created first.
+	If the entry does already exist and \a openMode specifies the \c O_EXCL
+	flag, the function shall fail with \c B_FILE_EXISTS (aka \c EEXIST).
 
 	\param volume The volume object.
 	\param dir The node object for the directory where the file should appear.
@@ -1244,9 +1244,9 @@
 		FS specific cookie for the open node.
 	\param[out] _newVnodeID In case of success, you can store the new vnode id
 		in this variable.
-	\return You should return \c B_OK if creating the new node succeeded, and if
-		you put data in both \a _cookie and \a _newVnodeID. Else you should
-		return an error code.
+	\return If opening the node succeeded (after creating it first, if
+		necessary), \c B_OK shall be returned and \a _cookie and \a _newVnodeID
+		shall be set. Otherwise an error code shall be returned.
 */
 
 /*!
