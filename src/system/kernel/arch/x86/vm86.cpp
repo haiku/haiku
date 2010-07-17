@@ -514,8 +514,8 @@ vm86_fault_callback(addr_t address, addr_t faultAddress, bool isWrite)
 {
 	struct iframe *frame = i386_get_user_iframe();
 
-	TRACE("Unhandled fault at 0x%08x touching 0x%08x while %s\n",
-		faultAddress, address, isWrite?"writing":"reading");
+	TRACE("Unhandled fault at %#" B_PRIxADDR " touching %#" B_PRIxADDR
+		"while %s\n", faultAddress, address, isWrite ? "writing" : "reading");
 
 	// we shouldn't have unhandled page faults in vm86 mode
 	x86_vm86_return((struct vm86_iframe *)frame, B_BAD_ADDRESS);
