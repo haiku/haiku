@@ -18,11 +18,13 @@ public:
 								BGroupView(const char* name,
 									enum orientation orientation = B_HORIZONTAL,
 									float spacing = 0.0f);
+								BGroupView(BMessage* from);
 	virtual						~BGroupView();
 
 	virtual	void				SetLayout(BLayout* layout);
-
 			BGroupLayout*		GroupLayout() const;
+
+	static	BArchivable*		Instantiate(BMessage* from);
 };
 
 
