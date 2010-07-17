@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_GROUP_LAYOUT_H
@@ -11,6 +11,7 @@ class BGroupLayout : public BTwoDimensionalLayout {
 public:
 								BGroupLayout(enum orientation orientation,
 									float spacing = 0.0f);
+								BGroupLayout(BMessage* from);
 	virtual						~BGroupLayout();
 
 			float				Spacing() const;
@@ -34,6 +35,15 @@ public:
 	virtual	bool				AddItem(int32 index, BLayoutItem* item,
 									float weight);
 
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
+	static	BArchivable*		Instantiate(BMessage* from);
+
+	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
+									int32 index) const;
+	virtual	status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
+
 protected:	
 	virtual	void				ItemAdded(BLayoutItem* item);
 	virtual	void				ItemRemoved(BLayoutItem* item);
@@ -46,7 +56,7 @@ protected:
 									enum orientation orientation,
 									int32 index,
 									ColumnRowConstraints* constraints);
-	virtual	void	 			GetItemDimensions(BLayoutItem* item,
+	virtual	void				GetItemDimensions(BLayoutItem* item,
 									Dimensions* dimensions);
 
 private:
