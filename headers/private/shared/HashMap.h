@@ -458,7 +458,7 @@ HashMap<Key, Value>::GetIterator() const
 
 // _FindElement
 template<typename Key, typename Value>
-struct HashMap<Key, Value>::Element *
+typename HashMap<Key, Value>::Element *
 HashMap<Key, Value>::_FindElement(const Key& key) const
 {
 	Element* element = fTable.FindFirst(key.GetHashCode());

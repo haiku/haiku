@@ -366,7 +366,7 @@ PreferencesWindow<Preferences>::PreferencesWindow(const char* title,
 template<typename Preferences>
 PreferencesWindow<Preferences>::~PreferencesWindow()
 {
-	SetWindowPosition(Frame().LeftTop());
+	PreferencesStorage<Preferences>::SetWindowPosition(Frame().LeftTop());
 }
 
 

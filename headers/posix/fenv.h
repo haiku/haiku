@@ -1,7 +1,7 @@
 #ifndef _FENV_H
 #define _FENV_H
 
-#if defined(_X86_)
+#if defined(__INTEL__)
 #  include <arch/x86/fenv.h>
 #elif defined(_x86_64_)
 #  include <arch/x86_64/fenv.h>

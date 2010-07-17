@@ -143,10 +143,10 @@ private:
 				previous = HashTable::_Link(previous));
 
 		if (previous) {
-			_Link(value) = _Link(previous);
-			_Link(previous) = value;
+			HashTable::_Link(value) = HashTable::_Link(previous);
+			HashTable::_Link(previous) = value;
 		} else {
-			_Link(value) = table[index];
+			HashTable::_Link(value) = table[index];
 			table[index] = value;
 		}
 	}
@@ -165,7 +165,7 @@ private:
 			for (size_t i = 0; i < HashTable::fTableSize; i++) {
 				ValueType *bucket = HashTable::fTable[i];
 				while (bucket) {
-					ValueType *next = _Link(bucket);
+					ValueType *next = HashTable::_Link(bucket);
 					_Insert(newTable, newSize, bucket);
 					bucket = next;
 				}
