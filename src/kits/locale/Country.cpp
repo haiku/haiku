@@ -35,29 +35,7 @@ using BPrivate::B_WEEK_START_MONDAY;
 using BPrivate::B_WEEK_START_SUNDAY;
 
 
-const char* gStrings[] = {
-	// date/time format
-	"",
-	"",
-	// short date/time format
-	"",
-	"",
-	// am/pm string
-	"AM",
-	"PM",
-	// separators
-	".",
-	":",
-
-	// currency/monetary
-	"."
-	","
-};
-
-
 BCountry::BCountry(const char* languageCode, const char* countryCode)
-	:
-	fStrings(gStrings)
 {
 	fICULocale = new ICU_VERSION::Locale(languageCode, countryCode);
 	fICULongDateFormatter = DateFormat::createDateInstance(
@@ -72,8 +50,6 @@ BCountry::BCountry(const char* languageCode, const char* countryCode)
 
 
 BCountry::BCountry(const char* languageAndCountryCode)
-	:
-	fStrings(gStrings)
 {
 	fICULocale = new ICU_VERSION::Locale(languageAndCountryCode);
 	fICULongDateFormatter = DateFormat::createDateInstance(
@@ -138,17 +114,6 @@ BCountry::GetIcon(BBitmap* result)
 }
 
 
-// TODO use ICU backend keywords instead
-const char*
-BCountry::GetString(uint32 id) const
-{
-	if (id < B_COUNTRY_STRINGS_BASE || id >= B_NUM_COUNTRY_STRINGS)
-		return NULL;
-
-	return gStrings[id - B_COUNTRY_STRINGS_BASE];
-}
-
-
 void
 BCountry::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 {
@@ -172,6 +137,45 @@ BCountry::FormatDate(BString *string, time_t time, bool longFormat)
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
+}
+
+
+status_t
+BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
+	time_t time, bool longFormat)
+{
+	fieldPositions = NULL;
+	UErrorCode error = U_ZERO_ERROR;
+	ICU_VERSION::DateFormat* dateFormatter;
+	ICU_VERSION::FieldPositionIterator positionIterator;
+	dateFormatter = longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
+	UnicodeString ICUString;
+	ICUString = dateFormatter->format((UDate)time * 1000, ICUString,
+		&positionIterator, error);
+
+	if (error != U_ZERO_ERROR)
+		return B_ERROR;
+
+	ICU_VERSION::FieldPosition field;
+	std::vector<int> fieldPosStorage;
+	fieldCount  = 0;
+	while (positionIterator.next(field)) {
+		fieldPosStorage.push_back(field.getBeginIndex());
+		fieldPosStorage.push_back(field.getEndIndex());
+		fieldCount += 2;
+	}
+
+	fieldPositions = (int*) malloc(fieldCount * sizeof(int));
+
+	for (int i = 0 ; i < fieldCount ; i++ )
+		fieldPositions[i] = fieldPosStorage[i];
+
+	string->Truncate(0);
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
+
+	return B_OK;
 }
 
 
@@ -272,21 +276,66 @@ BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 			case UDAT_HOUR_OF_DAY0_FIELD:
 			case UDAT_HOUR1_FIELD:
 			case UDAT_HOUR0_FIELD:
-				fields[i] = B_HOUR;
+				fields[i] = B_DATE_ELEMENT_HOUR;
 				break;
 			case UDAT_MINUTE_FIELD:
-				fields[i] = B_MINUTE;
+				fields[i] = B_DATE_ELEMENT_MINUTE;
 				break;
 			case UDAT_SECOND_FIELD:
-				fields[i] = B_SECOND;
+				fields[i] = B_DATE_ELEMENT_SECOND;
 				break;
 			case UDAT_AM_PM_FIELD:
-				fields[i] = B_AM_PM;
+				fields[i] = B_DATE_ELEMENT_AM_PM;
 				break;
 			default:
-				std::cout << "invalid field id " << fieldPosStorage[i] 
-					<< std::endl;
-				fields[i] = B_INVALID;
+				fields[i] = B_DATE_ELEMENT_INVALID;
+				break;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BCountry::DateFields(BDateElement*& fields, int& fieldCount, bool longFormat)
+{
+	fields = NULL;
+	UErrorCode error = U_ZERO_ERROR;
+	ICU_VERSION::DateFormat* dateFormatter;
+	ICU_VERSION::FieldPositionIterator positionIterator;
+	dateFormatter = longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
+	UnicodeString ICUString;
+	time_t now;
+	ICUString = dateFormatter->format((UDate)time(&now) * 1000, ICUString,
+		&positionIterator, error);
+
+	if (error != U_ZERO_ERROR)
+		return B_ERROR;
+
+	ICU_VERSION::FieldPosition field;
+	std::vector<int> fieldPosStorage;
+	fieldCount  = 0;
+	while (positionIterator.next(field)) {
+		fieldPosStorage.push_back(field.getField());
+		fieldCount ++;
+	}
+
+	fields = (BDateElement*) malloc(fieldCount * sizeof(BDateElement));
+
+	for (int i = 0 ; i < fieldCount ; i++ ) {
+		switch (fieldPosStorage[i]) {
+			case UDAT_YEAR_FIELD:
+				fields[i] = B_DATE_ELEMENT_YEAR;
+				break;
+			case UDAT_MONTH_FIELD:
+				fields[i] = B_DATE_ELEMENT_MONTH;
+				break;
+			case UDAT_DATE_FIELD:
+				fields[i] = B_DATE_ELEMENT_DAY;
+				break;
+			default:
+				fields[i] = B_DATE_ELEMENT_INVALID;
 				break;
 		}
 	}
@@ -373,23 +422,6 @@ BCountry::StartOfWeek()
 		// Might be another day, but BeAPI will not handle it
 		return B_WEEK_START_MONDAY;
 	}
-}
-
-
-// TODO find how to get it from ICU (setting it is ok, we use the pattern-string
-// for that)
-// Or remove this function ?
-const char*
-BCountry::DateSeparator() const
-{
-	return fStrings[B_DATE_SEPARATOR];
-}
-
-
-const char*
-BCountry::TimeSeparator() const
-{
-	return fStrings[B_TIME_SEPARATOR];
 }
 
 

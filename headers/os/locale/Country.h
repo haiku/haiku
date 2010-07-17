@@ -21,11 +21,14 @@ enum {
 };
 
 typedef enum {
-	B_INVALID = B_BAD_DATA,
-	B_AM_PM = 0,
-	B_HOUR,
-	B_MINUTE,
-	B_SECOND
+	B_DATE_ELEMENT_INVALID = B_BAD_DATA,
+	B_DATE_ELEMENT_YEAR = 0,
+	B_DATE_ELEMENT_MONTH,
+	B_DATE_ELEMENT_DAY,
+	B_DATE_ELEMENT_AM_PM,
+	B_DATE_ELEMENT_HOUR,
+	B_DATE_ELEMENT_MINUTE,
+	B_DATE_ELEMENT_SECOND
 } BDateElement;
 
 
@@ -47,6 +50,9 @@ class BCountry {
 			bool longFormat);
 		virtual void	FormatDate(BString* string, time_t time,
 			bool longFormat);
+		status_t		FormatDate(BString* string, int*& fieldPositions,
+			int& fieldCount, time_t time, bool longFormat);
+
 		virtual void	FormatTime(char* string, size_t maxSize, time_t time,
 			bool longFormat);
 		virtual void	FormatTime(BString* string, time_t time,
@@ -55,6 +61,8 @@ class BCountry {
 			int& fieldCount, time_t time, bool longFormat);
 		status_t		TimeFields(BDateElement*& fields, int& fieldCount,
 			bool longFormat);
+		status_t		DateFields(BDateElement*& fields, int& fieldCount,
+			bool longFormat);
 
 		bool		DateFormat(BString&, bool longFormat) const;
 		void		SetDateFormat(const char* formatString,
@@ -62,8 +70,6 @@ class BCountry {
 		void		SetTimeFormat(const char* formatString,
 						bool longFormat = true);
 		bool		TimeFormat(BString&, bool longFormat) const;
-		const char*	DateSeparator() const;
-		const char*	TimeSeparator() const;
 
 		int			StartOfWeek();
 
@@ -103,7 +109,6 @@ class BCountry {
 		icu_44::DateFormat* fICUShortDateFormatter;
 		icu_44::DateFormat* fICULongTimeFormatter;
 		icu_44::DateFormat* fICUShortTimeFormatter;
-		const char**	fStrings;
 		icu_44::Locale* fICULocale;
 };
 

@@ -121,7 +121,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	free(fieldPositions);
 
 	// calc and center text in section rect
-	float width = be_plain_font->StringWidth(field.String());
+	float width = be_plain_font->StringWidth(field);
 
 	BPoint offset(-((bounds.Width()- width) / 2.0) -1.0,
 		bounds.Height() / 2.0 -6.0);
@@ -280,13 +280,13 @@ TTimeEdit::BuildDispatch(BMessage *message)
 			data = fHoldValue;
 
 		switch(dateFormat[index]) {
-			case B_HOUR:
+			case B_DATE_ELEMENT_HOUR:
 				message->AddInt32(fields[0], data);
 				break;
-			case B_MINUTE:
+			case B_DATE_ELEMENT_MINUTE:
 				message->AddInt32(fields[1], data);
 				break;
-			case B_SECOND:
+			case B_DATE_ELEMENT_SECOND:
 				message->AddInt32(fields[2], data);
 			default:
 				break;
@@ -311,7 +311,7 @@ TTimeEdit::_CheckRange()
 		return;
 	}
 	switch (fields[fFocus]) {
-		case B_HOUR:
+		case B_DATE_ELEMENT_HOUR:
 			if (value > 23)
 				value = 0;
 			else if (value < 0)
@@ -320,7 +320,7 @@ TTimeEdit::_CheckRange()
 			fTime.SetTime(value, fTime.Minute(), fTime.Second());
 			break;
 
-		case B_MINUTE:
+		case B_DATE_ELEMENT_MINUTE:
 			if (value> 59)
 				value = 0;
 			else if (value < 0)
@@ -329,7 +329,7 @@ TTimeEdit::_CheckRange()
 			fTime.SetTime(fTime.Hour(), value, fTime.Second());
 			break;
 
-		case B_SECOND:
+		case B_DATE_ELEMENT_SECOND:
 			if (value > 59)
 				value = 0;
 			else if (value < 0)
@@ -338,7 +338,7 @@ TTimeEdit::_CheckRange()
 			fTime.SetTime(fTime.Hour(), fTime.Minute(), value);
 			break;
 
-		case B_AM_PM:
+		case B_DATE_ELEMENT_AM_PM:
 			value = fTime.Hour();
 			if (value < 13)
 				value += 12;
@@ -377,17 +377,17 @@ TTimeEdit::_IsValidDoubleDigi(int32 value)
 		return false;
 	}
 	switch (fields[fFocus]) {
-		case B_HOUR:
+		case B_DATE_ELEMENT_HOUR:
 			if (value <= 23)
 				isInRange = true;
 			break;
 
-		case B_MINUTE:
+		case B_DATE_ELEMENT_MINUTE:
 			if (value <= 59)
 				isInRange = true;
 			break;
 
-		case B_SECOND:
+		case B_DATE_ELEMENT_SECOND:
 			if (value <= 59)
 				isInRange = true;
 			break;
@@ -416,15 +416,15 @@ TTimeEdit::_SectionValue(int32 index) const
 		return 0;
 	}
 	switch (fields[index]) {
-		case B_HOUR:
+		case B_DATE_ELEMENT_HOUR:
 			value = fTime.Hour();
 			break;
 
-		case B_MINUTE:
+		case B_DATE_ELEMENT_MINUTE:
 			value = fTime.Minute();
 			break;
 
-		case B_SECOND:
+		case B_DATE_ELEMENT_SECOND:
 			value = fTime.Second();
 			break;
 
@@ -465,7 +465,7 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 		return;
 
 	int32 section = FocusIndex();
-	if (section < 1 || section > 2)
+	if (section < 0 || section > 2)
 		return;
 
 	bigtime_t currentTime = system_time();
@@ -480,12 +480,22 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 	}
 
 	// if year add 2000
-	if (section == 2) {
+	
+	BDateElement* dateFormat;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->DateFields(dateFormat, fieldCount, false);
+
+	if (dateFormat[section] == B_DATE_ELEMENT_YEAR) {
 		int32 oldCentury = int32(fHoldValue / 100) * 100;
 		if (number < 10 && oldCentury == 1900)
 			number += 70;
 		number += oldCentury;
 	}
+
+	free(dateFormat);
+
 	// update display value
 	fHoldValue = number;
 
@@ -509,7 +519,6 @@ TDateEdit::InitView()
 void
 TDateEdit::DrawSection(uint32 index, bool hasFocus)
 {
-	// user defined section drawing
 	TSection *section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 
@@ -517,29 +526,42 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 		return;
 
 	BRect bounds = section->Frame();
-	uint32 value = _SectionValue(index);
+	BDateTime dateTime(fDate, BTime());
 
 	SetLowColor(ViewColor());
-	if (hasFocus) {
+	BString field;
+	if (hasFocus)
 		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-		value = fHoldValue;
-	}
 
 	BString text;
-	if (index != 0) {
-		if (value < 10)	text << "0";
-		text << value;
-	} else
-		text.SetTo(fDate.LongMonthName(value));
+	int* fieldPositions;
+	int fieldCount;
+
+	BCountry* country;
+	be_locale_roster->GetDefaultCountry(&country);
+	country->FormatDate(&text, fieldPositions, fieldCount, dateTime.Time_t(),
+		false);
+		// TODO : this should be cached somehow to not redo it for each field
+
+	if (index * 2 + 1 > fieldCount) {
+		free(fieldPositions);
+		return;
+	}
+
+	text.CopyCharsInto(field, fieldPositions[index * 2],
+		fieldPositions[index * 2 + 1] - fieldPositions[index * 2]);
+
+	free(fieldPositions);
+
 
 	// calc and center text in section rect
-	float width = StringWidth(text.String());
+	float width = StringWidth(field);
 	BPoint offset(-(bounds.Width() - width) / 2.0 - 1.0,
 		(bounds.Height() / 2.0 - 6.0));
 
 	SetHighColor(0, 0, 0, 255);
 	FillRect(bounds, B_SOLID_LOW);
-	DrawString(text.String(), bounds.LeftBottom() - offset);
+	DrawString(field, bounds.LeftBottom() - offset);
 }
 
 
@@ -554,19 +576,43 @@ TDateEdit::DrawSeparator(uint32 index)
 	BRect bounds = section->Frame();
 
 	float sepWidth = SeparatorWidth();
-	float width = be_plain_font->StringWidth("/");
-
-	BPoint offset(-(sepWidth / 2.0 - width / 2.0) -1.0,
-		bounds.Height() / 2.0 -6.0);
 
 	SetHighColor(0, 0, 0, 255);
-	DrawString("/", bounds.RightBottom() - offset);
+
+	BString text;
+	int* fieldPositions;
+	int fieldCount;
+
+	BCountry* country;
+	be_locale_roster->GetDefaultCountry(&country);
+	BDateTime dateTime(fDate, BTime());
+	country->FormatDate(&text, fieldPositions, fieldCount, dateTime.Time_t(),
+		false);
+		// TODO : this should be cached somehow to not redo it for each field
+
+	if (index * 2 + 2 > fieldCount) {
+		free(fieldPositions);
+		return;
+	}
+
+	BString field;
+	text.CopyCharsInto(field, fieldPositions[index * 2 + 1],
+		fieldPositions[index * 2 + 2] - fieldPositions[index * 2 + 1]);
+
+	free(fieldPositions);
+
+	float width = be_plain_font->StringWidth(field);
+	BPoint offset(-((sepWidth - width) / 2.0) -1.0, bounds.Height() / 2.0 -6.0);
+	DrawString(field, bounds.RightBottom() - offset);
 }
 
 
 void
 TDateEdit::SetSections(BRect area)
 {
+	// TODO : we have to be more clever here, as the fields can move and have
+	// different sizes dependin on the locale
+
 	// create sections
 	for (uint32 idx = 0; idx < fSectionCount; idx++)
 		fSectionList->AddItem(new TSection(area));
@@ -664,15 +710,37 @@ TDateEdit::BuildDispatch(BMessage *message)
 
 	message->AddBool("time", false);
 
-	int32 value;
-	for (int32 index = 0; index < fSectionList->CountItems(); ++index) {
-		value = _SectionValue(index);
-
-		if (index == fFocus)
-			value = fHoldValue;
-
-		message->AddInt32(fields[index], value);
+	BDateElement* dateFormat;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->DateFields(dateFormat, fieldCount, false);
+	if (fFocus > fieldCount) {
+		free(dateFormat);
+		return;
 	}
+	for (int32 index = 0; index < fSectionList->CountItems(); ++index) {
+		uint32 data = _SectionValue(index);
+
+		if (fFocus == index)
+			data = fHoldValue;
+
+		switch(dateFormat[index]) {
+			case B_DATE_ELEMENT_MONTH:
+				message->AddInt32(fields[0], data);
+				break;
+			case B_DATE_ELEMENT_DAY:
+				message->AddInt32(fields[1], data);
+				break;
+			case B_DATE_ELEMENT_YEAR:
+				message->AddInt32(fields[2], data);
+				break;
+			default:
+				break;
+		}
+	}
+
+	free(dateFormat);
 }
 
 
@@ -680,10 +748,18 @@ void
 TDateEdit::_CheckRange()
 {
 	int32 value = fHoldValue;
+	BDateElement* fields;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->DateFields(fields, fieldCount, false);
+	if (fFocus > fieldCount) {
+		free(fields);
+		return;
+	}
 
-	switch (fFocus) {
-		case 0:
-			// month
+	switch (fields[fFocus]) {
+		case B_DATE_ELEMENT_MONTH:
 			if (value > 12)
 				value = 1;
 			else if (value < 1)
@@ -692,9 +768,8 @@ TDateEdit::_CheckRange()
 			fDate.SetDate(fDate.Year(), value, fDate.Day());
 			break;
 
-		case 1:
+		case B_DATE_ELEMENT_DAY:
 		{
-			// day
 			int32 days = fDate.DaysInMonth();
 			if (value > days)
 				value = 1;
@@ -705,8 +780,8 @@ TDateEdit::_CheckRange()
 			break;
 		}
 
-		case 2:
-			// year
+		case B_DATE_ELEMENT_YEAR:
+			// 2037 is the end of 32-bit UNIX time
 			if (value > 2037)
 				value = 2037;
 			else if (value < 1970)
@@ -716,9 +791,11 @@ TDateEdit::_CheckRange()
 			break;
 
 		default:
+			free(fields);
 			return;
 	}
 
+	free(fields);
 	fHoldValue = value;
 	Draw(Bounds());
 }
@@ -728,20 +805,27 @@ bool
 TDateEdit::_IsValidDoubleDigi(int32 value)
 {
 	bool isInRange = false;
+	BDateElement* fields;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->DateFields(fields, fieldCount, false);
+	if (fFocus > fieldCount) {
+		free(fields);
+		return false;
+	}
 	int32 year = 0;
-	switch (fFocus) {
-		case 1:
+	switch (fields[fFocus]) {
+		case B_DATE_ELEMENT_DAY:
 		{
-			// day
 			int32 days = fDate.DaysInMonth();
 			if (value <= days)
 				isInRange = true;
 			break;
 		}
 
-		case 2:
+		case B_DATE_ELEMENT_YEAR:
 		{
-			// year
 			year = int32(fHoldValue / 100) * 100 + value;
 			if (year <= 2037 && year >= 1970)
 				isInRange = true;
@@ -749,9 +833,11 @@ TDateEdit::_IsValidDoubleDigi(int32 value)
 		}
 
 		default:
+			free(fields);
 			return isInRange;
 	}
 
+	free(fields);
 	return isInRange;
 }
 
@@ -760,12 +846,21 @@ int32
 TDateEdit::_SectionValue(int32 index) const
 {
 	int32 value = 0;
-	switch (index) {
-		case 0:
+	BDateElement* fields;
+	int fieldCount;
+	BCountry* here;
+	be_locale_roster->GetDefaultCountry(&here);
+	here->DateFields(fields, fieldCount, false);
+	if (index > fieldCount) {
+		free(fields);
+		return 0;
+	}
+	switch (fields[index]) {
+		case B_DATE_ELEMENT_MONTH:
 			value = fDate.Month();
 			break;
 
-		case 1:
+		case B_DATE_ELEMENT_DAY:
 			value = fDate.Day();
 			break;
 
