@@ -487,11 +487,18 @@
 	marked removed.
 
 	The hook has to initialize \a vnode->private_node with its handle created
-	for the node and \a vnode->ops with the operation vector for the node.
+	for the node and \a vnode->ops with the operation vector for the node. It
+	also has to set \c *_type to the type of the node -- as in \c stat::st_mode
+	(the non-type bits can, but do not need to be cleared) -- and \c *_flags to
+	a bitwise OR of vnode flags to apply (cf. publish_vnode() for what flags
+	bits are possible).
 
 	\param volume The volume object.
 	\param id The ID of the node.
 	\param vnode Pointer to a node object to be initialized.
+	\param _type Pointer to a variable to be set to the node's type.
+	\param _flags Pointer to a variable to be set to flags to apply to the
+		vnode.
 	\param reenter \c true if the hook invocation has been caused by the FS
 		itself, e.g. by invoking ::get_vnode().
 	\return \c B_OK if everything went fine, another error code otherwise.
