@@ -5144,12 +5144,13 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 	// This is somewhat tricky: If the entry already exists, the FS responsible
 	// for the directory might not necessarily also be the one responsible for
-	// the node the entry refers to. So we can actually never call the create()
-	// hook without O_EXCL. Instead we try to look the entry up first. If it
-	// already exists, we just open the node (unless O_EXCL), otherwise we call
-	// create() with O_EXCL. This introduces a race condition, since someone
-	// else might have created the entry in the meantime. We hope the respective
-	// FS returns the correct error code and retry (up to 3 times) again.
+	// the node the entry refers to (e.g. in case of mount points or FIFOs). So
+	// we can actually never call the create() hook without O_EXCL. Instead we
+	// try to look the entry up first. If it already exists, we just open the
+	// node (unless O_EXCL), otherwise we call create() with O_EXCL. This
+	// introduces a race condition, since someone else might have created the
+	// entry in the meantime. We hope the respective FS returns the correct
+	// error code and retry (up to 3 times) again.
 
 	for (int i = 0; i < 3 && status != B_OK; i++) {
 		// look the node up
