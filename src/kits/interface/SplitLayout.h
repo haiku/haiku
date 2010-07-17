@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc.
+ * Copyright 2006-2010, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_SPLIT_LAYOUT_H
@@ -25,6 +25,7 @@ class BSplitLayout : public BLayout {
 public:
 								BSplitLayout(enum orientation orientation,
 									float spacing = 0.0f);
+								BSplitLayout(BMessage* from);
 	virtual						~BSplitLayout();
 
 			void				SetInsets(float left, float top, float right,
@@ -87,6 +88,15 @@ public:
 			bool				StopDraggingSplitter();
 			int32				DraggedSplitter() const;
 
+	// archiving methods
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
+
+	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
+									int32 index) const;
+	virtual	status_t			ItemUnarchived(const BMessage* from,
+									BLayoutItem* item, int32 index);
+
 protected:
 	virtual	void				ItemAdded(BLayoutItem* item);
 	virtual	void				ItemRemoved(BLayoutItem* item);
@@ -121,7 +131,7 @@ private:
 
 			void				_ValidateMinMax();
 
-			void				 _InternalGetHeightForWidth(float width,
+			void				_InternalGetHeightForWidth(float width,
 									bool realLayout, float* minHeight,
 									float* maxHeight, float* preferredHeight);
 
