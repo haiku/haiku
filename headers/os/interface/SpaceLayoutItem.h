@@ -12,6 +12,7 @@ class BSpaceLayoutItem : public BLayoutItem {
 public:
 								BSpaceLayoutItem(BSize minSize, BSize maxSize,
 									BSize preferredSize, BAlignment alignment);
+								BSpaceLayoutItem(BMessage* archive);
 	virtual						~BSpaceLayoutItem();
 
 	static	BSpaceLayoutItem*	CreateGlue();
@@ -33,6 +34,9 @@ public:
 
 	virtual	BRect				Frame();
 	virtual	void				SetFrame(BRect frame);
+
+	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
 
 private:
 			BRect				fFrame;

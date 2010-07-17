@@ -1,31 +1,63 @@
 /*
+ * Copyright 2010, Haiku, Inc.
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <SpaceLayoutItem.h>
 
+#include <new>
 
-// constructor
+#include <Message.h>
+
+
+namespace {
+	const char* kMinSizeField = "BSpaceLayoutItem:minsize";
+	const char* kMaxSizeField = "BSpaceLayoutItem:maxsize";
+	const char* kPreferredSizeField = "BSpaceLayoutItem:prefsize";
+	const char* kAlignmentField = "BSpaceLayoutItem:alignment";
+	const char* kFrameField = "BSpaceLayoutItem:frame";
+	const char* kVisibleField = "BSpaceLayoutItem:visible";
+}
+
+
 BSpaceLayoutItem::BSpaceLayoutItem(BSize minSize, BSize maxSize,
 	BSize preferredSize, BAlignment alignment)
-	: fFrame(),
-	  fMinSize(minSize),
-	  fMaxSize(maxSize),
-	  fPreferredSize(preferredSize),
-	  fAlignment(alignment),
-	  fVisible(true)
+	:
+	fFrame(),
+	fMinSize(minSize),
+	fMaxSize(maxSize),
+	fPreferredSize(preferredSize),
+	fAlignment(alignment),
+	fVisible(true)
 {
 }
 
-// destructor
+
+BSpaceLayoutItem::BSpaceLayoutItem(BMessage* archive)
+	:
+	BLayoutItem(archive)
+{
+	archive->FindSize(kMinSizeField, &fMinSize);
+	archive->FindSize(kMaxSizeField, &fMaxSize);
+	archive->FindSize(kPreferredSizeField, &fPreferredSize);
+
+	archive->FindAlignment(kAlignmentField, &fAlignment);
+
+	archive->FindRect(kFrameField, &fFrame);
+	archive->FindBool(kVisibleField, &fVisible);
+}
+
+
 BSpaceLayoutItem::~BSpaceLayoutItem()
 {
 }
 
-// CreateGlue
+
 BSpaceLayoutItem*
-BSpaceLayoutItem::CreateGlue() {
+BSpaceLayoutItem::CreateGlue()
+{
 	return new BSpaceLayoutItem(
 		BSize(-1, -1),
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED),
@@ -33,9 +65,10 @@ BSpaceLayoutItem::CreateGlue() {
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 }
 
-// CreateHorizontalStrut
+
 BSpaceLayoutItem*
-BSpaceLayoutItem::CreateHorizontalStrut(float width) {
+BSpaceLayoutItem::CreateHorizontalStrut(float width)
+{
 	return new BSpaceLayoutItem(
 		BSize(width, -1),
 		BSize(width, B_SIZE_UNLIMITED),
@@ -43,9 +76,10 @@ BSpaceLayoutItem::CreateHorizontalStrut(float width) {
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 }
 
-// CreateVerticalStrut
+
 BSpaceLayoutItem*
-BSpaceLayoutItem::CreateVerticalStrut(float height) {
+BSpaceLayoutItem::CreateVerticalStrut(float height)
+{
 	return new BSpaceLayoutItem(
 		BSize(-1, height),
 		BSize(B_SIZE_UNLIMITED, height),
@@ -53,35 +87,35 @@ BSpaceLayoutItem::CreateVerticalStrut(float height) {
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 }
 
-// MinSize
+
 BSize
 BSpaceLayoutItem::MinSize()
 {
 	return fMinSize;
 }
 
-// MaxSize
+
 BSize
 BSpaceLayoutItem::MaxSize()
 {
 	return fMaxSize;
 }
 
-// PreferredSize
+
 BSize
 BSpaceLayoutItem::PreferredSize()
 {
 	return fPreferredSize;
 }
 
-// Alignment
+
 BAlignment
 BSpaceLayoutItem::Alignment()
 {
 	return fAlignment;
 }
 
-// SetExplicitMinSize
+
 void
 BSpaceLayoutItem::SetExplicitMinSize(BSize size)
 {
@@ -93,7 +127,7 @@ BSpaceLayoutItem::SetExplicitMinSize(BSize size)
 	InvalidateLayout();
 }
 
-// SetExplicitMaxSize
+
 void
 BSpaceLayoutItem::SetExplicitMaxSize(BSize size)
 {
@@ -105,7 +139,7 @@ BSpaceLayoutItem::SetExplicitMaxSize(BSize size)
 	InvalidateLayout();
 }
 
-// SetExplicitPreferredSize
+
 void
 BSpaceLayoutItem::SetExplicitPreferredSize(BSize size)
 {
@@ -117,7 +151,7 @@ BSpaceLayoutItem::SetExplicitPreferredSize(BSize size)
 	InvalidateLayout();
 }
 
-// SetExplicitAlignment
+
 void
 BSpaceLayoutItem::SetExplicitAlignment(BAlignment alignment)
 {
@@ -129,30 +163,67 @@ BSpaceLayoutItem::SetExplicitAlignment(BAlignment alignment)
 	InvalidateLayout();
 }
 
-// IsVisible
+
 bool
 BSpaceLayoutItem::IsVisible()
 {
 	return fVisible;
 }
 
-// SetVisible
+
 void
 BSpaceLayoutItem::SetVisible(bool visible)
 {
 	fVisible = visible;
 }
 
-// Frame
+
 BRect
 BSpaceLayoutItem::Frame()
 {
 	return fFrame;
 }
 
-// SetFrame
+
 void
 BSpaceLayoutItem::SetFrame(BRect frame)
 {
 	fFrame = frame;
 }
+
+
+status_t
+BSpaceLayoutItem::Archive(BMessage* into, bool deep) const
+{
+	status_t err = BLayoutItem::Archive(into, deep);
+
+	if (err == B_OK)
+		err = into->AddRect(kFrameField, fFrame);
+
+	if (err == B_OK)
+		err = into->AddSize(kMinSizeField, fMinSize);
+
+	if (err == B_OK)
+		err = into->AddSize(kMaxSizeField, fMaxSize);
+
+	if (err == B_OK)
+		err = into->AddSize(kPreferredSizeField, fPreferredSize);
+
+	if (err == B_OK)
+		err = into->AddAlignment(kAlignmentField, fAlignment);
+
+	if (err == B_OK)
+		err = into->AddBool(kVisibleField, fVisible);
+
+	return err;
+}
+
+
+BArchivable*
+BSpaceLayoutItem::Instantiate(BMessage* from)
+{
+	if (validate_instantiation(from, "BSpaceLayoutItem"))
+		return new(std::nothrow) BSpaceLayoutItem(from);
+	return NULL;
+}
+
