@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	-60397933
+1	lithuanian	x-vnd.Haiku-DriveSetup	4234569363
 Delete	MainWindow		Šalinti
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tikrai norite įžymėti pasirinktą skirsnį?\nPo įžymėjimo apibrėžčių įvedimo galėsite atšaukti šį veiksmą prieš pat įrašant pakeitimus į laikmeną.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tikrai dabar norite pakeitimus įrašyti tiesiai į laikmeną?\n\nJei tęsite toliau – visi duomenys, esantys pasirinktame skirsnyje, bus negrįžtamai prarasti!

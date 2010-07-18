@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	-60397933
+1	russian	x-vnd.Haiku-DriveSetup	4234569363
 Delete	MainWindow		Удалить
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Вы уверены, что хотите инициализировать выбранный раздел?\nПосле ввода параметров инициализации вы сможете отменить эту операцию непосредственно перед записью изменений на диск.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на выбранном разделе будут безвозвратно потеряны!

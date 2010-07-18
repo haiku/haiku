@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DriveSetup	-60397933
+1	danish	x-vnd.Haiku-DriveSetup	4234569363
 Delete	MainWindow		Slet
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Er du sikker på at du ønsker at initialisere den valgte partition? Efter initialisations parametrene er indtastet, er det muligt at afbryde proceduren inden at ændringerne skrives til disken.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du ønsker at skrive ændringerne tilbage til disken nu?\n\nData på den valgte partition vil blive permanent slettet!

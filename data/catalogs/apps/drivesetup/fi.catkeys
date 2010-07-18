@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	-60397933
+1	finnish	x-vnd.Haiku-DriveSetup	4234569363
 Delete	MainWindow		Poista
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Oletko varma, että haluat alustaa valitun osion? Alustusparametrien kirjoittamisen jälkeen voit keskeyttää toiminnan juuri ennen muutosten kirjoittamista takaisin levylle.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!

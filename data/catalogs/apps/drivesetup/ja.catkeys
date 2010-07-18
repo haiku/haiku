@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	-60397933
+1	japanese	x-vnd.Haiku-DriveSetup	4234569363
 Delete	MainWindow		削除
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		選択されたパーティションを本当に初期化しますか？初期化パラメーター入力後でも、変更をディスクへ書き込む前なら、この動作は中止できます。
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		変更を本当にディスクに保存しますか？\n\nその場合、選択されたパーティションの全てのデータが失われますので、ご注意ください。

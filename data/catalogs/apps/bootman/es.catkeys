@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-bootman	-1301793070
+1	spanish	x-vnd.Haiku-bootman	2993174226
 The boot manager has been successfully installed on your system.	BootManagerController		El gestor de arranque ha sido instalado satisfactoriamente en su sistema.
 At least one partition must be selected!	BootManagerController		¡Debe haber una partición seleccionada!
 The old Master Boot Record could not be saved to %s	BootManagerController		El anterior registro de arranque maestro (MBR) no se ha podido grabar en %s

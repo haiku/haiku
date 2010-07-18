@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Installer	-1073908369
+1	korean	x-vnd.Haiku-Installer	3221058927
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tJérôme Duval 과 Stephan Aßmus 작성\n\t저작권 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		설치가 완료됨.  부트 섹터는 '%s'에 기록되었습니다.  나가기를 눌려서 설치프로그램을 나가거나 새로운 설치 볼륨을 선택해서 다른 설치를 할 수 있습니다.
 Quit	InstallerWindow		나가기

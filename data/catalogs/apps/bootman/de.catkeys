@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-bootman	-1301793070
+1	german	x-vnd.Haiku-bootman	2993174226
 The boot manager has been successfully installed on your system.	BootManagerController		Der Boot-Manager wurde erfolgreich in Ihrem System eingerichtet.
 At least one partition must be selected!	BootManagerController		Es muss mindestens eine Partition ausgewählt werden!
 The old Master Boot Record could not be saved to %s	BootManagerController		Der alte Master-Boot-Record konnte nicht unter %s gesichert werden.

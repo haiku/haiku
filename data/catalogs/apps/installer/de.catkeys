@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Installer	-1961591700
+1	german	x-vnd.Haiku-Installer	2333375596
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tAutoren: Jérôme Duval und Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation abgeschlossen. Der Bootsektor wurde nach '%s' geschrieben. Wählen Sie 'Beenden', um das Installationsprogramm zu verlassen, oder eine anderes Ziellaufwerk für eine weitere Installation.
 Quit	InstallerWindow		Beenden

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	-60397933
+1	hungarian	x-vnd.Haiku-DriveSetup	4234569363
 Delete	MainWindow		Törlés
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Biztosan el szeretné kezdeni a kiválasztott partíción a műveletek végrehajtását? A folyamat még megszakítható mielőtt az írási szakasz elkezdődne!
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Biztosan jóváhagyja az adatok felírását a lemezre?\n\nEz esetben a partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.

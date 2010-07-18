@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-DriveSetup	-60397933
+1	spanish	x-vnd.Haiku-DriveSetup	4234569363
 Delete	MainWindow		Eliminar
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		¿Está seguro que quiere inicializar la partición seleccionada? Después de introducir los parámetros de inicialización, podrá abortar esta operación antes de escribir los cambios en el disco.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información de la partición se perderá irremisiblemente si lo hace!.

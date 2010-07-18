@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Installer	-1073908369
+1	lithuanian	x-vnd.Haiku-Installer	3221058927
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Diegyklė „Installer“\n\tparašyta Jérôme'o Duval'io ir Stephan'o Aßmus'o\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“ Diegyklės uždarymui arba rinkitės kitą skirsnį jei norite dar kur įdiegti.
 Quit	InstallerWindow		Baigti
