@@ -1190,12 +1190,30 @@ syslog_sender(void* data)
 			// Note: We time out since in some situations output is added to
 			// the syslog buffer without being allowed to notify us (e.g. in
 			// the kernel debugger).
+			// TODO: A semaphore is rather unhandy here. It is released for
+			// every single message written to the buffer, but we potentially
+			// send a lot more than a single message per iteration. On the other
+			// hand, as long as the syslog daemon is not running, we acquire
+			// the semaphore anyway. A better solution would be a flag + a
+			// condition variable.
 
 		sSyslogMessage->when = real_time_clock();
 
 		if (error == B_BAD_PORT_ID) {
 			// last message couldn't be sent, try to locate the syslog_daemon
 			port = find_port(SYSLOG_PORT_NAME);
+			if (port < 0) {
+				// Don't recheck too quickly, since find_port) is rather
+				// expensive.
+				// TODO: Maybe using the port notification mechanism would be
+				// the better option here. Alternatively, and probably even
+				// better, the syslog daemon could register itself via a syscall
+				// (like the messaging service). We could even wait with
+				// starting this thread before that happened (end exit as soon
+				// as the port is gone).
+				snooze(1000000);
+				continue;
+			}
 		}
 
 		if (port >= B_OK) {
