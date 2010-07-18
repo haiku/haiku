@@ -546,6 +546,10 @@ checksumfs_create_symlink(fs_volume* fsVolume, fs_vnode* parent,
 	if (error != B_OK)
 		return error;
 
+	// don't create an entry in an unlinked directory
+	if (directory->HardLinks() == 0)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+
 	// create a symlink node
 	SymLink* newSymLink;
 	error = volume->CreateSymLink(mode, transaction, newSymLink);
@@ -849,12 +853,15 @@ checksumfs_create(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 		RETURN_ERROR(error);
 
 	// The entry doesn't exist yet. We have to create a new file.
-// TODO: Don't do that in an unlinked directory!
 
 	// check the directory write permission
 	error = check_access(directory, W_OK);
 	if (error != B_OK)
 		return error;
+
+	// don't create an entry in an unlinked directory
+	if (directory->HardLinks() == 0)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
 	// start a transaction and attach the directory
 	Transaction transaction(volume);
@@ -1120,6 +1127,10 @@ checksumfs_create_dir(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 	error = transaction.StartAndAddNode(directory);
 	if (error != B_OK)
 		return error;
+
+	// don't create an entry in an unlinked directory
+	if (directory->HardLinks() == 0)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
 	// create a directory node
 	Directory* newDirectory;
