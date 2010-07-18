@@ -309,8 +309,9 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 static status_t
 synchronous_io(io_request* request, DoIO& io)
 {
-	TRACE_RIO("[%ld] synchronous_io(request: %p (offset: %lld, length: %lu))\n",
-		find_thread(NULL), request, request->Offset(), request->Length());
+	TRACE_RIO("[%" B_PRId32 "] synchronous_io(request: %p (offset: %" B_PRIdOFF
+		", length: %" B_PRIuGENADDR "))\n", find_thread(NULL), request,
+		request->Offset(), request->Length());
 
 	IOBuffer* buffer = request->Buffer();
 
@@ -455,9 +456,9 @@ status_t
 do_iterative_fd_io(int fd, io_request* request, iterative_io_get_vecs getVecs,
 	iterative_io_finished finished, void* cookie)
 {
-	TRACE_RIO("[%ld] do_iterative_fd_io(fd: %d, request: %p (offset: %lld, "
-		"length: %ld))\n", find_thread(NULL), fd, request, request->Offset(),
-		request->Length());
+	TRACE_RIO("[%" B_PRId32 "] do_iterative_fd_io(fd: %d, request: %p "
+		"(offset: %" B_PRIdOFF ", length: %" B_PRIuGENADDR "))\n",
+		find_thread(NULL), fd, request, request->Offset(), request->Length());
 
 	struct vnode* vnode;
 	file_descriptor* descriptor = get_fd_and_vnode(fd, &vnode, true);
