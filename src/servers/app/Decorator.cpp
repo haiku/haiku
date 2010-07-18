@@ -187,12 +187,10 @@ Decorator::SetZoom(bool pressed)
 void
 Decorator::SetTitle(const char* string, BRegion* updateRegion)
 {
-	fTitle.SetTo(string);
-	_DoLayout();
-
 	fFootprintValid = false;
 		// the border very likely changed
 
+	fTitle.SetTo(string);
 	_SetTitle(string, updateRegion);
 
 	// TODO: redraw?
@@ -635,12 +633,6 @@ Decorator::_SetLook(DesktopSettings& settings, window_look look,
 
 void
 Decorator::_SetFlags(uint32 flags, BRegion* updateRegion)
-{
-}
-
-
-void
-Decorator::_SetTitle(const char* string, BRegion* updateRegion)
 {
 }
 

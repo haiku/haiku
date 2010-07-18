@@ -120,31 +120,6 @@ DefaultDecorator::~DefaultDecorator()
 }
 
 
-void
-DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	BRect rect = TabRect();
-
-	Decorator::SetTitle(string);
-
-	if (updateRegion == NULL)
-		return;
-
-	BRect updatedRect = TabRect();
-	if (rect.left > updatedRect.left)
-		rect.left = updatedRect.left;
-	if (rect.right < updatedRect.right)
-		rect.right = updatedRect.right;
-
-	rect.bottom++;
-		// the border will look differently when the title is adjacent
-
-	updateRegion->Include(rect);
-}
-
-
 bool
 DefaultDecorator::GetSettings(BMessage* settings) const
 {
@@ -764,6 +739,31 @@ DefaultDecorator::_DrawZoom(BRect rect)
 	}
 
 	_DrawButtonBitmap(bitmap, rect);
+}
+
+
+void
+DefaultDecorator::_SetTitle(const char* string, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	BRect rect = TabRect();
+
+	_DoLayout();
+
+	if (updateRegion == NULL)
+		return;
+
+	BRect updatedRect = TabRect();
+	if (rect.left > updatedRect.left)
+		rect.left = updatedRect.left;
+	if (rect.right < updatedRect.right)
+		rect.right = updatedRect.right;
+
+	rect.bottom++;
+		// the border will look differently when the title is adjacent
+
+	updateRegion->Include(rect);
 }
 
 

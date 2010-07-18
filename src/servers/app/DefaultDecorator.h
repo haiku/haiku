@@ -27,9 +27,6 @@ public:
 									uint32 flags);
 	virtual						~DefaultDecorator();
 
-	virtual	void				SetTitle(const char* string,
-									BRegion* updateRegion = NULL);
-
 	virtual float				TabLocation() const
 									{ return (float)fTabOffset; }
 
@@ -53,6 +50,9 @@ protected:
 	virtual void				_DrawClose(BRect r);
 	virtual void				_DrawTitle(BRect r);
 	virtual void				_DrawZoom(BRect r);
+
+	virtual	void				_SetTitle(const char* string,
+									BRegion* updateRegion = NULL);
 
 	virtual void				_FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);

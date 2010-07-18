@@ -144,7 +144,7 @@ protected:
 								BRegion* updateRegion = NULL);
 
 	virtual	void			_SetTitle(const char* string,
-								BRegion* updateRegion = NULL);
+								BRegion* updateRegion = NULL) = 0;
 
 	virtual	void			_SetFocus();
 	virtual void			_MoveBy(BPoint offset);
