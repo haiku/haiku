@@ -133,7 +133,10 @@ extractFile()
 	if [ "$isGCCAgnostic" = "true" ] && [ $isHybridBuild ] ; then
 		extractedLibs=`find "$extractDir/$extractedSubDir/" -name "*.so"`
 		moreExtractedLibs=`find "$extractDir/$extractedSubDir/" -name "*.so.*"`
-		createSymlinksForHybrid $extractedLibs $moreExtractedLibs
+		staticLibs=`find "$extractDir/$extractedSubDir/" -name "*.a"`
+		#NOTE: should we symlink libtool's *.la files?
+		#laLibs=`find "$extractDir/$extractedSubDir/" -name "*.la"`
+		createSymlinksForHybrid $extractedLibs $moreExtractedLibs $staticLibs
 	fi
 
 	$cp -r "${sPrefix}$extractDir/$extractedSubDir/." "${tPrefix}$targetExtractedDir"
