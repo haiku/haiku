@@ -754,11 +754,7 @@ DefaultDecorator::_SetTitle(const char* string, BRegion* updateRegion)
 	if (updateRegion == NULL)
 		return;
 
-	BRect updatedRect = TabRect();
-	if (rect.left > updatedRect.left)
-		rect.left = updatedRect.left;
-	if (rect.right < updatedRect.right)
-		rect.right = updatedRect.right;
+	rect = rect | TabRect();
 
 	rect.bottom++;
 		// the border will look differently when the title is adjacent
