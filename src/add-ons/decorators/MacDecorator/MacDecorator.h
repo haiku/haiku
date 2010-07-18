@@ -19,7 +19,7 @@ public:
 									uint32 flags);
 								~MacDecorator();
 
-			void				SetTitle(const char* string,
+			void				_SetTitle(const char* string,
 	 								BRegion* updateRegion = NULL);
 			void				FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);
@@ -29,7 +29,7 @@ public:
 									BRegion* updateRegion = NULL);
 	
 			void				MoveBy(BPoint offset);
-			void 				ResizeBy(BPoint offset, BRegion* dirty);
+			void 				_ResizeBy(BPoint offset, BRegion* dirty);
 
 	// SetTabLocation
 	// TabLocation

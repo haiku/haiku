@@ -59,13 +59,11 @@ MacDecorator::~MacDecorator()
 
 
 void
-MacDecorator::SetTitle(const char* string, BRegion* updateRegion)
+MacDecorator::_SetTitle(const char* string, BRegion* updateRegion)
 {
 	// TODO: we could be much smarter about the update region
 
 	BRect rect = TabRect();
-
-	Decorator::SetTitle(string);
 
 	if (updateRegion == NULL)
 		return;
@@ -165,7 +163,7 @@ MacDecorator::MoveBy(BPoint offset)
 
 
 void
-MacDecorator::ResizeBy(BPoint offset, BRegion* dirty)
+MacDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 {
 	// Move all internal rectangles the appropriate amount
 	fFrame.right += offset.x;
