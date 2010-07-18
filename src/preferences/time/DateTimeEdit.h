@@ -46,7 +46,7 @@ class TTimeEdit : public TSectionEdit {
 		int32			_SectionValue(int32 index) const;
 
 	private:
-		BTime			fTime;
+		BDateTime		fTime;
 		bigtime_t		fLastKeyDownTime;
 		int32			fLastKeyDownInt;
 };

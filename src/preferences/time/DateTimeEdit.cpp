@@ -30,7 +30,7 @@ TTimeEdit::TTimeEdit(BRect frame, const char* name, uint32 sections)
 	fLastKeyDownTime(0)
 {
 	InitView();
-	fTime = BTime::CurrentTime(B_LOCAL_TIME);
+	fTime = BDateTime::CurrentDateTime(B_LOCAL_TIME);
 }
 
 
@@ -94,7 +94,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 		return;
 
 	BRect bounds = section->Frame();
-	time_t time = fTime.Hour() * 3600 + fTime.Minute() * 60 + fTime.Second();
+	time_t time = fTime.Time_t();
 
 	SetLowColor(ViewColor());
 	BString field;
@@ -150,7 +150,7 @@ TTimeEdit::DrawSeparator(uint32 index)
 
 	BCountry* country;
 	be_locale_roster->GetDefaultCountry(&country);
-	time_t time = fTime.Hour() * 3600 + fTime.Minute() * 60 + fTime.Second();
+	time_t time = fTime.Time_t();
 	country->FormatTime(&text, fieldPositions, fieldCount, time, true);
 		// TODO : this should be cached somehow to not redo it for each field
 
@@ -215,11 +215,11 @@ TTimeEdit::SectionFocus(uint32 index)
 void
 TTimeEdit::SetTime(int32 hour, int32 minute, int32 second)
 {
-	if (fTime.Hour() == hour && fTime.Minute() == minute
-		&& fTime.Second() == second)
+	if (fTime.Time().Hour() == hour && fTime.Time().Minute() == minute
+		&& fTime.Time().Second() == second)
 		return;
 
-	fTime.SetTime(hour, minute, second);
+	fTime.SetTime(BTime(hour, minute, second));
 	Invalidate(Bounds());
 }
 
@@ -317,7 +317,8 @@ TTimeEdit::_CheckRange()
 			else if (value < 0)
 				value = 23;
 
-			fTime.SetTime(value, fTime.Minute(), fTime.Second());
+			fTime.SetTime(BTime(value, fTime.Time().Minute(),
+				fTime.Time().Second()));
 			break;
 
 		case B_DATE_ELEMENT_MINUTE:
@@ -326,7 +327,8 @@ TTimeEdit::_CheckRange()
 			else if (value < 0)
 				value = 59;
 
-			fTime.SetTime(fTime.Hour(), value, fTime.Second());
+			fTime.SetTime(BTime(fTime.Time().Hour(), value,
+				fTime.Time().Second()));
 			break;
 
 		case B_DATE_ELEMENT_SECOND:
@@ -335,11 +337,12 @@ TTimeEdit::_CheckRange()
 			else if (value < 0)
 				value = 59;
 
-			fTime.SetTime(fTime.Hour(), fTime.Minute(), value);
+			fTime.SetTime(BTime(fTime.Time().Hour(), fTime.Time().Minute(),
+				value));
 			break;
 
 		case B_DATE_ELEMENT_AM_PM:
-			value = fTime.Hour();
+			value = fTime.Time().Hour();
 			if (value < 13)
 				value += 12;
 			else
@@ -348,7 +351,8 @@ TTimeEdit::_CheckRange()
 				value = 0;
 
 			// modify hour value to reflect change in am/ pm
-			fTime.SetTime(value, fTime.Minute(), fTime.Second());
+			fTime.SetTime(BTime(value, fTime.Time().Minute(),
+				fTime.Time().Second()));
 			break;
 
 		default:
@@ -417,15 +421,15 @@ TTimeEdit::_SectionValue(int32 index) const
 	}
 	switch (fields[index]) {
 		case B_DATE_ELEMENT_HOUR:
-			value = fTime.Hour();
+			value = fTime.Time().Hour();
 			break;
 
 		case B_DATE_ELEMENT_MINUTE:
-			value = fTime.Minute();
+			value = fTime.Time().Minute();
 			break;
 
 		case B_DATE_ELEMENT_SECOND:
-			value = fTime.Second();
+			value = fTime.Time().Second();
 			break;
 
 		default:
