@@ -19,41 +19,21 @@ class Desktop;
 
 class BeDecorator: public Decorator {
  public:
-					BeDecorator(DesktopSettings& settings,
-						BRect frame,
-						window_look look,
-						uint32 flags);
+								BeDecorator(DesktopSettings& settings,
+									BRect frame, window_look look,
+									uint32 flags);
 	virtual						~BeDecorator();
 
-	virtual	void				SetTitle(const char* string,
-										 BRegion* updateRegion = NULL);
-	virtual void				SetLook(DesktopSettings& settings,
-										window_look look,
-										BRegion* updateRegion = NULL);
-	virtual void				SetFlags(uint32 flags,
-										 BRegion* updateRegion = NULL);
-
-	virtual	void				MoveBy(BPoint offset);
-	virtual	void				ResizeBy(BPoint offset, BRegion* dirty);
-
-	virtual bool				SetTabLocation(float location,
-											   BRegion* updateRegion = NULL);
 	virtual float				TabLocation() const
 									{ return (float)fTabOffset; }
 
-	virtual	bool				SetSettings(const BMessage& settings,
-											BRegion* updateRegion = NULL);
 	virtual	bool				GetSettings(BMessage* settings) const;
 
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				Draw();
 
-	virtual	void				GetSizeLimits(int32* minWidth,
-											  int32* minHeight,
-											  int32* maxWidth,
-											  int32* maxHeight) const;
-
-	virtual	void				GetFootprint(BRegion* region);
+	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
+									int32* maxWidth, int32* maxHeight) const;
 
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
 										int32 modifiers);
@@ -68,10 +48,33 @@ class BeDecorator: public Decorator {
 	virtual void				_DrawTitle(BRect r);
 	virtual void				_DrawZoom(BRect r);
 
+	virtual	void				_SetTitle(const char* string,
+										 BRegion* updateRegion = NULL);
+
+	virtual void				_FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion);
+	virtual void				_SetLook(DesktopSettings& settings,
+										window_look look,
+										BRegion* updateRegion = NULL);
+	virtual void				_SetFlags(uint32 flags,
+										 BRegion* updateRegion = NULL);
+
 	virtual void				_SetFocus();
 	virtual void				_SetColors();
 
+	virtual	void				_MoveBy(BPoint offset);
+	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);
+
+	virtual bool				_SetTabLocation(float location,
+											   BRegion* updateRegion = NULL);
+
+	virtual	bool				_SetSettings(const BMessage& settings,
+											BRegion* updateRegion = NULL);
+
+	virtual	void				_GetFootprint(BRegion* region);
+
  private:
+			void				_UpdateFont(DesktopSettings& settings);
 			void				_DrawBlendedRect(BRect r, bool down);
 			void				_GetButtonSizeAndOffset(const BRect& tabRect,
 														float* offset,
