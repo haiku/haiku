@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	3196829578
+1	french	x-vnd.Haiku-About	-25810714
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (et son noyau, NewOS)\n
 %ld Processors:	AboutView		%ld Processeurs :
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondateur du projet)\n\n
@@ -10,15 +10,13 @@ Processor:	AboutView		Processeur :
 Kernel:	AboutView		Noyau :
 Contributors:\n	AboutView		Contributeurs :\n
 Unknown	AboutView		Inconnu
-... and the many people making donations!\n\n	AboutView		... et nos nombreux donateurs!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… et surement d'autres que nous avons oubliés (désolé !)\n\n
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Mémoire :
-Google & their Google Summer of Code program\n\n	AboutView		Google & son programme Google Summer of Code (GSoC)\n\n
 Past maintainers:\n	AboutView		Précédents développeurs :\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Le code propre à Haiku, en particulier le noyau et tout code auquel les applications peuvent être liées, est distribué sous les termes de
 \n\nSpecial thanks to:\n	AboutView		\n\nRemerciements spéciaux à :\n
-Licenses: 	AboutView		Licenses : 
+Licenses: 	AboutView		Licences : 
 . Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Certaines bibliothèques du système contiennent du code de tiers publié sous la licence LGPL. Vous pouvez voir ci-dessous les droits d'auteurs des tiers.\n\n
 \nCopyrights\n\n	AboutView		\nDroits d'auteurs\n\n
 Current maintainers:\n	AboutView		Développeurs actuels :\n
@@ -27,10 +25,10 @@ MIT license	AboutView		Licence MIT
 The Haikuware team and their bounty program\n	AboutView		L'équipe Haikuware et leur programme de récompenses\n
 About this system	AboutWindow		À propos de ce système
 Version:	AboutView		Version :
-The BeGeistert team\n	AboutView		L'équipe BeGeistert\n
 %ld MHz	AboutView		%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Les droits d'auteur du code source de Haiku sont la propriété de Haiku, Inc. ou des auteurs respectifs expressément notés dans les sources.\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Cliquez sur un nom de licence pour la lire.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d Mo total, %d Mo utilisés (%d%%)
-License: 	AboutView		License : 
+License: 	AboutView		Licence : 
 Translations:\n	AboutView		Traductions :\n
+... and the many people making donations!\n\n	AboutView		... et nos nombreux donateurs!\n\n
+Google & their Google Summer of Code program\n\n	AboutView		Google & son programme Google Summer of Code (GSoC)\n\n
+The BeGeistert team\n	AboutView		L'équipe BeGeistert\n

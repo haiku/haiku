@@ -1,18 +1,16 @@
-1	japanese	x-vnd.Haiku-Touchpad	3077633033
+1	japanese	x-vnd.Haiku-Touchpad	1498191605
 Scrolling	TouchpadPrefView		スクロール
 Revert	TouchpadPrefView		元に戻す
 Two finger scrolling	TouchpadPrefView		２本指スクロール
 Defaults	TouchpadPrefView		デフォルト
 Slow	TouchpadPrefView		遅い
-Horizontal scroll step size	TouchpadPrefView		水平スクロール領域
 High	TouchpadPrefView		高い
 Tap gesture	TouchpadPrefView		タップジェスチャー
 Horizontal scrolling	TouchpadPrefView		水平スクロール
-Wide	TouchpadPrefView		広い
 Fast	TouchpadPrefView		速い
 Tap click sensitivity	TouchpadPrefView		タップクリック感度
 Scroll acceleration	TouchpadPrefView		スクロール速度
-Vertical scroll step size	TouchpadPrefView		垂直スクロール領域
 Off	TouchpadPrefView		無効
-Small	TouchpadPrefView		狭い
 Touchpad	TouchpadMain		タッチパッド
+Horizontal scroll speed	TouchpadPrefView		水平スクロール速度
+Vertical scroll speed	TouchpadPrefView		垂直スクロース速度

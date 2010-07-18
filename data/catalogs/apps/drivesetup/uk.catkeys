@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	2303126039
+1	ukrainian	x-vnd.Haiku-DriveSetup	-60397933
 Delete	MainWindow		Видалити
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Ви дійсно бажаєте зініціалізувати цей розділ. Після вибору параметрів ініціалізації у вас залишається можливість перервати операцію безпосередньо перед самим записом на диск.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск зараз?\n\nВсі дані на вибраному розділі будуть безповоротно втрачені!
@@ -6,14 +6,13 @@ Rescan	MainWindow		Пересканувати
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Неможливо відобразити інформацію про розмітку.
 There's no space on the partition where a child partition could be created.	MainWindow		Відсутнє місце в розділі , де ви бажаєте створити дочірній розділ.
-%ld MiB	Support		%ld MiB
-<empty>	PartitionList		<пусто>
+<empty>	DiskView		<пусто>
 Unable to find the selected partition by ID.	MainWindow		Неможливо знайти розділ за ID.
 Select a partition from the list below.	DiskView		Виберіть розділ зі списку нижче.
 No disk devices have been recognized.	DiskView		Нерозпізнано жодного дискового приладу.
 The selected disk is read-only.	MainWindow		Вибраний диск тільки для читання.
 Partition name:	CreateParamsPanel		Ім'я розділу:
-Initialize	InitParamsPanel		Ініціалізувати
+Initialize	MainWindow		Ініціалізація
 Could not mount partition %s.	MainWindow		Неможливо підмонтувати розділ %s.
 The partition %s is already unmounted.	MainWindow		Розділ %s повністю відмонтований.
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Ініціалізація розділу призупинена. Жодні зміни не були записані на диск.
@@ -21,11 +20,9 @@ Failed to delete the partition. No changes have been written to disk.	MainWindow
 Partition type:	CreateParamsPanel		Тип розділу:
 Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \"%s\"? Після введення параметрів, ви можете відмінити цю операцію до запису змін назад на диск.
 Could not delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
-Initialize	MainWindow		Ініціалізація
 Error: 	MainWindow	in any error alert	Помилка: 
 Partition %ld	DiskView		Розділ %ld
 The partition %s has been successfully initialized.\n	MainWindow		Розділ %s був успішно ініціалізований.\n
-<empty>	DiskView		<пусто>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Ініціалізація розділу %s призупинена. (Нічого не було записано на диск.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви  впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі будуть безповоротно втрачені!
 Mounted at	PartitionList		Змонтувати на
@@ -46,14 +43,13 @@ Disk system \"%s\"\" not found!	MainWindow		Системний диск \"%s\"\"
 Could not unmount partition %s.	MainWindow		Неможливо відмонтувати розділ %s.
 Mount	MainWindow		Змонтувати
 Create	CreateParamsPanel		Створити
-Device	PartitionList		Прилад
-Disk	MainWindow		Диск
 Device	DiskView		Прилад
+Disk	MainWindow		Диск
 Volume name	PartitionList		Ім'я величини
 Continue	MainWindow		Продовжити
 Cannot delete the selected partition.	MainWindow		Неможливо видалити вибраний розділ.
 Mount all	MainWindow		Підмонтувати все
-Cancel	MainWindow		Відмінити
+Cancel	CreateParamsPanel		Відмінити
 Delete partition	MainWindow		Видалити розділ
 End: %ld MB	Support		Кінець: %ld MB
 Eject	MainWindow		Виштовхнути
@@ -61,15 +57,18 @@ Partition	MainWindow		Розділ
 File system	PartitionList		Файлова система
 Validation of the given creation parameters failed.	MainWindow		Обгрунтування отриманих параметрів створення призупинене.
 Size	PartitionList		Розмір
-Don't know how to gather initialization parameters for this disk system.	MainWindow		Невідомо як зібрати параметри ініціалізації цієї дискової системи.
 Validation of the given initialization parameters failed.	MainWindow		Обгрунтування отриманих параметрів ініціалізації призупинене.
 The selected partition does not contain a partitioning system.	MainWindow		Вибраний розділ не містить системної розмітки.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені що бажаєте записати зміни на диск зараз?\n\nВсі дані в розділі %s будуть безповоротно втрачені!
 The partition %s is currently mounted.	MainWindow		Розділ %s Повністю підмонтовано.
 Partition size	CreateParamsPanel		розмір розділу
 Surface test (not implemented)	MainWindow		Тест поверхні (не реалізовано)
-Cancel	InitParamsPanel		Відмінити
-Cancel	CreateParamsPanel		Відмінити
 Creation of the partition has failed.	MainWindow		Створення розділу призупинено.
 The currently selected partition is not empty.	MainWindow		Біжучий вибраний розділ не є пустим.
 Unmount	MainWindow		Відмонтувати
+<empty>	PartitionList		<пусто>
+Initialize	InitParamsPanel		Ініціалізувати
+Device	PartitionList		Прилад
+Cancel	MainWindow		Відмінити
+Cancel	InitParamsPanel		Відмінити
+%ld MiB	Support		%ld MiB

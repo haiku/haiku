@@ -1,5 +1,4 @@
-1	russian	x-vnd.Be-MAIL	3640755640
-View	Mail		Вид
+1	russian	x-vnd.Be-MAIL	-231929388
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
 Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
@@ -26,9 +25,8 @@ There is no installed handler for URL links.	Mail		Не выбрано прил�
 Signature	Mail		Подпись
 Find again	Mail		Найти снова
 Bcc:	Mail		Скрытая копия:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите /"Отправить/" чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите /"Отмена/" и попробуйте исправить их вручную.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите /\"Отправить/\" чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите /\"Отмена/\" и попробуйте исправить их вручную.
 Signature:	Mail		Подпись:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nРазработана Robert Polic.\nУлучшена коммандой Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		Сохранить изменения в этой подписи?
 Cc:	Mail		Копия:
 Find	Mail		Найти
@@ -44,7 +42,7 @@ Include file attributes in attachments	Mail		Добавлять атрибуты
 OK	Mail		Ок
 Send	Mail		Отправить
 Show icons only	Mail		Отображать только иконки
-Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Удаление вложений из пересланного письма еще не реализовано!\nПока эта функция не работает.
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Удаление вложений из пересланного письма еще не реализовано!\nЭта функция еще не работает.
 Hide	Mail		Скрыть
 Forward without attachments	Mail		Переслать без вложений
 Previous	Mail		Предыдущее
@@ -54,7 +52,6 @@ Print…	Mail		Печать…
 Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
 Quit	Mail		Выход
 %n - Full name	Mail		%n - Полное имя
- Read 	Mail		Читать
 Trash	Mail		Корзина
 Default account:	Mail		Аккаунт по умолчанию:
 Size:	Mail		Размер:
@@ -76,9 +73,7 @@ Initial spell check mode:	Mail		Начальный режим проверки �
 Leave same	Mail		Оставить
 About Mail…	Mail		О программе…
 Page setup…	Mail		Настройка печати…
-Text wrapping:	Mail		Перенос строк:
 Revert	Mail		Вернуть
-File	Mail		Файл
 None	Mail		Нет
 Copy link location	Mail		Копировать адрес ссылки
 Show header	Mail		Показать заголовок
@@ -89,7 +84,7 @@ Show raw message	Mail		Показать письмо в необработанн
 Start now	Mail		Запустить сейчас
 Close	Mail		Закрыть
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Не запущен mail_daemon. Сообщение поставлено в очередь и будет отправлено как только mail_daemon будет запущен.
-Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию невозможно будет отменить.
+Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию будет невозможно  отменить.
 Open	Mail		Открыть
 Quote	Mail		Цитата
 Add	Mail		Добавить
@@ -105,7 +100,6 @@ Do you wish to send this message before closing?	Mail		Хотите отправ
 Delete	Mail		Удалить
 Leave as '%s'	Mail		Оставить как '%s'
 Copy	Mail		Копия
-Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
 Reply preamble:	Mail		Ответное вступление:
 Signatures	Mail		Подписи
 Next	Mail		Следущее
@@ -116,11 +110,11 @@ Encoding:	Mail		Кодировка:
 Font:	Mail		Шрифт:
 Save address	Mail		Сохранить адрес
 Queries	Mail		Запросы
-Do you wish to save this message as a draft before closing?	Mail		Вы хотите сохранить это сообщение как черновик перед закрытием?
+Do you wish to save this message as a draft before closing?	Mail		Сохранить это сообщение как черновик перед закрытием?
 Save	Mail		Сохранить
 Random	Mail		Случайная
 Close and 	Mail		Закрыть и 
-Save as draft	Mail		Созранить как черновик
+Save as draft	Mail		Сохранить как черновик
 The mail_daemon could not be started:\n\t	Mail		Невозможно запустить mail_daemon:\n\t
 Open attachment	Mail		Открыть вложение
 Reply	Mail		Ответить
@@ -140,3 +134,9 @@ Remove quote	Mail		Удалить цитату
 Move to trash	Mail		Переместить в Корзину
 Select all	Mail		Выделить все
 An error occurred trying to save this signature.	Mail		Произошла ошибка при попытке сохранить эту подпись.
+View	Mail		Вид
+Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
+Mail\n\n	Mail		Почта\n\n
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Разработано Robert Polic.\nУлучшено командой Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Text wrapping:	Mail		Перенос строк:
+File	Mail		Файл

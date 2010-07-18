@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Screenshot	1342822790
+1	russian	x-vnd.Haiku-screenshot-cli	1091349652
 seconds	ScreenshotWindow		секунд(ы)
 Options	ScreenshotWindow		Опции
 Desktop	ScreenshotWindow		Рабочий стол
@@ -10,6 +10,7 @@ Cancel	ScreenshotWindow		Отмена
 screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	screenshot
 Name:	ScreenshotWindow		Имя:
 screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	screenshot1
+SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	SomethingLongHere
 Save screenshot	ScreenshotWindow		Сохранить снимок экрана
 Capture entire screen	ScreenshotWindow		Захватить весь экран
 Choose folder	ScreenshotWindow		Выбрать папку

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PRNT	403433619
+1	ukrainian	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		Очікування
 page	JobListView		сторінка
 Cancel	AddPrinterDialog		Відмінити
@@ -9,7 +9,6 @@ No pending jobs.	PrinterListView		Завдання, що виконуються,
 pages	JobListView		сторінки
 Processing	JobListView		Обробка
 Printer name:	AddPrinterDialog		І'мя принтера:
- pending jobs.	PrinterListView		 Завдання, що виконуються.
 Restart job	PrintersWindow		Перезапустити завдання
 Add	AddPrinterDialog		Додати
 Make default	PrintersWindow		Зробити по замовчуванню

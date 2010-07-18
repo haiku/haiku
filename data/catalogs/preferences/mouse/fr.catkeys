@@ -15,7 +15,7 @@ Instant warp	SettingsView		Téléportation instantanée
 Dig Deal	MouseApplication		Et alors ?
 1-Button	SettingsView		1 bouton
 Double-click speed	SettingsView		Vitesse du double clic
-Defaults	MouseWindow		Défauts
+Defaults	MouseWindow		Par défaut
 Focus follows mouse	SettingsView		Le focus suit le pointeur
 Accept first click	SettingsView		Accepter le premier clic
 Fast	SettingsView		Rapide

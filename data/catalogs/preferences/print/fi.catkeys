@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PRNT	403433619
+1	finnish	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		Odotetaan
 page	JobListView		sivu
 Cancel	AddPrinterDialog		Peru
@@ -9,7 +9,6 @@ No pending jobs.	PrinterListView		Ei vireillä olevia töitä.
 pages	JobListView		sivut
 Processing	JobListView		Käsitellään
 Printer name:	AddPrinterDialog		Tulostinnimi:
- pending jobs.	PrinterListView		 vireillä olevia töitä.
 Restart job	PrintersWindow		Käynnistä työ uudelleen
 Add	AddPrinterDialog		Lisää
 Make default	PrintersWindow		Tee oletukseksi

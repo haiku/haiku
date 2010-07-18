@@ -1,10 +1,9 @@
-1	japanese	x-vnd.Haiku-Expander	3642794258
+1	japanese	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		解凍
 Set destination…	ExpanderMenu		解凍先を指定…
 File expanded	ExpanderWindow		ファイル解凍が完了しました
 The destination is read only.	ExpanderWindow		解凍先は読み取り専用です
 Expander: Open	ExpanderWindow		Expander: 開く
- is not supported	ExpanderWindow		 はサポートされてません
 Select current	DirectoryFilePanel		このフォルダーを選択
 Source	ExpanderWindow		書庫ファイル
 Error when expanding archive	ExpanderWindow		書庫ファイルの解凍時にエラーが発生しました
@@ -24,12 +23,10 @@ Expanding file 	ExpanderWindow		ファイルを解凍中
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		指定されたフォルダー移動されたか、名前が変更されたか、\nサポートされていません。
 The file doesn't exist	ExpanderWindow		ファイルは存在しません
 Stop	ExpanderMenu		中止
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tJérôme Duval 作\n\tCopyright 2004-2006, Haiku Inc.\n\n元の Be バージョンの作者\nDominic, Hiroshi, Peter, Pavel および Robert\n
 File	ExpanderMenu		ファイル
 Expand	ExpanderWindow		解凍
 Close	ExpanderMenu		閉じる
 The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
-Expander	About		Expander
 About Expander…	ExpanderMenu		Expander について…
 OK	About		Ok
 Set source…	ExpanderMenu		書庫ファイルを指定…
@@ -37,3 +34,5 @@ Select '%s'	DirectoryFilePanel		「%s」を選択
 Show contents	ExpanderMenu		内容を表示
 Stop	ExpanderWindow		中止
 Destination	ExpanderWindow		解凍先
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tJérôme Duval 作\n\tCopyright 2004-2006, Haiku Inc.\n\n元の Be バージョンの作者\nDominic, Hiroshi, Peter, Pavel および Robert\n
+Expander	About		Expander

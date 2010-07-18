@@ -5,7 +5,7 @@ Disabling virtual memory will have unwanted effects on system stability once the
 Requested swap file size:	SettingsWindow		Taille demandée pour le fichier d'échange :
 Physical memory: 	SettingsWindow		Mémoire physique : 
 Changes will take effect on restart!	SettingsWindow		Les changements seront pris en compte au redémarrage !
-Defaults	SettingsWindow		Défauts
+Defaults	SettingsWindow		Par défaut
 KB	SettingsWindow		Ko
 Use volume:	SettingsWindow		Utiliser le volume :
 Keep enabled	SettingsWindow		Laisser actif

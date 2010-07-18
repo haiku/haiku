@@ -7,13 +7,13 @@ Cavern	Main Window		Barlang
 Volume:	Main Window		Hangerő:
 Reverb:	Main Window		Visszhang:
 OK	Main Window		Rendben
-MidiPlayer	Main Window		MIDI-lejátszó
 Off	Main Window		Nincs
 Dungeon	Main Window		Cella
 Play	Main Window		Lejátszás
 Garage	Main Window		Garázs
 Closet	Main Window		Szekrény
-Drop MIDI file here	Scope View		Húzzon ide egy MIDI-fájlt!
 Igor's lab	Main Window		Igor laboratóriuma
 Scope	Main Window		Oszcilloszkóp
 Could not load song	Main Window		Nem lehetett betölteni a számot!
+MidiPlayer	Main Window		MIDI-lejátszó
+Drop MIDI file here	Scope View		Húzzon ide egy MIDI-fájlt!

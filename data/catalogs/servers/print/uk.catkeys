@@ -1,11 +1,6 @@
-1	ukrainian	x-vnd.Be-PSRV	2376709688
+1	ukrainian	x-vnd.Be-PSRV	101881708
 Undefined	ConfigWindow		Невизначений
-A5	ConfigWindow		A5
 Cancel	PrintServerApp		Відмінити
-copies	ConfigWindow		копій
-Legal	ConfigWindow		Законний
-A2	ConfigWindow		A2
-to	ConfigWindow		до
 Page setup:	ConfigWindow		Настройка сторінки:
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Відмінити
@@ -14,23 +9,13 @@ Would you like to set one up now?	PrintServerApp		Бажаєте встанов�
 Portrait	ConfigWindow		Портрет
 All pages	ConfigWindow		Всі сторінки
 There is no default printer set up.	PrintServerApp		Не встановлено  принтер по замовчуванню.
-Tabloid	ConfigWindow		Таблоїд
 There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		 Принтер який ви хочете встановити повністю присутній, але драйвер до нього не знайдено! Перемістити?
-A4	ConfigWindow		A4
 Printer:	ConfigWindow		Принтер:
 Select a printer	ConfigWindow		Вибрати принтер
-A1	ConfigWindow		A1
 No	PrintServerApp		Ні
-B5	ConfigWindow		B5
 Landscape	ConfigWindow		Альбом
 There are no printers set up.	PrintServerApp		Принтер не встановлено.
-Page	ConfigWindow		Сторінка
-Ledger	ConfigWindow		Абзац
-Letter	ConfigWindow		Лист
 There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Принтер ,що ви прагнете створити повністю присутній, але не використовується!Перемістити?
-A0	ConfigWindow		A0
-A6	ConfigWindow		A6
-A3	ConfigWindow		A3
 OK	PrintServerApp		OK
 Print setup	ConfigWindow		Настройка друку
 Would you like to make @ the default printer?	PrintServerApp		Ви бажаєте зробити @  принтером по замовчуванню?

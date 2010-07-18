@@ -1,9 +1,9 @@
-1	japanese	system	2677153267
+1	japanese	system	-1617814029
 %3.2f GiB	StringForSize		%3.2f GiB
 %3.2f KiB	StringForSize		%3.2f KiB
 %d bytes	StringForSize		%d バイト
-Green:	ColorControl		緑：
 %.2f TiB	StringForSize		%.2f TiB
-Red:	ColorControl		赤：
 %3.2f MiB	StringForSize		%3.2f MiB
+Green:	ColorControl		緑：
+Red:	ColorControl		赤：
 Blue:	ColorControl		青：

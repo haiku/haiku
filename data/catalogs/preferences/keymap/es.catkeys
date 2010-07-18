@@ -1,15 +1,15 @@
-1	spanish	x-vnd.Haiku-Keymap	4175672673
+1	spanish	x-vnd.Haiku-Keymap	-119294623
 Tilde trigger	Keymap window		Disparador de tilde (~)
 Grave trigger	Keymap window		Disparador de acento grave (`)
 Select dead keys	Keymap window		Seleccionar teclas muertas
 Quit	Keymap window		Salir
-Switch shortcut keys to Haiku mode	Keymap window		Cambiar atajos de teclado a modo Haiku
 Circumflex trigger	Keymap window		Disparador de acento circunflejo (^)
 Diaeresis trigger	Keymap window		Disparador de diéresis (¨)
 Open…	Keymap window		Abrir…
 System:	Keymap window		Sistema:
 Switch shortcut keys	Keymap window		Cambiar atajos de teclado
 User:	Keymap window		Usuario:
+Switch shortcut keys to Haiku mode	Keymap window		Cambiar atajos de teclado a modo Haiku
 Keymap	Keymap window		Mapa de teclado
 Sample and clipboard:	Keymap window		Ejemplo y portapapeles:
 Layout	Keymap window		Distribución

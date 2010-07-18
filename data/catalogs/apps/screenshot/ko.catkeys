@@ -1,0 +1,28 @@
+1	korean	x-vnd.Haiku-screenshot-cli	1342822790
+seconds	ScreenshotWindow		초
+Options	ScreenshotWindow		옵션
+Desktop	ScreenshotWindow		바탕화면
+Include window border	ScreenshotWindow		창 테두리 포함
+Back to saving	ScreenshotWindow		저장하고 돌아가기
+Select	ScreenshotWindow		선택
+Capture active window	ScreenshotWindow		활성화된 창 갈무리
+Cancel	ScreenshotWindow		취소
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	스크린샷
+Name:	ScreenshotWindow		이름:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	screenshot1
+Save screenshot	ScreenshotWindow		스크린샷 저장
+Capture entire screen	ScreenshotWindow		전체 화면 갈무리
+Choose folder	ScreenshotWindow		폴더 선택
+Take screenshot	ScreenshotWindow		화면 캡쳐 하기
+Save	ScreenshotWindow		저장
+Overwrite	ScreenshotWindow		덮어쓰기
+Retake screenshot	ScreenshotWindow		다시 화면 캡처하기
+Choose folder...	ScreenshotWindow		폴더 선택...
+Please select	ScreenshotWindow		선택해 주십시오
+Save as:	ScreenshotWindow		저장할 형식:
+Save in:	ScreenshotWindow		저장할 곳:
+Take screenshot after a delay of	ScreenshotWindow		화면 캡처하기 전의 대기 시간
+Artwork folder	ScreenshotWindow		Artwork 폴더
+Home folder	ScreenshotWindow		홈 폴더
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		이 파일은 이미 존재합니다.\n  당신은 정말로 이 파일을 덮어 쓰겠습니까?
+Include mouse pointer	ScreenshotWindow		마우스 포인터 포함

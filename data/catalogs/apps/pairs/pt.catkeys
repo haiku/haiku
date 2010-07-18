@@ -1,10 +1,10 @@
 1	portuguese	x-vnd.Haiku-Pairs	794776701
+Quit game	PairsWindow		Terminar jogo
+New game	PairsWindow		Novo jogo
 Expert (8x8)	PairsWindow		Especialista (8x8)
 Beginner (4x4)	PairsWindow		Principiante (4x4)
-Quit game	PairsWindow		Terminar jogo
 Game	PairsWindow		Jogo
 Size	PairsWindow		Tamanho
 New	PairsWindow		Novo
 Intermediate (6x6)	PairsWindow		Médio (6x6)
 Quit	PairsWindow		Sair
-New game	PairsWindow		Novo jogo

@@ -1,18 +1,14 @@
-1	japanese	x-vnd.Haiku-StyledEdit	1909738892
-Paste	Menus		貼り付け
+1	japanese	x-vnd.Haiku-StyledEdit	154881138
 OK	LoadAlert		Ok
-File	Menus		ファイル
 ???	LoadAlert		???
 Left	Menus		左揃え
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		\"%s\" を最後に保存した内容へ戻しますか？
 Search backwards	FindandReplaceWindow		逆方向検索
 Size	Menus		サイズ
 Save	QuitAlert		保存
-Page setup…	Menus		ページ設定…
 Redo typing	Menus		入力をやり直す
-Print…	Menus		印刷…
 Replace same	Menus		繰り返し置換
-Can't undo	Menus		元に戻せない
+Can't Undo	Menus		元に戻せない
 Save	Menus		保存
 Replace with:	FindandReplaceWindow		置換：
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
@@ -22,17 +18,13 @@ Revert to saved…	Menus		最新保存版に戻す…
 Yellow	Menus		黄
 Replace in all windows	FindandReplaceWindow		全てのウィンドウで置換
 Wrap lines	Menus		ワードラップ
-Quit	Menus		終了
 Cancel	RevertToSavedAlert		中止
 Document	Menus		ドキュメント
-Clear	Menus		クリアー
 Save changes to the document \"%s\"? 	QuitAlert		\"%s\" が変更されましたが、保存されていません。終了前に保存しますか?
-Edit	Menus		編集
 Font	Menus		フォント
 Replace all	FindandReplaceWindow		全て置換
 Default	Open_and_SaveAsPanel		デフォルト
 Cancel	FindandReplaceWindow		中止
-Close	Menus		閉じる
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" を読み込み中に不明なエラー発生：\n\tフォーマットがサポートされていません。
 OK	RevertToSavedAlert		Ok
 Don't save	QuitAlert		保存しない
@@ -49,20 +41,20 @@ Wrap-around search	FindandReplaceWindow		ラップアラウンド検索
 Find selection	Menus		選択範囲を検索
 Find:	FindandReplaceWindow		検索：
 Error saving \"%s\":\n%s	SaveAlert		\"%s\" を保存中エラーが発生しました：\n%s
-Copy	Menus		コピー
-Cut	Menus		切り取り
 Replace	FindandReplaceWindow		置換
 Undo typing	Menus		入力を元に戻す
 Find again	Menus		次を検索
 Cancel	QuitAlert		中止
 Find…	Menus		検索…
-Select all	Menus		全文選択
 Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラー発生：\n\t%s
 Black	Menus		黒
 Untitled 	StyledEditWindow		無題
 OK	SaveAlert		Ok
 Find	FindandReplaceWindow		検索
 Encoding	Open_and_SaveAsPanel		文字コード
-Save as…	Menus		名前をつけて保存…
 Replace…	Menus		置換…
 Right	Menus		右揃え
+Cancel	SaveAlert		中止
+Save	SaveAlert		保存
+Don't save	SaveAlert		保存しない
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか？

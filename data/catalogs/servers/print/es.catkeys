@@ -1,11 +1,6 @@
-1	spanish	x-vnd.Be-PSRV	2376709688
+1	spanish	x-vnd.Be-PSRV	101881708
 Undefined	ConfigWindow		No definido
-A5	ConfigWindow		A5
 Cancel	PrintServerApp		Cancelar
-copies	ConfigWindow		copias
-Legal	ConfigWindow		Oficio
-A2	ConfigWindow		A2
-to	ConfigWindow		a
 Page setup:	ConfigWindow		Configuración de página:
 OK	ConfigWindow		Aceptar
 Cancel	ConfigWindow		Cancelar
@@ -14,23 +9,13 @@ Would you like to set one up now?	PrintServerApp		¿Desea instalar una ahora?
 Portrait	ConfigWindow		Vertical
 All pages	ConfigWindow		Todas las páginas
 There is no default printer set up.	PrintServerApp		No hay ninguna impresora instalada.
-Tabloid	ConfigWindow		Revista (tabloide)
 There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		La impresora que va a crear ya existe, pero no se encuentra un driver válido para ella! ¿Desea reemplazarla?
-A4	ConfigWindow		A4
 Printer:	ConfigWindow		Impresora:
 Select a printer	ConfigWindow		Seleccione una impresora
-A1	ConfigWindow		A1
 No	PrintServerApp		No
-B5	ConfigWindow		B5
 Landscape	ConfigWindow		Horizontal (apaisado)
 There are no printers set up.	PrintServerApp		No hay impresoras configuradas.
-Page	ConfigWindow		Página
-Ledger	ConfigWindow		Oficio
-Letter	ConfigWindow		Carta
 There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		La impresora que va a crear ya existe, ¡pero no se puede usar! ¿Desea reemplazarla?
-A0	ConfigWindow		A0
-A6	ConfigWindow		A6
-A3	ConfigWindow		A3
 OK	PrintServerApp		Aceptar
 Print setup	ConfigWindow		Configurar impresora
 Would you like to make @ the default printer?	PrintServerApp		¿Desea convertir @ en la impresora predeterminada?

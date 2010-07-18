@@ -1,0 +1,28 @@
+1	swedish	x-vnd.Haiku-screenshot-cli	1342822790
+seconds	ScreenshotWindow		 sekunder
+Options	ScreenshotWindow		Alternativ
+Desktop	ScreenshotWindow		Skrivbord
+Include window border	ScreenshotWindow		Inkludera fönsterkant
+Back to saving	ScreenshotWindow		Tillbaka till sparande
+Select	ScreenshotWindow		Välj
+Capture active window	ScreenshotWindow		Fånga aktiva fönstret
+Cancel	ScreenshotWindow		Avbryt
+screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	skärmdump
+Name:	ScreenshotWindow		Namn:
+screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	skärmdump1
+Save screenshot	ScreenshotWindow		Spara skärmdump
+Capture entire screen	ScreenshotWindow		Fånga hela skärmen
+Choose folder	ScreenshotWindow		Välj mapp
+Take screenshot	ScreenshotWindow		Ta skärmdump
+Save	ScreenshotWindow		Spara
+Overwrite	ScreenshotWindow		Skriv över
+Retake screenshot	ScreenshotWindow		Ta om skärmdump
+Choose folder...	ScreenshotWindow		Välj mapp...
+Please select	ScreenshotWindow		Var god välj
+Save as:	ScreenshotWindow		Spara som:
+Save in:	ScreenshotWindow		Spara i:
+Take screenshot after a delay of	ScreenshotWindow		Ta skärmdump efter en fördröjning på
+Artwork folder	ScreenshotWindow		Teckningsmapp
+Home folder	ScreenshotWindow		Hemmapp
+This file already exists.\n Are you sure would you like to overwrite it?	ScreenshotWindow		Den här filen existerar redan.\n Är du säker på att du vill skriva över den?
+Include mouse pointer	ScreenshotWindow		Inkludera muspekare

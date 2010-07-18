@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-PRNT	403433619
+1	danish	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		Venter
 page	JobListView		side
 Cancel	AddPrinterDialog		Afbryd
@@ -9,7 +9,6 @@ No pending jobs.	PrinterListView		Ingen igangværende jobs.
 pages	JobListView		sider
 Processing	JobListView		Bearbejder
 Printer name:	AddPrinterDialog		Printer navn:
- pending jobs.	PrinterListView		 afventende jobs.
 Restart job	PrintersWindow		Genstart job
 Add	AddPrinterDialog		Tilføj
 Make default	PrintersWindow		Lav standard

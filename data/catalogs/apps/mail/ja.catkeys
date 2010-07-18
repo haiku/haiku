@@ -1,5 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	3640755640
-View	Mail		表示
+1	japanese	x-vnd.Be-MAIL	-340722818
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付：
 Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redo バッファに不一致が発生しました。
@@ -28,7 +27,6 @@ Find again	Mail		次を検索
 Bcc:	Mail		Bcc:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください（代用文字が Unicode 化可能な文字に代わって使われます）。文字セットを変更する場合、「中止」ボタンを押して下さい。
 Signature:	Mail		署名:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\n作者： Robert Polic\n改良： Dr. Zoidberg チーム\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		署名の変更を確定し保存しますか？
 Cc:	Mail		Cc:
 Find	Mail		検索
@@ -54,7 +52,7 @@ Print…	Mail		印刷…
 Warn unencodable:	Mail		文字コード不一致通知：
 Quit	Mail		終了
 %n - Full name	Mail		%n - 名前
- Read 	Mail		既読
+Read 	Mail		 既読
 Trash	Mail		削除
 Default account:	Mail		標準アカウント：
 Size:	Mail		フォントサイズ：
@@ -76,9 +74,7 @@ Initial spell check mode:	Mail		スペルチェックモード：
 Leave same	Mail		変更しません
 About Mail…	Mail		Mail について…
 Page setup…	Mail		ページ設定…
-Text wrapping:	Mail		ワードラップ：
 Revert	Mail		戻す
-File	Mail		ファイル
 None	Mail		無し
 Copy link location	Mail		このリンクのアドレスをコピー
 Show header	Mail		ヘッダーを表示
@@ -105,7 +101,6 @@ Do you wish to send this message before closing?	Mail		閉じる前にこのメ�
 Delete	Mail		削除
 Leave as '%s'	Mail		「%s」のままにする
 Copy	Mail		コピー
-Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
 Reply preamble:	Mail		返信の前書き：
 Signatures	Mail		署名の編集
 Next	Mail		次へ
@@ -140,3 +135,5 @@ Remove quote	Mail		引用を削除
 Move to trash	Mail		ごみ箱に捨てる
 Select all	Mail		全て選択
 An error occurred trying to save this signature.	Mail		署名を保存しようとした時にエラーが発生しました。
+View	Mail		表示
+Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。

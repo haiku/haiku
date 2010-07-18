@@ -1,11 +1,6 @@
-1	finnish	x-vnd.Be-PSRV	2376709688
+1	finnish	x-vnd.Be-PSRV	101881708
 Undefined	ConfigWindow		Määrittelemätön
-A5	ConfigWindow		A5
 Cancel	PrintServerApp		Peru
-copies	ConfigWindow		kopiota
-Legal	ConfigWindow		Legal
-A2	ConfigWindow		A2
-to	ConfigWindow		kohteeseen
 Page setup:	ConfigWindow		Sivuasetus:
 OK	ConfigWindow		Valmis
 Cancel	ConfigWindow		Peru
@@ -14,23 +9,13 @@ Would you like to set one up now?	PrintServerApp		Haluaisitko asettaa yhden nyt?
 Portrait	ConfigWindow		Pystysuora
 All pages	ConfigWindow		Kaikki sivut
 There is no default printer set up.	PrintServerApp		Ei ole olemassa tulostimen oletusasetusta.
-Tabloid	ConfigWindow		ANSI B (tabloid)
 There already exists a printer you are going to create, but it's driver could not be found! Replace?	PrintServerApp		On jo olemassa sellainen tulostin, jota olet luomassa, mutta sen ajuria ei löydy! Korvataanko?
-A4	ConfigWindow		A4
 Printer:	ConfigWindow		Tulostin:
 Select a printer	ConfigWindow		Valitse tulostin
-A1	ConfigWindow		A1
 No	PrintServerApp		Ei
-B5	ConfigWindow		B5
 Landscape	ConfigWindow		Vaakasuora
 There are no printers set up.	PrintServerApp		Ei ole asetettavia tulostimia.
-Page	ConfigWindow		Sivu
-Ledger	ConfigWindow		ANSI B (ledger)
-Letter	ConfigWindow		ANSI A (letter)
 There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		On jo olemassa tulostin, jota olet luomassa, mutta se ei ole ollenkaan käyttökelpoinen! Korvataanko?
-A0	ConfigWindow		A0
-A6	ConfigWindow		A6
-A3	ConfigWindow		A3
 OK	PrintServerApp		Valmis
 Print setup	ConfigWindow		Tulostinasetukset
 Would you like to make @ the default printer?	PrintServerApp		Haluaisitko tehdä @ oletustulostimeksi?

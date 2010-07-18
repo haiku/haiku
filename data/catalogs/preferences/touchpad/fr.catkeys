@@ -1,18 +1,14 @@
-1	french	x-vnd.Haiku-Touchpad	3077633033
+1	french	x-vnd.Haiku-Touchpad	2104608255
 Scrolling	TouchpadPrefView		Défilement
 Revert	TouchpadPrefView		Défaire
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
-Defaults	TouchpadPrefView		Défauts
+Defaults	TouchpadPrefView		Par défaut
 Slow	TouchpadPrefView		Lent
-Horizontal scroll step size	TouchpadPrefView		Pas de défilement horizontal
 High	TouchpadPrefView		Haut
-Tap gesture	TouchpadPrefView		Mouvement \"tap\"
+Tap gesture	TouchpadPrefView		Mouvement de tapotement
 Horizontal scrolling	TouchpadPrefView		Défilement horizontal
-Wide	TouchpadPrefView		Large
 Fast	TouchpadPrefView		Rapide
 Tap click sensitivity	TouchpadPrefView		Sensibilité du clic par tapotement
 Scroll acceleration	TouchpadPrefView		Accélération du défilement
-Vertical scroll step size	TouchpadPrefView		Pas de défilement vertical
 Off	TouchpadPrefView		Désactivé
-Small	TouchpadPrefView		Petit
 Touchpad	TouchpadMain		Touchpad

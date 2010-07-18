@@ -1,10 +1,9 @@
-1	finnish	x-vnd.Haiku-Expander	3642794258
+1	finnish	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		Laajenna
 Set destination…	ExpanderMenu		Aseta kohde…
 File expanded	ExpanderWindow		Tiedosto laajennettu
 The destination is read only.	ExpanderWindow		Kohde on kirjoitussuojattu.
 Expander: Open	ExpanderWindow		Laajentaja: Avaa
- is not supported	ExpanderWindow		 ei tueta
 Select current	DirectoryFilePanel		Valitse nykyinen
 Source	ExpanderWindow		Lähde
 Error when expanding archive	ExpanderWindow		Virhe laajennettaessa arkistoa
@@ -24,12 +23,10 @@ Expanding file 	ExpanderWindow		Laajennetaan tiedosto
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Kansio on joko siirretty, nimetty uudelleen tai sitä\nei tueta.
 The file doesn't exist	ExpanderWindow		Tiedostoa ei ole olemassa
 Stop	ExpanderMenu		Pysäytä
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\ttekijä: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nalkuperäinen Be-versio: \nDominic, Hiroshi, Peter, Pavel ja Robert\n
 File	ExpanderMenu		Tiedosto
 Expand	ExpanderWindow		Laajenna
 Close	ExpanderMenu		Sulje
 The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
-Expander	About		Laajentaja
 About Expander…	ExpanderMenu		Laajentajasta…
 OK	About		Valmis
 Set source…	ExpanderMenu		Aseta lähde…
@@ -37,3 +34,5 @@ Select '%s'	DirectoryFilePanel		Valitse '%s'
 Show contents	ExpanderMenu		Näytä sisällöt
 Stop	ExpanderWindow		Pysäytä
 Destination	ExpanderWindow		Kohde
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\ttekijä: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nalkuperäinen Be-versio: \nDominic, Hiroshi, Peter, Pavel ja Robert\n
+Expander	About		Laajentaja

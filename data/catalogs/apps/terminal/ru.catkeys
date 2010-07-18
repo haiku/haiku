@@ -1,0 +1,49 @@
+1	russian	x-vnd.Haiku-Terminal	-481181218
+Not found.	Terminal TermWindow		Не найдено
+Didn't find any available pseudo ttys.	Terminal Shell		Didn't find any available pseudo ttys.
+Switch Terminals	Terminal TermWindow		Переключить терминалы
+Change directory	Terminal TermView		Сменить каталог
+OK	Terminal TermWindow		Oк
+New Terminal	Terminal TermWindow		Новый терминал
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не может запустить оболочку. Простите.
+Text size	Terminal TermWindow		Размер шрифта
+Match case	Terminal FindWindow		Учитывать регистр
+Quit	Terminal TermWindow		Выход
+Use default shell	Terminal Shell		Использовать оболочку по умолчанию
+Select all	Terminal TermWindow		Выделить всё
+Terminal	Terminal TermWindow		Терминал
+Save to file…	Terminal PrefWindow		Сохранить в файл…
+Failed to init pseudo tty.	Terminal Shell		Не удалось иницализировать псевдо tty.
+OK	Terminal PrefWindow		Oк
+Font:	Terminal AppearancePrefView		Шрифт:
+Copy here	Terminal TermView		Копировать сюда
+Copy	Terminal TermWindow		Копировать
+could not set session leader.	Terminal Shell		could not set session leader.
+sigaction() failed: %s\n	Terminal TermApp		sigaction() failed: %s\n
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognized option \"%s\"\n
+Print cancelled.	Terminal TermWindow		Печать отменена.
+Increase	Terminal TermWindow		Увеличить
+Settings	Terminal TermWindow		Настройки
+Window size	Terminal TermWindow		Размер окна
+Terminal settings	Terminal PrefWindow		Настройки трминала
+Find	Terminal FindWindow		Найти
+Appearance	Terminal PrefWindow		Внешний вид
+Use selection	Terminal FindWindow		Использовать выделение
+Size:	Terminal AppearancePrefView		Размер:
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Cannot execute \"%command\":\n\t%error
+Full screen	Terminal TermWindow		На весь экран
+Page setup…	Terminal TermWindow		Настройка печати...
+OK	Terminal TermView		Ок
+Insert path	Terminal TermView		Вставить путь
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
+No search string was entered.	Terminal TermWindow		Не введена строка поиска.
+Don't save	Terminal PrefWindow		Не сохранять
+Find…	Terminal TermWindow		Найти...
+Move here	Terminal TermView		Переместить сюда
+Secondary mouse button drop menu	Terminal TermView		Secondary mouse button drop menu
+Error!	Terminal getString		Ошибка!
+New tab	Terminal TermWindow		Новая вкладка
+can't open tty (%s).	Terminal Shell		can't open tty (%s).
+Decrease	Terminal TermWindow		Уменьшить
+Create link here	Terminal TermView		Создать ссылку здесь
+failed set terminal interface (TERMIOS).	Terminal Shell		failed set terminal interface (TERMIOS).

@@ -7,13 +7,13 @@ Cavern	Main Window		Urvas
 Volume:	Main Window		Garsumas:
 Reverb:	Main Window		Aidas:
 OK	Main Window		Gerai
-MidiPlayer	Main Window		MidiGrotuvas
 Off	Main Window		Išjungti
 Dungeon	Main Window		Požemis
 Play	Main Window		Groti
 Garage	Main Window		Garažas
 Closet	Main Window		Kriauklė
-Drop MIDI file here	Scope View		Įmeskite MIDI bylą šičia
 Igor's lab	Main Window		Igorio laboratorija
 Scope	Main Window		Osciloskopas
 Could not load song	Main Window		Nepaleidžiama daina
+MidiPlayer	Main Window		MidiGrotuvas
+Drop MIDI file here	Scope View		Įmeskite MIDI bylą šičia

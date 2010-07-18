@@ -1,37 +1,29 @@
-1	japanese	x-vnd.Haiku-ShowImage	1282650517
-Paste	Menus		貼り付け
+1	japanese	x-vnd.Haiku-ShowImage	249555060
 Use as background…	Menus		デスクトップの背景にする…
-File	Menus		ファイル
 5 seconds	Menus		５秒
 Slide delay	Menus		スライド間隔
 Zoom in	Menus		ズームイン
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		画像ファイル「%s」が変更されています。保存せずに閉じますか？
-Page setup…	Menus		ページ設定…
 8 seconds	Menus		８秒
-Print…	Menus		印刷…
 Previous page	Menus		前のページ
 View	Menus		表示
 Full screen	Menus		全画面表示
 Go to page	Menus		指定ページへ
 Zoom out	Menus		ズームアウト
 20 seconds	Menus		２０秒
-Quit	Menus		終了
 Invert colors	Menus		カラー反転
 3 seconds	Menus		３秒
 Rotate counterclockwise	Menus		反時計まわりに 90° 回転
 10 seconds	Menus		１０秒
 High-quality zooming	Menus		高画質ズーム
-Clear	Menus		クリアー
 Browse	Menus		閲覧
 6 seconds	Menus		６秒
-Edit	Menus		編集
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		画像ファイルを読み込めません！ ファイルまたは画像トランスレータが存在しません。
 First page	Menus		最初のページ
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		「%s」の %d ページが変更されました。それでもファイルを閉じますか？
 About ShowImage…	Menus		ShowImage について…
 Open	Menus		開く
 OK	LoadAlerts		Ok
-Close	Menus		閉じる
 Close	ClosePrompt		閉じる
 Height:	ResizerWindow		高さ：
 Undo	Menus		元に戻す
@@ -52,8 +44,6 @@ Cancel	ClosePrompt		中止
 Resize…	Menus		リサイズ…
 Print options	PrintOptionsWindow		印刷オプション
 Width:	ResizerWindow		幅：
-Copy	Menus		コピー
-Cut	Menus		切り取り
 ShowImage	AboutWindow		ShowImage
 7 seconds	Menus		７秒
 Last page	Menus		最後のページ
@@ -62,7 +52,6 @@ Resize	ResizerWindow		リサイズ
 Slide show	Menus		スライドショー
 Fit image to page	PrintOptionsWindow		画像を用紙サイズにあわせる
 Flip top to bottom	Menus		上下反転
-Select all	Menus		全て選択
 Zoom factor in %:	PrintOptionsWindow		ズーム倍率 (%)：
 Width:	PrintOptionsWindow		幅：
 Image	Menus		画像
@@ -70,5 +59,4 @@ Rotate clockwise	Menus		時計まわりに 90° 回転
 Job setup	PrintOptionsWindow		ジョブ設定
 Original size	Menus		原寸に戻す
 Next page	Menus		次のページ
-Save as…	Menus		ファイル形式を選んで保存…
 Shrink to window	Menus		ウィンドウサイズに縮小

@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	3640755640
-View	Mail		Näkymä
+1	finnish	x-vnd.Be-MAIL	-1267338228
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
@@ -28,7 +27,6 @@ Find again	Mail		Hae uudelleen
 Bcc:	Mail		Piilokopio:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld merkkiä, joita ei voida koodata. Eri kirjaimisto olisi ehkä parempi? Napauttamalla Lähetä-painiketta lähetät sen kaikesta huolimatta (korvausmerkkiä käytetään koodauskelvottomien merkkien paikalla), tai valitse Peru takaisinpalaamista ja korjausyritystä varten.
 Signature:	Mail		Allekirjoitus:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nTekijä: Robert Polic.\nLaajentaja: Tri Zoidbergin avustajat.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		Tallenna muutokset tähän allekirjoitukseen?
 Cc:	Mail		Kopio:
 Find	Mail		Haku
@@ -54,7 +52,6 @@ Print…	Mail		Tulosta…
 Warn unencodable:	Mail		Varoita koodaamattomista:
 Quit	Mail		Poistu
 %n - Full name	Mail		%n - Koko nimi
- Read 	Mail		 Lue 
 Trash	Mail		Roskakori
 Default account:	Mail		Oletustili:
 Size:	Mail		Koko:
@@ -76,9 +73,7 @@ Initial spell check mode:	Mail		Alustava oikolukutila:
 Leave same	Mail		Jätä samaksi
 About Mail…	Mail		Mail-ohjelmasta…
 Page setup…	Mail		Sivuasetukset…
-Text wrapping:	Mail		Tekstin rivitys:
 Revert	Mail		Palauta
-File	Mail		Tiedosto
 None	Mail		Ei mikään
 Copy link location	Mail		Kopioi linkkisijainti
 Show header	Mail		Näytä otsake
@@ -105,7 +100,6 @@ Do you wish to send this message before closing?	Mail		Haluatko lähettää täm
 Delete	Mail		Poista
 Leave as '%s'	Mail		Jätä nimellä '%s'
 Copy	Mail		Kopioi
-Mail couldn't find its dictionary.	Mail		Sähköposti ei löytänyt hakemistoaan.
 Reply preamble:	Mail		Vastauksen esipuhe:
 Signatures	Mail		Allekirjoitukset
 Next	Mail		Seuraava
@@ -140,3 +134,5 @@ Remove quote	Mail		Poista lainaus
 Move to trash	Mail		Siirrä roskakoriin
 Select all	Mail		Valitse kaikki
 An error occurred trying to save this signature.	Mail		Tapahtui virhe yritettäessä tallentaa tämä allekirjoitus.
+View	Mail		Näkymä
+Mail couldn't find its dictionary.	Mail		Sähköposti ei löytänyt hakemistoaan.

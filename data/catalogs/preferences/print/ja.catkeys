@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PRNT	403433619
+1	japanese	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		待機中
 page	JobListView		ページ
 Cancel	AddPrinterDialog		中止
@@ -9,7 +9,6 @@ No pending jobs.	PrinterListView		印刷待ち中のジョブはありません�
 pages	JobListView		ページ
 Processing	JobListView		処理中
 Printer name:	AddPrinterDialog		プリンタ名：
- pending jobs.	PrinterListView		 個ののジョブが印刷待ちです。
 Restart job	PrintersWindow		ジョブを再開
 Add	AddPrinterDialog		追加
 Make default	PrintersWindow		デフォルトに設定

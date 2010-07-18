@@ -1,4 +1,4 @@
-1	brazilian portuguese	x-vnd.Haiku-DriveSetup	3974722262
+1	brazilian_portuguese	x-vnd.Haiku-DriveSetup	1611198290
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Tem certeza que deseja inicializar a partição selecionada? Depois de inserir os parâmetros de inicialização, você poderá cancelar esta operação antes de escrever as mudanças de volta no disco rígido.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!
 Could not aquire partitioning information.	MainWindow		Não foi possível obter informações sobre a divisão em partições
@@ -20,7 +20,6 @@ Cannot delete the selected partition.	MainWindow		Não foi posível deletar a pa
 Eject	MainWindow		Ejetar
 File system	PartitionList		Sistema de arquivos
 Validation of the given creation parameters failed.	MainWindow		A validação dos parâmetros de criação inseridas falhou.
-Don't know how to gather initialization parameters for this disk system.	MainWindow		Não sei como obter os parâmetros de inicialização para este disco.
 Validation of the given initialization parameters failed.	MainWindow		A validação dos parâmetros de criação  inseridas falhou.
 The selected partition does not contain a partitioning system.	MainWindow		A partição selecionada não contém um sistema de partições.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Tem certeza que deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos de forma irrecuperável se continuar!

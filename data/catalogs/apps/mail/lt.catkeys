@@ -1,5 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	3640755640
-View	Mail		Roda
+1	lithuanian	x-vnd.Be-MAIL	-1267338228
 %d - Date	Mail		%d - data
 Attach attributes:	Mail		Pridėti bylų požymius:
 Inconsistency occurred in the undo/redo buffer.	Mail		Nesutapimas buferyje atšaukti/grąžinti.
@@ -28,7 +27,6 @@ Find again	Mail		Rasti dar
 Bcc:	Mail		Slapukas:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Pagrindiniame tekste yra nekoduojamas simbolis %ld. Gali būti, kad kitokia koduotė geriau tiktų? Spauskite „Siųsti“, kad vis vien išsiųstumėte (nekoduojami simboliai bus pakeisti kuoduojamais), arba spauskite „Atsisakyti“ ir bandykite taisyti laiško tekstą.
 Signature:	Mail		Prierašas:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Paštas (Mail)\n\nParašyta Robert'o Polic'o.\nTobulinta Dr. Zoidberg'o grupės.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		Išsaugoti šio prierašo keitimus?
 Cc:	Mail		Kopija:
 Find	Mail		Rasti
@@ -54,7 +52,6 @@ Print…	Mail		Spausdinti…
 Warn unencodable:	Mail		Įspėti apie neiškodavimus:
 Quit	Mail		Baigti
 %n - Full name	Mail		%n – Pilnas pavadinimas
- Read 	Mail		Skaityta 
 Trash	Mail		Šiukšlinė
 Default account:	Mail		Numatytoji paskyra:
 Size:	Mail		Dydis:
@@ -76,9 +73,7 @@ Initial spell check mode:	Mail		Pradinis rašybos tikrinimas:
 Leave same	Mail		Palikti
 About Mail…	Mail		Apie programą…
 Page setup…	Mail		Puslapio nustatymai…
-Text wrapping:	Mail		Eilučių perkėlimas:
 Revert	Mail		Grįžti
-File	Mail		Byla
 None	Mail		Nieko
 Copy link location	Mail		Kopijuoti nuorodą
 Show header	Mail		Rodyti antraštę
@@ -105,7 +100,6 @@ Do you wish to send this message before closing?	Mail		Norite išsiųsti šį la
 Delete	Mail		Šalinti
 Leave as '%s'	Mail		Palikti kaip „%s“
 Copy	Mail		Kopija
-Mail couldn't find its dictionary.	Mail		Nerandamas laiško žodynėlis
 Reply preamble:	Mail		Atsakyti įžanga:
 Signatures	Mail		Prierašai
 Next	Mail		Kitas
@@ -140,3 +134,5 @@ Remove quote	Mail		Šalinti citatą
 Move to trash	Mail		Mesti šiukšlinėn
 Select all	Mail		Žymėti viską
 An error occurred trying to save this signature.	Mail		Klaida išsaugant šį prierašą.
+View	Mail		Roda
+Mail couldn't find its dictionary.	Mail		Nerandamas laiško žodynėlis

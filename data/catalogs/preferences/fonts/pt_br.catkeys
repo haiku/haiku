@@ -1,7 +1,8 @@
-1	brazilian portuguese	x-vnd.Haiku-Fonts	783490817
+1	brazilian_portuguese	x-vnd.Haiku-Fonts	-2021709267
 Plain font:	Font view		Fonte normal:
 Defaults	Main window		Padrões
 Fonts	Main window		Fontes
 Fonts\n\tCopyright 2004-2005, Haiku.\n\n	main		Fontes\n\tCopyright 2004-2005, Haiku.\n\n
+Revert	Main window		Desfazer
 Menu font:	Font view		Fonte do menu:
 Fixed font:	Font view		Fonte fixa:

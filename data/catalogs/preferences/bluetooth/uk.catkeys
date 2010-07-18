@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-BluetoothPrefs	3840151416
+1	ukrainian	x-vnd.Haiku-BluetoothPrefs	455630337
 About Bluetooth…	Window		Про Bluetooth…
 Handheld	Settings view		Переносний
 Default inquiry time:	Settings view		Час запиту по замовчуванню:
@@ -6,27 +6,25 @@ Add device to list	Inquiry panel		Додати прилад  до списку
 Starting scan...	Inquiry panel		Початок сканування...
 Show bluetooth console…	Window		Показати консоль Bluetooth...
 Smart phone	Settings view		Смартфон
- seconds	Inquiry panel		 сек.
-Server	Settings view		Сервер
+seconds	Inquiry panel		 секунд
+Server	Window		Сервер
 Stop bluetooth services…	Window		Зупинити служби Bluetooth…
 Identify host as:	Settings view		Визначити хост як :
 View	Window		Вигляд
 Refresh…	Remote devices		Обновити…
 Pair…	Remote devices		Пара…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Система bluetoothHaiku, (ARCE)\n\nАвтор Oliver Ruiz Dorantes\n\nза підтримки :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nПодяка людям які допомагали...\n\nобладнанням :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nфінансово :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nзаплатками :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nТим хто навчив :\n\t- команда yellowTAB
 Incoming connections policy:	Settings view		Правило вхідних під'єднань :
 From all devices	Settings view		Для всіх приладів
 Show name	Extended local device view		Показати Ім'я
 Local devices found on system:	Settings view		Локальні прилади знайдені в системі :
-Server	Window		Сервер
 Scanning completed.	Inquiry panel		Сканування завершене.
-OK	main		Ok
-Remote devices list…	Window		Список зовнішніх приладів…
+Remote devices	Window		Віддалені прилади
 Remove	Remote devices		Видалити
 15 secs	Settings view		15 сек.
 Start bluetooth services…	Window		Запуск служб Bluetooth…
 Policy...	Settings view		Правило...
 61 secs	Settings view		61 сек.
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nАвтор Oliver Ruiz Dorantes\n\nЗа підтримки:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nПодяка особистостям, хто допоміг...\n\nПрисилав/жертвував обладнання:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПідтримував фінансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПрисилав патчі:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTестував:\n\t- Petter H. Juliussen\nТим хто дав мені всізнання:\n\t-  команда yellowTAB \n\nПереклад  Олекса Рудик aka totish\n
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не знайдено жодного приладу з Bluetoth зареєстрованого в системі
 Identify us as...	Settings view		Визначити нас як...
 Remaining 	Inquiry panel		Залишилось
@@ -36,7 +34,7 @@ Defaults	Window		По замовчуванню
 Inquiry	Inquiry panel		Запит
 Desktop	Settings view		Робочий стіл
 Revert	Window		Повернути
-Remote devices	Window		Віддалені прилади
+Remote devices list…	Window		Список зовнішніх приладів…
 Laptop	Settings view		Ноутбук
 Retrieving name of 	Inquiry panel		Отримання імені
 Bluetooth	Window		Bluetooth
@@ -52,3 +50,6 @@ Check that the Bluetooth capabilities of your remote device are activated. Press
 Retrieving names...	Inquiry panel		Отримання імен...
 Help	Window		Допомога
 Add…	Remote devices		Додати…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth system, (ARCE)\n\nАвтор Oliver Ruiz Dorantes\n\nЗа підтримки:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nПодяка особистостям, хто допоміг...\n\nПрисилав/жертвував обладнання:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПідтримував фінансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПрисилав патчі:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTестував:\n\t- Petter H. Juliussen\nТим хто дав мені всізнання:\n\t-  команда yellowTAB \n\nПереклад  Олекса Рудик aka totish\n
+ seconds	Inquiry panel		 сек.
+Server	Settings view		Сервер

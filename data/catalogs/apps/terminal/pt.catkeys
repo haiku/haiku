@@ -1,0 +1,16 @@
+1	portuguese	x-vnd.Haiku-Terminal	1175661654
+Not found.	Terminal TermWindow		Não encontrado.
+Didn't find any available pseudo ttys.	Terminal Shell		Nenhum pseudo tty disponível encontrado.
+Switch Terminals	Terminal TermWindow		Alternar Terminais
+Change directory	Terminal TermView		Mudar de directório
+OK	Terminal TermWindow		OK
+New Terminal	Terminal TermWindow		Novo Terminal
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		O Terminal não consegiu iniciar a shell. Desculpe.
+Text size	Terminal TermWindow		Tamanho do texto
+Match case	Terminal FindWindow		Corresponder maiúsculas e minúsculas
+Quit	Terminal TermWindow		Sair
+Use default shell	Terminal Shell		Utilizar shell predefinida
+Select all	Terminal TermWindow		Seleccionar tudo
+Terminal	Terminal TermWindow		Terminal
+Failed to init pseudo tty.	Terminal Shell		Falha ao iniciar pseudo tty.
+OK	Terminal PrefWindow		OK

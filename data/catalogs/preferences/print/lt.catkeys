@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-PRNT	403433619
+1	lithuanian	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		Laukiama
 page	JobListView		puslapis
 Cancel	AddPrinterDialog		Atsisakyti
@@ -9,7 +9,6 @@ No pending jobs.	PrinterListView		Jokių laukiančių užduočių.
 pages	JobListView		puslapių
 Processing	JobListView		Dorojama
 Printer name:	AddPrinterDialog		Spausdintuvas:
- pending jobs.	PrinterListView		 laukiančios užduotys.
 Restart job	PrintersWindow		Perleisti užduotį
 Add	AddPrinterDialog		Pridėti
 Make default	PrintersWindow		Padaryti numatytuoju

@@ -1,10 +1,9 @@
-1	german	x-vnd.Haiku-Expander	2289329519
+1	german	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		Entpacken
 Set destination…	ExpanderMenu		Ziel wählen…
 File expanded	ExpanderWindow		Datei entpackt
 The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
 Expander: Open	ExpanderWindow		Expander: Öffnen
- is not supported	ExpanderWindow		 wird nicht unterstützt
 Select current	DirectoryFilePanel		Aktuellen wählen
 Source	ExpanderWindow		Quelle
 Error when expanding archive	ExpanderWindow		Fehler beim Entpacken des Archivs
@@ -35,3 +34,5 @@ Select '%s'	DirectoryFilePanel		Verwende '%s'
 Show contents	ExpanderMenu		Inhalt zeigen
 Stop	ExpanderWindow		Stopp
 Destination	ExpanderWindow		Ziel
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tAutor: Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nUrsprüngliche Be Version von \nDominic, Hiroshi, Peter, Pavel und Robert\n
+Expander	About		Expander

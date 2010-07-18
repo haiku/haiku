@@ -1,10 +1,9 @@
-1	french	x-vnd.Haiku-Expander	3642794258
+1	french	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		Décompresser
 Set destination…	ExpanderMenu		Choisir la destination…
 File expanded	ExpanderWindow		Fichier décompressé
 The destination is read only.	ExpanderWindow		La destination est en lecture seule.
 Expander: Open	ExpanderWindow		Décompresseur : Ouvrir
- is not supported	ExpanderWindow		 n'est pas reconnu
 Select current	DirectoryFilePanel		Sélectionner le répertoire courant
 Source	ExpanderWindow		Source
 Error when expanding archive	ExpanderWindow		Erreur lors de la décompression de l'archive
@@ -20,16 +19,14 @@ Settings	ExpanderMenu		Paramètres
 Settings…	ExpanderMenu		Paramètres…
 Expander: Choose destination	DirectoryFilePanel		Décompresseur : Choix de la destination
 Show contents	ExpanderWindow		Montrer le contenu
-Expanding file 	ExpanderWindow		Décompression du fichier 
+Expanding file 	ExpanderWindow		Décompression du fichier
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Le dossier a été renommé, déplacé, ou\ninsupportable.
 The file doesn't exist	ExpanderWindow		Le fichier n'existe pas
 Stop	ExpanderMenu		Arrêt
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\técrit par Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversion originale Be par\nDominic, Hiroshi, Peter, Pavel et Robert\n
 File	ExpanderMenu		Fichier
 Expand	ExpanderWindow		Décompresser
 Close	ExpanderMenu		Fermer
 The destination is not a folder.	ExpanderWindow		La destination n'est pas un dossier.
-Expander	About		Décompresseur
 About Expander…	ExpanderMenu		À propos du décompresseur…
 OK	About		OK
 Set source…	ExpanderMenu		Choisir la source…
@@ -37,3 +34,5 @@ Select '%s'	DirectoryFilePanel		Selectionner '%s'
 Show contents	ExpanderMenu		Montrer le contenu
 Stop	ExpanderWindow		Arrêt
 Destination	ExpanderWindow		Destination
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\técrit par Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersion originale Be par\nDominic, Hiroshi, Peter, Pavel et Robert\n
+Expander	About		Décompresseur

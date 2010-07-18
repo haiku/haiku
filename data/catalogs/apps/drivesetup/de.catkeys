@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	2303126039
+1	german	x-vnd.Haiku-DriveSetup	-60397933
 Delete	MainWindow		Löschen
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Sind Sie sicher, dass Sie die gewählte Partition initialisieren möchten? Nach der Eingabe der Initialisierungsparameter kann die Aktion noch vor dem Schreiben der Änderungen auf das Medium abgebrochen werden.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
@@ -6,14 +6,13 @@ Rescan	MainWindow		Neu einlesen
 OK	MainWindow		OK
 Could not aquire partitioning information.	MainWindow		Partitionierungsinformationen konnten nicht ermittelt werden.
 There's no space on the partition where a child partition could be created.	MainWindow		Es gibt keinen Platz auf der Partition, wo eine Tochterpartition angelegt werden könnte.
-%ld MiB	Support		%ld MiB
-<empty>	PartitionList		<leer>
+<empty>	DiskView		<leer>
 Unable to find the selected partition by ID.	MainWindow		Die ausgewählte Partition konnte anhand ihrer ID nicht gefunden werden.
 Select a partition from the list below.	DiskView		Wählen Sie eine Partition aus der Liste.
 No disk devices have been recognized.	DiskView		Es wurden keine Speichermedien erkannt.
 The selected disk is read-only.	MainWindow		Das ausgewählte Speichermedium kann nur gelesen werden.
 Partition name:	CreateParamsPanel		Partitionsname:
-Initialize	InitParamsPanel		Initialisieren
+Initialize	MainWindow		Initialisieren
 Could not mount partition %s.	MainWindow		Die Partition %s konnte nicht eingehangen werden.
 The partition %s is already unmounted.	MainWindow		Die Partition %s ist bereits ausgehangen.
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Die Initialisierung der Parition ist fehlgeschlagen. Das Speichermedium blieb unverändert.
@@ -21,11 +20,9 @@ Failed to delete the partition. No changes have been written to disk.	MainWindow
 Partition type:	CreateParamsPanel		Partitionstyp:
 Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Sind Sie sicher, dass die die Partition \"%s\" initialisieren möchten? Nach der Eingabe der Initialisierungsparameter können Sie diese Operation abbrechen, bevor Änderungen auf das Medium geschrieben werden.
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
-Initialize	MainWindow		Initialisieren
 Error: 	MainWindow	in any error alert	Fehler: 
 Partition %ld	DiskView		Partition %ld
 The partition %s has been successfully initialized.\n	MainWindow		Die Partition %s wurde erfolgreich initialisiert.\n
-<empty>	DiskView		<leer>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition %s fehlgeschlagen. (Das Speichermedium blieb unverändert.)
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf der Partition gehen dabei unwiderruflich verloren!
 Mounted at	PartitionList		Eingehangen in
@@ -46,14 +43,13 @@ Disk system \"%s\"\" not found!	MainWindow		Medienschema \"%s\"\" nicht gefunden
 Could not unmount partition %s.	MainWindow		Partition %s konnte nicht ausgehangen werden.
 Mount	MainWindow		Einhängen
 Create	CreateParamsPanel		Anlegen
-Device	PartitionList		Gerät
-Disk	MainWindow		Medium
 Device	DiskView		Gerät
+Disk	MainWindow		Medium
 Volume name	PartitionList		Volumenname
 Continue	MainWindow		Weiter
 Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nicht gelöscht werden.
 Mount all	MainWindow		Alle einhängen
-Cancel	MainWindow		Abbrechen
+Cancel	CreateParamsPanel		Abbrechen
 Delete partition	MainWindow		Partition löschen
 End: %ld MB	Support		Ende: %ld MB
 Eject	MainWindow		Auswerfen
@@ -61,15 +57,18 @@ Partition	MainWindow		Partition
 File system	PartitionList		Dateisystem
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter schlug fehl.
 Size	PartitionList		Größe
-Don't know how to gather initialization parameters for this disk system.	MainWindow		Initialisierungsparamter für dieses Medienschema konnten nicht ermittelt werden.
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter schlug fehl.
 The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sind Sie sicher, dass sie die Änderungen jetzt auf das Speichermedium schreiben möchten?\n\nAlle Daten auf der Partition %s gehen dabei unwiderruflich verloren!
 The partition %s is currently mounted.	MainWindow		Die Partition %s ist momentan eingehangen.
 Partition size	CreateParamsPanel		Partitionsgröße
 Surface test (not implemented)	MainWindow		Oberflächentest (nicht implementiert)
-Cancel	InitParamsPanel		Abbrechen
-Cancel	CreateParamsPanel		Abbrechen
 Creation of the partition has failed.	MainWindow		Anlegen der Parition schlug fehl.
 The currently selected partition is not empty.	MainWindow		Die gewählte Partition ist nicht leer.
 Unmount	MainWindow		Aushängen
+<empty>	PartitionList		<leer>
+Initialize	InitParamsPanel		Initialisieren
+Device	PartitionList		Gerät
+Cancel	MainWindow		Abbrechen
+Cancel	InitParamsPanel		Abbrechen
+%ld MiB	Support		%ld MiB

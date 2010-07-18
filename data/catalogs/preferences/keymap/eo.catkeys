@@ -1,15 +1,15 @@
-1	esperanto	x-vnd.Haiku-Keymap	4175672673
+1	esperanto	x-vnd.Haiku-Keymap	-119294623
 Tilde trigger	Keymap window		Tildo
 Grave trigger	Keymap window		Maldekstra korno
 Select dead keys	Keymap window		Elektu senpaŝajn klavojn
 Quit	Keymap window		Eliri
-Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
 Circumflex trigger	Keymap window		Ĉapelo
 Diaeresis trigger	Keymap window		Dupunkto
 Open…	Keymap window		Malfermi…
 System:	Keymap window		Sistemo:
 Switch shortcut keys	Keymap window		Ŝparvojklavoj
 User:	Keymap window		Uzanto:
+Switch shortcut keys to Haiku mode	Keymap window		Ŝparvojklavoj laŭ Haiku
 Keymap	Keymap window		Klavara aranĝo
 Sample and clipboard:	Keymap window		Ekzemplo kaj poŝo:
 Layout	Keymap window		Aranĝo

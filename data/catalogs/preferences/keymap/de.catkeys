@@ -1,15 +1,15 @@
-1	german	x-vnd.Haiku-Keymap	4175672673
+1	german	x-vnd.Haiku-Keymap	-119294623
 Tilde trigger	Keymap window		Tilde-Auslöser
 Grave trigger	Keymap window		Grave-Auslöser
-Select dead keys	Keymap window		"Tote" Tasten definieren
+Select dead keys	Keymap window		\"Tote\" Tasten definieren
 Quit	Keymap window		Beenden
-Switch shortcut keys to Haiku mode	Keymap window		Shortcut-Tasten zu Haiku-Modus wechseln
 Circumflex trigger	Keymap window		Zirkumflex-Trigger
 Diaeresis trigger	Keymap window		Diaeresis-Auslöser
 Open…	Keymap window		Öffnen…
 System:	Keymap window		System:
 Switch shortcut keys	Keymap window		Shortcut-Tasten umschalten
 User:	Keymap window		Benutzer:
+Switch shortcut keys to Haiku mode	Keymap window		Shortcut-Tasten zu Haiku-Modus wechseln
 Keymap	Keymap window		Tastaturschema
 Sample and clipboard:	Keymap window		Beispiel und Zwischenablage:
 Layout	Keymap window		Layout

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Locale	1551394073
+1	hungarian	x-vnd.Haiku-Locale	1535389305
 Day in month (2 digits)	TimeFormatSettings		Hónap napja (két számjeggyel)
 Available languages	Locale Preflet Window		Elérhető nyelvek
 Day of week (name)	TimeFormatSettings		A hét napja (név)
@@ -25,25 +25,25 @@ Symbol position	TimeFormatSettings		Jel helye
 Day of week (short name)	TimeFormatSettings		A hét napja (rövid forma)
 Numbers	TimeFormatSettings		Számok
 24 hour	TimeFormatSettings		24-órás
- (unknown format)	TimeFormatSettings		 (ismeretlen formátum)
+(unknown format)	TimeFormatSettings		 (ismeretlen alak)
 Negative marker:	TimeFormatSettings		Negatív előjel:
 Day in month	TimeFormatSettings		Hónap napja
-OK	Locale Preflet Window		Ok
 Defaults	Locale Preflet Window		Alapértelmezés
-Month	TimeFormatSettings		Hónap
 Separator	TimeFormatSettings		Elválasztó
 Country	Locale Preflet Window		Ország
 Month number (2 digits)	TimeFormatSettings		Hónap száma (két számjeggyel)
 Revert	Locale Preflet Window		Visszaállítás
 Negative marker	TimeFormatSettings		Negatív előjel
+OK	Locale Preflet Window		Ok
 Day of week	TimeFormatSettings		A hét napja
 List separator: 	TimeFormatSettings		Listaelválasztó
-12 hour	TimeFormatSettings		12-órás
 Time	TimeFormatSettings		Idő
 Date	TimeFormatSettings		Dátum
+12 hour	TimeFormatSettings		12-órás
 Locale	Locale Preflet		Nyelvi beállítások
 None	TimeFormatSettings		Semmi
 Clock	TimeFormatSettings		Óra
 Example:	TimeFormatSettings		Példa:
 Day	TimeFormatSettings		Nap
 Leading 0	TimeFormatSettings		Vezető nullák
+Month	TimeFormatSettings		Hónap

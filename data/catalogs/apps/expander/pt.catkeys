@@ -1,10 +1,9 @@
-1	portuguese	x-vnd.Haiku-Expander	3642794258
+1	portuguese	x-vnd.Haiku-Expander	1292562546
 Expand	ExpanderMenu		Expandir
 Set destination…	ExpanderMenu		Selecione destino…
 File expanded	ExpanderWindow		Arquivo expandido
 The destination is read only.	ExpanderWindow		O destino é apenas para leitura.
 Expander: Open	ExpanderWindow		Expander: Abrir
- is not supported	ExpanderWindow		 não é suportado
 Select current	DirectoryFilePanel		Selecionar actual
 Source	ExpanderWindow		Fonte
 Error when expanding archive	ExpanderWindow		Erro ao expandir o arquivo
@@ -24,12 +23,10 @@ Expanding file 	ExpanderWindow		Extraindo arquivo
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		A pasta foi movida, renomeada ou não é suportada
 The file doesn't exist	ExpanderWindow		O arquivo não existe
 Stop	ExpanderMenu		Parar
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersão original Be por \nDominic, Hiroshi, Peter, Pavel and Robert\n
 File	ExpanderMenu		Arquivo
 Expand	ExpanderWindow		Expande
 Close	ExpanderMenu		Fechar
 The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
-Expander	About		Expander
 About Expander…	ExpanderMenu		Sobre Expander…
 OK	About		OK
 Set source…	ExpanderMenu		Selecione fonte…
@@ -37,3 +34,6 @@ Select '%s'	DirectoryFilePanel		Selecione '%s'
 Show contents	ExpanderMenu		Mostra conteúdo
 Stop	ExpanderWindow		Parar
 Destination	ExpanderWindow		Destino
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersão original Be por \nDominic, Hiroshi, Peter, Pavel and Robert\n
+Expander	About		Expander
+is not supported	ExpanderWindow		não é suportado

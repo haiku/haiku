@@ -1,10 +1,12 @@
-1	german	x-vnd.Haiku-Pairs	794776701
+1	german	x-vnd.Haiku-Pairs	499694401
+Quit game	PairsWindow		Spiel verlassen
+New game	PairsWindow		Neues Spiel
 Expert (8x8)	PairsWindow		Experte (8x8)
 Beginner (4x4)	PairsWindow		Anfänger (4x4)
-Quit game	PairsWindow		Spiel verlassen
 Game	PairsWindow		Spiel
 Size	PairsWindow		Größe
 New	PairsWindow		Neu
 Intermediate (6x6)	PairsWindow		Fortgeschrittener (6x6)
 Quit	PairsWindow		Beenden
-New game	PairsWindow		Neues Spiel
+OK	PairsView		OK
+Pairs	PairsWindow		Paare

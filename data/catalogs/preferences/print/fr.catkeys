@@ -1,15 +1,14 @@
-1	french	x-vnd.Be-PRNT	403433619
+1	french	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		En attente
 page	JobListView		page
 Cancel	AddPrinterDialog		Annuler
 Add printer	AddPrinterDialog		Ajouter une imprimante
 Printers	PrintersWindow		Imprimantes
 Default Printer	PrinterListView		Imprimante par défaut
-No pending jobs.	PrinterListView		Pas de travaux en file d'attente.
+No pending jobs.	PrinterListView		Pas de travaux en attente.
 pages	JobListView		pages
 Processing	JobListView		En cours
 Printer name:	AddPrinterDialog		Nom de l'imprimante :
- pending jobs.	PrinterListView		 travaux en attente.
 Restart job	PrintersWindow		Redémarrer le travail
 Add	AddPrinterDialog		Ajouter
 Make default	PrintersWindow		Rendre par défaut
@@ -19,10 +18,10 @@ Remove	PrintersWindow		Supprimer
 <pick one>	AddPrinterDialog		<choisir>
 Add …	PrintersWindow		Ajouter …
 Print jobs for 	PrintersWindow		Travaux en attente pour
-Failed	JobListView		Raté
-%.2f KB	JobListView		%.2f KB
+Failed	JobListView		Echec
+%.2f KB	JobListView		%.2f Ko
 Completed	JobListView		Fini
 Print jobs: No printer selected	PrintersWindow		Travaux d'impression : pas d'imprimante sélectionnée
 Unknown status	JobListView		Statut inconnu
-Connected to:	AddPrinterDialog		Connecté à :
+Connected to:	AddPrinterDialog		Connectée à :
 Printer type:	AddPrinterDialog		Type d'imprimante :

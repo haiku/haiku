@@ -1,5 +1,4 @@
-1	spanish	x-vnd.Be-MAIL	3640755640
-View	Mail		Ver
+1	spanish	x-vnd.Be-MAIL	-340722818
 %d - Date	Mail		%d - Fecha
 Attach attributes:	Mail		Adjuntar atributos:
 Inconsistency occurred in the undo/redo buffer.	Mail		Se produjo una inconsistencia en el búfer de deshacer/rehacer.
@@ -8,7 +7,7 @@ Copy to new	Mail		Copiar a mensaje nuevo
 Edit	Mail		Editar
 Print	Mail		Imprimir
 New mail message	Mail		Crear mensaje de correo
-Automatically mark mail as read:	Mail		Marcar correo automáticamente como leído
+Automatically mark mail as read:	Mail		Marcar correo automáticamente como leído:
 Colored quotes:	Mail		Citas coloreadas:
 Subject:	Mail		Asunto:
 Reply to all	Mail		Responder a todos
@@ -22,13 +21,12 @@ Reply account:	Mail		Cuenta para responder:
 Discard	Mail		Descartar
 Message	Mail		Mensaje
 Reply to sender	Mail		Responder al remitente
-There is no installed handler for URL links.	Mail		No hay manejadores instalados para enlaces URL
+There is no installed handler for URL links.	Mail		No hay manejadores instalados para enlaces URL.
 Signature	Mail		Firma
 Find again	Mail		Buscar nuevamente
 Bcc:	Mail		Cco:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto principal contiene carácteres %ld no codificables. Quizás un juego de carácteres diferente podría funcionar mejor. En cualquier caso, presione Enviar (un carácter sustituto se utilizará en lugar de los no codificables), o bien elija Cancelar para volver atrás y tratar de solucionarlo.
 Signature:	Mail		Firma:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nEscrito por Robert Polic.\nMejorado por el equipo del Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		¿Guardar los cambios hechos a esta firma?
 Cc:	Mail		Cc:
 Find	Mail		Buscar
@@ -51,12 +49,12 @@ Previous	Mail		Anterior
 Redo	Mail		Rehacer
 Add enclosure…	Mail		Adjuntar documento...
 Print…	Mail		Imprimir…
-Warn unencodable:	Mail		Advertir sobre carácteres indodificables:
+Warn unencodable:	Mail		Advertir sobre carácteres no codificables:
 Quit	Mail		Salir
 %n - Full name	Mail		%n - Nombre completo
- Read 	Mail		Leer
+Read 	Mail		Read
 Trash	Mail		Papelera
-Default account:	Mail		Cuenta predeterminada
+Default account:	Mail		Cuenta predeterminada:
 Size:	Mail		Tamaño:
 Account from mail	Mail		Cuenta desde correo
 Edit signatures…	Mail		Editar firmas…
@@ -76,9 +74,7 @@ Initial spell check mode:	Mail		Modo inicial del corrector ortográfico:
 Leave same	Mail		Dejar igual
 About Mail…	Mail		Acerca de Mail…
 Page setup…	Mail		Configuración de página…
-Text wrapping:	Mail		Envoltura de texto:
 Revert	Mail		Revertir
-File	Mail		Archivo
 None	Mail		Ninguno
 Copy link location	Mail		Copiar ubicación de enlace
 Show header	Mail		Mostrar encabezado
@@ -105,7 +101,6 @@ Do you wish to send this message before closing?	Mail		¿Desea enviar el mensaje
 Delete	Mail		Borrar
 Leave as '%s'	Mail		Dejar como '%s'
 Copy	Mail		Copiar
-Mail couldn't find its dictionary.	Mail		Mail no puede encontrar su diccionario.
 Reply preamble:	Mail		Responder preámbulo:
 Signatures	Mail		Firmas
 Next	Mail		Siguiente
@@ -131,7 +126,7 @@ Cut	Mail		Cortar
 Check spelling	Mail		Comprobar ortografía
 Set to Saved	Mail		Marcar como Guardado
 Open this link	Mail		Abrir este enlace
-Auto signature:	Mail		Firma automática
+Auto signature:	Mail		Firma automática:
 Add signature	Mail		Añadir firma
 Need Tracker to move items to trash	Mail		Requerir a Tracker mover elementos a la papelera
 Mailing	Mail		Mensajería
@@ -140,3 +135,5 @@ Remove quote	Mail		Eliminar cita
 Move to trash	Mail		Mover a la Papelera
 Select all	Mail		Seleccionar todo
 An error occurred trying to save this signature.	Mail		Ocurrió un error intentando guardar esta firma.
+View	Mail		Ver
+Mail couldn't find its dictionary.	Mail		Mail no puede encontrar su diccionario.

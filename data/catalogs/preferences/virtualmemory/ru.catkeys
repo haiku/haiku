@@ -3,7 +3,7 @@ Turn off	SettingsWindow		Выключить
 GB	SettingsWindow		ГБ
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Отключение виртуальной памяти может повлиять на стабильность системы, когда вся память будет израсходована.\nВиртуальная память не влияет на производительность системы пока она не используется.\n\nВы уверены, что хотите выключить ее?
 Requested swap file size:	SettingsWindow		Выбранный размер файла подкачки:
-Physical memory: 	SettingsWindow		Физической памяти: 
+Physical memory: 	SettingsWindow		Объем физической памяти: 
 Changes will take effect on restart!	SettingsWindow		Изменения вступят в силу после перезагрузки!
 Defaults	SettingsWindow		По умолчанию
 KB	SettingsWindow		КБ

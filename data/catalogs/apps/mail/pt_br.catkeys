@@ -1,4 +1,4 @@
-1	brazilian portuguese	x-vnd.Be-MAIL	3623971781
+1	brazilian_portuguese	x-vnd.Be-MAIL	-1284122087
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Anexar Atributos:
 Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
@@ -27,7 +27,6 @@ Find again	Mail		Localizar próximo
 Bcc:	Mail		Bcc:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto principal contém %ld caracteres incodificáveis. Talvez um conjunto de caracteres novos funcionará melhor? Clique em Enviar para enviar de qualquer modo (um caractere alternativo será usado em vez dos incodificáveis), ou escolha Cancelar para voltar e tentar corrigir o problema.
 Signature:	Mail		Assinatura:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nEscrito por Robert Polic.\nMelhorado pela turma do Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		Salvar alterações feitas a esta assinatura?
 Cc:	Mail		Cc:
 Find	Mail		Localizar
@@ -53,7 +52,6 @@ Print…	Mail		Imprimir...
 Warn unencodable:	Mail		Aviso incodificável:
 Quit	Mail		Sair
 %n - Full name	Mail		%n - Nome completo
- Read 	Mail		Lida
 Trash	Mail		Lixeira
 Default account:	Mail		Conta predefenida:
 Size:	Mail		Tamanho:
@@ -75,9 +73,7 @@ Initial spell check mode:	Mail		Modo de correcção ortográfica inicial:
 Leave same	Mail		Deixar a mesma
 About Mail…	Mail		Sobre o Mail...
 Page setup…	Mail		Configurar página...
-Text wrapping:	Mail		Moldagem do texto
 Revert	Mail		Reverter
-File	Mail		Arquivo
 None	Mail		Nenhum
 Copy link location	Mail		Copiar endereço do link
 Show header	Mail		Mostrar cabeçalho

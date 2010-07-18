@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-Screenshot	1342822790
+1	spanish	x-vnd.Haiku-screenshot-cli	1091349652
 seconds	ScreenshotWindow		segundos
 Options	ScreenshotWindow		Opciones
 Desktop	ScreenshotWindow		Escritorio
@@ -10,6 +10,7 @@ Cancel	ScreenshotWindow		Cancelar
 screenshot	ScreenshotWindow	!! Basename of screenshot files. !!	captura de pantalla
 Name:	ScreenshotWindow		Nombre:
 screenshot1	ScreenshotWindow	!! Filename of first screenshot !!	captura de pantalla1
+SomethingLongHere	ScreenshotWindow	!! length >= screenshot file name? !!	AlgoLargoAquí
 Save screenshot	ScreenshotWindow		Guardar captura de pantalla
 Capture entire screen	ScreenshotWindow		Capturar pantalla completa
 Choose folder	ScreenshotWindow		Elegir carpeta

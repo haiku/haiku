@@ -13,6 +13,6 @@ Stopped	file:ZipOMaticWindow.cpp		Detenido
 Archive	file:ZipperThread.cpp		Archivo
 Drop files to zip.	file:ZipOMaticWindow.cpp		Suelte archivos para comprimirlos.
 Error creating archive	file:ZipOMaticWindow.cpp		Error al crear el archivo
-You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Usted tiene %ld Zip-O-Matic corriendo.\n\n
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Tiene %ld Zip-O-Matic corriendo.\n\n
 Archive created OK	file:ZipOMaticWindow.cpp		Archivo creado correctamente
 Stop them	file:ZipOMatic.cpp		Detenerlos

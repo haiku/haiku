@@ -1,18 +1,16 @@
-1	russian	x-vnd.Haiku-Touchpad	3077633033
+1	russian	x-vnd.Haiku-Touchpad	1498191605
 Scrolling	TouchpadPrefView		Прокрутка
 Revert	TouchpadPrefView		Вернуть
 Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
 Defaults	TouchpadPrefView		По умолчанию
 Slow	TouchpadPrefView		Медленное
-Horizontal scroll step size	TouchpadPrefView		Шаг горизонтальной прокрутки
 High	TouchpadPrefView		Высокая
 Tap gesture	TouchpadPrefView		Касание легким ударом с перетаскиванием
 Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
-Wide	TouchpadPrefView		Большой
 Fast	TouchpadPrefView		Быстрое
 Tap click sensitivity	TouchpadPrefView		Чувствительность к прикосновению
 Scroll acceleration	TouchpadPrefView		Ускорение прокрутки
-Vertical scroll step size	TouchpadPrefView		Шаг вертикальной прокрутки
 Off	TouchpadPrefView		Выключить
-Small	TouchpadPrefView		Малый
 Touchpad	TouchpadMain		Сенсорная панель
+Horizontal scroll speed	TouchpadPrefView		Скорость горизонтальной прокрутки
+Vertical scroll speed	TouchpadPrefView		Скорость вертикальной прокрутки

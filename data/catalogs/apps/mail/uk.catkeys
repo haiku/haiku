@@ -1,5 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	3640755640
-View	Mail		Вигляд
+1	ukrainian	x-vnd.Be-MAIL	-1267338228
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність У буфері відміни/заміни
@@ -28,7 +27,6 @@ Find again	Mail		Повторний пошук
 Bcc:	Mail		Bcc:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить  %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете  зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб п.овернутися назад і виправити ситуацію
 Signature:	Mail		Підпис
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Пошта\n\nавтор Robert Polic.\nДоповнення Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\nПереклад українською Олекса Рудик aka totish\n
 Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
 Cc:	Mail		Cc:
 Find	Mail		Знайти
@@ -54,7 +52,6 @@ Print…	Mail		Друкувати…
 Warn unencodable:	Mail		Увага нерозкодоване:
 Quit	Mail		Завершити
 %n - Full name	Mail		%n - Повне ім'я
- Read 	Mail		 Читати 
 Trash	Mail		Кошик
 Default account:	Mail		Аккаунт по замовчуванню:
 Size:	Mail		Розмір:
@@ -76,9 +73,7 @@ Initial spell check mode:	Mail		Режим перевірки правопису
 Leave same	Mail		Зберегти саме це
 About Mail…	Mail		Про Пошту…
 Page setup…	Mail		Налаштувати сторінку…
-Text wrapping:	Mail		Вирівнювання тексту:
 Revert	Mail		Повернути
-File	Mail		Файл
 None	Mail		Не вибрано
 Copy link location	Mail		Скопіювати розміщення посилання
 Show header	Mail		Показати заголовок
@@ -105,7 +100,6 @@ Do you wish to send this message before closing?	Mail		Бажаєте відпр
 Delete	Mail		Видалити
 Leave as '%s'	Mail		Зберегти як '%s'
 Copy	Mail		Копіювати
-Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
 Reply preamble:	Mail		Вступ відповіді:
 Signatures	Mail		Підписи
 Next	Mail		Наступний
@@ -140,3 +134,5 @@ Remove quote	Mail		Видалити цитату
 Move to trash	Mail		Видалити
 Select all	Mail		Виділити все
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
+View	Mail		Вигляд
+Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.

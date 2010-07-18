@@ -1,21 +1,16 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	2750476595
-Paste	Menus		Įdėti
+1	lithuanian	x-vnd.Haiku-StyledEdit	154881138
 OK	LoadAlert		Gerai
-File	Menus		Byla
 ???	LoadAlert		???
 Left	Menus		Kairėn
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Grįžti prie paskutinės versijos „%s“? 
 Search backwards	FindandReplaceWindow		Ieškoti viršun
 Size	Menus		Dydis
 Save	QuitAlert		Išsaugoti
-Page setup…	Menus		Puslapio nustatymai…
 Redo typing	Menus		Grąžinti
-Print…	Menus		Spausdinti…
 Replace same	Menus		Keisti vienodus
-Can't undo	Menus		Neatšaukiama
+Can't Undo	Menus		Neatšaukiama
 Save	Menus		Išsaugoti
 Replace with:	FindandReplaceWindow		Keisti į:
-Cancel	SaveAlert		Atsisakyti
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, byla nerasta: „%s“.
 Case-sensitive	FindandReplaceWindow		Paisyti registro
 Green	Menus		Žalia
@@ -23,18 +18,13 @@ Revert to saved…	Menus		Grįžti prie išsaugoto…
 Yellow	Menus		Geltona
 Replace in all windows	FindandReplaceWindow		Keisti visuose languose
 Wrap lines	Menus		Eilučių perkėlimas
-Quit	Menus		Baigti
 Cancel	RevertToSavedAlert		Atsisakyti
 Document	Menus		Tekstas
-Clear	Menus		Valyti
 Save changes to the document \"%s\"? 	QuitAlert		Išsaugoti dokumento „%s“ pakeitimus? 
-Edit	Menus		Taisa
 Font	Menus		Rašmenys
 Replace all	FindandReplaceWindow		Keisti viską
 Default	Open_and_SaveAsPanel		Numatytai
 Cancel	FindandReplaceWindow		Atsisakyti
-Save	SaveAlert		Išsaugoti
-Close	Menus		Uždaryti
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Įkėlimo klaida „%s“:\n\tNepalaikomas formatas
 OK	RevertToSavedAlert		Gerai
 Don't save	QuitAlert		Neišsaugoti
@@ -51,22 +41,20 @@ Wrap-around search	FindandReplaceWindow		Grįžtant pradžion
 Find selection	Menus		Rasti žymėtą
 Find:	FindandReplaceWindow		Rasti:
 Error saving \"%s\":\n%s	SaveAlert		Klaida išsaugojant „%s“:\n%s
-Copy	Menus		Kopija
-Cut	Menus		Iškirpti
 Replace	FindandReplaceWindow		Pakeisti
 Undo typing	Menus		Atšaukti
 Find again	Menus		Rasti dar
 Cancel	QuitAlert		Atsisakyti
 Find…	Menus		Rasti…
-Select all	Menus		Žymėti viską
-Don't save	SaveAlert		Neišsaugoti
 Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Byla žymėta tik skaitymui. Išsaugoti dokumento „%s“ keitimus? 
 Black	Menus		Juoda
 Untitled 	StyledEditWindow		Bevardis 
 OK	SaveAlert		Gerai
 Find	FindandReplaceWindow		Rasti
 Encoding	Open_and_SaveAsPanel		Koduotė
-Save as…	Menus		Išsaugoti kaip…
 Replace…	Menus		Pakeisti…
 Right	Menus		Dešinėn
+Cancel	SaveAlert		Atsisakyti
+Save	SaveAlert		Išsaugoti
+Don't save	SaveAlert		Neišsaugoti
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Byla žymėta tik skaitymui. Išsaugoti dokumento „%s“ keitimus? 

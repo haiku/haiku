@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	3840151416
+1	russian	x-vnd.Haiku-BluetoothPrefs	455630337
 About Bluetooth…	Window		О программе...
 Handheld	Settings view		Переносной
 Default inquiry time:	Settings view		Время запроса по умолчанию:
@@ -6,27 +6,25 @@ Add device to list	Inquiry panel		Добавить устройство в сп�
 Starting scan...	Inquiry panel		Начало сканирования...
 Show bluetooth console…	Window		Показать консоль bluetooth 
 Smart phone	Settings view		Смартфон
- seconds	Inquiry panel		 секунд
-Server	Settings view		Сервер
+seconds	Inquiry panel		 секунд
+Server	Window		Сервер
 Stop bluetooth services…	Window		Остановить службу bluetooth
 Identify host as:	Settings view		Идентифицировать как:
 View	Window		Вид
 Refresh…	Remote devices		Обновить...
 Pair…	Remote devices		Пара…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Система bluetoothHaiku, (ARCE)\n\nРазработано Oliver Ruiz Dorantes\n\nПоддержка :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nОтдельное спасибо за помощь...\n\nПожертвование комплектующих :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nФинансовая поддержка :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nИсправления и доработка :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестирование:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nКто дал мне все знания :\n\t- компания yellowTAB
 Incoming connections policy:	Settings view		Политика входящих соединений:
 From all devices	Settings view		От всех устройств
 Show name	Extended local device view		Показывать имя
 Local devices found on system:	Settings view		Локальные устройства, найденные в системе:
-Server	Window		Сервер
 Scanning completed.	Inquiry panel		Сканирование завершенно.
-OK	main		Oк
-Remote devices list…	Window		Список внешних устройств...
+Remote devices	Window		Удалённые устройства
 Remove	Remote devices		Удалить
 15 secs	Settings view		15 сек
 Start bluetooth services…	Window		Запуск службы bluetooth...
 Policy...	Settings view		Политика...
 61 secs	Settings view		61 сек
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Bluetooth Haiku стек, (ARCE)\n\nРазработан Oliver Ruiz Dorantes\n\nС при поддержке:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nСпасибо всем тем, кто оказывал помощь...\n\nПрисылал/жертвовал оборудование:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\tи Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПоддерживал финансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПрисылал патчи:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестировал:\n\t- Petter H. Juliussen\nТем, кто дал мне все знания:\n\t- команде yellowTAB
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не было найдено ни одного bluetooth устройства, зарегистрированного в системе.
 Identify us as...	Settings view		Идентифицировать нас как...
 Remaining 	Inquiry panel		Осталось
@@ -36,7 +34,7 @@ Defaults	Window		По умолчанию
 Inquiry	Inquiry panel		Запрос
 Desktop	Settings view		Рабочий стол
 Revert	Window		Вернуть
-Remote devices	Window		Удалённые устройства
+Remote devices list…	Window		Список внешних устройств...
 Laptop	Settings view		Ноутбук
 Retrieving name of 	Inquiry panel		Получение имени
 Bluetooth	Window		Bluetooth
@@ -48,7 +46,10 @@ Settings	Window		Настройки
 Only from trusted devices	Settings view		Только от доверенных устройств
 Scanning progress	Inquiry panel		Прогресс сканирования
 Always ask	Settings view		Всегда спрашивать
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку "Запрос". Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Убедитесь, что на удалённом устройстве активирован bluetooth. Чтобы начать сканирование, нажмите кнопку \"Запрос\". Время, необходимое для получения имён неизвестно, хотя не должно превышать 3-х секунд на одно устройство. После этого вы сможете подключиться к ним.
 Retrieving names...	Inquiry panel		Получение имен...
 Help	Window		Помощь
 Add…	Remote devices		Добавить
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Bluetooth Haiku стек, (ARCE)\n\nРазработан Oliver Ruiz Dorantes\n\nС при поддержке:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nСпасибо всем тем, кто оказывал помощь...\n\nПрисылал/жертвовал оборудование:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\tи Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПоддерживал финансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПрисылал патчи:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестировал:\n\t- Petter H. Juliussen\nТем, кто дал мне все знания:\n\t- команде yellowTAB
+ seconds	Inquiry panel		 секунд
+Server	Settings view		Сервер

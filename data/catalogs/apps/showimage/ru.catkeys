@@ -1,41 +1,33 @@
-1	russian	x-vnd.Haiku-ShowImage	1282650517
-Paste	Menus		Вставить
+1	russian	x-vnd.Haiku-ShowImage	1038439310
 Use as background…	Menus		Использовать как фоновый рисунок…
-File	Menus		Файл
 5 seconds	Menus		5 секунд
 Slide delay	Menus		Задержка слайд шоу 
 Zoom in	Menus		Увеличить
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его?
-Page setup…	Menus		Настройка печати…
 8 seconds	Menus		8 секунд
-Print…	Menus		Печать…
 Previous page	Menus		Предыдущая страница
 View	Menus		Вид
 Full screen	Menus		На весь экран
 Go to page	Menus		Перейти к странице
 Zoom out	Menus		Уменьшить
 20 seconds	Menus		20 секунд
-Quit	Menus		Выход
 Invert colors	Menus		Инвертировать цвета
 3 seconds	Menus		3 секунды
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
 10 seconds	Menus		10 секунд
 High-quality zooming	Menus		Высококачественное масштабирование
-Clear	Menus		Очистить
 Browse	Menus		Просмотр
 6 seconds	Menus		6 секунд
-Edit	Menus		Изменить
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Невозможно открыть изображение! Либо файл, либо транслятор отсутствует.
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Невозможно открыть изображение! Либо файл, либо транслятор этого изображения отсутствует.
 First page	Menus		Первая страница
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
 About ShowImage…	Menus		О программе…
 Open	Menus		Открыть
 OK	LoadAlerts		Oк
-Close	Menus		Закрыть
 Close	ClosePrompt		Закрыть
 Height:	ResizerWindow		Высота:
 Undo	Menus		Вернуть
-Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1/72 дюма):
+Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1/72 дюйма):
 Apply	ResizerWindow		Применить
 Keep original proportions	ResizerWindow		Сохранить пропорции
 9 seconds	Menus		9 секунд
@@ -52,8 +44,6 @@ Cancel	ClosePrompt		Отмена
 Resize…	Menus		Изменить размер…
 Print options	PrintOptionsWindow		Настройки печати
 Width:	ResizerWindow		Ширина:
-Copy	Menus		Копировать
-Cut	Menus		Вырезать
 ShowImage	AboutWindow		Просмотрщик изображений
 7 seconds	Menus		7 секунд
 Last page	Menus		Последняя страница
@@ -62,7 +52,6 @@ Resize	ResizerWindow		Изменить размер
 Slide show	Menus		Слайд шоу
 Fit image to page	PrintOptionsWindow		Подогнать изображение под окно
 Flip top to bottom	Menus		Отобразить сверху вниз
-Select all	Menus		Выделить всё
 Zoom factor in %:	PrintOptionsWindow		Увеличение в %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Изображение
@@ -70,5 +59,7 @@ Rotate clockwise	Menus		Повернуть по часовой стрелке
 Job setup	PrintOptionsWindow		Настройка задания
 Original size	Menus		Оригинальный размер
 Next page	Menus		Следующая страница
-Save as…	Menus		Сохранить как…
 Shrink to window	Menus		Уменьшить до размеров окна
+OK	SaveToFile		Oк
+The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
+Progress monitor	ProgressWindow		Монитор состояния

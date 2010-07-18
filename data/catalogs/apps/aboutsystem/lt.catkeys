@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-About	3196829578
+1	lithuanian	x-vnd.Haiku-About	1634947051
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht'as (bei jo NewOS branduolys)\n
 %ld Processors:	AboutView		%ld Procesoriai:
 Michael Phipps (project founder)\n\n	AboutView		Michael'is Phipps'as (porojekto įkūrėjas)\n\n
@@ -10,11 +10,9 @@ Processor:	AboutView		Procesorius:
 Kernel:	AboutView		Branduolys:
 Contributors:\n	AboutView		Talkininkai:\n
 Unknown	AboutView		Nežinoma
-... and the many people making donations!\n\n	AboutView		... ir daugeliui kitų aukojusių žmonių!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… ir tie, kuriuos galbūt pamiršome paminėti (atleiskite!)\n\n
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Atmintis:
-Google & their Google Summer of Code program\n\n	AboutView		„Google“ės ir jos „Google Summer of Code“  programai\n\n
 Past maintainers:\n	AboutView		Ankstesni darytojai:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Pirminis tekstas išskirtinai rašytas Haiku'i, be to branduolio ir visi kiti tekstai, kuriais gali būti jungiamos kitos programos, platinamos tokiais leidimais 
 \n\nSpecial thanks to:\n	AboutView		\n\nYpatinga padėka:\n
@@ -27,10 +25,12 @@ MIT license	AboutView		MIT leidimas
 The Haikuware team and their bounty program\n	AboutView		Haikuware komanda bei jos aukų programa\n
 About this system	AboutWindow		Apie šią sistemą
 Version:	AboutView		Versija:
-The BeGeistert team\n	AboutView		„BeGeistert“ komandai\n
 %ld MHz	AboutView		%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Autorinės teisės pirminiam Haiku tekstui priklauso Haiku, Inc. arba autoriams atitinkamai nurodytiems pačiuose tekstuose.\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Norėdami paskaityti leidimą spustelėkite ant atitinkamo pavadinimo.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d MiB viso, išnaudota %d MiB (%d%%)
 License: 	AboutView		Leidimas: 
 Translations:\n	AboutView		Vertimai:\n
+... and the many people making donations!\n\n	AboutView		... ir daugeliui kitų aukojusių žmonių!\n\n
+Google & their Google Summer of Code program\n\n	AboutView		„Google“ės ir jos „Google Summer of Code“  programai\n\n
+The BeGeistert team\n	AboutView		„BeGeistert“ komandai\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Haiku pirminių tekstų autorinės teisės priklauso Haiku, Inc. arba autoriams, nurodytiems tuose pirminiuose tekstuose. Haiku bei Haiku ženklas yra Haiku, Inc. prekių ženklai.\n\n
+GCC %d Hybrid	AboutView		GCC %d hibridas

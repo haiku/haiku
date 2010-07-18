@@ -1,21 +1,16 @@
-1	finnish	x-vnd.Haiku-StyledEdit	2750476595
-Paste	Menus		Liitä
+1	finnish	x-vnd.Haiku-StyledEdit	154881138
 OK	LoadAlert		Valmis
-File	Menus		Tiedosto
 ???	LoadAlert		???
 Left	Menus		Vasen
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Palauta viimeinen \"%s\"-versio? 
 Search backwards	FindandReplaceWindow		Etsi taaksepäin
 Size	Menus		Koko
 Save	QuitAlert		Tallenna
-Page setup…	Menus		Sivuasetukset…
 Redo typing	Menus		Toista kirjoittaminen
-Print…	Menus		Tulosta…
 Replace same	Menus		Korvaa sama
-Can't undo	Menus		Ei voi perua
+Can't Undo	Menus		Ei voi perua
 Save	Menus		Tallenna
 Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
-Cancel	SaveAlert		Peru
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: \"%s\".
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
 Green	Menus		Vihreä
@@ -23,18 +18,13 @@ Revert to saved…	Menus		Palauta tallennettuun…
 Yellow	Menus		Keltainen
 Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
 Wrap lines	Menus		Rivitä
-Quit	Menus		Poistu
 Cancel	RevertToSavedAlert		Peru
 Document	Menus		Asiakirja
-Clear	Menus		Tyhjennnä
 Save changes to the document \"%s\"? 	QuitAlert		Tallenna muutokset asiakirjaan \"%s\"? 
-Edit	Menus		Muokkaa
 Font	Menus		Kirjasin
 Replace all	FindandReplaceWindow		Korvaa kaikki
 Default	Open_and_SaveAsPanel		Oletus
 Cancel	FindandReplaceWindow		Peru
-Save	SaveAlert		Tallenna
-Close	Menus		Sulje
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Virhe ladattaessa \"%s\":\n\tTukematon muoto
 OK	RevertToSavedAlert		Valmis
 Don't save	QuitAlert		Älä tallenna
@@ -51,22 +41,20 @@ Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
 Find selection	Menus		Hakuvalinta
 Find:	FindandReplaceWindow		Haku:
 Error saving \"%s\":\n%s	SaveAlert		Virhe tallennettaessa \"%s\":\n%s
-Copy	Menus		Kopioi
-Cut	Menus		Leikkaa
 Replace	FindandReplaceWindow		Korvaa
 Undo typing	Menus		Peru kirjoitus
 Find again	Menus		Hae uudelleen
 Cancel	QuitAlert		Peru
 Find…	Menus		Hae…
-Select all	Menus		Valitse kaikki
-Don't save	SaveAlert		Älä tallenna
 Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa \"%s\":\n\t%s
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \"%s\"? 
 Black	Menus		Musta
 Untitled 	StyledEditWindow		Otsikoton 
 OK	SaveAlert		Valmis
 Find	FindandReplaceWindow		Haku
 Encoding	Open_and_SaveAsPanel		Koodaus
-Save as…	Menus		Tallenna nimellä…
 Replace…	Menus		Korvaa…
 Right	Menus		Oikea
+Cancel	SaveAlert		Peru
+Save	SaveAlert		Tallenna
+Don't save	SaveAlert		Älä tallenna
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \"%s\"? 

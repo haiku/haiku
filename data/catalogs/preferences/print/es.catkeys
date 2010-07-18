@@ -1,15 +1,14 @@
-1	spanish	x-vnd.Be-PRNT	403433619
+1	spanish	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		Esperando
 page	JobListView		página
 Cancel	AddPrinterDialog		Cancelar
 Add printer	AddPrinterDialog		Añadir impresora
 Printers	PrintersWindow		Impresoras
 Default Printer	PrinterListView		Impresora predeterminada
-No pending jobs.	PrinterListView		No hay trabajos pendientes
+No pending jobs.	PrinterListView		No hay trabajos pendientes.
 pages	JobListView		páginas
 Processing	JobListView		Procesando
 Printer name:	AddPrinterDialog		Nombre de la impresora:
- pending jobs.	PrinterListView		trabajos pendientes.
 Restart job	PrintersWindow		Reiniciar trabajo
 Add	AddPrinterDialog		Añadir
 Make default	PrintersWindow		Hacer predeterminada

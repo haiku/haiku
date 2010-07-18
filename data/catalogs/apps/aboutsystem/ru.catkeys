@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	3196829578
+1	russian	x-vnd.Haiku-About	-551879706
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 %ld Processors:	AboutView		%ld Процессоры:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
@@ -10,11 +10,9 @@ Processor:	AboutView		Процессор:
 Kernel:	AboutView		Ядро:
 Contributors:\n	AboutView		Внесли вклад в развитие:\n
 Unknown	AboutView		Неизвестен
-... and the many people making donations!\n\n	AboutView		... и многим другим людям, которые делают пожертвования!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… а также те, кого мы забыли упомянуть (простите!)\n\n
 %.2f GHz	AboutView		%.2f ГГц
 Memory:	AboutView		Память:
-Google & their Google Summer of Code program\n\n	AboutView		Корпорации Google и их программе Google Summer of Code\n\n
 Past maintainers:\n	AboutView		Предыдущие разработчики:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Код, написанный специально для Haiku, особенно ядро и весь код, с которым могут быть связаны приложения, распространяется на условиях 
 \n\nSpecial thanks to:\n	AboutView		\n\nОсобая благодарность:\n
@@ -27,10 +25,14 @@ MIT license	AboutView		лицензии MIT
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 About this system	AboutWindow		Об этой системе
 Version:	AboutView		Версия:
-The BeGeistert team\n	AboutView		команде BeGeistert\n
 %ld MHz	AboutView		%ld МГц
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде.\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Щелкните левой кнопкой мыши на название лицензии для её прочтения.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d МБ всего, %d МБ (%d%%) занято
 License: 	AboutView		Лицензия: 
 Translations:\n	AboutView		Переводчики:\n
+... and the many people making donations!\n\n	AboutView		... и многим другим людям, которые делают пожертвования!\n\n
+Google & their Google Summer of Code program\n\n	AboutView		Корпорации Google и их программе Google Summer of Code\n\n
+The BeGeistert team\n	AboutView		команде BeGeistert\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku и логотип Haiku являются торговыми марками Haiku, Inc.\n\n
+GCC %d Hybrid	AboutView		GCC %d Гибрид
+%d MiB used (%d%%)	AboutView		Использовано %d МиБ (%d%%)
+%d MiB total, %d MiB inaccessible	AboutView		%d МиБ всего, %d МиБ недоступно

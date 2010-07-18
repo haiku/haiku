@@ -1,0 +1,10 @@
+1	swedish	x-vnd.Haiku-Pairs	794776701
+Quit game	PairsWindow		Avsluta spel
+New game	PairsWindow		Nytt spel
+Expert (8x8)	PairsWindow		Expert (8x8)
+Beginner (4x4)	PairsWindow		Nybörjare (4x4)
+Game	PairsWindow		Spel
+Size	PairsWindow		Storlek
+New	PairsWindow		Ny
+Intermediate (6x6)	PairsWindow		Medelmåtta (6x6)
+Quit	PairsWindow		Avsluta

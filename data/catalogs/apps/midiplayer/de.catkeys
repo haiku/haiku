@@ -7,13 +7,13 @@ Cavern	Main Window		Höhle
 Volume:	Main Window		Lautstärke:
 Reverb:	Main Window		Reverb:
 OK	Main Window		OK
-MidiPlayer	Main Window		MidiPlayer
 Off	Main Window		Aus
 Dungeon	Main Window		Kerker
 Play	Main Window		Abspielen
 Garage	Main Window		Garage
 Closet	Main Window		Schrank
-Drop MIDI file here	Scope View		Hier MIDI-Dateien ablegen
 Igor's lab	Main Window		Igors Labor
 Scope	Main Window		Wellenform
 Could not load song	Main Window		Song konnte nicht geladen werden
+MidiPlayer	Main Window		MidiPlayer
+Drop MIDI file here	Scope View		Hier MIDI-Dateien ablegen

@@ -1,21 +1,16 @@
-1	portuguese	x-vnd.Haiku-StyledEdit	2750476595
-Paste	Menus		Colar
+1	portuguese	x-vnd.Haiku-StyledEdit	154881138
 OK	LoadAlert		OK
-File	Menus		Ficheiro
 ???	LoadAlert		???
 Left	Menus		À esquerda
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Reverter para a última versão de \"%s\"? 
 Search backwards	FindandReplaceWindow		Localizar anterior
 Size	Menus		Tamanho
 Save	QuitAlert		Guardar
-Page setup…	Menus		Configuração de página
 Redo typing	Menus		Refazer introdução de texto
-Print…	Menus		Imprimir...
 Replace same	Menus		Substituir todos
-Can't undo	Menus		Impossível desfazer
+Can't Undo	Menus		Impossível desfazer
 Save	Menus		Guardar
 Replace with:	FindandReplaceWindow		Substituir por:
-Cancel	SaveAlert		Cancelar
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, ficheiro não encontrado: \"%s\".
 Case-sensitive	FindandReplaceWindow		Sensível a minúsculas e maiúsculas
 Green	Menus		Verde
@@ -23,18 +18,13 @@ Revert to saved…	Menus		Reverter para o ficheiro guardado...
 Yellow	Menus		Amarelo
 Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
 Wrap lines	Menus		Quebrar linhas
-Quit	Menus		Terminar
 Cancel	RevertToSavedAlert		Cancelar
 Document	Menus		Documento
-Clear	Menus		Limpar
 Save changes to the document \"%s\"? 	QuitAlert		Guardar alterações ao documento \"%s\"? 
-Edit	Menus		Editar
 Font	Menus		Tipo de letra
 Replace all	FindandReplaceWindow		Substituir todos
 Default	Open_and_SaveAsPanel		Predefenido
 Cancel	FindandReplaceWindow		Cancelar
-Save	SaveAlert		Guardar
-Close	Menus		Fechar
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Erro ao carregar \"%s\":\n\tFormato não suportado
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Não guardar
@@ -51,22 +41,20 @@ Wrap-around search	FindandReplaceWindow		Pesquisar em todo o documento
 Find selection	Menus		Localizar selecção
 Find:	FindandReplaceWindow		Localizar:
 Error saving \"%s\":\n%s	SaveAlert		Erro ao guardar \"%s\":\n%s
-Copy	Menus		Copiar
-Cut	Menus		Cortar
 Replace	FindandReplaceWindow		Substituir
 Undo typing	Menus		Anular introdução de texto
 Find again	Menus		Localizar seguinte
 Cancel	QuitAlert		Cancelar
 Find…	Menus		Localizar..
-Select all	Menus		Seleccionar tudo
-Don't save	SaveAlert		Não guardar
 Error loading \"%s\":\n\t%s	LoadAlert		Erro ao abrir \"%s\":\n\t%s
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este ficheiro está marcado como só de leitura. Guardar alterações ao documento \"%s\"?
 Black	Menus		Preto
 Untitled 	StyledEditWindow		Sem título
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Localizar
 Encoding	Open_and_SaveAsPanel		Codificação
-Save as…	Menus		Guardar como...
 Replace…	Menus		Substituir...
 Right	Menus		À Direita
+Cancel	SaveAlert		Cancelar
+Save	SaveAlert		Guardar
+Don't save	SaveAlert		Não guardar
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este ficheiro está marcado como só de leitura. Guardar alterações ao documento \"%s\"?

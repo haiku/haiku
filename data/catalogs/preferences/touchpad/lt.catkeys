@@ -1,18 +1,16 @@
-1	lithuanian	x-vnd.Haiku-Touchpad	3077633033
+1	lithuanian	x-vnd.Haiku-Touchpad	1498191605
 Scrolling	TouchpadPrefView		Slinkinimas
 Revert	TouchpadPrefView		Grįžti
 Two finger scrolling	TouchpadPrefView		Dvipirštis slinkinimas
 Defaults	TouchpadPrefView		Numatytai
 Slow	TouchpadPrefView		Lėtai
-Horizontal scroll step size	TouchpadPrefView		Slinkimo žingsnis horizontale
 High	TouchpadPrefView		Didelis
 Tap gesture	TouchpadPrefView		Prilietimas
 Horizontal scrolling	TouchpadPrefView		Horizontalusis slinkinimas
-Wide	TouchpadPrefView		Didelis
 Fast	TouchpadPrefView		Greitai
 Tap click sensitivity	TouchpadPrefView		Jautrumas prilietimui
 Scroll acceleration	TouchpadPrefView		Slinkimo pagreitis
-Vertical scroll step size	TouchpadPrefView		Slinkimo žingsnis vertikale
 Off	TouchpadPrefView		Išjungta
-Small	TouchpadPrefView		Mažai
 Touchpad	TouchpadMain		Lietyklė
+Horizontal scroll speed	TouchpadPrefView		Slinkimo greitis horizontale
+Vertical scroll speed	TouchpadPrefView		Slinkimo greitis vertikale

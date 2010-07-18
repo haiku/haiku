@@ -1,43 +1,43 @@
-1	swedish	x-vnd.Haiku-Appearance	3612090060
-Navigation pulse	Colors tab		Navigeringspuls
+1	swedish	x-vnd.Haiku-Appearance	-682877236
+Control highlight	Colors tab		Framhävd kontroll
+Control border	Colors tab		Kontrollkant
+Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
 Shadow	Colors tab		Skugga
 On	AntialiasingSettingsView		Aktiv
 Defaults	APRWindow		Förval
 Grayscale	AntialiasingSettingsView		Gråskala
 Shine	Colors tab		Ljusstyrka
 Off	AntialiasingSettingsView		Inaktiv
-Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
 Success	Colors tab		Framgång
-Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
+Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
 Failure	Colors tab		Misslyckande
 Hinting menu	AntialiasingSettingsView		Hinting-meny
-Control border	Colors tab		Kontrollkant
 Document background	Colors tab		Dokumentbakgrund
 Revert	APRWindow		Återgå
-Selected menu item border	Colors tab		Kantfärg för valt menyalternativ
-Selected menu item text	Colors tab		Textfärg för valt menyalternativ
-Antialiasing	APRWindow		Kantutjämning
-Window tab text	Colors tab		Fönsterflikfärg
+Window tab	Colors tab		Fösterflik
 Tooltip background	Colors tab		Tooltipsbakgrund
-Document text	Colors tab		Dokumenttext
+Selected menu item background	Colors tab		Bakgrund för valt menyalternativ
+Antialiasing	APRWindow		Kantutjämning
 Navigation base	Colors tab		Navigeringsbas
+Window tab text	Colors tab		Fönsterflikfärg
+Document text	Colors tab		Dokumenttext
+Navigation pulse	Colors tab		Navigeringspuls
+Selected menu item text	Colors tab		Textfärg för valt menyalternativ
 Menu background	Colors tab		Menybakgrund
 Appearance	APRWindow		Utseende
-Control background	Colors tab		Kontrollbkgrund
-Colors	APRWindow		Färger
 Panel background	Colors tab		Panelbakgrund
-Window tab	Colors tab		Fösterflik
+Colors	APRWindow		Färger
+Control background	Colors tab		Kontrollbkgrund
+Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
 Reduce colored edges filter strength:	AntialiasingSettingsView		Minska färgintensitet på färgade kanter:
-Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel-baerad kantutjämning i kombination med glyfhinting är inte tillgängligt i färdigbyggda Haiku för att undvika patentproblem. För att aktivera denna funktionalitet, måste du själv kompilera Haiku och välja särskilda val i libfreetypes konfigurationsheader.
-Menu item text	Colors tab		Menyalternativstext
-Monospaced fonts only	AntialiasingSettingsView		Endast teckensnitt med fast bredd
-LCD subpixel	AntialiasingSettingsView		LCD-subpixel
-Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
-Strong	AntialiasingSettingsView		Framhävd
-Control highlight	Colors tab		Framhävd kontroll
+Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Subpixel-baserad kantutjämning i kombination med glyfhinting är inte tillgängligt i färdigbyggda Haiku för att undvika patentproblem. För att aktivera denna funktionalitet, måste du själv kompilera Haiku och välja särskilda val i libfreetypes konfigurationsheader.
 Control text	Colors tab		Kontrolltext
 Tooltip text	Colors tab		Tooltiptext
-Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
-Selected menu item background	Colors tab		Bakgrund för valt menyalternativ
-Glyph hinting:	AntialiasingSettingsView		Glyfhinting:
+Menu item text	Colors tab		Menyalternativstext
+LCD subpixel	AntialiasingSettingsView		LCD-subpixel
+Selected menu item border	Colors tab		Kantfärg för valt menyalternativ
+Strong	AntialiasingSettingsView		Framhävd
 Panel text	Colors tab		Paneltext
+Monospaced fonts only	AntialiasingSettingsView		Endast teckensnitt med fast bredd
+Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
+Glyph hinting:	AntialiasingSettingsView		Glyfhinting:

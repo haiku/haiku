@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-DriveSetup	2303126039
+1	spanish	x-vnd.Haiku-DriveSetup	-60397933
 Delete	MainWindow		Eliminar
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		¿Está seguro que quiere inicializar la partición seleccionada? Después de introducir los parámetros de inicialización, podrá abortar esta operación antes de escribir los cambios en el disco.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información de la partición se perderá irremisiblemente si lo hace!.
@@ -6,14 +6,13 @@ Rescan	MainWindow		Actualizar lista de dispositivos
 OK	MainWindow		Aceptar
 Could not aquire partitioning information.	MainWindow		No se pudo obtener información de la partición.
 There's no space on the partition where a child partition could be created.	MainWindow		No hay espacio en la partición para crear una partición hija.
-%ld MiB	Support		%ld MiB
-<empty>	PartitionList		<vacío>
+<empty>	DiskView		<vacío>
 Unable to find the selected partition by ID.	MainWindow		Imposible encontrar la partición seleccionada por ID.
 Select a partition from the list below.	DiskView		Elija una partición de la lista inferior.
 No disk devices have been recognized.	DiskView		No se reconoce ningún dispositivo de disco.
 The selected disk is read-only.	MainWindow		El disco seleccionado es de sólo lectura.
 Partition name:	CreateParamsPanel		Nombre de la partición:
-Initialize	InitParamsPanel		Inicializar
+Initialize	MainWindow		Inicializar
 Could not mount partition %s.	MainWindow		No se pudo montar la partición  %s.
 The partition %s is already unmounted.	MainWindow		La partición %s ya está montada.
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Falló la inicialización de la partición. No se han escrito cambios en el disco.
@@ -21,16 +20,14 @@ Failed to delete the partition. No changes have been written to disk.	MainWindow
 Partition type:	CreateParamsPanel		Tipo de partición:
 Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		¿Está seguro que quiere inicializar la partición \"%s\"? Después de introducir los parámetros de inicialización, podrá abortar esta operación antes de escribir cambios en el disco.
 Could not delete the selected partition.	MainWindow		No se pudo borrar la partición seleccionada.
-Initialize	MainWindow		Inicializar
 Error: 	MainWindow	in any error alert	Error:
 Partition %ld	DiskView		Partición %ld
 The partition %s has been successfully initialized.\n	MainWindow		La partición %s ha sido inicializada satisfactoriamente.\n
-<empty>	DiskView		<vacío>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		La inicialización de la partición %s ha fallado (no se ha escrito nada en el disco).
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información en la partición se perderá irremisiblemente si lo hace!
 Mounted at	PartitionList		Montado en
-Failed to initialize the partition %s!\n	MainWindow		Falló al inicializar la partición %s!\n
-There was an error acquiring the partition row.	MainWindow		Hay un error adquiriendo la fila de partición.
+Failed to initialize the partition %s!\n	MainWindow		¡Falló al inicializar la partición %s!\n
+There was an error acquiring the partition row.	MainWindow		Hubo un error adquiriendo la fila de partición.
 You need to select a partition entry from the list.	MainWindow		Debe seleccionar una partición de la lista.
 Format (not implemented)	MainWindow		Formatear (no implementado)
 The currently selected partition does not have a parent partition.	MainWindow		La partición seleccionada no tiene una partición padre.
@@ -42,18 +39,17 @@ The partition %s is already mounted.	MainWindow		La partición %s ya está monta
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información en la partición se perderá irremisiblemente si lo hace!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere borrar la partición seleccionada?\n\n¡Toda la información en la partición se perderán irremisiblemente si lo hace!
 Create…	MainWindow		Crear…
-Disk system \"%s\"\" not found!	MainWindow		No se encuentra el disco de sistema \"%s\"\"!
+Disk system \"%s\"\" not found!	MainWindow		¡No se encuentra el disco de sistema \"%s\"\"!
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount	MainWindow		Montar
 Create	CreateParamsPanel		Crear
-Device	PartitionList		Dispositivo
-Disk	MainWindow		Disco
 Device	DiskView		Dispositivo
+Disk	MainWindow		Disco
 Volume name	PartitionList		Nombre del volumen
 Continue	MainWindow		Continuar
 Cannot delete the selected partition.	MainWindow		No se puede borrar la partición seleccionada.
 Mount all	MainWindow		Montar todo
-Cancel	MainWindow		Cancelar
+Cancel	CreateParamsPanel		Cancelar
 Delete partition	MainWindow		Eliminar partición
 End: %ld MB	Support		Fin: %ld MB
 Eject	MainWindow		Expulsar
@@ -61,15 +57,18 @@ Partition	MainWindow		Partición
 File system	PartitionList		Sistema de archivos
 Validation of the given creation parameters failed.	MainWindow		Falló la validación de los parámetros de creación proporcionados.
 Size	PartitionList		Tamaño
-Don't know how to gather initialization parameters for this disk system.	MainWindow		Se ignora cómo recolectar parámetros de inicialización para este sistema de disco.
 Validation of the given initialization parameters failed.	MainWindow		La validación de los parámetros de inicialización proporcionados falló.
 The selected partition does not contain a partitioning system.	MainWindow		La partición seleccionada no contiene un sistema de particionado.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\n¡Toda la información en la partición se perderá irremisiblemente si lo hace!
 The partition %s is currently mounted.	MainWindow		La partición %s está montada actualmente.
 Partition size	CreateParamsPanel		Tamaño de partición
 Surface test (not implemented)	MainWindow		Comprobación de superficie (no implementado)
-Cancel	InitParamsPanel		Cancelar
-Cancel	CreateParamsPanel		Cancelar
 Creation of the partition has failed.	MainWindow		La creación de la partición falló.
 The currently selected partition is not empty.	MainWindow		La partición seleccionada actualmente no está vacía.
 Unmount	MainWindow		Desmontar
+<empty>	PartitionList		<vacío>
+Initialize	InitParamsPanel		Inicializar
+Device	PartitionList		Dispositivo
+Cancel	MainWindow		Cancelar
+Cancel	InitParamsPanel		Cancelar
+%ld MiB	Support		%ld MiB

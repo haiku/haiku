@@ -1,15 +1,15 @@
-1	japanese	x-vnd.Haiku-Keymap	4175672673
+1	japanese	x-vnd.Haiku-Keymap	-119294623
 Tilde trigger	Keymap window		チルダのトリガー
 Grave trigger	Keymap window		グレイヴアクセントのトリガー
 Select dead keys	Keymap window		デッドキーの選択
 Quit	Keymap window		終了
-Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
 Circumflex trigger	Keymap window		サーカムフレックスのトリガー
 Diaeresis trigger	Keymap window		ウムラウトのトリガー
 Open…	Keymap window		開く…
 System:	Keymap window		システム：
 Switch shortcut keys	Keymap window		ショートカットキーのスイッチ
 User:	Keymap window		ユーザー：
+Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
 Keymap	Keymap window		キーマップ
 Sample and clipboard:	Keymap window		サンプル＆クリップボード
 Layout	Keymap window		レイアウト

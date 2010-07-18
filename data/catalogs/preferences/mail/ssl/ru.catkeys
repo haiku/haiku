@@ -1,0 +1,48 @@
+1	russian	x-vnd.Haiku-Mail	1416961282
+Select account type	Config Views		Выберите тип аккаунта
+Mail checking	Config Window		Проверка почты
+Settings	Config Window		Настройки
+Only when dial-up is connected	Config Window		Только при наличии связи
+While sending and receiving	Config Window		Во время отсылки и получения
+days	Config Window		дней
+Start mail services on startup	Config Window		Запускать почтовый сервис при старте
+Receive mail only	Config Views		Только для получения почты
+Account name:	Config Views		имя аккаунта:
+OK	Config Views		Oк
+The filter could not be moved. Deleting filter.	Config Views		Невозможно переименовать фильтр. Удаление фильтра.
+Revert	Config Window		Вернуть
+Accounts	Config Window		Аккаунты
+Account type:	Config Views		Тип аккаунта:
+Remove	Config Window		Удалить
+Miscellaneous	Config Window		Разное
+Show connection status window:	Config Window		Отображать окно статуса соединения:
+While sending	Config Window		Во время отправки
+Schedule outgoing mail when dial-up is disconnected	Config Window		Заносить в список ожидания исходящую почту пока отсутствует подключение
+hours	Config Window		часов
+Add	Config Window		Добавить
+Send mail only	Config Views		Только для отправки почты
+E-mail	Account		E-mail
+Unnamed	Account		Без имени
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nНевозможно получить общие настройки.\n\nВозникла ошибка при получении общих настроек:\n%s\n
+Send and receive mail	Config Views		Для отправки и получения почты
+Real name:	Config Views		Настоящее имя:
+Return address:	Config Views		Обратный адрес:
+Edit mailbox menu…	Config Window		Изменить меню…
+Remove	Config Views		Удалить
+Could not create inbound chain.	Account		Невозможно создать входяшую цепь.
+Check every	Config Window		Проверять каждые
+never	Config Window		Никогда
+Incoming mail filters	Config Views		Фильтры входящей почты
+Account settings	Config Views		Настройки аккаунта
+minutes	Config Window		минут
+Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
+OK	Account		Oк
+Apply	Config Window		Применить
+Could not create outbound chain.	Account		Невозможно создать исходящую цепь.
+Always	Config Window		Всегда
+Add filter	Config Views		Добавить фильтр
+Outgoing mail filters	Config Views		Фильтры исходящей почты
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля того, чтобы создать аккаунт нажмите кнопку Добавить.\n\nУдалить аккаунт можно при помощи кнопки Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
+· Outgoing	Account		· Исходящие
+· E-mail filters	Account		· Фильтры
+· Incoming	Account		· Входящие

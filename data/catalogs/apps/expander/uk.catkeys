@@ -1,10 +1,9 @@
-1	ukrainian	x-vnd.Haiku-Expander	3642794258
+1	ukrainian	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		Розпакувати
 Set destination…	ExpanderMenu		Встановити ціль…
 File expanded	ExpanderWindow		Файл розпаковано
 The destination is read only.	ExpanderWindow		Ціль тільки для читання.
 Expander: Open	ExpanderWindow		Expander: Відкрити
- is not supported	ExpanderWindow		 не підтримується
 Select current	DirectoryFilePanel		Вибрати біжучий
 Source	ExpanderWindow		Джерело
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
@@ -24,12 +23,10 @@ Expanding file 	ExpanderWindow		Розпакувати файл
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка могла бути видалена, переіменована або не підтримується.
 The file doesn't exist	ExpanderWindow		Файл відсутній
 Stop	ExpanderMenu		Зупинити
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tАвтор Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nАвтори Be версії \nDominic, Hiroshi, Peter, Pavel і Robert\nПереклад Віктор Чумак aka 386sx\n
 File	ExpanderMenu		Файл
 Expand	ExpanderWindow		Розпакувати
 Close	ExpanderMenu		Закрити
 The destination is not a folder.	ExpanderWindow		Ціль не є папкою.
-Expander	About		Expander
 About Expander…	ExpanderMenu		Про Expander…
 OK	About		OK
 Set source…	ExpanderMenu		Встановити джерело…
@@ -37,3 +34,5 @@ Select '%s'	DirectoryFilePanel		Вибрати '%s'
 Show contents	ExpanderMenu		Показати вміст
 Stop	ExpanderWindow		Зупинити
 Destination	ExpanderWindow		Ціль
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tАвтор Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nАвтори Be версії \nDominic, Hiroshi, Peter, Pavel і Robert\nПереклад Віктор Чумак aka 386sx\nn
+Expander	About		Expander

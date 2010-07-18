@@ -1,10 +1,9 @@
-1	romanian	x-vnd.Haiku-Expander	3642794258
+1	romanian	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		Dezarhivează
 Set destination…	ExpanderMenu		Setează destinația…
 File expanded	ExpanderWindow		Fișier dezarhivat
-The destination is read only.	ExpanderWindow		Destinația este în mod "doar citire".
+The destination is read only.	ExpanderWindow		Destinația este în mod \"doar citire\".
 Expander: Open	ExpanderWindow		Dezarhivator: Deschis
- is not supported	ExpanderWindow		 nu este suportat
 Select current	DirectoryFilePanel		Selectează curent
 Source	ExpanderWindow		Sursă
 Error when expanding archive	ExpanderWindow		Eroare la dezarhivare
@@ -24,12 +23,10 @@ Expanding file 	ExpanderWindow		Dezarhivare fișier
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Dosarul a fost mutat, redenumit\nsau nu este suportat.
 The file doesn't exist	ExpanderWindow		Fișierul nu există
 Stop	ExpanderMenu		Oprește
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tscris de Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversiunea originală Be creată de \nDominic, Hiroshi, Peter, Pavel și Robert\n
 File	ExpanderMenu		Fișier
 Expand	ExpanderWindow		Dezarhivează
 Close	ExpanderMenu		Închide
 The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
-Expander	About		Dezarhivator
 About Expander…	ExpanderMenu		Despre Dezarhivator…
 OK	About		Bine
 Set source…	ExpanderMenu		Setează sursa…
@@ -37,3 +34,5 @@ Select '%s'	DirectoryFilePanel		Selectează '%s'
 Show contents	ExpanderMenu		Afișează conținut
 Stop	ExpanderWindow		Oprește
 Destination	ExpanderWindow		Destinație
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tscris de Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversiunea originală Be creată de \nDominic, Hiroshi, Peter, Pavel și Robert\n
+Expander	About		Dezarhivator

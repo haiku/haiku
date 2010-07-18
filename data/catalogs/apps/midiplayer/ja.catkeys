@@ -7,13 +7,13 @@ Cavern	Main Window		Cavern (洞くつ)
 Volume:	Main Window		音量：
 Reverb:	Main Window		リバーブ：
 OK	Main Window		Ok
-MidiPlayer	Main Window		MIDI プレーヤー
 Off	Main Window		無効
 Dungeon	Main Window		Dungeon (地下牢)
 Play	Main Window		再生
 Garage	Main Window		Garage (ガレージ)
 Closet	Main Window		Closet (クローゼット)
-Drop MIDI file here	Scope View		ここに MIDI ファイルをドロップしてください
 Igor's lab	Main Window		Igor's lab (実験室)
 Scope	Main Window		Scope (スコープ)
 Could not load song	Main Window		ファイルの読み込みに失敗
+MidiPlayer	Main Window		MIDI プレーヤー
+Drop MIDI file here	Scope View		ここに MIDI ファイルをドロップしてください

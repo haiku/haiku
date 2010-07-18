@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-About	3196829578
+1	ukrainian	x-vnd.Haiku-About	-25810714
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (і ядро його NewOS)\n
 %ld Processors:	AboutView		%ld Процесори:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновник проекту)\n\n
@@ -10,11 +10,9 @@ Processor:	AboutView		Процесор:
 Kernel:	AboutView		Ядро:
 Contributors:\n	AboutView		Співробітники:\n
 Unknown	AboutView		Невідомий
-... and the many people making donations!\n\n	AboutView		...і багато людей, що зробили внески!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… і напевно багатьох інших, котрих ми забули згадати (Вибачте!)\n\n
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Пам'ять:
-Google & their Google Summer of Code program\n\n	AboutView		Google і їхня програма Google Summer of Code\n\n
 Past maintainers:\n	AboutView		Попередні розробники:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Код є унікальним для Haiku,особливо ядро системи і всі коди що додатки можуть використовувати знову поширюються під умовами
 \n\nSpecial thanks to:\n	AboutView		\n\nОсоблива вдячність:\n
@@ -27,10 +25,10 @@ MIT license	AboutView		ліцензія MIT
 The Haikuware team and their bounty program\n	AboutView		Команда Haikuware з їхньою програмою заохочень\n
 About this system	AboutWindow		Про цю систему
 Version:	AboutView		Версія:
-The BeGeistert team\n	AboutView		Команда BeGeistert \n
 %ld MHz	AboutView		%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		Авторські права кода Haiku є власністю Haiku, Inc. або відповідних авторів, що відмічено в джерелах.\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Клікніть ім'я ліцензії для прочитання її.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d MB разом, %d MB використано (%d%%)
 License: 	AboutView		Ліцензія: 
 Translations:\n	AboutView		Переклади:\n
+... and the many people making donations!\n\n	AboutView		...і багато людей, що зробили внески!\n\n
+Google & their Google Summer of Code program\n\n	AboutView		Google і їхня програма Google Summer of Code\n\n
+The BeGeistert team\n	AboutView		Команда BeGeistert \n

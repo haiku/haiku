@@ -7,13 +7,13 @@ Cavern	Main Window		Caverna
 Volume:	Main Window		Volume:
 Reverb:	Main Window		Reverb:
 OK	Main Window		OK
-MidiPlayer	Main Window		Leitor MIDI
 Off	Main Window		Desligado
 Dungeon	Main Window		Mosteiro
 Play	Main Window		Reproduzir
 Garage	Main Window		Garagem
 Closet	Main Window		Armário
-Drop MIDI file here	Scope View		Arraste para aqui o ficheiro MIDI
 Igor's lab	Main Window		Laboratório do Igor
 Scope	Main Window		Âmbito
 Could not load song	Main Window		Impossível carregar a música
+MidiPlayer	Main Window		Leitor MIDI
+Drop MIDI file here	Scope View		Arraste para aqui o ficheiro MIDI

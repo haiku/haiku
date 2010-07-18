@@ -1,5 +1,4 @@
-1	german	x-vnd.Be-MAIL	3640755640
-View	Mail		Ansicht
+1	german	x-vnd.Be-MAIL	-1267338228
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		BFS-Attribute des Anhangs immer mitsenden:
 Inconsistency occurred in the undo/redo buffer.	Mail		Es ist eine Inkonsistenz im Rückgängig/Wiederherstellen-System aufgetreten.
@@ -28,7 +27,6 @@ Find again	Mail		Nächstes finden
 Bcc:	Mail		Blindkopie:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ihr Text enthält %ld nicht kodierbare Zeichen. Eine alternative Zeichenkodierung wäre angebracht. Wählen Sie Senden um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder brechen Sie den Vorgang ab, um das Problem zu lösen.
 Signature:	Mail		Signatur:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nGeschrieben von Robert Polic.\nErweitert vom Dr. Zoidberg Team.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		Änderungen an der Signatur speichern?
 Cc:	Mail		Kopie:
 Find	Mail		Finden
@@ -54,7 +52,6 @@ Print…	Mail		Drucken…
 Warn unencodable:	Mail		Warnung nicht-kodierbar:
 Quit	Mail		Beenden
 %n - Full name	Mail		%n - Voller Name
- Read 	Mail		Gelesen
 Trash	Mail		Löschen
 Default account:	Mail		Standardkonto:
 Size:	Mail		Größe:
@@ -76,9 +73,7 @@ Initial spell check mode:	Mail		Voreingestellter Rechtschreibprüfmodus:
 Leave same	Mail		Beibehalten
 About Mail…	Mail		Über Mail…
 Page setup…	Mail		Seite einrichten…
-Text wrapping:	Mail		Textumbruch:
 Revert	Mail		Änderungen verwerfen
-File	Mail		Datei
 None	Mail		Keines
 Copy link location	Mail		Linkadresse kopieren
 Show header	Mail		Nachrichtenkopf anzeigen
@@ -105,7 +100,6 @@ Do you wish to send this message before closing?	Mail		Möchten Sie diese Nachri
 Delete	Mail		Löschen
 Leave as '%s'	Mail		Als '%s' belassen
 Copy	Mail		Kopieren
-Mail couldn't find its dictionary.	Mail		Mail konnte sein Wörterbuch nicht finden.
 Reply preamble:	Mail		Antwort einleiten:
 Signatures	Mail		Signaturen
 Next	Mail		Nächste
@@ -140,3 +134,5 @@ Remove quote	Mail		Zitat entfernen
 Move to trash	Mail		In den Papierkorb verschieben
 Select all	Mail		Alles auswählen
 An error occurred trying to save this signature.	Mail		Beim Speichern dieser Signatur ist ein Fehler aufgetreten.
+View	Mail		Ansicht
+Mail couldn't find its dictionary.	Mail		Mail konnte sein Wörterbuch nicht finden.

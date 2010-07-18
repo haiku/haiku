@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	3623971781
+1	hungarian	x-vnd.Be-MAIL	-1267338228
 %d - Date	Mail		%d - dátum
 Attach attributes:	Mail		Attribútumok csatolása:
 Inconsistency occurred in the undo/redo buffer.	Mail		Kavarodás történt a visszavon/újra tárolóban.
@@ -27,7 +27,6 @@ Find again	Mail		Keresés ismétlése
 Bcc:	Mail		Titkos másolat:
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A begépelt szövegben %ld felismerhetetlen karakter található. Egy másik karakterkódolással lehet, helyre lehet hozni ezt a malőrt. Ha így kívánja elküldeni levelét (a nem felismerhető karakterek helyettesítő jelre lesznek cserélve), küldje el bátran, vagy kattintson a Mégsem gombra és próbálja meg kijavítani a problémát.
 Signature:	Mail		Aláírás:
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nÍrta Robert Polic.\nKésőbb Dr. Zoidberg csapata javította fel.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		El lehet menteni az aláírást?
 Cc:	Mail		Másolat:
 Find	Mail		Keresés
@@ -53,7 +52,6 @@ Print…	Mail		Nyomtatás…
 Warn unencodable:	Mail		Figyelmeztetés a nem felismerhető karakterk esetén:
 Quit	Mail		Kilépés
 %n - Full name	Mail		%n - teljes név
- Read 	Mail		Olvasás
 Trash	Mail		Szemetes
 Default account:	Mail		Alapértelmezett fiók:
 Size:	Mail		Méret:
@@ -75,9 +73,7 @@ Initial spell check mode:	Mail		Kezdeti helyesírás-ellenőrzés módja:
 Leave same	Mail		Változatlanul hagy
 About Mail…	Mail		A levelezőről…
 Page setup…	Mail		Oldalbeállítás…
-Text wrapping:	Mail		Szövegtördelés:
 Revert	Mail		Visszaállít
-File	Mail		Fájl
 None	Mail		Nincs
 Copy link location	Mail		Hivatkozás címének másolása
 Show header	Mail		Fejléc megjelenítése
@@ -138,3 +134,5 @@ Remove quote	Mail		Idézet eltávolítása
 Move to trash	Mail		Szemétbe dobás
 Select all	Mail		Mind kijelöl
 An error occurred trying to save this signature.	Mail		Hiba történt az aláírás mentése közben.
+View	Mail		Nézet
+Mail couldn't find its dictionary.	Mail		A levelező nem talált szótárakat.

@@ -1,0 +1,42 @@
+1	brazilian_portuguese	x-vnd.Haiku-Mail	1891519393
+Select account type	Config Views		Selecionar tipo de conta
+Mail checking	Config Window		Checar e-mail
+Settings	Config Window		Configurações
+Only when dial-up is connected	Config Window		Somente quando a discagem estiver conectada
+While sending and receiving	Config Window		Enquanto estiver enviando e recebendo
+days	Config Window		dias
+Start mail services on startup	Config Window		Iniciar serviços de e-mail na inicialização
+Receive mail only	Config Views		Receber somente e-mails
+Account name:	Config Views		Nome da conta:
+The filter could not be moved. Deleting filter.	Config Views		Este filtro não pode ser movido. Deletando filtro.
+Revert	Config Window		Reverter
+Accounts	Config Window		Contas
+Account type:	Config Views		Tipo de conta:
+Remove	Config Window		Remover
+Miscellaneous	Config Window		Configurações gerais
+Show connection status window:	Config Window		Mostrar janela de status da conexão:
+While sending	Config Window		Enquanto estiver enviando
+Schedule outgoing mail when dial-up is disconnected	Config Window		Agendar saída de e-mail quando a discagem estiver desconectada
+hours	Config Window		horas
+Add	Config Window		Adicionar
+Send mail only	Config Views		Enviar somente e-mails
+Unnamed	Account		Sem nome
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nAs configurações gerais não podem ser revertidas.\n\nErro ao carregar configurações gerais:\n%s\n
+Send and receive mail	Config Views		Enviar e receber e-mail
+Real name:	Config Views		Nome real:
+Return address:	Config Views		Endereço de retorno:
+Edit mailbox menu…	Config Window		Editar menu da caixa postal…
+Remove	Config Views		Remover
+Could not create inbound chain.	Account		Não foi possível criar corrente de destino.
+Check every	Config Window		Checar todo
+never	Config Window		Nunca
+Incoming mail filters	Config Views		Filtros de e-mails recebidos
+Account settings	Config Views		Configurações da conta
+minutes	Config Window		minutos
+Error retrieving general settings: %s\n	Config Window		Erro ao carregar as configurações gerais: %s\n
+Apply	Config Window		Aplicar
+Could not create outbound chain.	Account		Não foi possível criar corrente de destino.
+Always	Config Window		Sempre
+Add filter	Config Views		Adicionar filtro
+Outgoing mail filters	Config Views		Filtro de e-mails enviados
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCriar uma nova conta com o botão Adicionar.\n\nRemover uma conta com o botão Remover no item selecionado.\n\nSelecionar um item da lista para mudar suas configurações.

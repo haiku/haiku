@@ -1,10 +1,9 @@
-1	lithuanian	x-vnd.Haiku-Expander	3642794258
+1	lithuanian	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		Išskleisti
 Set destination…	ExpanderMenu		Paskirti vietą…
 File expanded	ExpanderWindow		Byla išskleista
 The destination is read only.	ExpanderWindow		Paskirties vieta tik skaitymui.
 Expander: Open	ExpanderWindow		Skleideris: Atidaryti
- is not supported	ExpanderWindow		 nepalaikoma
 Select current	DirectoryFilePanel		Parinkti esamą
 Source	ExpanderWindow		Šaltinis
 Error when expanding archive	ExpanderWindow		Klaida išskleidžiant bylą
@@ -20,16 +19,14 @@ Settings	ExpanderMenu		Nustatymai
 Settings…	ExpanderMenu		Nustatymai…
 Expander: Choose destination	DirectoryFilePanel		Skleideris: šaltinio vietos parinkimas
 Show contents	ExpanderWindow		Rodyti turinį
-Expanding file 	ExpanderWindow		Bylos skleidimas
+Expanding file 	ExpanderWindow		Išskleidžiama byla 
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Aplankas buvo perkeltas, pervadintas arba\nnepalaikomas.
 The file doesn't exist	ExpanderWindow		Tokios bylos nėra
 Stop	ExpanderMenu		Stop
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tparašyta Jérôme'o Duval'io\n\tCopyright 2004-2006, Haiku Inc.\n\npirminė „Be“ versija \nDominic'o, Hiroshi'o, Peter'io, Pavel'o bei Robert'o\n
 File	ExpanderMenu		Byla
 Expand	ExpanderWindow		Išskleisti
 Close	ExpanderMenu		Uždaryti
 The destination is not a folder.	ExpanderWindow		Paskirties vieta nėra aplankas.
-Expander	About		Skleideris
 About Expander…	ExpanderMenu		Apie programą…
 OK	About		Gerai
 Set source…	ExpanderMenu		Parinkti šaltinį…
@@ -37,3 +34,5 @@ Select '%s'	DirectoryFilePanel		Rinktis „%s“
 Show contents	ExpanderMenu		Rodyti turinį
 Stop	ExpanderWindow		Stop
 Destination	ExpanderWindow		Paskirtis
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tparašyta Jérôme'o Duval'io\n\tCopyright 2004-2006, Haiku Inc.\n\npirminė „Be“ versija \nDominic'o, Hiroshi'o, Peter'io, Pavel'o bei Robert'o\n
+Expander	About		Skleideris

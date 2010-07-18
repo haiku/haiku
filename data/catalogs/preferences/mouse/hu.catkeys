@@ -6,10 +6,10 @@ Warp	SettingsView		Áthajlás
 Double-click test area	SettingsView		Duplakattintásos próbaterület
 Revert	MouseWindow		Visszaállít
 ...by Andrew Edward McCall	MouseApplication		Írta: Andrew Edward McCall
-Mouse acceleration	SettingsView		Egérgyorsítás
+Mouse acceleration	SettingsView		Egérmozdulat gyorsulása
 Click to focus	SettingsView		A fókuszhoz kattintani kell
 3-Button	SettingsView		Háromgombos
-Mouse speed	SettingsView		Egér sebessége
+Mouse speed	SettingsView		Egérmozgatás sebessége
 Focus mode:	SettingsView		Fókuszmód:
 Instant warp	SettingsView		Szünetmentes áthajlás
 Dig Deal	MouseApplication		Dig Deal

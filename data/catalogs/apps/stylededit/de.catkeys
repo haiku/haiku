@@ -1,40 +1,30 @@
-1	german	x-vnd.Haiku-StyledEdit	2750476595
-Paste	Menus		Einfügen
+1	german	x-vnd.Haiku-StyledEdit	154881138
 OK	LoadAlert		OK
-File	Menus		Datei
 ???	LoadAlert		???
 Left	Menus		Links
-Revert to the last version of \"%s\"? 	RevertToSavedAlert		Letzte Version von "%s" wiederherstellen? 
+Revert to the last version of \"%s\"? 	RevertToSavedAlert		Letzte Version von \"%s\" wiederherstellen? 
 Search backwards	FindandReplaceWindow		Rückwärts suchen
 Size	Menus		Größe
 Save	QuitAlert		Speichern
-Page setup…	Menus		Seite einrichten…
 Redo typing	Menus		Wiederholen: Eingabe
-Print…	Menus		Drucken…
 Replace same	Menus		Erneut ersetzen
-Can't undo	Menus		Rückgängig nicht möglich
+Can't Undo	Menus		Rückgängig nicht möglich
 Save	Menus		Speichern
 Replace with:	FindandReplaceWindow		Ersetzen durch:
-Cancel	SaveAlert		Abbrechen
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig nicht möglich, Datei nicht gefunden: "%s".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig nicht möglich, Datei nicht gefunden: \"%s\".
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Green	Menus		Grün
 Revert to saved…	Menus		Gespeicherte Version wiederherstellen…
 Yellow	Menus		Gelb
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
 Wrap lines	Menus		Zeilenumbruch
-Quit	Menus		Beenden
 Cancel	RevertToSavedAlert		Abbrechen
 Document	Menus		Dokument
-Clear	Menus		Leeren
-Save changes to the document \"%s\"? 	QuitAlert		Änderungen an Dokument "%s" speichern? 
-Edit	Menus		Bearbeiten
+Save changes to the document \"%s\"? 	QuitAlert		Änderungen an Dokument \"%s\" speichern? 
 Font	Menus		Schriftart
 Replace all	FindandReplaceWindow		Alle ersetzen
 Default	Open_and_SaveAsPanel		Standard
 Cancel	FindandReplaceWindow		Abbrechen
-Save	SaveAlert		Speichern
-Close	Menus		Schließen
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fehler beim Laden von \"%s\":\n\tDateiformat nicht unterstützt
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Nicht speichern
@@ -51,22 +41,20 @@ Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
 Find selection	Menus		Auswahl suchen
 Find:	FindandReplaceWindow		Suche:
 Error saving \"%s\":\n%s	SaveAlert		Fehler beim Speichern von "%s":\n%s
-Copy	Menus		Kopieren
-Cut	Menus		Ausschneiden
 Replace	FindandReplaceWindow		Ersetze
 Undo typing	Menus		Rückgängig: Eingabe
 Find again	Menus		Weitersuchen
 Cancel	QuitAlert		Abbrechen
 Find…	Menus		Suchen…
-Select all	Menus		Alles markieren
-Don't save	SaveAlert		Nicht speichern
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von "%s":\n\t%s
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist schreibgeschützt. Änderungen am Dokument \"%s\" speichern? 
 Black	Menus		Schwarz
 Untitled 	StyledEditWindow		Unbenannt
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Finden
 Encoding	Open_and_SaveAsPanel		Kodierung
-Save as…	Menus		Speichern unter…
 Replace…	Menus		Ersetzen…
 Right	Menus		Rechts
+Cancel	SaveAlert		Abbrechen
+Save	SaveAlert		Speichern
+Don't save	SaveAlert		Nicht speichern
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist schreibgeschützt. Änderungen am Dokument \"%s\" speichern? 

@@ -1,15 +1,15 @@
-1	french	x-vnd.Haiku-Keymap	4175672673
+1	french	x-vnd.Haiku-Keymap	-119294623
 Tilde trigger	Keymap window		Tilde
 Grave trigger	Keymap window		Accent grave
 Select dead keys	Keymap window		Touches mortes
 Quit	Keymap window		Quitter
-Switch shortcut keys to Haiku mode	Keymap window		Touches raccourci en mode Haiku
 Circumflex trigger	Keymap window		Accent circonflexe
 Diaeresis trigger	Keymap window		Trema
 Open…	Keymap window		Ouvrir…
 System:	Keymap window		Système:
 Switch shortcut keys	Keymap window		Touches raccourci
 User:	Keymap window		Utilisateur:
+Switch shortcut keys to Haiku mode	Keymap window		Touches raccourci en mode Haiku
 Keymap	Keymap window		Disposition du clavier
 Sample and clipboard:	Keymap window		Exemple et presse-papier:
 Layout	Keymap window		Disposition

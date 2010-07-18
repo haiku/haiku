@@ -1,4 +1,4 @@
-1	brazilian portuguese	x-vnd.Haiku-About	1662455661
+1	brazilian_portuguese	x-vnd.Haiku-About	1171930639
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e o kernel do seu NewOS)\n
 %ld Processors:	AboutView		%ld Processadores:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projeto)\n\n
@@ -13,4 +13,3 @@ The code that is unique to Haiku, especially the kernel and all code that applic
 Current maintainers:\n	AboutView		Desenvolvedores atuais:\n
 Time running:	AboutView		Tempo de funcionamento:
 The Haikuware team and their bounty program\n	AboutView		A equipe do Haikuware e o seu programa de recompensas\n
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		O copyright do código do Haiku é propriedade de Haiku, Inc. ou dos respectivos autores quando expressamente notado na fonte.\n\n

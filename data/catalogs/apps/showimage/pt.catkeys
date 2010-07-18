@@ -1,37 +1,29 @@
-1	portuguese	x-vnd.Haiku-ShowImage	1282650517
-Paste	Menus		Colar
+1	portuguese	x-vnd.Haiku-ShowImage	249555060
 Use as background…	Menus		Usar como papel de parede...
-File	Menus		Ficheiro
 5 seconds	Menus		5 segundos
 Slide delay	Menus		Tempo de transição
 Zoom in	Menus		Aumentar zoom
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Você deseja fechar o documento?
-Page setup…	Menus		Configuração de página
 8 seconds	Menus		8 segundos
-Print…	Menus		Imprimir...
 Previous page	Menus		Página anterior
 View	Menus		Ver
 Full screen	Menus		Ecrã inteiro
 Go to page	Menus		Ir para a página
 Zoom out	Menus		Diminuir zoom
 20 seconds	Menus		20 segundos
-Quit	Menus		Sair
 Invert colors	Menus		Inverter cores
 3 seconds	Menus		3 segundos
 Rotate counterclockwise	Menus		Rodar para a esquerda
 10 seconds	Menus		10 segundos
 High-quality zooming	Menus		Zoom de alta qualidade
-Clear	Menus		Limpar
 Browse	Menus		Navegar
 6 seconds	Menus		6 segundos
-Edit	Menus		Editar
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou um arquivo ou um tradutor de imagem necessário não existe.
 First page	Menus		Primeira página
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
 About ShowImage…	Menus		Sobre o Visualizador de Imagens…
 Open	Menus		Abrir
 OK	LoadAlerts		OK
-Close	Menus		Fechar
 Close	ClosePrompt		Fechar
 Height:	ResizerWindow		Altura:
 Undo	Menus		Anular
@@ -52,8 +44,6 @@ Cancel	ClosePrompt		Cancelar
 Resize…	Menus		Redimensionar…
 Print options	PrintOptionsWindow		Opções de impressão
 Width:	ResizerWindow		Largura:
-Copy	Menus		Copiar
-Cut	Menus		Cortar
 ShowImage	AboutWindow		Visualizador de Imagens
 7 seconds	Menus		7 segundos
 Last page	Menus		Última página
@@ -62,7 +52,6 @@ Resize	ResizerWindow		Redimensionar
 Slide show	Menus		Apresentação de Diapositivos
 Fit image to page	PrintOptionsWindow		Ajustar imagem à página
 Flip top to bottom	Menus		Inverter verticalmente
-Select all	Menus		Seleccionar tudo
 Zoom factor in %:	PrintOptionsWindow		Zoom em %:
 Width:	PrintOptionsWindow		Largura:
 Image	Menus		Imagem
@@ -70,5 +59,4 @@ Rotate clockwise	Menus		Rodar para a direita
 Job setup	PrintOptionsWindow		Configurar trabalho de impressão
 Original size	Menus		Tamanho original
 Next page	Menus		Próxima página
-Save as…	Menus		Guardar como...
 Shrink to window	Menus		Reduzir para janela

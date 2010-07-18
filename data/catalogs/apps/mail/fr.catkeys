@@ -1,5 +1,4 @@
-1	french	x-vnd.Be-MAIL	3640755640
-View	Mail		Vue
+1	french	x-vnd.Be-MAIL	-1267338228
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint : 
 Inconsistency occurred in the undo/redo buffer.	Mail		Une erreur est survenue dans le tampon d'annulation.
@@ -26,9 +25,8 @@ There is no installed handler for URL links.	Mail		Il n'y a pas d'application po
 Signature	Mail		Signature
 Find again	Mail		Chercher de nouveau
 Bcc:	Mail		Cci :
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Votre texte principal contient %ld caractères non encodables. Peut être qu'un jeu de caractère différent fonctionnerait mieux? Sélectionnez "Envoyer" pour envoyer le message tout de même (un caractère de substitution remplacera ceux qui ne peuvent être encodés), ou choisissez "Annuler" pour revenir et essayer de régler le problème.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Votre texte principal contient %ld caractères non encodables. Peut être qu'un jeu de caractère différent fonctionnerait mieux? Sélectionnez \"Envoyer\" pour envoyer le message tout de même (un caractère de substitution remplacera ceux qui ne peuvent être encodés), ou choisissez \"Annuler\" pour revenir et essayer de régler le problème.
 Signature:	Mail		Signature :
-Mail\n\nWritten by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Mail\n\nÉcrit par Robert Polic.\nAmélioré par Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
 Save changes to this signature?	Mail		Enregistrer les modifications apportées à cette signature ?
 Cc:	Mail		Cc :
 Find	Mail		Trouver
@@ -54,7 +52,6 @@ Print…	Mail		Imprimer…
 Warn unencodable:	Mail		Avertir si non encodable :
 Quit	Mail		Quitter
 %n - Full name	Mail		%n - Nom complet
- Read 	Mail		Lu
 Trash	Mail		Corbeille
 Default account:	Mail		Compte par défaut :
 Size:	Mail		Taille :
@@ -76,9 +73,7 @@ Initial spell check mode:	Mail		Mode de correction orthographique initial :
 Leave same	Mail		Laisser à l'identique
 About Mail…	Mail		A propos de Mail…
 Page setup…	Mail		Mise en page…
-Text wrapping:	Mail		Retour à la ligne :
 Revert	Mail		Défaire
-File	Mail		Fichier
 None	Mail		Aucun
 Copy link location	Mail		Copier l'adresse du lien
 Show header	Mail		Montrer l'entête
@@ -105,7 +100,6 @@ Do you wish to send this message before closing?	Mail		Voulez-vous fermer ce mes
 Delete	Mail		Effacer
 Leave as '%s'	Mail		Laisser '%s'
 Copy	Mail		Copier
-Mail couldn't find its dictionary.	Mail		Mail n'a pas trouvé son dictionaire.
 Reply preamble:	Mail		Préambule de réponse :
 Signatures	Mail		Signatures
 Next	Mail		Suivant
@@ -140,3 +134,5 @@ Remove quote	Mail		Enlever la citation
 Move to trash	Mail		Déplacer vers la corbeille
 Select all	Mail		Tout sélectionner
 An error occurred trying to save this signature.	Mail		Une erreur est survenue en essayant de sauvegarder cette signature.
+View	Mail		Vue
+Mail couldn't find its dictionary.	Mail		Mail n'a pas trouvé son dictionaire.

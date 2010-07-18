@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Locale	1551394073
+1	portuguese	x-vnd.Haiku-Locale	1535389305
 Day in month (2 digits)	TimeFormatSettings		Dia do mês (2 dígitos)
 Available languages	Locale Preflet Window		Idiomas disponíveis
 Day of week (name)	TimeFormatSettings		Dia da semana (nome)
@@ -25,25 +25,25 @@ Symbol position	TimeFormatSettings		Posição do símbolo
 Day of week (short name)	TimeFormatSettings		Dia da semana (nome pequeno)
 Numbers	TimeFormatSettings		Números
 24 hour	TimeFormatSettings		24 horas
- (unknown format)	TimeFormatSettings		(formato desconhecido)
+(unknown format)	TimeFormatSettings		(formato desconhecido)
 Negative marker:	TimeFormatSettings		Numeração negativa:
 Day in month	TimeFormatSettings		Dia do mês
-OK	Locale Preflet Window		OK
 Defaults	Locale Preflet Window		Predefenições
-Month	TimeFormatSettings		Mês
 Separator	TimeFormatSettings		Separador
 Country	Locale Preflet Window		País
 Month number (2 digits)	TimeFormatSettings		Número do mês (2 dígitos)
 Revert	Locale Preflet Window		Reverter
 Negative marker	TimeFormatSettings		Símbolo de números negativos:
+OK	Locale Preflet Window		OK
 Day of week	TimeFormatSettings		Dia da semana
 List separator: 	TimeFormatSettings		Separador de lista
-12 hour	TimeFormatSettings		12 horas
 Time	TimeFormatSettings		Hora
 Date	TimeFormatSettings		Data
+12 hour	TimeFormatSettings		12 horas
 Locale	Locale Preflet		Região
 None	TimeFormatSettings		Nenhum
 Clock	TimeFormatSettings		Relógio
 Example:	TimeFormatSettings		Exemplo:
 Day	TimeFormatSettings		Dia
 Leading 0	TimeFormatSettings		0 inicial
+Month	TimeFormatSettings		Mês

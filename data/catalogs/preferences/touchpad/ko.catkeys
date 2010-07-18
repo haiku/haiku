@@ -1,0 +1,16 @@
+1	korean	x-vnd.Haiku-Touchpad	1498191605
+Scrolling	TouchpadPrefView		스크롤
+Revert	TouchpadPrefView		되돌리기
+Two finger scrolling	TouchpadPrefView		두 손가락 스크롤
+Defaults	TouchpadPrefView		기본설정
+Slow	TouchpadPrefView		느리게
+High	TouchpadPrefView		높게
+Tap gesture	TouchpadPrefView		탑 제스처
+Horizontal scrolling	TouchpadPrefView		수평 스크롤링
+Fast	TouchpadPrefView		빠르게
+Tap click sensitivity	TouchpadPrefView		탭 클릭 민감도
+Scroll acceleration	TouchpadPrefView		스크롤 가속
+Off	TouchpadPrefView		끄기
+Touchpad	TouchpadMain		터치패드
+Horizontal scroll speed	TouchpadPrefView		가로 스크롤 속도
+Vertical scroll speed	TouchpadPrefView		세로 스크롤 속도

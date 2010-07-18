@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-About	3196829578
+1	portuguese	x-vnd.Haiku-About	-25810714
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e o seu kernel do NewOS )\n
 %ld Processors:	AboutView		%ld Processadores:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projecto)\n\n
@@ -10,11 +10,9 @@ Processor:	AboutView		Processador:
 Kernel:	AboutView		Kernel:
 Contributors:\n	AboutView		Colaboradores:\n
 Unknown	AboutView		Desconhecido
-... and the many people making donations!\n\n	AboutView		... e as muitas pessoas que fizeram donativos!\n\n
 \n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… e provavelmente mais alguém o qual nos esquecemos de mencionar (desculpe!)\n\n
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Memória:
-Google & their Google Summer of Code program\n\n	AboutView		Google e o seu programa Google Summer of Code\n\n
 Past maintainers:\n	AboutView		Ex-desenvolvedores:\n
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		O código criado únicamente para o Haiku, especialmente o kernel e todo o código com que as aplicações possam interligar é distribuído sobre os termos da 
 \n\nSpecial thanks to:\n	AboutView		\n\nAgradecimentos especiais a:\n
@@ -27,10 +25,10 @@ MIT license	AboutView		Licença MIT
 The Haikuware team and their bounty program\n	AboutView		A equipa do Haikuware e o seu programa de recompensas\n
 About this system	AboutWindow		Sobre este sistema
 Version:	AboutView		Versão:
-The BeGeistert team\n	AboutView		A equipa BeGeistert\n
 %ld MHz	AboutView		%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source.\n\n	AboutView		O copyright do código do Haiku é propriedade de Haiku, Inc. ou dos respectivos autores quando expressamente notado no mesmo.\n\n
 [Click a license name to read the respective license.]\n\n	AboutView		[Clique no nome da licença para a ler.]\n\n
-%d MB total, %d MB used (%d%%)	AboutView		%d MB no total, %d MB usados (%d%%)
 License: 	AboutView		Licença: 
 Translations:\n	AboutView		Traduções:\n
+... and the many people making donations!\n\n	AboutView		... e as muitas pessoas que fizeram donativos!\n\n
+Google & their Google Summer of Code program\n\n	AboutView		Google e o seu programa Google Summer of Code\n\n
+The BeGeistert team\n	AboutView		A equipa BeGeistert\n

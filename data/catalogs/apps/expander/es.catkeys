@@ -1,10 +1,9 @@
-1	spanish	x-vnd.Haiku-Expander	3642794258
+1	spanish	x-vnd.Haiku-Expander	-1337785931
 Expand	ExpanderMenu		Extraer
 Set destination…	ExpanderMenu		Elegir destino...
 File expanded	ExpanderWindow		Fichero descomprimido
 The destination is read only.	ExpanderWindow		El destino es de sólo lectura.
 Expander: Open	ExpanderWindow		Expander: Abrir
- is not supported	ExpanderWindow		no está soportado
 Select current	DirectoryFilePanel		Selecciona actual
 Source	ExpanderWindow		Origen
 Error when expanding archive	ExpanderWindow		Error extrayendo archivo
@@ -24,12 +23,10 @@ Expanding file 	ExpanderWindow		Descomprimiendo archivo
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		La carpeta o bien fue movida, o renombrada o\n no está soportada.
 The file doesn't exist	ExpanderWindow		El archivo no existe
 Stop	ExpanderMenu		Parar
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversión original Be por \nDominic, Hiroshi, Peter, Pavel y Robert\n
 File	ExpanderMenu		Archivo
 Expand	ExpanderWindow		Extraer
 Close	ExpanderMenu		Cerrar
-The destination is not a folder.	ExpanderWindow		El destino no es una carpeta
-Expander	About		Expander: extraer archivos
+The destination is not a folder.	ExpanderWindow		El destino no es una carpeta.
 About Expander…	ExpanderMenu		Acerca de Expander…
 OK	About		Aceptar
 Set source…	ExpanderMenu		Elegir origen...
@@ -37,3 +34,5 @@ Select '%s'	DirectoryFilePanel		Seleccionar '%s'
 Show contents	ExpanderMenu		Mostrar contenidos
 Stop	ExpanderWindow		Parar
 Destination	ExpanderWindow		Destino
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nversión original Be por \nDominic, Hiroshi, Peter, Pavel y Robert\n
+Expander	About		Expander: extraer archivos

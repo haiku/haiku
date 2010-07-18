@@ -1,0 +1,112 @@
+1	finnish	x-vnd.Haiku-DiskProbe	872627029
+File offset: 	ProbeView		Tiedostosiirros: 
+DiskProbe	OpenWindow		Levykoestaja
+%ld (native)	ProbeView		%ld (kotoperäinen)
+64 bit unsigned value:	TypeEditors		64-bittinen etumerkitön arvo:
+Find again	ProbeView		Hae uudelleen
+Text	FindWindow		Teksti
+Find…	ProbeView		Hae…
+Case sensitive	FindWindow		Kirjainkoosta riippuva
+Cancel	OpenWindow		Peru
+Close	AttributeWindow		Sulje
+File	ProbeView		Tiedosto
+Attribute	ProbeView		Attribuutti
+Floating-point value:	TypeEditors		Liukulukuarvo:
+16 bit	TypeEditors		16-bittinen
+Attributes	ProbeView		Attribuutit
+Device offset: 	ProbeView		Laitesiirros: 
+Selection	ProbeView		Valinta
+File	FileWindow		Tiedosto
+OK	DiskProbe		Valmis
+Paste	ProbeView		Liitä
+PNG format	TypeEditors		PNG-muoto
+Font size	ProbeView		Kirjasinkoko
+Attribute type: 	ProbeView		Attribuuttityyppi: 
+Attribute	AttributeWindow		Attribuutti
+8 bit signed value:	TypeEditors		8-bittinen etumerkillinen arvo:
+Number:	TypeEditors		Numero:
+Save	ProbeView		Tallenna
+Number editor	TypeEditors		Numeromuokkain
+No type editor available	AttributeWindow		Tyyppimuokkainta ei ole käytettävissä
+Double precision floating-point value:	TypeEditors		Kaksoistarkkuuden liukulukuarvo:
+Device: 	ProbeView		Laite: 
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Haluatko todella poistaa attribuutin \"%s\" tiedostosta \"%s\"?\n\nEt voi perua tätä toimintoa.
+8 bit unsigned value:	TypeEditors		8-bittinen etumerkitön arvo:
+Block	ProbeView		Lohko
+Back	ProbeView		Takaisin
+Device	ProbeView		Laite
+Unknown type	TypeEditors		Tuntematon tyyppi
+Block 0x%Lx	ProbeView		Lohko 0x%Lx
+Quit	FileWindow		Poistu
+Undo	ProbeView		Peru
+Close	ProbeView		Sulje
+16 bit signed value:	TypeEditors		16-bittinen etumerkillinen arvo:
+64 bit signed offset:	TypeEditors		64-bittinen etumerkillinen siirros:
+Copy	ProbeView		Kopioi
+Boolean value:	TypeEditors		Boolean-arvo:
+32 bit size or status:	TypeEditors		32-bittinen koko tai tila:
+8 bit palette	TypeEditors		8-bittinen paletti
+Probe device	OpenWindow		Koesta laite
+Unknown format	TypeEditors		Tuntematon muoto
+MIME type:	TypeEditors		MIME-tyyppi:
+Page setup…	ProbeView		Sivuasetukset…
+New…	FileWindow		Uusi…
+DiskProbe request	AttributeWindow		Levykoestajapyyntö
+Save changes before closing?	ProbeView		Tallennatko muutokset ennen sulkemista?
+Type editor	AttributeWindow		Tyyppimuokkain
+Native: 0x%0*Lx	ProbeView		Kotoperäinen: 0x%0*Lx
+Raw editor	AttributeWindow		Raakamuokkain
+Message View	TypeEditors		Viestinäkymä
+DiskProbe request	ProbeView		Levykoestajapyyntö
+32 bit unsigned size:	TypeEditors		32-bittinen etumerkitön koko:
+Flattened bitmap	TypeEditors		Litistetty bittikarttatiedosto
+Open file…	FileWindow		Avaa tiedosto…
+Next	ProbeView		Seuraava
+Close	FileWindow		Sulje
+Attribute: 	ProbeView		Attribuutti: 
+Remove from file	AttributeWindow		Poista tiedostosta
+Don't save	ProbeView		Älä tallenna
+Previous	ProbeView		Edellinen
+64 bit signed value:	TypeEditors		64-bittinen etumerkillinen arvo:
+Icon	TypeEditors		Kuvake
+Block: 	ProbeView		Lohko: 
+Examine device:	OpenWindow		Tutki laitetta:
+Offset: 	ProbeView		Siirros: 
+OK	ProbeView		Valmis
+Add	ProbeView		Lisää
+Edit	ProbeView		Muokkaa
+Native: %Ld (0x%0*Lx)	ProbeView		Kotoperäinen: %Ld (0x%0*Lx)
+32 bit unsigned value:	TypeEditors		32-bittinen etumerkitön arvo:
+Cancel	AttributeWindow		Peru
+Type editor not supported	ProbeView		Tyyppimuokkainta ei tueta
+MIME type editor	TypeEditors		MIME-tyyppimuokkain
+Swapped: %Ld (0x%0*Lx)	ProbeView		Siiretty näennäismuistiin: %Ld (0x%0*Lx)
+Find	FindWindow		Haku
+Remove	AttributeWindow		Poista
+Print…	ProbeView		Tulosta…
+Block %Ld (0x%Lx)	ProbeView		Lohko %Ld (0x%Lx)
+Could not open file \"%s\": %s\n	DiskProbe		Ei voitu avata tiedostoa \"%s\": %s\n
+Select all	ProbeView		Valitse kaikki
+Probe file…	OpenWindow		Koesta tiedostoa…
+Icon view	TypeEditors		Kuvakenäkymä
+Bookmarks	ProbeView		Kirjanmerkit
+Mode:	FindWindow		Tila:
+15 bit	TypeEditors		15-bittinen
+Open device	FileWindow		Avaa laite
+Could not find search string.	ProbeView		Ei voitu löytää hakumerkkijonoa.
+16 bit unsigned value:	TypeEditors		16-bittinen etumerkitön arvo:
+Attribute offset: 	ProbeView		Attribuuttisiirros: 
+Redo	ProbeView		Tee uudelleen
+File: 	ProbeView		Tiedosto: 
+32 bit unsigned pointer:	TypeEditors		32-bittinen etumerkitön osoitin:
+of 	ProbeView		/ 
+DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		Levykoestaja\n\ttekijä: Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nAlkuperäisen Be-version tekijä: Robert Polic\n
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Tiedostoon kirjoittaminen epäonnistui:\n%s\n\nKaikki muutokset katoavat, kun poistut.
+32 bit	TypeEditors		32-bittinen
+Cancel	ProbeView		Peru
+Swapped: 0x%0*Lx	ProbeView		Siirretty näennäismuistiin: 0x%0*Lx
+Grayscale	TypeEditors		Harmaasävy
+32 bit signed value:	TypeEditors		32-bittinen etumerkillinen arvo:
+DiskProbe request	DiskProbe		Levykoestajapyyntö
+Type editor	ProbeView		Tyyppimuokkain
+Contents:	TypeEditors		Sisältö:

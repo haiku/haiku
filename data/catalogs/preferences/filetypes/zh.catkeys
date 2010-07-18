@@ -1,0 +1,74 @@
+1	chinese	x-vnd.Haiku-FileTypes	311030361
+Args only	Application Type Window		仅含参数
+Add group	New File Type Window		增加用户组
+Remove	Application Type Window		删除
+Select same type as	FileType Window		选择相同的文件类型
+Remove icon	Icon View		删除图标
+Supported types	Application Type Window		支持文件类型
+Internal name:	New File Type Window		内部名称:
+New file type	New File Type Window		新建文件类型
+Add icon…	Icon View		增加图标…
+Do you want to save the changes?	Application Type Window		是否保留配置?
+File type	FileType Window		文件类型
+Could not change attributes	Attribute Window		无法改变属性
+Save	Application Type Window		保存
+Add	Extension Window		增加
+Select same preferred application as	FileType Window		首选程序相同于
+Cancel	Attribute Window		取消
+Multiple launch	Application Type Window		多种方式启动
+Group:	New File Type Window		用户组:
+Done	Extension Window		完成
+Could not open file	FileType Window		无法打开文件
+Preferred application	FileType Window		首选程序
+Same as…	FileType Window		类似于…
+File	Application Type Window		文件
+Version:	Application Type Window		版本:
+FileTypes request	FileTypes		需要文件类型
+Select…	FileType Window		选择…
+Development	Application Type Window		开发
+Icon	FileType Window		快捷式
+Special:	Attribute Window		特性:
+Alpha	Application Type Window		字母
+Quit, don't save	Application Type Window		不保存，退出
+Add…	Application Type Window		增加…
+Select preferred application	FileType Window		设置首选程序
+Single launch	Application Type Window		单个启动
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		该程序 \"%s\" 不支持这种文件类型.\是否继续进行设置?
+Type:	Attribute Window		类型:
+Done	Attribute Window		完成
+Set Preferred Application	Preferred App Menu		设置首选程序
+Background app	Application Type Window		背景设置
+Add new group	New File Type Window		新建用户组
+Cancel	Application Type Window		取消
+Cancel	New File Type Window		取消
+Extension:	Extension Window		扩展:
+Add	Attribute Window		增加
+Close	Application Type Window		关闭
+Golden master	Application Type Window		金色主人
+Could not open \"%s\":\n%s	FileTypes		无法打开 \"%s\":\n%s
+Alignment:	Attribute Window		排序:
+Cancel	Extension Window		取消
+Application flags	Application Type Window		程序标识
+Editable	Attribute Window	If Tracker allows to edit this attribute.	可编辑
+Width:	Attribute Window	Default column width in Tracker for this attribute.	宽度:
+Save request	Application Type Window		保留设置
+Attribute name:	Attribute Window		属性名:
+Extension	Extension Window		扩展
+Add type	New File Type Window		增加类型
+Internal name:	Attribute Window		内部名称:
+Final	Application Type Window		最终
+Open file	FileTypes		打开文件
+Exclusive launch	Application Type Window		单独启动
+Default application	FileType Window		默认程序
+Long description:	Application Type Window		详细特征:
+Version info	Application Type Window		版本信息
+Center	Attribute Window	Attribute column alignment in Tracker	居中
+Short description:	Application Type Window		简单特征:
+File could not be opened	Preferred App Menu		文件无法打开
+Could not change file extensions	Extension Window		无法改变文件属性
+Edit icon…	Icon View		编辑图标…
+Save into resource file…	Application Type Window		保存源文件到…
+Left	Attribute Window	Attribute column alignment in Tracker	左对齐
+Visible	Attribute Window		可见
+Could not install file type	New File Type Window		无法安装文件类型
+Application type	Application Type Window		程序类型

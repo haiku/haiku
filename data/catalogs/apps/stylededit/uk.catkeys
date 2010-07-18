@@ -1,18 +1,14 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	2279398219
-Paste	Menus		Вставити
+1	ukrainian	x-vnd.Haiku-StyledEdit	-316197238
 OK	LoadAlert		OK
-File	Menus		Файл
 ???	LoadAlert		???
 Left	Menus		Вліво
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Повернутись до останньої версії \"%s\" ? 
 Search backwards	FindandReplaceWindow		Повторний пошук
 Size	Menus		Розмір
 Save	QuitAlert		Зберегти
-Page setup…	Menus		Встановити сторінку…
 Redo typing	Menus		Відмінити набір
-Print…	Menus		Друкувати…
 Replace same	Menus		Перемістити  це саме
-Can't undo	Menus		Неможливо відмінити
+Can't Undo	Menus		Неможливо відмінити
 Save	Menus		Зберегти
 Replace with:	FindandReplaceWindow		Перемістити з:
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо повернути, файл не знайдено: \"%s\".
@@ -22,18 +18,13 @@ Revert to saved…	Menus		Повернутись до збереження…
 Yellow	Menus		Жовтий
 Replace in all windows	FindandReplaceWindow		Замінити  у всіх вікнах
 Wrap lines	Menus		Перенос по словах
-Quit	Menus		Завершити
 Cancel	RevertToSavedAlert		Відмінити
 Document	Menus		Документ
-Clear	Menus		Очистити
 Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 
-Edit	Menus		Редагувати
 Font	Menus		Шрифт
 Replace all	FindandReplaceWindow		Замінити все
 Default	Open_and_SaveAsPanel		По замовчуванню
 Cancel	FindandReplaceWindow		Відмінити
-Save	SaveAlert		Зберегти
-Close	Menus		Закрити
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Помилка при загрузці \"%s\":\n\tФормат не підтримується
 OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Не збережено
@@ -50,22 +41,19 @@ Wrap-around search	FindandReplaceWindow		Шукати по всьому доку
 Find selection	Menus		Знайти  вибране
 Find:	FindandReplaceWindow		Знайти:
 Error saving \"%s\":\n%s	SaveAlert		Помилка збереження "%s":\n%s
-Copy	Menus		Копіювати
-Cut	Menus		Вирізати
 Replace	FindandReplaceWindow		Перемістити
 Undo typing	Menus		Відмінити набір
 Find again	Menus		Повторний пошук
 Cancel	QuitAlert		Відмінити
 Find…	Menus		Знайти…
-Select all	Menus		Виділити все
-Don't save	SaveAlert		Не збережено
 Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки "%s":\n\t%s
-This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Файл помічений, як такий, що є тільки для читання. Зберегти зміни в документі \"%s\"? 
 Black	Menus		Чорний
 Untitled 	StyledEditWindow		Неназваний
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Знайти
 Encoding	Open_and_SaveAsPanel		Кодування
-Save as…	Menus		Зберегти як…
 Replace…	Menus		Перемістити…
 Right	Menus		Вправо
+Save	SaveAlert		Зберегти
+Don't save	SaveAlert		Не збережено
+This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Файл помічений, як такий, що є тільки для читання. Зберегти зміни в документі \"%s\"? 

@@ -1,0 +1,78 @@
+1	french	x-vnd.Haiku-FileTypes	-2133321031
+Args only	Application Type Window		Arguments seuls
+Add group	New File Type Window		Ajouter un groupe
+Remove	Application Type Window		Supprimer
+Select same type as	FileType Window		Selectionner le même type que
+Remove icon	Icon View		Supprimer l'icône
+Supported types	Application Type Window		Types supportés
+Internal name:	New File Type Window		Nom interne :
+New file type	New File Type Window		Nouveau type de fichier
+Add icon…	Icon View		Ajouter une icône…
+Do you want to save the changes?	Application Type Window		Voulez-vous enregistrer les changements ?
+File type	FileType Window		Type de fichier
+Could not change attributes	Attribute Window		Impossible de modifier les attributs
+OK	FileTypes		Ok
+Save	Application Type Window		Enregistrer
+Add	Extension Window		Ajouter
+Select same preferred application as	FileType Window		Selectionner la même application préférée que
+Cancel	Attribute Window		Annuler
+Multiple launch	Application Type Window		Instances multiples
+Group:	New File Type Window		Groupe :
+Done	Extension Window		Terminé
+Could not open file	FileType Window		Impossible d'ouvrir le fichier
+Preferred application	FileType Window		Application préférée 
+Same as…	FileType Window		Identique à…
+File	Application Type Window		Fichier
+Version:	Application Type Window		Version :
+FileTypes request	FileTypes		Demande de types de fichiers
+Select…	FileType Window		Sélectionner…
+Development	Application Type Window		Développement
+Icon	FileType Window		Icône
+Special:	Attribute Window		Spécial :
+Alpha	Application Type Window		Alpha
+Signature:	Application Type Window		Signature :
+Quit, don't save	Application Type Window		Quitter sans enregistrer
+Add…	Application Type Window		Ajouter…
+Select preferred application	FileType Window		Selectionner l'application préférée
+Single launch	Application Type Window		Instance unique
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		l'application \"%s\" ne supporte pas ce type de fichier.\nÊtes-vous sûr de vouloir l'associer quand même ?
+Type:	Attribute Window		Type :
+Done	Attribute Window		Terminé
+Set Preferred Application	Preferred App Menu		Definir l'application préférée
+Background app	Application Type Window		Tâche de fond
+Add new group	New File Type Window		Ajouter un nouveau groupe
+Cancel	Application Type Window		Annuler
+Cancel	New File Type Window		Annuler
+Extension:	Extension Window		Extension :
+Add	Attribute Window		Ajouter
+Close	Application Type Window		Fermer
+Golden master	Application Type Window		Candidate
+Could not open \"%s\":\n%s	FileTypes		Impossible d'ouvrir \"%s\":\n%s
+Alignment:	Attribute Window		Alignement :
+Cancel	Extension Window		Annuler
+Application flags	Application Type Window		Fanions de l'application
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Éditable
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Largeur :
+Save request	Application Type Window		Enregistrer la requête
+Beta	Application Type Window		Beta
+Attribute name:	Attribute Window		Nom de l'attribut :
+Extension	Extension Window		Extension
+Add type	New File Type Window		Ajouter un type
+Internal name:	Attribute Window		Nom interne :
+Final	Application Type Window		Finale
+Open file	FileTypes		Ouvrir un fichier
+Exclusive launch	Application Type Window		Instance exclusive
+Gamma	Application Type Window		Gamma
+Default application	FileType Window		Application par défaut
+Long description:	Application Type Window		Description longue :
+Version info	Application Type Window		Info de version
+Center	Attribute Window	Attribute column alignment in Tracker	Centré
+Short description:	Application Type Window		Description courte :
+File could not be opened	Preferred App Menu		Impossible d'ouvrir le fichier
+Could not change file extensions	Extension Window		Impossible de modifier les extensions de fichiers
+Edit icon…	Icon View		Éditer l'icône…
+Save into resource file…	Application Type Window		Sauvegarder dans un fichier de ressources…
+Left	Attribute Window	Attribute column alignment in Tracker	À gauche
+Visible	Attribute Window		Visible
+Could not install file type	New File Type Window		Impossible d'installer le type de fichier
+Application type	Application Type Window		Type de applicatif

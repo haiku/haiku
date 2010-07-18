@@ -1,18 +1,18 @@
-1	german	x-vnd.Haiku-Network	3643490310
+1	german	x-vnd.Haiku-Network	-651476986
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Netzmaske:
 DHCP	EthernetSettingsView		DHCP
 DNS #2:	EthernetSettingsView		DNS #2:
 Apply	EthernetSettingsView		Anwenden
-OK	EthernetSettingsView		OK
 DNS #1:	EthernetSettingsView		DNS #1:
-IP address:	EthernetSettingsView		IP-Adresse:
 Network	NetworkWindow		Netzwerk
 Adapter:	EthernetSettingsView		Adapter:
-Domain:	EthernetSettingsView		Domäne:
+IP address:	EthernetSettingsView		IP-Adresse:
 Revert	EthernetSettingsView		Zurücksetzen
 Sending auto-config message failed: 	EthernetSettingsView		Senden der Auto-Konfigurationsnachricht fehlgeschlagen: 
 Mode:	EthernetSettingsView		Modus:
 The net_server needs to run for the auto configuration!	EthernetSettingsView		Der net_server muss gestartet sein für die Auto-Konfiguration!
 Auto-configuring failed: 	EthernetSettingsView		Auto-Konfiguration fehlgeschlagen: 
 Static	EthernetSettingsView		Statisch
+OK	EthernetSettingsView		OK
+Domain:	EthernetSettingsView		Domäne:

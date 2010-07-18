@@ -2,7 +2,7 @@
 Keyboard	KeyboardWindow		Clavier
 Written by Andrew Edward McCall	KeyboardApplication		Écrit par Andrew Edward McCall
 Typing test area	KeyboardView		Zone de test de frappe
-Defaults	KeyboardWindow		Défauts
+Defaults	KeyboardWindow		Par défaut
 Key repeat rate	KeyboardView		Vitesse de répétition des touches
 Revert	KeyboardWindow		Défaire
 Delay until key repeat	KeyboardView		Délai avant répétition des touches

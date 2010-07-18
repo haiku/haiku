@@ -1,10 +1,10 @@
 1	french	x-vnd.Haiku-Pairs	794776701
+Quit game	PairsWindow		Quitter le jeu
+New game	PairsWindow		Nouvelle partie
 Expert (8x8)	PairsWindow		Expert (8x8)
 Beginner (4x4)	PairsWindow		Débutant (4x4)
-Quit game	PairsWindow		Quitter le jeu
 Game	PairsWindow		Jeu
 Size	PairsWindow		Taille
 New	PairsWindow		Nouveau
 Intermediate (6x6)	PairsWindow		Intermédiaire (6x6)
 Quit	PairsWindow		Quitter
-New game	PairsWindow		Nouvelle partie

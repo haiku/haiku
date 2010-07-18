@@ -1,2 +1,5 @@
-1	brazilian portuguese	x-vnd.Haiku-Pairs	1273414999
+1	brazilian_portuguese	x-vnd.Haiku-Pairs	-87108348
 Quit game	PairsWindow		Sair do jogo
+Expert (8x8)	PairsWindow		Especialista (8x8)
+Game	PairsWindow		Jogo
+Intermediate (6x6)	PairsWindow		Intermediário (6x6)

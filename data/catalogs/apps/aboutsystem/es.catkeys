@@ -1,0 +1,34 @@
+1	spanish	x-vnd.Haiku-About	-25810714
+Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (y el núcleo de su NewOS)\n
+%ld Processors:	AboutView		%ld Procesadores:
+Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador del proyecto)\n\n
+The Haiku-Ports team\n	AboutView		El equipo Haiku-Ports\n
+Website, marketing & documentation:\n	AboutView		Sitio web, márketing y documentación:\n
+Revision	AboutView		Revisión
+Source Code: 	AboutView		Código fuente:
+Processor:	AboutView		Procesador:
+Kernel:	AboutView		Núcleo:
+Contributors:\n	AboutView		Colaboradores:\n
+Unknown	AboutView		Desconocido
+\n… and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… y probablemente algunos más que se nos haya olvidado mencionar (¡disculpas!)\n\n
+%.2f GHz	AboutView		%.2f GHz
+Memory:	AboutView		Memoria:
+Past maintainers:\n	AboutView		Mantenedores previos:\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		El código que es único de Haiku, especialmente el kernel y todo el código con el que las aplicaciones pudieran enlazarse, esta distribuido bajo los términos de
+\n\nSpecial thanks to:\n	AboutView		\n\nAgradecimientos especiales a:\n
+Licenses: 	AboutView		Licencias: 
+. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Algunas bibliotecas de sistema contienen código de terceras personas distribuido bajo la licencia LGPL. Puede encontrar los textos de derechos reservados de dicho código más abajo.\n\n
+\nCopyrights\n\n	AboutView		\nDerechos reservados\n\n
+Current maintainers:\n	AboutView		Mantenedores actuales:\n
+Time running:	AboutView		Tiempo en ejecución:
+MIT license	AboutView		Licencia MIT
+The Haikuware team and their bounty program\n	AboutView		El equipo de Haikuware y su programa de recompensas\n
+About this system	AboutWindow		Acerca de este sistema
+Version:	AboutView		Versión:
+%ld MHz	AboutView		%ld MHz
+[Click a license name to read the respective license.]\n\n	AboutView		[Haga click en un nombre de licencia para leer la licencia respectiva.]\n\n
+License: 	AboutView		Licencia: 
+Translations:\n	AboutView		Traducciones:\n
+... and the many people making donations!\n\n	AboutView		... ¡y a toda la gente que realizó donaciones!\n\n
+Google & their Google Summer of Code program\n\n	AboutView		Google & y su programa Google Summer of Code\n\n
+The BeGeistert team\n	AboutView		El equipo de BeGeistert\n

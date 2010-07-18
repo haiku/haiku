@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PRNT	403433619
+1	german	x-vnd.Be-PRNT	634957092
 Waiting	JobListView		Wartend
 page	JobListView		Seite
 Cancel	AddPrinterDialog		Abbrechen
@@ -9,7 +9,6 @@ No pending jobs.	PrinterListView		Keine ausstehenden Druckaufträge.
 pages	JobListView		Seiten
 Processing	JobListView		Verarbeite
 Printer name:	AddPrinterDialog		Druckername:
- pending jobs.	PrinterListView		 ausstehende Druckaufträge.
 Restart job	PrintersWindow		Auftrag neustarten
 Add	AddPrinterDialog		Hinzufügen
 Make default	PrintersWindow		Als bevorzugten Drucker wählen

@@ -1,18 +1,14 @@
-1	spanish	x-vnd.Haiku-Touchpad	3077633033
+1	spanish	x-vnd.Haiku-Touchpad	2104608255
 Scrolling	TouchpadPrefView		Desplazamiento
 Revert	TouchpadPrefView		Revertir
 Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
 Defaults	TouchpadPrefView		Valores predeterminados
 Slow	TouchpadPrefView		Lento
-Horizontal scroll step size	TouchpadPrefView		Incrementos en desplazamiento horizontal
 High	TouchpadPrefView		Alta
 Tap gesture	TouchpadPrefView		Toque dactilar
 Horizontal scrolling	TouchpadPrefView		Desplazamiento Horizontal
-Wide	TouchpadPrefView		Ancho
 Fast	TouchpadPrefView		Rápido
-Tap click sensitivity	TouchpadPrefView		Sensibilidad
+Tap click sensitivity	TouchpadPrefView		Sensibilidad del toque para hacer click
 Scroll acceleration	TouchpadPrefView		Aceleración
-Vertical scroll step size	TouchpadPrefView		Incrementos en desplazamiento vertical
 Off	TouchpadPrefView		Desactivado
-Small	TouchpadPrefView		Pequeño
 Touchpad	TouchpadMain		Panel táctil

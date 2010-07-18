@@ -1,37 +1,29 @@
-1	finnish	x-vnd.Haiku-ShowImage	1282650517
-Paste	Menus		Liitä
+1	finnish	x-vnd.Haiku-ShowImage	1038439310
 Use as background…	Menus		Käytä taustana…
-File	Menus		Tiedosto
 5 seconds	Menus		5 sekuntia
 Slide delay	Menus		Diaviive
 Zoom in	Menus		Lähennä
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' on muuttunut. Haluatko sulkea asiakirjan?
-Page setup…	Menus		Sivuasetukset…
 8 seconds	Menus		8 sekuntia
-Print…	Menus		Tulosta…
 Previous page	Menus		Edellinen sivu
 View	Menus		Näkymä
 Full screen	Menus		Kokoruutu
 Go to page	Menus		Siirry sivulle
 Zoom out	Menus		Loitonna
 20 seconds	Menus		20 sekuntia
-Quit	Menus		Poistu
 Invert colors	Menus		Käännä värit
 3 seconds	Menus		3 sekuntia
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
 10 seconds	Menus		10 sekuntia
 High-quality zooming	Menus		Korkealaatuinen rajaus
-Clear	Menus		Tyhjennä
 Browse	Menus		Selaa
 6 seconds	Menus		6 sekuntia
-Edit	Menus		Muokkaa
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ei voitu ladata kuvaa! Puuttuu joko tiedosto tai kuvakääntäjä sitä varten.
 First page	Menus		Ensimmäinen sivu
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja '%s' (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
 About ShowImage…	Menus		ShowImage-ohjelmasta…
 Open	Menus		Avaa
 OK	LoadAlerts		Valmis
-Close	Menus		Sulje
 Close	ClosePrompt		Sulje
 Height:	ResizerWindow		Korkeus:
 Undo	Menus		Peru
@@ -52,8 +44,6 @@ Cancel	ClosePrompt		Peru
 Resize…	Menus		Skaalaa…
 Print options	PrintOptionsWindow		Tulostusvalitsimet
 Width:	ResizerWindow		Leveys:
-Copy	Menus		Kopioi
-Cut	Menus		Leikkaa
 ShowImage	AboutWindow		ShowImage
 7 seconds	Menus		7 sekuntia
 Last page	Menus		Viimeinen sivu
@@ -62,7 +52,6 @@ Resize	ResizerWindow		Skaalaa
 Slide show	Menus		Diaesitys
 Fit image to page	PrintOptionsWindow		Sovita kuva sivulle
 Flip top to bottom	Menus		Käännä ympäri ylhäältä alas
-Select all	Menus		Valitse kaikki
 Zoom factor in %:	PrintOptionsWindow		Rajaustekijä kohteessa %:
 Width:	PrintOptionsWindow		Leveys:
 Image	Menus		Kuva
@@ -70,5 +59,7 @@ Rotate clockwise	Menus		Pyöritä myötäpäivään
 Job setup	PrintOptionsWindow		Työasetukset
 Original size	Menus		Alkuperäiskoko
 Next page	Menus		Seuraava sivu
-Save as…	Menus		Tallenna nimellä…
 Shrink to window	Menus		Kutista ikkunaan
+OK	SaveToFile		Valmis
+The file '%s' could not be written.	SaveToFile		Tiedostoa '%s' ei voitu kirjoittaa.
+Progress monitor	ProgressWindow		Edistymisvalvonta

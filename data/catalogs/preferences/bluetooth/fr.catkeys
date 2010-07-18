@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-BluetoothPrefs	3840151416
+1	french	x-vnd.Haiku-BluetoothPrefs	455630337
 About Bluetooth…	Window		À propos de Bluetooth…
 Handheld	Settings view		Appareil de poche
 Default inquiry time:	Settings view		Temps de requête par défaut :
@@ -6,27 +6,25 @@ Add device to list	Inquiry panel		Ajouter l'appareil à la liste
 Starting scan...	Inquiry panel		Démarrage de la recherche...
 Show bluetooth console…	Window		Montrer le terminal bluetooth…
 Smart phone	Settings view		Téléphone
- seconds	Inquiry panel		secondes
-Server	Settings view		Serveur
+seconds	Inquiry panel		 secondes
+Server	Window		Serveur
 Stop bluetooth services…	Window		Arrêter les services bluetooth…
 Identify host as:	Settings view		Identifier l'hôte comme :
 View	Window		Vue
 Refresh…	Remote devices		Rafraîchir…
 Pair…	Remote devices		Associer…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système bluetoothHaiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec le soutien de :\n\t- Mika Lindqvist\n\t- Maksym Yevmenkin\n\nMerci à toutes les personnes qui ont aidé...\n\nDons de matériel :\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t & Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nRustines :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTests:\n\t- Petter H. Juliussen\n\t- Adrien Destugues\n\nQui m'ont tout appris :\n\t- l'équipe yellowTAB
 Incoming connections policy:	Settings view		Attitude envers les connexions entrantes :
 From all devices	Settings view		Tous les appareils
 Show name	Extended local device view		Montrer le nom
 Local devices found on system:	Settings view		Appareils locaux trouvés sur le système :
-Server	Window		Serveur
 Scanning completed.	Inquiry panel		Recherche complète.
-OK	main		Ok
-Remote devices list…	Window		Liste des appareils distants…
+Remote devices	Window		Appareils distants
 Remove	Remote devices		Enlever
 15 secs	Settings view		15 secs
 Start bluetooth services…	Window		Démarrer les services bluetooth…
 Policy...	Settings view		Attitude...
 61 secs	Settings view		61 secs
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système Bluetooth Haiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec l'aide de :\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nMerci à tous ceux qui ont apporté leur aide...\n\nDon/envoi de matériel :\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nAvec du code :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesteurs :\n\t- Petter H. Juliussen\nCeux qui m'ont donné la connaissance :\n\t- l'équipe yellowTAB
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Aucun matériel bluetooth trouvé sur le système
 Identify us as...	Settings view		S'identifier comme...
 Remaining 	Inquiry panel		Restant
@@ -36,7 +34,7 @@ Defaults	Window		Défauts
 Inquiry	Inquiry panel		Requête
 Desktop	Settings view		Bureau
 Revert	Window		Défaire
-Remote devices	Window		Appareils distants
+Remote devices list…	Window		Liste des appareils distants…
 Laptop	Settings view		Portable
 Retrieving name of 	Inquiry panel		Récupérer le nom de
 Bluetooth	Window		Bluetooth
@@ -48,7 +46,10 @@ Settings	Window		Paramètres
 Only from trusted devices	Settings view		Seulement les appareils de confiance
 Scanning progress	Inquiry panel		Avancée de la recherche
 Always ask	Settings view		Toujours demander
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Vérifiez que les fonctionnalités bluetooth de votre appareil distant sont activées. Appuyez sur "Requête" pour lancer la recherche. Le temps nécessaire pour récupérer les noms n'est pas connu, mais ça ne devrait pas prendre plus de 3 secondes par appareil. Ensuite vous pourrez les ajouter à la liste principale, où vous pourrez vous associer avec eux.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Vérifiez que les fonctionnalités bluetooth de votre appareil distant sont activées. Appuyez sur \"Requête\" pour lancer la recherche. Le temps nécessaire pour récupérer les noms n'est pas connu, mais ça ne devrait pas prendre plus de 3 secondes par appareil. Ensuite vous pourrez les ajouter à la liste principale, où vous pourrez vous associer avec eux.
 Retrieving names...	Inquiry panel		Récupération des noms...
 Help	Window		Aide
 Add…	Remote devices		Ajouter…
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Système Bluetooth Haiku, (ARCE)\n\nCréé par Oliver Ruiz Dorantes\n\nAvec l'aide de :\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nMerci à tous ceux qui ont apporté leur aide...\n\nDon/envoi de matériel :\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nFinancièrement :\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nAvec du code :\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesteurs :\n\t- Petter H. Juliussen\nCeux qui m'ont donné la connaissance :\n\t- l'équipe yellowTAB
+ seconds	Inquiry panel		secondes
+Server	Settings view		Serveur

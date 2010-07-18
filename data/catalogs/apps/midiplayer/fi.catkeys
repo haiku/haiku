@@ -7,13 +7,13 @@ Cavern	Main Window		Luola
 Volume:	Main Window		Äänenvoimakkuus:
 Reverb:	Main Window		Kaikuefekti:
 OK	Main Window		Valmis
-MidiPlayer	Main Window		MidiPlayer
 Off	Main Window		Pois päältä
 Dungeon	Main Window		Tyrmä
 Play	Main Window		Soita
 Garage	Main Window		Korjaamo
 Closet	Main Window		Kaappi
-Drop MIDI file here	Scope View		Pudota MIDI-tiedosto tänne
 Igor's lab	Main Window		Igorin labra
 Scope	Main Window		Näkyvyysalue
 Could not load song	Main Window		Ei voitu ladata laulua
+MidiPlayer	Main Window		MidiPlayer
+Drop MIDI file here	Scope View		Pudota MIDI-tiedosto tänne

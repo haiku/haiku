@@ -1,10 +1,9 @@
-1	russian	x-vnd.Haiku-Expander	3642794258
+1	russian	x-vnd.Haiku-Expander	1292562546
 Expand	ExpanderMenu		Распаковать
 Set destination…	ExpanderMenu		Путь для извлечения…
 File expanded	ExpanderWindow		Файл распакован
 The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
 Expander: Open	ExpanderWindow		Expander: Открыть
- is not supported	ExpanderWindow		 не поддерживается
 Select current	DirectoryFilePanel		Выбрать текущий
 Source	ExpanderWindow		Источник
 Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
@@ -20,16 +19,14 @@ Settings	ExpanderMenu		Настройки
 Settings…	ExpanderMenu		Настройки…
 Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения
 Show contents	ExpanderWindow		Показать содержимое
-Expanding file 	ExpanderWindow		Извлечение файла
+Expanding file 	ExpanderWindow		Извлечение файла 
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка была перемещена, переименована либо не\nподдерживается.
 The file doesn't exist	ExpanderWindow		Файл не существует
 Stop	ExpanderMenu		Остановить
-\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tразработан Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nОригиналььная Be версия разработана\nDominic, Hiroshi, Peter, Pavel and Robert\n
 File	ExpanderMenu		Файл
 Expand	ExpanderWindow		Извлечь
 Close	ExpanderMenu		Закрыть
 The destination is not a folder.	ExpanderWindow		Указанный объет не является папкой.
-Expander	About		Expander
 About Expander…	ExpanderMenu		О программе…
 OK	About		Oк
 Set source…	ExpanderMenu		Выбрать источник…
@@ -37,3 +34,6 @@ Select '%s'	DirectoryFilePanel		Выбрать '%s'
 Show contents	ExpanderMenu		Показать содержимое
 Stop	ExpanderWindow		Остановить
 Destination	ExpanderWindow		Назначение
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tразработан Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nОригиналььная Be версия разработана\nDominic, Hiroshi, Peter, Pavel and Robert\n
+Expander	About		Expander
+is not supported	ExpanderWindow		не поддерживается
