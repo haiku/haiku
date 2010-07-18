@@ -134,6 +134,9 @@ function Exit()
 function InstallOptionalHaikuImagePackage()
 {
 	# InstallOptionalHaikuImagePackage package : url : dirTokens : isCDPackage
+	# 	: isGCCAgnostic
+	# TODO add support for isGCCAgnostic
+
 	# Wrapper for Jam rule
 	echo "Installing \$1 ..."
 	cd \$tmpDir
@@ -384,24 +387,31 @@ function GetBuildFile()
 
 function DetectSystemConfiguration()
 {
-	# Determine which GCC we're running and if we're a hybrid
-	if [ -d "$libDir"/gcc4 ] ; then
-		HAIKU_GCC_VERSION[1]=2
-		isHybridBuild=1
-	elif [ -d "$libDir"/gcc2 ] ; then
+
+	# Determine which GCC we're running
+	if [ -f "$libDir"/libsupc++.so ] ; then
 		HAIKU_GCC_VERSION[1]=4
-		isHybridBuild=1
-	elif [ -f "$libDir"/libsupc++.so ] ; then
-		HAIKU_GCC_VERSION[1]=4
-		isHybridBuild=""
 	else
 		HAIKU_GCC_VERSION[1]=2
+	fi
+
+	# Test for hybrid
+	if [ -d "$libDir"/gcc4 -a -d "$libDir"/gcc2 ]; then
+		echo "Sorry, but your build appears to be broken ..."
+		echo "Both gcc2 and gcc4 subdirs exist."
+		exit 1
+	elif [ -d "$libDir"/gcc4 -o -d "$libDir"/gcc2 ]; then
+		isHybridBuild=1
+	else
 		isHybridBuild=""
 	fi
 
 	# Determine the Architecture.
 	if [ `uname -m` == "BePC" ] ; then
 		TARGET_ARCH='x86'
+	else
+		echo "Sorry, x86 only for now."
+		exit 1
 	fi
 }
 
