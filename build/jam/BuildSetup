@@ -1183,6 +1183,9 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src kits storage ;
 	EnableWerror src kits support ;
 	EnableWerror src kits translation ;
+	EnableWerror src servers midi ;
+	EnableWerror src servers print ;
+	EnableWerror src servers registrar ;
 	EnableWerror src system kernel ;
 	EnableWerror src system runtime_loader ;
 }
