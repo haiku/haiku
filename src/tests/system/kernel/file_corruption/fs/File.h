@@ -28,7 +28,8 @@ public:
 	virtual	status_t			Read(off_t pos, void* buffer, size_t size,
 									size_t& _bytesRead);
 	virtual	status_t			Write(off_t pos, const void* buffer,
-									size_t size, size_t& _bytesWritten);
+									size_t size, size_t& _bytesWritten,
+									bool& _sizeChanged);
 	virtual	status_t			Sync();
 
 	virtual	void				RevertNodeData(const checksumfs_node& nodeData);

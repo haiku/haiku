@@ -99,7 +99,8 @@ Node::Read(off_t pos, void* buffer, size_t size, size_t& _bytesRead)
 
 
 status_t
-Node::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten)
+Node::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten,
+	bool& _sizeChanged)
 {
 	RETURN_ERROR(B_BAD_VALUE);
 }

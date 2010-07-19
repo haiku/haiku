@@ -169,8 +169,11 @@ File::Read(off_t pos, void* buffer, size_t size, size_t& _bytesRead)
 
 
 status_t
-File::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten)
+File::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten,
+	bool& _sizeChanged)
 {
+	_sizeChanged = false;
+
 	if (size == 0) {
 		_bytesWritten = 0;
 		return B_OK;
@@ -208,6 +211,8 @@ File::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten)
 		error = transaction.Commit();
 		if (error != B_OK)
 			RETURN_ERROR(error);
+
+		_sizeChanged = true;
 	}
 
 	// now the file has the right size -- do the write

@@ -13,6 +13,7 @@
 #include "Node.h"
 
 
+class PostCommitNotification;
 class Volume;
 
 
@@ -32,7 +33,11 @@ public:
 
 			status_t			Start();
 			status_t			StartAndAddNode(Node* node, uint32 flags = 0);
-			status_t			Commit();
+			status_t			Commit(
+									const PostCommitNotification* notification
+										= NULL);
+	inline	status_t			Commit(
+									const PostCommitNotification& notification);
 			void				Abort();
 
 			status_t			AddNode(Node* node, uint32 flags = 0);
@@ -59,6 +64,24 @@ private:
 			int32				fID;
 			NodeInfoList		fNodeInfos;
 			uint64				fOldFreeBlockCount;
+};
+
+
+status_t
+Transaction::Commit(const PostCommitNotification& notification)
+{
+	return Commit(&notification);
+}
+
+
+// #pragma mark -
+
+
+class PostCommitNotification {
+public:
+	virtual						~PostCommitNotification();
+
+	virtual	void				NotifyPostCommit() const = 0;
 };
 
 

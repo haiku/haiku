@@ -71,7 +71,7 @@ Transaction::StartAndAddNode(Node* node, uint32 flags = 0)
 
 
 status_t
-Transaction::Commit()
+Transaction::Commit(const PostCommitNotification* notification)
 {
 	ASSERT(fID >= 0);
 
@@ -92,6 +92,10 @@ Transaction::Commit()
 		Abort();
 		return error;
 	}
+
+	// send notifications
+	if (notification != NULL)
+		notification->NotifyPostCommit();
 
 	// clean up
 	_DeleteNodeInfosAndUnlock(false);
@@ -205,4 +209,13 @@ Transaction::_DeleteNodeInfosAndUnlock(bool failed)
 			info->node->WriteUnlock();
 		delete info;
 	}
+}
+
+
+
+// #pragma mark - PostCommitNotification
+
+
+PostCommitNotification::~PostCommitNotification()
+{
 }

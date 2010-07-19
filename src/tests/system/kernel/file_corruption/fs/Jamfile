@@ -22,6 +22,7 @@ HAIKU_CHECKSUM_FS_SOURCES =
 	Directory.cpp
 	File.cpp
 	Node.cpp
+	Notifications.cpp
 	SuperBlock.cpp
 	SymLink.cpp
 	Transaction.cpp

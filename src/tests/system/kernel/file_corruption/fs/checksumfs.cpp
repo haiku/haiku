@@ -19,12 +19,14 @@
 #include <AutoLocker.h>
 
 #include <debug.h>
+#include <util/AutoLock.h>
 
 #include "checksumfs.h"
 #include "checksumfs_private.h"
 #include "DebugSupport.h"
 #include "Directory.h"
 #include "File.h"
+#include "Notifications.h"
 #include "SuperBlock.h"
 #include "SymLink.h"
 #include "Transaction.h"
@@ -35,17 +37,99 @@ static const char* const kCheckSumFSModuleName	= "file_systems/checksumfs"
 	B_CURRENT_FS_API_VERSION;
 static const char* const kCheckSumFSShortName	= "checksumfs";
 
+static const bigtime_t kModifiedInterimUpdateInterval = 500000;
+	// wait at least 0.5s between interim modified updates
+
 
 // #pragma mark -
 
 
 struct FileCookie {
-	int	openMode;
+	mutex		lock;
+	int			openMode;
+	bigtime_t	lastModifiedUpdate;
+	bool		modifiedNeedsUpdate;
+	bool		sizeChangedSinceUpdate;
+	bool		modifiedNeedsFinalUpdate;
+	bool		finalSizeChanged;
+
 
 	FileCookie(int openMode)
 		:
-		openMode(openMode)
+		openMode(openMode),
+		lastModifiedUpdate(0),
+		modifiedNeedsUpdate(false),
+		sizeChangedSinceUpdate(false),
+		modifiedNeedsFinalUpdate(false),
+		finalSizeChanged(false)
 	{
+		mutex_init(&lock, "checksumfs file cookie");
+	}
+
+	~FileCookie()
+	{
+		mutex_destroy(&lock);
+	}
+
+	status_t UpdateModifiedIfNecessary(Node* node, bool finalUpdate)
+	{
+		MutexLocker locker(lock);
+
+		return _UpdateModifiedIfNecessary(node, finalUpdate);
+	}
+
+	status_t FileModified(Node* node, bool sizeChanged)
+	{
+		MutexLocker locker(lock);
+
+		modifiedNeedsUpdate = true;
+		modifiedNeedsFinalUpdate = true;
+		sizeChangedSinceUpdate |= sizeChanged;
+		finalSizeChanged |= sizeChanged;
+
+		return _UpdateModifiedIfNecessary(node, false);
+	}
+
+private:
+	status_t _UpdateModifiedIfNecessary(Node* node, bool finalUpdate)
+	{
+		uint32 statFlags = B_STAT_MODIFICATION_TIME | B_STAT_CHANGE_TIME;
+
+		if (finalUpdate) {
+			if (!modifiedNeedsFinalUpdate)
+				return B_OK;
+			if (finalSizeChanged)
+				statFlags |= B_STAT_SIZE;
+		} else {
+			if (!modifiedNeedsUpdate)
+				return B_OK;
+
+			if (system_time()
+					< lastModifiedUpdate + kModifiedInterimUpdateInterval) {
+				// not enough time passed -- postpone update
+   				return B_OK;
+			}
+
+			statFlags |= B_STAT_INTERIM_UPDATE
+				| (sizeChangedSinceUpdate ? B_STAT_SIZE : 0);
+		}
+
+		// do the update -- start a transaction, lock the node, and update
+		Transaction transaction(node->GetVolume());
+		status_t error = transaction.StartAndAddNode(node);
+		if (error != B_OK)
+			return error;
+
+		node->Touched(NODE_MODIFIED);
+
+		error = transaction.Commit(StatChangedNotification(node, statFlags));
+		if (error != B_OK)
+			return error;
+
+		modifiedNeedsUpdate = false;
+		lastModifiedUpdate = system_time();
+
+		return B_OK;
 	}
 };
 
@@ -308,7 +392,8 @@ remove_entry(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 	}
 
 	// commit the transaction
-	return transaction.Commit();
+	return transaction.Commit(EntryRemovedNotification(directory, name,
+		childNode));
 }
 
 
@@ -723,7 +808,8 @@ checksumfs_create_symlink(fs_volume* fsVolume, fs_vnode* parent,
 	directory->Touched(NODE_MODIFIED);
 
 	// commit the transaction
-	return transaction.Commit();
+	return transaction.Commit(EntryCreatedNotification(directory, name,
+		newSymLink));
 }
 
 
@@ -773,7 +859,7 @@ checksumfs_link(fs_volume* fsVolume, fs_vnode* dir, const char* name,
 	directory->Touched(NODE_MODIFIED);
 
 	// commit the transaction
-	return transaction.Commit();
+	return transaction.Commit(EntryCreatedNotification(directory, name, node));
 }
 
 
@@ -896,7 +982,8 @@ checksumfs_rename(fs_volume* fsVolume, fs_vnode* fromDir, const char* fromName,
 	toDirectory->Touched(NODE_MODIFIED);
 
 	// commit the transaction
-	return transaction.Commit();
+	return transaction.Commit(EntryMovedNotification(fromDirectory, fromName,
+		toDirectory, toName, node));
 }
 
 
@@ -1027,7 +1114,7 @@ checksumfs_write_stat(fs_volume* fsVolume, fs_vnode* vnode,
 		node->Touched(NODE_ACCESSED);
 
 	// commit the transaction
-	return transaction.Commit();
+	return transaction.Commit(StatChangedNotification(node, statMask));
 }
 
 
@@ -1231,7 +1318,8 @@ checksumfs_create(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 	transaction.KeepNode(newFile);
 
 	// commit the transaction
-	error = transaction.Commit();
+	error = transaction.Commit(EntryCreatedNotification(directory, name,
+		newFile));
 	if (error != B_OK) {
 		volume->RemoveNode(newFile);
 		delete newFile;
@@ -1281,6 +1369,10 @@ static status_t
 checksumfs_free_cookie(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie)
 {
 	FileCookie* cookie = (FileCookie*)_cookie;
+	Node* node = (Node*)vnode->private_node;
+
+	cookie->UpdateModifiedIfNecessary(node, true);
+
 	delete cookie;
 	return B_OK;
 }
@@ -1330,8 +1422,16 @@ checksumfs_write(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie, off_t pos,
 			// special value handled by Write()
 	}
 
-	RETURN_ERROR(node->Write(pos, buffer, *_length, *_length));
-// TODO: Modification time update!
+	bool sizeChanged;
+	status_t error = node->Write(pos, buffer, *_length, *_length, sizeChanged);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// update the modification time and send out a notification from time to
+	// time
+	cookie->FileModified(node, sizeChanged);
+
+	return B_OK;
 }
 
 
@@ -1384,7 +1484,8 @@ checksumfs_create_dir(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 	directory->Touched(NODE_MODIFIED);
 
 	// commit the transaction
-	return transaction.Commit();
+	return transaction.Commit(EntryCreatedNotification(directory, name,
+		newDirectory));
 }
 
 
