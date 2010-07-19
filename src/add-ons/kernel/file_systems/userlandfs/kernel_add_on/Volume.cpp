@@ -1749,6 +1749,7 @@ status_t
 Volume::Link(void* _dir, const char* name, void* node)
 {
 	VNode* vnode = (VNode*)_dir;
+	VNode* targetVnode = (VNode*)node;
 
 	// check capability
 	if (!HasVNodeCapability(vnode, FS_VNODE_CAPABILITY_LINK))
@@ -1770,7 +1771,7 @@ Volume::Link(void* _dir, const char* name, void* node)
 	request->volume = fUserlandVolume;
 	request->node = vnode->clientNode;
 	error = allocator.AllocateString(request->name, name);
-	request->target = node;
+	request->target = targetVnode->clientNode;
 	if (error != B_OK)
 		return error;
 
