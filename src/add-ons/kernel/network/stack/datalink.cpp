@@ -717,6 +717,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 				}
 
 				add_default_routes(interface, option);
+				notify_interface_changed(interface);
 			}
 
 			return address != NULL ? B_OK : B_NO_MEMORY;
@@ -811,6 +812,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 				return B_BAD_VALUE;
 
 			interface->mtu = request.ifr_mtu;
+			notify_interface_changed(interface);
 			return B_OK;
 		}
 
@@ -851,6 +853,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 				return B_BAD_ADDRESS;
 
 			interface->metric = request.ifr_metric;
+			notify_interface_changed(interface);
 			return B_OK;
 		}
 

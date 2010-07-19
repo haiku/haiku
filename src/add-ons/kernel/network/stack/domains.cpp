@@ -271,11 +271,12 @@ domain_interface_control(net_domain_private* domain, int32 option,
 
 			case SIOCSIFFLAGS:
 			{
+				uint32 oldFlags = interface->flags;
 				uint32 requestFlags = request->ifr_flags;
 				request->ifr_flags &= ~(IFF_UP | IFF_LINK | IFF_BROADCAST);
 
 				if ((requestFlags & IFF_UP) != (interface->flags & IFF_UP)) {
-					if (requestFlags & IFF_UP) {
+					if ((requestFlags & IFF_UP) != 0) {
 						status = interface->first_info->interface_up(
 							interface->first_protocol);
 						if (status == B_OK)
@@ -289,6 +290,11 @@ domain_interface_control(net_domain_private* domain, int32 option,
 					// TODO: why shouldn't we able to delete IFF_BROADCAST?
 					interface->flags &= IFF_UP | IFF_LINK | IFF_BROADCAST;
 					interface->flags |= request->ifr_flags;
+				}
+				
+				if (oldFlags != interface->flags) {
+					notify_interface_changed(interface, oldFlags,
+						interface->flags);
 				}
 				break;
 			}

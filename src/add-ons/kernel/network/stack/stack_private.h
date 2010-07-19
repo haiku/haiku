@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,12 +36,14 @@ status_t put_domain_datalink_protocols(net_interface *interface);
 // notifications.cpp
 status_t notify_interface_added(net_interface* interface);
 status_t notify_interface_removed(net_interface* interface);
-status_t notify_interface_changed(net_interface* interface);
+status_t notify_interface_changed(net_interface* interface, uint32 oldFlags = 0,
+	uint32 newFlags = 0);
 status_t notify_link_changed(net_device* device);
 status_t init_notifications();
 void uninit_notifications();
 
 status_t init_stack();
 status_t uninit_stack();
+
 
 #endif	// STACK_PRIVATE_H

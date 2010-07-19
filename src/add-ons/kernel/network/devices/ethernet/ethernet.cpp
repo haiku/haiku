@@ -326,6 +326,7 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 		status = bytesRead;
 		goto err;
 	}
+//dump_block((const char *)data, bytesRead, "rcv: ");
 
 	status = gBufferModule->trim(buffer, bytesRead);
 	if (status < B_OK) {

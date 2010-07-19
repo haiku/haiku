@@ -1,13 +1,15 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
 
 /*! Provides the stack internal notification API.
 
 	The actual message sending happens in another module to make the
 	notification listeners independent from the stack status.
 */
+
 
 #include <net_device.h>
 #include <net_notifications.h>
@@ -53,7 +55,8 @@ notify_interface_removed(net_interface* interface)
 
 
 status_t
-notify_interface_changed(net_interface* interface)
+notify_interface_changed(net_interface* interface, uint32 oldFlags,
+	uint32 newFlags)
 {
 	if (sNotificationModule == NULL)
 		return B_NOT_SUPPORTED;
@@ -63,6 +66,10 @@ notify_interface_changed(net_interface* interface)
 	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
 	message.AddInt32("opcode", B_NETWORK_INTERFACE_CHANGED);
 	message.AddString("interface", interface->name);
+	if (oldFlags != newFlags) {
+		message.AddInt32("old flags", oldFlags);
+		message.AddInt32("new flags", newFlags);
+	}
 
 	return sNotificationModule->send_notification(&message);
 }
