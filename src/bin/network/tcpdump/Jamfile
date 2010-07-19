@@ -4,7 +4,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 UseHeaders [ FDirName $(SUBDIR) libpcap ] : true ;
 
-local defines = [ FDefines HAVE_CONFIG_H=1 _U_=\"__attribute__((unused))\" ] ;
+local defines = [ FDefines HAVE_CONFIG_H=1 _U_=\"__attribute__((unused))\" INET6=1 HAVE_SOCKADDR_STORAGE=1 ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;
@@ -39,7 +39,7 @@ BinCommand tcpdump :
 	print-cnfp.c
 	print-dccp.c
 	print-decnet.c
-	#print-dhcp6.c
+	print-dhcp6.c
 	print-domain.c
 	print-dvmrp.c
 	print-eap.c
@@ -50,16 +50,16 @@ BinCommand tcpdump :
 	print-ether.c
 	print-fddi.c
 	print-fr.c
-	#print-frag6.c
+	print-frag6.c
 	print-gre.c
 	print-hsrp.c
 	print-icmp.c
-	#print-icmp6.c
+	print-icmp6.c
 	print-igmp.c
 	print-igrp.c
 	print-ip.c
-	#print-ip6.c
-	#print-ip6opts.c
+	print-ip6.c
+	print-ip6opts.c
 	print-ipcomp.c
 	print-ipfc.c
 	print-ipx.c
@@ -83,7 +83,7 @@ BinCommand tcpdump :
 	print-ntp.c
 	print-null.c
 	print-ospf.c
-	#print-ospf6.c
+	print-ospf6.c
 	print-pflog.c
 	print-pgm.c
 	print-pim.c
@@ -95,7 +95,7 @@ BinCommand tcpdump :
 	print-rip.c
 	print-ripng.c
 	print-rsvp.c
-	#print-rt6.c
+	print-rt6.c
 	print-rx.c
 	print-sctp.c
 	print-sip.c

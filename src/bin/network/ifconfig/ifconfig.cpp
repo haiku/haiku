@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Oliver Tappe, zooey@hirschkaefer.de
+ *		Atis Elsts, the.kfx@gmail.com
  */
 
 
@@ -33,28 +34,80 @@ extern const char* __progname;
 const char* kProgramName = __progname;
 
 
+enum preferred_output_format {
+	PREFER_OUTPUT_MASK,
+	PREFER_OUTPUT_PREFIX_LENGTH,
+};
+
+
 struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
+	preferred_output_format	preferred_format;
 	bool		(*parse_address)(const char* string, sockaddr* _address);
+	bool		(*prefix_length_to_mask)(uint8 prefixLength, sockaddr* mask);
+	uint8		(*mask_to_prefix_length)(sockaddr* mask);
 	void		(*print_address)(sockaddr* address);
 };
 
+
+bool initialize_address_families();
+
 // AF_INET family
 static bool inet_parse_address(const char* string, sockaddr* address);
+static bool inet_prefix_length_to_mask(uint8 prefixLength, sockaddr* mask);
+static uint8 inet_mask_to_prefix_length(sockaddr* mask);
 static void inet_print_address(sockaddr* address);
+
+// AF_INET6 family
+static bool inet6_parse_address(const char* string, sockaddr* address);
+static bool inet6_prefix_length_to_mask(uint8 prefixLength, sockaddr* mask);
+static uint8 inet6_mask_to_prefix_length(sockaddr* mask);
+static void inet6_print_address(sockaddr* address);
 
 static const address_family kFamilies[] = {
 	{
 		AF_INET,
 		"inet",
 		{"AF_INET", "inet", "ipv4", NULL},
+		PREFER_OUTPUT_MASK,
 		inet_parse_address,
+		inet_prefix_length_to_mask,
+		inet_mask_to_prefix_length,
 		inet_print_address
 	},
-	{ -1, NULL, {NULL}, NULL, NULL }
+	{
+		AF_INET6,
+		"inet6",
+		{"AF_INET6", "inet6", "ipv6", NULL},
+		PREFER_OUTPUT_PREFIX_LENGTH,
+		inet6_parse_address,
+		inet6_prefix_length_to_mask,
+		inet6_mask_to_prefix_length,
+		inet6_print_address
+	},
+	{ -1, NULL, {NULL}, PREFER_OUTPUT_MASK, NULL, NULL, NULL, NULL }
 };
+
+
+static int sAddressFamilySockets[sizeof(kFamilies) / sizeof(kFamilies[0])];
+
+
+bool
+initialize_address_families()
+{
+	bool ok = false;
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		int fd = socket(kFamilies[i].family, SOCK_DGRAM, 0);
+		if (fd != -1) {
+			sAddressFamilySockets[i] = fd;
+			ok = true;
+		}
+	}
+	return ok;
+}
+
 
 
 static bool
@@ -65,9 +118,9 @@ inet_parse_address(const char* string, sockaddr* _address)
 	if (inet_aton(string, &inetAddress) != 1)
 		return false;
 
-	sockaddr_in& address = *(sockaddr_in *)_address;
+	sockaddr_in& address = *(sockaddr_in*)_address;
 	address.sin_family = AF_INET;
-	address.sin_len = sizeof(struct sockaddr_in);
+	address.sin_len = sizeof(sockaddr_in);
 	address.sin_port = 0;
 	address.sin_addr = inetAddress;
 	memset(&address.sin_zero[0], 0, sizeof(address.sin_zero));
@@ -76,15 +129,139 @@ inet_parse_address(const char* string, sockaddr* _address)
 }
 
 
+static bool
+inet_prefix_length_to_mask(uint8 prefixLength, sockaddr* _mask)
+{
+	if (prefixLength > 32)
+		return false;
+
+	sockaddr_in& mask = *(sockaddr_in*)_mask;
+	mask.sin_family = AF_INET;
+	mask.sin_len = sizeof(sockaddr_in);
+	mask.sin_port = 0;
+	memset(&mask.sin_zero[0], 0, sizeof(mask.sin_zero));
+
+	uint32 hostMask = 0;
+	for (uint8 i = 32; i > 32 - prefixLength; i--)
+		hostMask |= 1 << (i - 1);
+	mask.sin_addr.s_addr = htonl(hostMask);
+
+	return true;
+}
+
+
+static uint8
+inet_mask_to_prefix_length(sockaddr* _mask)
+{
+	sockaddr_in& mask = *(sockaddr_in*)_mask;
+	if (mask.sin_family != AF_INET)
+		return (uint8)-1;
+
+	uint8 result = 0;
+	uint32 hostMask = ntohl(mask.sin_addr.s_addr);
+	for (uint8 i = 32; i > 0; i--) {
+		if (hostMask & (1 << (i - 1)) == 0)
+			break;
+		result++;
+	}
+
+	return result;
+}
+
+
 static void
 inet_print_address(sockaddr* _address)
 {
-	sockaddr_in& address = *(sockaddr_in *)_address;
+	sockaddr_in& address = *(sockaddr_in*)_address;
 
 	if (address.sin_family != AF_INET)
 		return;
 
 	printf("%s", inet_ntoa(address.sin_addr));
+}
+
+
+static bool
+inet6_parse_address(const char* string, sockaddr* _address)
+{
+	sockaddr_in6& address = *(sockaddr_in6*)_address;
+
+	if (inet_pton(AF_INET6, string, &address.sin6_addr) != 1)
+		return false;
+
+	address.sin6_family = AF_INET6;
+	address.sin6_len = sizeof(sockaddr_in6);
+	address.sin6_port = 0;
+	address.sin6_flowinfo = 0;
+	address.sin6_scope_id = 0;
+
+	return true;
+}
+
+
+static bool
+inet6_prefix_length_to_mask(uint8 prefixLength, sockaddr* _mask)
+{
+	if (prefixLength > 128)
+		return false;
+
+	sockaddr_in6& mask = *(sockaddr_in6*)_mask;
+	mask.sin6_family = AF_INET6;
+	mask.sin6_len = sizeof(sockaddr_in6);
+	mask.sin6_port = 0;
+	mask.sin6_flowinfo = 0;
+	mask.sin6_scope_id = 0;
+	memset(mask.sin6_addr.s6_addr, 0, sizeof(in6_addr));
+
+	for (uint8 i = 0; i < sizeof(in6_addr); i++, prefixLength -= 8) {
+		if (prefixLength < 8) {
+			const uint8 masks[] = {
+				0x00, 0x80, 0xc0, 0xe0,
+				0xf0, 0xf8, 0xfc, 0xfe
+			};
+			mask.sin6_addr.s6_addr[i] = masks[prefixLength];
+			break;
+		}
+
+		mask.sin6_addr.s6_addr[i] = 0xff;
+	}
+
+	return true;
+}
+
+
+static uint8
+inet6_mask_to_prefix_length(sockaddr* _mask)
+{
+	sockaddr_in6& mask = *(sockaddr_in6*)_mask;
+	if (mask.sin6_family != AF_INET6)
+		return (uint8)~0;
+
+	uint8 result = 0;
+	for (uint8 i = 0; i < sizeof(in6_addr); i++) {
+		for (uint8 j = 0; j < 8; j++) {
+			if (!(mask.sin6_addr.s6_addr[i] & (1 << j)))
+				return result;
+			result++;
+		}
+	}
+
+	return 128;
+}
+
+
+static void
+inet6_print_address(sockaddr* _address)
+{
+	sockaddr_in6& address = *(sockaddr_in6*)_address;
+
+	if (address.sin6_family != AF_INET6)
+		return;
+
+	char buffer[INET6_ADDRSTRLEN];
+
+	printf("%s",
+		inet_ntop(AF_INET6, &address.sin6_addr, buffer, sizeof(buffer)));
 }
 
 
@@ -181,12 +358,13 @@ usage(int status)
 			"auto-config] [<option/flags>...]]\n"
 		"\t%s --delete interface [...]\n\n"
 		"Where <option> can be the following:\n"
-		"  netmask <addr>   - networking subnet mask\n"
-		"  broadcast <addr> - set broadcast address\n"
-		"  peer <addr>      - ppp-peer address\n"
-		"  mtu <bytes>      - maximal transfer unit\n"
-		"  metric <number>  - metric number to use (defaults to 0)\n"
-		"  media <media>    - media type to use (defaults to auto)\n",
+		"  netmask <addr>     - networking subnet mask\n"
+		"  prefixlen <number> - subnet mask length in bits\n"
+		"  broadcast <addr>   - set broadcast address\n"
+		"  peer <addr>        - ppp-peer address\n"
+		"  mtu <bytes>        - maximal transfer unit\n"
+		"  metric <number>    - metric number to use (defaults to 0)\n"
+		"  media <media>      - media type to use (defaults to auto)\n",
 		kProgramName, kProgramName);
 	for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
 		printf("For %s <media> can be one of: ", kMediaTypes[i].pretty);
@@ -210,8 +388,8 @@ bool
 prepare_request(struct ifreq& request, const char* name)
 {
 	if (strlen(name) > IF_NAMESIZE) {
-		fprintf(stderr, "%s: interface name \"%s\" is too long.\n", kProgramName,
-			name);
+		fprintf(stderr, "%s: interface name \"%s\" is too long.\n",
+			kProgramName, name);
 		return false;
 	}
 
@@ -249,21 +427,102 @@ parse_address(int32 familyIndex, const char* argument, struct sockaddr& address)
 }
 
 
+bool
+prefix_length_to_mask(int32 familyIndex, const char* argument,
+	struct sockaddr& mask)
+{
+	if (argument == NULL)
+		return false;
+
+	char *end;
+	uint32 prefixLength = strtoul(argument, &end, 10);
+	if (end == argument)
+		return false;
+
+	return kFamilies[familyIndex].prefix_length_to_mask(
+		(uint8)prefixLength, &mask);
+}
+
+
 //	#pragma mark -
 
 
+int
+find_socket(struct ifreq& request, int addressFamily)
+{
+	int socket = -1;
+	bool socketExists = false;
+	bool ok = false;
+
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		if (addressFamily != -1 && addressFamily != kFamilies[i].family)
+			continue;
+
+		socket = sAddressFamilySockets[i];
+		if (socket == -1)
+			continue;
+
+		socketExists = true;
+
+		if (ioctl(socket, SIOCGIFINDEX, &request, sizeof(request)) >= 0) {
+			ok = true;
+			break;
+		}
+	}
+
+	if (socketExists && !ok) {
+		fprintf(stderr, "%s: Interface \"%s\" does not exist.\n",
+			kProgramName, request.ifr_name);
+		return -1;
+	}
+
+	return socket;
+}
+
+
 void
-list_interface(int socket, const char* name)
+list_interface_address(int socket, const address_family* family,
+	uint32 flags, ifreq* request)
+{
+	if (ioctl(socket, SIOCGIFADDR, request, sizeof(struct ifreq)) < 0)
+		return;
+
+	printf("\t%s addr: ", family->name);
+	family->print_address(&request->ifr_addr);
+
+	if ((flags & IFF_BROADCAST) != 0
+		&& ioctl(socket, SIOCGIFBRDADDR, request, sizeof(struct ifreq)) == 0
+		&& request->ifr_broadaddr.sa_family == family->family) {
+		printf(", Bcast: ");
+		family->print_address(&request->ifr_broadaddr);
+	}
+	if (ioctl(socket, SIOCGIFNETMASK, request, sizeof(struct ifreq)) == 0
+		&& request->ifr_mask.sa_family == family->family) {
+		switch (family->preferred_format) {
+			case PREFER_OUTPUT_MASK:
+				printf(", Mask: ");
+				family->print_address(&request->ifr_mask);
+				break;
+			case PREFER_OUTPUT_PREFIX_LENGTH:
+				printf(", Prefix Length: %u",
+					family->mask_to_prefix_length(&request->ifr_mask));
+				break;
+		}
+	}
+	putchar('\n');
+}
+
+
+bool
+list_interface(const char* name, int addressFamily)
 {
 	ifreq request;
 	if (!prepare_request(request, name))
-		return;
+		return true;
 
-	if (ioctl(socket, SIOCGIFINDEX, &request, sizeof(request)) < 0) {
-		fprintf(stderr, "%s: Interface \"%s\" does not exist.\n", kProgramName,
-			name);
-		return;
-	}
+	int socket = find_socket(request, addressFamily);
+	if (socket == -1)
+		return false;
 
 	printf("%s", name);
 	size_t length = strlen(name);
@@ -286,7 +545,7 @@ list_interface(int socket, const char* name)
 			prepare_request(request, request.ifr_parameter.device);
 			if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq))
 					== 0) {
-				sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
+				sockaddr_dl &link = *(sockaddr_dl*)&request.ifr_addr;
 
 				switch (link.sdl_type) {
 					case IFT_ETHER:
@@ -294,7 +553,7 @@ list_interface(int socket, const char* name)
 						type = "Ethernet";
 
 						if (link.sdl_alen > 0) {
-							uint8 *mac = (uint8 *)LLADDR(&link);
+							uint8 *mac = (uint8*)LLADDR(&link);
 							sprintf(address, "%02x:%02x:%02x:%02x:%02x:%02x",
 								mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 						} else
@@ -348,29 +607,11 @@ list_interface(int socket, const char* name)
 		flags = request.ifr_flags;
 
 	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-		int familySocket = ::socket(kFamilies[i].family, SOCK_DGRAM, 0);
-		if (familySocket < 0)
-			continue;
-
-		if (ioctl(familySocket, SIOCGIFADDR, &request, sizeof(struct ifreq)) == 0) {
-			printf("\t%s addr: ", kFamilies[i].name);
-			kFamilies[i].print_address(&request.ifr_addr);
-
-			if ((flags & IFF_BROADCAST) != 0
-				&& ioctl(familySocket, SIOCGIFBRDADDR, &request, sizeof(struct ifreq)) == 0
-				&& request.ifr_broadaddr.sa_family == kFamilies[i].family) {
-				printf(", Bcast: ");
-				kFamilies[i].print_address(&request.ifr_broadaddr);
-			}
-			if (ioctl(familySocket, SIOCGIFNETMASK, &request, sizeof(struct ifreq)) == 0
-				&& request.ifr_mask.sa_family == kFamilies[i].family) {
-				printf(", Mask: ");
-				kFamilies[i].print_address(&request.ifr_mask);
-			}
-			putchar('\n');
+		int familySocket = sAddressFamilySockets[i];
+		if (familySocket != -1) {
+			list_interface_address(familySocket, &kFamilies[i],
+				flags, &request);
 		}
-
-		close(familySocket);
 	}
 
 	// Print MTU, metric, flags
@@ -434,18 +675,21 @@ list_interface(int socket, const char* name)
 	}
 
 	putchar('\n');
+	return true;
 }
 
 
 void
-list_interfaces(int socket, const char* name)
+list_interfaces(const char* name)
 {
 	if (name != NULL) {
-		list_interface(socket, name);
+		list_interface(name, -1);
 		return;
 	}
 
 	// get a list of all interfaces
+
+	int socket = sAddressFamilySockets[0];
 
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
@@ -469,12 +713,13 @@ list_interfaces(int socket, const char* name)
 	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
 		return;
 
-	ifreq *interface = (ifreq *)buffer;
+	ifreq* interface = (ifreq*)buffer;
 
 	for (uint32 i = 0; i < count; i++) {
-		list_interface(socket, interface->ifr_name);
+		list_interface(interface->ifr_name, interface->ifr_addr.sa_family);
 
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE + interface->ifr_addr.sa_len);
+		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE
+			+ interface->ifr_addr.sa_len);
 	}
 
 	free(buffer);
@@ -482,10 +727,14 @@ list_interfaces(int socket, const char* name)
 
 
 void
-delete_interface(int socket, const char* name)
+delete_interface(const char* name)
 {
 	ifreq request;
 	if (!prepare_request(request, name))
+		return;
+
+	int socket = find_socket(request, -1);
+	if (socket == -1)
 		return;
 
 	if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
@@ -496,12 +745,26 @@ delete_interface(int socket, const char* name)
 
 
 void
-configure_interface(int socket, const char* name, char* const* args,
+configure_interface(const char* name, char* const* args,
 	int32 argCount)
 {
 	ifreq request;
 	if (!prepare_request(request, name))
 		return;
+
+	// try to parse address family
+
+	int32 familyIndex;
+	int32 i = 0;
+	if (get_address_family(args[i], familyIndex))
+		i++;
+
+	int socket = sAddressFamilySockets[familyIndex];
+	if (socket < 0) {
+		fprintf(stderr, "%s: Address family \"%s\" is not available.\n",
+			kProgramName, kFamilies[familyIndex].name);
+		exit(1);
+	}
 
 	uint32 index = 0;
 	if (ioctl(socket, SIOCGIFINDEX, &request, sizeof(request)) >= 0)
@@ -512,25 +775,6 @@ configure_interface(int socket, const char* name, char* const* args,
 	struct sockaddr address, mask, peer, broadcast;
 	int mtu = -1, metric = -1, media = -1;
 	int addFlags = 0, currentFlags = 0, removeFlags = 0;
-
-	// try to parse address family
-
-	int32 familyIndex;
-	int32 i = 0;
-	if (get_address_family(args[i], familyIndex))
-		i++;
-
-	if (kFamilies[familyIndex].family != AF_INET) {
-		close(socket);
-
-		// replace socket with one of the correct address family
-		socket = ::socket(kFamilies[familyIndex].family, SOCK_DGRAM, 0);
-		if (socket < 0) {
-			fprintf(stderr, "%s: Address family \"%s\" is not available.\n",
-				kProgramName, kFamilies[familyIndex].name);
-			exit(1);
-		}
-	}
 
 	if (index == 0) {
 		// the interface does not exist yet, we have to add it first
@@ -571,13 +815,27 @@ configure_interface(int socket, const char* name, char* const* args,
 			i++;
 		} else if (!strcmp(args[i], "nm") || !strcmp(args[i], "netmask")) {
 			if (hasMask) {
-				fprintf(stderr, "%s: Netmask is specified twice\n",
-					kProgramName);
+				fprintf(stderr, "%s: Netmask or prefix length is specified "
+					"twice\n", kProgramName);
 				exit(1);
 			}
 			if (!parse_address(familyIndex, args[i + 1], mask)) {
 				fprintf(stderr, "%s: Option 'netmask' needs valid address "
 					"parameter\n", kProgramName);
+				exit(1);
+			}
+			hasMask = true;
+			i++;
+		} else if (!strcmp(args[i], "prefixlen") 
+				|| !strcmp(args[i], "plen")) {
+			if (hasMask) {
+				fprintf(stderr, "%s: Netmask or prefix length is specified "
+					"twice\n", kProgramName);
+				exit(1);
+			}
+			if (!prefix_length_to_mask(familyIndex, args[i + 1], mask)) {
+				fprintf(stderr, "%s: Option 'prefixlen' is invalid for this "
+					"address family\n", kProgramName);
 				exit(1);
 			}
 			hasMask = true;
@@ -761,6 +1019,7 @@ configure_interface(int socket, const char* name, char* const* args,
 		BMessage message(kMsgConfigureInterface);
 		message.AddString("device", name);
 		BMessage address;
+		// TODO: this is not working for ipv6 yet
 		address.AddString("family", "inet");
 		address.AddBool("auto_config", true);
 		message.AddMessage("address", &address);
@@ -807,9 +1066,7 @@ main(int argc, char** argv)
 		deleteInterfaces = true;
 	}
 
-	// we need a socket to talk to the networking stack
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0) {
+	if (initialize_address_families() == false) {
 		fprintf(stderr, "%s: The networking stack doesn't seem to be "
 			"available.\n", kProgramName);
 		return 1;
@@ -817,7 +1074,7 @@ main(int argc, char** argv)
 
 	if (deleteInterfaces) {
 		for (int i = 2; i < argc; i++) {
-			delete_interface(socket, argv[i]);
+			delete_interface(argv[i]);
 		}
 		return 0;
 	} else if (argc > 1 && !strcmp(argv[1], "-a")) {
@@ -825,7 +1082,7 @@ main(int argc, char** argv)
 		if (argc > 2)
 			usage(1);
 
-		list_interfaces(socket, NULL);
+		list_interfaces(NULL);
 		return 0;
 	}
 
@@ -833,13 +1090,13 @@ main(int argc, char** argv)
 	if (argc > 2) {
 		// add or configure an interface
 
-		configure_interface(socket, name, argv + 2, argc - 2);
+		configure_interface(name, argv + 2, argc - 2);
 		return 0;
 	}
 
 	// list interfaces
 
-	list_interfaces(socket, name);
+	list_interfaces(name);
 	return 0;
 }
 

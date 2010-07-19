@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,27 +39,56 @@ enum modes {
 	RTM_FLUSH,
 };
 
+enum preferred_output_format {
+	PREFER_OUTPUT_MASK,
+	PREFER_OUTPUT_PREFIX_LENGTH,
+};
+
 struct address_family {
 	int			family;
 	const char*	name;
 	const char*	identifiers[4];
+	preferred_output_format	preferred_format;
 	bool		(*parse_address)(const char* string, sockaddr* _address);
+	bool		(*prefix_length_to_mask)(uint8 prefixLength, sockaddr* mask);
+	uint8		(*mask_to_prefix_length)(sockaddr* mask);
 	const char*	(*address_to_string)(sockaddr* address);
 };
 
 // AF_INET family
 static bool inet_parse_address(const char* string, sockaddr* address);
+static bool inet_prefix_length_to_mask(uint8 prefixLength, sockaddr* mask);
+static uint8 inet_mask_to_prefix_length(sockaddr* mask);
 static const char* inet_address_to_string(sockaddr* address);
+
+// AF_INET6 family
+static bool inet6_parse_address(const char* string, sockaddr* address);
+static bool inet6_prefix_length_to_mask(uint8 prefixLength, sockaddr* mask);
+static uint8 inet6_mask_to_prefix_length(sockaddr* mask);
+static const char* inet6_address_to_string(sockaddr* address);
 
 static const address_family kFamilies[] = {
 	{
 		AF_INET,
 		"inet",
 		{"AF_INET", "inet", "ipv4", NULL},
+		PREFER_OUTPUT_MASK,
 		inet_parse_address,
+		inet_prefix_length_to_mask,
+		inet_mask_to_prefix_length,
 		inet_address_to_string,
 	},
-	{ -1, NULL, {NULL}, NULL, NULL }
+	{
+		AF_INET6,
+		"inet6",
+		{"AF_INET6", "inet6", "ipv6", NULL},
+		PREFER_OUTPUT_PREFIX_LENGTH,
+		inet6_parse_address,
+		inet6_prefix_length_to_mask,
+		inet6_mask_to_prefix_length,
+		inet6_address_to_string,
+	},
+	{ -1, NULL, {NULL}, PREFER_OUTPUT_MASK, NULL, NULL, NULL, NULL }
 };
 
 
@@ -71,7 +100,7 @@ inet_parse_address(const char* string, sockaddr* _address)
 	if (inet_aton(string, &inetAddress) != 1)
 		return false;
 
-	sockaddr_in& address = *(sockaddr_in *)_address;
+	sockaddr_in& address = *(sockaddr_in*)_address;
 	address.sin_family = AF_INET; 
 	address.sin_len = sizeof(struct sockaddr_in);
 	address.sin_port = 0;
@@ -82,13 +111,143 @@ inet_parse_address(const char* string, sockaddr* _address)
 }
 
 
-static const char *
+static bool
+inet_prefix_length_to_mask(uint8 prefixLength, sockaddr* _mask)
+{
+	if (prefixLength > 32)
+		return false;
+
+	sockaddr_in& mask = *(sockaddr_in*)_mask;
+	mask.sin_family = AF_INET;
+        mask.sin_len = sizeof(sockaddr_in);
+	mask.sin_port = 0;
+	memset(&mask.sin_zero[0], 0, sizeof(mask.sin_zero));
+
+	uint32 hostMask = 0;
+	for (uint8 i = 32; i > 32 - prefixLength; i--)
+		hostMask |= 1 << (i - 1);
+	mask.sin_addr.s_addr = htonl(hostMask);
+
+	return true;
+}
+
+
+static uint8
+inet_mask_to_prefix_length(sockaddr* _mask)
+{
+	if (_mask == NULL)
+		return 32;
+
+	sockaddr_in& mask = *(sockaddr_in*)_mask;
+	if (mask.sin_family != AF_INET)
+	    return (uint8)-1;
+
+	uint8 result = 0;
+	uint32 hostMask = ntohl(mask.sin_addr.s_addr);
+	for (uint8 i = 32; i > 0; i--) {
+		if (hostMask & (1 << (i - 1)) == 0)
+			break;
+		result++;
+	}
+
+	return result;
+}
+
+
+static const char*
 inet_address_to_string(sockaddr* address)
 {
 	if (address == NULL || address->sa_family != AF_INET)
 		return "-";
 
-	return inet_ntoa(((sockaddr_in *)address)->sin_addr);
+	return inet_ntoa(((sockaddr_in*)address)->sin_addr);
+}
+
+
+static bool
+inet6_parse_address(const char* string, sockaddr* _address)
+{
+	sockaddr_in6& address = *(sockaddr_in6*)_address;
+
+	if (inet_pton(AF_INET6, string, &address.sin6_addr) != 1)
+		return false;
+
+	address.sin6_family = AF_INET6;
+	address.sin6_len = sizeof(sockaddr_in6);
+	address.sin6_port = 0;
+	address.sin6_flowinfo = 0;
+	address.sin6_scope_id = 0;
+
+	return true;
+}
+
+
+static bool
+inet6_prefix_length_to_mask(uint8 prefixLength, sockaddr* _mask)
+{
+	if (prefixLength > 128)
+		return false;
+
+	sockaddr_in6& mask = *(sockaddr_in6*)_mask;
+	mask.sin6_family = AF_INET6;
+	mask.sin6_len = sizeof(sockaddr_in6);
+	mask.sin6_port = 0;
+	mask.sin6_flowinfo = 0;
+	mask.sin6_scope_id = 0;
+	memset(mask.sin6_addr.s6_addr, 0, sizeof(in6_addr));
+
+	for (uint8 i = 0; i < sizeof(in6_addr); i++, prefixLength -= 8) {
+		if (prefixLength < 8) {
+			const uint8 masks[] = {
+				0x00, 0x80, 0xc0, 0xe0,
+				0xf0, 0xf8, 0xfc, 0xfe
+			};
+			mask.sin6_addr.s6_addr[i] = masks[prefixLength];
+			break;
+		}
+
+		mask.sin6_addr.s6_addr[i] = 0xff;
+	}
+
+	return true;
+}
+
+
+static uint8
+inet6_mask_to_prefix_length(sockaddr* _mask)
+{
+	if (_mask == NULL)
+		return 128;
+
+	sockaddr_in6& mask = *(sockaddr_in6*)_mask;
+	if (mask.sin6_family != AF_INET6)
+	    return (uint8)-1;
+
+	uint8 result = 0;
+	for (uint8 i = 0; i < sizeof(in6_addr); i++) {
+		for (uint8 j = 0; j < 8; j++) {
+			if (!(mask.sin6_addr.s6_addr[i] & (1 << j)))
+				return result;
+			result++;
+		}
+	}
+
+	return 128;
+}
+
+
+static const char*
+inet6_address_to_string(sockaddr* address)
+{
+	if (address == NULL || address->sa_family != AF_INET6)
+		return "-";
+
+	static char buffer[INET6_ADDRSTRLEN];
+
+	inet_ntop(AF_INET6, &((sockaddr_in6*)address)->sin6_addr,
+		buffer, sizeof(buffer));
+
+	return buffer;
 }
 
 
@@ -98,15 +257,17 @@ inet_address_to_string(sockaddr* address)
 void
 usage(int status)
 {
-	printf("usage: %s [command] [<interface>] [<address family>] <address|default> [<option/flags>...]\n"
+	printf("usage: %s [command] [<interface>] [<address family>] "
+			"<address|default> [<option/flags>...]\n"
 		"Where <command> can be the one of:\n"
-		"  add             - add a route for the specified interface\n"
-		"  delete          - deletes the specified route\n"
-		"  list            - list with filters [default]\n"
+		"  add                - add a route for the specified interface\n"
+		"  delete             - deletes the specified route\n"
+		"  list               - list with filters [default]\n"
 		"<option> can be the following:\n"
-		"  netmask <addr>  - networking subnet mask\n"
-		"  gw <addr>       - gateway address\n"
-		"  mtu <bytes>     - maximal transfer unit\n"
+		"  netmask <addr>     - networking subnet mask\n"
+		"  prefixlen <number> - subnet mask length in bits\n"
+		"  gw <addr>          - gateway address\n"
+		"  mtu <bytes>        - maximal transfer unit\n"
 		"And <flags> can be: reject, local, host\n\n"
 		"Example:\n"
 		"\t%s add /dev/net/ipro1000/0 default gw 192.168.0.254\n",
@@ -120,7 +281,8 @@ bool
 prepare_request(struct ifreq& request, const char* name)
 {
 	if (strlen(name) > IF_NAMESIZE) {
-		fprintf(stderr, "%s: interface name \"%s\" is too long.\n", kProgramName, name);
+		fprintf(stderr, "%s: interface name \"%s\" is too long.\n",
+			kProgramName, name);
 		return false;
 	}
 
@@ -149,12 +311,30 @@ get_address_family(const char* argument, int32& familyIndex)
 
 
 bool
-parse_address(int32 familyIndex, const char* argument, struct sockaddr_storage& address)
+parse_address(int32 familyIndex, const char* argument,
+	struct sockaddr_storage& address)
 {
 	if (argument == NULL)
 		return false;
 
-	return kFamilies[familyIndex].parse_address(argument, (sockaddr *)&address);
+	return kFamilies[familyIndex].parse_address(argument, (sockaddr*)&address);
+}
+
+
+bool
+prefix_length_to_mask(int32 familyIndex, const char* argument,
+	struct sockaddr_storage& mask)
+{
+	if (argument == NULL)
+		return false;
+
+	char *end;
+	uint32 prefixLength = strtoul(argument, &end, 10);
+	if (end == argument)
+		return false;
+
+	return kFamilies[familyIndex].prefix_length_to_mask(
+		(uint8)prefixLength, (sockaddr*)&mask);
 }
 
 
@@ -172,10 +352,8 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 		return;
 
 	uint32 size = (uint32)config.ifc_value;
-	if (size == 0) {
-		fprintf(stderr, "%s: There are no routes!\n", kProgramName);
+	if (size == 0)
 		return;
-	}
 
 	void *buffer = malloc(size);
 	if (buffer == NULL) {
@@ -188,14 +366,15 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 	if (ioctl(socket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
 		return;
 
-	ifreq *interface = (ifreq *)buffer;
-	ifreq *end = (ifreq *)((uint8 *)buffer + size);
+	ifreq *interface = (ifreq*)buffer;
+	ifreq *end = (ifreq*)((uint8*)buffer + size);
 
 	while (interface < end) {
 		route_entry& route = interface->ifr_route;
 
 		// apply filters
-		if (interfaceName == NULL || !strcmp(interfaceName, interface->ifr_name)) {
+		if (interfaceName == NULL
+			|| !strcmp(interfaceName, interface->ifr_name)) {
 			// find family
 			const address_family *family = NULL;
 			for (int32 i = 0; kFamilies[i].family >= 0; i++) {
@@ -206,11 +385,22 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 			}
 
 			if (family != NULL) {
-				printf("%15s ", family->address_to_string(route.destination));
-				printf("mask %-15s ", family->address_to_string(route.mask));
-	
-				if (route.flags & RTF_GATEWAY)
-					printf("gateway %-15s ", family->address_to_string(route.gateway));
+				// TODO: is the %15s format OK for IPv6?
+				printf("%15s", family->address_to_string(route.destination));
+				switch (family->preferred_format) {
+					case PREFER_OUTPUT_MASK:
+						printf(" mask %-15s ",
+							family->address_to_string(route.mask));
+						break;
+					case PREFER_OUTPUT_PREFIX_LENGTH:
+						printf("/%u ",
+							family->mask_to_prefix_length(route.mask));
+						break;
+				}
+				if ((route.flags & RTF_GATEWAY) != 0) {
+					printf("gateway %-15s ",
+						family->address_to_string(route.gateway));
+				}
 			} else {
 				printf("unknown family ");
 			}
@@ -254,7 +444,7 @@ list_routes(int socket, const char *interfaceName, route_entry &route)
 		if (route.gateway != NULL)
 			addressSize += route.gateway->sa_len;
 
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE + sizeof(route_entry)
+		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE + sizeof(route_entry)
 			+ addressSize);
 	}
 
@@ -321,8 +511,17 @@ get_route(int socket, route_entry &route)
 	}
 
 	if (family != NULL) {
-		printf("%s ", family->address_to_string(request.destination));
-		printf("mask %s ", family->address_to_string(request.mask));
+		printf("%s", family->address_to_string(request.destination));
+		switch (family->preferred_format) {
+			case PREFER_OUTPUT_MASK:
+				printf(" mask %s ",
+					family->address_to_string(request.mask));
+				break;
+			case PREFER_OUTPUT_PREFIX_LENGTH:
+				printf("/%u ",
+					family->mask_to_prefix_length(request.mask));
+				break;
+		}
 
 		if (request.flags & RTF_GATEWAY)
 			printf("gateway %s ", family->address_to_string(request.gateway));
@@ -386,7 +585,8 @@ main(int argc, char** argv)
 
 	while (i < argc && i < 5) {
 		// try to parse address family
-		if (i <= 3 && familyIndex == -1 && get_address_family(argv[i], familyIndex)) {
+		if (i <= 3 && familySpecified == false
+				&& get_address_family(argv[i], familyIndex)) {
 			familySpecified = true;
 			if (i == 2)
 				interfaceIndex = -1;
@@ -432,13 +632,26 @@ main(int argc, char** argv)
 			i++;
 		} else if (!strcmp(argv[i], "nm") || !strcmp(argv[i], "netmask")) {
 			if (hasMask) {
-				fprintf(stderr, "%s: Netmask is specified twice\n",
+				fprintf(stderr, "%s: Netmask or prefix length is specified twice\n",
 					kProgramName);
 				exit(1);
 			}
 			if (!parse_address(familyIndex, argv[i + 1], mask)) {
 				fprintf(stderr, "%s: Option 'netmask' needs valid address parameter\n",
 					kProgramName);
+				exit(1);
+			}
+			hasMask = true;
+			i++;
+		} else if (!strcmp(argv[i], "plen") || !strcmp(argv[i], "prefixlen")) {
+			if (hasMask) {
+				fprintf(stderr, "%s: Netmask or prefix length is specified twice\n",
+					kProgramName);
+				exit(1);
+			}
+			if (!prefix_length_to_mask(familyIndex, argv[i + 1], mask)) {
+				fprintf(stderr, "%s: Option 'prefixlen' is invalid for this "
+					"address family\n", kProgramName);
 				exit(1);
 			}
 			hasMask = true;
@@ -464,11 +677,11 @@ main(int argc, char** argv)
 	}
 
 	if (hasDestination)
-		route.destination = (sockaddr *)&destination;
+		route.destination = (sockaddr*)&destination;
 	if (hasMask)
-		route.mask = (sockaddr *)&mask;
+		route.mask = (sockaddr*)&mask;
 	if (hasGateway) {
-		route.gateway = (sockaddr *)&gateway;
+		route.gateway = (sockaddr*)&gateway;
 		route.flags |= RTF_GATEWAY;
 	}
 
@@ -505,7 +718,7 @@ main(int argc, char** argv)
 				list_routes(socket, interface, route);
 			else {
 				for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-					int socket = ::socket(kFamilies[familyIndex].family, SOCK_DGRAM, 0);
+					int socket = ::socket(kFamilies[i].family, SOCK_DGRAM, 0);
 					if (socket < 0)
 						continue;
 

@@ -15,6 +15,7 @@ SubInclude HAIKU_TOP src bin network netstat ;
 #SubInclude HAIKU_TOP src bin network pppconfig ;
 #SubInclude HAIKU_TOP src bin network ppp_up ;
 SubInclude HAIKU_TOP src bin network ping ;
+SubInclude HAIKU_TOP src bin network ping6 ;
 SubInclude HAIKU_TOP src bin network route ;
 SubInclude HAIKU_TOP src bin network setwep ;
 SubInclude HAIKU_TOP src bin network tcpdump ;
