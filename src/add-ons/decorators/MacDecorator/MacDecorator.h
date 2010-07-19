@@ -17,34 +17,12 @@ public:
 								MacDecorator(DesktopSettings& settings,
 									BRect frame, window_look look,
 									uint32 flags);
-								~MacDecorator();
+	virtual						~MacDecorator();
 
-			void				_SetTitle(const char* string,
-	 								BRegion* updateRegion = NULL);
-			void				FontsChanged(DesktopSettings& settings,
-									BRegion* updateRegion);
-	 		void				SetLook(DesktopSettings& settings, window_look look,
-									BRegion* updateRegion = NULL);
-	 		void				SetFlags(uint32 flags,
-									BRegion* updateRegion = NULL);
-	
-			void				MoveBy(BPoint offset);
-			void 				_ResizeBy(BPoint offset, BRegion* dirty);
-
-	// SetTabLocation
-	// TabLocation
-	//
-	// SetSettings
-	// GetSettings
-	
 			void 				Draw(BRect updateRect);
 			void 				Draw();
 
-	//GetSizeLimits
-	
-			void				GetFootprint(BRegion *region);
-
-			click_type 			Clicked(BPoint pt, int32 buttons,
+	click_type 					Clicked(BPoint pt, int32 buttons,
 									int32 modifiers);
 
 protected:
@@ -58,8 +36,24 @@ protected:
 			void				_DrawZoom(BRect r);
 			void				_DrawMinimize(BRect r);
 
-		// 	void				_SetFocus();
+			void				_SetTitle(const char* string,
+	 								BRegion* updateRegion = NULL);
+
+			void				_FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion);
+	 		void				_SetLook(DesktopSettings& settings,
+									window_look look,
+									BRegion* updateRegion = NULL);
+	 		void				_SetFlags(uint32 flags,
+									BRegion* updateRegion = NULL);
+	
 			void				_SetColors();
+
+			void				_MoveBy(BPoint offset);
+			void 				_ResizeBy(BPoint offset, BRegion* dirty);
+
+			void				_GetFootprint(BRegion *region);
+
 private:
 			void				_UpdateFont(DesktopSettings& settings);
 			void				_DrawBlendedRect(DrawingEngine* engine,

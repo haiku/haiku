@@ -33,6 +33,8 @@ MacDecorator::MacDecorator(DesktopSettings& settings, BRect rect,
 	:
 	Decorator(settings, rect, look, flags)
 {
+	_UpdateFont(settings);
+
 	frame_highcol = (rgb_color){ 255, 255, 255, 255 };
 	frame_midcol = (rgb_color){ 216, 216, 216, 255 };
 	frame_lowcol = (rgb_color){ 110, 110, 110, 255 };
@@ -58,131 +60,7 @@ MacDecorator::~MacDecorator()
 }
 
 
-void
-MacDecorator::_SetTitle(const char* string, BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	BRect rect = TabRect();
-
-	if (updateRegion == NULL)
-		return;
-
-	// Decorator::SetTitle may change the TabRect, so we merge the new one
-	BRect updatedRect = TabRect();
-	if (rect.left > updatedRect.left)
-		rect.left = updatedRect.left;
-	if (rect.right < updatedRect.right)
-		rect.right = updatedRect.right;
-
-	rect.bottom++;
-		// the border will look differently when the title is adjacent
-
-	updateRegion->Include(rect);
-}
-
-
-void
-MacDecorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
-{
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	// TODO : does this do anything usefull ?
-	// _UpdateFont(settings);
-	// _InvalidateBitmaps();
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-MacDecorator::SetLook(DesktopSettings& settings, window_look look,
-	BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	fLook = look;
-
-	// _UpdateFont(settings);
-	// _InvalidateBitmaps();
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-MacDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	Decorator::SetFlags(flags, updateRegion);
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-MacDecorator::MoveBy(BPoint offset)
-{
-	Decorator::MoveBy(offset);
-}
-
-
-void
-MacDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
-{
-	// Move all internal rectangles the appropriate amount
-	fFrame.right += offset.x;
-	fFrame.bottom += offset.y;
-
-	fTabRect.right += offset.x;
-	fBorderRect.right += offset.x;
-	fBorderRect.bottom += offset.y;
-	// fZoomRect.OffsetBy(offset.x,0);
-	// fMinimizeRect.OffsetBy(offset.x,0);
-	if (dirty) {
-		dirty->Include(fTabRect);
-		dirty->Include(fBorderRect);
-	}
-
-
-	// TODO probably some other layouting stuff here
-	_DoLayout();
-}
+// TODO : Add GetSettings
 
 
 void
@@ -191,7 +69,10 @@ MacDecorator::Draw(BRect update)
 	STRACE(("MacDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",
 		update.left, update.top, update.right, update.bottom));
 
+	// We need to draw a few things: the tab, the borders,
+	// and the buttons
 	fDrawingEngine->SetDrawState(&fDrawState);
+
 	_DrawFrame(update);
 	_DrawTab(update);
 }
@@ -208,29 +89,7 @@ MacDecorator::Draw()
 }
 
 
-void
-MacDecorator::GetFootprint(BRegion* region)
-{
-	// This function calculates the decorator's footprint in coordinates
-	// relative to the view. This is most often used to set a Window
-	// object's visible region.
-	if (!region)
-		return;
-
-	region->MakeEmpty();
-
-	// No border : we don't draw anything.
-	if (fLook == B_NO_BORDER_WINDOW_LOOK)
-		return;
-
-	
-	region->Set(fBorderRect);
-	region->Exclude(fFrame);
-
-	if (fLook == B_BORDERED_WINDOW_LOOK)
-		return;
-	region->Include(fTabRect);
-}
+// TODO : add GetSizeLimits
 
 
 click_type
@@ -304,6 +163,7 @@ MacDecorator::_DoLayout()
 	}
 	fBorderRect=fFrame;
 
+	// calculate our tab rect
 	if (hasTab) {
 		fBorderRect.InsetBy(-kDefaultBorderWidth, -kDefaultBorderWidth);
 		fBorderRect.top +=3;
@@ -754,9 +614,142 @@ MacDecorator::_DrawMinimize(BRect r)
 
 
 void
+MacDecorator::_SetTitle(const char* string, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	BRect rect = TabRect();
+
+	_DoLayout();
+
+	if (updateRegion == NULL)
+		return;
+
+	rect = rect | TabRect();
+
+	rect.bottom++;
+		// the border will look differently when the title is adjacent
+
+	updateRegion->Include(rect);
+}
+
+
+void
+MacDecorator::_FontsChanged(DesktopSettings& settings,
+	BRegion* updateRegion)
+{
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_UpdateFont(settings);
+	_DoLayout();
+
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
+MacDecorator::_SetLook(DesktopSettings& settings, window_look look,
+	BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	fLook = look;
+
+	_UpdateFont(settings);
+	_DoLayout();
+
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
+MacDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_DoLayout();
+
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+// TODO : _SetFocus
+
+
+void
 MacDecorator::_SetColors()
 {
 	_SetFocus();
+}
+
+
+void
+MacDecorator::_MoveBy(BPoint offset)
+{
+	// TODO ?
+}
+
+
+void
+MacDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
+{
+	// Move all internal rectangles the appropriate amount
+	fFrame.right += offset.x;
+	fFrame.bottom += offset.y;
+
+	fTabRect.right += offset.x;
+	fBorderRect.right += offset.x;
+	fBorderRect.bottom += offset.y;
+	// fZoomRect.OffsetBy(offset.x,0);
+	// fMinimizeRect.OffsetBy(offset.x,0);
+	if (dirty) {
+		dirty->Include(fTabRect);
+		dirty->Include(fBorderRect);
+	}
+
+
+	// TODO probably some other layouting stuff here
+	_DoLayout();
+}
+
+
+// TODO : _SetSettings
+
+
+void
+MacDecorator::_GetFootprint(BRegion* region)
+{
+	// This function calculates the decorator's footprint in coordinates
+	// relative to the view. This is most often used to set a Window
+	// object's visible region.
+	if (!region)
+		return;
+
+	region->MakeEmpty();
+
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
+		return;
+
+	
+	region->Set(fBorderRect);
+	region->Exclude(fFrame);
+
+	if (fLook == B_BORDERED_WINDOW_LOOK)
+		return;
+	region->Include(fTabRect);
 }
 
 
