@@ -584,6 +584,122 @@ checksumfs_unlink(fs_volume* fsVolume, fs_vnode* dir, const char* name)
 
 
 static status_t
+checksumfs_rename(fs_volume* fsVolume, fs_vnode* fromDir, const char* fromName,
+	fs_vnode* toDir, const char* toName)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Directory* fromDirectory
+		= dynamic_cast<Directory*>((Node*)fromDir->private_node);
+	Directory* toDirectory
+		= dynamic_cast<Directory*>((Node*)toDir->private_node);
+	if (fromDirectory == NULL || toDirectory == NULL)
+		return B_NOT_A_DIRECTORY;
+
+		if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	// We need to write-lock all three nodes (both directories and the moved
+	// node). To make that atomic, we have to lock the source directory, look up
+	// the entry, unlock the directory, get the node, re-lock all, and look up
+	// the entry again to check for changes.
+	Transaction transaction(volume);
+	Node* node;
+	NodePutter nodePutter;
+
+	while (true) {
+		// look up the entry
+		NodeReadLocker directoryLocker(fromDirectory);
+
+		uint64 blockIndex;
+		status_t error = fromDirectory->LookupEntry(fromName, blockIndex);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		directoryLocker.Unlock();
+
+		// get the entry's node
+		error = volume->GetNode(blockIndex, node);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+		nodePutter.SetTo(node);
+
+		// start the transaction
+		error = transaction.Start();
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// write-lock the nodes
+		error = fromDirectory != toDirectory
+			? transaction.AddNodes(fromDirectory, toDirectory, node)
+			: transaction.AddNodes(fromDirectory, node);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// check the situation again
+		error = fromDirectory->LookupEntry(fromName, blockIndex);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+		if (blockIndex != node->BlockIndex()) {
+			transaction.Abort();
+			continue;
+		}
+
+		break;
+	}
+
+	// check permissions
+	status_t error = check_access(fromDirectory, W_OK);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = check_access(toDirectory, W_OK);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// don't create an entry in an unlinked directory
+	if (toDirectory->HardLinks() == 0)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+
+	// Check whether this operation would move a directory into one of its
+	// descendents. We iterate upwards, checking whether any ancestor of the
+	// target directory is the moved directory (if it is a directory that is).
+	if (fromDirectory != toDirectory && S_ISDIR(node->Mode())) {
+		NodePutter ancestorPutter;
+		Node* ancestor = toDirectory;
+
+		while (ancestor != volume->RootDirectory()
+			|| ancestor == fromDirectory) {
+			if (ancestor == node)
+				RETURN_ERROR(B_BAD_VALUE);
+
+			error = volume->GetNode(ancestor->ParentDirectory(), ancestor);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+			ancestorPutter.SetTo(ancestor);
+		}
+	}
+
+	// Everything looks good -- insert a new entry in the target directory and
+	// remove the old entry from the source directory.
+	error = toDirectory->InsertEntry(toName, node->BlockIndex(), transaction);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = fromDirectory->RemoveEntry(fromName, transaction);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// update stat data
+	node->SetParentDirectory(toDirectory->BlockIndex());
+	fromDirectory->Touched(NODE_MODIFIED);
+	toDirectory->Touched(NODE_MODIFIED);
+
+	// commit the transaction
+	return transaction.Commit();
+}
+
+
+static status_t
 checksumfs_read_stat(fs_volume* fsVolume, fs_vnode* vnode, struct stat* st)
 {
 	Node* node = (Node*)vnode->private_node;
@@ -1365,7 +1481,7 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 
 	NULL,	// checksumfs_link,
 	checksumfs_unlink,
-	NULL,	// checksumfs_rename,
+	checksumfs_rename,
 
 	NULL,	// checksumfs_access,
 	checksumfs_read_stat,
