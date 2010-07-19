@@ -307,7 +307,7 @@ do_iterative_fd_io(int fd, io_request *_request, iterative_io_get_vecs getVecs,
 	uint32 fileVecCount = DoIterativeFDIORequest::MAX_VECS;
 	status_t error = getVecs(_cookie, _request, request->offset,
 		request->length, fileVecs, &fileVecCount);
-	if (error != B_OK)
+	if (error != B_OK && error != B_BUFFER_OVERFLOW)
 		return error;
 
 	// create a cookie
