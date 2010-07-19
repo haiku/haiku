@@ -15,6 +15,7 @@
 #include "Block.h"
 #include "checksumfs.h"
 #include "DebugSupport.h"
+#include "SuperBlock.h"
 #include "Volume.h"
 
 
@@ -177,12 +178,18 @@ dprintf("BlockAllocator::Allocate(%llu, %llu)\n", baseHint, count);
 	// search from base hint to end
 	status_t error = _Allocate(baseHint, fTotalBlocks, count, transaction,
 		&_allocatedBase, _allocatedCount);
-	if (error == B_OK || baseHint == 0)
+	if (error == B_OK)
+		return _UpdateSuperBlock(transaction);
+	if (baseHint == 0)
 		return error;
 
 	// search from 0 to hint
-	return _Allocate(0, baseHint, count, transaction, &_allocatedBase,
+	error = _Allocate(0, baseHint, count, transaction, &_allocatedBase,
 		_allocatedCount);
+	if (error != B_OK)
+		return error;
+
+	return _UpdateSuperBlock(transaction);
 }
 
 
@@ -204,7 +211,7 @@ dprintf("BlockAllocator::AllocateExactly(%llu, %llu)\n", base, count);
 		return B_BUSY;
 	}
 
-	return B_OK;
+	return _UpdateSuperBlock(transaction);
 }
 
 
@@ -213,7 +220,11 @@ BlockAllocator::Free(uint64 base, uint64 count, Transaction& transaction)
 {
 	MutexLocker locker(fLock);
 
-	return _Free(base, count, transaction);
+	status_t error = _Free(base, count, transaction);
+	if (error != B_OK)
+		return error;
+
+	return _UpdateSuperBlock(transaction);
 }
 
 
@@ -692,6 +703,25 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 
 		*bits &= ~mask;
 	}
+
+	return B_OK;
+}
+
+
+status_t
+BlockAllocator::_UpdateSuperBlock(Transaction& transaction)
+{
+	// write the super block
+	Block block;
+	if (!block.GetWritable(fVolume, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE,
+			transaction)) {
+		return B_ERROR;
+	}
+
+	SuperBlock* superBlock = (SuperBlock*)block.Data();
+	superBlock->SetFreeBlocks(fFreeBlocks);
+
+	block.Put();
 
 	return B_OK;
 }

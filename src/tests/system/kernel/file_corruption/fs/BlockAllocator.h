@@ -58,6 +58,8 @@ private:
 			status_t			_FreeInBitmapBlock(uint64 base, uint32 count,
 									Transaction& transaction);
 
+			status_t			_UpdateSuperBlock(Transaction& transaction);
+
 private:
 			mutex				fLock;
 			Volume*				fVolume;

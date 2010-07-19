@@ -45,3 +45,10 @@ SuperBlock::Initialize(Volume* volume)
 	rootDir = volume->RootDirectory()->BlockIndex();
 	strlcpy(name, volume->Name(), kCheckSumFSNameLength);
 }
+
+
+void
+SuperBlock::SetFreeBlocks(uint64 count)
+{
+	freeBlocks = count;
+}

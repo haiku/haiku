@@ -23,6 +23,8 @@ public:
 
 			bool				Check(uint64 totalBlocks) const;
 			void				Initialize(Volume* volume);
+
+			void				SetFreeBlocks(uint64 count);
 };
 
 
