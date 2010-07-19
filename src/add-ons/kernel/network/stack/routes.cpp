@@ -663,6 +663,9 @@ void
 put_route(struct net_domain* _domain, net_route* route)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
+	if (domain == NULL || route == NULL)
+		return;
+
 	RecursiveLocker locker(domain->lock);
 
 	put_route_internal(domain, (net_route*)route);
