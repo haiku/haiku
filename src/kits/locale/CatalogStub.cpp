@@ -12,6 +12,7 @@
 #include <Locale.h>
 #include <LocaleRoster.h>
 
+
 BCatalog BCatalogStub::sCatalog;
 vint32 BCatalogStub::sCatalogInitOnce = false;
 
@@ -27,6 +28,7 @@ BCatalogStub::GetCatalog()
 
 	return be_locale_roster->GetCatalog(&sCatalog, &sCatalogInitOnce);
 }
+
 
 /* static */ void
 BCatalogStub::ForceReload()
