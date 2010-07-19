@@ -1343,18 +1343,19 @@ legacy_driver_add_preloaded(kernel_args* args)
 	// NOTE: The initialization success of the path objects is implicitely
 	// checked by the immediately following functions.
 	KPath basePath;
-	status_t pathStatus = find_directory(B_BEOS_ADDONS_DIRECTORY,
+	status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY,
 		gBootDevice, false, basePath.LockBuffer(), basePath.BufferSize());
-	if (pathStatus != B_OK) {
-		dprintf("devfs_add_preloaded_drivers: find_directory() failed: "
-			"%s\n", strerror(pathStatus));
+	if (status != B_OK) {
+		dprintf("legacy_driver_add_preloaded: find_directory() failed: "
+			"%s\n", strerror(status));
 	}
 	basePath.UnlockBuffer();
-	if (pathStatus == B_OK)
-		pathStatus = basePath.Append("kernel");
-	if (pathStatus != B_OK) {
-		dprintf("devfs_add_preloaded_drivers: constructing base driver "
-			"path failed: %s\n", strerror(pathStatus));
+	if (status == B_OK)
+		status = basePath.Append("kernel");
+	if (status != B_OK) {
+		dprintf("legacy_driver_add_preloaded: constructing base driver "
+			"path failed: %s\n", strerror(status));
+		return;
 	}
 
 	struct preloaded_image* image;
@@ -1363,18 +1364,17 @@ legacy_driver_add_preloaded(kernel_args* args)
 			continue;
 
 		KPath imagePath(basePath);
-		if (pathStatus == B_OK)
-			pathStatus = imagePath.Append(image->name);
+		status = imagePath.Append(image->name);
 
 		// try to add the driver
-		TRACE(("devfs_add_preloaded_drivers: adding driver %s\n",
+		TRACE(("legacy_driver_add_preloaded: adding driver %s\n",
 			imagePath.Path()));
-		status_t addStatus = pathStatus;
-		if (pathStatus == B_OK)
-			addStatus = add_driver(imagePath.Path(), image->id);
-		if (addStatus != B_OK) {
-			dprintf("devfs_add_preloaded_drivers: Failed to add \"%s\"\n",
-				image->name);
+
+		if (status == B_OK)
+			status = add_driver(imagePath.Path(), image->id);
+		if (status != B_OK) {
+			dprintf("legacy_driver_add_preloaded: Failed to add \"%s\": %s\n",
+				image->name, strerror(status));
 			unload_kernel_add_on(image->id);
 		}
 	}
