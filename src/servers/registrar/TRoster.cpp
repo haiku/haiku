@@ -211,7 +211,7 @@ TRoster::HandleAddApplication(BMessage* request)
 		RosterAppInfo* info = NULL;
 		if ((launchFlags == B_SINGLE_LAUNCH
 			 || launchFlags ==  B_EXCLUSIVE_LAUNCH)
-			&& ((info = info = fRegisteredApps.InfoFor(&ref)) != NULL
+			&& ((info = fRegisteredApps.InfoFor(&ref)) != NULL
 				|| (info = fEarlyPreRegisteredApps.InfoFor(&ref)) != NULL)) {
 			SET_ERROR(error, B_ALREADY_RUNNING);
 			otherTeam = info->team;
