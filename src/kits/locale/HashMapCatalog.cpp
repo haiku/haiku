@@ -161,7 +161,11 @@ parseQuotedChars(BString& stringToParse)
 				*out = '"';
 			else if (*in == 'x') {
 				// Parse the 2-digit hex integer that follows
-				unsigned int hexchar = strtoul(in + 1, NULL, 16);
+				char tmp[3];
+				tmp[0] = *(in+1);
+				tmp[1] = *(in+2);
+				tmp[3] = '\0';
+				unsigned int hexchar = strtoul(tmp, NULL, 16);
 				*out = hexchar;
 				// skip the number
 				in += 2;
