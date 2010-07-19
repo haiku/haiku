@@ -57,7 +57,8 @@ class BCatalog {
 // This must be included (statically linked) into each shared object needing
 // a catalog on its own (application, add-on, library, ...). The shared object
 // must also have a mimetype so that the catalog can be identified.
-class BCatalogStub {
+class BCatalogStub 
+{
 	private:
 		static BCatalog	sCatalog;
 		static vint32	sCatalogInitOnce;

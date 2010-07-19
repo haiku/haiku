@@ -19,9 +19,14 @@ vint32 BCatalogStub::sCatalogInitOnce = false;
 /* static */ BCatalog*
 BCatalogStub::GetCatalog()
 {
+	#if (__GNUC__ < 3)
+		asm volatile(".hidden GetCatalog__12BCatalogStub");
+	#else
+		asm volatile(".hidden _ZN12BCatalogStub10GetCatalogEv");
+	#endif
+
 	return be_locale_roster->GetCatalog(&sCatalog, &sCatalogInitOnce);
 }
-
 
 /* static */ void
 BCatalogStub::ForceReload()

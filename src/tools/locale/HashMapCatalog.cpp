@@ -168,7 +168,7 @@ parseQuotedChars(BString& stringToParse)
 				char tmp[3];
 				tmp[0] = *(in+1);
 				tmp[1] = *(in+2);
-				tmp[3] = '\0';
+				tmp[2] = '\0';
 				unsigned int hexchar = strtoul(tmp, NULL, 16);
 				*out = hexchar;
 				// skip the number
