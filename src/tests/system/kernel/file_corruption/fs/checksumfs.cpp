@@ -577,6 +577,56 @@ checksumfs_create_symlink(fs_volume* fsVolume, fs_vnode* parent,
 
 
 static status_t
+checksumfs_link(fs_volume* fsVolume, fs_vnode* dir, const char* name,
+	fs_vnode* vnode)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)vnode->private_node;
+	Directory* directory = dynamic_cast<Directory*>((Node*)dir->private_node);
+	if (directory == NULL)
+		return B_NOT_A_DIRECTORY;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	// don't allow hardlinking directories
+	if (S_ISDIR(node->Mode()))
+		RETURN_ERROR(B_NOT_ALLOWED);
+
+	// start a transaction and lock the nodes
+	Transaction transaction(volume);
+	status_t error = transaction.Start();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = transaction.AddNodes(directory, node);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// check permissions
+	error = check_access(directory, W_OK);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// don't create an entry in an unlinked directory
+	if (directory->HardLinks() == 0)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+
+	// insert the new entry
+	error = directory->InsertEntry(name, node->BlockIndex(), transaction);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// update stat data
+	node->SetHardLinks(node->HardLinks() + 1);
+	directory->Touched(NODE_MODIFIED);
+
+	// commit the transaction
+	return transaction.Commit();
+}
+
+
+static status_t
 checksumfs_unlink(fs_volume* fsVolume, fs_vnode* dir, const char* name)
 {
 	return remove_entry(fsVolume, dir, name, false);
@@ -595,7 +645,7 @@ checksumfs_rename(fs_volume* fsVolume, fs_vnode* fromDir, const char* fromName,
 	if (fromDirectory == NULL || toDirectory == NULL)
 		return B_NOT_A_DIRECTORY;
 
-		if (volume->IsReadOnly())
+	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
 	// We need to write-lock all three nodes (both directories and the moved
@@ -1479,7 +1529,7 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 	checksumfs_read_symlink,
 	checksumfs_create_symlink,
 
-	NULL,	// checksumfs_link,
+	checksumfs_link,
 	checksumfs_unlink,
 	checksumfs_rename,
 
