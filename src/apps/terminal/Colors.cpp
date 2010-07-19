@@ -34,15 +34,16 @@ struct color_schema gCustomSchema = {
 	"Custom"
 };
 
-const color_schema *gPredefinedSchemas[] = {
+const color_schema* gPredefinedSchemas[] = {
 		&kBlackOnWhite,
 		&kWhiteOnBlack,
 		&gCustomSchema,
+		NULL
 };
 
 
 bool
-color_schema::operator==(const color_schema &schema)
+color_schema::operator==(const color_schema& schema)
 {
 	if (text_fore_color == schema.text_fore_color
 		&& text_back_color == schema.text_back_color

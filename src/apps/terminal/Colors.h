@@ -8,14 +8,14 @@
 #include <InterfaceDefs.h>
 
 struct color_schema {
-	const char *name;
+	const char* name;
 	rgb_color text_fore_color;
 	rgb_color text_back_color;
 	rgb_color cursor_fore_color;
 	rgb_color cursor_back_color;
 	rgb_color select_fore_color;
 	rgb_color select_back_color;
-	bool operator==(const color_schema &color);
+	bool operator==(const color_schema& color);
 };
 
 
@@ -23,7 +23,7 @@ extern const rgb_color kBlack;
 extern const rgb_color kWhite;
 
 extern color_schema gCustomSchema;
-extern const color_schema *gPredefinedSchemas[];
+extern const color_schema* gPredefinedSchemas[];
 
 
 #endif // _COLORS_H

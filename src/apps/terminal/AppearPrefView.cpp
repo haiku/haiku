@@ -95,12 +95,12 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fFont = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
 	fFontSize = new BMenuField(B_TRANSLATE("Size:"), sizeMenu);
 
-	BPopUpMenu *schemasPopUp =_MakeColorSchemaMenu(MSG_COLOR_SCHEMA_CHANGED, gPredefinedSchemas,
+	BPopUpMenu* schemasPopUp =_MakeColorSchemaMenu(MSG_COLOR_SCHEMA_CHANGED, gPredefinedSchemas,
 		gPredefinedSchemas[0]);
 	fColorSchemaField = new BMenuField(B_TRANSLATE("Color schema:"),
 		schemasPopUp);
 
-	BPopUpMenu *colorsPopUp =_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
+	BPopUpMenu* colorsPopUp =_MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
 		kColorTable[0]);
 
 	fColorField = new BMenuField(B_TRANSLATE("Color:"),
@@ -242,14 +242,17 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 
 		case MSG_COLOR_SCHEMA_CHANGED:
 		{
-			color_schema *newSchema = NULL;
-			msg->FindPointer("color_schema", (void**)&newSchema);
-			if (newSchema == &gCustomSchema)
-				_EnableCustomColors(true);
-			else
-				_EnableCustomColors(false);
-			_ChangeColorSchema(newSchema);
-			modified = true;
+			color_schema* newSchema = NULL;
+			if (msg->FindPointer("color_schema",
+				(void**)&newSchema) == B_OK) {
+
+				if (newSchema == &gCustomSchema)
+					_EnableCustomColors(true);
+				else
+					_EnableCustomColors(false);
+				_ChangeColorSchema(newSchema);
+				modified = true;
+			}
 			break;
 		}
 
@@ -283,7 +286,7 @@ AppearancePrefView::_EnableCustomColors(bool enable)
 void
 AppearancePrefView::_ChangeColorSchema(color_schema* schema)
 {
-	PrefHandler *pref = PrefHandler::Default();
+	PrefHandler* pref = PrefHandler::Default();
 
 	pref->setRGB(PREF_TEXT_FORE_COLOR, schema->text_fore_color);
 	pref->setRGB(PREF_TEXT_BACK_COLOR, schema->text_back_color);
@@ -295,9 +298,9 @@ AppearancePrefView::_ChangeColorSchema(color_schema* schema)
 
 
 void
-AppearancePrefView::_SetCurrentColorSchema(BMenuField *field)
+AppearancePrefView::_SetCurrentColorSchema(BMenuField* field)
 {
-	PrefHandler *pref = PrefHandler::Default();
+	PrefHandler* pref = PrefHandler::Default();
 
 	gCustomSchema.text_fore_color = pref->getRGB(PREF_TEXT_FORE_COLOR);
 	gCustomSchema.text_back_color = pref->getRGB(PREF_TEXT_BACK_COLOR);
@@ -306,9 +309,9 @@ AppearancePrefView::_SetCurrentColorSchema(BMenuField *field)
 	gCustomSchema.select_fore_color = pref->getRGB(PREF_SELECT_FORE_COLOR);
 	gCustomSchema.select_back_color = pref->getRGB(PREF_SELECT_BACK_COLOR);
 
-	const char *currentSchemaName = NULL;
+	const char* currentSchemaName = NULL;
 
-	color_schema **schemas = const_cast<color_schema**>(gPredefinedSchemas);
+	color_schema** schemas = const_cast<color_schema**>(gPredefinedSchemas);
 	while (*schemas) {
 		if (gCustomSchema == **schemas) {
 			currentSchemaName = (*schemas)->name;
@@ -319,7 +322,7 @@ AppearancePrefView::_SetCurrentColorSchema(BMenuField *field)
 
 	bool found = false;
 	for (int32 i = 0; i < fColorSchemaField->Menu()->CountItems(); i++) {
-		BMenuItem *item = fColorSchemaField->Menu()->ItemAt(i);
+		BMenuItem* item = fColorSchemaField->Menu()->ItemAt(i);
 		if (!strcmp(item->Label(), currentSchemaName)) {
 			item->SetMarked(true);
 			found = true;
