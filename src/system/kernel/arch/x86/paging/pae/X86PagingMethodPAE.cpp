@@ -107,7 +107,7 @@ struct X86PagingMethodPAE::ToPAESwitcher {
 		_AllocateNeededPages(pagesNeeded);
 
 		// prepare the page directory pointer table
-		phys_addr_t physicalPDPT;
+		phys_addr_t physicalPDPT = 0;
 		pae_page_directory_pointer_table_entry* pdpt
 			= (pae_page_directory_pointer_table_entry*)_NextPage(true,
 				physicalPDPT);
@@ -171,7 +171,7 @@ private:
 		page_table_entry* entry = &fPageHole[virtualBase / B_PAGE_SIZE];
 
 		// allocate a PAE page table
-		phys_addr_t physicalTable;
+		phys_addr_t physicalTable = 0;
 		pae_page_table_entry* paeTable = (pae_page_table_entry*)_NextPage(false,
 			physicalTable);
 
