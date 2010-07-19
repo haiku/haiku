@@ -166,17 +166,21 @@ _fbsd_init_driver(driver_t *driver)
 	if (status < B_OK)
 		goto err3;
 
+	status = init_callout();
+	if (status < B_OK)
+		goto err4;
+
 	init_bounce_pages();
 
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES)) {
 		status = init_taskqueues();
 		if (status < B_OK)
-			goto err4;
+			goto err5;
 	}
 
 	status = init_wlan_stack();
 	if (status < B_OK)
-		goto err5;
+		goto err6;
 
 	while (gDeviceCount < MAX_DEVICES) {
 		device_t root, device;
@@ -214,11 +218,13 @@ _fbsd_init_driver(driver_t *driver)
 
 	uninit_wlan_stack();
 
-err5:
+err6:
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
-err4:
+err5:
 	uninit_mbufs();
+err4:
+	uninit_callout();
 err3:
 	uninit_mutexes();
 err2:
@@ -248,6 +254,7 @@ _fbsd_uninit_driver(driver_t *driver)
 	uninit_mbufs();
 	if (HAIKU_DRIVER_REQUIRES(FBSD_TASKQUEUES))
 		uninit_taskqueues();
+	uninit_callout();
 	uninit_mutexes();
 
 	put_module(B_PCI_MODULE_NAME);

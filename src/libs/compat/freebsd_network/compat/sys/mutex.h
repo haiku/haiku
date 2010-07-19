@@ -42,9 +42,10 @@ void mtx_destroy(struct mtx*);
 static inline void
 mtx_lock(struct mtx* mutex)
 {
-	if (mutex->type == MTX_DEF)
-		mutex_lock(&mutex->u.mutex);
-	else if (mutex->type == MTX_RECURSE)
+	if (mutex->type == MTX_DEF) {
+		mutex_lock(&mutex->u.mutex.lock);
+		mutex->u.mutex.owner = thread_get_current_thread_id();
+	} else if (mutex->type == MTX_RECURSE)
 		recursive_lock_lock(&mutex->u.recursive);
 }
 
@@ -52,9 +53,10 @@ mtx_lock(struct mtx* mutex)
 static inline void
 mtx_unlock(struct mtx* mutex)
 {
-	if (mutex->type == MTX_DEF)
-		mutex_unlock(&mutex->u.mutex);
-	else if (mutex->type == MTX_RECURSE)
+	if (mutex->type == MTX_DEF) {
+		mutex->u.mutex.owner = -1;
+		mutex_unlock(&mutex->u.mutex.lock);
+	} else if (mutex->type == MTX_RECURSE)
 		recursive_lock_unlock(&mutex->u.recursive);
 }
 
@@ -62,7 +64,7 @@ mtx_unlock(struct mtx* mutex)
 static inline int
 mtx_initialized(struct mtx* mutex)
 {
-	/* XXX */
+	/* TODO */
 	return 1;
 }
 
@@ -71,22 +73,17 @@ static inline int
 mtx_owned(struct mtx* mutex)
 {
 	if (mutex->type == MTX_DEF)
-#if KDEBUG
-		return mutex->u.mutex.holder == thread_get_current_thread_id();
-#else
-		return 0;
-			// found no way how to determine the holder of the mutex
-			// so we setting it to 0 because a starving thread is easier
-			// to detect than a race condition; Colin Günther
-#endif
-	else if (mutex->type == MTX_RECURSE)
+		return mutex->u.mutex.owner == thread_get_current_thread_id();
+	if (mutex->type == MTX_RECURSE) {
 #if KDEBUG
 		return mutex->u.recursive.lock.holder == thread_get_current_thread_id();
 #else
 		return mutex->u.recursive.holder == thread_get_current_thread_id();
 #endif
-	else
-		return 0;
+	}
+
+	return 0;
 }
+
 
 #endif	/* _FBSD_COMPAT_SYS_MUTEX_H_ */

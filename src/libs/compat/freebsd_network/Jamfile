@@ -14,7 +14,7 @@ SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 
 KernelStaticLibrary libfreebsd_network.a :
 	bus.c
-	callout.c
+	callout.cpp
 	clock.c
 	compat.c
 	compat_cpp.cpp
@@ -40,7 +40,6 @@ KernelStaticLibrary libfreebsd_network.a :
 	priv.c
 	synch.c
 	taskqueue.c
-	timeout.c
 	unit.c
 	Unit.cpp
 	;

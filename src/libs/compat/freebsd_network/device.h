@@ -68,6 +68,9 @@ void uninit_taskqueues(void);
 status_t init_hard_clock(void);
 void uninit_hard_clock(void);
 
+status_t init_callout(void);
+void uninit_callout(void);
+
 device_t find_root_device(int);
 
 /* busdma_machdep.c */

@@ -37,6 +37,9 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	if (i == MAX_DEVICES)
 		return B_ERROR;
 
+	if (get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack) != B_OK)
+		return B_ERROR;
+
 	ifp = gDevices[i];
 	if_printf(ifp, "compat_open(0x%lx)\n", flags);
 

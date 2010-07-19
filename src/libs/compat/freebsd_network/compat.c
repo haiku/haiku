@@ -385,18 +385,13 @@ device_attach(device_t device)
 		|| device->methods.attach == NULL)
 		return B_ERROR;
 
-	if (get_module(NET_STACK_MODULE_NAME, (module_info **)&gStack) != B_OK)
-		return B_ERROR;
-
 	result = device->methods.attach(device);
 
-	if (result == 0) {
+	if (result == 0)
 		atomic_or(&device->flags, DEVICE_ATTACHED);
-	}
 
-	if (result == 0) {
+	if (result == 0)
 		result = start_wlan(device);
-	}
 
 	return result;
 }
