@@ -67,7 +67,7 @@ class DeskbarMountMenu : public BPrivate::MountMenu {
 
 #endif
 
-//#define SHOW_RECENT_FIND_ITEMS
+// #define SHOW_RECENT_FIND_ITEMS
 
 namespace BPrivate {
 	BMenu* TrackerBuildRecentFindItemsMenu(const char*);
@@ -257,16 +257,16 @@ TBeMenu::AddStandardBeMenuItems()
 	item->SetEnabled(!dragging);
 	AddItem(item);
 
-	static const char* kFindMenuItemStr =
-		B_TRANSLATE_MARK("Find" B_UTF8_ELLIPSIS);
+	static const char* kFindMenuItemStr
+		= B_TRANSLATE_MARK("Find" B_UTF8_ELLIPSIS);
 
 #ifdef SHOW_RECENT_FIND_ITEMS
 	item = new BMenuItem(
 		TrackerBuildRecentFindItemsMenu(kFindMenuItemStr),
 		new BMessage(kFindButton));
 #else
- 	item = new BMenuItem(B_TRANSLATE(kFindMenuItemStr),
- 		new BMessage(kFindButton));
+	item = new BMenuItem(B_TRANSLATE(kFindMenuItemStr),
+		new BMessage(kFindButton));
 #endif
 	item->SetEnabled(!dragging);
 	AddItem(item);
@@ -288,7 +288,7 @@ TBeMenu::AddStandardBeMenuItems()
 
 	item = new BMenuItem(B_TRANSLATE("Deskbar preferences" B_UTF8_ELLIPSIS),
 		new BMessage(kConfigShow));
- 	item->SetTarget(be_app);
+	item->SetTarget(be_app);
 	AddItem(item);
 
 	AddSeparatorItem();
@@ -304,7 +304,8 @@ TBeMenu::AddStandardBeMenuItems()
 
 #ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
-		item = new BMenuItem(kSuspendMenuItemStr), new BMessage(kSuspendSystem));
+		item = new BMenuItem(B_TRANSLATE(kSuspendMenuItemStr),
+			new BMessage(kSuspendSystem));
 		item->SetEnabled(!dragging);
 		shutdownMenu->AddItem(item);
 	}
@@ -341,7 +342,7 @@ void
 TBeMenu::ResetTargets()
 {
 	// This method does not recurse into submenus
- 	// and does not affect menu items in submenus.
+	// and does not affect menu items in submenus.
 	// (e.g. "Restart System" and "Power Off")
 
 	BNavMenu::ResetTargets();
