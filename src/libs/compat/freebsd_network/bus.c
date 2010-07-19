@@ -60,6 +60,18 @@ struct internal_intr {
 static int32 intr_wrapper(void *data);
 
 
+static int
+fls(int mask)
+{
+	int bit;
+	if (mask == 0)
+		return (0);
+	for (bit = 1; mask != 1; bit++)
+		mask = (unsigned int)mask >> 1;
+	return (bit);
+}
+
+
 static area_id
 map_mem(void **virtualAddr, phys_addr_t _phy, size_t size, uint32 protection,
 	const char *name)
@@ -764,18 +776,6 @@ pci_get_max_read_req(device_t dev)
 	val &= PCIM_EXP_CTL_MAX_READ_REQUEST;
 	val >>= 12;
 	return (1 << (val + 7));
-}
-
-
-int
-fls(int mask)
-{
-	int bit;
-	if (mask == 0)
-		return (0);
-	for (bit = 1; mask != 1; bit++)
-		mask = (unsigned int)mask >> 1;
-	return (bit);
 }
 
 
