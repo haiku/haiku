@@ -1,6 +1,3 @@
-/*	$FreeBSD: src/sys/netinet/ip6.h,v 1.15 2005/07/20 10:30:52 ume Exp $	*/
-/*	$KAME: ip6.h,v 1.18 2001/03/29 05:34:30 itojun Exp $	*/
-
 /*-
  * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
  * All rights reserved.
@@ -64,6 +61,9 @@
 #define _NETINET_IP6_H_
 
 
+#include <BeBuild.h>
+
+
 /*
  * Definition for internet protocol version 6.
  * RFC 2460
@@ -81,7 +81,7 @@ struct ip6_hdr {
 	} ip6_ctlun;
 	struct in6_addr ip6_src;	/* source address */
 	struct in6_addr ip6_dst;	/* destination address */
-} __packed;
+} _PACKED;
 
 #define ip6_vfc		ip6_ctlun.ip6_un2_vfc
 #define ip6_flow	ip6_ctlun.ip6_un1.ip6_un1_flow
@@ -115,7 +115,7 @@ struct ip6_hdr {
 struct	ip6_ext {
 	u_int8_t ip6e_nxt;
 	u_int8_t ip6e_len;
-} __packed;
+} _PACKED;
 
 /* Hop-by-Hop options header */
 /* XXX should we pad it to force alignment on an 8-byte boundary? */
@@ -123,7 +123,7 @@ struct ip6_hbh {
 	u_int8_t ip6h_nxt;	/* next header */
 	u_int8_t ip6h_len;	/* length in units of 8 octets */
 	/* followed by options */
-} __packed;
+} _PACKED;
 
 /* Destination options header */
 /* XXX should we pad it to force alignment on an 8-byte boundary? */
@@ -131,7 +131,7 @@ struct ip6_dest {
 	u_int8_t ip6d_nxt;	/* next header */
 	u_int8_t ip6d_len;	/* length in units of 8 octets */
 	/* followed by options */
-} __packed;
+} _PACKED;
 
 /* Option types and related macros */
 #define IP6OPT_PAD1		0x00	/* 00 0 00000 */
@@ -164,14 +164,14 @@ struct ip6_dest {
 struct ip6_opt {
 	u_int8_t ip6o_type;
 	u_int8_t ip6o_len;
-} __packed;
+} _PACKED;
 
 /* Jumbo Payload Option */
 struct ip6_opt_jumbo {
 	u_int8_t ip6oj_type;
 	u_int8_t ip6oj_len;
 	u_int8_t ip6oj_jumbo_len[4];
-} __packed;
+} _PACKED;
 #define IP6OPT_JUMBO_LEN	6
 
 /* NSAP Address Option */
@@ -182,21 +182,21 @@ struct ip6_opt_nsap {
 	u_int8_t ip6on_dst_nsap_len;
 	/* followed by source NSAP */
 	/* followed by destination NSAP */
-} __packed;
+} _PACKED;
 
 /* Tunnel Limit Option */
 struct ip6_opt_tunnel {
 	u_int8_t ip6ot_type;
 	u_int8_t ip6ot_len;
 	u_int8_t ip6ot_encap_limit;
-} __packed;
+} _PACKED;
 
 /* Router Alert Option */
 struct ip6_opt_router {
 	u_int8_t ip6or_type;
 	u_int8_t ip6or_len;
 	u_int8_t ip6or_value[2];
-} __packed;
+} _PACKED;
 /* Router alert values (in network byte order) */
 #if BYTE_ORDER == BIG_ENDIAN
 #define IP6_ALERT_MLD	0x0000
@@ -217,7 +217,7 @@ struct ip6_rthdr {
 	u_int8_t  ip6r_type;	/* routing type */
 	u_int8_t  ip6r_segleft;	/* segments left */
 	/* followed by routing type specific data */
-} __packed;
+} _PACKED;
 
 /* Type 0 Routing header */
 struct ip6_rthdr0 {
@@ -227,7 +227,7 @@ struct ip6_rthdr0 {
 	u_int8_t  ip6r0_segleft;	/* segments left */
 	u_int32_t  ip6r0_reserved;	/* reserved field */
 	/* followed by up to 127 struct in6_addr */
-} __packed;
+} _PACKED;
 
 /* Fragment header */
 struct ip6_frag {
@@ -235,7 +235,7 @@ struct ip6_frag {
 	u_int8_t  ip6f_reserved;	/* reserved field */
 	u_int16_t ip6f_offlg;		/* offset, reserved, and flag */
 	u_int32_t ip6f_ident;		/* identification */
-} __packed;
+} _PACKED;
 
 #if BYTE_ORDER == BIG_ENDIAN
 #define IP6F_OFF_MASK		0xfff8	/* mask out offset from _offlg */
@@ -259,93 +259,5 @@ struct ip6_frag {
 #define IPV6_MAXPACKET	65535	/* ip6 max packet size without Jumbo payload*/
 #define IPV6_MAXOPTHDR	2048	/* max option header size, 256 64-bit words */
 
-#ifdef _KERNEL
-/*
- * IP6_EXTHDR_CHECK ensures that region between the IP6 header and the
- * target header (including IPv6 itself, extension headers and
- * TCP/UDP/ICMP6 headers) are continuous. KAME requires drivers
- * to store incoming data into one internal mbuf or one or more external
- * mbufs(never into two or more internal mbufs). Thus, the third case is
- * supposed to never be matched but is prepared just in case.
- */
 
-#define IP6_EXTHDR_CHECK(m, off, hlen, ret)				\
-do {									\
-    if ((m)->m_next != NULL) {						\
-	if (((m)->m_flags & M_LOOP) &&					\
-	    ((m)->m_len < (off) + (hlen)) &&				\
-	    (((m) = m_pullup((m), (off) + (hlen))) == NULL)) {		\
-		ip6stat.ip6s_exthdrtoolong++;				\
-		return ret;						\
-	} else if ((m)->m_flags & M_EXT) {				\
-		if ((m)->m_len < (off) + (hlen)) {			\
-			ip6stat.ip6s_exthdrtoolong++;			\
-			m_freem(m);					\
-			return ret;					\
-		}							\
-	} else {							\
-		if ((m)->m_len < (off) + (hlen)) {			\
-			ip6stat.ip6s_exthdrtoolong++;			\
-			m_freem(m);					\
-			return ret;					\
-		}							\
-	}								\
-    } else {								\
-	if ((m)->m_len < (off) + (hlen)) {				\
-		ip6stat.ip6s_tooshort++;				\
-		in6_ifstat_inc(m->m_pkthdr.rcvif, ifs6_in_truncated);	\
-		m_freem(m);						\
-		return ret;						\
-	}								\
-    }									\
-} while (/*CONSTCOND*/ 0)
-
-/*
- * IP6_EXTHDR_GET ensures that intermediate protocol header (from "off" to
- * "len") is located in single mbuf, on contiguous memory region.
- * The pointer to the region will be returned to pointer variable "val",
- * with type "typ".
- * IP6_EXTHDR_GET0 does the same, except that it aligns the structure at the
- * very top of mbuf.  GET0 is likely to make memory copy than GET.
- *
- * XXX we're now testing this, needs m_pulldown()
- */
-#define IP6_EXTHDR_GET(val, typ, m, off, len) \
-do {									\
-	struct mbuf *t;							\
-	int tmp;							\
-	if ((m)->m_len >= (off) + (len))				\
-		(val) = (typ)(mtod((m), caddr_t) + (off));		\
-	else {								\
-		t = m_pulldown((m), (off), (len), &tmp);		\
-		if (t) {						\
-			if (t->m_len < tmp + (len))			\
-				panic("m_pulldown malfunction");	\
-			(val) = (typ)(mtod(t, caddr_t) + tmp);		\
-		} else {						\
-			(val) = (typ)NULL;				\
-			(m) = NULL;					\
-		}							\
-	}								\
-} while (/*CONSTCOND*/ 0)
-
-#define IP6_EXTHDR_GET0(val, typ, m, off, len) \
-do {									\
-	struct mbuf *t;							\
-	if ((off) == 0)							\
-		(val) = (typ)mtod(m, caddr_t);				\
-	else {								\
-		t = m_pulldown((m), (off), (len), NULL);		\
-		if (t) {						\
-			if (t->m_len < (len))				\
-				panic("m_pulldown malfunction");	\
-			(val) = (typ)mtod(t, caddr_t);			\
-		} else {						\
-			(val) = (typ)NULL;				\
-			(m) = NULL;					\
-		}							\
-	}								\
-} while (/*CONSTCOND*/ 0)
-#endif /*_KERNEL*/
-
-#endif /* not _NETINET_IP6_H_ */
+#endif /* !_NETINET_IP6_H_ */

@@ -46,13 +46,19 @@ typedef uint32_t in_addr_t;
 
 /* Protocol definitions */
 #define IPPROTO_IP				0	/* 0, IPv4 */
+#define IPPROTO_HOPOPTS			0	/* 0, IPv6 hop-by-hop options */
 #define IPPROTO_ICMP			1	/* 1, ICMP (v4) */
 #define IPPROTO_IGMP			2	/* 2, IGMP (group management) */
 #define IPPROTO_TCP				6	/* 6, tcp */
 #define IPPROTO_UDP				17	/* 17, UDP */
 #define IPPROTO_IPV6			41	/* 41, IPv6 in IPv6 */
 #define IPPROTO_ROUTING			43	/* 43, Routing */
+#define IPPROTO_FRAGMENT		44	/* 44, IPv6 fragmentation header */
+#define IPPROTO_ESP				50	/* 50, Encap Sec. Payload */
+#define IPPROTO_AH				51	/* 51, Auth Header */
 #define IPPROTO_ICMPV6			58	/* 58, IPv6 ICMP */
+#define IPPROTO_NONE			59	/* 59, IPv6 no next header */
+#define IPPROTO_DSTOPTS			60	/* 60, IPv6 destination option */
 #define IPPROTO_ETHERIP			97	/* 97, Ethernet in IPv4 */
 #define IPPROTO_RAW				255	/* 255 */
 
@@ -148,6 +154,15 @@ struct group_source_req {
 #define IPV6_JOIN_GROUP				28	/* struct ipv6_mreq */
 #define IPV6_LEAVE_GROUP			29	/* struct ipv6_mreq */
 #define IPV6_V6ONLY					30	/* int */
+
+#define IPV6_PKTINFO				31	/* struct ipv6_pktinfo */
+#define IPV6_RECVPKTINFO			32	/* struct ipv6_pktinfo */
+#define IPV6_HOPLIMIT				33	/* int */
+#define IPV6_RECVHOPLIMIT			34	/* int */
+
+#define IPV6_HOPOPTS				35  /* struct ip6_hbh */
+#define IPV6_DSTOPTS				36  /* struct ip6_dest */
+#define IPV6_RTHDR					37  /* struct ip6_rthdr */
 
 #define INADDR_ANY					((in_addr_t)0x00000000)
 #define INADDR_LOOPBACK				((in_addr_t)0x7f000001)
