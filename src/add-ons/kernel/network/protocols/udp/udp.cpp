@@ -1207,14 +1207,31 @@ init_udp()
 		NULL);
 	if (status < B_OK)
 		goto err1;
+	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_DGRAM, IPPROTO_IP,
+		"network/protocols/udp/v1",
+		"network/protocols/ipv6/v1",
+		NULL);
+	if (status < B_OK)
+		goto err1;
+
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		goto err1;
+	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
+		"network/protocols/udp/v1",
+		"network/protocols/ipv6/v1",
+		NULL);
+	if (status < B_OK)
+		goto err1;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_UDP,
+		"network/protocols/udp/v1");
+	if (status < B_OK)
+		goto err1;
+	status = gStackModule->register_domain_receiving_protocol(AF_INET6, IPPROTO_UDP,
 		"network/protocols/udp/v1");
 	if (status < B_OK)
 		goto err1;
@@ -1225,6 +1242,7 @@ init_udp()
 	return B_OK;
 
 err1:
+	// TODO: shouldn't unregister the protocols here?
 	delete sUdpEndpointManager;
 
 	TRACE_EPM("init_udp() fails with %lx (%s)", status, strerror(status));

@@ -100,6 +100,7 @@ struct net_datalink_module_info {
 
 struct net_address_module_info {
 	module_info info;
+	bool has_broadcast_address;
 
 	status_t (*copy_address)(const sockaddr *from, sockaddr **to,
 					bool replaceWithZeros, const sockaddr *mask);

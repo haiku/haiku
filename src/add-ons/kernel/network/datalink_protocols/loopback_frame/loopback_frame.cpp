@@ -171,6 +171,7 @@ static net_datalink_protocol_module_info sLoopbackFrameModule = {
 	loopback_frame_init,
 	loopback_frame_uninit,
 	loopback_frame_send_data,
+	NULL, // receive_data
 	loopback_frame_up,
 	loopback_frame_down,
 	loopback_frame_control,

@@ -1595,6 +1595,7 @@ ipv4_receive_data(net_buffer* buffer)
 	memcpy(buffer->destination, &destination, sizeof(sockaddr_in));
 
 	uint8 protocol = buffer->protocol = header.protocol;
+	buffer->hoplimit = header.time_to_live;
 
 	// remove any trailing/padding data
 	status_t status = gBufferModule->trim(buffer, packetLength);

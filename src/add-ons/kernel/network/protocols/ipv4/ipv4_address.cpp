@@ -489,14 +489,15 @@ ipv4_checksum_address(struct Checksum *checksum, const sockaddr *address)
 	return B_OK;
 }
 
+
 static void
-ipv4_get_loopback_address(sockaddr *result)
+ipv4_get_loopback_address(sockaddr *_address)
 {
-	sockaddr_in *resultIn = (sockaddr_in *)result;
-	memset(resultIn, 0, sizeof(resultIn));
-	resultIn->sin_len = sizeof(sockaddr_in);
-	resultIn->sin_family = AF_INET;
-	resultIn->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	sockaddr_in *address = (sockaddr_in *)_address;
+	memset(address, 0, sizeof(sockaddr_in));
+	address->sin_len = sizeof(sockaddr_in);
+	address->sin_family = AF_INET;
+	address->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 }
 
 
@@ -506,6 +507,7 @@ net_address_module_info gIPv4AddressModule = {
 		0,
 		NULL
 	},
+	true, // has_broadcast_address
 	ipv4_copy_address,
 	ipv4_mask_address,
 	ipv4_equal_addresses,

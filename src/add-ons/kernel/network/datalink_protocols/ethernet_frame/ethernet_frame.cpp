@@ -210,6 +210,7 @@ static net_datalink_protocol_module_info sEthernetFrameModule = {
 	ethernet_frame_init,
 	ethernet_frame_uninit,
 	ethernet_frame_send_data,
+	NULL, // receive_data
 	ethernet_frame_up,
 	ethernet_frame_down,
 	ethernet_frame_control,

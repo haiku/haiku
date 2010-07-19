@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <netinet6/in6.h> // TODO
+
 
 struct datalink_protocol : net_protocol {
 	struct net_domain_private* domain;
@@ -134,6 +136,21 @@ remove_default_routes(net_interface_private* interface, int32 option)
 		route.flags = RTF_LOCAL | RTF_HOST;
 		remove_route(interface->domain, &route);
 	}
+
+	// for IPv6 remove multicast route (ff00::/8)
+	// TODO: move this code
+	if (interface->address->sa_family == AF_INET6) {
+		sockaddr_in6 address;
+		memset(&address, 0, sizeof(sockaddr_in6));
+		address.sin6_family = AF_INET6;
+		address.sin6_len = sizeof(sockaddr_in6);
+		address.sin6_addr.s6_addr[0] = 0xff;
+
+		route.destination = (sockaddr*)&address;
+		route.mask = (sockaddr*)&address;
+		route.flags = 0;
+		remove_route(interface->domain, &route);
+	}
 }
 
 
@@ -160,6 +177,21 @@ add_default_routes(net_interface_private* interface, int32 option)
 		route.flags = RTF_LOCAL | RTF_HOST;
 		add_route(interface->domain, &route);
 	}
+
+	// for IPv6 add multicast route (ff00::/8)
+	// TODO: move this code
+	if (interface->address->sa_family == AF_INET6) {
+		sockaddr_in6 address;
+		memset(&address, 0, sizeof(sockaddr_in6));
+		address.sin6_family = AF_INET6;
+		address.sin6_len = sizeof(sockaddr_in6);
+		address.sin6_addr.s6_addr[0] = 0xff;
+
+		route.destination = (sockaddr*)&address;
+		route.mask = (sockaddr*)&address;
+		route.flags = 0;
+		add_route(interface->domain, &route);
+	}
 }
 
 
@@ -180,6 +212,14 @@ reallocate_address(sockaddr** _address, uint32 size)
 	*_address = address;
 
 	return address;
+}
+
+
+static void
+free_address(sockaddr** _address)
+{
+	free(*_address);
+	*_address = NULL;
 }
 
 
@@ -386,7 +426,8 @@ datalink_send_datagram(net_protocol* protocol, net_domain* domain,
 
 	net_route* route = NULL;
 	status_t status;
-	if (protocol != NULL && protocol->socket->bound_to_device > 0) {
+	if (protocol != NULL && protocol->socket != NULL
+		&& protocol->socket->bound_to_device > 0) {
 		status = get_device_route(domain, protocol->socket->bound_to_device,
 			&route);
 	} else
@@ -709,8 +750,15 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 					} else
 						oldNetmask = address;
 
-					sockaddr* broadcast = reallocate_address(
-						&interface->destination, request.ifr_addr.sa_len);
+					// reset the broadcast address if the address family has such
+					sockaddr* broadcast;
+					if (interface->domain->address_module->has_broadcast_address) {
+						broadcast = reallocate_address(&interface->destination,
+							request.ifr_addr.sa_len);
+					} else {
+						broadcast = NULL;
+						free_address(&interface->destination);
+					}
 
 					interface->domain->address_module->set_to_defaults(
 						netmask, broadcast, interface->address, oldNetmask);
@@ -923,6 +971,7 @@ net_datalink_protocol_module_info gDatalinkInterfaceProtocolModule = {
 	interface_protocol_init,
 	interface_protocol_uninit,
 	interface_protocol_send_data,
+	NULL, // receive_data
 	interface_protocol_up,
 	interface_protocol_down,
 	interface_protocol_control,

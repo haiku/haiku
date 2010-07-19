@@ -1038,6 +1038,7 @@ copy_metadata(net_buffer* destination, const net_buffer* source)
 	destination->interface = source->interface;
 	destination->offset = source->offset;
 	destination->protocol = source->protocol;
+	destination->hoplimit = source->hoplimit;
 	destination->type = source->type;
 }
 

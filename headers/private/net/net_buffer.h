@@ -36,6 +36,7 @@ typedef struct net_buffer {
 	uint32	flags;
 	uint32	size;
 	uint8	protocol;
+	uint8	hoplimit;
 } net_buffer;
 
 struct ancillary_data_container;

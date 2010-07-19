@@ -24,6 +24,7 @@ struct net_datalink_protocol_module_info {
 
 	status_t	(*send_data)(net_datalink_protocol *self,
 					net_buffer *buffer);
+	status_t	(*receive_data)(net_buffer *buffer);
 
 	status_t	(*interface_up)(net_datalink_protocol *self);
 	void		(*interface_down)(net_datalink_protocol *self);

@@ -413,6 +413,7 @@ net_address_module_info gL2cap4AddressModule = {
 		0,
 		NULL
 	},
+	true, // has_broadcast_address
 	l2cap_copy_address,
 	l2cap_mask_address,
 	l2cap_equal_addresses,
