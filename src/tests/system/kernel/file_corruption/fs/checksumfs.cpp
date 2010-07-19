@@ -36,6 +36,107 @@ static const char* const kCheckSumFSModuleName	= "file_systems/checksumfs"
 static const char* const kCheckSumFSShortName	= "checksumfs";
 
 
+// #pragma mark -
+
+
+struct FileCookie {
+	int	openMode;
+
+	FileCookie(int openMode)
+		:
+		openMode(openMode)
+	{
+	}
+};
+
+
+struct DirCookie {
+	DirCookie(Directory* directory)
+		:
+		fDirectory(directory)
+	{
+		Rewind();
+	}
+
+	Directory* GetDirectory() const
+	{
+		return fDirectory;
+	}
+
+	status_t ReadNextEntry(struct dirent* buffer, size_t size,
+		uint32& _countRead)
+	{
+		const char* name;
+		size_t nameLength;
+		uint64 blockIndex;
+
+		int nextIterationState = OTHERS;
+		switch (fIterationState) {
+			case DOT:
+				name = ".";
+				nameLength = 1;
+				blockIndex = fDirectory->BlockIndex();
+				nextIterationState = DOT_DOT;
+				break;
+			case DOT_DOT:
+				name = "..";
+				nameLength = 2;
+				blockIndex = fDirectory->ParentDirectory();
+				break;
+			default:
+			{
+				status_t error = fDirectory->LookupNextEntry(fEntryName,
+					fEntryName, nameLength, blockIndex);
+				if (error != B_OK) {
+					if (error != B_ENTRY_NOT_FOUND)
+						return error;
+
+					_countRead = 0;
+					return B_OK;
+				}
+
+				name = fEntryName;
+				break;
+			}
+		}
+
+		size_t entrySize = sizeof(dirent) + nameLength;
+		if (entrySize > size)
+			return B_BUFFER_OVERFLOW;
+
+		buffer->d_dev = fDirectory->GetVolume()->ID();
+		buffer->d_ino = blockIndex;
+		buffer->d_reclen = entrySize;
+		strcpy(buffer->d_name, name);
+
+		fIterationState = nextIterationState;
+
+		_countRead = 1;
+		return B_OK;
+	}
+
+	void Rewind()
+	{
+		fIterationState = DOT;
+		fEntryName[0] = '\0';
+	}
+
+private:
+	enum {
+		DOT,
+		DOT_DOT,
+		OTHERS
+	};
+
+	Directory*	fDirectory;
+	int			fIterationState;
+	char		fEntryName[kCheckSumFSNameLength + 1];
+};
+
+
+// #pragma mark -
+
+
 static void
 set_timespec(timespec& time, uint64 nanos)
 {
@@ -356,6 +457,31 @@ checksumfs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 
 
 static status_t
+checksumfs_write_fs_info(fs_volume* fsVolume, const struct fs_info* info,
+	uint32 mask)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	if ((mask & FS_WRITE_FSINFO_NAME) != 0) {
+		status_t error = volume->SetName(info->volume_name);
+		if (error != B_OK)
+			return error;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_sync(fs_volume* fsVolume)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+
+	return block_cache_sync(volume->BlockCache());
+}
+
+
+static status_t
 checksumfs_get_vnode(fs_volume* fsVolume, ino_t id, fs_vnode* vnode,
 	int* _type, uint32* _flags, bool reenter)
 {
@@ -505,6 +631,31 @@ checksumfs_get_file_map(fs_volume* fsVolume, fs_vnode* vnode, off_t offset,
 
 
 // #pragma mark - common operations
+
+
+static status_t
+checksumfs_set_flags(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie,
+	int flags)
+{
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	cookie->openMode = (cookie->openMode & ~O_APPEND) | (flags & O_APPEND);
+
+	// TODO: Also support O_NOCACHE!
+
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_fsync(fs_volume* fsVolume, fs_vnode* vnode)
+{
+	Node* node = (Node*)vnode->private_node;
+
+	NodeReadLocker nodeLocker(node);
+
+	return node->Sync();
+}
 
 
 static status_t
@@ -750,6 +901,17 @@ checksumfs_rename(fs_volume* fsVolume, fs_vnode* fromDir, const char* fromName,
 
 
 static status_t
+checksumfs_access(fs_volume* fsVolume, fs_vnode* vnode, int mode)
+{
+	Node* node = (Node*)vnode->private_node;
+
+	NodeReadLocker nodeLocker(node);
+
+	return check_access(node, mode);
+}
+
+
+static status_t
 checksumfs_read_stat(fs_volume* fsVolume, fs_vnode* vnode, struct stat* st)
 {
 	Node* node = (Node*)vnode->private_node;
@@ -870,17 +1032,6 @@ checksumfs_write_stat(fs_volume* fsVolume, fs_vnode* vnode,
 
 
 // #pragma mark - file operations
-
-
-struct FileCookie {
-	int	openMode;
-
-	FileCookie(int openMode)
-		:
-		openMode(openMode)
-	{
-	}
-};
 
 
 /*!	Opens the node according to the given open mode (if the permissions allow
@@ -1187,90 +1338,6 @@ checksumfs_write(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie, off_t pos,
 // #pragma mark - directory operations
 
 
-struct DirCookie {
-	DirCookie(Directory* directory)
-		:
-		fDirectory(directory)
-	{
-		Rewind();
-	}
-
-	Directory* GetDirectory() const
-	{
-		return fDirectory;
-	}
-
-	status_t ReadNextEntry(struct dirent* buffer, size_t size,
-		uint32& _countRead)
-	{
-		const char* name;
-		size_t nameLength;
-		uint64 blockIndex;
-
-		int nextIterationState = OTHERS;
-		switch (fIterationState) {
-			case DOT:
-				name = ".";
-				nameLength = 1;
-				blockIndex = fDirectory->BlockIndex();
-				nextIterationState = DOT_DOT;
-				break;
-			case DOT_DOT:
-				name = "..";
-				nameLength = 2;
-				blockIndex = fDirectory->ParentDirectory();
-				break;
-			default:
-			{
-				status_t error = fDirectory->LookupNextEntry(fEntryName,
-					fEntryName, nameLength, blockIndex);
-				if (error != B_OK) {
-					if (error != B_ENTRY_NOT_FOUND)
-						return error;
-
-					_countRead = 0;
-					return B_OK;
-				}
-
-				name = fEntryName;
-				break;
-			}
-		}
-
-		size_t entrySize = sizeof(dirent) + nameLength;
-		if (entrySize > size)
-			return B_BUFFER_OVERFLOW;
-
-		buffer->d_dev = fDirectory->GetVolume()->ID();
-		buffer->d_ino = blockIndex;
-		buffer->d_reclen = entrySize;
-		strcpy(buffer->d_name, name);
-
-		fIterationState = nextIterationState;
-
-		_countRead = 1;
-		return B_OK;
-	}
-
-	void Rewind()
-	{
-		fIterationState = DOT;
-		fEntryName[0] = '\0';
-	}
-
-private:
-	enum {
-		DOT,
-		DOT_DOT,
-		OTHERS
-	};
-
-	Directory*	fDirectory;
-	int			fIterationState;
-	char		fEntryName[kCheckSumFSNameLength + 1];
-};
-
-
 status_t
 checksumfs_create_dir(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 	int perms)
@@ -1469,8 +1536,8 @@ fs_volume_ops gCheckSumFSVolumeOps = {
 	checksumfs_unmount,
 
 	checksumfs_read_fs_info,
-	NULL,	// write_fs_info
-	NULL,	// sync
+	checksumfs_write_fs_info,
+	checksumfs_sync,
 
 	checksumfs_get_vnode,
 
@@ -1521,10 +1588,10 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 
 	/* common operations */
 	NULL,	// checksumfs_ioctl,
-	NULL,	// checksumfs_set_flags,
-	NULL,	// checksumfs_select,
-	NULL,	// checksumfs_deselect,
-	NULL,	// checksumfs_fsync,
+	checksumfs_set_flags,
+	NULL,	// select
+	NULL,	// deselect
+	checksumfs_fsync,
 
 	checksumfs_read_symlink,
 	checksumfs_create_symlink,
@@ -1533,7 +1600,7 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 	checksumfs_unlink,
 	checksumfs_rename,
 
-	NULL,	// checksumfs_access,
+	checksumfs_access,
 	checksumfs_read_stat,
 	checksumfs_write_stat,
 

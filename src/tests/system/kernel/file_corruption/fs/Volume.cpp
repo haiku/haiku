@@ -17,6 +17,9 @@
 
 #include <fs_cache.h>
 
+#include <AutoDeleter.h>
+#include <util/AutoLock.h>
+
 #include "Block.h"
 #include "BlockAllocator.h"
 #include "checksumfs.h"
@@ -40,6 +43,7 @@ Volume::Volume(uint32 flags)
 	fBlockAllocator(NULL),
 	fRootDirectory(NULL)
 {
+	mutex_init(&fLock, "checksumfs volume");
 	mutex_init(&fTransactionLock, "checksumfs transaction");
 }
 
@@ -58,6 +62,7 @@ Volume::~Volume()
 	free(fName);
 
 	mutex_destroy(&fTransactionLock);
+	mutex_destroy(&fLock);
 }
 
 
@@ -217,6 +222,8 @@ Volume::Initialize(const char* name)
 void
 Volume::GetInfo(fs_info& info)
 {
+	MutexLocker locker(fLock);
+
 	info.flags = fFlags;
 	info.block_size = B_PAGE_SIZE;
 	info.io_size = B_PAGE_SIZE * 16;	// random value
@@ -225,7 +232,6 @@ Volume::GetInfo(fs_info& info)
 	info.total_nodes = 1;	// phew, who cares?
 	info.free_nodes = info.free_blocks;
 	strlcpy(info.volume_name, fName, sizeof(info.volume_name));
-		// TODO: We need locking once we are able to change the name!
 }
 
 
@@ -424,6 +430,53 @@ Volume::DeleteNode(Node* node)
 
 	delete node;
 	return error;
+}
+
+
+status_t
+Volume::SetName(const char* name)
+{
+	if (name == NULL || strlen(name) > kCheckSumFSNameLength)
+		return B_BAD_VALUE;
+
+	// clone the name
+	char* newName = strdup(name);
+	if (newName == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter newNameDeleter(newName);
+
+	// start a transaction
+	Transaction transaction(this);
+	status_t error = transaction.Start();
+	if (error != B_OK)
+		return error;
+
+	// we lock the volume now, to keep the locking order (transaction -> volume)
+	MutexLocker locker(fLock);
+
+	// update the super block
+	Block block;
+	if (!block.GetWritable(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE,
+			transaction)) {
+		return B_ERROR;
+	}
+
+	SuperBlock* superBlock = (SuperBlock*)block.Data();
+	superBlock->SetName(newName);
+
+	block.Put();
+
+	// commit the transaction
+	error = transaction.Commit();
+	if (error != B_OK)
+		return error;
+
+	// Everything went fine. We can replace the name. Since we still have the
+	// volume lock, there's no race condition.
+	free(fName);
+	fName = (char*)newNameDeleter.Detach();
+
+	return B_OK;
 }
 
 

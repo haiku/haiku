@@ -52,3 +52,10 @@ SuperBlock::SetFreeBlocks(uint64 count)
 {
 	freeBlocks = count;
 }
+
+
+void
+SuperBlock::SetName(const char* name)
+{
+	strlcpy(this->name, name, kCheckSumFSNameLength);
+}

@@ -105,6 +105,13 @@ Node::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten)
 }
 
 
+status_t
+Node::Sync()
+{
+	return B_OK;
+}
+
+
 void
 Node::SetParentDirectory(uint32 blockIndex)
 {

@@ -43,6 +43,7 @@ public:
 									size_t& _bytesRead);
 	virtual	status_t			Write(off_t pos, const void* buffer,
 									size_t size, size_t& _bytesWritten);
+	virtual	status_t			Sync();
 
 	inline	const checksumfs_node& NodeData() const	{ return fNode; }
 	inline	Volume*				GetVolume() const	{ return fVolume; }

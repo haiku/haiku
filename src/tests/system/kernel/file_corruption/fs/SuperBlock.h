@@ -25,6 +25,7 @@ public:
 			void				Initialize(Volume* volume);
 
 			void				SetFreeBlocks(uint64 count);
+			void				SetName(const char* name);
 };
 
 

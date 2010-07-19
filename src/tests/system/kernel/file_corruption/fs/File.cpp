@@ -237,6 +237,13 @@ File::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten)
 }
 
 
+status_t
+File::Sync()
+{
+	return file_cache_sync(fFileCache);
+}
+
+
 void
 File::RevertNodeData(const checksumfs_node& nodeData)
 {

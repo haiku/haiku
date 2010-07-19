@@ -54,6 +54,8 @@ public:
 									SymLink*& _symLink);
 			status_t			DeleteNode(Node* node);
 
+			status_t			SetName(const char* name);
+
 	inline	void				TransactionStarted();
 	inline	void				TransactionFinished();
 
@@ -80,6 +82,7 @@ private:
 			char*				fName;
 			BlockAllocator*		fBlockAllocator;
 			Directory*			fRootDirectory;
+			mutex				fLock;
 			mutex				fTransactionLock;
 };
 
