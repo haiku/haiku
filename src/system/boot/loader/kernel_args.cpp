@@ -16,7 +16,7 @@
 #include <boot/platform.h>
 
 
-static const size_t kChunkSize = 8 * B_PAGE_SIZE;
+static const size_t kChunkSize = 16 * B_PAGE_SIZE;
 
 kernel_args gKernelArgs;
 
@@ -468,7 +468,7 @@ kernel_args_malloc(size_t size)
 		}
 
 		if (add_kernel_args_range(block, size) != B_OK)
-			panic("kernel_args max range to low!\n");
+			panic("kernel_args max range too low!\n");
 		return block;
 	}
 
@@ -483,7 +483,7 @@ kernel_args_malloc(size_t size)
 	sLast = block;
 	sFree = kChunkSize - size;
 	if (add_kernel_args_range(block, kChunkSize) != B_OK)
-		panic("kernel_args max range to low!\n");
+		panic("kernel_args max range too low!\n");
 
 	return block;
 }
