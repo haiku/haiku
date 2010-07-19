@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -48,7 +48,9 @@ struct icmp_header {
 	};
 };
 
-typedef NetBufferField<uint16, offsetof(icmp_header, checksum)> ICMPChecksumField;
+typedef NetBufferField<uint16, offsetof(icmp_header, checksum)>
+	ICMPChecksumField;
+
 
 #define ICMP_TYPE_ECHO_REPLY	0
 #define ICMP_TYPE_UNREACH		3
@@ -56,20 +58,22 @@ typedef NetBufferField<uint16, offsetof(icmp_header, checksum)> ICMPChecksumFiel
 #define ICMP_TYPE_ECHO_REQUEST	8
 
 // type unreach codes
-#define ICMP_CODE_UNREACH_NEED_FRAGMENT	4	// this is used for path MTU discovery
+#define ICMP_CODE_UNREACH_NEED_FRAGMENT	4
+	// this is used for path MTU discovery
+
 
 struct icmp_protocol : net_protocol {
 };
 
 
-net_buffer_module_info *gBufferModule;
-static net_stack_module_info *sStackModule;
+net_buffer_module_info* gBufferModule;
+static net_stack_module_info* sStackModule;
 
 
-net_protocol *
-icmp_init_protocol(net_socket *socket)
+net_protocol*
+icmp_init_protocol(net_socket* socket)
 {
-	icmp_protocol *protocol = new (std::nothrow) icmp_protocol;
+	icmp_protocol* protocol = new(std::nothrow) icmp_protocol;
 	if (protocol == NULL)
 		return NULL;
 
@@ -78,7 +82,7 @@ icmp_init_protocol(net_socket *socket)
 
 
 status_t
-icmp_uninit_protocol(net_protocol *protocol)
+icmp_uninit_protocol(net_protocol* protocol)
 {
 	delete protocol;
 	return B_OK;
@@ -86,43 +90,43 @@ icmp_uninit_protocol(net_protocol *protocol)
 
 
 status_t
-icmp_open(net_protocol *protocol)
+icmp_open(net_protocol* protocol)
 {
 	return B_OK;
 }
 
 
 status_t
-icmp_close(net_protocol *protocol)
+icmp_close(net_protocol* protocol)
 {
 	return B_OK;
 }
 
 
 status_t
-icmp_free(net_protocol *protocol)
+icmp_free(net_protocol* protocol)
 {
 	return B_OK;
 }
 
 
 status_t
-icmp_connect(net_protocol *protocol, const struct sockaddr *address)
+icmp_connect(net_protocol* protocol, const struct sockaddr* address)
 {
 	return B_ERROR;
 }
 
 
 status_t
-icmp_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
+icmp_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-icmp_control(net_protocol *protocol, int level, int option, void *value,
-	size_t *_length)
+icmp_control(net_protocol* protocol, int level, int option, void* value,
+	size_t* _length)
 {
 	return protocol->next->module->control(protocol->next, level, option,
 		value, _length);
@@ -130,8 +134,8 @@ icmp_control(net_protocol *protocol, int level, int option, void *value,
 
 
 status_t
-icmp_getsockopt(net_protocol *protocol, int level, int option,
-	void *value, int *length)
+icmp_getsockopt(net_protocol* protocol, int level, int option, void* value,
+	int* length)
 {
 	return protocol->next->module->getsockopt(protocol->next, level, option,
 		value, length);
@@ -139,8 +143,8 @@ icmp_getsockopt(net_protocol *protocol, int level, int option,
 
 
 status_t
-icmp_setsockopt(net_protocol *protocol, int level, int option,
-	const void *value, int length)
+icmp_setsockopt(net_protocol* protocol, int level, int option,
+	const void* value, int length)
 {
 	return protocol->next->module->setsockopt(protocol->next, level, option,
 		value, length);
@@ -148,86 +152,87 @@ icmp_setsockopt(net_protocol *protocol, int level, int option,
 
 
 status_t
-icmp_bind(net_protocol *protocol, const struct sockaddr *address)
+icmp_bind(net_protocol* protocol, const struct sockaddr* address)
 {
 	return B_ERROR;
 }
 
 
 status_t
-icmp_unbind(net_protocol *protocol, struct sockaddr *address)
+icmp_unbind(net_protocol* protocol, struct sockaddr* address)
 {
 	return B_ERROR;
 }
 
 
 status_t
-icmp_listen(net_protocol *protocol, int count)
+icmp_listen(net_protocol* protocol, int count)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-icmp_shutdown(net_protocol *protocol, int direction)
+icmp_shutdown(net_protocol* protocol, int direction)
 {
 	return EOPNOTSUPP;
 }
 
 
 status_t
-icmp_send_data(net_protocol *protocol, net_buffer *buffer)
+icmp_send_data(net_protocol* protocol, net_buffer* buffer)
 {
 	return protocol->next->module->send_data(protocol->next, buffer);
 }
 
 
 status_t
-icmp_send_routed_data(net_protocol *protocol, struct net_route *route,
-	net_buffer *buffer)
+icmp_send_routed_data(net_protocol* protocol, struct net_route* route,
+	net_buffer* buffer)
 {
-	return protocol->next->module->send_routed_data(protocol->next, route, buffer);
+	return protocol->next->module->send_routed_data(protocol->next, route,
+		buffer);
 }
 
 
 ssize_t
-icmp_send_avail(net_protocol *protocol)
+icmp_send_avail(net_protocol* protocol)
 {
 	return B_ERROR;
 }
 
 
 status_t
-icmp_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
-	net_buffer **_buffer)
+icmp_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
+	net_buffer** _buffer)
 {
 	return B_ERROR;
 }
 
 
 ssize_t
-icmp_read_avail(net_protocol *protocol)
+icmp_read_avail(net_protocol* protocol)
 {
 	return B_ERROR;
 }
 
 
-struct net_domain *
-icmp_get_domain(net_protocol *protocol)
+struct net_domain* 
+icmp_get_domain(net_protocol* protocol)
 {
 	return protocol->next->module->get_domain(protocol->next);
 }
 
 
 size_t
-icmp_get_mtu(net_protocol *protocol, const struct sockaddr *address)
+icmp_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 {
 	return protocol->next->module->get_mtu(protocol->next, address);
 }
 
 
 status_t
-icmp_receive_data(net_buffer *buffer)
+icmp_receive_data(net_buffer* buffer)
 {
 	TRACE(("ICMP received some data, buffer length %lu\n", buffer->size));
 
@@ -239,7 +244,8 @@ icmp_receive_data(net_buffer *buffer)
 
 	TRACE(("  got type %u, code %u, checksum %u\n", header.type, header.code,
 		ntohs(header.checksum)));
-	TRACE(("  computed checksum: %ld\n", gBufferModule->checksum(buffer, 0, buffer->size, true)));
+	TRACE(("  computed checksum: %ld\n",
+		gBufferModule->checksum(buffer, 0, buffer->size, true)));
 
 	if (gBufferModule->checksum(buffer, 0, buffer->size, true) != 0)
 		return B_BAD_DATA;
@@ -250,7 +256,7 @@ icmp_receive_data(net_buffer *buffer)
 
 		case ICMP_TYPE_ECHO_REQUEST:
 		{
-			net_domain *domain;
+			net_domain* domain;
 			if (buffer->interface != NULL) {
 				domain = buffer->interface->domain;
 
@@ -265,7 +271,7 @@ icmp_receive_data(net_buffer *buffer)
 			if (domain == NULL || domain->module == NULL)
 				break;
 
-			net_buffer *reply = gBufferModule->duplicate(buffer);
+			net_buffer* reply = gBufferModule->duplicate(buffer);
 			if (reply == NULL)
 				return B_NO_MEMORY;
 
@@ -289,6 +295,11 @@ icmp_receive_data(net_buffer *buffer)
 				return status;
 			}
 		}
+		
+		default:
+			dprintf("ICMP: received unhandled type %u, code %u\n", header.type,
+				header.code);
+			break;
 	}
 
 	gBufferModule->free(buffer);
@@ -297,15 +308,15 @@ icmp_receive_data(net_buffer *buffer)
 
 
 status_t
-icmp_error(uint32 code, net_buffer *data)
+icmp_error(uint32 code, net_buffer* data)
 {
 	return B_ERROR;
 }
 
 
 status_t
-icmp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+icmp_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
+	void* errorData)
 {
 	return B_ERROR;
 }
@@ -320,13 +331,14 @@ icmp_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
-			sStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_ICMP,
+			sStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM,
+				IPPROTO_ICMP,
 				"network/protocols/icmp/v1",
 				"network/protocols/ipv4/v1",
 				NULL);
 
-			sStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_ICMP,
-				"network/protocols/icmp/v1");
+			sStackModule->register_domain_receiving_protocol(AF_INET,
+				IPPROTO_ICMP, "network/protocols/icmp/v1");
 			return B_OK;
 		}
 
@@ -380,12 +392,12 @@ net_protocol_module_info sICMPModule = {
 };
 
 module_dependency module_dependencies[] = {
-	{NET_STACK_MODULE_NAME, (module_info **)&sStackModule},
-	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{NET_STACK_MODULE_NAME, (module_info**)&sStackModule},
+	{NET_BUFFER_MODULE_NAME, (module_info**)&gBufferModule},
 	{}
 };
 
-module_info *modules[] = {
-	(module_info *)&sICMPModule,
+module_info* modules[] = {
+	(module_info*)&sICMPModule,
 	NULL
 };
