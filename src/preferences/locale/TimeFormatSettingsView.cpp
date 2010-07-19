@@ -188,7 +188,7 @@ FormatView::FormatView(BCountry* country)
 
 	BString timeFormat;
 	fCountry->TimeFormat(timeFormat, false);
-	if (timeFormat.FindFirst(" a"))
+	if (timeFormat.FindFirst("a") != B_ERROR)
 		f12HrRadioButton->SetValue(1);
 	else
 		f24HrRadioButton->SetValue(1);
@@ -537,10 +537,14 @@ FormatView::SetCountry(BCountry* country)
 	delete fCountry;
 	fCountry = country;
 
-	/*
-	f24HrRadioButton->SetValue(settings.ClockIs24Hr());
-	f12HrRadioButton->SetValue(!settings.ClockIs24Hr());
+	BString timeFormat;
+	fCountry->TimeFormat(timeFormat, false);
+	if (timeFormat.FindFirst("a") != B_ERROR)
+		f12HrRadioButton->SetValue(1);
+	else
+		f24HrRadioButton->SetValue(1);
 
+	/*
 	FormatSeparator separator = settings.TimeFormatSeparator();
 
 	if (separator >= kNoSeparator && separator < kSeparatorsEnd)
