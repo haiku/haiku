@@ -311,7 +311,12 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 	status_t Init(const char* fileName)
 	{
 		// open and stat file
-		fFD = open(fileName, O_RDWR);
+		fFD = open(fileName, O_RDWR | O_NOCACHE);
+			// TODO: The O_NOCACHE is a work-around for a page writer problem.
+			// Since it collects pages for writing back without regard for
+			// which caches and file systems they belong to, a deadlock can
+			// result when pages from both the underlying file system and the
+			// one using the checksum device are collected in one run.
 		if (fFD < 0)
 			return errno;
 
