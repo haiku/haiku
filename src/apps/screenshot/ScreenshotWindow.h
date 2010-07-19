@@ -50,7 +50,7 @@ private:
 			void			_UpdateFilenameSelection();
 			void			_SetupTranslatorMenu();
 			status_t		_SaveScreenshot();
-			void			_ShowSettings();
+			void			_ShowSettings(bool activate);
 			BString			_FindValidFileName(const char* name);
 			BPath			_GetDirectory();
 			void			_ReadSettings();
@@ -69,6 +69,7 @@ private:
 			BBitmap*		fScreenshot;
 			BFilePanel*		fOutputPathPanel;
 			BMenuItem*		fLastSelectedPath;
+			BWindow*		fSettingsWindow;
 
 			bigtime_t		fDelay;
 			bool			fIncludeBorder;

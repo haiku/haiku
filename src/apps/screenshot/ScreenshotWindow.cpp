@@ -31,6 +31,7 @@
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <MessageFilter.h>
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
@@ -41,6 +42,10 @@
 
 #include "PreviewView.h"
 #include "Utility.h"
+
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "ScreenshotWindow"
 
 
 enum {
@@ -56,22 +61,47 @@ enum {
 };
 
 
+// #pragma mark - QuitMessageFilter
+
+
+class QuitMessageFilter : public BMessageFilter {
+public:
+							QuitMessageFilter(BWindow** window)
+								:
+								BMessageFilter((uint32)B_QUIT_REQUESTED),
+								fWindow(window)
+							{
+							}
+	virtual	filter_result	Filter(BMessage* message, BHandler** target)
+							{
+								*fWindow = NULL;
+								return B_DISPATCH_MESSAGE;
+							}
+
+private:
+			BWindow**		fWindow;
+		
+};
+
+
+// #pragma mark - DirectoryRefFilter
+
+
 class DirectoryRefFilter : public BRefFilter {
 public:
 	virtual ~DirectoryRefFilter()
 	{
 	}
 
-	virtual bool Filter(const entry_ref* ref, BNode* node,
-		struct stat_beos* stat, const char* filetype)
-	{
-		return node->IsDirectory();
-	}
+	virtual	bool	Filter(const entry_ref* ref, BNode* node,
+						struct stat_beos* stat, const char* filetype)
+					{
+						return node->IsDirectory();
+					}
 };
 
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "ScreenshotWindow"
+// #pragma mark - ScreenshotWindow
 
 
 ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
@@ -86,6 +116,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	fScreenshot(NULL),
 	fOutputPathPanel(NULL),
 	fLastSelectedPath(NULL),
+	fSettingsWindow(NULL),
 	fDelay(0),
 	fIncludeBorder(false),
 	fIncludeCursor(false),
@@ -262,6 +293,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			fNameControl->SetText(_FindValidFileName(
 				fNameControl->Text()).String());
 			_UpdateFilenameSelection();
+			_ShowSettings(false);
 			break;
 
 		case kLocationChanged:
@@ -308,7 +340,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			break;
 			
 		case kSettings:
-			_ShowSettings();
+			_ShowSettings(true);
 			break;
 
 		default:
@@ -325,9 +357,6 @@ ScreenshotWindow::Quit()
 		_WriteSettings();
 	BWindow::Quit();
 }
-
-
-// #pragma - private
 
 
 void
@@ -555,8 +584,11 @@ ScreenshotWindow::_SaveScreenshot()
 
 
 void
-ScreenshotWindow::_ShowSettings()
+ScreenshotWindow::_ShowSettings(bool activate)
 {
+	if (!fSettingsWindow && !activate)
+		return;
+	
 	// Find a translator
 	translator_id translator = 0;
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
@@ -568,7 +600,8 @@ ScreenshotWindow::_ShowSettings()
 	for (int32 x = 0; x < numTranslators; x++) {
 		const translation_format* formats = NULL;
 		int32 numFormats;
-		if (roster->GetOutputFormats(translators[x], &formats, &numFormats) == B_OK) {
+		if (roster->GetOutputFormats(translators[x], &formats,
+			&numFormats) == B_OK) {
 			for (int32 i = 0; i < numFormats; ++i) {
 				if (formats[i].type == static_cast<uint32>(fImageFileType)) {
 					translator = translators[x];
@@ -584,7 +617,7 @@ ScreenshotWindow::_ShowSettings()
 	if (!foundTranslator)
 		return;
 
-	// Create a window with a configuration view	
+	// Create a window with a configuration view
 	BView *view;
 	BRect rect(0, 0, 239, 239);
 
@@ -594,12 +627,23 @@ ScreenshotWindow::_ShowSettings()
 		BAlert *alert = new BAlert(NULL, strerror(err), "OK");
 		alert->Go();
 	} else {
-		BWindow* window = new BWindow(rect, "Translator Settings",
-			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
-		window->AddChild(view);
-		window->CenterOnScreen();
-		window->Show();
+		if (fSettingsWindow) {
+			fSettingsWindow->RemoveChild(fSettingsWindow->ChildAt(0));
+			float width, height;
+			view->GetPreferredSize(&width, &height);
+			fSettingsWindow->ResizeTo(width, height);
+			fSettingsWindow->AddChild(view);
+			if (activate)
+				fSettingsWindow->Activate();
+		} else {
+			fSettingsWindow = new BWindow(rect, "Translator Settings",
+				B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+				B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
+			fSettingsWindow->AddFilter(new QuitMessageFilter(&fSettingsWindow));
+			fSettingsWindow->AddChild(view);
+			fSettingsWindow->CenterOnScreen();
+			fSettingsWindow->Show();
+		}
 	}
 }
 
