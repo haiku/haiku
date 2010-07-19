@@ -253,34 +253,40 @@ status_t
 File::GetFileVecs(uint64 offset, size_t size, file_io_vec* vecs, size_t count,
 	size_t& _count)
 {
+	FUNCTION("offset: %" B_PRIu64 ", size: %" B_PRIuSIZE ", count: %" B_PRIuSIZE
+		"\n", offset, size, count);
+
 	// Round size to block size, but restrict to file size. This semantics is
 	// fine with the caller (the file map) and it will help avoiding partial
 	// block I/O.
 	uint32 inBlockOffset = offset % B_PAGE_SIZE;
-	offset -= inBlockOffset;
-	size = BLOCK_ROUND_UP(size + inBlockOffset);
 
-	uint64 fileSize = BLOCK_ROUND_UP(Size());
-	if (offset >= fileSize) {
+	uint64 firstBlock = offset / B_PAGE_SIZE;
+	uint64 neededBlockCount = BLOCK_ROUND_UP((uint64)size + inBlockOffset)
+		/ B_PAGE_SIZE;
+	uint64 fileBlockCount = BLOCK_ROUND_UP(Size()) / B_PAGE_SIZE;
+
+	if (firstBlock >= fileBlockCount) {
 		_count = 0;
 		return B_OK;
 	}
 
-	if (offset + size > fileSize)
-		size = fileSize - offset;
-
-	uint64 blockCount = fileSize / B_PAGE_SIZE;
+	if (firstBlock + neededBlockCount > fileBlockCount)
+		neededBlockCount = fileBlockCount - firstBlock;
 
 	// get the level infos
 	int32 depth;
-	LevelInfo* infos = _GetLevelInfos(blockCount, depth);
+	LevelInfo* infos = _GetLevelInfos(fileBlockCount, depth);
 	if (infos == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	ArrayDeleter<LevelInfo> infosDeleter(infos);
 
 	// prepare for the iteration
-	uint64 firstBlock = offset / B_PAGE_SIZE;
 	uint64 blockIndex = BlockIndex();
+
+	PRINT("  preparing iteration: firstBlock: %" B_PRIu64 ", blockIndex: %"
+		B_PRIu64 "\n", firstBlock, blockIndex);
+
 	for (int32 i = 0; i < depth; i++) {
 		LevelInfo& info = infos[i];
 		if (!info.block.GetReadable(GetVolume(), blockIndex))
@@ -296,11 +302,14 @@ File::GetFileVecs(uint64 offset, size_t size, file_io_vec* vecs, size_t count,
 		firstBlock -= (uint64)info.index << info.addressableShift;
 
 		blockIndex = info.blockData[info.index];
+
+		PRINT("  preparing level %" B_PRId32 ": index: %" B_PRId32
+			", firstBlock: %" B_PRIu64 ", blockIndex: %" B_PRIu64 "\n", i,
+			info.index, firstBlock, blockIndex);
 	}
 
 	// and iterate
 	int32 level = depth - 1;
-	uint64 neededBlockCount = size / B_PAGE_SIZE;
 	size_t countAdded = 0;
 
 	while (true) {
@@ -308,12 +317,18 @@ File::GetFileVecs(uint64 offset, size_t size, file_io_vec* vecs, size_t count,
 
 		if (info.index == (int32)kFileBlockMaxCount) {
 			// end of block -- back track to next greater branch
+			PRINT("  level: %" B_PRId32 ": index: %" B_PRId32 " -> back "
+				"tracking\n", level, info.index);
+
 			level--;
 			infos[level].index++;
 			continue;
 		}
 
 		blockIndex = info.blockData[info.index];
+
+		PRINT("  level: %" B_PRId32 ": index: %" B_PRId32 " -> blockIndex: %"
+			B_PRIu64 "\n", level, info.index, blockIndex);
 
 		if (level < depth - 1) {
 			// descend to next level
@@ -327,6 +342,8 @@ File::GetFileVecs(uint64 offset, size_t size, file_io_vec* vecs, size_t count,
 			continue;
 		}
 
+		info.index++;
+
 		// add the block
 		uint64 blockOffset = blockIndex * B_PAGE_SIZE;
 		if (countAdded > 0
@@ -336,14 +353,23 @@ File::GetFileVecs(uint64 offset, size_t size, file_io_vec* vecs, size_t count,
 			// the block continues where the previous block ends -- just extend
 			// the vector
 			vecs[countAdded - 1].length += B_PAGE_SIZE;
+
+			PRINT("  -> extended vector %" B_PRIuSIZE ": offset: %"
+				B_PRIdOFF " size: %" B_PRIdOFF "\n", countAdded - 1,
+				vecs[countAdded - 1].offset, vecs[countAdded - 1].length);
 		} else {
 			// we need a new block
 			if (countAdded == count)
 				break;
 
-			vecs[countAdded].offset = blockOffset;
-			vecs[countAdded].length = B_PAGE_SIZE;
+			vecs[countAdded].offset = blockOffset + inBlockOffset;
+			vecs[countAdded].length = B_PAGE_SIZE - inBlockOffset;
 			countAdded++;
+			inBlockOffset = 0;
+
+			PRINT("  -> added vector %" B_PRIuSIZE ":    offset: %"
+				B_PRIdOFF " size: %" B_PRIdOFF "\n", countAdded - 1,
+				vecs[countAdded - 1].offset, vecs[countAdded - 1].length);
 		}
 
 		if (--neededBlockCount == 0)
