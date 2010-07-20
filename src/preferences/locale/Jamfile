@@ -11,15 +11,10 @@ local sources =
 	TimeFormatSettingsView.cpp
 ;
 
-SubDirSysHdrs $(HAIKU_ICU_HEADERS) ;
-Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
-	# Dependency needed to trigger downloading/unzipping the package before
-	# compiling the files.
-
 Preference Locale
 	: $(sources)
-	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++)
-		libshared.a $(HAIKU_LOCALE_LIBS) $(HAIKU_ICU_LIBS)
+	: be $(TARGET_LIBSTDC++) $(TARGET_LIBSUPC++) libshared.a
+		$(HAIKU_LOCALE_LIBS)
 	: Locale.rdef
 ;
 

@@ -30,8 +30,6 @@
 #include <TextControl.h>
 #include <Window.h>
 
-#include <unicode/utypes.h>
-
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "TimeFormatSettings"
@@ -613,10 +611,10 @@ FormatView::_UpdateExamples()
 	fShortTimeExampleView->SetText(timeFormat);
 
 	status_t Error = fCountry->FormatNumber(&timeFormat, 1234.5678);
-	if (Error == U_ZERO_ERROR)
+	if (Error == B_OK)
 		fNumberFormatExampleView->SetText(timeFormat);
 	else
-		fNumberFormatExampleView->SetText(u_errorName((UErrorCode)Error));
+		fNumberFormatExampleView->SetText("ERROR");
 }
 
 

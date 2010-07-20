@@ -26,11 +26,6 @@
 #include <TabView.h>
 #include <UnicodeChar.h>
 
-#include <ICUWrapper.h>
-
-#include <unicode/locid.h>
-#include <unicode/datefmt.h>
-
 #include "TimeFormatSettingsView.h"
 
 
@@ -176,6 +171,25 @@ LocaleWindow::LocaleWindow()
 	// get all available countries from ICU
 	// Use DateFormat::getAvailableLocale so we get only the one we can
 	// use. Maybe check the NumberFormat one and see if there is more.
+	BMessage countryList;
+	be_locale_roster->GetInstalledLanguages(&countryList);
+	BString countryCode;
+
+	for (int i = 0; countryList.FindString("langs", i, &countryCode) == B_OK;
+			i++) {
+		BCountry country(countryCode);
+		BString countryName;
+
+		country.Name(countryName);
+
+		LanguageListItem* item
+			= new LanguageListItem(countryName, countryCode,
+				NULL);
+		listView->AddItem(item);
+		if (!strcmp(countryCode, defaultCountry->Code()))
+			listView->Select(listView->CountItems() - 1);
+	}
+	/*
 	int32_t localeCount;
 	const Locale* currentLocale = Locale::getAvailableLocales(localeCount);
 
@@ -192,7 +206,7 @@ LocaleWindow::LocaleWindow()
 		listView->AddItem(item);
 		if (!strcmp(currentLocale[index].getName(), defaultCountry->Code()))
 			listView->Select(listView->CountItems() - 1);
-	}
+	}*/
 
 	// TODO: find a real solution intead of this hack
 	listView->SetExplicitMinSize(
