@@ -11,11 +11,14 @@
 #include <algorithm>
 #include <new>
 
+#include <fs_cache.h>
+
 #include <AutoDeleter.h>
 
 #include "Block.h"
 #include "BlockAllocator.h"
 #include "DebugSupport.h"
+#include "Transaction.h"
 #include "Volume.h"
 
 

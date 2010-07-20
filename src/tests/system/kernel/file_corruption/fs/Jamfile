@@ -17,6 +17,7 @@ SubDirC++Flags -Werror ;
 
 
 HAIKU_CHECKSUM_FS_SOURCES =
+	Block.cpp
 	BlockAllocator.cpp
 	checksumfs.cpp
 	Directory.cpp

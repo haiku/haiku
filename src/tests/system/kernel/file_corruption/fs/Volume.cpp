@@ -29,6 +29,7 @@
 #include "File.h"
 #include "SuperBlock.h"
 #include "SymLink.h"
+#include "Transaction.h"
 
 
 Volume::Volume(uint32 flags)

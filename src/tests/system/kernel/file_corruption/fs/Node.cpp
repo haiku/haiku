@@ -12,6 +12,7 @@
 
 #include "Block.h"
 #include "DebugSupport.h"
+#include "Volume.h"
 
 
 static inline uint64

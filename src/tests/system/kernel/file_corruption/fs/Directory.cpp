@@ -14,6 +14,8 @@
 #include "Block.h"
 #include "BlockAllocator.h"
 #include "DebugSupport.h"
+#include "Transaction.h"
+#include "Volume.h"
 
 
 class DirEntryBlock {
