@@ -1494,14 +1494,6 @@ AboutView::_CreateCreditsView()
 		.SetURL("http://www.ralinktech.com/"));
 #endif
 
-	// ICU copyrights
-	_AddPackageCredit(PackageCredit(
-			"ICU - International Components for Unicode")
-		.SetCopyright(COPYRIGHT_STRING
-			"1995-2009 International Business Machines Corporation and others")
-		.SetLicense("ICU")
-		.SetURL("http://www.icu-project.org"));
-
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();
 
