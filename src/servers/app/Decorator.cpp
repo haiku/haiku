@@ -99,9 +99,9 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 	if (flags & B_NOT_RESIZABLE)
 		flags |= B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE;
 
-	fFootprintValid = false;
-		// the border might have changed (smaller/larger tab)
 	_SetFlags(flags, updateRegion);
+	_InvalidateFootprint();
+		// the border might have changed (smaller/larger tab)
 }
 
 
@@ -110,8 +110,8 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 void
 Decorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 {
-	fFootprintValid = false;
 	_FontsChanged(settings, updateRegion);
+	_InvalidateFootprint();
 }
 
 
@@ -122,9 +122,9 @@ void
 Decorator::SetLook(DesktopSettings& settings, window_look look,
 	BRegion* updateRect)
 {
-	fFootprintValid = false;
-		// the border very likely changed
 	_SetLook(settings, look, updateRect);
+	_InvalidateFootprint();
+		// the border very likely changed
 }
 
 
@@ -183,11 +183,11 @@ Decorator::SetZoom(bool pressed)
 void
 Decorator::SetTitle(const char* string, BRegion* updateRegion)
 {
-	fFootprintValid = false;
-		// the border very likely changed
-
 	fTitle.SetTo(string);
 	_SetTitle(string, updateRegion);
+
+	_InvalidateFootprint();
+		// the border very likely changed
 
 	// TODO: redraw?
 }
@@ -406,8 +406,8 @@ Decorator::ResizeBy(float x, float y, BRegion* dirty)
 void
 Decorator::ResizeBy(BPoint offset, BRegion* dirty)
 {
-	fFootprintValid = false;
 	_ResizeBy(offset, dirty);
+	_InvalidateFootprint();
 }
 
 
@@ -415,7 +415,7 @@ bool
 Decorator::SetTabLocation(float location, BRegion* updateRegion)
 {
 	if (_SetTabLocation(location, updateRegion)) {
-		fFootprintValid = false;
+		_InvalidateFootprint();
 		return true;
 	}
 	return false;
@@ -426,7 +426,7 @@ bool
 Decorator::SetSettings(const BMessage& settings, BRegion* updateRegion)
 {
 	if (_SetSettings(settings, updateRegion)) {
-		fFootprintValid = false;
+		_InvalidateFootprint();
 		return true;
 	}
 	return false;
@@ -666,4 +666,11 @@ Decorator::_SetSettings(const BMessage& settings, BRegion* updateRegion)
 void
 Decorator::_GetFootprint(BRegion *region)
 {
+}
+
+
+void
+Decorator::_InvalidateFootprint()
+{
+	fFootprintValid = false;
 }

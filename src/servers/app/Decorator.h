@@ -158,6 +158,7 @@ protected:
 								BRegion* updateRegion = NULL);
 
 	virtual	void			_GetFootprint(BRegion *region);
+			void			_InvalidateFootprint();
 
 			DrawingEngine*	fDrawingEngine;
 			DrawState		fDrawState;

@@ -775,6 +775,7 @@ DefaultDecorator::_FontsChanged(DesktopSettings& settings,
 	_InvalidateBitmaps();
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
@@ -796,6 +797,7 @@ DefaultDecorator::_SetLook(DesktopSettings& settings, window_look look,
 	_InvalidateBitmaps();
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
@@ -813,6 +815,7 @@ DefaultDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 	fFlags = flags;
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
