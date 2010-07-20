@@ -9,6 +9,8 @@
 
 #include "MacDecorator.h"
 
+#include <stdio.h>
+
 #include <GradientLinear.h>
 #include <Point.h>
 #include <View.h>
@@ -21,8 +23,7 @@
 
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
-#	include <stdio.h>
-#	define STRACE(x) printf x ;
+#	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
 #endif
@@ -134,8 +135,10 @@ MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 void
 MacDecorator::_DoLayout()
 {
-	int32 kDefaultBorderWidth = 6;
+	const int32 kDefaultBorderWidth = 6;
 	STRACE(("MacDecorator: Do Layout\n"));
+	// Here we determine the size of every rectangle that we use
+	// internally when we are given the size of the client rectangle.
 
 	bool hasTab = false;
 
@@ -162,10 +165,10 @@ MacDecorator::_DoLayout()
 			fBorderWidth = 0;
 	}
 	fBorderRect=fFrame;
+	fBorderRect.InsetBy(-fBorderWidth, -fBorderWidth);
 
 	// calculate our tab rect
 	if (hasTab) {
-		fBorderRect.InsetBy(-kDefaultBorderWidth, -kDefaultBorderWidth);
 		fBorderRect.top +=3;
 
 		font_height fontHeight;
@@ -645,6 +648,7 @@ MacDecorator::_FontsChanged(DesktopSettings& settings,
 	_UpdateFont(settings);
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
@@ -665,6 +669,7 @@ MacDecorator::_SetLook(DesktopSettings& settings, window_look look,
 	_UpdateFont(settings);
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
@@ -681,6 +686,7 @@ MacDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
@@ -699,7 +705,12 @@ MacDecorator::_SetColors()
 void
 MacDecorator::_MoveBy(BPoint offset)
 {
-	// TODO ?
+	fFrame.OffsetBy(offset);
+	fCloseRect.OffsetBy(offset);
+	fTabRect.OffsetBy(offset);
+	fResizeRect.OffsetBy(offset);
+	fZoomRect.OffsetBy(offset);
+	fBorderRect.OffsetBy(offset);
 }
 
 

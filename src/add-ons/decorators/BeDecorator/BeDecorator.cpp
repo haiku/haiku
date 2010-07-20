@@ -13,6 +13,8 @@
 
 #include "BeDecorator.h"
 
+#include <stdio.h>
+
 #include "DesktopSettings.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
@@ -28,7 +30,6 @@
 
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
-#	include <stdio.h>
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
@@ -114,7 +115,7 @@ BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect,
 	// resize itself!
 
 	STRACE(("BeDecorator:\n"));
-	STRACE(("\tFrame(%.1f,%.1f,%.1f,%.1f)\n",
+	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
 		rect.left, rect.top, rect.right, rect.bottom));
 }
 
@@ -754,11 +755,7 @@ BeDecorator::_SetTitle(const char* string, BRegion* updateRegion)
 	if (updateRegion == NULL)
 		return;
 
-	BRect updatedRect = TabRect();
-	if (rect.left > updatedRect.left)
-		rect.left = updatedRect.left;
-	if (rect.right < updatedRect.right)
-		rect.right = updatedRect.right;
+	rect = rect | TabRect();
 
 	rect.bottom++;
 		// the border will look differently when the title is adjacent
@@ -778,6 +775,7 @@ BeDecorator::_FontsChanged(DesktopSettings& settings,
 	_UpdateFont(settings);
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
@@ -793,10 +791,12 @@ BeDecorator::_SetLook(DesktopSettings& settings, window_look look,
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 
-	_UpdateFont(settings);
+	fLook = look;
 
+	_UpdateFont(settings);
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
@@ -811,8 +811,10 @@ BeDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 
+	fFlags = flags;
 	_DoLayout();
 
+	_InvalidateFootprint();
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 }
