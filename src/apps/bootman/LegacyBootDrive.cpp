@@ -15,6 +15,7 @@
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
+#include <Locale.h>
 #include <Partition.h>
 #include <Path.h>
 #include <String.h>

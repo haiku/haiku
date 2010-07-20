@@ -17,8 +17,9 @@
 #include <new>
 
 #include <Bitmap.h>
-#include <Country.h>
 #include <Catalog.h>
+#include <Country.h>
+#include <Locale.h>
 #include <Window.h>
 
 

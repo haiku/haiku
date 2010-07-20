@@ -12,6 +12,7 @@
 #include <GroupLayout.h>
 #include <HashMap.h>
 #include <LayoutItem.h>
+#include <Locale.h>
 #include <PartitioningInfo.h>
 #include <String.h>
 

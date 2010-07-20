@@ -16,6 +16,7 @@
 #include <Alert.h>
 #include <Autolock.h>
 #include <Catalog.h>
+#include <Locale.h>
 #include <PrintJob.h>
 
 

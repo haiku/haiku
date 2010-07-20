@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <Locale.h>
 #include <MimeType.h>
 #include <Roster.h>
 #include <Window.h>

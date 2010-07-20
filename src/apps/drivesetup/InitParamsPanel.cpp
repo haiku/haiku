@@ -18,6 +18,7 @@
 #include <ControlLook.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <Message.h>
 #include <MessageFilter.h>
 #include <String.h>

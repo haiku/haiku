@@ -18,9 +18,10 @@
 #include <GridLayout.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Layout.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <Layout.h>
 #include <NodeInfo.h>
 #include <Path.h>
 

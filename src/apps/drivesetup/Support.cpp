@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include <Catalog.h>
+#include <Locale.h>
 #include <Partition.h>
 #include <String.h>
 

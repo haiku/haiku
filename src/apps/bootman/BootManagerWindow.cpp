@@ -17,6 +17,7 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <Locale.h>
 #include <Roster.h>
 #include <Screen.h>
 

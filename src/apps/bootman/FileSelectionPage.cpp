@@ -12,6 +12,7 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <Locale.h>
 #include <Path.h>
 #include <RadioButton.h>
 #include <TextControl.h>

@@ -14,6 +14,7 @@
 #include <Entry.h>
 #include <fs_attr.h>
 #include <LayoutUtils.h>
+#include <Locale.h>
 #include <Messenger.h>
 #include <ScrollBar.h>
 #include <String.h>

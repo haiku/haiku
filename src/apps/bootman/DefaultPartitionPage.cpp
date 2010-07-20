@@ -12,6 +12,7 @@
 
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <Locale.h>
 #include <Message.h>
 #include <MenuItem.h>
 #include <MenuField.h>

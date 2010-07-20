@@ -38,20 +38,19 @@ of their respective holders. All rights reserved.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <InterfaceKit.h>
-#include <StorageKit.h>
-#include <E-mail.h>
+
 #include <Application.h>
-
-# include <GridView.h>
-# include <GroupLayoutBuilder.h>
-
-#include <MailSettings.h>
-#include <mail_encoding.h>
-
-#include <String.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
+#include <E-mail.h>
+#include <GridView.h>
+#include <GroupLayoutBuilder.h>
+#include <InterfaceKit.h>
+#include <Locale.h>
+#include <MailSettings.h>
+#include <mail_encoding.h>
+#include <StorageKit.h>
+#include <String.h>
 
 using namespace BPrivate;
 

@@ -12,6 +12,7 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <Directory.h>
+#include <Locale.h>
 #include <Mime.h>
 #include <NodeInfo.h>
 #include <String.h>

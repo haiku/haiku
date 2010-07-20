@@ -15,6 +15,7 @@
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <Message.h>

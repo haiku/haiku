@@ -24,6 +24,7 @@
 #include <DiskDeviceVisitor.h>
 #include <DiskDeviceTypes.h>
 #include <DiskSystem.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <MenuBar.h>
 #include <Menu.h>

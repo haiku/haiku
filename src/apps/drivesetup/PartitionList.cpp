@@ -12,6 +12,7 @@
 
 #include <Catalog.h>
 #include <ColumnTypes.h>
+#include <Locale.h>
 #include <Path.h>
 
 #include "Support.h"

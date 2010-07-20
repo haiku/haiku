@@ -18,6 +18,7 @@
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>

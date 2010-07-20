@@ -11,6 +11,7 @@
 
 
 #include <Catalog.h>
+#include <Locale.h>
 #include <RadioButton.h>
 #include <TextView.h>
 

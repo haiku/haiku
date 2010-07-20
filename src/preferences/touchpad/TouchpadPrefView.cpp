@@ -19,6 +19,7 @@
 #include <FindDirectory.h>
 #include <Input.h>
 #include <LayoutBuilder.h>
+#include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>

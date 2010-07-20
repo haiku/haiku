@@ -15,6 +15,7 @@
 #include <Catalog.h>
 #include <FindDirectory.h>
 #include <ListView.h>
+#include <Locale.h>
 #include <ScrollView.h>
 
 #include "pr_server.h"

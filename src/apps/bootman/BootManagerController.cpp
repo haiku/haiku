@@ -31,6 +31,7 @@
 #include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <Path.h>
 #include <String.h>
 
