@@ -12,6 +12,10 @@
 
 
 struct CheckSum {
+	const uint8* Data() const
+	{
+		return fData;
+	}
 
 	bool IsZero() const
 	{
@@ -26,6 +30,12 @@ struct CheckSum {
 	CheckSum& operator=(const CheckSum& other)
 	{
 		memcpy(fData, other.fData, sizeof(fData));
+		return *this;
+	}
+
+	CheckSum& operator=(const void* buffer)
+	{
+		memcpy(fData, buffer, sizeof(fData));
 		return *this;
 	}
 
