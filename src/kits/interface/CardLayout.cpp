@@ -6,46 +6,66 @@
 #include <CardLayout.h>
 
 #include <LayoutItem.h>
+#include <Message.h>
 #include <View.h>
 
-// constructor
+
+namespace {
+	const char* kVisibleItemField = "BCardLayout:visibleItem";
+}
+
+
 BCardLayout::BCardLayout()
-	: BLayout(),
-	  fMin(0, 0),
-	  fMax(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED),
-	  fPreferred(0, 0),
-	  fVisibleItem(NULL),
-	  fMinMaxValid(false)
+	:
+	BLayout(),
+	fMin(0, 0),
+	fMax(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED),
+	fPreferred(0, 0),
+	fVisibleItem(NULL),
+	fMinMaxValid(false)
 {
 }
 
-// destructor
+
+BCardLayout::BCardLayout(BMessage* from)
+	:
+	BLayout(BUnarchiver::PrepareArchive(from)),
+	fMin(0, 0),
+	fMax(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED),
+	fPreferred(0, 0),
+	fVisibleItem(NULL),
+	fMinMaxValid(false)
+{
+	BUnarchiver(from).Finish();
+}
+
+
 BCardLayout::~BCardLayout()
 {
 }
 
-// VisibleItem
+
 BLayoutItem*
 BCardLayout::VisibleItem() const
 {
 	return fVisibleItem;
 }
 
-// VisibleIndex
+
 int32
 BCardLayout::VisibleIndex() const
 {
 	return IndexOfItem(fVisibleItem);
 }
 
-// SetVisibleItem
+
 void
 BCardLayout::SetVisibleItem(int32 index)
 {
 	SetVisibleItem(ItemAt(index));
 }
 
-// SetVisibleItem
+
 void
 BCardLayout::SetVisibleItem(BLayoutItem* item)
 {
@@ -67,7 +87,7 @@ BCardLayout::SetVisibleItem(BLayoutItem* item)
 	}
 }
 
-// MinSize
+
 BSize
 BCardLayout::MinSize()
 {
@@ -75,7 +95,7 @@ BCardLayout::MinSize()
 	return fMin;
 }
 
-// MaxSize
+
 BSize
 BCardLayout::MaxSize()
 {
@@ -83,7 +103,7 @@ BCardLayout::MaxSize()
 	return fMax;
 }
 
-// PreferredSize
+
 BSize
 BCardLayout::PreferredSize()
 {
@@ -91,14 +111,14 @@ BCardLayout::PreferredSize()
 	return fPreferred;
 }
 
-// Alignment
+
 BAlignment
 BCardLayout::Alignment()
 {
 	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 }
 
-// HasHeightForWidth
+
 bool
 BCardLayout::HasHeightForWidth()
 {
@@ -111,7 +131,7 @@ BCardLayout::HasHeightForWidth()
 	return false;
 }
 
-// GetHeightForWidth
+
 void
 BCardLayout::GetHeightForWidth(float width, float* min, float* max,
 	float* preferred)
@@ -152,7 +172,7 @@ BCardLayout::GetHeightForWidth(float width, float* min, float* max,
 		*preferred = preferredHeight;
 }
 
-// InvalidateLayout
+
 void
 BCardLayout::InvalidateLayout()
 {
@@ -161,7 +181,7 @@ BCardLayout::InvalidateLayout()
 	fMinMaxValid = false;
 }
 
-// LayoutView
+
 void
 BCardLayout::LayoutView()
 {
@@ -175,14 +195,52 @@ BCardLayout::LayoutView()
 		fVisibleItem->AlignInFrame(BRect(0, 0, size.width, size.height));
 }
 
-// ItemAdded
+
+status_t
+BCardLayout::Archive(BMessage* into, bool deep) const
+{
+	BArchiver archiver(into);
+	status_t err = BLayout::Archive(into, deep);
+
+	if (err == B_OK && deep)
+		err = into->AddInt32(kVisibleItemField, IndexOfItem(fVisibleItem));
+
+	return archiver.Finish(err);
+}
+
+
+status_t
+BCardLayout::AllUnarchived(const BMessage* from)
+{
+	status_t err = BLayout::AllUnarchived(from);
+	if (err != B_OK)
+		return err;
+
+	int32 visibleIndex;
+	err = from->FindInt32(kVisibleItemField, &visibleIndex);
+	if (err == B_OK)
+		SetVisibleItem(visibleIndex);
+
+	return err;
+}
+
+
+BArchivable*
+BCardLayout::Instantiate(BMessage* from)
+{
+	if (validate_instantiation(from, "BCardLayout"))
+		return new BCardLayout(from);
+	return NULL;
+}
+	
+
 void
 BCardLayout::ItemAdded(BLayoutItem* item)
 {
 	item->SetVisible(false);
 }
 
-// ItemRemoved
+
 void
 BCardLayout::ItemRemoved(BLayoutItem* item)
 {
@@ -192,7 +250,7 @@ BCardLayout::ItemRemoved(BLayoutItem* item)
 	}
 }
 
-// _ValidateMinMax
+
 void
 BCardLayout::_ValidateMinMax()
 {

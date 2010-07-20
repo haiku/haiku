@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_CARD_LAYOUT_H
@@ -11,6 +11,7 @@
 class BCardLayout : public BLayout {
 public:
 								BCardLayout();
+								BCardLayout(BMessage* from);
 	virtual						~BCardLayout();
 
 			BLayoutItem*		VisibleItem() const;
@@ -29,6 +30,10 @@ public:
 
 	virtual	void				InvalidateLayout();
 	virtual	void				LayoutView();
+
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	virtual status_t			AllUnarchived(const BMessage* from);
+	static	BArchivable*		Instantiate(BMessage* from);
 
 protected:
 	virtual	void				ItemAdded(BLayoutItem* item);
