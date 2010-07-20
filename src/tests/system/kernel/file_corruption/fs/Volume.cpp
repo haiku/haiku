@@ -70,7 +70,17 @@ status_t
 Volume::Init(const char* device)
 {
 	// open the device
-	fFD = open(device, IsReadOnly() ? O_RDONLY : O_RDWR);
+	if (!IsReadOnly()) {
+		fFD = open(device, O_RDWR);
+
+		// If opening read-write fails, we retry read-only.
+		if (fFD < 0)
+			fFlags |= B_FS_IS_READONLY;
+	}
+
+	if (IsReadOnly())
+		fFD = open(device, O_RDONLY);
+
 	if (fFD < 0)
 		return errno;
 
