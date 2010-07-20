@@ -175,9 +175,6 @@ FormatView::FormatView(BCountry* country)
 
 	fSeparatorMenuField = new BMenuField(B_TRANSLATE("Separator:"), menu);
 
-	BBox* clockBox = new BBox("Clock");
-	clockBox->SetLabel(B_TRANSLATE("Clock"));
-
 	f24HrRadioButton = new BRadioButton("", B_TRANSLATE("24 hour"),
 		new BMessage(kClockFormatChange));
 
@@ -192,11 +189,6 @@ FormatView::FormatView(BCountry* country)
 		f24HrRadioButton->SetValue(1);
 
 	float spacing = be_control_look->DefaultItemSpacing();
-
-	clockBox->AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(f24HrRadioButton)
-		.Add(f12HrRadioButton)
-		.SetInsets(spacing, 0, spacing, 0));
 
 	fLongTimeExampleView = new BStringView("", "");
 	fShortTimeExampleView = new BStringView("", "");
@@ -307,7 +299,8 @@ FormatView::FormatView(BCountry* country)
 				.AddGlue()
 				.End()
 			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(clockBox)
+				.Add(f24HrRadioButton)
+				.Add(f12HrRadioButton)
 				.AddGlue()
 				.End()
 			.End()
