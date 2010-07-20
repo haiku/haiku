@@ -20,7 +20,7 @@ Block::TransferFrom(Block& other)
 	fVolume = other.fVolume;
 	fData = other.fData;
 	fIndex = other.fIndex;
-	fWritable = other.fWritable;
+	fTransaction = other.fTransaction;
 
 	other.fVolume = NULL;
 	other.fData = NULL;
@@ -33,7 +33,7 @@ Block::GetReadable(Volume* volume, uint64 blockIndex)
 	Put();
 
 	return _Init(volume, blockIndex,
-		block_cache_get(volume->BlockCache(), blockIndex), false);
+		block_cache_get(volume->BlockCache(), blockIndex), NULL);
 }
 
 
@@ -42,10 +42,14 @@ Block::GetWritable(Volume* volume, uint64 blockIndex, Transaction& transaction)
 {
 	Put();
 
+	status_t error = transaction.RegisterBlock(blockIndex);
+	if (error != B_OK)
+		return error;
+
 	return _Init(volume, blockIndex,
 		block_cache_get_writable(volume->BlockCache(), blockIndex,
 			transaction.ID()),
-		true);
+		&transaction);
 }
 
 
@@ -54,10 +58,14 @@ Block::GetZero(Volume* volume, uint64 blockIndex, Transaction& transaction)
 {
 	Put();
 
+	status_t error = transaction.RegisterBlock(blockIndex);
+	if (error != B_OK)
+		return error;
+
 	return _Init(volume, blockIndex,
 		block_cache_get_empty(volume->BlockCache(), blockIndex,
 			transaction.ID()),
-		true);
+		&transaction);
 }
 
 
@@ -66,15 +74,21 @@ Block::MakeWritable(Transaction& transaction)
 {
 	if (fVolume == NULL)
 		return B_BAD_VALUE;
-	if (fWritable)
+	if (fTransaction != NULL)
 		return B_OK;
 
-	status_t error = block_cache_make_writable(fVolume->BlockCache(),
-		fIndex, transaction.ID());
+	status_t error = transaction.RegisterBlock(fIndex);
 	if (error != B_OK)
 		return error;
 
-	fWritable = true;
+	error = block_cache_make_writable(fVolume->BlockCache(), fIndex,
+		transaction.ID());
+	if (error != B_OK) {
+		transaction.PutBlock(fIndex, NULL);
+		return error;
+	}
+
+	fTransaction = &transaction;
 	return B_OK;
 }
 
@@ -83,6 +97,9 @@ void
 Block::Put()
 {
 	if (fVolume != NULL) {
+		if (fTransaction != NULL)
+			fTransaction->PutBlock(fIndex, fData);
+
 		block_cache_put(fVolume->BlockCache(), fIndex);
 		fVolume = NULL;
 		fData = NULL;
@@ -91,7 +108,8 @@ Block::Put()
 
 
 bool
-Block::_Init(Volume* volume, uint64 blockIndex, const void* data, bool writable)
+Block::_Init(Volume* volume, uint64 blockIndex, const void* data,
+	Transaction* transaction)
 {
 	if (data == NULL)
 		return false;
@@ -99,7 +117,7 @@ Block::_Init(Volume* volume, uint64 blockIndex, const void* data, bool writable)
 	fVolume = volume;
 	fData = const_cast<void*>(data);
 	fIndex = blockIndex;
-	fWritable = writable;
+	fTransaction = transaction;
 
 	return true;
 }

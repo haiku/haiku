@@ -6,7 +6,11 @@
 
 #include "Transaction.h"
 
+#include <errno.h>
+
 #include <algorithm>
+
+#include <AutoDeleter.h>
 
 #include "BlockAllocator.h"
 #include "Volume.h"
@@ -29,6 +33,8 @@ swap_if_greater(Node*& a, Node*& b)
 Transaction::Transaction(Volume* volume)
 	:
 	fVolume(volume),
+	fSHA256(NULL),
+	fCheckSum(NULL),
 	fID(-1)
 {
 }
@@ -37,6 +43,9 @@ Transaction::Transaction(Volume* volume)
 Transaction::~Transaction()
 {
 	Abort();
+
+	delete fCheckSum;
+	delete fSHA256;
 }
 
 
@@ -44,6 +53,22 @@ status_t
 Transaction::Start()
 {
 	ASSERT(fID < 0);
+
+	status_t error = fBlockInfos.Init();
+	if (error != B_OK)
+		return error;
+
+	if (fSHA256 == NULL) {
+		fSHA256 = new(std::nothrow) SHA256;
+		if (fSHA256 == NULL)
+			return B_NO_MEMORY;
+	}
+
+	if (fCheckSum == NULL) {
+		fCheckSum = new(std::nothrow) checksum_device_ioctl_check_sum;
+		if (fCheckSum == NULL)
+			return B_NO_MEMORY;
+	}
 
 	fVolume->TransactionStarted();
 
@@ -87,9 +112,25 @@ Transaction::Commit(const PostCommitNotification* notification1,
 		}
 	}
 
+	// Make sure the previous transaction is on disk. This is not particularly
+	// performance friendly, but prevents race conditions between us setting
+	// the new block check sums and the block writer deciding to write back the
+	// old block data.
+	status_t error = block_cache_sync(fVolume->BlockCache());
+	if (error != B_OK) {
+		Abort();
+		return error;
+	}
+
+	// compute the new block check sums
+	error = _UpdateBlockCheckSums();
+	if (error != B_OK) {
+		Abort();
+		return error;
+	}
+
 	// commit the cache transaction
-	status_t error = cache_end_transaction(fVolume->BlockCache(), fID, NULL,
-		NULL);
+	error = cache_end_transaction(fVolume->BlockCache(), fID, NULL, NULL);
 	if (error != B_OK) {
 		Abort();
 		return error;
@@ -128,8 +169,23 @@ Transaction::Abort()
 		info->node->RevertNodeData(info->oldNodeData);
 	}
 
+	// revert the block check sums
+	_RevertBlockCheckSums();
+
 	// clean up
+
+	// delete the node infos
 	_DeleteNodeInfosAndUnlock(true);
+
+	// delete the block infos
+	BlockInfo* blockInfo = fBlockInfos.Clear(true);
+	while (blockInfo != NULL) {
+		BlockInfo* nextInfo = blockInfo->hashNext;
+		block_cache_put(fVolume->BlockCache(),
+			blockInfo->indexAndCheckSum.blockIndex);
+		delete nextInfo;
+		blockInfo = nextInfo;
+	}
 
 	fVolume->GetBlockAllocator()->ResetFreeBlocks(fOldFreeBlockCount);
 
@@ -228,6 +284,77 @@ Transaction::KeepNode(Node* node)
 }
 
 
+status_t
+Transaction::RegisterBlock(uint64 blockIndex)
+{
+	ASSERT(fID >= 0);
+
+	// look it up -- maybe it's already registered
+	BlockInfo* info = fBlockInfos.Lookup(blockIndex);
+	if (info != NULL) {
+		info->refCount++;
+		return B_OK;
+	}
+
+	// nope, create a new one
+	info = new(std::nothrow) BlockInfo;
+	if (info == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<BlockInfo> infoDeleter(info);
+
+	info->indexAndCheckSum.blockIndex = blockIndex;
+	info->refCount = 1;
+	info->dirty = false;
+
+	// get the old check sum
+	if (ioctl(fVolume->FD(), CHECKSUM_DEVICE_IOCTL_GET_CHECK_SUM,
+			&info->indexAndCheckSum, sizeof(info->indexAndCheckSum)) < 0) {
+		return errno;
+	}
+
+	// get the data (we're fine with read-only)
+	info->data = block_cache_get(fVolume->BlockCache(), blockIndex);
+	if (info->data == NULL) {
+		delete info;
+		return B_ERROR;
+	}
+
+	fBlockInfos.Insert(infoDeleter.Detach());
+
+	return B_OK;
+}
+
+
+void
+Transaction::PutBlock(uint64 blockIndex, const void* data)
+{
+	ASSERT(fID >= 0);
+
+	BlockInfo* info = fBlockInfos.Lookup(blockIndex);
+	if (info == NULL) {
+		panic("checksumfs: Transaction::PutBlock(): unknown block %" B_PRIu64,
+			blockIndex);
+		return;
+	}
+
+	if (info->refCount == 0) {
+		panic("checksumfs: Unbalanced Transaction::PutBlock(): for block %"
+			B_PRIu64, blockIndex);
+		return;
+	}
+
+	info->dirty |= data != NULL;
+
+	if (--info->refCount == 0 && !info->dirty) {
+		// block wasn't got successfully -- remove the info
+		fBlockInfos.Remove(info);
+		block_cache_put(fVolume->BlockCache(),
+			info->indexAndCheckSum.blockIndex);
+		delete info;
+	}
+}
+
+
 Transaction::NodeInfo*
 Transaction::_GetNodeInfo(Node* node) const
 {
@@ -266,6 +393,54 @@ Transaction::_DeleteNodeInfoAndUnlock(NodeInfo* info, bool failed)
 	delete info;
 }
 
+
+status_t
+Transaction::_UpdateBlockCheckSums()
+{
+	for (BlockInfoTable::Iterator it = fBlockInfos.GetIterator();
+			BlockInfo* info = it.Next();) {
+		if (info->refCount > 0) {
+			panic("checksumfs: Transaction::Commit(): block %" B_PRIu64
+				" still referenced", info->indexAndCheckSum.blockIndex);
+		}
+
+		if (!info->dirty)
+			continue;
+
+		// compute the check sum
+		fSHA256->Init();
+		fSHA256->Update(info->data, B_PAGE_SIZE);
+		fCheckSum->blockIndex = info->indexAndCheckSum.blockIndex;
+		fCheckSum->checkSum = fSHA256->Digest();
+
+		// set it
+		if (ioctl(fVolume->FD(), CHECKSUM_DEVICE_IOCTL_SET_CHECK_SUM, fCheckSum,
+				sizeof(*fCheckSum)) < 0) {
+			return errno;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Transaction::_RevertBlockCheckSums()
+{
+	for (BlockInfoTable::Iterator it = fBlockInfos.GetIterator();
+			BlockInfo* info = it.Next();) {
+		if (!info->dirty)
+			continue;
+
+		// set the old check sum
+		if (ioctl(fVolume->FD(), CHECKSUM_DEVICE_IOCTL_SET_CHECK_SUM,
+				&info->indexAndCheckSum, sizeof(info->indexAndCheckSum)) < 0) {
+			return errno;
+		}
+	}
+
+	return B_OK;
+}
 
 
 // #pragma mark - PostCommitNotification

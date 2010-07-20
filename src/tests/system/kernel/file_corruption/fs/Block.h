@@ -35,13 +35,13 @@ public:
 
 private:
 			bool				_Init(Volume* volume, uint64 blockIndex,
-									const void* data, bool writable);
+									const void* data, Transaction* transaction);
 
 private:
 			Volume*				fVolume;
 			void*				fData;
 			uint64				fIndex;
-			bool				fWritable;
+			Transaction*		fTransaction;
 };
 
 

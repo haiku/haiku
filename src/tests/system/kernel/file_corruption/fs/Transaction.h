@@ -9,7 +9,10 @@
 #include <fs_cache.h>
 
 #include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
 
+#include "CheckSum.h"
+#include "driver/checksum_device.h"
 #include "Node.h"
 
 
@@ -59,6 +62,9 @@ public:
 			bool				IsNodeLocked(Node* node) const
 									{ return _GetNodeInfo(node) != NULL; }
 
+			status_t			RegisterBlock(uint64 blockIndex);
+			void				PutBlock(uint64 blockIndex, const void* data);
+
 private:
 			struct NodeInfo : DoublyLinkedListLinkImpl<NodeInfo> {
 				Node*			node;
@@ -68,16 +74,57 @@ private:
 
 			typedef DoublyLinkedList<NodeInfo> NodeInfoList;
 
+			struct BlockInfo {
+				checksum_device_ioctl_check_sum	indexAndCheckSum;
+				BlockInfo*						hashNext;
+				const void*						data;
+				int32							refCount;
+				bool							dirty;
+			};
+
+			struct BlockInfoHashDefinition {
+				typedef uint64		KeyType;
+				typedef	BlockInfo	ValueType;
+
+				size_t HashKey(uint64 key) const
+				{
+					return (size_t)key;
+				}
+
+				size_t Hash(const BlockInfo* value) const
+				{
+					return HashKey(value->indexAndCheckSum.blockIndex);
+				}
+
+				bool Compare(uint64 key, const BlockInfo* value) const
+				{
+					return value->indexAndCheckSum.blockIndex == key;
+				}
+
+				BlockInfo*& GetLink(BlockInfo* value) const
+				{
+					return value->hashNext;
+				}
+			};
+
+			typedef BOpenHashTable<BlockInfoHashDefinition> BlockInfoTable;
+
 private:
 			NodeInfo*			_GetNodeInfo(Node* node) const;
 			void				_DeleteNodeInfosAndUnlock(bool failed);
 			void				_DeleteNodeInfoAndUnlock(NodeInfo* info,
 									bool failed);
 
+			status_t			_UpdateBlockCheckSums();
+			status_t			_RevertBlockCheckSums();
+
 private:
 			Volume*				fVolume;
+			SHA256*				fSHA256;
+			checksum_device_ioctl_check_sum* fCheckSum;
 			int32				fID;
 			NodeInfoList		fNodeInfos;
+			BlockInfoTable		fBlockInfos;
 			uint64				fOldFreeBlockCount;
 };
 
