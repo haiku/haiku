@@ -381,6 +381,13 @@ TermView::~TermView()
 }
 
 
+bool
+TermView::IsShellBusy() const
+{
+	return fShell != NULL && fShell->HasActiveProcesses();
+}
+
+
 /* static */
 BArchivable *
 TermView::Instantiate(BMessage* data)

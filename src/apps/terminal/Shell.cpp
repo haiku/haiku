@@ -214,7 +214,7 @@ Shell::GetAttr(struct termios &attr) const
 
 
 status_t
-Shell::SetAttr(struct termios &attr)
+Shell::SetAttr(const struct termios &attr)
 {
 	if (tcsetattr(fFd, TCSANOW, &attr) < 0)
 		return errno;
@@ -226,6 +226,17 @@ int
 Shell::FD() const
 {
 	return fFd;
+}
+
+
+bool
+Shell::HasActiveProcesses() const
+{
+	pid_t running = tcgetpgrp(fFd);
+	if (running == fProcessID || running == -1)
+		return false;
+
+	return true;
 }
 
 

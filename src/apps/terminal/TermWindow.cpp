@@ -230,6 +230,13 @@ TermWindow::_InitWindow()
 }
 
 
+bool
+TermWindow::QuitRequested()
+{
+	return BWindow::QuitRequested();
+}
+
+
 void
 TermWindow::MenusBeginning()
 {

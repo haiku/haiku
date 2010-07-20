@@ -46,6 +46,8 @@ public:
 
 	virtual void			GetPreferredSize(float* _width, float* _height);
 
+			bool			IsShellBusy() const;
+
 			const char*		TerminalName() const;
 
 	inline	TerminalBuffer* TextBuffer() const	{ return fTextBuffer; }

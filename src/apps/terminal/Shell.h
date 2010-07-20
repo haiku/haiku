@@ -24,32 +24,36 @@ public:
 			Shell();
 	virtual		~Shell();
 
-	status_t	Open(int row, int col, const char *encoding, int argc, const char **argv);
+	status_t	Open(int row, int col, const char* encoding,
+							int argc, const char** argv);
 	void		Close();
 	
-	const char *	TTYName() const;
+	const char*	TTYName() const;
 
-	ssize_t		Read(void *buffer, size_t numBytes) const;
-	ssize_t		Write(const void *buffer, size_t numBytes);
+	ssize_t		Read(void* buffer, size_t numBytes) const;
+	ssize_t		Write(const void* buffer, size_t numBytes);
 
 	status_t	UpdateWindowSize(int row, int columns);
 
-	status_t	GetAttr(struct termios &attr) const;
-	status_t	SetAttr(struct termios &attr);
+	status_t	GetAttr(struct termios& attr) const;
+	status_t	SetAttr(const struct termios& attr);
 
 	int			FD() const;
 	pid_t		ProcessID() const	{ return fProcessID; }
+
+	bool		HasActiveProcesses() const;
 	
-	virtual	status_t	AttachBuffer(TerminalBuffer *buffer);
+	virtual	status_t	AttachBuffer(TerminalBuffer* buffer);
 	virtual void	DetachBuffer();
 	
 private:
 	int		fFd;
 	pid_t		fProcessID;
-	TermParse	*fTermParse;
+	TermParse*	fTermParse;
 	bool		fAttached;
 
-	status_t	_Spawn(int row, int col, const char *encoding, int argc, const char **argv);
+	status_t	_Spawn(int row, int col, const char* encoding,
+							int argc, const char** argv);
 };
 
 #endif // _SHELL_H

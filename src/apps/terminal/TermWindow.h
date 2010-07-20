@@ -56,6 +56,7 @@ public:
 			void	SessionChanged();
 
 protected:
+	virtual bool	QuitRequested();
 	virtual void	MessageReceived(BMessage *message);
 	virtual void	WindowActivated(bool);
 	virtual void	MenusBeginning();
