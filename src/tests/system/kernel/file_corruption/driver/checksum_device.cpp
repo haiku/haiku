@@ -32,6 +32,14 @@
 #include "CheckSum.h"
 
 
+//#define TRACE_CHECK_SUM_DEVICE
+#ifdef TRACE_CHECK_SUM_DEVICE
+#	define TRACE(x...)	dprintf(x)
+#else
+#	define TRACE(x) do {} while (false)
+#endif
+
+
 // parameters for the DMA resource
 static const uint32 kDMAResourceBufferCount			= 16;
 static const uint32 kDMAResourceBounceBufferCount	= 16;
@@ -138,6 +146,14 @@ struct CheckSumCache {
 		block->checkSums[blockIndex % kCheckSumsPerBlock] = checkSum;
 		block->dirty = true;
 
+#ifdef TRACE_CHECK_SUM_DEVICE
+		TRACE("checksum_device: setting check sum of block %" B_PRIu64 " to: ",
+			blockIndex);
+		for (size_t i = 0; i < kCheckSumLength; i++)
+			TRACE("%02x", checkSum.Data()[i]);
+		TRACE("\n");
+#endif
+
 		return B_OK;
 	}
 
@@ -150,7 +166,7 @@ private:
 		// check whether we have already cached the block
 		for (BlockList::Iterator it = fBlocks.GetIterator();
 			CheckSumBlock* block = it.Next();) {
-			if (block->used && block->blockIndex) {
+			if (block->used && blockIndex == block->blockIndex) {
 				// we know it -- requeue and return
 				it.Remove();
 				fBlocks.Add(block);
@@ -434,6 +450,11 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			kRawDeviceModuleName);
 	}
 
+	status_t GetBlockCheckSum(uint64 blockIndex, CheckSum& checkSum)
+	{
+		return fCheckSumCache->GetCheckSum(blockIndex, checkSum);
+	}
+
 	status_t SetBlockCheckSum(uint64 blockIndex, const CheckSum& checkSum)
 	{
 		return fCheckSumCache->SetCheckSum(blockIndex, checkSum);
@@ -552,7 +573,9 @@ private:
 		fSHA256.Update(fTransferBuffer, B_PAGE_SIZE);
 
 		if (expectedCheckSum != fSHA256.Digest())
-			panic("Check sum mismatch for block %" B_PRIu64, blockIndex);
+			panic("Check sum mismatch for block %" B_PRIu64 " (exptected at %p"
+				", actual at %p)", blockIndex, &expectedCheckSum,
+				fSHA256.Digest());
 	}
 
 private:
@@ -1085,10 +1108,33 @@ checksum_raw_device_control(void* _cookie, uint32 op, void* buffer,
 		case B_FLUSH_DRIVE_CACHE:
 			return B_OK;
 
+		case CHECKSUM_DEVICE_IOCTL_GET_CHECK_SUM:
+		{
+			if (IS_USER_ADDRESS(buffer)) {
+				checksum_device_ioctl_check_sum getCheckSum;
+				if (user_memcpy(&getCheckSum, buffer, sizeof(getCheckSum))
+						!= B_OK) {
+					return B_BAD_ADDRESS;
+				}
+
+				status_t error = device->GetBlockCheckSum(
+					getCheckSum.blockIndex, getCheckSum.checkSum);
+				if (error != B_OK)
+					return error;
+
+				return user_memcpy(buffer, &getCheckSum, sizeof(getCheckSum));
+			}
+
+			checksum_device_ioctl_check_sum* getCheckSum
+				= (checksum_device_ioctl_check_sum*)buffer;
+			return device->GetBlockCheckSum(getCheckSum->blockIndex,
+				getCheckSum->checkSum);
+		}
+
 		case CHECKSUM_DEVICE_IOCTL_SET_CHECK_SUM:
 		{
 			if (IS_USER_ADDRESS(buffer)) {
-				checksum_device_ioctl_set_check_sum setCheckSum;
+				checksum_device_ioctl_check_sum setCheckSum;
 				if (user_memcpy(&setCheckSum, buffer, sizeof(setCheckSum))
 						!= B_OK) {
 					return B_BAD_ADDRESS;
@@ -1098,8 +1144,8 @@ checksum_raw_device_control(void* _cookie, uint32 op, void* buffer,
 					setCheckSum.checkSum);
 			}
 
-			checksum_device_ioctl_set_check_sum* setCheckSum
-				= (checksum_device_ioctl_set_check_sum*)buffer;
+			checksum_device_ioctl_check_sum* setCheckSum
+				= (checksum_device_ioctl_check_sum*)buffer;
 			return device->SetBlockCheckSum(setCheckSum->blockIndex,
 				setCheckSum->checkSum);
 		}

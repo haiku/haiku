@@ -12,11 +12,12 @@
 
 
 enum {
-	CHECKSUM_DEVICE_IOCTL_SET_CHECK_SUM	= B_DEVICE_OP_CODES_END + 0x666
+	CHECKSUM_DEVICE_IOCTL_GET_CHECK_SUM	= B_DEVICE_OP_CODES_END + 0x666,
+	CHECKSUM_DEVICE_IOCTL_SET_CHECK_SUM
 };
 
 
-struct checksum_device_ioctl_set_check_sum {
+struct checksum_device_ioctl_check_sum {
 	uint64		blockIndex;
 	CheckSum	checkSum;
 };
