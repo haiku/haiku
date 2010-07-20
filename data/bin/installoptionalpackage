@@ -145,6 +145,17 @@ function InstallOptionalHaikuImagePackage()
 	archiveFile=\`echo \$3 | sed -s "s/http.*\///"\`
 	if ! [ -f \$archiveFile ] ; then
 		echo "Downloading \$3 ..."
+		# TODO : add some error handling for downloads
+		# local attempt=1
+		# while [ `wget -nv \$3 2>&1 > /dev/null ; echo \$?` -ne 0 -a $attempt -lt 5 ]; do
+		#	echo "Download attempt #\$attempt failed. Retrying ..."
+		#	rm \$archiveFile
+		#	(( attempt++ ))
+		# done
+		# if [ $attempt -ge 5 ]; then
+		#	echo "Max download retries exceeded. Halting installation."
+		#	exit 1
+		# fi
 		wget -nv \$3
 	fi
 
