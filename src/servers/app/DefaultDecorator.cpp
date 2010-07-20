@@ -790,6 +790,8 @@ DefaultDecorator::_SetLook(DesktopSettings& settings, window_look look,
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 
+	fLook = look;
+
 	_UpdateFont(settings);
 	_InvalidateBitmaps();
 	_DoLayout();
@@ -808,6 +810,7 @@ DefaultDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 	if (updateRegion != NULL)
 		updateRegion->Include(&GetFootprint());
 
+	fFlags = flags;
 	_DoLayout();
 
 	if (updateRegion != NULL)

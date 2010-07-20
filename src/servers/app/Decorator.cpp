@@ -99,8 +99,6 @@ Decorator::SetFlags(uint32 flags, BRegion* updateRegion)
 	if (flags & B_NOT_RESIZABLE)
 		flags |= B_NOT_H_RESIZABLE | B_NOT_V_RESIZABLE;
 
-	fFlags = flags;
-
 	fFootprintValid = false;
 		// the border might have changed (smaller/larger tab)
 	_SetFlags(flags, updateRegion);
@@ -124,8 +122,6 @@ void
 Decorator::SetLook(DesktopSettings& settings, window_look look,
 	BRegion* updateRect)
 {
-	fLook = look;
-
 	fFootprintValid = false;
 		// the border very likely changed
 	_SetLook(settings, look, updateRect);
@@ -628,12 +624,14 @@ void
 Decorator::_SetLook(DesktopSettings& settings, window_look look,
 	BRegion* updateRect)
 {
+	fLook = look;
 }
 
 
 void
 Decorator::_SetFlags(uint32 flags, BRegion* updateRegion)
 {
+	fFlags = flags;
 }
 
 
