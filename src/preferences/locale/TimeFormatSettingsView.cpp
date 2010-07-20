@@ -30,7 +30,7 @@
 #include <TextControl.h>
 #include <Window.h>
 
-#include <iostream.h>
+#include <iostream>
 
 
 #undef B_TRANSLATE_CONTEXT
