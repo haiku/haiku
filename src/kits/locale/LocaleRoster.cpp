@@ -617,8 +617,8 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 
 
 status_t
-BLocaleRoster::GetInstalledCatalogs(BMessage * languageList, const char* sigPattern,
-	const char* langPattern, int32 fingerprint) const
+BLocaleRoster::GetInstalledCatalogs(BMessage * languageList,
+	const char* sigPattern,	const char* langPattern, int32 fingerprint) const
 {
 	if (languageList == NULL)
 		return B_BAD_VALUE;

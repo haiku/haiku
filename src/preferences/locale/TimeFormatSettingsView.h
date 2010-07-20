@@ -77,6 +77,10 @@ private:
 			FormatSeparator		fSeparator;
 			BString				fDateFormat;
 
+			BString				fOriginalTimeFormat;
+			BString				fOriginalLongTimeFormat;
+			bool				fCountryIs24Hr;
+
 			BCountry*			fCountry;
 
 			BBox*				fDateBox;

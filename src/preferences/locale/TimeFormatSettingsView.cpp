@@ -30,6 +30,8 @@
 #include <TextControl.h>
 #include <Window.h>
 
+#include <iostream.h>
+
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "TimeFormatSettings"
@@ -181,12 +183,15 @@ FormatView::FormatView(BCountry* country)
 	f12HrRadioButton = new BRadioButton("", B_TRANSLATE("12 hour"),
 		new BMessage(kClockFormatChange));
 
-	BString timeFormat;
-	fCountry->TimeFormat(timeFormat, false);
-	if (timeFormat.FindFirst("a") != B_ERROR)
-		f12HrRadioButton->SetValue(1);
-	else
-		f24HrRadioButton->SetValue(1);
+	fCountry->TimeFormat(fOriginalTimeFormat, false);
+	fCountry->TimeFormat(fOriginalLongTimeFormat, true);
+	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
+		f12HrRadioButton->SetValue(B_CONTROL_ON);
+		fCountryIs24Hr = false;
+	} else {
+		f24HrRadioButton->SetValue(B_CONTROL_ON);
+		fCountryIs24Hr = true;
+	}
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
@@ -376,11 +381,11 @@ FormatView::MessageReceived(BMessage* message)
 		{
 			// Update one of the dropdown menus
 			void* pointerFromMessage;
-			message->FindPointer("dest",&pointerFromMessage);
+			message->FindPointer("dest", &pointerFromMessage);
 			BMenuField* menuField
 			= static_cast<BMenuField*>(pointerFromMessage);
 			BString format;
-			message->FindString("format",&format);
+			message->FindString("format", &format);
 
 			for (int i = 0; i < 4; i++) {
 				if (fLongDateMenu[i]==menuField) {
@@ -437,30 +442,37 @@ FormatView::MessageReceived(BMessage* message)
 		case kClockFormatChange:
 		{
 			BString timeFormat;
-			fCountry->TimeFormat(timeFormat, false);
+			timeFormat = fOriginalTimeFormat;
 			if (f24HrRadioButton->Value() == 1) {
-				timeFormat.ReplaceAll("k", "h");
-				timeFormat.ReplaceAll("K", "H");
-				timeFormat.RemoveAll(" a");
+				if (!fCountryIs24Hr) {
+					timeFormat.ReplaceAll("h", "H");
+					timeFormat.ReplaceAll("k", "K");
+					timeFormat.RemoveAll(" a");
+					timeFormat.RemoveAll("a");
+				}
 			} else {
-				timeFormat.ReplaceAll("h", "k");
-				timeFormat.ReplaceAll("H", "K");
-				timeFormat.Append(" a");
-				f12HrRadioButton->SetValue(true);
+				if (fCountryIs24Hr && timeFormat.FindFirst("a") == B_ERROR) {
+					timeFormat.ReplaceAll("K", "k");
+					timeFormat.ReplaceAll("H", "h");
+					timeFormat.Append(" a");
+				}
 			}
 			fCountry->SetTimeFormat(timeFormat.String(), false);
 
-			timeFormat.Truncate(0);
-
-			fCountry->TimeFormat(timeFormat, true);
+			timeFormat = fOriginalLongTimeFormat;
 			if (f24HrRadioButton->Value() == 1) {
-				timeFormat.ReplaceAll("k", "h");
-				timeFormat.ReplaceAll("K", "H");
-				timeFormat.RemoveAll(" a");
+				if (!fCountryIs24Hr) {
+					timeFormat.ReplaceAll("h", "H");
+					timeFormat.ReplaceAll("k", "K");
+					timeFormat.RemoveAll(" a");
+					timeFormat.RemoveAll("a");
+				}
 			} else {
-				timeFormat.ReplaceAll("h", "k");
-				timeFormat.ReplaceAll("H", "K");
-				timeFormat.Append(" a");
+				if (fCountryIs24Hr && timeFormat.FindFirst("a") == B_ERROR) {
+					timeFormat.ReplaceAll("K", "k");
+					timeFormat.ReplaceAll("H", "h");
+					timeFormat.Append(" a");
+				}
 			}
 			fCountry->SetTimeFormat(timeFormat.String(), true);
 			_UpdateExamples();
@@ -528,12 +540,18 @@ FormatView::SetCountry(BCountry* country)
 	delete fCountry;
 	fCountry = country;
 
-	BString timeFormat;
-	fCountry->TimeFormat(timeFormat, false);
-	if (timeFormat.FindFirst("a") != B_ERROR)
-		f12HrRadioButton->SetValue(1);
-	else
-		f24HrRadioButton->SetValue(1);
+	fOriginalTimeFormat.Truncate(0);
+	fCountry->TimeFormat(fOriginalTimeFormat, false);
+	fOriginalLongTimeFormat.Truncate(0);
+	fCountry->TimeFormat(fOriginalLongTimeFormat, true);
+
+	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
+		f12HrRadioButton->SetValue(B_CONTROL_ON);
+		fCountryIs24Hr = false;
+	} else {
+		f24HrRadioButton->SetValue(B_CONTROL_ON);
+		fCountryIs24Hr = true;
+	}
 
 	/*
 	FormatSeparator separator = settings.TimeFormatSeparator();
