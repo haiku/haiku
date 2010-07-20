@@ -27,8 +27,7 @@ class Window;
 class DefaultWindowBehaviour : public WindowBehaviour
 {
 	public:
-						DefaultWindowBehaviour(Window* window,
-							Decorator* decorator);
+						DefaultWindowBehaviour(Window* window);
 		virtual			~DefaultWindowBehaviour();
 
 		virtual bool	MouseDown(BMessage* message, BPoint where);
@@ -38,7 +37,6 @@ class DefaultWindowBehaviour : public WindowBehaviour
 		
 	protected:
 		Window*			fWindow;
-		Decorator*		fDecorator;
 		Desktop*		fDesktop;
 
 		bool			fIsClosing : 1;

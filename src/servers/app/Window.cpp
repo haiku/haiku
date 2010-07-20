@@ -135,8 +135,7 @@ Window::Window(const BRect& frame, const char *name,
 				&fMaxWidth, &fMaxHeight);
 		}
 	}
-	fWindowBehaviour = new (std::nothrow)DefaultWindowBehaviour(this,
-		fDecorator);
+	fWindowBehaviour = new (std::nothrow)DefaultWindowBehaviour(this);
 
 	// do we need to change our size to let the decorator fit?
 	// _ResizeBy() will adapt the frame for validity before resizing

@@ -28,11 +28,9 @@
 #endif
 
 
-DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window,
-	Decorator* decorator)
+DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 	:
 	fWindow(window),
-	fDecorator(decorator),
 
 	fIsClosing(false),
 	fIsMinimizing(false),
@@ -61,10 +59,12 @@ static const bigtime_t kWindowActivationTimeout = 500000LL;
 bool
 DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 {
+	Decorator* decorator = fWindow->Decorator();
+
 	int32 modifiers = _ExtractModifiers(message);
 	bool inBorderRegion = false;
 	if (fWindow->Decorator())
-		inBorderRegion = fWindow->Decorator()->GetFootprint().Contains(where);
+		inBorderRegion = decorator->GetFootprint().Contains(where);
 	bool windowModifier =
 		(fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
 		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
@@ -82,7 +82,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 				action = CLICK_MOVE_TO_BACK;
 			else if ((fWindow->Flags() & B_NOT_MOVABLE) == 0
-					&& fDecorator != NULL)
+					&& decorator != NULL)
 				action = CLICK_DRAG;
 			else {
 				// pass click on to the application
@@ -143,22 +143,22 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 				break;
 		}
 
-		if (fDecorator != NULL) {
+		if (decorator != NULL) {
 			// redraw decorator
 			BRegion* visibleBorder = fWindow->RegionPool()->GetRegion();
 			fWindow->GetBorderRegion(visibleBorder);
 			visibleBorder->IntersectWith(&fWindow->VisibleRegion());
 
-			DrawingEngine* engine = fDecorator->GetDrawingEngine();
+			DrawingEngine* engine = decorator->GetDrawingEngine();
 			engine->LockParallelAccess();
 			engine->ConstrainClippingRegion(visibleBorder);
 
 			if (fIsZooming)
-				fDecorator->SetZoom(true);
+				decorator->SetZoom(true);
 			else if (fIsClosing)
-				fDecorator->SetClose(true);
+				decorator->SetClose(true);
 			else if (fIsMinimizing)
-				fDecorator->SetMinimize(true);
+				decorator->SetMinimize(true);
 
 			engine->UnlockParallelAccess();
 
@@ -206,8 +206,10 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 void
 DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 {
+	Decorator* decorator = fWindow->Decorator();
+
 	bool invalidate = false;
-	if (fDecorator) {
+	if (decorator) {
 		click_type action = _ActionFor(message);
 
 		// redraw decorator
@@ -215,13 +217,13 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 		fWindow->GetBorderRegion(visibleBorder);
 		visibleBorder->IntersectWith(&fWindow->VisibleRegion());
 
-		DrawingEngine* engine = fDecorator->GetDrawingEngine();
+		DrawingEngine* engine = decorator->GetDrawingEngine();
 		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
 			fIsZooming = false;
-			fDecorator->SetZoom(false);
+			decorator->SetZoom(false);
 			if (action == CLICK_ZOOM) {
 				invalidate = true;
 				fWindow->ServerWindow()->NotifyZoom();
@@ -229,7 +231,7 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 		}
 		if (fIsClosing) {
 			fIsClosing = false;
-			fDecorator->SetClose(false);
+			decorator->SetClose(false);
 			if (action == CLICK_CLOSE) {
 				invalidate = true;
 				fWindow->ServerWindow()->NotifyQuitRequested();
@@ -237,7 +239,7 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 		}
 		if (fIsMinimizing) {
 			fIsMinimizing = false;
-			fDecorator->SetMinimize(false);
+			decorator->SetMinimize(false);
 			if (action == CLICK_MINIMIZE) {
 				invalidate = true;
 				fWindow->ServerWindow()->NotifyMinimize(true);
@@ -277,9 +279,11 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 void
 DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 {
+	Decorator* decorator = fWindow->Decorator();
+
 	#if 0
-	if (fDecorator != NULL && fWindow->TopView() != NULL) {
-		DrawingEngine* engine = fDecorator->GetDrawingEngine();
+	if (decorator != NULL && fWindow->TopView() != NULL) {
+		DrawingEngine* engine = decorator->GetDrawingEngine();
 		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(&fWindow->VisibleRegion());
 
@@ -306,21 +310,21 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 			fLastMoveTime = now;
 	}
 
-	if (fDecorator) {
+	if (decorator) {
 		BRegion* visibleBorder = fWindow->RegionPool()->GetRegion();
 		fWindow->GetBorderRegion(visibleBorder);
 		visibleBorder->IntersectWith(&fWindow->VisibleRegion());
 
-		DrawingEngine* engine = fDecorator->GetDrawingEngine();
+		DrawingEngine* engine = decorator->GetDrawingEngine();
 		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
 		if (fIsZooming) {
-			fDecorator->SetZoom(_ActionFor(message) == CLICK_ZOOM);
+			decorator->SetZoom(_ActionFor(message) == CLICK_ZOOM);
 		} else if (fIsClosing) {
-			fDecorator->SetClose(_ActionFor(message) == CLICK_CLOSE);
+			decorator->SetClose(_ActionFor(message) == CLICK_CLOSE);
 		} else if (fIsMinimizing) {
-			fDecorator->SetMinimize(_ActionFor(message) == CLICK_MINIMIZE);
+			decorator->SetMinimize(_ActionFor(message) == CLICK_MINIMIZE);
 		}
 
 		engine->UnlockParallelAccess();
@@ -426,7 +430,9 @@ DefaultWindowBehaviour::_ExtractModifiers(const BMessage* message) const
 click_type
 DefaultWindowBehaviour::_ActionFor(const BMessage* message) const
 {
-	if (fDecorator == NULL)
+	Decorator* decorator = fWindow->Decorator();
+
+	if (decorator == NULL)
 		return CLICK_NONE;
 
 	int32 buttons = _ExtractButtons(message);
@@ -439,14 +445,16 @@ click_type
 DefaultWindowBehaviour::_ActionFor(const BMessage* message, int32 buttons,
 	int32 modifiers) const
 {
-	if (fDecorator == NULL)
+	Decorator* decorator = fWindow->Decorator();
+
+	if (decorator == NULL)
 		return CLICK_NONE;
 
 	BPoint where;
 	if (message->FindPoint("where", &where) != B_OK)
 		return CLICK_NONE;
 
-	return fDecorator->Clicked(where, buttons, modifiers);
+	return decorator->Clicked(where, buttons, modifiers);
 }
 
 
@@ -472,8 +480,9 @@ DefaultWindowBehaviour::_AlterDeltaForSnap(BPoint& delta, bigtime_t now)
 	// TODO: Perhaps obtain the usable area (not covered by the Deskbar)?
 	BRect screenFrame = fWindow->Screen()->Frame();
 
-	if (fDecorator) {
-		frame = fDecorator->GetFootprint().Frame();
+	Decorator* decorator = fWindow->Decorator();
+	if (decorator) {
+		frame = decorator->GetFootprint().Frame();
 		offsetWithinFrame.x = fWindow->Frame().left - frame.left;
 		offsetWithinFrame.y = fWindow->Frame().top - frame.top;
 	}
