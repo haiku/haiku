@@ -913,6 +913,13 @@ error:
 status_t
 arch_cpu_shutdown(bool rebootSystem)
 {
+	// Make sure we run on the boot CPU (apparently needed for ACPI)
+	_user_set_cpu_enabled(0, true);
+	for (int32 cpu = 1; cpu < smp_get_num_cpus(); cpu++) {
+		_user_set_cpu_enabled(cpu, false);
+	}
+	thread_yield(true);
+
 	if (acpi_shutdown(rebootSystem) == B_OK)
 		return B_OK;
 
