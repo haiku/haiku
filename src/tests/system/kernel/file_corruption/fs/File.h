@@ -16,12 +16,11 @@ class File : public Node {
 public:
 								File(Volume* volume, uint64 blockIndex,
 									const checksumfs_node& nodeData);
-								File(Volume* volume, uint64 blockIndex,
-									mode_t mode);
+								File(Volume* volume, mode_t mode);
 	virtual						~File();
 
 	virtual	status_t			InitForVFS();
-	virtual	status_t			DeletingNode(Transaction& transaction);
+	virtual	void				DeletingNode();
 
 	virtual	status_t			Resize(uint64 newSize, bool fillWithZeroes,
 									Transaction& transaction);

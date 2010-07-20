@@ -37,10 +37,10 @@ Node::Node(Volume* volume, uint64 blockIndex, const checksumfs_node& nodeData)
 }
 
 
-Node::Node(Volume* volume, uint64 blockIndex, mode_t mode)
+Node::Node(Volume* volume, mode_t mode)
 	:
 	fVolume(volume),
-	fBlockIndex(blockIndex),
+	fBlockIndex(0),
 	fNodeDataDirty(true)
 {
 	_Init();
@@ -70,6 +70,13 @@ Node::~Node()
 }
 
 
+void
+Node::SetBlockIndex(uint64 blockIndex)
+{
+	fBlockIndex = blockIndex;
+}
+
+
 status_t
 Node::InitForVFS()
 {
@@ -77,10 +84,22 @@ Node::InitForVFS()
 }
 
 
-status_t
-Node::DeletingNode(Transaction& transaction)
+void
+Node::DeletingNode()
 {
-	return B_OK;
+	// delete the node's attribute directory
+	if (AttributeDirectory() == 0)
+		return;
+
+	Node* attributeDirectory;
+	if (fVolume->GetNode(AttributeDirectory(), attributeDirectory) == B_OK) {
+		fVolume->RemoveNode(attributeDirectory);
+		fVolume->PutNode(attributeDirectory);
+	} else {
+		ERROR("Failed to get attribute directory (at %" B_PRIu64 ") for "
+			"deleted node at %" B_PRIu64 "\n", AttributeDirectory(),
+			BlockIndex());
+	}
 }
 
 
@@ -114,9 +133,35 @@ Node::Sync()
 
 
 void
+Node::SetMode(uint32 mode)
+{
+	ASSERT((mode & S_IFMT) == (Mode() & S_IFMT));
+
+	fNode.mode = mode;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetAttributeType(uint32 type)
+{
+	fNode.attributeType = type;
+	fNodeDataDirty = true;
+}
+
+
+void
 Node::SetParentDirectory(uint32 blockIndex)
 {
 	fNode.parentDirectory = blockIndex;
+	fNodeDataDirty = true;
+}
+
+
+void
+Node::SetAttributeDirectory(uint32 blockIndex)
+{
+	fNode.attributeDirectory = blockIndex;
 	fNodeDataDirty = true;
 }
 

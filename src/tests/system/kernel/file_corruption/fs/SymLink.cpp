@@ -24,9 +24,9 @@ SymLink::SymLink(Volume* volume, uint64 blockIndex,
 }
 
 
-SymLink::SymLink(Volume* volume, uint64 blockIndex, mode_t mode)
+SymLink::SymLink(Volume* volume, mode_t mode)
 	:
-	Node(volume, blockIndex, mode)
+	Node(volume, mode)
 {
 }
 

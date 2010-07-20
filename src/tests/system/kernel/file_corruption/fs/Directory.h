@@ -13,9 +13,10 @@ class Directory : public Node {
 public:
 								Directory(Volume* volume, uint64 blockIndex,
 									const checksumfs_node& nodeData);
-								Directory(Volume* volume, uint64 blockIndex,
-									mode_t mode);
+								Directory(Volume* volume, mode_t mode);
 	virtual						~Directory();
+
+	virtual	void				DeletingNode();
 
 			status_t			LookupEntry(const char* name,
 									uint64& _blockIndex);
@@ -26,7 +27,8 @@ public:
 			status_t			InsertEntry(const char* name, uint64 blockIndex,
 									Transaction& transaction);
 			status_t			RemoveEntry(const char* name,
-									Transaction& transaction);
+									Transaction& transaction,
+									bool* _lastEntryRemoved = NULL);
 };
 
 

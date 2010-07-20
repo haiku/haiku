@@ -30,12 +30,13 @@ class Node {
 public:
 								Node(Volume* volume, uint64 blockIndex,
 									const checksumfs_node& nodeData);
-								Node(Volume* volume, uint64 blockIndex,
-									mode_t mode);
+								Node(Volume* volume, mode_t mode);
 	virtual						~Node();
 
+			void				SetBlockIndex(uint64 blockIndex);
+
 	virtual	status_t			InitForVFS();
-	virtual	status_t			DeletingNode(Transaction& transaction);
+	virtual	void				DeletingNode();
 
 	virtual	status_t			Resize(uint64 newSize, bool fillWithZeroes,
 									Transaction& transaction);
@@ -50,7 +51,9 @@ public:
 	inline	Volume*				GetVolume() const	{ return fVolume; }
 	inline	uint64				BlockIndex() const	{ return fBlockIndex; }
 	inline	uint32				Mode() const		{ return fNode.mode; }
+	inline	uint32				AttributeType() const;
 	inline	uint64				ParentDirectory() const;
+	inline	uint64				AttributeDirectory() const;
 	inline	uint32				HardLinks() const	{ return fNode.hardLinks; }
 	inline	uint32				UID() const			{ return fNode.uid; }
 	inline	uint32				GID() const			{ return fNode.gid; }
@@ -60,7 +63,10 @@ public:
 	inline	uint64				ModificationTime() const;
 	inline	uint64				ChangeTime() const;
 
+			void				SetMode(uint32 mode);
+			void				SetAttributeType(uint32 type);
 			void				SetParentDirectory(uint32 blockIndex);
+			void				SetAttributeDirectory(uint32 blockIndex);
 			void				SetHardLinks(uint32 value);
 			void				SetUID(uint32 uid);
 			void				SetGID(uint32 gid);
@@ -94,10 +100,24 @@ private:
 };
 
 
+uint32
+Node::AttributeType() const
+{
+	return fNode.attributeType;
+}
+
+
 uint64
 Node::ParentDirectory() const
 {
 	return fNode.parentDirectory;
+}
+
+
+uint64
+Node::AttributeDirectory() const
+{
+	return fNode.attributeDirectory;
 }
 
 

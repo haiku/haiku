@@ -35,7 +35,7 @@ Volume::Volume(uint32 flags)
 	:
 	fFSVolume(NULL),
 	fFD(-1),
-	fFlags(B_FS_IS_PERSISTENT
+	fFlags(B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
 		| (flags & B_FS_IS_READONLY != 0 ? B_FS_IS_READONLY : 0)),
 	fBlockCache(NULL),
 	fTotalBlocks(0),
@@ -282,6 +282,13 @@ Volume::RemoveNode(Node* node)
 
 
 status_t
+Volume::UnremoveNode(Node* node)
+{
+	return unremove_vnode(fFSVolume, node->BlockIndex());
+}
+
+
+status_t
 Volume::ReadNode(uint64 blockIndex, Node*& _node)
 {
 	if (blockIndex == 0 || blockIndex >= fTotalBlocks)
@@ -326,28 +333,14 @@ status_t
 Volume::CreateDirectory(mode_t mode, Transaction& transaction,
 	Directory*& _directory)
 {
-	// allocate a free block
-	AllocatedBlock allocatedBlock(fBlockAllocator, transaction);
-	status_t error = allocatedBlock.Allocate();
+	Directory* directory = new(std::nothrow) Directory(this,
+		(mode & S_IUMSK) | S_IFDIR);
+
+	status_t error = _CreateNode(directory, transaction);
 	if (error != B_OK)
 		return error;
 
-	// create the directory
-	Directory* directory = new(std::nothrow) Directory(this,
-		allocatedBlock.Index(), (mode & S_IUMSK) | S_IFDIR);
-	if (directory == NULL)
-		return B_NO_MEMORY;
-
-	// attach the directory to the transaction
-	error = transaction.AddNode(directory, TRANSACTION_DELETE_NODE);
-	if (error != B_OK) {
-		delete directory;
-		return error;
-	}
-
-	allocatedBlock.Detach();
 	_directory = directory;
-
 	return B_OK;
 }
 
@@ -355,28 +348,13 @@ Volume::CreateDirectory(mode_t mode, Transaction& transaction,
 status_t
 Volume::CreateFile(mode_t mode, Transaction& transaction, File*& _file)
 {
-	// allocate a free block
-	AllocatedBlock allocatedBlock(fBlockAllocator, transaction);
-	status_t error = allocatedBlock.Allocate();
+	File* file = new(std::nothrow) File(this, (mode & S_IUMSK) | S_IFREG);
+
+	status_t error = _CreateNode(file, transaction);
 	if (error != B_OK)
 		return error;
 
-	// create the file
-	File* file = new(std::nothrow) File(this, allocatedBlock.Index(),
-		(mode & S_IUMSK) | S_IFREG);
-	if (file == NULL)
-		return B_NO_MEMORY;
-
-	// attach the file to the transaction
-	error = transaction.AddNode(file, TRANSACTION_DELETE_NODE);
-	if (error != B_OK) {
-		delete file;
-		return error;
-	}
-
-	allocatedBlock.Detach();
 	_file = file;
-
 	return B_OK;
 }
 
@@ -384,28 +362,14 @@ Volume::CreateFile(mode_t mode, Transaction& transaction, File*& _file)
 status_t
 Volume::CreateSymLink(mode_t mode, Transaction& transaction, SymLink*& _symLink)
 {
-	// allocate a free block
-	AllocatedBlock allocatedBlock(fBlockAllocator, transaction);
-	status_t error = allocatedBlock.Allocate();
+	SymLink* symLink = new(std::nothrow) SymLink(this,
+		(mode & S_IUMSK) | S_IFLNK);
+
+	status_t error = _CreateNode(symLink, transaction);
 	if (error != B_OK)
 		return error;
 
-	// create the symlink
-	SymLink* symLink = new(std::nothrow) SymLink(this, allocatedBlock.Index(),
-		(mode & S_IUMSK) | S_IFLNK);
-	if (symLink == NULL)
-		return B_NO_MEMORY;
-
-	// attach the symlink to the transaction
-	error = transaction.AddNode(symLink, TRANSACTION_DELETE_NODE);
-	if (error != B_OK) {
-		delete symLink;
-		return error;
-	}
-
-	allocatedBlock.Detach();
 	_symLink = symLink;
-
 	return B_OK;
 }
 
@@ -413,32 +377,35 @@ Volume::CreateSymLink(mode_t mode, Transaction& transaction, SymLink*& _symLink)
 status_t
 Volume::DeleteNode(Node* node)
 {
+	// let the node delete data associated with it
+	node->DeletingNode();
+
+	uint64 blockIndex = node->BlockIndex();
+
+	// delete the node itself
 	Transaction transaction(this);
 	status_t error = transaction.Start();
 	if (error == B_OK) {
-		error = node->DeletingNode(transaction);
-		if (error != B_OK) {
-			ERROR("Preparing deletion of failed for node at %" B_PRIu64 "\n",
-				node->BlockIndex());
-		}
-
 		error = fBlockAllocator->Free(node->BlockIndex(), 1, transaction);
 		if (error == B_OK) {
 			error = transaction.Commit();
 			if (error != B_OK) {
-				ERROR("Failed to commit transaction for delete node at %"
-					B_PRIu64 "\n", node->BlockIndex());
+				ERROR("Failed to commit transaction for deleting node at %"
+					B_PRIu64 "\n", blockIndex);
 			}
 		} else {
 			ERROR("Failed to free block for node at %" B_PRIu64 "\n",
-				node->BlockIndex());
+				blockIndex);
 		}
 	} else {
-		ERROR("Failed to start transaction for delete node at %" B_PRIu64 "\n",
-			node->BlockIndex());
+		ERROR("Failed to start transaction for deleting node at %" B_PRIu64
+			"\n", blockIndex);
 	}
 
+	transaction.Abort();
+
 	delete node;
+
 	return error;
 }
 
@@ -507,6 +474,41 @@ Volume::_Init(uint64 totalBlocks)
 	fBlockAllocator = new(std::nothrow) BlockAllocator(this);
 	if (fBlockAllocator == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+
+	return B_OK;
+}
+
+
+status_t
+Volume::_CreateNode(Node* node, Transaction& transaction)
+{
+	if (node == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<Node> nodeDeleter(node);
+
+	// allocate a free block
+	AllocatedBlock allocatedBlock(fBlockAllocator, transaction);
+	status_t error = allocatedBlock.Allocate();
+	if (error != B_OK)
+		return error;
+
+	// clear the block
+	{
+		Block block;
+		if (!block.GetZero(this, allocatedBlock.Index(), transaction))
+			return B_ERROR;
+	}
+
+	node->SetBlockIndex(allocatedBlock.Index());
+
+	// attach the node to the transaction
+	error = transaction.AddNode(node, TRANSACTION_DELETE_NODE);
+	if (error != B_OK)
+		return error;
+
+	allocatedBlock.Detach();
+	nodeDeleter.Detach();
 
 	return B_OK;
 }

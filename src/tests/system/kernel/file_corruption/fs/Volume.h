@@ -41,6 +41,7 @@ public:
 			status_t			GetNode(uint64 blockIndex, Node*& _node);
 			status_t			PutNode(Node* node);
 			status_t			RemoveNode(Node* node);
+			status_t			UnremoveNode(Node* node);
 
 			status_t			ReadNode(uint64 blockIndex, Node*& _node);
 
@@ -72,6 +73,10 @@ public:
 
 private:
 			status_t			_Init(uint64 totalBlocks);
+
+			status_t			_CreateNode(Node* node,
+									Transaction& transaction);
+			status_t			_DeleteDirectoryEntries(Directory* directory);
 
 private:
 			fs_volume*			fFSVolume;

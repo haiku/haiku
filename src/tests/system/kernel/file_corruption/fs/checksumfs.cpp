@@ -147,6 +147,12 @@ struct DirCookie {
 		return fDirectory;
 	}
 
+	void SetTo(Directory* directory, bool skipArtificialEntries)
+	{
+		fDirectory = directory;
+		Rewind(skipArtificialEntries);
+	}
+
 	status_t ReadNextEntry(struct dirent* buffer, size_t size,
 		uint32& _countRead)
 	{
@@ -199,9 +205,9 @@ struct DirCookie {
 		return B_OK;
 	}
 
-	void Rewind()
+	void Rewind(bool skipArtificialEntries = false)
 	{
-		fIterationState = DOT;
+		fIterationState = skipArtificialEntries ? OTHERS : DOT;
 		fEntryName[0] = '\0';
 	}
 
@@ -215,6 +221,115 @@ private:
 	Directory*	fDirectory;
 	int			fIterationState;
 	char		fEntryName[kCheckSumFSNameLength + 1];
+};
+
+
+struct AttrDirCookie {
+	AttrDirCookie(Node* node)
+		:
+		fNode(node),
+		fAttributeDirectory(NULL),
+		fDirCookie(NULL)
+	{
+	}
+
+	~AttrDirCookie()
+	{
+		if (fAttributeDirectory != NULL)
+			fNode->GetVolume()->PutNode(fAttributeDirectory);
+	}
+
+	status_t ReadNextEntry(struct dirent* buffer, size_t size,
+		uint32& _countRead)
+	{
+		status_t error = _UpdateAttributeDirectory();
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		if (fAttributeDirectory == NULL) {
+			_countRead = 0;
+			return B_OK;
+		}
+
+		return fDirCookie.ReadNextEntry(buffer, size, _countRead);
+	}
+
+	void Rewind()
+	{
+		fDirCookie.Rewind(true);
+	}
+
+private:
+	status_t _UpdateAttributeDirectory()
+	{
+		uint64 blockIndex = fNode->AttributeDirectory();
+		if (blockIndex == 0) {
+			// no (empty) attribute directory
+			if (fAttributeDirectory != NULL) {
+				fNode->GetVolume()->PutNode(fAttributeDirectory);
+				fAttributeDirectory = NULL;
+			}
+
+			return B_OK;
+		}
+
+		if (fAttributeDirectory != NULL) {
+			if (blockIndex == fAttributeDirectory->BlockIndex())
+				return B_OK;
+
+			// The attribute directory has changed in the meantime -- get rid
+			// of the old one.
+			fNode->GetVolume()->PutNode(fAttributeDirectory);
+			fAttributeDirectory = NULL;
+		}
+
+		// get the attribute directory node
+		Node* node;
+		status_t error = fNode->GetVolume()->GetNode(blockIndex, node);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		fAttributeDirectory = dynamic_cast<Directory*>(node);
+		if (fAttributeDirectory == NULL) {
+			fNode->GetVolume()->PutNode(node);
+			ERROR("checksumfs: attribute directory (%" B_PRIu64 ") of node %"
+				B_PRIu64 " is not a directory!\n", blockIndex,
+				fNode->BlockIndex());
+			RETURN_ERROR(B_BAD_DATA);
+		}
+
+		fDirCookie.SetTo(fAttributeDirectory, true);
+
+		return B_OK;
+	}
+
+private:
+	Node*		fNode;
+	Directory*	fAttributeDirectory;
+	DirCookie	fDirCookie;
+};
+
+
+struct AttributeCookie {
+	char*		name;
+	Node*		attribute;
+	FileCookie*	fileCookie;
+
+	AttributeCookie(const char* name)
+		:
+		name(strdup(name)),
+		attribute(NULL),
+		fileCookie(NULL)
+	{
+	}
+
+	~AttributeCookie()
+	{
+		if (attribute != NULL)
+			attribute->GetVolume()->PutNode(attribute);
+		delete fileCookie;
+		free(name);
+	}
 };
 
 
@@ -394,6 +509,280 @@ remove_entry(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 	// commit the transaction
 	return transaction.Commit(EntryRemovedNotification(directory, name,
 		childNode));
+}
+
+
+/*!	Opens the node according to the given open mode (if the permissions allow
+	that) and creates a file cookie.
+*/
+static status_t
+open_file(Volume* volume, Node* node, int openMode, Transaction& transaction,
+	bool commitTransaction, FileCookie*& _cookie)
+{
+	// translate the open mode to required permissions
+	uint32 accessFlags = 0;
+	switch (openMode & O_RWMASK) {
+		case O_RDONLY:
+			accessFlags = R_OK;
+			break;
+		case O_WRONLY:
+			accessFlags = W_OK;
+			break;
+		case O_RDWR:
+			accessFlags = R_OK | W_OK;
+			break;
+	}
+
+	// We need to at least read-lock the node. If O_TRUNC is specified, we even
+	// need a write lock and a transaction.
+	NodeReadLocker nodeReadLocker;
+
+	if ((openMode & O_TRUNC) != 0) {
+		accessFlags |= W_OK;
+
+		status_t error = transaction.IsActive()
+			? transaction.AddNode(node) : transaction.StartAndAddNode(node);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	} else if (!transaction.IsNodeLocked(node))
+		nodeReadLocker.SetTo(node, false);
+
+	// check permissions
+	if ((accessFlags & W_OK) != 0) {
+		if (volume->IsReadOnly())
+			return B_READ_ONLY_DEVICE;
+		if (S_ISDIR(node->Mode()))
+			return B_IS_A_DIRECTORY;
+	}
+
+	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(node->Mode()))
+		return B_NOT_A_DIRECTORY;
+
+	status_t error = check_access(node, accessFlags);
+	if (error != B_OK)
+		return error;
+
+	// TODO: Support O_NOCACHE.
+
+	FileCookie* cookie = new(std::nothrow) FileCookie(openMode);
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<FileCookie> cookieDeleter(cookie);
+
+	// truncate the file, if requested
+	if ((openMode & O_TRUNC) != 0 && node->Size() > 0) {
+		error = node->Resize(0, false, transaction);
+		if (error != B_OK)
+			return error;
+
+		node->Touched(NODE_MODIFIED);
+
+		if (commitTransaction) {
+			uint32 statFlags = B_STAT_MODIFICATION_TIME | B_STAT_CHANGE_TIME
+				| B_STAT_SIZE;
+			error = transaction.Commit(StatChangedNotification(node,
+				statFlags));
+			if (error != B_OK)
+				return error;
+		}
+	}
+
+	_cookie = cookieDeleter.Detach();
+	return B_OK;
+}
+
+
+static status_t
+create_file(Volume* volume, Directory* directory, const char* name,
+	int openMode, int permissions, Transaction& transaction,
+	bool commitTransaction, FileCookie*& _cookie, Node*& _node, bool& _created)
+{
+	Node* childNode = NULL;
+	NodePutter childNodePutter;
+
+	// Start the transaction and add the directory. We only need a read lock
+	// for the lookup, but later we'll need a write lock, if we have to create
+	// the file. So this is simpler.
+	status_t error = B_OK;
+	bool directoryLocked = false;
+	if (transaction.IsActive()) {
+		directoryLocked = transaction.IsNodeLocked(directory);
+		if (!directoryLocked)
+			error = transaction.AddNode(directory);
+	} else
+		error = transaction.StartAndAddNode(directory);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// look up the entry
+	uint64 blockIndex;
+	error = directory->LookupEntry(name, blockIndex);
+	if (error == B_OK) {
+		// the entry already exists
+		if ((openMode & O_EXCL) != 0)
+			return B_FILE_EXISTS;
+
+		// get the entry's node
+		error = volume->GetNode(blockIndex, childNode);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+		childNodePutter.SetTo(childNode);
+
+		// We can (must even) unlock the directory now. The file won't go
+		// anywhere, since a transaction is already running.
+		if (!directoryLocked)
+			transaction.RemoveNode(directory);
+
+		error = open_file(volume, childNode, openMode, transaction,
+			commitTransaction, _cookie);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		childNodePutter.Detach();
+		_node = childNode;
+		_created = false;
+		return B_OK;
+	}
+
+	if (error != B_ENTRY_NOT_FOUND)
+		RETURN_ERROR(error);
+
+	// The entry doesn't exist yet. We have to create a new file.
+
+	// check the directory write permission
+	error = check_access(directory, W_OK);
+	if (error != B_OK)
+		return error;
+
+	// don't create an entry in an unlinked directory
+	if (directory->HardLinks() == 0)
+		RETURN_ERROR(B_ENTRY_NOT_FOUND);
+
+	// create a file
+	File* newFile;
+	error = volume->CreateFile(permissions, transaction, newFile);
+	if (error != B_OK)
+		return error;
+
+	// insert the new file
+	error = directory->InsertEntry(name, newFile->BlockIndex(), transaction);
+	if (error != B_OK)
+		return error;
+
+	// open the file
+	FileCookie* cookie;
+	error = open_file(volume, newFile, openMode & ~O_TRUNC, transaction,
+		false, cookie);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	ObjectDeleter<FileCookie> cookieDeleter(cookie);
+
+	// update stat data
+	newFile->SetHardLinks(1);
+	newFile->SetParentDirectory(directory->BlockIndex());
+
+	directory->Touched(NODE_MODIFIED);
+
+	// announce the new vnode (needed for creating the file cache), but don't
+	// publish it yet
+	error = volume->NewNode(newFile);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// There's a vnode now -- the File object will be deleted when that is
+	// removed.
+	transaction.UpdateNodeFlags(newFile, TRANSACTION_REMOVE_NODE_ON_ERROR);
+
+	// create the file cache
+	error = newFile->InitForVFS();
+	if (error != B_OK)
+		return error;
+
+	// node is fully initialized -- publish the vnode
+	error = volume->PublishNode(newFile, 0);
+	if (error != B_OK) {
+		// publish_vnode() deletes the vnode on error, but it doesn't call the
+		// remove_vnode() hook. So we need to make sure the object is deleted.
+		transaction.UpdateNodeFlags(newFile, TRANSACTION_DELETE_NODE);
+		RETURN_ERROR(error);
+	}
+
+	// commit the transaction
+	if (commitTransaction) {
+		error = transaction.Commit(EntryCreatedNotification(directory, name,
+			newFile));
+		if (error != B_OK) {
+			volume->PutNode(newFile);
+			RETURN_ERROR(error);
+		}
+	}
+
+	_cookie = cookieDeleter.Detach();
+	_node = newFile;
+	_created = true;
+
+	return B_OK;
+}
+
+
+/*!	Gets the node's attribute directory.
+	If a transaction is given and the attribute directory doesn't exist, a new
+	one is created and associate with the node.
+	On success the caller gets a reference to the attribute directory and is
+	responsible for putting it. If a transaction was given, the attribute
+	directory must be put after committing/aborting the transaction.
+*/
+static status_t
+get_attribute_directory(Node* node, Transaction* transaction,
+	Directory*& _attributeDirectory)
+{
+	uint64 blockIndex = node->AttributeDirectory();
+	Directory* attributeDirectory;
+
+	if (blockIndex != 0) {
+		// get the attribute directory node
+		Node* attrDirNode;
+		status_t error = node->GetVolume()->GetNode(blockIndex, attrDirNode);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		attributeDirectory = dynamic_cast<Directory*>(attrDirNode);
+		if (attributeDirectory == NULL) {
+			node->GetVolume()->PutNode(node);
+			ERROR("checksumfs: attribute directory (%" B_PRIu64 ") of node %"
+				B_PRIu64 " is not a directory!\n", blockIndex,
+				node->BlockIndex());
+			RETURN_ERROR(B_BAD_DATA);
+		}
+	} else {
+		// no (i.e. empty) attribute directory yet
+		if (transaction == NULL)
+			return B_ENTRY_NOT_FOUND;
+
+		// create a new one
+		status_t error = node->GetVolume()->CreateDirectory(
+			S_IRWXU | S_IRWXG | S_IRWXO, *transaction, attributeDirectory);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		attributeDirectory->SetMode(attributeDirectory->Mode() | S_ATTR_DIR);
+		attributeDirectory->SetParentDirectory(node->BlockIndex());
+		attributeDirectory->SetHardLinks(1);
+		node->SetAttributeDirectory(attributeDirectory->BlockIndex());
+
+		// publish it
+		error = node->GetVolume()->PublishNode(attributeDirectory, 0);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		// We have published the attribute directory, so don't delete it when
+		// committing or aborting the transaction. Instead, on error remove it.
+		transaction->UpdateNodeFlags(attributeDirectory,
+			TRANSACTION_REMOVE_NODE_ON_ERROR);
+	}
+
+	_attributeDirectory = attributeDirectory;
+	return B_OK;
 }
 
 
@@ -1076,6 +1465,16 @@ checksumfs_write_stat(fs_volume* fsVolume, fs_vnode* vnode,
 		updateChanged = true;
 	}
 
+	if ((statMask & B_STAT_MODE) != 0) {
+		// only the user or root can do that
+		if (!isOwnerOrRoot)
+			RETURN_ERROR(B_NOT_ALLOWED);
+
+		node->SetMode((node->Mode() & ~(mode_t)S_IUMSK)
+			| (st->st_mode & S_IUMSK));
+		updateChanged = true;
+	}
+
 	if ((statMask & B_STAT_CREATION_TIME) != 0) {
 		// the user or root can do that or any user with write access
 		if (!isOwnerOrRoot && !hasWriteAccess)
@@ -1121,93 +1520,9 @@ checksumfs_write_stat(fs_volume* fsVolume, fs_vnode* vnode,
 // #pragma mark - file operations
 
 
-/*!	Opens the node according to the given open mode (if the permissions allow
-	that) and creates a file cookie.
-	The caller must either pass a \a transaction, which is already started and
-	has the node added to it, or not have a lock to any node at all (this
-	function will do the locking in this case).
-*/
-static status_t
-open_file(Volume* volume, Node* node, int openMode, Transaction* transaction,
-	FileCookie*& _cookie)
-{
-	// translate the open mode to required permissions
-	uint32 accessFlags = 0;
-	switch (openMode & O_RWMASK) {
-		case O_RDONLY:
-			accessFlags = R_OK;
-			break;
-		case O_WRONLY:
-			accessFlags = W_OK;
-			break;
-		case O_RDWR:
-			accessFlags = R_OK | W_OK;
-			break;
-	}
-
-	// We need to at least read-lock the node. If O_TRUNC is specified, we even
-	// need a write lock and a transaction. If the caller has supplied a
-	// transaction, it is already started and the node is locked.
-	NodeReadLocker nodeReadLocker;
-	Transaction localTransaction(volume);
-
-	if ((openMode & O_TRUNC) != 0) {
-		accessFlags |= W_OK;
-
-		if (transaction == NULL) {
-			transaction = &localTransaction;
-			status_t error = localTransaction.StartAndAddNode(node);
-			if (error != B_OK)
-				RETURN_ERROR(error);
-		}
-	} else if (transaction == NULL)
-		nodeReadLocker.SetTo(node, false);
-
-	// check permissions
-	if ((accessFlags & W_OK) != 0) {
-		if (volume->IsReadOnly())
-			return B_READ_ONLY_DEVICE;
-		if (S_ISDIR(node->Mode()))
-			return B_IS_A_DIRECTORY;
-	}
-
-	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(node->Mode()))
-		return B_NOT_A_DIRECTORY;
-
-	status_t error = check_access(node, accessFlags);
-	if (error != B_OK)
-		return error;
-
-	// TODO: Support O_NOCACHE.
-
-	FileCookie* cookie = new(std::nothrow) FileCookie(openMode);
-	if (cookie == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<FileCookie> cookieDeleter(cookie);
-
-	// truncate the file, if requested
-	if ((openMode & O_TRUNC) != 0) {
-		error = node->Resize(0, false, *transaction);
-		if (error != B_OK)
-			return error;
-
-		node->Touched(NODE_MODIFIED);
-
-		if (transaction == &localTransaction) {
-			error = transaction->Commit();
-			if (error != B_OK)
-				return error;
-		}
-	}
-
-	_cookie = cookieDeleter.Detach();
-	return B_OK;
-}
-
-
 static status_t
 checksumfs_create(fs_volume* fsVolume, fs_vnode* parent, const char* name,
-	int openMode, int perms, void** _cookie, ino_t* _newVnodeID)
+	int openMode, int permissions, void** _cookie, ino_t* _newVnodeID)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Directory* directory
@@ -1218,124 +1533,17 @@ checksumfs_create(fs_volume* fsVolume, fs_vnode* parent, const char* name,
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	Node* childNode;
-	NodePutter childNodePutter;
-
-	childNode = NULL;
-
-	// look up the entry
-	NodeWriteLocker directoryLocker(directory);
-		// We only need a read lock for the lookup, but later we'll need a
-		// write lock, if we have to create the file. So this is simpler.
-
-	uint64 blockIndex;
-	status_t error = directory->LookupEntry(name, blockIndex);
-	if (error == B_OK) {
-		// the entry already exists
-		if ((openMode & O_EXCL) != 0)
-			return B_FILE_EXISTS;
-
-		// get the entry's node
-		error = volume->GetNode(blockIndex, childNode);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-		childNodePutter.SetTo(childNode);
-
-		directoryLocker.Unlock();
-
-		FileCookie* cookie;
-		error = open_file(volume, childNode, openMode, NULL, cookie);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-
-		*_cookie = cookie;
-		*_newVnodeID = childNode->BlockIndex();
-		return B_OK;
-	}
-
-	if (error != B_ENTRY_NOT_FOUND)
-		RETURN_ERROR(error);
-
-	// The entry doesn't exist yet. We have to create a new file.
-
-	// check the directory write permission
-	error = check_access(directory, W_OK);
-	if (error != B_OK)
-		return error;
-
-	// don't create an entry in an unlinked directory
-	if (directory->HardLinks() == 0)
-		RETURN_ERROR(B_ENTRY_NOT_FOUND);
-
-	// start a transaction and attach the directory
 	Transaction transaction(volume);
-	error = transaction.StartAndAddNode(directory,
-		TRANSACTION_NODE_ALREADY_LOCKED);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
-	directoryLocker.Detach();
-		// write lock transferred to the transaction
-
-	// create a file
-	File* newFile;
-	error = volume->CreateFile(perms, transaction, newFile);
-	if (error != B_OK)
-		return error;
-
-	// insert the new file
-	error = directory->InsertEntry(name, newFile->BlockIndex(), transaction);
-	if (error != B_OK)
-		return error;
-
-	// open the file
 	FileCookie* cookie;
-	error = open_file(volume, newFile, openMode & ~O_TRUNC, &transaction,
-		cookie);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-	ObjectDeleter<FileCookie> cookieDeleter(cookie);
-
-	// update stat data
-	newFile->SetHardLinks(1);
-
-	directory->Touched(NODE_MODIFIED);
-
-	// announce the new vnode, but don't publish it yet
-	error = volume->NewNode(newFile);
+	Node* node;
+	bool created;
+	status_t error = create_file(volume, directory, name, openMode, permissions,
+		transaction, true, cookie, node, created);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	// create the file cache
-	error = newFile->InitForVFS();
-	if (error != B_OK) {
-		volume->RemoveNode(newFile);
-		return error;
-	}
-
-	// Don't delete the File object when the transaction is committed, since
-	// it's going to be published.
-	transaction.KeepNode(newFile);
-
-	// commit the transaction
-	error = transaction.Commit(EntryCreatedNotification(directory, name,
-		newFile));
-	if (error != B_OK) {
-		volume->RemoveNode(newFile);
-		delete newFile;
-		RETURN_ERROR(error);
-	}
-
-	// everything is on disk -- publish the vnode, now
-	error = volume->PublishNode(newFile, 0);
-	if (error != B_OK) {
-		// TODO: The file creation succeeded, but the caller will get an error.
-		// We could try to delete the file again.
-		RETURN_ERROR(error);
-	}
-
-	*_cookie = cookieDeleter.Detach();
-	*_newVnodeID = newFile->BlockIndex();
+	*_cookie = cookie;
+	*_newVnodeID = node->BlockIndex();
 
 	return B_OK;
 }
@@ -1348,8 +1556,14 @@ checksumfs_open(fs_volume* fsVolume, fs_vnode* vnode, int openMode,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)vnode->private_node;
 
+	// don't allow opening an attribute this way
+	if ((node->Mode() & S_ATTR) != 0)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	Transaction transaction(volume);
 	FileCookie* cookie;
-	status_t error = open_file(volume, node, openMode, NULL, cookie);
+	status_t error = open_file(volume, node, openMode, transaction, true,
+		cookie);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -1503,6 +1717,12 @@ checksumfs_open_dir(fs_volume* fsVolume, fs_vnode* vnode, void** _cookie)
 	if (directory == NULL)
 		return B_NOT_A_DIRECTORY;
 
+	NodeReadLocker nodeLocker(directory);
+
+	// don't allow opening an attribute directory this way
+	if ((directory->Mode() & S_ATTR_DIR) != 0)
+		RETURN_ERROR(B_BAD_VALUE);
+
 	status_t error = check_access(directory, R_OK);
 	if (error != B_OK)
 		return error;
@@ -1556,6 +1776,415 @@ checksumfs_rewind_dir(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie)
 
 	cookie->Rewind();
 	return B_OK;
+}
+
+
+// #pragma mark - attribute directory operations
+
+
+static status_t
+checksumfs_open_attr_dir(fs_volume* volume, fs_vnode* vnode, void** _cookie)
+{
+	Node* node = (Node*)vnode->private_node;
+
+	NodeReadLocker nodeLocker(node);
+
+	status_t error = check_access(node, R_OK);
+	if (error != B_OK)
+		return error;
+
+	AttrDirCookie* cookie = new(std::nothrow) AttrDirCookie(node);
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	*_cookie = cookie;
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_close_attr_dir(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_free_attr_dir_cookie(fs_volume* volume, fs_vnode* vnode,
+	void* _cookie)
+{
+	AttrDirCookie* cookie = (AttrDirCookie*)_cookie;
+	delete cookie;
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_read_attr_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie,
+	struct dirent* buffer, size_t bufferSize, uint32* _num)
+{
+	if (*_num == 0)
+		return B_OK;
+
+	Node* node = (Node*)vnode->private_node;
+	AttrDirCookie* cookie = (AttrDirCookie*)_cookie;
+
+	NodeReadLocker nodeLocker(node);
+
+	return cookie->ReadNextEntry(buffer, bufferSize, *_num);
+}
+
+
+static status_t
+checksumfs_rewind_attr_dir(fs_volume* volume, fs_vnode* vnode, void* _cookie)
+{
+	Node* node = (Node*)vnode->private_node;
+	AttrDirCookie* cookie = (AttrDirCookie*)_cookie;
+
+	NodeReadLocker nodeLocker(node);
+
+	cookie->Rewind();
+	return B_OK;
+}
+
+
+// #pragma mark - attribute operations
+
+
+static status_t
+checksumfs_create_attr(fs_volume* fsVolume, fs_vnode* vnode, const char* name,
+	uint32 type, int openMode, void** _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)vnode->private_node;
+	if (node == NULL)
+		return B_NOT_A_DIRECTORY;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	// create the attribute cookie
+	AttributeCookie* cookie = new(std::nothrow) AttributeCookie(name);
+	if (cookie == NULL || cookie->name == NULL) {
+		delete cookie;
+		return B_NO_MEMORY;
+	}
+	ObjectDeleter<AttributeCookie> cookieDeleter(cookie);
+
+	// Start a transaction and lock the node.
+	// Note: Other than for ordinary nodes the locking order when attributes
+	// are involved is: node -> attribute directory -> attribute.
+	Transaction transaction(volume);
+	status_t error = transaction.StartAndAddNode(node);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// check permissions
+	error = check_access(node, W_OK);
+	if (error != B_OK)
+		return error;
+
+	// get the attribute directory (create, if necessary)
+	Directory* attributeDirectory;
+	error = get_attribute_directory(node, &transaction, attributeDirectory);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	NodePutter attributeDirectoryPutter(attributeDirectory);
+
+	// open/create the attribute
+	bool created;
+	error = create_file(volume, attributeDirectory, name, openMode,
+		S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH, transaction,
+		false, cookie->fileCookie, cookie->attribute, created);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	if (created) {
+		cookie->attribute->SetMode(cookie->attribute->Mode() | S_ATTR);
+		cookie->attribute->SetAttributeType(type);
+	}
+
+	// commit the transaction
+	if (transaction.IsActive()) {
+		if (created || (openMode & O_TRUNC) != 0) {
+			node->Touched(NODE_STAT_CHANGED);
+
+			AttributeChangedNotification attributeNotification(node, name,
+				created ? B_ATTR_CREATED : B_ATTR_CHANGED);
+			StatChangedNotification statNotification(node, B_STAT_CHANGE_TIME);
+			error = transaction.Commit(&attributeNotification,
+				&statNotification);
+		} else
+			error = transaction.Commit();
+	}
+
+	*_cookie = cookieDeleter.Detach();
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_open_attr(fs_volume* fsVolume, fs_vnode* vnode, const char* name,
+	int openMode, void** _cookie)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)vnode->private_node;
+
+	// create the attribute cookie
+	AttributeCookie* cookie = new(std::nothrow) AttributeCookie(name);
+	if (cookie == NULL || cookie->name == NULL) {
+		delete cookie;
+		return B_NO_MEMORY;
+	}
+	ObjectDeleter<AttributeCookie> cookieDeleter(cookie);
+
+	// Get the node's attribute directory (don't create it, if it doesn't exist
+	// yet). We only need to read-lock the node for that, but when O_TRUNC is
+	// given, we already start the transaction and write-lock the node, so we
+	// don't get a locking order inversion later. The locking order when
+	// attributes are involved is: node -> attribute directory -> attribute.
+	Transaction transaction(volume);
+	NodeReadLocker readLocker;
+	if ((openMode & O_TRUNC) != 0) {
+		status_t error = transaction.StartAndAddNode(node);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+	} else
+		readLocker.SetTo(node, false);
+
+	Directory* attributeDirectory;
+	status_t error = get_attribute_directory(node, NULL, attributeDirectory);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	NodePutter attributeDirectoryPutter(attributeDirectory);
+
+	// look up the attribute
+	readLocker.SetTo(attributeDirectory, false);
+	uint64 blockIndex;
+	error = attributeDirectory->LookupEntry(name, blockIndex);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	error = volume->GetNode(blockIndex, cookie->attribute);
+		// the vnode reference directly goes to the cookie in case of success
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// open the attribute
+	error = open_file(volume, cookie->attribute, openMode, transaction, false,
+		cookie->fileCookie);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// commit the transaction
+	if (transaction.IsActive()) {
+		if ((openMode & O_TRUNC) != 0) {
+			node->Touched(NODE_STAT_CHANGED);
+
+			AttributeChangedNotification attributeNotification(node, name,
+				B_ATTR_CHANGED);
+			StatChangedNotification statNotification(node, B_STAT_CHANGE_TIME);
+			error = transaction.Commit(&attributeNotification,
+				&statNotification);
+		} else
+			error = transaction.Commit();
+	}
+
+	*_cookie = cookieDeleter.Detach();
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_close_attr(fs_volume* fsVolume, fs_vnode* vnode, void* cookie)
+{
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie)
+{
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+	delete cookie;
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_read_attr(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie,
+	off_t pos, void* buffer, size_t* _length)
+{
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	switch (cookie->fileCookie->openMode & O_RWMASK) {
+		case O_RDONLY:
+		case O_RDWR:
+			break;
+		case O_WRONLY:
+		default:
+			RETURN_ERROR(EBADF);
+	}
+
+	return cookie->attribute->Read(pos, buffer, *_length, *_length);
+}
+
+
+static status_t
+checksumfs_write_attr(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie,
+	off_t pos, const void* buffer, size_t* _length)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)vnode->private_node;
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	switch (cookie->fileCookie->openMode & O_RWMASK) {
+		case O_WRONLY:
+		case O_RDWR:
+			break;
+		case O_RDONLY:
+		default:
+			RETURN_ERROR(EBADF);
+	}
+
+	if (pos < 0)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	if ((cookie->fileCookie->openMode & O_APPEND) != 0) {
+		pos = -1;
+			// special value handled by Write()
+	}
+
+	bool sizeChanged;
+	status_t error = cookie->attribute->Write(pos, buffer, *_length, *_length,
+		sizeChanged);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// update the node changed time and send out a notifications (don't fail,
+	// if any of this fails)
+	Transaction transaction(volume);
+	if (transaction.StartAndAddNode(node) != B_OK)
+		return B_OK;
+	if (transaction.AddNode(cookie->attribute) != B_OK)
+		return B_OK;
+
+	cookie->attribute->Touched(NODE_MODIFIED);
+
+	// commit the transaction
+	if (cookie->attribute->ParentDirectory() != 0) {
+		node->Touched(NODE_STAT_CHANGED);
+
+		AttributeChangedNotification attributeNotification(node, cookie->name,
+			B_ATTR_CHANGED);
+		StatChangedNotification statNotification(node, B_STAT_CHANGE_TIME);
+		transaction.Commit(&attributeNotification, &statNotification);
+	} else {
+		// attribute has been removed -- no notifications needed
+		transaction.Commit();
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_read_attr_stat(fs_volume* fsVolume, fs_vnode* vnode, void* _cookie,
+	struct stat* st)
+{
+	AttributeCookie* cookie = (AttributeCookie*)_cookie;
+
+	// not many fields needed ATM
+	st->st_size = cookie->attribute->Size();
+    st->st_type = cookie->attribute->AttributeType();
+
+	return B_OK;
+}
+
+
+static status_t
+checksumfs_remove_attr(fs_volume* fsVolume, fs_vnode* vnode, const char* name)
+{
+	Volume* volume = (Volume*)fsVolume->private_volume;
+	Node* node = (Node*)vnode->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	// start a transaction
+	Transaction transaction(volume);
+	status_t error = transaction.StartAndAddNode(node);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// check permissions
+	error = check_access(node, W_OK);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// get the attribute directory
+	Directory* attributeDirectory;
+	error = get_attribute_directory(node, NULL, attributeDirectory);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	NodePutter attributeDirectoryPutter(attributeDirectory);
+
+	error = transaction.AddNode(attributeDirectory);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// look up the entry
+	uint64 blockIndex;
+	error = attributeDirectory->LookupEntry(name, blockIndex);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// get the attribute node
+	Node* attribute;
+	error = volume->GetNode(blockIndex, attribute);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+	NodePutter attributePutter(attribute);
+
+	error = transaction.AddNode(attribute);
+	if (error != B_OK) {
+		volume->PutNode(attribute);
+		RETURN_ERROR(error);
+	}
+
+	// remove the entry
+	bool attrDirEmpty;
+	error = attributeDirectory->RemoveEntry(name, transaction, &attrDirEmpty);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// remove the attribute node
+	error = volume->RemoveNode(attribute);
+	if (error != B_OK)
+		return error;
+	transaction.UpdateNodeFlags(attribute, TRANSACTION_UNREMOVE_NODE_ON_ERROR);
+
+	// if the attribute directory is empty now, remove it too
+	if (attrDirEmpty) {
+		error = volume->RemoveNode(attributeDirectory);
+		if (error != B_OK)
+			return error;
+		transaction.UpdateNodeFlags(attributeDirectory,
+			TRANSACTION_UNREMOVE_NODE_ON_ERROR);
+
+		node->SetAttributeDirectory(0);
+	}
+
+	// update stat data
+	attribute->SetHardLinks(0);
+
+	node->Touched(NODE_STAT_CHANGED);
+
+	// commit the transaction
+	AttributeChangedNotification attributeNotification(node, name,
+		B_ATTR_REMOVED);
+	StatChangedNotification statNotification(node, B_STAT_CHANGE_TIME);
+	return transaction.Commit(&attributeNotification, &statNotification);
 }
 
 
@@ -1682,13 +2311,13 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 
 	/* asynchronous I/O */
 	checksumfs_io,
-	NULL,	// checksumfs_cancel_io,
+	NULL,	// cancel_io
 
 	/* cache file access */
 	checksumfs_get_file_map,
 
 	/* common operations */
-	NULL,	// checksumfs_ioctl,
+	NULL,	// ioctl
 	checksumfs_set_flags,
 	NULL,	// select
 	NULL,	// deselect
@@ -1723,24 +2352,24 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 	checksumfs_rewind_dir,
 
 	/* attribute directory operations */
-	NULL,	// checksumfs_open_attr_dir,
-	NULL,	// checksumfs_close_attr_dir,
-	NULL,	// checksumfs_free_attr_dir_cookie,
-	NULL,	// checksumfs_read_attr_dir,
-	NULL,	// checksumfs_rewind_attr_dir,
+	checksumfs_open_attr_dir,
+	checksumfs_close_attr_dir,
+	checksumfs_free_attr_dir_cookie,
+	checksumfs_read_attr_dir,
+	checksumfs_rewind_attr_dir,
 
 	/* attribute operations */
-	NULL,	// checksumfs_create_attr,
-	NULL,	// checksumfs_open_attr,
-	NULL,	// checksumfs_close_attr,
-	NULL,	// checksumfs_free_attr_cookie,
-	NULL,	// checksumfs_read_attr,
-	NULL,	// checksumfs_write_attr,
+	checksumfs_create_attr,
+	checksumfs_open_attr,
+	checksumfs_close_attr,
+	checksumfs_free_attr_cookie,
+	checksumfs_read_attr,
+	checksumfs_write_attr,
 
-	NULL,	// checksumfs_read_attr_stat,
-	NULL,	// checksumfs_write_attr_stat,
-	NULL,	// checksumfs_rename_attr,
-	NULL,	// checksumfs_remove_attr,
+	checksumfs_read_attr_stat,
+	NULL,	// write_attr_stat
+	NULL,	// rename_attr
+	checksumfs_remove_attr,
 
 	/* support for node and FS layers */
 	NULL,	// create_special_node

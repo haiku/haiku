@@ -72,6 +72,10 @@ public:
 			status_t			RemoveEntry(const char* name,
 									Transaction& transaction);
 
+			status_t			FreeTree(Transaction& transaction);
+
+			bool				IsEmpty() const;
+
 			bool				Check();
 
 private:
@@ -975,6 +979,71 @@ ASSERT(nextInfo.entryBlock.Check());
 }
 
 
+status_t
+DirEntryTree::FreeTree(Transaction& transaction)
+{
+	status_t error = _InitReadOnly();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	int32 depth = _Depth();
+	if (depth == 0)
+		return B_OK;
+
+	LevelInfo* infos = new(std::nothrow) LevelInfo[
+		kCheckSumFSMaxDirEntryTreeDepth + 1];
+	if (infos == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ArrayDeleter<LevelInfo> infosDeleter(infos);
+
+	infos[0].entryBlock.SetTo(fRootEntryBlock, fRootEntryBlockSize);
+	infos[0].index = 0;
+
+	// Iterate through the tree in post order. We don't touch the content of
+	// any block, we only free the blocks.
+	int32 level = 0;
+	while (true) {
+		LevelInfo& info = infos[level];
+
+		if (level == depth || info.index >= info.entryBlock.EntryCount()) {
+			// we're through with the block
+			if (level == 0)
+				break;
+
+			// free it
+			error = fDirectory->GetVolume()->GetBlockAllocator()->Free(
+				info.block.Index(), 1, transaction);
+
+			// continue with the next sibling branch
+			infos[--level].index++;
+		}
+
+		// descend to next level
+		uint64 nextBlockIndex = info.entryBlock.BlockIndexAt(info.index);
+
+		LevelInfo& nextInfo = infos[++level];
+		if (!nextInfo.block.GetReadable(fDirectory->GetVolume(),
+				nextBlockIndex)) {
+			RETURN_ERROR(B_ERROR);
+		}
+
+		nextInfo.entryBlock.SetTo(
+			(checksumfs_dir_entry_block*)nextInfo.block.Data(),
+			B_PAGE_SIZE);
+	}
+
+	return B_OK;
+}
+
+
+bool
+DirEntryTree::IsEmpty() const
+{
+	DirEntryBlock entryBlock(fRootEntryBlock, fRootEntryBlockSize);
+	return entryBlock.EntryCount() == 0;
+}
+
+
 bool
 DirEntryTree::Check()
 {
@@ -1442,15 +1511,81 @@ Directory::Directory(Volume* volume, uint64 blockIndex,
 }
 
 
-Directory::Directory(Volume* volume, uint64 blockIndex, mode_t mode)
+Directory::Directory(Volume* volume, mode_t mode)
 	:
-	Node(volume, blockIndex, mode)
+	Node(volume, mode)
 {
 }
 
 
 Directory::~Directory()
 {
+}
+
+
+void
+Directory::DeletingNode()
+{
+	Node::DeletingNode();
+
+	// iterate through the directory and remove references to all entries' nodes
+	char* name = (char*)malloc(kCheckSumFSNameLength + 1);
+	if (name != NULL) {
+		name[0] = '\0';
+
+		DirEntryTree entryTree(this);
+		size_t nameLength;
+		uint64 blockIndex;
+		while (entryTree.LookupNextEntry(name, name, nameLength,
+				blockIndex) == B_OK) {
+			Node* node;
+			if (GetVolume()->GetNode(blockIndex, node) == B_OK) {
+				Transaction transaction(GetVolume());
+				if (transaction.StartAndAddNode(node) == B_OK) {
+					node->SetHardLinks(node->HardLinks() - 1);
+					if (node->HardLinks() == 0)
+						GetVolume()->RemoveNode(node);
+
+					if (transaction.Commit() != B_OK) {
+						ERROR("Failed to commit transaction for dereferencing "
+							"entry node of deleted directory at %" B_PRIu64
+							"\n", BlockIndex());
+					}
+				} else {
+					ERROR("Failed to start transaction for dereferencing "
+						"entry node of deleted directory at %" B_PRIu64 "\n",
+						BlockIndex());
+				}
+
+				GetVolume()->PutNode(node);
+			} else {
+				ERROR("Failed to get node %" B_PRIu64 " referenced by deleted "
+					"directory at %" B_PRIu64 "\n", blockIndex, BlockIndex());
+			}
+		}
+
+		free(name);
+	}
+
+	// free the directory entry block tree
+	Transaction transaction(GetVolume());
+	if (transaction.Start() != B_OK) {
+		ERROR("Failed to start transaction for freeing entry tree of deleted "
+			"directory at %" B_PRIu64 "\n", BlockIndex());
+		return;
+	}
+
+	DirEntryTree entryTree(this);
+	if (entryTree.FreeTree(transaction) != B_OK) {
+		ERROR("Failed to freeing entry tree of deleted directory at %" B_PRIu64
+			"\n", BlockIndex());
+		return;
+	}
+
+	if (transaction.Commit() != B_OK) {
+		ERROR("Failed to commit transaction for freeing entry tree of deleted "
+			"directory at %" B_PRIu64 "\n", BlockIndex());
+	}
 }
 
 
@@ -1486,12 +1621,19 @@ Directory::InsertEntry(const char* name, uint64 blockIndex,
 
 
 status_t
-Directory::RemoveEntry(const char* name, Transaction& transaction)
+Directory::RemoveEntry(const char* name, Transaction& transaction,
+	bool* _lastEntryRemoved)
 {
 	DirEntryTree entryTree(this);
 
 	status_t error = entryTree.RemoveEntry(name, transaction);
-	if (error == B_OK)
-		ASSERT(entryTree.Check());
-	return error;
+	if (error != B_OK)
+		return error;
+
+	ASSERT(entryTree.Check());
+
+	if (_lastEntryRemoved != NULL)
+		*_lastEntryRemoved = entryTree.IsEmpty();
+
+	return B_OK;
 }

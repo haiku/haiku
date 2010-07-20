@@ -13,8 +13,7 @@ class SymLink : public Node {
 public:
 								SymLink(Volume* volume, uint64 blockIndex,
 									const checksumfs_node& nodeData);
-								SymLink(Volume* volume, uint64 blockIndex,
-									mode_t mode);
+								SymLink(Volume* volume, mode_t mode);
 	virtual						~SymLink();
 
 			status_t			ReadSymLink(char* buffer, size_t toRead,

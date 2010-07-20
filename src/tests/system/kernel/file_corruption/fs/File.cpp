@@ -54,9 +54,9 @@ File::File(Volume* volume, uint64 blockIndex, const checksumfs_node& nodeData)
 }
 
 
-File::File(Volume* volume, uint64 blockIndex, mode_t mode)
+File::File(Volume* volume, mode_t mode)
 	:
-	Node(volume, blockIndex, mode),
+	Node(volume, mode),
 	fFileCache(NULL),
 	fFileMap(NULL)
 {
@@ -89,10 +89,32 @@ File::InitForVFS()
 }
 
 
-status_t
-File::DeletingNode(Transaction& transaction)
+void
+File::DeletingNode()
 {
-	return Resize(0, false, transaction);
+	Node::DeletingNode();
+
+	// start a transaction
+	Transaction transaction(GetVolume());
+	status_t error = transaction.Start();
+	if (error != B_OK) {
+		ERROR("Failed to start transaction for deleting contents of file at %"
+			B_PRIu64 "\n", BlockIndex());
+		return;
+	}
+
+	error = Resize(0, false, transaction);
+	if (error != B_OK) {
+		ERROR("Failed to delete contents of file at %" B_PRIu64 "\n",
+			BlockIndex());
+		return;
+	}
+
+	error = transaction.Commit();
+	if (error != B_OK) {
+		ERROR("Failed to commit transaction for deleting contents of file at %"
+			B_PRIu64 "\n", BlockIndex());
+	}
 }
 
 
