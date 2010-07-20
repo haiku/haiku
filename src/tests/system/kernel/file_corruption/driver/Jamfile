@@ -7,6 +7,9 @@ UsePrivateKernelHeaders ;
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 
+SubDirC++Flags -Werror ;
+
+
 KernelAddon checksum_device :
 	checksum_device.cpp
 
