@@ -763,8 +763,8 @@ if [ IsOptionalHaikuImagePackageAdded ICU ] {
 
 # ICU-devel
 if [ IsOptionalHaikuImagePackageAdded ICU-devel ] {
-	InstallOptionalHaikuImagePackage icu-devel-4.4.1-2010-07-15.zip
-		: $(baseURL)/icu-devel-4.4.1-2010-07-15.zip
+	InstallOptionalHaikuImagePackage $(HAIKU_ICU_DEVEL_PACKAGE)
+		: $(baseURL)/$(HAIKU_ICU_DEVEL_PACKAGE)
 	;
 
 	local arch = $(TARGET_ARCH) ;
