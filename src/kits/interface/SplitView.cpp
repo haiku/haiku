@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+#include <Archivable.h>
 #include <ControlLook.h>
 #include <Cursor.h>
 
@@ -20,6 +21,15 @@ BSplitView::BSplitView(enum orientation orientation, float spacing)
 		fSplitLayout = new BSplitLayout(orientation, spacing))
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
+BSplitView::BSplitView(BMessage* from)
+	:
+	BView(BUnarchiver::PrepareArchive(from)),
+	fSplitLayout(NULL)
+{
+	BUnarchiver(from).Finish();
 }
 
 
@@ -213,6 +223,37 @@ void
 BSplitView::SetLayout(BLayout* layout)
 {
 	// not allowed
+}
+
+
+status_t
+BSplitView::Archive(BMessage* into, bool deep) const
+{
+	return BView::Archive(into, deep);
+}
+
+
+status_t
+BSplitView::AllUnarchived(const BMessage* from)
+{
+	status_t err = BView::AllUnarchived(from);
+	if (err == B_OK) {
+		fSplitLayout = dynamic_cast<BSplitLayout*>(GetLayout());
+		if (!fSplitLayout && GetLayout())
+			return B_BAD_TYPE;
+		else if (!fSplitLayout)
+			return B_ERROR;
+	}
+	return err;
+}
+
+
+BArchivable*
+BSplitView::Instantiate(BMessage* from)
+{
+	if (validate_instantiation(from, "BSplitView"))
+		return new BSplitView(from);
+	return NULL;
 }
 
 
