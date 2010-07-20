@@ -47,7 +47,6 @@ struct checksumfs_node {
 	uint64	modificationTime;	//
 	uint64	changeTime;			//
 	uint64	hardLinks;			// number of references to the node
-	uint64	content;			// block index of the content (0 if empty)
 	uint64	size;				// content size in bytes
 	uint64	parentDirectory;	// block index of the parent directory
 								// (directories and attributes only)
