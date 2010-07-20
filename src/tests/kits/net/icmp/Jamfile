@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src tests kits net icmp ;
+
+SimpleTest big_datagram :
+	big_datagram.cpp
+	: libnetwork.so
+;
+
+SimpleTest udp_unreachable :
+	udp_unreachable.cpp
+	: libnetwork.so
+;
+
+SimpleTest tcp_unreachable :
+	tcp_unreachable.cpp
+	: libnetwork.so
+;
+
+SimpleTest icmp_dumper :
+	icmp_dumper.cpp
+	: libnetwork.so
+;
+
