@@ -206,10 +206,8 @@ dprintf("BlockAllocator::AllocateExactly(%llu, %llu)\n", base, count);
 	if (error != B_OK)
 		return error;
 
-	if (allocated < count) {
-		_Free(base, allocated, transaction);
+	if (allocated < count)
 		return B_BUSY;
-	}
 
 	return _UpdateSuperBlock(transaction);
 }
@@ -672,10 +670,8 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 		if (endOffset < 32)
 			mask &= ((uint32)1 << endOffset) - 1;
 
-		if ((*bits & mask) != mask) {
-			block.Discard();
+		if ((*bits & mask) != mask)
 			RETURN_ERROR(B_BAD_VALUE);
-		}
 
 		*bits &= ~mask;
 		remaining -= endOffset - bitOffset;
@@ -683,10 +679,8 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 
 	// handle complete uint32s in the middle
 	while (remaining >= 32) {
-		if (*bits != 0xffffffff) {
-			block.Discard();
+		if (*bits != 0xffffffff)
 			RETURN_ERROR(B_BUSY);
-		}
 
 		*bits = 0;
 		remaining -= 32;
@@ -696,10 +690,8 @@ dprintf("BlockAllocator::_FreeInBitmapBlock(%llu, %lu)\n", base, count);
 	if (remaining > 0) {
 		uint32 mask = ((uint32)1 << remaining) - 1;
 
-		if ((*bits & mask) != mask) {
-			block.Discard();
+		if ((*bits & mask) != mask)
 			return B_BUSY;
-		}
 
 		*bits &= ~mask;
 	}
