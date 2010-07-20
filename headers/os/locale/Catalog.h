@@ -5,6 +5,7 @@
 #ifndef _CATALOG_H_
 #define _CATALOG_H_
 
+#include <LocaleRoster.h>
 #include <SupportDefs.h>
 #include <String.h>
 
@@ -53,24 +54,6 @@ class BCatalog {
 };
 
 
-// Proxy class for handling a "shared object local" catalog.
-// This must be included (statically linked) into each shared object needing
-// a catalog on its own (application, add-on, library, ...). The shared object
-// must also have a mimetype so that the catalog can be identified.
-class BCatalogStub 
-{
-	private:
-		static BCatalog	sCatalog;
-		static vint32	sCatalogInitOnce;
-
-	public:
-		static BCatalog* GetCatalog();
-		static void ForceReload();
-			// Use this to force re-initialisation of the catalog (when there
-			// is a locale change for example)
-};
-
-
 #ifndef B_AVOID_TRANSLATION_MACROS
 // macros for easy catalog-access, define B_AVOID_TRANSLATION_MACROS if
 // you don't want these:
@@ -97,19 +80,19 @@ class BCatalogStub
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
 #define B_TRANSLATE(str) \
-	BCatalogStub::GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT)
+	be_locale_roster->GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT)
 
 #undef B_TRANSLATE_COMMENT
 #define B_TRANSLATE_COMMENT(str, cmt) \
-	BCatalogStub::GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT, (cmt))
+	be_locale_roster->GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT, (cmt))
 
 #undef B_TRANSLATE_ALL
 #define B_TRANSLATE_ALL(str, ctx, cmt) \
-	BCatalogStub::GetCatalog()->GetString((str), (ctx), (cmt))
+	be_locale_roster->GetCatalog()->GetString((str), (ctx), (cmt))
 
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
-	BCatalogStub::GetCatalog()->GetString((id))
+	be_locale_roster->GetCatalog()->GetString((id))
 
 // Translation markers which can be used to mark static strings/IDs which
 // are used as key for translation requests (at other places in the code):

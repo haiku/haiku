@@ -57,6 +57,10 @@ class BLocaleRoster {
 			const char* langPattern = NULL,	int32 fingerprint = 0) const;
 			// the message contains...
 
+		BCatalog* GetCatalog();
+			// Get the catalog for the calling image (that needs to link with
+			// liblocalestub.a)
+
 		static const char *kCatLangAttr;
 		static const char *kCatSigAttr;
 		static const char *kCatFingerprintAttr;

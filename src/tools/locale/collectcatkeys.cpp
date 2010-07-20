@@ -28,7 +28,7 @@ const char *inputFile = NULL;
 BString outputFile;
 const char *catalogSig = NULL;
 const char *catalogLang = "English";
-BString rxString("(BCatalogStub::GetCatalog\\(\\)\\s*->\\s*GetString\\s*"
+BString rxString("(be_locale_roster->GetCatalog\\(\\)\\s*->\\s*GetString\\s*"
 	"|BCatalogAddOn\\s*::\\s*MarkForTranslation\\s*)");
 
 
@@ -44,17 +44,22 @@ void
 usage()
 {
 	fprintf(stderr,
-		"usage: collectcatkeys [-pvw] [-r <regex>] [-o <outfile>] [-l <catalogLanguage>]\n"
+		"usage: collectcatkeys [-pvw] [-r <regex>] [-o <outfile>] "
+		"[-l <catalogLanguage>]\n"
 		"                      -s <catalogSig> <prepCppFile>\n"
 		"options:\n"
-		"  -l <catalogLang>\tlanguage of the target-catalog (default is English)\n"
+		"  -l <catalogLang>\tlanguage of the target-catalog (default is "
+		"English)\n"
 		"  -o <outfile>\t\texplicitly specifies the name of the output-file\n"
 		"  -p\t\t\tprint keys as they are found\n"
-		"  -r <regex>\t\tchanges the regex used by the key-scanner to the one given,\n"
-		"      \t\t\tthe default is:   be_catalog\\s*->\\s*GetString\\s*\n"
-		"  -s <catalogSig>\tsignature of the target-catalog\n"
+		"  -r <regex>\t\tchanges the regex used by the key-scanner to the one "
+		"given,\n"
+		"      \t\t\tthe default is:   ");
+		fprintf(stderr, rxString.String());
+		fprintf(stderr,"\n  -s <catalogSig>\tsignature of the target-catalog\n"
 		"  -v\t\t\tbe verbose, show summary\n"
-		"  -w\t\t\tshow warnings about catalog-accesses that couldn't be resolved completely\n");
+		"  -w\t\t\tshow warnings about catalog-accesses that couldn't be "
+		" resolved completely\n");
 	exit(-1);
 }
 

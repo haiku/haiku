@@ -4,37 +4,23 @@
  */
 
 
-#ifndef __CATALOG_STUB_H__
-#define __CATALOG_STUB_H__
-
-
 #include <Catalog.h>
-#include <Locale.h>
 #include <LocaleRoster.h>
 
 
-BCatalog BCatalogStub::sCatalog;
-vint32 BCatalogStub::sCatalogInitOnce = false;
+static BCatalog sCatalog;
+static vint32 sCatalogInitOnce = false;
 
 
-/* static */ BCatalog*
-BCatalogStub::GetCatalog()
+BCatalog*
+BLocaleRoster::GetCatalog()
 {
 	#if (__GNUC__ < 3)
-		asm volatile(".hidden GetCatalog__12BCatalogStub");
+		asm volatile(".hidden GetCatalog__13BLocaleRoster");
 	#else
-		asm volatile(".hidden _ZN12BCatalogStub10GetCatalogEv");
+		asm volatile(".hidden _ZN13BLocaleRoster10GetCatalogEv");
 	#endif
 
-	return be_locale_roster->GetCatalog(&sCatalog, &sCatalogInitOnce);
+	return GetCatalog(&sCatalog, &sCatalogInitOnce);
 }
 
-
-/* static */ void
-BCatalogStub::ForceReload()
-{
-	sCatalogInitOnce = false;
-}
-
-
-#endif
