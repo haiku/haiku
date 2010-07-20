@@ -71,7 +71,9 @@ Transaction::StartAndAddNode(Node* node, uint32 flags = 0)
 
 
 status_t
-Transaction::Commit(const PostCommitNotification* notification)
+Transaction::Commit(const PostCommitNotification* notification1,
+	const PostCommitNotification* notification2,
+	const PostCommitNotification* notification3)
 {
 	ASSERT(fID >= 0);
 
@@ -94,8 +96,12 @@ Transaction::Commit(const PostCommitNotification* notification)
 	}
 
 	// send notifications
-	if (notification != NULL)
-		notification->NotifyPostCommit();
+	if (notification1 != NULL)
+		notification1->NotifyPostCommit();
+	if (notification2 != NULL)
+		notification2->NotifyPostCommit();
+	if (notification3 != NULL)
+		notification3->NotifyPostCommit();
 
 	// clean up
 	_DeleteNodeInfosAndUnlock(false);
@@ -135,6 +141,8 @@ Transaction::Abort()
 status_t
 Transaction::AddNode(Node* node, uint32 flags)
 {
+	ASSERT(fID >= 0);
+
 	NodeInfo* info = _GetNodeInfo(node);
 	if (info != NULL)
 		return B_OK;
@@ -159,6 +167,8 @@ Transaction::AddNode(Node* node, uint32 flags)
 status_t
 Transaction::AddNodes(Node* node1, Node* node2, Node* node3)
 {
+	ASSERT(fID >= 0);
+
 	// sort the nodes
 	swap_if_greater(node1, node2);
 	if (node3 != NULL && swap_if_greater(node2, node3))
@@ -175,9 +185,41 @@ Transaction::AddNodes(Node* node1, Node* node2, Node* node3)
 }
 
 
+bool
+Transaction::RemoveNode(Node* node)
+{
+	ASSERT(fID >= 0);
+
+	NodeInfo* info = _GetNodeInfo(node);
+	if (info == NULL)
+		return false;
+
+	fNodeInfos.Remove(info);
+
+	_DeleteNodeInfoAndUnlock(info, false);
+
+	return true;
+}
+
+
+void
+Transaction::UpdateNodeFlags(Node* node, uint32 flags)
+{
+	ASSERT(fID >= 0);
+
+	NodeInfo* info = _GetNodeInfo(node);
+	if (info == NULL)
+		return;
+
+	info->flags = flags;
+}
+
+
 void
 Transaction::KeepNode(Node* node)
 {
+	ASSERT(fID >= 0);
+
 	NodeInfo* info = _GetNodeInfo(node);
 	if (info == NULL)
 		return;
@@ -202,13 +244,26 @@ Transaction::_GetNodeInfo(Node* node) const
 void
 Transaction::_DeleteNodeInfosAndUnlock(bool failed)
 {
-	while (NodeInfo* info = fNodeInfos.RemoveHead()) {
-		if ((info->flags & TRANSACTION_DELETE_NODE) != 0)
-			delete info->node;
-		else if ((info->flags & TRANSACTION_KEEP_NODE_LOCKED) == 0)
-			info->node->WriteUnlock();
-		delete info;
+	while (NodeInfo* info = fNodeInfos.RemoveHead())
+		_DeleteNodeInfoAndUnlock(info, failed);
+}
+
+
+void
+Transaction::_DeleteNodeInfoAndUnlock(NodeInfo* info, bool failed)
+{
+	if (failed) {
+		if ((info->flags & TRANSACTION_REMOVE_NODE_ON_ERROR) != 0)
+			fVolume->RemoveNode(info->node);
+		else if ((info->flags & TRANSACTION_UNREMOVE_NODE_ON_ERROR) != 0)
+			fVolume->UnremoveNode(info->node);
 	}
+
+	if ((info->flags & TRANSACTION_DELETE_NODE) != 0)
+		delete info->node;
+	else if ((info->flags & TRANSACTION_KEEP_NODE_LOCKED) == 0)
+		info->node->WriteUnlock();
+	delete info;
 }
 
 

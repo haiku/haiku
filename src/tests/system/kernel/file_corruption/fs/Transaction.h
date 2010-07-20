@@ -18,9 +18,11 @@ class Volume;
 
 
 enum {
-	TRANSACTION_DELETE_NODE			= 0x1,
-	TRANSACTION_NODE_ALREADY_LOCKED	= 0x2,
-	TRANSACTION_KEEP_NODE_LOCKED	= 0x4
+	TRANSACTION_DELETE_NODE				= 0x01,
+	TRANSACTION_NODE_ALREADY_LOCKED		= 0x02,
+	TRANSACTION_KEEP_NODE_LOCKED		= 0x04,
+	TRANSACTION_REMOVE_NODE_ON_ERROR	= 0x08,
+	TRANSACTION_UNREMOVE_NODE_ON_ERROR	= 0x10
 };
 
 
@@ -34,17 +36,28 @@ public:
 			status_t			Start();
 			status_t			StartAndAddNode(Node* node, uint32 flags = 0);
 			status_t			Commit(
-									const PostCommitNotification* notification
+									const PostCommitNotification* notification1
+										= NULL,
+									const PostCommitNotification* notification2
+										= NULL,
+									const PostCommitNotification* notification3
 										= NULL);
 	inline	status_t			Commit(
 									const PostCommitNotification& notification);
 			void				Abort();
 
+	inline	bool				IsActive() const	{ return fID >= 0; }
+
 			status_t			AddNode(Node* node, uint32 flags = 0);
 			status_t			AddNodes(Node* node1, Node* node2,
 									Node* node3 = NULL);
+			bool				RemoveNode(Node* node);
+			void				UpdateNodeFlags(Node* node, uint32 flags);
 
 			void				KeepNode(Node* node);
+
+			bool				IsNodeLocked(Node* node) const
+									{ return _GetNodeInfo(node) != NULL; }
 
 private:
 			struct NodeInfo : DoublyLinkedListLinkImpl<NodeInfo> {
@@ -58,6 +71,8 @@ private:
 private:
 			NodeInfo*			_GetNodeInfo(Node* node) const;
 			void				_DeleteNodeInfosAndUnlock(bool failed);
+			void				_DeleteNodeInfoAndUnlock(NodeInfo* info,
+									bool failed);
 
 private:
 			Volume*				fVolume;
