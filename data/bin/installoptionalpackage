@@ -42,7 +42,8 @@ declare alreadyInstalled=""
 # Some Packages cannot be installed,
 # as they require either the source code or compiled binaries
 declare packageIgnoreList="Bluetooth Development DevelopmentMin \
-DevelopmentBase MandatoryPackages UserlandFS Welcome WifiFirmwareScriptData "
+DevelopmentBase MandatoryPackages UserlandFS Welcome WifiFirmwareScriptData \
+ICU-devel ICU "
 
 
 function CreateInstallerScript()
@@ -633,6 +634,23 @@ function ConvertJamToBash()
 	countGenBashLine=0
 
 	# Parse out some variable declarations
+
+	# TODO : add these following variables to the CreateInstallerScript
+	# TODO : parse HAIKU_ICU_GCC_2_PACKAGE
+	#local regExp='/^HAIKU_ICU_GCC_2_PACKAGE/p'
+	#icuGcc2PkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	#ConvertVariableDeclarationLines "$regExp" 'icuGcc2PkgLine'
+
+	# TODO : parse HAIKU_ICU_GCC_4_PACKAGE
+	#local regExp='/^HAIKU_ICU_GCC_4_PACKAGE/p'
+	#icuGcc4PkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	#ConvertVariableDeclarationLines "$regExp" 'icuGcc4PkgLine'
+
+	# TODO : parse HAIKU_ICU_DEVEL_PACKAGE
+	#local regExp='/^HAIKU_ICU_DEVEL_PACKAGE/p'
+	#icuDevelPkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
+	#ConvertVariableDeclarationLines "$regExp" 'icuDevelPkgLine'
+
 	local regExp='/^HAIKU_OPENSSL_PACKAGE/p'
 	sslPkgLine=`sed -n -e "$regExp" ${baseDir}/OptionalBuildFeatures`
 	ConvertVariableDeclarationLines "$regExp" 'sslPkgLine'
@@ -650,6 +668,8 @@ function ConvertJamToBash()
 	while read line ; do
 		line=${line/'Echo'/'echo'}
 
+		# TODO: add support for converting for loops.
+		# 		will need to introduce curly brace counting
 		ConvertIfStatements "$line"
 		ConvertVariables "$line"
 		#ReplaceComparators "$line"
