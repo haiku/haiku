@@ -44,7 +44,7 @@ Block::GetWritable(Volume* volume, uint64 blockIndex, Transaction& transaction)
 
 	status_t error = transaction.RegisterBlock(blockIndex);
 	if (error != B_OK)
-		return error;
+		return false;
 
 	return _Init(volume, blockIndex,
 		block_cache_get_writable(volume->BlockCache(), blockIndex,
@@ -60,7 +60,7 @@ Block::GetZero(Volume* volume, uint64 blockIndex, Transaction& transaction)
 
 	status_t error = transaction.RegisterBlock(blockIndex);
 	if (error != B_OK)
-		return error;
+		return false;
 
 	return _Init(volume, blockIndex,
 		block_cache_get_empty(volume->BlockCache(), blockIndex,
