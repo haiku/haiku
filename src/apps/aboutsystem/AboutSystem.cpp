@@ -162,6 +162,9 @@ static const Translation gTranslations[] =
 	},
 	{ "uk",
 		"Alex Rudyk (totish)\n"
+	},
+	{ "zh",
+		"Pengfei Han (kurain)\n"
 	}
 };
 
