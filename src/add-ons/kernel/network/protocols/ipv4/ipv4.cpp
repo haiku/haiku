@@ -69,37 +69,38 @@ struct ipv4_packet_key {
 
 class FragmentPacket {
 public:
-							FragmentPacket(const ipv4_packet_key &key);
-							~FragmentPacket();
+								FragmentPacket(const ipv4_packet_key& key);
+								~FragmentPacket();
 
-			status_t		AddFragment(uint16 start, uint16 end,
-								net_buffer* buffer, bool lastFragment);
-			status_t		Reassemble(net_buffer* to);
+			status_t			AddFragment(uint16 start, uint16 end,
+									net_buffer* buffer, bool lastFragment);
+			status_t			Reassemble(net_buffer* to);
 
-			bool			IsComplete() const
-								{ return fReceivedLastFragment
-									&& fBytesLeft == 0; }
+			bool				IsComplete() const
+									{ return fReceivedLastFragment
+										&& fBytesLeft == 0; }
 
-	static	uint32			Hash(void* _packet, const void* _key, uint32 range);
-	static	int				Compare(void* _packet, const void* _key);
-	static	int32			NextOffset()
-								{ return offsetof(FragmentPacket, fNext); }
-	static	void			StaleTimer(struct net_timer* timer, void* data);
+	static	uint32				Hash(void* _packet, const void* _key,
+									uint32 range);
+	static	int					Compare(void* _packet, const void* _key);
+	static	int32				NextOffset()
+									{ return offsetof(FragmentPacket, fNext); }
+	static	void				StaleTimer(struct net_timer* timer, void* data);
 
 private:
-			FragmentPacket*	fNext;
+			FragmentPacket*		fNext;
 			struct ipv4_packet_key fKey;
-			bool			fReceivedLastFragment;
-			int32			fBytesLeft;
-			FragmentList	fFragments;
-			net_timer		fTimer;
+			bool				fReceivedLastFragment;
+			int32				fBytesLeft;
+			FragmentList		fFragments;
+			net_timer			fTimer;
 };
 
 
 class RawSocket
 	: public DoublyLinkedListLinkImpl<RawSocket>, public DatagramSocket<> {
 public:
-							RawSocket(net_socket* socket);
+								RawSocket(net_socket* socket);
 };
 
 typedef DoublyLinkedList<RawSocket> RawSocketList;
@@ -133,14 +134,14 @@ struct ipv4_protocol : net_protocol {
 	{
 	}
 
-	RawSocket	*raw;
-	uint8		service_type;
-	uint8		time_to_live;
-	uint8		multicast_time_to_live;
-	uint32		flags;
-	struct sockaddr* interface_address; // for IP_MULTICAST_IF
+	RawSocket*			raw;
+	uint8				service_type;
+	uint8				time_to_live;
+	uint8				multicast_time_to_live;
+	uint32				flags;
+	struct sockaddr*	interface_address; // for IP_MULTICAST_IF
 
-	IPv4MulticastFilter multicast_filter;
+	IPv4MulticastFilter	multicast_filter;
 };
 
 // protocol flags
@@ -660,12 +661,15 @@ send_fragments(ipv4_protocol* protocol, struct net_route* route,
 }
 
 
-static status_t
+/*!	Delivers the provided \a buffer to all listeners of this multicast group.
+	Does not take over ownership of the buffer.
+*/
+static bool
 deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 	bool deliverToRaw)
 {
 	if (module->deliver_data == NULL)
-		return B_OK;
+		return false;
 
 	MutexLocker _(sMulticastGroupsLock);
 
@@ -674,32 +678,41 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
 		&multicastAddr->sin_addr, buffer->interface->index));
 
+	size_t count = 0;
+
 	while (it.HasNext()) {
 		IPv4GroupInterface* state = it.Next();
 
-		if (deliverToRaw && state->Parent()->Socket()->raw == NULL)
+		ipv4_protocol* ipProtocol = state->Parent()->Socket();
+		if (deliverToRaw && (ipProtocol->raw == NULL
+			|| ipProtocol->socket->protocol != buffer->protocol))
 			continue;
 
 		if (state->FilterAccepts(buffer)) {
-			// as Multicast filters are installed with an IPv4 protocol
-			// reference, we need to go and find the appropriate instance
-			// related to the 'receiving protocol' with module 'module'.
-			net_protocol* protocol
-				= state->Parent()->Socket()->socket->first_protocol;
+			net_protocol* protocol = ipProtocol;
+			if (protocol->module != module) {
+				// as multicast filters are installed with an IPv4 protocol
+				// reference, we need to go and find the appropriate instance
+				// related to the 'receiving protocol' with module 'module'.
+				net_protocol* protocol = ipProtocol->socket->first_protocol;
 
-			while (protocol != NULL && protocol->module != module)
-				protocol = protocol->next;
+				while (protocol != NULL && protocol->module != module)
+					protocol = protocol->next;
+			}
 
-			if (protocol != NULL)
+			if (protocol != NULL) {
 				module->deliver_data(protocol, buffer);
+				count++;
+			}
 		}
 	}
 
-	return B_OK;
+	return count > 0;
 }
 
 
-/*!	Delivers the buffer to all listening raw sockets.
+/*!	Delivers the buffer to all listening raw sockets without taking ownership of
+	the provided \a buffer.
 	Returns \c true if there was any receiver, \c false if not.
 */
 static bool
@@ -712,25 +725,28 @@ raw_receive_data(net_buffer* buffer)
 
 	TRACE("RawReceiveData(%i)", buffer->protocol);
 
-	if (buffer->flags & MSG_MCAST) {
+	if ((buffer->flags & MSG_MCAST) != 0) {
 		// we need to call deliver_multicast here separately as
 		// buffer still has the IP header, and it won't in the
 		// next call. This isn't very optimized but works for now.
 		// A better solution would be to hold separate hash tables
 		// and lists for RAW and non-RAW sockets.
-		deliver_multicast(&gIPv4Module, buffer, true);
-	} else {
-		RawSocketList::Iterator iterator = sRawSockets.GetIterator();
+		return deliver_multicast(&gIPv4Module, buffer, true);
+	}
+	
+	RawSocketList::Iterator iterator = sRawSockets.GetIterator();
+	size_t count = 0;
 
-		while (iterator.HasNext()) {
-			RawSocket* raw = iterator.Next();
+	while (iterator.HasNext()) {
+		RawSocket* raw = iterator.Next();
 
-			if (raw->Socket()->protocol == buffer->protocol)
-				raw->SocketEnqueue(buffer);
+		if (raw->Socket()->protocol == buffer->protocol) {
+			raw->SocketEnqueue(buffer);
+			count++;
 		}
 	}
 
-	return true;
+	return count > 0;
 }
 
 
@@ -1637,11 +1653,13 @@ ipv4_receive_data(net_buffer* buffer)
 	}
 
 	if ((buffer->flags & MSG_MCAST) != 0) {
-		// Unfortunely historical reasons dictate that the IP multicast
+		// Unfortunately historical reasons dictate that the IP multicast
 		// model be a little different from the unicast one. We deliver
 		// this frame directly to all sockets registered with interest
 		// for this multicast group.
-		return deliver_multicast(module, buffer, false);
+		deliver_multicast(module, buffer, false);
+		gBufferModule->free(buffer);
+		return B_OK;
 	}
 
 	return module->receive_data(buffer);
