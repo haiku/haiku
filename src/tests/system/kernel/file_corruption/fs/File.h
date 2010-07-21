@@ -57,6 +57,8 @@ private:
 									Transaction& transaction);
 
 			status_t			_WriteZeroes(uint64 offset, uint64 size);
+			status_t			_WriteData(uint64 offset, const void* buffer,
+									size_t size, size_t& _bytesWritten);
 
 private:
 			void*				fFileCache;

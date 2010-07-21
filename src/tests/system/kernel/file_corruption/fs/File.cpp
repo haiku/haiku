@@ -6,7 +6,9 @@
 
 #include "File.h"
 
+#include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <algorithm>
 #include <new>
@@ -34,6 +36,16 @@ static const uint32 kFileMaxTreeDepth		= (64 + kFileBlockShift - 1)
 
 #define BLOCK_ROUND_UP(value)	(((value) + B_PAGE_SIZE - 1) / B_PAGE_SIZE \
 									* B_PAGE_SIZE)
+
+
+namespace {
+	struct WriteTempData {
+		SHA256							sha256;
+		checksum_device_ioctl_check_sum	indexAndCheckSum;
+		file_io_vec						fileVecs[16];
+		uint8							blockData[B_PAGE_SIZE];
+	};
+}
 
 
 struct File::LevelInfo {
@@ -146,14 +158,17 @@ File::Resize(uint64 newSize, bool fillWithZeroes, Transaction& transaction)
 
 	SetSize(newSize);
 
-	if (newSize > size && fillWithZeroes) {
-		status_t error = _WriteZeroes(size, newSize - size);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-	}
-
 	file_cache_set_size(fFileCache, newSize);
 	file_map_set_size(fFileMap, newSize);
+
+	if (newSize > size && fillWithZeroes) {
+		status_t error = _WriteZeroes(size, newSize - size);
+		if (error != B_OK) {
+			file_cache_set_size(fFileCache, size);
+			file_map_set_size(fFileMap, size);
+			RETURN_ERROR(error);
+		}
+	}
 
 	return B_OK;
 }
@@ -248,9 +263,8 @@ File::Write(off_t pos, const void* buffer, size_t size, size_t& _bytesWritten,
 		_WriteZeroes(fileSize, pos - fileSize);
 	}
 
-	size_t bytesWritten = size;
-	status_t error = file_cache_write(fFileCache, NULL, pos, buffer,
-		&bytesWritten);
+	size_t bytesWritten;
+	status_t error = _WriteData(pos, buffer, size, bytesWritten);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -696,15 +710,164 @@ status_t
 File::_WriteZeroes(uint64 offset, uint64 size)
 {
 	while (size > 0) {
-		size_t toWrite = std::min(size, (uint64)SIZE_MAX);
-		status_t error = file_cache_write(fFileCache, NULL, offset, NULL,
-			&toWrite);
+		size_t bytesWritten;
+		status_t error =  _WriteData(offset, NULL,
+			std::min(size, (uint64)SIZE_MAX), bytesWritten);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+		if (bytesWritten == 0)
+			RETURN_ERROR(B_ERROR);
+
+		size -= bytesWritten;
+		offset += bytesWritten;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+File::_WriteData(uint64 offset, const void* buffer, size_t size,
+	size_t& _bytesWritten)
+{
+	uint32 inBlockOffset = offset % B_PAGE_SIZE;
+	uint64 blockCount = ((uint64)size + inBlockOffset + B_PAGE_SIZE - 1)
+		/ B_PAGE_SIZE;
+
+	// allocate storage for the indices of the blocks
+	uint64* blockIndices = new(std::nothrow) uint64[blockCount];
+	if (blockIndices == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ArrayDeleter<uint64> blockIndicesDeleter(blockIndices);
+
+	// allocate temporary storage for the check sum computation
+	WriteTempData* tempData = new(std::nothrow) WriteTempData;
+	if (tempData == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
+	ObjectDeleter<WriteTempData> tempDataDeleter(tempData);
+
+	// get the block indices
+	uint64 firstBlockIndex = offset / B_PAGE_SIZE;
+	for (uint64 i = 0; i < blockCount;) {
+		size_t count;
+		status_t error = GetFileVecs((firstBlockIndex + i) * B_PAGE_SIZE,
+			size + inBlockOffset - i * B_PAGE_SIZE, tempData->fileVecs,
+			sizeof(tempData->fileVecs) / sizeof(file_io_vec), count);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
-		size -= toWrite;
-		offset += toWrite;
+		for (size_t k = 0; k < count && i < blockCount; k++) {
+			off_t vecBlockIndex = tempData->fileVecs[k].offset / B_PAGE_SIZE;
+			off_t vecLength = tempData->fileVecs[k].length;
+			while (vecLength > 0 && i < blockCount) {
+				blockIndices[i++] = vecBlockIndex++;
+				vecLength -= B_PAGE_SIZE;
+			}
+		}
 	}
 
+	// clear the check sums of the affected blocks
+	memset(&tempData->indexAndCheckSum.checkSum, 0, sizeof(CheckSum));
+	for (uint64 i = 0; i < blockCount; i++) {
+		tempData->indexAndCheckSum.blockIndex = blockIndices[i];
+		if (ioctl(GetVolume()->FD(), CHECKSUM_DEVICE_IOCTL_SET_CHECK_SUM,
+				&tempData->indexAndCheckSum,
+				sizeof(tempData->indexAndCheckSum)) < 0) {
+			RETURN_ERROR(errno);
+		}
+	}
+
+	// write
+	size_t bytesWritten = size;
+	status_t error = file_cache_write(fFileCache, NULL, offset, buffer,
+		&bytesWritten);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// compute and set the new check sums
+	for (uint64 i = 0; i < blockCount; i++) {
+		// copy the data to our temporary buffer
+		if (i == 0 && inBlockOffset != 0) {
+			// partial block -- read complete block from cache
+			size_t bytesRead = B_PAGE_SIZE;
+			error = file_cache_read(fFileCache, NULL, offset - inBlockOffset,
+				tempData->blockData, &bytesRead);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			if (bytesRead < B_PAGE_SIZE) {
+				// partial read (the file is possibly shorter) -- clear the rest
+				memset(tempData->blockData + bytesRead, 0,
+					B_PAGE_SIZE - bytesRead);
+			}
+
+			// copy provided data
+			size_t toCopy = std::min((size_t)B_PAGE_SIZE - inBlockOffset, size);
+			if (buffer != NULL) {
+				error = user_memcpy(tempData->blockData + inBlockOffset,
+					buffer, toCopy);
+				if (error != B_OK)
+					RETURN_ERROR(error);
+			} else
+				memset(tempData->blockData + inBlockOffset, 0, toCopy);
+		} else if (i == blockCount - 1
+			&& (size + inBlockOffset) % B_PAGE_SIZE != 0) {
+			// partial block -- read complete block from cache
+			size_t bytesRead = B_PAGE_SIZE;
+			error = file_cache_read(fFileCache, NULL,
+				offset - inBlockOffset + i * B_PAGE_SIZE,
+				tempData->blockData, &bytesRead);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			if (bytesRead < B_PAGE_SIZE) {
+				// partial read (the file is possibly shorter) -- clear the rest
+				memset(tempData->blockData + bytesRead, 0,
+					B_PAGE_SIZE - bytesRead);
+			}
+
+			// copy provided data
+			size_t toCopy = (size + inBlockOffset) % B_PAGE_SIZE;
+				// we start at the beginning of the block, since i > 0
+			if (buffer != NULL) {
+				error = user_memcpy(tempData->blockData,
+					(const uint8*)buffer + i * B_PAGE_SIZE - inBlockOffset,
+					toCopy);
+				if (error != B_OK)
+					RETURN_ERROR(error);
+			} else
+				memset(tempData->blockData, 0, toCopy);
+		} else {
+			// complete block
+			if (buffer != NULL) {
+				error = user_memcpy(tempData->blockData,
+					(const uint8*)buffer + i * B_PAGE_SIZE - inBlockOffset,
+					B_PAGE_SIZE);
+				if (error != B_OK)
+					RETURN_ERROR(error);
+			} else if (i == 0 || (i == 1 && inBlockOffset != 0)) {
+				// clear only once
+				memset(tempData->blockData, 0, B_PAGE_SIZE);
+			}
+		}
+
+		// compute the check sum
+		if (buffer != NULL || i == 0 || (i == 1 && inBlockOffset != 0)) {
+			tempData->sha256.Init();
+			tempData->sha256.Update(tempData->blockData, B_PAGE_SIZE);
+			tempData->indexAndCheckSum.checkSum = tempData->sha256.Digest();
+		}
+
+		// set it
+		tempData->indexAndCheckSum.blockIndex = blockIndices[i];
+
+		if (ioctl(GetVolume()->FD(), CHECKSUM_DEVICE_IOCTL_SET_CHECK_SUM,
+				&tempData->indexAndCheckSum,
+				sizeof(tempData->indexAndCheckSum)) < 0) {
+			RETURN_ERROR(errno);
+		}
+	}
+
+	_bytesWritten = bytesWritten;
 	return B_OK;
 }
