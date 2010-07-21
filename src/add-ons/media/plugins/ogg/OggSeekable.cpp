@@ -332,7 +332,7 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 	if (granulepos != fFirstGranulepos) {
 		// binary search to find our place
 		off_t right = GetLastPagePosition();
-		uint width = (uint)log10(max_c(1, fFirstGranulepos + right)) + 2;
+		// uint width = (uint)log10(max_c(1, fFirstGranulepos + right)) + 2;
 		while (true) {
 			ogg_sync_reset(&fSync);
 			ogg_stream_reset(&fStreamState);

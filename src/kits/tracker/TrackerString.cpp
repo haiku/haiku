@@ -449,9 +449,9 @@ TrackerString::MatchesBracketExpression(const char *string, const char *pattern,
 						return false;
 							// Not a valid range!
 					
-					if (islower(start) && islower(stop)	
-						|| isupper(start) && isupper(stop)
-						|| isdigit(start) && isdigit(stop))
+					if ((islower(start) && islower(stop))
+						|| (isupper(start) && isupper(stop))
+						|| (isdigit(start) && isdigit(stop)))
 							// Make sure 'start' and 'stop' are of the same type.
 						match = start <= testChar && testChar <= stop;
 					else

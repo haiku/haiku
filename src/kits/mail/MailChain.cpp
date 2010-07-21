@@ -95,9 +95,9 @@ BMailChain::Load(BMessage* settings)
 		char* addon_path;
 
 		if (settings->FindMessage("filter_settings", i, filter) < B_OK
-			|| (settings->FindString("filter_addons", i, (const char**)&addon_path) < B_OK
+			|| ((settings->FindString("filter_addons", i, (const char**)&addon_path) < B_OK
 				|| get_ref_for_path(addon_path, ref) < B_OK)
-			&& settings->FindRef("filter_addons", i, ref) < B_OK) {
+			&& settings->FindRef("filter_addons", i, ref) < B_OK)) {
 			delete filter;
 			delete ref;
 			break;

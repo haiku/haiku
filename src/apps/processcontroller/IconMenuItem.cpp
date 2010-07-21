@@ -169,7 +169,7 @@ before_dano()
 		get_system_info(&sys_info);
 		time_t kernelTime = parsedate(sys_info.kernel_build_date, time(NULL));
 		struct tm* date = gmtime(&kernelTime);
-		old_version = (date->tm_year < 101 || date->tm_year == 101 && date->tm_mon < 10);
+		old_version = (date->tm_year < 101 || (date->tm_year == 101 && date->tm_mon < 10));
 	}
 
 	return old_version;

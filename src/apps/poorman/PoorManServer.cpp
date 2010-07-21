@@ -43,8 +43,8 @@ PoorManServer::PoorManServer(const char* webDir,
 		(unsigned short)80,//port
 		(char*)0,//cgi pattern
 		0,//cgi_limit
-		"iso-8859-1",//charset
-		"",//p3p
+		(char *)"iso-8859-1",//charset
+		(char *)"",//p3p
 		-1,//max_age
 		const_cast<char*>(webDir),//cwd
 		1,//no_log
@@ -232,7 +232,7 @@ int32 PoorManServer::_Listener(void* data)
 		
 		if (s->fCurConns > s->fMaxConns) {
 			httpd_send_err(hc, 503,
-				httpd_err503title, "", httpd_err503form, "");
+				httpd_err503title, (char *)"", httpd_err503form, (char *)"");
 			httpd_write_response(hc);
 			continue;
 		}
@@ -292,7 +292,7 @@ int32 PoorManServer::_Worker(void* data)
 			break;
 		case GR_BAD_REQUEST:
 			httpd_send_err(hc, 400,
-				httpd_err400title, "", httpd_err400form, "");
+				httpd_err400title, (char *)"", httpd_err400form, (char *)"");
 			httpd_write_response(hc);//fall through
 		case GR_NO_REQUEST: //fall through
 		default: //won't happen

@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include <InterfaceDefs.h>
 
+/*
 static const char* 
 kAbout =
 "PDF Writer for BeOS\n"
@@ -44,3 +45,4 @@ B_UTF8_COPYRIGHT " 2001-2004 Haiku\n"
 "\tInteractive Features\n"
 "\t" B_UTF8_ELLIPSIS
 ;
+*/

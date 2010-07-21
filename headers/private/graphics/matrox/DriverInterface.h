@@ -187,7 +187,7 @@ typedef struct {
 		G400MAX,
 		G450,
 		G550
-	};
+	} card_type;
 	struct
 	{
 		/* specialised registers for card initialisation read from MGA BIOS (pins) */

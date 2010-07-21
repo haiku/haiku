@@ -206,7 +206,7 @@ TWindowMenuItem::Draw()
 
 	//	if not selected or being tracked on, fill with gray
 	TBarView* barview = (static_cast<TBarApp*>(be_app))->BarView();
-	if (!IsSelected() && !menu->IsRedrawAfterSticky()
+	if ((!IsSelected() && !menu->IsRedrawAfterSticky())
 		|| barview->Dragging() || !IsEnabled()) {
 
 		rgb_color shadow = tint_color(menuColor, 1.09);
@@ -294,8 +294,8 @@ TWindowMenuItem::Invoke(BMessage* /*message*/)
 
 			if (item->Menu()->Window() != NULL) {
 				zoomRect = item->Menu()->ConvertToScreen(item->Frame());
-				doZoom = fMini && action == B_BRING_TO_FRONT
-					|| !fMini && action == B_MINIMIZE_WINDOW;
+				doZoom = (fMini && action == B_BRING_TO_FRONT)
+					|| (!fMini && action == B_MINIMIZE_WINDOW);
 			}
 
 			do_window_action(fID, action, zoomRect, doZoom);

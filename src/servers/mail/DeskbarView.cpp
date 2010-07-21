@@ -235,7 +235,7 @@ DeskbarView::MessageReceived(BMessage* message)
 
 		case MD_OPEN_NEW:
 		{
-			char* argv[] = {"New Message", "mailto:"};
+			char* argv[] = {(char *)"New Message", (char *)"mailto:"};
 			be_roster->Launch("text/x-email", 2, argv);
 			break;
 		}

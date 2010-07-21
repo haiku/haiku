@@ -1099,6 +1099,7 @@ DVBMediaNode::Tune()
 		fSelectedState, fSelectedRegion, fSelectedChannel, fSelectedAudio);
 
 	status_t err;
+	bool needs_tuning = false;
 
 	if (fSelectedChannel < 0 || fSelectedAudio < 0) {
 		printf("DVBMediaNode::Tune: invalid tuning info\n");
@@ -1135,7 +1136,6 @@ DVBMediaNode::Tune()
 		return B_OK;
 	}
 */	
-	bool needs_tuning;
 	switch (fInterfaceType) {
 		case DVB_TYPE_DVB_T:
 			needs_tuning = (fTuningParam.u.dvb_t.frequency != new_params.u.dvb_t.frequency) || !fTuningSuccess;

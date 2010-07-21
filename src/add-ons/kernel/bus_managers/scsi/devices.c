@@ -204,7 +204,7 @@ static status_t
 scsi_create_autosense_request(scsi_device_info *device)
 {
 	scsi_ccb *request;
-	char *buffer;
+	unsigned char *buffer;
 	scsi_cmd_request_sense *cmd;
 	size_t total_size;
 

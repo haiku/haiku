@@ -294,7 +294,7 @@ asfReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		TRACE("BlockAlign %d\n",audioFormat.BlockAlign);
 		TRACE("Bits %d\n",audioFormat.BitsPerSample);
 		
-		uint32 sampleSize = (audioFormat.NoChannels * audioFormat.BitsPerSample / 8);
+		//uint32 sampleSize = (audioFormat.NoChannels * audioFormat.BitsPerSample / 8);
 		
 		cookie->audio = true;
 		cookie->duration = theFileReader->getStreamDuration(streamNumber);

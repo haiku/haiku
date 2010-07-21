@@ -425,7 +425,7 @@ set_bits(uint8* bits, uint8 r, uint8 g, uint8 b)
 }
 
 // _UpdateThread
-int32
+status_t
 ColorField::_UpdateThread(void* data)
 {
 	// initializing
@@ -589,6 +589,7 @@ ColorField::_UpdateThread(void* data)
 			}
 		}
 	}
+	return B_OK;
 }
 
 // _DrawBorder

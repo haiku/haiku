@@ -32,8 +32,8 @@ struct CharsetConversionEntry
 extern const CharsetConversionEntry mail_charsets[];
 
 
-extern const char *kHeaderCharsetString = "header-charset";
-extern const char *kHeaderEncodingString = "header-encoding";
+const char *kHeaderCharsetString = "header-charset";
+const char *kHeaderEncodingString = "header-encoding";
 // Special field names in the headers which specify the character set (int32)
 // and encoding (int8) to use when converting the headers from UTF-8 to the
 // output e-mail format (rfc2047).  Since they are numbers, not strings, the

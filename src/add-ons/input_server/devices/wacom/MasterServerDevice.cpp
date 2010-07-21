@@ -70,7 +70,7 @@ MasterServerDevice::~MasterServerDevice()
 status_t
 MasterServerDevice::InitCheck()
 {
-	input_device_ref device = { "Wacom Tablets",
+	input_device_ref device = { (char *)"Wacom Tablets",
 		B_POINTING_DEVICE, (void*)this };
 	input_device_ref* deviceList[2] = { &device, NULL };
 	RegisterDevices(deviceList);

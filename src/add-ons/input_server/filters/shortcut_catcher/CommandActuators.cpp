@@ -589,10 +589,10 @@ KeyStrokeSequenceCommandActuator::KeyStrokeSequenceCommandActuator(int32 argc,
 				}
 
 				// If we have a letter, try to make it the correct case
-				if ((unicodeVal >= 'A') && (unicodeVal <= 'Z'))
+				if ((unicodeVal >= 'A') && (unicodeVal <= 'Z')) {
 					if ((customMods &B_SHIFT_KEY) == 0)
 						unicodeVal += 'a'-'A';
-				else if ((unicodeVal >= 'a') && (unicodeVal <= 'z'))
+				} else if ((unicodeVal >= 'a') && (unicodeVal <= 'z'))
 					if ((customMods &B_SHIFT_KEY) != 0)
 						unicodeVal -= 'a'-'A';
 			} else {

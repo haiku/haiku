@@ -426,7 +426,7 @@ ale_attach(device_t dev)
 	struct ale_softc *sc;
 	struct ifnet *ifp;
 	uint16_t burst;
-	int error, i, msic, msixc, pmc;
+	int error, i, msic, msixc;
 	uint32_t rxf_len, txf_len;
 
 	error = 0;

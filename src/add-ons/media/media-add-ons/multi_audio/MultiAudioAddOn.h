@@ -30,7 +30,7 @@ public:
 							int32* _internalID, bool* _hasMore);
 
 private:
-			status_t	_RecursiveScan(char* path, BEntry* rootEntry = NULL,
+			status_t	_RecursiveScan(const char* path, BEntry* rootEntry = NULL,
 							uint32 depth = 0);
 			void		_SaveSettings();
 			void		_LoadSettings();

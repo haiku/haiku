@@ -237,7 +237,7 @@ usb_printer_device_added(usb_device newDevice, void **cookie)
 	if (freeDeviceMask != (uint32)-1) {
 		// reuse device number of first 32 devices
 		for (int32 deviceNumber = 0; deviceNumber < 32; deviceNumber++) {
-			if (freeDeviceMask & (1 << deviceNumber) == 0) {
+			if ((freeDeviceMask & (1 << deviceNumber)) == 0) {
 				device->device_number = deviceNumber;
 				break;
 			}

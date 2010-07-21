@@ -122,7 +122,7 @@ Savage_GetPanelInfo()
 	if (panelX == 1408)
 		panelX = 1400;
 
-	char* sTechnology;
+	const char* sTechnology;
 
 	if ((ReadSeqReg(0x39) & 0x03) == 0)
 		sTechnology = "TFT";

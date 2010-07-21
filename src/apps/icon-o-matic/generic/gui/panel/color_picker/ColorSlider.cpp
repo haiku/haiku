@@ -513,7 +513,7 @@ ColorSlider::SetMarkerToColor(rgb_color color)
 }
 
 // _UpdateThread
-int32
+status_t
 ColorSlider::_UpdateThread(void* data)
 {
 	// initializing
@@ -632,6 +632,7 @@ ColorSlider::_UpdateThread(void* data)
 			}
 		}
 	}
+	return B_OK;
 }
 
 // _DrawColorLineY

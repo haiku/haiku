@@ -132,7 +132,7 @@ void RuleFilterConfig::MessageReceived(BMessage *msg) {
 	{
 		case kMsgActionMoveTo:
 		case kMsgActionSetTo:
-			if (BControl *control = (BControl *)arg->FindView("file_path"))
+			if (arg->FindView("file_path"))
 				arg->SetEnabled(true);
 			if (BControl *control = (BControl *)arg->FindView("select_file"))
 				control->SetEnabled(msg->what == kMsgActionMoveTo);

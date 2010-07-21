@@ -242,10 +242,13 @@ TBeMenu::AddStandardBeMenuItems()
 		AddSeparatorItem();
 	}
 
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
 	static const char* kAboutHaikuMenuItemStr = B_TRANSLATE_MARK(
 		"About Haiku" B_UTF8_ELLIPSIS);
+#else
 	static const char* kAboutThisSystemMenuItemStr = B_TRANSLATE_MARK(
 		"About this system" B_UTF8_ELLIPSIS);
+#endif
 
 	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
@@ -300,9 +303,9 @@ TBeMenu::AddStandardBeMenuItems()
 	item->SetEnabled(!dragging);
 	shutdownMenu->AddItem(item);
 
+#ifdef APM_SUPPORT
 	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
 
-#ifdef APM_SUPPORT
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
 		item = new BMenuItem(B_TRANSLATE(kSuspendMenuItemStr),
 			new BMessage(kSuspendSystem));

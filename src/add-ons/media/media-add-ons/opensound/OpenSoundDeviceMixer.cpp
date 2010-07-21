@@ -63,7 +63,6 @@ int OpenSoundDeviceMixer::CountExtInfos()
 
 status_t OpenSoundDeviceMixer::GetExtInfo(int index, oss_mixext *info)
 {
-	status_t err;
 	CALLED();
 	
 	if (!info)
@@ -84,7 +83,6 @@ status_t OpenSoundDeviceMixer::GetExtInfo(int index, oss_mixext *info)
 
 status_t OpenSoundDeviceMixer::GetMixerValue(oss_mixer_value *value)
 {
-	status_t err;
 	CALLED();
 	
 	if (!value)
@@ -105,7 +103,6 @@ status_t OpenSoundDeviceMixer::GetMixerValue(oss_mixer_value *value)
 
 status_t OpenSoundDeviceMixer::SetMixerValue(oss_mixer_value *value)
 {
-	status_t err;
 	CALLED();
 	
 	if (!value)
@@ -126,7 +123,6 @@ status_t OpenSoundDeviceMixer::SetMixerValue(oss_mixer_value *value)
 
 status_t OpenSoundDeviceMixer::GetEnumInfo(int index, oss_mixer_enuminfo *info)
 {
-	status_t err;
 	CALLED();
 	
 	if (!info)

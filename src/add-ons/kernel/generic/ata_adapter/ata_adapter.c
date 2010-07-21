@@ -625,8 +625,6 @@ ata_adapter_init_controller(device_node *node,
 	pci_device *device;
 	ata_adapter_controller_info *controller;
 	uint16 bus_master_base;
-	uint16 pcicmdOld;
-	uint16 pcicmdNew;
 
 	// get device data
 	if (sDeviceManager->get_attr_uint16(node, ATA_ADAPTER_BUS_MASTER_BASE, &bus_master_base, false) != B_OK)

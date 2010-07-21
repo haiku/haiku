@@ -34,7 +34,7 @@ enum {
 	LED_SCROLL 	= 1,
 	LED_NUM 	= 2,
 	LED_CAPS	= 4
-} leds_status;
+};
 
 enum {
 	EXTENDED_KEY	= 0xe0,

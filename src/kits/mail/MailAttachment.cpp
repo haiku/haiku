@@ -245,7 +245,7 @@ status_t BSimpleMailAttachment::SetDecodedData(const void *data, size_t length) 
 void BSimpleMailAttachment::SetEncoding(mail_encoding encoding) {
 	_encoding = encoding;
 
-	char *cte = NULL; //--Content Transfer Encoding
+	const char *cte = NULL; //--Content Transfer Encoding
 	switch (_encoding) {
 		case base64:
 			cte = "base64";

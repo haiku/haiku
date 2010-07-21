@@ -74,7 +74,7 @@ Prefs::~Prefs()
 
 // GetInt
 bool
-Prefs::GetInt(char *name, int *value, int *defaultvalue)
+Prefs::GetInt(const char *name, int *value, int *defaultvalue)
 {
 	status_t err = file->ReadAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err == B_ENTRY_NOT_FOUND) {
@@ -92,7 +92,7 @@ Prefs::GetInt(char *name, int *value, int *defaultvalue)
 
 // GetBool
 bool
-Prefs::GetBool(char *name, bool *value, bool *defaultvalue)
+Prefs::GetBool(const char *name, bool *value, bool *defaultvalue)
 {
 	status_t err = file->ReadAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err == B_ENTRY_NOT_FOUND) {
@@ -110,7 +110,7 @@ Prefs::GetBool(char *name, bool *value, bool *defaultvalue)
 
 // PutInt
 bool
-Prefs::PutInt(char *name, int *value)
+Prefs::PutInt(const char *name, int *value)
 {
 	status_t err = file->WriteAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err < 0) {
@@ -122,7 +122,7 @@ Prefs::PutInt(char *name, int *value)
 
 // PutBool
 bool
-Prefs::PutBool(char *name, bool *value)
+Prefs::PutBool(const char *name, bool *value)
 {
 	status_t err = file->WriteAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err < 0) {

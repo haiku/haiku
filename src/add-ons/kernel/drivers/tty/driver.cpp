@@ -97,8 +97,8 @@ init_driver(void)
 		}
 	}
 
-	gDeviceNames[2 * kNumTTYs] = "ptmx";
-	gDeviceNames[2 * kNumTTYs + 1] = "tty";
+	gDeviceNames[2 * kNumTTYs] = (char *)"ptmx";
+	gDeviceNames[2 * kNumTTYs + 1] = (char *)"tty";
 
 	tty_add_debugger_commands();
 

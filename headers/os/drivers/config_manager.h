@@ -106,6 +106,8 @@ typedef struct config_manager_for_driver_module_info {
 						uint32 len);
 } config_manager_for_driver_module_info;
 
+int config_manager_scan_hardcoded(struct device_info **info, int32 *count);
+
 #define	B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME	"bus_managers/config_manager/driver/v1"
 
 #ifdef __cplusplus

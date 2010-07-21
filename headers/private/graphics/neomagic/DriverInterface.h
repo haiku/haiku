@@ -179,7 +179,7 @@ typedef struct {
     	NM2230,
     	NM2360,
     	NM2380
-	};
+	} card_type;
 	struct
 	{
 		/* specialised registers for predefined cardspecs */

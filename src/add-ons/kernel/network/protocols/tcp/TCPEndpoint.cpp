@@ -1566,9 +1566,9 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 	if ((segment.flags & TCP_FLAG_SYNCHRONIZE) != 0
 		|| (fState == SYNCHRONIZE_RECEIVED
 			&& (fInitialReceiveSequence > segment.sequence
-				|| (segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
+				|| ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
 					&& (fSendUnacknowledged > segment.acknowledge
-						|| fSendMax < segment.acknowledge)))) {
+						|| fSendMax < segment.acknowledge))))) {
 		// reset the connection - either the initial SYN was faulty, or we
 		// received a SYN within the data stream
 		return DROP | RESET;

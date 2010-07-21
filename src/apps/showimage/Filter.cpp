@@ -267,7 +267,7 @@ Scaler::~Scaler()
 BBitmap*
 Scaler::CreateDestImage(BBitmap* srcImage)
 {
-	if (srcImage == NULL || srcImage->ColorSpace() != B_RGB32 && srcImage->ColorSpace() != B_RGBA32) return NULL;
+	if (srcImage == NULL || (srcImage->ColorSpace() != B_RGB32 && srcImage->ColorSpace() != B_RGBA32)) return NULL;
 
 	BRect dest(0, 0, fRect.IntegerWidth(), fRect.IntegerHeight());
 	BBitmap* destImage = new BBitmap(dest, fDither ? B_CMAP8 : srcImage->ColorSpace());

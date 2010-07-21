@@ -65,7 +65,7 @@ add_to_message(TReadHelper& source, BMessage& target, tiff_tag& tag,
 
 			// remove trailing spaces
 			int32 i = tag.length;
-			while (--i > 0 && isspace(buffer[i]) || !buffer[i]) {
+			while ((--i > 0 && isspace(buffer[i])) || !buffer[i]) {
 				buffer[i] = '\0';
 			}
 

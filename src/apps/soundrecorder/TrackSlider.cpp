@@ -75,7 +75,7 @@ TrackSlider::_InitBitmap()
 	
 	fBitmap = new BBitmap(rect, BScreen().ColorSpace(), true);
 	
-	fBitmapView = new SliderOffscreenView(rect.OffsetToSelf(B_ORIGIN), "bitmapView");
+	fBitmapView = new SliderOffscreenView(rect.OffsetToSelf(B_ORIGIN), (char *)"bitmapView");
 	fBitmap->AddChild(fBitmapView);
 	
 	fBitmapView->fRight = Bounds().right - kLeftRightTrackSliderWidth;

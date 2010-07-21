@@ -174,7 +174,7 @@ MultiAudioAddOn::AutoStart(int count, BMediaNode** _node, int32* _internalID,
 
 
 status_t
-MultiAudioAddOn::_RecursiveScan(char* rootPath, BEntry* rootEntry, uint32 depth)
+MultiAudioAddOn::_RecursiveScan(const char* rootPath, BEntry* rootEntry, uint32 depth)
 {
 	CALLED();
 	if (depth > 16)

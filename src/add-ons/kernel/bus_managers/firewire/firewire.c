@@ -1096,7 +1096,6 @@ static struct fw_xfer *
 fw_tl2xfer(struct firewire_comm *fc, int node, int tlabel, int tcode)
 {
 	struct fw_xfer *xfer;
-	int s = splfw();
 	int req;
 
 	mtx_lock(&fc->tlabel_lock);

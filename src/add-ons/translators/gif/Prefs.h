@@ -30,10 +30,10 @@ class Prefs {
 		int transparentred, transparentgreen,
 			transparentblue, palettemode, palette_size_in_bits;
 	private:
-		bool GetInt(char *name, int *value, int *defaultvalue);
-		bool GetBool(char *name, bool *value, bool *defaultvalue);
-		bool PutInt(char *name, int *value);
-		bool PutBool(char *name, bool *value);
+		bool GetInt(const char *name, int *value, int *defaultvalue);
+		bool GetBool(const char *name, bool *value, bool *defaultvalue);
+		bool PutInt(const char *name, int *value);
+		bool PutBool(const char *name, bool *value);
 		
 		BNode *file;
 };

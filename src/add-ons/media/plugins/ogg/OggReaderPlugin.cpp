@@ -329,7 +329,6 @@ status_t
 OggReader::FindLastPages()
 {
 	TRACE("OggReader::FindLastPages\n");
-	bigtime_t start_time = system_time();
 
 	status_t result = B_ERROR;
 

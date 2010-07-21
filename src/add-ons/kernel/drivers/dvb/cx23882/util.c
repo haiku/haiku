@@ -98,6 +98,6 @@ alloc_mem(void **virt, void **phy, size_t size, uint32 protection,
 		*virt = virtadr;
 	if (phy)
 		*phy = (void*)(addr_t)pe.address;
-	TRACE("area = %ld, size = %ld, virt = %p, phy = %p\n", areaid, size, virtadr, pe.address);
+	TRACE("area = %ld, size = %ld, virt = %p, phy = %" B_PRIxPHYSADDR "\n", areaid, size, virtadr, pe.address);
 	return areaid;
 }

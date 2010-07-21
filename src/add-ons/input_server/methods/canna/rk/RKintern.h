@@ -23,7 +23,7 @@
 /* LINTLIBRARY */
 /* $Id: RKintern.h 10525 2004-12-23 21:23:50Z korli $ */
 /************************************************************************/
-/* THIS SOURCE CODE IS MODIFIED FOR kanBe BY T.MURAI 1997
+/* THIS SOURCE CODE IS MODIFIED FOR kanBe BY T.MURAI 1997 */
 /************************************************************************/
 #ifndef		_RKintern_h
 #define		_RKintern_h

@@ -171,7 +171,7 @@ FireWireDVAddOn::AddDevice(FireWireCard* card, const char* path)
 	
 	// setup flavor info
 	dev->flavor.name = dev->name;
-	dev->flavor.info = "The FireWireDVNode outputs to fw_raw drivers.";
+	dev->flavor.info = (char *)"The FireWireDVNode outputs to fw_raw drivers.";
 	dev->flavor.kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER 
 		| B_CONTROLLABLE | B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT;
 	dev->flavor.flavor_flags = B_FLAVOR_IS_GLOBAL;

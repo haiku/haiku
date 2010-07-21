@@ -43,7 +43,7 @@ const int kTerminatingSignal = SIGINT; // SIGCONT;
 // descriptors, which are each 8 bytes. We don't really need the first 5 bytes
 // of the track descriptor, so we'll just ignore them. All we really want is the
 // length of each track, which happen to be the last 3 bytes of the descriptor.
-typedef struct TrackRecord {
+struct TrackRecord {
 	int8	unused[5];
 
 	int8	min;

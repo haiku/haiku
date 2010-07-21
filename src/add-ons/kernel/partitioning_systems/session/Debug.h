@@ -212,7 +212,6 @@ private:
 	#define SIMPLE_PRINT(x) ;
 	#define PRINT_INDENT(x) ;
 	#define PRINT_DIVIDER()	;
-	#define DUMP(object) ;
 	#define PDUMP(objectPointer) ;
 	#define REPORT_ERROR(status) ;
 	#define RETURN_ERROR(status) return status;

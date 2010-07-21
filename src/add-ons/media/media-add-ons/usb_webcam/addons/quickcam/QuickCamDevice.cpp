@@ -58,9 +58,6 @@ QuickCamDevice::SupportsIsochronous()
 status_t
 QuickCamDevice::StartTransfer()
 {
-	status_t err;
-	uint8 r;
-	
 	SetScale(1);
 	if (Sensor())
 		SetVideoFrame(BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1));
@@ -85,7 +82,6 @@ status_t
 QuickCamDevice::StopTransfer()
 {
 	status_t err;
-	uint8 r;
 	
 DumpRegs();
 	err = CamDevice::StopTransfer();
@@ -137,7 +133,6 @@ QuickCamDevice::GetStatusIIC()
 status_t
 QuickCamDevice::WaitReadyIIC()
 {
-	status_t err;
 #warning WRITEME
 	return EBUSY;
 }
@@ -146,7 +141,6 @@ QuickCamDevice::WaitReadyIIC()
 ssize_t
 QuickCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
-	status_t err;
 	int i;
 	uint8 buffer[0x23];
 	if (count > 16)
@@ -174,7 +168,6 @@ ssize_t
 QuickCamDevice::ReadIIC8(uint8 address, uint8 *data)
 {
 	status_t err;
-	int i;
 	uint8 buffer[0x23];
 	memset(buffer, 0, sizeof(buffer));
 	buffer[0x20] = Sensor() ? Sensor()->IICReadAddress() : 0;
@@ -202,7 +195,6 @@ ssize_t
 QuickCamDevice::ReadIIC16(uint8 address, uint16 *data)
 {
 	status_t err;
-	int i;
 	uint8 buffer[0x23];
 	memset(buffer, 0, sizeof(buffer));
 	buffer[0x20] = Sensor() ? Sensor()->IICReadAddress() : 0;

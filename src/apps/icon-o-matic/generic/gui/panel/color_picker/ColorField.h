@@ -69,7 +69,7 @@ class ColorField :
 									{ return fMouseDown; }
 
  private:
-	static	int32				_UpdateThread(void* data);
+	static	status_t				_UpdateThread(void* data);
 			void				_DrawBorder();
 
 	selected_color_mode			fMode;

@@ -485,9 +485,9 @@ OpenSoundNode::NodeRegistered()
 			mediaInput.destination.port = ControlPort();
 			mediaInput.destination.id = fInputs.CountItems();
 			mediaInput.node = Node();
-			char *prefix = "";
+			char *prefix = (char *)"";
 			if (strstr(engine->Info()->name, "SPDIF"))
-				prefix = "S/PDIF ";
+				prefix = (char *)"S/PDIF ";
 			sprintf(mediaInput.name, "%sOutput %ld (%s)", prefix,
 				mediaInput.destination.id, gSupportedFormatsNames[f]);
 
@@ -533,9 +533,9 @@ OpenSoundNode::NodeRegistered()
 			mediaOutput.source.port = ControlPort();
 			mediaOutput.source.id = fOutputs.CountItems();
 			mediaOutput.node = Node();
-			char *prefix = "";
+			char *prefix = (char *)"";
 			if (strstr(engine->Info()->name, "SPDIF"))
-				prefix = "S/PDIF ";
+				prefix = (char *)"S/PDIF ";
 			sprintf(mediaOutput.name, "%sInput %ld (%s)", prefix,
 				mediaOutput.source.id, gSupportedFormatsNames[f]);
 
@@ -2672,8 +2672,8 @@ OpenSoundNode::GetFlavor(flavor_info* outInfo, int32 id)
 	outInfo->out_formats = 0;
 	outInfo->internal_id = id;
 
-	outInfo->name = "OpenSoundNode Node";
-	outInfo->info = "The OpenSoundNode outputs to OpenSound System v4 "
+	outInfo->name = (char *)"OpenSoundNode Node";
+	outInfo->info = (char *)"The OpenSoundNode outputs to OpenSound System v4 "
 		"drivers.";
 	outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE
 		| B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT | B_CONTROLLABLE;

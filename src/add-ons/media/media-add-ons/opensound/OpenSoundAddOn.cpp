@@ -64,7 +64,7 @@ OpenSoundAddOn::OpenSoundAddOn(image_id image) :
 	fInitCheckStatus = B_NO_INIT;
 
 	/* unix paths */
-	if (RecursiveScan("/dev/oss/") != B_OK)
+	if (RecursiveScan((char *)"/dev/oss/") != B_OK)
 		return;
 	/*
 	if (RecursiveScan("/dev/audio/oss/") != B_OK)

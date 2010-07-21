@@ -554,8 +554,8 @@ IconButton::Bitmap() const
 bool
 IconButton::DrawBorder() const
 {
-	return (IsEnabled() && (_HasFlags(STATE_INSIDE)
-		|| _HasFlags(STATE_TRACKING)) || _HasFlags(STATE_FORCE_PRESSED));
+	return ((IsEnabled() && (_HasFlags(STATE_INSIDE)
+		|| _HasFlags(STATE_TRACKING))) || _HasFlags(STATE_FORCE_PRESSED));
 }
 
 // DrawNormalBorder

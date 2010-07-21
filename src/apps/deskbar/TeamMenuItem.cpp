@@ -273,7 +273,7 @@ TTeamMenuItem::Draw()
 	}
 
 	//	if not selected or being tracked on, fill with gray
-	if (!_IsSelected() && !menu->IsRedrawAfterSticky() || !canHandle
+	if ((!_IsSelected() && !menu->IsRedrawAfterSticky()) || !canHandle
 		|| !IsEnabled()) {
 		frame.InsetBy(1, 1);
 		menu->SetHighColor(menuColor);

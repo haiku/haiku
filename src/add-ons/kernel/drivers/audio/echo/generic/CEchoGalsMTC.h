@@ -75,6 +75,6 @@ protected:
 };		// class CEchoGalsMTC
 
 
-#endif _CECHOGALSMTC_H_
+#endif // _CECHOGALSMTC_H_
 
 // *** CEchoGalsMTC.H ***

@@ -23,7 +23,7 @@
 /* $Id: RK.h 10527 2004-12-23 22:08:39Z korli $ */
 
 /************************************************************************/
-/* THIS SOURCE CODE IS MODIFIED FOR TKO BY T.MURAI 1997
+/* THIS SOURCE CODE IS MODIFIED FOR TKO BY T.MURAI 1997 */
 /************************************************************************/
 
 #ifndef		_RK_h

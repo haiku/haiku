@@ -665,7 +665,7 @@ DragSortableListView::ScrollTo(int32 index)
 	if (index >= CountItems())
 		index = CountItems() - 1;
 
-	if (BListItem* item = ItemAt(index)) {
+	if (ItemAt(index)) {
 		BRect itemFrame = ItemFrame(index);
 		BRect bounds = Bounds();
 		if (itemFrame.top < bounds.top) {
@@ -882,7 +882,7 @@ DragSortableListView::_SetDropIndex(int32 index)
 			int32 count = CountItems();
 			if (fDropIndex == count) {
 				BRect r;
-				if (BListItem* item = ItemAt(count - 1)) {
+				if (ItemAt(count - 1)) {
 					r = ItemFrame(count - 1);
 					r.top = r.bottom;
 					r.bottom = r.top + 1.0;

@@ -58,8 +58,8 @@ status_t AudioAdapterAddOn::GetFlavorAt(
 	
 	flavor_info* pInfo = new flavor_info;
 	pInfo->internal_id = n;
-	pInfo->name = "AudioAdapter";
-	pInfo->info =
+	pInfo->name = (char *)"AudioAdapter";
+	pInfo->info = (char *)
 		"AudioAdapter (generic raw-audio format conversion).\n"
 		"by Eric Moon (8 September 1999)";
 	pInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_CONTROLLABLE;

@@ -120,7 +120,7 @@ EXRTranslator::DerivedTranslate(BPositionIO* source,
 		//Imath::Box2i dw = in.dataWindow();
 		const Imath::Box2i &displayWindow = in.displayWindow();
 		const Imath::Box2i &dataWindow = in.dataWindow();
-		float a = in.pixelAspectRatio(); // TODO take into account the aspect ratio
+		//float a = in.pixelAspectRatio(); // TODO take into account the aspect ratio
 		int dataWidth = dataWindow.max.x - dataWindow.min.x + 1;
 		int dataHeight = dataWindow.max.y - dataWindow.min.y + 1;
 		int displayWidth = displayWindow.max.x - displayWindow.min.x + 1;

@@ -159,7 +159,7 @@ ICOTranslator::DerivedTranslate(BPositionIO *source,
 status_t
 ICOTranslator::DerivedCanHandleImageSize(float width, float height) const
 {
-	if (!ICO::is_valid_size(width) || !ICO::is_valid_size(height))
+	if (!ICO::is_valid_size((int)width) || !ICO::is_valid_size((int)height))
 		return B_NO_TRANSLATOR;
 	return B_OK;
 }

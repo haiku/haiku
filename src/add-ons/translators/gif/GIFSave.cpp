@@ -328,7 +328,7 @@ GIFSave::NextPixel(int pixel)
 {
 	int bpr = bitmap->BytesPerRow();
 	color_space cs = bitmap->ColorSpace();
-	bool useAlphaForTransparency = prefs->usetransparentauto && cs == B_RGBA32 || cs == B_RGBA32_BIG;
+	bool useAlphaForTransparency = (prefs->usetransparentauto && cs == B_RGBA32) || cs == B_RGBA32_BIG;
 	unsigned char r, g, b, a;
 
 	if (cs == B_RGB32 || cs == B_RGBA32) {

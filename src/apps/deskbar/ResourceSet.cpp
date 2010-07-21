@@ -546,7 +546,7 @@ TResourceSet::ExpandString(BString* out, const char* in)
 					in++;
 
 			} else 
-				while (isalnum(*in) || *in == '_' && i
+				while ((isalnum(*in) || *in == '_') && i
 					< sizeof(variableName) - 1)
 					variableName[i++] = *in++;
 			
