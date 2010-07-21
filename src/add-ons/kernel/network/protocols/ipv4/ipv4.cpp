@@ -43,9 +43,11 @@
 #	define TRACE_SK(protocol, format, args...) \
 		dprintf("IPv4 [%llu] %p " format "\n", system_time(), \
 			protocol , ##args)
+#	define TRACE_ONLY(x) x
 #else
-#	define TRACE(args...)		do { } while (0)
-#	define TRACE_SK(args...)	do { } while (0)
+#	define TRACE(args...) ;
+#	define TRACE_SK(args...) ;
+#	define TRACE_ONLY(x)
 #endif
 
 
@@ -438,7 +440,7 @@ FragmentPacket::StaleTimer(struct net_timer* timer, void* data)
 //	#pragma mark -
 
 
-#if 0
+#ifdef TRACE_IPV4
 static void
 dump_ipv4_header(ipv4_header &header)
 {
@@ -473,7 +475,7 @@ dump_ipv4_header(ipv4_header &header)
 	dprintf("  source: %d.%d.%d.%d\n", src->a, src->b, src->c, src->d);
 	dprintf("  destination: %d.%d.%d.%d\n", dst->a, dst->b, dst->c, dst->d);
 }
-#endif
+#endif	// TRACE_IPV4
 
 
 static int
@@ -1547,7 +1549,7 @@ ipv4_receive_data(net_buffer* buffer)
 		return bufferHeader.Status();
 
 	ipv4_header& header = bufferHeader.Data();
-	//dump_ipv4_header(header);
+	TRACE_ONLY(dump_ipv4_header(header));
 
 	if (header.version != IP_VERSION)
 		return B_BAD_TYPE;

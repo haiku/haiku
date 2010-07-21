@@ -401,6 +401,7 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 
 	uint8 icmpType, icmpCode;
 	icmp_decode(code, icmpType, icmpCode);
+	TRACE("  icmp type %u, code %u\n", icmpType, icmpCode);
 
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	size_t offset = 0;
