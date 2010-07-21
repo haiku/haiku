@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DiskProbe</title>
+	<title>DiskProbe（磁盘扫描器）</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -40,7 +42,7 @@
 </ul>
 <span>
  «  <a href="deskcalc.html">DeskCalc</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
 ::  <a href="diskusage.html">DriveUsage</a>  »
 </span></div>
 </div>
@@ -49,7 +51,7 @@
 <div>
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" />DiskProbe</h2>
+<h2><img src="../../images/apps-images/diskprobe-icon_64.png" alt="diskprobe-icon_64.png" width="64" height="64" />DiskProbe（磁盘扫描器）</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/DiskProbe</span></td></tr>
@@ -57,24 +59,24 @@
 </td><td></td><td><span class="path">~/config/settings/DiskProbe_data</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskProbe is a HEX editor to view and alter data of a file or on a device on a byte-level. It's a very low-level tool and has therefore the potential to really mess things up if you're not careful!</p>
-<div class="box-warning">Always work with the backup of a file and be extra careful when working directly on a device.</div>
-<p>When starting DiskProbe you'll first be asked for the file or the device to work on. After that you are presented with this interface:</p>
+<p>磁盘扫描器是一个十六进制的编辑器，用于在字节级上查看和修改文件或者硬件设备上的数据。它是一个低级的工具，当然如果不仔细操作的话，可能会造成错误。</p>
+<div class="box-warning">该工具主要用于处理文件的备份，但是在直接用于处理硬件设备时需要倍加谨慎小心。</div>
+<p>在启动磁盘扫描器时，您需要给出所要处理的文件或者硬件。 之后，软件将会呈现以下界面：</p>
 <p><img id="diskprobe" src="../images/apps-images/diskprobe.png" alt="diskprobe.png" /></p>
-<p>The main view shows always one block of data, the size of which can be adjusted with <span class="menu">View | BlockSize</span>. To the left is the offset to the start of the block, in the middle the data as HEX values and to the right the same as ASCII symbols.<br />
-You can move from block to block with the slider above or with <span class="key">ALT</span> <span class="key">←</span> and <span class="key">ALT</span> <span class="key">→</span> and switch between the HEX and ASCII columns with <span class="key">TAB</span>.</p>
-<p><span class="menu">Block | Selection</span> will not only show the selection with different endianess (and in HEX or decimal, set by <span class="menu">View | Base</span>), it will also interprete the selection as a block offset that you can jump to. It will be grayed out if the position is outside of the file/device.<br />
-This is a handy feature mostly when looking at file systems, as they often contain pointers to other blocks.</p>
-<p>If the file you're probing includes attributes, the <span class="menu">Attributes</span> menu can be used to open any of them in a new DiskProbe window. Here's the copyright attribute of the <span class="app">AboutSystem</span> application:
-</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
-<p>Depending on the kind of attribute, you'll get a different editor tab besides the always present <i>Raw Editor</i>. For example, there are editors for strings and MIME types or an icon viewer for the vectoricon attribute.</p>
+<p>主视图总是展示一个数据块，而数据块的大小可以通过 <span class="menu">View | BlockSize</span> 予以调整。在数据块的左端是数据块起始处的偏移量，而中部则是十六进制的数据，右端是数据的ASCII字符形式。
+<br />
+你可以通过使用主视图上部的滑动条或者组合键 <span class="key">ALT</span> <span class="key">←</span> 和 <span class="key">ALT</span> <span class="key">→</span> 来查看数据块，使用 <span class="key">TAB</span> 键来在不同的十六进制和ASCII数据列之间转换。</p>
+<p><span class="menu">Block | Selection</span> 不仅显示了存储方式的选择（以十六进制或者十进制的方式，这可以通过 <span class="menu">View | Base</span>来进行设置）,它也指明了你所跳转到的当前数据块的偏移量。如果您所查看的数据行超出了文件或者硬件的范围，它将会明显的灰暗化。<br />
+在查看文件系统时，这将会是一个非常好用的特性，因为在文件系统中包含了许多指向其他数据块的指针。</p>
+<p>如果您所查看的文件包含相关的属性，那么e <span class="menu">Attributes</span> 菜单可以打开一个新的磁盘扫描器窗口。下面就是 <span class="app">AboutSystem</span> 应用程序的版权属性在打开后的窗口：</p><p><img id="diskprobe-attribute" src="../images/apps-images/diskprobe-about-attr.png" alt="diskprobe-about-attr.png" /></p>
+<p>依据属性的类别，除了总是呈现的 <i>Raw Editor</i>，它还会呈现出其他不同的编辑器。例如，字符和MIME类型的编辑器或者用于矢量图标属性的图标查看器</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
  «  <a href="deskcalc.html">DeskCalc</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
 ::  <a href="diskusage.html">DriveUsage</a>  »
 </span></div>
 </div>

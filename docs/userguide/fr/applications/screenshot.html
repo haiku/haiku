@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2009, Haiku. All rights reserved.
+ * Copyright 2009-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>Guide de l’utilisateur</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -50,39 +50,52 @@
 
 <div id="content">
 <div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar :</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span></td></tr>
+<tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
+<span class="path">/bin/screenshot</span></td></tr>
 <tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>En plus de la copie d’écran classique <i>via</i> la touche <span class="key">IMPR ÉCRAN</span>, qui crée une image PNG de l’écran dans <span class="path">/boot/home/</span>, cette application fournit quelques options supplémentaires.</p>
+<p>Vous pouvez effectuer une copie d'écran à partir de l'application Screenshot, ou en utilisant la touche <span class="key">IMPR</span>,</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>Démarrer Screenshot fera une capture d'écran comme d'habitude, mais vous permettra de contrôler depuis la fenêtre principale, le nom, le format et le dossier du fichier avant d'enregistrer l'image.</p>
-<p>La boite de dialogue <span class="button">Options</span> contient quelques paramètres de plus :</p>
-<p><img id="sreenshot-options" src="../images/apps-images/screenshot-options.png" alt="screenshot-options.png" /></p>
-<p>En plus de permettre le choix entre une capture de l’écran entier (<span class="menu">Capture entire screen</span>) ou de la fenêtre active (<span class="menu">Capture active window</span>), d’inclure ou non la bordure de la fenêtre dans ce second cas (<span class="menu">Include window border</span>), cette fenêtre vous permet aussi d’entrer un délai avant la capture. Bien sûr, ce délai n’est effectif que si la capture est prise en pressant le bouton <span class="button">Take Screenshot</span>.</p>
-
+<p>dans le fenêtre Screenshot, vous pouvez choisir entre de prendre tout l'écran ou seulement la fenêtre active, et de conserver la bordure de la fenêtre ainsi que le pointeur de la souris.
+vous pouvez aussi entrer un délai avant le prendre le cliché.</p>
+<p>Below that you set the name, format and location for the screenshot that will be used when you click <span class="button">Save</span>. Instead of saving the file to disk you can also decide to <span class="button">Copy to clipboard</span> to be able to paste the shot directly into another application, or take a <span class="button">New screenshot</span>.</p>
+<p>All settings are remembered the next time you take a screenshot, enabling these convenient keyboard shortcuts:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
+<tr><td><span class="key">IMPR</span></td><td style="width:15px;"></td><td>Capture l'écran sans délai et affiche la fenêtre Screenshot.</td></tr>
+<tr><td class="onelinetop"><span class="key">MAJ</span> <span class="key">IMPR</span></td><td></td><td>Capture l'écran en silence (sans ouvrir de fenêtre), tout en respectant les derniers réglages utilisés.</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">IMPR</span></td><td></td><td>Prend aussi une capture d'écran en silence avec les derniers réglages enregistrés, mais au lieu d'écrire l'image dans un fichier, celle-ci est juste copiée dans le presse-papiers.</td></tr>
+</table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Effectuer un capture d'écran depuis le Terminal</h2>
-<p>L'application Screenshot est aussi utilisable depuis le Terminal ou depuis un script.<br />
-<span class="cli">Screenshot --help</span> 
-affiche les options en paramètres :</p>
+<p>Il existe aussi une commande <span class="cli">screenshot</span>, qui peut-être utilisée dans le Terminal ou dans un script.<br />
+<span class="cli">screenshot --help</span> affiche les options qui peuvent être passées en paramètres :</p>
 
-<pre class="terminal">~&gt; Screenshot --help
+<pre class="terminal">~&gt; screenshot --help
 
-Screenshot [OPTION]... Creates a bitmap of the current screen
+screenshot [OPTIONS] [FILE]  Creates a bitmap of the current screen
 
-OPTION
-  -o, --options         Show options window first
+FILE is the optional output path / filename used in silent mode. An exisiting
+file with the same name will be overwritten without warning. If FILE is not
+given the screenshot will be saved to a file with the default filename in the
+user's home directory.
+
+OPTIONS
   -m, --mouse-pointer   Include the mouse pointer
   -b, --border          Include the window border
   -w, --window          Capture the active window instead of the entire screen
-  -d, --delay=seconds   Take screenshot after specified delay [in seconds]
-  -s, --silent          Saves the screenshot without showing the app window
-                        overrides --options, saves to home folder as png
+  -d, --delay=seconds   Take screenshot after the specified delay [in seconds]
+  -s, --silent          Saves the screenshot without showing the application
+                        window
+  -f, --format=image    Give the image format you like to save as
+                        [bmp], [gif], [jpg], [png], [ppm], [tga], [tif]
+  -c, --clipboard       Copies the screenshot to the system clipboard without
+                        showing the application window
 
 Note: OPTION -b, --border takes only effect when used with -w, --window
 </pre>

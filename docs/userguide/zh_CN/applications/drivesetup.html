@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DriveSetup</title>
+	<title>DriveSetup（磁盘管理器）</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -39,8 +41,8 @@
 <li><a href="../../en/applications/drivesetup.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+ «  <a href="diskusage.html">DiskUsage（磁盘查看器）</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
 ::  <a href="expander.html">Expander</a>  »
 </span></div>
 </div>
@@ -49,7 +51,7 @@
 <div>
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />DriveSetup</h2>
+<h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />磁盘管理器</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
@@ -57,7 +59,7 @@
 </td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup is a tool to create, delete and initialize partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
+<p>磁盘管理器是一个用于磁盘分区的创建，删除，和格式化的工具。同时，它不能够移动和编辑已经存在的分区，所以您需要一个未格式化的磁卷（可能是一个USB磁盘或者硬盘）或者利用初始化工具，例如， <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> 来提供分区空间。</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
 <p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Besides a maximum of 4 primary partitions, each of those can contain a number of extended/logical partitions. You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
 <p>You can select a partition from the list and mount and unmount them with the commands in the <span class="menu">Partition</span> menu or by pressing <span class="key">ALT</span> <span class="key">M</span> or <span class="key">ALT</span> <span class="key">U</span>.</p>
@@ -66,7 +68,7 @@ Which brings us to this:</p>
 <div class="box-stop">Dealing with creating/deleting/initializing partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new partition</a></h2>
+<a id="creating" name="creating">创建分区</a></h2>
 <div class="box-info">If you plan to use the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you can skip the creation of a partition and proceed right to <a href="#initializing">Initializing</a>.</div>
 <p>When you found unformatted space on a drive, like the above <tt>&lt;empty&gt;</tt>, you can create a new partition in this space with <span class="menu">Partition | Create...</span>(<span class="key">ALT</span> <span class="key">C</span>).</p>
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
@@ -75,7 +77,7 @@ Which brings us to this:</p>
 <p>Before you can use, or even mount the newly created partition, it has to be initialized with a filesystem.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">Initializing a partition</a></h2>
+<a id="initializing" name="initializing">格式化分区</a></h2>
 <p>Only unmounted partitions can be initialized by using the <span class="menu">Partition | Initialize</span> menu.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
 <p>Here you set the name for the partition and it's blocksize. 2048 bytes per block are recommended, but you can choose larger or smaller sizes if you have these very specific needs.<br />
@@ -86,8 +88,8 @@ Initializing will destroy all data on that partition!</p>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskusage.html">DiskUsage</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
+ «  <a href="diskusage.html">DiskUsage（磁盘查看器）</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
 ::  <a href="expander.html">Expander</a>  »
 </span></div>
 </div>

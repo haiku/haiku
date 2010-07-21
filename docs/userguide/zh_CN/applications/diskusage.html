@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>DiskUsage</title>
+	<title>DiskUsage（磁盘查看器）</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -39,9 +41,9 @@
 <li><a href="../../en/applications/diskusage.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="diskprobe.html">DiskProbe</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+ «  <a href="diskprobe.html">DiskProbe（磁盘扫描器）</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="drivesetup.html">DriveSetup（磁盘管理器）</a>  »
 </span></div>
 </div>
 
@@ -49,7 +51,7 @@
 <div>
 <div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage</h2>
+<h2><img src="../../images/apps-images/diskusage-icon_64.png" alt="diskusage-icon_64.png" width="64" height="64" />DiskUsage（磁盘查看器）</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/DiskUsage</span></td></tr>
@@ -57,30 +59,31 @@
 </td><td></td><td><span class="path">~/config/settings/DiskUsage</span></td></tr>
 </table>
 <p><br /></p>
-<p>DiskUsage shows graphically how the space on your volumes is utilized.<br />
-A useful tool to answer the question, "<i>Where has all my disk space gone?</i>".</p>
+<p>磁盘查看器以图形的形式显示了您的磁盘卷的空间利用情况。<br />
+一个非常好用的工具，它回答了下面的问题，“<i>我的磁盘空间哪儿去了啊？</i>”。</p>
 <p><img id="diskusage" src="../images/apps-images/diskusage.png" alt="diskusage.png" /></p>
-<p>The concentric circles represent different levels in the file system hierarchy. Above, the circle in the center represents the <span class="path">/boot/home/</span> folder. Each segment of the ring immediately outside that circle is a file or folder under <span class="path">/boot/home/</span>. Every segment farther outside brings you one level deeper in the file hierarchy. You may have to resize the window to accommodate very deep folders.</p>
-<p>Above the graphic is a pop-up menu that lets you switch between all mounted volumes. Before the disk usage of a volume can be displayed, it has to be scanned. As this can take a while for larger disks, you can examine another volume while that scan is done in the background.</p>
+<p>不同层次的同心圆代表了文件系统中的不同等级。 在上图中，圆环中心代表了 <span class="path">/boot/home/</span> 文件夹。而圆环外的每个图块都代表了 <span class="path">/boot/home/</span> 文件夹下的一个文件或者文件夹。而更外层的图块则代表了更深一层等级的文件层次。当然，您可能需要调节窗口的大小来容纳深层地的文件夹。</p>
+<p>在图形的上方是一个弹出式菜单，它用于在所有挂载的磁卷之间进行转换。在显示磁卷的利用情况之前，该磁卷需要进行一次完全的扫描。对于大一点的磁卷，这可能需要比较长的时间，但是在此期间，您可以检查其他磁卷的利用情况，而磁卷的扫描将在后台运行。</p>
 <div class="box-info"><ul>
-<li>If the graphical representation of a file or folder comprises less than about 2° of a circle, it is excluded from the display.</li>
-<li>The number of files that's reported for a folder includes files in subfolders too. A folder counts as a file.</li>
-<li>DiskUsage ignores symbolic links.</li>
+<li>如果代表一个文件或者文件夹的扇形图块的角度小于圆环的2° ，那么它在图形中将无法显示出来。
+</li>
+<li>一个文件夹中文件的数量包括了其子文件夹中的文件。当然一个文件夹也看做为一个文件。</li>
+<li>磁盘查看器会忽略符号链接。</li>
 </ul></div>
-<p>As you move the mouse over a segment, information about that file or folder appears in the status bar at the bottom.</p>
-<p>Right-clicking a segment offers a context menu to <span class="menu">Get Info</span>, <span class="menu">Open</span> (with Tracker), <span class="menu">Open With</span> another suitable application or <span class="menu">Rescan</span> that particular folder.<br />
-Left-clicking a segment makes that file/folder the center circle.<br />
-Left-clicking the center circle moves you up one level.</p>
-<p>You can drag files and folders from DiskUsage to other applications or to the Desktop or other Tracker windows for copying. Vice versa, dropped volumes and folders on DiskUsage's window will zoom directly to them, making them the new center circle.</p>
+<p>在您的鼠标移动到一个图块上时，关于该文件或者文件夹的信息将会呈现在底部的状态栏里。</p>
+<p>右键点击一个图块将会显示一个右键菜单 <span class="menu">Get Info</span>, <span class="menu">Open</span> （ 在Tracker 中打开），<span class="menu">Open With</span> 其他的应用程序或者 <span class="menu">Rescan（浏览）</span> 此文件夹爱<br />
+左键点击一个图块将会使其所代表的文件或者文件夹位于圆环的中央<br />
+左键点击中央的圆环将会使您到达上一级的文件夹。</p>
+<p>您可以从磁盘查看器中拖拽文件或者文件夹到其他的程序，桌面或者其他的Tracker窗口完成复制。反之，如果把磁卷或者文件夹拖拽至磁盘查看器窗口将会把他们放置在圆环的中央进行显示。</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="diskprobe.html">DiskProbe</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="drivesetup.html">DriveSetup</a>  »
+ «  <a href="diskprobe.html">DiskProbe（磁盘扫描器）</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="drivesetup.html">DriveSetup（磁盘管理器）</a>  »
 </span></div>
 </div>
 

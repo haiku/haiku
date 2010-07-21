@@ -61,46 +61,47 @@
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">关于文件属性的命令： <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
 <p>这些命令用于显示，读取，添加和删除文件的属性；需要注意的是，这些元数据仅仅可用于BFS格式的磁盘和分区，而且移动文件到其他的文件系统将会把其相关的属性移除！<br />
-上面的命令在 <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a> 会有相关的描述。</p>
+上面的命令在 <a href="../attributes.html#attributes-terminal">终端中的属性</a> 会有相关的描述。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-index" name="cli-index">关于文件索引的命令：<span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
-<p>利用这些命令，您可以 list, make, reindex and remove attributes to BFS' index. 每个卷都有自己的索引，所以在不同的卷之间拷贝文件时尤其要注意。<br />上述这些命令在 <a href="../index.html">Index</a> 主题中会有详细的描述。</p>
+<p>利用这些命令，您可以对BFS的索引属性进行排序，新建，重新索引和删除等操作。由于每个卷都有自己独立的索引，所以在不同的卷之间拷贝文件时尤其要注意。<br />上述这些命令在 <a href="../index.html">索引</a> 主题中会有详细的描述。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-scripting" name="cli-scripting">有用的脚本命令</a></h3>
-<p>下面是一些非常有用的命令行工具，尤其适用于撰写脚本（详情请参阅 <a href="../bash-scripting.html">Bash and Scripting</a>）。</p>
+<p>下面是一些非常有用的命令行工具，尤其适用于撰写脚本（详情请参阅 <a href="../bash-scripting.html">Bash和脚本</a>）。</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+		<td valign="top"><p><span class="cli">alert</span> 该命令将会打开一个带有预定义图标，说明注记和三个按钮的典型警示窗口，并且在终端中返回已选中按钮的标题和退出状态（以0开始）。例如，下面就是一个例子：</p>
 <pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span> 显示一个装载或者保存文件的面板，并且让用户选择相应的文件和位置。同时您将会获取到一个文件或者文件的路径作为返回值。并且还有几个参数可供使用，例如，设置起始目录，窗体的标题，默认保存的文件名。下面是一个例子：</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+		<td valign="top"><p><span class="cli">waitfor</span> 是一个用于等待特殊的程序或者进程启动或者终止的非常好的方式。</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
+		<td valign="top"><p><span class="cli">query</span> 是查询面板的命令行版本。实际上，一个创建搜索项目的快速方式是在搜索面板创建一个查询，选择 <span class="menu">by formula</span> ，在查询词的前后添加双引号（<tt>"</tt>），然后在终端或者脚本中的 <span class="cli">query</span> 命令之后粘贴所要查找的整个查询词。</p>
 </td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">其他命令</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add the volume or device name and it'll run through every file and correct inconsistencies where possible.</p>
+		<td><p><span class="cli">checkfs</span> 是一个非常重要的工具，主要用于检查文件系统中的错误。只需在该命令之后添加磁卷或者设备名，它就会遍历所有的文件，然后修复所有可能出现不一致的地方。</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+		<td valign="top"><p><span class="cli">open</span> 是一个非常小巧的工具。通过它，您可以以默认的程序打开任何文件，或者利用程序的签名还打开该程序而无需知道它的路径。它也可以用于打开网页，甚至“虚拟” 的目录， <tt>.</tt> 用于当前目录或者 <tt>..</tt> 用于上层目录，并且可以在 Tracker 中打开相应的文件夹。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add <span class="app">Screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+		<td valign="top"><p><span class="cli">desklink</span> 可以为桌面栏托盘的任何文件，文件夹，查询或者程序安装图标。它也可以为相应的图标提供一个右键菜单。例如，尝试下面的脚本为 <span class="app">Screenshot</span> 添加不同的选项 （在第一行中的"<tt>\</tt>" 用于在终端中进行换行）：
+</p>
 <pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=Screenshot" /boot/system/apps/Screenshot
 </pre>
@@ -112,7 +113,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 
 <div class="nav">
 <div class="inner"><span>
-<a href="../applications.html#cli-apps" class="uplink">应用程序</a> 
+<a href="../applications.html#cli-apps" class="uplink">Applications</a> 
 </span></div>
 </div>
 
