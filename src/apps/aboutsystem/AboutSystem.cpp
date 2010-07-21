@@ -1125,14 +1125,27 @@ AboutView::_CreateCreditsView()
 		"respective license.]\n\n"));
 
 	// Haiku license
-	fCreditsView->Insert(B_TRANSLATE("The code that is unique to Haiku, "
+	BString haikuLicence = B_TRANSLATE("The code that is unique to Haiku, "
 		"especially the kernel and all code that applications may link "
-		"against, is distributed under the terms of the "));
-	fCreditsView->InsertHyperText(B_TRANSLATE("MIT license"),
-		new OpenFileAction(mitPath.Path()));
-	fCreditsView->Insert(B_TRANSLATE(". Some system libraries contain third "
-		"party code distributed under the LGPL license. You can find the "
-		"copyrights to third party code below.\n\n"));
+		"against, is distributed under the terms of the %MIT licence%. "
+		"Some system libraries contain third party code distributed under the "
+		"LGPL license. You can find the copyrights to third party code below.\n"
+		"\n");
+	int32 licencePart1 = haikuLicence.FindFirst("%");
+	int32 licencePart2 = haikuLicence.FindLast("%");
+	BString part;
+	haikuLicence.CopyCharsInto(part, 0, licencePart1 );
+	fCreditsView->Insert(part);
+
+	part.Truncate(0);
+	haikuLicence.CopyCharsInto(part, licencePart1 + 1, licencePart2 - 1
+		- licencePart1);
+	fCreditsView->InsertHyperText(part, new OpenFileAction(mitPath.Path()));
+
+	part.Truncate(0);
+	haikuLicence.CopyCharsInto(part, licencePart2 + 1, haikuLicence.CountChars()
+		- licencePart2);
+	fCreditsView->Insert(part);
 
 	// GNU copyrights
 	AddCopyrightEntry("The GNU Project",
