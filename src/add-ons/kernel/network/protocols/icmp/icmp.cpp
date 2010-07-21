@@ -27,12 +27,10 @@
 #include <net_stack.h>
 #include <NetBufferUtilities.h>
 
-//#include <util/list.h>
-
 #include "ipv4.h"
 
 
-#define TRACE_ICMP
+//#define TRACE_ICMP
 #ifdef TRACE_ICMP
 #	define TRACE(x...) dprintf(x)
 #else
@@ -69,11 +67,6 @@ struct icmp_header {
 typedef NetBufferField<uint16, offsetof(icmp_header, checksum)>
 	ICMPChecksumField;
 
-
-#define ICMP_TYPE_ECHO_REPLY	0
-#define ICMP_TYPE_UNREACH		3
-#define ICMP_TYPE_REDIRECT		5
-#define ICMP_TYPE_ECHO_REQUEST	8
 
 // type unreach codes
 #define ICMP_CODE_UNREACH_NEED_FRAGMENT	4
@@ -365,6 +358,7 @@ icmp_receive_data(net_buffer* buffer)
 			if (error > 0) {
 				// Deliver the error to the domain protocol which will
 				// propagate the error to the upper protocols
+				bufferHeader.Remove();
 				return domain->module->error_received(error, buffer);
 			}
 			break;

@@ -733,7 +733,7 @@ raw_receive_data(net_buffer* buffer)
 		// and lists for RAW and non-RAW sockets.
 		return deliver_multicast(&gIPv4Module, buffer, true);
 	}
-	
+
 	RawSocketList::Iterator iterator = sRawSockets.GetIterator();
 	size_t count = 0;
 
@@ -1679,16 +1679,14 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 
 
 status_t
-ipv4_error_received(uint32 code, net_buffer* data)
+ipv4_error_received(uint32 code, net_buffer* buffer)
 {
-	// Extracts the IP header in the ICMP message
-	NetBufferFieldReader<ipv4_header, 8> header(data);
-	net_protocol_module_info* protocol = receiving_protocol(header->protocol);
+	net_protocol_module_info* protocol = receiving_protocol(buffer->protocol);
 	if (protocol == NULL)
 		return B_ERROR;
 
 	// propagate error
-	return protocol->error_received(code, data);
+	return protocol->error_received(code, buffer);
 }
 
 
