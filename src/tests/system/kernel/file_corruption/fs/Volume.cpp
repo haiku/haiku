@@ -189,22 +189,22 @@ Volume::Initialize(const char* name)
 {
 	fName = strdup(name);
 	if (fName == NULL)
-		return B_NO_MEMORY;
+		RETURN_ERROR(B_NO_MEMORY);
 
 	Transaction transaction(this);
 	status_t error = transaction.Start();
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	error = fBlockAllocator->Initialize(transaction);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	// create the root directory
 	error = CreateDirectory(S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH,
 		transaction, fRootDirectory);
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	transaction.KeepNode(fRootDirectory);
 	fRootDirectory->SetHardLinks(1);
@@ -213,7 +213,7 @@ Volume::Initialize(const char* name)
 	Block block;
 	if (!block.GetZero(this, kCheckSumFSSuperBlockOffset / B_PAGE_SIZE,
 			transaction)) {
-		return B_ERROR;
+		RETURN_ERROR(B_ERROR);
 	}
 
 	SuperBlock* superBlock = (SuperBlock*)block.Data();
@@ -224,7 +224,7 @@ Volume::Initialize(const char* name)
 	// commit the transaction and flush the block cache
 	error = transaction.Commit();
 	if (error != B_OK)
-		return error;
+		RETURN_ERROR(error);
 
 	return block_cache_sync(fBlockCache);
 }
