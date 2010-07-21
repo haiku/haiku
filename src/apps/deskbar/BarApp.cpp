@@ -513,6 +513,12 @@ TBarApp::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_LOCALE_CHANGED:
+		{
+			be_locale_roster->UpdateSettings(message);
+			break;
+		}
+
 		default:
 			BApplication::MessageReceived(message);
 			break;

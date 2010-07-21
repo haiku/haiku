@@ -7,7 +7,9 @@
 #include "LocaleSettings.h"
 
 #include <FindDirectory.h>
+#include <LocaleRoster.h>
 #include <Path.h>
+#include <Roster.h>
 #include <String.h>
 #include <SupportDefs.h>
 
@@ -44,6 +46,11 @@ LocaleSettings::Load()
 status_t
 LocaleSettings::Save()
 {
+	// Send to all running apps to notify them they should update their settings
+	fMessage.what = B_LOCALE_CHANGED;
+	be_roster->Broadcast(&fMessage);
+
+	// Save on disk for next time we reboot
 	BFile file;
 	status_t err;
 	err = _Open(&file, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);

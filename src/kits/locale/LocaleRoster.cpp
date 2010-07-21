@@ -193,6 +193,7 @@ struct RosterData {
 	void InitializeCatalogAddOns();
 	void CleanupCatalogAddOns();
 	static int CompareInfos(const void *left, const void *right);
+	void UpdateSettings(BMessage* newSettings);
 };
 static RosterData gRosterData;
 
@@ -201,8 +202,6 @@ RosterData::RosterData()
 	:
 	fLock("LocaleRosterData")
 {
-	BAutolock lock(fLock);
-	assert(lock.IsLocked());
 
 	openlog_team("liblocale.so", LOG_PID, LOG_USER);
 #ifndef DEBUG
@@ -219,43 +218,7 @@ RosterData::RosterData()
 		BMessage settingsMessage;
 		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
 				&& settingsMessage.Unflatten(&file) == B_OK) {
-			BString langName;
-			if (settingsMessage.FindString("language", &langName) == B_OK) {
-				UErrorCode icuError = U_ZERO_ERROR;
-				Locale icuLocale = Locale::createCanonical(langName.String());
-				assert(!icuLocale.isBogus());
-				UnicodeString ustr;
-				BString bstr;
-				BStringByteSink bbs(&bstr);
-				icuLocale.getDisplayName(ustr);
-				ustr.toUTF8(bbs);
-
-				Locale::setDefault(icuLocale, icuError);
-				assert(icuError == U_ZERO_ERROR);
-				fPreferredLanguages.RemoveName("language");
-				for (int i = 0; settingsMessage.FindString("language", i,
-						&langName) == B_OK; i++) {
-					fPreferredLanguages.AddString("language", langName);
-				}
-			} else
-				fPreferredLanguages.AddString("language", "en");
-
-			BString codeName;
-
-			if (settingsMessage.FindString("country", &codeName)
-					== B_OK)
-				fDefaultCountry = BCountry(codeName);
-			else
-				fDefaultCountry = BCountry("en_US");
-
-			BString timeFormat;
-			if (settingsMessage.FindString("shortTimeFormat", &timeFormat)
-					== B_OK)
-				fDefaultCountry.SetTimeFormat(timeFormat, false);
-			if (settingsMessage.FindString("longTimeFormat", &timeFormat)
-					== B_OK)
-				fDefaultCountry.SetTimeFormat(timeFormat, true);
-
+			UpdateSettings(&settingsMessage);
 			return;
 		}
 	}
@@ -574,6 +537,58 @@ BLocaleRoster::SetDefaultCountry(BCountry* newDefault) const
 }
 
 
+void
+BLocaleRoster::UpdateSettings(BMessage* newSettings)
+{
+	gRosterData.UpdateSettings(newSettings);
+}
+
+
+void
+RosterData::UpdateSettings(BMessage* newSettings)
+{
+	BAutolock lock(fLock);
+	assert(lock.IsLocked());
+
+	BString langName;
+	if (newSettings->FindString("language", &langName) == B_OK) {
+		UErrorCode icuError = U_ZERO_ERROR;
+		Locale icuLocale = Locale::createCanonical(langName.String());
+		assert(!icuLocale.isBogus());
+		UnicodeString ustr;
+		BString bstr;
+		BStringByteSink bbs(&bstr);
+		icuLocale.getDisplayName(ustr);
+		ustr.toUTF8(bbs);
+
+		Locale::setDefault(icuLocale, icuError);
+		assert(icuError == U_ZERO_ERROR);
+		fPreferredLanguages.RemoveName("language");
+		for (int i = 0; newSettings->FindString("language", i,
+					&langName) == B_OK; i++) {
+			fPreferredLanguages.AddString("language", langName);
+		}
+	} else
+		fPreferredLanguages.AddString("language", "en");
+
+	BString codeName;
+
+	if (newSettings->FindString("country", &codeName)
+			== B_OK)
+		fDefaultCountry = BCountry(codeName);
+	else
+		fDefaultCountry = BCountry("en_US");
+
+	BString timeFormat;
+	if (newSettings->FindString("shortTimeFormat", &timeFormat)
+			== B_OK)
+		fDefaultCountry.SetTimeFormat(timeFormat, false);
+	if (newSettings->FindString("longTimeFormat", &timeFormat)
+			== B_OK)
+		fDefaultCountry.SetTimeFormat(timeFormat, true);
+}
+
+
 status_t
 BLocaleRoster::GetPreferredLanguages(BMessage* languages) const
 {
@@ -588,7 +603,7 @@ BLocaleRoster::GetPreferredLanguages(BMessage* languages) const
 }
 
 
-status_t
+	status_t
 BLocaleRoster::SetPreferredLanguages(BMessage *languages)
 {
 	BAutolock lock(gRosterData.fLock);
@@ -628,7 +643,7 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 
 status_t
 BLocaleRoster::GetInstalledCatalogs(BMessage * languageList,
-	const char* sigPattern,	const char* langPattern, int32 fingerprint) const
+		const char* sigPattern,	const char* langPattern, int32 fingerprint) const
 {
 	if (languageList == NULL)
 		return B_BAD_VALUE;
