@@ -326,7 +326,7 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 
 	status_t Init(const char* fileName)
 	{
-		// open and stat file
+		// open file/device
 		fFD = open(fileName, O_RDWR | O_NOCACHE);
 			// TODO: The O_NOCACHE is a work-around for a page writer problem.
 			// Since it collects pages for writing back without regard for
@@ -336,11 +336,32 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 		if (fFD < 0)
 			return errno;
 
+		// get the size
 		struct stat st;
 		if (fstat(fFD, &st) < 0)
 			return errno;
 
-		fFileSize = st.st_size / B_PAGE_SIZE * B_PAGE_SIZE;
+		switch (st.st_mode & S_IFMT) {
+			case S_IFREG:
+				fFileSize = st.st_size;
+				break;
+			case S_IFCHR:
+			case S_IFBLK:
+			{
+				device_geometry geometry;
+				if (ioctl(fFD, B_GET_GEOMETRY, &geometry, sizeof(geometry)) < 0)
+					return errno;
+
+				fFileSize = (off_t)geometry.bytes_per_sector
+					* geometry.sectors_per_track
+					* geometry.cylinder_count * geometry.head_count;
+				break;
+			}
+			default:
+				return B_BAD_VALUE;
+		}
+
+		fFileSize = fFileSize / B_PAGE_SIZE * B_PAGE_SIZE;
 		fDeviceSize = fFileSize / (B_PAGE_SIZE + kCheckSumLength) * B_PAGE_SIZE;
 
 		// find a free slot
