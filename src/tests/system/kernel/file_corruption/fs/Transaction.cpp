@@ -13,6 +13,7 @@
 #include <AutoDeleter.h>
 
 #include "BlockAllocator.h"
+#include "DebugSupport.h"
 #include "Volume.h"
 
 
@@ -299,7 +300,7 @@ Transaction::RegisterBlock(uint64 blockIndex)
 	// nope, create a new one
 	info = new(std::nothrow) BlockInfo;
 	if (info == NULL)
-		return B_NO_MEMORY;
+		RETURN_ERROR(B_NO_MEMORY);
 	ObjectDeleter<BlockInfo> infoDeleter(info);
 
 	info->indexAndCheckSum.blockIndex = blockIndex;
@@ -309,14 +310,14 @@ Transaction::RegisterBlock(uint64 blockIndex)
 	// get the old check sum
 	if (ioctl(fVolume->FD(), CHECKSUM_DEVICE_IOCTL_GET_CHECK_SUM,
 			&info->indexAndCheckSum, sizeof(info->indexAndCheckSum)) < 0) {
-		return errno;
+		RETURN_ERROR(errno);
 	}
 
 	// get the data (we're fine with read-only)
 	info->data = block_cache_get(fVolume->BlockCache(), blockIndex);
 	if (info->data == NULL) {
 		delete info;
-		return B_ERROR;
+		RETURN_ERROR(B_ERROR);
 	}
 
 	fBlockInfos.Insert(infoDeleter.Detach());
