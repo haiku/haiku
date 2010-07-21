@@ -52,7 +52,7 @@ icmp_decode(uint32 errorCode, uint8 &type, uint8 &code)
 static inline uint32
 icmp_encode(uint8 type, uint8 code)
 {
-	return ((uint32)type) << 8 + code;
+	return ((uint32)type << 8) + code;
 }
 
 
