@@ -1072,11 +1072,15 @@ checksumfs_io(fs_volume* fsVolume, fs_vnode* vnode, void* cookie,
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	File* file = dynamic_cast<File*>((Node*)vnode->private_node);
-	if (file == NULL)
+	if (file == NULL) {
+        notify_io_request(request, B_READ_ONLY_DEVICE);
 		RETURN_ERROR(B_BAD_VALUE);
+	}
 
-	if (io_request_is_write(request) && volume->IsReadOnly())
+	if (io_request_is_write(request) && volume->IsReadOnly()) {
+        notify_io_request(request, B_READ_ONLY_DEVICE);
 		RETURN_ERROR(B_READ_ONLY_DEVICE);
+	}
 
 	// Read-lock the file -- we'll unlock it in the finished hook.
 	file->ReadLock();
