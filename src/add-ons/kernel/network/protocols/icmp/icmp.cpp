@@ -7,24 +7,36 @@
  */
 
 
-#include <net_datalink.h>
-#include <net_protocol.h>
-#include <net_stack.h>
-#include <NetBufferUtilities.h>
+/*!	RFC 792 details the ICMP protocol, RFC 1122 lists when an ICMP error must,
+	shall, or must not be sent.
+*/
 
-#include <KernelExport.h>
-#include <util/list.h>
 
+#include <algorithm>
 #include <netinet/in.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
 
-//#define TRACE_ICMP
+#include <KernelExport.h>
+#include <OS.h>
+
+#include <icmp.h>
+#include <net_datalink.h>
+#include <net_protocol.h>
+#include <net_stack.h>
+#include <NetBufferUtilities.h>
+
+//#include <util/list.h>
+
+#include "ipv4.h"
+
+
+#define TRACE_ICMP
 #ifdef TRACE_ICMP
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
@@ -44,6 +56,12 @@ struct icmp_header {
 			uint16	_reserved;
 			uint16	next_mtu;
 		} path_mtu;
+		uint32	gateway;
+		struct {
+			uint16 unused;
+			uint16 mtu;
+		} frag;
+
 		uint32 zero;
 	};
 };
@@ -68,6 +86,36 @@ struct icmp_protocol : net_protocol {
 
 net_buffer_module_info* gBufferModule;
 static net_stack_module_info* sStackModule;
+
+
+static net_domain*
+get_domain(struct net_buffer* buffer)
+{
+	net_domain* domain;
+	if (buffer->interface != NULL)
+		domain = buffer->interface->domain;
+	else
+		domain = sStackModule->get_domain(buffer->source->sa_family);
+
+	if (domain == NULL || domain->module == NULL)
+		return NULL;
+
+	return domain;
+}
+
+
+static bool
+is_icmp_error(uint8 type)
+{
+	return type == ICMP_TYPE_UNREACH
+		|| type == ICMP_TYPE_PARAM_PROBLEM
+		|| type == ICMP_TYPE_REDIRECT
+		|| type == ICMP_TYPE_TIME_EXCEEDED
+		|| type == ICMP_TYPE_SOURCE_QUENCH;
+}
+
+
+// #pragma mark - module API
 
 
 net_protocol*
@@ -234,42 +282,49 @@ icmp_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 status_t
 icmp_receive_data(net_buffer* buffer)
 {
-	TRACE(("ICMP received some data, buffer length %lu\n", buffer->size));
+	TRACE("ICMP received some data, buffer length %lu\n", buffer->size);
+
+	net_domain* domain;
+	if (buffer->interface != NULL)
+		domain = buffer->interface->domain;
+	else
+		domain = sStackModule->get_domain(buffer->source->sa_family);
+
+	if (domain == NULL || domain->module == NULL)
+		return B_ERROR;
 
 	NetBufferHeaderReader<icmp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
-	icmp_header &header = bufferHeader.Data();
+	icmp_header& header = bufferHeader.Data();
+	uint8 type = header.type;
 
-	TRACE(("  got type %u, code %u, checksum %u\n", header.type, header.code,
-		ntohs(header.checksum)));
-	TRACE(("  computed checksum: %ld\n",
-		gBufferModule->checksum(buffer, 0, buffer->size, true)));
+	TRACE("  got type %u, code %u, checksum %u\n", header.type, header.code,
+		ntohs(header.checksum));
+	TRACE("  computed checksum: %ld\n",
+		gBufferModule->checksum(buffer, 0, buffer->size, true));
 
 	if (gBufferModule->checksum(buffer, 0, buffer->size, true) != 0)
 		return B_BAD_DATA;
 
-	switch (header.type) {
+	switch (type) {
 		case ICMP_TYPE_ECHO_REPLY:
 			break;
 
 		case ICMP_TYPE_ECHO_REQUEST:
 		{
-			net_domain* domain;
-			if (buffer->interface != NULL) {
-				domain = buffer->interface->domain;
+			net_domain* domain = get_domain(buffer);
+			if (domain == NULL)
+				break;
 
+			if (buffer->interface != NULL) {
 				// We only reply to echo requests of our local interface; we
 				// don't reply to broadcast requests
 				if (!domain->address_module->equal_addresses(
 						buffer->interface->address, buffer->destination))
 					break;
-			} else
-				domain = sStackModule->get_domain(buffer->source->sa_family);
-
-			if (domain == NULL || domain->module == NULL)
-				break;
+			}
 
 			net_buffer* reply = gBufferModule->duplicate(buffer);
 			if (reply == NULL)
@@ -278,13 +333,13 @@ icmp_receive_data(net_buffer* buffer)
 			gBufferModule->swap_addresses(reply);
 
 			// There already is an ICMP header, and we'll reuse it
-			NetBufferHeaderReader<icmp_header> header(reply);
+			NetBufferHeaderReader<icmp_header> newHeader(reply);
 
-			header->type = ICMP_TYPE_ECHO_REPLY;
-			header->code = 0;
-			header->checksum = 0;
+			newHeader->type = type == ICMP_TYPE_ECHO_REPLY;
+			newHeader->code = 0;
+			newHeader->checksum = 0;
 
-			header.Sync();
+			newHeader.Sync();
 
 			*ICMPChecksumField(reply) = gBufferModule->checksum(reply, 0,
 					reply->size, true);
@@ -294,9 +349,36 @@ icmp_receive_data(net_buffer* buffer)
 				gBufferModule->free(reply);
 				return status;
 			}
+			break;
 		}
-		
+
+		case ICMP_TYPE_UNREACH:
+		case ICMP_TYPE_SOURCE_QUENCH:
+		case ICMP_TYPE_PARAM_PROBLEM:
+		case ICMP_TYPE_TIME_EXCEEDED:
+		{
+			net_domain* domain = get_domain(buffer);
+			if (domain == NULL)
+				break;
+
+			uint32 error = icmp_encode(header.type, header.code);
+			if (error > 0) {
+				// Deliver the error to the domain protocol which will
+				// propagate the error to the upper protocols
+				return domain->module->error_received(error, buffer);
+			}
+			break;
+		}
+
+		case ICMP_TYPE_REDIRECT:
+			// TODO: Update the routing table
+		case ICMP_TYPE_TIMESTAMP_REQUEST:
+		case ICMP_TYPE_TIMESTAMP_REPLY:
+		case ICMP_TYPE_INFO_REQUEST:
+		case ICMP_TYPE_INFO_REPLY:
 		default:
+			// RFC 1122 3.2.2:
+			// Unknown ICMP messages are silently discarded
 			dprintf("ICMP: received unhandled type %u, code %u\n", header.type,
 				header.code);
 			break;
@@ -308,17 +390,96 @@ icmp_receive_data(net_buffer* buffer)
 
 
 status_t
-icmp_error(uint32 code, net_buffer* data)
+icmp_error_received(uint32 code, net_buffer* data)
 {
 	return B_ERROR;
 }
 
 
+/*!	Sends an ICMP error message to the source of the \a buffer causing the
+	error.
+*/
 status_t
-icmp_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
+icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 	void* errorData)
 {
-	return B_ERROR;
+	TRACE("icmp_error_reply(code %#" B_PRIx32 ")\n", code);
+
+	uint8 icmpType, icmpCode;
+	icmp_decode(code, icmpType, icmpCode);
+
+	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
+	size_t offset = 0;
+
+	// TODO: get rid of network_header
+	ipv4_header* header = (ipv4_header*)buffer->network_header;
+	if (header == NULL) {
+		if (bufferHeader.Status() != B_OK)
+			return bufferHeader.Status();
+
+		header = &bufferHeader.Data();
+		offset = header->HeaderLength();
+	}
+
+	char originalData[64];
+	size_t originalSize
+		= std::min(buffer->size - offset, sizeof(originalData));
+	if (originalSize < 8) {
+		// We need at least 8 bytes of data of the original data
+		return B_ERROR;
+	}
+
+	status_t status = gBufferModule->read(buffer, offset, originalData,
+		originalSize);
+	if (status != B_OK)
+		return status;
+
+	// RFC 1122 3.2.2:
+	// ICMP error message should not be sent on reception of
+	// an ICMP error message,
+	if (header->protocol == IPPROTO_ICMP) {
+		icmp_header* icmpHeader = (icmp_header*)originalData;
+		if (is_icmp_error(icmpHeader->code))
+			return B_ERROR;
+	}
+
+	// a datagram to an IP multicast or broadcast address,
+	if ((buffer->flags & (MSG_BCAST | MSG_MCAST)) != 0) 
+		return B_ERROR;
+
+	// a non-initial fragment
+	if ((header->FragmentOffset() & IP_FRAGMENT_OFFSET_MASK) != 0)
+		return B_ERROR;
+
+	net_buffer* reply = gBufferModule->create(256);
+	if (reply == NULL)
+		return B_NO_MEMORY;
+		
+	memcpy(reply->source, buffer->destination, buffer->destination->sa_len);
+	memcpy(reply->destination, buffer->source, buffer->source->sa_len);
+
+	// Now prepare the ICMP header
+	NetBufferPrepend<icmp_header> icmpHeader(reply);
+	icmpHeader->type = icmpType;
+	icmpHeader->code = icmpCode;
+	icmpHeader->gateway = errorData ? *((uint32*)errorData) : 0;
+	icmpHeader->checksum = 0;
+	icmpHeader.Sync();
+	*ICMPChecksumField(reply)
+		= gBufferModule->checksum(reply, 0, reply->size, true);
+
+	// Append IP header + 64 bits of the original datagram
+	gBufferModule->append(reply, header, sizeof(ipv4_header));
+
+	net_domain* domain = get_domain(buffer);
+	if (domain == NULL)
+		return B_ERROR;
+
+	status = domain->module->send_data(NULL, reply);
+	if (status != B_OK)
+		gBufferModule->free(reply);
+
+	return status;
 }
 
 
@@ -382,7 +543,7 @@ net_protocol_module_info sICMPModule = {
 	icmp_get_mtu,
 	icmp_receive_data,
 	NULL,		// deliver_data()
-	icmp_error,
+	icmp_error_received,
 	icmp_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()

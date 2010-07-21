@@ -70,7 +70,7 @@ struct net_protocol_module_info {
 	status_t	(*receive_data)(net_buffer *data);
 	status_t	(*deliver_data)(net_protocol *protocol, net_buffer *data);
 
-	status_t	(*error)(uint32 code, net_buffer *data);
+	status_t	(*error_received)(uint32 code, net_buffer *data);
 	status_t	(*error_reply)(net_protocol *self, net_buffer *causedError,
 					uint32 code, void *errorData);
 

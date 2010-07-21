@@ -7,9 +7,11 @@
  */
 
 
+#include "ipv4.h"
 #include "ipv4_address.h"
 #include "multicast.h"
 
+#include <icmp.h>
 #include <net_datalink.h>
 #include <net_datalink_protocol.h>
 #include <net_device.h>
@@ -18,7 +20,6 @@
 #include <NetBufferUtilities.h>
 #include <ProtocolUtilities.h>
 
-#include <ByteOrder.h>
 #include <KernelExport.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
@@ -48,41 +49,11 @@
 #endif
 
 
-struct ipv4_header {
-#if B_HOST_IS_LENDIAN == 1
-	uint8		header_length : 4;	// header length in 32-bit words
-	uint8		version : 4;
-#else
-	uint8		version : 4;
-	uint8		header_length : 4;
-#endif
-	uint8		service_type;
-	uint16		total_length;
-	uint16		id;
-	uint16		fragment_offset;
-	uint8		time_to_live;
-	uint8		protocol;
-	uint16		checksum;
-	in_addr_t	source;
-	in_addr_t	destination;
-
-	uint16 HeaderLength() const { return header_length << 2; }
-	uint16 TotalLength() const { return ntohs(total_length); }
-	uint16 FragmentOffset() const { return ntohs(fragment_offset); }
-} _PACKED;
-
-#define IP_VERSION				4
-
-// fragment flags
-#define IP_RESERVED_FLAG		0x8000
-#define IP_DONT_FRAGMENT		0x4000
-#define IP_MORE_FRAGMENTS		0x2000
-#define IP_FRAGMENT_OFFSET_MASK	0x1fff
-
 #define MAX_HASH_FRAGMENTS 		64
 	// slots in the fragment packet's hash
 #define FRAGMENT_TIMEOUT		60000000LL
 	// discard fragment after 60 seconds
+
 
 typedef DoublyLinkedList<struct net_buffer,
 	DoublyLinkedListCLink<struct net_buffer> > FragmentList;
@@ -116,7 +87,7 @@ public:
 	static	void			StaleTimer(struct net_timer* timer, void* data);
 
 private:
-			FragmentPacket	*fNext;
+			FragmentPacket*	fNext;
 			struct ipv4_packet_key fKey;
 			bool			fReceivedLastFragment;
 			int32			fBytesLeft;
@@ -232,7 +203,7 @@ FragmentPacket::FragmentPacket(const ipv4_packet_key &key)
 	fReceivedLastFragment(false),
 	fBytesLeft(IP_MAXPACKET)
 {
-	gStackModule->init_timer(&fTimer, StaleTimer, this);
+	gStackModule->init_timer(&fTimer, FragmentPacket::StaleTimer, this);
 }
 
 
@@ -450,8 +421,15 @@ FragmentPacket::StaleTimer(struct net_timer* timer, void* data)
 	TRACE("Assembling FragmentPacket %p timed out!", packet);
 
 	MutexLocker locker(&sFragmentLock);
-
 	hash_remove(sFragmentHash, packet);
+	locker.Unlock();
+
+	if (!packet->fFragments.IsEmpty()) {
+		// Send error: fragment reassembly time exceeded
+		sDomain->module->error_reply(NULL, packet->fFragments.First(),
+			icmp_encode(ICMP_TYPE_TIME_EXCEEDED, ICMP_CODE_TIMEEX_FRAG), NULL);
+	}
+
 	delete packet;
 }
 
@@ -706,14 +684,14 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 			// as Multicast filters are installed with an IPv4 protocol
 			// reference, we need to go and find the appropriate instance
 			// related to the 'receiving protocol' with module 'module'.
-			net_protocol* proto
+			net_protocol* protocol
 				= state->Parent()->Socket()->socket->first_protocol;
 
-			while (proto && proto->module != module)
-				proto = proto->next;
+			while (protocol != NULL && protocol->module != module)
+				protocol = protocol->next;
 
-			if (proto)
-				module->deliver_data(proto, buffer);
+			if (protocol != NULL)
+				module->deliver_data(protocol, buffer);
 		}
 	}
 
@@ -721,13 +699,16 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 }
 
 
-static void
+/*!	Delivers the buffer to all listening raw sockets.
+	Returns \c true if there was any receiver, \c false if not.
+*/
+static bool
 raw_receive_data(net_buffer* buffer)
 {
 	MutexLocker locker(sRawSocketsLock);
 
 	if (sRawSockets.IsEmpty())
-		return;
+		return false;
 
 	TRACE("RawReceiveData(%i)", buffer->protocol);
 
@@ -748,6 +729,8 @@ raw_receive_data(net_buffer* buffer)
 				raw->SocketEnqueue(buffer);
 		}
 	}
+
+	return true;
 }
 
 
@@ -1547,7 +1530,7 @@ ipv4_receive_data(net_buffer* buffer)
 	if (bufferHeader.Status() != B_OK)
 		return bufferHeader.Status();
 
-	ipv4_header &header = bufferHeader.Data();
+	ipv4_header& header = bufferHeader.Data();
 	//dump_ipv4_header(header);
 
 	if (header.version != IP_VERSION)
@@ -1563,7 +1546,8 @@ ipv4_receive_data(net_buffer* buffer)
 	if (gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
 		return B_BAD_DATA;
 
-	// lower layers notion of Broadcast or Multicast have no relevance to us
+	// lower layers notion of broadcast or multicast have no relevance to us
+	// TODO: they actually have when deciding whether to send an ICMP error
 	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	sockaddr_in destination;
@@ -1583,6 +1567,9 @@ ipv4_receive_data(net_buffer* buffer)
 				buffer->destination, &buffer->interface)) {
 			TRACE("  ReceiveData(): packet was not for us %x -> %x",
 				ntohl(header.source), ntohl(header.destination));
+			// Send ICMP error: Host unreachable
+			sDomain->module->error_reply(NULL, buffer,
+				icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_HOST_UNREACH), NULL);
 			return B_ERROR;
 		}
 
@@ -1603,7 +1590,7 @@ ipv4_receive_data(net_buffer* buffer)
 		return status;
 
 	// check for fragmentation
-	uint16 fragmentOffset = ntohs(header.fragment_offset);
+	uint16 fragmentOffset = header.FragmentOffset();
 	if ((fragmentOffset & IP_MORE_FRAGMENTS) != 0
 		|| (fragmentOffset & IP_FRAGMENT_OFFSET_MASK) != 0) {
 		// this is a fragment
@@ -1620,19 +1607,32 @@ ipv4_receive_data(net_buffer* buffer)
 		}
 	}
 
+	// Preserve the ipv4 header for ICMP processing
+	// TODO: solve this differently, and discard net_buffer::network_header!
+	ipv4_header* clonedHeader = (ipv4_header*)malloc(sizeof(ipv4_header));
+	if (clonedHeader == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(clonedHeader, &header, sizeof(ipv4_header));
+	buffer->network_header = clonedHeader;
+
 	// Since the buffer might have been changed (reassembled fragment)
 	// we must no longer access bufferHeader or header anymore after
 	// this point
 
-	raw_receive_data(buffer);
+	bool rawDelivered = raw_receive_data(buffer);
 
 	gBufferModule->remove_header(buffer, headerLength);
 		// the header is of variable size and may include IP options
-		// (that we ignore for now)
+		// (TODO: that we ignore for now)
 
 	net_protocol_module_info* module = receiving_protocol(protocol);
 	if (module == NULL) {
 		// no handler for this packet
+		if (!rawDelivered) {
+			sDomain->module->error_reply(NULL, buffer,
+				icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_PROTO_UNREACH), NULL);
+		}
 		return EAFNOSUPPORT;
 	}
 
@@ -1661,9 +1661,16 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 
 
 status_t
-ipv4_error(uint32 code, net_buffer* data)
+ipv4_error_received(uint32 code, net_buffer* data)
 {
-	return B_ERROR;
+	// Extracts the IP header in the ICMP message
+	NetBufferFieldReader<ipv4_header, 8> header(data);
+	net_protocol_module_info* protocol = receiving_protocol(header->protocol);
+	if (protocol == NULL)
+		return B_ERROR;
+
+	// propagate error
+	return protocol->error_received(code, data);
 }
 
 
@@ -1671,7 +1678,12 @@ status_t
 ipv4_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
 	void* errorData)
 {
-	return B_ERROR;
+	// Directly obtain the ICMP protocol module
+	net_protocol_module_info* icmp = receiving_protocol(IPPROTO_ICMP);
+	if (icmp == NULL)
+		return B_ERROR;
+
+	return icmp->error_reply(protocol, causedError, code, errorData);
 }
 
 
@@ -1838,7 +1850,7 @@ net_protocol_module_info gIPv4Module = {
 	ipv4_get_mtu,
 	ipv4_receive_data,
 	ipv4_deliver_data,
-	ipv4_error,
+	ipv4_error_received,
 	ipv4_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()

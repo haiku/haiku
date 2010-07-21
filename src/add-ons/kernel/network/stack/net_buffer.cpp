@@ -1040,6 +1040,8 @@ copy_metadata(net_buffer* destination, const net_buffer* source)
 	destination->protocol = source->protocol;
 	destination->hoplimit = source->hoplimit;
 	destination->type = source->type;
+
+	destination->network_header = NULL;
 }
 
 
@@ -1075,6 +1077,7 @@ create_buffer(size_t headerSpace)
 	list_add_item(&buffer->buffers, node);
 
 	buffer->ancillary_data = NULL;
+	buffer->network_header = NULL;
 
 	buffer->source = (sockaddr*)&buffer->storage.source;
 	buffer->destination = (sockaddr*)&buffer->storage.destination;
@@ -1117,6 +1120,7 @@ free_buffer(net_buffer* _buffer)
 	}
 
 	delete_ancillary_data_container(buffer->ancillary_data);
+	free(buffer->network_header);
 
 	release_data_header(buffer->allocation_header);
 
@@ -1516,6 +1520,11 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	if (node == NULL) {
+		node = add_first_data_node(buffer->allocation_header);
+		if (node == NULL)
+			return B_NO_MEMORY;
+	}
 
 	T(PrependSize(buffer, size));
 
@@ -1628,6 +1637,11 @@ append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 	data_node* node = (data_node*)list_get_last_item(&buffer->buffers);
+	if (node == NULL) {
+		node = add_first_data_node(buffer->allocation_header);
+		if (node == NULL)
+			return B_NO_MEMORY;
+	}
 
 	T(AppendSize(buffer, size));
 

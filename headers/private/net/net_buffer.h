@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_BUFFER_H
@@ -13,6 +13,7 @@
 
 
 #define NET_BUFFER_MODULE_NAME "network/stack/buffer/v1"
+
 
 typedef struct net_buffer {
 	struct list_link link;
@@ -36,7 +37,10 @@ typedef struct net_buffer {
 	uint32	flags;
 	uint32	size;
 	uint8	protocol;
+	
+	// TODO: these two should go away again
 	uint8	hoplimit;
+	void *	network_header;
 } net_buffer;
 
 struct ancillary_data_container;
@@ -97,5 +101,6 @@ struct net_buffer_module_info {
 
 	void			(*dump)(net_buffer *buffer);
 };
+
 
 #endif	// NET_BUFFER_H
