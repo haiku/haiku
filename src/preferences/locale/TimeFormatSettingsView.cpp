@@ -354,6 +354,12 @@ FormatView::FormatView(BCountry* country)
 }
 
 
+FormatView::~FormatView()
+{
+	be_locale_roster->SetDefaultCountry(&fCountry);
+}
+
+
 void
 FormatView::AttachedToWindow()
 {

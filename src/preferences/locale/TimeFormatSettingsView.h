@@ -38,6 +38,7 @@ const uint32 kMenuMessage = 'FRMT';
 class FormatView : public BView {
 public:
 								FormatView(BCountry* country);
+								~FormatView();
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
