@@ -105,11 +105,6 @@ SetupCatalogBasics()
 			res = mt.SetLongDescription("Catalog with translated application resources");
 		}
 
-		if (res == B_OK) {
-			// preferred app is catalog manager:
-			res = mt.SetPreferredApp(BLocaleRoster::kCatManagerMimeType, B_OPEN);
-		}
-
 		if (res == B_OK)
 			res = mt.Install();
 	}
