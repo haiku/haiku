@@ -46,10 +46,6 @@ LocaleSettings::Load()
 status_t
 LocaleSettings::Save()
 {
-	// Send to all running apps to notify them they should update their settings
-	fMessage.what = B_LOCALE_CHANGED;
-	be_roster->Broadcast(&fMessage);
-
 	// Save on disk for next time we reboot
 	BFile file;
 	status_t err;
@@ -108,6 +104,13 @@ LocaleSettings::UpdateFrom(BMessage* message)
 	if (message->FindString("longTimeFormat", &messageContent) == B_OK) {
 		fMessage.ReplaceString("longTimeFormat", messageContent);
 		fSaved = false;
+	}
+
+	if (fSaved == false) {
+		// Send to all running apps to notify them they should update their
+		// settings
+		fMessage.what = B_LOCALE_CHANGED;
+		be_roster->Broadcast(&fMessage);
 	}
 }
 
