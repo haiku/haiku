@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,28 +46,37 @@ public:
 
 class ProtocolSocket {
 public:
-	ProtocolSocket(net_socket* socket);
+								ProtocolSocket(net_socket* socket);
 
-	status_t Open();
+			status_t			Open();
 
-	SocketAddress LocalAddress()
-		{ return SocketAddress(fDomain->address_module, &fSocket->address); }
-	ConstSocketAddress LocalAddress() const
-		{ return ConstSocketAddress(fDomain->address_module,
-			&fSocket->address); }
+			SocketAddress		LocalAddress()
+									{ return SocketAddress(
+										fDomain->address_module,
+										&fSocket->address); }
+			ConstSocketAddress	LocalAddress() const
+									{ return ConstSocketAddress(
+										fDomain->address_module,
+										&fSocket->address); }
 
-	SocketAddress PeerAddress()
-		{ return SocketAddress(fDomain->address_module, &fSocket->peer); }
-	ConstSocketAddress PeerAddress() const
-		{ return ConstSocketAddress(fDomain->address_module, &fSocket->peer); }
+			SocketAddress		PeerAddress()
+									{ return SocketAddress(
+										fDomain->address_module,
+										&fSocket->peer); }
+			ConstSocketAddress	PeerAddress() const
+									{ return ConstSocketAddress(
+										fDomain->address_module,
+										&fSocket->peer); }
 
-	net_domain* Domain() const { return fDomain; }
-	net_address_module_info* AddressModule() const
-		{ return fDomain->address_module; }
+			net_domain*			Domain() const { return fDomain; }
+			net_address_module_info* AddressModule() const
+									{ return fDomain->address_module; }
+
+			net_socket*			Socket() const { return fSocket; }
 
 protected:
-	net_socket*	fSocket;
-	net_domain*	fDomain;
+			net_socket*			fSocket;
+			net_domain*			fDomain;
 };
 
 
@@ -97,49 +106,49 @@ template<typename LockingBase = MutexLocking,
 	typename ModuleBundle = NetModuleBundleGetter>
 class DatagramSocket : public ProtocolSocket {
 public:
-							DatagramSocket(const char* name, net_socket* socket);
-	virtual					~DatagramSocket();
+								DatagramSocket(const char* name,
+									net_socket* socket);
+	virtual						~DatagramSocket();
 
-			status_t		InitCheck() const;
+			status_t			InitCheck() const;
 
-			status_t		Enqueue(net_buffer* buffer);
-			net_buffer*		Dequeue(bool clone);
-			status_t		BlockingDequeue(bool clone, bigtime_t timeout,
-								net_buffer** _buffer);
-			void			Clear();
+			status_t			Enqueue(net_buffer* buffer);
+			net_buffer*			Dequeue(bool clone);
+			status_t			BlockingDequeue(bool clone, bigtime_t timeout,
+									net_buffer** _buffer);
+			void				Clear();
 
-			status_t		SocketEnqueue(net_buffer* buffer);
-			status_t		SocketDequeue(uint32 flags, net_buffer** _buffer);
+			status_t			SocketEnqueue(net_buffer* buffer);
+			status_t			SocketDequeue(uint32 flags,
+									net_buffer** _buffer);
 
-			ssize_t			AvailableData() const;
+			ssize_t				AvailableData() const;
 
-			void			WakeAll();
-
-			net_socket*		Socket() const { return fSocket; }
+			void				WakeAll();
 
 protected:
-	virtual	status_t		_SocketStatus() const;
+	virtual	status_t			_SocketStatus() const;
 
-			status_t		_Enqueue(net_buffer* buffer);
-			status_t		_SocketEnqueue(net_buffer* buffer);
-			net_buffer*		_Dequeue(bool clone);
-			void			_Clear();
+			status_t			_Enqueue(net_buffer* buffer);
+			status_t			_SocketEnqueue(net_buffer* buffer);
+			net_buffer*			_Dequeue(bool clone);
+			void				_Clear();
 
-			status_t		_Wait(bigtime_t timeout);
-			void			_NotifyOneReader(bool notifySocket);
+			status_t			_Wait(bigtime_t timeout);
+			void				_NotifyOneReader(bool notifySocket);
 
-			bool			_IsEmpty() const { return fBuffers.IsEmpty(); }
-			bigtime_t		_SocketTimeout(uint32 flags) const;
+			bool				_IsEmpty() const { return fBuffers.IsEmpty(); }
+			bigtime_t			_SocketTimeout(uint32 flags) const;
 
 	typedef typename LockingBase::Type LockType;
 	typedef typename LockingBase::AutoLocker AutoLocker;
 	typedef DoublyLinkedListCLink<net_buffer> NetBufferLink;
 	typedef DoublyLinkedList<net_buffer, NetBufferLink> BufferList;
 
-			sem_id			fNotify;
-			BufferList		fBuffers;
-			size_t			fCurrentBytes;
-	mutable	LockType		fLock;
+			sem_id				fNotify;
+			BufferList			fBuffers;
+			size_t				fCurrentBytes;
+	mutable	LockType			fLock;
 };
 
 
@@ -150,7 +159,8 @@ protected:
 
 DECL_DATAGRAM_SOCKET(inline)::DatagramSocket(const char* name,
 	net_socket* socket)
-	: ProtocolSocket(socket), fCurrentBytes(0)
+	:
+	ProtocolSocket(socket), fCurrentBytes(0)
 {
 	status_t status = LockingBase::Init(&fLock, name);
 	if (status != B_OK)
@@ -355,5 +365,6 @@ DECL_DATAGRAM_SOCKET(inline bigtime_t)::_SocketTimeout(uint32 flags) const
 
 	return timeout;
 }
+
 
 #endif	// PROTOCOL_UTILITIES_H
