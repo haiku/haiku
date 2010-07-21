@@ -39,6 +39,7 @@ class BLocaleRoster {
 		status_t GetDefaultLanguage(BLanguage **) const;
 		status_t GetDefaultCountry(BCountry **) const;
 		void SetDefaultCountry(BCountry *) const;
+		void UpdateSettings(BMessage* newSettings);
 
 		status_t GetLanguage(const char* languageCode, BLanguage** _language)
 			const;
