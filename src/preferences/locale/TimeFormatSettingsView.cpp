@@ -147,7 +147,7 @@ IsSpecialDateChar(char charToTest)
 FormatView::FormatView(BCountry* country)
 	:
 	BView("WindowsSettingsView", B_FRAME_EVENTS),
-	fCountry(country)
+	fCountry(*country)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
@@ -185,8 +185,8 @@ FormatView::FormatView(BCountry* country)
 	f12HrRadioButton = new BRadioButton("", B_TRANSLATE("12 hour"),
 		new BMessage(kClockFormatChange));
 
-	fCountry->TimeFormat(fOriginalTimeFormat, false);
-	fCountry->TimeFormat(fOriginalLongTimeFormat, true);
+	fCountry.TimeFormat(fOriginalTimeFormat, false);
+	fCountry.TimeFormat(fOriginalLongTimeFormat, true);
 	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
 		f12HrRadioButton->SetValue(B_CONTROL_ON);
 		fCountryIs24Hr = false;
@@ -461,7 +461,7 @@ FormatView::MessageReceived(BMessage* message)
 					timeFormat.Append(" a");
 				}
 			}
-			fCountry->SetTimeFormat(timeFormat.String(), false);
+			fCountry.SetTimeFormat(timeFormat.String(), false);
 			newMessage.AddString("shortTimeFormat", timeFormat);
 
 			timeFormat = fOriginalLongTimeFormat;
@@ -479,7 +479,7 @@ FormatView::MessageReceived(BMessage* message)
 					timeFormat.Append(" a");
 				}
 			}
-			fCountry->SetTimeFormat(timeFormat.String(), true);
+			fCountry.SetTimeFormat(timeFormat.String(), true);
 			newMessage.AddString("longTimeFormat", timeFormat);
 			_UpdateExamples();
 			Window()->PostMessage(kSettingsContentsModified);
@@ -504,8 +504,11 @@ FormatView::SetDefaults()
 	settings.SetClockTo24Hr(false);
 	*/
 
-	delete fCountry;
-	be_locale_roster->GetDefaultCountry(&fCountry);
+	BCountry* defaultCountry;
+	be_locale_roster->GetDefaultCountry(&defaultCountry);
+	fCountry = *defaultCountry;
+		// We work on a copy of the default country and set the changes when
+		// closing the preflet
 	_UpdateExamples();
 	_SendNotices();
 }
@@ -544,13 +547,12 @@ FormatView::Revert()
 void
 FormatView::SetCountry(BCountry* country)
 {
-	delete fCountry;
-	fCountry = country;
+	fCountry = *country;
 
 	fOriginalTimeFormat.Truncate(0);
-	fCountry->TimeFormat(fOriginalTimeFormat, false);
+	fCountry.TimeFormat(fOriginalTimeFormat, false);
 	fOriginalLongTimeFormat.Truncate(0);
-	fCountry->TimeFormat(fOriginalLongTimeFormat, true);
+	fCountry.TimeFormat(fOriginalLongTimeFormat, true);
 
 	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
 		f12HrRadioButton->SetValue(B_CONTROL_ON);
@@ -616,19 +618,19 @@ FormatView::_UpdateExamples()
 	time_t timeValue = (time_t)time(NULL);
 	BString timeFormat;
 
-	fCountry->FormatDate(&timeFormat, timeValue, true);
+	fCountry.FormatDate(&timeFormat, timeValue, true);
 	fLongDateExampleView->SetText(timeFormat);
 
-	fCountry->FormatDate(&timeFormat, timeValue, false);
+	fCountry.FormatDate(&timeFormat, timeValue, false);
 	fShortDateExampleView->SetText(timeFormat);
 
-	fCountry->FormatTime(&timeFormat, timeValue, true);
+	fCountry.FormatTime(&timeFormat, timeValue, true);
 	fLongTimeExampleView->SetText(timeFormat);
 
-	fCountry->FormatTime(&timeFormat, timeValue, false);
+	fCountry.FormatTime(&timeFormat, timeValue, false);
 	fShortTimeExampleView->SetText(timeFormat);
 
-	status_t Error = fCountry->FormatNumber(&timeFormat, 1234.5678);
+	status_t Error = fCountry.FormatNumber(&timeFormat, 1234.5678);
 	if (Error == B_OK)
 		fNumberFormatExampleView->SetText(timeFormat);
 	else
@@ -658,7 +660,7 @@ FormatView::_ParseDateFormat()
 {
 	// TODO parse the short date too
 	BString dateFormatString;
-	fCountry->DateFormat(dateFormatString, true);
+	fCountry.DateFormat(dateFormatString, true);
 	const char* dateFormat = dateFormatString.String();
 
 	// Travel trough the string and parse it
@@ -710,7 +712,7 @@ FormatView::_ParseDateFormat()
 
 	// Short date is a bit more tricky, we want to extract the separator
 	dateFormatString.Truncate(0);
-	fCountry->DateFormat(dateFormatString, false);
+	fCountry.DateFormat(dateFormatString, false);
 	dateFormat = dateFormatString.String();
 
 	// Travel trough the string and parse it
@@ -776,7 +778,7 @@ FormatView::_UpdateLongDateFormatString()
 	}
 
 	// TODO save this in the settings preflet and make the roster load it back
-	fCountry->SetDateFormat(newDateFormat.String());
+	fCountry.SetDateFormat(newDateFormat.String());
 
 	newDateFormat.Truncate(0);
 
@@ -787,5 +789,5 @@ FormatView::_UpdateLongDateFormatString()
 	newDateFormat.Append(fDateString[2]);
 
 	// TODO save this in the settings preflet and make the roster load it back
-	fCountry->SetDateFormat(newDateFormat.String(), false);
+	fCountry.SetDateFormat(newDateFormat.String(), false);
 }

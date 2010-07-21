@@ -186,7 +186,7 @@ struct RosterData {
 	BMessage fPreferredLanguages;
 	// BString fCountryCodeName;
 	// BString fCountryDateFormat;
-	BCountry* fDefaultCountry;
+	BCountry fDefaultCountry;
 
 	RosterData();
 	~RosterData();
@@ -241,19 +241,20 @@ RosterData::RosterData()
 				fPreferredLanguages.AddString("language", "en");
 
 			BString codeName;
+
 			if (settingsMessage.FindString("country", &codeName)
 					== B_OK)
-				fDefaultCountry = new BCountry(codeName);
+				fDefaultCountry = BCountry(codeName);
 			else
-				fDefaultCountry = new BCountry("en_US");
+				fDefaultCountry = BCountry("en_US");
 
 			BString timeFormat;
 			if (settingsMessage.FindString("shortTimeFormat", &timeFormat)
 					== B_OK)
-				fDefaultCountry->SetTimeFormat(timeFormat, false);
+				fDefaultCountry.SetTimeFormat(timeFormat, false);
 			if (settingsMessage.FindString("longTimeFormat", &timeFormat)
 					== B_OK)
-				fDefaultCountry->SetTimeFormat(timeFormat, true);
+				fDefaultCountry.SetTimeFormat(timeFormat, true);
 
 			return;
 		}
@@ -262,7 +263,7 @@ RosterData::RosterData()
 	// Something went wrong (no settings file or invalid BMessage
 	// set everything to default values
 	fPreferredLanguages.AddString("language", "en");
-	fDefaultCountry = new BCountry("en_US");
+	fDefaultCountry = BCountry("en_US");
 	log_team(LOG_ERR, "*** No language preference found!\n");
 }
 
@@ -271,7 +272,6 @@ RosterData::~RosterData()
 {
 	BAutolock lock(fLock);
 	assert(lock.IsLocked());
-	delete fDefaultCountry;
 	CleanupCatalogAddOns();
 	closelog();
 }
@@ -540,10 +540,7 @@ BLocaleRoster::GetDefaultCountry(BCountry **country) const
 	if (!country)
 		return B_BAD_VALUE;
 
-	BAutolock lock(gRosterData.fLock);
-	assert(lock.IsLocked());
-
-	*country = gRosterData.fDefaultCountry;
+	*country = &gRosterData.fDefaultCountry;
 	return B_OK;
 }
 
@@ -567,11 +564,13 @@ BLocaleRoster::GetLanguage(const char* languageCode,
 void
 BLocaleRoster::SetDefaultCountry(BCountry* newDefault) const
 {
+	if (newDefault == NULL)
+		return;
+
 	BAutolock lock(gRosterData.fLock);
 	assert(lock.IsLocked());
 
-	delete gRosterData.fDefaultCountry;
-	gRosterData.fDefaultCountry = newDefault;
+	gRosterData.fDefaultCountry = *newDefault;
 }
 
 

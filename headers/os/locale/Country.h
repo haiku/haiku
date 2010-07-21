@@ -36,6 +36,8 @@ class BCountry {
 	public:
 		BCountry(const char* languageCode, const char* countryCode);
 		BCountry(const char* languageAndCountryCode = "en_US");
+		BCountry(const BCountry& other);
+		BCountry& operator=(const BCountry& other);
 		virtual 		~BCountry();
 
 		virtual bool 	Name(BString&) const;

@@ -63,6 +63,46 @@ BCountry::BCountry(const char* languageAndCountryCode)
 }
 
 
+BCountry::BCountry(const BCountry& other)
+{
+	fICULocale = new ICU_VERSION::Locale(*other.fICULocale);
+	fICULongDateFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICULongDateFormatter));
+ 	fICUShortDateFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICUShortDateFormatter));
+	fICULongTimeFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICULongTimeFormatter));
+ 	fICUShortTimeFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICUShortTimeFormatter));
+}
+
+
+BCountry&
+BCountry::operator=(const BCountry& other)
+{
+	if (this == &other)
+		return *this;
+
+	delete fICULongTimeFormatter;
+	delete fICUShortTimeFormatter;
+	delete fICULongDateFormatter;
+	delete fICUShortDateFormatter;
+	delete fICULocale;
+
+	fICULocale = new ICU_VERSION::Locale(*other.fICULocale);
+	fICULongDateFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICULongDateFormatter));
+ 	fICUShortDateFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICUShortDateFormatter));
+	fICULongTimeFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICULongTimeFormatter));
+ 	fICUShortTimeFormatter = new ICU_VERSION::SimpleDateFormat(
+		*static_cast<SimpleDateFormat*>(other.fICUShortTimeFormatter));
+
+	return *this;
+}
+
+
 BCountry::~BCountry()
 {
 	delete fICULongTimeFormatter;

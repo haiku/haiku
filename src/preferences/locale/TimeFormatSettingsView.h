@@ -7,6 +7,7 @@
 
 
 #include <Box.h>
+#include <Country.h>
 #include <String.h>
 #include <View.h>
 
@@ -81,7 +82,7 @@ private:
 			BString				fOriginalLongTimeFormat;
 			bool				fCountryIs24Hr;
 
-			BCountry*			fCountry;
+			BCountry			fCountry;
 
 			BBox*				fDateBox;
 			BBox*				fTimeBox;
