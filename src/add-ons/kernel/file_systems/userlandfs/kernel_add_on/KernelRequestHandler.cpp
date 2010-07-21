@@ -706,9 +706,17 @@ KernelRequestHandler::_HandleRequest(FileCacheWriteRequest* request)
 
 	size_t size = 0;
 	if (result == B_OK) {
-		size = request->buffer.GetSize();
-		result = volume->WriteFileCache(request->vnid, request->cookie,
-			request->pos, request->buffer.GetData(), &size);
+		const void* data = request->buffer.GetData();
+		size = request->size;
+		if (data != NULL) {
+			if (size != (size_t)request->buffer.GetSize())
+				result = B_BAD_DATA;
+		}
+
+		if (result == B_OK) {
+			result = volume->WriteFileCache(request->vnid, request->cookie,
+				request->pos, data, &size);
+		}
 	}
 
 	// prepare the reply

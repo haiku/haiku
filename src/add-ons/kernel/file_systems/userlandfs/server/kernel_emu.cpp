@@ -824,11 +824,15 @@ UserlandFS::KernelEmu::file_cache_write(dev_t mountID, ino_t vnodeID,
 	request->nsid = mountID;
 	request->vnid = vnodeID;
 	request->cookie = cookie;
+	request->size = *_size;
 	request->pos = offset;
 
-	error = allocator.AllocateData(request->buffer, buffer, *_size, 1, false);
-	if (error != B_OK)
-		return error;
+	if (buffer != NULL) {
+		error = allocator.AllocateData(request->buffer, buffer, *_size, 1,
+			false);
+		if (error != B_OK)
+			return error;
+	}
 
 	// send the request
 	UserlandRequestHandler handler(fileSystem, FILE_CACHE_WRITE_REPLY);

@@ -1838,6 +1838,7 @@ public:
 
 	void*		cookie;
 	Address		buffer;
+	size_t		size;
 	off_t		pos;
 };
 
