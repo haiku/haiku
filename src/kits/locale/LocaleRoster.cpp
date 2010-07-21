@@ -50,13 +50,6 @@ const char *BLocaleRoster::kCatSigAttr = "BEOS:LOCALE_SIGNATURE";
 const char *BLocaleRoster::kCatFingerprintAttr = "BEOS:LOCALE_FINGERPRINT";
 	// catalog fingerprint, may live in catalog file
 
-const char *BLocaleRoster::kCatManagerMimeType
-	= "application/x-vnd.Be.locale.catalog-manager";
-	// signature of catalog managing app
-const char *BLocaleRoster::kCatEditorMimeType
-	= "application/x-vnd.Be.locale.catalog-editor";
-	// signature of catalog editor app
-
 const char *BLocaleRoster::kEmbeddedCatAttr = "BEOS:LOCALE_EMBEDDED_CATALOG";
 	// attribute which contains flattened data of embedded catalog
 	// this may live in an app- or add-on-file
@@ -358,7 +351,9 @@ RosterData::InitializeCatalogAddOns()
 		while ((count = addOnFolder.GetNextDirents((dirent *)buf, 4096)) > 0) {
 			dent = (dirent *)buf;
 			while (count-- > 0) {
-				if (strcmp(dent->d_name, ".") && strcmp(dent->d_name, "..")) {
+				if (strcmp(dent->d_name, ".") && strcmp(dent->d_name, "..")
+						&& strcmp(dent->d_name, "gcc2")
+						&& strcmp(dent->d_name, "gcc4")) {
 					// we have found (what should be) a catalog-add-on:
 					eref.device = dent->d_pdev;
 					eref.directory = dent->d_pino;
