@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,8 @@
 #include <net_protocol.h>
 #include <net_stack.h>
 
+#include <icmp.h>
+
 #include <lock.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -24,7 +26,9 @@
 #include <NetUtilities.h>
 #include <ProtocolUtilities.h>
 
+#include <algorithm>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
@@ -167,7 +171,8 @@ public:
 	void Ref() { fEndpointCount++; }
 	bool Put() { fEndpointCount--; return fEndpointCount == 0; }
 
-	status_t DemuxIncomingBuffer(net_buffer *buffer);
+	status_t DemuxIncomingBuffer(net_buffer* buffer);
+	status_t DeliverError(status_t error, net_buffer* buffer);
 
 	status_t BindEndpoint(UdpEndpoint *endpoint, const sockaddr *address);
 	status_t ConnectEndpoint(UdpEndpoint *endpoint, const sockaddr *address);
@@ -183,6 +188,7 @@ private:
 
 	UdpEndpoint *_FindActiveEndpoint(const sockaddr *ourAddress,
 		const sockaddr *peerAddress);
+	UdpEndpoint* _EndpointFor(net_buffer* buffer);
 	status_t _DemuxBroadcast(net_buffer *buffer);
 	status_t _DemuxUnicast(net_buffer *buffer);
 
@@ -213,25 +219,28 @@ typedef DoublyLinkedList<UdpDomainSupport> UdpDomainList;
 
 class UdpEndpointManager {
 public:
-	UdpEndpointManager();
-	~UdpEndpointManager();
+								UdpEndpointManager();
+								~UdpEndpointManager();
 
-	status_t		ReceiveData(net_buffer *buffer);
-	status_t		Deframe(net_buffer *buffer);
+			status_t			InitCheck() const;
 
-	UdpDomainSupport *OpenEndpoint(UdpEndpoint *endpoint);
-	status_t FreeEndpoint(UdpDomainSupport *domain);
+			status_t			ReceiveData(net_buffer* buffer);
+			status_t			ReceiveError(status_t error,
+									net_buffer* buffer);
+			status_t			Deframe(net_buffer* buffer);
 
-	status_t		InitCheck() const;
+			UdpDomainSupport*	OpenEndpoint(UdpEndpoint* endpoint);
+			status_t			FreeEndpoint(UdpDomainSupport* domain);
 
-	static int DumpEndpoints(int argc, char *argv[]);
+	static	int					DumpEndpoints(int argc, char *argv[]);
 
 private:
-	UdpDomainSupport *_GetDomain(net_domain *domain, bool create);
+			UdpDomainSupport*	_GetDomain(net_domain *domain, bool create);
+			UdpDomainSupport*	_GetDomain(net_buffer* buffer);
 
-	mutex			fLock;
-	status_t		fStatus;
-	UdpDomainList	fDomains;
+			mutex				fLock;
+			status_t			fStatus;
+			UdpDomainList		fDomains;
 };
 
 
@@ -240,6 +249,7 @@ static UdpEndpointManager *sUdpEndpointManager;
 net_buffer_module_info *gBufferModule;
 net_datalink_module_info *gDatalinkModule;
 net_stack_module_info *gStackModule;
+net_socket_module_info *gSocketModule;
 
 
 // #pragma mark -
@@ -273,16 +283,35 @@ UdpDomainSupport::Init()
 status_t
 UdpDomainSupport::DemuxIncomingBuffer(net_buffer *buffer)
 {
-	// NOTE multicast is delivered directly to the endpoint
-
+	// NOTE: multicast is delivered directly to the endpoint
 	MutexLocker _(fLock);
 
-	if (buffer->flags & MSG_BCAST)
+	if ((buffer->flags & MSG_BCAST) != 0)
 		return _DemuxBroadcast(buffer);
-	else if (buffer->flags & MSG_MCAST)
+	if ((buffer->flags & MSG_MCAST) != 0)
 		return B_ERROR;
 
 	return _DemuxUnicast(buffer);
+}
+
+
+status_t
+UdpDomainSupport::DeliverError(status_t error, net_buffer* buffer)
+{
+	if ((buffer->flags & (MSG_BCAST | MSG_MCAST)) != 0)
+		return B_ERROR;
+
+	MutexLocker _(fLock);
+
+	// RFC 1122 4.1.3.3:
+	// TODO: Pass to the application layer all ICMP error messages
+
+	UdpEndpoint* endpoint = _EndpointFor(buffer);
+	if (endpoint != NULL)
+		gSocketModule->notify(endpoint->Socket(), B_SELECT_ERROR, error);
+
+	gBufferModule->free(buffer);
+	return B_OK;
 }
 
 
@@ -479,6 +508,37 @@ UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
 }
 
 
+UdpEndpoint*
+UdpDomainSupport::_EndpointFor(net_buffer* buffer)
+{
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	struct sockaddr *peerAddr = buffer->source;
+	struct sockaddr *localAddr = buffer->destination;
+
+	// look for full (most special) match:
+	UdpEndpoint* endpoint = _FindActiveEndpoint(localAddr, peerAddr);
+	if (endpoint != NULL)
+		return endpoint;
+
+	// look for endpoint matching local address & port:
+	endpoint = _FindActiveEndpoint(localAddr, NULL);
+	if (endpoint != NULL)
+		return endpoint;
+
+	// look for endpoint matching peer address & port and local port:
+	SocketAddressStorage local(AddressModule());
+	local.SetToEmpty();
+	local.SetPort(AddressModule()->get_port(localAddr));
+	endpoint = _FindActiveEndpoint(*local, peerAddr);
+	if (endpoint != NULL)
+		return endpoint;
+
+	// last chance: look for endpoint matching local port only:
+	return _FindActiveEndpoint(*local, NULL);
+}
+
+
 status_t
 UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 {
@@ -529,32 +589,11 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 status_t
 UdpDomainSupport::_DemuxUnicast(net_buffer *buffer)
 {
-	struct sockaddr *peerAddr = buffer->source;
-	struct sockaddr *localAddr = buffer->destination;
-
 	TRACE_DOMAIN("_DemuxUnicast(%p)", buffer);
 
-	UdpEndpoint *endpoint;
-	// look for full (most special) match:
-	endpoint = _FindActiveEndpoint(localAddr, peerAddr);
-	if (!endpoint) {
-		// look for endpoint matching local address & port:
-		endpoint = _FindActiveEndpoint(localAddr, NULL);
-		if (!endpoint) {
-			// look for endpoint matching peer address & port and local port:
-			SocketAddressStorage local(AddressModule());
-			local.SetToEmpty();
-			local.SetPort(AddressModule()->get_port(localAddr));
-			endpoint = _FindActiveEndpoint(*local, peerAddr);
-			if (!endpoint) {
-				// last chance: look for endpoint matching local port only:
-				endpoint = _FindActiveEndpoint(*local, NULL);
-			}
-		}
-	}
-
-	if (!endpoint) {
-		TRACE_DOMAIN("_DemuxBroadcast(%p) - no matching endpoint found!", buffer);
+	UdpEndpoint* endpoint = _EndpointFor(buffer);
+	if (endpoint == NULL) {
+		TRACE_DOMAIN("_DemuxUnicast(%p) - no matching endpoint found!", buffer);
 		return B_NAME_NOT_FOUND;
 	}
 
@@ -650,39 +689,69 @@ UdpEndpointManager::DumpEndpoints(int argc, char *argv[])
 status_t
 UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
+	TRACE_EPM("ReceiveData(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
+
+	UdpDomainSupport* domainSupport = _GetDomain(buffer);
+	if (domainSupport == NULL) {
+		// we don't instantiate domain supports in the receiving path, as
+		// we are only interested in delivering data to existing sockets.
+		return B_ERROR;
+	}
+
 	status_t status = Deframe(buffer);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	TRACE_EPM("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
-
-	net_domain *domain = buffer->interface->domain;
-
-	UdpDomainSupport *domainSupport = NULL;
-
-	{
-		MutexLocker _(fLock);
-		domainSupport = _GetDomain(domain, false);
-		// TODO we don't want to hold to the manager's lock
-		//      during the whole RX path, we may not hold an
-		//      endpoint's lock with the manager lock held.
-		//      But we should increase the domain's refcount
-		//      here.
-	}
-
-	if (domainSupport == NULL) {
-		// we don't instantiate domain supports in the
-		// RX path as we are only interested in delivering
-		// data to existing sockets.
-		return B_ERROR;
-	}
-
 	status = domainSupport->DemuxIncomingBuffer(buffer);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		TRACE_EPM("  ReceiveData(): no endpoint.");
-		// TODO: send ICMP-error
+		// Send port unreachable error
+		domainSupport->Domain()->module->error_reply(NULL, buffer,
+			icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_PORT_UNREACH), NULL);
 		return B_ERROR;
 	}
+
+	gBufferModule->free(buffer);
+	return B_OK;
+}
+
+
+status_t
+UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
+{
+	TRACE_EPM("ReceiveError(code %" B_PRId32 " %p [%" B_PRIu32 " bytes])",
+		error, buffer, buffer->size);
+
+	// We only really need the port information
+	if (buffer->size < 4)
+		return B_BAD_VALUE;
+
+	UdpDomainSupport* domainSupport = _GetDomain(buffer);
+	if (domainSupport == NULL) {
+		// we don't instantiate domain supports in the receiving path, as
+		// we are only interested in delivering data to existing sockets.
+		return B_ERROR;
+	}
+
+	// Deframe the buffer manually, as we usually only get 8 bytes from the
+	// original packet
+	udp_header header;
+	if (gBufferModule->read(buffer, 0, &header,
+			std::min(buffer->size, sizeof(udp_header))) != B_OK)
+		return B_BAD_VALUE;
+
+	net_domain* domain = buffer->interface->domain;
+	net_address_module_info* addressModule = domain->address_module;
+
+	SocketAddress source(addressModule, buffer->source);
+	SocketAddress destination(addressModule, buffer->destination);
+
+	source.SetPort(header.source_port);
+	destination.SetPort(header.destination_port);
+
+	status_t status = domainSupport->DeliverError(error, buffer);
+	if (status != B_OK)
+		return status;
 
 	gBufferModule->free(buffer);
 	return B_OK;
@@ -803,6 +872,21 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 
 	fDomains.Add(domainSupport);
 	return domainSupport;
+}
+
+
+UdpDomainSupport*
+UdpEndpointManager::_GetDomain(net_buffer* buffer)
+{
+	if (buffer->interface == NULL)
+		return NULL;
+
+	MutexLocker _(fLock);
+	return _GetDomain(buffer->interface->domain, false);
+		// TODO: we don't want to hold to the manager's lock during the
+		// whole RX path, we may not hold an endpoint's lock with the
+		// manager lock held.
+		// But we should increase the domain's refcount here.
 }
 
 
@@ -1161,9 +1245,46 @@ udp_deliver_data(net_protocol *protocol, net_buffer *buffer)
 
 
 status_t
-udp_error(uint32 code, net_buffer *data)
+udp_error_received(uint32 code, net_buffer* buffer)
 {
-	return B_ERROR;
+	uint8 icmpType, icmpCode;
+	icmp_decode(code, icmpType, icmpCode);
+
+	status_t error = B_OK;
+	switch (icmpType) {
+		case ICMP_TYPE_UNREACH:
+			if (icmpCode == ICMP_CODE_NET_UNREACH)
+				error = ENETUNREACH;
+			else if (icmpCode == ICMP_CODE_HOST_UNREACH)
+				error = EHOSTUNREACH;
+			else if (icmpCode == ICMP_CODE_SOURCE_ROUTE_FAIL)
+				error = EOPNOTSUPP;
+			else if (icmpCode == ICMP_CODE_PROTO_UNREACH) 
+				error = ENOPROTOOPT;
+			else if (icmpCode == ICMP_CODE_PORT_UNREACH)
+				error = ECONNREFUSED;
+			else if (icmpCode == ICMP_CODE_FRAG_NEEDED)
+				error = EMSGSIZE;
+			else
+				error = EOPNOTSUPP;
+			break;
+		case ICMP_TYPE_TIME_EXCEEDED:
+			error = EHOSTUNREACH;
+			break;
+		case ICMP_TYPE_PARAM_PROBLEM:
+			error = EPROTO;
+			break;
+		case ICMP_TYPE_SOURCE_QUENCH:
+		default:
+			// ignore them
+			break;
+	}
+	
+	if (error != B_OK)
+		sUdpEndpointManager->ReceiveError(error, buffer);
+
+	gBufferModule->free(buffer);
+	return B_OK;
 }
 
 
@@ -1308,7 +1429,7 @@ net_protocol_module_info sUDPModule = {
 	udp_get_mtu,
 	udp_receive_data,
 	udp_deliver_data,
-	udp_error,
+	udp_error_received,
 	udp_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()
@@ -1321,6 +1442,7 @@ module_dependency module_dependencies[] = {
 	{NET_STACK_MODULE_NAME, (module_info **)&gStackModule},
 	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
 	{NET_DATALINK_MODULE_NAME, (module_info **)&gDatalinkModule},
+	{NET_SOCKET_MODULE_NAME, (module_info **)&gSocketModule},
 	{}
 };
 
