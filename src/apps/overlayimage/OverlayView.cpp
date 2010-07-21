@@ -104,9 +104,10 @@ OverlayView::MessageReceived(BMessage *msg)
 				}
 				
 				BRect rect = fBitmap->Bounds();
-				if (!fReplicated)
+				if (!fReplicated) {
 					Window()->ResizeTo(rect.right, rect.bottom);
-			
+					Window()->Activate(true);
+				}
 				ResizeTo(rect.right, rect.bottom);
 				Invalidate();
 			}
