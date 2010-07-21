@@ -158,6 +158,7 @@ function CleanTemporaryFiles()
 
 function PreFirmwareInstallation()
 {
+	echo "Installing firmware for ${driver} ..."
 	mkdir -p "${firmwareDir}/${driver}"
 	UnlinkDriver
 }
@@ -168,6 +169,7 @@ function PostFirmwareInstallation()
 	SetFirmwarePermissions
 	SymlinkDriver
 	CleanTemporaryFiles
+	echo "... firmware for ${driver} has been installed."
 }
 
 
@@ -308,6 +310,12 @@ function BuildBroadcomFWCutter()
 	# Build b43-fwcutter.
 	echo "Compiling b43-fwcutter for installing Broadcom's firmware ..."
 	make PREFIX=/boot/common CFLAGS="-I. -Wall -D_BSD_SOURCE" > /dev/null 2>&1
+	result=$?
+	if [ $result -gt 0 ]; then
+		echo "... failed to compile b43-fwcutter."
+	else
+		echo "... successfully compiled b43-fwcutter."
+	fi
 	if [ ! -e b43-fwcutter ] ; then
 		return 1
 	fi
