@@ -32,10 +32,10 @@ LocaleSettings::Load()
 	BFile file;
 	status_t err;
 	err = _Open(&file, B_READ_ONLY);
-   	if (err != B_OK)
+	if (err != B_OK)
 		return err;
 	err = fMessage.Unflatten(&file);
-   	if (err == B_OK)
+	if (err == B_OK)
 		fSaved = true;
 	return err;
 }
@@ -51,7 +51,7 @@ LocaleSettings::Save()
 		return err;
 
 	err = fMessage.Flatten(&file);
-   	if (err == B_OK)
+	if (err == B_OK)
 		fSaved = true;
 	return err;
 }
@@ -73,21 +73,34 @@ LocaleSettings::_Open(BFile* file, int32 mode)
 void
 LocaleSettings::UpdateFrom(BMessage* message)
 {
-	BString langName;
+	BString messageContent;
 
-	if (message->FindString("language", &langName) == B_OK) {
+	if (message->FindString("language", &messageContent) == B_OK) {
 		fMessage.RemoveName("language");
 
 		for (int i = 0;; i++) {
-			if (message->FindString("language", i, &langName) != B_OK)
+			if (message->FindString("language", i, &messageContent) != B_OK)
 				break;
-			fMessage.AddString("language", langName);
+			fMessage.AddString("language", messageContent);
 		}
+		fSaved = false;
 	}
 
-	if (message->FindString("country", &langName) == B_OK)
-		fMessage.ReplaceString("country", langName);
+	if (message->FindString("country", &messageContent) == B_OK) {
+		fMessage.ReplaceString("country", messageContent);
+		fMessage.RemoveName("shortTimeFormat");
+		fMessage.RemoveName("longTimeFormat");
+		fSaved = false;
+	}
 
-	fSaved = false;
+	if (message->FindString("shortTimeFormat", &messageContent) == B_OK) {
+		fMessage.ReplaceString("shortTimeFormat", messageContent);
+		fSaved = false;
+	}
+
+	if (message->FindString("longTimeFormat", &messageContent) == B_OK) {
+		fMessage.ReplaceString("longTimeFormat", messageContent);
+		fSaved = false;
+	}
 }
 

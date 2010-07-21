@@ -5,8 +5,10 @@
 
 
 #include "TimeFormatSettingsView.h"
+#include "Locale.h"
 
 #include <Alert.h>
+#include <Application.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
@@ -441,6 +443,8 @@ FormatView::MessageReceived(BMessage* message)
 
 		case kClockFormatChange:
 		{
+			BMessage newMessage(kMsgSettingsChanged);
+
 			BString timeFormat;
 			timeFormat = fOriginalTimeFormat;
 			if (f24HrRadioButton->Value() == 1) {
@@ -458,6 +462,7 @@ FormatView::MessageReceived(BMessage* message)
 				}
 			}
 			fCountry->SetTimeFormat(timeFormat.String(), false);
+			newMessage.AddString("shortTimeFormat", timeFormat);
 
 			timeFormat = fOriginalLongTimeFormat;
 			if (f24HrRadioButton->Value() == 1) {
@@ -475,8 +480,10 @@ FormatView::MessageReceived(BMessage* message)
 				}
 			}
 			fCountry->SetTimeFormat(timeFormat.String(), true);
+			newMessage.AddString("longTimeFormat", timeFormat);
 			_UpdateExamples();
 			Window()->PostMessage(kSettingsContentsModified);
+			be_app_messenger.SendMessage(&newMessage);
 			break;
 		}
 

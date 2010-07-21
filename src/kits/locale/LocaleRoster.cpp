@@ -191,8 +191,9 @@ struct RosterData {
 	BLocker fLock;
 	BList fCatalogAddOnInfos;
 	BMessage fPreferredLanguages;
-	BString fCountryCodeName;
-	BString fCountryDateFormat;
+	// BString fCountryCodeName;
+	// BString fCountryDateFormat;
+	BCountry* fDefaultCountry;
 
 	RosterData();
 	~RosterData();
@@ -236,7 +237,7 @@ RosterData::RosterData()
 				icuLocale.getDisplayName(ustr);
 				ustr.toUTF8(bbs);
 
-				Locale::setDefault(icuLocale,icuError);
+				Locale::setDefault(icuLocale, icuError);
 				assert(icuError == U_ZERO_ERROR);
 				fPreferredLanguages.RemoveName("language");
 				for (int i = 0; settingsMessage.FindString("language", i,
@@ -246,8 +247,21 @@ RosterData::RosterData()
 			} else
 				fPreferredLanguages.AddString("language", "en");
 
-			if (settingsMessage.FindString("country", &fCountryCodeName) != B_OK)
-				fCountryCodeName = "en_US";
+			BString codeName;
+			if (settingsMessage.FindString("country", &codeName)
+					== B_OK)
+				fDefaultCountry = new BCountry(codeName);
+			else
+				fDefaultCountry = new BCountry("en_US");
+
+			BString timeFormat;
+			if (settingsMessage.FindString("shortTimeFormat", &timeFormat)
+					== B_OK)
+				fDefaultCountry->SetTimeFormat(timeFormat, false);
+			if (settingsMessage.FindString("longTimeFormat", &timeFormat)
+					== B_OK)
+				fDefaultCountry->SetTimeFormat(timeFormat, true);
+
 			return;
 		}
 	}
@@ -255,8 +269,8 @@ RosterData::RosterData()
 	// Something went wrong (no settings file or invalid BMessage
 	// set everything to default values
 	fPreferredLanguages.AddString("language", "en");
-	fCountryCodeName = "en_US";
-	log_team(LOG_ERR,"*** No language preference found!\n");
+	fDefaultCountry = new BCountry("en_US");
+	log_team(LOG_ERR, "*** No language preference found!\n");
 }
 
 
@@ -264,6 +278,7 @@ RosterData::~RosterData()
 {
 	BAutolock lock(fLock);
 	assert(lock.IsLocked());
+	delete fDefaultCountry;
 	CleanupCatalogAddOns();
 	closelog();
 }
@@ -278,9 +293,9 @@ RosterData::CompareInfos(const void *left, const void *right)
 
 
 /*
- * iterate over add-on-folders and collect information about each
- * catalog-add-ons (types of catalogs) into fCatalogAddOnInfos.
- */
+iterate over add-on-folders and collect information about each
+catalog-add-ons (types of catalogs) into fCatalogAddOnInfos.
+*/
 void
 RosterData::InitializeCatalogAddOns()
 {
@@ -397,7 +412,7 @@ RosterData::InitializeCatalogAddOns()
 	}
 	fCatalogAddOnInfos.SortItems(CompareInfos);
 
-	for (int32 i=0; i<fCatalogAddOnInfos.CountItems(); ++i) {
+	for (int32 i = 0; i<fCatalogAddOnInfos.CountItems(); ++i) {
 		BCatalogAddOnInfo *info
 			= static_cast<BCatalogAddOnInfo*>(fCatalogAddOnInfos.ItemAt(i));
 	}
@@ -406,14 +421,14 @@ RosterData::InitializeCatalogAddOns()
 
 /*
  * unloads all catalog-add-ons (which will throw away all loaded catalogs, too)
- */
+*/
 void
 RosterData::CleanupCatalogAddOns()
 {
 	BAutolock lock(fLock);
 	assert(lock.IsLocked());
 	int32 count = fCatalogAddOnInfos.CountItems();
-	for (int32 i=0; i<count; ++i) {
+	for (int32 i = 0; i<count; ++i) {
 		BCatalogAddOnInfo *info
 			= static_cast<BCatalogAddOnInfo*>(fCatalogAddOnInfos.ItemAt(i));
 		delete info;
@@ -440,7 +455,7 @@ BLocaleRoster::GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 {
 	// This function is used in the translation macros, so it can't return a
 	// status_t. Maybe it could throw exceptions ?
-	
+
 	if (*catalogInitStatus == true) {
 		// Catalog already loaded - nothing else to do
 		return catalog;
@@ -452,15 +467,16 @@ BLocaleRoster::GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 	bool found = false;
 
 	while (get_next_image_info(0, &cookie, &info) == B_OK) {
-		if ((char*)info.data < (char*)catalog && (char*)info.data+info.data_size
-				> (char*)catalog) {
+		if ((char*)info.data < (char*)catalog && (char*)info.data
+				+ info.data_size > (char*)catalog) {
 			found = true;
 			break;
 		}
 	}
 
 	if (!found) {
-		log_team(LOG_DEBUG, "Catalog %x doesn't belong to any image !",catalog);
+		log_team(LOG_DEBUG, "Catalog %x doesn't belong to any image !",
+			catalog);
 		return catalog;
 	}
 	// figure out mimetype from image
@@ -475,7 +491,7 @@ BLocaleRoster::GetCatalog(BCatalog* catalog, vint32* catalogInitStatus)
 
 	// drop supertype from mimetype (should be "application/"):
 	char* stripSignature = objectSignature;
-	while(*stripSignature != '/')
+	while (*stripSignature != '/')
 		stripSignature ++;
 	stripSignature ++;
 
@@ -532,10 +548,7 @@ BLocaleRoster::GetDefaultCountry(BCountry **country) const
 	BAutolock lock(gRosterData.fLock);
 	assert(lock.IsLocked());
 
-	*country = new(std::nothrow) BCountry(
-		gRosterData.fCountryCodeName.String());
-	if (gRosterData.fCountryDateFormat.Length() > 0)
-		(*country)->SetDateFormat(gRosterData.fCountryDateFormat.String());
+	*country = gRosterData.fDefaultCountry;
 	return B_OK;
 }
 
@@ -559,8 +572,11 @@ BLocaleRoster::GetLanguage(const char* languageCode,
 void
 BLocaleRoster::SetDefaultCountry(BCountry* newDefault) const
 {
-	gRosterData.fCountryCodeName = newDefault->Code();
-	newDefault->DateFormat(gRosterData.fCountryDateFormat, true);
+	BAutolock lock(gRosterData.fLock);
+	assert(lock.IsLocked());
+
+	delete gRosterData.fDefaultCountry;
+	gRosterData.fDefaultCountry = newDefault;
 }
 
 
