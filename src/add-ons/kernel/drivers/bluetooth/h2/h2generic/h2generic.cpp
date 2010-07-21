@@ -31,9 +31,9 @@
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 // Modules
-static char* usb_name = B_USB_MODULE_NAME;
-static char* hci_name = BT_HCI_MODULE_NAME;
-static char* btDevices_name = BT_HCI_MODULE_NAME;
+static const char* usb_name = B_USB_MODULE_NAME;
+static const char* hci_name = BT_HCI_MODULE_NAME;
+static const char* btDevices_name = BT_HCI_MODULE_NAME;
 
 
 usb_module_info* usb = NULL;

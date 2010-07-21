@@ -43,7 +43,7 @@ AC3Decoder::AC3Decoder()
 {
 	fInputBuffer = malloc(INPUT_BUFFER_MAX_SIZE);
 	strcpy(fChannelInfo,"Unknown");
-	
+
 	fState = a52_init(0);
 	if (fState) {
 		fSamples = a52_samples(fState);
@@ -84,7 +84,7 @@ AC3Decoder::Setup(media_format *ioEncodedFormat,
 		TRACE("AC3Decoder::Setup: couldn't get stream info\n");
 		return B_ERROR;
 	}
-	
+
 	// Sample offsets of the output buffer are stored in fInterleaveOffset
 	// When a channel is not present, it is skipped, the rest is shifted left
 	// The block of samples order presented by liba52 is
@@ -253,7 +253,7 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 
 	ioDecodedFormat->u.raw_audio.buffer_size = 6 * 256 * fFrameSize;
 	ioDecodedFormat->u.raw_audio.channel_mask = fChannelMask;
-	
+
 	TRACE("AC3Decoder::NegotiateOutputFormat: fFlags 0x%x, fFrameRate %d, fBitRate %d, fChannelCount %d, fFrameSize %d\n", fFlags, fFrameRate, fBitRate, fChannelCount, fFrameSize);
 
 	return B_OK;
@@ -267,7 +267,7 @@ AC3Decoder::Seek(uint32 seekTo,
 {
 	fInputChunkSize = 0;
 	fInputBufferSize = 0;
-	
+
 	TRACE("AC3Decoder::Seek called\n");
 
 	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
@@ -297,7 +297,7 @@ AC3Decoder::Decode(void *buffer, int64 *frameCount,
 		TRACE("AC3Decoder::Decode: DecodeNext failed\n");
 		return B_ERROR;
 	}
-	
+
 	/*
 		Every A/52 frame is composed of 6 blocks, each with an output of 256
 		samples for each channel. The a52_block() function decodes the next
@@ -305,10 +305,10 @@ AC3Decoder::Decode(void *buffer, int64 *frameCount,
 		audio in the frame. After each call, you should extract the audio data
 		from the sample buffer.
 	*/
-	
+
 	// fInterleaveOffset[] is used to provide a correct interleave of
 	// multi channel audio
-	
+
 	for (int i = 0; i < 6; i++) {
 		a52_block(fState);
 		for (int j = 0; j < fChannelCount; j++) {
@@ -320,7 +320,7 @@ AC3Decoder::Decode(void *buffer, int64 *frameCount,
 			}
 		}
 	}
-	
+
 	mediaHeader->start_time = fStartTime;
 	mediaHeader->type = B_MEDIA_RAW_AUDIO;
 	mediaHeader->size_used = 6 * 256 * fFrameSize;
@@ -344,7 +344,8 @@ AC3Decoder::InputGetData(void **buffer, int size)
 			return true;
 		}
 		if (fInputChunkSize > 0) {
-			int bytes = min_c(size - fInputBufferSize, fInputChunkSize);
+			int bytes
+				= min_c((size_t)(size - fInputBufferSize), fInputChunkSize);
 			memcpy((char *)fInputBuffer + fInputBufferSize, (char *)fInputChunk + fInputChunkOffset, bytes);
 			fInputChunkOffset += bytes;
 			fInputChunkSize -= bytes;
@@ -368,7 +369,7 @@ void
 AC3Decoder::InputRemoveData(int size)
 {
 	fInputBufferSize -= size;
-	
+
 	if (fInputBufferSize)
 		memmove(fInputBuffer, (char *)fInputBuffer + size, fInputBufferSize);
 }
@@ -398,9 +399,9 @@ AC3Decoder::DecodeNext()
 			TRACE("AC3Decoder::DecodeNext: can't get 7 bytes\n");
 			return false;
 		}
-		
+
 		int flags, sample_rate, bit_rate;
-		
+
 		int bytes = a52_syncinfo((uint8_t *)input, &flags, &sample_rate, &bit_rate);
 		if (bytes == 0) {
 			TRACE("AC3Decoder::DecodeNext: syncinfo failed\n");
@@ -414,23 +415,23 @@ AC3Decoder::DecodeNext()
 			TRACE("AC3Decoder::DecodeNext: can't get %d data bytes\n", bytes);
 			return false;
 		}
-		
+
 //		printf("fFlags 0x%x, flags 0x%x\n", fFlags, flags);
-		
+
 		flags = fFlags | A52_ADJUST_LEVEL;
 		sample_t level = 1.0;
 		if (0 != a52_frame(fState, (uint8_t *)input, &flags, &level, 0)) {
 			TRACE("AC3Decoder::DecodeNext: a52_frame failed\n");
 			return false;
 		}
-			
+
 		TRACE("decoded %d bytes, flags 0x%x\n", bytes, fFlags);
 
 		InputRemoveData(bytes);
-			
+
 		if (fDisableDynamicCompression)
 			a52_dynrng(fState, NULL, 0);
-			
+
 		return true;
 	}
 }

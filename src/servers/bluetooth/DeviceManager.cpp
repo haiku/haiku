@@ -35,16 +35,16 @@ DeviceManager::MessageReceived(BMessage* msg)
 					entry_ref ref;
 					const char *name;
 					BDirectory dir;
-					
+
 					Output::Instance()->Post("Something new in the bus ... ", BLACKBOARD_DEVICEMANAGER);
-					
+
 					if ((msg->FindInt32("device", &ref.device)!=B_OK)
 						|| (msg->FindInt64("directory", &ref.directory)!=B_OK)
 						|| (msg->FindString("name",	&name) != B_OK))
 						return;
-                    
+
 					Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, " -> %s\n",	name);
-					
+
 					ref.set_name(name);
 
 					// Check if	the	entry is a File	or a directory
@@ -53,7 +53,7 @@ DeviceManager::MessageReceived(BMessage* msg)
 					    node_ref nref;
 					    dir.GetNodeRef(&nref);
 						AddDirectory(&nref);
-						
+
 					} else {
 						printf("%s: Entry %s is taken as a file\n", __FUNCTION__, name);
                         AddDevice(&ref);
@@ -64,8 +64,8 @@ DeviceManager::MessageReceived(BMessage* msg)
 				{
 					Output::Instance()->Post("Something removed from the bus ...\n",
 												BLACKBOARD_DEVICEMANAGER);
-					
-				}	
+
+				}
 				break;
 				case B_STAT_CHANGED:
 				case B_ATTR_CHANGED:
@@ -95,13 +95,13 @@ DeviceManager::AddDirectory(node_ref *nref)
 		Output::Instance()->Post("AddDirectory::watch_node	Failed\n", BLACKBOARD_DEVICEMANAGER);
 		return status;
 	}
-	
+
 //	BPath path(*nref);
 //	BString	str(path.Path());
-//	
-//	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, 
+//
+//	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER,
 //								"Exploring entries in %s\n", str.String());
-	
+
 	entry_ref ref;
 	status_t error;
 	while ((error =	directory.GetNextRef(&ref))	== B_OK) {
@@ -109,7 +109,7 @@ DeviceManager::AddDirectory(node_ref *nref)
 		AddDevice(&ref);
 	}
 
-	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, 
+	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER,
 								"Finished exploring entries(%s)\n", strerror(error));
 
 	return (error == B_OK || error == B_ENTRY_NOT_FOUND)?B_OK:error;
@@ -285,8 +285,8 @@ DeviceManager::StopMonitoringDevice(const char *device)
 		return err;
 
 	// test	if still monitored
-	bool stillMonitored	= false;
 /*
+	bool stillMonitored	= false;
 	int32 i	= 0;
 	while ((tmpaddon = (_BDeviceAddOn_ *)fDeviceAddons.ItemAt(i++))	!=NULL)	{
 		if (addon == tmpaddon)

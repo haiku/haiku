@@ -21,9 +21,9 @@ extern "C" {
 static int netfs_mount(nspace_id nsid, const char *device, ulong flags,
 				void *parameters, size_t len, void **data, vnode_id *rootID);
 static int netfs_unmount(void *ns);
-static int netfs_sync(void *ns);
+//static int netfs_sync(void *ns);
 static int netfs_read_fs_stat(void *ns, struct fs_info *info);
-static int netfs_write_fs_stat(void *ns, struct fs_info *info, long mask);
+//static int netfs_write_fs_stat(void *ns, struct fs_info *info, long mask);
 
 // vnodes
 static int netfs_read_vnode(void *ns, vnode_id vnid, char reenter,
@@ -32,7 +32,7 @@ static int netfs_write_vnode(void *ns, void *node, char reenter);
 static int netfs_remove_vnode(void *ns, void *node, char reenter);
 
 // nodes
-static int netfs_fsync(void *ns, void *node);
+//static int netfs_fsync(void *ns, void *node);
 static int netfs_read_stat(void *ns, void *node, struct stat *st);
 static int netfs_write_stat(void *ns, void *node, struct stat *st,
 				long mask);
@@ -50,7 +50,7 @@ static int netfs_write(void *ns, void *node, void *cookie, off_t pos,
 				const void *buffer, size_t *bufferSize);
 static int netfs_ioctl(void *ns, void *node, void *cookie, int cmd,
 				void *buffer, size_t bufferSize);
-static int netfs_setflags(void *ns, void *node, void *cookie, int flags);
+//static int netfs_setflags(void *ns, void *node, void *cookie, int flags);
 
 // hard links / symlinks
 static int netfs_link(void *ns, void *dir, const char *name, void *node);
@@ -239,6 +239,8 @@ netfs_unmount(void *ns)
 	return B_OK;
 }
 
+#if 0 // not used
+
 // netfs_sync
 static
 int
@@ -258,6 +260,8 @@ netfs_sync(void *ns)
 
 	return error;
 }
+
+#endif
 
 // netfs_read_fs_stat
 static
@@ -279,6 +283,8 @@ netfs_read_fs_stat(void *ns, struct fs_info *info)
 	return error;
 }
 
+#if 0 // not used
+
 // netfs_write_fs_stat
 static
 int
@@ -298,6 +304,8 @@ netfs_write_fs_stat(void *ns, struct fs_info *info, long mask)
 
 	return error;
 }
+
+#endif
 
 // #pragma mark -
 // #pragma mark ----- vnodes -----
@@ -355,6 +363,8 @@ netfs_remove_vnode(void *ns, void *_node, char reenter)
 // #pragma mark -
 // #pragma mark ----- nodes -----
 
+#if 0 // not used
+
 // netfs_fsync
 static
 int
@@ -366,6 +376,8 @@ netfs_fsync(void *ns, void *_node)
 	PRINT(("netfs_fsync() done: %lx\n", error));
 	return error;
 }
+
+#endif
 
 // netfs_read_stat
 static
