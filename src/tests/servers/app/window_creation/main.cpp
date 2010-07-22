@@ -2,6 +2,7 @@
 #include <Box.h>
 #include <OS.h>
 #include <Screen.h>
+#include <String.h>
 #include <Window.h>
 
 #include <stdio.h>
@@ -76,7 +77,7 @@ TestApp::_CreateFrames(uint32 numWindows)
 	uint32 numVertical = (fScreenFrame.IntegerHeight() + 1) / (frame.IntegerHeight() + 1);
 	sNumFrames = numHorizontal * numVertical;
 	sFrames = new BRect[sNumFrames];
-	for (int32 i = 0; i < sNumFrames; i++) {
+	for (uint32 i = 0; i < sNumFrames; i++) {
 		sFrames[i] = frame;	
 		frame.OffsetBy(50, 0);
 		if (!fScreenFrame.Contains(frame))
