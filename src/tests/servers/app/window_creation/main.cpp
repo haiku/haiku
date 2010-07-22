@@ -1,35 +1,37 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <Application.h>
 #include <Box.h>
 #include <OS.h>
 #include <Screen.h>
-#include <String.h>
 #include <Window.h>
 
-#include <stdio.h>
-#include <stdlib.h>
 
-
-static BRect *sFrames = NULL;
+static BRect* sFrames = NULL;
 static uint32 sNumFrames = 0;
 
 
 class TestApp : public BApplication {
 public:
-					TestApp(uint32 numWindows, bool views);
-	virtual				~TestApp();
+								TestApp(uint32 numWindows, bool views);
+	virtual						~TestApp();
 
-	virtual	void		ReadyToRun();
+	virtual	void				ReadyToRun();
 
 private:
-	uint32				fFrameNum;
-	BRect				fScreenFrame;
-	uint32				fNumWindows;
-	uint32				fMaxWindows;
-	bool				fTestViews;
+			void				_CreateFrames(uint32 numWindows);
+			int32				_WindowCreator();
+			static int32		_ThreadStarter(void* data);
 
-	void			_CreateFrames(uint32 numWindows);
-	int32			_WindowCreator();
-	static int32		_ThreadStarter(void *data);
+private:
+			uint32				fFrameNum;
+			BRect				fScreenFrame;
+			uint32				fNumWindows;
+			uint32				fMaxWindows;
+			bool				fTestViews;
 };
 
 
@@ -37,13 +39,12 @@ class TestWindow : public BWindow {
 public:
 						TestWindow(BRect frame, bool createView);
 	virtual				~TestWindow();
-
-
 };
 
 
 TestApp::TestApp(uint32 numWindows, bool views)
-	: BApplication("application/x.vnd-Haiku.window-creation"),
+	:
+	BApplication("application/x.vnd-Haiku.window-creation"),
 	fScreenFrame(),
 	fNumWindows(0),
 	fMaxWindows(numWindows),
@@ -64,7 +65,8 @@ TestApp::~TestApp()
 void
 TestApp::ReadyToRun()
 {
-	thread_id thread = spawn_thread(_ThreadStarter, "Window creator", B_NORMAL_PRIORITY, this);
+	thread_id thread = spawn_thread(_ThreadStarter, "Window creator",
+		B_NORMAL_PRIORITY, this);
 	resume_thread(thread);		
 }
 
@@ -73,8 +75,10 @@ void
 TestApp::_CreateFrames(uint32 numWindows)
 {
 	BRect frame(0, 0, 50, 50);
-	uint32 numHorizontal = (fScreenFrame.IntegerWidth() + 1) / (frame.IntegerWidth() + 1);
-	uint32 numVertical = (fScreenFrame.IntegerHeight() + 1) / (frame.IntegerHeight() + 1);
+	uint32 numHorizontal = (fScreenFrame.IntegerWidth() + 1)
+		/ (frame.IntegerWidth() + 1);
+	uint32 numVertical = (fScreenFrame.IntegerHeight() + 1)
+		/ (frame.IntegerHeight() + 1);
 	sNumFrames = numHorizontal * numVertical;
 	sFrames = new BRect[sNumFrames];
 	for (uint32 i = 0; i < sNumFrames; i++) {
@@ -95,14 +99,15 @@ TestApp::_WindowCreator()
 		if (fFrameNum >= sNumFrames)
 			fFrameNum = 0;
 
-		BWindow *window = new TestWindow(sFrames[fFrameNum++], fTestViews);
+		BWindow* window = new TestWindow(sFrames[fFrameNum++], fTestViews);
 		window->Show();
 		fNumWindows++;
 	}
 
 	bigtime_t endTime = system_time();
 	
-	printf("Test completed. %ld windows created in %lld usecs.\n", fNumWindows, endTime - startTime);
+	printf("Test completed. %ld windows created in %lld usecs.\n", fNumWindows,
+		endTime - startTime);
 
 	PostMessage(B_QUIT_REQUESTED);
 	return B_OK;
@@ -110,14 +115,15 @@ TestApp::_WindowCreator()
 
 
 int32
-TestApp::_ThreadStarter(void *data)
+TestApp::_ThreadStarter(void* data)
 {
-	return static_cast<TestApp *>(data)->_WindowCreator();
+	return static_cast<TestApp*>(data)->_WindowCreator();
 }
 
 
 TestWindow::TestWindow(BRect frame, bool views)
-	: BWindow(frame, "Test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	:
+	BWindow(frame, "Test", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	if (views)
 		AddChild(new BBox(Bounds())); 
@@ -129,16 +135,13 @@ TestWindow::~TestWindow()
 }
 
 
-
-// main
 int
 main(int argc, char** argv)
 {
 	uint32 numWindows = 10;
 	bool testViews = false;
-	if (argc > 1) {
+	if (argc > 1)
 		numWindows = atoi(argv[1]);
-	}
 
 	if (argc > 2) {
 		if (!strcmp(argv[2], "views"))
