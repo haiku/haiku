@@ -1691,9 +1691,16 @@ MemSizeToString(char string[], size_t size, system_info* info)
 	int inaccessibleMemory = int(info->ignored_pages
 		* (B_PAGE_SIZE / 1048576.0f) + 0.5f);
 	if (inaccessibleMemory > 0) {
-		snprintf(string, size, B_TRANSLATE("%d MiB total, %d MiB inaccessible"),
-			int((info->max_pages + info->ignored_pages)
-			* (B_PAGE_SIZE / 1048576.0f) + 0.5f), inaccessibleMemory);
+		BString message(B_TRANSLATE("%total MiB total, %inaccessible MiB "
+			"inacessible"));
+
+		snprintf(string, size, "%d", int((info->max_pages
+			+ info->ignored_pages) * (B_PAGE_SIZE / 1048576.0f) + 0.5f));
+		message.ReplaceFirst("%total", string);
+
+		snprintf(string, size, "%d", inaccessibleMemory);
+		message.ReplaceFirst("%inaccessible", string);
+		strncpy(string, message.String(), size);
 	} else {
 		snprintf(string, size, B_TRANSLATE("%d MiB total"),
 			int(info->max_pages * (B_PAGE_SIZE / 1048576.0f) + 0.5f));
@@ -1721,7 +1728,7 @@ UptimeToString(char string[], size_t size)
 	BString str;
 
 	formatter.Format(system_time() / 1000000, &str);
-	str.CopyInto(string,0,size);
+	str.CopyInto(string, 0, size);
 	string[str.Length()] = '\0';
 
 	return string;
