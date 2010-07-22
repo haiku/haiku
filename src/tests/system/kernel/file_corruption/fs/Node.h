@@ -79,6 +79,8 @@ public:
 			void				Touched(int32 mode);
 
 	inline	bool				ReadLock();
+	inline	bool				ReadLockWithTimeout(uint32 timeoutFlags,
+									bigtime_t timeout);
 	inline	void				ReadUnlock();
 	inline	bool				WriteLock();
 	inline	void				WriteUnlock();
@@ -146,6 +148,14 @@ bool
 Node::ReadLock()
 {
 	return rw_lock_read_lock(&fLock) == B_OK;
+}
+
+
+bool
+Node::ReadLockWithTimeout(uint32 timeoutFlags, bigtime_t timeout)
+{
+	return rw_lock_read_lock_with_timeout(&fLock, timeoutFlags, timeout)
+		== B_OK;
 }
 
 
