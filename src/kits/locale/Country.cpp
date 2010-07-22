@@ -38,42 +38,58 @@ using BPrivate::B_WEEK_START_SUNDAY;
 BCountry::BCountry(const char* languageCode, const char* countryCode)
 {
 	fICULocale = new ICU_VERSION::Locale(languageCode, countryCode);
-	fICULongDateFormatter = DateFormat::createDateInstance(
-		DateFormat::FULL, *fICULocale);
- 	fICUShortDateFormatter = DateFormat::createDateInstance(
-		DateFormat::SHORT, *fICULocale);
-	fICULongTimeFormatter = DateFormat::createTimeInstance(
-		DateFormat::MEDIUM, *fICULocale);
- 	fICUShortTimeFormatter = DateFormat::createTimeInstance(
-		DateFormat::SHORT, *fICULocale);
+	fICULongDateFormatter = NULL;
+	fICUShortDateFormatter = NULL;
+	fICULongTimeFormatter = NULL;
+	fICUShortTimeFormatter = NULL;
 }
 
 
 BCountry::BCountry(const char* languageAndCountryCode)
 {
 	fICULocale = new ICU_VERSION::Locale(languageAndCountryCode);
-	fICULongDateFormatter = DateFormat::createDateInstance(
-		DateFormat::FULL, *fICULocale);
- 	fICUShortDateFormatter = DateFormat::createDateInstance(
-		DateFormat::SHORT, *fICULocale);
-	fICULongTimeFormatter = DateFormat::createTimeInstance(
-		DateFormat::MEDIUM, *fICULocale);
- 	fICUShortTimeFormatter = DateFormat::createTimeInstance(
-		DateFormat::SHORT, *fICULocale);
+
+	// These will be initialized the first time they are actually needed
+	// this way the class is more lightweight when you just want the country
+	// name or some other information
+	fICULongDateFormatter = NULL;
+	fICUShortDateFormatter = NULL;
+	fICULongTimeFormatter = NULL;
+	fICUShortTimeFormatter = NULL;
 }
 
 
 BCountry::BCountry(const BCountry& other)
 {
 	fICULocale = new ICU_VERSION::Locale(*other.fICULocale);
-	fICULongDateFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICULongDateFormatter));
- 	fICUShortDateFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICUShortDateFormatter));
-	fICULongTimeFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICULongTimeFormatter));
- 	fICUShortTimeFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICUShortTimeFormatter));
+
+	// We could copy these, but we can recreate them when needed from the locale anyway
+	fICULongDateFormatter = NULL;
+	fICUShortDateFormatter = NULL;
+	fICULongTimeFormatter = NULL;
+	fICUShortTimeFormatter = NULL;
+
+	/*
+	if (other.fICULongDateFormatter) {
+		fICULongDateFormatter = new ICU_VERSION::SimpleDateFormat(
+			*static_cast<SimpleDateFormat*>(other.fICULongDateFormatter));
+	}
+
+	if (other.fICUShortDateFormatter) {
+		fICUShortDateFormatter = new ICU_VERSION::SimpleDateFormat(
+			*static_cast<SimpleDateFormat*>(other.fICUShortDateFormatter));
+	}
+
+	if (other.fICULongTimeFormatter) {
+		fICULongTimeFormatter = new ICU_VERSION::SimpleDateFormat(
+			*static_cast<SimpleDateFormat*>(other.fICULongTimeFormatter));
+	}
+
+	if (other.fICUShortTimeFormatter) {
+		fICUShortTimeFormatter = new ICU_VERSION::SimpleDateFormat(
+			*static_cast<SimpleDateFormat*>(other.fICUShortTimeFormatter));
+	}
+	*/
 }
 
 
@@ -90,14 +106,12 @@ BCountry::operator=(const BCountry& other)
 	delete fICULocale;
 
 	fICULocale = new ICU_VERSION::Locale(*other.fICULocale);
-	fICULongDateFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICULongDateFormatter));
- 	fICUShortDateFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICUShortDateFormatter));
-	fICULongTimeFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICULongTimeFormatter));
- 	fICUShortTimeFormatter = new ICU_VERSION::SimpleDateFormat(
-		*static_cast<SimpleDateFormat*>(other.fICUShortTimeFormatter));
+
+	// We could copy these, but we can recreate them when needed from the locale anyway
+	fICULongDateFormatter = NULL;
+	fICUShortDateFormatter = NULL;
+	fICULongTimeFormatter = NULL;
+	fICUShortTimeFormatter = NULL;
 
 	return *this;
 }
@@ -165,6 +179,47 @@ BCountry::GetIcon(BBitmap* result)
 }
 
 
+// #pragma mark - Date and Time
+
+
+DateFormat*
+BCountry::DateFormatter(bool longFormat)
+{
+	if (longFormat) {
+		if (fICULongDateFormatter == NULL) {
+			fICULongDateFormatter = DateFormat::createDateInstance(
+				DateFormat::FULL, *fICULocale);
+		}
+		return fICULongDateFormatter;
+	} else {
+		if (fICUShortDateFormatter == NULL) {
+			fICUShortDateFormatter = DateFormat::createDateInstance(
+				DateFormat::SHORT, *fICULocale);
+		}
+		return fICUShortDateFormatter;
+	}
+}
+
+
+DateFormat*
+BCountry::TimeFormatter(bool longFormat)
+{
+	if (longFormat) {
+		if (fICULongTimeFormatter == NULL) {
+			fICULongTimeFormatter = DateFormat::createTimeInstance(
+				DateFormat::MEDIUM, *fICULocale);
+		}
+		return fICULongTimeFormatter;
+	} else {
+		if (fICUShortTimeFormatter == NULL) {
+			fICUShortTimeFormatter = DateFormat::createTimeInstance(
+				DateFormat::SHORT, *fICULocale);
+		}
+		return fICUShortTimeFormatter;
+	}
+}
+
+
 void
 BCountry::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 {
@@ -179,10 +234,9 @@ BCountry::FormatDate(BString *string, time_t time, bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
-	ICU_VERSION::DateFormat* dateFormatter
-		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	UnicodeString ICUString;
-	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
+	ICUString = DateFormatter(longFormat)->format((UDate)time * 1000,
+		ICUString);
 
 	string->Truncate(0);
 	BStringByteSink stringConverter(string);
@@ -197,11 +251,9 @@ BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 {
 	fieldPositions = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::DateFormat* dateFormatter;
 	ICU_VERSION::FieldPositionIterator positionIterator;
-	dateFormatter = longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	UnicodeString ICUString;
-	ICUString = dateFormatter->format((UDate)time * 1000, ICUString,
+	ICUString = DateFormatter(longFormat)->format((UDate)time * 1000, ICUString,
 		&positionIterator, error);
 
 	if (error != U_ZERO_ERROR)
@@ -244,10 +296,9 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
-	ICU_VERSION::DateFormat* timeFormatter;
-	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	UnicodeString ICUString;
-	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
+	ICUString = TimeFormatter(longFormat)->format((UDate)time * 1000,
+		ICUString);
 
 	string->Truncate(0);
 	BStringByteSink stringConverter(string);
@@ -262,11 +313,9 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 {
 	fieldPositions = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::DateFormat* timeFormatter;
 	ICU_VERSION::FieldPositionIterator positionIterator;
-	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	UnicodeString ICUString;
-	ICUString = timeFormatter->format((UDate)time * 1000, ICUString,
+	ICUString = TimeFormatter(longFormat)->format((UDate)time * 1000, ICUString,
 		&positionIterator, error);
 
 	if (error != U_ZERO_ERROR)
@@ -300,13 +349,11 @@ BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 {
 	fields = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::DateFormat* timeFormatter;
 	ICU_VERSION::FieldPositionIterator positionIterator;
-	timeFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	UnicodeString ICUString;
 	time_t now;
-	ICUString = timeFormatter->format((UDate)time(&now) * 1000, ICUString,
-		&positionIterator, error);
+	ICUString = TimeFormatter(longFormat)->format((UDate)time(&now) * 1000,
+		ICUString, &positionIterator, error);
 
 	if (error != U_ZERO_ERROR)
 		return B_ERROR;
@@ -353,13 +400,11 @@ BCountry::DateFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 {
 	fields = NULL;
 	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::DateFormat* dateFormatter;
 	ICU_VERSION::FieldPositionIterator positionIterator;
-	dateFormatter = longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	UnicodeString ICUString;
 	time_t now;
-	ICUString = dateFormatter->format((UDate)time(&now) * 1000, ICUString,
-		&positionIterator, error);
+	ICUString = DateFormatter(longFormat)->format((UDate)time(&now) * 1000,
+		ICUString, &positionIterator, error);
 
 	if (error != U_ZERO_ERROR)
 		return B_ERROR;
@@ -396,12 +441,10 @@ BCountry::DateFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 
 
 bool
-BCountry::DateFormat(BString& format, bool longFormat) const
+BCountry::DateFormat(BString& format, bool longFormat)
 {
-	ICU_VERSION::DateFormat* dateFormatter
-		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(dateFormatter);
+		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
 
 	UnicodeString ICUString;
 	ICUString = dateFormatterImpl->toPattern(ICUString);
@@ -417,10 +460,8 @@ BCountry::DateFormat(BString& format, bool longFormat) const
 void
 BCountry::SetDateFormat(const char* formatString, bool longFormat)
 {
-	ICU_VERSION::DateFormat* dateFormatter
-		= longFormat ? fICULongDateFormatter : fICUShortDateFormatter;
 	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(dateFormatter);
+		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
 
 	UnicodeString pattern(formatString);
 	dateFormatterImpl->applyPattern(pattern);
@@ -430,10 +471,8 @@ BCountry::SetDateFormat(const char* formatString, bool longFormat)
 void
 BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 {
-	ICU_VERSION::DateFormat* dateFormatter
-		= longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(dateFormatter);
+		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
 
 	UnicodeString pattern(formatString);
 	dateFormatterImpl->applyPattern(pattern);
@@ -441,12 +480,10 @@ BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 
 
 bool
-BCountry::TimeFormat(BString& format, bool longFormat) const
+BCountry::TimeFormat(BString& format, bool longFormat)
 {
-	ICU_VERSION::DateFormat* dateFormatter;
- 	dateFormatter = longFormat ? fICULongTimeFormatter : fICUShortTimeFormatter;
 	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(dateFormatter);
+		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
 
 	UnicodeString ICUString;
 	ICUString = dateFormatterImpl->toPattern(ICUString);
@@ -474,6 +511,9 @@ BCountry::StartOfWeek()
 		return B_WEEK_START_MONDAY;
 	}
 }
+
+
+// #pragma mark - Numbers
 
 
 void

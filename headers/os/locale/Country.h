@@ -68,12 +68,12 @@ class BCountry {
 		status_t		DateFields(BDateElement*& fields, int& fieldCount,
 			bool longFormat);
 
-		bool		DateFormat(BString&, bool longFormat) const;
+		bool		DateFormat(BString&, bool longFormat);
 		void		SetDateFormat(const char* formatString,
 						bool longFormat = true);
 		void		SetTimeFormat(const char* formatString,
 						bool longFormat = true);
-		bool		TimeFormat(BString&, bool longFormat) const;
+		bool		TimeFormat(BString&, bool longFormat);
 
 		int			StartOfWeek();
 
@@ -112,6 +112,9 @@ class BCountry {
 		status_t GetTimeZones(BMessage* timezones);
 
 	private:
+		icu_44::DateFormat* DateFormatter(bool longFormat);
+		icu_44::DateFormat* TimeFormatter(bool longFormat);
+
 		icu_44::DateFormat* fICULongDateFormatter;
 		icu_44::DateFormat* fICUShortDateFormatter;
 		icu_44::DateFormat* fICULongTimeFormatter;
