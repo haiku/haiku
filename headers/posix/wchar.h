@@ -49,7 +49,7 @@ extern wint_t	fputwc(wchar_t, FILE *);
 extern int		fputws(const wchar_t *, FILE *);
 extern int		fwide(FILE *, int);
 extern int		fwprintf(FILE *, const wchar_t *, ...);
-extern int		fwscanf(FILE *, const wchar_t *, ...);
+/*extern int		fwscanf(FILE *, const wchar_t *, ...);*/
 extern wint_t	getwc(FILE *);
 extern wint_t	getwchar(void);
 
