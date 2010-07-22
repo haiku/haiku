@@ -975,6 +975,7 @@ checksumfs_get_vnode(fs_volume* fsVolume, ino_t id, fs_vnode* vnode,
 	vnode->private_node = node;
 	vnode->ops = &gCheckSumFSVnodeOps;
 	*_type = node->Mode();
+	*_flags = 0;
 
 	return B_OK;
 }
@@ -1083,7 +1084,15 @@ checksumfs_io(fs_volume* fsVolume, fs_vnode* vnode, void* cookie,
 	}
 
 	// Read-lock the file -- we'll unlock it in the finished hook.
-	file->ReadLock();
+	if (io_request_is_vip(request)) {
+		// We cannot wait for the node lock indefinitely. So try read-locking
+		// with a timeout (0.1 s).
+		if (!file->ReadLockWithTimeout(B_RELATIVE_TIMEOUT, 100000)) {
+	        notify_io_request(request, B_BUSY);
+			RETURN_ERROR(B_BUSY);
+		}
+	} else
+		file->ReadLock();
 
 	RETURN_ERROR(do_iterative_fd_io(volume->FD(), request,
 		iterative_io_get_vecs_hook, iterative_io_finished_hook, file));
