@@ -2,13 +2,14 @@
 
 _progress () {
 	notify --type progress --app mimeset \
+	--timeout ${3:-30} \
 	--icon /boot/system/apps/DiskProbe \
 	--messageID $0_$$ \
 	--title "Updating file MIME types..." \
 	--progress $1 "$2" >/dev/null
 }
 
-_progress 0.1 "desktop files"
+_progress 0.0 "desktop files"
 
 # Make sure files on the desktop are mimeset first
 
@@ -37,4 +38,4 @@ _progress 0.7 "application (by signature)"
 
 query -f 'BEOS:APP_SIG=*' | xargs --no-run-if-empty mimeset -apps -f
 
-_progress 1.0 "done"
+_progress 1.0 "done" 10
