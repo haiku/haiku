@@ -485,7 +485,7 @@ status_t
 BlockAllocator::_AllocateInBitmapBlock(uint64 base, uint32 count,
 	Transaction& transaction, uint64* _allocatedBase, uint32& _allocatedCount)
 {
-	PRINT("BlockAllocator::_AllocateInBitmapBlock(%" B_PRIu64 "u, %" B_PRIu32
+	PRINT("BlockAllocator::_AllocateInBitmapBlock(%" B_PRIu64 ", %" B_PRIu32
 		")\n", base, count);
 
 	ASSERT(count <= kBlocksPerBitmapBlock);
