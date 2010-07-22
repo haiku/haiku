@@ -2073,10 +2073,9 @@ page_writer(void* /*unused*/)
 			pageWritingTime = 0;
 		}
 
-		if (failedPages == numPages) {
-			pagesSinceLastSuccessfulWrite
-				+= modifiedPages - maxPagesToSee - numPages;
-		} else
+		if (failedPages == numPages)
+			pagesSinceLastSuccessfulWrite += modifiedPages - maxPagesToSee;
+		else
 			pagesSinceLastSuccessfulWrite = 0;
 	}
 
