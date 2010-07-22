@@ -516,6 +516,11 @@ TBarApp::MessageReceived(BMessage* message)
 		case B_LOCALE_CHANGED:
 		{
 			be_locale_roster->UpdateSettings(message);
+
+			BMessenger(fBarWindow->FindView("_deskbar_tv_")).SendMessage(
+				message);
+				// Notify the TimeView that the format has changed and it should
+				// recompute its size
 			break;
 		}
 

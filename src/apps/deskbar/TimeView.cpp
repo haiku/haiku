@@ -71,7 +71,7 @@ enum {
 TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	bool fullDate, bool)
 	:
-	BView(BRect(-100,-100,-90,-90), "_deskbar_tv_",
+	BView(BRect(-100, -100, -90, -90), "_deskbar_tv_",
 	B_FOLLOW_RIGHT | B_FOLLOW_TOP,
 	B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
 	fParent(NULL),
@@ -90,7 +90,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	fLastTimeStr[0] = 0;
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
-	
+
 	be_locale_roster->GetDefaultCountry(&fHere);
 }
 
@@ -104,7 +104,7 @@ TTimeView::TTimeView(BMessage* data)
 	data->FindBool("fulldate", &fFullDate);
 	data->FindBool("interval", &fInterval);
 	fShowingDate = false;
-	
+
 	be_locale_roster->GetDefaultCountry(&fHere);
 }
 #endif
@@ -215,6 +215,10 @@ TTimeView::MessageReceived(BMessage* message)
 			ShowSeconds(!ShowingSeconds());
 			break;
 
+		case B_LOCALE_CHANGED:
+			Update();
+			break;
+
 		case kChangeClock:
 			// launch the time prefs app
 			be_roster->Launch("application/x-vnd.Haiku-Time");
@@ -304,12 +308,12 @@ TTimeView::GetCurrentTime()
 {
 	// TODO : should this be another function ?
 	tm time = *localtime(&fTime);
-	
+
 	fSeconds = time.tm_sec;
 	fMinute = time.tm_min;
 	fHour = time.tm_hour;
-	
-	fHere->FormatTime(fTimeStr, 64, fTime, fShowSeconds);	
+
+	fHere->FormatTime(fTimeStr, 64, fTime, fShowSeconds);
 }
 
 
@@ -318,7 +322,7 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[64];
 
-	fHere->FormatDate(tmp, 64, fTime, fFullDate && CanShowFullDate()); 
+	fHere->FormatDate(tmp, 64, fTime, fFullDate && CanShowFullDate());
 
 	//	remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	//  or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -502,8 +506,8 @@ TTimeView::CalculateTextPlacement()
 	font.GetBoundingBoxesForStrings(stringArray, 1, B_SCREEN_METRIC, &delta,
 		rectArray);
 
-	fTimeLocation.y = fDateLocation.y = ceilf((bounds.Height() -
-		rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);
+	fTimeLocation.y = fDateLocation.y = ceilf((bounds.Height()
+		- rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);
 }
 
 
