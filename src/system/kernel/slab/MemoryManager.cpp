@@ -570,6 +570,7 @@ MemoryManager::Free(void* pages, uint32 flags)
 	MetaChunk* metaChunk = &area->metaChunks[
 		((addr_t)pages % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
 
+	ASSERT(metaChunk->chunkSize > 0);
 	ASSERT((addr_t)pages >= metaChunk->chunkBase);
 	ASSERT(((addr_t)pages % metaChunk->chunkSize) == 0);
 
@@ -696,6 +697,7 @@ MemoryManager::FreeRawOrReturnCache(void* pages, uint32 flags)
 		((addr_t)pages % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
 
 	// get the chunk
+	ASSERT(metaChunk->chunkSize > 0);
 	ASSERT((addr_t)pages >= metaChunk->chunkBase);
 	uint16 chunkIndex = _ChunkIndexForAddress(metaChunk, (addr_t)pages);
 	Chunk* chunk = &metaChunk->chunks[chunkIndex];
@@ -760,6 +762,7 @@ MemoryManager::GetAllocationInfo(void* address, size_t& _size)
 		((addr_t)address % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
 
 	// get the chunk
+	ASSERT(metaChunk->chunkSize > 0);
 	ASSERT((addr_t)address >= metaChunk->chunkBase);
 	uint16 chunkIndex = _ChunkIndexForAddress(metaChunk, (addr_t)address);
 
@@ -790,6 +793,7 @@ MemoryManager::CacheForAddress(void* address)
 		((addr_t)address % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
 
 	// get the chunk
+	ASSERT(metaChunk->chunkSize > 0);
 	ASSERT((addr_t)address >= metaChunk->chunkBase);
 	uint16 chunkIndex = _ChunkIndexForAddress(metaChunk, (addr_t)address);
 
