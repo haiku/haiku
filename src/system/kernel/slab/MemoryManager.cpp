@@ -9,7 +9,6 @@
 #include <algorithm>
 
 #include <debug.h>
-#include <kernel.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <vm/vm.h>
@@ -567,7 +566,7 @@ MemoryManager::Free(void* pages, uint32 flags)
 	T(Free(pages, flags));
 
 	// get the area and the meta chunk
-	Area* area = (Area*)ROUNDDOWN((addr_t)pages, SLAB_AREA_SIZE);
+	Area* area = _AreaForAddress((addr_t)pages);
 	MetaChunk* metaChunk = &area->metaChunks[
 		((addr_t)pages % SLAB_AREA_SIZE) / SLAB_CHUNK_SIZE_LARGE];
 
@@ -672,7 +671,7 @@ MemoryManager::FreeRawOrReturnCache(void* pages, uint32 flags)
 	T(FreeRawOrReturnCache(pages, flags));
 
 	// get the area
-	addr_t areaBase = ROUNDDOWN((addr_t)pages, SLAB_AREA_SIZE);
+	addr_t areaBase = _AreaBaseAddressForAddress((addr_t)pages);
 
 	ReadLocker readLocker(sAreaTableLock);
 	Area* area = sAreaTable.Lookup(areaBase);
@@ -740,10 +739,8 @@ MemoryManager::AcceptableChunkSize(size_t size)
 MemoryManager::GetAllocationInfo(void* address, size_t& _size)
 {
 	// get the area
-	addr_t areaBase = ROUNDDOWN((addr_t)address, SLAB_AREA_SIZE);
-
 	ReadLocker readLocker(sAreaTableLock);
-	Area* area = sAreaTable.Lookup(areaBase);
+	Area* area = sAreaTable.Lookup(_AreaBaseAddressForAddress((addr_t)address));
 	readLocker.Unlock();
 
 	if (area == NULL) {
@@ -782,10 +779,8 @@ MemoryManager::GetAllocationInfo(void* address, size_t& _size)
 MemoryManager::CacheForAddress(void* address)
 {
 	// get the area
-	addr_t areaBase = ROUNDDOWN((addr_t)address, SLAB_AREA_SIZE);
-
 	ReadLocker readLocker(sAreaTableLock);
-	Area* area = sAreaTable.Lookup(areaBase);
+	Area* area = sAreaTable.Lookup(_AreaBaseAddressForAddress((addr_t)address));
 	readLocker.Unlock();
 
 	if (area == NULL)
@@ -1156,8 +1151,9 @@ MemoryManager::_PrepareMetaChunk(MetaChunk* metaChunk, size_t chunkSize)
 
 	if (metaChunk == area->metaChunks) {
 		// the first chunk is shorter
-		size_t unusableSize = ROUNDUP(kAreaAdminSize, chunkSize);
-		metaChunk->chunkBase = (addr_t)area + unusableSize;
+		size_t unusableSize = ROUNDUP(SLAB_AREA_STRUCT_OFFSET + kAreaAdminSize,
+			chunkSize);
+		metaChunk->chunkBase = area->BaseAddress() + unusableSize;
 		metaChunk->totalSize = SLAB_CHUNK_SIZE_LARGE - unusableSize;
 	}
 
@@ -1203,6 +1199,7 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 	mutex_unlock(&sLock);
 
 	size_t pagesNeededToMap = 0;
+	void* areaBase;
 	Area* area;
 	VMArea* vmArea = NULL;
 
@@ -1211,19 +1208,21 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 		uint32 areaCreationFlags = (flags & CACHE_PRIORITY_VIP) != 0
 			? CREATE_AREA_PRIORITY_VIP : 0;
 		area_id areaID = vm_create_null_area(B_SYSTEM_TEAM, kSlabAreaName,
-			(void**)&area, B_ANY_KERNEL_BLOCK_ADDRESS, SLAB_AREA_SIZE,
+			&areaBase, B_ANY_KERNEL_BLOCK_ADDRESS, SLAB_AREA_SIZE,
 			areaCreationFlags);
 		if (areaID < 0) {
 			mutex_lock(&sLock);
 			return areaID;
 		}
 
+		area = _AreaForAddress((addr_t)areaBase);
+
 		// map the memory for the administrative structure
 		VMAddressSpace* addressSpace = VMAddressSpace::Kernel();
 		VMTranslationMap* translationMap = addressSpace->TranslationMap();
 
-		pagesNeededToMap = translationMap->MaxPagesNeededToMap((addr_t)area,
-			(addr_t)area + SLAB_AREA_SIZE - 1);
+		pagesNeededToMap = translationMap->MaxPagesNeededToMap(
+			(addr_t)area, (addr_t)areaBase + SLAB_AREA_SIZE - 1);
 
 		vmArea = VMAreaHash::Lookup(areaID);
 		status_t error = _MapChunk(vmArea, (addr_t)area, kAreaAdminSize,
@@ -1238,13 +1237,14 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 			areaID);
 	} else {
 		// no areas yet -- allocate raw memory
-		area = (Area*)vm_allocate_early(sKernelArgs, SLAB_AREA_SIZE,
+		areaBase = (void*)vm_allocate_early(sKernelArgs, SLAB_AREA_SIZE,
 			SLAB_AREA_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			SLAB_AREA_SIZE);
-		if (area == NULL) {
+		if (areaBase == NULL) {
 			mutex_lock(&sLock);
 			return B_NO_MEMORY;
 		}
+		area = _AreaForAddress((addr_t)areaBase);
 
 		TRACE("MemoryManager::_AllocateArea(): allocated early area %p\n",
 			area);
@@ -1260,7 +1260,7 @@ MemoryManager::_AllocateArea(uint32 flags, Area*& _area)
 	for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
 		MetaChunk* metaChunk = area->metaChunks + i;
 		metaChunk->chunkSize = 0;
-		metaChunk->chunkBase = (addr_t)area + i * SLAB_CHUNK_SIZE_LARGE;
+		metaChunk->chunkBase = (addr_t)areaBase + i * SLAB_CHUNK_SIZE_LARGE;
 		metaChunk->totalSize = SLAB_CHUNK_SIZE_LARGE;
 			// Note: chunkBase and totalSize aren't correct for the first
 			// meta chunk. They will be set in _PrepareMetaChunk().
@@ -1458,6 +1458,12 @@ MemoryManager::_UnmapFreeChunksEarly(Area* area)
 
 	TRACE("MemoryManager::_UnmapFreeChunksEarly(%p)\n", area);
 
+	// unmap the space before the Area structure
+	#if SLAB_AREA_STRUCT_OFFSET > 0
+		_UnmapChunk(area->vmArea, area->BaseAddress(), SLAB_AREA_STRUCT_OFFSET,
+			0);
+	#endif
+
 	for (int32 i = 0; i < SLAB_META_CHUNKS_PER_AREA; i++) {
 		MetaChunk* metaChunk = area->metaChunks + i;
 		if (metaChunk->chunkSize == 0) {
@@ -1467,7 +1473,7 @@ MemoryManager::_UnmapFreeChunksEarly(Area* area)
 					SLAB_CHUNK_SIZE_LARGE - kAreaAdminSize, 0);
 			} else {
 				_UnmapChunk(area->vmArea,
-					(addr_t)area + i * SLAB_CHUNK_SIZE_LARGE,
+					area->BaseAddress() + i * SLAB_CHUNK_SIZE_LARGE,
 					SLAB_CHUNK_SIZE_LARGE, 0);
 			}
 		} else {
@@ -1496,7 +1502,7 @@ MemoryManager::_UnmapFreeChunksEarly(Area* area)
 /*static*/ void
 MemoryManager::_ConvertEarlyArea(Area* area)
 {
-	void* address = area;
+	void* address = (void*)area->BaseAddress();
 	area_id areaID = create_area(kSlabAreaName, &address, B_EXACT_ADDRESS,
 		SLAB_AREA_SIZE, B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -1565,7 +1571,8 @@ MemoryManager::_CheckMetaChunk(MetaChunk* metaChunk)
 		return;
 	}
 
-	addr_t expectedBase = (addr_t)area + metaChunkIndex * SLAB_CHUNK_SIZE_LARGE;
+	addr_t expectedBase = area->BaseAddress()
+		+ metaChunkIndex * SLAB_CHUNK_SIZE_LARGE;
 	if (metaChunk->chunkBase < expectedBase
 		|| metaChunk->chunkBase - expectedBase + metaChunk->totalSize
 			> SLAB_CHUNK_SIZE_LARGE) {
@@ -1778,7 +1785,7 @@ MemoryManager::_DumpMetaChunk(int argc, char** argv)
 	if (!evaluate_debug_expression(argv[1], &address, false))
 		return 0;
 
-	Area* area = (Area*)(addr_t)ROUNDDOWN(address, SLAB_AREA_SIZE);
+	Area* area = _AreaForAddress(address);
 
 	MetaChunk* metaChunk;
 	if ((addr_t)address >= (addr_t)area->metaChunks
@@ -1851,9 +1858,7 @@ MemoryManager::_DumpArea(int argc, char** argv)
 	if (!evaluate_debug_expression(argv[argi], &address, false))
 		return 0;
 
-	address = ROUNDDOWN(address, SLAB_AREA_SIZE);
-
-	Area* area = (Area*)(addr_t)address;
+	Area* area = _AreaForAddress((addr_t)address);
 
 	for (uint32 k = 0; k < SLAB_META_CHUNKS_PER_AREA; k++) {
 		MetaChunk* metaChunk = area->metaChunks + k;

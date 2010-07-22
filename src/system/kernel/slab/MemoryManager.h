@@ -25,6 +25,10 @@ struct VMArea;
 #define SLAB_CHUNK_SIZE_LARGE	(128 * B_PAGE_SIZE)
 #define SLAB_AREA_SIZE			(2048 * B_PAGE_SIZE)
 	// TODO: These sizes have been chosen with 4 KB pages in mind.
+#define SLAB_AREA_STRUCT_OFFSET	B_PAGE_SIZE
+	// The offset from the start of the area to the Area structure. This space
+	// is not mapped and will trip code writing beyond the previous area's
+	// bounds.
 
 #define SLAB_META_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_LARGE)
 #define SLAB_SMALL_CHUNKS_PER_AREA	(SLAB_AREA_SIZE / SLAB_CHUNK_SIZE_SMALL)
@@ -80,6 +84,7 @@ private:
 				Area*			GetArea() const;
 			};
 
+			friend class MetaChunk;
 			typedef DoublyLinkedList<MetaChunk> MetaChunkList;
 
 			struct Area : DoublyLinkedListLinkImpl<Area> {
@@ -89,6 +94,11 @@ private:
 				uint16			usedMetaChunkCount;
 				bool			fullyMapped;
 				MetaChunk		metaChunks[SLAB_META_CHUNKS_PER_AREA];
+
+				addr_t BaseAddress() const
+				{
+					return (addr_t)this - SLAB_AREA_STRUCT_OFFSET;
+				}
 			};
 
 			typedef DoublyLinkedList<Area> AreaList;
@@ -104,12 +114,12 @@ private:
 
 				size_t Hash(const Area* value) const
 				{
-					return HashKey((addr_t)value);
+					return HashKey(value->BaseAddress());
 				}
 
 				bool Compare(addr_t key, const Area* value) const
 				{
-					return key == (addr_t)value;
+					return key == value->BaseAddress();
 				}
 
 				Area*& GetLink(Area* value) const
@@ -158,6 +168,8 @@ private:
 
 	static	void				_RequestMaintenance();
 
+	static	addr_t				_AreaBaseAddressForAddress(addr_t address);
+	static	Area*				_AreaForAddress(addr_t address);
 	static	uint32				_ChunkIndexForAddress(
 									const MetaChunk* metaChunk, addr_t address);
 	static	addr_t				_ChunkAddress(const MetaChunk* metaChunk,
@@ -207,6 +219,21 @@ MemoryManager::MaintenanceNeeded()
 }
 
 
+/*static*/ inline addr_t
+MemoryManager::_AreaBaseAddressForAddress(addr_t address)
+{
+	return ROUNDDOWN((addr_t)address, SLAB_AREA_SIZE);
+}
+
+
+/*static*/ inline MemoryManager::Area*
+MemoryManager::_AreaForAddress(addr_t address)
+{
+	return (Area*)(_AreaBaseAddressForAddress(address)
+		+ SLAB_AREA_STRUCT_OFFSET);
+}
+
+
 /*static*/ inline uint32
 MemoryManager::_ChunkIndexForAddress(const MetaChunk* metaChunk, addr_t address)
 {
@@ -234,7 +261,7 @@ MemoryManager::_IsChunkFree(const MetaChunk* metaChunk, const Chunk* chunk)
 inline MemoryManager::Area*
 MemoryManager::MetaChunk::GetArea() const
 {
-	return (Area*)ROUNDDOWN((addr_t)this, SLAB_AREA_SIZE);
+	return _AreaForAddress((addr_t)this);
 }
 
 
