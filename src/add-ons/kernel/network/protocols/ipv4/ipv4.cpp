@@ -1378,7 +1378,7 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 		if (header.Status() != B_OK)
 			return header.Status();
 
-		header->version = IP_VERSION;
+		header->version = IPV4_VERSION;
 		header->header_length = sizeof(ipv4_header) / 4;
 		header->service_type = protocol ? protocol->service_type : 0;
 		header->total_length = htons(buffer->size);
@@ -1397,6 +1397,8 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 
 		header->source = source.sin_addr.s_addr;
 		header->destination = destination.sin_addr.s_addr;
+
+		TRACE_ONLY(dump_ipv4_header(*header));
 	} else {
 		// if IP_HDRINCL, check if the source address is set
 		NetBufferHeaderReader<ipv4_header> header(buffer);
@@ -1409,6 +1411,9 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 			header.Sync();
 		} else
 			checksumNeeded = false;
+
+		TRACE("  Header was already supplied:");
+		TRACE_ONLY(dump_ipv4_header(*header));
 	}
 
 	if (buffer->size > 0xffff)
@@ -1444,7 +1449,7 @@ ipv4_send_data(net_protocol* _protocol, net_buffer* buffer)
 
 	TRACE_SK(protocol, "SendData(%p [%ld bytes])", buffer, buffer->size);
 
-	if (protocol && (protocol->flags & IP_FLAG_HEADER_INCLUDED)) {
+	if (protocol != NULL && (protocol->flags & IP_FLAG_HEADER_INCLUDED)) {
 		if (buffer->size < sizeof(ipv4_header))
 			return B_BAD_VALUE;
 
@@ -1551,7 +1556,7 @@ ipv4_receive_data(net_buffer* buffer)
 	ipv4_header& header = bufferHeader.Data();
 	TRACE_ONLY(dump_ipv4_header(header));
 
-	if (header.version != IP_VERSION)
+	if (header.version != IPV4_VERSION)
 		return B_BAD_TYPE;
 
 	uint16 packetLength = header.TotalLength();
@@ -1585,6 +1590,7 @@ ipv4_receive_data(net_buffer* buffer)
 				buffer->destination, &buffer->interface)) {
 			TRACE("  ReceiveData(): packet was not for us %x -> %x",
 				ntohl(header.source), ntohl(header.destination));
+
 			// Send ICMP error: Host unreachable
 			sDomain->module->error_reply(NULL, buffer,
 				icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_HOST_UNREACH), NULL);
@@ -1600,7 +1606,6 @@ ipv4_receive_data(net_buffer* buffer)
 	memcpy(buffer->destination, &destination, sizeof(sockaddr_in));
 
 	uint8 protocol = buffer->protocol = header.protocol;
-	buffer->hoplimit = header.time_to_live;
 
 	// remove any trailing/padding data
 	status_t status = gBufferModule->trim(buffer, packetLength);
@@ -1625,20 +1630,14 @@ ipv4_receive_data(net_buffer* buffer)
 		}
 	}
 
-	// Preserve the ipv4 header for ICMP processing
-	// TODO: solve this differently, and discard net_buffer::network_header!
-	ipv4_header* clonedHeader = (ipv4_header*)malloc(sizeof(ipv4_header));
-	if (clonedHeader == NULL)
-		return B_NO_MEMORY;
-
-	memcpy(clonedHeader, &header, sizeof(ipv4_header));
-	buffer->network_header = clonedHeader;
-
 	// Since the buffer might have been changed (reassembled fragment)
 	// we must no longer access bufferHeader or header anymore after
 	// this point
 
 	bool rawDelivered = raw_receive_data(buffer);
+
+	// Preserve the ipv4 header for ICMP processing
+	gBufferModule->store_header(buffer);
 
 	gBufferModule->remove_header(buffer, headerLength);
 		// the header is of variable size and may include IP options

@@ -11,7 +11,7 @@
 #include <ByteOrder.h>
 
 
-#define IP_VERSION	4
+#define IPV4_VERSION			4
 
 // fragment flags
 #define IP_RESERVED_FLAG		0x8000

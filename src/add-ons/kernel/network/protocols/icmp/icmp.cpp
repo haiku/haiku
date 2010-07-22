@@ -26,6 +26,7 @@
 #include <net_protocol.h>
 #include <net_stack.h>
 #include <NetBufferUtilities.h>
+#include <NetUtilities.h>
 
 #include "ipv4.h"
 
@@ -94,6 +95,16 @@ get_domain(struct net_buffer* buffer)
 		return NULL;
 
 	return domain;
+}
+
+
+static void
+fill_sockaddr_in(sockaddr_in* target, in_addr_t address)
+{
+	target->sin_family = AF_INET;
+	target->sin_len = sizeof(sockaddr_in);
+	target->sin_port = 0;
+	target->sin_addr.s_addr = address;
 }
 
 
@@ -403,38 +414,25 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 	icmp_decode(code, icmpType, icmpCode);
 	TRACE("  icmp type %u, code %u\n", icmpType, icmpCode);
 
-	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
-	size_t offset = 0;
+	ipv4_header header;
+	if (gBufferModule->restore_header(buffer, 0, &header, sizeof(ipv4_header))
+			!= B_OK)
+		return B_BAD_VALUE;
 
-	// TODO: get rid of network_header
-	ipv4_header* header = (ipv4_header*)buffer->network_header;
-	if (header == NULL) {
-		if (bufferHeader.Status() != B_OK)
-			return bufferHeader.Status();
-
-		header = &bufferHeader.Data();
-		offset = header->HeaderLength();
+	// Check if we actually have an IPv4 header now
+	if (header.version != IPV4_VERSION
+		|| header.HeaderLength() < sizeof(ipv4_header)) {
+		TRACE("  no IPv4 header found\n");
+		return B_BAD_VALUE;
 	}
-
-	char originalData[64];
-	size_t originalSize
-		= std::min(buffer->size - offset, sizeof(originalData));
-	if (originalSize < 8) {
-		// We need at least 8 bytes of data of the original data
-		return B_ERROR;
-	}
-
-	status_t status = gBufferModule->read(buffer, offset, originalData,
-		originalSize);
-	if (status != B_OK)
-		return status;
 
 	// RFC 1122 3.2.2:
 	// ICMP error message should not be sent on reception of
 	// an ICMP error message,
-	if (header->protocol == IPPROTO_ICMP) {
-		icmp_header* icmpHeader = (icmp_header*)originalData;
-		if (is_icmp_error(icmpHeader->code))
+	if (header.protocol == IPPROTO_ICMP) {
+		uint8 type;
+		if (gBufferModule->restore_header(buffer, header.HeaderLength(), &type,
+				1) != B_OK || is_icmp_error(type))
 			return B_ERROR;
 	}
 
@@ -443,15 +441,20 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 		return B_ERROR;
 
 	// a non-initial fragment
-	if ((header->FragmentOffset() & IP_FRAGMENT_OFFSET_MASK) != 0)
+	if ((header.FragmentOffset() & IP_FRAGMENT_OFFSET_MASK) != 0)
 		return B_ERROR;
 
 	net_buffer* reply = gBufferModule->create(256);
 	if (reply == NULL)
 		return B_NO_MEMORY;
-		
-	memcpy(reply->source, buffer->destination, buffer->destination->sa_len);
-	memcpy(reply->destination, buffer->source, buffer->source->sa_len);
+	
+	if (buffer->destination->sa_family == AF_INET) {
+		memcpy(reply->source, buffer->destination, buffer->destination->sa_len);
+		memcpy(reply->destination, buffer->source, buffer->source->sa_len);
+	} else {
+		fill_sockaddr_in((sockaddr_in*)reply->source, header.destination);
+		fill_sockaddr_in((sockaddr_in*)reply->destination, header.source);
+	}
 
 	// Now prepare the ICMP header
 	NetBufferPrepend<icmp_header> icmpHeader(reply);
@@ -463,14 +466,19 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 	*ICMPChecksumField(reply)
 		= gBufferModule->checksum(reply, 0, reply->size, true);
 
-	// Append IP header + 64 bits of the original datagram
-	gBufferModule->append(reply, header, sizeof(ipv4_header));
+	// Append IP header + 8 byte of the original datagram
+	status_t status = gBufferModule->append_restored_header(reply, buffer, 0,
+		std::min(header.HeaderLength() + 8, (int)header.TotalLength()));
+	if (status == B_OK) {
+		net_domain* domain = get_domain(buffer);
+		if (domain == NULL)
+			return B_ERROR;
 
-	net_domain* domain = get_domain(buffer);
-	if (domain == NULL)
-		return B_ERROR;
+		TRACE("  send ICMP message to %s\n", AddressString(
+				domain->address_module, reply->destination, true).Data());
 
-	status = domain->module->send_data(NULL, reply);
+		status = domain->module->send_data(NULL, reply);
+	}
 	if (status != B_OK)
 		gBufferModule->free(reply);
 

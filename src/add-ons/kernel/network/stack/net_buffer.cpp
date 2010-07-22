@@ -50,6 +50,7 @@
 #include <debug_paranoia.h>
 
 #define DATA_NODE_READ_ONLY		0x1
+#define DATA_NODE_STORED_HEADER	0x2
 
 struct header_space {
 	uint16	size;
@@ -131,6 +132,7 @@ struct net_buffer_private : net_buffer {
 	data_header*				allocation_header;
 		// the current place where we allocate header space (nodes, ...)
 	ancillary_data_container*	ancillary_data;
+	size_t						stored_header_length;
 
 	struct {
 		struct sockaddr_storage	source;
@@ -576,11 +578,28 @@ private:
 
 
 static void
+dump_address(const char* prefix, sockaddr* address)
+{
+	if (address == NULL || address->sa_len == 0)
+		return;
+
+	dprintf("  %s: length %u, family %u\n", prefix, address->sa_len,
+		address->sa_family);
+
+	dump_block((char*)address + 2, address->sa_len - 2, "    ");
+}
+
+
+static void
 dump_buffer(net_buffer* _buffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
-	dprintf("buffer %p, size %ld\n", buffer, buffer->size);
+	dprintf("buffer %p, size %ld, flags %lx\n", buffer, buffer->size,
+		buffer->flags);
+	dump_address("source", buffer->source);
+	dump_address("destination", buffer->destination);
+
 	data_node* node = NULL;
 	while ((node = (data_node*)list_get_next_item(&buffer->buffers, node))
 			!= NULL) {
@@ -1038,10 +1057,7 @@ copy_metadata(net_buffer* destination, const net_buffer* source)
 	destination->interface = source->interface;
 	destination->offset = source->offset;
 	destination->protocol = source->protocol;
-	destination->hoplimit = source->hoplimit;
 	destination->type = source->type;
-
-	destination->network_header = NULL;
 }
 
 
@@ -1077,7 +1093,7 @@ create_buffer(size_t headerSpace)
 	list_add_item(&buffer->buffers, node);
 
 	buffer->ancillary_data = NULL;
-	buffer->network_header = NULL;
+	buffer->stored_header_length = 0;
 
 	buffer->source = (sockaddr*)&buffer->storage.source;
 	buffer->destination = (sockaddr*)&buffer->storage.destination;
@@ -1120,7 +1136,6 @@ free_buffer(net_buffer* _buffer)
 	}
 
 	delete_ancillary_data_container(buffer->ancillary_data);
-	free(buffer->network_header);
 
 	release_data_header(buffer->allocation_header);
 
@@ -1534,6 +1549,13 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 		find_thread(NULL), buffer, size, node->HeaderSpace()));
 	//dump_buffer(buffer);
 
+	if ((node->flags & DATA_NODE_STORED_HEADER) != 0) {
+		// throw any stored headers away
+		node->AddHeaderSpace(buffer->stored_header_length);
+		node->flags &= ~DATA_NODE_STORED_HEADER;
+		buffer->stored_header_length = 0;
+	}
+
 	if (node->HeaderSpace() < size) {
 		// we need to prepend new buffers
 
@@ -1791,6 +1813,7 @@ remove_header(net_buffer* _buffer, size_t bytes)
 		left -= node->used;
 		remove_data_node(node);
 		node = NULL;
+		buffer->stored_header_length = 0;
 	}
 
 	// cut remaining node, if any
@@ -1799,7 +1822,10 @@ remove_header(net_buffer* _buffer, size_t bytes)
 		size_t cut = min_c(node->used, left);
 		node->offset = 0;
 		node->start += cut;
-		node->AddHeaderSpace(cut);
+		if ((node->flags & DATA_NODE_STORED_HEADER) != 0)
+			buffer->stored_header_length += cut;
+		else
+			node->AddHeaderSpace(cut);
 		node->used -= cut;
 
 		node = (data_node*)list_get_next_item(&buffer->buffers, node);
@@ -2002,6 +2028,107 @@ transfer_ancillary_data(net_buffer* _from, net_buffer* _to)
 	from->ancillary_data = NULL;
 
 	return data;
+}
+
+
+/*!	Stores the current header position; even if the header is removed with
+	remove_header(), you can still reclaim it later using restore_header(),
+	unless you prepended different data (in which case restoring will fail).
+*/
+status_t
+store_header(net_buffer* _buffer)
+{
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	if (node == NULL)
+		return B_ERROR;
+
+	if ((node->flags & DATA_NODE_STORED_HEADER) != 0) {
+		// Someone else already stored the header - since we cannot
+		// differentiate between them, we throw away everything
+		node->AddHeaderSpace(buffer->stored_header_length);
+		node->flags &= ~DATA_NODE_STORED_HEADER;
+		buffer->stored_header_length = 0;
+
+		return B_ERROR;
+	}
+
+	buffer->stored_header_length = 0;
+	node->flags |= DATA_NODE_STORED_HEADER;
+
+	return B_OK;
+}
+
+
+ssize_t
+stored_header_length(net_buffer* _buffer)
+{
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	if (node == NULL || (node->flags & DATA_NODE_STORED_HEADER) == 0)
+		return B_BAD_VALUE;
+
+	return buffer->stored_header_length;
+}
+
+
+/*!	Reads from the complete buffer with an eventually stored header.
+	This function does not care whether or not there is a stored header at
+	all - you have to use the stored_header_length() function to find out.
+*/
+status_t
+restore_header(net_buffer* _buffer, uint32 offset, void* data, size_t bytes)
+{
+	net_buffer_private* buffer = (net_buffer_private*)_buffer;
+	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+	if (node == NULL
+		|| offset + bytes > buffer->stored_header_length + buffer->size)
+		return B_BAD_VALUE;
+
+	// We have the data, so copy it out
+
+	memcpy(data, node->start - buffer->stored_header_length,
+		std::min(bytes, buffer->stored_header_length));
+	
+	if (bytes <= buffer->stored_header_length)
+		return B_OK;
+
+	data = (uint8*)data + buffer->stored_header_length;
+	bytes -= buffer->stored_header_length;
+
+	return read_data(_buffer, 0, data, bytes);
+}
+
+
+/*!	Copies from the complete \a source buffer with an eventually stored header
+	to the specified target \a buffer.
+	This function does not care whether or not there is a stored header at
+	all - you have to use the stored_header_length() function to find out.
+*/
+status_t
+append_restored_header(net_buffer* buffer, net_buffer* _source, uint32 offset,
+	size_t bytes)
+{
+	net_buffer_private* source = (net_buffer_private*)_source;
+	data_node* node = (data_node*)list_get_first_item(&source->buffers);
+	if (node == NULL
+		|| offset + bytes > source->stored_header_length + source->size)
+		return B_BAD_VALUE;
+
+	// We have the data, so copy it out
+
+	status_t status = append_data(buffer,
+		node->start - source->stored_header_length,
+		std::min(bytes, source->stored_header_length));
+	if (status != B_OK)
+		return status;
+
+	if (bytes <= source->stored_header_length)
+		return B_OK;
+
+	bytes -= source->stored_header_length;
+
+	return append_cloned_data(buffer, source, 0, bytes);
 }
 
 
@@ -2216,6 +2343,11 @@ net_buffer_module_info gNetBufferModule = {
 	set_ancillary_data,
 	get_ancillary_data,
 	transfer_ancillary_data,
+
+	store_header,
+	stored_header_length,
+	restore_header,
+	append_restored_header,
 
 	direct_access,
 	read_data,
