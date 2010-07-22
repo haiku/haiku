@@ -146,7 +146,9 @@ find_route(struct net_domain* _domain, const net_route* description)
 			&& domain->address_module->equal_addresses(route->mask,
 				description->mask)
 			&& domain->address_module->equal_addresses(route->gateway,
-				description->gateway))
+				description->gateway)
+			&& (description->interface == NULL
+				|| description->interface == route->interface))
 			return route;
 	}
 
