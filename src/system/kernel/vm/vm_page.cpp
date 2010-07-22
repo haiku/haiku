@@ -1480,28 +1480,22 @@ remove_page_marker(struct vm_page &marker)
 }
 
 
-static vm_page *
-next_modified_page(struct vm_page &marker)
+static vm_page*
+next_modified_page(page_num_t& maxPagesToSee)
 {
 	InterruptsSpinLocker locker(sModifiedPageQueue.GetLock());
-	vm_page *page;
 
-	DEBUG_PAGE_ACCESS_CHECK(&marker);
+	while (maxPagesToSee > 0) {
+		vm_page* page = sModifiedPageQueue.Head();
+		if (page == NULL)
+			return NULL;
 
-	if (marker.State() == PAGE_STATE_MODIFIED) {
-		page = sModifiedPageQueue.Next(&marker);
-		sModifiedPageQueue.Remove(&marker);
-		marker.SetState(PAGE_STATE_UNUSED);
-	} else
-		page = sModifiedPageQueue.Head();
+		sModifiedPageQueue.Requeue(page, true);
 
-	for (; page != NULL; page = sModifiedPageQueue.Next(page)) {
-		if (!page->busy) {
-			// insert marker
-			marker.SetState(PAGE_STATE_MODIFIED);
-			sModifiedPageQueue.InsertAfter(page, &marker);
+		maxPagesToSee--;
+
+		if (!page->busy)
 			return page;
-		}
 	}
 
 	return NULL;
@@ -1521,7 +1515,7 @@ public:
 
 	void PrepareNextRun();
 	void AddPage(vm_page* page);
-	void Go();
+	uint32 Go();
 
 	void PageWritten(PageWriteTransfer* transfer, status_t status,
 		bool partialTransfer, size_t bytesTransferred);
@@ -1569,7 +1563,7 @@ public:
 	PageWriteWrapper();
 	~PageWriteWrapper();
 	void SetTo(vm_page* page);
-	void Done(status_t result);
+	bool Done(status_t result);
 
 private:
 	vm_page*			fPage;
@@ -1628,8 +1622,10 @@ PageWriteWrapper::SetTo(vm_page* page)
 
 /*!	The page's cache must be locked.
 	The page queues must not be locked.
+	\return \c true if the page was written successfully respectively could be
+		handled somehow, \c false otherwise.
 */
-void
+bool
 PageWriteWrapper::Done(status_t result)
 {
 	if (!fIsActive)
@@ -1639,6 +1635,8 @@ PageWriteWrapper::Done(status_t result)
 
 	fPage->busy = false;
 		// Set unbusy and notify later by hand, since we might free the page.
+
+	bool success = true;
 
 	if (result == B_OK) {
 		// put it into the active/inactive queue
@@ -1677,11 +1675,15 @@ PageWriteWrapper::Done(status_t result)
 
 			fPage->busy_writing = false;
 			DEBUG_PAGE_ACCESS_END(fPage);
+
+			success = false;
 		}
 	}
 
 	fCache->NotifyPageEvents(fPage, PAGE_EVENT_NOT_BUSY);
 	fIsActive = false;
+
+	return success;
 }
 
 
@@ -1842,7 +1844,10 @@ PageWriterRun::AddPage(vm_page* page)
 }
 
 
-void
+/*!	Writes all pages previously added.
+	\return The number of pages that could not be written or otherwise handled.
+*/
+uint32
 PageWriterRun::Go()
 {
 	fPendingTransfers = fTransferCount;
@@ -1860,13 +1865,16 @@ PageWriterRun::Go()
 
 	// mark pages depending on whether they could be written or not
 
+	uint32 failedPages = 0;
 	uint32 wrapperIndex = 0;
 	for (uint32 i = 0; i < fTransferCount; i++) {
 		PageWriteTransfer& transfer = fTransfers[i];
 		transfer.Cache()->Lock();
 
-		for (uint32 j = 0; j < transfer.PageCount(); j++)
-			fWrappers[wrapperIndex++].Done(transfer.Status());
+		for (uint32 j = 0; j < transfer.PageCount(); j++) {
+			if (!fWrappers[wrapperIndex++].Done(transfer.Status()))
+				failedPages++;
+		}
 
 		transfer.Cache()->Unlock();
 	}
@@ -1885,6 +1893,8 @@ PageWriterRun::Go()
 			cache->ReleaseRef();
 		}
 	}
+
+	return failedPages;
 }
 
 
@@ -1918,8 +1928,7 @@ page_writer(void* /*unused*/)
 		return B_ERROR;
 	}
 
-	vm_page marker;
-	init_page_marker(marker);
+	page_num_t pagesSinceLastSuccessfulWrite = 0;
 
 	while (true) {
 // TODO: Maybe wait shorter when memory is low!
@@ -1928,9 +1937,16 @@ page_writer(void* /*unused*/)
 				// all 3 seconds when no one triggers us
 		}
 
-		int32 modifiedPages = sModifiedPageQueue.Count();
+		page_num_t modifiedPages = sModifiedPageQueue.Count();
 		if (modifiedPages == 0)
 			continue;
+
+		if (modifiedPages <= pagesSinceLastSuccessfulWrite) {
+			// We ran through the whole queue without being able to write a
+			// single page. Take a break.
+			snooze(500000);
+			pagesSinceLastSuccessfulWrite = 0;
+		}
 
 #if ENABLE_SWAP_SUPPORT
 		page_stats pageStats;
@@ -1962,8 +1978,10 @@ page_writer(void* /*unused*/)
 		// collect pages to be written
 		pageCollectionTime -= system_time();
 
-		while (numPages < kNumPages) {
-			vm_page *page = next_modified_page(marker);
+		page_num_t maxPagesToSee = modifiedPages;
+
+		while (numPages < kNumPages && maxPagesToSee > 0) {
+			vm_page *page = next_modified_page(maxPagesToSee);
 			if (page == NULL)
 				break;
 
@@ -2038,7 +2056,7 @@ page_writer(void* /*unused*/)
 
 		// write pages to disk and do all the cleanup
 		pageWritingTime -= system_time();
-		run.Go();
+		uint32 failedPages = run.Go();
 		pageWritingTime += system_time();
 
 		// debug output only...
@@ -2054,9 +2072,14 @@ page_writer(void* /*unused*/)
 			pageCollectionTime = 0;
 			pageWritingTime = 0;
 		}
+
+		if (failedPages == numPages) {
+			pagesSinceLastSuccessfulWrite
+				+= modifiedPages - maxPagesToSee - numPages;
+		} else
+			pagesSinceLastSuccessfulWrite = 0;
 	}
 
-	remove_page_marker(marker);
 	return B_OK;
 }
 
