@@ -20,6 +20,7 @@ extern "C" {
 #endif
 
 bool		io_request_is_write(const io_request* request);
+bool		io_request_is_vip(const io_request* request);
 off_t		io_request_offset(const io_request* request);
 off_t		io_request_length(const io_request* request);
 status_t	read_from_io_request(io_request* request, void* buffer,

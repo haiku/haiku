@@ -572,7 +572,7 @@ UserlandRequestHandler::_HandleRequest(DoIORequest* request)
 	if (result == B_OK) {
 		RequestThreadContext context(volume, request);
 		IORequestInfo requestInfo(request->request, request->isWrite,
-			request->offset, request->length);
+			request->offset, request->length, request->isVIP);
 		result = volume->DoIO(request->node, request->fileCookie, requestInfo);
 	}
 

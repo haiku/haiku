@@ -1228,6 +1228,7 @@ Volume::DoIO(void* _node, void* cookie, io_request* ioRequest)
 	request->offset = ioRequest->Offset();
 	request->length = ioRequest->Length();
 	request->isWrite = ioRequest->IsWrite();
+	request->isVIP = (ioRequest->Flags() & B_VIP_IO_REQUEST) != 0;
 
 	// send the request
 	KernelRequestHandler handler(this, DO_IO_REPLY);

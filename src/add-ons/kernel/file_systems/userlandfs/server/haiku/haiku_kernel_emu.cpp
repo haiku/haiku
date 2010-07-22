@@ -343,6 +343,13 @@ io_request_is_write(const io_request* request)
 }
 
 
+bool
+io_request_is_vip(const io_request* request)
+{
+	return ((HaikuKernelIORequest*)request)->isVIP;
+}
+
+
 off_t
 io_request_offset(const io_request* request)
 {

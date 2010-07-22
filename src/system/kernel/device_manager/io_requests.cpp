@@ -52,6 +52,14 @@ io_request_is_write(const io_request* request)
 }
 
 
+/*!	Returns whether the I/O request has VIP status. */
+bool
+io_request_is_vip(const io_request* request)
+{
+	return (request->Flags() & B_VIP_IO_REQUEST) != 0;
+}
+
+
 /*!	Returns the read/write offset of the given I/O request.
 	This is the immutable offset the request was created with;
 	read_from_io_request() and write_to_io_request() don't change it.

@@ -15,13 +15,16 @@ struct IORequestInfo {
 	size_t	length;
 	int32	id;
 	bool	isWrite;
+	bool	isVIP;
 
-	IORequestInfo(int32 id, bool isWrite, off_t offset, size_t length)
+	IORequestInfo(int32 id, bool isWrite, off_t offset, size_t length,
+		bool isVIP)
 		:
 		offset(offset),
 		length(length),
 		id(id),
-		isWrite(isWrite)
+		isWrite(isWrite),
+		isVIP(isVIP)
 	{
 	}
 
@@ -30,7 +33,8 @@ struct IORequestInfo {
 		offset(other.offset),
 		length(other.length),
 		id(other.id),
-		isWrite(other.isWrite)
+		isWrite(other.isWrite),
+		isVIP(other.isVIP)
 	{
 	}
 };
