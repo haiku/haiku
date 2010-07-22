@@ -591,6 +591,7 @@ public:
 	size_t		length;
 	int32		request;
 	bool		isWrite;
+	bool		isVIP;
 };
 
 // DoIOReply
