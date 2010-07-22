@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -238,6 +238,7 @@ rw_lock_unblock(rw_lock* lock)
 
 		// unblock thread
 		_kern_unblock_thread(get_thread_id(waiter->thread), B_OK);
+		waiter->thread = NULL;
 		return RW_LOCK_WRITER_COUNT_BASE;
 	}
 
@@ -253,6 +254,7 @@ rw_lock_unblock(rw_lock* lock)
 
 		// unblock thread
 		_kern_unblock_thread(get_thread_id(waiter->thread), B_OK);
+		waiter->thread = NULL;
 	} while ((waiter = lock->waiters) != NULL && !waiter->writer);
 
 	if (lock->count >= RW_LOCK_WRITER_COUNT_BASE)
@@ -356,6 +358,96 @@ _rw_lock_read_lock(rw_lock* lock)
 
 	// we need to wait
 	return rw_lock_wait(lock, false);
+}
+
+
+status_t
+_rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
+	bigtime_t timeout)
+{
+	AutoLocker<ThreadSpinlock> locker(sThreadSpinlock);
+
+	// We might be the writer ourselves.
+	if (lock->holder == find_thread(NULL)) {
+		lock->owner_count++;
+		return B_OK;
+	}
+
+	// The writer that originally had the lock when we called atomic_add() might
+	// already have gone and another writer could have overtaken us. In this
+	// case the original writer set pending_readers, so we know that we don't
+	// have to wait.
+	if (lock->pending_readers > 0) {
+		lock->pending_readers--;
+
+		if (lock->count >= RW_LOCK_WRITER_COUNT_BASE)
+			lock->active_readers++;
+
+		return B_OK;
+	}
+
+	ASSERT(lock->count >= RW_LOCK_WRITER_COUNT_BASE);
+
+	// we need to wait
+
+	// enqueue in waiter list
+	rw_lock_waiter waiter;
+	waiter.thread = get_current_thread();
+	waiter.next = NULL;
+	waiter.writer = false;
+
+	if (lock->waiters != NULL)
+		lock->waiters->last->next = &waiter;
+	else
+		lock->waiters = &waiter;
+
+	lock->waiters->last = &waiter;
+
+	// block
+	get_user_thread()->wait_status = 1;
+	sThreadSpinlock.Unlock();
+
+	status_t error;
+	while ((error = _kern_block_thread(timeoutFlags, timeout))
+			== B_INTERRUPTED) {
+	}
+
+	sThreadSpinlock.Lock();
+
+	if (error == B_OK || waiter.thread == NULL) {
+		// We were unblocked successfully -- potentially our unblocker overtook
+		// us after we already failed. In either case, we've got the lock, now.
+		return B_OK;
+	}
+
+	// We failed to get the lock -- dequeue from waiter list.
+	rw_lock_waiter* previous = NULL;
+	rw_lock_waiter* other = lock->waiters;
+	while (other != &waiter) {
+		previous = other;
+		other = other->next;
+	}
+
+	if (previous == NULL) {
+		// we are the first in line
+		lock->waiters = waiter.next;
+		if (lock->waiters != NULL)
+			lock->waiters->last = waiter.last;
+	} else {
+		// one or more other waiters are before us in the queue
+		previous->next = waiter.next;
+		if (lock->waiters->last == &waiter)
+			lock->waiters->last = previous;
+	}
+
+	// Decrement the count. ATM this is all we have to do. There's at least
+	// one writer ahead of us -- otherwise the last writer would have unblocked
+	// us (writers only manipulate the lock data with thread spinlock being
+	// held) -- so our leaving doesn't make a difference to the ones behind us
+	// in the queue.
+	atomic_add(&lock->count, -1);
+
+	return error;
 }
 
 

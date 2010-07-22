@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -142,6 +142,8 @@ extern status_t mutex_switch_from_read_lock(rw_lock* from, mutex* to);
 // implementation private:
 
 extern status_t _rw_lock_read_lock(rw_lock* lock);
+extern status_t _rw_lock_read_lock_with_timeout(rw_lock* lock,
+	uint32 timeoutFlags, bigtime_t timeout);
 extern void _rw_lock_read_unlock(rw_lock* lock, bool threadsLocked);
 extern void _rw_lock_write_unlock(rw_lock* lock, bool threadsLocked);
 
@@ -161,6 +163,21 @@ rw_lock_read_lock(rw_lock* lock)
 	int32 oldCount = atomic_add(&lock->count, 1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
 		return _rw_lock_read_lock(lock);
+	return B_OK;
+#endif
+}
+
+
+static inline status_t
+rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
+	bigtime_t timeout)
+{
+#if KDEBUG_RW_LOCK_DEBUG
+	return mutex_lock_with_timeout(lock, timeoutFlags, timeout);
+#else
+	int32 oldCount = atomic_add(&lock->count, 1);
+	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
+		return _rw_lock_read_lock_with_timeout(lock, timeoutFlags, timeout);
 	return B_OK;
 #endif
 }
