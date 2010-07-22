@@ -159,6 +159,11 @@ if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/cddb_daemon ""
 fi
 
+# Launch Notification Server
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/notification_server ""
+fi
+
 # Check for daily saving time
 launch system/bin/dstcheck
 
