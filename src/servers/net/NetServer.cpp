@@ -206,7 +206,7 @@ set_port(int32 familyIndex, struct sockaddr& address, int32 port)
 bool
 prepare_request(ifreq& request, const char* name)
 {
-	if (strlen(name) > IF_NAMESIZE)
+	if (strlen(name) >= IF_NAMESIZE)
 		return false;
 
 	strcpy(request.ifr_name, name);

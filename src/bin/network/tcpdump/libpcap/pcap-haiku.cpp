@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,7 +29,7 @@
 bool
 prepare_request(struct ifreq& request, const char* name)
 {
-	if (strlen(name) > IF_NAMESIZE) {
+	if (strlen(name) >= IF_NAMESIZE) {
 		return false;
 	}
 

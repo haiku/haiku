@@ -280,7 +280,7 @@ usage(int status)
 bool
 prepare_request(struct ifreq& request, const char* name)
 {
-	if (strlen(name) > IF_NAMESIZE) {
+	if (strlen(name) >= IF_NAMESIZE) {
 		fprintf(stderr, "%s: interface name \"%s\" is too long.\n",
 			kProgramName, name);
 		return false;
