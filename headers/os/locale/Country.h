@@ -41,8 +41,8 @@ class BCountry {
 		BCountry& operator=(const BCountry& other);
 		virtual 		~BCountry();
 
-		bool 			Name(BString&) const;
-		bool			LocaleName(BString&) const;
+		bool 			Name(BString& name) const;
+		bool			LocaleName(BString& name) const;
 		const char*		Code() const;
 		status_t		GetIcon(BBitmap* result);
 

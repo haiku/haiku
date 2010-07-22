@@ -1,6 +1,6 @@
 /*
  * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2009, Destugues, pulkomandy@gmail.com.
+ * Copyright 2009-2010, Adrien Destugues, pulkomandy@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -63,7 +63,8 @@ BCountry::BCountry(const BCountry& other)
 {
 	fICULocale = new ICU_VERSION::Locale(*other.fICULocale);
 
-	// We could copy these, but we can recreate them when needed from the locale anyway
+	// We could copy these, but we can recreate them when needed from the locale
+	// anyway
 	fICULongDateFormatter = NULL;
 	fICUShortDateFormatter = NULL;
 	fICULongTimeFormatter = NULL;
@@ -107,7 +108,8 @@ BCountry::operator=(const BCountry& other)
 
 	fICULocale = new ICU_VERSION::Locale(*other.fICULocale);
 
-	// We could copy these, but we can recreate them when needed from the locale anyway
+	// We could copy these, but we can recreate them when needed from the locale
+	// anyway
 	fICULongDateFormatter = NULL;
 	fICUShortDateFormatter = NULL;
 	fICULongTimeFormatter = NULL;
