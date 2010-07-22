@@ -179,7 +179,7 @@ BCountry::GetIcon(BBitmap* result)
 }
 
 
-// #pragma mark - Date and Time
+// #pragma mark - Date
 
 
 DateFormat*
@@ -220,28 +220,36 @@ BCountry::TimeFormatter(bool longFormat)
 }
 
 
-void
+status_t
 BCountry::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 {
 	BString fullString;
-	FormatDate(&fullString, time, longFormat);
-	strncpy(string, fullString.String(), maxSize);
+	status_t returnCode;
+	returnCode = FormatDate(&fullString, time, longFormat);
+	if (returnCode == B_OK)
+		strncpy(string, fullString.String(), maxSize);
+	return returnCode;
 }
 
 
-void
+status_t
 BCountry::FormatDate(BString *string, time_t time, bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
+	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
+	if (dateFormatter == NULL)
+		return B_NO_MEMORY;
+
 	UnicodeString ICUString;
-	ICUString = DateFormatter(longFormat)->format((UDate)time * 1000,
-		ICUString);
+	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
 
 	string->Truncate(0);
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
+
+	return B_OK;
 }
 
 
@@ -249,6 +257,10 @@ status_t
 BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 	time_t time, bool longFormat)
 {
+	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
+	if (dateFormatter == NULL)
+		return B_NO_MEMORY;
+
 	fieldPositions = NULL;
 	UErrorCode error = U_ZERO_ERROR;
 	ICU_VERSION::FieldPositionIterator positionIterator;
@@ -282,28 +294,142 @@ BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 }
 
 
-void
-BCountry::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
+status_t
+BCountry::DateFormat(BString& format, bool longFormat)
 {
-	BString fullString;
-	FormatTime(&fullString, time, longFormat);
-	strncpy(string, fullString.String(), maxSize);
+	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
+	if (dateFormatter == NULL)
+		return B_NO_MEMORY;
+
+	SimpleDateFormat* dateFormatterImpl
+		= static_cast<SimpleDateFormat*>(dateFormatter);
+
+	UnicodeString ICUString;
+	ICUString = dateFormatterImpl->toPattern(ICUString);
+
+	BStringByteSink stringConverter(&format);
+
+	ICUString.toUTF8(stringConverter);
+
+	return B_OK;
 }
 
 
-void
+status_t
+BCountry::SetDateFormat(const char* formatString, bool longFormat)
+{
+	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
+	if (dateFormatter == NULL)
+		return B_NO_MEMORY;
+
+	SimpleDateFormat* dateFormatterImpl
+		= static_cast<SimpleDateFormat*>(dateFormatter);
+
+	UnicodeString pattern(formatString);
+	dateFormatterImpl->applyPattern(pattern);
+
+	return B_OK;
+}
+
+
+status_t
+BCountry::DateFields(BDateElement*& fields, int& fieldCount, bool longFormat)
+{
+	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
+	if (dateFormatter == NULL)
+		return B_NO_MEMORY;
+
+	fields = NULL;
+	UErrorCode error = U_ZERO_ERROR;
+	ICU_VERSION::FieldPositionIterator positionIterator;
+	UnicodeString ICUString;
+	time_t now;
+	ICUString = dateFormatter->format((UDate)time(&now) * 1000, ICUString,
+		&positionIterator, error);
+
+	if (error != U_ZERO_ERROR)
+		return B_ERROR;
+
+	ICU_VERSION::FieldPosition field;
+	std::vector<int> fieldPosStorage;
+	fieldCount  = 0;
+	while (positionIterator.next(field)) {
+		fieldPosStorage.push_back(field.getField());
+		fieldCount ++;
+	}
+
+	fields = (BDateElement*) malloc(fieldCount * sizeof(BDateElement));
+
+	for (int i = 0 ; i < fieldCount ; i++ ) {
+		switch (fieldPosStorage[i]) {
+			case UDAT_YEAR_FIELD:
+				fields[i] = B_DATE_ELEMENT_YEAR;
+				break;
+			case UDAT_MONTH_FIELD:
+				fields[i] = B_DATE_ELEMENT_MONTH;
+				break;
+			case UDAT_DATE_FIELD:
+				fields[i] = B_DATE_ELEMENT_DAY;
+				break;
+			default:
+				fields[i] = B_DATE_ELEMENT_INVALID;
+				break;
+		}
+	}
+
+	return B_OK;
+}
+
+
+int
+BCountry::StartOfWeek()
+{
+	UErrorCode err = U_ZERO_ERROR;
+	Calendar* c = Calendar::createInstance(*fICULocale, err);
+
+	if (err == U_ZERO_ERROR && c->getFirstDayOfWeek(err) == UCAL_SUNDAY) {
+		delete c;
+		return B_WEEK_START_SUNDAY;
+	} else {
+		delete c;
+		// Might be another day, but BeAPI will not handle it
+		return B_WEEK_START_MONDAY;
+	}
+}
+
+
+// #pragma mark - Time
+
+
+status_t
+BCountry::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
+{
+	BString fullString;
+	status_t returnCode = FormatTime(&fullString, time, longFormat);
+	if (returnCode == B_OK)
+		strncpy(string, fullString.String(), maxSize);
+	return returnCode;
+}
+
+
+status_t
 BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
+	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
+	if (timeFormatter == NULL)
+		return B_NO_MEMORY;
+
 	UnicodeString ICUString;
-	ICUString = TimeFormatter(longFormat)->format((UDate)time * 1000,
-		ICUString);
+	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
 
 	string->Truncate(0);
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
+
+	return B_OK;
 }
 
 
@@ -311,11 +437,15 @@ status_t
 BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 	time_t time, bool longFormat)
 {
+	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
+	if (timeFormatter == NULL)
+		return B_NO_MEMORY;
+
 	fieldPositions = NULL;
 	UErrorCode error = U_ZERO_ERROR;
 	ICU_VERSION::FieldPositionIterator positionIterator;
 	UnicodeString ICUString;
-	ICUString = TimeFormatter(longFormat)->format((UDate)time * 1000, ICUString,
+	ICUString = timeFormatter->format((UDate)time * 1000, ICUString,
 		&positionIterator, error);
 
 	if (error != U_ZERO_ERROR)
@@ -347,13 +477,17 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 status_t
 BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 {
+	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
+	if (timeFormatter == NULL)
+		return B_NO_MEMORY;
+
 	fields = NULL;
 	UErrorCode error = U_ZERO_ERROR;
 	ICU_VERSION::FieldPositionIterator positionIterator;
 	UnicodeString ICUString;
 	time_t now;
-	ICUString = TimeFormatter(longFormat)->format((UDate)time(&now) * 1000,
-		ICUString, &positionIterator, error);
+	ICUString = timeFormatter->format((UDate)time(&now) * 1000,	ICUString,
+		&positionIterator, error);
 
 	if (error != U_ZERO_ERROR)
 		return B_ERROR;
@@ -396,94 +530,31 @@ BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 
 
 status_t
-BCountry::DateFields(BDateElement*& fields, int& fieldCount, bool longFormat)
+BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 {
-	fields = NULL;
-	UErrorCode error = U_ZERO_ERROR;
-	ICU_VERSION::FieldPositionIterator positionIterator;
-	UnicodeString ICUString;
-	time_t now;
-	ICUString = DateFormatter(longFormat)->format((UDate)time(&now) * 1000,
-		ICUString, &positionIterator, error);
+	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
+	if (timeFormatter == NULL)
+		return B_NO_MEMORY;
 
-	if (error != U_ZERO_ERROR)
-		return B_ERROR;
+	SimpleDateFormat* dateFormatterImpl
+		= static_cast<SimpleDateFormat*>(timeFormatter);
 
-	ICU_VERSION::FieldPosition field;
-	std::vector<int> fieldPosStorage;
-	fieldCount  = 0;
-	while (positionIterator.next(field)) {
-		fieldPosStorage.push_back(field.getField());
-		fieldCount ++;
-	}
-
-	fields = (BDateElement*) malloc(fieldCount * sizeof(BDateElement));
-
-	for (int i = 0 ; i < fieldCount ; i++ ) {
-		switch (fieldPosStorage[i]) {
-			case UDAT_YEAR_FIELD:
-				fields[i] = B_DATE_ELEMENT_YEAR;
-				break;
-			case UDAT_MONTH_FIELD:
-				fields[i] = B_DATE_ELEMENT_MONTH;
-				break;
-			case UDAT_DATE_FIELD:
-				fields[i] = B_DATE_ELEMENT_DAY;
-				break;
-			default:
-				fields[i] = B_DATE_ELEMENT_INVALID;
-				break;
-		}
-	}
+	UnicodeString pattern(formatString);
+	dateFormatterImpl->applyPattern(pattern);
 
 	return B_OK;
 }
 
 
-bool
-BCountry::DateFormat(BString& format, bool longFormat)
-{
-	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
-
-	UnicodeString ICUString;
-	ICUString = dateFormatterImpl->toPattern(ICUString);
-
-	BStringByteSink stringConverter(&format);
-
-	ICUString.toUTF8(stringConverter);
-
-	return true;
-}
-
-
-void
-BCountry::SetDateFormat(const char* formatString, bool longFormat)
-{
-	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
-
-	UnicodeString pattern(formatString);
-	dateFormatterImpl->applyPattern(pattern);
-}
-
-
-void
-BCountry::SetTimeFormat(const char* formatString, bool longFormat)
-{
-	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
-
-	UnicodeString pattern(formatString);
-	dateFormatterImpl->applyPattern(pattern);
-}
-
-
-bool
+status_t
 BCountry::TimeFormat(BString& format, bool longFormat)
 {
+	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
+	if (timeFormatter == NULL)
+		return B_NO_MEMORY;
+
 	SimpleDateFormat* dateFormatterImpl
-		= static_cast<SimpleDateFormat*>(DateFormatter(longFormat));
+		= static_cast<SimpleDateFormat*>(timeFormatter);
 
 	UnicodeString ICUString;
 	ICUString = dateFormatterImpl->toPattern(ICUString);
@@ -492,24 +563,7 @@ BCountry::TimeFormat(BString& format, bool longFormat)
 
 	ICUString.toUTF8(stringConverter);
 
-	return true;
-}
-
-
-int
-BCountry::StartOfWeek()
-{
-	UErrorCode err = U_ZERO_ERROR;
-	Calendar* c = Calendar::createInstance(*fICULocale, err);
-
-	if (err == U_ZERO_ERROR && c->getFirstDayOfWeek(err) == UCAL_SUNDAY) {
-		delete c;
-		return B_WEEK_START_SUNDAY;
-	} else {
-		delete c;
-		// Might be another day, but BeAPI will not handle it
-		return B_WEEK_START_MONDAY;
-	}
+	return B_OK;
 }
 
 
@@ -533,8 +587,8 @@ BCountry::FormatNumber(BString* string, double value)
 		= NumberFormat::createInstance(*fICULocale, NumberFormat::kNumberStyle,
 			err);
 
-	// Warning: we're returning an ICU error here but the type is status_t.
-	if (U_FAILURE(err)) return err;
+	if (U_FAILURE(err))
+		return B_ERROR;
 
 	UnicodeString ICUString;
 	ICUString = numberFormatter->format(value, ICUString);
@@ -544,7 +598,7 @@ BCountry::FormatNumber(BString* string, double value)
 
 	ICUString.toUTF8(stringConverter);
 
-	return U_ZERO_ERROR;
+	return B_OK;
 }
 
 

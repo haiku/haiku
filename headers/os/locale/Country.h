@@ -41,41 +41,43 @@ class BCountry {
 		BCountry& operator=(const BCountry& other);
 		virtual 		~BCountry();
 
-		virtual bool 	Name(BString&) const;
+		bool 			Name(BString&) const;
 		bool			LocaleName(BString&) const;
 		const char*		Code() const;
 		status_t		GetIcon(BBitmap* result);
 
 		const char*		GetString(uint32 id) const;
 
-		// date & time
+		// Date
 
-		virtual void	FormatDate(char* string, size_t maxSize, time_t time,
+		status_t	FormatDate(char* string, size_t maxSize, time_t time,
 			bool longFormat);
-		virtual void	FormatDate(BString* string, time_t time,
+		status_t	FormatDate(BString* string, time_t time,
 			bool longFormat);
-		status_t		FormatDate(BString* string, int*& fieldPositions,
+		status_t	FormatDate(BString* string, int*& fieldPositions,
 			int& fieldCount, time_t time, bool longFormat);
-
-		virtual void	FormatTime(char* string, size_t maxSize, time_t time,
+		status_t		DateFields(BDateElement*& fields, int& fieldCount,
 			bool longFormat);
-		virtual void	FormatTime(BString* string, time_t time,
+		status_t		DateFormat(BString&, bool longFormat);
+		status_t		SetDateFormat(const char* formatString,
+						bool longFormat = true);
+
+		int			StartOfWeek();
+
+		// Time
+
+		status_t	FormatTime(char* string, size_t maxSize, time_t time,
+			bool longFormat);
+		status_t	FormatTime(BString* string, time_t time,
 			bool longFormat);
 		status_t		FormatTime(BString* string, int*& fieldPositions,
 			int& fieldCount, time_t time, bool longFormat);
 		status_t		TimeFields(BDateElement*& fields, int& fieldCount,
 			bool longFormat);
-		status_t		DateFields(BDateElement*& fields, int& fieldCount,
-			bool longFormat);
 
-		bool		DateFormat(BString&, bool longFormat);
-		void		SetDateFormat(const char* formatString,
+		status_t		SetTimeFormat(const char* formatString,
 						bool longFormat = true);
-		void		SetTimeFormat(const char* formatString,
-						bool longFormat = true);
-		bool		TimeFormat(BString&, bool longFormat);
-
-		int			StartOfWeek();
+		status_t		TimeFormat(BString&, bool longFormat);
 
 		// numbers
 
