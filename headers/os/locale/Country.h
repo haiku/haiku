@@ -8,6 +8,7 @@
 
 
 class BBitmap;
+class BMessage;
 
 namespace icu_44 {
 	class DateFormat;
@@ -41,6 +42,7 @@ class BCountry {
 		virtual 		~BCountry();
 
 		virtual bool 	Name(BString&) const;
+		bool			LocaleName(BString&) const;
 		const char*		Code() const;
 		status_t		GetIcon(BBitmap* result);
 
@@ -105,6 +107,9 @@ class BCountry {
 		bool		MonThousandsSeparator(BString&) const;
 		bool		MonGrouping(BString&) const;
 		virtual int32	MonFracDigits() const;
+
+		// timezones
+		status_t GetTimeZones(BMessage* timezones);
 
 	private:
 		icu_44::DateFormat* fICULongDateFormatter;

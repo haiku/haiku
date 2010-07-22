@@ -641,6 +641,24 @@ BLocaleRoster::GetInstalledLanguages(BMessage *languages) const
 }
 
 
+// Get all the available countries from ICU
+status_t
+BLocaleRoster::GetAvailableCountries(BMessage *countries) const
+{
+	if (!countries)
+		return B_BAD_VALUE;
+
+	int32 i;
+	const char* const* countryList = uloc_getISOCountries();
+
+	for (i = 0; countryList[i] != NULL; i++) {
+		countries->AddString("countries", countryList[i]);
+	}
+
+	return B_OK;
+}
+
+
 status_t
 BLocaleRoster::GetInstalledCatalogs(BMessage * languageList,
 		const char* sigPattern,	const char* langPattern, int32 fingerprint) const

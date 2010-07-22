@@ -117,6 +117,17 @@ bool
 BCountry::Name(BString& name) const
 {
 	UnicodeString uString;
+	fICULocale->getDisplayCountry(uString);
+	BStringByteSink stringConverter(&name);
+	uString.toUTF8(stringConverter);
+	return true;
+}
+
+
+bool
+BCountry::LocaleName(BString& name) const
+{
+	UnicodeString uString;
 	fICULocale->getDisplayName(uString);
 	BStringByteSink stringConverter(&name);
 	uString.toUTF8(stringConverter);
@@ -139,18 +150,18 @@ BCountry::GetIcon(BBitmap* result)
 	// TODO: a proper way to locate the library being used ?
 	BResources storage("/boot/system/lib/liblocale.so");
 	if (storage.InitCheck() != B_OK)
-   		return B_ERROR;
-   	size_t size;
-   	const char* code = fICULocale->getCountry();
+		return B_ERROR;
+	size_t size;
+	const char* code = fICULocale->getCountry();
 	if (code != NULL) {
-   		const void* buffer = storage.LoadResource(B_VECTOR_ICON_TYPE, code,
-   			&size);
-   		if (buffer != NULL && size != 0) {
+		const void* buffer = storage.LoadResource(B_VECTOR_ICON_TYPE, code,
+			&size);
+		if (buffer != NULL && size != 0) {
 			return BIconUtils::GetVectorIcon(static_cast<const uint8*>(buffer),
 				size, result);
-   		}
+		}
 	}
-   	return B_BAD_DATA;
+	return B_BAD_DATA;
 }
 
 
@@ -840,3 +851,30 @@ BCountry::MonFracDigits() const
 	return 2;
 }
 
+
+// #pragma mark - Timezones
+
+
+status_t
+BCountry::GetTimeZones(BMessage* timezones)
+{
+	if (timezones == NULL)
+		return B_BAD_DATA;
+
+
+	StringEnumeration* icuTimeZoneList = TimeZone::createEnumeration(
+		fICULocale->getCountry());
+	UErrorCode error = U_ZERO_ERROR;
+
+	const char* tzName;
+	while (tzName = icuTimeZoneList->next(NULL, error)) {
+		if (error == U_ZERO_ERROR)
+			timezones->AddString("zones", tzName);
+		else
+			error = U_ZERO_ERROR;
+	}
+
+	delete icuTimeZoneList;
+
+	return B_OK;
+}

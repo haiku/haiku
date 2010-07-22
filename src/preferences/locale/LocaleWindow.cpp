@@ -168,9 +168,7 @@ LocaleWindow::LocaleWindow()
 		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 	listView->SetSelectionMessage(new BMessage(kMsgCountrySelection));
 
-	// get all available countries from ICU
-	// Use DateFormat::getAvailableLocale so we get only the one we can
-	// use. Maybe check the NumberFormat one and see if there is more.
+	// get all available countries
 	BMessage countryList;
 	be_locale_roster->GetInstalledLanguages(&countryList);
 	BString countryCode;
@@ -180,7 +178,7 @@ LocaleWindow::LocaleWindow()
 		BCountry country(countryCode);
 		BString countryName;
 
-		country.Name(countryName);
+		country.LocaleName(countryName);
 
 		LanguageListItem* item
 			= new LanguageListItem(countryName, countryCode,
@@ -189,24 +187,6 @@ LocaleWindow::LocaleWindow()
 		if (!strcmp(countryCode, defaultCountry->Code()))
 			listView->Select(listView->CountItems() - 1);
 	}
-	/*
-	int32_t localeCount;
-	const Locale* currentLocale = Locale::getAvailableLocales(localeCount);
-
-	for (int index = 0; index < localeCount; index++) {
-		UnicodeString countryFullName;
-		BString string;
-		BStringByteSink sink(&string);
-		currentLocale[index].getDisplayName(countryFullName);
-		countryFullName.toUTF8(sink);
-
-		LanguageListItem* item
-			= new LanguageListItem(string, currentLocale[index].getName(),
-				NULL);
-		listView->AddItem(item);
-		if (!strcmp(currentLocale[index].getName(), defaultCountry->Code()))
-			listView->Select(listView->CountItems() - 1);
-	}*/
 
 	// TODO: find a real solution intead of this hack
 	listView->SetExplicitMinSize(

@@ -53,6 +53,8 @@ class BLocaleRoster {
 			// the message contains one or more 'language'-string-fields
 			// which contain the language-name(s)
 
+		status_t GetAvailableCountries(BMessage *) const;
+
 		status_t GetInstalledCatalogs(BMessage *, const char* sigPattern = NULL,
 			const char* langPattern = NULL,	int32 fingerprint = 0) const;
 			// the message contains...
