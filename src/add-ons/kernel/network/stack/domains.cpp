@@ -242,6 +242,8 @@ remove_interface_from_domain(net_interface* interface)
 {
 	net_domain_private* domain = (net_domain_private*)interface->domain;
 
+	invalidate_routes(domain, interface);
+
 	list_remove_item(&domain->interfaces, interface);
 	notify_interface_removed(interface);
 	delete_interface((net_interface_private*)interface);
