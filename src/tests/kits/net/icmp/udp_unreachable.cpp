@@ -8,6 +8,7 @@
 
 
 #include <errno.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,50 +17,67 @@
 #include <unistd.h>
 
 
-#define MAXLEN 4096
+#define MAX_LENGTH 4096
+
+
+extern const char* __progname;
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
-	int sockfd, status;
-	char *str = "Hello";
-	char buf[MAXLEN];
-	struct sockaddr_in serverAddr;
-
-	if (argc != 3) {
-		fprintf(stderr, "Usage: %s <ip-address> <port>\n", argv[0]);
-		exit(1);
+	if (argc < 2) {
+		fprintf(stderr, "Usage: %s <host> [<port>]\n"
+			"Sends a UDP datagram to the specified target.\n"
+			"<port> defaults to 9999.\n", __progname);
+		return 1;
 	}
 
+	struct hostent* host = gethostbyname(argv[1]);
+	if (host == NULL) {
+		perror("gethostbyname");
+		return 1;
+	}
+
+	uint16_t port = 9999;
+	if (argc > 2)
+		port = atol(argv[2]);
+
+	struct sockaddr_in serverAddr;
 	memset(&serverAddr, 0, sizeof(struct sockaddr_in));
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(atoi(argv[2]));
+	serverAddr.sin_port = htons(port);
+	serverAddr.sin_addr = *((struct in_addr*)host->h_addr);
 
-	sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	int sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	// We need to call connect() to receive async ICMP errors
 	if (connect(sockfd, (struct sockaddr*)&serverAddr,
 			sizeof(struct sockaddr_in)) < 0) {
-		fprintf(stderr, "Calling connect() on UDP socket failed\n");
-		exit(1);
+		fprintf(stderr, "Calling connect() on UDP socket failed: %s\n",
+			strerror(errno));
+		return 1;
 	}
-	if ((status = write(sockfd, str, strlen(str))) < 0) {
-		int e = errno;
-		fprintf(stderr, "UDP send failed. Status: %d\n", status);
-		fprintf(stderr, "Error: %s\n", strerror(e));
-		exit(1);
+
+	const char* string = "Hello";
+	ssize_t bytes = write(sockfd, string, strlen(string));
+	if (bytes < 0) {
+		fprintf(stderr, "UDP send failed: %s\n", strerror(errno));
+		return 1;
+	}
+
+	printf("%zd bytes sent to remote server.\n", bytes);
+
+	char buffer[MAX_LENGTH];
+	bytes = read(sockfd, buffer, MAX_LENGTH);
+	if (bytes > 0) {
+		printf("Received %zd bytes from remote host\n", bytes);
+		printf("%s\n", buffer);
 	} else {
-		printf("%d bytes sent to remote server.\n", status);
-		if ((status = read(sockfd, buf, MAXLEN)) > 0) {
-			printf("Received %d bytes from remote host\n", status);
-			printf("%s\n", buf);
-		} else {
-			// We are expecting this
-			int e = errno;
-			printf("Error: %s\n", strerror(e));
-		}
-		close(sockfd);
-		printf("Socket closed.\n");
+		// We are expecting this
+		printf("Error: %s\n", strerror(errno));
 	}
+	close(sockfd);
+	printf("Socket closed.\n");
+
 	return 0;
 }
