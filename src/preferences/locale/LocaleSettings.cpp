@@ -97,12 +97,14 @@ LocaleSettings::UpdateFrom(BMessage* message)
 	}
 
 	if (message->FindString("shortTimeFormat", &messageContent) == B_OK) {
-		fMessage.ReplaceString("shortTimeFormat", messageContent);
+		fMessage.RemoveName("shortTimeFormat");
+		fMessage.AddString("shortTimeFormat", messageContent);
 		fSaved = false;
 	}
 
 	if (message->FindString("longTimeFormat", &messageContent) == B_OK) {
-		fMessage.ReplaceString("longTimeFormat", messageContent);
+		fMessage.RemoveName("longTimeFormat");
+		fMessage.AddString("longTimeFormat", messageContent);
 		fSaved = false;
 	}
 
