@@ -450,10 +450,16 @@ File::_DepthForBlockCount(uint64 blockCount)
 /*static*/ void
 File::_UpdateLevelInfos(LevelInfo* infos, int32 levelCount, uint64 blockCount)
 {
+	if (blockCount == 0) {
+		infos[0].addressableShift = 0;
+		infos[0].childCount = 0;
+		return;
+	}
+
 	uint64 addressableShift = 0;
 	for (int32 i = levelCount - 1; i >= 0; i--) {
 		infos[i].addressableShift = addressableShift;
-		infos[i].childCount = blockCount % kFileBlockMaxCount;
+		infos[i].childCount = (blockCount - 1) % kFileBlockMaxCount + 1;
 		addressableShift += kFileBlockShift;
 		blockCount = (blockCount + kFileBlockMaxCount - 1) / kFileBlockMaxCount;
 	}
@@ -616,32 +622,30 @@ File::_GrowTree(uint64 blockCount, uint64 newBlockCount,
 
 		// allocate a block per new level
 		for (int32 i = newDepth - depth - 1; i >= 0; i--) {
-			while (depth < newDepth) {
-				// allocate a new block
-				AllocatedBlock allocatedBlock(GetVolume()->GetBlockAllocator(),
-					transaction);
-				status_t error = allocatedBlock.Allocate(BlockIndex());
-				if (error != B_OK)
-					RETURN_ERROR(error);
+			// allocate a new block
+			AllocatedBlock allocatedBlock(GetVolume()->GetBlockAllocator(),
+				transaction);
+			status_t error = allocatedBlock.Allocate(BlockIndex());
+			if (error != B_OK)
+				RETURN_ERROR(error);
 
-				Block newBlock;
-				if (!newBlock.GetZero(GetVolume(), allocatedBlock.Index(),
-						transaction)) {
-					RETURN_ERROR(B_ERROR);
-				}
-
-				allocatedBlock.Detach();
-
-				PRINT("  inserting block %" B_PRIu64 " at level %" B_PRIi32
-					"\n", newBlock.Index(), i + 1);
-
-				// copy the root block
-				memcpy(newBlock.Data(), infos[0].blockData, childCount * 8);
-
-				// set the block in the root block
-				infos[0].blockData[0] = newBlock.Index();
-				childCount = 1;
+			Block newBlock;
+			if (!newBlock.GetZero(GetVolume(), allocatedBlock.Index(),
+					transaction)) {
+				RETURN_ERROR(B_ERROR);
 			}
+
+			allocatedBlock.Detach();
+
+			PRINT("  inserting block %" B_PRIu64 " at level %" B_PRIi32
+				"\n", newBlock.Index(), i + 1);
+
+			// copy the root block
+			memcpy(newBlock.Data(), infos[0].blockData, childCount * 8);
+
+			// set the block in the root block
+			infos[0].blockData[0] = newBlock.Index();
+			childCount = 1;
 		}
 	}
 
