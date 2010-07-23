@@ -31,14 +31,15 @@ main(int argc, char *argv[])
 
 	if (argc == 4) {
 		size_t size = strtoul(argv[2], NULL, 10);
-		if (0 < size)
+		if (size > 0)
 			framesPerBufferPart = size;
+
 		size = strtoul(argv[3], NULL,  10);
 		if (size == 1) {
 			printf("at least 2 buffer parts are needed\n");
-			return 0;
+			return 1;
 		}
-		if (0 < size)
+		if (size > 0)
 			bufferPartCount = size;
 	}
 
@@ -48,7 +49,7 @@ main(int argc, char *argv[])
 	BEntry entry(argv[1]);
 	if (entry.InitCheck() != B_OK || !entry.Exists()) {
 		printf("cannot open input file\n");
-		return 0;
+		return 1;
 	}
 
 	entry_ref entryRef;
@@ -57,18 +58,18 @@ main(int argc, char *argv[])
 	BMediaFile mediaFile(&entryRef);
 	if (mediaFile.InitCheck() != B_OK) {
 		printf("file not supported\n");
-		return 0;
+		return 1;
 	}
 
 	if (mediaFile.CountTracks() == 0) {
 		printf("no tracks found in file\n");
-		return 0;
+		return 1;
 	}
 
 	BMediaTrack *mediaTrack = mediaFile.TrackAt(0);
 	if (mediaTrack == NULL) {
 		printf("problem getting track from file\n");
-		return 0;
+		return 1;
 	}
 
 	// propose format, let it decide frame rate, channels number and buf size
@@ -80,7 +81,7 @@ main(int argc, char *argv[])
 
 	if (mediaTrack->DecodedFormat(&format) != B_OK) {
 		printf("cannot set decoder output format\n");
-		return 0;
+		return 1;
 	}
 
 	printf("negotiated format:\n");
@@ -98,7 +99,9 @@ main(int argc, char *argv[])
 	BPushGameSound pushGameSound(framesPerBufferPart, &gsFormat,
 		bufferPartCount);
 	if (pushGameSound.InitCheck() != B_OK) {
-		printf("trouble initializing push game sound\n");
+		printf("trouble initializing push game sound: %s\n",
+			strerror(pushGameSound.InitCheck()));
+		return 1;
 	}
 
 	uint8 *buffer;
@@ -106,13 +109,13 @@ main(int argc, char *argv[])
 	if (pushGameSound.LockForCyclic((void **)&buffer, &bufferSize)
 			!= BPushGameSound::lock_ok) {
 		printf("cannot lock buffer\n");
-		return 0;
+		return 1;
 	}
 	memset(buffer, 0, bufferSize);
 
 	if (pushGameSound.StartPlaying() != B_OK) {
 		printf("cannot start playback\n");
-		return 0;
+		return 1;
 	}
 
 	printf("playing, press [esc] to exit...\n");
@@ -153,8 +156,8 @@ main(int argc, char *argv[])
 				* (format.u.raw_audio.format
 					& media_raw_audio_format::B_AUDIO_SIZE_MASK);
 
-			printf("\rtime: %.2f", (double) mediaTrack->CurrentTime()
-					/ 1000000LL);
+			printf("\rtime: %.2f",
+				(double)mediaTrack->CurrentTime() / 1000000LL);
 			fflush(stdout);
 			continue;
 		}
