@@ -1,0 +1,321 @@
+1	russian	x-vnd.Haiku-libtracker	869545223
+Sorry, you can't save things at the root of your system.	libtracker		Извините, невозможно сохранять объекты в корневом каталоге системы.
+%capacity GB (%used MB used -- %free MB free)	libtracker		%capacity ГБ (%used МБ занято -- %free МБ свободно)
+Empty Trash	libtracker		Очистить Корзину
+Recent folders	libtracker		Последние папки
+You cannot copy or move the root directory.	libtracker		Невозможно переместить или скопировать корневой каталог.
+starts with	libtracker		начинается на
+TiB	libtracker		ТиБ
+Duplicate	libtracker		Дублировать
+Link To:	libtracker		Ссылка на:
+Paste links	libtracker		Вставить ссылки
+Volume icons	libtracker		Значки дисков
+Relation	libtracker		Отношение
+Create a Query template	libtracker		Создать шаблон запроса
+%num items	libtracker		объектов
+Name matches wildcard expression:###	libtracker		Имя удовлетворяет регулярному выражению:###
+Modified	libtracker		Изменён
+Group	libtracker		Группа
+Create link	libtracker		Создать ссылку в
+Moving: 	libtracker		Перемещение:
+Preparing to copy items…	libtracker		Подготовка к копированию объектов
+Error deleting items	libtracker		Ошибка во время удаления объектов
+Sorry, saving more than one item is not allowed.	libtracker		Извините, сохранение более чем одного объекта невозможно.
+Open with…	libtracker		Открыть с...
+for %num files	libtracker		в %num файлах
+At %func \nfind_directory() failed. \nReason: %error	libtracker		Не удалось выполнить %func в find_directory(). \nПричина: %error
+Unknown	libtracker		Неизвестно
+Close	libtracker		Закрыть
+Go to parent	libtracker		На каталог вверх
+%name info	libtracker	InfoWindow Title	Информация о %name
+(Finish: %time - %finishtime minutes left)	libtracker		(Осталось: %time - %finishtime минут)
+Recent documents	libtracker		Последние документы
+Clean up	libtracker		Выровнить
+Find…	libtracker		Найти...
+Mount all	libtracker		Монтировать всё
+Opens with:	libtracker		Открыть в:
+Paste layout	libtracker		Вставить вид папки
+Cancel	libtracker		Отмена
+Preparing to move items…	libtracker		Подготовка к перемещению объектов
+Invert selection	libtracker		Инвертированть
+Error calculating folder size.	libtracker		Ошибка подсчета размера папки.
+Don't move files to Trash	libtracker		Не помещать файлы в Корзину
+Name	libtracker		Имя
+Cut more	libtracker		Вырезать ещё
+save text	libtracker		сохранить текст
+Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		Невозможно открыть \"%document\" (Отсутствует символ: %symbol). \n
+Don't automount	libtracker		Не монтировать автоматически
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	libtracker		Извините, но атрибут 'Character' не может хранить многобайтовые глифы.
+Would you like to find a suitable application to open the file?	libtracker		Хотите найти подходящее приложение для открытия файла?
+Increase size	libtracker		Увеличить размер
+is	libtracker		равен
+(Finish: %time - Over %finishtime hours left)	libtracker		(Осталось: %time - Более %finishtime часов)
+Could not open \"%name\" (%error). 	libtracker		Невозможно открыть \"%name\" (%error).
+Copying: 	libtracker		Копирование:
+You cannot replace a folder or a symbolic link with a file.	libtracker		Невозможно заменить каталог или символическую ссылку файлом.
+Decrease size	libtracker		Уменьшить размер
+There was an error deleting \"%name\":\n\t%error	libtracker		Ошибка во время попытки удаления \"%name\":\n\t%error
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	libtracker		Вы уверены, что хотите удалить выделенные объекты? Эту операцию будет невозможно оменить.
+The target disk does not support creating links.	libtracker		Принимающий диск не поддерживает создание ссылок.
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	libtracker		Выбранный объект не может быть перемещён в Корзину. Хотите ли Вы вместо этого удалить его? (Эту операцию будет невозможно оменить.)
+before	libtracker		до
+Copy more	libtracker		Копировать ещё
+Disks	libtracker		Диски
+Cut	libtracker		Вырезать
+The Tracker must be running to see Info windows.	libtracker		Для просмотра окна \"Информация\" должен быть запущен Tracker.
+Desktop	libtracker		Рабочий стол
+Create a Query	libtracker		Создать запрос
+Could not update permissions of file \"%name\". %error	libtracker		Невозможно обновить права файла \"%name\". %error
+Error in regular expression:\n\n'	libtracker		Ошибка в регулярном выражении:\n\n'
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	libtracker		Если вы %action папку mime settings, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action папку mime settings нажмите \"Выполнить".
+Resize to Fit	libtracker		Масштабировать
+Add printer…	libtracker		Добавить принтер...
+Trash	libtracker		Корзина
+greater than	libtracker		больше чем
+Other	libtracker		Другие
+GiB	libtracker		ГиБ
+Query name:	libtracker		Имя запроса:
+Or	libtracker		Или
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	libtracker		Объект с именем \"%name\" уже существует в этой папке, и может содержать другие \nобъекты с совпадающими именами. Вы хотите заменить их теми файлами, которые содаржаться в папке, которую вы %verb?
+Do it	libtracker		Сделать это
+There was an error writing the attribute.	libtracker		Произошла ошибка при записи атрибута.
+Emptying Trash… 	libtracker		Очищение Корзины
+Close all in workspace	libtracker		Закрыть всё на этом рабочем столе
+Sorry, you cannot edit that attribute.	libtracker		Извините, но вы не можете редактировать этот атрибут.
+Deleting: 	libtracker		Удаление:
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	libtracker		Файл \"%name\" уже существует в указанном каталоге. Вы хотите заменить его?
+Revert	libtracker		Вернуть
+Could not open \"%document\" with application \"%app\" (%error). 	libtracker		Невозможно открыть \"%document\" приложением \"%app\" (%error).
+no supporting apps	libtracker		нет поддерживающих программ
+\nShould this be fixed?	libtracker		\nВы хотите это исправить?
+The specified name is already used as the name of a folder. Please choose another name.	libtracker		Указанное имя уже использовано в качестве имени каталога. Введите какое-нибудь другое.
+Version	libtracker		Версия
+Invert	libtracker		Инвертировать
+by attribute	libtracker		по атрибуту
+There was a problem trying to save in the folder you specified. Please try another one.	libtracker		Возникла проблема во время сохранения в указанный каталог. Пожалуйста, выберите какой-нибудь другой.
+Create relative link	libtracker		Создать относительную ссылку
+Attributes	libtracker		Атрибуты
+Mount server error	libtracker		Ошибка сервера монтирования
+Sorry, there is not enough free space on the destination volume to copy the selection.	libtracker		Извините, но на принимающем разделе недостаточно свободного места для копирования выделенных файлов.
+Replace all	libtracker		Заменить всё
+Owner	libtracker		Владелец
+12 hour	libtracker		12 часов
+Select all	libtracker		Выделить всё
+Delete	libtracker		Удалить
+Save as Query template:	libtracker		Сохранить как шаблон запроса:
+Only the boot disk	libtracker		Только загрузочный диск
+Set new link target	libtracker		Изменить цель ссылки
+ends with	libtracker		заканчивается на
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	libtracker		Если Вы %action папку config, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action папку config нажмите \"Выполнить".
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Ошибка копирования папки \"%name\":\n\t%error\n\nВы хотите продолжить?
+OK	libtracker		Ок
+Make active printer	libtracker		Сделать принтер основным
+New	libtracker		Создать
+Paused: click to resume or stop	libtracker		Пауза: нажмите продолжить или остановить
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	libtracker		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствуют библиотеки: %library). \n
+MiB	libtracker		МиБ
+Disk mount settings	libtracker		Настройка монтирования дисков
+Include trash	libtracker		Включая корзину
+Could not find an application to open \"%name\" (%error). 	libtracker		Невозможно найти программу для открытия \"%name\" (%error).
+(Finish: %time - Over %finishtime days left)	libtracker		(Осталось: %time - Более %finishtime дней)
+Could not open \"%document\" (Missing libraries: %library). \n	libtracker		Невозможно открыть \"%document\" (Отсутствуют библиотеки: %library). \n
+Preparing to restore items…	libtracker		Подготовка к восстановлению объектов
+You can't replace a folder with one of its sub-folders.	libtracker		Невозможно заменить каталог его собственным подкаталогом
+Mount all disks now	libtracker		Монтировать все диски сейчас
+Temporary	libtracker		Временно
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	libtracker		Если Вы %action папку home, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action папку home нажмите \"Выполнить".
+40 x 40	libtracker		40 x 40
+Previously mounted disks	libtracker		Монтировавшиеся ранее
+Create link here	libtracker		Создать ссылку здесь
+Unmount	libtracker		Отмонтировать
+That name is already taken. Please type another one.	libtracker		Это имя уже занято. Пожалуйста введите другое.
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	libtracker		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствует символ: %symbol). \n
+less than	libtracker		меньше чем
+Edit query	libtracker		Редактировать запрос
+Original name	libtracker		Оригинальное имя
+Preparing to delete items…	libtracker		Подготовка к удалению объектов...
+Created:	libtracker		Создан:
+Location:	libtracker		Размещение:
+New Query	libtracker		Новый запрос
+Write	libtracker		Запись
+Sorry, you can't copy items to the Trash.	libtracker		Извините, но вы не можете копировать объекты в Корзину.
+Mini icon view	libtracker		Мелкие значки
+Windows	libtracker		Окна
+Ask before delete	libtracker		Спрашивать перед удалением
+matches regular expression	libtracker		удовлетворяет регулярному выражению
+Open and make preferred	libtracker		Открыть и сделать предпочтительным
+Default application	libtracker		Приложении по умолчанию
+Execute	libtracker		Исполнять
+Created	libtracker		Создан
+calculating…	libtracker		подсчёт...
+label too long	libtracker		слишком длинная метка
+Link \"%name\" to:	libtracker	File dialog title for new sym link	Ссылка \"%name\" на:
+Query template	libtracker		Шаблон запроса
+Description:	libtracker		Описание:
+You cannot replace a file with a folder or a symbolic link.	libtracker		Невозможно заменить файл каталогом или символической ссылкой.
+Save	libtracker		Сохранить
+Month-day-year	libtracker		Месяц-день-год
+link	libtracker	filename link	ссылка
+Open	libtracker		Открыть
+Edit name	libtracker		Переименовать
+Show folder location in title tab	libtracker		Показывать адрес папки в заголовке окна
+contains	libtracker		содержит
+Formula %formula	libtracker	FindResultTitle	Формула %formula
+You cannot put the Trash, home or Desktop directory into the trash.	libtracker		Вы не можете перереместить каталоги Trash, home или Desktop в корзину.
+Date & Time	libtracker		Дата и время
+Modified:	libtracker		Изменён:
+Skip	libtracker		Пропустить
+Examples:	libtracker		Примеры:
+24 hour	libtracker		24 часа
+Preparing to create links…	libtracker		Подготовка к созданию ссылок...
+Error emptying Trash!	libtracker		Ошибка очистки Корзины!
+There was an error resolving the link.	libtracker		Возникла ошибка при открытии ссылки.
+Move	libtracker		Переместить
+You can't move a folder into itself or any of its own sub-folders.	libtracker		Невозможно переместить каталог в самого себя или в собственный подкаталог.
+Error %error loading Add-On %name.	libtracker		Ошибка %error во время запуска дополнения %name.
+Edit Query template	libtracker		Редактировать шаблон запроса
+Show shared volumes on Desktop	libtracker		Показывть значки общих дисков на Рабочем столе
+Ignore case	libtracker		Игнорировать регистр
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	libtracker		Некторые объекты с такими же именами которые вы %verb уже существуют в этой папке.\n \nВы хотите заменить их теми, которые Вы %verb или выводить запрос для каждого?"
+Open parent	libtracker		На уровень вверх
+None	libtracker		Нет
+You can't move or copy the trash.	libtracker		Вы не можете перемещать или копировать Корзину.
+Create relative link here	libtracker		Создать относительную ссылку здесь
+moving	libtracker		перемещаете
+Version:	libtracker		Версия:
+Capacity:	libtracker		Объём:
+You cannot create a link to the root directory.	libtracker		Невозможно создать ссылку на корневой каталог.
+Are you sure you want to move or copy the selected item(s) to this folder?	libtracker		Вы уверены, что хотите скопировать или переместить выбранные объекты в эту папку?
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	libtracker		Вы пытаетесь заменить объект:\n\t%name%dest\nна:\n\t%name%src\n\nЗаменить его на тот, который вы %movemode?
+Move here	libtracker		Переместить сюда
+Free space color	libtracker		Цвет свободного места
+Read	libtracker		Чтение
+after	libtracker		после
+Size	libtracker		Размер
+Search	libtracker		Искать
+Recalculate folder size	libtracker		Пересчитать размер папки
+Favorites	libtracker		Закладки
+List view	libtracker		Список
+Enable type-ahead filtering	libtracker		Включить фильтрацию печати
+Show Disks icon	libtracker		Показывать значок дисков
+Edit templates…	libtracker		Редактировать шаблоны
+Add	libtracker		Добавить
+Disk mounting during boot	libtracker		Монтирование дисков при загрузке:
+Date order	libtracker		Порядок даты
+Restoring: 	libtracker		Восстановление:
+Settings…	libtracker		Настройки
+Sorry, could not create a new folder.	libtracker		Извините, невозможно создать новый каталог.
+Current folder	libtracker		Текущая папка
+New folder %ld	libtracker		Новый каталог %ld
+Cannot unmount the boot volume \"%name\".	libtracker		Невозможно отмонтировать загрузочный раздел \"%name\".
+48 x 48	libtracker		48 x 48
+Copy here	libtracker		Копировать сюда
+%Ld bytes	libtracker		%Ld байт
+Used space color	libtracker		Цвет использованного места
+Location	libtracker		Размещение
+Error moving \"%name\".	libtracker		Ошибка во время перемещения \"%name\".
+Show volumes on Desktop	libtracker		Показывать диски на Рабочем столе
+Name = %name	libtracker	FindResultTitle	Имя = %name
+matches wildcard expression	libtracker		удовлетворяет шаблону
+Window	libtracker		Окно
+There was a problem trying to replace \"%name\". The item might be open or busy.	libtracker		Ошибка во время попытки замены \"%name\". Возможно объект открыт или занят.
+Proceed	libtracker		Продолжить
+New folder%ld	libtracker		Новый каталог%ld
+Year-month-day	libtracker		Год-месяц-день
+New folder	libtracker		Новый каталог
+File	libtracker		Файл
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Ошибка копирования файла \"%name\":\n\t%error\n\nВы хотите продолжить?
+Close all	libtracker		Закрыть всё
+(Finish: %time)	libtracker		(Осталось: %time)
+Clock	libtracker		Часы
+Show navigator	libtracker		Показывать панель навигации
+Force identify	libtracker		Форсировтаь опознание
+Mount settings…	libtracker		Настройка монтирования...
+is not	libtracker		не равно
+Clean up all	libtracker		Выровнить Всё
+List folders first	libtracker		Отображать папки первыми
+Remove	libtracker		Удалить
+All BeOS disks	libtracker		Все диски BeOS
+no items	libtracker		нет объектов
+copying	libtracker		копируете
+Preferences…	libtracker		Настройки...
+All disks	libtracker		Все диски
+Searching for disks to mount…	libtracker		Поиск дисков для монтирования...
+Tracker status	libtracker		Статус Трэкера
+Identify	libtracker		Опознать
+Automatic disk mounting	libtracker		Автоматическое монтирование
+Add-ons	libtracker		Дополнения
+The mount server could not be  contacted.	libtracker		Невозможно связаться с сервером монтирования
+Select…	libtracker		Выделить...
+multiple disks	libtracker		несколько дисков
+Could not open \"%name\". The file is mistakenly marked as executable. 	libtracker		Невозможно открыть \"%name\". Файл ошибочно помечен как исполняемый.
+Single window navigation	libtracker		Открывать папки в одном окне
+Done	libtracker		Готово
+Open selection with:	libtracker		Открыть выбранное с помощью:
+Paste	libtracker		Вставить
+32 x 32	libtracker		32 x 32
+Get info	libtracker		Информация
+Create %s clipping	libtracker		Создать %s выборку
+You must drop items on one of the disk icons in the \"Disks\" window.	libtracker		Вы должны переместитьт объекты на один из значков дисков окне \"Диски\"
+Move to	libtracker		Переместить в
+by name	libtracker		по имени
+Warning space color	libtracker		Цвет предупреждающий о нехватке места
+Add current folder	libtracker		Добавить текущий катало
+Replace other file	libtracker		Заменить существующий файл
+%Ld B	libtracker		%Ld Б
+Tracker preferences	libtracker		Натройка 
+Prompt	libtracker		Спрашивать
+Kind	libtracker		Тип
+Move to Trash	libtracker		В Корзину
+1 item	libtracker		1 объект
+Size:	libtracker		Размер:
+Would you like to find some other suitable application?	libtracker		Хотите найти какое-нибудь другое подходящее приложение?
+Files cannot be moved or deleted from a read-only volume.	libtracker		Невозможно перемещать или копировать файлы на раздел в режиме \"только для чтения\"
+by formula	libtracker		по формуле
+(%bytes bytes)	libtracker		(%bytes байт)
+Copy to	libtracker		Копировать в
+And	libtracker		И
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	libtracker		Некоторые из выбранных объектов не могут быть перемещены в Корзину. Хотите ли вы вместо этого удалить объекты? (Эту операцию будет невозможно оменить.)
+Eject when unmounting	libtracker		Выдвигать лоток диска при отмонтировании
+Error creating link to \"%name\".	libtracker		Ошибка создания ссылки к \"%name\".
+copy	libtracker	filename copy	копия
+Icon view	libtracker		Большие значки
+Sorry, you can't create links in the Trash.	libtracker		Извините, но Вы не можете создовать ссылки в Корзине.
+Edit favorites…	libtracker		Изменить закладки...
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	libtracker		Если Вы %action папку settings, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action папку settings нажмите \"Выполнить".
+On	libtracker		На
+Space	libtracker		Пустота
+Find	libtracker		Найти
+Error moving \"%name\"	libtracker		Ошибка во время перемещения \"%name\"
+(Finish: %time - %finishtime seconds left)	libtracker		(Осталось: %time - %finishtime секунд)
+That name is too long. Please type another one.	libtracker		Это имя слишком длинное. Пожалуйста введите другое.
+Select	libtracker		Выделить
+Error moving \"%name\" to Trash. (%error)	libtracker		Ошибка во время перемещения \"%name\" в Корзину.
+Outline selection rectangle only	libtracker		Показывать контур при выделении
+The specified name is illegal. Please choose another name.	libtracker		Введённое имя недопустимо. Введите какое-нибудь другое.
+of %items	libtracker		из %items
+Day-month-year	libtracker		День-месяц-год
+Preparing to empty Trash…	libtracker		Подготовка к очистке Корзины...
+%capacity MB (%used MB used -- %free MB free)	libtracker		%capacity МБ (%used MБ занято -- %free MБ свободно)
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		Если Вы %action папку system или её содержимое, Haiku больше не сможет загружаться! Вы уверены, что хотите сделать это? Чтобы %action папку system или её содержимое, зажмите клавишу Shift и нажмите \"Выполнить!\".
+Kind:	libtracker		Тип:
+Replace	libtracker		Заменить
+Show space bars on volumes	libtracker		Показывать индикаторы занятого места на значках дисков
+Permissions	libtracker		Права
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	libtracker		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?";
+64 x 64	libtracker		64 x 64
+You can't move or copy items to read-only volumes.	libtracker		Невозможно перемещать или копировать что-либо на раздел в режиме \"только для чтения\".
+You must have at least one attribute showing.	libtracker		Вы должны оставить хотя бы один атрибут для просмотра.
+Copy layout	libtracker		Копировать вид папки
+Empty folder	libtracker		Каталог пуст
+All files and folders	libtracker		Все файлы и папки
+Restore	libtracker		Восстановить
+The Tracker must be running to see set the default printer.	libtracker		Для установки принтера по умолчанию Трэкер должен быть запущен.
+Save Query as template…	libtracker		Сохранить запрос как шаблон...
+KiB	libtracker		КиБ
+Mount	libtracker		Монтировать
+Creating links: 	libtracker		Создание ссылок:
+<No recent items>	libtracker		<Нет последних объектов>
+Copy	libtracker		Копировать
+Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		Невозможно открыть \"%document\" поскольку программа \"%app\" находится в Корзине.
+Defaults	libtracker		По умолчанию

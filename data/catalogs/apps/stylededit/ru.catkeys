@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	154881138
+1	russian	x-vnd.Haiku-StyledEdit	1187976595
 OK	LoadAlert		Oк
 ???	LoadAlert		???
 Left	Menus		По левому краю
@@ -58,3 +58,15 @@ Cancel	SaveAlert		Отмена
 Save	SaveAlert		Сохранить
 Don't save	SaveAlert		Не сохранять
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Этот файл отмечен только для чтения. Сохранить изменения в документе \"%s\"? 
+Paste	Menus		Вставить
+File	Menus		Файл
+Page setup…	Menus		Настройка печати...
+Print…	Menus		Печать...
+Quit	Menus		Выход
+Clear	Menus		Очистить
+Edit	Menus		Изменить
+Close	Menus		Закрыть
+Copy	Menus		Копировать
+Cut	Menus		Вырезать
+Select all	Menus		Выделить всё
+Save as…	Menus		Сохранить как...

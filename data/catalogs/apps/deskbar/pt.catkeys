@@ -1,3 +1,42 @@
-1	portuguese	x-vnd.Be-TSKB	1884644663
+1	portuguese	x-vnd.Be-TSKB	3810030877
 Applications	PreferencesWindow		Aplicações
 Recent applications	BeMenu		Aplicações recentes
+Edit menu…	PreferencesWindow		Editar menu...
+Recent documents:	PreferencesWindow		Documentos recentes:
+Recent folders	BeMenu		Pastas recentes:
+Sort running applications	PreferencesWindow		Ordenar aplicações em execução
+Change time…	TimeView		Mudar hora...
+<Be folder is empty>	BeMenu		<Pasta Be vazia>
+Window	PreferencesWindow		Janela
+Menu	PreferencesWindow		Menu
+Show seconds	PreferencesWindow		Mostrar segundos
+Always on top	PreferencesWindow		Sempre visível
+Show all	WindowMenu		Mostrar todas
+No windows	WindowMenu		Não mostrar janelas
+Power off	BeMenu		Desligar
+Auto-raise	PreferencesWindow		Elevar automaticamente
+Full date	PreferencesWindow		Data completa
+Hide time	TimeView		Ocultar hora
+Recent folders:	PreferencesWindow		Pastas recentes:
+Deskbar preferences…	BeMenu		Preferências da Deskbar...
+Show application expander	PreferencesWindow		Mostrar expansor de aplicação
+Close all	WindowMenu		Fechar todas
+Deskbar preferences	PreferencesWindow		Preferências da Deskbar
+Mount	BeMenu		Montar
+Recent applications:	PreferencesWindow		Aplicações recentes:
+Tracker always first	PreferencesWindow		Tracker sempre à frente
+About Haiku…	BeMenu		Acerca do Haiku...
+Show calendar…	TimeView		Mostrar calendário
+Restart system	BeMenu		Reiniciar sistema
+Find…	BeMenu		Localizar...
+Restart Tracker	BeMenu		Reiniciar o Tracker
+Show Time	Tray		Mostrar hora
+Expand new applications	PreferencesWindow		Expandir novas aplicações
+Clock	PreferencesWindow		Relógio
+Recent documents	BeMenu		Documentos recentes
+Hide all	WindowMenu		Ocultar todas
+Shutdown…	BeMenu		Encerrar...
+Suspend	BeMenu		Suspender
+Quit application	WindowMenu		Sair da aplicação
+About this system…	BeMenu		Acerca deste sistema...
+Show replicants	BeMenu		Mostrar replicantes

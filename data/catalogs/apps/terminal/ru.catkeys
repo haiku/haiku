@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	3813786078
+1	russian	x-vnd.Haiku-Terminal	3313567607
 Not found.	Terminal TermWindow		Не найдено
 Didn't find any available pseudo ttys.	Terminal Shell		Didn't find any available pseudo ttys.
 Switch Terminals	Terminal TermWindow		Переключить терминалы
@@ -38,6 +38,10 @@ Insert path	Terminal TermView		Вставить путь
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
 No search string was entered.	Terminal TermWindow		Не введена строка поиска.
 Don't save	Terminal PrefWindow		Не сохранять
+Match word	Terminal FindWindow		Только слово целиком
+Close tab	Terminal SmartTabView		Закрыть вкладку
+Nothing is selected.	Terminal TermWindow		Ничего не выделено
+Text not found.	Terminal TermWindow		Текст не найден
 Find…	Terminal TermWindow		Найти...
 Move here	Terminal TermView		Переместить сюда
 Secondary mouse button drop menu	Terminal TermView		Secondary mouse button drop menu
@@ -47,3 +51,31 @@ can't open tty (%s).	Terminal Shell		can't open tty (%s).
 Decrease	Terminal TermWindow		Уменьшить
 Create link here	Terminal TermView		Создать ссылку здесь
 failed set terminal interface (TERMIOS).	Terminal Shell		failed set terminal interface (TERMIOS).
+Clear all	Terminal TermWindow		Очистить все
+Text encoding	Terminal TermWindow		Кодировка
+size	Terminal TermView		размер
+Save as default	Terminal TermWindow		Сохранить
+Settings…	Terminal TermWindow		Настройки...
+Abort	Terminal Shell		Отменить
+mismatch handshake.	Terminal Shell		mismatch handshake.
+Color:	Terminal AppearancePrefView		Цвет:
+Print	Terminal TermWindow		Печать
+Use text:	Terminal FindWindow		Использовать текст:
+Cancel	Terminal TermWindow		Отмена
+OK	Terminal TermApp		Ок
+Find failed	Terminal TermWindow		Строка не найдена
+Search forward	Terminal FindWindow		Искать вниз
+Find previous	Terminal TermWindow		Найти предыдущее
+About Terminal…	Terminal TermWindow		О программе....
+Find next	Terminal TermWindow		Найти далее
+Close active tab	Terminal TermWindow		Закрыть активную владку
+Terminal	Terminal TermApp		Терминал
+PrefHandler::getRGB(%s) - key not found\n	Terminal getRGB		PrefHandler::getRGB(%s) - key not found\n
+Paste	Terminal TermWindow		Вставить
+Save changes to this settings panel?	Terminal PrefWindow		Сохранить изменения в панеле настройки?
+Cancel	Terminal PrefWindow		Отмена
+Save	Terminal PrefWindow		Сохранить
+Cancel	Terminal TermView		Отмена
+-h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright 	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновил Kian Duffy и многие другие\n\nCopyright
+Color schema:	Terminal AppearancePrefView		Цветовая схема:

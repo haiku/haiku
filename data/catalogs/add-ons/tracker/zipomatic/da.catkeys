@@ -1,0 +1,18 @@
+1	danish	x-vnd.haiku.zip-o-matic	274748138
+1 file added.	file:ZipOMaticWindow.cpp		1 fil tilføjet.
+Stop	file:ZipOMaticWindow.cpp		Stop
+Creating archive: %s	file:ZipOMaticWindow.cpp		Opretter arkiv: %s
+Continue	file:ZipOMaticWindow.cpp		Fortsæt
+Preparing to archive	file:ZipperThread.cpp		Forbereder arkivering
+Filename: %s	file:ZipOMaticWindow.cpp		Filnavn: %s
+Let them continue	file:ZipOMatic.cpp		Lad dem fortsætte
+Do you want to stop them?	file:ZipOMatic.cpp		Ønsker du at stoppe dem?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på, at du ønsker at afbryde arkiveringen?
+%ld files added.	file:ZipOMaticWindow.cpp		%ld filer tilføjet.
+Stopped	file:ZipOMaticWindow.cpp		Stoppet
+Archive	file:ZipperThread.cpp		Arkiv
+Drop files to zip.	file:ZipOMaticWindow.cpp		Slip filer her for at arkivere dem.
+Error creating archive	file:ZipOMaticWindow.cpp		Fejl i forbindelse med oprettelsen af arkiv
+You have %ld Zip-O-Matic running.\n\n	file:ZipOMatic.cpp		Du har %ld Zip-O-Matic kørende.\n\n
+Archive created OK	file:ZipOMaticWindow.cpp		Arkiv oprettet uden fejl
+Stop them	file:ZipOMatic.cpp		Stop dem

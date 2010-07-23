@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	4063037908
+1	russian	x-vnd.Be-MAIL	694686022
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
 Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
@@ -52,6 +52,7 @@ Print…	Mail		Печать…
 Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
 Quit	Mail		Выход
 %n - Full name	Mail		%n - Полное имя
+Read 	Mail		Читать
 Trash	Mail		Корзина
 Default account:	Mail		Аккаунт по умолчанию:
 Size:	Mail		Размер:

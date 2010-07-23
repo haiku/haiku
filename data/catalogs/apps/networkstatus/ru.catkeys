@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-NetworkStatus	2629328496
+1	russian	x-vnd.Haiku-NetworkStatus	535806690
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n	NetworkStatus		NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit\n
 Broadcast information:\n	NetworkStatusView		Широковещательная информация:\n
 No link	NetworkStatusView		Нет соединения
 Install	NetworkStatus		Установить

@@ -1,4 +1,4 @@
-1	chinese	x-vnd.Haiku-bootman	705138509
+1	simplified_chinese	x-vnd.Haiku-bootman	705138509
 The boot manager has been successfully installed on your system.	BootManagerController		启动管理器已经成功安装到您的系统。
 At least one partition must be selected!	BootManagerController		至少选择一个分区！
 The old Master Boot Record could not be saved to %s	BootManagerController		原始主引导记录（MBR）不能够保存到 %s

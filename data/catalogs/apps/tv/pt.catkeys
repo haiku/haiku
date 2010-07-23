@@ -1,0 +1,30 @@
+1	portuguese	x-vnd.Haiku.TV	3791845041
+TV	MainWin		TV
+Channel	MainWin		Canal
+Settings…	MainWin		Definições...
+Interface	MainWin		Interface
+Keep aspect ratio	MainWin		Manter a proporção
+Previous channel	MainWin		Canal anterior
+Settings	MainWin		Definições
+About %1…	MainWin	Parameter %1 is the name of the application.	Sobre o %1... Nota: O parâmetro %1 é o nome da aplicação.
+No border	MainWin		Sem limte
+Always on top	MainWin		Sempre visível
+OK	MainWin		OK
+Quit	MainWin		Sair
+Full screen	MainWin		Ecrã inteiro
+\nRevision 	MainWin		\nRevisão
+Debug	MainWin		Depurar
+Scale to native size	MainWin		Ajustar para tamanho nativo
+unknown	MainWin		desconhecido
+Next channel	MainWin		Próximo canal
+Error, interface is busy:\n\n	MainWin		Erro, a interface está ocupada:\n\n
+None	MainWin		Nenhum
+force 704 x 576, display aspect 4:3	MainWin		force 704 x 576, display aspect 4:3
+DVB - Digital Video Broadcasting TV	MainWin		DVB - TV Digital Video Broadcasting
+force 544 x 576, display aspect 4:3	MainWin		force 544 x 576, display aspect 4:3
+pixel aspect ratio	MainWin		proporção do pixel
+No menu	MainWin		Sem menu
+\nBuild 	MainWin		\nCompilação
+Error, connecting to interface failed:\n\n	MainWin		Erro, falha na ligação à interface:\n\n
+\nVersion 	MainWin		\nVersão
+force 720 x 576, display aspect 4:3	MainWin		forçar 720 x 576, aspecto de vis 4:3

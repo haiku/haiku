@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	3743087590
+1	russian	x-vnd.Haiku-About	1829924476
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 %ld Processors:	AboutView		%ld Процессоры:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
@@ -34,5 +34,6 @@ Google & their Google Summer of Code program\n\n	AboutView		Корпорации
 The BeGeistert team\n	AboutView		команде BeGeistert\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku и логотип Haiku являются торговыми марками Haiku, Inc.\n\n
 GCC %d Hybrid	AboutView		GCC %d Гибрид
+%d MiB total	AboutView		Всего %d МиБ
 %d MiB used (%d%%)	AboutView		Использовано %d МиБ (%d%%)
 %d MiB total, %d MiB inaccessible	AboutView		%d МиБ всего, %d МиБ недоступно
