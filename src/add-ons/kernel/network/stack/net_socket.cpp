@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -902,7 +902,8 @@ socket_notify(net_socket* _socket, uint8 event, int32 value)
 
 	switch (event) {
 		case B_SELECT_READ:
-			if ((ssize_t)socket->receive.low_water_mark > value && value >= B_OK)
+			if ((ssize_t)socket->receive.low_water_mark > value
+				&& value >= B_OK)
 				notify = false;
 			break;
 
@@ -913,12 +914,13 @@ socket_notify(net_socket* _socket, uint8 event, int32 value)
 
 		case B_SELECT_ERROR:
 			socket->error = value;
+			event |= B_SELECT_READ | B_SELECT_WRITE;
 			break;
 	}
 
 	MutexLocker _(socket->lock);
 
-	if (notify && socket->select_pool)
+	if (notify && socket->select_pool != NULL)
 		notify_select_event_pool(socket->select_pool, event);
 
 	return B_OK;
