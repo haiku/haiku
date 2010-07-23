@@ -595,8 +595,10 @@ dump_buffer(net_buffer* _buffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
-	dprintf("buffer %p, size %ld, flags %lx\n", buffer, buffer->size,
-		buffer->flags);
+	dprintf("buffer %p, size %" B_PRIu32 ", flags %" B_PRIx32 ", stored header "
+		"%" B_PRIu32 "\n", buffer, buffer->size, buffer->flags,
+		buffer->stored_header_length);
+
 	dump_address("source", buffer->source);
 	dump_address("destination", buffer->destination);
 
@@ -606,8 +608,12 @@ dump_buffer(net_buffer* _buffer)
 		dprintf("  node %p, offset %lu, used %u, header %u, tail %u, "
 			"header %p\n", node, node->offset, node->used, node->HeaderSpace(),
 			node->TailSpace(), node->header);
-		//dump_block((char*)node->start, node->used, "    ");
-		dump_block((char*)node->start, min_c(node->used, 32), "    ");
+
+		if ((node->flags & DATA_NODE_STORED_HEADER) != 0) {
+			dump_block((char*)node->start - buffer->stored_header_length,
+				min_c(buffer->stored_header_length, 64), "  s ");
+		}
+		dump_block((char*)node->start, min_c(node->used, 64), "    ");
 	}
 }
 
