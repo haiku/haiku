@@ -49,7 +49,7 @@ extern wint_t	fputwc(wchar_t, FILE *);
 extern int		fputws(const wchar_t *, FILE *);
 extern int		fwide(FILE *, int);
 extern int		fwprintf(FILE *, const wchar_t *, ...);
-/*extern int		fwscanf(FILE *, const wchar_t *, ...);*/
+extern int		fwscanf(FILE *, const wchar_t *, ...);
 extern wint_t	getwc(FILE *);
 extern wint_t	getwchar(void);
 
@@ -97,8 +97,7 @@ extern int      wcscoll(const wchar_t *ws1, const wchar_t *ws2);
 extern wchar_t	*wcscpy(wchar_t *, const wchar_t *);
 extern size_t	wcscspn(const wchar_t *, const wchar_t *);
 extern wchar_t	*wcsdup(const wchar_t *);
-extern size_t	wcsftime(wchar_t *, size_t, const wchar_t *,
-					const struct tm *);
+extern size_t	wcsftime(wchar_t *, size_t, const wchar_t *, const struct tm *);
 extern size_t	wcslen(const wchar_t *);
 extern wchar_t 	*wcsncat(wchar_t *, const wchar_t *, size_t);
 extern int		wcsncmp(const wchar_t *, const wchar_t *, size_t);

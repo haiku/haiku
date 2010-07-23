@@ -19,6 +19,7 @@ MergeObject posix_time.o :
 	strptime.c
 	timelocal.c
 	time.c
+	wcsftime.c
 ;
 
 # Explanations of flags:
