@@ -24,8 +24,12 @@
 //#define TRACE_AV_CODEC
 #ifdef TRACE_AV_CODEC
 #	define TRACE(x...)	printf(x)
+#	define TRACE_AUDIO(x...)	printf(x)
+#	define TRACE_VIDEO(x...)	printf(x)
 #else
 #	define TRACE(x...)
+#	define TRACE_AUDIO(x...)
+#	define TRACE_VIDEO(x...)
 #endif
 
 //#define LOG_STREAM_TO_FILE
@@ -370,6 +374,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	inOutFormat->u.raw_audio = outputAudioFormat;
 
 	fContext->bit_rate = (int)fInputFormat.u.encoded_audio.bit_rate;
+	fContext->frame_size = (int)fInputFormat.u.encoded_audio.frame_size;
 	fContext->sample_rate
 		= (int)fInputFormat.u.encoded_audio.output.frame_rate;
 	fContext->channels = fInputFormat.u.encoded_audio.output.channel_count;
@@ -545,18 +550,20 @@ status_t
 AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 	media_header* mediaHeader, media_decode_info* info)
 {
-//	TRACE("audio start_time %.6f\n", mediaHeader->start_time / 1000000.0);
+	TRACE_AUDIO("AVCodecDecoder::_DecodeAudio()\n");
+//	TRACE_AUDIO("  audio start_time %.6f\n",
+//		mediaHeader->start_time / 1000000.0);
 
 	char* output_buffer = (char*)outBuffer;
 	*outFrameCount = 0;
 	while (*outFrameCount < fOutputFrameCount) {
 		if (fOutputBufferSize < 0) {
-			TRACE("############ fOutputBufferSize %ld\n",
+			TRACE_AUDIO("  ############ fOutputBufferSize %ld\n",
 				fOutputBufferSize);
 			fOutputBufferSize = 0;
 		}
 		if (fChunkBufferSize < 0) {
-			TRACE("############ fChunkBufferSize %ld\n",
+			TRACE_AUDIO("  ############ fChunkBufferSize %ld\n",
 				fChunkBufferSize);
 			fChunkBufferSize = 0;
 		}
@@ -576,9 +583,11 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 		if (fChunkBufferSize == 0) {
 			media_header chunkMediaHeader;
 			status_t err;
-			err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, &chunkMediaHeader);
+			err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize,
+				&chunkMediaHeader);
 			if (err == B_LAST_BUFFER_ERROR) {
-				TRACE("Last Chunk with chunk size %ld\n",fChunkBufferSize);
+				TRACE_AUDIO("  Last Chunk with chunk size %ld\n",
+					fChunkBufferSize);
 				fChunkBufferSize = 0;
 				return err;
 			}
@@ -601,7 +610,7 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 				fChunkBufferSize);
 			if (len < 0) {
 				if (!fAudioDecodeError) {
-					TRACE("########### audio decode error, "
+					printf("########### audio decode error, "
 						"fChunkBufferSize %ld, fChunkBufferOffset %ld\n",
 						fChunkBufferSize, fChunkBufferOffset);
 					fAudioDecodeError = true;
@@ -619,6 +628,7 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 			fOutputBufferSize = out_size;
 		}
 	}
+	TRACE_AUDIO("  frame count: %lld\n", *outFrameCount);
 	fFrame += *outFrameCount;
 
 //	TRACE("Played %Ld frames at time %Ld\n",*outFrameCount, mediaHeader->start_time);
