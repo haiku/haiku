@@ -4,6 +4,7 @@
 
 #include <SupportDefs.h>
 #include <LocaleStrings.h>
+#include <Locker.h>
 #include <String.h>
 
 
@@ -114,14 +115,21 @@ class BCountry {
 		status_t GetTimeZones(BMessage* timezones);
 
 	private:
-		icu_44::DateFormat* DateFormatter(bool longFormat);
-		icu_44::DateFormat* TimeFormatter(bool longFormat);
+		icu_44::DateFormat* LockDateFormatter(bool longFormat);
+		icu_44::DateFormat* LockTimeFormatter(bool longFormat);
+		void				UnlockDateFormatter(bool longFormat);
+		void				UnlockTimeFormatter(bool longFormat);
 
 		icu_44::DateFormat* fICULongDateFormatter;
 		icu_44::DateFormat* fICUShortDateFormatter;
 		icu_44::DateFormat* fICULongTimeFormatter;
 		icu_44::DateFormat* fICUShortTimeFormatter;
 		icu_44::Locale* fICULocale;
+
+		BLocker fLongDateLock;
+		BLocker fShortDateLock;
+		BLocker fLongTimeLock;
+		BLocker fShortTimeLock;
 };
 
 #endif	/* _COUNTRY_H_ */
