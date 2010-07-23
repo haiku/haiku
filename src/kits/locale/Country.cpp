@@ -7,15 +7,12 @@
 
 #include <Country.h>
 
-#include <assert.h>
-#include <iostream>
-#include <stdlib.h>
-#include <vector>
-
 #include <CalendarView.h>
 #include <IconUtils.h>
+#include <List.h>
 #include <Resources.h>
 #include <String.h>
+#include <TimeZone.h>
 
 #include <unicode/datefmt.h>
 #include <unicode/dcfmtsym.h>
@@ -24,8 +21,13 @@
 #include <unicode/smpdtfmt.h>
 #include <ICUWrapper.h>
 
+#include <assert.h>
+#include <iostream>
+#include <map>
 #include <monetary.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <vector>
 
 
 #define ICU_VERSION icu_44
@@ -195,7 +197,7 @@ BCountry::GetIcon(BBitmap* result)
 
 
 DateFormat*
-BCountry::LockDateFormatter(bool longFormat)
+BCountry::_LockDateFormatter(bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
@@ -218,7 +220,7 @@ BCountry::LockDateFormatter(bool longFormat)
 
 
 void
-BCountry::UnlockDateFormatter(bool longFormat)
+BCountry::_UnlockDateFormatter(bool longFormat)
 {
 	if (longFormat) {
 		fLongDateLock.Unlock();
@@ -229,7 +231,7 @@ BCountry::UnlockDateFormatter(bool longFormat)
 
 
 DateFormat*
-BCountry::LockTimeFormatter(bool longFormat)
+BCountry::_LockTimeFormatter(bool longFormat)
 {
 	// TODO: ICU allows for 4 different levels of expansion :
 	// short, medium, long, and full. Our bool parameter is not enough...
@@ -252,7 +254,7 @@ BCountry::LockTimeFormatter(bool longFormat)
 
 
 void
-BCountry::UnlockTimeFormatter(bool longFormat)
+BCountry::_UnlockTimeFormatter(bool longFormat)
 {
 	if (longFormat) {
 		fLongTimeLock.Unlock();
@@ -265,16 +267,16 @@ BCountry::UnlockTimeFormatter(bool longFormat)
 status_t
 BCountry::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 {
-	ICU_VERSION::DateFormat* dateFormatter = LockDateFormatter(longFormat);
+	ICU_VERSION::DateFormat* dateFormatter = _LockDateFormatter(longFormat);
 	if (dateFormatter == NULL) {
-		UnlockDateFormatter(longFormat);
+		_UnlockDateFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
 	UnicodeString ICUString;
 	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
 
-	UnlockDateFormatter(longFormat);
+	_UnlockDateFormatter(longFormat);
 
 	CheckedArrayByteSink stringConverter(string, maxSize);
 
@@ -293,15 +295,15 @@ BCountry::FormatDate(BString *string, time_t time, bool longFormat)
 	string->Truncate(0);
 		// We make the string empty, this way even in cases where ICU fail we at
 		// least return something sane
-	ICU_VERSION::DateFormat* dateFormatter = LockDateFormatter(longFormat);
+	ICU_VERSION::DateFormat* dateFormatter = _LockDateFormatter(longFormat);
 	if (dateFormatter == NULL) {
-		UnlockDateFormatter(longFormat);
+		_UnlockDateFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
 	UnicodeString ICUString;
 	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
-	UnlockDateFormatter(longFormat);
+	_UnlockDateFormatter(longFormat);
 
 	BStringByteSink stringConverter(string);
 
@@ -317,9 +319,9 @@ BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 {
 	string->Truncate(0);
 
-	ICU_VERSION::DateFormat* dateFormatter = LockDateFormatter(longFormat);
+	ICU_VERSION::DateFormat* dateFormatter = _LockDateFormatter(longFormat);
 	if (dateFormatter == NULL) {
-		UnlockDateFormatter(longFormat);
+		_UnlockDateFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -329,7 +331,7 @@ BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 	UnicodeString ICUString;
 	ICUString = dateFormatter->format((UDate)time * 1000, ICUString,
 		&positionIterator, error);
-	UnlockDateFormatter(longFormat);
+	_UnlockDateFormatter(longFormat);
 
 	if (error != U_ZERO_ERROR)
 		return B_ERROR;
@@ -361,9 +363,9 @@ BCountry::DateFormat(BString& format, bool longFormat)
 {
 	format.Truncate(0);
 
-	ICU_VERSION::DateFormat* dateFormatter = LockDateFormatter(longFormat);
+	ICU_VERSION::DateFormat* dateFormatter = _LockDateFormatter(longFormat);
 	if (dateFormatter == NULL) {
-		UnlockDateFormatter(longFormat);
+		_UnlockDateFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -372,7 +374,7 @@ BCountry::DateFormat(BString& format, bool longFormat)
 
 	UnicodeString ICUString;
 	ICUString = dateFormatterImpl->toPattern(ICUString);
-	UnlockDateFormatter(longFormat);
+	_UnlockDateFormatter(longFormat);
 
 	BStringByteSink stringConverter(&format);
 
@@ -385,9 +387,9 @@ BCountry::DateFormat(BString& format, bool longFormat)
 status_t
 BCountry::SetDateFormat(const char* formatString, bool longFormat)
 {
-	ICU_VERSION::DateFormat* dateFormatter = LockDateFormatter(longFormat);
+	ICU_VERSION::DateFormat* dateFormatter = _LockDateFormatter(longFormat);
 	if (dateFormatter == NULL) {
-		UnlockDateFormatter(longFormat);
+		_UnlockDateFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -396,7 +398,7 @@ BCountry::SetDateFormat(const char* formatString, bool longFormat)
 
 	UnicodeString pattern(formatString);
 	dateFormatterImpl->applyPattern(pattern);
-	UnlockDateFormatter(longFormat);
+	_UnlockDateFormatter(longFormat);
 
 	return B_OK;
 }
@@ -405,9 +407,9 @@ BCountry::SetDateFormat(const char* formatString, bool longFormat)
 status_t
 BCountry::DateFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 {
-	ICU_VERSION::DateFormat* dateFormatter = LockDateFormatter(longFormat);
+	ICU_VERSION::DateFormat* dateFormatter = _LockDateFormatter(longFormat);
 	if (dateFormatter == NULL) {
-		UnlockDateFormatter(longFormat);
+		_UnlockDateFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -418,7 +420,7 @@ BCountry::DateFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 	time_t now;
 	ICUString = dateFormatter->format((UDate)time(&now) * 1000, ICUString,
 		&positionIterator, error);
-	UnlockDateFormatter(longFormat);
+	_UnlockDateFormatter(longFormat);
 
 	if (error != U_ZERO_ERROR)
 		return B_ERROR;
@@ -477,15 +479,15 @@ BCountry::StartOfWeek()
 status_t
 BCountry::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
 {
-	ICU_VERSION::DateFormat* timeFormatter = LockTimeFormatter(longFormat);
+	ICU_VERSION::DateFormat* timeFormatter = _LockTimeFormatter(longFormat);
 	if (timeFormatter == NULL) {
-		UnlockTimeFormatter(longFormat);
+		_UnlockTimeFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
-	UnlockTimeFormatter(longFormat);
+	_UnlockTimeFormatter(longFormat);
 
 	CheckedArrayByteSink stringConverter(string, maxSize);
 
@@ -503,15 +505,15 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 {
 	string->Truncate(0);
 
-	ICU_VERSION::DateFormat* timeFormatter = LockTimeFormatter(longFormat);
+	ICU_VERSION::DateFormat* timeFormatter = _LockTimeFormatter(longFormat);
 	if (timeFormatter == NULL) {
-		UnlockTimeFormatter(longFormat);
+		_UnlockTimeFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
-	UnlockTimeFormatter(longFormat);
+	_UnlockTimeFormatter(longFormat);
 
 	BStringByteSink stringConverter(string);
 
@@ -527,9 +529,9 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 {
 	string->Truncate(0);
 
-	ICU_VERSION::DateFormat* timeFormatter = LockTimeFormatter(longFormat);
+	ICU_VERSION::DateFormat* timeFormatter = _LockTimeFormatter(longFormat);
 	if (timeFormatter == NULL) {
-		UnlockTimeFormatter(longFormat);
+		_UnlockTimeFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -539,7 +541,7 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString,
 		&positionIterator, error);
-	UnlockTimeFormatter(longFormat);
+	_UnlockTimeFormatter(longFormat);
 
 	if (error != U_ZERO_ERROR)
 		return B_ERROR;
@@ -569,9 +571,9 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 status_t
 BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 {
-	ICU_VERSION::DateFormat* timeFormatter = LockTimeFormatter(longFormat);
+	ICU_VERSION::DateFormat* timeFormatter = _LockTimeFormatter(longFormat);
 	if (timeFormatter == NULL) {
-		UnlockTimeFormatter(longFormat);
+		_UnlockTimeFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -582,7 +584,7 @@ BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 	time_t now;
 	ICUString = timeFormatter->format((UDate)time(&now) * 1000,	ICUString,
 		&positionIterator, error);
-	UnlockTimeFormatter(longFormat);
+	_UnlockTimeFormatter(longFormat);
 
 	if (error != U_ZERO_ERROR)
 		return B_ERROR;
@@ -627,9 +629,9 @@ BCountry::TimeFields(BDateElement*& fields, int& fieldCount, bool longFormat)
 status_t
 BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 {
-	ICU_VERSION::DateFormat* timeFormatter = LockTimeFormatter(longFormat);
+	ICU_VERSION::DateFormat* timeFormatter = _LockTimeFormatter(longFormat);
 	if (timeFormatter == NULL) {
-		UnlockTimeFormatter(longFormat);
+		_UnlockTimeFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -638,7 +640,7 @@ BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 
 	UnicodeString pattern(formatString);
 	dateFormatterImpl->applyPattern(pattern);
-	UnlockTimeFormatter(longFormat);
+	_UnlockTimeFormatter(longFormat);
 
 	return B_OK;
 }
@@ -647,9 +649,9 @@ BCountry::SetTimeFormat(const char* formatString, bool longFormat)
 status_t
 BCountry::TimeFormat(BString& format, bool longFormat)
 {
-	ICU_VERSION::DateFormat* timeFormatter = LockTimeFormatter(longFormat);
+	ICU_VERSION::DateFormat* timeFormatter = _LockTimeFormatter(longFormat);
 	if (timeFormatter == NULL) {
-		UnlockTimeFormatter(longFormat);
+		_UnlockTimeFormatter(longFormat);
 		return B_NO_MEMORY;
 	}
 
@@ -658,7 +660,7 @@ BCountry::TimeFormat(BString& format, bool longFormat)
 
 	UnicodeString ICUString;
 	ICUString = dateFormatterImpl->toPattern(ICUString);
-	UnlockTimeFormatter(longFormat);
+	_UnlockTimeFormatter(longFormat);
 
 	BStringByteSink stringConverter(&format);
 
@@ -1050,26 +1052,35 @@ BCountry::MonFracDigits() const
 // #pragma mark - Timezones
 
 
-status_t
-BCountry::GetTimeZones(BMessage* timezones)
+int
+BCountry::GetTimeZones(BList& timezones)
 {
-	if (timezones == NULL)
-		return B_BAD_DATA;
-
-
 	StringEnumeration* icuTimeZoneList = TimeZone::createEnumeration(
 		fICULocale->getCountry());
 	UErrorCode error = U_ZERO_ERROR;
 
 	const char* tzName;
+	std::map<BString, BTimeZone*> timeZoneMap;
+		// The map allows us to remove duplicates and get a count of the
+		// remaining zones after that
 	while (tzName = icuTimeZoneList->next(NULL, error)) {
-		if (error == U_ZERO_ERROR)
-			timezones->AddString("zones", tzName);
-		else
+		if (error == U_ZERO_ERROR) {
+			BString readableName;
+			BTimeZone* timeZone = new BTimeZone(tzName);
+			timeZone->GetName(readableName);
+			timeZoneMap.insert(std::pair<BString, BTimeZone*>(readableName,
+				timeZone));
+		} else
 			error = U_ZERO_ERROR;
 	}
 
 	delete icuTimeZoneList;
 
-	return B_OK;
+
+	for (std::map<BString, BTimeZone*>::const_iterator timeZoneIterator
+		= timeZoneMap.begin(); timeZoneIterator != timeZoneMap.end();
+		timeZoneIterator++)
+		timezones.AddItem((*timeZoneIterator).second);
+
+	return timeZoneMap.size();
 }

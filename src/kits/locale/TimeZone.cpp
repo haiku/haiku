@@ -25,23 +25,12 @@ BTimeZone::~BTimeZone()
 
 
 void
-BTimeZone::Name(BString& name)
+BTimeZone::GetName(BString& name)
 {
 	UnicodeString unicodeName;
 	fICUTimeZone->getDisplayName(unicodeName);
 
 	BStringByteSink converter(&name);
-	unicodeName.toUTF8(converter);
-}
-
-
-void
-BTimeZone::Code(BString& code)
-{
-	UnicodeString unicodeName;
-	fICUTimeZone->getID(unicodeName);
-
-	BStringByteSink converter(&code);
 	unicodeName.toUTF8(converter);
 }
 

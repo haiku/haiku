@@ -2,10 +2,11 @@
 #define _COUNTRY_H_
 
 
-#include <SupportDefs.h>
+#include <List.h>
 #include <LocaleStrings.h>
 #include <Locker.h>
 #include <String.h>
+#include <SupportDefs.h>
 
 
 class BBitmap;
@@ -112,13 +113,13 @@ class BCountry {
 		virtual int32	MonFracDigits() const;
 
 		// timezones
-		status_t GetTimeZones(BMessage* timezones);
+		int GetTimeZones(BList& timezones);
 
 	private:
-		icu_44::DateFormat* LockDateFormatter(bool longFormat);
-		icu_44::DateFormat* LockTimeFormatter(bool longFormat);
-		void				UnlockDateFormatter(bool longFormat);
-		void				UnlockTimeFormatter(bool longFormat);
+		icu_44::DateFormat* _LockDateFormatter(bool longFormat);
+		icu_44::DateFormat* _LockTimeFormatter(bool longFormat);
+		void				_UnlockDateFormatter(bool longFormat);
+		void				_UnlockTimeFormatter(bool longFormat);
 
 		icu_44::DateFormat* fICULongDateFormatter;
 		icu_44::DateFormat* fICUShortDateFormatter;

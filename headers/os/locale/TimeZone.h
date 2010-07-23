@@ -19,8 +19,7 @@ class BTimeZone {
 					BTimeZone(const char* zoneCode);
 					~BTimeZone();
 
-		void		Name(BString& name);
-		void		Code(BString& code);
+		void		GetName(BString& name);
 		int			OffsetFromGMT();
 
 	private:
