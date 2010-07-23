@@ -187,6 +187,8 @@ BCountry::GetIcon(BBitmap* result)
 DateFormat*
 BCountry::DateFormatter(bool longFormat)
 {
+	// TODO: ICU allows for 4 different levels of expansion :
+	// short, medium, long, and full. Our bool parameter is not enough...
 	if (longFormat) {
 		if (fICULongDateFormatter == NULL) {
 			fICULongDateFormatter = DateFormat::createDateInstance(
@@ -206,6 +208,8 @@ BCountry::DateFormatter(bool longFormat)
 DateFormat*
 BCountry::TimeFormatter(bool longFormat)
 {
+	// TODO: ICU allows for 4 different levels of expansion :
+	// short, medium, long, and full. Our bool parameter is not enough...
 	if (longFormat) {
 		if (fICULongTimeFormatter == NULL) {
 			fICULongTimeFormatter = DateFormat::createTimeInstance(
@@ -225,20 +229,6 @@ BCountry::TimeFormatter(bool longFormat)
 status_t
 BCountry::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 {
-	BString fullString;
-	status_t returnCode;
-	returnCode = FormatDate(&fullString, time, longFormat);
-	if (returnCode == B_OK)
-		strncpy(string, fullString.String(), maxSize);
-	return returnCode;
-}
-
-
-status_t
-BCountry::FormatDate(BString *string, time_t time, bool longFormat)
-{
-	// TODO: ICU allows for 4 different levels of expansion :
-	// short, medium, long, and full. Our bool parameter is not enough...
 	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
 	if (dateFormatter == NULL)
 		return B_NO_MEMORY;
@@ -246,7 +236,30 @@ BCountry::FormatDate(BString *string, time_t time, bool longFormat)
 	UnicodeString ICUString;
 	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
 
+	CheckedArrayByteSink stringConverter(string, maxSize);
+
+	ICUString.toUTF8(stringConverter);
+
+	if (stringConverter.Overflowed())
+		return B_BAD_VALUE;
+	else
+		return B_OK;
+}
+
+
+status_t
+BCountry::FormatDate(BString *string, time_t time, bool longFormat)
+{
 	string->Truncate(0);
+		// We make the string empty, this way even in cases where ICU fail we at
+		// least return something sane
+	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
+	if (dateFormatter == NULL)
+		return B_NO_MEMORY;
+
+	UnicodeString ICUString;
+	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
+
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
@@ -259,6 +272,8 @@ status_t
 BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 	time_t time, bool longFormat)
 {
+	string->Truncate(0);
+
 	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
 	if (dateFormatter == NULL)
 		return B_NO_MEMORY;
@@ -287,7 +302,6 @@ BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 	for (int i = 0 ; i < fieldCount ; i++ )
 		fieldPositions[i] = fieldPosStorage[i];
 
-	string->Truncate(0);
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
@@ -299,6 +313,8 @@ BCountry::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
 status_t
 BCountry::DateFormat(BString& format, bool longFormat)
 {
+	format.Truncate(0);
+
 	ICU_VERSION::DateFormat* dateFormatter = DateFormatter(longFormat);
 	if (dateFormatter == NULL)
 		return B_NO_MEMORY;
@@ -406,19 +422,6 @@ BCountry::StartOfWeek()
 status_t
 BCountry::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
 {
-	BString fullString;
-	status_t returnCode = FormatTime(&fullString, time, longFormat);
-	if (returnCode == B_OK)
-		strncpy(string, fullString.String(), maxSize);
-	return returnCode;
-}
-
-
-status_t
-BCountry::FormatTime(BString* string, time_t time, bool longFormat)
-{
-	// TODO: ICU allows for 4 different levels of expansion :
-	// short, medium, long, and full. Our bool parameter is not enough...
 	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
 	if (timeFormatter == NULL)
 		return B_NO_MEMORY;
@@ -426,7 +429,29 @@ BCountry::FormatTime(BString* string, time_t time, bool longFormat)
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
 
+	CheckedArrayByteSink stringConverter(string, maxSize);
+
+	ICUString.toUTF8(stringConverter);
+
+	if (stringConverter.Overflowed())
+		return B_BAD_VALUE;
+	else
+		return B_OK;
+}
+
+
+status_t
+BCountry::FormatTime(BString* string, time_t time, bool longFormat)
+{
 	string->Truncate(0);
+
+	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
+	if (timeFormatter == NULL)
+		return B_NO_MEMORY;
+
+	UnicodeString ICUString;
+	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
+
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
@@ -439,6 +464,8 @@ status_t
 BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 	time_t time, bool longFormat)
 {
+	string->Truncate(0);
+
 	ICU_VERSION::DateFormat* timeFormatter = TimeFormatter(longFormat);
 	if (timeFormatter == NULL)
 		return B_NO_MEMORY;
@@ -467,7 +494,6 @@ BCountry::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
 	for (int i = 0 ; i < fieldCount ; i++ )
 		fieldPositions[i] = fieldPosStorage[i];
 
-	string->Truncate(0);
 	BStringByteSink stringConverter(string);
 
 	ICUString.toUTF8(stringConverter);
