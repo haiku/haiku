@@ -188,7 +188,6 @@ private:
 
 	UdpEndpoint *_FindActiveEndpoint(const sockaddr *ourAddress,
 		const sockaddr *peerAddress);
-	UdpEndpoint* _EndpointFor(net_buffer* buffer);
 	status_t _DemuxBroadcast(net_buffer *buffer);
 	status_t _DemuxUnicast(net_buffer *buffer);
 
@@ -303,12 +302,13 @@ UdpDomainSupport::DeliverError(status_t error, net_buffer* buffer)
 
 	MutexLocker _(fLock);
 
-	// RFC 1122 4.1.3.3:
-	// TODO: Pass to the application layer all ICMP error messages
-
-	UdpEndpoint* endpoint = _EndpointFor(buffer);
-	if (endpoint != NULL)
+	// Forward the error to the socket
+	UdpEndpoint* endpoint = _FindActiveEndpoint(buffer->source,
+		buffer->destination);
+	if (endpoint != NULL) {
 		gSocketModule->notify(endpoint->Socket(), B_SELECT_ERROR, error);
+		endpoint->NotifyOne();
+	}
 
 	gBufferModule->free(buffer);
 	return B_OK;
@@ -500,42 +500,13 @@ UdpEndpoint *
 UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
 	const sockaddr *peerAddress)
 {
+	ASSERT_LOCKED_MUTEX(&fLock);
+
 	TRACE_DOMAIN("finding Endpoint for %s <- %s",
 		AddressString(fDomain, ourAddress, true).Data(),
 		AddressString(fDomain, peerAddress, true).Data());
 
 	return fActiveEndpoints.Lookup(std::make_pair(ourAddress, peerAddress));
-}
-
-
-UdpEndpoint*
-UdpDomainSupport::_EndpointFor(net_buffer* buffer)
-{
-	ASSERT_LOCKED_MUTEX(&fLock);
-
-	struct sockaddr *peerAddr = buffer->source;
-	struct sockaddr *localAddr = buffer->destination;
-
-	// look for full (most special) match:
-	UdpEndpoint* endpoint = _FindActiveEndpoint(localAddr, peerAddr);
-	if (endpoint != NULL)
-		return endpoint;
-
-	// look for endpoint matching local address & port:
-	endpoint = _FindActiveEndpoint(localAddr, NULL);
-	if (endpoint != NULL)
-		return endpoint;
-
-	// look for endpoint matching peer address & port and local port:
-	SocketAddressStorage local(AddressModule());
-	local.SetToEmpty();
-	local.SetPort(AddressModule()->get_port(localAddr));
-	endpoint = _FindActiveEndpoint(*local, peerAddr);
-	if (endpoint != NULL)
-		return endpoint;
-
-	// last chance: look for endpoint matching local port only:
-	return _FindActiveEndpoint(*local, NULL);
 }
 
 
@@ -587,11 +558,31 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 
 
 status_t
-UdpDomainSupport::_DemuxUnicast(net_buffer *buffer)
+UdpDomainSupport::_DemuxUnicast(net_buffer* buffer)
 {
 	TRACE_DOMAIN("_DemuxUnicast(%p)", buffer);
 
-	UdpEndpoint* endpoint = _EndpointFor(buffer);
+	const sockaddr* localAddress = buffer->destination;
+	const sockaddr* peerAddress = buffer->source;
+
+	// look for full (most special) match:
+	UdpEndpoint* endpoint = _FindActiveEndpoint(localAddress, peerAddress);
+	if (endpoint == NULL) {
+		// look for endpoint matching local address & port:
+		endpoint = _FindActiveEndpoint(localAddress, NULL);
+		if (endpoint == NULL) {
+			// look for endpoint matching peer address & port and local port:
+			SocketAddressStorage local(AddressModule());
+			local.SetToEmpty();
+			local.SetPort(AddressModule()->get_port(localAddress));
+			endpoint = _FindActiveEndpoint(*local, peerAddress);
+			if (endpoint == NULL) {
+				// last chance: look for endpoint matching local port only:
+				endpoint = _FindActiveEndpoint(*local, NULL);
+			}
+		}
+	}
+
 	if (endpoint == NULL) {
 		TRACE_DOMAIN("_DemuxUnicast(%p) - no matching endpoint found!", buffer);
 		return B_NAME_NOT_FOUND;
