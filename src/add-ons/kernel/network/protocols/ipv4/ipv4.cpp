@@ -763,6 +763,56 @@ fill_sockaddr_in(sockaddr_in* target, in_addr_t address)
 }
 
 
+static status_t
+get_int_option(void* target, size_t length, int value)
+{
+	if (length != sizeof(int))
+		return B_BAD_VALUE;
+
+	return user_memcpy(target, &value, sizeof(int));
+}
+
+
+template<typename Type> static status_t
+set_int_option(Type &target, const void* _value, size_t length)
+{
+	int value;
+
+	if (length != sizeof(int))
+		return B_BAD_VALUE;
+
+	if (user_memcpy(&value, _value, sizeof(int)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	target = value;
+	return B_OK;
+}
+
+
+static net_protocol_module_info*
+receiving_protocol(uint8 protocol)
+{
+	net_protocol_module_info* module = sReceivingProtocol[protocol];
+	if (module != NULL)
+		return module;
+
+	MutexLocker locker(sReceivingProtocolLock);
+
+	module = sReceivingProtocol[protocol];
+	if (module != NULL)
+		return module;
+
+	if (gStackModule->get_domain_receiving_protocol(sDomain, protocol,
+			&module) == B_OK)
+		sReceivingProtocol[protocol] = module;
+
+	return module;
+}
+
+
+// #pragma mark - multicast
+
+
 status_t
 IPv4Multicast::JoinGroup(IPv4GroupInterface* state)
 {
@@ -795,27 +845,6 @@ IPv4Multicast::LeaveGroup(IPv4GroupInterface* state)
 	return interface->first_protocol->module->join_multicast(
 		interface->first_protocol,
 		fill_sockaddr_in(&groupAddr, state->Address().s_addr));
-}
-
-
-static net_protocol_module_info*
-receiving_protocol(uint8 protocol)
-{
-	net_protocol_module_info* module = sReceivingProtocol[protocol];
-	if (module != NULL)
-		return module;
-
-	MutexLocker locker(sReceivingProtocolLock);
-
-	module = sReceivingProtocol[protocol];
-	if (module != NULL)
-		return module;
-
-	if (gStackModule->get_domain_receiving_protocol(sDomain, protocol,
-			&module) == B_OK)
-		sReceivingProtocol[protocol] = module;
-
-	return module;
 }
 
 
@@ -969,33 +998,7 @@ ipv4_generic_delta_membership(ipv4_protocol* protocol, int option,
 }
 
 
-static status_t
-get_int_option(void* target, size_t length, int value)
-{
-	if (length != sizeof(int))
-		return B_BAD_VALUE;
-
-	return user_memcpy(target, &value, sizeof(int));
-}
-
-
-template<typename Type> static status_t
-set_int_option(Type &target, const void* _value, size_t length)
-{
-	int value;
-
-	if (length != sizeof(int))
-		return B_BAD_VALUE;
-
-	if (user_memcpy(&value, _value, sizeof(int)) != B_OK)
-		return B_BAD_ADDRESS;
-
-	target = value;
-	return B_OK;
-}
-
-
-//	#pragma mark -
+//	#pragma mark - module interface
 
 
 net_protocol*
@@ -1547,7 +1550,7 @@ ipv4_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 status_t
 ipv4_receive_data(net_buffer* buffer)
 {
-	TRACE("ReceiveData(%p [%ld bytes])", buffer, buffer->size);
+	TRACE("ipv4_receive_data(%p [%ld bytes])", buffer, buffer->size);
 
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
@@ -1588,9 +1591,9 @@ ipv4_receive_data(net_buffer* buffer)
 				&buffer->interface, &matchedAddressType)
 			&& !sDatalinkModule->is_local_link_address(sDomain, true,
 				buffer->destination, &buffer->interface)) {
-			TRACE("  ReceiveData(): packet was not for us %x -> %x",
+			TRACE("  ipv4_receive_data(): packet was not for us %x -> %x",
 				ntohl(header.source), ntohl(header.destination));
-
+	
 			// Send ICMP error: Host unreachable
 			sDomain->module->error_reply(NULL, buffer,
 				icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_HOST_UNREACH), NULL);
@@ -1605,7 +1608,7 @@ ipv4_receive_data(net_buffer* buffer)
 	fill_sockaddr_in((struct sockaddr_in*)buffer->source, header.source);
 	memcpy(buffer->destination, &destination, sizeof(sockaddr_in));
 
-	uint8 protocol = buffer->protocol = header.protocol;
+	buffer->protocol = header.protocol;
 
 	// remove any trailing/padding data
 	status_t status = gBufferModule->trim(buffer, packetLength);
@@ -1617,15 +1620,15 @@ ipv4_receive_data(net_buffer* buffer)
 	if ((fragmentOffset & IP_MORE_FRAGMENTS) != 0
 		|| (fragmentOffset & IP_FRAGMENT_OFFSET_MASK) != 0) {
 		// this is a fragment
-		TRACE("  ReceiveData(): Found a Fragment!");
+		TRACE("  ipv4_receive_data(): Found a Fragment!");
 		status = reassemble_fragments(header, &buffer);
-		TRACE("  ReceiveData():  -> %s", strerror(status));
+		TRACE("  ipv4_receive_data():  -> %s", strerror(status));
 		if (status != B_OK)
 			return status;
 
 		if (buffer == NULL) {
 			// buffer was put into fragment packet
-			TRACE("  ReceiveData(): Not yet assembled.");
+			TRACE("  ipv4_receive_data(): Not yet assembled.");
 			return B_OK;
 		}
 	}
@@ -1639,11 +1642,11 @@ ipv4_receive_data(net_buffer* buffer)
 	// Preserve the ipv4 header for ICMP processing
 	gBufferModule->store_header(buffer);
 
-	gBufferModule->remove_header(buffer, headerLength);
+	bufferHeader.Remove(headerLength);
 		// the header is of variable size and may include IP options
 		// (TODO: that we ignore for now)
 
-	net_protocol_module_info* module = receiving_protocol(protocol);
+	net_protocol_module_info* module = receiving_protocol(buffer->protocol);
 	if (module == NULL) {
 		// no handler for this packet
 		if (!rawDelivered) {
@@ -1682,6 +1685,50 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 status_t
 ipv4_error_received(uint32 code, net_buffer* buffer)
 {
+	TRACE("  ipv4_error_received(code %" B_PRIx32 ", buffer %p [%zu bytes])",
+		code, buffer, buffer->size);
+
+	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
+	if (bufferHeader.Status() != B_OK)
+		return bufferHeader.Status();
+
+	ipv4_header& header = bufferHeader.Data();
+	TRACE_ONLY(dump_ipv4_header(header));
+
+	// We do not check the packet length, as we usually only get a part of it
+	uint16 headerLength = header.HeaderLength();
+	if (header.version != IPV4_VERSION
+		|| headerLength < sizeof(ipv4_header)
+		|| gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
+		return B_BAD_DATA;
+
+	// Restore addresses of the original buffer
+
+	// lower layers notion of broadcast or multicast have no relevance to us
+	// TODO: they actually have when deciding whether to send an ICMP error
+	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+
+	fill_sockaddr_in((struct sockaddr_in*)buffer->source, header.source);
+	fill_sockaddr_in((struct sockaddr_in*)buffer->destination,
+		header.destination);
+
+	if (header.destination == INADDR_BROADCAST)
+		buffer->flags |= MSG_BCAST;
+	else if (IN_MULTICAST(ntohl(header.destination)))
+		buffer->flags |= MSG_MCAST;
+
+	// test if the packet is really from us
+	if (!sDatalinkModule->is_local_address(sDomain, buffer->source, NULL,
+			NULL)) {
+		TRACE("  ipv4_error_received(): packet was not for us %x -> %x",
+			ntohl(header.source), ntohl(header.destination));
+		return B_ERROR;
+	}
+
+	buffer->protocol = header.protocol;
+
+	bufferHeader.Remove(headerLength);
+
 	net_protocol_module_info* protocol = receiving_protocol(buffer->protocol);
 	if (protocol == NULL)
 		return B_ERROR;
