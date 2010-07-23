@@ -463,8 +463,6 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 	icmpHeader->gateway = errorData ? *((uint32*)errorData) : 0;
 	icmpHeader->checksum = 0;
 	icmpHeader.Sync();
-	*ICMPChecksumField(reply)
-		= gBufferModule->checksum(reply, 0, reply->size, true);
 
 	// Append IP header + 8 byte of the original datagram
 	status_t status = gBufferModule->append_restored_header(reply, buffer, 0,
@@ -474,7 +472,12 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 		if (domain == NULL)
 			return B_ERROR;
 
-		TRACE("  send ICMP message to %s\n", AddressString(
+		*ICMPChecksumField(reply)
+			= gBufferModule->checksum(reply, 0, reply->size, true);
+
+		reply->protocol = IPPROTO_ICMP;
+
+		TRACE("  send ICMP message %p to %s\n", reply, AddressString(
 				domain->address_module, reply->destination, true).Data());
 
 		status = domain->module->send_data(NULL, reply);
