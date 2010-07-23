@@ -1,6 +1,6 @@
 #ifndef _LOCALE_H_
 #define _LOCALE_H_
-/* 
+/*
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -25,6 +25,12 @@ struct lconv {
 	char n_sep_by_space;
 	char p_sign_posn;
 	char n_sign_posn;
+	char int_p_cs_precedes;
+	char int_p_sep_by_space;
+	char int_n_cs_precedes;
+	char int_n_sep_by_space;
+	char int_p_sign_posn;
+	char int_n_sign_posn;
 };
 
 #define	LC_ALL		0
@@ -34,6 +40,11 @@ struct lconv {
 #define	LC_NUMERIC	4
 #define	LC_TIME		5
 #define	LC_MESSAGES	6
+/*
+ * the values above must be kept in loopable order (i.e. strictly increasing
+ * with no holes) and in sync with the value below
+ */
+#define	LC_LAST		LC_MESSAGES
 
 #ifdef __cplusplus
 extern "C" {

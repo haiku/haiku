@@ -32,9 +32,8 @@ StaticLibrary libruntime_loader.a :
 	<src!system!libroot!posix>errno.o
   	<src!system!libroot!posix>fcntl.o
 
- 	<src!system!libroot!posix!glibc!ctype>ctype-info.o
-	<src!system!libroot!posix!glibc!locale>C-ctype.o
-	<src!system!libroot!posix!glibc!locale>C_name.o
+	<src!system!libroot!posix!locale>ctype.o
+	<src!system!libroot!posix!locale>LocaleData.o
 
 	<src!system!libroot!posix!string>memchr.o
 	<src!system!libroot!posix!string>memcmp.o

@@ -21,6 +21,7 @@ MergeObject posix_stdlib.o :
 	rand.c
 	random.c
 	realpath.cpp
+	strfmon.c
 	strtol.c
 	strtoll.c
 	strtoul.c

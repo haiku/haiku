@@ -42,12 +42,6 @@ extern const char _nl_C_LC_CTYPE_width[];
 
 #define b(t,x,o) (((const t *) _nl_C_LC_CTYPE_##x) + o)
 
-const unsigned short int *__ctype_b = b (unsigned short int, class, 128);
-const __uint32_t *__ctype32_b = b (__uint32_t, class32, 0);
-const __int32_t *__ctype_tolower = b (__int32_t, tolower, 128);
-const __int32_t *__ctype_toupper = b (__int32_t, toupper, 128);
-const __uint32_t *__ctype32_tolower = b (__uint32_t, tolower, 128);
-const __uint32_t *__ctype32_toupper = b (__uint32_t, toupper, 128);
 const char *__ctype32_wctype[12] =
 {
   b(char, class_upper, 32),
@@ -68,4 +62,3 @@ const char *__ctype32_wctrans[2] =
   b(char, map_toupper, 0),
   b(char, map_tolower, 0)
 };
-const char *__ctype32_width = b (char, width, 0);

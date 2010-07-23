@@ -49,7 +49,7 @@ _strptime(const char *buf, const char *fmt, struct tm *tm, int *GMTp)
 	int	i,
 		len;
 	int Ealternative, Oalternative;
-	struct lc_time_T *tptr = __get_current_time_locale();
+	struct lc_time_t *tptr = __get_current_time_locale();
 
 	ptr = fmt;
 	while (*ptr != 0) {

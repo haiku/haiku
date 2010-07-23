@@ -36,6 +36,12 @@ typedef struct {
 #define WCHAR_MIN	0x00000000UL
 #define WCHAR_MAX	0x7FFFFFFFUL
 
+/*
+ * Haiku is always using UTF32 in wchars, other encodings can be handled
+ * by converting to/from wchar by means of mbsrtowcs() or wcsrtombs().
+ * TODO: define __STDC_ISO_10646__ accordingly in our compilers.
+ */
+
 
 #ifdef __cplusplus
 extern "C" {

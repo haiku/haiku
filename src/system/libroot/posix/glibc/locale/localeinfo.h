@@ -28,7 +28,7 @@
 #include <sys/types.h>
 
 /* This has to be changed whenever a new locale is defined.  */
-#define __LC_LAST	13
+#define __LC_LAST	7
 
 #include <intl/loadinfo.h>	/* For loaded_l10nfile definition.  */
 

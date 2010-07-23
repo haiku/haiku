@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system kernel lib ;
 
 UsePrivateHeaders shared ;
+UsePrivateHeaders [ FDirName libroot locale ] ;
 
 # kernel libroot os files
 
@@ -41,8 +42,9 @@ KernelMergeObject kernel_lib_posix.o :
  	poll.c
  	utime.c
  	# locale
-	ctype.c
-	localeconv.c
+	ctype.cpp
+	localeconv.cpp
+	LocaleData.cpp
 	# stdio (this subdir)
 	kernel_vsprintf.cpp
 	# stdlib

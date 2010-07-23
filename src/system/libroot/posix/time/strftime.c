@@ -36,75 +36,9 @@ static const char	sccsid[] = "@(#)strftime.c	5.4 (Berkeley) 3/14/89";
 #include "tzfile.h"
 #include "fcntl.h"
 #include "locale.h"
+#include "timelocal.h"
 
-struct lc_time_T {
-	const char *	mon[MONSPERYEAR];
-	const char *	month[MONSPERYEAR];
-	const char *	wday[DAYSPERWEEK];
-	const char *	weekday[DAYSPERWEEK];
-	const char *	X_fmt;
-	const char *	x_fmt;
-	const char *	c_fmt;
-	const char *	am;
-	const char *	pm;
-	const char *	date_fmt;
-};
-
-#ifdef LOCALE_HOME
-#include "sys/stat.h"
-static struct lc_time_T		localebuf;
-static struct lc_time_T *	_loc P((void));
-#define Locale	_loc()
-#endif /* defined LOCALE_HOME */
-#ifndef LOCALE_HOME
-#define Locale	(&C_time_locale)
-#endif /* !defined LOCALE_HOME */
-
-static const struct lc_time_T	C_time_locale = {
-	{
-		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-	}, {
-		"January", "February", "March", "April", "May", "June",
-		"July", "August", "September", "October", "November", "December"
-	}, {
-		"Sun", "Mon", "Tue", "Wed",
-		"Thu", "Fri", "Sat"
-	}, {
-		"Sunday", "Monday", "Tuesday", "Wednesday",
-		"Thursday", "Friday", "Saturday"
-	},
-
-	/* X_fmt */
-	"%H:%M:%S",
-
-	/*
-	** x_fmt
-	** C99 requires this format.
-	** Using just numbers (as here) makes Quakers happier;
-	** it's also compatible with SVR4.
-	*/
-	"%m/%d/%y",
-
-	/*
-	** c_fmt
-	** C99 requires this format.
-	** Previously this code used "%D %X", but we now conform to C99.
-	** Note that
-	**	"%a %b %d %H:%M:%S %Y"
-	** is used by Solaris 2.3.
-	*/
-	"%a %b %e %T %Y",
-
-	/* am */
-	"AM",
-
-	/* pm */
-	"PM",
-
-	/* date_fmt */
-	"%a %b %e %H:%M:%S %Z %Y"
-};
+#define Locale __get_current_time_locale()
 
 static char *	_add P((const char *, char *, const char *));
 static char *	_conv P((int, const char *, char *, const char *));
@@ -123,6 +57,8 @@ extern char *	tzname[];
 #define IN_THIS	2
 #define IN_ALL	3
 
+#define NO_RUN_TIME_WARNINGS_ABOUT_YEAR_2000_PROBLEMS_THANK_YOU
+
 size_t
 strftime(s, maxsize, format, t)
 char * const		s;
@@ -134,9 +70,6 @@ const struct tm * const	t;
 	int	warn;
 
 	tzset();
-#ifdef LOCALE_HOME
-	localebuf.mon[0] = 0;
-#endif /* defined LOCALE_HOME */
 	warn = IN_NONE;
 	p = _fmt(((format == NULL) ? "%c" : format), t, s, s + maxsize, &warn);
 #ifndef NO_RUN_TIME_WARNINGS_ABOUT_YEAR_2000_PROBLEMS_THANK_YOU
@@ -641,124 +574,3 @@ const char * const	ptlim;
 		pt = _conv(((trail < 0) ? -trail : trail), "%02d", pt, ptlim);
 	return pt;
 }
-
-#ifdef LOCALE_HOME
-static struct lc_time_T *
-_loc P((void))
-{
-	static const char	locale_home[] = LOCALE_HOME;
-	static const char	lc_time[] = "LC_TIME";
-	static char *		locale_buf;
-
-	int			fd;
-	int			oldsun;	/* "...ain't got nothin' to do..." */
-	char *			lbuf;
-	char *			name;
-	char *			p;
-	const char **		ap;
-	const char *		plim;
-	char			filename[FILENAME_MAX];
-	struct stat		st;
-	size_t			namesize;
-	size_t			bufsize;
-
-	/*
-	** Use localebuf.mon[0] to signal whether locale is already set up.
-	*/
-	if (localebuf.mon[0])
-		return &localebuf;
-	name = setlocale(LC_TIME, (char *) NULL);
-	if (name == NULL || *name == '\0')
-		goto no_locale;
-	/*
-	** If the locale name is the same as our cache, use the cache.
-	*/
-	lbuf = locale_buf;
-	if (lbuf != NULL && strcmp(name, lbuf) == 0) {
-		p = lbuf;
-		for (ap = (const char **) &localebuf;
-			ap < (const char **) (&localebuf + 1);
-				++ap)
-					*ap = p += strlen(p) + 1;
-		return &localebuf;
-	}
-	/*
-	** Slurp the locale file into the cache.
-	*/
-	namesize = strlen(name) + 1;
-	if (sizeof filename <
-		((sizeof locale_home) + namesize + (sizeof lc_time)))
-			goto no_locale;
-	oldsun = 0;
-	(void) sprintf(filename, "%s/%s/%s", locale_home, name, lc_time);
-	fd = open(filename, O_RDONLY);
-	if (fd < 0) {
-		/*
-		** Old Sun systems have a different naming and data convention.
-		*/
-		oldsun = 1;
-		(void) sprintf(filename, "%s/%s/%s", locale_home,
-			lc_time, name);
-		fd = open(filename, O_RDONLY);
-		if (fd < 0)
-			goto no_locale;
-	}
-	if (fstat(fd, &st) != 0)
-		goto bad_locale;
-	if (st.st_size <= 0)
-		goto bad_locale;
-	bufsize = namesize + st.st_size;
-	locale_buf = NULL;
-	lbuf = (lbuf == NULL) ? malloc(bufsize) : realloc(lbuf, bufsize);
-	if (lbuf == NULL)
-		goto bad_locale;
-	(void) strcpy(lbuf, name);
-	p = lbuf + namesize;
-	plim = p + st.st_size;
-	if (read(fd, p, (size_t) st.st_size) != st.st_size)
-		goto bad_lbuf;
-	if (close(fd) != 0)
-		goto bad_lbuf;
-	/*
-	** Parse the locale file into localebuf.
-	*/
-	if (plim[-1] != '\n')
-		goto bad_lbuf;
-	for (ap = (const char **) &localebuf;
-		ap < (const char **) (&localebuf + 1);
-			++ap) {
-				if (p == plim)
-					goto bad_lbuf;
-				*ap = p;
-				while (*p != '\n')
-					++p;
-				*p++ = '\0';
-	}
-	if (oldsun) {
-		/*
-		** SunOS 4 used an obsolescent format; see localdtconv(3).
-		** c_fmt had the ``short format for dates and times together''
-		** (SunOS 4 date, "%a %b %e %T %Z %Y" in the C locale);
-		** date_fmt had the ``long format for dates''
-		** (SunOS 4 strftime %C, "%A, %B %e, %Y" in the C locale).
-		** Discard the latter in favor of the former.
-		*/
-		localebuf.date_fmt = localebuf.c_fmt;
-	}
-	/*
-	** Record the successful parse in the cache.
-	*/
-	locale_buf = lbuf;
-
-	return &localebuf;
-
-bad_lbuf:
-	free(lbuf);
-bad_locale:
-	(void) close(fd);
-no_locale:
-	localebuf = C_time_locale;
-	locale_buf = NULL;
-	return &localebuf;
-}
-#endif /* defined LOCALE_HOME */

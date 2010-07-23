@@ -8,7 +8,6 @@ SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ctype ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc iconv ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
-#SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc string ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
@@ -18,7 +17,6 @@ MergeObject posix_gnu_iconv.o :
 	gconv_cache.c
 	gconv_conf.c
 	gconv_db.c
-#	gconv_dl.c
 	gconv_simple.c
 	gconv_trans.c
 ;

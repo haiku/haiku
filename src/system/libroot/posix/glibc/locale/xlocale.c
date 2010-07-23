@@ -42,12 +42,6 @@ struct __locale_struct _nl_C_locobj =
       [LC_COLLATE] = &_nl_C_LC_COLLATE,
       [LC_MONETARY] = &_nl_C_LC_MONETARY,
       [LC_MESSAGES] = &_nl_C_LC_MESSAGES,
-      [LC_PAPER] = &_nl_C_LC_PAPER,
-      [LC_NAME] = &_nl_C_LC_NAME,
-      [LC_ADDRESS] = &_nl_C_LC_ADDRESS,
-      [LC_TELEPHONE] = &_nl_C_LC_TELEPHONE,
-      [LC_MEASUREMENT] = &_nl_C_LC_MEASUREMENT,
-      [LC_IDENTIFICATION] = &_nl_C_LC_IDENTIFICATION
     },
     .__ctype_b = (const unsigned short int *) _nl_C_LC_CTYPE_class + 128,
     .__ctype_tolower = (const int *) _nl_C_LC_CTYPE_tolower + 128,

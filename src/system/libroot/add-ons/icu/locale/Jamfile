@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src system libroot add-ons icu locale ;
+
+UsePrivateHeaders [ FDirName libroot locale ] ;
+UsePrivateHeaders [ FDirName libroot time ] ;
+
+local sources =
+	ICUCategoryData.cpp
+	ICUCollateData.cpp
+	ICUCtypeData.cpp
+	ICULocaleBackend.cpp
+	ICULocaleconvData.cpp
+	ICUMessagesData.cpp
+	ICUMonetaryData.cpp
+	ICUNumericData.cpp
+	ICUTimeData.cpp
+;
+
+SubDirSysHdrs $(HAIKU_ICU_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
+
+MergeObject addon_icu_locale.o : $(sources) ;

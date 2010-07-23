@@ -1,0 +1,126 @@
+/*
+ * Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "ICUNumericData.h"
+
+#include <langinfo.h>
+#include <locale.h>
+#include <strings.h>
+
+
+namespace BPrivate {
+
+
+ICUNumericData::ICUNumericData(struct lconv& localeConv)
+	:
+	fLocaleConv(localeConv),
+	fDataBridge(NULL)
+{
+	fLocaleConv.decimal_point = fDecimalPoint;
+	fLocaleConv.thousands_sep = fThousandsSep;
+	fLocaleConv.grouping = fGrouping;
+}
+
+
+void
+ICUNumericData::Initialize(LocaleNumericDataBridge* dataBridge)
+{
+	*dataBridge->addrOfGlibcDecimalPoint = fDecimalPoint;
+	*dataBridge->addrOfGlibcThousandsSep = fThousandsSep;
+	*dataBridge->addrOfGlibcGrouping = fGrouping;
+	fDataBridge = dataBridge;
+}
+
+
+status_t
+ICUNumericData::SetTo(const Locale& locale, const char* posixLocaleName)
+{
+	status_t result = inherited::SetTo(locale, posixLocaleName);
+
+	if (result == B_OK) {
+		UErrorCode icuStatus = U_ZERO_ERROR;
+		DecimalFormat* numberFormat = dynamic_cast<DecimalFormat*>(
+			NumberFormat::createInstance(locale, DecimalFormat::kNumberStyle,
+				icuStatus));
+		if (!U_SUCCESS(icuStatus))
+			return B_UNSUPPORTED;
+		if (!numberFormat)
+			return B_BAD_TYPE;
+		const DecimalFormatSymbols* formatSymbols
+			= numberFormat->getDecimalFormatSymbols();
+		if (!formatSymbols)
+			result = B_BAD_DATA;
+
+		if (result == B_OK) {
+			result = _SetLocaleconvEntry(formatSymbols, fDecimalPoint,
+				DecimalFormatSymbols::kDecimalSeparatorSymbol);
+			*fDataBridge->addrOfGlibcWCDecimalPoint
+				= (unsigned int)fDecimalPoint[0];
+		}
+		if (result == B_OK) {
+			result = _SetLocaleconvEntry(formatSymbols, fThousandsSep,
+				DecimalFormatSymbols::kGroupingSeparatorSymbol);
+			*fDataBridge->addrOfGlibcWCThousandsSep
+				= (unsigned int)fThousandsSep[0];
+		}
+		if (result == B_OK) {
+			int32 groupingSize = numberFormat->getGroupingSize();
+			if (groupingSize < 1)
+				fGrouping[0] = '\0';
+			else {
+				fGrouping[0] = groupingSize;
+				int32 secondaryGroupingSize
+					= numberFormat->getSecondaryGroupingSize();
+				if (secondaryGroupingSize < 1)
+					fGrouping[1] = '\0';
+				else {
+					fGrouping[1] = secondaryGroupingSize;
+					fGrouping[2] = '\0';
+				}
+			}
+		}
+
+		delete numberFormat;
+	}
+
+	return result;
+}
+
+
+status_t
+ICUNumericData::SetToPosix()
+{
+	status_t result = inherited::SetToPosix();
+
+	if (result == B_OK) {
+		strcpy(fDecimalPoint, fDataBridge->posixLocaleConv->decimal_point);
+		strcpy(fThousandsSep, fDataBridge->posixLocaleConv->thousands_sep);
+		strcpy(fGrouping, fDataBridge->posixLocaleConv->grouping);
+		*fDataBridge->addrOfGlibcWCDecimalPoint
+			= (unsigned int)fDecimalPoint[0];
+		*fDataBridge->addrOfGlibcWCThousandsSep
+			= (unsigned int)fThousandsSep[0];
+	}
+
+	return result;
+}
+
+
+const char*
+ICUNumericData::GetLanginfo(int index)
+{
+	switch(index) {
+		case RADIXCHAR:
+			return fDecimalPoint;
+		case THOUSEP:
+			return fThousandsSep;
+		default:
+			return "";
+	}
+}
+
+
+}	// namespace BPrivate

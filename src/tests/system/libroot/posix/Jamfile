@@ -3,12 +3,16 @@ SubDir HAIKU_TOP src tests system libroot posix ;
 UsePrivateHeaders libroot syslog_daemon ;
 
 
+# filter warnings about strftime()-formats in locale_test
+TARGET_WARNING_C++FLAGS on [ FGristFiles locale_test.o ] += -Wno-format ;
+
 # POSIX/libc tests
 SimpleTest abort_test : abort_test.cpp ;
 SimpleTest SyslogTest : SyslogTest.cpp syslog.cpp ;
 SimpleTest clearenv : clearenv.cpp ;
 SimpleTest dirent_test : dirent_test.cpp ;
 SimpleTest flock_test : flock_test.cpp ;
+SimpleTest locale_test : locale_test.cpp ;
 SimpleTest memalign_test : memalign_test.cpp ;
 SimpleTest mprotect_test : mprotect_test.cpp ;
 SimpleTest realtime_sem_test1 : realtime_sem_test1.cpp ;

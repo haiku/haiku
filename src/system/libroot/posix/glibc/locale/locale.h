@@ -40,12 +40,6 @@ __BEGIN_DECLS
 #define LC_MONETARY       __LC_MONETARY
 #define LC_MESSAGES       __LC_MESSAGES
 #define	LC_ALL		  __LC_ALL
-#define LC_PAPER	  __LC_PAPER
-#define LC_NAME		  __LC_NAME
-#define LC_ADDRESS	  __LC_ADDRESS
-#define LC_TELEPHONE	  __LC_TELEPHONE
-#define LC_MEASUREMENT	  __LC_MEASUREMENT
-#define LC_IDENTIFICATION __LC_IDENTIFICATION
 
 
 /* Structure giving information about numeric and monetary notation.  */

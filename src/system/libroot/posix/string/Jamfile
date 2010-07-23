@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix string ;
 
+UsePrivateHeaders [ FDirName libroot locale ] ;
+
 MergeObject posix_string.o :
 	bcmp.c
 	bcopy.c
@@ -16,7 +18,7 @@ MergeObject posix_string.o :
 	strchr.c
 	strchrnul.c
 	strcmp.c
-	strcoll.c
+	strcoll.cpp
 	strcpy.c
 	strcspn.c
 	strdup.c
@@ -35,7 +37,7 @@ MergeObject posix_string.o :
 	strstr.c
 	strtok.c
 	strupr.c
-	strxfrm.c
+	strxfrm.cpp
 ;
 
 HaikuSubInclude arch $(TARGET_ARCH) ;

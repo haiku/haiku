@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src system libroot add-ons icu ;
+
+local addonIcuObjects =
+	addon_icu_locale.o
+;
+
+SharedLibrary libroot-addon-icu.so
+	:
+	:
+	$(addonIcuObjects:G=nogrist)
+	$(TARGET_LIBSTDC++) $(HAIKU_ICU_LIBS)
+;
+
+SubInclude HAIKU_TOP src system libroot add-ons icu locale ;

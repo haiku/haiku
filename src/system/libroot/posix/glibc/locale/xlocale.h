@@ -28,7 +28,7 @@
 typedef struct __locale_struct
 {
   /* Note: LC_ALL is not a valid index into this array.  */
-  struct locale_data *__locales[13]; /* 13 = __LC_LAST. */
+  struct locale_data *__locales[7]; /* 7 = __LC_LAST. */
 
   /* To increase the speed of this solution we add some special members.  */
   const unsigned short int *__ctype_b;

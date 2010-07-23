@@ -40,21 +40,10 @@ _nl_postload_ctype (void)
 #define current(type,x,offset) \
   ((const type *) _NL_CURRENT (LC_CTYPE, paste(_NL_CTYPE_,x)) + offset)
 
-  extern const uint32_t *__ctype32_b;
-  extern const uint32_t *__ctype32_toupper;
-  extern const uint32_t *__ctype32_tolower;
   extern const char *__ctype32_wctype[12];
   extern const char *__ctype32_wctrans[2];
-  extern const char *__ctype32_width;
 
   size_t offset, cnt;
-
-  __ctype_b = current (uint16_t, CLASS, 128);
-  __ctype_toupper = current (uint32_t, TOUPPER, 128);
-  __ctype_tolower = current (uint32_t, TOLOWER, 128);
-  __ctype32_b = current (uint32_t, CLASS32, 0);
-  __ctype32_toupper = current (uint32_t, TOUPPER32, 0);
-  __ctype32_tolower = current (uint32_t, TOLOWER32, 0);
 
   offset = _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_CLASS_OFFSET);
   for (cnt = 0; cnt < 12; cnt++)
@@ -63,6 +52,4 @@ _nl_postload_ctype (void)
   offset = _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_MAP_OFFSET);
   for (cnt = 0; cnt < 2; cnt++)
     __ctype32_wctrans[cnt] = _nl_current_LC_CTYPE->values[offset + cnt].string;
-
-  __ctype32_width = current (char, WIDTH, 0);
 }

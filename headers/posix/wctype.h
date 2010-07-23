@@ -8,7 +8,7 @@
 
 #include <wchar.h>
 
-typedef const int *wctrans_t;
+typedef int wctrans_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,7 +28,7 @@ extern int		iswupper(wint_t wc);
 extern int		iswxdigit(wint_t wc);
 
 extern int		iswctype(wint_t wc, wctype_t charClass);
-extern wint_t	towctrans(wint_t wc, wctrans_t charClass);
+extern wint_t	towctrans(wint_t wc, wctrans_t transition);
 extern wint_t	towlower(wint_t wc);
 extern wint_t	towupper(wint_t wc);
 

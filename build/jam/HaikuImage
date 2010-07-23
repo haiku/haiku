@@ -87,7 +87,7 @@ SYSTEM_LIBS =
 	libmail.so libmedia.so libmidi.so libmidi2.so
 	libnetwork.so
 	libpng.so
-	<revisioned>libroot.so
+	<revisioned>libroot.so libroot-addon-icu.so
 	libscreensaver.so
 	libtextencoding.so libtiff.so libtracker.so libtranslation.so
 	libz.so

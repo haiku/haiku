@@ -503,76 +503,10 @@ enum
   _NL_MESSAGES_CODESET,
   _NL_NUM_LC_MESSAGES,
 
-  _NL_PAPER_HEIGHT = _NL_ITEM (__LC_PAPER, 0),
-  _NL_PAPER_WIDTH,
-  _NL_PAPER_CODESET,
-  _NL_NUM_LC_PAPER,
-
-  _NL_NAME_NAME_FMT = _NL_ITEM (__LC_NAME, 0),
-  _NL_NAME_NAME_GEN,
-  _NL_NAME_NAME_MR,
-  _NL_NAME_NAME_MRS,
-  _NL_NAME_NAME_MISS,
-  _NL_NAME_NAME_MS,
-  _NL_NAME_CODESET,
-  _NL_NUM_LC_NAME,
-
-  _NL_ADDRESS_POSTAL_FMT = _NL_ITEM (__LC_ADDRESS, 0),
-  _NL_ADDRESS_COUNTRY_NAME,
-  _NL_ADDRESS_COUNTRY_POST,
-  _NL_ADDRESS_COUNTRY_AB2,
-  _NL_ADDRESS_COUNTRY_AB3,
-  _NL_ADDRESS_COUNTRY_CAR,
-  _NL_ADDRESS_COUNTRY_NUM,
-  _NL_ADDRESS_COUNTRY_ISBN,
-  _NL_ADDRESS_LANG_NAME,
-  _NL_ADDRESS_LANG_AB,
-  _NL_ADDRESS_LANG_TERM,
-  _NL_ADDRESS_LANG_LIB,
-  _NL_ADDRESS_CODESET,
-  _NL_NUM_LC_ADDRESS,
-
-  _NL_TELEPHONE_TEL_INT_FMT = _NL_ITEM (__LC_TELEPHONE, 0),
-  _NL_TELEPHONE_TEL_DOM_FMT,
-  _NL_TELEPHONE_INT_SELECT,
-  _NL_TELEPHONE_INT_PREFIX,
-  _NL_TELEPHONE_CODESET,
-  _NL_NUM_LC_TELEPHONE,
-
-  _NL_MEASUREMENT_MEASUREMENT = _NL_ITEM (__LC_MEASUREMENT, 0),
-  _NL_MEASUREMENT_CODESET,
-  _NL_NUM_LC_MEASUREMENT,
-
-  _NL_IDENTIFICATION_TITLE = _NL_ITEM (__LC_IDENTIFICATION, 0),
-  _NL_IDENTIFICATION_SOURCE,
-  _NL_IDENTIFICATION_ADDRESS,
-  _NL_IDENTIFICATION_CONTACT,
-  _NL_IDENTIFICATION_EMAIL,
-  _NL_IDENTIFICATION_TEL,
-  _NL_IDENTIFICATION_FAX,
-  _NL_IDENTIFICATION_LANGUAGE,
-  _NL_IDENTIFICATION_TERRITORY,
-  _NL_IDENTIFICATION_AUDIENCE,
-  _NL_IDENTIFICATION_APPLICATION,
-  _NL_IDENTIFICATION_ABBREVIATION,
-  _NL_IDENTIFICATION_REVISION,
-  _NL_IDENTIFICATION_DATE,
-  _NL_IDENTIFICATION_CATEGORY,
-  _NL_IDENTIFICATION_CODESET,
-  _NL_NUM_LC_IDENTIFICATION,
 
   /* This marks the highest value used.  */
   _NL_NUM
 };
-
-
-/* Return the current locale's value for ITEM.
-   If ITEM is invalid, an empty string is returned.
-
-   The string returned will not change until `setlocale' is called;
-   it is usually in read-only memory and cannot be modified.  */
-
-extern char *nl_langinfo (nl_item __item) __THROW;
 
 
 #ifdef	__USE_GNU
@@ -581,9 +515,6 @@ extern char *nl_langinfo (nl_item __item) __THROW;
 
 /* Get locale datatype definition.  */
 # include <xlocale.h>
-
-/* Just like nl_langinfo but get the information from the locale object L.  */
-extern char *__nl_langinfo_l (nl_item __item, __locale_t l);
 #endif
 
 __END_DECLS
