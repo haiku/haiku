@@ -480,7 +480,8 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				break;
 		}
 		TRACE("  codecTag '%.4s' or %ld\n", (char*)&codecTag, codecTag);
-		TRACE("  fourcc '%.4s'\n", (char*)&codecContext->codec_id);
+		TRACE("  fourcc '%.4s' or %d\n", (char*)&codecContext->codec_id,
+			codecContext->codec_id);
 
 		BMediaFormats formats;
 		status_t status = formats.GetFormatFor(description, format);
