@@ -288,17 +288,22 @@ BCatalogAddOn::Next()
 	return fNext;
 }
 
-
+// HACK: newline before '::' to avoid this being a false positive for
+// collectcatkeys
 inline const char *
-BCatalogAddOn::MarkForTranslation(const char *str, const char *ctx,
+BCatalogAddOn
+::MarkForTranslation(const char *str, const char *ctx,
 	const char *cmt)
 {
 	return str;
 }
 
 
+// HACK: newline before '::' to avoid this being a false positive for
+// collectcatkeys
 inline int32
-BCatalogAddOn::MarkForTranslation(int32 id)
+BCatalogAddOn
+::MarkForTranslation(int32 id)
 {
 	return id;
 }

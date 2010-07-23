@@ -82,9 +82,9 @@ DefaultCatalog::DefaultCatalog(entry_ref *appOrAddOnRef)
 	BHashMapCatalog("", "", 0)
 {
 	fInitCheck = ReadFromResource(appOrAddOnRef);
-	fprintf(stderr,
-		"trying to load embedded catalog from resources results in %s",
-		strerror(fInitCheck));
+	// fprintf(stderr,
+	//	"trying to load embedded catalog from resources results in %s",
+	//	strerror(fInitCheck));
 }
 
 

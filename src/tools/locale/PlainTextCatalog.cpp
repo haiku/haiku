@@ -189,7 +189,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 
 	// We managed to open the file, so we remember it's the one we are using
 	fPath = path;
-	fprintf(stderr, "LocaleKit Plaintext: found catalog at %s\n", path);
+	// fprintf(stderr, "LocaleKit Plaintext: found catalog at %s\n", path);
 
 	std::string originalString;
 	std::string context;

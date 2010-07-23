@@ -64,6 +64,4 @@ DoCatalogs liblocale.so :
 	system
 	: StringForSize.cpp
 	  ColorControl.cpp
-	:
-	: '"(gLocaleBackend\\s*->\\s*GetString\\s*|BCatalogAddOn\\s*::\\s*MarkForTranslation\\s*)"'
 	;
