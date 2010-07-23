@@ -11,8 +11,16 @@ local sources =
 	Catalog.cpp
 	Collator.cpp
 	Country.cpp
-	Currency.cpp
 	DefaultCatalog.cpp
+	HashMapCatalog.cpp
+	Language.cpp
+	LibbeLocaleBackend.cpp
+	LibraryInit.cpp
+	Locale.cpp
+	LocaleRoster.cpp
+	TimeZone.cpp
+
+	Currency.cpp
 	FloatFormat.cpp
 	FloatFormatImpl.cpp
 	FloatFormatParameters.cpp
@@ -20,16 +28,10 @@ local sources =
 	FormatImpl.cpp
 	FormatParameters.cpp
 	GenericNumberFormat.cpp
-	HashMapCatalog.cpp
 	IntegerFormat.cpp
 	IntegerFormatImpl.cpp
 	IntegerFormatParameters.cpp
 	langinfo.cpp
-	Language.cpp
-	LibbeLocaleBackend.cpp
-	LibraryInit.cpp
-	Locale.cpp
-	LocaleRoster.cpp
 	NumberFormat.cpp
 	NumberFormatImpl.cpp
 	NumberFormatParameters.cpp
