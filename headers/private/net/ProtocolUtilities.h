@@ -114,7 +114,7 @@ public:
 
 			status_t			Enqueue(net_buffer* buffer);
 			net_buffer*			Dequeue(bool clone);
-			status_t			BlockingDequeue(bool clone, bigtime_t timeout,
+			status_t			BlockingDequeue(bool peek, bigtime_t timeout,
 									net_buffer** _buffer);
 			void				Clear();
 
@@ -122,24 +122,27 @@ public:
 			status_t			SocketDequeue(uint32 flags,
 									net_buffer** _buffer);
 
+			bool				IsEmpty() const { return fBuffers.IsEmpty(); }
 			ssize_t				AvailableData() const;
 
 			void				WakeAll();
+			void				NotifyOne();
 
 protected:
-	virtual	status_t			_SocketStatus() const;
+	virtual	status_t			SocketStatus(bool peek) const;
 
+private:
 			status_t			_Enqueue(net_buffer* buffer);
 			status_t			_SocketEnqueue(net_buffer* buffer);
-			net_buffer*			_Dequeue(bool clone);
+			net_buffer*			_Dequeue(bool peek);
 			void				_Clear();
 
 			status_t			_Wait(bigtime_t timeout);
 			void				_NotifyOneReader(bool notifySocket);
 
-			bool				_IsEmpty() const { return fBuffers.IsEmpty(); }
 			bigtime_t			_SocketTimeout(uint32 flags) const;
 
+protected:
 	typedef typename LockingBase::Type LockType;
 	typedef typename LockingBase::AutoLocker AutoLocker;
 	typedef DoublyLinkedListCLink<net_buffer> NetBufferLink;
@@ -249,27 +252,31 @@ DECL_DATAGRAM_SOCKET(inline net_buffer*)::_Dequeue(bool clone)
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::BlockingDequeue(bool clone,
+DECL_DATAGRAM_SOCKET(inline status_t)::BlockingDequeue(bool peek,
 	bigtime_t timeout, net_buffer** _buffer)
 {
 	AutoLocker _(fLock);
 
 	bool waited = false;
 	while (fBuffers.IsEmpty()) {
-		status_t status = _SocketStatus();
-		if (status < B_OK)
+		status_t status = SocketStatus(peek);
+		if (status != B_OK) {
+			if (peek)
+				_NotifyOneReader(false);
+			return status;
+		}
+
+		status = _Wait(timeout);
+		if (status != B_OK)
 			return status;
 
-		if ((status = _Wait(timeout)) < B_OK)
-			return status;
 		waited = true;
 	}
 
-	*_buffer = _Dequeue(clone);
-	if (clone && waited) {
-		// we were signalled there was a new buffer in the
-		// list; but since we are cloning, notify the next
-		// waiting reader.
+	*_buffer = _Dequeue(peek);
+	if (peek && waited) {
+		// There is a new buffer in the list; but since we are only peeking,
+		// notify the next waiting reader.
 		_NotifyOneReader(false);
 	}
 
@@ -307,7 +314,7 @@ DECL_DATAGRAM_SOCKET(inline void)::_Clear()
 DECL_DATAGRAM_SOCKET(inline ssize_t)::AvailableData() const
 {
 	AutoLocker _(fLock);
-	status_t status = _SocketStatus();
+	status_t status = SocketStatus(true);
 	if (status < B_OK)
 		return status;
 
@@ -315,9 +322,15 @@ DECL_DATAGRAM_SOCKET(inline ssize_t)::AvailableData() const
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::_SocketStatus() const
+DECL_DATAGRAM_SOCKET(inline status_t)::SocketStatus(bool peek) const
 {
-	return B_OK;
+	if (peek)
+		return fSocket->error;
+	
+	status_t status = fSocket->error;
+	fSocket->error = B_OK;
+
+	return status;
 }
 
 
@@ -338,14 +351,22 @@ DECL_DATAGRAM_SOCKET(inline void)::WakeAll()
 }
 
 
+DECL_DATAGRAM_SOCKET(inline void)::NotifyOne()
+{
+	release_sem_etc(fNotify, 1, B_RELEASE_IF_WAITING_ONLY
+		| B_DO_NOT_RESCHEDULE);
+}
+
+
 DECL_DATAGRAM_SOCKET(inline void)::_NotifyOneReader(bool notifySocket)
 {
 	release_sem_etc(fNotify, 1, B_RELEASE_IF_WAITING_ONLY
 		| B_DO_NOT_RESCHEDULE);
 
-	if (notifySocket)
+	if (notifySocket) {
 		ModuleBundle::Stack()->notify_socket(fSocket, B_SELECT_READ,
 			fCurrentBytes);
+	}
 }
 
 

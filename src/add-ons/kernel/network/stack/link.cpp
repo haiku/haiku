@@ -40,22 +40,26 @@ typedef DatagramSocket<MutexLocking, LocalStackBundle> LocalDatagramSocket;
 
 class LinkProtocol : public net_protocol, public LocalDatagramSocket {
 public:
-	LinkProtocol(net_socket* socket);
-	~LinkProtocol();
+								LinkProtocol(net_socket* socket);
+	virtual						~LinkProtocol();
 
-	status_t StartMonitoring(const char* deviceName);
-	status_t StopMonitoring();
+			status_t			StartMonitoring(const char* deviceName);
+			status_t			StopMonitoring();
+
+protected:
+			status_t			SocketStatus(bool peek) const;
 
 private:
-	status_t _SocketStatus() const;
-	status_t _Unregister();
+			status_t			_Unregister();
 
-	static status_t _MonitorData(net_device_monitor* monitor,
-		net_buffer* buffer);
-	static void _MonitorEvent(net_device_monitor* monitor, int32 event);
+	static	status_t			_MonitorData(net_device_monitor* monitor,
+									net_buffer* buffer);
+	static	void				_MonitorEvent(net_device_monitor* monitor,
+									int32 event);
 
-	net_device_monitor		fMonitor;
-	net_device_interface*	fMonitoredDevice;
+private:
+			net_device_monitor	fMonitor;
+			net_device_interface* fMonitoredDevice;
 };
 
 
@@ -115,12 +119,14 @@ LinkProtocol::StopMonitoring()
 
 
 status_t
-LinkProtocol::_SocketStatus() const
+LinkProtocol::SocketStatus(bool peek) const
 {
 	if (fMonitoredDevice == NULL)
 		return ENODEV;
-	return LocalDatagramSocket::_SocketStatus();
+
+	return LocalDatagramSocket::SocketStatus(peek);
 }
+
 
 status_t
 LinkProtocol::_Unregister()
@@ -153,7 +159,7 @@ LinkProtocol::_MonitorEvent(net_device_monitor* monitor, int32 event)
 		MutexLocker _(protocol->fLock);
 
 		protocol->_Unregister();
-		if (protocol->_IsEmpty()) {
+		if (protocol->IsEmpty()) {
 			protocol->WakeAll();
 			notify_socket(protocol->socket, B_SELECT_READ, ENODEV);
 		}
