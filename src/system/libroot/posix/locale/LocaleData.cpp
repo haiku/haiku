@@ -27,7 +27,13 @@
 namespace BPrivate {
 
 
-const unsigned short gPosixClassInfo[256] = {
+/*
+ * the following arrays have 257 elements where the first is a
+ * dummy element (containing the neutral/identity value) used when
+ * the array is accessed as in 'isblank(EOF)' (i.e. with index -1).
+ */
+const unsigned short gPosixClassInfo[257] = {
+	/*  -1 */   0,	// neutral value
 	/*   0 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
 	/*   8 */	_IScntrl, _ISblank|_IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl, _IScntrl,
 	/*  16 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
@@ -62,7 +68,8 @@ const unsigned short gPosixClassInfo[256] = {
 	/* 248 */	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-const int gPosixToLowerMap[256] = {
+const int gPosixToLowerMap[257] = {
+	/*  -1 */    -1,	// identity value
 	/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 	/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 	/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -98,7 +105,8 @@ const int gPosixToLowerMap[256] = {
 };
 
 
-const int gPosixToUpperMap[256] = {
+const int gPosixToUpperMap[257] = {
+	/*  -1 */    -1,	// identity value
 	/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 	/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 	/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -267,6 +275,6 @@ const char* gPosixLanginfo[_NL_LANGINFO_LAST] = {
 }	// namespace BPrivate
 
 
-const unsigned short* 	__ctype_b 		= BPrivate::gPosixClassInfo;
-const int* 				__ctype_tolower = BPrivate::gPosixToLowerMap;
-const int* 				__ctype_toupper = BPrivate::gPosixToUpperMap;
+const unsigned short* 	__ctype_b 		= &BPrivate::gPosixClassInfo[1];
+const int* 				__ctype_tolower = &BPrivate::gPosixToLowerMap[1];
+const int* 				__ctype_toupper = &BPrivate::gPosixToUpperMap[1];

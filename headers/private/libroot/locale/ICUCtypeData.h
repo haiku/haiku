@@ -32,9 +32,14 @@ public:
 			const char*			GetLanginfo(int index);
 
 private:
-			unsigned short		fClassInfo[256];
-			int					fToLowerMap[256];
-			int					fToUpperMap[256];
+			/*
+			 * the following arrays have 257 elements where the first is a
+			 * dummy element (containing the neutral/identity value) used when
+			 * the array is accessed as in 'isblank(EOF)' (i.e. with index -1).
+			 */
+			unsigned short		fClassInfo[257];
+			int					fToLowerMap[257];
+			int					fToUpperMap[257];
 
 			LocaleCtypeDataBridge*	fDataBridge;
 };

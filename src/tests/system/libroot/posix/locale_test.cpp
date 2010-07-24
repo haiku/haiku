@@ -691,24 +691,24 @@ test_ctype(const char* locale, const unsigned short int classInfos[],
 	printf("ctype of %s locale\n", locale);
 
 	int problemCount = 0;
-	for (int i = 0; i < 256; ++i) {
+	for (int i = -1; i < 256; ++i) {
 		unsigned short classInfo = determineFullClassInfo(i);
 
-		if (classInfo != classInfos[i]) {
-			printf("\tPROBLEM: %d = %x (expected %x)\n", i, classInfo,
-				classInfos[i]);
+		if (classInfo != classInfos[i + 1]) {
+			printf("\tPROBLEM: ctype(%d) = %x (expected %x)\n", i, classInfo,
+				classInfos[i + 1]);
 			problemCount++;
 		}
 		int lower = tolower(i);
-		if (lower != toLowerMap[i]) {
+		if (lower != toLowerMap[i + 1]) {
 			printf("\tPROBLEM: tolower(%d) = %x (expected %x)\n", i, lower,
-				toLowerMap[i]);
+				toLowerMap[i + 1]);
 			problemCount++;
 		}
 		int upper = toupper(i);
-		if (upper != toUpperMap[i]) {
+		if (upper != toUpperMap[i + 1]) {
 			printf("\tPROBLEM: toupper(%d) = %x (expected %x)\n", i, upper,
-				toUpperMap[i]);
+				toUpperMap[i + 1]);
 			problemCount++;
 		}
 	}
@@ -722,7 +722,8 @@ test_ctype(const char* locale, const unsigned short int classInfos[],
 void
 test_ctype()
 {
-	const unsigned short int classInfos_posix[256] = {
+	const unsigned short int classInfos_posix[257] = {
+		/*  -1 */   0,	// neutral value
 		/*   0 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
 		/*   8 */	_IScntrl, _ISblank|_IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl, _IScntrl,
 		/*  16 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
@@ -756,7 +757,8 @@ test_ctype()
 		/* 240 */	0, 0, 0, 0, 0, 0, 0, 0,
 		/* 248 */	0, 0, 0, 0, 0, 0, 0, 0,
 	};
-	const int toLowerMap_posix[256] = {
+	const int toLowerMap_posix[257] = {
+		/*  -1 */    -1,	// identity value
 		/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 		/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 		/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -790,7 +792,8 @@ test_ctype()
 		/* 240 */	240, 241, 242, 243, 244, 245, 246, 247,
 		/* 248 */	248, 249, 250, 251, 252, 253, 254, 255,
 	};
-	const int toUpperMap_posix[256] = {
+	const int toUpperMap_posix[257] = {
+		/*  -1 */    -1,	// identity value
 		/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 		/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 		/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -826,7 +829,8 @@ test_ctype()
 	};
 	test_ctype("POSIX", classInfos_posix, toLowerMap_posix, toUpperMap_posix);
 
-	const unsigned short int classInfos_de[256] = {
+	const unsigned short int classInfos_de[257] = {
+		/*  -1 */   0,	// neutral value
 		/*   0 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
 		/*   8 */	_IScntrl, _ISblank|_IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl, _IScntrl,
 		/*  16 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
@@ -860,7 +864,8 @@ test_ctype()
 		/* 240 */	_ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph,
 		/* 248 */	_ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower, _ISprint|_ISgraph|_ISalnum|_ISalpha|_ISlower,
 	};
-	const int toLowerMap_de[256] = {
+	const int toLowerMap_de[257] = {
+		/*  -1 */    -1,	// identity value
 		/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 		/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 		/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -894,7 +899,8 @@ test_ctype()
 		/* 240 */	240, 241, 242, 243, 244, 245, 246, 247,
 		/* 248 */	248, 249, 250, 251, 252, 253, 254, 255,
 	};
-	const int toUpperMap_de[256] = {
+	const int toUpperMap_de[257] = {
+		/*  -1 */    -1,	// identity value
 		/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 		/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 		/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -930,7 +936,8 @@ test_ctype()
 	};
 	test_ctype("de_DE.ISO8859-1", classInfos_de, toLowerMap_de, toUpperMap_de);
 
-	const unsigned short int classInfos_utf8[256] = {
+	const unsigned short int classInfos_utf8[257] = {
+		/*  -1 */   0,	// neutral value
 		/*   0 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
 		/*   8 */	_IScntrl, _ISblank|_IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl, _IScntrl,
 		/*  16 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
@@ -1014,9 +1021,14 @@ test_wctype(const char* locale, const wchar_t* text,
 	printf("wctype of %s locale\n", locale);
 
 	int problemCount = 0;
+	unsigned short classInfo = determineWideFullClassInfo(WEOF);
+	if (classInfo != 0) {
+		printf("\tPROBLEM: classinfo for WEOF = %x (expected 0)\n", classInfo);
+		problemCount++;
+	}
 	wint_t wc = *text;
 	for (int i = 0; i < 48; wc = *++text, ++i) {
-		unsigned short classInfo = determineWideFullClassInfo(wc);
+		classInfo = determineWideFullClassInfo(wc);
 		if (wc != wcs[i]) {
 			printf("\tPROBLEM: wc for char #%d = %x (expected %x)\n", i, wc,
 				wcs[i]);

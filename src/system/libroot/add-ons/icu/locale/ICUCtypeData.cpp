@@ -30,9 +30,9 @@ ICUCtypeData::~ICUCtypeData()
 void
 ICUCtypeData::Initialize(LocaleCtypeDataBridge* dataBridge)
 {
-	*dataBridge->addrOfClassInfoTable = fClassInfo;
-	*dataBridge->addrOfToLowerTable = fToLowerMap;
-	*dataBridge->addrOfToUpperTable = fToUpperMap;
+	*dataBridge->addrOfClassInfoTable = &fClassInfo[1];
+	*dataBridge->addrOfToLowerTable = &fToLowerMap[1];
+	*dataBridge->addrOfToUpperTable = &fToUpperMap[1];
 	fDataBridge = dataBridge;
 }
 
@@ -97,9 +97,9 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 			if (U_SUCCESS(icuStatus))
 				toUpper = (unsigned char)buffer[0];
 		}
-		fClassInfo[i] = classInfo;
-		fToLowerMap[i] = toLower;
-		fToUpperMap[i] = toUpper;
+		fClassInfo[i + 1] = classInfo;
+		fToLowerMap[i + 1] = toLower;
+		fToUpperMap[i + 1] = toUpper;
 	}
 
 	return B_OK;
@@ -124,6 +124,9 @@ ICUCtypeData::SetToPosix()
 int
 ICUCtypeData::IsWCType(wint_t wc, wctype_t charClass)
 {
+	if (wc == WEOF)
+		return 0;
+
 	switch (charClass) {
 		case _ISalnum:
 			return u_hasBinaryProperty(wc, UCHAR_POSIX_ALNUM);

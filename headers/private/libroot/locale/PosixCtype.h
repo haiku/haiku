@@ -9,9 +9,14 @@
 namespace BPrivate {
 
 
-extern const unsigned short gPosixClassInfo[256];
-extern const int gPosixToLowerMap[256];
-extern const int gPosixToUpperMap[256];
+/*
+ * the following arrays have 257 elements where the first is a
+ * dummy element (containing the neutral/identity value) used when
+ * the array is accessed as in 'isblank(EOF)' (i.e. with index -1).
+ */
+extern const unsigned short gPosixClassInfo[257];
+extern const int gPosixToLowerMap[257];
+extern const int gPosixToUpperMap[257];
 
 
 }	// namespace BPrivate
