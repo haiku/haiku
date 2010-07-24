@@ -57,7 +57,8 @@ enum {
 	kLocationChanged,
 	kChooseLocation,
 	kSaveScreenshot,
-	kSettings
+	kSettings,
+	kCloseTranslatorSettings
 };
 
 
@@ -66,21 +67,21 @@ enum {
 
 class QuitMessageFilter : public BMessageFilter {
 public:
-							QuitMessageFilter(BWindow** window)
-								:
-								BMessageFilter((uint32)B_QUIT_REQUESTED),
-								fWindow(window)
-							{
-							}
-	virtual	filter_result	Filter(BMessage* message, BHandler** target)
-							{
-								*fWindow = NULL;
-								return B_DISPATCH_MESSAGE;
-							}
+	QuitMessageFilter(BWindow* window)
+	:
+	BMessageFilter((uint32)B_QUIT_REQUESTED),
+	fWindow(window)
+	{
+	}
+
+	virtual filter_result Filter(BMessage* message, BHandler** target)
+	{
+		BMessenger(fWindow).SendMessage(kCloseTranslatorSettings);
+		return B_SKIP_MESSAGE;
+	}
 
 private:
-			BWindow**		fWindow;
-		
+	BWindow* fWindow;
 };
 
 
@@ -93,11 +94,11 @@ public:
 	{
 	}
 
-	virtual	bool	Filter(const entry_ref* ref, BNode* node,
-						struct stat_beos* stat, const char* filetype)
-					{
-						return node->IsDirectory();
-					}
+	virtual bool Filter(const entry_ref* ref, BNode* node,
+		struct stat_beos* stat, const char* filetype)
+	{
+		return node->IsDirectory();
+	}
 };
 
 
@@ -342,6 +343,11 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		case kSettings:
 			_ShowSettings(true);
 			break;
+			
+		case kCloseTranslatorSettings:
+			fSettingsWindow->Lock();
+			fSettingsWindow->Quit();
+			fSettingsWindow = NULL;
 
 		default:
 			BWindow::MessageReceived(message);
@@ -636,10 +642,11 @@ ScreenshotWindow::_ShowSettings(bool activate)
 			if (activate)
 				fSettingsWindow->Activate();
 		} else {
-			fSettingsWindow = new BWindow(rect, "Translator Settings",
+			fSettingsWindow = new BWindow(rect, 
+				B_TRANSLATE("Translator Settings"),
 				B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 				B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
-			fSettingsWindow->AddFilter(new QuitMessageFilter(&fSettingsWindow));
+			fSettingsWindow->AddFilter(new QuitMessageFilter(this));
 			fSettingsWindow->AddChild(view);
 			fSettingsWindow->CenterOnScreen();
 			fSettingsWindow->Show();
