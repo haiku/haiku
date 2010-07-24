@@ -68,9 +68,9 @@ enum {
 class QuitMessageFilter : public BMessageFilter {
 public:
 	QuitMessageFilter(BWindow* window)
-	:
-	BMessageFilter((uint32)B_QUIT_REQUESTED),
-	fWindow(window)
+		:
+		BMessageFilter((uint32)B_QUIT_REQUESTED),
+		fWindow(window)
 	{
 	}
 
@@ -348,6 +348,7 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 			fSettingsWindow->Lock();
 			fSettingsWindow->Quit();
 			fSettingsWindow = NULL;
+			break;
 
 		default:
 			BWindow::MessageReceived(message);
