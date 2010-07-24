@@ -5,7 +5,6 @@
 
 
 #include <ctype.h>
-#include <PosixCtype.h>
 
 
 // disable macros defined in ctype.h
@@ -181,5 +180,3 @@ toupper(int c)
 
 	return c;
 }
-
-

@@ -1,6 +1,6 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H
-/* 
+/*
 ** Distributed under the terms of the OpenBeOS License.
 */
 
