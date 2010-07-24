@@ -85,9 +85,8 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	} else
 		owner->SetLowColor(owner->ViewColor());
 
-	frame.left += 4;
 	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top + 1, iconFrame.left + 15,
+	iconFrame.Set(iconFrame.left - 11, iconFrame.top + 1, iconFrame.left + 4,
 		iconFrame.top + 16);
 
 	if (fIcon != NULL && fIcon->IsValid()) {
@@ -95,8 +94,6 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->DrawBitmap(fIcon, iconFrame);
 		owner->SetDrawingMode(B_OP_COPY);
 	}
-
-	frame.left += 16 * (OutlineLevel() + 1);
 
 	BString text = Text();
 	if (IsEnabled())
