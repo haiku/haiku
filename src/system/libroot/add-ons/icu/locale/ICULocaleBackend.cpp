@@ -8,6 +8,7 @@
 
 #include <new>
 
+#include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
 #include <string.h>
@@ -21,6 +22,27 @@ CreateInstance()
 {
 	return new(std::nothrow) ICULocaleBackend();
 }
+
+
+/**
+ * A helper class resetting errno to 0 if it has been set during the execution
+ * of ICU methods. Any changes of errno shall only be done by our callers.
+ */
+class ErrnoMaintainer {
+public:
+	ErrnoMaintainer()
+		: fErrnoUponEntry(errno)
+	{
+	}
+
+	~ErrnoMaintainer()
+	{
+		if (errno != 0 && fErrnoUponEntry == 0)
+			errno = 0;
+	}
+private:
+	int fErrnoUponEntry;
+};
 
 
 ICULocaleBackend::ICULocaleBackend()
@@ -40,6 +62,8 @@ ICULocaleBackend::~ICULocaleBackend()
 void
 ICULocaleBackend::Initialize(LocaleDataBridge* dataBridge)
 {
+	ErrnoMaintainer errnoMaintainer;
+
 	fCtypeData.Initialize(&dataBridge->ctypeDataBridge);
 	fMessagesData.Initialize(&dataBridge->messagesDataBridge);
 	fMonetaryData.Initialize(&dataBridge->monetaryDataBridge);
@@ -55,6 +79,8 @@ ICULocaleBackend::Initialize(LocaleDataBridge* dataBridge)
 const char*
 ICULocaleBackend::SetLocale(int category, const char* posixLocaleName)
 {
+	ErrnoMaintainer errnoMaintainer;
+
 	if (posixLocaleName == NULL)
 		return _QueryLocale(category);
 
@@ -123,6 +149,8 @@ ICULocaleBackend::LCTimeInfo()
 int
 ICULocaleBackend::IsWCType(wint_t wc, wctype_t charClass)
 {
+	ErrnoMaintainer errnoMaintainer;
+
 	return fCtypeData.IsWCType(wc, charClass);
 }
 
@@ -130,6 +158,8 @@ ICULocaleBackend::IsWCType(wint_t wc, wctype_t charClass)
 status_t
 ICULocaleBackend::ToWCTrans(wint_t wc, wctrans_t transition, wint_t& result)
 {
+	ErrnoMaintainer errnoMaintainer;
+
 	return fCtypeData.ToWCTrans(wc, transition, result);
 }
 
@@ -137,6 +167,8 @@ ICULocaleBackend::ToWCTrans(wint_t wc, wctrans_t transition, wint_t& result)
 const char*
 ICULocaleBackend::GetLanginfo(int index)
 {
+	ErrnoMaintainer errnoMaintainer;
+
 	switch(index) {
 		case CODESET:
 			return fCtypeData.GetLanginfo(index);
@@ -214,6 +246,8 @@ ICULocaleBackend::GetLanginfo(int index)
 status_t
 ICULocaleBackend::Strcoll(const char* a, const char* b, int& result)
 {
+	ErrnoMaintainer errnoMaintainer;
+
 	return fCollateData.Strcoll(a, b, result);
 }
 
@@ -222,6 +256,8 @@ status_t
 ICULocaleBackend::Strxfrm(char* out, const char* in, size_t size,
 	size_t& outSize)
 {
+	ErrnoMaintainer errnoMaintainer;
+
 	return fCollateData.Strxfrm(out, in, size, outSize);
 }
 
