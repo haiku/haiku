@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku.
+ * Copyright 2003-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,8 +28,7 @@ const char *inputFile = NULL;
 BString outputFile;
 const char *catalogSig = NULL;
 const char *catalogLang = "English";
-BString rxString("(be_locale_roster->GetCatalog\\(\\)\\s*->\\s*GetString\\s*"
-	"|BCatalogAddOn\\s*::\\s*MarkForTranslation\\s*)");
+BString rxString("B_CATKEY\\s*");
 
 
 BString str, ctx, cmt;
@@ -96,7 +95,6 @@ fetchStr(const char *&in, BString &str, bool lookForID)
 
 			// Strip all whitespace until we find a closing parenthesis, or the
 			// beginning of another string
-			// TODO: ignore comments
 			while (isspace(*in) || *in == ')') {
 				if (*in == ')') {
 					if (parLevel == 0)
@@ -188,10 +186,10 @@ collectAllCatalogKeys(BString& inputStr)
 		if (fetchKey(in)) {
 			if (haveID) {
 				if (showKeys)
-					printf("CatKey(%ld)\n", id);
+					printf("CatKey(%d)\n", id);
 				res = catalog->SetString(id, "");
 				if (res != B_OK) {
-					fprintf(stderr, "Collectcatkeys: couldn't add key %ld - "
+					fprintf(stderr, "Collectcatkeys: couldn't add key %d - "
 						"error: %s\n", id, strerror(res));
 					exit(-1);
 				}
@@ -303,7 +301,7 @@ main(int argc, char **argv)
 		if (showSummary) {
 			int32 count = catalog->CountItems();
 			if (count)
-				fprintf(stderr, "%ld key%s found and written to %s\n",
+				fprintf(stderr, "%d key%s found and written to %s\n",
 					count, (count==1 ? "": "s"), outputFile.String());
 			else
 				fprintf(stderr, "no keys found\n");

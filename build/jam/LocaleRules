@@ -3,7 +3,7 @@
 # Extract catalog entries from the sourcefile and put the output textfile in
 # target. This output file is then used to create the binary catalog with
 # linkcatkeys.
-rule ExtractCatalogEntries target : source : signature : regexp
+rule ExtractCatalogEntries target : sources : signature : regexp
 {
 	# get compiler and defines for the platform
 	local headers ;
@@ -55,20 +55,21 @@ rule ExtractCatalogEntries target : source : signature : regexp
 		HAIKU_CATALOG_REGEXP on $(target) = -r $(regexp) ;
 	}
 
-	SEARCH on $(source) += $(SEARCH_SOURCE) ;
+	SEARCH on $(sources) += $(SEARCH_SOURCE) ;
 
 	MakeLocatePlatform $(target) ;
-	Depends $(target) : $(source) <build>collectcatkeys ;
+	Depends $(target) : $(sources) <build>collectcatkeys ;
 	LocalClean clean : $(target).pre ;
-	ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(source) ;
+	ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(sources) ;
 }
 
 actions ExtractCatalogEntries1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-		cat "$(2[2-])" | $(CC) -E $(CCDEFS) $(HDRS) - > "$(1)".pre
-		$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
-			-w -o "$(1)" "$(1)".pre
+	cat "$(2[2-])" \
+		| $(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) - > "$(1)".pre
+	$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
+		-w -o "$(1)" "$(1)".pre
 }
 
 rule LinkApplicationCatalog target : sources : signature : language

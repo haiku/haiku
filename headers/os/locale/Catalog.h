@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CATALOG_H_
@@ -26,6 +26,10 @@ class BCatalog {
 		const char *GetString(const char *string, const char *context = NULL,
 						const char *comment = NULL);
 		const char *GetString(uint32 id);
+
+		const char *GetNoAutoCollectString(const char *string,
+						const char *context = NULL, const char *comment = NULL);
+		const char *GetNoAutoCollectString(uint32 id);
 
 		status_t GetData(const char *name, BMessage *msg);
 		status_t GetData(uint32 id, BMessage *msg);
@@ -54,9 +58,12 @@ class BCatalog {
 };
 
 
+#ifndef B_COLLECTING_CATKEYS
+
 #ifndef B_AVOID_TRANSLATION_MACROS
 // macros for easy catalog-access, define B_AVOID_TRANSLATION_MACROS if
-// you don't want these:
+// you don't want these (in which case you need to collect the catalog keys
+// manually, as collectcatkeys won't do it for you):
 
 #undef B_TRANSLATE_CONTEXT
 	// In a single application, several strings (e.g. 'Ok') will be used
@@ -75,7 +82,6 @@ class BCatalog {
 	//		#define B_TRANSLATE_CONTEXT "Folder-Window"
 	// Tip: Use a descriptive name of the class implemented in that
 	//		source-file.
-
 
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
@@ -133,7 +139,81 @@ class BCatalog {
 #define B_TRANSLATE_MARK_ID(id) \
 	BCatalogAddOn::MarkForTranslation((id))
 
+// Translation macros which do not let collectcatkeys try to collect the key
+// (useful in combination with the marking macros above):
+#undef B_TRANSLATE_NOCOLLECT
+#define B_TRANSLATE_NOCOLLECT(str) \
+	B_TRANSLATE(str)
+
+#undef B_TRANSLATE_NOCOLLECT_COMMENT
+#define B_TRANSLATE_NOCOLLECT_COMMENT(str, cmt) \
+	B_TRANSLATE_COMMENT(str, cmt)
+
+#undef B_TRANSLATE_NOCOLLECT_ALL
+#define B_TRANSLATE_NOCOLLECT_ALL(str, ctx, cmt) \
+	B_TRANSLATE_ALL(str, ctx, cmt)
+
+#undef B_TRANSLATE_NOCOLLECT_ID
+#define B_TRANSLATE_NOCOLLECT_ID(id) \
+	B_TRANSLATE_ID(id)
+
 #endif	/* B_AVOID_TRANSLATION_MACROS */
+
+#else	/* B_COLLECTING_CATKEYS */
+
+// Translation macros used when executing collectcatkeys
+
+#undef B_TRANSLATE_CONTEXT
+
+#undef B_TRANSLATE
+#define B_TRANSLATE(str) \
+	B_CATKEY((str), B_TRANSLATE_CONTEXT)
+
+#undef B_TRANSLATE_COMMENT
+#define B_TRANSLATE_COMMENT(str, cmt) \
+	B_CATKEY((str), B_TRANSLATE_CONTEXT, (cmt))
+
+#undef B_TRANSLATE_ALL
+#define B_TRANSLATE_ALL(str, ctx, cmt) \
+	B_CATKEY((str), (ctx), (cmt))
+
+#undef B_TRANSLATE_ID
+#define B_TRANSLATE_ID(id) \
+	B_CATKEY((id))
+
+#undef B_TRANSLATE_MARK
+#define B_TRANSLATE_MARK(str) \
+	B_CATKEY((str), B_TRANSLATE_CONTEXT)
+
+#undef B_TRANSLATE_MARK_COMMENT
+#define B_TRANSLATE_MARK_COMMENT(str, cmt) \
+	B_CATKEY((str), B_TRANSLATE_CONTEXT, (cmt))
+
+#undef B_TRANSLATE_MARK_ALL
+#define B_TRANSLATE_MARK_ALL(str, ctx, cmt) \
+	B_CATKEY((str), (ctx), (cmt))
+
+#undef B_TRANSLATE_MARK_ID
+#define B_TRANSLATE_MARK_ID(id) \
+	B_CATKEY((id))
+
+#undef B_TRANSLATE_NOCOLLECT
+#define B_TRANSLATE_NOCOLLECT(str) \
+	(void)
+
+#undef B_TRANSLATE_NOCOLLECT_COMMENT
+#define B_TRANSLATE_NOCOLLECT_COMMENT(str, cmt) \
+	(void)
+
+#undef B_TRANSLATE_NOCOLLECT_ALL
+#define B_TRANSLATE_NOCOLLECT_ALL(str, ctx, cmt) \
+	(void)
+
+#undef B_TRANSLATE_NOCOLLECT_ID
+#define B_TRANSLATE_NOCOLLECT_ID(id) \
+	(void)
+
+#endif	/* B_COLLECTING_CATKEYS */
 
 
 /************************************************************************/
@@ -254,6 +334,21 @@ BCatalog::GetFingerprint(uint32 *fp)
 }
 
 
+inline const char *
+BCatalog::GetNoAutoCollectString(const char *string, const char *context,
+	const char *comment)
+{
+	return GetString(string, context, comment);
+}
+
+
+inline const char *
+BCatalog::GetNoAutoCollectString(uint32 id)
+{
+	return GetString(id);
+}
+
+
 inline status_t
 BCatalog::InitCheck() const
 {
@@ -288,22 +383,16 @@ BCatalogAddOn::Next()
 	return fNext;
 }
 
-// HACK: newline before '::' to avoid this being a false positive for
-// collectcatkeys
 inline const char *
-BCatalogAddOn
-::MarkForTranslation(const char *str, const char *ctx,
+BCatalogAddOn::MarkForTranslation(const char *str, const char *ctx,
 	const char *cmt)
 {
 	return str;
 }
 
 
-// HACK: newline before '::' to avoid this being a false positive for
-// collectcatkeys
 inline int32
-BCatalogAddOn
-::MarkForTranslation(int32 id)
+BCatalogAddOn::MarkForTranslation(int32 id)
 {
 	return id;
 }
