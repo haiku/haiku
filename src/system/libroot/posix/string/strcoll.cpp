@@ -4,7 +4,6 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#define B_USE_POSITIVE_POSIX_ERRORS
 #include <errno.h>
 #include <string.h>
 

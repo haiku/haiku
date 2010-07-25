@@ -3,7 +3,6 @@
 ** Distributed under the terms of the Haiku License.
 */
 
-#define B_USE_POSITIVE_POSIX_ERRORS
 #include <ctype.h>
 #include <errno.h>
 #include <string.h>
