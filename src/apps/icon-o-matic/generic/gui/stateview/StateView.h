@@ -38,6 +38,9 @@ class StateView : public BView {
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 	virtual	void				KeyUp(const char* bytes, int32 numBytes);
 
+	virtual	status_t			Perform(perform_code code, void* data);
+		// Avoids warning about hiding BView::Perform().
+
 	// StateView interface
 			void				SetState(ViewState* state);
 			void				UpdateStateCursor();

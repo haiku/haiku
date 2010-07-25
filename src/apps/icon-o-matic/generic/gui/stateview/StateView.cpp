@@ -314,6 +314,17 @@ StateView::KeyUp(const char* bytes, int32 numBytes)
 	BView::KeyUp(bytes, numBytes);
 }
 
+
+// #pragma mark -
+
+
+status_t
+StateView::Perform(perform_code code, void* data)
+{
+	return BView::Perform(code, data);
+}
+
+
 // #pragma mark -
 
 // SetState
