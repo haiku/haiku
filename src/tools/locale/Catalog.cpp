@@ -1,4 +1,4 @@
-/* 
+/*
 ** Distributed under the terms of the OpenBeOS License.
 ** Copyright 2003-2004. All rights reserved.
 **
@@ -31,7 +31,7 @@ BCatalog::BCatalog()
 }
 
 
-BCatalog::BCatalog(const char *signature, const char *language, 
+BCatalog::BCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 {
 	//fCatalog = be_locale_roster->LoadCatalog(signature, language, fingerprint);
@@ -72,7 +72,7 @@ BCatalog::GetString(uint32 id)
 }
 
 
-status_t 
+status_t
 BCatalog::GetData(const char *name, BMessage *msg)
 {
 	if (!fCatalog)
@@ -81,14 +81,14 @@ BCatalog::GetData(const char *name, BMessage *msg)
 	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
 		res = cat->GetData(name, msg);
 		if (res != B_NAME_NOT_FOUND && res != EOPNOTSUPP)
-			return res;	
+			return res;
 				// return B_OK if found, or specific error-code
 	}
 	return B_NAME_NOT_FOUND;
 }
 
 
-status_t 
+status_t
 BCatalog::GetData(uint32 id, BMessage *msg)
 {
 	if (!fCatalog)
@@ -97,7 +97,7 @@ BCatalog::GetData(uint32 id, BMessage *msg)
 	for (BCatalogAddOn* cat = fCatalog; cat != NULL; cat = cat->fNext) {
 		res = cat->GetData(id, msg);
 		if (res != B_NAME_NOT_FOUND && res != EOPNOTSUPP)
-			return res;	
+			return res;
 				// return B_OK if found, or specific error-code
 	}
 	return B_NAME_NOT_FOUND;
@@ -133,35 +133,35 @@ BCatalogAddOn::UpdateFingerprint()
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::InitCheck() const
-{ 
+{
 	return fInitCheck;
 }
 
 
-bool 
+bool
 BCatalogAddOn::CanHaveData() const
 {
 	return false;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::GetData(const char *name, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::GetData(uint32 id, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetString(const char *string, const char *translated,
 	const char *context, const char *comment)
 {
@@ -169,70 +169,70 @@ BCatalogAddOn::SetString(const char *string, const char *translated,
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetString(int32 id, const char *translated)
 {
 	return EOPNOTSUPP;
 }
 
 
-bool 
+bool
 BCatalogAddOn::CanWriteData() const
 {
 	return false;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetData(const char *name, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::SetData(uint32 id, BMessage *msg)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::ReadFromFile(const char *path)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::ReadFromAttribute(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::ReadFromResource(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::WriteToFile(const char *path)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::WriteToAttribute(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
 }
 
 
-status_t 
+status_t
 BCatalogAddOn::WriteToResource(entry_ref *appOrAddOnRef)
 {
 	return EOPNOTSUPP;
@@ -244,132 +244,8 @@ void BCatalogAddOn::MakeEmpty()
 }
 
 
-int32 
+int32
 BCatalogAddOn::CountItems() const
 {
 	return 0;
 }
-
-
-//#pragma mark - EditableCatalog
-namespace BPrivate {
-EditableCatalog::EditableCatalog(const char *type, const char *signature, 
-	const char *language)
-{
-	//fCatalog = be_locale_roster->CreateCatalog(type, signature, language);
-}
-
-
-EditableCatalog::~EditableCatalog()
-{
-}
-
-
-status_t 
-EditableCatalog::SetString(const char *string, const char *translated,
-	const char *context, const char *comment)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->SetString(string, translated, context, comment);
-}
-
-
-status_t 
-EditableCatalog::SetString(int32 id, const char *translated)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->SetString(id, translated);
-}
-
-
-bool 
-EditableCatalog::CanWriteData() const
-{
-	if (!fCatalog)
-		return false;
-	return fCatalog->CanWriteData();
-}
-
-
-status_t 
-EditableCatalog::SetData(const char *name, BMessage *msg)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->SetData(name, msg);
-}
-
-
-status_t 
-EditableCatalog::SetData(uint32 id, BMessage *msg)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->SetData(id, msg);
-}
-
-
-status_t 
-EditableCatalog::ReadFromFile(const char *path)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->ReadFromFile(path);
-}
-
-
-status_t 
-EditableCatalog::ReadFromAttribute(entry_ref *appOrAddOnRef)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->ReadFromAttribute(appOrAddOnRef);
-}
-
-
-status_t 
-EditableCatalog::ReadFromResource(entry_ref *appOrAddOnRef)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->ReadFromResource(appOrAddOnRef);
-}
-
-
-status_t 
-EditableCatalog::WriteToFile(const char *path)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->WriteToFile(path);
-}
-
-
-status_t 
-EditableCatalog::WriteToAttribute(entry_ref *appOrAddOnRef)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->WriteToAttribute(appOrAddOnRef);
-}
-
-
-status_t 
-EditableCatalog::WriteToResource(entry_ref *appOrAddOnRef)
-{
-	if (!fCatalog)
-		return B_NO_INIT;
-	return fCatalog->WriteToResource(appOrAddOnRef);
-}
-
-
-void EditableCatalog::MakeEmpty()
-{
-	if (fCatalog)
-		fCatalog->MakeEmpty();
-}
-
-
-} // namespace BPrivate
