@@ -11,8 +11,12 @@
 #include <boot/platform.h>
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
-#include <boot/images.h>
 #include <boot/platform/generic/video.h>
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+#include <boot/images.h>
+#else
+#include <boot/images-sans-tm.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
