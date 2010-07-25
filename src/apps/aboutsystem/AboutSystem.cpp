@@ -336,7 +336,7 @@ AboutWindow::QuitRequested()
 LogoView::LogoView()
 	: BView("logo", B_WILL_DRAW)
 {
-	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png");
 	SetViewColor(255, 255, 255);
 }
 

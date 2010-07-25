@@ -134,7 +134,7 @@ LogoView::GetPreferredSize(float* _width, float* _height)
 void
 LogoView::_Init()
 {
-	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "haikulogo.png");
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png");
 }
 
 

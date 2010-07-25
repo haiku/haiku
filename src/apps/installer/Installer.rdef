@@ -15,7 +15,13 @@ resource app_version {
 
 resource app_flags B_EXCLUSIVE_LAUNCH;
 
-resource(1, "haikulogo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - installer.png";
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+#ifdef HAIKU_OFFICIAL_RELEASE
+resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - installer.png";
+#else
+resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - installer - development.png";
+#endif
+#endif
 
 resource vector_icon {
 	$"6E6369660F0500020006023861093AA03CBD302A3AE36E4A1739473BE7009A9A"
