@@ -13,6 +13,10 @@ using BPrivate::gLocaleBackend;
 using BPrivate::LocaleBackend;
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "StringForSize"
+
+
 namespace BPrivate {
 
 
@@ -25,31 +29,31 @@ string_for_size(double size, char* string, size_t stringSize)
 		LocaleBackend::LoadBackend();
 	double kib = size / 1024.0;
 	if (kib < 1.0) {
-		snprintf(string, stringSize,
-			gLocaleBackend->GetString("%d bytes","StringForSize",""),
+		const char* trKey = B_TRANSLATE_MARK("%d bytes");
+		snprintf(string, stringSize, gLocaleBackend->GetString(trKey),
 			(int)size);
 		return string;
 	}
 	double mib = kib / 1024.0;
 	if (mib < 1.0) {
-		snprintf(string, stringSize,
-			gLocaleBackend->GetString("%3.2f KiB","StringForSize",""), kib);
+		const char* trKey = B_TRANSLATE_MARK("%3.2f KiB");
+		snprintf(string, stringSize, gLocaleBackend->GetString(trKey), kib);
 		return string;
 	}
 	double gib = mib / 1024.0;
 	if (gib < 1.0) {
-		snprintf(string, stringSize,
-			gLocaleBackend->GetString("%3.2f MiB","StringForSize",""), mib);
+		const char* trKey = B_TRANSLATE_MARK("%3.2f MiB");
+		snprintf(string, stringSize, gLocaleBackend->GetString(trKey), mib);
 		return string;
 	}
 	double tib = gib / 1024.0;
 	if (tib < 1.0) {
-		snprintf(string, stringSize,
-			gLocaleBackend->GetString("%3.2f GiB","StringForSize",""), gib);
+		const char* trKey = B_TRANSLATE_MARK("%3.2f GiB");
+		snprintf(string, stringSize, gLocaleBackend->GetString(trKey), gib);
 		return string;
 	}
-	snprintf(string, stringSize,
-		gLocaleBackend->GetString("%.2f TiB","StringForSize",""), tib);
+	const char* trKey = B_TRANSLATE_MARK("%.2f TiB");
+	snprintf(string, stringSize, gLocaleBackend->GetString(trKey), tib);
 	return string;
 }
 
