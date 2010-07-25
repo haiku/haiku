@@ -74,8 +74,8 @@ SYSTEM_PREFERENCES = Appearance Backgrounds CPUFrequency DataTranslations
 	Mouse Network Notifications OpenGL Printers Screen ScreenSaver Shortcuts Sounds Time
 	Touchpad <preference>Tracker VirtualMemory
 ;
-SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo
-	GLTeapot Haiku3d Mandelbrot Pairs Playground Pulse Sudoku
+SYSTEM_DEMOS = BSnow Chart Clock Cortex FontDemo GLTeapot
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d Mandelbrot Pairs Playground Pulse Sudoku
 ;
 SYSTEM_LIBS =
 	libbe.so libbsd.so libbnetapi.so
@@ -155,7 +155,8 @@ SYSTEM_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible
 SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port
 ;
-SYSTEM_ADD_ONS_SCREENSAVERS = DebugNow Flurry Haiku Icons IFS Spider Message ;
+SYSTEM_ADD_ONS_SCREENSAVERS = DebugNow Flurry
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku Icons IFS Spider Message ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO = auich auvia echo3g emuxki hda ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ; #cmedia sis7018 usb_audio ;
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = $(X86_ONLY)radeon $(X86_ONLY)nvidia
@@ -399,8 +400,9 @@ AddFilesToHaikuImage home config boot : $(userBootScripts) ;
 # Add boot launch directory
 AddDirectoryToHaikuImage home config boot launch ;
 
-local logoArtwork = "HAIKU logo - white on blue - big.png"
-	"HAIKU logo - white on blue - normal.png" ;
+local logoArtwork =
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - big.png"
+	$(HAIKU_INCLUDE_TRADEMARKS)"HAIKU logo - white on blue - normal.png" ;
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
 AddFilesToHaikuImage system data artwork : $(logoArtwork) ;
 
