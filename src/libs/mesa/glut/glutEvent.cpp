@@ -366,6 +366,32 @@ void glutMainLoop()
   }
 }
 
+
+void glutSetKeyRepeat(int repeatMode)
+{
+	switch(repeatMode) {
+	case GLUT_KEY_REPEAT_DEFAULT:
+		gState.keyRepeatMode = GLUT_KEY_REPEAT_ON;
+		break;
+	
+	case GLUT_KEY_REPEAT_ON:
+	case GLUT_KEY_REPEAT_OFF:
+		gState.keyRepeatMode = repeatMode;
+		break;
+		
+	default:
+		__glutWarning("invalid glutSetKeyRepeat mode: %d", repeatMode);
+	}
+}
+
+
+void glutIgnoreKeyRepeat(int ignore)
+{
+	if (gState.currentWindow)
+		gState.currentWindow->ignoreKeyRepeat = (ignore != 0);
+}
+
+
 /***********************************************************
  *	CLASS:		GlutWindow
  *
@@ -379,6 +405,10 @@ void GlutWindow::KeyDown(const char *s, int32 slen)
   BGLView::KeyDown(s,slen);
   
   BPoint p;
+	
+	if (ignoreKeyRepeat && 
+		Window()->CurrentMessage()->FindInt32("be:key_repeat") > 0)
+		return;
 	
 	switch (aChar) {
 		case B_FUNCTION_KEY:

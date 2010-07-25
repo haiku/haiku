@@ -43,6 +43,7 @@ struct GlutState {
 	GLUTidleCB idle;				// idle callback
 	GLUTmenuStatusCB menuStatus;	// menu status callback
 	int modifierKeys;				// only valid during keyboard callback
+	int keyRepeatMode;				// global repeat 
 	
 	bool debug;					// call glGetError
 	bool quitAll;				// quit 
@@ -61,6 +62,7 @@ struct GlutState {
 		idle = 0;
 		menuStatus = 0;
 		modifierKeys = ~0;
+		keyRepeatMode = GLUT_KEY_REPEAT_DEFAULT;
 		debug = quitAll = false;
 	}
 };

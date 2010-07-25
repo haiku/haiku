@@ -131,6 +131,8 @@ GlutWindow::GlutWindow(GlutWindow *nparent, const char *name,
 	statusEvent = 0;
 	menuEvent = 0;
 	visible = true;
+	ignoreKeyRepeat = (gState.keyRepeatMode == GLUT_KEY_REPEAT_OFF);
+	
 	gBlock.QuickNewEvent();
 
 	// if i'm a subwindow, add me to my parent view

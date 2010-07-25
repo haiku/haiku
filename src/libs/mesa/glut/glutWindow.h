@@ -92,6 +92,7 @@ public:
 	int menuNumber;		// for menu and status callbacks
 	int menuValue;		// for menu callback
 	bool visible;		// for visibility callback
+	bool ignoreKeyRepeat;
 };
 
 /***********************************************************
