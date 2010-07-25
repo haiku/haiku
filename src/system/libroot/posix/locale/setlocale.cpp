@@ -51,7 +51,7 @@ GetLocalesFromEnvironment(int category, const char** locales)
 			if (!locale || *locale == '\0')
 				locale = "POSIX";
 			locales[lc] = locale;
-			if (lastLocale && strcmp(locale, lastLocale) != 0)
+			if (lastLocale && strcasecmp(locale, lastLocale) != 0)
 				haveDifferentLocales = true;
 		}
 		if (!haveDifferentLocales) {
@@ -94,8 +94,8 @@ setlocale(int category, const char* locale)
 		// backend
 		bool needBackend = false;
 		for (int lc = 0; lc <= LC_LAST; lc++) {
-			if (locales[lc] != NULL && strcmp(locales[lc], "POSIX") != 0
-					&& strcmp(locales[lc], "C") != 0) {
+			if (locales[lc] != NULL && strcasecmp(locales[lc], "POSIX") != 0
+					&& strcasecmp(locales[lc], "C") != 0) {
 				needBackend = true;
 				break;
 			}
