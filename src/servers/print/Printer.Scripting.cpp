@@ -25,7 +25,7 @@
 
 static property_info prop_list[] = {
 	{ "Name", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		B_TRANSLATE_MARK("Get name of printer") }, 
+		B_TRANSLATE_MARK("Get name of printer") },
 	{ "TransportAddon", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Get name of the transport add-on used for this printer") },
 	{ "TransportConfig", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
@@ -34,11 +34,11 @@ static property_info prop_list[] = {
 		B_TRANSLATE_MARK("Get name of the printer add-on used for this printer") },
 	{ "Comments", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Get comments about this printer") },
-	{ 0 } // terminate list 
+	{ 0 } // terminate list
 };
 
 
-void 
+void
 Printer::HandleScriptingCommand(BMessage* msg)
 {
 	status_t rc = B_ERROR;
@@ -84,24 +84,24 @@ Printer::HandleScriptingCommand(BMessage* msg)
 	}
 }
 
-BHandler* 
+BHandler*
 Printer::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 	int32 form, const char* prop)
 {
 	BPropertyInfo prop_info(prop_list);
 	BHandler* rc = this;
-	
+
 	int32 idx;
 	switch( idx=prop_info.FindMatch(msg,0,spec,form,prop) ) {
 		case B_ERROR:
 			rc = Inherited::ResolveSpecifier(msg,index,spec,form,prop);
 			break;
 	}
-	
+
 	return rc;
 }
 
-status_t 
+status_t
 Printer::GetSupportedSuites(BMessage* msg)
 {
 	msg->AddString("suites", "application/x-vnd.OpenBeOS-printer");
@@ -110,11 +110,11 @@ Printer::GetSupportedSuites(BMessage* msg)
 	if (!localized) {
 		localized = true;
 		for (int i = 0; prop_list[i].name != NULL; i ++)
-			prop_list[i].usage = B_TRANSLATE(prop_list[i].usage);
+			prop_list[i].usage = B_TRANSLATE_NOCOLLECT(prop_list[i].usage);
 	}
-		
+
 	BPropertyInfo prop_info(prop_list);
 	msg->AddFlat("messages", &prop_info);
-	
+
 	return Inherited::GetSupportedSuites(msg);
 }

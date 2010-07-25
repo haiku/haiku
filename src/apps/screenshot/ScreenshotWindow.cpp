@@ -131,7 +131,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	_ReadSettings();
 
 	// _NewScreenshot() needs a valid fNameControl
-	BString name(B_TRANSLATE(fUtility.sDefaultFileNameBase));
+	BString name(B_TRANSLATE_NOCOLLECT(fUtility.sDefaultFileNameBase));
 	name << 1;
 	name = _FindValidFileName(name.String());
 	fNameControl = new BTextControl("", B_TRANSLATE("Name:"), name, NULL);
@@ -141,7 +141,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 		_NewScreenshot(silent, clipboard);
 		return;
 	}
-	
+
 	fScreenshot = fUtility.MakeScreenshot(fIncludeCursor, fGrabActiveWindow,
 		fIncludeBorder);
 
@@ -192,7 +192,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 		.Add(fNameControl->CreateTextViewLayoutItem(), 1, 0)
 		.Add(menuField->CreateLabelLayoutItem(), 0, 1)
 		.Add(menuField->CreateMenuBarLayoutItem(), 1, 1)
-		.Add(new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS), 
+		.Add(new BButton("", B_TRANSLATE("Settings"B_UTF8_ELLIPSIS),
 			new BMessage(kSettings)), 2, 1)
 		.Add(menuField2->CreateLabelLayoutItem(), 0, 2)
 		.Add(menuField2->CreateMenuBarLayoutItem(), 1, 2);
@@ -339,11 +339,11 @@ ScreenshotWindow::MessageReceived(BMessage* message)
 		case B_COPY:
 			fUtility.CopyToClipboard(fScreenshot);
 			break;
-			
+
 		case kSettings:
 			_ShowSettings(true);
 			break;
-			
+
 		case kCloseTranslatorSettings:
 			fSettingsWindow->Lock();
 			fSettingsWindow->Quit();
@@ -376,7 +376,7 @@ ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard)
 	message.AddString("argv", "screenshot");
 	message.AddString("argv", "--delay");
 	message.AddString("argv", delay);
-	
+
 	if (silent || clipboard) {
 		if (silent) {
 			argc++;
@@ -419,7 +419,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 {
 	float height = 150.0f;
 
-	float width = (fScreenshot->Bounds().Width() 
+	float width = (fScreenshot->Bounds().Width()
 		/ fScreenshot->Bounds().Height()) * height;
 
 	// to prevent a preview way too wide
@@ -595,7 +595,7 @@ ScreenshotWindow::_ShowSettings(bool activate)
 {
 	if (!fSettingsWindow && !activate)
 		return;
-	
+
 	// Find a translator
 	translator_id translator = 0;
 	BTranslatorRoster *roster = BTranslatorRoster::Default();
@@ -643,7 +643,7 @@ ScreenshotWindow::_ShowSettings(bool activate)
 			if (activate)
 				fSettingsWindow->Activate();
 		} else {
-			fSettingsWindow = new BWindow(rect, 
+			fSettingsWindow = new BWindow(rect,
 				B_TRANSLATE("Translator Settings"),
 				B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 				B_NOT_ZOOMABLE | B_NOT_RESIZABLE);
@@ -681,7 +681,8 @@ ScreenshotWindow::_FindValidFileName(const char* name)
 	if (!BEntry(outputPath.Path()).Exists())
 		return fileName;
 
-	if (baseName.FindFirst(B_TRANSLATE(fUtility.sDefaultFileNameBase)) == 0)
+	if (baseName.FindFirst(B_TRANSLATE_NOCOLLECT(
+			fUtility.sDefaultFileNameBase)) == 0)
 		baseName.SetTo(fUtility.sDefaultFileNameBase);
 
 	BEntry entry;

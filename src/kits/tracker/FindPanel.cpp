@@ -733,9 +733,9 @@ FindPanel::FindPanel(BRect frame, BFile *node, FindWindow *parent,
 		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[0]);
 		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[1]);
 		dragNDropMessage.AddString("be:actionspecifier",
-			B_TRANSLATE(kDragNDropActionSpecifiers[0]));
+			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[0]));
 		dragNDropMessage.AddString("be:actionspecifier",
-			B_TRANSLATE(kDragNDropActionSpecifiers[1]));
+			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[1]));
 
 		BMessenger self(this);
 		fDraggableIcon = new DraggableQueryIcon(DraggableIcon::PreferredRect(draggableIconOrigin,
@@ -1132,11 +1132,13 @@ FindPanel::MessageReceived(BMessage *message)
 
 					if (actionSpecifier
 						&& strcasecmp(actionSpecifier,
-							B_TRANSLATE(kDragNDropActionSpecifiers[0])) == 0) {
+							B_TRANSLATE_NOCOLLECT(
+								kDragNDropActionSpecifiers[0])) == 0) {
 						query = true;
 					} else if (actionSpecifier
 						&& strcasecmp(actionSpecifier,
-							B_TRANSLATE(kDragNDropActionSpecifiers[1])) == 0) {
+							B_TRANSLATE_NOCOLLECT(
+								kDragNDropActionSpecifiers[1])) == 0) {
 						queryTemplate = true;
 					} else if (mimeType && strcasecmp(mimeType,
 							kDragNDropTypes[0]) == 0) {
@@ -2391,7 +2393,7 @@ TAttrView::TAttrView(BRect frame, int32 index)
 	for (int32 i = 0; i < 5; i++) {
 		message = new BMessage(kAttributeItem);
 		message->AddInt32("operator", operators[i]);
-		submenu->AddItem(new BMenuItem(B_TRANSLATE(operatorLabels[i]),
+		submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[i]),
 			message));
 	}
 

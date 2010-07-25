@@ -45,7 +45,7 @@ static property_info prop_list[] = {
 	{ "UseConfigWindow", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER },
 		B_TRANSLATE_MARK("Show configuration window") },
-	{ 0 } // terminate list 
+	{ 0 } // terminate list
 };
 
 
@@ -62,19 +62,19 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 			case B_GET_PROPERTY:
 				if (propName == "ActivePrinter") {
 					BMessage reply(B_REPLY);
-					reply.AddString("result", fDefaultPrinter 
+					reply.AddString("result", fDefaultPrinter
 						? fDefaultPrinter->Name() : "");
 					reply.AddInt32("error", B_OK);
 					msg->SendReply(&reply);
 				} else if (propName == "UseConfigWindow") {
 					BMessage reply(B_REPLY);
-					reply.AddString("result", fUseConfigWindow 
+					reply.AddString("result", fUseConfigWindow
 						? "true" : "false");
 					reply.AddInt32("error", B_OK);
 					msg->SendReply(&reply);
 				}
 				break;
-	
+
 			case B_SET_PROPERTY:
 				if (propName == "ActivePrinter") {
 					BString newActivePrinter;
@@ -90,11 +90,11 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 						fUseConfigWindow = useConfigWindow;
 						BMessage reply(B_REPLY);
 						reply.AddInt32("error", fUseConfigWindow);
-						msg->SendReply(&reply);					
+						msg->SendReply(&reply);
 					}
 				}
 				break;
-	
+
 			case B_CREATE_PROPERTY:
 				if (propName == "Printer") {
 					BString name, driver, transport, config;
@@ -111,20 +111,20 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 					}
 				}
 				break;
-	
+
 			case B_DELETE_PROPERTY: {
 					Printer* printer = GetPrinterFromSpecifier(&spec);
 					status_t rc = B_BAD_VALUE;
 
 					if (printer != NULL)
 						rc=printer->Remove();
-					
+
 					BMessage reply(B_REPLY);
 					reply.AddInt32("error", rc);
 					msg->SendReply(&reply);
 				}
 				break;
-	
+
 			case B_COUNT_PROPERTIES:
 				if (propName == "Printers") {
 					BMessage reply(B_REPLY);
@@ -143,7 +143,7 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 }
 
 
-Printer* 
+Printer*
 PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
 {
 	switch(msg->what) {
@@ -154,7 +154,7 @@ PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
 				return Printer::Find(name.String());
 			break;
 		}
-		
+
 		case B_INDEX_SPECIFIER:
 		{
 			int32 idx;
@@ -171,12 +171,12 @@ PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
 			break;
 		}
 	}
-	
+
 	return NULL;
 }
 
 
-Transport* 
+Transport*
 PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
 {
 	switch(msg->what) {
@@ -187,7 +187,7 @@ PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
 				return Transport::Find(name);
 			break;
 		}
-		
+
 		case B_INDEX_SPECIFIER:
 		{
 			int32 idx;
@@ -204,7 +204,7 @@ PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
 			break;
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -223,7 +223,7 @@ PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 
 		case 1:
 			// GET Printer [arg]
-			if ((rc=GetPrinterFromSpecifier(spec)) == NULL) {		
+			if ((rc=GetPrinterFromSpecifier(spec)) == NULL) {
 				BMessage reply(B_REPLY);
 				reply.AddInt32("error", B_BAD_INDEX);
 				msg->SendReply(&reply);
@@ -246,7 +246,7 @@ PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 		default:
 			rc = this;
 	}
-	
+
 	return rc;
 }
 
@@ -255,16 +255,16 @@ status_t
 PrintServerApp::GetSupportedSuites(BMessage* msg)
 {
 	msg->AddString("suites", "suite/vnd.OpenBeOS-printserver");
-	
+
 	static bool localized = false;
 	if (!localized) {
 		localized = true;
 		for (int i = 0; prop_list[i].name != NULL; i ++)
-			prop_list[i].usage = B_TRANSLATE(prop_list[i].usage);
+			prop_list[i].usage = B_TRANSLATE_NOCOLLECT(prop_list[i].usage);
 	}
-	
+
 	BPropertyInfo prop_info(prop_list);
 	msg->AddFlat("messages", &prop_info);
-	
+
 	return Inherited::GetSupportedSuites(msg);
 }

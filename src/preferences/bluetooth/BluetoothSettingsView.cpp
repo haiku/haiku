@@ -26,6 +26,8 @@
 #include "defs.h"
 #include "BluetoothWindow.h"
 
+
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Settings view"
 
 static const int32 kMsgSetAntialiasing = 'anti';
@@ -203,18 +205,18 @@ BluetoothSettingsView::_BuildConnectionPolicy()
 	BMessage* message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", false);
 
-	BMenuItem* item = new BMenuItem(B_TRANSLATE(kAllLabel), message);
+	BMenuItem* item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAllLabel), message);
 
 	fPolicyMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", true);
 
-	item = new BMenuItem(B_TRANSLATE(kTrustedLabel), message);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kTrustedLabel), message);
 
 	fPolicyMenu->AddItem(item);
 
-	BMenuItem* item2 = new BMenuItem(B_TRANSLATE(kAlwaysLabel), NULL);
+	BMenuItem* item2 = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAlwaysLabel), NULL);
 
 	fPolicyMenu->AddItem(item2);
 
@@ -229,23 +231,24 @@ BluetoothSettingsView::_BuildClassMenu()
 	BMessage* message;
 
 	message = new BMessage(kMsgSetDeviceClassDesktop);
-	BMenuItem* item = new BMenuItem(B_TRANSLATE(kDesktopLabel), message);
+	BMenuItem* item
+		= new BMenuItem(B_TRANSLATE_NOCOLLECT(kDesktopLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassServer);
-	item = new BMenuItem(B_TRANSLATE(kServerLabel), message);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kServerLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassLaptop);
-	item = new BMenuItem(B_TRANSLATE(kLaptopLabel), message);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kLaptopLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassHandheld);
-	item = new BMenuItem(B_TRANSLATE(kHandheldLabel), message);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kHandheldLabel), message);
 	fClassMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetDeviceClassSmartPhone);
-	item = new BMenuItem(B_TRANSLATE(kPhoneLabel), message);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kPhoneLabel), message);
 	fClassMenu->AddItem(item);
 
 }

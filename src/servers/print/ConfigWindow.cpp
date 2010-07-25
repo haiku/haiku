@@ -75,26 +75,26 @@ static struct PageFormat
 		"paper size"), ledger_width, ledger_height },
 	{B_TRANSLATE_MARK_COMMENT("Tabloid", "ANSI B (tabloid), a North American "
 		"paper size"), tabloid_width, tabloid_height },
-	{B_TRANSLATE_MARK_COMMENT("A0", "ISO 216 paper size"), 
+	{B_TRANSLATE_MARK_COMMENT("A0", "ISO 216 paper size"),
 		a0_width, a0_height },
 	{B_TRANSLATE_MARK_COMMENT("A1", "ISO 216 paper size"),
 		a1_width, a1_height },
-	{B_TRANSLATE_MARK_COMMENT("A2", "ISO 216 paper size"), 
+	{B_TRANSLATE_MARK_COMMENT("A2", "ISO 216 paper size"),
 		a2_width, a2_height },
-	{B_TRANSLATE_MARK_COMMENT("A3", "ISO 216 paper size"), 
+	{B_TRANSLATE_MARK_COMMENT("A3", "ISO 216 paper size"),
 		a3_width, a3_height },
-	{B_TRANSLATE_MARK_COMMENT("A4", "ISO 216 paper size"), 
+	{B_TRANSLATE_MARK_COMMENT("A4", "ISO 216 paper size"),
 		a4_width, a4_height },
-	{B_TRANSLATE_MARK_COMMENT("A5", "ISO 216 paper size"), 
+	{B_TRANSLATE_MARK_COMMENT("A5", "ISO 216 paper size"),
 		a5_width, a5_height },
-	{B_TRANSLATE_MARK_COMMENT("A6", "ISO 216 paper size"), 
+	{B_TRANSLATE_MARK_COMMENT("A6", "ISO 216 paper size"),
 		a6_width, a6_height },
-	{B_TRANSLATE_MARK_COMMENT("B5", "ISO 216 paper size"), 
+	{B_TRANSLATE_MARK_COMMENT("B5", "ISO 216 paper size"),
 		b5_width, b5_height },
 };
 
 
-static void 
+static void
 GetPageFormat(float w, float h, BString& label)
 {
 	w = floor(w + 0.5); h = floor(h + 0.5);
@@ -102,7 +102,7 @@ GetPageFormat(float w, float h, BString& label)
 		struct PageFormat& pf = pageFormat[i];
 		if ((pf.width == w && pf.height == h) || (pf.width == h
 			&& pf.height == w)) {
-			label = B_TRANSLATE(pf.label);
+			label = B_TRANSLATE_NOCOLLECT(pf.label);
 			return;
 		}
 	}
@@ -137,7 +137,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 {
 	MimeTypeForSender(settings, fSenderMimeType);
 	PrinterForMimeType();
-	
+
 	if (kind == kJobSetup)
 		SetTitle(B_TRANSLATE("Print setup"));
 
@@ -249,7 +249,7 @@ ConfigWindow::~ConfigWindow()
 }
 
 
-void 
+void
 ConfigWindow::Go()
 {
 	sem_id sid = create_sem(0, "finished");
@@ -264,7 +264,7 @@ ConfigWindow::Go()
 }
 
 
-void 
+void
 ConfigWindow::MessageReceived(BMessage* m)
 {
 	switch (m->what) {
@@ -316,7 +316,7 @@ ConfigWindow::AboutRequested()
 }
 
 
-void 
+void
 ConfigWindow::FrameMoved(BPoint p)
 {
 	BRect frame = GetWindowFrame();
@@ -325,7 +325,7 @@ ConfigWindow::FrameMoved(BPoint p)
 }
 
 
-BRect 
+BRect
 ConfigWindow::GetWindowFrame()
 {
 	BAutolock lock(gLock);
@@ -336,7 +336,7 @@ ConfigWindow::GetWindowFrame()
 }
 
 
-void 
+void
 ConfigWindow::SetWindowFrame(BRect r)
 {
 	BAutolock lock(gLock);
@@ -345,7 +345,7 @@ ConfigWindow::SetWindowFrame(BRect r)
 }
 
 
-BPictureButton* 
+BPictureButton*
 ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 	const char* name, const char* on, const char* off, uint32 what)
 {
@@ -386,7 +386,7 @@ ConfigWindow::AddPictureButton(BView* panel, BRect frame,
 }
 
 
-void 
+void
 ConfigWindow::PrinterForMimeType()
 {
 	BAutolock lock(gLock);
@@ -409,7 +409,7 @@ ConfigWindow::PrinterForMimeType()
 }
 
 
-void 
+void
 ConfigWindow::SetupPrintersMenu(BMenu* menu)
 {
 	// clear menu
@@ -434,7 +434,7 @@ ConfigWindow::SetupPrintersMenu(BMenu* menu)
 }
 
 
-void 
+void
 ConfigWindow::UpdateAppSettings(const char* mime, const char* printer)
 {
 	BAutolock lock(gLock);
@@ -449,7 +449,7 @@ ConfigWindow::UpdateAppSettings(const char* mime, const char* printer)
 }
 
 
-void 
+void
 ConfigWindow::UpdateSettings(bool read)
 {
 	BAutolock lock(gLock);
@@ -473,7 +473,7 @@ ConfigWindow::UpdateSettings(bool read)
 }
 
 
-void 
+void
 ConfigWindow::UpdateUI()
 {
 	if (fCurrentPrinter == NULL) {
@@ -518,9 +518,9 @@ ConfigWindow::UpdateUI()
 			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK
 				&& fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) ==
 				B_OK) {
-				
+
 				bool printRange = first >= 1 && first <= last && last != INT_MAX;
-				char number[12];				
+				char number[12];
 				if (fJobSettings.FindInt32(PSRV_FIELD_COPIES, &copies)
 					== B_OK && copies > 1) {
 					if (printRange) {
@@ -548,14 +548,14 @@ ConfigWindow::UpdateUI()
 				}
 			} else
 				job << B_TRANSLATE("Undefined");
-			
+
 			fJobSetupText->SetText(job.String());
 		}
 	}
 }
 
 
-void 
+void
 ConfigWindow::Setup(config_setup_kind kind)
 {
 	if (fCurrentPrinter) {

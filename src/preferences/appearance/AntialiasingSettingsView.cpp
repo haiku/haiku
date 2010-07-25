@@ -235,14 +235,15 @@ AntialiasingSettingsView::_BuildAntialiasingMenu()
 	BMessage* message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", false);
 
-	BMenuItem* item = new BMenuItem(B_TRANSLATE(kGrayscaleLabel), message);
+	BMenuItem* item
+		= new BMenuItem(B_TRANSLATE_NOCOLLECT(kGrayscaleLabel), message);
 
 	fAntialiasingMenu->AddItem(item);
 
 	message = new BMessage(kMsgSetAntialiasing);
 	message->AddBool("antialiasing", true);
 
-	item = new BMenuItem(B_TRANSLATE(kSubpixelLabel), message);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSubpixelLabel), message);
 
 	fAntialiasingMenu->AddItem(item);
 }
@@ -255,18 +256,18 @@ AntialiasingSettingsView::_BuildHintingMenu()
 
 	BMessage* message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_OFF);
-	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE(kNoHintingLabel),
+	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(kNoHintingLabel),
 		message));
 
 	message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_ON);
-	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE(kFullHintingLabel),
-		message));
+	fHintingMenu->AddItem(new BMenuItem(
+		B_TRANSLATE_NOCOLLECT(kFullHintingLabel), message));
 
 	message = new BMessage(kMsgSetHinting);
 	message->AddInt8("hinting", HINTING_MODE_MONOSPACED_ONLY);
-	fHintingMenu->AddItem(new BMenuItem(B_TRANSLATE(kMonospacedHintingLabel),
-		message));
+	fHintingMenu->AddItem(new BMenuItem(
+		B_TRANSLATE_NOCOLLECT(kMonospacedHintingLabel), message));
 }
 
 
@@ -275,8 +276,8 @@ AntialiasingSettingsView::_SetCurrentAntialiasing()
 {
 	BMenuItem *item = fAntialiasingMenu->FindItem(
 		fCurrentSubpixelAntialiasing
-		? B_TRANSLATE(kSubpixelLabel)
-		: B_TRANSLATE(kGrayscaleLabel));
+		? B_TRANSLATE_NOCOLLECT(kSubpixelLabel)
+		: B_TRANSLATE_NOCOLLECT(kGrayscaleLabel));
 	if (item != NULL)
 		item->SetMarked(true);
 	if (fCurrentSubpixelAntialiasing)
@@ -300,7 +301,7 @@ AntialiasingSettingsView::_SetCurrentHinting()
 			break;
 	}
 
-	BMenuItem *item = fHintingMenu->FindItem(B_TRANSLATE(label));
+	BMenuItem *item = fHintingMenu->FindItem(B_TRANSLATE_NOCOLLECT(label));
 	if (item != NULL)
 		item->SetMarked(true);
 }

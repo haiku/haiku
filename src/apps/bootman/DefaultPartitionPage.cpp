@@ -250,7 +250,7 @@ DefaultPartitionPage::_CreatePopUpMenu()
 void
 DefaultPartitionPage::_GetTimeoutLabel(int32 timeout, BString& label)
 {
-	const char* text = B_TRANSLATE(get_label_for_timeout(timeout));
+	const char* text = B_TRANSLATE_NOCOLLECT(get_label_for_timeout(timeout));
 	label = B_TRANSLATE("Timeout: %s");
 	label.ReplaceFirst("%s", text);
 }

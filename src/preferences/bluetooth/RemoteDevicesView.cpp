@@ -26,6 +26,8 @@
 #include "InquiryPanel.h"
 #include "RemoteDevicesView.h"
 
+
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Remote devices"
 
 static const uint32 kMsgAddDevices = 'ddDv';

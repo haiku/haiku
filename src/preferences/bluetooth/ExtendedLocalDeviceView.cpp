@@ -16,6 +16,8 @@
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
+
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Extended local device view"
 
 ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame,

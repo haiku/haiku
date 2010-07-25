@@ -131,7 +131,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 		BMessage *message = new BMessage(kMsgMouseFocusMode);
 		message->AddInt32("mode", focusModes[i]);
 
-		fFocusMenu->AddItem(new BMenuItem(B_TRANSLATE(focusLabels[i]),
+		fFocusMenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(focusLabels[i]),
 			message));
 	}
 
@@ -154,7 +154,7 @@ SettingsView::SettingsView(MouseSettings &settings)
 			focusFollowsMouseModes[i]);
 
 		fFocusFollowsMouseMenu->AddItem(new BMenuItem(
-			B_TRANSLATE(focusFollowsMouseLabels[i]), message));
+			B_TRANSLATE_NOCOLLECT(focusFollowsMouseLabels[i]), message));
 	}
 
 	BMenuField *fFocusFollowsMouseField = new BMenuField(

@@ -170,8 +170,9 @@ TBeMenu::AddNextItem()
 		bool enabled = false;
 
 		for (int i = 0; i < recentTypes; i++) {
-			recentItem[i] = new TRecentsMenu(B_TRANSLATE(recentTitle[i]),
-				fBarView, recentType[i]);
+			recentItem[i]
+				= new TRecentsMenu(B_TRANSLATE_NOCOLLECT(recentTitle[i]),
+					fBarView, recentType[i]);
 
 			if (recentItem[i])
 				enabled |= recentItem[i]->RecentsEnabled();
@@ -252,9 +253,9 @@ TBeMenu::AddStandardBeMenuItems()
 
 	item = new BMenuItem(
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-	B_TRANSLATE(kAboutHaikuMenuItemStr)
+	B_TRANSLATE_NOCOLLECT(kAboutHaikuMenuItemStr)
 #else
-	B_TRANSLATE(kAboutThisSystemMenuItemStr)
+	B_TRANSLATE_NOCOLLECT(kAboutThisSystemMenuItemStr)
 #endif
 		, new BMessage(kShowSplash));
 	item->SetEnabled(!dragging);
@@ -268,7 +269,7 @@ TBeMenu::AddStandardBeMenuItems()
 		TrackerBuildRecentFindItemsMenu(kFindMenuItemStr),
 		new BMessage(kFindButton));
 #else
-	item = new BMenuItem(B_TRANSLATE(kFindMenuItemStr),
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kFindMenuItemStr),
 		new BMessage(kFindButton));
 #endif
 	item->SetEnabled(!dragging);
@@ -284,7 +285,7 @@ TBeMenu::AddStandardBeMenuItems()
 
 #ifdef MOUNT_MENU_IN_DESKBAR
 	DeskbarMountMenu* mountMenu = new DeskbarMountMenu(
-		B_TRANSLATE(kMountMenuStr));
+		B_TRANSLATE_NOCOLLECT(kMountMenuStr));
 	mountMenu->SetEnabled(!dragging);
 	AddItem(mountMenu);
 #endif
@@ -307,7 +308,7 @@ TBeMenu::AddStandardBeMenuItems()
 	static const char* kSuspendMenuItemStr = B_TRANSLATE_MARK("Suspend");
 
 	if (_kapm_control_(APM_CHECK_ENABLED) == B_OK) {
-		item = new BMenuItem(B_TRANSLATE(kSuspendMenuItemStr),
+		item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kSuspendMenuItemStr),
 			new BMessage(kSuspendSystem));
 		item->SetEnabled(!dragging);
 		shutdownMenu->AddItem(item);

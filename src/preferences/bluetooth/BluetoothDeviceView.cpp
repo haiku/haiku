@@ -18,6 +18,7 @@
 #include <TextView.h>
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Device View"
 
 BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice,

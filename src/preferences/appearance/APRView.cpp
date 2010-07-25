@@ -85,7 +85,7 @@ APRView::APRView(const char *name, uint32 flags)
 
 	for (int32 i = 0; i < color_description_count(); i++) {
 		const ColorDescription& description = *get_color_description(i);
-		const char* text = B_TRANSLATE(description.text);
+		const char* text = B_TRANSLATE_NOCOLLECT(description.text);
 		color_which which = description.which;
 		fAttrList->AddItem(new ColorWhichItem(text, which));
 	}

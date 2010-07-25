@@ -66,8 +66,12 @@ byte_string(int64 size)
 	if (value < 1024)
 		snprintf(string, sizeof(string), B_TRANSLATE("%Ld B"), size);
 	else {
-		static const char *units[] = {B_TRANSLATE_MARK("KB"),
-			B_TRANSLATE_MARK("MB"), B_TRANSLATE_MARK("GB"), NULL};
+		static const char *units[] = {
+			B_TRANSLATE_MARK("KB"),
+			B_TRANSLATE_MARK("MB"),
+			B_TRANSLATE_MARK("GB"),
+			NULL
+		};
 		int32 i = -1;
 
 		do {
@@ -76,7 +80,8 @@ byte_string(int64 size)
 		} while (value >= 1024 && units[i + 1]);
 
 		off_t rounded = off_t(value * 100LL);
-		sprintf(string, "%g %s", rounded / 100.0, B_TRANSLATE(units[i]));
+		sprintf(string, "%g %s", rounded / 100.0,
+			B_TRANSLATE_NOCOLLECT(units[i]));
 	}
 
 	return string;

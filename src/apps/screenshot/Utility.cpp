@@ -36,7 +36,7 @@
 #define B_TRANSLATE_CONTEXT "Screenshot"
 
 
-const char* Utility::sDefaultFileNameBase = 
+const char* Utility::sDefaultFileNameBase =
 	B_TRANSLATE_MARK_COMMENT("screenshot",
 	"Base filename of screenshot files");
 
@@ -97,8 +97,8 @@ Utility::Save(BBitmap** screenshot, const char* fileName, uint32 imageType)
 		BString extension = GetFileNameExtension(imageType);
 		do {
 			fileNameString.SetTo(homePath.Path());
-			fileNameString << "/" << B_TRANSLATE(sDefaultFileNameBase) << index++ 
-				<< extension;
+			fileNameString << "/" << B_TRANSLATE_NOCOLLECT(sDefaultFileNameBase)
+				<< index++ << extension;
 			entry.SetTo(fileNameString.String());
 		} while (entry.Exists());
 	}
@@ -156,7 +156,7 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 
 	if (activeWindow && activeWindowFrame.IsValid()) {
 
-		BRect frame(activeWindowFrame);	
+		BRect frame(activeWindowFrame);
 		if (includeBorder) {
 			frame.InsetBy(-borderSize, -borderSize);
 			frame.top -= tabFrame.bottom - tabFrame.top;

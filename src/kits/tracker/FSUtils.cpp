@@ -781,7 +781,8 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 					// check for free space before starting copy
 					if ((totalSize + (4 * kKBSize)) >= dstVol->FreeBytes()) {
 						BAlert* alert = new BAlert("",
-							B_TRANSLATE(kNoFreeSpace), B_TRANSLATE("Cancel"),
+							B_TRANSLATE_NOCOLLECT(kNoFreeSpace),
+							B_TRANSLATE("Cancel"),
 							0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 						alert->SetShortcut(0, B_ESCAPE);
 						alert->Go();
@@ -1084,8 +1085,8 @@ CopyFile(BEntry *srcFile, StatStruct *srcStat, BDirectory *destDir,
 
 	// check for free space first
 	if ((srcStat->st_size + kKBSize) >= volume.FreeBytes()) {
-		loopControl->FileError(B_TRANSLATE(kNoFreeSpace), "", B_DEVICE_FULL,
-			false);
+		loopControl->FileError(B_TRANSLATE_NOCOLLECT(kNoFreeSpace), "",
+			B_DEVICE_FULL, false);
 		throw (status_t)B_DEVICE_FULL;
 	}
 
@@ -1131,8 +1132,8 @@ CopyFile(BEntry *srcFile, StatStruct *srcStat, BDirectory *destDir,
 			throw (status_t)err;
 
 		if (err != B_OK) {
-			if (!loopControl->FileError(B_TRANSLATE(kFileErrorString), destName,
-				err, true)) {
+			if (!loopControl->FileError(B_TRANSLATE_NOCOLLECT(kFileErrorString),
+					destName, err, true)) {
 				throw (status_t)err;
 			} else {
 				// user selected continue in spite of error, update status bar
@@ -1453,8 +1454,8 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 	 	}
 #endif
 		if (err != B_OK) {
-			if (!loopControl->FileError(B_TRANSLATE(kFolderErrorString),
-				destName, err, true)) {
+			if (!loopControl->FileError(B_TRANSLATE_NOCOLLECT(
+					kFolderErrorString), destName, err, true)) {
 				throw err;
 			}
 
@@ -1956,7 +1957,7 @@ PreFlightNameCheck(BObjectList<entry_ref> *srcList, const BDirectory *destDir,
 	if (*collisionCount > 1) {
 		const char* verb = (moveMode == kMoveSelectionTo)
 			? B_TRANSLATE("moving")	: B_TRANSLATE("copying");
-		BString replaceMsg(B_TRANSLATE(kReplaceManyStr));
+		BString replaceMsg(B_TRANSLATE_NOCOLLECT(kReplaceManyStr));
 		replaceMsg.ReplaceAll("%verb", verb);
 
 		BAlert* alert = new BAlert("", replaceMsg.String(),
@@ -2081,10 +2082,10 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry,
 		BString replaceMsg;
 
 		if (moveMode == kCreateLink || moveMode == kCreateRelativeLink) {
-			replaceMsg.SetTo(B_TRANSLATE(kSymLinkReplaceStr));
+			replaceMsg.SetTo(B_TRANSLATE_NOCOLLECT(kSymLinkReplaceStr));
 			replaceMsg.ReplaceFirst("%name", name);
 		} else if (sourceEntry->IsDirectory()) {
-			replaceMsg.SetTo(B_TRANSLATE(kDirectoryReplaceStr));
+			replaceMsg.SetTo(B_TRANSLATE_NOCOLLECT(kDirectoryReplaceStr));
 			replaceMsg.ReplaceFirst("%name", name);
 			replaceMsg.ReplaceFirst("%verb",
 				moveMode == kMoveSelectionTo
@@ -2105,7 +2106,7 @@ CheckName(uint32 moveMode, const BEntry *sourceEntry,
 			else
 				destBuffer[0] = '\0';
 
-			replaceMsg.SetTo(B_TRANSLATE(kReplaceStr));
+			replaceMsg.SetTo(B_TRANSLATE_NOCOLLECT(kReplaceStr));
 			replaceMsg.ReplaceAll("%name", name);
 			replaceMsg.ReplaceFirst("%dest", destBuffer);
 			replaceMsg.ReplaceFirst("%src", sourceBuffer);
@@ -2195,8 +2196,8 @@ FSDeleteFolder(BEntry *dir_entry, CopyLoopControl *loopControl,
 		else if (err == B_OK)
 			dir.Rewind();
 		else {
-			loopControl->FileError(B_TRANSLATE(kFileDeleteErrorString),
-				ref.name, err, false);
+			loopControl->FileError(B_TRANSLATE_NOCOLLECT(
+					kFileDeleteErrorString), ref.name, err, false);
 		}
 	}
 
@@ -2781,9 +2782,10 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 
 		if (!dontMoveToTrash) {
 			BAlert* alert = new BAlert("",
-				B_TRANSLATE(kDeleteConfirmationStr), B_TRANSLATE("Cancel"),
-				B_TRANSLATE("Move to Trash"), B_TRANSLATE("Delete"),
-				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
+				B_TRANSLATE_NOCOLLECT(kDeleteConfirmationStr),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Move to Trash"),
+				B_TRANSLATE("Delete"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+				B_WARNING_ALERT);
 
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->SetShortcut(1, 'm');
@@ -2799,9 +2801,9 @@ _DeleteTask(BObjectList<entry_ref> *list, bool confirm)
 			}
 		} else {
 			BAlert* alert = new BAlert("",
-				B_TRANSLATE(kDeleteConfirmationStr), B_TRANSLATE("Cancel"),
-				B_TRANSLATE("Delete"), NULL, B_WIDTH_AS_USUAL,
-				B_OFFSET_SPACING, B_WARNING_ALERT);
+				B_TRANSLATE_NOCOLLECT(kDeleteConfirmationStr),
+				B_TRANSLATE("Cancel"), B_TRANSLATE("Delete"), NULL,
+				B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 
 			alert->SetShortcut(0, B_ESCAPE);
 			alert->SetShortcut(1, 'd');
@@ -3191,7 +3193,7 @@ _TrackerLaunchAppWithDocuments(const entry_ref *appRef, const BMessage *refs,
 		alertString.ReplaceFirst("%name", appRef->name);
 		alertString.ReplaceFirst("%error", strerror(error));
 		if (refs && openWithOK && error != B_SHUTTING_DOWN) {
-			alertString << B_TRANSLATE(kFindAlternativeStr);
+			alertString << B_TRANSLATE_NOCOLLECT(kFindAlternativeStr);
 			BAlert* alert = new BAlert("", alertString.String(),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Find"),	0, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
@@ -3348,7 +3350,7 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 			alertString.ReplaceFirst("%name", documentRef.name);
 			alertString.ReplaceFirst("%error", strerror(error));
 			if (openWithOK)
-				alternative = B_TRANSLATE(kFindApplicationStr);
+				alternative = B_TRANSLATE_NOCOLLECT(kFindApplicationStr);
 
 			break;
 		} else {
@@ -3431,19 +3433,19 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 					return;
 			}
 
-			alternative = B_TRANSLATE(kFindApplicationStr);
+			alternative = B_TRANSLATE_NOCOLLECT(kFindApplicationStr);
 		} else if (error == B_LAUNCH_FAILED_APP_IN_TRASH) {
 			alertString.SetTo(B_TRANSLATE("Could not open \"%document\" "
 				"because application \"%app\" is in the Trash. "));
 			alertString.ReplaceFirst("%document", documentRef.name);
 			alertString.ReplaceFirst("%app", app.name);
-			alternative = B_TRANSLATE(kFindAlternativeStr);
+			alternative = B_TRANSLATE_NOCOLLECT(kFindAlternativeStr);
 		} else if (error == B_LAUNCH_FAILED_APP_NOT_FOUND) {
 			alertString.SetTo(
 				B_TRANSLATE("Could not open \"%name\" (%error). "));
 			alertString.ReplaceFirst("%name", documentRef.name);
 			alertString.ReplaceFirst("%error", strerror(error));
-			alternative = B_TRANSLATE(kFindAlternativeStr);
+			alternative = B_TRANSLATE_NOCOLLECT(kFindAlternativeStr);
 		} else if (error == B_MISSING_SYMBOL
 			&& LoaderErrorDetails(&app, loaderErrorString) == B_OK) {
 			if (openedDocuments) {
@@ -3458,7 +3460,7 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 				alertString.ReplaceFirst("%document", documentRef.name);
 				alertString.ReplaceFirst("%symbol", loaderErrorString.String());
 			}
-			alternative = B_TRANSLATE(kFindAlternativeStr);
+			alternative = B_TRANSLATE_NOCOLLECT(kFindAlternativeStr);
 		} else if (error == B_MISSING_LIBRARY
 			&& LoaderErrorDetails(&app, loaderErrorString) == B_OK) {
 			if (openedDocuments) {
@@ -3474,14 +3476,14 @@ _TrackerLaunchDocuments(const entry_ref */*doNotUse*/, const BMessage *refs,
 				alertString.ReplaceFirst("%document", documentRef.name);
 				alertString.ReplaceFirst("%library", loaderErrorString.String());
 			}
-			alternative = B_TRANSLATE(kFindAlternativeStr);
+			alternative = B_TRANSLATE_NOCOLLECT(kFindAlternativeStr);
 		} else {
 			alertString.SetTo(B_TRANSLATE("Could not open \"%document\" with "
 				"application \"%app\" (%error). "));
 				alertString.ReplaceFirst("%document", documentRef.name);
 				alertString.ReplaceFirst("%app", app.name);
 				alertString.ReplaceFirst("%error", strerror(error));
-			alternative = B_TRANSLATE(kFindAlternativeStr);
+			alternative = B_TRANSLATE_NOCOLLECT(kFindAlternativeStr);
 		}
 	}
 

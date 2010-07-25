@@ -232,7 +232,7 @@ PairsWindow::MessageReceived(BMessage* message)
 					strAbout.Replace("%s", score.String(), 1);
 
 					BAlert* alert = new BAlert("about",
-						B_TRANSLATE(strAbout.String()),
+						strAbout.String(),
 						B_TRANSLATE("New game"),
 						B_TRANSLATE("Quit game"));
 

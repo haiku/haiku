@@ -15,6 +15,7 @@
 #include "defs.h"
 
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "main"
 
 BluetoothApplication::BluetoothApplication(void)
