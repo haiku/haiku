@@ -869,6 +869,9 @@ PathListView::_UpdateMenu()
 
 	fDuplicateMI->SetEnabled(gotSelection);
 	fReverseMI->SetEnabled(gotSelection);
+	fCleanUpMI->SetEnabled(gotSelection);
+	fRotateIndicesLeftMI->SetEnabled(gotSelection);
+	fRotateIndicesRightMI->SetEnabled(gotSelection);
 	fRemoveMI->SetEnabled(gotSelection);
 }
 
