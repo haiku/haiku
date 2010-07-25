@@ -32,9 +32,11 @@ class ChannelTransform : public Transformable {
 
 	virtual	void				TranslateBy(BPoint offset);
 	virtual	void				RotateBy(BPoint origin, double degrees);
-
-			void				ScaleBy(double xScale, double yScale);
 			void				RotateBy(double degrees);
+
+	virtual	void				ScaleBy(BPoint origin, double xScale,
+									double yScale);
+			void				ScaleBy(double xScale, double yScale);
 
 			void				SetTranslationAndScale(BPoint offset,
 													   double xScale,

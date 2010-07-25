@@ -162,28 +162,29 @@ ChannelTransform::RotateBy(double degrees)
 }
 
 
-//// ScaleBy
-////
-//// converts a scalation in world coordinates into
-//// a combined local scalation and a translation
-//void
-//ChannelTransform::ScaleBy(BPoint origin, double xScale, double yScale)
-//{
-//	if (xScale == 1.0 && yScale == 1.0)
-//		return;
+// ScaleBy
 //
-//	fXScale *= xScale;
-//	fYScale *= yScale;
-//
-//	// scale fTranslation
-//	double xOffset = fTranslation.x - origin.x;
-//	double yOffset = fTranslation.y - origin.y;
-//
-//	fTranslation.x = origin.x + (xOffset * xScale);
-//	fTranslation.y = origin.y + (yOffset * yScale);
-//
-//	_UpdateMatrix();
-//}
+// converts a scalation in world coordinates into
+// a combined local scalation and a translation
+void
+ChannelTransform::ScaleBy(BPoint origin, double xScale, double yScale)
+{
+	// TODO: Untested?
+	if (xScale == 1.0 && yScale == 1.0)
+		return;
+
+	fXScale *= xScale;
+	fYScale *= yScale;
+
+	// scale fTranslation
+	double xOffset = fTranslation.x - origin.x;
+	double yOffset = fTranslation.y - origin.y;
+
+	fTranslation.x = origin.x + (xOffset * xScale);
+	fTranslation.y = origin.y + (yOffset * yScale);
+
+	_UpdateMatrix();
+}
 
 // ScaleBy
 void
