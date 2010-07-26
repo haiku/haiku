@@ -31,6 +31,7 @@
 #include <Node.h>
 #include <Path.h>
 #include <String.h>
+#include <TimeZone.h>
 
 #include <ICUWrapper.h>
 
@@ -504,6 +505,17 @@ BLocaleRoster::GetDefaultCountry(BCountry **country) const
 		return B_BAD_VALUE;
 
 	*country = &gRosterData.fDefaultCountry;
+	return B_OK;
+}
+
+
+status_t
+BLocaleRoster::GetDefaultTimeZone(BTimeZone **timezone) const
+{
+	if (!timezone)
+		return B_BAD_VALUE;
+
+	*timezone = new(std::nothrow) BTimeZone("");
 	return B_OK;
 }
 

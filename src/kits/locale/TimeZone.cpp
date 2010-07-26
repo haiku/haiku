@@ -35,6 +35,17 @@ BTimeZone::GetName(BString& name)
 }
 
 
+void
+BTimeZone::GetCode(char* buffer, int size)
+{
+	UnicodeString unicodeName;
+	fICUTimeZone->getDisplayName(unicodeName);
+
+	CheckedArrayByteSink converter(buffer, size);
+	unicodeName.toUTF8(converter);
+}
+
+
 int
 BTimeZone::OffsetFromGMT()
 {

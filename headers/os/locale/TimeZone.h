@@ -20,6 +20,7 @@ class BTimeZone {
 					~BTimeZone();
 
 		void		GetName(BString& name);
+		void		GetCode(char* buffer, int size);
 		int			OffsetFromGMT();
 
 	private:

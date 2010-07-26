@@ -12,7 +12,6 @@
 #define TIME_MESSAGES_H
 
 //Timezone messages
-const uint32 H_REGION_CHANGED = 'h_RC';
 const uint32 H_CITY_CHANGED = 'h_CC';
 const uint32 H_CITY_SET = 'h_CS';
 

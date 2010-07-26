@@ -10,15 +10,16 @@
 #define ZONE_VIEW_H
 
 
+#include <TimeZone.h>
 #include <View.h>
-#include <Path.h>
 
 
 class BMessage;
 class BPopUpMenu;
-class BListView;
+class BOutlineListView;
 class BButton;
 class TTZDisplay;
+class TimeZoneListItem;
 
 
 class TimeZoneView : public BView {
@@ -32,32 +33,24 @@ class TimeZoneView : public BView {
 
 	private:
 		void 			UpdateDateTime(BMessage *message);
-		void 			ChangeRegion(BMessage *);
 		void 			SetTimeZone();
 		void 			SetTimeZone(const char *zone);
 		void 			SetPreview();
 		void 			SetCurrent(const char *text);
 		void 			InitView();
-		void 			ReadTimeZoneLink();
 		void 			BuildRegionMenu();
 		void			_Revert();
 
-		// returns index of current zone
-		int32 			FillCityList(const char *area);
-
-		status_t		_GetTimezonesPath(BPath& path);
-
 	private:
-		BPopUpMenu 		*fRegionPopUp;
-		BListView 		*fCityList;
+		BOutlineListView 		*fCityList;
 		BButton 		*fSetZone;
 		TTZDisplay 		*fCurrent;
 		TTZDisplay		*fPreview;
 
 		int32 			fHour;
 		int32 			fMinute;
-		BPath 			fCurrentZone;
-		BPath				fOldZone;
+		TimeZoneListItem *fCurrentZone;
+		TimeZoneListItem *fOldZone;
 		bool 			fInitialized;
 };
 

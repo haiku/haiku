@@ -16,6 +16,7 @@ class BCountry;
 class BCatalog;
 class BCatalogAddOn;
 class BMessage;
+class BTimeZone;
 
 struct entry_ref;
 
@@ -34,10 +35,12 @@ class BLocaleRoster {
 		BLocaleRoster();
 		~BLocaleRoster();
 
-		status_t GetSystemCatalog(BCatalogAddOn **) const;
-		status_t GetDefaultCollator(BCollator **) const;
-		status_t GetDefaultLanguage(BLanguage **) const;
-		status_t GetDefaultCountry(BCountry **) const;
+		status_t GetSystemCatalog(BCatalogAddOn **catalog) const;
+		status_t GetDefaultCollator(BCollator **collator) const;
+		status_t GetDefaultLanguage(BLanguage **language) const;
+		status_t GetDefaultCountry(BCountry **contry) const;
+		status_t GetDefaultTimeZone(BTimeZone**timezone) const;
+
 		void SetDefaultCountry(BCountry *) const;
 		void UpdateSettings(BMessage* newSettings);
 

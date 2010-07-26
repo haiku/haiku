@@ -15,6 +15,7 @@ Preference Time :
 	Time.cpp 
 	TimeSettings.cpp 
 	TimeWindow.cpp
+	TimeZoneListItem.cpp
 	TZDisplay.cpp 
 	ZoneView.cpp 
 	: be libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
