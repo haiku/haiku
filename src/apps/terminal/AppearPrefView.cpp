@@ -53,7 +53,7 @@ IsFontUsable(const BFont& font)
 	if (firstWidth <= 0)
 		return false;
 
-	for (int c = ' '+1; c <= 0x7e; c++) {
+	for (int c = ' ' + 1; c <= 0x7e; c++) {
 		buffer[0] = c;
 		int width = (int)ceilf(font.StringWidth(buffer));
 
@@ -86,7 +86,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fWarnOnExit = new BCheckBox(B_TRANSLATE("Warn on Exit"),
+	fWarnOnExit = new BCheckBox(
+		B_TRANSLATE("Confirm exit if active programs exist"),
 			new BMessage(MSG_WARN_ON_EXIT_CHANGED));
 
 	BMenu* fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,

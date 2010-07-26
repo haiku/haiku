@@ -19,9 +19,6 @@ struct color_schema {
 };
 
 
-extern const rgb_color kBlack;
-extern const rgb_color kWhite;
-
 extern color_schema gCustomSchema;
 extern const color_schema* gPredefinedSchemas[];
 
