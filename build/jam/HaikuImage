@@ -595,6 +595,11 @@ AddDirectoryToHaikuImage home config settings printers Preview
 AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 	: home-config-settings-printers-save-as-pdf.rdef ;
 
+# PDF Writer enconding files
+CopyDirectoryToHaikuImage common settings
+	: [ FDirName $(HAIKU_TOP) src add-ons print drivers pdf encoding ]
+	: "PDF Writer" : -x .svn -x Jamfile ;
+
 # licenses
 CopyDirectoryToHaikuImage system data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]

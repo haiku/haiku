@@ -347,26 +347,26 @@ PDFWriter::InitWriter()
 	REPORT(kDebug, 0, "Start of fonts declaration:");
 
 	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc0==/boot/home/config/settings/PDF Writer/t1enc0.enc");
+		"t1enc0==/boot/common/settings/PDF Writer/t1enc0.enc");
 	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc1==/boot/home/config/settings/PDF Writer/t1enc1.enc");
+		"t1enc1==/boot/common/settings/PDF Writer/t1enc1.enc");
 	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc2==/boot/home/config/settings/PDF Writer/t1enc2.enc");
+		"t1enc2==/boot/common/settings/PDF Writer/t1enc2.enc");
 	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc3==/boot/home/config/settings/PDF Writer/t1enc3.enc");
+		"t1enc3==/boot/common/settings/PDF Writer/t1enc3.enc");
 	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc4==/boot/home/config/settings/PDF Writer/t1enc4.enc");
+		"t1enc4==/boot/common/settings/PDF Writer/t1enc4.enc");
 
 	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc0==/boot/home/config/settings/PDF Writer/ttenc0.cpg");
+		"ttenc0==/boot/common/settings/PDF Writer/ttenc0.cpg");
 	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc1==/boot/home/config/settings/PDF Writer/ttenc1.cpg");
+		"ttenc1==/boot/common/settings/PDF Writer/ttenc1.cpg");
 	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc2==/boot/home/config/settings/PDF Writer/ttenc2.cpg");
+		"ttenc2==/boot/common/settings/PDF Writer/ttenc2.cpg");
 	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc3==/boot/home/config/settings/PDF Writer/ttenc3.cpg");
+		"ttenc3==/boot/common/settings/PDF Writer/ttenc3.cpg");
 	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc4==/boot/home/config/settings/PDF Writer/ttenc4.cpg");
+		"ttenc4==/boot/common/settings/PDF Writer/ttenc4.cpg");
 
 	DeclareFonts();
 
@@ -482,8 +482,8 @@ PDFWriter::BeginPage(BRect paperRect, BRect printRect)
 	ASSERT(fState == NULL);
 	fState = new State(height, printRect.left, printRect.top);
 
-    if (MakesPDF())
-    	PDF_begin_page(fPdf, width, height);
+	if (MakesPDF())
+		PDF_begin_page(fPdf, width, height);
 
 	REPORT(kDebug, fPage, ">>>> PDF_begin_page [%f, %f]", width, height);
 
@@ -509,8 +509,8 @@ PDFWriter::EndPage()
 
 	while (fState->prev != NULL) PopState();
 
-    if (MakesPDF())
-    	PDF_end_page(fPdf);
+	if (MakesPDF())
+		PDF_end_page(fPdf);
 	REPORT(kDebug, fPage, ">>>> PDF_end_page");
 
 	delete fState; fState = NULL;
