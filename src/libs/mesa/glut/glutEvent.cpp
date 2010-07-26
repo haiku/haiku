@@ -370,17 +370,17 @@ void glutMainLoop()
 void glutSetKeyRepeat(int repeatMode)
 {
 	switch(repeatMode) {
-	case GLUT_KEY_REPEAT_DEFAULT:
-		gState.keyRepeatMode = GLUT_KEY_REPEAT_ON;
-		break;
+		case GLUT_KEY_REPEAT_DEFAULT:
+			gState.keyRepeatMode = GLUT_KEY_REPEAT_ON;
+			break;
 	
-	case GLUT_KEY_REPEAT_ON:
-	case GLUT_KEY_REPEAT_OFF:
-		gState.keyRepeatMode = repeatMode;
-		break;
+		case GLUT_KEY_REPEAT_ON:
+		case GLUT_KEY_REPEAT_OFF:
+			gState.keyRepeatMode = repeatMode;
+			break;
 		
-	default:
-		__glutWarning("invalid glutSetKeyRepeat mode: %d", repeatMode);
+		default:
+			__glutWarning("invalid glutSetKeyRepeat mode: %d", repeatMode);
 	}
 }
 
@@ -406,8 +406,8 @@ void GlutWindow::KeyDown(const char *s, int32 slen)
   
   BPoint p;
 	
-	if (ignoreKeyRepeat && 
-		Window()->CurrentMessage()->FindInt32("be:key_repeat") > 0)
+	if (ignoreKeyRepeat 
+		&& Window()->CurrentMessage()->FindInt32("be:key_repeat") > 0)
 		return;
 	
 	switch (aChar) {
