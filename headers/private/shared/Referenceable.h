@@ -119,6 +119,11 @@ public:
 		return fObject;
 	}
 
+	operator Type*() const
+	{
+		return fObject;
+	}
+
 	BReference& operator=(const BReference<Type>& other)
 	{
 		SetTo(other.fObject);
