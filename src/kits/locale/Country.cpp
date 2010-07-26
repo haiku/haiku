@@ -1063,7 +1063,7 @@ BCountry::GetTimeZones(BList& timezones)
 	std::map<BString, BTimeZone*> timeZoneMap;
 		// The map allows us to remove duplicates and get a count of the
 		// remaining zones after that
-	while (tzName = icuTimeZoneList->next(NULL, error)) {
+	while ((tzName = icuTimeZoneList->next(NULL, error)) != NULL) {
 		if (error == U_ZERO_ERROR) {
 			BString readableName;
 			BTimeZone* timeZone = new BTimeZone(tzName);

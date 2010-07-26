@@ -88,7 +88,7 @@ main(int argc, char **argv)
 	if (inputFiles.empty() || !catalogSig || !outputFile.Length())
 		usage();
 
-	DefaultCatalog targetCatImpl(outputFile.String(), catalogSig, 
+	DefaultCatalog targetCatImpl(outputFile.String(), catalogSig,
 		catalogLang.String());
 	if ((res = targetCatImpl.InitCheck()) != B_OK) {
 		fprintf(stderr, "couldn't construct target-catalog %s - error: %s\n",
@@ -98,7 +98,7 @@ main(int argc, char **argv)
 
 	uint32 count = inputFiles.size();
 	for (uint32 i = 0; i < count; ++i) {
-		PlainTextCatalog inputCatalog(inputFiles[i], catalogSig, 
+		PlainTextCatalog inputCatalog(inputFiles[i], catalogSig,
 			catalogLang.String());
 		if ((res = inputCatalog.ReadFromFile()) != B_OK) {
 			fprintf(stderr, "couldn't load source-catalog %s - error: %s\n",
@@ -160,7 +160,7 @@ main(int argc, char **argv)
 	if (showSummary) {
 		int32 count = targetCatImpl.CountItems();
 		if (count) {
-			fprintf(stderr, "%ld key%s found and written to %s\n",
+			fprintf(stderr, "%d key%s found and written to %s\n",
 				count, (count==1 ? "": "s"), outputFile.String());
 		} else
 			fprintf(stderr, "no keys found\n");

@@ -184,10 +184,10 @@ collectAllCatalogKeys(BString& inputStr)
 		if (fetchKey(in)) {
 			if (haveID) {
 				if (showKeys)
-					printf("CatKey(%d)\n", id);
+					printf("CatKey(%ld)\n", id);
 				res = catalog->SetString(id, "");
 				if (res != B_OK) {
-					fprintf(stderr, "couldn't add key %d - error: %s\n",
+					fprintf(stderr, "couldn't add key %ld - error: %s\n",
 						id, strerror(res));
 					exit(-1);
 				}
@@ -301,7 +301,7 @@ main(int argc, char **argv)
 		if (showSummary) {
 			int32 count = catalog->CountItems();
 			if (count)
-				fprintf(stderr, "%d key%s found and written to %s\n",
+				fprintf(stderr, "%ld key%s found and written to %s\n",
 					count, (count==1 ? "": "s"), outputFile.String());
 			else
 				fprintf(stderr, "no keys found\n");

@@ -370,11 +370,6 @@ RosterData::InitializeCatalogAddOns()
 		}
 	}
 	fCatalogAddOnInfos.SortItems(CompareInfos);
-
-	for (int32 i = 0; i<fCatalogAddOnInfos.CountItems(); ++i) {
-		BCatalogAddOnInfo *info
-			= static_cast<BCatalogAddOnInfo*>(fCatalogAddOnInfos.ItemAt(i));
-	}
 }
 
 

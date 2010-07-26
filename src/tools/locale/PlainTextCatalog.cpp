@@ -231,7 +231,7 @@ PlainTextCatalog::ReadFromFile(const char *path)
 	uint32 checkFP = ComputeFingerprint();
 	if (fFingerprint != checkFP) {
 		fprintf(stderr, "plaintext-catalog(sig=%s, lang=%s) "
-			"has wrong fingerprint after load (%lX instead of %lX). "
+			"has wrong fingerprint after load (%X instead of %X). "
 			"The catalog data may be corrupted, so this catalog is "
 			"skipped.\n",
 			fSignature.String(), fLanguageName.String(), checkFP,

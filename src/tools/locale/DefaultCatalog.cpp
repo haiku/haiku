@@ -142,7 +142,7 @@ DefaultCatalog::ReadFromFile(const char *path)
 	}
 	if (res < sz) {
 		fprintf(stderr,
-			"only got %lu instead of %Lu bytes from catalog-file %s\n", res, sz,
+			"only got %u instead of %Lu bytes from catalog-file %s\n", res, sz,
 			path);
 		return res;
 	}
@@ -329,7 +329,7 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 		if (foundFingerprint != 0 && fFingerprint != 0
 			&& foundFingerprint != fFingerprint) {
 			fprintf(stderr, "default-catalog(sig=%s, lang=%s) "
-				"has mismatching fingerprint (%ld instead of the requested %ld)"
+				"has mismatching fingerprint (%d instead of the requested %d)"
 				", so this catalog is skipped.\n",
 				fSignature.String(), fLanguageName.String(), foundFingerprint,
 				fFingerprint);
@@ -369,7 +369,7 @@ DefaultCatalog::Unflatten(BDataIO *dataIO)
 		uint32 checkFP = ComputeFingerprint();
 		if (fFingerprint != checkFP) {
 			fprintf(stderr, "default-catalog(sig=%s, lang=%s) "
-				"has wrong fingerprint after load (%ld instead of the %ld). "
+				"has wrong fingerprint after load (%d instead of %d). "
 				"The catalog data may be corrupted, so this catalog is "
 				"skipped.\n",
 				fSignature.String(), fLanguageName.String(), checkFP,
