@@ -57,6 +57,23 @@ demangle_class_name(const char* name, BString& out)
 
 	out = "";
 
+#if __GNUC__ >= 4
+	if (name[0] == 'N')
+		name++;
+	int nameLen;
+	bool first = true;
+	while ((nameLen = strtoul(name, (char**)&name, 10))) {
+		if (!first)
+			out += "::";
+		else
+			first = false;
+		out.Append(name, nameLen);
+		name += nameLen;
+	}
+	if (first)
+		return B_BAD_VALUE;
+
+#else
 	if (name[0] == 'Q') {
 		// The name is in a namespace
 		int namespaceCount = 0;
@@ -87,6 +104,7 @@ demangle_class_name(const char* name, BString& out)
 
 	int nameLength = strtoul(name, (char**)&name, 10);
 	out.Append(name, nameLength);
+#endif
 
 	return B_OK;
 }
@@ -116,8 +134,19 @@ mangle_class_name(const char* name, BString& out)
 	}
 
 	//	Now mangle it into this:
+	//		9testthree8testfour9Testthree8Testfour
+	//			(for __GNUC__ > 2)
+	//			this isn't always the proper mangled class name, it should
+	//			actually have an 'N' prefix and 'E' suffix if the name is
+	//			in > 0 namespaces, but these would have to be removed in
+	//			build_function_name() (the only place this function is called)
+	//			so we don't add them.
+	//	or this:
 	//		Q49testthree8testfour9Testthree8Testfour
+	//			(for __GNUC__ == 2)
+
 	out = "";
+#if __GNUC__ == 2
 	if (count > 1) {
 		out += 'Q';
 		if (count > 10)
@@ -126,6 +155,7 @@ mangle_class_name(const char* name, BString& out)
 		if (count > 10)
 			out += '_';
 	}
+#endif
 
 	for (unsigned int i = 0; i < spacenames.size(); ++i) {
 		out << (int)spacenames[i].length();
