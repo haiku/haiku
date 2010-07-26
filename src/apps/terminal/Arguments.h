@@ -10,28 +10,28 @@
 
 class Arguments {
 public:
-	Arguments(int defaultArgcNum, const char *const *defaultArgv);
+	Arguments(int defaultArgcNum, const char* const* defaultArgv);
 	~Arguments();
 
-	void Parse(int argc, const char *const *argv);
+	void Parse(int argc, const char* const* argv);
 
 	BRect Bounds() const		{ return fBounds; }
-	const char *Title() const	{ return fTitle; }
+	const char* Title() const	{ return fTitle; }
 	bool StandardShell() const	{ return fStandardShell; }
 	bool FullScreen() const		{ return fFullScreen; }
 	bool UsageRequested() const	{ return fUsageRequested; }
-	void GetShellArguments(int &argc, const char *const *&argv) const;
+	void GetShellArguments(int& argc, const char* const*& argv) const;
 
 private:
-	void _SetShellArguments(int argc, const char *const *argv);
+	void _SetShellArguments(int argc, const char* const* argv);
 
-	bool		fUsageRequested;
-	BRect		fBounds;
-	bool		fStandardShell;
-	bool		fFullScreen;
-	int		fShellArgumentCount;
-	const char	**fShellArguments;
-	const char	*fTitle;
+	bool			fUsageRequested;
+	BRect			fBounds;
+	bool			fStandardShell;
+	bool			fFullScreen;
+	int				fShellArgumentCount;
+	const char**	fShellArguments;
+	const char*		fTitle;
 };
 
 

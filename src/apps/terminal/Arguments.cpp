@@ -18,7 +18,7 @@
 #define B_TRANSLATE_CONTEXT "Terminal arguments parsing"
 
 
-Arguments::Arguments(int defaultArgsNum, const char * const *defaultArgs)
+Arguments::Arguments(int defaultArgsNum, const char* const* defaultArgs)
 	: fUsageRequested(false),
 	  fBounds(50, 50, 630, 435),
 	  fStandardShell(true),
@@ -36,12 +36,13 @@ Arguments::~Arguments()
 	_SetShellArguments(0, NULL);
 }
 
+
 void
-Arguments::Parse(int argc, const char *const *argv)
+Arguments::Parse(int argc, const char* const* argv)
 {
 	int argi = 1;
 	while (argi < argc) {
-		const char *arg = argv[argi++];
+		const char* arg = argv[argi++];
 
 		if (*arg == '-') {
 			if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
@@ -98,7 +99,7 @@ Arguments::Parse(int argc, const char *const *argv)
 
 
 void
-Arguments::GetShellArguments(int &argc, const char *const *&argv) const
+Arguments::GetShellArguments(int& argc, const char* const*& argv) const
 {
 	argc = fShellArgumentCount;
 	argv = fShellArguments;
@@ -106,7 +107,7 @@ Arguments::GetShellArguments(int &argc, const char *const *&argv) const
 
 
 void
-Arguments::_SetShellArguments(int argc, const char *const *argv)
+Arguments::_SetShellArguments(int argc, const char* const* argv)
 {
 	// delete old arguments
 	for (int32 i = 0; i < fShellArgumentCount; i++)

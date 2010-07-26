@@ -26,7 +26,7 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Terminal PrefWindow"
 
-PrefWindow::PrefWindow(const BMessenger &messenger)
+PrefWindow::PrefWindow(const BMessenger& messenger)
 	: BWindow(BRect(0, 0, 375, 185), B_TRANSLATE("Terminal settings"),
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE|B_AUTO_UPDATE_SIZE_LIMITS),
@@ -84,7 +84,7 @@ PrefWindow::QuitRequested()
 	if (!fDirty)
 		return true;
 
-	BAlert *alert = new BAlert("",
+	BAlert* alert = new BAlert("",
 		B_TRANSLATE("Save changes to this settings panel?"),
 		B_TRANSLATE("Cancel"), B_TRANSLATE("Don't save"), B_TRANSLATE("Save"),
 		B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
@@ -122,7 +122,7 @@ void
 PrefWindow::_SaveRequested(BMessage *msg)
 {
 	entry_ref dirref;
-	const char *filename;
+	const char* filename;
 
 	msg->FindRef("directory", &dirref);
 	msg->FindString("name", &filename);
@@ -160,7 +160,7 @@ PrefWindow::_Revert()
 
 
 void
-PrefWindow::MessageReceived(BMessage *msg)
+PrefWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case MSG_SAVE_PRESSED:
