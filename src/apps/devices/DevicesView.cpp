@@ -277,21 +277,28 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 	// Determine what type of device it is and create it
 	for (unsigned int i = 0; i < attributes.size(); i++) {
 		// Devices Root
-		if (attributes[i].fName == "device/pretty name"
+		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
 				&& attributes[i].fValue == "Devices Root") {
 			newDevice = new Device(parent, BUS_NONE, CAT_COMPUTER, "Computer");
 			break;
 		}
 
+		// ACPI Controller
+		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
+				&& attributes[i].fValue == "ACPI") {
+			newDevice = new Device(parent, BUS_ACPI, CAT_BUS, "ACPI bus");
+			break;
+		}
+
 		// PCI bus
-		if (attributes[i].fName == "device/pretty name"
+		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
 				&& attributes[i].fValue == "PCI") {
 			newDevice = new Device(parent, BUS_PCI, CAT_BUS, "PCI bus");
 			break;
 		}
 
 		// ISA bus
-		if (attributes[i].fName == "device/bus"
+		if (attributes[i].fName == B_DEVICE_BUS
 				&& attributes[i].fValue == "isa") {
 			newDevice = new Device(parent, BUS_ISA, CAT_BUS, "ISA bus");
 			break;
@@ -301,6 +308,13 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 		if (attributes[i].fName == B_DEVICE_BUS
 				&& attributes[i].fValue == "pci") {
 			newDevice = new DevicePCI(parent);
+			break;
+		}
+
+		// ACPI device
+		if (attributes[i].fName == B_DEVICE_BUS
+				&& attributes[i].fValue == "acpi") {
+			newDevice = new DeviceACPI(parent);
 			break;
 		}
 	}

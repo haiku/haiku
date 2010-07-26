@@ -24,6 +24,7 @@ typedef enum {
 	BUS_ISA = 1,
 	BUS_PCI,
 	BUS_SCSI,
+	BUS_ACPI,
 	BUS_NONE
 } BusType;
 
@@ -45,7 +46,8 @@ typedef std::vector<Attribute> Attributes;
 typedef enum {
 	CAT_NONE = 0,
 	CAT_BUS = 6,
-	CAT_COMPUTER = 0x12
+	CAT_COMPUTER = 0x12,
+	CAT_ACPI = 0x13
 } Category;
 
 

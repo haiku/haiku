@@ -32,7 +32,8 @@ const char* kCategoryString[] = {
 	"Satellite communications controller",  // 0x0f
 	"Encryption controller",  				// 0x10
 	"Signal processing controller",			// 0x11
-	"Computer"								// 0x12 (added later)
+	"Computer",								// 0x12 (added later)
+	"ACPI controller"			// 0x13 (added later)
 };
 
 
