@@ -129,7 +129,7 @@ public:
 			void				AssumeOwnership(BArchivable* archivable);
 			void				RelinquishOwnership(BArchivable* archivable);
 
-	static	bool				IsArchiveManaged(BMessage* archive);
+	static	bool				IsArchiveManaged(const BMessage* archive);
 	static	BMessage*			PrepareArchive(BMessage*& archive);
 
 	template<class T>

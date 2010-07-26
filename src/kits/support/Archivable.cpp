@@ -452,6 +452,7 @@ BUnarchiver::FindObject<BArchivable>(const char* name,
 bool
 BUnarchiver::IsInstantiated(int32 token)
 {
+	_CallDebuggerIfManagerNull();
 	return fManager->IsInstantiated(token);
 }
 
@@ -504,7 +505,7 @@ BUnarchiver::RelinquishOwnership(BArchivable* archivable)
 
 
 bool
-BUnarchiver::IsArchiveManaged(BMessage* archive)
+BUnarchiver::IsArchiveManaged(const BMessage* archive)
 {
 	// managed child archives will return here
 	if (BManagerBase::ManagerPointer(archive))
