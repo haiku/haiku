@@ -130,6 +130,8 @@ const char* const PREF_SHELL = "Shell";
 const char* const PREF_TEXT_ENCODING = "Text encoding";
 const char* const PREF_GUI_LANGUAGE = "Language";
 
+const char* const PREF_WARN_ON_EXIT = "Warn on exit";
+
 // Color type
 enum {
   TEXT_FOREGROUND_COLOR,

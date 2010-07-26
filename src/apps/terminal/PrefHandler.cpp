@@ -58,6 +58,9 @@ static const pref_defaults kTermDefaults[] = {
 
 	{ PREF_GUI_LANGUAGE,		"English"},
 	{ PREF_IM_AWARE,			"0"},
+
+	{ PREF_WARN_ON_EXIT,		PREF_TRUE },
+
 	{ NULL, NULL},
 };
 
@@ -425,6 +428,7 @@ PrefHandler::_LoadFromFile(const char* path)
 	setRGB(PREF_SELECT_BACK_COLOR, prefs.selbg);
 	setRGB(PREF_SELECT_FORE_COLOR, prefs.selfg);
 	setString(PREF_TEXT_ENCODING, EncodingAsString(prefs.encoding));
+	setBool(PREF_WARN_ON_EXIT, prefs.warn_on_exit);
 
 	return B_OK;
 }

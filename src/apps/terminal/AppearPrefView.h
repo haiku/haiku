@@ -21,7 +21,7 @@ const ulong MSG_COLOR_FIELD_CHANGED	= 'mccf';
 const ulong MSG_COLOR_CHANGED		= 'mcbc';
 const ulong MSG_COLOR_SCHEMA_CHANGED		= 'mccs';
 
-
+const ulong MSG_WARN_ON_EXIT_CHANGED	= 'mwec';
 const ulong MSG_COLS_CHANGED            = 'mccl';
 const ulong MSG_ROWS_CHANGED            = 'mcrw';
 const ulong MSG_HISTORY_CHANGED         = 'mhst';
@@ -34,6 +34,7 @@ class BColorControl;
 class BMenu;
 class BMenuField;
 class BPopUpMenu;
+class BCheckBox;
 
 class AppearancePrefView : public BView {
 public:
@@ -65,6 +66,7 @@ private:
 	static	BPopUpMenu*			_MakeColorSchemaMenu(uint32 msg, const color_schema **schemas,
 									const color_schema *defaultItemName);
 			
+			BCheckBox			*fWarnOnExit;
 			BMenuField			*fFont;
 			BMenuField			*fFontSize;
 

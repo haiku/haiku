@@ -233,6 +233,30 @@ TermWindow::_InitWindow()
 bool
 TermWindow::QuitRequested()
 {
+	bool warnOnExit = PrefHandler::Default()->getBool(PREF_WARN_ON_EXIT);
+
+	if (!warnOnExit)
+		return BWindow::QuitRequested();
+
+	bool isBusy = false;
+	for (int32 i = 0; i < fSessions.CountItems(); i++) {
+		if (_TermViewAt(i)->IsShellBusy()) {
+			isBusy = true;
+			break;
+		}
+	}
+
+	if (isBusy) {
+		const char *alertMessage = B_TRANSLATE("A process is still running.\n"
+			"If you close the Terminal the process will be killed.");
+		BAlert *alert = new BAlert(B_TRANSLATE("Really quit?"),
+			alertMessage, B_TRANSLATE("OK"), B_TRANSLATE("Cancel"), NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		int32 result = alert->Go();
+		if (result == 1)
+			return false;
+	}
+
 	return BWindow::QuitRequested();
 }
 

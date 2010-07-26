@@ -13,6 +13,7 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <CheckBox.h>
 #include <ColorControl.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
@@ -85,6 +86,9 @@ AppearancePrefView::AppearancePrefView(const char* name,
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
+	fWarnOnExit = new BCheckBox(B_TRANSLATE("Warn on Exit"),
+			new BMessage(MSG_WARN_ON_EXIT_CHANGED));
+
 	BMenu* fontMenu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY),
 		PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE));
@@ -124,6 +128,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 				.AddGlue()
 				.Add(fColorControl = new BColorControl(BPoint(10, 10),
 					B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
+				.Add(fWarnOnExit)
 			.End()
 		.End();
 
@@ -136,6 +141,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 
 	fColorControl->SetEnabled(false);
 	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
+
+	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(PREF_WARN_ON_EXIT));
 
 	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
 	BTextControl* greenInput = (BTextControl*)fColorControl->ChildAt(1);
@@ -161,6 +168,9 @@ AppearancePrefView::GetPreferredSize(float* _width, float* _height)
 void
 AppearancePrefView::Revert()
 {
+	fWarnOnExit->SetValue(PrefHandler::Default()->getBool(
+		PREF_WARN_ON_EXIT));
+
 	fColorSchemaField->Menu()->ItemAt(0)->SetMarked(true);
 	fColorControl->SetValue(PrefHandler::Default()->
 		getRGB(PREF_TEXT_FORE_COLOR));
@@ -175,6 +185,8 @@ AppearancePrefView::Revert()
 void
 AppearancePrefView::AttachedToWindow()
 {
+	fWarnOnExit->SetTarget(this);
+
 	fFontSize->Menu()->SetTargetForItems(this);
 	fFont->Menu()->SetTargetForItems(this);
 
@@ -261,6 +273,14 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 				fColorField->Menu()->FindMarked()->Label()));
 			break;
 
+		case MSG_WARN_ON_EXIT_CHANGED:
+			if (PrefHandler::Default()->getBool(PREF_WARN_ON_EXIT)
+				!= fWarnOnExit->Value()) {
+					PrefHandler::Default()->setBool(PREF_WARN_ON_EXIT,
+						fWarnOnExit->Value());
+					modified = true;
+			}
+			break;
 		default:
 			BView::MessageReceived(msg);
 			return;

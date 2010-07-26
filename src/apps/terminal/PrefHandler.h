@@ -41,7 +41,8 @@ struct termprefs {
 	rgb_color selbg;
 	rgb_color selfg;
 	char encoding; // index in the menu (0 = UTF-8)
-	char unknown[3];
+	bool warn_on_exit;
+	char unknown[2];
 };
 
 struct pref_defaults {
