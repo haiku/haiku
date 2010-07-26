@@ -135,7 +135,7 @@ private:
 };
 
 
-TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
+TermWindow::TermWindow(BRect frame, const char* title, Arguments* args)
 	:
 	BWindow(frame, title, B_DOCUMENT_WINDOW,
 		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE),
@@ -247,9 +247,9 @@ TermWindow::QuitRequested()
 	}
 
 	if (isBusy) {
-		const char *alertMessage = B_TRANSLATE("A process is still running.\n"
+		const char* alertMessage = B_TRANSLATE("A process is still running.\n"
 			"If you close the Terminal the process will be killed.");
-		BAlert *alert = new BAlert(B_TRANSLATE("Really quit?"),
+		BAlert* alert = new BAlert(B_TRANSLATE("Really quit?"),
 			alertMessage, B_TRANSLATE("OK"), B_TRANSLATE("Cancel"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		int32 result = alert->Go();
@@ -264,10 +264,10 @@ TermWindow::QuitRequested()
 void
 TermWindow::MenusBeginning()
 {
-	TermView *view = _ActiveTermView();
+	TermView* view = _ActiveTermView();
 
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	BMenuItem *item = fEncodingmenu->FindItem(
+	BMenuItem* item = fEncodingmenu->FindItem(
 		EncodingAsString(view->Encoding()));
 	if (item != NULL)
 		item->SetMarked(true);
@@ -285,10 +285,10 @@ TermWindow::MenusBeginning()
 
 
 /* static */
-BMenu *
+BMenu*
 TermWindow::_MakeEncodingMenu()
 {
-	BMenu *menu = new (std::nothrow) BMenu(B_TRANSLATE("Text encoding"));
+	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Text encoding"));
 	if (menu == NULL)
 		return NULL;
 
@@ -399,13 +399,13 @@ TermWindow::_SetupMenu()
 
 
 void
-TermWindow::_GetPreferredFont(BFont &font)
+TermWindow::_GetPreferredFont(BFont& font)
 {
 	// Default to be_fixed_font
 	font = be_fixed_font;
 
-	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
-	const char *style = PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
+	const char* family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
+	const char* style = PrefHandler::Default()->getString(PREF_HALF_FONT_STYLE);
 
 	font.SetFamilyAndStyle(family, style);
 
@@ -461,7 +461,6 @@ TermWindow::MessageReceived(BMessage *message)
 		case MENU_PREF_OPEN:
 			if (!fPrefWindow) {
 				fPrefWindow = new PrefWindow(this);
-				//fPrefWindow->
 			}
 			else
 				fPrefWindow->Activate();
@@ -509,7 +508,7 @@ TermWindow::MessageReceived(BMessage *message)
 			findresult = _ActiveTermView()->Find(fFindString, fForwardSearch, fMatchCase, fMatchWord);
 
 			if (!findresult) {
-				BAlert *alert = new BAlert(B_TRANSLATE("Find failed"),
+				BAlert* alert = new BAlert(B_TRANSLATE("Find failed"),
 					B_TRANSLATE("Text not found."),
 					B_TRANSLATE("OK"), NULL, NULL,
 					B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -532,7 +531,7 @@ TermWindow::MessageReceived(BMessage *message)
 				(message->what == MENU_FIND_NEXT) == fForwardSearch,
 				fMatchCase, fMatchWord);
 			if (!findresult) {
-				BAlert *alert = new BAlert(B_TRANSLATE("Find failed"),
+				BAlert* alert = new BAlert(B_TRANSLATE("Find failed"),
 					B_TRANSLATE("Not found."), B_TRANSLATE("OK"),
 					NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 				alert->SetShortcut(0, B_ESCAPE);
@@ -689,7 +688,7 @@ TermWindow::MessageReceived(BMessage *message)
 		case kIncreaseFontSize:
 		case kDecreaseFontSize:
 		{
-			TermView *view = _ActiveTermView();
+			TermView* view = _ActiveTermView();
 			BFont font;
 			view->GetTermFont(&font);
 
@@ -728,7 +727,7 @@ TermWindow::WindowActivated(bool activated)
 
 
 void
-TermWindow::_SetTermColors(TermViewContainerView *containerView)
+TermWindow::_SetTermColors(TermViewContainerView* containerView)
 {
 	PrefHandler* handler = PrefHandler::Default();
 	rgb_color background = handler->getRGB(PREF_TEXT_BACK_COLOR);
@@ -808,10 +807,10 @@ TermWindow::_DoPrint()
 
 
 void
-TermWindow::_AddTab(Arguments *args)
+TermWindow::_AddTab(Arguments* args)
 {
 	int argc = 0;
-	const char *const *argv = NULL;
+	const char* const* argv = NULL;
 	if (args != NULL)
 		args->GetShellArguments(argc, argv);
 
@@ -820,14 +819,14 @@ TermWindow::_AddTab(Arguments *args)
 		// only to avoid adding it as a dependency: in other words, to keep
 		// the TermView class as agnostic as possible about the surrounding
 		// world.
-		CustomTermView *view = new CustomTermView(
+		CustomTermView* view = new CustomTermView(
 			PrefHandler::Default()->getInt32(PREF_ROWS),
 			PrefHandler::Default()->getInt32(PREF_COLS),
-			argc, (const char **)argv,
+			argc, (const char**)argv,
 			PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE));
 
-		TermViewContainerView *containerView = new TermViewContainerView(view);
-		BScrollView *scrollView = new TermScrollView("scrollView",
+		TermViewContainerView* containerView = new TermViewContainerView(view);
+		BScrollView* scrollView = new TermScrollView("scrollView",
 			containerView, view, fSessions.IsEmpty());
 
 		if (fSessions.IsEmpty())
@@ -863,7 +862,7 @@ TermWindow::_AddTab(Arguments *args)
 				// is one pixel wider than its parent.
 		}
 
-		BTab *tab = new BTab;
+		BTab* tab = new BTab;
 		fTabView->AddTab(scrollView, tab);
 		tab->SetLabel(session->name.String());
 			// TODO: Use a better name. For example, do like MacOS X's Terminal
@@ -931,7 +930,7 @@ TermWindow::_TermViewContainerViewAt(int32 index) const
 }
 
 
-TermView *
+TermView*
 TermWindow::_ActiveTermView() const
 {
 	return _ActiveTermViewContainerView()->GetTermView();
@@ -987,7 +986,7 @@ TermWindow::FrameResized(float newWidth, float newHeight)
 {
 	BWindow::FrameResized(newWidth, newHeight);
 
-	TermView *view = _ActiveTermView();
+	TermView* view = _ActiveTermView();
 	PrefHandler::Default()->setInt32(PREF_COLS, view->Columns());
 	PrefHandler::Default()->setInt32(PREF_ROWS, view->Rows());
 }
@@ -1009,7 +1008,8 @@ TermWindow::_ResizeView(TermView *view)
 		minimumHeight + MIN_ROWS * fontHeight - 1,
 		minimumHeight + MAX_ROWS * fontHeight - 1);
 
-	float width, height;
+	float width;
+	float height;
 	view->Parent()->GetPreferredSize(&width, &height);
 	width += B_V_SCROLL_BAR_WIDTH;
 		// NOTE: Width is one pixel too small, since the scroll view
@@ -1026,7 +1026,7 @@ TermWindow::_ResizeView(TermView *view)
 BMenu*
 TermWindow::_MakeWindowSizeMenu()
 {
-	BMenu *menu = new (std::nothrow) BMenu(B_TRANSLATE("Window size"));
+	BMenu* menu = new (std::nothrow) BMenu(B_TRANSLATE("Window size"));
 	if (menu == NULL)
 		return NULL;
 
@@ -1043,7 +1043,7 @@ TermWindow::_MakeWindowSizeMenu()
 		int32 columns = windowSizes[i][0];
 		int32 rows = windowSizes[i][1];
 		snprintf(label, sizeof(label), "%ldx%ld", columns, rows);
-		BMessage *message = new BMessage(MSG_COLS_CHANGED);
+		BMessage* message = new BMessage(MSG_COLS_CHANGED);
 		message->AddInt32("columns", columns);
 		message->AddInt32("rows", rows);
 		menu->AddItem(new BMenuItem(label, message));
@@ -1091,7 +1091,7 @@ CustomTermView::CustomTermView(int32 rows, int32 columns, int32 argc, const char
 void
 CustomTermView::NotifyQuit(int32 reason)
 {
-	BWindow *window = Window();
+	BWindow* window = Window();
 	// TODO: If we got this from a view in a tab not currently selected,
 	// Window() will be NULL, as the view is detached.
 	// So we send the message to the first application window
@@ -1110,7 +1110,7 @@ CustomTermView::NotifyQuit(int32 reason)
 
 
 void
-CustomTermView::SetTitle(const char *title)
+CustomTermView::SetTitle(const char* title)
 {
 	dynamic_cast<TermWindow*>(Window())->SetSessionWindowTitle(this, title);
 }
