@@ -96,9 +96,7 @@ AddFilesToHaikuImage system bin : crashing_app ;
 # Make a symlink to home/config/bin/crash.
 AddSymlinkToHaikuImage home config bin : /bin/crashing_app : crash ;
 
-# Add timezone and keymap settings.
-AddSymlinkToHaikuImage home config settings
-	: /boot/system/data/timezones/Europe/Paris : timezone ;
+# Add keymap settings.
 AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
 
 # Adds the source directories src/kits/storage and src/tests/servers/debug
