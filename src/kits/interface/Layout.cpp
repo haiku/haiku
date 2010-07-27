@@ -19,7 +19,7 @@
 using std::nothrow;
 
 namespace {
-	const char* kLayoutItemField = "BLayout:_items";
+	const char* const kLayoutItemField = "BLayout:items";
 }
 
 

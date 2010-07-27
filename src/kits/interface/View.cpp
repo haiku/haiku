@@ -318,10 +318,10 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 
 // archiving constants
 namespace {
-	const char* kMinSizeField = "ViewLayoutData:minsize";
-	const char* kMaxSizeField = "ViewLayoutData:maxsize";
-	const char* kPreferredSizeField = "ViewLayoutData:prefsize";
-	const char* kAlignmentField = "ViewLayoutData:alignment";
+	const char* const kSizesField = "BView:sizes";
+		// kSizesField = {min, max, pref}
+	const char* const kAlignmentField = "BView:alignment";
+	const char* const kLayoutField = "BView:layout";
 }
 
 
@@ -345,15 +345,15 @@ struct BView::LayoutData {
 	status_t
 	AddDataToArchive(BMessage* archive)
 	{
-		status_t err = archive->AddSize(kMinSizeField, fMinSize);
+		status_t err = archive->AddSize(kSizesField, fMinSize);
 
 		if (err == B_OK)
-			err = archive->AddSize(kMaxSizeField, fMaxSize);
+			err = archive->AddSize(kSizesField, fMaxSize);
 
 		if (err == B_OK)
-			err = archive->AddSize(kPreferredSizeField, fPreferredSize);
-	
-		if (err == B_OK) 
+			err = archive->AddSize(kSizesField, fPreferredSize);
+
+		if (err == B_OK)
 			err = archive->AddAlignment(kAlignmentField, fAlignment);
 
 		return err;
@@ -362,9 +362,9 @@ struct BView::LayoutData {
 	void
 	PopulateFromArchive(BMessage* archive)
 	{
-		archive->FindSize(kMinSizeField, &fMinSize);
-		archive->FindSize(kMaxSizeField, &fMaxSize);
-		archive->FindSize(kPreferredSizeField, &fPreferredSize);
+		archive->FindSize(kSizesField, 0, &fMinSize);
+		archive->FindSize(kSizesField, 1, &fMaxSize);
+		archive->FindSize(kSizesField, 2, &fPreferredSize);
 		archive->FindAlignment(kAlignmentField, &fAlignment);
 	}
 
@@ -497,7 +497,7 @@ BView::BView(BMessage* archive)
 		int32 i = 0;
 		while (unarchiver.EnsureUnarchived("_views", i++) == B_OK)
 				;
-		unarchiver.EnsureUnarchived("_layout");
+		unarchiver.EnsureUnarchived(kLayoutField);
 
 	} else {
 		BMessage msg;
@@ -618,7 +618,7 @@ BView::Archive(BMessage* data, bool deep) const
 			ret = archiver.AddArchivable("_views", child, deep);
 
 		if (ret == B_OK)
-			ret = archiver.AddArchivable("_layout", GetLayout(), deep);
+			ret = archiver.AddArchivable(kLayoutField, GetLayout(), deep);
 	}
 
 	return archiver.Finish(ret);
@@ -643,12 +643,11 @@ BView::AllUnarchived(const BMessage* from)
 
 	if (err == B_OK) {
 		BLayout*& layout = fLayoutData->fLayout;
-		err = unarchiver.FindObject("_layout", layout);
+		err = unarchiver.FindObject(kLayoutField, layout);
 		if (err == B_OK && layout) {
 			fFlags |= B_SUPPORTS_LAYOUT;
 			fLayoutData->fLayout->BLayout::SetView(this);
 		}
-
 	}
 
 	return err;

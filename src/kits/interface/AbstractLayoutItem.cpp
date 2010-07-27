@@ -12,10 +12,9 @@
 
 
 namespace {
-	const char* kMinSizeField = "BAbstractLayoutItem:minSize";
-	const char* kMaxSizeField = "BAbstractLayoutItem:maxSize";
-	const char* kPreferredSizeField = "BAbstractLayoutItem:preferredSize";
-	const char* kAlignmentField = "BAbstractLayoutItem:alignment";
+	const char* const kSizesField = "BAbstractLayoutItem:sizes";
+		// kSizesField == {min, max, preferred}
+	const char* const kAlignmentField = "BAbstractLayoutItem:alignment";
 }
 
 
@@ -37,9 +36,9 @@ BAbstractLayoutItem::BAbstractLayoutItem(BMessage* from)
 	fPreferredSize(),
 	fAlignment()
 {
-	from->FindSize(kMinSizeField, &fMinSize);
-	from->FindSize(kMaxSizeField, &fMaxSize);
-	from->FindSize(kPreferredSizeField, &fPreferredSize);
+	from->FindSize(kSizesField, 0, &fMinSize);
+	from->FindSize(kSizesField, 1, &fMaxSize);
+	from->FindSize(kSizesField, 2, &fPreferredSize);
 	from->FindAlignment(kAlignmentField, &fAlignment);
 }
 
@@ -140,13 +139,13 @@ BAbstractLayoutItem::Archive(BMessage* into, bool deep) const
 	status_t err = BLayoutItem::Archive(into, deep);
 
 	if (err == B_OK)
-		err = into->AddSize(kMinSizeField, fMinSize);
+		err = into->AddSize(kSizesField, fMinSize);
 
 	if (err == B_OK)
-		err = into->AddSize(kMaxSizeField, fMaxSize);
+		err = into->AddSize(kSizesField, fMaxSize);
 
 	if (err == B_OK)
-		err = into->AddSize(kPreferredSizeField, fPreferredSize);
+		err = into->AddSize(kSizesField, fPreferredSize);
 
 	if (err == B_OK)
 		err = into->AddAlignment(kAlignmentField, fAlignment);

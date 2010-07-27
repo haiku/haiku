@@ -31,18 +31,14 @@ namespace {
 	// a placeholder we put in our grid array to make a cell occupied
 	BLayoutItem* const OCCUPIED_GRID_CELL = (BLayoutItem*)0x1;
 
-	const char* kRowCountField = "gridlayout:rowcount";
-	const char* kRowMinSizeField = "gridlayout:rowminsize";
-	const char* kRowMaxSizeField = "gridlayout:rowmaxsize";
-	const char* kRowWeightField = "gridlayout:rowweight";
-	const char* kColumnCountField = "gridlayout:columncount";
-	const char* kColumnMinSizeField = "gridlayout:columnminsize";
-	const char* kColumnMaxSizeField = "gridlayout:columnmaxsize";
-	const char* kColumnWeightField = "gridlayout:columnweight";
-	const char* kItemHeight = "gridlayout:item:height";
-	const char* kItemWidth = "gridlayout:item:width";
-	const char* kItemX = "gridlayout:item:x";
-	const char* kItemY = "gridlayout:item:y";
+	const char* const kRowSizesField = "BGridLayout:rowsizes";
+		// kRowSizesField = {min, max}
+	const char* const kRowWeightField = "BGridLayout:rowweight";
+	const char* const kColumnSizesField = "BGridLayout:columnsizes";
+		// kColumnSizesField = {min, max}
+	const char* const kColumnWeightField = "BGridLayout:columnweight";
+	const char* const kItemDimensionsField = "BGridLayout:item:dimensions";
+		// kItemDimensionsField = {x, y, width, height}
 }
 
 
@@ -179,15 +175,12 @@ BGridLayout::BGridLayout(BMessage* from)
 	fMultiColumnItems(0),
 	fMultiRowItems(0)
 {
-	int32 rows;
-	int32 columns;
 	BUnarchiver unarchiver(from);
+	int32 columns;
+	from->GetInfo(kColumnWeightField, NULL, &columns);
 
-	if (from->FindInt32(kRowCountField, &rows) != B_OK)
-		fRowCount = 0;
-
-	if (from->FindInt32(kColumnCountField, &columns) != B_OK)
-		fColumnCount = 0;
+	int32 rows;
+	from->GetInfo(kRowWeightField, NULL, &rows);
 
 	// sets fColumnCount && fRowCount on success
 	if (!_ResizeGrid(columns, rows)) {
@@ -200,10 +193,10 @@ BGridLayout::BGridLayout(BMessage* from)
 		if (from->FindFloat(kRowWeightField, i, &getter) == B_OK)
 			fRowInfos->SetWeight(i, getter);
 
-		if (from->FindFloat(kRowMinSizeField, i, &getter) == B_OK)
+		if (from->FindFloat(kRowSizesField, i * 2, &getter) == B_OK)
 			fRowInfos->SetMinSize(i, getter);
 
-		if (from->FindFloat(kRowMaxSizeField, i, &getter) == B_OK)
+		if (from->FindFloat(kRowSizesField, i * 2 + 1, &getter) == B_OK)
 			fRowInfos->SetMaxSize(i, getter);
 	}
 
@@ -212,10 +205,10 @@ BGridLayout::BGridLayout(BMessage* from)
 		if (from->FindFloat(kColumnWeightField, i, &getter) == B_OK)
 			fColumnInfos->SetWeight(i, getter);
 
-		if (from->FindFloat(kColumnMinSizeField, i, &getter) == B_OK)
+		if (from->FindFloat(kColumnSizesField, i * 2, &getter) == B_OK)
 			fColumnInfos->SetMinSize(i, getter);
 
-		if (from->FindFloat(kColumnMaxSizeField, i, &getter) == B_OK)
+		if (from->FindFloat(kColumnSizesField, i * 2 + 1, &getter) == B_OK)
 			fColumnInfos->SetMaxSize(i, getter);
 	}
 }
@@ -467,25 +460,20 @@ BGridLayout::Archive(BMessage* into, bool deep) const
 	BArchiver archiver(into);
 	status_t err = BTwoDimensionalLayout::Archive(into, deep);
 
-	if (err == B_OK)
-		err = into->AddInt32(kRowCountField, fRowCount);
-	if (err == B_OK)
-		err = into->AddInt32(kColumnCountField, fColumnCount);
-
 	for (int32 i = 0; i < fRowCount && err == B_OK; i++) {
 		err = into->AddFloat(kRowWeightField, fRowInfos->Weight(i));
 		if (err == B_OK)
-			err = into->AddFloat(kRowMinSizeField, fRowInfos->MinSize(i));
+			err = into->AddFloat(kRowSizesField, fRowInfos->MinSize(i));
 		if (err == B_OK)
-			err = into->AddFloat(kRowMaxSizeField, fRowInfos->MaxSize(i));
+			err = into->AddFloat(kRowSizesField, fRowInfos->MaxSize(i));
 	}
 
 	for (int32 i = 0; i < fColumnCount && err == B_OK; i++) {
-		err = into->AddFloat(kColumnWeightField, fRowInfos->Weight(i));
+		err = into->AddFloat(kColumnWeightField, fColumnInfos->Weight(i));
 		if (err == B_OK)
-			err = into->AddFloat(kColumnMinSizeField, fRowInfos->MinSize(i));
+			err = into->AddFloat(kColumnSizesField, fColumnInfos->MinSize(i));
 		if (err == B_OK)
-			err = into->AddFloat(kColumnMaxSizeField, fRowInfos->MaxSize(i));
+			err = into->AddFloat(kColumnSizesField, fColumnInfos->MaxSize(i));
 	}
 
 	return archiver.Finish(err);
@@ -508,13 +496,13 @@ BGridLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
 	if (!data) // TODO: remove this check once AddItem() returns a bool
 		return B_ERROR;
 
-	status_t err = into->AddInt32(kItemX, data->dimensions.x);
+	status_t err = into->AddInt32(kItemDimensionsField, data->dimensions.x);
 	if (err == B_OK)
-		err = into->AddInt32(kItemY, data->dimensions.y);
+		err = into->AddInt32(kItemDimensionsField, data->dimensions.y);
 	if (err == B_OK)
-		err = into->AddInt32(kItemWidth, data->dimensions.width);
+		err = into->AddInt32(kItemDimensionsField, data->dimensions.width);
 	if (err == B_OK)
-		err = into->AddInt32(kItemHeight, data->dimensions.height);
+		err = into->AddInt32(kItemDimensionsField, data->dimensions.height);
 
 	return err;
 }
@@ -531,26 +519,33 @@ BGridLayout::ItemUnarchived(const BMessage* from,
 	}
 
 	Dimensions& dimensions = data->dimensions;
-	status_t err = from->FindInt32(kItemX, index, &dimensions.x);
+	index *= 4;
+		// each item stores 4 int32s into kItemDimensionsField
+	status_t err = from->FindInt32(kItemDimensionsField, index, &dimensions.x);
 	if (err == B_OK)
-		err = from->FindInt32(kItemY, index, &dimensions.y);
+		err = from->FindInt32(kItemDimensionsField, ++index, &dimensions.y);
 
 	if (err == B_OK)
-		err = from->FindInt32(kItemWidth, index, &dimensions.width);
+		err = from->FindInt32(kItemDimensionsField, ++index, &dimensions.width);
 
-	if (err == B_OK)
-		err = from->FindInt32(kItemHeight, index, &dimensions.height);
+	if (err == B_OK) {
+		err = from->FindInt32(kItemDimensionsField,
+			++index, &dimensions.height);
+	}
 
-	if (err == B_OK && !_AreGridCellsEmpty(dimensions.x, dimensions.y,
+	if (err != B_OK)
+		return err;
+
+	if (!_AreGridCellsEmpty(dimensions.x, dimensions.y,
 		dimensions.width, dimensions.height))
-		err = B_BAD_DATA;
+		return B_BAD_DATA;
 
-	if (err == B_OK && !_InsertItemIntoGrid(item))
-		err = B_NO_MEMORY;
+	if (!_InsertItemIntoGrid(item))
+		return B_NO_MEMORY;
 
-	if (err == B_OK && dimensions.width > 1)
+	if (dimensions.width > 1)
 		fMultiColumnItems++;
-	if (err == B_OK && dimensions.height > 1)
+	if (dimensions.height > 1)
 		fMultiRowItems++;
 
 	return err;

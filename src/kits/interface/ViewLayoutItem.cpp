@@ -14,7 +14,7 @@
 
 
 namespace {
-	const char* kViewField = "ViewLayoutItem:view";
+	const char* const kViewField = "BViewLayoutItem:view";
 }
 
 

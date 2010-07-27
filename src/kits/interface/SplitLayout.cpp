@@ -20,15 +20,12 @@
 
 // archivng constants
 namespace {
-	const char* kInfoCollapsibleField = "BSplitLayout::info::collapsible";
-	const char* kInfoWeightField = "BSplitLayout::info::weight";
-	const char* kSpacingField = "BSplitLayout::spacing";
-	const char* kSplitterSizeField = "BSplitLayout::splitterSize";
-	const char* kIsVerticalField = "BSplitLayout::vertical";
-	const char* kTopInsetField = "BSplitLayout::TopInset";
-	const char* kBottomInsetField = "BSplitLayout::BottomInset";
-	const char* kLeftInsetField = "BSplitLayout::LeftInset";
-	const char* kRightInsetField = "BSplitLayout::RightInset";
+	const char* const kItemCollapsibleField = "BSplitLayout:item:collapsible";
+	const char* const kItemWeightField = "BSplitLayout:item:weight";
+	const char* const kSpacingField = "BSplitLayout:spacing";
+	const char* const kSplitterSizeField = "BSplitLayout:splitterSize";
+	const char* const kIsVerticalField = "BSplitLayout:vertical";
+	const char* const kInsetsField = "BSplitLayout:insets";
 }
 
 
@@ -196,7 +193,7 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 
 BSplitLayout::BSplitLayout(BMessage* from)
 	:
-	BLayout(from),
+	BLayout(BUnarchiver::PrepareArchive(from)),
 	fSplitterItems(),
 	fVisibleItems(),
 	fMin(),
@@ -225,16 +222,29 @@ BSplitLayout::BSplitLayout(BMessage* from)
 	fDraggingCurrentValue(0),
 	fDraggingSplitterIndex(-1)
 {
+	BUnarchiver unarchiver(from);
+
 	bool isVertical;
-	from->FindBool(kIsVerticalField, &isVertical);
+	status_t err = from->FindBool(kIsVerticalField, &isVertical);
+	if (err != B_OK) {
+		unarchiver.Finish(err);
+		return;
+	}
 	fOrientation = (isVertical) ? B_VERTICAL : B_HORIZONTAL ;
 
-	from->FindFloat(kLeftInsetField, &fLeftInset);
-	from->FindFloat(kRightInsetField, &fRightInset);
-	from->FindFloat(kTopInsetField, &fTopInset);
-	from->FindFloat(kBottomInsetField, &fBottomInset);
-	from->FindFloat(kSplitterSizeField, &fSplitterSize);
-	from->FindFloat(kSpacingField, &fSpacing);
+	BRect insets;
+	err = from->FindRect(kInsetsField, &insets);
+	if (err != B_OK) {
+		unarchiver.Finish(err);
+		return;
+	}
+	SetInsets(insets.left, insets.top, insets.right, insets.bottom);
+
+	err = from->FindFloat(kSplitterSizeField, &fSplitterSize);
+	if (err == B_OK)
+		err = from->FindFloat(kSpacingField, &fSpacing);
+
+	unarchiver.Finish(err);
 }
 
 
@@ -702,19 +712,12 @@ BSplitLayout::Archive(BMessage* into, bool deep) const
 	status_t err = BLayout::Archive(into, deep);
 
 	if (err == B_OK)
-		into->AddBool(kIsVerticalField, fOrientation == B_VERTICAL);
+		err = into->AddBool(kIsVerticalField, fOrientation == B_VERTICAL);
 
-	if (err == B_OK)
-		err = into->AddFloat(kLeftInsetField, fLeftInset);
-
-	if (err == B_OK)
-		err = into->AddFloat(kRightInsetField, fRightInset);
-
-	if (err == B_OK)
-		err = into->AddFloat(kTopInsetField, fTopInset);
-
-	if (err == B_OK)
-		err = into->AddFloat(kBottomInsetField, fBottomInset);
+	if (err == B_OK) {
+		BRect insets(fLeftInset, fTopInset, fRightInset, fBottomInset);
+		err = into->AddRect(kInsetsField, insets);
+	}
 
 	if (err == B_OK)
 		err = into->AddFloat(kSplitterSizeField, fSplitterSize);
@@ -743,9 +746,9 @@ BSplitLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
 	if (!info) // TODO: remove this check when AddItem() returns a bool
 		return B_ERROR;
 
-	status_t err = into->AddFloat(kInfoWeightField, info->weight);
+	status_t err = into->AddFloat(kItemWeightField, info->weight);
 	if (err == B_OK)
-		err = into->AddBool(kInfoCollapsibleField, info->isCollapsible);
+		err = into->AddBool(kItemCollapsibleField, info->isCollapsible);
 
 	return err;
 }
@@ -756,11 +759,11 @@ BSplitLayout::ItemUnarchived(const BMessage* from,
 	BLayoutItem* item, int32 index)
 {
 	ItemLayoutInfo* info = _ItemLayoutInfo(item);
-	status_t err = from->FindFloat(kInfoWeightField, index, &info->weight);
+	status_t err = from->FindFloat(kItemWeightField, index, &info->weight);
 
 	if (err == B_OK) {
 		bool* collapsible = &info->isCollapsible;
-		err = from->FindBool(kInfoCollapsibleField, index, collapsible);
+		err = from->FindBool(kItemCollapsibleField, index, collapsible);
 	}
 	return err;
 }

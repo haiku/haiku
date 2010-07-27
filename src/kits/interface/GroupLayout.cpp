@@ -14,8 +14,8 @@
 
 
 namespace {
-	const char* kWeightField = "BGroupLayoutData:weight";
-	const char* kVerticalField = "BGroupLayout:vertical";
+	const char* const kItemWeightField = "BGroupLayout:item:weight";
+	const char* const kVerticalField = "BGroupLayout:vertical";
 }
 
 
@@ -219,7 +219,7 @@ BGroupLayout::ItemArchived(BMessage* into,
 	if (!data) // TODO: remove this once ItemAdded() returns a bool
 		return B_BAD_VALUE;
 
-	return into->AddFloat(kWeightField, data->weight);
+	return into->AddFloat(kItemWeightField, data->weight);
 }
 
 
@@ -228,7 +228,7 @@ BGroupLayout::ItemUnarchived(const BMessage* from,
 	BLayoutItem* item, int32 index)
 {
 	float weight;
-	status_t err = from->FindFloat(kWeightField, index, &weight);
+	status_t err = from->FindFloat(kItemWeightField, index, &weight);
 
 	if (err == B_OK)
 		_LayoutDataForItem(item)->weight = weight;

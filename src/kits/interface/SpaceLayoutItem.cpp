@@ -13,12 +13,11 @@
 
 
 namespace {
-	const char* kMinSizeField = "BSpaceLayoutItem:minsize";
-	const char* kMaxSizeField = "BSpaceLayoutItem:maxsize";
-	const char* kPreferredSizeField = "BSpaceLayoutItem:prefsize";
-	const char* kAlignmentField = "BSpaceLayoutItem:alignment";
-	const char* kFrameField = "BSpaceLayoutItem:frame";
-	const char* kVisibleField = "BSpaceLayoutItem:visible";
+	const char* const kSizesField = "BSpaceLayoutItem:sizes";
+		// kSizesField = {min, max, preferred}
+	const char* const kAlignmentField = "BSpaceLayoutItem:alignment";
+	const char* const kFrameField = "BSpaceLayoutItem:frame";
+	const char* const kVisibleField = "BSpaceLayoutItem:visible";
 }
 
 
@@ -39,9 +38,9 @@ BSpaceLayoutItem::BSpaceLayoutItem(BMessage* archive)
 	:
 	BLayoutItem(archive)
 {
-	archive->FindSize(kMinSizeField, &fMinSize);
-	archive->FindSize(kMaxSizeField, &fMaxSize);
-	archive->FindSize(kPreferredSizeField, &fPreferredSize);
+	archive->FindSize(kSizesField, 0, &fMinSize);
+	archive->FindSize(kSizesField, 1, &fMaxSize);
+	archive->FindSize(kSizesField, 2, &fPreferredSize);
 
 	archive->FindAlignment(kAlignmentField, &fAlignment);
 
@@ -201,13 +200,13 @@ BSpaceLayoutItem::Archive(BMessage* into, bool deep) const
 		err = into->AddRect(kFrameField, fFrame);
 
 	if (err == B_OK)
-		err = into->AddSize(kMinSizeField, fMinSize);
+		err = into->AddSize(kSizesField, fMinSize);
 
 	if (err == B_OK)
-		err = into->AddSize(kMaxSizeField, fMaxSize);
+		err = into->AddSize(kSizesField, fMaxSize);
 
 	if (err == B_OK)
-		err = into->AddSize(kPreferredSizeField, fPreferredSize);
+		err = into->AddSize(kSizesField, fPreferredSize);
 
 	if (err == B_OK)
 		err = into->AddAlignment(kAlignmentField, fAlignment);

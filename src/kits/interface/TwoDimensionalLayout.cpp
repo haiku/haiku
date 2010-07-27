@@ -22,11 +22,6 @@
 #include "SimpleLayouter.h"
 
 
-// Archiving constants
-namespace {
-	const char* kHAlignedLayoutField = "B2DLayout:halignedlayout";
-	const char* kVAlignedLayoutField = "B2DLayout:valignedlayout";
-}
 
 
 // Some words of explanation:
@@ -238,12 +233,13 @@ private:
 
 // archiving constants
 namespace {
-	const char* kLeftInsetField = "B2Dlayout:leftInset";
-	const char* kRightInsetField = "B2Dlayout:rightInset";
-	const char* kTopInsetField = "B2Dlayout:topInset";
-	const char* kBottomInsetField = "B2Dlayout:bottomInset";
-	const char* kHSpacingField = "B2Dlayout:hspacing";
-	const char* kVSpacingField = "B2Dlayout:vspacing";
+	const char* const kHAlignedLayoutField = "BTwoDimensionalLayout:"
+		"halignedlayout";
+	const char* const kVAlignedLayoutField = "BTwoDimensionalLayout:"
+		"valignedlayout";
+	const char* const kInsetsField = "BTwoDimensionalLayout:insets";
+	const char* const kSpacingField = "BTwoDimensionalLayout:spacing";
+		// kSpacingField = {fHSpacing, fVSpacing}
 }
 
 
@@ -271,18 +267,12 @@ BTwoDimensionalLayout::BTwoDimensionalLayout(BMessage* from)
 	fVSpacing(0),
 	fLocalLayouter(new LocalLayouter(this))
 {
-	float leftInset;
-	float rightInset;
-	float topInset;
-	float bottomInset;
-	if (from->FindFloat(kLeftInsetField, &leftInset) == B_OK
-		&& from->FindFloat(kRightInsetField, &rightInset) == B_OK
-		&& from->FindFloat(kTopInsetField, &topInset) == B_OK
-		&& from->FindFloat(kBottomInsetField, &bottomInset) == B_OK)
-		SetInsets(leftInset, topInset, rightInset, bottomInset);
+	BRect insets;
+	from->FindRect(kInsetsField, &insets);
+	SetInsets(insets.left, insets.top, insets.right, insets.bottom);
 
-	from->FindFloat(kHSpacingField, &fHSpacing);
-	from->FindFloat(kVSpacingField, &fVSpacing);
+	from->FindFloat(kSpacingField, 0, &fHSpacing);
+	from->FindFloat(kSpacingField, 1, &fVSpacing);
 }
 
 
@@ -454,23 +444,16 @@ BTwoDimensionalLayout::Archive(BMessage* into, bool deep) const
 	BArchiver archiver(into);
 	status_t err = BLayout::Archive(into, deep);
 
-	if (err == B_OK)
-		err = into->AddFloat(kLeftInsetField, fLeftInset);
+	if (err == B_OK) {
+		BRect insets(fLeftInset, fTopInset, fRightInset, fBottomInset);
+		err = into->AddRect(kInsetsField, insets);
+	}
 
 	if (err == B_OK)
-		err = into->AddFloat(kRightInsetField, fRightInset);
+		err = into->AddFloat(kSpacingField, fHSpacing);
 
 	if (err == B_OK)
-		err = into->AddFloat(kTopInsetField, fTopInset);
-
-	if (err == B_OK)
-		err = into->AddFloat(kBottomInsetField, fBottomInset);
-
-	if (err == B_OK)
-		err = into->AddFloat(kHSpacingField, fHSpacing);
-
-	if (err == B_OK)
-		err = into->AddFloat(kVSpacingField, fVSpacing);
+		err = into->AddFloat(kSpacingField, fVSpacing);
 
 	return archiver.Finish(err);
 }
