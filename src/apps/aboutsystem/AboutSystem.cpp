@@ -1692,7 +1692,7 @@ MemSizeToString(char string[], size_t size, system_info* info)
 		* (B_PAGE_SIZE / 1048576.0f) + 0.5f);
 	if (inaccessibleMemory > 0) {
 		BString message(B_TRANSLATE("%total MiB total, %inaccessible MiB "
-			"inacessible"));
+			"inaccessible"));
 
 		snprintf(string, size, "%d", int((info->max_pages
 			+ info->ignored_pages) * (B_PAGE_SIZE / 1048576.0f) + 0.5f));
