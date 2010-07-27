@@ -96,48 +96,6 @@ rule FSplitPath
 	return $(components) ;
 }
 
-rule FTimeZoneBinaries
-{
-	local sources = $(1:G=timezone-source) ;
-	local locate = $(2) ;
-	local setRelativeTimezoneDir = $(3) ;
-
-	local gristedBinaries ;
-
-	local source ;
-	for source in $(sources) {
-		local binaries = [ on $(source) return $(TZ_OBJECTS) ] ;
-
-		local targetDir = [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR)
-			data timezones ] ;
-
-		local binary ;
-		for binary in $(binaries) {
-			local dir = $(binary:D) ;
-			if $(dir) {
-				binary = $(binary:BSG=timezone!$(dir)) ;
-				if $(locate) {
-					LOCATE on $(binary) = [ FDirName $(targetDir) $(dir) ] ;
-				}
-			} else {
-				binary = $(binary:BSG=timezone) ;
-				if $(locate) {
-					LOCATE on $(binary) = $(targetDir) ;
-				}
-			}
-
-			if $(setRelativeTimezoneDir) {
-				RELATIVE_TIMEZONE_DIR on $(binary) = $(dir) ;
-			}
-
-			gristedBinaries += $(binary) ;
-		}
-	}
-
-	return $(gristedBinaries) ;
-}
-
-
 rule SetPlatformCompatibilityFlagVariables
 {
 	# SetPlatformCompatibilityFlagVariables <platform var> : <var prefix>

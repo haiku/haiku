@@ -82,22 +82,19 @@ HAIKU_DEFAULT_ANYBOOT_LABEL ?= Haiku ;
 ProcessCommandLineArguments ;
 
 
-# include Timezones/libgccObjects
+# include libgccObjects
 {
-	local timezones = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : Timezones ] ;
 	local libgccObjects = [ GLOB $(HAIKU_BUILD_OUTPUT_DIR) : libgccObjects ] ;
 
-	if ! ( $(timezones) && $(libgccObjects) ) {
-		ECHO "No `Timezones' or `libgccObjects' found in"
+	if ! $(libgccObjects) {
+		ECHO "No `libgccObjects' found in"
 			"$(HAIKU_BUILD_OUTPUT_DIR)!" ;
 		EXIT "Please run ./configure in the source tree's root directory"
 			"again!" ;
 	}
 
-	LOCATE on Timezones = $(HAIKU_BUILD_OUTPUT_DIR) ;
 	LOCATE on libgccObjects = $(HAIKU_BUILD_OUTPUT_DIR) ;
 
-	include Timezones ;
 	include libgccObjects ;
 }
 

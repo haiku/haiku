@@ -465,12 +465,6 @@ local keyboardLayoutsDir
 local keyboardLayouts = [ Glob $(keyboardLayoutsDir) : [^.]* ] ;
 AddFilesToHaikuImage system data KeyboardLayouts : $(keyboardLayouts) ;
 
-local timezones = [ FTimeZoneBinaries $(HAIKU_TIME_ZONE_SOURCES) : : true ] ;
-for timezone in $(timezones) {
-	local dir = [ on $(timezone) return $(RELATIVE_TIMEZONE_DIR) ] ;
-	AddFilesToHaikuImage system data timezones $(dir) : $(timezone) ;
-}
-
 local driverSettingsFiles = <driver-settings>kernel ;
 SEARCH on $(driverSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings kernel drivers ] ;
