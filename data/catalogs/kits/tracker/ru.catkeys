@@ -1,6 +1,6 @@
 1	russian	x-vnd.Haiku-libtracker	869545223
 Sorry, you can't save things at the root of your system.	libtracker		Извините, невозможно сохранять объекты в корневом каталоге системы.
-%capacity GB (%used MB used -- %free MB free)	libtracker		%capacity ГБ (%used МБ занято -- %free МБ свободно)
+%capacity (%used used -- %free free)	libtracker		%capacity (%used занято -- %free свободно)
 Empty Trash	libtracker		Очистить Корзину
 Recent folders	libtracker		Последние папки
 You cannot copy or move the root directory.	libtracker		Невозможно переместить или скопировать корневой каталог.
@@ -296,7 +296,6 @@ The specified name is illegal. Please choose another name.	libtracker		Введ�
 of %items	libtracker		из %items
 Day-month-year	libtracker		День-месяц-год
 Preparing to empty Trash…	libtracker		Подготовка к очистке Корзины...
-%capacity MB (%used MB used -- %free MB free)	libtracker		%capacity МБ (%used MБ занято -- %free MБ свободно)
 If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		Если Вы %action папку system или её содержимое, Haiku больше не сможет загружаться! Вы уверены, что хотите сделать это? Чтобы %action папку system или её содержимое, зажмите клавишу Shift и нажмите \"Выполнить!\".
 Kind:	libtracker		Тип:
 Replace	libtracker		Заменить
