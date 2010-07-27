@@ -654,19 +654,19 @@ BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 
 	// when we show the byte size, format it with a thousands delimiter (comma)
 	// TODO: use BCountry::FormatNumber
-	if (size >= kKBSize) {		
+	if (size >= kKBSize) {
 		char numStr[128];
 		snprintf(numStr, sizeof(numStr), "%Ld", size);
 		BString bytes;
-	
+
 		uint32 length = strlen(numStr);
 		if (length >= 4) {
 			uint32 charsTillComma = length % 3;
 			if (charsTillComma == 0)
 				charsTillComma = 3;
-	
+
 			uint32 numberIndex = 0;
-	
+
 			while (numStr[numberIndex]) {
 				bytes += numStr[numberIndex++];
 				if (--charsTillComma == 0 && numStr[numberIndex]) {
@@ -675,7 +675,7 @@ BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 				}
 			}
 		}
-		
+
 		result << " " << B_TRANSLATE("(%bytes bytes)");
 			// "bytes" translation could come from string_for_size
 			// which could be part of the localekit itself
@@ -1206,7 +1206,7 @@ AttributeView::MouseDown(BPoint point)
 {
 	BEntry entry;
 	fModel->GetEntry(&entry);
-	
+
 	// Assume this isn't part of a double click
 	fDoubleClick = false;
 
@@ -1546,16 +1546,11 @@ AttributeView::CheckAndSetSize()
 		fFreeBytes = freeBytes;
 
 		char capacityStr[16], usedStr[16], freeStr[16];
-		sprintf(usedStr, "%.1f", (float)(capacity - fFreeBytes) / kMBSize);
-		sprintf(freeStr, "%.1f", (float)fFreeBytes / kMBSize);
+		string_for_size(capacity, capacityStr, sizeof(capacityStr));
+		string_for_size(capacity - fFreeBytes, usedStr, sizeof(usedStr));
+		string_for_size(fFreeBytes, freeStr, sizeof(freeStr));
 
-		if (capacity >= kGBSize) {
-			fSizeStr.SetTo(B_TRANSLATE("%capacity GB (%used MB used -- %free MB free)"));
-			sprintf(capacityStr, "%.1f", (float)capacity / kGBSize);
-		} else {
-			fSizeStr.SetTo(B_TRANSLATE("%capacity MB (%used MB used -- %free MB free)"));
-			sprintf(capacityStr, "%.1f", (float)capacity / kMBSize);
-		}
+		fSizeStr.SetTo(B_TRANSLATE("%capacity (%used used -- %free free)"));
 		fSizeStr.ReplaceFirst("%capacity", capacityStr);
 		fSizeStr.ReplaceFirst("%used", usedStr);
 		fSizeStr.ReplaceFirst("%free", freeStr);
