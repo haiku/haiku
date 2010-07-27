@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TEXT_CONTROL_H
@@ -36,6 +36,8 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
+	virtual	status_t			AllArchived(BMessage* into) const;
+	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual	void				SetText(const char* text);
 			const char*			Text() const;
@@ -117,8 +119,9 @@ private:
 			void				_CommitValue();
 			void				_UpdateTextViewColors(bool enabled);
 			void				_InitData(const char* label,
-									const char* initialText,
-									BMessage* archive = NULL);
+									const BMessage* archive = NULL);
+			void				_InitText(const char* initialText,
+									const BMessage* archive = NULL);
 			void				_ValidateLayout();
 			void				_LayoutTextView();
 			void				_UpdateFrame();

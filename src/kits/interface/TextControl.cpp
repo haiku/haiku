@@ -23,6 +23,7 @@
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
+#include <binary_compatibility/Support.h>
 
 #include "TextInput.h"
 
@@ -43,6 +44,13 @@
 #endif
 
 
+namespace {
+	const char* const kFrameField = "BTextControl:layoutitem:frame";
+	const char* const kTextViewItemField = "BTextControl:textViewItem";
+	const char* const kLabelItemField = "BMenuField:labelItem";
+}
+
+
 static property_info sPropertyList[] = {
 	{
 		"Value",
@@ -58,6 +66,7 @@ static property_info sPropertyList[] = {
 class BTextControl::LabelLayoutItem : public BAbstractLayoutItem {
 public:
 								LabelLayoutItem(BTextControl* parent);
+								LabelLayoutItem(BMessage* from);
 
 	virtual	bool				IsVisible();
 	virtual	void				SetVisible(bool visible);
@@ -65,6 +74,7 @@ public:
 	virtual	BRect				Frame();
 	virtual	void				SetFrame(BRect frame);
 
+			void				SetParent(BTextControl* parent);
 	virtual	BView*				View();
 
 	virtual	BSize				BaseMinSize();
@@ -72,6 +82,8 @@ public:
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
 
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
 private:
 			BTextControl*		fParent;
 			BRect				fFrame;
@@ -81,6 +93,7 @@ private:
 class BTextControl::TextViewLayoutItem : public BAbstractLayoutItem {
 public:
 								TextViewLayoutItem(BTextControl* parent);
+								TextViewLayoutItem(BMessage* from);
 
 	virtual	bool				IsVisible();
 	virtual	void				SetVisible(bool visible);
@@ -88,6 +101,7 @@ public:
 	virtual	BRect				Frame();
 	virtual	void				SetFrame(BRect frame);
 
+			void				SetParent(BTextControl* parent);
 	virtual	BView*				View();
 
 	virtual	BSize				BaseMinSize();
@@ -95,6 +109,8 @@ public:
 	virtual	BSize				BasePreferredSize();
 	virtual	BAlignment			BaseAlignment();
 
+	virtual status_t			Archive(BMessage* into, bool deep = true) const;
+	static	BArchivable*		Instantiate(BMessage* from);
 private:
 			BTextControl*		fParent;
 			BRect				fFrame;
@@ -103,11 +119,12 @@ private:
 
 struct BTextControl::LayoutData {
 	LayoutData(float width, float height)
-		: label_layout_item(NULL),
-		  text_view_layout_item(NULL),
-		  previous_width(width),
-		  previous_height(height),
-		  valid(false)
+		:
+		label_layout_item(NULL),
+		text_view_layout_item(NULL),
+		previous_width(width),
+		previous_height(height),
+		valid(false)
 	{
 	}
 
@@ -133,28 +150,34 @@ static const int32 kLabelInputSpacing = 3;
 
 BTextControl::BTextControl(BRect frame, const char* name, const char* label,
 		const char* text, BMessage* message, uint32 mask, uint32 flags)
-	: BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
+	:
+	BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
 {
-	_InitData(label, text);
+	_InitData(label);
+	_InitText(text);
 	_ValidateLayout();
 }
 
 
 BTextControl::BTextControl(const char* name, const char* label,
 		const char* text, BMessage* message, uint32 flags)
-	: BControl(name, label, message, flags | B_FRAME_EVENTS)
+	:
+	BControl(name, label, message, flags | B_FRAME_EVENTS)
 {
-	_InitData(label, text);
+	_InitData(label);
+	_InitText(text);
 	_ValidateLayout();
 }
 
 
 BTextControl::BTextControl(const char* label, const char* text,
 		BMessage* message)
-	: BControl(NULL, label, message,
+	:
+	BControl(NULL, label, message,
 		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
 {
-	_InitData(label, text);
+	_InitData(label);
+	_InitText(text);
 	_ValidateLayout();
 }
 
@@ -167,29 +190,27 @@ BTextControl::~BTextControl()
 
 
 BTextControl::BTextControl(BMessage* archive)
-	: BControl(archive)
+	:
+	BControl(BUnarchiver::PrepareArchive(archive))
 {
-	_InitData(Label(), NULL, archive);
+	BUnarchiver unarchiver(archive);
 
-	int32 labelAlignment = B_ALIGN_LEFT;
-	int32 textAlignment = B_ALIGN_LEFT;
+	_InitData(Label(), archive);
 
-	if (archive->HasInt32("_a_label"))
-		archive->FindInt32("_a_label", &labelAlignment);
+	if (!BUnarchiver::IsArchiveManaged(archive))
+		_InitText(NULL, archive);
 
-	if (archive->HasInt32("_a_text"))
-		archive->FindInt32("_a_text", &textAlignment);
-
-	SetAlignment((alignment)labelAlignment, (alignment)textAlignment);
-
+	status_t err = B_OK;
 	if (archive->HasFloat("_divide"))
-		archive->FindFloat("_divide", &fDivider);
+		err = archive->FindFloat("_divide", &fDivider);
 
-	if (archive->HasMessage("_mod_msg")) {
+	if (err == B_OK && archive->HasMessage("_mod_msg")) {
 		BMessage* message = new BMessage;
-		archive->FindMessage("_mod_msg", message);
+		err = archive->FindMessage("_mod_msg", message);
 		SetModificationMessage(message);
 	}
+
+	unarchiver.Finish(err);
 }
 
 
@@ -206,6 +227,7 @@ BTextControl::Instantiate(BMessage* archive)
 status_t
 BTextControl::Archive(BMessage *data, bool deep) const
 {
+	BArchiver archiver(data);
 	status_t ret = BControl::Archive(data, deep);
 	alignment labelAlignment, textAlignment;
 
@@ -221,7 +243,60 @@ BTextControl::Archive(BMessage *data, bool deep) const
 	if (ModificationMessage() && (ret == B_OK))
 		ret = data->AddMessage("_mod_msg", ModificationMessage());
 
-	return ret;
+	return archiver.Finish(ret);
+}
+
+
+status_t
+BTextControl::AllArchived(BMessage* into) const
+{
+	BArchiver archiver(into);
+	status_t err = B_OK;
+
+	if (archiver.IsArchived(fLayoutData->text_view_layout_item)) {
+		err = archiver.AddArchivable(kTextViewItemField,
+			fLayoutData->text_view_layout_item);
+	}
+
+	if (err == B_OK && archiver.IsArchived(fLayoutData->label_layout_item)) {
+		err = archiver.AddArchivable(kLabelItemField,
+			fLayoutData->label_layout_item);
+	}
+
+	return err;
+}
+
+
+status_t
+BTextControl::AllUnarchived(const BMessage* from)
+{
+	status_t err;
+	if ((err = BControl::AllUnarchived(from)) != B_OK)
+		return err;
+
+	_InitText(NULL, from);
+
+	BUnarchiver unarchiver(from);
+	if (unarchiver.IsInstantiated(kTextViewItemField)) {
+		err = unarchiver.FindObject(kTextViewItemField,
+			BUnarchiver::B_DONT_ASSUME_OWNERSHIP,
+			fLayoutData->text_view_layout_item);
+
+		if (err == B_OK)
+			fLayoutData->text_view_layout_item->SetParent(this);
+		else
+			return err;
+	}
+
+	if (unarchiver.IsInstantiated(kLabelItemField)) {
+		err = unarchiver.FindObject(kLabelItemField,
+			BUnarchiver::B_DONT_ASSUME_OWNERSHIP,
+			fLayoutData->label_layout_item);
+
+		if (err == B_OK)
+			fLayoutData->label_layout_item->SetParent(this);
+	}
+	return err;
 }
 
 
@@ -548,7 +623,7 @@ BTextControl::SetFlags(uint32 flags)
 		if (flags & B_NAVIGABLE)
 			fText->SetFlags(fText->Flags() | B_NAVIGABLE);
 	}
-	
+
 	// Don't make this one navigable
 	flags &= ~B_NAVIGABLE;
 
@@ -583,13 +658,13 @@ BTextControl::MessageReceived(BMessage *message)
 				}
 			}
 		}
-		
+
 		if (handled) {
 			message->SendReply(&reply);
 			return;
 		}
 	}
-	
+
 	BControl::MessageReceived(message);
 }
 
@@ -900,6 +975,22 @@ BTextControl::Perform(perform_code code, void* _data)
 			BTextControl::DoLayout();
 			return B_OK;
 		}
+		case PERFORM_CODE_ALL_UNARCHIVED:
+		{
+			perform_data_all_unarchived* data
+				= (perform_data_all_unarchived*)_data;
+
+			data->return_value = BTextControl::AllUnarchived(data->archive);
+			return B_OK;
+		}
+		case PERFORM_CODE_ALL_ARCHIVED:
+		{
+			perform_data_all_archived* data
+				= (perform_data_all_archived*)_data;
+
+			data->return_value = BTextControl::AllArchived(data->archive);
+			return B_OK;
+		}
 	}
 
 	return BControl::Perform(code, _data);
@@ -956,8 +1047,7 @@ BTextControl::_CommitValue()
 
 
 void
-BTextControl::_InitData(const char* label, const char* initialText,
-	BMessage* archive)
+BTextControl::_InitData(const char* label, const BMessage* archive)
 {
 	BRect bounds(Bounds());
 
@@ -984,13 +1074,20 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		fDivider = floorf(bounds.Width() / 2.0f);
 
 	uint32 navigableFlags = Flags() & B_NAVIGABLE;
-	if (navigableFlags != 0) 	 
+	if (navigableFlags != 0)
 		BView::SetFlags(Flags() & ~B_NAVIGABLE);
 
+}
+
+
+void
+BTextControl::_InitText(const char* initialText, const BMessage* archive)
+{
 	if (archive)
 		fText = static_cast<BPrivate::_BTextInput_*>(FindView("_input_"));
 
 	if (fText == NULL) {
+		BRect bounds(Bounds());
 		BRect frame(fDivider, bounds.top, bounds.right, bounds.bottom);
 		// we are stroking the frame around the text view, which
 		// is 2 pixels wide
@@ -998,12 +1095,29 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		BRect textRect(frame.OffsetToCopy(B_ORIGIN));
 
 		fText = new BPrivate::_BTextInput_(frame, textRect,
-			B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | navigableFlags);
+			B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS
+			| (Flags() & B_NAVIGABLE));
 		AddChild(fText);
 
 		SetText(initialText);
 		fText->SetAlignment(B_ALIGN_LEFT);
 		fText->AlignTextRect();
+	}
+
+	// Although this is not strictly initializing the text view,
+	// it cannot be done while fText is NULL, so it resides here.
+	if (archive) {
+		int32 labelAlignment = B_ALIGN_LEFT;
+		int32 textAlignment = B_ALIGN_LEFT;
+
+		status_t err = B_OK;
+		if (archive->HasInt32("_a_label"))
+			err = archive->FindInt32("_a_label", &labelAlignment);
+
+		if (err == B_OK && archive->HasInt32("_a_text"))
+			err = archive->FindInt32("_a_text", &textAlignment);
+
+		SetAlignment((alignment)labelAlignment, (alignment)textAlignment);
 	}
 }
 
@@ -1125,9 +1239,20 @@ BTextControl::_ValidateLayoutData()
 
 
 BTextControl::LabelLayoutItem::LabelLayoutItem(BTextControl* parent)
-	: fParent(parent),
-	  fFrame()
+	:
+	fParent(parent),
+	fFrame()
 {
+}
+
+
+BTextControl::LabelLayoutItem::LabelLayoutItem(BMessage* from)
+	:
+	BAbstractLayoutItem(from),
+	fParent(NULL),
+	fFrame()
+{
+	from->FindRect(kFrameField, &fFrame);
 }
 
 
@@ -1157,6 +1282,13 @@ BTextControl::LabelLayoutItem::SetFrame(BRect frame)
 {
 	fFrame = frame;
 	fParent->_UpdateFrame();
+}
+
+
+void
+BTextControl::LabelLayoutItem::SetParent(BTextControl* parent)
+{
+	fParent = parent;
 }
 
 
@@ -1201,16 +1333,48 @@ BTextControl::LabelLayoutItem::BaseAlignment()
 }
 
 
+status_t
+BTextControl::LabelLayoutItem::Archive(BMessage* into, bool deep) const
+{
+	BArchiver archiver(into);
+	status_t err = BAbstractLayoutItem::Archive(into, deep);
+	if (err == B_OK)
+		err = into->AddRect(kFrameField, fFrame);
+
+	return archiver.Finish(err);
+}
+
+
+BArchivable*
+BTextControl::LabelLayoutItem::Instantiate(BMessage* from)
+{
+	if (validate_instantiation(from, "BTextControl::LabelLayoutItem"))
+		return new LabelLayoutItem(from);
+	return NULL;
+}
+
+
 // #pragma mark -
 
 
 BTextControl::TextViewLayoutItem::TextViewLayoutItem(BTextControl* parent)
-	: fParent(parent),
-	  fFrame()
+	:
+	fParent(parent),
+	fFrame()
 {
 	// by default the part right of the divider shall have an unlimited maximum
 	// width
 	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+}
+
+
+BTextControl::TextViewLayoutItem::TextViewLayoutItem(BMessage* from)
+	:
+	BAbstractLayoutItem(from),
+	fParent(NULL),
+	fFrame()
+{
+	from->FindRect(kFrameField, &fFrame);
 }
 
 
@@ -1240,6 +1404,13 @@ BTextControl::TextViewLayoutItem::SetFrame(BRect frame)
 {
 	fFrame = frame;
 	fParent->_UpdateFrame();
+}
+
+
+void
+BTextControl::TextViewLayoutItem::SetParent(BTextControl* parent)
+{
+	fParent = parent;
 }
 
 
@@ -1287,4 +1458,26 @@ BTextControl::TextViewLayoutItem::BaseAlignment()
 {
 	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 }
+
+
+status_t
+BTextControl::TextViewLayoutItem::Archive(BMessage* into, bool deep) const
+{
+	BArchiver archiver(into);
+	status_t err = BAbstractLayoutItem::Archive(into, deep);
+	if (err == B_OK)
+		err = into->AddRect(kFrameField, fFrame);
+
+	return archiver.Finish(err);
+}
+
+
+BArchivable*
+BTextControl::TextViewLayoutItem::Instantiate(BMessage* from)
+{
+	if (validate_instantiation(from, "BTextControl::TextViewLayoutItem"))
+		return new TextViewLayoutItem(from);
+	return NULL;
+}
+
 
