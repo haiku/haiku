@@ -374,5 +374,7 @@ TimeZoneView::SetTimeZone(const char *zone)
 {
 	putenv(BString("TZ=").Append(zone).String());
 	tzset();
+
+	be_locale_roster->SetDefaultTimeZone(zone);
 }
 

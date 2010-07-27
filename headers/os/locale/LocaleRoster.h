@@ -42,6 +42,7 @@ class BLocaleRoster {
 		status_t GetDefaultTimeZone(BTimeZone**timezone) const;
 
 		void SetDefaultCountry(BCountry *) const;
+		void SetDefaultTimeZone(const char* zone) const;
 		void UpdateSettings(BMessage* newSettings);
 
 		status_t GetLanguage(const char* languageCode, BLanguage** _language)

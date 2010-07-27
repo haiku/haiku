@@ -37,6 +37,7 @@
 
 // ICU includes
 #include <unicode/locid.h>
+#include <unicode/timezone.h>
 
 
 /*
@@ -541,6 +542,13 @@ BLocaleRoster::SetDefaultCountry(BCountry* newDefault) const
 	assert(lock.IsLocked());
 
 	gRosterData.fDefaultCountry = *newDefault;
+}
+
+
+void
+BLocaleRoster::SetDefaultTimeZone(const char* zone) const
+{
+	TimeZone::adoptDefault(TimeZone::createTimeZone(zone));
 }
 
 
