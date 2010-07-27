@@ -342,7 +342,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		/* get the conversion qualifier */
 
 		qualifier = -1;
-		if (format[0] == 'h' || format[0] == 'L') {
+		if (format[0] == 'h' || format[0] == 'L' || format[0] == 'z') {
 			qualifier = *format++;
 		} else if (format[0] == 'l')  {
 			format++;
@@ -453,13 +453,17 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 			num = va_arg(args, uint64);
 		else if (qualifier == 'l') {
 			num = va_arg(args, uint32);
-			if (flags & SIGN)
+			if ((flags & SIGN) != 0)
+				num = (ssize_t)num;
+		} else if (qualifier == 'z') {
+			num = va_arg(args, size_t);
+			if ((flags & SIGN) != 0)
 				num = (long)num;
 		} else if (qualifier == 'h') {
 			num = (unsigned short)va_arg(args, int);
-			if (flags & SIGN)
+			if ((flags & SIGN) != 0)
 				num = (short)num;
-		} else if (flags & SIGN)
+		} else if ((flags & SIGN) != 0)
 			num = va_arg(args, int);
 		else
 			num = va_arg(args, unsigned int);
