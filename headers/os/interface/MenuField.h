@@ -35,6 +35,8 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
+	virtual status_t			AllArchived(BMessage* into) const;
+	virtual status_t			AllUnarchived(const BMessage* from);
 
 	virtual	void				Draw(BRect update);
 	virtual	void				AttachedToWindow();
@@ -122,6 +124,7 @@ private:
 			void				_UpdateFrame();
 			void				_InitMenuBar(BMenu* menu,
 									BRect frame, bool fixedSize);
+			void				_InitMenuBar(const BMessage* archive);
 
 			void				_ValidateLayoutData();
 			float				_MenuBarOffset() const;
