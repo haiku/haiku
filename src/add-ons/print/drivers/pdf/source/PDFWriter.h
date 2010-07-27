@@ -125,6 +125,9 @@ class PDFWriter : public PrinterDriver, public PictureIterator {
 		void		DrawChar(uint16 unicode, const char *utf8, int16 size);
 		void		ClipChar(BFont* font, const char* unicode, const char *utf8, int16 size, float width);
 		bool   		EmbedFont(const char* n);
+		void		DeclareEncodingFiles();
+		void		DeclareEncodingFile(BPath* path, const char* id,
+				const char* name);
 		status_t	DeclareFonts();
 		void        RecordFont(const char* family, const char* style, float size);
 

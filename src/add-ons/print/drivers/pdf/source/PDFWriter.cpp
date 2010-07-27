@@ -35,6 +35,12 @@
 #include "Report.h"
 
 
+static const char* kEncodingDirectory = "PDF Writer";
+static const char* kSettingsDirectory = "PDF Writer";
+static const char* kBookmarksDirectory = "bookmarks";
+static const char* kCrossReferencesDirectory = "xrefs";
+
+
 PDFWriter::PDFWriter()
 	:
 	PrinterDriver(),
@@ -331,7 +337,7 @@ PDFWriter::InitWriter()
 	if (setCreator && JobFile()->ReadAttr("_spool/MimeType", B_STRING_TYPE, 0,
 			buffer, sizeof(buffer))) {
 		SetAttribute("Creator", buffer);
-	    ToPDFUnicode(buffer, s); PDF_set_info(fPdf, "Creator", s.String());
+		ToPDFUnicode(buffer, s); PDF_set_info(fPdf, "Creator", s.String());
 	}
 
 	int32 compression;
@@ -344,33 +350,12 @@ PDFWriter::InitWriter()
 	PDF_set_parameter(fPdf, "fontwarning", "false");
 	// PDF_set_parameter(fPdf, "native-unicode", "true");
 
-	REPORT(kDebug, 0, "Start of fonts declaration:");
+	REPORT(kDebug, 0, "Start of declarations:");
 
-	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc0==/boot/common/settings/PDF Writer/t1enc0.enc");
-	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc1==/boot/common/settings/PDF Writer/t1enc1.enc");
-	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc2==/boot/common/settings/PDF Writer/t1enc2.enc");
-	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc3==/boot/common/settings/PDF Writer/t1enc3.enc");
-	PDF_set_parameter(fPdf, "Encoding",
-		"t1enc4==/boot/common/settings/PDF Writer/t1enc4.enc");
-
-	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc0==/boot/common/settings/PDF Writer/ttenc0.cpg");
-	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc1==/boot/common/settings/PDF Writer/ttenc1.cpg");
-	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc2==/boot/common/settings/PDF Writer/ttenc2.cpg");
-	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc3==/boot/common/settings/PDF Writer/ttenc3.cpg");
-	PDF_set_parameter(fPdf, "Encoding",
-		"ttenc4==/boot/common/settings/PDF Writer/ttenc4.cpg");
-
+	DeclareEncodingFiles();
 	DeclareFonts();
 
-	REPORT(kDebug, fPage, "End of fonts declaration.");
+	REPORT(kDebug, fPage, "End of declarations.");
 
 	// Links
 	float width;
@@ -416,6 +401,40 @@ PDFWriter::InitWriter()
 }
 
 
+void
+PDFWriter::DeclareEncodingFiles()
+{
+	BPath prefix;
+	if (find_directory(B_SYSTEM_DATA_DIRECTORY, &prefix) != B_OK)
+		return;
+
+	DeclareEncodingFile(&prefix, "t1enc0", "t1enc0.enc");
+	DeclareEncodingFile(&prefix, "t1enc1", "t1enc1.enc");
+	DeclareEncodingFile(&prefix, "t1enc2", "t1enc2.enc");
+	DeclareEncodingFile(&prefix, "t1enc3", "t1enc3.enc");
+	DeclareEncodingFile(&prefix, "t1enc4", "t1enc4.enc");
+
+	DeclareEncodingFile(&prefix, "ttenc0", "ttenc0.cpg");
+	DeclareEncodingFile(&prefix, "ttenc1", "ttenc1.cpg");
+	DeclareEncodingFile(&prefix, "ttenc2", "ttenc2.cpg");
+	DeclareEncodingFile(&prefix, "ttenc3", "ttenc3.cpg");
+	DeclareEncodingFile(&prefix, "ttenc4", "ttenc4.cpg");
+}
+
+
+void
+PDFWriter::DeclareEncodingFile(BPath* prefix, const char* id, const char* name)
+{
+	BPath path(*prefix);
+	path.Append(kEncodingDirectory);
+	path.Append(name);
+
+	BString encodingDeclaration;
+	encodingDeclaration << id << "==" << path.Path();
+	PDF_set_parameter(fPdf, "Encoding", encodingDeclaration.String());
+}
+
+
 status_t
 PDFWriter::DeclareFonts()
 {
@@ -448,26 +467,32 @@ PDFWriter::DeclareFonts()
 bool
 PDFWriter::LoadBookmarkDefinitions(const char* name)
 {
-	// TODO: use B_USER_SETTINGS_DIRECTORY instead of hard coded constant
-	BString path("/boot/home/config/settings/PDF Writer/bookmarks/");
-	path.Append(name);
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+		return false;
 
-	return fBookmark->Read(path.String());
+	path.Append(kSettingsDirectory);
+	path.Append(kBookmarksDirectory);
+
+	return fBookmark->Read(path.Path());
 }
 
 
 bool
 PDFWriter::LoadXRefsDefinitions(const char* name)
 {
-	// TODO: use B_USER_SETTINGS_DIRECTORY instead of hard coded constant
-	BString path("/boot/home/config/settings/PDF Writer/xrefs/");
-	path.Append(name);
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
+		return false;
 
-	if (fXRefs->Read(path.String())) {
-		fXRefDests = new XRefDests(fXRefs->Count());
-		return true;
-	}
-	return false;
+	path.Append(kSettingsDirectory);
+	path.Append(kCrossReferencesDirectory);
+
+	if (!fXRefs->Read(path.Path()))
+		return false;
+
+	fXRefDests = new XRefDests(fXRefs->Count());
+	return true;
 }
 
 
