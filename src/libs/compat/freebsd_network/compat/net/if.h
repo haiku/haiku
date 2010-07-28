@@ -67,7 +67,6 @@ struct	ifreq {
 		struct sockaddr ifr_dstaddr;
 		struct sockaddr ifr_broadaddr;
 		struct sockaddr ifr_mask;
-		struct ifreq_parameter ifr_parameter;
 		struct ifreq_stats ifr_stats;
 		struct route_entry ifr_route;
 		int		ifr_flags;
