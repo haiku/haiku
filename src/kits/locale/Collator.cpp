@@ -120,7 +120,7 @@ BCollator::GetSortKey(const char *string, BString *key, int8 strength)
 	if (strength == B_COLLATE_DEFAULT)
 		strength = fStrength;
 	Collator::ECollationStrength icuStrength;
-	switch(strength) {
+	switch (strength) {
 		case B_COLLATE_PRIMARY:
 			icuStrength = Collator::PRIMARY;
 			break;
@@ -164,8 +164,7 @@ BCollator::GetSortKey(const char *string, BString *key, int8 strength)
 
 	if (error == U_ZERO_ERROR)
 		return B_OK;
-	else
-		return B_ERROR;
+	return B_ERROR;
 }
 
 
@@ -176,7 +175,7 @@ BCollator::Compare(const char *a, const char *b, int32 length, int8 strength)
 	if (strength == B_COLLATE_DEFAULT)
 		strength = fStrength;
 	Collator::ECollationStrength icuStrength;
-	switch(strength) {
+	switch (strength) {
 		case B_COLLATE_PRIMARY:
 			icuStrength = Collator::PRIMARY;
 			break;
@@ -228,8 +227,7 @@ BCollator::Archive(BMessage *archive, bool deep) const
 
 	if (error == U_ZERO_ERROR)
 		return status;
-	else
-		return B_ERROR;
+	return B_ERROR;
 }
 
 
