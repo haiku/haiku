@@ -15,10 +15,12 @@
 #include <ctype.h>
 
 #include <unicode/coll.h>
+#include <unicode/tblcoll.h>
 
 
 BCollator::BCollator()
 	:
+	fFallbackICUCollator(NULL),
 	fStrength(B_COLLATE_PRIMARY),
 	fIgnorePunctuation(true)
 {
@@ -34,6 +36,7 @@ BCollator::BCollator()
 BCollator::BCollator(const char *locale, int8 strength,
 	bool ignorePunctuation)
 	:
+	fFallbackICUCollator(NULL),
 	fStrength(strength),
 	fIgnorePunctuation(ignorePunctuation)
 {
@@ -45,9 +48,9 @@ BCollator::BCollator(const char *locale, int8 strength,
 BCollator::BCollator(BMessage *archive)
 	: BArchivable(archive),
 	fICUCollator(NULL),
+	fFallbackICUCollator(NULL),
 	fIgnorePunctuation(true)
 {
-#if HAIKU_TARGET_PLATFORM_HAIKU
 	int32 data;
 	if (archive->FindInt32("loc:strength", &data) == B_OK)
 		fStrength = (uint8)data;
@@ -57,14 +60,28 @@ BCollator::BCollator(BMessage *archive)
 	if (archive->FindBool("loc:punctuation", &fIgnorePunctuation) != B_OK)
 		fIgnorePunctuation = true;
 
-	// TODO : ICU collator ? or just store the locale name ?
-#endif
+	UErrorCode error = U_ZERO_ERROR;
+	fFallbackICUCollator = static_cast<RuleBasedCollator*>
+		(Collator::createInstance(error));
+
+	ssize_t size;
+	const void* buffer = NULL;
+	if (archive->FindData("loc:collator", B_RAW_TYPE, &buffer, &size) == B_OK) {
+		fICUCollator = new RuleBasedCollator((const uint8_t*)buffer, (int)size,
+			fFallbackICUCollator, error);
+		if (fICUCollator == NULL) {
+			fICUCollator = fFallbackICUCollator;
+				// Unarchiving failed, so we revert to the fallback collator
+		}
+	}
 }
 
 
 BCollator::~BCollator()
 {
 	delete fICUCollator;
+	fICUCollator = NULL;
+	delete fFallbackICUCollator;
 }
 
 
@@ -169,17 +186,24 @@ BCollator::Archive(BMessage *archive, bool deep) const
 	if (status == B_OK)
 		status = archive->AddBool("loc:punctuation", fIgnorePunctuation);
 
-	/*
-	BMessage collatorArchive;
-	if (status == B_OK && deep
-		&& typeid(*fCollator) != typeid(BCollatorAddOn)
-			// only archive subclasses from BCollatorAddOn
-		&& (status = fCollator->Archive(&collatorArchive, true)) == B_OK)
-		status = archive->AddMessage("loc:collator", &collatorArchive);
-	*/
-	//TODO : archive fICUCollator
+	UErrorCode error = U_ZERO_ERROR;
+	int size = static_cast<RuleBasedCollator*>(fICUCollator)->cloneBinary(NULL,
+		0, error);
+		// This WILL fail with U_BUFFER_OVERFLOW_ERROR. But we get the needed
+		// size.
+	error = U_ZERO_ERROR;
+	uint8_t* buffer = (uint8_t*)malloc(size);
+	static_cast<RuleBasedCollator*>(fICUCollator)->cloneBinary(buffer, size,
+		error);
 
-	return status;
+	if (status == B_OK && error == U_ZERO_ERROR)
+		status = archive->AddData("loc:collator", B_RAW_TYPE, buffer, size);
+	delete buffer;
+
+	if (error == U_ZERO_ERROR)
+		return status;
+	else
+		return B_ERROR;
 }
 
 

@@ -14,6 +14,7 @@
 
 namespace icu_44 {
 	class Collator;
+	class RuleBasedCollator;
 };
 
 
@@ -65,6 +66,7 @@ class BCollator : public BArchivable {
 
 	private:
 		icu_44::Collator* fICUCollator;
+		icu_44::RuleBasedCollator* fFallbackICUCollator;
 		int8			fStrength;
 		bool			fIgnorePunctuation;
 };

@@ -156,20 +156,7 @@ main(int argc, char **argv)
 	// load the collator add-on if necessary
 
 	if (addon != NULL) {
-		image_id image = load_add_on(addon);
-		if (image < B_OK)
-			fprintf(stderr, "could not load add-on at \"%s\": %s.\n", addon, strerror(image));
-
-		BCollatorAddOn *(*instantiate)(void);
-		if (get_image_symbol(image, "instantiate_collator",
-				B_SYMBOL_TYPE_TEXT, (void **)&instantiate) == B_OK) {
-			BCollatorAddOn *collator = instantiate();
-			if (collator != NULL)
-				gCollator = new BCollator(collator, strength, true);
-		} else if (image >= B_OK) {
-			fprintf(stderr, "could not find instantiate_collator() function in add-on!\n");
-			unload_add_on(image);
-		}
+		gCollator = new BCollator(addon, strength, true);
 	}
 
 	if (gCollator == NULL) {
@@ -177,7 +164,7 @@ main(int argc, char **argv)
 		gCollator = be_locale->Collator();
 	}
 
-	// test archiving/unarchiving collator
+	printf("test archiving/unarchiving collator\n");
 
 	BMessage archive;
 	if (gCollator->Archive(&archive, true) != B_OK)
@@ -193,7 +180,10 @@ main(int argc, char **argv)
 		}
 	}
 
-	// test the BCollator::Compare() and GetSortKey() methods
+	printf(" Archived content :");
+	archive.PrintToStream();
+
+	printf("test the BCollator::Compare() and GetSortKey() methods\n");
 
 	const char *strengthLabels[] = {"primary:  ", "secondary:", "tertiary: "};
 	uint32 strengths[] = {B_COLLATE_PRIMARY, B_COLLATE_SECONDARY, B_COLLATE_TERTIARY};
