@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Julun <host.haiku@gmx.de>
  *
  */
-#ifndef DATETIME_H
-#define DATETIME_H
+#ifndef _DATE_TIME_EDIT_H
+#define _DATE_TIME_EDIT_H
 
 
 #include "SectionEdit.h"
@@ -19,36 +19,37 @@
 
 
 class TTimeEdit : public TSectionEdit {
-	public:
-						TTimeEdit(BRect frame, const char *name,
-							uint32 sections);
-		virtual			~TTimeEdit();
-		virtual	void	KeyDown(const char* bytes, int32 numBytes);
+public:
+								TTimeEdit(BRect frame, const char* name,
+									uint32 sections);
+	virtual						~TTimeEdit();
 
-		virtual void	InitView();
-		virtual void	DrawSection(uint32 index, bool isfocus);
-		virtual void	DrawSeparator(uint32 index);
+	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 
-		virtual void	SetSections(BRect area);
-		virtual void	SectionFocus(uint32 index);
-		virtual float	SeparatorWidth() const;
+	virtual	void				InitView();
+	virtual	void				DrawSection(uint32 index, bool isfocus);
+	virtual	void				DrawSeparator(uint32 index);
 
-		virtual void	DoUpPress();
-		virtual void	DoDownPress();
+	virtual	void				SetSections(BRect area);
+	virtual	void				SectionFocus(uint32 index);
+	virtual	float				SeparatorWidth() const;
 
-		virtual void	BuildDispatch(BMessage *message);
+	virtual	void				DoUpPress();
+	virtual	void				DoDownPress();
 
-		void			SetTime(int32 hour, int32 minute, int32 second);
+	virtual	void				BuildDispatch(BMessage* message);
 
-	private:
-		void			_CheckRange();
-		bool			_IsValidDoubleDigi(int32 value);
-		int32			_SectionValue(int32 index) const;
+			void				SetTime(int32 hour, int32 minute, int32 second);
 
-	private:
-		BDateTime		fTime;
-		bigtime_t		fLastKeyDownTime;
-		int32			fLastKeyDownInt;
+private:
+			void				_CheckRange();
+			bool				_IsValidDoubleDigi(int32 value);
+			int32				_SectionValue(int32 index) const;
+
+private:
+			BDateTime		fTime;
+			bigtime_t		fLastKeyDownTime;
+			int32			fLastKeyDownInt;
 };
 
 
@@ -85,5 +86,5 @@ class TDateEdit : public TSectionEdit {
 		int32			fLastKeyDownInt;
 };
 
-#endif // DATETIME_H
+#endif	// _DATE_TIME_EDIT_H
 

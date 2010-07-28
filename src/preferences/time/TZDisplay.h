@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,8 +8,8 @@
  *		Julun <host.haiku@gmx.de>
  *
  */
-#ifndef TTZDISPLAY_H
-#define TTZDISPLAY_H
+#ifndef _TZ_DISPLAY_H
+#define _TZ_DISPLAY_H
 
 
 #include <View.h>
@@ -17,29 +17,30 @@
 
 
 class TTZDisplay : public BView {
-	public:
-						TTZDisplay(BRect frame, const char *name, const char *label);
-		virtual			~TTZDisplay();
+public:
+								TTZDisplay(BRect frame, const char* name,
+									const char* label);
+	virtual						~TTZDisplay();
 
-		virtual void 	AttachedToWindow();
-		virtual void 	ResizeToPreferred();
-		virtual void 	Draw(BRect updateRect);
+	virtual	void				AttachedToWindow();
+	virtual	void				ResizeToPreferred();
+	virtual	void				Draw(BRect updateRect);
 
-		const char*		Label() const;
-		void			SetLabel(const char *label);
+			const char*			Label() const;
+			void				SetLabel(const char* label);
 
-		const char*		Text() const;
-		void			SetText(const char *text);
+			const char*			Text() const;
+			void				SetText(const char* text);
 
-		const char*		Time() const;
-		void 			SetTime(int32 hour, int32 minute);
+			const char*			Time() const;
+			void				SetTime(int32 hour, int32 minute);
 
-	private:
-		BString 		fLabel;
-		BString 		fText;
-		BString 		fTime;
-
+private:
+			BString 		fLabel;
+			BString 		fText;
+			BString 		fTime;
 };
 
-#endif	// TTZDISPLAY_H
+
+#endif	// _TZ_DISPLAY_H
 

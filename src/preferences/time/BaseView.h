@@ -1,13 +1,13 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
-#ifndef TIMEBASE_H
-#define TIMEBASE_H
+#ifndef _BASE_VIEW_H
+#define _BASE_VIEW_H
 
 
 #include <Message.h>
@@ -15,21 +15,21 @@
 
 
 class TTimeBaseView: public BView {
-	public:
-						TTimeBaseView(BRect frame, const char *name);
-		virtual 		~TTimeBaseView();
-		
-		virtual void 	Pulse();
-		virtual void 	AttachedToWindow();
+public:
+								TTimeBaseView(BRect frame, const char* name);
+	virtual						~TTimeBaseView();
 
-		void 			ChangeTime(BMessage *message);
+	virtual	void			 	Pulse();
+	virtual	void				AttachedToWindow();
 
-	private:
-		void			_SendNotices();
+			void				ChangeTime(BMessage* message);
 
-	private:
-		BMessage 		fMessage;
+private:
+			void				_SendNotices();
+
+private:
+			BMessage			fMessage;
 };
 
-#endif	// TIMEBASE_H
 
+#endif	// _BASE_VIEW_H

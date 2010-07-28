@@ -26,7 +26,7 @@ namespace {
 }
 
 
-TTZDisplay::TTZDisplay(BRect frame, const char *name, const char *label)
+TTZDisplay::TTZDisplay(BRect frame, const char* name, const char* label)
 	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
 	  fLabel(label),
 	  fText(""),
@@ -62,7 +62,7 @@ TTZDisplay::Draw(BRect /* updateRect */)
 
 	BRect bounds = Bounds();
 	FillRect(Bounds(), B_SOLID_LOW);
-	
+
 	float fontHeight = _FontHeight();
 
 	BPoint pt(bounds.left + 2.0, fontHeight / 2.0 + 2.0);
@@ -70,7 +70,7 @@ TTZDisplay::Draw(BRect /* updateRect */)
 
 	pt.y += fontHeight;
 	DrawString(fText.String(), pt);
-	
+
 	pt.x = bounds.right - StringWidth(fTime.String()) - 2.0;
 	DrawString(fTime.String(), pt);
 }
@@ -84,7 +84,7 @@ TTZDisplay::Label() const
 
 
 void
-TTZDisplay::SetLabel(const char *label)
+TTZDisplay::SetLabel(const char* label)
 {
 	fLabel.SetTo(label);
 	Draw(Bounds());
@@ -99,7 +99,7 @@ TTZDisplay::Text() const
 
 
 void
-TTZDisplay::SetText(const char *text)
+TTZDisplay::SetText(const char* text)
 {
 	fText.SetTo(text);
 	Draw(Bounds());
@@ -119,11 +119,11 @@ TTZDisplay::SetTime(int32 hour, int32 minute)
 	int32 ahour = hour;
 	if (hour > 12)
 		ahour = hour -12;
-		
+
 	if (ahour == 0)
 		ahour = 12;
 
-	const char *ap = "AM";
+	const char* ap = "AM";
 	if (hour > 11)
 		ap = "PM";
 

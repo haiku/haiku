@@ -39,7 +39,7 @@ using BPrivate::B_LOCAL_TIME;
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 #	include <syscalls.h>
 #else
-extern "C" void _kset_tzfilename_(const char *name, size_t length, bool isGMT);
+extern "C" void _kset_tzfilename_(const char* name, size_t length, bool isGMT);
 #	define _kern_set_tzfilename _kset_tzfilename_
 #endif
 
@@ -105,7 +105,7 @@ DateTimeView::Draw(BRect /*updateRect*/)
 
 
 void
-DateTimeView::MessageReceived(BMessage *message)
+DateTimeView::MessageReceived(BMessage* message)
 {
 	int32 change;
 	switch (message->what) {
@@ -249,7 +249,7 @@ DateTimeView::_InitView()
 
 	// clock radio buttons
 	bounds.top = fClock->Frame().bottom + 10.0;
-	BStringView *text = new BStringView(bounds, "clockSetTo", "Clock set to:");
+	BStringView* text = new BStringView(bounds, "clockSetTo", "Clock set to:");
 	AddChild(text);
 	text->ResizeToPreferred();
 
@@ -342,7 +342,7 @@ DateTimeView::_UpdateGmtSettings()
 
 
 void
-DateTimeView::_UpdateDateTime(BMessage *message)
+DateTimeView::_UpdateDateTime(BMessage* message)
 {
 	int32 day;
 	int32 month;

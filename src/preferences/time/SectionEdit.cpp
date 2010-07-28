@@ -18,10 +18,39 @@
 #include "TimeMessages.h"
 
 
+TSection::TSection(BRect frame)
+	:
+	fFrame(frame)
+{
+}
+
+
+BRect
+TSection::Bounds() const
+{
+	BRect frame(fFrame);
+	return frame.OffsetByCopy(B_ORIGIN);
+}
+
+
+void
+TSection::SetFrame(BRect frame)
+{
+	fFrame = frame;
+}
+
+
+BRect
+TSection::Frame() const
+{
+	return fFrame;
+}
+
+
 const uint32 kArrowAreaWidth = 16;
 
 
-TSectionEdit::TSectionEdit(BRect frame, const char *name, uint32 sections)
+TSectionEdit::TSectionEdit(BRect frame, const char* name, uint32 sections)
 	:
 	BControl(frame, name, NULL, NULL, B_FOLLOW_NONE, B_NAVIGABLE | B_WILL_DRAW),
 	fSectionList(NULL),
@@ -74,9 +103,9 @@ TSectionEdit::MouseDown(BPoint where)
 	else if (fDownRect.Contains(where))
 		DoDownPress();
 	else if (fSectionList->CountItems()> 0) {
-		TSection *section;
+		TSection* section;
 		for (uint32 idx = 0; idx < fSectionCount; idx++) {
-			section = (TSection *)fSectionList->ItemAt(idx);
+			section = (TSection*)fSectionList->ItemAt(idx);
 			if (section->Frame().Contains(where)) {
 				SectionFocus(idx);
 				return;
@@ -102,7 +131,7 @@ TSectionEdit::MakeFocus(bool focused)
 
 
 void
-TSectionEdit::KeyDown(const char *bytes, int32 numbytes)
+TSectionEdit::KeyDown(const char* bytes, int32 numbytes)
 {
 	if (fFocus == -1)
 		SectionFocus(0);

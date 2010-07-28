@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,14 +8,14 @@
  *		Julun <host.haiku@gmx.de>
  *
  */
-#ifndef ANALOG_CLOCK_H
-#define ANALOG_CLOCK_H
+#ifndef _BITMAPS_H
+#define _BITMAPS_H
 
 
 #include <Bitmap.h>
 
 
-void ReplaceTransparentColor(BBitmap *bitmap, rgb_color with);
+void ReplaceTransparentColor(BBitmap* bitmap, rgb_color with);
 
 const int32 kUpArrowWidth = 16;
 const int32 kUpArrowHeight = 7;
@@ -45,5 +45,6 @@ const unsigned char kDownArrowBits [] = {
 	0xff,0xff,0xff,0xff,0xff,0x13,0xff,0xff,0xff,0xff,0xff,0xff,0x18,0x3f,0xff,0xff
 };
 
-#endif	// ANALOG_CLOCK_H
+
+#endif	// _BITMAPS_H
 

@@ -26,11 +26,11 @@
 
 class OffscreenClock : public BView {
 public:
-							OffscreenClock(BRect frame, const char *name);
+							OffscreenClock(BRect frame, const char* name);
 	virtual					~OffscreenClock();
 
 			void		 	SetTime(int32 hour, int32 minute, int32 second);
-			void 			GetTime(int32 *hour, int32 *minute, int32 *second);
+			void 			GetTime(int32* hour, int32* minute, int32* second);
 			bool			IsDirty() const	{	return fDirty;	}
 			void 			DrawClock();
 
@@ -65,7 +65,7 @@ private:
 };
 
 
-OffscreenClock::OffscreenClock(BRect frame, const char *name)
+OffscreenClock::OffscreenClock(BRect frame, const char* name)
 	:
 	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW),
 	fHours(0),
@@ -108,7 +108,7 @@ OffscreenClock::SetTime(int32 hour, int32 minute, int32 second)
 
 
 void
-OffscreenClock::GetTime(int32 *hour, int32 *minute, int32 *second)
+OffscreenClock::GetTime(int32* hour, int32* minute, int32* second)
 {
 	*hour = fHours;
 	*minute = fMinutes;
@@ -359,7 +359,7 @@ OffscreenClock::_DrawHands(float x, float y, float radius,
 //	#pragma mark -
 
 
-TAnalogClock::TAnalogClock(BRect frame, const char *name)
+TAnalogClock::TAnalogClock(BRect frame, const char* name)
 	:
 	BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_DRAW_ON_CHILDREN),
 	fBitmap(NULL),
@@ -397,7 +397,7 @@ TAnalogClock::AttachedToWindow()
 
 
 void
-TAnalogClock::MessageReceived(BMessage *message)
+TAnalogClock::MessageReceived(BMessage* message)
 {
 	int32 change;
 	switch (message->what) {
@@ -468,7 +468,7 @@ TAnalogClock::MouseUp(BPoint point)
 
 
 void
-TAnalogClock::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+TAnalogClock::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 
 	if (fDraggingMinuteHand)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku. All rights reserved.
+ * Copyright 2002-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,13 +8,13 @@
  *		Julun <host.haiku@gmx.de>
  *		Philippe Saint-Pierre <stpere@gmail.com>
  */
-#ifndef TIME_MESSAGES_H
-#define TIME_MESSAGES_H
+#ifndef _TIME_MESSAGES_H
+#define _TIME_MESSAGES_H
+
 
 //Timezone messages
 const uint32 H_CITY_CHANGED = 'h_CC';
 const uint32 H_CITY_SET = 'h_CS';
-
 
 //SetButton
 const uint32 H_SET_TIME_ZONE = 'hSTZ';
@@ -46,5 +46,6 @@ const uint32 kMsgRevert = 'rvrt';
 // change time finished
 const uint32 kChangeTimeFinished = 'tcfi';
 
-#endif //TIME_MESSAGES_H
+
+#endif	// _TIME_MESSAGES_H
 

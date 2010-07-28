@@ -44,7 +44,7 @@ TimeApplication::ReadyToRun()
 void
 TimeApplication::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", 
+	BAlert* alert = new BAlert("about",
 		"Time & Date, writen by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\t"
 		"Julun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2008, Haiku.", "OK");
 	alert->Go();

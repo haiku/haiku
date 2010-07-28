@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku. All rights reserved.
+ * Copyright 2002-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
-#ifndef TIME_H
-#define TIME_H
+#ifndef _TIME_H
+#define _TIME_H
 
 
 #include <Application.h>
@@ -18,16 +18,17 @@ class TTimeWindow;
 
 
 class TimeApplication : public BApplication {
-	public:
-						TimeApplication();
-		virtual 		~TimeApplication();
+public:
+								TimeApplication();
+	virtual						~TimeApplication();
 
-		virtual void 	ReadyToRun();
-		virtual void 	AboutRequested();
+	virtual void				ReadyToRun();
+	virtual void				AboutRequested();
 
-	private:
-		TTimeWindow 	*fWindow;
+private:
+			TTimeWindow*		fWindow;
 };
 
-#endif	// TIME_H
+
+#endif	// _TIME_H
 

@@ -41,13 +41,13 @@ TTimeWindow::~TTimeWindow()
 void
 TTimeWindow::SetRevertStatus()
 {
-	fRevertButton->SetEnabled(fDateTimeView->CheckCanRevert() 
+	fRevertButton->SetEnabled(fDateTimeView->CheckCanRevert()
 		|| fTimeZoneView->CheckCanRevert());
 }
 
 
-void 
-TTimeWindow::MessageReceived(BMessage *message)
+void
+TTimeWindow::MessageReceived(BMessage* message)
 {
 	switch(message->what) {
 		case H_USER_CHANGE:
@@ -56,7 +56,7 @@ TTimeWindow::MessageReceived(BMessage *message)
 			_SendTimeChangeFinished();
 			SetRevertStatus();
 			break;
-		
+
 		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(B_ABOUT_REQUESTED);
 			break;
@@ -79,41 +79,41 @@ TTimeWindow::MessageReceived(BMessage *message)
 }
 
 
-bool 
+bool
 TTimeWindow::QuitRequested()
 {
 	TimeSettings().SetLeftTop(Frame().LeftTop());
 
 	fBaseView->StopWatchingAll(fTimeZoneView);
 	fBaseView->StopWatchingAll(fDateTimeView);
-	
+
 	be_app->PostMessage(B_QUIT_REQUESTED);
-	
+
 	return BWindow::QuitRequested();
 }
 
 
-void 
+void
 TTimeWindow::_InitWindow()
 {
 	SetPulseRate(500000);
 
 	fDateTimeView = new DateTimeView(Bounds());
-	
+
 	BRect bounds = fDateTimeView->Bounds();
 	fTimeZoneView = new TimeZoneView(bounds);
 
 	fBaseView = new TTimeBaseView(bounds, "baseView");
 	AddChild(fBaseView);
-	
+
 	fBaseView->StartWatchingAll(fDateTimeView);
 	fBaseView->StartWatchingAll(fTimeZoneView);
 
 	bounds.OffsetBy(10.0, 10.0);
-	BTabView *tabView = new BTabView(bounds.InsetByCopy(-5.0, -5.0),
+	BTabView* tabView = new BTabView(bounds.InsetByCopy(-5.0, -5.0),
 		"tabView" , B_WIDTH_AS_USUAL, B_FOLLOW_NONE);
-	
-	BTab *tab = new BTab();
+
+	BTab* tab = new BTab();
 	tabView->AddTab(fDateTimeView, tab);
 	tab->SetLabel("Date & Time");
 
@@ -131,7 +131,7 @@ TTimeWindow::_InitWindow()
 
 	fRevertButton = new BButton(rect, "revert", "Revert",
 		new BMessage(kMsgRevert), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
-	
+
 	fRevertButton->ResizeToPreferred();
 	fRevertButton->SetEnabled(false);
 	float buttonHeight = fRevertButton->Bounds().Height();
@@ -139,7 +139,7 @@ TTimeWindow::_InitWindow()
 	fBaseView->AddChild(fRevertButton);
 	fRevertButton->SetTarget(this);
 
-	fBaseView->ResizeTo(tabView->Bounds().Width() + 10.0, 
+	fBaseView->ResizeTo(tabView->Bounds().Width() + 10.0,
 		tabView->Bounds().Height() + buttonHeight + 30.0);
 
 	ResizeTo(fBaseView->Bounds().Width(), fBaseView->Bounds().Height());

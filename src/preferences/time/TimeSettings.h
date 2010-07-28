@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku. All rights reserved.
+ * Copyright 2002-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,8 +7,8 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  */
-#ifndef TIME_SETTINGS_H
-#define TIME_SETTINGS_H
+#ifndef _TIME_SETTINGS_H
+#define _TIME_SETTINGS_H
 
 
 #include <Point.h>
@@ -16,16 +16,17 @@
 
 
 class TimeSettings {
-	public :
-					TimeSettings();
-					~TimeSettings();
+public :
+								TimeSettings();
+								~TimeSettings();
 
-		BPoint 		LeftTop() const;
-		void		SetLeftTop(const BPoint leftTop);
+			BPoint				LeftTop() const;
+			void				SetLeftTop(const BPoint leftTop);
 
-	private:
-		BString		fSettingsFile;
+private:
+			BString				fSettingsFile;
 };
 
-#endif	// TIME_SETTINGS_H
+
+#endif	// _TIME_SETTINGS_H
 

@@ -15,7 +15,7 @@
 #include <OS.h>
 
 
-TTimeBaseView::TTimeBaseView(BRect frame, const char *name)
+TTimeBaseView::TTimeBaseView(BRect frame, const char* name)
 	: BView(frame, name, B_FOLLOW_NONE, B_PULSE_NEEDED),
 	  fMessage(H_TIME_UPDATE)
 {
@@ -43,7 +43,7 @@ TTimeBaseView::AttachedToWindow()
 
 
 void
-TTimeBaseView::ChangeTime(BMessage *message)
+TTimeBaseView::ChangeTime(BMessage* message)
 {
 	bool isTime;
 	if (message->FindBool("time", &isTime) != B_OK)

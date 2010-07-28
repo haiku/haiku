@@ -87,7 +87,7 @@ TTimeEdit::InitView()
 void
 TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 {
-	TSection *section = NULL;
+	TSection* section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 
 	if (!section)
@@ -110,7 +110,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	country->FormatTime(&text, fieldPositions, fieldCount, time, true);
 		// TODO : this should be cached somehow to not redo it for each field
 
-	if (index * 2 + 1 > fieldCount) {
+	if (index * 2 + 1 > (uint32)fieldCount) {
 		free(fieldPositions);
 		return;
 	}
@@ -135,7 +135,7 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 void
 TTimeEdit::DrawSeparator(uint32 index)
 {
-	TSection *section = NULL;
+	TSection* section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 
 	if (!section)
@@ -154,7 +154,7 @@ TTimeEdit::DrawSeparator(uint32 index)
 	country->FormatTime(&text, fieldPositions, fieldCount, time, true);
 		// TODO : this should be cached somehow to not redo it for each field
 
-	if (index * 2 + 2 > fieldCount) {
+	if (index * 2 + 2 > (uint32)fieldCount) {
 		free(fieldPositions);
 		return;
 	}
@@ -257,9 +257,9 @@ TTimeEdit::DoDownPress()
 
 
 void
-TTimeEdit::BuildDispatch(BMessage *message)
+TTimeEdit::BuildDispatch(BMessage* message)
 {
-	const char *fields[3] = { "hour", "minute", "second" };
+	const char* fields[3] = { "hour", "minute", "second" };
 
 	message->AddBool("time", true);
 
@@ -445,7 +445,7 @@ TTimeEdit::_SectionValue(int32 index) const
 //	#pragma mark -
 
 
-TDateEdit::TDateEdit(BRect frame, const char *name, uint32 sections)
+TDateEdit::TDateEdit(BRect frame, const char* name, uint32 sections)
 	: TSectionEdit(frame, name, sections)
 {
 	InitView();
@@ -484,7 +484,7 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 	}
 
 	// if year add 2000
-	
+
 	BDateElement* dateFormat;
 	int fieldCount;
 	BCountry* here;
@@ -523,7 +523,7 @@ TDateEdit::InitView()
 void
 TDateEdit::DrawSection(uint32 index, bool hasFocus)
 {
-	TSection *section = NULL;
+	TSection* section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 
 	if (!section)
@@ -547,7 +547,7 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 		false);
 		// TODO : this should be cached somehow to not redo it for each field
 
-	if (index * 2 + 1 > fieldCount) {
+	if (index * 2 + 1 > (uint32)fieldCount) {
 		free(fieldPositions);
 		return;
 	}
@@ -575,7 +575,7 @@ TDateEdit::DrawSeparator(uint32 index)
 	if (index == 3)
 		return;
 
-	TSection *section = NULL;
+	TSection* section = NULL;
 	section = static_cast<TSection*> (fSectionList->ItemAt(index));
 	BRect bounds = section->Frame();
 
@@ -594,7 +594,7 @@ TDateEdit::DrawSeparator(uint32 index)
 		false);
 		// TODO : this should be cached somehow to not redo it for each field
 
-	if (index * 2 + 2 > fieldCount) {
+	if (index * 2 + 2 > (uint32)fieldCount) {
 		free(fieldPositions);
 		return;
 	}
@@ -625,7 +625,7 @@ TDateEdit::SetSections(BRect area)
 	float sepWidth = SeparatorWidth();
 
 	// year
-	TSection *section = NULL;
+	TSection* section = NULL;
 	float width = be_plain_font->StringWidth("0000") +6;
 	bounds.right = area.right;
 	bounds.left = bounds.right -width;
@@ -708,9 +708,9 @@ TDateEdit::DoDownPress()
 
 
 void
-TDateEdit::BuildDispatch(BMessage *message)
+TDateEdit::BuildDispatch(BMessage* message)
 {
-	const char *fields[3] = { "month", "day", "year" };
+	const char* fields[3] = { "month", "day", "year" };
 
 	message->AddBool("time", false);
 

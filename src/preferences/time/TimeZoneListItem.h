@@ -6,8 +6,8 @@
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  */
 
-#ifndef __TIMEZONELISTITEM_H__
-#define __TIMEZONELISTITEM_H__
+#ifndef _TIME_ZONE_LIST_ITEM_H
+#define _TIME_ZONE_LIST_ITEM_H
 
 
 #include <StringItem.h>
@@ -19,17 +19,19 @@ class BTimeZone;
 
 
 class TimeZoneListItem : public BStringItem {
-	public:
-					TimeZoneListItem(const char* text, BCountry* country,
-						BTimeZone* timeZone);
-					~TimeZoneListItem();
+public:
+								TimeZoneListItem(const char* text,
+									BCountry* country, BTimeZone* timeZone);
+								~TimeZoneListItem();
 
-		void		DrawItem(BView* owner, BRect frame, bool complete = false);
-		void		Code(char* buffer);
+			void				DrawItem(BView* owner, BRect frame,
+									bool complete = false);
+			void				Code(char* buffer);
 
-	private:
-		BBitmap*	fIcon;
-		BTimeZone*	fTimeZone;
+private:
+			BBitmap*			fIcon;
+			BTimeZone*			fTimeZone;
 };
 
-#endif
+
+#endif	// _TIME_ZONE_LIST_ITEM_H
