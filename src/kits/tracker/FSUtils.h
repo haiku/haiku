@@ -264,8 +264,7 @@ const uint32 B_USER_DOWNLOADS_DIRECTORY = 3503;
 const uint32 B_USER_DESKBAR_APPS_DIRECTORY = 3504;
 const uint32 B_USER_DESKBAR_PREFERENCES_DIRECTORY = 3505;
 const uint32 B_USER_DESKBAR_DEVELOP_DIRECTORY = 3506;
-
-const int32 B_BOOT_DISK = 10000000;
+const uint32 B_BOOT_DISK = 3507;
 	// map /boot into the directory_which enum for convenience
 
 class WellKnowEntryList {
