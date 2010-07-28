@@ -26,6 +26,11 @@
 #include <Region.h>
 #include <String.h>
 
+#include <binary_compatibility/Support.h>
+
+
+using std::nothrow;
+
 
 static property_info sPropertyList[] = {
 	{
@@ -52,6 +57,7 @@ BTab::BTab(BView *tabView)
 
 BTab::BTab(BMessage *archive)
 	:
+	BArchivable(archive),
 	fSelected(false),
 	fFocus(false),
 	fView(NULL)
@@ -400,14 +406,15 @@ BTabView::~BTabView()
 
 
 BTabView::BTabView(BMessage *archive)
-	: BView(archive),
+	:
+	BView(BUnarchiver::PrepareArchive(archive)),
+	fTabList(new BList),
+	fContainerView(NULL),
 	fFocus(-1)
 {
-	fContainerView = NULL;
-	fTabList = new BList;
+	BUnarchiver unarchiver(archive);
 
 	int16 width;
-
 	if (archive->FindInt16("_but_width", &width) == B_OK)
 		fTabWidthSetting = (button_width)width;
 	else
@@ -419,16 +426,24 @@ BTabView::BTabView(BMessage *archive)
 		fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
 	}
 
-	fFocus = -1;
-
 	if (archive->FindInt32("_sel", &fSelection) != B_OK)
 		fSelection = 0;
 
-	if (fContainerView == NULL)
-		fContainerView = ChildAt(0);
-
 	int32 i = 0;
 	BMessage tabMsg;
+
+	if (BUnarchiver::IsArchiveManaged(archive)) {
+		int32 tabCount;
+		archive->GetInfo("_l_items", NULL, &tabCount);
+		for (int32 i = 0; i < tabCount; i++) {
+			unarchiver.EnsureUnarchived("_l_items", i);
+			unarchiver.EnsureUnarchived("_view_list", i);
+		}
+		return;
+	}
+
+	fContainerView = ChildAt(0);
+	_InitContainerView(Flags() & B_SUPPORTS_LAYOUT);
 
 	while (archive->FindMessage("_l_items", i, &tabMsg) == B_OK) {
 		BArchivable *archivedTab = instantiate_object(&tabMsg);
@@ -461,10 +476,9 @@ BTabView::Instantiate(BMessage *archive)
 
 
 status_t
-BTabView::Archive(BMessage *archive, bool deep) const
+BTabView::Archive(BMessage* archive, bool deep) const
 {
-	if (CountTabs() > 0)
-		TabAt(Selection())->View()->RemoveSelf();
+	BArchiver archiver(archive);
 
 	status_t ret = BView::Archive(archive, deep);
 
@@ -477,38 +491,68 @@ BTabView::Archive(BMessage *archive, bool deep) const
 
 	if (ret == B_OK && deep) {
 		for (int32 i = 0; i < CountTabs(); i++) {
-			BMessage tabArchive;
-			BTab *tab = TabAt(i);
+			BTab* tab = TabAt(i);
 
-			if (!tab)
-				continue;
-			ret = tab->Archive(&tabArchive, true);
-			if (ret == B_OK)
-				ret = archive->AddMessage("_l_items", &tabArchive);
-
-			if (!tab->View())
-				continue;
-
-			BMessage viewArchive;
-			ret = tab->View()->Archive(&viewArchive, true);
-			if (ret == B_OK)
-				ret = archive->AddMessage("_view_list", &viewArchive);
+			if ((ret = archiver.AddArchivable("_l_items", tab, deep)) != B_OK)
+				break;
+			ret = archiver.AddArchivable("_view_list", tab->View(), deep);
 		}
 	}
 
-	if (CountTabs() > 0) {
-		if (TabAt(Selection())->View() && ContainerView())
-			TabAt(Selection())->Select(ContainerView());
-	}
-
-	return ret;
+	return archiver.Finish(ret);
 }
 
 
 status_t
-BTabView::Perform(perform_code d, void *arg)
+BTabView::AllUnarchived(const BMessage* archive)
 {
-	return BView::Perform(d, arg);
+	status_t err = BView::AllUnarchived(archive);
+	if (err != B_OK)
+		return err;
+
+	fContainerView = ChildAt(0);
+	_InitContainerView(Flags() & B_SUPPORTS_LAYOUT);
+
+	BUnarchiver unarchiver(archive);
+
+	int32 tabCount;	
+	archive->GetInfo("_l_items", NULL, &tabCount);
+	for (int32 i = 0; i < tabCount && err == B_OK; i++) {
+		BTab* tab;
+		err = unarchiver.FindObject("_l_items", i, tab);
+		if (err == B_OK && tab) {
+			BView* view;
+			if ((err = unarchiver.FindObject("_view_list", i,
+				BUnarchiver::B_DONT_ASSUME_OWNERSHIP, view)) != B_OK)
+				break;
+
+			tab->SetView(view);
+			fTabList->AddItem(tab);
+		}
+	}
+
+	if (err == B_OK)
+		Select(fSelection);
+
+	return err;
+}
+
+
+status_t
+BTabView::Perform(perform_code code, void* _data)
+{
+	switch (code) {
+		case PERFORM_CODE_ALL_UNARCHIVED:
+		{
+			perform_data_all_unarchived* data
+				= (perform_data_all_unarchived*)_data;
+
+			data->return_value = BTabView::AllUnarchived(data->archive);
+			return B_OK;
+		}
+	}
+
+	return BView::Perform(code, _data);
 }
 
 
@@ -1317,21 +1361,37 @@ BTabView::_InitObject(bool layouted, button_width width)
 	GetFontHeight(&fh);
 	fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
 
-	if (layouted) {
-		SetLayout(new(std::nothrow) BGroupLayout(B_HORIZONTAL));
+	_InitContainerView(layouted);
+}
 
-		fContainerView = new BView("view container", B_WILL_DRAW);
-		fContainerView->SetLayout(new(std::nothrow) BCardLayout());
-	} else {
+
+void
+BTabView::_InitContainerView(bool layouted)
+{
+	bool needsLayout = false;
+	if (layouted) {
+		if (!GetLayout()) {
+			SetLayout(new(nothrow) BGroupLayout(B_HORIZONTAL));
+			needsLayout = true;
+		}
+
+		if (!fContainerView) {
+			fContainerView = new BView("view container", B_WILL_DRAW);
+			fContainerView->SetLayout(new(std::nothrow) BCardLayout());
+			needsLayout = true;
+		}
+	} else if (!fContainerView) {
 		fContainerView = new BView(Bounds(), "view container", B_FOLLOW_ALL,
 			B_WILL_DRAW);
+		needsLayout= true;
 	}
-	_LayoutContainerView(layouted);
 
-	fContainerView->SetViewColor(color);
-	fContainerView->SetLowColor(color);
-
-	AddChild(fContainerView);
+	if (needsLayout) {
+		_LayoutContainerView(layouted);
+		fContainerView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fContainerView->SetLowColor(fContainerView->ViewColor());
+		AddChild(fContainerView);
+	}
 }
 
 

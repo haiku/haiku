@@ -96,6 +96,7 @@ public:
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* into,
 									bool deep = true) const;
+	virtual status_t			AllUnarchived(const BMessage* from);
 	virtual	status_t			Perform(perform_code d, void* arg);
 
 	virtual	void 				AttachedToWindow();
@@ -182,6 +183,7 @@ private:
 
 private:
 			void				_InitObject(bool layouted, button_width width);
+			void				_InitContainerView(bool layouted);
 			BSize				_TabsMinSize() const;
 			float				_BorderWidth() const;
 			void				_LayoutContainerView(bool layouted);
