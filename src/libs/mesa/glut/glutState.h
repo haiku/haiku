@@ -28,7 +28,7 @@
 struct GlutState {
 	BApplication *display;
 	thread_id appthread;
-	
+
 	int initX, initY;			// initial window position
 	int initWidth, initHeight;	// initial window size
 	unsigned int displayMode;	// initial display mode
@@ -36,18 +36,20 @@ struct GlutState {
 
 	GlutWindow *currentWindow;	// current window
 	GlutMenu *currentMenu;		// current menu
-	
+
 	GlutWindow **windowList;	// array of pointers to windows
 	int windowListSize;			// size of window list
-	
+
 	GLUTidleCB idle;				// idle callback
 	GLUTmenuStatusCB menuStatus;	// menu status callback
 	int modifierKeys;				// only valid during keyboard callback
-	int keyRepeatMode;				// global repeat 
-	
+	int keyRepeatMode;				// global repeat
+
+	bool	gameMode;			// game mode is active
+
 	bool debug;					// call glGetError
-	bool quitAll;				// quit 
-	
+	bool quitAll;				// quit
+
 	GlutState() {
 		display = 0;
 		appthread = 0;
