@@ -46,7 +46,7 @@ static GLUTtimer *freeTimerList = 0;
  *
  *	DESCRIPTION:  register a new timer callback
  ***********************************************************/
-void APIENTRY 
+void APIENTRY
 glutTimerFunc(unsigned int interval, GLUTtimerCB timerFunc, int value)
 {
   GLUTtimer *timer, *other;
@@ -119,10 +119,10 @@ processEventsAndTimeouts(void)
 	gBlock.WaitEvent();		// if there is already an event, returns
 							// immediately, otherwise wait forever
 	gBlock.ClearEvents();
-	
+
 	if(gState.quitAll)
 		exit(0);		// exit handler cleans up windows and quits nicely
-	
+
 	if (gState.currentWindow)
 		gState.currentWindow->LockGL();
 	for(int i=0; i<gState.windowListSize; i++) {
@@ -301,10 +301,10 @@ waitForSomething(void)
 {
 	bigtime_t timeout = __glutTimerList->timeout;
 	bigtime_t now = system_time();
-	
+
 	if (gBlock.PendingEvent())
 		goto immediatelyHandleEvent;
-	
+
 	if(timeout>now)
 		gBlock.WaitEvent(timeout-now);
 	if (gBlock.PendingEvent()) {
@@ -373,12 +373,12 @@ void glutSetKeyRepeat(int repeatMode)
 		case GLUT_KEY_REPEAT_DEFAULT:
 			gState.keyRepeatMode = GLUT_KEY_REPEAT_ON;
 			break;
-	
+
 		case GLUT_KEY_REPEAT_ON:
 		case GLUT_KEY_REPEAT_OFF:
 			gState.keyRepeatMode = repeatMode;
 			break;
-		
+
 		default:
 			__glutWarning("invalid glutSetKeyRepeat mode: %d", repeatMode);
 	}
@@ -403,13 +403,13 @@ void GlutWindow::KeyDown(const char *s, int32 slen)
 {
   ulong aChar = s[0];
   BGLView::KeyDown(s,slen);
-  
+
   BPoint p;
-	
-	if (ignoreKeyRepeat 
+
+	if (ignoreKeyRepeat
 		&& Window()->CurrentMessage()->FindInt32("be:key_repeat") > 0)
 		return;
-	
+
 	switch (aChar) {
 		case B_FUNCTION_KEY:
 		switch(Window()->CurrentMessage()->FindInt32("key")) {
@@ -478,7 +478,7 @@ void GlutWindow::KeyDown(const char *s, int32 slen)
 			goto specialLabel;
 		case B_INSERT:
             aChar = GLUT_KEY_INSERT;
-specialLabel:	
+specialLabel:
 			if (special) {
 				anyevents = specialEvent = true;
 				GetMouse(&p,&m_buttons);
@@ -492,7 +492,7 @@ specialLabel:
 		default:
 			break;
 	}
-		
+
 	if (keyboard) {
 		anyevents = keybEvent = true;
 		GetMouse(&p,&m_buttons);
@@ -528,9 +528,9 @@ void GlutWindow::KeyUp(const char *s, int32 slen)
 {
   ulong aChar = s[0];
   BGLView::KeyUp(s,slen);
-  
+
   BPoint p;
-	
+
 	switch (aChar) {
 		case B_FUNCTION_KEY:
 		switch(Window()->CurrentMessage()->FindInt32("key")) {
@@ -599,7 +599,7 @@ void GlutWindow::KeyUp(const char *s, int32 slen)
 			goto specialLabel;
 		case B_INSERT:
             aChar = GLUT_KEY_INSERT;
-specialLabel:	
+specialLabel:
 			if (specialUp!=0) {
 				anyevents = specialUpEvent = true;
 				GetMouse(&p,&m_buttons);
@@ -613,7 +613,7 @@ specialLabel:
 		default:
 			break;
 	}
-		
+
 	if (keyboardUp!=0) {
 		anyevents = keybUpEvent = true;
 		GetMouse(&p,&m_buttons);
@@ -702,7 +702,7 @@ void GlutWindow::MouseCheck()
 				statusX = (int)point.x;
 				statusY = (int)point.y;
 				gBlock.NewEvent();
-			}		
+			}
 			BRect bounds = w->Frame();
 			point.x += bounds.left;
 			point.y += bounds.top;
@@ -743,7 +743,7 @@ void GlutWindow::MouseMoved(BPoint point,
 						ulong transit, const BMessage *msg)
 {
 	BGLView::MouseMoved(point,transit,msg);
-	
+
 	if(transit != B_INSIDE_VIEW) {
 		if (entry) {
 			anyevents = entryEvent = true;
@@ -756,7 +756,7 @@ void GlutWindow::MouseMoved(BPoint point,
 		} else
 			entryState = GLUT_LEFT;
 	}
-	
+
 	MouseCheck();
 	if(m_buttons) {
 		if(motion) {
@@ -782,7 +782,7 @@ void GlutWindow::MouseMoved(BPoint point,
  *
  *	DESCRIPTION:  handles mouse wheel events
  ***********************************************************/
- 
+
 void GlutWindow::MessageReceived(BMessage *message)
 {
 	switch(message->what){
@@ -801,7 +801,7 @@ void GlutWindow::MessageReceived(BMessage *message)
 	}
 	default:
 	 	break;
-	}			
+	}
 }
 
 /***********************************************************
@@ -866,7 +866,7 @@ void GlutWindow::Pulse()
  *
  *	DESCRIPTION:  handles GL error messages
  ***********************************************************/
-void GlutWindow::ErrorCallback(GLenum errorCode) {
+void GlutWindow::ErrorCallback(unsigned long errorCode) {
 	__glutWarning("GL error: %s", gluErrorString(errorCode));
 }
 

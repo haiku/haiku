@@ -31,7 +31,7 @@ public:
 	void Draw(BRect updateRect);
 	void Pulse();		// needed since MouseUp() is broken
 	void MouseCheck();	// check for button state changes
-	void ErrorCallback(GLenum errorCode);
+	void ErrorCallback(unsigned long errorCode);
 
 	static long MenuThread(void *menu);
 
