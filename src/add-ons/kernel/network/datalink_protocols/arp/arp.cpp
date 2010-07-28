@@ -1095,7 +1095,6 @@ static net_datalink_protocol_module_info sARPModule = {
 	arp_init_protocol,
 	arp_uninit_protocol,
 	arp_send_data,
-	NULL, // receive_data
 	arp_up,
 	arp_down,
 	arp_control,

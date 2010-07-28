@@ -756,6 +756,13 @@ tcp_init()
 		NULL);
 	if (status < B_OK)
 		return status;
+	status = gStackModule->register_domain_protocols(AF_INET6,
+		SOCK_STREAM, 0,
+		"network/protocols/tcp/v1",
+		"network/protocols/ipv6/v1",
+		NULL);
+	if (status < B_OK)
+		return status;
 
 	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM,
 		IPPROTO_TCP,
@@ -764,8 +771,19 @@ tcp_init()
 		NULL);
 	if (status < B_OK)
 		return status;
+	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_STREAM,
+		IPPROTO_TCP,
+		"network/protocols/tcp/v1",
+		"network/protocols/ipv6/v1",
+		NULL);
+	if (status < B_OK)
+		return status;
 
 	status = gStackModule->register_domain_receiving_protocol(AF_INET,
+		IPPROTO_TCP, "network/protocols/tcp/v1");
+	if (status < B_OK)
+		return status;
+	status = gStackModule->register_domain_receiving_protocol(AF_INET6,
 		IPPROTO_TCP, "network/protocols/tcp/v1");
 	if (status < B_OK)
 		return status;

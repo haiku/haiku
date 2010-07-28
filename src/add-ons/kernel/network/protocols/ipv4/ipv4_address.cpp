@@ -507,7 +507,7 @@ net_address_module_info gIPv4AddressModule = {
 		0,
 		NULL
 	},
-	true, // has_broadcast_address
+	NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS,
 	ipv4_copy_address,
 	ipv4_mask_address,
 	ipv4_equal_addresses,

@@ -12,6 +12,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 UsePrivateKernelHeaders ;
 UsePrivateHeaders kernel net ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ] : true ;
 
 KernelAddon ipv6_datagram :
 	ipv6_datagram.cpp

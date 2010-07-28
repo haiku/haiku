@@ -31,8 +31,9 @@
 
 #include <new>
 
-#include "../../protocols/ipv6/jenkins.h" // TODO: move this file
-#include "../../protocols/ipv6/ipv6_address.h"
+#include <ipv6/jenkins.h>
+#include <ipv6/ipv6_address.h>
+#include "ndp.h"
 
 
 #define TRACE_NDP
@@ -81,6 +82,18 @@ struct neighbor_discovery_header {
 	uint8		option_type;
 	uint8		option_length;
 	uint8		link_address[ETHER_ADDRESS_LENGTH];
+} _PACKED;
+
+struct router_advertisement_header {
+	uint8		icmp6_type;
+	uint8		icmp6_code;
+	uint16		icmp6_checksum;
+	uint8		hop_limit;
+	uint8		flags;
+	uint16		router_lifetime;
+	uint32		reachable_time;
+	uint32		retransmit_timer;
+	uint8		options[];
 } _PACKED;
 
 
@@ -532,8 +545,10 @@ ndp_update_local(ipv6_datalink_protocol* protocol)
 
 
 static status_t
-handle_neighbor_solicitation(net_buffer* buffer)
+ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 {
+	*reuseBuffer = false;
+
 	NetBufferHeaderReader<neighbor_discovery_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
@@ -594,22 +609,19 @@ handle_neighbor_solicitation(net_buffer* buffer)
 	buffer->flags = 0;
 		// make sure this won't be a broadcast message
 
-	// TODO: there is not need to clone, could reuse old buffer
-	net_buffer* clone = gBufferModule->clone(buffer, true);
-	if (clone == NULL)
-		return B_NO_MEMORY;
-
 	if (sIPv6Protocol == NULL)
 		return B_ERROR;
 
+	*reuseBuffer = true;
+
 	// send the ICMPv6 packet out
 	TRACE(("Sending Neighbor Advertisement\n"));
-	return sIPv6Module->send_data(sIPv6Protocol, clone);
+	return sIPv6Module->send_data(sIPv6Protocol, buffer);
 }
 
 
 static void
-handle_neighbor_advertisement(net_buffer* buffer)
+ndp_receive_advertisement(net_buffer* buffer)
 {
 	// TODO: also process unsolicited advertisments?
 	if ((buffer->flags & MSG_MCAST) != 0)
@@ -638,6 +650,53 @@ handle_neighbor_advertisement(net_buffer* buffer)
 	MutexLocker locker(sCacheLock);
 	// TODO: take in account ND_NA_FLAGs
 	ndp_update_entry(header.target_address, &hardwareAddress, 0);
+}
+
+
+static void
+ndp_receive_router_advertisement(net_buffer* buffer)
+{
+	NetBufferHeaderReader<router_advertisement_header> bufferHeader(buffer);
+	if (bufferHeader.Status() < B_OK)
+		return;
+
+	// TODO: check for validity
+
+	// TODO: parse the options
+}
+
+
+static status_t
+ndp_receive_data(net_buffer* buffer)
+{
+	dprintf("ndp_receive_data\n");
+
+	NetBufferHeaderReader<icmp6_hdr> icmp6Header(buffer);
+	if (icmp6Header.Status() < B_OK)
+		return icmp6Header.Status();
+
+	bool reuseBuffer = false;
+
+	switch (icmp6Header->icmp6_type) {
+		case ND_NEIGHBOR_SOLICIT:
+			TRACE(("  received Neighbor Solicitation\n"));
+			ndp_receive_solicitation(buffer, &reuseBuffer);
+			break;
+
+		case ND_NEIGHBOR_ADVERT:
+			TRACE(("  received Neighbor Advertisement\n"));
+			ndp_receive_advertisement(buffer);
+			break;
+
+		case ND_ROUTER_ADVERT:
+			TRACE(("  received Router Advertisement\n"));
+			ndp_receive_router_advertisement(buffer);
+			break;
+	}
+
+	if (reuseBuffer == false)
+		gBufferModule->free(buffer);
+	return B_OK;
 }
 
 
@@ -898,30 +957,6 @@ ipv6_datalink_send_data(net_datalink_protocol* _protocol, net_buffer* buffer)
 
 
 static status_t
-ipv6_datalink_receive_data(net_buffer* buffer)
-{
-	NetBufferHeaderReader<icmp6_hdr> bufferHeader(buffer);
-	if (bufferHeader.Status() < B_OK)
-		return bufferHeader.Status();
-
-	switch (bufferHeader->icmp6_type) {
-		case ND_NEIGHBOR_SOLICIT:
-			TRACE(("  received Neighbor Solicitation\n"));
-			handle_neighbor_solicitation(buffer);
-			break;
-
-		case ND_NEIGHBOR_ADVERT:
-			TRACE(("  received Neighbor Advertisement\n"));
-			handle_neighbor_advertisement(buffer);
-			break;
-	}
-
-	gBufferModule->free(buffer);
-	return B_OK;
-}
-
-
-static status_t
 ipv6_datalink_up(net_datalink_protocol* _protocol)
 {
 	ipv6_datalink_protocol* protocol = (ipv6_datalink_protocol*)_protocol;
@@ -1058,6 +1093,7 @@ ipv6_datalink_std_ops(int32 op, ...)
 	return B_ERROR;
 }
 
+
 net_datalink_protocol_module_info gIPv6DataLinkModule = {
 	{
 		"network/datalink_protocols/ipv6_datagram/v1",
@@ -1067,7 +1103,6 @@ net_datalink_protocol_module_info gIPv6DataLinkModule = {
 	ipv6_datalink_init,
 	ipv6_datalink_uninit,
 	ipv6_datalink_send_data,
-	ipv6_datalink_receive_data,
 	ipv6_datalink_up,
 	ipv6_datalink_down,
 	ipv6_datalink_control,
@@ -1075,6 +1110,14 @@ net_datalink_protocol_module_info gIPv6DataLinkModule = {
 	ipv6_datalink_leave_multicast,
 };
 
+net_ndp_module_info gIPv6NDPModule = {
+	{
+		"network/datalink_protocols/ipv6_datagram/ndp/v1",
+		0,
+		NULL
+	},
+	ndp_receive_data
+};
 
 module_dependency module_dependencies[] = {
 	{NET_STACK_MODULE_NAME, (module_info**)&sStackModule},
@@ -1085,5 +1128,6 @@ module_dependency module_dependencies[] = {
 
 module_info* modules[] = {
 	(module_info*)&gIPv6DataLinkModule,
+	(module_info*)&gIPv6NDPModule,
 	NULL
 };

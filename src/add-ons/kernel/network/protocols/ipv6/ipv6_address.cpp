@@ -247,8 +247,8 @@ ipv6_first_mask_bit(const sockaddr *_mask)
 			continue;
 
 		for (uint8 bit = 0; bit < 8; bit++) {
-			if (pmask[i] & (1 << bit))
-				return bit;
+			if ((pmask[i] & (1 << (7 - bit))) == 0)
+				return i * 8 + bit;
 		}
 	}
 
@@ -276,7 +276,7 @@ ipv6_check_mask(const sockaddr *_mask)
 		} else if (pmask[i] == 0) {
 			zero = true;
 		} else {
-			for (int8 bit = 7; bit > 0; bit--) {
+			for (int8 bit = 7; bit >= 0; bit--) {
 				if (pmask[i] & (1 << bit)) {
 					if (zero)
 						return false;
@@ -520,8 +520,8 @@ ipv6_checksum_address(struct Checksum *checksum, const sockaddr *address)
 		return B_BAD_VALUE;
 
 	in6_addr &a = ((sockaddr_in6 *)address)->sin6_addr;
-	for (uint32 i = 0; i < sizeof(in6_addr); i++)
-		(*checksum) << a.s6_addr[i];
+	for (uint32 i = 0; i < sizeof(in6_addr); i += 2)
+		(*checksum) << *(uint16*)(a.s6_addr + i);
 
 	return B_OK;
 }
@@ -544,7 +544,7 @@ net_address_module_info gIPv6AddressModule = {
 		0,
 		NULL
 	},
-	false, // has_broadcast_address
+	0, // flags
 	ipv6_copy_address,
 	ipv6_mask_address,
 	ipv6_equal_addresses,

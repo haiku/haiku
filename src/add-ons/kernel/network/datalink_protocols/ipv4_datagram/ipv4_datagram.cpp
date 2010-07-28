@@ -127,6 +127,7 @@ ipv4_datalink_std_ops(int32 op, ...)
 	return B_ERROR;
 }
 
+
 net_datalink_protocol_module_info gIPv4DataLinkModule = {
 	{
 		"network/datalink_protocols/ipv4_datagram/v1",
@@ -136,7 +137,6 @@ net_datalink_protocol_module_info gIPv4DataLinkModule = {
 	ipv4_datalink_init,
 	ipv4_datalink_uninit,
 	ipv4_datalink_send_data,
-	NULL, // receive_data
 	ipv4_datalink_up,
 	ipv4_datalink_down,
 	ipv4_datalink_control,

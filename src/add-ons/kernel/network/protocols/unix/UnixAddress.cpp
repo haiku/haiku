@@ -290,7 +290,7 @@ net_address_module_info gAddressModule = {
 		0,
 		NULL
 	},
-	true, // has_broadcast_address
+	NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS,
 	unix_copy_address,
 	unix_mask_address,
 	unix_equal_addresses,

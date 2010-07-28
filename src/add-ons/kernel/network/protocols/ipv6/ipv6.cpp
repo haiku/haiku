@@ -52,13 +52,13 @@
 
 
 struct IPv6Header {
-	struct ip6_hdr h;
+	struct ip6_hdr header;
 
-	uint8 ProtocolVersion() const { return h.ip6_vfc & IPV6_VERSION_MASK; }
-	uint8 ServiceType() const { return ntohl(h.ip6_flow) >> 20;}
- 	uint16 PayloadLength() const { return ntohs(h.ip6_plen); }
-	const in6_addr& Dst() const { return h.ip6_dst; }
-	const in6_addr& Src() const { return h.ip6_src; }
+	uint8 ProtocolVersion() const { return header.ip6_vfc & IPV6_VERSION_MASK; }
+	uint8 ServiceType() const { return ntohl(header.ip6_flow) >> 20;}
+ 	uint16 PayloadLength() const { return ntohs(header.ip6_plen); }
+	const in6_addr& Dst() const { return header.ip6_dst; }
+	const in6_addr& Src() const { return header.ip6_src; }
 	uint16 GetTransportHeaderOffset(net_buffer* buffer) const;
 };
 
@@ -139,7 +139,7 @@ uint16
 IPv6Header::GetTransportHeaderOffset(net_buffer* buffer) const
 {
 	uint16 offset = sizeof(struct ip6_hdr);
-	uint8 next = h.ip6_nxt;
+	uint8 next = header.ip6_nxt;
 
 	// these are the extension headers that might be supported one day
 	while (next == IPPROTO_HOPOPTS
@@ -192,10 +192,11 @@ dump_ipv6_header(IPv6Header &header)
 	dprintf("  version: %d\n", header.ProtocolVersion() >> 4);
 	dprintf("  service_type: %d\n", header.ServiceType());
 	dprintf("  payload_length: %d\n", header.PayloadLength());
-	dprintf("  next_header: %d\n", header.h.ip6_nxt);
-	dprintf("  hop_limit: %d\n", header.h.ip6_hops);
-	dprintf("  source: %s\n", ip6_sprintf(&header.h.ip6_src, addrbuf));
-	dprintf("  destination: %s\n", ip6_sprintf(&header.h.ip6_dst, addrbuf));
+	dprintf("  next_header: %d\n", header.header.ip6_nxt);
+	dprintf("  hop_limit: %d\n", header.header.ip6_hops);
+	dprintf("  source: %s\n", ip6_sprintf(&header.header.ip6_src, addrbuf));
+	dprintf("  destination: %s\n",
+		ip6_sprintf(&header.header.ip6_dst, addrbuf));
 #endif
 }
 
@@ -968,8 +969,6 @@ ipv6_receive_data(net_buffer* buffer)
 	uint16 transportHeaderOffset = header.GetTransportHeaderOffset(buffer);
 	uint8 protocol = buffer->protocol;
 
-	buffer->hoplimit = header.h.ip6_hlim;
-
 	// remove any trailing/padding data
 	status_t status = gBufferModule->trim(buffer, packetLength);
 	if (status != B_OK)
@@ -979,8 +978,15 @@ ipv6_receive_data(net_buffer* buffer)
 	// TODO: check for fragmentation
 	//
 
+	// tell the buffer to preserve removed ipv6 header - may need it later
+	gBufferModule->store_header(buffer);
+
+	TRACE("store_header for %p\n", buffer);
+
+	// remove ipv6 headers for now
 	gBufferModule->remove_header(buffer, transportHeaderOffset);
 
+	// deliver the data to raw sockets
 	raw_receive_data(buffer);
 
 	net_protocol_module_info* module = receiving_protocol(protocol);
@@ -1029,30 +1035,45 @@ ipv6_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
 
 
 ssize_t
-ipv6_process_ancillary_data_no_container(net_protocol* protocol,
+ipv6_process_ancillary_data_no_container(net_protocol* _protocol,
 	net_buffer* buffer, void* msgControl, size_t msgControlLen)
 {
+	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 	ssize_t bytesWritten = 0;
 
-	if (((ipv6_protocol*)protocol)->receive_hoplimit != 0) {
+	if (protocol->receive_hoplimit != 0) {
 		TRACE("receive_hoplimit");
 
 		if (msgControlLen < CMSG_SPACE(sizeof(int)))
 			return B_NO_MEMORY;
+
+		TRACE("restore_header for %p\n", buffer);
+
+		if (gBufferModule->stored_header_length(buffer)
+				< (int)sizeof(ip6_hdr))
+			return B_ERROR;
+
+		IPv6Header header;
+		if (gBufferModule->restore_header(buffer, 0, &header, sizeof(ip6_hdr))
+				!= B_OK)
+			return B_ERROR;
+
+		if (header.ProtocolVersion() != IPV6_VERSION)
+			return B_ERROR;
 
 		cmsghdr* messageHeader = (cmsghdr*)((char*)msgControl + bytesWritten);
 		messageHeader->cmsg_len = CMSG_LEN(sizeof(int));
 		messageHeader->cmsg_level = IPPROTO_IPV6;
 		messageHeader->cmsg_type = IPV6_HOPLIMIT;
 
-		int hoplimit = buffer->hoplimit;
+		int hoplimit = header.header.ip6_hlim;
 		memcpy(CMSG_DATA(messageHeader), &hoplimit, sizeof(int));
 
 		bytesWritten += CMSG_SPACE(sizeof(int));
 		msgControlLen -= CMSG_SPACE(sizeof(int));
 	}
 
-	if (((ipv6_protocol*)protocol)->receive_pktinfo != 0) {
+	if (protocol->receive_pktinfo != 0) {
 		TRACE("receive_pktinfo");
 
 		if (msgControlLen < CMSG_SPACE(sizeof(struct in6_pktinfo)))
@@ -1161,7 +1182,6 @@ ipv6_std_ops(int32 op, ...)
 			return init_ipv6();
 		case B_MODULE_UNINIT:
 			return uninit_ipv6();
-
 		default:
 			return B_ERROR;
 	}

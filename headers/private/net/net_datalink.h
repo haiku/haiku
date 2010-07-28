@@ -98,9 +98,11 @@ struct net_datalink_module_info {
 					struct net_route_info *info);
 };
 
+#define NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS		0x01
+
 struct net_address_module_info {
 	module_info info;
-	bool has_broadcast_address;
+	uint32 flags;
 
 	status_t (*copy_address)(const sockaddr *from, sockaddr **to,
 					bool replaceWithZeros, const sockaddr *mask);

@@ -30,7 +30,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <netinet6/in6.h> // TODO
+// TODO: this is only needed for IPv6 multicast route code;
+// remove it when the code will be refactored
+#include <netinet6/in6.h>
 
 
 struct datalink_protocol : net_protocol {
@@ -752,7 +754,8 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 
 					// reset the broadcast address if the address family has such
 					sockaddr* broadcast;
-					if (interface->domain->address_module->has_broadcast_address) {
+					if ((interface->domain->address_module->flags
+						& NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS) != 0) {
 						broadcast = reallocate_address(&interface->destination,
 							request.ifr_addr.sa_len);
 					} else {
@@ -971,7 +974,6 @@ net_datalink_protocol_module_info gDatalinkInterfaceProtocolModule = {
 	interface_protocol_init,
 	interface_protocol_uninit,
 	interface_protocol_send_data,
-	NULL, // receive_data
 	interface_protocol_up,
 	interface_protocol_down,
 	interface_protocol_control,

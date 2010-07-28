@@ -11,6 +11,8 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePrivateHeaders kernel net ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network protocols ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network datalink_protocols ] : true ;
 
 KernelAddon icmp6 :
 	icmp6.cpp

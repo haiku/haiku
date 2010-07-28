@@ -8,6 +8,7 @@
 #include <net_protocol.h>
 #include <net_stack.h>
 #include <net_datalink_protocol.h>
+#include <NetUtilities.h>
 #include <NetBufferUtilities.h>
 
 #include <KernelExport.h>
@@ -19,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../ipv6/ipv6_utils.h" // ipv6_checksum()
+#include <ipv6_datagram/ndp.h>
 
 
 #define TRACE_ICMP6
@@ -35,7 +36,7 @@ typedef NetBufferField<uint16, offsetof(icmp6_hdr, icmp6_cksum)> ICMP6ChecksumFi
 
 net_buffer_module_info *gBufferModule;
 static net_stack_module_info *sStackModule;
-static net_datalink_protocol_module_info *sIPv6DatalinkModule;
+static net_ndp_module_info *sIPv6NDPModule;
 
 
 net_protocol *
@@ -212,17 +213,22 @@ icmp6_receive_data(net_buffer *buffer)
 	TRACE(("  got type %u, code %u, checksum 0x%x\n", header.icmp6_type,
 			header.icmp6_code, header.icmp6_cksum));
 
+	net_domain* domain;
+	if (buffer->interface != NULL)
+		domain = buffer->interface->domain;
+	else
+		domain = sStackModule->get_domain(buffer->source->sa_family);
+
+	// TODO: possible?
+	if (domain == NULL || domain->module == NULL)
+		return B_ERROR;
+
+	net_address_module_info* addressModule = domain->address_module;
+
 	// compute and check the checksum
-	uint16 checksum;
-	checksum = gBufferModule->checksum(buffer, 0, buffer->size, false);
-	checksum = ipv6_checksum(&((sockaddr_in6*)buffer->source)->sin6_addr,
-		&((sockaddr_in6*)buffer->destination)->sin6_addr,
-		buffer->size, IPPROTO_ICMPV6, checksum);
-
-	TRACE(("  computed checksum: %ld\n", checksum));
-
-	if (checksum != 0)
-		return B_BAD_DATA;
+ 	if (Checksum::PseudoHeader(addressModule, gBufferModule, buffer,
+ 			IPPROTO_ICMPV6) != 0)
+ 		return B_BAD_DATA;
 
 	switch (header.icmp6_type) {
 		case ICMP6_ECHO_REPLY:
@@ -230,20 +236,13 @@ icmp6_receive_data(net_buffer *buffer)
 
 		case ICMP6_ECHO_REQUEST:
 		{
-			net_domain *domain;
 			if (buffer->interface != NULL) {
-				domain = buffer->interface->domain;
-
 				// We only reply to echo requests of our local interface; we
 				// don't reply to broadcast requests
 				if (!domain->address_module->equal_addresses(
 						buffer->interface->address, buffer->destination))
 					break;
-			} else
-				domain = sStackModule->get_domain(buffer->source->sa_family);
-
-			if (domain == NULL || domain->module == NULL)
-				break;
+			}
 
 			net_buffer *reply = gBufferModule->duplicate(buffer);
 			if (reply == NULL)
@@ -260,11 +259,8 @@ icmp6_receive_data(net_buffer *buffer)
 
 			header.Sync();
 
-			checksum = gBufferModule->checksum(buffer, 0, buffer->size, false);
-			*ICMP6ChecksumField(reply) = 
-				ipv6_checksum(&((sockaddr_in6*)buffer->source)->sin6_addr,
-					&((sockaddr_in6*)buffer->destination)->sin6_addr,
-					buffer->size, IPPROTO_ICMPV6, checksum);
+			*ICMP6ChecksumField(reply) = Checksum::PseudoHeader(addressModule,
+				gBufferModule, buffer, IPPROTO_ICMPV6);
 
 			status_t status = domain->module->send_data(NULL, reply);
 			if (status < B_OK) {
@@ -274,8 +270,8 @@ icmp6_receive_data(net_buffer *buffer)
 		}
 
 		default:
-			// forward unrecognized messages to datalink layer
-			return sIPv6DatalinkModule->receive_data(buffer);
+			// unrecognized messages go to neighbor discovery protocol handler
+			return sIPv6NDPModule->receive_data(buffer);
 	}
 
 	gBufferModule->free(buffer);
@@ -383,8 +379,8 @@ net_protocol_module_info sICMP6Module = {
 module_dependency module_dependencies[] = {
 	{NET_STACK_MODULE_NAME, (module_info **)&sStackModule},
 	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
-	{"network/datalink_protocols/ipv6_datagram/v1",
-		(module_info **)&sIPv6DatalinkModule},
+	{"network/datalink_protocols/ipv6_datagram/ndp/v1",
+		(module_info **)&sIPv6NDPModule},
 	{}
 };
 
