@@ -75,7 +75,7 @@ printArray(const char *label, const char **strings, size_t size)
 			if (compare > 0)
 				printf("\n%2lu)", bucket++);
 			else if (compare < 0) {
-				printf("\t*** broken sort order!\n");
+				printf("\t*** broken sort order, next is NOT %s\n", strings[i]);
 				exit(-1);
 			}
 

@@ -116,9 +116,29 @@ BCollator::IgnorePunctuation() const
 status_t
 BCollator::GetSortKey(const char *string, BString *key, int8 strength)
 {
-	// TODO : handle fIgnorePunctuation and strength
+	// TODO : handle fIgnorePunctuation
 	if (strength == B_COLLATE_DEFAULT)
 		strength = fStrength;
+	Collator::ECollationStrength icuStrength;
+	switch(strength) {
+		case B_COLLATE_PRIMARY:
+			icuStrength = Collator::PRIMARY;
+			break;
+		case B_COLLATE_SECONDARY:
+			icuStrength = Collator::SECONDARY;
+			break;
+		case B_COLLATE_TERTIARY:
+		default:
+			icuStrength = Collator::TERTIARY;
+			break;
+		case B_COLLATE_QUATERNARY:
+			icuStrength = Collator::QUATERNARY;
+			break;
+		case B_COLLATE_IDENTICAL:
+			icuStrength = Collator::IDENTICAL;
+			break;
+	}
+	fICUCollator->setStrength(icuStrength);
 
 	int length = strlen(string);
 
@@ -127,20 +147,25 @@ BCollator::GetSortKey(const char *string, BString *key, int8 strength)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	int requiredSize = fICUCollator->getSortKey(UnicodeString(string, length),
-		buffer, length * 2);
+	UErrorCode error = U_ZERO_ERROR;
+	int requiredSize = fICUCollator->getSortKey(UnicodeString(string, length,
+		NULL, error), buffer, length * 2);
 	if (requiredSize > length * 2) {
 		buffer = (uint8_t*)realloc(buffer, requiredSize);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
-		fICUCollator->getSortKey(UnicodeString(string, length), buffer,
-			requiredSize);
+		error = U_ZERO_ERROR;
+		fICUCollator->getSortKey(UnicodeString(string, length, NULL, error),
+			buffer,	requiredSize);
 	}
 
 	key->SetTo((char*)buffer);
 	free(buffer);
 
-	return B_OK;
+	if (error == U_ZERO_ERROR)
+		return B_OK;
+	else
+		return B_ERROR;
 }
 
 
@@ -170,7 +195,8 @@ BCollator::Compare(const char *a, const char *b, int32 length, int8 strength)
 			break;
 	}
 	fICUCollator->setStrength(icuStrength);
-	return fICUCollator->compare(a, b, length);
+	UErrorCode error = U_ZERO_ERROR;
+	return fICUCollator->compare(a, b, error);
 }
 
 
