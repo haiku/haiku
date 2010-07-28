@@ -1,0 +1,2 @@
+resource app_signature "application/x-vnd.Haiku-notify";
+resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;

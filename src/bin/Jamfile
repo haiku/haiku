@@ -15,12 +15,13 @@ local haiku-utils_rsrc = [ FGristFiles haiku-utils.rsrc ] ;
 
 ResComp $(haiku-utils_rsrc) : [ FGristFiles haiku-utils.rdef ] ;
 
+AddResources checkitout : checkitout.rdef ;
 AddResources fortune : fortune.rdef ;
 AddResources hey : hey.rdef ;
 AddResources mimeset : mimeset.rdef ;
 AddResources mountvolume : mountvolume.rdef ;
+AddResources notify : notify.rdef ;
 AddResources urlwrapper : urlwrapper.rdef ;
-AddResources checkitout : checkitout.rdef ;
 
 # standard commands that don't need any additional library
 StdBinCommands
