@@ -24,8 +24,7 @@ if $(HAIKU_ATA_STACK) = 1 {
 }
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
-SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
-	ipv4_datagram ;
+SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame ;
 SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ;
 
 SYSTEM_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com $(X86_ONLY)atheros813x
