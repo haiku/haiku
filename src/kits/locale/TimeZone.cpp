@@ -39,7 +39,7 @@ void
 BTimeZone::GetCode(char* buffer, int size)
 {
 	UnicodeString unicodeName;
-	fICUTimeZone->getDisplayName(unicodeName);
+	fICUTimeZone->getID(unicodeName);
 
 	CheckedArrayByteSink converter(buffer, size);
 	unicodeName.toUTF8(converter);
