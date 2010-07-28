@@ -9,36 +9,37 @@ if $(TARGET_PLATFORM) != haiku {
 
 MergeObject <opengl>glut.o :
 	# C++ sources
-	glutBlocker.cpp 
-	glutInit.cpp 
-	glutWindow.cpp 
-	glutEvent.cpp 
-	glutCallback.cpp 
-	glutOverlay.cpp 
-	glutGet.cpp 
-	glutColor.cpp 
-	glutCursor.cpp 
-	glutMenu.cpp 
-	glutDstr.cpp 
+	glutBlocker.cpp
+	glutInit.cpp
+	glutWindow.cpp
+	glutEvent.cpp
+	glutCallback.cpp
+	glutOverlay.cpp
+	glutGet.cpp
+	glutColor.cpp
+	glutCursor.cpp
+	glutMenu.cpp
+	glutDstr.cpp
+	glutGameMode.cpp
 	beos_x11.cpp
 
 	# C sources
-	glut_8x13.c 
-	glut_9x15.c 
-	glut_bitmap.c 
-	glut_bwidth.c 
-	glut_hel10.c 
-	glut_hel12.c 
-	glut_hel18.c 
-	glut_tr10.c 
-	glut_tr24.c 
-	glut_mroman.c 
-	glut_roman.c 
-	glut_stroke.c 
-	glut_swidth.c 
-	glut_shapes.c 
-	glut_teapot.c 
-	glut_vidresize.c 
-	glut_util.c 
+	glut_8x13.c
+	glut_9x15.c
+	glut_bitmap.c
+	glut_bwidth.c
+	glut_hel10.c
+	glut_hel12.c
+	glut_hel18.c
+	glut_tr10.c
+	glut_tr24.c
+	glut_mroman.c
+	glut_roman.c
+	glut_stroke.c
+	glut_swidth.c
+	glut_shapes.c
+	glut_teapot.c
+	glut_vidresize.c
+	glut_util.c
 	glut_ext.c
 ;

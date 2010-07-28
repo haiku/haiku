@@ -72,7 +72,7 @@ int glutGet(GLenum state) {
 			num++;
 			children = children->siblings;
 		}
-		return num; 
+		return num;
 		}
   case GLUT_WINDOW_BUFFER_SIZE:	// best guesses
   case GLUT_WINDOW_DEPTH_SIZE:
@@ -97,7 +97,7 @@ int glutGet(GLenum state) {
   case GLUT_WINDOW_NUM_SAMPLES:
   case GLUT_WINDOW_STEREO:
         return 0;
- 
+
  	case GLUT_WINDOW_CURSOR:
  		return gState.currentWindow->cursor;	// don't need to lock window since it won't change
 
@@ -172,14 +172,18 @@ int glutDeviceGet(GLenum info) {
 		return 1;
 
 	case GLUT_HAS_SPACEBALL:
-	case GLUT_HAS_DIAL_AND_BUTTON_BOX:
-	case GLUT_HAS_TABLET:
 	case GLUT_NUM_SPACEBALL_BUTTONS:
-	case GLUT_NUM_BUTTON_BOX_BUTTONS:
+	case GLUT_HAS_DIAL_AND_BUTTON_BOX:
 	case GLUT_NUM_DIALS:
+	case GLUT_NUM_BUTTON_BOX_BUTTONS:
+	case GLUT_HAS_TABLET:
 	case GLUT_NUM_TABLET_BUTTONS:
+	case GLUT_HAS_JOYSTICK:
+	case GLUT_JOYSTICK_POLL_RATE:
+	case GLUT_JOYSTICK_BUTTONS:
+	case GLUT_JOYSTICK_AXES:
 		return 0;
-	
+
 	case GLUT_NUM_MOUSE_BUTTONS:
 	    {
 		int32 mouseButtons = 3;		// good guess
@@ -188,6 +192,14 @@ int glutDeviceGet(GLenum info) {
 		}
 		return mouseButtons;
 	    }
+
+	case GLUT_DEVICE_IGNORE_KEY_REPEAT:
+		if (gState.currentWindow)
+			return gState.currentWindow->ignoreKeyRepeat;
+ 		return 0;
+
+	case GLUT_DEVICE_KEY_REPEAT:
+		return GLUT_KEY_REPEAT_DEFAULT;
 
 	default:
 		__glutWarning("invalid glutDeviceGet parameter: %d", info);
