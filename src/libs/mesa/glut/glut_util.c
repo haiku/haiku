@@ -29,7 +29,7 @@ __glutStrdup(const char *string)
 }
 
 void
-__glutWarning(char *format,...)
+__glutWarning(const char *format,...)
 {
   va_list args;
 
@@ -42,7 +42,7 @@ __glutWarning(char *format,...)
 }
 
 /* CENTRY */
-void APIENTRY 
+void APIENTRY
 glutReportErrors(void)
 {
   GLenum error;
@@ -53,7 +53,7 @@ glutReportErrors(void)
 /* ENDCENTRY */
 
 void
-__glutFatalError(char *format,...)
+__glutFatalError(const char *format,...)
 {
   va_list args;
 
@@ -67,7 +67,7 @@ __glutFatalError(char *format,...)
 }
 
 void
-__glutFatalUsage(char *format,...)
+__glutFatalUsage(const char *format,...)
 {
   va_list args;
 

@@ -3,8 +3,8 @@
 
 /* Copyright (c) Mark J. Kilgard, 1994, 1997, 1998. */
 
-/* This program is freely distributable without licensing fees 
-   and is provided without guarantee or warrantee expressed or 
+/* This program is freely distributable without licensing fees
+   and is provided without guarantee or warrantee expressed or
    implied. This program is -not- in the public domain. */
 
 #if defined(__CYGWIN32__)
@@ -169,7 +169,7 @@ extern int sys$gettim(struct timeval *);
 #define XSTATICGRAY             (NUM_GLXCAPS + 3)  /* Used as
                                                       mask bit
                                                       for "any
-                                                      visual type 
+                                                      visual type
                                                       selected". */
 #define XGRAYSCALE              (NUM_GLXCAPS + 4)
 #define XSTATICCOLOR            (NUM_GLXCAPS + 5)
@@ -734,9 +734,9 @@ extern "C" {
 #endif
 /* private routines from glut_util.c */
 extern char * __glutStrdup(const char *string);
-extern void __glutWarning(char *format,...);
-extern void __glutFatalError(char *format,...);
-extern void __glutFatalUsage(char *format,...);
+extern void __glutWarning(const char *format,...);
+extern void __glutFatalError(const char *format,...);
+extern void __glutFatalUsage(const char *format,...);
 #ifdef __cplusplus
 }
 #endif
