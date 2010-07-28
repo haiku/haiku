@@ -217,7 +217,7 @@ unix_mask_address(const sockaddr *address, const sockaddr *mask,
 
 static status_t
 unix_set_to_defaults(sockaddr *defaultMask, sockaddr *defaultBroadcast,
-	sockaddr *address, sockaddr *netmask)
+	const sockaddr *address, const sockaddr *netmask)
 {
 	if (address == NULL)
 		return B_BAD_VALUE;
@@ -246,8 +246,9 @@ unix_update_to(sockaddr *address, const sockaddr *from)
 
 
 static uint32
-hash_address(const sockaddr_un* address)
+unix_hash_address(const sockaddr* _address, bool includePort)
 {
+	sockaddr_un* address = (sockaddr_un*)_address;
 	if (address == NULL)
 		return 0;
 
@@ -264,8 +265,8 @@ hash_address(const sockaddr_un* address)
 static uint32
 unix_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 {
-	return hash_address((sockaddr_un*)ourAddress) * 17
-		+ hash_address((sockaddr_un*)peerAddress);
+	return unix_hash_address(ourAddress, false) * 17
+		+ unix_hash_address(peerAddress, false);
 }
 
 
@@ -309,6 +310,7 @@ net_address_module_info gAddressModule = {
 	unix_set_to_empty_address,
 	unix_set_to_defaults,
 	unix_update_to,
+	unix_hash_address,
 	unix_hash_address_pair,
 	unix_checksum_address,
 	NULL	// get_loopback_address

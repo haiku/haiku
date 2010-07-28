@@ -406,14 +406,10 @@ NetServer::_IsValidInterface(int socket, const char* name)
 
 	// check if it has a hardware address, too, in case of ethernet
 
-	if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq)) < 0)
-		return false;
-
 	int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
 	if (linkSocket < 0)
 		return false;
 
-	prepare_request(request, request.ifr_parameter.device);
 	if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq)) < 0) {
 		close(linkSocket);
 		return false;
@@ -623,10 +619,12 @@ NetServer::_ConfigureInterface(int socket, BMessage& interface,
 
 		if (interfaceIndex == 0) {
 			// we need to create the interface first
-			request.ifr_parameter.base_name[0] = '\0';
-			request.ifr_parameter.device[0] = '\0';
-			request.ifr_parameter.sub_type = 0;
-				// the default device is okay for us
+			ifaliasreq request;
+			strlcpy(request.ifra_name, device, IF_NAMESIZE);
+
+			request.ifra_addr.ss_family = AF_UNSPEC;
+			request.ifra_mask.ss_family = AF_UNSPEC;
+			request.ifra_broadaddr.ss_family = AF_UNSPEC;
 
 			if (ioctl(socket, SIOCAIFADDR, &request, sizeof(request)) < 0) {
 				fprintf(stderr, "%s: Could not add interface: %s\n", Name(),

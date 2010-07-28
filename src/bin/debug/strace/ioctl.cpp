@@ -1,13 +1,15 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Hugo Santos <hugosantos@gmail.com>
  */
 
+
 #include <sys/sockio.h>
 #include <termios.h>
+
 #include <Drivers.h>
 #include <tty.h>
 #include <scsi.h>
@@ -15,6 +17,7 @@
 #include "strace.h"
 #include "Syscall.h"
 #include "TypeHandler.h"
+
 
 struct ioctl_info {
 	int index;
@@ -83,7 +86,7 @@ static const ioctl_info kIOCtls[] = {
 	IOCTL_INFO_ENTRY_TYPE(SIOCGIFMETRIC, struct ifreq *),
 	IOCTL_INFO_ENTRY_TYPE(SIOCSIFMETRIC, struct ifreq *),
 	IOCTL_INFO_ENTRY_TYPE(SIOCDIFADDR, struct ifreq *),
-	IOCTL_INFO_ENTRY_TYPE(SIOCAIFADDR, struct ifreq *),
+	IOCTL_INFO_ENTRY_TYPE(SIOCAIFADDR, struct ifaliasreq *),
 	IOCTL_INFO_ENTRY(SIOCADDMULTI),
 	IOCTL_INFO_ENTRY(SIOCDELMULTI),
 	IOCTL_INFO_ENTRY_TYPE(SIOCGIFMTU, struct ifreq *),
@@ -93,7 +96,6 @@ static const ioctl_info kIOCtls[] = {
 	IOCTL_INFO_ENTRY(SIOCGRTSIZE),
 	IOCTL_INFO_ENTRY(SIOCGRTTABLE),
 	IOCTL_INFO_ENTRY_TYPE(SIOCGIFSTATS, struct ifreq *),
-	IOCTL_INFO_ENTRY_TYPE(SIOCGIFPARAM, struct ifreq *),
 	IOCTL_INFO_ENTRY(SIOCGIFTYPE),
 	IOCTL_INFO_ENTRY(SIOCSPACKETCAP),
 	IOCTL_INFO_ENTRY(SIOCCPACKETCAP),

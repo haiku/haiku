@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -107,6 +107,7 @@ ipv4_is_empty_address(const sockaddr *address, bool checkPort)
 		&& (!checkPort || ((sockaddr_in *)address)->sin_port == 0);
 }
 
+
 /*!	Checks if the given \a address is an IPv4 address.
 	\return false if \a address is NULL, or with family different from AF_INET
 		true if it has AF_INET address family
@@ -119,6 +120,7 @@ ipv4_is_same_family(const sockaddr *address)
 
 	return address->sa_family == AF_INET;
 }
+
 
 /*!	Compares the IP-addresses of the two given address structures \a a and \a b.
 	\return true if IP-addresses of \a a and \a b are equal, false if not
@@ -407,12 +409,12 @@ ipv4_set_to_empty_address(sockaddr *address)
 
 static status_t
 ipv4_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
-	sockaddr *_address, sockaddr *_mask)
+	const sockaddr *_address, const sockaddr *_mask)
 {
 	sockaddr_in *defaultMask = (sockaddr_in *)_defaultMask;
 	sockaddr_in *defaultBroadcast = (sockaddr_in *)_defaultBroadcast;
-	sockaddr_in *address = (sockaddr_in *)_address;
-	sockaddr_in *mask = (sockaddr_in *)_mask;
+	const sockaddr_in *address = (const sockaddr_in *)_address;
+	const sockaddr_in *mask = (const sockaddr_in *)_mask;
 
 	if (address == NULL || (defaultMask == NULL && defaultBroadcast == NULL))
 		return B_BAD_VALUE;
@@ -450,6 +452,23 @@ ipv4_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 	}
 
 	return B_OK;
+}
+
+
+/*!	Computes a hash value of the given \a address.
+	\return uint32 representing the hash value
+*/
+static uint32
+ipv4_hash_address(const struct sockaddr* _address, bool includePort)
+{
+	const sockaddr_in* address = (const sockaddr_in*)_address;
+	if (address == NULL || address->sin_len == 0)
+		return 0;
+
+	if (includePort)
+		return address->sin_port ^ address->sin_addr.s_addr;
+
+	return address->sin_addr.s_addr;
 }
 
 
@@ -526,6 +545,7 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_set_to_empty_address,
 	ipv4_set_to_defaults,
 	ipv4_update_to,
+	ipv4_hash_address,
 	ipv4_hash_address_pair,
 	ipv4_checksum_address,
 	ipv4_get_loopback_address

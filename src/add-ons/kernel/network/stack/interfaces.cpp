@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,179 +7,83 @@
  */
 
 
-#include "domains.h"
 #include "interfaces.h"
-#include "stack_private.h"
-#include "utility.h"
-
-#include <net_device.h>
-
-#include <lock.h>
-#include <util/AutoLock.h>
-
-#include <KernelExport.h>
 
 #include <net/if_dl.h>
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/sockio.h>
+
+#include <KernelExport.h>
+
+#include <lock.h>
+#include <net_device.h>
+#include <util/AutoLock.h>
+
+#include "device_interfaces.h"
+#include "domains.h"
+#include "stack_private.h"
+#include "utility.h"
 
 
-#define TRACE_INTERFACES
+//#define TRACE_INTERFACES
 #ifdef TRACE_INTERFACES
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(STACK_DEBUG_PREFIX x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
-#define ENABLE_DEBUGGER_COMMANDS	1
+
+struct AddressHashDefinition {
+	typedef const sockaddr* KeyType;
+	typedef InterfaceAddress ValueType;
+
+	AddressHashDefinition()
+	{
+	}
+
+	size_t HashKey(const KeyType& key) const
+	{
+		net_domain* domain = get_domain(key->sa_family);
+		if (domain == NULL)
+			return 0;
+
+		return domain->address_module->hash_address(key, false);
+	}
+
+	size_t Hash(InterfaceAddress* address) const
+	{
+		return address->domain->address_module->hash_address(address->local, false);
+	}
+
+	bool Compare(const KeyType& key, InterfaceAddress* address) const
+	{
+		if (address->local == NULL)
+			return key->sa_family == AF_UNSPEC;
+
+		if (address->local->sa_family != key->sa_family)
+			return false;
+
+		return address->domain->address_module->equal_addresses(key,
+			address->local);
+	}
+
+	InterfaceAddress*& GetLink(InterfaceAddress* address) const
+	{
+		return address->HashTableLink();
+	}
+};
+
+typedef BOpenHashTable<AddressHashDefinition, true, true> AddressTable;
 
 
-static mutex sInterfaceLock;
-static DeviceInterfaceList sInterfaces;
+static mutex sLock;
+static InterfaceList sInterfaces;
+static mutex sHashLock;
+static AddressTable sAddressTable;
 static uint32 sInterfaceIndex;
-static uint32 sDeviceIndex;
-
-
-static status_t
-device_consumer_thread(void* _interface)
-{
-	net_device_interface* interface = (net_device_interface*)_interface;
-	net_device* device = interface->device;
-	net_buffer* buffer;
-
-	while (true) {
-		ssize_t status = fifo_dequeue_buffer(&interface->receive_queue, 0,
-			B_INFINITE_TIMEOUT, &buffer);
-		if (status == B_INTERRUPTED)
-			continue;
-		else if (status < B_OK)
-			break;
-
-		if (buffer->interface != NULL) {
-			// if the interface is already specified, this buffer was
-			// delivered locally.
-			if (buffer->interface->domain->module->receive_data(buffer) == B_OK)
-				buffer = NULL;
-		} else {
-			// find handler for this packet
-			DeviceHandlerList::Iterator iterator =
-				interface->receive_funcs.GetIterator();
-			while (buffer && iterator.HasNext()) {
-				net_device_handler* handler = iterator.Next();
-
-				// if the handler returns B_OK, it consumed the buffer
-				if (handler->type == buffer->type
-					&& handler->func(handler->cookie, device, buffer) == B_OK)
-					buffer = NULL;
-			}
-		}
-
-		if (buffer != NULL)
-			gNetBufferModule.free(buffer);
-	}
-
-	return B_OK;
-}
-
-
-static net_device_interface*
-find_device_interface(const char* name)
-{
-	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
-
-	while (net_device_interface* interface = iterator.Next()) {
-		if (!strcmp(interface->device->name, name))
-			return interface;
-	}
-
-	return NULL;
-}
-
-
-/*!	The domain's device receive handler - this will inject the net_buffers into
-	the protocol layer (the domain's registered receive handler).
-*/
-static status_t
-domain_receive_adapter(void* cookie, net_device* device, net_buffer* buffer)
-{
-	net_domain_private* domain = (net_domain_private*)cookie;
-
-	buffer->interface = find_interface(domain, device->index);
-	return domain->module->receive_data(buffer);
-}
-
-
-static net_device_interface*
-allocate_device_interface(net_device* device, net_device_module_info* module)
-{
-	net_device_interface* interface = new(std::nothrow) net_device_interface;
-	if (interface == NULL)
-		return NULL;
-
-	recursive_lock_init(&interface->receive_lock, "interface receive lock");
-
-	char name[128];
-	snprintf(name, sizeof(name), "%s receive queue", device->name);
-
-	if (init_fifo(&interface->receive_queue, name, 16 * 1024 * 1024) < B_OK)
-		goto error1;
-
-	interface->device = device;
-	interface->up_count = 0;
-	interface->ref_count = 1;
-	interface->deframe_func = NULL;
-	interface->deframe_ref_count = 0;
-
-	snprintf(name, sizeof(name), "%s consumer", device->name);
-
-	interface->reader_thread   = -1;
-	interface->consumer_thread = spawn_kernel_thread(device_consumer_thread,
-		name, B_DISPLAY_PRIORITY, interface);
-	if (interface->consumer_thread < B_OK)
-		goto error2;
-	resume_thread(interface->consumer_thread);
-
-	// TODO: proper interface index allocation
-	device->index = ++sDeviceIndex;
-	device->module = module;
-
-	sInterfaces.Add(interface);
-	return interface;
-
-error2:
-	uninit_fifo(&interface->receive_queue);
-error1:
-	recursive_lock_destroy(&interface->receive_lock);
-	delete interface;
-
-	return NULL;
-}
-
-
-static net_device_interface*
-acquire_device_interface(net_device_interface* interface)
-{
-	if (interface == NULL || atomic_add(&interface->ref_count, 1) == 0)
-		return NULL;
-
-	return interface;
-}
-
-
-static void
-notify_device_monitors(net_device_interface* interface, int32 event)
-{
-	RecursiveLocker _(interface->receive_lock);
-
-	DeviceMonitorList::Iterator iterator
-		= interface->monitor_funcs.GetIterator();
-	while (net_device_monitor* monitor = iterator.Next()) {
-		// it's safe for the "current" item to remove itself.
-		monitor->event(monitor, event);
-	}
-}
 
 
 #if ENABLE_DEBUGGER_COMMANDS
@@ -193,73 +97,57 @@ dump_interface(int argc, char** argv)
 		return 0;
 	}
 
-	net_interface_private* interface
-		= (net_interface_private*)parse_expression(argv[1]);
-
-	kprintf("name:             %s\n", interface->name);
-	kprintf("base_name:        %s\n", interface->name);
-	kprintf("domain:           %p\n", interface->domain);
-	kprintf("device:           %p\n", interface->device);
-	kprintf("device_interface: %p\n", interface->device_interface);
-	kprintf("direct_route:     %p\n", &interface->direct_route);
-	kprintf("first_protocol:   %p\n", interface->first_protocol);
-	kprintf("first_info:       %p\n", interface->first_info);
-	kprintf("address:          %p\n", interface->address);
-	kprintf("destination:      %p\n", interface->destination);
-	kprintf("mask:             %p\n", interface->mask);
-	kprintf("index:            %" B_PRIu32 "\n", interface->index);
-	kprintf("flags:            %#" B_PRIx32 "\n", interface->flags);
-	kprintf("type:             %u\n", interface->type);
-	kprintf("mtu:              %" B_PRIu32 "\n", interface->mtu);
-	kprintf("metric:           %" B_PRIu32 "\n", interface->metric);
+	Interface* interface = (Interface*)parse_expression(argv[1]);
+	interface->Dump();
 
 	return 0;
 }
 
 
 static int
-dump_device_interface(int argc, char** argv)
+dump_interfaces(int argc, char** argv)
+{
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
+		kprintf("%p  %s\n", interface, interface->name);
+	}
+	return 0;
+}
+
+
+static int
+dump_local(int argc, char** argv)
+{
+	AddressTable::Iterator iterator = sAddressTable.GetIterator();
+	size_t i = 0;
+	while (InterfaceAddress* address = iterator.Next()) {
+		address->Dump(++i);
+		dprintf("    hash:          %lu\n",
+			address->domain->address_module->hash_address(address->local,
+				false));
+	}
+	return 0;
+}
+
+
+static int
+dump_route(int argc, char** argv)
 {
 	if (argc != 2) {
 		kprintf("usage: %s [address]\n", argv[0]);
 		return 0;
 	}
 
-	net_device_interface* interface
-		= (net_device_interface*)parse_expression(argv[1]);
+	net_route* route = (net_route*)parse_expression(argv[1]);
+	kprintf("destination:       %p\n", route->destination);
+	kprintf("mask:              %p\n", route->mask);
+	kprintf("gateway:           %p\n", route->gateway);
+	kprintf("flags:             %" B_PRIx32 "\n", route->flags);
+	kprintf("mtu:               %" B_PRIu32 "\n", route->mtu);
+	kprintf("interface address: %p\n", route->interface_address);
 
-	kprintf("device:            %p\n", interface->device);
-	kprintf("reader_thread:     %ld\n", interface->reader_thread);
-	kprintf("up_count:          %" B_PRIu32 "\n", interface->up_count);
-	kprintf("ref_count:         %" B_PRId32 "\n", interface->ref_count);
-	kprintf("deframe_func:      %p\n", interface->deframe_func);
-	kprintf("deframe_ref_count: %" B_PRId32 "\n", interface->ref_count);
-	kprintf("monitor_funcs:\n");
-	kprintf("receive_funcs:\n");
-	kprintf("consumer_thread:   %ld\n", interface->consumer_thread);
-	kprintf("receive_lock:      %p\n", &interface->receive_lock);
-	kprintf("receive_queue:     %p\n", &interface->receive_queue);
-
-	DeviceMonitorList::Iterator monitorIterator
-		= interface->monitor_funcs.GetIterator();
-	while (monitorIterator.HasNext())
-		kprintf("  %p\n", monitorIterator.Next());
-
-	DeviceHandlerList::Iterator handlerIterator
-		= interface->receive_funcs.GetIterator();
-	while (handlerIterator.HasNext())
-		kprintf("  %p\n", handlerIterator.Next());
-
-	return 0;
-}
-
-
-static int
-dump_device_interfaces(int argc, char** argv)
-{
-	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
-	while (net_device_interface* interface = iterator.Next()) {
-		kprintf("  %p\n", interface);
+	if (route->interface_address != NULL) {
+		((InterfaceAddress*)route->interface_address)->Dump();
 	}
 
 	return 0;
@@ -269,23 +157,649 @@ dump_device_interfaces(int argc, char** argv)
 #endif	// ENABLE_DEBUGGER_COMMANDS
 
 
-//	#pragma mark - interfaces
-
-
-/*!	Searches for a specific interface in a domain by name.
-	You need to have the domain's lock hold when calling this function.
-*/
-struct net_interface_private*
-find_interface(struct net_domain* domain, const char* name)
+InterfaceAddress::InterfaceAddress()
 {
-	net_interface_private* interface = NULL;
+	_Init(NULL, NULL);
+}
 
-	while (true) {
-		interface = (net_interface_private*)list_get_next_item(
-			&domain->interfaces, interface);
-		if (interface == NULL)
+
+InterfaceAddress::InterfaceAddress(net_interface* netInterface,
+	net_domain* netDomain)
+{
+	_Init(netInterface, netDomain);
+}
+
+
+InterfaceAddress::~InterfaceAddress()
+{
+}
+
+
+status_t
+InterfaceAddress::SetTo(const ifaliasreq& request)
+{
+	status_t status = SetLocal((const sockaddr*)&request.ifra_addr);
+	if (status == B_OK)
+		status = SetDestination((const sockaddr*)&request.ifra_broadaddr);	
+	if (status == B_OK)
+		status = SetMask((const sockaddr*)&request.ifra_mask);
+
+	return status;
+}
+
+
+status_t
+InterfaceAddress::SetLocal(const sockaddr* to)
+{
+	return Set(&local, to);
+}
+
+
+status_t
+InterfaceAddress::SetDestination(const sockaddr* to)
+{
+	return Set(&destination, to);
+}
+
+
+status_t
+InterfaceAddress::SetMask(const sockaddr* to)
+{
+	return Set(&mask, to);
+}
+
+
+sockaddr**
+InterfaceAddress::AddressFor(int32 option)
+{
+	switch (option) {
+		case SIOCSIFADDR:
+		case SIOCGIFADDR:
+			return &local;
+
+		case SIOCSIFNETMASK:
+		case SIOCGIFNETMASK:
+			return &mask;
+
+		case SIOCSIFBRDADDR:
+		case SIOCSIFDSTADDR:
+		case SIOCGIFBRDADDR:
+		case SIOCGIFDSTADDR:
+			return &destination;
+
+		default:
+			return NULL;
+	}
+}
+
+
+#if ENABLE_DEBUGGER_COMMANDS
+
+
+void
+InterfaceAddress::Dump(size_t index, bool hideInterface)
+{
+	if (index)
+		kprintf("%2zu. ", index);
+	else
+		kprintf("    ");
+	
+	if (!hideInterface) {
+		kprintf("interface:   %p (%s)\n    ", interface,
+			interface != NULL ? interface->name : "-");
+	}
+
+	kprintf("domain:      %p (family %u)\n", domain,
+		domain != NULL ? domain->family : AF_UNSPEC);
+
+	char buffer[64];
+	if (local != NULL && domain != NULL) {
+		domain->address_module->print_address_buffer(local, buffer,
+			sizeof(buffer), false);
+	} else
+		strcpy(buffer, "-");
+	kprintf("    local:       %s\n", buffer);
+
+	if (mask != NULL && domain != NULL) {
+		domain->address_module->print_address_buffer(mask, buffer,
+			sizeof(buffer), false);
+	} else
+		strcpy(buffer, "-");
+	kprintf("    mask:        %s\n", buffer);
+
+	if (destination != NULL && domain != NULL) {
+		domain->address_module->print_address_buffer(destination, buffer,
+			sizeof(buffer), false);
+	} else
+		strcpy(buffer, "-");
+	kprintf("    destination: %s\n", buffer);
+}
+
+
+#endif	// ENABLE_DEBUGGER_COMMANDS
+
+
+/*static*/ status_t
+InterfaceAddress::Set(sockaddr** _address, const sockaddr* to)
+{
+	sockaddr* address = *_address;
+
+	if (to == NULL || to->sa_family == AF_UNSPEC) {
+		// Clear address
+		free(address);
+		*_address = NULL;
+		return B_OK;
+	}
+
+	// Set address
+
+	size_t size = max_c(to->sa_len, sizeof(sockaddr));
+	if (size > sizeof(sockaddr_storage))
+		size = sizeof(sockaddr_storage);
+
+	address = Prepare(_address, size);
+	if (address == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(address, to, size);
+	address->sa_len = size;
+
+	return B_OK;
+}
+
+
+/*static*/ sockaddr*
+InterfaceAddress::Prepare(sockaddr** _address, size_t size)
+{
+	size = max_c(size, sizeof(sockaddr));
+	if (size > sizeof(sockaddr_storage))
+		size = sizeof(sockaddr_storage);
+
+	sockaddr* address = *_address;
+
+	if (address == NULL || size > address->sa_len) {
+		address = (sockaddr*)realloc(address, size);
+		if (address == NULL)
+			return NULL;
+	}
+
+	address->sa_len = size;
+
+	*_address = address;
+	return address;
+}
+
+
+void
+InterfaceAddress::_Init(net_interface* netInterface, net_domain* netDomain)
+{
+	interface = netInterface;
+	domain = netDomain;
+	local = NULL;
+	destination = NULL;
+	mask = NULL;
+}
+
+
+// #pragma mark -
+
+
+Interface::Interface(const char* interfaceName,
+	net_device_interface* deviceInterface)
+{
+	TRACE("Interface %p: new \"%s\", device interface %p\n", this,
+		interfaceName, deviceInterface);
+
+	strlcpy(name, interfaceName, IF_NAMESIZE);
+	device = deviceInterface->device;
+
+	index = ++sInterfaceIndex;
+	flags = 0;
+	type = 0;
+	mtu = deviceInterface->device->mtu;
+	metric = 0;
+
+	fDeviceInterface = acquire_device_interface(deviceInterface);
+
+	recursive_lock_init(&fLock, name);
+
+	// Grab a reference to the networking stack, to make sure it won't be
+	// unloaded as long as an interface exists
+	module_info* module;
+	get_module(gNetStackInterfaceModule.info.name, &module);
+}
+
+
+Interface::~Interface()
+{
+	recursive_lock_destroy(&fLock);
+
+	// Release reference of the stack - at this point, our stack may be unloaded
+	// if no other interfaces or sockets are left
+	put_module(gNetStackInterfaceModule.info.name);
+}
+
+
+/*!	Returns a reference to the first InterfaceAddress that is from the same
+	as the specified \a family.
+*/
+InterfaceAddress*
+Interface::FirstForFamily(int family)
+{
+	RecursiveLocker locker(fLock);
+
+	InterfaceAddress* address = _FirstForFamily(family);
+	if (address != NULL) {
+		address->AcquireReference();
+		return address;
+	}
+
+	return NULL;
+}
+
+
+/*!	Returns a reference to the first unconfigured address of this interface
+	for the specified \a family.
+*/
+InterfaceAddress*
+Interface::FirstUnconfiguredForFamily(int family)
+{
+	RecursiveLocker locker(fLock);
+
+	AddressList::Iterator iterator = fAddresses.GetIterator();
+	while (InterfaceAddress* address = iterator.Next()) {
+		if (address->domain->family == family
+			&& (address->local == NULL
+				// TODO: this has to be solved differently!!
+				|| (flags & IFF_CONFIGURING) != 0)) {
+			address->AcquireReference();
+			return address;
+		}
+	}
+
+	return NULL;
+}
+
+
+/*!	Returns a reference to the InterfaceAddress that has the specified
+	\a destination address.
+*/
+InterfaceAddress*
+Interface::AddressForDestination(net_domain* domain,
+	const sockaddr* destination)
+{
+	RecursiveLocker locker(fLock);
+
+	if ((device->flags & IFF_BROADCAST) == 0) {
+		// The device does not support broadcasting
+		return NULL;
+	}
+
+	AddressList::Iterator iterator = fAddresses.GetIterator();
+	while (InterfaceAddress* address = iterator.Next()) {
+		if (address->domain == domain
+			&& address->destination != NULL
+			&& domain->address_module->equal_addresses(address->destination,
+					destination)) {
+			address->AcquireReference();
+			return address;
+		}
+	}
+
+	return NULL;
+}
+
+
+status_t
+Interface::AddAddress(InterfaceAddress* address)
+{
+	net_domain* domain = address->domain;
+	if (domain == NULL)
+		return B_BAD_VALUE;
+
+	RecursiveLocker locker(fLock);
+	fAddresses.Add(address);
+	locker.Unlock();
+	
+	MutexLocker hashLocker(sHashLock);
+	sAddressTable.Insert(address);
+	return B_OK;
+}
+
+
+void
+Interface::RemoveAddress(InterfaceAddress* address)
+{
+	net_domain* domain = address->domain;
+	if (domain == NULL)
+		return;
+
+	RecursiveLocker locker(fLock);
+
+	fAddresses.Remove(address);
+	address->GetDoublyLinkedListLink()->next = NULL;
+
+// TODO!
+//	if (_FirstForFamily(domain->family) == NULL)
+//		put_domain_datalink_protocols(this, domain);
+
+	locker.Unlock();
+	
+	MutexLocker hashLocker(sHashLock);
+	sAddressTable.Remove(address);
+}
+
+
+bool
+Interface::GetNextAddress(InterfaceAddress** _address)
+{
+	RecursiveLocker locker(fLock);
+
+	InterfaceAddress* address = *_address;
+	if (address == NULL) {
+		// get first address
+		address = fAddresses.First();
+	} else {
+		// get next, if possible
+		InterfaceAddress* next = fAddresses.GetNext(address);
+		address->ReleaseReference();
+		address = next;
+	}
+
+	*_address = address;
+
+	if (address == NULL)
+		return false;
+
+	address->AcquireReference();
+	return true;
+}
+
+
+status_t
+Interface::Control(net_domain* domain, int32 option, ifreq& request,
+	ifreq* userRequest, size_t length)
+{
+	switch (option) {
+		case SIOCSIFFLAGS:
+		{
+			uint32 requestFlags = request.ifr_flags;
+			uint32 oldFlags = flags;
+			status_t status = B_OK;
+
+			request.ifr_flags &= ~(IFF_UP | IFF_LINK | IFF_BROADCAST);
+
+			if ((requestFlags & IFF_UP) != (flags & IFF_UP)) {
+				if ((requestFlags & IFF_UP) != 0)
+					status = _SetUp();
+				else
+					_SetDown();
+			}
+
+			if (status == B_OK) {
+				// TODO: maybe allow deleting IFF_BROADCAST on the interface
+				// level?
+				flags &= IFF_UP | IFF_LINK | IFF_BROADCAST;
+				flags |= request.ifr_flags;
+			}
+
+			if (oldFlags != flags)
+				notify_interface_changed(this, oldFlags, flags);
+
+			return status;
+		}
+		
+		case SIOCSIFADDR:
+		case SIOCSIFNETMASK:
+		case SIOCSIFBRDADDR:
+		case SIOCSIFDSTADDR:
+		case SIOCDIFADDR:
+		{
+			RecursiveLocker locker(fLock);
+			
+			InterfaceAddress* address = NULL;
+			sockaddr_storage oldAddress;
+			sockaddr_storage newAddress;
+
+			size_t size = max_c(request.ifr_addr.sa_len, sizeof(sockaddr));
+			if (size > sizeof(sockaddr_storage))
+				size = sizeof(sockaddr_storage);
+
+			if (user_memcpy(&newAddress, &userRequest->ifr_addr, size) != B_OK)
+				return B_BAD_ADDRESS;
+
+			if (option == SIOCDIFADDR) {
+				// Find referring address - we can't use the hash, as another
+				// interface might use the same address.
+				AddressList::Iterator iterator = fAddresses.GetIterator();
+				while ((address = iterator.Next()) != NULL) {
+					if (address->domain == domain
+						&& domain->address_module->equal_addresses(
+							address->local, (sockaddr*)&newAddress))
+						break;
+				}
+			} else {
+				// Just use the first address for this family
+				address = _FirstForFamily(domain->family);
+			}
+
+			if (address == NULL)
+				return B_BAD_VALUE;
+
+			if (*address->AddressFor(option) != NULL)
+				memcpy(&oldAddress, *address->AddressFor(option), size);
+			else
+				oldAddress.ss_family = AF_UNSPEC;
+
+			// TODO: mark this address busy or call while holding the lock!
+			address->AcquireReference();
+			locker.Unlock();
+
+			domain_datalink* datalink = DomainDatalink(domain->family);
+			status_t status = datalink->first_protocol->module->change_address(
+				datalink->first_protocol, address, option,
+				oldAddress.ss_family != AF_UNSPEC
+					? (sockaddr*)&oldAddress : NULL,
+				option != SIOCDIFADDR ? (sockaddr*)&newAddress : NULL);
+
+			address->ReleaseReference();
+			return status;
+		}
+
+		default:
+			// pass the request into the datalink protocol stack
+			domain_datalink* datalink = DomainDatalink(domain->family);
+			if (datalink->first_info != NULL) {
+				return datalink->first_info->control(
+					datalink->first_protocol, option, userRequest, length);
+			}
 			break;
+	}
 
+	return B_BAD_VALUE;
+}
+
+
+status_t
+Interface::CreateDomainDatalinkIfNeeded(net_domain* domain)
+{
+	RecursiveLocker locker(fLock);
+	
+	if (fDatalinkTable.Lookup(domain->family) != NULL)
+		return B_OK;
+
+	TRACE("Interface %p: create domain datalink for domain %p\n", this, domain);
+
+	domain_datalink* datalink = new(std::nothrow) domain_datalink;
+	if (datalink == NULL)
+		return B_NO_MEMORY;
+
+	datalink->domain = domain;
+
+	// setup direct route for bound devices
+	datalink->direct_route.destination = NULL;
+	datalink->direct_route.mask = NULL;
+	datalink->direct_route.gateway = NULL;
+	datalink->direct_route.flags = 0;
+	datalink->direct_route.mtu = 0;
+	datalink->direct_route.interface_address = &datalink->direct_address;
+	datalink->direct_route.ref_count = 1;
+		// make sure this doesn't get deleted accidently
+
+	// provide its link back to the interface
+	datalink->direct_address.local = NULL;
+	datalink->direct_address.destination = NULL;
+	datalink->direct_address.mask = NULL;
+	datalink->direct_address.domain = domain;
+	datalink->direct_address.interface = this;
+
+	fDatalinkTable.Insert(datalink);
+
+	status_t status = get_domain_datalink_protocols(this, domain);
+	if (status == B_OK)
+		return B_OK;
+
+	fDatalinkTable.Remove(datalink);
+	delete datalink;
+
+	return status;
+}
+
+
+domain_datalink*
+Interface::DomainDatalink(uint8 family)
+{
+	// Note: domain datalinks cannot be removed while the interface is alive,
+	// since this would require us either to hold the lock while calling this
+	// function, or introduce reference counting for the domain_datalink
+	// structure. 
+	RecursiveLocker locker(fLock);
+	return fDatalinkTable.Lookup(family);
+}
+
+
+#if ENABLE_DEBUGGER_COMMANDS
+
+
+void
+Interface::Dump() const
+{
+	kprintf("name:                %s\n", name);
+	kprintf("device:              %p\n", device);
+	kprintf("device_interface:    %p\n", fDeviceInterface);
+	kprintf("index:               %" B_PRIu32 "\n", index);
+	kprintf("flags:               %#" B_PRIx32 "\n", flags);
+	kprintf("type:                %u\n", type);
+	kprintf("mtu:                 %" B_PRIu32 "\n", mtu);
+	kprintf("metric:              %" B_PRIu32 "\n", metric);
+
+	kprintf("datalink protocols:\n");
+
+	DatalinkTable::Iterator datalinkIterator = fDatalinkTable.GetIterator();
+	size_t i = 0;
+	while (domain_datalink* datalink = datalinkIterator.Next()) {
+		kprintf("%2zu. domain:          %p\n", ++i, datalink->domain);
+		kprintf("    first_protocol:  %p\n", datalink->first_protocol);
+		kprintf("    first_info:      %p\n", datalink->first_info);
+		kprintf("    direct_route:    %p\n", &datalink->direct_route);
+	}
+
+	kprintf("addresses:\n");
+
+	AddressList::ConstIterator iterator = fAddresses.GetIterator();
+	i = 0;
+	while (InterfaceAddress* address = iterator.Next()) {
+		address->Dump(++i, true);
+	}
+}
+
+
+#endif	// ENABLE_DEBUGGER_COMMANDS
+
+
+status_t
+Interface::_SetUp()
+{
+	status_t status = up_device_interface(fDeviceInterface);
+	if (status != B_OK)
+		return status;
+
+	// propagate flag to all datalink protocols
+
+	RecursiveLocker locker(fLock);
+
+	DatalinkTable::Iterator iterator = fDatalinkTable.GetIterator();
+	while (domain_datalink* datalink = iterator.Next()) {
+		status = datalink->first_info->interface_up(datalink->first_protocol);
+		if (status != B_OK) {
+			// Revert "up" status
+			DatalinkTable::Iterator secondIterator
+				= fDatalinkTable.GetIterator();
+			while (secondIterator.HasNext()) {
+				domain_datalink* secondDatalink = secondIterator.Next();
+				if (secondDatalink == NULL || secondDatalink == datalink)
+					break;
+
+				secondDatalink->first_info->interface_down(
+					secondDatalink->first_protocol);
+			}
+
+			down_device_interface(fDeviceInterface);
+			return status;
+		}
+	}
+
+	flags |= IFF_UP;
+	return B_OK;
+}
+
+
+void
+Interface::_SetDown()
+{
+	if ((flags & IFF_UP) == 0)
+		return;
+
+	RecursiveLocker locker(fLock);
+
+	DatalinkTable::Iterator iterator = fDatalinkTable.GetIterator();
+	while (domain_datalink* datalink = iterator.Next()) {
+		datalink->first_info->interface_down(datalink->first_protocol);
+	}
+
+	down_device_interface(fDeviceInterface);
+	flags &= ~IFF_UP;
+}
+
+
+InterfaceAddress*
+Interface::_FirstForFamily(int family)
+{
+	ASSERT_LOCKED_RECURSIVE(&fLock);
+
+	AddressList::Iterator iterator = fAddresses.GetIterator();
+	while (InterfaceAddress* address = iterator.Next()) {
+		if (address->domain != NULL && address->domain->family == family)
+			return address;
+	}
+
+	return NULL;
+}
+
+
+// #pragma mark -
+
+
+/*!	Searches for a specific interface by name.
+	You need to have the interface list's lock hold when calling this function.
+*/
+static struct Interface*
+find_interface(const char* name)
+{
+	ASSERT_LOCKED_MUTEX(&sLock);
+
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
 		if (!strcmp(interface->name, name))
 			return interface;
 	}
@@ -294,20 +808,14 @@ find_interface(struct net_domain* domain, const char* name)
 }
 
 
-/*!	Searches for a specific interface in a domain by index.
-	You need to have the domain's lock hold when calling this function.
+/*!	Searches for a specific interface by index.
+	You need to have the interface list's lock hold when calling this function.
 */
-struct net_interface_private*
-find_interface(struct net_domain* domain, uint32 index)
+static struct Interface*
+find_interface(uint32 index)
 {
-	net_interface_private* interface = NULL;
-
-	while (true) {
-		interface = (net_interface_private*)list_get_next_item(
-			&domain->interfaces, interface);
-		if (interface == NULL)
-			break;
-
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
 		if (interface->index == index)
 			return interface;
 	}
@@ -316,70 +824,96 @@ find_interface(struct net_domain* domain, uint32 index)
 }
 
 
-status_t
-create_interface(net_domain* domain, const char* name, const char* baseName,
-	net_device_interface* deviceInterface, net_interface_private** _interface)
+/*!	Removes the default routes as set by add_default_routes() again. */
+static void
+remove_default_routes(InterfaceAddress* address, int32 option)
 {
-	net_interface_private* interface = new(std::nothrow) net_interface_private;
+	net_route route;
+	route.destination = address->local;
+	route.gateway = NULL;
+	route.interface_address = address;
+
+	if (address->mask != NULL
+		&& (option == SIOCSIFNETMASK || option == SIOCSIFADDR)) {
+		route.mask = address->mask;
+		route.flags = 0;
+		remove_route(address->domain, &route);
+	}
+
+	if (option == SIOCSIFADDR) {
+		route.mask = NULL;
+		route.flags = RTF_LOCAL | RTF_HOST;
+		remove_route(address->domain, &route);
+	}
+}
+
+
+/*!	Adds the default routes that every interface address needs, ie. the local
+	host route, and one for the subnet (if set).
+*/
+static void
+add_default_routes(InterfaceAddress* address, int32 option)
+{
+	net_route route;
+	route.destination = address->local;
+	route.gateway = NULL;
+	route.interface_address = address;
+
+	if (address->mask != NULL
+		&& (option == SIOCSIFNETMASK || option == SIOCSIFADDR)) {
+		route.mask = address->mask;
+		route.flags = 0;
+		add_route(address->domain, &route);
+	}
+
+	if (option == SIOCSIFADDR) {
+		route.mask = NULL;
+		route.flags = RTF_LOCAL | RTF_HOST;
+		add_route(address->domain, &route);
+	}
+}
+
+
+// #pragma mark -
+
+
+status_t
+add_interface(const char* name, net_domain_private* domain,
+	const ifaliasreq& request, net_device_interface* deviceInterface)
+{
+	MutexLocker locker(sLock);
+	
+	if (find_interface(name) != NULL)
+		return B_NAME_IN_USE;
+
+	Interface* interface
+		= new(std::nothrow) Interface(name, deviceInterface);
 	if (interface == NULL)
 		return B_NO_MEMORY;
 
-	strlcpy(interface->name, name, IF_NAMESIZE);
-	strlcpy(interface->base_name, baseName, IF_NAMESIZE);
-	interface->domain = domain;
-	interface->device = deviceInterface->device;
+	sInterfaces.Add(interface);
+	interface->AcquireReference();
+		// We need another reference to be able to use the interface without
+		// holding sLock.
 
-	interface->address = NULL;
-	interface->destination = NULL;
-	interface->mask = NULL;
+	locker.Unlock();
 
-	interface->index = ++sInterfaceIndex;
-	interface->flags = 0;
-	interface->type = 0;
-	interface->mtu = deviceInterface->device->mtu;
-	interface->metric = 0;
-	interface->device_interface = acquire_device_interface(deviceInterface);
+	notify_interface_added(interface);
+	add_interface_address(interface, domain, request);
 
-	// setup direct route for bound devices
-	interface->direct_route.destination = NULL;
-	interface->direct_route.mask = NULL;
-	interface->direct_route.gateway = NULL;
-	interface->direct_route.flags = 0;
-	interface->direct_route.mtu = 0;
-	interface->direct_route.interface = interface;
-	interface->direct_route.ref_count = 1;
-		// make sure this doesn't get deleted accidently
+	interface->ReleaseReference();
 
-	status_t status = get_domain_datalink_protocols(interface);
-	if (status < B_OK) {
-		delete interface;
-		return status;
-	}
-
-	// Grab a reference to the networking stack, to make sure it won't be
-	// unloaded as long as an interface exists
-	module_info* module;
-	get_module(gNetStackInterfaceModule.info.name, &module);
-
-	*_interface = interface;
 	return B_OK;
 }
 
 
-void
-interface_set_down(net_interface* interface)
+/*!	Removes the interface from the list, and puts the stack's reference to it.
+*/
+status_t
+remove_interface(Interface* interface)
 {
-	if ((interface->flags & IFF_UP) == 0)
-		return;
-
-	interface->flags &= ~IFF_UP;
-	interface->first_info->interface_down(interface->first_protocol);
-}
-
-
-void
-delete_interface(net_interface_private* interface)
-{
+	return B_ERROR;
+#if 0
 	// deleting an interface is fairly complex as we need
 	// to clear all references to it throughout the stack
 
@@ -401,87 +935,250 @@ delete_interface(net_interface_private* interface)
 
 	put_device_interface(interface->device_interface);
 
-	free(interface->address);
-	free(interface->destination);
-	free(interface->mask);
-
 	delete interface;
+#endif
+#if 0
+	invalidate_routes(domain, interface);
 
-	// Release reference of the stack - at this point, our stack may be unloaded
-	// if no other interfaces or sockets are left
-	put_module(gNetStackInterfaceModule.info.name);
+	list_remove_item(&domain->interfaces, interface);
+	notify_interface_removed(interface);
+	delete_interface((net_interface_private*)interface);
+#endif
 }
 
 
 void
-put_interface(struct net_interface_private* interface)
+interface_went_down(Interface* interface)
 {
-	// TODO: reference counting
-	// TODO: better locking scheme
-	recursive_lock_unlock(&((net_domain_private*)interface->domain)->lock);
+	TRACE("interface_went_down(%s)\n", interface->name);
+	// TODO!
+	//invalidate_routes(domain, interface);
 }
 
 
-struct net_interface_private*
-get_interface(net_domain* _domain, const char* name)
+status_t
+add_interface_address(Interface* interface, net_domain_private* domain,
+	const ifaliasreq& request)
 {
-	net_domain_private* domain = (net_domain_private*)_domain;
-	recursive_lock_lock(&domain->lock);
+	// Make sure the family of the provided addresses is valid
+	if ((request.ifra_addr.ss_family != domain->family
+			&& request.ifra_addr.ss_family != AF_UNSPEC)
+		|| (request.ifra_mask.ss_family != domain->family
+			&& request.ifra_mask.ss_family != AF_UNSPEC)
+		|| (request.ifra_broadaddr.ss_family != domain->family
+			&& request.ifra_broadaddr.ss_family != AF_UNSPEC))
+		return B_BAD_VALUE;
 
-	net_interface_private* interface = NULL;
-	while (true) {
-		interface = (net_interface_private*)list_get_next_item(
-			&domain->interfaces, interface);
-		if (interface == NULL)
-			break;
+	RecursiveLocker locker(interface->Lock());
 
-		// TODO: We keep the domain locked for now
-		if (!strcmp(interface->name, name))
-			return interface;
+	InterfaceAddress* address
+		= new(std::nothrow) InterfaceAddress(interface, domain);
+	if (address == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = address->SetTo(request);
+	if (status == B_OK)
+		status = interface->CreateDomainDatalinkIfNeeded(domain);
+	if (status == B_OK)
+		status = interface->AddAddress(address);
+
+	if (status == B_OK && address->local != NULL) {
+		// update the datalink protocols
+		domain_datalink* datalink = interface->DomainDatalink(domain->family);
+
+		status = datalink->first_protocol->module->change_address(
+			datalink->first_protocol, address, SIOCAIFADDR, NULL,
+			address->local);
+		if (status != B_OK)
+			interface->RemoveAddress(address);
+	}
+	if (status == B_OK)
+		notify_interface_changed(interface);
+	else
+		delete address;
+
+	return status;
+}
+
+
+status_t
+update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
+	const sockaddr* oldAddress, const sockaddr* newAddress)
+{
+	MutexLocker locker(sHashLock);
+
+	// set logical interface address
+	sockaddr** _address = interfaceAddress->AddressFor(option);
+	if (_address == NULL)
+		return B_BAD_VALUE;
+
+	remove_default_routes(interfaceAddress, option);
+	sAddressTable.Remove(interfaceAddress);
+
+	// Copy new address over
+	status_t status = InterfaceAddress::Set(_address, newAddress);
+	if (status == B_OK) {
+		sockaddr* address = *_address;
+
+		if (option == SIOCSIFADDR || option == SIOCSIFNETMASK) {
+			// Reset netmask and broadcast addresses to defaults
+			net_domain* domain = interfaceAddress->domain;
+			sockaddr* netmask = NULL;
+			const sockaddr* oldNetmask = NULL;
+			if (option == SIOCSIFADDR) {
+				netmask = InterfaceAddress::Prepare(
+					&interfaceAddress->mask, address->sa_len);
+			} else {
+				oldNetmask = oldAddress;
+				netmask = interfaceAddress->mask;
+			}
+
+			// Reset the broadcast address if the address family has
+			// such
+			sockaddr* broadcast = NULL;
+			if ((domain->address_module->flags
+					& NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS) != 0) {
+				broadcast = InterfaceAddress::Prepare(
+					&interfaceAddress->destination, address->sa_len);
+			} else
+				InterfaceAddress::Set(&interfaceAddress->destination, NULL);
+
+			domain->address_module->set_to_defaults(netmask, broadcast,
+				interfaceAddress->local, oldNetmask);
+		}
+
+		add_default_routes(interfaceAddress, option);
+		notify_interface_changed(interfaceAddress->interface);
 	}
 
-	recursive_lock_unlock(&domain->lock);
+	sAddressTable.Insert(interfaceAddress);
+	return status;
+}
+
+
+Interface*
+get_interface(net_domain* domain, uint32 index)
+{
+	MutexLocker locker(sLock);
+
+	if (index == 0)
+		return sInterfaces.First();
+	
+	Interface* interface = find_interface(index);
+	if (interface == NULL)
+		return NULL;
+
+	if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
+		return NULL;
+
+	interface->AcquireReference();
+	return interface;
+}
+
+
+Interface*
+get_interface(net_domain* domain, const char* name)
+{
+	MutexLocker locker(sLock);
+
+	Interface* interface = find_interface(name);
+	if (interface == NULL)
+		return NULL;
+
+	if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
+		return NULL;
+
+	interface->AcquireReference();
+	return interface;
+}
+
+
+Interface*
+get_interface_for_device(net_domain* domain, uint32 index)
+{
+	MutexLocker locker(sLock);
+
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
+		if (interface->device->index == index) {
+			if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
+				return NULL;
+
+			interface->AcquireReference();
+			return interface;
+		}
+	}
+	
 	return NULL;
 }
 
 
-//	#pragma mark - device interfaces
-
-
-void
-get_device_interface_address(net_device_interface* interface, sockaddr* _address)
+InterfaceAddress*
+get_interface_address(const sockaddr* local)
 {
-	sockaddr_dl &address = *(sockaddr_dl*)_address;
+	if (local->sa_family == AF_UNSPEC)
+		return NULL;
 
-	address.sdl_family = AF_LINK;
-	address.sdl_index = interface->device->index;
-	address.sdl_type = interface->device->type;
-	address.sdl_nlen = strlen(interface->device->name);
-	address.sdl_slen = 0;
-	memcpy(address.sdl_data, interface->device->name, address.sdl_nlen);
+	MutexLocker locker(sHashLock);
 
-	address.sdl_alen = interface->device->address.length;
-	memcpy(LLADDR(&address), interface->device->address.data, address.sdl_alen);
+	InterfaceAddress* address = sAddressTable.Lookup(local);
+	if (address == NULL)
+		return NULL;
 
-	address.sdl_len = sizeof(sockaddr_dl) - sizeof(address.sdl_data)
-		+ address.sdl_nlen + address.sdl_alen;
+	address->AcquireReference();
+	return address;
+}
+
+
+InterfaceAddress*
+get_interface_address_for_destination(net_domain* domain,
+	const struct sockaddr* destination)
+{
+	MutexLocker locker(sLock);
+	
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
+		InterfaceAddress* address
+			= interface->AddressForDestination(domain, destination);
+		if (address != NULL)
+			return address;
+	}
+
+	return NULL;
+}
+
+
+InterfaceAddress*
+get_interface_address_for_link(net_domain* domain,
+	const struct sockaddr* _linkAddress, bool unconfiguredOnly)
+{
+	sockaddr_dl& linkAddress = *(sockaddr_dl*)_linkAddress;
+
+	MutexLocker locker(sLock);
+
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
+		if (linkAddress.sdl_alen == interface->device->address.length
+			&& memcmp(LLADDR(&linkAddress), interface->device->address.data,
+				linkAddress.sdl_alen) == 0) {
+			// link address matches
+			if (unconfiguredOnly)
+				return interface->FirstUnconfiguredForFamily(domain->family);
+
+			return interface->FirstForFamily(domain->family);
+		}
+	}
+
+	return NULL;
 }
 
 
 uint32
-count_device_interfaces()
+count_interfaces()
 {
-	MutexLocker locker(sInterfaceLock);
+	MutexLocker locker(sLock);
 
-	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
-	uint32 count = 0;
-
-	while (iterator.HasNext()) {
-		iterator.Next();
-		count++;
-	}
-
-	return count;
+	return sInterfaces.Count();
 }
 
 
@@ -490,398 +1187,36 @@ count_device_interfaces()
 	returned.
 */
 status_t
-list_device_interfaces(void* _buffer, size_t* bufferSize)
+list_interfaces(int family, void* _buffer, size_t* bufferSize)
 {
-	MutexLocker locker(sInterfaceLock);
+	MutexLocker locker(sLock);
 
-	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	UserBuffer buffer(_buffer, *bufferSize);
 
-	while (net_device_interface* interface = iterator.Next()) {
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
 		ifreq request;
-		strlcpy(request.ifr_name, interface->device->name, IF_NAMESIZE);
-		get_device_interface_address(interface, &request.ifr_addr);
+		strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
 
-		if (buffer.Copy(&request, IF_NAMESIZE + request.ifr_addr.sa_len) == NULL)
+		InterfaceAddress* address = interface->FirstForFamily(family);
+		if (address != NULL && address->local != NULL) {
+			// copy actual address
+			memcpy(&request.ifr_addr, address->local, address->local->sa_len);
+		} else {
+			// empty address
+			request.ifr_addr.sa_len = 2;
+			request.ifr_addr.sa_family = AF_UNSPEC;
+		}
+		if (address != NULL)
+			address->ReleaseReference();
+
+		if (buffer.Copy(&request, IF_NAMESIZE
+				+ request.ifr_addr.sa_len) == NULL)
 			return buffer.Status();
 	}
 
 	*bufferSize = buffer.ConsumedAmount();
 	return B_OK;
-}
-
-
-/*!	Releases the reference for the interface. When all references are
-	released, the interface is removed.
-*/
-void
-put_device_interface(struct net_device_interface* interface)
-{
-	if (atomic_add(&interface->ref_count, -1) != 1)
-		return;
-
-	{
-		MutexLocker locker(sInterfaceLock);
-		sInterfaces.Remove(interface);
-	}
-
-	uninit_fifo(&interface->receive_queue);
-	status_t status;
-	wait_for_thread(interface->consumer_thread, &status);
-
-	net_device* device = interface->device;
-	const char* moduleName = device->module->info.name;
-
-	device->module->uninit_device(device);
-	put_module(moduleName);
-
-	recursive_lock_destroy(&interface->receive_lock);
-	delete interface;
-}
-
-
-/*!	Finds an interface by the specified index and acquires a reference to it.
-*/
-struct net_device_interface*
-get_device_interface(uint32 index)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	// TODO: maintain an array of all device interfaces instead
-	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
-	while (net_device_interface* interface = iterator.Next()) {
-		if (interface->device->index == index) {
-			if (atomic_add(&interface->ref_count, 1) != 0)
-				return interface;
-		}
-	}
-
-	return NULL;
-}
-
-
-/*!	Finds an interface by the specified name and grabs a reference to it.
-	If the interface does not yet exist, a new one is created.
-*/
-struct net_device_interface*
-get_device_interface(const char* name, bool create)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	net_device_interface* interface = find_device_interface(name);
-	if (interface != NULL) {
-		if (atomic_add(&interface->ref_count, 1) != 0)
-			return interface;
-
-		// try to recreate interface - it just got removed
-	}
-
-	if (!create)
-		return NULL;
-
-	void* cookie = open_module_list("network/devices");
-	if (cookie == NULL)
-		return NULL;
-
-	while (true) {
-		char moduleName[B_FILE_NAME_LENGTH];
-		size_t length = sizeof(moduleName);
-		if (read_next_module_name(cookie, moduleName, &length) != B_OK)
-			break;
-
-		TRACE(("get_device_interface: ask \"%s\" for %s\n", moduleName, name));
-
-		net_device_module_info* module;
-		if (get_module(moduleName, (module_info**)&module) == B_OK) {
-			net_device* device;
-			status_t status = module->init_device(name, &device);
-			if (status == B_OK) {
-				interface = allocate_device_interface(device, module);
-				if (interface != NULL)
-					return interface;
-
-				module->uninit_device(device);
-			}
-			put_module(moduleName);
-		}
-	}
-
-	return NULL;
-}
-
-
-void
-down_device_interface(net_device_interface* interface)
-{
-	// Receive lock must be held when calling down_device_interface.
-	// Known callers are `interface_protocol_down' which gets
-	// here via one of the following paths:
-	//
-	// - domain_interface_control() [rx lock held, domain lock held]
-	//    interface_set_down()
-	//     interface_protocol_down()
-	//
-	// - domain_interface_control() [rx lock held, domain lock held]
-	//    remove_interface_from_domain()
-	//     delete_interface()
-	//      interface_set_down()
-
-	net_device* device = interface->device;
-
-	device->flags &= ~IFF_UP;
-	device->module->down(device);
-
-	notify_device_monitors(interface, B_DEVICE_GOING_DOWN);
-
-	if (device->module->receive_data != NULL) {
-		thread_id readerThread = interface->reader_thread;
-
-		// make sure the reader thread is gone before shutting down the interface
-		status_t status;
-		wait_for_thread(readerThread, &status);
-	}
-}
-
-
-//	#pragma mark - devices stack API
-
-
-/*!	Unregisters a previously registered deframer function. */
-status_t
-unregister_device_deframer(net_device* device)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	// find device interface for this device
-	net_device_interface* interface = find_device_interface(device->name);
-	if (interface == NULL)
-		return ENODEV;
-
-	RecursiveLocker _(interface->receive_lock);
-
-	if (--interface->deframe_ref_count == 0)
-		interface->deframe_func = NULL;
-
-	return B_OK;
-}
-
-
-/*!	Registers the deframer function for the specified \a device.
-	Note, however, that right now, you can only register one single
-	deframer function per device.
-
-	If the need arises, we might want to lift that limitation at a
-	later time (which would require a slight API change, though).
-*/
-status_t
-register_device_deframer(net_device* device, net_deframe_func deframeFunc)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	// find device interface for this device
-	net_device_interface* interface = find_device_interface(device->name);
-	if (interface == NULL)
-		return ENODEV;
-
-	RecursiveLocker _(interface->receive_lock);
-
-	if (interface->deframe_func != NULL
-		&& interface->deframe_func != deframeFunc)
-		return B_ERROR;
-
-	interface->deframe_func = deframeFunc;
-	interface->deframe_ref_count++;
-	return B_OK;
-}
-
-
-/*!	Registers a domain to receive net_buffers from the specified \a device. */
-status_t
-register_domain_device_handler(struct net_device* device, int32 type,
-	struct net_domain* _domain)
-{
-	net_domain_private* domain = (net_domain_private*)_domain;
-	if (domain->module == NULL || domain->module->receive_data == NULL)
-		return B_BAD_VALUE;
-
-	return register_device_handler(device, type, &domain_receive_adapter,
-		domain);
-}
-
-
-/*!	Registers a receiving function callback for the specified \a device. */
-status_t
-register_device_handler(struct net_device* device, int32 type,
-	net_receive_func receiveFunc, void* cookie)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	// find device interface for this device
-	net_device_interface* interface = find_device_interface(device->name);
-	if (interface == NULL)
-		return ENODEV;
-
-	RecursiveLocker _(interface->receive_lock);
-
-	// see if such a handler already for this device
-
-	DeviceHandlerList::Iterator iterator
-		= interface->receive_funcs.GetIterator();
-	while (net_device_handler* handler = iterator.Next()) {
-		if (handler->type == type)
-			return B_ERROR;
-	}
-
-	// Add new handler
-
-	net_device_handler* handler = new(std::nothrow) net_device_handler;
-	if (handler == NULL)
-		return B_NO_MEMORY;
-
-	handler->func = receiveFunc;
-	handler->type = type;
-	handler->cookie = cookie;
-	interface->receive_funcs.Add(handler);
-	return B_OK;
-}
-
-
-/*!	Unregisters a previously registered device handler. */
-status_t
-unregister_device_handler(struct net_device* device, int32 type)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	// find device interface for this device
-	net_device_interface* interface = find_device_interface(device->name);
-	if (interface == NULL)
-		return ENODEV;
-
-	RecursiveLocker _(interface->receive_lock);
-
-	// search for the handler
-
-	DeviceHandlerList::Iterator iterator
-		= interface->receive_funcs.GetIterator();
-	while (net_device_handler* handler = iterator.Next()) {
-		if (handler->type == type) {
-			// found it
-			iterator.Remove();
-			delete handler;
-			return B_OK;
-		}
-	}
-
-	return B_BAD_VALUE;
-}
-
-
-/*!	Registers a device monitor for the specified device. */
-status_t
-register_device_monitor(net_device* device, net_device_monitor* monitor)
-{
-	if (monitor->receive == NULL || monitor->event == NULL)
-		return B_BAD_VALUE;
-
-	MutexLocker locker(sInterfaceLock);
-
-	// find device interface for this device
-	net_device_interface* interface = find_device_interface(device->name);
-	if (interface == NULL)
-		return ENODEV;
-
-	RecursiveLocker _(interface->receive_lock);
-	interface->monitor_funcs.Add(monitor);
-	return B_OK;
-}
-
-
-/*!	Unregisters a previously registered device monitor. */
-status_t
-unregister_device_monitor(net_device* device, net_device_monitor* monitor)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	// find device interface for this device
-	net_device_interface* interface = find_device_interface(device->name);
-	if (interface == NULL)
-		return ENODEV;
-
-	RecursiveLocker _(interface->receive_lock);
-
-	// search for the monitor
-
-	DeviceMonitorList::Iterator iterator = interface->monitor_funcs.GetIterator();
-	while (iterator.HasNext()) {
-		if (iterator.Next() == monitor) {
-			iterator.Remove();
-			return B_OK;
-		}
-	}
-
-	return B_BAD_VALUE;
-}
-
-
-/*!	This function is called by device modules in case their link
-	state changed, ie. if an ethernet cable was plugged in or
-	removed.
-*/
-status_t
-device_link_changed(net_device* device)
-{
-	notify_link_changed(device);
-	return B_OK;
-}
-
-
-/*!	This function is called by device modules once their device got
-	physically removed, ie. a USB networking card is unplugged.
-*/
-status_t
-device_removed(net_device* device)
-{
-	MutexLocker locker(sInterfaceLock);
-
-	// hold a reference to the device interface being removed
-	// so our put_() will (eventually) do the final cleanup
-	net_device_interface* interface = get_device_interface(device->name, false);
-	if (interface == NULL)
-		return ENODEV;
-
-	// Propagate the loss of the device throughout the stack.
-	// This is very complex, refer to delete_interface() for
-	// further details.
-
-	domain_removed_device_interface(interface);
-
-	notify_device_monitors(interface, B_DEVICE_BEING_REMOVED);
-
-	// By now all of the monitors must have removed themselves. If they
-	// didn't, they'll probably wait forever to be callback'ed again.
-	interface->monitor_funcs.RemoveAll();
-
-	// All of the readers should be gone as well since we are out of
-	// interfaces and put_domain_datalink_protocols() is called for
-	// each delete_interface().
-
-	put_device_interface(interface);
-
-	return B_OK;
-}
-
-
-status_t
-device_enqueue_buffer(net_device* device, net_buffer* buffer)
-{
-	net_device_interface* interface = get_device_interface(device->index);
-	if (interface == NULL)
-		return ENODEV;
-
-	status_t status = fifo_enqueue_buffer(&interface->receive_queue, buffer);
-
-	put_device_interface(interface);
-	return status;
 }
 
 
@@ -891,18 +1226,22 @@ device_enqueue_buffer(net_device* device, net_buffer* buffer)
 status_t
 init_interfaces()
 {
-	mutex_init(&sInterfaceLock, "net interfaces");
+	mutex_init(&sLock, "net interfaces");
+	mutex_init(&sHashLock, "net local addresses");
 
-	new (&sInterfaces) DeviceInterfaceList;
+	new (&sInterfaces) InterfaceList;
+	new (&sAddressTable) AddressTable;
 		// static C++ objects are not initialized in the module startup
 
 #if ENABLE_DEBUGGER_COMMANDS
 	add_debugger_command("net_interface", &dump_interface,
 		"Dump the given network interface");
-	add_debugger_command("net_device_interface", &dump_device_interface,
-		"Dump the given network device interface");
-	add_debugger_command("net_device_interfaces", &dump_device_interfaces,
-		"Dump network device interfaces");
+	add_debugger_command("net_interfaces", &dump_interfaces,
+		"Dump all network interfaces");
+	add_debugger_command("net_local", &dump_local,
+		"Dump all local interface addresses");
+	add_debugger_command("net_route", &dump_route,
+		"Dump the given network route");
 #endif
 	return B_OK;
 }
@@ -913,11 +1252,10 @@ uninit_interfaces()
 {
 #if ENABLE_DEBUGGER_COMMANDS
 	remove_debugger_command("net_interface", &dump_interface);
-	remove_debugger_command("net_device_interface", &dump_device_interface);
-	remove_debugger_command("net_device_interfaces", &dump_device_interfaces);
 #endif
 
-	mutex_destroy(&sInterfaceLock);
+	mutex_destroy(&sLock);
+	mutex_destroy(&sHashLock);
 	return B_OK;
 }
 

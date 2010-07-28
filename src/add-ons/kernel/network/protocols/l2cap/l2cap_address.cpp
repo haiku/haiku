@@ -1,10 +1,11 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  */
+
 
 #include <net_datalink.h>
 
@@ -20,15 +21,13 @@
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/L2CAP/btL2CAP.h>
 
-#define L2CAP_CHECKSUM(address) (address.b[0]+\
-								address.b[1]+\
-								address.b[2]+\
-								address.b[3]+\
-								address.b[4]+\
-								address.b[5])
 
-/*!
-	Routing utility function: copies address \a from into a new address
+#define L2CAP_CHECKSUM(address) \
+	(address.b[0] + address.b[1] + address.b[2] + address.b[3] \
+		+ address.b[4] + address.b[5])
+
+
+/*!	Routing utility function: copies address \a from into a new address
 	that is put into \a to.
 	If \a replaceWithZeros is set \a from will be replaced by an empty
 	address.
@@ -67,8 +66,7 @@ l2cap_copy_address(const sockaddr *from, sockaddr **to,
 }
 
 
-/*!
-	Routing utility function: applies \a mask to given \a address and puts
+/*!	Routing utility function: applies \a mask to given \a address and puts
 	the resulting address into \a result.
 	\return B_OK if the mask has been applied
 	\return B_BAD_VALUE if \a address or \a mask is NULL
@@ -84,8 +82,7 @@ l2cap_mask_address(const sockaddr *address, const sockaddr *mask,
 }
 
 
-/*!
-	Checks if the given \a address is the empty address. By default, the port
+/*!	Checks if the given \a address is the empty address. By default, the port
 	is checked, too, but you can avoid that by passing \a checkPort = false.
 	\return true if \a address is NULL, uninitialized or the empty address,
 		false if not
@@ -103,8 +100,8 @@ l2cap_is_empty_address(const sockaddr *address, bool checkPort)
 
 
 /*!	Checks if the given \a address is L2CAP address.
-	\return false if \a address is NULL, or with family different from AF_BLUETOOTH
-		true if it has AF_BLUETOOTH address family
+	\return false if \a address is NULL, or with family different from
+		AF_BLUETOOTH true if it has AF_BLUETOOTH address family
 */
 static bool
 l2cap_is_same_family(const sockaddr *address)
@@ -115,8 +112,8 @@ l2cap_is_same_family(const sockaddr *address)
 	return address->sa_family == AF_BLUETOOTH;
 }
 
-/*!
-	Compares the IP-addresses of the two given address structures \a a and \a b.
+
+/*!	Compares the IP-addresses of the two given address structures \a a and \a b.
 	\return true if IP-addresses of \a a and \a b are equal, false if not
 */
 static bool
@@ -134,8 +131,7 @@ l2cap_equal_addresses(const sockaddr *a, const sockaddr *b)
 }
 
 
-/*!
-	Compares the ports of the two given address structures \a a and \a b.
+/*!	Compares the ports of the two given address structures \a a and \a b.
 	\return true if ports of \a a and \a b are equal, false if not
 */
 static bool
@@ -147,10 +143,10 @@ l2cap_equal_ports(const sockaddr *a, const sockaddr *b)
 }
 
 
-/*!
-	Compares the IP-addresses and ports of the two given address structures
+/*!	Compares the IP-addresses and ports of the two given address structures
 	\a a and \a b.
-	\return true if IP-addresses and ports of \a a and \a b are equal, false if not
+	\return true if IP-addresses and ports of \a a and \a b are equal, false if
+		not.
 */
 static bool
 l2cap_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
@@ -168,8 +164,7 @@ l2cap_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
 }
 
 
-/*!
-	Applies the given \a mask two \a a and \a b and then checks whether
+/*!	Applies the given \a mask two \a a and \a b and then checks whether
 	the masked addresses match.
 	\return true if \a a matches \a b after masking both, false if not
 */
@@ -184,8 +179,7 @@ l2cap_equal_masked_addresses(const sockaddr *a, const sockaddr *b,
 }
 
 
-/*!
-	Routing utility function: determines the least significant bit that is set
+/*!	Routing utility function: determines the least significant bit that is set
 	in the given \a mask.
 	\return the number of the first bit that is set (0-32, where 32 means
 		that there's no bit set in the mask).
@@ -200,8 +194,7 @@ l2cap_first_mask_bit(const sockaddr *_mask)
 }
 
 
-/*!
-	Routing utility function: checks the given \a mask for correctness (which
+/*!	Routing utility function: checks the given \a mask for correctness (which
 	means that (starting with LSB) consists zero or more unset bits, followed
 	by bits that are all set).
 	\return true if \a mask is ok, false if not
@@ -214,8 +207,7 @@ l2cap_check_mask(const sockaddr *_mask)
 }
 
 
-/*!
-	Creates a buffer for the given \a address and prints the address into
+/*!	Creates a buffer for the given \a address and prints the address into
 	it (hexadecimal representation in host byte order or '<none>').
 	If \a printPort is set, the port is printed, too.
 	\return B_OK if the address could be printed, \a buffer will point to
@@ -270,8 +262,7 @@ l2cap_print_address(const sockaddr *_address, char **_buffer, bool printPort)
 }
 
 
-/*!
-	Determines the port of the given \a address.
+/*!	Determines the port of the given \a address.
 	\return uint16 representing the port-nr
 */
 static uint16
@@ -284,8 +275,7 @@ l2cap_get_port(const sockaddr *address)
 }
 
 
-/*!
-	Sets the port of the given \a address to \a port.
+/*!	Sets the port of the given \a address to \a port.
 	\return B_OK if the port has been set
 	\return B_BAD_VALUE if \a address is NULL
 */
@@ -300,8 +290,7 @@ l2cap_set_port(sockaddr *address, uint16 port)
 }
 
 
-/*!
-	Sets \a address to \a from.
+/*!	Sets \a address to \a from.
 	\return B_OK if \a from has been copied into \a address
 	\return B_BAD_VALUE if either \a address or \a from is NULL
 	\return B_MISMATCHED_VALUES if from is not of family AF_BLUETOOTH
@@ -346,8 +335,7 @@ l2cap_update_to(sockaddr *_address, const sockaddr *_from)
 }
 
 
-/*!
-	Sets \a address to the empty address (0.0.0.0).
+/*!	Sets \a address to the empty address.
 	\return B_OK if \a address has been set
 	\return B_BAD_VALUE if \a address is NULL
 */
@@ -366,14 +354,28 @@ l2cap_set_to_empty_address(sockaddr *address)
 
 static status_t
 l2cap_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
-	sockaddr *_address, sockaddr *_mask)
+	const sockaddr *_address, const sockaddr *_mask)
 {
-
-	return B_OK;
+	// TODO: not implemented
+	return B_ERROR;
 }
 
-/*!
-	Computes a hash-value of the given addresses \a ourAddress
+
+/*!	Computes a hash value of the given \a address.
+	\return uint32 representing the hash value
+*/
+static uint32
+l2cap_hash_address(const struct sockaddr* _address, bool includePort)
+{
+	const sockaddr_l2cap* address = (const sockaddr_l2cap*)_address;
+	if (address == NULL || address->l2cap_len == 0)
+		return 0;
+
+	return address->l2cap_psm ^ L2CAP_CHECKSUM(address->l2cap_bdaddr);
+}
+
+
+/*!	Computes a hash-value of the given addresses \a ourAddress
 	and \a peerAddress.
 	\return uint32 representing the hash-value
 */
@@ -389,8 +391,7 @@ l2cap_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 }
 
 
-/*!
-	Adds the given \a address to the IP-checksum \a checksum.
+/*!	Adds the given \a address to the IP-checksum \a checksum.
 	\return B_OK if \a address has been added to the checksum
 	\return B_BAD_VALUE if either \a address or \a checksum is NULL
 */
@@ -432,6 +433,7 @@ net_address_module_info gL2cap4AddressModule = {
 	l2cap_set_to_empty_address,
 	l2cap_set_to_defaults,
 	l2cap_update_to,
+	l2cap_hash_address,
 	l2cap_hash_address_pair,
 	l2cap_checksum_address,
 	NULL	// get_loopback_address

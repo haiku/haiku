@@ -541,32 +541,29 @@ list_interface(const char* name, int addressFamily)
 		char address[256];
 		strcpy(address, "none");
 
-		if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq)) == 0) {
-			prepare_request(request, request.ifr_parameter.device);
-			if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq))
-					== 0) {
-				sockaddr_dl &link = *(sockaddr_dl*)&request.ifr_addr;
+		if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq))
+				== 0) {
+			sockaddr_dl &link = *(sockaddr_dl*)&request.ifr_addr;
 
-				switch (link.sdl_type) {
-					case IFT_ETHER:
-					{
-						type = "Ethernet";
+			switch (link.sdl_type) {
+				case IFT_ETHER:
+				{
+					type = "Ethernet";
 
-						if (link.sdl_alen > 0) {
-							uint8 *mac = (uint8*)LLADDR(&link);
-							sprintf(address, "%02x:%02x:%02x:%02x:%02x:%02x",
-								mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-						} else
-							strcpy(address, "not available");
-						break;
-					}
-					case IFT_LOOP:
-						type = "Local Loopback";
-						break;
-					case IFT_MODEM:
-						type = "Modem";
-						break;
+					if (link.sdl_alen > 0) {
+						uint8 *mac = (uint8*)LLADDR(&link);
+						sprintf(address, "%02x:%02x:%02x:%02x:%02x:%02x",
+							mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+					} else
+						strcpy(address, "not available");
+					break;
 				}
+				case IFT_LOOP:
+					type = "Local Loopback";
+					break;
+				case IFT_MODEM:
+					type = "Modem";
+					break;
 			}
 		}
 
@@ -778,10 +775,12 @@ configure_interface(const char* name, char* const* args,
 
 	if (index == 0) {
 		// the interface does not exist yet, we have to add it first
-		request.ifr_parameter.base_name[0] = '\0';
-		request.ifr_parameter.device[0] = '\0';
-		request.ifr_parameter.sub_type = 0;
-			// the default device is okay for us
+		ifaliasreq request;
+		strlcpy(request.ifra_name, name, IF_NAMESIZE);
+
+		request.ifra_addr.ss_family = AF_UNSPEC;
+		request.ifra_mask.ss_family = AF_UNSPEC;
+		request.ifra_broadaddr.ss_family = AF_UNSPEC;
 
 		if (ioctl(socket, SIOCAIFADDR, &request, sizeof(request)) < 0) {
 			fprintf(stderr, "%s: Could not add interface: %s\n", kProgramName,

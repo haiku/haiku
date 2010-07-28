@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NET_IF_H
@@ -15,12 +15,6 @@
 /* BSD specific/proprietary part */
 
 #define IFNAMSIZ IF_NAMESIZE
-
-struct ifreq_parameter {
-	char		base_name[IF_NAMESIZE];
-	char		device[128];
-	uint8_t		sub_type;
-};
 
 struct ifreq_stream_stats {
 	uint32_t	packets;
@@ -43,7 +37,6 @@ struct ifreq {
 		struct sockaddr ifr_dstaddr;
 		struct sockaddr ifr_broadaddr;
 		struct sockaddr ifr_mask;
-		struct ifreq_parameter ifr_parameter;
 		struct ifreq_stats ifr_stats;
 		struct route_entry ifr_route;
 		int		ifr_flags;
@@ -54,6 +47,14 @@ struct ifreq {
 		int		ifr_type;
 		int		ifr_reqcap;
 	};
+};
+
+/* used with SIOCAIFADDR */
+struct ifaliasreq {
+	char		ifra_name[IF_NAMESIZE];
+	struct sockaddr_storage ifra_addr;
+	struct sockaddr_storage ifra_broadaddr;
+	struct sockaddr_storage ifra_mask;
 };
 
 /* interface flags */

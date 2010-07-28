@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,19 +14,27 @@
 
 #include <new>
 
-static inline bool
-operator==(const in_addr &a1, const in_addr &a2)
-{
-	return a1.s_addr == a2.s_addr;
-}
 
 using std::nothrow;
+
+
+static inline bool
+operator==(const in_addr& a, const in_addr& b)
+{
+	return a.s_addr == b.s_addr;
+}
+
+
+// #pragma mark -
 
 
 template<typename Addressing>
 MulticastGroupInterface<Addressing>::MulticastGroupInterface(Filter *parent,
 	const AddressType &address, net_interface *interface)
-	: fParent(parent), fMulticastAddress(address), fInterface(interface)
+	:
+	fParent(parent),
+	fMulticastAddress(address),
+	fInterface(interface)
 {
 }
 

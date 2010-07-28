@@ -31,9 +31,9 @@
 
 //#define TRACE_ROUTES
 #ifdef TRACE_ROUTES
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(STACK_DEBUG_PREFIX x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
@@ -131,8 +131,9 @@ find_route(struct net_domain* _domain, const net_route* description)
 
 		if ((route->flags & RTF_DEFAULT) != 0
 			&& (description->flags & RTF_DEFAULT) != 0) {
-			// there can only be one default route per interface
-			if (route->interface == description->interface)
+			// there can only be one default route per interface address family
+			// TODO: check this better
+			if (route->interface_address == description->interface_address)
 				return route;
 
 			continue;
@@ -147,8 +148,8 @@ find_route(struct net_domain* _domain, const net_route* description)
 				description->mask)
 			&& domain->address_module->equal_addresses(route->gateway,
 				description->gateway)
-			&& (description->interface == NULL
-				|| description->interface == route->interface))
+			&& (description->interface_address == NULL
+				|| description->interface_address == route->interface_address))
 			return route;
 	}
 
@@ -166,8 +167,8 @@ find_route(net_domain* _domain, const sockaddr* address)
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	net_route_private* candidate = NULL;
 
-	TRACE(("test address %s for routes...\n",
-		AddressString(domain, address).Data()));
+	TRACE("test address %s for routes...\n",
+		AddressString(domain, address).Data());
 
 	// TODO: alternate equal default routes
 
@@ -186,17 +187,18 @@ find_route(net_domain* _domain, const sockaddr* address)
 			continue;
 
 		// neglect routes that point to devices that have no link
-		if ((route->interface->device->flags & IFF_LINK) == 0) {
+		if ((route->interface_address->interface->device->flags & IFF_LINK)
+				== 0) {
 			if (candidate == NULL) {
-				TRACE(("  found candidate: %s, flags %lx\n", AddressString(
-					domain, route->destination).Data(), route->flags));
+				TRACE("  found candidate: %s, flags %lx\n", AddressString(
+					domain, route->destination).Data(), route->flags);
 				candidate = route;
 			}
 			continue;
 		}
 
-		TRACE(("  found route: %s, flags %lx\n",
-			AddressString(domain, route->destination).Data(), route->flags));
+		TRACE("  found route: %s, flags %lx\n",
+			AddressString(domain, route->destination).Data(), route->flags);
 
 		return route;
 	}
@@ -215,6 +217,9 @@ put_route_internal(struct net_domain_private* domain, net_route* _route)
 		return;
 
 	// delete route - it must already have been removed at this point
+	if (route->interface_address != NULL)
+		((InterfaceAddress*)route->interface_address)->ReleaseReference();
+
 	delete route;
 }
 
@@ -234,7 +239,7 @@ get_route_internal(struct net_domain_private* domain,
 		while (iterator.HasNext()) {
 			route = iterator.Next();
 
-			net_device* device = route->interface->device;
+			net_device* device = route->interface_address->interface->device;
 
 			if ((link->sdl_nlen > 0
 					&& !strncmp(device->name, (const char*)link->sdl_data,
@@ -291,7 +296,7 @@ fill_route_entry(route_entry* target, void* _buffer, size_t bufferSize,
 	target->destination = copy_address(buffer, route->destination);
 	target->mask = copy_address(buffer, route->mask);
 	target->gateway = copy_address(buffer, route->gateway);
-	target->source = copy_address(buffer, route->interface->address);
+	target->source = copy_address(buffer, route->interface_address->local);
 	target->flags = route->flags;
 	target->mtu = route->mtu;
 
@@ -375,7 +380,8 @@ list_routes(net_domain_private* domain, void* buffer, size_t size)
 			return ENOBUFS;
 
 		ifreq request;
-		strlcpy(request.ifr_name, route->interface->name, IF_NAMESIZE);
+		strlcpy(request.ifr_name, route->interface_address->interface->name,
+			IF_NAMESIZE);
 		request.ifr_route.destination = destination;
 		request.ifr_route.mask = mask;
 		request.ifr_route.gateway = gateway;
@@ -402,10 +408,10 @@ list_routes(net_domain_private* domain, void* buffer, size_t size)
 
 
 status_t
-control_routes(struct net_interface* interface, int32 option, void* argument,
-	size_t length)
+control_routes(struct net_interface* _interface, net_domain* domain,
+	int32 option, void* argument, size_t length)
 {
-	net_domain_private* domain = (net_domain_private*)interface->domain;
+	Interface* interface = (Interface*)_interface;
 
 	switch (option) {
 		case SIOCADDRT:
@@ -429,14 +435,20 @@ control_routes(struct net_interface* interface, int32 option, void* argument,
 					!= B_OK)
 				return status;
 
+			InterfaceAddress* address
+				= interface->FirstForFamily(domain->family);
+
 			route.mtu = entry.mtu;
 			route.flags = entry.flags;
-			route.interface = interface;
+			route.interface_address = address;
 
 			if (option == SIOCADDRT)
-				return add_route(domain, &route);
+				status = add_route(domain, &route);
+			else
+				status = remove_route(domain, &route);
 
-			return remove_route(domain, &route);
+			address->ReleaseReference();
+			return status;
 		}
 	}
 	return B_BAD_VALUE;
@@ -448,16 +460,20 @@ add_route(struct net_domain* _domain, const struct net_route* newRoute)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
 
-	TRACE(("add route to domain %s: dest %s, mask %s, gw %s, flags %lx\n",
+	TRACE("add route to domain %s: dest %s, mask %s, gw %s, flags %lx\n",
 		domain->name,
-		AddressString(domain, newRoute->destination ? newRoute->destination : NULL).Data(),
+		AddressString(domain, newRoute->destination
+			? newRoute->destination : NULL).Data(),
 		AddressString(domain, newRoute->mask ? newRoute->mask : NULL).Data(),
-		AddressString(domain, newRoute->gateway ? newRoute->gateway : NULL).Data(),
-		newRoute->flags));
+		AddressString(domain, newRoute->gateway
+			? newRoute->gateway : NULL).Data(),
+		newRoute->flags);
 
-	if (domain == NULL || newRoute == NULL || newRoute->interface == NULL
+	if (domain == NULL || newRoute == NULL
+		|| newRoute->interface_address == NULL
 		|| ((newRoute->flags & RTF_HOST) != 0 && newRoute->mask != NULL)
-		|| ((newRoute->flags & RTF_DEFAULT) == 0 && newRoute->destination == NULL)
+		|| ((newRoute->flags & RTF_DEFAULT) == 0
+			&& newRoute->destination == NULL)
 		|| ((newRoute->flags & RTF_GATEWAY) != 0 && newRoute->gateway == NULL)
 		|| !domain->address_module->check_mask(newRoute->mask))
 		return B_BAD_VALUE;
@@ -484,7 +500,8 @@ add_route(struct net_domain* _domain, const struct net_route* newRoute)
 	}
 
 	route->flags = newRoute->flags;
-	route->interface = newRoute->interface;
+	route->interface_address = newRoute->interface_address;
+	((InterfaceAddress*)route->interface_address)->AcquireReference();
 	route->mtu = 0;
 	route->ref_count = 1;
 
@@ -504,8 +521,8 @@ add_route(struct net_domain* _domain, const struct net_route* newRoute)
 			&& (before->flags & RTF_DEFAULT) != 0) {
 			// both routes are equal - let the link speed decide the
 			// order
-			if (before->interface->device->link_speed
-					< route->interface->device->link_speed)
+			if (before->interface_address->interface->device->link_speed
+					< route->interface_address->interface->device->link_speed)
 				break;
 		}
 	}
@@ -522,12 +539,15 @@ remove_route(struct net_domain* _domain, const struct net_route* removeRoute)
 {
 	struct net_domain_private* domain = (net_domain_private*)_domain;
 
-	TRACE(("remove route from domain %s: dest %s, mask %s, gw %s, flags %lx\n",
+	TRACE("remove route from domain %s: dest %s, mask %s, gw %s, flags %lx\n",
 		domain->name,
-		AddressString(domain, removeRoute->destination ? removeRoute->destination : NULL).Data(),
-		AddressString(domain, removeRoute->mask ? removeRoute->mask : NULL).Data(),
-		AddressString(domain, removeRoute->gateway ? removeRoute->gateway : NULL).Data(),
-		removeRoute->flags));
+		AddressString(domain, removeRoute->destination
+			? removeRoute->destination : NULL).Data(),
+		AddressString(domain, removeRoute->mask
+			? removeRoute->mask : NULL).Data(),
+		AddressString(domain, removeRoute->gateway
+			? removeRoute->gateway : NULL).Data(),
+		removeRoute->flags);
 
 	RecursiveLocker locker(domain->lock);
 
@@ -578,9 +598,8 @@ get_route_information(struct net_domain* _domain, void* value, size_t length)
 void
 invalidate_routes(net_domain* _domain, net_interface* interface)
 {
-	// this function is called with the domain locked
-	// (see domain_interface_went_down)
 	net_domain_private* domain = (net_domain_private*)_domain;
+	RecursiveLocker locker(domain->lock);
 
 	dprintf("invalidate_routes(%i, %s)\n", domain->family, interface->name);
 
@@ -588,7 +607,7 @@ invalidate_routes(net_domain* _domain, net_interface* interface)
 	while (iterator.HasNext()) {
 		net_route* route = iterator.Next();
 
-		if (route->interface->index == interface->index)
+		if (route->interface_address->interface == interface)
 			remove_route(domain, route);
 	}
 }
@@ -605,28 +624,20 @@ get_route(struct net_domain* _domain, const struct sockaddr* address)
 
 
 status_t
-get_device_route(struct net_domain* _domain, uint32 index, net_route** _route)
+get_device_route(struct net_domain* domain, uint32 index, net_route** _route)
 {
-	net_domain_private* domain = (net_domain_private*)_domain;
+	Interface* interface = get_interface_for_device(domain, index);
+	if (interface == NULL)
+		return ENETUNREACH;
 
-	RecursiveLocker _(domain->lock);
+	net_route_private* route
+		= &interface->DomainDatalink(domain->family)->direct_route;
 
-	net_interface_private* interface = NULL;
+	atomic_add(&route->ref_count, 1);
+	*_route = route;
 
-	while (true) {
-		interface = (net_interface_private*)list_get_next_item(
-			&domain->interfaces, interface);
-		if (interface == NULL)
-			break;
-
-		if (interface->device->index == index) {
-			atomic_add(&interface->direct_route.ref_count, 1);
-			*_route = &interface->direct_route;
-			return B_OK;
-		}
-	}
-
-	return ENETUNREACH;
+	interface->ReleaseReference();
+	return B_OK;
 }
 
 
@@ -647,9 +658,10 @@ get_buffer_route(net_domain* _domain, net_buffer* buffer, net_route** _route)
 	// TODO: we are quite relaxed in the address checking here
 	// as we might proceed with source = INADDR_ANY.
 
-	if (route->interface != NULL && route->interface->address != NULL) {
+	if (route->interface_address != NULL
+		&& route->interface_address->local != NULL) {
 		status = domain->address_module->update_to(source,
-			route->interface->address);
+			route->interface_address->local);
 	}
 
 	if (status != B_OK)

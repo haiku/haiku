@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
 
 
 #include "ancillary_data.h"
+#include "device_interfaces.h"
 #include "domains.h"
 #include "interfaces.h"
 #include "link.h"
@@ -501,9 +502,9 @@ put_domain_protocols(net_socket* socket)
 
 
 static void
-uninit_domain_datalink_protocols(net_interface* interface)
+uninit_domain_datalink_protocols(domain_datalink* datalink)
 {
-	net_datalink_protocol* protocol = interface->first_protocol;
+	net_datalink_protocol* protocol = datalink->first_protocol;
 	while (protocol != NULL) {
 		net_datalink_protocol* next = protocol->next;
 		protocol->module->uninit_protocol(protocol);
@@ -511,22 +512,21 @@ uninit_domain_datalink_protocols(net_interface* interface)
 		protocol = next;
 	}
 
-	interface->first_protocol = NULL;
-	interface->first_info = NULL;
+	datalink->first_protocol = NULL;
+	datalink->first_info = NULL;
 }
 
 
 status_t
-get_domain_datalink_protocols(net_interface* _interface)
+get_domain_datalink_protocols(Interface* interface, net_domain* domain)
 {
-	struct net_interface_private* interface = (net_interface_private*)_interface;
 	struct chain* chain;
 
 	{
 		MutexLocker _(sChainLock);
 
-		chain = chain::Lookup(sDatalinkProtocolChains, interface->domain->family,
-			interface->device_interface->device->type, 0);
+		chain = chain::Lookup(sDatalinkProtocolChains, domain->family,
+			interface->DeviceInterface()->device->type, 0);
 		if (chain == NULL)
 			return EAFNOSUPPORT;
 	}
@@ -542,21 +542,26 @@ get_domain_datalink_protocols(net_interface* _interface)
 	for (int32 i = 0; chain->infos[i] != NULL; i++) {
 		net_datalink_protocol* protocol;
 		status_t status = ((net_datalink_protocol_module_info*)
-			chain->infos[i])->init_protocol(interface, &protocol);
-		if (status < B_OK) {
+			chain->infos[i])->init_protocol(interface, domain, &protocol);
+		if (status != B_OK) {
 			// free protocols we already initialized
-			uninit_domain_datalink_protocols(interface);
+			uninit_domain_datalink_protocols(
+				interface->DomainDatalink(domain->family));
 			chain->Release();
 			return status;
 		}
 
 		protocol->module = (net_datalink_protocol_module_info*)chain->infos[i];
 		protocol->interface = interface;
+		protocol->domain = domain;
 		protocol->next = NULL;
 
 		if (last == NULL) {
-			interface->first_protocol = protocol;
-			interface->first_info = protocol->module;
+			domain_datalink* datalink
+				= interface->DomainDatalink(domain->family);
+
+			datalink->first_protocol = protocol;
+			datalink->first_info = protocol->module;
 		} else
 			last->next = protocol;
 
@@ -568,21 +573,20 @@ get_domain_datalink_protocols(net_interface* _interface)
 
 
 status_t
-put_domain_datalink_protocols(net_interface* _interface)
+put_domain_datalink_protocols(Interface* interface, net_domain* domain)
 {
-	struct net_interface_private* interface = (net_interface_private*)_interface;
 	struct chain* chain;
 
 	{
 		MutexLocker _(sChainLock);
 
-		chain = chain::Lookup(sDatalinkProtocolChains, interface->domain->family,
-			interface->device_interface->device->type, 0);
+		chain = chain::Lookup(sDatalinkProtocolChains, domain->family,
+			interface->DeviceInterface()->device->type, 0);
 		if (chain == NULL)
 			return B_ERROR;
 	}
 
-	uninit_domain_datalink_protocols(interface);
+	uninit_domain_datalink_protocols(interface->DomainDatalink(domain->family));
 	chain->Release();
 	return B_OK;
 }
@@ -756,9 +760,13 @@ init_stack()
 	if (status != B_OK)
 		goto err1;
 
-	status = init_timers();
+	status = init_device_interfaces();
 	if (status != B_OK)
 		goto err2;
+
+	status = init_timers();
+	if (status != B_OK)
+		goto err3;
 
 	status = init_notifications();
 	if (status < B_OK) {
@@ -771,7 +779,7 @@ init_stack()
 	module_info* dummy;
 	status = get_module(NET_SOCKET_MODULE_NAME, &dummy);
 	if (status != B_OK)
-		goto err3;
+		goto err4;
 
 	mutex_init(&sChainLock, "net chains");
 	mutex_init(&sInitializeChainLock, "net intialize chains");
@@ -816,7 +824,6 @@ init_stack()
 	register_domain_datalink_protocols(AF_INET6, IFT_LOOP,
 		"network/datalink_protocols/loopback_frame/v1", NULL);
 	register_domain_datalink_protocols(AF_INET, IFT_ETHER,
-		"network/datalink_protocols/ipv4_datagram/v1",
 		"network/datalink_protocols/arp/v1",
 		"network/datalink_protocols/ethernet_frame/v1",
 		NULL);
@@ -836,8 +843,10 @@ err6:
 err5:
 	mutex_destroy(&sInitializeChainLock);
 	mutex_destroy(&sChainLock);
-err3:
+err4:
 	uninit_timers();
+err3:
+	uninit_device_interfaces();
 err2:
 	uninit_interfaces();
 err1:
@@ -853,6 +862,7 @@ uninit_stack()
 
 	put_module(NET_SOCKET_MODULE_NAME);
 	uninit_timers();
+	uninit_device_interfaces();
 	uninit_interfaces();
 	uninit_domains();
 	uninit_notifications();

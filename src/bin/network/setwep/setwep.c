@@ -64,7 +64,7 @@ get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 			if (hexstr)
 				printf("%s: hexadecimal digits too long", __func__);
 			else
-				printf("string too long", __func__);
+				printf("%s: string too long", __func__);
 			return NULL;
 		}
 		if (hexstr) {

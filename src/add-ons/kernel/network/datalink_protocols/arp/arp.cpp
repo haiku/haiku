@@ -1,11 +1,12 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Hugo Santos, hugosantos@gmail.com
  */
+
 
 //! Ethernet Address Resolution Protocol, see RFC 826.
 
@@ -110,6 +111,7 @@ struct arp_entry {
 
 struct arp_protocol : net_datalink_protocol {
 	sockaddr_dl	hardware_address;
+	in_addr_t	local_address;
 };
 
 
@@ -117,9 +119,10 @@ static const net_buffer* kDeletedBuffer = (net_buffer*)~0;
 
 static void arp_timer(struct net_timer *timer, void *data);
 
-net_buffer_module_info *gBufferModule;
-static net_stack_module_info *sStackModule;
-static hash_table *sCache;
+net_buffer_module_info* gBufferModule;
+static net_stack_module_info* sStackModule;
+static net_datalink_module_info* sDatalinkModule;
+static hash_table* sCache;
 static mutex sCacheLock;
 static bool sIgnoreReplies;
 
@@ -283,7 +286,7 @@ void
 arp_entry::MarkValid()
 {
 	TRACE(("ARP entry %p Marked as VALID, have %li packets queued.\n", this,
-		queue.Size()));
+		queue.Count()));
 
 	flags = (flags & ~ARP_FLAG_REJECT) | ARP_FLAG_VALID;
 
@@ -316,9 +319,6 @@ arp_entry::ScheduleRemoval()
 static void
 ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 {
-	// TODO: this is ethernet specific, and doesn't belong here
-	//	(should be moved to the ethernet_frame module)
-
 	// RFC 1112 - Host extensions for IP multicasting
 	//
 	//   ``An IP host group address is mapped to an Ethernet multicast
@@ -352,7 +352,7 @@ ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
 	This function does not lock the cache - you have to do it yourself
 	before calling it.
 */
-status_t
+static status_t
 arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	uint32 flags, arp_entry **_entry = NULL)
 {
@@ -405,22 +405,73 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 }
 
 
-/*!	Creates a permanent local entry for the interface belonging to this protocol.
-	You need to hold the cache lock when calling this function.
-*/
-static status_t
-arp_update_local(arp_protocol *protocol)
+static void
+arp_remove_local_entry(arp_protocol* protocol, const sockaddr* local,
+	bool updateLocalAddress)
 {
-	ASSERT_LOCKED_MUTEX(&sCacheLock);
+	in_addr_t inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
 
-	net_interface *interface = protocol->interface;
+	MutexLocker locker(sCacheLock);
+
+	arp_entry* entry = arp_entry::Lookup(inetAddress);
+	if (entry != NULL) {
+		hash_remove(sCache, entry);
+		entry->flags |= ARP_FLAG_REMOVED;
+	}
+
+	if (updateLocalAddress && protocol->local_address == inetAddress) {
+		// find new local sender address
+		protocol->local_address = 0;
+
+		net_interface_address* address = NULL;
+		while (sDatalinkModule->get_next_interface_address(protocol->interface,
+				&address)) {
+			if (address->local == NULL || address->local->sa_family != AF_INET)
+				continue;
+
+			protocol->local_address
+				= ((sockaddr_in*)address->local)->sin_addr.s_addr;
+		}
+	}
+
+	locker.Unlock();
+	delete entry;
+}
+
+
+/*!	Removes all entries belonging to the local interface of the \a procotol
+	given.
+*/
+static void
+arp_remove_local(arp_protocol* protocol)
+{
+	net_interface_address* address = NULL;
+	while (sDatalinkModule->get_next_interface_address(protocol->interface,
+			&address)) {
+		if (address->local == NULL || address->local->sa_family != AF_INET)
+			continue;
+
+		arp_remove_local_entry(protocol, address->local, false);
+	}
+}
+
+
+static status_t
+arp_set_local_entry(arp_protocol* protocol, const sockaddr* local)
+{
+	MutexLocker locker(sCacheLock);
+	
+	net_interface* interface = protocol->interface;
 	in_addr_t inetAddress;
-
-	if (interface->address == NULL) {
+	
+	if (local == NULL) {
 		// interface has not yet been set
 		inetAddress = INADDR_ANY;
 	} else
-		inetAddress = ((sockaddr_in *)interface->address)->sin_addr.s_addr;
+		inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
+
+	if (protocol->local_address == 0)
+		protocol->local_address = inetAddress;
 
 	sockaddr_dl address;
 	address.sdl_len = sizeof(sockaddr_dl);
@@ -435,13 +486,44 @@ arp_update_local(arp_protocol *protocol)
 	memcpy(&protocol->hardware_address, &address, sizeof(sockaddr_dl));
 		// cache the address in our protocol
 
-	arp_entry *entry;
+	arp_entry* entry;
 	status_t status = arp_update_entry(inetAddress, &address,
 		ARP_FLAG_LOCAL | ARP_FLAG_PERMANENT, &entry);
 	if (status == B_OK)
 		entry->protocol = protocol;
 
 	return status;
+}
+
+
+/*!	Creates permanent local entries for all addresses of the interface belonging
+	to this protocol.
+	Returns an error if no entry could be added.
+*/
+static status_t
+arp_update_local(arp_protocol* protocol)
+{
+	protocol->local_address = 0;
+		// TODO: test if this actually works - maybe we should use
+		// INADDR_BROADCAST instead
+
+	ssize_t count = 0;
+
+	net_interface_address* address = NULL;
+	while (sDatalinkModule->get_next_interface_address(protocol->interface,
+			&address)) {
+		if (address->local == NULL || address->local->sa_family != AF_INET)
+			continue;
+
+		if (arp_set_local_entry(protocol, address->local) == B_OK) {
+			count++;
+		}
+	}
+
+	if (count == 0)
+		return arp_set_local_entry(protocol, NULL);
+
+	return B_OK;
 }
 
 
@@ -518,15 +600,19 @@ arp_receive(void *cookie, net_device *device, net_buffer *buffer)
 
 #ifdef TRACE_ARP
 	dprintf("  hw sender: %02x:%02x:%02x:%02x:%02x:%02x\n",
-		header.hardware_sender[0], header.hardware_sender[1], header.hardware_sender[2],
-		header.hardware_sender[3], header.hardware_sender[4], header.hardware_sender[5]);
-	dprintf("  proto sender: %ld.%ld.%ld.%ld\n", header.protocol_sender >> 24, (header.protocol_sender >> 16) & 0xff,
-		(header.protocol_sender >> 8) & 0xff, header.protocol_sender & 0xff);
+		header.hardware_sender[0], header.hardware_sender[1],
+		header.hardware_sender[2], header.hardware_sender[3],
+		header.hardware_sender[4], header.hardware_sender[5]);
+	unsigned int addr = ntohl(header.protocol_sender);
+	dprintf("  proto sender: %d.%d.%d.%d\n", addr >> 24, (addr >> 16) & 0xff,
+		(addr >> 8) & 0xff, addr & 0xff);
 	dprintf("  hw target: %02x:%02x:%02x:%02x:%02x:%02x\n",
-		header.hardware_target[0], header.hardware_target[1], header.hardware_target[2],
-		header.hardware_target[3], header.hardware_target[4], header.hardware_target[5]);
-	dprintf("  proto target: %ld.%ld.%ld.%ld\n", header.protocol_target >> 24, (header.protocol_target >> 16) & 0xff,
-		(header.protocol_target >> 8) & 0xff, header.protocol_target & 0xff);
+		header.hardware_target[0], header.hardware_target[1],
+		header.hardware_target[2], header.hardware_target[3],
+		header.hardware_target[4], header.hardware_target[5]);
+	addr = ntohl(header.protocol_target);
+	dprintf("  proto target: %d.%d.%d.%d\n", addr >> 24, (addr >> 16) & 0xff,
+		(addr >> 8) & 0xff, addr & 0xff);
 #endif
 
 	if (ntohs(header.protocol_type) != ETHER_TYPE_IP
@@ -588,21 +674,23 @@ arp_timer(struct net_timer *timer, void *data)
 
 		case ARP_STATE_REMOVE_FAILED:
 		case ARP_STATE_STALE:
+		{
 			// the entry has aged so much that we're going to remove it
 			TRACE(("  remove ARP entry %p!\n", entry));
 
-			mutex_lock(&sCacheLock);
+			MutexLocker locker(sCacheLock);
 			if ((entry->flags & ARP_FLAG_REMOVED) != 0) {
-				// The entry has already been removed, and is about to be deleted
-				mutex_unlock(&sCacheLock);
+				// The entry has already been removed, and is about to be
+				// deleted
 				break;
 			}
 
 			hash_remove(sCache, entry);
-			mutex_unlock(&sCacheLock);
+			locker.Unlock();
 
 			delete entry;
 			break;
+		}
 
 		default:
 		{
@@ -649,8 +737,7 @@ arp_timer(struct net_timer *timer, void *data)
 	You need to have the sCacheLock held when calling this function.
 */
 static status_t
-arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
-	arp_entry **_entry)
+arp_start_resolve(arp_protocol* protocol, in_addr_t address, arp_entry** _entry)
 {
 	ASSERT_LOCKED_MUTEX(&sCacheLock);
 
@@ -686,16 +773,8 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 	header.opcode = htons(ARP_OPCODE_REQUEST);
 
 	memcpy(header.hardware_sender, device->address.data, ETHER_ADDRESS_LENGTH);
-	if (protocol->interface->address != NULL) {
-		header.protocol_sender
-			= ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
-	} else {
-		header.protocol_sender = 0;
-			// TODO: test if this actually works - maybe we should use
-			// INADDR_BROADCAST instead
-	}
-
 	memset(header.hardware_target, 0, ETHER_ADDRESS_LENGTH);
+	header.protocol_sender = protocol->local_address;
 	header.protocol_target = address;
 
 	// prepare source and target addresses
@@ -867,21 +946,25 @@ arp_uninit()
 
 
 status_t
-arp_init_protocol(struct net_interface *interface,
-	net_datalink_protocol **_protocol)
+arp_init_protocol(net_interface* interface, net_domain* domain,
+	net_datalink_protocol** _protocol)
 {
 	// We currently only support a single family and type!
-	if (interface->domain->family != AF_INET
-		|| interface->device->type != IFT_ETHER)
+	if (interface->device->type != IFT_ETHER
+		|| domain->family != AF_INET)
 		return B_BAD_TYPE;
 
 	status_t status = sStackModule->register_device_handler(interface->device,
 		ETHER_FRAME_TYPE | ETHER_TYPE_ARP, &arp_receive, NULL);
-
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
-	arp_protocol *protocol = new (std::nothrow) arp_protocol;
+	status = sStackModule->register_domain_device_handler(
+		interface->device, ETHER_FRAME_TYPE | ETHER_TYPE_IP, domain);
+	if (status != B_OK)
+		return status;
+
+	arp_protocol* protocol = new(std::nothrow) arp_protocol;
 	if (protocol == NULL)
 		return B_NO_MEMORY;
 
@@ -896,6 +979,8 @@ arp_uninit_protocol(net_datalink_protocol *protocol)
 {
 	sStackModule->unregister_device_handler(protocol->interface->device,
 		ETHER_FRAME_TYPE | ETHER_TYPE_ARP);
+	sStackModule->unregister_device_handler(protocol->interface->device,
+		ETHER_FRAME_TYPE | ETHER_TYPE_IP);
 
 	delete protocol;
 	return B_OK;
@@ -914,7 +999,7 @@ arp_send_data(net_datalink_protocol *_protocol, net_buffer *buffer)
 		memcpy(buffer->source, &protocol->hardware_address,
 			protocol->hardware_address.sdl_len);
 
-		if (buffer->flags & MSG_MCAST) {
+		if ((buffer->flags & MSG_MCAST) != 0) {
 			sockaddr_dl multicastDestination;
 			ipv4_to_ether_multicast(&multicastDestination,
 				(sockaddr_in *)buffer->destination);
@@ -926,14 +1011,16 @@ arp_send_data(net_datalink_protocol *_protocol, net_buffer *buffer)
 				((struct sockaddr_in *)buffer->destination)->sin_addr.s_addr);
 			if (entry == NULL) {
 				status_t status = arp_start_resolve(protocol,
-					((struct sockaddr_in *)buffer->destination)->sin_addr.s_addr, &entry);
-				if (status < B_OK)
+					((struct sockaddr_in*)buffer->destination)->sin_addr.s_addr,
+					&entry);
+				if (status != B_OK)
 					return status;
 			}
 
-			if (entry->flags & ARP_FLAG_REJECT)
+			if ((entry->flags & ARP_FLAG_REJECT) != 0)
 				return EHOSTUNREACH;
-			else if (!(entry->flags & ARP_FLAG_VALID)) {
+			
+			if ((entry->flags & ARP_FLAG_VALID) == 0) {
 				// entry is still being resolved.
 				TRACE(("ARP Queuing packet %p, entry still being resolved.\n",
 					buffer));
@@ -951,20 +1038,17 @@ arp_send_data(net_datalink_protocol *_protocol, net_buffer *buffer)
 
 
 status_t
-arp_up(net_datalink_protocol *_protocol)
+arp_up(net_datalink_protocol* _protocol)
 {
-	arp_protocol *protocol = (arp_protocol *)_protocol;
+	arp_protocol* protocol = (arp_protocol*)_protocol;
 	status_t status = protocol->next->module->interface_up(protocol->next);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	// cache this device's address for later use
 
-	mutex_lock(&sCacheLock);
 	status = arp_update_local(protocol);
-	mutex_unlock(&sCacheLock);
-
-	if (status < B_OK) {
+	if (status != B_OK) {
 		protocol->next->module->interface_down(protocol->next);
 		return status;
 	}
@@ -976,23 +1060,45 @@ arp_up(net_datalink_protocol *_protocol)
 void
 arp_down(net_datalink_protocol *protocol)
 {
-	// remove local ARP entry from the cache
-
-	if (protocol->interface->address != NULL) {
-		MutexLocker locker(sCacheLock);
-
-		arp_entry *entry = arp_entry::Lookup(
-			((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr);
-		if (entry != NULL) {
-			hash_remove(sCache, entry);
-			entry->flags |= ARP_FLAG_REMOVED;
-			locker.Unlock();
-
-			delete entry;
-		}
-	}
+	// remove local ARP entries from the cache
+	arp_remove_local((arp_protocol*)protocol);
 
 	protocol->next->module->interface_down(protocol->next);
+}
+
+
+status_t
+arp_change_address(net_datalink_protocol* _protocol,
+	net_interface_address* address, int32 option,
+	const struct sockaddr* oldAddress, const struct sockaddr* newAddress)
+{
+	arp_protocol* protocol = (arp_protocol*)_protocol;
+
+	switch (option) {
+		case SIOCSIFADDR:
+		case SIOCAIFADDR:
+		case SIOCDIFADDR:
+			// Those are the options we handle
+			if ((protocol->interface->flags & IFF_UP) != 0) {
+				// Update ARP entry for the local address
+			
+				if (newAddress != NULL && newAddress->sa_family == AF_INET) {
+					status_t status = arp_set_local_entry(protocol, newAddress);
+					if (status != B_OK)
+						return status;
+				}
+
+				if (oldAddress != NULL && oldAddress->sa_family == AF_INET)
+					arp_remove_local_entry(protocol, oldAddress, true);
+			}			
+			break;
+
+		default:
+			break;
+	}
+
+	return protocol->next->module->change_address(protocol->next, address,
+		option, oldAddress, newAddress);
 }
 
 
@@ -1000,46 +1106,9 @@ status_t
 arp_control(net_datalink_protocol *_protocol, int32 op, void *argument,
 	size_t length)
 {
-	arp_protocol *protocol = (arp_protocol *)_protocol;
-
-	if (op == SIOCSIFADDR && (protocol->interface->flags & IFF_UP) != 0) {
-		// The interface may get a new address, so we need to update our
-		// local entries.
-		in_addr_t oldAddress = 0;
-		if (protocol->interface->address != NULL) {
-			oldAddress
-				= ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
-		}
-
-		status_t status = protocol->next->module->control(protocol->next,
-			SIOCSIFADDR, argument, length);
-		if (status < B_OK)
-			return status;
-
-		MutexLocker locker(sCacheLock);
-
-		arp_update_local(protocol);
-
-		if (oldAddress == ((sockaddr_in *)
-				protocol->interface->address)->sin_addr.s_addr)
-			return B_OK;
-
-		// remove previous address from cache
-
-		arp_entry *entry = arp_entry::Lookup(oldAddress);
-		if (entry != NULL) {
-			hash_remove(sCache, entry);
-			entry->flags |= ARP_FLAG_REMOVED;
-			locker.Unlock();
-
-			delete entry;
-		}
-
-		return B_OK;
-	}
-
-	return protocol->next->module->control(protocol->next,
-		op, argument, length);
+	arp_protocol* protocol = (arp_protocol*)_protocol;
+	return protocol->next->module->control(protocol->next, op, argument,
+		length);
 }
 
 
@@ -1097,6 +1166,7 @@ static net_datalink_protocol_module_info sARPModule = {
 	arp_send_data,
 	arp_up,
 	arp_down,
+	arp_change_address,
 	arp_control,
 	arp_join_multicast,
 	arp_leave_multicast,
@@ -1104,12 +1174,13 @@ static net_datalink_protocol_module_info sARPModule = {
 
 
 module_dependency module_dependencies[] = {
-	{NET_STACK_MODULE_NAME, (module_info **)&sStackModule},
-	{NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule},
+	{NET_STACK_MODULE_NAME, (module_info**)&sStackModule},
+	{NET_DATALINK_MODULE_NAME, (module_info**)&sDatalinkModule},
+	{NET_BUFFER_MODULE_NAME, (module_info**)&gBufferModule},
 	{}
 };
 
-module_info *modules[] = {
-	(module_info *)&sARPModule,
+module_info* modules[] = {
+	(module_info*)&sARPModule,
 	NULL
 };

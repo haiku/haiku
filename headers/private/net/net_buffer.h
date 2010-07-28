@@ -18,14 +18,9 @@
 typedef struct net_buffer {
 	struct list_link		link;
 
-	// TODO: we should think about moving the address fields into the buffer
-	// data itself via associated data or something like this. Or this
-	// structure as a whole, too...
-
 	struct sockaddr*		source;
 	struct sockaddr*		destination;
-	struct net_interface*	interface;
-	int32					type;
+	struct net_interface_address*	interface_address;
 	union {
 		struct {
 			uint16			start;
@@ -33,6 +28,7 @@ typedef struct net_buffer {
 		}					fragment;
 		uint32				sequence;
 		uint32				offset;
+		int32				type;
 	};
 	uint32					flags;
 	uint32					size;

@@ -1,16 +1,18 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 //! The net_protocol one talks to when using the AF_LINK protocol
 
+
 #include "datalink.h"
+#include "device_interfaces.h"
 #include "domains.h"
-#include "interfaces.h"
 #include "link.h"
 #include "stack_private.h"
 #include "utility.h"

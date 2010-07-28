@@ -660,10 +660,11 @@ tcp_receive_data(net_buffer* buffer)
 {
 	TRACE(("TCP: Received buffer %p\n", buffer));
 
-	if (buffer->interface == NULL || buffer->interface->domain == NULL)
+	if (buffer->interface_address == NULL
+		|| buffer->interface_address->domain == NULL)
 		return B_ERROR;
 
-	net_domain* domain = buffer->interface->domain;
+	net_domain* domain = buffer->interface_address->domain;
 	net_address_module_info* addressModule = domain->address_module;
 
 	NetBufferHeaderReader<tcp_header> bufferHeader(buffer);

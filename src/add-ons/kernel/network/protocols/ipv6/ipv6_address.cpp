@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -478,6 +478,25 @@ ipv6_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 }
 
 
+/*!	Computes a hash value of the given \a address.
+	\return uint32 representing the hash value
+*/
+static uint32
+ipv6_hash_address(const struct sockaddr* _address, bool includePort)
+{
+	const sockaddr_in6* address = (const sockaddr_in6*)_address;
+	if (address == NULL || address->sin6_len == 0)
+		return 0;
+
+	// TODO: also use sin6_flowinfo and sin6_scope_id?
+	uint32 port = includePort ? address->sin6_port : 0;
+
+	uint32 result = jenkins_hashword((const uint32*)&address->sin6_addr,
+		sizeof(in6_addr) / sizeof(uint32), 0);
+	return jenkins_hashword(&port, 1, result);
+}
+
+
 /*!	Computes a hash-value of the given addresses \a ourAddress
 	and \a peerAddress.
 	\return uint32 representing the hash-value
@@ -485,26 +504,8 @@ ipv6_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 static uint32
 ipv6_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 {
-	uint32 result = 0;
-	if (ourAddress) {
-		const sockaddr_in6 *our = (const sockaddr_in6 *)ourAddress;
-		uint32 port = our->sin6_port;
-
-		result = jenkins_hashword((const uint32*)&our->sin6_addr,
-			sizeof(in6_addr) / sizeof(uint32), result);
-		result = jenkins_hashword(&port, 1, result);
-	}
-	if (peerAddress) {
-		const sockaddr_in6 *peer = (const sockaddr_in6 *)peerAddress;
-		uint32 port = peer->sin6_port;
-
-		result = jenkins_hashword((const uint32*)&peer->sin6_addr,
-			sizeof(in6_addr) / sizeof(uint32), result);
-		result = jenkins_hashword(&port, 1, result);
-	}
-
-	// TODO: also use sin6_flowinfo and sin6_scope_id?
-	return result;
+	uint32 result = ipv6_hash_address(peerAddress, true);
+	return jenkins_hashword(&result, 1, ipv6_hash_address(ourAddress, true));
 }
 
 
@@ -563,6 +564,7 @@ net_address_module_info gIPv6AddressModule = {
 	ipv6_set_to_empty_address,
 	ipv6_set_to_defaults,
 	ipv6_update_to,
+	ipv6_hash_address,
 	ipv6_hash_address_pair,
 	ipv6_checksum_address,
 	ipv6_get_loopback_address

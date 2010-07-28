@@ -159,11 +159,17 @@ private:
 
 		if (ioctl(fSocket, SIOCGIFINDEX, &request, sizeof(request)) < 0) {
 			// not known yet -- add it
-			request.ifr_parameter.base_name[0] = '\0';
-			request.ifr_parameter.device[0] = '\0';
-			request.ifr_parameter.sub_type = 0;
+			ifaliasreq aliasRequest;
+			strcpy(aliasRequest.ifra_name, path);
+			aliasRequest.ifra_addr.ss_family = AF_UNSPEC;
+			aliasRequest.ifra_addr.ss_len = 2;
+			aliasRequest.ifra_broadaddr.ss_family = AF_UNSPEC;
+			aliasRequest.ifra_broadaddr.ss_len = 2;
+			aliasRequest.ifra_mask.ss_family = AF_UNSPEC;
+			aliasRequest.ifra_mask.ss_len = 2;
 
-			if (ioctl(fSocket, SIOCAIFADDR, &request, sizeof(request)) < 0) {
+			if (ioctl(fSocket, SIOCAIFADDR, &aliasRequest,
+					sizeof(aliasRequest)) < 0) {
 				dprintf("NetStackInitializer: adding interface failed for "
 					"device %s: %s\n", path, strerror(errno));
 				return;

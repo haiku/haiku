@@ -1040,6 +1040,66 @@ ipv6_datalink_down(net_datalink_protocol* protocol)
 }
 
 
+status_t
+ipv6_datalink_change_address(net_datalink_protocol* protocol,
+	net_interface_address* address, int32 option,
+	const struct sockaddr* oldAddress, const struct sockaddr* newAddress)
+{
+#if 0
+	switch (option) {
+		case SIOCSIFADDR:
+		case SIOCAIFADDR:
+		case SIOCDIFADDR:
+			// Those are the options we handle
+			if ((protocol->interface->flags & IFF_UP) != 0) {
+				// Update ARP entry for the local address
+			
+				if (newAddress != NULL && newAddress->sa_family == AF_INET6) {
+					status_t status = arp_set_local_entry(protocol, newAddress);
+					if (status != B_OK)
+						return status;
+
+					// add IPv6 remove multicast route (ff00::/8)
+					sockaddr_in6 address;
+					memset(&address, 0, sizeof(sockaddr_in6));
+					address.sin6_family = AF_INET6;
+					address.sin6_len = sizeof(sockaddr_in6);
+					address.sin6_addr.s6_addr[0] = 0xff;
+			
+					route.destination = (sockaddr*)&address;
+					route.mask = (sockaddr*)&address;
+					route.flags = 0;
+					add_route(interface->domain, &route);
+				}
+
+				if (oldAddress != NULL && oldAddress->sa_family == AF_INET6) {
+					arp_remove_local_entry(protocol, oldAddress, true);
+
+					// remove IPv6 remove multicast route (ff00::/8)
+					sockaddr_in6 address;
+					memset(&address, 0, sizeof(sockaddr_in6));
+					address.sin6_family = AF_INET6;
+					address.sin6_len = sizeof(sockaddr_in6);
+					address.sin6_addr.s6_addr[0] = 0xff;
+			
+					route.destination = (sockaddr*)&address;
+					route.mask = (sockaddr*)&address;
+					route.flags = 0;
+					remove_route(interface->domain, &route);
+				}
+			}			
+			break;
+
+		default:
+			break;
+	}
+#endif
+
+	return protocol->next->module->change_address(protocol->next, address,
+		option, oldAddress, newAddress);
+}
+
+
 static status_t
 ipv6_datalink_control(net_datalink_protocol* protocol, int32 op, void* argument,
 	size_t length)
@@ -1105,6 +1165,7 @@ net_datalink_protocol_module_info gIPv6DataLinkModule = {
 	ipv6_datalink_send_data,
 	ipv6_datalink_up,
 	ipv6_datalink_down,
+	ipv6_datalink_change_address,
 	ipv6_datalink_control,
 	ipv6_datalink_join_multicast,
 	ipv6_datalink_leave_multicast,

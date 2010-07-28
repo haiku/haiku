@@ -503,6 +503,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 			case DHCP_OFFER:
 			{
+				syslog(LOG_DEBUG, "DHCP received offer for %s\n", Device());
+
 				// first offer wins
 				if (state != INIT)
 					break;
@@ -537,6 +539,7 @@ DHCPClient::_Negotiate(dhcp_state state)
 
 			case DHCP_ACK:
 			{
+				syslog(LOG_DEBUG, "DHCP received ack for %s\n", Device());
 				if (state != REQUESTING && state != REBINDING
 					&& state != RENEWAL)
 					continue;
@@ -565,6 +568,8 @@ DHCPClient::_Negotiate(dhcp_state state)
 			}
 
 			case DHCP_NACK:
+				syslog(LOG_DEBUG, "DHCP received nack for %s\n", Device());
+
 				if (state != REQUESTING)
 					continue;
 
@@ -638,7 +643,7 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 			case OPTION_DOMAIN_NAME_SERVER:
 			{
 				for (uint32 i = 0; i < size / 4; i++) {
-					syslog(LOG_INFO, "DNS: %s\n",
+					syslog(LOG_INFO, "DHCP for %s got DNS: %s\n", Device(),
 						_ToString(&data[i * 4]).String());
 					resolverConfiguration.AddString("nameserver",
 						_ToString(&data[i * 4]).String());
@@ -770,8 +775,8 @@ DHCPClient::_TimeoutShift(int socket, time_t& timeout, uint32& tries)
 		if (++tries > 2)
 			return false;
 	}
-	syslog(LOG_DEBUG, "DHCP timeout shift: %lu secs (try %lu)\n", timeout,
-		tries);
+	syslog(LOG_DEBUG, "DHCP timeout shift for %s: %lu secs (try %lu)\n",
+		Device(), timeout, tries);
 
 	struct timeval value;
 	value.tv_sec = timeout;
@@ -802,6 +807,9 @@ status_t
 DHCPClient::_SendMessage(int socket, dhcp_message& message,
 	sockaddr_in& address) const
 {
+	syslog(LOG_DEBUG, "DHCP send message %u for %s\n", message.Type(),
+		Device());
+
 	ssize_t bytesSent = sendto(socket, &message, message.Size(),
 		address.sin_addr.s_addr == INADDR_BROADCAST ? MSG_BCAST : 0,
 		(struct sockaddr*)&address, sizeof(sockaddr_in));

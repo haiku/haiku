@@ -28,6 +28,7 @@
 #include <sys/uio.h>
 
 #include "ancillary_data.h"
+#include "interfaces.h"
 
 #include "paranoia_config.h"
 
@@ -127,6 +128,10 @@ struct data_node {
 	}
 };
 
+
+// TODO: we should think about moving the address fields into the buffer
+// data itself via associated data or something like this. Or this
+// structure as a whole, too...
 struct net_buffer_private : net_buffer {
 	struct list					buffers;
 	data_header*				allocation_header;
@@ -578,15 +583,24 @@ private:
 
 
 static void
-dump_address(const char* prefix, sockaddr* address)
+dump_address(const char* prefix, sockaddr* address,
+	net_interface_address* interfaceAddress)
 {
 	if (address == NULL || address->sa_len == 0)
 		return;
 
-	dprintf("  %s: length %u, family %u\n", prefix, address->sa_len,
-		address->sa_family);
+	if (interfaceAddress == NULL || interfaceAddress->domain == NULL) {
+		dprintf("  %s: length %u, family %u\n", prefix, address->sa_len,
+			address->sa_family);
 
-	dump_block((char*)address + 2, address->sa_len - 2, "    ");
+		dump_block((char*)address + 2, address->sa_len - 2, "    ");
+	} else {
+		char buffer[64];
+		interfaceAddress->domain->address_module->print_address_buffer(address,
+			buffer, sizeof(buffer), true);
+
+		dprintf("  %s: %s\n", prefix, buffer);
+	}
 }
 
 
@@ -596,11 +610,11 @@ dump_buffer(net_buffer* _buffer)
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
 	dprintf("buffer %p, size %" B_PRIu32 ", flags %" B_PRIx32 ", stored header "
-		"%" B_PRIu32 "\n", buffer, buffer->size, buffer->flags,
-		buffer->stored_header_length);
+		"%" B_PRIu32 ", interface address %p\n", buffer, buffer->size,
+		buffer->flags, buffer->stored_header_length, buffer->interface_address);
 
-	dump_address("source", buffer->source);
-	dump_address("destination", buffer->destination);
+	dump_address("source", buffer->source, buffer->interface_address);
+	dump_address("destination", buffer->destination, buffer->interface_address);
 
 	data_node* node = NULL;
 	while ((node = (data_node*)list_get_next_item(&buffer->buffers, node))
@@ -1060,7 +1074,7 @@ copy_metadata(net_buffer* destination, const net_buffer* source)
 		min_c(source->destination->sa_len, sizeof(sockaddr_storage)));
 
 	destination->flags = source->flags;
-	destination->interface = source->interface;
+	destination->interface_address = source->interface_address;
 	destination->offset = source->offset;
 	destination->protocol = source->protocol;
 	destination->type = source->type;
@@ -1107,12 +1121,10 @@ create_buffer(size_t headerSpace)
 	buffer->storage.source.ss_len = 0;
 	buffer->storage.destination.ss_len = 0;
 
-	buffer->interface = NULL;
+	buffer->interface_address = NULL;
 	buffer->offset = 0;
 	buffer->flags = 0;
 	buffer->size = 0;
-
-	buffer->type = -1;
 
 	CHECK_BUFFER(buffer);
 	CREATE_PARANOIA_CHECK_SET(buffer, "net_buffer");
@@ -2086,23 +2098,29 @@ status_t
 restore_header(net_buffer* _buffer, uint32 offset, void* data, size_t bytes)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
-	if (node == NULL
-		|| offset + bytes > buffer->stored_header_length + buffer->size)
-		return B_BAD_VALUE;
-
-	// We have the data, so copy it out
-
-	memcpy(data, node->start - buffer->stored_header_length,
-		std::min(bytes, buffer->stored_header_length));
 	
-	if (bytes <= buffer->stored_header_length)
-		return B_OK;
+	if (offset < buffer->stored_header_length) {
+		data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
+		if (node == NULL
+			|| offset + bytes > buffer->stored_header_length + buffer->size)
+			return B_BAD_VALUE;
 
-	data = (uint8*)data + buffer->stored_header_length;
-	bytes -= buffer->stored_header_length;
+		// We have the data, so copy it out
 
-	return read_data(_buffer, 0, data, bytes);
+		size_t copied = std::min(bytes, buffer->stored_header_length - offset);
+		memcpy(data, node->start + offset - buffer->stored_header_length,
+			copied);
+
+		if (copied == bytes)
+			return B_OK;
+
+		data = (uint8*)data + copied;
+		bytes -= copied;
+		offset = 0;
+	} else
+		offset -= buffer->stored_header_length;
+
+	return read_data(_buffer, offset, data, bytes);
 }
 
 
@@ -2116,25 +2134,30 @@ append_restored_header(net_buffer* buffer, net_buffer* _source, uint32 offset,
 	size_t bytes)
 {
 	net_buffer_private* source = (net_buffer_private*)_source;
-	data_node* node = (data_node*)list_get_first_item(&source->buffers);
-	if (node == NULL
-		|| offset + bytes > source->stored_header_length + source->size)
-		return B_BAD_VALUE;
 
-	// We have the data, so copy it out
+	if (offset < source->stored_header_length) {
+		data_node* node = (data_node*)list_get_first_item(&source->buffers);
+		if (node == NULL
+			|| offset + bytes > source->stored_header_length + source->size)
+			return B_BAD_VALUE;
 
-	status_t status = append_data(buffer,
-		node->start - source->stored_header_length,
-		std::min(bytes, source->stored_header_length));
-	if (status != B_OK)
-		return status;
+		// We have the data, so copy it out
 
-	if (bytes <= source->stored_header_length)
-		return B_OK;
+		size_t appended = std::min(bytes, source->stored_header_length - offset);
+		status_t status = append_data(buffer,
+			node->start + offset - source->stored_header_length, appended);
+		if (status != B_OK)
+			return status;
 
-	bytes -= source->stored_header_length;
+		if (appended == bytes)
+			return B_OK;
 
-	return append_cloned_data(buffer, source, 0, bytes);
+		bytes -= appended;
+		offset = 0;
+	} else
+		offset -= source->stored_header_length;
+
+	return append_cloned_data(buffer, source, offset, bytes);
 }
 
 

@@ -141,7 +141,7 @@ struct ipv4_protocol : net_protocol {
 	uint8				time_to_live;
 	uint8				multicast_time_to_live;
 	uint32				flags;
-	struct sockaddr*	interface_address; // for IP_MULTICAST_IF
+	struct sockaddr*	multicast_address; // for IP_MULTICAST_IF
 
 	IPv4MulticastFilter	multicast_filter;
 };
@@ -673,12 +673,14 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 	if (module->deliver_data == NULL)
 		return false;
 
+	// TODO: fix multicast!
+	return false;
 	MutexLocker _(sMulticastGroupsLock);
 
 	sockaddr_in* multicastAddr = (sockaddr_in*)buffer->destination;
 
 	MulticastState::ValueIterator it = sMulticastState->Lookup(std::make_pair(
-		&multicastAddr->sin_addr, buffer->interface->index));
+		&multicastAddr->sin_addr, buffer->interface_address->interface->index));
 
 	size_t count = 0;
 
@@ -687,7 +689,7 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 
 		ipv4_protocol* ipProtocol = state->Parent()->Socket();
 		if (deliverToRaw && (ipProtocol->raw == NULL
-			|| ipProtocol->socket->protocol != buffer->protocol))
+				|| ipProtocol->socket->protocol != buffer->protocol))
 			continue;
 
 		if (state->FilterAccepts(buffer)) {
@@ -819,11 +821,8 @@ IPv4Multicast::JoinGroup(IPv4GroupInterface* state)
 	MutexLocker _(sMulticastGroupsLock);
 
 	sockaddr_in groupAddr;
-	net_interface* interface = state->Interface();
-
-	status_t status = interface->first_info->join_multicast(
-		interface->first_protocol,
-		fill_sockaddr_in(&groupAddr, state->Address().s_addr));
+	status_t status = sDatalinkModule->join_multicast(state->Interface(),
+		sDomain, fill_sockaddr_in(&groupAddr, state->Address().s_addr));
 	if (status != B_OK)
 		return status;
 
@@ -840,10 +839,7 @@ IPv4Multicast::LeaveGroup(IPv4GroupInterface* state)
 	sMulticastState->Remove(state);
 
 	sockaddr_in groupAddr;
-	net_interface* interface = state->Interface();
-
-	return interface->first_protocol->module->join_multicast(
-		interface->first_protocol,
+	return sDatalinkModule->leave_multicast(state->Interface(), sDomain,
 		fill_sockaddr_in(&groupAddr, state->Address().s_addr));
 }
 
@@ -876,7 +872,7 @@ ipv4_delta_membership(ipv4_protocol* protocol, int option,
 	net_interface* interface, const in_addr* groupAddr,
 	const in_addr* sourceAddr)
 {
-	IPv4MulticastFilter &filter = protocol->multicast_filter;
+	IPv4MulticastFilter& filter = protocol->multicast_filter;
 	IPv4GroupInterface* state = NULL;
 	status_t status = B_OK;
 
@@ -935,13 +931,14 @@ generic_to_ipv4(int option)
 static net_interface*
 get_multicast_interface(ipv4_protocol* protocol, const in_addr* address)
 {
+	// TODO: this is broken and leaks references
 	sockaddr_in groupAddr;
 	net_route* route = sDatalinkModule->get_route(sDomain,
 		fill_sockaddr_in(&groupAddr, address ? address->s_addr : INADDR_ANY));
 	if (route == NULL)
 		return NULL;
 
-	return route->interface;
+	return route->interface_address->interface;
 }
 
 
@@ -955,7 +952,7 @@ ipv4_delta_membership(ipv4_protocol* protocol, int option,
 		interface = get_multicast_interface(protocol, groupAddr);
 	} else {
 		sockaddr_in address;
-		interface = sDatalinkModule->get_interface_with_address(sDomain,
+		interface = sDatalinkModule->get_interface_with_address(
 			fill_sockaddr_in(&address, interfaceAddr->s_addr));
 	}
 
@@ -972,14 +969,13 @@ ipv4_generic_delta_membership(ipv4_protocol* protocol, int option,
 	uint32 index, const sockaddr_storage* _groupAddr,
 	const sockaddr_storage* _sourceAddr)
 {
-	if (_groupAddr->ss_family != AF_INET)
-		return B_BAD_VALUE;
-
-	if (_sourceAddr && _sourceAddr->ss_family != AF_INET)
+	if (_groupAddr->ss_family != AF_INET
+		|| _sourceAddr != NULL && _sourceAddr->ss_family != AF_INET)
 		return B_BAD_VALUE;
 
 	const in_addr* groupAddr = &((const sockaddr_in*)_groupAddr)->sin_addr;
 
+	// TODO: this is broken and leaks references
 	net_interface* interface;
 	if (index == 0)
 		interface = get_multicast_interface(protocol, groupAddr);
@@ -990,7 +986,7 @@ ipv4_generic_delta_membership(ipv4_protocol* protocol, int option,
 		return ENODEV;
 
 	const in_addr* sourceAddr = NULL;
-	if (_sourceAddr)
+	if (_sourceAddr != NULL)
 		sourceAddr = &((const sockaddr_in*)_sourceAddr)->sin_addr;
 
 	return ipv4_delta_membership(protocol, generic_to_ipv4(option), interface,
@@ -1013,7 +1009,7 @@ ipv4_init_protocol(net_socket* socket)
 	protocol->time_to_live = kDefaultTTL;
 	protocol->multicast_time_to_live = kDefaultMulticastTTL;
 	protocol->flags = 0;
-	protocol->interface_address = NULL;
+	protocol->multicast_address = NULL;
 	return protocol;
 }
 
@@ -1024,7 +1020,7 @@ ipv4_uninit_protocol(net_protocol* _protocol)
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
 	delete protocol->raw;
-	delete protocol->interface_address;
+	delete protocol->multicast_address;
 	delete protocol;
 	return B_OK;
 }
@@ -1217,21 +1213,23 @@ ipv4_setsockopt(net_protocol* _protocol, int level, int option,
 			// Using INADDR_ANY to remove the previous setting.
 			if (address->sin_addr.s_addr == htonl(INADDR_ANY)) {
 				delete address;
-				delete protocol->interface_address;
-				protocol->interface_address = NULL;
+				delete protocol->multicast_address;
+				protocol->multicast_address = NULL;
 				return B_OK;
 			}
 
 			struct net_interface* interface
-				= sDatalinkModule->get_interface_with_address(sDomain,
-					(struct sockaddr*)address);
+				= sDatalinkModule->get_interface_with_address(
+					(sockaddr*)address);
 			if (interface == NULL) {
 				delete address;
 				return EADDRNOTAVAIL;
 			}
 
-			delete protocol->interface_address;
-			protocol->interface_address = (struct sockaddr*)address;
+			delete protocol->multicast_address;
+			protocol->multicast_address = (struct sockaddr*)address;
+
+			sDatalinkModule->put_interface(interface);
 			return B_OK;
 		}
 		if (option == IP_MULTICAST_TTL) {
@@ -1346,16 +1344,18 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 		return B_BAD_VALUE;
 
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
-	net_interface* interface = route->interface;
+	net_interface_address* interfaceAddress = route->interface_address;
+	net_interface* interface = interfaceAddress->interface;
 
 	TRACE_SK(protocol, "SendRoutedData(%p, %p [%ld bytes])", route, buffer,
 		buffer->size);
 
 	sockaddr_in& source = *(sockaddr_in*)buffer->source;
 	sockaddr_in& destination = *(sockaddr_in*)buffer->destination;
-	sockaddr_in& broadcastAddress = *(sockaddr_in*)interface->destination;
+	sockaddr_in* broadcastAddress = (sockaddr_in*)interfaceAddress->destination;
 
-	bool headerIncluded = false, checksumNeeded = true;
+	bool checksumNeeded = true;
+	bool headerIncluded = false;
 	if (protocol != NULL)
 		headerIncluded = (protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0;
 
@@ -1366,8 +1366,8 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 
 	if ((interface->device->flags & IFF_BROADCAST) != 0
 		&& (destination.sin_addr.s_addr == INADDR_BROADCAST
-			|| destination.sin_addr.s_addr
-				== broadcastAddress.sin_addr.s_addr)) {
+			|| (broadcastAddress != NULL && destination.sin_addr.s_addr
+					== broadcastAddress->sin_addr.s_addr))) {
 		if (protocol && !(protocol->socket->options & SO_BROADCAST))
 			return B_BAD_VALUE;
 		buffer->flags |= MSG_BCAST;
@@ -1466,18 +1466,21 @@ ipv4_send_data(net_protocol* _protocol, net_buffer* buffer)
 	}
 
 	// handle IP_MULTICAST_IF
-	if (IN_MULTICAST(ntohl(((sockaddr_in*)buffer->destination)->
-			sin_addr.s_addr)) && protocol->interface_address != NULL) {
-		net_interface* interface
-			= sDatalinkModule->get_interface_with_address(sDomain,
-				protocol->interface_address);
-		if (interface == NULL || (interface->flags & IFF_UP) == 0)
+	if (IN_MULTICAST(ntohl(
+			((sockaddr_in*)buffer->destination)->sin_addr.s_addr))
+		&& protocol->multicast_address != NULL) {
+		net_interface_address* address = sDatalinkModule->get_interface_address(
+			protocol->multicast_address);
+		if (address == NULL || (address->interface->flags & IFF_UP) == 0) {
+			sDatalinkModule->put_interface_address(address);
 			return EADDRNOTAVAIL;
+		}
 
-		buffer->interface = interface;
+		sDatalinkModule->put_interface_address(buffer->interface_address);
+		buffer->interface_address = address;
+			// the buffer takes over ownership of the address
 
-		net_route* route = sDatalinkModule->get_route(sDomain,
-			interface->address);
+		net_route* route = sDatalinkModule->get_route(sDomain, address->local);
 		if (route == NULL)
 			return ENETUNREACH;
 
@@ -1540,7 +1543,7 @@ ipv4_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 	if (route->mtu != 0)
 		mtu = route->mtu;
 	else
-		mtu = route->interface->mtu;
+		mtu = route->interface_address->interface->mtu;
 
 	sDatalinkModule->put_route(sDomain, route);
 	return mtu - sizeof(ipv4_header);
@@ -1588,9 +1591,9 @@ ipv4_receive_data(net_buffer* buffer)
 
 		// test if the packet is really for us
 		if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
-				&buffer->interface, &matchedAddressType)
+				&buffer->interface_address, &matchedAddressType)
 			&& !sDatalinkModule->is_local_link_address(sDomain, true,
-				buffer->destination, &buffer->interface)) {
+				buffer->destination, &buffer->interface_address)) {
 			TRACE("  ipv4_receive_data(): packet was not for us %x -> %x",
 				ntohl(header.source), ntohl(header.destination));
 	

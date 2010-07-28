@@ -18,6 +18,14 @@
 #include <net_stack_interface.h>
 
 
+// Stack-wide configuration
+#define ENABLE_DEBUGGER_COMMANDS	1
+#define STACK_DEBUG_PREFIX			"\33[31mnet:\33[0m "
+
+
+class Interface;
+
+
 extern net_stack_module_info gNetStackModule;
 extern net_buffer_module_info gNetBufferModule;
 extern net_socket_module_info gNetSocketModule;
@@ -28,10 +36,12 @@ extern net_stack_interface_module_info gNetStackInterfaceModule;
 // stack.cpp
 status_t register_domain_datalink_protocols(int family, int type, ...);
 status_t register_domain_protocols(int family, int type, int protocol, ...);
-status_t get_domain_protocols(net_socket *socket);
-status_t put_domain_protocols(net_socket *socket);
-status_t get_domain_datalink_protocols(net_interface *interface);
-status_t put_domain_datalink_protocols(net_interface *interface);
+status_t get_domain_protocols(net_socket* socket);
+status_t put_domain_protocols(net_socket* socket);
+status_t get_domain_datalink_protocols(Interface* interface,
+	net_domain* domain);
+status_t put_domain_datalink_protocols(Interface* interface,
+	net_domain* domain);
 
 // notifications.cpp
 status_t notify_interface_added(net_interface* interface);

@@ -176,17 +176,10 @@ pcap_open_live(const char *device, int snapLength, int /*promisc*/,
 		return NULL;
 	}
 
-	// get link level interface for this interface
-
-	if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq)) < 0) {
-		snprintf(errorBuffer, PCAP_ERRBUF_SIZE, "Cannot get link level: %s\n",
-			strerror(errno));
-		close(socket);
-		return NULL;
-	}
-
 	close(socket);
 		// no longer needed after this point
+
+	// get link level interface for this interface
 
 	socket = ::socket(AF_LINK, SOCK_DGRAM, 0);
 	if (socket < 0) {
@@ -196,7 +189,6 @@ pcap_open_live(const char *device, int snapLength, int /*promisc*/,
 	}
 
 	// start monitoring
-	prepare_request(request, request.ifr_parameter.device);
 	if (ioctl(socket, SIOCSPACKETCAP, &request, sizeof(struct ifreq)) < 0) {
 		snprintf(errorBuffer, PCAP_ERRBUF_SIZE, "Cannot start monitoring: %s\n",
 			strerror(errno));
@@ -318,16 +310,12 @@ pcap_platform_finddevs(pcap_if_t** _allDevices, char* errorBuffer)
 				return -1;
 			}
 
-			if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq))
+			if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq))
 					== 0) {
-				prepare_request(request, request.ifr_parameter.device);
-				if (ioctl(linkSocket, SIOCGIFADDR, &request,
-						sizeof(struct ifreq)) == 0) {
-					sockaddr_dl &link = *(sockaddr_dl*)&request.ifr_addr;
+				sockaddr_dl &link = *(sockaddr_dl*)&request.ifr_addr;
 
-					if (link.sdl_type == IFT_LOOP)
-						flags = IFF_LOOPBACK;
-				}
+				if (link.sdl_type == IFT_LOOP)
+					flags = IFF_LOOPBACK;
 			}
 			close(linkSocket);
 		}

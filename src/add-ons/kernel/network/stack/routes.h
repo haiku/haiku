@@ -31,7 +31,7 @@ typedef DoublyLinkedList<net_route_info,
 uint32 route_table_size(struct net_domain_private* domain);
 status_t list_routes(struct net_domain_private* domain, void* buffer,
 				size_t size);
-status_t control_routes(struct net_interface* interface,
+status_t control_routes(struct net_interface* interface, net_domain* domain,
 				int32 option, void* argument, size_t length);
 
 status_t add_route(struct net_domain* domain,

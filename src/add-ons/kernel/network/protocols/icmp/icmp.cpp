@@ -86,8 +86,8 @@ static net_domain*
 get_domain(struct net_buffer* buffer)
 {
 	net_domain* domain;
-	if (buffer->interface != NULL)
-		domain = buffer->interface->domain;
+	if (buffer->interface_address != NULL)
+		domain = buffer->interface_address->domain;
 	else
 		domain = sStackModule->get_domain(buffer->source->sa_family);
 
@@ -288,13 +288,8 @@ icmp_receive_data(net_buffer* buffer)
 {
 	TRACE("ICMP received some data, buffer length %lu\n", buffer->size);
 
-	net_domain* domain;
-	if (buffer->interface != NULL)
-		domain = buffer->interface->domain;
-	else
-		domain = sStackModule->get_domain(buffer->source->sa_family);
-
-	if (domain == NULL || domain->module == NULL)
+	net_domain* domain = get_domain(buffer);
+	if (domain == NULL)
 		return B_ERROR;
 
 	NetBufferHeaderReader<icmp_header> bufferHeader(buffer);
@@ -322,11 +317,11 @@ icmp_receive_data(net_buffer* buffer)
 			if (domain == NULL)
 				break;
 
-			if (buffer->interface != NULL) {
+			if (buffer->interface_address != NULL) {
 				// We only reply to echo requests of our local interface; we
 				// don't reply to broadcast requests
 				if (!domain->address_module->equal_addresses(
-						buffer->interface->address, buffer->destination))
+						buffer->interface_address->local, buffer->destination))
 					break;
 			}
 

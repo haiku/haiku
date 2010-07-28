@@ -2127,7 +2127,7 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 
 	// make sure connection does not already exist
 	status_t status = fManager->SetConnection(this, *LocalAddress(), peer,
-		fRoute->interface->address);
+		fRoute->interface_address->local);
 	if (status < B_OK)
 		return status;
 

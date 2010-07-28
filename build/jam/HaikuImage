@@ -46,8 +46,8 @@ SYSTEM_BIN = "[" addattr alert arp base64 basename bash bc beep bootman bzip2
 	mkfifo mkfs mkindex mktemp modifiers mount mount_nfs mountvolume mv
 	netcat netstat nl nohup notify nproc
 	od open
-	passwd paste patch pathchk pc ping play playfile playsound playwav pr prio
-	printenv printf profile ps ptx pwd
+	passwd paste patch pathchk pc ping ping6 play playfile playsound playwav
+	pr prio printenv printf profile ps ptx pwd
 	query quit
 	rc readlink ReadOnlyBootPrompt reindex release renice rlog rm rmattr
 	rmindex rmdir roster route
@@ -105,10 +105,10 @@ SYSTEM_SERVERS = app_server cddb_daemon debug_server input_server mail_daemon
 ;
 
 SYSTEM_NETWORK_DEVICES = ethernet loopback ;
-SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
-	ipv4_datagram ;
+SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame ;
+	#ipv6_datagram ;
 #SYSTEM_NETWORK_PPP = ipcp modem pap pppoe ;
-SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ;
+SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ; # icmp6 ipv6 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant
 	$(X86_ONLY)nvidia.accelerant $(X86_ONLY)matrox.accelerant

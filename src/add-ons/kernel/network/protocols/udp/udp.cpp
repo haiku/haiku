@@ -367,7 +367,7 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 			= gDatalinkModule->get_route(fDomain, address);
 		if (routeToDestination) {
 			status = endpoint->LocalAddress().SetTo(
-				routeToDestination->interface->address);
+				routeToDestination->interface_address->local);
 			gDatalinkModule->put_route(fDomain, routeToDestination);
 			if (status < B_OK)
 				return status;
@@ -516,8 +516,8 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 	sockaddr *peerAddr = buffer->source;
 	sockaddr *broadcastAddr = buffer->destination;
 	sockaddr *mask = NULL;
-	if (buffer->interface)
-		mask = (sockaddr *)buffer->interface->mask;
+	if (buffer->interface_address != NULL)
+		mask = (sockaddr *)buffer->interface_address->mask;
 
 	TRACE_DOMAIN("_DemuxBroadcast(%p)", buffer);
 
@@ -731,7 +731,7 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 			std::min(buffer->size, sizeof(udp_header))) != B_OK)
 		return B_BAD_VALUE;
 
-	net_domain* domain = buffer->interface->domain;
+	net_domain* domain = buffer->interface_address->domain;
 	net_address_module_info* addressModule = domain->address_module;
 
 	SocketAddress source(addressModule, buffer->source);
@@ -760,13 +760,14 @@ UdpEndpointManager::Deframe(net_buffer *buffer)
 
 	udp_header &header = bufferHeader.Data();
 
-	if (buffer->interface == NULL || buffer->interface->domain == NULL) {
+	if (buffer->interface_address == NULL
+		|| buffer->interface_address->domain == NULL) {
 		TRACE_EPM("  Deframe(): UDP packed dropped as there was no domain "
-			"specified (interface %p).", buffer->interface);
+			"specified (interface address %p).", buffer->interface_address);
 		return B_BAD_VALUE;
 	}
 
-	net_domain *domain = buffer->interface->domain;
+	net_domain *domain = buffer->interface_address->domain;
 	net_address_module_info *addressModule = domain->address_module;
 
 	SocketAddress source(addressModule, buffer->source);
@@ -869,11 +870,11 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 UdpDomainSupport*
 UdpEndpointManager::_GetDomain(net_buffer* buffer)
 {
-	if (buffer->interface == NULL)
+	if (buffer->interface_address == NULL)
 		return NULL;
 
 	MutexLocker _(fLock);
-	return _GetDomain(buffer->interface->domain, false);
+	return _GetDomain(buffer->interface_address->domain, false);
 		// TODO: we don't want to hold to the manager's lock during the
 		// whole RX path, we may not hold an endpoint's lock with the
 		// manager lock held.
@@ -1313,38 +1314,42 @@ init_udp()
 	if (status != B_OK)
 		goto err1;
 
-	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_IP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM,
+		IPPROTO_IP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		goto err1;
-	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_DGRAM, IPPROTO_IP,
+	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_DGRAM,
+		IPPROTO_IP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv6/v1",
 		NULL);
 	if (status < B_OK)
 		goto err1;
 
-	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM, IPPROTO_UDP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_DGRAM,
+		IPPROTO_UDP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		goto err1;
-	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_DGRAM, IPPROTO_UDP,
+	status = gStackModule->register_domain_protocols(AF_INET6, SOCK_DGRAM,
+		IPPROTO_UDP,
 		"network/protocols/udp/v1",
 		"network/protocols/ipv6/v1",
 		NULL);
 	if (status < B_OK)
 		goto err1;
 
-	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_UDP,
-		"network/protocols/udp/v1");
+	status = gStackModule->register_domain_receiving_protocol(AF_INET,
+		IPPROTO_UDP, "network/protocols/udp/v1");
 	if (status < B_OK)
 		goto err1;
-	status = gStackModule->register_domain_receiving_protocol(AF_INET6, IPPROTO_UDP,
-		"network/protocols/udp/v1");
+	status = gStackModule->register_domain_receiving_protocol(AF_INET6,
+		IPPROTO_UDP, "network/protocols/udp/v1");
 	if (status < B_OK)
 		goto err1;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_SOCKIO_H
@@ -38,7 +38,6 @@
 #define SIOCGETRT			8928	/* get route information for destination */
 
 #define SIOCGIFSTATS		8929	/* get interface stats */
-#define SIOCGIFPARAM		8930	/* get interface parameter */
 #define SIOCGIFTYPE			8931	/* get interface type */
 
 #define SIOCSPACKETCAP		8932	/* Start capturing packets on an interface */
