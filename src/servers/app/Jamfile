@@ -23,6 +23,7 @@ Server app_server :
 	DefaultDecorator.cpp
 	DefaultWindowBehaviour.cpp
 	Desktop.cpp
+	DesktopListener.cpp
 	DesktopSettings.cpp
 	DirectWindowInfo.cpp
 	DrawState.cpp

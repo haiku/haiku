@@ -14,6 +14,7 @@
 
 
 #include "CursorManager.h"
+#include "DesktopListener.h"
 #include "DesktopSettings.h"
 #include "EventDispatcher.h"
 #include "MessageLooper.h"
@@ -58,7 +59,8 @@ namespace BPrivate {
 };
 
 
-class Desktop : public MessageLooper, public ScreenOwner {
+class Desktop : public DesktopObservable, public MessageLooper,
+	public ScreenOwner {
 public:
 								Desktop(uid_t userID, const char* targetScreen);
 	virtual						~Desktop();
@@ -76,6 +78,8 @@ public:
 			void				BroadcastToAllApps(int32 code);
 			void				BroadcastToAllWindows(int32 code);
 
+			void				KeyEvent(uint32 what, int32 key,
+									int32 modifiers);
 	// Locking
 #if USE_MULTI_LOCKER
 			bool				LockSingleWindow()
@@ -171,6 +175,7 @@ public:
 
 			void				ShowWindow(Window* window);
 			void				HideWindow(Window* window);
+			void				MinimizeWindow(Window* window, bool minimize);
 
 			void				MoveWindowBy(Window* window, float x, float y,
 									int32 workspace = -1);
@@ -243,6 +248,8 @@ public:
 			void				WriteWindowOrder(int32 workspace,
 									BPrivate::LinkSender& sender);
 
+			WindowList&			CurrentWindows();
+
 private:
 			void				_LaunchInputServer();
 			void				_GetLooperName(char* name, size_t size);
@@ -250,7 +257,6 @@ private:
 			void				_DispatchMessage(int32 code,
 									BPrivate::LinkReceiver &link);
 
-			WindowList&			_CurrentWindows();
 			WindowList&			_Windows(int32 index);
 
 			void				_UpdateFloating(int32 previousWorkspace = -1,

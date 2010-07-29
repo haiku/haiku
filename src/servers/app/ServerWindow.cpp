@@ -625,16 +625,9 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					break;
 				}
 
-				if (minimize && !fWindow->IsHidden()) {
-					_Hide();
-					fWindow->SetMinimized(minimize);
-				} else if (!minimize && fWindow->IsHidden()) {
-					fDesktop->UnlockSingleWindow();
-					fDesktop->ActivateWindow(fWindow);
-						// this will unminimize the window for us
-					fDesktop->LockSingleWindow();
-				}
-
+				fDesktop->UnlockSingleWindow();
+				fDesktop->MinimizeWindow(fWindow, minimize);
+				fDesktop->LockSingleWindow();
 			}
 			break;
 		}
