@@ -382,7 +382,8 @@ BTab &BTab::operator=(const BTab &)
 
 
 BTabView::BTabView(const char *name, button_width width, uint32 flags)
-	: BView(name, flags)
+	:
+	BView(name, flags)
 {
 	_InitObject(true, width);
 }
@@ -390,7 +391,8 @@ BTabView::BTabView(const char *name, button_width width, uint32 flags)
 
 BTabView::BTabView(BRect frame, const char *name, button_width width,
 	uint32 resizingMode, uint32 flags)
-	: BView(frame, name, resizingMode, flags)
+	:
+	BView(frame, name, resizingMode, flags)
 {
 	_InitObject(false, width);
 }
@@ -428,6 +430,9 @@ BTabView::BTabView(BMessage *archive)
 
 	if (archive->FindInt32("_sel", &fSelection) != B_OK)
 		fSelection = 0;
+
+	if (archive->FindInt32("_border_style", (int32*)&fBorderStyle) != B_OK)
+		fBorderStyle = B_FANCY_BORDER;
 
 	int32 i = 0;
 	BMessage tabMsg;
@@ -488,6 +493,8 @@ BTabView::Archive(BMessage* archive, bool deep) const
 		ret = archive->AddFloat("_high", fTabHeight);
 	if (ret == B_OK)
 		ret = archive->AddInt32("_sel", fSelection);
+	if (ret == B_OK && fBorderStyle != B_FANCY_BORDER)
+		ret = archive->AddInt32("_border_style", fBorderStyle);
 
 	if (ret == B_OK && deep) {
 		for (int32 i = 0; i < CountTabs(); i++) {
@@ -1361,6 +1368,7 @@ BTabView::_InitObject(bool layouted, button_width width)
 	GetFontHeight(&fh);
 	fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
 
+	fContainerView = NULL;
 	_InitContainerView(layouted);
 }
 
@@ -1369,6 +1377,7 @@ void
 BTabView::_InitContainerView(bool layouted)
 {
 	bool needsLayout = false;
+	bool createdContainer = false;
 	if (layouted) {
 		if (!GetLayout()) {
 			SetLayout(new(nothrow) BGroupLayout(B_HORIZONTAL));
@@ -1378,16 +1387,18 @@ BTabView::_InitContainerView(bool layouted)
 		if (!fContainerView) {
 			fContainerView = new BView("view container", B_WILL_DRAW);
 			fContainerView->SetLayout(new(std::nothrow) BCardLayout());
-			needsLayout = true;
+			createdContainer = true;
 		}
 	} else if (!fContainerView) {
 		fContainerView = new BView(Bounds(), "view container", B_FOLLOW_ALL,
 			B_WILL_DRAW);
-		needsLayout= true;
+		createdContainer = true;
 	}
 
-	if (needsLayout) {
+	if (needsLayout || createdContainer)
 		_LayoutContainerView(layouted);
+
+	if (createdContainer) {
 		fContainerView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fContainerView->SetLowColor(fContainerView->ViewColor());
 		AddChild(fContainerView);
