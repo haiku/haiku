@@ -111,6 +111,10 @@ option_to_string(int32 option)
 		CODE(SIOCSIFGENERIC)	/* generic IF set op */
 		CODE(SIOCGIFGENERIC)	/* generic IF get op */
 
+		CODE(SIOC_IF_ALIAS_SET)	/* set interface alias, ifaliasreq */
+		CODE(SIOC_IF_ALIAS_GET)	/* get interface alias, ifaliasreq */
+		CODE(SIOC_IF_ALIAS_COUNT) /* count interface aliases */
+
 		default:
 			static char buffer[24];
 			snprintf(buffer, sizeof(buffer), "%" B_PRId32, option);
