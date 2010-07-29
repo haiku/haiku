@@ -75,8 +75,8 @@ void
 TimedAlert::GetLabel(BString &string)
 {
 	string = B_TRANSLATE("Attention!\n\nBecause of the switch from daylight "
-		"saving time, your computer's clock may be an hour off. Currently, "
-		"your computer thinks it is ");
+		"saving time, your computer's clock may be an hour off.\n"
+		"Your computer thinks it is");
 
 	time_t t;
 	struct tm tm;
@@ -89,6 +89,7 @@ TimedAlert::GetLabel(BString &string)
 	
 	here->FormatTime(timestring, 15, t, false);
 	
+	string += " ";
 	string += timestring;
 
 	string += B_TRANSLATE(".\n\nIs this the correct time?");
@@ -147,8 +148,7 @@ main(int argc, char **argv)
 
 		if (index == 2) {
 			index = (new BAlert("dstcheck",
-				B_TRANSLATE("Would you like to set the clock using the Time and"
-				"\nDate preference utility?"), 
+				B_TRANSLATE("Would you like to set the clock?"), 
 				B_TRANSLATE("No"), B_TRANSLATE("Yes")))->Go();
 
 			if (index == 1)
