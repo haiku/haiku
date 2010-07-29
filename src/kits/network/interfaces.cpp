@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <AutoDeleter.h>
 
 
 namespace BPrivate {
@@ -41,7 +43,7 @@ namespace BPrivate {
 
 
 unsigned
-if_nametoindex(const char *name)
+if_nametoindex(const char* name)
 {
 	BPrivate::Socket socket;
 	if (socket.FD() < 0)
@@ -56,8 +58,8 @@ if_nametoindex(const char *name)
 }
 
 
-char *
-if_indextoname(unsigned index, char *nameBuffer)
+char*
+if_indextoname(unsigned index, char* nameBuffer)
 {
 	BPrivate::Socket socket;
 	if (socket.FD() < 0)
@@ -74,7 +76,7 @@ if_indextoname(unsigned index, char *nameBuffer)
 }
 
 
-struct if_nameindex *
+struct if_nameindex*
 if_nameindex(void)
 {
 	BPrivate::Socket socket;
@@ -93,19 +95,24 @@ if_nameindex(void)
 	if (interfaces == NULL)
 		return NULL;
 
+	MemoryDeleter deleter(interfaces);
+
 	config.ifc_len = count * sizeof(struct ifreq);
 	config.ifc_req = interfaces;
 	if (ioctl(socket.FD(), SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
 		return NULL;
 
-	struct if_nameindex *interfaceArray = (struct if_nameindex *)malloc(
+	struct if_nameindex* interfaceArray = (struct if_nameindex*)malloc(
 		sizeof(struct if_nameindex) * (count + 1));
 	if (interfaceArray == NULL)
 		return NULL;
 
 	for (int i = 0; i < count; i++) {
-		interfaceArray[i].if_index = interfaces[i].ifr_index;
-		interfaceArray[i].if_name = strdup(interfaces[i].ifr_name);
+		interfaceArray[i].if_index = interfaces->ifr_index;
+		interfaceArray[i].if_name = strdup(interfaces->ifr_name);
+
+		interfaces
+			= (ifreq*)((char*)interfaces + _SIZEOF_ADDR_IFREQ(interfaces[0]));
 	}
 
 	interfaceArray[count].if_index = 0;
