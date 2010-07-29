@@ -69,8 +69,6 @@ CapabilitiesView::CapabilitiesView()
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	BRect dummyRect(0, 0, 0, 0);
-
 	const float kInset = 10;
 
 	int lights = 0;
