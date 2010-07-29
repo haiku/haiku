@@ -8,6 +8,7 @@
 #ifndef __ICU_WRAPPER_H__
 #define __ICU_WRAPPER_H__
 
+
 #include <String.h>
 
 #include <unicode/bytestream.h>
@@ -16,15 +17,22 @@
 
 /* Convert UnicodeString to BString needs an ICU ByteSink to do the work */
 class BStringByteSink : public ByteSink {
-	public:
-		BStringByteSink(BString* dest) : dest_(dest) {}
-		virtual void Append(const char* data, int32_t n)
-			{ dest_->Append(data, n); }
-	private:
-		BString* dest_;
-		BStringByteSink();
-		BStringByteSink(const BStringByteSink &);
-		BStringByteSink &operator=(const BStringByteSink &);
+public:
+	BStringByteSink(BString* dest)
+		: fDest(dest)
+		{}
+	virtual void Append(const char* data, int32_t n)
+		{ fDest->Append(data, n); }
+
+	void SetTo(BString* dest)
+		{ fDest = dest; }
+
+private:
+	BString* fDest;
+
+	BStringByteSink();
+	BStringByteSink(const BStringByteSink&);
+	BStringByteSink& operator=(const BStringByteSink&);
 };
 
 
