@@ -109,7 +109,7 @@ static bool
 unix_is_empty_address(const sockaddr *address, bool checkPort)
 {
 	return address == NULL || address->sa_len == 0
-		|| address->sa_family == AF_UNSPEC)
+		|| address->sa_family == AF_UNSPEC
 		|| (address->sa_len >= kEmptyAddress.sun_len
 			&& memcmp(address, &kEmptyAddress, kEmptyAddress.sun_len) == 0);
 }
