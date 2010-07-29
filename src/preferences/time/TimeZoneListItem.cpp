@@ -21,6 +21,9 @@
 #include <Window.h>
 
 
+static const BString skDefaultString;
+
+
 TimeZoneListItem::TimeZoneListItem(const char* text, BCountry* country,
 	BTimeZone* timeZone)
 	:
@@ -92,13 +95,31 @@ TimeZoneListItem::DrawItem(BView* owner, BRect frame, bool complete)
 }
 
 
-void
-TimeZoneListItem::Code(char* buffer)
+const BString&
+TimeZoneListItem::Code() const
 {
-	if (fTimeZone == NULL) {
-		buffer[0] = '\0';
-		return;
-	}
+	if (fTimeZone == NULL)
+		return skDefaultString;
 
-	fTimeZone->GetCode(buffer, 50);
+	return fTimeZone->Code();
+}
+
+
+const BString&
+TimeZoneListItem::Name() const
+{
+	if (fTimeZone == NULL)
+		return skDefaultString;
+
+	return fTimeZone->Name();
+}
+
+
+int
+TimeZoneListItem::OffsetFromGMT() const
+{
+	if (fTimeZone == NULL)
+		return 0;
+
+	return fTimeZone->OffsetFromGMT();
 }

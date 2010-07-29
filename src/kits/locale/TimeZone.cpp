@@ -1,12 +1,14 @@
 /*
-Copyright 2010, Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
-Distributed under the terms of the MIT License.
-*/
+ * Copyright (c) 2010, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ * 		Oliver Tappe <zooey@hirschkaefer.de>
+ */
 
 
 #include <TimeZone.h>
-
-#include <String.h>
 
 #include <unicode/timezone.h>
 #include <ICUWrapper.h>
@@ -14,49 +16,74 @@ Distributed under the terms of the MIT License.
 
 BTimeZone::BTimeZone(const char* zoneCode)
 {
-	fICUTimeZone = TimeZone::createTimeZone(zoneCode);
+	_Init(zoneCode);
 }
 
 
 BTimeZone::~BTimeZone()
 {
-	delete fICUTimeZone;
 }
 
 
-void
-BTimeZone::GetName(BString& name)
+const BString&
+BTimeZone::Name() const
 {
-	UnicodeString unicodeName;
-	fICUTimeZone->getDisplayName(unicodeName);
-
-	BStringByteSink converter(&name);
-	unicodeName.toUTF8(converter);
+	return fName;
 }
 
 
-void
-BTimeZone::GetCode(char* buffer, int size)
+const BString&
+BTimeZone::Code() const
 {
-	UnicodeString unicodeName;
-	fICUTimeZone->getID(unicodeName);
-
-	CheckedArrayByteSink converter(buffer, size);
-	unicodeName.toUTF8(converter);
+	return fCode;
 }
 
 
 int
-BTimeZone::OffsetFromGMT()
+BTimeZone::OffsetFromGMT() const
 {
+	return fOffsetFromGMT;
+}
+
+
+status_t
+BTimeZone::InitCheck() const
+{
+	return fInitStatus;
+}
+
+
+void
+BTimeZone::_Init(const char* zoneCode)
+{
+	TimeZone* icuTimeZone;
+	if (zoneCode == NULL || zoneCode[0] == '\0')
+		icuTimeZone = TimeZone::createDefault();
+	else
+		icuTimeZone = TimeZone::createTimeZone(zoneCode);
+
+	UnicodeString unicodeString;
+	icuTimeZone->getID(unicodeString);
+	BStringByteSink converter(&fCode);
+	unicodeString.toUTF8(converter);
+
+	unicodeString.remove();
+	icuTimeZone->getDisplayName(unicodeString);
+	converter.SetTo(&fName);
+	unicodeString.toUTF8(converter);
+
 	int32_t rawOffset;
 	int32_t dstOffset;
-	time_t now;
+	UDate nowMillis = 1000 * (double)time(NULL);
 	UErrorCode error = U_ZERO_ERROR;
-	fICUTimeZone->getOffset(time(&now) * 1000, FALSE, rawOffset, dstOffset
-		, error);
-	if (error != U_ZERO_ERROR)
-		return 0;
-	else
-		return rawOffset + dstOffset;
+	icuTimeZone->getOffset(nowMillis, FALSE, rawOffset, dstOffset, error);
+
+	if (error != U_ZERO_ERROR) {
+		fOffsetFromGMT = 0;
+		fInitStatus = B_ERROR;
+	} else {
+		fOffsetFromGMT = (rawOffset + dstOffset) / 1000;
+			// we want seconds, not ms (which ICU gives us)
+		fInitStatus = B_OK;
+	}
 }

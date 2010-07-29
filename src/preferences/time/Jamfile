@@ -5,19 +5,19 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders shared ;
 UsePrivateSystemHeaders ;
 
-Preference Time : 
-	AnalogClock.cpp 
-	BaseView.cpp 
-	Bitmaps.cpp 
-	DateTimeEdit.cpp 
-	SectionEdit.cpp 
-	DateTimeView.cpp 
-	Time.cpp 
-	TimeSettings.cpp 
+Preference Time :
+	AnalogClock.cpp
+	BaseView.cpp
+	Bitmaps.cpp
+	DateTimeEdit.cpp
+	SectionEdit.cpp
+	DateTimeView.cpp
+	Time.cpp
+	TimeSettings.cpp
 	TimeWindow.cpp
 	TimeZoneListItem.cpp
-	TZDisplay.cpp 
-	ZoneView.cpp 
+	TZDisplay.cpp
+	ZoneView.cpp
 	: be libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Time.rdef
 	;

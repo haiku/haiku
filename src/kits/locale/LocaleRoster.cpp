@@ -511,7 +511,7 @@ BLocaleRoster::GetDefaultTimeZone(BTimeZone **timezone) const
 	if (!timezone)
 		return B_BAD_VALUE;
 
-	*timezone = new(std::nothrow) BTimeZone("");
+	*timezone = new(std::nothrow) BTimeZone();
 	return B_OK;
 }
 

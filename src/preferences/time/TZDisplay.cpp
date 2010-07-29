@@ -71,6 +71,7 @@ TTZDisplay::Draw(BRect /* updateRect */)
 	pt.y += fontHeight;
 	DrawString(fText.String(), pt);
 
+	pt.y -= fontHeight;
 	pt.x = bounds.right - StringWidth(fTime.String()) - 2.0;
 	DrawString(fTime.String(), pt);
 }

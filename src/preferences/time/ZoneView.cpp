@@ -7,6 +7,7 @@
  *		Julun <host.haiku@gmx.de>
  *		Philippe Saint-Pierre <stpere@gmail.com>
  *		Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ *		Oliver Tappe <zooey@hirschkaefer.de>
  */
 
 /*
@@ -20,6 +21,7 @@
 #include <stdlib.h>
 
 #include <Button.h>
+#include <Collator.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
@@ -42,13 +44,17 @@
 #include "TimeWindow.h"
 
 
+static BCollator sCollator;
+	// used to sort the timezone list
+
+
 TimeZoneView::TimeZoneView(BRect frame)
-	: BView(frame, "timeZoneView", B_FOLLOW_NONE, B_WILL_DRAW
-		| B_NAVIGABLE_JUMP), fInitialized(false)
+	:
+	BView(frame, "timeZoneView", B_FOLLOW_NONE, B_WILL_DRAW | B_NAVIGABLE_JUMP),
+	fCurrentZone(NULL),
+	fOldZone(NULL),
+	fInitialized(false)
 {
-	fCurrentZone = NULL;
-	fOldZone = NULL;
-	// TODO : get default timezone from locale kit
 	_InitView();
 }
 
@@ -231,10 +237,12 @@ TimeZoneView::_InitView()
 void
 TimeZoneView::_BuildRegionMenu()
 {
-	// Get a list of countries
-	// For each country, get all the timezones and AddItemUnder them
-	//	(only if there are multiple ones ?)
-	// Unfold the current country and highlight the selected TZ
+	BTimeZone* defaultTimeZone = NULL;
+	be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
+
+	// Get a list of countries and, for each country, get all the timezones and
+	// AddUnder() them (only if there are multiple ones).
+	// Finally expand the current country and highlight the active TZ.
 
 	BMessage countryList;
 	be_locale_roster->GetAvailableCountries(&countryList);
@@ -249,6 +257,7 @@ TimeZoneView::_BuildRegionMenu()
 		// Now list the timezones for this country
 		BList tzList;
 
+		BTimeZone* timeZone;
 		TimeZoneListItem* countryItem;
 		switch (country.GetTimeZones(tzList))
 		{
@@ -257,30 +266,47 @@ TimeZoneView::_BuildRegionMenu()
 				break;
 			case 1:
 				// Only one Timezone, no need to add it to the list
-				countryItem = new TimeZoneListItem(fullName, &country,
-					(BTimeZone*)tzList.ItemAt(0));
+				timeZone = (BTimeZone*)tzList.ItemAt(0);
+				countryItem
+					= new TimeZoneListItem(fullName, &country, timeZone);
 				fCityList->AddItem(countryItem);
+				if (timeZone->Code() == defaultTimeZone->Code())
+					fCurrentZone = countryItem;
 				break;
 			default:
 				countryItem = new TimeZoneListItem(fullName, &country, NULL);
+				countryItem->SetExpanded(false);
 				fCityList->AddItem(countryItem);
 
-				BTimeZone* timeZone;
 				for (int j = 0;
 						(timeZone = (BTimeZone*)tzList.ItemAt(j)) != NULL;
 						j++) {
-					BString readableName;
-					timeZone->GetName(readableName);
-					BStringItem* tzItem = new TimeZoneListItem(readableName,
-						NULL, timeZone);
+					TimeZoneListItem* tzItem = new TimeZoneListItem(
+						timeZone->Name(), NULL, timeZone);
 					fCityList->AddUnder(tzItem, countryItem);
+					if (timeZone->Code() == defaultTimeZone->Code())
+					{
+						fCurrentZone = tzItem;
+						countryItem->SetExpanded(true);
+					}
 				}
 				break;
 		}
 	}
 
-	fCurrentZone = fOldZone = (TimeZoneListItem*)fCityList->ItemAt(0);
-		// TODO get the actual setting from locale kit
+	fOldZone = fCurrentZone;
+
+	delete defaultTimeZone;
+
+	struct ListSorter {
+		static int compare(const BListItem* first, const BListItem* second)
+		{
+			return sCollator.Compare(((BStringItem*)first)->Text(),
+				((BStringItem*)second)->Text());
+		}
+	};
+	fCityList->SortItemsUnder(NULL, true, ListSorter::compare);
+
 }
 
 
@@ -289,25 +315,17 @@ TimeZoneView::_SetPreview()
 {
 	int32 selection = fCityList->CurrentSelection();
 	if (selection >= 0) {
-		TimeZoneListItem* item = (TimeZoneListItem*)fCityList->ItemAt(
-			selection);
-
-		// set timezone to selection
-		char buffer[50];
-		item->Code(buffer);
-		_SetTimeZone(buffer);
+		TimeZoneListItem* item
+			= (TimeZoneListItem*)fCityList->ItemAt(selection);
 
 		// calc preview time
-		time_t current = time(NULL);
+		time_t current = time(NULL) + item->OffsetFromGMT();
 		struct tm localTime;
-		localtime_r(&current, &localTime);
+		gmtime_r(&current, &localTime);
 
 		// update prview
 		fPreview->SetText(item->Text());
 		fPreview->SetTime(localTime.tm_hour, localTime.tm_min);
-
-		fCurrentZone->Code(buffer);
-		_SetTimeZone(buffer);
 
 		fSetZone->SetEnabled((strcmp(fCurrent->Text(), item->Text()) != 0));
 	}
@@ -317,9 +335,7 @@ TimeZoneView::_SetPreview()
 void
 TimeZoneView::_SetCurrent(const char* text)
 {
-	char buffer[50];
-	fCurrentZone->Code(buffer);
-	_SetTimeZone(buffer);
+	_SetTimeZone(fCurrentZone->Code().String());
 
 	time_t current = time(NULL);
 	struct tm localTime;
@@ -345,18 +361,16 @@ TimeZoneView::_SetTimeZone()
 	if (selection < 0)
 		return;
 
-	char timeZoneCode[50];
-	((TimeZoneListItem*)fCityList->ItemAt(selection))->Code(timeZoneCode);
-
-	// update environment
-	_SetTimeZone(timeZoneCode);
+	const BString& code
+		= ((TimeZoneListItem*)fCityList->ItemAt(selection))->Code();
+	_SetTimeZone(code.String());
 
 	// update display
 	time_t current = time(NULL);
 	struct tm localTime;
 	localtime_r(&current, &localTime);
 
-	set_timezone(timeZoneCode);
+	set_timezone(code.String());
 	// disable button
 	fSetZone->SetEnabled(false);
 

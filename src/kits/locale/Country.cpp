@@ -1065,10 +1065,8 @@ BCountry::GetTimeZones(BList& timezones)
 		// remaining zones after that
 	while ((tzName = icuTimeZoneList->next(NULL, error)) != NULL) {
 		if (error == U_ZERO_ERROR) {
-			BString readableName;
 			BTimeZone* timeZone = new BTimeZone(tzName);
-			timeZone->GetName(readableName);
-			timeZoneMap.insert(std::pair<BString, BTimeZone*>(readableName,
+			timeZoneMap.insert(std::pair<BString, BTimeZone*>(timeZone->Name(),
 				timeZone));
 		} else
 			error = U_ZERO_ERROR;
