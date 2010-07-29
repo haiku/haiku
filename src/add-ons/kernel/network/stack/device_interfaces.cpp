@@ -531,7 +531,7 @@ unregister_device_deframer(net_device* device)
 	// find device interface for this device
 	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	RecursiveLocker _(interface->receive_lock);
 
@@ -557,7 +557,7 @@ register_device_deframer(net_device* device, net_deframe_func deframeFunc)
 	// find device interface for this device
 	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	RecursiveLocker _(interface->receive_lock);
 
@@ -595,7 +595,7 @@ register_device_handler(struct net_device* device, int32 type,
 	// find device interface for this device
 	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	RecursiveLocker _(interface->receive_lock);
 
@@ -631,7 +631,7 @@ unregister_device_handler(struct net_device* device, int32 type)
 	// find device interface for this device
 	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	RecursiveLocker _(interface->receive_lock);
 
@@ -664,7 +664,7 @@ register_device_monitor(net_device* device, net_device_monitor* monitor)
 	// find device interface for this device
 	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	RecursiveLocker _(interface->receive_lock);
 	interface->monitor_funcs.Add(monitor);
@@ -681,7 +681,7 @@ unregister_device_monitor(net_device* device, net_device_monitor* monitor)
 	// find device interface for this device
 	net_device_interface* interface = find_device_interface(device->name);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	RecursiveLocker _(interface->receive_lock);
 
@@ -723,7 +723,7 @@ device_removed(net_device* device)
 	// so our put_() will (eventually) do the final cleanup
 	net_device_interface* interface = get_device_interface(device->name, false);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	// Propagate the loss of the device throughout the stack.
 	// This is very complex, refer to remove_interface() for
@@ -753,7 +753,7 @@ device_enqueue_buffer(net_device* device, net_buffer* buffer)
 {
 	net_device_interface* interface = get_device_interface(device->index);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	status_t status = fifo_enqueue_buffer(&interface->receive_queue, buffer);
 

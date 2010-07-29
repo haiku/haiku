@@ -97,7 +97,7 @@ LinkProtocol::StartMonitoring(const char* deviceName)
 
 	net_device_interface* interface = get_device_interface(deviceName);
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	status_t status = register_device_monitor(interface->device, &fMonitor);
 	if (status < B_OK) {
@@ -124,7 +124,7 @@ status_t
 LinkProtocol::SocketStatus(bool peek) const
 {
 	if (fMonitoredDevice == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	return LocalDatagramSocket::SocketStatus(peek);
 }
@@ -163,7 +163,7 @@ LinkProtocol::_MonitorEvent(net_device_monitor* monitor, int32 event)
 		protocol->_Unregister();
 		if (protocol->IsEmpty()) {
 			protocol->WakeAll();
-			notify_socket(protocol->socket, B_SELECT_READ, ENODEV);
+			notify_socket(protocol->socket, B_SELECT_READ, B_DEVICE_NOT_FOUND);
 		}
 	}
 }
@@ -276,7 +276,7 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 			net_device_interface* interface
 				= get_device_interface(request.ifr_index);
 			if (interface == NULL)
-				return ENODEV;
+				return B_DEVICE_NOT_FOUND;
 
 			strlcpy(request.ifr_name, interface->device->name, IF_NAMESIZE);
 			put_device_interface(interface);
@@ -317,7 +317,7 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 				return B_BAD_ADDRESS;
 
 			if (interface == NULL)
-				return ENODEV;
+				return B_DEVICE_NOT_FOUND;
 
 			get_device_interface_address(interface, &request.ifr_addr);
 			put_device_interface(interface);
@@ -335,7 +335,7 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 				return B_BAD_ADDRESS;
 
 			if (interface == NULL)
-				return ENODEV;
+				return B_DEVICE_NOT_FOUND;
 
 			request.ifr_flags = interface->device->flags;
 			put_device_interface(interface);

@@ -411,7 +411,7 @@ ipv6_delta_membership(ipv6_protocol* protocol, int option,
 	interface = sDatalinkModule->get_interface(sDomain, interfaceIndex);
 
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	return ipv6_delta_membership(protocol, option, interface,
 		groupAddr, sourceAddr);

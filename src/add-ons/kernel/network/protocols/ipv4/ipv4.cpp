@@ -957,7 +957,7 @@ ipv4_delta_membership(ipv4_protocol* protocol, int option,
 	}
 
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	return ipv4_delta_membership(protocol, option, interface,
 		groupAddr, sourceAddr);
@@ -983,7 +983,7 @@ ipv4_generic_delta_membership(ipv4_protocol* protocol, int option,
 		interface = sDatalinkModule->get_interface(sDomain, index);
 
 	if (interface == NULL)
-		return ENODEV;
+		return B_DEVICE_NOT_FOUND;
 
 	const in_addr* sourceAddr = NULL;
 	if (_sourceAddr != NULL)
