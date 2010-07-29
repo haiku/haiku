@@ -305,7 +305,7 @@ TimeZoneView::_BuildRegionMenu()
 				((BStringItem*)second)->Text());
 		}
 	};
-	fCityList->SortItemsUnder(NULL, true, ListSorter::compare);
+	fCityList->SortItemsUnder(NULL, false, ListSorter::compare);
 
 }
 
