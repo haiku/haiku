@@ -1,10 +1,13 @@
 /*
- * Copyright (c) 2001-2005, Haiku, Inc.
+ * Copyright (c) 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author: DarkWyrm <bpmagic@columbus.rr.com>
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
- 
+
+#include "DecorManager.h"
 
 #include <Directory.h>
 #include <Entry.h>
@@ -20,7 +23,7 @@
 #include "Desktop.h"
 #include "DesktopSettings.h"
 #include "ServerConfig.h"
-#include "DecorManager.h"
+#include "Window.h"
 
 typedef float get_version(void);
 typedef Decorator* create_decorator(DesktopSettings& desktopSettings, BRect rect,
@@ -230,12 +233,13 @@ DecorManager::GetDecorator() const
 
 
 bool
-DecorManager::SetDecorator(int32 index)
+DecorManager::SetDecorator(int32 index, Desktop* desktop)
 {
 	DecorInfo* newDecInfo = (DecorInfo*)fDecorList.ItemAt(index);
 
 	if (newDecInfo) {
 		fCurrentDecor = newDecInfo;
+		_UpdateWindows(desktop);
 		return true;
 	}
 
@@ -306,3 +310,13 @@ DecorManager::_FindDecor(const char *name)
 	return NULL;
 }
 
+
+void
+DecorManager::_UpdateWindows(Desktop* desktop)
+{
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		for (Window* window = desktop->Windows(i).LastWindow(); window;
+				window = window->PreviousWindow(i))
+			desktop->ReloadDecorator(window);
+	}
+}

@@ -2,8 +2,11 @@
  * Copyright (c) 2001-2005, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author: DarkWyrm <bpmagic@columbus.rr.com>
+ * Author:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
+
 #ifndef DECOR_MANAGER_H
 #define DECOR_MANAGER_H
 
@@ -35,7 +38,7 @@ class DecorManager : public BLocker {
 		int32		CountDecorators() const;
 
 		int32		GetDecorator() const;
-		bool		SetDecorator(int32 index);
+		bool		SetDecorator(int32 index, Desktop* desktop);
 		bool		SetR5Decorator(int32 value);
 		const char*	GetDecoratorName(int32 index);
 
@@ -46,6 +49,8 @@ class DecorManager : public BLocker {
 	private:
 		void		_EmptyList();
 		DecorInfo*	_FindDecor(const char *name);
+
+		void		_UpdateWindows(Desktop* desktop);
 
 		BObjectList<DecorInfo> fDecorList;
 		DecorInfo*	fCurrentDecor;

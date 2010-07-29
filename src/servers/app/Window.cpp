@@ -543,6 +543,20 @@ Window::PreviousWindow(int32 index) const
 
 
 void
+Window::ReloadDecorator()
+{
+	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
+		delete fDecorator;
+		// we need a new decorator
+		fDecorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
+			Frame(), Title(), fLook, fFlags);
+		if (IsFocus())
+			fDecorator->SetFocus(true);
+	}
+}
+
+
+void
 Window::SetScreen(const ::Screen* screen)
 {
 	ASSERT_MULTI_WRITE_LOCKED(fDesktop->ScreenLocker());

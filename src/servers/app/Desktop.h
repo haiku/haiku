@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Axel Dörfler <axeld@pinc-software.de>
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  *		Brecht Machiels <brecht@mos6581.org>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 #ifndef DESKTOP_H
 #define DESKTOP_H
@@ -232,6 +233,8 @@ public:
 			void				Redraw();
 			void				RedrawBackground();
 
+			void				ReloadDecorator(Window* window);
+
 			BRegion&			BackgroundRegion()
 									{ return fBackgroundRegion; }
 
@@ -249,6 +252,7 @@ public:
 									BPrivate::LinkSender& sender);
 
 			WindowList&			CurrentWindows();
+			WindowList&			Windows(int32 index);
 
 private:
 			void				_LaunchInputServer();
@@ -256,8 +260,6 @@ private:
 			void				_PrepareQuit();
 			void				_DispatchMessage(int32 code,
 									BPrivate::LinkReceiver &link);
-
-			WindowList&			_Windows(int32 index);
 
 			void				_UpdateFloating(int32 previousWorkspace = -1,
 									int32 nextWorkspace = -1,

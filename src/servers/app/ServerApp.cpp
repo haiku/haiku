@@ -625,7 +625,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			int32 index;
 			link.Read<int32>(&index);
-			if (gDecorManager.SetDecorator(index))
+			if (gDecorManager.SetDecorator(index, fDesktop))
 				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
 			break;
 		}

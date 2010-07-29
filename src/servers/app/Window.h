@@ -71,6 +71,8 @@ public:
 			::EventTarget&		EventTarget() const
 									{ return fWindow->EventTarget(); }
 
+			void				ReloadDecorator();
+
 			void				SetScreen(const ::Screen* screen);
 			const ::Screen*		Screen() const;
 
