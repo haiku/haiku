@@ -100,7 +100,8 @@ ipv4_mask_address(const sockaddr *address, const sockaddr *mask,
 static bool
 ipv4_is_empty_address(const sockaddr *address, bool checkPort)
 {
-	if (address == NULL || address->sa_len == 0)
+	if (address == NULL || address->sa_len == 0
+		|| address->sa_family == AF_UNSPEC)
 		return true;
 
 	return ((sockaddr_in *)address)->sin_addr.s_addr == 0

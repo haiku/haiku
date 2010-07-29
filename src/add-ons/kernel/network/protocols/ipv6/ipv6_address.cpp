@@ -113,7 +113,8 @@ ipv6_mask_address(const sockaddr *address, const sockaddr *mask,
 static bool
 ipv6_is_empty_address(const sockaddr *_address, bool checkPort)
 {
-	if (_address == NULL || _address->sa_len == 0)
+	if (_address == NULL || _address->sa_len == 0
+		|| _address->sa_family == AF_UNSPEC)
 		return true;
 
 	const sockaddr_in6 *address = (const sockaddr_in6 *)_address;

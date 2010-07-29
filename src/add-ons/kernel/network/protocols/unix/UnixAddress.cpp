@@ -108,9 +108,12 @@ unix_equal_masked_addresses(const sockaddr *a, const sockaddr *b,
 static bool
 unix_is_empty_address(const sockaddr *address, bool checkPort)
 {
-	return address->sa_len >= kEmptyAddress.sun_len
-		&& memcmp(address, &kEmptyAddress, kEmptyAddress.sun_len) == 0;
+	return address == NULL || address->sa_len == 0
+		|| address->sa_family == AF_UNSPEC)
+		|| (address->sa_len >= kEmptyAddress.sun_len
+			&& memcmp(address, &kEmptyAddress, kEmptyAddress.sun_len) == 0);
 }
+
 
 static bool
 unix_is_same_family(const sockaddr *address)
@@ -120,6 +123,7 @@ unix_is_same_family(const sockaddr *address)
 
 	return address->sa_family == AF_UNIX;
 }
+
 
 static int32
 unix_first_mask_bit(const sockaddr *mask)

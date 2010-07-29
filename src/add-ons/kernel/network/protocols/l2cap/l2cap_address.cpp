@@ -90,7 +90,8 @@ l2cap_mask_address(const sockaddr *address, const sockaddr *mask,
 static bool
 l2cap_is_empty_address(const sockaddr *address, bool checkPort)
 {
-	if (address == NULL || address->sa_len == 0)
+	if (address == NULL || address->sa_len == 0
+		|| address->sa_family == AF_UNSPEC)
 		return true;
 
 	return ((bdaddrUtils::Compare(
