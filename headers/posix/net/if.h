@@ -31,7 +31,7 @@ struct ifreq_stats {
 };
 
 struct ifreq {
-	char		ifr_name[IF_NAMESIZE];
+	char			ifr_name[IF_NAMESIZE];
 	union {
 		struct sockaddr ifr_addr;
 		struct sockaddr ifr_dstaddr;
@@ -39,21 +39,27 @@ struct ifreq {
 		struct sockaddr ifr_mask;
 		struct ifreq_stats ifr_stats;
 		struct route_entry ifr_route;
-		int		ifr_flags;
-		int		ifr_index;
-		int		ifr_metric;
-		int		ifr_mtu;
-		int		ifr_media;
-		int		ifr_type;
-		int		ifr_reqcap;
+		int			ifr_flags;
+		int			ifr_index;
+		int			ifr_metric;
+		int			ifr_mtu;
+		int			ifr_media;
+		int			ifr_type;
+		int			ifr_reqcap;
+		int			ifr_count;
+		uint8_t*	ifr_data;
 	};
 };
 
-/* used with SIOCAIFADDR */
+/* used with SIOC_IF_ALIAS_ADD, SIOC_IF_ALIAS_GET, SIOC_ALIAS_SET */
 struct ifaliasreq {
-	char		ifra_name[IF_NAMESIZE];
+	char			ifra_name[IF_NAMESIZE];
+	int				ifra_index;
 	struct sockaddr_storage ifra_addr;
-	struct sockaddr_storage ifra_broadaddr;
+	union {
+		struct sockaddr_storage ifra_broadaddr;
+		struct sockaddr_storage ifra_destination;
+	};
 	struct sockaddr_storage ifra_mask;
 };
 
@@ -72,12 +78,13 @@ struct ifaliasreq {
 #define IFF_CONFIGURING		0x4000	/* auto configuration in progress */
 #define IFF_MULTICAST		0x8000	/* supports multicast */
 
+/* used with SIOCGIFCOUNT, and SIOCGIFCONF */
 struct ifconf {
-	int			ifc_len;	/* size of buffer */
+	int				ifc_len;	/* size of buffer */
 	union {
-		void	*ifc_buf;
-		struct ifreq *ifc_req;
-		int		ifc_value;
+		void*		ifc_buf;
+		struct ifreq* ifc_req;
+		int			ifc_value;
 	};
 };
 
@@ -88,8 +95,8 @@ struct ifconf {
 /* POSIX definitions follow */
 
 struct if_nameindex {
-	unsigned	if_index;	/* positive interface index */
-	char		*if_name;	/* interface name, ie. "loopback" */
+	unsigned		if_index;	/* positive interface index */
+	char*			if_name;	/* interface name, ie. "loopback" */
 };
 
 
@@ -97,13 +104,14 @@ struct if_nameindex {
 extern "C" {
 #endif
 
-unsigned if_nametoindex(const char *name);
-char *if_indextoname(unsigned index, char *nameBuffer);
-struct if_nameindex *if_nameindex(void);
-void if_freenameindex(struct if_nameindex *interfaceArray);
+unsigned if_nametoindex(const char* name);
+char* if_indextoname(unsigned index, char* nameBuffer);
+struct if_nameindex* if_nameindex(void);
+void if_freenameindex(struct if_nameindex* interfaceArray);
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	/* _NET_IF_H */

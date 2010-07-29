@@ -18,9 +18,7 @@
 
 #include <KernelExport.h>
 
-#include <lock.h>
 #include <net_device.h>
-#include <util/AutoLock.h>
 
 #include "device_interfaces.h"
 #include "domains.h"
@@ -516,6 +514,40 @@ Interface::GetNextAddress(InterfaceAddress** _address)
 }
 
 
+InterfaceAddress*
+Interface::AddressAt(size_t index)
+{
+	RecursiveLocker locker(fLock);
+	
+	AddressList::Iterator iterator = fAddresses.GetIterator();
+	size_t i = 0;
+	
+	while (InterfaceAddress* address = iterator.Next()) {
+		if (i++ == index) {
+			address->AcquireReference();
+			return address;
+		}
+	}
+
+	return NULL;
+}
+
+
+size_t
+Interface::CountAddresses()
+{
+	RecursiveLocker locker(fLock);
+	return fAddresses.Count();
+}
+
+
+/*!	This is called in order to call the correct methods of the datalink
+	protocols, ie. it will translate address changes to
+	net_datalink_protocol::change_address(), and IFF_UP changes to
+	net_datalink_protocol::interface_up(), and interface_down().
+
+	Everything else is passed unchanged to net_datalink_protocol::control().
+*/
 status_t
 Interface::Control(net_domain* domain, int32 option, ifreq& request,
 	ifreq* userRequest, size_t length)
@@ -549,6 +581,51 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 			return status;
 		}
 		
+		case SIOC_IF_ALIAS_SET:
+		{
+			RecursiveLocker locker(fLock);
+
+			ifaliasreq aliasRequest;
+			if (user_memcpy(&aliasRequest, userRequest, sizeof(ifaliasreq))
+					!= B_OK)
+				return B_BAD_ADDRESS;
+
+			InterfaceAddress* address = AddressAt(aliasRequest.ifra_index);
+			if (address == NULL)
+				return B_BAD_VALUE;
+
+			status_t status = B_OK;
+			address->AcquireReference();
+				// _ChangeAddress() currently unlocks, so we need another
+				// reference to make sure "address" is not going away.
+
+			if (!domain->address_module->equal_addresses(
+					(sockaddr*)&aliasRequest.ifra_addr, address->local)) {
+				status = _ChangeAddress(locker, address, SIOCSIFADDR,
+					address->local, (sockaddr*)&aliasRequest.ifra_addr);
+			}
+
+			if (status == B_OK && !domain->address_module->equal_addresses(
+					(sockaddr*)&aliasRequest.ifra_mask, address->mask)) {
+				status = _ChangeAddress(locker, address, SIOCSIFNETMASK,
+					address->mask, (sockaddr*)&aliasRequest.ifra_mask);
+			}
+
+			if (status == B_OK && !domain->address_module->equal_addresses(
+					(sockaddr*)&aliasRequest.ifra_destination,
+					address->destination)) {
+				status = _ChangeAddress(locker, address,
+					(domain->address_module->flags
+						& NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS) != 0
+							? SIOCSIFBRDADDR : SIOCSIFDSTADDR,
+					address->destination,
+					(sockaddr*)&aliasRequest.ifra_destination);
+			}
+
+			address->ReleaseReference();
+			return status;
+		}
+
 		case SIOCSIFADDR:
 		case SIOCSIFNETMASK:
 		case SIOCSIFBRDADDR:
@@ -558,7 +635,6 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 			RecursiveLocker locker(fLock);
 			
 			InterfaceAddress* address = NULL;
-			sockaddr_storage oldAddress;
 			sockaddr_storage newAddress;
 
 			size_t size = max_c(request.ifr_addr.sa_len, sizeof(sockaddr));
@@ -586,24 +662,9 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 			if (address == NULL)
 				return B_BAD_VALUE;
 
-			if (*address->AddressFor(option) != NULL)
-				memcpy(&oldAddress, *address->AddressFor(option), size);
-			else
-				oldAddress.ss_family = AF_UNSPEC;
-
-			// TODO: mark this address busy or call while holding the lock!
-			address->AcquireReference();
-			locker.Unlock();
-
-			domain_datalink* datalink = DomainDatalink(domain->family);
-			status_t status = datalink->first_protocol->module->change_address(
-				datalink->first_protocol, address, option,
-				oldAddress.ss_family != AF_UNSPEC
-					? (sockaddr*)&oldAddress : NULL,
+			return _ChangeAddress(locker, address, option,
+				*address->AddressFor(option),
 				option != SIOCDIFADDR ? (sockaddr*)&newAddress : NULL);
-
-			address->ReleaseReference();
-			return status;
 		}
 
 		default:
@@ -784,6 +845,33 @@ Interface::_FirstForFamily(int family)
 	}
 
 	return NULL;
+}
+
+
+status_t
+Interface::_ChangeAddress(RecursiveLocker& locker, InterfaceAddress* address,
+	int32 option, const sockaddr* originalAddress, const sockaddr* newAddress)
+{
+	// Copy old address over
+	sockaddr_storage oldAddress;
+	if (address->domain->address_module->set_to((sockaddr*)&oldAddress,
+			originalAddress) != B_OK)
+		oldAddress.ss_family = AF_UNSPEC;
+
+	// TODO: mark this address busy or call while holding the lock!
+	address->AcquireReference();
+	locker.Unlock();
+
+	domain_datalink* datalink = DomainDatalink(address->domain);
+	status_t status = datalink->first_protocol->module->change_address(
+		datalink->first_protocol, address, option,
+		oldAddress.ss_family != AF_UNSPEC ? (sockaddr*)&oldAddress : NULL,
+		newAddress != NULL && newAddress->sa_family != AF_UNSPEC
+			? newAddress : NULL);
+
+	locker.Lock();
+	address->ReleaseReference();
+	return status;
 }
 
 

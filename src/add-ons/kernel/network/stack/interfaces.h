@@ -17,6 +17,7 @@
 
 #include <Referenceable.h>
 
+#include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
@@ -118,6 +119,8 @@ public:
 			status_t			AddAddress(InterfaceAddress* address);
 			void				RemoveAddress(InterfaceAddress* address);
 			bool				GetNextAddress(InterfaceAddress** _address);
+			InterfaceAddress*	AddressAt(size_t index);
+			size_t				CountAddresses();
 
 			status_t			Control(net_domain* domain, int32 option,
 									ifreq& request, ifreq* userRequest,
@@ -141,7 +144,10 @@ private:
 			status_t			_SetUp();
 			void				_SetDown();
 			InterfaceAddress*	_FirstForFamily(int family);
-			status_t			_AddDomainDatalink(net_domain* domain);
+			status_t			_ChangeAddress(RecursiveLocker& locker,
+									InterfaceAddress* address, int32 option,
+									const sockaddr* oldAddress,
+									const sockaddr* newAddress);
 
 private:
 			recursive_lock		fLock;

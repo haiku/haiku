@@ -159,6 +159,23 @@ get_interface_name_or_index(net_domain* domain, int32 option, void* value,
 }
 
 
+status_t
+fill_address(const sockaddr* from, sockaddr* to, size_t maxLength)
+{
+	if (from != NULL) {
+		// Copy address over
+		return user_memcpy(to, from, min_c(from->sa_len, maxLength));
+	}
+
+	// Fill in empty address
+	sockaddr empty;
+	empty.sa_len = 2;
+	empty.sa_family = AF_UNSPEC;
+
+	return user_memcpy(to, &empty, min_c(2, maxLength));
+}
+
+
 //	#pragma mark - datalink module
 
 
@@ -180,7 +197,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 		case SIOCGIFNAME:
 			return get_interface_name_or_index(domain, option, value, _length);
 
-		case SIOCAIFADDR:
+		case SIOCAIFADDR:	/* same as SIOC_IF_ALIAS_ADD */
 		{
 			// add new interface address
 			if (*_length < sizeof(struct ifaliasreq))
@@ -203,7 +220,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 			net_device_interface* deviceInterface
 				= get_device_interface(request.ifra_name);
 			if (deviceInterface == NULL)
-				return ENODEV;
+				return B_DEVICE_NOT_FOUND;
 
 			status_t status = add_interface(request.ifra_name, domain, request,
 				deviceInterface);
@@ -212,7 +229,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 			return status;
 		}
 
-		case SIOCDIFADDR:
+		case SIOCDIFADDR:	/* same as SIOC_IF_ALIAS_REMOVE */
 		{
 			// remove interface (address)
 			struct ifreq request;
@@ -727,18 +744,48 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 
 			size_t maxLength = length - offsetof(ifreq, ifr_addr);
 
-			sockaddr* address = *interfaceAddress->AddressFor(option);
-			if (address != NULL) {
-				// Copy address over
-				return user_memcpy(&((struct ifreq*)argument)->ifr_addr,
-					address, min_c(address->sa_len, maxLength));
+			return fill_address(*interfaceAddress->AddressFor(option),
+				&((struct ifreq*)argument)->ifr_addr, maxLength);
+		}
+
+		case SIOC_IF_ALIAS_COUNT:
+		{
+			ifreq request;
+			request.ifr_count = interface->CountAddresses();
+
+			return user_memcpy(&((struct ifreq*)argument)->ifr_count,
+				&request.ifr_count, sizeof(request.ifr_count));
+		}
+
+		case SIOC_IF_ALIAS_GET:
+		{
+			ifaliasreq request;
+			if (user_memcpy(&request, argument, sizeof(ifaliasreq)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			InterfaceAddress* address
+				= interface->AddressAt(request.ifra_index);
+			if (address == NULL)
+				return B_BAD_VALUE;
+
+			status_t status = fill_address(address->local,
+				(sockaddr*)&((struct ifaliasreq*)argument)->ifra_addr,
+				sizeof(sockaddr_storage));
+			if (status == B_OK) {
+				status = fill_address(address->mask,
+					(sockaddr*)&((struct ifaliasreq*)argument)->ifra_mask,
+					sizeof(sockaddr_storage));
+			}
+			if (status == B_OK) {
+				status = fill_address(address->destination,
+					(sockaddr*)&((struct ifaliasreq*)argument)
+						->ifra_destination,
+					sizeof(sockaddr_storage));
 			}
 
-			// Fill in empty address
-			request.ifr_addr.sa_len = 2;
-			request.ifr_addr.sa_family = AF_UNSPEC;
-			return user_memcpy(&((struct ifreq*)argument)->ifr_addr,
-				&request.ifr_addr, min_c(2, maxLength));
+			address->ReleaseReference();
+
+			return status;
 		}
 
 		case SIOCGIFFLAGS:
