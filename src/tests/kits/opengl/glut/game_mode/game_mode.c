@@ -157,14 +157,9 @@ init(void)
 
 
 void
-clean_exit(void)
+on_exit(void)
 {
 	printf("Exit.\n");
-
-	if (glutGameModeGet(GLUT_GAME_MODE_ACTIVE)) {
- 		printf("glutLeaveGameMode()\n");
-		glutLeaveGameMode();
-	}
 }
 
 
@@ -226,7 +221,7 @@ main(int argc, char **argv)
 
 	init();
 
-	atexit(clean_exit);
+	atexit(on_exit);
 	glutMainLoop();
 
 	return 0;

@@ -790,6 +790,7 @@ extern HDC XHDC;
 /* private routines from glutInit.cpp */
 void __glutInitTime(bigtime_t *beginning);
 void __glutInit();
+void __glutExitCleanup();
 
 /* private routines from glutMenu.cpp */
 class GlutMenu;         // avoid including glutMenu.h

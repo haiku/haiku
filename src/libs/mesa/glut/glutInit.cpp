@@ -168,7 +168,7 @@ void glutInit(int *argcp, char **argv) {
       break;
     }
   }
-  
+
   __glutInit();  /* Create BApplication first so DisplayWidth() works */
   if (geometry) {
     int flags, x, y, width, height;
@@ -225,12 +225,23 @@ void __glutInit() {
   bigtime_t unused;
   __glutInitTime(&unused);
 
-  /* set atexit() function to destroy all windows before exiting */
-  if(atexit(__glutDestroyAllWindows))
+  /* set atexit() function to cleanup before exiting */
+  if(atexit(__glutExitCleanup))
   	__glutFatalError("can't set exit handler");
-  
+
   /* similarly, destroy all windows on CTRL-C */
   signal(SIGINT, sigHandler);
+}
+
+
+void
+__glutExitCleanup()
+{
+	if (glutGameModeGet(GLUT_GAME_MODE_ACTIVE) > 0)
+		// Try to restore initial screen mode...
+		glutLeaveGameMode();
+
+	__glutDestroyAllWindows();
 }
 
 /***********************************************************
