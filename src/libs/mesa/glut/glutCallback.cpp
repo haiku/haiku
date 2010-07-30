@@ -22,7 +22,7 @@
 /***********************************************************
  *	Window related callbacks
  ***********************************************************/
-void APIENTRY 
+void APIENTRY
 glutDisplayFunc(GLUTdisplayCB displayFunc)
 {
   /* XXX Remove the warning after GLUT 3.0. */
@@ -31,49 +31,49 @@ glutDisplayFunc(GLUTdisplayCB displayFunc)
   gState.currentWindow->display = displayFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutKeyboardFunc(GLUTkeyboardCB keyboardFunc)
 {
   gState.currentWindow->keyboard = keyboardFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutKeyboardUpFunc(GLUTkeyboardCB keyboardUpFunc)
 {
   gState.currentWindow->keyboardUp = keyboardUpFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutSpecialFunc(GLUTspecialCB specialFunc)
 {
   gState.currentWindow->special = specialFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutSpecialUpFunc(GLUTspecialCB specialUpFunc)
 {
   gState.currentWindow->specialUp = specialUpFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutMouseFunc(GLUTmouseCB mouseFunc)
 {
   gState.currentWindow->mouse = mouseFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutMotionFunc(GLUTmotionCB motionFunc)
 {
   gState.currentWindow->motion = motionFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutPassiveMotionFunc(GLUTpassiveCB passiveMotionFunc)
 {
   gState.currentWindow->passive = passiveMotionFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutEntryFunc(GLUTentryCB entryFunc)
 {
   gState.currentWindow->entry = entryFunc;
@@ -97,7 +97,7 @@ visibilityHelper(int status)
     gState.currentWindow->visibility(GLUT_VISIBLE);
 }
 
-void APIENTRY 
+void APIENTRY
 glutVisibilityFunc(GLUTvisibilityCB visibilityFunc)
 {
   gState.currentWindow->visibility = visibilityFunc;
@@ -107,7 +107,7 @@ glutVisibilityFunc(GLUTvisibilityCB visibilityFunc)
     glutWindowStatusFunc(NULL);
 }
 
-void APIENTRY 
+void APIENTRY
 glutReshapeFunc(GLUTreshapeCB reshapeFunc)
 {
   if (reshapeFunc) {

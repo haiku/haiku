@@ -11,7 +11,7 @@
 #include "glutint.h"
 
 /* CENTRY */
-int GLUTAPIENTRY 
+int GLUTAPIENTRY
 glutExtensionSupported(const char *extension)
 {
   static const GLubyte *extensions = NULL;
@@ -125,7 +125,7 @@ static struct name_address_pair glut_functions[] = {
    { "glutWindowStatusFunc", (const GLUTproc) glutWindowStatusFunc },
    { "glutKeyboardUpFunc", (const GLUTproc) glutKeyboardUpFunc },
    { "glutSpecialUpFunc", (const GLUTproc) glutSpecialUpFunc },
-//   { "glutJoystickFunc", (const GLUTproc) glutJoystickFunc },
+   { "glutJoystickFunc", (const GLUTproc) glutJoystickFunc },
    { "glutSetColor", (const GLUTproc) glutSetColor },
    { "glutGetColor", (const GLUTproc) glutGetColor },
    { "glutCopyColormap", (const GLUTproc) glutCopyColormap },
@@ -167,17 +167,17 @@ static struct name_address_pair glut_functions[] = {
    { "glutReportErrors", (const GLUTproc) glutReportErrors },
    { "glutIgnoreKeyRepeat", (const GLUTproc) glutIgnoreKeyRepeat },
    { "glutSetKeyRepeat", (const GLUTproc) glutSetKeyRepeat },
-//   { "glutForceJoystickFunc", (const GLUTproc) glutForceJoystickFunc },
-//   { "glutGameModeString", (const GLUTproc) glutGameModeString },
-//   { "glutEnterGameMode", (const GLUTproc) glutEnterGameMode },
-//   { "glutLeaveGameMode", (const GLUTproc) glutLeaveGameMode },
-//   { "glutGameModeGet", (const GLUTproc) glutGameModeGet },
+   { "glutForceJoystickFunc", (const GLUTproc) glutForceJoystickFunc },
+   { "glutGameModeString", (const GLUTproc) glutGameModeString },
+   { "glutEnterGameMode", (const GLUTproc) glutEnterGameMode },
+   { "glutLeaveGameMode", (const GLUTproc) glutLeaveGameMode },
+   { "glutGameModeGet", (const GLUTproc) glutGameModeGet },
    { NULL, NULL }
-};   
+};
 
 
 /* XXX This isn't an official GLUT function, yet */
-GLUTproc GLUTAPIENTRY 
+GLUTproc GLUTAPIENTRY
 glutGetProcAddress(const char *procName)
 {
    /* Try GLUT functions first */

@@ -103,16 +103,16 @@ GlutWindow::GlutWindow(GlutWindow *nparent, const char *name,
 	// clear callbacks
 	display = __glutDefaultDisplay;
 	reshape = __glutDefaultReshape;
-	mouse = 0;
-	motion = 0;
-	passive = 0;
-	entry = 0;
-	keyboard = 0;
-	keyboardUp = 0;
-	visibility = 0;
-	special = 0;
-	specialUp = 0;
-	windowStatus = 0;
+	mouse = NULL;
+	motion = NULL;
+	passive = NULL;
+	entry = NULL;
+	keyboard = NULL;
+	keyboardUp = NULL;
+	visibility = NULL;
+	special = NULL;
+	specialUp = NULL;
+	windowStatus = NULL;
 
 	// clear event counters
 	anyevents = 1;
@@ -124,7 +124,7 @@ GlutWindow::GlutWindow(GlutWindow *nparent, const char *name,
 	entryEvent = 0;
 	keybEvent = 0;
 	keybUpEvent = 0;
-	windowStatusEvent = 0; // DirectConnected() will report change in 
+	windowStatusEvent = 0; // DirectConnected() will report change in
 	visState = -1;         // visibility
 	specialEvent = 0;
 	specialUpEvent = 0;
@@ -132,7 +132,7 @@ GlutWindow::GlutWindow(GlutWindow *nparent, const char *name,
 	menuEvent = 0;
 	visible = true;
 	ignoreKeyRepeat = (gState.keyRepeatMode == GLUT_KEY_REPEAT_OFF);
-	
+
 	gBlock.QuickNewEvent();
 
 	// if i'm a subwindow, add me to my parent view
@@ -218,7 +218,7 @@ void
 glutSetWindow(int win)
 {
 	GlutWindow *window;
-	
+
 	if (win < 1 || win > gState.windowListSize) {
 		__glutWarning("glutSetWindow attempted on bogus window.");
 		return;
@@ -270,7 +270,7 @@ __glutDestroyWindow(GlutWindow *window, GlutWindow *initialWindow)
 			cur = cur->siblings;
 		}
 	}
-	
+
 	// finally, check if we are the current window, and set to 0
 	if (gState.currentWindow == window)
 		gState.currentWindow = 0;
@@ -484,7 +484,7 @@ glutIconifyWindow()
 {
 	if (gState.currentWindow->parent)
 		__glutFatalError("can't iconify a subwindow");
-		
+
 	gState.currentWindow->Window()->Lock();
 	gState.currentWindow->Window()->Minimize(true);
 	gState.currentWindow->Window()->Unlock();
@@ -494,7 +494,7 @@ glutIconifyWindow()
 /*!	Sets the window title */
 void
 glutSetWindowTitle(const char *name)
-{ 
+{
 	if (gState.currentWindow->parent)
 		__glutFatalError("glutSetWindowTitle: isn't a top-level window");
 
@@ -545,7 +545,7 @@ __glutConvertDisplayMode(unsigned long *options)
 			newoptions |= BGL_STENCIL;
 		*options = newoptions;
 	}
-	
+
 	if (gState.displayMode & GLUT_INDEX) {
 		__glutWarning("BeOS doesn't support indexed color");
 		return 0;
@@ -625,7 +625,7 @@ GlutBWindow::~GlutBWindow()
 		Hide();
 
 	Sync();
-}	
+}
 
 
 bool

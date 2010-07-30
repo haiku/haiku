@@ -17,8 +17,10 @@
  ***********************************************************/
 #include <GL/glut.h>
 #include <Application.h>
+
 #include "glutWindow.h"
 #include "glutMenu.h"
+#include "glutGameMode.h"
 
 /***********************************************************
  *	CLASS:	GlutState
@@ -45,7 +47,7 @@ struct GlutState {
 	int modifierKeys;				// only valid during keyboard callback
 	int keyRepeatMode;				// global repeat
 
-	bool	gameMode;			// game mode is active
+	GlutGameMode* gameMode;
 
 	bool debug;					// call glGetError
 	bool quitAll;				// quit
@@ -57,14 +59,15 @@ struct GlutState {
 		initWidth = initHeight = 300;
 		displayMode = GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH;
 		displayString = 0;
-		currentWindow = 0;
-		currentMenu = 0;
-		windowList = 0;
+		currentWindow = NULL;
+		currentMenu = NULL;
+		windowList = NULL;
 		windowListSize = 0;
 		idle = 0;
 		menuStatus = 0;
 		modifierKeys = ~0;
 		keyRepeatMode = GLUT_KEY_REPEAT_DEFAULT;
+		gameMode = NULL;
 		debug = quitAll = false;
 	}
 };

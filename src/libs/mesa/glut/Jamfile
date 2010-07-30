@@ -20,7 +20,7 @@ MergeObject <opengl>glut.o :
 	glutCursor.cpp
 	glutMenu.cpp
 	glutDstr.cpp
-	# glutGameMode.cpp
+	glutGameMode.cpp
 	beos_x11.cpp
 
 	# C sources
