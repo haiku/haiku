@@ -12,6 +12,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Message.h>
 #include <Path.h>
 #include <Rect.h>
@@ -122,24 +123,9 @@ DecorManager::DecorManager()
 
 	// Add any on disk
 	RescanDecorators();
-#if 0
 
-	// Find out which one should be the active one
-	BDirectory dir;
-	if (dir.SetTo(SERVER_SETTINGS_DIR) == B_ENTRY_NOT_FOUND)
-		create_directory(SERVER_SETTINGS_DIR, 0777);
+	_LoadSettingsFromDisk();
 
-	BMessage settings;
-	BFile file(SERVER_SETTINGS_DIR "decorator_settings", B_READ_ONLY);
-
-	// Fallback to the default decorator if something goes wrong
-	if (file.InitCheck() == B_OK && settings.Unflatten(&file) == B_OK) {
-		BString itemtext;
-		if (settings.FindString("decorator", &itemtext) == B_OK) {
-			fCurrentDecor = _FindDecor(itemtext.String());
-		}
-	}
-#endif
 	if (!fCurrentDecor)
 		fCurrentDecor = (DecorInfo*)fDecorList.ItemAt(0L);
 }
@@ -239,7 +225,8 @@ DecorManager::SetDecorator(int32 index, Desktop* desktop)
 
 	if (newDecInfo) {
 		fCurrentDecor = newDecInfo;
-		_UpdateWindows(desktop);
+		desktop->ReloadAllDecorators();
+		_SaveSettingsToDisk();
 		return true;
 	}
 
@@ -311,12 +298,65 @@ DecorManager::_FindDecor(const char *name)
 }
 
 
-void
-DecorManager::_UpdateWindows(Desktop* desktop)
+static const char* kSettingsDir = "system/app_server";
+static const char* kSettingsFile = "decorator_settings";
+
+
+bool
+DecorManager::_LoadSettingsFromDisk()
 {
-	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		for (Window* window = desktop->Windows(i).LastWindow(); window;
-				window = window->PreviousWindow(i))
-			desktop->ReloadDecorator(window);
+	// get the user settings directory
+	BPath path;
+	status_t error = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
+	if (error != B_OK)
+		return false;
+
+	path.Append(kSettingsDir);
+	path.Append(kSettingsFile);
+	BFile file(path.Path(), B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return false;
+
+	BMessage settings;
+	if (settings.Unflatten(&file) == B_OK) {
+		BString itemtext;
+		if (settings.FindString("decorator", &itemtext) == B_OK) {
+			DecorInfo* decor = _FindDecor(itemtext.String());
+			if (decor) {
+				fCurrentDecor = decor;
+				return true;
+			}
+		}
 	}
+
+	return false;
 }
+
+
+bool
+DecorManager::_SaveSettingsToDisk()
+{
+	// get the user settings directory
+	BPath path;
+	status_t error = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
+	if (error != B_OK)
+		return false;
+
+	path.Append(kSettingsDir);
+	if (create_directory(path.Path(), 777) != B_OK)
+		return false;
+
+	path.Append(kSettingsFile);
+	BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	if (file.InitCheck() != B_OK)
+		return false;
+
+	BMessage settings;
+	if (settings.AddString("decorator", fCurrentDecor->Name()) != B_OK)
+		return false;
+	if (settings.Flatten(&file) != B_OK)
+		return false;
+
+	return true;
+}
+

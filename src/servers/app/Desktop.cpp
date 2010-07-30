@@ -394,7 +394,7 @@ Desktop::Init()
 	fSettings = new DesktopSettingsPrivate(fServerReadOnlyMemory);
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		Windows(i).SetIndex(i);
+		_Windows(i).SetIndex(i);
 		fWorkspaces[i].RestoreConfiguration(*fSettings->WorkspacesMessage(i));
 	}
 
@@ -1519,7 +1519,7 @@ Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 		if (i == fCurrentWorkspace && window->IsVisible())
 			visibleBefore = window->VisibleRegion();
 
-		Window* backmost = window->Backmost(Windows(i).LastWindow(), i);
+		Window* backmost = window->Backmost(_Windows(i).LastWindow(), i);
 		if (backmost != NULL) {
 			// check if the backmost window is really behind it
 			Window* previous = window->PreviousWindow(i);
@@ -1532,13 +1532,13 @@ Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 
 			if (previous == NULL) {
 				// need to reinsert window before its backmost window
-				Windows(i).RemoveWindow(window);
-				Windows(i).AddWindow(window, backmost->NextWindow(i));
+				_Windows(i).RemoveWindow(window);
+				_Windows(i).AddWindow(window, backmost->NextWindow(i));
 				changed = true;
 			}
 		}
 
-		Window* frontmost = window->Frontmost(Windows(i).FirstWindow(), i);
+		Window* frontmost = window->Frontmost(_Windows(i).FirstWindow(), i);
 		if (frontmost != NULL) {
 			// check if the frontmost window is really in front of it
 			Window* next = window->NextWindow(i);
@@ -1551,8 +1551,8 @@ Desktop::SetWindowFeel(Window* window, window_feel newFeel)
 
 			if (next == NULL) {
 				// need to reinsert window behind its frontmost window
-				Windows(i).RemoveWindow(window);
-				Windows(i).AddWindow(window, frontmost);
+				_Windows(i).RemoveWindow(window);
+				_Windows(i).AddWindow(window, frontmost);
 				changed = true;
 			}
 		}
@@ -1901,20 +1901,25 @@ Desktop::RedrawBackground()
 
 
 void
-Desktop::ReloadDecorator(Window* window)
+Desktop::ReloadAllDecorators()
 {
 	AutoWriteLocker _(fWindowLock);
 
-	BRegion oldBorder;
-	window->GetBorderRegion(&oldBorder);
+	for (int32 i = 0; i < kMaxWorkspaces; i++) {
+		for (Window* window = _Windows(i).LastWindow(); window;
+				window = window->PreviousWindow(i)) {
+			BRegion oldBorder;
+			window->GetBorderRegion(&oldBorder);
 
-	window->ReloadDecorator();
+			window->ReloadDecorator();
 
-	BRegion border;
-	window->GetBorderRegion(&border);
+			BRegion border;
+			window->GetBorderRegion(&border);
 
-	border.Include(&oldBorder);
-	_RebuildAndRedrawAfterWindowChange(window, border);
+			border.Include(&oldBorder);
+			_RebuildAndRedrawAfterWindowChange(window, border);
+		}
+	}
 }
 
 
@@ -2087,14 +2092,14 @@ Desktop::WriteWindowOrder(int32 workspace, BPrivate::LinkSender& sender)
 		return;
 	}
 
-	int32 count = Windows(workspace).Count();
+	int32 count = _Windows(workspace).Count();
 
 	// write list
 
 	sender.StartMessage(B_OK);
 	sender.Attach<int32>(count);
 
-	for (Window *window = Windows(workspace).LastWindow(); window != NULL;
+	for (Window *window = _Windows(workspace).LastWindow(); window != NULL;
 			window = window->PreviousWindow(workspace)) {
 		sender.Attach<int32>(window->ServerWindow()->ServerToken());
 	}
@@ -2137,7 +2142,7 @@ Desktop::WriteApplicationOrder(int32 workspace, BPrivate::LinkSender& sender)
 
 	int32 count = 0;
 
-	for (Window *window = Windows(workspace).LastWindow(); window != NULL;
+	for (Window *window = _Windows(workspace).LastWindow(); window != NULL;
 			window = window->PreviousWindow(workspace)) {
 		team_id team = window->ServerWindow()->ClientTeam();
 		if (count > 1) {
@@ -2446,7 +2451,7 @@ Desktop::CurrentWindows()
 
 
 WindowList&
-Desktop::Windows(int32 index)
+Desktop::_Windows(int32 index)
 {
 	return fWorkspaces[index].Windows();
 }
@@ -2471,18 +2476,18 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 		if (fFront != NULL && fFront->IsNormal()
 			&& floating->HasInSubset(fFront)) {
 			// is now visible
-			if (Windows(previousWorkspace).HasWindow(floating)
+			if (_Windows(previousWorkspace).HasWindow(floating)
 				&& previousWorkspace != nextWorkspace
 				&& !floating->InSubsetWorkspace(previousWorkspace)) {
 				// but no longer on the previous workspace
-				Windows(previousWorkspace).RemoveWindow(floating);
+				_Windows(previousWorkspace).RemoveWindow(floating);
 				floating->SetCurrentWorkspace(-1);
 			}
 
-			if (!Windows(nextWorkspace).HasWindow(floating)) {
+			if (!_Windows(nextWorkspace).HasWindow(floating)) {
 				// but wasn't before
-				Windows(nextWorkspace).AddWindow(floating,
-					floating->Frontmost(Windows(nextWorkspace).FirstWindow(),
+				_Windows(nextWorkspace).AddWindow(floating,
+					floating->Frontmost(_Windows(nextWorkspace).FirstWindow(),
 					nextWorkspace));
 				floating->SetCurrentWorkspace(nextWorkspace);
 				if (mouseEventWindow != fFront)
@@ -2491,11 +2496,11 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 				// TODO: put the floating last in the floating window list to
 				// preserve the on screen window order
 			}
-		} else if (Windows(previousWorkspace).HasWindow(floating)
+		} else if (_Windows(previousWorkspace).HasWindow(floating)
 			&& !floating->InSubsetWorkspace(previousWorkspace)) {
 			// was visible, but is no longer
 
-			Windows(previousWorkspace).RemoveWindow(floating);
+			_Windows(previousWorkspace).RemoveWindow(floating);
 			floating->SetCurrentWorkspace(-1);
 			_HideWindow(floating);
 
@@ -2729,7 +2734,7 @@ Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 		if (workspace_in_workspaces(i, oldWorkspaces)) {
 			// window is on this workspace, is it anymore?
 			if (!workspace_in_workspaces(i, newWorkspaces)) {
-				Windows(i).RemoveWindow(window);
+				_Windows(i).RemoveWindow(window);
 				if (fLastWorkspaceFocus[i] == window)
 					fLastWorkspaceFocus[i] = NULL;
 
@@ -2744,8 +2749,8 @@ Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 		} else {
 			// window was not on this workspace, is it now?
 			if (workspace_in_workspaces(i, newWorkspaces)) {
-				Windows(i).AddWindow(window,
-					window->Frontmost(Windows(i).FirstWindow(), i));
+				_Windows(i).AddWindow(window,
+					window->Frontmost(_Windows(i).FirstWindow(), i));
 
 				if (i == CurrentWorkspace()) {
 					// make the window visible in current workspace
@@ -3174,9 +3179,9 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 				// But only normal windows are following
 				uint32 oldWorkspaces = movedWindow->Workspaces();
 
-				Windows(previousIndex).RemoveWindow(movedWindow);
-				Windows(index).AddWindow(movedWindow,
-					movedWindow->Frontmost(Windows(index).FirstWindow(),
+				_Windows(previousIndex).RemoveWindow(movedWindow);
+				_Windows(index).AddWindow(movedWindow,
+					movedWindow->Frontmost(_Windows(index).FirstWindow(),
 					index));
 
 				// TODO: subset windows will always flicker this way
@@ -3189,9 +3194,9 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 				InvokeSetWindowWorkspaces(movedWindow, movedWindow->Workspaces());
 			} else {
 				// make sure it's frontmost
-				Windows(index).RemoveWindow(movedWindow);
-				Windows(index).AddWindow(movedWindow,
-					movedWindow->Frontmost(Windows(index).FirstWindow(),
+				_Windows(index).RemoveWindow(movedWindow);
+				_Windows(index).AddWindow(movedWindow,
+					movedWindow->Frontmost(_Windows(index).FirstWindow(),
 					index));
 			}
 		}
@@ -3242,7 +3247,7 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 	WindowList windows(kWorkingList);
 	BList previousRegions;
 
-	for (Window* window = Windows(index).FirstWindow();
+	for (Window* window = _Windows(index).FirstWindow();
 			window != NULL; window = window->NextWindow(index)) {
 		BPoint position = window->Anchor(index).position;
 
@@ -3296,7 +3301,7 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
 
-	for (Window* window = Windows(index).FirstWindow(); window != NULL;
+	for (Window* window = _Windows(index).FirstWindow(); window != NULL;
 			window = window->NextWindow(index)) {
 		// send B_WORKSPACE_ACTIVATED message
 		window->WorkspaceActivated(index, true);
@@ -3332,7 +3337,7 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 	// Set new focus, but keep focus to a floating window if still visible
 	if (movedWindow != NULL)
 		SetFocusWindow(movedWindow);
-	else if (!Windows(index).HasWindow(FocusWindow())
+	else if (!_Windows(index).HasWindow(FocusWindow())
 		|| (FocusWindow() != NULL && !FocusWindow()->IsFloating()))
 		SetFocusWindow(fLastWorkspaceFocus[index]);
 

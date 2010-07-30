@@ -50,7 +50,8 @@ class DecorManager : public BLocker {
 		void		_EmptyList();
 		DecorInfo*	_FindDecor(const char *name);
 
-		void		_UpdateWindows(Desktop* desktop);
+		bool		_LoadSettingsFromDisk();
+		bool		_SaveSettingsToDisk();
 
 		BObjectList<DecorInfo> fDecorList;
 		DecorInfo*	fCurrentDecor;

@@ -233,7 +233,7 @@ public:
 			void				Redraw();
 			void				RedrawBackground();
 
-			void				ReloadDecorator(Window* window);
+			void				ReloadAllDecorators();
 
 			BRegion&			BackgroundRegion()
 									{ return fBackgroundRegion; }
@@ -252,9 +252,10 @@ public:
 									BPrivate::LinkSender& sender);
 
 			WindowList&			CurrentWindows();
-			WindowList&			Windows(int32 index);
 
 private:
+			WindowList&			_Windows(int32 index);
+
 			void				_LaunchInputServer();
 			void				_GetLooperName(char* name, size_t size);
 			void				_PrepareQuit();
