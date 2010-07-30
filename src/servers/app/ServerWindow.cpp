@@ -2786,6 +2786,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					// state makes sure that everything the picture
 					// does is relative to the global picture offset.
 					BPoint origin = fCurrentView->DrawingOrigin();
+					fCurrentView->ConvertToScreenForDrawing(&where);
 					fCurrentView->SetDrawingOrigin(where);
 
 					fCurrentView->PushState();
