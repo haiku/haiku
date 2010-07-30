@@ -13,6 +13,9 @@
 #include <new>
 
 
+using std::nothrow;
+
+
 namespace {
 	const char* const kItemWeightField = "BGroupLayout:item:weight";
 	const char* const kVerticalField = "BGroupLayout:vertical";
@@ -204,7 +207,7 @@ BArchivable*
 BGroupLayout::Instantiate(BMessage* from)
 {
 	if (validate_instantiation(from, "BGroupLayout"))
-		return new(std::nothrow) BGroupLayout(from);
+		return new(nothrow) BGroupLayout(from);
 	return NULL;
 }
 
@@ -213,13 +216,7 @@ status_t
 BGroupLayout::ItemArchived(BMessage* into,
 	BLayoutItem* item, int32 index) const
 {
-	BGroupLayout::ItemLayoutData* data =
-		(BGroupLayout::ItemLayoutData*)item->LayoutData();
-
-	if (!data) // TODO: remove this once ItemAdded() returns a bool
-		return B_BAD_VALUE;
-
-	return into->AddFloat(kItemWeightField, data->weight);
+	return into->AddFloat(kItemWeightField, _LayoutDataForItem(item)->weight);
 }
 
 
@@ -237,15 +234,16 @@ BGroupLayout::ItemUnarchived(const BMessage* from,
 }
 
 
-void
-BGroupLayout::ItemAdded(BLayoutItem* item)
+bool
+BGroupLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 {
-	item->SetLayoutData(new(std::nothrow) ItemLayoutData);
+	item->SetLayoutData(new(nothrow) ItemLayoutData);
+	return item->LayoutData() != NULL;
 }
 
 
 void
-BGroupLayout::ItemRemoved(BLayoutItem* item)
+BGroupLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 {
 	if (ItemLayoutData* data = _LayoutDataForItem(item)) {
 		item->SetLayoutData(NULL);

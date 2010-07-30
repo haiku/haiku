@@ -45,8 +45,8 @@ public:
 									BLayoutItem* item, int32 index);
 
 protected:	
-	virtual	void				ItemAdded(BLayoutItem* item);
-	virtual	void				ItemRemoved(BLayoutItem* item);
+	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
+	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
 	virtual	void				PrepareItems(enum orientation orientation);
 	

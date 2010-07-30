@@ -18,6 +18,7 @@
 
 using std::nothrow;
 
+
 namespace {
 	const char* const kLayoutItemField = "BLayout:items";
 }
@@ -93,20 +94,29 @@ BLayout::AddItem(int32 index, BLayoutItem* item)
 
 	// if the item refers to a BView, we make sure it is added to the parent
 	// view
+	bool addedView = false;
 	BView* view = item->View();
-	if (view && view->fParent != fView && !fView->_AddChild(view, NULL))
+	if (view && view->fParent != fView
+		&& !(addedView = fView->_AddChild(view, NULL)))
 		return false;
 
 	// validate the index
 	if (index < 0 || index > fItems.CountItems())
 		index = fItems.CountItems();
 
-	fItems.AddItem(item, index);
-	ItemAdded(item);
-	item->SetLayout(this);
-	InvalidateLayout();
-
-	return true;
+	if (fItems.AddItem(item, index) && ItemAdded(item, index)) {
+		item->SetLayout(this);
+		InvalidateLayout();
+		return true;
+	} else {
+		// this check is necessary so that if an addition somewhere other
+		// than the end of the list fails, we don't remove the wrong item
+		if (fItems.ItemAt(index) == item)
+			fItems.RemoveItem(index);
+		if (addedView)
+			view->_RemoveSelf();
+		return false;
+	}
 }
 
 
@@ -154,7 +164,7 @@ BLayout::RemoveItem(int32 index)
 		view->_RemoveSelf();
 
 	item->SetLayout(NULL);
-	ItemRemoved(item);
+	ItemRemoved(item, index);
 	InvalidateLayout();
 
 	return item;
@@ -233,7 +243,6 @@ BLayout::AllUnarchived(const BMessage* from)
 {
 	BUnarchiver unarchiver(from);
 	status_t err = BArchivable::AllUnarchived(from);
-
 	if (err != B_OK)
 		return err;
 
@@ -241,24 +250,34 @@ BLayout::AllUnarchived(const BMessage* from)
 	unarchiver.ArchiveMessage()->GetInfo(kLayoutItemField, NULL, &itemCount);
 	for (int32 i = 0; i < itemCount && err == B_OK; i++) {
 		BLayoutItem* item;
-		err = unarchiver.FindObject(kLayoutItemField, i, item);
+		err = unarchiver.FindObject(kLayoutItemField,
+			i, BUnarchiver::B_DONT_ASSUME_OWNERSHIP, item);
+		if (err != B_OK)
+			return err;
 
-		if (err == B_OK && item) {
-			if (fItems.AddItem(item)) {
-				ItemAdded(item);
-				item->SetLayout(this);
-				err = ItemUnarchived(from, item, i);
-			} else
-				err = B_NO_MEMORY;
+		if (!fItems.AddItem(item, i) || !ItemAdded(item, i)) {
+			fItems.RemoveItem(i);
+			return B_ERROR;
 		}
+
+		err = ItemUnarchived(from, item, i);
+		if (err != B_OK) {
+			fItems.RemoveItem(i);
+			ItemRemoved(item, i);	
+			return err;
+		}
+
+		item->SetLayout(this);
+		unarchiver.AssumeOwnership(item);
 	}
 
+	InvalidateLayout();
 	return err;
 }
 
 
 status_t
-BLayout::ItemArchived(BMessage* into, BLayoutItem* of, int32 index) const
+BLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
 {
 	return B_OK;
 }
@@ -271,14 +290,15 @@ BLayout::ItemUnarchived(const BMessage* from, BLayoutItem* item, int32 index)
 }
 
 
-void
-BLayout::ItemAdded(BLayoutItem* item)
+bool
+BLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 {
+	return true;
 }
 
 
 void
-BLayout::ItemRemoved(BLayoutItem* item)
+BLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 {
 }
 

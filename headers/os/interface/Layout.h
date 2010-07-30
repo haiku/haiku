@@ -60,10 +60,8 @@ public:
 	virtual	status_t			ItemUnarchived(const BMessage* from,
 									BLayoutItem* item, int32 index);
 protected:
-// TODO: Since memory allocations can fail, we should return a bool and
-// undo the addition, if false.
-	virtual	void				ItemAdded(BLayoutItem* item);
-	virtual	void				ItemRemoved(BLayoutItem* item);
+	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
+	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
 private:
 			friend class BView;

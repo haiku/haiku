@@ -18,6 +18,9 @@
 #include "SimpleLayouter.h"
 
 
+using std::nothrow;
+
+
 // archivng constants
 namespace {
 	const char* const kItemCollapsibleField = "BSplitLayout:item:collapsible";
@@ -741,10 +744,7 @@ BSplitLayout::Instantiate(BMessage* from)
 status_t
 BSplitLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
 {
-	ItemLayoutInfo* info = (ItemLayoutInfo*)item->LayoutData();
-
-	if (!info) // TODO: remove this check when AddItem() returns a bool
-		return B_ERROR;
+	ItemLayoutInfo* info = _ItemLayoutInfo(item);
 
 	status_t err = into->AddFloat(kItemWeightField, info->weight);
 	if (err == B_OK)
@@ -769,30 +769,43 @@ BSplitLayout::ItemUnarchived(const BMessage* from,
 }
 
 
-void
-BSplitLayout::ItemAdded(BLayoutItem* item)
+bool
+BSplitLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 {
+	ItemLayoutInfo* itemInfo = new(nothrow) ItemLayoutInfo();
+	if (!itemInfo)
+		return false;
+
 	if (CountItems() > 1) {
-		SplitterItem* splitterItem = new SplitterItem(this);
-		SetItemWeight(splitterItem, 0);
-		fSplitterItems.AddItem(splitterItem);
+		SplitterItem* splitter = new(nothrow) SplitterItem(this);
+		ItemLayoutInfo* splitterInfo = new(nothrow) ItemLayoutInfo();
+		if (!splitter || !splitterInfo || !fSplitterItems.AddItem(splitter)) {
+			delete itemInfo;
+			delete splitter;
+			delete splitterInfo;
+			return false;
+		}
+		splitter->SetLayoutData(splitterInfo);
+		SetItemWeight(splitter, 0);
 	}
 
+	item->SetLayoutData(itemInfo);
 	SetItemWeight(item, 1);
+	return true;
 }
 
 
 void
-BSplitLayout::ItemRemoved(BLayoutItem* item)
+BSplitLayout::ItemRemoved(BLayoutItem* item, int32 atIndex)
 {
 	if (fSplitterItems.CountItems() > 0) {
 		SplitterItem* splitterItem = (SplitterItem*)fSplitterItems.RemoveItem(
 			fSplitterItems.CountItems() - 1);
-		delete (ItemLayoutInfo*)splitterItem->LayoutData();
+		delete _ItemLayoutInfo(splitterItem);
 		delete splitterItem;
 	}
 
-	delete (ItemLayoutInfo*)item->LayoutData();
+	delete _ItemLayoutInfo(item);
 	item->SetLayoutData(NULL);
 }
 
@@ -1184,13 +1197,7 @@ BSplitLayout::_SetSplitterValue(int32 index, int32 value)
 BSplitLayout::ItemLayoutInfo*
 BSplitLayout::_ItemLayoutInfo(BLayoutItem* item) const
 {
-	ItemLayoutInfo* info = (ItemLayoutInfo*)item->LayoutData();
-	if (!info) {
-		info = new ItemLayoutInfo();
-		item->SetLayoutData(info);
-	}
-
-	return info;
+	return (ItemLayoutInfo*)item->LayoutData();
 }
 
 

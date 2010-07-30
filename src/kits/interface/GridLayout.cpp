@@ -493,8 +493,6 @@ status_t
 BGridLayout::ItemArchived(BMessage* into, BLayoutItem* item, int32 index) const
 {
 	ItemLayoutData* data =	_LayoutDataForItem(item);
-	if (!data) // TODO: remove this check once AddItem() returns a bool
-		return B_ERROR;
 
 	status_t err = into->AddInt32(kItemDimensionsField, data->dimensions.x);
 	if (err == B_OK)
@@ -513,12 +511,8 @@ BGridLayout::ItemUnarchived(const BMessage* from,
 	BLayoutItem* item, int32 index)
 {
 	ItemLayoutData* data = _LayoutDataForItem(item);
-	if (!data) { // TODO: remove this check once AddItem() returns a bool
-		data = new ItemLayoutData();
-		item->SetLayoutData(data);
-	}
-
 	Dimensions& dimensions = data->dimensions;
+
 	index *= 4;
 		// each item stores 4 int32s into kItemDimensionsField
 	status_t err = from->FindInt32(kItemDimensionsField, index, &dimensions.x);
@@ -552,21 +546,18 @@ BGridLayout::ItemUnarchived(const BMessage* from,
 }
 
 
-void
-BGridLayout::ItemAdded(BLayoutItem* item)
+bool
+BGridLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 {
-	item->SetLayoutData(new ItemLayoutData);
+	item->SetLayoutData(new(nothrow) ItemLayoutData);
+	return item->LayoutData() != NULL;
 }
 
 
 void
-BGridLayout::ItemRemoved(BLayoutItem* item)
+BGridLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 {
 	ItemLayoutData* data = _LayoutDataForItem(item);
-// TODO: Once ItemAdded() returns a bool, we can remove this check.
-	if (!data)
-		return;
-
 	Dimensions itemDimensions = data->dimensions;
 	item->SetLayoutData(NULL);
 	delete data;

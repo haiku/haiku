@@ -234,15 +234,16 @@ BCardLayout::Instantiate(BMessage* from)
 }
 	
 
-void
-BCardLayout::ItemAdded(BLayoutItem* item)
+bool
+BCardLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 {
 	item->SetVisible(false);
+	return true;
 }
 
 
 void
-BCardLayout::ItemRemoved(BLayoutItem* item)
+BCardLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 {
 	if (fVisibleItem == item) {
 		BLayoutItem* newVisibleItem = NULL;
