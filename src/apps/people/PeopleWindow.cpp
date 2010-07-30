@@ -10,46 +10,53 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <MenuBar.h>
-#include <MenuItem.h>
-#include <FilePanel.h>
-#include <NodeInfo.h>
-#include <Alert.h>
-#include <Path.h>
-#include <FindDirectory.h>
-#include <Font.h>
-#include <Clipboard.h>
-#include <TextView.h>
-#include <NodeMonitor.h>
-#include <String.h>
-#include <Volume.h>
-
-#include "PeopleApp.h"
-#include "PeopleView.h"
 #include "PeopleWindow.h"
 
 #include <stdio.h>
 #include <string.h>
 
+#include <Alert.h>
+#include <Clipboard.h>
+#include <ControlLook.h>
+#include <FilePanel.h>
+#include <FindDirectory.h>
+#include <Font.h>
+#include <LayoutBuilder.h>
+#include <MenuBar.h>
+#include <MenuItem.h>
+#include <NodeInfo.h>
+#include <NodeMonitor.h>
+#include <Path.h>
+#include <String.h>
+#include <TextView.h>
+#include <Volume.h>
+
+#include "PeopleApp.h"
+#include "PeopleView.h"
+
 
 TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
-	: BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
+	:
+	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fPanel(NULL)
 {
 	BMenu* menu;
 	BMenuItem* item;
 
-	BRect rect(0, 0, 32767, 15);
-	BMenuBar* menuBar = new BMenuBar(rect, "");
+	BMenuBar* menuBar = new BMenuBar("");
 	menu = new BMenu("File");
-	menu->AddItem(item = new BMenuItem("New person" B_UTF8_ELLIPSIS, new BMessage(M_NEW), 'N'));
+	menu->AddItem(item = new BMenuItem("New person" B_UTF8_ELLIPSIS,
+		new BMessage(M_NEW), 'N'));
 	item->SetTarget(NULL, be_app);
 	menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W'));
 	menu->AddSeparatorItem();
 	menu->AddItem(fSave = new BMenuItem("Save", new BMessage(M_SAVE), 'S'));
 	fSave->SetEnabled(FALSE);
-	menu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS, new BMessage(M_SAVE_AS)));
-	menu->AddItem(fRevert = new BMenuItem("Revert", new BMessage(M_REVERT), 'R'));
+	menu->AddItem(new BMenuItem("Save as"B_UTF8_ELLIPSIS,
+		new BMessage(M_SAVE_AS)));
+	menu->AddItem(fRevert = new BMenuItem("Revert",
+		new BMessage(M_REVERT), 'R'));
 	fRevert->SetEnabled(FALSE);
 	menu->AddSeparatorItem();
 	item = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q');
@@ -68,10 +75,10 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	fCopy->SetTarget(NULL, this);
 	menu->AddItem(fPaste = new BMenuItem("Paste", new BMessage(B_PASTE), 'V'));
 	fPaste->SetTarget(NULL, this);
-	menu->AddItem(item = new BMenuItem("Select all", new BMessage(M_SELECT), 'A'));
+	menu->AddItem(item = new BMenuItem("Select all",
+		new BMessage(M_SELECT), 'A'));
 	item->SetTarget(NULL, this);
 	menuBar->AddItem(menu);
-	AddChild(menuBar);
 
 	if (ref) {
 		fRef = new entry_ref(*ref);
@@ -80,12 +87,12 @@ TPeopleWindow::TPeopleWindow(BRect frame, const char *title, entry_ref *ref)
 	} else
 		fRef = NULL;
 
-	rect = Frame();
-	rect.OffsetTo(0, menuBar->Bounds().bottom + 1);
-	fView = new TPeopleView(rect, "PeopleView", fRef);
+	fView = new TPeopleView("PeopleView", fRef);
 
-	AddChild(fView);
-	ResizeTo(fView->Frame().right, fView->Frame().bottom);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, 0, 0, 0)
+		.Add(menuBar)
+		.Add(fView);
 }
 
 

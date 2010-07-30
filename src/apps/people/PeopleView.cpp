@@ -10,26 +10,31 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
+#include "PeopleView.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <fs_attr.h>
-#include <Window.h>
 #include <Box.h>
+#include <ControlLook.h>
+#include <GridLayout.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <Query.h>
 #include <VolumeRoster.h>
+#include <Window.h>
 
-#include "PeopleView.h"
 #include "TTextControl.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
-
-TPeopleView::TPeopleView(BRect rect, const char *title, entry_ref *ref)
-		   :BView(rect, title, B_FOLLOW_NONE, B_WILL_DRAW)
+TPeopleView::TPeopleView(const char* name, entry_ref *ref)
+	:
+	BGridView()
 {
+	SetName(name);
 	if (ref)
 		fFile = new BFile(ref, O_RDWR);
 	else
@@ -46,68 +51,60 @@ TPeopleView::~TPeopleView(void)
 void
 TPeopleView::AttachedToWindow(void)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BGridLayout* layout = GridLayout();
 
-	BRect bounds = Bounds();
-
-	BFont font = *be_plain_font;
-	int32 offset = int32(font.StringWidth(gFields[F_HPHONE].name) + 10.5);
-	font_height fontHeight;
-	font.GetHeight(&fontHeight);
-	int32 textHeight = int32(fontHeight.ascent + fontHeight.descent
-		+ fontHeight.leading + 12.5);
-	BRect rect;
 	int32 row = 0;
-
 	for (int32 i = 0; gFields[i].attribute; i++, row++) {
 		const char *name = gFields[i].name;
 
-		rect.Set(NAME_H, NAME_V + row * textHeight,
-			bounds.right - NAME_H, NAME_V + (row + 1) * textHeight);
-		int32 labelOffset = offset;
-
 		if (i == F_NAME)
 			name = "Name";
-		else if (i == F_GROUP) {
-			name = "";
-			rect.left += offset;
-			labelOffset = 0;
-		} else if (i == F_STATE) {
-			rect.right = rect.left + STATE_WIDTH;
-			row--;
-		} else if (i == F_ZIP) {
-			rect.left += STATE_WIDTH + 10;
-			labelOffset = int32(font.StringWidth(gFields[i].name) + 10.5);
-		}
 
 		char *text = NULL;
 		attr_info info;
 		if (fFile && fFile->GetAttrInfo(gFields[i].attribute, &info) == B_OK) {
 			text = (char *)calloc(info.size, 1);
-			fFile->ReadAttr(gFields[i].attribute, B_STRING_TYPE, 0, text, info.size);
+			fFile->ReadAttr(gFields[i].attribute, B_STRING_TYPE,
+				0, text, info.size);
 		}
 
-		fField[i] = new TTextControl(rect, name, labelOffset, text, M_DIRTY, M_NAME);
-		fField[i]->SetTarget(this);
-		AddChild(fField[i]);
-
+		fField[i] = new TTextControl(name, text);
 		free(text);
-	}
 
-	rect.right = NAME_H + offset;
-	rect.left = rect.right - font.StringWidth(gFields[F_GROUP].name) - 32;
-	rect.top -= 1;
+		int32 labelColumn = 0;
+		int32 textViewColumn = 1;
+		int32 textViewWidth = 3;
+		if (i == F_STATE)
+			textViewWidth = 1;
+		else if (i == F_ZIP) {
+			row--;
+			labelColumn = 2;
+			textViewColumn = 3;
+			textViewWidth = 1;
+		}
+		
+		if (i != F_GROUP) {
+			layout->AddItem(fField[i]->CreateLabelLayoutItem(),
+				labelColumn, row, 1, 1);
+			layout->AddItem(fField[i]->CreateTextViewLayoutItem(),
+				textViewColumn, row, textViewWidth, 1);
+		} else {
+			fField[i]->SetLabel("");
+			layout->AddView(fField[i], textViewColumn, row, textViewWidth, 1);
+		}
+	}
 
 	fGroups = new BPopUpMenu(gFields[F_GROUP].name);
 	fGroups->SetRadioMode(false);
-	BMenuField *field = new BMenuField(rect, "", "", fGroups);
-	field->SetDivider(0.0);
-	field->SetFont(&font);
+	BMenuField *field = new BMenuField("", "", fGroups);
 	field->SetEnabled(true);
-	AddChild(field);
+	layout->AddView(field, 0, --row);
 
+	float spacing = be_control_look->DefaultItemSpacing();
+	layout->SetSpacing(spacing, spacing);
+		// TODO: remove this after #5614 is fixed
+	layout->SetInsets(spacing, spacing, spacing, spacing);
 	fField[F_NAME]->MakeFocus();
-	ResizeTo(bounds.right, rect.bottom - 5 + NAME_V);
 }
 
 
@@ -126,7 +123,7 @@ TPeopleView::MessageReceived(BMessage* msg)
 
 		case M_SELECT:
 			for (int32 loop = 0; loop < F_END; loop++) {
-				BTextView* text = (BTextView *)fField[loop]->ChildAt(0);
+				BTextView* text = fField[loop]->TextView();
 				if (text->IsFocus()) {
 					text->Select(0, text->TextLength());
 					break;
@@ -279,7 +276,7 @@ TPeopleView::SetField(int32 index, char *data, bool update)
 		fField[index]->SetText(data);
 		fField[index]->Update();
 	} else {
-		BTextView* text = (BTextView *)fField[index]->ChildAt(0);
+		BTextView* text = fField[index]->TextView();
 
 		int32 start, end;
 		text->GetSelection(&start, &end);
@@ -303,7 +300,7 @@ bool
 TPeopleView::TextSelected(void)
 {
 	for (int32 loop = 0; loop < F_END; loop++) {
-		BTextView* text = (BTextView*)fField[loop]->ChildAt(0);
+		BTextView* text = fField[loop]->TextView();
 
 		int32 start, end;
 		text->GetSelection(&start, &end);

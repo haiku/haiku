@@ -17,38 +17,25 @@
 #include "TTextControl.h"
 
 
-TTextControl::TTextControl(BRect r, const char *label, int32 offset,
-	const char *text, int32 modificationMessage, int32 msg)
-	: BTextControl(r, "", "", text, new BMessage(msg))
+TTextControl::TTextControl(const char *label, const char *text)
+	:
+	BTextControl(NULL, text, NULL)
 {
-	SetModificationMessage(new BMessage(modificationMessage));
 
-	if (label[0]) {
-		char newLabel[B_FILE_NAME_LENGTH];
-		int32 length = strlen(label);
-		memcpy(newLabel, label, length);
-		newLabel[length] = ':';
-		newLabel[length + 1] = '\0';
-
-		SetLabel(newLabel);
-	}
-	SetDivider(offset);
+	if (label && label[0])
+		SetLabel(BString(label).Append(":"));
 	SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-
-	if (text == NULL)
-		text = "";
-	fOriginal = strdup(text);
+	fOriginal = text;
 }
 
 
-TTextControl::~TTextControl(void)
+TTextControl::~TTextControl()
 {
-	free(fOriginal);
 }
 
 
 void
-TTextControl::AttachedToWindow(void)
+TTextControl::AttachedToWindow()
 {
 	BTextControl::AttachedToWindow();
 
@@ -58,9 +45,9 @@ TTextControl::AttachedToWindow(void)
 
 
 bool
-TTextControl::Changed(void)
+TTextControl::Changed()
 {
-	return strcmp(fOriginal, Text());
+	return fOriginal != Text();
 }
 
 
@@ -75,6 +62,5 @@ TTextControl::Revert(void)
 void
 TTextControl::Update(void)
 {
-	fOriginal = (char *)realloc(fOriginal, strlen(Text()) + 1);
-	strcpy(fOriginal, Text());
+	fOriginal = Text();
 }

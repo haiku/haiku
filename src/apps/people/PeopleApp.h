@@ -31,11 +31,7 @@ extern people_field gFields[];
 
 enum messages{
 	M_NEW = 128, M_SAVE, M_SAVE_AS, M_REVERT,
-	M_UNDO, M_SELECT, M_GROUP_MENU, M_DIRTY,
-	M_NAME, M_NICKNAME, M_COMPANY, M_ADDRESS,
-	M_CITY, M_STATE, M_ZIP, M_COUNTRY, M_HPHONE,
-	M_WPHONE, M_FAX, M_EMAIL, M_URL, M_GROUP,
-	M_WINDOW_QUITS
+	M_UNDO, M_SELECT, M_GROUP_MENU, M_WINDOW_QUITS
 };
 
 enum fields {
@@ -50,24 +46,24 @@ class TPeopleWindow;
 
 class TPeopleApp : public BApplication {
 	public:
-		TPeopleApp(void);
-		virtual ~TPeopleApp(void);
+								TPeopleApp();
+		virtual 				~TPeopleApp();
 
-		virtual void	AboutRequested(void);
-		virtual void	ArgvReceived(int32, char**);
-		virtual void	MessageReceived(BMessage*);
-		virtual void	RefsReceived(BMessage*);
-		virtual void	ReadyToRun(void);
-		TPeopleWindow	*FindWindow(entry_ref);
-		TPeopleWindow	*NewWindow(entry_ref* = NULL);
+		virtual	void			AboutRequested();
+		virtual void			ArgvReceived(int32, char**);
+		virtual void			MessageReceived(BMessage*);
+		virtual void			RefsReceived(BMessage*);
+		virtual void			ReadyToRun();
+				TPeopleWindow*	FindWindow(entry_ref);
+				TPeopleWindow*	NewWindow(entry_ref* = NULL);
 
-		BFile			*fPrefs;
+				BFile*			fPrefs;
 
 	private:
-				void	SavePreferences(BMessage* message);
+				void			SavePreferences(BMessage* message);
 
-		uint32			fWindowCount;
-		BRect			fPosition;
+				uint32			fWindowCount;
+				BRect			fPosition;
 };
 
 #endif /* PEOPLEAPP_H */

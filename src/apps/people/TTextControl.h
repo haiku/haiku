@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------
 //	
-//	TextControl.h
+//	TTextControl.h
 //
 //	Written by: Robert Polic
 //	
@@ -13,22 +13,22 @@
 #ifndef TEXTCONTROL_H
 #define TEXTCONTROL_H
 
+#include <String.h>
 #include <TextControl.h>
 
 class TTextControl : public BTextControl {
 	public:
-		TTextControl(BRect rect, const char* label, int32 length, const char* text,
-			int32 modificationMessage, int32 invokationMessage);
-		~TTextControl();
+							TTextControl(const char* label, const char* text);
+		virtual				~TTextControl();
 
-		virtual void AttachedToWindow(void);
+		virtual	void AttachedToWindow();
 
-		bool Changed(void);
-		void Revert(void);
-		void Update(void);
+				bool		Changed();
+				void		Revert();
+				void		Update();
 
 	private:
-		char	*fOriginal;
+				BString		fOriginal;
 };
 
 #endif /* TEXTCONTROL_H */

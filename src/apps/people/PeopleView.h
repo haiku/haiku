@@ -15,17 +15,16 @@
 
 #include "PeopleApp.h"
 
-#define NAME_H				 10
-#define NAME_V				 10
-#define STATE_WIDTH			175
+#include <GridView.h>
+
 
 class BPopUpMenu;
 class TTextControl;
 
 
-class TPeopleView : public BView {
+class TPeopleView : public BGridView {
 	public:
-		TPeopleView(BRect rect, const char* title, entry_ref* ref);
+		TPeopleView(const char* name, entry_ref* ref);
 		~TPeopleView(void);
 
 		virtual	void	AttachedToWindow(void);
