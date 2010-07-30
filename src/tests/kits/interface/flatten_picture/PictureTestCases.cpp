@@ -8,6 +8,8 @@
 
 #include "PictureTestCases.h"
 
+#include <stdio.h>
+
 static const rgb_color kBlack = {0, 0, 0};
 static const rgb_color kWhite = {255, 255, 255};
 static const rgb_color kRed = {255, 0, 0};
@@ -292,6 +294,23 @@ static void testAppendToPicture(BView *view, BRect frame)
 	delete picture;
 }
 
+static void testDrawScaledPicture(BView* view, BRect frame)
+{
+	view->BeginPicture(new BPicture());
+	view->FillRect(BRect(0, 0, 15, 15));
+	BPicture* picture = view->EndPicture();
+
+	// first unscaled at left, top
+	view->DrawPicture(picture, BPoint(2, 2));
+	
+	// draw scaled at middle top
+	view->SetScale(0.5);
+	// the drawing offset must be scaled too!
+	view->DrawPicture(picture, BPoint(frame.Width(), 2));
+	
+	delete picture;
+}
+
 static void testLineArray(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -373,8 +392,8 @@ static void testDrawBitmapAtRect(BView *view, BRect frame) {
 static void testDrawLargeBitmap(BView *view, BRect frame) {
 	BRect bounds(frame);
 	bounds.OffsetTo(0, 0);
-	bounds.left = 1024;
-	bounds.bottom = 767;
+	bounds.right *= 4;
+	bounds.bottom *= 4;
 	BBitmap bitmap(bounds, B_RGBA32);
 	fillBitmap(bitmap);
 	frame.InsetBy(2, 2);
@@ -724,6 +743,19 @@ static void testPushPopState(BView *view, BRect frame)
 	view->FillRect(frame, B_SOLID_HIGH);
 }
 
+static void testFontRotation(BView* view, BRect frame)
+{
+	BFont font;
+	view->GetFont(&font);
+	
+	font.SetRotation(90);
+	view->SetFont(&font, B_FONT_ROTATION);
+	view->DrawString("This is a test!", BPoint(frame.Width() / 2, frame.bottom - 3));
+	
+	view->GetFont(&font);
+	if (font.Rotation() != 90.0)
+		fprintf(stderr, "Error: Rotation is %f but should be 90.0\n", font.Rotation());
+}
 
 // TODO
 // - blending mode
@@ -762,6 +794,7 @@ TestCase gTestCases[] = {
 	{ "Test Record And Play Picture", testRecordAndPlayPicture },
 	{ "Test Record And Play Picture With Offset", testRecordAndPlayPictureWithOffset },
 	{ "Test AppendToPicture", testAppendToPicture },
+	{ "Test Draw Scaled Picture", testDrawScaledPicture },
 	{ "Test LineArray", testLineArray },
 	{ "Test InvertRect", testInvertRect },
 	{ "Test DrawBitmap", testDrawBitmap },
@@ -790,6 +823,7 @@ TestCase gTestCases[] = {
 	{ "Test SetFontFamilyAndStyle", testSetFontFamilyAndStyle },
 	{ "Test SetDrawingMode", testSetDrawingMode },
 	{ "Test PushPopState", testPushPopState },
+	{ "Test FontRotation", testFontRotation },
 	{ NULL, NULL }
 };
 
