@@ -306,7 +306,7 @@ static void testDrawScaledPicture(BView* view, BRect frame)
 	// draw scaled at middle top
 	view->SetScale(0.5);
 	// the drawing offset must be scaled too!
-	view->DrawPicture(picture, BPoint(frame.Width(), 2));
+	view->DrawPicture(picture, BPoint(frame.Width(), 4));
 	
 	delete picture;
 }
