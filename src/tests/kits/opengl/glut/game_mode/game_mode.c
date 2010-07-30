@@ -1,10 +1,25 @@
 
 #include <stdio.h>
+#include <string.h>
+
 #include <GL/glut.h>
+
+
+void display(void);
+void idle(void);
+void reshape(int w, int h);
+void keyboard(unsigned char key, int x, int y);
+
+void draw_cube(void);
+void game_mode(char *mode);
+void dump_game_mode(void);
+void init(void);
+void clean_exit(void);
 
 float spin = 0;
 
-static void
+
+void
 draw_cube(void)
 {
   glLoadIdentity();
@@ -52,7 +67,7 @@ draw_cube(void)
 }
 
 
-static void
+void
 display(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -63,10 +78,10 @@ display(void)
 }
 
 
-static void
+void
 idle(void)
 {
-	spin += 2.0;
+	spin += 1.0;
 	if (spin > 360.0)
 		spin = 0.0;
 
@@ -74,7 +89,7 @@ idle(void)
 }
 
 
-static void
+void
 reshape(int w, int h)
 {
 	glViewport (0, 0, (GLsizei) w, (GLsizei) h);
@@ -97,52 +112,122 @@ reshape(int w, int h)
 }
 
 
-static void
+void
+keyboard(unsigned char key, int x, int y)
+{
+	switch(key) {
+		case 27:
+			exit(0);
+			break;
+
+		case 'g':
+		case 'G':
+			dump_game_mode();
+			break;
+
+		case 'e':
+		case 'E': {
+			char mode[255];
+
+			printf("Game mode string? ");
+			gets(mode);
+			if (!strlen(mode))
+				break;
+
+			game_mode(mode);
+			if (glutGameModeGet(GLUT_GAME_MODE_DISPLAY_CHANGED))
+				init();
+			break;
+		}
+	}
+}
+
+
+void
 init(void)
 {
 	glutIdleFunc(idle);
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
+	glutKeyboardFunc(keyboard);
 
 	glClearColor(0, 0, 0, 0);
+	glEnable(GL_DEPTH_TEST);
 }
 
+
+void
+clean_exit(void)
+{
+	printf("Exit.\n");
+
+	if (glutGameModeGet(GLUT_GAME_MODE_ACTIVE)) {
+ 		printf("glutLeaveGameMode()\n");
+		glutLeaveGameMode();
+	}
+}
+
+
+void
+game_mode(char *mode)
+{
+	printf("glutGameModeString(\"%s\"): ", mode);
+
+	glutGameModeString(mode);
+
+	if (!glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)) {
+		printf("*not* possible!\n");
+		return;
+	}
+
+	printf("possible.\nglutEnterGameMode()\n");
+	glutEnterGameMode();
+
+	printf("glutGameModeGet(GLUT_GAME_MODE_DISPLAY_CHANGED) = %d\n",
+			glutGameModeGet(GLUT_GAME_MODE_DISPLAY_CHANGED));
+}
+
+
+void
+dump_game_mode()
+{
+	printf("glutGameModeGet():\n");
+
+#	define DUMP(pname)	\
+	printf("\t" #pname " = %d\n", glutGameModeGet(pname));
+
+	DUMP(GLUT_GAME_MODE_ACTIVE);
+	DUMP(GLUT_GAME_MODE_POSSIBLE);
+	DUMP(GLUT_GAME_MODE_WIDTH);
+	DUMP(GLUT_GAME_MODE_HEIGHT);
+	DUMP(GLUT_GAME_MODE_PIXEL_DEPTH);
+	DUMP(GLUT_GAME_MODE_REFRESH_RATE);
+	DUMP(GLUT_GAME_MODE_DISPLAY_CHANGED);
+
+#	undef DUMP
+
+	printf("\n");
+}
 
 int
 main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
 
-  	if (argc > 1) {
-  		printf("glutGameModeString(\"%s\"): ", argv[1]);
-
-  		glutGameModeString(argv[1]);
-
-  		if (!glutGameModeGet(GLUT_GAME_MODE_POSSIBLE))
-  			printf("*not* possible: fallback to windowed mode.\n");
-  		else {
- 	 		printf("possible!\nglutEnterGameMode()\n");
-  			glutEnterGameMode();
-
-  			printf("glutGameModeGet(GLUT_GAME_MODE_DISPLAY_CHANGED) = %d\n",
-  				glutGameModeGet(GLUT_GAME_MODE_DISPLAY_CHANGED));
-  		}
-	}
+  	if (argc > 1)
+  		game_mode(argv[1]);
 
 	if (!glutGameModeGet(GLUT_GAME_MODE_ACTIVE)) {
+		printf("Using windowed mode.\n");
+
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 		glutCreateWindow(argv[0]);
 	}
 
 	init();
 
-
+	atexit(clean_exit);
 	glutMainLoop();
-
-	if (glutGameModeGet(GLUT_GAME_MODE_ACTIVE)) {
- 		printf("glutLeaveGameMode()\n");
-		glutLeaveGameMode();
-	}
 
 	return 0;
 }
