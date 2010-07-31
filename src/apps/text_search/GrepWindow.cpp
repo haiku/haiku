@@ -291,7 +291,7 @@ void GrepWindow::MessageReceived(BMessage *message)
 			_OnTrimSelection();
 			break;
 
-		case MSG_COPY_TEXT:
+		case B_COPY:
 			_OnCopyText();
 			break;
 
@@ -428,7 +428,7 @@ GrepWindow::_CreateMenus()
 		B_TRANSLATE("New window"), new BMessage(MSG_NEW_WINDOW), 'N');
 
 	fOpen = new BMenuItem(
-		B_TRANSLATE("Set which files to search"), new BMessage(MSG_OPEN_PANEL), 'F');
+		B_TRANSLATE("Set target" B_UTF8_ELLIPSIS), new BMessage(MSG_OPEN_PANEL), 'F');
 
 	fClose = new BMenuItem(
 		B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED), 'W');
@@ -455,7 +455,7 @@ GrepWindow::_CreateMenus()
 		B_TRANSLATE("Show files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
 
 	fCopyText = new BMenuItem(
-		B_TRANSLATE("Copy text to clipboard"), new BMessage(MSG_COPY_TEXT), 'B');
+		B_TRANSLATE("Copy text to clipboard"), new BMessage(B_COPY), 'C');
 
 	fRecurseLinks = new BMenuItem(
 		B_TRANSLATE("Follow symbolic links"), new BMessage(MSG_RECURSE_LINKS));
@@ -464,7 +464,7 @@ GrepWindow::_CreateMenus()
 		B_TRANSLATE("Look in sub-folders"), new BMessage(MSG_RECURSE_DIRS));
 
 	fSkipDotDirs = new BMenuItem(
-		B_TRANSLATE("Skip sub-folders starting with a dot"), new BMessage(MSG_SKIP_DOT_DIRS));
+		B_TRANSLATE("Skip folders starting with a dot"), new BMessage(MSG_SKIP_DOT_DIRS));
 
 	fCaseSensitive = new BMenuItem(
 		B_TRANSLATE("Case-sensitive"), new BMessage(MSG_CASE_SENSITIVE));
