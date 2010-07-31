@@ -66,6 +66,11 @@ public:
 		return object;
 	}
 
+	inline C *operator->() const
+	{
+		return fObject;
+	}
+
 protected:
 	C			*fObject;
 	DeleteFunc	fDelete;
