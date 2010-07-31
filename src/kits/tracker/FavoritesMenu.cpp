@@ -165,6 +165,9 @@ FavoritesMenu::AddNextItem()
 			BMenuItem *item = BNavMenu::NewModelItem(&model,
 				model.IsDirectory() ? fOpenFolderMessage : fOpenFileMessage,
 				fTarget);
+				
+			if (item == NULL)
+				return true;
 
 			item->SetLabel(ref.name);		// this is the name of the link in the Go dir
 
