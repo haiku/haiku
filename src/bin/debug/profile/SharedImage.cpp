@@ -142,7 +142,6 @@ SharedImage::_Init(debug_symbol_iterator* iterator)
 			if (symbol == NULL || !symbols.AddItem(symbol)) {
 				delete symbol;
 				fprintf(stderr, "%s: Out of memory\n", kCommandName);
-				debug_delete_symbol_iterator(iterator);
 				return B_NO_MEMORY;
 			}
 		}
