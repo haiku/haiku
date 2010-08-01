@@ -64,6 +64,8 @@ const struct {
 
 	{B_BOOL_TYPE, "bool"},
 
+	{B_VECTOR_ICON_TYPE, "icon"},
+
 	{B_RAW_TYPE, "raw"},
 };
 const uint32 kNumSupportedTypes = sizeof(kSupportedTypes)
