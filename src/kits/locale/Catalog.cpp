@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de
  * Copyright 2003-2004, Oliver Tappe, zooey@hirschkaefer.de
  * Distributed under the terms of the MIT License.
@@ -10,9 +10,12 @@
 
 #include <Application.h>
 #include <Locale.h>
-#include <LocaleRoster.h>
+#include <MutableLocaleRoster.h>
 #include <Node.h>
 #include <Roster.h>
+
+
+using BPrivate::mutable_locale_roster;
 
 
 //#pragma mark - BCatalog
@@ -26,13 +29,14 @@ BCatalog::BCatalog()
 BCatalog::BCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 {
-	fCatalog = be_locale_roster->LoadCatalog(signature, language, fingerprint);
+	fCatalog
+		= mutable_locale_roster->LoadCatalog(signature, language, fingerprint);
 }
 
 
 BCatalog::~BCatalog()
 {
-	be_locale_roster->UnloadCatalog(fCatalog);
+	mutable_locale_roster->UnloadCatalog(fCatalog);
 }
 
 
@@ -101,8 +105,7 @@ BCatalog::SetCatalog(const char* signature, uint32 fingerprint)
 	// properly maintained.
 	// No other method should touch fCatalog directly, either (constructor for
 	// example)
-	fCatalog
-		= be_locale_roster->LoadCatalog(signature, NULL, fingerprint);
+	fCatalog = mutable_locale_roster->LoadCatalog(signature, NULL, fingerprint);
 
 	return B_OK;
 }
@@ -255,12 +258,19 @@ BCatalogAddOn::CountItems() const
 }
 
 
+void
+BCatalogAddOn::SetNext(BCatalogAddOn *next)
+{
+	fNext = next;
+}
+
+
 //#pragma mark - EditableCatalog
 namespace BPrivate {
 EditableCatalog::EditableCatalog(const char *type, const char *signature,
 	const char *language)
 {
-	fCatalog = be_locale_roster->CreateCatalog(type, signature, language);
+	fCatalog = mutable_locale_roster->CreateCatalog(type, signature, language);
 }
 
 

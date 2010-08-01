@@ -19,7 +19,6 @@ class LocaleSettings {
 		status_t	Load();
 		status_t	Save();
 
-		bool		Saved();
 		bool 		operator==(const LocaleSettings& other);
 
 		void		UpdateFrom(BMessage* message);
@@ -44,7 +43,6 @@ class LocaleSettings {
 		status_t	_Open(BFile* file, int32 mode);
 
 		BMessage	fMessage;
-		bool		fSaved;
 };
 
 

@@ -28,7 +28,8 @@ TimeZoneListItem::TimeZoneListItem(const char* text, BCountry* country,
 	BTimeZone* timeZone)
 	:
 	BStringItem(text),
-	fIcon(NULL)
+	fIcon(NULL),
+	fTimeZone(timeZone)
 {
 	if (country != NULL) {
 		fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
@@ -37,8 +38,6 @@ TimeZoneListItem::TimeZoneListItem(const char* text, BCountry* country,
 			fIcon = NULL;
 		}
 	}
-
-	fTimeZone = timeZone;
 }
 
 
@@ -92,6 +91,20 @@ TimeZoneListItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->DrawBitmap(fIcon, iconFrame);
 		owner->SetDrawingMode(B_OP_COPY);
 	}
+}
+
+
+bool
+TimeZoneListItem::HasTimeZone() const
+{
+	return fTimeZone != NULL;
+}
+
+
+const BTimeZone&
+TimeZoneListItem::TimeZone() const
+{
+	return *fTimeZone;
 }
 
 

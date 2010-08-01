@@ -6,23 +6,29 @@
  *		Oliver Tappe <zooey@hirschkaefer.de>
  */
 
-#include <TimeFormat.h>
+#include <DateFormat.h>
 
+
+// default constructor
+BDateFormat::BDateFormat()
+	: BDateTimeFormat()
+{
+}
 
 // copy constructor
-BTimeFormat::BTimeFormat(const BTimeFormat &other)
+BDateFormat::BDateFormat(const BDateFormat &other)
 	: BDateTimeFormat(other)
 {
 }
 
 // destructor
-BTimeFormat::~BTimeFormat()
+BDateFormat::~BDateFormat()
 {
 }
 
 // Format
 status_t
-BTimeFormat::Format(bigtime_t value, BString* buffer) const
+BDateFormat::Format(bigtime_t value, BString* buffer) const
 {
 	return B_ERROR;
 }

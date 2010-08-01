@@ -25,7 +25,7 @@
 #include <Roster.h>
 
 #include <DefaultCatalog.h>
-#include <LocaleRoster.h>
+#include <MutableLocaleRoster.h>
 
 #include <cstdio>
 
@@ -596,9 +596,9 @@ default_catalog_get_available_languages(BMessage* availableLanguages,
 	BPath catalogPath(&appDir, catalogName.String());
 	BEntry file(catalogPath.Path());
 	BDirectory dir(&file);
-	
+
 	char fileName[B_FILE_NAME_LENGTH];
-	while(dir.GetNextEntry(&file) == B_OK) {			
+	while(dir.GetNextEntry(&file) == B_OK) {
 		file.GetName(fileName);
 		BString langName(fileName);
 		langName.Replace(kCatExtension,"",1);
@@ -616,16 +616,16 @@ default_catalog_get_available_languages(BMessage* availableLanguages,
 	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
 		BPath path;
 		if (find_directory(which[i], &path) == B_OK) {
-			catalogName = BString("locale/") 
+			catalogName = BString("locale/")
 				<< kCatFolder
 				<< "/" << sigPattern;
-			
+
 			BPath catalogPath(path.Path(), catalogName.String());
 			BEntry file(catalogPath.Path());
 			BDirectory dir(&file);
-			
+
 			char fileName[B_FILE_NAME_LENGTH];
-			while(dir.GetNextEntry(&file) == B_OK) {			
+			while(dir.GetNextEntry(&file) == B_OK) {
 				file.GetName(fileName);
 				BString langName(fileName);
 				langName.Replace(kCatExtension,"",1);
@@ -633,6 +633,6 @@ default_catalog_get_available_languages(BMessage* availableLanguages,
 			}
 		}
 	}
-	
+
 	return B_OK;
 }

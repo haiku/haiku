@@ -37,7 +37,7 @@ const uint32 kMenuMessage = 'FRMT';
 
 class FormatView : public BView {
 public:
-								FormatView(BCountry* country);
+								FormatView(const BCountry& country);
 								~FormatView();
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -46,7 +46,7 @@ public:
 	virtual	void				SetDefaults();
 	virtual	bool				IsDefaultable() const;
 	virtual	void				Revert();
-	virtual	void				SetCountry(BCountry* country);
+	virtual	void				SetCountry(const BCountry& country);
 	virtual	void				RecordRevertSettings();
 	virtual	bool				IsRevertable() const;
 

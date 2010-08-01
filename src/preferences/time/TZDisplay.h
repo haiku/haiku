@@ -33,12 +33,12 @@ public:
 			void				SetText(const char* text);
 
 			const char*			Time() const;
-			void				SetTime(int32 hour, int32 minute);
+			void				SetTime(const char* time);
 
 private:
-			BString 		fLabel;
-			BString 		fText;
-			BString 		fTime;
+			BString 			fLabel;
+			BString 			fText;
+			BString 			fTime;
 };
 
 

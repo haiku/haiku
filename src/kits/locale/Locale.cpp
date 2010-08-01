@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -38,5 +38,5 @@ BLocale::GetString(uint32 id)
 
 		return "";
 	}
-	return fLanguage->GetString(id);
+	return fLanguage.GetString(id);
 }

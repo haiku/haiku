@@ -88,7 +88,7 @@ void
 TTZDisplay::SetLabel(const char* label)
 {
 	fLabel.SetTo(label);
-	Draw(Bounds());
+	Invalidate();
 }
 
 
@@ -103,7 +103,7 @@ void
 TTZDisplay::SetText(const char* text)
 {
 	fText.SetTo(text);
-	Draw(Bounds());
+	Invalidate();
 }
 
 
@@ -115,24 +115,9 @@ TTZDisplay::Time() const
 
 
 void
-TTZDisplay::SetTime(int32 hour, int32 minute)
+TTZDisplay::SetTime(const char* time)
 {
-	int32 ahour = hour;
-	if (hour > 12)
-		ahour = hour -12;
-
-	if (ahour == 0)
-		ahour = 12;
-
-	const char* ap = "AM";
-	if (hour > 11)
-		ap = "PM";
-
-	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%ld:%02ld %s", ahour, minute, ap);
-
-	fTime.SetTo(buffer);
-
+	fTime.SetTo(time);
 	Invalidate();
 }
 

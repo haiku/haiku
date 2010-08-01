@@ -27,6 +27,8 @@ public:
 			void				DrawItem(BView* owner, BRect frame,
 									bool complete = false);
 
+			bool				HasTimeZone() const;
+			const BTimeZone&	TimeZone() const;
 			const BString&		Code() const;
 			const BString&		Name() const;
 			int					OffsetFromGMT() const;

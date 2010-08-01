@@ -20,9 +20,11 @@ public:
 
 			status_t			InitCheck() const;
 
-private:
-			void				_Init(const char* zoneCode);
+			status_t			SetTo(const char* zoneCode);
 
+	static  const char*			kNameOfGmtZone;
+
+private:
 			BString				fCode;
 			BString				fName;
 			int					fOffsetFromGMT;

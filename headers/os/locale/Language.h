@@ -27,7 +27,12 @@ enum script_direction {
 
 class BLanguage {
 public:
+								BLanguage();
+								BLanguage(const char* language);
+								BLanguage(const BLanguage& other);
 								~BLanguage();
+
+			BLanguage&			operator=(const BLanguage& source);
 
 			status_t			GetName(BString& name) const;
 			status_t			GetTranslatedName(BString& name) const;
@@ -43,19 +48,15 @@ public:
 
 			uint8				Direction() const;
 
+			status_t			SetTo(const char* language);
+
 			// see definitions below
 			const char*			GetString(uint32 id) const;
 
 private:
-			friend class BLocaleRoster;
-
-								BLanguage(const char *language);
-			void				Default();
-
-private:
-			char*				fStrings[B_NUM_LANGUAGE_STRINGS];
+//			BString				fStrings[B_NUM_LANGUAGE_STRINGS];
 			uint8				fDirection;
-			icu_44::Locale*	fICULocale;
+			icu_44::Locale*		fICULocale;
 };
 
 

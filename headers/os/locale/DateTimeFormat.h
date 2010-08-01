@@ -2,18 +2,20 @@
  * Copyright 2010, Haiku, Inc.
  * Distributed under the terms of the MIT Licence.
  */
-#ifndef _B_TIME_FORMAT_H_
-#define _B_TIME_FORMAT_H_
+#ifndef _B_DATE_TIME_FORMAT_H_
+#define _B_DATE_TIME_FORMAT_H_
 
-#include <DateTimeFormat.h>
+#include <Format.h>
+#include <FormatParameters.h>
 
 
 class BString;
 
-class BTimeFormat : public BDateTimeFormat {
+class BDateTimeFormat : public BFormat {
 public:
-								BTimeFormat(const BTimeFormat &other);
-	virtual						~BTimeFormat();
+								BDateTimeFormat();
+								BDateTimeFormat(const BDateTimeFormat &other);
+	virtual						~BDateTimeFormat();
 
 								// formatting
 
@@ -26,4 +28,4 @@ public:
 };
 
 
-#endif	// _B_TIME_FORMAT_H_
+#endif	// _B_DATE_TIME_FORMAT_H_

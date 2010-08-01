@@ -91,7 +91,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
 
-	be_locale_roster->GetDefaultCountry(&fHere);
+	be_locale_roster->GetDefaultCountry(&fCountry);
 }
 
 
@@ -105,7 +105,7 @@ TTimeView::TTimeView(BMessage* data)
 	data->FindBool("interval", &fInterval);
 	fShowingDate = false;
 
-	be_locale_roster->GetDefaultCountry(&fHere);
+	be_locale_roster->GetDefaultCountry(&fCountry);
 }
 #endif
 
@@ -313,7 +313,7 @@ TTimeView::GetCurrentTime()
 	fMinute = time.tm_min;
 	fHour = time.tm_hour;
 
-	fHere->FormatTime(fTimeStr, 64, fTime, fShowSeconds);
+	fCountry.FormatTime(fTimeStr, 64, fTime, fShowSeconds);
 }
 
 
@@ -322,7 +322,7 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[64];
 
-	fHere->FormatDate(tmp, 64, fTime, fFullDate && CanShowFullDate());
+	fCountry.FormatDate(tmp, 64, fTime, fFullDate && CanShowFullDate());
 
 	//	remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	//  or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -465,6 +465,7 @@ TTimeView::AllowFullDate(bool allow)
 void
 TTimeView::Update()
 {
+	be_locale_roster->GetDefaultCountry(&fCountry);
 	GetCurrentTime();
 	GetCurrentDate();
 

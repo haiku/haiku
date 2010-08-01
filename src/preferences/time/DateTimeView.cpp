@@ -15,7 +15,6 @@
 #include "TimeMessages.h"
 #include "TimeWindow.h"
 
-
 #include <CalendarView.h>
 #include <CheckBox.h>
 #include <DateTime.h>
@@ -28,20 +27,16 @@
 #include <String.h>
 #include <StringView.h>
 #include <Window.h>
+
+#include <stdio.h>
 #include <time.h>
+
+#include <syscalls.h>
 
 
 using BPrivate::BCalendarView;
 using BPrivate::BDateTime;
 using BPrivate::B_LOCAL_TIME;
-
-
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	include <syscalls.h>
-#else
-extern "C" void _kset_tzfilename_(const char* name, size_t length, bool isGMT);
-#	define _kern_set_tzfilename _kset_tzfilename_
-#endif
 
 
 DateTimeView::DateTimeView(BRect frame)
@@ -266,6 +261,7 @@ DateTimeView::_InitView()
 	AddChild(fGmtTime);
 	fGmtTime->ResizeToPreferred();
 
+printf("fUseGmtTime=%d\n", fUseGmtTime);
 	if (fUseGmtTime)
 		fGmtTime->SetValue(B_CONTROL_ON);
 	else
@@ -323,20 +319,6 @@ DateTimeView::_UpdateGmtSettings()
 {
 	_WriteRTCSettings();
 
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append("timezone");
-		BEntry entry(path.Path(), true);
-		if (entry.Exists()) {
-			entry.GetPath(&path);
-
-			// take the existing timezone and set it's gmt use
-			_kern_set_tzfilename(path.Path(), B_PATH_NAME_LENGTH, fUseGmtTime);
-			return;
-		}
-	}
-
-	// Only update GMT
 	_kern_set_tzfilename(NULL, 0, fUseGmtTime);
 }
 

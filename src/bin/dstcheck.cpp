@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2004, Jérôme Duval, jerome.duval@free.fr.
  * Distributed under the terms of the MIT License.
  */
@@ -29,7 +29,7 @@ const uint32 TIMEDALERT_UPDATE = 'taup';
 class TimedAlert : public BAlert {
 	public:
 		TimedAlert(const char *title, const char *text, const char *button1,
-			const char *button2 = NULL, const char *button3 = NULL, 
+			const char *button2 = NULL, const char *button3 = NULL,
 			button_width width = B_WIDTH_AS_USUAL, alert_type type = B_INFO_ALERT);
 		void MessageReceived(BMessage *);
 		void Show();
@@ -59,12 +59,12 @@ TimedAlert::Show()
 }
 
 
-void 
+void
 TimedAlert::MessageReceived(BMessage *msg)
 {
 	if (msg->what == TIMEDALERT_UPDATE) {
 		BString string;
-		GetLabel(string);	
+		GetLabel(string);
 		TextView()->SetText(string.String());
 	} else
 		BAlert::MessageReceived(msg);
@@ -83,12 +83,12 @@ TimedAlert::GetLabel(BString &string)
 	char timestring[15];
 	time(&t);
 	localtime_r(&t, &tm);
-	
-	BCountry* here;
+
+	BCountry here;
 	be_locale_roster->GetDefaultCountry(&here);
-	
-	here->FormatTime(timestring, 15, t, false);
-	
+
+	here.FormatTime(timestring, 15, t, false);
+
 	string += " ";
 	string += timestring;
 
@@ -106,9 +106,9 @@ main(int argc, char **argv)
 	struct tm tm;
 	tzset();
 	time(&t);
-	localtime_r(&t, &tm);	
+	localtime_r(&t, &tm);
 
-	char path[B_PATH_NAME_LENGTH];	
+	char path[B_PATH_NAME_LENGTH];
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, path, B_PATH_NAME_LENGTH) != B_OK) {
 		fprintf(stderr, "%s: can't find settings directory\n", argv[0]);
 		exit(1);
@@ -148,7 +148,7 @@ main(int argc, char **argv)
 
 		if (index == 2) {
 			index = (new BAlert("dstcheck",
-				B_TRANSLATE("Would you like to set the clock?"), 
+				B_TRANSLATE("Would you like to set the clock?"),
 				B_TRANSLATE("No"), B_TRANSLATE("Yes")))->Go();
 
 			if (index == 1)

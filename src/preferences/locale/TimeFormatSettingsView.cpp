@@ -17,7 +17,7 @@
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
-#include <LocaleRoster.h>
+#include <MutableLocaleRoster.h>
 #include <Message.h>
 #include <Menu.h>
 #include <MenuField.h>
@@ -33,6 +33,10 @@
 #include <Window.h>
 
 #include <iostream>
+
+#include <stdio.h>
+
+using BPrivate::mutable_locale_roster;
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -144,10 +148,10 @@ IsSpecialDateChar(char charToTest)
 // #pragma mark -
 
 
-FormatView::FormatView(BCountry* country)
+FormatView::FormatView(const BCountry& country)
 	:
 	BView("WindowsSettingsView", B_FRAME_EVENTS),
-	fCountry(*country)
+	fCountry(country)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
@@ -185,8 +189,8 @@ FormatView::FormatView(BCountry* country)
 	f12HrRadioButton = new BRadioButton("", B_TRANSLATE("12 hour"),
 		new BMessage(kClockFormatChange));
 
-	fCountry.TimeFormat(fOriginalTimeFormat, false);
-	fCountry.TimeFormat(fOriginalLongTimeFormat, true);
+	fCountry.GetTimeFormat(fOriginalTimeFormat, false);
+	fCountry.GetTimeFormat(fOriginalLongTimeFormat, true);
 	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
 		f12HrRadioButton->SetValue(B_CONTROL_ON);
 		fCountryIs24Hr = false;
@@ -356,7 +360,7 @@ FormatView::FormatView(BCountry* country)
 
 FormatView::~FormatView()
 {
-	be_locale_roster->SetDefaultCountry(&fCountry);
+	mutable_locale_roster->SetDefaultCountry(fCountry);
 }
 
 
@@ -510,9 +514,9 @@ FormatView::SetDefaults()
 	settings.SetClockTo24Hr(false);
 	*/
 
-	BCountry* defaultCountry;
+	BCountry defaultCountry;
 	be_locale_roster->GetDefaultCountry(&defaultCountry);
-	fCountry = *defaultCountry;
+	fCountry = defaultCountry;
 		// We work on a copy of the default country and set the changes when
 		// closing the preflet
 	_UpdateExamples();
@@ -551,14 +555,12 @@ FormatView::Revert()
 
 
 void
-FormatView::SetCountry(BCountry* country)
+FormatView::SetCountry(const BCountry& country)
 {
-	fCountry = *country;
+	fCountry = country;
 
-	fOriginalTimeFormat.Truncate(0);
-	fCountry.TimeFormat(fOriginalTimeFormat, false);
-	fOriginalLongTimeFormat.Truncate(0);
-	fCountry.TimeFormat(fOriginalLongTimeFormat, true);
+	fCountry.GetTimeFormat(fOriginalTimeFormat, false);
+	fCountry.GetTimeFormat(fOriginalLongTimeFormat, true);
 
 	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
 		f12HrRadioButton->SetValue(B_CONTROL_ON);
@@ -666,10 +668,12 @@ FormatView::_ParseDateFormat()
 {
 	// TODO parse the short date too
 	BString dateFormatString;
-	fCountry.DateFormat(dateFormatString, true);
+	fCountry.GetDateFormat(dateFormatString, true);
 	const char* dateFormat = dateFormatString.String();
 
-	// Travel trough the string and parse it
+printf("FV::_ParseDateFormat: df='%s'\n", dateFormat);
+
+	// Travel through the string and parse it
 	const char* parsePointer = dateFormat;
 	const char* fieldBegin = dateFormat;
 
@@ -717,8 +721,7 @@ FormatView::_ParseDateFormat()
 	}
 
 	// Short date is a bit more tricky, we want to extract the separator
-	dateFormatString.Truncate(0);
-	fCountry.DateFormat(dateFormatString, false);
+	fCountry.GetDateFormat(dateFormatString, false);
 	dateFormat = dateFormatString.String();
 
 	// Travel trough the string and parse it

@@ -33,24 +33,28 @@ public:
 
 private:
 			void				_UpdateDateTime(BMessage* message);
-			void				_SetTimeZone();
-			void				_SetTimeZone(const char* zone);
-			void				_SetPreview();
-			void				_SetCurrent(const char* text);
+
+			void				_SetSystemTimeZone();
+
+			void				_UpdatePreview();
+			void				_UpdateCurrent();
+			BString				_FormatTime(TimeZoneListItem* zoneItem);
+
 			void				_InitView();
 			void				_BuildRegionMenu();
+
 			void				_Revert();
 
 private:
-			BOutlineListView*	fCityList;
+			BOutlineListView*	fZoneList;
 			BButton*			fSetZone;
 			TTZDisplay*			fCurrent;
 			TTZDisplay*			fPreview;
 
-			int32				fHour;
-			int32				fMinute;
-			TimeZoneListItem*	fCurrentZone;
-			TimeZoneListItem*	fOldZone;
+			int32				fLastUpdateMinute;
+
+			TimeZoneListItem*	fCurrentZoneItem;
+			TimeZoneListItem*	fOldZoneItem;
 			bool				fInitialized;
 };
 

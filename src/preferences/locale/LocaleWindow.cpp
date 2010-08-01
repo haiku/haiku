@@ -47,10 +47,24 @@ static const uint32 kMsgPreferredLanguagesChanged = 'lang';
 static int
 compare_typed_list_items(const BListItem* _a, const BListItem* _b)
 {
-	// TODO: sort them using collators.
+	static BCollator collator;
+
 	LanguageListItem* a = (LanguageListItem*)_a;
 	LanguageListItem* b = (LanguageListItem*)_b;
-	return strcasecmp(a->Text(), b->Text());
+
+	return collator.Compare(a->Text(), b->Text());
+}
+
+
+static int
+compare_void_list_items(const void* _a, const void* _b)
+{
+	static BCollator collator;
+
+	LanguageListItem* a = *(LanguageListItem**)_a;
+	LanguageListItem* b = *(LanguageListItem**)_b;
+
+	return collator.Compare(a->Text(), b->Text());
 }
 
 
@@ -62,7 +76,7 @@ LocaleWindow::LocaleWindow()
 	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE
 		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BCountry* defaultCountry;
+	BCountry defaultCountry;
 	be_locale_roster->GetDefaultCountry(&defaultCountry);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
@@ -173,20 +187,25 @@ LocaleWindow::LocaleWindow()
 	be_locale_roster->GetInstalledLanguages(&countryList);
 	BString countryCode;
 
+	LanguageListItem* currentItem = NULL;
 	for (int i = 0; countryList.FindString("langs", i, &countryCode) == B_OK;
 			i++) {
 		BCountry country(countryCode);
 		BString countryName;
 
-		country.LocaleName(countryName);
+		country.GetLocaleName(countryName);
 
 		LanguageListItem* item
 			= new LanguageListItem(countryName, countryCode,
 				NULL);
 		listView->AddItem(item);
-		if (!strcmp(countryCode, defaultCountry->Code()))
-			listView->Select(listView->CountItems() - 1);
+		if (!strcmp(countryCode, defaultCountry.Code()))
+			currentItem = item;
 	}
+
+	listView->SortItems(compare_void_list_items);
+	if (currentItem != NULL)
+		listView->Select(listView->IndexOf(currentItem));
 
 	// TODO: find a real solution intead of this hack
 	listView->SetExplicitMinSize(
@@ -341,7 +360,7 @@ LocaleWindow::MessageReceived(BMessage* message)
 			be_app_messenger.SendMessage(&newMessage);
 			SettingsChanged();
 
-			BCountry* country = new BCountry(item->ID());
+			BCountry country(item->ID());
 			fFormatView->SetCountry(country);
 			break;
 		}

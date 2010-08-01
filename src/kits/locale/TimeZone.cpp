@@ -14,9 +14,12 @@
 #include <ICUWrapper.h>
 
 
+const char* BTimeZone::kNameOfGmtZone = "GMT";
+
+
 BTimeZone::BTimeZone(const char* zoneCode)
 {
-	_Init(zoneCode);
+	SetTo(zoneCode);
 }
 
 
@@ -53,8 +56,8 @@ BTimeZone::InitCheck() const
 }
 
 
-void
-BTimeZone::_Init(const char* zoneCode)
+status_t
+BTimeZone::SetTo(const char* zoneCode)
 {
 	TimeZone* icuTimeZone;
 	if (zoneCode == NULL || zoneCode[0] == '\0')
@@ -86,4 +89,6 @@ BTimeZone::_Init(const char* zoneCode)
 			// we want seconds, not ms (which ICU gives us)
 		fInitStatus = B_OK;
 	}
+
+	return fInitStatus;
 }

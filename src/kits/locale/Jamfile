@@ -18,8 +18,17 @@ local sources =
 	LibraryInit.cpp
 	Locale.cpp
 	LocaleRoster.cpp
+	MutableLocaleRoster.cpp
 	TimeZone.cpp
 
+	# in progress
+	DateFormat.cpp
+	DateTimeFormat.cpp
+	DurationFormat.cpp
+	TimeFormat.cpp
+	TimeUnitFormat.cpp
+
+	# old, needs investigation
 	Currency.cpp
 	FloatFormat.cpp
 	FloatFormatImpl.cpp
@@ -36,7 +45,6 @@ local sources =
 	NumberFormatImpl.cpp
 	NumberFormatParameters.cpp
 	PropertyFile.cpp
-	TimeFormat.cpp
 	UnicodeChar.cpp
 	;
 

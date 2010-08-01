@@ -1,10 +1,13 @@
+/*
+ * Copyright 2003-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT Licence.
+ */
 #ifndef _COUNTRY_H_
 #define _COUNTRY_H_
 
 
 #include <List.h>
 #include <LocaleStrings.h>
-#include <Locker.h>
 #include <String.h>
 #include <SupportDefs.h>
 
@@ -36,101 +39,86 @@ typedef enum {
 
 
 class BCountry {
-	public:
-		BCountry(const char* languageCode, const char* countryCode);
-		BCountry(const char* languageAndCountryCode = "en_US");
-		BCountry(const BCountry& other);
-		BCountry& operator=(const BCountry& other);
-		virtual 		~BCountry();
+public:
+								BCountry(const char* languageCode,
+									const char* countryCode);
+								BCountry(const char* languageAndCountryCode
+									= "en_US");
+								BCountry(const BCountry& other);
+								BCountry& operator=(const BCountry& other);
+								~BCountry();
 
-		bool 			Name(BString& name) const;
-		bool			LocaleName(BString& name) const;
-		const char*		Code() const;
-		status_t		GetIcon(BBitmap* result);
+			bool				GetName(BString& name) const;
+			bool				GetLocaleName(BString& name) const;
+			const char*			Code() const;
+			status_t			GetIcon(BBitmap* result) const;
 
-		const char*		GetString(uint32 id) const;
+			const char*			GetLocalizedString(uint32 id) const;
 
-		// Date
+								// Date
 
-		status_t	FormatDate(char* string, size_t maxSize, time_t time,
-			bool longFormat);
-		status_t	FormatDate(BString* string, time_t time,
-			bool longFormat);
-		status_t	FormatDate(BString* string, int*& fieldPositions,
-			int& fieldCount, time_t time, bool longFormat);
-		status_t		DateFields(BDateElement*& fields, int& fieldCount,
-			bool longFormat);
-		status_t		DateFormat(BString&, bool longFormat);
-		status_t		SetDateFormat(const char* formatString,
-						bool longFormat = true);
+			status_t			FormatDate(char* string, size_t maxSize,
+									time_t time, bool longFormat);
+			status_t			FormatDate(BString* string, time_t time,
+									bool longFormat);
+			status_t			FormatDate(BString* string,
+									int*& fieldPositions, int& fieldCount,
+									time_t time, bool longFormat);
+			status_t			GetDateFields(BDateElement*& fields,
+									int& fieldCount, bool longFormat) const;
+			status_t			GetDateFormat(BString&, bool longFormat) const;
+			status_t			SetDateFormat(const char* formatString,
+									bool longFormat = true);
 
-		int			StartOfWeek();
+			int					StartOfWeek() const;
 
-		// Time
+								// Time
 
-		status_t	FormatTime(char* string, size_t maxSize, time_t time,
-			bool longFormat);
-		status_t	FormatTime(BString* string, time_t time,
-			bool longFormat);
-		status_t		FormatTime(BString* string, int*& fieldPositions,
-			int& fieldCount, time_t time, bool longFormat);
-		status_t		TimeFields(BDateElement*& fields, int& fieldCount,
-			bool longFormat);
+			status_t			FormatTime(char* string, size_t maxSize,
+									time_t time, bool longFormat);
+			status_t			FormatTime(BString* string, time_t time,
+									bool longFormat);
+			status_t			FormatTime(BString* string,
+									int*& fieldPositions, int& fieldCount,
+									time_t time, bool longFormat);
+			status_t			GetTimeFields(BDateElement*& fields,
+									int& fieldCount, bool longFormat) const;
 
-		status_t		SetTimeFormat(const char* formatString,
-						bool longFormat = true);
-		status_t		TimeFormat(BString&, bool longFormat);
+			status_t			SetTimeFormat(const char* formatString,
+									bool longFormat = true);
+			status_t			GetTimeFormat(BString& out,
+									bool longFormat) const;
 
-		// numbers
+								// numbers
 
-		virtual void FormatNumber(char* string, size_t maxSize, double value);
-		virtual status_t FormatNumber(BString* string, double value);
-		virtual void FormatNumber(char* string, size_t maxSize, int32 value);
-		virtual void FormatNumber(BString* string, int32 value);
+			status_t			FormatNumber(char* string, size_t maxSize,
+									double value);
+			status_t			FormatNumber(BString* string, double value);
+			status_t			FormatNumber(char* string, size_t maxSize,
+									int32 value);
+			status_t			FormatNumber(BString* string, int32 value);
 
-		bool		DecimalPoint(BString&) const;
-		bool		ThousandsSeparator(BString&) const;
-		bool		Grouping(BString&) const;
+								// measurements
 
-		bool		PositiveSign(BString&) const;
-		bool		NegativeSign(BString&) const;
+			int8				Measurement() const;
 
-		// measurements
+								// monetary
 
-		virtual int8	Measurement() const;
+			ssize_t				FormatMonetary(char* string, size_t maxSize,
+									double value);
+			ssize_t				FormatMonetary(BString* string, double value);
 
-		// monetary
+								// timezones
 
-		virtual ssize_t	FormatMonetary(char* string, size_t maxSize,
-			double value);
-		virtual ssize_t	FormatMonetary(BString* string, double value);
+			int					GetTimeZones(BList& timezones) const;
 
-		bool		CurrencySymbol(BString&) const;
-		bool		InternationalCurrencySymbol(BString&) const;
-		bool		MonDecimalPoint(BString&) const;
-		bool		MonThousandsSeparator(BString&) const;
-		bool		MonGrouping(BString&) const;
-		virtual int32	MonFracDigits() const;
-
-		// timezones
-		int GetTimeZones(BList& timezones);
-
-	private:
-		icu_44::DateFormat* _LockDateFormatter(bool longFormat);
-		icu_44::DateFormat* _LockTimeFormatter(bool longFormat);
-		void				_UnlockDateFormatter(bool longFormat);
-		void				_UnlockTimeFormatter(bool longFormat);
-
-		icu_44::DateFormat* fICULongDateFormatter;
-		icu_44::DateFormat* fICUShortDateFormatter;
-		icu_44::DateFormat* fICULongTimeFormatter;
-		icu_44::DateFormat* fICUShortTimeFormatter;
-		icu_44::Locale* fICULocale;
-
-		BLocker fLongDateLock;
-		BLocker fShortDateLock;
-		BLocker fLongTimeLock;
-		BLocker fShortTimeLock;
+private:
+			icu_44::Locale*		fICULocale;
+			BString				fLongDateFormat;
+			BString				fShortDateFormat;
+			BString				fLongTimeFormat;
+			BString				fShortTimeFormat;
 };
+
 
 #endif	/* _COUNTRY_H_ */

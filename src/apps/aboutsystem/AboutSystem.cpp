@@ -22,6 +22,7 @@
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <DurationFormat.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Font.h>
@@ -36,7 +37,6 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
-#include <TimeFormat.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 #include <View.h>
@@ -1724,12 +1724,14 @@ MemUsageToString(char string[], size_t size, system_info* info)
 static const char*
 UptimeToString(char string[], size_t size)
 {
-	BTimeFormat formatter;
+	BDurationFormat formatter;
 	BString str;
 
-	formatter.Format(system_time() / 1000000, &str);
+	bigtime_t uptime = system_time();
+	bigtime_t now = (bigtime_t)time(NULL) * 1000000;
+	formatter.Format(now - uptime, now, &str);
 	str.CopyInto(string, 0, size);
-	string[str.Length()] = '\0';
+	string[std::min((size_t)str.Length(), size)] = '\0';
 
 	return string;
 }

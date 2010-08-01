@@ -5,14 +5,16 @@
 */
 
 
+#include <ctype.h>
+#include <stdlib.h>
+
+#include <new>
+#include <typeinfo>
+
 #include <Collator.h>
 #include <UnicodeChar.h>
 #include <String.h>
 #include <Message.h>
-
-#include <stdlib.h>
-#include <typeinfo>
-#include <ctype.h>
 
 #include <unicode/coll.h>
 #include <unicode/tblcoll.h>
@@ -20,8 +22,7 @@
 
 BCollator::BCollator()
 	:
-	fFallbackICUCollator(NULL),
-	fStrength(B_COLLATE_PRIMARY),
+	fDefaultStrength(B_COLLATE_PRIMARY),
 	fIgnorePunctuation(true)
 {
 	// TODO: the collator construction will have to change; the default
@@ -33,11 +34,9 @@ BCollator::BCollator()
 }
 
 
-BCollator::BCollator(const char *locale, int8 strength,
-	bool ignorePunctuation)
+BCollator::BCollator(const char* locale, int8 strength, bool ignorePunctuation)
 	:
-	fFallbackICUCollator(NULL),
-	fStrength(strength),
+	fDefaultStrength(strength),
 	fIgnorePunctuation(ignorePunctuation)
 {
 	UErrorCode error = U_ZERO_ERROR;
@@ -45,57 +44,80 @@ BCollator::BCollator(const char *locale, int8 strength,
 }
 
 
-BCollator::BCollator(BMessage *archive)
-	: BArchivable(archive),
+BCollator::BCollator(BMessage* archive)
+	:
+	BArchivable(archive),
 	fICUCollator(NULL),
-	fFallbackICUCollator(NULL),
+	fDefaultStrength(B_COLLATE_PRIMARY),
 	fIgnorePunctuation(true)
 {
 	int32 data;
 	if (archive->FindInt32("loc:strength", &data) == B_OK)
-		fStrength = (uint8)data;
+		fDefaultStrength = (uint8)data;
 	else
-		fStrength = B_COLLATE_PRIMARY;
+		fDefaultStrength = B_COLLATE_PRIMARY;
 
-	if (archive->FindBool("loc:punctuation", &fIgnorePunctuation) != B_OK)
-		fIgnorePunctuation = true;
+	archive->FindBool("loc:punctuation", &fIgnorePunctuation);
 
 	UErrorCode error = U_ZERO_ERROR;
-	fFallbackICUCollator = static_cast<RuleBasedCollator*>
-		(Collator::createInstance(error));
+	RuleBasedCollator* fallbackICUCollator
+		= static_cast<RuleBasedCollator*>(Collator::createInstance(error));
 
 	ssize_t size;
 	const void* buffer = NULL;
 	if (archive->FindData("loc:collator", B_RAW_TYPE, &buffer, &size) == B_OK) {
 		fICUCollator = new RuleBasedCollator((const uint8_t*)buffer, (int)size,
-			fFallbackICUCollator, error);
+			fallbackICUCollator, error);
 		if (fICUCollator == NULL) {
-			fICUCollator = fFallbackICUCollator;
+			fICUCollator = fallbackICUCollator;
 				// Unarchiving failed, so we revert to the fallback collator
+				// TODO: when can this happen, can it be avoided?
 		}
 	}
+}
+
+
+BCollator::BCollator(const BCollator& other)
+	:
+	fICUCollator(NULL)
+{
+	*this = other;
 }
 
 
 BCollator::~BCollator()
 {
 	delete fICUCollator;
-	fICUCollator = NULL;
-	delete fFallbackICUCollator;
+}
+
+
+BCollator& BCollator::operator=(const BCollator& source)
+{
+	if (&source != this) {
+		delete fICUCollator;
+
+		fICUCollator = source.fICUCollator != NULL
+			? source.fICUCollator->clone()
+			: NULL;
+		fDefaultStrength = source.fDefaultStrength;
+		fIgnorePunctuation = source.fIgnorePunctuation;
+	}
+
+	return *this;
 }
 
 
 void
 BCollator::SetDefaultStrength(int8 strength)
 {
-	fStrength = strength;
+	fDefaultStrength = strength;
 }
 
 
 int8
 BCollator::DefaultStrength() const
 {
-	return fStrength;
+	return fDefaultStrength;
 }
 
 
@@ -114,31 +136,11 @@ BCollator::IgnorePunctuation() const
 
 
 status_t
-BCollator::GetSortKey(const char *string, BString *key, int8 strength)
+BCollator::GetSortKey(const char* string, BString* key, int8 strength) const
 {
+	_SetStrength(strength);
+
 	// TODO : handle fIgnorePunctuation
-	if (strength == B_COLLATE_DEFAULT)
-		strength = fStrength;
-	Collator::ECollationStrength icuStrength;
-	switch (strength) {
-		case B_COLLATE_PRIMARY:
-			icuStrength = Collator::PRIMARY;
-			break;
-		case B_COLLATE_SECONDARY:
-			icuStrength = Collator::SECONDARY;
-			break;
-		case B_COLLATE_TERTIARY:
-		default:
-			icuStrength = Collator::TERTIARY;
-			break;
-		case B_COLLATE_QUATERNARY:
-			icuStrength = Collator::QUATERNARY;
-			break;
-		case B_COLLATE_IDENTICAL:
-			icuStrength = Collator::IDENTICAL;
-			break;
-	}
-	fICUCollator->setStrength(icuStrength);
 
 	int length = strlen(string);
 
@@ -154,6 +156,7 @@ BCollator::GetSortKey(const char *string, BString *key, int8 strength)
 		buffer = (uint8_t*)realloc(buffer, requiredSize);
 		if (buffer == NULL)
 			return B_NO_MEMORY;
+
 		error = U_ZERO_ERROR;
 		fICUCollator->getSortKey(UnicodeString(string, length, NULL, error),
 			buffer,	requiredSize);
@@ -164,50 +167,32 @@ BCollator::GetSortKey(const char *string, BString *key, int8 strength)
 
 	if (error == U_ZERO_ERROR)
 		return B_OK;
+
 	return B_ERROR;
 }
 
 
 int
-BCollator::Compare(const char *a, const char *b, int32 length, int8 strength)
+BCollator::Compare(const char* s1, const char* s2, int8 strength) const
 {
+	_SetStrength(strength);
+
 	// TODO : handle fIgnorePunctuation
-	if (strength == B_COLLATE_DEFAULT)
-		strength = fStrength;
-	Collator::ECollationStrength icuStrength;
-	switch (strength) {
-		case B_COLLATE_PRIMARY:
-			icuStrength = Collator::PRIMARY;
-			break;
-		case B_COLLATE_SECONDARY:
-			icuStrength = Collator::SECONDARY;
-			break;
-		case B_COLLATE_TERTIARY:
-		default:
-			icuStrength = Collator::TERTIARY;
-			break;
-		case B_COLLATE_QUATERNARY:
-			icuStrength = Collator::QUATERNARY;
-			break;
-		case B_COLLATE_IDENTICAL:
-			icuStrength = Collator::IDENTICAL;
-			break;
-	}
-	fICUCollator->setStrength(icuStrength);
+
 	UErrorCode error = U_ZERO_ERROR;
-	return fICUCollator->compare(a, b, error);
+	return fICUCollator->compare(s1, s2, error);
 }
 
 
 status_t
-BCollator::Archive(BMessage *archive, bool deep) const
+BCollator::Archive(BMessage* archive, bool deep) const
 {
 	status_t status = BArchivable::Archive(archive, deep);
 	if (status < B_OK)
 		return status;
 
 	if (status == B_OK)
-		status = archive->AddInt32("loc:strength", fStrength);
+		status = archive->AddInt32("loc:strength", fDefaultStrength);
 	if (status == B_OK)
 		status = archive->AddBool("loc:punctuation", fIgnorePunctuation);
 
@@ -231,13 +216,42 @@ BCollator::Archive(BMessage *archive, bool deep) const
 }
 
 
-BArchivable *
-BCollator::Instantiate(BMessage *archive)
+BArchivable*
+BCollator::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BCollator"))
-		return new BCollator(archive);
+		return new(std::nothrow) BCollator(archive);
 
 	return NULL;
 }
 
 
+status_t
+BCollator::_SetStrength(int8 strength) const
+{
+	if (strength == B_COLLATE_DEFAULT)
+		strength = fDefaultStrength;
+
+	Collator::ECollationStrength icuStrength;
+	switch (strength) {
+		case B_COLLATE_PRIMARY:
+			icuStrength = Collator::PRIMARY;
+			break;
+		case B_COLLATE_SECONDARY:
+			icuStrength = Collator::SECONDARY;
+			break;
+		case B_COLLATE_TERTIARY:
+		default:
+			icuStrength = Collator::TERTIARY;
+			break;
+		case B_COLLATE_QUATERNARY:
+			icuStrength = Collator::QUATERNARY;
+			break;
+		case B_COLLATE_IDENTICAL:
+			icuStrength = Collator::IDENTICAL;
+			break;
+	}
+	fICUCollator->setStrength(icuStrength);
+
+	return B_OK;
+}

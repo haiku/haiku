@@ -6,6 +6,11 @@
 
 #include <Language.h>
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
 #include <iostream>
 
 #include <Catalog.h>
@@ -15,11 +20,6 @@
 #include <String.h>
 #include <FindDirectory.h>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-
 #include <ICUWrapper.h>
 
 #include <unicode/locid.h>
@@ -28,91 +28,62 @@
 #define ICU_VERSION icu_44
 
 
-static const char *gBuiltInStrings[] = {
-	"Yesterday",
-	"Today",
-	"Tomorrow",
-	"Future",
-
-	"Sunday",
-	"Monday",
-	"Tuesday",
-	"Wednesday",
-	"Thursday",
-	"Friday",
-	"Saturday",
-
-	"Sun",
-	"Mon",
-	"Tue",
-	"Wed",
-	"Thu",
-	"Fri",
-	"Sat",
-
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
-
-	"Jan",
-	"Feb",
-	"Mar",
-	"Apr",
-	"May",
-	"Jun",
-	"Jul",
-	"Aug",
-	"Sep",
-	"Oct",
-	"Nov",
-	"Dec",
-
-	"^[yY]",
-	"^[nN]",
-	"yes",
-	"no"
-};
+BLanguage::BLanguage()
+	:
+	fDirection(B_LEFT_TO_RIGHT),
+	fICULocale(NULL)
+{
+	SetTo(NULL);
+}
 
 
 BLanguage::BLanguage(const char* language)
 	:
-	fDirection(B_LEFT_TO_RIGHT)
+	fDirection(B_LEFT_TO_RIGHT),
+	fICULocale(NULL)
 {
-	fICULocale = new ICU_VERSION::Locale(language);
+	SetTo(language);
+}
 
-	for (int32 i = B_NUM_LANGUAGE_STRINGS;i-- > 0;)
-		fStrings[i] = NULL;
+
+BLanguage::BLanguage(const BLanguage& other)
+	:
+	fICULocale(NULL)
+{
+	*this = other;
 }
 
 
 BLanguage::~BLanguage()
 {
 	delete fICULocale;
-
-	for (int32 i = B_NUM_LANGUAGE_STRINGS;i-- > 0;)
-		free(fStrings[i]);
 }
 
 
-void
-BLanguage::Default()
+status_t
+BLanguage::SetTo(const char* language)
 {
-	fICULocale = new ICU_VERSION::Locale("en");
-	fDirection = B_LEFT_TO_RIGHT;
+	delete fICULocale;
+	fICULocale = new ICU_VERSION::Locale(language);
+	if (fICULocale == NULL)
+		return B_NO_MEMORY;
 
-	for (int32 i = B_NUM_LANGUAGE_STRINGS;i-- > 0;) {
-		free(fStrings[i]);
-		fStrings[i] = strdup(gBuiltInStrings[i]);
+	return B_OK;
+}
+
+
+BLanguage& BLanguage::operator=(const BLanguage& source)
+{
+	if (&source != this) {
+		delete fICULocale;
+
+		fICULocale = source.fICULocale != NULL
+			? source.fICULocale->clone()
+			: NULL;
+		fDirection = source.fDirection;
 	}
+
+	return *this;
 }
 
 
@@ -130,7 +101,11 @@ BLanguage::GetString(uint32 id) const
 		|| id > B_LANGUAGE_STRINGS_BASE + B_NUM_LANGUAGE_STRINGS)
 		return NULL;
 
-	return fStrings[id - B_LANGUAGE_STRINGS_BASE];
+	return NULL;
+
+	// TODO: fetch string from ICU
+
+//	return fStrings[id - B_LANGUAGE_STRINGS_BASE];
 }
 
 

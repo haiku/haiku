@@ -220,7 +220,6 @@ class BCatalog {
 // For BCatalog add-on implementations:
 
 class BCatalogAddOn {
-		friend class BLocaleRoster;
 	public:
 		BCatalogAddOn(const char *signature, const char *language,
 			uint32 fingerprint);
@@ -268,6 +267,8 @@ class BCatalogAddOn {
 		static const char *MarkForTranslation(const char *str, const char *ctx,
 								const char *cmt);
 		static int32 MarkForTranslation(int32 id);
+
+		void SetNext(BCatalogAddOn *next);
 
 	protected:
 		virtual void UpdateFingerprint();

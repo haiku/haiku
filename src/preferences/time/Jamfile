@@ -2,10 +2,10 @@ SubDir HAIKU_TOP src preferences time ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders locale shared ;
 UsePrivateSystemHeaders ;
 
-Preference Time :
+local sources =
 	AnalogClock.cpp
 	BaseView.cpp
 	Bitmaps.cpp
@@ -18,6 +18,16 @@ Preference Time :
 	TimeZoneListItem.cpp
 	TZDisplay.cpp
 	ZoneView.cpp
+	;
+
+
+SubDirSysHdrs $(HAIKU_ICU_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
+	# Dependency needed to trigger downloading/unzipping the package before
+	# compiling the files.
+
+Preference Time
+	: $(sources)
 	: be libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
 	: Time.rdef
 	;

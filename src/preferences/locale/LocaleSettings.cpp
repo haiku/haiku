@@ -7,11 +7,13 @@
 #include "LocaleSettings.h"
 
 #include <FindDirectory.h>
-#include <LocaleRoster.h>
+#include <MutableLocaleRoster.h>
 #include <Path.h>
-#include <Roster.h>
 #include <String.h>
 #include <SupportDefs.h>
+
+
+using BPrivate::mutable_locale_roster;
 
 
 static const uint32 kMsgLocaleSettings = 'LCst';
@@ -19,8 +21,7 @@ static const uint32 kMsgLocaleSettings = 'LCst';
 
 LocaleSettings::LocaleSettings()
 	:
-	fMessage(kMsgLocaleSettings),
-	fSaved(false)
+	fMessage(kMsgLocaleSettings)
 {
 	// Set default preferences
 	fMessage.AddString("language", "en");
@@ -36,27 +37,14 @@ LocaleSettings::Load()
 	err = _Open(&file, B_READ_ONLY);
 	if (err != B_OK)
 		return err;
-	err = fMessage.Unflatten(&file);
-	if (err == B_OK)
-		fSaved = true;
-	return err;
+	return fMessage.Unflatten(&file);
 }
 
 
 status_t
 LocaleSettings::Save()
 {
-	// Save on disk for next time we reboot
-	BFile file;
-	status_t err;
-	err = _Open(&file, B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
-	if (err != B_OK)
-		return err;
-
-	err = fMessage.Flatten(&file);
-	if (err == B_OK)
-		fSaved = true;
-	return err;
+	return B_OK;
 }
 
 
@@ -86,33 +74,35 @@ LocaleSettings::UpdateFrom(BMessage* message)
 				break;
 			fMessage.AddString("language", messageContent);
 		}
-		fSaved = false;
+		mutable_locale_roster->SetPreferredLanguages(message);
 	}
 
+	BCountry defaultCountry;
+	mutable_locale_roster->GetDefaultCountry(&defaultCountry);
+
+	bool countryChanged = false;
 	if (message->FindString("country", &messageContent) == B_OK) {
 		fMessage.ReplaceString("country", messageContent);
 		fMessage.RemoveName("shortTimeFormat");
 		fMessage.RemoveName("longTimeFormat");
-		fSaved = false;
+		defaultCountry = BCountry(messageContent.String());
+		countryChanged = true;
 	}
 
 	if (message->FindString("shortTimeFormat", &messageContent) == B_OK) {
 		fMessage.RemoveName("shortTimeFormat");
 		fMessage.AddString("shortTimeFormat", messageContent);
-		fSaved = false;
+		defaultCountry.SetTimeFormat(messageContent, false);
+		countryChanged = true;
 	}
 
 	if (message->FindString("longTimeFormat", &messageContent) == B_OK) {
 		fMessage.RemoveName("longTimeFormat");
 		fMessage.AddString("longTimeFormat", messageContent);
-		fSaved = false;
+		defaultCountry.SetTimeFormat(messageContent, true);
+		countryChanged = true;
 	}
 
-	if (fSaved == false) {
-		// Send to all running apps to notify them they should update their
-		// settings
-		fMessage.what = B_LOCALE_CHANGED;
-		be_roster->Broadcast(&fMessage);
-	}
+	if (countryChanged)
+		mutable_locale_roster->SetDefaultCountry(defaultCountry);
 }
-

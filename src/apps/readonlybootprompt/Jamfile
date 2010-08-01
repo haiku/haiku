@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps readonlybootprompt ;
 
-UsePrivateHeaders interface shared ;
+UsePrivateHeaders interface locale shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src preferences keymap ] ;
 

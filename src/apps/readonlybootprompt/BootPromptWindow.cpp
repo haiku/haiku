@@ -18,7 +18,7 @@
 #include <GroupLayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
-#include <LocaleRoster.h>
+#include <MutableLocaleRoster.h>
 #include <Path.h>
 #include <ScrollView.h>
 #include <SeparatorView.h>
@@ -30,6 +30,9 @@
 #include "BootPrompt.h"
 #include "Keymap.h"
 #include "KeymapListItem.h"
+
+
+using BPrivate::mutable_locale_roster;
 
 
 enum {
@@ -156,7 +159,8 @@ BootPromptWindow::MessageReceived(BMessage* message)
 				BMessage preferredLanguages;
 				preferredLanguages.AddString("language",
 					languageItem->Language());
-				be_locale_roster->SetPreferredLanguages(&preferredLanguages);
+				mutable_locale_roster->SetPreferredLanguages(
+					&preferredLanguages);
 				_InitCatalog(true);
 			}
 			// Calling it here is a cheap way of preventing the user to have

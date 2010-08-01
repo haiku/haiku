@@ -1,8 +1,13 @@
+/*
+ * Copyright 2003-2010, Haiku, Inc.
+ * Distributed under the terms of the MIT Licence.
+*/
 #ifndef _B_FORMAT_H_
 #define _B_FORMAT_H_
 
 #include <FormatParameters.h>
 #include <SupportDefs.h>
+
 
 // types of fields contained in formatted strings
 enum {
@@ -30,16 +35,18 @@ struct format_field_position {
 	int32	length;
 };
 
+
 class BFormatImpl;
 
 class BFormat {
-	protected:
-		BFormat(const BFormat &other);
-		~BFormat();
+protected:
+								BFormat(const BFormat& other);
+	virtual 					~BFormat();
 
-		BFormat &operator=(const BFormat &other);
+			BFormat&			operator=(const BFormat& other);
 
-		BFormat();
+								BFormat();
 };
+
 
 #endif	// _B_FORMAT_H_

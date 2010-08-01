@@ -8,7 +8,7 @@
 
 #include "Catalog.h"
 #include "Locale.h"
-#include "LocaleRoster.h"
+#include "MutableLocaleRoster.h"
 
 #include <new>
 
@@ -25,7 +25,7 @@ CreateLocaleBackendInstance()
 
 LibbeLocaleBackend::LibbeLocaleBackend()
 {
-	be_locale_roster->GetSystemCatalog(&systemCatalog);
+	mutable_locale_roster->GetSystemCatalog(&systemCatalog);
 }
 
 
