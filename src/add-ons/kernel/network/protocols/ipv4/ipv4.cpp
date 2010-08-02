@@ -1034,6 +1034,10 @@ ipv4_open(net_protocol* _protocol)
 {
 	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
 
+	// Only root may open raw sockets
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+
 	RawSocket* raw = new (std::nothrow) RawSocket(protocol->socket);
 	if (raw == NULL)
 		return B_NO_MEMORY;
