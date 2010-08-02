@@ -5270,8 +5270,8 @@ BView::_ResizeBy(int32 deltaWidth, int32 deltaHeight)
 	if (fFlags & B_FRAME_EVENTS) {
 		BMessage resized(B_VIEW_RESIZED);
 		resized.AddInt64("when", system_time());
-		resized.AddFloat("width", fBounds.Width());
-		resized.AddFloat("height", fBounds.Height());
+		resized.AddInt32("width", fBounds.Width());
+		resized.AddInt32("height", fBounds.Height());
 
 		BMessenger target(this);
 		target.SendMessage(&resized);
