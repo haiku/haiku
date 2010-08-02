@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Terminal</title>
+	<title>终端</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -39,77 +41,77 @@
 <li><a href="../../en/applications/terminal.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="stylededit.html">StyledEdit</a> 
+ «  <a href="stylededit.html">文本编辑器</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">文本搜索</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />Terminal</h2>
+<h2><img src="../../images/apps-images/terminal-icon_64.png" alt="terminal-icon_64.png" width="64" height="64" />终端</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Terminal</span></td></tr>
 <tr><td>设置：
 </td><td></td><td><span class="path">~/config/settings/Terminal</span><br />
-<span class="path">~/.profile</span> - adds/overrides defaults in <span class="path">/boot/system/etc/profile</span><br />
-<span class="path">~/.inputrc</span> - adds/overrides defaults in <span class="path">/boot/system/etc/inputrc</span></td></tr>
+<span class="path">~/.profile</span> - 添加或者覆盖默认的 <span class="path">/boot/system/etc/profile</span><br />
+<span class="path">~/.inputrc</span> - 添加或者覆盖默认的 <span class="path">/boot/system/etc/inputrc</span></td></tr>
 </table>
 <p><br /></p>
-<p>The Terminal is Haiku's interface to bash, the Bourne Again Shell.</p>
-<p>Please refer to the topic on <a href="../bash-scripting.html">Scripting</a> for a few links to online tutorials on working in the shell and also have a look at <a href="cli-apps.html">Haiku's commandline applications</a>. Here, we'll concentrate on the Terminal application itself.</p>
+<p>终端是Haiku中具有用户界面的bash，即 Bourne Again Shell。</p>
+<p>请参考 <a href="../bash-scripting.html">脚本</a> 这一主题获取有关Shell的在线教程，同时也可以阅读<a href="cli-apps.html">Haiku的命令行程序</a>。在本文中，我们重点关注终端本身的使用。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="appearance" name="appearance">Appearance</a></h3>
-<p>You can open as many Terminals as needed, either each in it's own window by simply launching more Terminals or with <span class="key">ALT</span> <span class="key">N</span> from an already running Terminal. Or you use Terminal's tabbed view and open another tab with <span class="key">ALT</span> <span class="key">T</span>.</p>
-<p>A Terminal window can be resized like any other window or you use the presets from the <span class="menu">Settings | Window Size</span> menu. <span class="key">ALT</span> <span class="key">ENTER</span> toggles fullscreen mode.</p>
-<p>Changed window size and text encoding are only kept choosing <span class="menu">Settings | Save as default</span>.</p>
+<a id="appearance" name="appearance">外观</a></h3>
+<p>您可以根据需要打开任意数量的终端，可以简单的启动，或者从正在运行的终端中使用 <span class="key">ALT</span> <span class="key">N</span> 组合键来打开多个终端窗口。您也可以使用终端的标签视图方式，使用 <span class="key">ALT</span> <span class="key">T</span> 组合键打开新的终端标签。</p>
+<p>终端的窗口和其他窗口一样可以调整尺寸，或者使用 <span class="menu">Settings | Window Size</span> 菜单中的预置尺寸。 <span class="key">ALT</span> <span class="key">ENTER</span> 组合键将会切换到全屏模式。</p>
+<p>调整的窗口尺寸和文字编码只有通过 <span class="menu">Settings | Save as default</span> 才可以进行保持不变。</p>
 <img src="../images/apps-images/terminal.png" alt="terminal.png" />
 <br />
-<p><span class="menu">Settings | Preferences</span> opens a panel where you can set font type, font size and the different text and background colors. You can save different settings as separate profiles, which on double-click open an accordingly configured Terminal.<br />
-Pressing <span class="button">OK</span> will save the current settings as default.</p>
+<p><span class="menu">Settings | Preferences</span> 打开一个面板用于设置字体类型，字体大小以及不同文本和背景的颜色。您可以把不同的设置保存为独立的配置文件，而后通过双击则会打开具有相应配置的终端。<br />
+按下 <span class="button">OK</span> 将会默认保存和使用当前配置。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="customization" name="customization">Bash customization</a></h3>
-<p>Coming from Unix, there are countless possibilities to customize the bash itself. There are two files that are especially important to the user: <span class="cli">.profile</span> and <span class="cli">.inputrc</span><br />
-Both files can be created in the <span class="path">home/</span> folder and add or override the system defaults that are defined in <span class="path">/boot/system/etc/</span>.</p>
+<a id="customization" name="customization">Bash的定制</a></h3>
+<p>由于bash来自于Unix，它具有无数的可定制的方式。对于用户，有两个文件至关重要： <span class="cli">.profile</span> 和 <span class="cli">.inputrc</span> 。
+<br />
+这两个文件可以在 <span class="path">home/</span> 文件夹中予以创建， 然后将会添加到或者覆盖系统默认在 <span class="path">/boot/system/etc/</span> 中定义的配置文件。</p>
 
 <h4>.profile</h4>
-<p>The <span class="cli">.profile</span> is loaded every time you open a new Terminal. It sets all kinds of aliases and variables that will affect bash's behavior and appearance. You'll find many online resources that will detail all possibilities.</p>
-<p>The Haiku/BeOS Tip Server has quite a few tips to get you started, for example:</p>
+<p>在您每次打开新的终端时， <span class="cli">.profile</span> 都会被载入程序。在该文件中，设置了所有影响到bash行为和外观的各种类型的设备接口和变量。你可以在网络上找到许多资源，它们将会给出所有可能性的详细介绍。</p>
+<p>Haiku/BeOS Tip Server提供了许多入门的技巧，例如：</p>
 <ul>
-<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">Customize your Terminal prompt</a></li>
-<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">More prompt customizations</a></li>
-<li><a href="http://betips.net/1997/09/09/enhancing-bash/">Enhancing bash</a></li>
-<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">Custom keyboard shortcuts</a></li>
+<li><a href="http://betips.net/1997/09/09/customize-your-terminal-prompt/">定制终端的提示信息</a></li>
+<li><a href="http://betips.net/1997/09/09/more-prompt-customizations/">更多提示信息的定制</a></li>
+<li><a href="http://betips.net/1997/09/09/enhancing-bash/">bash的优化和增强</a></li>
+<li><a href="http://betips.net/1997/09/09/custom-keyboard-shortcuts/">定制快捷键</a></li>
 </ul>
-<p>There are more, <a href="http://betips.net/index.php?s=.profile">have a look</a>.</p>
+<p>还有很多类似的信息，<a href="http://betips.net/index.php?s=.profile">请参阅</a>。</p>
 
 <h4>.inputrc</h4>
-<p>The <span class="cli">.inputrc</span> deals with keybindings. Since Haiku provides useful defaults, you probably don't have to mess with these more involved settings. If you do have special needs here, consult one of the many online resources, e.g. <a href="http://tiswww.case.edu/php/chet/readline/rluserman.html">The GNU Readline Library</a>.</p>
+<p> <span class="cli">.inputrc</span> 用于处理键盘关联的配置。由于Haiku默认提供了非常有用的配置，您不需要修改相关的设置。如果您确实有特殊的需要，可以参考许多在线的资源，例如<a href="http://tiswww.case.edu/php/chet/readline/rluserman.html"> GNU 的命令行读取库</a> 。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="shortcuts" name="shortcuts">Keyboard shortcuts</a></h3>
-<p>You'll find a list of useful shortcuts in <a href="../keyboard-shortcuts.html#terminal">Shortcuts and key combinations</a>.</p>
+<a id="shortcuts" name="shortcuts">快捷键</a></h3>
+<p>您可以在 <a href="../keyboard-shortcuts.html#terminal">快捷键和组合键</a> 主题中找到非常有用的快捷键的列表。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="hints" name="hints">Hints for working with the Terminal</a></h3>
-<ul><li><p>Dragging a file or folder from a Tracker window into the Terminal will insert its path at the location of the cursor. Dragging with the right mouse button offers additional actions in a context menu:</p>
+<a id="hints" name="hints">关于终端的提醒</a></h3>
+<ul><li><p>从Tracker窗口中拖拽文件或者文件夹到终端将会在光标的位置插入它的路径。而使用右键拖拽将会弹出一个右键菜单，显示附加的操作：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Insert Path</span></td><td> </td><td>Inserts the location of the file, same as drag&amp;dropping with the left mouse button.</td></tr>
-<tr><td><span class="menu">Change Directory</span></td><td> </td><td>Changes to the folder of the dragged file.</td></tr>
-<tr><td><span class="menu">Create Link Here</span></td><td> </td><td>Creates a link to the dragged file in the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Move Here</span></td><td> </td><td>Moves the dragged file into the current working directory of the Terminal.</td></tr>
-<tr><td><span class="menu">Copy Here</span></td><td> </td><td>Copies the dragged file into the current working directory of the Terminal.</td></tr>
+<tr><td><span class="menu">Insert Path</span></td><td> </td><td>插入一个文件的路径，与左键拖拽文件到终端类似。</td></tr>
+<tr><td><span class="menu">Change Directory</span></td><td> </td><td>切换到所拖拽文件所在的文件夹。</td></tr>
+<tr><td><span class="menu">Create Link Here</span></td><td> </td><td>在终端当前工作的目录为拖拽的文件创建链接。</td></tr>
+<tr><td><span class="menu">Move Here</span></td><td> </td><td>移动拖拽的文件到终端当前工作的目录。</td></tr>
+<tr><td><span class="menu">Copy Here</span></td><td> </td><td>复制拖拽的文件到终端当期工作的目录。</td></tr>
 </table></li>
-<li><p>You can open any file with its preferred application with the command <span class="cli">open <i>[filename]</i></span>. This also works with the representation of the current ("<span class="cli">.</span>") and parent ("<span class="cli">..</span>") folder which then open in a Tracker window. So, to open the current working directory, you type:</p>
+<li><p>您可以使用<span class="cli">open <i>[filename]</i></span> 命令以首选程序打开任何的文件。该命令也作用于当前文件夹（"<span class="cli">.</span>"）和父文件夹（"<span class="cli">..</span>"），它们分别以Tracker窗口打开。所以，如果希望打开当前工作的目录，您可以输入：</p>
 <pre class="terminal">open .</pre>
 </li></ul>
 
@@ -119,9 +121,9 @@ Both files can be created in the <span class="path">home/</span> folder and add 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="stylededit.html">StyledEdit</a> 
+ «  <a href="stylededit.html">文本编辑器</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="textsearch.html">TextSearch</a>  »
+::  <a href="textsearch.html">文本搜索</a>  »
 </span></div>
 </div>
 

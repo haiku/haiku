@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filetypes</title>
+	<title>文件类型</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -39,50 +41,50 @@
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskbar.html">Deskbar（桌面栏）</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="deskbar.html">桌面栏</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
 ::  <a href="attributes.html">Attributes（属性）</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
-<h1>Filetypes</h1>
+<h1>文件类型</h1>
 
-<p>Other than Windows, Haiku doesn't rely on the 3-letter file extension for a file type (e.g. .txt, .jpg, .mp3). This method is only a last resort fallback. Haiku uses <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> types just like it's custom on the internet.</p>
-<div class="box-info">While there's no reason to use file extensions in Haiku, remember to add them to files you want to share with users of other operating systems, e.g. over email, uploading to a server or via exchange of an USB drive. Otherwise their system may not recognize the file type.</div>
+<p>与Windows所不同的是，Haiku不依赖于3个字符的文件扩展名用于标识文件类型（例如，.txt，.jpg，.mp3）。这种方式是一种技术的退步。Haiku使用的是 <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 类型，类似于互联网上的习惯做法。</p>
+<div class="box-info">由于在Haiku中没有必要使用文件扩展，但是您需要注意的是，当您和其他系统的用户分享文件时，您需要添加上扩展名，例如，通过邮件，上传到服务器或者交换闪盘。否则，他们的系统将无法识别出文件类型。</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="specific-file" name="specific-file">Setting the filetype of a specific file</a></h2>
-<p>You can change the type of a specific file, its icon and the associated application. Select the file and invoke the <span class="menu">Add-Ons | Filetype add-on</span> from the right-click context menu.</p>
+<a id="specific-file" name="specific-file">设置特定文件的文件类型</a></h2>
+<p>您可以修改特定文件的类型，它的图标，以及相关联的程序。选择该文件，然后从右键菜单中调用 <span class="menu">Add-Ons | Filetype add-on</span> 。</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="filetype" id="filetype">The File Type</a></h3>
-<p>The above is a PNG file, it's MIME string image/png. Let's say you definitely know that it's not a PNG but a GIF. You can change that either by entering the correct MIME string by hand or with one of the two buttons below the textbox:</p>
+<a name="filetype" id="filetype">文件类型</a></h3>
+<p>上面的是 PNG 文件，它的 MIME 字符时 image/png 。如果说，您确定它不是 PNG 类型而是 GIF 类型，您可以通过手动输入正确的 MIME 字符或者使用文本框下的两个按钮进行修改：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select...</span></td><td> </td><td>shows a hierarchical list of filetypes where you navigate to <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the filetype you're looking for.</td></tr>
+<tr><td><span class="button">Select...</span></td><td> </td><td>显示了一个文件类型的分类列表，您可以将其导航至 <tt>image | GIF Image</tt>。</td></tr>
+<tr><td><span class="button">Same as...</span></td><td> </td><td>打开一个文件对话框，您可以在其中找出与该文件的类型相同的文件。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="preferred-app" name="preferred-app">The Preferred Application</a></h3>
+<a id="preferred-app" name="preferred-app">首选应用程序</a></h3>
 <p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked. You could, for example, change a HTML file's preferred application from the browser to a text editor while you're working on it. Every other HTML file still opens in the browser, only this particular one starts in your text editor.</p>
 
 <p>The <span class="menu">Default Application</span> is the one that's set globally for that filetype. If you don't find the program you want to associate with this file in the pop-up menu, you'll again find the buttons <span class="button">Select...</span> and <span class="button">Same As...</span> which do the similar thing described under "The File Type" above.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">The Icon</a></h3>
+<a id="icon" name="icon">图标</a></h3>
 <p>If you're wondering why the icon well on the top right is empty: Icons are normally inherited from the system default for that filetype. You can open the <span class="app">Filetype Add-On</span> of a file that contains an icon and drag&amp;drop it into your file's icon well. Or you double-click the icon well and create or edit your own icon. For more info on icons and how to create your own, see topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings-apps" name="settings-apps">Special settings for applications</a></h2>
+<a id="settings-apps" name="settings-apps">应用程序的特殊设置</a></h2>
 <p>If you invoke the <span class="app">Filetype Add-On</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
 <p>On top, you'll see, instead of a standardized MIME string, the unique application signature. With it, the system finds the program wherever it's installed.</p>
@@ -109,8 +111,8 @@
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskbar.html">Deskbar（桌面栏）</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="deskbar.html">桌面栏</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
 ::  <a href="attributes.html">Attributes（属性）</a>  »
 </span></div>
 </div>

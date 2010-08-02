@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Tracker Add-Ons</title>
+	<title>Tracker 附加组件</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -39,43 +41,44 @@
 <li><a href="../en/tracker-add-ons.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="tracker.html">Tracker</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="keyboard-shortcuts.html">Keyboard shortcuts</a>  »
+ «  <a href="tracker.html">Tracker 文件浏览器</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
+::  <a href="keyboard-shortcuts.html">快捷键</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Tracker Add-Ons</h1>
+<h1>Tracker 附加组件</h1>
 
-<p>Applications can install add-ons so they can be invoked easily on a selection of files from Tracker. Only the add-ons that can handle a specific filetype are presented under <span class="menu">Add-Ons</span> from the context menu or the <span class="menu">File</span> menu of a Tracker window. Some add-ons don't necessarily need a file to work on and are thus always present.</p>
-<p>Tracker Add-Ons, or links to applications that can act as add-ons, can be installed in three different locations (see topic <a href="filesystem-layout.html">Filesystem layout</a>):</p>
+<p>通过安装附加组件，您可以在Tracker中选择相关联的文件来打开程序。只有能够处理特定文件类型的附加组件才可以在Tracker窗口中的 <span class="menu">Add-Ons</span> 右键菜单或者 <span class="menu">File</span> 菜单中显示。 还有一些附加组件不需要进行文件处理，但也总是会显示出来。</p>
+<p>Tracker附加组件，或者程序快捷式都可以作为附加组件，它们可以被安装在三个不同的位置（相关信息可以参阅 <a href="filesystem-layout.html">文件系统布局</a>）：</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td> for system provided add-ons.</td></tr>
-<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td> for add-ons available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td> for add-ons only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/system/add-ons/Tracker/</span></td><td>   </td><td>用于系统提供的附加组件。</td></tr>
+<tr><td><span class="path">/boot/common/add-ons/Tracker/</span></td><td>   </td><td>用于所有用户的附加附件。</td></tr>
+<tr><td><span class="path">/boot/home/config/add-ons/Tracker/</span></td><td>   </td><td>仅自己可用的附加组件。</td></tr>
 </table>
-<p>The file name of an add-on can be suffixed with a dash and capital letter, and is then available via keyboard shortcut. For example, <span class="app">Open Target Folder-T</span> opens with <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span>.<br />
-Of course, you have to take care of possible shortcut collisions when deciding on a shortcut. You can't have the same for different add-ons.</p>
+<p>附加组件的文件名可以以破折号和一个大写字母作为后缀，然后它们就可以通过快捷键来打开。例如：<span class="app">Open Target Folder-T</span> 可以利用 <span class="key">ALT</span> <span class="key">OPT</span> <span class="key">T</span> 组合键打开。
+<br />
+当然，在设置快捷键时，您需要注意可能出现的快捷键冲突，您不能够为不同的附加组件设置相同的快捷键。
+</p>
 
-<h2><a id="system-add-ons" name="system-add-ons">Haiku's Tracker Add-Ons</a></h2>
-<p>These Tracker Add-Ons come with every Haiku installation:</p>
+<h2><a id="system-add-ons" name="system-add-ons">Haiku的Tracker附加组件</a></h2>
+<p>以下Tracker附加组件与Haiku同时安装：</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4"> 
-	<tr><td class="onelinetop"><b>Background</b><i>-B</i></td>
-		<td valign="top">Opens the <a href="preferences/backgrounds.html">Background</a> preferences to change the color or image of the Desktop or any folder. Invoked on an image file the Background panel is launched with that image already loaded as a potential background.</td></tr>
-	<tr><td class="onelinetop"><b>DiskUsage</b><i>-I</i></td>
-		<td valign="top">Starts the <a href="applications/diskusage.html">DiskUsage</a> application with the according folder as basis.</td></tr>
-	<tr><td class="onelinetop"><b>FileType</b><i>-F</i></td>
-		<td valign="top">Invoked on a file, opens its specific <a href="filetypes.html">FileType</a> panel, otherwise the general FileTypes preferences are launched.</td></tr>
-	<tr><td class="onelinetop"><b>Open Target Folder</b><i>-O</i></td>
-		<td valign="top">Can only be used on a linked file and opens the folder that file lives in.</td></tr>
-	<tr><td class="onelinetop"><b>TextSearch</b><i>-G</i></td>
-		<td valign="top">Starts the <a href="applications/textsearch.html">TextSearch</a> application to look for a string in the selected folder (and its subfolders).</td></tr>
+	<tr><td class="onelinetop"><b>背景</b><i>-B</i></td>
+		<td valign="top">打开<a href="preferences/backgrounds.html">背景</a>首选项，修改桌面或者任意文件夹的色彩或图像背景。如果是作用于图像文件，则将会打开背景面板，并且以该图像作为潜在的背景。</td></tr>
+	<tr><td class="onelinetop"><b>磁盘查看器</b><i>-I</i></td>
+		<td valign="top">使用<a href="applications/diskusage.html">磁盘查看器</a> 打开选中的目录。</td></tr>
+	<tr><td class="onelinetop"><b>文件类型</b><i>-F</i></td>
+		<td valign="top">打开选中文件的<a href="filetypes.html">文件类型</a>面板，否则，将会打开文件类型首选项。</td></tr>
+	<tr><td class="onelinetop"><b>打开目标文件夹</b><i>-O</i></td>
+		<td valign="top">只能用于链接文件，并且将会打开该文件所在的文件夹。</td></tr>
+	<tr><td class="onelinetop"><b>文本搜索</b><i>-G</i></td>
+		<td valign="top">打开<a href="applications/textsearch.html">文本搜索</a>程序，在选中的文件夹（包括其子文件夹）内查询一个字符串。</td></tr>
 	<tr><td class="onelinetop"><b>ZipOMatic</b><i>-Z</i></td>
-		<td valign="top">A selection of files will be added to a zip archive, invoked without a selection opens a panel to create an archive via drag&amp;drop.</td></tr>
+		<td valign="top">选中的文件将会被添加到zip压缩档；如果没有选中任何文件，将会打开一个面板，然后您可以通过拖拽来添加文件，创建压缩档。</td></tr>
 </table>
 
 </div>
@@ -83,9 +86,9 @@ Of course, you have to take care of possible shortcut collisions when deciding o
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="tracker.html">Tracker</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="keyboard-shortcuts.html">Keyboard shortcuts</a>  »
+ «  <a href="tracker.html">Tracker 文件浏览器</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
+::  <a href="keyboard-shortcuts.html">快捷键</a>  »
 </span></div>
 </div>
 

@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Haiku's GUI</title>
+	<title>Haiku的图形用户界面</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -39,38 +41,38 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">文件系统布局</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
+::  <a href="workspaces.html">Workspaces（工作区）</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
-<h1>Haiku's GUI</h1>
+<h1>Haiku的图形用户界面</h1>
 
-<p>Haiku's graphical user interface is an integral part of the system. Unlike Unix-based operating systems, there's no separate window manager and booting just into a command line shell is not possible. Haiku's focus being on the desktop user, this is just not considered necessary.</p>
-<p>As you probably have experience with other graphical environments, let's skip over the standards like menus, right-click context menus, drag&amp;drop etc. Let's have a look at the few unique aspects of Haiku's GUI instead.</p>
+<p>Haiku的图形用户界面是系统的组成部分。与基于Unix的操作系统不同的是，Haiku没有独立的窗口管理器，而且在启动时不能够进入命令行界面。Haiku所面向的人群是桌面用户，所以命令行界面不是非常必要。</p>
+<p>鉴于您已经有过使用其他图形环境的经历，那么我们就跳过这些标准，例如，菜单，右键菜单，拖拽操作等； 直接开始了解Haiku图形用户界面与其他系统不同的地方。</p>
 <img src="images/gui-images/gui.png" alt="gui.png" />
-<p>There are only a few things in Haiku's GUI that aren't obvious and deserve an explanation.</p>
+<p>Haiku的图形界面只有很少一部分不是很常见，可能需要进行解释。</p>
 <ol>
-<li><p>The Deskbar is Haiku's "Start" menu and taskbar, if you will. See topic <a href="deskbar.html">Deskbar</a>.</p></li>
-<li>The yellow tab offers more than just a program's name or a document's filename:
-<ul><li>You can move it by holding the <span class="key">SHIFT</span> key while dragging it to another position, enabling you to stack a number of windows and conveniently access them by their named tab.</li>
-<li>You minimize a window with a double-click on its tab (or with <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span>). A such hidden window can be accessed by its entry in the <a href="deskbar.html">Deskbar</a> or the <a href="twitcher.html">Twitcher</a>.</li>
-<li>You can send a window to the back with a right-click on its tab (or its border).</li></ul></li>
-<li><p>The close button.</p></li>
-<li><p>The "zoom" button (or <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span>). In most applications, this will expand a window to maximum size. It doesn't have to, however. Tracker windows, for example, will resize to best fit the contents.</p></li>
-<li><p>The resize corner. Dragging anywhere else on a window's border will move the window.</p></li>
+<li><p>桌面栏可以看做是Haiku的"开始"菜单和任务栏（如果您愿意这样认为的话），详情参阅<a href="deskbar.html">桌面栏</a>主题。</p></li>
+<li>黄色的标签不仅仅提供了程序名或者文档的文件名：
+<ul><li>在拖动窗口时，您可以同时按下 <span class="key">SHIFT</span> 键来移动标签，这样您可以将许多窗口进行叠加，而只需要点击标签即可方便的进行访问。</li>
+<li>双击标签可以最小化窗口（或者使用 <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> 组合键）。通过这种方式隐藏的窗口可以通过 <a href="deskbar.html">桌面栏</a> 或者 <a href="twitcher.html">Twitcher</a> 进行访问。</li>
+<li>您可以通过右键点击标签（或者窗口边界）来置后窗口。</li></ul></li>
+<li><p>关闭按钮</p></li>
+<li><p>“缩放”按钮（也可以通过<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> 组合键进行缩放）。对于大多数的程序，该按钮将会把窗口最大化。但并不是都如此，例如Tracker窗口，该按钮将会依据其内容将窗口放大至合适大小。</p></li>
+<li><p>可调整的窗口边角。在窗口的边缘拖拽将会移动整个窗口。</p></li>
 </ol>
-<div class="box-info">While holding <span class="key">CTRL</span> <span class="key">ALT</span>, you can click anywhere into a window to move it with the left mouse button; the right mouse button sends it to the back.</div>
+<div class="box-info">如果同时按下 <span class="key">CTRL</span> <span class="key">ALT</span> 键，您可以使用左键点击在窗口的任意位置对它进行移动，而右键点击将会使其返回原位。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-panel" name="open-save-panel">Open and save panels</a></h2>
-<p>When opening or saving a file from any application, a panel like this opens:</p>
+<a id="open-save-panel" name="open-save-panel">打开和保存面板</a></h2>
+<p>从任意的程序打开或保存文件都将会打开类似于下面的面板：</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
 <p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
 You can enter parent folders with the pop-up menu above the file listing.</p>
@@ -78,7 +80,7 @@ You can enter parent folders with the pop-up menu above the file listing.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="open-save-shortcuts" name="open-save-shortcuts">Keyboard shortcuts</a></h3>
+<a id="open-save-shortcuts" name="open-save-shortcuts">快捷键</a></h3>
 <p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
@@ -91,7 +93,7 @@ You can enter parent folders with the pop-up menu above the file listing.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="favorites-recent" name="favorites-recent">Favorites and recent folders</a></h3>
+<a id="favorites-recent" name="favorites-recent">收藏夹和最近的文件夹</a></h3>
 <p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
 <p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add Current Folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure Favorites...</span> and delete its entry.<br />
@@ -111,9 +113,9 @@ A right-click on a Replicant handle offers a context menu to show the originatin
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">Filesystem layout</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="workspaces.html">Workspaces</a>  »
+ «  <a href="filesystem-layout.html">文件系统布局</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
+::  <a href="workspaces.html">Workspaces（工作区）</a>  »
 </span></div>
 </div>
 

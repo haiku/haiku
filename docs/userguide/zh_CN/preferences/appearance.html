@@ -16,13 +16,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Appearance（外观设置）</title>
+	<title>外观</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -41,33 +41,32 @@
 <li><a href="../../en/preferences/appearance.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+    <a href="../preferences.html" class="uplink">首选项</a> 
+::  <a href="backgrounds.html">背景</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Appearance（外观设置）</h2>
+<h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />外观</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">首选项</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
 <tr><td>设置：
 </td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span></td></tr>
 </table>
-<p> Appearance 允许你对 Haiku 的外观做出一些修改。</p>
+<p>外观首选项允许你对 Haiku 的外观做出一些修改。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="colors" name="colors">Colors</a></h2>
+<a id="colors" name="colors">颜色</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>在第一个标签 <span class="menu">Colors</span> 中，您可以对用户界面不同部分的颜色做出修改。当然，这些颜色也支持拖拽操作；您从其他程序选取颜色，例如：<span class="app">WonderBrush</span>，<span class="app">Icon-O-Matic</span> 或者 <span class="app">Backgrounds</span> 面板。</p>
+<p>在第一个标签 <span class="menu">Colors</span> 中，您可以对用户界面不同部分的颜色做出修改。当然，这些颜色也支持拖拽操作；您从其他程序选取颜色，例如：<span class="app">神笔画具</span>，<span class="app">Icon-O-Matic</span> 或者 <span class="app">背景</span> 面板。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="antialiasing" name="antialiasing">Antialiasing</a></h2>
+<a id="antialiasing" name="antialiasing">抗锯齿</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
 <p>第二个标签 <span class="menu">Antialiasing</span> 提供了关于计算机屏幕中图形渲染的不同设置选项。</p>
 
@@ -79,12 +78,12 @@ Glyph hinting</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-off.png" alt="appearance-glyph-off.png" /><br />Hinting: off</td><td style="width:15px;"></td><td style="text-align:center; font-style:italic"><img src="../../images/prefs-images/appearance-glyph-on.png" alt="appearance-glyph-on.png" /><br />Hinting: on</td></tr>
 </table>
-<p>需要指出的是，本页中所有的 <span class="app">Magnify</span> 窗口当然也是通过一些选项实现自我渲染的。所以，你通过对比来获得有关设置的真实印象，例如，粗体的黄色标题或者文本 "33 x 15 @ 8 pixels/pixel"。</p>
+<p>需要指出的是，本页中所有的 <span class="app">放大镜</span> 窗口当然也是通过一些选项实现自我渲染的。所以，你通过对比来获得有关设置的真实印象，例如，粗体的黄色标题或者文本 "33 x 15 @ 8 pixels/pixel"。</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Antialiasing type</h3>
-<p>另一个可以用于渲染的技术是 <i>Antialiasing</i>（抗锯齿），它支持所有的矢量字体和文本，通过改变一些像素的颜色来使线条平滑。有两种方法实现抗锯齿类型：</p>
+抗锯齿类型</h3>
+<p>另一个可以用于渲染的是 <i>抗锯齿技术</i> ，它支持所有的矢量字体和文本，通过改变一些像素的颜色来使线条平滑。有两种方法实现抗锯齿类型：</p>
 <p><span class="menu">Grayscale</span> 改变边缘像素的灰度。<br />
 <span class="menu">LCD subpixel</span> 会有更好的效果，尤其是对于 (高分辨率的) LCD 显示器。因为 LCD 显示器的每个像素是由红，绿，蓝三种基本色组成，所以该方法除了调节边缘像素的灰度，它还改变了边缘像素的部分颜色。</p>
 <p>同样的，以上两种方法处理过的字体放大后的截图如下：</p>
@@ -101,7 +100,7 @@ Antialiasing type</h3>
 <p>在本面板底部有两个按钮：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
 <tr><td><span class="button">Defaults</span></td><td> </td><td>恢复所有设置为默认状态。</td></tr>
-<tr><td><span class="button">Revert</span></td><td> </td><td>取消设置，恢复到打开 Appearance 时的设置状态。</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>取消设置，恢复到打开外观首选项前的设置状态。</td></tr>
 </table>
 
 </div>
@@ -109,8 +108,8 @@ Antialiasing type</h3>
 
 <div class="nav">
 <div class="inner"><span>
-    <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="backgrounds.html">Backgrounds</a>  »
+    <a href="../preferences.html" class="uplink">首选项</a> 
+::  <a href="backgrounds.html">背景</a>  »
 </span></div>
 </div>
 

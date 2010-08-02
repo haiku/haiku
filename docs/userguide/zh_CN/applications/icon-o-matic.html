@@ -9,6 +9,8 @@
  *
  * Authors:
  *              Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -20,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -39,33 +41,33 @@
 <li><a href="../../en/applications/icon-o-matic.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">档案管理器</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="installer.html">Installer</a>  »
+::  <a href="installer.html">Installer（安装器）</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
-<tr class="index"><td><a href="#bitmap-vector">BeOS bitmap vs. Haiku vector icons</a><br />
-                <a href="#icons-attributes">Icons are attributes</a><br />
-                <a href="#i-o-m">Creating icons with Icon-O-Matic</a><br />
-                  <a href="#i-o-m-path">Path</a><br />
+<tr class="index"><td><a href="#bitmap-vector">位图图标和矢量图标</a><br />
+                <a href="#icons-attributes">图标属性</a><br />
+                <a href="#i-o-m">创建图标</a><br />
+                  <a href="#i-o-m-path">路径</a><br />
                   <a href="#i-o-m-shape">Shape</a><br />
                   <a href="#i-o-m-style">Style</a><br />
                   <a href="#i-o-m-transformer">Transformer</a><br />
-                  <a href="#i-o-m-save">Saving an icon</a><br />
-                  <a href="#i-o-m-tips">Tips &amp; Tricks</a></td></tr>
+                  <a href="#i-o-m-save">保存图标</a><br />
+                  <a href="#i-o-m-tips">提示与技巧</a></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Matic</h2>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
 <tr><td>设置：
 </td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
@@ -77,7 +79,7 @@
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bitmap-vector" name="bitmap-vector">BeOS bitmap vs. Haiku vector icons</a></h2>
+<a id="bitmap-vector" name="bitmap-vector">位图图标和矢量图标</a></h2>
 <p>Contrary to the BeOS, Haiku uses vector icons instead of bitmap icons. A special Haiku Vector Icon Format (HVIF) was developed that is highly optimized for small file sizes and fast rendering. That's why our icons are for the most part <i>much</i> smaller than either a bitmap or the widely used SVG format. Also, unlike BeOS' bitmap icons, Haiku isn't limited to an 8bit palette (256 colors).<br />
 Take this icon of the Terminal, for example:</p>
 <table border="0" cellpadding="10">
@@ -104,13 +106,13 @@ Take this icon of the Terminal, for example:</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icons-attributes" name="icons-attributes">Icons are attributes</a></h2>
+<a id="icons-attributes" name="icons-attributes">图标属性</a></h2>
 <p>Icons are stored as an attribute with their file. However, that doesn't mean that every file has to have this attribute to appear with an icon in a Tracker window: data files inherit their icon from their filetype. To globally change the filetype's icon you use the <span class="app">FileTypes</span> preferences. If you only want to add a special icon to an individual file, you use the <span class="app">FileType Add-On</span> on it instead. See topic <a href="../filetypes.html">Filetypes</a> for more information.</p>
 <div class="box-info">Being an attribute, it follows that only filesystems supporting metadata can retain a file's individual icon. So, if you move files off your BFS volume, consider zipping them up so you don't lose icons or other attributes.</div>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m" name="i-o-m">Creating icons with Icon-O-Matic</a></h2>
+<a id="i-o-m" name="i-o-m">创建图标</a></h2>
 <p>Icon-O-Matic is Haiku's icon editor that can save your work as HVIF, SVG or PNG. The icon can also be directly attached as attribute to an existing file or exported as a resource or source file used by developers. Since the application was tailored to the optimized HVIF format, its usage reflects the inner workings of this format.</p>
 <p>Other than your normal vector graphics software, you don't deal with separate objects that each include all their specific properties like path, stroke width, stroke and fill color etc. Rather, you assemble your objects ("shapes") from shared paths and colors ("styles") and set certain properties. This re-using of elements is one secret of HVIF's efficiency. Although that imposes some constraints on the icon designer, there are a few advantages, too.<br />
 For example, by re-using a path, several objects can be modified together by manipulating this one path. Think of an object and its shadow. Modifying their shared path will change the object itself and automatically its (maybe slightly distorted/translated) shadow.</p>
@@ -308,7 +310,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-tips" name="i-o-m-tips">Tips &amp; Tricks</a></h3>
+<a id="i-o-m-tips" name="i-o-m-tips">提示与技巧</a></h3>
 <p>A few things you should keep in mind when working with Icon-O-Matic and some general tips for its usage:</p>
 <ul>
 <li><p>Read the <a href="http://factory.haiku-os.org/documentation/icon_guidelines/">Icon Guidelines</a> to learn about important characteristics of Haiku icons, e.g. perspective, colors and shadows.</p></li>
@@ -341,9 +343,9 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">档案管理器</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="installer.html">Installer</a>  »
+::  <a href="installer.html">Installer（安装器）</a>  »
 </span></div>
 </div>
 

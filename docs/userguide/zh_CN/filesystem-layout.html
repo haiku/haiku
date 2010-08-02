@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Filesystem layout</title>
+	<title>文件系统布局</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -39,46 +41,46 @@
 <li><a href="../en/filesystem-layout.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="bootloader.html">Boot Loader</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="gui.html">Haiku's GUI</a>  »
+ «  <a href="bootloader.html">引导程序</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
+::  <a href="gui.html">Haiku的图形用户界面</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Filesystem layout</h1>
+<h1>文件系统布局</h1>
 
-<p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:</p>
+<p>Haiku的文件系统布局是非常简洁易懂的，尽量使用简单的名字为文件和文件夹命名，让用户不会产生疑问。对于维持系统的正常运行非常重要的文件和文件夹是收到保护的，当它们发生意外的更改时，系统将会弹出以下的警告：</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
 <img src="images/filesystem-layout-images/achtung-system.png" alt="achtung-system.png" />
-<p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<span class="button">Do it</span>" button will only become clickable when you're holding down the <span class="key">SHIFT</span> key.</p>
-<p>Generally, there are three separate branches springing from the root folder of the boot volume:</p>
+<p>如果您对重命名或者删除了系统层次上的一些东西，那么系统将会弹出第二个警告。在这里，“<span class="button">Do it</span>” 按钮只有在您按下 <span class="key">SHIFT</span> 键时才能够点击。</p>
+<p>通常，在根目录下的启动卷中有三个独立的分支文件夹：</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>belongs to the system. Don't touch!</td></tr>
-<tr><td><span class="path">/boot/common/</span></td><td> </td><td>holds files that are shared between users.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>is your personal folder where you keep your data and settings.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>该文件夹属于操作系统，最好不要改动。</td></tr>
+<tr><td><span class="path">/boot/common/</span></td><td> </td><td>该文件夹内的文件是用户之间共享的文件。</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>该文件夹是您私人的文件夹，保存了您的数据和设置。</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">The system folder - <span class="path">/boot/system/</span></a></h2>
-<p>Under Haiku's predecessor BeOS, this folder was named <span class="path">/boot/beos/</span>. You may still find it in some older documentation (e.g. in the original BeBook).<br />
-Whatever it's named, you should not alter what's inside. Every update of Haiku can add, remove or overwrite anything within it. If you want to add functionality, maybe with other Tracker Add-Ons or Translators or maybe another hardware driver, you install these things under your own <span class="path">/boot/home/</span> hierarchy or, if it's supposed to be for every user, under <span class="path">/boot/common/</span>. As long as Haiku isn't multi-user, this distinction has no apparent effect, as there's only one user with one <i>home</i> folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
-<p>So, let's say you want to install a new Translator for the latest image format, you <b>don't</b> simply copy it into the respective system folder. Remember: Don't touch!<br />
-Instead, you put it into the mirrored hierarchy under <span class="path">/boot/common/</span> or <span class="path">/boot/home/config/</span>.</p>
-<p>In our example the location for Translators in the system folder would be</p>
+<a id="system" name="system">系统文件夹 - <span class="path">/boot/system/</span></a></h2>
+<p>在原BeOS中，该文件夹命名为 <span class="path">/boot/beos/</span>。在一些老的文档中，您仍然可以找到它（例如在BeBook中）。
+<br />
+不论它以何种方式命名，您最好不要修改里面的内容。Haiku的每次更新都可能会添加，删除或者覆盖里面的东西。如果您希望添加新的功能，可能是Tracker的附加组件，或者Translators，或者其他的硬件驱动，您需要将其安装在 <span class="path">/boot/home/</span> 中；如果是用于所有的用户，则安装在 <span class="path">/boot/common/</span> 中。只要Haiku不是多用户系统，这两者就没有明显的区别， 因为系统中只有一个用户，只有一个 <i>home</i> 文件夹。但是由于Haiku最终会支持多用户，那就有必要在开始时就对此有一个正确的理解。</p>
+<p>所以，假如您希望安装一个新的 Translator 以用于最新的图像格式，您最好<b>不要</b>简单的将其复制到系统文件夹中。切记：不要动其中的文件！<br />
+相反的，您需要把它放置在 <span class="path">/boot/common/</span> 或者 <span class="path">/boot/home/config/</span> 文件夹下对应的文件层次中即可。</p>
+<p>在我们的例子中，Translators在系统文件夹中的路径应该是：</p>
 <p><span class="path">/boot/system/add-ons/Translators/</span></p>
-<p>So, the user "mirror" folder is either</p>
+<p>所以，在用户文件夹中，相对应的是：</p>
 <p><span class="path">/boot/home/config/add-ons/Translators/</span><br />
-or<br />
+或者<br />
 <span class="path">/boot/common/add-ons/Translators/</span></p>
-<p>This has another advantage: If the component you have installed messes things up (which is possible as you install hardware drivers like this, too) you are able to choose "<i>Disable User Add-Ons</i>" from the <a href="bootloader.html">Boot Loader</a> menu and are thus always able to boot without the offending component.</p>
-<p>Most of the time, however, you won't have to deal with these things at all, since every software that comes from a trusted source should include an installation routine that handles these things.<br />
+<p>这还具有一项优势：如果您安装的组件陷入了混乱（在您安装硬件驱动时可能就会出现这种状况），您可以在<a href="bootloader.html">引导程序</a>菜单中选择 "<i>Disable User Add-Ons</i>"，这样就能够避开产生麻烦的组件而顺利启动。</p>
+<p>然而，多数情况下，您根本不需要处理这些东西， 因为每个来自可信赖源的程序都包含了用于处理这些事物的例行安装程序。<br />
 <!--
-If you do want to know more about how things tick in Haiku, have a look at this layout chart of the system folder:
+如果您确实希望了解Haiku中文件的排布方式，您可以查看系统文件夹的布局图：
 </p>
 <p><i>TODO.... Table to be added ....</i>
 <table>
@@ -88,55 +90,55 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="common" name="common">The common folder - <span class="path">/boot/common/</span></a></h2>
-<p>Haiku is not a multi-user system yet. Once it is though, every user has her own <i>home</i> folder that is not accessible to anyone else. Every application or added component like Tracker Add-Ons, Translators etc. as well as any data that's supposed to be shared between different users, has to be put under <span class="path">/boot/common/</span>.</p>
+<a id="common" name="common">共享文件夹 - <span class="path">/boot/common/</span></a></h2>
+<p>Haiku 不是一个多用户的操作系统。然而一旦它实现了多用户，每个用户都将拥有自己的 <i>home</i> 文件夹，并且不能够被其他用户所访问。 每个程序或者附加组件，例如，Tracker Add-Ons，Translators 等，它们和任何属于不同用户的共享数据一样，必须存放在 <span class="path">/boot/common/</span> 中。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="home" name="home">The home folder - <span class="path">/boot/home/</span></a></h2>
-<p>This folder belongs to you. Here you can create and delete files and folders as you wish. However, you shouldn't mess too much with the <span class="path">~/config/</span> directory and its subfolders. You <i>could</i> delete e.g. the <span class="path">~/config/settings/</span> folder without damaging the operating system itself, but who wants to lose all his configurations and application settings? In any case, the system warns you with the at the top mentioned alert.</p>
-<p>Besides the <span class="path">~/config/add-ons/</span> folder, which mirrors the system's add-ons folder for additional components as described above, there are a few other folders of interest. (By the way, the tilde ("<tt>~</tt>") is a shortcut for your home folder, so you don't always have to write "<span class="path">/boot/home/</span>" in Terminal.)</p>
+<a id="home" name="home">home文件夹 - <span class="path">/boot/home/</span></a></h2>
+<p>该文件夹属于您私人的文件夹。您完全可以按照自己的意愿来创建和删除文件和文件夹。但是，您最好不要乱动 <span class="path">~/config/</span> 目录和它的子文件夹。您 <i>完全可以</i> 删除文件夹，例如  <span class="path">~/config/settings/</span> 文件夹，并且不会对系统产生破坏，但是谁愿意丢失所有的系统配置和程序设置呢？在此情形下，系统将会弹出上面所述的前一个警报。</p>
+<p>除了 <span class="path">~/config/add-ons/</span> 文件夹，主要对应于上述的系统附加组件的add-ons文件夹，还有一些其他有趣的文件夹。（顺便提一下，（"<tt>~</tt>"）字符是您的home文件夹的简写，所以您不必每次都在终端中写出它的绝对路径 "<span class="path">/boot/home/</span>" ）</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><span class="path">~/mail</span></td><td style="width:10px;"> </td>
-<td>By default, this is where your mails are kept.</td></tr>
+<td>默认的，这里是您的邮件保存的位置。</td></tr>
 
 <tr><td><span class="path">~/queries</span></td><td style="width:10px;"> </td>
-<td><a href="queries.html">Queries</a> are stored, by default temporarily for 7 days, in this folder.</td></tr>
+<td><a href="queries.html">查询</a> 默认保存在该文件夹中，并且暂存一周的时间。</td></tr>
 
 <tr><td><span class="path">~/config/be/</span></td><td> </td>
-<td>Again from our BeOS legacy, the <span class="path">be</span> folder contains what's shown in the <a href="deskbar.html#deskbar-menu">Deskbar menu</a>. You can add and remove items by putting files, folders, links or queries into this folder.</td></tr>
+<td>它也是从 BeOS 遗留下来的，<span class="path">be</span> 文件夹存放了 <a href="deskbar.html#deskbar-menu">桌面栏菜单</a>中显示的所有东西。您可以通过在该文件夹中添加文件，文件夹，快捷方式或者查询来添加或者删除桌面栏菜单中的项目。</td></tr>
 
 <tr><td><span class="path">~/config/bin/</span></td><td> </td>
-<td>Complements the system's <span class="path">/boot/system/bin/</span> folder and holds all your command line programs.</td></tr>
+<td>该文件夹是系统文件夹 <span class="path">/boot/system/bin/</span> 的补充，并且存放了所有的命令行程序。</td></tr>
 
 <tr><td><span class="path">~/config/boot/</span></td><td> </td>
-<td>This folder is the place for <a href="bash-scripting.html#user-scripts">User Scripts</a> that are executed before or after the system boots up or shuts down.</td></tr>
+<td>该文件夹存放了在系统启动或者关闭时所运行的<a href="bash-scripting.html#user-scripts">用户脚本</a>。</td></tr>
 
 <tr><td><span class="path">~/config/boot/launch/</span></td><td> </td>
-<td>Links to programs or documents in this folder are automatically launched on every boot-up.</td></tr>
+<td>该文件夹中的程序快捷方式，或者文档在每次启动时都自动开始运行。</td></tr>
 
 <tr><td><span class="path">~/config/fonts/</span></td><td> </td>
-<td>Simply copy a TrueType or Postscript font into this folder and its usable right away.</td></tr>
+<td>只要把TrueType 或者Postscript字体复制到该文件夹中，它们就可以马上投入使用。</td></tr>
 
 <tr><td><span class="path">~/config/settings/</span></td><td> </td>
-<td>This folder contains the settings to all applications and a few configurations for the system. Some applications manage their settings in their own subfolders, others simply put their configuration file in there.</td></tr>
+<td>该文件夹存放了所有程序的设置文件和一些系统配置文件。有些程序会将其设置文件存放在它们自己的子文件夹中，但是其他的则直接存放在这里。</td></tr>
 
 <tr><td><span class="path">~/config/settings/beos_mime/</span></td><td> </td>
-<td>In this <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> database Haiku keeps track of all the different <a href="filetypes.html">filetypes</a> and their settings.</td></tr>
+<td>在这个<acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> 数据库中， Haiku跟踪保持了所有的 <a href="filetypes.html">文件类型</a> 和它们的设置情况。</td></tr>
 
 <tr><td class="onelinetop"><span class="path">~/config/settings/kernel/drivers/</span></td><td> </td>
-<td>There's one settings file that may be of interest: <span class="cli">kernel</span> offers some low level configurations like disabling <acronym title="Symmetric Multi Processing">SMP</acronym>, activating serial debugging or enabling advanced power management. You activate a configuration line by removing the commentary symbol "<tt>#</tt>". Be careful here!</td></tr>
+<td>有一个设置文件可能比较有趣： <span class="cli">kernel</span> 提供了一些底层的配置，例如，禁用 <acronym title="Symmetric Multi Processing">SMP</acronym>，激活串行调试或者 允许高级电源管理。您只要将该配置行前的 “<tt>#</tt>” 注解符号删除即可。在操作时，要时刻小心！</td></tr>
 
 <tr><td><span class="path">~/config/settings/Tracker/</span></td><td> </td>
-<td>Besides the various settings files for Tracker, there are some interesting subfolders:</td></tr>
+<td>除了用于 Tracker 的各种设置文件外，还有一些有趣的子文件夹：</td></tr>
 
-<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>Show and arrange all attributes and the window size to your liking. Every new folder you create will use it as a template.</td></tr>
+<tr><td align="right"><span class="path">DefaultFolderTemplate/</span></td><td style="width:10px;"></td><td>显示和编排所有的属性与您喜欢的窗口大小。每个新建的文件夹都将以它为模板。</td></tr>
 
-<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>You can define the layout of query result windows for certain filetypes. See topic <a href="queries.html#result-window">Query: The result window</a>.</td></tr>
+<tr><td align="right"><span class="path">DefaultQueryTemplates/</span></td><td></td><td>您可以为确定的文件类型定义查询结果的窗口布局。可以参阅 <a href="queries.html#result-window">查询：结果窗口</a> 主题。</td></tr>
 
-<tr><td align="right"><span class="path">Go/</span></td><td></td><td>Put links to your favorite locations in here to make them available e.g. in open and save panels. See topic <a href="gui.html#favorites-recent">Haiku's GUI: Favorites and recent folders</a>.</td></tr>
+<tr><td align="right"><span class="path">Go/</span></td><td></td><td>把您最喜欢的路径的链接放置在这里，可以打开或者保存面板中对他们进行访问。可以参阅 <a href="gui.html#favorites-recent">Haiku's GUI: Favorites and recent folders</a> 主题。</td></tr>
 
-<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>Add a template for any filetype that's then available from Tracker's <span class="menu">File | New...</span> menu. See topic <a href="tracker.html#working-with-files">Tracker: Working with files</a>.</td></tr>
+<tr><td align="right"><span class="path">Tracker New Template/</span></td><td></td><td>为任意的文件类型添加模板，它们就可以在Tracker的 <span class="menu">File | New...</span> 菜单中进行访问。 可以参阅<a href="tracker.html#working-with-files">Tracker：文件处理</a>主题。</td></tr>
 </table>
 
 </div>
@@ -144,9 +146,9 @@ If you do want to know more about how things tick in Haiku, have a look at this 
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="bootloader.html">Boot Loader</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="gui.html">Haiku's GUI</a>  »
+ «  <a href="bootloader.html">引导程序</a> 
+::  <a href="contents.html" class="uplink">内容</a> 
+::  <a href="gui.html">Haiku的图形用户界面</a>  »
 </span></div>
 </div>
 

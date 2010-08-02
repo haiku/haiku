@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>E-mail</title>
+	<title>电子邮箱</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -39,30 +41,30 @@
 <li><a href="../../en/preferences/e-mail.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskbar.html">Deskbar（桌面栏）</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+ «  <a href="deskbar.html">桌面栏</a> 
+::  <a href="../preferences.html" class="uplink">首选项</a> 
+::  <a href="filetypes.html">文件类型</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
 <tr class="index"><td>
-	<a href="#creating">Creating a new e-mail account</a><br />
-	<a href="#incoming">Setting up incoming e-mail</a><br />
-	<a href="#outgoing">Setting up outgoing e-mail</a><br />
-	<a href="#filters">Setting up e-mail filters</a><br />
-	<a href="#settings">Setting up the Mail Service</a>
+	<a href="#creating">新建邮箱账户</a><br />
+	<a href="#incoming">收件箱的设置</a><br />
+	<a href="#outgoing">发件箱的设置</a><br />
+	<a href="#filters">过滤器的设置</a><br />
+	<a href="#settings">邮箱服务设置</a>
 </td></tr>
 </table>
 
-<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />E-mail</h2>
+<h2><img src="../../images/prefs-images/e-mail-icon_64.png" alt="e-mail-icon_64.png" width="64" height="64" />电子邮箱</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">首选项</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/preferences/E-mail</span></td></tr>
 <tr><td>设置：
 </td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
@@ -72,7 +74,7 @@ The configuration is done in the E-Mail preference panel.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="creating" name="creating">Creating a new e-mail account</a></h2>
+<a id="creating" name="creating">新建邮箱账户</a></h2>
 <p>Let's go through the process of setting up an e-mail account.<br />
 You start by clicking the <span class="button">Add</span> button to create a new, unnamed account. This opens a panel where you fill in your account info:</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
@@ -82,7 +84,7 @@ You start by clicking the <span class="button">Add</span> button to create a new
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="incoming" name="incoming">Setting up incoming e-mail</a></h2>
+<a id="incoming" name="incoming">收件箱的设置</a></h2>
 <p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
 <p>From the pop-up menu you choose the protocol used by your provider. <span class="menu">IMAP</span> and <span class="menu">POP3</span> are supported.</p>
@@ -96,7 +98,7 @@ You start by clicking the <span class="button">Add</span> button to create a new
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="outgoing" name="outgoing">Setting up outgoing e-mail</a></h2>
+<a id="outgoing" name="outgoing">发件箱的设置</a></h2>
 <p>Click on <span class="menu">Outgoing</span> under your account's name to set up how e-mails are sent.</p>
 <img src="../images/prefs-images/e-mail-out.png" alt="e-mail-out.png" />
 <p>As with incoming mail, you can also change the <i>Location</i> of your outbox (default: <span class="path">/boot/home/mail/out/</span>).</p>
@@ -105,7 +107,7 @@ You start by clicking the <span class="button">Add</span> button to create a new
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filters" name="filters">Setting up e-mail filters</a></h2>
+<a id="filters" name="filters">过滤器的设置</a></h2>
 <p>If you want to filter your incoming email, you click on <span class="menu">E-Mail Filters</span> under your account's name to set up automatic sorting. You can add any number of filters that are applied one after the other. You can rearrange them by drag&amp;dropping them to their new position.<br />
 Besides the <span class="menu">R5 Daemon Filter</span> that's used for backward compatibility, there are two other <span class="menu">Incoming Mail Filters</span> you can add.</p>
 
@@ -163,7 +165,7 @@ Outgoing Mail Filters</h3>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings" name="settings">Setting up the Mail Service</a></h2>
+<a id="settings" name="settings">邮箱服务设置</a></h2>
 <p>Now that your incoming and outgoing mail servers (and maybe some filters, too), are configured, you have to tell the Mail Service that does all the actual checking and fetching how to do its job.</p>
 <img src="../images/prefs-images/e-mail-settings.png" alt="e-mail-settings.png" />
 <p>Under <i>Mail Checking</i> you configure the interval at which the account's mail server is probed for new mail.<br />
@@ -180,9 +182,9 @@ If you're on a dial-up connection, you may want to do that <span class="menu">On
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskbar.html">Deskbar（桌面栏）</a> 
-::  <a href="../preferences.html" class="uplink">Preferences</a> 
-::  <a href="filetypes.html">FileTypes</a>  »
+ «  <a href="deskbar.html">桌面栏</a> 
+::  <a href="../preferences.html" class="uplink">首选项</a> 
+::  <a href="filetypes.html">文件类型</a>  »
 </span></div>
 </div>
 

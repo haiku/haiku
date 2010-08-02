@@ -11,12 +11,13 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		log-1
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Attributes</title>
+	<title>属性</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -49,37 +50,37 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Attributes</h1>
+<h1>属性</h1>
 
-<p>Attributes are data fields that belong to a file but aren't part of that file, e.g. they are not computed into the file size and can be copied or changed without touching the file itself. The system uses these attributes to store e.g. file size, file type or date of the last modification. This is similar to other operating systems and their filesystems.</p>
-<p>What's different is that you can add any kind of attribute to any file and display it or make it editable in a Tracker window. You just have to define the kind of attribute you want to add to a file type (e.g. string, integer or time) and give it a name and description.</p>
-<p>The file itself doesn't even need any contents at all. Take a look at these People files for example:</p>
+<p>属性とは、ファイルに属するけれどもそのファイルの一部ではないデータ・フィールドのことです。例えば、属性はファイル・サイズの計算には含まれませんが、属性をコピーしたり、ファイル自体触れることなく属性に変更を加えたりすることができます。システムはこれら属性をファイル・サイズやファイル・タイプ、ファイルが最後に変更された日付などを保存するのに使用します。この仕組みは他のオペレーティング・システムやそのファイル・システムと似ています。</p>
+<p>他のオペレーティング・システムとの違いは、任意のファイルに対して任意の種類の属性を追加できること、およびTrackerウィンドウの中でその属性を表示したり編集したりすることが可能であることです。必要なことはファイル・タイプに追加したい属性の種類(文字列や整数値、時刻など)を定義し、属性に名前と説明を付けることだけです。</p>
+<p>ファイルそのものは中身を含んでいる必要すら全くありません。例えば、次のPeopleファイルをご覧ください:</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
-<p>As you can see, these are all 0-sized files with attached attributes, the E-mail attribute of "John Nox" being edited right in Tracker.</p>
-<p>If you index these attributes, as People, Email or audio files are by default, they are also searchable with Haiku's fast query system.</p>
+<p>ご覧の通り、これらはすべて属性が付与された大きさが0のファイルです。Trackerウィンドウの右側で"John Nox"の電子メール属性を編集中です。</p>
+<p>Peopleや電子メール・ファイル、音声ファイルがデフォルトでそうしているように、これら属性をインデックス化することにより、Haikuの高速クエリ・システムを使用して属性を検索することもできます。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h2>
-<p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
-<p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag&amp;drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
-<p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
-<p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <span class="key">SHIFT</span> key while clicking on a column heading. You can sort your People files by company and within that order sort by contact name, for instance. See the above screenshot as an example. The secondary sort order is marked by a lighter colored indicator beside the heading.</p>
-<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span> <span class="key">E</span> and move between the attributes with <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
+<a id="attributes-tracker" name="attributes-tracker">Trackerにおける属性</a></h2>
+<p>属性はデータベースやスプレッド・シートと非常によく似た形で表示されます。Trackerを使うことで、どの属性(列)を表示するのかを選択したり、属性に従ってファイル・リストの順番(行)を並べ替えたりできます。</p>
+<p>Trackerで属性を操作するには、Trackerウィンドウを開いて<span class="menu">Attributes</span>メニューをクリックし、表示したい属性を選択します。あるいは単純に列見出しを右クリックし、コンテクスト・メニューで該当する項目をマークします。また、列見出しをドラッグ・アンド・ドロップするだけで、列を再配置することができます。列をウィンドウの外に移動させることにより、不要な列をすばやく取り除くことができます。</p>
+<p>列見出し中の2つの属性の間の線をダブル・クリックすると、列幅が自動的に適切なサイズに調整されます。</p>
+<p>列見出しをクリックすると、ソートの順序が昇順から降順へ切り替わります。<span class="key">SHIFT</span>を押しながら列見出しをクリックすることで、2番目のソート順序を決めることができます。例えば、1番目のソート順序を会社名、2番目のソート順序をコンタクト名にしてPeopleファイルを並べ替えることができます。例として上のスクリーン・ショットをご覧ください。2番目のソート順序は、列見出しすぐそばの、1番目のソート順序よりも明るい色の目印でマークされています。</p>
+<p>これら属性の編集はファイルのリネームと同様にシンプルです: 項目をクリックするか、<span class="key">ALT</span> <span class="key">E</span>を押します。属性間の移動は<span class="key">TAB</span>および<span class="key">SHIFT</span> <span class="key">TAB</span>で行います。変更を適応せずに編集モードを抜けるには<span class="key">ESC</span>を押します。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h2>
-<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal.</p>
+<a id="attributes-terminal" name="attributes-terminal">Terminalにおける属性</a></h2>
+<p>コマンド・ラインがお好みの場合やスクリプトを使って大量のファイルを処理しようという場合に備えて、Terminalから属性を制御できるコマンドがいくつか用意されています。</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
-<p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
+<p><span class="cli">listattr</span>は個々のファイルの属性の一覧を表示します。属性の中身については表示しません。</p>
 <pre>使い方: listattr 'filename' ['filename' ...]</pre>
-<p>From our screenshot example above:</p>
+<p>上のスクリーン・ショットの例です:
+</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
    Type         Size                 Name
@@ -105,56 +106,56 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<p>コンタクト情報を保持しているすべての"<tt>META:*</tt>"属性に加えて、システムによって管理されている次の2つの属性が存在します:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>". It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<li><p><tt>BEOS:TYPE</tt>は<acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>文字列としてファイル・タイプを保持しています。この例では"<tt>application/x-person</tt>"です。この属性によりデフォルトのアイコンやファイルをダブル・クリックしたときなどにそのファイルを開くアプリケーションが決まります。</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>"はTrackerがファイルのアイコンの位置を記録するために使用する属性です。</p></li></ul>
+<div class="box-info">"Clara"の後ろのバック・スラッシュに関する補足です。Terminalでは<tt>'"*\$?!</tt>等の特別な文字を「エスケープ」する必要があります。"Clara"と"Botters"の間のスペースもエスケープする必要のある文字の1つです。従ってこの例のバック・スラッシュは、実は空白文字の直前にあるのであり、"Clara"の後ろにあるのではありません。</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="catattr" name="catattr">catattr</a></h3>
-<p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
+<p><span class="cli">catattr</span>はファイルの指定された属性の内容を表示します。</p>
 <pre>使い方: catattr [--raw|-r] attr_name file1 [file2...]</pre>
-<p>Again our example:</p>
+<p>先のファイルを再度例にします:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
+<p><span class="cli">addattr</span>はファイルに属性を追加します。同時に属性の内容を埋めることもできます。</p>
 <pre>使い方: addattr [-t type] attr value file1 [file2...]
     または: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
          タイプは次のうちのいずれか1つです:
-                 string, mime, int, llong, float, double, bool, raw
+                 string, mime, int, llong, float, double, bool, icon, raw
                  または数値です（例: 0x1234, 42, 'ABCD', ...)
          デフォルトは"string"です。</pre>
-<p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
+<p>ではここで、あなたの親友のClaraが多国籍企業であるBarkelbaer社で働くことになりました。これまで空であった"Company"属性(「文字列」型)をその情報で埋めましょう:</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
-<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
+<p><span class="cli">rmattr</span>はファイルから属性を削除します。</p>
 
 <pre>使い方: rmattr [-p] attr filename1 [filename2...]
          'attr'はそのファイル属性の名前です。
          '-p'が指定されると、'attr'はパターンとみなされます。</pre>
-<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<p>実用的な観点から見れば、単に"Fax"属性の内容を埋めないことで十分対応することができますが、次のようにタイプすることにより、Claraファイルから"Fax"属性を完全に削除することができます:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
+<p><span class="cli">copyattr</span>は1つ以上のファイルの属性を他のファイルにコピーします。デフォルトでは実際のファイルの中身については<b>コピーされません</b>。</p>
 <pre>使い方: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
-<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+<p>属性に加えてファイルの中身そのものもコピーしたい場合は、"<span class="cli">-d</span>"または"<span class="cli">--data</span>"オプションを追加します。</p>
 
 <p><br /></p>
-<p>More information on these commands and their options can be found by typing the command name followed by "<span class="cli">-h</span>" or "<span class="cli">--help</span>".</p>
+<p>以上のコマンドに関する情報や各コマンドのオプションに関する情報は、コマンド名のうしろに"<span class="cli">-h</span>"または"<span class="cli">--help</span>"を続けてタイプすることにより見ることができます。</p>
 
 </div>
 </div>

@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Screenshot</title>
+	<title>屏幕截图</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -40,39 +42,38 @@
 </ul>
 <span>
  «  <a href="poorman.html">PoorMan</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
 ::  <a href="showimage.html">Showimage</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />Screenshot</h2>
+<h2><img src="../../images/apps-images/screenshot-icon_64.png" alt="screenshot-icon_64.png" width="64" height="64" />屏幕截图</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Screenshot</span><br />
 <span class="path">/bin/screenshot</span></td></tr>
 <tr><td>设置：
 </td><td></td><td><span class="path">~/config/settings/screenshot</span></td></tr>
 </table>
 <p><br /></p>
-<p>Screenshots are taken by either starting the Screenshot application or by pressing the <span class="key">PRINT</span> key,</p>
+<p>您可以通过启动屏幕截图软件或者按下 <span class="key">PRINT</span> 键来进行屏幕截图。</p>
 <p><img id="sreenshot" src="../images/apps-images/screenshot.png" alt="screenshot.png" /></p>
-<p>In the Screenshot panel you can toggle between taking the whole screen or just the active window and decide if the window border and mouse pointer should be included. You can also enter a delay before a screenshot is taken.</p>
-<p>Below that you set the name, format and location for the screenshot that will be used when you click <span class="button">Save</span>. Instead of saving the file to disk you can also decide to <span class="button">Copy to clipboard</span> to be able to paste the shot directly into another application, or take a <span class="button">New screenshot</span>.</p>
-<p>All settings are remembered the next time you take a screenshot, enabling these convenient keyboard shortcuts:</p>
+<p>在屏幕截图面板中，您可以在全屏截图和窗口截图之间进行切换，然后决定是否要在截图中包括窗口的边界和鼠标指针。您也可以在屏幕截图之前加入时间延迟。</p>
+<p>在下面，您可以对文件名，格式和截图的位置，在您按下 <span class="button">Save</span>时，这些设置将会被使用。除了可以将文件保存到本地磁盘外，您也可以使用 <span class="button">Copy to clipboard</span> 将截图直接复制到其他的程序，或者开始 <span class="button">New screenshot</span>。</p>
+<p>所有的设置在您下次进行屏幕截图的时候将会被记住，您需要激活下面的快捷键：</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="4">
-<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>Takes a screenshot with zero delay and launches the Screenshot panel.</td></tr>
-<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>Takes a screenshot silently (without opening the panel), while still respecting the last used settings.</td></tr>
-<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>Also takes a screenshot silently with the saved settings, but instead of saving it as a file, it's just copied to the clipboard.</td></tr>
+<tr><td><span class="key">PRINT</span></td><td style="width:15px;"></td><td>零延迟屏幕截图，并且打开屏幕截图面板。</td></tr>
+<tr><td class="onelinetop"><span class="key">SHIFT</span> <span class="key">PRINT</span></td><td></td><td>安静的执行屏幕截图（不打开截图面板），但是使用最近的设置。</td></tr>
+<tr><td><span class="key">CTRL</span> <span class="key">PRINT</span></td><td></td><td>使用最近的设置进行屏幕截图，但是不保存为文件，而是保存到剪切板。</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-Taking a screenshot from Terminal</h2>
-<p>There's a special <span class="cli">screenshot</span> application to be used from Terminal or a script.<br />
-<span class="cli">screenshot --help</span> shows the familiar options as parameters:</p>
+终端屏幕截图</h2>
+<p>在终端或者脚本中，可以使用 <span class="cli">screenshot</span> 命令行程序来进行屏幕截图。<br />
+<span class="cli">screenshot --help</span> 可以显示常用的选项参数：</p>
 
 <pre class="terminal">~&gt; screenshot --help
 
@@ -104,7 +105,7 @@ Note: OPTION -b, --border takes only effect when used with -w, --window
 <div class="nav">
 <div class="inner"><span>
  «  <a href="poorman.html">PoorMan</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
 ::  <a href="showimage.html">Showimage</a>  »
 </span></div>
 </div>

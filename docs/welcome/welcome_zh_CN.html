@@ -10,17 +10,19 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de> 
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Welcome to Haiku!</title>
+	<title>欢迎使用Haiku！</title>
 	<link rel="stylesheet" type="text/css" href="Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -45,78 +47,77 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2>
-<a id="welcome" name="welcome">Welcome to Haiku!</a></h2>
-<p>Thank you very much for checking out Haiku! This is our second public release. We hope to attract new developers to our project and give future users a chance to check out Haiku. We realize that this <i>alpha release</i> does not yet fully live up to the goals that we have set for ourselves and doesn't offer all the features and well-rounded end-user experience planned for the final R1 version. However, we hope that this release lets you discover Haiku's great potential and that you share our excitement.</p>
+<a id="welcome" name="welcome">欢迎使用Haiku！</a></h2>
+<p>非常感谢您对Haiku的试用和测试！这是我们公开发布的第二个版本，我们希望吸引更多的开发者参与我们的项目，也希望能够为未来的用户提供测试Haiku的机会。我们也注意到本<i>试用版本</i> 还远远没有达到既定的目标，没有提供为最终的R1版本计划的所有特性和全面用户体验。然而，我们希望这一版本可以让您发现Haiku的巨大潜力，让您分享我们的喜悦。</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="bugreport" name="bugreport">Beware of Bugs</a></h2>
-<p>We have been working hard to fix all possibly show stopping bugs, however, being an alpha release, there are bound to be plenty left undiscovered.</p>
-<div class="box-warning">We discourage using alpha versions as a production system. Your data could very well be altered, mangled or downright destroyed.</div>
+<a id="bugreport" name="bugreport">警惕错误</a></h2>
+<p>我们已经尽力去修复所有发现了的错误。然而作为测试版本，它可能还有许多未发现的错误。</p>
+<div class="box-warning">我们不鼓励您使用测试版本作为生产用系统。您的数据可能会被改变，损坏或者完全销毁。</div>
 
-<p>One of the main reasons for releasing an alpha version is to attract more people to test the system and discover bugs or provide suggestions for future enhancements. Please file bugs and enhancements in our bug tracker after using its search function to avoid duplicates.</p>
+<p>发布该测试版本的主要原因之一是为了吸引更多的用户来测试系统，发现错误，提供未来发展的建议。在您使用我们的错误跟踪系统提交错误或者发展建议之前，请使用它的查询功能来避免重复的提交相同的内容。</p>
 <ul>
-	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
-	<li><a href="zh_CN/bugreports.html">Tips for a helpful bug report</a></li>
+	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku错误跟踪系统</a></li>
+	<li><a href="zh_CN/bugreports.html">错误报告的提示</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="system" name="system">Getting to know the system</a></h2>
-<p>The first release(s) of Haiku will be very much like the BeOS R5, the operating system it is reimplementing. If you never experienced it, have a look at these links:</p>
+<a id="system" name="system">了解Haiku操作系统</a></h2>
+<p>Haiku的第一个系列的版本将会非常类似于BeOS R5，是BeOS R5系统的重建系统。如果您从未尝试过该系统，您可以参阅以下链接：</p>
 <ul>
-	<li><a href="../userguide/zh_CN/contents.html">Haiku User Guide</a></li>
-	<li><a href="http://www.haiku-os.org/community/" class="printurl">List of BeOS/Haiku websites</a></li>
+	<li><a href="../userguide/zh_CN/contents.html">Haiku用户指南</a></li>
+	<li><a href="http://www.haiku-os.org/community/" class="printurl"> BeOS/Haiku 网站清单</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="software">Installing more software</a></h2>
-<p>Because of our binary and source compatibility, many BeOS applications run on Haiku (you may have to install the optional package "beoscompatibility" for some programs, see below). After downloading a package, simply unzip it (double clicking opens <span class="app">Expander</span>) to <span class="path">/boot/apps/</span> and start the application from there.</p>
+<a id="software" name="software">安装更多的程序</a></h2>
+<p>由于二进制库和源代码的兼容性，许多BeOS程序可以在Haiku系统中运行。（您可能需要为某些程序安装“beoscompatibility”附加软件包，详情见下文）。 下载软件包之后，将其解压（双击打开 <span class="app">档案管理器</span>）到 <span class="path">/boot/apps/</span> ，然后从这里启动程序。</p>
 
-<p>Popular software repositories are:</p>
+<p>非常有名的软件仓库有：</p>
 <ul>
 	<li><a href="http://www.haikuware.com" class="printurl">Haikuware</a></li>
 	<li><a href="http://www.bebits.com" class="printurl">BeBits</a></li>
-	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - maintains patches for ported software</li>
-	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - hosts native BeOS and Haiku open source software projects</li>
+	<li><a href="http://ports.haiku-files.org/" class="printurl">HaikuPorts</a> - 包含了移植程序的补丁</li>
+	<li><a href="http://www.osdrawer.net/" class="printurl">OsDrawer</a> - 主持原生的BeOS和Haiku开源程序项目</li>
 </ul>
 
-<p>There are also so-called Optional Packages, which are used by Haiku's build system. It is not intended for end users to manually extract and install them. Instead, a utility script is provided, <tt>installoptionalpackage</tt>. This script is meant to bridge the gap while Haiku's package management is still under construction. It will allow you to install most of the available Optional Packages.<br />
-You'll have to run a command in Terminal: <tt>installoptionalpackage -h</tt> explains its usage.</p>
+<p>还有一些所谓的附加软件包，它们主要用于Haiku的构建系统，终端用户并不需要对它们进行解压和安装。相应的，系统提供了一个工具脚本 <tt>installoptionalpackage</tt> 来安装附加软件包。由于Haiku的包管理软件仍在开发之中，该脚本主要起到一个暂时的过渡作用。它允许您安装大部分可用的附加软件包。<br />
+您可以在终端中输入命令： <tt>installoptionalpackage -h</tt>  来查看它的用法。</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="software" name="wifi">Wifi in Haiku</a></h2>
-<p>Wifi does work to some extent. At the moment you can only connect to unencrypted or WEP encrypted wireless networks. Due to several different licensing policies of different vendors, a manual installation process for the firmware may be required. A list of working devices and instructions for installation can be found on our <a href="zh_CN/wifi.html">Wifi</a> page (also <a href="http://www.haiku-os.org/guides/wifi">online</a>).</p> 
+<a id="software" name="wifi">Haiku的无线网络</a></h2>
+<p>在某种程度上，无线网络可以工作。现在您只能连接到未加密的或者WEP加密的无线网络。由于不同提供商的各种不同的授权政策，对于一些固件，可能需要手动的安装。您可以在我们的<a href="zh_CN/wifi.html">无线网络</a>页面上找到可用硬件和相关的安装说明（当然，还有<a href="http://www.haiku-os.org/guides/wifi">在线</a>文档）。</p> 
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="api" name="api">Getting to know the API</a></h2>
-<p>Since Haiku is a reimplementation, the API is still the same as for BeOS R5 (with some additions). Therefore the documentation in the Be Book is still a valid resource. Thanks to ACCESS, who owns the rights to former Be Inc. property, we are allowed to provide a copy of the Be Book.</p>
+<a id="api" name="api">了解Haiku的API</a></h2>
+<p>由于 Haiku 是 BeOS 系统的重新实现，它的 API 仍然和 BeOS R5 的相同（增添了一些特性）。所以 Be Book 中的文档仍然是非常有用的资源。非常感谢前 BeOS 公司财产的拥有者 - ACCESS，我们才可以提供 Be Book 的副本供大家参考。</p>
 
-<p>There are additional resources that should help you getting started:</p>
+<p>下面的资源对您的入门会有很多帮助：</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">Development FAQ</a></li>
-	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">Source Browser</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archive</a></li>
+	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">开发FAQ</a></li>
+	<li><a href="http://dev.haiku-os.org/browser/" class="printurl">源码浏览</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">Be Book</a></li>
+	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be 通讯存档</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="contact" name="contact">Getting in contact</a></h2>
-<p>Get in contact with other developers and users and join the discussions on IRC, in our forums or the mailing lists. When many different people come together, rules have to established to keep communication effective. Please respect our <a href="http://www.haiku-os.org/community/ml/etiquette">Mailing List Etiquette</a>.</p>
+<a id="contact" name="contact">联系方式</a></h2>
+<p>通过参加IRC，论坛，邮件列表中的讨论来同其他的开发者和用户保持联系。由于许多不同人员的参与，我们需要制定一些规则使交流变得方便有效。请遵守我们的<a href="http://www.haiku-os.org/community/ml/etiquette">邮件列表规范</a>。</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
-	<li><a href="http://www.haiku-os.org/forum" class="printurl">Forums</a></li>
-	<li><a href="http://www.freelists.org/list/haiku" class="printurl">General mailing list</a></li>
-	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Development mailing list concerning Haiku itself</a></li>
-	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Mailing list for 3rd party application programmers</a></li>
-	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Overview of all mailing lists</a></li>
+	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC聊天频道</a></li>
+	<li><a href="http://www.haiku-os.org/forum" class="printurl">相关论坛</a></li>
+	<li><a href="http://www.freelists.org/list/haiku" class="printurl">通用邮件列表</a></li>
+	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">开发邮件列表（只关注Haiku项目）</a></li>
+	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">开发邮件列表（第三方程序）</a></li>
+	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">所有邮件列表概览</a></li>
 </ul>
 
 </div>

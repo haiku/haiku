@@ -10,18 +10,20 @@
  * Authors:
 * 		Matt Madia who wrote http://www.haiku-os.org/guides/wifi 
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Wifi</title>
+	<title>无线网络</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -47,45 +49,47 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2>Wifi in Haiku</h2>
+<h2>Haiku中的无线网络</h2>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="hardware" rel="nofollow" id="hardware">Expected supported hardware</a></h3>
-<p>All of FreeBSD 8 wlan drivers should be working. Any PCMCIA, CardBus, ExpressCard, USB or ISA based cards will not work. Only PCI, miniPCI, PCI-Express, miniPci-Express and PCI-X are supposed to work.<br />
-This includes:
+<a name="hardware" rel="nofollow" id="hardware">预期的硬件支持</a></h3>
+<p>FreeBSD 8的所有无线驱动都应该可以工作。但是任何的PCMCIA，CardBus，ExpressCard，USB或者基于ISA的网卡将无法工作。只有PCI，miniPCI，PCI-Express，miniPci-Express 和 PCI-X 才应该可以工作。<br />
+包括以下：
 </p>
 <ul>
-<li><p><i>aironetwifi</i> supporting at least<br />
+<li><p><i>aironetwifi</i> 至少支持：<br />
 Cisco Aironet 350 Series<br />
 Aironet PCI4500<br />
 Aironet PCI4800<br />
 </p></li>
-<li><p><i>atheroswifi</i> supporting almost every chipset outthere (though no AR9285 chips)</p></li>
-<li><p><i>broadcom43xx</i> supporting<br />
-BCM4301, BCM4306, BCM4307, BCM4309, BCM4311, BCM4312 and BCM4318
+<li><p><i>atheroswifi</i>支持几乎所有的芯片集(但是除了 AR9285 芯片)</p></li>
+<li><p><i>broadcom43xx</i> 支持：<br />
+BCM4301，BCM4306，BCM4307，BCM4309，BCM4311，BCM4312和 BCM4318
 </p></li>
-<li><p><i>iprowifi2100</i> supporting the 2100 chips</p></li>
-<li><p><i>iprowifi2200</i> supporting<br />
+<li><p><i>iprowifi2100</i> 支持 2100 芯片</p></li>
+<li><p><i>iprowifi2200</i> 支持：<br />
 2200BG<br />
 2225BG<br />
 2915ABG
 </p></li>
-<li><p><i>iprowifi3945</i> supporting the 3945 chips</p></li>
-<li><p><i>iprowifi4965</i> supporting the 4965 chips</p></li>
-<li><p><i>marvell88w8335</i> supporting<br />
+<li><p><i>iprowifi3945</i> 支持 3945 芯片</p></li>
+<li><p><i>iprowifi4965</i>支持 4965 芯片</p></li>
+<li><p><i>marvell88w8335</i> 支持：
+<br />
 Marvell Libertas 88W8310<br />
 Marvell Libertas 88W8335
 </p></li>
-<li><p><i>marvell88w8363</i> supporting the 88W8363 chips</p></li>
-<li><p><i>ralinkwifi</i> supporting<br />
+<li><p><i>marvell88w8363</i> 支持 88W8363 芯片</p></li>
+<li><p><i>ralinkwifi</i> 支持：
+<br />
 RT2560<br />
 RT2561S<br />
 RT2561<br />
 RT2661
 </p></li>
-<li><p><i>wavelanwifi</i> supporting at least<br />
+<li><p><i>wavelanwifi</i> 目前支持：
+<br />
 3Com Airconnect<br />
 GLPRISM2 WaveLAN<br />
 Intersil Prism3<br />
@@ -101,38 +105,39 @@ Addtron AWA-100 PCI
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wep" rel="nofollow" id="wep">WEP encryption</a></h3>
-<p>WEP encryption is available through a command-line application <span class="cli">setwep</span>. It is a temporary means for joining an unencrypted or WEP encrypted wifi network. <span class="cli">setwep</span> works with 64- and 128-bit WEP and supports both text keys as well as hex digit keys (see <a href="#wep-notes" rel="nofollow">WEP notes</a> below).
+<a name="wep" rel="nofollow" id="wep">WEP 加密</a></h3>
+<p>WEP 加密可以通过命令行程序 <span class="cli">setwep</span> 来进行启动。它是一种用于加入未加密或者WEP加密的无线网络的临时方法。 <span class="cli">setwep</span> 可用于64位或者128位的WEP，而且同时支持文本输入密钥和十六进制产品密钥（详细内容可以参阅下面的<a href="#wep-notes" rel="nofollow">WEP备注</a> ）。
 </p>
-<p>The usage is: <span class="cli">setwep device_path [ssid] [key]</span></p>
-<p>Below are two examples. Let us assume your wifi network card is "/dev/net/iprowifi3945/0" and the wireless network is named "haikuwifi".</p>
-<h4>Example 1: Connect with 64-bit WEP encryption using a hex digit key</h4>
+<p>用法是：<span class="cli">setwep device_path [ssid] [key]</span></p>
+<p>下面是两个示例。我们假定您的无线网卡是 “/dev/net/iprowifi3945/0”，而无线网络是“haikuwifi”。</p>
+<h4>示例1：使用十六进制产品密钥连接64位WEP加密网络。</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi 0x3456789abc
-</pre><h4>Example 2: Connect to an unencrypted wireless network</h4>
+</pre><h4>示例2：连接到未加密的无线网络</h4>
 <pre class="terminal">setwep /dev/net/iprowifi3945/0 haikuwifi
 </pre><div class="box-info">
-<li>To find out what your device_path is, have a look in Preferences -&gt; Network</li>
-<li>To make your wifi device connect to a given SSID at each boot, add the <tt>setwep</tt> command to your <tt>home/config/boot/UserBootscript</tt></li>
+<li>为找出您的硬件的路径，你可以查看Preferences -&gt; Network</li>
+<li>为了使您的无线设备在每次启动时都连接到给定的SSID，您可以添加 <tt>setwep</tt> 命令到 <tt>home/config/boot/UserBootscript</tt> 。
+</li> 
 </div>
-<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP notes</strong></a></p>
+<p><a name="wep-notes" rel="nofollow" id="wep-notes"><strong>WEP 备注</strong></a></p>
 <ul>
-<li>64-bit WEP uses a 40-bit key, which means 5 text characters or 10 hex digits</li>
-<li>128-bit WEP uses a 104-bit key, which means 13 text characters or 26 hex digits</li>
-<li>hexadecimal digits = characters 0-9 and A through F (prepended with "0x" in <tt>setwep</tt>)</li>
+<li>64位的WEP使用了40位的密钥，也就是5个文本字符或者10个十六进制数字。</li>
+<li>128位的WEP是引用了104位密钥，也就是13个文本字符或者26个十六进制数字。</li>
+<li>十六进制位数字 = 0-9和A-F十六个字符 (在 <tt>setwep</tt> 命令中，它们前面冠以 “0x” )。</li>
 </ul>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="wpa" rel="nofollow" id="wpa">WPA encryption</a></h3>
-<p>At the moment there is no WPA encryption available in Haiku. However, there is some <a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">preliminary and unfinished code for implementing WPA</a><span class="ext"></span> available. Some tasks for improving this is to plug it into the wpa_supplicant build process and then fixing compile &amp; runtime issues.</p>
+<a name="wpa" rel="nofollow" id="wpa">WPA加密</a></h3>
+<p>现在，在Haiku中还未有可用的WPA加密。但是，存在一些可用的<a target="_blank" class="ext" href="http://alexbl.net/%7Ealexbl/haiku-wpa/" rel="nofollow">用于实现WPA的私有或者未完成的代码</a><span class="ext"></span>。为了提高代码的可用性，您需要在构建wpa_supplicant的过程中加入相关代码，并且要袖管在编译和使用过程中存在的错误。</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a name="install_script" rel="nofollow" id="install_script">install-wifi-firmwares.sh</a></h3>
-<p>To install the firmware for Intel ipw2100, Intel ipw2200/2225/2915, Broadcom 43xx &amp; Marvell 88W8335, you need to run</p>
+<p>为了安装用于 Intel ipw2100，Intel ipw2200/2225/2915，Broadcom 43xx 和 Marvell 88W8335 等的固件，您需要运行</p>
 <pre class="terminal">install-wifi-firmwares.sh
 </pre>
-<p>The Intel ipw2100 and ipw22xx will install without an internet connection, as the licensing terms allow Haiku to distribute the original firmware archives. However, they do require acknowledgment by the end-user prior to their installation. The Broadcom 43xx and Marvell 88W8335 will require an active internet connection, as the files containing their respective firmwares cannot be distributed with Haiku.</p>
-<p>People building their own Haiku image can modify their <span class="cli">build/jam/UserBuildConfig</span> accordingly. Details for that and general updates on the wifi topic are found at the <a href="http://www.haiku-os.org/guides/wifi">online version of this document</a>.</p>
-<p>If you have to download the firmware, but don't have a working internet connection under Haiku, the online version offers a <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell script</a>, which will create a zip file for you to extract to Haiku's <tt>/boot</tt>. After that you'll have all files needed by install-wifi-firmwares.sh.</p>
+<p> Intel ipw2100 和 ipw22xx 无需网络连接也可以进行安装，这是因为它们的许可条款允许Haiku发行原始的固件档案。但是在安装之前，它们确实需要用户的确认。Broadcom 43xx 和 Marvell 88W8335 需要活动的网络连接，这是因为包含固件的文件不能够随着Haiku一同发布。</p>
+<p>构建自己的Haiku镜像的人们可以在 <span class="cli">build/jam/UserBuildConfig</span> 中进行相应的改动。更多详细信息和关于无线网络的主题更新可以参阅 <a href="http://www.haiku-os.org/guides/wifi">有关的在线文档</a>。</p>
+<p>如果您确实需要下载该固件，而且在 Haiku 下也没有可用的网络连接，在线文档提供了一个<a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt" rel="nofollow">shell 脚本</a>，它将会为你创建用于解压到 Haiku 的 <tt>/boot</tt> 文件夹下的Zip文件。之后，您就具有了所有 install-wifi-firmwares.sh 所需要的所有文件。</p>
 </div>
 </div>
 

@@ -10,17 +10,19 @@
  * Authors:
  * 		Niels Reedijk and Matt Madia who wrote http://dev.haiku-os.org/wiki 
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Reporting bugs</title>
+	<title>报告错误</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>用户指南</span></div>
 </div>
 
 <div class="nav">
@@ -45,55 +47,54 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Reporting bugs</h1>
+<h1>报告错误</h1>
 
-<p>Since our developers are unable to test every hardware combination, nor every different way of interacting with the operating system, we are relying on users to give us some input on how things work at their end. Since Haiku is still quite young, it's very likely that you will encounter bugs. We thank you for taking the time to report these. Together we can improve Haiku, bit by bit.</p>
-<p>To keep our bugtracker effective, it's essential to abide by the <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Bug Tracker Etiquette</a>.</p>
+<p>由于我们的开发人员不可能测试每种硬件组合和每种不同的系统交互方式，所以我们依赖于用户，通过用户来给予我们Haiku的运行情况。由于Haiku还很年轻，您在使用时很有可能会遇到错误。我们非常感谢您能够分出时间来提交这些错误报告。我们可以共同的一位一位的提高Haiku的性能。</p>
+<p>为了确保我们的错误跟踪系统的有效性，遵守共同的<a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">错误报告规范</a>是很有必要的。</p>
 
-<h2>Getting a Trac account</h2>
-<p>To file a ticket, you need to have an account at <a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku's Bugtracker</a>.<br />
-When creating a new account, be certain to <b>provide your email address</b> as it is necessary to obtain basic ticket modification privileges. Be sure to <b>check your spam folder</b> shortly afterwards, as the all important verification mail often ends up there.</p>
+<h2>获取Trac账户</h2>
+<p>为了提交任务单，您需要在<a href="http://dev.haiku-os.org/register" title="Register at Haiku's Bugtracker">Haiku的错误跟踪系统</a>中注册一个账户。
+<br />
+在新建账户时，你需要<b>提供自己的电子邮箱</b> ，否则您将不具有基本的任务单修改权限。之后，您一定要保证<b>检查您的垃圾邮件文件夹</b>，因为所有重要的验证邮件都会被发送到那儿去。</p>
 
-<h2>Creating a bug report</h2>
-<p>Before reporting a bug, please <a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">make sure</a> that it does not yet exist. You can also use the <a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">search</a> function for this.<br />
-After you have established that it's a unique bug, make your information as accurate as possible:</p>
+<h2>创建错误报告</h2>
+<p>在报告一个错误之前，请您<a href="http://dev.haiku-os.org/query?status=new&amp;status=assigned&amp;status=reopened&amp;status=closed&amp;summary=%7Etext+you+want+to+search+for&amp;order=priority">确保</a>该错误报告之前不存在。你可以使用<a href="http://dev.haiku-os.org/search?q=&amp;noquickjump=1&amp;ticket=on">查找</a>功能来查找其是否存在。
+<br />
+在确定它是一个独特的错误之后，您需要尽可能的找出有关的详细信息：</p>
 <ul>
-	<li><p>Include basic information such as how you are testing Haiku (on real hardware, on VMWare, on QEMU, etc.).</p></li>
-	<li><p>Mention which revision from <acronym title="Subversion, the source code management system we use">SVN</acronym> you are running. You can find this information in '<i>About This System...</i>' from the Deskbar menu.</p></li>
-	<li><p>Describe the problem you are experiencing. Try to be as accurate as you can: describe the actual behavior, and the behavior you expected.</p></li>
-	<li><p>Describe what steps you need to perform in order to expose the bug. This will help developers reproduce the bug.</p></li>
-	<li><p>Attach as much information as you have. If it is a GUI bug, or a bug in one of the applications, try to make a screen shot (the <span class="key">PRINT</span> key saves a <acronym title="Portable Network Graphics image format">PNG</acronym> in <span class="path">/boot/home/</span>).</p></li>
+	<li><p>包括基本的信息，例如以何种方式测试Haiku（利用真实的硬件，VMware，还是QEMU）。</p></li>
+	<li><p>提及您正在运行的系统的 <acronym title="Subversion, the source code management system we use">SVN</acronym> 发布版本。你可以在桌面栏菜单中的 '<i>About This System...</i>' 中找出相关信息。</p></li>
+	<li><p>描述您所遇到的问题。尽量把问题讲得精确和明白：描述详细的系统行为反馈，和您期望的反馈。</p></li>
+	<li><p>描述暴露该错误所需要的操作步骤。这将会有助于开发者重现该错误，并对其进行修复和完善。</p></li>
+	<li><p>附带你所掌握的尽可能多的信息。如果是一个GUI错误，或者图形程序错误，尽量附带出现错误时的屏幕截图。（<span class="key">PRINT</span> 键保存了一个<acronym title="Portable Network Graphics image format">PNG</acronym> 图像到 <span class="path">/boot/home/</span>）。</p></li>
 </ul>
 	
-<h3>Software Bugs</h3>
-<p>When an application crashed, you should invoke the debugger from the alert that pops up. Entering <span class="cli">bt</span> into the launched debug Terminal, you create a "backtrace" that you should copy into your bug report.</p>
+<h3>软件错误</h3>
+<p>如果出现了程序崩溃，您应该从弹出的警告窗口中启动调试程序。 在启动的调试终端中，输入<span class="cli">bt</span>，你将会创建关于调试信息的“回溯”，然后你应该把它复制到您的错误报告中。</p>
 
-<h3>Hardware Bugs</h3>
-<p>When dealing with a hardware/driver related bug, you should attach the following information:</p>
+<h3>硬件错误</h3>
+<p>如果遇到了硬件或者驱动相关的错误，您应该附带下列信息：</p>
 <ul>
-<li><span class="cli">listdev</span> - a detailed listing of your hardware, including vendor and pci id's, similar to Linux' <span class="cli">lshw</span> and <span class="cli">lspci</span>.</li>
-<li><span class="cli">listusb -v</span> - assuming its a USB related issue, similar to <span class="cli">lsusb</span>.</li>
-<li><span class="cli">open /var/log/syslog</span> - the primary system log used by Haiku, akin to on screen debugging during boot. With the <span class="cli">open</span> command you can crop down the relevant part of the syslog in a text editor.</li>
-<li><span class="cli">listimage | grep drivers/</span> - lists all used drivers.</li>
-<li><span class="cli">ints</span> - only available within <i>Kernel Debugging Land</i> (see below). Shows interrupt usage. There shouldn't be too many that are shared by different devices.</li>
+<li><span class="cli">listdev</span> - 有关您的硬件的详细列表，包括提供商和PCI ID。类似于Linux下的 <span class="cli">lshw</span> 和 <span class="cli">lspci</span> 。</li>
+<li><span class="cli">listusb -v</span> - 如果存在USB相关的问题；类似于Linux下的 <span class="cli">lsusb</span>。</li>
+<li><span class="cli">open /var/log/syslog</span> - Haiku主要的系统日志，近似于在启动期间的屏幕调试。使用 <span class="cli">open</span> 命令，您可以把在文本编辑器中把系统日志中重要的部分裁剪下来。</li>
+<li><span class="cli">listimage | grep drivers/</span> - 列出所有使用的驱动。</li>
+<li><span class="cli">ints</span> - 只在 <i>内核调试状态</i> 下才可用（参见下文）。它显示了中断的使用情况，而由不同的硬件所共享的中断并不是很多。</li>
 </ul>
-<p>You enter these commands into Terminal. Add a <span class="cli"> &gt; output.txt</span> after a command, and it's piped into a text file called "output.txt" that you can attach to your bug report or email.</p>
+<p>您在终端中输入这些命令，在每个命令后面添加 <span class="cli"> &gt; output.txt</span> 。 然后命令输出的结果就被重定向到一个称为 “output.txt” 的文本文件；您可以把它附带到您的错误报告或者邮件中。</p>
 
-<h3>Kernel Debugging Land - KDL</h3>
-<p>When some very low level system component crashed, you may end up in the kernel debugger. It can also be entered deliberately with <span class="key">ALT</span><span class="key">SysReq</span><span class="key">D</span> (<span class="key">SysReq</span> being <span class="key">PRINT</span> on most keyboards).</p>
+<h3>内核调试 - KDL</h3>
+<p>如果某些底层的系统组件发生了崩溃，您可能就会进入了内核调试状态。您也可以有意识的使用 <span class="key">ALT</span><span class="key">SysReq</span><span class="key">D</span>（<span class="key">SysReq</span> 在多数键盘中都是 <span class="key">PRINT</span>）来进入内核调试状态。</p>
 <ul>
-<li><span class="cli">co</span> - will exit KDL and continue normal system operation, if possible.</li>
-<li><span class="cli">int</span> - will show interrupt usage (as described above).</li>
-<li><span class="cli">bt</span> - shows a backtrace, detailing where exactly the crash happened.</li>
+<li><span class="cli">co</span> - 如果可能的话，系统将会结束内核调试状态，返回正常的系统操作界面。</li>
+<li><span class="cli">int</span> - 将会显示中断使用情况（如上所述）。</li>
+<li><span class="cli">bt</span> - 显示一个调试信息的回溯，详细的给出了崩溃发生的地方。</li>
 </ul>
 
-<h2>What's next?</h2>
-<p>After the bug has been reported, a developer will look at your bug and try to classify it. Remember, we are all volunteers, and as such, sometimes a bug report might go unanswered for a while. Adding new information when it becomes available usually helps getting a bug picked up quicker, but do not try to 'bump' the bug up by adding
-non-descriptive comments.</p>
-<p>Remember, reporting a bug is not something you spend a little time on and then you are done. If you reported a bug, then you are part of the Haiku development process. Developers might come up with questions while they are trying to fix your bug. Please stay around to answer these. Consider your participation 'done' when the bug is marked
-as 'fixed'.</p>
+<h2>下一步？</h2>
+<p>在您提交了错误报告之后，开发人员将会检查您的错误，然后尝试进行修复。但是需要注意的是，我们所有的人员都是志愿者，有时候一个错误报告可能会很长时间没有人来进行回答。如果可以的话，添加新的信息将会有助于早点修复错误，但是请不要添加非描述性的评论来将“炒热”该错误。</p>
+<p>切记，提交错误报告不是花些很少的时间写个报告的事。如果您提交了一个错误，然后您属于Haiku开发过程中的一部分。开发人员在解决您的错误过程中可能会遇到问题，因此请你一定要始终关注该错误，然后回答相关的问题。如果该问题没有“fixed”，你的任务就没有“done”。</p>
 
 </div>
 </div>

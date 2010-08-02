@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -47,33 +49,32 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/prefs-images/backgrounds-icon_64.png" alt="backgrounds-icon_64.png" width="64" height="64" />Backgrounds</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbarメニュー:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
 <tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Backgrounds</span></td></tr>
 <tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/system/app_server/workspaces</span><br />
-<span class="path">~/config/settings/Backgrounds settings</span> - stores the panel's window position</td></tr>
+<span class="path">~/config/settings/Backgrounds settings</span> - パネルのウィンドウの位置が保存されます。</td></tr>
 </table>
-<p>You can set a color or an image as background for every folder and the Desktop for every workspace.</p>
+<p>色や画像を各フォルダの背景やワーク・スペースごとのデスクトップの背景として指定することができます。</p>
 <p><br /></p>
 <img src="../images/prefs-images/backgrounds.png" alt="backgrounds.png" />
-<p>The top menu specifies if your changes are applied to the current workspace only, all workspaces, a specific folder or as default for every new folder.</p>
-<p>Below that you can assign an image or select <span class="menu">None</span> if you want simply a colored background. Images can also be drag&amp;dropped onto the preview to the left.</p>
-<p>If you are using an image, you have to decide on the placement:</p>
+<p>ウィンドウの一番上のプルダウン・メニューを使って、変更を現在のワーク・スペースのみ、すべてのワーク・スペース、ある特定のフォルダ、新しく作成されるすべてのフォルダのデフォルト設定のいずれに適応するか選択します。</p>
+<p>その下のプルダウン・メニューで背景の画像を指定します。シンプルに単色の背景を選択したい場合は、<span class="menu">None</span>を選択します。画像については、ウィンドウ左側のプレビュー部分にファイルをドラッグ・アンド・ドロップすることで指定することもできます。</p>
+<p>画像を指定する場合、表示位置を決める必要があります:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Manual</span></td><td> </td><td>lets you specify the coordinates. You can drag the picture around in the preview to the left or enter <i>X</i> and <i>Y</i> manually.</td></tr>
-<tr><td><span class="menu">Center</span></td><td> </td><td>centers the picture in the middle of the screen.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Scale to fit</span></td><td> </td><td>enlarges the picture with no regard to its aspect ratio until it fills the screen.</td></tr>
-<tr><td><span class="menu">Tile</span></td><td> </td><td>fills the screen by repeating the picture.</td></tr>
+<tr><td><span class="menu">Manual</span></td><td> </td><td>座標位置を指定します。ウィンドウ左側のプレビュー部分で画像をドラッグすることで座標を指定することもできますし、<i>X</i>座標と<i>Y</i>座標を手で入力することもできます。</td></tr>
+<tr><td><span class="menu">Center</span></td><td> </td><td>画像を画面の中央に配置します。</td></tr>
+<tr><td class="onelinetop"><span class="menu">Scale to fit</span></td><td> </td><td>アスペクト比を考慮せずに、画面にフィットするように画像を拡大します。</td></tr>
+<tr><td><span class="menu">Tile</span></td><td> </td><td>同じ画像を繰り返し表示して画面を埋めつくします。</td></tr>
 </table>
-<p>Activating <span class="menu">Icon label outline</span> puts a thin contour around icon labels.</p>
-<p>Whether an icon label's actual text is black or white depends on the setting of the color picker. A dark color sets the text to white, a light color to black. So, if you assign a very bright image to the background, you should also set the color picker to a bright color in order to have icon labels readable in black. (Or use the outline option above.)<br />
-The selected color is also reflected in the <a href="../desktop-applets/workspaces.html">Workspaces applet</a>, which ignores images as backgrounds.</p>
+<p><span class="menu">Icon label outline</span>を有効にすると、アイコン・ラベルの周囲に細い輪郭が表示されるようになります。</p>
+<p>アイコン・ラベルの文字が実際は黒になるのか白になるのかは、スポイト・ツールの設定に依存します。暗い色が指定されていれば文字は白色で表示されますし、明るい色が指定されていれば文字は黒色で表示されます。従って、背景に非常に明るい画像を指定する場合は、アイコン・ラベルを黒色にして読めるようにするために、スポイト・ツールでは明るい色を指定すべきです(あるいは、上のアウトライン・オプションを有効にすべきです)。<br />
+Backgrounds preferencesで指定された色は、<a href="../desktop-applets/workspaces.html">Workspacesアプレット</a>にも反映されます。このとき背景の画像については無視されます。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Revert</span></td><td> </td><td>brings back the settings that were active when you started the Backgrounds preferences.</td></tr>
-<tr><td><span class="button">Apply</span></td><td> </td><td>sets your changes.</td></tr>
+<tr><td><span class="button">Revert</span></td><td> </td><td>Backgrouds preferencesが起動された時点で有効だった設定に戻します。</td></tr>
+<tr><td><span class="button">Apply</span></td><td> </td><td>変更を適応します。</td></tr>
 </table>
 
 </div>
