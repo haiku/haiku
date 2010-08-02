@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1694,7 +1694,7 @@ normalize_flock(struct file_descriptor* descriptor, struct flock* flock)
 			status_t status;
 
 			if (!HAS_FS_CALL(vnode, read_stat))
-				return EOPNOTSUPP;
+				return B_NOT_SUPPORTED;
 
 			status = FS_CALL(vnode, read_stat, &stat);
 			if (status != B_OK)
@@ -2495,7 +2495,7 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	// parent directory for the vnode, if the caller let us.
 
 	if (parent == NULL)
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	void* cookie;
 
@@ -4209,7 +4209,7 @@ vfs_read_stat(int fd, const char* path, bool traverseLeafLink,
 		if (descriptor->ops->fd_read_stat)
 			status = descriptor->ops->fd_read_stat(descriptor, stat);
 		else
-			status = EOPNOTSUPP;
+			status = B_NOT_SUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -4897,7 +4897,7 @@ static status_t
 vfs_resize_fd_table(struct io_context* context, const int newSize)
 {
 	if (newSize <= 0 || newSize > MAX_FD_TABLE_SIZE)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	TIOC(ResizeIOContext(context, newSize));
 
@@ -4911,7 +4911,7 @@ vfs_resize_fd_table(struct io_context* context, const int newSize)
 	if (newSize < oldSize) {
 		for (int i = oldSize; i-- > newSize;) {
 			if (context->fds[i])
-				return EBUSY;
+				return B_BUSY;
 		}
 	}
 
@@ -4926,7 +4926,7 @@ vfs_resize_fd_table(struct io_context* context, const int newSize)
 		+ sizeof(struct select_sync*) * newSize
 		+ newCloseOnExitBitmapSize);
 	if (newFDs == NULL)
-		return ENOMEM;
+		return B_NO_MEMORY;
 
 	context->fds = newFDs;
 	context->select_infos = (select_info**)(context->fds + newSize);
@@ -4962,12 +4962,12 @@ vfs_resize_monitor_table(struct io_context* context, const int newSize)
 	int	status = B_OK;
 
 	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	mutex_lock(&context->io_mutex);
 
 	if ((size_t)newSize < context->num_monitors) {
-		status = EBUSY;
+		status = B_BUSY;
 		goto out;
 	}
 	context->max_monitors = newSize;
@@ -5196,7 +5196,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 		// it doesn't exist yet -- try to create it
 
 		if (!HAS_FS_CALL(directory, create))
-			return EROFS;
+			return B_READ_ONLY_DEVICE;
 
 		status = FS_CALL(directory, create, name, openMode | O_EXCL, perms,
 			&cookie, &newID);
@@ -5275,7 +5275,7 @@ open_attr_dir_vnode(struct vnode* vnode, bool kernel)
 	int status;
 
 	if (!HAS_FS_CALL(vnode, open_attr_dir))
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	status = FS_CALL(vnode, open_attr_dir, &cookie);
 	if (status != B_OK)
@@ -5464,7 +5464,7 @@ file_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
 	if (!HAS_FS_CALL(vnode, write))
-		return EROFS;
+		return B_READ_ONLY_DEVICE;
 
 	return FS_CALL(vnode, write, descriptor->cookie, pos, buffer, length);
 }
@@ -5505,7 +5505,7 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 		{
 			// stat() the node
 			if (!HAS_FS_CALL(vnode, read_stat))
-				return EOPNOTSUPP;
+				return B_NOT_SUPPORTED;
 
 			struct stat stat;
 			status_t status = FS_CALL(vnode, read_stat, &stat);
@@ -5521,7 +5521,7 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 
 	// assumes off_t is 64 bits wide
 	if (offset > 0 && LONGLONG_MAX - offset < pos)
-		return EOVERFLOW;
+		return B_BUFFER_OVERFLOW;
 
 	pos += offset;
 	if (pos < 0)
@@ -5580,7 +5580,7 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char* name, int perms,
 	if (HAS_FS_CALL(vnode, create_dir))
 		status = FS_CALL(vnode, create_dir, name, perms);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 	put_vnode(vnode);
 	return status;
@@ -5604,7 +5604,7 @@ dir_create(int fd, char* path, int perms, bool kernel)
 	if (HAS_FS_CALL(vnode, create_dir)) {
 		status = FS_CALL(vnode, create_dir, filename, perms);
 	} else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 	put_vnode(vnode);
 	return status;
@@ -5756,7 +5756,7 @@ dir_read(struct io_context* ioContext, struct vnode* vnode, void* cookie,
 	struct dirent* buffer, size_t bufferSize, uint32* _count)
 {
 	if (!HAS_FS_CALL(vnode, read_dir))
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	status_t error = FS_CALL(vnode, read_dir, cookie, buffer, bufferSize,
 		_count);
@@ -5786,7 +5786,7 @@ dir_rewind(struct file_descriptor* descriptor)
 		return FS_CALL(vnode, rewind_dir, descriptor->cookie);
 	}
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -5829,7 +5829,7 @@ dir_remove(int fd, char* path, bool kernel)
 	if (HAS_FS_CALL(directory, remove_dir))
 		status = FS_CALL(directory, remove_dir, name);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 	put_vnode(directory);
 	return status;
@@ -5845,7 +5845,7 @@ common_ioctl(struct file_descriptor* descriptor, uint32 op, void* buffer,
 	if (HAS_FS_CALL(vnode, ioctl))
 		return FS_CALL(vnode, ioctl, descriptor->cookie, op, buffer, length);
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -5916,7 +5916,7 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				status = FS_CALL(vnode, set_flags, descriptor->cookie,
 					(int)argument);
 			} else
-				status = EOPNOTSUPP;
+				status = B_NOT_SUPPORTED;
 
 			if (status == B_OK) {
 				// update this descriptor's open_mode field
@@ -6009,7 +6009,7 @@ common_sync(int fd, bool kernel)
 	if (HAS_FS_CALL(vnode, fsync))
 		status = FS_CALL_NO_PARAMS(vnode, fsync);
 	else
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 
 	put_fd(descriptor);
 	return status;
@@ -6142,7 +6142,7 @@ common_create_link(int pathFD, char* path, int toFD, char* toPath,
 	if (HAS_FS_CALL(directory, link))
 		status = FS_CALL(directory, link, name, vnode);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 err1:
 	put_vnode(vnode);
@@ -6170,7 +6170,7 @@ common_unlink(int fd, char* path, bool kernel)
 	if (HAS_FS_CALL(vnode, unlink))
 		status = FS_CALL(vnode, unlink, filename);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 	put_vnode(vnode);
 
@@ -6237,7 +6237,7 @@ common_rename(int fd, char* path, int newFD, char* newPath, bool kernel)
 	if (HAS_FS_CALL(fromVnode, rename))
 		status = FS_CALL(fromVnode, rename, fromName, toVnode, toName);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 err2:
 	put_vnode(toVnode);
@@ -6284,7 +6284,7 @@ common_write_stat(struct file_descriptor* descriptor, const struct stat* stat,
 		vnode, stat, statMask));
 
 	if (!HAS_FS_CALL(vnode, write_stat))
-		return EROFS;
+		return B_READ_ONLY_DEVICE;
 
 	return FS_CALL(vnode, write_stat, stat, statMask);
 }
@@ -6337,7 +6337,7 @@ common_path_write_stat(int fd, char* path, bool traverseLeafLink,
 	if (HAS_FS_CALL(vnode, write_stat))
 		status = FS_CALL(vnode, write_stat, stat, statMask);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 	put_vnode(vnode);
 
@@ -6404,7 +6404,7 @@ attr_dir_read(struct io_context* ioContext, struct file_descriptor* descriptor,
 		return FS_CALL(vnode, read_attr_dir, descriptor->cookie, buffer,
 			bufferSize, _count);
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -6418,7 +6418,7 @@ attr_dir_rewind(struct file_descriptor* descriptor)
 	if (HAS_FS_CALL(vnode, rewind_attr_dir))
 		return FS_CALL(vnode, rewind_attr_dir, descriptor->cookie);
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -6436,7 +6436,7 @@ attr_create(int fd, char* path, const char* name, uint32 type,
 		return status;
 
 	if (!HAS_FS_CALL(vnode, create_attr)) {
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 		goto err;
 	}
 
@@ -6476,7 +6476,7 @@ attr_open(int fd, char* path, const char* name, int openMode, bool kernel)
 		return status;
 
 	if (!HAS_FS_CALL(vnode, open_attr)) {
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 		goto err;
 	}
 
@@ -6538,7 +6538,7 @@ attr_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 		*length));
 
 	if (!HAS_FS_CALL(vnode, read_attr))
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	return FS_CALL(vnode, read_attr, descriptor->cookie, pos, buffer, length);
 }
@@ -6552,7 +6552,7 @@ attr_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 
 	FUNCTION(("attr_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
 	if (!HAS_FS_CALL(vnode, write_attr))
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	return FS_CALL(vnode, write_attr, descriptor->cookie, pos, buffer, length);
 }
@@ -6574,7 +6574,7 @@ attr_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 		{
 			struct vnode* vnode = descriptor->u.vnode;
 			if (!HAS_FS_CALL(vnode, read_stat))
-				return EOPNOTSUPP;
+				return B_NOT_SUPPORTED;
 
 			struct stat stat;
 			status_t status = FS_CALL(vnode, read_attr_stat, descriptor->cookie,
@@ -6591,7 +6591,7 @@ attr_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 
 	// assumes off_t is 64 bits wide
 	if (offset > 0 && LONGLONG_MAX - offset < pos)
-		return EOVERFLOW;
+		return B_BUFFER_OVERFLOW;
 
 	pos += offset;
 	if (pos < 0)
@@ -6609,7 +6609,7 @@ attr_read_stat(struct file_descriptor* descriptor, struct stat* stat)
 	FUNCTION(("attr_read_stat: stat 0x%p\n", stat));
 
 	if (!HAS_FS_CALL(vnode, read_attr_stat))
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	return FS_CALL(vnode, read_attr_stat, descriptor->cookie, stat);
 }
@@ -6624,7 +6624,7 @@ attr_write_stat(struct file_descriptor* descriptor, const struct stat* stat,
 	FUNCTION(("attr_write_stat: stat = %p, statMask %d\n", stat, statMask));
 
 	if (!HAS_FS_CALL(vnode, write_attr_stat))
-		return EROFS;
+		return B_READ_ONLY_DEVICE;
 
 	return FS_CALL(vnode, write_attr_stat, descriptor->cookie, stat, statMask);
 }
@@ -6650,7 +6650,7 @@ attr_remove(int fd, const char* name, bool kernel)
 	if (HAS_FS_CALL(vnode, remove_attr))
 		status = FS_CALL(vnode, remove_attr, name);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 	put_fd(descriptor);
 
@@ -6694,7 +6694,7 @@ attr_rename(int fromFD, const char* fromName, int toFD, const char* toName,
 	if (HAS_FS_CALL(fromVnode, rename_attr)) {
 		status = FS_CALL(fromVnode, rename_attr, fromName, toVnode, toName);
 	} else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 err1:
 	put_fd(toDescriptor);
@@ -6718,7 +6718,7 @@ index_dir_open(dev_t mountID, bool kernel)
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, open_index_dir)) {
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 		goto error;
 	}
 
@@ -6781,7 +6781,7 @@ index_dir_read(struct io_context* ioContext, struct file_descriptor* descriptor,
 			bufferSize, _count);
 	}
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -6793,7 +6793,7 @@ index_dir_rewind(struct file_descriptor* descriptor)
 	if (HAS_FS_MOUNT_CALL(mount, rewind_index_dir))
 		return FS_MOUNT_CALL(mount, rewind_index_dir, descriptor->cookie);
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -6810,7 +6810,7 @@ index_create(dev_t mountID, const char* name, uint32 type, uint32 flags,
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, create_index)) {
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 		goto out;
 	}
 
@@ -6831,9 +6831,9 @@ index_read_stat(struct file_descriptor* descriptor, struct stat* stat)
 	// ToDo: currently unused!
 	FUNCTION(("index_read_stat: stat 0x%p\n", stat));
 	if (!HAS_FS_CALL(vnode, read_index_stat))
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 	//return FS_CALL(vnode, read_index_stat, descriptor->cookie, stat);
 }
 
@@ -6864,7 +6864,7 @@ index_name_read_stat(dev_t mountID, const char* name, struct stat* stat,
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, read_index_stat)) {
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 		goto out;
 	}
 
@@ -6888,7 +6888,7 @@ index_remove(dev_t mountID, const char* name, bool kernel)
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, remove_index)) {
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 		goto out;
 	}
 
@@ -6920,7 +6920,7 @@ query_open(dev_t device, const char* query, uint32 flags, port_id port,
 		return status;
 
 	if (!HAS_FS_MOUNT_CALL(mount, open_query)) {
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 		goto error;
 	}
 
@@ -6984,7 +6984,7 @@ query_read(struct io_context* ioContext, struct file_descriptor* descriptor,
 			bufferSize, _count);
 	}
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -6996,7 +6996,7 @@ query_rewind(struct file_descriptor* descriptor)
 	if (HAS_FS_MOUNT_CALL(mount, rewind_query))
 		return FS_MOUNT_CALL(mount, rewind_query, descriptor->cookie);
 
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -7182,7 +7182,7 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 		volume->file_system = get_file_system(layerFSName);
 		if (volume->file_system == NULL) {
-			status = ENODEV;
+			status = B_DEVICE_NOT_FOUND;
 			free(layerFSName);
 			free(volume->file_system_name);
 			free(volume);
@@ -7613,7 +7613,7 @@ fs_write_info(dev_t device, const struct fs_info* info, int mask)
 	if (HAS_FS_MOUNT_CALL(mount, write_fs_info))
 		status = FS_MOUNT_CALL(mount, write_fs_info, info, mask);
 	else
-		status = EROFS;
+		status = B_READ_ONLY_DEVICE;
 
 	put_mount(mount);
 	return status;
@@ -8290,7 +8290,7 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 		if (descriptor->ops->fd_write_stat)
 			status = descriptor->ops->fd_write_stat(descriptor, stat, statMask);
 		else
-			status = EOPNOTSUPP;
+			status = B_NOT_SUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -9202,7 +9202,7 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 		if (descriptor->ops->fd_read_stat)
 			status = descriptor->ops->fd_read_stat(descriptor, &stat);
 		else
-			status = EOPNOTSUPP;
+			status = B_NOT_SUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -9263,7 +9263,7 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 			status = descriptor->ops->fd_write_stat(descriptor, &stat,
 				statMask);
 		} else
-			status = EOPNOTSUPP;
+			status = B_NOT_SUPPORTED;
 
 		put_fd(descriptor);
 	}
@@ -9343,7 +9343,7 @@ _user_stat_attr(int fd, const char* attribute, struct attr_info* userAttrInfo)
 	if (descriptor->ops->fd_read_stat)
 		status = descriptor->ops->fd_read_stat(descriptor, &stat);
 	else
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 
 	put_fd(descriptor);
 	_user_close(attr);
@@ -9542,7 +9542,7 @@ _user_change_root(const char* userPath)
 {
 	// only root is allowed to chroot()
 	if (geteuid() != 0)
-		return EPERM;
+		return B_NOT_ALLOWED;
 
 	// alloc path buffer
 	KPath pathBuffer(B_PATH_NAME_LENGTH);

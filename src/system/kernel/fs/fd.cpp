@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -518,7 +518,7 @@ fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 	if (descriptor->ops->fd_ioctl)
 		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
 	else
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 
 	put_fd(descriptor);
 	return status;
@@ -987,7 +987,7 @@ _user_rewind_dir(int fd)
 	if (descriptor->ops->fd_rewind_dir)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
 	else
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 
 	put_fd(descriptor);
 	return status;
@@ -1260,7 +1260,7 @@ _kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
 		if (retval >= 0)
 			retval = count;
 	} else
-		retval = EOPNOTSUPP;
+		retval = B_NOT_SUPPORTED;
 
 	put_fd(descriptor);
 	return retval;
@@ -1282,7 +1282,7 @@ _kern_rewind_dir(int fd)
 	if (descriptor->ops->fd_rewind_dir)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
 	else
-		status = EOPNOTSUPP;
+		status = B_NOT_SUPPORTED;
 
 	put_fd(descriptor);
 	return status;
