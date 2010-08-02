@@ -914,14 +914,20 @@ socket_notify(net_socket* _socket, uint8 event, int32 value)
 
 		case B_SELECT_ERROR:
 			socket->error = value;
-			event |= B_SELECT_READ | B_SELECT_WRITE;
 			break;
 	}
 
 	MutexLocker _(socket->lock);
 
-	if (notify && socket->select_pool != NULL)
+	if (notify && socket->select_pool != NULL) {
 		notify_select_event_pool(socket->select_pool, event);
+
+		if (event == B_SELECT_ERROR) {
+			// always notify read/write on error
+			notify_select_event_pool(socket->select_pool, B_SELECT_READ);
+			notify_select_event_pool(socket->select_pool, B_SELECT_WRITE);
+		}
+	}
 
 	return B_OK;
 }
