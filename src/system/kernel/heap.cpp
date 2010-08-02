@@ -32,6 +32,11 @@
 #endif
 
 
+#if USE_SLAB_ALLOCATOR_FOR_MALLOC
+#	undef KERNEL_HEAP_LEAK_CHECK
+#endif
+
+
 #if KERNEL_HEAP_LEAK_CHECK
 typedef struct heap_leak_check_info_s {
 	addr_t		caller;
@@ -49,7 +54,7 @@ struct caller_info {
 static const int32 kCallerInfoTableSize = 1024;
 static caller_info sCallerInfoTable[kCallerInfoTableSize];
 static int32 sCallerInfoCount = 0;
-#endif
+#endif	// KERNEL_HEAP_LEAK_CHECK
 
 
 typedef struct heap_page_s heap_page;
@@ -278,9 +283,6 @@ class Free : public AbstractTraceEntry {
 // #pragma mark - Debug functions
 
 
-#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
-
-
 #if KERNEL_HEAP_LEAK_CHECK
 static addr_t
 get_caller()
@@ -301,6 +303,9 @@ get_caller()
 	return 0;
 }
 #endif
+
+
+#if !USE_SLAB_ALLOCATOR_FOR_MALLOC
 
 
 static void
