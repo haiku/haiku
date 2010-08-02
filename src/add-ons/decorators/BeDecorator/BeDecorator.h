@@ -18,7 +18,7 @@ class Desktop;
 
 
 class BeDecorator: public Decorator {
- public:
+public:
 								BeDecorator(DesktopSettings& settings,
 									BRect frame, window_look look,
 									uint32 flags);
@@ -38,7 +38,7 @@ class BeDecorator: public Decorator {
 	virtual	click_type			Clicked(BPoint pt, int32 buttons,
 										int32 modifiers);
 
- protected:
+protected:
 	virtual void				_DoLayout();
 
 	virtual void				_DrawFrame(BRect r);
@@ -49,15 +49,15 @@ class BeDecorator: public Decorator {
 	virtual void				_DrawZoom(BRect r);
 
 	virtual	void				_SetTitle(const char* string,
-										 BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 
 	virtual void				_FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion);
 	virtual void				_SetLook(DesktopSettings& settings,
-										window_look look,
-										BRegion* updateRegion = NULL);
+									window_look look,
+									BRegion* updateRegion = NULL);
 	virtual void				_SetFlags(uint32 flags,
-										 BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 
 	virtual void				_SetFocus();
 	virtual void				_SetColors();
@@ -66,19 +66,18 @@ class BeDecorator: public Decorator {
 	virtual	void				_ResizeBy(BPoint offset, BRegion* dirty);
 
 	virtual bool				_SetTabLocation(float location,
-											   BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 
 	virtual	bool				_SetSettings(const BMessage& settings,
-											BRegion* updateRegion = NULL);
+									BRegion* updateRegion = NULL);
 
 	virtual	void				_GetFootprint(BRegion* region);
 
- private:
+private:
 			void				_UpdateFont(DesktopSettings& settings);
 			void				_DrawBlendedRect(BRect r, bool down);
 			void				_GetButtonSizeAndOffset(const BRect& tabRect,
-														float* offset,
-														float*size) const;
+									float* offset, float*size) const;
 			void				_LayoutTabItems(const BRect& tabRect);
 
 			RGBColor			fButtonHighColor;

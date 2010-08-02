@@ -87,14 +87,15 @@ make_blend_color(rgb_color colorA, rgb_color colorB, float position)
 //	methods to the Decorator base class
 
 BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect,
-		window_look look, uint32 flags)
-	: Decorator(settings, rect, look, flags),
+	window_look look, uint32 flags)
+	:
+	Decorator(settings, rect, look, flags),
 	fTabOffset(0),
 	fTabLocation(0.0),
 	fLastClicked(0)
 {
 	_UpdateFont(settings);
-	BeDecorator::SetLook(settings, look);
+	SetLook(settings, look);
 
 	fFrameColors = new RGBColor[6];
 	fFrameColors[0].SetColor(152, 152, 152);
