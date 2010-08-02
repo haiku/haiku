@@ -235,14 +235,14 @@ link_free(net_protocol* protocol)
 status_t
 link_connect(net_protocol* protocol, const struct sockaddr* address)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 link_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -420,14 +420,14 @@ link_unbind(net_protocol* protocol, struct sockaddr* address)
 status_t
 link_listen(net_protocol* protocol, int count)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 link_shutdown(net_protocol* protocol, int direction)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 

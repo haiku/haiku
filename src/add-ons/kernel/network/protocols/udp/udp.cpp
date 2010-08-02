@@ -1112,7 +1112,7 @@ udp_connect(net_protocol *protocol, const struct sockaddr *address)
 status_t
 udp_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -1160,14 +1160,14 @@ udp_unbind(net_protocol *protocol, struct sockaddr *address)
 status_t
 udp_listen(net_protocol *protocol, int count)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 udp_shutdown(net_protocol *protocol, int direction)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -1250,7 +1250,7 @@ udp_error_received(uint32 code, net_buffer* buffer)
 			else if (icmpCode == ICMP_CODE_HOST_UNREACH)
 				error = EHOSTUNREACH;
 			else if (icmpCode == ICMP_CODE_SOURCE_ROUTE_FAIL)
-				error = EOPNOTSUPP;
+				error = B_NOT_SUPPORTED;
 			else if (icmpCode == ICMP_CODE_PROTO_UNREACH) 
 				error = ENOPROTOOPT;
 			else if (icmpCode == ICMP_CODE_PORT_UNREACH)
@@ -1258,7 +1258,7 @@ udp_error_received(uint32 code, net_buffer* buffer)
 			else if (icmpCode == ICMP_CODE_FRAG_NEEDED)
 				error = EMSGSIZE;
 			else
-				error = EOPNOTSUPP;
+				error = B_NOT_SUPPORTED;
 			break;
 		case ICMP_TYPE_TIME_EXCEEDED:
 			error = EHOSTUNREACH;

@@ -54,7 +54,7 @@ update_link_state(ethernet_device *device, bool notify = true)
 	if (ioctl(device->fd, ETHER_GET_LINK_STATE, &state,
 			sizeof(ether_link_state)) < 0) {
 		// This device does not support retrieving the link
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 	}
 
 	state.media |= IFM_ETHER;
@@ -367,7 +367,7 @@ ethernet_set_promiscuous(net_device *_device, bool promiscuous)
 
 	int32 value = (int32)promiscuous;
 	if (ioctl(device->fd, ETHER_SETPROMISC, &value, sizeof(value)) < 0)
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	return B_OK;
 }
@@ -376,7 +376,7 @@ ethernet_set_promiscuous(net_device *_device, bool promiscuous)
 status_t
 ethernet_set_media(net_device *device, uint32 media)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 

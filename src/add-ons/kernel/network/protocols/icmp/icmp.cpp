@@ -172,7 +172,7 @@ icmp_connect(net_protocol* protocol, const struct sockaddr* address)
 status_t
 icmp_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -220,14 +220,14 @@ icmp_unbind(net_protocol* protocol, struct sockaddr* address)
 status_t
 icmp_listen(net_protocol* protocol, int count)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 icmp_shutdown(net_protocol* protocol, int direction)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 

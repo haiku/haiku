@@ -235,7 +235,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 			struct sockaddr_dl address;
 
 			if ((ifp->if_flags & IFF_MULTICAST) == 0)
-				return EOPNOTSUPP;
+				return B_NOT_SUPPORTED;
 
 			memset(&address, 0, sizeof(address));
 			address.sdl_family = AF_LINK;
@@ -262,11 +262,11 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 				return status;
 
 			state.media = mediareq.ifm_active;
-			if (mediareq.ifm_status & IFM_ACTIVE)
+			if ((mediareq.ifm_status & IFM_ACTIVE) != 0)
 				state.media |= IFM_ACTIVE;
-			if (mediareq.ifm_active & IFM_10_T)
+			if ((mediareq.ifm_active & IFM_10_T) != 0)
 				state.speed = 10000;
-			else if (mediareq.ifm_active & IFM_100_TX)
+			else if ((mediareq.ifm_active & IFM_100_TX) != 0)
 				state.speed = 100000;
 			else
 				state.speed = 1000000;

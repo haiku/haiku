@@ -206,7 +206,7 @@ add_ancillary_data(net_socket* socket, ancillary_data_container* container,
 			return B_BAD_VALUE;
 
 		if (socket->first_info->add_ancillary_data == NULL)
-			return EOPNOTSUPP;
+			return B_NOT_SUPPORTED;
 
 		status_t status = socket->first_info->add_ancillary_data(
 			socket->first_protocol, container, header);
@@ -238,7 +238,7 @@ process_ancillary_data(net_socket* socket, ancillary_data_container* container,
 
 	while ((data = next_ancillary_data(container, data, &header)) != NULL) {
 		if (socket->first_info->process_ancillary_data == NULL)
-			return EOPNOTSUPP;
+			return B_NOT_SUPPORTED;
 
 		ssize_t bytesWritten = socket->first_info->process_ancillary_data(
 			socket->first_protocol, &header, data, dataBuffer, dataBufferLen);
@@ -268,7 +268,7 @@ process_ancillary_data(net_socket* socket,
 	}
 
 	if (socket->first_info->process_ancillary_data_no_container == NULL)
-		return EOPNOTSUPP;
+		return B_NOT_SUPPORTED;
 
 	bytesWritten = socket->first_info->process_ancillary_data_no_container(
 		socket->first_protocol, buffer, dataBuffer,

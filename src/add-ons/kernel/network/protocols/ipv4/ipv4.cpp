@@ -1094,7 +1094,7 @@ ipv4_connect(net_protocol* protocol, const struct sockaddr* address)
 status_t
 ipv4_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -1147,7 +1147,7 @@ ipv4_getsockopt(net_protocol* _protocol, int level, int option, void* value,
 			// RFC 3678, Section 4.1:
 			// ``An error of EOPNOTSUPP is returned if these options are
 			// used with getsockopt().''
-			return EOPNOTSUPP;
+			return B_NOT_SUPPORTED;
 		}
 
 		dprintf("IPv4::getsockopt(): get unknown option: %d\n", option);
@@ -1329,14 +1329,14 @@ ipv4_unbind(net_protocol* protocol, struct sockaddr* address)
 status_t
 ipv4_listen(net_protocol* protocol, int count)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 ipv4_shutdown(net_protocol* protocol, int direction)
 {
-	return EOPNOTSUPP;
+	return B_NOT_SUPPORTED;
 }
 
 
