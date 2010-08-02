@@ -46,7 +46,7 @@ public:
 	virtual						~LinkProtocol();
 
 			status_t			StartMonitoring(const char* deviceName);
-			status_t			StopMonitoring();
+			status_t			StopMonitoring(const char* deviceName);
 
 protected:
 			status_t			SocketStatus(bool peek) const;
@@ -92,7 +92,7 @@ LinkProtocol::StartMonitoring(const char* deviceName)
 {
 	MutexLocker _(fLock);
 
-	if (fMonitoredDevice)
+	if (fMonitoredDevice != NULL)
 		return B_BUSY;
 
 	net_device_interface* interface = get_device_interface(deviceName);
@@ -111,11 +111,14 @@ LinkProtocol::StartMonitoring(const char* deviceName)
 
 
 status_t
-LinkProtocol::StopMonitoring()
+LinkProtocol::StopMonitoring(const char* deviceName)
 {
 	MutexLocker _(fLock);
 
-	// TODO compare our device with the supplied device name?
+	if (fMonitoredDevice == NULL
+		|| strcmp(fMonitoredDevice->device->name, deviceName) != 0)
+		return B_BAD_VALUE;
+
 	return _Unregister();
 }
 
@@ -351,14 +354,20 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 				return B_NOT_ALLOWED;
 
 			struct ifreq request;
-			if (user_memcpy(&request, value, IF_NAMESIZE) < B_OK)
+			if (user_memcpy(&request, value, IF_NAMESIZE) != B_OK)
 				return B_BAD_ADDRESS;
 
 			return protocol->StartMonitoring(request.ifr_name);
 		}
 
 		case SIOCCPACKETCAP:
-			return protocol->StopMonitoring();
+		{
+			struct ifreq request;
+			if (user_memcpy(&request, value, IF_NAMESIZE) != B_OK)
+				return B_BAD_ADDRESS;
+
+			return protocol->StopMonitoring(request.ifr_name);
+		}
 	}
 
 	return gNetDatalinkModule.control(sDomain, option, value, _length);

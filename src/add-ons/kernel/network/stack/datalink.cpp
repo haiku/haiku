@@ -642,18 +642,8 @@ interface_protocol_send_data(net_datalink_protocol* _protocol,
 	interface_protocol* protocol = (interface_protocol*)_protocol;
 	Interface* interface = (Interface*)protocol->interface;
 
-	// TODO: Need to think about this locking. We can't obtain the
-	//       RX Lock here (nor would it make sense) as the ARP
-	//       module calls send_data() with it's lock held (similiar
-	//       to the domain lock, which would violate the locking
-	//       protocol).
-
-	DeviceMonitorList::Iterator iterator =
-		interface->DeviceInterface()->monitor_funcs.GetIterator();
-	while (iterator.HasNext()) {
-		net_device_monitor* monitor = iterator.Next();
-		monitor->receive(monitor, buffer);
-	}
+	if (atomic_get(&interface->DeviceInterface()->monitor_count) > 0)
+		device_interface_monitor_receive(interface->DeviceInterface(), buffer);
 
 	return protocol->device_module->send_data(protocol->device, buffer);
 }

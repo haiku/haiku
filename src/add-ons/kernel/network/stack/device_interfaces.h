@@ -36,9 +36,11 @@ struct net_device_interface : DoublyLinkedListLinkImpl<net_device_interface> {
 	net_deframe_func	deframe_func;
 	int32				deframe_ref_count;
 
+	int32				monitor_count;
+	mutex				monitor_lock;
 	DeviceMonitorList	monitor_funcs;
-	DeviceHandlerList	receive_funcs;
 
+	DeviceHandlerList	receive_funcs;
 	recursive_lock		receive_lock;
 
 	thread_id			consumer_thread;
@@ -58,12 +60,15 @@ void put_device_interface(struct net_device_interface* interface);
 struct net_device_interface* get_device_interface(uint32 index);
 struct net_device_interface* get_device_interface(const char* name,
 	bool create = true);
+void device_interface_monitor_receive(net_device_interface* interface,
+	net_buffer* buffer);
 status_t up_device_interface(net_device_interface* interface);
 void down_device_interface(net_device_interface* interface);
 
 // devices
 status_t unregister_device_deframer(net_device* device);
-status_t register_device_deframer(net_device* device, net_deframe_func deframeFunc);
+status_t register_device_deframer(net_device* device,
+	net_deframe_func deframeFunc);
 status_t register_domain_device_handler(struct net_device* device, int32 type,
 	struct net_domain* domain);
 status_t register_device_handler(struct net_device* device, int32 type,
