@@ -8,8 +8,6 @@
  */
 
 
-#include "datalink.h"
-
 #include <net/if.h>
 #include <net/if_media.h>
 #include <net/route.h>
@@ -21,6 +19,7 @@
 
 #include <KernelExport.h>
 
+#include <net_datalink.h>
 #include <net_device.h>
 #include <NetUtilities.h>
 
@@ -183,7 +182,7 @@ fill_address(const sockaddr* from, sockaddr* to, size_t maxLength)
 //	#pragma mark - datalink module
 
 
-status_t
+static status_t
 datalink_control(net_domain* _domain, int32 option, void* value,
 	size_t* _length)
 {
@@ -330,7 +329,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 }
 
 
-status_t
+static status_t
 datalink_send_data(struct net_route* route, net_buffer* buffer)
 {
 	TRACE("%s(route %p, buffer %p)\n", __FUNCTION__, route, buffer);
@@ -375,7 +374,7 @@ datalink_send_data(struct net_route* route, net_buffer* buffer)
 }
 
 
-status_t
+static status_t
 datalink_send_datagram(net_protocol* protocol, net_domain* domain,
 	net_buffer* buffer)
 {
@@ -417,7 +416,7 @@ datalink_send_datagram(net_protocol* protocol, net_domain* domain,
 		if non-NULL.
 	\param _matchedType will be set to either zero or MSG_BCAST if non-NULL.
 */
-bool
+static bool
 datalink_is_local_address(net_domain* domain, const struct sockaddr* address,
 	net_interface_address** _interfaceAddress, uint32* _matchedType)
 {
@@ -465,7 +464,7 @@ datalink_is_local_address(net_domain* domain, const struct sockaddr* address,
 	\param _interfaceAddress will be set to the first address of the interface
 		and domain belonging to that address if non-NULL.
 */
-bool
+static bool
 datalink_is_local_link_address(net_domain* domain, bool unconfiguredOnly,
 	const struct sockaddr* address, net_interface_address** _interfaceAddress)
 {
@@ -486,14 +485,14 @@ datalink_is_local_link_address(net_domain* domain, bool unconfiguredOnly,
 }
 
 
-net_interface*
+static net_interface*
 datalink_get_interface(net_domain* domain, uint32 index)
 {
 	return get_interface(domain, index);
 }
 
 
-net_interface*
+static net_interface*
 datalink_get_interface_with_address(const sockaddr* address)
 {
 	InterfaceAddress* interfaceAddress = get_interface_address(address);
@@ -519,7 +518,7 @@ datalink_put_interface(net_interface* interface)
 }
 
 
-net_interface_address*
+static net_interface_address*
 datalink_get_interface_address(const struct sockaddr* address)
 {
 	return get_interface_address(address);
@@ -540,7 +539,7 @@ datalink_get_interface_address(const struct sockaddr* address)
 
 	\return \c true if an address reference was returned, \c false if not.
 */
-bool
+static bool
 datalink_get_next_interface_address(net_interface* _interface,
 	net_interface_address** _address)
 {
@@ -554,7 +553,7 @@ datalink_get_next_interface_address(net_interface* _interface,
 }
 
 
-void
+static void
 datalink_put_interface_address(net_interface_address* address)
 {
 	if (address == NULL)
@@ -564,7 +563,7 @@ datalink_put_interface_address(net_interface_address* address)
 }
 
 
-status_t
+static status_t
 datalink_join_multicast(net_interface* _interface, net_domain* domain,
 	const struct sockaddr* address)
 {
@@ -576,7 +575,7 @@ datalink_join_multicast(net_interface* _interface, net_domain* domain,
 }
 
 
-status_t
+static status_t
 datalink_leave_multicast(net_interface* _interface, net_domain* domain,
 	const struct sockaddr* address)
 {
@@ -605,7 +604,7 @@ datalink_std_ops(int32 op, ...)
 //	#pragma mark - net_datalink_protocol
 
 
-status_t
+static status_t
 interface_protocol_init(net_interface* interface, net_domain* domain,
 	net_datalink_protocol** _protocol)
 {
@@ -624,7 +623,7 @@ interface_protocol_init(net_interface* interface, net_domain* domain,
 }
 
 
-status_t
+static status_t
 interface_protocol_uninit(net_datalink_protocol* protocol)
 {
 	TRACE("%s(%p)\n", __FUNCTION__, protocol);
@@ -634,7 +633,7 @@ interface_protocol_uninit(net_datalink_protocol* protocol)
 }
 
 
-status_t
+static status_t
 interface_protocol_send_data(net_datalink_protocol* _protocol,
 	net_buffer* buffer)
 {
@@ -660,7 +659,7 @@ interface_protocol_send_data(net_datalink_protocol* _protocol,
 }
 
 
-status_t
+static status_t
 interface_protocol_up(net_datalink_protocol* protocol)
 {
 	TRACE("%s(%p)\n", __FUNCTION__, protocol);
@@ -668,7 +667,7 @@ interface_protocol_up(net_datalink_protocol* protocol)
 }
 
 
-void
+static void
 interface_protocol_down(net_datalink_protocol* _protocol)
 {
 	TRACE("%s(%p)\n", __FUNCTION__, _protocol);
@@ -691,7 +690,7 @@ interface_protocol_down(net_datalink_protocol* _protocol)
 }
 
 
-status_t
+static status_t
 interface_protocol_change_address(net_datalink_protocol* protocol,
 	net_interface_address* interfaceAddress, int32 option,
 	const struct sockaddr* oldAddress, const struct sockaddr* newAddress)
@@ -714,7 +713,7 @@ interface_protocol_change_address(net_datalink_protocol* protocol,
 }
 
 
-status_t
+static status_t
 interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 	void* argument, size_t length)
 {

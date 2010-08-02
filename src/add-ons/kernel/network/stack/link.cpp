@@ -10,26 +10,26 @@
 //! The net_protocol one talks to when using the AF_LINK protocol
 
 
-#include "datalink.h"
-#include "device_interfaces.h"
-#include "domains.h"
 #include "link.h"
-#include "stack_private.h"
-#include "utility.h"
-
-#include <net_device.h>
-
-#include <lock.h>
-#include <util/AutoLock.h>
-
-#include <KernelExport.h>
-#include <ProtocolUtilities.h>
 
 #include <net/if_types.h>
 #include <new>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/sockio.h>
+
+#include <KernelExport.h>
+
+#include <lock.h>
+#include <net_datalink.h>
+#include <net_device.h>
+#include <ProtocolUtilities.h>
+#include <util/AutoLock.h>
+
+#include "device_interfaces.h"
+#include "domains.h"
+#include "stack_private.h"
+#include "utility.h"
 
 
 class LocalStackBundle {
@@ -346,6 +346,10 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 
 		case SIOCSPACKETCAP:
 		{
+			// Only root is allowed to capture packets
+			if (geteuid() != 0)
+				return B_NOT_ALLOWED;
+
 			struct ifreq request;
 			if (user_memcpy(&request, value, IF_NAMESIZE) < B_OK)
 				return B_BAD_ADDRESS;
@@ -357,7 +361,7 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 			return protocol->StopMonitoring();
 	}
 
-	return datalink_control(sDomain, option, value, _length);
+	return gNetDatalinkModule.control(sDomain, option, value, _length);
 }
 
 
@@ -421,7 +425,11 @@ link_shutdown(net_protocol* protocol, int direction)
 status_t
 link_send_data(net_protocol* protocol, net_buffer* buffer)
 {
-	return B_NOT_ALLOWED;
+	// Only root is allowed to send link protocol packets
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -429,7 +437,7 @@ status_t
 link_send_routed_data(net_protocol* protocol, struct net_route* route,
 	net_buffer* buffer)
 {
-	return B_NOT_ALLOWED;
+	return B_NOT_SUPPORTED;
 }
 
 
