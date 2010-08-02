@@ -291,7 +291,7 @@ void GrepWindow::MessageReceived(BMessage *message)
 			_OnTrimSelection();
 			break;
 
-		case B_COPY:
+		case MSG_COPY_TEXT:
 			_OnCopyText();
 			break;
 
@@ -455,7 +455,7 @@ GrepWindow::_CreateMenus()
 		B_TRANSLATE("Show files in Tracker"), new BMessage(MSG_SELECT_IN_TRACKER), 'K');
 
 	fCopyText = new BMenuItem(
-		B_TRANSLATE("Copy text to clipboard"), new BMessage(B_COPY), 'C');
+		B_TRANSLATE("Copy text to clipboard"), new BMessage(MSG_COPY_TEXT), 'B');
 
 	fRecurseLinks = new BMenuItem(
 		B_TRANSLATE("Follow symbolic links"), new BMessage(MSG_RECURSE_LINKS));
