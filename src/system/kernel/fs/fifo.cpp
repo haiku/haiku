@@ -390,7 +390,7 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 		}
 
 		// write only as long as there are readers left
-		if (fReaderCount == 0 && fActive) {
+		if (fReaderCount == 0) {
 			if (written == 0)
 				send_signal(find_thread(NULL), SIGPIPE);
 			return EPIPE;
@@ -442,7 +442,7 @@ Inode::ReadDataFromBuffer(void *data, size_t *_length, bool nonBlocking,
 		if (nonBlocking)
 			return B_WOULD_BLOCK;
 
-		if (fActive && fWriterCount == 0)
+		if (fWriterCount == 0)
 			return B_OK;
 
 		TRACE("Inode %p::%s(): wait for data, request %p\n", this, __FUNCTION__,
