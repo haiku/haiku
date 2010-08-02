@@ -1317,7 +1317,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 
 	if (addressLength == 0)
 		address = NULL;
-	else if (addressLength != 0 && address == NULL)
+	else if (address == NULL)
 		return B_BAD_VALUE;
 
 	if (socket->peer.ss_len != 0) {
@@ -1341,7 +1341,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 	if (socket->address.ss_len == 0) {
 		// try to bind first
 		status_t status = socket_bind(socket, NULL, 0);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
