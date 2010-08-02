@@ -74,9 +74,10 @@ make_color_drop_message(rgb_color color, BBitmap* bitmap)
 {
 	// prepare message
 	BMessage message(B_PASTE);
-	char hexstr[7];
-	sprintf(hexstr, "#%.2X%.2X%.2X", color.red, color.green, color.blue);
-	message.AddData("text/plain", B_MIME_TYPE, &hexstr, sizeof(hexstr));
+	char hexString[8];
+	snprintf(hexString, sizeof(hexString), "#%.2X%.2X%.2X",
+		color.red, color.green, color.blue);
+	message.AddData("text/plain", B_MIME_TYPE, &hexString, sizeof(hexString));
 	message.AddData("RGBColor", B_RGB_COLOR_TYPE, &color, sizeof(color));
 	// prepare bitmap
 	if (bitmap && bitmap->IsValid()
