@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-TSKB	3810030877
+1	russian	x-vnd.Be-TSKB	2686533917
 Applications	PreferencesWindow		Приложения
 Recent applications	BeMenu		Последние приложения
 Edit menu…	PreferencesWindow		Изменить меню…
@@ -36,7 +36,5 @@ Clock	PreferencesWindow		Часы
 Recent documents	BeMenu		Последние документы
 Hide all	WindowMenu		Скрыть все
 Shutdown…	BeMenu		Завершение работы…
-Suspend	BeMenu		Приостановить
 Quit application	WindowMenu		Закрыть приложение
-About this system…	BeMenu		Об этой системе…
 Show replicants	BeMenu		Отображать репликанты

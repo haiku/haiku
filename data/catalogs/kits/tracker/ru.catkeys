@@ -1,6 +1,5 @@
 1	russian	x-vnd.Haiku-libtracker	2723586359
 Sorry, you can't save things at the root of your system.	libtracker		Извините, невозможно сохранять объекты в корневом каталоге системы.
-%capacity (%used used -- %free free)	libtracker		%capacity (%used занято -- %free свободно)
 Empty Trash	libtracker		Очистить Корзину
 Recent folders	libtracker		Последние папки
 You cannot copy or move the root directory.	libtracker		Невозможно переместить или скопировать корневой каталог.
@@ -263,7 +262,7 @@ Warning space color	libtracker		Цвет предупреждающий о не�
 Add current folder	libtracker		Добавить текущий катало
 Replace other file	libtracker		Заменить существующий файл
 %Ld B	libtracker		%Ld Б
-Tracker preferences	libtracker		Натройка
+Tracker preferences	libtracker		Натройка 
 Prompt	libtracker		Спрашивать
 Kind	libtracker		Тип
 Move to Trash	libtracker		В Корзину
@@ -318,3 +317,4 @@ Creating links: 	libtracker		Создание ссылок:
 Copy	libtracker		Копировать
 Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		Невозможно открыть \"%document\" поскольку программа \"%app\" находится в Корзине.
 Defaults	libtracker		По умолчанию
+%capacity (%used used -- %free free)	libtracker		%capacity (%used занято -- %free свободно)

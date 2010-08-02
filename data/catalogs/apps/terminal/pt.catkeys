@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Terminal	3313567607
+1	portuguese	x-vnd.Haiku-Terminal	1150769874
 Not found.	Terminal TermWindow		Não encontrado.
 Didn't find any available pseudo ttys.	Terminal Shell		Nenhum pseudo tty disponível encontrado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
@@ -77,5 +77,8 @@ Cancel	Terminal PrefWindow		Cancelar
 Save	Terminal PrefWindow		Guardar
 Cancel	Terminal TermView		Cancelar
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help mostra esta ajuda\n -t, --title define o título da janela\n -f, --fullscreen iniciar em ecrã completo\n
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright 	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e akashi Murai\nactualizado por Kian Duffy e outras pessoas
 Color schema:	Terminal AppearancePrefView		Esquema de cores:
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\nactualizado por Kian Duffy 
+Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem programas activos
+A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		A process is still running.\nSe fechar o Terminal o processo será terminado.
+Really quit?	Terminal TermWindow		Deseja mesmo sair?

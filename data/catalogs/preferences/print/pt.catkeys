@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-PRNT	634957092
+1	portuguese	x-vnd.Be-PRNT	4088995571
 Waiting	JobListView		A aguardar...
 page	JobListView		página
 Cancel	AddPrinterDialog		Cancelar
@@ -25,3 +25,4 @@ Print jobs: No printer selected	PrintersWindow		Trabalhos de impressão: Nenhuma
 Unknown status	JobListView		Estado desconhecido
 Connected to:	AddPrinterDialog		Ligado a:
 Printer type:	AddPrinterDialog		Tipo de impressora:
+pending jobs.	PrinterListView		Trabalhos pendentes.

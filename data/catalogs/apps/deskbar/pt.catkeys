@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-TSKB	3810030877
+1	portuguese	x-vnd.Be-TSKB	2686533917
 Applications	PreferencesWindow		Aplicações
 Recent applications	BeMenu		Aplicações recentes
 Edit menu…	PreferencesWindow		Editar menu...
@@ -36,7 +36,5 @@ Clock	PreferencesWindow		Relógio
 Recent documents	BeMenu		Documentos recentes
 Hide all	WindowMenu		Ocultar todas
 Shutdown…	BeMenu		Encerrar...
-Suspend	BeMenu		Suspender
 Quit application	WindowMenu		Sair da aplicação
-About this system…	BeMenu		Acerca deste sistema...
 Show replicants	BeMenu		Mostrar replicantes

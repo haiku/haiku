@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FileTypes	2161646265
+1	french	x-vnd.Haiku-FileTypes	2789440297
 Args only	Application Type Window		Arguments seuls
 Add group	New File Type Window		Ajouter un groupe
 Remove	Application Type Window		Supprimer
@@ -76,3 +76,14 @@ Left	Attribute Window	Attribute column alignment in Tracker	À gauche
 Visible	Attribute Window		Visible
 Could not install file type	New File Type Window		Impossible d'installer le type de fichier
 Application type	Application Type Window		Type de applicatif
+Extensions:	FileTypes Window		Extensions :
+Icon	Application Type Window		Icône
+File	FileTypes Window		Fichier
+Open…	FileTypes Window		Ouvrir…
+no icon	FileTypes Window		pas d'icône
+Icon	FileTypes Window		Icône
+Cancel	Type List Window		Annuler
+Description	FileTypes Window		Description
+None	FileTypes Window		Aucun
+Cancel	Preferred App Menu		Annuler
+Cancel	FileTypes Window		Annuler

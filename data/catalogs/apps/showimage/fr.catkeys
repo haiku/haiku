@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	249555060
+1	french	x-vnd.Haiku-ShowImage	3750119916
 Use as background…	Menus		Utiliser comme fond d'écran...
 5 seconds	Menus		5 secondes
 Slide delay	Menus		Délai de diaporama
@@ -60,3 +60,15 @@ Job setup	PrintOptionsWindow		Définir la tâche
 Original size	Menus		Taille originale
 Next page	Menus		Page suivante
 Shrink to window	Menus		Adapter à la fenêtre
+OK	SaveToFile		OK
+Paste	Menus		Coller
+File	Menus		Fichier
+Page setup…	Menus		Mise en page…
+Print…	Menus		Imprimer…
+Quit	Menus		Quitter
+Clear	Menus		Nettoyer
+Edit	Menus		Editer
+Close	Menus		Fermer
+Copy	Menus		Copier
+Cut	Menus		Couper
+Save as…	Menus		Enregistrer sous…

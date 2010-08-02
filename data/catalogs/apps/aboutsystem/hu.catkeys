@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-About	4269156582
+1	hungarian	x-vnd.Haiku-About	1443838569
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
 %ld Processors:	AboutView		%ld Processzor:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phippsnek (projektalapító)\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		Ismeretlen
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Memória:
 Past maintainers:\n	AboutView		Régebbi karbantartók:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Az a kód, mely a Haikuban egyedülálló (különösképpen a kernel és az összes kód, mely az alkalmazásokkal kapcsolódik),
 \n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet jár:\n
 Licenses: 	AboutView		Licencek: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		 alatt van terjesztve. Néhány rendszerfüggvény-könyvtár harmadik személytől származó, LGPL-licenc alatt terjesztett kódból tevődik össze. A harmadik személyű kódhoz tartozó szerzői jogokat az alábbiakban tekintheti meg:\n\n
 \nCopyrights\n\n	AboutView		\nSzerzői jogok\n\n
 Current maintainers:\n	AboutView		Jelenlegi karbantartók:\n
 Time running:	AboutView		Ennyi ideje fut:
-MIT license	AboutView		MIT licenc
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 About this system	AboutWindow		A futó rendszerről
 Version:	AboutView		Verzió:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	1829924476
+1	swedish	x-vnd.Haiku-About	801836987
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och hans NewOS-kärna)\n
 %ld Processors:	AboutView		%ld Processorer:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektgrundare)\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		Okänd
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Minne:
 Past maintainers:\n	AboutView		Tidigare projektledare:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Haikus egen kod, främst den för kärnan och för de bibliotek som applikationer kan länkas med, görs tillgänglig under förutsättningarna som anges i 
 \n\nSpecial thanks to:\n	AboutView		\n\nSärskilt tack till:\n
 Licenses: 	AboutView		Licenser: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Några av systemets kodbibliotek är skapade av tredje part och distributeras med LGPL-licens. Copyright anges nedan.\n\n
 \nCopyrights\n\n	AboutView		\nCopyrights\n\n
 Current maintainers:\n	AboutView		Nuvarande projektledare:\n
 Time running:	AboutView		Tid sedan uppstart:
-MIT license	AboutView		MIT-licens
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras bounty-program\n
 About this system	AboutWindow		Om det här systemet
 Version:	AboutView		Version:
@@ -36,4 +33,3 @@ The copyright to the Haiku code is property of Haiku, Inc. or of the respective 
 GCC %d Hybrid	AboutView		GCC %d-hybrid
 %d MiB total	AboutView		%d MiB totalt
 %d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
-%d MiB total, %d MiB inaccessible	AboutView		%d MiB totalt, %d MiB oåtkomligt

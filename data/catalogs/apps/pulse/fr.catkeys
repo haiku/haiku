@@ -1,0 +1,31 @@
+1	french	x-vnd.Haiku-Pulse	1614816934
+OK	PrefsWindow		OK
+Quit	DeskbarPulseView		Quitter
+Pulse	PulseWindow		Pulse
+Mini mode	DeskbarPulseView		Mode miniature
+Remove replicant	CPUButton		Enlever le réplicant
+Active color	ConfigView		Couleur active
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Mode deskbar
+Normal mode	PrefsWindow		Mode normal
+Normal mode	MiniPulseView		Mode normal
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Couleur du cadre
+Mini mode	PrefsWindow		Mode miniature
+OK	PulseApp		OK
+Settings…	PulseView		Réglages…
+You can't disable the last active CPU.	PulseView		Vous ne pouvez pas désactiver le dernier processeur actif.
+OK	PulseView		OK
+About Pulse…	PulseView		À propos de Pulse…
+Deskbar mode	MiniPulseView		Mode Deskbar
+Quit	MiniPulseView		Quitter
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Mode Deskbar
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nPar David Ramsey et Arve Hjønnevåg\nModifié par Daniel Switkin
+You can't disable the last active CPU.	CPUButton		Vous ne pouvez pas désactiver le dernier processeur actif.
+Normal mode	DeskbarPulseView		Mode normal
+OK	CPUButton		OK
+About Pulse…	CPUButton		À propos de Pulse…
+Mini mode	NormalPulseView		Mode miniature
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulse\n\nPar David Ramsey et Arve Hjønnevåg\nModifié par Daniel Switkin
+OK	PulseWindow		OK

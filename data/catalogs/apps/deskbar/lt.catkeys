@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-TSKB	3810030877
+1	lithuanian	x-vnd.Be-TSKB	2686533917
 Applications	PreferencesWindow		Programos
 Recent applications	BeMenu		Naudotos programos
 Edit menu…	PreferencesWindow		Taisyti meniu…
@@ -36,7 +36,5 @@ Clock	PreferencesWindow		Laikrodis
 Recent documents	BeMenu		Paskiausiai atverti dokumentai
 Hide all	WindowMenu		Slėpti visus
 Shutdown…	BeMenu		Kompiuterio išjungimas…
-Suspend	BeMenu		Pristabdyti
 Quit application	WindowMenu		Užbaigti programos darbą
-About this system…	BeMenu		Apie šią sistemą…
 Show replicants	BeMenu		Rodyti integravimo rankenėles

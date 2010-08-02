@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-About	1829924476
+1	portuguese	x-vnd.Haiku-About	2583642733
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e o seu kernel do NewOS )\n
 %ld Processors:	AboutView		%ld Processadores:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projecto)\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		Desconhecido
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Memória:
 Past maintainers:\n	AboutView		Ex-desenvolvedores:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		O código criado únicamente para o Haiku, especialmente o kernel e todo o código com que as aplicações possam interligar é distribuído sobre os termos da 
 \n\nSpecial thanks to:\n	AboutView		\n\nAgradecimentos especiais a:\n
 Licenses: 	AboutView		Licenças: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Algumas das bibliotecas de sistema contém código-fonte de terceiros que é distribuído sobre a licença LGPL. Poderá encontrar os copyrights do código-fonte de terceiros em baixo.\n\n
 \nCopyrights\n\n	AboutView		\nCopyrights\n\n
 Current maintainers:\n	AboutView		Desenvolvedores actuais:\n
 Time running:	AboutView		Tempo de Uptime:
-MIT license	AboutView		Licença MIT
 The Haikuware team and their bounty program\n	AboutView		A equipa do Haikuware e o seu programa de recompensas\n
 About this system	AboutWindow		Sobre este sistema
 Version:	AboutView		Versão:
@@ -36,4 +33,5 @@ The copyright to the Haiku code is property of Haiku, Inc. or of the respective 
 GCC %d Hybrid	AboutView		GCC %d Híbrido
 %d MiB total	AboutView		%d MiB no total
 %d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
-%d MiB total, %d MiB inaccessible	AboutView		%d MiB no total, %d MiB inacessíveis
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		O código específico do Haiku, especialmente o kernel e todo o código  com o qual as aplicações se podem interligar, é distribuído sob os termos da licença %MIT. Algumas bibliotecas de sistema contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inacessíveis MiB inacessíveis

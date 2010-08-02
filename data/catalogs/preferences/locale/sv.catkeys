@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Locale	1535389305
+1	swedish	x-vnd.Haiku-Locale	1225819117
 Day in month (2 digits)	TimeFormatSettings		dag i månad (2 siffror)
 Available languages	Locale Preflet Window		Tillgängliga språk
 Day of week (name)	TimeFormatSettings		veckodag (namn)
@@ -42,7 +42,6 @@ Date	TimeFormatSettings		Datum
 12 hour	TimeFormatSettings		12 timmar
 Locale	Locale Preflet		Lokalitet
 None	TimeFormatSettings		Ingen
-Clock	TimeFormatSettings		Klocka
 Example:	TimeFormatSettings		Exempel:
 Day	TimeFormatSettings		Dag
 Leading 0	TimeFormatSettings		Inledande 0

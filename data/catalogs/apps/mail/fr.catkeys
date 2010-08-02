@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	3027629068
+1	french	x-vnd.Be-MAIL	694686022
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint : 
 Inconsistency occurred in the undo/redo buffer.	Mail		Une erreur est survenue dans le tampon d'annulation.
@@ -52,6 +52,7 @@ Print…	Mail		Imprimer…
 Warn unencodable:	Mail		Avertir si non encodable :
 Quit	Mail		Quitter
 %n - Full name	Mail		%n - Nom complet
+Read 	Mail		Lire
 Trash	Mail		Corbeille
 Default account:	Mail		Compte par défaut :
 Size:	Mail		Taille :
@@ -136,3 +137,7 @@ Select all	Mail		Tout sélectionner
 An error occurred trying to save this signature.	Mail		Une erreur est survenue en essayant de sauvegarder cette signature.
 View	Mail		Vue
 Mail couldn't find its dictionary.	Mail		Mail n'a pas trouvé son dictionaire.
+Mail\n\n	Mail		Mail\n\n
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Écrit par Robert Polic.\nAmélioré par Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Text wrapping:	Mail		Renvoi à la ligne :
+File	Mail		Fichier

@@ -1,0 +1,39 @@
+1	french	x-vnd.Haiku.CodyCam	4290640111
+Every 30 seconds	CodyCam		Toutes les 30 secondes
+File name:	CodyCam		Nom du fichier :
+Last Capture: 	VideoConsumer.cpp		Dernière capture :
+Login:	CodyCam		Identifiant :
+Format:	CodyCam		Format :
+Every 2 hours	CodyCam		Toutes les 2 heures
+Password:	CodyCam		Mot de passe :
+password	CodyCam		mot de passe
+Directory:	CodyCam		Dossier :
+Every minute	CodyCam		Toutes les minutes
+read: %ld\n	SftpClient		lire : %ldn
+Server:	CodyCam		Serveur :
+Every 15 minutes	CodyCam		Toutes les 15 minutes
+Cannot find an available video stream	CodyCam		Impossible de trouver un flux vidéo disponible
+Transmitting…	VideoConsumer.cpp		Transmission…
+Every 8 hours	CodyCam		Toutes les 8 heures
+Close	CodyCam		Fermer
+Every 24 hours	CodyCam		Toutes les 24 heures
+unknown command	SettingsHandler		command inconnue
+Video settings	CodyCam		Réglages vidéo
+Every 15 seconds	CodyCam		Toutes les 15 secondes
+About Codycam…	CodyCam		À propos de CodyCam…
+Type:	CodyCam		Type :
+Stop video	CodyCam		Arrêter la vidéo
+SFTP	CodyCam		SFTP
+Every 5 minutes	CodyCam		Toutes les 5 minutes
+read: %d\n	SftpClient		lire : %d\n
+OK	CodyCam		OK
+Every hour	CodyCam		Toutes les heures
+Quit	CodyCam		Quitter
+Never	CodyCam		Jamais
+CodyCam	CodyCam		CodyCam
+Every 10 minutes	CodyCam		Toutes les 10 minutes
+Every 4 hours	CodyCam		Toutes les 4 heures
+FTP	CodyCam		FTP
+File	CodyCam		Fichier
+Every 30 minutes	CodyCam		Toutes les 30 minutes
+FTP Setup	CodyCam		Réglages FTP

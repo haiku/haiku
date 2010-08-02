@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Locale	1535389305
+1	ukrainian	x-vnd.Haiku-Locale	1225819117
 Day in month (2 digits)	TimeFormatSettings		День в місяці (2 цифри)
 Available languages	Locale Preflet Window		Доступні мови
 Day of week (name)	TimeFormatSettings		День тижня (назва)
@@ -42,7 +42,6 @@ Date	TimeFormatSettings		Дата
 12 hour	TimeFormatSettings		12 годин
 Locale	Locale Preflet		Locale
 None	TimeFormatSettings		жоден
-Clock	TimeFormatSettings		Час
 Example:	TimeFormatSettings		Приклад:
 Day	TimeFormatSettings		День
 Leading 0	TimeFormatSettings		інтервал між стрічками 0

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Locale	943651373
+1	finnish	x-vnd.Haiku-Locale	634081185
 Day in month (2 digits)	TimeFormatSettings		kuukaudenpäivä (2 merkkiä)
 Available languages	Locale Preflet Window		Valittavat kielet
 Day of week (name)	TimeFormatSettings		viikonpäivä (nimi)
@@ -42,7 +42,6 @@ Date	TimeFormatSettings		Päivämäärä
 12 hour	TimeFormatSettings		12 tuntia
 Locale	Locale Preflet		Maa-asetus
 None	TimeFormatSettings		Ei mikään
-Clock	TimeFormatSettings		Kello
 Example:	TimeFormatSettings		Esimerkki:
 Day	TimeFormatSettings		Päivä
 Leading 0	TimeFormatSettings		Alkava 0

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	2434333703
+1	japanese	x-vnd.Haiku-About	3903982986
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (および彼が開発したNewOSカーネル)\n
 %ld Processors:	AboutView		%ld プロセッサー：
 Michael Phipps (project founder)\n\n	AboutView		プロジェクト創立者Michael Phipps\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		不明
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		メモリー：
 Past maintainers:\n	AboutView		過去のメンテナー\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Haikuに特有のコード、特にカーネルやカーネルにリンクされる可能性のあるアプリケーションのすべてのコードは、
 \n\nSpecial thanks to:\n	AboutView		\n\n下記の方々に特別な感謝を...\n
 Licenses: 	AboutView		ライセンス：
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		条件に従い配布されます。一部のシステムライブラリーには、LGPL で配布されているサードパーティコードが含まれています。これらのサードパーティコードの著作権情報は、下記に記載されています。\n\n
 \nCopyrights\n\n	AboutView		\n著作権\n\n
 Current maintainers:\n	AboutView		現在のメンテナー\n
 Time running:	AboutView		稼動時間：
-MIT license	AboutView		MITライセンス
 The Haikuware team and their bounty program\n	AboutView		Haikuwareチーム＆報奨金プログラム\n
 About this system	AboutWindow		このシステムについて
 Version:	AboutView		バージョン：

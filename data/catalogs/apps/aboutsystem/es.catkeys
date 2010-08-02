@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-About	4269156582
+1	spanish	x-vnd.Haiku-About	1443838569
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (y el núcleo de su NewOS)\n
 %ld Processors:	AboutView		%ld Procesadores:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador del proyecto)\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		Desconocido
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Memoria:
 Past maintainers:\n	AboutView		Mantenedores previos:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		El código que es único de Haiku, especialmente el kernel y todo el código con el que las aplicaciones pudieran enlazarse, esta distribuido bajo los términos de
 \n\nSpecial thanks to:\n	AboutView		\n\nAgradecimientos especiales a:\n
 Licenses: 	AboutView		Licencias: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Algunas bibliotecas de sistema contienen código de terceras personas distribuido bajo la licencia LGPL. Puede encontrar los textos de derechos reservados de dicho código más abajo.\n\n
 \nCopyrights\n\n	AboutView		\nDerechos reservados\n\n
 Current maintainers:\n	AboutView		Mantenedores actuales:\n
 Time running:	AboutView		Tiempo en ejecución:
-MIT license	AboutView		Licencia MIT
 The Haikuware team and their bounty program\n	AboutView		El equipo de Haikuware y su programa de recompensas\n
 About this system	AboutWindow		Acerca de este sistema
 Version:	AboutView		Versión:

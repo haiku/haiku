@@ -1,4 +1,4 @@
-1	spanish	x-vnd.Haiku-Locale	1535389305
+1	spanish	x-vnd.Haiku-Locale	1225819117
 Day in month (2 digits)	TimeFormatSettings		Día del mes (2 dígitos)
 Available languages	Locale Preflet Window		Idiomas disponibles
 Day of week (name)	TimeFormatSettings		Día de la semana (nombre)
@@ -42,7 +42,6 @@ Date	TimeFormatSettings		Fecha
 12 hour	TimeFormatSettings		12 horas
 Locale	Locale Preflet		Región de procedencia
 None	TimeFormatSettings		Ninguno
-Clock	TimeFormatSettings		Reloj
 Example:	TimeFormatSettings		Ejemplo:
 Day	TimeFormatSettings		Día
 Leading 0	TimeFormatSettings		0 a la izquierda

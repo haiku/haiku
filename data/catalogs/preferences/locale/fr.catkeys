@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Locale	1535389305
+1	french	x-vnd.Haiku-Locale	634081185
 Day in month (2 digits)	TimeFormatSettings		Jour du mois (2 chiffres)
 Available languages	Locale Preflet Window		Langues disponibles
 Day of week (name)	TimeFormatSettings		Jour de la semaine (nom)
@@ -42,8 +42,8 @@ Date	TimeFormatSettings		Date
 12 hour	TimeFormatSettings		12 heures
 Locale	Locale Preflet		Locale
 None	TimeFormatSettings		Aucun
-Clock	TimeFormatSettings		Horloge
 Example:	TimeFormatSettings		Exemple :
 Day	TimeFormatSettings		Jour
 Leading 0	TimeFormatSettings		0 en tête
 Month	TimeFormatSettings		Mois
+already chosen	LanguageListView		déjà choisi

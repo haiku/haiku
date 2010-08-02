@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-About	1634947051
+1	danish	x-vnd.Haiku-About	3104596334
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS kerne)\n
 %ld Processors:	AboutView		%ld Processorer:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projekt grundlægger)\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		Ukendt
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Hukommelse:
 Past maintainers:\n	AboutView		Tidligere vedligeholdere:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Den del af koden der er unik i forhold til Haiku, specielt kernen og al den kode som programmer kan linke til, er distribueret under betingelserne for 
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecielt tak til:\n
 Licenses: 	AboutView		Licenser: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Nogle system biblioteker indeholder tredieparts kode distribueret under LGPL licensen. Du kan se ophavsrettighederne til tredie parts kode herunder.\n\n
 \nCopyrights\n\n	AboutView		\nOphavsrettigheder\n\n
 Current maintainers:\n	AboutView		Nuværende vedligeholdere:\n
 Time running:	AboutView		Tid kørt:
-MIT license	AboutView		MIT licens
 The Haikuware team and their bounty program\n	AboutView		Haikuware holdet og deres dusør program\n
 About this system	AboutWindow		Omkring dette system
 Version:	AboutView		Version:

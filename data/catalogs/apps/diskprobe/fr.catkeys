@@ -1,0 +1,69 @@
+1	french	x-vnd.Haiku-DiskProbe	2916367740
+File offset: 	ProbeView		Offset dans le fichier
+DiskProbe	OpenWindow		DiskProbe
+64 bit unsigned value:	TypeEditors		Valeur non signée sur 64 bits:
+Text	FindWindow		Texte
+Cancel	OpenWindow		Annuler
+Close	AttributeWindow		Fermer
+File	ProbeView		Fichier
+Attribute	ProbeView		Attribut
+Floating-point value:	TypeEditors		Valeur en virgule flottante:
+16 bit	TypeEditors		16 bits
+Attributes	ProbeView		Attributs
+File	FileWindow		Fichier
+OK	DiskProbe		OK
+Paste	ProbeView		Coller
+Font size	ProbeView		Taille de la police
+Attribute	AttributeWindow		Attribut
+8 bit signed value:	TypeEditors		Valeur signée sur 8 bits:
+Number:	TypeEditors		Nombre :
+Save	ProbeView		Enregistrer
+Number editor	TypeEditors		Éditeur de nombre
+Double precision floating-point value:	TypeEditors		Valeur en virgule flottante en double précision:
+Device: 	ProbeView		Périphérique :
+Device	ProbeView		Périphérique
+Quit	FileWindow		Quitter
+Undo	ProbeView		Annuler
+Close	ProbeView		Fermer
+16 bit signed value:	TypeEditors		Valeur signée sur 16 bits :
+64 bit signed offset:	TypeEditors		Offset sur 64 bits signés :
+Copy	ProbeView		Copier
+Boolean value:	TypeEditors		Valeur booléenne :
+32 bit size or status:	TypeEditors		Taille ou statut sur 32 bits :
+8 bit palette	TypeEditors		Palette 8 bits :
+MIME type:	TypeEditors		Type MIME :
+Page setup…	ProbeView		Mise en page…
+New…	FileWindow		Nouveau…
+DiskProbe request	AttributeWindow		Attention
+DiskProbe request	ProbeView		Attention
+Open file…	FileWindow		Ouvrir un fichier…
+Next	ProbeView		Suivant
+Close	FileWindow		Fermer
+Attribute: 	ProbeView		Attribut :
+Previous	ProbeView		Précédent
+64 bit signed value:	TypeEditors		Valeur signée sur 64 bits :
+Icon	TypeEditors		Icône
+Block: 	ProbeView		Bloc :
+Offset: 	ProbeView		Déplacement :
+OK	ProbeView		OK
+Add	ProbeView		Ajouter
+Edit	ProbeView		Éditer
+Cancel	AttributeWindow		Annuler
+MIME type editor	TypeEditors		Éditeur de type MIME
+Print…	ProbeView		Imprimer...
+Probe file…	OpenWindow		Examiner le fichier...
+16 bit unsigned value:	TypeEditors		Valeur non signée sur 16 bits :
+File: 	ProbeView		Fichier :
+32 bit	TypeEditors		32 bits
+Cancel	ProbeView		Annuler
+32 bit signed value:	TypeEditors		Valeur signée sur 32 bits :
+DiskProbe request	DiskProbe		Attention
+Type editor	ProbeView		Éditeur de type
+Boolean	TypeEditors	This is the type of editor	Booléen
+Stop	ProbeView		Arrêt
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Text	TypeEditors	This is the type of editor	Texte
+Number	TypeEditors	This is the type of editor	Nombre
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Décimal
+String editor	TypeEditors		Éditeur de chaîne
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Héxadécimal

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-About	4269156582
+1	ukrainian	x-vnd.Haiku-About	1443838569
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (і ядро його NewOS)\n
 %ld Processors:	AboutView		%ld Процесори:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновник проекту)\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		Невідомий
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Пам'ять:
 Past maintainers:\n	AboutView		Попередні розробники:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Код є унікальним для Haiku,особливо ядро системи і всі коди що додатки можуть використовувати знову поширюються під умовами
 \n\nSpecial thanks to:\n	AboutView		\n\nОсоблива вдячність:\n
 Licenses: 	AboutView		Ліцензії: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		.Деякі системні бібліотеки містять фрагменти, що поширюються під ліцензією LGPL. Авторські права до них можна знайти нижче по тексту.\n\n
 \nCopyrights\n\n	AboutView		\nАвторські права\n\n
 Current maintainers:\n	AboutView		Розробники:\n
 Time running:	AboutView		Час роботи:
-MIT license	AboutView		ліцензія MIT
 The Haikuware team and their bounty program\n	AboutView		Команда Haikuware з їхньою програмою заохочень\n
 About this system	AboutWindow		Про цю систему
 Version:	AboutView		Версія:

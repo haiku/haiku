@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	3313567607
+1	russian	x-vnd.Haiku-Terminal	1150769874
 Not found.	Terminal TermWindow		Не найдено
 Didn't find any available pseudo ttys.	Terminal Shell		Didn't find any available pseudo ttys.
 Switch Terminals	Terminal TermWindow		Переключить терминалы
@@ -77,5 +77,8 @@ Cancel	Terminal PrefWindow		Отмена
 Save	Terminal PrefWindow		Сохранить
 Cancel	Terminal TermView		Отмена
 -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		-h, --help вывести этот текст\n -t, --title установить заголовок окна\n -f, --fullscreen запустить в полном экране\n
-Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright 	Terminal TermView		Terminal\n\nразработал Kazuho Okui и Takashi Murai\nобновил Kian Duffy и многие другие\n\nCopyright
 Color schema:	Terminal AppearancePrefView		Цветовая схема:
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Терминал\n\nразработал Kazuho Okui и Takashi Murai\nобновлено Kian Duffy и многими другими\n\nCopyright ©2003-2009, Haiku.\n
+Confirm exit if active programs exist	Terminal AppearancePrefView		Подтвержать выход если запущен процесс
+A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		В окне терминала запущен процесс.\nЕсли вы закроете это окно, то этот процесс будет завершён.
+Really quit?	Terminal TermWindow		Действитель выйти?

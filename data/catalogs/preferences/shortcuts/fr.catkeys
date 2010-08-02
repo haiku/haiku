@@ -1,0 +1,15 @@
+1	french	x-vnd.Haiku-Shortcuts	2598391916
+OK	ShortcutsWindow		OK
+Cancel	ShortcutsWindow		Annuler
+Control	ShortcutsSpec	Name for modifier on keyboard	Contrôle
+Key	ShortcutsWindow		Touche
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts	ShortcutsWindow		Raccourcis
+Window	ShortcutsSpec	Name for modifier on keyboard	Fenêtre
+Save	ShortcutsWindow		Enregistrer
+Save & apply	ShortcutsWindow		sauver et appliquer
+OK	ShortcutsApp		OK
+Quit	ShortcutsWindow		Quitter
+Application	ShortcutsWindow		Application
+Open	ShortcutsWindow		Ouvrir
+Select	ShortcutsWindow		Sélectionner

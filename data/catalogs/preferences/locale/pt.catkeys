@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-Locale	1535389305
+1	portuguese	x-vnd.Haiku-Locale	634081185
 Day in month (2 digits)	TimeFormatSettings		Dia do mês (2 dígitos)
 Available languages	Locale Preflet Window		Idiomas disponíveis
 Day of week (name)	TimeFormatSettings		Dia da semana (nome)
@@ -42,8 +42,8 @@ Date	TimeFormatSettings		Data
 12 hour	TimeFormatSettings		12 horas
 Locale	Locale Preflet		Região
 None	TimeFormatSettings		Nenhum
-Clock	TimeFormatSettings		Relógio
 Example:	TimeFormatSettings		Exemplo:
 Day	TimeFormatSettings		Dia
 Leading 0	TimeFormatSettings		0 inicial
 Month	TimeFormatSettings		Mês
+already chosen	LanguageListView		escolhida

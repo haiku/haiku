@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-Locale	162011539
+1	korean	x-vnd.Haiku-Locale	4147408647
 Day in month (2 digits)	TimeFormatSettings		한 달의 날짜 (2자리)
 Available languages	Locale Preflet Window		사용 가능한 언어
 Day of week (name)	TimeFormatSettings		요일 (이름)
@@ -41,7 +41,6 @@ Date	TimeFormatSettings		날짜
 12 hour	TimeFormatSettings		12 시간
 Locale	Locale Preflet		언어 설정
 None	TimeFormatSettings		없음
-Clock	TimeFormatSettings		시계
 Example:	TimeFormatSettings		예제:
 Day	TimeFormatSettings		일
 Leading 0	TimeFormatSettings		앞에 오는 0

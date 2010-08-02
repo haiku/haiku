@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Locale	1535389305
+1	hungarian	x-vnd.Haiku-Locale	1225819117
 Day in month (2 digits)	TimeFormatSettings		Hónap napja (két számjeggyel)
 Available languages	Locale Preflet Window		Elérhető nyelvek
 Day of week (name)	TimeFormatSettings		A hét napja (név)
@@ -42,7 +42,6 @@ Date	TimeFormatSettings		Dátum
 12 hour	TimeFormatSettings		12-órás
 Locale	Locale Preflet		Nyelvi beállítások
 None	TimeFormatSettings		Semmi
-Clock	TimeFormatSettings		Óra
 Example:	TimeFormatSettings		Példa:
 Day	TimeFormatSettings		Nap
 Leading 0	TimeFormatSettings		Vezető nullák

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-About	1634947051
+1	finnish	x-vnd.Haiku-About	3104596334
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ja hänen NewOS-ytimensä)\n
 %ld Processors:	AboutView		%ld suoritinta:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektin perustaja)\n\n
@@ -14,14 +14,11 @@ Unknown	AboutView		Tuntematon
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Muisti:
 Past maintainers:\n	AboutView		Entiset ylläpitäjät:\n
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the 	AboutView		Koodin, joka on uniikkia Haikulle, erityisesti ydin ja kaikki koodi johon sovellukset linkittävät, levitysehtona on  
 \n\nSpecial thanks to:\n	AboutView		\n\nErityiskiitokset:\n
 Licenses: 	AboutView		Lisenssit: 
-. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		. Jotkut järjestelmäkirjastot sisältävät kolmannen osapuolen koodia, jota levitetään LGPL-lisenssin alaisena. Löydät kolmannen osapuolen koodin copyright-oikeudet alapuolelta.\n\n
 \nCopyrights\n\n	AboutView		\nCopyright-oikeudet\n\n
 Current maintainers:\n	AboutView		Nykyiset ylläpitäjät:\n
 Time running:	AboutView		Aika kuluu:
-MIT license	AboutView		MIT-lisenssi
 The Haikuware team and their bounty program\n	AboutView		Haikuware-ryhmä ja heidän bounty-ohjelmansa\n
 About this system	AboutWindow		Tästä järjestelmästä
 Version:	AboutView		Versio:
