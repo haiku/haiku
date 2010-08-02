@@ -357,13 +357,15 @@ list_device_interfaces(void* _buffer, size_t* bufferSize)
 void
 put_device_interface(struct net_device_interface* interface)
 {
+	if (interface == NULL)
+		return;
+
 	if (atomic_add(&interface->ref_count, -1) != 1)
 		return;
 
-	{
-		MutexLocker locker(sLock);
-		sInterfaces.Remove(interface);
-	}
+	MutexLocker locker(sLock);
+	sInterfaces.Remove(interface);
+	locker.Unlock();
 
 	uninit_fifo(&interface->receive_queue);
 	status_t status;
