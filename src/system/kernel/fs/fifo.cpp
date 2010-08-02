@@ -1,8 +1,11 @@
 /*
  * Copyright 2007-2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
+
+#include "fifo.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -29,14 +32,12 @@
 #include <vfs.h>
 #include <vm/vm.h>
 
-#include "fifo.h"
-
 
 //#define TRACE_FIFO
 #ifdef TRACE_FIFO
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x)
+#	define TRACE(x...)
 #endif
 
 
@@ -92,6 +93,7 @@ class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
 		void Notify()
 		{
 			InterruptsSpinLocker _(fLock);
+			TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
 
 			if (!fNotified) {
 				SpinLocker threadLocker(gThreadSpinlock);
@@ -355,8 +357,8 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 	size_t& written = *_length;
 	written = 0;
 
-	TRACE(("Inode::WriteDataToBuffer(data = %p, bytes = %lu)\n",
-		data, dataSize));
+	TRACE("Inode %p::WriteDataToBuffer(data = %p, bytes = %zu)\n", this, data,
+		dataSize);
 
 	// According to the standard, request up to PIPE_BUF bytes shall not be
 	// interleaved with other writer's data.
@@ -427,6 +429,9 @@ Inode::ReadDataFromBuffer(void *data, size_t *_length, bool nonBlocking,
 		if (nonBlocking)
 			return B_WOULD_BLOCK;
 
+		TRACE("Inode %p::%s(): wait for request %p to become the first "
+			"request.\n", this, __FUNCTION__, &request);
+
 		error = WaitForReadRequest(request);
 		if (error != B_OK)
 			return error;
@@ -439,6 +444,9 @@ Inode::ReadDataFromBuffer(void *data, size_t *_length, bool nonBlocking,
 
 		if (fActive && fWriterCount == 0)
 			return B_OK;
+
+		TRACE("Inode %p::%s(): wait for data, request %p\n", this, __FUNCTION__,
+			&request);
 
 		error = WaitForReadRequest(request);
 		if (error != B_OK)
@@ -555,13 +563,16 @@ Inode::NotifyBytesWritten(size_t bytes)
 void
 Inode::NotifyEndClosed(bool writer)
 {
+	TRACE("Inode %p::%s(%s)\n", this, __FUNCTION__,
+		writer ? "writer" : "reader");
+
 	if (writer) {
 		// Our last writer has been closed; if the pipe
 		// contains no data, unlock all waiting readers
+		TRACE("  buffer readable: %zu\n", fBuffer.Readable());
 		if (fBuffer.Readable() == 0) {
-			ReadRequest *request;
 			ReadRequestList::Iterator iterator = fReadRequests.GetIterator();
-			while ((request = iterator.Next()) != NULL)
+			while (ReadRequest* request = iterator.Next())
 				request->Notify();
 
 			if (fReadSelectSyncPool)
@@ -591,6 +602,7 @@ Inode::Open(int openMode)
 		fReaderCount++;
 
 	if (fReaderCount > 0 && fWriterCount > 0) {
+		TRACE("Inode %p::Open(): fifo becomes active\n", this);
 		fBuffer.CreateBuffer();
 		fActive = true;
 
@@ -605,14 +617,15 @@ Inode::Open(int openMode)
 void
 Inode::Close(int openMode)
 {
-	TRACE(("Inode::Close(openMode = %d)\n", openMode));
+	TRACE("Inode %p::Close(openMode = %d)\n", this, openMode);
 
 	MutexLocker locker(RequestLock());
 
 	if ((openMode & O_ACCMODE) == O_WRONLY && --fWriterCount == 0)
 		NotifyEndClosed(true);
 
-	if ((openMode & O_ACCMODE) == O_RDONLY || (openMode & O_ACCMODE) == O_RDWR) {
+	if ((openMode & O_ACCMODE) == O_RDONLY
+		|| (openMode & O_ACCMODE) == O_RDWR) {
 		if (--fReaderCount == 0)
 			NotifyEndClosed(false);
 	}
@@ -715,13 +728,13 @@ fifo_open(fs_volume *_volume, fs_vnode *_node, int openMode,
 {
 	Inode *inode = (Inode *)_node->private_node;
 
-	TRACE(("fifo_open(): node = %p, openMode = %d\n", inode, openMode));
+	TRACE("fifo_open(): node = %p, openMode = %d\n", inode, openMode);
 
 	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	TRACE(("  open cookie = %p\n", cookie));
+	TRACE("  open cookie = %p\n", cookie);
 	cookie->open_mode = openMode;
 	inode->Open(openMode);
 
@@ -748,7 +761,7 @@ fifo_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
-	TRACE(("fifo_freecookie: entry vnode %p, cookie %p\n", _node, _cookie));
+	TRACE("fifo_freecookie: entry vnode %p, cookie %p\n", _node, _cookie);
 
 	free(cookie);
 
@@ -770,8 +783,8 @@ fifo_read(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	file_cookie *cookie = (file_cookie *)_cookie;
 	Inode *inode = (Inode *)_node->private_node;
 
-	TRACE(("fifo_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n",
-		inode, cookie, *_length, cookie->open_mode));
+	TRACE("fifo_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n",
+		inode, cookie, *_length, cookie->open_mode);
 
 	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
 		return B_NOT_ALLOWED;
@@ -792,12 +805,16 @@ fifo_read(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	ReadRequest request;
 	inode->AddReadRequest(request);
 
+	TRACE("  issue read request %p\n", &request);
+
 	size_t length = *_length;
 	status_t status = inode->ReadDataFromBuffer(buffer, &length,
 		(cookie->open_mode & O_NONBLOCK) != 0, request);
 
 	inode->RemoveReadRequest(request);
 	inode->NotifyReadDone();
+
+	TRACE("  done reading request %p, length %zu\n", &request, length);
 
 	if (length > 0)
 		status = B_OK;
@@ -814,8 +831,8 @@ fifo_write(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	file_cookie *cookie = (file_cookie *)_cookie;
 	Inode *inode = (Inode *)_node->private_node;
 
-	TRACE(("fifo_write(vnode = %p, cookie = %p, length = %lu)\n",
-		_node, cookie, *_length));
+	TRACE("fifo_write(vnode = %p, cookie = %p, length = %lu)\n",
+		_node, cookie, *_length);
 
 	if ((cookie->open_mode & O_RWMASK) != O_WRONLY)
 		return B_NOT_ALLOWED;
@@ -872,7 +889,7 @@ fifo_write_stat(fs_volume *volume, fs_vnode *vnode, const struct ::stat *st,
 	uint32 statMask)
 {
 	// we cannot change the size of anything
-	if (statMask & B_STAT_SIZE)
+	if ((statMask & B_STAT_SIZE) != 0)
 		return B_BAD_VALUE;
 
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
@@ -894,8 +911,8 @@ static status_t
 fifo_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, uint32 op,
 	void *buffer, size_t length)
 {
-	TRACE(("fifo_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
-		_vnode, _cookie, op, buffer, length));
+	TRACE("fifo_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
+		_vnode, _cookie, op, buffer, length);
 
 	return EINVAL;
 }
@@ -907,7 +924,7 @@ fifo_set_flags(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
-	TRACE(("fifo_set_flags(vnode = %p, flags = %x)\n", _vnode, flags));
+	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _vnode, flags);
 	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;
 	return B_OK;
 }
@@ -919,7 +936,7 @@ fifo_select(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
-	TRACE(("fifo_select(vnode = %p)\n", _node));
+	TRACE("fifo_select(vnode = %p)\n", _node);
 	Inode *inode = (Inode *)_node->private_node;
 	if (!inode)
 		return B_ERROR;
@@ -935,7 +952,7 @@ fifo_deselect(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
-	TRACE(("fifo_deselect(vnode = %p)\n", _node));
+	TRACE("fifo_deselect(vnode = %p)\n", _node);
 	Inode *inode = (Inode *)_node->private_node;
 	if (!inode)
 		return B_ERROR;
