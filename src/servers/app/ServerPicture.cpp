@@ -516,7 +516,6 @@ draw_picture(View* view, BPoint where, int32 token)
 		= view->Window()->ServerWindow()->App()->GetPicture(token);
 	if (picture != NULL) {
 		BPoint origin = view->DrawingOrigin();
-		view->ConvertToScreenForDrawing(&where);
 		view->SetDrawingOrigin(where);
 		view->PushState();
 		picture->Play(view);
