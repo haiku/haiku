@@ -47,7 +47,7 @@ public:
 
 			PrinterItem 		*ActivePrinter() const;
 			void 				SetActivePrinter(PrinterItem* item);
-			
+
 private:
 		typedef BListView Inherited;
 
@@ -55,10 +55,10 @@ private:
 			void				_LayoutPrinterItems();
 			PrinterItem			*_FindItem(node_ref* node) const;
 
-			void				_EntryCreated(node_ref *node,
+			void				EntryCreated(node_ref *node,
 									entry_ref *entry);
-			void				_EntryRemoved(node_ref *node);
-			void				_AttributeChanged(node_ref *node);
+			void				EntryRemoved(node_ref *node);
+			void				AttributeChanged(node_ref *node);
 
 			FolderWatcher 		*fFolder;
 			PrinterItem 		*fActivePrinter;
@@ -73,9 +73,9 @@ public:
 									PrinterListLayoutData& layoutData);
 								~PrinterItem();
 
-			void				GetColumnWidth(BView* view, float& leftColumn, 
+			void				GetColumnWidth(BView* view, float& leftColumn,
 									float& rightColumn);
-	
+
 			void				DrawItem(BView *owner, BRect bounds,
 									bool complete);
 			void				Update(BView *owner, const BFont *font);

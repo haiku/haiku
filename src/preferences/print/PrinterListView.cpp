@@ -70,7 +70,7 @@ PrinterListView::BuildPrinterList()
 		BDirectory printer(&entry);
 		_AddPrinter(printer, false);
 	}
-	
+
 	_LayoutPrinterItems();
 }
 
@@ -151,6 +151,40 @@ PrinterListView::SelectedItem() const
 }
 
 
+// FolderListener interface
+
+void
+PrinterListView::EntryCreated(node_ref* node, entry_ref* entry)
+{
+	BDirectory printer(node);
+	_AddPrinter(printer, true);
+}
+
+
+void
+PrinterListView::EntryRemoved(node_ref* node)
+{
+	PrinterItem* item = _FindItem(node);
+	if (item) {
+		if (item == fActivePrinter)
+			fActivePrinter = NULL;
+
+		RemoveItem(item);
+		delete item;
+	}
+}
+
+
+void
+PrinterListView::AttributeChanged(node_ref* node)
+{
+	BDirectory printer(node);
+	_AddPrinter(printer, true);
+}
+
+
+// private methods
+
 void
 PrinterListView::_AddPrinter(BDirectory& printer, bool calculateLayout)
 {
@@ -169,7 +203,7 @@ PrinterListView::_AddPrinter(BDirectory& printer, bool calculateLayout)
 		if (info.GetType(buffer) == B_OK
 			&& strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
 				// Yes, it is a printer definition node
-			AddItem(new PrinterItem(dynamic_cast<PrintersWindow*>(Window()), 
+			AddItem(new PrinterItem(dynamic_cast<PrintersWindow*>(Window()),
 				printer, fLayoutData));
 			if (calculateLayout)
 				_LayoutPrinterItems();
@@ -183,20 +217,20 @@ PrinterListView::_LayoutPrinterItems()
 {
 	float& leftColumnMaximumWidth = fLayoutData.fLeftColumnMaximumWidth;
 	float& rightColumnMaximumWidth = fLayoutData.fRightColumnMaximumWidth;
-		
-	for (int32 i = 0; i < CountItems(); i ++) {	
+
+	for (int32 i = 0; i < CountItems(); i ++) {
 		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
 
 		float leftColumnWidth = 0;
 		float rightColumnWidth = 0;
 		item->GetColumnWidth(this, leftColumnWidth, rightColumnWidth);
-		
-		leftColumnMaximumWidth = MAX(leftColumnMaximumWidth, 
+
+		leftColumnMaximumWidth = MAX(leftColumnMaximumWidth,
 			leftColumnWidth);
-		rightColumnMaximumWidth = MAX(rightColumnMaximumWidth, 
+		rightColumnMaximumWidth = MAX(rightColumnMaximumWidth,
 			rightColumnWidth);
 	}
-	
+
 	Invalidate();
 }
 
@@ -212,37 +246,6 @@ PrinterListView::_FindItem(node_ref* node) const
 	}
 	return NULL;
 }
-
-
-void
-PrinterListView::_EntryCreated(node_ref* node, entry_ref* entry)
-{
-	BDirectory printer(node);
-	_AddPrinter(printer, true);
-}
-
-
-void
-PrinterListView::_EntryRemoved(node_ref* node)
-{
-	PrinterItem* item = _FindItem(node);
-	if (item) {
-		if (item == fActivePrinter)
-			fActivePrinter = NULL;
-
-		RemoveItem(item);
-		delete item;
-	}
-}
-
-
-void
-PrinterListView::_AttributeChanged(node_ref* node)
-{
-	BDirectory printer(node);
-	_AddPrinter(printer, true);
-}
-
 
 
 
@@ -325,10 +328,10 @@ PrinterItem::GetColumnWidth(BView* view, float& leftColumn, float& rightColumn)
 {
 	BFont font;
 	view->GetFont(&font);
-	
+
 	leftColumn = font.StringWidth(fName.String());
 	leftColumn = MAX(leftColumn, font.StringWidth(fDriverName.String()));
-	
+
 	rightColumn = font.StringWidth(fPendingJobs.String());
 	rightColumn = MAX(rightColumn, font.StringWidth(fTransport.String()));
 	rightColumn = MAX(rightColumn, font.StringWidth(fComments.String()));
@@ -413,7 +416,7 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	} else {
 		width = fLayoutData.fRightColumnMaximumWidth;
 	}
-		
+
 	BPoint pendingPt(bounds.right - width - 8.0, namePt.y);
 	BPoint transportPt(bounds.right - width - 8.0, driverPt.y);
 	BPoint commentPt(bounds.right - width - 8.0, defaultPt.y);
