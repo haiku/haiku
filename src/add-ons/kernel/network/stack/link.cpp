@@ -12,6 +12,7 @@
 
 #include "link.h"
 
+#include <net/if_dl.h>
 #include <net/if_types.h>
 #include <new>
 #include <stdlib.h>
@@ -28,6 +29,7 @@
 
 #include "device_interfaces.h"
 #include "domains.h"
+#include "interfaces.h"
 #include "stack_private.h"
 #include "utility.h"
 
@@ -48,6 +50,13 @@ public:
 			status_t			StartMonitoring(const char* deviceName);
 			status_t			StopMonitoring(const char* deviceName);
 
+			status_t			Bind(const sockaddr* address);
+			status_t			Unbind();
+			bool				IsBound() const
+									{ return fBoundToDevice != NULL; }
+
+			size_t				MTU();
+
 protected:
 			status_t			SocketStatus(bool peek) const;
 
@@ -58,10 +67,14 @@ private:
 									net_buffer* buffer);
 	static	void				_MonitorEvent(net_device_monitor* monitor,
 									int32 event);
+	static	status_t			_ReceiveData(void* cookie, net_device* device,
+									net_buffer* buffer);
 
 private:
 			net_device_monitor	fMonitor;
 			net_device_interface* fMonitoredDevice;
+			net_device_interface* fBoundToDevice;
+			uint32				fBoundType;
 };
 
 
@@ -69,28 +82,31 @@ struct net_domain* sDomain;
 
 
 LinkProtocol::LinkProtocol(net_socket* socket)
-	: LocalDatagramSocket("packet capture", socket)
+	:
+	LocalDatagramSocket("packet capture", socket),
+	fMonitoredDevice(NULL),
+	fBoundToDevice(NULL)
 {
 	fMonitor.cookie = this;
 	fMonitor.receive = _MonitorData;
 	fMonitor.event = _MonitorEvent;
-	fMonitoredDevice = NULL;
 }
 
 
 LinkProtocol::~LinkProtocol()
 {
-	if (fMonitoredDevice) {
+	if (fMonitoredDevice != NULL) {
 		unregister_device_monitor(fMonitoredDevice->device, &fMonitor);
 		put_device_interface(fMonitoredDevice);
-	}
+	} else
+		Unbind();
 }
 
 
 status_t
 LinkProtocol::StartMonitoring(const char* deviceName)
 {
-	MutexLocker _(fLock);
+	MutexLocker locker(fLock);
 
 	if (fMonitoredDevice != NULL)
 		return B_BUSY;
@@ -113,13 +129,88 @@ LinkProtocol::StartMonitoring(const char* deviceName)
 status_t
 LinkProtocol::StopMonitoring(const char* deviceName)
 {
-	MutexLocker _(fLock);
+	MutexLocker locker(fLock);
 
 	if (fMonitoredDevice == NULL
 		|| strcmp(fMonitoredDevice->device->name, deviceName) != 0)
 		return B_BAD_VALUE;
 
 	return _Unregister();
+}
+
+
+status_t
+LinkProtocol::Bind(const sockaddr* address)
+{
+	// Only root is allowed to bind to a link layer interface
+	if (address == NULL || geteuid() != 0)
+		return B_NOT_ALLOWED;
+
+	MutexLocker locker(fLock);
+
+	if (fMonitoredDevice != NULL)
+		return B_BUSY;
+
+	Interface* interface = get_interface_for_link(sDomain, address);
+	if (interface == NULL)
+		return B_BAD_VALUE;
+
+	net_device_interface* boundTo
+		= acquire_device_interface(interface->DeviceInterface());
+
+	interface->ReleaseReference();
+
+	if (boundTo == NULL)
+		return B_BAD_VALUE;
+
+	sockaddr_dl& linkAddress = *(sockaddr_dl*)address;
+
+	if (linkAddress.sdl_type != 0) {
+		fBoundType = ((uint32)linkAddress.sdl_type << 16)
+			| linkAddress.sdl_e_type;
+		// Bind to the type requested - this is needed in order to
+		// receive any buffers
+		// TODO: this could be easily changed by introducing catch all or rule
+		// based handlers!
+		status_t status = register_device_handler(boundTo->device, fBoundType,
+			&LinkProtocol::_ReceiveData, this);
+		if (status != B_OK)
+			return status;
+	} else
+		fBoundType = 0;
+
+	fBoundToDevice = boundTo;
+	socket->bound_to_device = boundTo->device->index;
+
+	return B_OK;
+}
+
+
+status_t
+LinkProtocol::Unbind()
+{
+	MutexLocker locker(fLock);
+
+	if (fBoundToDevice == NULL)
+		return B_BAD_VALUE;
+
+	unregister_device_handler(fBoundToDevice->device, fBoundType);
+	put_device_interface(fBoundToDevice);
+
+	socket->bound_to_device = 0;
+	return B_OK;
+}
+
+
+size_t
+LinkProtocol::MTU()
+{
+	MutexLocker locker(fLock);
+
+	if (!IsBound())
+		return 0;
+
+	return fBoundToDevice->device->mtu;
 }
 
 
@@ -148,14 +239,14 @@ LinkProtocol::_Unregister()
 }
 
 
-status_t
+/*static*/ status_t
 LinkProtocol::_MonitorData(net_device_monitor* monitor, net_buffer* packet)
 {
 	return ((LinkProtocol*)monitor->cookie)->SocketEnqueue(packet);
 }
 
 
-void
+/*static*/ void
 LinkProtocol::_MonitorEvent(net_device_monitor* monitor, int32 event)
 {
 	LinkProtocol* protocol = (LinkProtocol*)monitor->cookie;
@@ -169,6 +260,15 @@ LinkProtocol::_MonitorEvent(net_device_monitor* monitor, int32 event)
 			notify_socket(protocol->socket, B_SELECT_READ, B_DEVICE_NOT_FOUND);
 		}
 	}
+}
+
+
+/*static*/ status_t
+LinkProtocol::_ReceiveData(void* cookie, net_device* device, net_buffer* buffer)
+{
+	LinkProtocol* protocol = (LinkProtocol*)cookie;
+
+	return protocol->Enqueue(buffer);
 }
 
 
@@ -187,10 +287,10 @@ user_request_get_device_interface(void* value, struct ifreq& request,
 }
 
 
-//	#pragma mark -
+//	#pragma mark - net_protocol module
 
 
-net_protocol* 
+static net_protocol* 
 link_init_protocol(net_socket* socket)
 {
 	LinkProtocol* protocol = new (std::nothrow) LinkProtocol(socket);
@@ -203,7 +303,7 @@ link_init_protocol(net_socket* socket)
 }
 
 
-status_t
+static status_t
 link_uninit_protocol(net_protocol* protocol)
 {
 	delete (LinkProtocol*)protocol;
@@ -211,42 +311,42 @@ link_uninit_protocol(net_protocol* protocol)
 }
 
 
-status_t
+static status_t
 link_open(net_protocol* protocol)
 {
 	return B_OK;
 }
 
 
-status_t
+static status_t
 link_close(net_protocol* protocol)
 {
 	return B_OK;
 }
 
 
-status_t
+static status_t
 link_free(net_protocol* protocol)
 {
 	return B_OK;
 }
 
 
-status_t
+static status_t
 link_connect(net_protocol* protocol, const struct sockaddr* address)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
-status_t
+static status_t
 link_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
-status_t
+static status_t
 link_control(net_protocol* _protocol, int level, int option, void* value,
 	size_t* _length)
 {
@@ -374,7 +474,7 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 }
 
 
-status_t
+static status_t
 link_getsockopt(net_protocol* protocol, int level, int option, void* value,
 	int* length)
 {
@@ -388,7 +488,7 @@ link_getsockopt(net_protocol* protocol, int level, int option, void* value,
 }
 
 
-status_t
+static status_t
 link_setsockopt(net_protocol* protocol, int level, int option,
 	const void* value, int length)
 {
@@ -402,62 +502,69 @@ link_setsockopt(net_protocol* protocol, int level, int option,
 }
 
 
-status_t
-link_bind(net_protocol* protocol, const struct sockaddr* address)
+static status_t
+link_bind(net_protocol* _protocol, const struct sockaddr* address)
 {
-	// TODO: bind to a specific interface and ethernet type
-	return B_ERROR;
+	LinkProtocol* protocol = (LinkProtocol*)_protocol;
+	return protocol->Bind(address);
 }
 
 
-status_t
-link_unbind(net_protocol* protocol, struct sockaddr* address)
+static status_t
+link_unbind(net_protocol* _protocol, struct sockaddr* address)
 {
-	return B_ERROR;
+	LinkProtocol* protocol = (LinkProtocol*)_protocol;
+	return protocol->Unbind();
 }
 
 
-status_t
+static status_t
 link_listen(net_protocol* protocol, int count)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
-status_t
+static status_t
 link_shutdown(net_protocol* protocol, int direction)
 {
 	return B_NOT_SUPPORTED;
 }
 
 
-status_t
+static status_t
 link_send_data(net_protocol* protocol, net_buffer* buffer)
 {
-	// Only root is allowed to send link protocol packets
-	if (geteuid() != 0)
-		return B_NOT_ALLOWED;
-
-	return B_NOT_SUPPORTED;
+	return gNetDatalinkModule.send_datagram(protocol, sDomain, buffer);
 }
 
 
-status_t
+static status_t
 link_send_routed_data(net_protocol* protocol, struct net_route* route,
 	net_buffer* buffer)
 {
-	return B_NOT_SUPPORTED;
+	if (buffer->destination->sa_family != buffer->source->sa_family
+		|| buffer->destination->sa_family != AF_LINK)
+		return B_BAD_VALUE;
+
+	// The datalink layer will take care of the framing
+
+	return gNetDatalinkModule.send_data(route, buffer);
 }
 
 
-ssize_t
-link_send_avail(net_protocol* protocol)
+static ssize_t
+link_send_avail(net_protocol* _protocol)
 {
-	return B_ERROR;
+	LinkProtocol* protocol = (LinkProtocol*)_protocol;
+	if (!protocol->IsBound())
+		return B_ERROR;
+
+	return protocol->socket->send.buffer_size;
 }
 
 
-status_t
+static status_t
 link_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
 	net_buffer** _buffer)
 {
@@ -465,46 +572,49 @@ link_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
 }
 
 
-ssize_t
+static ssize_t
 link_read_avail(net_protocol* protocol)
 {
 	return ((LinkProtocol*)protocol)->AvailableData();
 }
 
 
-struct net_domain* 
+static struct net_domain* 
 link_get_domain(net_protocol* protocol)
 {
 	return sDomain;
 }
 
 
-size_t
-link_get_mtu(net_protocol* protocol, const struct sockaddr* address)
+static size_t
+link_get_mtu(net_protocol* _protocol, const struct sockaddr* address)
 {
-	// TODO: for now
-	return 0;
+	LinkProtocol* protocol = (LinkProtocol*)_protocol;
+	return protocol->MTU();
 }
 
 
-status_t
+static status_t
 link_receive_data(net_buffer* buffer)
 {
+	// We never receive any data this way
 	return B_ERROR;
 }
 
 
-status_t
-link_error(uint32 code, net_buffer* data)
+static status_t
+link_error_received(uint32 code, net_buffer* data)
 {
+	// We don't do any error processing
 	return B_ERROR;
 }
 
 
-status_t
+static status_t
 link_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
 	void* errorData)
 {
+	// We don't do any error processing
 	return B_ERROR;
 }
 
@@ -535,6 +645,7 @@ link_init()
 	register_domain_protocols(AF_LINK, SOCK_DGRAM, 0, "network/stack/link/v1",
 		NULL);
 
+	// TODO: this should actually be registered for all types (besides local)
 	register_domain_datalink_protocols(AF_LINK, IFT_ETHER,
 		"network/datalink_protocols/ethernet_frame/v1",
 		NULL);
@@ -571,7 +682,12 @@ net_protocol_module_info gLinkModule = {
 	link_get_domain,
 	link_get_mtu,
 	link_receive_data,
-	NULL,
-	link_error,
+	NULL,		// deliver_data
+	link_error_received,
 	link_error_reply,
+	NULL,		// add_ancillary_data()
+	NULL,		// process_ancillary_data()
+	NULL,		// process_ancillary_data_no_container()
+	NULL,		// send_data_no_buffer()
+	NULL		// read_data_no_buffer()
 };

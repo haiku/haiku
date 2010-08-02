@@ -1201,6 +1201,40 @@ get_interface_for_device(net_domain* domain, uint32 index)
 }
 
 
+/*!	Returns a reference to an Interface that matches the given \a linkAddress.
+	The link address is checked against its hardware address, or its interface
+	name, or finally the interface index.
+*/
+Interface*
+get_interface_for_link(net_domain* domain, const sockaddr* _linkAddress)
+{
+	sockaddr_dl& linkAddress = *(sockaddr_dl*)_linkAddress;
+
+	MutexLocker locker(sLock);
+
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
+		// Test if the hardware address matches, or if the given interface
+		// matches, or if at least the index matches.
+		if ((linkAddress.sdl_alen == interface->device->address.length
+				&& memcmp(LLADDR(&linkAddress), interface->device->address.data,
+					linkAddress.sdl_alen) == 0)
+			|| (linkAddress.sdl_nlen > 0
+				&& !strcmp(interface->name, (const char*)linkAddress.sdl_data))
+			|| (linkAddress.sdl_nlen == 0 && linkAddress.sdl_alen == 0
+				&& linkAddress.sdl_index == interface->index)) {
+			if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
+				return NULL;
+
+			interface->AcquireReference();
+			return interface;
+		}
+	}
+
+	return NULL;
+}
+
+
 InterfaceAddress*
 get_interface_address(const sockaddr* local)
 {
@@ -1220,7 +1254,7 @@ get_interface_address(const sockaddr* local)
 
 InterfaceAddress*
 get_interface_address_for_destination(net_domain* domain,
-	const struct sockaddr* destination)
+	const sockaddr* destination)
 {
 	MutexLocker locker(sLock);
 	
@@ -1236,16 +1270,25 @@ get_interface_address_for_destination(net_domain* domain,
 }
 
 
+/*!	Returns a reference to an InterfaceAddress of the specified \a domain that
+	belongs to the interface identified via \a linkAddress. Only the hardware
+	address is matched.
+
+	If \a unconfiguredOnly is set, the interface address must not yet be
+	configured, or must currently be in the process of being configured.
+*/
 InterfaceAddress*
-get_interface_address_for_link(net_domain* domain,
-	const struct sockaddr* _linkAddress, bool unconfiguredOnly)
+get_interface_address_for_link(net_domain* domain, const sockaddr* address,
+	bool unconfiguredOnly)
 {
-	sockaddr_dl& linkAddress = *(sockaddr_dl*)_linkAddress;
+	sockaddr_dl& linkAddress = *(sockaddr_dl*)address;
 
 	MutexLocker locker(sLock);
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
+		// Test if the hardware address matches, or if the given interface
+		// matches, or if at least the index matches.
 		if (linkAddress.sdl_alen == interface->device->address.length
 			&& memcmp(LLADDR(&linkAddress), interface->device->address.data,
 				linkAddress.sdl_alen) == 0) {

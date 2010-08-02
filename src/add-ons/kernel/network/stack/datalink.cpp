@@ -374,6 +374,10 @@ datalink_send_data(struct net_route* route, net_buffer* buffer)
 }
 
 
+/*!	Finds a route for the given \a buffer in the given \a domain, and calls
+	net_protocol_info::send_routed_data() on either the \a protocol (if
+	non-NULL), or the domain.
+*/
 static status_t
 datalink_send_datagram(net_protocol* protocol, net_domain* domain,
 	net_buffer* buffer)

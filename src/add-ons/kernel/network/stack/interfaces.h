@@ -176,11 +176,12 @@ status_t update_interface_address(InterfaceAddress* interfaceAddress,
 Interface* get_interface(net_domain* domain, uint32 index);
 Interface* get_interface(net_domain* domain, const char* name);
 Interface* get_interface_for_device(net_domain* domain, uint32 index);
+Interface* get_interface_for_link(net_domain* domain, const sockaddr* address);
 InterfaceAddress* get_interface_address(const struct sockaddr* address);
 InterfaceAddress* get_interface_address_for_destination(net_domain* domain,
-	const struct sockaddr* destination);
+	const sockaddr* destination);
 InterfaceAddress* get_interface_address_for_link(net_domain* domain,
-	const struct sockaddr* linkAddress, bool unconfiguredOnly);
+	const sockaddr* linkAddress, bool unconfiguredOnly);
 
 uint32 count_interfaces();
 status_t list_interfaces(int family, void* buffer, size_t* _bufferSize);
