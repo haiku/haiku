@@ -6,10 +6,11 @@
 #define NET_BUFFER_H
 
 
-#include <util/list.h>
+#include <sys/socket.h>
 
 #include <module.h>
-#include <sys/socket.h>
+
+#include <util/list.h>
 
 
 #define NET_BUFFER_MODULE_NAME "network/stack/buffer/v1"

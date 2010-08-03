@@ -1,14 +1,17 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_DEVICE_H
 #define NET_DEVICE_H
 
 
+#include <net/if.h>
+
 #include <module.h>
 
-#include <net/if.h>
+
+typedef struct net_buffer net_buffer;
 
 
 struct net_hardware_address {
@@ -16,8 +19,8 @@ struct net_hardware_address {
 	uint8	length;
 };
 
-struct net_device {
-	struct net_device_module_info *module;
+typedef struct net_device {
+	struct net_device_module_info* module;
 
 	char	name[IF_NAMESIZE];
 	uint32	index;
@@ -32,33 +35,33 @@ struct net_device {
 	struct net_hardware_address address;
 
 	struct ifreq_stats stats;
-};
+} net_device;
+
 
 struct net_device_module_info {
 	struct module_info info;
 
-	status_t	(*init_device)(const char *name, struct net_device **_device);
-	status_t	(*uninit_device)(struct net_device *device);
+	status_t	(*init_device)(const char* name, net_device** _device);
+	status_t	(*uninit_device)(net_device* device);
 
-	status_t	(*up)(struct net_device *device);
-	void		(*down)(struct net_device *device);
+	status_t	(*up)(net_device* device);
+	void		(*down)(net_device* device);
 
-	status_t	(*control)(struct net_device *device, int32 op,
-					void *argument, size_t length);
+	status_t	(*control)(net_device* device, int32 op, void* argument,
+					size_t length);
 
-	status_t	(*send_data)(struct net_device *device,
-					struct net_buffer *buffer);
-	status_t	(*receive_data)(struct net_device *device,
-					struct net_buffer **_buffer);
+	status_t	(*send_data)(net_device* device, net_buffer* buffer);
+	status_t	(*receive_data)(net_device* device, net_buffer** _buffer);
 
-	status_t	(*set_mtu)(struct net_device *device, size_t mtu);
-	status_t	(*set_promiscuous)(struct net_device *device, bool promiscuous);
-	status_t	(*set_media)(struct net_device *device, uint32 media);
+	status_t	(*set_mtu)(net_device* device, size_t mtu);
+	status_t	(*set_promiscuous)(net_device* device, bool promiscuous);
+	status_t	(*set_media)(net_device* device, uint32 media);
 
-	status_t	(*add_multicast)(struct net_device *device,
-					const struct sockaddr *address);
-	status_t	(*remove_multicast)(struct net_device *device,
-					const struct sockaddr *address);
+	status_t	(*add_multicast)(net_device* device,
+					const struct sockaddr* address);
+	status_t	(*remove_multicast)(net_device* device,
+					const struct sockaddr* address);
 };
+
 
 #endif	// NET_DEVICE_H

@@ -166,8 +166,8 @@ LinkProtocol::Bind(const sockaddr* address)
 	sockaddr_dl& linkAddress = *(sockaddr_dl*)address;
 
 	if (linkAddress.sdl_type != 0) {
-		fBoundType = ((uint32)linkAddress.sdl_type << 16)
-			| linkAddress.sdl_e_type;
+		fBoundType = B_NET_FRAME_TYPE(linkAddress.sdl_type, 
+			linkAddress.sdl_e_type);
 		// Bind to the type requested - this is needed in order to
 		// receive any buffers
 		// TODO: this could be easily changed by introducing catch all or rule

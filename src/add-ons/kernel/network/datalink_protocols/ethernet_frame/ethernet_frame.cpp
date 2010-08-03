@@ -61,17 +61,35 @@ ethernet_deframe(net_device* device, net_buffer* buffer)
 	destination.sdl_family = AF_LINK;
 	destination.sdl_index = device->index;
 	destination.sdl_type = IFT_ETHER;
+	destination.sdl_e_type = type;
 	destination.sdl_nlen = destination.sdl_slen = 0;
 	destination.sdl_alen = ETHER_ADDRESS_LENGTH;
 	memcpy(destination.sdl_data, header.destination, ETHER_ADDRESS_LENGTH);
 
-	// mark buffer if it was a broadcast/multicast packet
+	// Mark buffer if it was a broadcast/multicast packet
 	if (!memcmp(header.destination, kBroadcastAddress, ETHER_ADDRESS_LENGTH))
 		buffer->flags |= MSG_BCAST;
 	else if ((header.destination[0] & 0x01) != 0)
 		buffer->flags |= MSG_MCAST;
 
-	return ETHER_FRAME_TYPE | type;
+	// Translate the ethernet specific type to a generic one if possible
+	switch (type) {
+		case ETHER_TYPE_IP:
+			buffer->type = B_NET_FRAME_TYPE_IPV4;
+			break;
+		case ETHER_TYPE_IPV6:
+			buffer->type = B_NET_FRAME_TYPE_IPV6;
+			break;
+		case ETHER_TYPE_IPX:
+			buffer->type = B_NET_FRAME_TYPE_IPX;
+			break;
+
+		default:
+			buffer->type = B_NET_FRAME_TYPE(IFT_ETHER, type);
+			break;
+	}
+
+	return B_OK;
 }
 
 

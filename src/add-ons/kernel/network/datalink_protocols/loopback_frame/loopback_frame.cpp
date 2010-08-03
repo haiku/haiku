@@ -31,11 +31,11 @@ struct loopback_frame_protocol : net_datalink_protocol {
 struct net_buffer_module_info* gBufferModule;
 
 
-int32
+status_t
 loopback_deframe(net_device* device, net_buffer* buffer)
 {
 	// there is not that much to do...
-	return 0;
+	return B_OK;
 }
 
 

@@ -955,12 +955,12 @@ arp_init_protocol(net_interface* interface, net_domain* domain,
 		return B_BAD_TYPE;
 
 	status_t status = sStackModule->register_device_handler(interface->device,
-		ETHER_FRAME_TYPE | ETHER_TYPE_ARP, &arp_receive, NULL);
+		B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_ARP), &arp_receive, NULL);
 	if (status != B_OK)
 		return status;
 
 	status = sStackModule->register_domain_device_handler(
-		interface->device, ETHER_FRAME_TYPE | ETHER_TYPE_IP, domain);
+		interface->device, B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_IP), domain);
 	if (status != B_OK)
 		return status;
 
@@ -978,9 +978,9 @@ status_t
 arp_uninit_protocol(net_datalink_protocol *protocol)
 {
 	sStackModule->unregister_device_handler(protocol->interface->device,
-		ETHER_FRAME_TYPE | ETHER_TYPE_ARP);
+		B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_ARP));
 	sStackModule->unregister_device_handler(protocol->interface->device,
-		ETHER_FRAME_TYPE | ETHER_TYPE_IP);
+		B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_IP));
 
 	delete protocol;
 	return B_OK;

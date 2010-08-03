@@ -51,24 +51,16 @@ device_reader_thread(void* _interface)
 	net_device* device = interface->device;
 	status_t status = B_OK;
 
-	RecursiveLocker locker(interface->receive_lock);
-
 	while ((device->flags & IFF_UP) != 0) {
-		locker.Unlock();
-
 		net_buffer* buffer;
 		status = device->module->receive_data(device, &buffer);
-
-		locker.Lock();
-
 		if (status == B_OK) {
 			// feed device monitors
 			if (atomic_get(&interface->monitor_count) > 0)
 				device_interface_monitor_receive(interface, buffer);
 
 			buffer->interface_address = NULL;
-			buffer->type = interface->deframe_func(interface->device, buffer);
-			if (buffer->type < 0) {
+			if (interface->deframe_func(interface->device, buffer) != B_OK) {
 				gNetBufferModule.free(buffer);
 				continue;
 			}
@@ -102,20 +94,29 @@ device_consumer_thread(void* _interface)
 		}
 
 		if (buffer->interface_address != NULL) {
-			// if the interface is already specified, this buffer was
+			// If the interface is already specified, this buffer was
 			// delivered locally.
 			if (buffer->interface_address->domain->module->receive_data(buffer)
 					== B_OK)
 				buffer = NULL;
 		} else {
-			// find handler for this packet
-			DeviceHandlerList::Iterator iterator =
-				interface->receive_funcs.GetIterator();
-			while (buffer && iterator.HasNext()) {
+			sockaddr_dl& linkAddress = *(sockaddr_dl*)buffer->source;
+			int32 specificType = B_NET_FRAME_TYPE(linkAddress.sdl_type,
+				linkAddress.sdl_e_type);
+
+			// Find handler for this packet
+
+			RecursiveLocker locker(interface->receive_lock);
+
+			DeviceHandlerList::Iterator iterator
+				= interface->receive_funcs.GetIterator();
+			while (buffer != NULL && iterator.HasNext()) {
 				net_device_handler* handler = iterator.Next();
 
-				// if the handler returns B_OK, it consumed the buffer
-				if (handler->type == buffer->type
+				// If the handler returns B_OK, it consumed the buffer - first
+				// handler wins.
+				if ((handler->type == buffer->type
+						|| handler->type == specificType)
 					&& handler->func(handler->cookie, device, buffer) == B_OK)
 					buffer = NULL;
 			}

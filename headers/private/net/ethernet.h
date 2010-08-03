@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ETHERNET_H
@@ -22,7 +22,6 @@ struct ether_header {
 	uint16	type;
 } _PACKED;
 
-#define ETHER_FRAME_TYPE			0x00010000
 
 // ethernet types
 #define ETHER_TYPE_IP				0x0800
@@ -31,5 +30,6 @@ struct ether_header {
 #define	ETHER_TYPE_IPV6				0x86dd
 #define	ETHER_TYPE_PPPOE_DISCOVERY	0x8863	// PPPoE discovery stage
 #define	ETHER_TYPE_PPPOE			0x8864	// PPPoE session stage
+
 
 #endif	// ETHERNET_H

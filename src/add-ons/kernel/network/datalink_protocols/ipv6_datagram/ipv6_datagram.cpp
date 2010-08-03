@@ -58,9 +58,6 @@ static net_protocol_module_info* sIPv6Module;
 net_protocol* sIPv6Protocol;
 static hash_table* sCache;
 static mutex sCacheLock;
-// TODO ETHER_FRAME_TYPE doesn't belong there, we need Layer 2
-//      independence.
-static const int32 kIPv6FrameType = ETHER_FRAME_TYPE | ETHER_TYPE_IPV6;
 static const net_buffer* kDeletedBuffer = (net_buffer*)~0;
 
 // needed for IN6_IS_ADDR_UNSPECIFIED() macro
@@ -887,12 +884,9 @@ ipv6_datalink_init(net_interface* interface, net_datalink_protocol** _protocol)
 
 	memset(&protocol->hardware_address, 0, sizeof(sockaddr_dl));
 
-	// We register ETHER_TYPE_IPV6 as most datalink protocols use it
-	// to identify IPv6 datagrams. In the future we may limit this.
-
 	status_t status = sStackModule->register_domain_device_handler(
-		interface->device, kIPv6FrameType, interface->domain);
-	if (status < B_OK)
+		interface->device, B_NET_FRAME_TYPE_IPV6, interface->domain);
+	if (status != B_OK)
 		delete protocol;
 	else
 		*_protocol = protocol;
@@ -905,7 +899,7 @@ static status_t
 ipv6_datalink_uninit(net_datalink_protocol* protocol)
 {
 	sStackModule->unregister_device_handler(protocol->interface->device,
-		kIPv6FrameType);
+		B_NET_FRAME_TYPE_IPV6);
 	delete protocol;
 	return B_OK;
 }

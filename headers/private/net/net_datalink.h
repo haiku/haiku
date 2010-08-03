@@ -6,15 +6,20 @@
 #define NET_DATALINK_H
 
 
+#include <net/if.h>
+
 #include <net_buffer.h>
 #include <net_routing_info.h>
 
 #include <util/list.h>
 
-#include <net/if.h>
-
 
 #define NET_DATALINK_MODULE_NAME "network/stack/datalink/v1"
+
+
+struct Checksum;
+struct net_protocol;
+
 
 typedef struct net_datalink_protocol net_datalink_protocol;
 
