@@ -10,12 +10,10 @@
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
 #ifndef WINDOW_H
 #define WINDOW_H
 
 
-#include "Decorator.h"
 #include "RegionPool.h"
 #include "ServerWindow.h"
 #include "View.h"
@@ -71,7 +69,7 @@ public:
 			::EventTarget&		EventTarget() const
 									{ return fWindow->EventTarget(); }
 
-			void				ReloadDecorator();
+			bool				ReloadDecor();
 
 			void				SetScreen(const ::Screen* screen);
 			const ::Screen*		Screen() const;

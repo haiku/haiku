@@ -37,6 +37,13 @@ DesktopObservable::UnregisterListener(DesktopListener* listener)
 }
 
 
+const DesktopListenerDLList&
+DesktopObservable::GetDesktopListenerList()
+{
+	return fDesktopListenerList;
+}
+
+
 #define FOR_ALL_DESKTOP_LISTENER 											\
 	for (DesktopListener* listener = fDesktopListenerList.First();			\
 		listener != NULL; listener = fDesktopListenerList.GetNext(listener))

@@ -14,6 +14,14 @@
 #define DESKTOP_H
 
 
+#include <Autolock.h>
+#include <InterfaceDefs.h>
+#include <List.h>
+#include <Menu.h>
+#include <ObjectList.h>
+#include <Region.h>
+#include <Window.h>
+
 #include "CursorManager.h"
 #include "DesktopListener.h"
 #include "DesktopSettings.h"
@@ -26,15 +34,6 @@
 #include "WindowList.h"
 #include "Workspace.h"
 #include "WorkspacePrivate.h"
-
-#include <ObjectList.h>
-
-#include <Autolock.h>
-#include <InterfaceDefs.h>
-#include <List.h>
-#include <Menu.h>
-#include <Region.h>
-#include <Window.h>
 
 
 #define USE_MULTI_LOCKER 1
@@ -233,7 +232,7 @@ public:
 			void				Redraw();
 			void				RedrawBackground();
 
-			void				ReloadAllDecorators();
+			void				ReloadDecor();
 
 			BRegion&			BackgroundRegion()
 									{ return fBackgroundRegion; }

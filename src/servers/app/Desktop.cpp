@@ -36,6 +36,7 @@
 #include <WindowInfo.h>
 
 #include "AppServer.h"
+#include "DecorManager.h"
 #include "DesktopSettingsPrivate.h"
 #include "DrawingEngine.h"
 #include "HWInterface.h"
@@ -1901,9 +1902,21 @@ Desktop::RedrawBackground()
 
 
 void
-Desktop::ReloadAllDecorators()
+Desktop::ReloadDecor()
 {
 	AutoWriteLocker _(fWindowLock);
+
+	// TODO it is assumed all listeners are registered by one decor
+	// unregister old listeners
+	const DesktopListenerDLList& currentListeners = GetDesktopListenerList();
+	for (DesktopListener* listener = currentListeners.First();
+		listener != NULL; listener = currentListeners.GetNext(listener))
+		UnregisterListener(listener);
+	// register new listeners
+	const DesktopListenerList& newListeners
+		= gDecorManager.GetDesktopListeners();
+	for (int i = 0; i < newListeners.CountItems(); i++)
+ 		RegisterListener(newListeners.ItemAt(i));
 
 	for (int32 i = 0; i < kMaxWorkspaces; i++) {
 		for (Window* window = _Windows(i).LastWindow(); window;
@@ -1911,7 +1924,7 @@ Desktop::ReloadAllDecorators()
 			BRegion oldBorder;
 			window->GetBorderRegion(&oldBorder);
 
-			window->ReloadDecorator();
+			window->ReloadDecor();
 
 			BRegion border;
 			window->GetBorderRegion(&border);

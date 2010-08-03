@@ -10,20 +10,18 @@
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
-
 #include "Window.h"
 
 #include "Decorator.h"
 #include "DecorManager.h"
 #include "Desktop.h"
-#include "DefaultWindowBehaviour.h"
 #include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "MessagePrivate.h"
 #include "PortLink.h"
 #include "ServerApp.h"
 #include "ServerWindow.h"
+#include "WindowBehaviour.h"
 #include "Workspace.h"
 #include "WorkspacesView.h"
 
@@ -135,7 +133,7 @@ Window::Window(const BRect& frame, const char *name,
 				&fMaxWidth, &fMaxHeight);
 		}
 	}
-	fWindowBehaviour = new (std::nothrow)DefaultWindowBehaviour(this);
+	fWindowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
 
 	// do we need to change our size to let the decorator fit?
 	// _ResizeBy() will adapt the frame for validity before resizing
@@ -542,17 +540,35 @@ Window::PreviousWindow(int32 index) const
 }
 
 
-void
-Window::ReloadDecorator()
+bool
+Window::ReloadDecor()
 {
+	::Decorator* decorator = NULL;
+	WindowBehaviour* windowBehaviour = NULL;
+
 	if (fLook != B_NO_BORDER_WINDOW_LOOK) {
-		delete fDecorator;
 		// we need a new decorator
-		fDecorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
+		decorator = gDecorManager.AllocateDecorator(fDesktop, fDrawingEngine,
 			Frame(), Title(), fLook, fFlags);
+		if (!decorator)
+			return false;
 		if (IsFocus())
-			fDecorator->SetFocus(true);
+			decorator->SetFocus(true);
 	}
+
+	windowBehaviour = gDecorManager.AllocateWindowBehaviour(this);
+	if (!windowBehaviour) {
+		delete decorator;
+		return false;
+	}
+
+	delete fDecorator;
+	fDecorator = decorator;
+
+	delete fWindowBehaviour;
+	fWindowBehaviour = windowBehaviour;
+
+	return true;
 }
 
 

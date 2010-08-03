@@ -55,7 +55,7 @@ class DesktopListener : public DoublyLinkedListLinkImpl<DesktopListener>
 };
 
 
-typedef DoublyLinkedList<DesktopListener> DesktopListenerList;
+typedef DoublyLinkedList<DesktopListener> DesktopListenerDLList;
 
 
 class DesktopObservable
@@ -65,6 +65,7 @@ class DesktopObservable
 
 		void				RegisterListener(DesktopListener* listener);
 		void				UnregisterListener(DesktopListener* listener);
+	const DesktopListenerDLList&	GetDesktopListenerList();
 
 		void				InvokeAddWindow(Window* window);
 		void				InvokeRemoveWindow(Window* window);
@@ -104,10 +105,10 @@ class DesktopObservable
 				bool&	fInvoking;
 		};
 
-		DesktopListenerList	fDesktopListenerList;
+		DesktopListenerDLList	fDesktopListenerList;
 		
 		// prevent recursive invokes
-		bool				fWeAreInvoking;
+		bool					fWeAreInvoking;
 };
 
 #endif
