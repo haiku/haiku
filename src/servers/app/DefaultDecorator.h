@@ -7,7 +7,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
 #ifndef DEFAULT_DECORATOR_H
 #define DEFAULT_DECORATOR_H
 

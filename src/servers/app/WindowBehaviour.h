@@ -5,7 +5,6 @@
  * Authors:
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
 #ifndef WINDOW_BEHAVIOUR_H
 #define WINDOW_BEHAVIOUR_H
 
@@ -16,9 +15,8 @@
 class BMessage;
 
 
-class WindowBehaviour
-{
-	public:
+class WindowBehaviour {
+public:
 							WindowBehaviour();
 	virtual					~WindowBehaviour();
 
@@ -31,7 +29,7 @@ class WindowBehaviour
 		bool				IsDragging() const { return fIsDragging; }
 		bool				IsResizing() const { return fIsResizing; }
 
-	protected:
+protected:
 		bool				fIsResizing : 1;
 		bool				fIsDragging : 1;
 };

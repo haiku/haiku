@@ -10,7 +10,6 @@
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
 #ifndef DEFAULT_WINDOW_BEHAVIOUR_H
 #define DEFAULT_WINDOW_BEHAVIOUR_H
 
@@ -24,9 +23,8 @@ class Desktop;
 class Window;
 
 
-class DefaultWindowBehaviour : public WindowBehaviour
-{
-	public:
+class DefaultWindowBehaviour : public WindowBehaviour {
+public:
 						DefaultWindowBehaviour(Window* window);
 		virtual			~DefaultWindowBehaviour();
 
@@ -35,7 +33,7 @@ class DefaultWindowBehaviour : public WindowBehaviour
 		virtual void	MouseMoved(BMessage *message, BPoint where,
 							bool isFake);
 		
-	protected:
+protected:
 		Window*			fWindow;
 		Desktop*		fDesktop;
 
@@ -50,7 +48,7 @@ class DefaultWindowBehaviour : public WindowBehaviour
 		bigtime_t		fLastMoveTime;
 		bigtime_t		fLastSnapTime;
 
-	private:
+private:
 		int32			_ExtractButtons(const BMessage* message) const;
 		int32			_ExtractModifiers(const BMessage* message) const;
 		click_type		_ActionFor(const BMessage* message) const;

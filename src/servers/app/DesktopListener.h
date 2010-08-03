@@ -5,9 +5,9 @@
  * Authors:
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
 #ifndef DESKTOP_LISTENER_H
 #define DESKTOP_LISTENER_H
+
 
 #include <util/DoublyLinkedList.h>
 
@@ -18,9 +18,8 @@ class BMessage;
 class Window;
 
 
-class DesktopListener : public DoublyLinkedListLinkImpl<DesktopListener>
-{
-	public:
+class DesktopListener : public DoublyLinkedListLinkImpl<DesktopListener> {
+public:
 	virtual						~DesktopListener();
 
 	virtual void				AddWindow(Window* window) = 0;
@@ -58,9 +57,8 @@ class DesktopListener : public DoublyLinkedListLinkImpl<DesktopListener>
 typedef DoublyLinkedList<DesktopListener> DesktopListenerDLList;
 
 
-class DesktopObservable
-{
-	public:
+class DesktopObservable {
+public:
 							DesktopObservable();
 
 		void				RegisterListener(DesktopListener* listener);
@@ -96,8 +94,8 @@ class DesktopObservable
 		void				InvokeGetDecoratorSettings(Window* window,
 								BMessage& settings);
 
-	private:
-		class InvokeGuard{
+private:
+		class InvokeGuard {
 			public:
 				InvokeGuard(bool& invoking);
 				~InvokeGuard();

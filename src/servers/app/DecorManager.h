@@ -6,7 +6,6 @@
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
 #ifndef DECOR_MANAGER_H
 #define DECOR_MANAGER_H
 
@@ -29,8 +28,7 @@ class WindowBehaviour;
 typedef BObjectList<DesktopListener> DesktopListenerList;
 
 
-class DecorAddOn
-{
+class DecorAddOn {
 public:
 								DecorAddOn(image_id id, const char* name);
 	virtual						~DecorAddOn();

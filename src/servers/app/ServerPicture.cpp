@@ -7,6 +7,7 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen <marcus@overhagen.de>
  */
+
 #include "ServerPicture.h"
 
 #include <new>

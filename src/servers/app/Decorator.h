@@ -7,7 +7,6 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
-
 #ifndef DECORATOR_H
 #define DECORATOR_H
 
@@ -45,6 +44,7 @@ enum click_type {
 	CLICK_RESIZE_LB,
 	CLICK_RESIZE_RB
 };
+
 
 class Decorator {
 public:
