@@ -56,6 +56,7 @@
 #include "Desktop.h"
 #include "DirectWindowInfo.h"
 #include "DrawingEngine.h"
+#include "DrawState.h"
 #include "HWInterface.h"
 #include "Overlay.h"
 #include "ProfileMessageSupport.h"

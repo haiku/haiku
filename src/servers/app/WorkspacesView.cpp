@@ -11,8 +11,10 @@
 #include "WorkspacesView.h"
 
 #include "AppServer.h"
+#include "Decorator.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
+#include "DrawState.h"
 #include "ServerApp.h"
 #include "Window.h"
 #include "Workspace.h"

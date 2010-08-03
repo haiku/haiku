@@ -7,11 +7,14 @@
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen <marcus@overhagen.de>
  */
-
-
 #include "ServerPicture.h"
 
+#include <new>
+#include <stdio.h>
+#include <stack>
+
 #include "DrawingEngine.h"
+#include "DrawState.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerFont.h"
@@ -31,10 +34,6 @@
 #include <Debug.h>
 #include <List.h>
 #include <Shape.h>
-
-#include <new>
-#include <stdio.h>
-#include <stack>
 
 
 using std::stack;

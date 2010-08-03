@@ -9,13 +9,15 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
  */
-
-
 #include "View.h"
+
+#include <new>
+#include <stdio.h>
 
 #include "BitmapManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
+#include "DrawState.h"
 #include "Overlay.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
@@ -38,9 +40,6 @@
 #include <GradientDiamond.h>
 #include <GradientConic.h>
 
-#include <stdio.h>
-
-#include <new>
 
 using std::nothrow;
 
