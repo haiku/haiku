@@ -244,15 +244,15 @@ GlutGameMode::_CompareModes(const void* _mode1, const void* _mode2)
 	display_mode *mode2 = (display_mode *)_mode2;
 
 	if (mode1->virtual_width != mode2->virtual_width)
-		return mode1->virtual_width - mode2->virtual_width;
+		return mode2->virtual_width - mode1->virtual_width;
 
 	if (mode1->virtual_height != mode2->virtual_height)
-		return mode1->virtual_height - mode2->virtual_height;
+		return mode2->virtual_height - mode1->virtual_height;
 
 	if (mode1->space != mode2->space)
-		return _GetModePixelDepth(mode1) - _GetModePixelDepth(mode2);
+		return _GetModePixelDepth(mode2) - _GetModePixelDepth(mode1);
 
-	return _GetModeRefreshRate(mode1) - _GetModeRefreshRate(mode2);
+	return _GetModeRefreshRate(mode2) - _GetModeRefreshRate(mode1);
 }
 
 
