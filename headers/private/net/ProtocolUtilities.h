@@ -133,7 +133,6 @@ protected:
 
 private:
 			status_t			_Enqueue(net_buffer* buffer);
-			status_t			_SocketEnqueue(net_buffer* buffer);
 			net_buffer*			_Dequeue(bool peek);
 			void				_Clear();
 
@@ -212,37 +211,32 @@ DECL_DATAGRAM_SOCKET(inline status_t)::_Enqueue(net_buffer* buffer)
 DECL_DATAGRAM_SOCKET(inline status_t)::SocketEnqueue(net_buffer* _buffer)
 {
 	AutoLocker _(fLock);
-	return _SocketEnqueue(_buffer);
-}
 
-
-DECL_DATAGRAM_SOCKET(inline status_t)::_SocketEnqueue(net_buffer* _buffer)
-{
 	net_buffer* buffer = ModuleBundle::Buffer()->clone(_buffer, false);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
 	status_t status = _Enqueue(buffer);
-	if (status < B_OK)
+	if (status != B_OK)
 		ModuleBundle::Buffer()->free(buffer);
 
 	return status;
 }
 
 
-DECL_DATAGRAM_SOCKET(inline net_buffer*)::Dequeue(bool clone)
+DECL_DATAGRAM_SOCKET(inline net_buffer*)::Dequeue(bool peek)
 {
 	AutoLocker _(fLock);
-	return _Dequeue(clone);
+	return _Dequeue(peek);
 }
 
 
-DECL_DATAGRAM_SOCKET(inline net_buffer*)::_Dequeue(bool clone)
+DECL_DATAGRAM_SOCKET(inline net_buffer*)::_Dequeue(bool peek)
 {
 	if (fBuffers.IsEmpty())
 		return NULL;
 
-	if (clone)
+	if (peek)
 		return ModuleBundle::Buffer()->clone(fBuffers.Head(), false);
 
 	net_buffer* buffer = fBuffers.RemoveHead();
