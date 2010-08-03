@@ -242,7 +242,7 @@ LinkProtocol::_Unregister()
 /*static*/ status_t
 LinkProtocol::_MonitorData(net_device_monitor* monitor, net_buffer* packet)
 {
-	return ((LinkProtocol*)monitor->cookie)->SocketEnqueue(packet);
+	return ((LinkProtocol*)monitor->cookie)->EnqueueClone(packet);
 }
 
 
@@ -535,7 +535,7 @@ link_shutdown(net_protocol* protocol, int direction)
 static status_t
 link_send_data(net_protocol* protocol, net_buffer* buffer)
 {
-	return gNetDatalinkModule.send_datagram(protocol, sDomain, buffer);
+	return gNetDatalinkModule.send_data(protocol, sDomain, buffer);
 }
 
 
@@ -549,7 +549,7 @@ link_send_routed_data(net_protocol* protocol, struct net_route* route,
 
 	// The datalink layer will take care of the framing
 
-	return gNetDatalinkModule.send_data(route, buffer);
+	return gNetDatalinkModule.send_routed_data(route, buffer);
 }
 
 
@@ -568,7 +568,7 @@ static status_t
 link_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
 	net_buffer** _buffer)
 {
-	return ((LinkProtocol*)protocol)->SocketDequeue(flags, _buffer);
+	return ((LinkProtocol*)protocol)->Dequeue(flags, _buffer);
 }
 
 

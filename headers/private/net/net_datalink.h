@@ -72,8 +72,8 @@ struct net_datalink_module_info {
 
 	status_t		(*control)(net_domain* domain, int32 option, void* value,
 						size_t* _length);
-	status_t		(*send_data)(net_route* route, net_buffer* buffer);
-	status_t		(*send_datagram)(struct net_protocol* protocol,
+	status_t		(*send_routed_data)(net_route* route, net_buffer* buffer);
+	status_t		(*send_data)(struct net_protocol* protocol,
 						net_domain* domain, net_buffer* buffer);
 
 	bool			(*is_local_address)(net_domain* domain,

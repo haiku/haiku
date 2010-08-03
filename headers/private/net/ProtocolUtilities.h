@@ -113,14 +113,14 @@ public:
 			status_t			InitCheck() const;
 
 			status_t			Enqueue(net_buffer* buffer);
+			status_t			EnqueueClone(net_buffer* buffer);
+
+			status_t			Dequeue(uint32 flags, net_buffer** _buffer);
 			net_buffer*			Dequeue(bool clone);
 			status_t			BlockingDequeue(bool peek, bigtime_t timeout,
 									net_buffer** _buffer);
-			void				Clear();
 
-			status_t			SocketEnqueue(net_buffer* buffer);
-			status_t			SocketDequeue(uint32 flags,
-									net_buffer** _buffer);
+			void				Clear();
 
 			bool				IsEmpty() const { return fBuffers.IsEmpty(); }
 			ssize_t				AvailableData() const;
@@ -193,22 +193,7 @@ DECL_DATAGRAM_SOCKET(inline status_t)::Enqueue(net_buffer* buffer)
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::_Enqueue(net_buffer* buffer)
-{
-	if (fSocket->receive.buffer_size > 0
-		&& (fCurrentBytes + buffer->size) > fSocket->receive.buffer_size)
-		return ENOBUFS;
-
-	fBuffers.Add(buffer);
-	fCurrentBytes += buffer->size;
-
-	_NotifyOneReader(true);
-
-	return B_OK;
-}
-
-
-DECL_DATAGRAM_SOCKET(inline status_t)::SocketEnqueue(net_buffer* _buffer)
+DECL_DATAGRAM_SOCKET(inline status_t)::EnqueueClone(net_buffer* _buffer)
 {
 	AutoLocker _(fLock);
 
@@ -224,25 +209,18 @@ DECL_DATAGRAM_SOCKET(inline status_t)::SocketEnqueue(net_buffer* _buffer)
 }
 
 
+DECL_DATAGRAM_SOCKET(inline status_t)::Dequeue(uint32 flags,
+	net_buffer** _buffer)
+{
+	return BlockingDequeue((flags & MSG_PEEK) != 0, _SocketTimeout(flags),
+		_buffer);
+}
+
+
 DECL_DATAGRAM_SOCKET(inline net_buffer*)::Dequeue(bool peek)
 {
 	AutoLocker _(fLock);
 	return _Dequeue(peek);
-}
-
-
-DECL_DATAGRAM_SOCKET(inline net_buffer*)::_Dequeue(bool peek)
-{
-	if (fBuffers.IsEmpty())
-		return NULL;
-
-	if (peek)
-		return ModuleBundle::Buffer()->clone(fBuffers.Head(), false);
-
-	net_buffer* buffer = fBuffers.RemoveHead();
-	fCurrentBytes -= buffer->size;
-
-	return buffer;
 }
 
 
@@ -281,27 +259,10 @@ DECL_DATAGRAM_SOCKET(inline status_t)::BlockingDequeue(bool peek,
 }
 
 
-DECL_DATAGRAM_SOCKET(inline status_t)::SocketDequeue(uint32 flags,
-	net_buffer** _buffer)
-{
-	return BlockingDequeue((flags & MSG_PEEK) != 0, _SocketTimeout(flags),
-		_buffer);
-}
-
-
 DECL_DATAGRAM_SOCKET(inline void)::Clear()
 {
 	AutoLocker _(fLock);
 	_Clear();
-}
-
-
-DECL_DATAGRAM_SOCKET(inline void)::_Clear()
-{
-	BufferList::Iterator it = fBuffers.GetIterator();
-	while (it.HasNext())
-		ModuleBundle::Buffer()->free(it.Next());
-	fCurrentBytes = 0;
 }
 
 
@@ -313,6 +274,19 @@ DECL_DATAGRAM_SOCKET(inline ssize_t)::AvailableData() const
 		return status;
 
 	return fCurrentBytes;
+}
+
+
+DECL_DATAGRAM_SOCKET(inline void)::WakeAll()
+{
+	release_sem_etc(fNotify, 0, B_RELEASE_ALL);
+}
+
+
+DECL_DATAGRAM_SOCKET(inline void)::NotifyOne()
+{
+	release_sem_etc(fNotify, 1, B_RELEASE_IF_WAITING_ONLY
+		| B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -328,6 +302,45 @@ DECL_DATAGRAM_SOCKET(inline status_t)::SocketStatus(bool peek) const
 }
 
 
+DECL_DATAGRAM_SOCKET(inline status_t)::_Enqueue(net_buffer* buffer)
+{
+	if (fSocket->receive.buffer_size > 0
+		&& (fCurrentBytes + buffer->size) > fSocket->receive.buffer_size)
+		return ENOBUFS;
+
+	fBuffers.Add(buffer);
+	fCurrentBytes += buffer->size;
+
+	_NotifyOneReader(true);
+
+	return B_OK;
+}
+
+
+DECL_DATAGRAM_SOCKET(inline net_buffer*)::_Dequeue(bool peek)
+{
+	if (fBuffers.IsEmpty())
+		return NULL;
+
+	if (peek)
+		return ModuleBundle::Buffer()->clone(fBuffers.Head(), false);
+
+	net_buffer* buffer = fBuffers.RemoveHead();
+	fCurrentBytes -= buffer->size;
+
+	return buffer;
+}
+
+
+DECL_DATAGRAM_SOCKET(inline void)::_Clear()
+{
+	BufferList::Iterator it = fBuffers.GetIterator();
+	while (it.HasNext())
+		ModuleBundle::Buffer()->free(it.Next());
+	fCurrentBytes = 0;
+}
+
+
 DECL_DATAGRAM_SOCKET(inline status_t)::_Wait(bigtime_t timeout)
 {
 	LockingBase::Unlock(&fLock);
@@ -336,19 +349,6 @@ DECL_DATAGRAM_SOCKET(inline status_t)::_Wait(bigtime_t timeout)
 	LockingBase::Lock(&fLock);
 
 	return status;
-}
-
-
-DECL_DATAGRAM_SOCKET(inline void)::WakeAll()
-{
-	release_sem_etc(fNotify, 0, B_RELEASE_ALL);
-}
-
-
-DECL_DATAGRAM_SOCKET(inline void)::NotifyOne()
-{
-	release_sem_etc(fNotify, 1, B_RELEASE_IF_WAITING_ONLY
-		| B_DO_NOT_RESCHEDULE);
 }
 
 

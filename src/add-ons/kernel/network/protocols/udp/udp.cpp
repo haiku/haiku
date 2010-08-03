@@ -994,7 +994,7 @@ UdpEndpoint::SendData(net_buffer *buffer)
 {
 	TRACE_EP("SendData(%p [%lu bytes])", buffer, buffer->size);
 
-	return gDatalinkModule->send_datagram(this, NULL, buffer);
+	return gDatalinkModule->send_data(this, NULL, buffer);
 }
 
 
@@ -1015,9 +1015,9 @@ UdpEndpoint::FetchData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 {
 	TRACE_EP("FetchData(%ld, 0x%lx)", numBytes, flags);
 
-	status_t status = SocketDequeue(flags, _buffer);
+	status_t status = Dequeue(flags, _buffer);
 	TRACE_EP("  FetchData(): returned from fifo status=0x%lx", status);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	TRACE_EP("  FetchData(): returns buffer with %ld bytes", (*_buffer)->size);
@@ -1030,7 +1030,7 @@ UdpEndpoint::StoreData(net_buffer *buffer)
 {
 	TRACE_EP("StoreData(%p [%ld bytes])", buffer, buffer->size);
 
-	return SocketEnqueue(buffer);
+	return EnqueueClone(buffer);
 }
 
 
@@ -1049,8 +1049,6 @@ UdpEndpoint::DeliverData(net_buffer *_buffer)
 		return status;
 	}
 
-	// we call Enqueue() instead of SocketEnqueue() as there is
-	// no need to clone the buffer again.
 	return Enqueue(buffer);
 }
 

@@ -330,7 +330,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 
 
 static status_t
-datalink_send_data(struct net_route* route, net_buffer* buffer)
+datalink_send_routed_data(struct net_route* route, net_buffer* buffer)
 {
 	TRACE("%s(route %p, buffer %p)\n", __FUNCTION__, route, buffer);
 
@@ -379,7 +379,7 @@ datalink_send_data(struct net_route* route, net_buffer* buffer)
 	non-NULL), or the domain.
 */
 static status_t
-datalink_send_datagram(net_protocol* protocol, net_domain* domain,
+datalink_send_data(net_protocol* protocol, net_domain* domain,
 	net_buffer* buffer)
 {
 	TRACE("%s(%p, domain %p, buffer %p)\n", __FUNCTION__, protocol, domain,
@@ -921,8 +921,8 @@ net_datalink_module_info gNetDatalinkModule = {
 	},
 
 	datalink_control,
+	datalink_send_routed_data,
 	datalink_send_data,
-	datalink_send_datagram,
 
 	datalink_is_local_address,
 	datalink_is_local_link_address,

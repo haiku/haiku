@@ -645,7 +645,7 @@ send_fragments(ipv4_protocol* protocol, struct net_route* route,
 
 		// send fragment
 		if (status == B_OK)
-			status = sDatalinkModule->send_data(route, fragmentBuffer);
+			status = sDatalinkModule->send_routed_data(route, fragmentBuffer);
 
 		if (lastFragment) {
 			// we don't own the last buffer, so we don't have to free it
@@ -745,7 +745,7 @@ raw_receive_data(net_buffer* buffer)
 		RawSocket* raw = iterator.Next();
 
 		if (raw->Socket()->protocol == buffer->protocol) {
-			raw->SocketEnqueue(buffer);
+			raw->EnqueueClone(buffer);
 			count++;
 		}
 	}
@@ -1445,7 +1445,7 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 		return send_fragments(protocol, route, buffer, mtu);
 	}
 
-	return sDatalinkModule->send_data(route, buffer);
+	return sDatalinkModule->send_routed_data(route, buffer);
 }
 
 
@@ -1488,10 +1488,10 @@ ipv4_send_data(net_protocol* _protocol, net_buffer* buffer)
 		if (route == NULL)
 			return ENETUNREACH;
 
-		return sDatalinkModule->send_data(route, buffer);
+		return sDatalinkModule->send_routed_data(route, buffer);
 	}
 
-	return sDatalinkModule->send_datagram(protocol, sDomain, buffer);
+	return sDatalinkModule->send_data(protocol, sDomain, buffer);
 }
 
 
@@ -1513,7 +1513,7 @@ ipv4_read_data(net_protocol* _protocol, size_t numBytes, uint32 flags,
 
 	TRACE_SK(protocol, "ReadData(%lu, 0x%lx)", numBytes, flags);
 
-	return raw->SocketDequeue(flags, _buffer);
+	return raw->Dequeue(flags, _buffer);
 }
 
 
@@ -1685,7 +1685,7 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 	if (protocol->raw == NULL)
 		return B_ERROR;
 
-	return protocol->raw->SocketEnqueue(buffer);
+	return protocol->raw->EnqueueClone(buffer);
 }
 
 
