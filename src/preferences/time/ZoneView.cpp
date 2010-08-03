@@ -353,10 +353,11 @@ TimeZoneView::_SetSystemTimeZone()
 		return;
 
 	fCurrentZoneItem = (TimeZoneListItem*)(fZoneList->ItemAt(selection));
+	const BTimeZone& timeZone = fCurrentZoneItem->TimeZone();
 
-	mutable_locale_roster->SetDefaultTimeZone(fCurrentZoneItem->TimeZone());
+	mutable_locale_roster->SetDefaultTimeZone(timeZone);
 
-	set_timezone(fCurrentZoneItem->Code());
+	_kern_set_timezone(timeZone.OffsetFromGMT(), false);
 
 	fSetZone->SetEnabled(false);
 	fLastUpdateMinute = -1;
