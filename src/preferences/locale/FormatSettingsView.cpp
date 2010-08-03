@@ -4,7 +4,7 @@
  */
 
 
-#include "TimeFormatSettingsView.h"
+#include "FormatSettingsView.h"
 #include "Locale.h"
 
 #include <Alert.h>

@@ -26,7 +26,7 @@
 #include <TabView.h>
 #include <UnicodeChar.h>
 
-#include "TimeFormatSettingsView.h"
+#include "FormatSettingsView.h"
 
 
 #undef B_TRANSLATE_CONTEXT

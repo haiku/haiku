@@ -8,7 +8,7 @@ local sources =
 	Locale.cpp
 	LocaleSettings.cpp
 	LocaleWindow.cpp
-	TimeFormatSettingsView.cpp
+	FormatSettingsView.cpp
 ;
 
 Preference Locale
@@ -22,5 +22,5 @@ DoCatalogs Locale : x-vnd.Haiku-Locale :
 	LanguageListView.cpp
 	Locale.cpp
 	LocaleWindow.cpp
-	TimeFormatSettingsView.cpp
+	FormatSettingsView.cpp
 ;

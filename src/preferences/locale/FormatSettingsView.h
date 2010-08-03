@@ -2,8 +2,8 @@
  * Copyright 2009, Adrien Destugues, pulkomandy@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef TIME_FORMAT_SETTINGS_H
-#define TIME_FORMAT_SETTINGS_H
+#ifndef _FORMAT_SETTINGS_H
+#define _FORMAT_SETTINGS_H
 
 
 #include <Box.h>
@@ -92,4 +92,4 @@ private:
 };
 
 
-#endif	// TIME_FORMAT_SETTINGS_H
+#endif	// _FORMAT_SETTINGS_H
