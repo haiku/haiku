@@ -102,7 +102,7 @@ BCatalog::SetCatalog(const char* signature, uint32 fingerprint)
 {
 	// This is not thread safe. It is used only in ReadOnlyBootPrompt and should
 	// not do harm there, but not sure what to do about it…
-	delete fCatalog;
+	mutable_locale_roster->UnloadCatalog(fCatalog);
 	fCatalog = mutable_locale_roster->LoadCatalog(signature, NULL, fingerprint);
 
 	return B_OK;
