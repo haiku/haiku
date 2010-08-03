@@ -78,10 +78,10 @@ BTimeZone::SetTo(const char* zoneCode)
 	int32_t rawOffset;
 	int32_t dstOffset;
 	UDate nowMillis = 1000 * (double)time(NULL);
+
 	UErrorCode error = U_ZERO_ERROR;
 	icuTimeZone->getOffset(nowMillis, FALSE, rawOffset, dstOffset, error);
-
-	if (error != U_ZERO_ERROR) {
+	if (!U_SUCCESS(error)) {
 		fOffsetFromGMT = 0;
 		fInitStatus = B_ERROR;
 	} else {
@@ -89,6 +89,8 @@ BTimeZone::SetTo(const char* zoneCode)
 			// we want seconds, not ms (which ICU gives us)
 		fInitStatus = B_OK;
 	}
+
+	delete icuTimeZone;
 
 	return fInitStatus;
 }
