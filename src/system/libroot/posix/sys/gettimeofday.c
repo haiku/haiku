@@ -9,7 +9,7 @@
 
 
 int
-gettimeofday(struct timeval *tv, struct timezone *tz)
+gettimeofday(struct timeval *tv, void *tz)
 {
 	if (tv != NULL) {
 		bigtime_t usecs = real_time_clock_usecs();
@@ -18,14 +18,8 @@ gettimeofday(struct timeval *tv, struct timezone *tz)
 		tv->tv_usec = usecs % 1000000;
 	}
 
-	if (tz != NULL) {
-		time_t timezoneOffset;
-		bool daylightSavingTime;
-		_kern_get_timezone(&timezoneOffset, &daylightSavingTime);
-
-		tz->tz_minuteswest = timezoneOffset;
-		tz->tz_dsttime = daylightSavingTime;
-	}
+	// struct timezone (tz) has been deprecated since long and its exact
+	// semantics are a bit unclear, so we need not bother to deal with it
 
 	return 0;
 }

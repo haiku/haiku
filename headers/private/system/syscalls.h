@@ -363,10 +363,8 @@ extern status_t		_kern_stop_watching(dev_t device, ino_t node, port_id port,
 
 // time functions
 extern status_t		_kern_set_real_time_clock(uint32 time);
-extern status_t		_kern_set_timezone(int32 timezoneOffset,
-						bool daylightSavingTime);
-extern status_t		_kern_get_timezone(int32 *_timezoneOffset,
-						bool *_daylightSavingTime);
+extern status_t		_kern_set_timezone(int32 timezoneOffset);
+extern status_t		_kern_get_timezone(int32 *_timezoneOffset);
 extern status_t		_kern_set_real_time_clock_is_gmt(bool isGMT);
 extern status_t		_kern_get_real_time_clock_is_gmt(bool *_isGMT);
 

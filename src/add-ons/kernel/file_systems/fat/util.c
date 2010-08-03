@@ -69,16 +69,22 @@ dump_directory(uint8 *buffer)
 static void
 get_tzoffset()
 {
-	rtc_info info;
-
 	if (tzoffset != -1)
 		return;
 
-	if (get_rtc_info(&info) < 0) {
-		dprintf("error getting rtc info\n");
-	} else {
-		tzoffset = info.tz_minuteswest;
-	}
+	// tzoffset used to be set to a bogus value (timezone offset in seconds),
+	// we could try to use something like the following ...
+	//
+	//	int32 tzOffsetInSeconds;
+	//	if (_kern_get_timezone(&tzOffsetInSeconds) < 0) {
+	//		dprintf("error getting timezone offset\n");
+	//	} else {
+	//		tzoffset = tzOffsetInSeconds / 60;
+	//	}
+	//
+	// but I'd rather like to spare us the specific kernel call,
+	// so we hardcode the timezone (let's see if it makes any difference)
+	tzoffset = 0;
 }
 
 

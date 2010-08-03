@@ -68,7 +68,7 @@ setTimeZoneOffset(BPath path)
 		return;
 	}
 
-	_kern_set_timezone(timeZoneOffset, false);
+	_kern_set_timezone(timeZoneOffset);
 	printf("timezone offset is %ld seconds from GMT.\n", timeZoneOffset);
 }
 

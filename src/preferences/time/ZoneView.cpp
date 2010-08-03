@@ -357,7 +357,7 @@ TimeZoneView::_SetSystemTimeZone()
 
 	mutable_locale_roster->SetDefaultTimeZone(timeZone);
 
-	_kern_set_timezone(timeZone.OffsetFromGMT(), false);
+	_kern_set_timezone(timeZone.OffsetFromGMT());
 
 	fSetZone->SetEnabled(false);
 	fLastUpdateMinute = -1;

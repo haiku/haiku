@@ -1,6 +1,6 @@
 #ifndef _SYS_TIME_H
 #define _SYS_TIME_H
-/* 
+/*
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -40,7 +40,7 @@ extern "C" {
 
 extern int	getitimer(int which, struct itimerval *value);
 extern int	setitimer(int which, const struct itimerval *value, struct itimerval *oldValue);
-extern int	gettimeofday(struct timeval *tv, struct timezone *tz);
+extern int	gettimeofday(struct timeval *tv, void *tz);
 
 extern int	utimes(const char *name, const struct timeval times[2]);
 	/* legacy */
