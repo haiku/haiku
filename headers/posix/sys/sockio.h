@@ -6,7 +6,9 @@
 #define _SYS_SOCKIO_H
 
 
-/*! Socket I/O control codes, usually via struct ifreq */
+/*! Socket I/O control codes, usually via struct ifreq, most of them should
+	be compatible with the BSDs.
+*/
 
 
 #define SIOCADDRT				8900	/* add route */
@@ -66,11 +68,12 @@
 #define SIOCSIFGENERIC			8945	/* generic IF set op */
 #define SIOCGIFGENERIC			8946	/* generic IF get op */
 
-#define SIOC_IF_ALIAS_REMOVE	8918	/* synonym for SIOCDIFADDR */
-#define SIOC_IF_ALIAS_ADD		8919	/* synonym for SIOCAIFADDR */
-#define SIOC_IF_ALIAS_SET		8947	/* set interface alias, ifaliasreq */
-#define SIOC_IF_ALIAS_GET		8948	/* get interface alias, ifaliasreq */
-#define SIOC_IF_ALIAS_COUNT		8959	/* count interface aliases */
+/* Haiku specific extensions */
+#define B_SOCKET_REMOVE_ALIAS	8918	/* synonym for SIOCDIFADDR */
+#define B_SOCKET_ADD_ALIAS		8919	/* synonym for SIOCAIFADDR */
+#define B_SOCKET_SET_ALIAS		8947	/* set interface alias, ifaliasreq */
+#define B_SOCKET_GET_ALIAS		8948	/* get interface alias, ifaliasreq */
+#define B_SOCKET_COUNT_ALIASES	8949	/* count interface aliases */
 
 #define SIOCEND					9000	/* SIOCEND >= highest SIOC* */
 

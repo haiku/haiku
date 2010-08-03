@@ -38,6 +38,7 @@ typedef struct net_interface_address {
 	struct sockaddr*	local;
 	struct sockaddr*	destination;
 	struct sockaddr*	mask;
+	uint32_t			flags;
 } net_interface_address;
 
 typedef struct net_interface {

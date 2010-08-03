@@ -110,9 +110,9 @@ option_to_string(int32 option)
 		CODE(SIOCSIFGENERIC)	/* generic IF set op */
 		CODE(SIOCGIFGENERIC)	/* generic IF get op */
 
-		CODE(SIOC_IF_ALIAS_SET)	/* set interface alias, ifaliasreq */
-		CODE(SIOC_IF_ALIAS_GET)	/* get interface alias, ifaliasreq */
-		CODE(SIOC_IF_ALIAS_COUNT) /* count interface aliases */
+		CODE(B_SOCKET_SET_ALIAS)		/* set interface alias, ifaliasreq */
+		CODE(B_SOCKET_GET_ALIAS)		/* get interface alias, ifaliasreq */
+		CODE(B_SOCKET_COUNT_ALIASES)	/* count interface aliases */
 
 		default:
 			static char buffer[24];
@@ -142,7 +142,7 @@ get_interface_name_or_index(net_domain* domain, int32 option, void* value,
 	if (user_memcpy(&request, value, expected) < B_OK)
 		return B_BAD_ADDRESS;
 
-	net_interface* interface = NULL;
+	Interface* interface = NULL;
 	if (option == SIOCGIFINDEX)
 		interface = get_interface(domain, request.ifr_name);
 	else
@@ -157,6 +157,7 @@ get_interface_name_or_index(net_domain* domain, int32 option, void* value,
 		strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
 
 	*_length = sizeof(ifreq);
+	interface->ReleaseReference();
 
 	return user_memcpy(value, &request, sizeof(ifreq));
 }
@@ -200,14 +201,14 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 		case SIOCGIFNAME:
 			return get_interface_name_or_index(domain, option, value, _length);
 
-		case SIOCAIFADDR:	/* same as SIOC_IF_ALIAS_ADD */
+		case SIOCAIFADDR:	/* same as B_SOCKET_ADD_ALIAS */
 		{
 			// add new interface address
 			if (*_length < sizeof(struct ifaliasreq))
 				return B_BAD_VALUE;
 
 			struct ifaliasreq request;
-			if (user_memcpy(&request, value, sizeof(struct ifaliasreq)) < B_OK)
+			if (user_memcpy(&request, value, sizeof(struct ifaliasreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			Interface* interface = get_interface(domain, request.ifra_name);
@@ -216,6 +217,8 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 				status_t status = add_interface_address(interface, domain,
 					request);
 				notify_interface_changed(interface);
+				interface->ReleaseReference();
+
 				return status;
 			}
 
@@ -232,11 +235,11 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 			return status;
 		}
 
-		case SIOCDIFADDR:	/* same as SIOC_IF_ALIAS_REMOVE */
+		case SIOCDIFADDR:	/* same as B_SOCKET_REMOVE_ALIAS */
 		{
 			// remove interface (address)
 			struct ifreq request;
-			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
+			if (user_memcpy(&request, value, sizeof(struct ifreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			Interface* interface = get_interface(domain, request.ifr_name);
@@ -246,8 +249,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 			status_t status;
 
 			if (request.ifr_addr.sa_family != AF_UNSPEC
-				|| request.ifr_addr.sa_len != 0) {
-				// TODO: remove interface if this was the last address?
+				&& request.ifr_addr.sa_len != 0) {
 				status = interface->Control(domain, SIOCDIFADDR, request,
 					(ifreq*)value, *_length);
 			} else
@@ -675,7 +677,7 @@ interface_protocol_down(net_datalink_protocol* _protocol)
 
 	deviceInterface->up_count--;
 
-	interface_went_down(interface);
+	interface->WentDown();
 
 	if (deviceInterface->up_count > 0)
 		return;
@@ -745,7 +747,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 				&((struct ifreq*)argument)->ifr_addr, maxLength);
 		}
 
-		case SIOC_IF_ALIAS_COUNT:
+		case B_SOCKET_COUNT_ALIASES:
 		{
 			ifreq request;
 			request.ifr_count = interface->CountAddresses();
@@ -754,7 +756,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 				&request.ifr_count, sizeof(request.ifr_count));
 		}
 
-		case SIOC_IF_ALIAS_GET:
+		case B_SOCKET_GET_ALIAS:
 		{
 			ifaliasreq request;
 			if (user_memcpy(&request, argument, sizeof(ifaliasreq)) != B_OK)

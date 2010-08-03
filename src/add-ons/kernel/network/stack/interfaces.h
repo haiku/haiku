@@ -25,6 +25,10 @@
 struct net_device_interface;
 
 
+// Additional address flags
+#define IFAF_DIRECT_ADDRESS		0x1000
+
+
 struct InterfaceAddress : DoublyLinkedListLinkImpl<InterfaceAddress>,
 		net_interface_address, Referenceable {
 								InterfaceAddress();
@@ -39,6 +43,9 @@ struct InterfaceAddress : DoublyLinkedListLinkImpl<InterfaceAddress>,
 			status_t			SetMask(const sockaddr* to);
 
 			sockaddr**			AddressFor(int32 option);
+
+			void				AddDefaultRoutes(int32 option);
+			void				RemoveDefaultRoutes(int32 option);
 
 			InterfaceAddress*&	HashTableLink() { return fLink; }
 
@@ -121,10 +128,14 @@ public:
 			bool				GetNextAddress(InterfaceAddress** _address);
 			InterfaceAddress*	AddressAt(size_t index);
 			size_t				CountAddresses();
+			void				RemoveAddresses();
 
 			status_t			Control(net_domain* domain, int32 option,
 									ifreq& request, ifreq* userRequest,
 									size_t length);
+
+			void				SetDown();
+			void				WentDown();
 
 			recursive_lock&		Lock() { return fLock; }
 
@@ -142,7 +153,6 @@ public:
 
 private:
 			status_t			_SetUp();
-			void				_SetDown();
 			InterfaceAddress*	_FirstForFamily(int family);
 			status_t			_ChangeAddress(RecursiveLocker& locker,
 									InterfaceAddress* address, int32 option,

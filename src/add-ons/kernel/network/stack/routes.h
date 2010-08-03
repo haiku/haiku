@@ -15,6 +15,9 @@
 #include <util/DoublyLinkedList.h>
 
 
+class InterfaceAddress;
+
+
 struct net_route_private
 	: net_route, DoublyLinkedListLinkImpl<net_route_private> {
 	int32	ref_count;
@@ -41,6 +44,7 @@ status_t remove_route(struct net_domain* domain,
 status_t get_route_information(struct net_domain* domain, void* buffer,
 				size_t length);
 void invalidate_routes(net_domain* domain, net_interface* interface);
+void invalidate_routes(InterfaceAddress* address);
 struct net_route* get_route(struct net_domain* domain,
 				const struct sockaddr* address);
 status_t get_device_route(struct net_domain* domain, uint32 index,

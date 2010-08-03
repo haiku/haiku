@@ -411,6 +411,8 @@ status_t
 control_routes(struct net_interface* _interface, net_domain* domain,
 	int32 option, void* argument, size_t length)
 {
+	TRACE("control_routes(interface %p, domain %p, option %" B_PRId32 ")\n",
+		_interface, domain, option);
 	Interface* interface = (Interface*)_interface;
 
 	switch (option) {
@@ -447,7 +449,8 @@ control_routes(struct net_interface* _interface, net_domain* domain,
 			else
 				status = remove_route(domain, &route);
 
-			address->ReleaseReference();
+			if (address != NULL)
+				address->ReleaseReference();
 			return status;
 		}
 	}
@@ -601,13 +604,33 @@ invalidate_routes(net_domain* _domain, net_interface* interface)
 	net_domain_private* domain = (net_domain_private*)_domain;
 	RecursiveLocker locker(domain->lock);
 
-	dprintf("invalidate_routes(%i, %s)\n", domain->family, interface->name);
+	TRACE("invalidate_routes(%i, %s)\n", domain->family, interface->name);
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	while (iterator.HasNext()) {
 		net_route* route = iterator.Next();
 
 		if (route->interface_address->interface == interface)
+			remove_route(domain, route);
+	}
+}
+
+
+void
+invalidate_routes(InterfaceAddress* address)
+{
+	net_domain_private* domain = (net_domain_private*)address->domain;
+
+	TRACE("invalidate_routes(%s)\n",
+		AddressString(domain, address->local).Data());
+
+	RecursiveLocker locker(domain->lock);
+
+	RouteList::Iterator iterator = domain->routes.GetIterator();
+	while (iterator.HasNext()) {
+		net_route* route = iterator.Next();
+
+		if (route->interface_address == address)
 			remove_route(domain, route);
 	}
 }

@@ -393,6 +393,7 @@ prepare_request(struct ifreq& request, const char* name)
 		return false;
 	}
 
+	memset(&request, 0, sizeof(ifreq));
 	strcpy(request.ifr_name, name);
 	return true;
 }
@@ -723,20 +724,56 @@ list_interfaces(const char* name)
 }
 
 
+/*!	If there are any arguments given, this will remove only the specified
+	addresses from the interface named \a name.
+	If there are no arguments, it will remove the complete interface with all
+	of its addresses.
+*/
 void
-delete_interface(const char* name)
+delete_interface(const char* name, char* const* args, int32 argCount)
 {
 	ifreq request;
 	if (!prepare_request(request, name))
 		return;
 
-	int socket = find_socket(request, -1);
-	if (socket == -1)
-		return;
+	for (int32 i = 0; i < argCount; i++) {
+		int32 familyIndex;
+		if (get_address_family(args[i], familyIndex))
+			i++;
 
-	if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
-		fprintf(stderr, "%s: Could not delete interface %s: %s\n",
-			kProgramName, name, strerror(errno));
+		// TODO: be smart enough to detect the family by the address
+
+		int socket = find_socket(request, kFamilies[familyIndex].family);
+		if (socket == -1) {
+			fprintf(stderr, "%s: Address family \"%s\" is not available.\n",
+				kProgramName, kFamilies[familyIndex].name);
+			exit(1);
+		}
+
+		if (!parse_address(familyIndex, args[i], request.ifr_addr)) {
+			fprintf(stderr, "%s: Could not parse address \"%s\".\n",
+				kProgramName, args[i]);
+			exit(1);
+		}
+
+		if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
+			fprintf(stderr, "%s: Could not delete address %s from interface %s:"
+				" %s\n", kProgramName, args[i], name, strerror(errno));
+		}
+	}
+
+	if (argCount == 0) {
+		// Delete interface
+		int socket = find_socket(request, -1);
+		if (socket < 0)
+			exit(1);
+
+		request.ifr_addr.sa_family = AF_UNSPEC;
+
+		if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) < 0) {
+			fprintf(stderr, "%s: Could not delete interface %s: %s\n",
+				kProgramName, name, strerror(errno));
+		}
 	}
 }
 
@@ -776,11 +813,8 @@ configure_interface(const char* name, char* const* args,
 	if (index == 0) {
 		// the interface does not exist yet, we have to add it first
 		ifaliasreq request;
+		memset(&request, 0, sizeof(ifaliasreq));
 		strlcpy(request.ifra_name, name, IF_NAMESIZE);
-
-		request.ifra_addr.ss_family = AF_UNSPEC;
-		request.ifra_mask.ss_family = AF_UNSPEC;
-		request.ifra_broadaddr.ss_family = AF_UNSPEC;
 
 		if (ioctl(socket, SIOCAIFADDR, &request, sizeof(request)) < 0) {
 			fprintf(stderr, "%s: Could not add interface: %s\n", kProgramName,
@@ -1052,32 +1086,32 @@ main(int argc, char** argv)
 	if (argc > 1 && (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")))
 		usage(0);
 
-	bool deleteInterfaces = false;
-
-	if (argc > 1
-		&& (!strcmp(argv[1], "--delete")
-			|| !strcmp(argv[1], "--del")
-			|| !strcmp(argv[1], "-d"))) {
-		// delete interfaces
-		if (argc < 3)
-			usage(1);
-
-		deleteInterfaces = true;
-	}
-
-	if (initialize_address_families() == false) {
+	if (!initialize_address_families()) {
 		fprintf(stderr, "%s: The networking stack doesn't seem to be "
 			"available.\n", kProgramName);
 		return 1;
 	}
 
-	if (deleteInterfaces) {
-		for (int i = 2; i < argc; i++) {
-			delete_interface(argv[i]);
-		}
+	if (argc > 1
+		&& (!strcmp(argv[1], "--delete")
+			|| !strcmp(argv[1], "--del")
+			|| !strcmp(argv[1], "-d")
+			|| !strcmp(argv[1], "del")
+			|| !strcmp(argv[1], "delete"))) {
+		// Delete interface (addresses)
+
+		if (argc < 3)
+			usage(1);
+
+		const char* name = argv[2];
+		delete_interface(name, argv + 3, argc - 3);
 		return 0;
-	} else if (argc > 1 && !strcmp(argv[1], "-a")) {
-		// accept -a option for those that are used to it from other platforms
+	}
+
+	if (argc > 1 && !strcmp(argv[1], "-a")) {
+		// Accept an optional "-a" option to list all interfaces for those
+		// that are used to it from other platforms.
+
 		if (argc > 2)
 			usage(1);
 
@@ -1087,7 +1121,7 @@ main(int argc, char** argv)
 
 	const char* name = argv[1];
 	if (argc > 2) {
-		// add or configure an interface
+		// Add or configure an interface
 
 		configure_interface(name, argv + 2, argc - 2);
 		return 0;

@@ -106,9 +106,9 @@ static const ioctl_info kIOCtls[] = {
 	IOCTL_INFO_ENTRY(SIOCATMARK),
 	IOCTL_INFO_ENTRY(SIOCSPGRP),
 
-	IOCTL_INFO_ENTRY_TYPE(SIOC_IF_ALIAS_SET, struct ifaliasreq *),
-	IOCTL_INFO_ENTRY_TYPE(SIOC_IF_ALIAS_GET, struct ifaliasreq *),
-	IOCTL_INFO_ENTRY_TYPE(SIOC_IF_ALIAS_COUNT, struct ifaliasreq *),
+	IOCTL_INFO_ENTRY_TYPE(B_SOCKET_SET_ALIAS, struct ifaliasreq *),
+	IOCTL_INFO_ENTRY_TYPE(B_SOCKET_GET_ALIAS, struct ifaliasreq *),
+	IOCTL_INFO_ENTRY_TYPE(B_SOCKET_COUNT_ALIASES, struct ifreq *),
 
 	// termios ioctls
 	IOCTL_INFO_ENTRY(TCGETA),
