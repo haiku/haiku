@@ -42,8 +42,8 @@ bigtime_t _user_system_time(void);
 status_t _user_set_real_time_clock(uint32 time);
 status_t _user_set_timezone(int32 timezoneOffset, bool daylightSavingTime);
 status_t _user_get_timezone(int32 *_timezoneOffset, bool *_daylightSavingTime);
-status_t _user_set_tzfilename(const char* filename, size_t length, bool isGMT);
-status_t _user_get_tzfilename(char *filename, size_t length, bool *_isGMT);
+status_t _user_set_real_time_clock_is_gmt(bool isGMT);
+status_t _user_get_real_time_clock_is_gmt(bool *_isGMT);
 
 #ifdef __cplusplus
 }

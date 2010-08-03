@@ -319,7 +319,7 @@ DateTimeView::_UpdateGmtSettings()
 {
 	_WriteRTCSettings();
 
-	_kern_set_tzfilename(NULL, 0, fUseGmtTime);
+	_kern_set_real_time_clock_is_gmt(fUseGmtTime);
 }
 
 

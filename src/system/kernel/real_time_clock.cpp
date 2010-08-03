@@ -31,7 +31,6 @@
 
 static struct real_time_data *sRealTimeData;
 static bool sIsGMT = false;
-static char sTimezoneFilename[B_PATH_NAME_LENGTH] = "";
 static bigtime_t sTimezoneOffset = 0;
 static bool sDaylightSavingTime = false;
 
@@ -290,18 +289,12 @@ _user_get_timezone(time_t *_timezoneOffset, bool *_daylightSavingTime)
 
 
 status_t
-_user_set_tzfilename(const char *filename, size_t length, bool isGMT)
+_user_set_real_time_clock_is_gmt(bool isGMT)
 {
 	// store previous value
 	bool wasGMT = sIsGMT;
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
-
-	if (filename != NULL && length > 0) {
-		if (!IS_USER_ADDRESS(filename)
-			|| user_strlcpy(sTimezoneFilename, filename, B_PATH_NAME_LENGTH) < 0)
-			return B_BAD_ADDRESS;
-	}
 
 	sIsGMT = isGMT;
 
@@ -316,15 +309,10 @@ _user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 
 
 status_t
-_user_get_tzfilename(char *userFilename, size_t length, bool *_userIsGMT)
+_user_get_real_time_clock_is_gmt(bool *_userIsGMT)
 {
-	if ((userFilename == NULL || length == 0) && _userIsGMT == NULL)
+	if (_userIsGMT == NULL)
 		return B_BAD_VALUE;
-
-	if (userFilename != NULL
-		&& (!IS_USER_ADDRESS(userFilename)
-			|| user_strlcpy(userFilename, sTimezoneFilename, length) < 0))
-		return B_BAD_ADDRESS;
 
 	if (_userIsGMT != NULL
 		&& (!IS_USER_ADDRESS(_userIsGMT)

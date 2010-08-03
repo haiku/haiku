@@ -29,7 +29,6 @@ StdBinCommands
 	cal.c
 	chop.c
 	clear.c
-	clockconfig.c
 #	csplit.c
 	driveinfo.c
 #	echo.c
@@ -83,6 +82,7 @@ StdBinCommands
 	catattr.cpp
 	checkfs.cpp
 	clipboard.cpp
+	clockconfig.cpp
 	df.cpp
 	diskimage.cpp
 	dpms.cpp
@@ -203,7 +203,7 @@ StdBinCommands
 StdBinCommands
 	checkitout.cpp
 	: be tracker $(TARGET_LIBSUPC++) : $(haiku-utils_rsrc) ;
-	
+
 #standard commands that need libbe.so, libtracker.so, liblocale.so
 StdBinCommands
 	filepanel.cpp

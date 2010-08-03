@@ -367,10 +367,8 @@ extern status_t		_kern_set_timezone(int32 timezoneOffset,
 						bool daylightSavingTime);
 extern status_t		_kern_get_timezone(int32 *_timezoneOffset,
 						bool *_daylightSavingTime);
-extern status_t		_kern_set_tzfilename(const char *filename, size_t length,
-						bool isGMT);
-extern status_t		_kern_get_tzfilename(char *filename, size_t length,
-						bool *_isGMT);
+extern status_t		_kern_set_real_time_clock_is_gmt(bool isGMT);
+extern status_t		_kern_get_real_time_clock_is_gmt(bool *_isGMT);
 
 extern bigtime_t	_kern_system_time();
 extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
