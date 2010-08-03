@@ -207,14 +207,13 @@ int
 main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
   	if (argc > 1)
   		game_mode(argv[1]);
 
 	if (!glutGameModeGet(GLUT_GAME_MODE_ACTIVE)) {
 		printf("Using windowed mode.\n");
-
-		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 		glutCreateWindow(argv[0]);
 	}
 
