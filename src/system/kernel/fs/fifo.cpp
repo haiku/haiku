@@ -57,83 +57,83 @@ class Inode;
 
 
 class RingBuffer {
-	public:
-		RingBuffer();
-		~RingBuffer();
+public:
+								RingBuffer();
+								~RingBuffer();
 
-		status_t CreateBuffer();
-		void DeleteBuffer();
+			status_t			CreateBuffer();
+			void				DeleteBuffer();
 
-		size_t Write(const void *buffer, size_t length);
-		size_t Read(void *buffer, size_t length);
-		ssize_t UserWrite(const void *buffer, ssize_t length);
-		ssize_t UserRead(void *buffer, ssize_t length);
+			size_t				Write(const void* buffer, size_t length);
+			size_t				Read(void* buffer, size_t length);
+			ssize_t				UserWrite(const void* buffer, ssize_t length);
+			ssize_t				UserRead(void* buffer, ssize_t length);
+	
+			size_t				Readable() const;
+			size_t				Writable() const;
 
-		size_t Readable() const;
-		size_t Writable() const;
-
-	private:
-		struct ring_buffer	*fBuffer;
+private:
+			struct ring_buffer*	fBuffer;
 };
 
 
 class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
-	public:
-		ReadRequest(file_cookie* cookie)
-			:
-			fThread(thread_get_current_thread()),
-			fCookie(cookie),
-			fNotified(true)
-		{
-			B_INITIALIZE_SPINLOCK(&fLock);
+public:
+	ReadRequest(file_cookie* cookie)
+		:
+		fThread(thread_get_current_thread()),
+		fCookie(cookie),
+		fNotified(true)
+	{
+		B_INITIALIZE_SPINLOCK(&fLock);
+	}
+
+	void SetNotified(bool notified)
+	{
+		InterruptsSpinLocker _(fLock);
+		fNotified = notified;
+	}
+
+	void Notify(status_t status = B_OK)
+	{
+		InterruptsSpinLocker _(fLock);
+		TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
+
+		if (!fNotified) {
+			SpinLocker threadLocker(gThreadSpinlock);
+			thread_unblock_locked(fThread, status);
+			fNotified = true;
 		}
+	}
 
-		void SetNotified(bool notified)
-		{
-			InterruptsSpinLocker _(fLock);
-			fNotified = notified;
-		}
+	file_cookie* Cookie() const
+	{
+		return fCookie;
+	}
 
-		void Notify(status_t status = B_OK)
-		{
-			InterruptsSpinLocker _(fLock);
-			TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
-
-			if (!fNotified) {
-				SpinLocker threadLocker(gThreadSpinlock);
-				thread_unblock_locked(fThread, status);
-				fNotified = true;
-			}
-		}
-
-		file_cookie* Cookie() const
-		{
-			return fCookie;
-		}
-
-	private:
-		spinlock			fLock;
-		struct thread*		fThread;
-		file_cookie*		fCookie;
-		volatile bool		fNotified;
+private:
+	spinlock			fLock;
+	struct thread*		fThread;
+	file_cookie*		fCookie;
+	volatile bool		fNotified;
 };
 
 
 class WriteRequest : public DoublyLinkedListLinkImpl<WriteRequest> {
-	public:
-		WriteRequest(size_t minimalWriteCount)
-			:
-			fMinimalWriteCount(minimalWriteCount)
-		{
-		}
+public:
+	WriteRequest(size_t minimalWriteCount)
+		:
+		fMinimalWriteCount(minimalWriteCount)
+	{
+	}
 
-		size_t MinimalWriteCount() const
-		{
-			return fMinimalWriteCount;
-		}
+	size_t MinimalWriteCount() const
+	{
+		return fMinimalWriteCount;
+	}
 
-	private:
-		size_t	fMinimalWriteCount;
+private:
+	size_t	fMinimalWriteCount;
 };
 
 
@@ -142,65 +142,70 @@ typedef DoublyLinkedList<WriteRequest> WriteRequestList;
 
 
 class Inode {
-	public:
-		Inode();
-		~Inode();
+public:
+								Inode();
+								~Inode();
 
-		status_t	InitCheck();
+			status_t			InitCheck();
 
-		bool		IsActive() const { return fActive; }
-		timespec	CreationTime() const { return fCreationTime; }
-		void		SetCreationTime(timespec creationTime)
-						{ fCreationTime = creationTime; }
-		timespec	ModificationTime() const { return fModificationTime; }
-		void		SetModificationTime(timespec modificationTime)
-						{ fModificationTime = modificationTime; }
+			bool				IsActive() const { return fActive; }
+			timespec			CreationTime() const { return fCreationTime; }
+			void				SetCreationTime(timespec creationTime)
+									{ fCreationTime = creationTime; }
+			timespec			ModificationTime() const
+									{ return fModificationTime; }
+			void				SetModificationTime(timespec modificationTime)
+									{ fModificationTime = modificationTime; }
+	
+			mutex*				RequestLock() { return &fRequestLock; }
+	
+			status_t			WriteDataToBuffer(const void* data,
+									size_t* _length, bool nonBlocking);
+			status_t			ReadDataFromBuffer(void* data, size_t* _length,
+									bool nonBlocking, ReadRequest& request);
+			size_t				BytesAvailable() const
+									{ return fBuffer.Readable(); }
+			size_t				BytesWritable() const
+									{ return fBuffer.Writable(); }
+	
+			void				AddReadRequest(ReadRequest& request);
+			void				RemoveReadRequest(ReadRequest& request);
+			status_t			WaitForReadRequest(ReadRequest& request);
+	
+			void				NotifyBytesRead(size_t bytes);
+			void				NotifyReadDone();
+			void				NotifyBytesWritten(size_t bytes);
+			void				NotifyEndClosed(bool writer);
+	
+			void				Open(int openMode);
+			void				Close(int openMode, file_cookie* cookie);
+			int32				ReaderCount() const { return fReaderCount; }
+			int32				WriterCount() const { return fWriterCount; }
+	
+			status_t			Select(uint8 event, selectsync* sync,
+									int openMode);
+			status_t			Deselect(uint8 event, selectsync* sync,
+									int openMode);
 
-		mutex		*RequestLock() { return &fRequestLock; }
-
-		status_t	WriteDataToBuffer(const void *data, size_t *_length,
-						bool nonBlocking);
-		status_t	ReadDataFromBuffer(void *data, size_t *_length,
-						bool nonBlocking, ReadRequest &request);
-		size_t		BytesAvailable() const { return fBuffer.Readable(); }
-		size_t		BytesWritable() const { return fBuffer.Writable(); }
-
-		void		AddReadRequest(ReadRequest &request);
-		void		RemoveReadRequest(ReadRequest &request);
-		status_t	WaitForReadRequest(ReadRequest &request);
-
-		void		NotifyBytesRead(size_t bytes);
-		void		NotifyReadDone();
-		void		NotifyBytesWritten(size_t bytes);
-		void		NotifyEndClosed(bool writer);
-
-		void		Open(int openMode);
-		void		Close(int openMode, file_cookie* cookie);
-		int32		ReaderCount() const { return fReaderCount; }
-		int32		WriterCount() const { return fWriterCount; }
-
-		status_t	Select(uint8 event, selectsync *sync, int openMode);
-		status_t	Deselect(uint8 event, selectsync *sync, int openMode);
-
-	private:
-		timespec	fCreationTime;
-		timespec	fModificationTime;
-
-		RingBuffer	fBuffer;
-
-		ReadRequestList		fReadRequests;
-		WriteRequestList	fWriteRequests;
-
-		mutex		fRequestLock;
-
-		ConditionVariable fWriteCondition;
-
-		int32		fReaderCount;
-		int32		fWriterCount;
-		bool		fActive;
-
-		select_sync_pool	*fReadSelectSyncPool;
-		select_sync_pool	*fWriteSelectSyncPool;
+private:
+			timespec			fCreationTime;
+			timespec			fModificationTime;
+	
+			RingBuffer			fBuffer;
+	
+			ReadRequestList		fReadRequests;
+			WriteRequestList	fWriteRequests;
+	
+			mutex				fRequestLock;
+	
+			ConditionVariable	fWriteCondition;
+	
+			int32				fReaderCount;
+			int32				fWriterCount;
+			bool				fActive;
+	
+			select_sync_pool*	fReadSelectSyncPool;
+			select_sync_pool*	fWriteSelectSyncPool;
 };
 
 
@@ -229,7 +234,8 @@ struct file_cookie {
 
 
 RingBuffer::RingBuffer()
-	: fBuffer(NULL)
+	:
+	fBuffer(NULL)
 {
 }
 
@@ -247,7 +253,7 @@ RingBuffer::CreateBuffer()
 		return B_OK;
 
 	fBuffer = create_ring_buffer(PIPEFS_MAX_BUFFER_SIZE);
-	return (fBuffer != NULL ? B_OK : B_NO_MEMORY);
+	return fBuffer != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -262,56 +268,56 @@ RingBuffer::DeleteBuffer()
 
 
 inline size_t
-RingBuffer::Write(const void *buffer, size_t length)
+RingBuffer::Write(const void* buffer, size_t length)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	return ring_buffer_write(fBuffer, (const uint8 *)buffer, length);
+	return ring_buffer_write(fBuffer, (const uint8*)buffer, length);
 }
 
 
 inline size_t
-RingBuffer::Read(void *buffer, size_t length)
+RingBuffer::Read(void* buffer, size_t length)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	return ring_buffer_read(fBuffer, (uint8 *)buffer, length);
+	return ring_buffer_read(fBuffer, (uint8*)buffer, length);
 }
 
 
 inline ssize_t
-RingBuffer::UserWrite(const void *buffer, ssize_t length)
+RingBuffer::UserWrite(const void* buffer, ssize_t length)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	return ring_buffer_user_write(fBuffer, (const uint8 *)buffer, length);
+	return ring_buffer_user_write(fBuffer, (const uint8*)buffer, length);
 }
 
 
 inline ssize_t
-RingBuffer::UserRead(void *buffer, ssize_t length)
+RingBuffer::UserRead(void* buffer, ssize_t length)
 {
 	if (fBuffer == NULL)
 		return B_NO_MEMORY;
 
-	return ring_buffer_user_read(fBuffer, (uint8 *)buffer, length);
+	return ring_buffer_user_read(fBuffer, (uint8*)buffer, length);
 }
 
 
 inline size_t
 RingBuffer::Readable() const
 {
-	return (fBuffer != NULL ? ring_buffer_readable(fBuffer) : 0);
+	return fBuffer != NULL ? ring_buffer_readable(fBuffer) : 0;
 }
 
 
 inline size_t
 RingBuffer::Writable() const
 {
-	return (fBuffer != NULL ? ring_buffer_writable(fBuffer) : 0);
+	return fBuffer != NULL ? ring_buffer_writable(fBuffer) : 0;
 }
 
 
@@ -360,7 +366,7 @@ Inode::InitCheck()
 	the returned length is > 0, the returned error code can be ignored.
 */
 status_t
-Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
+Inode::WriteDataToBuffer(const void* _data, size_t* _length, bool nonBlocking)
 {
 	const uint8* data = (const uint8*)_data;
 	size_t dataSize = *_length;
@@ -427,8 +433,8 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 
 
 status_t
-Inode::ReadDataFromBuffer(void *data, size_t *_length, bool nonBlocking,
-	ReadRequest &request)
+Inode::ReadDataFromBuffer(void* data, size_t* _length, bool nonBlocking,
+	ReadRequest& request)
 {
 	size_t dataSize = *_length;
 	*_length = 0;
@@ -480,21 +486,21 @@ Inode::ReadDataFromBuffer(void *data, size_t *_length, bool nonBlocking,
 
 
 void
-Inode::AddReadRequest(ReadRequest &request)
+Inode::AddReadRequest(ReadRequest& request)
 {
 	fReadRequests.Add(&request);
 }
 
 
 void
-Inode::RemoveReadRequest(ReadRequest &request)
+Inode::RemoveReadRequest(ReadRequest& request)
 {
 	fReadRequests.Remove(&request);
 }
 
 
 status_t
-Inode::WaitForReadRequest(ReadRequest &request)
+Inode::WaitForReadRequest(ReadRequest& request)
 {
 	// add the entry to wait on
 	thread_prepare_to_block(thread_get_current_thread(), B_CAN_INTERRUPT,
@@ -531,7 +537,7 @@ Inode::NotifyBytesRead(size_t bytes)
 		// If any of the waiting writers has a minimal write count that has
 		// now become satisfied, we notify all of them (condition variables
 		// don't support doing that selectively).
-		WriteRequest *request;
+		WriteRequest* request;
 		WriteRequestList::Iterator iterator = fWriteRequests.GetIterator();
 		while ((request = iterator.Next()) != NULL) {
 			size_t minWriteCount = request->MinimalWriteCount();
@@ -655,7 +661,7 @@ Inode::Close(int openMode, file_cookie* cookie)
 
 
 status_t
-Inode::Select(uint8 event, selectsync *sync, int openMode)
+Inode::Select(uint8 event, selectsync* sync, int openMode)
 {
 	bool writer = true;
 	select_sync_pool** pool;
@@ -689,7 +695,7 @@ Inode::Select(uint8 event, selectsync *sync, int openMode)
 
 
 status_t
-Inode::Deselect(uint8 event, selectsync *sync, int openMode)
+Inode::Deselect(uint8 event, selectsync* sync, int openMode)
 {
 	select_sync_pool** pool;
 	if ((openMode & O_RWMASK) == O_RDONLY) {
@@ -704,11 +710,11 @@ Inode::Deselect(uint8 event, selectsync *sync, int openMode)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - vnode API
 
 
 static status_t
-fifo_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
+fifo_put_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
@@ -724,7 +730,7 @@ fifo_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 
 
 static status_t
-fifo_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
+fifo_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
@@ -740,14 +746,14 @@ fifo_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 
 
 static status_t
-fifo_open(fs_volume *_volume, fs_vnode *_node, int openMode,
-	void **_cookie)
+fifo_open(fs_volume* _volume, fs_vnode* _node, int openMode,
+	void** _cookie)
 {
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 
 	TRACE("fifo_open(): node = %p, openMode = %d\n", inode, openMode);
 
-	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
+	file_cookie* cookie = (file_cookie*)malloc(sizeof(file_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
@@ -755,16 +761,16 @@ fifo_open(fs_volume *_volume, fs_vnode *_node, int openMode,
 	cookie->open_mode = openMode;
 	inode->Open(openMode);
 
-	*_cookie = (void *)cookie;
+	*_cookie = (void*)cookie;
 
 	return B_OK;
 }
 
 
 static status_t
-fifo_close(fs_volume *volume, fs_vnode *vnode, void *_cookie)
+fifo_close(fs_volume* volume, fs_vnode* vnode, void* _cookie)
 {
-	file_cookie *cookie = (file_cookie *)_cookie;
+	file_cookie* cookie = (file_cookie*)_cookie;
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 
 	fifo->Close(cookie->open_mode, cookie);
@@ -774,9 +780,9 @@ fifo_close(fs_volume *volume, fs_vnode *vnode, void *_cookie)
 
 
 static status_t
-fifo_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
+fifo_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
-	file_cookie *cookie = (file_cookie *)_cookie;
+	file_cookie* cookie = (file_cookie*)_cookie;
 
 	TRACE("fifo_freecookie: entry vnode %p, cookie %p\n", _node, _cookie);
 
@@ -787,18 +793,18 @@ fifo_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 
 
 static status_t
-fifo_fsync(fs_volume *_volume, fs_vnode *_v)
+fifo_fsync(fs_volume* _volume, fs_vnode* _node)
 {
 	return B_OK;
 }
 
 
 static status_t
-fifo_read(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	off_t /*pos*/, void *buffer, size_t *_length)
+fifo_read(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t /*pos*/, void* buffer, size_t* _length)
 {
-	file_cookie *cookie = (file_cookie *)_cookie;
-	Inode *inode = (Inode *)_node->private_node;
+	file_cookie* cookie = (file_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
 
 	TRACE("fifo_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n",
 		inode, cookie, *_length, cookie->open_mode);
@@ -842,11 +848,11 @@ fifo_read(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 
 static status_t
-fifo_write(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	off_t /*pos*/, const void *buffer, size_t *_length)
+fifo_write(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t /*pos*/, const void* buffer, size_t* _length)
 {
-	file_cookie *cookie = (file_cookie *)_cookie;
-	Inode *inode = (Inode *)_node->private_node;
+	file_cookie* cookie = (file_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
 
 	TRACE("fifo_write(vnode = %p, cookie = %p, length = %lu)\n",
 		_node, cookie, *_length);
@@ -873,7 +879,7 @@ fifo_write(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 
 static status_t
-fifo_read_stat(fs_volume *volume, fs_vnode *vnode, struct ::stat *st)
+fifo_read_stat(fs_volume* volume, fs_vnode* vnode, struct ::stat* st)
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
@@ -902,7 +908,7 @@ fifo_read_stat(fs_volume *volume, fs_vnode *vnode, struct ::stat *st)
 
 
 static status_t
-fifo_write_stat(fs_volume *volume, fs_vnode *vnode, const struct ::stat *st,
+fifo_write_stat(fs_volume* volume, fs_vnode* vnode, const struct ::stat* st,
 	uint32 statMask)
 {
 	// we cannot change the size of anything
@@ -925,8 +931,8 @@ fifo_write_stat(fs_volume *volume, fs_vnode *vnode, const struct ::stat *st,
 
 
 static status_t
-fifo_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, uint32 op,
-	void *buffer, size_t length)
+fifo_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
+	void* buffer, size_t length)
 {
 	TRACE("fifo_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
 		_vnode, _cookie, op, buffer, length);
@@ -936,10 +942,10 @@ fifo_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, uint32 op,
 
 
 static status_t
-fifo_set_flags(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
+fifo_set_flags(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	int flags)
 {
-	file_cookie *cookie = (file_cookie *)_cookie;
+	file_cookie* cookie = (file_cookie*)_cookie;
 
 	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _vnode, flags);
 	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;
@@ -948,13 +954,13 @@ fifo_set_flags(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 
 
 static status_t
-fifo_select(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	uint8 event, selectsync *sync)
+fifo_select(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	uint8 event, selectsync* sync)
 {
-	file_cookie *cookie = (file_cookie *)_cookie;
+	file_cookie* cookie = (file_cookie*)_cookie;
 
 	TRACE("fifo_select(vnode = %p)\n", _node);
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 	if (!inode)
 		return B_ERROR;
 
@@ -964,14 +970,14 @@ fifo_select(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 
 static status_t
-fifo_deselect(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	uint8 event, selectsync *sync)
+fifo_deselect(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	uint8 event, selectsync* sync)
 {
-	file_cookie *cookie = (file_cookie *)_cookie;
+	file_cookie* cookie = (file_cookie*)_cookie;
 
 	TRACE("fifo_deselect(vnode = %p)\n", _node);
-	Inode *inode = (Inode *)_node->private_node;
-	if (!inode)
+	Inode* inode = (Inode*)_node->private_node;
+	if (inode == NULL)
 		return B_ERROR;
 
 	MutexLocker locker(inode->RequestLock());
@@ -980,31 +986,31 @@ fifo_deselect(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 
 static bool
-fifo_can_page(fs_volume *_volume, fs_vnode *_v, void *cookie)
+fifo_can_page(fs_volume* _volume, fs_vnode* _node, void* cookie)
 {
 	return false;
 }
 
 
 static status_t
-fifo_read_pages(fs_volume *_volume, fs_vnode *_v, void *cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes)
+fifo_read_pages(fs_volume* _volume, fs_vnode* _node, void* cookie, off_t pos,
+	const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-fifo_write_pages(fs_volume *_volume, fs_vnode *_v, void *cookie,
-	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+fifo_write_pages(fs_volume* _volume, fs_vnode* _node, void* cookie,
+	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-fifo_get_super_vnode(fs_volume *volume, fs_vnode *vnode, fs_volume *superVolume,
-	fs_vnode *_superVnode)
+fifo_get_super_vnode(fs_volume* volume, fs_vnode* vnode, fs_volume* superVolume,
+	fs_vnode* _superVnode)
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
@@ -1100,6 +1106,7 @@ static fs_vnode_ops sFIFOVnodeOps = {
 
 }	// namespace fifo
 
+
 using namespace fifo;
 
 
@@ -1109,7 +1116,7 @@ using namespace fifo;
 status_t
 create_fifo_vnode(fs_volume* superVolume, fs_vnode* vnode)
 {
-	FIFOInode *fifo = new(std::nothrow) FIFOInode(vnode);
+	FIFOInode* fifo = new(std::nothrow) FIFOInode(vnode);
 	if (fifo == NULL)
 		return B_NO_MEMORY;
 
