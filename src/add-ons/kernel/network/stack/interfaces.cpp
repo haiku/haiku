@@ -1058,7 +1058,7 @@ add_interface(const char* name, net_domain_private* domain,
 
 /*!	Removes the interface from the list, and puts the stack's reference to it.
 */
-status_t
+void
 remove_interface(Interface* interface)
 {
 	interface->SetDown();
@@ -1071,7 +1071,20 @@ remove_interface(Interface* interface)
 	notify_interface_removed(interface);
 	
 	interface->ReleaseReference();
-	return B_OK;
+}
+
+
+/*!	This is called whenever a device interface is being removed. We will get
+	the corresponding Interface, and remove it.
+*/
+void
+interface_removed_device_interface(net_device_interface* deviceInterface)
+{
+	MutexLocker locker(sLock);
+
+	Interface* interface = find_interface(deviceInterface->device->name);
+	if (interface != NULL)
+		remove_interface(interface);
 }
 
 

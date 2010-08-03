@@ -175,8 +175,8 @@ status_t uninit_interfaces();
 // interfaces
 status_t add_interface(const char* name, net_domain_private* domain,
 	const ifaliasreq& request, net_device_interface* deviceInterface);
-status_t remove_interface(Interface* interface);
-void interface_went_down(Interface* interface);
+void remove_interface(Interface* interface);
+void interface_removed_device_interface(net_device_interface* deviceInterface);
 
 status_t add_interface_address(Interface* interface, net_domain_private* domain,
 	const ifaliasreq& request);

@@ -246,14 +246,14 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 			if (interface == NULL)
 				return B_BAD_VALUE;
 
-			status_t status;
+			status_t status = B_OK;
 
 			if (request.ifr_addr.sa_family != AF_UNSPEC
 				&& request.ifr_addr.sa_len != 0) {
 				status = interface->Control(domain, SIOCDIFADDR, request,
 					(ifreq*)value, *_length);
 			} else
-				status = remove_interface(interface);
+				remove_interface(interface);
 
 			interface->ReleaseReference();
 

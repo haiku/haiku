@@ -754,12 +754,8 @@ device_removed(net_device* device)
 		return B_DEVICE_NOT_FOUND;
 
 	// Propagate the loss of the device throughout the stack.
-	// This is very complex, refer to remove_interface() for
-	// further details.
 
-	// TODO!
-	//domain_removed_device_interface(interface);
-
+	interface_removed_device_interface(interface);
 	notify_device_monitors(interface, B_DEVICE_BEING_REMOVED);
 
 	// By now all of the monitors must have removed themselves. If they
