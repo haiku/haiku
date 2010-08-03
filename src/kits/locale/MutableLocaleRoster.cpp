@@ -594,7 +594,14 @@ RosterData::_AddDefaultCountryToMessage(BMessage* message) const
 status_t
 RosterData::_AddDefaultTimeZoneToMessage(BMessage* message) const
 {
-	return message->AddString("timezone", fDefaultTimeZone.Code());
+	status_t status = message->AddString("timezone", fDefaultTimeZone.Code());
+
+	// add the offset, too, since that is used by clockconfig when setting
+	// up timezone state during boot
+	if (status == B_OK)
+		status = message->AddInt32("offset", fDefaultTimeZone.OffsetFromGMT());
+
+	return status;
 }
 
 
