@@ -1,0 +1,54 @@
+/*!
+\class BLocale
+\ingroup locale
+\brief Class for representing a locale and its settings
+
+A locale is defined by the combination of a country and a language. Using these
+two informations, it is possible to determine the format to use for date, time,
+and number formatting. The BLocale class also provide collators, which allows
+you to sort a list of strings properly depending on a set of rules about
+accented chars and other special cases that vary over the different locales.
+
+*/
+
+/*!
+\fn const BCollator* Collator() const
+\brief Returns the collator associated to this locale
+
+Returns the collator in use for this locale, allowing you to use it to sort a
+set of strings.
+
+*/
+
+/*!
+\fn const BCountry* Country() const
+\brief Returns the country associated to this locale
+
+A locale is defined by the combination of a country and a language. This
+method gets the country part of this information, so you can access the
+data that is not language-dependant (such as the country flag).
+
+*/
+
+/*!
+\fn const BLanguage* Language() const
+\brief Returns the language associated to this locale
+
+*/
+
+/*!
+\fn int StringCompare(const char* s1, const char* s2) const
+\fn int StringCompare(const BString* s1, const BString* s2) const
+\brief Compares two strings using the locale's collator
+
+These methods are short-hands to Collator()->StringCompare.
+
+*/
+
+/*!
+\fn void GetSortKey(const char* string, BString* key) const
+\brief Computes the sort key of a string
+
+This method is a short-hand to Collator()->GetSortKey.
+
+*/

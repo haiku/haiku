@@ -465,6 +465,7 @@ WARN_LOGFILE           =
 INPUT                  = . \
 						 app \
                          drivers \
+						 locale \
                          midi \
                          midi2 \
                          support \

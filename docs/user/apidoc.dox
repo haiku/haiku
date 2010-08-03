@@ -68,7 +68,7 @@
 			of the methods, variables, functions, etc. will have to be the same.
 		-# The root directory of the public API headers is at \c
 			/trunk/headers/os. In a similar vein, the root of the documentation
-			files is at \c /trunk/src/documentation/haiku_book. The subdirectory
+			files is at \c /trunk/docs/user. The subdirectory
 			structure, or the division of kits, will also be replicated.
 		-# The name of the files is the same as the base of the header files,
 			with the \c dox extension. So \c Something.h becomes \c

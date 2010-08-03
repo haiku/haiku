@@ -1,11 +1,11 @@
 
-THE OPENBEOS BOOK HOWTO
+THE HAIKU BOOK HOWTO
 
-The end user documentation for OpenBeOS is automatically generated from the 
+The end user documentation for Haiku is automatically generated from the 
 source code using the Doxygen tool. We are talking BeBook-style documentation 
 here, not development related docs (those belong in /current/docs/develop).
 
-This HOWTO only explains how to include your kit into the "OpenBeOS Book", it
+This HOWTO only explains how to include your kit into the "Haiku Book", it
 is not a Doxygen tutorial. For information about using Doxygen, see the Doxygen
 manual, www.doxygen.org, and OpenBeOS newletters 31 and 29.
 
