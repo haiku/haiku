@@ -556,6 +556,10 @@ AddFilesToHaikuImage system add-ons Screen\ Savers
 AddFilesToHaikuImage system add-ons disk_systems
 	: <disk_system>intel <disk_system>bfs ;
 
+# decorators
+AddFilesToHaikuImage home config add-ons decorators :
+	MacDecorator WinDecorator ClassicBe ;
+
 # create directories that will remain empty
 AddDirectoryToHaikuImage common bin ;
 AddDirectoryToHaikuImage common include ;

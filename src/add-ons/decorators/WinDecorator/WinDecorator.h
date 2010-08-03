@@ -1,45 +1,76 @@
+/*
+ Copyright 2009-2010, Haiku.
+ Distributed under the terms of the MIT License.
+*/
 #ifndef _BEOS_DECORATOR_H_
 #define _BEOS_DECORATOR_H_
 
-#include "Decorator.h"
+
+#include "DecorManager.h"
+#include "RGBColor.h"
+
+
+class WinDecorAddOn : public DecorAddOn
+{
+public:
+								WinDecorAddOn(image_id id, const char* name);
+
+		float					Version();
+protected:
+	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
+									BRect rect, window_look look, uint32 flags);
+};
+
 
 class WinDecorator: public Decorator
 {
 public:
-					WinDecorator(DesktopSettings& settings,
-						BRect frame, window_look wlook,
-						uint32 wflags);
-					~WinDecorator(void);
+								WinDecorator(DesktopSettings& settings,
+									BRect frame, window_look wlook,
+									uint32 wflags);
+								~WinDecorator(void);
 
-	void			SetTitle(const char* string,
-	 					BRegion* updateRegion = NULL);
-	void			FontsChanged(DesktopSettings& settings,
-						BRegion* updateRegion);
-	virtual void	SetLook(DesktopSettings& settings,
-						window_look look,
-						BRegion* updateRegion = NULL);
-	virtual void	SetFlags(uint32 flags,
-						BRegion* updateRegion = NULL);
-	
-	void MoveBy(BPoint pt);
-	void ResizeBy(BPoint pt, BRegion* dirty);
-	void Draw(BRect r);
-	void Draw(void);
-	void GetFootprint(BRegion *region);
-	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
+			void				Draw(BRect r);
+			void				Draw();
+
+	click_type					Clicked(BPoint pt, int32 buttons,
+									int32 modifiers);
 
 protected:
-	void		_UpdateFont(DesktopSettings& settings);
-	void _DrawClose(BRect r);
-	void _DrawFrame(BRect r);
-	void _DrawTab(BRect r);
-	void _DrawTitle(BRect r);
-	void _DrawZoom(BRect r);
-	void _DrawMinimize(BRect r);
-	void _DoLayout(void);
-	void _SetFocus(void);
-	void _SetColors(void);
-	void DrawBeveledRect(BRect r, bool down);
+			void				_DoLayout();
+
+			void				_DrawFrame(BRect r);
+			void				_DrawTab(BRect r);
+
+			void				_DrawClose(BRect r);
+			void				_DrawTitle(BRect r);
+			void				_DrawZoom(BRect r);
+			void				_DrawMinimize(BRect r);
+
+			void				_SetTitle(const char* string,
+	 								BRegion* updateRegion = NULL);
+
+			void				_FontsChanged(DesktopSettings& settings,
+									BRegion* updateRegion);
+			void				_SetLook(DesktopSettings& settings,
+									window_look look,
+									BRegion* updateRegion = NULL);
+			void				_SetFlags(uint32 flags,
+									BRegion* updateRegion = NULL);
+	
+			void				_SetColors();
+
+			void				_MoveBy(BPoint pt);
+			void				_ResizeBy(BPoint pt, BRegion* dirty);
+
+			void				_GetFootprint(BRegion *region);
+			void				_SetFocus(void);
+
+private:
+			void				_UpdateFont(DesktopSettings& settings);
+			void				_DrawBeveledRect(BRect r, bool down);
+
+
 	uint32 taboffset;
 
 	rgb_color tab_highcol;

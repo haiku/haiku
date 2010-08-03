@@ -550,11 +550,10 @@ MacDecorator::_DrawTitle(BRect rect)
 void
 MacDecorator::_DrawZoom(BRect r)
 {
-	bool down = GetClose();
+	bool down = GetZoom();
 
 	// Just like DrawZoom, but for a close button
 	BRect rect(r);
-
 	BPoint offset(r.LeftTop()),pt2(r.RightTop());
 
 	pt2.x--;
@@ -597,11 +596,10 @@ MacDecorator::_DrawZoom(BRect r)
 void
 MacDecorator::_DrawMinimize(BRect r)
 {
-	bool down = GetClose();
+	bool down = GetMinimize();
 
-	// Just like DrawZoom, but for a close button
+	// Just like DrawZoom, but for a Minimize button
 	BRect rect(r);
-
 	BPoint offset(r.LeftTop()), pt2(r.RightTop());
 
 	pt2.x--;
@@ -748,8 +746,8 @@ MacDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 	fTabRect.right += offset.x;
 	fBorderRect.right += offset.x;
 	fBorderRect.bottom += offset.y;
-	// fZoomRect.OffsetBy(offset.x,0);
-	// fMinimizeRect.OffsetBy(offset.x,0);
+	// fZoomRect.OffsetBy(offset.x, 0);
+	// fMinimizeRect.OffsetBy(offset.x, 0);
 	if (dirty) {
 		dirty->Include(fTabRect);
 		dirty->Include(fBorderRect);
@@ -777,7 +775,6 @@ MacDecorator::_GetFootprint(BRegion* region)
 
 	if (fLook == B_NO_BORDER_WINDOW_LOOK)
 		return;
-
 	
 	region->Set(fBorderRect);
 	region->Exclude(fFrame);
@@ -792,9 +789,9 @@ void
 MacDecorator::_UpdateFont(DesktopSettings& settings)
 {
 	ServerFont font;
-	if (fLook == B_FLOATING_WINDOW_LOOK) {
+	if (fLook == B_FLOATING_WINDOW_LOOK)
 		settings.GetDefaultPlainFont(font);
-	} else
+	else
 		settings.GetDefaultBoldFont(font);
 
 	font.SetFlags(B_FORCE_ANTIALIASING);

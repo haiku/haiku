@@ -9,6 +9,9 @@
 
 #include "WinDecorator.h"
 
+#include <new>
+#include <stdio.h>
+
 #include <Point.h>
 #include <View.h>
 
@@ -20,20 +23,40 @@
 
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
-#	include <stdio.h>
-#	define STRACE(x) printf x ;
+#	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
 #endif
 
 
+WinDecorAddOn::WinDecorAddOn(image_id id, const char* name)
+	:
+	DecorAddOn(id, name)
+{
+
+}
+
+
+float
+WinDecorAddOn::Version()
+{
+	return 1.00;
+}
+
+
+Decorator*
+WinDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
+	window_look look, uint32 flags)
+{
+	return new (std::nothrow)WinDecorator(settings, rect, look, flags);
+}
+
+
 WinDecorator::WinDecorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
 	:
-	Decorator(settings, rect, look, flags),
-	taboffset(0)
+	Decorator(settings, rect, look, flags)
 {
-
 	_UpdateFont(settings);
 
 	// common colors to both focus and non focus state
@@ -67,132 +90,7 @@ WinDecorator::~WinDecorator()
 }
 
 
-void
-WinDecorator::SetTitle(const char* string, BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	BRect rect = TabRect();
-
-	Decorator::SetTitle(string);
-
-	if (updateRegion == NULL)
-		return;
-
-	BRect updatedRect = TabRect();
-	if (rect.left > updatedRect.left)
-		rect.left = updatedRect.left;
-	if (rect.right < updatedRect.right)
-		rect.right = updatedRect.right;
-
-	updateRegion->Include(rect);
-}
-
-
-void
-WinDecorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
-{
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	_UpdateFont(settings);
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-WinDecorator::SetLook(DesktopSettings& settings, window_look look,
-	BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	fLook = look;
-
-	_UpdateFont(settings);
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-WinDecorator::SetFlags(uint32 flags, BRegion* updateRegion)
-{
-	// TODO: we could be much smarter about the update region
-
-	// get previous extent
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-
-	Decorator::SetFlags(flags, updateRegion);
-	_DoLayout();
-
-	if (updateRegion != NULL) {
-		BRegion extent;
-		GetFootprint(&extent);
-		updateRegion->Include(&extent);
-	}
-}
-
-
-void
-WinDecorator::MoveBy(BPoint pt)
-{
-	// Move all internal rectangles the appropriate amount
-	fFrame.OffsetBy(pt);
-	fCloseRect.OffsetBy(pt);
-	fTabRect.OffsetBy(pt);
-	fBorderRect.OffsetBy(pt);
-	fZoomRect.OffsetBy(pt);
-	fMinimizeRect.OffsetBy(pt);
-}
-
-
-void
-WinDecorator::ResizeBy(BPoint offset, BRegion* dirty)
-{
-	// Move all internal rectangles the appropriate amount
-	fFrame.right += offset.x;
-	fFrame.bottom += offset.y;
-
-	fTabRect.right += offset.x;
-	fBorderRect.right += offset.x;
-	fBorderRect.bottom += offset.y;
-	// fZoomRect.OffsetBy(offset.x,0);
-	// fMinimizeRect.OffsetBy(offset.x,0);
-	if (dirty) {
-		dirty->Include(fTabRect);
-		dirty->Include(fBorderRect);
-	}
-
-
-	// TODO probably some other layouting stuff here
-	_DoLayout();
-}
+// TODO : Add GetSettings
 
 
 void
@@ -208,10 +106,9 @@ WinDecorator::Draw(BRect update)
 
 
 void
-WinDecorator::Draw(void)
+WinDecorator::Draw()
 {
 	STRACE(("WinDecorator::Draw()\n"));
-
 	fDrawingEngine->SetDrawState(&fDrawState);
 
 	_DrawFrame(fBorderRect);
@@ -219,27 +116,7 @@ WinDecorator::Draw(void)
 }
 
 
-// TODO : GetSizeLimits
-
-
-void
-WinDecorator::GetFootprint(BRegion* region)
-{
-	// This function calculates the decorator's footprint in coordinates
-	// relative to the view. This is most often used to set a Window
-	// object's visible region.
-	if (!region)
-		return;
-
-	region->MakeEmpty();
-
-	if (fLook == B_NO_BORDER_WINDOW_LOOK)
-		return;
-	
-	region->Set(fBorderRect);
-	region->Include(fTabRect);
-	region->Exclude(fFrame);
-}
+// TODO : add GetSizeLimits
 
 
 click_type
@@ -337,108 +214,49 @@ WinDecorator::_DoLayout()
 
 
 void
-WinDecorator::_DrawTitle(BRect r)
+WinDecorator::_DrawFrame(BRect rect)
 {
-	//fDrawingEngine->SetDrawingMode(B_OP_OVER);
-	fDrawingEngine->SetHighColor(textcol);
-	fDrawingEngine->SetLowColor(IsFocus()?fFocusTabColor:fNonFocusTabColor);
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
+		return;
 
-	fTruncatedTitle = Title();
-	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END,
-		((fZoomRect.IsValid() ? fZoomRect.left :
-			fCloseRect.IsValid() ? fCloseRect.left : fTabRect.right) - 5)
-		- (fTabRect.left + textoffset));
-	fTruncatedTitleLength = fTruncatedTitle.Length();
+	if (fBorderRect == fFrame)
+		return;
 
-	//fDrawingEngine->SetFont(fDrawState.Font());
-	fDrawingEngine->DrawString(fTruncatedTitle,fTruncatedTitleLength,
-		BPoint(fTabRect.left+textoffset,fCloseRect.bottom-1));
-
-	//fDrawingEngine->SetDrawingMode(B_OP_COPY);
-}
-
-
-void
-WinDecorator::_SetFocus(void)
-{
-	// SetFocus() performs necessary duties for color swapping and
-	// other things when a window is deactivated or activated.
-
-	if (IsFocus()) {
-//		tab_highcol.SetColor(100,100,255);
-//		tab_lowcol.SetColor(40,0,255);
-		tab_highcol=fFocusTabColor;
-		textcol=fFocusTextColor;
-	} else {
-//		tab_highcol.SetColor(220,220,220);
-//		tab_lowcol.SetColor(128,128,128);
-		tab_highcol=fNonFocusTabColor;
-		textcol=fNonFocusTextColor;
-	}
-}
-
-
-void
-WinDecorator::_DrawZoom(BRect r)
-{
-	DrawBeveledRect(r,GetZoom());
+	BRect r = fBorderRect;
 	
-	// Draw the Zoom box
+	fDrawingEngine->SetHighColor(frame_lowercol);
+	fDrawingEngine->StrokeRect(r);
 
-	BRect rect(r);
-	rect.InsetBy(2,2);
-	rect.InsetBy(1,0);
-	rect.bottom--;
-	rect.right--;
+	if (fLook == B_BORDERED_WINDOW_LOOK)
+		return;
 	
-	if (GetZoom())
-		rect.OffsetBy(1,1);
+	BPoint pt;
 
-	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeRect(rect);
-	rect.InsetBy(1,1);
-	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop());
+	pt=r.RightTop();
+	pt.x--;
+	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_midcol);
+	pt=r.LeftBottom();
+	pt.y--;
+	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_midcol);
+
+	fDrawingEngine->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowercol);
+	fDrawingEngine->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowercol);
 	
-}
+	r.InsetBy(1,1);
+	pt=r.RightTop();
+	pt.x--;
+	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_highcol);
+	pt=r.LeftBottom();
+	pt.y--;
+	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_highcol);
 
-void
-WinDecorator::_DrawClose(BRect r)
-{
-	// Just like DrawZoom, but for a close button
-	DrawBeveledRect(r,GetClose());
+	fDrawingEngine->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowcol);
+	fDrawingEngine->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowcol);
 	
-	// Draw the X
-
-	BRect rect(r);
-	rect.InsetBy(4,4);
-	rect.right--;
-	rect.top--;
-	
-	if (GetClose())
-		rect.OffsetBy(1,1);
-
-	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightBottom());
-	fDrawingEngine->StrokeLine(rect.RightTop(),rect.LeftBottom());
-	rect.OffsetBy(1,0);
-	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightBottom());
-	fDrawingEngine->StrokeLine(rect.RightTop(),rect.LeftBottom());
-}
-
-
-void
-WinDecorator::_DrawMinimize(BRect r)
-{
-	// Just like DrawZoom, but for a Minimize button
-	DrawBeveledRect(r,GetMinimize());
-
-	fDrawingEngine->SetHighColor(textcol);
-	BRect rect(r.left+5,r.bottom-4,r.right-5,r.bottom-3);
-	if(GetMinimize())
-		rect.OffsetBy(1,1);
-	
-	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
-	fDrawingEngine->StrokeRect(rect);
+	r.InsetBy(1,1);
+	fDrawingEngine->StrokeRect(r,frame_midcol);
+	r.InsetBy(1,1);
+	fDrawingEngine->StrokeRect(r,frame_midcol);
 }
 
 
@@ -464,7 +282,270 @@ WinDecorator::_DrawTab(BRect invalid)
 
 
 void
-WinDecorator::DrawBeveledRect(BRect r, bool down)
+WinDecorator::_DrawClose(BRect r)
+{
+	// Just like DrawZoom, but for a close button
+	_DrawBeveledRect(r,GetClose());
+	
+	// Draw the X
+
+	BRect rect(r);
+	rect.InsetBy(4,4);
+	rect.right--;
+	rect.top--;
+	
+	if (GetClose())
+		rect.OffsetBy(1,1);
+
+	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightBottom());
+	fDrawingEngine->StrokeLine(rect.RightTop(),rect.LeftBottom());
+	rect.OffsetBy(1,0);
+	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightBottom());
+	fDrawingEngine->StrokeLine(rect.RightTop(),rect.LeftBottom());
+}
+
+
+void
+WinDecorator::_DrawTitle(BRect r)
+{
+	//fDrawingEngine->SetDrawingMode(B_OP_OVER);
+	fDrawingEngine->SetHighColor(textcol);
+	fDrawingEngine->SetLowColor(IsFocus()?fFocusTabColor:fNonFocusTabColor);
+
+	fTruncatedTitle = Title();
+	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END,
+		((fZoomRect.IsValid() ? fZoomRect.left :
+			fCloseRect.IsValid() ? fCloseRect.left : fTabRect.right) - 5)
+		- (fTabRect.left + textoffset));
+	fTruncatedTitleLength = fTruncatedTitle.Length();
+	fDrawingEngine->SetFont(fDrawState.Font());
+
+	fDrawingEngine->DrawString(fTruncatedTitle,fTruncatedTitleLength,
+		BPoint(fTabRect.left+textoffset,fCloseRect.bottom-1));
+
+	//fDrawingEngine->SetDrawingMode(B_OP_COPY);
+}
+
+
+void
+WinDecorator::_DrawZoom(BRect r)
+{
+	_DrawBeveledRect(r,GetZoom());
+	
+	// Draw the Zoom box
+
+	BRect rect(r);
+	rect.InsetBy(2,2);
+	rect.InsetBy(1,0);
+	rect.bottom--;
+	rect.right--;
+	
+	if (GetZoom())
+		rect.OffsetBy(1,1);
+
+	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeRect(rect);
+	rect.InsetBy(1,1);
+	fDrawingEngine->StrokeLine(rect.LeftTop(),rect.RightTop());
+
+}
+
+
+void
+WinDecorator::_DrawMinimize(BRect r)
+{
+	// Just like DrawZoom, but for a Minimize button
+	_DrawBeveledRect(r,GetMinimize());
+
+	fDrawingEngine->SetHighColor(textcol);
+	BRect rect(r.left+5,r.bottom-4,r.right-5,r.bottom-3);
+	if(GetMinimize())
+		rect.OffsetBy(1,1);
+	
+	fDrawingEngine->SetHighColor(RGBColor(0,0,0));
+	fDrawingEngine->StrokeRect(rect);
+}
+
+
+void
+WinDecorator::_SetTitle(const char* string, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	BRect rect = TabRect();
+
+	if (updateRegion == NULL)
+		return;
+
+	BRect updatedRect = TabRect();
+	if (rect.left > updatedRect.left)
+		rect.left = updatedRect.left;
+	if (rect.right < updatedRect.right)
+		rect.right = updatedRect.right;
+
+	updateRegion->Include(rect);
+}
+
+
+void
+WinDecorator::_FontsChanged(DesktopSettings& settings,
+	BRegion* updateRegion)
+{
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_UpdateFont(settings);
+	_DoLayout();
+
+	_InvalidateFootprint();
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
+WinDecorator::_SetLook(DesktopSettings& settings, window_look look,
+	BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	fLook = look;
+
+	_UpdateFont(settings);
+	_DoLayout();
+
+	_InvalidateFootprint();
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
+WinDecorator::_SetFlags(uint32 flags, BRegion* updateRegion)
+{
+	// TODO: we could be much smarter about the update region
+
+	// get previous extent
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_DoLayout();
+
+	_InvalidateFootprint();
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+}
+
+
+void
+WinDecorator::_SetFocus(void)
+{
+	// SetFocus() performs necessary duties for color swapping and
+	// other things when a window is deactivated or activated.
+
+	if (IsFocus()) {
+//		tab_highcol.SetColor(100,100,255);
+//		tab_lowcol.SetColor(40,0,255);
+		tab_highcol=fFocusTabColor;
+		textcol=fFocusTextColor;
+	} else {
+//		tab_highcol.SetColor(220,220,220);
+//		tab_lowcol.SetColor(128,128,128);
+		tab_highcol=fNonFocusTabColor;
+		textcol=fNonFocusTextColor;
+	}
+}
+
+
+void
+WinDecorator::_SetColors()
+{
+	_SetFocus();
+}
+
+
+void
+WinDecorator::_MoveBy(BPoint pt)
+{
+	// Move all internal rectangles the appropriate amount
+	fFrame.OffsetBy(pt);
+	fCloseRect.OffsetBy(pt);
+	fTabRect.OffsetBy(pt);
+	fBorderRect.OffsetBy(pt);
+	fZoomRect.OffsetBy(pt);
+	fMinimizeRect.OffsetBy(pt);
+}
+
+
+void
+WinDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
+{
+	// Move all internal rectangles the appropriate amount
+	fFrame.right += offset.x;
+	fFrame.bottom += offset.y;
+
+	fTabRect.right += offset.x;
+	fBorderRect.right += offset.x;
+	fBorderRect.bottom += offset.y;
+	// fZoomRect.OffsetBy(offset.x, 0);
+	// fMinimizeRect.OffsetBy(offset.x, 0);
+	if (dirty) {
+		dirty->Include(fTabRect);
+		dirty->Include(fBorderRect);
+	}
+
+
+	// TODO probably some other layouting stuff here
+	_DoLayout();
+}
+
+
+// TODO : _SetSettings
+
+
+void
+WinDecorator::_GetFootprint(BRegion* region)
+{
+	// This function calculates the decorator's footprint in coordinates
+	// relative to the view. This is most often used to set a Window
+	// object's visible region.
+	if (!region)
+		return;
+
+	region->MakeEmpty();
+
+	if (fLook == B_NO_BORDER_WINDOW_LOOK)
+		return;
+	
+	region->Set(fBorderRect);
+	region->Include(fTabRect);
+	region->Exclude(fFrame);
+}
+
+
+void
+WinDecorator::_UpdateFont(DesktopSettings& settings)
+{
+	ServerFont font;
+	if (fLook == B_FLOATING_WINDOW_LOOK)
+		settings.GetDefaultPlainFont(font);
+	else
+		settings.GetDefaultBoldFont(font);
+
+	font.SetFlags(B_FORCE_ANTIALIASING);
+	font.SetSpacing(B_STRING_SPACING);
+	fDrawState.SetFont(font);
+}
+
+
+void
+WinDecorator::_DrawBeveledRect(BRect r, bool down)
 {
 	RGBColor higher;
 	RGBColor high;
@@ -530,85 +611,11 @@ WinDecorator::DrawBeveledRect(BRect r, bool down)
 }
 
 
-void
-WinDecorator::_SetColors()
+// #pragma mark -
+
+
+extern "C" DecorAddOn*
+instantiate_decor_addon(image_id id, const char* name)
 {
-	_SetFocus();
-}
-
-
-void
-WinDecorator::_UpdateFont(DesktopSettings& settings)
-{
-	ServerFont font;
-	if (fLook == B_FLOATING_WINDOW_LOOK)
-		settings.GetDefaultPlainFont(font);
-	else
-		settings.GetDefaultBoldFont(font);
-
-	font.SetFlags(B_FORCE_ANTIALIASING);
-	font.SetSpacing(B_STRING_SPACING);
-	fDrawState.SetFont(font);
-}
-
-
-void
-WinDecorator::_DrawFrame(BRect rect)
-{
-	if (fLook == B_NO_BORDER_WINDOW_LOOK)
-		return;
-
-	if (fBorderRect == fFrame)
-		return;
-
-	BRect r = fBorderRect;
-	
-	fDrawingEngine->SetHighColor(frame_lowercol);
-	fDrawingEngine->StrokeRect(r);
-
-	if (fLook == B_BORDERED_WINDOW_LOOK)
-		return;
-	
-	BPoint pt;
-
-	pt=r.RightTop();
-	pt.x--;
-	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_midcol);
-	pt=r.LeftBottom();
-	pt.y--;
-	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_midcol);
-
-	fDrawingEngine->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowercol);
-	fDrawingEngine->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowercol);
-	
-	r.InsetBy(1,1);
-	pt=r.RightTop();
-	pt.x--;
-	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_highcol);
-	pt=r.LeftBottom();
-	pt.y--;
-	fDrawingEngine->StrokeLine(r.LeftTop(),pt,frame_highcol);
-
-	fDrawingEngine->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowcol);
-	fDrawingEngine->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowcol);
-	
-	r.InsetBy(1,1);
-	fDrawingEngine->StrokeRect(r,frame_midcol);
-	r.InsetBy(1,1);
-	fDrawingEngine->StrokeRect(r,frame_midcol);
-}
-
-
-extern "C" float
-get_decorator_version(void)
-{
-	return 1.00;
-}
-
-
-extern "C" Decorator *
-instantiate_decorator(DesktopSettings &desktopSetting, BRect rect,
-	window_look wlook, int32 wflags)
-{
-	return new WinDecorator(desktopSetting, rect, wlook, wflags);
+	return new (std::nothrow)WinDecorAddOn(id, name);
 }
