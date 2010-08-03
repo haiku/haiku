@@ -113,9 +113,9 @@ DecorInfo::Instantiate(Desktop* desktop, DrawingEngine* engine, BRect rect,
 
 
 DecorManager::DecorManager()
- :	BLocker("DecorManager"),
+	:
 	fDecorList(0),
- 	fCurrentDecor(NULL)
+	fCurrentDecor(NULL)
 {
 	// Start with the default decorator - index is always 0
 	DecorInfo *defaultDecor = new DecorInfo(-1, "Default", NULL);

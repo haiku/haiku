@@ -22,8 +22,10 @@ class DecorInfo;
 class Desktop;
 class DrawingEngine;
 
-class DecorManager : public BLocker {
-	public:
+
+class DecorManager
+{
+public:
 					DecorManager();
 					~DecorManager();
 
@@ -46,7 +48,7 @@ class DecorManager : public BLocker {
 		// is in place
 		//status_t	GetPreview(int32 index, ServerBitmap *bitmap);
 
-	private:
+private:
 		void		_EmptyList();
 		DecorInfo*	_FindDecor(const char *name);
 
