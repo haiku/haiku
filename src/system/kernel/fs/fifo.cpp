@@ -51,7 +51,10 @@
 
 namespace fifo {
 
+
+struct file_cookie;
 class Inode;
+
 
 class RingBuffer {
 	public:
@@ -76,9 +79,10 @@ class RingBuffer {
 
 class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
 	public:
-		ReadRequest()
+		ReadRequest(file_cookie* cookie)
 			:
 			fThread(thread_get_current_thread()),
+			fCookie(cookie),
 			fNotified(true)
 		{
 			B_INITIALIZE_SPINLOCK(&fLock);
@@ -90,21 +94,27 @@ class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
 			fNotified = notified;
 		}
 
-		void Notify()
+		void Notify(status_t status = B_OK)
 		{
 			InterruptsSpinLocker _(fLock);
 			TRACE("ReadRequest %p::Notify(), fNotified %d\n", this, fNotified);
 
 			if (!fNotified) {
 				SpinLocker threadLocker(gThreadSpinlock);
-				thread_unblock_locked(fThread, B_OK);
+				thread_unblock_locked(fThread, status);
 				fNotified = true;
 			}
+		}
+
+		file_cookie* Cookie() const
+		{
+			return fCookie;
 		}
 
 	private:
 		spinlock			fLock;
 		struct thread*		fThread;
+		file_cookie*		fCookie;
 		volatile bool		fNotified;
 };
 
@@ -165,7 +175,7 @@ class Inode {
 		void		NotifyEndClosed(bool writer);
 
 		void		Open(int openMode);
-		void		Close(int openMode);
+		void		Close(int openMode, file_cookie* cookie);
 		int32		ReaderCount() const { return fReaderCount; }
 		int32		WriterCount() const { return fWriterCount; }
 
@@ -215,7 +225,7 @@ struct file_cookie {
 };
 
 
-//---------------------
+// #pragma mark -
 
 
 RingBuffer::RingBuffer()
@@ -390,7 +400,7 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 		}
 
 		// write only as long as there are readers left
-		if (fReaderCount == 0) {
+		if (fActive && fReaderCount == 0) {
 			if (written == 0)
 				send_signal(find_thread(NULL), SIGPIPE);
 			return EPIPE;
@@ -615,11 +625,18 @@ Inode::Open(int openMode)
 
 
 void
-Inode::Close(int openMode)
+Inode::Close(int openMode, file_cookie* cookie)
 {
 	TRACE("Inode %p::Close(openMode = %d)\n", this, openMode);
 
 	MutexLocker locker(RequestLock());
+
+	// Notify all currently reading file descriptors
+	ReadRequestList::Iterator iterator = fReadRequests.GetIterator();
+	while (ReadRequest* request = iterator.Next()) {
+		if (request->Cookie() == cookie)
+			request->Notify(B_FILE_ERROR);
+	}
 
 	if ((openMode & O_ACCMODE) == O_WRONLY && --fWriterCount == 0)
 		NotifyEndClosed(true);
@@ -750,7 +767,7 @@ fifo_close(fs_volume *volume, fs_vnode *vnode, void *_cookie)
 	file_cookie *cookie = (file_cookie *)_cookie;
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 
-	fifo->Close(cookie->open_mode);
+	fifo->Close(cookie->open_mode, cookie);
 
 	return B_OK;
 }
@@ -802,7 +819,7 @@ fifo_read(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 	// issue read request
 
-	ReadRequest request;
+	ReadRequest request(cookie);
 	inode->AddReadRequest(request);
 
 	TRACE("  issue read request %p\n", &request);
