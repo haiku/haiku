@@ -366,11 +366,13 @@ extern status_t		convert_to_pthread(thread_id thread, pthread_t *_thread);
 extern uint32		real_time_clock(void);
 extern void			set_real_time_clock(uint32 secsSinceJan1st1970);
 extern bigtime_t	real_time_clock_usecs(void);
-extern status_t		set_timezone(const char *timezone);
 extern bigtime_t	system_time(void);
 						/* time since booting in microseconds */
 extern nanotime_t	system_time_nsecs();
 						/* time since booting in nanoseconds */
+
+					// deprecated (is no-op)
+extern status_t		set_timezone(const char *timezone);
 
 /* Alarm */
 

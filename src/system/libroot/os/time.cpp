@@ -57,40 +57,14 @@ set_real_time_clock(uint32 secs)
 
 
 status_t
-set_timezone(const char* timezone)
+set_timezone(const char* /*timezone*/)
 {
-	char path[B_PATH_NAME_LENGTH];
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, path,
-		B_PATH_NAME_LENGTH);
-	if (status != B_OK) {
-		syslog(LOG_ERR, "can't find settings directory: %s\n", strerror(status));
-		return status;
-	}
-
-	strlcat(path, "/timezone", sizeof(path));
-
-	if (unlink(path) != 0 && errno != ENOENT) {
-		syslog(LOG_ERR, "can't unlink: %s\n", strerror(errno));
-		return errno;
-	}
-
-	if (symlink(timezone, path) != 0) {
-		syslog(LOG_ERR, "can't symlink: %s\n", strerror(errno));
-		return errno;
-	}
-
-	bool isGMT;
-	_kern_get_tzfilename(NULL, 0, &isGMT);
-	_kern_set_tzfilename(timezone, strlen(timezone), isGMT);
-
-	tzset();
-
-	time_t seconds;
-	time(&seconds);
-	struct tm tm;
-	localtime_r(&seconds, &tm);
-
-	return _kern_set_timezone(tm.tm_gmtoff, tm.tm_isdst);
+	/* There's nothing we can do here, since we no longer support named
+	 * timezones.
+	 *
+	 * TODO: should we keep this around for compatibility or get rid of it?
+	 */
+	return B_OK;
 }
 
 
