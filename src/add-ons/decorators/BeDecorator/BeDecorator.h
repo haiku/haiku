@@ -1,20 +1,34 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 #ifndef DEFAULT_DECORATOR_H
 #define DEFAULT_DECORATOR_H
 
-
-#include "Decorator.h"
 #include <Region.h>
+
+#include "DecorManager.h"
 #include "RGBColor.h"
 
+
 class Desktop;
+
+
+class BeDecorAddOn : public DecorAddOn
+{
+public:
+								BeDecorAddOn(image_id id, const char* name);
+
+		float					Version();
+protected:
+	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
+									BRect rect, window_look look, uint32 flags);
+};
 
 
 class BeDecorator: public Decorator {

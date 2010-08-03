@@ -5,6 +5,7 @@
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
 
@@ -13,6 +14,7 @@
 
 #include "BeDecorator.h"
 
+#include <new>
 #include <stdio.h>
 
 #include "DesktopSettings.h"
@@ -81,6 +83,29 @@ make_blend_color(rgb_color colorA, rgb_color colorB, float position)
 
 
 //	#pragma mark -
+
+
+BeDecorAddOn::BeDecorAddOn(image_id id, const char* name)
+	:
+	DecorAddOn(id, name)
+{
+	
+}
+
+
+float
+BeDecorAddOn::Version()
+{
+	return 1.00;
+}
+
+
+Decorator*
+BeDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
+	window_look look, uint32 flags)
+{
+	return new (std::nothrow)BeDecorator(settings, rect, look, flags);
+}
 
 
 // TODO: get rid of DesktopSettings here, and introduce private accessor
@@ -1262,13 +1287,8 @@ BeDecorator::_LayoutTabItems(const BRect& tabRect)
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 }
 
-extern "C" float get_decorator_version(void)
-{
-	return 1.00;
-}
 
-extern "C" Decorator *(instantiate_decorator)(DesktopSettings &desktopSetting, BRect rec,
-										window_look loo, uint32 flag)
+extern "C" DecorAddOn* (instantiate_decor_addon)(image_id id, const char* name)
 {
-	return (new BeDecorator(desktopSetting, rec, loo, flag));
+	return new (std::nothrow)BeDecorAddOn(id, name);
 }
