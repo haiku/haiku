@@ -10,6 +10,7 @@
 #ifndef DEFAULT_DECORATOR_H
 #define DEFAULT_DECORATOR_H
 
+
 #include <Region.h>
 
 #include "DecorManager.h"
@@ -19,8 +20,7 @@
 class Desktop;
 
 
-class BeDecorAddOn : public DecorAddOn
-{
+class BeDecorAddOn : public DecorAddOn {
 public:
 								BeDecorAddOn(image_id id, const char* name);
 
