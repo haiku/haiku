@@ -177,13 +177,15 @@ BootPromptWindow::MessageReceived(BMessage* message)
 	}
 }
 
+namespace BPrivate {
+	void ForceUnloadCatalog();
+};
 
 void
 BootPromptWindow::_InitCatalog(bool saveSettings)
 {
 	// Initilialize the Locale Kit
-	// TODO : not possible with the current API !
-	// sCatalogInitOnce = false;
+	BPrivate::ForceUnloadCatalog();
 
 	// Generate a settings file
 	// TODO: This should not be necessary.

@@ -24,3 +24,11 @@ BLocaleRoster::GetCatalog()
 	return _GetCatalog(&sCatalog, &sCatalogInitOnce);
 }
 
+
+namespace BPrivate{
+	void ForceUnloadCatalog()
+	{
+		sCatalogInitOnce = false;
+	}
+}
+
