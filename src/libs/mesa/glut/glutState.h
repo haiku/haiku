@@ -47,7 +47,7 @@ struct GlutState {
 	int modifierKeys;				// only valid during keyboard callback
 	int keyRepeatMode;				// global repeat
 
-	GlutGameMode* gameMode;
+	GlutGameMode gameMode;
 
 	bool debug;					// call glGetError
 	bool quitAll;				// quit
@@ -67,7 +67,6 @@ struct GlutState {
 		menuStatus = 0;
 		modifierKeys = ~0;
 		keyRepeatMode = GLUT_KEY_REPEAT_DEFAULT;
-		gameMode = NULL;
 		debug = quitAll = false;
 	}
 };
