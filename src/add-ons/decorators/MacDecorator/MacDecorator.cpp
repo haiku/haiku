@@ -9,6 +9,7 @@
 
 #include "MacDecorator.h"
 
+#include <new>
 #include <stdio.h>
 
 #include <GradientLinear.h>
@@ -27,6 +28,29 @@
 #else
 #	define STRACE(x) ;
 #endif
+
+
+MacDecorAddOn::MacDecorAddOn(image_id id, const char* name)
+	:
+	DecorAddOn(id, name)
+{
+	
+}
+
+
+float
+MacDecorAddOn::Version()
+{
+	return 1.00;
+}
+
+
+Decorator*
+MacDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
+	window_look look, uint32 flags)
+{
+	return new (std::nothrow)MacDecorator(settings, rect, look, flags);
+}
 
 
 MacDecorator::MacDecorator(DesktopSettings& settings, BRect rect,
@@ -810,16 +834,8 @@ MacDecorator::_DrawBlendedRect(DrawingEngine* engine, BRect rect,
 // #pragma mark -
 
 
-extern "C" float
-get_decorator_version(void)
+extern "C" DecorAddOn*
+instantiate_decor_addon(image_id id, const char* name)
 {
-	return 1.00;
-}
-
-
-extern "C" Decorator*
-instantiate_decorator(DesktopSettings& desktopSetting, BRect rect,
-	window_look look, uint32 flag)
-{
-	return new MacDecorator(desktopSetting, rect, look, flag);
+	return new (std::nothrow)MacDecorAddOn(id, name);
 }

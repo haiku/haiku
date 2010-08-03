@@ -8,8 +8,20 @@
 #define _MAC_DECORATOR_H_
 
 
-#include "Decorator.h"
+#include "DecorManager.h"
 #include "RGBColor.h"
+
+
+class MacDecorAddOn : public DecorAddOn
+{
+public:
+								MacDecorAddOn(image_id id, const char* name);
+
+		float					Version();
+protected:
+	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
+									BRect rect, window_look look, uint32 flags);
+};
 
 
 class MacDecorator: public Decorator {
