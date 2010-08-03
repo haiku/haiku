@@ -458,7 +458,7 @@ Inode::ReadDataFromBuffer(void* data, size_t* _length, bool nonBlocking,
 		if (nonBlocking)
 			return B_WOULD_BLOCK;
 
-		if (fWriterCount == 0)
+		if (fActive && fWriterCount == 0)
 			return B_OK;
 
 		TRACE("Inode %p::%s(): wait for data, request %p\n", this, __FUNCTION__,
@@ -651,6 +651,13 @@ Inode::Close(int openMode, file_cookie* cookie)
 		|| (openMode & O_ACCMODE) == O_RDWR) {
 		if (--fReaderCount == 0)
 			NotifyEndClosed(false);
+	}
+
+	if (fWriterCount == 0) {
+		// Notify any still reading writers to stop
+		// TODO: This only works reliable if there is only one writer - we could
+		// do the same thing done for the read requests.
+		fWriteCondition.NotifyAll(B_FILE_ERROR);
 	}
 
 	if (fReaderCount == 0 && fWriterCount == 0) {
