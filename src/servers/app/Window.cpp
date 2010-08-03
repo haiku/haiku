@@ -10,6 +10,8 @@
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
+
+
 #include "Window.h"
 
 #include "Decorator.h"
@@ -793,8 +795,8 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 
 			// clicking a simple View
 			if (!IsFocus()) {
-				bool acceptFirstClick = desktopSettings.AcceptFirstClick()
-					|| ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) != 0);
+				bool acceptFirstClick
+					= (Flags() & B_WILL_ACCEPT_FIRST_CLICK) != 0;
 				bool avoidFocus = (Flags() & B_AVOID_FOCUS) != 0;
 
 				// Activate or focus the window in case it doesn't accept first
@@ -811,7 +813,8 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				// TODO: the latter is unlike BeOS - if we really wanted to
 				// imitate this behaviour, we would need to check if we're
 				// the front window instead of the focus window
-				if (!acceptFirstClick && !avoidFocus)
+				if ((!acceptFirstClick || !desktopSettings.AcceptFirstClick())
+					&& !avoidFocus)
 					return;
 			}
 
