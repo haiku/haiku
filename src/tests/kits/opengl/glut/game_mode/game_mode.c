@@ -14,7 +14,7 @@ void draw_cube(void);
 void game_mode(char *mode);
 void dump_game_mode(void);
 void init(void);
-void clean_exit(void);
+void on_exit(void);
 
 float spin = 0;
 
@@ -81,7 +81,7 @@ display(void)
 void
 idle(void)
 {
-	spin += 1.0;
+	spin += 0.5;
 	if (spin > 360.0)
 		spin = 0.0;
 
@@ -166,10 +166,9 @@ on_exit(void)
 void
 game_mode(char *mode)
 {
-	printf("glutGameModeString(\"%s\"): ", mode);
-
 	glutGameModeString(mode);
 
+	printf("glutGameModeString(\"%s\"): ", mode);
 	if (!glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)) {
 		printf("*not* possible!\n");
 		return;
