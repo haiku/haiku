@@ -13,13 +13,16 @@
 #include <time.h>
 
 
+struct kernel_args;
+
+
 #define RTC_EPOCH_BASE_YEAR	1970
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-status_t rtc_init(kernel_args *args);
+status_t rtc_init(struct kernel_args *args);
 bigtime_t rtc_boot_time(void);
 	// Returns the time at which the system was booted in microseconds since Jan 1, 1970 UTC.
 
@@ -27,6 +30,8 @@ bigtime_t rtc_boot_time(void);
 // (no tm_wday, tm_yday, tm_isdst).
 uint32 rtc_tm_to_secs(const struct tm *t);
 void rtc_secs_to_tm(uint32 seconds, struct tm *t);
+
+uint32 get_timezone_offset();
 
 bigtime_t _user_system_time(void);
 status_t _user_set_real_time_clock(uint32 time);

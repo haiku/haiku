@@ -128,6 +128,13 @@ real_time_clock_usecs(void)
 }
 
 
+uint32
+get_timezone_offset(void)
+{
+	return (time_t)(sTimezoneOffset / 1000000LL);
+}
+
+
 // #pragma mark -
 
 

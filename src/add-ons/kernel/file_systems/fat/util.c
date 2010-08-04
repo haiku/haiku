@@ -7,11 +7,11 @@
 #include <SupportDefs.h>
 #include <KernelExport.h>
 
+#include <real_time_clock.h>
+
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
-
-#include "rtc_info.h"
 
 #include "dosfs.h"
 #include "fat.h"
@@ -72,19 +72,7 @@ get_tzoffset()
 	if (tzoffset != -1)
 		return;
 
-	// tzoffset used to be set to a bogus value (timezone offset in seconds),
-	// we could try to use something like the following ...
-	//
-	//	int32 tzOffsetInSeconds;
-	//	if (_kern_get_timezone(&tzOffsetInSeconds) < 0) {
-	//		dprintf("error getting timezone offset\n");
-	//	} else {
-	//		tzoffset = tzOffsetInSeconds / 60;
-	//	}
-	//
-	// but I'd rather like to spare us the specific kernel call,
-	// so we hardcode the timezone (let's see if it makes any difference)
-	tzoffset = 0;
+	tzoffset = get_timezone_offset() / 60;
 }
 
 
