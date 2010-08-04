@@ -5,6 +5,8 @@
  *
  * Distributed under the terms of the MIT License.
  */
+#ifndef GLUT_GAME_MODE_H
+#define GLUT_GAME_MODE_H
 
 #include <GL/glut.h>
 #include <Screen.h>
@@ -52,3 +54,5 @@ private:
 	display_mode	fCurrentMode;
 
 };
+
+#endif	// GLUT_GAME_MODE_H
