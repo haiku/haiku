@@ -31,7 +31,7 @@ bigtime_t rtc_boot_time(void);
 uint32 rtc_tm_to_secs(const struct tm *t);
 void rtc_secs_to_tm(uint32 seconds, struct tm *t);
 
-uint32 get_timezone_offset();
+uint32 get_timezone_offset(void);
 
 bigtime_t _user_system_time(void);
 status_t _user_set_real_time_clock(uint32 time);
