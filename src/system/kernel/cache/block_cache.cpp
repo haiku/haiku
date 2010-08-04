@@ -60,8 +60,19 @@ struct cached_block {
 	block_link		link;
 	off_t			block_number;
 	void*			current_data;
+		// The data that is seen by everyone using the API; this one is always
+		// present.
 	void*			original_data;
+		// When in a transaction, this contains the original data from before
+		// the transaction.
 	void*			parent_data;
+		// This is a lazily alloced buffer that represents the contents of the
+		// block in the parent transaction. It may point to current_data if the
+		// contents have been changed only in the parent transaction, or, if the
+		// block has been changed in the current sub transaction already, to a
+		// new block containing the contents changed in the parent transaction.
+		// If this is NULL, the block has not been changed in the parent
+		// transaction at all.
 #if BLOCK_CACHE_DEBUG_CHANGED
 	void*			compare;
 #endif
@@ -2838,9 +2849,10 @@ cache_abort_transaction(void* _cache, int32 id)
 		next = block->transaction_next;
 
 		if (block->original_data != NULL) {
-			TRACE(("cache_abort_transaction(id = %ld): restored contents of block %Ld\n",
-				transaction->id, block->block_number));
-			memcpy(block->current_data, block->original_data, cache->block_size);
+			TRACE(("cache_abort_transaction(id = %ld): restored contents of "
+				"block %Ld\n", transaction->id, block->block_number));
+			memcpy(block->current_data, block->original_data,
+				cache->block_size);
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
@@ -2925,16 +2937,31 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 			continue;
 		}
 
-		if (block->original_data != NULL && block->parent_data != NULL) {
-			// free the original data if the parent data of the transaction
-			// will be made current - but keep them otherwise
+		if (block->parent_data != NULL) {
+			// The block changed in the parent - free the original data, since
+			// they will be replaced by what is in current.
+			ASSERT(block->original_data != NULL);
 			cache->Free(block->original_data);
-			block->original_data = NULL;
+
+			if (block->parent_data != block->current_data) {
+				// The block had been changed in both transactions
+				block->original_data = block->parent_data;
+			} else {
+				// The block has only been changed in the parent
+				block->original_data = NULL;
+			}
+
+			// move the block to the previous transaction list
+			transaction->blocks.Add(block);
+			block->previous_transaction = transaction;
+			block->parent_data = NULL;
 		}
-		if (block->parent_data == NULL
-			|| block->parent_data != block->current_data) {
-			// we need to move this block over to the new transaction
-			block->original_data = block->parent_data;
+
+		if (block->original_data != NULL) {
+			// This block had been changed in the current sub transaction,
+			// we need to move this block over to the new transaction.
+			ASSERT(block->parent_data == NULL);
+
 			if (last == NULL)
 				newTransaction->first_block = block;
 			else
@@ -2944,13 +2971,6 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 			last = block;
 		} else
 			block->transaction = NULL;
-
-		if (block->parent_data != NULL) {
-			// move the block to the previous transaction list
-			transaction->blocks.Add(block);
-			block->previous_transaction = transaction;
-			block->parent_data = NULL;
-		}
 
 		block->transaction_next = NULL;
 	}
@@ -2996,16 +3016,15 @@ cache_abort_sub_transaction(void* _cache, int32 id)
 		next = block->transaction_next;
 
 		if (block->parent_data == NULL) {
-			if (block->original_data != NULL) {
-				// the parent transaction didn't change the block, but the sub
-				// transaction did - we need to revert from the original data
-				memcpy(block->current_data, block->original_data,
-					cache->block_size);
-			}
+			// the parent transaction didn't change the block, but the sub
+			// transaction did - we need to revert from the original data
+			ASSERT(block->original_data != NULL);
+			memcpy(block->current_data, block->original_data,
+				cache->block_size);
 		} else if (block->parent_data != block->current_data) {
 			// the block has been changed and must be restored
-			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents of block %Ld\n",
-				transaction->id, block->block_number));
+			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents "
+				"of block %Ld\n", transaction->id, block->block_number));
 			memcpy(block->current_data, block->parent_data, cache->block_size);
 			cache->Free(block->parent_data);
 		}
@@ -3032,7 +3051,8 @@ cache_start_sub_transaction(void* _cache, int32 id)
 
 	cache_transaction* transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
-		panic("cache_start_sub_transaction(): invalid transaction ID %ld\n", id);
+		panic("cache_start_sub_transaction(): invalid transaction ID %ld\n",
+			id);
 		return B_BAD_VALUE;
 	}
 
@@ -3048,6 +3068,9 @@ cache_start_sub_transaction(void* _cache, int32 id)
 
 		if (block->discard) {
 			// This block has been discarded in the parent transaction
+			// TODO: this is wrong: since the parent transaction is not
+			// finished here (just extended), this block cannot be reverted
+			// anymore in case the parent transaction is aborted!!!
 			if (last != NULL)
 				last->transaction_next = next;
 			else
@@ -3057,6 +3080,7 @@ cache_start_sub_transaction(void* _cache, int32 id)
 			transaction->num_blocks--;
 			continue;
 		}
+
 		if (transaction->has_sub_transaction
 			&& block->parent_data != NULL
 			&& block->parent_data != block->current_data) {
