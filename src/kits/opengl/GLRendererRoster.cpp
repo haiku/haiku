@@ -33,7 +33,8 @@ GLRendererRoster::GLRendererRoster(BGLView *view, ulong options)
 	: fNextID(0),
 	fView(view),
 	fOptions(options),
-	fSafeMode(false)
+	fSafeMode(false),
+	fABISubDirectory(NULL)
 {
 	char parameter[32];
 	size_t parameterLength = sizeof(parameter);
@@ -49,7 +50,7 @@ GLRendererRoster::GLRendererRoster(BGLView *view, ulong options)
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
-	
+
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
 #else
@@ -61,7 +62,24 @@ GLRendererRoster::GLRendererRoster(BGLView *view, ulong options)
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
-	
+
+	// We might run in compatibility mode on a system with a different ABI. The
+	// renderers matching our ABI can usually be found in respective
+	// subdirectories of the opengl add-ons directories.
+	system_info info;
+	if (get_system_info(&info) == B_OK
+		&& (info.abi & B_HAIKU_ABI_MAJOR)
+			!= (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR)) {
+			switch (B_HAIKU_ABI & B_HAIKU_ABI_MAJOR) {
+				case B_HAIKU_ABI_GCC_2:
+					fABISubDirectory = "gcc2";
+					break;
+				case B_HAIKU_ABI_GCC_4:
+					fABISubDirectory = "gcc4";
+					break;
+			}
+	}
+
 	AddDefaultPaths();
 }
 
@@ -110,6 +128,16 @@ GLRendererRoster::AddPath(const char* path)
 	status_t status = directory.InitCheck();
 	if (status < B_OK)
 		return status;
+
+	// if a subdirectory for our ABI exists, use that instead
+	if (fABISubDirectory != NULL) {
+		BEntry entry(&directory, fABISubDirectory);
+		if (entry.IsDirectory()) {
+			status = directory.SetTo(&entry);
+			if (status != B_OK)
+				return status;
+		}
+	}
 
 	node_ref nodeRef;
 	status = directory.GetNodeRef(&nodeRef);
@@ -181,7 +209,7 @@ GLRendererRoster::CreateRenderer(const entry_ref& ref)
 			unload_add_on(image);
 			return B_UNSUPPORTED;
 		}
-		
+
 		if (AddRenderer(renderer, image, &ref, nodeRef.node) != B_OK) {
 			renderer->Release();
 			// this will delete the renderer

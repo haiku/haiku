@@ -27,7 +27,7 @@ class GLRendererRoster {
 	private:
 		void AddDefaultPaths();
 		status_t AddPath(const char* path);
-		status_t AddRenderer(BGLRenderer* renderer, 
+		status_t AddRenderer(BGLRenderer* renderer,
 			image_id image, const entry_ref* ref, ino_t node);
 		status_t CreateRenderer(const entry_ref& ref);
 
@@ -36,6 +36,8 @@ class GLRendererRoster {
 		BGLView 	*fView;
 		ulong		fOptions;
 		bool		fSafeMode;
+		const char*	fABISubDirectory;
+
 };
 
 #endif	/* _GLRENDERER_ROSTER_H */
