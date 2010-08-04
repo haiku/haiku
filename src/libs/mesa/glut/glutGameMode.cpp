@@ -7,10 +7,13 @@
  */
 
 
-#include <GL/glut.h>
+#include "glutGameMode.h"
 #include "glutint.h"
 #include "glutState.h"
-#include "glutBlocker.h"
+// #include "glutBlocker.h"
+
+#include <GL/glut.h>
+#include <String.h>
 #include <stdio.h>
 
 
@@ -110,14 +113,22 @@ GlutGameMode::Enter()
 	screen.GetMode(fGameModeWorkspace, &fCurrentMode);
 
 	// create a new window in full screen
-	glutCreateWindow("glutGameMode");
+	BString name;
+	name << "Game Mode " << fCurrentMode.virtual_width 
+		<< "x" << fCurrentMode.virtual_height 
+		<< ":" << _GetModePixelDepth(&fCurrentMode)
+		<< "@" << _GetModeRefreshRate(&fCurrentMode);
+	 
+	glutCreateWindow(name.String());
 	BDirectWindow *directWindow
 		= dynamic_cast<BDirectWindow*>(gState.currentWindow->Window());
 	if (directWindow == NULL)
 		// Hum?!
 		return B_ERROR;
 
+	directWindow->Lock();
 	directWindow->SetFullScreen(true);
+	directWindow->Unlock();
 
 	fDisplayChanged = true;
 	fActive = true;
@@ -160,7 +171,7 @@ GlutGameMode::_FindMatchingMode()
 		// Lazy retrieval of supported modes...
 		BScreen screen;
 		if (screen.GetModeList(&fModesList, &fModesCount) == B_OK) {
-			// sort modes
+			// sort modes in decrease order (resolution, depth, frequency)
 			qsort(fModesList, fModesCount, sizeof(display_mode), _CompareModes);
 		} else {
 			// bad luck, no modes can be retrieved!
