@@ -1020,15 +1020,15 @@ ipv6_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 
 
 status_t
-ipv6_error(uint32 code, net_buffer* data)
+ipv6_error_received(net_error error, net_buffer* data)
 {
 	return B_ERROR;
 }
 
 
 status_t
-ipv6_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
-	void* errorData)
+ipv6_error_reply(net_protocol* protocol, net_buffer* cause, net_error error,
+	net_error_data* errorData)
 {
 	return B_ERROR;
 }
@@ -1219,7 +1219,7 @@ net_protocol_module_info gIPv6Module = {
 	ipv6_get_mtu,
 	ipv6_receive_data,
 	ipv6_deliver_data,
-	ipv6_error,
+	ipv6_error_received,
 	ipv6_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()

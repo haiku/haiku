@@ -13,8 +13,6 @@
 #include <net_protocol.h>
 #include <net_stack.h>
 
-#include <icmp.h>
-
 #include <lock.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -698,7 +696,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 		TRACE_EPM("  ReceiveData(): no endpoint.");
 		// Send port unreachable error
 		domainSupport->Domain()->module->error_reply(NULL, buffer,
-			icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_PORT_UNREACH), NULL);
+			B_NET_ERROR_UNREACH_PORT, NULL);
 		return B_ERROR;
 	}
 
@@ -1235,43 +1233,37 @@ udp_deliver_data(net_protocol *protocol, net_buffer *buffer)
 
 
 status_t
-udp_error_received(uint32 code, net_buffer* buffer)
+udp_error_received(net_error error, net_buffer* buffer)
 {
-	uint8 icmpType, icmpCode;
-	icmp_decode(code, icmpType, icmpCode);
+	status_t notifyError = B_OK;
 
-	status_t error = B_OK;
-	switch (icmpType) {
-		case ICMP_TYPE_UNREACH:
-			if (icmpCode == ICMP_CODE_NET_UNREACH)
-				error = ENETUNREACH;
-			else if (icmpCode == ICMP_CODE_HOST_UNREACH)
-				error = EHOSTUNREACH;
-			else if (icmpCode == ICMP_CODE_SOURCE_ROUTE_FAIL)
-				error = B_NOT_SUPPORTED;
-			else if (icmpCode == ICMP_CODE_PROTO_UNREACH) 
-				error = ENOPROTOOPT;
-			else if (icmpCode == ICMP_CODE_PORT_UNREACH)
-				error = ECONNREFUSED;
-			else if (icmpCode == ICMP_CODE_FRAG_NEEDED)
-				error = EMSGSIZE;
-			else
-				error = B_NOT_SUPPORTED;
+	switch (error) {
+		case B_NET_ERROR_UNREACH_NET:
+			notifyError = ENETUNREACH;
 			break;
-		case ICMP_TYPE_TIME_EXCEEDED:
-			error = EHOSTUNREACH;
+		case B_NET_ERROR_UNREACH_HOST:
+		case B_NET_ERROR_TRANSIT_TIME_EXCEEDED:
+			notifyError = EHOSTUNREACH;
 			break;
-		case ICMP_TYPE_PARAM_PROBLEM:
-			error = EPROTO;
+		case B_NET_ERROR_UNREACH_PROTOCOL:
+		case B_NET_ERROR_UNREACH_PORT:
+			notifyError = ECONNREFUSED;
 			break;
-		case ICMP_TYPE_SOURCE_QUENCH:
+		case B_NET_ERROR_MESSAGE_SIZE:
+			notifyError = EMSGSIZE;
+			break;
+		case B_NET_ERROR_PARAMETER_PROBLEM:
+			notifyError = ENOPROTOOPT;
+			break;
+
+		case B_NET_ERROR_QUENCH:
 		default:
 			// ignore them
 			break;
 	}
-	
-	if (error != B_OK)
-		sUdpEndpointManager->ReceiveError(error, buffer);
+
+	if (notifyError != B_OK)
+		sUdpEndpointManager->ReceiveError(notifyError, buffer);
 
 	gBufferModule->free(buffer);
 	return B_OK;
@@ -1279,8 +1271,8 @@ udp_error_received(uint32 code, net_buffer* buffer)
 
 
 status_t
-udp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+udp_error_reply(net_protocol *protocol, net_buffer *cause, net_error error,
+	net_error_data *errorData)
 {
 	return B_ERROR;
 }

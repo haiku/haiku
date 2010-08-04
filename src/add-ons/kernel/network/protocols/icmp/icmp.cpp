@@ -12,6 +12,8 @@
 */
 
 
+#include "icmp.h"
+
 #include <algorithm>
 #include <netinet/in.h>
 #include <new>
@@ -21,7 +23,6 @@
 #include <KernelExport.h>
 #include <OS.h>
 
-#include <icmp.h>
 #include <net_datalink.h>
 #include <net_protocol.h>
 #include <net_stack.h>
@@ -55,11 +56,10 @@ struct icmp_header {
 			uint16	_reserved;
 			uint16	next_mtu;
 		} path_mtu;
-		uint32	gateway;
 		struct {
-			uint16 unused;
-			uint16 mtu;
-		} frag;
+			uint8	pointer;
+			uint8	_reserved[3];
+		} parameter_problem;
 
 		uint32 zero;
 	};
@@ -80,6 +80,34 @@ struct icmp_protocol : net_protocol {
 
 net_buffer_module_info* gBufferModule;
 static net_stack_module_info* sStackModule;
+
+
+#ifdef TRACE_ICMP
+
+
+static const char*
+net_error_to_string(net_error error)
+{
+#define CODE(x) case x: return #x;
+	switch (error) {
+		CODE(B_NET_ERROR_REDIRECT_HOST)
+		CODE(B_NET_ERROR_UNREACH_NET)
+		CODE(B_NET_ERROR_UNREACH_HOST)
+		CODE(B_NET_ERROR_UNREACH_PROTOCOL)
+		CODE(B_NET_ERROR_UNREACH_PORT)
+		CODE(B_NET_ERROR_MESSAGE_SIZE)
+		CODE(B_NET_ERROR_TRANSIT_TIME_EXCEEDED)
+		CODE(B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED)
+		CODE(B_NET_ERROR_PARAMETER_PROBLEM)
+		CODE(B_NET_ERROR_QUENCH)
+		default:
+			return "unknown";
+	}
+#undef CODE
+}
+
+
+#endif	// TRACE_ICMP
 
 
 static net_domain*
@@ -112,10 +140,110 @@ static bool
 is_icmp_error(uint8 type)
 {
 	return type == ICMP_TYPE_UNREACH
-		|| type == ICMP_TYPE_PARAM_PROBLEM
+		|| type == ICMP_TYPE_PARAMETER_PROBLEM
 		|| type == ICMP_TYPE_REDIRECT
 		|| type == ICMP_TYPE_TIME_EXCEEDED
 		|| type == ICMP_TYPE_SOURCE_QUENCH;
+}
+
+
+static net_error
+icmp_to_net_error(uint8 type, uint8 code)
+{
+	switch (type) {
+		case ICMP_TYPE_UNREACH:
+			switch (code) {
+				case ICMP_CODE_FRAGMENTATION_NEEDED:
+					return B_NET_ERROR_MESSAGE_SIZE;
+				case ICMP_CODE_NET_UNREACH:
+					return B_NET_ERROR_UNREACH_NET;
+				case ICMP_CODE_HOST_UNREACH:
+					return B_NET_ERROR_UNREACH_HOST;
+				case ICMP_CODE_PROTOCOL_UNREACH:
+					return B_NET_ERROR_UNREACH_PROTOCOL;
+				case ICMP_CODE_PORT_UNREACH:
+					return B_NET_ERROR_UNREACH_PORT;
+			}
+			break;
+
+		case ICMP_TYPE_PARAMETER_PROBLEM:
+			return B_NET_ERROR_PARAMETER_PROBLEM;
+
+		case ICMP_TYPE_REDIRECT:
+			return B_NET_ERROR_REDIRECT_HOST;
+
+		case ICMP_TYPE_SOURCE_QUENCH:
+			return B_NET_ERROR_QUENCH;
+
+		case ICMP_TYPE_TIME_EXCEEDED:
+			switch (code) {
+				case ICMP_CODE_TIME_EXCEEDED_IN_TRANSIT:
+					return B_NET_ERROR_TRANSIT_TIME_EXCEEDED;
+				case ICMP_CODE_REASSEMBLY_TIME_EXCEEDED:
+					return B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED;
+			}
+			break;
+		
+		default:
+			break;
+	}
+
+	return (net_error)0;
+}
+
+
+static void
+net_error_to_icmp(net_error error, uint8& type, uint8& code)
+{
+	switch (error) {
+		// redirect
+		case B_NET_ERROR_REDIRECT_HOST:
+			type = ICMP_TYPE_REDIRECT;
+			code = ICMP_CODE_REDIRECT_HOST;
+			break;
+
+		// unreach
+		case B_NET_ERROR_UNREACH_NET:
+			type = ICMP_TYPE_UNREACH;
+			code = ICMP_CODE_NET_UNREACH;
+			break;
+		case B_NET_ERROR_UNREACH_HOST:
+			type = ICMP_TYPE_UNREACH;
+			code = ICMP_CODE_HOST_UNREACH;
+			break;
+		case B_NET_ERROR_UNREACH_PROTOCOL:
+			type = ICMP_TYPE_UNREACH;
+			code = ICMP_CODE_PROTOCOL_UNREACH;
+			break;
+		case B_NET_ERROR_UNREACH_PORT:
+			type = ICMP_TYPE_UNREACH;
+			code = ICMP_CODE_PORT_UNREACH;
+			break;
+		case B_NET_ERROR_MESSAGE_SIZE:
+			type = ICMP_TYPE_UNREACH;
+			code = ICMP_CODE_FRAGMENTATION_NEEDED;
+			break;
+
+		// time exceeded
+		case B_NET_ERROR_TRANSIT_TIME_EXCEEDED:
+			type = ICMP_TYPE_TIME_EXCEEDED;
+			code = ICMP_CODE_TIME_EXCEEDED_IN_TRANSIT;
+			break;
+		case B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED:
+			type = ICMP_TYPE_TIME_EXCEEDED;
+			code = ICMP_CODE_REASSEMBLY_TIME_EXCEEDED;
+			break;
+
+		// other
+		case B_NET_ERROR_PARAMETER_PROBLEM:
+			type = ICMP_TYPE_PARAMETER_PROBLEM;
+			code = 0;
+			break;
+		case B_NET_ERROR_QUENCH:
+			type = ICMP_TYPE_SOURCE_QUENCH;
+			code = 0;
+			break;
+	}
 }
 
 
@@ -353,17 +481,17 @@ icmp_receive_data(net_buffer* buffer)
 
 		case ICMP_TYPE_UNREACH:
 		case ICMP_TYPE_SOURCE_QUENCH:
-		case ICMP_TYPE_PARAM_PROBLEM:
+		case ICMP_TYPE_PARAMETER_PROBLEM:
 		case ICMP_TYPE_TIME_EXCEEDED:
 		{
 			net_domain* domain = get_domain(buffer);
 			if (domain == NULL)
 				break;
 
-			uint32 error = icmp_encode(header.type, header.code);
-			if (error > 0) {
-				// Deliver the error to the domain protocol which will
-				// propagate the error to the upper protocols
+			// Deliver the error to the domain protocol which will
+			// propagate the error to the upper protocols
+			net_error error = icmp_to_net_error(header.type, header.code);
+			if (error != 0) {
 				bufferHeader.Remove();
 				return domain->module->error_received(error, buffer);
 			}
@@ -390,7 +518,7 @@ icmp_receive_data(net_buffer* buffer)
 
 
 status_t
-icmp_error_received(uint32 code, net_buffer* data)
+icmp_error_received(net_error code, net_buffer* data)
 {
 	return B_ERROR;
 }
@@ -400,13 +528,14 @@ icmp_error_received(uint32 code, net_buffer* data)
 	error.
 */
 status_t
-icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
-	void* errorData)
+icmp_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
+	net_error_data* errorData)
 {
-	TRACE("icmp_error_reply(code %#" B_PRIx32 ")\n", code);
+	TRACE("icmp_error_reply(code %s)\n", net_error_to_string(error));
 
 	uint8 icmpType, icmpCode;
-	icmp_decode(code, icmpType, icmpCode);
+	net_error_to_icmp(error, icmpType, icmpCode);
+
 	TRACE("  icmp type %u, code %u\n", icmpType, icmpCode);
 
 	ipv4_header header;
@@ -452,11 +581,33 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, uint32 code,
 	}
 
 	// Now prepare the ICMP header
+
 	NetBufferPrepend<icmp_header> icmpHeader(reply);
 	icmpHeader->type = icmpType;
 	icmpHeader->code = icmpCode;
-	icmpHeader->gateway = errorData ? *((uint32*)errorData) : 0;
+	icmpHeader->zero = 0;
 	icmpHeader->checksum = 0;
+
+	if (errorData != NULL) {
+		switch (error) {
+			case B_NET_ERROR_REDIRECT_HOST:
+			{
+				sockaddr_in& gateway = (sockaddr_in&)errorData->gateway;
+				icmpHeader->redirect.gateway = gateway.sin_addr.s_addr;
+				break;
+			}
+			case B_NET_ERROR_PARAMETER_PROBLEM:
+				icmpHeader->parameter_problem.pointer = errorData->error_offset;
+				break;
+			case B_NET_ERROR_MESSAGE_SIZE:
+				icmpHeader->path_mtu.next_mtu = errorData->mtu;
+				break;
+
+			default:
+				break;
+		}
+	}
+
 	icmpHeader.Sync();
 
 	// Append IP header + 8 byte of the original datagram

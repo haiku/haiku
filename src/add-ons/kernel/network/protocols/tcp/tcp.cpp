@@ -728,15 +728,15 @@ tcp_receive_data(net_buffer* buffer)
 
 
 status_t
-tcp_error(uint32 code, net_buffer* data)
+tcp_error_received(net_error error, net_buffer* data)
 {
 	return B_ERROR;
 }
 
 
 status_t
-tcp_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
-	void* errorData)
+tcp_error_reply(net_protocol* protocol, net_buffer* cause, net_error error,
+	net_error_data* errorData)
 {
 	return B_ERROR;
 }
@@ -861,7 +861,7 @@ net_protocol_module_info sTCPModule = {
 	tcp_get_mtu,
 	tcp_receive_data,
 	NULL,		// deliver_data()
-	tcp_error,
+	tcp_error_received,
 	tcp_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()

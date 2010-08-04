@@ -11,7 +11,6 @@
 #include "ipv4_address.h"
 #include "multicast.h"
 
-#include <icmp.h>
 #include <net_datalink.h>
 #include <net_datalink_protocol.h>
 #include <net_device.h>
@@ -430,7 +429,7 @@ FragmentPacket::StaleTimer(struct net_timer* timer, void* data)
 	if (!packet->fFragments.IsEmpty()) {
 		// Send error: fragment reassembly time exceeded
 		sDomain->module->error_reply(NULL, packet->fFragments.First(),
-			icmp_encode(ICMP_TYPE_TIME_EXCEEDED, ICMP_CODE_TIMEEX_FRAG), NULL);
+			B_NET_ERROR_REASSEMBLY_TIME_EXCEEDED, NULL);
 	}
 
 	delete packet;
@@ -1602,8 +1601,8 @@ ipv4_receive_data(net_buffer* buffer)
 				ntohl(header.source), ntohl(header.destination));
 	
 			// Send ICMP error: Host unreachable
-			sDomain->module->error_reply(NULL, buffer,
-				icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_HOST_UNREACH), NULL);
+			sDomain->module->error_reply(NULL, buffer, B_NET_ERROR_UNREACH_HOST,
+				NULL);
 			return B_ERROR;
 		}
 
@@ -1658,7 +1657,7 @@ ipv4_receive_data(net_buffer* buffer)
 		// no handler for this packet
 		if (!rawDelivered) {
 			sDomain->module->error_reply(NULL, buffer,
-				icmp_encode(ICMP_TYPE_UNREACH, ICMP_CODE_PROTO_UNREACH), NULL);
+				B_NET_ERROR_UNREACH_PROTOCOL, NULL);
 		}
 		return EAFNOSUPPORT;
 	}
@@ -1690,10 +1689,10 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 
 
 status_t
-ipv4_error_received(uint32 code, net_buffer* buffer)
+ipv4_error_received(net_error error, net_buffer* buffer)
 {
 	TRACE("  ipv4_error_received(code %" B_PRIx32 ", buffer %p [%zu bytes])",
-		code, buffer, buffer->size);
+		error, buffer, buffer->size);
 
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
@@ -1741,20 +1740,20 @@ ipv4_error_received(uint32 code, net_buffer* buffer)
 		return B_ERROR;
 
 	// propagate error
-	return protocol->error_received(code, buffer);
+	return protocol->error_received(error, buffer);
 }
 
 
 status_t
-ipv4_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
-	void* errorData)
+ipv4_error_reply(net_protocol* protocol, net_buffer* cause, net_error error,
+	net_error_data* errorData)
 {
 	// Directly obtain the ICMP protocol module
 	net_protocol_module_info* icmp = receiving_protocol(IPPROTO_ICMP);
 	if (icmp == NULL)
 		return B_ERROR;
 
-	return icmp->error_reply(protocol, causedError, code, errorData);
+	return icmp->error_reply(protocol, cause, error, errorData);
 }
 
 

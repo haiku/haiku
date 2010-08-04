@@ -18,6 +18,7 @@
  *    documentation and/or other materials provided with the distribution.
 */
 
+
 #include <net_datalink.h>
 #include <net_protocol.h>
 #include <net_stack.h>
@@ -38,6 +39,7 @@
 
 #include <bluetooth/HCI/btHCI_acl.h>
 #include <btModules.h>
+
 
 #define BT_DEBUG_THIS_MODULE
 #define SUBMODULE_NAME "L2cap"
@@ -281,7 +283,8 @@ status_t
 l2cap_receive_data(net_buffer* buffer)
 {
 	HciConnection* conn = (HciConnection*)buffer;
-	debugf("received some data, buffer length %lu\n", conn->currentRxPacket->size);
+	debugf("received some data, buffer length %lu\n",
+		conn->currentRxPacket->size);
 
 	l2cap_receive(conn, conn->currentRxPacket);
 
@@ -290,7 +293,7 @@ l2cap_receive_data(net_buffer* buffer)
 
 
 status_t
-l2cap_error(uint32 code, net_buffer* data)
+l2cap_error_received(net_error error, net_buffer* data)
 {
 	flowf("\n");
 
@@ -299,8 +302,8 @@ l2cap_error(uint32 code, net_buffer* data)
 
 
 status_t
-l2cap_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
-	void* errorData)
+l2cap_error_reply(net_protocol* protocol, net_buffer* cause, net_error error,
+	net_error_data* errorData)
 {
 	flowf("\n");
 
@@ -308,9 +311,8 @@ l2cap_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
 }
 
 
-#if 0
-#pragma mark -
-#endif
+// #pragma mark -
+
 
 static status_t
 l2cap_std_ops(int32 op, ...)
@@ -329,14 +331,15 @@ l2cap_std_ops(int32 op, ...)
 			if (error != B_OK)
 				return error;
 
-			error = gStackModule->register_domain_receiving_protocol(AF_BLUETOOTH,
+			error = gStackModule->register_domain_receiving_protocol(
+				AF_BLUETOOTH,
 				BLUETOOTH_PROTO_L2CAP,
 				"network/protocols/l2cap/v1");
 			if (error != B_OK)
 				return error;
 
-			error = gStackModule->register_domain(AF_BLUETOOTH, "l2cap", &gL2CAPModule,
-				&gL2cap4AddressModule, &sDomain);
+			error = gStackModule->register_domain(AF_BLUETOOTH, "l2cap",
+				&gL2CAPModule, &gL2cap4AddressModule, &sDomain);
 			if (error != B_OK)
 				return error;
 
@@ -391,7 +394,7 @@ net_protocol_module_info gL2CAPModule = {
 	l2cap_get_mtu,
 	l2cap_receive_data,
 	NULL,		// deliver_data()
-	l2cap_error,
+	l2cap_error_received,
 	l2cap_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()

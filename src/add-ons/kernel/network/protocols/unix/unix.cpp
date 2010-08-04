@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <stdio.h>
 #include <sys/un.h>
 
@@ -268,15 +269,15 @@ unix_deliver_data(net_protocol *_protocol, net_buffer *buffer)
 
 
 status_t
-unix_error(uint32 code, net_buffer *data)
+unix_error_received(net_error error, net_buffer *data)
 {
 	return B_ERROR;
 }
 
 
 status_t
-unix_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+unix_error_reply(net_protocol *protocol, net_buffer *cause, net_error error,
+	net_error_data *errorData)
 {
 	return B_ERROR;
 }
@@ -504,7 +505,7 @@ net_protocol_module_info gUnixModule = {
 	unix_get_mtu,
 	unix_receive_data,
 	unix_deliver_data,
-	unix_error,
+	unix_error_received,
 	unix_error_reply,
 	unix_add_ancillary_data,
 	unix_process_ancillary_data,
