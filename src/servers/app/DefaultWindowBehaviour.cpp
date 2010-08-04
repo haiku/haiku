@@ -20,12 +20,14 @@
 
 
 //#define DEBUG_WINDOW_CLICK
-
 #ifdef DEBUG_WINDOW_CLICK
 #	define STRACE_CLICK(x) printf x
 #else
 #	define STRACE_CLICK(x) ;
 #endif
+
+
+static const bigtime_t kWindowActivationTimeout = 500000LL;
 
 
 DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
@@ -49,11 +51,7 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 
 DefaultWindowBehaviour::~DefaultWindowBehaviour()
 {
-	
 }
-
-
-static const bigtime_t kWindowActivationTimeout = 500000LL;
 
 
 bool
@@ -61,19 +59,19 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 {
 	Decorator* decorator = fWindow->Decorator();
 
-	int32 modifiers = _ExtractModifiers(message);
 	bool inBorderRegion = false;
-	if (fWindow->Decorator())
+	if (decorator != NULL)
 		inBorderRegion = decorator->GetFootprint().Contains(where);
-	bool windowModifier =
-		(fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
-		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
-			| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
+
+	int32 modifiers = _ExtractModifiers(message);
+	bool windowModifier
+		= (fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
+			&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
+					| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
 	click_type action = CLICK_NONE;
 
 	if (windowModifier || inBorderRegion) {
-		// clicking Window visible area
-
+		// Click on the window border or we have the window modifier keys held
 		int32 buttons = _ExtractButtons(message);
 
 		if (inBorderRegion)
@@ -91,115 +89,104 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		}
 	}
 
+	if (!windowModifier && !inBorderRegion) {
+		// This is a click inside the window's contents
+		return false;
+	}
+
 	DesktopSettings desktopSettings(fDesktop);
-	if (windowModifier || inBorderRegion) {
-		if (!desktopSettings.AcceptFirstClick()) {
-			// Ignore clicks on decorator buttons if the
-			// non-floating window doesn't have focus
-			if (!fWindow->IsFocus() && !fWindow->IsFloating()
-				&& action != CLICK_MOVE_TO_BACK
-				&& action != CLICK_RESIZE && action != CLICK_SLIDE_TAB)
-				action = CLICK_DRAG;
-		}
+	if (!desktopSettings.AcceptFirstClick()) {
+		// Ignore clicks on decorator buttons if the
+		// non-floating window doesn't have focus
+		if (!fWindow->IsFocus() && !fWindow->IsFloating()
+			&& action != CLICK_MOVE_TO_BACK
+			&& action != CLICK_RESIZE && action != CLICK_SLIDE_TAB)
+			action = CLICK_DRAG;
+	}
 
-		// set decorator internals
-		switch (action) {
-			case CLICK_CLOSE:
-				fIsClosing = true;
-				STRACE_CLICK(("===> CLICK_CLOSE\n"));
-				break;
+	// set decorator internals
+	switch (action) {
+		case CLICK_CLOSE:
+			fIsClosing = true;
+			STRACE_CLICK(("===> CLICK_CLOSE\n"));
+			break;
 
-			case CLICK_ZOOM:
-				fIsZooming = true;
-				STRACE_CLICK(("===> CLICK_ZOOM\n"));
-				break;
+		case CLICK_ZOOM:
+			fIsZooming = true;
+			STRACE_CLICK(("===> CLICK_ZOOM\n"));
+			break;
 
-			case CLICK_MINIMIZE:
-				if ((fWindow->Flags() & B_NOT_MINIMIZABLE) == 0) {
-					fIsMinimizing = true;
-					STRACE_CLICK(("===> CLICK_MINIMIZE\n"));
-				}
-				break;
+		case CLICK_MINIMIZE:
+			if ((fWindow->Flags() & B_NOT_MINIMIZABLE) == 0) {
+				fIsMinimizing = true;
+				STRACE_CLICK(("===> CLICK_MINIMIZE\n"));
+			}
+			break;
 
-			case CLICK_DRAG:
-				fIsDragging = true;
-				fLastMousePosition = where;
-				STRACE_CLICK(("===> CLICK_DRAG\n"));
-				break;
+		case CLICK_DRAG:
+			fIsDragging = true;
+			fLastMousePosition = where;
+			STRACE_CLICK(("===> CLICK_DRAG\n"));
+			break;
 
-			case CLICK_RESIZE:
-				fIsResizing = true;
-				fLastMousePosition = where;
-				STRACE_CLICK(("===> CLICK_RESIZE\n"));
-				break;
+		case CLICK_RESIZE:
+			fIsResizing = true;
+			fLastMousePosition = where;
+			STRACE_CLICK(("===> CLICK_RESIZE\n"));
+			break;
 
-			case CLICK_SLIDE_TAB:
-				fIsSlidingTab = true;
-				fLastMousePosition = where;
-				STRACE_CLICK(("===> CLICK_SLIDE_TAB\n"));
-				break;
+		case CLICK_SLIDE_TAB:
+			fIsSlidingTab = true;
+			fLastMousePosition = where;
+			STRACE_CLICK(("===> CLICK_SLIDE_TAB\n"));
+			break;
 
-			default:
-				break;
-		}
+		default:
+			break;
+	}
 
-		if (decorator != NULL) {
-			// redraw decorator
-			BRegion* visibleBorder = fWindow->RegionPool()->GetRegion();
-			fWindow->GetBorderRegion(visibleBorder);
-			visibleBorder->IntersectWith(&fWindow->VisibleRegion());
+	if (decorator != NULL) {
+		// redraw decorator
+		BRegion* visibleBorder = fWindow->RegionPool()->GetRegion();
+		fWindow->GetBorderRegion(visibleBorder);
+		visibleBorder->IntersectWith(&fWindow->VisibleRegion());
 
-			DrawingEngine* engine = decorator->GetDrawingEngine();
-			engine->LockParallelAccess();
-			engine->ConstrainClippingRegion(visibleBorder);
+		DrawingEngine* engine = decorator->GetDrawingEngine();
+		engine->LockParallelAccess();
+		engine->ConstrainClippingRegion(visibleBorder);
 
-			if (fIsZooming)
-				decorator->SetZoom(true);
-			else if (fIsClosing)
-				decorator->SetClose(true);
-			else if (fIsMinimizing)
-				decorator->SetMinimize(true);
+		if (fIsZooming)
+			decorator->SetZoom(true);
+		else if (fIsClosing)
+			decorator->SetClose(true);
+		else if (fIsMinimizing)
+			decorator->SetMinimize(true);
 
-			engine->UnlockParallelAccess();
+		engine->UnlockParallelAccess();
 
-			fWindow->RegionPool()->Recycle(visibleBorder);
-		}
+		fWindow->RegionPool()->Recycle(visibleBorder);
+	}
 
-		if (action == CLICK_MOVE_TO_BACK) {
-			if (desktopSettings.MouseMode() == B_CLICK_TO_FOCUS_MOUSE) {
-				bool covered = true;
-				BRegion fullRegion;
-				fWindow->GetFullRegion(&fullRegion);
-				if (fullRegion == fWindow->VisibleRegion()) {
-    				// window is overlapped.
-    				covered = false;
-				}
-				if (fWindow != fDesktop->FrontWindow() && covered)
-					fDesktop->ActivateWindow(fWindow);
-				else
-					fDesktop->SendWindowBehind(fWindow);
-			} else
-				fDesktop->SendWindowBehind(fWindow);
-		} else {
-			fDesktop->SetMouseEventWindow(fWindow);
+	if (action == CLICK_MOVE_TO_BACK)
+		fDesktop->SendWindowBehind(fWindow);
+	else {
+		fDesktop->SetMouseEventWindow(fWindow);
 
-			// activate window if in click to activate mode, else only focus it
-			if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
-				fDesktop->ActivateWindow(fWindow);
-			else {
-				fDesktop->SetFocusWindow(fWindow);
-				if (desktopSettings.MouseMode() == B_FOCUS_FOLLOWS_MOUSE
-					&& (action == CLICK_DRAG || action == CLICK_RESIZE)) {
-					fActivateOnMouseUp = true;
-					fMouseMoveDistance = 0.0f;
-					fLastMoveTime = system_time();
-				}
+		// activate window if in click to activate mode, else only focus it
+		if (desktopSettings.MouseMode() == B_NORMAL_MOUSE)
+			fDesktop->ActivateWindow(fWindow);
+		else {
+			fDesktop->SetFocusWindow(fWindow);
+
+			if (action == CLICK_DRAG || action == CLICK_RESIZE) {
+				fActivateOnMouseUp = true;
+				fMouseMoveDistance = 0.0f;
+				fLastMoveTime = system_time();
 			}
 		}
-
-		return true;
 	}
-	return false;
+
+	return true;
 }
 
 
@@ -209,7 +196,9 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 	Decorator* decorator = fWindow->Decorator();
 
 	bool invalidate = false;
-	if (decorator) {
+		// TODO: not used - can it be removed?
+
+	if (decorator != NULL) {
 		click_type action = _ActionFor(message);
 
 		// redraw decorator
@@ -411,9 +400,10 @@ int32
 DefaultWindowBehaviour::_ExtractButtons(const BMessage* message) const
 {
 	int32 buttons;
-	if (message->FindInt32("buttons", &buttons) != B_OK)
-		buttons = 0;
-	return buttons;
+	if (message->FindInt32("buttons", &buttons) == B_OK)
+		return buttons;
+
+	return 0;
 }
 
 
@@ -421,18 +411,17 @@ int32
 DefaultWindowBehaviour::_ExtractModifiers(const BMessage* message) const
 {
 	int32 modifiers;
-	if (message->FindInt32("modifiers", &modifiers) != B_OK)
-		modifiers = 0;
-	return modifiers;
+	if (message->FindInt32("modifiers", &modifiers) == B_OK)
+		return modifiers;
+
+	return 0;
 }
 
 
 click_type
 DefaultWindowBehaviour::_ActionFor(const BMessage* message) const
 {
-	Decorator* decorator = fWindow->Decorator();
-
-	if (decorator == NULL)
+	if (fWindow->Decorator() == NULL)
 		return CLICK_NONE;
 
 	int32 buttons = _ExtractButtons(message);
@@ -446,7 +435,6 @@ DefaultWindowBehaviour::_ActionFor(const BMessage* message, int32 buttons,
 	int32 modifiers) const
 {
 	Decorator* decorator = fWindow->Decorator();
-
 	if (decorator == NULL)
 		return CLICK_NONE;
 
