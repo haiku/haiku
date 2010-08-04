@@ -7,7 +7,7 @@
 
 
 #include <Box.h>
-#include <Country.h>
+#include <Locale.h>
 #include <String.h>
 #include <View.h>
 
@@ -37,7 +37,7 @@ const uint32 kMenuMessage = 'FRMT';
 
 class FormatView : public BView {
 public:
-								FormatView(const BCountry& country);
+								FormatView(const BLocale& locale);
 								~FormatView();
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -46,7 +46,7 @@ public:
 	virtual	void				SetDefaults();
 	virtual	bool				IsDefaultable() const;
 	virtual	void				Revert();
-	virtual	void				SetCountry(const BCountry& country);
+	virtual	void				SetLocale(const BLocale& locale);
 	virtual	void				RecordRevertSettings();
 	virtual	bool				IsRevertable() const;
 
@@ -81,9 +81,9 @@ private:
 
 			BString				fOriginalTimeFormat;
 			BString				fOriginalLongTimeFormat;
-			bool				fCountryIs24Hr;
+			bool				fLocaleIs24Hr;
 
-			BCountry			fCountry;
+			BLocale				fLocale;
 
 			BBox*				fDateBox;
 			BBox*				fTimeBox;

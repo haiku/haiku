@@ -347,6 +347,32 @@ RosterData::SetDefaultCountry(const BCountry& newCountry)
 
 
 status_t
+RosterData::SetDefaultLocale(const BLocale& newLocale)
+{
+	status_t status = B_OK;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	status = _SetDefaultLocale(newLocale);
+
+	if (status == B_OK)
+		status = _SaveLocaleSettings();
+
+	if (status == B_OK) {
+		BMessage updateMessage(B_LOCALE_CHANGED);
+		status = _AddDefaultCountryToMessage(&updateMessage);
+			// TODO : should be differenciated from country
+		if (status == B_OK)
+			status = be_roster->Broadcast(&updateMessage);
+	}
+
+	return status;
+}
+
+
+status_t
 RosterData::SetDefaultTimeZone(const BTimeZone& newZone)
 {
 	status_t status = B_OK;
@@ -414,18 +440,18 @@ RosterData::_LoadLocaleSettings()
 
 	if (status == B_OK) {
 		BString codeName;
-		BCountry newDefaultCountry;
+		BLocale newDefaultLocale;
 
 		if (settings.FindString("country", &codeName) == B_OK)
-			newDefaultCountry = BCountry(codeName);
+			newDefaultLocale = BLocale(codeName);
 
 		BString timeFormat;
 		if (settings.FindString("shortTimeFormat", &timeFormat) == B_OK)
-			newDefaultCountry.SetTimeFormat(timeFormat, false);
+			newDefaultLocale.SetTimeFormat(timeFormat, false);
 		if (settings.FindString("longTimeFormat", &timeFormat) == B_OK)
-			newDefaultCountry.SetTimeFormat(timeFormat, true);
+			newDefaultLocale.SetTimeFormat(timeFormat, true);
 
-		_SetDefaultCountry(newDefaultCountry);
+		_SetDefaultLocale(newDefaultLocale);
 
 		return B_OK;
 	}
@@ -526,7 +552,16 @@ RosterData::_SaveTimeSettings()
 status_t
 RosterData::_SetDefaultCountry(const BCountry& newCountry)
 {
-	fDefaultCountry = newCountry;
+	fDefaultLocale.SetCountry(newCountry);
+
+	return B_OK;
+}
+
+
+status_t
+RosterData::_SetDefaultLocale(const BLocale& newLocale)
+{
+	fDefaultLocale = newLocale;
 
 	return B_OK;
 }
@@ -556,8 +591,8 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 		if (!U_SUCCESS(icuError))
 			return B_ERROR;
 
-		fDefaultCollator = BCollator(langName.String());
-		fDefaultLanguage.SetTo(langName.String());
+		fDefaultLocale.SetCollator(BCollator(langName.String()));
+		fDefaultLocale.SetLanguage(langName.String());
 
 		fPreferredLanguages.RemoveName("language");
 		for (int i = 0; languages->FindString("language", i, &langName) == B_OK;
@@ -576,14 +611,14 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 status_t
 RosterData::_AddDefaultCountryToMessage(BMessage* message) const
 {
-	status_t status = message->AddString("country", fDefaultCountry.Code());
+	status_t status = message->AddString("country", fDefaultLocale.Code());
 	BString timeFormat;
 	if (status == B_OK)
-		status = fDefaultCountry.GetTimeFormat(timeFormat, false);
+		status = fDefaultLocale.GetTimeFormat(timeFormat, false);
 	if (status == B_OK)
 		status = message->AddString("shortTimeFormat", timeFormat.String());
 	if (status == B_OK)
-		status = fDefaultCountry.GetTimeFormat(timeFormat, true);
+		status = fDefaultLocale.GetTimeFormat(timeFormat, true);
 	if (status == B_OK)
 		status = message->AddString("longTimeFormat", timeFormat.String());
 
@@ -643,6 +678,13 @@ status_t
 MutableLocaleRoster::SetDefaultCountry(const BCountry& newCountry)
 {
 	return gRosterData.SetDefaultCountry(newCountry);
+}
+
+
+status_t
+MutableLocaleRoster::SetDefaultLocale(const BLocale& newLocale)
+{
+	return gRosterData.SetDefaultLocale(newLocale);
 }
 
 

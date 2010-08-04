@@ -105,9 +105,9 @@ TTimeEdit::DrawSection(uint32 index, bool hasFocus)
 	int* fieldPositions;
 	int fieldCount;
 
-	BCountry country;
-	be_locale_roster->GetDefaultCountry(&country);
-	country.FormatTime(&text, fieldPositions, fieldCount, time, true);
+	BLocale locale;
+	be_locale_roster->GetDefaultLocale(&locale);
+	locale.FormatTime(&text, fieldPositions, fieldCount, time, true);
 		// TODO : this should be cached somehow to not redo it for each field
 
 	if (index * 2 + 1 > (uint32)fieldCount) {
@@ -148,10 +148,10 @@ TTimeEdit::DrawSeparator(uint32 index)
 	int* fieldPositions;
 	int fieldCount;
 
-	BCountry country;
-	be_locale_roster->GetDefaultCountry(&country);
+	BLocale locale;
+	be_locale_roster->GetDefaultLocale(&locale);
 	time_t time = fTime.Time_t();
-	country.FormatTime(&text, fieldPositions, fieldCount, time, true);
+	locale.FormatTime(&text, fieldPositions, fieldCount, time, true);
 		// TODO : this should be cached somehow to not redo it for each field
 
 	if (index * 2 + 2 > (uint32)fieldCount) {
@@ -265,8 +265,8 @@ TTimeEdit::BuildDispatch(BMessage* message)
 
 	BDateElement* dateFormat;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetTimeFields(dateFormat, fieldCount, true);
 	if (fFocus > fieldCount) {
 		free(dateFormat);
@@ -303,8 +303,8 @@ TTimeEdit::_CheckRange()
 	int32 value = fHoldValue;
 	BDateElement* fields;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetTimeFields(fields, fieldCount, true);
 	if (fFocus > fieldCount) {
 		free(fields);
@@ -373,8 +373,8 @@ TTimeEdit::_IsValidDoubleDigi(int32 value)
 	bool isInRange = false;
 	BDateElement* fields;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetTimeFields(fields, fieldCount, true);
 	if (fFocus > fieldCount) {
 		free(fields);
@@ -412,8 +412,8 @@ TTimeEdit::_SectionValue(int32 index) const
 	int32 value;
 	BDateElement* fields;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetTimeFields(fields, fieldCount, true);
 	if (index > fieldCount) {
 		free(fields);
@@ -487,8 +487,8 @@ TDateEdit::KeyDown(const char* bytes, int32 numBytes)
 
 	BDateElement* dateFormat;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetDateFields(dateFormat, fieldCount, false);
 
 	if (dateFormat[section] == B_DATE_ELEMENT_YEAR) {
@@ -541,9 +541,9 @@ TDateEdit::DrawSection(uint32 index, bool hasFocus)
 	int* fieldPositions;
 	int fieldCount;
 
-	BCountry country;
-	be_locale_roster->GetDefaultCountry(&country);
-	country.FormatDate(&text, fieldPositions, fieldCount, dateTime.Time_t(),
+	BLocale locale;
+	be_locale_roster->GetDefaultLocale(&locale);
+	locale.FormatDate(&text, fieldPositions, fieldCount, dateTime.Time_t(),
 		false);
 		// TODO : this should be cached somehow to not redo it for each field
 
@@ -587,10 +587,10 @@ TDateEdit::DrawSeparator(uint32 index)
 	int* fieldPositions;
 	int fieldCount;
 
-	BCountry country;
-	be_locale_roster->GetDefaultCountry(&country);
+	BLocale locale;
+	be_locale_roster->GetDefaultLocale(&locale);
 	BDateTime dateTime(fDate, BTime());
-	country.FormatDate(&text, fieldPositions, fieldCount, dateTime.Time_t(),
+	locale.FormatDate(&text, fieldPositions, fieldCount, dateTime.Time_t(),
 		false);
 		// TODO : this should be cached somehow to not redo it for each field
 
@@ -716,8 +716,8 @@ TDateEdit::BuildDispatch(BMessage* message)
 
 	BDateElement* dateFormat;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetDateFields(dateFormat, fieldCount, false);
 	if (fFocus > fieldCount) {
 		free(dateFormat);
@@ -754,8 +754,8 @@ TDateEdit::_CheckRange()
 	int32 value = fHoldValue;
 	BDateElement* fields;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetDateFields(fields, fieldCount, false);
 	if (fFocus > fieldCount) {
 		free(fields);
@@ -811,8 +811,8 @@ TDateEdit::_IsValidDoubleDigi(int32 value)
 	bool isInRange = false;
 	BDateElement* fields;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetDateFields(fields, fieldCount, false);
 	if (fFocus > fieldCount) {
 		free(fields);
@@ -852,8 +852,8 @@ TDateEdit::_SectionValue(int32 index) const
 	int32 value = 0;
 	BDateElement* fields;
 	int fieldCount;
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 	here.GetDateFields(fields, fieldCount, false);
 	if (index > fieldCount) {
 		free(fields);

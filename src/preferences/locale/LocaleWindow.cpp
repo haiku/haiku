@@ -76,8 +76,8 @@ LocaleWindow::LocaleWindow()
 	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE
 		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BCountry defaultCountry;
-	be_locale_roster->GetDefaultCountry(&defaultCountry);
+	BLocale defaultLocale;
+	be_locale_roster->GetDefaultLocale(&defaultLocale);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
@@ -199,7 +199,7 @@ LocaleWindow::LocaleWindow()
 			= new LanguageListItem(countryName, countryCode,
 				NULL);
 		listView->AddItem(item);
-		if (!strcmp(countryCode, defaultCountry.Code()))
+		if (!strcmp(countryCode, defaultLocale.Code()))
 			currentItem = item;
 	}
 
@@ -211,7 +211,7 @@ LocaleWindow::LocaleWindow()
 	listView->SetExplicitMinSize(
 		BSize(25 * be_plain_font->Size(), B_SIZE_UNSET));
 
-	fFormatView = new FormatView(defaultCountry);
+	fFormatView = new FormatView(defaultLocale);
 
 	countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
 		.AddGroup(B_VERTICAL, 3)
@@ -360,8 +360,8 @@ LocaleWindow::MessageReceived(BMessage* message)
 			be_app_messenger.SendMessage(&newMessage);
 			SettingsChanged();
 
-			BCountry country(item->ID());
-			fFormatView->SetCountry(country);
+			BLocale locale(item->ID());
+			fFormatView->SetLocale(locale);
 			break;
 		}
 

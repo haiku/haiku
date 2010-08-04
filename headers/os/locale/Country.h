@@ -55,58 +55,9 @@ public:
 
 			const char*			GetLocalizedString(uint32 id) const;
 
-								// Date
-
-			status_t			FormatDate(char* string, size_t maxSize,
-									time_t time, bool longFormat);
-			status_t			FormatDate(BString* string, time_t time,
-									bool longFormat);
-			status_t			FormatDate(BString* string,
-									int*& fieldPositions, int& fieldCount,
-									time_t time, bool longFormat);
-			status_t			GetDateFields(BDateElement*& fields,
-									int& fieldCount, bool longFormat) const;
-			status_t			GetDateFormat(BString&, bool longFormat) const;
-			status_t			SetDateFormat(const char* formatString,
-									bool longFormat = true);
-
-			int					StartOfWeek() const;
-
-								// Time
-
-			status_t			FormatTime(char* string, size_t maxSize,
-									time_t time, bool longFormat);
-			status_t			FormatTime(BString* string, time_t time,
-									bool longFormat);
-			status_t			FormatTime(BString* string,
-									int*& fieldPositions, int& fieldCount,
-									time_t time, bool longFormat);
-			status_t			GetTimeFields(BDateElement*& fields,
-									int& fieldCount, bool longFormat) const;
-
-			status_t			SetTimeFormat(const char* formatString,
-									bool longFormat = true);
-			status_t			GetTimeFormat(BString& out,
-									bool longFormat) const;
-
-								// numbers
-
-			status_t			FormatNumber(char* string, size_t maxSize,
-									double value);
-			status_t			FormatNumber(BString* string, double value);
-			status_t			FormatNumber(char* string, size_t maxSize,
-									int32 value);
-			status_t			FormatNumber(BString* string, int32 value);
-
 								// measurements
 
 			int8				Measurement() const;
-
-								// monetary
-
-			ssize_t				FormatMonetary(char* string, size_t maxSize,
-									double value);
-			ssize_t				FormatMonetary(BString* string, double value);
 
 								// timezones
 
@@ -114,10 +65,6 @@ public:
 
 private:
 			icu_44::Locale*		fICULocale;
-			BString				fLongDateFormat;
-			BString				fShortDateFormat;
-			BString				fLongTimeFormat;
-			BString				fShortTimeFormat;
 };
 
 

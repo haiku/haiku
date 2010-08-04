@@ -7,6 +7,7 @@
 #include "LocaleSettings.h"
 
 #include <FindDirectory.h>
+#include <Locale.h>
 #include <MutableLocaleRoster.h>
 #include <Path.h>
 #include <String.h>
@@ -77,32 +78,32 @@ LocaleSettings::UpdateFrom(BMessage* message)
 		mutable_locale_roster->SetPreferredLanguages(message);
 	}
 
-	BCountry defaultCountry;
-	mutable_locale_roster->GetDefaultCountry(&defaultCountry);
+	BLocale defaultLocale;
+	mutable_locale_roster->GetDefaultLocale(&defaultLocale);
 
 	bool countryChanged = false;
 	if (message->FindString("country", &messageContent) == B_OK) {
 		fMessage.ReplaceString("country", messageContent);
 		fMessage.RemoveName("shortTimeFormat");
 		fMessage.RemoveName("longTimeFormat");
-		defaultCountry = BCountry(messageContent.String());
+		defaultLocale = BLocale(messageContent.String());
 		countryChanged = true;
 	}
 
 	if (message->FindString("shortTimeFormat", &messageContent) == B_OK) {
 		fMessage.RemoveName("shortTimeFormat");
 		fMessage.AddString("shortTimeFormat", messageContent);
-		defaultCountry.SetTimeFormat(messageContent, false);
+		defaultLocale.SetTimeFormat(messageContent, false);
 		countryChanged = true;
 	}
 
 	if (message->FindString("longTimeFormat", &messageContent) == B_OK) {
 		fMessage.RemoveName("longTimeFormat");
 		fMessage.AddString("longTimeFormat", messageContent);
-		defaultCountry.SetTimeFormat(messageContent, true);
+		defaultLocale.SetTimeFormat(messageContent, true);
 		countryChanged = true;
 	}
 
 	if (countryChanged)
-		mutable_locale_roster->SetDefaultCountry(defaultCountry);
+		mutable_locale_roster->SetDefaultLocale(defaultLocale);
 }

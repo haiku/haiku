@@ -17,12 +17,20 @@ class BString;
 
 class BLocale {
 public:
-								BLocale();
+								BLocale(const char* languageAndCountryCode
+									= "en_US");
+								BLocale(const BLocale& other);
+								BLocale& operator=(const BLocale& other);
 								~BLocale();
 
 			const BCollator*	Collator() const { return &fCollator; }
 			const BCountry*		Country() const { return &fCountry; }
 			const BLanguage*	Language() const { return &fLanguage; }
+			const char*			Code() const;
+
+			void				SetCountry(const BCountry& newCountry);
+			void				SetCollator(const BCollator& newCollator);
+			void				SetLanguage(const char* languageCode);
 
 			// see definitions in LocaleStrings.h
 			const char*			GetString(uint32 id);
@@ -35,16 +43,54 @@ public:
 			void				FormatDateTime(BString* buffer, const char* fmt,
 									time_t value);
 
-			// Country short-hands, TODO: all these should go, once the
-			// Date...Format classes are done
-			void				FormatDate(char* target, size_t maxSize,
-									time_t value, bool longFormat);
-			void				FormatDate(BString* target, time_t value,
+								// Date
+
+			status_t			FormatDate(char* string, size_t maxSize,
+									time_t time, bool longFormat);
+			status_t			FormatDate(BString* string, time_t time,
 									bool longFormat);
-			void				FormatTime(char* target, size_t maxSize,
-									time_t value, bool longFormat);
-			void				FormatTime(BString* target, time_t value,
+			status_t			FormatDate(BString* string,
+									int*& fieldPositions, int& fieldCount,
+									time_t time, bool longFormat);
+			status_t			GetDateFields(BDateElement*& fields,
+									int& fieldCount, bool longFormat) const;
+			status_t			GetDateFormat(BString&, bool longFormat) const;
+			status_t			SetDateFormat(const char* formatString,
+									bool longFormat = true);
+
+			int					StartOfWeek() const;
+
+								// Time
+
+			status_t			FormatTime(char* string, size_t maxSize,
+									time_t time, bool longFormat);
+			status_t			FormatTime(BString* string, time_t time,
 									bool longFormat);
+			status_t			FormatTime(BString* string,
+									int*& fieldPositions, int& fieldCount,
+									time_t time, bool longFormat);
+			status_t			GetTimeFields(BDateElement*& fields,
+									int& fieldCount, bool longFormat) const;
+
+			status_t			SetTimeFormat(const char* formatString,
+									bool longFormat = true);
+			status_t			GetTimeFormat(BString& out,
+									bool longFormat) const;
+
+								// numbers
+
+			status_t			FormatNumber(char* string, size_t maxSize,
+									double value);
+			status_t			FormatNumber(BString* string, double value);
+			status_t			FormatNumber(char* string, size_t maxSize,
+									int32 value);
+			status_t			FormatNumber(BString* string, int32 value);
+
+								// monetary
+
+			ssize_t				FormatMonetary(char* string, size_t maxSize,
+									double value);
+			ssize_t				FormatMonetary(BString* string, double value);
 
 			// Collator short-hands
 			int					StringCompare(const char* s1,
@@ -59,44 +105,16 @@ protected:
 			BCollator			fCollator;
 			BCountry			fCountry;
 			BLanguage			fLanguage;
+
+			icu_44::Locale*		fICULocale;
+			BString				fLongDateFormat;
+			BString				fShortDateFormat;
+			BString				fLongTimeFormat;
+			BString				fShortTimeFormat;
 };
 
 
-// global objects
-extern BLocale* be_locale;
-
-
-//----------------------------------------------------------------------
-//--- country short-hands inlines ---
-inline void
-BLocale::FormatDate(char* target, size_t maxSize, time_t timer, bool longFormat)
-{
-	fCountry.FormatDate(target, maxSize, timer, longFormat);
-}
-
-
-inline void
-BLocale::FormatDate(BString* target, time_t timer, bool longFormat)
-{
-	fCountry.FormatDate(target, timer, longFormat);
-}
-
-
-inline void
-BLocale::FormatTime(char* target, size_t maxSize, time_t timer, bool longFormat)
-{
-	fCountry.FormatTime(target, maxSize, timer, longFormat);
-}
-
-
-inline void
-BLocale::FormatTime(BString* target, time_t timer, bool longFormat)
-{
-	fCountry.FormatTime(target, timer, longFormat);
-}
-
-
-//--- locale short-hands inlines ---
+//--- collator short-hands inlines ---
 //	#pragma mark -
 
 inline int

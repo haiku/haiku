@@ -11,6 +11,7 @@
 #include <image.h>
 #include <Language.h>
 #include <List.h>
+#include <Locale.h>
 #include <Locker.h>
 #include <LocaleRoster.h>
 #include <Message.h>
@@ -33,6 +34,7 @@ public:
 								~MutableLocaleRoster();
 
 			status_t			SetDefaultCountry(const BCountry& country);
+			status_t			SetDefaultLocale(const BLocale& locale);
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);
 
 			status_t			SetPreferredLanguages(const BMessage* message);
@@ -106,9 +108,7 @@ struct RosterData {
 			BList				fCatalogAddOnInfos;
 			BMessage			fPreferredLanguages;
 
-			BCollator			fDefaultCollator;
-			BCountry			fDefaultCountry;
-			BLanguage			fDefaultLanguage;
+			BLocale				fDefaultLocale;
 			BTimeZone			fDefaultTimeZone;
 
 								RosterData();
@@ -122,6 +122,7 @@ struct RosterData {
 									const void* right);
 
 			status_t			SetDefaultCountry(const BCountry& country);
+			status_t			SetDefaultLocale(const BLocale& locale);
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);
 			status_t			SetPreferredLanguages(const BMessage* msg);
 private:
@@ -132,6 +133,7 @@ private:
 			status_t			_SaveTimeSettings();
 
 			status_t			_SetDefaultCountry(const BCountry& country);
+			status_t			_SetDefaultLocale(const BLocale& locale);
 			status_t			_SetDefaultTimeZone(const BTimeZone& zone);
 			status_t			_SetPreferredLanguages(const BMessage* msg);
 

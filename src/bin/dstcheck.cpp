@@ -84,8 +84,8 @@ TimedAlert::GetLabel(BString &string)
 	time(&t);
 	localtime_r(&t, &tm);
 
-	BCountry here;
-	be_locale_roster->GetDefaultCountry(&here);
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 
 	here.FormatTime(timestring, 15, t, false);
 

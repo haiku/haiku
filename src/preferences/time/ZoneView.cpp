@@ -374,7 +374,9 @@ TimeZoneView::_FormatTime(TimeZoneListItem* zoneItem)
 		return result;
 
 	time_t nowInTimeZone = time(NULL) + zoneItem->OffsetFromGMT();
-	be_locale->FormatTime(&result, nowInTimeZone, false);
+	BLocale locale;
+	be_locale_roster->GetDefaultLocale(&locale);
+	locale.FormatTime(&result, nowInTimeZone, false);
 
 	return result;
 }

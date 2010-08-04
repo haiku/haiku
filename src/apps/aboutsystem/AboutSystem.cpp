@@ -188,8 +188,9 @@ TranslationComparator(const void* left, const void* right)
 	language->GetTranslatedName(rightName);
 	delete language;
 
-	return be_locale->Collator()->Compare(leftName.String(),
-		rightName.String());
+	BCollator collator;
+	be_locale_roster->GetDefaultCollator(&collator);
+	return collator.Compare(leftName.String(), rightName.String());
 }
 
 

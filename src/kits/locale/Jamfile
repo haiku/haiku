@@ -40,7 +40,6 @@ local sources =
 	IntegerFormat.cpp
 	IntegerFormatImpl.cpp
 	IntegerFormatParameters.cpp
-	langinfo.cpp
 	NumberFormat.cpp
 	NumberFormatImpl.cpp
 	NumberFormatParameters.cpp
