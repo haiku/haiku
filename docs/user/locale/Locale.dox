@@ -12,7 +12,7 @@ accented chars and other special cases that vary over the different locales.
 */
 
 /*!
-\fn const BCollator* Collator() const
+\fn const BLocale::BCollator* Collator() const
 \brief Returns the collator associated to this locale
 
 Returns the collator in use for this locale, allowing you to use it to sort a
@@ -21,7 +21,7 @@ set of strings.
 */
 
 /*!
-\fn const BCountry* Country() const
+\fn const BLocale::BCountry* Country() const
 \brief Returns the country associated to this locale
 
 A locale is defined by the combination of a country and a language. This
@@ -31,14 +31,14 @@ data that is not language-dependant (such as the country flag).
 */
 
 /*!
-\fn const BLanguage* Language() const
+\fn const BLocale::BLanguage* Language() const
 \brief Returns the language associated to this locale
 
 */
 
 /*!
-\fn int StringCompare(const char* s1, const char* s2) const
-\fn int StringCompare(const BString* s1, const BString* s2) const
+\fn int BLocale::StringCompare(const char* s1, const char* s2) const
+\fn int BLocale::StringCompare(const BString* s1, const BString* s2) const
 \brief Compares two strings using the locale's collator
 
 These methods are short-hands to Collator()->StringCompare.
@@ -46,7 +46,7 @@ These methods are short-hands to Collator()->StringCompare.
 */
 
 /*!
-\fn void GetSortKey(const char* string, BString* key) const
+\fn void BLocale::GetSortKey(const char* string, BString* key) const
 \brief Computes the sort key of a string
 
 This method is a short-hand to Collator()->GetSortKey.

@@ -5,6 +5,7 @@
 
   - \ref app | \link app_intro \em Introduction \endlink
   - \ref drivers
+  - \ref locale | \link locale_intro \em Introduction \endlink
   - \ref midi1
   - \ref midi2 | \link midi2_intro \em Introduction \endlink
   - \ref support | \link support_intro \em Introduction \endlink
@@ -27,6 +28,8 @@
   \brief Collection of utility classes that are used throughout the API.
   \defgroup libbe (libbe.so)
   \defgroup libroot (libroot.so)
+  \defgroup locale (liblocale.so)
+  \brief Collection of classes for localizing applications.
 */
 
 ///// Subgroups /////
