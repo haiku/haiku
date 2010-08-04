@@ -61,7 +61,7 @@ local genericSources =
 	s_llround.c s_llroundf.c s_llroundl.c
 	s_lround.c s_lroundf.c s_lroundl.c
 	s_matherr.c
-	s_modf.c s_modff.c # s_modfl.c
+	s_modf.c s_modff.c s_modfl.c
 	s_nan.c s_nanf.c s_nanl.c
 	s_nextafter.c s_nextafterf.c
 	s_nexttowardl.c
