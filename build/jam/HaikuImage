@@ -506,8 +506,8 @@ AddBootModuleSymlinksToHaikuImage
 # add-ons
 AddFilesToHaikuImage system add-ons accelerants
 	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToHaikuImage system add-ons opengl
-	: Mesa\ Software\ Renderer ;
+AddFilesToHaikuHybridImage system add-ons opengl
+	: Mesa\ Software\ Renderer : : true ;
 AddFilesToHaikuHybridImage system add-ons Translators
 	: $(SYSTEM_ADD_ONS_TRANSLATORS) : : true ;
 AddFilesToHaikuImage system add-ons locale catalogs
