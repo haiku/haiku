@@ -139,6 +139,16 @@ keyboard(unsigned char key, int x, int y)
 				init();
 			break;
 		}
+
+		case 'l':
+		case 'L': {
+			// return to default window
+			glutLeaveGameMode();
+			if (!glutGetWindow())
+				// exit if none
+				exit(0);
+			break;
+		}
 	}
 }
 
