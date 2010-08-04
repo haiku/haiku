@@ -813,7 +813,7 @@ Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				// TODO: the latter is unlike BeOS - if we really wanted to
 				// imitate this behaviour, we would need to check if we're
 				// the front window instead of the focus window
-				if ((!acceptFirstClick || !desktopSettings.AcceptFirstClick())
+				if (!acceptFirstClick && !desktopSettings.AcceptFirstClick()
 					&& !avoidFocus)
 					return;
 			}
