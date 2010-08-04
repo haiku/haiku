@@ -65,6 +65,8 @@ public:
 								Desktop(uid_t userID, const char* targetScreen);
 	virtual						~Desktop();
 
+			void				RegisterListener(DesktopListener* listener);
+
 			status_t			Init();
 
 			uid_t				UserID() const { return fUserID; }
@@ -251,6 +253,7 @@ public:
 									BPrivate::LinkSender& sender);
 
 			WindowList&			CurrentWindows();
+			WindowList&			AllWindows();
 
 private:
 			WindowList&			_Windows(int32 index);

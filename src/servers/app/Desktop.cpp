@@ -359,6 +359,12 @@ Desktop::Desktop(uid_t userID, const char* targetScreen)
 		return;
 
 	fLink.SetReceiverPort(fMessagePort);
+
+	// register listeners
+	const DesktopListenerList& newListeners
+		= gDecorManager.GetDesktopListeners();
+	for (int i = 0; i < newListeners.CountItems(); i++)
+ 		RegisterListener(newListeners.ItemAt(i));
 }
 
 
@@ -369,6 +375,13 @@ Desktop::~Desktop()
 	delete_area(fSharedReadOnlyArea);
 	delete_port(fMessagePort);
 	gFontManager->DetachUser(fUserID);
+}
+
+
+void
+Desktop::RegisterListener(DesktopListener* listener)
+{
+	DesktopObservable::RegisterListener(listener, this);
 }
 
 
@@ -1906,6 +1919,20 @@ Desktop::ReloadDecor()
 {
 	AutoWriteLocker _(fWindowLock);
 
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+			BRegion oldBorder;
+			window->GetBorderRegion(&oldBorder);
+
+			window->ReloadDecor();
+
+			BRegion border;
+			window->GetBorderRegion(&border);
+
+			border.Include(&oldBorder);
+			_RebuildAndRedrawAfterWindowChange(window, border);
+	}
+
 	// TODO it is assumed all listeners are registered by one decor
 	// unregister old listeners
 	const DesktopListenerDLList& currentListeners = GetDesktopListenerList();
@@ -1917,22 +1944,6 @@ Desktop::ReloadDecor()
 		= gDecorManager.GetDesktopListeners();
 	for (int i = 0; i < newListeners.CountItems(); i++)
  		RegisterListener(newListeners.ItemAt(i));
-
-	for (int32 i = 0; i < kMaxWorkspaces; i++) {
-		for (Window* window = _Windows(i).LastWindow(); window;
-				window = window->PreviousWindow(i)) {
-			BRegion oldBorder;
-			window->GetBorderRegion(&oldBorder);
-
-			window->ReloadDecor();
-
-			BRegion border;
-			window->GetBorderRegion(&border);
-
-			border.Include(&oldBorder);
-			_RebuildAndRedrawAfterWindowChange(window, border);
-		}
-	}
 }
 
 
@@ -2460,6 +2471,13 @@ WindowList&
 Desktop::CurrentWindows()
 {
 	return fWorkspaces[fCurrentWorkspace].Windows();
+}
+
+
+WindowList&
+Desktop::AllWindows()
+{
+	return fAllWindows;
 }
 
 

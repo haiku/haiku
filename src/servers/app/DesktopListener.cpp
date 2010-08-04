@@ -25,9 +25,10 @@ DesktopObservable::DesktopObservable()
 
 
 void
-DesktopObservable::RegisterListener(DesktopListener* listener)
+DesktopObservable::RegisterListener(DesktopListener* listener, Desktop* desktop)
 {
 	fDesktopListenerList.Add(listener);
+	listener->ListenerRegistered(desktop);
 }
 
 
@@ -35,6 +36,7 @@ void
 DesktopObservable::UnregisterListener(DesktopListener* listener)
 {
 	fDesktopListenerList.Remove(listener);
+	listener->ListenerUnregistered();
 }
 
 

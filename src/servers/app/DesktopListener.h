@@ -15,12 +15,16 @@
 
 
 class BMessage;
+class Desktop;
 class Window;
 
 
 class DesktopListener : public DoublyLinkedListLinkImpl<DesktopListener> {
 public:
 	virtual						~DesktopListener();
+
+	virtual	void				ListenerRegistered(Desktop* desktop) = 0;
+	virtual	void				ListenerUnregistered() = 0;
 
 	virtual void				AddWindow(Window* window) = 0;
 	virtual void				RemoveWindow(Window* window) = 0;
@@ -61,7 +65,8 @@ class DesktopObservable {
 public:
 							DesktopObservable();
 
-		void				RegisterListener(DesktopListener* listener);
+		void				RegisterListener(DesktopListener* listener,
+								Desktop* desktop);
 		void				UnregisterListener(DesktopListener* listener);
 	const DesktopListenerDLList&	GetDesktopListenerList();
 
