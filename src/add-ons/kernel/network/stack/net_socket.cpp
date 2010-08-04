@@ -128,9 +128,10 @@ net_socket_private::~net_socket_private()
 		child->RemoveFromParent();
 	}
 
+	mutex_unlock(&lock);
+
 	put_domain_protocols(this);
 
-	mutex_unlock(&lock);
 	mutex_destroy(&lock);
 }
 
