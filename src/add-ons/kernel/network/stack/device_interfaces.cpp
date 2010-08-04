@@ -66,6 +66,8 @@ device_reader_thread(void* _interface)
 			}
 
 			fifo_enqueue_buffer(&interface->receive_queue, buffer);
+		} else if (status == B_DEVICE_NOT_FOUND) {
+				device_removed(device);
 		} else {
 			// In case of error, give the other threads some
 			// time to run since this is a high priority time thread.

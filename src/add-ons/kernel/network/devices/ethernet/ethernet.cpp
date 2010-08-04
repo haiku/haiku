@@ -278,7 +278,7 @@ ethernet_send_data(net_device *_device, net_buffer *buffer)
 		device->stats.send.errors++;
 		if (allocated)
 			gBufferModule->free(allocated);
-		return bytesWritten;
+		return errno;
 	}
 
 	device->stats.send.packets++;
@@ -323,7 +323,7 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 	bytesRead = read(device->fd, data, device->frame_size);
 	if (bytesRead < 0) {
 		device->stats.receive.errors++;
-		status = bytesRead;
+		status = errno;
 		goto err;
 	}
 //dump_block((const char *)data, bytesRead, "rcv: ");
