@@ -661,7 +661,7 @@ RosterData::_AddPreferredLanguagesToMessage(BMessage* message) const
 
 
 static MutableLocaleRoster gLocaleRoster;
-MutableLocaleRoster* mutable_locale_roster = &gLocaleRoster;
+MutableLocaleRoster* gMutableLocaleRoster = &gLocaleRoster;
 
 
 MutableLocaleRoster::MutableLocaleRoster()

@@ -46,7 +46,7 @@
 #include "TimeWindow.h"
 
 
-using BPrivate::mutable_locale_roster;
+using BPrivate::gMutableLocaleRoster;
 using BPrivate::ObjectDeleter;
 
 
@@ -355,7 +355,7 @@ TimeZoneView::_SetSystemTimeZone()
 	fCurrentZoneItem = (TimeZoneListItem*)(fZoneList->ItemAt(selection));
 	const BTimeZone& timeZone = fCurrentZoneItem->TimeZone();
 
-	mutable_locale_roster->SetDefaultTimeZone(timeZone);
+	gMutableLocaleRoster->SetDefaultTimeZone(timeZone);
 
 	_kern_set_timezone(timeZone.OffsetFromGMT());
 

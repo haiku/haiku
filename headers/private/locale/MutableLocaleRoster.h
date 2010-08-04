@@ -56,7 +56,7 @@ public:
 };
 
 
-extern MutableLocaleRoster* mutable_locale_roster;
+extern MutableLocaleRoster* gMutableLocaleRoster;
 
 
 typedef BCatalogAddOn* (*InstantiateCatalogFunc)(const char* name,

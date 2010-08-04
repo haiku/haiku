@@ -15,7 +15,7 @@
 #include <Roster.h>
 
 
-using BPrivate::mutable_locale_roster;
+using BPrivate::gMutableLocaleRoster;
 
 
 //#pragma mark - BCatalog
@@ -30,13 +30,13 @@ BCatalog::BCatalog(const char *signature, const char *language,
 	uint32 fingerprint)
 {
 	fCatalog
-		= mutable_locale_roster->LoadCatalog(signature, language, fingerprint);
+		= gMutableLocaleRoster->LoadCatalog(signature, language, fingerprint);
 }
 
 
 BCatalog::~BCatalog()
 {
-	mutable_locale_roster->UnloadCatalog(fCatalog);
+	gMutableLocaleRoster->UnloadCatalog(fCatalog);
 }
 
 
@@ -102,8 +102,8 @@ BCatalog::SetCatalog(const char* signature, uint32 fingerprint)
 {
 	// This is not thread safe. It is used only in ReadOnlyBootPrompt and should
 	// not do harm there, but not sure what to do about it…
-	mutable_locale_roster->UnloadCatalog(fCatalog);
-	fCatalog = mutable_locale_roster->LoadCatalog(signature, NULL, fingerprint);
+	gMutableLocaleRoster->UnloadCatalog(fCatalog);
+	fCatalog = gMutableLocaleRoster->LoadCatalog(signature, NULL, fingerprint);
 
 	return B_OK;
 }
@@ -268,7 +268,7 @@ namespace BPrivate {
 EditableCatalog::EditableCatalog(const char *type, const char *signature,
 	const char *language)
 {
-	fCatalog = mutable_locale_roster->CreateCatalog(type, signature, language);
+	fCatalog = gMutableLocaleRoster->CreateCatalog(type, signature, language);
 }
 
 

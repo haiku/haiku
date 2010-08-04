@@ -32,7 +32,7 @@
 #include "KeymapListItem.h"
 
 
-using BPrivate::mutable_locale_roster;
+using BPrivate::gMutableLocaleRoster;
 
 
 enum {
@@ -159,7 +159,7 @@ BootPromptWindow::MessageReceived(BMessage* message)
 				BMessage preferredLanguages;
 				preferredLanguages.AddString("language",
 					languageItem->Language());
-				mutable_locale_roster->SetPreferredLanguages(
+				gMutableLocaleRoster->SetPreferredLanguages(
 					&preferredLanguages);
 				_InitCatalog(true);
 			}
@@ -198,10 +198,10 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 		settings.AddString("language", language.String());
 	}
 
-	mutable_locale_roster->SetPreferredLanguages(&settings);
+	gMutableLocaleRoster->SetPreferredLanguages(&settings);
 
 	BCountry country(language.String(), language.ToUpper());
-	mutable_locale_roster->SetDefaultCountry(country);
+	gMutableLocaleRoster->SetDefaultCountry(country);
 }
 
 

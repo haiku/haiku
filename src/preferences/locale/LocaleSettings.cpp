@@ -14,7 +14,7 @@
 #include <SupportDefs.h>
 
 
-using BPrivate::mutable_locale_roster;
+using BPrivate::gMutableLocaleRoster;
 
 
 static const uint32 kMsgLocaleSettings = 'LCst';
@@ -75,11 +75,11 @@ LocaleSettings::UpdateFrom(BMessage* message)
 				break;
 			fMessage.AddString("language", messageContent);
 		}
-		mutable_locale_roster->SetPreferredLanguages(message);
+		gMutableLocaleRoster->SetPreferredLanguages(message);
 	}
 
 	BLocale defaultLocale;
-	mutable_locale_roster->GetDefaultLocale(&defaultLocale);
+	gMutableLocaleRoster->GetDefaultLocale(&defaultLocale);
 
 	bool countryChanged = false;
 	if (message->FindString("country", &messageContent) == B_OK) {
@@ -105,5 +105,5 @@ LocaleSettings::UpdateFrom(BMessage* message)
 	}
 
 	if (countryChanged)
-		mutable_locale_roster->SetDefaultLocale(defaultLocale);
+		gMutableLocaleRoster->SetDefaultLocale(defaultLocale);
 }

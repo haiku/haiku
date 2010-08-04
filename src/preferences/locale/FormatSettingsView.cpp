@@ -36,7 +36,7 @@
 
 #include <stdio.h>
 
-using BPrivate::mutable_locale_roster;
+using BPrivate::gMutableLocaleRoster;
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -360,7 +360,7 @@ FormatView::FormatView(const BLocale& locale)
 
 FormatView::~FormatView()
 {
-	mutable_locale_roster->SetDefaultLocale(fLocale);
+	gMutableLocaleRoster->SetDefaultLocale(fLocale);
 }
 
 
