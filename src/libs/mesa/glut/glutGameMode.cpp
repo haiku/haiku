@@ -28,7 +28,9 @@ GlutGameMode::GlutGameMode()
 	fRefreshRate(-1),
 	fModesList(NULL),
 	fModesCount(0),
-	fGameModeWorkspace(-1)
+	fGameModeWorkspace(-1),
+	fGameModeWindow(0),
+	fPreviousWindow(0)
 {
 }
 
@@ -111,21 +113,32 @@ GlutGameMode::Enter()
 	// a sligth different than the one we asked for...
 	screen.GetMode(fGameModeWorkspace, &fCurrentMode);
 
-	// create a new window in full screen
-	BString name;
-	name << "Game Mode " << fCurrentMode.virtual_width 
-		<< "x" << fCurrentMode.virtual_height 
-		<< ":" << _GetModePixelDepth(&fCurrentMode)
-		<< "@" << _GetModeRefreshRate(&fCurrentMode);
-	 
-	glutCreateWindow(name.String());
+	if (!fGameModeWindow) {
+		// create a new window
+		fPreviousWindow = glutGetWindow();
+		fGameModeWindow = glutCreateWindow("glutGameMode");
+		if (!fGameModeWindow)
+			return Leave();
+	} else
+		// make sure it's the current window
+		glutSetWindow(fGameModeWindow);
+
 	BDirectWindow *directWindow
 		= dynamic_cast<BDirectWindow*>(gState.currentWindow->Window());
 	if (directWindow == NULL)
 		// Hum?!
 		return B_ERROR;
 
+	// Give it some useless title, except for debugging (thread name).
+	BString name;
+	name << "Game Mode " << fCurrentMode.virtual_width
+		<< "x" << fCurrentMode.virtual_height
+		<< ":" << _GetModePixelDepth(&fCurrentMode)
+		<< "@" << _GetModeRefreshRate(&fCurrentMode);
+
+	// force the game mode window to fullscreen
 	directWindow->Lock();
+	directWindow->SetTitle(name.String());
 	directWindow->SetFullScreen(true);
 	directWindow->Unlock();
 
@@ -144,6 +157,13 @@ GlutGameMode::Leave()
 
 	if (fGameModeWorkspace < 0)
 		return B_ERROR;
+
+	if (fGameModeWindow) {
+		glutDestroyWindow(fGameModeWindow);
+		fGameModeWindow = 0;
+		if (fPreviousWindow)
+			glutSetWindow(fPreviousWindow);
+	}
 
 	if (_CompareModes(&fOriginalMode, &fCurrentMode)) {
 		// Restore original display mode

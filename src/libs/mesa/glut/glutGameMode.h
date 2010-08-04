@@ -52,6 +52,8 @@ private:
 	display_mode	fOriginalMode;
 	int				fGameModeWorkspace;
 	display_mode	fCurrentMode;
+	int				fGameModeWindow;
+	int				fPreviousWindow;
 
 };
 
