@@ -411,6 +411,8 @@ arp_remove_local_entry(arp_protocol* protocol, const sockaddr* local,
 {
 	in_addr_t inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
 
+	TRACE(("%s(): address %x\n", __FUNCTION__, inetAddress));
+
 	MutexLocker locker(sCacheLock);
 
 	arp_entry* entry = arp_entry::Lookup(inetAddress);
@@ -469,6 +471,8 @@ arp_set_local_entry(arp_protocol* protocol, const sockaddr* local)
 		inetAddress = INADDR_ANY;
 	} else
 		inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
+
+	TRACE(("%s(): address %x\n", __FUNCTION__, inetAddress));
 
 	if (protocol->local_address == 0)
 		protocol->local_address = inetAddress;
@@ -1073,6 +1077,7 @@ arp_change_address(net_datalink_protocol* _protocol,
 	const struct sockaddr* oldAddress, const struct sockaddr* newAddress)
 {
 	arp_protocol* protocol = (arp_protocol*)_protocol;
+	TRACE(("%s(option %" B_PRId32 ")\n", __FUNCTION__, option));
 
 	switch (option) {
 		case SIOCSIFADDR:
