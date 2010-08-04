@@ -75,22 +75,7 @@ protected:
 
 	virtual	void				_GetFootprint(BRegion *region);
 
-private:
-			void				_UpdateFont(DesktopSettings& settings);
- 			void				_DrawButtonBitmap(ServerBitmap* bitmap,
- 									BRect rect);
-			void				_DrawBlendedRect(DrawingEngine *engine,
-									BRect rect, bool down, bool focus);
-			void				_GetButtonSizeAndOffset(const BRect& tabRect,
-									float* offset, float* size,
-									float* inset) const;
-			void				_LayoutTabItems(const BRect& tabRect);
-			void 				_InvalidateBitmaps();
-
-	static	ServerBitmap*		_GetBitmapForButton(int32 item, bool down,
-									bool focus, int32 width, int32 height,
-									DefaultDecorator* object);
-
+protected:
 			rgb_color			fButtonHighColor;
 			rgb_color			fButtonLowColor;
 			rgb_color			fTabColor;
@@ -129,6 +114,22 @@ private:
 			float				fMaxTabSize;
 			BString				fTruncatedTitle;
 			int32				fTruncatedTitleLength;
+
+private:
+			void				_UpdateFont(DesktopSettings& settings);
+ 			void				_DrawButtonBitmap(ServerBitmap* bitmap,
+ 									BRect rect);
+			void				_DrawBlendedRect(DrawingEngine *engine,
+									BRect rect, bool down, bool focus);
+			void				_GetButtonSizeAndOffset(const BRect& tabRect,
+									float* offset, float* size,
+									float* inset) const;
+			void				_LayoutTabItems(const BRect& tabRect);
+			void 				_InvalidateBitmaps();
+
+	static	ServerBitmap*		_GetBitmapForButton(int32 item, bool down,
+									bool focus, int32 width, int32 height,
+									DefaultDecorator* object);
 
 			bigtime_t			fLastClicked;
 			bool				fWasDoubleClick;
