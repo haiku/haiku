@@ -738,11 +738,7 @@ DesktopSettings::DesktopSettings(Desktop* desktop)
 	:
 	fSettings(desktop->fSettings)
 {
-#if DEBUG
-	if (!desktop->fWindowLock.IsWriteLocked()
-		&& !desktop->fWindowLock.IsReadLocked())
-		debugger("desktop not locked when trying to access settings");
-#endif
+
 }
 
 
@@ -883,7 +879,8 @@ DesktopSettings::IsSubpixelOrderingRegular() const
 
 
 LockedDesktopSettings::LockedDesktopSettings(Desktop* desktop)
-	: DesktopSettings(desktop),
+	:
+	DesktopSettings(desktop),
 	fDesktop(desktop)
 {
 #if DEBUG
