@@ -969,6 +969,13 @@ Interface::_ChangeAddress(RecursiveLocker& locker, InterfaceAddress* address,
 			originalAddress) != B_OK)
 		oldAddress.ss_family = AF_UNSPEC;
 
+	// Test if anything changed for real
+	if (!address->domain->address_module->equal_addresses(originalAddress,
+			newAddress)) {
+		// Nothing to do
+		return B_OK;
+	}
+
 	// TODO: mark this address busy or call while holding the lock!
 	address->AcquireReference();
 	locker.Unlock();
