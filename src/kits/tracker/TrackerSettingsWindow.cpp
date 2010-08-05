@@ -120,8 +120,6 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 		new DesktopSettingsView(rect)));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Windows"),
 		new WindowsSettingsView(rect)));
-	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Date & Time"),
-		new TimeFormatSettingsView(rect)));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Trash"),
 		new TrashSettingsView(rect)));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Volume icons"),

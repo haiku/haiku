@@ -134,44 +134,6 @@ class WindowsSettingsView : public SettingsView {
 		typedef SettingsView _inherited;
 };
 
-class TimeFormatSettingsView : public SettingsView {
-	public:
-		TimeFormatSettingsView(BRect frame);
-
-		virtual void MessageReceived(BMessage *message);
-		virtual void AttachedToWindow();
-		virtual void GetPreferredSize(float *_width, float *_height);
-
-		virtual void SetDefaults();
-		virtual bool IsDefaultable() const;
-		virtual void Revert();
-		virtual void ShowCurrentSettings();
-		virtual void RecordRevertSettings();
-		virtual bool IsRevertable() const;
-
-	private:
-		void _UpdateExamples();
-		void _SendNotices();
-
-		BRadioButton *f24HrRadioButton;
-		BRadioButton *f12HrRadioButton;
-
-		BRadioButton *fYMDRadioButton;
-		BRadioButton *fDMYRadioButton;
-		BRadioButton *fMDYRadioButton;
-
-		BMenuField *fSeparatorMenuField;
-
-		BStringView *fLongDateExampleView;
-		BStringView *fShortDateExampleView;
-
-		bool f24HrClock;
-
-		FormatSeparator fSeparator;
-		DateOrder fFormat;
-
-		typedef SettingsView _inherited;
-};
 
 class SpaceBarSettingsView : public SettingsView {
 	public:
