@@ -28,7 +28,7 @@
   \brief Collection of utility classes that are used throughout the API.
   \defgroup libbe (libbe.so)
   \defgroup libroot (libroot.so)
-  \defgroup locale (liblocale.so)
+  \defgroup locale Locale Kit
   \brief Collection of classes for localizing applications.
 */
 

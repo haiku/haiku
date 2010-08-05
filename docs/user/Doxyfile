@@ -473,6 +473,7 @@ INPUT                  = . \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \
+                         ../../headers/os/locale \
                          ../../headers/os/midi2 \
                          ../../headers/os/support \
                          ../../headers/posix/syslog.h
