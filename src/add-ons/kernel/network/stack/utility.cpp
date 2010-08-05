@@ -123,11 +123,11 @@ base_fifo_clear(FifoType* fifo)
 }
 
 
-//	#pragma mark -
+// #pragma mark - UserBuffer
 
 
 void*
-UserBuffer::Copy(void* source, size_t length)
+UserBuffer::Push(void* source, size_t length)
 {
 	if (fStatus != B_OK)
 		return NULL;
@@ -139,7 +139,7 @@ UserBuffer::Copy(void* source, size_t length)
 
 #ifdef _KERNEL_MODE
 	fStatus = user_memcpy(fBuffer, source, length);
-	if (fStatus < B_OK)
+	if (fStatus != B_OK)
 		return NULL;
 #else
 	memcpy(fBuffer, source, length);
@@ -152,6 +152,36 @@ UserBuffer::Copy(void* source, size_t length)
 
 	return current;
 }
+
+
+status_t
+UserBuffer::Pad(size_t length)
+{
+	if (fStatus != B_OK)
+		return fStatus;
+
+	if (fAvailable < length)
+		return fStatus = ENOBUFS;
+
+	fStatus = user_memset(fBuffer, 0, length);
+	if (fStatus != B_OK)
+		return fStatus;
+
+	fAvailable -= length;
+	fBuffer += length;
+
+	return B_OK;
+}
+
+
+status_t
+UserBuffer::PadToNext(size_t length)
+{
+	return Pad((BytesConsumed() + length - 1) / length - BytesConsumed());
+}
+
+
+// #pragma mark -
 
 
 uint16

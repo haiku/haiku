@@ -14,16 +14,22 @@
 
 class UserBuffer {
 public:
-	UserBuffer(void* buffer, size_t size);
+								UserBuffer(void* buffer, size_t size);
 
-	void* Copy(void* source, size_t size);
-	status_t Status() const;
-	size_t ConsumedAmount() const;
+			void*				Push(void* source, size_t size);
+			status_t			Pad(size_t length);
+			status_t			PadToNext(size_t length);
+
+			status_t			Status() const
+									{ return fStatus; }
+			size_t				BytesConsumed() const
+									{ return fBufferSize - fAvailable; }
 
 private:
-	uint8* fBuffer;
-	size_t fBufferSize, fAvailable;
-	status_t fStatus;
+			uint8*				fBuffer;
+			size_t				fBufferSize;
+			size_t				fAvailable;
+			status_t			fStatus;
 };
 
 
@@ -35,20 +41,6 @@ UserBuffer::UserBuffer(void* buffer, size_t size)
 	fAvailable(size),
 	fStatus(B_OK)
 {
-}
-
-
-inline status_t
-UserBuffer::Status() const
-{
-	return fStatus;
-}
-
-
-inline size_t
-UserBuffer::ConsumedAmount() const
-{
-	return fBufferSize - fAvailable;
 }
 
 

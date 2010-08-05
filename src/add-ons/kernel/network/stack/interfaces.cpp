@@ -1385,27 +1385,38 @@ list_interfaces(int family, void* _buffer, size_t* bufferSize)
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
-		ifreq request;
-		strlcpy(request.ifr_name, interface->name, IF_NAMESIZE);
+		// Copy name
+		buffer.Push(interface->name, IF_NAMESIZE);
 
+		// Copy address
 		InterfaceAddress* address = interface->FirstForFamily(family);
+		sockaddr_storage storage;
+
 		if (address != NULL && address->local != NULL) {
-			// copy actual address
-			memcpy(&request.ifr_addr, address->local, address->local->sa_len);
+			// Actual address
+			memcpy(&storage, address->local, address->local->sa_len);
 		} else {
-			// empty address
-			request.ifr_addr.sa_len = 2;
-			request.ifr_addr.sa_family = AF_UNSPEC;
+			// Empty address
+			storage.ss_len = 2;
+			storage.ss_family = AF_UNSPEC;
 		}
+
+		if (storage.ss_len < sizeof(sockaddr)) {
+			// Make sure at least sizeof(sockaddr) bytes are written for
+			// compatibility with other platforms
+			memset((uint8*)&storage + storage.ss_len, 0,
+				sizeof(sockaddr) - storage.ss_len);
+			storage.ss_len = sizeof(sockaddr);
+		}
+
 		if (address != NULL)
 			address->ReleaseReference();
 
-		if (buffer.Copy(&request, IF_NAMESIZE
-				+ request.ifr_addr.sa_len) == NULL)
+		if (buffer.Push(&storage, storage.ss_len) == NULL)
 			return buffer.Status();
 	}
 
-	*bufferSize = buffer.ConsumedAmount();
+	*bufferSize = buffer.BytesConsumed();
 	return B_OK;
 }
 

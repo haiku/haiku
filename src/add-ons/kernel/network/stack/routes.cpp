@@ -282,7 +282,7 @@ copy_address(UserBuffer& buffer, sockaddr* address)
 	if (address == NULL)
 		return NULL;
 
-	return (sockaddr*)buffer.Copy(address, address->sa_len);
+	return (sockaddr*)buffer.Push(address, address->sa_len);
 }
 
 

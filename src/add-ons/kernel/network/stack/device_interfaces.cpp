@@ -292,7 +292,8 @@ acquire_device_interface(net_device_interface* interface)
 
 
 void
-get_device_interface_address(net_device_interface* interface, sockaddr* _address)
+get_device_interface_address(net_device_interface* interface,
+	sockaddr* _address)
 {
 	sockaddr_dl &address = *(sockaddr_dl*)_address;
 
@@ -306,8 +307,7 @@ get_device_interface_address(net_device_interface* interface, sockaddr* _address
 	address.sdl_alen = interface->device->address.length;
 	memcpy(LLADDR(&address), interface->device->address.data, address.sdl_alen);
 
-	address.sdl_len = sizeof(sockaddr_dl) - sizeof(address.sdl_data)
-		+ address.sdl_nlen + address.sdl_alen;
+	address.sdl_len = sizeof(sockaddr_dl);
 }
 
 
@@ -341,15 +341,16 @@ list_device_interfaces(void* _buffer, size_t* bufferSize)
 	UserBuffer buffer(_buffer, *bufferSize);
 
 	while (net_device_interface* interface = iterator.Next()) {
-		ifreq request;
-		strlcpy(request.ifr_name, interface->device->name, IF_NAMESIZE);
-		get_device_interface_address(interface, &request.ifr_addr);
+		buffer.Push(interface->device->name, IF_NAMESIZE);
 
-		if (buffer.Copy(&request, IF_NAMESIZE + request.ifr_addr.sa_len) == NULL)
+		sockaddr address;
+		get_device_interface_address(interface, &address);
+
+		if (buffer.Push(&address, address.sa_len) == NULL)
 			return buffer.Status();
 	}
 
-	*bufferSize = buffer.ConsumedAmount();
+	*bufferSize = buffer.BytesConsumed();
 	return B_OK;
 }
 
