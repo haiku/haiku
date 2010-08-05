@@ -289,6 +289,8 @@ public:
       replace (__o, l-f, (size_type)0, (charT)0);selfish ();
       return ibegin() + __o; }
 
+  void clear()
+    { erase(begin(), end()); }
   basic_string& replace (size_type pos1, size_type n1, const basic_string& str,
 			 size_type pos2 = 0, size_type n2 = npos);
   basic_string& replace (size_type pos, size_type n1, const charT* s,
