@@ -74,10 +74,13 @@ extern char 		*strptime(const char *buf, const char *format, struct tm *tm);
 
 /* special timezone support */
 extern void tzset(void);
+
+/* non-POSIX */
 extern int	stime(const time_t *t);
 
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	/* _TIME_H_ */
