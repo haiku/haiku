@@ -167,9 +167,12 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		fWindow->RegionPool()->Recycle(visibleBorder);
 	}
 
-	if (action == CLICK_MOVE_TO_BACK)
-		fDesktop->SendWindowBehind(fWindow);
-	else {
+	if (action == CLICK_MOVE_TO_BACK) {
+		if (!fIsDragging || fWindow != fDesktop->BackWindow())
+			fDesktop->SendWindowBehind(fWindow);
+		else
+			fDesktop->ActivateWindow(fWindow);
+	} else {
 		fDesktop->SetMouseEventWindow(fWindow);
 
 		// activate window if in click to activate mode, else only focus it
