@@ -127,6 +127,35 @@ static mutex sCacheLock;
 static bool sIgnoreReplies;
 
 
+#ifdef TRACE_ARP
+
+
+const char*
+mac_to_string(uint8* address)
+{
+	static char buffer[20];
+	snprintf(buffer, sizeof(buffer), "%02x:%02x:%02x:%02x:%02x:%02x",
+		address[0], address[1], address[2], address[3], address[4], address[5]);
+	return buffer;
+}
+
+
+const char*
+inet_to_string(in_addr_t address)
+{
+	static char buffer[20];
+
+	unsigned int hostAddress = ntohl(address);
+	snprintf(buffer, sizeof(buffer), "%d.%d.%d.%d",
+		hostAddress >> 24, (hostAddress >> 16) & 0xff,
+		(hostAddress >> 8) & 0xff, hostAddress & 0xff);
+	return buffer;
+}
+
+
+#endif	// TRACE_ARP
+
+
 static net_buffer*
 get_request_buffer(arp_entry* entry)
 {
@@ -163,6 +192,33 @@ delete_request_buffer(arp_entry* entry)
 	if (buffer != NULL && buffer != kDeletedBuffer)
 		gBufferModule->free(buffer);
 }
+
+
+static void
+ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
+{
+	// RFC 1112 - Host extensions for IP multicasting
+	//
+	//   ``An IP host group address is mapped to an Ethernet multicast
+	//   address by placing the low-order 23-bits of the IP address into
+	//   the low-order 23 bits of the Ethernet multicast address
+	//   01-00-5E-00-00-00 (hex).''
+
+	destination->sdl_len = sizeof(sockaddr_dl);
+	destination->sdl_family = AF_LINK;
+	destination->sdl_index = 0;
+	destination->sdl_type = IFT_ETHER;
+	destination->sdl_e_type = ETHER_TYPE_IP;
+	destination->sdl_nlen = destination->sdl_slen = 0;
+	destination->sdl_alen = ETHER_ADDRESS_LENGTH;
+
+	memcpy(LLADDR(destination) + 2, &source->sin_addr, sizeof(in_addr));
+	uint32 *data = (uint32 *)LLADDR(destination);
+	data[0] = (data[0] & htonl(0x7f)) | htonl(0x01005e00);
+}
+
+
+// #pragma mark -
 
 
 /*static*/ int
@@ -316,33 +372,6 @@ arp_entry::ScheduleRemoval()
 //	#pragma mark -
 
 
-static void
-ipv4_to_ether_multicast(sockaddr_dl *destination, const sockaddr_in *source)
-{
-	// RFC 1112 - Host extensions for IP multicasting
-	//
-	//   ``An IP host group address is mapped to an Ethernet multicast
-	//   address by placing the low-order 23-bits of the IP address into
-	//   the low-order 23 bits of the Ethernet multicast address
-	//   01-00-5E-00-00-00 (hex).''
-
-	destination->sdl_len = sizeof(sockaddr_dl);
-	destination->sdl_family = AF_LINK;
-	destination->sdl_index = 0;
-	destination->sdl_type = IFT_ETHER;
-	destination->sdl_e_type = ETHER_TYPE_IP;
-	destination->sdl_nlen = destination->sdl_slen = 0;
-	destination->sdl_alen = ETHER_ADDRESS_LENGTH;
-
-	memcpy(LLADDR(destination) + 2, &source->sin_addr, sizeof(in_addr));
-	uint32 *data = (uint32 *)LLADDR(destination);
-	data[0] = (data[0] & htonl(0x7f)) | htonl(0x01005e00);
-}
-
-
-//	#pragma mark -
-
-
 /*!	Updates the entry determined by \a protocolAddress with the specified
 	\a hardwareAddress.
 	If such an entry does not exist yet, a new entry is added. If you try
@@ -379,6 +408,7 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 
 		entry->hardware_address = *hardwareAddress;
 		entry->timestamp = system_time();
+		entry->protocol = NULL;
 	} else {
 		entry = arp_entry::Add(protocolAddress, hardwareAddress, flags);
 		if (entry == NULL)
@@ -393,7 +423,7 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 		sStackModule->set_timer(&entry->timer, ARP_STALE_TIMEOUT);
 	}
 
-	if (entry->flags & ARP_FLAG_REJECT)
+	if ((entry->flags & ARP_FLAG_REJECT) != 0)
 		entry->MarkFailed();
 	else
 		entry->MarkValid();
@@ -409,9 +439,15 @@ static void
 arp_remove_local_entry(arp_protocol* protocol, const sockaddr* local,
 	bool updateLocalAddress)
 {
-	in_addr_t inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
+	in_addr_t inetAddress;
 
-	TRACE(("%s(): address %x\n", __FUNCTION__, inetAddress));
+	if (local == NULL) {
+		// interface has not yet been set
+		inetAddress = INADDR_ANY;
+	} else
+		inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
+
+	TRACE(("%s(): address %s\n", __FUNCTION__, inet_to_string(inetAddress)));
 
 	MutexLocker locker(sCacheLock);
 
@@ -462,17 +498,17 @@ static status_t
 arp_set_local_entry(arp_protocol* protocol, const sockaddr* local)
 {
 	MutexLocker locker(sCacheLock);
-	
+
 	net_interface* interface = protocol->interface;
 	in_addr_t inetAddress;
-	
+
 	if (local == NULL) {
 		// interface has not yet been set
 		inetAddress = INADDR_ANY;
 	} else
 		inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
 
-	TRACE(("%s(): address %x\n", __FUNCTION__, inetAddress));
+	TRACE(("%s(): address %s\n", __FUNCTION__, inet_to_string(inetAddress)));
 
 	if (protocol->local_address == 0)
 		protocol->local_address = inetAddress;
@@ -545,7 +581,7 @@ handle_arp_request(net_buffer *buffer, arp_header &header)
 	// check if this request is for us
 
 	arp_entry *entry = arp_entry::Lookup(header.protocol_target);
-	if (entry == NULL
+	if (entry == NULL || entry->protocol == NULL
 		|| (entry->flags & (ARP_FLAG_LOCAL | ARP_FLAG_PUBLISH)) == 0) {
 		// We're not the one to answer this request
 		// TODO: instead of letting the other's request time-out, can we reply
@@ -603,21 +639,11 @@ arp_receive(void *cookie, net_device *device, net_buffer *buffer)
 	uint16 opcode = ntohs(header.opcode);
 
 #ifdef TRACE_ARP
-	dprintf("  hw sender: %02x:%02x:%02x:%02x:%02x:%02x\n",
-		header.hardware_sender[0], header.hardware_sender[1],
-		header.hardware_sender[2], header.hardware_sender[3],
-		header.hardware_sender[4], header.hardware_sender[5]);
-	unsigned int addr = ntohl(header.protocol_sender);
-	dprintf("  proto sender: %d.%d.%d.%d\n", addr >> 24, (addr >> 16) & 0xff,
-		(addr >> 8) & 0xff, addr & 0xff);
-	dprintf("  hw target: %02x:%02x:%02x:%02x:%02x:%02x\n",
-		header.hardware_target[0], header.hardware_target[1],
-		header.hardware_target[2], header.hardware_target[3],
-		header.hardware_target[4], header.hardware_target[5]);
-	addr = ntohl(header.protocol_target);
-	dprintf("  proto target: %d.%d.%d.%d\n", addr >> 24, (addr >> 16) & 0xff,
-		(addr >> 8) & 0xff, addr & 0xff);
-#endif
+	dprintf("  hw sender: %s\n", mac_to_string(header.hardware_sender));
+	dprintf("  proto sender: %s\n", inet_to_string(header.protocol_sender));
+	dprintf("  hw target: %s\n", mac_to_string(header.hardware_target));;
+	dprintf("  proto target: %s\n", inet_to_string(header.protocol_target));
+#endif	// TRACE_ARP
 
 	if (ntohs(header.protocol_type) != ETHER_TYPE_IP
 		|| ntohs(header.hardware_type) != ARP_HARDWARE_TYPE_ETHER)
@@ -698,7 +724,8 @@ arp_timer(struct net_timer *timer, void *data)
 
 		default:
 		{
-			if (entry->timer_state > ARP_STATE_LAST_REQUEST)
+			if (entry->timer_state > ARP_STATE_LAST_REQUEST
+				|| entry->protocol == NULL)
 				break;
 
 			TRACE(("  send request for ARP entry %p!\n", entry));
@@ -946,7 +973,7 @@ arp_uninit()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - net_datalink_protocol
 
 
 status_t
@@ -1023,7 +1050,7 @@ arp_send_data(net_datalink_protocol *_protocol, net_buffer *buffer)
 
 			if ((entry->flags & ARP_FLAG_REJECT) != 0)
 				return EHOSTUNREACH;
-			
+
 			if ((entry->flags & ARP_FLAG_VALID) == 0) {
 				// entry is still being resolved.
 				TRACE(("ARP Queuing packet %p, entry still being resolved.\n",
@@ -1086,16 +1113,17 @@ arp_change_address(net_datalink_protocol* _protocol,
 			// Those are the options we handle
 			if ((protocol->interface->flags & IFF_UP) != 0) {
 				// Update ARP entry for the local address
-			
+
 				if (newAddress != NULL && newAddress->sa_family == AF_INET) {
 					status_t status = arp_set_local_entry(protocol, newAddress);
 					if (status != B_OK)
 						return status;
 				}
 
-				if (oldAddress != NULL && oldAddress->sa_family == AF_INET)
+				if (option != SIOCAIFADDR
+					&& (oldAddress == NULL || oldAddress->sa_family == AF_INET))
 					arp_remove_local_entry(protocol, oldAddress, true);
-			}			
+			}
 			break;
 
 		default:
