@@ -8,8 +8,9 @@
  *		Eric Petit <eric.petit@lapsus.org>
  */
 
-#include "GlobalData.h"
 #include <string.h>
+#include <SupportDefs.h>
+#include "GlobalData.h"
 
 #define MODE_FLAGS (B_8_BIT_DAC|B_PARALLEL_ACCESS)
 #define MODE_COUNT (sizeof(kModeList) / sizeof(display_mode))
@@ -60,7 +61,7 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low,
 uint32
 ACCELERANT_MODE_COUNT()
 {
-	TRACE("ACCELERANT_MODE_COUNT: %d\n", MODE_COUNT);
+	TRACE("ACCELERANT_MODE_COUNT: %"B_PRIuSIZE"\n", MODE_COUNT);
 	return MODE_COUNT;
 }
 

@@ -8,6 +8,7 @@
  *		Eric Petit <eric.petit@lapsus.org>
  */
 
+#include <string.h>
 #include "GlobalData.h"
 
 

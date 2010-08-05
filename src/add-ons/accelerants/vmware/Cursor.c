@@ -9,6 +9,8 @@
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
+
+#include <string.h>
 #include "GlobalData.h"
 
 
