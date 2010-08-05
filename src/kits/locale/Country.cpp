@@ -79,17 +79,6 @@ BCountry::GetName(BString& name) const
 }
 
 
-bool
-BCountry::GetLocaleName(BString& name) const
-{
-	UnicodeString uString;
-	fICULocale->getDisplayName(uString);
-	BStringByteSink stringConverter(&name);
-	uString.toUTF8(stringConverter);
-	return true;
-}
-
-
 const char*
 BCountry::Code() const
 {

@@ -125,6 +125,16 @@ BLocale::Code() const
 }
 
 
+bool
+BLocale::GetName(BString& name) const
+{
+	UnicodeString uString;
+	fICULocale->getDisplayName(uString);
+	BStringByteSink stringConverter(&name);
+	uString.toUTF8(stringConverter);
+	return true;
+}
+
 // #pragma mark - Date
 
 

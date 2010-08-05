@@ -190,10 +190,10 @@ LocaleWindow::LocaleWindow()
 	LanguageListItem* currentItem = NULL;
 	for (int i = 0; countryList.FindString("langs", i, &countryCode) == B_OK;
 			i++) {
-		BCountry country(countryCode);
+		BLocale locale(countryCode);
 		BString countryName;
 
-		country.GetLocaleName(countryName);
+		locale.GetName(countryName);
 
 		LanguageListItem* item
 			= new LanguageListItem(countryName, countryCode,

@@ -49,7 +49,6 @@ public:
 								~BCountry();
 
 			bool				GetName(BString& name) const;
-			bool				GetLocaleName(BString& name) const;
 			const char*			Code() const;
 			status_t			GetIcon(BBitmap* result) const;
 

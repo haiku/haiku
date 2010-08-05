@@ -27,6 +27,7 @@ public:
 			const BCountry*		Country() const { return &fCountry; }
 			const BLanguage*	Language() const { return &fLanguage; }
 			const char*			Code() const;
+			bool				GetName(BString& name) const;
 
 			void				SetCountry(const BCountry& newCountry);
 			void				SetCollator(const BCollator& newCollator);
