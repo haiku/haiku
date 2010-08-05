@@ -104,7 +104,7 @@ BLocaleRoster::GetDefaultLanguage(BLanguage* language) const
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	*language = *gRosterData.fDefaultLocale.Language();
+	*language = gRosterData.fDefaultLanguage;
 
 	return B_OK;
 }

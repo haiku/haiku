@@ -592,7 +592,7 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 			return B_ERROR;
 
 		fDefaultLocale.SetCollator(BCollator(langName.String()));
-		fDefaultLocale.SetLanguage(langName.String());
+		fDefaultLanguage.SetTo(langName.String());
 
 		fPreferredLanguages.RemoveName("language");
 		for (int i = 0; languages->FindString("language", i, &langName) == B_OK;
