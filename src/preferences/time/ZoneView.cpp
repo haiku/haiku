@@ -22,11 +22,13 @@
 #include <Collator.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <File.h>
 #include <FindDirectory.h>
 #include <ListItem.h>
 #include <Locale.h>
 #include <MutableLocaleRoster.h>
 #include <OutlineListView.h>
+#include <Path.h>
 #include <ScrollView.h>
 #include <StorageDefs.h>
 #include <String.h>
@@ -34,6 +36,7 @@
 #include <View.h>
 #include <Window.h>
 
+#include <localtime.h>
 #include <syscalls.h>
 
 #include <unicode/datefmt.h>
@@ -345,7 +348,8 @@ TimeZoneView::_SetSystemTimeZone()
 {
 	/*	Set sytem timezone for all different API levels. How to do this?
 	 *	1) tell locale-roster about new default timezone
-	 *	2) write new POSIX-timezone file
+	 *	2) tell kernel about new timezone offset
+	 *	3) write new POSIX-timezone-info file
 	 */
 
 	int32 selection = fZoneList->CurrentSelection();
@@ -358,6 +362,27 @@ TimeZoneView::_SetSystemTimeZone()
 	gMutableLocaleRoster->SetDefaultTimeZone(timeZone);
 
 	_kern_set_timezone(timeZone.OffsetFromGMT());
+
+	BPath path;
+	status_t status = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true);
+	BFile file;
+	if (status == B_OK) {
+		path.Append(BPrivate::skPosixTimeZoneInfoFile);
+		status = file.SetTo(path.Path(),
+			B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
+	}
+	if (status == B_OK) {
+		BPrivate::time_zone_info tzInfo;
+		tzInfo.offset_from_gmt = timeZone.OffsetFromGMT();
+		tzInfo.uses_daylight_saving = timeZone.SupportsDaylightSaving();
+		strlcpy(tzInfo.short_std_name, timeZone.ShortName().String(),
+			BPrivate::skTimeZoneInfoNameMax);
+		strlcpy(tzInfo.short_dst_name,
+			timeZone.ShortDaylightSavingName().String(),
+			BPrivate::skTimeZoneInfoNameMax);
+		file.Write(&tzInfo, sizeof(tzInfo));
+		file.Sync();
+	}
 
 	fSetZone->SetEnabled(false);
 	fLastUpdateMinute = -1;

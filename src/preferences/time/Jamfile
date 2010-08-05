@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences time ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders locale shared ;
+UsePrivateHeaders locale shared [ FDirName libroot time ] ;
 UsePrivateSystemHeaders ;
 
 local sources =
