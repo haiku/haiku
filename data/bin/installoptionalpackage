@@ -146,17 +146,23 @@ function InstallOptionalHaikuImagePackage()
 	if ! [ -f \$archiveFile ] ; then
 		echo "Downloading \$3 ..."
 		# TODO : add some error handling for downloads
-		# local attempt=1
-		# while [ `wget -nv \$3 2>&1 > /dev/null ; echo \$?` -ne 0 -a $attempt -lt 5 ]; do
-		#	echo "Download attempt #\$attempt failed. Retrying ..."
-		#	rm \$archiveFile
-		#	(( attempt++ ))
-		# done
-		# if [ $attempt -ge 5 ]; then
-		#	echo "Max download retries exceeded. Halting installation."
-		#	exit 1
-		# fi
-		wget -nv \$3
+		local attempt=1
+		while [ \`wget -nv \$3 ; echo \$? \` -ne 0 ]; do
+			if [ \$attempt -eq 5 ]; then
+				break
+			fi
+			(( attempt++ ))
+			echo "Download attempt #\$attempt failed. Retrying ..."
+			if [ -e \$archiveFile ]; then
+				rm \$archiveFile
+			fi
+		done
+		if [ \$attempt -ge 5 ]; then
+			if [ -e \$archiveFile ]; then
+				rm \$archiveFile
+			fi
+			Exit "Max download retries exceeded. Halting installation."
+		fi
 	fi
 
 	local dirTokens='/boot'
@@ -177,12 +183,18 @@ function InstallOptionalHaikuImagePackage()
 	echo "Extracting \$archiveFile ..."
 	extractDir="\${dirTokens}"
 
+	local errorMessage="
+...Failed while extracting \$archiveFile
+You may need to manually clean up the partially extracted files.
+	"
 	case "\$archiveFile" in
 		*.zip)
-			unzip -q -o -d "\$extractDir" "\$archiveFile"
+			unzip -q -o -d "\$extractDir" "\$archiveFile" \
+			|| Exit "\$errorMessage"
 			;;
 		*.tgz|*.tar.gz)
-			tar -C "\$extractDir" -xf "\$archiveFile"
+			tar -C "\$extractDir" -xf "\$archiveFile" \
+			|| Exit "\$errorMessage"
 			;;
 		*)
 			echo "Unhandled archive extension in InstallOptionalHaikuImagePackage()"
@@ -567,6 +579,10 @@ function AddPackages()
 		rm "${tmpDir}/optpkg.jam"
 		CreateInstallerScript
 		sh ${tmpDir}/install-optpkg.sh
+		exitcode=$?
+		if [ $exitcode -gt 0 ]; then
+			ErrorExit "... something went wrong when installing packages."
+		fi
 		rm ${tmpDir}/install-optpkg.sh
 
 		# update files to account for the newly installed packages
@@ -606,7 +622,12 @@ function BuildFinalListOfPackagesToInstall()
 
 	if ! [ ${#packagesToInstall} -gt 1 ]; then
 		echo "... no packages need to be installed."
-		echo "If you wish to re-install a package, edit $installedPackagesFile"
+		echo ""
+		echo "If you wish to re-install a package, run these two commands"
+		echo "    rm ${baseDir}/OptionalPackageNames"
+		echo "    open $installedPackagesFile"
+		echo "and delete the line containing the package name(s)."
+		echo ""
 		proceedWithInstallation=false
 	fi
 	if ! $proceedWithInstallation ; then
