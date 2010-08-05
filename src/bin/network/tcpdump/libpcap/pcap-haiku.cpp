@@ -29,9 +29,8 @@
 bool
 prepare_request(struct ifreq& request, const char* name)
 {
-	if (strlen(name) >= IF_NAMESIZE) {
+	if (strlen(name) >= IF_NAMESIZE)
 		return false;
-	}
 
 	strcpy(request.ifr_name, name);
 	return true;
@@ -57,7 +56,7 @@ pcap_read_haiku(pcap_t* handle, int maxPackets, pcap_handler callback,
 
 		socklen_t fromLength = sizeof(from);
 		bytesReceived = recvfrom(handle->fd, buffer, handle->bufsize, MSG_TRUNC,
-			(struct sockaddr *) &from, &fromLength);
+			(struct sockaddr*)&from, &fromLength);
 	} while (bytesReceived < 0 && errno == B_INTERRUPTED);
 
 	if (bytesReceived < 0) {
@@ -103,6 +102,8 @@ static int
 pcap_inject_haiku(pcap_t *handle, const void *buffer, size_t size)
 {
 	// we don't support injecting packets yet
+	// TODO: use the AF_LINK protocol (we need another socket for this) to
+	// inject the packets
 	strlcpy(handle->errbuf, "Sending packets isn't supported yet",
 		PCAP_ERRBUF_SIZE);
 	return -1;
@@ -322,8 +323,8 @@ pcap_platform_finddevs(pcap_if_t** _allDevices, char* errorBuffer)
 
 		pcap_add_if(_allDevices, interface->ifr_name, flags, NULL, errorBuffer);
 
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
+		interface = (ifreq*)((uint8*)interface
+			+ _SIZEOF_ADDR_IFREQ(interface[0]));
 	}
 
 	free(buffer);
