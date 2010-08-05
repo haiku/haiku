@@ -716,8 +716,8 @@ list_interfaces(const char* name)
 	for (uint32 i = 0; i < count; i++) {
 		list_interface(interface->ifr_name, interface->ifr_addr.sa_family);
 
-		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
+		interface = (ifreq*)((uint8*)interface
+			+ _SIZEOF_ADDR_IFREQ(interface[0]));
 	}
 
 	free(buffer);
