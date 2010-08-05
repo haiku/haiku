@@ -1,7 +1,10 @@
 SubDir HAIKU_TOP src system libroot add-ons icu locale ;
 
-UsePrivateHeaders [ FDirName libroot locale ] ;
-UsePrivateHeaders [ FDirName libroot time ] ;
+UsePrivateHeaders
+	libroot
+	[ FDirName libroot locale ]
+	[ FDirName libroot time ]
+;
 
 local sources =
 	ICUCategoryData.cpp

@@ -8,10 +8,11 @@
 
 #include <new>
 
-#include <errno.h>
 #include <langinfo.h>
 #include <locale.h>
 #include <string.h>
+
+#include <ErrnoMaintainer.h>
 
 
 namespace BPrivate {
@@ -22,27 +23,6 @@ CreateInstance()
 {
 	return new(std::nothrow) ICULocaleBackend();
 }
-
-
-/**
- * A helper class resetting errno to 0 if it has been set during the execution
- * of ICU methods. Any changes of errno shall only be done by our callers.
- */
-class ErrnoMaintainer {
-public:
-	ErrnoMaintainer()
-		: fErrnoUponEntry(errno)
-	{
-	}
-
-	~ErrnoMaintainer()
-	{
-		if (errno != 0 && fErrnoUponEntry == 0)
-			errno = 0;
-	}
-private:
-	int fErrnoUponEntry;
-};
 
 
 ICULocaleBackend::ICULocaleBackend()
