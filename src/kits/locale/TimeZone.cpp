@@ -36,6 +36,27 @@ BTimeZone::Name() const
 
 
 const BString&
+BTimeZone::DaylightSavingName() const
+{
+	return fDaylightSavingName;
+}
+
+
+const BString&
+BTimeZone::ShortName() const
+{
+	return fShortName;
+}
+
+
+const BString&
+BTimeZone::ShortDaylightSavingName() const
+{
+	return fShortDaylightSavingName;
+}
+
+
+const BString&
 BTimeZone::Code() const
 {
 	return fCode;
@@ -46,6 +67,13 @@ int
 BTimeZone::OffsetFromGMT() const
 {
 	return fOffsetFromGMT;
+}
+
+
+bool
+BTimeZone::SupportsDaylightSaving() const
+{
+	return fSupportsDaylightSaving;
 }
 
 
@@ -71,9 +99,26 @@ BTimeZone::SetTo(const char* zoneCode)
 	unicodeString.toUTF8(converter);
 
 	unicodeString.remove();
-	icuTimeZone->getDisplayName(unicodeString);
+	icuTimeZone->getDisplayName(false, TimeZone::LONG, unicodeString);
 	converter.SetTo(&fName);
 	unicodeString.toUTF8(converter);
+
+	unicodeString.remove();
+	icuTimeZone->getDisplayName(true, TimeZone::LONG, unicodeString);
+	converter.SetTo(&fDaylightSavingName);
+	unicodeString.toUTF8(converter);
+
+	unicodeString.remove();
+	icuTimeZone->getDisplayName(false, TimeZone::SHORT, unicodeString);
+	converter.SetTo(&fShortName);
+	unicodeString.toUTF8(converter);
+
+	unicodeString.remove();
+	icuTimeZone->getDisplayName(true, TimeZone::SHORT, unicodeString);
+	converter.SetTo(&fShortDaylightSavingName);
+	unicodeString.toUTF8(converter);
+
+	fSupportsDaylightSaving = icuTimeZone->useDaylightTime();
 
 	int32_t rawOffset;
 	int32_t dstOffset;

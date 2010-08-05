@@ -16,7 +16,11 @@ public:
 
 			const BString&		Code() const;
 			const BString&		Name() const;
+			const BString&		DaylightSavingName() const;
+			const BString&		ShortName() const;
+			const BString&		ShortDaylightSavingName() const;
 			int					OffsetFromGMT() const;
+			bool				SupportsDaylightSaving() const;
 
 			status_t			InitCheck() const;
 
@@ -27,7 +31,11 @@ public:
 private:
 			BString				fCode;
 			BString				fName;
+			BString				fDaylightSavingName;
+			BString				fShortName;
+			BString				fShortDaylightSavingName;
 			int					fOffsetFromGMT;
+			bool				fSupportsDaylightSaving;
 
 			status_t			fInitStatus;
 };
