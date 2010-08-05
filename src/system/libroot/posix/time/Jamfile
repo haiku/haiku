@@ -13,7 +13,8 @@ MergeObject posix_time.o :
 	clock.c
 	ctime.c
 	difftime.c
-	localtime.c
+	localtime_fading_out.c
+	localtime.cpp
 	nanosleep.c
 	stime.c
 	strftime.c

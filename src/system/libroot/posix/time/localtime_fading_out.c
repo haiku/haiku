@@ -202,10 +202,12 @@ static char		lcl_TZname[TZ_STRLEN_MAX + 1];
 static int		lcl_is_set;
 static int		gmt_is_set;
 
+#if 0
 char *			tzname[2] = {
 	wildabbr,
 	wildabbr
 };
+#endif
 
 /*
 ** Section 4.12.3 of X3.159-1989 requires that
@@ -217,10 +219,12 @@ char *			tzname[2] = {
 
 static struct tm	tm;
 
+#if 0
 #ifdef USG_COMPAT
 time_t			timezone = 0;
 int			daylight = 0;
 #endif /* defined USG_COMPAT */
+#endif
 
 #ifdef ALTZONE
 time_t			altzone = 0;
@@ -1164,6 +1168,7 @@ tzsetwall P((void))
 #include <StorageDefs.h>
 #include <syscalls.h>
 
+#if 0
 void
 tzset P((void))
 {
@@ -1212,6 +1217,7 @@ tzset P((void))
 			(void) gmtload(lclptr);
 	settzname();
 }
+#endif
 
 /*
 ** The easy way to behave "as if no library function calls" localtime
