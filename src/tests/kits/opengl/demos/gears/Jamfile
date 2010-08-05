@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src tests kits opengl demos gears ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if $(TARGET_PLATFORM) != haiku {
-	# Needed for <GL/glut.h>, not present in R5. 
+	# Needed for <GL/glut.h>, not present in R5.
 	# Unfortunately we also get the other headers there,
 	# that we don't really want.
 	UsePublicHeaders opengl ;
@@ -11,5 +11,5 @@ if $(TARGET_PLATFORM) != haiku {
 
 SimpleTest GLGears :
 	gears.c
-	: be libGL.so $(TARGET_LIBSUPC++)
+	: be GL
 ;

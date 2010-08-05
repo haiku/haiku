@@ -11,5 +11,5 @@ if $(TARGET_PLATFORM) != haiku {
 
 SimpleTest GLUTGameMode :
 	game_mode.c
-	: be libGL.so $(TARGET_LIBSUPC++)
+	: be GL
 ;
