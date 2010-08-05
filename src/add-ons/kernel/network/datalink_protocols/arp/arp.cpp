@@ -408,7 +408,6 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 
 		entry->hardware_address = *hardwareAddress;
 		entry->timestamp = system_time();
-		entry->protocol = NULL;
 	} else {
 		entry = arp_entry::Add(protocolAddress, hardwareAddress, flags);
 		if (entry == NULL)
