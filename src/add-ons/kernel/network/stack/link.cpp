@@ -422,11 +422,12 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 			if (interface == NULL)
 				return B_DEVICE_NOT_FOUND;
 
-			get_device_interface_address(interface, &request.ifr_addr);
+			sockaddr_storage address;
+			get_device_interface_address(interface, (sockaddr*)&address);
 			put_device_interface(interface);
 
 			return user_memcpy(&((struct ifreq*)value)->ifr_addr,
-				&request.ifr_addr, request.ifr_addr.sa_len);
+				&address, address.ss_len);
 		}
 
 		case SIOCGIFFLAGS:
