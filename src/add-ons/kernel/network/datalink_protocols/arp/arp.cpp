@@ -386,6 +386,9 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	uint32 flags, arp_entry **_entry = NULL)
 {
 	ASSERT_LOCKED_MUTEX(&sCacheLock);
+	TRACE(("%s(%s, %s, flags 0x%" B_PRIx32 ")\n", __FUNCTION__,
+		inet_to_string(protocolAddress), mac_to_string(LLADDR(hardwareAddress)),
+		flags));
 
 	arp_entry *entry = arp_entry::Lookup(protocolAddress);
 	if (entry != NULL) {
@@ -398,11 +401,10 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 			&& entry->hardware_address.sdl_alen != 0
 			&& memcmp(LLADDR(&entry->hardware_address),
 				LLADDR(hardwareAddress), ETHER_ADDRESS_LENGTH)) {
+			uint8* data = LLADDR(hardwareAddress);
 			dprintf("ARP host %08x updated with different hardware address "
 				"%02x:%02x:%02x:%02x:%02x:%02x.\n", protocolAddress,
-				hardwareAddress->sdl_data[0], hardwareAddress->sdl_data[1],
-				hardwareAddress->sdl_data[2], hardwareAddress->sdl_data[3],
-				hardwareAddress->sdl_data[4], hardwareAddress->sdl_data[5]);
+				data[0], data[1], data[2], data[3], data[4], data[5]);
 			return B_ERROR;
 		}
 
@@ -1061,7 +1063,12 @@ arp_send_data(net_datalink_protocol *_protocol, net_buffer *buffer)
 			memcpy(buffer->destination, &entry->hardware_address,
 				entry->hardware_address.sdl_len);
 		}
+		// the broadcast address is set in the ethernet frame module
 	}
+	TRACE(("%s(%p): from %s\n", __FUNCTION__, buffer,
+		mac_to_string(LLADDR((sockaddr_dl*)buffer->source))));
+	TRACE(("  to %s\n",
+		mac_to_string(LLADDR((sockaddr_dl*)buffer->destination))));
 
 	return protocol->next->module->send_data(protocol->next, buffer);
 }

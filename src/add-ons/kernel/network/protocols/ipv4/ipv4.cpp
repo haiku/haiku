@@ -1691,8 +1691,8 @@ ipv4_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 status_t
 ipv4_error_received(net_error error, net_buffer* buffer)
 {
-	TRACE("  ipv4_error_received(code %" B_PRIx32 ", buffer %p [%zu bytes])",
-		error, buffer, buffer->size);
+	TRACE("  ipv4_error_received(error %d, buffer %p [%zu bytes])", (int)error,
+		buffer, buffer->size);
 
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
