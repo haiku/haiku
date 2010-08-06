@@ -19,6 +19,7 @@
 #include <KernelExport.h>
 
 #include <net_device.h>
+#include <NetUtilities.h>
 
 #include "device_interfaces.h"
 #include "domains.h"
@@ -408,7 +409,10 @@ Interface::Interface(const char* interfaceName,
 	TRACE("Interface %p: new \"%s\", device interface %p\n", this,
 		interfaceName, deviceInterface);
 
-	strlcpy(name, interfaceName, IF_NAMESIZE);
+	int written = strlcpy(name, interfaceName, IF_NAMESIZE);
+	memset(name + written, 0, IF_NAMESIZE - written);
+		// Clear remaining space
+
 	device = deviceInterface->device;
 
 	index = ++sInterfaceIndex;
@@ -961,18 +965,27 @@ Interface::_FirstForFamily(int family)
 
 status_t
 Interface::_ChangeAddress(RecursiveLocker& locker, InterfaceAddress* address,
-	int32 option, const sockaddr* originalAddress, const sockaddr* newAddress)
+	int32 option, const sockaddr* originalAddress,
+	const sockaddr* requestedAddress)
 {
-	// Copy old address over
+	// Copy old address
 	sockaddr_storage oldAddress;
 	if (address->domain->address_module->set_to((sockaddr*)&oldAddress,
 			originalAddress) != B_OK)
 		oldAddress.ss_family = AF_UNSPEC;
 
+	// Copy new address (this also makes sure that sockaddr::sa_len is set
+	// correctly)
+	sockaddr_storage newAddress;
+	if (address->domain->address_module->set_to((sockaddr*)&newAddress,
+			requestedAddress) != B_OK)
+		newAddress.ss_family = AF_UNSPEC;
+
 	// Test if anything changed for real
-	if (!address->domain->address_module->equal_addresses(originalAddress,
-			newAddress)) {
+	if (address->domain->address_module->equal_addresses(
+			(sockaddr*)&oldAddress, (sockaddr*)&newAddress)) {
 		// Nothing to do
+		TRACE("  option %" B_PRId32 " addresses are equal!\n", option);
 		return B_OK;
 	}
 
@@ -984,8 +997,7 @@ Interface::_ChangeAddress(RecursiveLocker& locker, InterfaceAddress* address,
 	status_t status = datalink->first_protocol->module->change_address(
 		datalink->first_protocol, address, option,
 		oldAddress.ss_family != AF_UNSPEC ? (sockaddr*)&oldAddress : NULL,
-		newAddress != NULL && newAddress->sa_family != AF_UNSPEC
-			? newAddress : NULL);
+		newAddress.ss_family != AF_UNSPEC ? (sockaddr*)&newAddress : NULL);
 
 	locker.Lock();
 	address->ReleaseReference();
@@ -1144,6 +1156,11 @@ status_t
 update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 	const sockaddr* oldAddress, const sockaddr* newAddress)
 {
+	TRACE("%s(address %p, option %" B_PRId32 ", oldAddress %s, newAddress "
+		"%s)\n", __FUNCTION__, interfaceAddress, option,
+		AddressString(interfaceAddress->domain, oldAddress).Data(),
+		AddressString(interfaceAddress->domain, newAddress).Data());
+
 	MutexLocker locker(sHashLock);
 
 	// set logical interface address
@@ -1358,6 +1375,7 @@ get_interface_address_for_link(net_domain* domain, const sockaddr* address,
 		if (linkAddress.sdl_alen == interface->device->address.length
 			&& memcmp(LLADDR(&linkAddress), interface->device->address.data,
 				linkAddress.sdl_alen) == 0) {
+			TRACE("  %s matches\n", interface->name);
 			// link address matches
 			if (unconfiguredOnly)
 				return interface->FirstUnconfiguredForFamily(domain->family);

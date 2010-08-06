@@ -9,6 +9,7 @@
 
 
 #include <net/if.h>
+#include <net/if_dl.h>
 #include <net/if_media.h>
 #include <net/route.h>
 #include <new>
@@ -477,10 +478,19 @@ datalink_is_local_link_address(net_domain* domain, bool unconfiguredOnly,
 	if (domain == NULL || address == NULL || address->sa_family != AF_LINK)
 		return false;
 
+#ifdef TRACE_DATALINK
+	uint8* data = LLADDR((sockaddr_dl*)address);
+	TRACE("%s(domain %p, unconfiguredOnly %d, address %02x:%02x:%02x:%02x:%02x"
+		":%02x)\n", __FUNCTION__, domain, unconfiguredOnly, data[0], data[1],
+		data[2], data[3], data[4], data[5]);
+#endif
+
 	InterfaceAddress* interfaceAddress = get_interface_address_for_link(domain,
 		address, unconfiguredOnly);
-	if (interfaceAddress == NULL)
+	if (interfaceAddress == NULL) {
+		TRACE("  no\n");
 		return false;
+	}
 
 	if (_interfaceAddress != NULL)
 		*_interfaceAddress = interfaceAddress;
