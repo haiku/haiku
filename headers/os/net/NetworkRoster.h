@@ -15,16 +15,16 @@ class BNetworkInterface;
 
 class BNetworkRoster {
 public:
-			BNetworkRoster&		Default();
+	static	BNetworkRoster&		Default();
 
-			uint32				CountInterfaces();
-			BNetworkInterface*	InterfaceAt(uint32 index);
-			
+			int32				CountInterfaces();
+			BNetworkInterface*	InterfaceAt(int32 index);
+
 			status_t			AddInterface(
 									const BNetworkInterface& interface);
 			status_t			RemoveInterface(
 									const BNetworkInterface& interface);
-			status_t			RemoveInterfaceAt(uint32 index);
+			status_t			RemoveInterfaceAt(int32 index);
 
 			status_t			StartWatching(const BMessenger& target,
 									uint32 eventMask);

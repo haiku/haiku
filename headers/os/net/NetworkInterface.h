@@ -65,14 +65,14 @@ public:
 			status_t			SetFlags(uint32 flags);
 			status_t			SetMTU(uint32 mtu);
 
-			uint32				CountAddresses() const;
-			BNetworkInterfaceAddress* AddressAt(uint32 index);
+			int32				CountAddresses() const;
+			BNetworkInterfaceAddress* AddressAt(int32 index);
 
 			status_t			AddAddress(
 									const BNetworkInterfaceAddress& address);
 			status_t			RemoveAddress(
 									const BNetworkInterfaceAddress& address);
-			status_t			RemoveAddressAt(uint32 index);
+			status_t			RemoveAddressAt(int32 index);
 
 			status_t			GetHardwareAddress(BNetworkAddress& address);
 

@@ -1,52 +1,18 @@
 SubDir HAIKU_TOP src kits network libnetapi ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UsePrivateHeaders net ;
 
-local netapi_sources =
+SharedLibrary libbnetapi.so :
 	init.cpp
 	DynamicBuffer.cpp
 	NetEndpoint.cpp
 	NetAddress.cpp 
 	NetBuffer.cpp
 	NetDebug.cpp
+
+	NetworkAddress.cpp
+	NetworkInterface.cpp
+	NetworkRoster.cpp
+
+	: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++)
 ;
-
-if $(TARGET_PLATFORM) != haiku {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
-		# We need the public network headers also when not compiling for Haiku.
-		# Unfortunately we get more than we want, namely all POSIX headers.
-	UseHeaders [ FStandardOSHeaders ] : true ;
-		# Needed for <net/*.h> and maybe other stuff.
-
-	local defines = [ FDefines BUILDING_R5_LIBNET ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) ;
-
-	SharedLibrary libnetapi.so :
-		$(netapi_sources)
-		: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++)
-	;
-
-	# Installation -- in the test directory for the time being
-	HaikuInstallRelSymLink install-networking
-		: [ FDirName $(HAIKU_TEST_DIR) kits net lib ]
-		: libnetapi.so
-		: installed-networking-test ;
-
-	HaikuInstallRelSymLink install-userland-networking
-		: [ FDirName $(HAIKU_TEST_DIR) kits net userland lib ]
-		: libnetapi.so
-		: installed-userland-networking ;
-
-	Package haiku-networkingkit-cvs :
-		libnetapi.so :
-	#	boot home config lib ;
-		boot home Desktop haiku-networkingkit lib ;
-} else {
-	SharedLibrary libbnetapi.so :
-		$(netapi_sources)
-		: be $(TARGET_NETWORK_LIBS) $(TARGET_LIBSUPC++)
-	;
-}
