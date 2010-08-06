@@ -530,8 +530,8 @@ NetworkStatusView::_Update(bool force)
 				fStatus = status;
 		}
 
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
+		interface = (ifreq *)((addr_t)interface
+			+ _SIZEOF_ADDR_IFREQ(interface[0]));
 	}
 
 	free(buffer);

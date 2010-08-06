@@ -94,8 +94,11 @@ struct ifconf {
 	};
 };
 
+/* Macro that returns the size of a single address within a SIOCGIFCONF buffer;
+   it looks like this because of compatibility with other platforms. */
 #define _SIZEOF_ADDR_IFREQ(request) \
-	(sizeof((request).ifr_name) + (request).ifr_addr.sa_len)
+	(IF_NAMESIZE + (request).ifr_addr.sa_len > (int)sizeof(ifreq) \
+		? IF_NAMESIZE + (request).ifr_addr.sa_len : sizeof(ifreq))
 
 
 /* POSIX definitions follow */

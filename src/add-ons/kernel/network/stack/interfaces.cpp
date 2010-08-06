@@ -1415,29 +1415,29 @@ list_interfaces(int family, void* _buffer, size_t* bufferSize)
 
 		// Copy address
 		InterfaceAddress* address = interface->FirstForFamily(family);
-		sockaddr_storage storage;
+		size_t length = 0;
 
 		if (address != NULL && address->local != NULL) {
 			// Actual address
-			memcpy(&storage, address->local, address->local->sa_len);
+			buffer.Push(address->local, length = address->local->sa_len);
 		} else {
 			// Empty address
-			storage.ss_len = 2;
-			storage.ss_family = AF_UNSPEC;
-		}
-
-		if (storage.ss_len < sizeof(sockaddr)) {
-			// Make sure at least sizeof(sockaddr) bytes are written for
-			// compatibility with other platforms
-			memset((uint8*)&storage + storage.ss_len, 0,
-				sizeof(sockaddr) - storage.ss_len);
-			storage.ss_len = sizeof(sockaddr);
+			sockaddr empty;
+			empty.sa_len = 2;
+			empty.sa_family = AF_UNSPEC;
+			buffer.Push(&empty, length = empty.sa_len);
 		}
 
 		if (address != NULL)
 			address->ReleaseReference();
 
-		if (buffer.Push(&storage, storage.ss_len) == NULL)
+		if (IF_NAMESIZE + length < sizeof(ifreq)) {
+			// Make sure at least sizeof(ifreq) bytes are written for each
+			// interface for compatibility with other platforms
+			buffer.Pad(sizeof(ifreq) - IF_NAMESIZE - length);
+		}
+
+		if (buffer.Status() != B_OK)
 			return buffer.Status();
 	}
 

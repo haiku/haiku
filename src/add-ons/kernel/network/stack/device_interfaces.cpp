@@ -307,7 +307,8 @@ get_device_interface_address(net_device_interface* interface,
 	address.sdl_alen = interface->device->address.length;
 	memcpy(LLADDR(&address), interface->device->address.data, address.sdl_alen);
 
-	address.sdl_len = sizeof(sockaddr_dl);
+	address.sdl_len = sizeof(sockaddr_dl) - sizeof(address.sdl_data) 
+		+ address.sdl_nlen + address.sdl_alen;
 }
 
 
@@ -343,10 +344,14 @@ list_device_interfaces(void* _buffer, size_t* bufferSize)
 	while (net_device_interface* interface = iterator.Next()) {
 		buffer.Push(interface->device->name, IF_NAMESIZE);
 
-		sockaddr address;
-		get_device_interface_address(interface, &address);
+		sockaddr_storage address;
+		get_device_interface_address(interface, (sockaddr*)&address);
 
-		if (buffer.Push(&address, address.sa_len) == NULL)
+		buffer.Push(&address, address.ss_len);
+		if (IF_NAMESIZE + address.ss_len < (int)sizeof(ifreq))
+			buffer.Pad(sizeof(ifreq) - IF_NAMESIZE - address.ss_len);
+
+		if (buffer.Status() != B_OK)
 			return buffer.Status();
 	}
 
