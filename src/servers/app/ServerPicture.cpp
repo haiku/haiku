@@ -515,12 +515,14 @@ draw_picture(View* view, BPoint where, int32 token)
 	ServerPicture* picture
 		= view->Window()->ServerWindow()->App()->GetPicture(token);
 	if (picture != NULL) {
-		BPoint origin = view->DrawingOrigin();
+		view->PushState();
 		view->SetDrawingOrigin(where);
+
 		view->PushState();
 		picture->Play(view);
 		view->PopState();
-		view->SetDrawingOrigin(origin);
+
+		view->PopState();
 		picture->ReleaseReference();
 	}
 }
