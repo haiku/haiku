@@ -153,7 +153,7 @@ BKeymap::SetToDefault()
 void
 BKeymap::Unset()
 {
-	delete fChars;
+	delete[] fChars;
 	fChars = NULL;
 	fCharsSize = 0;
 
