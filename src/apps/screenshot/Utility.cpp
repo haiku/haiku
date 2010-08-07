@@ -133,9 +133,14 @@ Utility::MakeScreenshot(bool includeMouse, bool activeWindow,
 	if (wholeScreen == NULL)
 		return NULL;
 
-	BRect bounds = cursorBitmap->Bounds();
-	int cursorWidth = bounds.IntegerWidth() + 1;
-	int cursorHeight = bounds.IntegerHeight() + 1;
+	int cursorWidth = 0;
+	int cursorHeight = 0;
+
+	if (cursorBitmap != NULL) {
+		BRect bounds = cursorBitmap->Bounds();
+		cursorWidth = bounds.IntegerWidth() + 1;
+		cursorHeight = bounds.IntegerHeight() + 1;
+	}
 
 	if (includeMouse && cursorBitmap != NULL) {
 		// Import the cursor bitmap into wholeScreen
