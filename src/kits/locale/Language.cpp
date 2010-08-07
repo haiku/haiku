@@ -98,7 +98,7 @@ const char*
 BLanguage::GetString(uint32 id) const
 {
 	if (id < B_LANGUAGE_STRINGS_BASE
-		|| id > B_LANGUAGE_STRINGS_BASE + B_NUM_LANGUAGE_STRINGS)
+		|| id >= B_LANGUAGE_STRINGS_BASE + B_NUM_LANGUAGE_STRINGS)
 		return NULL;
 
 	return NULL;
