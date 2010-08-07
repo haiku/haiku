@@ -72,13 +72,9 @@ class TTrackerState : public Settings {
 		BooleanValueSetting *fHideDotFiles;
 		BooleanValueSetting *fTypeAheadFiltering;
 
-		BooleanValueSetting *f24HrClock;
-
 		ScalarValueSetting *fRecentApplicationsCount;
 		ScalarValueSetting *fRecentDocumentsCount;
 		ScalarValueSetting *fRecentFoldersCount;
-		ScalarValueSetting *fTimeFormatSeparator;
-		ScalarValueSetting *fDateOrderFormat;
 
 		BooleanValueSetting *fShowVolumeSpaceBar;
 		HexScalarValueSetting *fUsedSpaceColor;
@@ -182,10 +178,6 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fRecentApplicationsCount = new ScalarValueSetting("RecentApplications", 10, "", ""));
 	Add(fRecentDocumentsCount = new ScalarValueSetting("RecentDocuments", 10, "", ""));
 	Add(fRecentFoldersCount = new ScalarValueSetting("RecentFolders", 10, "", ""));
-
-	Add(fTimeFormatSeparator = new ScalarValueSetting("TimeFormatSeparator", 3, "", ""));
-	Add(fDateOrderFormat = new ScalarValueSetting("DateOrderFormat", 2, "", ""));
-	Add(f24HrClock = new BooleanValueSetting("24HrClock", false));
 
 	Add(fShowVolumeSpaceBar = new BooleanValueSetting("ShowVolumeSpaceBar", true));
 
@@ -489,48 +481,6 @@ void
 TrackerSettings::SetRecentFoldersCount(int32 count)
 {
 	gTrackerState.fRecentFoldersCount->ValueChanged(count);
-}
-
-
-FormatSeparator
-TrackerSettings::TimeFormatSeparator()
-{
-	return (FormatSeparator)gTrackerState.fTimeFormatSeparator->Value();
-}
-
-
-void
-TrackerSettings::SetTimeFormatSeparator(FormatSeparator separator)
-{
-	gTrackerState.fTimeFormatSeparator->ValueChanged((int32)separator);
-}
-
-
-DateOrder
-TrackerSettings::DateOrderFormat()
-{
-	return (DateOrder)gTrackerState.fDateOrderFormat->Value();
-}
-
-
-void
-TrackerSettings::SetDateOrderFormat(DateOrder order)
-{
-	gTrackerState.fDateOrderFormat->ValueChanged((int32)order);
-}
-
-
-bool
-TrackerSettings::ClockIs24Hr()
-{
-	return gTrackerState.f24HrClock->Value();
-}
-
-
-void
-TrackerSettings::SetClockTo24Hr(bool enabled)
-{
-	gTrackerState.f24HrClock->SetValue(enabled);
 }
 
 

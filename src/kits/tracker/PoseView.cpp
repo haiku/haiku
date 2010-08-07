@@ -9528,21 +9528,6 @@ BPoseView::UpdateDateColumns(BMessage *message)
 
 	BRect columnRect(Bounds());
 
-	if (IsFilePanel()) {
-		FormatSeparator separator;
-		DateOrder format;
-		bool clock;
-
-		message->FindInt32("TimeFormatSeparator", (int32*)&separator);
-		message->FindInt32("DateOrderFormat", (int32*)&format);
-		message->FindBool("24HrClock", &clock);
-
-		TrackerSettings settings;
-		settings.SetTimeFormatSeparator(separator);
-		settings.SetDateOrderFormat(format);
-		settings.SetClockTo24Hr(clock);
-	}
-
 	for (int32 i = 0; i < columnCount; i++) {
 		BColumn *col = ColumnAt(i);
 		if (col && col->AttrType() == B_TIME_TYPE) {

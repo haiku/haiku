@@ -283,129 +283,27 @@ WidgetAttributeText::TruncFileSize(BString *result, int64 value,
 	return TruncFileSizeBase(result, value, view, width);
 }
 
-/*
-const char *kTimeFormats[] = {
-	"%A, %B %d %Y, %I:%M:%S %p",	// Monday, July 09 1997, 05:08:15 PM
-	"%a, %b %d %Y, %I:%M:%S %p",	// Mon, Jul 09 1997, 05:08:15 PM
-	"%a, %b %d %Y, %I:%M %p",		// Mon, Jul 09 1997, 05:08 PM
-	"%b %d %Y, %I:%M %p",			// Jul 09 1997, 05:08 PM
-	"%m/%d/%y, %I:%M %p",			// 07/09/97, 05:08 PM
-	"%m/%d/%y",						// 07/09/97
-	NULL
-};
-*/
-
-status_t
-TimeFormat(BString &string, int32 index, FormatSeparator separator,
-	DateOrder order, bool clockIs24Hour)
-{
-	if (index >= 6)
-		return B_ERROR;
-
-	BString clockString;
-	BString dateString;
-
-	if (index <= 1)
-		if (clockIs24Hour)
-			clockString = "%H:%M:%S";
-		else
-			clockString = "%I:%M:%S %p";
-	else
-		if (clockIs24Hour)
-			clockString = "%H:%M";
-		else
-			clockString = "%I:%M %p";
-
-	if (index <= 3) {
-		switch (order) {
-			case kYMDFormat:
-				dateString = "%Y %! %d";
-				break;
-			case kDMYFormat:
-				dateString = "%d %! %Y";
-				break;
-			case kMDYFormat:
-				// Fall through
-			case kDateFormatEnd:
-				// Fall through
-			default:
-				dateString = "%! %d %Y";
-				break;
-		}
-		if (index == 0)
-			dateString.Replace('!', 'B', 1);
-		else
-			dateString.Replace('!', 'b', 1);
-	} else {
-		switch (order) {
-			case kYMDFormat:
-				dateString = "%y!%m!%d";
-				break;
-			case kDMYFormat:
-				dateString = "%d!%m!%y";
-				break;
-			case kMDYFormat:
-				// Fall through
-			case kDateFormatEnd:
-				// Fall through
-			default:
-				dateString = "%m!%d!%y";
-				break;
-		}
-
-		char separatorArray[] = {' ', '-', '/', '\\', '.'};
-
-		if (separator == kNoSeparator)
-			dateString.ReplaceAll("!", "");
-		else
-			dateString.ReplaceAll('!', separatorArray[separator-1]);
-	}
-
-	if (index == 0)
-		string = "%A, ";
-	else if (index < 3)
-		string = "%a, ";
-	else
-		string = "";
-
-	string << dateString;
-
-	if (index < 5)
-		string << ", " << clockString;
-
-	return B_OK;
-}
-
-
 template <class View>
 float
 TruncTimeBase(BString *result, int64 value, const View *view, float width)
 {
-	TrackerSettings settings;
-	FormatSeparator separator = settings.TimeFormatSeparator();
-	DateOrder order = settings.DateOrderFormat();
-	bool clockIs24hr = settings.ClockIs24Hr();
-
 	float resultWidth = 0;
 	char buffer[256];
 
 	time_t timeValue = (time_t)value;
-	tm timeData;
-	// use reentrant version of localtime to avoid having to have a semaphore
-	// (localtime uses a global structure to do it's conversion)
-	localtime_r(&timeValue, &timeData);
 
-	BString timeFormat;
+	BLocale here;
+	be_locale_roster->GetDefaultLocale(&here);
 
-	for (int32 index = 0; ; index++) {
-		if (TimeFormat(timeFormat, index, separator, order, clockIs24hr)
-				!= B_OK)
-			break;
-		strftime(buffer, 256, timeFormat.String(), &timeData);
+	if (here.FormatDateTime(buffer, 256, timeValue, true) == B_OK) {
 		resultWidth = view->StringWidth(buffer);
-		if (resultWidth <= width)
-			break;
 	}
+	
+	if (resultWidth > width && here.FormatDateTime(buffer, 256, timeValue,
+			false) == B_OK) {
+		resultWidth = view->StringWidth(buffer);
+	}
+
 	if (resultWidth > width) {
 		// even the shortest format string didn't do it, insert ellipsis
 		resultWidth = TruncStringBase(result, buffer, (ssize_t)strlen(buffer),
@@ -1115,19 +1013,10 @@ TimeAttributeText::FitValue(BString *result, const BPoseView *view)
 
 
 bool
-TimeAttributeText::CheckSettingsChanged()
+TimeAttributeText::CheckSettingsChanged(void)
 {
-	bool changed = fLastClockIs24 != fSettings.ClockIs24Hr()
-		|| fLastDateOrder != fSettings.DateOrderFormat()
-		|| fLastTimeFormatSeparator != fSettings.TimeFormatSeparator();
-
-	if (changed) {
-		fLastClockIs24 = fSettings.ClockIs24Hr();
-		fLastDateOrder = fSettings.DateOrderFormat();
-		fLastTimeFormatSeparator = fSettings.TimeFormatSeparator();
-	}
-
-	return changed;
+	// TODO : check against the actual locale settings
+	return false;
 }
 
 

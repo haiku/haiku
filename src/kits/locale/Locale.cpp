@@ -336,6 +336,37 @@ BLocale::StartOfWeek() const
 }
 
 
+status_t
+BLocale::FormatDateTime(char* target, size_t maxSize, time_t time,
+	bool longFormat)
+{
+	ObjectDeleter<DateFormat> dateFormatter = CreateDateFormat(longFormat,
+		*fICULocale, longFormat ? fLongDateFormat : fShortDateFormat);
+	if (dateFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<DateFormat> timeFormatter = CreateTimeFormat(longFormat,
+		*fICULocale, longFormat ? fLongTimeFormat : fShortTimeFormat);
+	if (timeFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	UnicodeString ICUString;
+	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
+
+	ICUString.append(UnicodeString::fromUTF8(", "));
+
+	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
+
+	CheckedArrayByteSink stringConverter(target, maxSize);
+	ICUString.toUTF8(stringConverter);
+
+	if (stringConverter.Overflowed())
+		return B_BAD_VALUE;
+
+	return B_OK;
+}
+
+
 // #pragma mark - Time
 
 

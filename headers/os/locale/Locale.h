@@ -39,10 +39,10 @@ public:
 			void				FormatString(char* target, size_t maxSize,
 									char* fmt, ...);
 			void				FormatString(BString* buffer, char* fmt, ...);
-			void				FormatDateTime(char* target, size_t maxSize,
-									const char* fmt, time_t value);
-			void				FormatDateTime(BString* buffer, const char* fmt,
-									time_t value);
+			status_t			FormatDateTime(char* target, size_t maxSize,
+									time_t time, bool longFormat);
+			status_t			FormatDateTime(BString* buffer, time_t time,
+									bool longFormat);
 
 								// Date
 
