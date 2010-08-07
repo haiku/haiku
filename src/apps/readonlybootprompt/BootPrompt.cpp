@@ -69,6 +69,7 @@ BootPromptApp::AboutRequested()
 		kAuthors);
 
 	aboutWindow->Show();
+	delete aboutWindow;
 }
 
 
