@@ -13,7 +13,8 @@
  * positions to be set and must contain 1s at all other bits; val must
  * contain the values of bits to be set.
  */
-__inline void set8(volatile char *addr, char mask, char val)
+static __inline void set8(volatile unsigned char *addr, unsigned char mask,
+	unsigned char val)
 {
     if (mask == 0)
         *addr = val;
@@ -21,12 +22,12 @@ __inline void set8(volatile char *addr, char mask, char val)
         *addr = (*addr & mask) | (val & ~mask);
 }
 /*****************************************************************************/
-__inline char get8(volatile char *addr)
+static __inline unsigned char get8(volatile unsigned char *addr)
 {
     return *addr;
 }
 /*****************************************************************************/
-__inline void et6000aclTerminate(void) {
+static __inline void et6000aclTerminate(void) {
     set8(mmRegs+0x31, 0xef, 0x10); /* let ACL to operate */
     et6000aclWaitIdle();
     set8(mmRegs+0x30, 0, 0x00);
@@ -62,7 +63,7 @@ void et6000aclWaitIdle(void) {
 /*
  * Wait until ACL queue becomes not full.
  */
-__inline void et6000aclWaitQueueNotFull(void) {
+static __inline void et6000aclWaitQueueNotFull(void) {
     while ((get8(mmRegs+0x36) & 0x01) == 0x01);
 }
 /*****************************************************************************/
@@ -79,7 +80,7 @@ uint16 screenWidth = si->dm.virtual_width;
 uint8 bpp = si->bytesPerPixel;
 uint8 bltDir;
 uint16 src_left, src_top, dest_left, dest_top, width, height;
-uint32 srcAddr, destAddr;
+uint32 srcAddr = 0, destAddr = 0;
 
     et6000aclWaitQueueNotFull();
 
