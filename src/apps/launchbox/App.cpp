@@ -101,7 +101,7 @@ App::AboutRequested()
 	const char* authors[2];
 	authors[0] = "Stephan Aßmus (aka stippi)";
 	authors[1] = NULL;
-	(new BAboutWindow("LaunchBox", 2004, authors))->Show();
+	BAboutWindow("LaunchBox", 2004, authors).Show();
 }
 
 
