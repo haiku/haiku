@@ -201,8 +201,10 @@ FireWireCard::DetectRecvFn()
 
 	buf = (char*)malloc(1024*16);
 	len = read(fDev, buf, 1024*16);
-	if (len < 0)
+	if (len < 0) {
+		free(buf);
 		return errno;
+	}
 	ptr = (u_int32_t*) buf;
 	ciph = (struct ciphdr*)(ptr + 1);
 
