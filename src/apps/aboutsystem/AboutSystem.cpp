@@ -1077,13 +1077,19 @@ AboutView::_CreateCreditsView()
 	sortedTranslations.SortItems(TranslationComparator);
 
 	for (uint32 i = 0; i < kNumberOfTranslations; i ++) {
-		const Translation& translation =
-			*(const Translation*)sortedTranslations.ItemAt(i);
+		const Translation& translation
+			= *(const Translation*)sortedTranslations.ItemAt(i);
 
-		be_locale_roster->GetLanguage(translation.languageCode, &lang);
 		langName.Truncate(0);
-		lang->GetTranslatedName(langName);
-		delete lang;
+		if (be_locale_roster->GetLanguage(translation.languageCode, &lang)
+			== B_OK) {
+			lang->GetTranslatedName(langName);
+			delete lang;
+		} else {
+			// We failed to get the localized readable name,
+			// go with what we have.
+			langName.Append(translation.languageCode);
+		}
 
 		fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
 		fCreditsView->Insert("\n");
