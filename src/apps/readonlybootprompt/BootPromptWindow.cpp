@@ -155,7 +155,7 @@ BootPromptWindow::MessageReceived(BMessage* message)
 		case MSG_LANGUAGE_SELECTED:
 			if (BListItem* item = fLanguagesListView->ItemAt(
 				fLanguagesListView->CurrentSelection(0))) {
-				LanguageItem* languageItem = dynamic_cast<LanguageItem*>(item);
+				LanguageItem* languageItem = static_cast<LanguageItem*>(item);
 				BMessage preferredLanguages;
 				preferredLanguages.AddString("language",
 					languageItem->Language());
