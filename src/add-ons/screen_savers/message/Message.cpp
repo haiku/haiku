@@ -239,7 +239,7 @@ Message::Draw(BView *view, int32 frame)
 		strncpy(toDraw, message->String()+start, drawingLength);
 		toDraw[drawingLength] = 0;
 		offscreen.DrawString(toDraw, BPoint(x, y));
-		delete toDraw;
+		delete[] toDraw;
 	}
 
 	// Now draw the full message in a nice translucent box, but only
