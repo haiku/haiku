@@ -15,7 +15,7 @@ of dates, times, and numbers, in the natural language of the user.
 */
 
 /*!
-\fn const BLocale::BCollator* Collator() const
+\fn const BCollator* BLocale::Collator() const
 \brief Returns the collator associated to this locale.
 
 Returns the collator in use for this locale, allowing you to use it to sort a
@@ -24,7 +24,7 @@ set of strings.
 */
 
 /*!
-\fn const BLocale::BCountry* Country() const
+\fn const BCountry* BLocale::Country() const
 \brief Returns the country associated to this locale.
 
 A locale is defined by the combination of a country and a language. This
@@ -34,7 +34,7 @@ data that is not language-dependant (such as the country flag).
 */
 
 /*!
-\fn const BLocale::BLanguage* Language() const
+\fn const BLanguage* BLocale::Language() const
 \brief Returns the language associated to this locale.
 
 */

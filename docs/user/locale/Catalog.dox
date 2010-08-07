@@ -1,7 +1,7 @@
 /*!
 \class BCatalog
 \ingroup locale
-\brief class handling string localization.
+\brief Class handling string localization.
 
 BCatalog is the class that allows you to perform string localization. This means
 you give it a string in english, and it automatically returns the translation of
@@ -17,7 +17,7 @@ access to the catalog linked with your application. To access other catalogs
 (for example if you create a script interpreter and want to localize the
 scripts), you will have to open a catalog associated with your script.
 
-\section Using the macros
+\section macros Using the macros
 You don't have to do much in your program to handle catalogs. You must first
 set the B_TRANSLATE_CONTEXT define to a string that identifies which part of the
 application the strings you will translate are in. This allows the translators
@@ -28,7 +28,7 @@ it will allow your text to be replaced at run-time by the proper localized one,
 but it will also allow to build the base catalog, the one that you will send to
 the translator team, from your sourcecode.
 
-\section Chaining of catalogs
+\section chaining Chaining of catalogs
 The catalogs you get from the locale kit are designed to use a fallback system
 so that the user get strings in the language he's the more fluent with,
 depending onwhat isavailable.
