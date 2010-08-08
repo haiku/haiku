@@ -41,7 +41,7 @@ some specific examples:
   source and binary incompatible.
 - The file system API has changed; file systems that worked on BeOS will no
   longer work on Haiku.
-- Haiku isnot compatible with the Network kit, nor with BONE. Instead, we have
+- Haiku is not compatible with the Network kit, nor with BONE. Instead, we have
   both UNIX sockets and a new C++ API.
 - In several places we also dropped compatibility support for older BeOS
   versions (PR2, R3, R4), which BeOS R5 still featured.
