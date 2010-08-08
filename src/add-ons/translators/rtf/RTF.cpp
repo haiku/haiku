@@ -205,7 +205,7 @@ Parser::Parse(Header &header)
 						if (openBrackets == 0)
 							return B_OK;
 
-						throw B_ERROR;
+						throw (status_t)B_ERROR;
 					}
 					continue;
 				}
