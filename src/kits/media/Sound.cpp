@@ -17,7 +17,7 @@
 #include <string.h>
 
 
-BSound::BSound(void *data, size_t size, const media_raw_audio_format &format,
+BSound::BSound(void* data, size_t size, const media_raw_audio_format& format,
 	bool freeWhenDone)
 	:	fData(data),
 		fDataSize(size),
@@ -35,7 +35,7 @@ BSound::BSound(void *data, size_t size, const media_raw_audio_format &format,
 }
 
 
-BSound::BSound(const entry_ref *soundFile, bool loadIntoMemory)
+BSound::BSound(const entry_ref* soundFile, bool loadIntoMemory)
 	:	fData(NULL),
 		fDataSize(0),
 		fFile(new(std::nothrow) BFile(soundFile, B_READ_ONLY)),
@@ -69,7 +69,7 @@ BSound::BSound(const entry_ref *soundFile, bool loadIntoMemory)
 }
 
 
-BSound::BSound(const media_raw_audio_format &format)
+BSound::BSound(const media_raw_audio_format& format)
 	:	fData(NULL),
 		fDataSize(0),
 		fFile(NULL),
@@ -101,12 +101,13 @@ BSound::InitCheck()
 }
 
 
-BSound *
+BSound*
 BSound::AcquireRef()
 {
 	atomic_add(&fRefCount, 1);
 	return this;
 }
+
 
 bool
 BSound::ReleaseRef()
@@ -136,14 +137,14 @@ BSound::Duration() const
 }
 
 
-const media_raw_audio_format &
+const media_raw_audio_format&
 BSound::Format() const
 {
 	return fFormat;
 }
 
 
-const void *
+const void*
 BSound::Data() const
 {
 	return fData;
@@ -164,15 +165,15 @@ BSound::Size() const
 
 
 bool 
-BSound::GetDataAt(off_t offset, void *intoBuffer, size_t bufferSize,
-	size_t *outUsed)
+BSound::GetDataAt(off_t offset, void* intoBuffer, size_t bufferSize,
+	size_t* outUsed)
 {
 	if (intoBuffer == NULL)
 		return false;
 
 	if (fData != NULL) {
 		size_t copySize = MIN(bufferSize, fDataSize - offset);
-		memcpy(intoBuffer, (uint8 *)fData + offset, copySize);
+		memcpy(intoBuffer, (uint8*)fData + offset, copySize);
 		if (outUsed != NULL)
 			*outUsed = copySize;
 		return true;
@@ -196,16 +197,16 @@ BSound::GetDataAt(off_t offset, void *intoBuffer, size_t bufferSize,
 		if (bufferOffset != 0) {
 			int64 indirectFrameCount = directStartFrame - startFrame;
 			size_t indirectSize = indirectFrameCount * frameSize;
-			void *buffer = malloc(indirectSize);
+			void* buffer = malloc(indirectSize);
 			if (buffer == NULL)
 				return false;
 
 			if (fTrackReader->ReadFrames(buffer, indirectFrameCount) != B_OK) {
 				free(buffer);
 				return false;
-}
+			}
 
-			memcpy(intoBuffer, (uint8 *)buffer + bufferOffset,
+			memcpy(intoBuffer, (uint8*)buffer + bufferOffset,
 				indirectSize - bufferOffset);
 			if (outUsed != NULL)
 				*outUsed = indirectSize - bufferOffset;
@@ -214,7 +215,7 @@ BSound::GetDataAt(off_t offset, void *intoBuffer, size_t bufferSize,
 		} else if (outUsed != NULL)
 			*outUsed = 0;
 
-		if (fTrackReader->ReadFrames((uint8 *)intoBuffer + bufferOffset,
+		if (fTrackReader->ReadFrames((uint8*)intoBuffer + bufferOffset,
 			directFrameCount) != B_OK)
 			return false;
 
@@ -229,7 +230,7 @@ BSound::GetDataAt(off_t offset, void *intoBuffer, size_t bufferSize,
 
 
 status_t
-BSound::BindTo(BSoundPlayer *player, const media_raw_audio_format &format)
+BSound::BindTo(BSoundPlayer* player, const media_raw_audio_format& format)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
@@ -237,7 +238,7 @@ BSound::BindTo(BSoundPlayer *player, const media_raw_audio_format &format)
 
 
 status_t
-BSound::UnbindFrom(BSoundPlayer *player)
+BSound::UnbindFrom(BSoundPlayer* player)
 {
 	UNIMPLEMENTED();
 	return B_ERROR;
@@ -252,9 +253,9 @@ BSound::Perform(int32 code, ...)
 }
 
 
-status_t BSound::_Reserved_Sound_0(void *) { return B_ERROR; }
-status_t BSound::_Reserved_Sound_1(void *) { return B_ERROR; }
-status_t BSound::_Reserved_Sound_2(void *) { return B_ERROR; }
-status_t BSound::_Reserved_Sound_3(void *) { return B_ERROR; }
-status_t BSound::_Reserved_Sound_4(void *) { return B_ERROR; }
-status_t BSound::_Reserved_Sound_5(void *) { return B_ERROR; }
+status_t BSound::_Reserved_Sound_0(void*) { return B_ERROR; }
+status_t BSound::_Reserved_Sound_1(void*) { return B_ERROR; }
+status_t BSound::_Reserved_Sound_2(void*) { return B_ERROR; }
+status_t BSound::_Reserved_Sound_3(void*) { return B_ERROR; }
+status_t BSound::_Reserved_Sound_4(void*) { return B_ERROR; }
+status_t BSound::_Reserved_Sound_5(void*) { return B_ERROR; }
