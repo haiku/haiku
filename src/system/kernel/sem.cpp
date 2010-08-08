@@ -506,6 +506,7 @@ create_sem_etc(int32 count, const char* name, team_id owner)
 		if (team == NULL) {
 			RELEASE_TEAM_LOCK();
 			restore_interrupts(state);
+			free(tempName);
 			return B_BAD_TEAM_ID;
 		}
 
