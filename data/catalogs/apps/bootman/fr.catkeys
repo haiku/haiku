@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-bootman	2993174226
+1	french	x-vnd.Haiku-bootman	681536107
 The boot manager has been successfully installed on your system.	BootManagerController		Le gestionnaire de démarrage a été installé avec succès sur votre système.
 At least one partition must be selected!	BootManagerController		Au moins une partition doit être sélectionnée !
 The old Master Boot Record could not be saved to %s	BootManagerController		L'ancien MBR (Master Boot Record : informations de démarrage)) n'a pas pu être sauvegardé vers %s
@@ -61,3 +61,4 @@ After five seconds	DefaultPartitionPage		Après cinq secondes
 Never	DefaultPartitionPage		Jamais
 Immediately	DefaultPartitionPage		Immédiatement
 After three seconds	DefaultPartitionPage		Après trois secondes
+The old Master Boot Record was successfully saved to %s.	BootManagerController		L'ancien MBR a été sauvegardé dans le fichier %s.

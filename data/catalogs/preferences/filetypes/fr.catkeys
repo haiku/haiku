@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-FileTypes	2789440297
+1	french	x-vnd.Haiku-FileTypes	1134247143
 Args only	Application Type Window		Arguments seuls
 Add group	New File Type Window		Ajouter un groupe
 Remove	Application Type Window		Supprimer
@@ -76,14 +76,40 @@ Left	Attribute Window	Attribute column alignment in Tracker	À gauche
 Visible	Attribute Window		Visible
 Could not install file type	New File Type Window		Impossible d'installer le type de fichier
 Application type	Application Type Window		Type de applicatif
+Type name:	FileTypes Window		Nom du type :
+About FileTypes…	FileTypes Window		À propos de FileTypes
+Choose type	Type List Window		Choisir le type
+Rule:	FileTypes Window		Règle :
 Extensions:	FileTypes Window		Extensions :
+Select same preferred application as	FileTypes Window		choisir la même application préférée que pour 
+Could not retrieve application signature	Preferred App Menu		Impossible de récupérer la signature d'application
 Icon	Application Type Window		Icône
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		La suppression d'un type de fichier ne peut pas être rétabli.\nÊtes-vous sûr de vouloir le supprimer ?
+(from application)	FileTypes Window		(depuis l'application)
+Done	Type List Window		Terminé
+Show recognition rule	FileTypes Window		Afficher les règles d'identification
+Description:	FileTypes Window		Description :
 File	FileTypes Window		Fichier
+Select…	FileTypes Window		Sélectioner…
+FileTypes	FileTypes Window		FileTypes
 Open…	FileTypes Window		Ouvrir…
+FileTypes	FileTypes		FileTypes
+Extra attributes	FileTypes Window		Attributs supplémentaires
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tÉcrit par Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Add…	FileTypes Window		Ajouter…
+Quit	FileTypes Window		Quitter
+%s file type	FileType Window		Type du fichier %s
 no icon	FileTypes Window		pas d'icône
+Settings	FileTypes Window		Réglages
 Icon	FileTypes Window		Icône
+File recognition	FileTypes Window		Identification de fichier
 Cancel	Type List Window		Annuler
 Description	FileTypes Window		Description
 None	FileTypes Window		Aucun
+Remove	FileTypes Window		Enlever
+This file type already exists	New File Type Window		Ce type de fichier existe déjà
 Cancel	Preferred App Menu		Annuler
 Cancel	FileTypes Window		Annuler
+Attribute	Attribute Window		Attribut
+Group name:	New File Type Window		Nom de groupe :
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Montrer comme :

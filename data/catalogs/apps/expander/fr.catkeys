@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Expander	2957181365
+1	french	x-vnd.Haiku-Expander	1292562546
 Expand	ExpanderMenu		Décompresser
 Set destination…	ExpanderMenu		Choisir la destination…
 File expanded	ExpanderWindow		Fichier décompressé
@@ -36,3 +36,4 @@ Stop	ExpanderWindow		Arrêt
 Destination	ExpanderWindow		Destination
 \n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\técrit par Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersion originale Be par\nDominic, Hiroshi, Peter, Pavel et Robert\n
 Expander	About		Décompresseur
+is not supported	ExpanderWindow		n'est pas géré

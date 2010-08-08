@@ -1,18 +1,30 @@
-1	french	x-vnd.Be-TSKB	1551870051
+1	french	x-vnd.Be-TSKB	2686533917
 Applications	PreferencesWindow		Applications
 Recent applications	BeMenu		Applications récentes
+Edit menu…	PreferencesWindow		Éditer le menu…
 Recent documents:	PreferencesWindow		Documents récents :
 Recent folders	BeMenu		Dossiers récents
+Sort running applications	PreferencesWindow		Trier les applications lancées
+Change time…	TimeView		Changer l'heure…
+<Be folder is empty>	BeMenu		<Le dossier Be est vide>
 Window	PreferencesWindow		Fenêtre
 Menu	PreferencesWindow		Menu
+Show seconds	PreferencesWindow		Montrer les secondes
+Always on top	PreferencesWindow		Toujours au dessus
+Show all	WindowMenu		Montrer tout
+No windows	WindowMenu		Pas de fenêtres
 Power off	BeMenu		Éteindre
+Auto-raise	PreferencesWindow		Auto-montée
+Full date	PreferencesWindow		Date complète
 Hide time	TimeView		Cacher l'heure
 Recent folders:	PreferencesWindow		Dossiers récents :
 Deskbar preferences…	BeMenu		Réglages de la Deskbar…
+Show application expander	PreferencesWindow		Montrer l'étendeur d'application
 Close all	WindowMenu		Tout fermer
 Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
 Mount	BeMenu		Monter
 Recent applications:	PreferencesWindow		Applications récentes :
+Tracker always first	PreferencesWindow		Tracker toujours en premier
 About Haiku…	BeMenu		À propos de Haiku...
 Show calendar…	TimeView		Montrer le calendrier…
 Restart system	BeMenu		Redémarrer le système
@@ -22,6 +34,7 @@ Show Time	Tray		Montrer l'heure
 Expand new applications	PreferencesWindow		Développer les nouvelles applications
 Clock	PreferencesWindow		Horloge
 Recent documents	BeMenu		Documents récents
+Hide all	WindowMenu		Tout cacher
 Shutdown…	BeMenu		Éteindre...
 Quit application	WindowMenu		Quitter l'application
 Show replicants	BeMenu		Montrer les réplicants

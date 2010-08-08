@@ -1,7 +1,10 @@
-1	brazilian_portuguese	x-vnd.Haiku-Keymap	1711193531
+1	brazilian_portuguese	x-vnd.Haiku-Keymap	2798035402
 Tilde trigger	Keymap window		Acento Til
+Select dead keys	Keymap window		Selecionar teclas mortas
 Switch shortcut keys	Keymap window		Mudas as teclas de atalho
 User:	Keymap window		Usuário:
+Keymap	Keymap window		Mapa de teclas
 Save as…	Keymap window		Salvar como...
+File	Keymap window		Arquivo
 (Current)	Keymap window		(Atual)
 Font	Keymap window		Fonte

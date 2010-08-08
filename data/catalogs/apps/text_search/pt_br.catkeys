@@ -1,0 +1,35 @@
+1	brazilian_portuguese	x-vnd.Haiku.TextSearch	2912179465
+%s: Not enough room to escape the filename.	Grepper		%s. Não há espaço suficiente para escapar o nome do arquivo.
+Trim to selection	GrepWindow		Reduzir para seleção
+Follow symbolic links	GrepWindow		Seguir atalhos
+Set which files to search	GrepWindow		Determinar em quais arquivos procurar
+Close	GrepWindow		Fechar
+Cancel	GrepWindow		Cancelar
+The unselected files will be removed from the list.	GrepWindow		Os arquivos não selecionados irão ser removidos da lista.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Por favor selecione os arquivos que você deseja ter selecionados por você no Tracker
+Open files in Pe	GrepWindow		Abrir os arquivos no Pe
+Copy text to clipboard	GrepWindow		Copiar texto para a Área de Transferência
+Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Criado por Matthijs Hollemans.\n\nContribuído por Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers e momoziro.\n
+Settings	GrepWindow		Configurações
+Select all	GrepWindow		Selecionar tudo
+OK	GrepWindow		OK
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME não pode abrir um ou mais pastas
+Escape search text	GrepWindow		Escapar texto de procura
+Search	GrepWindow		Localizar
+Open selection	GrepWindow		Abrir seleção
+Look in sub-folders	GrepWindow		Procurar nas sub-pastas
+Actions	GrepWindow		Ações
+File	GrepWindow		Arquivo
+Encoding	GrepWindow		Codificação
+History	GrepWindow		Histórico
+%s: There was a problem running grep.	Grepper		%s: Houve um problema ao executar o grep.
+New window	GrepWindow		Nova janela
+Please select the files you wish to keep searching.	GrepWindow		Por favor selecione os arquivos em que deseja que a procura continue.
+TextSearch	GrepWindow		Localizar Texto
+Quit	GrepWindow		Sair
+Show files in Tracker	GrepWindow		Mostrar arquivos no Tracker
+About TextSearch…	GrepWindow		Sobre o Localizar Texto...
+Case-sensitive	GrepWindow		Diferenciar maiúsculas e minúsculas
+Text files only	GrepWindow		Somente arquivos de texto
+Skip sub-folders starting with a dot	GrepWindow		Pular sub-pastas cujo nome iniciam com um ponto (.)
+Show lines	GrepWindow		Mostrar linhas

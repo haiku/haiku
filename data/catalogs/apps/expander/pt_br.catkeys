@@ -1,9 +1,11 @@
-1	brazilian_portuguese	x-vnd.Haiku-Expander	1418498182
+1	brazilian_portuguese	x-vnd.Haiku-Expander	1501150370
+Set destination…	ExpanderMenu		Selecionar destino…
 Expander: Open	ExpanderWindow		Expansor: Abrir
 Select current	DirectoryFilePanel		Selecione o atual
 Hide contents	ExpanderWindow		Esconder conteúdo
 Expander	ExpanderWindow	!! Window Title !!	Expansor
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Tem certeza que quer parar de expandir este \narquivo? Os itens expandidos podem não estar completos.
+Settings	ExpanderMenu		Configurações
 Expander: Choose destination	DirectoryFilePanel		Expansor: Escolha destino
 Show contents	ExpanderWindow		Mostrar conteúdo
 Expanding file 	ExpanderWindow		Expandindo arquivo
@@ -14,3 +16,5 @@ Select '%s'	DirectoryFilePanel		Selecionar '%s'
 Show contents	ExpanderMenu		Mostrar conteúdo
 Stop	ExpanderWindow		Parar
 Destination	ExpanderWindow		Destino
+\n\twritten by Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\noriginal Be version by \nDominic, Hiroshi, Peter, Pavel and Robert\n	About		\n\tescrito por Jérôme Duval\n\tCopyright 2004-2006, Haiku Inc.\n\nVersão original da Be por \nDominic, Hiroshi, Peter, Pavel e Robert\n
+Expander	About		Expansor

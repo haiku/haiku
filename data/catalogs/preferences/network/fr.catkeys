@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Network	3643490310
+1	french	x-vnd.Haiku-Network	3742287184
 Gateway:	EthernetSettingsView		Passerelle :
 Netmask:	EthernetSettingsView		Masque de sous-réseau :
 DHCP	EthernetSettingsView		DHCP
@@ -16,3 +16,4 @@ Auto-configuring failed: 	EthernetSettingsView		Échec de la configuration autom
 Static	EthernetSettingsView		Statique
 OK	EthernetSettingsView		Ok
 Domain:	EthernetSettingsView		Domaine :
+Disabled	EthernetSettingsView		Désactivé

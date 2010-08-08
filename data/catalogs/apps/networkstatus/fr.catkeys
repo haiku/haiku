@@ -1,0 +1,11 @@
+1	french	x-vnd.Haiku-NetworkStatus	964615297
+No link	NetworkStatusView		Débranché
+Install	NetworkStatus		Installer
+NetworkStatus\n\twritten by %1 and Hugo Santos\n\t%2, Haiku, Inc.\n	NetworkStatusView		NetworkStatus\n\tÉcrit par %1 et Hugo Santos\n\t%2, Haiku, Inc.\n
+Unknown	NetworkStatusView		Inconnu
+Ready	NetworkStatusView		Prêt
+Address	NetworkStatusView		Adresse
+OK	NetworkStatusView		OK
+Open network preferences…	NetworkStatusView		Ouvrir les préférences du réseau…
+Don't	NetworkStatus		Ne pas installer
+Quit	NetworkStatusView		Quitter

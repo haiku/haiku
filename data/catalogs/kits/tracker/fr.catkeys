@@ -1,21 +1,45 @@
-1	french	x-vnd.Haiku-libtracker	2383668825
+1	french	x-vnd.Haiku-libtracker	1239521653
+Sorry, you can't save things at the root of your system.	libtracker		Désolé, vous ne pouvez rien enregistrer à la racine de votre système.
 Empty Trash	libtracker		Vider la poubelle
 Recent folders	libtracker		Répertoires récents
+You cannot copy or move the root directory.	libtracker		Vous ne pouvez pas copier ou déplacer le répertoire racine.
+starts with	libtracker		commence par
 TiB	libtracker		Tio
+Duplicate	libtracker		Dupliquer
+Link To:	libtracker		Lien vers :
+Paste links	libtracker		Coller les liens
 Volume icons	libtracker		Icônes des volumes
+Create a Query template	libtracker		créer un modèle de requête 
+%num items	libtracker		%num objets
+Modified	libtracker		Modifié
 Group	libtracker		Groupe
+Moving: 	libtracker		Déplace :
+Preparing to copy items…	libtracker		Préparation de la copie…
+Error deleting items	libtracker		Erreur en supprimant les objets
+Sorry, saving more than one item is not allowed.	libtracker		Désolé, sauver plus d'un item n'est pas autorisé.
 Open with…	libtracker		Ouvrir avec…
+for %num files	libtracker		pour %num fichiers
+Unknown	libtracker		Inconnu
 Close	libtracker		Fermer
 Recent documents	libtracker		Documents récents
 Clean up	libtracker		Nettoyer
 Find…	libtracker		Trouver…
+Mount all	libtracker		Tout monter
+Opens with:	libtracker		S'ouvre avec :
+Paste layout	libtracker		Coller la disposition
 Cancel	libtracker		Annuler
+Invert selection	libtracker		Inverser la sélection
 Name	libtracker		Nom
 Cut more	libtracker		Couper plus
 save text	libtracker		enregistrer le texte
+Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		Impossible d'ouvrir \"%document\" (Symbole manquant: %symbol). \n
 Don't automount	libtracker		Ne pas monter automatiquement
+Would you like to find a suitable application to open the file?	libtracker		Voulez-vous chercher une application adaptée pour ouvrir ce fichier ?
 Increase size	libtracker		Augmenter la taille
+is	libtracker		est
 Could not open \"%name\" (%error). 	libtracker		Impossible d'ouvrir \"%name\" (%error).
+Copying: 	libtracker		Copie :
+You cannot replace a folder or a symbolic link with a file.	libtracker		Vous ne pouvez pas remplacer un répertoire ou un lien symbolique par un fichier
 Decrease size	libtracker		Réduire la taille
 before	libtracker		avant
 Disks	libtracker		Disques
@@ -25,13 +49,19 @@ Create a Query	libtracker		Créer une requête
 Add printer…	libtracker		Ajouter une imprimante…
 Trash	libtracker		Poubelle
 greater than	libtracker		plus grand que
+Other	libtracker		Autre
 GiB	libtracker		GiO
 Or	libtracker		Ou
+Do it	libtracker		Le faire
 Emptying Trash… 	libtracker		Vidage de la corbeille...
 Sorry, you cannot edit that attribute.	libtracker		Désolé, vous ne pouvez pas éditer cet attribut
+Deleting: 	libtracker		Supprime :
+Revert	libtracker		Défaire
 Version	libtracker		Version
+Invert	libtracker		Inverser
 by attribute	libtracker		par attribut
 Attributes	libtracker		Attributs
+Replace all	libtracker		Tout remplacer
 Owner	libtracker		Propriétaire
 12 hour	libtracker		12 heures
 Select all	libtracker		Tout sélectionner
@@ -41,36 +71,72 @@ OK	libtracker		OK
 New	libtracker		Nouveau
 MiB	libtracker		MiO
 Include trash	libtracker		Inclure la corbeille
+Temporary	libtracker		Temporaire
+40 x 40	libtracker		40 x 40
+Create link here	libtracker		Créer un lien ici
 Unmount	libtracker		Démonter
 less than	libtracker		moins que
+Original name	libtracker		Nom original
+Created:	libtracker		Créé :
 Location:	libtracker		Emplacement :
 New Query	libtracker		Nouvelle requête
 Write	libtracker		Ecrire
 Sorry, you can't copy items to the Trash.	libtracker		Désolé, vous ne pouvez pas copier des objets dans la corbeille.
 Windows	libtracker		Fenêtres
 Execute	libtracker		Exécuter
+Created	libtracker		Créé
+label too long	libtracker		étiquette trop longue
 Description:	libtracker		Description :
 Save	libtracker		Enregistrer
 Month-day-year	libtracker		Mois-jour-année
+link	libtracker	filename link	lien
 Open	libtracker		Ouvrir
 contains	libtracker		contient
+Date & Time	libtracker		Date et Heure
 Modified:	libtracker		Modifié :
 24 hour	libtracker		24 heures
 Move	libtracker		Déplacer
+Ignore case	libtracker		Insensible à la casse
+None	libtracker		Aucun
+moving	libtracker		déplace
 Version:	libtracker		Version :
 after	libtracker		après
 Size	libtracker		Taille
+Edit templates…	libtracker		Éditer les modèles…
 Add	libtracker		Ajouter
+Settings…	libtracker		Réglages…
 Copy here	libtracker		Copier ici
+%Ld bytes	libtracker		%Ld octets
 Location	libtracker		Emplacement
 Window	libtracker		Fenêtre
 File	libtracker		Fichier
+Close all	libtracker		Tout fermer
+Clock	libtracker		Horloge
+is not	libtracker		n'est pas
+Remove	libtracker		Enlever
+no items	libtracker		pas d'objets
+copying	libtracker		copie
 Preferences…	libtracker		Préférences…
+All disks	libtracker		Tous les disques
 Identify	libtracker		Identifier
+Add-ons	libtracker		Extensions
+Done	libtracker		Terminé
 Paste	libtracker		Coller
+32 x 32	libtracker		32 x 32
+Move to	libtracker		Déplacer vers
 by name	libtracker		par nom
+%Ld B	libtracker		%Ld o
+Kind	libtracker		Type
+Move to Trash	libtracker		Déplacer vers la corbeille
+1 item	libtracker		1 objet
+Size:	libtracker		Taille :
 by formula	libtracker		par formule
+(%bytes bytes)	libtracker		(%bytes octets)
 And	libtracker		Et
+copy	libtracker	filename copy	copier
+Edit favorites…	libtracker		Édit les favoris…
+On	libtracker		Sur
+Space	libtracker		Espace
 Find	libtracker		Trouver
 Day-month-year	libtracker		Jour-mois-année
 Replace	libtracker		Remplacer
@@ -78,3 +144,4 @@ Restore	libtracker		Restaurer
 KiB	libtracker		KiO
 Mount	libtracker		Monter
 Copy	libtracker		Copier
+Defaults	libtracker		Défauts

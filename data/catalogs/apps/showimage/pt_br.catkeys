@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-ShowImage	1064923264
+1	brazilian_portuguese	x-vnd.Haiku-ShowImage	2886902971
 Use as background…	Menus		Usar como papel de parede...
 5 seconds	Menus		5 segundos
 Slide delay	Menus		Tempo de transição
@@ -59,3 +59,18 @@ Job setup	PrintOptionsWindow		Configurar trabalho
 Original size	Menus		Tamanho original
 Next page	Menus		Próxima página
 Shrink to window	Menus		Reduzir para janela
+OK	SaveToFile		OK
+The file '%s' could not be written.	SaveToFile		Este arquivo '%s' não pode ser escrito.
+Progress monitor	ProgressWindow		Monitor de progresso
+Paste	Menus		Colar
+File	Menus		Arquivo
+Page setup…	Menus		Configurar página...
+Print…	Menus		Imprimir..
+Quit	Menus		Sair
+Clear	Menus		Limpar
+Edit	Menus		Editar
+Close	Menus		Fechar
+Copy	Menus		Copiar
+Cut	Menus		Recortar
+Select all	Menus		Selecionar tudo
+Save as…	Menus		Salvar como...

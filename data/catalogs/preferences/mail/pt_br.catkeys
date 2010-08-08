@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-Mail	1891519393
+1	brazilian_portuguese	x-vnd.Haiku-Mail	958732170
 Select account type	Config Views		Selecionar tipo de conta
 Mail checking	Config Window		Checar e-mail
 Settings	Config Window		Configurações
@@ -40,3 +40,6 @@ Always	Config Window		Sempre
 Add filter	Config Views		Adicionar filtro
 Outgoing mail filters	Config Views		Filtro de e-mails enviados
 \n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCriar uma nova conta com o botão Adicionar.\n\nRemover uma conta com o botão Remover no item selecionado.\n\nSelecionar um item da lista para mudar suas configurações.
+· Outgoing	Account		· Caixa de Saída
+· E-mail filters	Account		· Filtro de e-mails
+· Incoming	Account		· Caixa de Entrada

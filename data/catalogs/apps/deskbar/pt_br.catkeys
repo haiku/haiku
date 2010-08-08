@@ -1,3 +1,20 @@
-1	brazilian_portuguese	x-vnd.Be-TSKB	1884644663
+1	brazilian_portuguese	x-vnd.Be-TSKB	858845231
 Applications	PreferencesWindow		Aplicativos
 Recent applications	BeMenu		Aplicativos recentes
+Edit menu…	PreferencesWindow		Editar menu...
+Sort running applications	PreferencesWindow		Ordenar aplicativos em execução
+<Be folder is empty>	BeMenu		<Pasta Be está vazia>
+Show all	WindowMenu		Mostrar tudo
+No windows	WindowMenu		Sem janelas
+Deskbar preferences…	BeMenu		Preferências da Mesa de Trabalho...
+Show application expander	PreferencesWindow		Mostrar expansor de aplicativo
+Deskbar preferences	PreferencesWindow		Preferências da Mesa de Trabalho
+Recent applications:	PreferencesWindow		Aplicativos recentes:
+Tracker always first	PreferencesWindow		Tracker sempre em primeiro
+About Haiku…	BeMenu		Sobre o Haiku...
+Show calendar…	TimeView		Mostrar calendário...
+Restart system	BeMenu		Reiniciar o sistema
+Expand new applications	PreferencesWindow		Expandir novos aplicativos
+Hide all	WindowMenu		Ocultar tudo
+Shutdown…	BeMenu		Desligar...
+Quit application	WindowMenu		Fechar aplicativo

@@ -1,0 +1,45 @@
+1	brazilian_portuguese	x-vnd.Haiku-Pulse	2756001860
+OK	PrefsWindow		OK
+Quit	DeskbarPulseView		Sair
+Pulse	PulseWindow		Pulso
+Mini mode	DeskbarPulseView		Modo miniatura
+Remove replicant	CPUButton		Remover replicante
+Active color	ConfigView		Cor ativa
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Modo de usar: Pulse [--mini] [-w largura] [--width=largura]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
+Fade colors	ConfigView		Cor da sombra
+OK	DeskbarPulseView		OK
+Deskbar mode	PrefsWindow		Modo Deskbar
+Normal mode	PrefsWindow		Modo normal
+Defaults	PrefsWindow		Padrões
+Normal mode	MiniPulseView		Modo normal
+Deskbar	CPUButton		Deskbar
+Frame color	ConfigView		Cor da borda
+Mini mode	PrefsWindow		Modo miniatura
+OK	PulseApp		OK
+Bar colors	ConfigView		Cor da barra
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulso\n\nPor David Ramsey e Arve Hjønnevåg\nRevisado por Daniel Switkin
+Settings…	PulseView		Configurações...
+You can't disable the last active CPU.	PulseView		Você pode desabilitar a última CPU ativa.
+Info	CPUButton		Informação
+OK	PulseView		OK
+Remove(): %s	DeskbarPulseView		Remover(): %s
+Deskbar menu	CPUButton		Menu da Deskbar
+About Pulse…	PulseView		Sobre o Pulso..
+Deskbar mode	MiniPulseView		Modo Deskbar
+Quit	MiniPulseView		Sair
+Pulse	NormalPulseView		Pulso
+Deskbar mode	NormalPulseView		Modo Deskbar
+Width of icon:	ConfigView		Largura do ícone:
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulso\n\nPor David Ramsey e Arve Hjønnevåg\nRevisado por Daniel Switkin
+You can't disable the last active CPU.	CPUButton		Você não pode desabilitar o último CPU ativo.
+Normal mode	DeskbarPulseView		Modo normal
+OK	CPUButton		OK
+About Pulse…	CPUButton		Sobre o Pulso...
+Mini mode	NormalPulseView		Modo miniatura
+Info	DeskbarPulseView		Informação
+Pulse settings	PulseWindow		Configurações do Pulso
+Idle color	ConfigView		Cor
+Info	PulseWindow		Informação
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	DeskbarPulseView		Pulso\n\nPor David Ramsey e Arve Hjønnevåg\nRevisado por Daniel Switkin
+OK	PulseWindow		OK
+CPU progress bar	NormalPulseView		Barra de progresso da CPU

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Pulse	1614816934
+1	french	x-vnd.Haiku-Pulse	4173314575
 OK	PrefsWindow		OK
 Quit	DeskbarPulseView		Quitter
 Pulse	PulseWindow		Pulse
@@ -13,6 +13,7 @@ Deskbar	CPUButton		Deskbar
 Frame color	ConfigView		Couleur du cadre
 Mini mode	PrefsWindow		Mode miniature
 OK	PulseApp		OK
+Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	CPUButton		Pulse\n\nÉcrit par David Ramsey et Arve Hjønnevåg\nModifié par Daniel Switkin
 Settings…	PulseView		Réglages…
 You can't disable the last active CPU.	PulseView		Vous ne pouvez pas désactiver le dernier processeur actif.
 OK	PulseView		OK
@@ -21,6 +22,7 @@ Deskbar mode	MiniPulseView		Mode Deskbar
 Quit	MiniPulseView		Quitter
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Mode Deskbar
+Width of icon:	ConfigView		Largeur de l'icône :
 Pulse\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin	PulseWindow		Pulse\n\nPar David Ramsey et Arve Hjønnevåg\nModifié par Daniel Switkin
 You can't disable the last active CPU.	CPUButton		Vous ne pouvez pas désactiver le dernier processeur actif.
 Normal mode	DeskbarPulseView		Mode normal

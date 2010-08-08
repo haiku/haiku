@@ -1,0 +1,37 @@
+1	brazilian_portuguese	x-vnd.Haiku-Terminal	1363474068
+Didn't find any available pseudo ttys.	Terminal Shell		Não foi encontrado nenhum pseudo ttys disponível
+Change directory	Terminal TermView		Mudar de pasta
+Select all	Terminal TermWindow		Selecionar tudo
+Save to file…	Terminal PrefWindow		Salvar para arquivo...
+Font:	Terminal AppearancePrefView		Fonte:
+Copy here	Terminal TermView		Copiar aqui
+could not set session leader.	Terminal Shell		não foi possível definir o líder da sessão.
+Settings	Terminal TermWindow		Configurações
+Use selection	Terminal FindWindow		Usar seleção
+Full screen	Terminal TermWindow		Tela inteira
+Page setup…	Terminal TermWindow		Configurar página...
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nModo de usar: %s [OPÇÃO] [SHELL]\n
+No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma expressão para localizar.
+Don't save	Terminal PrefWindow		Não salvar
+Match word	Terminal FindWindow		Palavra exata
+Close tab	Terminal SmartTabView		Fechar aba
+Nothing is selected.	Terminal TermWindow		Não há nada selecionado.
+Move here	Terminal TermView		Mover aqui
+Secondary mouse button drop menu	Terminal TermView		Menu de contexto do segundo botão do mouse
+New tab	Terminal TermWindow		Nova aba
+failed set terminal interface (TERMIOS).	Terminal Shell		a definição da interface do terminal falhou
+Save as default	Terminal TermWindow		Salvar como padrão
+Settings…	Terminal TermWindow		Configurações...
+mismatch handshake.	Terminal Shell		erro de incompatibilidade
+Find failed	Terminal TermWindow		Localizar falhou
+Search forward	Terminal FindWindow		Localizar próximo
+Find previous	Terminal TermWindow		Localizar anterior
+About Terminal…	Terminal TermWindow		Sobre o Terminal...
+Find next	Terminal TermWindow		Localizar próximo
+Close active tab	Terminal TermWindow		Fechar a aba ativa
+Save changes to this settings panel?	Terminal PrefWindow		Salvar as mudanças para este painel de configurações?
+Save	Terminal PrefWindow		Salvar
+-h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		 -h, --help mostra esta ajuda\n -t, --title define o título da janela\n -f, --fullscreen iniciar em tela inteira\n
+Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nescrito por Kazuho Okui e Takashi Murai\natualizado por Kian Duffy 
+Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar saída se existirem aplicativos em execução
+A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		Um processo ainda está funcionando.\nSe fechar o Terminal o processo será terminado.

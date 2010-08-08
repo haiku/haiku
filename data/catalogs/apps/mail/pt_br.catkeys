@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Be-MAIL	3010845209
+1	brazilian_portuguese	x-vnd.Be-MAIL	4046254049
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Anexar Atributos:
 Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
@@ -134,3 +134,7 @@ Remove quote	Mail		Remover citação
 Move to trash	Mail		Mover para a lixeira
 Select all	Mail		Selecionar tudo
 An error occurred trying to save this signature.	Mail		Ocorreu um erro ao tentar salvar esta assinatura.
+Mail\n\n	Mail		Mail\n\n
+Written by Robert Polic.\nEnhanced by the Dr. Zoidberg crew.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n	Mail		Escrito por Robert Polic.\nMelhorado pelo bando do Dr. Zoidberg.\n\nCopyright 1991-2001, Be Incorporated.\nCopyright 2005-2010 Haiku, Inc.\n
+Text wrapping:	Mail		Quebra de texto:
+File	Mail		Arquivo

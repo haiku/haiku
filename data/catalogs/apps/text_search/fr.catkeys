@@ -1,0 +1,29 @@
+1	french	x-vnd.Haiku.TextSearch	1932518839
+Trim to selection	GrepWindow		Réduire à la sélection
+Follow symbolic links	GrepWindow		Suivre les liens symboliques
+Set which files to search	GrepWindow		Sélectionner les fichiers à examiner
+Close	GrepWindow		Fermer
+Cancel	GrepWindow		Annuler
+The unselected files will be removed from the list.	GrepWindow		Les fichiers non-sélectionnés seront retirés de la liste.
+Open files in Pe	GrepWindow		Ouvrir les fichiers avec Pe
+Copy text to clipboard	GrepWindow		Copier le texte dans le presse-papier
+Created by Matthijs Hollemans.\n\nContributed to by Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers and momoziro.\n	GrepWindow		Créé par Matthijs Hollemans.\n\nAvec la contribution de Peter Hinely, Serge Fantino, Hideki Naito, Oscar Lesta, Oliver Tappe, Jonas Sundström, Luc Schrijvers et momoziro.\n
+Settings	GrepWindow		Réglages
+Select all	GrepWindow		Tout sélectionner
+OK	GrepWindow		OK
+Search	GrepWindow		Chercher
+Open selection	GrepWindow		Ouvrir la sélection
+Look in sub-folders	GrepWindow		Regarder dans les sous-dossiers
+Actions	GrepWindow		Actions
+File	GrepWindow		Fichier
+Encoding	GrepWindow		Encodage
+History	GrepWindow		Historique
+%s: There was a problem running grep.	Grepper		%s : une erreur est survenue en lançant grep.
+New window	GrepWindow		Nouvelle fenêtre
+TextSearch	GrepWindow		TextSearch
+Quit	GrepWindow		Quitter
+Show files in Tracker	GrepWindow		Montrer les fichiers dans le Tracker
+About TextSearch…	GrepWindow		À propos de TextSearch…
+Case-sensitive	GrepWindow		Sensible à la casse
+Text files only	GrepWindow		Seulement les fichiers texte
+Show lines	GrepWindow		Montrer les lignes

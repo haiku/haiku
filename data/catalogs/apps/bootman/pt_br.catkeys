@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-bootman	1729200097
+1	brazilian_portuguese	x-vnd.Haiku-bootman	1565138354
 The boot manager has been successfully installed on your system.	BootManagerController		O gerenciador de boot foi instalado com sucesso.
 At least one partition must be selected!	BootManagerController		Pelo menos uma partição deve ser selecionada!
 The old Master Boot Record could not be saved to %s	BootManagerController		O antigo Master Boot Record não pode ser salvo em %s
@@ -48,3 +48,6 @@ Error reading partition table	BootManagerController	Title	Error reading partitio
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Escrever o menu de boot no disco. Tem certeza que deseja continuar?
 OK	BootManagerController	Button	OK
 Backup Master Boot Record	BootManagerController	Title	Fazer backup do Master Boot Record
+Haiku Boot Manager	BootManager	About text title	Gerenciador de Inicialização do Haiku
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Por favor especifique uma partição padrão e um tempo limite.\nO menu de inicialização irá carregar a partição escolhida após o tempo limite ter transcorrido a não ser que você escolha outra partição. Você também pode fazer com que o menu de inicialização aguarde por tempo indeterminado até a escolha uma partição.\nMantenha a tecla 'ALT' pressionada para desligar o tempo limite na hora da inicialização.
+The old Master Boot Record was successfully saved to %s.	BootManagerController		O Master Boot Record antigo foi salvo com sucesso em %s.

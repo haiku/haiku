@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-mount_server	2634122385
+1	french	x-vnd.Haiku-mount_server	1104969457
+Mount read-only	AutoMounter		Monter en lecture seule
 Mount read/write	AutoMounter		Monter en lecture et en écriture
 Mounting volume '%s'\n\n	AutoMounter		Montage du volume '%s'\n\n
 Cancel	AutoMounter		Annuler
@@ -6,5 +7,6 @@ Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Impossible de démonter le disque \"%s\":\n\t%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Montage du volume <sans nom>\n\n
 OK	AutoMounter		OK
+Previous volumes mounted.	AutoMounter		Volumes montés précédemment.
 Mount error	AutoMounter		Erreur de montage
 Force unmount	AutoMounter		Forcer le démontage

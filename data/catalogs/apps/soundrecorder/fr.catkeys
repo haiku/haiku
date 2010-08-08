@@ -1,0 +1,15 @@
+1	french	x-vnd.Haiku-SoundRecorder	2606767031
+Loop	RecorderWindow		Boucler
+Duration:	RecorderWindow		Durée :
+Stop	RecorderWindow		Arrêter
+Format: 	RecorderWindow		Format :
+Compression:	RecorderWindow		Compression :
+Sample rate: 	RecorderWindow		Fréquence d'échantillonnage :
+seconds	RecorderWindow		secondes
+OK	RecorderWindow		OK
+Play	RecorderWindow		Lecture
+bits	RecorderWindow		bits
+None	RecorderWindow		Aucun
+Record	RecorderWindow		Enregistrer
+File name:	RecorderWindow		Nom du fichier :
+Save	RecorderWindow		Sauvegarder

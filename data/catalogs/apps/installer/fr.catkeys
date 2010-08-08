@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Installer	863906579
+1	french	x-vnd.Haiku-Installer	1949855347
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installeur\n\técrit par Jérôme Duval et Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installation terminée. Le secteur d'amorce à été écrit sur '%s'. Cliquer sur Quitter pour sortir de l'Installeur ou choisir un nouveau volume cible pour faire une autre installation.
 Quit	InstallerWindow		Quitter
@@ -63,3 +63,16 @@ OK	InstallerWindow		OK
 Cancel	InstallerWindow		Annuler
 Additional disk space required: 0.0 KiB	InstallerWindow		Espace disque additionnel requis: 0.0 Kio
 The mount point could not be retrieved.	InstallProgress		Le point de montage n'a pu être récupéré.
+Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman, l'application de configuration du menu de démarrage de Haiku, n'a pas pu être lancé.
+Quit Boot Manager	InstallerWindow		Quitter le gestionnaire de démarrage
+Quit Boot Manager and DriveSetup	InstallerWindow		Quitter le gestionnaire de démarrage et DriveSetup
+Set up boot menu	InstallerWindow		Mettre en place le menu de démarrage
+Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Veuillez fermer les fenêtres du gestionnaire de démarrage et de DriveSetup avant de quitter Installer.
+Quit DriveSetup	InstallerWindow		Quitter DriveSetup
+Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lancement du gestionnaire de démarrage...\n\nFermez le gestionnaire de démarrage pour poursuivre l'installation.
+Boot sector not written because of an internal error.	InstallProgress		Le secteur d'amorçage n'a pas été écrit à cause d'une erreur interne.
+Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Lancement du gestionnaire de démarrage et de DriveSetup...\n\nFermez ces deux applications pour poursuivre l'installation.
+Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Veuillez fermer la fenêtre du gestionnaire de démarrage avant de fermer la fenêtre d'Installation.
+Tools	InstallerWindow		Outils
+Stop	InstallerWindow		Arrêter
+???	InstallerWindow	Unknown currently copied item	???

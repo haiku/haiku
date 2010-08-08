@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-Network	2897060402
+1	brazilian_portuguese	x-vnd.Haiku-Network	2995857276
 Gateway:	EthernetSettingsView		Gateway:
 Netmask:	EthernetSettingsView		Máscara de Rede:
 DHCP	EthernetSettingsView		DHCP
@@ -15,3 +15,4 @@ The net_server needs to run for the auto configuration!	EthernetSettingsView		É
 Auto-configuring failed: 	EthernetSettingsView		A configuração automática falhou:
 Static	EthernetSettingsView		Estático
 OK	EthernetSettingsView		OK
+Disabled	EthernetSettingsView		Desativado

@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-FileTypes	3209930196
+1	brazilian_portuguese	x-vnd.Haiku-FileTypes	4226609053
 Args only	Application Type Window		Somente argumentos
 Add group	New File Type Window		Adicionar grupo
 Remove	Application Type Window		Remover
@@ -11,12 +11,14 @@ Add icon…	Icon View		Adicionar ícone…
 Do you want to save the changes?	Application Type Window		Você quer salvar as alterações?
 File type	FileType Window		Tipo de arquivo
 Could not change attributes	Attribute Window		Não foi possível mudar os atributos
+Save	Application Type Window		Salvar
 Select same preferred application as	FileType Window		Selecionar como o mesmo aplicativo preferido de
 Multiple launch	Application Type Window		Múltiplas instâncias
 Group:	New File Type Window		Grupo:
 Could not open file	FileType Window		Não foi possível abrir o arquivo
 Preferred application	FileType Window		Aplicativo preferido
 Same as…	FileType Window		O mesmo de…
+File	Application Type Window		Arquivo
 Version:	Application Type Window		Versão:
 FileTypes request	FileTypes		Requerimento do Tipos de Arquivo
 Select…	FileType Window		Selecionar...
@@ -65,3 +67,57 @@ Left	Attribute Window	Attribute column alignment in Tracker	Esquerda
 Visible	Attribute Window		Visível
 Could not install file type	New File Type Window		Não foi possível instalar o tipo de arquivo
 Application type	Application Type Window		Tipo de aplicativo
+Application types…	FileTypes Window		Tipos de aplicativo...
+Recognition rule is not valid:\n\n	FileTypes Window		Regra de reconhecimento não é válida:\n\n
+Show icons in list	FileTypes Window		Mostrar ícones na lsita
+Type name:	FileTypes Window		Nome do tipo:
+About FileTypes…	FileTypes Window		Sobre os Tipos de Arquivo...
+Choose type	Type List Window		Escolher tipo
+Rule:	FileTypes Window		Regra:
+Multiple files from \"%s\" file type	FileType Window		Multiplos arquivos do tipo \"%s\"
+Could not retrieve preferred application of this file	Preferred App Menu		Não foi possível encontrar o aplicativo preferido desse arquivo
+Extensions:	FileTypes Window		Extensões:
+Select same preferred application as	FileTypes Window		Selecionar o mesmo aplicativo preferido como
+Could not retrieve application signature	Preferred App Menu		Não foi possível encontrar a assinatura do aplicativo
+Icon	Application Type Window		Ícone
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Removendo um tipo de arquivo não pode ser revertido.\nVocê tem certeza que deseja remover mesmo assim?
+(from application)	FileTypes Window		(do aplicativo)
+Could not set preferred application	FileTypes Window		Não foi possível mudar o aplicativo preferido
+Done	Type List Window		Pronto
+Show recognition rule	FileTypes Window		Mostrar regra de reconhecimento
+FileTypes request	Preferred App Menu		Requerimento de  Tipos de Arquivo
+Description:	FileTypes Window		Descrição
+File	FileTypes Window		Arquivo
+Select…	FileTypes Window		Selecionar...
+FileTypes	FileTypes Window		Tipos de Arquivo
+Open…	FileTypes Window		Abrir...
+Extra attributes	FileTypes Window		Atributos extra
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tescrito por Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+Add…	FileTypes Window		Adicionar...
+[Multiple files] file types	FileType Window		tipos de arquivo [Multiplos arquivos]
+Quit	FileTypes Window		Sair
+%s file type	FileType Window		%s tipo de arquivo
+no icon	FileTypes Window		sem ícone
+Settings	FileTypes Window		Configurações
+New resource file…	FileTypes Window		Novo arquivo de recursos...
+Icon	FileTypes Window		Ícone
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Remover um super tipo não pode ser revertido.\nTodos os tipos de arquivos que pertencem a este super tipo serão perdidos!\n\nVocê tem certeza que deseja continuar? Para remover o grupo inteiro, segure pressionada a tecla Shift e clique em \"Remover\".
+Internal name:	FileTypes Window		Nome interno:
+File recognition	FileTypes Window		Reconhecimento de arquivo
+Cancel	Type List Window		Cancelar
+Description	FileTypes Window		Descrição
+None	FileTypes Window		Nenhum
+Remove	FileTypes Window		Remover
+This file type already exists	New File Type Window		Este tipo de arquivo já existe
+Same as…	FileTypes Window		O mesmo de...
+Could not remove file type: %s\n	FileTypes Window		Não foi possível remover o tipo de arquivo: %s\n
+Cancel	Preferred App Menu		Cancelar
+Cancel	FileTypes Window		Cancelar
+Select preferred application	FileTypes Window		Selecionar aplicativo preferido
+FileTypes request	FileTypes Window		Requerimento do Tipos de Arquivo
+(from super type)	FileTypes Window		(do super tipo)
+Preferred application	FileTypes Window		Aplicativo preferido
+Attribute	Attribute Window		Atributo
+Group name:	New File Type Window		Nome do grupo:
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Mostrar como:
+Right	Attribute Window	Attribute column alignment in Tracker	à direita

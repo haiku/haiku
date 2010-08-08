@@ -1,0 +1,12 @@
+1	french	x-vnd.Haiku-Sounds	1757904531
+OK	SoundsHApp		OK
+Sound File:	HWindow		Fichier son :
+OK	HEventList		OK
+OK	HWindow		OK
+This is not an audio file.	HWindow		Ceci n'est pas un fichier son.
+Stop	HWindow		Arrêter
+Sound	HEventList		Son
+Event	HEventList		Événement
+Other…	HWindow		Autre…
+Play	HWindow		Lire
+Sounds	SoundsHApp		Sons

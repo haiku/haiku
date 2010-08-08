@@ -1,52 +1,14 @@
-1	french	x-vnd.Haiku-Mail	1679872636
-Select account type	Config Views		Choisir le type de compte
-Mail checking	Config Window		Vérification du courrier
+1	french	x-vnd.Haiku-Mail	3191822430
 Settings	Config Window		Réglages
-Only when dial-up is connected	Config Window		Seulement si le modem est en ligne
-While sending and receiving	Config Window		Pendant l'envoi et la réception
 days	Config Window		jours
-Start mail services on startup	Config Window		Démarrer les services mail automatiquement
-Receive mail only	Config Views		Réception seulement
+Start mail services on startup	Config Window		Lancer le service de messagerie au démarrage
 Account name:	Config Views		Nom du compte :
-OK	Config Views		Ok
-The filter could not be moved. Deleting filter.	Config Views		Impossible de déplacer le filtre. Suppression du filtre.
-Revert	Config Window		Défaire
-Accounts	Config Window		Comptes
-Remove	Config Window		Enlever
-New mail notification	Account		Notification de nouveau message
-Account type:	Config Views		Type de compte :
-Send mail only	Config Views		Envoi seulement
-E-mail	Account		E-mail
-Unnamed	Account		Sans nom
-Send and receive mail	Config Views		Envoi et réception
-Real name:	Config Views		Nom réel :
-   · Outgoing	Account		   · Sortant
-Return address:	Config Views		Adresse de réponse :
-   · E-mail filters	Account		   · Filtres E-mail
-   · Incoming	Account		   · Entrant
-Remove	Config Views		Supprimer
-Could not create inbound chain.	Account		Impossible de créer la chaîne entrante.
-Incoming mail filters	Config Views		Filtres de courier entrant
-Account settings	Config Views		Réglages du compte
-OK	Account		Ok
-Could not create outbound chain.	Account		Impossible de créer la chaîne sortante.
-Outbox	Account		Boîte d'envoi
-Inbox	Account		Boîte de réception
-Add filter	Config Views		Ajouter un filtre
-Outgoing mail filters	Config Views		Filtres de courrier sortant
-Miscellaneous	Config Window		Autres
-Show connection status window:	Config Window		Montrer la fenêtre d'état de la connexion :
-While sending	Config Window		Pendant l'envoi
-Schedule outgoing mail when dial-up is disconnected	Config Window		Planifier l'envoi de messages quand le modem est déconnecté
+OK	Config Views		OK
 hours	Config Window		heures
 Add	Config Window		Ajouter
-\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nLes réglages généraux n'ont pas pu être restaurés.\n\nErreur de lecture des réglages originaux :\n%s\n
-Edit mailbox menu…	Config Window		Editer le menu boîte à lettres…
-Check every	Config Window		Vérifier tous les
-Never	Config Window		Jamais
-never	Config Window		jamais
+E-mail	Account		Courriel
 minutes	Config Window		minutes
-Error retrieving general settings: %s\n	Config Window		Erreur de chargement des réglages principaux : %s\n
+OK	Account		OK
 Apply	Config Window		Appliquer
 Always	Config Window		Toujours
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nCréez un nouveau compte avec le bouton Ajouter.\n\nSupprimez un compte avec le bouton Supprimer sur le compte sélectionné.\n\nSélectionnez un compte pour changer ses réglages.
+Add filter	Config Views		Ajouter un filtre
