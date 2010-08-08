@@ -201,6 +201,7 @@ BSound::GetDataAt(off_t offset, void *intoBuffer, size_t bufferSize,
 				return false;
 
 			if (fTrackReader->ReadFrames(buffer, indirectFrameCount) != B_OK)
+				free(buffer);
 				return false;
 
 			memcpy(intoBuffer, (uint8 *)buffer + bufferOffset,
