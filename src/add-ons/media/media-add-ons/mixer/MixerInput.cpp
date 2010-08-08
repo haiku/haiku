@@ -96,6 +96,7 @@ MixerInput::~MixerInput()
 	for (int i = 0; i < fInputChannelCount; i++)
 		delete fResampler[i];
 	delete [] fResampler;
+	delete fInputByteSwap;
 }
 
 
