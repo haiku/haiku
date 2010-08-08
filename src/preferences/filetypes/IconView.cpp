@@ -1131,14 +1131,12 @@ IconView::SetModificationMessage(BMessage* message)
 
 
 status_t
-IconView::Invoke(const BMessage* _message)
+IconView::Invoke(BMessage* message)
 {
-	if (_message == NULL)
+	if (message == NULL)
 		fTarget.SendMessage(kMsgIconInvoked);
-	else {
-		BMessage message(*_message);
-		fTarget.SendMessage(&message);
-	}
+	else 
+		fTarget.SendMessage(message);
 	return B_OK;
 }
 

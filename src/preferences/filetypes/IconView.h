@@ -98,7 +98,7 @@ class IconView : public BControl {
 		void ShowEmptyFrame(bool show);
 		status_t SetTarget(const BMessenger& target);
 		void SetModificationMessage(BMessage* message);
-		status_t Invoke(const BMessage* message = NULL);
+		status_t Invoke(BMessage* message = NULL);
 
 		::Icon* Icon();
 		int32 IconSize() const { return fIconSize; } 
