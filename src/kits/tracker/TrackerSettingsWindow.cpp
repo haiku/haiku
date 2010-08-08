@@ -33,13 +33,14 @@ All rights reserved.
 */
 
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 
 #include "SettingsViews.h"
 #include "TrackerSettings.h"
 #include "TrackerSettingsWindow.h"
 
-//#include <CheckBox.h>
 #include <ScrollView.h>
 
 
@@ -73,76 +74,54 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 	BWindow(BRect(80, 80, 450, 350), B_TRANSLATE("Tracker preferences"),
 		B_TITLED_WINDOW, B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
 		| B_NO_WORKSPACE_ACTIVATION	| B_NOT_ANCHORED_ON_ACTIVATE
-		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+		| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BRect rect = Bounds();
-	BView *topView = new BView(rect, "Background", B_FOLLOW_ALL, 0);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	fSettingsTypeListView = new BListView("List View", B_SINGLE_SELECTION_LIST);
 
-	rect.InsetBy(10, 10);
-	rect.right = be_plain_font->StringWidth(B_TRANSLATE("Volume Icons"))
-		+ rect.left + (float)B_V_SCROLL_BAR_WIDTH + 40.0f;
-	fSettingsTypeListView = new BListView(rect, "List View", B_SINGLE_SELECTION_LIST,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM);
-	BScrollView* scrollView = new BScrollView("scrollview", fSettingsTypeListView,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	topView->AddChild(scrollView);
+	BScrollView* scrollView = new BScrollView("scrollview",
+		fSettingsTypeListView, B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	rect = scrollView->Frame();
-	rect.left = rect.right + 10;
-	rect.top = rect.bottom;
-	fDefaultsButton = new BButton(rect, "Defaults",	B_TRANSLATE("Defaults"),
-		new BMessage(kDefaultsButtonPressed), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fDefaultsButton->ResizeToPreferred();
+	fDefaultsButton = new BButton("Defaults", B_TRANSLATE("Defaults"),
+		new BMessage(kDefaultsButtonPressed));
 	fDefaultsButton->SetEnabled(false);
-	fDefaultsButton->MoveBy(0, -fDefaultsButton->Bounds().Height());
 
-	rect = fDefaultsButton->Frame();
-	rect.left = rect.right + 10;
-	fRevertButton = new BButton(rect, "Revert",	B_TRANSLATE("Revert"),
-		new BMessage(kRevertButtonPressed), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+	fRevertButton = new BButton("Revert", B_TRANSLATE("Revert"),
+		new BMessage(kRevertButtonPressed));
 	fRevertButton->SetEnabled(false);
-	fRevertButton->ResizeToPreferred();
 
-	rect = scrollView->Frame();
-	rect.left = rect.right + 10;
-	rect.right = Bounds().right - 10;
-	rect.bottom = fDefaultsButton->Frame().top - 10;
-	fSettingsContainerBox = new BBox(rect, NULL, B_FOLLOW_ALL);
-	topView->AddChild(fSettingsContainerBox);
-	topView->AddChild(fDefaultsButton);
-	topView->AddChild(fRevertButton);
+	fSettingsContainerBox = new BBox("SettingsContainerBox");
+	
+	const float spacing = be_control_look->DefaultItemSpacing();
 
-	rect = _SettingsFrame();
+	BLayoutBuilder::Group<>(this)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(scrollView)
+			.AddGroup(B_VERTICAL, spacing)
+				.Add(fSettingsContainerBox)
+				.AddGroup(B_HORIZONTAL, spacing)
+					.Add(fDefaultsButton)
+					.Add(fRevertButton)
+					.AddGlue()
+				.End()
+			.End()
+		.SetInsets(spacing, spacing, spacing, spacing)
+		.End();
 
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Desktop"),
-		new DesktopSettingsView(rect)));
+		new DesktopSettingsView()));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Windows"),
-		new WindowsSettingsView(rect)));
+		new WindowsSettingsView()));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Trash"),
-		new TrashSettingsView(rect)));
+		new TrashSettingsView()));
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Volume icons"),
-		new SpaceBarSettingsView(rect)));
+		new SpaceBarSettingsView()));
 
-	// compute preferred view size
-
-	float minWidth = 0, minHeight = 0;
-
-	for (int32 i = 0; i < fSettingsTypeListView->CountItems(); i++) {
-		SettingsView* view = ((SettingsItem *)fSettingsTypeListView->ItemAt(i))->View();
-
-		float width, height;
-		view->GetPreferredSize(&width, &height);
-
-		if (minWidth < width)
-			minWidth = width;
-		if (minHeight < height)
-			minHeight = height;
-	}
-
-	ResizeBy(max_c(minWidth - rect.Width(), 0), max_c(minHeight - rect.Height(), 0));
-		// make sure window is large enough to contain all views
+	// constraint the listview width so that the longest item fits
+	float width = 0;
+	fSettingsTypeListView->GetPreferredSize(&width, NULL);
+	width += B_V_SCROLL_BAR_WIDTH;
+	fSettingsTypeListView->SetExplicitMinSize(BSize(width, 0));
+	fSettingsTypeListView->SetExplicitMaxSize(BSize(width, B_SIZE_UNLIMITED));
 
 	fSettingsTypeListView->SetSelectionMessage(new BMessage(kSettingsViewChanged));
 	fSettingsTypeListView->Select(0);
@@ -230,19 +209,6 @@ TrackerSettingsWindow::_ViewAt(int32 i)
 }
 
 
-BRect
-TrackerSettingsWindow::_SettingsFrame()
-{
-	font_height fontHeight;
-	be_bold_font->GetHeight(&fontHeight);
-
-	BRect rect = fSettingsContainerBox->Bounds().InsetByCopy(8, 8);
-	rect.top += ceilf(fontHeight.ascent + fontHeight.descent);
-
-	return rect;
-}
-
-
 void
 TrackerSettingsWindow::_HandleChangedContents()
 {
@@ -322,10 +288,6 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 		view->Hide();
 		fSettingsContainerBox->AddChild(view);
 
-		// Resize view after it has been attached to the window, so that
-		// it's resizing modes are respected
-		BRect rect = _SettingsFrame();
-		view->ResizeTo(rect.Width(), rect.Height());
 		view->Show();
 	}
 }

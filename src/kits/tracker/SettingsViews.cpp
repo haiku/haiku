@@ -44,6 +44,8 @@ All rights reserved.
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <GroupLayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <ColorControl.h>
@@ -83,8 +85,9 @@ send_bool_notices(uint32 what, const char *name, bool value)
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "libtracker"
 
-SettingsView::SettingsView(BRect rect, const char *name)
-	: BView(rect, name, B_FOLLOW_ALL, 0)
+SettingsView::SettingsView(const char* name)
+	:
+	BGroupView(name)
 {
 }
 
@@ -165,59 +168,45 @@ SettingsView::IsRevertable() const
 // #pragma mark -
 
 
-DesktopSettingsView::DesktopSettingsView(BRect rect)
-	: SettingsView(rect, "DesktopSettingsView")
+DesktopSettingsView::DesktopSettingsView()
+	:
+	SettingsView("DesktopSettingsView")
 {
-	rect.OffsetTo(B_ORIGIN);
-	fShowDisksIconRadioButton = new BRadioButton(rect, "",
+	fShowDisksIconRadioButton = new BRadioButton("",
 		B_TRANSLATE("Show Disks icon"),
 		new BMessage(kShowDisksIconChanged));
-	fShowDisksIconRadioButton->ResizeToPreferred();
-	AddChild(fShowDisksIconRadioButton);
 
-	const float itemSpacing = fShowDisksIconRadioButton->Bounds().Height() + kItemExtraSpacing;
-	rect.OffsetBy(0, itemSpacing);
-
-	fMountVolumesOntoDesktopRadioButton = new BRadioButton(rect, "",
+	fMountVolumesOntoDesktopRadioButton = new BRadioButton("",
 		B_TRANSLATE("Show volumes on Desktop"),
 		new BMessage(kVolumesOnDesktopChanged));
-	AddChild(fMountVolumesOntoDesktopRadioButton);
-	fMountVolumesOntoDesktopRadioButton->ResizeToPreferred();
 
-	rect.OffsetBy(20, itemSpacing);
-
-	fMountSharedVolumesOntoDesktopCheckBox = new BCheckBox(rect, "",
+	fMountSharedVolumesOntoDesktopCheckBox = new BCheckBox("",
 		B_TRANSLATE("Show shared volumes on Desktop"),
 		new BMessage(kVolumesOnDesktopChanged));
-	AddChild(fMountSharedVolumesOntoDesktopCheckBox);
-	fMountSharedVolumesOntoDesktopCheckBox->ResizeToPreferred();
 
-	rect.OffsetBy(-20, itemSpacing);
-
-	rect = Bounds();
-	rect.top = rect.bottom;
-	fMountButton = new BButton(rect, "",
+	fMountButton = new BButton("",
 		B_TRANSLATE("Mount settings" B_UTF8_ELLIPSIS),
-		new BMessage(kRunAutomounterSettings), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fMountButton->ResizeToPreferred();
-	fMountButton->MoveBy(0, -fMountButton->Bounds().Height());
-	AddChild(fMountButton);
+		new BMessage(kRunAutomounterSettings));
+
+	const float spacing = be_control_look->DefaultItemSpacing();
+
+	BGroupLayoutBuilder(this)
+		.AddGroup(B_VERTICAL)
+			.Add(fShowDisksIconRadioButton)
+			.Add(fMountVolumesOntoDesktopRadioButton)
+			.AddGroup(B_VERTICAL)
+				.Add(fMountSharedVolumesOntoDesktopCheckBox)
+				.SetInsets(20, 0, 0, 0)
+			.End()
+			.AddGlue()
+			.AddGroup(B_HORIZONTAL)
+				.Add(fMountButton)
+				.AddGlue()
+			.End()
+		.End()
+		.SetInsets(spacing, spacing, spacing, spacing);
 
 	fMountButton->SetTarget(be_app);
-}
-
-
-void
-DesktopSettingsView::GetPreferredSize(float *_width, float *_height)
-{
-	if (_width != NULL) {
-		*_width = fMountSharedVolumesOntoDesktopCheckBox->Frame().right;
-	}
-
-	if (_height != NULL) {
-		*_height = fMountSharedVolumesOntoDesktopCheckBox->Frame().bottom + 8
-			+ fMountButton->Bounds().Height();
-	}
 }
 
 
@@ -414,67 +403,54 @@ DesktopSettingsView::IsRevertable() const
 // #pragma mark -
 
 
-WindowsSettingsView::WindowsSettingsView(BRect rect)
-	: SettingsView(rect, "WindowsSettingsView")
+WindowsSettingsView::WindowsSettingsView()
+	:
+	SettingsView("WindowsSettingsView")
 {
-	rect.OffsetTo(B_ORIGIN);
-	fShowFullPathInTitleBarCheckBox = new BCheckBox(rect, "",
+	fShowFullPathInTitleBarCheckBox = new BCheckBox("",
 		B_TRANSLATE("Show folder location in title tab"),
 		new BMessage(kWindowsShowFullPathChanged));
-	fShowFullPathInTitleBarCheckBox->ResizeToPreferred();
-	AddChild(fShowFullPathInTitleBarCheckBox);
 
-	const float itemSpacing = fShowFullPathInTitleBarCheckBox->Bounds().Height() + kItemExtraSpacing;
-	rect.OffsetBy(0, itemSpacing);
-
-	fSingleWindowBrowseCheckBox = new BCheckBox(rect, "",
+	fSingleWindowBrowseCheckBox = new BCheckBox("",
 		B_TRANSLATE("Single window navigation"),
 		new BMessage(kSingleWindowBrowseChanged));
-	fSingleWindowBrowseCheckBox->ResizeToPreferred();
-	AddChild(fSingleWindowBrowseCheckBox);
 
-	rect.OffsetBy(20, itemSpacing);
-
-	fShowNavigatorCheckBox = new BCheckBox(rect, "",
+	fShowNavigatorCheckBox = new BCheckBox("",
 		B_TRANSLATE("Show navigator"),
 		new BMessage(kShowNavigatorChanged));
-	fShowNavigatorCheckBox->ResizeToPreferred();
-	AddChild(fShowNavigatorCheckBox);
 
-	rect.OffsetBy(-20, itemSpacing);
-
-	fOutlineSelectionCheckBox = new BCheckBox(rect, "",
+	fOutlineSelectionCheckBox = new BCheckBox("",
 		B_TRANSLATE("Outline selection rectangle only"),
 		new BMessage(kTransparentSelectionChanged));
-	fOutlineSelectionCheckBox->ResizeToPreferred();
-	AddChild(fOutlineSelectionCheckBox);
 
-	rect.OffsetBy(0, itemSpacing);
-
-	fSortFolderNamesFirstCheckBox = new BCheckBox(rect, "",
+	fSortFolderNamesFirstCheckBox = new BCheckBox("",
 		B_TRANSLATE("List folders first"),
 		new BMessage(kSortFolderNamesFirstChanged));
-	fSortFolderNamesFirstCheckBox->ResizeToPreferred();
-	AddChild(fSortFolderNamesFirstCheckBox);
 
-	rect.OffsetBy(0, itemSpacing);
-
-	fTypeAheadFilteringCheckBox = new BCheckBox(rect, "",
+	fTypeAheadFilteringCheckBox = new BCheckBox("",
 		B_TRANSLATE("Enable type-ahead filtering"),
 		new BMessage(kTypeAheadFilteringChanged));
-	fTypeAheadFilteringCheckBox->ResizeToPreferred();
-	AddChild(fTypeAheadFilteringCheckBox);
-}
 
+	const float spacing = be_control_look->DefaultItemSpacing();
 
-void
-WindowsSettingsView::GetPreferredSize(float *_width, float *_height)
-{
-	if (_width != NULL)
-		*_width = fOutlineSelectionCheckBox->Frame().right;
-
-	if (_height != NULL)
-		*_height = fSortFolderNamesFirstCheckBox->Frame().bottom;
+	BGroupLayoutBuilder(this)
+		.AddGroup(B_VERTICAL)
+			.AddGroup(B_VERTICAL)
+				.Add(fShowFullPathInTitleBarCheckBox)
+				.Add(fSingleWindowBrowseCheckBox)
+			.End()
+			.AddGroup(B_VERTICAL)
+				.Add(fShowNavigatorCheckBox)
+				.SetInsets(20, 0, 0, 0)
+			.End()
+			.AddGroup(B_VERTICAL)
+				.Add(fOutlineSelectionCheckBox)
+				.Add(fSortFolderNamesFirstCheckBox)
+				.Add(fTypeAheadFilteringCheckBox)
+			.End()
+		.AddGlue()
+		.End()
+		.SetInsets(spacing, spacing, spacing, spacing);
 }
 
 
@@ -719,23 +695,18 @@ WindowsSettingsView::IsRevertable() const
 // #pragma mark -
 
 
-SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
-	: SettingsView(rect, "SpaceBarSettingsView")
+SpaceBarSettingsView::SpaceBarSettingsView()
+	:
+	SettingsView("SpaceBarSettingsView")
 {
-	rect.OffsetTo(B_ORIGIN);
-	fSpaceBarShowCheckBox = new BCheckBox(rect, "",
+	fSpaceBarShowCheckBox = new BCheckBox("",
 		B_TRANSLATE("Show space bars on volumes"),
 		new BMessage(kUpdateVolumeSpaceBar));
-	fSpaceBarShowCheckBox->ResizeToPreferred();
-	AddChild(fSpaceBarShowCheckBox);
 
-	rect = fSpaceBarShowCheckBox->Frame();
-	rect.OffsetBy(0, fSpaceBarShowCheckBox->Bounds().Height() + kItemExtraSpacing);
-
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING);
+	BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING);
 	menu->SetFont(be_plain_font);
 
-	BMenuItem *item;
+	BMenuItem* item;
 	menu->AddItem(item = new BMenuItem(
 		B_TRANSLATE("Used space color"),
 		new BMessage(kSpaceBarSwitchColor)));
@@ -748,44 +719,30 @@ SpaceBarSettingsView::SpaceBarSettingsView(BRect rect)
 		B_TRANSLATE("Warning space color"),
 		new BMessage(kSpaceBarSwitchColor)));
 
-	BBox *box = new BBox(rect);
-	box->SetLabel(fColorPicker = new BMenuField(rect, NULL, NULL, menu));
-	AddChild(box);
+	BBox* box = new BBox("box");
+	box->SetLabel(fColorPicker = new BMenuField("menu", NULL, menu));
 
 	fColorControl = new BColorControl(BPoint(8, fColorPicker->Bounds().Height()
 			+ 8 + kItemExtraSpacing),
 		B_CELLS_16x16, 1, "SpaceColorControl", new BMessage(kSpaceBarColorChanged));
 	fColorControl->SetValue(TrackerSettings().UsedSpaceColor());
-	fColorControl->ResizeToPreferred();
 	box->AddChild(fColorControl);
 
-	box->ResizeTo(fColorControl->Bounds().Width() + 16,
-		fColorControl->Frame().bottom + 8);
+	const float spacing = be_control_look->DefaultItemSpacing();
+
+	BGroupLayoutBuilder(this)
+		.AddGroup(B_VERTICAL)
+			.Add(fSpaceBarShowCheckBox)
+			.Add(box)
+		.AddGlue()
+		.End()
+		.SetInsets(spacing, spacing, spacing, spacing);
+
 }
 
 
 SpaceBarSettingsView::~SpaceBarSettingsView()
 {
-}
-
-
-void
-SpaceBarSettingsView::GetPreferredSize(float *_width, float *_height)
-{
-	BView* view = fColorControl->Parent();
-	if (view == NULL)
-		BView::GetPreferredSize(_width, _height);
-
-	if (_width != NULL) {
-		float width = fSpaceBarShowCheckBox->Bounds().Width();
-		if (view->Bounds().Width() > width)
-			width = view->Bounds().Width();
-
-		*_width = width;
-	}
-
-	if (_height != NULL)
-		*_height = view->Frame().bottom;
 }
 
 
@@ -976,40 +933,28 @@ SpaceBarSettingsView::IsRevertable() const
 // #pragma mark -
 
 
-TrashSettingsView::TrashSettingsView(BRect rect)
-	: SettingsView(rect, "TrashSettingsView")
+TrashSettingsView::TrashSettingsView()
+	:
+	SettingsView("TrashSettingsView")
 {
-	rect.OffsetTo(B_ORIGIN);
-	fDontMoveFilesToTrashCheckBox = new BCheckBox(rect, "",
+	fDontMoveFilesToTrashCheckBox = new BCheckBox("",
 		B_TRANSLATE("Don't move files to Trash"),
 			new BMessage(kDontMoveFilesToTrashChanged));
-	fDontMoveFilesToTrashCheckBox->ResizeToPreferred();
-	AddChild(fDontMoveFilesToTrashCheckBox);
 
-	rect = fDontMoveFilesToTrashCheckBox->Frame();
-	rect.OffsetBy(0, fDontMoveFilesToTrashCheckBox->Bounds().Height() + kItemExtraSpacing);
-
-	fAskBeforeDeleteFileCheckBox = new BCheckBox(rect, "",
+	fAskBeforeDeleteFileCheckBox = new BCheckBox("",
 		B_TRANSLATE("Ask before delete"),
 			new BMessage(kAskBeforeDeleteFileChanged));
-	fAskBeforeDeleteFileCheckBox->ResizeToPreferred();
-	AddChild(fAskBeforeDeleteFileCheckBox);
-}
 
+	const float spacing = be_control_look->DefaultItemSpacing();
 
-void
-TrashSettingsView::GetPreferredSize(float *_width, float *_height)
-{
-	if (_width != NULL) {
-		float width = fDontMoveFilesToTrashCheckBox->Bounds().Width();
-		if (width < fAskBeforeDeleteFileCheckBox->Bounds().Width())
-			width = fAskBeforeDeleteFileCheckBox->Bounds().Width();
+	BGroupLayoutBuilder(this)
+		.AddGroup(B_VERTICAL)
+			.Add(fDontMoveFilesToTrashCheckBox)
+			.Add(fAskBeforeDeleteFileCheckBox)
+			.AddGlue()
+		.End()
+		.SetInsets(spacing, spacing, spacing, spacing);
 
-		*_width = width;
-	}
-
-	if (_height != NULL)
-		*_height = fAskBeforeDeleteFileCheckBox->Frame().bottom;
 }
 
 

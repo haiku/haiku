@@ -57,7 +57,6 @@ class TrackerSettingsWindow : public BWindow {
 
 	private:
 		SettingsView *_ViewAt(int32 i);
-		BRect _SettingsFrame();
 
 		void _HandleChangedContents();
 		void _HandlePressedDefaultsButton();

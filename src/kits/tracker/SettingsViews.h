@@ -36,6 +36,7 @@ All rights reserved.
 #define _SETTINGS_VIEWS
 
 #include <CheckBox.h>
+#include <GroupView.h>
 #include <RadioButton.h>
 #include <TextControl.h>
 #include <ColorControl.h>
@@ -51,9 +52,9 @@ class BStringView;
 
 namespace BPrivate {
 
-class SettingsView : public BView {
+class SettingsView : public BGroupView {
 	public:
-		SettingsView(BRect frame, const char *name);
+				SettingsView(const char* name);
 		virtual ~SettingsView();
 
 		virtual void SetDefaults();
@@ -64,16 +65,15 @@ class SettingsView : public BView {
 		virtual bool IsRevertable() const;
 
 	protected:
-		typedef BView _inherited;
+		typedef BGroupView _inherited;
 };
 
 class DesktopSettingsView : public SettingsView {
 	public:
-		DesktopSettingsView(BRect frame);
+		DesktopSettingsView();
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
-		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual bool IsDefaultable() const;
@@ -102,11 +102,10 @@ class DesktopSettingsView : public SettingsView {
 
 class WindowsSettingsView : public SettingsView {
 	public:
-		WindowsSettingsView(BRect frame);
+		WindowsSettingsView();
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
-		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual bool IsDefaultable() const;
@@ -134,15 +133,13 @@ class WindowsSettingsView : public SettingsView {
 		typedef SettingsView _inherited;
 };
 
-
 class SpaceBarSettingsView : public SettingsView {
 	public:
-		SpaceBarSettingsView(BRect frame);
+		SpaceBarSettingsView();
 		virtual ~SpaceBarSettingsView();
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
-		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual bool IsDefaultable() const;
@@ -167,11 +164,10 @@ class SpaceBarSettingsView : public SettingsView {
 
 class TrashSettingsView : public SettingsView {
 	public:
-		TrashSettingsView(BRect frame);
+		TrashSettingsView();
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void AttachedToWindow();
-		virtual void GetPreferredSize(float *_width, float *_height);
 
 		virtual void SetDefaults();
 		virtual bool IsDefaultable() const;
