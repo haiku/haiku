@@ -580,7 +580,7 @@ BGridLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 		int32 rowCount = fRowCount;
 
 		// check for empty columns
-		bool empty = false;
+		bool empty = true;
 		for (; columnCount > 0; columnCount--) {
 			for (int32 row = 0; empty && row < rowCount; row++)
 				empty &= (fGrid[columnCount - 1][row] == NULL);
@@ -590,7 +590,7 @@ BGridLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 		}
 
 		// check for empty rows
-		empty = false;
+		empty = true;
 		for (; rowCount > 0; rowCount--) {
 			for (int32 column = 0; empty && column < columnCount; column++)
 				empty &= (fGrid[column][rowCount - 1] == NULL);
