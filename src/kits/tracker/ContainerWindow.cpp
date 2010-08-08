@@ -2195,7 +2195,7 @@ BContainerWindow::SetUpEditQueryItem(BMenu *menu)
 	bool poseViewIsQuery = TargetModel()->IsQuery();
 		// if the view is a query pose view, add edit query menu item
 
-	BMenuItem* item = menu->FindItem(B_TRANSLATE("Edit query"));
+	BMenuItem* item = menu->FindItem(kEditQuery);
 	if (!poseViewIsQuery && !queryInSelection && item)
 		item->Menu()->RemoveItem(item);
 
@@ -3024,7 +3024,7 @@ BContainerWindow::UpdateMenu(BMenu *menu, UpdateMenuContext context)
 
 	if (context == kMenuBarContext || context == kWindowPopUpContext) {
 		BMenu* sizeMenu = NULL;
-		if (BMenuItem* item = menu->FindItem(B_TRANSLATE("Icon view"))) {
+		if (BMenuItem* item = menu->FindItem(kIconMode)) {
 			sizeMenu = item->Submenu();
 		}
 
