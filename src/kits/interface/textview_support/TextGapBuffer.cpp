@@ -59,10 +59,10 @@ TextGapBuffer::InsertText(const char* inText, int32 inNumItems, int32 inAtIndex)
 	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
 
 	if (inAtIndex != fGapIndex)
-		MoveGapTo(inAtIndex);
+		_MoveGapTo(inAtIndex);
 
 	if (fGapCount < inNumItems)
-		SizeGapTo(inNumItems + kTextGapBufferBlockSize);
+		_EnlargeGapTo(inNumItems + kTextGapBufferBlockSize);
 
 	memcpy(fBuffer + fGapIndex, inText, inNumItems);
 
@@ -95,10 +95,10 @@ TextGapBuffer::InsertText(BFile* file, int32 fileOffset, int32 inNumItems,
 	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
 
 	if (inAtIndex != fGapIndex)
-		MoveGapTo(inAtIndex);
+		_MoveGapTo(inAtIndex);
 
 	if (fGapCount < inNumItems)
-		SizeGapTo(inNumItems + kTextGapBufferBlockSize);
+		_EnlargeGapTo(inNumItems + kTextGapBufferBlockSize);
 
 	// Finally, read the data and put it into the buffer
 	if (file->ReadAt(fileOffset, fBuffer + fGapIndex, inNumItems) > 0) {
@@ -121,59 +121,13 @@ TextGapBuffer::RemoveRange(int32 start, int32 end)
 	inAtIndex = (inAtIndex > fItemCount - 1) ? (fItemCount - 1) : inAtIndex;
 	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
 
-	MoveGapTo(inAtIndex);
+	_MoveGapTo(inAtIndex);
 
 	fGapCount += inNumItems;
 	fItemCount -= inNumItems;
 
 	if (fGapCount > kTextGapBufferBlockSize)
-		SizeGapTo(kTextGapBufferBlockSize);
-}
-
-
-void
-TextGapBuffer::MoveGapTo(int32 toIndex)
-{
-	if (toIndex == fGapIndex)
-		return;
-	if (toIndex > fItemCount) {
-		debugger("MoveGapTo: invalid toIndex supplied");
-		return;
-	}
-
-	int32 srcIndex = 0;
-	int32 dstIndex = 0;
-	int32 count = 0;
-	if (toIndex > fGapIndex) {
-		srcIndex = fGapIndex + fGapCount;
-		dstIndex = fGapIndex;
-		count = toIndex - fGapIndex;
-	} else {
-		srcIndex = toIndex;
-		dstIndex = toIndex + fGapCount;
-		count = fGapIndex- toIndex;
-	}
-
-	if (count > 0)
-		memmove(fBuffer + dstIndex, fBuffer + srcIndex, count);
-
-	fGapIndex = toIndex;
-}
-
-
-void
-TextGapBuffer::SizeGapTo(long inCount)
-{
-	if (inCount == fGapCount)
-		return;
-
-	fBuffer = (char*)realloc(fBuffer, fItemCount + inCount);
-	memmove(fBuffer + fGapIndex + inCount,
-			fBuffer + fGapIndex + fGapCount,
-			fBufferCount - (fGapIndex + fGapCount));
-
-	fGapCount = inCount;
-	fBufferCount = fItemCount + fGapCount;
+		_ShrinkGapTo(kTextGapBufferBlockSize);
 }
 
 
@@ -195,7 +149,6 @@ TextGapBuffer::GetString(int32 fromOffset, int32* _numBytes)
 		result = fBuffer + fromOffset;
 		if (!isStartBeforeGap)
 			result += fGapCount;
-
 	} else {
 		if (fScratchSize < numBytes) {
 			fScratchBuffer = (char*)realloc(fScratchBuffer, numBytes);
@@ -284,10 +237,10 @@ TextGapBuffer::Text()
 const char*
 TextGapBuffer::RealText()
 {
-	MoveGapTo(fItemCount);
+	_MoveGapTo(fItemCount);
 
 	if (fGapCount == 0)
-		SizeGapTo(kTextGapBufferBlockSize);
+		_EnlargeGapTo(kTextGapBufferBlockSize);
 
 	fBuffer[fItemCount] = '\0';
 	return fBuffer;
@@ -348,5 +301,65 @@ TextGapBuffer::SetPasswordMode(bool state)
 	fPasswordMode = state;
 }
 
-} // namespace BPrivate
 
+void
+TextGapBuffer::_MoveGapTo(int32 toIndex)
+{
+	if (toIndex == fGapIndex)
+		return;
+	if (toIndex > fItemCount) {
+		debugger("MoveGapTo: invalid toIndex supplied");
+		return;
+	}
+
+	int32 srcIndex = 0;
+	int32 dstIndex = 0;
+	int32 count = 0;
+	if (toIndex > fGapIndex) {
+		srcIndex = fGapIndex + fGapCount;
+		dstIndex = fGapIndex;
+		count = toIndex - fGapIndex;
+	} else {
+		srcIndex = toIndex;
+		dstIndex = toIndex + fGapCount;
+		count = fGapIndex- toIndex;
+	}
+
+	if (count > 0)
+		memmove(fBuffer + dstIndex, fBuffer + srcIndex, count);
+
+	fGapIndex = toIndex;
+}
+
+
+void
+TextGapBuffer::_EnlargeGapTo(long inCount)
+{
+	if (inCount == fGapCount)
+		return;
+
+	fBuffer = (char*)realloc(fBuffer, fItemCount + inCount);
+	memmove(fBuffer + fGapIndex + inCount, fBuffer + fGapIndex + fGapCount,
+		fBufferCount - (fGapIndex + fGapCount));
+
+	fGapCount = inCount;
+	fBufferCount = fItemCount + fGapCount;
+}
+
+
+void
+TextGapBuffer::_ShrinkGapTo(long inCount)
+{
+	if (inCount == fGapCount)
+		return;
+
+	memmove(fBuffer + fGapIndex + inCount, fBuffer + fGapIndex + fGapCount,
+		fBufferCount - (fGapIndex + fGapCount));
+	fBuffer = (char*)realloc(fBuffer, fItemCount + inCount);
+
+	fGapCount = inCount;
+	fBufferCount = fItemCount + fGapCount;
+}
+
+
+} // namespace BPrivate

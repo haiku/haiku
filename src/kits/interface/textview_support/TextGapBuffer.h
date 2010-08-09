@@ -30,9 +30,6 @@ public:
 									int32 amount, int32 atIndex);
 			void				RemoveRange(int32 start, int32 end);
 
-			void				MoveGapTo(int32 toIndex);
-			void				SizeGapTo(int32 inCount);
-
 			bool				FindChar(char inChar, int32 fromIndex,
 									int32* ioDelta);
 
@@ -49,7 +46,11 @@ public:
 			bool				PasswordMode() const;
 			void				SetPasswordMode(bool);
 
-protected:
+private:
+			void				_MoveGapTo(int32 toIndex);
+			void				_EnlargeGapTo(int32 inCount);
+			void				_ShrinkGapTo(int32 inCount);
+
 			int32				fItemCount;			// logical count
 			char*				fBuffer;			// allocated memory
 			int32				fBufferCount;		// physical count
