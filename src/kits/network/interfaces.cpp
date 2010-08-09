@@ -72,7 +72,6 @@ if_indextoname(unsigned index, char* nameBuffer)
 
 	strlcpy(nameBuffer, request.ifr_name, IF_NAMESIZE);
 	return nameBuffer;
-
 }
 
 
