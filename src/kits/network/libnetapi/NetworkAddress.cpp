@@ -860,7 +860,7 @@ BNetworkAddress::PortName() const
 
 
 status_t
-BNetworkAddress::Archive(BMessage* into, bool deep = true) const
+BNetworkAddress::Archive(BMessage* into, bool deep) const
 {
 	// TODO: implement me!
 	return B_ERROR;
