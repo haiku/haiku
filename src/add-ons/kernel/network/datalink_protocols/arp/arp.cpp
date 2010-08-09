@@ -1001,6 +1001,8 @@ arp_init_protocol(net_interface* interface, net_domain* domain,
 		return B_NO_MEMORY;
 
 	memset(&protocol->hardware_address, 0, sizeof(sockaddr_dl));
+	protocol->local_address = 0;
+
 	*_protocol = protocol;
 	return B_OK;
 }
