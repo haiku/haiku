@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009 Haiku Inc. All rights reserved.
+ * Copyright 2004-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,8 @@
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <fs_interface.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
 #include <Path.h>
 
 #include <arpa/inet.h>
@@ -235,38 +237,17 @@ EthernetSettingsView::_GatherInterfaces()
 {
 	// iterate over all interfaces and retrieve minimal status
 
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(fSocket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return;
-
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0)
-		return;
-
-	void* buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL)
-		return;
-
-	MemoryDeleter deleter(buffer);
-
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(fSocket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
-		return;
-
-	ifreq* interface = (ifreq*)buffer;
-
 	fInterfaces.MakeEmpty();
 
-	for (uint32 i = 0; i < count; i++) {
-		if (strncmp(interface->ifr_name, "loop", 4) && interface->ifr_name[0]) {
-			fInterfaces.AddItem(new BString(interface->ifr_name));
-			fSettings.AddItem(new Settings(interface->ifr_name));
-		}
+	BNetworkRoster& roster = BNetworkRoster::Default();
+	BNetworkInterface interface;
+	uint32 cookie = 0;
 
-		interface = (ifreq*)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		if (strncmp(interface.Name(), "loop", 4) && interface.Name()[0]) {
+			fInterfaces.AddItem(new BString(interface.Name()));
+			fSettings.AddItem(new Settings(interface.Name()));
+		}
 	}
 }
 

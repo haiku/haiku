@@ -49,6 +49,9 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 {
 	// TODO: think about caching the interfaces!
 
+	if (cookie == NULL)
+		return B_BAD_VALUE;
+
 	// get a list of all interfaces
 
 	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
@@ -82,8 +85,10 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 
 	for (uint32 i = 0; interfaces < end; i++) {
 		interface.SetTo(interfaces[0].ifr_name);
-		if (i == *cookie)
+		if (i == *cookie) {
+			(*cookie)++;
 			return B_OK;
+		}
 
 		interfaces = (ifreq*)((uint8*)interfaces
 			+ _SIZEOF_ADDR_IFREQ(interfaces[0]));

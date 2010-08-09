@@ -10,6 +10,7 @@ Preference Network :
 	Settings.cpp
 
 	: be $(HAIKU_NETWORK_LIBS) $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+		libbnetapi.so
 	: Network.rdef
 ;
 
