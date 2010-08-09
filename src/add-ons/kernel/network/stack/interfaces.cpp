@@ -325,6 +325,8 @@ InterfaceAddress::Dump(size_t index, bool hideInterface)
 	} else
 		strcpy(buffer, "-");
 	kprintf("    destination: %s\n", buffer);
+	
+	kprintf("    ref count:   %" B_PRId32 "\n", CountReferences());
 }
 
 

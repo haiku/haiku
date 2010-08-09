@@ -1075,6 +1075,9 @@ copy_metadata(net_buffer* destination, const net_buffer* source)
 
 	destination->flags = source->flags;
 	destination->interface_address = source->interface_address;
+	if (destination->interface_address != NULL)
+		((InterfaceAddress*)destination->interface_address)->AcquireReference();
+
 	destination->offset = source->offset;
 	destination->protocol = source->protocol;
 	destination->type = source->type;
@@ -1156,6 +1159,9 @@ free_buffer(net_buffer* _buffer)
 	delete_ancillary_data_container(buffer->ancillary_data);
 
 	release_data_header(buffer->allocation_header);
+	
+	if (buffer->interface_address != NULL)
+		((InterfaceAddress*)buffer->interface_address)->ReleaseReference();
 
 	free_net_buffer(buffer);
 }
@@ -1972,7 +1978,12 @@ append_cloned_data(net_buffer* _buffer, net_buffer* _source, uint32 offset,
 		clone->offset = buffer->size;
 		clone->start = node->start + offset;
 		clone->used = min_c(bytes, node->used - offset);
-		clone->flags |= DATA_NODE_READ_ONLY;
+		if (list_is_empty(&buffer->buffers)) {
+			// take over stored offset
+			buffer->stored_header_length = source->stored_header_length;
+			clone->flags = node->flags | DATA_NODE_READ_ONLY;
+		} else
+			clone->flags = DATA_NODE_READ_ONLY;
 
 		list_add_item(&buffer->buffers, clone);
 
