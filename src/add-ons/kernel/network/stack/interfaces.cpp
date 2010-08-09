@@ -746,13 +746,26 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 							address->local, (sockaddr*)&newAddress))
 						break;
 				}
+				
+				if (address == NULL)
+					return B_BAD_VALUE;
 			} else {
 				// Just use the first address for this family
 				address = _FirstForFamily(domain->family);
-			}
+				if (address == NULL) {
+					// Create new on the fly
+					address = new(std::nothrow) InterfaceAddress(this, domain);
+					if (address == NULL)
+						return B_NO_MEMORY;
 
-			if (address == NULL)
-				return B_BAD_VALUE;
+					status_t status = AddAddress(address);
+					if (status != B_OK)
+						return status;
+
+					// Note, even if setting the address failed, the empty
+					// address added here will still be added to the interface.
+				}
+			}
 
 			return _ChangeAddress(locker, address, option,
 				*address->AddressFor(option),
