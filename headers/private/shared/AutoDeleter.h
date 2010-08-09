@@ -5,16 +5,22 @@
 #ifndef _AUTO_DELETER_H
 #define _AUTO_DELETER_H
 
+
 /*!	Scope-based automatic deletion of objects/arrays.
 	ObjectDeleter  - deletes an object
 	ArrayDeleter   - deletes an array
 	MemoryDeleter  - free()s malloc()ed memory
 	CObjectDeleter - calls an arbitrary specified destructor function
+	DescriptorCloser - closes a file descriptor
 */
 
+
 #include <stdlib.h>
+#include <unistd.h>
+
 
 namespace BPrivate {
+
 
 // AutoDeleter
 
@@ -214,12 +220,41 @@ struct MethodDeleter
 	}
 };
 
+
+// DescriptorCloser
+
+struct DescriptorCloser {
+	inline DescriptorCloser(int descriptor)
+		:
+		fDescriptor(descriptor)
+	{
+	}
+
+	inline ~DescriptorCloser()
+	{
+		if (fDescriptor >= 0)
+			close(fDescriptor);
+	}
+
+	inline void Detach()
+	{
+		fDescriptor = -1;
+	}
+
+private:
+	int	fDescriptor;
+};
+
+
 }	// namespace BPrivate
+
 
 using BPrivate::ObjectDeleter;
 using BPrivate::ArrayDeleter;
 using BPrivate::MemoryDeleter;
 using BPrivate::CObjectDeleter;
 using BPrivate::MethodDeleter;
+using BPrivate::DescriptorCloser;
+
 
 #endif	// _AUTO_DELETER_H
