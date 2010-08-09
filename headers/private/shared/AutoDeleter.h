@@ -11,7 +11,7 @@
 	ArrayDeleter   - deletes an array
 	MemoryDeleter  - free()s malloc()ed memory
 	CObjectDeleter - calls an arbitrary specified destructor function
-	DescriptorCloser - closes a file descriptor
+	FileDescriptorCloser - closes a file descriptor
 */
 
 
@@ -221,16 +221,16 @@ struct MethodDeleter
 };
 
 
-// DescriptorCloser
+// FileDescriptorCloser
 
-struct DescriptorCloser {
-	inline DescriptorCloser(int descriptor)
+struct FileDescriptorCloser {
+	inline FileDescriptorCloser(int descriptor)
 		:
 		fDescriptor(descriptor)
 	{
 	}
 
-	inline ~DescriptorCloser()
+	inline ~FileDescriptorCloser()
 	{
 		if (fDescriptor >= 0)
 			close(fDescriptor);
@@ -254,7 +254,7 @@ using BPrivate::ArrayDeleter;
 using BPrivate::MemoryDeleter;
 using BPrivate::CObjectDeleter;
 using BPrivate::MethodDeleter;
-using BPrivate::DescriptorCloser;
+using BPrivate::FileDescriptorCloser;
 
 
 #endif	// _AUTO_DELETER_H

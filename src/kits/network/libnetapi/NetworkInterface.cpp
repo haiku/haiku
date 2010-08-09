@@ -21,7 +21,7 @@ do_ifaliasreq(const char* name, int32 option, BNetworkInterfaceAddress& address,
 	if (socket < 0)
 		return errno;
 
-	DescriptorCloser closer(socket);
+	FileDescriptorCloser closer(socket);
 
 	ifaliasreq request;
 	strlcpy(request.ifra_name, name, IF_NAMESIZE);
@@ -65,7 +65,7 @@ do_request(ifreq& request, const char* name, int option)
 	if (socket < 0)
 		return errno;
 
-	DescriptorCloser closer(socket);
+	FileDescriptorCloser closer(socket);
 
 	strlcpy(request.ifr_name, name, IF_NAMESIZE);
 
@@ -331,7 +331,7 @@ BNetworkInterface::GetHardwareAddress(BNetworkAddress& address)
 	if (socket < 0)
 		return errno;
 
-	DescriptorCloser closer(socket);
+	FileDescriptorCloser closer(socket);
 
 	ifreq request;
 	strlcpy(request.ifr_name, Name(), IF_NAMESIZE);

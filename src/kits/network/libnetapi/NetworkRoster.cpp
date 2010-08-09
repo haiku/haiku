@@ -32,7 +32,7 @@ BNetworkRoster::CountInterfaces() const
 	if (socket < 0)
 		return 0;
 
-	DescriptorCloser closer(socket);
+	FileDescriptorCloser closer(socket);
 
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
@@ -58,7 +58,7 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 	if (socket < 0)
 		return errno;
 
-	DescriptorCloser closer(socket);
+	FileDescriptorCloser closer(socket);
 
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
