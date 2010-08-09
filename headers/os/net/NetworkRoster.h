@@ -6,7 +6,7 @@
 #define _NETWORK_ROSTER_H
 
 
-#include <SupportDefs.h>
+#include <Locker.h>
 
 
 class BMessenger;
@@ -17,14 +17,14 @@ class BNetworkRoster {
 public:
 	static	BNetworkRoster&		Default();
 
-			int32				CountInterfaces();
-			BNetworkInterface*	InterfaceAt(int32 index);
+			size_t				CountInterfaces() const;
+			status_t			GetNextInterface(uint32* cookie,
+									BNetworkInterface& interface) const;
 
 			status_t			AddInterface(
 									const BNetworkInterface& interface);
 			status_t			RemoveInterface(
 									const BNetworkInterface& interface);
-			status_t			RemoveInterfaceAt(int32 index);
 
 			status_t			StartWatching(const BMessenger& target,
 									uint32 eventMask);
@@ -33,6 +33,9 @@ public:
 private:
 								BNetworkRoster();
 								~BNetworkRoster();
+
+private:
+	static	BNetworkRoster		sDefault;
 };
 
 

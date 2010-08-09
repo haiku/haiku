@@ -21,9 +21,12 @@ public:
 								BNetworkInterfaceAddress();
 								~BNetworkInterfaceAddress();
 
+			status_t			SetTo(BNetworkInterface& interface,
+									int32 index);
+
 			void				SetAddress(BNetworkAddress& address);
 			void				SetMask(BNetworkAddress& mask);
-			void				SetBroadcast(BNetworkAddress& mask);
+			void				SetBroadcast(BNetworkAddress& broadcast);
 
 			BNetworkAddress&	Address() { return fAddress; }
 			BNetworkAddress&	Mask() { return fMask; }
@@ -36,9 +39,10 @@ public:
 			void				SetFlags(uint32 flags);
 			uint32				Flags() const { return fFlags; }
 
+			int32				Index() const { return fIndex; }
+
 private:
-			BNetworkInterface*	fInterface;
-			uint32				fIndex;
+			int32				fIndex;
 			BNetworkAddress		fAddress;
 			BNetworkAddress		fMask;
 			BNetworkAddress		fBroadcast;
@@ -53,9 +57,14 @@ public:
 								BNetworkInterface(uint32 index);
 								~BNetworkInterface();
 
+			void				Unset();
+			void				SetTo(const char* name);
+			status_t			SetTo(uint32 index);
+
 			bool				Exists() const;
 
 			const char*			Name() const;
+			uint32				Index() const;
 			uint32				Flags() const;
 			uint32				MTU() const;
 			uint32				Type() const;
@@ -66,9 +75,12 @@ public:
 			status_t			SetMTU(uint32 mtu);
 
 			int32				CountAddresses() const;
-			BNetworkInterfaceAddress* AddressAt(int32 index);
+			status_t			GetAddressAt(int32 index,
+									BNetworkInterfaceAddress& address);
 
 			status_t			AddAddress(
+									const BNetworkInterfaceAddress& address);
+			status_t			SetAddress(
 									const BNetworkInterfaceAddress& address);
 			status_t			RemoveAddress(
 									const BNetworkInterfaceAddress& address);
@@ -78,7 +90,6 @@ public:
 
 private:
 			char				fName[IF_NAMESIZE];
-			uint32				fIndex;
 			BList				fAddresses;
 };
 
