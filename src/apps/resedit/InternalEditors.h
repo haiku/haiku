@@ -8,9 +8,11 @@
 #ifndef INTERNALEDITORS_H
 #define INTERNALEDITORS_H
 
-#include <View.h>
-#include <TextControl.h>
 #include <Button.h>
+#include <TextControl.h>
+#include <StringView.h>
+#include <View.h>
+
 #include "Editor.h"
 
 class StringEditView : public BView
@@ -27,8 +29,8 @@ public:
 	const char *	GetName(void) const { return fNameBox->Text(); }
 	void			SetName(const char *name) { fNameBox->SetText(name); }
 	
-	const char *	GetValue(void) const { return fValueBox->Text(); }
-	void			SetValue(const char *value) { fValueBox->SetText(value); }
+	const char *	GetValue(void) const { return fValueView->Text(); }
+	void			SetValue(const char *value) { fValueView->SetText(value); }
 	
 	void			EnableID(const bool &value) { fIDBox->SetEnabled(value); }
 	bool			IsIDEnabled(void) const { return fIDBox->IsEnabled(); }
@@ -38,8 +40,8 @@ public:
 	
 private:
 	BTextControl	*fIDBox,
-					*fNameBox,
-					*fValueBox;
+					*fNameBox;
+	BTextView		*fValueView;
 	
 	BButton			*fCancel,
 					*fOK;

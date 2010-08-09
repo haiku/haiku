@@ -10,6 +10,7 @@
 
 #include <Message.h>
 #include <Messenger.h>
+#include <ScrollView.h>
 #include <String.h>
 
 #include <stdlib.h>
@@ -30,8 +31,6 @@ StringEditor::StringEditor(const BRect &frame, ResourceData *data,
 		fView->SetID(data->GetIDString());
 	fView->SetName(data->GetName());
 	fView->SetValue(data->GetData());
-	
-	SetFlags(Flags() | B_NOT_V_RESIZABLE);
 }
 
 
@@ -103,23 +102,26 @@ StringEditView::StringEditView(const BRect &frame)
 	
 	r.OffsetBy(0, r.Height() + 10);
 	r.left = 10;
-	fValueBox = new BTextControl(r, "value", "Value: ", "", NULL,
-								B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fValueBox->SetDivider(be_plain_font->StringWidth("Value: ") + 5);
-	AddChild(fValueBox);
+	r.right -= B_V_SCROLL_BAR_WIDTH;
+	BRect textRect(r.OffsetToCopy(0.0, 0.0));
+	textRect.InsetBy(5.0, 5.0);
+	fValueView = new BTextView(r, "value", textRect, B_FOLLOW_ALL);
+	
+	BScrollView *scrollView = new BScrollView("scrollView", fValueView,
+												B_FOLLOW_ALL, 0, false, true);
+	AddChild(scrollView);
 	
 	fOK = new BButton(BRect(10, 10, 11, 11), "ok", "Cancel", new BMessage(M_UPDATE_RESOURCE),
-					  B_FOLLOW_RIGHT);
+					  B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fOK->ResizeToPreferred();
 	fOK->SetLabel("OK");
-	fOK->MakeDefault(true);
 	AddChild(fOK);
 	
 	fOK->MoveTo(r.right - fOK->Bounds().Width(), r.bottom + 10);
 	r = fOK->Frame();
 	r.OffsetBy(-r.Width() - 10, 0);
 	fCancel = new BButton(r, "cancel", "Cancel", new BMessage(B_QUIT_REQUESTED),
-					  B_FOLLOW_RIGHT);
+					  B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(fCancel);
 }
 
@@ -132,8 +134,16 @@ StringEditView::~StringEditView(void)
 void
 StringEditView::AttachedToWindow(void)
 {
-	if (Bounds().Height() < fCancel->Frame().bottom + 10)
+	if (Bounds().Height() < fCancel->Frame().bottom + 10) {
+		BView *view = FindView("scrollView");
+		view->SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+		fOK->SetResizingMode(B_FOLLOW_RIGHT);
+		fCancel->SetResizingMode(B_FOLLOW_RIGHT);
 		Window()->ResizeTo(Window()->Bounds().Width(), fCancel->Frame().bottom + 10);
+		view->SetResizingMode(B_FOLLOW_ALL);
+		fOK->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+		fCancel->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	}
 	
 	Window()->SetSizeLimits(Window()->Bounds().Width(), 30000,
 							Window()->Bounds().Height(), 30000);
@@ -144,9 +154,9 @@ float
 StringEditView::GetPreferredWidth(void) const
 {
 	float idwidth = be_plain_font->StringWidth("ID: ") + 
-					be_plain_font->StringWidth("(attr) ") + 15;
+					be_plain_font->StringWidth("(attr) ") + 15.0;
 	float namewidth = be_plain_font->StringWidth("Name: ") + 
-					be_plain_font->StringWidth(fNameBox->Text()) + 15;
+					be_plain_font->StringWidth(fNameBox->Text()) + 15.0;
 	return idwidth + namewidth + 100;
 }
 
@@ -157,6 +167,7 @@ StringEditView::GetPreferredHeight(void) const
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
 	float strheight = fh.ascent + fh.descent + fh.leading + 5;
-	return fOK->Frame().Height() + (strheight * 2) + 40;
+	float lineCount = fValueView->CountLines() < 5.0 ? fValueView->CountLines() : 5.0;
+	return fOK->Frame().Height() + (strheight * lineCount) + 40.0;
 }
 

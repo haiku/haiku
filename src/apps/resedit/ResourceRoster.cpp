@@ -152,6 +152,7 @@ ResourceRoster::SpawnEditor(ResourceData *data, BHandler *handler)
 {
 	// temporary code until editors are done
 	switch (data->GetType()) {
+		case B_STRING_TYPE:
 		case B_MIME_STRING_TYPE: {
 			StringEditor *strEd = new StringEditor(BRect(100, 100, 400, 200),
 													data, handler);

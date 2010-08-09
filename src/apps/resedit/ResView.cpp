@@ -358,13 +358,16 @@ ResView::UpdateRow(BRow *row)
 		strField->SetString(resData->GetIDString());
 	
 	strField = (BStringField *)row->GetField(2);
-	strField->SetString(resData->GetName());
+	if (strField)
+		strField->SetString(resData->GetName());
 	
 	PreviewField *preField = (PreviewField*)row->GetField(3);
-	preField->SetData(resData->GetData(), resData->GetLength());
+	if (preField)
+		preField->SetData(resData->GetData(), resData->GetLength());
 	
 	BSizeField *sizeField = (BSizeField*)row->GetField(4);
-	sizeField->SetSize(resData->GetLength());
+	if (sizeField)
+		sizeField->SetSize(resData->GetLength());
 }
 
 
