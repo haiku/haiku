@@ -127,7 +127,7 @@ TextGapBuffer::RemoveRange(int32 start, int32 end)
 	fItemCount -= inNumItems;
 
 	if (fGapCount > kTextGapBufferBlockSize)
-		_ShrinkGapTo(kTextGapBufferBlockSize);
+		_ShrinkGapTo(kTextGapBufferBlockSize / 2);
 }
 
 
