@@ -160,6 +160,32 @@ div.contents {
 	padding: 50px 40px;	
 }
 
+/* The boxes from the userguide */
+/* Rounded corner boxes */
+/* Common declarations */
+.info, .stop, .warning {
+	-webkit-border-radius: 10px;
+	-khtml-border-radius: 10px;	
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	border-style: dotted;
+	border-width: thin;
+	border-color: #dcdcdc;
+	padding: 10px 15px 10px 80px;
+	margin-bottom: 15px;
+	margin-top: 15px;
+	min-height: 42px;
+}
+.info {
+	background: #e4ffde url(images/alert_info_32.png) 15px 15px no-repeat;
+}
+.warning {
+	background: #fffbc6 url(images/alert_warning_32.png) 15px 15px no-repeat;
+}
+.stop {
+	background: #ffeae6 url(images/alert_stop_32.png) 15px 15px no-repeat;
+}
+
 /* Continue with the rest of the standard Doxygen stuff... */
 
 CAPTION { font-weight: bold }
