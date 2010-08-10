@@ -46,7 +46,7 @@ status_t
 loopback_frame_init(struct net_interface*interface, net_domain* domain,
 	net_datalink_protocol** _protocol)
 {
-	// We currently only support a single family and type!
+	// We only support a single type!
 	if (interface->device->type != IFT_LOOP)
 		return B_BAD_TYPE;
 
@@ -62,17 +62,16 @@ loopback_frame_init(struct net_interface*interface, net_domain* domain,
 	if (status != B_OK)
 		goto err1;
 
-	// We also register the domain as a handler for our packets
-	status = stack->register_domain_device_handler(interface->device, 0,
-		domain);
-	if (status != B_OK)
-		goto err2;
-
-	put_module(NET_STACK_MODULE_NAME);
+	// Locally received buffers don't need a domain device handler, as the
+	// buffer reception is handled internally.
 
 	protocol = new(std::nothrow) loopback_frame_protocol;
-	if (protocol == NULL)
-		return B_NO_MEMORY;
+	if (protocol == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
+	put_module(NET_STACK_MODULE_NAME);
 
 	*_protocol = protocol;
 	return B_OK;
