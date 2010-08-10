@@ -302,7 +302,7 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 			fLastMoveTime = now;
 	}
 
-	if (decorator) {
+	if (decorator != NULL) {
 		BRegion* visibleBorder = fWindow->RegionPool()->GetRegion();
 		fWindow->GetBorderRegion(visibleBorder);
 		visibleBorder->IntersectWith(&fWindow->VisibleRegion());
@@ -311,13 +311,13 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
-		if (fIsZooming) {
-			decorator->SetZoom(_ActionFor(message) == CLICK_ZOOM);
-		} else if (fIsClosing) {
-			decorator->SetClose(_ActionFor(message) == CLICK_CLOSE);
-		} else if (fIsMinimizing) {
-			decorator->SetMinimize(_ActionFor(message) == CLICK_MINIMIZE);
-		}
+		click_type type = _ActionFor(message);
+		if (fIsZooming)
+			decorator->SetZoom(type == CLICK_ZOOM);
+		else if (fIsClosing)
+			decorator->SetClose(type == CLICK_CLOSE);
+		else if (fIsMinimizing)
+			decorator->SetMinimize(type == CLICK_MINIMIZE);
 
 		engine->UnlockParallelAccess();
 		fWindow->RegionPool()->Recycle(visibleBorder);
@@ -445,7 +445,7 @@ DefaultWindowBehaviour::_ActionFor(const BMessage* message, int32 buttons,
 	if (message->FindPoint("where", &where) != B_OK)
 		return CLICK_NONE;
 
-	return decorator->Clicked(where, buttons, modifiers);
+	return decorator->MouseAction(message, where, buttons, modifiers);
 }
 
 

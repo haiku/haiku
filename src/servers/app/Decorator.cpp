@@ -8,7 +8,9 @@
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
+
 /*!	Base class for window decorators */
+
 
 #include "Decorator.h"
 
@@ -315,38 +317,39 @@ Decorator::GetFootprint()
 /*!	\brief Performs hit-testing for the decorator
 
 	Clicked is called whenever it has been determined that the window has
-	received a mouse click. The default version returns DEC_NONE. A subclass
+	received a mouse click. The default version returns CLICK_NONE. A subclass
 	may use any or all of them.
 
 	Click type : Action taken by the server
 
-	- \c DEC_NONE : Do nothing
-	- \c DEC_ZOOM : Handles the zoom button (setting states, etc)
-	- \c DEC_CLOSE : Handles the close button (setting states, etc)
-	- \c DEC_MINIMIZE : Handles the minimize button (setting states, etc)
-	- \c DEC_TAB : Currently unused
-	- \c DEC_DRAG : Moves the window to the front and prepares to move the
+	- \c CLICK_NONE: Do nothing
+	- \c CLICK_ZOOM: Handles the zoom button (setting states, etc)
+	- \c CLICK_CLOSE: Handles the close button (setting states, etc)
+	- \c CLICK_MINIMIZE: Handles the minimize button (setting states, etc)
+	- \c CLICK_TAB: Currently unused
+	- \c CLICK_DRAG: Moves the window to the front and prepares to move the
 		window
-	- \c DEC_MOVETOBACK : Moves the window to the back of the stack
-	- \c DEC_MOVETOFRONT : Moves the window to the front of the stack
-	- \c DEC_SLIDETAB : Initiates tab-sliding
+	- \c CLICK_MOVE_TO_BACK: Moves the window to the back of the stack
+	- \c CLICK_MOVE_TO_FRONT: Moves the window to the front of the stack
+	- \c CLICK_SLIDE_TAB: Initiates tab-sliding
 
-	- \c DEC_RESIZE : Handle window resizing as appropriate
-	- \c DEC_RESIZE_L
-	- \c DEC_RESIZE_T
-	- \c DEC_RESIZE_R
-	- \c DEC_RESIZE_B
-	- \c DEC_RESIZE_LT
-	- \c DEC_RESIZE_RT
-	- \c DEC_RESIZE_LB
-	- \c DEC_RESIZE_RB
+	- \c CLICK_RESIZE: Handle window resizing as appropriate
+	- \c CLICK_RESIZE_L
+	- \c CLICK_RESIZE_T
+	- \c CLICK_RESIZE_R
+	- \c CLICK_RESIZE_B
+	- \c CLICK_RESIZE_LT
+	- \c CLICK_RESIZE_RT
+	- \c CLICK_RESIZE_LB
+	- \c CLICK_RESIZE_RB
 
 	This function is required by all subclasses.
 
 	\return The type of area clicked
 */
 click_type
-Decorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
+Decorator::MouseAction(const BMessage* message, BPoint point, int32 buttons,
+	int32 modifiers)
 {
 	return CLICK_NONE;
 }

@@ -118,7 +118,8 @@ MacDecorator::Draw()
 
 
 click_type
-MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
+MacDecorator::MouseAction(const BMessage* message, BPoint point, int32 buttons,
+	int32 modifiers)
 {
 	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(point)) {
 		STRACE(("MacDecorator():Clicked() - Close\n"));
@@ -133,8 +134,8 @@ MacDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 	// Clicking in the tab?
 	if (fTabRect.Contains(point)) {
 		// Here's part of our window management stuff
-		/* TODO This is missing CLICK_MOVETOFRONT
-		if(buttons==B_PRIMARY_MOUSE_BUTTON && !IsFocus())
+		/* TODO: This is missing CLICK_MOVETOFRONT
+		if(buttons == B_PRIMARY_MOUSE_BUTTON && !IsFocus())
 			return CLICK_MOVETOFRONT;
 		*/
 		return CLICK_DRAG;

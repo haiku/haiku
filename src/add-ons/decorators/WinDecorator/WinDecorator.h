@@ -1,29 +1,28 @@
 /*
- Copyright 2009-2010, Haiku.
- Distributed under the terms of the MIT License.
-*/
-#ifndef _BEOS_DECORATOR_H_
-#define _BEOS_DECORATOR_H_
+ * Copyright 2009-2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _WINDOWS_DECORATOR_H_
+#define _WINDOWS_DECORATOR_H_
 
 
 #include "DecorManager.h"
 #include "RGBColor.h"
 
 
-class WinDecorAddOn : public DecorAddOn
-{
+class WinDecorAddOn : public DecorAddOn {
 public:
 								WinDecorAddOn(image_id id, const char* name);
 
-		float					Version();
+			float				Version();
+
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
 									BRect rect, window_look look, uint32 flags);
 };
 
 
-class WinDecorator: public Decorator
-{
+class WinDecorator: public Decorator {
 public:
 								WinDecorator(DesktopSettings& settings,
 									BRect frame, window_look wlook,
@@ -33,7 +32,8 @@ public:
 			void				Draw(BRect r);
 			void				Draw();
 
-	click_type					Clicked(BPoint pt, int32 buttons,
+			click_type			MouseAction(const BMessage* message,
+									BPoint point, int32 buttons,
 									int32 modifiers);
 
 protected:
@@ -70,27 +70,28 @@ private:
 			void				_UpdateFont(DesktopSettings& settings);
 			void				_DrawBeveledRect(BRect r, bool down);
 
-
-	uint32 taboffset;
-
-	rgb_color tab_highcol;
-	rgb_color tab_lowcol;
-	rgb_color frame_highcol;
-	rgb_color frame_midcol;
-	rgb_color frame_lowcol;
-	rgb_color frame_lowercol;
-	rgb_color textcol;
-	rgb_color			fFocusTabColor;
-	rgb_color			fNonFocusTabColor;
-	rgb_color			fFocusTextColor;
-	rgb_color			fNonFocusTextColor;
-	uint64 solidhigh, solidlow;
-
-	BString				fTruncatedTitle;
-	int32				fTruncatedTitleLength;
-
-	bool slidetab;
-	int textoffset;
+private:
+			uint32 taboffset;
+		
+			rgb_color tab_highcol;
+			rgb_color tab_lowcol;
+			rgb_color frame_highcol;
+			rgb_color frame_midcol;
+			rgb_color frame_lowcol;
+			rgb_color frame_lowercol;
+			rgb_color textcol;
+			rgb_color			fFocusTabColor;
+			rgb_color			fNonFocusTabColor;
+			rgb_color			fFocusTextColor;
+			rgb_color			fNonFocusTextColor;
+			uint64 solidhigh, solidlow;
+		
+			BString				fTruncatedTitle;
+			int32				fTruncatedTitleLength;
+		
+			bool slidetab;
+			int textoffset;
 };
 
-#endif
+
+#endif	// _WINDOWS_DECORATOR_H_

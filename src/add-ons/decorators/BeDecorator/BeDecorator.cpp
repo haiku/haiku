@@ -9,7 +9,7 @@
  */
 
 
-// This one is more like the classic R5 look
+//! This one is more like the classic R5 look
 
 
 #include "BeDecorator.h"
@@ -117,7 +117,7 @@ BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect,
 	Decorator(settings, rect, look, flags),
 	fTabOffset(0),
 	fTabLocation(0.0),
-	fLastClicked(0)
+	fWasDoubleClick(false)
 {
 	_UpdateFont(settings);
 	SetLook(settings, look);
@@ -215,7 +215,8 @@ BeDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 
 
 click_type
-BeDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
+BeDecorator::MouseAction(const BMessage* message, BPoint point, int32 buttons,
+	int32 modifiers)
 {
 #ifdef DEBUG_DECORATOR
 	printf("BeDecorator: Clicked\n");
@@ -223,13 +224,8 @@ BeDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
 #endif // DEBUG_DECORATOR
 
-	// TODO: have a real double-click mechanism, ie. take user settings into
-	// account
-	bigtime_t now = system_time();
-	if (buttons != 0) {
-		fWasDoubleClick = now - fLastClicked < 200000;
-		fLastClicked = now;
-	}
+	if (buttons != 0)
+		fWasDoubleClick = message->FindInt32("clicks") == 2;
 
 	// In checking for hit test stuff, we start with the smallest rectangles
 	// the user might be clicking on and gradually work our way out into larger
@@ -263,9 +259,10 @@ BeDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 				|| fLook == B_FLOATING_WINDOW_LOOK
 				|| fLook == B_MODAL_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook)) {
-			BRect temp(BPoint(fBottomBorder.right - kBorderResizeLength,
-				fBottomBorder.bottom - kBorderResizeLength), fBottomBorder.RightBottom());
-			if (temp.Contains(point))
+			BRect resizeRect(BPoint(fBottomBorder.right - kBorderResizeLength,
+				fBottomBorder.bottom - kBorderResizeLength),
+				fBottomBorder.RightBottom());
+			if (resizeRect.Contains(point))
 				return CLICK_RESIZE;
 		}
 

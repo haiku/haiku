@@ -37,7 +37,8 @@ public:
 	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
 									int32* maxWidth, int32* maxHeight) const;
 
-	virtual	click_type			Clicked(BPoint pt, int32 buttons,
+	virtual	click_type			MouseAction(const BMessage* message,
+									BPoint point, int32 buttons,
 									int32 modifiers);
 
 protected:
@@ -132,8 +133,8 @@ protected:
 			int32				fTruncatedTitleLength;
 
 private:
-			bigtime_t			fLastClicked;
 			bool				fWasDoubleClick;
 };
+
 
 #endif	// DEFAULT_DECORATOR_H

@@ -91,8 +91,8 @@ public:
 
 			const BRegion&	GetFootprint();
 
-	virtual	click_type		Clicked(BPoint where, int32 buttons,
-								int32 modifiers);
+	virtual	click_type		MouseAction(const BMessage* message, BPoint where,
+								int32 buttons, int32 modifiers);
 
 			void			MoveBy(float x, float y);
 			void			MoveBy(BPoint offset);

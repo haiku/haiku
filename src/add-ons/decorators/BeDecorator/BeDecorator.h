@@ -24,7 +24,8 @@ class BeDecorAddOn : public DecorAddOn {
 public:
 								BeDecorAddOn(image_id id, const char* name);
 
-		float					Version();
+			float				Version();
+
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
 									BRect rect, window_look look, uint32 flags);
@@ -49,8 +50,9 @@ public:
 	virtual	void				GetSizeLimits(int32* minWidth, int32* minHeight,
 									int32* maxWidth, int32* maxHeight) const;
 
-	virtual	click_type			Clicked(BPoint pt, int32 buttons,
-										int32 modifiers);
+	virtual	click_type			MouseAction(const BMessage* message,
+									BPoint pointt, int32 buttons,
+									int32 modifiers);
 
 protected:
 	virtual void				_DoLayout();
@@ -94,6 +96,7 @@ private:
 									float* offset, float*size) const;
 			void				_LayoutTabItems(const BRect& tabRect);
 
+private:
 			RGBColor			fButtonHighColor;
 			RGBColor			fButtonLowColor;
 			RGBColor			fTextColor;
@@ -118,9 +121,9 @@ private:
 			float				fMaxTabSize;
 			BString				fTruncatedTitle;
 			int32				fTruncatedTitleLength;
-	
-			bigtime_t			fLastClicked;
+
 			bool				fWasDoubleClick;
 };
+
 
 #endif	// DEFAULT_DECORATOR_H

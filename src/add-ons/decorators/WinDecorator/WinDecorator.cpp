@@ -120,7 +120,8 @@ WinDecorator::Draw()
 
 
 click_type
-WinDecorator::Clicked(BPoint where, int32 buttons, int32 modifiers)
+WinDecorator::MouseAction(const BMessage* message, BPoint where, int32 buttons,
+	int32 modifiers)
 {
 	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(where))
 		return CLICK_CLOSE;
@@ -131,8 +132,8 @@ WinDecorator::Clicked(BPoint where, int32 buttons, int32 modifiers)
 	// Clicking in the tab?
 	if (fTabRect.Contains(where)) {
 		// Here's part of our window management stuff
-		/* TODO This is missing CLICK_MOVETOFRONT
-		if(buttons==B_PRIMARY_MOUSE_BUTTON && !IsFocus())
+		/* TODO: This is missing CLICK_MOVETOFRONT
+		if(buttons == B_PRIMARY_MOUSE_BUTTON && !IsFocus())
 			return CLICK_MOVETOFRONT;
 		*/
 		return CLICK_DRAG;

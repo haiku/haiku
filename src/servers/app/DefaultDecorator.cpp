@@ -66,13 +66,12 @@ blend_color_value(uint8 a, uint8 b, float position)
 
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
-
 DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 		window_look look, uint32 flags)
 	: Decorator(settings, rect, look, flags),
 	fTabOffset(0),
 	fTabLocation(0.0),
-	fLastClicked(0)
+	fWasDoubleClick(false)
 {
 	_UpdateFont(settings);
 
@@ -182,7 +181,8 @@ DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 
 
 click_type
-DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
+DefaultDecorator::MouseAction(const BMessage* message, BPoint point,
+	int32 buttons, int32 modifiers)
 {
 #ifdef DEBUG_DECORATOR
 	printf("DefaultDecorator: Clicked\n");
@@ -190,13 +190,8 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
 #endif // DEBUG_DECORATOR
 
-	// TODO: have a real double-click mechanism, ie. take user settings into
-	// account
-	bigtime_t now = system_time();
-	if (buttons != 0) {
-		fWasDoubleClick = now - fLastClicked < 200000;
-		fLastClicked = now;
-	}
+	if (buttons != 0)
+		fWasDoubleClick = message->FindInt32("clicks") == 2;
 
 	// In checking for hit test stuff, we start with the smallest rectangles
 	// the user might be clicking on and gradually work our way out into larger
@@ -218,7 +213,7 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 
 		// tab sliding in any case if either shift key is held down
 		// except sliding up-down by moving mouse left-right would look strange
-		if ((modifiers & B_SHIFT_KEY) && (fLook != kLeftTitledWindowLook))
+		if ((modifiers & B_SHIFT_KEY) != 0 && fLook != kLeftTitledWindowLook)
 			return CLICK_SLIDE_TAB;
 	} else if (fLeftBorder.Contains(point) || fRightBorder.Contains(point)
 		|| fTopBorder.Contains(point) || fBottomBorder.Contains(point)) {
@@ -230,15 +225,18 @@ DefaultDecorator::Clicked(BPoint point, int32 buttons, int32 modifiers)
 				|| fLook == B_FLOATING_WINDOW_LOOK
 				|| fLook == B_MODAL_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook)) {
-			BRect temp(BPoint(fBottomBorder.right - kBorderResizeLength,
-				fBottomBorder.bottom - kBorderResizeLength), fBottomBorder.RightBottom());
-			if (temp.Contains(point))
+			BRect resizeRect(BPoint(fBottomBorder.right - kBorderResizeLength,
+				fBottomBorder.bottom - kBorderResizeLength),
+				fBottomBorder.RightBottom());
+			if (resizeRect.Contains(point))
 				return CLICK_RESIZE;
 		}
 	} else {
 		// Guess user didn't click anything
 		return CLICK_NONE;
 	}
+
+	// Either tab or border was clicked
 
 	if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
 		return CLICK_MINIMIZE;

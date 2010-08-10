@@ -1,7 +1,7 @@
 /*
- Copyright 2009, Haiku.
- Distributed under the terms of the MIT License.
-*/
+ * Copyright 2009-2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MAC_DECORATOR_H_
 #define _MAC_DECORATOR_H_
 
@@ -10,12 +10,12 @@
 #include "RGBColor.h"
 
 
-class MacDecorAddOn : public DecorAddOn
-{
+class MacDecorAddOn : public DecorAddOn {
 public:
 								MacDecorAddOn(image_id id, const char* name);
 
-		float					Version();
+			float				Version();
+
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
 									BRect rect, window_look look, uint32 flags);
@@ -32,7 +32,8 @@ public:
 			void				Draw(BRect updateRect);
 			void				Draw();
 
-	click_type					Clicked(BPoint pt, int32 buttons,
+	click_type					MouseAction(const BMessage* message,
+									BPoint point, int32 buttons,
 									int32 modifiers);
 
 protected:
