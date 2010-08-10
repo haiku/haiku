@@ -1206,7 +1206,7 @@ update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 	if (status == B_OK) {
 		sockaddr* address = *_address;
 
-		if (option == SIOCSIFADDR || option == SIOCSIFNETMASK) {
+		if (option == SIOCSIFADDR) {
 			// Reset netmask and broadcast addresses to defaults
 			net_domain* domain = interfaceAddress->domain;
 			sockaddr* netmask = NULL;
