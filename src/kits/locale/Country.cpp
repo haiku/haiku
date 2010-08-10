@@ -115,8 +115,7 @@ int8
 BCountry::Measurement() const
 {
 	UErrorCode error = U_ZERO_ERROR;
-	switch(ulocdata_getMeasurementSystem(Code(), &error))
-	{
+	switch (ulocdata_getMeasurementSystem(Code(), &error)) {
 		case UMS_US:
 			return B_US;
 		case UMS_SI:
