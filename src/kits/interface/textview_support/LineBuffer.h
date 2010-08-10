@@ -5,6 +5,9 @@
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  */
+#ifndef __LINE_BUFFER_H
+#define __LINE_BUFFER_H
+
 
 #include <SupportDefs.h>
 #include <TextView.h>
@@ -22,22 +25,23 @@ struct STELine {
 class BTextView::LineBuffer : public _BTextViewSupportBuffer_<STELine> {
 
 public:
-						LineBuffer();
-virtual					~LineBuffer();
+								LineBuffer();
+	virtual						~LineBuffer();
 
-		void			InsertLine(STELine *inLine, int32 index);
-		void			RemoveLines(int32 index, int32 count = 1);
-		void			RemoveLineRange(int32 fromOffset, int32 toOffset);
+			void				InsertLine(STELine* inLine, int32 index);
+			void				RemoveLines(int32 index, int32 count = 1);
+			void				RemoveLineRange(int32 fromOffset,
+									int32 toOffset);
 
-		int32			OffsetToLine(int32 offset) const;
-		int32			PixelToLine(float pixel) const;
+			int32				OffsetToLine(int32 offset) const;
+			int32				PixelToLine(float pixel) const;
 
-		void			BumpOrigin(float delta, int32 index);
-		void			BumpOffset(int32 delta, int32 index);
+			void				BumpOrigin(float delta, int32 index);
+			void				BumpOffset(int32 delta, int32 index);
 
-		long			NumLines() const;
-		float			MaxWidth() const;
-		STELine *		operator[](int32 index) const;
+			long				NumLines() const;
+			float				MaxWidth() const;
+			STELine*			operator[](int32 index) const;
 };
 
 
@@ -53,3 +57,6 @@ BTextView::LineBuffer::operator[](int32 index) const
 {
 	return &fBuffer[index];
 }
+
+
+#endif	// __LINE_BUFFER_H

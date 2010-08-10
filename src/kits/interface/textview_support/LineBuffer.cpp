@@ -6,7 +6,9 @@
  *		Marc Flerackers (mflerackers@androme.be)
  */
 
+
 #include "LineBuffer.h"
+
 
 BTextView::LineBuffer::LineBuffer()
 	:	_BTextViewSupportBuffer_<STELine>(20, 2)
@@ -20,7 +22,7 @@ BTextView::LineBuffer::~LineBuffer()
 
 
 void
-BTextView::LineBuffer::InsertLine(STELine *inLine, int32 index)
+BTextView::LineBuffer::InsertLine(STELine* inLine, int32 index)
 {
 	InsertItemsAt(1, index, inLine);
 }
