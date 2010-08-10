@@ -453,15 +453,18 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 		if (mode == 0xffff)
 			break;
 
-		TRACE(("  %x: ", mode));
-
 		struct vbe_mode_info modeInfo;
 		if (vesa_get_mode_info(mode, &modeInfo) == B_OK) {
-			TRACE(("%u x %u x %u (a = %d, mem = %d, phy = %lx, p = %d, b = %d)\n",
-				modeInfo.width, modeInfo.height, modeInfo.bits_per_pixel, modeInfo.attributes,
-				modeInfo.memory_model, modeInfo.physical_base, modeInfo.num_planes,
-				modeInfo.num_banks));
-
+			TRACE((" 0x%03x: %u x %u x %u (a = %d, mem = %d, phy = %lx, p = %d, b = %d)\n", mode,
+				   modeInfo.width, modeInfo.height, modeInfo.bits_per_pixel, modeInfo.attributes,
+				   modeInfo.memory_model, modeInfo.physical_base, modeInfo.num_planes,
+				   modeInfo.num_banks));
+			TRACE(("	mask: r: %d %d g: %d %d b: %d %d dcmi: %d\n",
+				   modeInfo.red_mask_size, modeInfo.red_field_position,
+				   modeInfo.green_mask_size, modeInfo.green_field_position, 
+				   modeInfo.blue_mask_size, modeInfo.blue_field_position,
+				   modeInfo.direct_color_mode_info));
+			
 			const uint32 requiredAttributes = MODE_ATTR_AVAILABLE
 				| MODE_ATTR_GRAPHICS_MODE | MODE_ATTR_COLOR_MODE
 				| MODE_ATTR_LINEAR_BUFFER;
@@ -496,7 +499,7 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 				add_video_mode(videoMode);
 			}
 		} else
-			TRACE(("(failed)\n"));
+			TRACE((" 0x%03x: (failed)\n", mode));
 	}
 
 	// Choose default resolution (when no EDID information is available)
@@ -522,6 +525,7 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 		return B_ERROR;
 	}
 
+	TRACE(("Using mode 0x%03x\n", standardMode->mode));
 	*_standardMode = standardMode;
 	return B_OK;
 }
