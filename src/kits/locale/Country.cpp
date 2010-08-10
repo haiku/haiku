@@ -16,6 +16,7 @@
 
 #include <unicode/datefmt.h>
 #include <unicode/locid.h>
+#include <unicode/ulocdata.h>
 #include <ICUWrapper.h>
 
 #include <iostream>
@@ -113,7 +114,15 @@ BCountry::GetIcon(BBitmap* result) const
 int8
 BCountry::Measurement() const
 {
-	return B_US;
+	UErrorCode error = U_ZERO_ERROR;
+	switch(ulocdata_getMeasurementSystem(Code(), &error))
+	{
+		case UMS_US:
+			return B_US;
+		case UMS_SI:
+		default:
+			return B_METRIC;
+	}
 }
 
 
