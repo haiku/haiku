@@ -95,6 +95,10 @@ extern FILE		*popen(const char *command, const char *mode);
 extern int		pclose(FILE *stream);
 extern void		perror(const char *errorPrefix);
 
+/* memory streams */
+extern FILE		*fmemopen(void *buf, size_t size, const char *mode);
+extern FILE		*open_memstream(void **buf, size_t *size);
+
 /* file I/O */
 extern int		fflush(FILE *stream);
 extern int		fflush_unlocked(FILE *stream);

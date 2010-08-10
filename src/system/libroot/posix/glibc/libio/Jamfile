@@ -30,6 +30,7 @@ MergeObject posix_gnu_libio.o :
 	filedoalloc.c
 	fileops.c
 	flockfile.c
+	fmemopen.c
 	fputc.c
 	fputc_u.c
 	freopen.c
@@ -49,6 +50,7 @@ MergeObject posix_gnu_libio.o :
 	iofgets.c
 	iofgets_u.c
 	iofopen.c
+	iofopncook.c
 	iofputs.c
 	iofputs_u.c
 	iofread.c
@@ -72,6 +74,7 @@ MergeObject posix_gnu_libio.o :
 	iovdprintf.c
 	iovsprintf.c
 	iovsscanf.c
+	memstream.c
 #	obprintf.c
 	pclose.c
 	peekc.c
