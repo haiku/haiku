@@ -3039,6 +3039,12 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 
 		// update the style runs
 		fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
+
+		// offset the caret/selection, if the text was inserted before it
+		if (inOffset <= fSelEnd) {
+			fSelStart += inLength;
+			fCaretOffset = fSelEnd = fSelStart;
+		}
 	}
 
 	if (fStylable && inRuns != NULL) {
@@ -4201,12 +4207,6 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 
 	// copy data into buffer
 	InsertText(inText, inLength, inOffset, inRuns);
-
-	// offset the caret/selection, if the text was inserted before it
-	if (inOffset <= fSelEnd) {
-		fSelStart += inLength;
-		fCaretOffset = fSelEnd = fSelStart;
-	}
 
 	// recalc line breaks and draw the text
 	_Refresh(inOffset, inOffset + inLength, false);
