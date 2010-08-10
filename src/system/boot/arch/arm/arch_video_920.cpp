@@ -41,18 +41,43 @@ extern "C" addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, u
 #if BOARD_CPU_ARM920T
 //	#pragma mark -
 
+extern void *gFrameBufferBase;
 
 status_t
 arch_probe_video_mode(void)
 {
-	return B_ERROR;
+	gKernelArgs.frame_buffer.depth = 16;
+	gKernelArgs.frame_buffer.width = 1024;
+	gKernelArgs.frame_buffer.height = 768;
+	gKernelArgs.frame_buffer.bytes_per_row = gKernelArgs.frame_buffer.width * 2;
+	gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+		* gKernelArgs.frame_buffer.height
+		* gKernelArgs.frame_buffer.depth / 8;
+
+#if 0
+	if (!gFrameBufferBase) {
+		int err = platform_allocate_region(&gFrameBufferBase, gKernelArgs.frame_buffer.physical_buffer.size, 0, false);
+		if (err < B_OK) return err;
+		gKernelArgs.frame_buffer.physical_buffer.start = (addr_t)gFrameBufferBase;
+		dprintf("video framebuffer: %p\n", gFrameBufferBase);
+	}
+#else
+	gFrameBufferBase = (void *)0x88000000;
+	gKernelArgs.frame_buffer.physical_buffer.start = (addr_t)gFrameBufferBase;
+#endif
+
+	dprintf("video mode: %ux%ux%u\n", gKernelArgs.frame_buffer.width,
+		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth);
+
+	gKernelArgs.frame_buffer.enabled = true;
+	return B_OK;
 }
 
 
 status_t
 arch_set_video_mode(int width, int height, int depth)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
 
