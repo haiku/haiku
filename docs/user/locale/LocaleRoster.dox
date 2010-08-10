@@ -1,0 +1,86 @@
+/*!
+\class BLocaleRoster
+\ingroup locale
+\brief Main class for accessingthe locale kit data
+
+The Locale Roster is the central part of the locale roster.
+It is a blobal object (be_locale√_roster) storing all the useful locale
+data. Other classes from the Locale Kit can be constructed on their own,
+but only hte Locale Roster allows you to do so while taking account of
+the user's locale settings.
+
+The Locale Roster also provides convenient short-hands to the most used
+methods of the Locale Kit.
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetDefaultCollator(BCollator* collator) const
+\brief Get the default collator.
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetDefaultLocale(BLocale* locale) const
+\brief Get the default locale.
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetDefaultCountry(BCountry* country) const
+\brief Get the default country.
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetDefaultLanguage(BLanguage* language) const
+\brief Get the default language.
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetDefaultTimeZone(BTimeZone* timezone) const
+\brief Get the default timezone.
+*/
+
+/*!
+\fn status_t BlocaleRoster::GetLanguage(const char* languagecode, BLanguage** _language) const
+\brief Instanciate a language from its code.
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetInstalledLanguages(BMessage* message) const
+\brief List the available languages
+
+This function fills the passed BMessage with one or more 'language' string
+fields, containing the language(s) code(s).
+
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetAvailableCountries(BMessage√* message) const
+\brief List the available countries
+
+This function filles the passed BMessage with one or more 'country' string
+fields, containing the country names.
+
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetInstalledCatalogs(BMessage* message, const char* sigPattern = NULL, const char* langPattern = NULL, int32 fingerprint = 0) const
+\brief Get the available locales and catalogs
+
+This function fills the passed BMessage with one or more 'locale' string
+fields, containing the locale names.
+
+The optional parameters can be used to filter the list and only get the
+locales for which a catalog is available for the given app (sigPattern, fingerprint),
+or the locales with a given language.
+*/
+
+/*!
+\fn BCatalog* BLocaleRoster::GetCatalog()
+\brief Get the current image catalog.
+
+This function returns the catalog for the calling image (application, add-on, or shared
+library). Note that it doesn't allow to specify a fingerprint. The language will be
+selected from the user preferences.
+
+\returns The catalog, if it was loaded successfully.
+\warning This function needs the image to be lined with liblocalestub.a
+*/

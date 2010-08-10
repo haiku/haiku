@@ -1,0 +1,72 @@
+/*!
+\class BCountry
+\ingroup locale
+\brief Class representing a country
+
+BCountry provides all the information about a particular country.
+This includes the country flag (as an HVIF icon), the localized name of the
+country, and the iso country code.
+
+Date, timeand numer formatting also depends to some extent of the language,
+so they are done in the BLocale classinstead.
+
+*/
+
+/*!
+\fn BCountry::BCountry(const char* languageCode, const char* countryCode)
+\fn BCountry::BCountry(const char* languageAndCountryCode)
+\fn BCountry::BCountry(const BCountry& other)
+\brief Constructor.
+
+A BCountry is constructed from a language and a country code.
+
+*/
+
+/*!
+\fn bool BCountry::GetName(BString& name) const
+\brief Get the name of the country
+
+Fills in the name parameter with the name of the country, in the user's locale.
+*/
+
+/*!
+\fn const char* BCountry::Code() const
+\brief Returns the country code.
+*/
+
+/*!
+\fn status_t BCountry::GetIcon(BBitmap* result) const;
+\brief Render the country's flag to the given BBitmap
+
+This function renders the Country's flag to the given BBitmap. The bitmap
+should already be set to the pixel format and size you want to use.
+
+The flag is stored in HVIF format and can be rendered atany size and color depth.
+
+\param result The BBitmap to drag the flag to.
+\returns B_OK if the drawing was successful.
+*/
+
+/*!
+\fn const char* GetLocalizedString(uint32 id) const;
+\brief Get one of the default localized strings for this country.
+
+The strings include monetary symbols and other similar things.
+
+*/
+
+/*!
+\fn int8 BCountry::Measurement() const
+\brief Returrns the measurement used in this country.
+
+\returns B_METRIC for the metric system, or B_US for the USA's system.
+*/
+
+/*!
+\fn int GetTimeZones(BList& timezones) const
+\brief Returns all the timeaones used in this country.
+
+The count may vary from 0 for countries where there is no data, to twelve, for Russia.
+
+\returns The number of timezones that were added to the list.
+*/

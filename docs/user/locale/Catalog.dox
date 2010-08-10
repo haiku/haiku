@@ -66,11 +66,14 @@ usually not a problem, it only means that some strings may not be translated
 properly. But if you want to provide different versions of your application, it
 may be useful to separate their catalogs.
 
+\param signature Mime-signature of the application for which to load a catalog.
+\param language The language of the catalog to load. If NULL, the user settings will be used.
+\param fingerprint The fingerprint version-info for the catalog to load. If 0, the fingerprint will
+not be checked,and any version of the catalog will be loaded.
 */
 
 /*!
 \fn const char* BCatalog::GetString(const char* string, const char* context = NULL, const char* comment = NULL)
-\fn const char* GetString(uint32 id)
 \brief Get a string from the catalog.
 
 This method access the data of the catalog and reeturns you the translated
@@ -81,6 +84,16 @@ alone is not helpful enough or there are special things to note. The comment is
 also used as a way to uniquely identify a string, so if two identical strings
 share the same context, it is still possible to provide different translations.
 
+\returns The translated string, or the one passed as a parameter if no translation was found.
+\param string The string to translate.
+\param context The context where the string is located.
+\param comment Supplementary comment for translators.
+*/
+
+/*!
+\fn const char* GetString(uint32 id)
+\brief Get a string by id from the catalog.
+
 The id based version of this method is slightly faster, as it doesn't have to
 compute the hash from the 3 parameters. However, it will fail if there is an
 hash collision, so you should still fallback to the first one in case of
@@ -89,6 +102,8 @@ another, depending on the file format they are stored in, so you shouldn't rely
 on this method unless you are sure you can keep all the catalog files under
 control.
 
+\returns The translated string if found, or an empty string.
+\param id The identifier of the string.
 */
 
 /*!
@@ -101,6 +116,10 @@ parsed by the collectcatkeys tool. This allows you, for example, to translate a
 string constant that you declared at another place, without getting a warning
 message from collectcatkeys.
 
+\returns The translated string, or the one passed as a parameter if no translation was found.
+\param string The string to translate.
+\param context The context where the string is located.
+\param comment Supplementary comment for translators.
 */
 
 
@@ -115,6 +134,9 @@ generatinga catalog with such data inside, and the current format may not
 support it. If you need to localize data that is not text, it is advised to
 handle it by yourself.
 
+\returns An error code.
+\param name The name of the data to retrieve.
+\param msg The BMessage to fillin with the data.
 */
 
 /*!
@@ -124,6 +146,8 @@ handle it by yourself.
 This function fills the sig string with the mime-signature associated to the
 catalog.
 
+\param sig The string where to copy the signature.
+\returns An error code.
 */
 
 /*!
@@ -131,6 +155,9 @@ catalog.
 \brief Get the catalog language.
 
 This function fills the lang string with the language name for the catalog.
+
+\param sig The string where to copy the language.
+\returns An error code.
 */
 
 /*!
@@ -139,6 +166,9 @@ This function fills the lang string with the language name for the catalog.
 
 This function setsfp to the fingerprint of the catalog. This allows you to check
 which version of the sourcecode this catalog was generated from.
+
+\returns An error code.
+\param fp The integer to set to the fingerprint value.
 */
 
 /*!
@@ -146,6 +176,10 @@ which version of the sourcecode this catalog was generated from.
 \brief Reload the string data.
 
 This function reloads the data for the given signature and fingerprint.
+
+\returns An error code.
+\param signature The signature of the catalog youwant to load
+\param fingerprint The fingerprint of the catalog you want to load.
 */
 
 /*!
