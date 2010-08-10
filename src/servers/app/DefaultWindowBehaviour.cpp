@@ -63,24 +63,24 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 	if (decorator != NULL)
 		inBorderRegion = decorator->GetFootprint().Contains(where);
 
-	int32 modifiers = _ExtractModifiers(message);
-	bool windowModifier
-		= (fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
-			&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
-					| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
+	int32 modifiers = message->FindInt32("modifiers");
+	bool windowModifier = _IsWindowModifier(modifiers);
 	click_type action = CLICK_NONE;
 
 	if (windowModifier || inBorderRegion) {
 		// Click on the window border or we have the window modifier keys held
-		int32 buttons = _ExtractButtons(message);
+		int32 buttons = message->FindInt32("buttons");
 
 		if (inBorderRegion)
 			action = _ActionFor(message, buttons, modifiers);
 		else {
 			if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
 				action = CLICK_MOVE_TO_BACK;
+			else if ((fWindow->Flags() & B_NOT_MINIMIZABLE) == 0
+				&& message->FindInt32("clicks") == 2)
+				action = CLICK_MINIMIZE;
 			else if ((fWindow->Flags() & B_NOT_MOVABLE) == 0
-					&& decorator != NULL)
+				&& decorator != NULL)
 				action = CLICK_DRAG;
 			else {
 				// pass click on to the application
@@ -165,6 +165,9 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where)
 		engine->UnlockParallelAccess();
 
 		fWindow->RegionPool()->Recycle(visibleBorder);
+	} else if (fIsMinimizing) {
+		fWindow->ServerWindow()->NotifyQuitRequested();
+		return true;
 	}
 
 	if (action == CLICK_MOVE_TO_BACK) {
@@ -198,11 +201,10 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 {
 	Decorator* decorator = fWindow->Decorator();
 
-	bool invalidate = false;
-		// TODO: not used - can it be removed?
-
 	if (decorator != NULL) {
-		click_type action = _ActionFor(message);
+		int32 modifiers = message->FindInt32("modifiers");
+		int32 buttons = message->FindInt32("buttons");
+		click_type action = _ActionFor(message, buttons, modifiers);
 
 		// redraw decorator
 		BRegion* visibleBorder = fWindow->RegionPool()->GetRegion();
@@ -216,35 +218,25 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 		if (fIsZooming) {
 			fIsZooming = false;
 			decorator->SetZoom(false);
-			if (action == CLICK_ZOOM) {
-				invalidate = true;
+			if (action == CLICK_ZOOM)
 				fWindow->ServerWindow()->NotifyZoom();
-			}
 		}
 		if (fIsClosing) {
 			fIsClosing = false;
 			decorator->SetClose(false);
-			if (action == CLICK_CLOSE) {
-				invalidate = true;
+			if (action == CLICK_CLOSE)
 				fWindow->ServerWindow()->NotifyQuitRequested();
-			}
 		}
 		if (fIsMinimizing) {
 			fIsMinimizing = false;
 			decorator->SetMinimize(false);
-			if (action == CLICK_MINIMIZE) {
-				invalidate = true;
+			if (action == CLICK_MINIMIZE || _IsWindowModifier(modifiers))
 				fWindow->ServerWindow()->NotifyMinimize(true);
-			}
 		}
 
 		engine->UnlockParallelAccess();
 
 		fWindow->RegionPool()->Recycle(visibleBorder);
-
-		int32 buttons;
-		if (message->FindInt32("buttons", &buttons) != B_OK)
-			buttons = 0;
 
 		// if the primary mouse button is released, stop
 		// dragging/resizing/sliding
@@ -311,7 +303,10 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(visibleBorder);
 
-		click_type type = _ActionFor(message);
+		int32 buttons = message->FindInt32("buttons");
+		int32 modifiers = message->FindInt32("modifiers");
+		click_type type = _ActionFor(message, buttons, modifiers);
+
 		if (fIsZooming)
 			decorator->SetZoom(type == CLICK_ZOOM);
 		else if (fIsClosing)
@@ -399,37 +394,12 @@ DefaultWindowBehaviour::MouseMoved(BMessage *message, BPoint where, bool isFake)
 }
 
 
-int32
-DefaultWindowBehaviour::_ExtractButtons(const BMessage* message) const
+bool
+DefaultWindowBehaviour::_IsWindowModifier(int32 modifiers) const
 {
-	int32 buttons;
-	if (message->FindInt32("buttons", &buttons) == B_OK)
-		return buttons;
-
-	return 0;
-}
-
-
-int32
-DefaultWindowBehaviour::_ExtractModifiers(const BMessage* message) const
-{
-	int32 modifiers;
-	if (message->FindInt32("modifiers", &modifiers) == B_OK)
-		return modifiers;
-
-	return 0;
-}
-
-
-click_type
-DefaultWindowBehaviour::_ActionFor(const BMessage* message) const
-{
-	if (fWindow->Decorator() == NULL)
-		return CLICK_NONE;
-
-	int32 buttons = _ExtractButtons(message);
-	int32 modifiers = _ExtractModifiers(message);
-	return _ActionFor(message, buttons, modifiers);
+	return (fWindow->Flags() & B_NO_SERVER_SIDE_WINDOW_MODIFIERS) == 0
+		&& (modifiers & (B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY
+				| B_SHIFT_KEY)) == (B_COMMAND_KEY | B_CONTROL_KEY);
 }
 
 
