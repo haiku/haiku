@@ -22,23 +22,11 @@
 #include <OS.h>
 
 #include <UnicodeChar.h>
-#include "UnicodeProperties.h"
-#include "PropertyFile.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-
-#if B_BEOS_VERSION <= B_BEOS_VERSION_5 && !defined(__HAIKU__)
-// B_BAD_DATA was introduced with DANO, so we define it for R5:
-#define B_BAD_DATA -2147483632L
-#endif
-
-static const uint16 *sPropsTable = NULL;
-#define sProps32Table ((uint32 *)sPropsTable)
-static uint16 *sIndices;
-static vint32 sHavePropsData = 0;
 
 #define FLAG(n) ((uint32)1 << (n))
 enum {
@@ -179,11 +167,7 @@ getProperties(uint32 c)
 	if (c > 0x10ffff)
 		return 0;
 
-	if (sHavePropsData > 0)
-		return sProps32Table[sPropsTable[
-					sPropsTable[sPropsTable[8 + (c >> sStage23Bits)]
-						+ ((c >> sStage3Bits) & sStage2Mask)]
-					+ (c & sStage3Mask)]];
+	// TODO : Data from unicode
 
 	return c > 0x9f ? 0 : gStaticProps32Table[c];
 }
@@ -220,7 +204,8 @@ getSignedValue(uint32 properties)
 static inline uint32 *
 getExceptions(uint32 properties)
 {
-	return sProps32Table + sIndices[INDEX_EXCEPTIONS] + getUnsignedValue(properties);
+	// TODO : data from unicode
+	return 0;
 }
 
 
@@ -243,67 +228,11 @@ addExceptionOffset(uint32 &flags, int16 &index, uint32 **offset)
 }
 
 
-static status_t
-loadPropsData()
-{
-	PropertyFile file;
-	status_t status = file.SetTo(PROPERTIES_DIRECTORY, PROPERTIES_FILE_NAME);
-	if (status < B_OK) {
-		fprintf(stderr, "could not open unicode.properties file: %s\n", strerror(status));
-		return status;
-	}
-
-	off_t size = file.Size();
-	uint16 *table = (uint16 *)malloc(size);
-	if (table == NULL)
-		return B_NO_MEMORY;
-
-	if (file.Read(table, size) < size) {
-		free(table);
-		return B_IO_ERROR;
-	}
-
-	// check if the property file matches our needs
-	if (table[INDEX_STAGE_2_BITS] != 6 || table[INDEX_STAGE_3_BITS] != 4) {
-		free(table);
-		return B_BAD_DATA;
-	}
-
-	sIndices = table;
-#ifdef UCHAR_VARIABLE_TRIE_BITS
-	sStage23Bits = uint16(sIndices[INDEX_STAGE_2_BITS] + sIndices[INDEX_STAGE_3_BITS]);
-	sStage2Mask = uint16((1 << sIndices[INDEX_STAGE_2_BITS]) - 1);
-	sStage3Mask = uint16((1 << sIndices[INDEX_STAGE_3_BITS]) - 1);
-#endif
-
-	sPropsTable = table;
-	sHavePropsData = 1;
-
-	return B_OK;
-}
-
-
 //	#pragma mark -
 
 
-/**	If the constructor is used for the first time, the property
- *	file gets loaded from disk.
- *	It makes sure that this will only happen once throughout the
- *	application's lifetime.
- */
-
 BUnicodeChar::BUnicodeChar()
 {
-	static int32 lock = 0;
-
-	if (atomic_add(&lock, 1) > 0) {
-		while (sHavePropsData == 0)
-			snooze(10000);
-
-		return;
-	}
-	if (loadPropsData() < B_OK)
-		sHavePropsData = -1;
 }
 
 
@@ -318,7 +247,6 @@ BUnicodeChar::IsAlpha(uint32 c)
 
 
 /** Returns the type code of the specified unicode character */
-
 int8
 BUnicodeChar::Type(uint32 c)
 {

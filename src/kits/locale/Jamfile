@@ -30,9 +30,6 @@ local sources =
 	Format.cpp # Used by some of the above.
 	UnicodeChar.cpp # Already used in ReadOnlyBootPrompt.
 
-	# Should go away
-	PropertyFile.cpp # Used by UnicodeChar which should rely on ICU instead
-
 	# old, needs investigation
 	# Currency.cpp
 	# FloatFormat.cpp
