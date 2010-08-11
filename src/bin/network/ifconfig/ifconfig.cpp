@@ -48,9 +48,6 @@ struct address_family {
 	const char*	identifiers[4];
 	preferred_output_format	preferred_format;
 	bool		(*parse_address)(const char* string, sockaddr* _address);
-	bool		(*prefix_length_to_mask)(uint8 prefixLength, sockaddr* mask);
-	uint8		(*mask_to_prefix_length)(sockaddr* mask);
-	void		(*print_address)(sockaddr* address);
 };
 
 
@@ -58,15 +55,9 @@ bool initialize_address_families();
 
 // AF_INET family
 static bool inet_parse_address(const char* string, sockaddr* address);
-static bool inet_prefix_length_to_mask(uint8 prefixLength, sockaddr* mask);
-static uint8 inet_mask_to_prefix_length(sockaddr* mask);
-static void inet_print_address(sockaddr* address);
 
 // AF_INET6 family
 static bool inet6_parse_address(const char* string, sockaddr* address);
-static bool inet6_prefix_length_to_mask(uint8 prefixLength, sockaddr* mask);
-static uint8 inet6_mask_to_prefix_length(sockaddr* mask);
-static void inet6_print_address(sockaddr* address);
 
 static const address_family kFamilies[] = {
 	{
@@ -75,9 +66,6 @@ static const address_family kFamilies[] = {
 		{"AF_INET", "inet", "ipv4", NULL},
 		PREFER_OUTPUT_MASK,
 		inet_parse_address,
-		inet_prefix_length_to_mask,
-		inet_mask_to_prefix_length,
-		inet_print_address
 	},
 	{
 		AF_INET6,
@@ -85,11 +73,8 @@ static const address_family kFamilies[] = {
 		{"AF_INET6", "inet6", "ipv6", NULL},
 		PREFER_OUTPUT_PREFIX_LENGTH,
 		inet6_parse_address,
-		inet6_prefix_length_to_mask,
-		inet6_mask_to_prefix_length,
-		inet6_print_address
 	},
-	{ -1, NULL, {NULL}, PREFER_OUTPUT_MASK, NULL, NULL, NULL, NULL }
+	{ -1, NULL, {NULL}, PREFER_OUTPUT_MASK, NULL }
 };
 
 
@@ -111,6 +96,9 @@ initialize_address_families()
 }
 
 
+// #pragma mark - IPv4
+
+
 static bool
 inet_parse_address(const char* string, sockaddr* _address)
 {
@@ -130,56 +118,7 @@ inet_parse_address(const char* string, sockaddr* _address)
 }
 
 
-static bool
-inet_prefix_length_to_mask(uint8 prefixLength, sockaddr* _mask)
-{
-	if (prefixLength > 32)
-		return false;
-
-	sockaddr_in& mask = *(sockaddr_in*)_mask;
-	mask.sin_family = AF_INET;
-	mask.sin_len = sizeof(sockaddr_in);
-	mask.sin_port = 0;
-	memset(&mask.sin_zero[0], 0, sizeof(mask.sin_zero));
-
-	uint32 hostMask = 0;
-	for (uint8 i = 32; i > 32 - prefixLength; i--)
-		hostMask |= 1 << (i - 1);
-	mask.sin_addr.s_addr = htonl(hostMask);
-
-	return true;
-}
-
-
-static uint8
-inet_mask_to_prefix_length(sockaddr* _mask)
-{
-	sockaddr_in& mask = *(sockaddr_in*)_mask;
-	if (mask.sin_family != AF_INET)
-		return (uint8)-1;
-
-	uint8 result = 0;
-	uint32 hostMask = ntohl(mask.sin_addr.s_addr);
-	for (uint8 i = 32; i > 0; i--) {
-		if ((hostMask & (1 << (i - 1))) == 0)
-			break;
-		result++;
-	}
-
-	return result;
-}
-
-
-static void
-inet_print_address(sockaddr* _address)
-{
-	sockaddr_in& address = *(sockaddr_in*)_address;
-
-	if (address.sin_family != AF_INET)
-		return;
-
-	printf("%s", inet_ntoa(address.sin_addr));
-}
+// #pragma mark - IPv6
 
 
 static bool
@@ -197,72 +136,6 @@ inet6_parse_address(const char* string, sockaddr* _address)
 	address.sin6_scope_id = 0;
 
 	return true;
-}
-
-
-static bool
-inet6_prefix_length_to_mask(uint8 prefixLength, sockaddr* _mask)
-{
-	if (prefixLength > 128)
-		return false;
-
-	sockaddr_in6& mask = *(sockaddr_in6*)_mask;
-	mask.sin6_family = AF_INET6;
-	mask.sin6_len = sizeof(sockaddr_in6);
-	mask.sin6_port = 0;
-	mask.sin6_flowinfo = 0;
-	mask.sin6_scope_id = 0;
-	memset(mask.sin6_addr.s6_addr, 0, sizeof(in6_addr));
-
-	for (uint8 i = 0; i < sizeof(in6_addr); i++, prefixLength -= 8) {
-		if (prefixLength < 8) {
-			static const uint8 masks[] = {
-				0x00, 0x80, 0xc0, 0xe0,
-				0xf0, 0xf8, 0xfc, 0xfe
-			};
-			mask.sin6_addr.s6_addr[i] = masks[prefixLength];
-			break;
-		}
-
-		mask.sin6_addr.s6_addr[i] = 0xff;
-	}
-
-	return true;
-}
-
-
-static uint8
-inet6_mask_to_prefix_length(sockaddr* _mask)
-{
-	sockaddr_in6& mask = *(sockaddr_in6*)_mask;
-	if (mask.sin6_family != AF_INET6)
-		return (uint8)~0;
-
-	uint8 result = 0;
-	for (uint8 i = 0; i < sizeof(in6_addr); i++) {
-		for (uint8 j = 0; j < 8; j++) {
-			if (!(mask.sin6_addr.s6_addr[i] & (1 << j)))
-				return result;
-			result++;
-		}
-	}
-
-	return 128;
-}
-
-
-static void
-inet6_print_address(sockaddr* _address)
-{
-	sockaddr_in6& address = *(sockaddr_in6*)_address;
-
-	if (address.sin6_family != AF_INET6)
-		return;
-
-	char buffer[INET6_ADDRSTRLEN];
-
-	printf("%s",
-		inet_ntop(AF_INET6, &address.sin6_addr, buffer, sizeof(buffer)));
 }
 
 
@@ -324,9 +197,6 @@ static const media_type kMediaTypes[] = {
 	},
 	{ -1, NULL, NULL, {{ -1, NULL, NULL }}, {{ -1, false, NULL, NULL }} }
 };
-
-
-static bool media_parse_subtype(const char* string, int media, int* type);
 
 
 static bool
@@ -446,16 +316,17 @@ bool
 prefix_length_to_mask(int32 familyIndex, const char* argument,
 	struct sockaddr& mask)
 {
-	if (argument == NULL)
-		return false;
-
 	char *end;
 	uint32 prefixLength = strtoul(argument, &end, 10);
 	if (end == argument)
 		return false;
 
-	return kFamilies[familyIndex].prefix_length_to_mask(
-		(uint8)prefixLength, &mask);
+	BNetworkAddress address;
+	if (address.SetToMask(kFamilies[familyIndex].family, prefixLength) != B_OK)
+		return false;
+
+	memcpy(&mask, &address.SockAddr(), address.Length());
+	return true;
 }
 
 
@@ -507,21 +378,18 @@ list_interface_addresses(BNetworkInterface& interface, uint32 flags)
 		const address_family* family
 			= get_address_family(address.Address().Family());
 
-		printf("\t%s addr: ", family->name);
-		family->print_address(address.Address());
+		printf("\t%s addr: %s", family->name,
+			address.Address().ToString().String());
 
-		if ((flags & IFF_BROADCAST) != 0) {
-			printf(", Bcast: ");
-			family->print_address(address.Broadcast());
-		}
+		if ((flags & IFF_BROADCAST) != 0)
+			printf(", Bcast: %s", address.Broadcast().ToString().String());
+
 		switch (family->preferred_format) {
 			case PREFER_OUTPUT_MASK:
-				printf(", Mask: ");
-				family->print_address(address.Mask());
+				printf(", Mask: %s", address.Mask().ToString().String());
 				break;
 			case PREFER_OUTPUT_PREFIX_LENGTH:
-				printf(", Prefix Length: %u",
-					family->mask_to_prefix_length(address.Mask()));
+				printf(", Prefix Length: %zu", address.Mask().PrefixLength());
 				break;
 		}
 
