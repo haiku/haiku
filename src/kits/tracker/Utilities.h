@@ -32,9 +32,11 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-#ifndef	_UTILITIES_H
+#ifndef _UTILITIES_H
 #define _UTILITIES_H
 
+
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdlib.h>
 
@@ -195,42 +197,37 @@ struct natural_chunk {
 };
 
 
-inline bool
-IsNaturalDigit(const char c)
-{
-	return (c >= '0' && c <= '9') || c == ' ';
-}
-
-
-inline void
+inline int32
 FetchNaturalChunk(natural_chunk& chunk, const char* source)
 {
 	if (chunk.type == natural_chunk::ASCII) {
 		// string chunk
 		int32 pos = 0;
-		while (!IsNaturalDigit(source[pos]) && source[pos] != '\0') {
+		while (!isdigit(source[pos]) && !isspace(source[pos])
+			&& source[pos] != '\0') {
 			pos++;
 		}
 		strlcpy(chunk.buffer, source, pos + 1);
 		chunk.length = pos;
-	} else {
-		// number chunk
-		int32 pos = 0;
-		while (IsNaturalDigit(source[pos]) && source[pos] != '\0') {
-			pos++;
-		}
-		strlcpy(&chunk.buffer[sizeof(chunk.buffer) - 1 - pos], source, pos + 1);
-		chunk.length = pos;
-
-		// replace leading zeros with spaces
-		for (pos = sizeof(chunk.buffer) - 1 - pos;
-				pos < (int32)sizeof(chunk.buffer) - 1; pos++) {
-			if (chunk.buffer[pos] != ' ' && chunk.buffer[pos] != '0')
-				break;
-
-			chunk.buffer[pos] = ' ';
-		}
+		return pos;
 	}
+	
+	// skip leading zeros and spaces
+	int32 skip = 0;
+	while (source[0] == '0' || source[0] == ' ') {
+		source++;
+		skip++;
+	}
+
+	// number chunk (stop at next white space)
+	int32 pos = 0;
+	while (isdigit(source[pos]) && source[pos] != '\0') {
+		pos++;
+	}
+	strlcpy(&chunk.buffer[sizeof(chunk.buffer) - 1 - pos], source, pos + 1);
+	chunk.length = pos;
+
+	return pos + skip;
 }
 
 
@@ -264,14 +261,14 @@ NaturalCompare(const char* stringA, const char* stringB)
 		// Determine type of next chunks in each string based on first char
 		if (stringA[indexA] == '\0')
 			a.type = natural_chunk::END;
-		else if (IsNaturalDigit(stringA[indexA]))
+		else if (isdigit(stringA[indexA]) || isspace(stringA[indexA]))
 			a.type = natural_chunk::NUMBER;
 		else
 			a.type = natural_chunk::ASCII;
 
 		if (stringB[indexB] == '\0')
 			b.type = natural_chunk::END;
-		else if (IsNaturalDigit(stringB[indexB]))
+		else if (isdigit(stringB[indexB]) || isspace(stringB[indexB]))
 			b.type = natural_chunk::NUMBER;
 		else
 			b.type = natural_chunk::ASCII;
@@ -288,11 +285,8 @@ NaturalCompare(const char* stringA, const char* stringB)
 		}
 
 		// Fetch the next chunks
-		FetchNaturalChunk(a, &stringA[indexA]);
-		FetchNaturalChunk(b, &stringB[indexB]);
-
-		indexA += a.length;
-		indexB += b.length;
+		indexA += FetchNaturalChunk(a, &stringA[indexA]);
+		indexB += FetchNaturalChunk(b, &stringB[indexB]);
 
 		// Compare the two chunks based on their type
 		if (a.type == natural_chunk::ASCII) {
