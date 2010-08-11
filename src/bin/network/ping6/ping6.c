@@ -110,6 +110,7 @@
 #include <netdb.h>
 
 #include <ctype.h>
+#include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <math.h>
@@ -271,38 +272,6 @@ void	 tvsub(struct timeval *, struct timeval *);
 int	 setpolicy(int, char *);
 char	*nigroup(char *);
 void	 usage(void);
-
-
-static void err(int exitval, char *where)
-{
-	printf("error: %s: error %d [%s]\n", where, errno, strerror(errno));
-	exit(exitval);
-}
-
-static void errx(int exitval, char *fmt_string, ...)
-{
-	va_list list;
-	va_start(list, fmt_string);
-	printf("error: ");
-	vprintf(fmt_string, list);
-	printf("\n");
-	va_end(list);
-	exit(exitval);
-}
-
-static void warn(char *where)
-{
-	printf("warning: %s: error %d [%s]\n", where, errno, strerror(errno));
-}
-
-static void warnx(char *fmt_string, ...)
-{
-	va_list list;
-	va_start(list, fmt_string);
-	printf("warning: ");
-	vprintf(fmt_string, list);
-	printf("\n");
-}
 
 
 int
@@ -700,6 +669,10 @@ main(argc, argv)
 			err(1, "setsockopt(IPV6_RECVRTHDRDSTOPTS)");
 #endif
 	}
+
+	/* revoke root privilege */
+	seteuid(getuid());
+	setuid(getuid());
 
 	if ((options & F_FLOOD) && (options & F_INTERVAL))
 		errx(1, "-f and -i incompatible options");

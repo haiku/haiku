@@ -8,20 +8,11 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+
 BinCommand ping6 :
 	ping6.c
-	: $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) ;
-
-# Installation -- in the test directory for the time being
-HaikuInstall install-networking
-	: [ FDirName $(HAIKU_TEST_DIR) kits net ]
-	: ping6 ;
-
-HaikuInstall install-userland-networking 
-	: [ FDirName $(HAIKU_TEST_DIR) kits net userland ]
-	: ping6
-	: installed-userland-networking
-;
+	: libbsd.so $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) ;
 
 Package haiku-networkingkit-cvs :
 	ping6 :
