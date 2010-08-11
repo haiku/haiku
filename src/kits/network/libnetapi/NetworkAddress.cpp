@@ -975,3 +975,9 @@ BNetworkAddress::operator<(const BNetworkAddress& other) const
 
 	return Port() < other.Port();
 }
+
+
+BNetworkAddress::operator sockaddr*() const
+{
+	return (sockaddr*)&fAddress;
+}
