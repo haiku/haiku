@@ -140,6 +140,7 @@ static const Translation gTranslations[] =
 	{ "pt",
 		"Marcos Alves (Xeon3D)\n"
 		"Vasco Costa (gluon)\n"
+		"Michael Vinícius de Oliveira (michaelvo)\n"
 	},
 	{ "ru",
 		"Tatyana Fursic (iceid)\n"
