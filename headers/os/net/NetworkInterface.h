@@ -67,12 +67,16 @@ public:
 			uint32				Index() const;
 			uint32				Flags() const;
 			uint32				MTU() const;
+			uint32				Media() const;
+			uint32				Metric() const;
 			uint32				Type() const;
 			status_t			GetStats(ifreq_stats& stats);
 			bool				HasLink() const;
 
 			status_t			SetFlags(uint32 flags);
 			status_t			SetMTU(uint32 mtu);
+			status_t			SetMedia(uint32 media);
+			status_t			SetMetric(uint32 metric);
 
 			int32				CountAddresses() const;
 			status_t			GetAddressAt(int32 index,

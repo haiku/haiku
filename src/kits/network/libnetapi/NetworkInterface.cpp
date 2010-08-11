@@ -221,6 +221,28 @@ BNetworkInterface::MTU() const
 
 
 uint32
+BNetworkInterface::Media() const
+{
+	ifreq request;
+	if (do_request(request, Name(), SIOCGIFMEDIA) != B_OK)
+		return 0;
+
+	return request.ifr_media;
+}
+
+
+uint32
+BNetworkInterface::Metric() const
+{
+	ifreq request;
+	if (do_request(request, Name(), SIOCGIFMETRIC) != B_OK)
+		return 0;
+
+	return request.ifr_metric;
+}
+
+
+uint32
 BNetworkInterface::Type() const
 {
 	ifreq request;
@@ -266,6 +288,24 @@ BNetworkInterface::SetMTU(uint32 mtu)
 	ifreq request;
 	request.ifr_mtu = mtu;
 	return do_request(request, Name(), SIOCSIFMTU);
+}
+
+
+status_t
+BNetworkInterface::SetMedia(uint32 media)
+{
+	ifreq request;
+	request.ifr_media = media;
+	return do_request(request, Name(), SIOCSIFMEDIA);
+}
+
+
+status_t
+BNetworkInterface::SetMetric(uint32 metric)
+{
+	ifreq request;
+	request.ifr_metric = metric;
+	return do_request(request, Name(), SIOCSIFMETRIC);
 }
 
 
