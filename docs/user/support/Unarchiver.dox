@@ -1,0 +1,304 @@
+/*
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Author:
+ *		Alex Wilson, yourpalal2@gmail.com
+ *
+ * Corresponds to:
+ *		/trunk/headers/os/support/Archivable.h rev 37751 
+ *		/trunk/src/kits/support/Archivable.cpp rev 37751
+ */
+
+
+/*!
+\class BUnarchiver
+\ingroup support
+\ingroup libbe
+\brief A class that simplifies the unarchiving of complicated BArchivable
+	hierarchies.
+
+	The BUnarchiver class is a small class used to recover BArchivable objects
+	that have been archived with the BArchiver class. It also provides ownership
+	semantics, so that memory leaks can be avoided during the unarchival
+	process. When retrieving an object (either via GetObject() or FindObject()),
+	you can specify a BUnarchiver::ownership_policy. If you specify
+	BUnarchiver::B_ASSUME_OWNERSHIP, you will become responsible for deleting
+	the retrieved item. If you specify BUnarchiver::B_DONT_ASSUME_OWNERSHIP,
+	you will not become responsible. You cannot take ownership of the same
+	object twice. After the unarchival process finishes, any unclaimed objects,
+	excluding the root object (the object being instantiated via
+	instantiate_object() or BUnarchiver::InstantiateObject()), will be deleted.
+
+	If you are updating a class that previously did not use the BArchiver and
+	BUnarchiver helper classes, and want to maintain backwards compatibility
+	with old archive, this can be done using the IsArchiveManaged() method. 
+
+ 	\Warning Calling methods on your BUnarchiver with a legacy archive (one that
+		was not managed by a BArchiver during archival) will result in a
+		call to debugger().
+*/
+
+
+/*!
+	\fn BUnarchiver::BUnarchiver(const BMessage* archive)
+	\brief Constructs a BUnarchiver object to manage \c archive.
+
+	\note To guarantee that your AllUnarchived() method will be called during
+		archival, you must create a BUnarchiver object in your archive
+		constructor. It is necessary to do this even if you won't use the
+		BUnarchiver object in your archive constructor.
+
+	\warning Do not construct a BUnarchiver object without first calling
+		BUnarchiver::PrepareArchive() on \c archive. It is only safe to build a
+		BUnarchiver without this call in your AllUnarchived() implementation. 
+
+	\see BUnarchiver::PrepareArchive()
+*/
+
+
+/*!
+	\fn BUnarchiver::~BUnarchiver()
+	\brief Destroys a BUnarchiver object. Calls this objects Finish() method,
+		if it has not yet been called.
+*/
+
+
+/*!
+	\fn status_t BUnarchiver::EnsureUnarchived(int32 token)
+	\brief Ensure the object represented by \c token is unarchived and
+		instantiated.
+*/
+
+
+/*!
+	\fn status_t BUnarchiver::EnsureUnarchived(const char* name,
+		int32 index = 0)
+	\brief Ensure the object archived under \c name at \c index is unarchived
+		and instantiated.
+*/
+
+
+/*!
+	\fn bool BUnarchiver::IsInstantiated(int32 token)
+	\brief Checks whether the object represented by \c token has been
+		instantiated in this session.
+*/
+
+
+/*!
+	\fn bool BUnarchiver::IsInstantiated(const char* name, int32 index = 0)
+	\brief Checks whether the object archived under \c name at \c index has been
+		instantiated in this session.
+ */
+
+
+/*!
+	\fn template<class T> status_t BUnarchiver::GetObject(int32 token,
+		ownership_policy owning, T*& object)
+
+	\brief Recover an object by token that was archived by a BArchiver object.
+	If the object has not yet been instantiated, and this request is not coming
+	from an AllUnarchived() implementation, the object will be instantiated now.
+
+	If the retrieved object is not of the type \c T, then this method will fail.
+	If this method fails, you will not receive ownership of the object, no
+	matter what you specified in \c owning.
+	
+	\tparam T The type of object you wish to find.
+
+	\param token The token you got for this object from
+		BArchiver::GetTokenForArchivable() during archival.
+	\param owning Whether or not you wish to take ownership of the
+		retrieved object.
+	\param object Return parameter for the retrieved object of type \c T.
+
+	\retval B_BAD_TYPE The object retrieved was not of type \c T.
+*/
+
+
+/*!
+	\fn template<class T> status_t BUnarchiver::GetObject(int32 token,
+		T*& object)
+
+	\brief Recover and take ownership of an object represented by \c token.
+
+	Equivalent to calling GetObject(token, BUnarchiver::B_ASSUME_OWNERSHIP,
+		 object)
+*/
+
+
+/*!
+	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
+		int32 index, ownership_policy owning, T*& object)
+
+	\brief Recover an object that had previously been archived using
+		the BArchiver::AddArchivable() method. If the object has not yet been
+		instantiated, and this request is not coming from an AllUnarchived()
+		implementation, the object will be instantiated now.
+
+	If the retrieved object is not of the type \c T, then this method will fail.
+	If this method fails, you will not receive ownership of the object, no
+	matter what you specified in \c owning.
+	
+	\tparam T The type of object you wish to find.
+
+	\param name The name that was passed to BArchiver::AddArchivable() when
+		adding this object.
+	\param index The index of the object you wish to recover (0 based, like
+		BMessage::FindData().
+	\param owning Dictates whether or not you wish to take ownership of the
+		retrieved object.
+	\param object Return parameter for the retrieved object of type \c T.
+
+	\retval B_BAD_TYPE The object retrieved was not of type \c T.
+*/
+
+
+/*!
+	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
+		int32 index, T*& object)
+
+	\brief Recover and take ownership of an object that had previously been
+		archived using the BArchiver::AddArchivable() method.
+*/
+
+
+/*!
+	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
+		ownership_policy owning, T*& object)
+
+	\brief Recover an object at index 0 that had previously been archived using
+		the BArchiver::AddArchivable() method.
+
+	Equivalent to calling FindObject(name, 0, owning, object).
+*/
+
+
+/*!
+	\fn template<class T> status_t BUnarchiver::FindObject(const char* name,
+		T*& object)
+
+	\brief Recover and take ownership of an object at index 0 that had
+		previously been archived using the BArchiver::AddArchivable() method.
+
+	Equivalent to calling FindObject(name, 0, BUnarchiver::B_ASSUME_OWNERSHIP,
+		object).
+*/
+
+
+/*!
+	\fn status_t BUnarchiver::Finish(status_t err = B_OK);
+	\brief Report any unarchiving errors and possibly complete the archiving
+		session.
+	\return The first error reported in this unarchiving session, or B_OK.
+
+	This method may finish an unarchiving session (triggering the call of all
+	instantiated objects' AllUnarchived() methods) if the following conditions
+	are true:
+	\li No errors have been reported to this or any other BUnarchiver object
+		within this session.
+	\li This is the last remaining BUnarchiver that has not had its Finish()
+		method invoked.
+	If you call this method with an error code not equal to B_OK, then this
+	unarchiving session has failed, instantiated objects will not have their
+	AllUnarchived() methods called, and any subsequent calls to this method
+	on any BUnarchiver objects in this session will return your error code.
+	Furthermore, any objects that have been instantiated, but have not had
+	their ownership assumed by another object will now be deleted (excluding
+	the root object).
+*/
+
+
+/*!
+	\fn	const BMessage*	BUnarchiver::ArchiveMessage() const
+	\brief Returns the BMessage* used to construct this BUnarchiver. This is
+		the archive that FindObject() uses.
+*/
+
+
+/*!
+	\fn static bool BUnarchiver::IsArchiveManaged(const BMessage* archive)
+
+	\brief Checks whether \c archive was managed by a BArchiver object.
+	\retval true if \c archive was managed by a BArchiver object.
+	\retval false otherwise.
+
+	This method can be used to maintain archive backwards-compatibility for a
+	class that has been updated to use the BArchiver class. If there is a
+	possibility that you are may dealing with a legacy archive, you can use
+	this method to find out before calling any methods on your BUnarchiver
+	object.
+
+	Here is an example of how you might use this method. Note that you
+	must still call BUnarchiver::PrepareArchive(archive), either way.
+
+	\code
+MyArchivableClas::MyArchivableClass(BMessage* archive)
+	:
+	BArchivable(BUnarchiver::PrepareArchive(archive))
+{
+	BUnarchiver unarchiver(archive);
+
+	if (BUnarchiver::IsArchiveManaged(archive)) {
+		// ... calls to FindObject() or GetObject() here ...
+	} else {
+		// ... calls to BMessage::FindMessage() here ...
+	}
+}
+	\endcode
+*/
+
+
+/*!
+	\fn static BMessage* BUnarchiver::PrepareArchive(BMessage*& archive)
+	\brief Prepares \c archive for use by a BUnarchiver.
+	\param	archive The archive you wish to have prepared.
+	\return The same BMessage as is passed in.
+
+	This method must be called if you plan to use a BUnarchiver on an archive.
+	It must be called once for each class an object inherits from that
+	will use a BUnarchiver.
+
+	\warning This method \bold must be called \bold before a call to the
+		archive constructor of your parent class.
+
+	Notice the use of this method in the example provided below.
+	\code
+MyArchivableClas::MyArchivableClas(BMessage* archive)
+	:
+	BArchivable(BUnarchiver::PrepareArchive(archive))
+{
+	// ...
+}
+	\endcode
+*/
+
+
+/*!
+	\fn void BUnarchiver::AssumeOwnership(BArchivable* archivable)
+	\brief Become the owner of \c archivable.
+
+	After calling this method, you are responsible for the deletion
+		of \c archivable.
+*/
+
+
+/*!
+	\fn void BUnarchiver::RelinquishOwnership(BArchivable* archivable)
+	\brief Relinquish ownership of \c archivable. If \c archivable remains
+		unclaimed at the end of the unarchiving session, it will be deleted
+		(unless it is the root object).
+*/
+
+
+/*!
+	\fn template<class T> status_t BUnarchiver::InstantiateObject(
+		BMessage* from, T*& object)
+	\brief Attempt to instantiate an object of type \c T from BMessage* \c from.
+
+	If the instantiated object is not of type \c T, then it will be deleted,
+	and this method will return \c B_BAD_TYPE. This method is similar to
+	the instantiate_object() function, but provides error reporting and 
+	protection from memory leaks.
+*/

@@ -47,4 +47,6 @@ some specific examples:
   have such an interface in the first place).
 - In several places we also dropped compatibility support for older BeOS
   versions (PR2, R3, R4), which BeOS R5 still featured.
+- The BArchivable class has been updated, and for some classes, unarchiving
+  is slightly different.
 */

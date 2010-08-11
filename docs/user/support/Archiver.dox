@@ -1,0 +1,138 @@
+/*
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Author:
+ *		Alex Wilson, yourpalal2@gmail.com
+ *
+ * Corresponds to:
+ *		/trunk/headers/os/support/Archivable.h rev 37751 
+ *		/trunk/src/kits/support/Archivable.cpp rev 37751
+ */
+
+
+/*!
+	\class BArchiver
+	\ingroup support
+	\ingroup libbe
+	\brief A class that simplifies the archiving of complicated BArchivable
+		hierarchies.
+
+	The BArchiver class is a small class that is used for archiving of
+	complicated BArchivable hierarchies. Such a hierarchy may include
+	multiple BArchivable objects, each of which might be referenced by 
+	many BArchivable objects. With the BArchiver class, you can be certain
+	that each BArchivable object is archived only once with very little work.
+	When used in conjuction with the BArchivable::AllArchived() and
+	BArchivable::AllUnarchived() methods, it is simple to rebuild your system of
+	references upon unarchival so that they are equivalent to those that were
+	present in your original hierarchy.
+
+	The objects you archive can be retrieved using a BUnarchiver object.
+*/
+
+
+/*!
+	\fn BArchiver::BArchiver(BMessage* archive)
+	\brief Constructs a BArchiver object that manages \c archive.
+*/
+
+
+/*!
+	\fn BArchiver::~BArchiver()
+	\brief Destroys a BArchiver object. If the BArchiver object has not had its
+	Finish() method called, this will be done now.
+*/
+
+
+/*!
+	\fn status_t BArchiver::AddArchivable(const char* name,
+			BArchivable* archivable, bool deep = true)
+	\brief Adds a reference to \c archivable to the archive used to
+		construct this BArchiver. May call \c archivable's Archive() method.
+
+	\param name Where this reference will be stored in the archive.
+	\param archivable The BArchivable* object that to reference.
+	\param deep Passed to \c archivable->Archive() if \c archivable must
+		be archived.
+
+	Adds a reference to \c archivable to your archive. If \c archivable has
+	not yet been archived, then its Archive() method is called. BArchiver
+	can only track BArchivable objects that have been archived through this
+	method or the GetTokenForArchivable() methods.
+
+	\warning If you manually archive an object, and then pass it to
+		AddArchivable() or GetTokenForArchivable(), it will be archived again,
+		and when unarchived you will end up with two different BArchivable
+		objects.
+*/
+
+
+/*!
+	\fn status_t BArchiver::GetTokenForArchivable(BArchivable* archivable,
+		bool deep, int32& _token);
+	\brief Get a token representing \c archivable for this archiving
+		session.
+
+	\param deep Controls how \c archivable will be archived, if it has not yet
+		been archived in this session.
+	\param[out] _token The token representing \c archivable is stored here.
+
+	Retrieves or creates a token to represent \c archivable in this archiving
+	session. If \c archivable has not yet been archived, it will be now. If
+	\c archivable gets archived, the \c deep parameter will be passed to its
+	Archive() method.
+
+	\warning If you manually archive an object, and then pass it to
+		GetTokenForArchivable(), it will be archived again, and when unarchived
+		you will end up with two different BArchivable objects.
+*/
+
+
+/*!
+	\fn status_t BArchiver::GetTokenForArchivable(BArchivable* archivable,
+		int32 &_token)
+	\brief Equivalent to calling the expanded GetTokenForArchivable(
+		BArchivable*, bool, int32&), with the deep parameter equal to true.
+
+	\see GetTokenForArchivable(BArchivable*, bool, int32&)
+*/
+
+
+/*!
+	\fn bool BArchiver::IsArchived(BArchivable* archivable);
+	\brief Returns whether \c archivable has already been archived in this
+		session.
+
+	\retval true \c archivable has been archived in this archiving session.
+	\retval false \c archivable has not been archived in this archiving session.
+*/
+
+
+/*!
+	\fn status_t BArchiver::Finish(status_t err = B_OK);
+	\brief Report any archiving errors and possibly complete the archiving
+		session.
+	\return The first error reported in this archiving session, or B_OK.
+
+	This method may finish an archiving session (triggering the call of all
+	archived objects' AllArchived() methods) if the following conditions
+	are true:
+	\li No errors have been reported to this or any other BArchiver object
+		within this session.
+	\li This is the last remaining BArchiver that has not had its Finish()
+		method invoked.
+	If you call this method with an error code not equal to B_OK, then this
+	archiving session has failed, archived objects will not have their
+	AllArchived() methods called, and any subsequent calls to this method
+	on any BArchiver objects in this session will return your error code.
+*/
+
+
+/*!
+	\fn	const BMessage*	BArchiver::ArchiveMessage() const
+	\brief Returns the BMessage* used to construct this BArchiver. This is
+		the archive that AddArchivable() modifies.
+*/
+
+
