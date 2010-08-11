@@ -16,13 +16,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Tracker 文件浏览器</title>
+	<title>Tracker </title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -41,15 +41,15 @@
 <li><a href="../en/tracker.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="teammonitor.html">程序监控器</a> 
-::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="tracker-add-ons.html">Tracker 附加组件</a>  »
+ «  <a href="teammonitor.html">Team Monitor</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -64,7 +64,7 @@
 </td></tr>
 </table>
 
-<h1>Tracker 文件浏览器</h1>
+<h1>Tracker </h1>
 
 <p>Tracker是所有文件的图形界面显示工具。它允许您新建文件和文件夹，复制和删除文件，并且还可以对文件进行查询，启动和重命名等操作。</p>
 <p>同其他的应用程序一样 (the Desktop with its icons is really just a fullscreen window in the background)，Tracker与它的窗口出现在桌面栏，并且可以关闭和重启。 The easiest way to quit and restart a crashed or frozen Tracker (or a wayward Deskbar) is to call the <a href="teammonitor.html">Team Monitor</a>.</p>
@@ -72,22 +72,23 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="mounting-volumes" name="mounting-volumes">挂载磁卷</a></h2>
-<p>In order to access a harddisk, CD, USB stick etc., you first have to mount the volume, that is, let the system know it's there. This is done with a right-click on the Desktop or an already mounted volume (like the boot disk) and choosing the volume from the <span class="menu">Mount</span> submenu. You find the same <span class="menu">Mount</span> menu in the Deskbar.</p>
+<p>为了能够访问硬盘，CD，USB磁盘等，您首先需要挂载这些磁卷，也就是告诉系统，它们存在。 右键点击桌面，或者已经挂载的刺卷（如启动盘），然后从 <span class="menu">Mount</span> 子菜单中选择磁卷。您也可以在桌面栏中找到相同的 <span class="menu">Mount</span> 菜单。</p>
 <img src="images/tracker-images/mount-settings.png" alt="drill-down.png" />
-<p>There are also <span class="menu">Mount Settings</span> so you don't have to mount everything manually after every bootup.<br />
-The above settings will automatically mount any storage device you connect/insert and also mount all disks on bootup that were mounted previously.</p>
-<div class="box-warning">Before you disconnect e.g. a harddrive or USB stick, make sure you have successfully unmounted the volume. This guarantees that all data transfer has finished. Otherwise you may lose data or corrupt the disk!</div>
+<p>还有一个 <span class="menu">Mount Settings</span> ，因此你不需要每次启动时都手动挂载所有磁卷。
+<br />
+上述的设置将会自动挂载您所连接/插入的所有存储设备，然后在启动时挂载所有曾经挂载过的磁盘。</p>
+<div class="box-warning">在您断开硬件设备或者USB磁盘的连接时，一定要保证您已经成功的卸载了该磁卷。这样可以保证所有的数据传输已经结束，否则可能会导致数据的丢失或者损坏磁盘。</div>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="navigating" name="navigating">文件导航</a></h2>
-<p>By default, when you double-click a folder, Tracker opens a new window while leaving the parent window open. This can quickly lead to an overcrowded desktop.<br />
-You can prevent that by holding down the <span class="key">OPT</span> key, which automatically closes the parent window.<br />
-This is also true for keyboard navigation. For more on that, see topic <a href="keyboard-shortcuts.html">Shortcuts and key combinations</a>.</p>
+<p>默认情况下，双击文件夹，Tracker打开新窗口，并且保持先前的打开窗口。这将会很快导致桌面的拥挤。<br />
+您可以使用 <span class="key">OPT</span> 键来阻止这种情况发生，它将会自动关闭先前的窗口。<br />
+这也同样适用于键盘导航，更多的信息可以参阅主题 <a href="keyboard-shortcuts.html">快捷键和组合键</a>。</p>
 <p>Moving through your folders is one of Trackers main purposes, just like the file managers on other platforms. Haiku's Tracker has some unique features that will help you doing that efficiently.</p>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">Drilling down the submenus</a></h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="drill-down" name="drill-down">进入子菜单</a></h3>
 <p>Instead of double-clicking your way down folder after folder, there's a better way to drill down:</p>
 <img src="images/tracker-images/drill-down.png" alt="drill-down.png" />
 <!-- screenshot needs updating to show /boot/system/documentation -->
@@ -126,7 +127,7 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 <ul>
 <li><p><b>Resize Window</b> (<span class="key">ALT</span> <span class="key">Y</span>) - Resizes the window to its ideal size.</p></li>
 <li><p><b>Clean Up</b> (<span class="key">ALT</span> <span class="key">K</span>) - Aligns all icons to an invisible grid. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Clean Up All</span> which additionally sorts all icons alphabetically.</p></li>
-<li><p><b>Select...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression">regular expression</a>.</p></li>
+<li><p><b>Select...</b> (<span class="key">SHIFT</span> <span class="key">ALT</span> <span class="key">A</span>) - Select files according to a <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="Wikipedia: Regular expression">regular expression</a>.</p></li>
 <li><p><b>Close</b> (<span class="key">ALT</span> <span class="key">W</span>) - Closes the window. Hold down <span class="key">SHIFT</span> and the menu becomes <span class="menu">Close All</span> which closes every Tracker window.</p></li>
 <li><p><b>Close All in Workspace</b> (<span class="key">ALT</span> <span class="key">Q</span>) - Closes every Tracker window in the current workspace. A useful shortcut if you forgot to hold the <span class="key">OPT</span> key while clicking through folders and all those still open Tracker windows clutter your workspace.</p></li>
 </ul>
@@ -193,9 +194,9 @@ This type-ahead filtering is set in the <a href="#tracker-preferences.html">Trac
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="teammonitor.html">程序监控器</a> 
-::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="tracker-add-ons.html">Tracker 附加组件</a>  »
+ «  <a href="teammonitor.html">Team Monitor</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="tracker-add-ons.html">Tracker Add-Ons</a>  »
 </span></div>
 </div>
 

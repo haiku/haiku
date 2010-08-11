@@ -9,18 +9,20 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Pengphei Han
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Magnify</title>
+	<title>放大镜</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -40,16 +42,16 @@
 </ul>
 <span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="mail.html">电子邮箱</a>  »
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="mail.html">Mail</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/magnify-icon_64.png" alt="magnify-icon_64.png" width="64" height="64" />Magnify</h2>
+<h2><img src="../../images/apps-images/magnify-icon_64.png" alt="magnify-icon_64.png" width="64" height="64" />放大镜</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/Magnify</span></td></tr>
@@ -57,29 +59,31 @@
 </td><td></td><td><span class="path">~/config/settings/Magnify_prefs</span></td></tr>
 </table>
 <p><br /></p>
-<p>Magnify shows an enlarged version of the area around your mouse pointer.</p>
+<p>放大镜对您的鼠标指针周围区域进行了放大显示。</p>
 <img src="../images/apps-images/magnify.png" alt="magnify.png" />
-<p>At the top you'll find the size and magnification level of the area. "<i>32 x 32 @ 8 pixels/pixel</i>" means that you look at a 32x32 pixel square around your mouse pointer and every pixel is enlarged by a factor of 8.</p>
-<p>Below that is the color of the pixel that's marked by a red outline. Its color is presented as RGB and hex value.<br />
-You can move the red outline with <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span>.</p>
-<p>To measure distances and align objects, you can add up to two blue crosshairs with <span class="key">ALT</span> <span class="key">H</span>. Their X/Y coordinates toward the top left corner and, if both are added, their X/Y distance from each other, are displayed at the bottom.<br />
-They can also be moved with <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span>. The active crosshair is marked with an "x".</p>
-<p>You can move the mouse pointer pixel by pixel with <span class="key">OPT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span>.</p>
-<p>Clicking on the pop-up menu gives you a number of options:</p>
+<p>在顶部，您可以找到该区域的尺寸和放大倍数。 "<i>32 x 32 @ 8 pixels/pixel</i>" 表示，您正在查看鼠标周围 32x32 的像素面积，而且每个像素都放大了8倍。</p>
+<p>下面是一个具有红色轮廓的的像素。它的颜色以RGB和十六进制值表示。<br />
+您可以使用 <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span> 移动红色的轮廓。</p>
+<p>为了量度距离和排列的对象，您可以使用 <span class="key">ALT</span> <span class="key">H</span> 添加两个蓝色的十字丝。它们的 X/Y 坐标趋向于左上角，如果添加了两个十字丝，它们的之间的 X/Y 距离显示于窗口的底部。
+
+<br />
+十字丝也可以通过 <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span> 进行移动，而活动的十字丝则标记为 "x" 。</p>
+<p>您可以使用 <span class="key">OPT</span> <span class="key">←</span> / <span class="key">→</span> / <span class="key">↑</span> / <span class="key">↓</span> 控制鼠标指针，使指针以像素为单位移动。</p>
+<p>点击弹出菜单将会给出下面的选项：</p>
 <table summary="options" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Save Image</span></td><td><span class="key">ALT</span> <span class="key">S</span></td><td> </td><td>Saves the current display as a resource file.</td></tr>
-<tr><td><span class="menu">Copy Image</span></td><td><span class="key">ALT</span> <span class="key">C</span></td><td> </td><td>Copies the current display to the clipboard.</td></tr>
-<tr><td><span class="menu">Hide/Show Info</span></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Toggles the display of all the additional information.</td></tr>
-<tr><td><span class="menu">Add a Crosshair</span></td><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>Adds a crosshair you can drag around. </td></tr>
-<tr><td><span class="menu">Remove a Crosshair</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">H</span></td><td> </td><td>Removes the last added crosshair.</td></tr>
-<tr><td><span class="menu">Hide/Show Grid</span></td><td><span class="key">ALT</span> <span class="key">G</span></td><td> </td><td>Toggles the overlayed grid.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Freeze/Unfreeze image</span></td><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>Stops/continues updating the magnification area.</td></tr>
-<tr><td><span class="menu">Stick Coordinates</span></td><td><span class="key">ALT</span> <span class="key">I</span></td><td> </td><td>Keeps updating the magnification area, but don't follow the mouse pointer any more.</td></tr>
+<tr><td><span class="menu">Save Image</span></td><td><span class="key">ALT</span> <span class="key">S</span></td><td> </td><td>保存当前显示图像为源文件。</td></tr>
+<tr><td><span class="menu">Copy Image</span></td><td><span class="key">ALT</span> <span class="key">C</span></td><td> </td><td>复制当前显示到剪贴板。</td></tr>
+<tr><td><span class="menu">Hide/Show Info</span></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>切换显示所有的附加信息。</td></tr>
+<tr><td><span class="menu">Add a Crosshair</span></td><td><span class="key">ALT</span> <span class="key">H</span></td><td> </td><td>添加可以移动的十字丝。</td></tr>
+<tr><td><span class="menu">Remove a Crosshair</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">H</span></td><td> </td><td>删除最近添加的十字丝。</td></tr>
+<tr><td><span class="menu">Hide/Show Grid</span></td><td><span class="key">ALT</span> <span class="key">G</span></td><td> </td><td>在覆盖网格之间进行切换。</td></tr>
+<tr><td class="onelinetop"><span class="menu">Freeze/Unfreeze image</span></td><td><span class="key">ALT</span> <span class="key">F</span></td><td> </td><td>停止/继续更新放大区域。</td></tr>
+<tr><td><span class="menu">Stick Coordinates</span></td><td><span class="key">ALT</span> <span class="key">I</span></td><td> </td><td>持续更新放大区域，但是不再追踪鼠标指针。</td></tr>
 <tr><td><span class="menu">Make Square</span></td><td><span class="key">ALT</span> <span class="key">/</span></td><td> </td><td>Reverts back to a square display after resizing the window.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Decrease Window Size</span></td><td><span class="key">ALT</span> <span class="key">-</span></td><td> </td><td>Shrinks the magnified area around the mouse pointer.</td></tr>
-<tr><td><span class="menu">Increase Window Size</span></td><td><span class="key">ALT</span> <span class="key">+</span></td><td> </td><td>Enlarges the magnified area around the mouse pointer.</td></tr>
-<tr><td><span class="menu">Decrease Pixel Size</span></td><td><span class="key">ALT</span> <span class="key">,</span></td><td> </td><td>Lowers magnification.</td></tr>
-<tr><td><span class="menu">Increase Pixel Size</span></td><td><span class="key">ALT</span> <span class="key">.</span></td><td> </td><td>Increases magnification.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Decrease Window Size</span></td><td><span class="key">ALT</span> <span class="key">-</span></td><td> </td><td>缩小鼠标指针周围放大区域的面积。</td></tr>
+<tr><td><span class="menu">Increase Window Size</span></td><td><span class="key">ALT</span> <span class="key">+</span></td><td> </td><td>增加鼠标指针周围放大区域的面积。</td></tr>
+<tr><td><span class="menu">Decrease Pixel Size</span></td><td><span class="key">ALT</span> <span class="key">,</span></td><td> </td><td>缩小放大倍数。</td></tr>
+<tr><td><span class="menu">Increase Pixel Size</span></td><td><span class="key">ALT</span> <span class="key">.</span></td><td> </td><td>增加放大倍数。</td></tr>
 </table>
 
 </div>
@@ -88,8 +92,8 @@ They can also be moved with <span class="key">←</span> / <span class="key">→
 <div class="nav">
 <div class="inner"><span>
  «  <a href="icon-o-matic.html">Icon-O-Matic</a> 
-::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="mail.html">电子邮箱</a>  »
+::  <a href="../applications.html#list-of-apps" class="uplink">Applications</a> 
+::  <a href="mail.html">Mail</a>  »
 </span></div>
 </div>
 

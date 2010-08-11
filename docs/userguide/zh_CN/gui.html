@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -41,15 +41,15 @@
 <li><a href="../en/gui.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filesystem-layout.html">文件系统布局</a> 
-::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="workspaces.html">Workspaces（工作区）</a>  »
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Haiku的图形用户界面</h1>
 
@@ -61,7 +61,7 @@
 <li><p>桌面栏可以看做是Haiku的"开始"菜单和任务栏（如果您愿意这样认为的话），详情参阅<a href="deskbar.html">桌面栏</a>主题。</p></li>
 <li>黄色的标签不仅仅提供了程序名或者文档的文件名：
 <ul><li>在拖动窗口时，您可以同时按下 <span class="key">SHIFT</span> 键来移动标签，这样您可以将许多窗口进行叠加，而只需要点击标签即可方便的进行访问。</li>
-<li>双击标签可以最小化窗口（或者使用 <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> 组合键）。通过这种方式隐藏的窗口可以通过 <a href="deskbar.html">桌面栏</a> 或者 <a href="twitcher.html">Twitcher</a> 进行访问。</li>
+<li>双击标签可以最小化窗口（或者使用 <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">M</span> 组合键）。通过这种方式隐藏的窗口可以通过 <a href="deskbar.html">桌面栏</a> 或者 <a href="twitcher.html">任务切换器</a> 进行访问。</li>
 <li>您可以通过右键点击标签（或者窗口边界）来置后窗口。</li></ul></li>
 <li><p>关闭按钮</p></li>
 <li><p>“缩放”按钮（也可以通过<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">Z</span> 组合键进行缩放）。对于大多数的程序，该按钮将会把窗口最大化。但并不是都如此，例如Tracker窗口，该按钮将会依据其内容将窗口放大至合适大小。</p></li>
@@ -72,32 +72,32 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="open-save-panel" name="open-save-panel">打开和保存面板</a></h2>
-<p>从任意的程序打开或保存文件都将会打开类似于下面的面板：</p>
+<p>从任意的程序打开或保存文件都将会打开类似于如下所示的面板：</p>
 <img src="images/gui-images/open-save.png" alt="open-save.png" />
-<p>It has all the usual things: A list of files of the current folder to choose from, in case of a save panel, a text field to enter a filename and a pop-up menu for different file formats and their settings.<br />
-You can enter parent folders with the pop-up menu above the file listing.</p>
-<p>If you already have a Tracker window with the location for a file open, you can simply drag either any file or the folder-representation (i.e. the symbol to the far right in its menu bar) into the panel. This changes the panel to that new location.</p>
+<p>它具有所有常用的东西：当前文件夹下可选的文件列表，用于输入文件名的文本框，用于不同文件格式的弹出菜单，以及有关的设置。<br />
+您可以使用文件列表上面的弹出菜单进入上层文件夹。</p>
+<p>如果您已经拥有一个Tracker窗口用于打开文件，您可以将任何的文件或者代表的文件夹（例如，在菜单栏最右边的标志）拖拽到该面板。然后，它将会修改面板指向新的位置。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="open-save-shortcuts" name="open-save-shortcuts">快捷键</a></h3>
-<p>Many shortcuts in open and save panels are the same used in Tracker. Besides the commands that are also available through the <span class="menu">File</span> menu, there are a few not that obvious:</p>
+<p>在打开和保存面板中的许多快捷键和在Tracker中使用的相同。除了在 <span class="menu">File</span> 菜单中也可用的命令之外，还有些不是很明显的命令：</p>
 <table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td> Creates a new folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td> Lets you rename the selected entry.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td> Moves into the parent folder.</td></tr>
-<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td> Moves into the selected folder.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td> Takes you to your Desktop.</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td> Takes you to your Home folder.</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">N</span></td><td></td><td>新建一个文件夹。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">E</span></td><td></td><td>重命名选中的文件。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>移动到上层文件夹。</td></tr>
+<tr><td class="onelinetop"><span class="key">ALT</span> <span class="key">↓</span> or <span class="key">ENTER</span></td><td></td><td>进入选中的文件夹。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">D</span></td><td></td><td>返回桌面。</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">H</span></td><td></td><td>返回home文件夹。</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="favorites-recent" name="favorites-recent">收藏夹和最近的文件夹</a></h3>
-<p>The <span class="menu">Favorites</span> menu in open and save panels provides recently visited folders and favorite locations that you can set up yourself. As indicated by the little arrow, you can also use these locations to navigate further down the hierarchy via submenus.</p>
+<p>在打开和保存面板中的 <span class="menu">收藏夹</span> 菜单提供了您可以自主设置的最近访问文件夹和收藏夹的位置。根据小箭头的指示，您也可以使用这些位置通过子菜单导航至下面的文件层次。</p>
 <img src="images/gui-images/favorites.png" alt="favorites.png" />
-<p>To add a Favorite, you simply navigate to your destination and choose <span class="menu">Favorites | Add Current Folder</span>. From now on it will appear in every open/save panel. To remove a Favorite, choose <span class="menu">Favorites | Configure Favorites...</span> and delete its entry.<br />
-All Favorites are kept in <span class="path">/boot/home/config/settings/Tracker/Go/</span>. So you might as well add and remove links to files and folders there directly.</p>
+<p>为了添加收藏项目，您可以导航至目标，然后选择 <span class="menu">Favorites | Add Current Folder</span> 。那么之后，它将会出现在每个打开/保存面板。为了删除收藏项目，选择 <span class="menu">Favorites | Configure Favorites...</span> ，然后在其中删除该入口。<br />
+所有的收藏项目保存在 <span class="path">/boot/home/config/settings/Tracker/Go/</span>。所以您可以直接在那里添加或者删除相关的文件和文件夹的链接。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -113,9 +113,9 @@ A right-click on a Replicant handle offers a context menu to show the originatin
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filesystem-layout.html">文件系统布局</a> 
-::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="workspaces.html">Workspaces（工作区）</a>  »
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
 

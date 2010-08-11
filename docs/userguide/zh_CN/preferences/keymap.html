@@ -16,13 +16,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>终端键盘映射</title>
+	<title>键盘映射</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -42,16 +42,16 @@
 </ul>
 <span>
  «  <a href="keyboard.html">键盘</a> 
-::  <a href="../preferences.html" class="uplink">首选项</a> 
-::  <a href="locale.html">本地化</a>  »
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="locale.html">Locale</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />终端键盘映射</h2>
+<h2><img src="../../images/prefs-images/keymap-icon_64.png" alt="keymap-icon_64.png" width="64" height="64" />键盘映射</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">首选项</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/preferences/Keymap</span></td></tr>
@@ -61,35 +61,37 @@
 </table>
 <p><br /></p>
 <img src="../images/prefs-images/keymap.png" alt="keymap.png" />
-<p>To the right, the Keymap window shows a representation of your keyboard. When you press a key, the corresponding key is darkened and the assigned symbol is entered into the <i>Sample and Clipboard</i> text field at the bottom. From there you can also copy and paste it into a document.<br />
-Thus, the Keymap preferences are not only for configuring your local keymap, but are also useful when looking for a special symbol used in other languages. For example, you can switch the keymap to "French", find the "ç" and copy it into your mail to François. (Though you'll find the "cedil" also in other keymaps...)</p>
-<p>Pressing modifier keys like <span class="key">SHIFT</span>, <span class="key">CONTROL</span> or <span class="key">OPTION</span> changes the displayed keyboard accordingly.</p>
-<p>Then there are the keys that are marked with a blue background. These keys are called <i>Dead Keys</i> that can change the key you press after that. If you click on such a blue key with your mouse, those changeable keys light up yellow. Click again and everything's back to normal. Examples are é, ñ, ó or ë.</p>
-<p>Below the keyboard representation are two more options:</p>
+<p>在面板右侧，键盘映射窗口显示了一个键盘。当你按下某个按键时，所要响应的按键将会变暗，然后指定的符号将会输入到底部的 <i>Sample and Clipboard</i> 文本框。您也可以从这儿复制里面的内容，将粘贴到文档中。
+<br />
+如此，键盘映射首选项不仅可以用于配置您的本地键盘映射，还可用于寻找其他语言的特殊符号。例如，您可以将键盘映射切换为"法语"，找出 "ç" 然后将其复制到您邮件中的 François。（尽管您也可以在其他的键盘映射中找出 "cedil"...）</p>
+<p>按下辅助按键，例如 <span class="key">SHIFT</span>，<span class="key">CONTROL</span> 或者 <span class="key">OPTION</span> 来改变显示的键盘类型。</p>
+<p>还有些按键的背景标记为蓝色，这些按键称为 <i>Dead Keys</i> ，它们可以改变您在按下它们之后所按下的按键。如果您点击了这些蓝色的按键，那些可以改变的按键显示为黄色；再次点击，所有的按键将恢复正常。例如 é，ñ，ó或者ë。</p>
+<p>在键盘显示的下面，还有两个选项：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>for setting the above mentioned blue keys.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>for using the shortcut key in Windows/Linux mode, i.e. <span class="key">CONTROL</span> (normally <span class="key">CTRL</span>) or Haiku mode, i.e. <span class="key">COMMAND</span> (normally <span class="key">ALT</span>).</td></tr>
+<tr><td><span class="menu">Select Dead Keys</span></td><td> </td><td>用于设置上述的蓝色按键。</td></tr>
+<tr><td class="onelinetop"><span class="menu">Switch Shortcut Key...</span></td><td> </td><td>用于使用 Windows/Linux 模式的快捷键，例如 <span class="key">CONTROL</span>（通常为 <span class="key">CTRL</span>）或者 Haiku 模式，例如 <span class="key">COMMAND</span>（通常为 <span class="key">ALT</span>）。</td></tr>
 </table>
-<p>The lists on the left offer the available pre-configured keymaps of the system, and below that, if available, user-defined maps. You can change a keymap via drag&amp;drop in the keyboard representation: a left-click-drag copies a key, a right-click-drag exchanges the two keys.<br />
-When you're done you can save the result from the menu <span class="menu">File | Save...</span>. Your modified map will only appear in the user-defined list if it's stored in <span class="path">~/config/settings/Keymap/</span>. Otherwise you'll have to manually load it via <span class="menu">File | Open...</span>.</p>
-<p>To better match the Keymap panel to your physical keyboard, there are several different settings available from the <span class="menu">Layout</span> menu.</p>
-<p>The font used in the keyboard representation is set from the <span class="menu">Font</span> menu. Note, that it may or may not contain all symbols for a specific keymap.</p>
-<p>Finally, there's a <span class="button">Revert</span> button to bring back the settings that were active when you started the Keymap preferences.</p>
+<p>左边的列表提供了可用的系统预设值键盘映射，在它的下面还提供了可用的用户定义键盘映射。您可以通过拖拽来改变键盘映射：左键点击拖拽复制一个按键，而右键点击拖拽调换两个按键。
+<br />
+修改完成之后，您可以使用菜单 <span class="menu">File | Save...</span> 来保存结果。如果结果保存在 <span class="path">~/config/settings/Keymap/</span>，那么您修改后的映射将会只出现在用户定义的列表，否则，您需要通过 <span class="menu">File | Open...</span> 对其进行手动的加载。</p>
+<p>为了使键盘映射面板更好的对应于您实际的键盘，在 <span class="menu">Layout</span> 菜单中有几个不同的设置可供选择。</p>
+<p>在键盘显示面板中的字体可以通过 <span class="menu">Font</span> 菜单进行设置。需要注意的是，它可能不包含某种特别映射的所有符号。</p>
+<p>最后，有一个 <span class="button">Revert</span> 按钮，它用于恢复设置到键盘映射首选项启动之前的状态。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="advanced-keymapping" name="advanced-keymapping">Advanced keymap manipulation</a></h2>
-<p>There's another method to customize your keymap besides the Keymap preference panel. It involves editing a text file containing loads of hex values, which may appear daunting on first sight, but isn't really that impossible to grasp.</p>
-<p>You can dump the current keymap with a command in Terminal:</p>
+<a id="advanced-keymapping" name="advanced-keymapping">高级键盘映射操作</a></h2>
+<p>除了使用键盘映射首选项面板之外，还有一种方法可以用于定制键盘映射。它涉及到编辑包含十六进制值的文本文件，看起来难度很大，但是它并非无法掌握。</p>
+<p>您可以在终端中使用下述命令卸载当前的键盘映射：</p>
 <pre class="terminal">keymap -d &gt; MyKeymap</pre>
 <p>The generated text file can then be opened in a text editor. Make sure to use a fixed font in that editor or you'll never grok that file...<br />
 At the beginning of that file, you'll find a legend of a stylized keyboard with the hex value corresponding to each key. Below that are the actual assignments of every value. You can do all the customizing that's also available from the Keymap preference panel, and then some. If you happen to have some special keys on your keyboard, you may be able to activate them. That is, use them as ordinary keys or like an option or control key. You won't be able to, for example, have your multimedia keys de/increase the volume or start some application. For this you can use e.g. <a href="http://www.haikuware.com/directory/view-details/utilities/desktop-accessories/spicykeys" class="noprinturl">SpicyKeys</a>.</p>
-<p>When you're finished, you'll save the file and have your system load the modified keymap with this command:</p>
+<p>在完成修改之后，为了保存文件，并且使系统启用修改后的键盘映射，您可以使用下述命令：</p>
 <pre class="terminal">keymap -s &lt; MyKeymap</pre>
-<p>If you'd like to import this keymap into the Keymap panel, you have to compile it first to a binary format:</p>
+<p>如果您希望将该键盘映射引入映射面板，您必须首先将它编译为二进制格式：</p>
 <pre class="terminal">keymap -c &lt; MyKeymap</pre>
-<p>This will produce a file <span class="cli">keymap.out</span> which you can load into Keymap via its <span class="menu">Open...</span> menu. By the way, the keymap command is able to load this binary format as well: <span class="cli">keymap -l &lt; keymap.out</span></p>
-<p>This is the dumped file (the rightmost keys of the stylized keyboard are cut-off for a nicer display on this page):</p>
+<p>该命令将会创建一个文件 <span class="cli">keymap.out</span>，您可以通过 <span class="menu">Open...</span> 菜单载入键盘映射。还需要说明的是，keymap命令也可以载入该二进制格式： <span class="cli">keymap -l &lt; keymap.out</span></p>
+<p>下面是卸载后的文件（为了使该页面有更好的显示效果，我们剪切了键盘最右边的按键设置）：</p>
 
 <pre>#!/bin/keymap -s
 #
@@ -372,8 +374,8 @@ TildeTab = Normal Shift Option Option-Shift CapsLock CapsLock-Shift CapsLock-Opt
 <div class="nav">
 <div class="inner"><span>
  «  <a href="keyboard.html">键盘</a> 
-::  <a href="../preferences.html" class="uplink">首选项</a> 
-::  <a href="locale.html">本地化</a>  »
+::  <a href="../preferences.html" class="uplink">Preferences</a> 
+::  <a href="locale.html">Locale</a>  »
 </span></div>
 </div>
 

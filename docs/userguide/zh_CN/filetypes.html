@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -41,15 +41,14 @@
 <li><a href="../en/filetypes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="deskbar.html">桌面栏</a> 
-::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="attributes.html">Attributes（属性）</a>  »
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="attributes.html">Attributes</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
 <h1>文件类型</h1>
 
@@ -57,8 +56,8 @@
 <div class="box-info">由于在Haiku中没有必要使用文件扩展，但是您需要注意的是，当您和其他系统的用户分享文件时，您需要添加上扩展名，例如，通过邮件，上传到服务器或者交换闪盘。否则，他们的系统将无法识别出文件类型。</div>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="specific-file" name="specific-file">设置特定文件的文件类型</a></h2>
-<p>您可以修改特定文件的类型，它的图标，以及相关联的程序。选择该文件，然后从右键菜单中调用 <span class="menu">Add-Ons | Filetype add-on</span> 。</p>
+<a id="specific-file" name="specific-file">文件类型设置</a></h2>
+<p>您可以修改单个文件的类型，图标，以及相关联的程序。选择该文件，然后从右键菜单中调用 <span class="menu">Add-Ons | Filetype add-on</span> 。</p>
 <img src="images/filetypes-images/filetype-addon.png" alt="filetype-addon.png" />
 
 <h3>
@@ -73,47 +72,47 @@
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preferred-app" name="preferred-app">首选应用程序</a></h3>
-<p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked. You could, for example, change a HTML file's preferred application from the browser to a text editor while you're working on it. Every other HTML file still opens in the browser, only this particular one starts in your text editor.</p>
+<p>弹出菜单中显示了一个可以处理该特定类型文件的所有程序的列表。您可以选择某个程序，当双击打该类型文件时，该程序将会自动启动。例如，您可以将一个HTML文件的首选程序修改为您正在使用的文本编辑器。那么所有其他的HTML文件仍会在浏览器中打开，仅该文件在您的文本编辑器中打开。</p>
 
-<p>The <span class="menu">Default Application</span> is the one that's set globally for that filetype. If you don't find the program you want to associate with this file in the pop-up menu, you'll again find the buttons <span class="button">Select...</span> and <span class="button">Same As...</span> which do the similar thing described under "The File Type" above.</p>
+<p><span class="menu">Default Application</span> 是用于全局设置的文件类型首选程序。如果您在弹出菜单中没有找出关联到该文件的程序，您会再次找到 <span class="button">Select...</span> 和 <span class="button">Same As...</span> 按钮，它们两个具有类似于“文件类型”下描述的功能。</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">图标</a></h3>
-<p>If you're wondering why the icon well on the top right is empty: Icons are normally inherited from the system default for that filetype. You can open the <span class="app">Filetype Add-On</span> of a file that contains an icon and drag&amp;drop it into your file's icon well. Or you double-click the icon well and create or edit your own icon. For more info on icons and how to create your own, see topic <a href="applications/icon-o-matic.html">Icon-O-Matic</a>.</p>
+<a id="icon" name="icon">图标设置</a></h3>
+<p>如果您对左上角的图标为空产生疑问：图标通常从系统为文件类型默认的图标中继承而来。您可以打开一个带有图标文件的 <span class="app">Filetype Add-On</span>，然后将它的图标拖拽到您的文件的图标栏中。或者您可以双击图标，然后创建和F编辑自己的图标。更多有关图标的信息和如何创建图标，您可以参阅 <a href="applications/icon-o-matic.html">Icon-O-Matic</a> 主题。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="settings-apps" name="settings-apps">应用程序的特殊设置</a></h2>
-<p>If you invoke the <span class="app">Filetype Add-On</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
+<a id="settings-apps" name="settings-apps">程序的特殊设置</a></h2>
+<p>如果您调用可执行文件的 <span class="app">Filetype Add-On</span> （此处使用的是 <span class="app">StyledEdit</span>），您会打开一个不同的对话框：</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
-<p>On top, you'll see, instead of a standardized MIME string, the unique application signature. With it, the system finds the program wherever it's installed.</p>
-<p>Below it are several flags, controlling the app's behaviour:</p>
+<p>在顶部，您可以看到，它不是一个标准的MIME字符串，而是唯一的程序署名。通过它，操作系统可以找出程序的安装位置。</p>
+<p>在它的下面，是用于控制程序的行为的标记：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Single Launch</span></td><td> </td><td>Only one instance of the app can be running per executable file. If you have two copies of that app, however, they can run side by side.</td></tr>
-<tr><td><span class="menu">Multiple Launch</span></td><td> </td><td>Many instances of the app can run simultaneously.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Exclusive Launch</span></td><td> </td><td>Really only one instance with that app's signature is allowed to run at a time.</td></tr>
-<tr><td><span class="menu">Args Only</span></td><td> </td><td>Indicates the app doesn't respond to messages.</td></tr>
-<tr><td><span class="menu">Background App</span></td><td> </td><td>The app won't appear in <a href="twitcher.html">Twitcher</a> or the list of running apps of the Deskbar.</td></tr>
+<tr><td><span class="menu">Single Launch</span></td><td> </td><td>对于每个可执行文件，仅有其中一个实例可以运行。如果您拥有两份该程序，它们可以依次运行。</td></tr>
+<tr><td><span class="menu">Multiple Launch</span></td><td> </td><td>程序的许多实例可以同步运行。</td></tr>
+<tr><td class="onelinetop"><span class="menu">Exclusive Launch</span></td><td> </td><td>每次只允许具有该程序的署名的一个实例运行。</td></tr>
+<tr><td><span class="menu">Args Only</span></td><td> </td><td>指出该程序对于调用消息不作出响应。</td></tr>
+<tr><td><span class="menu">Background App</span></td><td> </td><td>该程序不出现在 <a href="twitcher.html">任务切换器</a> 或者桌面栏的运行程序列表中。</td></tr>
 </table>
-<p>Then there's the list of supported filetypes. You can add (and remove) filetypes if you think the application can handle them. As a consequence, the app will appear in the menu for preferred applications or Tracker's <span class="menu">Open with...</span> context menu when you right-click on a file of that type.</p>
-<p>At the bottom are version and copyright information. Like the application signature, they are filled in by the app's author and shouldn't be altered.</p>
+<p>然后，有一个支持文件类型的列表。如果您认为该程序可以处理此文件类型，您可以在这里进行添加或者删除。结果是，当您右键点击一个该类型的文件时，该程序将会出现在首选程序菜单，或者 Tracker 的  <span class="menu">Open with...</span> 右键菜单中。</p>
+<p>在底部是程序的版本和授权信息。它们同程序的署名相类似，其中写入了程序创建者的名字，而且这些名字是不可更改的。</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filetypes-preferences" name="filetypes-preferences">Global settings with the FileTypes Preferences</a></h2>
-<p>The <span class="app">FileTypes</span> preferences don't deal with individual files but with global settings of filetypes. You can change default icons and preferred applications or add, remove, or alter attributes of whole filetypes. You can even create your own filetype from scratch.</p>
-<p>All filetypes and their configurations are stored in <span class="path">/boot/home/config/settings/beos_mime/</span>. Before you start experimenting, it may be prudent to make a backup of that folder...</p>
-<p>To learn more about the <span class="app">FileTypes</span> preferences see the workshop: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>
+<a id="filetypes-preferences" name="filetypes-preferences">全局设置</a></h2>
+<p><span class="app">文件类型</span> 首选项不用于处理单个文件，而是文件类型的全局设置。您可以修改所有文件类型的默认图标，首选程序，或者添加，删除，和修改属性。您甚至可以从头开始创建自己的文件类型。</p>
+<p>所有的文件类型和它们的配置文件保存在 <span class="path">/boot/home/config/settings/beos_mime/</span> 。在您开始尝试作出改动之前，您最好对该文件夹做个备份以防出错。</p>
+<p>了解更多有关 <span class="app">文件类型</span> 首选项的信息，可以参阅<a href="workshop-filetypes+attributes.html">操作练习：文件类型，属性，索引和查询</a>。</p>
 
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="deskbar.html">桌面栏</a> 
-::  <a href="contents.html" class="uplink">内容</a> 
-::  <a href="attributes.html">Attributes（属性）</a>  »
+ «  <a href="deskbar.html">Deskbar</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="attributes.html">Attributes</a>  »
 </span></div>
 </div>
 

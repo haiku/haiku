@@ -49,40 +49,41 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar :</td><td style="width:15px;"></td><td><i>No entry, normally launched via Tracker Add-on</i></td></tr>
+<tr><td>Deskbar :</td><td style="width:15px;"></td><td><i>Pas d'entrée, normalement vous y accédez via les Extensions du Tracker</i></td></tr>
 <tr><td>Localisation :</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
 <tr><td>Réglages :</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch looks for a string in text files. Typically it is invoked from <a href="../tracker-add-ons.html">Tracker's Add-on</a> context menu on the selection of files or folders you want to search.</p>
+<p>TextSearch recherche une chaîne de caractères dans des fichiers texte. En général, il est appelé à partir du menu contextuel <a href="../tracker-add-ons.html">Extensions du Tracker</a> sur la selection de fichiers ou dossiers que vous souhaitez examiner.</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>Entrez la chaîne à rechercher dans la zone de texte en haut, puis pressez <span Class="key">ENTRÉE</span> ou cliquez sur <span class="button">Search</span>(Rechercher) pour démarrer la recherche. Si <span class="menu">Show lines</span>(Afficher les lignes) est coché, les résultats sont automatiquement développés pour afficher les lignes du fichier contenant la chaîne de recherche.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Juste quelques mots sur les éléments de menu les moins évidents :</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>File menu</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
-</td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries form the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line command <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td colspan="5"><h3>Le menu Fichier (File)</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">CMD</span> <span class="key">N</span></td><td> </td><td>Ouvre une nouvelle fenêtre où vous pouvez entrer une autre chaîne à rechercher dans les mêmes fichiers ou dossiers.</td></tr>
+<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">CMD</span> <span class="key">F</span></td><td></td><td>Vous permet de choisir un nouvel ensemble de fichiers et de dossiers à examiner.</td></tr>
+<tr><td colspan="5"><h3>Le menu Action</h3></td></tr>
+<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">CMD</span> <span class="key">T</span></td><td> </td><td>Supprime toutes les entrées de la liste qui ne sont pas actuellement sélectionnées.</td></tr>
+<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">CMD</span> <span class="key">O</span></td><td></td><td>Ouvre les fichiers sélectionnés avec leurs applications préférées (comme avec un double-clic). Si c'est un éditeur de texte qui le supporte (comme Pe), vous pouvez passer à la ligne exacte où la chaîne a été trouvé.</td></tr>
+<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">CMD</span> <span class="key">K</span></td><td></td><td>Ouvre l'emplacement des fichiers sélectionnés dans Tracker.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">CMD</span> <span class="key">C</span></td><td></td><td>Copie la sélection actuelle dans le presse papier.</td></tr>
+<tr><td colspan="5"><h3>Le menu Réglage (Settings)</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>C'est utile lorsque vous travaillez dans un environnement « à la Unix », où, souvent, les fichiers d'administration sont cachés à l'intérieur de « <tt>.dossiers/</tt> ». Par exemples, les systèmes de gestion de versions de sources comme SVN et CVS, qui sont largement utilisés dans le Haiku, utilisent cela.</td></tr>
+<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch utilise l'outil en ligne de commande <span class="cli">grep</span>. 
+Pour ce faire, les caractères spéciaux comme <tt>'"*\$?!</tt> et espace, doivent 
+être précédés du caractère d'échappement <tt>\</tt>.
+Désactiver ce paramètre signifie que vous devez le faire vous-même, mais en échange, vous bénéficierez de la puissance des <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression" rel="nofollow">expressions régulières</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch n'est actuellement utile que pour trouver des chaînes dans les fichiers de texte brut. En désactivant ce paramètre, tous les types de fichiers seront examinées.</td></tr>
+<tr><td colspan="5"><h3>Le menu Historique (History)</h3></td></tr>
+<tr><td colspan="4"></td><td>Contient les chaînes recherchées récemment.</td></tr>
+<tr><td colspan="5"><h3>Le  menu Encodage (Encoding)</h3></td></tr>
+<tr><td colspan="4"></td><td>Vous permet de choisir un jeu de caractères différents, si nécessaire.</td></tr>
 </table>
 </div>
 </div>

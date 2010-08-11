@@ -49,40 +49,38 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/textsearch-icon_64.png" alt="textsearch-icon_64.png" width="64" height="64" />TextSearch</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally launched via Tracker Add-on</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Kein Eintrag; wird normalerweise über das Tracker Add-on gestartet.</i></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/TextSearch</span></td></tr>
 <tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/TextSearch</span></td></tr>
 </table>
 <p><br /></p>
-<p>TextSearch looks for a string in text files. Typically it is invoked from <a href="../tracker-add-ons.html">Tracker's Add-on</a> context menu on the selection of files or folders you want to search.</p>
+<p>TextSearch sucht nach Zeichenfolgen in Textdateien. Normalerweise wählt man dazu die Dateien oder Ordner aus, die durchsucht werden sollen und wählt TextSearch aus Trackers <a href="../tracker-add-ons.html">Add-on</a> Kontextmenü.</p>
 
 <img src="../images/apps-images/textsearch.png" alt="textsearch.png" />
 
-<p>You enter a search string in the text box on top and hit <span class="key">RETURN</span> or click <span class="button">Search</span> to start. If <span class="menu">Show lines</span> is checked, the hits are automatically expanded to show the lines of the file containing the search string.</p>
+<p>Im Textfeld oben wird der Suchbegriff eingegeben und die Suche per <span class="key">RETURN</span> oder Klick auf <span class="button">Search</span> gestartet. Ist die <span class="menu">Show lines</span> Option aktiviert, werden die Suchergebnisse automatisch aufgeklappt und zeigen dann die Zeilennummern der Fundstellen in den Dateien, die den Suchbegriff enthalten.</p>
 
-<p>Only a few words on some of the otherwise self-explaining menu items:</p>
+<p>Nur ein paar kurze Erläuterungen zu den ansonsten sich selbst erklärenden Menüpunkten:</p>
 <table summary="menus" border="0" cellpadding="2" cellspacing="0">
-<tr><td colspan="5"><h3>File menu</h3></td></tr>
-<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Opens a new window where you can enter another string and search through the same files/folders.
-</td></tr>
-<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Lets you choose a new set of files and folders to search through.</td></tr>
-<tr><td colspan="5"><h3>Action menu</h3></td></tr>
-<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Removes all entries form the list that are not currently selected.</td></tr>
-<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Opens the currently selected files with their preferred application (same as a double-click). If it's a text editor supporting it (like Pe), you can jump to the exact line the search string was found.</td></tr>
-<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Opens the location of the currently selected files in Tracker.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">C</span></td><td></td><td>Copies the current selection to the clipboard.</td></tr>
-<tr><td colspan="5"><h3>Settings menu</h3></td></tr>
-<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>This is useful when working in a "unixy" environment, where often administrative files are hidden inside "<tt>.folders/</tt>". Source versioning systems like SVN and CVS are examples of applications using this and are also widely used in Haiku.</td></tr>
-<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch uses the command line command <span class="cli">grep</span>. For it, special characters like <tt>'"*\$?!</tt> and spaces have to be escaped with a <tt>\</tt>. Deactivating this setting means you have to do this yourself, but in exchange grants you the power of <a href="http://en.wikipedia.org/wiki/Regular_expression" class="external free" title="http://en.wikipedia.org/wiki/Regular expression" rel="nofollow">regular expressions</a>.</td></tr>
-<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch is currently only useful for finding strings in plain text files. Deactivating this setting will have it look through any kind of file anyway.</td></tr>
-<tr><td colspan="5"><h3>History menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Contains recently used search strings.</td></tr>
-<tr><td colspan="5"><h3>Encoding menu</h3></td></tr>
-<tr><td colspan="4"></td><td>Lets you choose different character encodings if needed.</td></tr>
+<tr><td colspan="5"><h3>File Menü</h3></td></tr>
+<tr><td class="onelinetop"><span class="menu">New window</span></td><td></td><td><span class="key">ALT</span> <span class="key">N</span></td><td> </td><td>Öffnet ein neues Fenster, um dieselben Dateien/Ordner nach einem neuen Begriff zu durchsuchen.</td></tr>
+<tr><td><span class="menu">Set target...</span></td><td></td><td><span class="key">ALT</span> <span class="key">F</span></td><td></td><td>Zum Ändern der Dateien oder Ordner, die durchsucht werden sollen.</td></tr>
+<tr><td colspan="5"><h3>Action Menü</h3></td></tr>
+<tr><td><span class="menu">Trim selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">T</span></td><td> </td><td>Entfernt alle Suchergebnisse aus der Liste, die nicht  ausgewählt sind.</td></tr>
+<tr><td><span class="menu">Open selection</span></td><td></td><td><span class="key">ALT</span> <span class="key">O</span></td><td></td><td>Öffnet die ausgewählten Dateien mit ihrer bevorzugten Anwendung (wie bei einem Doppelklick). Falls es sich um einen Texteditor handelt, der das unterstützt (wie Pe), lässt sich auch genau zu der Zeile der Fundstelle springen.</td></tr>
+<tr><td><span class="menu">Open files in Tracker</span></td><td></td><td><span class="key">ALT</span> <span class="key">K</span></td><td></td><td>Öffnet die Speicherorte der gerade ausgewählten Dateien im Tracker.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Copy text to clipboard</span></td><td></td><td><span class="key">ALT</span> <span class="key">B</span></td><td></td><td>Kopiert die momentane Auswahl in die Ablage.</td></tr>
+<tr><td colspan="5"><h3>Settings Menü</h3></td></tr>
+<tr><td colspan="3" class="onelinetop"><span class="menu">Skip folders starting with a dot</span></td><td> </td><td>Nützlich wenn man sich in einer Unix-Umgebung bewegt, in der Verwaltungsdateien oft in "<tt>.Ordner</tt>" versteckt werden. Sourcecode Versionierungssysteme wie SVN und CVS sind Beispiele für Anwendungen, die das so machen und auch unter Haiku weit verbreitet sind.</td></tr>
+<tr><td colspan="3"><span class="menu">Escape search text</span></td><td> </td><td>TextSearch benutzt das Konsolenprogramm <span class="cli">grep</span>. Dazu müssen spezielle Zeichen wie <tt>'"*\$?!</tt> und Leerzeichen mit einem <tt>\</tt> "escaped" werden. Deaktiviert man diese Option, heißt das, dass man das von Hand machen muss, im Gegenzug erhält man allerdings die mächtigen Möglichkeiten von <a href="http://de.wikipedia.org/wiki/Regul%C3%A4re_Ausdr%C3%BCcke" class="external free" title="Reguläre Ausdrücke" rel="nofollow">Regulären Ausdrücken</a>.</td></tr>
+<tr><td colspan="3"><span class="menu">Text files only</span></td><td> </td><td>TextSearch ist momentan nur zur Suche von Begriffen in reinen Textdateien sinnvoll zu gebrauchen. Deaktiviert man diese Option, werden alle Arten von Dateien durchsucht.</td></tr>
+<tr><td colspan="5"><h3>History Menü</h3></td></tr>
+<tr><td colspan="4"></td><td>Enthält kürzlich benutzte Suchbegriffe.</td></tr>
+<tr><td colspan="5"><h3>Encoding Menü</h3></td></tr>
+<tr><td colspan="4"></td><td>Erlaubt bei Bedarf verschiedene Zeichencodierungen.</td></tr>
 </table>
 </div>
 </div>

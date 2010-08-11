@@ -16,13 +16,13 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>LaunchBox</title>
+	<title>快速启动</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -41,29 +41,28 @@
 <li><a href="../../en/desktop-applets/launchbox.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
-    <a href="../desktop-applets.html" class="uplink">桌面小程序</a> 
-::  <a href="networkstatus.html">网络状态</a>  »
+    <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="networkstatus.html">NetworkStatus</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 
-<h2><img src="../../images/desktop-applets-images/launchbox-icon_64.png" alt="launchbox-icon_64.png" width="64" height="64" />LaunchBox</h2>
+<h2><img src="../../images/desktop-applets-images/launchbox-icon_64.png" alt="launchbox-icon_64.png" width="64" height="64" />快速启动</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏：</td><td style="width:15px;"></td><td><span class="menu">桌面小程序</span></td></tr>
 <tr><td>位置：</td><td></td><td><span class="path">/boot/system/apps/LaunchBox</span></td></tr>
 <tr><td>设置：
 </td><td></td><td><span class="path">~/config/settings/LaunchBox/*</span></td></tr>
 </table>
-<p>One or more LaunchBox applets can be started to organize shortcuts to your favorite applications or documents. You decide if each is shown on all or just the current workspace. They can also serve to quickly open a document in a specific application. For example, you could drag&amp;drop a HTML file onto a text editor in a LaunchBox to open it in the editor instead of its preferred application, the browser.</p>
+<p>你可以启动一个或者多个快速启动小程序，然后使用它们来组织您的收藏程序和文档的快捷方式。您可以决定是否显示所有工作区或者当前工作区的快捷方式。它们也可以用于快速的在某个程序中打开文档。 例如，您可以拖拽一个HTML文件到快速启动栏中的文本编辑器中，然后通过该编辑器打开它，而不是它的首选程序，浏览器。</p>
 <img src="../images/desktop-applets-images/launchbox.png" alt="launchbox.png" />
-<p>All options are reached from the context menu:</p>
+<p>所有的选项都可以从右键菜单中进行设置：</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Add Button Here</span></td><td style="width:10px;"> </td><td>Adds an empty button.</td></tr>
-<tr><td><span class="menu">Clear Button</span></td><td> </td><td>Empties a button.</td></tr>
-<tr><td><span class="menu">Remove Button</span></td><td> </td><td>Removes a button.</td></tr>
+<tr><td><span class="menu">Add Button Here</span></td><td style="width:10px;"> </td><td>添加一个空按钮。</td></tr>
+<tr><td><span class="menu">Clear Button</span></td><td> </td><td>清空一个按钮。</td></tr>
+<tr><td><span class="menu">Remove Button</span></td><td> </td><td>删除一个按钮。</td></tr>
 <tr><td class="onelinetop"><span class="menu">Settings</span><br />
 <span class="menu">- Horizontal Layout</span><br />
 <span class="menu">- Icon size</span><br />
@@ -71,24 +70,32 @@
 <span class="menu">- Show Window Border</span><br />
 <span class="menu">- Auto Raise</span><br />
 <span class="menu">- Show On All Workspaces</span></td><td> </td><td class="onelinetop"><br />
-Aligns the buttons horizontally.<br />
-Sets the icon size between 16 and 64 pixel.<br />
-Launches the object only once, even when you (accidentally) double-click.<br />
-Shows the window border.<br />
-LaunchBox pops up if the mouse is near the screen edge.<br />
-Shows the LaunchBox on every workspace.</td></tr>
+横向排列程序按钮。
+<br />
+设置图标尺寸，从16像素到64像素。
+<br />
+忽略双击，点击对象只启动一次。
+<br />
+显示窗口边缘。
+<br />
+鼠标靠近屏幕边缘时，弹出快速启动。
+<br />
+在所有工作区中显示快速启动。</td></tr>
 <tr><td><span class="menu">Pad</span><br />
 <span class="menu">- New</span><br />
 <span class="menu">- Clone</span><br />
 <span class="menu">- Close</span></td><td> </td><td><br />
-Add a new pad.<br />
-Duplicate the current pad.<br />
-Close the current pad.</td></tr>
+新建一个快速启动面板。
+<br />
+复制当前快速启动面板。
+<br />
+关闭当前快速启动面板。</td></tr>
 <tr><td><span class="menu">LaunchBox</span><br />
 <span class="menu">- About...</span><br />
 <span class="menu">- Quit</span></td><td> </td><td><br />
-Shows the About window.<br />
-Quits all LaunchBox pads.</td><td> </td></tr>
+显示简介窗口。
+<br />
+退出快速启动</td><td> </td></tr>
 </table>
 
 </div>
@@ -96,8 +103,8 @@ Quits all LaunchBox pads.</td><td> </td></tr>
 
 <div class="nav">
 <div class="inner"><span>
-    <a href="../desktop-applets.html" class="uplink">桌面小程序</a> 
-::  <a href="networkstatus.html">网络状态</a>  »
+    <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
+::  <a href="networkstatus.html">NetworkStatus</a>  »
 </span></div>
 </div>
 
