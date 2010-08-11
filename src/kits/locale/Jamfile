@@ -27,24 +27,26 @@ local sources =
 	DurationFormat.cpp
 	TimeFormat.cpp
 	TimeUnitFormat.cpp
+	Format.cpp # Used by some of the above.
+	UnicodeChar.cpp # Already used in ReadOnlyBootPrompt.
+
+	# Should go away
+	PropertyFile.cpp # Used by UnicodeChar which should rely on ICU instead
 
 	# old, needs investigation
-	Currency.cpp
-	FloatFormat.cpp
-	FloatFormatImpl.cpp
-	FloatFormatParameters.cpp
-	Format.cpp
-	FormatImpl.cpp
-	FormatParameters.cpp
-	GenericNumberFormat.cpp
-	IntegerFormat.cpp
-	IntegerFormatImpl.cpp
-	IntegerFormatParameters.cpp
-	NumberFormat.cpp
-	NumberFormatImpl.cpp
-	NumberFormatParameters.cpp
-	PropertyFile.cpp
-	UnicodeChar.cpp
+	# Currency.cpp
+	# FloatFormat.cpp
+	# FloatFormatImpl.cpp
+	# FloatFormatParameters.cpp
+	# FormatImpl.cpp
+	# FormatParameters.cpp
+	# GenericNumberFormat.cpp
+	# IntegerFormat.cpp
+	# IntegerFormatImpl.cpp
+	# IntegerFormatParameters.cpp
+	# NumberFormat.cpp
+	# NumberFormatImpl.cpp
+	# NumberFormatParameters.cpp
 	;
 
 
