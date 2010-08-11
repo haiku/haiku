@@ -9,9 +9,6 @@
  */
 
 
-#include <Message.h>
-#include <Messenger.h>
-
 #include <arpa/inet.h>
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -26,6 +23,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <Message.h>
+#include <Messenger.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
 
 #include <NetServer.h>
 
@@ -109,7 +111,6 @@ initialize_address_families()
 }
 
 
-
 static bool
 inet_parse_address(const char* string, sockaddr* _address)
 {
@@ -160,7 +161,7 @@ inet_mask_to_prefix_length(sockaddr* _mask)
 	uint8 result = 0;
 	uint32 hostMask = ntohl(mask.sin_addr.s_addr);
 	for (uint8 i = 32; i > 0; i--) {
-		if (hostMask & (1 << (i - 1)) == 0)
+		if ((hostMask & (1 << (i - 1))) == 0)
 			break;
 		result++;
 	}
@@ -215,7 +216,7 @@ inet6_prefix_length_to_mask(uint8 prefixLength, sockaddr* _mask)
 
 	for (uint8 i = 0; i < sizeof(in6_addr); i++, prefixLength -= 8) {
 		if (prefixLength < 8) {
-			const uint8 masks[] = {
+			static const uint8 masks[] = {
 				0x00, 0x80, 0xc0, 0xe0,
 				0xf0, 0xf8, 0xfc, 0xfe
 			};
@@ -418,6 +419,19 @@ get_address_family(const char* argument, int32& familyIndex)
 }
 
 
+const address_family*
+get_address_family(int32 family)
+{
+	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
+		if (kFamilies[i].family == family)
+			return &kFamilies[i];
+	}
+
+	// defaults to AF_INET
+	return &kFamilies[0];
+}
+
+
 bool
 parse_address(int32 familyIndex, const char* argument, struct sockaddr& address)
 {
@@ -482,49 +496,43 @@ find_socket(struct ifreq& request, int addressFamily)
 
 
 void
-list_interface_address(int socket, const address_family* family,
-	uint32 flags, ifreq* request)
+list_interface_addresses(BNetworkInterface& interface, uint32 flags)
 {
-	if (ioctl(socket, SIOCGIFADDR, request, sizeof(struct ifreq)) < 0)
-		return;
+	int32 count = interface.CountAddresses();
+	for (int32 i = 0; i < count; i++) {
+		BNetworkInterfaceAddress address;
+		if (interface.GetAddressAt(i, address) != B_OK)
+			break;
 
-	printf("\t%s addr: ", family->name);
-	family->print_address(&request->ifr_addr);
+		const address_family* family
+			= get_address_family(address.Address().Family());
 
-	if ((flags & IFF_BROADCAST) != 0
-		&& ioctl(socket, SIOCGIFBRDADDR, request, sizeof(struct ifreq)) == 0
-		&& request->ifr_broadaddr.sa_family == family->family) {
-		printf(", Bcast: ");
-		family->print_address(&request->ifr_broadaddr);
-	}
-	if (ioctl(socket, SIOCGIFNETMASK, request, sizeof(struct ifreq)) == 0
-		&& request->ifr_mask.sa_family == family->family) {
+		printf("\t%s addr: ", family->name);
+		family->print_address(address.Address());
+
+		if ((flags & IFF_BROADCAST) != 0) {
+			printf(", Bcast: ");
+			family->print_address(address.Broadcast());
+		}
 		switch (family->preferred_format) {
 			case PREFER_OUTPUT_MASK:
 				printf(", Mask: ");
-				family->print_address(&request->ifr_mask);
+				family->print_address(address.Mask());
 				break;
 			case PREFER_OUTPUT_PREFIX_LENGTH:
 				printf(", Prefix Length: %u",
-					family->mask_to_prefix_length(&request->ifr_mask));
+					family->mask_to_prefix_length(address.Mask()));
 				break;
 		}
+
+		putchar('\n');
 	}
-	putchar('\n');
 }
 
 
 bool
-list_interface(const char* name, int addressFamily)
+list_interface(const char* name)
 {
-	ifreq request;
-	if (!prepare_request(request, name))
-		return true;
-
-	int socket = find_socket(request, addressFamily);
-	if (socket == -1)
-		return false;
-
 	printf("%s", name);
 	size_t length = strlen(name);
 	if (length < 8)
@@ -534,60 +542,57 @@ list_interface(const char* name, int addressFamily)
 
 	// get link level interface for this interface
 
-	int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
-	if (linkSocket < 0) {
-		printf("No link level: %s\n", strerror(errno));
-	} else {
+	BNetworkInterface interface(name);
+	BNetworkAddress linkAddress;
+	status_t status = interface.GetHardwareAddress(linkAddress);
+	if (status == B_OK) {
 		const char *type = "unknown";
 		char address[256];
 		strcpy(address, "none");
 
-		if (ioctl(linkSocket, SIOCGIFADDR, &request, sizeof(struct ifreq))
-				== 0) {
-			sockaddr_dl &link = *(sockaddr_dl*)&request.ifr_addr;
+		switch (linkAddress.LinkLevelType()) {
+			case IFT_ETHER:
+			{
+				type = "Ethernet";
 
-			switch (link.sdl_type) {
-				case IFT_ETHER:
-				{
-					type = "Ethernet";
-
-					if (link.sdl_alen > 0) {
-						uint8 *mac = (uint8*)LLADDR(&link);
-						sprintf(address, "%02x:%02x:%02x:%02x:%02x:%02x",
-							mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-					} else
-						strcpy(address, "not available");
-					break;
-				}
-				case IFT_LOOP:
-					type = "Local Loopback";
-					break;
-				case IFT_MODEM:
-					type = "Modem";
-					break;
+				if (linkAddress.LinkLevelAddressLength() > 0) {
+					uint8 *mac = linkAddress.LinkLevelAddress();
+					sprintf(address, "%02x:%02x:%02x:%02x:%02x:%02x",
+						mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+				} else
+					strcpy(address, "not available");
+				break;
 			}
+			case IFT_LOOP:
+				type = "Local Loopback";
+				break;
+			case IFT_MODEM:
+				type = "Modem";
+				break;
 		}
 
 		printf("Hardware Type: %s, Address: %s\n", type, address);
-		close(linkSocket);
-	}
+	} else
+		printf("No link level: %s\n", strerror(status));
 
-	if (ioctl(socket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) == 0
-		&& (request.ifr_media & IFM_ACTIVE) != 0) {
+	int media = interface.Media();
+	if ((media & IFM_ACTIVE) != 0) {
 		// dump media state in case we're linked
 		const char* type = "unknown";
 		bool show = false;
 
 		for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
 			// loopback don't really have a media anyway
-			if (IFM_TYPE(request.ifr_media) == 0/*IFT_LOOP*/)
+			if (IFM_TYPE(media) == 0/*IFT_LOOP*/)
 				break;
+
 			// only check for generic or correct subtypes
-			if (kMediaTypes[i].type &&
-				kMediaTypes[i].type != IFM_TYPE(request.ifr_media))
+			if (kMediaTypes[i].type
+				&& kMediaTypes[i].type != IFM_TYPE(media))
 				continue;
+
 			for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++) {
-				if (kMediaTypes[i].subtypes[j].subtype == IFM_SUBTYPE(request.ifr_media)) {
+				if (kMediaTypes[i].subtypes[j].subtype == IFM_SUBTYPE(media)) {
 					// found a match
 					type = kMediaTypes[i].subtypes[j].pretty;
 					show = true;
@@ -600,31 +605,14 @@ list_interface(const char* name, int addressFamily)
 			printf("\tMedia Type: %s\n", type);
 	}
 
-	uint32 flags = 0;
-	if (ioctl(socket, SIOCGIFFLAGS, &request, sizeof(struct ifreq)) == 0)
-		flags = request.ifr_flags;
+	uint32 flags = interface.Flags();
 
-	for (int32 i = 0; kFamilies[i].family >= 0; i++) {
-		int familySocket = sAddressFamilySockets[i];
-		if (familySocket != -1) {
-			list_interface_address(familySocket, &kFamilies[i],
-				flags, &request);
-		}
-	}
+	list_interface_addresses(interface, flags);
 
 	// Print MTU, metric, flags
 
-	printf("\tMTU: ");
-	if (ioctl(socket, SIOCGIFMTU, &request, sizeof(struct ifreq)) == 0)
-		printf("%d", request.ifr_mtu);
-	else
-		printf("-");
-
-	printf(", Metric: ");
-	if (ioctl(socket, SIOCGIFMETRIC, &request, sizeof(struct ifreq)) == 0)
-		printf("%d", request.ifr_metric);
-	else
-		printf("-");
+	printf("\tMTU: %" B_PRId32 ", Metric: %" B_PRId32, interface.MTU(),
+		interface.Metric());
 
 	if (flags != 0) {
 		const struct {
@@ -660,16 +648,16 @@ list_interface(const char* name, int addressFamily)
 
 	// Print statistics
 
-	if (ioctl(socket, SIOCGIFSTATS, &request, sizeof(struct ifreq)) == 0) {
-		printf("\tReceive: %d packets, %d errors, %Ld bytes, %d mcasts, %d dropped\n",
-			request.ifr_stats.receive.packets, request.ifr_stats.receive.errors,
-			request.ifr_stats.receive.bytes, request.ifr_stats.receive.multicast_packets,
-			request.ifr_stats.receive.dropped);
-		printf("\tTransmit: %d packets, %d errors, %Ld bytes, %d mcasts, %d dropped\n",
-			request.ifr_stats.send.packets, request.ifr_stats.send.errors,
-			request.ifr_stats.send.bytes, request.ifr_stats.send.multicast_packets,
-			request.ifr_stats.send.dropped);
-		printf("\tCollisions: %d\n", request.ifr_stats.collisions);
+	ifreq_stats stats;
+	if (interface.GetStats(stats) == B_OK) {
+		printf("\tReceive: %d packets, %d errors, %Ld bytes, %d mcasts, %d "
+			"dropped\n", stats.receive.packets, stats.receive.errors,
+			stats.receive.bytes, stats.receive.multicast_packets,
+			stats.receive.dropped);
+		printf("\tTransmit: %d packets, %d errors, %Ld bytes, %d mcasts, %d "
+			"dropped\n", stats.send.packets, stats.send.errors,
+			stats.send.bytes, stats.send.multicast_packets, stats.send.dropped);
+		printf("\tCollisions: %d\n", stats.collisions);
 	}
 
 	putchar('\n');
@@ -681,46 +669,20 @@ void
 list_interfaces(const char* name)
 {
 	if (name != NULL) {
-		list_interface(name, -1);
+		list_interface(name);
 		return;
 	}
 
 	// get a list of all interfaces
 
-	int socket = sAddressFamilySockets[0];
+	BNetworkRoster& roster = BNetworkRoster::Default();
 
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0)
-		return;
+	BNetworkInterface interface;
+	uint32 cookie = 0;
 
-	uint32 count = (uint32)config.ifc_value;
-	if (count == 0) {
-		fprintf(stderr, "%s: There are no interfaces yet!\n", kProgramName);
-		return;
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		list_interface(interface.Name());
 	}
-
-	void *buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL) {
-		fprintf(stderr, "%s: Out of memory.\n", kProgramName);
-		return;
-	}
-
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0)
-		return;
-
-	ifreq* interface = (ifreq*)buffer;
-
-	for (uint32 i = 0; i < count; i++) {
-		list_interface(interface->ifr_name, interface->ifr_addr.sa_family);
-
-		interface = (ifreq*)((uint8*)interface
-			+ _SIZEOF_ADDR_IFREQ(interface[0]));
-	}
-
-	free(buffer);
 }
 
 
@@ -1052,8 +1014,7 @@ configure_interface(const char* name, char* const* args,
 		BMessage message(kMsgConfigureInterface);
 		message.AddString("device", name);
 		BMessage address;
-		// TODO: this is not working for ipv6 yet
-		address.AddString("family", "inet");
+		address.AddString("family", kFamilies[familyIndex].name);
 		address.AddBool("auto_config", true);
 		message.AddMessage("address", &address);
 
