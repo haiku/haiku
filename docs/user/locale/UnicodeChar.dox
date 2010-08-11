@@ -1,0 +1,167 @@
+/*!
+\class BUnicodeChar
+\ingroup locale
+
+\brief Management of all information about characters.
+
+This class provide a set of tools for managing the whole set of characters
+defined in unicode. This include informations such as knowing if the character is
+whitespace, if it is alphanumeric, or solething else ; what is the uppercase
+equivalent of a character ; or wether it can be ornamented with accents.
+
+This class consists entirely of static methods, which means you don't have to
+instanciate it. Just call one of the methods with the char you want examinated.
+
+Note all the function work with chars encoded in utf-32. This is not the most usual
+way to handle characters, but it is the faster. To convert an utf-8 string to an
+utf-32 character, pass it to the FromUTF8 function.
+
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsAlpha(uint32 c)
+\brief Tell if the character is alphabetic.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsAlNum(uint32 c)
+\brief Tell if the character is alphanumeric.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsDigit(uint32 c)
+\brief Tell if the caracter is numeric.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsHexDigit(uint32 c)
+\brief Tell if the character is numeric in base 16.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsUpper(uint32 c)
+\brief Tell if the character is uppercase.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsLower(uint32 c)
+\brief Tell if the character is lowercase.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsSpace(uint32 c)
+\brief Tell if the character is space.
+
+Unlike IsWhitespace, this function will return true for non-breakable
+spaces. It is the one to use for determining if the character will render
+as an empty space on screen and can be stretched to make the text look
+nicer.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsWhitespace(uint32 c)
+\brief Tell if the character is whitespace.
+
+Unlike IsSpace, this method will return false for non-breakable spaces.
+It is the one to use for selecting where to insert line breaks.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsControl(uint32 c)
+\brief Tell if the character is a control character.
+
+Example control characters are the non-printable ASCII characters 0 to 0x1F.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsPunctuation(uint32 c)
+\brief Tell if the character is a punctuation.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsPrintable(uint32 c)
+\brief Tell if the character is printable.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsTitle(uint32 c)
+\brief Tell if the character is title case.
+
+Title case is usually a smaller version of upercase letters.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsDefined(uint32 c)
+\brief Tell if the character is defined at all.
+
+In unicode, some codes are not valid, or not attributed yet.
+For these, this method wil lreturn false.
+*/
+
+/*!
+\fn static bool BUnicodeChar::IsBase(uint32 c)
+\brief Tell if the character can be used with a diacritic.
+*/
+
+/*!
+\fn static int8 BUnicodeChar::Type(uint32 c)
+\brief Returns the type of the character.
+
+Return value is a member of the unicode_char_category enum.
+*/
+
+/*!
+\fn static uint32 ToLower(uint32 c);
+\brief Returns the lowercase version of a character.
+*/
+
+/*!
+\fn static uint32 ToUpper(uint32 c);
+\brief Returns the uppercase version of a character.
+*/
+
+/*!
+\fn static uint32 ToTitle(uint32 c);
+\brief Returns the titlecase version of a character.
+*/
+
+/*!
+\fn static int32 DigitValue(uint32 c);
+\brief Returns the numeric value of the character.
+*/
+
+/*!
+\fn static void ToUTF8(uint32c, char √π**ou
+\brief Convert a character to utf8 encoding.
+*/
+
+/*!
+\fn static uint32 FromUTF8(const char** in)
+\brief Convert an utf-8 string to an utf-32 character.
+
+If the string contains multiple characters, only the fist one is used.
+This function updates the in pointer so that it points on the next
+character for the following call.
+*/
+
+/*!
+\fn static uint32 FromUTF8(const char* in)
+\brief Convert an utf√-8 string to an utf√-32 character.
+
+If the string contains multiple characters, only the first one is used.
+The in pointer is not modified.
+*/
+
+/*!
+\fn static size_t UTF8StringLength(const char* str)
+\brief This function counts the characters in the given null-terminated string.
+
+\sa BString::CountChars()
+*/
+
+/*!
+\fn static size_t UTF8StringLength(const char* str, size_t maxLength)
+\brief This function counts the characters in the given string.
+
+The string does not need to be null-terminated if you specify the length.
+*/
