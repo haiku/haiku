@@ -178,15 +178,21 @@ TranslationComparator(const void* left, const void* right)
 	const Translation* rightTranslation = *(const Translation**)right;
 
 	BLanguage* language;
-	be_locale_roster->GetLanguage(leftTranslation->languageCode, &language);
 	BString leftName;
-	language->GetTranslatedName(leftName);
-	delete language;
+	if (be_locale_roster->GetLanguage(leftTranslation->languageCode, &language)
+			== B_OK) {
+		language->GetTranslatedName(leftName);
+		delete language;
+	} else
+		leftName = leftTranslation->languageCode;
 
-	be_locale_roster->GetLanguage(rightTranslation->languageCode, &language);
 	BString rightName;
-	language->GetTranslatedName(rightName);
-	delete language;
+	if (be_locale_roster->GetLanguage(rightTranslation->languageCode, &language)
+			== B_OK) {
+		language->GetTranslatedName(rightName);
+		delete language;
+	} else
+		rightName = rightTranslation->languageCode;
 
 	BCollator collator;
 	be_locale_roster->GetDefaultCollator(&collator);
