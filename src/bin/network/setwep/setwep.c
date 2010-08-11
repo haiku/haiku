@@ -31,6 +31,10 @@
 #include <net80211/ieee80211_ioctl.h>
 #include <net80211/ieee80211_haiku.h>
 
+
+extern const char* __progname;
+
+
 static const char*
 get_string(const char* val, const char* sep, u_int8_t* buf, int* lenp)
 {
@@ -100,8 +104,10 @@ set80211(int s, const char* dev, int type, int val, int len, void* data)
 	ireq.i_val = val;
 	ireq.i_len = len;
 	ireq.i_data = data;
-	if (ioctl(s, SIOCS80211, &ireq, sizeof(struct ieee80211req)) < 0)
-		printf("%s: error in handling SIOCS80211\n", __func__);
+	if (ioctl(s, SIOCS80211, &ireq, sizeof(struct ieee80211req)) < 0) {
+		fprintf(stderr, "%s: error in handling SIOCS80211 (type %d): %s\n",
+			__progname, type, strerror(errno));
+	}
 }
 
 
@@ -259,7 +265,7 @@ show_status(const char* dev, int s)
 }
 
 
-void
+static void
 usage()
 {
 	fprintf(stderr, "usage: setwep device_path [ssid] [key]\n");
