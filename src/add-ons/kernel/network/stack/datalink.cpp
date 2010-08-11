@@ -309,12 +309,15 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 
 		default:
 		{
-			if (*_length < sizeof(struct ifreq))
+			// We also accept partial ifreqs as long as the name is complete.
+			if (*_length < IF_NAMESIZE)
 				return B_BAD_VALUE;
+
+			size_t length = min_c(sizeof(struct ifreq), *_length);
 
 			// try to pass the request to an existing interface
 			struct ifreq request;
-			if (user_memcpy(&request, value, sizeof(struct ifreq)) < B_OK)
+			if (user_memcpy(&request, value, length) != B_OK)
 				return B_BAD_ADDRESS;
 
 			Interface* interface = get_interface(domain, request.ifr_name);

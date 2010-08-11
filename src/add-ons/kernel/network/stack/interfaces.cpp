@@ -649,6 +649,9 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 	switch (option) {
 		case SIOCSIFFLAGS:
 		{
+			if (length != sizeof(ifreq))
+				return B_BAD_VALUE;
+
 			uint32 requestFlags = request.ifr_flags;
 			uint32 oldFlags = flags;
 			status_t status = B_OK;
@@ -677,6 +680,9 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 		
 		case B_SOCKET_SET_ALIAS:
 		{
+			if (length != sizeof(ifaliasreq))
+				return B_BAD_VALUE;
+
 			RecursiveLocker locker(fLock);
 
 			ifaliasreq aliasRequest;
@@ -726,6 +732,9 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 		case SIOCSIFDSTADDR:
 		case SIOCDIFADDR:
 		{
+			if (length != sizeof(ifreq))
+				return B_BAD_VALUE;
+
 			RecursiveLocker locker(fLock);
 			
 			InterfaceAddress* address = NULL;
