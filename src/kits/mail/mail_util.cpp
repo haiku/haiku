@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#define __USE_GNU
 #include <regex.h>
 #include <ctype.h>
 #include <errno.h>
@@ -1159,7 +1160,7 @@ static int32				gLocker = 0;
 static size_t				gNsub = 1;
 static re_pattern_buffer	gRe;
 static re_pattern_buffer   *gRebuf = NULL;
-static char					gTranslation[256];
+static unsigned char					gTranslation[256];
 
 _EXPORT void SubjectToThread (BString &string)
 {

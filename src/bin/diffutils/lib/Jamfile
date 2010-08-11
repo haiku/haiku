@@ -31,7 +31,7 @@ StaticLibrary libdiffutils.a :
 	prepargs.c
 	quotesys.c
 	realloc.c
-	regex.c
+#	regex.c
 	setmode.c
 	strcasecmp.c
 	strftime.c
