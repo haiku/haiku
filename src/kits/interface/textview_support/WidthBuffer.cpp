@@ -58,7 +58,7 @@ CharToCode(const char* text, const int32 charLen)
 	uint32 value = 0;
 	int32 shiftVal = 24;
 	for (int32 c = 0; c < charLen; c++) {
-		value |= (text[c] << shiftVal);
+		value |= ((unsigned char)text[c] << shiftVal);
 		shiftVal -= 8;
 	}
 	return value;
