@@ -455,7 +455,7 @@ ipv6_set_to_empty_address(sockaddr *address)
 
 static status_t
 ipv6_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
-	sockaddr *_address, sockaddr *_mask)
+	const sockaddr *_address, const sockaddr *_mask)
 {
 	sockaddr_in6 *defaultMask = (sockaddr_in6 *)_defaultMask;
 	sockaddr_in6 *address = (sockaddr_in6 *)_address;

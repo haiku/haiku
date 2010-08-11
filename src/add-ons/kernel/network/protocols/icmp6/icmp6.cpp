@@ -199,10 +199,30 @@ icmp6_get_mtu(net_protocol *protocol, const struct sockaddr *address)
 }
 
 
+static net_domain*
+get_domain(struct net_buffer* buffer)
+{
+	net_domain* domain;
+	if (buffer->interface_address != NULL)
+		domain = buffer->interface_address->domain;
+	else
+		domain = sStackModule->get_domain(buffer->source->sa_family);
+
+	if (domain == NULL || domain->module == NULL)
+		return NULL;
+
+	return domain;
+}
+
+
 status_t
 icmp6_receive_data(net_buffer *buffer)
 {
 	TRACE(("ICMPv6 received some data, buffer length %lu\n", buffer->size));
+
+	net_domain* domain = get_domain(buffer);
+	if (domain == NULL)
+		return B_ERROR;
 
 	NetBufferHeaderReader<icmp6_hdr> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
@@ -212,16 +232,6 @@ icmp6_receive_data(net_buffer *buffer)
 
 	TRACE(("  got type %u, code %u, checksum 0x%x\n", header.icmp6_type,
 			header.icmp6_code, header.icmp6_cksum));
-
-	net_domain* domain;
-	if (buffer->interface != NULL)
-		domain = buffer->interface->domain;
-	else
-		domain = sStackModule->get_domain(buffer->source->sa_family);
-
-	// TODO: possible?
-	if (domain == NULL || domain->module == NULL)
-		return B_ERROR;
 
 	net_address_module_info* addressModule = domain->address_module;
 
@@ -236,11 +246,11 @@ icmp6_receive_data(net_buffer *buffer)
 
 		case ICMP6_ECHO_REQUEST:
 		{
-			if (buffer->interface != NULL) {
+			if (buffer->interface_address != NULL) {
 				// We only reply to echo requests of our local interface; we
 				// don't reply to broadcast requests
 				if (!domain->address_module->equal_addresses(
-						buffer->interface->address, buffer->destination))
+						buffer->interface_address->local, buffer->destination))
 					break;
 			}
 
@@ -288,15 +298,15 @@ icmp6_deliver_data(net_protocol *protocol, net_buffer *buffer)
 
 
 status_t
-icmp6_error(uint32 code, net_buffer *data)
+icmp6_error_received(net_error code, net_buffer* data)
 {
-	return B_ERROR;
+ 	return B_ERROR;
 }
 
 
 status_t
-icmp6_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+icmp6_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
+	net_error_data* errorData)
 {
 	return B_ERROR;
 }
@@ -367,7 +377,7 @@ net_protocol_module_info sICMP6Module = {
 	icmp6_get_mtu,
 	icmp6_receive_data,
 	icmp6_deliver_data,
-	icmp6_error,
+	icmp6_error_received,
 	icmp6_error_reply,
 	NULL,		// add_ancillary_data()
 	NULL,		// process_ancillary_data()

@@ -11,7 +11,6 @@
 #include "ipv6_address.h"
 #include "ipv6_utils.h"
 #include "multicast.h"
-#include "../../stack/domains.h"
 
 #include <net_datalink.h>
 #include <net_datalink_protocol.h>
@@ -105,7 +104,7 @@ struct ipv6_protocol : net_protocol {
 	uint8		multicast_time_to_live;
 	uint8		receive_hoplimit;
 	uint8		receive_pktinfo;
-	struct sockaddr* interface_address; // for IPV6_MULTICAST_IF
+	struct sockaddr* multicast_address; // for IPV6_MULTICAST_IF
 
 	IPv6MulticastFilter multicast_filter;
 };
@@ -237,11 +236,11 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 	MutexLocker _(sMulticastGroupsLock);
 
 	status_t status = B_OK;
-	if (buffer->interface) {
+	if (buffer->interface_address != NULL) {
 		status = deliver_multicast(module, buffer, deliverToRaw,
-			buffer->interface);
+			buffer->interface_address->interface);
 	} else {
-		// REVIEWME: does this look ok?
+#if 0 //  FIXME: multicast
 		net_domain_private* domain = (net_domain_private*)sDomain;
 		RecursiveLocker locker(domain->lock);
 
@@ -256,6 +255,7 @@ deliver_multicast(net_protocol_module_info* module, net_buffer* buffer,
 			if (status < B_OK)
 				break;
 		}
+#endif
 	}
 	return status;
 }
@@ -280,7 +280,7 @@ raw_receive_data(net_buffer* buffer)
 			RawSocket* raw = iterator.Next();
 
 			if (raw->Socket()->protocol == buffer->protocol)
-				raw->SocketEnqueue(buffer);
+				raw->EnqueueClone(buffer);
 		}
 	}
 }
@@ -305,11 +305,8 @@ IPv6Multicast::JoinGroup(IPv6GroupInterface* state)
 	MutexLocker _(sMulticastGroupsLock);
 
 	sockaddr_in6 groupAddr;
-	net_interface* interface = state->Interface();
-
-	status_t status = interface->first_info->join_multicast(
-		interface->first_protocol,
-		fill_sockaddr_in6(&groupAddr, state->Address()));
+	status_t status = sDatalinkModule->join_multicast(state->Interface(),
+		sDomain, fill_sockaddr_in6(&groupAddr, state->Address()));
 	if (status != B_OK)
 		return status;
 
@@ -326,10 +323,7 @@ IPv6Multicast::LeaveGroup(IPv6GroupInterface* state)
 	sMulticastState->Remove(state);
 
 	sockaddr_in6 groupAddr;
-	net_interface* interface = state->Interface();
-
-	return interface->first_protocol->module->join_multicast(
-		interface->first_protocol,
+	return sDatalinkModule->leave_multicast(state->Interface(), sDomain,
 		fill_sockaddr_in6(&groupAddr, state->Address()));
 }
 
@@ -460,7 +454,7 @@ ipv6_init_protocol(net_socket* socket)
 	protocol->multicast_time_to_live = kDefaultMulticastTTL;
 	protocol->receive_hoplimit = 0;
 	protocol->receive_pktinfo = 0;
-	protocol->interface_address = NULL;
+	protocol->multicast_address = NULL;
 	return protocol;
 }
 
@@ -471,7 +465,7 @@ ipv6_uninit_protocol(net_protocol* _protocol)
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
 
 	delete protocol->raw;
-	delete protocol->interface_address;
+	delete protocol->multicast_address;
 	delete protocol;
 	return B_OK;
 }
@@ -618,21 +612,21 @@ ipv6_setsockopt(net_protocol* _protocol, int level, int option,
 			// Using the unspecifed address to remove the previous setting.
 			if (IN6_IS_ADDR_UNSPECIFIED(&address->sin6_addr)) {
 				delete address;
-				delete protocol->interface_address;
-				protocol->interface_address = NULL;
+				delete protocol->multicast_address;
+				protocol->multicast_address = NULL;
 				return B_OK;
 			}
 
 			struct net_interface* interface
-				= sDatalinkModule->get_interface_with_address(sDomain,
-					(struct sockaddr*)address);
+				= sDatalinkModule->get_interface_with_address(
+					(sockaddr*)address);
 			if (interface == NULL) {
 				delete address;
 				return EADDRNOTAVAIL;
 			}
 
-			delete protocol->interface_address;
-			protocol->interface_address = (struct sockaddr*)address;
+			delete protocol->multicast_address;
+			protocol->multicast_address = (struct sockaddr*)address;
 			return B_OK;
 		}
 		if (option == IPV6_MULTICAST_HOPS) {
@@ -743,7 +737,7 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 		return B_BAD_VALUE;
 
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
-	net_interface* interface = route->interface;
+	net_interface* interface = route->interface_address->interface;
 	uint8 protocolNumber;
 	if (protocol != NULL && protocol->socket != NULL)
 		protocolNumber = protocol->socket->protocol;
@@ -817,12 +811,11 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 
 	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
 	if (buffer->size > mtu) {
-		// we need to fragment the packet
-		return EMSGSIZE; // TODO
-		//return send_fragments(protocol, route, buffer, mtu);
+		// TODO: we need to fragment the packet
+		return EMSGSIZE;
 	}
 
-	return sDatalinkModule->send_data(route, buffer);
+	return sDatalinkModule->send_routed_data(route, buffer);
 }
 
 
@@ -837,24 +830,26 @@ ipv6_send_data(net_protocol* _protocol, net_buffer* buffer)
 
 	// handle IPV6_MULTICAST_IF
 	if (IN6_IS_ADDR_MULTICAST(&destination->sin6_addr)
-			&& protocol->interface_address != NULL) {
-		net_interface* interface
-			= sDatalinkModule->get_interface_with_address(sDomain,
-				protocol->interface_address);
-		if (interface == NULL || (interface->flags & IFF_UP) == 0)
+		&& protocol->multicast_address != NULL) {
+		net_interface_address* address = sDatalinkModule->get_interface_address(
+			protocol->multicast_address);
+ 		if (address == NULL || (address->interface->flags & IFF_UP) == 0) {
+			sDatalinkModule->put_interface_address(address);
 			return EADDRNOTAVAIL;
+		}
 
-		buffer->interface = interface;
+		sDatalinkModule->put_interface_address(buffer->interface_address);
+		buffer->interface_address = address;
+			// the buffer takes over ownership of the address
 
-		net_route* route = sDatalinkModule->get_route(sDomain,
-			interface->address);
+		net_route* route = sDatalinkModule->get_route(sDomain, address->local);
 		if (route == NULL)
 			return ENETUNREACH;
 
-		return sDatalinkModule->send_data(route, buffer);
+		return sDatalinkModule->send_routed_data(route, buffer);
 	}
 
-	return sDatalinkModule->send_datagram(protocol, sDomain, buffer);
+	return sDatalinkModule->send_data(protocol, sDomain, buffer);
 }
 
 
@@ -876,7 +871,7 @@ ipv6_read_data(net_protocol* _protocol, size_t numBytes, uint32 flags,
 
 	TRACE_SK(protocol, "ReadData(%lu, 0x%lx)", numBytes, flags);
 
-	return raw->SocketDequeue(flags, _buffer);
+	return raw->Dequeue(flags, _buffer);
 }
 
 
@@ -910,7 +905,7 @@ ipv6_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 	if (route->mtu != 0)
 		mtu = route->mtu;
 	else
-		mtu = route->interface->mtu;
+		mtu = route->interface_address->interface->mtu;
 
 	sDatalinkModule->put_route(sDomain, route);
 	// TODO: what about extension headers?
@@ -947,18 +942,25 @@ ipv6_receive_data(net_buffer* buffer)
 	if (IN6_IS_ADDR_MULTICAST(&destination.sin6_addr)) {
 		buffer->flags |= MSG_MCAST;
 	} else {
+		uint32 matchedAddressType = 0;
+
 		// test if the packet is really for us
 		if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
-				&buffer->interface, NULL)
+				&buffer->interface_address, &matchedAddressType)
 			&& !sDatalinkModule->is_local_link_address(sDomain, true,
-				buffer->destination, &buffer->interface)) {
+				buffer->destination, &buffer->interface_address)) {
 			char srcbuf[INET6_ADDRSTRLEN];
 			char dstbuf[INET6_ADDRSTRLEN];
-			TRACE("  ReceiveData(): packet was not for us %s -> %s",
+			TRACE("  ipv4_receive_data(): packet was not for us %s -> %s",
 				ip6_sprintf(&header.Src(), srcbuf),
 				ip6_sprintf(&header.Dst(), dstbuf));
+	
+			// TODO: Send ICMPv6 error: Host unreachable
 			return B_ERROR;
 		}
+
+		// copy over special address types (MSG_BCAST or MSG_MCAST):
+		buffer->flags |= matchedAddressType;
 	}
 
 	// set net_buffer's source/destination address
@@ -981,8 +983,6 @@ ipv6_receive_data(net_buffer* buffer)
 	// tell the buffer to preserve removed ipv6 header - may need it later
 	gBufferModule->store_header(buffer);
 
-	TRACE("store_header for %p\n", buffer);
-
 	// remove ipv6 headers for now
 	gBufferModule->remove_header(buffer, transportHeaderOffset);
 
@@ -996,7 +996,7 @@ ipv6_receive_data(net_buffer* buffer)
 	}
 
 	if ((buffer->flags & MSG_MCAST) != 0) {
-		// Unfortunely historical reasons dictate that the IP multicast
+		// Unfortunately historical reasons dictate that the IP multicast
 		// model be a little different from the unicast one. We deliver
 		// this frame directly to all sockets registered with interest
 		// for this multicast group.
@@ -1015,7 +1015,7 @@ ipv6_deliver_data(net_protocol* _protocol, net_buffer* buffer)
 	if (protocol->raw == NULL)
 		return B_ERROR;
 
-	return protocol->raw->SocketEnqueue(buffer);
+	return protocol->raw->EnqueueClone(buffer);
 }
 
 
@@ -1047,27 +1047,26 @@ ipv6_process_ancillary_data_no_container(net_protocol* _protocol,
 		if (msgControlLen < CMSG_SPACE(sizeof(int)))
 			return B_NO_MEMORY;
 
-		TRACE("restore_header for %p\n", buffer);
+		// '255' is the default value to use when extracting the real one fails
+		int hopLimit = 255;
 
 		if (gBufferModule->stored_header_length(buffer)
-				< (int)sizeof(ip6_hdr))
-			return B_ERROR;
-
-		IPv6Header header;
-		if (gBufferModule->restore_header(buffer, 0, &header, sizeof(ip6_hdr))
-				!= B_OK)
-			return B_ERROR;
-
-		if (header.ProtocolVersion() != IPV6_VERSION)
-			return B_ERROR;
+				>= (int)sizeof(ip6_hdr)) {
+			IPv6Header header;
+			if (gBufferModule->restore_header(buffer, 0,
+					&header, sizeof(ip6_hdr)) == B_OK
+				&& header.ProtocolVersion() != IPV6_VERSION) {
+				// header is OK, take hoplimit from it
+				hopLimit = header.header.ip6_hlim;
+			}
+		}
 
 		cmsghdr* messageHeader = (cmsghdr*)((char*)msgControl + bytesWritten);
 		messageHeader->cmsg_len = CMSG_LEN(sizeof(int));
 		messageHeader->cmsg_level = IPPROTO_IPV6;
 		messageHeader->cmsg_type = IPV6_HOPLIMIT;
 
-		int hoplimit = header.header.ip6_hlim;
-		memcpy(CMSG_DATA(messageHeader), &hoplimit, sizeof(int));
+		memcpy(CMSG_DATA(messageHeader), &hopLimit, sizeof(int));
 
 		bytesWritten += CMSG_SPACE(sizeof(int));
 		msgControlLen -= CMSG_SPACE(sizeof(int));
@@ -1088,8 +1087,11 @@ ipv6_process_ancillary_data_no_container(net_protocol* _protocol,
 		memcpy(&pi.ipi6_addr,
 			&((struct sockaddr_in6*)buffer->destination)->sin6_addr,
 		 	sizeof(struct in6_addr));
-		// REVIEWME: assume buffer->interface cannot be NULL
-		pi.ipi6_ifindex = buffer->interface->index;
+		if (buffer->interface_address != NULL
+			&& buffer->interface_address->interface != NULL)
+			pi.ipi6_ifindex = buffer->interface_address->interface->index;
+		else
+			pi.ipi6_ifindex = 0;
 		memcpy(CMSG_DATA(messageHeader), &pi, sizeof(struct in6_pktinfo));
 
 		bytesWritten += CMSG_SPACE(sizeof(struct in6_pktinfo));
@@ -1145,7 +1147,7 @@ err:
 	mutex_destroy(&sReceivingProtocolLock);
 	mutex_destroy(&sMulticastGroupsLock);
 	mutex_destroy(&sRawSocketsLock);
-	TRACE("init_ipv6: error, status=%u\n", status);
+	TRACE("init_ipv6: error %s\n", strerror(status));
 	return status;
 }
 

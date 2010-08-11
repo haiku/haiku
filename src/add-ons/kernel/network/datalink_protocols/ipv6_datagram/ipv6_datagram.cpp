@@ -28,7 +28,7 @@
 #include <net/if.h>
 #include <net/if_types.h>
 #include <net/if_dl.h>
-
+#include <sys/sockio.h>
 #include <new>
 
 #include <ipv6/jenkins.h>
@@ -46,6 +46,7 @@
 
 struct ipv6_datalink_protocol : net_datalink_protocol {
 	sockaddr_dl	hardware_address;
+	in6_addr	local_address;
 };
 
 
@@ -54,8 +55,9 @@ static void ndp_timer(struct net_timer* timer, void* data);
 
 net_buffer_module_info* gBufferModule;
 static net_stack_module_info* sStackModule;
+static net_datalink_module_info* sDatalinkModule;
 static net_protocol_module_info* sIPv6Module;
-net_protocol* sIPv6Protocol;
+static net_protocol* sIPv6Protocol;
 static hash_table* sCache;
 static mutex sCacheLock;
 static const net_buffer* kDeletedBuffer = (net_buffer*)~0;
@@ -75,7 +77,7 @@ struct neighbor_discovery_header {
 	in6_addr	target_address;
 
 	// This part is specific for Ethernet;
-	// also, the could be more than one option in theory.
+	// also, theoretically there could be more than one option.
 	uint8		option_type;
 	uint8		option_length;
 	uint8		link_address[ETHER_ADDRESS_LENGTH];
@@ -499,24 +501,114 @@ ndp_update_entry(const in6_addr& protocolAddress, sockaddr_dl* hardwareAddress,
 }
 
 
-/*!	Creates a permanent local entry for the interface belonging to this protocol.
-	You need to hold the cache lock when calling this function.
-*/
-static status_t
-ndp_update_local(ipv6_datalink_protocol* protocol)
+static void
+ndp_remove_local_entry(ipv6_datalink_protocol* protocol, const sockaddr* local,
+	bool updateLocalAddress)
 {
-	ASSERT_LOCKED_MUTEX(&sCacheLock);
+	in6_addr inetAddress;
+
+	if (local == NULL) {
+		// interface has not yet been set
+		memset(&inetAddress, 0, sizeof(in6_addr));
+	} else {
+		memcpy(&inetAddress, &((sockaddr_in6*)local)->sin6_addr,
+			sizeof(in6_addr));
+
+		// leave the NS multicast address
+		sockaddr_in6 multicast;
+		ipv6_to_solicited_multicast(&multicast, inetAddress);
+
+		struct ipv6_mreq mreq;
+		memcpy(&mreq.ipv6mr_multiaddr, &multicast.sin6_addr, sizeof(in6_addr));
+		mreq.ipv6mr_interface = protocol->interface->index;
+
+		if (sIPv6Protocol != NULL) {
+			sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6,
+				IPV6_LEAVE_GROUP, &mreq, sizeof(mreq));
+		}
+	}
+
+	// TRACE(("%s(): address %s\n", __FUNCTION__, inet6_to_string(inetAddress)));
+
+	MutexLocker locker(sCacheLock);
+
+	ndp_entry* entry = ndp_entry::Lookup(inetAddress);
+	if (entry != NULL) {
+		hash_remove(sCache, entry);
+		entry->flags |= NDP_FLAG_REMOVED;
+	}
+
+	if (updateLocalAddress && protocol->local_address == inetAddress) {
+		// find new local sender address
+		memset(&protocol->local_address, 0, sizeof(in6_addr));
+
+		net_interface_address* address = NULL;
+		while (sDatalinkModule->get_next_interface_address(protocol->interface,
+				&address)) {
+			if (address->local == NULL || address->local->sa_family != AF_INET6)
+				continue;
+
+			memcpy(&protocol->local_address,
+				&((sockaddr_in6*)address->local)->sin6_addr, sizeof(in6_addr));
+		}
+	}
+
+	locker.Unlock();
+	delete entry;
+}
+
+
+/*!	Removes all entries belonging to the local interface of the \a procotol
+	given.
+*/
+static void
+ndp_remove_local(ipv6_datalink_protocol* protocol)
+{
+	net_interface_address* address = NULL;
+	while (sDatalinkModule->get_next_interface_address(protocol->interface,
+			&address)) {
+		if (address->local == NULL || address->local->sa_family != AF_INET6)
+			continue;
+
+		ndp_remove_local_entry(protocol, address->local, false);
+	}
+}
+
+
+static status_t
+ndp_set_local_entry(ipv6_datalink_protocol* protocol, const sockaddr* local)
+{
+	MutexLocker locker(sCacheLock);
 
 	net_interface* interface = protocol->interface;
-	in6_addr inet6Address;
+	in6_addr inetAddress;
 
-	if (interface->address == NULL) {
+	if (local == NULL) {
 		// interface has not yet been set
-		memset(&inet6Address, 0, sizeof(in6_addr));
+		memset(&inetAddress, 0, sizeof(in6_addr));
 	} else {
-		memcpy(&inet6Address,
-			&((sockaddr_in6*)interface->address)->sin6_addr, sizeof(in6_addr));
+		memcpy(&inetAddress,
+			&((sockaddr_in6*)local)->sin6_addr,
+			sizeof(in6_addr));
+
+		// join multicast address for listening to NS packets
+		sockaddr_in6 multicast;
+		ipv6_to_solicited_multicast(&multicast, inetAddress);
+
+		struct ipv6_mreq mreq;
+		memcpy(&mreq.ipv6mr_multiaddr, &multicast.sin6_addr, sizeof(in6_addr));
+		mreq.ipv6mr_interface = protocol->interface->index;
+
+		if (sIPv6Protocol != NULL) {
+			sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6,
+				IPV6_JOIN_GROUP, &mreq, sizeof(mreq));
+		}
 	}
+
+	// TRACE(("%s(): address %s\n", __FUNCTION__, inet6_to_string(inetAddress)));
+
+	if (IN6_IS_ADDR_UNSPECIFIED(&protocol->local_address))
+		memcpy(&protocol->local_address, &inetAddress, sizeof(in6_addr));
 
 	sockaddr_dl address;
 	address.sdl_len = sizeof(sockaddr_dl);
@@ -532,12 +624,41 @@ ndp_update_local(ipv6_datalink_protocol* protocol)
 		// cache the address in our protocol
 
 	ndp_entry* entry;
-	status_t status = ndp_update_entry(inet6Address, &address,
+	status_t status = ndp_update_entry(inetAddress, &address,
 		NDP_FLAG_LOCAL | NDP_FLAG_PERMANENT, &entry);
 	if (status == B_OK)
 		entry->protocol = protocol;
 
 	return status;
+}
+
+
+/*!	Creates permanent local entries for all addresses of the interface belonging
+	to this protocol.
+	Returns an error if no entry could be added.
+*/
+static status_t
+ndp_update_local(ipv6_datalink_protocol* protocol)
+{
+	memset(&protocol->local_address, 0, sizeof(in6_addr));
+
+	ssize_t count = 0;
+
+	net_interface_address* address = NULL;
+	while (sDatalinkModule->get_next_interface_address(protocol->interface,
+			&address)) {
+		if (address->local == NULL || address->local->sa_family != AF_INET6)
+			continue;
+
+		if (ndp_set_local_entry(protocol, address->local) == B_OK) {
+			count++;
+		}
+	}
+
+	if (count == 0)
+		return ndp_set_local_entry(protocol, NULL);
+
+	return B_OK;
 }
 
 
@@ -778,7 +899,7 @@ ndp_timer(struct net_timer* timer, void* data)
 
 
 static status_t
-ndp_start_resolve(net_datalink_protocol* protocol, const in6_addr& address,
+ndp_start_resolve(ipv6_datalink_protocol* protocol, const in6_addr& address,
 	ndp_entry** _entry)
 {
 	ASSERT_LOCKED_MUTEX(&sCacheLock);
@@ -808,8 +929,9 @@ ndp_start_resolve(net_datalink_protocol* protocol, const in6_addr& address,
 
 	// prepare source and target addresses
 
- 	sockaddr_in6* source = (sockaddr_in6*)buffer->source;
-	ipv6_to_sockaddr(source, ((sockaddr_in6*)interface->address)->sin6_addr);
+	sockaddr_in6* source = (sockaddr_in6*)buffer->source;
+	ipv6_to_sockaddr(source, protocol->local_address);
+	// protocol->local_address
 
 	sockaddr_in6* destination = (sockaddr_in6*)buffer->destination;
 	ipv6_to_solicited_multicast(destination, address);
@@ -868,30 +990,25 @@ ndp_start_resolve(net_datalink_protocol* protocol, const in6_addr& address,
 
 
 static status_t
-ipv6_datalink_init(net_interface* interface, net_datalink_protocol** _protocol)
+ipv6_datalink_init(net_interface* interface, net_domain* domain,
+	net_datalink_protocol** _protocol)
 {
-	if (interface->domain->family != AF_INET6)
+	if (domain->family != AF_INET6)
 		return B_BAD_TYPE;
 
-	// While the loopback doesn't get a header to mux protocols,
-	// we let it do all of the registration work.
-	if (interface->device->type == IFT_LOOP)
-		return B_BAD_TYPE;
+	status_t status = sStackModule->register_domain_device_handler(
+		interface->device, B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_IPV6), domain);
+	if (status != B_OK)
+		return status;
 
 	ipv6_datalink_protocol* protocol = new(std::nothrow) ipv6_datalink_protocol;
 	if (protocol == NULL)
 		return B_NO_MEMORY;
 
 	memset(&protocol->hardware_address, 0, sizeof(sockaddr_dl));
-
-	status_t status = sStackModule->register_domain_device_handler(
-		interface->device, B_NET_FRAME_TYPE_IPV6, interface->domain);
-	if (status != B_OK)
-		delete protocol;
-	else
-		*_protocol = protocol;
-
-	return status;
+	memset(&protocol->local_address, 0, sizeof(in6_addr));
+	*_protocol = protocol;
+	return B_OK;
 }
 
 
@@ -899,9 +1016,10 @@ static status_t
 ipv6_datalink_uninit(net_datalink_protocol* protocol)
 {
 	sStackModule->unregister_device_handler(protocol->interface->device,
-		B_NET_FRAME_TYPE_IPV6);
+		B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_IPV6));
+
 	delete protocol;
-	return B_OK;
+ 	return B_OK;
 }
 
 
@@ -950,136 +1068,87 @@ ipv6_datalink_send_data(net_datalink_protocol* _protocol, net_buffer* buffer)
 }
 
 
+
 static status_t
 ipv6_datalink_up(net_datalink_protocol* _protocol)
 {
 	ipv6_datalink_protocol* protocol = (ipv6_datalink_protocol*)_protocol;
 	status_t status = protocol->next->module->interface_up(protocol->next);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
-
-	// join multicast address for listening to NS packets
-
-	// REVIEWME: can I rely on this function being called every time
-	// when interfae address changes?
-
-	if (protocol->interface->address != NULL) {
-		sockaddr_in6& address = *(sockaddr_in6*)protocol->interface->address;
-		sockaddr_in6 multicast;
-		ipv6_to_solicited_multicast(&multicast, address.sin6_addr);
-
-		struct ipv6_mreq mreq;
-		memcpy(&mreq.ipv6mr_multiaddr, &multicast.sin6_addr, sizeof(in6_addr));
-		mreq.ipv6mr_interface = protocol->interface->index;
-
-		if (sIPv6Protocol != NULL) {
-			sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6,
-				IPV6_JOIN_GROUP, &mreq, sizeof(mreq));
-		}
-	}
 
 	// cache this device's address for later use
 
-	mutex_lock(&sCacheLock);
 	status = ndp_update_local(protocol);
-	mutex_unlock(&sCacheLock);
-
-	if (status < B_OK) {
+	if (status != B_OK) {
 		protocol->next->module->interface_down(protocol->next);
 		return status;
 	}
+
+	return B_OK;
 }
 
 
 static void
-ipv6_datalink_down(net_datalink_protocol* protocol)
+ipv6_datalink_down(net_datalink_protocol *protocol)
 {
-	// leave the NS multicast address
-
-	// REVIEWME: can I rely on this function being called every time
-	// when interface address changes?
-
-	if (protocol->interface->address != NULL) {
-		sockaddr_in6& address = *(sockaddr_in6*)protocol->interface->address;
-		sockaddr_in6 multicast;
-		ipv6_to_solicited_multicast(&multicast, address.sin6_addr);
-
-		struct ipv6_mreq mreq;
-		memcpy(&mreq.ipv6mr_multiaddr, &multicast.sin6_addr, sizeof(in6_addr));
-		mreq.ipv6mr_interface = protocol->interface->index;
-
-		if (sIPv6Protocol != NULL) {
-			sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6,
-				IPV6_LEAVE_GROUP, &mreq, sizeof(mreq));
-		}
-	}
-
-	// remove local NDP entry from the cache
-
-	if (protocol->interface->address != NULL) {
-		MutexLocker locker(sCacheLock);
-
-		ndp_entry* entry = ndp_entry::Lookup(
-			((sockaddr_in6*)protocol->interface->address)->sin6_addr);
-		if (entry != NULL) {
-			hash_remove(sCache, entry);
-			entry->flags |= NDP_FLAG_REMOVED;
-			locker.Unlock();
-
-			delete entry;
-		}
-	}
+	// remove local NDP entries from the cache
+	ndp_remove_local((ipv6_datalink_protocol*)protocol);
 
 	protocol->next->module->interface_down(protocol->next);
 }
 
 
 status_t
-ipv6_datalink_change_address(net_datalink_protocol* protocol,
+ipv6_datalink_change_address(net_datalink_protocol* _protocol,
 	net_interface_address* address, int32 option,
 	const struct sockaddr* oldAddress, const struct sockaddr* newAddress)
 {
-#if 0
+	ipv6_datalink_protocol* protocol = (ipv6_datalink_protocol*)_protocol;
 	switch (option) {
 		case SIOCSIFADDR:
 		case SIOCAIFADDR:
 		case SIOCDIFADDR:
 			// Those are the options we handle
 			if ((protocol->interface->flags & IFF_UP) != 0) {
-				// Update ARP entry for the local address
+				// Update NDP entry for the local address
 			
 				if (newAddress != NULL && newAddress->sa_family == AF_INET6) {
-					status_t status = arp_set_local_entry(protocol, newAddress);
+					status_t status = ndp_set_local_entry(protocol, newAddress);
 					if (status != B_OK)
 						return status;
 
-					// add IPv6 remove multicast route (ff00::/8)
-					sockaddr_in6 address;
-					memset(&address, 0, sizeof(sockaddr_in6));
-					address.sin6_family = AF_INET6;
-					address.sin6_len = sizeof(sockaddr_in6);
-					address.sin6_addr.s6_addr[0] = 0xff;
-			
-					route.destination = (sockaddr*)&address;
-					route.mask = (sockaddr*)&address;
+					// add IPv6 multicast route (ff00::/8)
+					sockaddr_in6 socketAddress;
+					memset(&socketAddress, 0, sizeof(sockaddr_in6));
+					socketAddress.sin6_family = AF_INET6;
+					socketAddress.sin6_len = sizeof(sockaddr_in6);
+					socketAddress.sin6_addr.s6_addr[0] = 0xff;
+
+					net_route route;
+					memset(&route, 0, sizeof(net_route));
+					route.destination = (sockaddr*)&socketAddress;
+					route.mask = (sockaddr*)&socketAddress;
 					route.flags = 0;
-					add_route(interface->domain, &route);
+					sDatalinkModule->add_route(address->domain, &route);
 				}
 
 				if (oldAddress != NULL && oldAddress->sa_family == AF_INET6) {
-					arp_remove_local_entry(protocol, oldAddress, true);
+					ndp_remove_local_entry(protocol, oldAddress, true);
 
-					// remove IPv6 remove multicast route (ff00::/8)
-					sockaddr_in6 address;
-					memset(&address, 0, sizeof(sockaddr_in6));
-					address.sin6_family = AF_INET6;
-					address.sin6_len = sizeof(sockaddr_in6);
-					address.sin6_addr.s6_addr[0] = 0xff;
-			
-					route.destination = (sockaddr*)&address;
-					route.mask = (sockaddr*)&address;
+					// remove IPv6 multicast route (ff00::/8)
+					sockaddr_in6 socketAddress;
+					memset(&socketAddress, 0, sizeof(sockaddr_in6));
+					socketAddress.sin6_family = AF_INET6;
+					socketAddress.sin6_len = sizeof(sockaddr_in6);
+					socketAddress.sin6_addr.s6_addr[0] = 0xff;
+
+					net_route route;
+					memset(&route, 0, sizeof(net_route));			
+					route.destination = (sockaddr*)&socketAddress;
+					route.mask = (sockaddr*)&socketAddress;
 					route.flags = 0;
-					remove_route(interface->domain, &route);
+					sDatalinkModule->remove_route(address->domain, &route);
 				}
 			}			
 			break;
@@ -1087,7 +1156,6 @@ ipv6_datalink_change_address(net_datalink_protocol* protocol,
 		default:
 			break;
 	}
-#endif
 
 	return protocol->next->module->change_address(protocol->next, address,
 		option, oldAddress, newAddress);
@@ -1176,6 +1244,7 @@ net_ndp_module_info gIPv6NDPModule = {
 
 module_dependency module_dependencies[] = {
 	{NET_STACK_MODULE_NAME, (module_info**)&sStackModule},
+	{NET_DATALINK_MODULE_NAME, (module_info**)&sDatalinkModule},
 	{NET_BUFFER_MODULE_NAME, (module_info**)&gBufferModule},
 	{"network/protocols/ipv6/v1", (module_info**)&sIPv6Module},
 	{}
