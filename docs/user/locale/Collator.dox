@@ -52,14 +52,16 @@ tell if the collator should take punctuation into account when sorting.
 \fn void BCollator::SetDefaultStrength(int8 strength)
 \brief Set the strength of the collator.
 
-The collator class provide four level of strength. These define the handling of variuous
-things.
+The collator class provide four level of strength. These define the handling of
+various things.
 \item B_COLLATE_PRIMARY doesn't differenciate e from Ã©,
 \item B_COLLATE_SECONDARY takes them into account,
 \item B_COLLATE_TERTIARY is case sensitive,
-\item B_COLLATEÃ_QUATERNARY is very strict. Most of the time you shouldn't need to go that far.
+\item B_COLLATE_QUATERNARY is very strict. Most of the time you shouldn't need
+to go that far.
 
-Note the strength can also be given on a case-by-case basis when calling other methods.
+Note the strength can also be given on a case-by-case basis when calling other
+methods.
 
 \param strength The strength the catalog should use as default.
 */
@@ -82,17 +84,18 @@ This function enables or disables the handling of punctuations.
 \fn bool BCollator::IgnorePunctuation() const
 \brief Return the behaviour ofthe collator regarding punctuation.
 
-This function returns true if the collator will take punctuation into account when sorting.
+This function returns true if the collator will take punctuation into account
+when sorting.
 */
 
 /*!
-\fn satus_t BCollator::GetSortKey(constchar* string, BString* key, int8 strength = B_COLLATE_DEFAULT) const
+\fn satus_t BCollator::GetSortKey(const char* string, BString* key, int8 strength) const
 \brief Compute the sortkey of a string
 
-A sortkey is a modified version of the string that you can use for faster comparison with
-other sortkeys, using strcmp or a similar ASCII comparison. If you need to compare a
-string with other ones a lot of times, storing the sortkey will allow you to do the
-comparisons faster.
+A sortkey is a modified version of the string that you can use for faster
+comparison with other sortkeys, using strcmp or a similar ASCII comparison. If
+you need to compare a string with other ones a lot of times, storing the sortkey
+will allow you to do the comparisons faster.
 
 \param string String from which to compute the sortkey.
 \param key The resulting sortkey.
@@ -102,39 +105,50 @@ comparisons faster.
 */
 
 /*!
-\fn int BCollator::Compare(const char* s1, const char* s2, int8 strength = B_COLLATE_DEFAULT) const
+\fn int BCollator::Compare(const char* s1, const char* s2, int8 strength) const
 \brief Compare two strings.
 
-This function returns the difference betweens the two strings, in a way similar to strcmp.
+This function returns the difference betweens the two strings, in a way similar
+to strcmp.
 
 \param s1,s2 The strings to compare.
-\returns The comparison value. 0 if the strings are equal, negative if s1<s2, positive if s1>s2.
+\returns The comparison value. 0 if the strings are equal, negative if s1<s2,
+positive if s1>s2.
 */
 
 /*!
-\fn bool Equal(const char* s1, const char* s2, int8 strength = B_COLLATE_DEFAULT) const
+\fn bool BCollator::Equal(const char* s1, const char* s2, int8 strength) const
 \brief Checks two strings for equality.
 
-Compares two strings for equality. Note that different strings may end up being equal,
-for example if the differences are only in case and punctuation, depending on the strenght
-used. Quaterary strength will make this function return true only if the strings are
-byte-for-byte identical.
+Compares two strings for equality. Note that different strings may end up being
+equal, for example if the differences are only in case and punctuation,
+depending on the strenght used. Quaterary strength will make this function
+return true only if the strings are byte-for-byte identical.
 
 \returns True if the two strings are identical.
 */
 
 /*!
-\fn bool Greater(cosnt char* s1, const char* s2, int8 strength = B_COLLATE_DEFAULT) const)
+\fn bool BCollator::Greater(cosnt char* s1, const char* s2, int8 strength) const)
 \brief Tell if a string is greater than another.
 
 \returns True if s1 is greater (not equal) than s2.
 
-\note !Greater(s1, s2) does the same thing as Greater(s2,s1)
+\note !Greater(s1, s2) does the same thing as Greater(s2, s1)
 */
 
 /*!
-\fn bool GreaterOrEqual(cosnt char* s1, const char* s2, int8 strength = B_COLLATE_DEFAULT) const)
+\fn bool BCollator::GreaterOrEqual(cosnt char* s1, const char* s2, int8 strength) const)
 \brief Tell if a string is greater than another.
 
 \returns True if s1 is greater or equal to s2.
+*/
+
+/*!
+\fn static BArchivable* BCollator::Instanciate(BMessage* archive)
+\brief Unarchive the collator
+
+Thif function allows you to restore a collator that you previously archived. It
+is faster to do that than to buid a collator and set it up by hand every time
+you need it with the same settings.
 */

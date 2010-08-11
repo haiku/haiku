@@ -67,9 +67,11 @@ properly. But if you want to provide different versions of your application, it
 may be useful to separate their catalogs.
 
 \param signature Mime-signature of the application for which to load a catalog.
-\param language The language of the catalog to load. If NULL, the user settings will be used.
-\param fingerprint The fingerprint version-info for the catalog to load. If 0, the fingerprint will
-not be checked,and any version of the catalog will be loaded.
+\param language The language of the catalog to load. If NULL, the user settings
+will be used.
+\param fingerprint The fingerprint version-info for the catalog to load. If 0,
+the fingerprint will not be checked,and any version of the catalog will be
+loaded.
 */
 
 /*!
@@ -84,14 +86,15 @@ alone is not helpful enough or there are special things to note. The comment is
 also used as a way to uniquely identify a string, so if two identical strings
 share the same context, it is still possible to provide different translations.
 
-\returns The translated string, or the one passed as a parameter if no translation was found.
+\returns The translated string, or the one passed as a parameter if no
+translation was found.
 \param string The string to translate.
 \param context The context where the string is located.
 \param comment Supplementary comment for translators.
 */
 
 /*!
-\fn const char* GetString(uint32 id)
+\fn const char* BCatalog::GetString(uint32 id)
 \brief Get a string by id from the catalog.
 
 The id based version of this method is slightly faster, as it doesn't have to
@@ -116,7 +119,8 @@ parsed by the collectcatkeys tool. This allows you, for example, to translate a
 string constant that you declared at another place, without getting a warning
 message from collectcatkeys.
 
-\returns The translated string, or the one passed as a parameter if no translation was found.
+\returns The translated string, or the one passed as a parameter if no
+translation was found.
 \param string The string to translate.
 \param context The context where the string is located.
 \param comment Supplementary comment for translators.
@@ -125,7 +129,6 @@ message from collectcatkeys.
 
 /*!
 \fn status_t BCatalog::GetData(const char* name, BMessage* msg)
-\fn status_t BCatalog::GetData(uint32 id, BMessage* msg)
 \brief Get custom data from the catalog.
 
 This function allows you to localize something else than raw text. This may
@@ -136,7 +139,19 @@ handle it by yourself.
 
 \returns An error code.
 \param name The name of the data to retrieve.
-\param msg The BMessage to fillin with the data.
+\param msg The BMessage to fill in with the data.
+*/
+
+/*!
+\fn status_t BCatalog::GetData(uint32 id, BMessage* msg)
+\brief Get custom data from the catalog.
+
+As for GetString, the id-based version may be subject to hash-collisions, but is
+faster.
+
+Note the current catalog format doesn't allow storing custom data in catalogs,
+so the only way to use this function is providing your own catalog add-on for
+storing the data.
 */
 
 /*!
@@ -183,7 +198,7 @@ This function reloads the data for the given signature and fingerprint.
 */
 
 /*!
-\fn status_t BCatalog::InitCheck()
+\fn status_t BCatalog::InitCheck() const
 \brief Check if the catalog is in an useable state.
 
 This function returns B_OK if the catalog is initialized properly.

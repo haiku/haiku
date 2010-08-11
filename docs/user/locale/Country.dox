@@ -14,11 +14,9 @@ so they are done in the BLocale classinstead.
 
 /*!
 \fn BCountry::BCountry(const char* languageCode, const char* countryCode)
-\fn BCountry::BCountry(const char* languageAndCountryCode)
-\fn BCountry::BCountry(const BCountry& other)
 \brief Constructor.
 
-A BCountry is constructed from a language and a country code.
+Construct a BCountry from a language and a country code.
 
 */
 
@@ -48,7 +46,7 @@ The flag is stored in HVIF format and can be rendered atany size and color depth
 */
 
 /*!
-\fn const char* GetLocalizedString(uint32 id) const;
+\fn const char* BCountry::GetLocalizedString(uint32 id) const;
 \brief Get one of the default localized strings for this country.
 
 The strings include monetary symbols and other similar things.
@@ -63,7 +61,7 @@ The strings include monetary symbols and other similar things.
 */
 
 /*!
-\fn int GetTimeZones(BList& timezones) const
+\fn int BCountry::GetTimeZones(BList& timezones) const
 \brief Returns all the timeaones used in this country.
 
 The count may vary from 0 for countries where there is no data, to twelve, for Russia.

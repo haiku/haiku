@@ -47,7 +47,7 @@ This function returns the locale name (such as en_US for united states english).
 */
 
 /*!
-\fn bool Blocale::GetName(BString& name) const
+\fn bool BLocale::GetName(BString& name) const
 \brief Get the name of the locale.
 
 This function fills the name string with the localized name of this locale.
@@ -71,11 +71,20 @@ For example, if the locale us en_US and the user language is french, this functi
 
 /*!
 \fn status_t BLocale::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
-\fn status_t BLocale::FormatDate(BString* string, time_t time, bool longFormat)
 \brief Format a date.
 
 Fills in the string with a formatted date. The longFormat parameter allows you
 to select the short or the full format.
+
+\param string The string buffer to fill with the formated date.
+\param maxSize The size of the buffer.
+\param time The time (in seconds since epoch) to format
+\param longFormat If true, uses the long format (with day name, full month name). If false, use the short format, 08/12/2010 or similar.
+*/
+
+/*!
+\fn status_t BLocale::FormatDate(BString* string, time_t time, bool longFormat)
+\brief Formats a date to a BString.
 */
 
 /*!
@@ -122,7 +131,7 @@ Thisfunction allows you to define your own date format for specific purposes.
 */
 
 /*!
-\fn int StartOfWeek() const
+\fn int BLocale::StartOfWeek() const
 \brief Returns the day used as start of week in this locale.
 
 */

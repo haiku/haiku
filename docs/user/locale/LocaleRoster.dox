@@ -39,7 +39,7 @@ methods of the Locale Kit.
 */
 
 /*!
-\fn status_t BlocaleRoster::GetLanguage(const char* languagecode, BLanguage** _language) const
+\fn status_t BLocaleRoster::GetLanguage(const char* languagecode, BLanguage** _language) const
 \brief Instanciate a language from its code.
 */
 
@@ -53,7 +53,7 @@ fields, containing the language(s) code(s).
 */
 
 /*!
-\fn status_t BLocaleRoster::GetAvailableCountries(BMessage√* message) const
+\fn status_t BLocaleRoster::GetAvailableCountries(BMessage* message) const
 \brief List the available countries
 
 This function filles the passed BMessage with one or more 'country' string
@@ -83,4 +83,13 @@ selected from the user preferences.
 
 \returns The catalog, if it was loaded successfully.
 \warning This function needs the image to be lined with liblocalestub.a
+*/
+
+/*!
+\fn status_t BLocaleRoster::GetPreferredLanguages(BMessage* message) const
+\brief Return the list of user preferred languages.
+
+This function fills in the given message with one or more language string
+fields. They constitute the ordered list of user-selected languages to use for
+string translation.
 */
