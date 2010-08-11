@@ -923,6 +923,8 @@ BackgroundsView::_UpdatePreview()
 
 			fPreView->fImageBounds = BRect(bitmap->Bounds());
 			fCurrent->Show(info, fPreView);
+
+			delete info;
 		}
 	} else
 		fPreView->SetEnabled(false);
