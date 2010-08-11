@@ -34,3 +34,4 @@ SubInclude HAIKU_TOP src tests kits net sock ;
 SubInclude HAIKU_TOP src tests kits net tcp_shell ;
 SubInclude HAIKU_TOP src tests kits net tcptester ;
 SubInclude HAIKU_TOP src tests kits net icmp ;
+SubInclude HAIKU_TOP src tests kits net ipv6 ;

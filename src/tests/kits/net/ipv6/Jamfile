@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src tests kits net ipv6 ;
+
+SimpleTest ipv6_raw_server : raw_server.cpp : $(TARGET_NETWORK_LIBS) ;
+SimpleTest ipv6_raw_client : raw_client.cpp : $(TARGET_NETWORK_LIBS) ;
+
+SimpleTest ipv6_udp_server : udp_server.cpp : $(TARGET_NETWORK_LIBS) ;
+SimpleTest ipv6_udp_client : udp_client.cpp : $(TARGET_NETWORK_LIBS) ;
+
+SimpleTest ipv6_tcp_udp_server : tcp_udp_server.cpp : $(TARGET_NETWORK_LIBS) ;
+SimpleTest ipv6_tcp_udp_client : tcp_udp_client.cpp : $(TARGET_NETWORK_LIBS) ;
+
+SimpleTest ipv6_multicast_sender : multicast_sender.cpp : $(TARGET_NETWORK_LIBS) ;
