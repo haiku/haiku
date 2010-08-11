@@ -423,8 +423,52 @@ BNetworkAddress::SetToLoopback()
 status_t
 BNetworkAddress::SetToMask(int family, uint32 prefixLength)
 {
-	// TODO: implement SetToMask()
-	return B_NOT_SUPPORTED;
+	switch (family) {
+		case AF_INET:
+		{
+			if (prefixLength > 32)
+				return B_BAD_VALUE;
+		
+			sockaddr_in& mask = (sockaddr_in&)fAddress;
+			memset(&fAddress, 0, sizeof(sockaddr_storage));
+			mask.sin_family = AF_INET;
+			mask.sin_len = sizeof(sockaddr_in);
+		
+			uint32 hostMask = 0;
+			for (uint8 i = 32; i > 32 - prefixLength; i--)
+				hostMask |= 1 << (i - 1);
+
+			mask.sin_addr.s_addr = htonl(hostMask);
+			break;
+		}
+
+		case AF_INET6:
+		{
+			if (prefixLength > 128)
+				return B_BAD_VALUE;
+
+			sockaddr_in6& mask = (sockaddr_in6&)fAddress;
+			memset(&fAddress, 0, sizeof(sockaddr_storage));
+			mask.sin6_family = AF_INET6;
+			mask.sin6_len = sizeof(sockaddr_in6);
+		
+			for (uint8 i = 0; i < sizeof(in6_addr); i++, prefixLength -= 8) {
+				if (prefixLength < 8) {
+					mask.sin6_addr.s6_addr[i]
+						= (uint8)(0xff << (8 - prefixLength));
+					break;
+				}
+		
+				mask.sin6_addr.s6_addr[i] = 0xff;
+			}
+			break;
+		}
+
+		default:
+			return B_NOT_SUPPORTED;
+	}
+
+	return B_OK;
 }
 
 
@@ -706,6 +750,47 @@ BNetworkAddress::IsLocal() const
 	}
 
 	return false;
+}
+
+
+ssize_t
+BNetworkAddress::PrefixLength() const
+{
+	switch (fAddress.ss_family) {
+		case AF_INET:
+		{
+			sockaddr_in& mask = (sockaddr_in&)fAddress;
+		
+			ssize_t result = 0;
+			uint32 hostMask = ntohl(mask.sin_addr.s_addr);
+			for (uint8 i = 32; i > 0; i--) {
+				if ((hostMask & (1 << (i - 1))) == 0)
+					break;
+				result++;
+			}
+
+			return result;
+		}
+
+		case AF_INET6:
+		{
+			sockaddr_in6& mask = (sockaddr_in6&)fAddress;
+
+			ssize_t result = 0;
+			for (uint8 i = 0; i < sizeof(in6_addr); i++) {
+				for (uint8 j = 0; j < 8; j++) {
+					if (!(mask.sin6_addr.s6_addr[i] & (1 << j)))
+						return result;
+					result++;
+				}
+			}
+		
+			return 128;
+		}
+
+		default:
+			return B_NOT_SUPPORTED;
+	}
 }
 
 

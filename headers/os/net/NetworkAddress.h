@@ -82,6 +82,8 @@ public:
 			bool				IsSiteLocal() const;
 			bool				IsLocal() const;
 			
+			ssize_t				PrefixLength() const;
+
 			uint32				LinkLevelIndex() const;
 			BString				LinkLevelInterface() const;
 			uint32				LinkLevelType() const;
