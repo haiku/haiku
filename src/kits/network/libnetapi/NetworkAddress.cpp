@@ -803,7 +803,7 @@ BNetworkAddress::ResolveTo(const BNetworkAddress& address)
 BString
 BNetworkAddress::ToString(bool includePort) const
 {
-	char buffer[128];
+	char buffer[512];
 
 	switch (fAddress.ss_family) {
 		case AF_INET:
@@ -815,6 +815,31 @@ BNetworkAddress::ToString(bool includePort) const
 			inet_ntop(AF_INET6, &((sockaddr_in6&)fAddress).sin6_addr,
 				buffer, sizeof(buffer));
 			break;
+
+		case AF_LINK:
+		{
+			uint8 *byte = LinkLevelAddress();
+			char* target = buffer;
+			int bytesLeft = sizeof(buffer);
+			target[0] = '\0';
+
+			for (size_t i = 0; i < LinkLevelAddressLength(); i++) {
+				if (i != 0 && bytesLeft > 1) {
+					target[0] = ':';
+					target[1] = '\0';
+					target++;
+					bytesLeft--;
+				}
+
+				int bytesWritten = snprintf(target, bytesLeft, "%02x", byte[i]);
+				if (bytesWritten >= bytesLeft)
+					break;
+
+				target += bytesWritten;
+				bytesLeft -= bytesWritten;
+			}
+			break;
+		}
 
 		default:
 			return "";
