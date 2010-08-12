@@ -21,20 +21,24 @@ public:
 								BNetworkInterfaceAddress();
 								~BNetworkInterfaceAddress();
 
-			status_t			SetTo(BNetworkInterface& interface,
+			status_t			SetTo(const BNetworkInterface& interface,
 									int32 index);
 
-			void				SetAddress(BNetworkAddress& address);
-			void				SetMask(BNetworkAddress& mask);
-			void				SetBroadcast(BNetworkAddress& broadcast);
+			void				SetAddress(const BNetworkAddress& address);
+			void				SetMask(const BNetworkAddress& mask);
+			void				SetBroadcast(const BNetworkAddress& broadcast);
+			void				SetDestination(
+									const BNetworkAddress& destination);
 
 			BNetworkAddress&	Address() { return fAddress; }
 			BNetworkAddress&	Mask() { return fMask; }
 			BNetworkAddress&	Broadcast() { return fBroadcast; }
+			BNetworkAddress&	Destination() { return fBroadcast; }
 
 			const BNetworkAddress& Address() const { return fAddress; }
 			const BNetworkAddress& Mask() const { return fMask; }
 			const BNetworkAddress& Broadcast() const { return fBroadcast; }
+			const BNetworkAddress& Destination() const { return fBroadcast; }
 
 			void				SetFlags(uint32 flags);
 			uint32				Flags() const { return fFlags; }
@@ -67,7 +71,7 @@ public:
 			uint32				Index() const;
 			uint32				Flags() const;
 			uint32				MTU() const;
-			uint32				Media() const;
+			int32				Media() const;
 			uint32				Metric() const;
 			uint32				Type() const;
 			status_t			GetStats(ifreq_stats& stats);
@@ -75,19 +79,23 @@ public:
 
 			status_t			SetFlags(uint32 flags);
 			status_t			SetMTU(uint32 mtu);
-			status_t			SetMedia(uint32 media);
+			status_t			SetMedia(int32 media);
 			status_t			SetMetric(uint32 metric);
 
 			int32				CountAddresses() const;
 			status_t			GetAddressAt(int32 index,
 									BNetworkInterfaceAddress& address);
+			int32				FindAddress(const BNetworkAddress& address);
+			int32				FindFirstAddress(int family);
 
 			status_t			AddAddress(
 									const BNetworkInterfaceAddress& address);
+			status_t			AddAddress(const BNetworkAddress& address);
 			status_t			SetAddress(
 									const BNetworkInterfaceAddress& address);
 			status_t			RemoveAddress(
 									const BNetworkInterfaceAddress& address);
+			status_t			RemoveAddress(const BNetworkAddress& address);
 			status_t			RemoveAddressAt(int32 index);
 
 			status_t			GetHardwareAddress(BNetworkAddress& address);

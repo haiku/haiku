@@ -81,7 +81,7 @@ do_request(ifreq& request, const char* name, int option)
 
 BNetworkInterfaceAddress::BNetworkInterfaceAddress()
 	:
-	fIndex(0),
+	fIndex(-1),
 	fFlags(0)
 {
 }
@@ -93,7 +93,7 @@ BNetworkInterfaceAddress::~BNetworkInterfaceAddress()
 
 
 status_t
-BNetworkInterfaceAddress::SetTo(BNetworkInterface& interface, int32 index)
+BNetworkInterfaceAddress::SetTo(const BNetworkInterface& interface, int32 index)
 {
 	fIndex = index;
 	return do_ifaliasreq(interface.Name(), B_SOCKET_GET_ALIAS, *this, true);
@@ -101,23 +101,30 @@ BNetworkInterfaceAddress::SetTo(BNetworkInterface& interface, int32 index)
 
 
 void
-BNetworkInterfaceAddress::SetAddress(BNetworkAddress& address)
+BNetworkInterfaceAddress::SetAddress(const BNetworkAddress& address)
 {
 	fAddress = address;
 }
 
 
 void
-BNetworkInterfaceAddress::SetMask(BNetworkAddress& mask)
+BNetworkInterfaceAddress::SetMask(const BNetworkAddress& mask)
 {
 	fMask = mask;
 }
 
 
 void
-BNetworkInterfaceAddress::SetBroadcast(BNetworkAddress& broadcast)
+BNetworkInterfaceAddress::SetBroadcast(const BNetworkAddress& broadcast)
 {
 	fBroadcast = broadcast;
+}
+
+
+void
+BNetworkInterfaceAddress::SetDestination(const BNetworkAddress& destination)
+{
+	fBroadcast = destination;
 }
 
 
@@ -220,12 +227,12 @@ BNetworkInterface::MTU() const
 }
 
 
-uint32
+int32
 BNetworkInterface::Media() const
 {
 	ifreq request;
 	if (do_request(request, Name(), SIOCGIFMEDIA) != B_OK)
-		return 0;
+		return -1;
 
 	return request.ifr_media;
 }
@@ -292,7 +299,7 @@ BNetworkInterface::SetMTU(uint32 mtu)
 
 
 status_t
-BNetworkInterface::SetMedia(uint32 media)
+BNetworkInterface::SetMedia(int32 media)
 {
 	ifreq request;
 	request.ifr_media = media;
@@ -327,9 +334,67 @@ BNetworkInterface::GetAddressAt(int32 index, BNetworkInterfaceAddress& address)
 }
 
 
+int32
+BNetworkInterface::FindAddress(const BNetworkAddress& address)
+{
+	int socket = ::socket(address.Family(), SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	FileDescriptorCloser closer(socket);
+
+	ifaliasreq request;
+	memset(&request, 0, sizeof(ifaliasreq));
+
+	strlcpy(request.ifra_name, Name(), IF_NAMESIZE);
+	request.ifra_index = -1;
+	memcpy(&request.ifra_addr, &address.SockAddr(), address.Length());
+	
+	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
+			< 0)
+		return errno;
+
+	return request.ifra_index;
+}
+
+
+int32
+BNetworkInterface::FindFirstAddress(int family)
+{
+	int socket = ::socket(family, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	FileDescriptorCloser closer(socket);
+
+	ifaliasreq request;
+	memset(&request, 0, sizeof(ifaliasreq));
+
+	strlcpy(request.ifra_name, Name(), IF_NAMESIZE);
+	request.ifra_index = -1;
+	request.ifra_addr.ss_family = AF_UNSPEC;
+	
+	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
+			< 0)
+		return errno;
+
+	return request.ifra_index;
+}
+
+
 status_t
 BNetworkInterface::AddAddress(const BNetworkInterfaceAddress& address)
 {
+	return do_ifaliasreq(Name(), B_SOCKET_ADD_ALIAS, address);
+}
+
+
+status_t
+BNetworkInterface::AddAddress(const BNetworkAddress& local)
+{
+	BNetworkInterfaceAddress address;
+	address.SetAddress(local);
+
 	return do_ifaliasreq(Name(), B_SOCKET_ADD_ALIAS, address);
 }
 
@@ -347,6 +412,16 @@ BNetworkInterface::RemoveAddress(const BNetworkInterfaceAddress& address)
 	ifreq request;
 	memcpy(&request.ifr_addr, &address.Address().SockAddr(),
 		address.Address().Length());
+
+	return do_request(request, Name(), B_SOCKET_REMOVE_ALIAS);
+}
+
+
+status_t
+BNetworkInterface::RemoveAddress(const BNetworkAddress& address)
+{
+	ifreq request;
+	memcpy(&request.ifr_addr, &address.SockAddr(), address.Length());
 
 	return do_request(request, Name(), B_SOCKET_REMOVE_ALIAS);
 }
