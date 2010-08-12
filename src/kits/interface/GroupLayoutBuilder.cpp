@@ -60,6 +60,13 @@ BGroupLayoutBuilder::GetTopLayout(BGroupLayout** _layout)
 	return *this;
 }
 
+// TopView
+BView*
+BGroupLayoutBuilder::TopView() const
+{
+	return TopLayout()->View();
+}
+
 // GetTopView
 BGroupLayoutBuilder&
 BGroupLayoutBuilder::GetTopView(BView** _view)

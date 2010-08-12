@@ -20,6 +20,7 @@ public:
 			BGroupLayout*		RootLayout() const;
 			BGroupLayout*		TopLayout() const;
 			BGroupLayoutBuilder& GetTopLayout(BGroupLayout** _layout);
+			BView*				TopView() const;
 			BGroupLayoutBuilder& GetTopView(BView** _view);
 
 			BGroupLayoutBuilder& Add(BView* view);
