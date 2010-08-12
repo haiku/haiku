@@ -715,7 +715,8 @@ TReplicantTray::HandleEntryUpdate(BMessage* message)
 			if (message->FindInt32("new device", &device) != B_OK)
 				break;
 
-			RunAddOnQuery(new BVolume(device), kEnabledPredicate);
+			BVolume volume(device);
+			RunAddOnQuery(&volume, kEnabledPredicate);
 			break;
 		}
 
