@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2010, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -45,7 +45,7 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 
 	BRadioButton* useSelection = NULL;
 	const float spacing = be_control_look->DefaultItemSpacing();
-	BView* layoutView = BGroupLayoutBuilder(B_VERTICAL, 5.0)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 5.0)
 		.SetInsets(spacing, spacing, spacing, spacing)
 		.Add(BGridLayoutBuilder()
 			.Add(fTextRadio = new BRadioButton(B_TRANSLATE("Use text:"),
@@ -57,11 +57,9 @@ FindWindow::FindWindow(BMessenger messenger, const BString& str,
 		.Add(fForwardSearchBox = new BCheckBox(B_TRANSLATE("Search forward")))
 		.Add(fMatchCaseBox = new BCheckBox(B_TRANSLATE("Match case")))
 		.Add(fMatchWordBox = new BCheckBox(B_TRANSLATE("Match word")))
-		.Add(fFindButton = new BButton(B_TRANSLATE("Find"), new BMessage(MSG_FIND)))
-		.End();
-	AddChild(layoutView);
-
-	layoutView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		.Add(fFindButton = new BButton(B_TRANSLATE("Find"),
+				new BMessage(MSG_FIND)))
+		.TopView());
 
 	fFindLabel->SetDivider(0.0);
 

@@ -26,6 +26,7 @@
 #include <ControlLook.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <MenuBar.h>
@@ -302,8 +303,6 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	if (settings.FindBool("show_rule", &showRule) != B_OK)
 		showRule = false;
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	float padding = be_control_look->DefaultItemSpacing();
 	BAlignment labelAlignment = be_control_look->DefaultLabelAlignment();
 	BAlignment fullAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
@@ -352,8 +351,6 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	item->SetTarget(this);
 	menu->AddItem(item);
 	menuBar->AddItem(menu);
-
-	AddChild(menuBar);
 	menuBar->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 
 	// MIME Types list
@@ -379,7 +376,8 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.Add(BSpaceLayoutItem::CreateGlue(), 1)
 		.Add(fIconView, 3)
 		.Add(BSpaceLayoutItem::CreateGlue(), 1)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.TopView());
 
 	// "File Recognition" group
 
@@ -413,7 +411,8 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fRuleControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fRuleControl->Hide();
 
-	BView* recognitionBoxGrid = BGridLayoutBuilder(padding, padding / 2)
+	BGridView* recognitionBoxGrid = new BGridView(padding, padding / 2);
+	BGridLayoutBuilder(recognitionBoxGrid)
 		.Add(fExtensionLabel->LabelView(), 0, 0)
 		.Add(scrollView, 0, 1, 2, 3)
 		.Add(fAddExtensionButton, 2, 1)
@@ -444,7 +443,8 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.Add(fTypeNameControl->CreateTextViewLayoutItem(), 1, 1, 2)
 		.Add(fDescriptionControl->CreateLabelLayoutItem(), 0, 2)
 		.Add(fDescriptionControl->CreateTextViewLayoutItem(), 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.View());
 
 	// "Preferred Application" group
 
@@ -469,7 +469,8 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.Add(fPreferredField)
 		.Add(fSelectButton)
 		.Add(fSameAsButton)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.TopView());
 
 	// "Extra Attributes" group
 
@@ -497,27 +498,31 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.Add(attributesScroller, 0, 0, 2, 3)
 		.Add(fAddAttributeButton, 2, 0)
 		.Add(fRemoveAttributeButton, 2, 1)
-		.SetInsets(padding, padding, padding, padding));
-
-	BView* topView = BGroupLayoutBuilder(B_HORIZONTAL, padding)
 		.SetInsets(padding, padding, padding, padding)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
-			.Add(typeListScrollView)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
-				.Add(addTypeButton)
-				.Add(fRemoveTypeButton)
-				.AddGlue()))
-		// Right side
-		.Add(BGroupLayoutBuilder(B_VERTICAL, padding)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
-				.Add(fIconBox, 1).Add(fRecognitionBox, 3))
-			.Add(fDescriptionBox)
-			.Add(fPreferredBox)
-			.Add(fAttributeBox, 5));
+		.View());
 
-	//topView->SetExplicitAlignment(fullAlignment);
-	//topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(topView);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, 0, 0, 0)
+		.Add(menuBar)
+		.AddGroup(B_HORIZONTAL, padding)
+			.SetInsets(padding, padding, padding, padding)
+			.AddGroup(B_VERTICAL, padding)
+				.Add(typeListScrollView)
+				.AddGroup(B_HORIZONTAL, padding)
+					.Add(addTypeButton)
+					.Add(fRemoveTypeButton)
+					.AddGlue()
+					.End()
+				.End()
+			// Right side
+			.AddGroup(B_VERTICAL, padding)
+				.AddGroup(B_HORIZONTAL, padding)
+					.Add(fIconBox, 1)
+					.Add(fRecognitionBox, 3)
+					.End()
+				.Add(fDescriptionBox)
+				.Add(fPreferredBox)
+				.Add(fAttributeBox, 5);
 
 	_SetType(NULL);
 	_ShowSnifferRule(showRule);

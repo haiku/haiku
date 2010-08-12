@@ -82,7 +82,8 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		.Add(fTypeControl, 0, 0, 2, 1)
 		.Add(fSelectTypeButton, 0, 1)
 		.Add(fSameTypeAsButton, 1, 1)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.View());
 
 	// "Icon" group
 
@@ -91,7 +92,8 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 	fIconView = new IconView("icon");
 	iconBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(fIconView)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.TopView());
 
 	// "Preferred Application" group
 
@@ -118,14 +120,15 @@ FileTypeWindow::FileTypeWindow(BPoint position, const BMessage& refs)
 		.Add(fPreferredField, 0, 0, 2, 1)
 		.Add(fSelectAppButton, 0, 1)
 		.Add(fSameAppAsButton, 1, 1)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.View());
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, padding)
+		.SetInsets(padding, padding, padding, padding)
 		.AddGroup(B_VERTICAL, padding)
 			.Add(fileTypeBox)
 			.Add(preferredBox)
 			.End()
-		.SetInsets(padding, padding, padding, padding)
 		.Add(iconBox);
 
 	fTypeControl->MakeFocus(true);

@@ -140,6 +140,6 @@ InitializeBFSEditor::_CreateViewControls()
 		.Add(fBlockSizeMF->CreateMenuBarLayoutItem(), 1, 1)
 
 		// row 3
-		.Add(fUseIndicesCB, 0, 2, 2)
+		.Add(fUseIndicesCB, 0, 2, 2).View()
 	;
 }

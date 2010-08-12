@@ -121,6 +121,7 @@ FontSelectionView::FontSelectionView(const char* name,
 	fPreviewBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(fPreviewText)
 		.SetInsets(5, 5, 5, 5)
+		.TopView()
 	);
 }
 

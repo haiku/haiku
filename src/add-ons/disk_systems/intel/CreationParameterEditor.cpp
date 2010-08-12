@@ -7,7 +7,7 @@
 #include "CreationParameterEditor.h"
 
 #include <DiskDeviceTypes.h>
-#include <GroupLayoutBuilder.h>
+#include <GroupView.h>
 #include <PartitionParameterEditor.h>
 #include <View.h>
 
@@ -20,9 +20,8 @@ PrimaryPartitionEditor::PrimaryPartitionEditor()
 	fParameters(NULL)
 {
 	fActiveCB = new BCheckBox("active", "Active partition", NULL);
-	fView = BGroupLayoutBuilder(B_VERTICAL)
-		.Add(fActiveCB)
-	;
+	fView = new BGroupView(B_VERTICAL);
+	fView->AddChild(fActiveCB);
 }
 
 

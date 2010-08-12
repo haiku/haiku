@@ -6,8 +6,7 @@
 #include <stdio.h>
 
 #include <Button.h>
-#include <GroupLayoutBuilder.h>
-#include <SpaceLayoutItem.h>
+#include <LayoutBuilder.h>
 #include <Screen.h>
 #include <TextControl.h>
 
@@ -35,35 +34,30 @@ NamePanel::NamePanel(const char* label, const char* text, BWindow* window,
 		new BMessage(MSG_PANEL_CANCEL));
 	fNameTC = new BTextControl(label, text, NULL);
 
-	BView* topView = BGroupLayoutBuilder(B_VERTICAL, 10)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 10)
 		.AddGlue()
 
 		// controls
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+		.AddGroup(B_HORIZONTAL, 5)
+			.AddStrut(5)
 
 			// text control
 			.Add(fNameTC->CreateLabelLayoutItem())
 			.Add(fNameTC->CreateTextViewLayoutItem())
-
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-		)
+			.AddStrut(5)
+			.End()
 
 		.AddGlue()
 
 		// buttons
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-			.Add(BSpaceLayoutItem::CreateGlue())
+		.AddGroup(B_HORIZONTAL, 5)
+			.AddGlue()
 			.Add(cancelButton)
 			.Add(defaultButton)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-		)
+			.AddStrut(5)
+			.End()
 
-		.AddGlue()
-	;
-
-	SetLayout(new BGroupLayout(B_HORIZONTAL));	
-	AddChild(topView);
+		.AddGlue();
 
 	SetDefaultButton(defaultButton);
 	fNameTC->MakeFocus(true);

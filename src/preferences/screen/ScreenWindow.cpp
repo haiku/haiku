@@ -222,12 +222,13 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		.AddGroup(B_HORIZONTAL, 0, 2, 1)
 			.Add(_CreateColumnRowButton(true, false))
 			.Add(_CreateColumnRowButton(true, true))
-		.End()
+			.End()
 		.AddTextControl(fRowsControl, 0, 2, B_ALIGN_RIGHT)
 		.AddGroup(B_HORIZONTAL, 0, 2, 2)
 			.Add(_CreateColumnRowButton(false, false))
 			.Add(_CreateColumnRowButton(false, true))
-		.End());
+			.End()
+		.View());
 
 	fBackgroundsButton = new BButton("BackgroundsButton",
 		"Set background" B_UTF8_ELLIPSIS,
@@ -239,8 +240,8 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	BBox* controlsBox = new BBox("controls box");
 	controlsBox->SetLabel(workspaceMenuField);
-	BView* outerControlsView = BLayoutBuilder::Group<>(B_VERTICAL, 10.0)
-		.SetInsets(10, 10, 10, 10);
+	BGroupView* outerControlsView = new BGroupView(B_VERTICAL, 10.0);
+	outerControlsView->GroupLayout()->SetInsets(10, 10, 10, 10);
 	controlsBox->AddChild(outerControlsView);
 
 	fResolutionMenu = new BPopUpMenu("resolution", true, true);
@@ -274,10 +275,6 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	fMonitorView->SetMaxResolution(maxWidth, maxHeight);
 
-	BRect rect(0.0, 0.0, 200.0, 15.0);
-	// fResolutionField needs to be at the correct
-	// left-top offset, because all other menu fields
-	// will be layouted relative to it
 	fResolutionField = new BMenuField("ResolutionMenu", "Resolution:",
 		fResolutionMenu, NULL);
 
@@ -297,8 +294,6 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 		fColorsMenu->AddItem(item);
 	}
-
-	rect.OffsetTo(B_ORIGIN);
 
 	fColorsField = new BMenuField("ColorsMenu", "Colors:", fColorsMenu, NULL);
 
@@ -440,15 +435,16 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			fTVStandardField->Hide();
 	}
 
-	BView* controlsView = BLayoutBuilder::Grid<>(5.0, 5.0)
-		.AddMenuField(fResolutionField, 0, 0, B_ALIGN_RIGHT)
-		.AddMenuField(fColorsField, 0, 1, B_ALIGN_RIGHT)
-		.AddMenuField(fRefreshField, 0, 2, B_ALIGN_RIGHT)
-		.AddMenuField(fCombineField, 0, 3, B_ALIGN_RIGHT)
-		.AddMenuField(fSwapDisplaysField, 0, 4, B_ALIGN_RIGHT)
-		.AddMenuField(fUseLaptopPanelField, 0, 5, B_ALIGN_RIGHT)
-		.AddMenuField(fTVStandardField, 0, 6, B_ALIGN_RIGHT);
-	outerControlsView->AddChild(controlsView);
+	BLayoutBuilder::Group<>(outerControlsView)
+		.AddGrid(5.0, 5.0)
+			.AddMenuField(fResolutionField, 0, 0, B_ALIGN_RIGHT)
+			.AddMenuField(fColorsField, 0, 1, B_ALIGN_RIGHT)
+			.AddMenuField(fRefreshField, 0, 2, B_ALIGN_RIGHT)
+			.AddMenuField(fCombineField, 0, 3, B_ALIGN_RIGHT)
+			.AddMenuField(fSwapDisplaysField, 0, 4, B_ALIGN_RIGHT)
+			.AddMenuField(fUseLaptopPanelField, 0, 5, B_ALIGN_RIGHT)
+			.AddMenuField(fTVStandardField, 0, 6, B_ALIGN_RIGHT)
+		.End();
 
 	// TODO: we don't support getting the screen's preferred settings
 	/* fDefaultsButton = new BButton(buttonRect, "DefaultsButton", "Defaults",
@@ -457,22 +453,21 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fApplyButton = new BButton("ApplyButton", "Apply",
 		new BMessage(BUTTON_APPLY_MSG));
 	fApplyButton->SetEnabled(false);
-	outerControlsView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-	outerControlsView->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL)
+	BLayoutBuilder::Group<>(outerControlsView)
 		.AddGlue()
-		.Add(fApplyButton));
+			.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fApplyButton);
 
 	fRevertButton = new BButton("RevertButton", "Revert",
 		new BMessage(BUTTON_REVERT_MSG));
 	fRevertButton->SetEnabled(false);
 
-	SetLayout(new BGroupLayout(B_VERTICAL, 10.0));
-	GetLayout()->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BLayoutBuilder::Group<>(static_cast<BGroupLayout*>(GetLayout()))
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 10.0)
 		.SetInsets(10, 10, 10, 10)
 		.AddGroup(B_HORIZONTAL, 10.0)
 			.AddGroup(B_VERTICAL)
+				.AddStrut(controlsBox->TopBorderOffset() - 1)
 				.Add(screenBox)
 			.End()
 			.Add(controlsBox)
@@ -480,10 +475,6 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		.AddGroup(B_HORIZONTAL, 10.0)
 			.Add(fRevertButton)
 			.AddGlue();
-
-	screenBox->Parent()->GetLayout()->AddItem(0,
-		BSpaceLayoutItem::CreateVerticalStrut(
-			controlsBox->TopBorderOffset() - 1));
 
 	_UpdateControls();
 	_UpdateMonitor();

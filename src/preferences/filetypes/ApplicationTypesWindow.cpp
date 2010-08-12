@@ -117,12 +117,11 @@ ProgressWindow::ProgressWindow(const char* message,
 	fAbortButton = new BButton("abort", B_TRANSLATE("Abort"),
 		new BMessage(B_CANCEL));
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 3.0f)
+	float padding = be_control_look->DefaultItemSpacing();
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(padding, padding, padding, padding)
 		.Add(fStatusBar)
-		.Add(fAbortButton)
-		.SetInsets(3.0f, 3.0f, 3.0f, 3.0f)
-	);
+		.Add(fAbortButton);
 
 	// center on screen
 	BScreen screen(this);
@@ -190,8 +189,6 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	BButton* button = new BButton("remove", B_TRANSLATE("Remove uninstalled"),
 		new BMessage(kMsgRemoveUninstalled));
 
-	SetLayout(BGroupLayoutBuilder(B_HORIZONTAL));
-
 	// "Information" group
 
 	BBox* infoBox = new BBox((char*)NULL);
@@ -215,7 +212,8 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 		.Add(fSignatureView->TextView(), 1, 1, 2)
 		.Add(fPathView->LabelView(), 0, 2)
 		.Add(fPathView->TextView(), 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.View());
 
 	// "Version" group
 
@@ -238,7 +236,8 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 		.Add(fVersionView->TextView(), 1, 0)
 		.Add(fDescriptionLabel->LabelView(), 0, 1)
 		.Add(fDescriptionView, 1, 1, 2, 2)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.View());
 
 	// Launch and Tracker buttons
 
@@ -249,7 +248,8 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fTrackerButton = new BButton(
 		B_TRANSLATE("Show in Tracker" B_UTF8_ELLIPSIS));
 
-	AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, padding)
+
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, padding)
 		.AddGroup(B_VERTICAL, padding, 3)
 			.Add(scrollView)
 			.AddGroup(B_HORIZONTAL)
@@ -257,19 +257,18 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 				.AddGlue()
 				.End()
 			.End()
-//			.AddGlue())//, 3)
 		.AddGroup(B_VERTICAL, padding)
 			.Add(infoBox)
 			.Add(versionBox)
 			.AddGroup(B_HORIZONTAL, padding)
-				.AddGlue()
 				.Add(fEditButton)
 				.Add(fLaunchButton)
 				.Add(fTrackerButton)
+				.AddGlue()
 				.End()
 			.AddGlue()
 			.End()
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding);
 
 	BMimeType::StartWatching(this);
 	_SetType(NULL);

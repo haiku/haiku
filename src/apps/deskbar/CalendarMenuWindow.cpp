@@ -129,7 +129,8 @@ CalendarMenuWindow::CalendarMenuWindow(BPoint where)
 	BView* view = BGroupLayoutBuilder(B_VERTICAL, 5.0)
 		.Add(gridLayout->View())
 		.Add(fCalendarView)
-		.SetInsets(5.0, 5.0, 5.0, 5.0);
+		.SetInsets(5.0, 5.0, 5.0, 5.0)
+		.TopView();
 	groupView->AddChild(view);
 	AddChild(groupView);
 

@@ -15,8 +15,6 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
@@ -84,8 +82,6 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		NULL
 	};
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
 	fWarnOnExit = new BCheckBox(
 		B_TRANSLATE("Confirm exit if active programs exist"),
 			new BMessage(MSG_WARN_ON_EXIT_CHANGED));
@@ -100,8 +96,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fFont = new BMenuField(B_TRANSLATE("Font:"), fontMenu);
 	fFontSize = new BMenuField(B_TRANSLATE("Size:"), sizeMenu);
 
-	BPopUpMenu* schemasPopUp =_MakeColorSchemaMenu(MSG_COLOR_SCHEMA_CHANGED, gPredefinedSchemas,
-		gPredefinedSchemas[0]);
+	BPopUpMenu* schemasPopUp =_MakeColorSchemaMenu(MSG_COLOR_SCHEMA_CHANGED,
+		gPredefinedSchemas, gPredefinedSchemas[0]);
 	fColorSchemaField = new BMenuField(B_TRANSLATE("Color schema:"),
 		schemasPopUp);
 
@@ -112,10 +108,12 @@ AppearancePrefView::AppearancePrefView(const char* name,
 			colorsPopUp);
 	fColorField->SetEnabled(false);
 
-	BView* layoutView = BLayoutBuilder::Group<>()
+	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
+	SetLayout(layout);
+	BLayoutBuilder::Group<>(layout)
 		.SetInsets(5, 5, 5, 5)
 		.AddGroup(B_VERTICAL, 5)
-			.Add(BGridLayoutBuilder(5, 5)
+			.AddGrid(5, 5)
 				.Add(fFont->CreateLabelLayoutItem(), 0, 0)
 				.Add(fFont->CreateMenuBarLayoutItem(), 1, 0)
 				.Add(fFontSize->CreateLabelLayoutItem(), 0, 1)
@@ -124,16 +122,12 @@ AppearancePrefView::AppearancePrefView(const char* name,
 				.Add(fColorSchemaField->CreateMenuBarLayoutItem(), 1, 2)
 				.Add(fColorField->CreateLabelLayoutItem(), 0, 3)
 				.Add(fColorField->CreateMenuBarLayoutItem(), 1, 3)
-				)
+			.	End()
 			.AddGroup(B_VERTICAL, 5)
 				.AddGlue()
 				.Add(fColorControl = new BColorControl(BPoint(10, 10),
 					B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
-				.Add(fWarnOnExit)
-			.End()
-		.End();
-
-	AddChild(layoutView);
+				.Add(fWarnOnExit);
 
 	fFont->SetAlignment(B_ALIGN_RIGHT);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
@@ -421,7 +415,8 @@ AppearancePrefView::_MakeSizeMenu(uint32 command, uint8 defaultSize)
 			if (sizes[i] > defaultSize) {
 				BString string;
 				string << defaultSize;
-				BMenuItem* item = new BMenuItem(string.String(), new BMessage(command));
+				BMenuItem* item = new BMenuItem(string.String(),
+					new BMessage(command));
 				item->SetMarked(true);
 				menu->AddItem(item, i);
 				break;

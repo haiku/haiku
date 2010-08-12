@@ -42,7 +42,6 @@ class PackageStatus : public BWindow {
 		bool Stopped();
 		
 	private:
-		BView *fBackground;
 		BStatusBar *fStatus;
 		StopButton *fButton;
 		bool fIsStopped;

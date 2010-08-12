@@ -23,6 +23,7 @@
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <GroupView.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <MenuBar.h>
@@ -308,7 +309,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(fSingleLaunchButton, 0, 0).Add(fArgsOnlyCheckBox, 1, 0)
 		.Add(fMultipleLaunchButton, 0, 1).Add(fBackgroundAppCheckBox, 1, 1)
 		.Add(fExclusiveLaunchButton, 0, 2)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.View());
 	flagsBox->SetLabel(fFlagsCheckBox);
 
 	// "Icon" group
@@ -319,7 +321,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	fIconView->SetModificationMessage(new BMessage(kMsgIconChanged));
 	iconBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(fIconView)
-		.SetInsets(padding, padding, padding, padding));
+		.SetInsets(padding, padding, padding, padding)
+		.TopView());
 
 	// "Supported Types" group
 
@@ -340,7 +343,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		new BMessage(kMsgRemoveType));
 
 	fTypeIconView = new IconView("type icon");
-	BView* iconHolder = BGroupLayoutBuilder(B_HORIZONTAL).Add(fTypeIconView);
+	BGroupView* iconHolder = new BGroupView(B_HORIZONTAL);
+	iconHolder->AddChild(fTypeIconView);
 	fTypeIconView->SetModificationMessage(new BMessage(kMsgTypeIconsChanged));
 
 	typeBox->AddChild(BGridLayoutBuilder(padding, padding)
@@ -351,7 +355,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.SetInsets(padding, padding, padding, padding)
 		.SetColumnWeight(0, 3)
 		.SetColumnWeight(1, 2)
-		.SetColumnWeight(2, 1));
+		.SetColumnWeight(2, 1)
+		.View());
 	iconHolder->SetExplicitAlignment(
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 
@@ -416,19 +421,22 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(longLabel, 0, 2)
 		.Add(scrollView, 1, 2, 10, 3)
 		.SetInsets(padding, padding, padding, padding)
-		.SetRowWeight(3, 3));
+		.SetRowWeight(3, 3)
+		.View());
 
 	// put it all together
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(menuBar);
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
-		.Add(fSignatureControl)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
-			.Add(flagsBox, 3)
-			.Add(iconBox, 1))
-		.Add(typeBox)
-		.Add(versionBox)
-		.SetInsets(padding, padding, padding, padding));
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, 0, 0, 0)
+		.Add(menuBar)
+		.AddGroup(B_VERTICAL, padding)
+			.SetInsets(padding, padding, padding, padding)
+			.Add(fSignatureControl)
+			.AddGroup(B_HORIZONTAL, padding)
+				.Add(flagsBox, 3)
+				.Add(iconBox, 1)
+				.End()
+			.Add(typeBox)
+			.Add(versionBox);
 
 	SetKeyMenuBar(menuBar);
 

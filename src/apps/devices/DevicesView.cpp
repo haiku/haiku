@@ -88,16 +88,17 @@ DevicesView::CreateLayout()
 	fTabView->AddTab(fAttributesView, fDetailedTab);
 	fDetailedTab->SetLabel("Detailed");
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL,0)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 				.Add(menuBar)
 				.Add(BSplitLayoutBuilder(B_HORIZONTAL, 5)
 					.Add(BGroupLayoutBuilder(B_VERTICAL, 5)
 						.Add(fOrderByMenu, 1)
 						.Add(scrollView, 2)
+						.TopView()
 					)
 					.Add(fTabView, 2)
 					.SetInsets(5, 5, 5, 5)
-				)
+				).TopView()
 			);
 }
 

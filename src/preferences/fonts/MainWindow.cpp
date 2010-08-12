@@ -19,12 +19,11 @@
 #include <Button.h>
 #include <Box.h>
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MessageRunner.h>
 #include <Screen.h>
-#include <SpaceLayoutItem.h>
 #include <TabView.h>
 #include <TextView.h>
 
@@ -62,22 +61,17 @@ MainWindow::MainWindow()
 
 	fFontsView->UpdateFonts();
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	const float kInset = 10;
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	const float kInset = be_control_look->DefaultItemSpacing();
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(kInset, kInset, kInset, kInset)
 		.Add(box)
 //		.Add(tabView)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(kInset))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.AddStrut(kInset)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(kInset))
+			.AddStrut(kInset)
 			.Add(fRevertButton)
-			.Add(BSpaceLayoutItem::CreateGlue())
-		)
-		.SetInsets(kInset, kInset, kInset, kInset)
-	);
+			.AddGlue();
 
 	if (fSettings.WindowCorner() == BPoint(-1, -1)) {
 		// center window on screen

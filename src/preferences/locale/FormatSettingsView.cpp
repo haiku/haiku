@@ -153,8 +153,6 @@ FormatView::FormatView(const BLocale& locale)
 	BView("WindowsSettingsView", B_FRAME_EVENTS),
 	fLocale(locale)
 {
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
 	fLongDateExampleView = new BStringView("", "");
 
 	for (int i = 0; i < 4; i++) {
@@ -248,7 +246,8 @@ FormatView::FormatView(const BLocale& locale)
 	formatBox->AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(beforeRadioButton)
 		.Add(afterRadioButton)
-		.SetInsets(spacing, 0, spacing, 0));
+		.SetInsets(spacing, 0, spacing, 0)
+		.TopView());
 
 	_UpdateExamples();
 	_ParseDateFormat();
@@ -263,62 +262,60 @@ FormatView::FormatView(const BLocale& locale)
 	fNumbersBox->SetLabel(B_TRANSLATE("Numbers"));
 	fCurrencyBox->SetLabel(B_TRANSLATE("Currency"));
 
-	fDateBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL)
-		.AddGroup(B_VERTICAL, spacing / 2)
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(new BStringView("", B_TRANSLATE("Long format:")))
-				.Add(fLongDateExampleView)
-				.AddGlue()
-				.End()
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(fLongDateMenu[0])
-				.Add(fLongDateSeparator[0])
-				.End()
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(fLongDateMenu[1])
-				.Add(fLongDateSeparator[1])
-				.End()
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(fLongDateMenu[2])
-				.Add(fLongDateSeparator[2])
-				.End()
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(fLongDateMenu[3])
-				.Add(fLongDateSeparator[3])
-				.End()
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(new BStringView("", B_TRANSLATE("Short format:")))
-				.Add(fShortDateExampleView)
-				.AddGlue()
-				.End()
-			.Add(fDateMenu[0])
-			.Add(fDateMenu[1])
-			.Add(fDateMenu[2])
+	fDateBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
+		.SetInsets(spacing, spacing, spacing, spacing)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(new BStringView("", B_TRANSLATE("Long format:")))
+			.Add(fLongDateExampleView)
+			.AddGlue()
 			.End()
-		.SetInsets(spacing, spacing, spacing, spacing));
-
-	fTimeBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
-		.AddGroup(B_VERTICAL, spacing / 2)
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(new BStringView("", B_TRANSLATE("Long format:")))
-				.Add(fLongTimeExampleView)
-				.AddGlue()
-				.End()
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(new BStringView("", B_TRANSLATE("Short format:")))
-				.Add(fShortTimeExampleView)
-				.AddGlue()
-				.End()
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(f24HrRadioButton)
-				.Add(f12HrRadioButton)
-				.AddGlue()
-				.End()
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(fLongDateMenu[0])
+			.Add(fLongDateSeparator[0])
 			.End()
-		.SetInsets(spacing, spacing, spacing, spacing));
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(fLongDateMenu[1])
+			.Add(fLongDateSeparator[1])
+			.End()
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(fLongDateMenu[2])
+			.Add(fLongDateSeparator[2])
+			.End()
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(fLongDateMenu[3])
+			.Add(fLongDateSeparator[3])
+			.End()
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(new BStringView("", B_TRANSLATE("Short format:")))
+			.Add(fShortDateExampleView)
+			.AddGlue()
+			.End()
+		.Add(fDateMenu[0])
+		.Add(fDateMenu[1])
+		.Add(fDateMenu[2])
+		.View());
 
-	fNumbersBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
-		.AddGroup(B_VERTICAL, spacing / 2)
+	fTimeBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
+		.SetInsets(spacing, spacing, spacing, spacing)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(new BStringView("", B_TRANSLATE("Long format:")))
+			.Add(fLongTimeExampleView)
+			.AddGlue()
+			.End()
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(new BStringView("", B_TRANSLATE("Short format:")))
+			.Add(fShortTimeExampleView)
+			.AddGlue()
+			.End()
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(f24HrRadioButton)
+			.Add(f12HrRadioButton)
+			.AddGlue()
+			.End()
+		.View());
+
+	fNumbersBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
+		.SetInsets(spacing, spacing, spacing, spacing)
 			.AddGroup(B_HORIZONTAL, spacing)
 				.Add(new BStringView("", B_TRANSLATE("Example:")))
 				.Add(fNumberFormatExampleView)
@@ -328,23 +325,25 @@ FormatView::FormatView(const BLocale& locale)
 			.Add(numberDecimal)
 			.Add(numberLeadingZero)
 			.Add(numberList)
-			.End()
-		.SetInsets(spacing, spacing, spacing, spacing));
+			.View());
 
-	fCurrencyBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
-		.AddGroup(B_VERTICAL, spacing / 2)
-			.Add(currencySymbol)
-			.Add(currencyNegative)
-			.Add(currencyDecimal)
-			.Add(currencyLeadingZero)
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(formatBox)
-				.AddGlue()
-				.End()
+	fCurrencyBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
+		.SetInsets(spacing, spacing, spacing, spacing)
+		.Add(currencySymbol)
+		.Add(currencyNegative)
+		.Add(currencyDecimal)
+		.Add(currencyLeadingZero)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(formatBox)
+			.AddGlue()
 			.End()
-		.SetInsets(spacing, spacing, spacing, spacing));
+		.View());
 
-	AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
+	
+	BGroupLayout* rootLayout = new BGroupLayout(B_HORIZONTAL, spacing);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLayout(rootLayout);
+	BLayoutBuilder::Group<>(rootLayout)
 		.AddGroup(B_VERTICAL, spacing)
 			.Add(fDateBox)
 			.Add(fTimeBox)
@@ -353,8 +352,7 @@ FormatView::FormatView(const BLocale& locale)
 		.AddGroup(B_VERTICAL, spacing)
 			.Add(fNumbersBox)
 			.Add(fCurrencyBox)
-			.AddGlue()
-			.End());
+			.AddGlue();
 }
 
 

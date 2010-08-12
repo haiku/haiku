@@ -11,8 +11,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayout.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -120,10 +119,6 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 	fMimeType(type.Type()),
 	fExtension(extension)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	float padding = be_control_look->DefaultItemSpacing();
-
 	fExtensionControl = new BTextControl(B_TRANSLATE("Extension:"),
 		extension, NULL);
 	fExtensionControl->SetModificationMessage(
@@ -145,13 +140,12 @@ ExtensionWindow::ExtensionWindow(FileTypesWindow* target, BMimeType& type,
 	BButton* button = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
-	AddChild(BGridLayoutBuilder(padding, padding)
-		.Add(fExtensionControl->CreateLabelLayoutItem(), 0, 0)
-		.Add(fExtensionControl->CreateTextViewLayoutItem(), 1, 0)
-		.Add(fAcceptButton, 0, 1)
-		.Add(button, 1, 1)
+	float padding = be_control_look->DefaultItemSpacing();
+	BLayoutBuilder::Grid<>(this, padding, padding)
 		.SetInsets(padding, padding, padding, padding)
-	);
+		.AddTextControl(fExtensionControl, 0, 0)
+		.Add(fAcceptButton, 0, 1)
+		.Add(button, 1, 1);
 
 	// omit the leading dot
 	if (fExtension.ByteAt(0) == '.')
