@@ -421,7 +421,7 @@ BString::operator[](int32 index) const
 inline char
 BString::ByteAt(int32 index) const
 {
-	if (!fPrivateData || index < 0 || index > Length())
+	if (!fPrivateData || index < 0 || index >= Length())
 		return 0;
 	return fPrivateData[index];
 }
