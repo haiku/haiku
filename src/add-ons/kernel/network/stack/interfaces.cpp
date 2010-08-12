@@ -183,7 +183,7 @@ InterfaceAddress::SetTo(const ifaliasreq& request)
 {
 	status_t status = SetLocal((const sockaddr*)&request.ifra_addr);
 	if (status == B_OK)
-		status = SetDestination((const sockaddr*)&request.ifra_broadaddr);	
+		status = SetDestination((const sockaddr*)&request.ifra_broadaddr);
 	if (status == B_OK)
 		status = SetMask((const sockaddr*)&request.ifra_mask);
 
@@ -295,7 +295,7 @@ InterfaceAddress::Dump(size_t index, bool hideInterface)
 		kprintf("%2zu. ", index);
 	else
 		kprintf("    ");
-	
+
 	if (!hideInterface) {
 		kprintf("interface:   %p (%s)\n    ", interface,
 			interface != NULL ? interface->name : "-");
@@ -325,7 +325,7 @@ InterfaceAddress::Dump(size_t index, bool hideInterface)
 	} else
 		strcpy(buffer, "-");
 	kprintf("    destination: %s\n", buffer);
-	
+
 	kprintf("    ref count:   %" B_PRId32 "\n", CountReferences());
 }
 
@@ -567,7 +567,7 @@ Interface::AddAddress(InterfaceAddress* address)
 	RecursiveLocker locker(fLock);
 	fAddresses.Add(address);
 	locker.Unlock();
-	
+
 	MutexLocker hashLocker(sHashLock);
 	sAddressTable.Insert(address);
 	return B_OK;
@@ -587,7 +587,7 @@ Interface::RemoveAddress(InterfaceAddress* address)
 	address->GetDoublyLinkedListLink()->next = NULL;
 
 	locker.Unlock();
-	
+
 	MutexLocker hashLocker(sHashLock);
 	sAddressTable.Remove(address);
 }
@@ -623,10 +623,10 @@ InterfaceAddress*
 Interface::AddressAt(size_t index)
 {
 	RecursiveLocker locker(fLock);
-	
+
 	AddressList::Iterator iterator = fAddresses.GetIterator();
 	size_t i = 0;
-	
+
 	while (InterfaceAddress* address = iterator.Next()) {
 		if (i++ == index) {
 			address->AcquireReference();
@@ -642,10 +642,10 @@ int32
 Interface::IndexOfAddress(InterfaceAddress* address)
 {
 	RecursiveLocker locker(fLock);
-	
+
 	AddressList::Iterator iterator = fAddresses.GetIterator();
 	int32 index = 0;
-	
+
 	while (iterator.HasNext()) {
 		if (address == iterator.Next())
 			return index;
@@ -718,7 +718,7 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 
 			return status;
 		}
-		
+
 		case B_SOCKET_SET_ALIAS:
 		{
 			if (length != sizeof(ifaliasreq))
@@ -750,8 +750,10 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 						return B_NO_MEMORY;
 
 					status_t status = AddAddress(address);
-					if (status != B_OK)
+					if (status != B_OK) {
+						delete address;
 						return status;
+					}
 
 					// Note, even if setting the address failed, the empty
 					// address added here will still be added to the interface.
@@ -808,7 +810,7 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 				return B_BAD_VALUE;
 
 			RecursiveLocker locker(fLock);
-			
+
 			InterfaceAddress* address = NULL;
 			sockaddr_storage newAddress;
 
@@ -829,7 +831,7 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 							address->local, (sockaddr*)&newAddress))
 						break;
 				}
-				
+
 				if (address == NULL)
 					return B_BAD_VALUE;
 			} else {
@@ -842,8 +844,10 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 						return B_NO_MEMORY;
 
 					status_t status = AddAddress(address);
-					if (status != B_OK)
+					if (status != B_OK) {
+						delete address;
 						return status;
+					}
 
 					// Note, even if setting the address failed, the empty
 					// address added here will still be added to the interface.
@@ -906,7 +910,7 @@ status_t
 Interface::CreateDomainDatalinkIfNeeded(net_domain* domain)
 {
 	RecursiveLocker locker(fLock);
-	
+
 	if (fDatalinkTable.Lookup(domain->family) != NULL)
 		return B_OK;
 
@@ -955,7 +959,7 @@ Interface::DomainDatalink(uint8 family)
 	// Note: domain datalinks cannot be removed while the interface is alive,
 	// since this would require us either to hold the lock while calling this
 	// function, or introduce reference counting for the domain_datalink
-	// structure. 
+	// structure.
 	RecursiveLocker locker(fLock);
 	return fDatalinkTable.Lookup(family);
 }
@@ -1146,7 +1150,7 @@ add_interface(const char* name, net_domain_private* domain,
 	const ifaliasreq& request, net_device_interface* deviceInterface)
 {
 	MutexLocker locker(sLock);
-	
+
 	if (find_interface(name) != NULL)
 		return B_NAME_IN_USE;
 
@@ -1184,7 +1188,7 @@ remove_interface(Interface* interface)
 	locker.Unlock();
 
 	notify_interface_removed(interface);
-	
+
 	interface->ReleaseReference();
 }
 
@@ -1330,7 +1334,7 @@ get_interface(net_domain* domain, uint32 index)
 
 	if (index == 0)
 		return sInterfaces.First();
-	
+
 	Interface* interface = find_interface(index);
 	if (interface == NULL)
 		return NULL;
@@ -1375,7 +1379,7 @@ get_interface_for_device(net_domain* domain, uint32 index)
 			return interface;
 		}
 	}
-	
+
 	return NULL;
 }
 
@@ -1436,7 +1440,7 @@ get_interface_address_for_destination(net_domain* domain,
 	const sockaddr* destination)
 {
 	MutexLocker locker(sLock);
-	
+
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
 		InterfaceAddress* address
