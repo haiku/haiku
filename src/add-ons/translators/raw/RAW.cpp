@@ -2036,8 +2036,12 @@ DCRaw::_ConvertToRGB()
 	}
 
 	if (1/*verbose*/) {
-		fprintf(stderr, fRawColor ? "Building histograms...\n"
-			: "Converting to %s colorspace...\n", name[fOutputColor - 1]);
+		if (fRawColor)
+			fprintf(stderr, "Building histograms...\n");
+		else {
+			fprintf(stderr, "Converting to %s colorspace...\n",
+				name[fOutputColor - 1]);
+		}
 	}
 
 	ushort* img = fImageData[0];
