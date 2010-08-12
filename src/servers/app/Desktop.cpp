@@ -1360,6 +1360,8 @@ Desktop::SetWindowTabLocation(Window* window, float location)
 	if (changed)
 		_RebuildAndRedrawAfterWindowChange(window, dirty);
 
+	InvokeSetWindowTabLocation(window, location);
+
 	return changed;
 }
 

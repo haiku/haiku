@@ -51,6 +51,9 @@ public:
 	virtual void				MinimizeWindow(Window* window,
 									bool minimize) = 0;
 
+	virtual void				SetWindowTabLocation(Window* window,
+									float location) = 0;
+
 	virtual bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings) = 0;
 	virtual void				GetDecoratorSettings(Window* window,
@@ -93,6 +96,9 @@ public:
 		void				InvokeShowWindow(Window* window);
 		void				InvokeHideWindow(Window* window);
 		void				InvokeMinimizeWindow(Window* window, bool minimize);
+
+		void				InvokeSetWindowTabLocation(Window* window,
+								float location);
 
 		bool				InvokeSetDecoratorSettings(Window* window,
 								const BMessage& settings);

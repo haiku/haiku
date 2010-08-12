@@ -187,6 +187,18 @@ DesktopObservable::InvokeSendWindowBehind(Window* window, Window* behindOf)
 }
 
 
+void
+DesktopObservable::InvokeSetWindowTabLocation(Window* window, float location)
+{
+	if (fWeAreInvoking)
+		return;
+	InvokeGuard invokeGuard(fWeAreInvoking);
+
+	FOR_ALL_DESKTOP_LISTENER
+		listener->SetWindowTabLocation(window, location);
+}
+
+
 bool
 DesktopObservable::InvokeSetDecoratorSettings(Window* window,
 	const BMessage& settings)
