@@ -146,10 +146,10 @@ BNetworkAddressResolver::SetTo(int family, const char* host,
 
 	addrinfo hint = {0};
 	hint.ai_family = family;
-	if ((flags & B_UNCONFIGURED_ADDRESS_FAMILIES) == 0)
-		hint.ai_flags |= AI_ADDRCONFIG;
 	if ((flags & B_NO_ADDRESS_RESOLUTION) != 0)
 		hint.ai_flags |= AI_NUMERICHOST;
+	else if ((flags & B_UNCONFIGURED_ADDRESS_FAMILIES) == 0)
+		hint.ai_flags |= AI_ADDRCONFIG;
 
 	if (host == NULL && portString.Length() == 0) {
 		portString = "0";
