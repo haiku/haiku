@@ -2162,13 +2162,16 @@ BDiscreteParameter::Unflatten(type_code code, const void* buffer, ssize_t size)
 				buffer)) < B_OK)
 			return B_BAD_DATA;
 
-		if (size_left(size, bufferStart, buffer) < (int)sizeof(int32))
+		if (size_left(size, bufferStart, buffer) < (int)sizeof(int32)) {
+			free(name);
 			return B_BAD_DATA;
+		}
 
 		int32 value = read_from_buffer_swap32<int32>(&buffer,
 			SwapOnUnflatten());
 
 		AddItem(value, name);
+		free(name);
 	}
 
 	return B_OK;
