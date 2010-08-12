@@ -164,10 +164,10 @@ BString	MediaString::getStringFor(
 		case B_MEDIA_ENCODED_AUDIO:		return "Encoded audio";
 		case B_MEDIA_ENCODED_VIDEO:		return "Encoded video";
 		default: {
-			if (type >= B_MEDIA_PRIVATE)
-				return "Private Be media type";
 			if (type >= B_MEDIA_FIRST_USER_TYPE)
 				return "User-defined media type";
+			if (type >= B_MEDIA_PRIVATE)
+				return "Private Be media type";
 		}
 	}
 	return "Unknown Media Type";
