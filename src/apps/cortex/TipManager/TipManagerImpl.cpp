@@ -104,8 +104,8 @@ status_t _ViewEntry::add(BView* pView, const tip_entry& tipEntry) {
 	// [e.moon 13oct99] ref'd by pointer
 	tip_entry_set::iterator itFound = viewEntry->m_tips.find(newTipEntry);
 	if(itFound != viewEntry->m_tips.end()) {
-		viewEntry->m_tips.erase(itFound);
 		delete *itFound;
+		viewEntry->m_tips.erase(itFound);
 	}
 	
 	pair<tip_entry_set::iterator, bool> ret;
@@ -163,10 +163,10 @@ status_t _ViewEntry::remove(
 		tip_entry matchEntry(rect);
 		tip_entry_set::iterator it = viewEntry->m_tips.lower_bound(&matchEntry);
 		tip_entry_set::iterator itEnd = viewEntry->m_tips.upper_bound(&matchEntry);
-		for(; it != itEnd; ++it) {
+		while(it != itEnd) {
 			// found one; erase it
 			delete *it;
-			viewEntry->m_tips.erase(it);
+			viewEntry->m_tips.erase(it++);
 		}
 	}
 	else {
