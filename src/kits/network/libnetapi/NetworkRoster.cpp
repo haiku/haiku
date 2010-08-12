@@ -15,6 +15,13 @@
 #include <AutoDeleter.h>
 
 
+// TODO: using AF_INET for the socket isn't really a smart idea, as one
+// could completely remove IPv4 support from the stack easily.
+// Since in the stack, device_interfaces are pretty much interfaces now, we
+// could get rid of them more or less, and make AF_LINK provide the same
+// information as AF_INET for the interface functions mostly.
+
+
 BNetworkRoster BNetworkRoster::sDefault;
 
 
@@ -101,16 +108,37 @@ BNetworkRoster::GetNextInterface(uint32* cookie,
 status_t
 BNetworkRoster::AddInterface(const BNetworkInterface& interface)
 {
-	// TODO: implement me
-	return B_NOT_SUPPORTED;
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	ifaliasreq request;
+	memset(&request, 0, sizeof(ifaliasreq));
+	strlcpy(request.ifra_name, interface.Name(), IF_NAMESIZE);
+
+	if (ioctl(socket, SIOCAIFADDR, &request, sizeof(request)) != 0)
+		return errno;
+
+	return B_OK;
 }
 
 
 status_t
 BNetworkRoster::RemoveInterface(const BNetworkInterface& interface)
 {
-	// TODO: implement me
-	return B_NOT_SUPPORTED;
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	ifreq request;
+	strlcpy(request.ifr_name, interface.Name(), IF_NAMESIZE);
+
+	request.ifr_addr.sa_family = AF_UNSPEC;
+
+	if (ioctl(socket, SIOCDIFADDR, &request, sizeof(request)) != 0)
+		return errno;
+
+	return B_OK;
 }
 
 
