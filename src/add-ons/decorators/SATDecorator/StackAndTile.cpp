@@ -41,7 +41,7 @@ StackAndTile::ListenerRegistered(Desktop* desktop)
 	WindowList& windows = desktop->AllWindows();
 	for (Window *window = windows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList))
-		AddWindow(window);
+		WindowAdded(window);
 }
 
 
@@ -58,7 +58,7 @@ StackAndTile::ListenerUnregistered()
 
 
 void
-StackAndTile::AddWindow(Window* window)
+StackAndTile::WindowAdded(Window* window)
 {
 	SATWindow* satWindow = new (std::nothrow)SATWindow(this, window);
 	if (!satWindow)
@@ -70,7 +70,7 @@ StackAndTile::AddWindow(Window* window)
 
 
 void
-StackAndTile::RemoveWindow(Window* window)
+StackAndTile::WindowRemoved(Window* window)
 {
 	STRACE_SAT("StackAndTile::WindowRemoved %s\n", window->Title());
 
@@ -86,7 +86,7 @@ StackAndTile::RemoveWindow(Window* window)
 
 
 void
-StackAndTile::KeyEvent(uint32 what, int32 key, int32 modifiers)
+StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 {
 	// switch to and from stacking and snapping mode
 	if (what == B_MODIFIERS_CHANGED) {
@@ -138,7 +138,7 @@ StackAndTile::MouseUp(Window* window, BMessage* message, const BPoint& where)
 
 
 void
-StackAndTile::MoveWindow(Window* window)
+StackAndTile::WindowMoved(Window* window)
 {
 	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
@@ -152,14 +152,14 @@ StackAndTile::MoveWindow(Window* window)
 
 
 void
-StackAndTile::ResizeWindow(Window* window)
+StackAndTile::WindowResized(Window* window)
 {
-	MoveWindow(window);
+	WindowMoved(window);
 }
 
 
 void
-StackAndTile::ActivateWindow(Window* window)
+StackAndTile::WindowActitvated(Window* window)
 {
 	SATWindow*	satWindow = GetSATWindow(window);
 	if (!satWindow)
@@ -170,7 +170,7 @@ StackAndTile::ActivateWindow(Window* window)
 
 
 void
-StackAndTile::SendWindowBehind(Window* window, Window* behindOf)
+StackAndTile::WindowSentBehind(Window* window, Window* behindOf)
 {
 	SATWindow*	satWindow = GetSATWindow(window);
 	if (!satWindow)
@@ -191,7 +191,7 @@ StackAndTile::SendWindowBehind(Window* window, Window* behindOf)
 
 
 void
-StackAndTile::SetWindowWorkspaces(Window* window, uint32 workspaces)
+StackAndTile::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 {
 	SATWindow*	satWindow = GetSATWindow(window);
 	if (!satWindow)
@@ -212,21 +212,7 @@ StackAndTile::SetWindowWorkspaces(Window* window, uint32 workspaces)
 
 
 void
-StackAndTile::ShowWindow(Window* window)
-{
-
-}
-
-
-void
-StackAndTile::HideWindow(Window* window)
-{
-
-}
-
-
-void
-StackAndTile::MinimizeWindow(Window* window, bool minimize)
+StackAndTile::WindowMinimized(Window* window, bool minimize)
 {
 	SATWindow*	satWindow = GetSATWindow(window);
 	if (!satWindow)
@@ -247,7 +233,7 @@ StackAndTile::MinimizeWindow(Window* window, bool minimize)
 
 
 void
-StackAndTile::SetWindowTabLocation(Window* window, float location)
+StackAndTile::WindowTabLocationChanged(Window* window, float location)
 {
 	SATWindow*	satWindow = GetSATWindow(window);
 	if (!satWindow)

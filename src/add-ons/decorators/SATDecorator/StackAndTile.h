@@ -44,10 +44,10 @@ public:
 	virtual void			ListenerRegistered(Desktop* desktop);
 	virtual	void			ListenerUnregistered();
 
-	virtual void			AddWindow(Window* window);
-	virtual void			RemoveWindow(Window* window);
+	virtual void			WindowAdded(Window* window);
+	virtual void			WindowRemoved(Window* window);
 	
-	virtual void			KeyEvent(uint32 what, int32 key,
+	virtual void			KeyPressed(uint32 what, int32 key,
 								int32 modifiers);
 	virtual void			MouseEvent(BMessage* message) {}
 	virtual void			MouseDown(Window* window, BMessage* message,
@@ -57,18 +57,15 @@ public:
 	virtual void			MouseMoved(Window* window, BMessage* message,
 									const BPoint& where) {}
 
-	virtual void			MoveWindow(Window* window);
-	virtual void			ResizeWindow(Window* window);
-	virtual void			ActivateWindow(Window* window);
-	virtual void			SendWindowBehind(Window* window,
-									Window* behindOf);
-	virtual void			SetWindowWorkspaces(Window* window,
+	virtual void			WindowMoved(Window* window);
+	virtual void			WindowResized(Window* window);
+	virtual void			WindowActitvated(Window* window);
+	virtual void			WindowSentBehind(Window* window, Window* behindOf);
+	virtual void			WindowWorkspacesChanged(Window* window,
 									uint32 workspaces);
-	virtual void			ShowWindow(Window* window);
-	virtual void			HideWindow(Window* window);
-	virtual void			MinimizeWindow(Window* window, bool minimize);
+	virtual void			WindowMinimized(Window* window, bool minimize);
 
-	virtual void			SetWindowTabLocation(Window* window,
+	virtual void			WindowTabLocationChanged(Window* window,
 								float location);
 
 	virtual bool			SetDecoratorSettings(Window* window,
