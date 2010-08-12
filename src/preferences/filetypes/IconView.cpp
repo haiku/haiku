@@ -1088,10 +1088,14 @@ IconView::ShowIconHeap(bool show)
 			if (data == NULL) {
 				// no vector icon or failed to get bitmap
 				// try bitmap icon
-				data = resources->LoadResource(B_LARGE_ICON_TYPE, "icon heap", NULL);
+				data = resources->LoadResource(B_LARGE_ICON_TYPE, "icon heap",
+					NULL);
 				if (data != NULL) {
 					fHeapIcon = Icon::AllocateBitmap(B_LARGE_ICON, B_CMAP8);
-					memcpy(fHeapIcon->Bits(), data, fHeapIcon->BitsLength());
+					if (fHeapIcon != NULL) {
+						memcpy(fHeapIcon->Bits(), data,
+							fHeapIcon->BitsLength());
+					}
 				}
 			}
 		}
