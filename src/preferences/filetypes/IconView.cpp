@@ -1210,6 +1210,10 @@ IconView::_AddOrEditIcon()
 			// can be preserved. Maybe in a second (optional) attribute
 			// where ever a vector icon attribute is present?
 		}
+
+		if (icon != fIconData) {
+			delete icon;
+		}
 	}
 
 	be_roster->Launch("application/x-vnd.haiku-icon_o_matic", &message);
