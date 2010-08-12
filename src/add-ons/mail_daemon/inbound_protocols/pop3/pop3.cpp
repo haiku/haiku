@@ -640,7 +640,7 @@ POP3Protocol::ReceiveLine(BString &line)
 status_t
 POP3Protocol::SendCommand(const char *cmd)
 {
-	if (fSocket < 0 || fSocket > FD_SETSIZE)
+	if (fSocket < 0 || fSocket >= FD_SETSIZE)
 		return B_FILE_ERROR;
 
 	//printf(cmd);
