@@ -1211,9 +1211,8 @@ IconView::_AddOrEditIcon()
 			// where ever a vector icon attribute is present?
 		}
 
-		if (icon != fIconData) {
+		if (icon != fIconData)
 			delete icon;
-		}
 	}
 
 	be_roster->Launch("application/x-vnd.haiku-icon_o_matic", &message);
