@@ -122,6 +122,8 @@ public:
 			InterfaceAddress*	FirstUnconfiguredForFamily(int family);
 			InterfaceAddress*	AddressForDestination(net_domain* domain,
 									const sockaddr* destination);
+			InterfaceAddress*	AddressForLocal(net_domain* domain,
+									const sockaddr* local);
 
 			status_t			AddAddress(InterfaceAddress* address);
 			void				RemoveAddress(InterfaceAddress* address);

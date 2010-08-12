@@ -535,6 +535,28 @@ Interface::AddressForDestination(net_domain* domain,
 }
 
 
+/*!	Returns a reference to the InterfaceAddress that has the specified
+	\a local address.
+*/
+InterfaceAddress*
+Interface::AddressForLocal(net_domain* domain, const sockaddr* local)
+{
+	RecursiveLocker locker(fLock);
+
+	AddressList::Iterator iterator = fAddresses.GetIterator();
+	while (InterfaceAddress* address = iterator.Next()) {
+		if (address->domain == domain
+			&& address->local != NULL
+			&& domain->address_module->equal_addresses(address->local, local)) {
+			address->AcquireReference();
+			return address;
+		}
+	}
+
+	return NULL;
+}
+
+
 status_t
 Interface::AddAddress(InterfaceAddress* address)
 {
@@ -690,7 +712,21 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 					!= B_OK)
 				return B_BAD_ADDRESS;
 
-			InterfaceAddress* address = AddressAt(aliasRequest.ifra_index);
+			InterfaceAddress* address = NULL;
+			if (aliasRequest.ifra_index < 0) {
+				if (!domain->address_module->is_empty_address(
+						(const sockaddr*)&aliasRequest.ifra_addr, false)) {
+					// Find first address that matches the local address
+					address = AddressForLocal(domain,
+						(const sockaddr*)&aliasRequest.ifra_addr);
+				}
+				if (address == NULL) {
+					// Find first address for family
+					address = FirstForFamily(domain->family);
+				}
+			} else
+				address = AddressAt(aliasRequest.ifra_index);
+
 			if (address == NULL)
 				return B_BAD_VALUE;
 
@@ -706,14 +742,18 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 			}
 
 			if (status == B_OK && !domain->address_module->equal_addresses(
-					(sockaddr*)&aliasRequest.ifra_mask, address->mask)) {
+					(sockaddr*)&aliasRequest.ifra_mask, address->mask)
+				&& !domain->address_module->is_empty_address(
+					(sockaddr*)&aliasRequest.ifra_mask, false)) {
 				status = _ChangeAddress(locker, address, SIOCSIFNETMASK,
 					address->mask, (sockaddr*)&aliasRequest.ifra_mask);
 			}
 
 			if (status == B_OK && !domain->address_module->equal_addresses(
 					(sockaddr*)&aliasRequest.ifra_destination,
-					address->destination)) {
+					address->destination)
+				&& !domain->address_module->is_empty_address(
+					(sockaddr*)&aliasRequest.ifra_destination, false)) {
 				status = _ChangeAddress(locker, address,
 					(domain->address_module->flags
 						& NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS) != 0
