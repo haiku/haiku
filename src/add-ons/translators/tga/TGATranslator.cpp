@@ -875,8 +875,11 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 	const color_map *pmap = NULL;
 	if (fromspace == B_CMAP8) {
 		pmap = system_colors();
-		if (!pmap)
+		if (!pmap) {
+			delete[] tgaRowData;
+			delete[] bitsRowData;
 			return B_ERROR;
+		}
 	}
 	while (rd == bitsRowBytes) {
 		status_t bytescopied;
