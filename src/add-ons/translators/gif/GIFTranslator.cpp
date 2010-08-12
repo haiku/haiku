@@ -124,7 +124,10 @@ GetBitmap(BPositionIO *in, BBitmap **out)
 	}
 	err = in->Read(bits, header.dataSize);
 	if (err == (status_t)header.dataSize) return B_OK;
-	else return B_IO_ERROR;
+	else {
+		delete bitmap;
+		return B_IO_ERROR;
+	}
 }
 
 
