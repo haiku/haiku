@@ -775,8 +775,21 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 			if (user_memcpy(&request, argument, sizeof(ifaliasreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			InterfaceAddress* address
-				= interface->AddressAt(request.ifra_index);
+			InterfaceAddress* address = NULL;
+			if (request.ifra_index < 0) {
+				if (!protocol->domain->address_module->is_empty_address(
+						(const sockaddr*)&request.ifra_addr, false)) {
+					// Find first address that matches the local address
+					address = interface->AddressForLocal(protocol->domain,
+						(const sockaddr*)&request.ifra_addr);
+				}
+				if (address == NULL) {
+					// Find first address for family
+					address = interface->FirstForFamily(
+						protocol->domain->family);
+				}
+			} else
+				address = interface->AddressAt(request.ifra_index);
 			if (address == NULL)
 				return B_BAD_VALUE;
 
