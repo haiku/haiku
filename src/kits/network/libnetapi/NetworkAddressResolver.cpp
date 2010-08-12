@@ -6,6 +6,7 @@
 
 #include <NetworkAddressResolver.h>
 
+#include <errno.h>
 #include <netdb.h>
 
 #include <NetworkAddress.h>
@@ -157,12 +158,44 @@ BNetworkAddressResolver::SetTo(int family, const char* host,
 
 	int status = getaddrinfo(host != NULL ? hostString.String() : NULL,
 		portString.Length() != 0 ? portString.String() : NULL, &hint, &fInfo);
-	if (status != 0) {
-		// TODO: improve error reporting
-		return fStatus = B_ERROR;
+	if (status == 0)
+		return fStatus = B_OK;
+	
+	// Map errors
+	// TODO: improve error reporting, maybe add specific error codes?
+
+	switch (status) {
+		case EAI_ADDRFAMILY:
+		case EAI_BADFLAGS:
+		case EAI_PROTOCOL:
+		case EAI_BADHINTS:
+		case EAI_SOCKTYPE:
+		case EAI_SERVICE:
+		case EAI_NONAME:
+		case EAI_FAMILY:
+			fStatus = B_BAD_VALUE;
+			break;
+
+		case EAI_SYSTEM:
+			fStatus = errno;
+			break;
+
+		case EAI_OVERFLOW:
+		case EAI_MEMORY:
+			fStatus = B_NO_MEMORY;
+			break;
+		
+		case EAI_AGAIN:
+			// TODO: better error code to denote temporary failure?
+			fStatus = B_TIMED_OUT;
+			break;
+		
+		default:
+			fStatus = B_ERROR;
+			break;
 	}
 
-	return fStatus = B_OK;
+	return fStatus;
 }
 
 
