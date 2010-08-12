@@ -296,6 +296,7 @@ MixerCore::ApplyOutputFormat()
 
 	fResampler = new Resampler * [fMixBufferChannelCount];
 	for (int i = 0; i < fMixBufferChannelCount; i++) {
+		// TODO create Interpolate instead of Resampler if the settings say so
 		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT,
 			format.format);
 	}

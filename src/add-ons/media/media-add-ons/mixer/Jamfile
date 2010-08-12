@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 Addon mixer.media_addon :
 	AudioMixer.cpp
 	ByteSwap.cpp
+	Interpolate.cpp
 	MixerAddOn.cpp
 	MixerCore.cpp
 	MixerInput.cpp
