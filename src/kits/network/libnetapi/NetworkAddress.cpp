@@ -6,96 +6,40 @@
 
 #include <NetworkAddress.h>
 
-#include <ByteOrder.h>
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 
 #include <arpa/inet.h>
 #include <errno.h>
-#include <net/if.h>
-#include <net/route.h>
-#include <netdb.h>
 #include <netinet/in.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
+#include <stdio.h>
 #include <sys/sockio.h>
 
 
-static bool
-strip_port(BString& host, BString& port)
+BNetworkAddress::BNetworkAddress(const char* host, uint16 port, uint32 flags)
 {
-	int32 separator = host.FindFirst(':');
-	if (separator != -1) {
-		// looks like there is a port
-		host.CopyInto(port, separator + 1, -1);
-		host.Truncate(separator);
-
-		return true;
-	}
-
-	return false;
+	SetTo(host, port, flags);
 }
 
 
-static status_t
-resolve_address(int family, const char* host, const char* port,
-	int type, sockaddr_storage& address)
+BNetworkAddress::BNetworkAddress(const char* host, const char* service,
+	uint32 flags)
 {
-	addrinfo hint = {0};
-	hint.ai_family = family;
-	hint.ai_socktype = type;
-	hint.ai_protocol = 0;
-
-	if (host == NULL && port == NULL) {
-		port = "0";
-		hint.ai_flags = AI_PASSIVE;
-	}
-
-	addrinfo* info;
-	int status = getaddrinfo(host, port, &hint, &info);
-	if (status != 0) {
-		// TODO: improve error reporting
-		return B_ERROR;
-	}
-
-	bool foundAddress = false;
-
-	if (family == AF_UNSPEC) {
-		// Prefer IPv6 addresses over IPv4 addresses
-
-		for (const addrinfo* next = info; next != NULL; next = next->ai_next) {
-			if (next->ai_family == AF_INET6) {
-				memcpy(&address, next->ai_addr, next->ai_addrlen);
-				foundAddress = true;
-				break;
-			}
-		}
-	}
-
-	if (!foundAddress) {
-		// No preferred, or no IPv6 address found, just take the first one
-		// that works
-		memcpy(&address, info->ai_addr, info->ai_addrlen);
-	}
-
-	freeaddrinfo(info);
-	return B_OK;
+	SetTo(host, service, flags);
 }
 
 
-// #pragma mark -
-
-
-BNetworkAddress::BNetworkAddress(int family, const char* host, uint16 port)
+BNetworkAddress::BNetworkAddress(int family, const char* host, uint16 port,
+	uint32 flags)
 {
-	SetTo(family, host, port);
+	SetTo(family, host, port, flags);
 }
 
 
-BNetworkAddress::BNetworkAddress(const char* host, uint16 port)
+BNetworkAddress::BNetworkAddress(int family, const char* host,
+	const char* service, uint32 flags)
 {
-	SetTo(host, port);
+	SetTo(family, host, service, flags);
 }
 
 
@@ -184,119 +128,69 @@ BNetworkAddress::Unset()
 
 
 status_t
-BNetworkAddress::SetTo(int family, const char* host, uint16 port)
+BNetworkAddress::SetTo(const char* host, uint16 port, uint32 flags)
 {
-	// Check if the address contains a port
+	BNetworkAddressResolver resolver;
+	status_t status = resolver.SetTo(host, port, flags);
+	if (status != B_OK)
+		return status;
 
-	BString hostAddress(host);
+	// Prefer IPv6 addresses
 
-	BString portString;
-	if (strip_port(hostAddress, portString) && port == 0)
-		port = strtoul(portString.String(), NULL, 0);
+	uint32 cookie = 0;
+	status = resolver.GetNextAddress(AF_INET6, &cookie, *this);
+	if (status == B_OK)
+		return B_OK;
 
-	// Resolve address
-
-	memset(&fAddress, 0, sizeof(sockaddr_storage));
-	fAddress.ss_family = family;
-
-	if (host != NULL) {
-		switch (family) {
-			case AF_INET:
-			{
-				hostent* server = gethostbyname(hostAddress.String());
-				if (server == NULL)
-					return errno;
-
-				struct sockaddr_in& address = (sockaddr_in&)fAddress;
-				address.sin_port = htons(port);
-				address.sin_addr.s_addr = *(in_addr_t*)server->h_addr_list[0];
-				break;
-			}
-			
-			default:
-			{
-				fStatus = resolve_address(family, host, "0", 0, fAddress);
-				if (fStatus != B_OK)
-					return fStatus;
-
-				if (family == AF_INET6) {
-					struct sockaddr_in6& address = (sockaddr_in6&)fAddress;
-					address.sin6_port = htons(port);
-				}
-				break;
-			}
-		}
-	} else {
-		switch (fAddress.ss_family) {
-			case AF_INET:
-			{
-				struct sockaddr_in& address = (sockaddr_in&)fAddress;
-				address.sin_port = htons(port);
-				address.sin_addr.s_addr = INADDR_ANY;
-				break;
-			}
-
-			case AF_INET6:
-			{
-				struct sockaddr_in6& address = (sockaddr_in6&)fAddress;
-				address.sin6_port = htons(port);
-				address.sin6_addr = in6addr_any;
-				break;
-			}
-
-			default:
-				return B_NOT_SUPPORTED;
-		}
-	}
-
-	return fStatus = B_OK;
+	cookie = 0;
+	return resolver.GetNextAddress(&cookie, *this);
 }
 
 
 status_t
-BNetworkAddress::SetTo(const char* host, uint16 port)
+BNetworkAddress::SetTo(const char* host, const char* service, uint32 flags)
 {
-	// Check if the address contains a port
+	BNetworkAddressResolver resolver;
+	status_t status = resolver.SetTo(host, service, flags);
+	if (status != B_OK)
+		return status;
 
-	BString hostAddress(host);
+	// Prefer IPv6 addresses
 
-	BString portString;
-	strip_port(hostAddress, portString);
+	uint32 cookie = 0;
+	status = resolver.GetNextAddress(AF_INET6, &cookie, *this);
+	if (status == B_OK)
+		return B_OK;
 
-	// Resolve address
+	cookie = 0;
+	return resolver.GetNextAddress(&cookie, *this);
+}
 
-	memset(&fAddress, 0, sizeof(sockaddr_storage));
 
-	fStatus = resolve_address(AF_UNSPEC,
-		host != NULL ? hostAddress.String() : NULL,
-		portString.Length() == 0 ? NULL : portString.String(), 0, fAddress);
-	if (fStatus != B_OK)
-		return fStatus;
+status_t
+BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
+{
+	BNetworkAddressResolver resolver;
+	status_t status = resolver.SetTo(family, host, port, flags);
+	if (status != B_OK)
+		return status;
 
-	// Set port if specified separately
+	uint32 cookie = 0;
+	return resolver.GetNextAddress(&cookie, *this);
+}
 
-	switch (fAddress.ss_family) {
-		case AF_INET:
-		{
-			struct sockaddr_in& address = (sockaddr_in&)fAddress;
-			if (address.sin_port == 0)
-				address.sin_port = htons(port);
-			break;
-		}
 
-		case AF_INET6:
-		{
-			struct sockaddr_in6& address = (sockaddr_in6&)fAddress;
-			if (address.sin6_port == 0)
-				address.sin6_port = htons(port);
-			break;
-		}
+status_t
+BNetworkAddress::SetTo(int family, const char* host, const char* service,
+	uint32 flags)
+{
+	BNetworkAddressResolver resolver;
+	status_t status = resolver.SetTo(family, host, service, flags);
+	if (status != B_OK)
+		return status;
 
-		default:
-			break;
-	}
-
-	return B_OK;
+	uint32 cookie = 0;
+	return resolver.GetNextAddress(&cookie, *this);
 }
 
 
@@ -317,8 +211,24 @@ BNetworkAddress::SetTo(const sockaddr& address)
 			length = sizeof(sockaddr_in6);
 			break;
 		case AF_LINK:
-			length = sizeof(sockaddr_dl);
+		{
+			sockaddr_dl& link = (sockaddr_dl&)address;
+			length = sizeof(sockaddr_dl) - sizeof(link.sdl_data) + link.sdl_alen
+				+ link.sdl_nlen + link.sdl_slen;
 			break;
+		}
+	}
+
+	SetTo(address, length);
+}
+
+
+void
+BNetworkAddress::SetTo(const sockaddr& address, size_t length)
+{
+	if (address.sa_family == AF_UNSPEC || length == 0) {
+		Unset();
+		return;
 	}
 
 	memcpy(&fAddress, &address, length);
@@ -935,7 +845,7 @@ BNetworkAddress::HostName() const
 
 
 BString
-BNetworkAddress::PortName() const
+BNetworkAddress::ServiceName() const
 {
 	// TODO: implement service lookup
 	BString portName;
@@ -1062,7 +972,13 @@ BNetworkAddress::operator<(const BNetworkAddress& other) const
 }
 
 
-BNetworkAddress::operator sockaddr*() const
+BNetworkAddress::operator const sockaddr*() const
 {
-	return (sockaddr*)&fAddress;
+	return (const sockaddr*)&fAddress;
+}
+
+
+BNetworkAddress::operator const sockaddr&() const
+{
+	return (const sockaddr&)fAddress;
 }

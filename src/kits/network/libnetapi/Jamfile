@@ -11,6 +11,7 @@ SharedLibrary libbnetapi.so :
 	NetDebug.cpp
 
 	NetworkAddress.cpp
+	NetworkAddressResolver.cpp
 	NetworkInterface.cpp
 	NetworkRoster.cpp
 

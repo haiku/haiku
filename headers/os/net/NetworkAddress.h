@@ -12,16 +12,21 @@
 #include <sys/socket.h>
 
 #include <Archivable.h>
+#include <NetworkAddressResolver.h>
 #include <String.h>
 
 
 class BNetworkAddress : public BArchivable {
 public:
 								BNetworkAddress();
-								BNetworkAddress(int family,
-									const char* address, uint16 port = 0);
 								BNetworkAddress(const char* address,
-									uint16 port = 0);
+									uint16 port = 0, uint32 flags = 0);
+								BNetworkAddress(const char* address,
+									const char* service, uint32 flags = 0);
+								BNetworkAddress(int family, const char* address,
+									uint16 port = 0, uint32 flags = 0);
+								BNetworkAddress(int family, const char* address,
+									const char* service, uint32 flags = 0);
 								BNetworkAddress(const sockaddr& address);
 								BNetworkAddress(
 									const sockaddr_storage& address);
@@ -38,10 +43,16 @@ public:
 
 			void				Unset();
 
+			status_t			SetTo(const char* address, uint16 port = 0,
+									uint32 flags = 0);
+			status_t			SetTo(const char* address, const char* service,
+									uint32 flags = 0);
 			status_t			SetTo(int family, const char* address,
-									uint16 port = 0);
-			status_t			SetTo(const char* address, uint16 port = 0);
+									uint16 port = 0, uint32 flags = 0);
+			status_t			SetTo(int family, const char* address,
+									const char* service, uint32 flags = 0);
 			void				SetTo(const sockaddr& address);
+			void				SetTo(const sockaddr& address, size_t length);
 			void				SetTo(const sockaddr_storage& address);
 			void				SetTo(const sockaddr_in& address);
 			void				SetTo(const sockaddr_in6& address);
@@ -56,6 +67,7 @@ public:
 			status_t			SetToMask(int family, uint32 prefixLength);
 			status_t			SetToWildcard(int family);
 			void				SetPort(uint16 port);
+			status_t			SetPort(const char* service);
 
 			void				SetToLinkLevel(uint8* address, size_t length);
 			void				SetToLinkLevel(const char* name);
@@ -97,7 +109,7 @@ public:
 
 			BString				ToString(bool includePort = true) const;
 			BString				HostName() const;
-			BString				PortName() const;
+			BString				ServiceName() const;
 
 	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 	static	BArchivable*		Instantiate(BMessage* archive);
@@ -111,8 +123,8 @@ public:
 			bool				operator!=(const BNetworkAddress& other) const;
 			bool				operator<(const BNetworkAddress& other) const;
 
-								operator sockaddr*() const;
-								operator sockaddr&() const;
+								operator const sockaddr*() const;
+								operator const sockaddr&() const;
 
 private:
 			sockaddr_storage	fAddress;
