@@ -145,6 +145,11 @@ public:
 			::HWInterface*		HWInterface() const
 									{ return fVirtualScreen.HWInterface(); }
 
+			void				RebuildAndRedrawAfterWindowChange(
+									Window* window, BRegion& dirty);
+									// the window lock must be held when calling
+									// this function
+
 	// ScreenOwner implementation
 	virtual	void				ScreenRemoved(Screen* screen) {}
 	virtual	void				ScreenAdded(Screen* screen) {}
@@ -295,8 +300,6 @@ private:
 			void				_TriggerWindowRedrawing(
 									BRegion& newDirtyRegion);
 			void				_SetBackground(BRegion& background);
-			void				_RebuildAndRedrawAfterWindowChange(
-									Window* window, BRegion& dirty);
 
 			status_t			_ActivateApp(team_id team);
 

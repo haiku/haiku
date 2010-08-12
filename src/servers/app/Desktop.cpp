@@ -1358,7 +1358,7 @@ Desktop::SetWindowTabLocation(Window* window, float location)
 	BRegion dirty;
 	bool changed = window->SetTabLocation(location, dirty);
 	if (changed)
-		_RebuildAndRedrawAfterWindowChange(window, dirty);
+		RebuildAndRedrawAfterWindowChange(window, dirty);
 
 	InvokeSetWindowTabLocation(window, location);
 
@@ -1375,7 +1375,7 @@ Desktop::SetWindowDecoratorSettings(Window* window, const BMessage& settings)
 	bool changed = window->SetDecoratorSettings(settings, dirty);
 	bool listenerChanged = InvokeSetDecoratorSettings(window, settings);
 	if (changed || listenerChanged)
-		_RebuildAndRedrawAfterWindowChange(window, dirty);
+		RebuildAndRedrawAfterWindowChange(window, dirty);
 
 	return changed;
 }
@@ -1480,7 +1480,7 @@ Desktop::FontsChanged(Window* window)
 	BRegion dirty;
 	window->FontsChanged(&dirty);
 
-	_RebuildAndRedrawAfterWindowChange(window, dirty);
+	RebuildAndRedrawAfterWindowChange(window, dirty);
 }
 
 
@@ -1497,7 +1497,7 @@ Desktop::SetWindowLook(Window* window, window_look newLook)
 		// TODO: test what happens when the window
 		// finds out it needs to resize itself...
 
-	_RebuildAndRedrawAfterWindowChange(window, dirty);
+	RebuildAndRedrawAfterWindowChange(window, dirty);
 }
 
 
@@ -1615,7 +1615,7 @@ Desktop::SetWindowFlags(Window *window, uint32 newFlags)
 		// TODO: test what happens when the window
 		// finds out it needs to resize itself...
 
-	_RebuildAndRedrawAfterWindowChange(window, dirty);
+	RebuildAndRedrawAfterWindowChange(window, dirty);
 }
 
 
@@ -1627,7 +1627,7 @@ Desktop::SetWindowTitle(Window *window, const char* title)
 	BRegion dirty;
 	window->SetTitle(title, dirty);
 
-	_RebuildAndRedrawAfterWindowChange(window, dirty);
+	RebuildAndRedrawAfterWindowChange(window, dirty);
 }
 
 
@@ -1925,6 +1925,13 @@ Desktop::ReloadDecor()
 {
 	AutoWriteLocker _(fWindowLock);
 
+	// TODO it is assumed all listeners are registered by one decor
+	// unregister old listeners
+	const DesktopListenerDLList& currentListeners = GetDesktopListenerList();
+	for (DesktopListener* listener = currentListeners.First();
+		listener != NULL; listener = currentListeners.GetNext(listener))
+		UnregisterListener(listener);
+
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 			BRegion oldBorder;
@@ -1936,15 +1943,9 @@ Desktop::ReloadDecor()
 			window->GetBorderRegion(&border);
 
 			border.Include(&oldBorder);
-			_RebuildAndRedrawAfterWindowChange(window, border);
+			RebuildAndRedrawAfterWindowChange(window, border);
 	}
 
-	// TODO it is assumed all listeners are registered by one decor
-	// unregister old listeners
-	const DesktopListenerDLList& currentListeners = GetDesktopListenerList();
-	for (DesktopListener* listener = currentListeners.First();
-		listener != NULL; listener = currentListeners.GetNext(listener))
-		UnregisterListener(listener);
 	// register new listeners
 	const DesktopListenerList& newListeners
 		= gDecorManager.GetDesktopListeners();
@@ -3010,7 +3011,7 @@ Desktop::_SetBackground(BRegion& background)
 
 //!	The all window lock must be held when calling this function.
 void
-Desktop::_RebuildAndRedrawAfterWindowChange(Window* changedWindow,
+Desktop::RebuildAndRedrawAfterWindowChange(Window* changedWindow,
 	BRegion& dirty)
 {
 	if (!changedWindow->IsVisible() || dirty.CountRects() == 0)
