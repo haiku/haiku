@@ -295,7 +295,7 @@ PackageItem::ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 			B_SWAP_BENDIAN_TO_HOST);
 
 		if (*nameSize < (length + 1)) {
-			delete *attrName;
+			delete[] *attrName;
 			*nameSize = length + 1;
 			*attrName = new char[*nameSize];
 		}
@@ -331,7 +331,7 @@ PackageItem::ParseAttribute(uint8 *buffer, BNode *node, char **attrName,
 		fPackage->Seek(4, SEEK_CUR); // TODO: Check what this means
 
 		if (*tempSize < *attrCSize) {
-			delete *temp;
+			delete[] *temp;
 			*tempSize = *attrCSize;
 			*temp = new uint8[*tempSize];
 		}
