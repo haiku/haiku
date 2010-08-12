@@ -214,6 +214,8 @@ WonderBrushTranslator::_TranslateFromWBI(BPositionIO* inSource, uint32 outType,
 		bitsHeader.dataSize = bitsHeader.rowBytes * height;
 		if ((ret = swap_data(B_UINT32_TYPE, &bitsHeader,
 			sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN)) < B_OK) {
+			delete bitmap;
+			delete wbImage;
 			return ret;
 		} else
 			ret = outDestination->Write(&bitsHeader, sizeof(TranslatorBitmap));
