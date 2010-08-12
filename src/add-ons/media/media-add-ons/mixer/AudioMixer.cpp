@@ -1818,12 +1818,12 @@ AudioMixer::UpdateParameterWeb()
 
 	dp = group->MakeDiscreteParameter(PARAM_ETC(70), B_MEDIA_RAW_AUDIO, "Resampling algorithm", B_INPUT_MUX);
 	dp->AddItem(0, "Drop/repeat samples");
+	dp->AddItem(2, "Linear interpolation");
 
 	// Note: The following code is outcommented on purpose
 	// and is about to be modified at a later point
 	/*
 	dp->AddItem(1, "Drop/repeat samples (template based)");
-	dp->AddItem(2, "Linear interpolation");
 	dp->AddItem(3, "17th order filtering");
 	*/
 	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO, "Refuse output format changes", B_ENABLE);

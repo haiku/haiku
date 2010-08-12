@@ -20,6 +20,7 @@
 #include <TimeSource.h>
 
 #include "AudioMixer.h"
+#include "Interpolate.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
 #include "MixerUtils.h"
@@ -296,9 +297,15 @@ MixerCore::ApplyOutputFormat()
 
 	fResampler = new Resampler * [fMixBufferChannelCount];
 	for (int i = 0; i < fMixBufferChannelCount; i++) {
-		// TODO create Interpolate instead of Resampler if the settings say so
-		fResampler[i] = new Resampler(media_raw_audio_format::B_AUDIO_FLOAT,
-			format.format);
+		switch (Settings()->ResamplingAlgorithm()) {
+			case 2:
+				fResampler[i] = new Interpolate(
+					media_raw_audio_format::B_AUDIO_FLOAT, format.format);
+				break;
+			default:
+				fResampler[i] = new Resampler(
+					media_raw_audio_format::B_AUDIO_FLOAT, format.format);
+		}
 	}
 
 	TRACE("MixerCore::OutputFormatChanged:\n");
