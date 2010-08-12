@@ -76,6 +76,9 @@ protected:
 
 	virtual	void				_GetFootprint(BRegion *region);
 
+			void				_GetButtonSizeAndOffset(const BRect& tabRect,
+									float* offset, float* size,
+									float* inset) const;
 
 private:
 			void				_UpdateFont(DesktopSettings& settings);
@@ -83,9 +86,6 @@ private:
  									BRect rect);
 			void				_DrawBlendedRect(DrawingEngine *engine,
 									BRect rect, bool down, bool focus);
-			void				_GetButtonSizeAndOffset(const BRect& tabRect,
-									float* offset, float* size,
-									float* inset) const;
 			void				_LayoutTabItems(const BRect& tabRect);
 			void 				_InvalidateBitmaps();
 	static	ServerBitmap*		_GetBitmapForButton(int32 item, bool down,
