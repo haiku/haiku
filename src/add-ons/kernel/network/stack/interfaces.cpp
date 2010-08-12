@@ -638,6 +638,25 @@ Interface::AddressAt(size_t index)
 }
 
 
+int32
+Interface::IndexOfAddress(InterfaceAddress* address)
+{
+	RecursiveLocker locker(fLock);
+	
+	AddressList::Iterator iterator = fAddresses.GetIterator();
+	int32 index = 0;
+	
+	while (iterator.HasNext()) {
+		if (address == iterator.Next())
+			return index;
+
+		index++;
+	}
+
+	return -1;
+}
+
+
 size_t
 Interface::CountAddresses()
 {

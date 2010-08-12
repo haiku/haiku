@@ -129,6 +129,7 @@ public:
 			void				RemoveAddress(InterfaceAddress* address);
 			bool				GetNextAddress(InterfaceAddress** _address);
 			InterfaceAddress*	AddressAt(size_t index);
+			int32				IndexOfAddress(InterfaceAddress* address);
 			size_t				CountAddresses();
 			void				RemoveAddresses();
 

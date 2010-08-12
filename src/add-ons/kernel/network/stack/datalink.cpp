@@ -788,14 +788,24 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 					address = interface->FirstForFamily(
 						protocol->domain->family);
 				}
+
+				request.ifra_index = interface->IndexOfAddress(address);
 			} else
 				address = interface->AddressAt(request.ifra_index);
 			if (address == NULL)
 				return B_BAD_VALUE;
 
-			status_t status = fill_address(address->local,
-				(sockaddr*)&((struct ifaliasreq*)argument)->ifra_addr,
-				sizeof(sockaddr_storage));
+			// Copy index (in case none was specified)
+			status_t status = user_memcpy(
+				&((struct ifaliasreq*)argument)->ifra_index,
+				&request.ifra_index, sizeof(request.ifra_index));
+
+			// Copy address info
+			if (status == B_OK) {
+				status = fill_address(address->local,
+					(sockaddr*)&((struct ifaliasreq*)argument)->ifra_addr,
+					sizeof(sockaddr_storage));
+			}
 			if (status == B_OK) {
 				status = fill_address(address->mask,
 					(sockaddr*)&((struct ifaliasreq*)argument)->ifra_mask,
