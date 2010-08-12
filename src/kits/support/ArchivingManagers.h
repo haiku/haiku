@@ -43,6 +43,9 @@ public:
 	static BManagerBase*
 	ManagerPointer(const BMessage* constArchive)
 	{
+		if (!constArchive)
+			return NULL;
+
 		BMessage* archive = const_cast<BMessage*>(constArchive);
 
 		return static_cast<BManagerBase*>(

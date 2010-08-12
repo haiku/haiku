@@ -511,6 +511,9 @@ BUnarchiver::IsArchiveManaged(const BMessage* archive)
 	if (BManagerBase::ManagerPointer(archive))
 		return true;
 
+	if (!archive)
+		return false;
+
 	// managed top level archives return here
 	bool dummy;
 	if (archive->FindBool(kManagedField, &dummy) == B_OK)

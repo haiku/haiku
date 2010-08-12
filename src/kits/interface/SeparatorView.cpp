@@ -84,9 +84,7 @@ BSeparatorView::BSeparatorView(BMessage* archive)
 		B_ALIGN_VERTICAL_CENTER)),
 	fBorder(B_FANCY_BORDER)
 {
-	// TODO: Test this.
-	if (archive == NULL)
-		return;
+	// NULL archives will be caught by BView.
 
 	const char* label;
 	if (archive->FindString("_labelview", &label) == B_OK) {

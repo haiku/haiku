@@ -405,6 +405,8 @@ BView::BView(BMessage* archive)
 	BHandler(BUnarchiver::PrepareArchive(archive))
 {
 	BUnarchiver unarchiver(archive);
+	if (!archive)
+		debugger("BView cannot be constructed from a NULL archive.");
 
 	BRect frame;
 	archive->FindRect("_frame", &frame);
