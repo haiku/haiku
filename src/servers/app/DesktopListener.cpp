@@ -53,154 +53,192 @@ DesktopObservable::GetDesktopListenerList()
 
 
 void
-DesktopObservable::InvokeAddWindow(Window* window)
+DesktopObservable::WindowAdded(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->AddWindow(window);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowAdded(window);
 }
 
 
 void
-DesktopObservable::InvokeRemoveWindow(Window* window)
+DesktopObservable::WindowRemoved(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->RemoveWindow(window);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowRemoved(window);
 }
 
 
 void
-DesktopObservable::InvokeKeyEvent(uint32 what, int32 key, int32 modifiers)
+DesktopObservable::KeyPressed(uint32 what, int32 key, int32 modifiers)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->KeyEvent(what, key, modifiers);	
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->KeyPressed(what, key, modifiers);	
 }
 
 
 void
-DesktopObservable::InvokeMouseEvent(BMessage* message)
+DesktopObservable::MouseEvent(BMessage* message)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
 		listener->MouseEvent(message);
 }
 
 
 void
-DesktopObservable::InvokeMouseDown(Window* window, BMessage* message,
+DesktopObservable::MouseDown(Window* window, BMessage* message,
 	const BPoint& where)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
 		listener->MouseDown(window, message, where);
 }
 
 
 void
-DesktopObservable::InvokeMouseUp(Window* window, BMessage* message,
+DesktopObservable::MouseUp(Window* window, BMessage* message,
 	const BPoint& where)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
 		listener->MouseUp(window, message, where);
 }
 
 
 void
-DesktopObservable::InvokeMouseMoved(Window* window, BMessage* message,
+DesktopObservable::MouseMoved(Window* window, BMessage* message,
 	const BPoint& where)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
 		listener->MouseMoved(window, message, where);
 }
 
 
 void
-DesktopObservable::InvokeMoveWindow(Window* window)
+DesktopObservable::WindowMoved(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->MoveWindow(window);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowMoved(window);
 }
 
 
 void
-DesktopObservable::InvokeResizeWindow(Window* window)
+DesktopObservable::WindowResized(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->ResizeWindow(window);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowResized(window);
 }
 
 
 void
-DesktopObservable::InvokeActivateWindow(Window* window)
+DesktopObservable::WindowActitvated(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->ActivateWindow(window);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowActitvated(window);
 }
 
 
 void
-DesktopObservable::InvokeSendWindowBehind(Window* window, Window* behindOf)
+DesktopObservable::WindowSentBehind(Window* window, Window* behindOf)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->SendWindowBehind(window, behindOf);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowSentBehind(window, behindOf);
 }
 
 
 void
-DesktopObservable::InvokeSetWindowTabLocation(Window* window, float location)
+DesktopObservable::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
-		listener->SetWindowTabLocation(window, location);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowWorkspacesChanged(window, workspaces);
+}
+
+
+void
+DesktopObservable::WindowMinimized(Window* window, bool minimize)
+{
+	if (fWeAreInvoking)
+		return;
+	InvokeGuard invokeGuard(fWeAreInvoking);
+
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowMinimized(window, minimize);
+}
+
+
+void
+DesktopObservable::WindowTabLocationChanged(Window* window, float location)
+{
+	if (fWeAreInvoking)
+		return;
+	InvokeGuard invokeGuard(fWeAreInvoking);
+
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowTabLocationChanged(window, location);
 }
 
 
 bool
-DesktopObservable::InvokeSetDecoratorSettings(Window* window,
+DesktopObservable::SetDecoratorSettings(Window* window,
 	const BMessage& settings)
 {
 	if (fWeAreInvoking)
@@ -208,7 +246,8 @@ DesktopObservable::InvokeSetDecoratorSettings(Window* window,
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
 	bool changed = false;
-	FOR_ALL_DESKTOP_LISTENER
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
 		changed = changed | listener->SetDecoratorSettings(window, settings);
 
 	return changed;
@@ -216,62 +255,15 @@ DesktopObservable::InvokeSetDecoratorSettings(Window* window,
 
 
 void
-DesktopObservable::InvokeGetDecoratorSettings(Window* window, BMessage& settings)
+DesktopObservable::GetDecoratorSettings(Window* window, BMessage& settings)
 {
 	if (fWeAreInvoking)
 		return;
 	InvokeGuard invokeGuard(fWeAreInvoking);
 
-	FOR_ALL_DESKTOP_LISTENER
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
 		listener->GetDecoratorSettings(window, settings);
-}
-
-
-void
-DesktopObservable::InvokeSetWindowWorkspaces(Window* window, uint32 workspaces)
-{
-	if (fWeAreInvoking)
-		return;
-	InvokeGuard invokeGuard(fWeAreInvoking);
-
-	FOR_ALL_DESKTOP_LISTENER
-		listener->SetWindowWorkspaces(window, workspaces);
-}
-
-
-void
-DesktopObservable::InvokeShowWindow(Window* window)
-{
-	if (fWeAreInvoking)
-		return;
-	InvokeGuard invokeGuard(fWeAreInvoking);
-
-	FOR_ALL_DESKTOP_LISTENER
-		listener->ShowWindow(window);
-}
-
-
-void
-DesktopObservable::InvokeHideWindow(Window* window)
-{
-	if (fWeAreInvoking)
-		return;
-	InvokeGuard invokeGuard(fWeAreInvoking);
-
-	FOR_ALL_DESKTOP_LISTENER
-		listener->HideWindow(window);
-}
-
-
-void
-DesktopObservable::InvokeMinimizeWindow(Window* window, bool minimize)
-{
-	if (fWeAreInvoking)
-		return;
-	InvokeGuard invokeGuard(fWeAreInvoking);
-
-	FOR_ALL_DESKTOP_LISTENER
-		listener->MinimizeWindow(window, minimize);
 }
 
 
