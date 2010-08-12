@@ -1,6 +1,14 @@
 SubDir HAIKU_TOP 3rdparty mmu_man ;
 
-SubInclude HAIKU_TOP 3rdparty mmu_man themes ;
+# theme manager from osdrawer
+# to use it symlink it here.
+{
+	local subDir
+		= [ GLOB [ FDirName $(HAIKU_TOP) 3rdparty mmu_man ] : themes ] ;
+	if $(subDir) {
+		SubInclude HAIKU_TOP 3rdparty mmu_man themes ;
+	}
+}
 
 # distro stuff located in my own branch, 
 # to use it symlink it here.
