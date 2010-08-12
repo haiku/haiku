@@ -724,6 +724,19 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 					// Find first address for family
 					address = FirstForFamily(domain->family);
 				}
+				if (address == NULL) {
+					// Create new on the fly
+					address = new(std::nothrow) InterfaceAddress(this, domain);
+					if (address == NULL)
+						return B_NO_MEMORY;
+
+					status_t status = AddAddress(address);
+					if (status != B_OK)
+						return status;
+
+					// Note, even if setting the address failed, the empty
+					// address added here will still be added to the interface.
+				}
 			} else
 				address = AddressAt(aliasRequest.ifra_index);
 
