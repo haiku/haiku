@@ -77,10 +77,10 @@ public:
 			bool				IsFullWidthChar(int32 row, int32 column) const;
 			int					GetChar(int32 row, int32 column,
 									UTF8Char& character,
-									uint16& attributes) const;
+									uint32& attributes) const;
 			int32				GetString(int32 row, int32 firstColumn,
 									int32 lastColumn, char* buffer,
-									uint16& attributes) const;
+									uint32& attributes) const;
 			void				GetStringFromRegion(BString& string,
 									const TermPos& start,
 									const TermPos& end) const;

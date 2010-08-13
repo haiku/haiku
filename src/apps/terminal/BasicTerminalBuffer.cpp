@@ -267,7 +267,7 @@ BasicTerminalBuffer::IsFullWidthChar(int32 row, int32 column) const
 
 int
 BasicTerminalBuffer::GetChar(int32 row, int32 column, UTF8Char& character,
-	uint16& attributes) const
+	uint32& attributes) const
 {
 	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
 	TerminalLine* line = _HistoryLineAt(row, lineBuffer);
@@ -289,7 +289,7 @@ BasicTerminalBuffer::GetChar(int32 row, int32 column, UTF8Char& character,
 
 int32
 BasicTerminalBuffer::GetString(int32 row, int32 firstColumn, int32 lastColumn,
-	char* buffer, uint16& attributes) const
+	char* buffer, uint32& attributes) const
 {
 	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
 	TerminalLine* line = _HistoryLineAt(row, lineBuffer);

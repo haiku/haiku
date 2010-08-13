@@ -12,7 +12,7 @@
 
 struct TerminalCell {
 	UTF8Char		character;
-	uint16			attributes;
+	uint32			attributes;
 };
 
 

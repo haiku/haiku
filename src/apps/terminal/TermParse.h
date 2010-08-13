@@ -84,8 +84,8 @@ private:
 
 	int fFd;
 
-	ushort fAttr;
-	ushort fSavedAttr;
+	uint32 fAttr;
+	uint32 fSavedAttr;
 
 	thread_id fParseThread;
 	thread_id fReaderThread;

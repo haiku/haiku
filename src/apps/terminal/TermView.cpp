@@ -849,7 +849,7 @@ TermView::_Deactivate()
 
 //! Draw part of a line in the given view.
 void
-TermView::_DrawLinePart(int32 x1, int32 y1, uint16 attr, char *buf,
+TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	int32 width, bool mouse, bool cursor, BView *inView)
 {
 	rgb_color rgb_fore = fTextForeColor, rgb_back = fTextBackColor;
@@ -926,7 +926,7 @@ TermView::_DrawCursor()
 	int32 firstVisible = _LineAt(0);
 
 	UTF8Char character;
-	uint16 attr;
+	uint32 attr;
 
 	bool cursorVisible = _IsCursorVisible();
 
@@ -1156,7 +1156,7 @@ TermView::Draw(BRect updateRect)
 			for (int32 i = k; i <= x2;) {
 				int32 lastColumn = x2;
 				bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
-				uint16 attr;
+				uint32 attr;
 				int32 count = fVisibleTextBuffer->GetString(j - firstVisible, i,
 					lastColumn, buf, attr);
 
@@ -1198,7 +1198,7 @@ void
 TermView::_DoPrint(BRect updateRect)
 {
 #if 0
-	ushort attr;
+	uint32 attr;
 	uchar buf[1024];
 
 	const int numLines = (int)((updateRect.Height()) / fFontHeight);

@@ -183,9 +183,9 @@ enum{
 #define FONT			0x0100
 #define RESERVE			0x0080
 #define DUMPCR			0x0040
-#define FORECOLOR		0x0038
-#define BACKCOLOR		0x0007
-#define CHAR_ATTRIBUTES	0x773f
+#define FORECOLOR		0xFF0000
+#define BACKCOLOR		0xFF000000
+#define CHAR_ATTRIBUTES	0xFFFF7700
 
 #define IS_WIDTH(x)	(((x) & A_WIDTH)   )
 #define IS_BOLD(x)	(((x) & BOLD)      )
@@ -196,11 +196,11 @@ enum{
 #define IS_BACKSET(x)	(((x) & BACKSET)   )
 #define IS_FONT(x)	(((x) & FONT)      )
 #define IS_CR(x)	(((x) & DUMPCR)	   )
-#define IS_FORECOLOR(x) (((x) & FORECOLOR) >> 3)
-#define IS_BACKCOLOR(x) (((x) & BACKCOLOR) )
+#define IS_FORECOLOR(x) (((x) & FORECOLOR) >> 16)
+#define IS_BACKCOLOR(x) (((x) & BACKCOLOR) >> 24)
 
-#define FORECOLORED(x) ((x) << 3)
-#define BACKCOLORED(x) ((x) << 0)
+#define FORECOLORED(x) ((x) << 16)
+#define BACKCOLORED(x) ((x) << 24)
 
 
 #endif	// TERMCONST_H_INCLUDED
