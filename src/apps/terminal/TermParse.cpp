@@ -44,6 +44,8 @@ extern int gIesTable[];				/* ignore ESC table */
 extern int gEscIgnoreTable[];		/* ESC ignore table */
 extern int gMbcsTable[];			/* ESC $ */
 
+extern int gLineDrawTable[];		/* ESC ( 0 */
+
 
 #define DEFAULT -1
 #define NPARAM 10		// Max parameters
@@ -448,6 +450,30 @@ TermParse::EscParse()
 					fBuffer->InsertChar(dstbuf, dstLen, fAttr);
 					break;
 
+				case CASE_PRINT_GRA:
+					/* "Special characters and line drawing" enabled by \E(0 */
+					switch (c) {
+						case 'j':
+							fBuffer->InsertChar("\xE2\x94\x98",3,fAttr);
+							break;
+						case 'k':
+							fBuffer->InsertChar("\xE2\x94\x90",3,fAttr);
+							break;
+						case 'l':
+							fBuffer->InsertChar("\xE2\x94\x8C",3,fAttr);
+							break;
+						case 'm':
+							fBuffer->InsertChar("\xE2\x94\x94",3,fAttr);
+							break;
+						case 'q':
+							break;
+						case 'x':
+							break;
+						default:
+							fBuffer->InsertChar((char)c, fAttr);
+					}
+					break;
+
 				case CASE_LF:
 					fBuffer->InsertLF();
 					break;
@@ -516,13 +542,12 @@ TermParse::EscParse()
 					break;
 
 				case CASE_SCS_STATE:
-				{
-					cs96 = 0;
-					_NextParseChar();
-						// skip next char
-					parsestate = groundtable;
+					if (_NextParseChar() == '0')
+						parsestate = gLineDrawTable;
+					else
+						parsestate = groundtable;
 					break;
-				}
+
 				case CASE_GROUND_STATE:
 					/* exit ignore mode */
 					parsestate = groundtable;

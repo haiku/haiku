@@ -123,3 +123,5 @@
 #define CASE_SU		89	/* scroll screen up */
 #define CASE_SD		90	/* scroll screen down */
 #define CASE_ECH 	91	/* erase characters */
+
+#define CASE_PRINT_GRA 92
