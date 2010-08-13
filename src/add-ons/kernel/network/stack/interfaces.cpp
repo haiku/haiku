@@ -757,6 +757,7 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 
 					// Note, even if setting the address failed, the empty
 					// address added here will still be added to the interface.
+					address->AcquireReference();
 				}
 			} else
 				address = AddressAt(aliasRequest.ifra_index);
@@ -765,9 +766,6 @@ Interface::Control(net_domain* domain, int32 option, ifreq& request,
 				return B_BAD_VALUE;
 
 			status_t status = B_OK;
-			address->AcquireReference();
-				// _ChangeAddress() currently unlocks, so we need another
-				// reference to make sure "address" is not going away.
 
 			if (!domain->address_module->equal_addresses(
 					(sockaddr*)&aliasRequest.ifra_addr, address->local)) {
