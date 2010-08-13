@@ -13,6 +13,7 @@
 #include "stack_private.h"
 
 #include <net_device.h>
+#include <NetUtilities.h>
 
 #include <lock.h>
 #include <util/AutoLock.h>
@@ -75,8 +76,14 @@ dump_domains(int argc, char** argv)
 			kprintf("  routes:\n");
 	
 		RouteList::Iterator routeIterator = domain->routes.GetIterator();
-		while (net_route* route = routeIterator.Next()) {
-			kprintf("    %p\n", route);
+		while (net_route_private* route = routeIterator.Next()) {
+			kprintf("    %p: dest %s, mask %s, gw %s, flags %lx, address %p\n",
+				route, AddressString(domain, route->destination
+					? route->destination : NULL).Data(),
+				AddressString(domain, route->mask ? route->mask : NULL).Data(),
+				AddressString(domain, route->gateway
+					? route->gateway : NULL).Data(),
+				route->flags, route->interface_address);
 		}
 
 		if (!domain->route_infos.IsEmpty())

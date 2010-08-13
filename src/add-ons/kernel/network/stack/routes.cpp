@@ -54,26 +54,6 @@ net_route_private::~net_route_private()
 //	#pragma mark - private functions
 
 
-#if 0
-static void
-dump_routes(net_domain_private* domain)
-{
-	RouteList::Iterator iterator = domain->routes.GetIterator();
-	uint32 count = 1;
-
-	while (iterator.HasNext()) {
-		net_route_private* route = iterator.Next();
-
-		dprintf("  [%lu] dest %s, mask %s, gw %s, flags %lx\n", count++,
-			AddressString(domain, route->destination ? route->destination : NULL).Data(),
-			AddressString(domain, route->mask ? route->mask : NULL).Data(),
-			AddressString(domain, route->gateway ? route->gateway : NULL).Data(),
-			route->flags);
-	}
-}
-#endif
-
-
 static status_t
 user_copy_address(const sockaddr* from, sockaddr** to)
 {
