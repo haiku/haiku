@@ -270,7 +270,10 @@ int32 PoorManServer::_Worker(void* data)
 		if (receive_data(&sender, &hc, sizeof(httpd_conn*)) != 512)
 			goto cleanup;
 	} else {
-		goto cleanup;
+		// No need to go throught the whole cleanup, as we haven't open
+		// nor allocated ht yet.
+		atomic_add(&s->fCurConns, -1);
+		return 0;
 	}
 	
 	PRINT(("A worker thread starts to work.\n"));
