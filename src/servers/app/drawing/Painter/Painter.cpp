@@ -903,7 +903,7 @@ Painter::FillRect(const BRect& r, const BGradient& gradient) const
 	if (gradient.GetType() == BGradient::TYPE_LINEAR
 		&& (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
 		const BGradientLinear* linearGradient
-			= static_cast<const BGradientLinear*>(&gradient);
+			= dynamic_cast<const BGradientLinear*>(&gradient);
 		if (linearGradient->Start().x == linearGradient->End().x
 			// TODO: Remove this second check once the optimized method
 			// handled "upside down" gradients as well...
