@@ -10,6 +10,7 @@
 
 #include <Debug.h>
 
+#include "SATGroup.h"
 #include "Window.h"
 
 
@@ -322,7 +323,7 @@ SATWindow::_InitGroup()
 }
 
 
-SATWindow::GroupCookie::GroupCookie(SATWindow* satWindow)
+GroupCookie::GroupCookie(SATWindow* satWindow)
 	:
 	fSATWindow(satWindow),
 
@@ -349,14 +350,14 @@ SATWindow::GroupCookie::GroupCookie(SATWindow* satWindow)
 }
 
 
-SATWindow::GroupCookie::~GroupCookie()
+GroupCookie::~GroupCookie()
 {
 	Uninit();
 }
 
 
 void
-SATWindow::GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
+GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 {
 	if (!fSATGroup.Get())
 		return;
@@ -400,7 +401,7 @@ SATWindow::GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 
 
 void
-SATWindow::GroupCookie::MoveWindow(int32 workspace)
+GroupCookie::MoveWindow(int32 workspace)
 {
 	Window* window = fSATWindow->GetWindow();
 	Desktop* desktop = window->Desktop();
@@ -418,7 +419,7 @@ SATWindow::GroupCookie::MoveWindow(int32 workspace)
 
 
 bool
-SATWindow::GroupCookie::Init(SATGroup* group, WindowArea* area)
+GroupCookie::Init(SATGroup* group, WindowArea* area)
 {
 	ASSERT(fSATGroup.Get() == NULL);
 
@@ -489,7 +490,7 @@ SATWindow::GroupCookie::Init(SATGroup* group, WindowArea* area)
 
 
 void
-SATWindow::GroupCookie::Uninit()
+GroupCookie::Uninit()
 {
 	delete leftBorder;
 	delete topBorder;
@@ -528,7 +529,7 @@ SATWindow::GroupCookie::Uninit()
 
 
 bool
-SATWindow::GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
+GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
 {
 	if (!fSATGroup->fSATWindowList.RemoveItem(fSATWindow))
 		return false;

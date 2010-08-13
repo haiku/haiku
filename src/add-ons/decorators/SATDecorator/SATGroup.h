@@ -191,7 +191,7 @@ class SATGroup : public BReferenceable {
 public:
 		friend class Tab;
 		friend class WindowArea;
-		friend class SATWindow;
+		friend class GroupCookie;
 
 							SATGroup();
 							~SATGroup();

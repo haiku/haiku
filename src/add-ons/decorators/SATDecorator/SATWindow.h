@@ -11,14 +11,58 @@
 
 #include <Region.h>
 #include "SATDecorator.h"
-#include "SATGroup.h"
 #include "Stacking.h"
 #include "Tiling.h"
 
 
 class Desktop;
+class SATGroup;
 class StackAndTile;
 class Window;
+
+
+class GroupCookie
+{
+public:
+							GroupCookie(SATWindow* satWindow);
+							~GroupCookie();
+
+		bool				Init(SATGroup* group, WindowArea* area);
+		void				Uninit();
+
+		void				DoGroupLayout(SATWindow* triggerWindow);
+		void				MoveWindow(int32 workspace);
+
+		SATGroup*			GetGroup() { return fSATGroup.Get(); }
+
+		WindowArea*			GetWindowArea() { return windowArea; }
+
+		bool				PropagateToGroup(SATGroup* group, WindowArea* area);
+
+private:
+		SATWindow*			fSATWindow;
+
+		BReference<SATGroup>	fSATGroup;
+
+		WindowArea*			windowArea;
+
+		Variable*			leftBorder;
+		Variable*			topBorder;
+		Variable*			rightBorder;
+		Variable*			bottomBorder;
+
+		Constraint*			leftBorderConstraint;
+		Constraint*			topBorderConstraint;
+		Constraint*			rightBorderConstraint;
+		Constraint*			bottomBorderConstraint;
+
+		Constraint*			leftConstraint;
+		Constraint*			topConstraint;
+		Constraint*			minWidthConstraint;
+		Constraint*			minHeightConstraint;
+		Constraint*			widthConstraint;
+		Constraint*			heightConstraint;
+};
 
 
 class SATWindow {
@@ -63,56 +107,12 @@ public:
 		void				TabLocationMoved(float location, bool shifting);
 
 private:
-		void				_InitGroup();
+		void						_InitGroup();
 
-		Window*				fWindow;
-		SATDecorator*		fDecorator;
-		StackAndTile*		fStackAndTile;
-		Desktop*			fDesktop;
-
-		class GroupCookie
-		{
-		public:
-								GroupCookie(SATWindow* satWindow);
-								~GroupCookie();
-
-			bool				Init(SATGroup* group, WindowArea* area);
-			void				Uninit();
-
-			void				DoGroupLayout(SATWindow* triggerWindow);
-			void				MoveWindow(int32 workspace);
-
-			SATGroup*			GetGroup() { return fSATGroup.Get(); }
-
-			WindowArea*			GetWindowArea() { return windowArea; }
-
-			bool				PropagateToGroup(SATGroup* group,
-									WindowArea* area);
-
-		private:
-			SATWindow*			fSATWindow;
-
-			BReference<SATGroup>	fSATGroup;
-
-			WindowArea*			windowArea;
-
-			Variable*			leftBorder;
-			Variable*			topBorder;
-			Variable*			rightBorder;
-			Variable*			bottomBorder;
-
-			Constraint*			leftBorderConstraint;
-			Constraint*			topBorderConstraint;
-			Constraint*			rightBorderConstraint;
-			Constraint*			bottomBorderConstraint;
-
-			Constraint*			leftConstraint;
-			Constraint*			topConstraint;
-			Constraint*			minWidthConstraint;
-			Constraint*			minHeightConstraint;
-			Constraint*			widthConstraint;
-			Constraint*			heightConstraint;
-		};
+		Window*						fWindow;
+		SATDecorator*				fDecorator;
+		StackAndTile*				fStackAndTile;
+		Desktop*					fDesktop;
 
 		//! Current group.
 		GroupCookie*				fGroupCookie;

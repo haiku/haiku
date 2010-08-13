@@ -437,8 +437,6 @@ SATTiling::_FreeAreaSize()
 void
 SATTiling::_HighlightWindows(SATGroup* group, bool highlight)
 {
-	BRect windowFrame = fSATWindow->CompleteWindowFrame();
-
 	const TabList* hTabs = group->HorizontalTabs();
 	const TabList* vTabs = group->VerticalTabs();
 	// height light windows at all four sites
