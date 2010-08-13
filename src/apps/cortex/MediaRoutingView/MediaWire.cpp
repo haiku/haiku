@@ -200,12 +200,12 @@ void MediaWire::selected()
 	D_METHOD(("MediaWire::selected()\n"));
 	if (startPoint())
 	{
-		MediaJack *outputJack = dynamic_cast<MediaJack *>(startPoint());
+		MediaJack *outputJack = static_cast<MediaJack *>(startPoint());
 		outputJack->select();
 	}
 	if (endPoint())
 	{
-		MediaJack *inputJack = dynamic_cast<MediaJack *>(endPoint());
+		MediaJack *inputJack = static_cast<MediaJack *>(endPoint());
 		inputJack->select();
 	}
 }
@@ -215,12 +215,12 @@ void MediaWire::deselected()
 	D_METHOD(("MediaWire::deselected()\n"));
 	if (startPoint())
 	{
-		MediaJack *outputJack = dynamic_cast<MediaJack *>(startPoint());
+		MediaJack *outputJack = static_cast<MediaJack *>(startPoint());
 		outputJack->deselect();
 	}
 	if (endPoint())
 	{
-		MediaJack *inputJack = dynamic_cast<MediaJack *>(endPoint());
+		MediaJack *inputJack = static_cast<MediaJack *>(endPoint());
 		inputJack->deselect();
 	}
 }
