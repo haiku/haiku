@@ -10,7 +10,6 @@ launch() {
 	toLaunch="$1"
 	shift
 	toWaitFor="$1"
-	shift
 	if [ -f "/boot/$toLaunch" ]
 	then
 		"/boot/$toLaunch" $* &
