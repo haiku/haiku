@@ -464,8 +464,10 @@ BackgroundImage::SetBackgroundImage(BNode* node)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	if ((err = container.Flatten(buffer, flattenedSize)) != B_OK)
+	if ((err = container.Flatten(buffer, flattenedSize)) != B_OK) {
+		delete[] buffer;
 		return err;
+	}
 
 	ssize_t size = node->WriteAttr(kBackgroundImageInfo, B_MESSAGE_TYPE,
 		0, buffer, flattenedSize);
