@@ -14,9 +14,25 @@
 #include <pci/if_rlreg.h>
 
 
+extern driver_t *DRIVER_MODULE_NAME(rgephy, miibus);
+extern driver_t *DRIVER_MODULE_NAME(rlphy, miibus);
+
+
 HAIKU_FBSD_DRIVER_GLUE(rtl81xx, re, pci);
-HAIKU_FBSD_MII_DRIVER(rgephy);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE);
+
+
+driver_t *
+__haiku_select_miibus_driver(device_t dev)
+{
+	driver_t *drivers[] = {
+		DRIVER_MODULE_NAME(rgephy, miibus),
+		DRIVER_MODULE_NAME(rlphy, miibus),
+		NULL
+	};
+
+	return __haiku_probe_miibus(dev, drivers);
+}
 
 
 int

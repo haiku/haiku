@@ -11,8 +11,13 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 KernelStaticLibrary rtl81xx_mii.a :
 	rgephy.c
+	rlphy.c
 ;
 
-ObjectHdrs [ FGristFiles rgephy$(SUFOBJ) ] : [ FDirName
+SEARCH on [ FGristFiles rlphy.c ] = [ FDirName $(HAIKU_TOP) src add-ons kernel
+		drivers network rtl8139 dev mii ] ;
+
+ObjectHdrs [ FGristFiles rgephy$(SUFOBJ) rlphy$(SUFOBJ) ] : [ FDirName
 		$(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles rgephy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
+Includes [ FGristFiles rgephy.c rlphy.c ]
+	: <src!libs!compat!freebsd_network>miidevs.h ;

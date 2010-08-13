@@ -1,7 +1,8 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network 3com dev mii ;
 
 UseHeaders [ FDirName $(SUBDIR) .. .. ] : true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
 
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
@@ -17,6 +18,7 @@ KernelStaticLibrary 3com_mii.a
 	;
 
 ObjectHdrs [ FGristFiles bmtphy$(SUFOBJ) exphy$(SUFOBJ) ukphy$(SUFOBJ) ]
-        : [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat freebsd_network ] ;
-Includes [ FGristFiles bmtphy.c exphy.c ukphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;
-
+	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR) libs compat
+			freebsd_network ] ;
+Includes [ FGristFiles bmtphy.c exphy.c ukphy.c ]
+	: <src!libs!compat!freebsd_network>miidevs.h ;
