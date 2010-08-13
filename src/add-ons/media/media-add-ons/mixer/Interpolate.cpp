@@ -63,7 +63,7 @@ Interpolate::float_to_float(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			*(float*)dest = gain
 				* (SRC(0) + (SRC((int)skipcount) - SRC(0)) * offset);
@@ -115,7 +115,7 @@ Interpolate::int32_to_float(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
 				* offset);
@@ -167,7 +167,7 @@ Interpolate::int16_to_float(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
 				* offset);
@@ -219,7 +219,7 @@ Interpolate::int8_to_float(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
 				* offset);
@@ -271,7 +271,7 @@ Interpolate::uint8_to_float(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			*(float*)dest = gain * (SRC(0) + (SRC((int)skipcount) - SRC(0))
 				* offset);
@@ -336,7 +336,7 @@ Interpolate::float_to_int32(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
 				- SRC(0)) * offset);
@@ -404,7 +404,7 @@ Interpolate::float_to_int16(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
 				- SRC(0)) * offset);
@@ -472,7 +472,7 @@ Interpolate::float_to_int8(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
 				- SRC(0)) * offset);
@@ -540,7 +540,7 @@ Interpolate::float_to_uint8(const void *_src, int32 srcSampleOffset,
 	} else {
 		// downsample
 		while (count--) {
-			register double skipcount;
+			double skipcount;
 			register float offset = modf(current, &skipcount);
 			register float sample = gain * (SRC(0) + (SRC((int)skipcount)
 				- SRC(0)) * offset) + 128.0f;
