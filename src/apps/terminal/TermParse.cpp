@@ -1083,21 +1083,21 @@ TermParse::EscParse()
 }
 
 
-	/*static*/ int32
+/*static*/ int32
 TermParse::_ptyreader_thread(void *data)
 {
 	return reinterpret_cast<TermParse *>(data)->PtyReader();
 }
 
 
-	/*static*/ int32
+/*static*/ int32
 TermParse::_escparse_thread(void *data)
 {
 	return reinterpret_cast<TermParse *>(data)->EscParse();
 }
 
 
-	status_t
+status_t
 TermParse::_ReadParserBuffer()
 {
 	// We have to unlock the terminal buffer while waiting for data from the
@@ -1153,7 +1153,7 @@ TermParse::_ReadParserBuffer()
 }
 
 
-	void
+void
 TermParse::_DeviceStatusReport(int n)
 {
 	char sbuf[16] ;
@@ -1181,7 +1181,7 @@ TermParse::_DeviceStatusReport(int n)
 }
 
 
-	void
+void
 TermParse::_DecReqTermParms(int value)
 {
 	// Terminal parameters report:
@@ -1205,7 +1205,7 @@ TermParse::_DecReqTermParms(int value)
 }
 
 
-	void
+void
 TermParse::_DecPrivateModeSet(int value)
 {
 	switch (value) {
@@ -1274,7 +1274,7 @@ TermParse::_DecPrivateModeSet(int value)
 }
 
 
-	void
+void
 TermParse::_DecPrivateModeReset(int value)
 {
 	switch (value) {
@@ -1348,7 +1348,7 @@ TermParse::_DecPrivateModeReset(int value)
 }
 
 
-	void
+void
 TermParse::_DecSaveCursor()
 {
 	fBuffer->SaveCursor();
@@ -1357,7 +1357,7 @@ TermParse::_DecSaveCursor()
 }
 
 
-	void
+void
 TermParse::_DecRestoreCursor()
 {
 	fBuffer->RestoreCursor();
