@@ -214,7 +214,7 @@ GameSoundBuffer::GetAttributes(gs_attribute * attributes,
 			case B_GS_PAN:
 				attributes[i].value = fPan;
 				if (fPanRamp) 
-					attributes[i].duration = fGainRamp->duration;
+					attributes[i].duration = fPanRamp->duration;
 				break;
 
 			case B_GS_LOOPING:
