@@ -181,11 +181,12 @@ PoorManWindow::PoorManWindow(BRect frame)
 		FileMenuBar->AddItem(ControlsMenu);
 	
 	// File Panels
-	BWindow * change_title;
+	BWindow* change_title;
 	
+	BMessenger messenger(this);
 	saveConsoleFilePanel = new BFilePanel(
 						B_SAVE_PANEL,
-						new BMessenger(this),
+						&messenger,
 						NULL,
 						B_FILE_NODE,
 						false,
@@ -196,7 +197,7 @@ PoorManWindow::PoorManWindow(BRect frame)
 	
 	saveConsoleSelectionFilePanel = new BFilePanel(
 						B_SAVE_PANEL,
-						new BMessenger(this),
+						&messenger,
 						NULL,
 						B_FILE_NODE,
 						false,
