@@ -575,6 +575,8 @@ Keymap::SaveAsSource(const char* name)
 	_SaveSourceText(file);
 #endif
 
+	fclose(file);
+
 	return B_OK;
 }
 
