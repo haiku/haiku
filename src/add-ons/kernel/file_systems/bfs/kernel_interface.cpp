@@ -1217,8 +1217,8 @@ bfs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 					return B_OK;
 				}
 
-				entry_cache_remove(volume->ID(), oldDirectory->ID(), newName);
-				entry_cache_add(volume->ID(), newDirectory->ID(), oldName, id);
+				entry_cache_remove(volume->ID(), newDirectory->ID(), newName);
+				entry_cache_add(volume->ID(), oldDirectory->ID(), oldName, id);
 			}
 		}
 	}
