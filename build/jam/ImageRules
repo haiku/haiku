@@ -785,6 +785,16 @@ rule AddOptionalHaikuImagePackages packages
 	}
 }
 
+rule SuppressOptionalHaikuImagePackages packages
+{
+	local package ;
+	for package in $(packages) {
+		if ! [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_SUPPRESSED) ] {
+			HAIKU_OPTIONAL_PACKAGE_SUPPRESSED on $(package) = 1 ;
+		}
+	}
+}
+
 rule IsOptionalHaikuImagePackageAdded package
 {
 	if ! [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_EXISTS) ] {
@@ -792,7 +802,8 @@ rule IsOptionalHaikuImagePackageAdded package
 		HAIKU_EXISTING_OPTIONAL_PACKAGES += $(package) ;
 	}
 
-	if [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_ADDED) ] {
+	if [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_ADDED) ] &&
+			! [ on $(package) return $(HAIKU_OPTIONAL_PACKAGE_SUPPRESSED) ] {
 		return 1 ;
 	}
 

@@ -128,6 +128,12 @@ ExtractArchiveToHaikuImage develop tools
 # via wget (i.e. wget must be installed).
 AddOptionalHaikuImagePackages WonderBrush ;
 
+# Add the optional package WebPositive to the image but don't add its
+# dependent SQLite optional package to the image. WebPositive still needs
+# SQLite to run, this allows you to test a different version of it though.
+AddOptionalHaikuImagePackages WebPositive ;
+SuppressOptionalHaikuImagePackages SQLite ;
+
 # Don't add the libraries built with the alternative gcc version.
 # If the alternative gcc generated directory has been specified via the
 # configure option --alternative-gcc-output-dir, the libraries for the
