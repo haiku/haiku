@@ -18,6 +18,7 @@ ResComp $(haiku-utils_rsrc) : [ FGristFiles haiku-utils.rdef ] ;
 AddResources checkitout : checkitout.rdef ;
 AddResources fortune : fortune.rdef ;
 AddResources hey : hey.rdef ;
+AddResources keymap : keymap.rdef ;
 AddResources mimeset : mimeset.rdef ;
 AddResources mountvolume : mountvolume.rdef ;
 AddResources notify : notify.rdef ;
