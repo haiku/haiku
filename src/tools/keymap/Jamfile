@@ -11,6 +11,8 @@ local regexSources ;
 local storageSources ;
 
 if $(HOST_PLATFORM) = cygwin || $(HOST_PLATFORM) = sunos {
+	UseHeaders [ FDirName $(HAIKU_TOP) src system libroot posix glibc regex ] ;
+	SubDirCcFlags -D__USE_GNU -DHAVE_STDBOOL_H ;
 	regexSources = regex.c ;
 }
 if $(HOST_PLATFORM) = haiku_host {
