@@ -2038,8 +2038,11 @@ ep_initialize(int fd, partition_id partitionID, const char* name,
 
 	// get partition
 	partition_data* partition = get_partition(partitionID);
+	if (!partition)
+		return B_BAD_VALUE;
+
 	PrimaryPartition* primary = (PrimaryPartition*)partition->cookie;
-	if (!partition || !primary)
+	if (!primary)
 		return B_BAD_VALUE;
 
 	// name is ignored - we cannot set it to the Intel Extended Partition
