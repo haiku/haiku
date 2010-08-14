@@ -41,7 +41,7 @@ typedef __haiku_addr_t active_reg_t;
    remains the value 0.  The bits are given in alphabetical order, and
    the definitions shifted by one from the previous bit; thus, when we
    add or remove a bit, only one other definition need change.  */
-typedef __haiku_addr_t reg_syntax_t;
+typedef __haiku_uint32 reg_syntax_t;
 
 #ifdef __USE_GNU
 /* If this bit is not set, then \ inside a bracket expression is literal.
