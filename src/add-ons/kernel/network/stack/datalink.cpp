@@ -164,7 +164,17 @@ get_interface_name_or_index(net_domain* domain, int32 option, void* value,
 }
 
 
-status_t
+static void
+set_interface_address(net_interface_address*& target, InterfaceAddress* address)
+{
+	if (target != NULL)
+		static_cast<InterfaceAddress*>(target)->ReleaseReference();
+
+	target = address;
+}
+
+
+static status_t
 fill_address(const sockaddr* from, sockaddr* to, size_t maxLength)
 {
 	if (from != NULL) {
@@ -260,7 +270,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 
 			return status;
 		}
-	
+
 		case SIOCGIFCOUNT:
 		{
 			// count number of interfaces
@@ -340,7 +350,7 @@ datalink_send_routed_data(struct net_route* route, net_buffer* buffer)
 {
 	TRACE("%s(route %p, buffer %p)\n", __FUNCTION__, route, buffer);
 
-	net_interface_address* address = route->interface_address;
+	InterfaceAddress* address = (InterfaceAddress*)route->interface_address;
 	Interface* interface = (Interface*)address->interface;
 
 	//dprintf("send buffer (%ld bytes) to interface %s (route flags %lx)\n",
@@ -356,7 +366,8 @@ datalink_send_routed_data(struct net_route* route, net_buffer* buffer)
 
 		// We set the interface address here, so the buffer is delivered
 		// directly to the domain in interfaces.cpp:device_consumer_thread()
-		buffer->interface_address = address;
+		address->AcquireReference();
+		set_interface_address(buffer->interface_address, address);
 
 		// this one goes back to the domain directly
 		return fifo_enqueue_buffer(
@@ -408,7 +419,7 @@ datalink_send_data(net_protocol* protocol, net_domain* domain,
 			&route);
 	} else
 		status = get_buffer_route(domain, buffer, &route);
-	
+
 	TRACE("  route status: %s\n", strerror(status));
 
 	if (status != B_OK)
@@ -422,8 +433,10 @@ datalink_send_data(net_protocol* protocol, net_domain* domain,
 
 /*!	Tests if \a address is a local address in the domain.
 
-	\param _interface will be set to the interface belonging to that address
-		if non-NULL.
+	\param _interfaceAddress will be set to the interface address belonging to
+		that address if non-NULL. If the address \a _interfaceAddress points to
+		is not NULL, it is assumed that it already points to an address, which
+		is then released before the new address is assigned.
 	\param _matchedType will be set to either zero or MSG_BCAST if non-NULL.
 */
 static bool
@@ -457,7 +470,7 @@ datalink_is_local_address(net_domain* domain, const struct sockaddr* address,
 	TRACE("  it is, interface address %p\n", interfaceAddress);
 
 	if (_interfaceAddress != NULL)
-		*_interfaceAddress = interfaceAddress;
+		set_interface_address(*_interfaceAddress, interfaceAddress);
 	else
 		interfaceAddress->ReleaseReference();
 
@@ -472,7 +485,10 @@ datalink_is_local_address(net_domain* domain, const struct sockaddr* address,
 
 	\param unconfiguredOnly only unconfigured interfaces are taken into account.
 	\param _interfaceAddress will be set to the first address of the interface
-		and domain belonging to that address if non-NULL.
+		and domain belonging to that address if non-NULL. If the address
+		\a _interfaceAddress points to is not NULL, it is assumed that it
+		already points to an address, which is then released before the new
+		address is assigned.
 */
 static bool
 datalink_is_local_link_address(net_domain* domain, bool unconfiguredOnly,
@@ -496,7 +512,7 @@ datalink_is_local_link_address(net_domain* domain, bool unconfiguredOnly,
 	}
 
 	if (_interfaceAddress != NULL)
-		*_interfaceAddress = interfaceAddress;
+		set_interface_address(*_interfaceAddress, interfaceAddress);
 	else
 		interfaceAddress->ReleaseReference();
 

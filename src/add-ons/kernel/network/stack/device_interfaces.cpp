@@ -59,7 +59,8 @@ device_reader_thread(void* _interface)
 			if (atomic_get(&interface->monitor_count) > 0)
 				device_interface_monitor_receive(interface, buffer);
 
-			buffer->interface_address = NULL;
+			ASSERT(buffer->interface_address == NULL);
+
 			if (interface->deframe_func(interface->device, buffer) != B_OK) {
 				gNetBufferModule.free(buffer);
 				continue;
@@ -307,7 +308,7 @@ get_device_interface_address(net_device_interface* interface,
 	address.sdl_alen = interface->device->address.length;
 	memcpy(LLADDR(&address), interface->device->address.data, address.sdl_alen);
 
-	address.sdl_len = sizeof(sockaddr_dl) - sizeof(address.sdl_data) 
+	address.sdl_len = sizeof(sockaddr_dl) - sizeof(address.sdl_data)
 		+ address.sdl_nlen + address.sdl_alen;
 }
 
