@@ -280,8 +280,8 @@ BMediaFiles::RemoveItem(const char* type, const char* item)
 void
 BMediaFiles::_ClearTypes()
 {
-	for (int32 i = 0; i < fItems.CountItems(); i++)
-		delete (BString*)fItems.ItemAt(i);
+	for (int32 i = 0; i < fTypes.CountItems(); i++)
+		delete (BString*)fTypes.ItemAt(i);
 
 	fTypes.MakeEmpty();
 }
