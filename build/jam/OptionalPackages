@@ -316,17 +316,10 @@ if [ IsOptionalHaikuImagePackageAdded CDRecord ] {
 		Echo "No optional package CDRecord available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			cdrtools-2.01.01a77-r1a2-x86-gcc2-2010-04-30-a.zip
-			: $(baseURL)/cdrtools-2.01.01a77-r1a2-x86-gcc2-2010-04-30-a.zip
+			cdrtools-3.00-x86-gcc2-2010-08-14.zip
+			: $(baseURL)/cdrtools-3.00-x86-gcc2-2010-08-14.zip
 			:
 		;
-		AddSymlinkToHaikuImage common bin
-			: /boot/apps/cdrtools/bin/cdrecord ;
-		AddSymlinkToHaikuImage common bin
-			: /boot/apps/cdrtools/bin/mkisofs ;
-		InstallSourceArchive cdrtools-2.01.01a77_haiku-2010-04-30.tar.xz
-			: $(baseSourceURL)/cdrtools-2.01.01a77_haiku-2010-04-30.tar.xz
- 		;
 	}
 }
 
