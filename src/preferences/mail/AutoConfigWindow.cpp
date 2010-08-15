@@ -154,55 +154,55 @@ AutoConfigWindow::QuitRequested(void)
 Account*
 AutoConfigWindow::GenerateBasicAccount()
 {
-	if(!fAccount){
+	if(!fAccount) {
 		fAccount = Accounts::NewAccount();
 		fAccount->SetType(fAccountInfo.type);
 		fAccount->SetName(fAccountInfo.accountName.String());
 		fAccount->SetRealName(fAccountInfo.name.String());
 		fAccount->SetReturnAddress(fAccountInfo.email.String());
 				
-		BMailChain *inbound = fAccount->Inbound();
-
 		BString inServerName;
 		int32 authType = 0;
 		int32 ssl = 0;
 		if (fAccountInfo.inboundType == IMAP) {
 			inServerName = fAccountInfo.providerInfo.imap_server;
 			ssl = fAccountInfo.providerInfo.ssl_imap;
-		}
-		else {
+		} else {
 			inServerName = fAccountInfo.providerInfo.pop_server;
 			authType = fAccountInfo.providerInfo.authentification_pop;
 			ssl = fAccountInfo.providerInfo.ssl_pop;
 		}
 		if (fAccountInfo.type == INBOUND_TYPE
-				|| fAccountInfo.type == IN_AND_OUTBOUND_TYPE)
-		{
-			BMessage inboundArchive;
-			inboundArchive.AddString("server", inServerName);
-			inboundArchive.AddInt32("auth_method", authType);
-			inboundArchive.AddInt32("flavor", ssl);
-			inboundArchive.AddString("username", fAccountInfo.loginName);
-			inboundArchive.AddString("password", fAccountInfo.password);
-			inboundArchive.AddBool("leave_mail_on_server", true);
-			inboundArchive.AddBool("delete_remote_when_local", true);
-			inbound->SetFilter(0, inboundArchive, fAccountInfo.inboundProtocol);
+				|| fAccountInfo.type == IN_AND_OUTBOUND_TYPE) {
+			BMailChain *inbound = fAccount->Inbound();
+			if (inbound != NULL) {
+				BMessage inboundArchive;
+				inboundArchive.AddString("server", inServerName);
+				inboundArchive.AddInt32("auth_method", authType);
+				inboundArchive.AddInt32("flavor", ssl);
+				inboundArchive.AddString("username", fAccountInfo.loginName);
+				inboundArchive.AddString("password", fAccountInfo.password);
+				inboundArchive.AddBool("leave_mail_on_server", true);
+				inboundArchive.AddBool("delete_remote_when_local", true);
+				inbound->SetFilter(0, inboundArchive, fAccountInfo.inboundProtocol);
+			}
 		}
 
 		if (fAccountInfo.type == OUTBOUND_TYPE
-				|| fAccountInfo.type == IN_AND_OUTBOUND_TYPE)
-		{
+				|| fAccountInfo.type == IN_AND_OUTBOUND_TYPE) {
 			BMailChain *outbound = fAccount->Outbound();
-			BMessage outboundArchive;
-			outboundArchive.AddString("server",
-										fAccountInfo.providerInfo.smtp_server);
-			outboundArchive.AddString("username", fAccountInfo.loginName);
-			outboundArchive.AddString("password", fAccountInfo.password);
-			outboundArchive.AddInt32("auth_method",
-										fAccountInfo.providerInfo.authentification_smtp);
-			outboundArchive.AddInt32("flavor", fAccountInfo.providerInfo.ssl_smtp);
-			outbound->SetFilter(1, outboundArchive,
-									fAccountInfo.outboundProtocol);
+			if (outbound != NULL) {
+				BMessage outboundArchive;
+				outboundArchive.AddString("server",
+											fAccountInfo.providerInfo.smtp_server);
+				outboundArchive.AddString("username", fAccountInfo.loginName);
+				outboundArchive.AddString("password", fAccountInfo.password);
+				outboundArchive.AddInt32("auth_method",
+											fAccountInfo.providerInfo.authentification_smtp);
+				outboundArchive.AddInt32("flavor", fAccountInfo.providerInfo.ssl_smtp);
+				outbound->SetFilter(1, outboundArchive,
+										fAccountInfo.outboundProtocol);
+			}
 		}
 	}
 	return fAccount;
