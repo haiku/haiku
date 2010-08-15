@@ -43,9 +43,9 @@ public:
 	virtual	void				MakeFocus(bool focused = true);
 	virtual	void				KeyDown(const char* bytes, int32 numBytes);
 
-	uint32						CountSections() const;
-	int32						FocusIndex() const;
-	BRect						SectionArea() const;
+			uint32				CountSections() const;
+			int32				FocusIndex() const;
+			BRect				SectionArea() const;
 
 protected:
 	virtual	void				InitView();
