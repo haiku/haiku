@@ -473,7 +473,7 @@ ata_adapter_channel_removed(ata_adapter_channel_info *channel)
 
 	if (channel != NULL)
 		// disable access instantly
-		atomic_or(&channel->lost, 1);
+		atomic_or((int32*)&channel->lost, 1);
 }
 
 
@@ -684,7 +684,7 @@ ata_adapter_controller_removed(ata_adapter_controller_info *controller)
 
 	if (controller != NULL) {
 		// disable access instantly; unit_device takes care of unregistering ioports
-		atomic_or(&controller->lost, 1);
+		atomic_or((int32*)&controller->lost, 1);
 	}
 }
 
