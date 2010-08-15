@@ -436,65 +436,6 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 }
 
 
-static void
-arp_remove_local_entry(arp_protocol* protocol, const sockaddr* local,
-	bool updateLocalAddress)
-{
-	in_addr_t inetAddress;
-
-	if (local == NULL) {
-		// interface has not yet been set
-		inetAddress = INADDR_ANY;
-	} else
-		inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
-
-	TRACE(("%s(): address %s\n", __FUNCTION__, inet_to_string(inetAddress)));
-
-	MutexLocker locker(sCacheLock);
-
-	arp_entry* entry = arp_entry::Lookup(inetAddress);
-	if (entry != NULL) {
-		hash_remove(sCache, entry);
-		entry->flags |= ARP_FLAG_REMOVED;
-	}
-
-	if (updateLocalAddress && protocol->local_address == inetAddress) {
-		// find new local sender address
-		protocol->local_address = 0;
-
-		net_interface_address* address = NULL;
-		while (sDatalinkModule->get_next_interface_address(protocol->interface,
-				&address)) {
-			if (address->local == NULL || address->local->sa_family != AF_INET)
-				continue;
-
-			protocol->local_address
-				= ((sockaddr_in*)address->local)->sin_addr.s_addr;
-		}
-	}
-
-	locker.Unlock();
-	delete entry;
-}
-
-
-/*!	Removes all entries belonging to the local interface of the \a procotol
-	given.
-*/
-static void
-arp_remove_local(arp_protocol* protocol)
-{
-	net_interface_address* address = NULL;
-	while (sDatalinkModule->get_next_interface_address(protocol->interface,
-			&address)) {
-		if (address->local == NULL || address->local->sa_family != AF_INET)
-			continue;
-
-		arp_remove_local_entry(protocol, address->local, false);
-	}
-}
-
-
 static status_t
 arp_set_local_entry(arp_protocol* protocol, const sockaddr* local)
 {
@@ -534,6 +475,71 @@ arp_set_local_entry(arp_protocol* protocol, const sockaddr* local)
 		entry->protocol = protocol;
 
 	return status;
+}
+
+
+static void
+arp_remove_local_entry(arp_protocol* protocol, const sockaddr* local,
+	net_interface_address* updateLocalAddress = NULL)
+{
+	in_addr_t inetAddress;
+
+	if (local == NULL) {
+		// interface has not yet been set
+		inetAddress = INADDR_ANY;
+	} else
+		inetAddress = ((sockaddr_in*)local)->sin_addr.s_addr;
+
+	TRACE(("%s(): address %s\n", __FUNCTION__, inet_to_string(inetAddress)));
+
+	MutexLocker locker(sCacheLock);
+
+	arp_entry* entry = arp_entry::Lookup(inetAddress);
+	if (entry != NULL) {
+		hash_remove(sCache, entry);
+		entry->flags |= ARP_FLAG_REMOVED;
+	}
+
+	if (updateLocalAddress != NULL && protocol->local_address == inetAddress) {
+		// find new local sender address
+		protocol->local_address = 0;
+
+		net_interface_address* address = NULL;
+		while (sDatalinkModule->get_next_interface_address(protocol->interface,
+				&address)) {
+			if (address == updateLocalAddress || address->local == NULL
+				|| address->local->sa_family != AF_INET)
+				continue;
+
+			protocol->local_address
+				= ((sockaddr_in*)address->local)->sin_addr.s_addr;
+		}
+	}
+
+	locker.Unlock();
+	delete entry;
+
+	if (protocol->local_address == 0 && updateLocalAddress) {
+		// Try to keep the interface operational
+		arp_set_local_entry(protocol, NULL);
+	}
+}
+
+
+/*!	Removes all entries belonging to the local interface of the \a procotol
+	given.
+*/
+static void
+arp_remove_local(arp_protocol* protocol)
+{
+	net_interface_address* address = NULL;
+	while (sDatalinkModule->get_next_interface_address(protocol->interface,
+			&address)) {
+		if (address->local == NULL || address->local->sa_family != AF_INET)
+			continue;
+
+		arp_remove_local_entry(protocol, address->local);
+	}
 }
 
 
@@ -1130,7 +1136,7 @@ arp_change_address(net_datalink_protocol* _protocol,
 
 				if (option != SIOCAIFADDR
 					&& (oldAddress == NULL || oldAddress->sa_family == AF_INET))
-					arp_remove_local_entry(protocol, oldAddress, true);
+					arp_remove_local_entry(protocol, oldAddress, address);
 			}
 			break;
 
