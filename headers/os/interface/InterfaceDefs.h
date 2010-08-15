@@ -295,8 +295,6 @@ enum color_which {
 	// Old name synonyms.
 	B_KEYBOARD_NAVIGATION_COLOR = B_NAVIGATION_BASE_COLOR,
 	B_MENU_SELECTION_BACKGROUND_COLOR = B_MENU_SELECTED_BACKGROUND_COLOR,
-	B_TOOLTIP_BACKGROUND_COLOR = B_TOOL_TIP_BACKGROUND_COLOR,
-	B_TOOLTIP_TEXT_COLOR = B_TOOL_TIP_TEXT_COLOR,
 
 	// These are deprecated -- do not use in new code.  See BScreen for
 	// the replacement for B_DESKTOP_COLOR.
