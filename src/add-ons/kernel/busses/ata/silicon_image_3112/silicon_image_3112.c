@@ -685,7 +685,7 @@ dma_prepare(void *channelCookie, const physical_entry *sg_list,
 
 	for (i = sg_list_count - 1, prd = channel->prdt; i >= 0;
 			--i, ++prd, ++sg_list ) {
-		prd->address = B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
+		prd->address = B_HOST_TO_LENDIAN_INT32((uint32)pci->ram_address(device,
 			(void*)(addr_t)sg_list->address));
 
 		// 0 means 64K - this is done automatically by discarding upper 16 bits
@@ -697,7 +697,7 @@ dma_prepare(void *channelCookie, const physical_entry *sg_list,
 
 	// XXX move this to chan init?
 	temp = (*channel->bm_prdt_address) & 3;
-	temp |= B_HOST_TO_LENDIAN_INT32(pci->ram_address(device,
+	temp |= B_HOST_TO_LENDIAN_INT32((uint32)pci->ram_address(device,
 		(void *)(addr_t)channel->prdt_phys)) & ~3;
 	*channel->bm_prdt_address = temp;
 
