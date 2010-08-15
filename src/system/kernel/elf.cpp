@@ -1167,7 +1167,7 @@ load_elf_symbol_table(int fd, struct elf_image_info *image)
 			if (length < size) {
 				TRACE(("error reading in symbol table\n"));
 				status = B_ERROR;
-				goto error1;
+				goto error2;
 			}
 
 			numSymbols = size / sizeof(struct Elf32_Sym);
