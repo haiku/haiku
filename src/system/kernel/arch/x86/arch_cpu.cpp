@@ -124,6 +124,15 @@ acpi_shutdown(bool rebootSystem)
 	if (rebootSystem) {
 		status = acpi->reboot();
 	} else {
+		// Make sure we run on the boot CPU (apparently needed for some ACPI
+		// implementations)
+		_user_set_cpu_enabled(0, true);
+		for (int32 cpu = 1; cpu < smp_get_num_cpus(); cpu++) {
+			_user_set_cpu_enabled(cpu, false);
+		}
+		// TODO: must not be called from the idle thread!
+		thread_yield(true);
+
 		status = acpi->prepare_sleep_state(ACPI_POWER_STATE_OFF, NULL, 0);
 		if (status == B_OK) {
 			//cpu_status state = disable_interrupts();
@@ -913,13 +922,6 @@ error:
 status_t
 arch_cpu_shutdown(bool rebootSystem)
 {
-	// Make sure we run on the boot CPU (apparently needed for ACPI)
-	_user_set_cpu_enabled(0, true);
-	for (int32 cpu = 1; cpu < smp_get_num_cpus(); cpu++) {
-		_user_set_cpu_enabled(cpu, false);
-	}
-	thread_yield(true);
-
 	if (acpi_shutdown(rebootSystem) == B_OK)
 		return B_OK;
 
