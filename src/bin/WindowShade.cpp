@@ -15,6 +15,15 @@
 #include <InterfaceDefs.h>
 #include <String.h>
 
+namespace BPrivate {
+int32 count_decorators(void);
+int32 get_decorator(void);
+status_t get_decorator_name(const int32 &index, BString &name);
+status_t get_decorator_preview(const int32 &index, BBitmap *bitmap);
+status_t set_decorator(const int32 &index);
+}
+
+using namespace BPrivate;
 
 static int sColorWhich = -1;
 static struct option const kLongOptions[] = {
@@ -133,6 +142,7 @@ main(int argc, char **argv)
 
 			case 'r':
 				// TODO: refresh (but shouldn't be needed)
+				set_decorator(get_decorator());
 				break;
 			case 's':
 				// IGNORED, for compatibility with original app
