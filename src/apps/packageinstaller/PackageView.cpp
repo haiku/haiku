@@ -607,9 +607,9 @@ PackageView::_GroupChanged(int32 index)
 	fCurrentType = index;
 	pkg_profile *prof = fInfo.GetProfile(index);
 	BString test;
-	fInstallDesc->SetText(prof->description.String());
-
+	
 	if (prof) {
+		fInstallDesc->SetText(prof->description.String());
 		BMenuItem *item = 0;
 		BPath path;
 		BMessage *temp;
