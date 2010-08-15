@@ -320,7 +320,7 @@ BUSBDevice::CountConfigurations() const
 const BUSBConfiguration *
 BUSBDevice::ConfigurationAt(uint32 index) const
 {
-	if (index >= fDescriptor.num_configurations && fConfigurations != NULL)
+	if (index >= fDescriptor.num_configurations || fConfigurations == NULL)
 		return NULL;
 
 	return fConfigurations[index];
