@@ -848,6 +848,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->MakeEditable(false);
 	fCreditsView->SetWordWrap(true);
 	fCreditsView->SetInsets(5, 5, 5, 5);
+	fCreditsView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 
 	BScrollView* creditsScroller = new BScrollView("creditsScroller",
 		fCreditsView, B_WILL_DRAW | B_FRAME_EVENTS, false, true,

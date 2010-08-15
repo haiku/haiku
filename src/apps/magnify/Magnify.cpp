@@ -897,7 +897,7 @@ TInfoView::Draw(BRect updateRect)
 	invalRect.Set(10, 5, 10 + StringWidth(fInfoStr), fFontHeight+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);
-	SetHighColor(0, 0, 0, 255);
+	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	strcpy(fInfoStr, str);
 	DrawString(fInfoStr);
 
@@ -914,7 +914,7 @@ TInfoView::Draw(BRect updateRect)
 	invalRect.Set(10, fFontHeight+7, 10 + StringWidth(fRGBStr), fFontHeight*2+7);
 	SetHighColor(ViewColor());
 	FillRect(invalRect);
-	SetHighColor(0,0,0,255);
+	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	strcpy(fRGBStr,str);
 	DrawString(fRGBStr);
 
@@ -933,7 +933,7 @@ TInfoView::Draw(BRect updateRect)
 			invalRect.Set(10, h-12-fFontHeight, 10 + StringWidth(fCH2Str), h-10);
 			SetHighColor(ViewColor());
 			FillRect(invalRect);
-			SetHighColor(0,0,0,255);
+			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH2Str,str);
 			DrawString(fCH2Str);
 		}
@@ -945,7 +945,7 @@ TInfoView::Draw(BRect updateRect)
 			invalRect.Set(10, h-10-2*fFontHeight-2, 10 + StringWidth(fCH1Str), h-10-fFontHeight);
 			SetHighColor(ViewColor());
 			FillRect(invalRect);
-			SetHighColor(0,0,0,255);
+			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH1Str,str);
 			DrawString(fCH1Str);
 		} else if (ch1Showing) {
@@ -954,7 +954,7 @@ TInfoView::Draw(BRect updateRect)
 			invalRect.Set(10, h-10-fFontHeight, 10 + StringWidth(fCH1Str), h-8);
 			SetHighColor(ViewColor());
 			FillRect(invalRect);
-			SetHighColor(0,0,0,255);
+			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 			strcpy(fCH1Str,str);
 			DrawString(fCH1Str);
 		}
