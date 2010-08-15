@@ -1159,7 +1159,7 @@ free_buffer(net_buffer* _buffer)
 	delete_ancillary_data_container(buffer->ancillary_data);
 
 	release_data_header(buffer->allocation_header);
-	
+
 	if (buffer->interface_address != NULL)
 		((InterfaceAddress*)buffer->interface_address)->ReleaseReference();
 
@@ -2109,7 +2109,7 @@ status_t
 restore_header(net_buffer* _buffer, uint32 offset, void* data, size_t bytes)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	
+
 	if (offset < buffer->stored_header_length) {
 		data_node* node = (data_node*)list_get_first_item(&buffer->buffers);
 		if (node == NULL

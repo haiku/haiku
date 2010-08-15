@@ -1599,7 +1599,7 @@ ipv4_receive_data(net_buffer* buffer)
 				buffer->destination, &buffer->interface_address)) {
 			TRACE("  ipv4_receive_data(): packet was not for us %x -> %x",
 				ntohl(header.source), ntohl(header.destination));
-	
+
 			// Send ICMP error: Host unreachable
 			sDomain->module->error_reply(NULL, buffer, B_NET_ERROR_UNREACH_HOST,
 				NULL);
