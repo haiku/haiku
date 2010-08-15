@@ -459,8 +459,8 @@ ApplicationTypeWindow::_Title(const BEntry& entry)
 	if (entry.GetName(name) != B_OK)
 		strcpy(name, "\"-\"");
 
-	BString title(name);
-	title.Append(" application type");
+	BString title = B_TRANSLATE("%1 application type");
+	title.ReplaceFirst("%1", name);
 	return title;
 }
 
