@@ -92,11 +92,21 @@ static int
 dump_interface(int argc, char** argv)
 {
 	if (argc != 2) {
-		kprintf("usage: %s [address]\n", argv[0]);
+		kprintf("usage: %s [name|address]\n", argv[0]);
 		return 0;
 	}
 
-	Interface* interface = (Interface*)parse_expression(argv[1]);
+	Interface* interface = NULL;
+
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while ((interface = iterator.Next()) != NULL) {
+		if (!strcmp(argv[1], interface->name))
+			break;
+	}
+
+	if (interface == NULL)
+		interface = (Interface*)parse_expression(argv[1]);
+
 	interface->Dump();
 
 	return 0;
