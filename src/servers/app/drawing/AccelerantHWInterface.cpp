@@ -252,6 +252,8 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 		}
 	}
 
+	closedir(directory);
+
 	return device;
 }
 
