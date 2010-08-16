@@ -8,6 +8,8 @@
 
 #include <time.h>
 
+#include <StorageDefs.h>
+
 #include "ICUTimeData.h"
 #include "LocaleBackend.h"
 
@@ -39,7 +41,7 @@ private:
 
 			TimeConversionDataBridge*	fDataBridge;
 
-			char				fTimeZoneID[64];
+			char				fTimeZoneID[B_FILE_NAME_LENGTH];
 };
 
 

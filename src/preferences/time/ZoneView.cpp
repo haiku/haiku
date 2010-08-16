@@ -360,21 +360,8 @@ TimeZoneView::_SetSystemTimeZone()
 
 	gMutableLocaleRoster->SetDefaultTimeZone(timeZone);
 
-	_kern_set_timezone(timeZone.OffsetFromGMT());
-
-	BPath path;
-	status_t status = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true);
-	BFile file;
-	if (status == B_OK) {
-		path.Append("libroot_timezone_info");
-		status = file.SetTo(path.Path(),
-			B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
-	}
-	if (status == B_OK) {
-		const BString& timeZoneID = timeZone.Code();
-		file.Write(timeZoneID.String(), timeZoneID.Length());
-		file.Sync();
-	}
+	_kern_set_timezone(timeZone.OffsetFromGMT(), timeZone.Code().String(),
+		timeZone.Code().Length());
 
 	fSetZone->SetEnabled(false);
 	fLastUpdateMinute = -1;

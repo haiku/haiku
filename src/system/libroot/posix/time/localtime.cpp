@@ -5,12 +5,12 @@
 
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include <FindDirectory.h>
+#include <syscalls.h>
+
 #include <StorageDefs.h>
 
 #include "LocaleBackend.h"
@@ -38,31 +38,16 @@ tzset(void)
 	if (gLocaleBackend == NULL && LocaleBackend::LoadBackend() != B_OK)
 		return;
 
-	char timeZoneID[64] = { "GMT" };
+	char timeZoneID[B_FILE_NAME_LENGTH] = { "GMT" };
 
 	const char* tz = getenv("TZ");
 	if (tz != NULL)
 		strlcpy(timeZoneID, tz, sizeof(timeZoneID));
-	else {
-		do {
-			char path[B_PATH_NAME_LENGTH];
-			if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
-					sizeof(path)) < 0)
-				break;
-			strlcat(path, "/libroot_timezone_info", sizeof(path));
+	else
+		_kern_get_timezone(NULL, timeZoneID, sizeof(timeZoneID));
 
-			FILE* tzInfoFile = fopen(path, "r");
-			if (tzInfoFile == NULL)
-				break;
-
-			fgets(timeZoneID, sizeof(timeZoneID), tzInfoFile);
-			fclose(tzInfoFile);
-		} while(0);
-	}
-
-	if (gLocaleBackend != NULL) {
+	if (gLocaleBackend != NULL)
 		gLocaleBackend->TZSet(timeZoneID);
-	}
 }
 
 

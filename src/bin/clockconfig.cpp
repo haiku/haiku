@@ -10,6 +10,7 @@
 #include <Message.h>
 #include <OS.h>
 #include <Path.h>
+#include <String.h>
 
 #include <syscalls.h>
 
@@ -62,14 +63,21 @@ setTimeZoneOffset(BPath path)
 		fprintf(stderr, "%s: unable to parse Time settings file\n", program);
 		return;
 	}
+	BString timeZoneName;
+	if (settings.FindString("timezone", &timeZoneName) != B_OK) {
+		fprintf(stderr, "%s: no timezone found\n", program);
+		return;
+	}
 	int32 timeZoneOffset;
 	if (settings.FindInt32("offset", &timeZoneOffset) != B_OK) {
 		fprintf(stderr, "%s: no timezone offset found\n", program);
 		return;
 	}
 
-	_kern_set_timezone(timeZoneOffset);
-	printf("timezone offset is %ld seconds from GMT.\n", timeZoneOffset);
+	_kern_set_timezone(timeZoneOffset, timeZoneName.String(),
+		timeZoneName.Length());
+	printf("timezone is %s, offset is %ld seconds from GMT.\n",
+		timeZoneName.String(), timeZoneOffset);
 }
 
 

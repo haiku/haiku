@@ -32,6 +32,7 @@
 static struct real_time_data *sRealTimeData;
 static bool sIsGMT = false;
 static bigtime_t sTimezoneOffset = 0;
+static char sTimezoneName[B_FILE_NAME_LENGTH] = "GMT";
 
 
 /*! Write the system time to CMOS. */
@@ -217,7 +218,7 @@ _user_set_real_time_clock(uint32 time)
 
 
 status_t
-_user_set_timezone(time_t timezoneOffset)
+_user_set_timezone(time_t timezoneOffset, const char *name, size_t nameLength)
 {
 	bigtime_t offset = (bigtime_t)timezoneOffset * 1000000LL;
 
@@ -227,6 +228,12 @@ _user_set_timezone(time_t timezoneOffset)
 	TRACE(("old system_time_offset %Ld old %Ld new %Ld gmt %d\n",
 		arch_rtc_get_system_time_offset(sRealTimeData), sTimezoneOffset,
 		offset, sIsGMT));
+
+	if (name != NULL && nameLength > 0) {
+		if (!IS_USER_ADDRESS(name)
+			|| user_strlcpy(sTimezoneName, name, sizeof(sTimezoneName)) < 0)
+			return B_BAD_ADDRESS;
+	}
 
 	// We only need to update our time offset if the hardware clock
 	// does not run in the local timezone.
@@ -247,12 +254,18 @@ _user_set_timezone(time_t timezoneOffset)
 
 
 status_t
-_user_get_timezone(time_t *_timezoneOffset)
+_user_get_timezone(time_t *_timezoneOffset, char *userName, size_t nameLength)
 {
 	time_t offset = (time_t)(sTimezoneOffset / 1000000LL);
 
-	if (!IS_USER_ADDRESS(_timezoneOffset)
-		|| user_memcpy(_timezoneOffset, &offset, sizeof(time_t)) < B_OK)
+	if (_timezoneOffset != NULL
+		&& (!IS_USER_ADDRESS(_timezoneOffset)
+			|| user_memcpy(_timezoneOffset, &offset, sizeof(time_t)) < B_OK))
+		return B_BAD_ADDRESS;
+
+	if (userName != NULL
+		&& (!IS_USER_ADDRESS(userName)
+			|| user_strlcpy(userName, sTimezoneName, nameLength) < 0))
 		return B_BAD_ADDRESS;
 
 	return B_OK;
