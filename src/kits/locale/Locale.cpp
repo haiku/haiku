@@ -259,7 +259,6 @@ BLocale::GetDateFormat(BString& format, bool longFormat) const
 status_t
 BLocale::SetDateFormat(const char* formatString, bool longFormat)
 {
-printf("FV::SetDateFormat: df='%s'\n", formatString);
 	if (longFormat)
 		fLongDateFormat = formatString;
 	else
