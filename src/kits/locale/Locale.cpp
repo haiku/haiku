@@ -9,6 +9,7 @@
 #include <Catalog.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
+#include <TimeZone.h>
 
 #include <unicode/datefmt.h>
 #include <unicode/dcfmtsym.h>
@@ -393,7 +394,8 @@ BLocale::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
 
 
 status_t
-BLocale::FormatTime(BString* string, time_t time, bool longFormat)
+BLocale::FormatTime(BString* string, time_t time, bool longFormat,
+	const BTimeZone* timeZone)
 {
 	string->Truncate(0);
 
@@ -401,6 +403,14 @@ BLocale::FormatTime(BString* string, time_t time, bool longFormat)
 		*fICULocale, longFormat ? fLongTimeFormat : fShortTimeFormat);
 	if (timeFormatter.Get() == NULL)
 		return B_NO_MEMORY;
+
+	if (timeZone != NULL) {
+		ObjectDeleter<TimeZone> icuTimeZone
+			= TimeZone::createTimeZone(timeZone->Code().String());
+		if (icuTimeZone.Get() == NULL)
+			return B_NO_MEMORY;
+		timeFormatter->setTimeZone(*icuTimeZone.Get());
+	}
 
 	UnicodeString ICUString;
 	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);

@@ -13,6 +13,7 @@
 
 class BCatalog;
 class BString;
+class BTimeZone;
 
 
 class BLocale {
@@ -46,6 +47,8 @@ public:
 
 								// Date
 
+								// TODO: drop some of these once BDateFormat
+								//       has been implemented!
 			status_t			FormatDate(char* string, size_t maxSize,
 									time_t time, bool longFormat);
 			status_t			FormatDate(BString* string, time_t time,
@@ -63,10 +66,13 @@ public:
 
 								// Time
 
+								// TODO: drop some of these once BTimeFormat
+								//       has been implemented!
 			status_t			FormatTime(char* string, size_t maxSize,
 									time_t time, bool longFormat);
 			status_t			FormatTime(BString* string, time_t time,
-									bool longFormat);
+									bool longFormat,
+									const BTimeZone* timeZone = NULL);
 			status_t			FormatTime(BString* string,
 									int*& fieldPositions, int& fieldCount,
 									time_t time, bool longFormat);
