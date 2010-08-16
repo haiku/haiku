@@ -74,8 +74,8 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 			if (!fOldItems) {
 				// indicate bad object init
 				_CleanUp(fNewItems, fNewCount, true);
-			}
-			memset(fOldItems, 0, fOldCount * sizeof(PlaylistItem*));
+			} else
+				memset(fOldItems, 0, fOldCount * sizeof(PlaylistItem*));
 		}
 	}
 
