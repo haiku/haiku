@@ -227,7 +227,7 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 
 			if (!entry->WriteLock()) {
 				FontCache::Default()->Recycle(entry);
-				return NULL;
+				return false;
 			}
 
 			// Update the FontCacheReference, since the locking kind changed.
