@@ -486,7 +486,7 @@ BColumnTitle::Draw(BView *view, bool pressed)
 			be_control_look->DrawButtonBackground(view, rect, rect, base, 0,
 				BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 		} else {
-			view->SetLowColor(pressed ? sDarkTitleBackground : sTitleBackground);
+			view->SetLowColor(sDarkTitleBackground);
 			view->FillRect(bounds, B_SOLID_LOW);
 		}
 	}
