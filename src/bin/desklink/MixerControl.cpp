@@ -135,7 +135,7 @@ retry:
 					errorString = volumeWhich ? "Soundcard control unknown"
 						: "Mixer control unknown";
 				} else {
-					fMixerParameter = dynamic_cast<BContinuousParameter*>(p);
+					fMixerParameter = static_cast<BContinuousParameter*>(p);
 					fMin = fMixerParameter->MinValue();
 					fMax = fMixerParameter->MaxValue();
 					fStep = fMixerParameter->ValueStep();
