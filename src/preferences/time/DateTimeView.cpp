@@ -28,7 +28,6 @@
 #include <StringView.h>
 #include <Window.h>
 
-#include <stdio.h>
 #include <time.h>
 
 #include <syscalls.h>
@@ -261,7 +260,6 @@ DateTimeView::_InitView()
 	AddChild(fGmtTime);
 	fGmtTime->ResizeToPreferred();
 
-printf("fUseGmtTime=%d\n", fUseGmtTime);
 	if (fUseGmtTime)
 		fGmtTime->SetValue(B_CONTROL_ON);
 	else
