@@ -572,6 +572,11 @@ RosterData::_SetDefaultTimeZone(const BTimeZone& newZone)
 {
 	fDefaultTimeZone = newZone;
 
+	TimeZone* timeZone = TimeZone::createTimeZone(newZone.Code().String());
+	if (timeZone == NULL)
+		return B_ERROR;
+	TimeZone::adoptDefault(timeZone);
+
 	return B_OK;
 }
 
