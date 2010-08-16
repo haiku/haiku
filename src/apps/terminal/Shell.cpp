@@ -14,7 +14,6 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <iostream>
 #include <new>
 #include <signal.h>
 #include <string.h>
