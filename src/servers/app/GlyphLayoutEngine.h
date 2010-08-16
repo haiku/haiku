@@ -301,9 +301,8 @@ GlyphLayoutEngine::LayoutGlyphs(GlyphConsumer& consumer,
 		// The caller passed a FontCacheReference, but this is the first
 		// iteration -> switch the ownership from the stack allocated
 		// FontCacheReference to the one passed by the caller. The fallback
-		// FontCacheReference is not affected by this. Eventually, the fallback
-		// glyphs shall be cached in the original FontCacheEntry, so that it is
-		// not even used in this situation.
+		// FontCacheReference is not affected by this, since it is never used
+		// during a second iteration.
 		_cacheReference->SetTo(entry, cacheReference.WriteLocked());
 		cacheReference.SetTo(NULL, false);
 	}
