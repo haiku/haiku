@@ -14,6 +14,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <iostream>
 #include <new>
 #include <signal.h>
 #include <string.h>
@@ -335,7 +336,7 @@ initialize_termios(struct termios &tio)
 status_t
 Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
 {
-	const char *kDefaultShellCommand[] = { "/bin/sh", "--login", NULL };
+	const char *kDefaultShellCommand[] = { "/bin/bash", "--login", NULL };
 
 	if (argv == NULL || argc == 0) {
 		argv = kDefaultShellCommand;
