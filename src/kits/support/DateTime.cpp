@@ -157,6 +157,9 @@ BTime::CurrentTime(time_type type)
 	else
 		timeinfo = localtime_r(&tv.tv_sec, &result);
 
+	if (timeinfo == NULL)
+		return BTime();
+
 	int32 sec = timeinfo->tm_sec;
 	return BTime(timeinfo->tm_hour, timeinfo->tm_min, (sec > 59) ? 59 : sec,
 		tv.tv_usec);
@@ -593,6 +596,9 @@ BDate::CurrentDate(time_type type)
 		timeinfo = gmtime_r(&timer, &result);
 	else
 		timeinfo = localtime_r(&timer, &result);
+
+	if (timeinfo == NULL)
+		return BDate();
 
 	return BDate(timeinfo->tm_year + 1900, timeinfo->tm_mon +1, timeinfo->tm_mday);
 }
@@ -1385,7 +1391,7 @@ BDateTime::SetTime_t(uint32 seconds)
 	BTime time;
 	time.AddSeconds(seconds % kSecondsPerDay);
 	fTime.SetTime(time);
-	
+
 	BDate date(1970, 1, 1);
 	date.AddDays(seconds / kSecondsPerDay);
 	fDate.SetDate(date);
