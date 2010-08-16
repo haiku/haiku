@@ -8,6 +8,7 @@
 
 #include <ctype.h>
 #include <langinfo.h>
+#include <time.h>
 
 #include <PosixCtype.h>
 #include <PosixLanginfo.h>
@@ -81,6 +82,15 @@ LocaleNumericDataBridge::LocaleNumericDataBridge()
 LocaleTimeDataBridge::LocaleTimeDataBridge()
 	:
 	posixLCTimeInfo(&gPosixLCTimeInfo)
+{
+}
+
+
+TimeConversionDataBridge::TimeConversionDataBridge()
+	:
+	addrOfDaylight(&daylight),
+	addrOfTimezone(&timezone),
+	addrOfTZName(tzname)
 {
 }
 

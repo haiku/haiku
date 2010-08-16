@@ -1321,6 +1321,7 @@ struct tm * const	tmp;
 	return result;
 }
 
+#if 0
 struct tm *
 localtime(timep)
 const time_t * const	timep;
@@ -1340,6 +1341,7 @@ struct tm *		tmp;
 {
 	return localsub(timep, 0L, tmp);
 }
+#endif
 
 /*
 ** gmtsub is to gmtime as localsub is to localtime.
@@ -1384,6 +1386,7 @@ struct tm * const	tmp;
 	return result;
 }
 
+#if 0
 struct tm *
 gmtime(timep)
 const time_t * const	timep;
@@ -1402,6 +1405,8 @@ struct tm *		tmp;
 {
 	return gmtsub(timep, 0L, tmp);
 }
+
+#endif
 
 #ifdef STD_INSPIRED
 
@@ -1932,6 +1937,7 @@ const long		offset;
 	return WRONG;
 }
 
+#if 0
 time_t
 mktime(tmp)
 struct tm * const	tmp;
@@ -1939,6 +1945,7 @@ struct tm * const	tmp;
 	tzset();
 	return time1(tmp, localsub, 0L);
 }
+#endif
 
 #ifndef STD_INSPIRED
 #pragma weak timelocal=mktime

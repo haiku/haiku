@@ -29,7 +29,8 @@ ICULocaleBackend::ICULocaleBackend()
 	:
 	fMonetaryData(fLocaleConv),
 	fNumericData(fLocaleConv),
-	fTimeData(fLCTimeInfo)
+	fTimeData(fLCTimeInfo),
+	fTimeConversion(fTimeData)
 {
 }
 
@@ -49,6 +50,7 @@ ICULocaleBackend::Initialize(LocaleDataBridge* dataBridge)
 	fMonetaryData.Initialize(&dataBridge->monetaryDataBridge);
 	fNumericData.Initialize(&dataBridge->numericDataBridge);
 	fTimeData.Initialize(&dataBridge->timeDataBridge);
+	fTimeConversion.Initialize(&dataBridge->timeConversionDataBridge);
 
 	fPosixLanginfo = dataBridge->posixLanginfo;
 
@@ -239,6 +241,42 @@ ICULocaleBackend::Strxfrm(char* out, const char* in, size_t size,
 	ErrnoMaintainer errnoMaintainer;
 
 	return fCollateData.Strxfrm(out, in, size, outSize);
+}
+
+
+status_t
+ICULocaleBackend::TZSet(const char* timeZoneID)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fTimeConversion.TZSet(timeZoneID);
+}
+
+
+status_t
+ICULocaleBackend::Localtime(const time_t* inTime, struct tm* tmOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fTimeConversion.Localtime(inTime, tmOut);
+}
+
+
+status_t
+ICULocaleBackend::Gmtime(const time_t* inTime, struct tm* tmOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fTimeConversion.Gmtime(inTime, tmOut);
+}
+
+
+status_t
+ICULocaleBackend::Mktime(struct tm* inOutTm, time_t& timeOut)
+{
+	ErrnoMaintainer errnoMaintainer;
+
+	return fTimeConversion.Mktime(inOutTm, timeOut);
 }
 
 

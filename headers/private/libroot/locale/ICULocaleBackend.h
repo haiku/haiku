@@ -16,6 +16,7 @@
 #include "ICUMessagesData.h"
 #include "ICUMonetaryData.h"
 #include "ICUNumericData.h"
+#include "ICUTimeConversion.h"
 #include "ICUTimeData.h"
 
 
@@ -44,6 +45,13 @@ public:
 	virtual status_t			Strxfrm(char* out, const char* in, size_t size,
 									size_t& outSize);
 
+	virtual status_t			TZSet(const char* timeZoneID);
+	virtual	status_t			Localtime(const time_t* inTime,
+									struct tm* tmOut);
+	virtual status_t			Gmtime(const time_t* inTime, struct tm* tmOut);
+
+	virtual status_t			Mktime(struct tm* inOutTm, time_t& timeOut);
+
 private:
 			const char*			_QueryLocale(int category);
 			const char*			_SetPosixLocale(int category);
@@ -62,6 +70,7 @@ private:
 			ICUMonetaryData		fMonetaryData;
 			ICUNumericData		fNumericData;
 			ICUTimeData			fTimeData;
+			ICUTimeConversion	fTimeConversion;
 
 			// static posix langinfo data
 			const char**		fPosixLanginfo;

@@ -4,51 +4,153 @@
  */
 
 
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
-#include <localtime.h>
+#include <time.h>
 
 #include <FindDirectory.h>
 #include <StorageDefs.h>
 
+#include "LocaleBackend.h"
 
-char* tzname[2] = { "???", "???" };
+
+using BPrivate::gLocaleBackend;
+using BPrivate::LocaleBackend;
+
+
+static char sStandardTZName[64] 		= { "???" };
+static char sDaylightSavingTZName[64]	= { "???" };
+
+
+char* tzname[2] = {
+	sStandardTZName,
+	sDaylightSavingTZName
+};
 long timezone = 0;
 int daylight = 0;
-
-
-namespace BPrivate {
-
-
-static time_zone_info tzInfo;
 
 
 extern "C" void
 tzset(void)
 {
-	char path[B_PATH_NAME_LENGTH];
-	if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
-			sizeof(path)) < 0)
-		return;
-	strlcat(path, "/", sizeof(path));
-	strlcat(path, skPosixTimeZoneInfoFile, sizeof(path));
-
-	FILE* tzInfoFile = fopen(path, "r");
-	if (tzInfoFile == NULL)
+	if (gLocaleBackend == NULL && LocaleBackend::LoadBackend() != B_OK)
 		return;
 
-	size_t numRead = fread(&tzInfo, sizeof(tzInfo), 1, tzInfoFile);
-	fclose(tzInfoFile);
+	char timeZoneID[64] = { "GMT" };
 
-	if (numRead != 1)
-		return;
+	const char* tz = getenv("TZ");
+	if (tz != NULL)
+		strlcpy(timeZoneID, tz, sizeof(timeZoneID));
+	else {
+		do {
+			char path[B_PATH_NAME_LENGTH];
+			if (find_directory(B_COMMON_SETTINGS_DIRECTORY, -1, false, path,
+					sizeof(path)) < 0)
+				break;
+			strlcat(path, "/libroot_timezone_info", sizeof(path));
 
-	tzname[0] = tzInfo.short_std_name;
-	tzname[1] = tzInfo.short_dst_name;
-	timezone = tzInfo.offset_from_gmt;
-	daylight = tzInfo.uses_daylight_saving;
+			FILE* tzInfoFile = fopen(path, "r");
+			if (tzInfoFile == NULL)
+				break;
+
+			fgets(timeZoneID, sizeof(timeZoneID), tzInfoFile);
+			fclose(tzInfoFile);
+		} while(0);
+	}
+
+	if (gLocaleBackend != NULL) {
+		gLocaleBackend->TZSet(timeZoneID);
+	}
 }
 
 
-}	// namespace BPrivate
+extern "C" struct tm*
+localtime(const time_t* inTime)
+{
+	static tm tm;
+
+	return localtime_r(inTime, &tm);
+}
+
+
+extern "C" struct tm*
+localtime_r(const time_t* inTime, struct tm* tmOut)
+{
+	if (inTime == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	tzset();
+	if (gLocaleBackend != NULL) {
+		status_t status = gLocaleBackend->Localtime(inTime, tmOut);
+
+		if (status != B_OK)
+			errno = EOVERFLOW;
+
+		return tmOut;
+	}
+
+	errno = ENOSYS;
+	return NULL;
+}
+
+
+extern "C" struct tm*
+gmtime(const time_t* inTime)
+{
+	static tm tm;
+
+	return gmtime_r(inTime, &tm);
+}
+
+
+extern "C" struct tm*
+gmtime_r(const time_t* inTime, struct tm* tmOut)
+{
+	if (inTime == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	tzset();
+	if (gLocaleBackend != NULL) {
+		status_t status = gLocaleBackend->Gmtime(inTime, tmOut);
+
+		if (status != B_OK)
+			errno = EOVERFLOW;
+
+		return tmOut;
+	}
+
+	errno = ENOSYS;
+	return NULL;
+}
+
+
+extern "C" time_t
+mktime(struct tm* inTm)
+{
+	if (inTm == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	tzset();
+	if (gLocaleBackend != NULL) {
+		time_t timeOut;
+		status_t status = gLocaleBackend->Mktime(inTm, timeOut);
+
+		if (status != B_OK) {
+			errno = EOVERFLOW;
+			return -1;
+		}
+
+		return timeOut;
+	}
+
+	errno = ENOSYS;
+	return -1;
+}

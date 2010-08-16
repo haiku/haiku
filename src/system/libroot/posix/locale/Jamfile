@@ -1,7 +1,9 @@
 SubDir HAIKU_TOP src system libroot posix locale ;
 
-UsePrivateHeaders [ FDirName libroot locale ] ;
-UsePrivateHeaders [ FDirName libroot time ] ;
+UsePrivateHeaders
+	[ FDirName libroot locale ]
+	[ FDirName libroot time ]
+;
 
 MergeObject posix_locale.o :
 	ctype.cpp

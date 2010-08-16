@@ -4,8 +4,10 @@ SubDir HAIKU_TOP src system libroot posix time ;
 SubDirCcFlags -DNOID -DTZDIR='get_timezones_directory()' -DUSG_COMPAT
 	-DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone -DPCTS=1 -DSTD_INSPIRED ;
 
-UsePrivateHeaders [ FDirName libroot locale ] ;
-UsePrivateHeaders [ FDirName libroot time ] ;
+UsePrivateHeaders
+	[ FDirName libroot locale ]
+	[ FDirName libroot time ]
+;
 UsePrivateSystemHeaders ;
 
 MergeObject posix_time.o :

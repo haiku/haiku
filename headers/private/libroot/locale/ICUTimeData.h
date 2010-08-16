@@ -21,6 +21,7 @@ class ICUTimeData : public ICUCategoryData {
 	typedef	ICUCategoryData		inherited;
 public:
 								ICUTimeData(struct lc_time_t& lcTimeInfo);
+								~ICUTimeData();
 
 			void				Initialize(LocaleTimeDataBridge* dataBridge);
 
@@ -29,6 +30,8 @@ public:
 	virtual	status_t			SetToPosix();
 
 			const char*			GetLanginfo(int index);
+
+			const Locale&		ICULocale() const;
 
 private:
 			status_t			_SetLCTimeEntries(const UnicodeString* strings,
@@ -52,7 +55,8 @@ private:
 			char				fAmPmFormat[32];
 
 			struct lc_time_t&	fLCTimeInfo;
-			const struct lc_time_t* fPosixLCTimeInfo;
+
+			LocaleTimeDataBridge*	fDataBridge;
 };
 
 

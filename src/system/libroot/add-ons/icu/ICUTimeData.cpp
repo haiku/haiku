@@ -10,7 +10,10 @@
 #include <strings.h>
 
 #include <unicode/dtfmtsym.h>
+#include <unicode/gregocal.h>
 #include <unicode/smpdtfmt.h>
+
+#include <AutoDeleter.h>
 
 
 namespace BPrivate {
@@ -19,7 +22,7 @@ namespace BPrivate {
 ICUTimeData::ICUTimeData(struct lc_time_t& lcTimeInfo)
 	:
 	fLCTimeInfo(lcTimeInfo),
-	fPosixLCTimeInfo(NULL)
+	fDataBridge(NULL)
 {
 	for (int i = 0; i < 12; ++i) {
 		fLCTimeInfo.mon[i] = fMon[i];
@@ -41,10 +44,15 @@ ICUTimeData::ICUTimeData(struct lc_time_t& lcTimeInfo)
 }
 
 
+ICUTimeData::~ICUTimeData()
+{
+}
+
+
 void
 ICUTimeData::Initialize(LocaleTimeDataBridge* dataBridge)
 {
-	fPosixLCTimeInfo = dataBridge->posixLCTimeInfo;
+	fDataBridge = dataBridge;
 }
 
 
@@ -140,7 +148,7 @@ ICUTimeData::SetTo(const Locale& locale, const char* posixLocaleName)
 			count, 12);
 	}
 
-	strcpy(fAmPmFormat, fPosixLCTimeInfo->ampm_fmt);
+	strcpy(fAmPmFormat, fDataBridge->posixLCTimeInfo->ampm_fmt);
 		// ICU does not provide anything for this (and that makes sense, too)
 
 	return result;
@@ -154,22 +162,22 @@ ICUTimeData::SetToPosix()
 
 	if (result == B_OK) {
 		for (int i = 0; i < 12; ++i) {
-			strcpy(fMon[i], fPosixLCTimeInfo->mon[i]);
-			strcpy(fMonth[i], fPosixLCTimeInfo->month[i]);
-			strcpy(fAltMonth[i], fPosixLCTimeInfo->alt_month[i]);
+			strcpy(fMon[i], fDataBridge->posixLCTimeInfo->mon[i]);
+			strcpy(fMonth[i], fDataBridge->posixLCTimeInfo->month[i]);
+			strcpy(fAltMonth[i], fDataBridge->posixLCTimeInfo->alt_month[i]);
 		}
 		for (int i = 0; i < 7; ++i) {
-			strcpy(fWday[i], fPosixLCTimeInfo->wday[i]);
-			strcpy(fWeekday[i], fPosixLCTimeInfo->weekday[i]);
+			strcpy(fWday[i], fDataBridge->posixLCTimeInfo->wday[i]);
+			strcpy(fWeekday[i], fDataBridge->posixLCTimeInfo->weekday[i]);
 		}
-		strcpy(fTimeFormat, fPosixLCTimeInfo->X_fmt);
-		strcpy(fDateFormat, fPosixLCTimeInfo->x_fmt);
-		strcpy(fDateTimeFormat, fPosixLCTimeInfo->c_fmt);
-		strcpy(fAm, fPosixLCTimeInfo->am);
-		strcpy(fPm, fPosixLCTimeInfo->pm);
-		strcpy(fDateTimeZoneFormat, fPosixLCTimeInfo->date_fmt);
-		strcpy(fMonthDayOrder, fPosixLCTimeInfo->md_order);
-		strcpy(fAmPmFormat, fPosixLCTimeInfo->ampm_fmt);
+		strcpy(fTimeFormat, fDataBridge->posixLCTimeInfo->X_fmt);
+		strcpy(fDateFormat, fDataBridge->posixLCTimeInfo->x_fmt);
+		strcpy(fDateTimeFormat, fDataBridge->posixLCTimeInfo->c_fmt);
+		strcpy(fAm, fDataBridge->posixLCTimeInfo->am);
+		strcpy(fPm, fDataBridge->posixLCTimeInfo->pm);
+		strcpy(fDateTimeZoneFormat, fDataBridge->posixLCTimeInfo->date_fmt);
+		strcpy(fMonthDayOrder, fDataBridge->posixLCTimeInfo->md_order);
+		strcpy(fAmPmFormat, fDataBridge->posixLCTimeInfo->ampm_fmt);
 	}
 
 	return result;
@@ -394,6 +402,14 @@ ICUTimeData::_SetLCTimePattern(DateFormat* format, char* destination,
 
 	return _ConvertUnicodeStringToLocaleconvEntry(posixPattern, destination,
 		destinationSize);
+}
+
+
+const Locale&
+ICUTimeData::ICULocale() const
+{
+	return fLocale;
+
 }
 
 

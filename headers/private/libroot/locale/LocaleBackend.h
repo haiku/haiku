@@ -8,6 +8,7 @@
 
 #include <SupportDefs.h>
 
+#include <time.h>
 #include <wctype.h>
 
 
@@ -64,12 +65,22 @@ struct LocaleTimeDataBridge {
 };
 
 
+struct TimeConversionDataBridge {
+	int*					addrOfDaylight;
+	long*					addrOfTimezone;
+	char**					addrOfTZName;
+
+	TimeConversionDataBridge();
+};
+
+
 struct LocaleDataBridge {
 	LocaleCtypeDataBridge		ctypeDataBridge;
 	LocaleMessagesDataBridge	messagesDataBridge;
 	LocaleMonetaryDataBridge	monetaryDataBridge;
 	LocaleNumericDataBridge		numericDataBridge;
 	LocaleTimeDataBridge		timeDataBridge;
+	TimeConversionDataBridge	timeConversionDataBridge;
 	const char**				posixLanginfo;
 
 	LocaleDataBridge();
@@ -95,6 +106,13 @@ public:
 									int& out) = 0;
 	virtual status_t			Strxfrm(char* out, const char* in, size_t size,
 									size_t& outSize) = 0;
+
+	virtual status_t			TZSet(const char* timeZoneID) = 0;
+	virtual	status_t			Localtime(const time_t* inTime,
+									struct tm* tmOut) = 0;
+	virtual	status_t			Gmtime(const time_t* inTime,
+									struct tm* tmOut) = 0;
+	virtual status_t			Mktime(struct tm* inOutTm, time_t& timeOut) = 0;
 
 	virtual void				Initialize(LocaleDataBridge* dataBridge) = 0;
 
