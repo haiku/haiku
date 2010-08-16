@@ -36,7 +36,6 @@
 #include <View.h>
 #include <Window.h>
 
-#include <localtime.h>
 #include <syscalls.h>
 
 #include <unicode/datefmt.h>
@@ -367,20 +366,13 @@ TimeZoneView::_SetSystemTimeZone()
 	status_t status = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true);
 	BFile file;
 	if (status == B_OK) {
-		path.Append(BPrivate::skPosixTimeZoneInfoFile);
+		path.Append("libroot_timezone_info");
 		status = file.SetTo(path.Path(),
 			B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY);
 	}
 	if (status == B_OK) {
-		BPrivate::time_zone_info tzInfo;
-		tzInfo.offset_from_gmt = timeZone.OffsetFromGMT();
-		tzInfo.uses_daylight_saving = timeZone.SupportsDaylightSaving();
-		strlcpy(tzInfo.short_std_name, timeZone.ShortName().String(),
-			BPrivate::skTimeZoneInfoNameMax);
-		strlcpy(tzInfo.short_dst_name,
-			timeZone.ShortDaylightSavingName().String(),
-			BPrivate::skTimeZoneInfoNameMax);
-		file.Write(&tzInfo, sizeof(tzInfo));
+		const BString& timeZoneID = timeZone.Code();
+		file.Write(timeZoneID.String(), timeZoneID.Length());
 		file.Sync();
 	}
 
@@ -398,10 +390,15 @@ TimeZoneView::_FormatTime(TimeZoneListItem* zoneItem)
 	if (zoneItem == NULL)
 		return result;
 
-	time_t nowInTimeZone = time(NULL) + zoneItem->OffsetFromGMT();
 	BLocale locale;
 	be_locale_roster->GetDefaultLocale(&locale);
-	locale.FormatTime(&result, nowInTimeZone, false);
+	time_t now = time(NULL);
+	bool rtcIsGMT;
+	_kern_get_real_time_clock_is_gmt(&rtcIsGMT);
+	if (!rtcIsGMT) {
+		now -= zoneItem->OffsetFromGMT() - fCurrentZoneItem->OffsetFromGMT();
+	}
+	locale.FormatTime(&result, now, false, &zoneItem->TimeZone());
 
 	return result;
 }
