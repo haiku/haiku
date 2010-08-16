@@ -738,12 +738,7 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 	source.SetPort(header.source_port);
 	destination.SetPort(header.destination_port);
 
-	status_t status = domainSupport->DeliverError(error, buffer);
-	if (status != B_OK)
-		return status;
-
-	gBufferModule->free(buffer);
-	return B_OK;
+	return domainSupport->DeliverError(error, buffer);
 }
 
 
