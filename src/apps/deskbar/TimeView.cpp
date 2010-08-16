@@ -306,13 +306,6 @@ TTimeView::StopLongClickNotifier()
 void
 TTimeView::GetCurrentTime()
 {
-	// TODO : should this be another function ?
-	tm time = *localtime(&fTime);
-
-	fSeconds = time.tm_sec;
-	fMinute = time.tm_min;
-	fHour = time.tm_hour;
-
 	fLocale.FormatTime(fTimeStr, 64, fTime, fShowSeconds);
 }
 
@@ -390,7 +383,10 @@ void
 TTimeView::Pulse()
 {
 	time_t curTime = time(NULL);
-	tm	ct = *localtime(&curTime);
+	tm* ct = localtime(&curTime);
+	if (ct == NULL)
+		return;
+
 	fTime = curTime;
 
 	GetCurrentTime();
@@ -417,10 +413,10 @@ TTimeView::Pulse()
 	}
 
 	if (fNeedToUpdate) {
-		fSeconds = ct.tm_sec;
-		fMinute = ct.tm_min;
-		fHour = ct.tm_hour;
-		fInterval = ct.tm_hour >= 12;
+		fSeconds = ct->tm_sec;
+		fMinute = ct->tm_min;
+		fHour = ct->tm_hour;
+		fInterval = ct->tm_hour >= 12;
 
 		Draw(Bounds());
 		fNeedToUpdate = false;
