@@ -8,7 +8,7 @@
  *		Julun <host.haiku@gmx.de>
  *
  */
- 
+
 #include "TimeSettings.h"
 #include "TimeMessages.h"
 
@@ -19,7 +19,7 @@
 
 
 TimeSettings::TimeSettings()
-	: fSettingsFile("Time_settings")
+	: fSettingsFile("Time_preflet_window")
 {
 }
 
@@ -37,7 +37,7 @@ TimeSettings::LeftTop() const
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(fSettingsFile.String());
-	
+
 		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() == B_OK) {
 			BPoint tmp;
@@ -58,7 +58,7 @@ TimeSettings::SetLeftTop(const BPoint leftTop)
 		return;
 
 	path.Append(fSettingsFile.String());
-	
+
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 	if (file.InitCheck() == B_OK)
 		file.Write(&leftTop, sizeof(BPoint));
