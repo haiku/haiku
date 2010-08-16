@@ -7747,7 +7747,7 @@ BPoseView::SwitchDir(const entry_ref *newDirRef, AttributeStreamNode *node)
 
 			MoveBy(0, -(kTitleViewHeight + 1));
 			ResizeBy(0, kTitleViewHeight + 1);
-		} else if (ViewMode() == kListMode && oldMode == kListMode && fTitleView != NULL)
+		} else if (ViewMode() == kListMode && oldMode == kListMode)
 			fTitleView->Invalidate();
 
 		BPoint origin;
