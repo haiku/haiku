@@ -259,10 +259,15 @@ RemoteMessage::ReadString(char** _string, size_t& _length)
 		return B_NO_MEMORY;
 
 	int32 readSize = fSource->Read(string, length);
-	if (readSize < 0)
+	if (readSize < 0) {
+		free(string);
 		return readSize;
-	if ((uint32)readSize != length)
+	}
+
+	if ((uint32)readSize != length) {
+		free(string);
 		return B_ERROR;
+	}
 
 	fDataLeft -= readSize;
 
