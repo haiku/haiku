@@ -16,6 +16,18 @@ class BString;
 class BTimeZone;
 
 
+typedef enum {
+	B_DATE_ELEMENT_INVALID = B_BAD_DATA,
+	B_DATE_ELEMENT_YEAR = 0,
+	B_DATE_ELEMENT_MONTH,
+	B_DATE_ELEMENT_DAY,
+	B_DATE_ELEMENT_AM_PM,
+	B_DATE_ELEMENT_HOUR,
+	B_DATE_ELEMENT_MINUTE,
+	B_DATE_ELEMENT_SECOND
+} BDateElement;
+
+
 class BLocale {
 public:
 								BLocale(const char* languageAndCountryCode
