@@ -342,7 +342,7 @@ TermWindow::_SetupMenu()
 	fMenubar->AddItem(fFilemenu);
 
 	// Make Edit Menu.
-	fEditmenu = new BMenu("Edit");
+	fEditmenu = new BMenu(B_TRANSLATE("Edit"));
 	fEditmenu->AddItem(new BMenuItem(B_TRANSLATE("Copy"),
 		new BMessage(B_COPY),'C'));
 	fEditmenu->AddItem(new BMenuItem(B_TRANSLATE("Paste"),
