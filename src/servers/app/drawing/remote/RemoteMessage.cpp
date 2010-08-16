@@ -471,8 +471,10 @@ RemoteMessage::ReadGradient(BGradient** _gradient)
 
 	int32 stopCount;
 	status_t result = Read(stopCount);
-	if (result != B_OK)
+	if (result != B_OK) {
+		delete gradient;
 		return result;
+	}
 
 	for (int32 i = 0; i < stopCount; i++) {
 		rgb_color color;
