@@ -203,7 +203,7 @@ PrinterListView::_AddPrinter(BDirectory& printer, bool calculateLayout)
 		if (info.GetType(buffer) == B_OK
 			&& strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
 				// Yes, it is a printer definition node
-			AddItem(new PrinterItem(dynamic_cast<PrintersWindow*>(Window()),
+			AddItem(new PrinterItem(static_cast<PrintersWindow*>(Window()),
 				printer, fLayoutData));
 			if (calculateLayout)
 				_LayoutPrinterItems();
@@ -219,7 +219,7 @@ PrinterListView::_LayoutPrinterItems()
 	float& rightColumnMaximumWidth = fLayoutData.fRightColumnMaximumWidth;
 
 	for (int32 i = 0; i < CountItems(); i ++) {
-		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
+		PrinterItem* item = static_cast<PrinterItem*>(ItemAt(i));
 
 		float leftColumnWidth = 0;
 		float rightColumnWidth = 0;
