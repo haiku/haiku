@@ -802,7 +802,6 @@ TermParse::EscParse()
 				case CASE_SGR:
 				{
 					/* SGR */
-					char xterm256_mode = 0;
 					for (row = 0; row < nparam; ++row) {
 						switch (param[row]) {
 							case DEFAULT:
@@ -810,11 +809,8 @@ TermParse::EscParse()
 								fAttr = 0;
 								break;
 
-							case 5:	/* Bold or validation of xterm 256 col*/
-								if (xterm256_mode)
-									xterm256_mode |= 4;
-								// falthrough
 							case 1: /* Bold     */
+							case 5:
 								fAttr |= BOLD;
 								break;
 
@@ -852,8 +848,17 @@ TermParse::EscParse()
 								break;
 
 							case 38:
-								xterm256_mode = 1;
+							{
+								if (nparam != 3 || param[1] != 5)
+									break;
+								fAttr &= ~FORECOLOR;
+								fAttr |= FORECOLORED(param[2]);
+								fAttr |= FORESET;
+
+								row = nparam; // force exit of the parsing
+
 								break;
+							}
 
 							case 39:
 								fAttr &= ~FORESET;
@@ -873,24 +878,21 @@ TermParse::EscParse()
 								break;
 
 							case 48:
-								xterm256_mode = 2;
+							{
+								if (nparam != 3 || param[1] != 5)
+									break;
+								fAttr &= ~BACKCOLOR;
+								fAttr |= BACKCOLORED(param[2]);
+								fAttr |= BACKSET;
+
+								row = nparam; // force exit of the parsing
+
 								break;
+							}
 
 							case 49:
 								fAttr &= ~BACKSET;
 								break;
-						}
-
-						if (xterm256_mode == 5) {
-							fAttr &= ~FORECOLOR;
-							fAttr |= FORECOLORED(param[row]);
-							fAttr |= FORESET;
-						}
-
-						if (xterm256_mode == 6) {
-								fAttr &= ~BACKCOLOR;
-								fAttr |= BACKCOLORED(param[row]);
-								fAttr |= BACKSET;
 						}
 					}
 					parsestate = groundtable;
