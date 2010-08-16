@@ -28,6 +28,7 @@ Application Terminal :
 	VTKeyTbl.c
 	VTPrsTbl.c
 	: be $(HAIKU_LOCALE_LIBS) tracker textencoding $(TARGET_LIBSUPC++)
+		$(TARGET_LIBSTDC++)
 	: Terminal.rdef
 ;
 
