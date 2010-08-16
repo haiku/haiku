@@ -255,6 +255,8 @@ void
 BMessage::operator delete(void *pointer, size_t size)
 {
 	DEBUG_FUNCTION_ENTER2;
+	if (pointer == NULL)
+		return;
 	sMsgCache->Save(pointer, size);
 }
 
