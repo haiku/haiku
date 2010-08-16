@@ -330,6 +330,10 @@ TermParse::EscParse()
 	int *groundtable = gUTF8GroundTable;
 	int *parsestate = gUTF8GroundTable;
 
+	/* Handle switch between G0 and G1 character sets */
+	int *alternateParseTable = gUTF8GroundTable;
+	bool shifted_in = false;
+
 	int32 srcLen;
 	int32 dstLen;
 	long dummyState = 0;
@@ -453,6 +457,9 @@ TermParse::EscParse()
 				case CASE_PRINT_GRA:
 					/* "Special characters and line drawing" enabled by \E(0 */
 					switch (c) {
+						case 'a':
+							fBuffer->InsertChar("\xE2\x96\x92",3,fAttr);
+							break;
 						case 'j':
 							fBuffer->InsertChar("\xE2\x94\x98",3,fAttr);
 							break;
@@ -465,9 +472,26 @@ TermParse::EscParse()
 						case 'm':
 							fBuffer->InsertChar("\xE2\x94\x94",3,fAttr);
 							break;
+						case 'n':
+							fBuffer->InsertChar("\xE2\x94\xBC",3,fAttr);
+							break;
 						case 'q':
+							fBuffer->InsertChar("\xE2\x94\x80",3,fAttr);
+							break;
+						case 't':
+							fBuffer->InsertChar("\xE2\x94\x9C",3,fAttr);
+							break;
+						case 'u':
+							fBuffer->InsertChar("\xE2\x94\xA4",3,fAttr);
+							break;
+						case 'v':
+							fBuffer->InsertChar("\xE2\x94\xB4",3,fAttr);
+							break;
+						case 'w':
+							fBuffer->InsertChar("\xE2\x94\xAC",3,fAttr);
 							break;
 						case 'x':
+							fBuffer->InsertChar("\xE2\x94\x82",3,fAttr);
 							break;
 						default:
 							fBuffer->InsertChar((char)c, fAttr);
@@ -542,11 +566,29 @@ TermParse::EscParse()
 					break;
 
 				case CASE_SCS_STATE:
-					if (_NextParseChar() == '0')
-						parsestate = gLineDrawTable;
-					else
-						parsestate = groundtable;
+				{
+					char page = _NextParseChar();
+
+					int* newTable = gUTF8GroundTable;
+					if (page == '0')
+						newTable = gLineDrawTable;
+
+					if (c == '(') {
+						if (shifted_in)
+							alternateParseTable = newTable;
+						else
+							groundtable = newTable;
+					} else if (c == ')') {
+						if (!shifted_in)
+							alternateParseTable = newTable;
+						else
+							groundtable = newTable;
+					}
+
+					parsestate = groundtable;
+
 					break;
+				}
 
 				case CASE_GROUND_STATE:
 					/* exit ignore mode */
@@ -585,9 +627,21 @@ TermParse::EscParse()
 					break;
 
 				case CASE_SI:
+					/* shift in (to G1 charset) */
+					if (shifted_in == false) {
+						int* tmp = alternateParseTable;
+						alternateParseTable = parsestate;
+						parsestate = tmp;
+					}
 					break;
 
 				case CASE_SO:
+					/* shift out (to G0 charset) */
+					if (shifted_in == true) {
+						int* tmp = alternateParseTable;
+						alternateParseTable = parsestate;
+						parsestate = tmp;
+					}
 					break;
 
 				case CASE_SCR_STATE:	// ESC #
