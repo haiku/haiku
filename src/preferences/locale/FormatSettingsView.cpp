@@ -34,7 +34,6 @@
 
 #include <iostream>
 
-#include <stdio.h>
 
 using BPrivate::gMutableLocaleRoster;
 
@@ -339,7 +338,7 @@ FormatView::FormatView(const BLocale& locale)
 			.End()
 		.View());
 
-	
+
 	BGroupLayout* rootLayout = new BGroupLayout(B_HORIZONTAL, spacing);
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(rootLayout);
@@ -662,8 +661,6 @@ FormatView::_ParseDateFormat()
 	BString dateFormatString;
 	fLocale.GetDateFormat(dateFormatString, true);
 	const char* dateFormat = dateFormatString.String();
-
-printf("FV::_ParseDateFormat: df='%s'\n", dateFormat);
 
 	// Travel through the string and parse it
 	const char* parsePointer = dateFormat;
