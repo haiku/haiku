@@ -169,11 +169,10 @@ RosterData::Refresh()
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	status_t status = _LoadLocaleSettings();
-	if (status == B_OK)
-		status = _LoadTimeSettings();
+	_LoadLocaleSettings();
+	_LoadTimeSettings();
 
-	return status;
+	return B_OK;
 }
 
 /*
@@ -458,8 +457,11 @@ RosterData::_LoadLocaleSettings()
 
 	// Something went wrong (no settings file or invalid BMessage), so we
 	// set everything to default values
+
+	fPreferredLanguages.MakeEmpty();
 	fPreferredLanguages.AddString("language", "en");
-	log_team(LOG_ERR, "*** No locale settings found!\n");
+	_SetDefaultLocale("en_US");
+	fDefaultLanguage.SetTo("en");
 
 	return status;
 }
@@ -491,7 +493,6 @@ RosterData::_LoadTimeSettings()
 	// Something went wrong (no settings file or invalid BMessage), so we
 	// set everything to default values
 	_SetDefaultTimeZone(BTimeZone(BTimeZone::kNameOfGmtZone));
-	log_team(LOG_ERR, "*** No time settings found!\n");
 
 	return status;
 }
@@ -607,6 +608,8 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 	} else {
 		fPreferredLanguages.MakeEmpty();
 		fPreferredLanguages.AddString("language", "en");
+		fDefaultLocale.SetCollator(BCollator("en"));
+		fDefaultLanguage.SetTo("en");
 	}
 
 	return B_OK;
