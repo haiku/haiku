@@ -175,11 +175,10 @@ FontCacheEntry::Init(const ServerFont& font)
 bool
 FontCacheEntry::HasGlyphs(const char* utf8String, ssize_t length) const
 {
-	uint32 charCode;
+	uint32 glyphCode;
 	const char* start = utf8String;
-	while ((charCode = UTF8ToCharCode(&utf8String))) {
-		uint32 glyphIndex = fEngine.GlyphIndexForGlyphCode(charCode);
-		if (!fGlyphCache->FindGlyph(glyphIndex))
+	while ((glyphCode = UTF8ToCharCode(&utf8String))) {
+		if (fGlyphCache->FindGlyph(glyphCode) == NULL)
 			return false;
 		if (utf8String - start + 1 > length)
 			break;
@@ -189,28 +188,41 @@ FontCacheEntry::HasGlyphs(const char* utf8String, ssize_t length) const
 
 
 const GlyphCache*
-FontCacheEntry::Glyph(uint32 glyphCode)
+FontCacheEntry::Glyph(uint32 glyphCode, FontCacheEntry* fallbackEntry)
 {
-	uint32 glyphIndex = fEngine.GlyphIndexForGlyphCode(glyphCode);
-	if (glyphIndex == 0)
-		return NULL;
-	const GlyphCache* glyph = fGlyphCache->FindGlyph(glyphIndex);
-	if (glyph) {
+	// We cache the glyph by the requested glyphCode. The FontEngine of this
+	// FontCacheEntry may not contain a glyph for the given code, in which case
+	// we ask the fallbackEntry for the code to index translation and let it
+	// generate the glyph data. We will still use our own cache for storing the
+	// glyph. The next time it will be found (by glyphCode).
+
+	// NOTE: Both this and the fallback FontCacheEntry are expected to be
+	// write-locked!
+
+	const GlyphCache* glyph = fGlyphCache->FindGlyph(glyphCode);
+	if (glyph != NULL)
 		return glyph;
-	} else {
-		if (fEngine.PrepareGlyph(glyphIndex)) {
-			glyph = fGlyphCache->CacheGlyph(glyphIndex,
-				fEngine.DataSize(), fEngine.DataType(), fEngine.Bounds(),
-				fEngine.AdvanceX(), fEngine.AdvanceY(),
-				fEngine.InsetLeft(), fEngine.InsetRight());
 
-			if (glyph != NULL)
-				fEngine.WriteGlyphTo(glyph->data);
-
-			return glyph;
-		}
+	FontEngine* engine = &fEngine;
+	uint32 glyphIndex = engine->GlyphIndexForGlyphCode(glyphCode);
+	if (glyphIndex == 0 && fallbackEntry != NULL) {
+		// Our FontEngine does not contain this glyph, but we can retry with
+		// the fallbackEntry.
+		engine = &fallbackEntry->fEngine;
+		glyphIndex = engine->GlyphIndexForGlyphCode(glyphCode);
 	}
-	return NULL;
+
+	if (glyphIndex != 0 && engine->PrepareGlyph(glyphIndex)) {
+		glyph = fGlyphCache->CacheGlyph(glyphCode,
+			engine->DataSize(), engine->DataType(), engine->Bounds(),
+			engine->AdvanceX(), engine->AdvanceY(),
+			engine->InsetLeft(), engine->InsetRight());
+
+		if (glyph != NULL)
+			engine->WriteGlyphTo(glyph->data);
+
+	}
+	return glyph;
 }
 
 
@@ -294,7 +306,7 @@ FontCacheEntry::_RenderTypeFor(const ServerFont& font)
 
 	if (font.Rotation() != 0.0 || font.Shear() != 90.0
 		|| font.FalseBoldWidth() != 0.0
-		|| font.Flags() & B_DISABLE_ANTIALIASING
+		|| (font.Flags() & B_DISABLE_ANTIALIASING) != 0
 		|| font.Size() > 30
 		|| !font.Hinting()) {
 		renderingType = glyph_ren_outline;
