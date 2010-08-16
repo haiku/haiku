@@ -15,6 +15,8 @@
 #include "SectionEdit.h"
 
 #include <DateTime.h>
+#include <Locale.h>
+#include <String.h>
 
 
 class TTimeEdit : public TSectionEdit {
@@ -41,14 +43,23 @@ public:
 			void				SetTime(int32 hour, int32 minute, int32 second);
 
 private:
+			void				_UpdateFields();
 			void				_CheckRange();
-			bool				_IsValidDoubleDigi(int32 value);
+			bool				_IsValidDoubleDigit(int32 value);
 			int32				_SectionValue(int32 index) const;
 
 private:
 			BDateTime			fTime;
 			bigtime_t			fLastKeyDownTime;
 			int32				fLastKeyDownInt;
+
+			BString				fText;
+
+			// TODO: morph the following into a proper class
+			BDateElement*		fFields;
+			int					fFieldCount;
+			int*				fFieldPositions;
+			int					fFieldPosCount;
 };
 
 
@@ -75,14 +86,23 @@ public:
 			void				SetDate(int32 year, int32 month, int32 day);
 
 private:
+			void				_UpdateFields();
 			void				_CheckRange();
-			bool				_IsValidDoubleDigi(int32 value);
+			bool				_IsValidDoubleDigit(int32 value);
 			int32				_SectionValue(int32 index) const;
 
 private:
 			BDate				fDate;
 			bigtime_t			fLastKeyDownTime;
 			int32				fLastKeyDownInt;
+
+			BString				fText;
+
+			// TODO: morph the following into a proper class
+			BDateElement*		fFields;
+			int					fFieldCount;
+			int*				fFieldPositions;
+			int					fFieldPosCount;
 };
 
 
