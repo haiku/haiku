@@ -300,17 +300,18 @@ Screenshot::_GetActiveWindowFrame()
 			foundActiveWindow = true;
 		} else if (reply.FindBool("result", &foundActiveWindow) != B_OK)
 			foundActiveWindow = false;
-			
+
 		if (foundActiveWindow) {
 			// Get the client_window_info of the active window
 			foundActiveWindow = false;
 			for (int i = 0; i < tokenCount; i++) {
 				token = tokens[i];
 				windowInfo = get_window_info(token);
-				if (!windowInfo->is_mini && !windowInfo->show_hide_level > 0) {
+				if (windowInfo && !windowInfo->is_mini
+						&& !windowInfo->show_hide_level > 0) {
 					foundActiveWindow = true;
 					break;
-				} 
+				}
 				free(windowInfo);
 			}
 			if (foundActiveWindow)
