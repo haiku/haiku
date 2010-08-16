@@ -32,8 +32,6 @@
 #include <TextControl.h>
 #include <Window.h>
 
-#include <iostream>
-
 
 using BPrivate::gMutableLocaleRoster;
 
