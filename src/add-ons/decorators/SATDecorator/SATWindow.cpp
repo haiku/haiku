@@ -11,7 +11,11 @@
 #include <Debug.h>
 
 #include "SATGroup.h"
+#include "ServerApp.h"
 #include "Window.h"
+
+
+using namespace BPrivate;
 
 
 SATWindow::SATWindow(StackAndTile* sat, Window* window)
@@ -72,6 +76,13 @@ SATWindow::GetGroup()
 
 
 bool
+SATWindow::HandleMessage(SATWindow* sender, BPrivate::ServerLink& link)
+{
+	return StackingEventHandler::HandleMessage(sender, link);
+}
+
+
+bool
 SATWindow::PropagateToGroup(SATGroup* group, WindowArea* area)
 {
 	return fGroupCookie->PropagateToGroup(group, area);
@@ -122,6 +133,27 @@ SATWindow::RemovedFromGroup(SATGroup* group)
 	else
 		fGroupCookie = &fOwnGroupCookie;
 
+	return true;
+}
+
+
+bool
+SATWindow::StackWindow(SATWindow* child)
+{
+	SATGroup* group = GetGroup();
+	WindowArea* area = GetWindowArea();
+	if (!group || !area)
+		return false;
+
+	bool status = group->AddWindow(child, area, this);
+
+	if (status) {
+		area->WindowList().ItemAt(0)->SetStackedMode(true);
+			// for the case we are the first added window
+		child->SetStackedMode(true);
+	}
+
+	DoGroupLayout();
 	return true;
 }
 

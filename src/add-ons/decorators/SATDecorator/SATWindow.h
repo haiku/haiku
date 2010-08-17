@@ -72,10 +72,16 @@ public:
 
 		Window*				GetWindow() { return fWindow; }
 		SATDecorator*		GetDecorator() { return fDecorator; }
+		StackAndTile*		GetStackAndTile() { return fStackAndTile; }
+		Desktop*			GetDesktop() { return fDesktop; }
 		//! Can be NULL if memory allocation failed!
 		SATGroup*			GetGroup();
 		WindowArea*			GetWindowArea() {
 								return fGroupCookie->GetWindowArea(); }
+
+		bool				HandleMessage(SATWindow* sender,
+								BPrivate::ServerLink& link);
+
 		bool				PropagateToGroup(SATGroup* group, WindowArea* area);
 
 		//! Move the window to the tab's position. 
@@ -85,6 +91,8 @@ public:
 		bool				AddedToGroup(SATGroup* group, WindowArea* area);
 		bool				RemovedFromGroup(SATGroup* group);
 		void				RemovedFromArea(WindowArea* area);
+
+		bool				StackWindow(SATWindow* child);
 
 		void				FindSnappingCandidates();
 		bool				JoinCandidates();

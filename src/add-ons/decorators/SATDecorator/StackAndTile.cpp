@@ -10,6 +10,8 @@
 
 #include <Debug.h>
 
+#include "StackAndTilePrivate.h"
+
 #include "Desktop.h"
 #include "SATWindow.h"
 #include "Tiling.h"
@@ -35,6 +37,13 @@ StackAndTile::~StackAndTile()
 }
 
 
+int32
+StackAndTile::Identifier()
+{
+	return BPrivate::kMagicSATIdentifier;
+}
+
+
 void
 StackAndTile::ListenerRegistered(Desktop* desktop)
 {
@@ -54,6 +63,17 @@ StackAndTile::ListenerUnregistered()
 		delete satWindow;
 	}
 	fSATWindowMap.clear();
+}
+
+
+bool
+StackAndTile::HandleMessage(Window* sender, BPrivate::ServerLink& link)
+{
+	SATWindow* satWindow = GetSATWindow(sender);
+	if (!satWindow)
+		return false;
+
+	return satWindow->HandleMessage(satWindow, link);
 }
 
 

@@ -16,7 +16,7 @@
 #include "DrawingEngine.h"
 
 
-#define DEBUG_SATDECORATOR
+//#define DEBUG_SATDECORATOR
 #ifdef DEBUG_SATDECORATOR
 #	define STRACE(x) debug_printf x
 #else

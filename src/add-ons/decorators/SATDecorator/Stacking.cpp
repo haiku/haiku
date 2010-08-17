@@ -10,6 +10,8 @@
 
 #include <Debug.h>
 
+#include "StackAndTilePrivate.h"
+
 #include "SATWindow.h"
 #include "Window.h"
 
@@ -21,6 +23,178 @@
 #else
 #	define STRACE_STACKING(x...) ;
 #endif
+
+
+using namespace BPrivate;
+
+
+bool
+StackingEventHandler::HandleMessage(SATWindow* sender,
+	BPrivate::ServerLink& link)
+{
+	Desktop* desktop = sender->GetDesktop();
+	StackAndTile* stackAndTile = sender->GetStackAndTile();
+
+	int32 what;
+	link.Read<int32>(&what);
+
+	switch (what) {
+		case kAddWindowToStack:
+		{
+			port_id port;
+			int32 token;
+			team_id team;
+			link.Read<port_id>(&port);
+			link.Read<int32>(&token);
+			link.Read<team_id>(&team);
+			int32 position;
+			if (link.Read<int32>(&position) != B_OK)
+				return false;
+
+			WindowArea* area = sender->GetWindowArea();
+			if (!area)
+				return false;
+			if (position < 0)
+				position = area->WindowList().CountItems() - 1;
+
+			SATWindow* parent = area->WindowList().ItemAt(position);
+			Window* window = desktop->WindowForClientLooperPort(port);
+			if (!parent || !window) {
+				link.StartMessage(B_BAD_VALUE);
+				link.Flush();
+				break;
+			}
+
+			SATWindow* candidate = stackAndTile->GetSATWindow(window);
+			if (!candidate)
+				return false;
+			if (!parent->StackWindow(candidate))
+				return false;
+
+			link.StartMessage(B_OK);
+			link.Flush();
+			break;
+		}
+		case kRemoveWindowFromStack:
+		{
+			port_id port;
+			int32 token;
+			team_id team;
+			link.Read<port_id>(&port);
+			link.Read<int32>(&token);
+			if (link.Read<team_id>(&team) != B_OK)
+				return false;
+
+			SATGroup* group = sender->GetGroup();
+			if (!group)
+				return false;
+
+			Window* window = desktop->WindowForClientLooperPort(port);
+			if (!window) {
+				link.StartMessage(B_BAD_VALUE);
+				link.Flush();
+				break;
+			}
+			SATWindow* candidate = stackAndTile->GetSATWindow(window);
+			if (!candidate)
+				return false;
+			if (!group->RemoveWindow(candidate))
+				return false;
+			break;
+		}
+		case kRemoveWindowFromStackAt:
+		{
+			int32 position;
+			if (link.Read<int32>(&position) != B_OK)
+				return false;
+			SATGroup* group = sender->GetGroup();
+			WindowArea* area = sender->GetWindowArea();
+			if (!area || !group)
+				return false;
+			SATWindow* removeWindow = area->WindowList().ItemAt(position);
+			if (!removeWindow) {
+				link.StartMessage(B_BAD_VALUE);
+				link.Flush();
+				break;
+			}
+
+			if (!group->RemoveWindow(removeWindow))
+				return false;
+
+			ServerWindow* window = removeWindow->GetWindow()->ServerWindow();
+			link.StartMessage(B_OK);
+			link.Attach<port_id>(window->ClientLooperPort());
+			link.Attach<int32>(window->ClientToken());
+			link.Attach<team_id>(window->ClientTeam());
+			link.Flush();
+			break;
+		}
+		case kCountWindowsOnStack:
+		{
+			WindowArea* area = sender->GetWindowArea();
+			if (!area)
+				return false;
+			link.StartMessage(B_OK);
+			link.Attach<int32>(area->WindowList().CountItems());
+			link.Flush();
+			break;
+		}
+		case kWindowOnStackAt:
+		{
+			int32 position;
+			if (link.Read<int32>(&position) != B_OK)
+				return false;
+			WindowArea* area = sender->GetWindowArea();
+			if (!area)
+				return false;
+			SATWindow* satWindow = area->WindowList().ItemAt(position);
+			if (!satWindow) {
+				link.StartMessage(B_BAD_VALUE);
+				link.Flush();
+				break;
+			}
+
+			ServerWindow* window = satWindow->GetWindow()->ServerWindow();
+			link.StartMessage(B_OK);
+			link.Attach<port_id>(window->ClientLooperPort());
+			link.Attach<int32>(window->ClientToken());
+			link.Attach<team_id>(window->ClientTeam());
+			link.Flush();
+			break;
+		}
+		case kStackHasWindow:
+		{
+			port_id port;
+			int32 token;
+			team_id team;
+			link.Read<port_id>(&port);
+			link.Read<int32>(&token);
+			if (link.Read<team_id>(&team) != B_OK)
+				return false;
+
+			Window* window = desktop->WindowForClientLooperPort(port);
+			if (!window) {
+				link.StartMessage(B_BAD_VALUE);
+				link.Flush();
+				break;
+			}
+			SATWindow* candidate = stackAndTile->GetSATWindow(window);
+			if (!candidate)
+				return false;
+
+			WindowArea* area = sender->GetWindowArea();
+			if (!area)
+				return false;
+			link.StartMessage(B_OK);
+			link.Attach<bool>(area->WindowList().HasItem(candidate));
+			link.Flush();
+			break;
+		}
+		default:
+			return false;
+	}
+	return true;
+}
 
 
 SATStacking::SATStacking(SATWindow* window)
@@ -68,24 +242,11 @@ SATStacking::JoinCandidates()
 {
 	if (!fStackingCandidate)
 		return false;
-	SATGroup* group = fStackingCandidate->GetGroup();
-	WindowArea* area = fStackingCandidate->GetWindowArea();
-	if (!group || !area) {
-		_ClearSearchResult();
-		return false;
-	}
 
-	bool status = group->AddWindow(fSATWindow, area, fStackingCandidate);
+	bool result = fStackingCandidate->StackWindow(fSATWindow);
 
-	if (status) {
-		area->WindowList().ItemAt(0)->SetStackedMode(true);
-			// for the case we are the first added window
-		fSATWindow->SetStackedMode(true);
-	}
-
-	fStackingCandidate->DoGroupLayout();
 	_ClearSearchResult();
-	return status;
+	return result;
 }
 
 

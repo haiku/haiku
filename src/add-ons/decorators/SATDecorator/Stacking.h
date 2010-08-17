@@ -15,6 +15,14 @@
 class SATWindow;
 
 
+class StackingEventHandler
+{
+public:
+	static bool				HandleMessage(SATWindow* sender,
+								BPrivate::ServerLink& link);
+};
+
+
 class SATStacking : public SATSnappingBehaviour {
 public:
 							SATStacking(SATWindow* window);
