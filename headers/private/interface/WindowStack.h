@@ -16,14 +16,15 @@ public:
 
 		status_t				InitCheck();
 
-		status_t				AddWindow(BWindow* window);
-		status_t				AddWindow(BMessenger& window);
-		status_t				AddWindowAt(BWindow* window, int32 position);
-		status_t				AddWindowAt(BMessenger& window,
+		status_t				AddWindow(const BWindow* window);
+		status_t				AddWindow(const BMessenger& window);
+		status_t				AddWindowAt(const BWindow* window,
+									int32 position);
+		status_t				AddWindowAt(const BMessenger& window,
 									int32 position);
 
-		status_t				RemoveWindow(BWindow* window);
-		status_t				RemoveWindow(BMessenger& window);
+		status_t				RemoveWindow(const BWindow* window);
+		status_t				RemoveWindow(const BMessenger& window);
 		status_t				RemoveWindowAt(int32 position,
 									BMessenger* window = NULL);
 
@@ -31,11 +32,11 @@ public:
 
 		status_t				WindowAt(int32 position,
 									BMessenger& messenger);
-		bool					HasWindow(BWindow* window);
-		bool					HasWindow(BMessenger& window);
+		bool					HasWindow(const BWindow* window);
+		bool					HasWindow(const BMessenger& window);
 
 private:
-		status_t				_AttachMessenger(BMessenger& window);
+		status_t				_AttachMessenger(const BMessenger& window);
 		status_t				_ReadMessenger(BMessenger& window);
 		status_t				_StartMessage(int32 what);
 

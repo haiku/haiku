@@ -30,7 +30,7 @@ BWindowStack::BWindowStack(BWindow* window)
 {
 	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
 		"w_stack<app_server");
-	if (receivePort != B_OK)
+	if (receivePort >= 0)
 		fLink = new(std::nothrow) BPrivate::PortLink(
 			window->fLink->SenderPort(), receivePort);
 }
@@ -47,14 +47,14 @@ BWindowStack::~BWindowStack()
 status_t
 BWindowStack::InitCheck()
 {
-	if (!fLink)
+	if (fLink == NULL)
 		return B_NO_MEMORY;
 	return B_OK;
 }
 
 
 status_t
-BWindowStack::AddWindow(BWindow* window)
+BWindowStack::AddWindow(const BWindow* window)
 {
 	BMessenger messenger(window);
 	return AddWindow(messenger);
@@ -62,14 +62,14 @@ BWindowStack::AddWindow(BWindow* window)
 
 
 status_t
-BWindowStack::AddWindow(BMessenger& window)
+BWindowStack::AddWindow(const BMessenger& window)
 {
 	return AddWindowAt(window, -1);
 }
 
 
 status_t
-BWindowStack::AddWindowAt(BWindow* window, int32 position)
+BWindowStack::AddWindowAt(const BWindow* window, int32 position)
 {
 	BMessenger messenger(window);
 	return AddWindowAt(messenger, position);
@@ -77,7 +77,7 @@ BWindowStack::AddWindowAt(BWindow* window, int32 position)
 
 
 status_t
-BWindowStack::AddWindowAt(BMessenger& window, int32 position)
+BWindowStack::AddWindowAt(const BMessenger& window, int32 position)
 {
 	_StartMessage(kAddWindowToStack);
 
@@ -93,7 +93,7 @@ BWindowStack::AddWindowAt(BMessenger& window, int32 position)
 
 
 status_t
-BWindowStack::RemoveWindow(BWindow* window)
+BWindowStack::RemoveWindow(const BWindow* window)
 {
 	BMessenger messenger(window);
 	return RemoveWindow(messenger);
@@ -101,7 +101,7 @@ BWindowStack::RemoveWindow(BWindow* window)
 
 
 status_t
-BWindowStack::RemoveWindow(BMessenger& window)
+BWindowStack::RemoveWindow(const BMessenger& window)
 {
 	_StartMessage(kRemoveWindowFromStack);
 	_AttachMessenger(window);
@@ -164,7 +164,7 @@ BWindowStack::WindowAt(int32 position, BMessenger& messenger)
 
 
 bool
-BWindowStack::HasWindow(BWindow* window)
+BWindowStack::HasWindow(const BWindow* window)
 {
 	BMessenger messenger(window);
 	return HasWindow(messenger);
@@ -172,7 +172,7 @@ BWindowStack::HasWindow(BWindow* window)
 
 
 bool
-BWindowStack::HasWindow(BMessenger& window)
+BWindowStack::HasWindow(const BMessenger& window)
 {
 	_StartMessage(kStackHasWindow);
 	_AttachMessenger(window);
@@ -191,9 +191,9 @@ BWindowStack::HasWindow(BMessenger& window)
 
 
 status_t
-BWindowStack::_AttachMessenger(BMessenger& window)
+BWindowStack::_AttachMessenger(const BMessenger& window)
 {
-	BMessenger::Private messengerPrivate(window);
+	BMessenger::Private messengerPrivate(const_cast<BMessenger&>(window));
 	fLink->Attach<port_id>(messengerPrivate.Port());
 	fLink->Attach<int32>(messengerPrivate.Token());
 	return fLink->Attach<team_id>(messengerPrivate.Team());
