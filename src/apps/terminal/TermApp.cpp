@@ -10,7 +10,6 @@
 #include "TermApp.h"
 
 #include <errno.h>
-#include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +38,6 @@
 static bool sUsageRequested = false;
 //static bool sGeometryRequested = false;
 
-const char *kDefaultShell = "/bin/bash";
 const ulong MSG_ACTIVATE_TERM = 'msat';
 const ulong MSG_TERM_WINDOW_INFO = 'mtwi';
 
@@ -63,19 +61,8 @@ TermApp::TermApp()
 	fTermWindow(NULL),
 	fArgs(NULL)
 {
-	const char *defaultArgs[2];
-	defaultArgs[0] = kDefaultShell;
-	defaultArgs[1] = "--login";
 
-	struct passwd passwdStruct;
-	struct passwd *passwdResult;
-	char stringBuffer[256];
-	if (!getpwuid_r(getuid(), &passwdStruct, stringBuffer,
-			sizeof(stringBuffer), &passwdResult)) {
-		defaultArgs[0] = passwdStruct.pw_shell;
-	}
-
-	fArgs = new Arguments(2, defaultArgs);
+	fArgs = new Arguments(0, NULL);
 
 	fWindowTitle = B_TRANSLATE("Terminal");
 	_RegisterTerminal();

@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <new>
+#include <pwd.h>
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
@@ -58,6 +59,7 @@
 #define CSWTCH 0
 #endif
 
+const char *kDefaultShell = "/bin/sh";
 
 /*
  * Set environment variable.
@@ -335,10 +337,20 @@ initialize_termios(struct termios &tio)
 status_t
 Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
 {
-	const char *kDefaultShellCommand[] = { "/bin/bash", "--login", NULL };
-
 	if (argv == NULL || argc == 0) {
-		argv = kDefaultShellCommand;
+		const char *defaultArgs[2];
+		defaultArgs[0] = kDefaultShell;
+		defaultArgs[1] = "-l";
+
+		struct passwd passwdStruct;
+		struct passwd *passwdResult;
+		char stringBuffer[256];
+		if (!getpwuid_r(getuid(), &passwdStruct, stringBuffer,
+				sizeof(stringBuffer), &passwdResult)) {
+			defaultArgs[0] = passwdStruct.pw_shell;
+		}
+
+		argv = defaultArgs;
 		argc = 2;
 	}
 
@@ -538,8 +550,8 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 		int returnValue = system(alertCommand.String());
 		if (returnValue == 0) {
-			execl(kDefaultShellCommand[0], kDefaultShellCommand[0],
-				kDefaultShellCommand[1], NULL);
+			execl(kDefaultShell, kDefaultShell,
+				"-l", NULL);
 		}
 
 		exit(1);
