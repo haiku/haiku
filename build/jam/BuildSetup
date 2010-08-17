@@ -1406,7 +1406,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src preferences media ;
 	EnableWerror src preferences mouse ;
 	EnableWerror src preferences network ;
-#	EnableWerror src preferences notifications ;
+	EnableWerror src preferences notifications ;
 	EnableWerror src preferences opengl ;
 	EnableWerror src preferences print ;
 	EnableWerror src preferences screen ;

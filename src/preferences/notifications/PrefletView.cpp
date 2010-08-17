@@ -32,9 +32,9 @@ PrefletView::PrefletView(SettingsHost* host)
 	// Page selector
 	fRule = new BIconRule("icon_rule");
 	fRule->SetSelectionMessage(new BMessage(kPageSelected));
-	(void)fRule->AddIcon(_T("General"), NULL);
-	(void)fRule->AddIcon(_T("Display"), NULL);
-	//(void)fRule->AddIcon(_T("Notifications"), NULL);
+	fRule->AddIcon(_T("General"), NULL);
+	fRule->AddIcon(_T("Display"), NULL);
+	//fRule->AddIcon(_T("Notifications"), NULL);
 
 	// View for card layout
 	fPagesView = new BView("pages", B_WILL_DRAW);

@@ -146,7 +146,7 @@ BIconRule::SetSelectionMessage(BMessage* message)
 }
 
 
-int32
+void
 BIconRule::AddIcon(const char* label, const BBitmap* icon)
 {
 	BIconItem* item = new BIconItem(this, label, (BBitmap*)icon);

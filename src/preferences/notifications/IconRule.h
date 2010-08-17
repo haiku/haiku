@@ -27,7 +27,7 @@ public:
 			BMessage*	SelectionMessage() const;
 			void		SetSelectionMessage(BMessage* message);
 
-			int32		AddIcon(const char* label, const BBitmap* icon);
+			void		AddIcon(const char* label, const BBitmap* icon);
 			void		RemoveIconAt(int32 index);
 			void		RemoveAllIcons();
 

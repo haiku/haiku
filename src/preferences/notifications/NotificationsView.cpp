@@ -140,17 +140,22 @@ void
 NotificationsView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case kApplicationSelected: {
-				BRow *row = fApplications->CurrentSelection();
-				if (row == NULL)
-					return;
-				BStringField* appname =
-					dynamic_cast<BStringField*>(row->GetField(kAppIndex));
+		case kApplicationSelected:
+		{
+			BRow* row = fApplications->CurrentSelection();
+			if (row == NULL)
+				return;
+			BStringField* appName
+				= dynamic_cast<BStringField*>(row->GetField(kAppIndex));
+			if (appName == NULL)
+				break;
 
-				appusage_t::iterator it = fAppFilters.find(appname->String());
-				if (it != fAppFilters.end())
-					_Populate(it->second);
-			} break;
+			appusage_t::iterator it = fAppFilters.find(appName->String());
+			if (it != fAppFilters.end())
+				_Populate(it->second);
+
+			break;
+		}
 		case kNotificationSelected:
 			break;
 		default:

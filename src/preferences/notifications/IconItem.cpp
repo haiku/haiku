@@ -17,10 +17,10 @@
 const int32 kEdgeOffset = 4;
 
 
-BIconItem::BIconItem(BView* owner, const char* label, BBitmap* icon) 
+BIconItem::BIconItem(BView* owner, const char* label, BBitmap* icon)
 	:
-	fIcon(icon),
 	fLabel(label),
+	fIcon(icon),
 	fSelected(false),
 	fOwner(owner)
 {
