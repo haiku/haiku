@@ -2484,6 +2484,18 @@ Desktop::AllWindows()
 }
 
 
+Window*
+Desktop::WindowForClientLooperPort(port_id port)
+{
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		if (window->ServerWindow()->ClientLooperPort() == port)
+			return window;
+	}
+	return NULL;
+}
+
+
 WindowList&
 Desktop::_Windows(int32 index)
 {

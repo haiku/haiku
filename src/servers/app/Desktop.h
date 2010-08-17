@@ -260,6 +260,8 @@ public:
 			WindowList&			CurrentWindows();
 			WindowList&			AllWindows();
 
+			Window*				WindowForClientLooperPort(port_id port);
+
 private:
 			WindowList&			_Windows(int32 index);
 
