@@ -123,7 +123,7 @@ ColumnListView::~ColumnListView()
 		fScrollView->RemoveChild(this);
 		delete fScrollView;
 	}
-	
+
 	delete _editMessage;
 }
 
@@ -243,7 +243,7 @@ void ColumnListView::UpdateScrollBars()
 			if(ViewBounds.bottom-ViewBounds.top > fDataHeight)
 				fPageHeight = ViewBounds.bottom;
 		}while(DeltaX != 0.0 || DeltaY != 0.0);
-	
+
 		//Figure out the ratio of the bounds rectangle width or height to the page rectangle width or height
 		float WidthProp = (ViewBounds.right-ViewBounds.left)/fPageWidth;
 		float HeightProp = (ViewBounds.bottom-ViewBounds.top)/fPageHeight;
@@ -488,7 +488,7 @@ bool ColumnListView::RemoveColumn(CLVColumn* Column)
 	int32 ColumnIndex = fSortKeyList.IndexOf(Column);
 	if(ColumnIndex >= 0)
 		fSortKeyList.RemoveItem(ColumnIndex);
-		
+
 	if(Column->fFlags & CLV_EXPANDER)
 		fExpanderColumn = -1;
 
@@ -558,7 +558,7 @@ bool ColumnListView::RemoveColumns(CLVColumn* Column, int32 Count)
 void ColumnListView :: SetEditMessage(BMessage * newMsg, BMessenger target)
 {
    delete _editMessage;
-   _editMessage = newMsg;  
+   _editMessage = newMsg;
    _editTarget = target;
 }
 
@@ -569,11 +569,11 @@ void ColumnListView :: KeyDown(const char * bytes, int32 numBytes)
 
    // Find out if any meta-keys are pressed
    int32 q;
-   if (Window()->CurrentMessage()->FindInt32("modifiers", &q) == B_NO_ERROR) 
-   { 
+   if (Window()->CurrentMessage()->FindInt32("modifiers", &q) == B_NO_ERROR)
+   {
       metaKeysPressed = ((q & (B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY)) != 0);
    }
-   
+
    if (numBytes > 0)
    {
       switch (*bytes)
@@ -581,10 +581,10 @@ void ColumnListView :: KeyDown(const char * bytes, int32 numBytes)
          case B_LEFT_ARROW:
             if (metaKeysPressed == false)
             {
-               colDiff = -1;           
+               colDiff = -1;
                break;
             }
-         
+
          case B_RIGHT_ARROW:
             if (metaKeysPressed == false)
             {
@@ -599,26 +599,26 @@ void ColumnListView :: KeyDown(const char * bytes, int32 numBytes)
                BListView::KeyDown(bytes, numBytes);
                break;
             }
-                  
+
          default:
             if (_editMessage != NULL)
             {
                BMessage temp(*_editMessage);
                temp.AddInt32("column", _selectedColumn);
-               temp.AddInt32("row", CurrentSelection());      
+               temp.AddInt32("row", CurrentSelection());
                temp.AddString("bytes", bytes);
-               
+
                int32 key;
                if (Window()->CurrentMessage()->FindInt32("key", &key) == B_NO_ERROR) temp.AddInt32("key", key);
-               
+
                _editTarget.SendMessage(&temp);
-            }      
+            }
          break;
-      }      
+      }
    }
-   
+
    if (colDiff != 0)
-   {     
+   {
       // We need to move the highlighted column by (colDiff) columns, if possible.
       int numDisplayColumns = fColumnDisplayList.CountItems();
 
@@ -633,11 +633,11 @@ void ColumnListView :: KeyDown(const char * bytes, int32 numBytes)
          int32 currentDisplayIndex = GetDisplayIndexOf(curColumn);
          if (currentDisplayIndex < 0) currentDisplayIndex = 0;
          currentDisplayIndex += colDiff;
- 
+
          if (currentDisplayIndex < 0) currentDisplayIndex = numDisplayColumns - 1;
          if (currentDisplayIndex >= numDisplayColumns) currentDisplayIndex = 0;
          curColumn = GetActualIndexOf(currentDisplayIndex);
-      }      
+      }
       SetSelectedColumnIndex(curColumn);
    }
 }
@@ -665,9 +665,9 @@ CLVColumn* ColumnListView::ColumnAt(BPoint point) const
     {
        CLVColumn * col = (CLVColumn *) fColumnList.ItemAt(i);
        if ((point.x >= col->fColumnBegin)&&(point.x <= col->fColumnEnd)) return col;
-    } 
+    }
     return NULL;
-}   
+}
 
 bool ColumnListView::SetDisplayOrder(const int32* ColumnOrder)
 //Sets the display order using a BList of CLVColumn's
@@ -708,7 +708,7 @@ bool ColumnListView::SetDisplayOrder(const int32* ColumnOrder)
 
 
 void ColumnListView::ColumnWidthChanged(int32 ColumnIndex, float NewWidth)
-{ 
+{
     Invalidate();
 }
 
@@ -876,11 +876,11 @@ int32 ColumnListView::Sorting(int32* SortKeys, CLVSortMode* SortModes) const
 void ColumnListView :: Pulse()
 {
    int32 curSel = CurrentSelection();
-   if (curSel >= 0) 
+   if (curSel >= 0)
    {
       CLVListItem * item = (CLVListItem *) ItemAt(curSel);
       item->Pulse(this);
-   } 
+   }
 }
 
 void ColumnListView::SetSorting(int32 NumberOfKeys, int32* SortKeys, CLVSortMode* SortModes)
@@ -956,19 +956,19 @@ int32 ColumnListView::GetDisplayIndexOf(int32 realIndex) const
 // Gotta change the _selectedColumn on all entries.  There is
 // undoubtedly a more efficient way to do this!  --jaf
 void ColumnListView :: SetSelectedColumnIndex(int32 col)
-{			          
+{
    if (_selectedColumn != col)
    {
       _selectedColumn = col;
-      
+
       int numRows = fFullItemList.CountItems();
       for (int j=0; j<numRows; j++) ((CLVListItem *)fFullItemList.ItemAt(j))->_selectedColumn = _selectedColumn;
-   
+
       // Update current row if necessary.
       int32 selectedIndex = CurrentSelection();
       if (selectedIndex != -1) InvalidateItem(selectedIndex);
    }
-}			        
+}
 
 
 void ColumnListView::MouseDown(BPoint point)
@@ -981,16 +981,16 @@ void ColumnListView::MouseDown(BPoint point)
 		CLVColumn* Column = (CLVColumn*)fColumnDisplayList.ItemAt(Counter);
 		if(Column->IsShown())
 		{
-			if (xleft > 0) 
+			if (xleft > 0)
 			{
 			   xleft -= Column->Width();
-			   if (xleft <= 0) 
+			   if (xleft <= 0)
 			   {
-			      SetSelectedColumnIndex(GetActualIndexOf(Counter));			          
+			      SetSelectedColumnIndex(GetActualIndexOf(Counter));
 			      break;
 			   }
 			}
-		}				
+		}
 	}
 	int32 ItemIndex = IndexOf(point);
 	if(ItemIndex >= 0)
@@ -1019,7 +1019,7 @@ void ColumnListView::MouseDown(BPoint point)
 	      BMessage * msg = Window()->CurrentMessage();
 	      int32 buttons;
 	      if ((msg->FindInt32("buttons", &buttons) == B_NO_ERROR)&&(buttons == B_SECONDARY_MOUSE_BUTTON))
-	      {	   
+	      {
 	         BPoint where(point);
 	         Select(IndexOf(where));
 	         ConvertToScreen(&where);
@@ -1028,20 +1028,20 @@ void ColumnListView::MouseDown(BPoint point)
 	      }
 	   }
 	}
-	
+
 	int prevRow = CurrentSelection();
 	BListView::MouseDown(point);
-	
+
 	int curRow = CurrentSelection();
 	if ((_editMessage != NULL)&&((selectedText)||((_selectedColumn == prevColumn)&&(curRow == prevRow))))
 	{
 	   // Send mouse message...
 	   BMessage temp(*_editMessage);
 	   temp.AddInt32("column", _selectedColumn);
-	   temp.AddInt32("row", CurrentSelection());      
+	   temp.AddInt32("row", CurrentSelection());
 	   if (selectedText) temp.AddString("text", selectedText);
 	                else temp.AddInt32("mouseClick", 0);
-	   _editTarget.SendMessage(&temp);       
+	   _editTarget.SendMessage(&temp);
 	}
 }
 
@@ -1094,7 +1094,7 @@ bool ColumnListView::AddItem(CLVListItem* item)
 bool ColumnListView::AddItemPrivate(CLVListItem* item, int32 fullListIndex)
 {
     item->_selectedColumn = _selectedColumn;
-    
+
 	if(fHierarchical)
 	{
 		uint32 ItemLevel = item->OutlineLevel();
@@ -1706,6 +1706,7 @@ BList* ColumnListView::SortItemsInThisLevel(int32 OriginalListStartIndex)
 	SortListArray(SortArray,ItemsInThisLevel);
 	for(Counter = 0; Counter < ItemsInThisLevel; Counter++)
 		ThisLevelItems->AddItem(SortArray[Counter]);
+	delete [] SortArray;
 	return ThisLevelItems;
 }
 
@@ -1756,4 +1757,4 @@ void ColumnListView :: MessageReceived(BMessage * msg)
          BListView::MessageReceived(msg);
       break;
    }
-}               
+}
