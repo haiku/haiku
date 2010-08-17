@@ -1,5 +1,13 @@
+/*
+ * Copyright 2010, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ */
 #ifndef STACK_AND_TILE_PRIVATE_H
 #define STACK_AND_TILE_PRIVATE_H
+
 
 namespace BPrivate {
 
@@ -16,7 +24,8 @@ enum sat_messages {
 	kStackHasWindow
 };
 
-};
+
+}
 
 
-#endif
+#endif // STACK_AND_TILE_PRIVATE_H
