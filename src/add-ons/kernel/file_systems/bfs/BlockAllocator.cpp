@@ -582,8 +582,10 @@ BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 
 	for (int32 i = 0; i < fNumGroups; i++) {
 		if (write_pos(fVolume->Device(), offset << blockShift, buffer,
-				fBlocksPerGroup << blockShift) < B_OK)
+				fBlocksPerGroup << blockShift) < B_OK) {
+			free(buffer);
 			return B_ERROR;
+		}
 
 		// the last allocation group may contain less blocks than the others
 		if (i == fNumGroups - 1) {
