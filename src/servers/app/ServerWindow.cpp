@@ -1158,16 +1158,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_TALK_TO_DESKTOP_LISTENER:
 		{
-			port_id senderPort;
-			link.Read<port_id>(&senderPort);
-			BPrivate::LinkSender sender(senderPort);
-			BPrivate::PortLinkRef listenerLink(&sender, &link);
-			if (fDesktop->MessageForListener(fWindow, listenerLink))
+			if (fDesktop->MessageForListener(fWindow, fLink))
 				break;
 			// unhandled message at least send an error if needed
 			if (link.NeedsReply()) {
-				sender.StartMessage(B_ERROR);
-				sender.Flush();
+				fLink.StartMessage(B_ERROR);
+				fLink.Flush();
 			}
 			break;
 		}

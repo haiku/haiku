@@ -14,8 +14,6 @@ public:
 								BWindowStack(BWindow* window);
 								~BWindowStack();
 
-		status_t				InitCheck();
-
 		status_t				AddWindow(const BWindow* window);
 		status_t				AddWindow(const BMessenger& window);
 		status_t				AddWindowAt(const BWindow* window,

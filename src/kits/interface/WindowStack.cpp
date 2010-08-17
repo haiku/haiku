@@ -25,31 +25,14 @@ using namespace BPrivate;
 
 
 BWindowStack::BWindowStack(BWindow* window)
-	:
-	fLink(NULL)
 {
-	port_id receivePort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
-		"w_stack<app_server");
-	if (receivePort >= 0)
-		fLink = new(std::nothrow) BPrivate::PortLink(
-			window->fLink->SenderPort(), receivePort);
+	fLink = window->fLink;
 }
 
 
 BWindowStack::~BWindowStack()
 {
-	if (fLink)
-		delete_port(fLink->ReceiverPort());
-	delete fLink;
-}
 
-
-status_t
-BWindowStack::InitCheck()
-{
-	if (fLink == NULL)
-		return B_NO_MEMORY;
-	return B_OK;
 }
 
 
@@ -221,7 +204,6 @@ status_t
 BWindowStack::_StartMessage(int32 what)
 {
 	fLink->StartMessage(AS_TALK_TO_DESKTOP_LISTENER);
-	fLink->Attach<port_id>(fLink->ReceiverPort());
 	fLink->Attach<int32>(kMagicSATIdentifier);
 	return fLink->Attach<int32>(what);
 }
