@@ -320,8 +320,10 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 			//offset.x += glyph.Bounds().Width();
 			offset.x += charWidth;
 			Shape* shape = new (nothrow) Shape(NULL);
+			if (shape == NULL)
+				return B_NO_MEMORY;
 			shape->SetName(glyphName.String());
-			if (!shape || !icon->Shapes()->AddShape(shape)) {
+			if (!icon->Shapes()->AddShape(shape)) {
 				delete shape;
 				return B_NO_MEMORY;
 			}
