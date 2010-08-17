@@ -220,7 +220,7 @@ void CLVColumnLabelView::MouseDown(BPoint Point)
 		bool GrabbedResizeTab = false;
 		int32 NumberOfColumns = fDisplayList->CountItems();
 		int32 ColumnFind;
-		CLVColumn* ThisColumn;
+		CLVColumn* ThisColumn = NULL;
 		for(ColumnFind = 0; ColumnFind < NumberOfColumns; ColumnFind++)
 		{
 			ThisColumn = (CLVColumn*)fDisplayList->ItemAt(ColumnFind);
@@ -228,13 +228,13 @@ void CLVColumnLabelView::MouseDown(BPoint Point)
 			{
 				float ColumnBegin = ThisColumn->fColumnBegin;
 				float ColumnEnd = ThisColumn->fColumnEnd;
-				if ((Point.x >= ColumnBegin && Point.x <= ColumnEnd) || 
+				if ((Point.x >= ColumnBegin && Point.x <= ColumnEnd) ||
 				    ((ColumnFind == NumberOfColumns-1)&&(Point.x >= ColumnBegin)))  // anything after the rightmost column can drag... jaf
 				{
 				    const float resizeTolerance = 5.0f;  // jaf is too clumsy to click on a 2 pixel space.  :)
-				    
+
 					//User clicked in this column
-					if(Point.x <= ColumnBegin+resizeTolerance)  
+					if(Point.x <= ColumnBegin+resizeTolerance)
 					{
 						//User clicked the resize tab preceding this column
 						for(ColumnFind--; ColumnFind >= 0; ColumnFind--)
@@ -312,7 +312,7 @@ void CLVColumnLabelView::MessageReceived(BMessage *message)
 		uint32 Buttons;
 		message->FindInt32("buttons",(int32*)&Buttons);
 		uint32 Modifiers;
-		message->FindInt32("modifiers",(int32*)&Modifiers);		
+		message->FindInt32("modifiers",(int32*)&Modifiers);
 		BRect ViewBounds;
 		ViewBounds = Bounds();
 		uint32 ColumnFlags = fColumnClicked->Flags();
@@ -356,9 +356,11 @@ void CLVColumnLabelView::MessageReceived(BMessage *message)
 						{
 							//Live dragging of columns
 							ColumnSnapped = false;
-							float ColumnsUpdateLeft,ColumnsUpdateRight;
-							float MainViewUpdateLeft,MainViewUpdateRight;
-							CLVColumn* LastSwapColumn;
+							float ColumnsUpdateLeft = 0;
+							float ColumnsUpdateRight = 0;
+							float MainViewUpdateLeft = 0;
+							float MainViewUpdateRight = 0;
+							CLVColumn* LastSwapColumn = NULL;
 							if(fSnapMin != -1.0 && MousePos.x < fSnapMin)
 							{
 								//Shift the group left
@@ -595,7 +597,7 @@ void CLVColumnLabelView::UpdateDragGroups()
 	fDragGroups.MakeEmpty();
 	int32 NumberOfColumns = fDisplayList->CountItems();
 	bool ContinueGroup = false;
-	CLVDragGroup* CurrentGroup;
+	CLVDragGroup* CurrentGroup = NULL;
 	for(int32 Counter = 0; Counter < NumberOfColumns; Counter++)
 	{
 		CLVColumn* CurrentColumn = (CLVColumn*)fDisplayList->ItemAt(Counter);

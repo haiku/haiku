@@ -77,16 +77,20 @@ ColumnListView::ColumnListView(BRect Frame, BScrollView **ContainerView, const c
 	uint32 ResizingMode, uint32 flags, list_view_type Type, bool hierarchical, bool horizontal,
 	bool vertical, border_style border, const BFont *LabelFont)
 : BListView(Frame,Name,Type,B_FOLLOW_ALL_SIDES,flags|B_PULSE_NEEDED),
+fHierarchical(hierarchical),
 fColumnList(6),
 fColumnDisplayList(6),
+fDataWidth(0),
+fDataHeight(0),
+fPageWidth(0),
+fPageHeight(0),
 fSortKeyList(6),
-fFullItemList(32),
 fRightArrow(BRect(0.0,0.0,10.0,10.0),B_COLOR_8_BIT,CLVRightArrowData,false,false),
 fDownArrow(BRect(0.0,0.0,10.0,10.0),B_COLOR_8_BIT,CLVDownArrowData,false,false),
-_selectedColumn(-1), _editMessage(NULL)
+fFullItemList(32),
+_selectedColumn(-1),
+_editMessage(NULL)
 {
-	fHierarchical = hierarchical;
-
 	//Create the column titles bar view
 	font_height FontAttributes;
 	LabelFont->GetHeight(&FontAttributes);
@@ -917,7 +921,7 @@ void ColumnListView::SetSorting(int32 NumberOfKeys, int32* SortKeys, CLVSortMode
 void ColumnListView::FrameResized(float width, float height)
 {
 	UpdateColumnSizesDataRectSizeScrollBars();
-	int32 NumberOfItems = CountItems();
+	uint32 NumberOfItems = CountItems();
 	BFont Font;
 	GetFont(&Font);
 	for(uint32 Counter = 0; Counter < NumberOfItems; Counter++)
@@ -1088,6 +1092,18 @@ bool ColumnListView::AddItem(CLVListItem* item)
 		return AddItemPrivate(item,fFullItemList.CountItems());
 	else
 		return AddItemPrivate(item,CountItems());
+}
+
+
+bool ColumnListView::AddItem(BListItem* item, int32 fullListIndex)
+{
+	return BListView::AddItem(item, fullListIndex);
+}
+
+
+bool ColumnListView::AddItem(BListItem* item)
+{
+	return BListView::AddItem(item);
 }
 
 
@@ -1278,6 +1294,12 @@ bool ColumnListView::RemoveItems(int32 fullListIndex, int32 count)
 	}
 	else
 		return BListView::RemoveItems(fullListIndex,count);
+}
+
+
+bool ColumnListView::RemoveItem(BListItem* item)
+{
+	return BListView::RemoveItem(item);
 }
 
 
@@ -1533,7 +1555,6 @@ void ColumnListView::Collapse(CLVListItem* item)
 		}
 
 		//Remove the items under it
-		int32 FullListIndex = fFullItemList.IndexOf(item);
 		uint32 ItemLevel = item->fOutlineLevel;
 		int32 NextItemIndex = DisplayIndex+1;
 		while(true)
@@ -1590,7 +1611,6 @@ void ColumnListView::SortItems()
 		return;
 	}
 	int32 Counter;
-	BRect OldBounds;
 	if(!fHierarchical)
 	{
 		//Plain sort

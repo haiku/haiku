@@ -1411,7 +1411,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src preferences print ;
 	EnableWerror src preferences screen ;
 	EnableWerror src preferences screensaver ;
-#	EnableWerror src preferences shortcuts ;
+	EnableWerror src preferences shortcuts ;
 	EnableWerror src preferences sounds ;
 	EnableWerror src preferences time ;
 	EnableWerror src preferences touchpad ;

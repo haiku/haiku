@@ -93,7 +93,7 @@ class ColumnListView : public BListView
 		virtual void SetSortMode(int32 ColumnIndex,CLVSortMode Mode);
 		int32 Sorting(int32* SortKeys, CLVSortMode* SortModes) const;
 			//Returns the number of used sort keys, and fills the provided arrays with the sort keys
-			//by column index and sort modes, in priority order.  The pointers should point to an array 
+			//by column index and sort modes, in priority order.  The pointers should point to an array
 			//int32 SortKeys[n], and an array CLVSortMode SortModes[n] where n is the number of sortable
 			//columns in the ColumnListView.  Note: sorting will only occur if the key column is shown.
 		void SetSorting(int32 NumberOfKeys, int32* SortKeys, CLVSortMode* SortModes);
@@ -104,7 +104,7 @@ class ColumnListView : public BListView
 		virtual void AttachedToWindow();
  		virtual void ScrollTo(BPoint point);
  		virtual void MouseDown(BPoint point);
- 
+
 		//List functions
 		virtual bool AddUnder(CLVListItem*, CLVListItem* superitem);
 		virtual bool AddItem(CLVListItem*, int32 fullListIndex);
@@ -113,9 +113,12 @@ class ColumnListView : public BListView
 																	//CLVListItem*'s, NOT BListItem*'s
 		virtual bool AddList(BList* newItems, int32 fullListIndex);	//This must be a BList of
 																	//CLVListItem*'s, NOT BListItem*'s
+		virtual bool AddItem(BListItem*, int32 fullListIndex);		// unhide
+		virtual bool AddItem(BListItem*);							// unhide
 		virtual bool RemoveItem(CLVListItem* item);
 		virtual BListItem* RemoveItem(int32 fullListIndex);			//Actually returns CLVListItem
 		virtual bool RemoveItems(int32 fullListIndex, int32 count);
+		virtual bool RemoveItem(BListItem* item);					// unhide
 		virtual void MakeEmpty();
 		CLVListItem* FullListItemAt(int32 fullListIndex)  const;
 		int32 FullListIndexOf(const CLVListItem* item) const;
@@ -141,13 +144,13 @@ class ColumnListView : public BListView
         void SetEditMessage(BMessage * newMsg, BMessenger target);
         // Sets a BMessage that will be sent every time a key is pressed, or the mouse
         // is clicked in the active cell.  (newMsg) becomes property of this ColumnListView.
-        // Copies of (newMsg) will be sent to (target).        
+        // Copies of (newMsg) will be sent to (target).
 
         virtual void Pulse();
         // Used to make the cursor blink on the string column...
-        
+
         int32 GetSelectedColumn() const {return _selectedColumn;}
-        
+
 	private:
 		friend class CLVMainView;
 		friend class CLVColumn;
@@ -156,13 +159,13 @@ class ColumnListView : public BListView
 
         int32 GetActualIndexOf(int32 displayIndex) const;
         // Returns the "real" index of the given display index, or -1 if there is none.
-        
+
         int32 GetDisplayIndexOf(int32 actualIndex) const;
         // Returns the display index of the given "real" index, or -1 if there is none.
-        
+
         void SetSelectedColumnIndex(int32 selectedColumnIndex);
         // Call this to change _selectedColumn to a new value properly.
-        
+
 		void UpdateColumnSizesDataRectSizeScrollBars();
 		void UpdateScrollBars();
 		void ColumnsChanged();
@@ -190,7 +193,7 @@ class ColumnListView : public BListView
 		BList fFullItemList;
 		int32 fExpanderColumn;
 		CLVCompareFuncPtr fCompare;
-		
+
 		// added by jaf
 		int32 _selectedColumn;    // actual index of the column that contains the active cell.
 		BMessage * _editMessage;  // if non-NULL, sent on keypress or when active cell is clicked.

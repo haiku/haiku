@@ -20,7 +20,7 @@ int32 MouseWatcher(void* data)
 {
 	BMessenger* TheMessenger = (BMessenger*)data;
 	BPoint PreviousPos;
-	uint32 PreviousButtons;
+	uint32 PreviousButtons = 0xFFFFFFFF;
 	bool FirstCheck = true;
 	BMessage MessageToSend;
 	MessageToSend.AddPoint("where",BPoint(0,0));
