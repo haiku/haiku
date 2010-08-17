@@ -8,7 +8,7 @@ Preference Joysticks :
 	Joysticks.cpp
 	MessageWin.cpp
 	PortItem.cpp
-	: be libdevice.so
+	: be libdevice.so $(TARGET_LIBSUPC++)
 	: Joysticks.rdef
 	;
 

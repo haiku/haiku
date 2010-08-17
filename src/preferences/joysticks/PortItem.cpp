@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Fredrik Modéen 			fredrik@modeen.se 
+ *		Fredrik Modéen 			fredrik@modeen.se
  */
 
 #include "PortItem.h"
@@ -17,7 +17,7 @@ PortItem::~PortItem()
 {}
 
 void
-PortItem::DrawItem(BView *owner, BRect frame, bool complete = false)
+PortItem::DrawItem(BView *owner, BRect frame, bool complete)
 {
 	BStringItem::DrawItem(owner, frame, complete);
 }
@@ -32,7 +32,7 @@ PortItem::GetOldJoystickName()
 BString
 PortItem::GetJoystickName()
 {
-	return fSelectedJoystick;	
+	return fSelectedJoystick;
 }
 
 
@@ -40,5 +40,5 @@ void
 PortItem::SetJoystickName(BString str)
 {
 	fOldSelectedJoystick = fSelectedJoystick;
-	fSelectedJoystick = str;	
+	fSelectedJoystick = str;
 }

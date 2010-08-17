@@ -191,7 +191,7 @@ JoyWin::MessageReceived(BMessage *message)
 				}
 			} else {
 				fConControllerL->DeselectAll();
-				ShowMessage(SELECTGAMEPORTFIRST);
+				ShowMessage((char*)SELECTGAMEPORTFIRST);
 			}
 		break;
 		}
@@ -204,7 +204,7 @@ JoyWin::MessageReceived(BMessage *message)
 				//printf("invoke.. inte null\n");
 				_PerformProbe(item->Text());
 			} else
-				ShowMessage(SELECTGAMEPORTFIRST);
+				ShowMessage((char*)SELECTGAMEPORTFIRST);
 		break;
 		}
 
@@ -233,7 +233,7 @@ JoyWin::MessageReceived(BMessage *message)
 					dir->CreateSymLink(strLinkPlace.String(),
 						strLinkTo.String(), NULL);
 				} else
-					ShowMessage(SELECTGAMEPORTFIRST);
+					ShowMessage((char*)SELECTGAMEPORTFIRST);
 			}
 
 			fSystemUsedSelect = false;
@@ -256,7 +256,7 @@ JoyWin::MessageReceived(BMessage *message)
 					*/
 				}
 			} else
-				ShowMessage(SELECTGAMEPORTFIRST);
+				ShowMessage((char*)SELECTGAMEPORTFIRST);
 		break;
 		}
 		default:
@@ -276,8 +276,8 @@ JoyWin::QuitRequested()
 
 //---------------------- Private ---------------------------------//
 status_t
-JoyWin::_AddToList(BListView *list, uint32 command,
-	const char* rootPath, BEntry *rootEntry = NULL)
+JoyWin::_AddToList(BListView *list, uint32 command, const char* rootPath,
+	BEntry *rootEntry)
 {
 	BDirectory root;
 
