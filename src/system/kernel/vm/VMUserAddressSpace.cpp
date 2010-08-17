@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -192,24 +192,19 @@ VMUserAddressSpace::CanResizeArea(VMArea* area, size_t newSize)
 {
 	VMUserArea* next = fAreas.GetNext(static_cast<VMUserArea*>(area));
 	addr_t newEnd = area->Base() + (newSize - 1);
-	if (next == NULL) {
-		if (fEndAddress >= newEnd)
-			return true;
-	} else {
-		if (next->Base() > newEnd)
-			return true;
-	}
+
+	if (next == NULL)
+		return fEndAddress >= newEnd;
+
+	if (next->Base() > newEnd)
+		return true;
 
 	// If the area was created inside a reserved area, it can
 	// also be resized in that area
 	// TODO: if there is free space after the reserved area, it could
 	// be used as well...
-	if (next->id == RESERVED_AREA_ID && next->cache_offset <= area->Base()
-		&& next->Base() + (next->Size() - 1) >= newEnd) {
-		return true;
-	}
-
-	return false;
+	return next->id == RESERVED_AREA_ID && next->cache_offset <= area->Base()
+		&& next->Base() + (next->Size() - 1) >= newEnd;
 }
 
 
