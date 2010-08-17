@@ -148,7 +148,9 @@ HWindow::InitGUI()
 
 	// setup file menu
 	SetupMenuField();
-	menu->FindItem(B_TRANSLATE("<none>"))->SetMarked(true);
+	BMenuItem* noneItem = menu->FindItem(B_TRANSLATE("<none>"));
+	if (noneItem != NULL)
+		noneItem->SetMarked(true);
 }
 
 
