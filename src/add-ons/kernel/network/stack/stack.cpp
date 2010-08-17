@@ -504,6 +504,11 @@ put_domain_protocols(net_socket* socket)
 static void
 uninit_domain_datalink_protocols(domain_datalink* datalink)
 {
+	TRACE(("%s(datalink %p)\n", __FUNCTION__, datalink));
+
+	if (datalink == NULL)
+		return;
+
 	net_datalink_protocol* protocol = datalink->first_protocol;
 	while (protocol != NULL) {
 		net_datalink_protocol* next = protocol->next;
@@ -520,6 +525,9 @@ uninit_domain_datalink_protocols(domain_datalink* datalink)
 status_t
 get_domain_datalink_protocols(Interface* interface, net_domain* domain)
 {
+	TRACE(("%s(interface %p, domain %d)\n", __FUNCTION__, interface,
+		domain->family));
+
 	struct chain* chain;
 
 	{
@@ -531,10 +539,16 @@ get_domain_datalink_protocols(Interface* interface, net_domain* domain)
 			return EAFNOSUPPORT;
 	}
 
+	domain_datalink* datalink = interface->DomainDatalink(domain->family);
+	if (datalink == NULL)
+		return B_BAD_VALUE;
+	if (datalink->first_protocol != NULL)
+		return B_NAME_IN_USE;
+
 	// create net_protocol objects for the protocols in the chain
 
 	status_t status = chain->Acquire();
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	net_datalink_protocol* last = NULL;
@@ -545,8 +559,7 @@ get_domain_datalink_protocols(Interface* interface, net_domain* domain)
 			chain->infos[i])->init_protocol(interface, domain, &protocol);
 		if (status != B_OK) {
 			// free protocols we already initialized
-			uninit_domain_datalink_protocols(
-				interface->DomainDatalink(domain->family));
+			uninit_domain_datalink_protocols(datalink);
 			chain->Release();
 			return status;
 		}
@@ -557,9 +570,6 @@ get_domain_datalink_protocols(Interface* interface, net_domain* domain)
 		protocol->next = NULL;
 
 		if (last == NULL) {
-			domain_datalink* datalink
-				= interface->DomainDatalink(domain->family);
-
 			datalink->first_protocol = protocol;
 			datalink->first_info = protocol->module;
 		} else
@@ -575,6 +585,9 @@ get_domain_datalink_protocols(Interface* interface, net_domain* domain)
 status_t
 put_domain_datalink_protocols(Interface* interface, net_domain* domain)
 {
+	TRACE(("%s(interface %p, domain %d)\n", __FUNCTION__, interface,
+		domain->family));
+
 	struct chain* chain;
 
 	{
