@@ -81,28 +81,30 @@ public:
 		bool				MessageForListener(Window* sender,
 								BPrivate::ServerLink& link);
 
-		void				WindowAdded(Window* window);
-		void				WindowRemoved(Window* window);
+		void				NotifyWindowAdded(Window* window);
+		void				NotifyWindowRemoved(Window* window);
 
-		void				KeyPressed(uint32 what, int32 key,
+		void				NotifyKeyPressed(uint32 what, int32 key,
 								int32 modifiers);
-		void				MouseEvent(BMessage* message);
-		void				MouseDown(Window* window, BMessage* message,
+		void				NotifyMouseEvent(BMessage* message);
+		void				NotifyMouseDown(Window* window, BMessage* message,
 									const BPoint& where);
-		void				MouseUp(Window* window, BMessage* message,
+		void				NotifyMouseUp(Window* window, BMessage* message,
 									const BPoint& where);
-		void				MouseMoved(Window* window, BMessage* message,
+		void				NotifyMouseMoved(Window* window, BMessage* message,
 									const BPoint& where);
 
-		void				WindowMoved(Window* window);
-		void				WindowResized(Window* window);
-		void				WindowActitvated(Window* window);
-		void				WindowSentBehind(Window* window, Window* behindOf);
-		void				WindowWorkspacesChanged(Window* window,
+		void				NotifyWindowMoved(Window* window);
+		void				NotifyWindowResized(Window* window);
+		void				NotifyWindowActitvated(Window* window);
+		void				NotifyWindowSentBehind(Window* window,
+								Window* behindOf);
+		void				NotifyWindowWorkspacesChanged(Window* window,
 									uint32 workspaces);
-		void				WindowMinimized(Window* window, bool minimize);
+		void				NotifyWindowMinimized(Window* window,
+								bool minimize);
 
-		void				WindowTabLocationChanged(Window* window,
+		void				NotifyWindowTabLocationChanged(Window* window,
 								float location);
 
 		bool				SetDecoratorSettings(Window* window,

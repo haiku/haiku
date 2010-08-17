@@ -66,7 +66,7 @@ DesktopObservable::MessageForListener(Window* sender,
 
 
 void
-DesktopObservable::WindowAdded(Window* window)
+DesktopObservable::NotifyWindowAdded(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
@@ -79,7 +79,7 @@ DesktopObservable::WindowAdded(Window* window)
 
 
 void
-DesktopObservable::WindowRemoved(Window* window)
+DesktopObservable::NotifyWindowRemoved(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
@@ -92,7 +92,7 @@ DesktopObservable::WindowRemoved(Window* window)
 
 
 void
-DesktopObservable::KeyPressed(uint32 what, int32 key, int32 modifiers)
+DesktopObservable::NotifyKeyPressed(uint32 what, int32 key, int32 modifiers)
 {
 	if (fWeAreInvoking)
 		return;
@@ -105,7 +105,7 @@ DesktopObservable::KeyPressed(uint32 what, int32 key, int32 modifiers)
 
 
 void
-DesktopObservable::MouseEvent(BMessage* message)
+DesktopObservable::NotifyMouseEvent(BMessage* message)
 {
 	if (fWeAreInvoking)
 		return;
@@ -118,7 +118,7 @@ DesktopObservable::MouseEvent(BMessage* message)
 
 
 void
-DesktopObservable::MouseDown(Window* window, BMessage* message,
+DesktopObservable::NotifyMouseDown(Window* window, BMessage* message,
 	const BPoint& where)
 {
 	if (fWeAreInvoking)
@@ -132,7 +132,7 @@ DesktopObservable::MouseDown(Window* window, BMessage* message,
 
 
 void
-DesktopObservable::MouseUp(Window* window, BMessage* message,
+DesktopObservable::NotifyMouseUp(Window* window, BMessage* message,
 	const BPoint& where)
 {
 	if (fWeAreInvoking)
@@ -146,7 +146,7 @@ DesktopObservable::MouseUp(Window* window, BMessage* message,
 
 
 void
-DesktopObservable::MouseMoved(Window* window, BMessage* message,
+DesktopObservable::NotifyMouseMoved(Window* window, BMessage* message,
 	const BPoint& where)
 {
 	if (fWeAreInvoking)
@@ -160,7 +160,7 @@ DesktopObservable::MouseMoved(Window* window, BMessage* message,
 
 
 void
-DesktopObservable::WindowMoved(Window* window)
+DesktopObservable::NotifyWindowMoved(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
@@ -173,7 +173,7 @@ DesktopObservable::WindowMoved(Window* window)
 
 
 void
-DesktopObservable::WindowResized(Window* window)
+DesktopObservable::NotifyWindowResized(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
@@ -186,7 +186,7 @@ DesktopObservable::WindowResized(Window* window)
 
 
 void
-DesktopObservable::WindowActitvated(Window* window)
+DesktopObservable::NotifyWindowActitvated(Window* window)
 {
 	if (fWeAreInvoking)
 		return;
@@ -199,7 +199,7 @@ DesktopObservable::WindowActitvated(Window* window)
 
 
 void
-DesktopObservable::WindowSentBehind(Window* window, Window* behindOf)
+DesktopObservable::NotifyWindowSentBehind(Window* window, Window* behindOf)
 {
 	if (fWeAreInvoking)
 		return;
@@ -212,7 +212,8 @@ DesktopObservable::WindowSentBehind(Window* window, Window* behindOf)
 
 
 void
-DesktopObservable::WindowWorkspacesChanged(Window* window, uint32 workspaces)
+DesktopObservable::NotifyWindowWorkspacesChanged(Window* window,
+	uint32 workspaces)
 {
 	if (fWeAreInvoking)
 		return;
@@ -225,7 +226,7 @@ DesktopObservable::WindowWorkspacesChanged(Window* window, uint32 workspaces)
 
 
 void
-DesktopObservable::WindowMinimized(Window* window, bool minimize)
+DesktopObservable::NotifyWindowMinimized(Window* window, bool minimize)
 {
 	if (fWeAreInvoking)
 		return;
@@ -238,7 +239,8 @@ DesktopObservable::WindowMinimized(Window* window, bool minimize)
 
 
 void
-DesktopObservable::WindowTabLocationChanged(Window* window, float location)
+DesktopObservable::NotifyWindowTabLocationChanged(Window* window,
+	float location)
 {
 	if (fWeAreInvoking)
 		return;

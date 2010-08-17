@@ -251,21 +251,21 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 		switch (message->what) {
 			case B_MOUSE_DOWN:
 				window->MouseDown(message, where, &viewToken);
-				fDesktop->MouseDown(window, message, where);
+				fDesktop->NotifyMouseDown(window, message, where);
 				break;
 
 			case B_MOUSE_UP:
 				window->MouseUp(message, where, &viewToken);
 				if (buttons == 0)
 					fDesktop->SetMouseEventWindow(NULL);
-				fDesktop->MouseUp(window, message, where);
+				fDesktop->NotifyMouseUp(window, message, where);
 				break;
 
 			case B_MOUSE_MOVED:
 				window->MouseMoved(message, where, &viewToken,
 					latestMouseMoved == NULL || latestMouseMoved == message,
 					false);
-				fDesktop->MouseMoved(window, message, where);
+				fDesktop->NotifyMouseMoved(window, message, where);
 				break;
 		}
 
@@ -287,7 +287,7 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 
 	fDesktop->SetLastMouseState(where, buttons, window);
 
-	fDesktop->MouseEvent(message);
+	fDesktop->NotifyMouseEvent(message);
 
 	fDesktop->UnlockAllWindows();
 
@@ -492,7 +492,7 @@ Desktop::BroadcastToAllWindows(int32 code)
 void
 Desktop::KeyEvent(uint32 what, int32 key, int32 modifiers)
 {
-	KeyPressed(what, key, modifiers);
+	NotifyKeyPressed(what, key, modifiers);
 }
 
 
@@ -921,7 +921,7 @@ Desktop::ActivateWindow(Window* window)
 
 	AutoWriteLocker _(fWindowLock);
 
-	WindowActitvated(window);
+	NotifyWindowActitvated(window);
 
 	bool windowOnOtherWorkspace = !window->InWorkspace(fCurrentWorkspace);
 	if (windowOnOtherWorkspace
@@ -1076,7 +1076,7 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 
 	_WindowChanged(window);
 
-	WindowSentBehind(window, behindOf);
+	NotifyWindowSentBehind(window, behindOf);
 
 	UnlockAllWindows();
 
@@ -1190,11 +1190,11 @@ Desktop::MinimizeWindow(Window* window, bool minimize)
 	if (minimize && !window->IsHidden()) {
 		HideWindow(window);
 		window->SetMinimized(minimize);
-		WindowMinimized(window, minimize);
+		NotifyWindowMinimized(window, minimize);
 	} else if (!minimize && window->IsHidden()) {
 		ActivateWindow(window);
 			// this will unminimize the window for us
-		WindowMinimized(window, minimize);
+		NotifyWindowMinimized(window, minimize);
 	}
 
 	UnlockAllWindows();
@@ -1225,7 +1225,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 		} else
 			window->MoveBy((int32)x, (int32)y);
 
-		WindowMoved(window);
+		NotifyWindowMoved(window);
 		UnlockAllWindows();
 		return;
 	}
@@ -1280,7 +1280,7 @@ Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 			B_DIRECT_START | B_BUFFER_MOVED | B_CLIPPING_MODIFIED);
 	}
 
-	WindowMoved(window);
+	NotifyWindowMoved(window);
 
 	UnlockAllWindows();
 }
@@ -1297,7 +1297,7 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 
 	if (!window->IsVisible()) {
 		window->ResizeBy((int32)x, (int32)y, NULL);
-		WindowResized(window);
+		NotifyWindowResized(window);
 		UnlockAllWindows();
 		return;
 	}
@@ -1340,7 +1340,7 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 			B_DIRECT_START | B_BUFFER_RESIZED | B_CLIPPING_MODIFIED);
 	}
 
-	WindowResized(window);
+	NotifyWindowResized(window);
 
 	UnlockAllWindows();
 }
@@ -1356,7 +1356,7 @@ Desktop::SetWindowTabLocation(Window* window, float location)
 	if (changed)
 		RebuildAndRedrawAfterWindowChange(window, dirty);
 
-	WindowTabLocationChanged(window, location);
+	NotifyWindowTabLocationChanged(window, location);
 
 	return changed;
 }
@@ -1417,7 +1417,7 @@ Desktop::AddWindow(Window *window)
 
 	_ChangeWindowWorkspaces(window, 0, window->Workspaces());
 	
-	WindowAdded(window);
+	NotifyWindowAdded(window);
 
 	UnlockAllWindows();
 }
@@ -1437,7 +1437,7 @@ Desktop::RemoveWindow(Window *window)
 
 	_ChangeWindowWorkspaces(window, window->Workspaces(), 0);
 	
-	WindowRemoved(window);
+	NotifyWindowRemoved(window);
 
 	UnlockAllWindows();
 
@@ -2834,7 +2834,7 @@ Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 	// take care about modals and floating windows
 	_UpdateSubsetWorkspaces(window);
 
-	WindowWorkspacesChanged(window, newWorkspaces);
+	NotifyWindowWorkspacesChanged(window, newWorkspaces);
 
 	UnlockAllWindows();
 }
@@ -3239,7 +3239,8 @@ Desktop::_SetWorkspace(int32 index, bool moveFocusWindow)
 				// send B_WORKSPACES_CHANGED message
 				movedWindow->WorkspacesChanged(oldWorkspaces,
 					movedWindow->Workspaces());
-				WindowWorkspacesChanged(movedWindow, movedWindow->Workspaces());
+				NotifyWindowWorkspacesChanged(movedWindow,
+					movedWindow->Workspaces());
 			} else {
 				// make sure it's frontmost
 				_Windows(index).RemoveWindow(movedWindow);
