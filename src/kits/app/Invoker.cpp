@@ -62,7 +62,7 @@ BInvoker::SetMessage(BMessage* message)
 }
 
 
-BMessage *
+BMessage*
 BInvoker::Message() const
 {
 	return fMessage;
@@ -124,7 +124,7 @@ BInvoker::SetHandlerForReply(BHandler* replyHandler)
 }
 
 
-BHandler *
+BHandler*
 BInvoker::HandlerForReply() const
 {
 	return fReplyTo;
