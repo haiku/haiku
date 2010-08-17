@@ -83,7 +83,7 @@ public:
 
 		SATWindow*			GetSATWindow(Window* window);
 
-protected:
+private:
 		void				_StartSAT();
 		void				_StopSAT();
 		void				_ActivateWindow(SATWindow* window);

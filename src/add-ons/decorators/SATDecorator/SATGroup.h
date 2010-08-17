@@ -217,10 +217,6 @@ public:
 		Tab*				FindHorizontalTab(float position);
 		Tab*				FindVerticalTab(float position);
 
-protected:
-		SATWindowList		fSATWindowList;
-		LinearSpec			fLinearSpec;
-
 private:
 		BReference<Tab>		_AddHorizontalTab(float position = 0);
 		BReference<Tab>		_AddVerticalTab(float position = 0);
@@ -255,6 +251,11 @@ private:
 	inline void				_CallculateYOffset(BPoint& offset, BRect& frame,
 								BRect& screen);
 
+protected:
+		SATWindowList		fSATWindowList;
+		LinearSpec			fLinearSpec;
+
+private:
 		TabList				fHorizontalTabs;
 		bool				fHorizontalTabsSorted;
 		TabList				fVerticalTabs;
