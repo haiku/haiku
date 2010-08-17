@@ -1396,7 +1396,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src preferences cpufrequency ;
 	EnableWerror src preferences datatranslations ;
 	EnableWerror src preferences deskbar ;
-#	EnableWerror src preferences filetypes ;
+	EnableWerror src preferences filetypes ;
 	EnableWerror src preferences fonts ;
 	EnableWerror src preferences joysticks ;
 	EnableWerror src preferences keyboard ;

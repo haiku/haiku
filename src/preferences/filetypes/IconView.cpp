@@ -696,12 +696,12 @@ IconView::AcceptsDrag(const BMessage* message)
 		return true;
 	}
 
-	if (message->GetInfo("icon/large", &type) == B_OK
-			&& type == B_MESSAGE_TYPE
-		|| message->GetInfo("icon", &type) == B_OK
-			&& type == B_VECTOR_ICON_TYPE
-		|| message->GetInfo("icon/mini", &type) == B_OK
+	if ((message->GetInfo("icon/large", &type) == B_OK
 			&& type == B_MESSAGE_TYPE)
+		|| (message->GetInfo("icon", &type) == B_OK
+			&& type == B_VECTOR_ICON_TYPE)
+		|| (message->GetInfo("icon/mini", &type) == B_OK
+			&& type == B_MESSAGE_TYPE))
 		return true;
 
 	return false;
@@ -1377,3 +1377,23 @@ IconView::_StopWatching()
 	else if (fHasType)
 		BMimeType::StopWatching(this);
 }
+
+
+#if __GNUC__ == 2
+
+status_t
+IconView::SetTarget(BMessenger target)
+{
+	return BControl::SetTarget(target);
+}
+
+
+status_t
+IconView::SetTarget(const BHandler* handler, const BLooper* looper = NULL)
+{
+	return BControl::SetTarget(handler,
+		looper);
+}
+
+#endif
+

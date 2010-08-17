@@ -118,6 +118,15 @@ public:
 			status_t			GetRef(entry_ref& ref) const;
 			status_t			GetMimeType(BMimeType& type) const;
 
+#if __GNUC__ == 2
+	virtual	status_t			SetTarget(BMessenger target);
+	virtual	status_t			SetTarget(const BHandler* handler,
+									const BLooper* looper = NULL);
+#else
+			using BControl::SetTarget;
+#endif
+
+
 protected:
 	virtual	bool				AcceptsDrag(const BMessage* message);
 	virtual	BRect				BitmapRect() const;
