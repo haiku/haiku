@@ -958,8 +958,8 @@ BSplitLayout::_LayoutItem(BLayoutItem* item, ItemLayoutInfo* info)
 	item->AlignInFrame(info->layoutFrame);
 
 	// if the item became visible, we need to update its internal layout
-	if (visibilityChanged && fOrientation != B_HORIZONTAL
-		|| !HasHeightForWidth()) {
+	if (visibilityChanged && (fOrientation != B_HORIZONTAL
+		|| !HasHeightForWidth())) {
 		item->Relayout(true);
 	}
 }
