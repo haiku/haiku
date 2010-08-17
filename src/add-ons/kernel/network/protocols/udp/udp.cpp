@@ -1254,14 +1254,13 @@ udp_error_received(net_error error, net_buffer* buffer)
 		case B_NET_ERROR_QUENCH:
 		default:
 			// ignore them
-			break;
+			gBufferModule->free(buffer);
+			return B_OK;
 	}
 
-	if (notifyError != B_OK)
-		sUdpEndpointManager->ReceiveError(notifyError, buffer);
+	ASSERT(notifyError != B_OK);
 
-	gBufferModule->free(buffer);
-	return B_OK;
+	return sUdpEndpointManager->ReceiveError(notifyError, buffer);
 }
 
 
