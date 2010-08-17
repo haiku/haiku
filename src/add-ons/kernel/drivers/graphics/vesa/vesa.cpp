@@ -242,7 +242,7 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 	uint32 height, int8 depth, uint32 bytesPerRow, bool initializing)
 {
 	vesa_shared_info& sharedInfo = *info.shared_info;
-	addr_t frameBuffer;
+	addr_t frameBuffer = info.frame_buffer;
 
 	if (!info.complete_frame_buffer_mapped) {
 		addr_t base = physicalBase;
@@ -282,8 +282,7 @@ remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 			if (info.physical_frame_buffer_size != 0)
 				info.complete_frame_buffer_mapped = true;
 		}
-	} else
-		frameBuffer = info.frame_buffer;
+	}
 
 	if (info.complete_frame_buffer_mapped)
 		frameBuffer += physicalBase - info.physical_frame_buffer;
