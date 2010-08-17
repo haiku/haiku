@@ -904,6 +904,8 @@ Interface::SetDown()
 void
 Interface::WentDown()
 {
+	TRACE("Interface %p: went down\n", this);
+
 	RecursiveLocker locker(fLock);
 
 	AddressList::Iterator iterator = fAddresses.GetIterator();
@@ -928,6 +930,8 @@ Interface::CreateDomainDatalinkIfNeeded(net_domain* domain)
 	if (datalink == NULL)
 		return B_NO_MEMORY;
 
+	datalink->first_protocol = NULL;
+	datalink->first_info = NULL;
 	datalink->domain = domain;
 
 	// setup direct route for bound devices
@@ -987,6 +991,7 @@ Interface::Dump() const
 	kprintf("type:                %u\n", type);
 	kprintf("mtu:                 %" B_PRIu32 "\n", mtu);
 	kprintf("metric:              %" B_PRIu32 "\n", metric);
+	kprintf("ref count:           %" B_PRId32 "\n", CountReferences());
 
 	kprintf("datalink protocols:\n");
 
