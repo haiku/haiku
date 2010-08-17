@@ -250,7 +250,7 @@ TouchpadView::DrawSliders()
 			fPadRect.top + fYScrollRange + dragSize);
 		view->FillRect(fYScrollDragZone2);
 
-		fOffScreenView->Sync();
+		view->Sync();
 		fOffScreenBitmap->Unlock();
 		DrawBitmap(fOffScreenBitmap, B_ORIGIN);
 	}
