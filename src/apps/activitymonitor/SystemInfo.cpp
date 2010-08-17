@@ -1,18 +1,15 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "SystemInfo.h"
-#include "SystemInfoHandler.h"
 
-#include <net/if.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/sockio.h>
-#include <unistd.h>
+#include <NetworkInterface.h>
+#include <NetworkRoster.h>
+
+#include "SystemInfoHandler.h"
 
 
 SystemInfo::SystemInfo(SystemInfoHandler* handler)
@@ -158,55 +155,17 @@ SystemInfo::_RetrieveNetwork()
 	fBytesSent = 0;
 	fRetrievedNetwork = true;
 
-	// we need a socket to talk to the networking stack
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
-		return;
+	BNetworkRoster& roster = BNetworkRoster::Default();
 
-	// get a list of all interfaces
-
-	ifconf config;
-	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0
-		|| config.ifc_value == 0) {
-		close(socket);
-		return;
-	}
-
-	uint32 count = (uint32)config.ifc_value;
-
-	void *buffer = malloc(count * sizeof(struct ifreq));
-	if (buffer == NULL) {
-		close(socket);
-		return;
-	}
-
-	config.ifc_len = count * sizeof(struct ifreq);
-	config.ifc_buf = buffer;
-	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
-		close(socket);
-		return;
-	}
-
-	ifreq *interface = (ifreq *)buffer;
-
-	for (uint32 i = 0; i < count; i++) {
-		ifreq request;
-		strlcpy(request.ifr_name, interface->ifr_name, IF_NAMESIZE);
-
-#ifdef __HAIKU__
-		if (ioctl(socket, SIOCGIFSTATS, &request, sizeof(struct ifreq)) == 0) {
-			fBytesReceived += request.ifr_stats.receive.bytes;
-			fBytesSent += request.ifr_stats.send.bytes;
+	BNetworkInterface interface;
+	uint32 cookie = 0;
+	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
+		ifreq_stats stats;
+		if (interface.GetStats(stats) == B_OK) {
+			fBytesReceived += stats.receive.bytes;
+			fBytesSent += stats.send.bytes;
 		}
-#endif
-
-		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
-			+ interface->ifr_addr.sa_len);
 	}
-
-	free(buffer);
-	close(socket);
 }
 
 
