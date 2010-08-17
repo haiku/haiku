@@ -17,7 +17,7 @@
 CLVColumn::CLVColumn(const char* label,BPopUpMenu * popup,float width,uint32 flags,float min_width)
 {
     fPopup = popup;
-    
+
 	if(flags & CLV_EXPANDER)
 	{
 		label = NULL;
@@ -30,12 +30,6 @@ CLVColumn::CLVColumn(const char* label,BPopUpMenu * popup,float width,uint32 fla
 		min_width = 4.0;
 	if(width < min_width)
 		width = min_width;
-	if(label)
-	{
-		char* Temp = new char[strlen(label)+1];
-		strcpy(Temp,label);
-		label = Temp;
-	}
 	if(label)
 	{
 		fLabel = new char[strlen(label)+1];
@@ -54,9 +48,9 @@ CLVColumn::CLVColumn(const char* label,BPopUpMenu * popup,float width,uint32 fla
 
 CLVColumn::~CLVColumn()
 {
-	if(fLabel) delete[] fLabel;
+	delete [] fLabel;
 	if(fParent) fParent->RemoveColumn(this);
-    delete fPopup;	
+    delete fPopup;
 }
 
 
@@ -136,7 +130,7 @@ void CLVColumn::SetWidth(float width)
 				DestArea.left = fColumnEnd + Delta;
 			DestArea.right = DestArea.left;
 			fParent->fColumnLabelView->Invalidate(DestArea);
-			
+
 			//Update the column sizes, positions and group positions
 			fParent->UpdateColumnSizesDataRectSizeScrollBars();
 			fParent->fColumnLabelView->UpdateDragGroups();
