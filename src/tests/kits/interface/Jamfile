@@ -11,6 +11,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpolygon ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bregion ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bwindowstack ] ;
 
 SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
 
@@ -159,6 +160,11 @@ SimpleTest SetBorderScrollViewTest :
 
 SimpleTest TextViewTest :
 	TextViewTest.cpp
+	: be $(TARGET_LIBSUPC++)
+	;
+
+SimpleTest WindowStackTest :
+	WindowStackTest.cpp
 	: be $(TARGET_LIBSUPC++)
 	;
 
