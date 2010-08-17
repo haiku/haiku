@@ -1156,6 +1156,22 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_TALK_TO_DESKTOP_LISTENER:
+		{
+			port_id senderPort;
+			link.Read<port_id>(&senderPort);
+			BPrivate::LinkSender sender(senderPort);
+			BPrivate::PortLinkRef listenerLink(&sender, &link);
+			if (fDesktop->MessageForListener(fWindow, listenerLink))
+				break;
+			// unhandled message at least send an error if needed
+			if (link.NeedsReply()) {
+				sender.StartMessage(B_ERROR);
+				sender.Flush();
+			}
+			break;
+		}
+
 		default:
 			if (fCurrentView == NULL) {
 				BString codeName;
@@ -3635,6 +3651,7 @@ ServerWindow::_MessageNeedsAllWindowsLocked(uint32 code) const
 		case AS_DIRECT_WINDOW_SET_FULLSCREEN:
 //		case AS_VIEW_SET_EVENT_MASK:
 //		case AS_VIEW_SET_MOUSE_EVENT_MASK:
+		case AS_TALK_TO_DESKTOP_LISTENER:
 			return true;
 		default:
 			return false;

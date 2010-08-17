@@ -13,6 +13,8 @@
 
 #include <Point.h>
 
+#include <ServerLink.h>
+
 
 class BMessage;
 class Desktop;
@@ -23,8 +25,13 @@ class DesktopListener : public DoublyLinkedListLinkImpl<DesktopListener> {
 public:
 	virtual						~DesktopListener();
 
+	virtual int32				Identifier() = 0;
+
 	virtual	void				ListenerRegistered(Desktop* desktop) = 0;
 	virtual	void				ListenerUnregistered() = 0;
+
+	virtual bool				HandleMessage(Window* sender,
+									BPrivate::ServerLink& link) = 0;
 
 	virtual void				WindowAdded(Window* window) = 0;
 	virtual void				WindowRemoved(Window* window) = 0;
@@ -70,6 +77,9 @@ public:
 								Desktop* desktop);
 		void				UnregisterListener(DesktopListener* listener);
 	const DesktopListenerDLList&	GetDesktopListenerList();
+
+		bool				MessageForListener(Window* sender,
+								BPrivate::ServerLink& link);
 
 		void				WindowAdded(Window* window);
 		void				WindowRemoved(Window* window);

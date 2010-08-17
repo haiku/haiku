@@ -47,9 +47,22 @@ DesktopObservable::GetDesktopListenerList()
 }
 
 
-#define FOR_ALL_DESKTOP_LISTENER 											\
-	for (DesktopListener* listener = fDesktopListenerList.First();			\
-		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+bool
+DesktopObservable::MessageForListener(Window* sender,
+	BPrivate::ServerLink& link)
+{
+	int32 identifier;
+	link.Read<int32>(&identifier);
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener)) {
+		if (listener->Identifier() == identifier) {
+			if (!listener->HandleMessage(sender, link))
+				break;
+			return true;
+		}
+	}
+	return false;
+}
 
 
 void

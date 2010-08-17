@@ -93,6 +93,9 @@ public:
 			// related thread/team_id(s).
 	inline	team_id				ClientTeam() const { return fClientTeam; }
 
+	inline	port_id				ClientLooperPort () const
+									{ return fClientLooperPort; }
+
 	inline	int32				ClientToken() const { return fClientToken; }
 	inline	int32				ServerToken() const { return fServerToken; }
 

@@ -333,6 +333,9 @@ enum {
 	AS_DIRECT_WINDOW_SET_FULLSCREEN,
 	AS_DIRECT_SCREEN_LOCK,
 
+	// desktop listener communications
+	AS_TALK_TO_DESKTOP_LISTENER,
+
 	AS_LAST_CODE
 };
 
