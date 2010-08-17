@@ -4,7 +4,6 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
- *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
 
@@ -25,13 +24,6 @@ PortLink::~PortLink()
 {
 	delete fReceiver;
 	delete fSender;
-}
-
-
-PortLinkRef::PortLinkRef(LinkSender* send, LinkReceiver* receive)
-{
-	fSender = send;
-	fReceiver = receive;
 }
 
 
