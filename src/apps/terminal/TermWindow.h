@@ -48,7 +48,8 @@ class TermViewContainerView;
 
 class TermWindow : public BWindow {
 public:
-	TermWindow(BRect frame, const char* title, Arguments *args);
+	TermWindow(BRect frame, const char* title, uint32 workspaces,
+		Arguments *args);
 	virtual ~TermWindow();
 
 			void	SetSessionWindowTitle(TermView* termView,

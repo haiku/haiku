@@ -34,6 +34,7 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <File.h>
 #include <String.h>
 
 class Arguments;
@@ -53,7 +54,10 @@ class TermApp : public BApplication {
 		void ArgvReceived(int32 argc, char** argv);
 
 	private:
-		status_t _MakeTermWindow(BRect& frame);
+		status_t _MakeTermWindow(BRect& frame, uint32 workspaces);
+		status_t _GetWindowPositionFile(BFile* file, uint32 openMode);
+		status_t _LoadWindowPosition(BRect* frame, uint32* workspaces);
+		status_t _SaveWindowPosition(BMessage* message);
 		void _SwitchTerm();
 		void _ActivateTermWindow(team_id id);
 		bool _IsSwitchTarget(team_id id);
@@ -73,9 +77,10 @@ class TermApp : public BApplication {
 		bool		fStartFullscreen;
 		BString		fWindowTitle;
 		int32		fWindowNumber;
-		
+
 		BWindow*	fTermWindow;
 		BRect		fTermFrame;
+		uint32		fTermWorkspaces;
 		Arguments	*fArgs;
 };
 

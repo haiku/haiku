@@ -135,10 +135,11 @@ private:
 };
 
 
-TermWindow::TermWindow(BRect frame, const char* title, Arguments* args)
+TermWindow::TermWindow(BRect frame, const char* title, uint32 workspaces,
+	Arguments* args)
 	:
 	BWindow(frame, title, B_DOCUMENT_WINDOW,
-		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE),
+		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE, workspaces),
 	fInitialTitle(title),
 	fTabView(NULL),
 	fMenubar(NULL),
@@ -256,6 +257,11 @@ TermWindow::QuitRequested()
 		if (result == 1)
 			return false;
 	}
+
+	BMessage position = BMessage(MSG_SAVE_WINDOW_POSITION);
+	position.AddRect("rect", Frame());
+	position.AddInt32("workspaces", Workspaces());
+	be_app->PostMessage(&position);
 
 	return BWindow::QuitRequested();
 }
