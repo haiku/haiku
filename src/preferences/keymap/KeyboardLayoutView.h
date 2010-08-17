@@ -26,7 +26,7 @@ public:
 
 			KeyboardLayout*		GetKeyboardLayout() { return fLayout; }
 
-			void				SetFont(const BFont& font);
+			void				SetBaseFont(const BFont& font);
 
 			void				SetEditable(bool editable);
 
@@ -112,7 +112,7 @@ private:
 			BPoint				fDropPoint;
 
 			BSize				fOldSize;
-			BFont				fFont;
+			BFont				fBaseFont;
 			BFont				fSpecialFont;
 			float				fBaseFontHeight;
 			float				fBaseFontSize;

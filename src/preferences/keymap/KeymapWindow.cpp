@@ -244,7 +244,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 			if (item != NULL) {
 				BFont font;
 				font.SetFamilyAndStyle(item->Label(), NULL);
-				fKeyboardLayoutView->SetFont(font);
+				fKeyboardLayoutView->SetBaseFont(font);
 				fTextControl->TextView()->SetFontAndColor(&font);
 			}
 			break;

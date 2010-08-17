@@ -77,14 +77,14 @@ KeyboardLayoutView::SetTarget(BMessenger target)
 
 
 void
-KeyboardLayoutView::SetFont(const BFont& font)
+KeyboardLayoutView::SetBaseFont(const BFont& font)
 {
-	fFont = font;
+	fBaseFont = font;
 
 	font_height fontHeight;
-	fFont.GetHeight(&fontHeight);
+	fBaseFont.GetHeight(&fontHeight);
 	fBaseFontHeight = fontHeight.ascent + fontHeight.descent;
-	fBaseFontSize = fFont.Size();
+	fBaseFontSize = fBaseFont.Size();
 
 	Invalidate();
 }
@@ -95,7 +95,7 @@ KeyboardLayoutView::AttachedToWindow()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 
-	SetFont(*be_plain_font);
+	SetBaseFont(*be_plain_font);
 	fSpecialFont = *be_fixed_font;
 	fModifiers = modifiers();
 }
@@ -277,7 +277,7 @@ KeyboardLayoutView::MouseMoved(BPoint point, uint32 transit,
 
 		BView* view = new BView(rect, "drag", B_FOLLOW_NONE, 0);
 		bitmap->AddChild(view);
-		
+
 		view->SetHighColor(0, 0, 0, 0);
 		view->FillRect(view->Bounds());
 		view->SetDrawingMode(B_OP_ALPHA);
@@ -860,7 +860,7 @@ KeyboardLayoutView::_GetKeyLabel(const Key* key, char* text, size_t textSize,
 				keyKind = kSymbolKey;
 			} else {
 				bool hasGlyphs;
-				fFont.GetHasGlyphs(bytes, 1, &hasGlyphs);
+				fBaseFont.GetHasGlyphs(bytes, 1, &hasGlyphs);
 				if (hasGlyphs)
 					strlcpy(text, bytes, sizeof(text));
 			}
@@ -1062,8 +1062,8 @@ KeyboardLayoutView::_SetFontSize(BView* view, key_kind keyKind)
 
 	switch (keyKind) {
 		case kNormalKey:
-			fFont.SetSize(fontSize);
-			view->SetFont(&fFont);
+			fBaseFont.SetSize(fontSize);
+			view->SetFont(&fBaseFont);
 			break;
 		case kSpecialKey:
 			fSpecialFont.SetSize(fontSize * 0.7);
