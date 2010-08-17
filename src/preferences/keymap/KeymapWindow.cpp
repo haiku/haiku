@@ -508,7 +508,8 @@ KeymapWindow::_CreateMapLists()
 		.Add(new BStringView("system", B_TRANSLATE("System:")))
 		.Add(systemScroller, 3)
 		.Add(new BStringView("user", B_TRANSLATE("User:")))
-		.Add(userScroller);
+		.Add(userScroller)
+		.TopView();
 }
 
 
