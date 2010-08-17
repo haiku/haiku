@@ -1765,7 +1765,7 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 				&fSelectionModel),
 			fSchedulingView = new SchedulingView(fFontInfo, &fFilterModel,
 				&fSelectionModel),
-			fFontInfo, &fFilterModel))
+			fFontInfo, &fFilterModel)).View();
 	;
 
 	AddChild(fScrollView = new BScrollView("scroll", scrollChild, 0, true,
