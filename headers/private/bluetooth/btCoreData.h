@@ -138,7 +138,7 @@ struct bluetooth_core_data_module_info {
 	status_t				(*PostEvent)(bluetooth_device* ndev, void* event,
 								size_t size);
 	struct HciConnection*	(*AddConnection)(uint16 handle, int type,
-								bdaddr_t* dst, hci_id hid);
+								const bdaddr_t* dst, hci_id hid);
 
 	// status_t				(*RemoveConnection)(bdaddr_t destination, hci_id hid);
 	status_t				(*RemoveConnection)(uint16 handle, hci_id hid);

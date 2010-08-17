@@ -44,6 +44,15 @@
 #include "acl.h"
 
 
+namespace BPrivate {
+
+const bdaddr_t kBdNullAddress 		= {{0, 0, 0, 0, 0, 0}};
+const bdaddr_t kBdLocalAddress 		= {{0, 0, 0, 0xff, 0xff, 0xff}};
+const bdaddr_t kBdBroadcastAddress	= {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}};
+
+}
+
+
 typedef PortListener<void,
 	HCI_MAX_FRAME_SIZE, // Event Body can hold max 255 + 2 header
 	24					// Some devices have sent chunks of 24 events(inquiry result)

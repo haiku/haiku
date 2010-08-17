@@ -37,7 +37,7 @@ HciConnection::~HciConnection()
 
 
 HciConnection*
-AddConnection(uint16 handle, int type, bdaddr_t* dst, hci_id hid)
+AddConnection(uint16 handle, int type, const bdaddr_t* dst, hci_id hid)
 {
 	// Create connection descriptor
 

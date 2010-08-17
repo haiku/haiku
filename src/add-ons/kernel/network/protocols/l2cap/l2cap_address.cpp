@@ -22,6 +22,15 @@
 #include <bluetooth/L2CAP/btL2CAP.h>
 
 
+namespace BPrivate {
+
+const bdaddr_t kBdNullAddress 		= {{0, 0, 0, 0, 0, 0}};
+const bdaddr_t kBdLocalAddress 		= {{0, 0, 0, 0xff, 0xff, 0xff}};
+const bdaddr_t kBdBroadcastAddress	= {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}};
+
+}
+
+
 #define L2CAP_CHECKSUM(address) \
 	(address.b[0] + address.b[1] + address.b[2] + address.b[3] \
 		+ address.b[4] + address.b[5])
