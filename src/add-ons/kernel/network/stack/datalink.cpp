@@ -772,8 +772,12 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 
 			size_t maxLength = length - offsetof(ifreq, ifr_addr);
 
-			return fill_address(*interfaceAddress->AddressFor(option),
+			status_t status = fill_address(
+				*interfaceAddress->AddressFor(option),
 				&((struct ifreq*)argument)->ifr_addr, maxLength);
+
+			interfaceAddress->ReleaseReference();
+			return status;
 		}
 
 		case B_SOCKET_COUNT_ALIASES:
