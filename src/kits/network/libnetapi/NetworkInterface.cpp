@@ -13,11 +13,29 @@
 #include <AutoDeleter.h>
 
 
+static int
+family_from_interface_address(const BNetworkInterfaceAddress& address)
+{
+	if (address.Address().Family() != AF_UNSPEC)
+		return address.Address().Family();
+	if (address.Mask().Family() != AF_UNSPEC)
+		return address.Mask().Family();
+	if (address.Destination().Family() != AF_UNSPEC)
+		return address.Destination().Family();
+
+	return AF_INET;
+}
+
+
 static status_t
 do_ifaliasreq(const char* name, int32 option, BNetworkInterfaceAddress& address,
 	bool readBack = false)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	int family = AF_INET;
+	if (!readBack)
+		family = family_from_interface_address(address);
+
+	int socket = ::socket(family, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return errno;
 
@@ -34,7 +52,7 @@ do_ifaliasreq(const char* name, int32 option, BNetworkInterfaceAddress& address,
 		address.Mask().Length());
 	memcpy(&request.ifra_broadaddr, &address.Broadcast().SockAddr(),
 		address.Broadcast().Length());
-	
+
 	if (ioctl(socket, option, &request, sizeof(struct ifaliasreq)) < 0)
 		return errno;
 
@@ -59,9 +77,9 @@ do_ifaliasreq(const char* name, int32 option,
 
 
 static status_t
-do_request(ifreq& request, const char* name, int option)
+do_request(int family, ifreq& request, const char* name, int option)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	int socket = ::socket(family, SOCK_DGRAM, 0);
 	if (socket < 0)
 		return errno;
 
@@ -181,7 +199,7 @@ BNetworkInterface::SetTo(uint32 index)
 	ifreq request;
 	request.ifr_index = index;
 
-	status_t status = do_request(request, "", SIOCGIFNAME);
+	status_t status = do_request(AF_INET, request, "", SIOCGIFNAME);
 	if (status != B_OK)
 		return status;
 
@@ -194,7 +212,7 @@ bool
 BNetworkInterface::Exists() const
 {
 	ifreq request;
-	return do_request(request, Name(), SIOCGIFINDEX) == B_OK;
+	return do_request(AF_INET, request, Name(), SIOCGIFINDEX) == B_OK;
 }
 
 
@@ -209,7 +227,7 @@ uint32
 BNetworkInterface::Flags() const
 {
 	ifreq request;
-	if (do_request(request, Name(), SIOCGIFFLAGS) != B_OK)
+	if (do_request(AF_INET, request, Name(), SIOCGIFFLAGS) != B_OK)
 		return 0;
 
 	return request.ifr_flags;
@@ -220,7 +238,7 @@ uint32
 BNetworkInterface::MTU() const
 {
 	ifreq request;
-	if (do_request(request, Name(), SIOCGIFMTU) != B_OK)
+	if (do_request(AF_INET, request, Name(), SIOCGIFMTU) != B_OK)
 		return 0;
 
 	return request.ifr_mtu;
@@ -231,7 +249,7 @@ int32
 BNetworkInterface::Media() const
 {
 	ifreq request;
-	if (do_request(request, Name(), SIOCGIFMEDIA) != B_OK)
+	if (do_request(AF_INET, request, Name(), SIOCGIFMEDIA) != B_OK)
 		return -1;
 
 	return request.ifr_media;
@@ -242,7 +260,7 @@ uint32
 BNetworkInterface::Metric() const
 {
 	ifreq request;
-	if (do_request(request, Name(), SIOCGIFMETRIC) != B_OK)
+	if (do_request(AF_INET, request, Name(), SIOCGIFMETRIC) != B_OK)
 		return 0;
 
 	return request.ifr_metric;
@@ -253,7 +271,7 @@ uint32
 BNetworkInterface::Type() const
 {
 	ifreq request;
-	if (do_request(request, Name(), SIOCGIFTYPE) != B_OK)
+	if (do_request(AF_INET, request, Name(), SIOCGIFTYPE) != B_OK)
 		return 0;
 
 	return request.ifr_type;
@@ -264,7 +282,7 @@ status_t
 BNetworkInterface::GetStats(ifreq_stats& stats)
 {
 	ifreq request;
-	status_t status = do_request(request, Name(), SIOCGIFSTATS);
+	status_t status = do_request(AF_INET, request, Name(), SIOCGIFSTATS);
 	if (status != B_OK)
 		return status;
 
@@ -285,7 +303,7 @@ BNetworkInterface::SetFlags(uint32 flags)
 {
 	ifreq request;
 	request.ifr_flags = flags;
-	return do_request(request, Name(), SIOCSIFFLAGS);
+	return do_request(AF_INET, request, Name(), SIOCSIFFLAGS);
 }
 
 
@@ -294,7 +312,7 @@ BNetworkInterface::SetMTU(uint32 mtu)
 {
 	ifreq request;
 	request.ifr_mtu = mtu;
-	return do_request(request, Name(), SIOCSIFMTU);
+	return do_request(AF_INET, request, Name(), SIOCSIFMTU);
 }
 
 
@@ -303,7 +321,7 @@ BNetworkInterface::SetMedia(int32 media)
 {
 	ifreq request;
 	request.ifr_media = media;
-	return do_request(request, Name(), SIOCSIFMEDIA);
+	return do_request(AF_INET, request, Name(), SIOCSIFMEDIA);
 }
 
 
@@ -312,7 +330,7 @@ BNetworkInterface::SetMetric(uint32 metric)
 {
 	ifreq request;
 	request.ifr_metric = metric;
-	return do_request(request, Name(), SIOCSIFMETRIC);
+	return do_request(AF_INET, request, Name(), SIOCSIFMETRIC);
 }
 
 
@@ -320,7 +338,7 @@ int32
 BNetworkInterface::CountAddresses() const
 {
 	ifreq request;
-	if (do_request(request, Name(), B_SOCKET_COUNT_ALIASES) != B_OK)
+	if (do_request(AF_INET, request, Name(), B_SOCKET_COUNT_ALIASES) != B_OK)
 		return 0;
 
 	return request.ifr_count;
@@ -349,7 +367,7 @@ BNetworkInterface::FindAddress(const BNetworkAddress& address)
 	strlcpy(request.ifra_name, Name(), IF_NAMESIZE);
 	request.ifra_index = -1;
 	memcpy(&request.ifra_addr, &address.SockAddr(), address.Length());
-	
+
 	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
 			< 0)
 		return errno;
@@ -373,7 +391,7 @@ BNetworkInterface::FindFirstAddress(int family)
 	strlcpy(request.ifra_name, Name(), IF_NAMESIZE);
 	request.ifra_index = -1;
 	request.ifra_addr.ss_family = AF_UNSPEC;
-	
+
 	if (ioctl(socket, B_SOCKET_GET_ALIAS, &request, sizeof(struct ifaliasreq))
 			< 0)
 		return errno;
@@ -413,7 +431,8 @@ BNetworkInterface::RemoveAddress(const BNetworkInterfaceAddress& address)
 	memcpy(&request.ifr_addr, &address.Address().SockAddr(),
 		address.Address().Length());
 
-	return do_request(request, Name(), B_SOCKET_REMOVE_ALIAS);
+	return do_request(family_from_interface_address(address), request, Name(),
+		B_SOCKET_REMOVE_ALIAS);
 }
 
 
@@ -423,7 +442,7 @@ BNetworkInterface::RemoveAddress(const BNetworkAddress& address)
 	ifreq request;
 	memcpy(&request.ifr_addr, &address.SockAddr(), address.Length());
 
-	return do_request(request, Name(), B_SOCKET_REMOVE_ALIAS);
+	return do_request(address.Family(), request, Name(), B_SOCKET_REMOVE_ALIAS);
 }
 
 
