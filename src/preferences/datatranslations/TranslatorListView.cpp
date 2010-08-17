@@ -30,7 +30,8 @@ compare_items(const void* a, const void* b)
 
 
 TranslatorItem::TranslatorItem(translator_id id, const char* name)
-	: BStringItem(name),
+	:
+	BStringItem(name),
 	fID(id)
 {
 }
@@ -44,15 +45,22 @@ TranslatorItem::~TranslatorItem()
 //	#pragma mark -
 
 
-TranslatorListView::TranslatorListView(BRect rect, const char *name,
-		list_view_type type)
-	: BListView(rect, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES) 
+TranslatorListView::TranslatorListView(const char *name, list_view_type type)
+	:
+	BListView(name, B_SINGLE_SELECTION_LIST) 
 {	
 }
 
 
 TranslatorListView::~TranslatorListView() 
 {
+}
+
+
+TranslatorItem*
+TranslatorListView::TranslatorAt(int32 index) const
+{
+	return dynamic_cast<TranslatorItem*>(ItemAt(index));
 }
 
 

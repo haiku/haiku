@@ -28,9 +28,11 @@ class TranslatorItem : public BStringItem {
 
 class TranslatorListView : public BListView {
 	public:
-		TranslatorListView(BRect rect, const char *name,
+		TranslatorListView(const char *name,
 			list_view_type type = B_SINGLE_SELECTION_LIST);
 		virtual ~TranslatorListView();
+
+		TranslatorItem* TranslatorAt(int32 index) const;
 
 		virtual void MessageReceived(BMessage *message);
 		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);

@@ -9,6 +9,6 @@ Preference DataTranslations :
 	IconView.cpp 
 	TranslatorListView.cpp
 
-	: be translation $(TARGET_LIBSUPC++) liblpsolve55.so liblinprog.so libalm.so
+	: be translation $(TARGET_LIBSUPC++)
 	: DataTranslations.rdef
 	;

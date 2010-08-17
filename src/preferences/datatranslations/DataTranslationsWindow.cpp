@@ -16,13 +16,16 @@
 #include "TranslatorListView.h"
 
 #include <Application.h>
-#include <Screen.h>
+#include <Alignment.h>
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Path.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
@@ -30,23 +33,18 @@
 #include <TranslationDefs.h>
 #include <TranslatorRoster.h>
 
-#include "Area.h"
-#include "BALMLayout.h"
-#include "OperatorType.h"
-#include "XTab.h"
-#include "YTab.h"
-
 
 const uint32 kMsgTranslatorInfo = 'trin';
 const uint32 kMsgSelectedTranslator = 'trsl';
 
 
 DataTranslationsWindow::DataTranslationsWindow()
-	: BWindow(BRect(0, 0, 550, 350), "DataTranslations", B_TITLED_WINDOW,
+	:
+	BWindow(BRect(0, 0, 550, 350), "DataTranslations", B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	MoveTo(dynamic_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
+	MoveTo(static_cast<DataTranslationsApplication *>(be_app)->WindowCorner());
 
 	_SetupViews();
 
@@ -137,32 +135,12 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 
 	BMessage emptyMsg;
 	BRect rect(0, 0, 200, 233);
-	status_t ret = roster->MakeConfigurationView(id, &emptyMsg, &fConfigView, &rect);
-	if (ret != B_OK) {
-		fRightBox->RemoveChild(fConfigView);
-		return ret;
-	}
+	status_t ret = roster->MakeConfigurationView(id, &emptyMsg,
+		&fConfigView, &rect);
 
-	BRect configRect(fRightBox->Bounds());
-	configRect.InsetBy(3, 3);
-	configRect.bottom -= 45;
-	float width = 0, height = 0;
-	if ((fConfigView->Flags() & B_SUPPORTS_LAYOUT) != 0) {
-		BSize configSize = fConfigView->ExplicitPreferredSize();
-		width = configSize.Width();
-		height = configSize.Height();
-	} else {
-		fConfigView->GetPreferredSize(&width, &height);
-	}
-	float widen = max_c(0, width - configRect.Width());
-	float heighten = max_c(0, height - configRect.Height());
-	if (widen > 0 || heighten > 0) {
-		ResizeBy(widen, heighten);
-		configRect.right += widen;
-		configRect.bottom += heighten;
-	}
-	fConfigView->MoveTo(configRect.left, configRect.top);
-	fConfigView->ResizeTo(configRect.Width(), configRect.Height());
+	if (ret != B_OK)
+		return ret;
+
 	fConfigView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		// force config views to all have the same color
 	fRightBox->AddChild(fConfigView);
@@ -178,22 +156,19 @@ DataTranslationsWindow::_SetupViews()
 	// This is NULL until a translator is
 	// selected from the listview
 
-	// Window box
-	BView* mainView = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
-	mainView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(mainView);
-
 	// Add the translators list view
-	fTranslatorListView = new TranslatorListView(BRect(0, 0, 1, 1), "TransList",
-		B_SINGLE_SELECTION_LIST);
-	fTranslatorListView->SetSelectionMessage(new BMessage(kMsgSelectedTranslator));
+	fTranslatorListView = new TranslatorListView("TransList");
+	fTranslatorListView->SetSelectionMessage(
+		new BMessage(kMsgSelectedTranslator));
 
-	BScrollView *scrollView = new BScrollView("scroll_trans", fTranslatorListView,
-    		B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS,
-    		false, true, B_FANCY_BORDER);
+	BScrollView *scrollView = new BScrollView("scroll_trans",
+		fTranslatorListView, B_WILL_DRAW | B_FRAME_EVENTS, false,
+		true, B_FANCY_BORDER);
 
 	// Box around the config and info panels
 	fRightBox = new BBox("Right_Side");
+	fRightBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+			B_ALIGN_USE_FULL_HEIGHT));
 
 	// Add the translator icon view
 	fIconView = new IconView(BRect(0, 0, 31, 31), "Icon",
@@ -203,42 +178,19 @@ DataTranslationsWindow::_SetupViews()
 	BButton *button = new BButton("STD", "Info" B_UTF8_ELLIPSIS,
 		new BMessage(kMsgTranslatorInfo), B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
 
-	// Add the translator name view
-	fTranslatorNameView = new BStringView("TranName", "None");
-
 	// Populate the translators list view
 	_PopulateListView();
 
 	// Build the layout
-	BALMLayout *layout = new BALMLayout();
-	mainView->SetLayout(layout);
-
-	XTab *x1 = layout->AddXTab();
-	XTab *x2 = layout->AddXTab();
-	XTab *x3 = layout->AddXTab();
-	YTab *y1 = layout->AddYTab();
-
-	Area *leftArea = layout->AddArea(layout->Left(), layout->Top(),
-		x1, layout->Bottom(), scrollView);
-	leftArea->SetLeftInset(10);
-	leftArea->SetTopInset(10);
-	leftArea->SetBottomInset(10);
-
-	Area *rightArea = layout->AddArea(x1, layout->Top(), layout->Right(), y1, fRightBox);
-	rightArea->SetLeftInset(10);
-	rightArea->SetTopInset(10);
-	rightArea->SetRightInset(10);
-	rightArea->SetBottomInset(10);
-
-	Area *iconArea = layout->AddArea(x1, y1, x2, layout->Bottom(), fIconView);
-	iconArea->SetLeftInset(10);
-	iconArea->SetBottomInset(10);
-
-	Area *infoButtonArea = layout->AddArea(x3, y1, layout->Right(), layout->Bottom(), button);
-	infoButtonArea->SetRightInset(10);
-	infoButtonArea->SetBottomInset(10);
-
-	layout->AddConstraint(3.0, x1, -1.0, layout->Right(), OperatorType(EQ), 0.0);
+	float padding = be_control_look->DefaultItemSpacing();
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, padding)
+		.SetInsets(padding, padding, padding, padding)
+		.Add(scrollView, 3)
+		.AddGrid(padding, padding, 6)
+			.SetInsets(0, 0, 0, 0)
+			.Add(fRightBox, 0, 0, 3, 1)
+			.Add(fIconView, 0, 1)
+			.Add(button, 2, 1);
 
 	fTranslatorListView->MakeFocus();
 	fTranslatorListView->Select(0);
@@ -248,7 +200,7 @@ DataTranslationsWindow::_SetupViews()
 bool
 DataTranslationsWindow::QuitRequested()
 {
-	BPoint pt(Frame().left, Frame().top);
+	BPoint pt(Frame().LeftTop());
 	dynamic_cast<DataTranslationsApplication *>(be_app)->SetWindowCorner(pt);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 
@@ -275,7 +227,7 @@ DataTranslationsWindow::_ShowInfoAlert(int32 id)
 	message << "\nInfo: " << info <<
 		"\n\nPath:\n" << path.Path() << "\n";
 
-	BAlert *alert = new BAlert("info", message.String(), "OK");
+	BAlert* alert = new BAlert("info", message.String(), "OK");
 	BTextView *view = alert->TextView();
 	BFont font;
 
@@ -313,7 +265,7 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 				break;
 			}
 
-			TranslatorItem* item = dynamic_cast<TranslatorItem*>(fTranslatorListView->ItemAt(selected));
+			TranslatorItem* item = fTranslatorListView->TranslatorAt(selected);
 			if (item != NULL)
 				_ShowInfoAlert(item->ID());
 			break;
@@ -328,12 +280,11 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			if (selected < 0) {
 				// If none selected, clear the old one
 				fIconView->DrawIcon(false);
-				fTranslatorNameView->SetText("");
 				fRightBox->RemoveChild(fConfigView);
 				break;
 			}
 
-			TranslatorItem* item = dynamic_cast<TranslatorItem*>(fTranslatorListView->ItemAt(selected));
+			TranslatorItem* item = fTranslatorListView->TranslatorAt(selected);
 			if (item == NULL)
 				break;
 
@@ -344,7 +295,6 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			int32 version = 0;
 			BPath path;
 			_GetTranslatorInfo(item->ID(), name, info, version, path);
-			fTranslatorNameView->SetText(path.Leaf());
 			fIconView->SetIcon(path);
 			break;
 		}
@@ -370,7 +320,8 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			int32 index = 0, id;
 			while (message->FindInt32("translator_id", index++, &id) == B_OK) {
 				for (int32 i = 0; i < fTranslatorListView->CountItems(); i++) {
-					TranslatorItem* item = dynamic_cast<TranslatorItem*>(fTranslatorListView->ItemAt(i));
+					TranslatorItem* item = fTranslatorListView->TranslatorAt(i);
+
 					if (item == NULL)
 						continue;
 

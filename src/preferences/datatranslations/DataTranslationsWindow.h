@@ -49,7 +49,6 @@ class DataTranslationsWindow : public BWindow {
 			// the translator config view
 
 		IconView *fIconView;
-		BStringView *fTranslatorNameView;
 };
 
 #endif	// DATA_TRANSLATIONS_WINDOW_H
