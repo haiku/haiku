@@ -288,7 +288,7 @@ AntialiasingSettingsView::_SetCurrentAntialiasing()
 void
 AntialiasingSettingsView::_SetCurrentHinting()
 {
-	const char* label = NULL;
+	const char* label;
 	switch (fCurrentHinting) {
 		case HINTING_MODE_OFF:
 			label = kNoHintingLabel;
@@ -299,6 +299,8 @@ AntialiasingSettingsView::_SetCurrentHinting()
 		case HINTING_MODE_MONOSPACED_ONLY:
 			label = kMonospacedHintingLabel;
 			break;
+		default:
+			return;
 	}
 
 	BMenuItem *item = fHintingMenu->FindItem(B_TRANSLATE_NOCOLLECT(label));
