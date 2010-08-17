@@ -49,7 +49,7 @@ extern "C" uint32 adler32(uint32 adler, const uint8 *buf, uint32 len);
 	// definition lives in adler32.c
 
 static const char *kCatFolder = "catalogs";
-static const char *kCatExtension = ".txt";
+static const char *kCatExtension = ".catkeys";
 
 const char *PlainTextCatalog::kCatMimeType
 	= "locale/x-vnd.Be.locale-catalog.plaintext";
