@@ -257,6 +257,7 @@ public:
 			void				WriteWindowOrder(int32 workspace,
 									BPrivate::LinkSender& sender);
 
+			//! The window lock has to be held when accessing a window list!
 			WindowList&			CurrentWindows();
 			WindowList&			AllWindows();
 
