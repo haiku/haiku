@@ -285,6 +285,7 @@ private:
 	friend class BWindowScreen;
 	friend class BDirectWindow;
 	friend class BFilePanel;
+	friend class BWindowStack;
 
 	friend void _set_menu_sem_(BWindow* w, sem_id sem);
 	friend status_t _safe_get_server_token_(const BLooper*, int32*);

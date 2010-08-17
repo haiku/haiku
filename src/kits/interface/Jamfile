@@ -120,6 +120,7 @@ MergeObject <libbe>interface_kit.o :
 	View.cpp
 	ViewLayoutItem.cpp
 	Window.cpp
+	WindowStack.cpp
 	ZombieReplicantView.cpp
 
 	# BTextView support
