@@ -1471,7 +1471,7 @@ ipv4_send_data(net_protocol* _protocol, net_buffer* buffer)
 	// handle IP_MULTICAST_IF
 	if (IN_MULTICAST(ntohl(
 			((sockaddr_in*)buffer->destination)->sin_addr.s_addr))
-		&& protocol->multicast_address != NULL) {
+		&& protocol != NULL && protocol->multicast_address != NULL) {
 		net_interface_address* address = sDatalinkModule->get_interface_address(
 			protocol->multicast_address);
 		if (address == NULL || (address->interface->flags & IFF_UP) == 0) {
