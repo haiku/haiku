@@ -182,7 +182,7 @@ ColorStepView::Draw(BRect updateRect)
 								colorBarRect.bottom	+ totalFontHeight + 5));
 
 	// blit bitmap
-	fOffScreenView->Sync();
+	view->Sync();
 	fOffScreenBitmap->Unlock();
 	DrawBitmap(fOffScreenBitmap, B_ORIGIN);
 
