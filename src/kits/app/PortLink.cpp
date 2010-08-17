@@ -1,9 +1,10 @@
 /*
- * Copyright 2005-2009, Haiku Inc.
+ * Copyright 2005-2010, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
  */
 
 
@@ -24,6 +25,13 @@ PortLink::~PortLink()
 {
 	delete fReceiver;
 	delete fSender;
+}
+
+
+PortLinkRef::PortLinkRef(LinkSender* send, LinkReceiver* receive)
+{
+	fSender = send;
+	fReceiver = receive;
 }
 
 
