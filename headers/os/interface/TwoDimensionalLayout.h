@@ -6,12 +6,12 @@
 #define	_TWO_DIMENSIONAL_LAYOUT_H
 
 
-#include <Layout.h>
+#include <AbstractLayout.h>
 
 class BLayoutContext;
 
 
-class BTwoDimensionalLayout : public BLayout {
+class BTwoDimensionalLayout : public BAbstractLayout {
 public:
 								BTwoDimensionalLayout();
 								BTwoDimensionalLayout(BMessage* from);
@@ -25,18 +25,18 @@ public:
 			void				AlignLayoutWith(BTwoDimensionalLayout* other,
 									enum orientation orientation);
 
-	virtual	BSize				MinSize();
-	virtual	BSize				MaxSize();
-	virtual	BSize				PreferredSize();
-	virtual	BAlignment			Alignment();
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
 
 	virtual	bool				HasHeightForWidth();
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout();
+	virtual	void				SetFrame(BRect frame);
 
-	virtual	void				LayoutView();
+	virtual	void				InvalidateLayout(bool children = false);
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual status_t			AllArchived(BMessage* into) const;
@@ -55,6 +55,8 @@ protected:
 				int32	width;
 				int32	height;
 			};
+
+	virtual	void				DerivedLayoutItems();
 
 			BSize				AddInsets(BSize size);
 			void				AddInsets(float* minHeight, float* maxHeight,
@@ -82,7 +84,6 @@ private:
 			friend class LocalLayouter;
 
 			void				_ValidateMinMax();
-			BLayoutContext*		_CurrentLayoutContext();
 
 protected:
 			float				fLeftInset;

@@ -45,7 +45,7 @@ BGridLayoutBuilder::GridLayout() const
 BView*
 BGridLayoutBuilder::View() const
 {
-	return fLayout->View();
+	return fLayout->Owner();
 }
 
 // GetGridLayout
@@ -60,7 +60,7 @@ BGridLayoutBuilder::GetGridLayout(BGridLayout** _layout)
 BGridLayoutBuilder&
 BGridLayoutBuilder::GetView(BView** _view)
 {
-	*_view = fLayout->View();
+	*_view = fLayout->Owner();
 	return *this;
 }
 
@@ -112,8 +112,3 @@ BGridLayoutBuilder::operator BGridLayout*()
 	return fLayout;
 }
 
-// cast operator BView*
-BGridLayoutBuilder::operator BView*()
-{
-	return fLayout->View();
-}

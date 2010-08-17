@@ -196,7 +196,7 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 
 BSplitLayout::BSplitLayout(BMessage* from)
 	:
-	BLayout(BUnarchiver::PrepareArchive(from)),
+	BAbstractLayout(BUnarchiver::PrepareArchive(from)),
 	fSplitterItems(),
 	fVisibleItems(),
 	fMin(),
@@ -340,14 +340,14 @@ BSplitLayout::SetSplitterSize(float size)
 BLayoutItem*
 BSplitLayout::AddView(BView* child)
 {
-	return BLayout::AddView(child);
+	return BAbstractLayout::AddView(child);
 }
 
 
 BLayoutItem*
 BSplitLayout::AddView(int32 index, BView* child)
 {
-	return BLayout::AddView(index, child);
+	return BAbstractLayout::AddView(index, child);
 }
 
 
@@ -372,14 +372,14 @@ BSplitLayout::AddView(int32 index, BView* child, float weight)
 bool
 BSplitLayout::AddItem(BLayoutItem* item)
 {
-	return BLayout::AddItem(item);
+	return BAbstractLayout::AddItem(item);
 }
 
 
 bool
 BSplitLayout::AddItem(int32 index, BLayoutItem* item)
 {
-	return BLayout::AddItem(index, item);
+	return BAbstractLayout::AddItem(index, item);
 }
 
 
@@ -480,7 +480,7 @@ BSplitLayout::SetCollapsible(int32 first, int32 last, bool collapsible)
 
 
 BSize
-BSplitLayout::MinSize()
+BSplitLayout::BaseMinSize()
 {
 	_ValidateMinMax();
 
@@ -489,7 +489,7 @@ BSplitLayout::MinSize()
 
 
 BSize
-BSplitLayout::MaxSize()
+BSplitLayout::BaseMaxSize()
 {
 	_ValidateMinMax();
 
@@ -498,7 +498,7 @@ BSplitLayout::MaxSize()
 
 
 BSize
-BSplitLayout::PreferredSize()
+BSplitLayout::BasePreferredSize()
 {
 	_ValidateMinMax();
 
@@ -507,9 +507,9 @@ BSplitLayout::PreferredSize()
 
 
 BAlignment
-BSplitLayout::Alignment()
+BSplitLayout::BaseAlignment()
 {
-	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+	return BAbstractLayout::BaseAlignment();
 }
 
 
@@ -536,19 +536,19 @@ BSplitLayout::GetHeightForWidth(float width, float* min, float* max,
 
 
 void
-BSplitLayout::InvalidateLayout()
+BSplitLayout::InvalidateLayout(bool children)
 {
-	_InvalidateLayout(true);
+	_InvalidateLayout(true, children);
 }
 
 
 void
-BSplitLayout::LayoutView()
+BSplitLayout::DerivedLayoutItems()
 {
 	_ValidateMinMax();
 
 	// layout the elements
-	BSize size = _SubtractInsets(View()->Bounds().Size());
+	BSize size = _SubtractInsets(LayoutArea().Size());
 	fHorizontalLayouter->Layout(fHorizontalLayoutInfo, size.width);
 
 	Layouter* verticalLayouter;
@@ -647,7 +647,7 @@ BSplitLayout::StartDraggingSplitter(BPoint point)
 		return false;
 
 	// Things shouldn't be draggable, if we have a >= max layout.
-	BSize size = _SubtractInsets(View()->Frame().Size());
+	BSize size = _SubtractInsets(LayoutArea().Size());
 	if ((fOrientation == B_HORIZONTAL && size.width >= fMax.width)
 		|| (fOrientation == B_VERTICAL && size.height >= fMax.height)) {
 		return false;
@@ -655,7 +655,7 @@ BSplitLayout::StartDraggingSplitter(BPoint point)
 
 	int32 index = -1;
 	if (_SplitterItemAt(point, &index) != NULL) {
-		fDraggingStartPoint = View()->ConvertToScreen(point);
+		fDraggingStartPoint = Owner()->ConvertToScreen(point);
 		fDraggingStartValue = _SplitterValue(index);
 		fDraggingCurrentValue = fDraggingStartValue;
 		fDraggingSplitterIndex = index;
@@ -673,7 +673,7 @@ BSplitLayout::DragSplitter(BPoint point)
 	if (fDraggingSplitterIndex < 0)
 		return false;
 
-	point = View()->ConvertToScreen(point);
+	point = Owner()->ConvertToScreen(point);
 
 	int32 valueDiff;
 	if (fOrientation == B_HORIZONTAL)
@@ -712,7 +712,7 @@ status_t
 BSplitLayout::Archive(BMessage* into, bool deep) const
 {
 	BArchiver archiver(into);
-	status_t err = BLayout::Archive(into, deep);
+	status_t err = BAbstractLayout::Archive(into, deep);
 
 	if (err == B_OK)
 		err = into->AddBool(kIsVerticalField, fOrientation == B_VERTICAL);
@@ -811,10 +811,10 @@ BSplitLayout::ItemRemoved(BLayoutItem* item, int32 atIndex)
 
 
 void
-BSplitLayout::_InvalidateLayout(bool invalidateView)
+BSplitLayout::_InvalidateLayout(bool invalidateView, bool children)
 {
 	if (invalidateView)
-		BLayout::InvalidateLayout();
+		BAbstractLayout::InvalidateLayout(children);
 
 	delete fHorizontalLayouter;
 	delete fVerticalLayouter;
@@ -929,7 +929,7 @@ BSplitLayout::_LayoutItem(BLayoutItem* item, BRect frame, bool visible)
 	info->max = item->MaxSize();
 
 	if (item->HasHeightForWidth()) {
-		BSize size = _SubtractInsets(View()->Frame().Size());
+		BSize size = _SubtractInsets(LayoutArea().Size());
 		float minHeight, maxHeight;
 		item->GetHeightForWidth(size.width, &minHeight, &maxHeight, NULL);
 		info->min.height = max_c(info->min.height, minHeight);
@@ -958,9 +958,9 @@ BSplitLayout::_LayoutItem(BLayoutItem* item, ItemLayoutInfo* info)
 	item->AlignInFrame(info->layoutFrame);
 
 	// if the item became visible, we need to update its internal layout
-	if (visibilityChanged) {
-		if (BView* itemView = item->View())
-			itemView->Layout(false);
+	if (visibilityChanged && fOrientation != B_HORIZONTAL
+		|| !HasHeightForWidth()) {
+		item->Relayout(true);
 	}
 }
 
@@ -1216,7 +1216,7 @@ BSplitLayout::_UpdateSplitterWeights()
 	}
 
 	// Just updating the splitter weights is fine in principle. The next
-	// LayoutView() will use the correct values. But, if our orientation is
+	// LayoutItems() will use the correct values. But, if our orientation is
 	// vertical, the cached height for width info needs to be flushed, or the
 	// obsolete cached values will be used.
 	if (fOrientation == B_VERTICAL)
@@ -1293,8 +1293,7 @@ BSplitLayout::_ValidateMinMax()
 	if (fHeightForWidthItems.IsEmpty())
 		fVerticalLayoutInfo = fVerticalLayouter->CreateLayoutInfo();
 
-	if (BView* view = View())
-		view->ResetLayoutInvalidation();
+	ResetLayoutInvalidation();
 }
 
 

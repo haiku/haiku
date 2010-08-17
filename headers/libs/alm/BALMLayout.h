@@ -7,8 +7,8 @@
 #ifndef	BALM_LAYOUT_H
 #define	BALM_LAYOUT_H
 
+#include <AbstractLayout.h>
 #include <File.h>
-#include <Layout.h>
 #include <List.h>
 #include <Size.h>
 #include <SupportDefs.h>
@@ -29,7 +29,7 @@ namespace BALM {
 /**
  * A GUI layout engine using the ALM.
  */
-class BALMLayout : public BLayout, public LinearSpec {
+class BALMLayout : public BAbstractLayout, public LinearSpec {
 		
 public:
 						BALMLayout();
@@ -70,15 +70,15 @@ public:
 	bool				RemoveItem(BLayoutItem* item);
 	BLayoutItem*		RemoveItem(int32 index);
 
-	BSize				MinSize();
-	BSize				MaxSize();
-	BSize				PreferredSize();
-	BAlignment			Alignment();
+	BSize				BaseMinSize();
+	BSize				BaseMaxSize();
+	BSize				BasePreferredSize();
+	BAlignment			BaseAlignment();
 	bool				HasHeightForWidth();
 	void				GetHeightForWidth(float width, float* min,
 								float* max, float* preferred);
-	void				InvalidateLayout();
-	void				LayoutView();
+	void				InvalidateLayout(bool children = false);
+	virtual void		DerivedLayoutItems();
 	
 	char*				PerformancePath() const;
 	void				SetPerformancePath(char* path);

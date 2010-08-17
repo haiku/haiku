@@ -5,10 +5,10 @@
 #ifndef	_CARD_LAYOUT_H
 #define	_CARD_LAYOUT_H
 
-#include <Layout.h>
+#include <AbstractLayout.h>
 
 
-class BCardLayout : public BLayout {
+class BCardLayout : public BAbstractLayout {
 public:
 								BCardLayout();
 								BCardLayout(BMessage* from);
@@ -19,23 +19,23 @@ public:
 			void				SetVisibleItem(int32 index);
 			void				SetVisibleItem(BLayoutItem* item);
 
-	virtual	BSize				MinSize();
-	virtual	BSize				MaxSize();
-	virtual	BSize				PreferredSize();
-	virtual	BAlignment			Alignment();
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
 
 	virtual	bool				HasHeightForWidth();
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout();
-	virtual	void				LayoutView();
+	virtual	void				InvalidateLayout(bool children = false);
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual status_t			AllUnarchived(const BMessage* from);
 	static	BArchivable*		Instantiate(BMessage* from);
 
 protected:
+	virtual	void				DerivedLayoutItems();
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 

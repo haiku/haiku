@@ -17,7 +17,7 @@ namespace {
 
 BCardLayout::BCardLayout()
 	:
-	BLayout(),
+	BAbstractLayout(),
 	fMin(0, 0),
 	fMax(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED),
 	fPreferred(0, 0),
@@ -29,7 +29,7 @@ BCardLayout::BCardLayout()
 
 BCardLayout::BCardLayout(BMessage* from)
 	:
-	BLayout(BUnarchiver::PrepareArchive(from)),
+	BAbstractLayout(BUnarchiver::PrepareArchive(from)),
 	fMin(0, 0),
 	fMax(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED),
 	fPreferred(0, 0),
@@ -83,13 +83,13 @@ BCardLayout::SetVisibleItem(BLayoutItem* item)
 	if (fVisibleItem != NULL) {
 		fVisibleItem->SetVisible(true);
 
-		LayoutView();
+		Relayout();
 	}
 }
 
 
 BSize
-BCardLayout::MinSize()
+BCardLayout::BaseMinSize()
 {
 	_ValidateMinMax();
 	return fMin;
@@ -97,7 +97,7 @@ BCardLayout::MinSize()
 
 
 BSize
-BCardLayout::MaxSize()
+BCardLayout::BaseMaxSize()
 {
 	_ValidateMinMax();
 	return fMax;
@@ -105,7 +105,7 @@ BCardLayout::MaxSize()
 
 
 BSize
-BCardLayout::PreferredSize()
+BCardLayout::BasePreferredSize()
 {
 	_ValidateMinMax();
 	return fPreferred;
@@ -113,7 +113,7 @@ BCardLayout::PreferredSize()
 
 
 BAlignment
-BCardLayout::Alignment()
+BCardLayout::BaseAlignment()
 {
 	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 }
@@ -174,25 +174,30 @@ BCardLayout::GetHeightForWidth(float width, float* min, float* max,
 
 
 void
-BCardLayout::InvalidateLayout()
+BCardLayout::InvalidateLayout(bool children)
 {
-	BLayout::InvalidateLayout();
+	BLayout::InvalidateLayout(children);
 
 	fMinMaxValid = false;
 }
 
 
 void
-BCardLayout::LayoutView()
+BCardLayout::DerivedLayoutItems()
 {
 	_ValidateMinMax();
 
-	BSize size = View()->Bounds().Size();
-	size.width = max_c(size.width, fMin.width);
-	size.height = max_c(size.height, fMin.height);
+	BSize size(LayoutArea().Size());
 
-	if (fVisibleItem != NULL)
-		fVisibleItem->AlignInFrame(BRect(0, 0, size.width, size.height));
+	// this cannot be done when we are viewless, as our children
+	// would not get cut off in the right place.
+	if (Owner()) {
+		size.width = max_c(size.width, fMin.width);
+		size.height = max_c(size.height, fMin.height);
+	}
+ 
+ 	if (fVisibleItem != NULL)
+		fVisibleItem->AlignInFrame(BRect(LayoutArea().LeftTop(), size));
 }
 
 
@@ -200,7 +205,7 @@ status_t
 BCardLayout::Archive(BMessage* into, bool deep) const
 {
 	BArchiver archiver(into);
-	status_t err = BLayout::Archive(into, deep);
+	status_t err = BAbstractLayout::Archive(into, deep);
 
 	if (err == B_OK && deep)
 		err = into->AddInt32(kVisibleItemField, IndexOfItem(fVisibleItem));
@@ -292,7 +297,5 @@ BCardLayout::_ValidateMinMax()
 	fPreferred.height = min_c(fPreferred.height, fMax.height);
 
 	fMinMaxValid = true;
-
-	if (BView* view = View())
-		view->ResetLayoutInvalidation();
+	ResetLayoutInvalidation();
 }

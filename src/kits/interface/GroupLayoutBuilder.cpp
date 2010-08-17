@@ -28,7 +28,6 @@ BGroupLayoutBuilder::BGroupLayoutBuilder(BGroupLayout* layout)
 	_PushLayout(fRootLayout);
 }
 
-
 // constructor
 BGroupLayoutBuilder::BGroupLayoutBuilder(BGroupView* view)
 	: fRootLayout(view->GroupLayout())
@@ -64,7 +63,7 @@ BGroupLayoutBuilder::GetTopLayout(BGroupLayout** _layout)
 BView*
 BGroupLayoutBuilder::TopView() const
 {
-	return TopLayout()->View();
+	return TopLayout()->Owner();
 }
 
 // GetTopView
@@ -72,7 +71,7 @@ BGroupLayoutBuilder&
 BGroupLayoutBuilder::GetTopView(BView** _view)
 {
 	if (BGroupLayout* layout = TopLayout())
-		*_view = layout->View();
+		*_view = layout->Owner();
 	else
 		*_view = NULL;
 
@@ -179,12 +178,6 @@ BGroupLayoutBuilder::SetInsets(float left, float top, float right, float bottom)
 BGroupLayoutBuilder::operator BGroupLayout*()
 {
 	return fRootLayout;
-}
-
-// cast operator BView*
-BGroupLayoutBuilder::operator BView*()
-{
-	return fRootLayout->View();
 }
 
 // _PushLayout

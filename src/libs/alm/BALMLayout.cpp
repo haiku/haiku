@@ -20,7 +20,8 @@
  * Creates new layout engine.
  */
 BALMLayout::BALMLayout()
-	: BLayout(),
+	:
+	BAbstractLayout(),
 	LinearSpec()
 {
 	fLayoutStyle = FIT_TO_SIZE;
@@ -189,7 +190,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 {
 	InvalidateLayout();
 	if (content != NULL)
-		View()->AddChild(content);
+		TargetView()->AddChild(content);
 	Area* area = new Area(this, left, top, right, bottom, content, minContentSize);
 	fAreas->AddItem(area);
 	return area;
@@ -211,7 +212,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content,
 {
 	InvalidateLayout();
 	if (content != NULL)
-		View()->AddChild(content);
+		TargetView()->AddChild(content);
 	Area* area = new Area(this, row, column, content, minContentSize);
 	fAreas->AddItem(area);
 	return area;
@@ -234,7 +235,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 {
 	InvalidateLayout();
 	if (content != NULL)
-		View()->AddChild(content);
+		TargetView()->AddChild(content);
 	Area* area = new Area(this, left, top, right, bottom, content, BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
@@ -256,7 +257,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 {
 	InvalidateLayout();
 	if (content != NULL)
-		View()->AddChild(content);
+		TargetView()->AddChild(content);
 	Area* area = new Area(this, row, column, content, BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
@@ -435,9 +436,10 @@ BALMLayout::RemoveItem(int32 index)
 
 
 /**
- * Sets and gets minimum size.
+ * Gets minimum size.
  */
-BSize BALMLayout::MinSize() {
+BSize
+BALMLayout::BaseMinSize() {
 	if (fMinSize == Area::kUndefinedSize)
 		fMinSize = CalculateMinSize();
 	return fMinSize;
@@ -445,10 +447,10 @@ BSize BALMLayout::MinSize() {
 
 
 /**
- * Sets and gets maximum size.
+ * Gets maximum size.
  */
 BSize
-BALMLayout::MaxSize()
+BALMLayout::BaseMaxSize()
 {
 	if (fMaxSize == Area::kUndefinedSize)
 		fMaxSize = CalculateMaxSize();
@@ -457,10 +459,10 @@ BALMLayout::MaxSize()
 
 
 /**
- * Sets and gets preferred size.
+ * Gets preferred size.
  */
 BSize
-BALMLayout::PreferredSize()
+BALMLayout::BasePreferredSize()
 {
 	if (fPreferredSize == Area::kUndefinedSize)
 		fPreferredSize = CalculatePreferredSize();
@@ -472,7 +474,7 @@ BALMLayout::PreferredSize()
  * Gets the alignment.
  */
 BAlignment
-BALMLayout::Alignment()
+BALMLayout::BaseAlignment()
 {
 	BAlignment alignment;
 	alignment.SetHorizontal(B_ALIGN_HORIZONTAL_CENTER);
@@ -492,7 +494,7 @@ BALMLayout::HasHeightForWidth()
 
 
 /**
- * Sets whether the height of the layout depends on its width.
+ * Gets height constraints for a given width.
  */
 void
 BALMLayout::GetHeightForWidth(float width, float* min, float* max, float* preferred) {}
@@ -503,8 +505,9 @@ BALMLayout::GetHeightForWidth(float width, float* min, float* max, float* prefer
  * Resets minimum/maximum/preferred size.
  */
 void
-BALMLayout::InvalidateLayout()
+BALMLayout::InvalidateLayout(bool children)
 {
+	BLayout::InvalidateLayout(children);
 	fMinSize = Area::kUndefinedSize;
 	fMaxSize = Area::kUndefinedSize;
 	fPreferredSize = Area::kUndefinedSize;
@@ -516,25 +519,28 @@ BALMLayout::InvalidateLayout()
  * If no layout specification is given, a specification is reverse engineered automatically.
  */
 void
-BALMLayout::LayoutView()
+BALMLayout::DerivedLayoutItems()
 {
+	// TODO: modify to allow for viewlessness
 	// make sure that layout events occuring during layout are ignored
-	// i.e. activated is set to false during layout caluclation
+	// i.e. activated is set to false during layout calculation
 	if (!fActivated)
 		return;
 	fActivated = false;
 
-	if (View() == NULL)
+	if (Owner() == NULL)
 		return;
 
 	// reverse engineer a layout specification if none was given
 	//~ if (this == NULL) RecoverLayout(View());
 
 	// if the layout engine is set to fit the GUI to the given size,
-	// then the given size is enforced by setting absolute positions for Right and Bottom
+	// then the given size is enforced by setting absolute positions
+	// for Right and Bottom
 	if (fLayoutStyle == FIT_TO_SIZE) {
-		Right()->SetRange(View()->Bounds().Width(), View()->Bounds().Width());
-		Bottom()->SetRange(View()->Bounds().Height(), View()->Bounds().Height());
+		BRect area(LayoutArea());
+		Right()->SetRange(area.right, area.right);
+		Bottom()->SetRange(area.bottom, area.bottom);
 	}
 
 	SolveLayout();
@@ -554,7 +560,7 @@ BALMLayout::LayoutView()
 	// change the size of the GUI according to the calculated size
 	// if the layout engine was configured to do so
 	if (fLayoutStyle == ADJUST_SIZE) {
-		View()->ResizeTo(floor(Right()->Value() - Left()->Value() + 0.5),
+		Owner()->ResizeTo(floor(Right()->Value() - Left()->Value() + 0.5),
 				floor(Bottom()->Value() - Top()->Value() + 0.5));
 	}
 

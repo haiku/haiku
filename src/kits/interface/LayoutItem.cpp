@@ -8,6 +8,9 @@
 
 #include <Layout.h>
 #include <LayoutUtils.h>
+#include <View.h>
+
+#include <algorithm>
 
 
 BLayoutItem::BLayoutItem()
@@ -30,6 +33,8 @@ BLayoutItem::BLayoutItem(BMessage* from)
 
 BLayoutItem::~BLayoutItem()
 {
+	if (fLayout)
+		fLayout->RemoveItem(this);
 }
 
 
@@ -64,10 +69,21 @@ BLayoutItem::View()
 
 
 void
-BLayoutItem::InvalidateLayout()
+BLayoutItem::InvalidateLayout(bool children)
 {
 	if (fLayout)
-		fLayout->InvalidateLayout();
+		fLayout->InvalidateLayout(children);
+}
+
+
+void
+BLayoutItem::Relayout(bool immediate)
+{
+	BView* view = View();
+	if (view && !immediate)
+		view->Relayout();
+	else if (view && immediate)
+		view->Layout(false);
 }
 
 
@@ -144,5 +160,35 @@ BLayoutItem::AllUnarchived(const BMessage* from)
 void
 BLayoutItem::SetLayout(BLayout* layout)
 {
-	fLayout = layout;
+	if (layout == fLayout)
+		return;
+
+	std::swap(fLayout, layout);
+	if (layout)
+		DetachedFromLayout(layout);
+		
+	if (fLayout)
+		AttachedToLayout();
 }
+
+
+void
+BLayoutItem::AttachedToLayout()
+{
+	// hook method
+}
+
+
+void
+BLayoutItem::DetachedFromLayout(BLayout* oldLayout)
+{
+	// hook method
+}
+
+
+void
+BLayoutItem::AncestorVisibilityChanged(bool shown)
+{
+	// hook method
+}
+

@@ -562,6 +562,8 @@ public:
 			void				Layout(bool force);
 			void				Relayout();
 
+	class Private;
+
 protected:
 	virtual	void				DoLayout();
 
@@ -580,6 +582,8 @@ protected:
 
 private:
 			void				_Layout(bool force, BLayoutContext* context);
+			void				_LayoutLeft(BLayout* deleted);
+			void				_InvalidateParentLayout();
 
 private:
 	// FBC padding and forbidden methods
@@ -595,6 +599,7 @@ private:
 private:
 	struct LayoutData;
 
+	friend class Private;
 	friend class BBitmap;
 	friend class BLayout;
 	friend class BPrintJob;

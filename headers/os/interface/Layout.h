@@ -8,22 +8,27 @@
 
 #include <Alignment.h>
 #include <Archivable.h>
+#include <LayoutItem.h>
 #include <List.h>
 #include <Size.h>
 
 
+class BLayoutContext;
 class BLayoutItem;
 class BView;
 
 
-class BLayout : public BArchivable {
+class BLayout : public BLayoutItem {
 public:
 								BLayout();
 								BLayout(BMessage* archive);
 	virtual						~BLayout();
 
-			BView*				View() const;
+			BView*				Owner() const;
+			BView*				TargetView() const;
+	virtual	BView*				View(); // from BLayoutItem
 
+	// methods dealing with items
 	virtual	BLayoutItem*		AddView(BView* child);
 	virtual	BLayoutItem*		AddView(int32 index, BView* child);
 
@@ -39,18 +44,22 @@ public:
 			int32				IndexOfItem(const BLayoutItem* item) const;
 			int32				IndexOfView(BView* child) const;
 
-	virtual	BSize				MinSize() = 0;
-	virtual	BSize				MaxSize() = 0;
-	virtual	BSize				PreferredSize() = 0;
-	virtual	BAlignment			Alignment() = 0;
+			bool				AncestorsVisible();
 
-	virtual	bool				HasHeightForWidth() = 0;
-	virtual	void				GetHeightForWidth(float width, float* min,
-									float* max, float* preferred) = 0;
+	// Layouting related methods
 
-	virtual	void				InvalidateLayout();
+	virtual	void				InvalidateLayout(bool children = false);
+	virtual	void				Relayout(bool immediate = false);
+			void				RequireLayout();
+			bool				IsValid();
+			void				EnableLayoutInvalidation();
+			void				DisableLayoutInvalidation();
 
-	virtual	void				LayoutView() = 0;
+			void				LayoutItems(bool force = false);
+			BRect				LayoutArea();
+			BLayoutContext*		LayoutContext();
+
+	// Archiving methods
 
 	virtual status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
@@ -59,17 +68,44 @@ public:
 									int32 index) const;
 	virtual	status_t			ItemUnarchived(const BMessage* from,
 									BLayoutItem* item, int32 index);
+
 protected:
+	// BLayout hook methods
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
+	virtual	void				DerivedLayoutItems() = 0;
+	virtual	void				OwnerChanged(BView* was);
+
+	// BLayoutItem hook methods
+	virtual	void				AttachedToLayout();
+	virtual void				DetachedFromLayout(BLayout* layout);
+	virtual	void				AncestorVisibilityChanged(bool shown);
+
+	// To be called by sub-classes in SetVisible().
+			void				VisibilityChanged(bool show);
+	// To be called when layout data is known to be good
+			void				ResetLayoutInvalidation();
 
 private:
 			friend class BView;
 
-			void				SetView(BView* view);
+			bool				RemoveViewRecursive(BView* view);
+			bool				InvalidateLayoutsForView(BView* view);
+			bool				InvalidationLegal();
+			void				SetOwner(BView* owner);
+			void				SetTarget(BView* target);
 
-			BView*				fView;
+			void				_LayoutWithinContext(bool force,
+									BLayoutContext* context);
+
+			uint32				fState;
+			bool				fAncestorsVisible;
+			int32				fInvalidationDisabled;
+			BLayoutContext*		fContext;
+			BView*				fOwner;
+			BView*				fTarget;
 			BList				fItems;
+			BList				fNestedLayouts;
 };
 
 

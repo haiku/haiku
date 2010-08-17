@@ -33,7 +33,6 @@ protected:
 public:
 	inline	void				SetParent(ParentBuilder* parent);
 		// conceptually private
-
 	inline	ParentBuilder&		End();
 
 protected:
@@ -71,11 +70,23 @@ public:
 
 	inline	GroupBuilder		AddGroup(enum orientation orientation,
 									float spacing = 0.0f, float weight = 1.0f);
+	inline	GroupBuilder		AddGroup(BGroupView* groupView,
+									float weight = 1.0f);
+	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout,
+									float weight = 1.0f);
+
 	inline	GridBuilder			AddGrid(float horizontalSpacing = 0.0f,
 									float verticalSpacing = 0.0f,
 									float weight = 1.0f);
+	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
+									float weight = 1.0f);
+	inline	GridBuilder			AddGrid(BGridView* gridView,
+									float weight = 1.0f);
+
 	inline	SplitBuilder		AddSplit(enum orientation orientation,
 									float spacing = 0.0f, float weight = 1.0f);
+	inline	SplitBuilder		AddSplit(BSplitView* splitView,
+									float weight = 1.0f);
 
 	inline	ThisBuilder&		AddGlue(float weight = 1.0f);
 	inline	ThisBuilder&		AddStrut(float size);
@@ -84,7 +95,6 @@ public:
 									float bottom);
 
 	inline						operator BGroupLayout*();
-	inline						operator BView*();
 
 private:
 			BGroupLayout*		fLayout;
@@ -131,13 +141,30 @@ public:
 	inline	GroupBuilder		AddGroup(enum orientation orientation,
 									float spacing, int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
+	inline	GroupBuilder		AddGroup(BGroupView* groupView,	int32 column,
+									int32 row, int32 columnCount = 1,
+									int32 rowCount = 1);
+	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout, 
+									int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+
 	inline	GridBuilder			AddGrid(float horizontalSpacing,
 									float verticalSpacing, int32 column,
 									int32 row, int32 columnCount = 1,
 									int32 rowCount = 1);
+	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
+									int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	GridBuilder			AddGrid(BGridView* gridView,
+									int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+
 	inline	SplitBuilder		AddSplit(enum orientation orientation,
 									float spacing, int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
+	inline	SplitBuilder		AddSplit(BSplitView* splitView, int32 column,
+									int32 row, int32 columnCount = 1,
+									int32 rowCount = 1);
 
 	inline	ThisBuilder&		SetColumnWeight(int32 column, float weight);
 	inline	ThisBuilder&		SetRowWeight(int32 row, float weight);
@@ -146,7 +173,6 @@ public:
 									float bottom);
 
 	inline						operator BGridLayout*();
-	inline						operator BView*();
 
 private:
 			BGridLayout*		fLayout;
@@ -168,7 +194,8 @@ public:
 	inline						Split(BSplitView* view);
 
 	inline	BSplitView*			View() const;
-	inline	ThisBuilder&		GetView(BSplitView** _view);
+	inline	ThisBuilder&		GetView(BView** _view);
+	inline	ThisBuilder&		GetSplitView(BSplitView** _view);
 
 	inline	ThisBuilder&		Add(BView* view);
 	inline	ThisBuilder&		Add(BView* view, float weight);
@@ -177,11 +204,23 @@ public:
 
 	inline	GroupBuilder		AddGroup(enum orientation orientation,
 									float spacing = 0.0f, float weight = 1.0f);
+	inline	GroupBuilder		AddGroup(BGroupView* groupView,
+									float weight = 1.0f);
+	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout,
+									float weight = 1.0f);
+
 	inline	GridBuilder			AddGrid(float horizontalSpacing = 0.0f,
 									float verticalSpacing = 0.0f,
 									float weight = 1.0f);
+	inline	GridBuilder			AddGrid(BGridView* gridView,
+									float weight = 1.0f);
+	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
+									float weight = 1.0f);
+
 	inline	SplitBuilder		AddSplit(enum orientation orientation,
 									float spacing = 0.0f, float weight = 1.0f);
+	inline	SplitBuilder		AddSplit(BSplitView* splitView,
+									float weight = 1.0f);
 
 	inline	ThisBuilder&		SetCollapsible(bool collapsible);
 	inline	ThisBuilder&		SetCollapsible(int32 index, bool collapsible);
@@ -244,7 +283,7 @@ Group<ParentBuilder>::Group(BWindow* window, enum orientation orientation,
 {
 	window->SetLayout(fLayout);
 
-	fLayout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		// TODO: we get a white background if we don't do this
 }
 
@@ -277,7 +316,7 @@ template<typename ParentBuilder>
 BView*
 Group<ParentBuilder>::View() const
 {
-	return fLayout->View();
+	return fLayout->Owner();
 }
 
 
@@ -294,7 +333,7 @@ template<typename ParentBuilder>
 typename Group<ParentBuilder>::ThisBuilder&
 Group<ParentBuilder>::GetView(BView** _view)
 {
-	*_view = fLayout->View();
+	*_view = fLayout->Owner();
 	return *this;
 }
 
@@ -340,21 +379,65 @@ typename Group<ParentBuilder>::GroupBuilder
 Group<ParentBuilder>::AddGroup(enum orientation orientation, float spacing,
 	float weight)
 {
-	GroupBuilder builder(orientation, spacing);
+	GroupBuilder builder(new BGroupLayout(orientation, spacing));
 	builder.SetParent(this);
-	fLayout->AddView(builder.View(), weight);
+	fLayout->AddItem(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::GroupBuilder
+Group<ParentBuilder>::AddGroup(BGroupView* groupView, float weight)
+{
+	GroupBuilder builder(groupView);
+	builder.SetParent(this);
+	fLayout->AddItem(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::GroupBuilder
+Group<ParentBuilder>::AddGroup(BGroupLayout* groupLayout, float weight)
+{
+	GroupBuilder builder(groupLayout);
+	builder.SetParent(this);
+	fLayout->AddItem(builder.Layout(), weight);
 	return builder;
 }
 
 
 template<typename ParentBuilder>
 typename Group<ParentBuilder>::GridBuilder
-Group<ParentBuilder>::AddGrid(float horizontalSpacing, float verticalSpacing,
-	float weight)
+Group<ParentBuilder>::AddGrid(float horizontalSpacing,
+	float verticalSpacing, float weight)
 {
-	GridBuilder builder(horizontalSpacing, verticalSpacing);
+	GridBuilder builder(new BGridLayout(horizontalSpacing, verticalSpacing));
 	builder.SetParent(this);
-	fLayout->AddView(builder.View(), weight);
+	fLayout->AddItem(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::GridBuilder
+Group<ParentBuilder>::AddGrid(BGridLayout* gridLayout, float weight)
+{
+	GridBuilder builder(gridLayout);
+	builder.SetParent(this);
+	fLayout->AddItem(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::GridBuilder
+Group<ParentBuilder>::AddGrid(BGridView* gridView, float weight)
+{
+	GridBuilder builder(gridView);
+	builder.SetParent(this);
+	fLayout->AddItem(builder.Layout(), weight);
 	return builder;
 }
 
@@ -365,6 +448,17 @@ Group<ParentBuilder>::AddSplit(enum orientation orientation, float spacing,
 	float weight)
 {
 	SplitBuilder builder(orientation, spacing);
+	builder.SetParent(this);
+	fLayout->AddView(builder.View(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Group<ParentBuilder>::SplitBuilder
+Group<ParentBuilder>::AddSplit(BSplitView* splitView, float weight)
+{
+	SplitBuilder builder(splitView);
 	builder.SetParent(this);
 	fLayout->AddView(builder.View(), weight);
 	return builder;
@@ -410,13 +504,6 @@ Group<ParentBuilder>::operator BGroupLayout*()
 }
 
 
-template<typename ParentBuilder>
-Group<ParentBuilder>::operator BView*()
-{
-	return fLayout->View();
-}
-
-
 // #pragma mark - Grid
 
 
@@ -436,7 +523,7 @@ Grid<ParentBuilder>::Grid(BWindow* window, float horizontalSpacing,
 {
 	window->SetLayout(fLayout);
 
-	fLayout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		// TODO: we get a white background if we don't do this
 }
 
@@ -469,7 +556,7 @@ template<typename ParentBuilder>
 BView*
 Grid<ParentBuilder>::View() const
 {
-	return fLayout->View();
+	return fLayout->Owner();
 }
 
 
@@ -486,7 +573,7 @@ template<typename ParentBuilder>
 typename Grid<ParentBuilder>::ThisBuilder&
 Grid<ParentBuilder>::GetView(BView** _view)
 {
-	*_view = fLayout->View();
+	*_view = fLayout->Owner();
 	return *this;
 }
 
@@ -546,9 +633,33 @@ typename Grid<ParentBuilder>::GroupBuilder
 Grid<ParentBuilder>::AddGroup(enum orientation orientation, float spacing,
 	int32 column, int32 row, int32 columnCount, int32 rowCount)
 {
-	GroupBuilder builder(orientation, spacing);
+	GroupBuilder builder(new BGroupLayout(orientation, spacing));
 	builder.SetParent(this);
-	fLayout->AddView(builder.View(), column, row, columnCount, rowCount);
+	fLayout->AddItem(builder.Layout(), column, row, columnCount, rowCount);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::GroupBuilder
+Grid<ParentBuilder>::AddGroup(BGroupView* groupView, int32 column, int32 row,
+	int32 columnCount, int32 rowCount)
+{
+	GroupBuilder builder(groupView);
+	builder.SetParent(this);
+	fLayout->AddItem(builder.Layout(), column, row, columnCount, rowCount);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::GroupBuilder
+Grid<ParentBuilder>::AddGroup(BGroupLayout* groupLayout, int32 column,
+	int32 row, int32 columnCount, int32 rowCount)
+{
+	GroupBuilder builder(groupLayout);
+	builder.SetParent(this);
+	fLayout->AddItem(builder.Layout(), column, row, columnCount, rowCount);
 	return builder;
 }
 
@@ -558,7 +669,19 @@ typename Grid<ParentBuilder>::GridBuilder
 Grid<ParentBuilder>::AddGrid(float horizontalSpacing, float verticalSpacing,
 	int32 column, int32 row, int32 columnCount, int32 rowCount)
 {
-	GridBuilder builder(horizontalSpacing, verticalSpacing);
+	GridBuilder builder(new BGridLayout(horizontalSpacing, verticalSpacing));
+	builder.SetParent(this);
+	fLayout->AddItem(builder.Layout(), column, row, columnCount, rowCount);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::GridBuilder
+Grid<ParentBuilder>::AddGrid(BGridView* gridView, int32 column, int32 row,
+	int32 columnCount, int32 rowCount)
+{
+	GridBuilder builder(gridView);
 	builder.SetParent(this);
 	fLayout->AddView(builder.View(), column, row, columnCount, rowCount);
 	return builder;
@@ -574,7 +697,19 @@ Grid<ParentBuilder>::AddSplit(enum orientation orientation, float spacing,
 	builder.SetParent(this);
 	fLayout->AddView(builder.View(), column, row, columnCount, rowCount);
 	return builder;
-}
+} 
+
+
+template<typename ParentBuilder>
+typename Grid<ParentBuilder>::SplitBuilder
+Grid<ParentBuilder>::AddSplit(BSplitView* splitView, int32 column, int32 row,
+	int32 columnCount, int32 rowCount)
+{
+	SplitBuilder builder(splitView);
+	builder.SetParent(this);
+	fLayout->AddView(builder.View(), column, row, columnCount, rowCount);
+	return builder;
+} 
 
 
 template<typename ParentBuilder>
@@ -612,13 +747,6 @@ Grid<ParentBuilder>::operator BGridLayout*()
 }
 
 
-template<typename ParentBuilder>
-Grid<ParentBuilder>::operator BView*()
-{
-	return fLayout->View();
-}
-
-
 // #pragma mark - Split
 
 
@@ -648,7 +776,16 @@ Split<ParentBuilder>::View() const
 
 template<typename ParentBuilder>
 typename Split<ParentBuilder>::ThisBuilder&
-Split<ParentBuilder>::GetView(BSplitView** _view)
+Split<ParentBuilder>::GetView(BView** _view)
+{
+	*_view = fView;
+	return *this;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::ThisBuilder&
+Split<ParentBuilder>::GetSplitView(BSplitView** _view)
 {
 	*_view = fView;
 	return *this;
@@ -696,9 +833,31 @@ typename Split<ParentBuilder>::GroupBuilder
 Split<ParentBuilder>::AddGroup(enum orientation orientation, float spacing,
 	float weight)
 {
-	GroupBuilder builder(orientation, spacing);
+	GroupBuilder builder(new BGroupLayout(orientation, spacing));
 	builder.SetParent(this);
-	fView->AddChild(builder.View(), weight);
+	fView->AddChild(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::GroupBuilder
+Split<ParentBuilder>::AddGroup(BGroupView* groupView, float weight)
+{
+	GroupBuilder builder(groupView);
+	builder.SetParent(this);
+	fView->AddChild(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::GroupBuilder
+Split<ParentBuilder>::AddGroup(BGroupLayout* groupLayout, float weight)
+{
+	GroupBuilder builder(groupLayout);
+	builder.SetParent(this);
+	fView->AddChild(builder.Layout(), weight);
 	return builder;
 }
 
@@ -708,9 +867,31 @@ typename Split<ParentBuilder>::GridBuilder
 Split<ParentBuilder>::AddGrid(float horizontalSpacing, float verticalSpacing,
 	float weight)
 {
-	GridBuilder builder(horizontalSpacing, verticalSpacing);
+	GridBuilder builder(new BGridLayout(horizontalSpacing, verticalSpacing));
 	builder.SetParent(this);
-	fView->AddChild(builder.View(), weight);
+	fView->AddChild(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::GridBuilder
+Split<ParentBuilder>::AddGrid(BGridView* gridView, float weight)
+{
+	GridBuilder builder(gridView);
+	builder.SetParent(this);
+	fView->AddChild(builder.Layout(), weight);
+	return builder;
+}
+
+
+template<typename ParentBuilder>
+typename Split<ParentBuilder>::GridBuilder
+Split<ParentBuilder>::AddGrid(BGridLayout* layout, float weight)
+{
+	GridBuilder builder(layout);
+	builder.SetParent(this);
+	fView->AddChild(builder.Layout(), weight);
 	return builder;
 }
 

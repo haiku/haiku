@@ -36,15 +36,20 @@ public:
 
 	virtual	BView*				View();
 
-	virtual	void				InvalidateLayout();
+	virtual	void				InvalidateLayout(bool children = false);
+	virtual	void				Relayout(bool immediate = false);
 
 	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 	virtual status_t			AllArchived(BMessage* into) const;
 	virtual status_t			AllUnarchived(const BMessage* from);
 	static	BArchivable*		Instantiate(BMessage* from);
 
+protected:
+	virtual void				AncestorVisibilityChanged(bool shown);
+
 private:
 			BView*				fView;
+			int32				fAncestorsVisible;
 };
 
 #endif	//	_VIEW_LAYOUT_ITEM_H

@@ -6,7 +6,7 @@
 #define	_SPLIT_LAYOUT_H
 
 
-#include <Layout.h>
+#include <AbstractLayout.h>
 #include <Point.h>
 
 
@@ -21,7 +21,7 @@ using BPrivate::Layout::Layouter;
 using BPrivate::Layout::LayoutInfo;
 
 
-class BSplitLayout : public BLayout {
+class BSplitLayout : public BAbstractLayout {
 public:
 								BSplitLayout(enum orientation orientation,
 									float spacing = 0.0f);
@@ -66,18 +66,18 @@ public:
 			void				SetCollapsible(int32 first, int32 last,
 									bool collapsible);
 
-	virtual	BSize				MinSize();
-	virtual	BSize				MaxSize();
-	virtual	BSize				PreferredSize();
-	virtual	BAlignment			Alignment();
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
 
 	virtual	bool				HasHeightForWidth();
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
-	virtual	void				InvalidateLayout();
+	virtual	void				InvalidateLayout(bool children = false);
 
-	virtual	void				LayoutView();
+	virtual	void				DerivedLayoutItems();
 
 	// interface for BSplitView
 			BRect				SplitterItemFrame(int32 index) const;
@@ -106,7 +106,8 @@ private:
 			class ValueRange;
 			class SplitterItem;
 
-			void				_InvalidateLayout(bool invalidateView);
+			void				_InvalidateLayout(bool invalidateView,
+									bool children = false);
 			void				_InvalidateCachedHeightForWidth();
 
 			SplitterItem*		_SplitterItemAt(const BPoint& point,

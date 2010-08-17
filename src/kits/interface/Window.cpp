@@ -543,6 +543,15 @@ BWindow::AddChild(BView* child, BView* before)
 }
 
 
+void
+BWindow::AddChild(BLayoutItem* child)
+{
+	BAutolock locker(this);
+	if (locker.IsLocked())
+		fTopView->AddChild(child);
+}
+
+
 bool
 BWindow::RemoveChild(BView* child)
 {

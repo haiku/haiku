@@ -103,6 +103,7 @@ public:
 			void				Close() { Quit(); }
 
 			void				AddChild(BView* child, BView* before = NULL);
+			void				AddChild(BLayoutItem* child);
 			bool				RemoveChild(BView* child);
 			int32				CountChildren() const;
 			BView*				ChildAt(int32 index) const;

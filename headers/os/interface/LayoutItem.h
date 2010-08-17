@@ -16,7 +16,7 @@ class BLayout;
 class BView;
 
 
-class BLayoutItem: public BArchivable {
+class BLayoutItem : public BArchivable {
 public:
 								BLayoutItem();
 								BLayoutItem(BMessage* from);
@@ -46,7 +46,8 @@ public:
 
 	virtual	BView*				View();
 
-	virtual	void				InvalidateLayout();
+	virtual	void				InvalidateLayout(bool children = false);
+	virtual	void				Relayout(bool immediate = false);
 
 			void*				LayoutData() const;
 			void				SetLayoutData(void* data);
@@ -57,10 +58,18 @@ public:
 	virtual status_t			AllArchived(BMessage* into) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 
-private:
-			friend class BLayout;
+protected:
 
 			void				SetLayout(BLayout* layout);
+
+	// hook methods
+	virtual	void				AttachedToLayout();
+	virtual	void				DetachedFromLayout(BLayout* layout);
+
+	virtual void				AncestorVisibilityChanged(bool shown);
+
+private:
+			friend class BLayout;
 
 			BLayout*			fLayout;
 			void*				fLayoutData;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_GROUP_LAYOUT_BUILDER_H
@@ -39,7 +39,6 @@ public:
 									float bottom);
 
 								operator BGroupLayout*();
-								operator BView*();
 
 private:
 			bool				_PushLayout(BGroupLayout* layout);

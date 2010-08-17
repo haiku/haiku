@@ -648,7 +648,7 @@ BView::AllUnarchived(const BMessage* from)
 		err = unarchiver.FindObject(kLayoutField, layout);
 		if (err == B_OK && layout) {
 			fFlags |= B_SUPPORTS_LAYOUT;
-			fLayoutData->fLayout->BLayout::SetView(this);
+			fLayoutData->fLayout->SetOwner(this);
 		}
 	}
 
@@ -997,7 +997,7 @@ BView::Hide()
 	fShowLevel++;
 
 	if (fShowLevel == 1 && fParent)
-		fParent->InvalidateLayout();
+		_InvalidateParentLayout();
 }
 
 
@@ -1012,7 +1012,7 @@ BView::Show()
 	}
 
 	if (fShowLevel == 0 && fParent)
-		fParent->InvalidateLayout();
+		_InvalidateParentLayout();
 }
 
 
@@ -4020,7 +4020,7 @@ bool
 BView::RemoveSelf()
 {
 	if (fParent && fParent->fLayoutData->fLayout)
-		return fParent->fLayoutData->fLayout->RemoveView(this);
+		return fParent->fLayoutData->fLayout->RemoveViewRecursive(this);
 
 	return _RemoveSelf();
 }
@@ -4643,18 +4643,21 @@ BView::SetLayout(BLayout* layout)
 	if (layout == fLayoutData->fLayout)
 		return;
 
+	if (layout && layout->Layout())
+		debugger("BView::SetLayout() failed, layout is already in use.");
+
 	fFlags |= B_SUPPORTS_LAYOUT;
 
 	// unset and delete the old layout
 	if (fLayoutData->fLayout) {
-		fLayoutData->fLayout->SetView(NULL);
+		fLayoutData->fLayout->SetOwner(NULL);
 		delete fLayoutData->fLayout;
 	}
 
 	fLayoutData->fLayout = layout;
 
 	if (fLayoutData->fLayout) {
-		fLayoutData->fLayout->SetView(this);
+		fLayoutData->fLayout->SetOwner(this);
 
 		// add all children
 		int count = CountChildren();
@@ -4676,21 +4679,27 @@ BView::GetLayout() const
 void
 BView::InvalidateLayout(bool descendants)
 {
+	// printf("BView(%p)::InvalidateLayout(%i), valid: %i, inProgress: %i\n",
+	//	this, descendants, fLayoutData->fLayoutValid,
+	//	fLayoutData->fLayoutInProgress);
+
 	if (fLayoutData->fMinMaxValid && !fLayoutData->fLayoutInProgress
-		&& fLayoutData->fLayoutInvalidationDisabled == 0) {
-		if (fParent && fParent->fLayoutData->fMinMaxValid)
-			fParent->InvalidateLayout(false);
+ 		&& fLayoutData->fLayoutInvalidationDisabled == 0) {
 
 		fLayoutData->fLayoutValid = false;
 		fLayoutData->fMinMaxValid = false;
 
-		if (fLayoutData->fLayout)
-			fLayoutData->fLayout->InvalidateLayout();
-
 		if (descendants) {
-			int count = CountChildren();
-			for (int i = 0; i < count; i++)
-				ChildAt(i)->InvalidateLayout(descendants);
+			for (BView* child = fFirstChild;
+				child; child = child->fNextSibling) {
+				child->InvalidateLayout(descendants);
+			}
+		}
+
+		if (fLayoutData->fLayout && fLayoutData->fLayout->InvalidationLegal())
+			fLayoutData->fLayout->InvalidateLayout(descendants);
+		else if (!fLayoutData->fLayout && fParent) {
+			_InvalidateParentLayout();
 		}
 
 		if (fTopLevelView) {
@@ -4724,15 +4733,12 @@ BView::IsLayoutValid() const
 }
 
 
-/*!	\brief Service call for BLayout derived classes reenabling
+/*!	\brief Service call for BView derived classes reenabling
 	InvalidateLayout() notifications.
-	BView::InvalidateLayout() invokes InvalidateLayout() on its layout the first
-	time, but suppresses further calls until Layout()/Relayout() has been
-	invoked. This method will reenable the notification for the next call of
-	BView::InvalidateLayout().
 
-	If the layout caches internal layout information and updates those
-	information also in methods other than LayoutView(), it has to invoke this
+	BLayout & BView will avoid calling InvalidateLayout on views that have
+	already been invalidated, but if the view caches internal layout information
+	which it updates in methds other than DoLayout(), it has to invoke this
 	method, when it has done so, since otherwise the information might become
 	obsolete without the layout noticing.
 */
@@ -4763,6 +4769,8 @@ BView::Relayout()
 {
 	if (fLayoutData->fLayoutValid && !fLayoutData->fLayoutInProgress) {
 		fLayoutData->fNeedsRelayout = true;
+		if (fLayoutData->fLayout)
+			fLayoutData->fLayout->RequireLayout();
 
 		// Layout() is recursive, that is if the parent view is currently laid
 		// out, we don't call layout() on this view, but wait for the parent's
@@ -4777,7 +4785,7 @@ void
 BView::DoLayout()
 {
 	if (fLayoutData->fLayout)
-		fLayoutData->fLayout->LayoutView();
+		fLayoutData->fLayout->_LayoutWithinContext(false, LayoutContext());
 }
 
 
@@ -4881,9 +4889,7 @@ BView::_Layout(bool force, BLayoutContext* context)
 		fLayoutData->fNeedsRelayout = false;
 
 		// layout children
-		int32 childCount = CountChildren();
-		for (int32 i = 0; i < childCount; i++) {
-			BView* child = ChildAt(i);
+		for(BView* child = fFirstChild; child; child = child->fNextSibling) {
 			if (!child->IsHidden(child))
 				child->_Layout(force, context);
 		}
@@ -4893,6 +4899,34 @@ BView::_Layout(bool force, BLayoutContext* context)
 		// invalidate the drawn content, if requested
 		if (fFlags & B_INVALIDATE_AFTER_LAYOUT)
 			Invalidate();
+	}
+}
+
+
+void
+BView::_LayoutLeft(BLayout* deleted)
+{
+	// If our layout is added to another layout (via BLayout::AddItem())
+	// then we share ownership of our layout. In the event that our layout gets
+	// deleted by the layout it has been added to, this method is called so
+	// that we don't double-delete our layout.
+	if (fLayoutData->fLayout == deleted)
+		fLayoutData->fLayout = NULL;
+	InvalidateLayout();
+}
+
+
+void
+BView::_InvalidateParentLayout()
+{
+	BLayout* layout = fLayoutData->fLayout;
+	BLayout* layoutParent = layout ? layout->Layout() : NULL;
+	if (layoutParent && layoutParent->InvalidationLegal()) {
+		layout->Layout()->InvalidateLayout();
+	} else if (fParent && fParent->fLayoutData->fLayout) {
+		fParent->fLayoutData->fLayout->InvalidateLayoutsForView(this);
+	} else if (fParent) {
+		fParent->InvalidateLayout();
 	}
 }
 
@@ -5919,4 +5953,26 @@ BView::_PrintTree()
 			}
 		}
 	}
+}
+
+
+// #pragma mark -
+
+
+bool
+BView::Private::MinMaxValid()
+{
+	return fView->fLayoutData->fMinMaxValid;
+}
+
+
+bool
+BView::Private::WillLayout()
+{
+	BView::LayoutData* data = fView->fLayoutData;
+	if (data->fLayoutInProgress)
+		return false;
+	if (data->fNeedsRelayout || !data->fLayoutValid || !data->fMinMaxValid)
+		return true;
+	return false;
 }

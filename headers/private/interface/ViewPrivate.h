@@ -16,6 +16,7 @@
 #include <Rect.h>
 #include <Region.h>
 #include <ServerProtocolStructs.h>
+#include <View.h>
 
 const static uint32 kDeleteReplicant = 'JAHA';
 
@@ -45,6 +46,27 @@ enum {
 	B_VIEW_RESIZE_BIT			= 0x00001000,
 	B_VIEW_FLAGS_BIT			= 0x00002000,
 	B_VIEW_EVENT_MASK_BIT		= 0x00004000
+};
+
+
+class BView::Private {
+public:
+	Private(BView* view)
+		:
+		fView(view)
+	{
+	}
+
+	int16 ShowLevel()
+	{
+		return fView->fShowLevel;
+	}
+
+	// defined in View.cpp
+	bool	WillLayout();
+	bool	MinMaxValid();
+
+	BView* fView;
 };
 
 

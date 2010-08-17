@@ -11,6 +11,7 @@
 
 #include <Layout.h>
 #include <View.h>
+#include <ViewPrivate.h>
 
 
 namespace {
@@ -20,7 +21,8 @@ namespace {
 
 BViewLayoutItem::BViewLayoutItem(BView* view)
 	:
-	fView(view)
+	fView(view),
+	fAncestorsVisible(true)
 {
 }
 
@@ -28,7 +30,8 @@ BViewLayoutItem::BViewLayoutItem(BView* view)
 BViewLayoutItem::BViewLayoutItem(BMessage* from)
 	:
 	BLayoutItem(BUnarchiver::PrepareArchive(from)),
-	fView(NULL)
+	fView(NULL),
+	fAncestorsVisible(true)
 {
 	BUnarchiver unarchiver(from);
 	unarchiver.Finish(unarchiver.FindObject<BView>(kViewField, 0,
@@ -100,7 +103,8 @@ BViewLayoutItem::SetExplicitAlignment(BAlignment alignment)
 bool
 BViewLayoutItem::IsVisible()
 {
-	return !fView->IsHidden(fView);
+	int16 showLevel = BView::Private(fView).ShowLevel();
+	return showLevel - (fAncestorsVisible ? 0 : 1) <= 0;
 }
 
 
@@ -154,9 +158,19 @@ BViewLayoutItem::View()
 
 
 void
-BViewLayoutItem::InvalidateLayout()
+BViewLayoutItem::InvalidateLayout(bool children)
 {
-	fView->InvalidateLayout();
+	fView->InvalidateLayout(children);
+}
+
+
+void
+BViewLayoutItem::Relayout(bool immediate)
+{
+	if (immediate)
+		fView->Layout(false);
+	else
+		fView->Relayout();
 }
 
 
@@ -204,3 +218,18 @@ BViewLayoutItem::Instantiate(BMessage* from)
 		return new(std::nothrow) BViewLayoutItem(from);
 	return NULL;
 }
+
+
+void
+BViewLayoutItem::AncestorVisibilityChanged(bool shown)
+{
+	if (fAncestorsVisible == shown)
+		return;
+
+	fAncestorsVisible = shown;
+	if (shown)
+		fView->Show();
+	if (!shown)
+		fView->Hide();
+}
+
