@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1090,7 +1090,8 @@ devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
 	struct devfs_vnode* vnode;
 	status_t status = B_OK;
 
-	TRACE(("devfs_create: dir %p, name \"%s\", openMode 0x%x, fs_cookie %p \n", dir, name, openMode, _cookie));
+	TRACE(("devfs_create: dir %p, name \"%s\", openMode 0x%x, fs_cookie %p \n",
+		dir, name, openMode, _cookie));
 
 	RecursiveLocker locker(fs->lock);
 
@@ -1099,11 +1100,11 @@ devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
 	if (vnode == NULL)
 		return EROFS;
 
-	if (openMode & O_EXCL)
+	if ((openMode & O_EXCL) != 0)
 		return B_FILE_EXISTS;
 
 	status = get_vnode(fs->volume, vnode->id, NULL);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	locker.Unlock();
@@ -1119,18 +1120,18 @@ devfs_create(fs_volume* _volume, fs_vnode* _dir, const char* name, int openMode,
 	if (S_ISCHR(vnode->stream.type)) {
 		BaseDevice* device = vnode->stream.u.dev.device;
 		status = device->InitDevice();
-		if (status < B_OK)
-			return status;
+		if (status != B_OK)
+			goto err2;
 
 		char path[B_FILE_NAME_LENGTH];
 		get_device_name(vnode, path, sizeof(path));
 
 		status = device->Open(path, openMode, &cookie->device_cookie);
-		if (status != B_OK)
+		if (status != B_OK) {
 			device->UninitDevice();
+			goto err2;
+		}
 	}
-	if (status < B_OK)
-		goto err2;
 
 	*_cookie = cookie;
 	return B_OK;
