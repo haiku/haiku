@@ -509,7 +509,7 @@ JoyWin::_SelectDeselectJoystick(BListView* list, bool enable)
 int32
 JoyWin::_FindStringItemInList(BListView *view, PortItem *item)
 {
-	PortItem *strItem;
+	PortItem *strItem = NULL;
 	int32 number = view->CountItems();
 	for (int32 i = 0; i < number; i++) {
 		strItem = dynamic_cast<PortItem*>(view->ItemAt(i));
