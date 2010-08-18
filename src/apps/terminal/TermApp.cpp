@@ -79,6 +79,7 @@ TermApp::TermApp()
 		int l = (j * 16)  + 50;
 
 		fTermFrame.Set(k, l, k + 50, k + 50);
+		fTermWorkspaces = B_CURRENT_WORKSPACE;
 	}
 }
 
@@ -288,8 +289,10 @@ TermApp::_LoadWindowPosition(BRect* frame, uint32* workspaces)
 	status = position.FindInt32("workspaces", fWindowNumber - 1, &_workspaces);
 	if (status != B_OK)
 		return status;
-	if (modifiers() & B_OPTION_KEY)
+	if (modifiers() & B_SHIFT_KEY)
 		*workspaces = _workspaces;
+	else
+		*workspaces = B_CURRENT_WORKSPACE;
 
 	printf("loading settings ok\n");
 	return B_OK;
