@@ -3406,6 +3406,9 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 	writer.Write();
 		// TODO: this can fail, too!
 
+	blockNumber -= numBlocks;
+		// reset blockNumber to its original value
+
 	for (size_t i = 0; i < numBlocks; i++, blockNumber++) {
 		cached_block* block = (cached_block*)hash_lookup(cache->hash,
 			&blockNumber);
