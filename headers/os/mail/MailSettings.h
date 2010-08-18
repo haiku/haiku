@@ -40,16 +40,17 @@ class BMailChain;
 BMailChain* NewMailChain();
 BMailChain* GetMailChain(uint32 id);
 
-status_t GetOutboundMailChains(BList *list);
-status_t GetInboundMailChains(BList *list);
+status_t GetOutboundMailChains(BList* list);
+status_t GetInboundMailChains(BList* list);
+
 
 class BMailChain : public BArchivable {
-  public:
+public:
 	BMailChain(uint32 id);
 	BMailChain(BMessage*);
 	virtual ~BMailChain();
 	
-	virtual status_t Archive(BMessage*,bool) const;
+	virtual status_t Archive(BMessage*, bool) const;
 	static BArchivable* Instantiate(BMessage*);
 	
 	status_t Save(bigtime_t timeout = B_INFINITE_TIMEOUT);
@@ -62,32 +63,32 @@ class BMailChain : public BArchivable {
 	b_mail_chain_direction ChainDirection() const;
 	void SetChainDirection(b_mail_chain_direction);
 	
-	const char *Name() const;
+	const char* Name() const;
 	status_t SetName(const char*);
 	
-	BMessage *MetaData() const;
+	BMessage* MetaData() const;
 	
 	// "Filter" below refers to the settings message for a MailFilter
 	int32 CountFilters() const;
-	status_t GetFilter(int32 index, BMessage* out_settings, entry_ref *addon = NULL) const;
+	status_t GetFilter(int32 index, BMessage* out_settings, entry_ref* addon = NULL) const;
 	status_t SetFilter(int32 index, const BMessage&, const entry_ref&);
 	
 	status_t AddFilter(const BMessage&, const entry_ref&); // at end
 	status_t AddFilter(int32 index, const BMessage&, const entry_ref&);
 	status_t RemoveFilter(int32 index);
 	
-	void RunChain(BMailStatusWindow *window,
+	void RunChain(BMailStatusWindow* window,
 		bool async = true,
 		bool save_when_done = true,
 		bool delete_when_done = false);
 	
   private:
-	status_t Path(BPath *path) const;
+	status_t Path(BPath* path) const;
 	status_t Load(BMessage*);
 	
 	int32 fId;
 	char fName[B_FILE_NAME_LENGTH];
-	BMessage *fMetaData;
+	BMessage* fMetaData;
 	
 	status_t fStatus;
 
@@ -146,7 +147,7 @@ class BMailSettings {
 	void SetDefaultOutboundChainID(uint32 to);
 
   private:
-	BMessage data;
+	BMessage fData;
 	uint32 _reserved[4];
 };
 

@@ -100,7 +100,7 @@ BMailChain::Load(BMessage* settings)
 			&& settings->FindRef("filter_addons", i, ref) < B_OK)) {
 			delete filter;
 			delete ref;
-			break;
+			return B_NO_MEMORY;
 		}
 		
 		if (!fFilterSettings.AddItem(filter)) {
