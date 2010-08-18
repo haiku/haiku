@@ -103,14 +103,20 @@ BMailChain::Load(BMessage* settings)
 			break;
 		}
 		
-		if (!filter_settings.AddItem(filter) || !filter_addons.AddItem(ref))
-			break;
+		if (!filter_settings.AddItem(filter)) {
+			delete filter;
+			delete ref;
+			return B_NO_MEMORY;
+		}
+
+		if (!filter_addons.AddItem(ref)) {
+			filter_settings.RemoveItem(filter);
+			delete filter;
+			delete ref;
+			return B_NO_MEMORY;
+		}
 	}
-	
-	if (filter_settings.CountItems() != settings_ct
-		||  filter_addons.CountItems() != addons_ct)
-		return B_NO_MEMORY;
-	
+
 	return B_OK;
 }
 
