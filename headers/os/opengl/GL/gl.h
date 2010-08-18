@@ -67,7 +67,7 @@
 #  define GLAPIENTRY
 #endif /* WIN32 && !CYGWIN */
 
-#if ((defined(__BEOS__) || defined(__HAIKU__)) && defined(__POWERPC__)) || defined(__QUICKDRAW__)
+#if (defined(__BEOS__) && defined(__POWERPC__)) || defined(__QUICKDRAW__)
 #  define PRAGMA_EXPORT_SUPPORTED		1
 #endif
 
