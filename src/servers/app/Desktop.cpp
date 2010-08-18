@@ -64,9 +64,6 @@
 #	define STRACE(a) ;
 #endif
 
-#if !USE_MULTI_LOCKER
-#	define AutoWriteLocker BAutolock
-#endif
 
 class KeyboardFilter : public EventFilter {
 	public:
@@ -83,6 +80,7 @@ class KeyboardFilter : public EventFilter {
 		EventTarget*	fLastFocus;
 		bigtime_t		fTimestamp;
 };
+
 
 class MouseFilter : public EventFilter {
 	public:
@@ -2487,7 +2485,7 @@ Desktop::AllWindows()
 Window*
 Desktop::WindowForClientLooperPort(port_id port)
 {
-	AutoReadLocker locker(fWindowLock);
+	ASSERT(fWindowLock.IsReadLocked());
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
