@@ -251,48 +251,62 @@ BMailChainRunner::Init()
 	);
 
 	_status->Lock();
-	_statview = _status->NewStatusView(desc.String(),_chain->ChainDirection() == outbound);
+	_statview = _status->NewStatusView(desc.String(), _chain->ChainDirection() == outbound);
 	_status->Unlock();
 
 	BMessage settings;
-	for (int32 i = 0; _chain->GetFilter(i,&settings,&addon) >= B_OK; i++) {
-		struct filter_image *image = new struct filter_image;
+	for (int32 i = 0; _chain->GetFilter(i, &settings, &addon) >= B_OK; i++) {
 		BPath path(&addon);
-		BMailFilter *(* instantiate)(BMessage *,BMailChainRunner *);
+		BMailFilter *(*instantiate)(BMessage*, BMailChainRunner*);
 
-		image->id = load_add_on(path.Path());
-
-		if (image->id < B_OK) {
+		image_id imageId = load_add_on(path.Path());
+					
+		if (imageId < B_OK) {
 			BString error;
 			MDR_DIALECT_CHOICE (
-				error << "Error loading the mail addon " << path.Path() << " from chain " << _chain->Name() << ": " << strerror(image->id);
+				error << "Error loading the mail addon "
+					<< path.Path() << " from chain " << _chain->Name()
+					<< ": " << strerror(imageId);
 				ShowError(error.String());,
-				error << "メールアドオン " << path.Path() << " を " << _chain->Name() << "から読み込む際にエラーが発生しました: " << strerror(image->id);
+				error << "メールアドオン " << path.Path()
+					<< " を " << _chain->Name() 
+					<< "から読み込む際にエラーが発生しました: "
+					<< strerror(imageId);
+					
 				ShowError(error.String());
 			)
-			return image->id;
+			return imageId;
 		}
 
-		status_t err = get_image_symbol(image->id,"instantiate_mailfilter",B_SYMBOL_TYPE_TEXT,(void **)&instantiate);
+		status_t err = get_image_symbol(imageId,
+			"instantiate_mailfilter", B_SYMBOL_TYPE_TEXT,
+			(void **)&instantiate);
 		if (err < B_OK) {
 			BString error;
 			MDR_DIALECT_CHOICE (
-				error << "Error loading the mail addon " << path.Path() << " from chain " << _chain->Name()
+				error << "Error loading the mail addon " << path.Path()
+					<< " from chain " << _chain->Name()
 					<< ": the addon does not seem to be a mail addon (missing symbol instantiate_mailfilter).";
 				ShowError(error.String());,
-				error << "メールアドオン " << path.Path() << " を " << _chain->Name() << "から読み込む際にエラーが発生しました"
-						<< ": そのアドオンはメールアドオンではないようです（instantiate_mailfilterシンボルがありません）";
+				error << "メールアドオン " << path.Path() << " を "
+					<< _chain->Name() << "から読み込む際にエラーが発生しました"
+					<< ": そのアドオンはメールアドオンではないようです（instantiate_mailfilterシンボルがありません）";
 				ShowError(error.String());
 			)
 
 			err = -1;
+			
+			// TODO: unload_add_on() ?
 			return err;
 		}
 
+		filter_image* image = new filter_image;
+		
+		image->id = imageId;
 		image->settings = new BMessage(settings);
-
-		image->settings->AddInt32("chain",_chain->ID());
-		image->filter = (*instantiate)(image->settings,this);
+		image->settings->AddInt32("chain", _chain->ID());
+		image->filter = (*instantiate)(image->settings, this);
+		
 		addons.AddItem(image);
 
 		if ((big_err = image->filter->InitCheck()) != B_OK) {
@@ -302,6 +316,7 @@ BMailChainRunner::Init()
 	}
 	return big_err;
 }
+
 
 void
 BMailChainRunner::MessageReceived(BMessage *msg)
