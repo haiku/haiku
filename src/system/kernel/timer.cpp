@@ -1,12 +1,14 @@
 /*
- * Copyright 2002-2009, Haiku. All rights reserved.
+ * Copyright 2002-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
+
 /*! Policy info for timers */
+
 
 #include <timer.h>
 
@@ -39,7 +41,7 @@ static per_cpu_timer_data sPerCPU[B_MAX_CPU_COUNT];
 
 
 status_t
-timer_init(kernel_args *args)
+timer_init(kernel_args* args)
 {
 	TRACE(("timer_init: entry\n"));
 
@@ -49,13 +51,13 @@ timer_init(kernel_args *args)
 
 /*! NOTE: expects interrupts to be off */
 static void
-add_event_to_list(timer *event, timer * volatile *list)
+add_event_to_list(timer* event, timer* volatile* list)
 {
-	timer *next;
-	timer *last = NULL;
+	timer* next;
+	timer* last = NULL;
 
 	// stick it in the event list
-	for (next = *list; next; last = next, next = (timer *)next->next) {
+	for (next = *list; next; last = next, next = (timer*)next->next) {
 		if ((bigtime_t)next->schedule_time >= (bigtime_t)event->schedule_time)
 			break;
 	}
@@ -73,8 +75,8 @@ add_event_to_list(timer *event, timer * volatile *list)
 int32
 timer_interrupt()
 {
-	timer *event;
-	spinlock *spinlock;
+	timer* event;
+	spinlock* spinlock;
 	per_cpu_timer_data& cpuData = sPerCPU[smp_get_current_cpu()];
 	int32 rc = B_HANDLED_INTERRUPT;
 
@@ -90,7 +92,7 @@ timer_interrupt()
 		// this event needs to happen
 		int mode = event->flags;
 
-		cpuData.events = (timer *)event->next;
+		cpuData.events = (timer*)event->next;
 		cpuData.current_event = event;
 		cpuData.current_event_in_progress = 1;
 		event->schedule_time = 0;
@@ -161,7 +163,7 @@ timer_interrupt()
 
 
 status_t
-add_timer(timer *event, timer_hook hook, bigtime_t period, int32 flags)
+add_timer(timer* event, timer_hook hook, bigtime_t period, int32 flags)
 {
 	bigtime_t scheduleTime;
 	bigtime_t currentTime = system_time();
@@ -203,7 +205,7 @@ add_timer(timer *event, timer_hook hook, bigtime_t period, int32 flags)
 
 
 bool
-cancel_timer(timer *event)
+cancel_timer(timer* event)
 {
 	TRACE(("cancel_timer: event %p\n", event));
 
@@ -227,16 +229,15 @@ cancel_timer(timer *event)
 
 	per_cpu_timer_data& cpuData = sPerCPU[cpu];
 
-	timer *current = cpuData.events;
-
 	if (event != cpuData.current_event) {
 		// The timer hook is not yet being executed.
-		timer *last = NULL;
+		timer* current = cpuData.events;
+		timer* last = NULL;
 
 		while (current != NULL) {
 			if (current == event) {
 				// we found it
-				if (current == cpuData.events)
+				if (last == NULL)
 					cpuData.events = current->next;
 				else
 					last->next = current->next;
@@ -267,27 +268,26 @@ cancel_timer(timer *event)
 		}
 
 		return false;
-	} else {
-		// The timer hook is currently being executed. We clear the current
-		// event so that timer_interrupt() will not reschedule periodic timers.
-		cpuData.current_event = NULL;
-		current = event;
-
-		// Unless this is a kernel-private timer that also requires the thread
-		// lock to be held while calling the event hook, we'll have to wait
-		// for the hook to complete. When called from the timer hook we don't
-		// wait either, of course.
-		if ((event->flags & B_TIMER_ACQUIRE_THREAD_LOCK) == 0
-			|| cpu == smp_get_current_cpu()) {
-			spinLocker.Unlock();
-
-			while (cpuData.current_event_in_progress == 1) {
-				PAUSE();
-			}
-		}
-
-		return true;
 	}
+
+	// The timer hook is currently being executed. We clear the current
+	// event so that timer_interrupt() will not reschedule periodic timers.
+	cpuData.current_event = NULL;
+
+	// Unless this is a kernel-private timer that also requires the thread
+	// lock to be held while calling the event hook, we'll have to wait
+	// for the hook to complete. When called from the timer hook we don't
+	// wait either, of course.
+	if ((event->flags & B_TIMER_ACQUIRE_THREAD_LOCK) == 0
+		|| cpu == smp_get_current_cpu()) {
+		spinLocker.Unlock();
+
+		while (cpuData.current_event_in_progress == 1) {
+			PAUSE();
+		}
+	}
+
+	return true;
 }
 
 
