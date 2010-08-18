@@ -338,10 +338,10 @@ status_t
 Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
 {
 	const char* defaultArgs[3] = {kDefaultShell, "-l", NULL};
+	struct passwd passwdStruct;
+	struct passwd *passwdResult;
+	char stringBuffer[256];
 	if (argv == NULL || argc == 0) {
-		struct passwd passwdStruct;
-		struct passwd *passwdResult;
-		char stringBuffer[256];
 		if (!getpwuid_r(getuid(), &passwdStruct, stringBuffer,
 				sizeof(stringBuffer), &passwdResult)) {
 			defaultArgs[0] = passwdStruct.pw_shell;
