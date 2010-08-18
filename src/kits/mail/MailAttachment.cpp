@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <AutoDeleter.h>
+
 class _EXPORT BSimpleMailAttachment;
 class _EXPORT BAttributedMailAttachment;
 class _EXPORT BMailAttachment;
@@ -352,11 +354,13 @@ status_t BSimpleMailAttachment::RenderToRFC822(BPositionIO *render_to) {
 	if (src == NULL)
 		return B_NO_MEMORY;
 
+	MemoryDeleter sourceDeleter(src);
+
 	_data->Seek(0,SEEK_SET);
 
 	ssize_t read = _data->Read(src,size);
 	if (read < B_OK)
-		return read; // Return an error code and leak memory.
+		return read;
 
 	// The encoded text will never be more than twice as large with any
 	// conceivable encoding.  But just in case, there's a function call which
@@ -368,15 +372,15 @@ status_t BSimpleMailAttachment::RenderToRFC822(BPositionIO *render_to) {
 	if (dest == NULL)
 		return B_NO_MEMORY;
 
+	MemoryDeleter destinationDeleter(dest);
+
 	destSize = encode (_encoding, dest, src, read, false /* headerMode */);
-	if (destSize < B_OK) {
-		free(dest);
+	if (destSize < B_OK)
 		return destSize;
-	}
+
 	if (destSize > 0)
 		read = render_to->Write(dest,destSize);
-	free (src);
-	free (dest);
+
 	return (read > 0) ? B_OK : read;
 }
 

@@ -5,7 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders mail ;
 }
-UsePrivateHeaders mail ;
+UsePrivateHeaders mail shared ;
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
 
 if $(CHECK_MALLOC) {
