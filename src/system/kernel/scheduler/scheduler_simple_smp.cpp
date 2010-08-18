@@ -234,7 +234,7 @@ estimate_max_scheduling_latency(struct thread* thread)
 	// TODO: This is probably meant to be called periodically to return the
 	// current estimate depending on the system usage; we return fixed estimates
 	// per thread priority, though.
-	
+
 	if (thread->priority >= B_REAL_TIME_DISPLAY_PRIORITY)
 		return kThreadQuantum / 4;
 	if (thread->priority >= B_DISPLAY_PRIORITY)
@@ -298,13 +298,15 @@ reschedule(void)
 		}
 	}
 
-	TRACE(("reschedule(): cpu %ld, cur_thread = %ld\n", smp_get_current_cpu(), thread_get_current_thread()->id));
+	TRACE(("reschedule(): cpu %ld, cur_thread = %ld\n", smp_get_current_cpu(),
+		thread_get_current_thread()->id));
 
 	oldThread->state = oldThread->next_state;
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
-			TRACE(("enqueueing thread %ld into run q. pri = %ld\n", oldThread->id, oldThread->priority));
+			TRACE(("enqueueing thread %ld into run q. pri = %ld\n",
+				oldThread->id, oldThread->priority));
 			enqueue_in_run_queue(oldThread);
 			break;
 		case B_THREAD_SUSPENDED:
@@ -313,7 +315,8 @@ reschedule(void)
 		case THREAD_STATE_FREE_ON_RESCHED:
 			break;
 		default:
-			TRACE(("not enqueueing thread %ld into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));
+			TRACE(("not enqueueing thread %ld into run q. next_state = %ld\n",
+				oldThread->id, oldThread->next_state));
 			break;
 	}
 
@@ -323,17 +326,20 @@ reschedule(void)
 	if (oldThread->cpu->disabled) {
 		// CPU is disabled - service any threads we may have that are pinned,
 		// otherwise just select the idle thread
-		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
-			if (nextThread->pinned_to_cpu > 0 &&
-				nextThread->previous_cpu == oldThread->cpu)
-					break;
+		while (nextThread != NULL && nextThread->priority > B_IDLE_PRIORITY) {
+			if (nextThread->pinned_to_cpu > 0
+				&& nextThread->previous_cpu == oldThread->cpu)
+				break;
 			prevThread = nextThread;
 			nextThread = nextThread->queue_next;
 		}
 	} else {
-		while (nextThread) {
+		while (nextThread != NULL) {
 			// select next thread from the run queue
-			while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
+			// TODO: nextThread cannot really be NULL here, so we should be able
+			// to remove the check, as well as the panic later on.
+			while (nextThread != NULL
+				&& nextThread->priority > B_IDLE_PRIORITY) {
 #if 0
 				if (oldThread == nextThread && nextThread->was_yielded) {
 					// ignore threads that called thread_yield() once
@@ -383,7 +389,7 @@ reschedule(void)
 				prevThread = lowerPrevThread;
 			}
 
-			if (nextThread->cpu
+			if (nextThread != NULL && nextThread->cpu
 				&& nextThread->cpu->cpu_num != oldThread->cpu->cpu_num) {
 				panic("thread in run queue that's still running on another CPU!\n");
 				// TODO: remove this check completely when we're sure that this
@@ -397,11 +403,11 @@ reschedule(void)
 		}
 	}
 
-	if (!nextThread)
+	if (nextThread == NULL)
 		panic("reschedule(): run queue is empty!\n");
 
 	// extract selected thread from the run queue
-	if (prevThread)
+	if (prevThread != NULL)
 		prevThread->queue_next = nextThread->queue_next;
 	else
 		sRunQueue = nextThread->queue_next;
@@ -409,8 +415,8 @@ reschedule(void)
 	T(ScheduleThread(nextThread, oldThread));
 
 	// notify listeners
-	NotifySchedulerListeners(&SchedulerListener::ThreadScheduled,
-		oldThread, nextThread);
+	NotifySchedulerListeners(&SchedulerListener::ThreadScheduled, oldThread,
+		nextThread);
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
@@ -423,9 +429,9 @@ reschedule(void)
 
 	// track CPU activity
 	if (!thread_is_idle_thread(oldThread)) {
-		oldThread->cpu->active_time +=
-			(oldThread->kernel_time - oldThread->cpu->last_kernel_time)
-			+ (oldThread->user_time - oldThread->cpu->last_user_time);
+		oldThread->cpu->active_time
+			+= (oldThread->kernel_time - oldThread->cpu->last_kernel_time)
+				+ (oldThread->user_time - oldThread->cpu->last_user_time);
 	}
 
 	if (!thread_is_idle_thread(nextThread)) {
