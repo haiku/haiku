@@ -142,20 +142,9 @@ PathTokenizer::is_separator(unsigned c) const
 bool
 PathTokenizer::parse_number()
 {
-	char buf[256]; // Should be enough for any number
-	char* buf_ptr = buf;
-
-	// Copy all sign characters
-	while (buf_ptr < buf+255 && *fPath == '-' || *fPath == '+') {
-		*buf_ptr++ = *fPath++;
-	}
-
-	// Copy all numeric characters
-	while (buf_ptr < buf+255 && isNumeric(*fPath)) {
-		*buf_ptr++ = *fPath++;
-	}
-	*buf_ptr = 0;
-	fLastNumber = atof(buf);
+	char* end;
+	fLastNumber = strtod(fPath, &end);
+	fPath = end;
 	return true;
 }
 

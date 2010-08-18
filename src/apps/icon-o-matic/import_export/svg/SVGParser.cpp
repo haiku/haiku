@@ -364,7 +364,7 @@ Parser::parse(const char* pathToFile)
 void
 Parser::start_element(void* data, const char* el, const char** attr)
 {
-//printf("Parser::start_element(%s)\n", el);
+// printf("Parser::start_element(%s)\n", el);
 	Parser& self = *(Parser*)data;
 
 	if (strcmp(el, "svg") == 0)
