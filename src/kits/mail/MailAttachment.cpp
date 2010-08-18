@@ -369,8 +369,10 @@ status_t BSimpleMailAttachment::RenderToRFC822(BPositionIO *render_to) {
 		return B_NO_MEMORY;
 
 	destSize = encode (_encoding, dest, src, read, false /* headerMode */);
-	if (destSize < B_OK)
+	if (destSize < B_OK) {
+		free(dest);
 		return destSize;
+	}
 	if (destSize > 0)
 		read = render_to->Write(dest,destSize);
 	free (src);
