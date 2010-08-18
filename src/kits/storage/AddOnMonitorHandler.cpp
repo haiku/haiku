@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include <Autolock.h>
 #include <Directory.h>
 
 
