@@ -2,9 +2,6 @@
  * Copyright 2010, Ingo Weinhold <ingo_weinhold@gmx.de>.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
  */
 
 
@@ -52,19 +49,19 @@ size_to_index(size_t size)
 {
 	if (size <= 16)
 		return 0;
-	else if (size <= 32)
+	if (size <= 32)
 		return 1 + (size - 16 - 1) / 8;
-	else if (size <= 128)
+	if (size <= 128)
 		return 3 + (size - 32 - 1) / 16;
-	else if (size <= 256)
+	if (size <= 256)
 		return 9 + (size - 128 - 1) / 32;
-	else if (size <= 512)
+	if (size <= 512)
 		return 13 + (size - 256 - 1) / 64;
-	else if (size <= 1024)
+	if (size <= 1024)
 		return 17 + (size - 512 - 1) / 128;
-	else if (size <= 2048)
+	if (size <= 2048)
 		return 21 + (size - 1024 - 1) / 256;
-	else if (size <= 8192)
+	if (size <= 8192)
 		return 25 + (size - 2048 - 1) / 512;
 
 	return -1;
