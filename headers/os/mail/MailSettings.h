@@ -43,8 +43,7 @@ BMailChain* GetMailChain(uint32 id);
 status_t GetOutboundMailChains(BList *list);
 status_t GetInboundMailChains(BList *list);
 
-class BMailChain : public BArchivable
-{
+class BMailChain : public BArchivable {
   public:
 	BMailChain(uint32 id);
 	BMailChain(BMessage*);
@@ -86,23 +85,24 @@ class BMailChain : public BArchivable
 	status_t Path(BPath *path) const;
 	status_t Load(BMessage*);
 	
-	int32 id;
-	char name[B_FILE_NAME_LENGTH];
-	BMessage *meta_data;
+	int32 fId;
+	char fName[B_FILE_NAME_LENGTH];
+	BMessage *fMetaData;
 	
-	status_t _err;
+	status_t fStatus;
 
-  	b_mail_chain_direction direction;
+  	b_mail_chain_direction fDirection;
 
-	int32 settings_ct, addons_ct;  
-	BList filter_settings;
-	BList filter_addons;
+	int32 fSettingsCount;
+	int32 fAddonsCount;
+	BList fFilterSettings;
+	BList fFilterAddons;
 	
 	uint32 _reserved[5];
 };
 
-class BMailSettings
-{
+
+class BMailSettings {
   public:
 	BMailSettings();
 	~BMailSettings();
