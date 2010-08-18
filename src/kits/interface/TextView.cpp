@@ -5401,8 +5401,6 @@ BTextView::_HandleInputMethodChanged(BMessage *message)
 
 		const int32 inlineOffset = fInline->Offset();
 		InsertText(string, stringLen, fSelStart, NULL);
-		fSelStart += stringLen;
-		fCaretOffset = fSelEnd = fSelStart;
 
 		_Refresh(inlineOffset, fSelEnd, true);
 		_ShowCaret();
