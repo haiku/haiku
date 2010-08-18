@@ -58,7 +58,7 @@ HAIKU_ICU_DEVEL_PACKAGE = icu-devel-4.4.1-2010-07-26.zip ;
 if $(TARGET_ARCH) = ppc {
 	local icu_package = $(HAIKU_ICU_PPC_PACKAGE) ;
 	local zipFile = [ DownloadFile $(icu_package)
-		: http://ports-space.haiku-files.org/dev-libs/$(icu_package) ] ;
+		: $(baseURL)/$(icu_package) ] ;
 
 	# zip file and output directory
 	HAIKU_ICU_ZIP_FILE = $(zipFile) ;
