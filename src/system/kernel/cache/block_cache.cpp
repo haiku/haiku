@@ -3382,15 +3382,21 @@ block_cache_sync_etc(void* _cache, off_t blockNumber, size_t numBlocks)
 }
 
 
+/*!	Discards a block from the current transaction or from the cache.
+	You have to call this function when you no longer use a block, ie. when it
+	might be reclaimed by the file cache in order to make sure they won't
+	interfere.
+*/
 void
 block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 {
+	// TODO: this could be a nice place to issue the ATA trim command
 	block_cache* cache = (block_cache*)_cache;
 	TransactionLocker locker(cache);
 
 	BlockWriter writer(cache);
 
-	for (; numBlocks > 0; numBlocks--, blockNumber++) {
+	for (size_t i = 0; i < numBlocks; i++, blockNumber++) {
 		cached_block* block = (cached_block*)hash_lookup(cache->hash,
 			&blockNumber);
 		if (block != NULL && block->previous_transaction != NULL)
@@ -3400,7 +3406,7 @@ block_cache_discard(void* _cache, off_t blockNumber, size_t numBlocks)
 	writer.Write();
 		// TODO: this can fail, too!
 
-	for (; numBlocks > 0; numBlocks--, blockNumber++) {
+	for (size_t i = 0; i < numBlocks; i++, blockNumber++) {
 		cached_block* block = (cached_block*)hash_lookup(cache->hash,
 			&blockNumber);
 		if (block == NULL)
