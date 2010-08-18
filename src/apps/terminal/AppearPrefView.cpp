@@ -110,20 +110,20 @@ AppearancePrefView::AppearancePrefView(const char* name,
 
 	BLayoutBuilder::Group<>(this)
 		.SetInsets(5, 5, 5, 5)
-			.AddGrid(5, 5)
-				.Add(fFont->CreateLabelLayoutItem(), 0, 0)
-				.Add(fFont->CreateMenuBarLayoutItem(), 1, 0)
-				.Add(fFontSize->CreateLabelLayoutItem(), 0, 1)
-				.Add(fFontSize->CreateMenuBarLayoutItem(), 1, 1)
-				.Add(fColorSchemaField->CreateLabelLayoutItem(), 0, 2)
-				.Add(fColorSchemaField->CreateMenuBarLayoutItem(), 1, 2)
-				.Add(fColorField->CreateLabelLayoutItem(), 0, 3)
-				.Add(fColorField->CreateMenuBarLayoutItem(), 1, 3)
-				.End()
-			.AddGlue()
-			.Add(fColorControl = new BColorControl(BPoint(10, 10),
-				B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
-			.Add(fWarnOnExit);
+		.AddGrid(5, 5)
+			.Add(fFont->CreateLabelLayoutItem(), 0, 0)
+			.Add(fFont->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fFontSize->CreateLabelLayoutItem(), 0, 1)
+			.Add(fFontSize->CreateMenuBarLayoutItem(), 1, 1)
+			.Add(fColorSchemaField->CreateLabelLayoutItem(), 0, 2)
+			.Add(fColorSchemaField->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(fColorField->CreateLabelLayoutItem(), 0, 3)
+			.Add(fColorField->CreateMenuBarLayoutItem(), 1, 3)
+			.End()
+		.AddGlue()
+		.Add(fColorControl = new BColorControl(BPoint(10, 10),
+			B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
+		.Add(fWarnOnExit);
 
 	fFont->SetAlignment(B_ALIGN_RIGHT);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
