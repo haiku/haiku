@@ -338,12 +338,12 @@ BNetworkAddress::SetToMask(int family, uint32 prefixLength)
 		{
 			if (prefixLength > 32)
 				return B_BAD_VALUE;
-		
+
 			sockaddr_in& mask = (sockaddr_in&)fAddress;
 			memset(&fAddress, 0, sizeof(sockaddr_storage));
 			mask.sin_family = AF_INET;
 			mask.sin_len = sizeof(sockaddr_in);
-		
+
 			uint32 hostMask = 0;
 			for (uint8 i = 32; i > 32 - prefixLength; i--)
 				hostMask |= 1 << (i - 1);
@@ -361,14 +361,14 @@ BNetworkAddress::SetToMask(int family, uint32 prefixLength)
 			memset(&fAddress, 0, sizeof(sockaddr_storage));
 			mask.sin6_family = AF_INET6;
 			mask.sin6_len = sizeof(sockaddr_in6);
-		
+
 			for (uint8 i = 0; i < sizeof(in6_addr); i++, prefixLength -= 8) {
 				if (prefixLength < 8) {
 					mask.sin6_addr.s6_addr[i]
 						= (uint8)(0xff << (8 - prefixLength));
 					break;
 				}
-		
+
 				mask.sin6_addr.s6_addr[i] = 0xff;
 			}
 			break;
@@ -486,6 +486,13 @@ BNetworkAddress::SockAddr() const
 }
 
 
+sockaddr&
+BNetworkAddress::SockAddr()
+{
+	return (sockaddr&)fAddress;
+}
+
+
 bool
 BNetworkAddress::IsEmpty() const
 {
@@ -536,7 +543,7 @@ BNetworkAddress::IsMulticast() const
 
 		case AF_INET6:
 			return IN6_IS_ADDR_MULTICAST(&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -549,7 +556,7 @@ BNetworkAddress::IsMulticastGlobal() const
 	switch (fAddress.ss_family) {
 		case AF_INET6:
 			return IN6_IS_ADDR_MC_GLOBAL(&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -563,7 +570,7 @@ BNetworkAddress::IsMulticastNodeLocal() const
 		case AF_INET6:
 			return IN6_IS_ADDR_MC_NODELOCAL(
 				&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -577,7 +584,7 @@ BNetworkAddress::IsMulticastLinkLocal() const
 		case AF_INET6:
 			return IN6_IS_ADDR_MC_LINKLOCAL(
 				&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -591,7 +598,7 @@ BNetworkAddress::IsMulticastSiteLocal() const
 		case AF_INET6:
 			return IN6_IS_ADDR_MC_SITELOCAL(
 				&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -605,7 +612,7 @@ BNetworkAddress::IsMulticastOrgLocal() const
 		case AF_INET6:
 			return IN6_IS_ADDR_MC_ORGLOCAL(
 				&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -619,7 +626,7 @@ BNetworkAddress::IsLinkLocal() const
 	switch (fAddress.ss_family) {
 		case AF_INET6:
 			return IN6_IS_ADDR_LINKLOCAL(&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -632,7 +639,7 @@ BNetworkAddress::IsSiteLocal() const
 	switch (fAddress.ss_family) {
 		case AF_INET6:
 			return IN6_IS_ADDR_SITELOCAL(&((sockaddr_in6&)fAddress).sin6_addr);
-		
+
 		default:
 			return false;
 	}
@@ -670,7 +677,7 @@ BNetworkAddress::PrefixLength() const
 		case AF_INET:
 		{
 			sockaddr_in& mask = (sockaddr_in&)fAddress;
-		
+
 			ssize_t result = 0;
 			uint32 hostMask = ntohl(mask.sin_addr.s_addr);
 			for (uint8 i = 32; i > 0; i--) {
@@ -694,7 +701,7 @@ BNetworkAddress::PrefixLength() const
 					result++;
 				}
 			}
-		
+
 			return 128;
 		}
 
@@ -923,7 +930,7 @@ BNetworkAddress::Equals(const BNetworkAddress& other, bool includePort) const
 			return memcmp(&address.sin6_addr, &otherAddress.sin6_addr,
 				sizeof(address.sin6_addr)) == 0;
 		}
-		
+
 		default:
 			if (fAddress.ss_len != other.fAddress.ss_len)
 				return false;
@@ -1006,4 +1013,16 @@ BNetworkAddress::operator const sockaddr*() const
 BNetworkAddress::operator const sockaddr&() const
 {
 	return (const sockaddr&)fAddress;
+}
+
+
+BNetworkAddress::operator sockaddr*()
+{
+	return (sockaddr*)&fAddress;
+}
+
+
+BNetworkAddress::operator sockaddr&()
+{
+	return (sockaddr&)fAddress;
 }

@@ -80,6 +80,7 @@ public:
 			uint16				Port() const;
 			size_t				Length() const;
 			const sockaddr&		SockAddr() const;
+			sockaddr&			SockAddr();
 
 			bool				IsEmpty() const;
 			bool				IsWildcard() const;
@@ -93,7 +94,7 @@ public:
 			bool				IsLinkLocal() const;
 			bool				IsSiteLocal() const;
 			bool				IsLocal() const;
-			
+
 			ssize_t				PrefixLength() const;
 
 			uint32				LinkLevelIndex() const;
@@ -125,6 +126,8 @@ public:
 
 								operator const sockaddr*() const;
 								operator const sockaddr&() const;
+								operator sockaddr*();
+								operator sockaddr&();
 
 private:
 			sockaddr_storage	fAddress;
