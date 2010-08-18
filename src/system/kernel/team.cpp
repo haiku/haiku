@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1094,6 +1094,7 @@ team_create_thread_start(void* args)
 		|| user_memcpy(userArgs, teamArgs->flat_args,
 				teamArgs->flat_args_size) < B_OK) {
 		// the team deletion process will clean this mess
+		free_team_arg(teamArgs);
 		return B_BAD_ADDRESS;
 	}
 
@@ -1219,7 +1220,6 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
 		envCount, errorPort, errorToken);
-
 	if (status != B_OK)
 		goto err1;
 
@@ -1403,14 +1403,13 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 
 	status = create_team_arg(&teamArgs, path, flatArgs, flatArgsSize, argCount,
 		envCount, -1, 0);
-
 	if (status != B_OK)
 		return status;
 
 	_flatArgs = NULL;
 		// args are owned by the team_arg structure now
 
-	// ToDo: remove team resources if there are any left
+	// TODO: remove team resources if there are any left
 	// thread_atkernel_exit() might not be called at all
 
 	thread_reset_for_exec();
@@ -1431,6 +1430,7 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	if (status != B_OK) {
 		// creating the user data failed -- we're toast
 		// TODO: We should better keep the old user area in the first place.
+		free_team_arg(teamArgs);
 		exit_thread(status);
 		return status;
 	}
