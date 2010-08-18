@@ -44,6 +44,14 @@ AddOnMonitorHandler::MessageReceived(BMessage* msg)
 status_t
 AddOnMonitorHandler::AddDirectory(const node_ref* nref)
 {
+	// Keep the looper thread locked, since this method is likely to be called
+	// in a thread other than the looper thread. Otherwise we may access the
+	// lists concurrently with the looper thread, when node monitor notifications
+	// arrive while we are still adding initial entries from the directory, or
+	// (much more likely) if the looper thread handles a pulse message and wants
+	// to process pending entries while we are still adding them.
+	BAutolock _(Looper());
+
 	// ignore directories added twice
 	std::list<add_on_directory_info>::iterator iterator = fDirectories.begin();
 	for (; iterator != fDirectories.end() ; iterator++) {
@@ -166,12 +174,11 @@ AddOnMonitorHandler::EntryRemoved(ino_t directory, dev_t device, ino_t node)
 	}
 
 	// if it was not found, we're done
-	if (diter == fDirectories.end()) {
+	if (diter == fDirectories.end())
 		return;
-	}
 
 	// Start at the top again, and search until the directory we found
-	// the old add-on in. If we find a add-on with the same name then
+	// the old add-on in. If we find an add-on with the same name then
 	// the old add-on was not enabled. So we deallocate the old
 	// add-on and return.
 	std::list<add_on_directory_info>::iterator diter2 = fDirectories.begin();
@@ -190,7 +197,7 @@ AddOnMonitorHandler::EntryRemoved(ino_t directory, dev_t device, ino_t node)
 	AddOnDisabled(&info);
 	AddOnRemoved(&info);
 
-	// Continue searching for a add-on below us. If we find a add-on
+	// Continue searching for an add-on below us. If we find an add-on
 	// with the same name, we must enable it.
 	for (diter++ ; diter != fDirectories.end() ; diter++) {
 		std::list<add_on_entry_info>::iterator eiter = diter->entries.begin();
@@ -222,13 +229,13 @@ AddOnMonitorHandler::EntryMoved(const char* name, ino_t fromDirectory,
 	make_node_ref(device, toDirectory, &toNodeRef);
 	std::list<add_on_directory_info>::iterator to_iter = fDirectories.begin();
 	for ( ; to_iter != fDirectories.end() ; to_iter++) {
-		if (to_iter->nref == toNodeRef) {
+		if (to_iter->nref == toNodeRef)
 			break;
-		}
 	}
 
 	if (from_iter == fDirectories.end() && to_iter == fDirectories.end()) {
-		// huh? whatever...
+		// It seems the notification was for a directory we are not
+		// actually watching by intention.
 		return;
 	}
 
@@ -290,9 +297,8 @@ AddOnMonitorHandler::EntryMoved(const char* name, ino_t fromDirectory,
 		}
 
 		// finally, if the new name is different, destroy the addon
-		if (strcmp(info.name, name) != 0) {
+		if (strcmp(info.name, name) != 0)
 			AddOnRemoved(&info);
-		}
 
 		// done
 		return;
@@ -480,8 +486,8 @@ AddOnMonitorHandler::_HandlePulse()
 		add_on_entry_info info = *iter;
 
 		node_ref dirNodeRef;
-		if ((directory.GetNodeRef(&dirNodeRef) != B_OK) ||
-			(dirNodeRef != info.dir_nref)) {
+		if (directory.GetNodeRef(&dirNodeRef) != B_OK
+			|| dirNodeRef != info.dir_nref) {
 			if (directory.SetTo(&info.dir_nref) != B_OK) {
 				// invalid directory, discard this pending entry
 				iter = fPendingEntries.erase(iter);
@@ -520,7 +526,7 @@ AddOnMonitorHandler::_HandlePulse()
 		AddOnCreated(&info);
 
 		// Start at the top again, and search until the directory we put
-		// the new add-on in.  If we find a add-on with the same name then
+		// the new add-on in.  If we find an add-on with the same name then
 		// the new add-on should not be enabled.
 		bool enabled = true;
 		std::list<add_on_directory_info>::iterator diter2
