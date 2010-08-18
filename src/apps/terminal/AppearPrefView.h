@@ -10,7 +10,7 @@
 
 #include <Messenger.h>
 #include <String.h>
-#include <View.h>
+#include <GroupView.h>
 
 
 const ulong MSG_HALF_FONT_CHANGED	= 'mchf';
@@ -36,7 +36,7 @@ class BMenuField;
 class BPopUpMenu;
 class BCheckBox;
 
-class AppearancePrefView : public BView {
+class AppearancePrefView : public BGroupView {
 public:
 								AppearancePrefView(const char *name,
 									const BMessenger &messenger);

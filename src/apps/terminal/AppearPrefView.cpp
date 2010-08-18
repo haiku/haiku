@@ -69,7 +69,7 @@ IsFontUsable(const BFont& font)
 AppearancePrefView::AppearancePrefView(const char* name,
 		const BMessenger& messenger)
 	:
-	BView(name, B_WILL_DRAW),
+	BGroupView(name, B_VERTICAL, 5),
 	fTerminalMessenger(messenger)
 {
 	const char* kColorTable[] = {
@@ -108,11 +108,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 			colorsPopUp);
 	fColorField->SetEnabled(false);
 
-	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
-	SetLayout(layout);
-	BLayoutBuilder::Group<>(layout)
+	BLayoutBuilder::Group<>(this)
 		.SetInsets(5, 5, 5, 5)
-		.AddGroup(B_VERTICAL, 5)
 			.AddGrid(5, 5)
 				.Add(fFont->CreateLabelLayoutItem(), 0, 0)
 				.Add(fFont->CreateMenuBarLayoutItem(), 1, 0)
@@ -122,12 +119,11 @@ AppearancePrefView::AppearancePrefView(const char* name,
 				.Add(fColorSchemaField->CreateMenuBarLayoutItem(), 1, 2)
 				.Add(fColorField->CreateLabelLayoutItem(), 0, 3)
 				.Add(fColorField->CreateMenuBarLayoutItem(), 1, 3)
-			.	End()
-			.AddGroup(B_VERTICAL, 5)
-				.AddGlue()
-				.Add(fColorControl = new BColorControl(BPoint(10, 10),
-					B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
-				.Add(fWarnOnExit);
+				.End()
+			.AddGlue()
+			.Add(fColorControl = new BColorControl(BPoint(10, 10),
+				B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
+			.Add(fWarnOnExit);
 
 	fFont->SetAlignment(B_ALIGN_RIGHT);
 	fFontSize->SetAlignment(B_ALIGN_RIGHT);
