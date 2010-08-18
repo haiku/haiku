@@ -3674,7 +3674,7 @@ status_t
 BView::SetViewOverlay(const BBitmap* overlay, BRect srcRect, BRect dstRect,
 	rgb_color* colorKey, uint32 followFlags, uint32 options)
 {
-	if ((overlay->fFlags & B_BITMAP_WILL_OVERLAY) == 0)
+	if (overlay == NULL || (overlay->fFlags & B_BITMAP_WILL_OVERLAY) == 0)
 		return B_BAD_VALUE;
 
 	status_t status = _SetViewBitmap(overlay, srcRect, dstRect, followFlags,
@@ -3692,11 +3692,11 @@ status_t
 BView::SetViewOverlay(const BBitmap* overlay, rgb_color* colorKey,
 	uint32 followFlags, uint32 options)
 {
-	BRect rect;
- 	if (overlay != NULL) {
-		rect = overlay->Bounds();
-	 	rect.OffsetTo(B_ORIGIN);
- 	}
+	if (overlay == NULL)
+		return B_BAD_VALUE;
+
+	BRect rect = overlay->Bounds();
+ 	rect.OffsetTo(B_ORIGIN);
 
 	return SetViewOverlay(overlay, rect, rect, colorKey, followFlags, options);
 }
