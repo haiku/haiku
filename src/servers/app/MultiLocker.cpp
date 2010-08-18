@@ -509,8 +509,10 @@ MultiLocker::WriteUnlock()
 			}
 		}
 	} else {
-		debug_printf("write holder %ld\n", fWriterThread);
-		debugger("Non-writer attempting to WriteUnlock()");
+		char message[256];
+		snprintf(message, sizeof(message), "Non-writer attempting to "
+			"WriteUnlock() - write holder: %ld", fWriterThread);
+		debugger(message);
 	}
 
 	return unlocked;
