@@ -224,6 +224,19 @@ BBitmap::BBitmap(const BBitmap* source, bool acceptsViews, bool needsContiguous)
 
 
 BBitmap::BBitmap(const BBitmap& source, uint32 flags)
+	:
+	fBasePointer(NULL),
+	fSize(0),
+	fColorSpace(B_NO_COLOR_SPACE),
+	fBounds(0, 0, -1, -1),
+	fBytesPerRow(0),
+	fWindow(NULL),
+	fServerToken(-1),
+	fAreaOffset(-1),
+	fArea(-1),
+	fServerArea(-1),
+	fFlags(0),
+	fInitError(B_NO_INIT)
 {
 	if (!source.IsValid())
 		return;
@@ -237,8 +250,20 @@ BBitmap::BBitmap(const BBitmap& source, uint32 flags)
 
 
 BBitmap::BBitmap(const BBitmap& source)
+	:
+	fBasePointer(NULL),
+	fSize(0),
+	fColorSpace(B_NO_COLOR_SPACE),
+	fBounds(0, 0, -1, -1),
+	fBytesPerRow(0),
+	fWindow(NULL),
+	fServerToken(-1),
+	fAreaOffset(-1),
+	fArea(-1),
+	fServerArea(-1),
+	fFlags(0),
+	fInitError(B_NO_INIT)
 {
-	fBasePointer = NULL;
 	*this = source;
 }
 
@@ -247,8 +272,6 @@ BBitmap::BBitmap(const BBitmap& source)
 */
 BBitmap::~BBitmap()
 {
-	if (fWindow && fWindow->Lock())
-		delete fWindow;
 	_CleanUp();
 }
 
@@ -1092,13 +1115,13 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// clear.
 		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
 			fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
-				if (fWindow) {
-					// A BWindow starts life locked and is unlocked
-					// in Show(), but this window is never shown and
-					// it's message loop is never started.
-					fWindow->Unlock();
-				} else
-					fInitError = B_NO_MEMORY;
+			if (fWindow) {
+				// A BWindow starts life locked and is unlocked
+				// in Show(), but this window is never shown and
+				// it's message loop is never started.
+				fWindow->Unlock();
+			} else
+				fInitError = B_NO_MEMORY;
 		}
 	}
 }
@@ -1110,12 +1133,19 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 void
 BBitmap::_CleanUp()
 {
+	if (fWindow != NULL) {
+		if (fWindow->Lock())
+			delete fWindow;
+		fWindow = NULL;
+			// this will leak fWindow if it couldn't be locked
+	}
+
 	if (fBasePointer == NULL)
 		return;
 
 	if ((fFlags & B_BITMAP_NO_SERVER_LINK) != 0) {
 		free(fBasePointer);
-	} else {
+	} else if (fServerToken != -1) {
 		BPrivate::AppServerLink link;
 		// AS_DELETE_BITMAP:
 		// Attached Data:
