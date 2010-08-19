@@ -532,7 +532,7 @@ bool
 AddOnMonitorHandler::_FindEntry(const node_ref& entry, const EntryList& list,
 	EntryList::iterator& it) const
 {
-	for (; it != list.end(); it++) {
+	for (; EntryList::const_iterator(it) != list.end(); it++) {
 		if (it->nref == entry)
 			return true;
 	}
@@ -544,7 +544,7 @@ bool
 AddOnMonitorHandler::_FindEntry(const char* name, const EntryList& list,
 	EntryList::iterator& it) const
 {
-	for (; it != list.end(); it++) {
+	for (; EntryList::const_iterator(it) != list.end(); it++) {
 		if (strcmp(it->name, name) == 0)
 			return true;
 	}
@@ -602,7 +602,7 @@ AddOnMonitorHandler::_FindDirectory(const node_ref& directoryNodeRef,
 	DirectoryList::iterator& it,
 	const DirectoryList::const_iterator& end) const
 {
-	for (; it != end; it++) {
+	for (; DirectoryList::const_iterator(it) != end; it++) {
 		if (it->nref == directoryNodeRef)
 			return true;
 	}
