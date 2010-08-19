@@ -24,17 +24,10 @@ typedef struct {
 	uint8 b[6];
 } __attribute__((packed)) bdaddr_t;
 
-namespace BPrivate {
 
-extern const bdaddr_t kBdNullAddress;
-extern const bdaddr_t kBdLocalAddress;
-extern const bdaddr_t kBdBroadcastAddress;
-
-}
-
-#define BDADDR_NULL			(&BPrivate::kBdNullAddress)
-#define BDADDR_LOCAL		(&BPrivate::kBdLocalAddress)
-#define BDADDR_BROADCAST	(&BPrivate::kBdBroadcastAddress)
+#define BDADDR_NULL			(&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+#define BDADDR_LOCAL		(&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+#define BDADDR_BROADCAST	(&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
 #define BDADDR_ANY			BDADDR_BROADCAST
 
 

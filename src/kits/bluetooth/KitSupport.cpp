@@ -11,16 +11,6 @@
 
 #include "KitSupport.h"
 
-
-namespace BPrivate {
-
-const bdaddr_t kBdNullAddress 		= {{0, 0, 0, 0, 0, 0}};
-const bdaddr_t kBdLocalAddress 		= {{0, 0, 0, 0xff, 0xff, 0xff}};
-const bdaddr_t kBdBroadcastAddress	= {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}};
-
-}
-
-
 BMessenger* _RetrieveBluetoothMessenger(void)
 {
 	// Fix/review: leaking memory here
