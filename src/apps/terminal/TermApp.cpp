@@ -266,8 +266,8 @@ TermApp::_GetWindowPositionFile(BFile* file, uint32 openMode)
 status_t
 TermApp::_LoadWindowPosition(BRect* frame, uint32* workspaces)
 {
-	status_t status = B_ERROR;
-	BMessage position = BMessage();
+	status_t status;
+	BMessage position;
 
 	BFile file;
 	status = _GetWindowPositionFile(&file, B_READ_ONLY);
@@ -294,7 +294,6 @@ TermApp::_LoadWindowPosition(BRect* frame, uint32* workspaces)
 	else
 		*workspaces = B_CURRENT_WORKSPACE;
 
-	printf("loading settings ok\n");
 	return B_OK;
 }
 
