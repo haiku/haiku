@@ -54,8 +54,10 @@ public:
 									media_format* _outputFormat, int32 cookie);
 
 private:
-			status_t			_RegisterAddOn(BEntry& entry);
 			void				_RegisterAddOns();
+
+			status_t			_RegisterAddOn(BEntry& entry);
+			status_t			_UnregisterAddOn(BEntry& entry);
 
 			void				_RegisterReader(ReaderPlugin* reader,
 									const entry_ref& ref);
@@ -99,7 +101,7 @@ private:
 			uint32				fNextWriterFormatFamilyID;
 			uint32				fNextEncoderCodecInfoID;
 
-			AddOnMonitorHandler* fHandler;
+			AddOnMonitorHandler* fAddOnMonitorHandler;
 			AddOnMonitor*		fAddOnMonitor;
 };
 

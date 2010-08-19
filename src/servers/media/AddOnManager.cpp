@@ -49,7 +49,7 @@ public:
 			unload_add_on(fImage);
 	}
 
-	status_t InitCheck() const { return fImage; }
+	status_t InitCheck() const { return fImage >= 0 ? B_OK : fImage; }
 	image_id Image() const { return fImage; }
 
 private:
@@ -64,13 +64,20 @@ AddOnManager::AddOnManager()
 	:
  	fLock("add-on manager"),
  	fNextWriterFormatFamilyID(0),
- 	fNextEncoderCodecInfoID(0)
+ 	fNextEncoderCodecInfoID(0),
+ 	fAddOnMonitorHandler(NULL),
+ 	fAddOnMonitor(NULL)
 {
 }
 
 
 AddOnManager::~AddOnManager()
 {
+	if (fAddOnMonitor != NULL && fAddOnMonitor->Lock()) {
+		fAddOnMonitor->RemoveHandler(fAddOnMonitorHandler);
+		delete fAddOnMonitorHandler;
+		fAddOnMonitor->Quit();
+	}
 }
 
 
@@ -223,6 +230,89 @@ AddOnManager::GetCodecInfo(media_codec_info* _codecInfo,
 // #pragma mark -
 
 
+void
+AddOnManager::_RegisterAddOns()
+{
+	class CodecHandler : public AddOnMonitorHandler {
+	private:
+		AddOnManager* fManager;
+
+	public:
+		CodecHandler(AddOnManager* manager)
+		{
+			fManager = manager;
+		}
+
+		virtual void AddOnCreated(const add_on_entry_info* entryInfo)
+		{
+		}
+
+		virtual void AddOnEnabled(const add_on_entry_info* entryInfo)
+		{
+			entry_ref ref;
+			make_entry_ref(entryInfo->dir_nref.device,
+				entryInfo->dir_nref.node, entryInfo->name, &ref);
+			BEntry entry(&ref, false);
+			if (entry.InitCheck() == B_OK)
+				fManager->_RegisterAddOn(entry);
+		}
+
+		virtual void AddOnDisabled(const add_on_entry_info* entryInfo)
+		{
+			entry_ref ref;
+			make_entry_ref(entryInfo->dir_nref.device,
+				entryInfo->dir_nref.node, entryInfo->name, &ref);
+			BEntry entry(&ref, false);
+			if (entry.InitCheck() == B_OK)
+				fManager->_UnregisterAddOn(entry);
+		}
+
+		virtual void AddOnRemoved(const add_on_entry_info* entryInfo)
+		{
+		}
+	};
+
+	const directory_which directories[] = {
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_BEOS_ADDONS_DIRECTORY,
+	};
+
+	fAddOnMonitorHandler = new CodecHandler(this);
+	fAddOnMonitor = new AddOnMonitor(fAddOnMonitorHandler);
+
+	// get safemode option for disabling user add-ons
+
+	char buffer[16];
+	size_t size = sizeof(buffer);
+
+	bool disableUserAddOns = _kern_get_safemode_option(
+			B_SAFEMODE_DISABLE_USER_ADD_ONS, buffer, &size) == B_OK
+		&& (!strcasecmp(buffer, "true")
+			|| !strcasecmp(buffer, "yes")
+			|| !strcasecmp(buffer, "on")
+			|| !strcasecmp(buffer, "enabled")
+			|| !strcmp(buffer, "1"));
+
+	node_ref nref;
+	BDirectory directory;
+	BPath path;
+	for (uint i = 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++) {
+		if (disableUserAddOns && i <= 1)
+			continue;
+
+		if (find_directory(directories[i], &path) == B_OK
+			&& path.Append("media/plugins") == B_OK
+			&& directory.SetTo(path.Path()) == B_OK
+			&& directory.GetNodeRef(&nref) == B_OK) {
+			fAddOnMonitorHandler->AddDirectory(&nref);
+				// NOTE: This may already start registering add-ons in the
+				// AddOnMonitor looper thread after the call returns!
+		}
+	}
+}
+
+
 status_t
 AddOnManager::_RegisterAddOn(BEntry& entry)
 {
@@ -237,7 +327,7 @@ AddOnManager::_RegisterAddOn(BEntry& entry)
 		path.Path());
 
 	ImageLoader loader(path);
-	if ((status = loader.InitCheck()) < B_OK)
+	if ((status = loader.InitCheck()) != B_OK)
 		return status;
 
 	MediaPlugin* (*instantiate_plugin_func)();
@@ -280,78 +370,68 @@ AddOnManager::_RegisterAddOn(BEntry& entry)
 }
 
 
-void
-AddOnManager::_RegisterAddOns()
+status_t
+AddOnManager::_UnregisterAddOn(BEntry& entry)
 {
-	class CodecHandler : public AddOnMonitorHandler {
-	private:
-		AddOnManager* fManager;
+BPath path(&entry);
+printf("AddOnManager::_UnregisterAddOn(): trying to unload \"%s\"\n",
+	path.Path());
 
-	public:
-		CodecHandler(AddOnManager* manager)
-		{
-			fManager = manager;
-		}
+	BAutolock locker(fLock);
 
-		virtual void AddOnCreated(const add_on_entry_info* entryInfo)
-		{
-		}
+	entry_ref ref;
+	status_t status = entry.GetRef(&ref);
+	if (status != B_OK)
+		return status;
 
-		virtual void AddOnEnabled(const add_on_entry_info* entryInfo)
-		{
-			entry_ref ref;
-			make_entry_ref(entryInfo->dir_nref.device,
-				entryInfo->dir_nref.node, entryInfo->name, &ref);
-			BEntry entry(&ref, false);
-			if (entry.InitCheck() == B_OK)
-				fManager->_RegisterAddOn(entry);
-		}
-
-		virtual void AddOnDisabled(const add_on_entry_info* entryInfo)
-		{
-		}
-
-		virtual void AddOnRemoved(const add_on_entry_info* entryInfo)
-		{
-		}
-	};
-
-	const directory_which directories[] = {
-		B_USER_ADDONS_DIRECTORY,
-		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY,
-	};
-
-	fHandler = new CodecHandler(this);
-	fAddOnMonitor = new AddOnMonitor(fHandler);
-
-	// get safemode option for disabling user add-ons
-
-	char buffer[16];
-	size_t size = sizeof(buffer);
-
-	bool disableUserAddOns = _kern_get_safemode_option(
-			B_SAFEMODE_DISABLE_USER_ADD_ONS, buffer, &size) == B_OK
-		&& (!strcasecmp(buffer, "true")
-			|| !strcasecmp(buffer, "yes")
-			|| !strcasecmp(buffer, "on")
-			|| !strcasecmp(buffer, "enabled")
-			|| !strcmp(buffer, "1"));
-
-	node_ref nref;
-	BDirectory directory;
-	BPath path;
-	for (uint i = 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++) {
-		if (disableUserAddOns && i <= 1)
-			continue;
-
-		if (find_directory(directories[i], &path) == B_OK
-			&& path.Append("media/plugins") == B_OK
-			&& directory.SetTo(path.Path()) == B_OK
-			&& directory.GetNodeRef(&nref) == B_OK) {
-			fHandler->AddDirectory(&nref);
+	// Remove any Readers exported by this add-on
+	reader_info* readerInfo;
+	for (fReaderList.Rewind(); fReaderList.GetNext(&readerInfo);) {
+		if (readerInfo->ref == ref) {
+printf("removing reader '%s'\n", readerInfo->ref.name);
+			fReaderList.RemoveCurrent();
+			break;
 		}
 	}
+
+	// Remove any Decoders exported by this add-on
+	decoder_info* decoderInfo;
+	for (fDecoderList.Rewind(); fDecoderList.GetNext(&decoderInfo);) {
+		if (decoderInfo->ref == ref) {
+printf("removing decoder '%s'\n", decoderInfo->ref.name);
+			fDecoderList.RemoveCurrent();
+			break;
+		}
+	}
+
+	// Remove any Writers exported by this add-on
+	writer_info* writerInfo;
+	for (fWriterList.Rewind(); fWriterList.GetNext(&writerInfo);) {
+		if (writerInfo->ref == ref) {
+			// Remove any formats from this writer
+			media_file_format* writerFormat;
+			for (fWriterFileFormats.Rewind();
+				fWriterFileFormats.GetNext(&writerFormat);) {
+				if (writerFormat->id.internal_id == writerInfo->internalID)
+					fWriterFileFormats.RemoveCurrent();
+			}
+printf("removing writer '%s'\n", writerInfo->ref.name);
+			fWriterList.RemoveCurrent();
+			break;
+		}
+	}
+
+	encoder_info* encoderInfo;
+	for (fEncoderList.Rewind(); fEncoderList.GetNext(&encoderInfo);) {
+		if (encoderInfo->ref == ref) {
+printf("removing encoder '%s', id %lu\n", encoderInfo->ref.name,
+	encoderInfo->internalID);
+			fEncoderList.RemoveCurrent();
+			// Keep going, since we add multiple encoder infos per add-on.
+		}
+	}
+
+	return B_OK;
 }
 
 
