@@ -16,8 +16,10 @@
 #include <List.h>
 #include <InputServerFilter.h>
 
+#ifndef __HAIKU__
 #ifndef __INTEL__
 #pragma export on 
+#endif
 #endif
 
 struct key_map; // declaration
@@ -362,8 +364,10 @@ private:
 			BMessage				fSendMsg;
 };
 
+#ifndef __HAIKU__
 #ifndef __INTEL__
 #pragma export reset
+#endif
 #endif
 
 #endif

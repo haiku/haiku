@@ -19,8 +19,10 @@
 // This file contains various BitTester classes, each of which defines a 
 // sequence of bit testing logics to do on a uint32.
 
+#ifndef __HAIKU__
 #ifndef __INTEL__
 #pragma export on 
+#endif
 #endif
 
 // The abstract base class. Defines the interface.
@@ -114,8 +116,10 @@ private:
 			bool			fDeleteSlaves;
 };
 
+#ifndef __HAIKU__
 #ifndef __INTEL__
 #pragma export reset 
+#endif
 #endif
 
 #endif
