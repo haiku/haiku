@@ -83,7 +83,7 @@ extern const char* STR_BBX_OPTIONS;
 extern const char* STR_CBX_DIR_LIST;
 extern const char* STR_CBX_DIR_LIST_LABEL;
 extern const char* STR_FILEPANEL_SELECT_WEB_DIR;
-	
+
 extern const char* STR_TAB_LOGGING;
 extern const char* STR_BBX_CONSOLE_LOGGING;
 extern const char* STR_CBX_LOG_CONSOLE;
@@ -92,12 +92,12 @@ extern const char* STR_CBX_LOG_FILE;
 extern const char* STR_TXT_LOG_FILE_NAME;
 extern const char* STR_BTN_CREATE_LOG_FILE;
 extern const char* STR_FILEPANEL_CREATE_LOG_FILE;
-	
+
 extern const char* STR_TAB_ADVANCED;
 extern const char* STR_BBX_CONNECTION;
 extern const char* STR_SLD_LABEL;
 extern 		 char* STR_SLD_STATUS_LABEL;
-			 
+
 extern const char CMD_FILE_SAVE_AS;
 extern const char CMD_FILE_QUIT;
 extern const char CMD_EDIT_COPY;
