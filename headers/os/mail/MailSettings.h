@@ -83,7 +83,7 @@ public:
 		bool delete_when_done = false);
 	
   private:
-	status_t Path(BPath* path) const;
+	status_t GetPath(BPath& path) const;
 	status_t Load(BMessage*);
 	
 	int32 fId;

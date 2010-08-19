@@ -200,7 +200,7 @@ BMailChain::Instantiate(BMessage* archive)
 
 
 status_t
-BMailChain::Path(BPath* path) const
+BMailChain::GetPath(BPath& path) const
 {
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY,path);
 	if (status < B_OK) {
@@ -209,16 +209,16 @@ BMailChain::Path(BPath* path) const
 		return status;
 	}
 
-	path->Append("Mail/chains");
+	path.Append("Mail/chains");
 
 	if (ChainDirection() == outbound)
-		path->Append("outbound");
+		path.Append("outbound");
 	else
-		path->Append("inbound");
+		path.Append("inbound");
 
 	BString leaf;
 	leaf << fId;
-	path->Append(leaf.String());
+	path.Append(leaf.String());
 
 	return B_OK;
 }
@@ -227,10 +227,8 @@ BMailChain::Path(BPath* path) const
 status_t
 BMailChain::Save(bigtime_t /*timeout*/)
 {
-	status_t ret;
-	
 	BMessage archive;
-	ret = Archive(&archive,true);
+	status_t ret = Archive(&archive, true);
 	if (ret != B_OK) {
 		fprintf(stderr, "Couldn't archive chain %ld: %s\n",
 			fId, strerror(ret));
@@ -238,14 +236,15 @@ BMailChain::Save(bigtime_t /*timeout*/)
 	}
 
 	BPath path;
-	if ((ret = Path(&path)) < B_OK)
+	if ((ret = GetPath(path)) < B_OK)
 		return ret;
 
 	BPath directory;
 	if ((ret = path.GetParent(&directory)) < B_OK)
 		return ret;
 
-	return MailInternal::WriteMessageFile(archive,directory,path.Leaf()/*,timeout*/);
+	return MailInternal::WriteMessageFile(archive, directory,
+		path.Leaf()/*, timeout*/);
 }
 
 
@@ -254,7 +253,7 @@ BMailChain::Delete() const
 {
 	status_t status;
 	BPath path;
-	if ((status = Path(&path)) < B_OK)
+	if ((status = GetPath(path)) < B_OK)
 		return status;
 
 	BEntry entry(path.Path());
@@ -466,7 +465,7 @@ status_t
 BMailChain::AddFilter(int32 index, const BMessage& settings,
 	const entry_ref& addon)
 {
-	BMessage*s = new BMessage(settings);
+	BMessage* s = new BMessage(settings);
 	entry_ref* a = new entry_ref(addon);
 	
 	if (!fFilterSettings.AddItem(s, index)) {
