@@ -40,8 +40,7 @@ All rights reserved.
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <Debug.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <SpaceLayoutItem.h>
 #include <SeparatorView.h>
@@ -162,33 +161,33 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 	fDone->MakeDefault(true);
 
 	// Layout the controls
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
-			.Add(BGroupLayoutBuilder(autoMountLayout)
+	BGroupView* contentView = new BGroupView(B_VERTICAL, 0);
+	AddChild(contentView);
+	BLayoutBuilder::Group<>(contentView)
+		.AddGroup(B_VERTICAL, spacing)
+			.SetInsets(spacing, spacing, spacing, spacing)
+			.AddGroup(autoMountLayout)
 				.Add(fScanningDisabledCheck)
 				.Add(fAutoMountAllBFSCheck)
 				.Add(fAutoMountAllCheck)
-			)
-			.Add(BGroupLayoutBuilder(bootMountLayout)
+				.End()
+			.AddGroup(bootMountLayout)
 				.Add(fInitialDontMountCheck)
 				.Add(fInitialMountRestoreCheck)
 				.Add(fInitialMountAllBFSCheck)
 				.Add(fInitialMountAllCheck)
-			)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing - 1))
+				.End()
+			.AddGroup(B_HORIZONTAL)
+				.AddStrut(spacing - 1)
 				.Add(fEjectWhenUnmountingCheckBox)
-			)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		)
+				.End()
+			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL/*, B_FANCY_BORDER*/))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.SetInsets(spacing, spacing, spacing, spacing)
 			.AddGlue()
 			.Add(fMountAllNow)
-			.Add(fDone)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		)
-	);
+			.Add(fDone);
 
 
 	// Apply the settings
