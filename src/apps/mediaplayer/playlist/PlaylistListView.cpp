@@ -71,6 +71,12 @@ public:
 
 	virtual	void				ItemChanged(const PlaylistItem* item);
 
+#if __GNUC__ == 2
+	virtual	void				Draw(BView* owner, BRect frame, uint32 flags);
+#else
+			using SimpleItem::Draw;
+#endif
+
 private:
 			PlaylistItemRef		fItem;
 
@@ -217,6 +223,17 @@ PlaylistListView::Item::ItemChanged(const PlaylistItem* item)
 {
 	// TODO: Invalidate
 }
+
+
+#if __GNUC__ == 2
+
+void
+PlaylistListView::Item::Draw(BView* owner, BRect frame, uint32 flags)
+{
+	SimpleItem::Draw(owner, frame, flags);
+}
+
+#endif
 
 
 // #pragma mark -
