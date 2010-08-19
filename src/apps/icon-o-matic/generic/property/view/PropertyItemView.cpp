@@ -59,11 +59,11 @@ PropertyItemView::Draw(BRect updateRect)
 			labelColor = tint_color(labelColor, B_DARKEN_MAX_TINT);
 		else
 			labelColor = tint_color(labelColor, B_DISABLED_LABEL_TINT);
-		
+
 		SetHighColor(labelColor);
 		BFont font;
 		GetFont(&font);
-		
+
 		BString truncated(name_for_id(property->Identifier()));
 		font.TruncateString(&truncated, B_TRUNCATE_MIDDLE, fLabelWidth - 10.0);
 
@@ -114,11 +114,12 @@ PropertyItemView::MouseDown(BPoint where)
 
 		if (BMessage* message = Window()->CurrentMessage()) {
 			int32 clicks;
-			if (message->FindInt32("clicks", &clicks) >= B_OK)
+			if (message->FindInt32("clicks", &clicks) >= B_OK) {
 				if (clicks >= 2)
 					fParent->DoubleClicked(this);
 				else
 					fParent->Clicked(this);
+			}
 		}
 	}
 }

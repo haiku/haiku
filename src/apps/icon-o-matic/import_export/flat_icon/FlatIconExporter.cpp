@@ -451,8 +451,7 @@ _WriteTransformer(LittleEndianBuffer& buffer, Transformer* t)
 			|| !buffer.Write(miterLimit))
 			return false;
 
-	} else if (PerspectiveTransformer* perspective
-		= dynamic_cast<PerspectiveTransformer*>(t)) {
+	} else if (dynamic_cast<PerspectiveTransformer*>(t)) {
 		// perspective
 		if (!buffer.Write((uint8)TRANSFORMER_TYPE_PERSPECTIVE))
 			return false;
