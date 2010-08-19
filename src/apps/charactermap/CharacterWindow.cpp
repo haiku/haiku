@@ -268,7 +268,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 
 			BlockListItem* item
 				= static_cast<BlockListItem*>(fUnicodeBlockView->ItemAt(index));
-			fCharacterView->ScrollTo(item->BlockIndex());
+			fCharacterView->ScrollToBlock(item->BlockIndex());
 
 			fFilterControl->MakeFocus();
 			break;

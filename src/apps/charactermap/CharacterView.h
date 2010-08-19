@@ -30,7 +30,7 @@ public:
 
 			bool			IsShowingBlock(int32 blockIndex) const;
 
-			void			ScrollTo(int32 blockIndex);
+			void			ScrollToBlock(int32 blockIndex);
 
 	static	void			UnicodeToUTF8(uint32 c, char* text,
 								size_t textSize);

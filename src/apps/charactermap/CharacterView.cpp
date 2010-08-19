@@ -103,7 +103,7 @@ CharacterView::IsShowingBlock(int32 blockIndex) const
 
 
 void
-CharacterView::ScrollTo(int32 blockIndex)
+CharacterView::ScrollToBlock(int32 blockIndex)
 {
 	if (blockIndex < 0)
 		blockIndex = 0;
