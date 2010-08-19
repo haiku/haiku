@@ -40,7 +40,7 @@ PadView::PadView(const char* name)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	get_click_speed(&sActivationDelay); 
+	get_click_speed(&sActivationDelay);
 
 	fButtonLayout->SetInsets(2, 7, 2, 2);
 	SetLayout(fButtonLayout);
@@ -91,20 +91,16 @@ PadView::Draw(BRect updateRect)
 	while (current <= stop) {
 		rgb_color col1;
 		rgb_color col2;
-		switch (num) {
-			case 1:
-				col1 = shadow;
-				col2 = background;
-				break;
-			case 2:
-				col1 = background;
-				col2 = light;
-				break;
-			case 3:
-				col1 = background;
-				col2 = background;
-				num = 0;
-				break;
+		if (num == 1) {
+			col1 = shadow;
+			col2 = background;
+		} else if (num == 2) {
+			col1 = background;
+			col2 = light;
+		} else {
+			col1 = background;
+			col2 = background;
+			num = 0;
 		}
 		SetHighColor(col1);
 		StrokeLine(dot, dot, B_SOLID_HIGH);
@@ -369,7 +365,7 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		message = new BMessage(MSG_SET_ICON_SIZE);
 		message->AddInt32("size", iconSize);
 		BString label;
-		label << iconSize << " x " << iconSize; 
+		label << iconSize << " x " << iconSize;
 		item = new BMenuItem(label.String(), message);
 		item->SetTarget(this);
 		item->SetMarked(IconSize() == iconSize);
