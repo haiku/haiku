@@ -5,6 +5,7 @@
 #ifndef _BTCOREDATA_H
 #define _BTCOREDATA_H
 
+
 #include <module.h>
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
@@ -18,7 +19,9 @@
 #include <bluetooth/HCI/btHCI_transport.h>
 #include <l2cap.h>
 
+
 #define BT_CORE_DATA_MODULE_NAME "bluetooth/btCoreData/v1"
+
 
 struct L2capChannel;
 struct L2capFrame;
@@ -28,6 +31,7 @@ typedef enum _connection_status {
 	HCI_CONN_CLOSED,
 	HCI_CONN_OPEN,
 } connection_status;
+
 
 #ifdef __cplusplus
 
@@ -138,12 +142,12 @@ struct bluetooth_core_data_module_info {
 	status_t				(*PostEvent)(bluetooth_device* ndev, void* event,
 								size_t size);
 	struct HciConnection*	(*AddConnection)(uint16 handle, int type,
-								bdaddr_t* dst, hci_id hid);
+								const bdaddr_t& dst, hci_id hid);
 
 	// status_t				(*RemoveConnection)(bdaddr_t destination, hci_id hid);
 	status_t				(*RemoveConnection)(uint16 handle, hci_id hid);
 
-	hci_id					(*RouteConnection)(const bdaddr_t* destination);
+	hci_id					(*RouteConnection)(const bdaddr_t& destination);
 
 	void					(*SetAclBuffer)(struct HciConnection* conn,
 								net_buffer* nbuf);
@@ -155,8 +159,8 @@ struct bluetooth_core_data_module_info {
 	bool					(*AclOverFlowed)(struct HciConnection* conn);
 
 	struct HciConnection*	(*ConnectionByHandle)(uint16 handle, hci_id hid);
-	struct HciConnection*	(*ConnectionByDestination)(const bdaddr_t* destination,
-								hci_id hid);
+	struct HciConnection*	(*ConnectionByDestination)(
+								const bdaddr_t& destination, hci_id hid);
 
 	struct L2capChannel*	(*AddChannel)(struct HciConnection* conn,
 								uint16 psm);
@@ -169,20 +173,24 @@ struct bluetooth_core_data_module_info {
 
 	struct L2capFrame*		(*SignalByIdent)(struct HciConnection* conn,
 								uint8 ident);
-	status_t				(*TimeoutSignal)(struct L2capFrame* frame, uint32 timeo);
+	status_t				(*TimeoutSignal)(struct L2capFrame* frame,
+								uint32 timeo);
 	status_t				(*UnTimeoutSignal)(struct L2capFrame* frame);
 	struct L2capFrame*		(*SpawnFrame)(struct HciConnection* conn,
-								struct L2capChannel* channel, net_buffer* buffer, frame_type frame);
+								struct L2capChannel* channel,
+								net_buffer* buffer, frame_type frame);
 	struct L2capFrame*		(*SpawnSignal)(struct HciConnection* conn,
-								struct L2capChannel* channel, net_buffer* buffer,
-								uint8 ident, uint8 code);
+								struct L2capChannel* channel,
+								net_buffer* buffer, uint8 ident, uint8 code);
 	status_t				(*AcknowledgeSignal)(struct L2capFrame* frame);
 	status_t				(*QueueSignal)(struct L2capFrame* frame);
 
 };
 
 
-inline bool ExistConnectionByDestination(bdaddr_t* destination, hci_id hid);
+inline bool ExistConnectionByDestination(const bdaddr_t& destination,
+				hci_id hid);
 inline bool ExistConnectionByHandle(uint16 handle, hci_id hid);
+
 
 #endif // _BTCOREDATA_H

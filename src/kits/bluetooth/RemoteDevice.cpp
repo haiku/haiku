@@ -115,9 +115,7 @@ RemoteDevice::GetBluetoothAddress()
 bool
 RemoteDevice::Equals(RemoteDevice* obj)
 {
-	bdaddr_t ba = obj->GetBluetoothAddress();
-
-	return bdaddrUtils::Compare(&fBdaddr, &ba);
+	return bdaddrUtils::Compare(fBdaddr, obj->GetBluetoothAddress());
 }
 
 
@@ -135,7 +133,7 @@ RemoteDevice::Authenticate()
 	BluetoothCommand<typed_command(hci_cp_create_conn)>
 		createConnection(OGF_LINK_CONTROL, OCF_CREATE_CONN);
 
-	bdaddrUtils::Copy(&createConnection->bdaddr, &fBdaddr);
+	bdaddrUtils::Copy(createConnection->bdaddr, fBdaddr);
 	createConnection->pscan_rep_mode = fPageRepetitionMode;
 	createConnection->pscan_mode = fScanMode; // Reserved in spec 2.1
 	createConnection->clock_offset = fClockOffset | 0x8000; // substract!

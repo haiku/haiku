@@ -19,7 +19,7 @@ net_buffer_module_info* gBufferModule = NULL;
 
 
 inline bool
-ExistConnectionByDestination(bdaddr_t* destination, hci_id hid = -1)
+ExistConnectionByDestination(const bdaddr_t& destination, hci_id hid = -1)
 {
 	return (ConnectionByDestination(destination, hid) != NULL);
 }
@@ -102,7 +102,7 @@ PostEvent(bluetooth_device* ndev, void* event, size_t size)
 
 			// TODO: XXX parse handle field
 			HciConnection* conn = AddConnection(data->handle, BT_ACL,
-				&data->bdaddr, ndev->index);
+				data->bdaddr, ndev->index);
 
 			if (conn == NULL)
 				panic("no mem for conn desc");

@@ -1198,6 +1198,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons input_server devices ;
 #	EnableWerror src add-ons input_server filters ;
 #	EnableWerror src add-ons input_server methods ;
+	EnableWerror src add-ons kernel bluetooth ;
 #	EnableWerror src add-ons kernel bus_managers acpi ;
 	EnableWerror src add-ons kernel bus_managers agp_gart ;
 	EnableWerror src add-ons kernel bus_managers ata ;
@@ -1391,23 +1392,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 #	EnableWerror src kits tracker ;
 	EnableWerror src kits translation ;
 	EnableWerror src preferences ;
-	EnableWerror src servers app ;
-#	EnableWerror src servers bluetooth ;
-	EnableWerror src servers cddb_daemon ;
-	EnableWerror src servers debug ;
-	EnableWerror src servers input ;
-	EnableWerror src servers mail ;
-	EnableWerror src servers media ;
-	EnableWerror src servers media_addon ;
-	EnableWerror src servers midi ;
-	EnableWerror src servers mount ;
-	EnableWerror src servers net ;
-	EnableWerror src servers notification ;
-	EnableWerror src servers power ;
-	EnableWerror src servers print ;
-	EnableWerror src servers registrar ;
-	EnableWerror src servers services_daemon ;
-	EnableWerror src servers syslog_daemon ;
+	EnableWerror src servers ;
 	EnableWerror src system kernel ;
 	EnableWerror src system runtime_loader ;
 }

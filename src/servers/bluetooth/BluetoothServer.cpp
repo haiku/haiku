@@ -509,7 +509,7 @@ BluetoothServer::SDPServerThread(void* data)
 	// bind socket to port 0x1001 of the first available
 	// bluetooth adapter
 	loc_addr.l2cap_family = AF_BLUETOOTH;
-	loc_addr.l2cap_bdaddr = *BDADDR_ANY;
+	loc_addr.l2cap_bdaddr = BDADDR_ANY;
 	loc_addr.l2cap_psm = B_HOST_TO_LENDIAN_INT16(1);
 	loc_addr.l2cap_len = sizeof(struct sockaddr_l2cap);
 

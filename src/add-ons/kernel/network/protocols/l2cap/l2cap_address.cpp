@@ -95,7 +95,7 @@ l2cap_is_empty_address(const sockaddr *address, bool checkPort)
 		return true;
 
 	return ((bdaddrUtils::Compare(
-		&((const sockaddr_l2cap *)address)->l2cap_bdaddr, BDADDR_NULL)==0)
+		((const sockaddr_l2cap *)address)->l2cap_bdaddr, BDADDR_NULL)==0)
 		&& (!checkPort || ((sockaddr_l2cap *)address)->l2cap_psm == 0));
 }
 
@@ -127,8 +127,8 @@ l2cap_equal_addresses(const sockaddr *a, const sockaddr *b)
 	if (a == NULL && b != NULL)
 		return l2cap_is_empty_address(b, false);
 
-	return bdaddrUtils::Compare(&((const sockaddr_l2cap*)a)->l2cap_bdaddr,
-		&((sockaddr_l2cap*)b)->l2cap_bdaddr);
+	return bdaddrUtils::Compare(((const sockaddr_l2cap*)a)->l2cap_bdaddr,
+		((sockaddr_l2cap*)b)->l2cap_bdaddr);
 }
 
 
@@ -159,8 +159,8 @@ l2cap_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
 	if (a == NULL && b != NULL)
 		return l2cap_is_empty_address(b, true);
 
-	return (bdaddrUtils::Compare(&((const sockaddr_l2cap *)a)->l2cap_bdaddr,
-		&((const sockaddr_l2cap *)b)->l2cap_bdaddr))
+	return (bdaddrUtils::Compare(((const sockaddr_l2cap *)a)->l2cap_bdaddr,
+		((const sockaddr_l2cap *)b)->l2cap_bdaddr))
 		&& ((sockaddr_l2cap *)a)->l2cap_psm == ((sockaddr_l2cap *)b)->l2cap_psm;
 }
 
@@ -329,7 +329,7 @@ l2cap_update_to(sockaddr *_address, const sockaddr *_from)
 	if (address->l2cap_psm == 0)
 		address->l2cap_psm = from->l2cap_psm;
 
-	if (bdaddrUtils::Compare(&address->l2cap_bdaddr, BDADDR_BROADCAST))
+	if (bdaddrUtils::Compare(address->l2cap_bdaddr, BDADDR_BROADCAST))
 		address->l2cap_bdaddr = from->l2cap_bdaddr;
 
 	return B_OK;

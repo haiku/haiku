@@ -37,7 +37,7 @@ HciConnection::~HciConnection()
 
 
 HciConnection*
-AddConnection(uint16 handle, int type, bdaddr_t* dst, hci_id hid)
+AddConnection(uint16 handle, int type, const bdaddr_t& dst, hci_id hid)
 {
 	// Create connection descriptor
 
@@ -55,7 +55,7 @@ AddConnection(uint16 handle, int type, bdaddr_t* dst, hci_id hid)
 	conn->currentRxExpectedLength = 0;
 update:
 	// fill values
-	bdaddrUtils::Copy(&conn->destination, dst);
+	bdaddrUtils::Copy(conn->destination, dst);
 	conn->type = type;
 	conn->handle = handle;
 	conn->Hid = hid;
@@ -72,7 +72,7 @@ bail:
 
 
 status_t
-RemoveConnection(bdaddr_t* destination, hci_id hid)
+RemoveConnection(const bdaddr_t& destination, hci_id hid)
 {
 	HciConnection*	conn;
 
@@ -83,7 +83,7 @@ RemoveConnection(bdaddr_t* destination, hci_id hid)
 
 		conn = iterator.Next();
 		if (conn->Hid == hid
-			&& bdaddrUtils::Compare(&conn->destination, destination)) {
+			&& bdaddrUtils::Compare(conn->destination, destination)) {
 
 			// if the device is still part of the list, remove it
 			if (conn->GetDoublyLinkedListLink()->next != NULL
@@ -129,7 +129,7 @@ RemoveConnection(uint16 handle, hci_id hid)
 
 
 hci_id
-RouteConnection(const bdaddr_t* destination) {
+RouteConnection(const bdaddr_t& destination) {
 
 	HciConnection* conn;
 
@@ -138,7 +138,7 @@ RouteConnection(const bdaddr_t* destination) {
 	while (iterator.HasNext()) {
 
 		conn = iterator.Next();
-		if (bdaddrUtils::Compare(&conn->destination, destination)) {
+		if (bdaddrUtils::Compare(conn->destination, destination)) {
 			return conn->Hid;
 		}
 	}
@@ -167,7 +167,7 @@ ConnectionByHandle(uint16 handle, hci_id hid)
 
 
 HciConnection*
-ConnectionByDestination(const bdaddr_t* destination, hci_id hid)
+ConnectionByDestination(const bdaddr_t& destination, hci_id hid)
 {
 	HciConnection*	conn;
 
@@ -177,7 +177,7 @@ ConnectionByDestination(const bdaddr_t* destination, hci_id hid)
 
 		conn = iterator.Next();
 		if (conn->Hid == hid
-			&& bdaddrUtils::Compare(&conn->destination, destination)) {
+			&& bdaddrUtils::Compare(conn->destination, destination)) {
 			return conn;
 		}
 	}

@@ -25,9 +25,9 @@ typedef struct {
 } __attribute__((packed)) bdaddr_t;
 
 
-#define BDADDR_NULL			(&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
-#define BDADDR_LOCAL		(&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
-#define BDADDR_BROADCAST	(&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
+#define BDADDR_NULL			((bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+#define BDADDR_LOCAL		((bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+#define BDADDR_BROADCAST	((bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
 #define BDADDR_ANY			BDADDR_BROADCAST
 
 

@@ -34,15 +34,15 @@ public:
 	}
 
 
-	static bool Compare(const bdaddr_t* ba1, const bdaddr_t* ba2)
+	static bool Compare(const bdaddr_t& ba1, const bdaddr_t& ba2)
 	{
-		return (memcmp(ba1, ba2, sizeof(bdaddr_t)) == 0);
+		return (memcmp(&ba1, &ba2, sizeof(bdaddr_t)) == 0);
 	}
 
 
-	static void Copy(bdaddr_t* dst, const bdaddr_t* src)
+	static void Copy(bdaddr_t& dst, const bdaddr_t& src)
 	{
-		memcpy(dst, src, sizeof(bdaddr_t));
+		memcpy(&dst, &src, sizeof(bdaddr_t));
 	}
 
 	static char* ToString(const bdaddr_t bdaddr)

@@ -143,8 +143,7 @@ DeviceListItem::Compare(const void	*firstArg, const void	*secondArg)
 	const DeviceListItem* item2 = *static_cast<const DeviceListItem* const *>
 		(secondArg);
 
-	return (int)bdaddrUtils::Compare((bdaddr_t*)&item1->fAddress,
-		(bdaddr_t*)&item2->fAddress);
+	return (int)bdaddrUtils::Compare(item1->fAddress, item2->fAddress);
 }
 
 

@@ -975,7 +975,7 @@ LocalDeviceImpl::LinkKeyRequested(struct hci_ev_link_key_req* keyRequested,
 	BluetoothCommand<typed_command(hci_cp_link_key_neg_reply)>
 		linkKeyNegativeReply(OGF_LINK_CONTROL, OCF_LINK_KEY_NEG_REPLY);
 
-	bdaddrUtils::Copy(&linkKeyNegativeReply->bdaddr, &keyRequested->bdaddr);
+	bdaddrUtils::Copy(linkKeyNegativeReply->bdaddr, keyRequested->bdaddr);
 
 	if ((fHCIDelegate)->IssueCommand(linkKeyNegativeReply.Data(),
 		linkKeyNegativeReply.Size()) == B_ERROR) {

@@ -15,16 +15,16 @@
 extern DoublyLinkedList<HciConnection> sConnectionList;
 
 HciConnection* ConnectionByHandle(uint16 handle, hci_id hid);
-HciConnection* ConnectionByDestination(const bdaddr_t* destination,
+HciConnection* ConnectionByDestination(const bdaddr_t& destination,
 	hci_id hid);
 
 
-HciConnection* AddConnection(uint16 handle, int type, bdaddr_t* dst,
+HciConnection* AddConnection(uint16 handle, int type, const bdaddr_t& dst,
 	hci_id hid);
-status_t RemoveConnection(bdaddr_t* destination, hci_id hid);
+status_t RemoveConnection(const bdaddr_t& destination, hci_id hid);
 status_t RemoveConnection(uint16 handle, hci_id hid);
 
-hci_id RouteConnection(const bdaddr_t* destination);
+hci_id RouteConnection(const bdaddr_t& destination);
 
 void SetAclBuffer(HciConnection* conn, net_buffer* nbuf);
 void SetAclExpectedSize(HciConnection* conn, size_t size);

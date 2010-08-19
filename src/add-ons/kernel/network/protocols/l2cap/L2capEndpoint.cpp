@@ -237,14 +237,14 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 	// TODO: If we were bound to a specific source address
 
 	// Route, we must find a Connection descriptor with address->l2cap_address
-	hci_id hid = btCoreData->RouteConnection(&address->l2cap_bdaddr);
+	hci_id hid = btCoreData->RouteConnection(address->l2cap_bdaddr);
 
 	debugf("%lx for route %s\n", hid,
 		bdaddrUtils::ToString(address->l2cap_bdaddr));
 
 	if (hid > 0) {
 		HciConnection* connection = btCoreData->ConnectionByDestination(
-			&address->l2cap_bdaddr, hid);
+			address->l2cap_bdaddr, hid);
 
 		L2capChannel* channel = btCoreData->AddChannel(connection,
 			address->l2cap_psm);

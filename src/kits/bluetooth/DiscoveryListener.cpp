@@ -45,7 +45,7 @@ DiscoveryListener::InquiryCompleted(int discType)
 /* private */
 
 /* A LocalDevice is always referenced in any request to the
- * Bluetooth server therefore is going to be needed in any 
+ * Bluetooth server therefore is going to be needed in any
  */
 void
 DiscoveryListener::SetLocalDeviceOwner(LocalDevice* ld)
@@ -73,21 +73,26 @@ DiscoveryListener::MessageReceived(BMessage* message)
 			ssize_t	size;
 			RemoteDevice* rd = NULL;
 			bool duplicatedFound = false;
-				
+
 			//  TODO: Loop for all inquiryInfo!
-			if (message->FindData("info", B_ANY_TYPE, 0, (const void**)&inquiryInfo, &size) == B_OK) {
+			if (message->FindData("info", B_ANY_TYPE, 0,
+					(const void**)&inquiryInfo, &size) == B_OK) {
 				// Skip duplicated replies
-				for (int32 index = 0 ; index < fRemoteDevicesList.CountItems(); index++) {
-					
-					bdaddr_t b1 = fRemoteDevicesList.ItemAt(index)->GetBluetoothAddress();
+				for (int32 index = 0 ; index < fRemoteDevicesList.CountItems();
+					index++) {
+					bdaddr_t b1 = fRemoteDevicesList.ItemAt(index)
+						->GetBluetoothAddress();
 
-					if (bdaddrUtils::Compare((bdaddr_t*) &inquiryInfo->bdaddr, &b1)) {
-
+					if (bdaddrUtils::Compare(inquiryInfo->bdaddr, b1)) {
 						// update these values
-						fRemoteDevicesList.ItemAt(index)->fPageRepetitionMode = inquiryInfo->pscan_rep_mode;
-						fRemoteDevicesList.ItemAt(index)->fScanPeriodMode = inquiryInfo->pscan_period_mode;
-						fRemoteDevicesList.ItemAt(index)->fScanMode = inquiryInfo->pscan_mode;
-						fRemoteDevicesList.ItemAt(index)->fClockOffset = inquiryInfo->clock_offset;
+						fRemoteDevicesList.ItemAt(index)->fPageRepetitionMode
+							= inquiryInfo->pscan_rep_mode;
+						fRemoteDevicesList.ItemAt(index)->fScanPeriodMode
+							= inquiryInfo->pscan_period_mode;
+						fRemoteDevicesList.ItemAt(index)->fScanMode
+							= inquiryInfo->pscan_mode;
+						fRemoteDevicesList.ItemAt(index)->fClockOffset
+							= inquiryInfo->clock_offset;
 
 						duplicatedFound = true;
 						break;
@@ -95,7 +100,8 @@ DiscoveryListener::MessageReceived(BMessage* message)
 				}
 
 				if (!duplicatedFound) {
-					rd = new RemoteDevice(inquiryInfo->bdaddr, (uint8*)inquiryInfo->dev_class);
+					rd = new RemoteDevice(inquiryInfo->bdaddr,
+						(uint8*)inquiryInfo->dev_class);
 					fRemoteDevicesList.AddItem(rd);
 					// keep all inquiry reported data
 					rd->SetLocalDeviceOwner(fLocalDevice);
@@ -124,7 +130,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
 		case BT_MSG_INQUIRY_TERMINATED: /* inquiry was cancelled */
 			InquiryCompleted(BT_INQUIRY_TERMINATED);
 			break;
-		
+
 		case BT_MSG_INQUIRY_ERROR:
 			InquiryCompleted(BT_INQUIRY_ERROR);
 			break;
@@ -136,7 +142,10 @@ DiscoveryListener::MessageReceived(BMessage* message)
 }
 
 
-DiscoveryListener::DiscoveryListener() : BLooper() , fRemoteDevicesList(BT_MAX_RESPONSES)
+DiscoveryListener::DiscoveryListener()
+	:
+	BLooper(),
+	fRemoteDevicesList(BT_MAX_RESPONSES)
 {
 	// TODO: Make a better handling of the running not running state
 	Run();
