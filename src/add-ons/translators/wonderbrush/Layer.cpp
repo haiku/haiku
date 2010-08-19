@@ -6,6 +6,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
+
 #include "Layer.h"
 
 #include <stdio.h>
@@ -18,6 +19,7 @@
 #include "lab_convert.h"
 #include "support.h"
 
+
 // constructor
 Layer::Layer()
 	: fBitmap(NULL),
@@ -28,18 +30,21 @@ Layer::Layer()
 {
 }
 
+
 // destructor
 Layer::~Layer()
 {
 	delete fBitmap;
 }
 
+
 // Compose
 status_t
 Layer::Compose(const BBitmap* into, BRect area)
 {
 	if (!fBitmap || !fBitmap->IsValid()
-		|| (fBitmap->ColorSpace() != B_RGBA32 && fBitmap->ColorSpace() != B_RGB32))
+		|| (fBitmap->ColorSpace() != B_RGBA32
+			&& fBitmap->ColorSpace() != B_RGB32))
 		return B_NO_INIT;
 
 	status_t status = B_BAD_VALUE;
@@ -73,19 +78,43 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					if (srcHandle[3] > 0) {
 						uint8 c1 = dstHandle[0] * srcHandle[0] >> 8;
-						c1 = c1 + dstHandle[0] * (255 - ((255 - dstHandle[0]) * (255 - srcHandle[0]) >> 8) - c1) >> 8;
-						c1 = (c1 * dstHandle[3] + srcHandle[0] * (255 - dstHandle[3])) >> 8;
+						c1 = c1 + dstHandle[0] * (
+								255 - (
+									(255 - dstHandle[0])
+									* (255 - srcHandle[0])
+									>> 8
+								) - c1
+							) >> 8;
+						c1 = (c1 * dstHandle[3]
+								+ srcHandle[0] * (255 - dstHandle[3])
+							) >> 8;
 
 						uint8 c2 = dstHandle[1] * srcHandle[1] >> 8;
-						c2 = c2 + dstHandle[1] * (255 - ((255 - dstHandle[1]) * (255 - srcHandle[1]) >> 8) - c2) >> 8;
-						c2 = (c2 * dstHandle[3] + srcHandle[1] * (255 - dstHandle[3])) >> 8;
+						c2 = c2 + dstHandle[1] * (
+								255 - (
+									(255 - dstHandle[1])
+									* (255 - srcHandle[1])
+									>> 8
+								) - c2
+							) >> 8;
+						c2 = (c2 * dstHandle[3]
+								+ srcHandle[1] * (255 - dstHandle[3])
+							) >> 8;
 
 						uint8 c3 = dstHandle[2] * srcHandle[2] >> 8;
-						c3 = c3 + dstHandle[2] * (255 - ((255 - dstHandle[2]) * (255 - srcHandle[2]) >> 8) - c3) >> 8;
-						c3 = (c3 * dstHandle[3] + srcHandle[2] * (255 - dstHandle[3])) >> 8;
+						c3 = c3 + dstHandle[2] * (
+								255 - (
+									(255 - dstHandle[2])
+									* (255 - srcHandle[2])
+									>> 8
+								) - c3
+							) >> 8;
+						c3 = (c3 * dstHandle[3]
+								+ srcHandle[2] * (255 - dstHandle[3])
+							) >> 8;
 
-						blend_colors(dstHandle, (srcHandle[3] * alphaOverride) >> 8,
-									 c1, c2, c3);
+						blend_colors(dstHandle,
+							(srcHandle[3] * alphaOverride) >> 8, c1, c2, c3);
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -102,14 +131,17 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					if (srcHandle[3] > 0) {
 						// compose
-						uint8 c1 = (max_c(srcHandle[0], dstHandle[0]) * dstHandle[3]
-									+ srcHandle[0] * (255 - dstHandle[3])) / 255;
-						uint8 c2 = (max_c(srcHandle[1], dstHandle[1]) * dstHandle[3]
-									+ srcHandle[1] * (255 - dstHandle[3])) / 255;
-						uint8 c3 = (max_c(srcHandle[2], dstHandle[2]) * dstHandle[3]
-									+ srcHandle[2] * (255 - dstHandle[3])) / 255;
-						blend_colors(dstHandle, (srcHandle[3] * alphaOverride) / 255,
-									 c1, c2, c3);
+						uint8 c1
+							= (max_c(srcHandle[0], dstHandle[0]) * dstHandle[3]
+								+ srcHandle[0] * (255 - dstHandle[3])) / 255;
+						uint8 c2
+							= (max_c(srcHandle[1], dstHandle[1]) * dstHandle[3]
+								+ srcHandle[1] * (255 - dstHandle[3])) / 255;
+						uint8 c3
+							= (max_c(srcHandle[2], dstHandle[2]) * dstHandle[3]
+								+ srcHandle[2] * (255 - dstHandle[3])) / 255;
+						blend_colors(dstHandle,
+							(srcHandle[3] * alphaOverride) / 255, c1, c2, c3);
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -126,14 +158,17 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					if (srcHandle[3] > 0) {
 						// compose
-						uint8 c1 = (min_c(srcHandle[0], dstHandle[0]) * dstHandle[3]
-									+ srcHandle[0] * (255 - dstHandle[3])) / 255;
-						uint8 c2 = (min_c(srcHandle[1], dstHandle[1]) * dstHandle[3]
-									+ srcHandle[1] * (255 - dstHandle[3])) / 255;
-						uint8 c3 = (min_c(srcHandle[2], dstHandle[2]) * dstHandle[3]
-									+ srcHandle[2] * (255 - dstHandle[3])) / 255;
-						blend_colors(dstHandle, (srcHandle[3] * alphaOverride) / 255,
-									 c1, c2, c3);
+						uint8 c1
+							= (min_c(srcHandle[0], dstHandle[0]) * dstHandle[3]
+								+ srcHandle[0] * (255 - dstHandle[3])) / 255;
+						uint8 c2
+							= (min_c(srcHandle[1], dstHandle[1]) * dstHandle[3]
+								+ srcHandle[1] * (255 - dstHandle[3])) / 255;
+						uint8 c3
+							= (min_c(srcHandle[2], dstHandle[2]) * dstHandle[3]
+								+ srcHandle[2] * (255 - dstHandle[3])) / 255;
+						blend_colors(dstHandle,
+							(srcHandle[3] * alphaOverride) / 255, c1, c2, c3);
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -152,7 +187,7 @@ Layer::Compose(const BBitmap* into, BRect area)
 						// compose
 						uint32 alpha = srcHandle[3] * alphaOverride;
 						dstHandle[2] = (srcHandle[2] * alpha
-										+ dstHandle[2] * (65025 - alpha)) / 65025;
+								+ dstHandle[2] * (65025 - alpha)) / 65025;
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -171,7 +206,7 @@ Layer::Compose(const BBitmap* into, BRect area)
 						// compose
 						uint32 alpha = srcHandle[3] * alphaOverride;
 						dstHandle[1] = (srcHandle[1] * alpha
-										+ dstHandle[1] * (65025 - alpha)) / 65025;
+								+ dstHandle[1] * (65025 - alpha)) / 65025;
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -190,7 +225,7 @@ Layer::Compose(const BBitmap* into, BRect area)
 						// compose
 						uint32 alpha = srcHandle[3] * alphaOverride;
 						dstHandle[0] = (srcHandle[0] * alpha
-										+ dstHandle[0] * (65025 - alpha)) / 65025;
+								+ dstHandle[0] * (65025 - alpha)) / 65025;
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -207,7 +242,10 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					// compose
 					uint8 temp = min_c(dstHandle[3], 255 - srcHandle[3]);
-					dstHandle[3] = (dstHandle[3] * (255 - alphaOverride) + temp * alphaOverride) / 255;
+					dstHandle[3] = (
+							dstHandle[3] * (255 - alphaOverride)
+							+ temp * alphaOverride
+						) / 255;
 					srcHandle += 4;
 					dstHandle += 4;
 				}
@@ -223,7 +261,10 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					// compose
 					uint8 temp = min_c(dstHandle[3], srcHandle[3]);
-					dstHandle[3] = (dstHandle[3] * (255 - alphaOverride) + temp * alphaOverride) / 255;
+					dstHandle[3] = (
+							dstHandle[3] * (255 - alphaOverride)
+							+ temp * alphaOverride
+						) / 255;
 					srcHandle += 4;
 					dstHandle += 4;
 				}
@@ -243,9 +284,10 @@ Layer::Compose(const BBitmap* into, BRect area)
 						uint8 g = dstHandle[1];
 						uint8 b = dstHandle[0];
 						uint8 alpha = dstHandle[3];
-						replace_luminance(r, g, b, srcHandle[2], srcHandle[1], srcHandle[0]);
-						blend_colors(dstHandle, (srcHandle[3] * alphaOverride) / 255,
-									 b, g, r);
+						replace_luminance(r, g, b, srcHandle[2], srcHandle[1],
+							srcHandle[0]);
+						blend_colors(dstHandle,
+							(srcHandle[3] * alphaOverride) / 255, b, g, r);
 						dstHandle[3] = alpha;
 					}
 					srcHandle += 4;
@@ -263,14 +305,23 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					if (srcHandle[3] > 0) {
 						// compose
-						uint8 c1 = 255 - ((((255 - srcHandle[0]) * (255 - dstHandle[0])) / 255) * dstHandle[3]
-									+ (255 - srcHandle[0]) * (255 - dstHandle[3])) / 255;
-						uint8 c2 = 255 - ((((255 - srcHandle[1]) * (255 - dstHandle[1])) / 255) * dstHandle[3]
-									+ (255 - srcHandle[1]) * (255 - dstHandle[3])) / 255;
-						uint8 c3 = 255 - ((((255 - srcHandle[2]) * (255 - dstHandle[2])) / 255) * dstHandle[3]
-									+ (255 - srcHandle[2]) * (255 - dstHandle[3])) / 255;
-						blend_colors(dstHandle, (srcHandle[3] * alphaOverride) / 255,
-									 c1, c2, c3);
+						uint8 c1 = 255 - (
+								(((255 - srcHandle[0]) * (255 - dstHandle[0]))
+									/ 255) * dstHandle[3]
+								+ (255 - srcHandle[0]) * (255 - dstHandle[3])
+							) / 255;
+						uint8 c2 = 255 - (
+								(((255 - srcHandle[1]) * (255 - dstHandle[1]))
+									/ 255) * dstHandle[3]
+								+ (255 - srcHandle[1]) * (255 - dstHandle[3])
+							) / 255;
+						uint8 c3 = 255 - (
+								(((255 - srcHandle[2]) * (255 - dstHandle[2]))
+									/ 255) * dstHandle[3]
+								+ (255 - srcHandle[2]) * (255 - dstHandle[3])
+							) / 255;
+						blend_colors(dstHandle,
+							(srcHandle[3] * alphaOverride) / 255, c1, c2, c3);
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -287,14 +338,23 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					if (srcHandle[3] > 0) {
 						// compose
-						uint8 c1 = (((srcHandle[0] * dstHandle[0]) / 255) * dstHandle[3]
-									+ srcHandle[0] * (255 - dstHandle[3])) / 255;
-						uint8 c2 = (((srcHandle[1] * dstHandle[1]) / 255) * dstHandle[3]
-									+ srcHandle[1] * (255 - dstHandle[3])) / 255;
-						uint8 c3 = (((srcHandle[2] * dstHandle[2]) / 255) * dstHandle[3]
-									+ srcHandle[2] * (255 - dstHandle[3])) / 255;
-						blend_colors(dstHandle, (srcHandle[3] * alphaOverride) / 255,
-									 c1, c2, c3);
+						uint8 c1 = (
+								((srcHandle[0] * dstHandle[0]) / 255)
+									* dstHandle[3]
+								+ srcHandle[0] * (255 - dstHandle[3])
+							) / 255;
+						uint8 c2 = (
+								((srcHandle[1] * dstHandle[1]) / 255)
+									* dstHandle[3]
+								+ srcHandle[1] * (255 - dstHandle[3])
+							) / 255;
+						uint8 c3 = (
+								((srcHandle[2] * dstHandle[2]) / 255)
+									* dstHandle[3]
+								+ srcHandle[2] * (255 - dstHandle[3])
+							) / 255;
+						blend_colors(dstHandle,
+							(srcHandle[3] * alphaOverride) / 255, c1, c2, c3);
 					}
 					srcHandle += 4;
 					dstHandle += 4;
@@ -337,6 +397,7 @@ Layer::Compose(const BBitmap* into, BRect area)
 
 	return status;
 }
+
 
 // Unarchive
 status_t
