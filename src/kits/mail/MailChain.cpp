@@ -202,7 +202,7 @@ BMailChain::Instantiate(BMessage* archive)
 status_t
 BMailChain::GetPath(BPath& path) const
 {
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY,path);
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	if (status < B_OK) {
 		fprintf(stderr, "Couldn't find user settings directory: %s\n",
 			strerror(status));
