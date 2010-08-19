@@ -89,7 +89,7 @@ MainWindow::MessageReceived(BMessage* message)
 		case kBtnHelp:
 			be_roster->Launch(&kHelpFileRef);
 			break;
-			
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -111,7 +111,7 @@ MainWindow::QuitRequested()
 void
 MainWindow::ShowInfo(const FileInfo* info)
 {
-	fStatusView->Show(info);
+	fStatusView->ShowInfo(info);
 }
 
 

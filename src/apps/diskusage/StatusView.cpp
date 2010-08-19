@@ -90,7 +90,7 @@ StatusView::~StatusView()
 
 
 void
-StatusView::Show(const FileInfo* info)
+StatusView::ShowInfo(const FileInfo* info)
 {
 	if (info == fCurrentFileInfo)
 		return;

@@ -18,13 +18,13 @@
 
 #ifdef ASSIGN_RESOURCES
 #   define EXTERN
-#   define EQ(x) =x
+#   define EQ(x)
 #else
 #   define EXTERN extern
 #   define EQ(x)
 #endif
 
-#define PUBLIC_CONST extern const
+#define EXTERN_CONST extern const
 
 
 // Resources
@@ -56,32 +56,32 @@ EXTERN int kBasePieColorCount;
 EXTERN rgb_color *kBasePieColor;
 
 // Non-resources :)
-PUBLIC_CONST char*	kAppSignature		EQ("application/x-vnd.Haiku-DiskUsage");
-PUBLIC_CONST char*	kHelpFileName		EQ("userguide/en/applications/diskusage.html");
-PUBLIC_CONST char*	kPieRectAttrName	EQ("mainrect");
+EXTERN_CONST char*	kAppSignature;
+EXTERN_CONST char*	kHelpFileName;
+EXTERN_CONST char*	kPieRectAttrName;
 
-PUBLIC_CONST char*	kHelpBtnLabel		EQ("?");
-PUBLIC_CONST char*	kEmptyStr			EQ("");
-PUBLIC_CONST char*	kNameVolPtr			EQ("vol");
-PUBLIC_CONST char*	kNameFilePtr		EQ("file");
+EXTERN_CONST char*	kHelpBtnLabel;
+EXTERN_CONST char*	kEmptyStr;
+EXTERN_CONST char*	kNameVolPtr;
+EXTERN_CONST char*	kNameFilePtr;
 
-PUBLIC_CONST float	kSmallHMargin		EQ(5.0);
-PUBLIC_CONST float	kSmallVMargin		EQ(2.0);
-PUBLIC_CONST float	kButtonMargin		EQ(20.0);
-PUBLIC_CONST float	kMinButtonWidth		EQ(60.0);
+EXTERN_CONST float	kSmallHMargin;
+EXTERN_CONST float	kSmallVMargin;
+EXTERN_CONST float	kButtonMargin;
+EXTERN_CONST float	kMinButtonWidth;
 
-PUBLIC_CONST float	kProgBarWidth		EQ(150.0);
-PUBLIC_CONST float	kProgBarHeight		EQ(16.0);
-PUBLIC_CONST float	kReportInterval		EQ(2.5);
+EXTERN_CONST float	kProgBarWidth;
+EXTERN_CONST float	kProgBarHeight;
+EXTERN_CONST float	kReportInterval;
 
-PUBLIC_CONST float	kDefaultPieSize		EQ(400.0);
-PUBLIC_CONST float	kPieCenterSize		EQ(80.0);
-PUBLIC_CONST float	kPieRingSize		EQ(20.0);
-PUBLIC_CONST float	kPieInnerMargin		EQ(10.0);
-PUBLIC_CONST float	kPieOuterMargin		EQ(10.0);
-PUBLIC_CONST float	kMinSegmentSpan		EQ(2.0);
-PUBLIC_CONST int	kLightenFactor		EQ(0x12);
-PUBLIC_CONST float	kDragThreshold		EQ(5.0);
+EXTERN_CONST float	kDefaultPieSize;
+EXTERN_CONST float	kPieCenterSize;
+EXTERN_CONST float	kPieRingSize;
+EXTERN_CONST float	kPieInnerMargin;
+EXTERN_CONST float	kPieOuterMargin;
+EXTERN_CONST float	kMinSegmentSpan;
+EXTERN_CONST int	kLightenFactor;
+EXTERN_CONST float	kDragThreshold;
 
 EXTERN app_info kAppInfo;
 EXTERN entry_ref kHelpFileRef;
@@ -99,5 +99,6 @@ EXTERN bool kFoundHelpFile;
 
 BResources* read_resources(const char* appSignature);
 void size_to_string(off_t byteCount, char* name);
+
 
 #endif // COMMON_H

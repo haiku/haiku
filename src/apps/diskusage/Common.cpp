@@ -10,6 +10,7 @@
 
 #define ASSIGN_RESOURCES
 #include "Common.h"
+#undef ASSIGN_RESOURCES
 
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +22,34 @@
 #include <Path.h>
 
 
+const char*	kAppSignature		= "application/x-vnd.Haiku-DiskUsage";
+const char*	kHelpFileName		= "userguide/en/applications/diskusage.html";
+const char*	kPieRectAttrName	= "mainrect";
+
+const char*	kHelpBtnLabel		= "?";
+const char*	kEmptyStr			= "";
+const char*	kNameVolPtr			= "vol";
+const char*	kNameFilePtr		= "file";
+
+const float	kSmallHMargin		= 5.0;
+const float	kSmallVMargin		= 2.0;
+const float	kButtonMargin		= 20.0;
+const float	kMinButtonWidth		= 60.0;
+
+const float	kProgBarWidth		= 150.0;
+const float	kProgBarHeight		= 16.0;
+const float	kReportInterval		= 2.5;
+
+const float	kDefaultPieSize		= 400.0;
+const float	kPieCenterSize		= 80.0;
+const float	kPieRingSize		= 20.0;
+const float	kPieInnerMargin		= 10.0;
+const float	kPieOuterMargin		= 10.0;
+const float	kMinSegmentSpan		= 2.0;
+const int	kLightenFactor		= 0x12;
+const float	kDragThreshold		= 5.0;
+
+
 BResources*
 read_resources(const char* appSignature)
 {
@@ -30,7 +59,7 @@ read_resources(const char* appSignature)
 			strerror(ret));
 		exit(1);
 	}
-	
+
 	BFile file(&kAppInfo.ref, O_RDONLY);
 	ret = file.InitCheck();
 	if (ret != B_OK) {

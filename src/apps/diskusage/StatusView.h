@@ -22,7 +22,7 @@ public:
 								StatusView(BRect frame);
 	virtual						~StatusView();
 
-			void				Show(const FileInfo* info);
+			void				ShowInfo(const FileInfo* info);
 
 private:
 			BStringView*		fPathView;
