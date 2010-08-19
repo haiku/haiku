@@ -47,7 +47,7 @@ enum {
 };
 
 
-/* 
+/*
 	MAXMETAPH is the length of the Metaphone code.
 
 	Four is a good compromise value for English names. For comparing words
@@ -55,7 +55,7 @@ enum {
 	length for more precise matches.
 
 	The default here is 5.
-*/ 
+*/
 
 #define MAXMETAPH 6
 
@@ -80,7 +80,7 @@ Words::Words(bool useMetaphone)
 	:
 	fUseMetaphone(useMetaphone)
 {
-	
+
 }
 
 
@@ -89,13 +89,13 @@ Words::Words(BPositionIO* thes, bool useMetaphone)
 	WIndex(thes),
 	fUseMetaphone(useMetaphone)
 {
-	
+
 }
 
 
 Words::~Words(void)
 {
-	
+
 }
 
 
@@ -119,27 +119,27 @@ Words::BuildIndex(void)
 	char			*nptr, *eptr;
 	int64			blockOffset;
 	int32			blockSize;
-	
+
 	// The Word Entry
 	WIndexEntry		entry;
 	char			entryName[256], *namePtr = entryName;
 	char			suffixName[256];
 	char			flags[32], *flagsPtr = flags;
-	
+
 	// State Info
 	int32			state = FIND_WORD;
-	
+
 	// Make sure we are at start of file
 	fDataFile->Seek(0, SEEK_SET);
 	entry.offset = -1;
-	
+
 	// Read blocks from thes until eof
 	while (true) {
 		// Get next block
 		blockOffset = fDataFile->Position();
 		if ((blockSize = fDataFile->Read(buffer, 16384)) == 0)
 			break;
-		
+
 		// parse block
 		for (nptr = buffer, eptr = buffer + blockSize; nptr < eptr; nptr++) {
 			// Looking for start of word?
@@ -163,7 +163,7 @@ Words::BuildIndex(void)
 					// Add base word
 					entry.key = GetKey(entryName);
 					AddItem(&entry);
-					
+
 					// Add suffixed words if any
 					if (flagsPtr != flags) {
 						// printf("Base: %s, flags: %s\n", entryName, flags);
@@ -185,7 +185,7 @@ Words::BuildIndex(void)
 				if (*nptr == '/') {
 					*namePtr = 0; // terminate word
 					// printf("Found word: %s\n", entryName);
-					
+
 					state = GET_FLAGS;
 				} else {
 					*namePtr++ = *nptr; // copy word
@@ -210,12 +210,12 @@ Words::GetKey(const char* s)
 		int32		key = 0;
 		int32		offset;
 		char		c;
-		
+
 		metaphone(s, Metaph, GENERATE);
 		// Compact Metaphone from 6 bytes to 4
-		
+
 		// printf("%s -> %s: \n", s, Metaph);
-		
+
 		for (sPtr = Metaph, offset = 25; *sPtr; sPtr++, offset -= 5) {
 			c = *sPtr - 'A';
 			// printf("%d,", int16(c));
@@ -470,13 +470,13 @@ word_match(const char* reference, const char* test)
 	char		c1, c2;
 	s1 = test;
 	s2 = reference;
-	
+
 	bool a, b;
-	
+
 	while (*s2 || *s1) {
 		c1 = tolower(*s1);
 		c2 = tolower(*s2);
-		
+
 		if (*s2 && *s1) {
 			if (c1 != c2) {
 				a = (tolower(s1[1]) == c2);
@@ -498,7 +498,7 @@ word_match(const char* reference, const char* test)
 					s2++;
 				}
 				// Equivalent Character
-				else if (vsvfn[c1] == vsvfn[c2])
+				else if (vsvfn[(unsigned)c1] == vsvfn[(unsigned)c2])
 					x++;
 				// Unrelated Character
 				else
@@ -513,7 +513,7 @@ word_match(const char* reference, const char* test)
 		if (*s1)
 			s1++;
 	}
-	
+
 	return x;
 }
 
@@ -522,7 +522,7 @@ int32
 suffix_word(char* dst, const char* src, char flag)
 {
 	char* end;
-	
+
 	end = stpcpy(dst, src);
 	flag = toupper(flag);
 	switch(flag) {
@@ -706,46 +706,46 @@ Words::FindBestMatches(BList* matches, const char* s)
 {
 	int32		index;
 	// printf("*** Looking for %s: ***\n", s);
-	
+
 	if ((index = FindFirst(s)) >= 0) {
 		BString srcWord(s);
 		FileEntry* entry;
 		WIndexEntry* indexEntry;
-		
+
 		int32		key = (ItemAt(index))->key;
 		int32		suffixLength;
 		char		word[128], suffixWord[128];
 		const char	*src, *testWord;
 		const char 	*suffixFlags;
 		char		*dst;
-		
+
 		gCmpKey = srcWord.String();
-		
+
 		uint8		hashTable[32];
 		uint8		hashValue, highHash, lowHash;
 		for (int32 i = 0; i < 32; i++)
 			hashTable[i] = 0;
-		
+
 		do {
 			indexEntry = ItemAt(index);
 			// Hash the entry offset; we use this to make sure we don't add
 			// the same word file entry twice;
 			// It is possible for the same entry in the words file to have
 			// multiple entries in the index.
-			
+
 			hashValue = indexEntry->offset % 256;
 			highHash = hashValue >> 3;
 			lowHash = 0x01 << (hashValue & 0x07);
-			
+
 			// printf("Testing Entry: %ld: hash=%d, highHash=%d, lowHash=%d\n",
-			// indexEntry->offset, hashValue, (uint16)highHash, 
+			// indexEntry->offset, hashValue, (uint16)highHash,
 			// (uint16)lowHash);
-			
+
 			// Has this entry offset been seen before?
 			if (!(hashTable[highHash] & lowHash)) {
 				// printf("New Entry\n");
 				hashTable[highHash] |= lowHash; // Mark this offset so we don't add it twice
-				
+
 				entry = GetEntry(index);
 				src = entry->String();
 				while (*src && !isalpha(*src))
@@ -758,7 +758,7 @@ Words::FindBestMatches(BList* matches, const char* s)
 					suffixFlags = src + 1;
 				else
 					suffixFlags = src;
-					
+
 				// printf("Base Word: %s\n", word);
 				// printf("Flags: %s\n", suffixFlags);
 				testWord = word; // Test the base word first
@@ -769,12 +769,12 @@ Words::FindBestMatches(BList* matches, const char* s)
 					// And does it look close enough to the compare key?
 					// word_match(gCmpKey, testWord)
 					//	<= int32((strlen(gCmpKey)-1)/2))
-						&& word_match(gCmpKey, testWord) 
+						&& word_match(gCmpKey, testWord)
 							<= int32(float(strlen(gCmpKey)-1)*.75)) {
 						// printf("Added: %s\n", testWord);
 						matches->AddItem((void*)(new BString(testWord)));
 					}
-					
+
 					// If suffix, transform and test
 					if (*suffixFlags) {
 						// Repeat until valid suffix found or end is reached
@@ -796,7 +796,7 @@ Words::FindBestMatches(BList* matches, const char* s)
 
 			index++;
 		} while (key == (ItemAt(index))->key);
-		
+
 		return matches->CountItems();
 	} else {
 		return 0;

@@ -59,7 +59,7 @@ unsigned long update_crc(unsigned long crc_accum, const char *data_blk_ptr,
 
 FileEntry::FileEntry(void)
 {
-	
+
 }
 
 
@@ -67,7 +67,7 @@ FileEntry::FileEntry(const char *entryString)
 	:
 	BString(entryString)
 {
-	
+
 }
 
 
@@ -76,7 +76,7 @@ WIndex::SetTo(const char *dataPath, const char *indexPath)
 {
 	BFile* dataFile;
 	BFile indexFile;
-	
+
 	dataFile = new BFile();
 
 	if (dataFile->SetTo(dataPath, B_READ_ONLY) != B_OK) {
@@ -84,12 +84,12 @@ WIndex::SetTo(const char *dataPath, const char *indexPath)
 	} else {
 		bool buildIndex = true;
 		SetTo(dataFile);
-		
+
 		time_t mtime;
 		time_t modified;
-		
+
 		dataFile->GetModificationTime(&mtime);
-		
+
 		if (indexFile.SetTo(indexPath, B_READ_ONLY) == B_OK) {
 			attr_info info;
 			if ((indexFile.GetAttrInfo("WINDEX:version", &info) == B_OK)) {
@@ -171,25 +171,25 @@ WIndex::UnflattenIndex(BPositionIO *io)
 	if (fEntryList)
 		free(fEntryList);
 	WIndexHead		head;
-	
+
 	io->Seek(0, SEEK_SET);
 	io->Read(&head, sizeof(head));
 	io->Seek(head.offset, SEEK_SET);
-	
+
 	fEntrySize = head.entrySize;
 	fEntries = head.entries;
 	fMaxEntries = fEntriesPerBlock;
 	fBlockSize = fEntriesPerBlock * fEntrySize;
 	fBlocks = fEntries / fEntriesPerBlock + 1;;
 	fIsSorted = true;
-	
+
 	int32 size = (head.entries + 1) * head.entrySize;
 	if (!(fEntryList = (uint8 *)malloc(size)))
 		return B_ERROR;
-		
+
 	if (fEntries)
 		io->Read(fEntryList, size);
-	
+
 	return B_OK;
 }
 
@@ -200,7 +200,7 @@ WIndex::FlattenIndex(BPositionIO *io)
 	if (fEntries && !fIsSorted)
 		SortItems();
 	WIndexHead		head;
-	
+
 	head.entries = fEntries;
 	head.entrySize = fEntrySize;
 	head.offset = sizeof(WIndexHead);
@@ -208,7 +208,7 @@ WIndex::FlattenIndex(BPositionIO *io)
 	io->Write(&head, sizeof(head));
 	if (fEntries)
 		io->Write(fEntryList, head.entries * head.entrySize);
-	
+
 	return B_OK;
 }
 
@@ -220,7 +220,7 @@ WIndex::Lookup(int32 key)
 		return -1;
 	if (!fIsSorted)
 		SortItems();
-	
+
 	// Binary Search
 	int32	M, Lb, Ub;
 	Lb = 0;
@@ -244,11 +244,11 @@ WIndex::AddItem(WIndexEntry *entry)
 {
 	if (_BlockCheck() == B_ERROR)
 		return B_ERROR;
-	memcpy(((WIndexEntry *)(fEntryList + (fEntries * fEntrySize))), entry, 
+	memcpy(((WIndexEntry *)(fEntryList + (fEntries * fEntrySize))), entry,
 		fEntrySize);
 	fEntries++;
 	fIsSorted = false;
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -295,7 +295,7 @@ WIndex::InitIndex(void)
 int32
 WIndex::GetKey(const char *s)
 {
-	
+
 	int32	key = 0;
 	/*int32	x;
 	int32	a = 84589;
@@ -303,16 +303,16 @@ WIndex::GetKey(const char *s)
 	int32	m = 217728;
 	while (*s) {
 		x = *s++ - 'a';
-		
+
 		key ^= (a * x + b) % m;
 		key <<= 1;
 	}*/
-	
+
 	key = update_crc(0, s, strlen(s));
-	
+
 	if (key < 0) // No negative values!
 		key = ~key;
-	
+
 	return key;
 }
 
@@ -344,14 +344,14 @@ WIndex::FindFirst(const char *word)
 {
 	if (!fEntries)
 		return -1;
-	
+
 	int32			index;
 	char			nword[256];
 	int32			key;
-	
+
 	NormalizeWord(word, nword);
 	key = GetKey(nword);
-	
+
 	if ((index = Lookup(key)) < 0)
 		return -1;
 	// Find first instance of key
@@ -369,13 +369,13 @@ WIndex::GetEntry(int32 index)
 	WIndexEntry		*ientry;
 	FileEntry		*dentry;
 	char			*buffer;
-	
+
 	dentry = new FileEntry();
-	
+
 	ientry = ItemAt(index);
-	
+
 	int32 size;
-	
+
 	fDataFile->Seek(ientry->offset, SEEK_SET);
 	buffer = dentry->LockBuffer(256);
 	fDataFile->Read(buffer, 256);
@@ -392,7 +392,7 @@ WIndex::_GetEntrySize(WIndexEntry *entry, const char *entryData)
 {
 	// eliminate unused parameter warning
 	(void)entry;
-	
+
 	return strcspn(entryData, "\n\r");
 }
 
@@ -409,7 +409,7 @@ WIndex::NormalizeWord(const char *word, char *dest)
 {
 	const char 	*src;
 	char		*dst;
-	
+
 	// remove dots and copy
 	src = word;
 	dst = dest;
@@ -419,54 +419,53 @@ WIndex::NormalizeWord(const char *word, char *dest)
 		src++;
 	}
 	*dst = 0;
-	
+
 	// convert to lower-case
-	dst = dest;
-	while (*dst)
-		*dst++ = tolower(*dst);
+	for (dst = dest; *dst; dst++)
+		*dst = tolower(*dst);
 	return dest;
 }
 
 
-/* crc32h.c -- package to compute 32-bit CRC one byte at a time using   */ 
-/*             the high-bit first (Big-Endian) bit ordering convention  */ 
-/*                                                                      */ 
-/* Synopsis:                                                            */ 
-/*  gen_crc_table() -- generates a 256-word table containing all CRC    */ 
-/*                     remainders for every possible 8-bit byte.  It    */ 
-/*                     must be executed (once) before any CRC updates.  */ 
-/*                                                                      */ 
-/*  unsigned update_crc(crc_accum, data_blk_ptr, data_blk_size)         */ 
-/*           unsigned crc_accum; char *data_blk_ptr; int data_blk_size; */ 
-/*           Returns the updated value of the CRC accumulator after     */ 
-/*           processing each byte in the addressed block of data.       */ 
-/*                                                                      */ 
-/*  It is assumed that an unsigned long is at least 32 bits wide and    */ 
-/*  that the predefined type char occupies one 8-bit byte of storage.   */ 
-/*                                                                      */ 
-/*  The generator polynomial used for this version of the package is    */ 
-/*  x^32+x^26+x^23+x^22+x^16+x^12+x^11+x^10+x^8+x^7+x^5+x^4+x^2+x^1+x^0 */ 
-/*  as specified in the Autodin/Ethernet/ADCCP protocol standards.      */ 
-/*  Other degree 32 polynomials may be substituted by re-defining the   */ 
-/*  symbol POLYNOMIAL below.  Lower degree polynomials must first be    */ 
-/*  multiplied by an appropriate power of x.  The representation used   */ 
-/*  is that the coefficient of x^0 is stored in the LSB of the 32-bit   */ 
-/*  word and the coefficient of x^31 is stored in the most significant  */ 
-/*  bit.  The CRC is to be appended to the data most significant byte   */ 
-/*  first.  For those protocols in which bytes are transmitted MSB      */ 
-/*  first and in the same order as they are encountered in the block    */ 
-/*  this convention results in the CRC remainder being transmitted with */ 
-/*  the coefficient of x^31 first and with that of x^0 last (just as    */ 
-/*  would be done by a hardware shift register mechanization).          */ 
-/*                                                                      */ 
-/*  The table lookup technique was adapted from the algorithm described */ 
-/*  by Avram Perez, Byte-wise CRC Calculations, IEEE Micro 3, 40 (1983).*/ 
+/* crc32h.c -- package to compute 32-bit CRC one byte at a time using   */
+/*             the high-bit first (Big-Endian) bit ordering convention  */
+/*                                                                      */
+/* Synopsis:                                                            */
+/*  gen_crc_table() -- generates a 256-word table containing all CRC    */
+/*                     remainders for every possible 8-bit byte.  It    */
+/*                     must be executed (once) before any CRC updates.  */
+/*                                                                      */
+/*  unsigned update_crc(crc_accum, data_blk_ptr, data_blk_size)         */
+/*           unsigned crc_accum; char *data_blk_ptr; int data_blk_size; */
+/*           Returns the updated value of the CRC accumulator after     */
+/*           processing each byte in the addressed block of data.       */
+/*                                                                      */
+/*  It is assumed that an unsigned long is at least 32 bits wide and    */
+/*  that the predefined type char occupies one 8-bit byte of storage.   */
+/*                                                                      */
+/*  The generator polynomial used for this version of the package is    */
+/*  x^32+x^26+x^23+x^22+x^16+x^12+x^11+x^10+x^8+x^7+x^5+x^4+x^2+x^1+x^0 */
+/*  as specified in the Autodin/Ethernet/ADCCP protocol standards.      */
+/*  Other degree 32 polynomials may be substituted by re-defining the   */
+/*  symbol POLYNOMIAL below.  Lower degree polynomials must first be    */
+/*  multiplied by an appropriate power of x.  The representation used   */
+/*  is that the coefficient of x^0 is stored in the LSB of the 32-bit   */
+/*  word and the coefficient of x^31 is stored in the most significant  */
+/*  bit.  The CRC is to be appended to the data most significant byte   */
+/*  first.  For those protocols in which bytes are transmitted MSB      */
+/*  first and in the same order as they are encountered in the block    */
+/*  this convention results in the CRC remainder being transmitted with */
+/*  the coefficient of x^31 first and with that of x^0 last (just as    */
+/*  would be done by a hardware shift register mechanization).          */
+/*                                                                      */
+/*  The table lookup technique was adapted from the algorithm described */
+/*  by Avram Perez, Byte-wise CRC Calculations, IEEE Micro 3, 40 (1983).*/
 
 
-#define POLYNOMIAL 0x04c11db7L 
+#define POLYNOMIAL 0x04c11db7L
 
 
-static unsigned long crc_table[256]; 
+static unsigned long crc_table[256];
 
 
 void
