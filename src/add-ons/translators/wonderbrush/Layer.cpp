@@ -78,7 +78,7 @@ Layer::Compose(const BBitmap* into, BRect area)
 				for (int32 x = left; x <= right; x++) {
 					if (srcHandle[3] > 0) {
 						uint8 c1 = dstHandle[0] * srcHandle[0] >> 8;
-						c1 = c1 + dstHandle[0] * (
+						c1 += dstHandle[0] * (
 								255 - (
 									(255 - dstHandle[0])
 									* (255 - srcHandle[0])
@@ -90,7 +90,7 @@ Layer::Compose(const BBitmap* into, BRect area)
 							) >> 8;
 
 						uint8 c2 = dstHandle[1] * srcHandle[1] >> 8;
-						c2 = c2 + dstHandle[1] * (
+						c2 += dstHandle[1] * (
 								255 - (
 									(255 - dstHandle[1])
 									* (255 - srcHandle[1])
@@ -102,7 +102,7 @@ Layer::Compose(const BBitmap* into, BRect area)
 							) >> 8;
 
 						uint8 c3 = dstHandle[2] * srcHandle[2] >> 8;
-						c3 = c3 + dstHandle[2] * (
+						c3 += dstHandle[2] * (
 								255 - (
 									(255 - dstHandle[2])
 									* (255 - srcHandle[2])
