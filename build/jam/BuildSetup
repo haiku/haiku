@@ -1377,7 +1377,7 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src kits interface ;
 	EnableWerror src kits locale ;
 	EnableWerror src kits mail ;
-#	EnableWerror src kits media ; # gcc2
+	EnableWerror src kits media ;
 	EnableWerror src kits midi ;
 	EnableWerror src kits midi2 ;
 	EnableWerror src kits network ;

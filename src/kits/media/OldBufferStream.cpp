@@ -19,13 +19,6 @@
 /*************************************************************
  * public BAbstractBufferStream
  *************************************************************/
-#if __GNUC__ > 3
-BAbstractBufferStream::~BAbstractBufferStream()
-{
-}
-#endif
-
-
 status_t
 BAbstractBufferStream::GetStreamParameters(size_t *bufferSize,
 										   int32 *bufferCount,
@@ -186,7 +179,10 @@ void *
 BBufferStream::operator new(size_t size)
 {
 	UNIMPLEMENTED();
-	return NULL;
+
+	void *dummy = NULL;
+		// just to circumvent a warning that operator new should not return NULL
+	return dummy;
 }
 
 
