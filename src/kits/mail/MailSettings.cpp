@@ -178,7 +178,7 @@ BMailSettings::Save(bigtime_t /*timeout*/)
 
 	path.Append("Mail");
 
-	status_t result = MailInternal::WriteMessageFile(data,path,"new_mail_daemon");
+	status_t result = MailInternal::WriteMessageFile(fData,path,"new_mail_daemon");
 	if (result < B_OK)
 		return result;
 
@@ -222,7 +222,7 @@ BMailSettings::Reload()
 	}
 
 	// clobber old settings
-	data = tmp;
+	fData = tmp;
 	return B_OK;
 }
 
@@ -233,60 +233,60 @@ BMailSettings::Reload()
 int32
 BMailSettings::WindowFollowsCorner()
 {
-	return data.FindInt32("WindowFollowsCorner");
+	return fData.FindInt32("WindowFollowsCorner");
 }
 
 
 void
 BMailSettings::SetWindowFollowsCorner(int32 which_corner)
 {
-	if (data.ReplaceInt32("WindowFollowsCorner",which_corner))
-		data.AddInt32("WindowFollowsCorner",which_corner);
+	if (fData.ReplaceInt32("WindowFollowsCorner",which_corner))
+		fData.AddInt32("WindowFollowsCorner",which_corner);
 }
 
 
 uint32
 BMailSettings::ShowStatusWindow()
 {
-	return data.FindInt32("ShowStatusWindow");
+	return fData.FindInt32("ShowStatusWindow");
 }
 
 
 void
 BMailSettings::SetShowStatusWindow(uint32 mode)
 {
-	if (data.ReplaceInt32("ShowStatusWindow",mode))
-		data.AddInt32("ShowStatusWindow",mode);
+	if (fData.ReplaceInt32("ShowStatusWindow",mode))
+		fData.AddInt32("ShowStatusWindow",mode);
 }
 
 
 bool
 BMailSettings::DaemonAutoStarts()
 {
-	return data.FindBool("DaemonAutoStarts");
+	return fData.FindBool("DaemonAutoStarts");
 }
 
 
 void
 BMailSettings::SetDaemonAutoStarts(bool does_it)
 {
-	if (data.ReplaceBool("DaemonAutoStarts",does_it))
-		data.AddBool("DaemonAutoStarts",does_it);
+	if (fData.ReplaceBool("DaemonAutoStarts",does_it))
+		fData.AddBool("DaemonAutoStarts",does_it);
 }
 
 
 BRect
 BMailSettings::ConfigWindowFrame()
 {
-	return data.FindRect("ConfigWindowFrame");
+	return fData.FindRect("ConfigWindowFrame");
 }
 
 
 void
 BMailSettings::SetConfigWindowFrame(BRect frame)
 {
-	if (data.ReplaceRect("ConfigWindowFrame",frame))
-		data.AddRect("ConfigWindowFrame",frame);
+	if (fData.ReplaceRect("ConfigWindowFrame",frame))
+		fData.AddRect("ConfigWindowFrame",frame);
 }
 
 
@@ -294,7 +294,7 @@ BRect
 BMailSettings::StatusWindowFrame()
 {
 	BRect frame;
-	if (data.FindRect("StatusWindowFrame", &frame) != B_OK)
+	if (fData.FindRect("StatusWindowFrame", &frame) != B_OK)
 		return BRect(100, 100, 200, 120);
 	
 	return frame;
@@ -304,8 +304,8 @@ BMailSettings::StatusWindowFrame()
 void
 BMailSettings::SetStatusWindowFrame(BRect frame)
 {
-	if (data.ReplaceRect("StatusWindowFrame",frame))
-		data.AddRect("StatusWindowFrame",frame);
+	if (fData.ReplaceRect("StatusWindowFrame",frame))
+		fData.AddRect("StatusWindowFrame",frame);
 }
 
 
@@ -313,7 +313,7 @@ int32
 BMailSettings::StatusWindowWorkspaces()
 {
 	uint32 workspaces;
-	if (data.FindInt32("StatusWindowWorkSpace", (int32*)&workspaces) != B_OK)
+	if (fData.FindInt32("StatusWindowWorkSpace", (int32*)&workspaces) != B_OK)
 		return B_ALL_WORKSPACES;
 
 	return workspaces;
@@ -323,8 +323,8 @@ BMailSettings::StatusWindowWorkspaces()
 void
 BMailSettings::SetStatusWindowWorkspaces(int32 workspace)
 {
-	if (data.ReplaceInt32("StatusWindowWorkSpace",workspace))
-		data.AddInt32("StatusWindowWorkSpace",workspace);
+	if (fData.ReplaceInt32("StatusWindowWorkSpace",workspace))
+		fData.AddInt32("StatusWindowWorkSpace",workspace);
 
 	BMessage msg('wsch');
 	msg.AddInt32("StatusWindowWorkSpace",workspace);
@@ -335,15 +335,15 @@ BMailSettings::SetStatusWindowWorkspaces(int32 workspace)
 int32
 BMailSettings::StatusWindowLook()
 {
-	return data.FindInt32("StatusWindowLook");
+	return fData.FindInt32("StatusWindowLook");
 }
 
 
 void
 BMailSettings::SetStatusWindowLook(int32 look)
 {
-	if (data.ReplaceInt32("StatusWindowLook",look))
-		data.AddInt32("StatusWindowLook",look);
+	if (fData.ReplaceInt32("StatusWindowLook",look))
+		fData.AddInt32("StatusWindowLook",look);
 		
 	BMessage msg('lkch');
 	msg.AddInt32("StatusWindowLook",look);
@@ -355,7 +355,7 @@ bigtime_t
 BMailSettings::AutoCheckInterval()
 {
 	bigtime_t value = B_INFINITE_TIMEOUT;
-	data.FindInt64("AutoCheckInterval",&value);
+	fData.FindInt64("AutoCheckInterval",&value);
 	return value;
 }
 
@@ -363,51 +363,51 @@ BMailSettings::AutoCheckInterval()
 void
 BMailSettings::SetAutoCheckInterval(bigtime_t interval)
 {
-	if (data.ReplaceInt64("AutoCheckInterval",interval))
-		data.AddInt64("AutoCheckInterval",interval);
+	if (fData.ReplaceInt64("AutoCheckInterval",interval))
+		fData.AddInt64("AutoCheckInterval",interval);
 }
 
 
 bool
 BMailSettings::CheckOnlyIfPPPUp()
 {
-	return data.FindBool("CheckOnlyIfPPPUp");
+	return fData.FindBool("CheckOnlyIfPPPUp");
 }
 
 
 void
 BMailSettings::SetCheckOnlyIfPPPUp(bool yes)
 {
-	if (data.ReplaceBool("CheckOnlyIfPPPUp",yes))
-		data.AddBool("CheckOnlyIfPPPUp",yes);
+	if (fData.ReplaceBool("CheckOnlyIfPPPUp",yes))
+		fData.AddBool("CheckOnlyIfPPPUp",yes);
 }
 
 
 bool
 BMailSettings::SendOnlyIfPPPUp()
 {
-	return data.FindBool("SendOnlyIfPPPUp");
+	return fData.FindBool("SendOnlyIfPPPUp");
 }
 
 
 void
 BMailSettings::SetSendOnlyIfPPPUp(bool yes)
 {
-	if (data.ReplaceBool("SendOnlyIfPPPUp",yes))
-		data.AddBool("SendOnlyIfPPPUp",yes);
+	if (fData.ReplaceBool("SendOnlyIfPPPUp",yes))
+		fData.AddBool("SendOnlyIfPPPUp",yes);
 }
 
 
 uint32
 BMailSettings::DefaultOutboundChainID()
 {
-	return data.FindInt32("DefaultOutboundChainID");
+	return fData.FindInt32("DefaultOutboundChainID");
 }
 
 
 void
 BMailSettings::SetDefaultOutboundChainID(uint32 to)
 {
-	if (data.ReplaceInt32("DefaultOutboundChainID",to))
-		data.AddInt32("DefaultOutboundChainID",to);
+	if (fData.ReplaceInt32("DefaultOutboundChainID",to))
+		fData.AddInt32("DefaultOutboundChainID",to);
 }
