@@ -12,6 +12,7 @@
 #include <boot/kernel_args.h>
 
 #include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
 #include <arch/vm.h>
 #include <arch_mmu.h>
 
@@ -117,10 +118,16 @@ arch_vm_init_end(kernel_args *args)
 			continue;
 		}
 
+		phys_addr_t physicalAddress;
 		void *address = (void*)range.start;
-		area_id area = create_area("boot loader reserved area", &address,
-			B_EXACT_ADDRESS, range.size, B_ALREADY_WIRED,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (vm_get_page_mapping(VMAddressSpace::KernelID(), range.start,
+				&physicalAddress) != B_OK)
+			panic("arch_vm_init_end(): No page mapping for %p\n", address);
+		area_id area = vm_map_physical_memory(VMAddressSpace::KernelID(),
+			"boot loader reserved area", &address,
+			B_EXACT_ADDRESS, range.size,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			physicalAddress, true);
 		if (area < 0) {
 			panic("arch_vm_init_end(): Failed to create area for boot loader "
 				"reserved area: %p - %p\n", (void*)range.start,

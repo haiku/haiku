@@ -40,15 +40,13 @@ extern "C" uint8 __text_begin;
 extern "C" uint8 _end;
 
 
-#if 0
 static status_t
 insert_virtual_range_to_keep(void *start, uint32 size)
 {
-	return insert_memory_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
-		gKernelArgs.arch_args.num_virtual_ranges_to_keep,
-		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
+	return insert_address_range(gKernelArgs.arch_args.virtual_ranges_to_keep,
+		&gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, (addr_t)start, size);
 }
-#endif
 
 
 static status_t
@@ -297,12 +295,6 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 
 		// insert range in virtual ranges to keep
 
-// TODO: ATM keeping the ranges doesn't make much sense. The OF usually identity
-// maps stuff, which means that RAM will most likely be mapped < 2 GB, which we
-// cannot preserve, since that doesn't lie in the kernel address space. Mappings
-// >= 2 GB are probably memory mapped hardware registers or the frame buffer
-// (i.e. non-RAM), which we don't handle correctly ATM.
-#if 0
 		if (keepRange) {
 			if (insert_virtual_range_to_keep(map->virtual_address,
 					map->length) != B_OK) {
@@ -310,7 +302,6 @@ find_allocated_ranges(void *oldPageTable, void *pageTable,
 					gKernelArgs.num_virtual_allocated_ranges);
 			}
 		}
-#endif
 
 		total += map->length;
 	}
