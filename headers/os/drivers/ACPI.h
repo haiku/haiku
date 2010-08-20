@@ -229,6 +229,8 @@ struct acpi_module_info {
 
 	status_t	(*get_irq_routing_table)(acpi_handle busDeviceHandle,
 					acpi_data *retBuffer);
+	status_t	(*get_current_resources)(acpi_handle busDeviceHandle,
+					acpi_data *retBuffer);
 
 	/* Power state setting */
 
