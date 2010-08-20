@@ -558,7 +558,7 @@ PackageScript::DoInstall(const char *path, ItemState *state)
 		}
 	}
 
-	parser_debug("Ret: %d %s\n", ret, strerror(ret));
+	parser_debug("Ret: %ld %s\n", ret, strerror(ret));
 	return ret;
 }
 
@@ -710,14 +710,14 @@ PackageDirectory::DoInstall(const char *path, ItemState *state)
 	parser_debug("Directory: %s DoInstall() called!\n", fPath.String());
 
 	ret = InitPath(path, &destination);
-	parser_debug("Ret: %d %s\n", ret, strerror(ret));
+	parser_debug("Ret: %ld %s\n", ret, strerror(ret));
 	if (ret != B_OK)
 		return ret;
 
 	// Since Haiku is single-user right now, we give the newly
 	// created directory default permissions
 	ret = create_directory(destination.Path(), kDefaultMode);
-	parser_debug("Create dir ret: %d %s\n", ret, strerror(ret));
+	parser_debug("Create dir ret: %ld %s\n", ret, strerror(ret));
 	if (ret != B_OK)
 		return ret;
 	BDirectory dir(destination.Path());
@@ -734,7 +734,7 @@ PackageDirectory::DoInstall(const char *path, ItemState *state)
 	if (fOffset)
 		ret = HandleAttributes(&destination, &dir, "FoDa");
 
-	parser_debug("Ret: %d %s\n", ret, strerror(ret));
+	parser_debug("Ret: %ld %s\n", ret, strerror(ret));
 	return ret;
 }
 
