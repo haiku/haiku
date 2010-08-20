@@ -304,7 +304,7 @@ parse_vmdk_header(int fd, off_t fileSize, VmdkCookie*& _cookie)
 					break;
 				}
 
-				extendOffset = strtoll(token2.string, 0, NULL);
+				extendOffset = strtoll(token2.string, NULL, 0);
 				if (extendOffset == 0) {
 					TRACE("Bad extend offset.\n");
 					return B_BAD_DATA;
