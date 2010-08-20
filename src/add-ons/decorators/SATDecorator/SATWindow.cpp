@@ -405,7 +405,6 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	leftConstraint->SetRightSide(frame.left);
 	topConstraint->SetRightSide(frame.top);
 
-
 	widthConstraint->SetPenaltyNeg(110);
 	widthConstraint->SetPenaltyPos(110);
 	heightConstraint->SetPenaltyNeg(110);
@@ -417,7 +416,16 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	topConstraint->SetPenaltyPos(100);
 
 	// After we set the new parameter solve and apply the new layout.
-	fSATGroup->SolveSATAndAdjustWindows(triggerWindow);
+	ResultType result;
+	for (int32 tries = 0; tries < 15; tries++) {
+		result = fSATGroup->GetLinearSpec()->Solve();
+		if (result == INFEASIBLE)
+			break;
+		if (result == OPTIMAL) {
+			fSATGroup->AdjustWindows(triggerWindow);
+			break;
+		}
+	}
 
 	// set penalties back to normal
 	widthConstraint->SetPenaltyNeg(10);

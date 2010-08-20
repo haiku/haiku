@@ -713,16 +713,8 @@ SATGroup::FindVerticalTab(float position)
 
 
 void
-SATGroup::SolveSATAndAdjustWindows(SATWindow* triggerWindow)
+SATGroup::AdjustWindows(SATWindow* triggerWindow)
 {
-	// solve Stack & Tile specification
-	ResultType result;
-	for (int32 tries = 0; tries < 15; tries++) {
-		result = fLinearSpec.Solve();
-		if (result == OPTIMAL || result == INFEASIBLE)
-			break;
-	}
-
 	// set window locations and sizes
 	for (int i = 0; i < fSATWindowList.CountItems(); i++) {
 		SATWindow* windowSAT = fSATWindowList.ItemAt(i);

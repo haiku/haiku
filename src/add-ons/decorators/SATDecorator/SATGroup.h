@@ -198,7 +198,7 @@ public:
 
 		LinearSpec*			GetLinearSpec() { return &fLinearSpec; }
 
-		void				SolveSATAndAdjustWindows(SATWindow* triggerWindow);
+		void				AdjustWindows(SATWindow* triggerWindow);
 
 		/*! Create a new WindowArea from the crossing and add the window. */
 		bool				AddWindow(SATWindow* window, Tab* left, Tab* top,
