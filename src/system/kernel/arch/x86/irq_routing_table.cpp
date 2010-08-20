@@ -11,7 +11,7 @@
 #include <int.h>
 
 
-//#define TRACE_PRT
+#define TRACE_PRT
 #ifdef TRACE_PRT
 #	define TRACE(x...) dprintf("IRQRoutingTable: "x)
 #else
@@ -49,8 +49,8 @@ print_irq_descriptor(irq_descriptor* descriptor)
 	const char* levelTriggeredString = "level triggered";
 	const char* edgeTriggeredString = " edge triggered";
 
-	dprintf("shareable: %i, polarity: %s, interrupt_mode: %s\n",
-		descriptor->shareable, descriptor->polarity == B_HIGH_ACTIVE_POLARITY
+	dprintf("irq: %i, shareable: %i, polarity: %s, interrupt_mode: %s\n",
+		descriptor->irq, descriptor->shareable, descriptor->polarity == B_HIGH_ACTIVE_POLARITY
 			? activeHighString : activeLowString,
 		descriptor->interrupt_mode == B_LEVEL_TRIGGERED	? levelTriggeredString
 			: edgeTriggeredString);
@@ -67,31 +67,7 @@ print_irq_routing_table(IRQRoutingTable* table)
 		dprintf("pin: %i\n", entry.pin);
 		dprintf("source: %x\n", int(entry.source));
 		dprintf("source index: %i\n", entry.source_index);
-
-		dprintf("pci_bus: %i\n", entry.pci_bus);
-		dprintf("pci_device: %i\n", entry.pci_device);
 	}
-}
-
-
-static status_t
-find_pci_device(pci_module_info *pci, irq_routing_entry* entry)
-{
-	pci_info info;
-	int pciN = 0;
-	while ((*pci->get_nth_pci_info)(pciN, &info) == B_OK) {
-		pciN ++;
-
-		int16 deviceAddress = entry->device_address >> 16 & 0xFFFF;
-		if (info.device == deviceAddress
-			&& info.u.h0.interrupt_pin == entry->pin + 1) {
-			entry->pci_bus = info.bus;
-			entry->pci_device = info.device;
-			return B_OK;
-		}
-	}
-
-	return B_ERROR;
 }
 
 
@@ -107,27 +83,16 @@ read_device_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 		return status;
 
 	irq_routing_entry irqEntry;
-	acpi_pci_routing_table* acpiTable
-		= (acpi_pci_routing_table*)buffer.pointer;
+	acpi_pci_routing_table* acpiTable = (acpi_pci_routing_table*)buffer.pointer;
 	while (acpiTable->length) {
-		irqEntry.device_address = acpiTable->address;
-		irqEntry.pin = acpiTable->pin;
 		acpi_handle source;
-		if (acpi->get_handle(device, acpiTable->source, &source) != B_OK)
-			continue;
-		irqEntry.source = source;
-		irqEntry.source_index = acpiTable->sourceIndex;
-
-		// connect to pci device
-		if (find_pci_device(pci, &irqEntry) != B_OK) {
-			TRACE("no pci dev found, device %x, pin %i\n",
-				irqEntry.device_address, irqEntry.pin);
-			acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
-				+ acpiTable->length);
-			continue;
+		if (acpi->get_handle(NULL, acpiTable->source, &source) == B_OK) {
+			irqEntry.device_address = acpiTable->address;
+			irqEntry.pin = acpiTable->pin;
+			irqEntry.source = source;
+			irqEntry.source_index = acpiTable->sourceIndex;
+			table->PushBack(irqEntry);			
 		}
-
-		table->PushBack(irqEntry);
 		acpiTable = (acpi_pci_routing_table*)((uint8*)acpiTable
 			+ acpiTable->length);
 	}
@@ -156,24 +121,24 @@ read_irq_routing_table(pci_module_info *pci, acpi_module_info* acpi,
 	if (status != B_OK)
 		return status;
 
-	TRACE("find p2p \n");
+	TRACE("find routing tables \n");
 
-	char result[255];
-	result[0] = 0;
+	char name[255];
+	name[0] = 0;
 	void *counter = NULL;
-	while (acpi->get_next_entry(ACPI_TYPE_DEVICE, rootPciName, result, 255,
+	while (acpi->get_next_entry(ACPI_TYPE_DEVICE, rootPciName, name, 255,
 		&counter) == B_OK) {
 		acpi_handle brigde;
-		status = acpi->get_handle(NULL, result, &brigde);
+		status = acpi->get_handle(NULL, name, &brigde);
 		if (status != B_OK)
 			continue;
 
 		status = read_device_irq_routing_table(pci, acpi, brigde, table);
 		if (status == B_OK)
-			TRACE("p2p found %s\n", result);
+			TRACE("routing table found %s\n", name);			
 	}
 
-	return status;
+	return table->Count() > 0 ? B_OK : B_ERROR;
 }
 
 
@@ -184,50 +149,31 @@ read_irq_descriptor(acpi_module_info* acpi, acpi_handle device,
 	acpi_data buffer;
 	buffer.pointer = NULL;
 	buffer.length = ACPI_ALLOCATE_BUFFER;
-	status_t status = acpi->evaluate_method(device, method, NULL,
-		&buffer);
+	status_t status = acpi->get_current_resources(device, &buffer);
 	if (status != B_OK) {
 		free(buffer.pointer);
 		return status;
 	}
 
-	acpi_object_type* resourceBuffer = (acpi_object_type*)buffer.pointer;
-	if (resourceBuffer[0].object_type != ACPI_TYPE_BUFFER)
-		return B_ERROR;
+	acpi_resource* resource = (acpi_resource*)buffer.pointer;
+	//TODO Don't hardcode END TAG
+	while (resource->type != 7) {
+		//TODO: Don't hardcode IRQ or Extended IRQ
+		if (resource->type == 0 || resource->type == 15) {
+			descriptor->irq = resource->interrupts[0];
+			descriptor->shareable = resource->sharable != 0;
+			descriptor->interrupt_mode = resource->triggering == 0 ?
+				B_LEVEL_TRIGGERED : B_EDGE_TRIGGERED;
+			descriptor->polarity = resource->polarity == 0 ?
+				B_HIGH_ACTIVE_POLARITY : B_LOW_ACTIVE_POLARITY;
 
-	int8* resourcePointer = (int8*)resourceBuffer[0].data.buffer.buffer;
-	int8 integer = resourcePointer[0];
-	if (integer >> 3 != kIRQDescriptor) {
-		TRACE("resource is not a irq descriptor\n");
-		return B_ERROR;
+			free(buffer.pointer);
+			return B_OK;
+		} 
+		resource = (acpi_resource*)((uint8*)resource + resource->length);
 	}
-
-	int8 size = resourcePointer[0] & 0x07;
-	if (size < 2) {
-		TRACE("invalid resource size\n");
-		return B_ERROR;
-	}
-
-	descriptor->irq = resourcePointer[2];
-	descriptor->irq = descriptor->irq << 8;
-	descriptor->irq |= resourcePointer[1];
-
-	// if size equal 2 we are don't else read the third entry
-	if (size == 2)
-		return B_OK;
-
-	int irqInfo = resourcePointer[3];
-	int bit;
-	
-	bit = irqInfo & 0x01;
-	descriptor->interrupt_mode = (bit == 0) ? B_LEVEL_TRIGGERED
-		: B_EDGE_TRIGGERED;
-	bit = irqInfo >> 3 & 0x01;
-	descriptor->polarity = (bit == 0) ? B_HIGH_ACTIVE_POLARITY
-		: B_LOW_ACTIVE_POLARITY;
-	descriptor->shareable = irqInfo >> 4 & 0x01;
-
-	return B_OK;
+	free(buffer.pointer);
+	return B_ERROR;
 }
 
 
