@@ -38,20 +38,24 @@ const static rgb_color kZombieColor = {220, 220, 220, 255};
 class _BZombieReplicantView_ : public BBox {
 
 public:
-				_BZombieReplicantView_(BRect frame, status_t error);
-virtual			~_BZombieReplicantView_();
+								_BZombieReplicantView_(BRect frame, 
+									status_t error);
+	virtual						~_BZombieReplicantView_();
 
-virtual	void	MessageReceived(BMessage *msg);
+	virtual	void				MessageReceived(BMessage*msg);
 
-virtual	void	Draw(BRect updateRect);
+	virtual	void				Draw(BRect updateRect);
 
-virtual	void	MouseDown(BPoint);
+	virtual	void				MouseDown(BPoint);
 
-		void	SetArchive(BMessage *);
+	virtual status_t			Archive(BMessage* archive,
+									bool deep = true) const;
+
+			void				SetArchive(BMessage*);
 
 private:
-		status_t	fError;
-		BMessage	*fArchive;
+			status_t			fError;
+			BMessage*			fArchive;
 };
 
 #endif /* _ZOMBIE_REPLICANT_VIEW_H */

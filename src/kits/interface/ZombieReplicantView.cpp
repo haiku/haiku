@@ -37,12 +37,12 @@ _BZombieReplicantView_::~_BZombieReplicantView_()
 
 
 void
-_BZombieReplicantView_::MessageReceived(BMessage *msg)
+_BZombieReplicantView_::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case B_ABOUT_REQUESTED:
 		{
-			const char *addOn = NULL;
+			const char* addOn = NULL;
 			char error[1024];
 			if (fArchive->FindString("add_on", &addOn) == B_OK) {
 				char description[B_MIME_TYPE_LENGTH] = "";				
@@ -58,7 +58,7 @@ _BZombieReplicantView_::MessageReceived(BMessage *msg)
 			}
 
 						
-			BAlert *alert = new (std::nothrow) BAlert("Error", error, "OK", NULL, NULL,
+			BAlert* alert = new (std::nothrow) BAlert("Error", error, "OK", NULL, NULL,
 								B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			if (alert != NULL)
 				alert->Go();
@@ -92,8 +92,17 @@ _BZombieReplicantView_::MouseDown(BPoint)
 }
 
 
+status_t
+_BZombieReplicantView_::Archive(BMessage* archive, bool) const
+{
+	*archive = *fArchive;
+	
+	return B_OK;
+}
+
+
 void
-_BZombieReplicantView_::SetArchive(BMessage *archive)
+_BZombieReplicantView_::SetArchive(BMessage* archive)
 {
 	fArchive = archive;
 }
