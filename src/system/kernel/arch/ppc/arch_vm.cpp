@@ -175,5 +175,5 @@ arch_vm_set_memory_type(VMArea *area, phys_addr_t physicalBase, uint32 type)
 	if (type == 0)
 		return B_OK;
 
-	return B_ERROR;
+	return B_OK;
 }

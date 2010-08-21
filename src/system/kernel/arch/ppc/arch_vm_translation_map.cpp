@@ -201,15 +201,15 @@ ppc_translation_map_change_asid(VMTranslationMap *map)
 static void
 fill_page_table_entry(page_table_entry *entry, uint32 virtualSegmentID,
 	addr_t virtualAddress, phys_addr_t physicalAddress, uint8 protection,
-	bool secondaryHash)
+	uint32 memoryType, bool secondaryHash)
 {
 	// lower 32 bit - set at once
 	entry->physical_page_number = physicalAddress / B_PAGE_SIZE;
 	entry->_reserved0 = 0;
 	entry->referenced = false;
 	entry->changed = false;
-	entry->write_through = false;
-	entry->caching_inhibited = false;
+	entry->write_through = (memoryType == B_MTR_UC) || (memoryType == B_MTR_WT);
+	entry->caching_inhibited = (memoryType == B_MTR_UC);
 	entry->memory_coherent = false;
 	entry->guarded = false;
 	entry->_reserved1 = 0;
@@ -389,7 +389,6 @@ status_t
 PPCVMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 	uint32 attributes, uint32 memoryType, vm_page_reservation* reservation)
 {
-// TODO: Support memory types!
 	// lookup the vsid based off the va
 	uint32 virtualSegmentID = VADDR_TO_VSID(fVSIDBase, virtualAddress);
 	uint32 protection = 0;
@@ -413,7 +412,7 @@ PPCVMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 			continue;
 
 		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
-			protection, false);
+			protection, memoryType, false);
 		fMapCount++;
 		return B_OK;
 	}
@@ -430,7 +429,7 @@ PPCVMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 			continue;
 
 		fill_page_table_entry(entry, virtualSegmentID, virtualAddress, physicalAddress,
-			protection, false);
+			protection, memoryType, false);
 		fMapCount++;
 		return B_OK;
 	}
@@ -767,7 +766,8 @@ arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress,
 		if (group->entry[i].valid)
 			continue;
 
-		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, PTE_READ_WRITE, false);
+		fill_page_table_entry(&group->entry[i], virtualSegmentID,
+			virtualAddress, physicalAddress, PTE_READ_WRITE, 0, false);
 		return B_OK;
 	}
 
@@ -778,7 +778,8 @@ arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress,
 		if (group->entry[i].valid)
 			continue;
 
-		fill_page_table_entry(&group->entry[i], virtualSegmentID, virtualAddress, physicalAddress, PTE_READ_WRITE, true);
+		fill_page_table_entry(&group->entry[i], virtualSegmentID,
+			virtualAddress, physicalAddress, PTE_READ_WRITE, 0, true);
 		return B_OK;
 	}
 
