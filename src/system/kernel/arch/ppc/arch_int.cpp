@@ -471,7 +471,6 @@ probe_pic_device(device_node *node, PICModuleList &picModules)
 	for (PICModule *module = picModules.Head();
 		 module;
 		 module = picModules.GetNext(module)) {
-		//bool noConnection;
 		if (module->module->info.supports_device(node) > 0) {
 			if (module->module->info.register_device(node) == B_OK)
 				return true;
