@@ -1,5 +1,6 @@
 /*
  * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010 Andreas Färber <andreas.faerber@web.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +11,7 @@
 
 #include <SupportDefs.h>
 
+#include <boot/stage2.h>
 #include <platform/openfirmware/openfirmware.h>
 #include <util/kernel_cpp.h>
 
@@ -71,6 +73,11 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 	size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
+
+	// If the frame buffer is enabled, don't write to the chosen stdout.
+	// On Apple's OpenFirmware this would overwrite parts of the frame buffer.
+	if (gKernelArgs.frame_buffer.enabled)
+		return bufferSize;
 
 	// be nice to our audience and replace single "\n" with "\r\n"
 
