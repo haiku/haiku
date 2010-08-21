@@ -444,11 +444,8 @@ ShelfContainerViewFilter::_ObjectDropFilter(BMessage *msg, BHandler **_handler)
 		mouseView = dynamic_cast<BView*>(*_handler);
 
 	if (msg->WasDropped()) {
-		if (!fShelf->fAllowDragging) {
-			printf("Dragging replicants isn't allowed to this shelf.");
-			beep();
+		if (!fShelf->fAllowDragging)
 			return B_SKIP_MESSAGE;
-		}
 	}
 
 	BPoint point;
@@ -934,22 +931,13 @@ BShelf::SetSaveLocation(const entry_ref *ref)
 BDataIO *
 BShelf::SaveLocation(entry_ref *ref) const
 {
-	entry_ref entry;
-
-	if (fStream && ref) {
-		*ref = entry;
-		return fStream;
-	}
-	if (fEntry) {
-		fEntry->GetRef(&entry);
-
+	if (fStream) {
 		if (ref)
-			*ref = entry;
+			*ref = entry_ref();
+		return fStream;
+	} else if (fEntry && ref)
+		fEntry->GetRef(ref);
 
-		return NULL;
-	}
-
-	*ref = entry;
 	return NULL;
 }
 
