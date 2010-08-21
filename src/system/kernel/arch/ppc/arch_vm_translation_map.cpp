@@ -887,6 +887,20 @@ bool
 arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
 	uint32 protection)
 {
-	// TODO: Implement!
-	return false;
+	VMAddressSpace *addressSpace = VMAddressSpace::Kernel();
+
+	PPCVMTranslationMap* map = static_cast<PPCVMTranslationMap*>(
+		addressSpace->TranslationMap());
+
+	phys_addr_t physicalAddress;
+	uint32 flags;
+	if (map->Query(virtualAddress, &physicalAddress, &flags) != B_OK)
+		return false;
+
+	if ((flags & PAGE_PRESENT) == 0)
+		return false;
+
+	// present means kernel-readable, so check for writable
+	return (protection & B_KERNEL_WRITE_AREA) == 0
+		|| (flags & B_KERNEL_WRITE_AREA) != 0;
 }
