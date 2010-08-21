@@ -1334,8 +1334,10 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		}
 	}
 
-	data->RemoveName("_drop_point_");
-	data->RemoveName("_drop_offset_");
+	if (!zombie) {
+		data->RemoveName("_drop_point_");
+		data->RemoveName("_drop_offset_");
+	}
 
 	replicant_data *item = new replicant_data(data, replicant, dragger,
 		relation, uniqueID);
