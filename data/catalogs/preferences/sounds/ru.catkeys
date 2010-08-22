@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Sounds	157066591
+1	russian	x-vnd.Haiku-Sounds	3382039821
 No such file or directory	HEventList		Такого файла или папки не существует
 OK	SoundsHApp		Oк
 Sound File:	HWindow		Аудио файл:
@@ -6,3 +6,12 @@ OK	HEventList		Oк
 OK	HWindow		Ок
 This is not an audio file.	HWindow		Это не аудио файл.
 Stop	HWindow		Остановить
+About Sounds	SoundsHApp		О программе...
+Sound	HEventList		Звук
+Event	HEventList		Событие
+<none>	HEventList		<нет>
+Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n разработали:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n Оригинальную Be версию разработал Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku
+<none>	HWindow		<нет>
+Other…	HWindow		Другой...
+Play	HWindow		Воспроизвести
+Sounds	SoundsHApp		Звуки

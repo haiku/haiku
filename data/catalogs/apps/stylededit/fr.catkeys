@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	154881138
+1	french	x-vnd.Haiku-StyledEdit	1187976595
 OK	LoadAlert		OK
 ???	LoadAlert		???
 Left	Menus		À gauche
@@ -58,3 +58,15 @@ Cancel	SaveAlert		Annuler
 Save	SaveAlert		Sauvegarder
 Don't save	SaveAlert		Ne pas enregistrer
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document \"%s\" ?
+Paste	Menus		Coller
+File	Menus		Fichier
+Page setup…	Menus		Mise en page…
+Print…	Menus		Imprimer…
+Quit	Menus		Quitter
+Clear	Menus		Vider
+Edit	Menus		Édition
+Close	Menus		Fermer
+Copy	Menus		Copier
+Cut	Menus		Couper
+Select all	Menus		Selectionner tout
+Save as…	Menus		Enregistrer sous…

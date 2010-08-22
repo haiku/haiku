@@ -1,14 +1,16 @@
-1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	4272614932
+1	brazilian_portuguese	x-vnd.Haiku-StyledEdit	1497992737
 Search backwards	FindandReplaceWindow		Localizar anterior
 Size	Menus		Tamanho
 Save	QuitAlert		Salvar
 Redo typing	Menus		Refazer digitação
 Replace same	Menus		Substituir tudo
+Can't Undo	Menus		Impossível desfazer
 Save	Menus		Salvar
 Replace with:	FindandReplaceWindow		Substituir por:
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
 Revert to saved…	Menus		Reverter para arquivo salvo...
 Save changes to the document \"%s\"? 	QuitAlert		Salvar as alterações ao documento \"%s\"? 
+Font	Menus		Fonte
 Default	Open_and_SaveAsPanel		Padrões
 Don't save	QuitAlert		Não salvar
 Center	Menus		Centralizado
@@ -18,7 +20,11 @@ Undo typing	Menus		Desfazer digitação
 Save	SaveAlert		Salvar
 Don't save	SaveAlert		Não salvar
 This file is marked Read-Only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações ao documento \"%s\"?
+Paste	Menus		Colar.
 File	Menus		Arquivo
+Clear	Menus		Limpar.
+Edit	Menus		Editar
+Copy	Menus		Copiar
 Cut	Menus		Recortar
 Select all	Menus		Selecionar tudo
 Save as…	Menus		Salvar como...

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	3103088351
+1	french	x-vnd.Haiku-Terminal	1553477114
 Not found.	Terminal TermWindow		Non trouvé
 Change directory	Terminal TermView		Changer de répertoire
 OK	Terminal TermWindow		OK
@@ -11,9 +11,12 @@ OK	Terminal PrefWindow		OK
 Font:	Terminal AppearancePrefView		Police :
 Copy here	Terminal TermView		Copier ici
 Copy	Terminal TermWindow		Copier
+sigaction() failed: %s\n	Terminal TermApp		sigaction() a échoué : %s\n
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Option « %s » non reconnue\n
 Print cancelled.	Terminal TermWindow		Impression annulée
 Increase	Terminal TermWindow		Augmenter
 Settings	Terminal TermWindow		Réglages
+Window size	Terminal TermWindow		Taille de la fenêtre
 Terminal settings	Terminal PrefWindow		Réglages du Terminal
 Find	Terminal FindWindow		Rechercher
 Appearance	Terminal PrefWindow		Apparence
@@ -22,14 +25,17 @@ Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d'exécuter «
 Full screen	Terminal TermWindow		Plein écran
 Page setup…	Terminal TermWindow		Mise en page…
 OK	Terminal TermView		OK
+Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui et Takashi Murai.\n\nUsage : %s [OPTION] [SHELL]\n
 Close tab	Terminal SmartTabView		Fermer l'onglet
 Text not found.	Terminal TermWindow		Texte non trouvé
+Find…	Terminal TermWindow		Rechercher…
 Move here	Terminal TermView		Déplacer ici
 Error!	Terminal getString		Erreur !
 New tab	Terminal TermWindow		Nouvel onglet
 Decrease	Terminal TermWindow		Réduire
 size	Terminal TermView		taille
 Settings…	Terminal TermWindow		Réglages…
+Abort	Terminal Shell		Abandonner
 Color:	Terminal AppearancePrefView		Couleur :
 Print	Terminal TermWindow		Imprimer
 Cancel	Terminal TermWindow		Annuler
@@ -41,5 +47,6 @@ Paste	Terminal TermWindow		Coller
 Cancel	Terminal PrefWindow		Annuler
 Save	Terminal PrefWindow		Enregistrer
 Cancel	Terminal TermView		Annuler
+Color schema:	Terminal AppearancePrefView		Schéma de couleur
 Terminal\n\nwritten by Kazuho Okui and Takashi Murai\nupdated by Kian Duffy and others\n\nCopyright ©2003-2009, Haiku.\n	Terminal TermView		Terminal\n\nÉcrit par Kazuho Okui et Takashi Murai\nMis à jour par by Kian Duffy et d'autres\n\nCopyright ©2003-2009, Haiku.\n
 A process is still running.\nIf you close the Terminal the process will be killed.	Terminal TermWindow		Une tâche tourne encore.\nSi vous fermer le Terminal, cette tâche sera détruite.

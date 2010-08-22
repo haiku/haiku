@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1239521653
+1	french	x-vnd.Haiku-libtracker	1636109715
 Sorry, you can't save things at the root of your system.	libtracker		Désolé, vous ne pouvez rien enregistrer à la racine de votre système.
 Empty Trash	libtracker		Vider la poubelle
 Recent folders	libtracker		Répertoires récents
@@ -13,6 +13,7 @@ Create a Query template	libtracker		créer un modèle de requête
 %num items	libtracker		%num objets
 Modified	libtracker		Modifié
 Group	libtracker		Groupe
+Create link	libtracker		Créer un lien
 Moving: 	libtracker		Déplace :
 Preparing to copy items…	libtracker		Préparation de la copie…
 Error deleting items	libtracker		Erreur en supprimant les objets
@@ -21,6 +22,9 @@ Open with…	libtracker		Ouvrir avec…
 for %num files	libtracker		pour %num fichiers
 Unknown	libtracker		Inconnu
 Close	libtracker		Fermer
+Go to parent	libtracker		Ouvrir le parent
+%name info	libtracker	InfoWindow Title	Informations sur %name
+(Finish: %time - %finishtime minutes left)	libtracker		(Fin à %time - %finishtime minutes restantes)
 Recent documents	libtracker		Documents récents
 Clean up	libtracker		Nettoyer
 Find…	libtracker		Trouver…
@@ -28,35 +32,51 @@ Mount all	libtracker		Tout monter
 Opens with:	libtracker		S'ouvre avec :
 Paste layout	libtracker		Coller la disposition
 Cancel	libtracker		Annuler
+Preparing to move items…	libtracker		Préparation du déplacement…
 Invert selection	libtracker		Inverser la sélection
+Don't move files to Trash	libtracker		Ne pas déplacer les fichiers dans la poubelle
 Name	libtracker		Nom
 Cut more	libtracker		Couper plus
 save text	libtracker		enregistrer le texte
 Could not open \"%document\" (Missing symbol: %symbol). \n	libtracker		Impossible d'ouvrir \"%document\" (Symbole manquant: %symbol). \n
 Don't automount	libtracker		Ne pas monter automatiquement
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	libtracker		Désolé, l'attribut 'Caractère' ne peut pas stocker un symbole sur plusieurs octets.
 Would you like to find a suitable application to open the file?	libtracker		Voulez-vous chercher une application adaptée pour ouvrir ce fichier ?
 Increase size	libtracker		Augmenter la taille
 is	libtracker		est
+(Finish: %time - Over %finishtime hours left)	libtracker		(Fin à %time - Plus de %finishtime heures restantes)
 Could not open \"%name\" (%error). 	libtracker		Impossible d'ouvrir \"%name\" (%error).
 Copying: 	libtracker		Copie :
 You cannot replace a folder or a symbolic link with a file.	libtracker		Vous ne pouvez pas remplacer un répertoire ou un lien symbolique par un fichier
 Decrease size	libtracker		Réduire la taille
+There was an error deleting \"%name\":\n\t%error	libtracker		Une erreur est survenue lors de la suppression de « %name » :\n\t%error
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	libtracker		Êtes-vous sûr de vouloir supprimer les éléments sélectionnés ? Cette opération ne peut pas être annulée.
+The target disk does not support creating links.	libtracker		Le disque cible ne supporte pas la création de liens.
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	libtracker		L'élément sélectionné ne peut pas être déplacé dans la Poubelle. Voulez-vous le supprimer définitivement ? (Cette opération ne peut pas être annulée.)
 before	libtracker		avant
 Disks	libtracker		Disques
 Cut	libtracker		Couper
+The Tracker must be running to see Info windows.	libtracker		Pour voir les fenêtre d'informations, le Tracker doit être lancé.
 Desktop	libtracker		Bureau
 Create a Query	libtracker		Créer une requête
+Could not update permissions of file \"%name\". %error	libtracker		Impossible de mettre à jour les permissions du fichier « %name ». %error
+Error in regular expression:\n\n'	libtracker		Erreur dans une expression régulière : \n\n'
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le type mime ? Haiku pourrait ne pas se comporter correctement.
+Resize to Fit	libtracker		Retailler et ajuster
 Add printer…	libtracker		Ajouter une imprimante…
 Trash	libtracker		Poubelle
 greater than	libtracker		plus grand que
 Other	libtracker		Autre
 GiB	libtracker		GiO
+Query name:	libtracker		Nom de la requête :
 Or	libtracker		Ou
 Do it	libtracker		Le faire
 Emptying Trash… 	libtracker		Vidage de la corbeille...
 Sorry, you cannot edit that attribute.	libtracker		Désolé, vous ne pouvez pas éditer cet attribut
 Deleting: 	libtracker		Supprime :
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	libtracker		Le fichier « %name » existe déjà dans le répertoire spécifié. Voulez-vous le remplacer ?
 Revert	libtracker		Défaire
+Could not open \"%document\" with application \"%app\" (%error). 	libtracker		Impossible d'ouvrir « %document » avec l'application « %app » (%error).
 Version	libtracker		Version
 Invert	libtracker		Inverser
 by attribute	libtracker		par attribut
@@ -67,16 +87,28 @@ Owner	libtracker		Propriétaire
 Select all	libtracker		Tout sélectionner
 Delete	libtracker		Supprimer
 ends with	libtracker		se termine par
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	libtracker		Si vous %action le répertoire config, Haiku pourrait ne plus fonctionner correctement. Êtes-vous sûr de vouloir faire ceci ? Pour %action le répertoire config malgré tout, cliquez sur « Le faire ».
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Erreur lors de la copie du répertoire « %name » :\n\t%error\n\nVoulez-vous continuer ?
 OK	libtracker		OK
+Make active printer	libtracker		Activer l'imprimante
 New	libtracker		Nouveau
+Paused: click to resume or stop	libtracker		Mis en pause : cliquez pour reprendre ou arrêter
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	libtracker		Impossible d'ouvrir « %document » avec l'application « %app » (Bibliothèques manquantes : %library).\n
 MiB	libtracker		MiO
 Include trash	libtracker		Inclure la corbeille
+Could not find an application to open \"%name\" (%error). 	libtracker		Impossible de trouver une application pour ouvrir « %name » (%error).
+Could not open \"%document\" (Missing libraries: %library). \n	libtracker		Impossible d'ouvrir « %document » (Bibliothèques manquantes : %library).\n
 Temporary	libtracker		Temporaire
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le répertoire « home » ? Haiku pourrait ne pas se comporter correctement.
 40 x 40	libtracker		40 x 40
+Previously mounted disks	libtracker		Disques précédemment montés
 Create link here	libtracker		Créer un lien ici
 Unmount	libtracker		Démonter
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	libtracker		Impossible d'ouvrir « %document » avec l'application « %app » (Symbol manquant : %symbol).\n
 less than	libtracker		moins que
+Edit query	libtracker		Modifier la requête
 Original name	libtracker		Nom original
+Preparing to delete items…	libtracker		Préparation de la suppression…
 Created:	libtracker		Créé :
 Location:	libtracker		Emplacement :
 New Query	libtracker		Nouvelle requête
@@ -86,6 +118,8 @@ Windows	libtracker		Fenêtres
 Execute	libtracker		Exécuter
 Created	libtracker		Créé
 label too long	libtracker		étiquette trop longue
+Link \"%name\" to:	libtracker	File dialog title for new sym link	Lien « %name » vers :
+Query template	libtracker		Modèle de requête
 Description:	libtracker		Description :
 Save	libtracker		Enregistrer
 Month-day-year	libtracker		Mois-jour-année
@@ -100,31 +134,58 @@ Ignore case	libtracker		Insensible à la casse
 None	libtracker		Aucun
 moving	libtracker		déplace
 Version:	libtracker		Version :
+Move here	libtracker		Déplacer ici
 after	libtracker		après
 Size	libtracker		Taille
+Search	libtracker		Rechercher
+Recalculate folder size	libtracker		Recalculer la taille du répertoire
+Favorites	libtracker		Favoris
 Edit templates…	libtracker		Éditer les modèles…
 Add	libtracker		Ajouter
 Settings…	libtracker		Réglages…
+Sorry, could not create a new folder.	libtracker		Désolé, impossible de créer un nouveau répertoire.
+Current folder	libtracker		Répertoire courant
+New folder %ld	libtracker		Nouveau dossier %ld
+Cannot unmount the boot volume \"%name\".	libtracker		Impossible de démonter le volume d'amorçage « %name ».
 Copy here	libtracker		Copier ici
 %Ld bytes	libtracker		%Ld octets
 Location	libtracker		Emplacement
+Error moving \"%name\".	libtracker		Erreur lors du déplacement de \"%name\"
+Show volumes on Desktop	libtracker		Montrer les volumes sur le bureau
+Name = %name	libtracker	FindResultTitle	Nom = %name
 Window	libtracker		Fenêtre
+There was a problem trying to replace \"%name\". The item might be open or busy.	libtracker		Un problème est survenu lors du remplacement de « %name ». L'élément est peut-être ouvert ou occupé.
+New folder%ld	libtracker		Nouveau dossier %ld
+Year-month-day	libtracker		Année-mois-jour
+New folder	libtracker		Nouveau dossier
 File	libtracker		Fichier
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	libtracker		Erreur lors de la copie du fichier « %name » :\n\t%error\n\nVoulez-vous continuer ?
 Close all	libtracker		Tout fermer
+(Finish: %time)	libtracker		(Fin à : %time)
 Clock	libtracker		Horloge
+Mount settings…	libtracker		Paramètres de montage…
 is not	libtracker		n'est pas
 Remove	libtracker		Enlever
 no items	libtracker		pas d'objets
 copying	libtracker		copie
 Preferences…	libtracker		Préférences…
 All disks	libtracker		Tous les disques
+Searching for disks to mount…	libtracker		Recherche des disques à monter…
+Tracker status	libtracker		État du Tracker
 Identify	libtracker		Identifier
+Automatic disk mounting	libtracker		Montage automatique des disques
 Add-ons	libtracker		Extensions
+Select…	libtracker		Selectionner…
+Could not open \"%name\". The file is mistakenly marked as executable. 	libtracker		Impossible d'ouvrir « %name ». Le fichier est marqué par erreur comme étant exécutable.
+Single window navigation	libtracker		Navigation dans une fenêtre unique
 Done	libtracker		Terminé
+Open selection with:	libtracker		Ouvrir la sélection avec :
 Paste	libtracker		Coller
 32 x 32	libtracker		32 x 32
+You must drop items on one of the disk icons in the \"Disks\" window.	libtracker		Vous devez déposer les éléments sur l'une des icônes de disques dans la fenêtre « Disques ».
 Move to	libtracker		Déplacer vers
 by name	libtracker		par nom
+Add current folder	libtracker		Ajouter le dossier courant
 %Ld B	libtracker		%Ld o
 Kind	libtracker		Type
 Move to Trash	libtracker		Déplacer vers la corbeille
@@ -135,13 +196,18 @@ by formula	libtracker		par formule
 And	libtracker		Et
 copy	libtracker	filename copy	copier
 Edit favorites…	libtracker		Édit les favoris…
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le dossier settings, Haiku pourrait ne plus fonctionner correctement. Pour %action le dossier settings malgré tout, cliquez sur « Le faire ».
 On	libtracker		Sur
 Space	libtracker		Espace
 Find	libtracker		Trouver
 Day-month-year	libtracker		Jour-mois-année
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	libtracker		Êtes vous sûr de vouloir %action le dossier « system » ? Vous ne pourrez plus démarrer Haiku ! Pour %action malgré tout le dossier « system » ou son contenu, cliquez sur « Le faire » en maintenant la touche Shift appuyée.
 Replace	libtracker		Remplacer
 Restore	libtracker		Restaurer
+Save Query as template…	libtracker		Sauvegarder la Requête comme modèle…
 KiB	libtracker		KiO
 Mount	libtracker		Monter
 Copy	libtracker		Copier
+Could not open \"%document\" because application \"%app\" is in the Trash. 	libtracker		Impossible d'ouvrir « %document » parce que l'application « %app » est dans la corbeille.
 Defaults	libtracker		Défauts
+%capacity (%used used -- %free free)	libtracker		%capacity (%used utilisés -- %free libres)

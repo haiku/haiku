@@ -1,16 +1,19 @@
-1	simplified_chinese	x-vnd.Haiku-Appearance	654135182
+1	simplified_chinese	x-vnd.Haiku-Appearance	3612090060
 Control highlight	Colors tab		控件亮度
 Control border	Colors tab		控件边界
 Antialiasing type:	AntialiasingSettingsView		抗锯齿类型:
 Shadow	Colors tab		阴影效果
 On	AntialiasingSettingsView		开启
+Defaults	APRWindow		默认
 Grayscale	AntialiasingSettingsView		灰度
 Shine	Colors tab		亮度
+Off	AntialiasingSettingsView		关闭
 Success	Colors tab		成功
 Inactive window tab text	Colors tab		激活窗口标签
 Failure	Colors tab		失败
 Hinting menu	AntialiasingSettingsView		提示菜单
 Document background	Colors tab		文档背景
+Revert	APRWindow		恢复默认
 Window tab	Colors tab		窗口选项
 Tooltip background	Colors tab		工具提示背景
 Selected menu item background	Colors tab		选择菜单背景

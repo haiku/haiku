@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-About	3166073302
+1	brazilian_portuguese	x-vnd.Haiku-About	4162644896
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e o kernel do seu NewOS)\n
 %ld Processors:	AboutView		%ld Processadores:
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projeto)\n\n
@@ -11,6 +11,9 @@ Past maintainers:\n	AboutView		Antigos desenvolvedores:\n
 Current maintainers:\n	AboutView		Desenvolvedores atuais:\n
 Time running:	AboutView		Tempo de funcionamento:
 The Haikuware team and their bounty program\n	AboutView		A equipe do Haikuware e o seu programa de recompensas\n
+About this system	AboutWindow		Sobre o Haiku
 The BeGeistert team\n	AboutView		A equipe BeGeistert\n
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku and the Haiku logo are trademarks of Haiku, Inc.\n\n	AboutView		Os direitos de copyright do código do Haiku são propriedade da Haiku Inc. ou dos respectivos autores quando devidamente explícito no código fonte. Haiku e o logo Haiku são marcas registadas da Haiku Inc.\n\n
+%d MiB used (%d%%)	AboutView		%d MiB usada (%d%%)
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the %MIT licence%. Some system libraries contain third party code distributed under the LGPL license. You can find the copyrights to third party code below.\n\n	AboutView		O código que é específico do Haiku, especialmente o kernel e todo o código do qual os programas se podem interligar, é distribuído sob os termos da licença %MIT. Algumas bibliotecas do sistema contém código de terceiros distribuído sob a licença LGPL. Você pode encontrar os copyrights para o código de terceiros abaixo.\n\n
+%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inacessíveis

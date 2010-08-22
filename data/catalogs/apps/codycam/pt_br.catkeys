@@ -1,9 +1,12 @@
-1	brazilian_portuguese	x-vnd.Haiku.CodyCam	3645173376
+1	brazilian_portuguese	x-vnd.Haiku.CodyCam	1832811833
 Capturing Image…	VideoConsumer.cpp		Capturando imagem...
+Every 30 seconds	CodyCam		A cada 30 segundos
 File name:	CodyCam		Nome do arquivo
 Server login failed	VideoConsumer.cpp		O login no servidor falhou
 Remote host has closed the connection.\n	FtpClient		O servidor remoto fechou a conexão.\n
+Every 2 hours	CodyCam		A cada 2 horas
 Rate:	CodyCam		Taxa:
+JPEG image	CodyCam		Imagem JPEG
 Capture Rate Menu	CodyCam		Menu de Taxa de Captura
 CodyCam\n\nThe Original BeOS webcam	CodyCam		CodyCam\n\nA original webcam BeOS
 File %s # unterminated quote at end of file\n	SettingsHandler		Arquivo %s # citação não terminada no final do arquivo\n

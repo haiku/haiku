@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PSRV	101881708
+1	russian	x-vnd.Be-PSRV	219268753
 Undefined	ConfigWindow		Неопределено
 Cancel	PrintServerApp		Отмена
 Page setup:	ConfigWindow		Настройка печати:
@@ -21,3 +21,9 @@ Print setup	ConfigWindow		Настройка печати
 Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
 Page setup	ConfigWindow		Настройка печати
 Paper setup:	ConfigWindow		Параметры бумаги:
+Page %1 to %2	ConfigWindow		Страница %1 из %2
+Page %1 to %2, %3 copies	ConfigWindow		Страница %1 из %2, копий: %3
+Show configuration window	PrintServerApp Scripting		Показать окно настройки
+All pages, %1 copies	ConfigWindow		Все страницы, копий: %1
+Delete a specific printer	PrintServerApp Scripting		Удалить выбранный принтер
+Create a new printer	PrintServerApp Scripting		Создать новый принтер

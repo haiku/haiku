@@ -1,0 +1,8 @@
+1	russian	x-vnd.Haiku.TextSearch	1904175921
+Actions	GrepWindow		Действия
+File	GrepWindow		Файл
+Encoding	GrepWindow		Кодировка
+History	GrepWindow		История
+%s: There was a problem running grep.	Grepper		%s: Возникла ошибка при работе grep.
+New window	GrepWindow		Новое окно
+Show files in Tracker	GrepWindow		Показать файлы в Tracker

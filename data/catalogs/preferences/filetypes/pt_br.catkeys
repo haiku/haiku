@@ -1,4 +1,4 @@
-1	brazilian_portuguese	x-vnd.Haiku-FileTypes	4226609053
+1	brazilian_portuguese	x-vnd.Haiku-FileTypes	1021255494
 Args only	Application Type Window		Somente argumentos
 Add group	New File Type Window		Adicionar grupo
 Remove	Application Type Window		Remover
@@ -26,6 +26,7 @@ Development	Application Type Window		Desenvolvimento
 Icon	FileType Window		Ícone
 Special:	Attribute Window		Especial:
 Alpha	Application Type Window		Alfa
+Signature:	Application Type Window		Assinatura:.
 Quit, don't save	Application Type Window		Sair e não salvar
 Add…	Application Type Window		Adicionar…
 Select preferred application	FileType Window		Selecionar aplicativo preferido

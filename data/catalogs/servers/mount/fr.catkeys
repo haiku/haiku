@@ -1,5 +1,7 @@
-1	french	x-vnd.Haiku-mount_server	1104969457
+1	french	x-vnd.Haiku-mount_server	4142541118
 Mount read-only	AutoMounter		Monter en lecture seule
+Unmount error	AutoMounter		Erreur de démontage
+Mount warning	AutoMounter		Avertissement
 Mount read/write	AutoMounter		Monter en lecture et en écriture
 Mounting volume '%s'\n\n	AutoMounter		Montage du volume '%s'\n\n
 Cancel	AutoMounter		Annuler

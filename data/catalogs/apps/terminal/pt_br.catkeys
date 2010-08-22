@@ -1,6 +1,7 @@
-1	brazilian_portuguese	x-vnd.Haiku-Terminal	1363474068
+1	brazilian_portuguese	x-vnd.Haiku-Terminal	1776148061
 Didn't find any available pseudo ttys.	Terminal Shell		Não foi encontrado nenhum pseudo ttys disponível
 Change directory	Terminal TermView		Mudar de pasta
+Use default shell	Terminal Shell		Utilizar shell padrão
 Select all	Terminal TermWindow		Selecionar tudo
 Save to file…	Terminal PrefWindow		Salvar para arquivo...
 Font:	Terminal AppearancePrefView		Fonte:

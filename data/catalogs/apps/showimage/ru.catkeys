@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	1038439310
+1	russian	x-vnd.Haiku-ShowImage	2071534767
 Use as background…	Menus		Использовать как фоновый рисунок…
 5 seconds	Menus		5 секунд
 Slide delay	Menus		Задержка слайд шоу 
@@ -63,3 +63,15 @@ Shrink to window	Menus		Уменьшить до размеров окна
 OK	SaveToFile		Oк
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Progress monitor	ProgressWindow		Монитор состояния
+Paste	Menus		Вставить
+File	Menus		Файл
+Page setup…	Menus		Настройка печати...
+Print…	Menus		Печать...
+Quit	Menus		Выход
+Clear	Menus		Очистить
+Edit	Menus		Изменить
+Close	Menus		Закрыть
+Copy	Menus		Копипровать
+Cut	Menus		Вырезать
+Select all	Menus		Выделить всё
+Save as…	Menus		Сохранить как...

@@ -1,0 +1,4 @@
+1	simplified_chinese	x-vnd.Haiku-Installer	3900502572
+Quit	InstallerWindow		退出
+Stop	InstallerWindow	In alert after pressing Stop	暂停
+Show optional packages	InstallerWindow		显示附加软件包
