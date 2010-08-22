@@ -120,8 +120,10 @@ PPCOpenFirmware::InitSerialDebug(struct kernel_args *kernelArgs)
 {
 	if (of_getprop(gChosen, "stdin", &fInput, sizeof(int)) == OF_FAILED)
 		return B_ERROR;
-	if (of_getprop(gChosen, "stdout", &fOutput, sizeof(int)) == OF_FAILED)
-		return B_ERROR;
+	if (!kernelArgs->frame_buffer.enabled) {
+		if (of_getprop(gChosen, "stdout", &fOutput, sizeof(int)) == OF_FAILED)
+			return B_ERROR;
+	}
 
 	return B_OK;
 }
@@ -168,6 +170,9 @@ PPCOpenFirmware::SerialDebugGetChar()
 void
 PPCOpenFirmware::SerialDebugPutChar(char c)
 {
+	if (fOutput == -1)
+		return;
+
 	if (c == '\n')
 		of_write(fOutput, "\r\n", 2);
 	else
