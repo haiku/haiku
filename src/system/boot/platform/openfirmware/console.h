@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 extern status_t console_init(void);
+extern int console_check_for_key(void);
 
 #ifdef __cplusplus
 }

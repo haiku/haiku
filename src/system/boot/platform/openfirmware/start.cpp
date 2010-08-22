@@ -32,6 +32,7 @@ extern uint8 __bss_start;
 extern uint8 _end;
 
 uint32 gMachine;
+static uint32 sBootOptions;
 
 
 static void
@@ -111,8 +112,7 @@ platform_exit(void)
 extern "C" uint32
 platform_boot_options(void)
 {
-	// ToDo: implement me!
-	return 0;
+	return sBootOptions;
 }
 
 
@@ -162,6 +162,17 @@ start(void *openFirmwareEntry)
 
 	if (init_real_time_clock() != B_OK)
 		of_exit();
+
+	// check for key presses once
+	sBootOptions = 0;
+	int key = console_check_for_key();
+	if (key == 32) {
+		// space bar: option menu
+		sBootOptions |= BOOT_OPTION_MENU;
+	} else if (key == 27) {
+		// ESC: debug output
+		sBootOptions |= BOOT_OPTION_DEBUG_OUTPUT;
+	}
 
 	gKernelArgs.platform_args.openfirmware_entry = openFirmwareEntry;
 

@@ -291,6 +291,31 @@ console_set_color(int32 foreground, int32 background)
 }
 
 
+static int
+translate_key(char escapeCode)
+{
+	switch (escapeCode) {
+		case 65:
+			return TEXT_CONSOLE_KEY_UP;
+		case 66:
+			return TEXT_CONSOLE_KEY_DOWN;
+		case 67:
+			return TEXT_CONSOLE_KEY_RIGHT;
+		case 68:
+			return TEXT_CONSOLE_KEY_LEFT;
+// TODO: Translate the codes for the following keys. Unfortunately my OF just
+// returns a '\0' character. :-/
+// 			TEXT_CONSOLE_KEY_PAGE_UP,
+// 			TEXT_CONSOLE_KEY_PAGE_DOWN,
+// 			TEXT_CONSOLE_KEY_HOME,
+// 			TEXT_CONSOLE_KEY_END,
+
+		default:
+			return 0;
+	}
+}
+
+
 int
 console_wait_for_key(void)
 {
@@ -304,26 +329,10 @@ console_wait_for_key(void)
 	} while (bytesRead == 0);
 
 	// translate the ESC sequences for cursor keys
-	if (bytesRead == 3 && buffer[0] == 27 && buffer [1] == 91) {
-		switch (buffer[2]) {
-			case 65:
-				return TEXT_CONSOLE_KEY_UP;
-			case 66:
-				return TEXT_CONSOLE_KEY_DOWN;
-			case 67:
-				return TEXT_CONSOLE_KEY_RIGHT;
-			case 68:
-				return TEXT_CONSOLE_KEY_LEFT;
-// TODO: Translate the codes for the following keys. Unfortunately my OF just
-// returns a '\0' character. :-/
-// 			TEXT_CONSOLE_KEY_PAGE_UP,
-// 			TEXT_CONSOLE_KEY_PAGE_DOWN,
-// 			TEXT_CONSOLE_KEY_HOME,
-// 			TEXT_CONSOLE_KEY_END,
-
-			default:
-				break;
-		}
+	if (bytesRead == 3 && buffer[0] == 27 && buffer[1] == 91) {
+		int key = translate_key(buffer[2]);
+		if (key != 0)
+			return key;
 	}
 
 	// put back unread chars
@@ -333,3 +342,25 @@ console_wait_for_key(void)
 	return buffer[0];
 }
 
+
+int
+console_check_for_key(void)
+{
+	char buffer[3];
+	ssize_t bytesRead = sInput.ReadAt(NULL, 0, buffer, 3);
+	if (bytesRead <= 0)
+		return 0;
+
+	// translate the ESC sequences for cursor keys
+	if (bytesRead == 3 && buffer[0] == 27 && buffer[1] == 91) {
+		int key = translate_key(buffer[2]);
+		if (key != 0)
+			return key;
+	}
+
+	// put back unread chars
+	if (bytesRead > 1)
+		sInput.PutChars(buffer + 1, bytesRead - 1);
+
+	return buffer[0];
+}
