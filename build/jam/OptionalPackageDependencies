@@ -23,7 +23,7 @@ OptionalPackageDependencies OpenSSH : OpenSSL ;
 OptionalPackageDependencies Pe : PCRE ;
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies Transmission : LibEvent GetText Curl OpenSSL LibIconv ;
-OptionalPackageDependencies Vim : LibIconv ;
+OptionalPackageDependencies Vim : GetText LibIconv ;
 OptionalPackageDependencies WebPositive : Curl LibXML2 SQLite ;
 OptionalPackageDependencies XZ-Utils : Tar ;
 
