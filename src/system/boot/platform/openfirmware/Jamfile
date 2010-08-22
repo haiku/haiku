@@ -4,6 +4,9 @@ SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
 
 local genericPlatformSources =
 	text_menu.cpp
+	video_blit.cpp
+	video_rle.cpp
+	video_splash.cpp
 ;
 
 KernelMergeObject boot_platform_openfirmware.o :
