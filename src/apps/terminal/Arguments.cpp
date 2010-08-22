@@ -52,7 +52,7 @@ Arguments::Parse(int argc, const char* const* argv)
 				if (argi >= argc)
 					fUsageRequested = true;
 				else
-					fTitle = argv[argi++];
+					fTitle = argv[++argi];
 
 			} else if (strcmp(arg, "-f") == 0 || strcmp(arg, "--fullscreen")
 					== 0)
