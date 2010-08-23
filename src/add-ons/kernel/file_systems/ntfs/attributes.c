@@ -371,6 +371,9 @@ fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name, int openMode,
 				if (ntfs_attr_truncate(na, 0))
 					result = errno;
 			}
+		} else {
+			result = ENOENT;
+			goto exit;
 		}
 	}
 
