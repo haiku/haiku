@@ -18,6 +18,244 @@
 using namespace BPrivate;
 
 
+GroupCookie::GroupCookie(SATWindow* satWindow)
+	:
+	fSATWindow(satWindow),
+
+	fWindowArea(NULL),
+
+	fLeftBorder(NULL),
+	fTopBorder(NULL),
+	fRightBorder(NULL),
+	fBottomBorder(NULL),
+
+	fLeftBorderConstraint(NULL),
+	fTopBorderConstraint(NULL),
+	fRightBorderConstraint(NULL),
+	fBottomBorderConstraint(NULL),
+
+	fLeftConstraint(NULL),
+	fTopConstraint(NULL),
+	fMinWidthConstraint(NULL),
+	fMinHeightConstraint(NULL),
+	fWidthConstraint(NULL),
+	fHeightConstraint(NULL)
+{
+	
+}
+
+
+GroupCookie::~GroupCookie()
+{
+	Uninit();
+}
+
+
+void
+GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
+{
+	if (!fSATGroup.Get())
+		return;
+
+	BRect frame = triggerWindow->CompleteWindowFrame();
+
+	// adjust window size soft constraints
+	fWidthConstraint->SetRightSide(frame.Width());
+	fHeightConstraint->SetRightSide(frame.Height());
+	
+	// adjust window position soft constraints
+	// (a bit more penalty for them so they take precedence)
+	fLeftConstraint->SetRightSide(frame.left);
+	fTopConstraint->SetRightSide(frame.top);
+
+	fWidthConstraint->SetPenaltyNeg(110);
+	fWidthConstraint->SetPenaltyPos(110);
+	fHeightConstraint->SetPenaltyNeg(110);
+	fHeightConstraint->SetPenaltyPos(110);
+
+	fLeftConstraint->SetPenaltyNeg(100);
+	fLeftConstraint->SetPenaltyPos(100);
+	fTopConstraint->SetPenaltyNeg(100);
+	fTopConstraint->SetPenaltyPos(100);
+
+	// After we set the new parameter solve and apply the new layout.
+	ResultType result;
+	for (int32 tries = 0; tries < 15; tries++) {
+		result = fSATGroup->GetLinearSpec()->Solve();
+		if (result == INFEASIBLE)
+			break;
+		if (result == OPTIMAL) {
+			fSATGroup->AdjustWindows(triggerWindow);
+			break;
+		}
+	}
+
+	// set penalties back to normal
+	fWidthConstraint->SetPenaltyNeg(10);
+	fWidthConstraint->SetPenaltyPos(10);
+	fHeightConstraint->SetPenaltyNeg(10);
+	fHeightConstraint->SetPenaltyPos(10);
+
+	fLeftConstraint->SetPenaltyNeg(1);
+	fLeftConstraint->SetPenaltyPos(1);
+	fTopConstraint->SetPenaltyNeg(1);
+	fTopConstraint->SetPenaltyPos(1);
+}
+
+
+void
+GroupCookie::MoveWindow(int32 workspace)
+{
+	Window* window = fSATWindow->GetWindow();
+	Desktop* desktop = window->Desktop();
+
+	BRect frame = fSATWindow->CompleteWindowFrame();
+	desktop->MoveWindowBy(window, fLeftBorder->Value() - frame.left,
+		fTopBorder->Value() - frame.top, workspace);
+
+	// Update frame to the new position
+	frame.OffsetBy(fLeftBorder->Value() - frame.left,
+		fTopBorder->Value() - frame.top);
+	desktop->ResizeWindowBy(window, fRightBorder->Value() - frame.right,
+		fBottomBorder->Value() - frame.bottom);
+}
+
+
+void
+GroupCookie::UpdateWindowSize()
+{
+	BRect frame = fSATWindow->CompleteWindowFrame();
+
+	// adjust window size soft constraints
+	fWidthConstraint->SetRightSide(frame.Width());
+	fHeightConstraint->SetRightSide(frame.Height());
+}
+
+
+bool
+GroupCookie::Init(SATGroup* group, WindowArea* area)
+{
+	ASSERT(fSATGroup.Get() == NULL);
+
+	Window* window = fSATWindow->GetWindow();
+	fSATGroup.SetTo(group);
+	fWindowArea = area;
+
+	LinearSpec* linearSpec = group->GetLinearSpec();
+	// create variables
+	fLeftBorder = linearSpec->AddVariable();
+	fTopBorder = linearSpec->AddVariable();
+	fRightBorder = linearSpec->AddVariable();
+	fBottomBorder = linearSpec->AddVariable();
+
+	if (!fLeftBorder || !fTopBorder || !fRightBorder || !fBottomBorder) {
+		// clean up
+		Uninit();
+		return false;
+	}
+
+	// create constraints
+	BRect frame = fSATWindow->CompleteWindowFrame();
+	fLeftConstraint = linearSpec->AddConstraint(1.0, fLeftBorder,
+		OperatorType(EQ), frame.left, 1, 1);
+	fTopConstraint  = linearSpec->AddConstraint(1.0, fTopBorder,
+		OperatorType(EQ), frame.top, 1, 1);
+
+	int32 minWidth, maxWidth, minHeight, maxHeight;
+	window->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fMinWidthConstraint = linearSpec->AddConstraint(1.0, fLeftBorder, -1.0,
+		fRightBorder, OperatorType(LE), -minWidth);
+	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fTopBorder, -1.0,
+		fBottomBorder, OperatorType(LE), -minHeight);
+
+	// The width and height constraints have higher penalties than the
+	// position constraints (left, top), so a window will keep its size
+	// unless explicitly resized.
+	fWidthConstraint = linearSpec->AddConstraint(-1.0, fLeftBorder, 1.0,
+		fRightBorder, OperatorType(EQ), frame.Width(), 10, 10);
+	fHeightConstraint = linearSpec->AddConstraint(-1.0, fTopBorder, 1.0,
+		fBottomBorder, OperatorType(EQ), frame.Height(), 10, 10);
+	
+	if (!fLeftConstraint || !fTopConstraint || !fMinWidthConstraint
+		|| !fMinHeightConstraint || !fWidthConstraint || !fHeightConstraint) {
+		// clean up
+		Uninit();
+		return false;
+	}
+	
+	fLeftBorderConstraint = area->LeftTab()->Connect(fLeftBorder);
+	fTopBorderConstraint = area->TopTab()->Connect(fTopBorder);
+	fRightBorderConstraint = area->RightTab()->Connect(fRightBorder);
+	fBottomBorderConstraint = area->BottomTab()->Connect(fBottomBorder);
+
+	if (!fLeftBorderConstraint || !fTopBorderConstraint
+		|| !fRightBorderConstraint || !fBottomBorderConstraint) {
+		Uninit();
+		return false;
+	}
+
+	return true;
+}
+
+
+void
+GroupCookie::Uninit()
+{
+	delete fLeftBorder;
+	delete fTopBorder;
+	delete fRightBorder;
+	delete fBottomBorder;
+	fLeftBorder = NULL;
+	fTopBorder = NULL;
+	fRightBorder = NULL;
+	fBottomBorder = NULL;
+	
+	delete fLeftBorderConstraint;
+	delete fTopBorderConstraint;
+	delete fRightBorderConstraint;
+	delete fBottomBorderConstraint;
+	fLeftBorderConstraint = NULL;
+	fTopBorderConstraint = NULL;
+	fRightBorderConstraint = NULL;
+	fBottomBorderConstraint = NULL;
+
+	delete fLeftConstraint;
+	delete fTopConstraint;
+	delete fMinWidthConstraint;
+	delete fMinHeightConstraint;
+	delete fWidthConstraint;
+	delete fHeightConstraint;
+	fLeftConstraint = NULL;
+	fTopConstraint = NULL;
+	fMinWidthConstraint = NULL;
+	fMinHeightConstraint = NULL;
+	fWidthConstraint = NULL;
+	fHeightConstraint = NULL;
+
+	fSATGroup.Unset();
+	fWindowArea = NULL;
+}
+
+
+bool
+GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
+{
+	if (!fSATGroup->fSATWindowList.RemoveItem(fSATWindow))
+		return false;
+	Uninit();
+
+	if (!Init(group, area))
+		return false;
+
+	if (!group->fSATWindowList.AddItem(fSATWindow)) {
+		Uninit();
+		return false;
+	}
+
+	return true;
+}
+
+
 SATWindow::SATWindow(StackAndTile* sat, Window* window)
 	:
 	fWindow(window),
@@ -375,242 +613,4 @@ SATWindow::_InitGroup()
 	group. */
 	if (!groupRef->AddWindow(this, NULL, NULL, NULL, NULL))
 		STRACE_SAT("SATWindow::_InitGroup(): adding window to group failed\n");
-}
-
-
-GroupCookie::GroupCookie(SATWindow* satWindow)
-	:
-	fSATWindow(satWindow),
-
-	windowArea(NULL),
-
-	leftBorder(NULL),
-	topBorder(NULL),
-	rightBorder(NULL),
-	bottomBorder(NULL),
-
-	leftBorderConstraint(NULL),
-	topBorderConstraint(NULL),
-	rightBorderConstraint(NULL),
-	bottomBorderConstraint(NULL),
-
-	leftConstraint(NULL),
-	topConstraint(NULL),
-	minWidthConstraint(NULL),
-	minHeightConstraint(NULL),
-	widthConstraint(NULL),
-	heightConstraint(NULL)
-{
-	
-}
-
-
-GroupCookie::~GroupCookie()
-{
-	Uninit();
-}
-
-
-void
-GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
-{
-	if (!fSATGroup.Get())
-		return;
-
-	BRect frame = triggerWindow->CompleteWindowFrame();
-
-	// adjust window size soft constraints
-	widthConstraint->SetRightSide(frame.Width());
-	heightConstraint->SetRightSide(frame.Height());
-	
-	// adjust window position soft constraints
-	// (a bit more penalty for them so they take precedence)
-	leftConstraint->SetRightSide(frame.left);
-	topConstraint->SetRightSide(frame.top);
-
-	widthConstraint->SetPenaltyNeg(110);
-	widthConstraint->SetPenaltyPos(110);
-	heightConstraint->SetPenaltyNeg(110);
-	heightConstraint->SetPenaltyPos(110);
-
-	leftConstraint->SetPenaltyNeg(100);
-	leftConstraint->SetPenaltyPos(100);
-	topConstraint->SetPenaltyNeg(100);
-	topConstraint->SetPenaltyPos(100);
-
-	// After we set the new parameter solve and apply the new layout.
-	ResultType result;
-	for (int32 tries = 0; tries < 15; tries++) {
-		result = fSATGroup->GetLinearSpec()->Solve();
-		if (result == INFEASIBLE)
-			break;
-		if (result == OPTIMAL) {
-			fSATGroup->AdjustWindows(triggerWindow);
-			break;
-		}
-	}
-
-	// set penalties back to normal
-	widthConstraint->SetPenaltyNeg(10);
-	widthConstraint->SetPenaltyPos(10);
-	heightConstraint->SetPenaltyNeg(10);
-	heightConstraint->SetPenaltyPos(10);
-
-	leftConstraint->SetPenaltyNeg(1);
-	leftConstraint->SetPenaltyPos(1);
-	topConstraint->SetPenaltyNeg(1);
-	topConstraint->SetPenaltyPos(1);
-}
-
-
-void
-GroupCookie::MoveWindow(int32 workspace)
-{
-	Window* window = fSATWindow->GetWindow();
-	Desktop* desktop = window->Desktop();
-
-	BRect frame = fSATWindow->CompleteWindowFrame();
-	desktop->MoveWindowBy(window, leftBorder->Value() - frame.left,
-		topBorder->Value() - frame.top, workspace);
-
-	// Update frame to the new position
-	frame.OffsetBy(leftBorder->Value() - frame.left,
-		topBorder->Value() - frame.top);
-	desktop->ResizeWindowBy(window, rightBorder->Value() - frame.right,
-		bottomBorder->Value() - frame.bottom);
-}
-
-
-void
-GroupCookie::UpdateWindowSize()
-{
-	BRect frame = fSATWindow->CompleteWindowFrame();
-
-	// adjust window size soft constraints
-	widthConstraint->SetRightSide(frame.Width());
-	heightConstraint->SetRightSide(frame.Height());
-}
-
-
-bool
-GroupCookie::Init(SATGroup* group, WindowArea* area)
-{
-	ASSERT(fSATGroup.Get() == NULL);
-
-	Window* window = fSATWindow->GetWindow();
-	fSATGroup.SetTo(group);
-	windowArea = area;
-
-	LinearSpec* linearSpec = group->GetLinearSpec();
-	// create variables
-	leftBorder = linearSpec->AddVariable();
-	topBorder = linearSpec->AddVariable();
-	rightBorder = linearSpec->AddVariable();
-	bottomBorder = linearSpec->AddVariable();
-
-	if (!leftBorder || !topBorder || !rightBorder || !bottomBorder) {
-		// clean up
-		Uninit();
-		return false;
-	}
-
-	// create constraints
-	BRect frame = fSATWindow->CompleteWindowFrame();
-	leftConstraint = linearSpec->AddConstraint(1.0, leftBorder,
-		OperatorType(EQ), frame.left, 1, 1);
-	topConstraint  = linearSpec->AddConstraint(1.0, topBorder,
-		OperatorType(EQ), frame.top, 1, 1);
-
-	int32 minWidth, maxWidth, minHeight, maxHeight;
-	window->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	minWidthConstraint = linearSpec->AddConstraint(1.0, leftBorder, -1.0,
-		rightBorder, OperatorType(LE), -minWidth);
-	minHeightConstraint = linearSpec->AddConstraint(1.0, topBorder, -1.0,
-		bottomBorder, OperatorType(LE), -minHeight);
-
-	// The width and height constraints have higher penalties than the
-	// position constraints (left, top), so a window will keep its size
-	// unless explicitly resized.
-	widthConstraint = linearSpec->AddConstraint(-1.0, leftBorder, 1.0,
-		rightBorder, OperatorType(EQ), frame.Width(), 10, 10);
-	heightConstraint = linearSpec->AddConstraint(-1.0, topBorder, 1.0,
-		bottomBorder, OperatorType(EQ), frame.Height(), 10, 10);
-	
-	if (!leftConstraint || !topConstraint || !minWidthConstraint
-		|| !minHeightConstraint || !widthConstraint || !heightConstraint) {
-		// clean up
-		Uninit();
-		return false;
-	}
-	
-	leftBorderConstraint = area->LeftTab()->Connect(leftBorder);
-	topBorderConstraint = area->TopTab()->Connect(topBorder);
-	rightBorderConstraint = area->RightTab()->Connect(rightBorder);
-	bottomBorderConstraint = area->BottomTab()->Connect(bottomBorder);
-
-	if (!leftBorderConstraint || !topBorderConstraint
-		|| !rightBorderConstraint || !bottomBorderConstraint) {
-		Uninit();
-		return false;
-	}
-
-	return true;
-}
-
-
-void
-GroupCookie::Uninit()
-{
-	delete leftBorder;
-	delete topBorder;
-	delete rightBorder;
-	delete bottomBorder;
-	leftBorder = NULL;
-	topBorder = NULL;
-	rightBorder = NULL;
-	bottomBorder = NULL;
-	
-	delete leftBorderConstraint;
-	delete topBorderConstraint;
-	delete rightBorderConstraint;
-	delete bottomBorderConstraint;
-	leftBorderConstraint = NULL;
-	topBorderConstraint = NULL;
-	rightBorderConstraint = NULL;
-	bottomBorderConstraint = NULL;
-
-	delete leftConstraint;
-	delete topConstraint;
-	delete minWidthConstraint;
-	delete minHeightConstraint;
-	delete widthConstraint;
-	delete heightConstraint;
-	leftConstraint = NULL;
-	topConstraint = NULL;
-	minWidthConstraint = NULL;
-	minHeightConstraint = NULL;
-	widthConstraint = NULL;
-	heightConstraint = NULL;
-
-	fSATGroup.Unset();
-	windowArea = NULL;
-}
-
-
-bool
-GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
-{
-	if (!fSATGroup->fSATWindowList.RemoveItem(fSATWindow))
-		return false;
-	Uninit();
-
-	if (!Init(group, area))
-		return false;
-
-	if (!group->fSATWindowList.AddItem(fSATWindow)) {
-		Uninit();
-		return false;
-	}
-
-	return true;
 }

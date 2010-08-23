@@ -36,7 +36,7 @@ public:
 
 		SATGroup*			GetGroup() { return fSATGroup.Get(); }
 
-		WindowArea*			GetWindowArea() { return windowArea; }
+		WindowArea*			GetWindowArea() { return fWindowArea; }
 
 		bool				PropagateToGroup(SATGroup* group, WindowArea* area);
 
@@ -45,24 +45,24 @@ private:
 
 		BReference<SATGroup>	fSATGroup;
 
-		WindowArea*			windowArea;
+		WindowArea*			fWindowArea;
 
-		Variable*			leftBorder;
-		Variable*			topBorder;
-		Variable*			rightBorder;
-		Variable*			bottomBorder;
+		Variable*			fLeftBorder;
+		Variable*			fTopBorder;
+		Variable*			fRightBorder;
+		Variable*			fBottomBorder;
 
-		Constraint*			leftBorderConstraint;
-		Constraint*			topBorderConstraint;
-		Constraint*			rightBorderConstraint;
-		Constraint*			bottomBorderConstraint;
+		Constraint*			fLeftBorderConstraint;
+		Constraint*			fTopBorderConstraint;
+		Constraint*			fRightBorderConstraint;
+		Constraint*			fBottomBorderConstraint;
 
-		Constraint*			leftConstraint;
-		Constraint*			topConstraint;
-		Constraint*			minWidthConstraint;
-		Constraint*			minHeightConstraint;
-		Constraint*			widthConstraint;
-		Constraint*			heightConstraint;
+		Constraint*			fLeftConstraint;
+		Constraint*			fTopConstraint;
+		Constraint*			fMinWidthConstraint;
+		Constraint*			fMinHeightConstraint;
+		Constraint*			fWidthConstraint;
+		Constraint*			fHeightConstraint;
 };
 
 
