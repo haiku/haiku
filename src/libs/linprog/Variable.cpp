@@ -344,7 +344,7 @@ Variable::Variable(LinearSpec* ls)
 			printf("Error in add_columnex.");
 	}
 
-	SetRange(-DBL_MAX, DBL_MAX);
+	SetRange(-20000, 20000);
 }
 
 
