@@ -62,7 +62,7 @@
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
 
-const static rgb_color kTermColorTable[256] = {
+static rgb_color kTermColorTable[256] = {
 	{ 40,  40,  40, 0},	// black
 	{204,   0,   0, 0},	// red
 	{ 78, 154,   6, 0},	// green
@@ -548,8 +548,6 @@ TermView::_InitObject(int32 argc, const char** argv)
 	fVisibleTextBuffer = NULL;
 	fScrollBar = NULL;
 	fInline = NULL;
-	fTextForeColor = kBlackColor;
-	fTextBackColor = kWhiteColor;
 	fCursorForeColor = kWhiteColor;
 	fCursorBackColor = kBlackColor;
 	fSelectForeColor = kWhiteColor;
@@ -609,7 +607,7 @@ TermView::_InitObject(int32 argc, const char** argv)
 	if (error < B_OK)
 		return error;
 
-	SetLowColor(fTextBackColor);
+	SetLowColor(kTermColorTable[8]);
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 	return B_OK;
@@ -836,10 +834,10 @@ TermView::GetTermSizeFromRect(const BRect &rect, int *_rows,
 void
 TermView::SetTextColor(rgb_color fore, rgb_color back)
 {
-	fTextForeColor = fore;
-	fTextBackColor = back;
+	kTermColorTable[0] = back;
+	kTermColorTable[7] = fore;
 
-	SetLowColor(fTextBackColor);
+	SetLowColor(back);
 }
 
 
@@ -1103,7 +1101,7 @@ void
 TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	int32 width, bool mouse, bool cursor, BView *inView)
 {
-	rgb_color rgb_fore = fTextForeColor, rgb_back = fTextBackColor;
+	rgb_color rgb_fore, rgb_back;
 
 	inView->SetFont(&fHalfFont);
 
@@ -1115,10 +1113,10 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	int forecolor = IS_FORECOLOR(attr);
 	int backcolor = IS_BACKCOLOR(attr);
 
-	if (IS_FORESET(attr))
+	// if (IS_FORESET(attr))
 		rgb_fore = kTermColorTable[forecolor];
 
-	if (IS_BACKSET(attr))
+	// if (IS_BACKSET(attr))
 		rgb_back = kTermColorTable[backcolor];
 
 	// Selection check.
@@ -1201,7 +1199,7 @@ TermView::_DrawCursor()
 		if (selected)
 			SetHighColor(fSelectBackColor);
 		else
-			SetHighColor(cursorVisible ? fCursorBackColor : fTextBackColor);
+			SetHighColor(cursorVisible ? fCursorBackColor : kTermColorTable[IS_BACKCOLOR(attr)]);
 
 		FillRect(rect);
 	}
@@ -1339,27 +1337,6 @@ TermView::DetachedFromWindow()
 void
 TermView::Draw(BRect updateRect)
 {
-//	if (IsPrinting()) {
-//		_DoPrint(updateRect);
-//		return;
-//	}
-
-// debug_printf("TermView::Draw((%f, %f) - (%f, %f))\n", updateRect.left,
-// updateRect.top, updateRect.right, updateRect.bottom);
-// {
-// BRect bounds(Bounds());
-// debug_printf("Bounds(): (%f, %f) - (%f - %f)\n", bounds.left, bounds.top,
-// 	bounds.right, bounds.bottom);
-// debug_printf("clipping region:\n");
-// BRegion region;
-// GetClippingRegion(&region);
-// for (int32 i = 0; i < region.CountRects(); i++) {
-// 	BRect rect(region.RectAt(i));
-// 	debug_printf("  (%f, %f) - (%f, %f)\n", rect.left, rect.top, rect.right,
-// 		rect.bottom);
-// }
-// }
-
 	int32 x1 = (int32)updateRect.left / fFontWidth;
 	int32 x2 = std::min((int)updateRect.right / fFontWidth, fColumns - 1);
 
@@ -1367,33 +1344,10 @@ TermView::Draw(BRect updateRect)
 	int32 y1 = _LineAt(updateRect.top);
 	int32 y2 = std::min(_LineAt(updateRect.bottom), (int32)fRows - 1);
 
-//debug_printf("TermView::Draw(): (%ld, %ld) - (%ld, %ld), top: %f, fontHeight: %d, scrollOffset: %f\n",
-//x1, y1, x2, y2, updateRect.top, fFontHeight, fScrollOffset);
-
-	// clear the area to the right of the line ends
-	if (y1 <= y2) {
-		float clearLeft = fColumns * fFontWidth;
-		if (clearLeft <= updateRect.right) {
-			BRect rect(clearLeft, updateRect.top, updateRect.right,
-				updateRect.bottom);
-			SetHighColor(fTextBackColor);
-			FillRect(rect);
-		}
-	}
-
-	// clear the area below the last line
-	if (y2 == fRows - 1) {
-		float clearTop = _LineOffset(fRows);
-		if (clearTop <= updateRect.bottom) {
-			BRect rect(updateRect.left, clearTop, updateRect.right,
-				updateRect.bottom);
-			SetHighColor(fTextBackColor);
-			FillRect(rect);
-		}
-	}
-
 	// draw the affected line parts
 	if (x1 <= x2) {
+		uint32 attr = 0;
+
 		for (int32 j = y1; j <= y2; j++) {
 			int32 k = x1;
 			char buf[fColumns * 4 + 1];
@@ -1404,23 +1358,29 @@ TermView::Draw(BRect updateRect)
 			if (k < 0)
 				k = 0;
 
-			for (int32 i = k; i <= x2;) {
-				int32 lastColumn = x2;
+			int32 lastColumn = (int)updateRect.right / fFontWidth;
+			for (int32 i = k; i <= lastColumn;) {
 				bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
-				uint32 attr;
 				int32 count = fVisibleTextBuffer->GetString(j - firstVisible, i,
 					lastColumn, buf, attr);
 
-//debug_printf("  fVisibleTextBuffer->GetString(%ld, %ld, %ld) -> (%ld, \"%.*s\"), selected: %d\n",
-//j - firstVisible, i, lastColumn, count, (int)count, buf, insideSelection);
+// debug_printf("  fVisibleTextBuffer->GetString(%ld, %ld, %ld) -> (%ld, \"%.*s\"), selected: %d\n",
+// j - firstVisible, i, lastColumn, count, (int)count, buf, insideSelection);
 
 				if (count == 0) {
 					BRect rect(fFontWidth * i, _LineOffset(j),
 						fFontWidth * (lastColumn + 1) - 1, 0);
 					rect.bottom = rect.top + fFontHeight - 1;
 
+					int t = 1;
+					while(count == 0 && i - t > 0) {
+						count = fVisibleTextBuffer->GetString(j - firstVisible, i - t,
+							lastColumn, buf, attr);
+						t++;
+					}
+
 					SetHighColor(insideSelection ? fSelectBackColor
-						: fTextBackColor);
+						: kTermColorTable[IS_BACKCOLOR(attr)]);
 					FillRect(rect);
 
 					i = lastColumn + 1;

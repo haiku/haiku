@@ -238,8 +238,6 @@ private:
 			InlineInput*		fInline;
 
 			// Color and Attribute.
-			rgb_color		fTextForeColor;
-			rgb_color		fTextBackColor;
 			rgb_color		fCursorForeColor;
 			rgb_color		fCursorBackColor;
 			rgb_color		fSelectForeColor;

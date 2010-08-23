@@ -69,6 +69,7 @@ TermParse::_NextParseChar()
 TermParse::TermParse(int fd)
 	:
 	fFd(fd),
+	fAttr(FORECOLORED(7)),
 	fParseThread(-1),
 	fReaderThread(-1),
 	fReaderSem(-1),
@@ -341,7 +342,7 @@ TermParse::EscParse()
 	int width = 1;
 	BAutolock locker(fBuffer);
 
-	fAttr = fSavedAttr = BACKCOLOR;
+	fAttr = fSavedAttr = FORECOLORED(7);
 
 	while (!fQuitting) {
 		try {
@@ -806,7 +807,7 @@ TermParse::EscParse()
 						switch (param[row]) {
 							case DEFAULT:
 							case 0: /* Reset attribute */
-								fAttr = 0;
+								fAttr = FORECOLORED(7);
 								break;
 
 							case 1: /* Bold     */
