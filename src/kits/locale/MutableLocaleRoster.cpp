@@ -450,10 +450,10 @@ RosterData::_LoadLocaleSettings()
 
 		_SetDefaultLocale(newDefaultLocale);
 
+		_SetPreferredLanguages(&settings);
+
 		return B_OK;
 	}
-	if (status == B_OK)
-		status = _SetPreferredLanguages(&settings);
 
 
 	// Something went wrong (no settings file or invalid BMessage), so we
