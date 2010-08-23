@@ -13,4 +13,5 @@ KernelStaticLibrary pci_arch_bus_manager :
 	# openfirmware
 	pci_openfirmware.cpp
 	uninorth.cpp
+	grackle.cpp
 ;

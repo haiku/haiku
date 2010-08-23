@@ -19,6 +19,8 @@ struct StringArrayPropertyValue;
 
 status_t	ppc_openfirmware_probe_uninorth(int deviceNode,
 				const StringArrayPropertyValue &compatibleValue);
+status_t	ppc_openfirmware_probe_grackle(int deviceNode,
+				const StringArrayPropertyValue &compatibleValue);
 
 
 // property support

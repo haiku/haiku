@@ -21,6 +21,7 @@ typedef status_t (*probeFunction)(int, const StringArrayPropertyValue&);
 
 static const probeFunction sProbeFunctions[] = {
 	ppc_openfirmware_probe_uninorth,
+	ppc_openfirmware_probe_grackle,
 	NULL,
 };
 
