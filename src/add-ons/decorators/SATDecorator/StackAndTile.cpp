@@ -165,16 +165,27 @@ StackAndTile::WindowMoved(Window* window)
 		return;
 
 	if (SATKeyPressed())
-			satWindow->FindSnappingCandidates();
-		else
-			satWindow->DoGroupLayout();
+		satWindow->FindSnappingCandidates();
+	else
+		satWindow->DoGroupLayout();
 }
 
 
 void
 StackAndTile::WindowResized(Window* window)
 {
-	WindowMoved(window);
+	SATWindow* satWindow = GetSATWindow(window);
+	if (!satWindow)
+		return;
+
+	if (SATKeyPressed())
+		satWindow->FindSnappingCandidates();
+	else {
+		satWindow->DoGroupLayout();
+		// after solve the layout update the size constraints of all windows in
+		// the group
+		satWindow->UpdateGroupWindowsSize();
+	}
 }
 
 
@@ -185,7 +196,6 @@ StackAndTile::WindowActitvated(Window* window)
 	if (!satWindow)
 		return;
 	_ActivateWindow(satWindow);
-	
 }
 
 

@@ -90,6 +90,29 @@ SATWindow::PropagateToGroup(SATGroup* group, WindowArea* area)
 
 
 void
+SATWindow::UpdateGroupWindowsSize()
+{
+	SATGroup* group = GetGroup();
+	if (!group)
+		return;
+
+	for (int i = 0; i < group->CountItems(); i++) {
+		SATWindow* window = group->WindowAt(i);
+		if (window == this)
+			continue;
+		window->UpdateWindowSize();
+	}
+}
+
+
+void
+SATWindow::UpdateWindowSize()
+{
+	fGroupCookie->UpdateWindowSize();
+}
+
+
+void
 SATWindow::MoveWindowToSAT(int32 workspace)
 {
 	fGroupCookie->MoveWindow(workspace);
@@ -458,6 +481,17 @@ GroupCookie::MoveWindow(int32 workspace)
 }
 
 
+void
+GroupCookie::UpdateWindowSize()
+{
+	BRect frame = fSATWindow->CompleteWindowFrame();
+
+	// adjust window size soft constraints
+	widthConstraint->SetRightSide(frame.Width());
+	heightConstraint->SetRightSide(frame.Height());
+}
+
+
 bool
 GroupCookie::Init(SATGroup* group, WindowArea* area)
 {
@@ -473,11 +507,6 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 	topBorder = linearSpec->AddVariable();
 	rightBorder = linearSpec->AddVariable();
 	bottomBorder = linearSpec->AddVariable();
-
-	leftBorder->SetRange(-DBL_MAX, DBL_MAX);
-	topBorder->SetRange(-DBL_MAX, DBL_MAX);
-	rightBorder->SetRange(-DBL_MAX, DBL_MAX);
-	bottomBorder->SetRange(-DBL_MAX, DBL_MAX);
 
 	if (!leftBorder || !topBorder || !rightBorder || !bottomBorder) {
 		// clean up
