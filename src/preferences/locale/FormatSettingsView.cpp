@@ -231,20 +231,11 @@ FormatView::FormatView(const BLocale& locale)
 	BCheckBox* currencyLeadingZero = new BCheckBox("",
 		B_TRANSLATE("Leading 0"), new BMessage(kSettingsContentsModified));
 
-	BBox* formatBox = new BBox("Symbol position");
-	formatBox->SetLabel(B_TRANSLATE("Symbol position"));
-
 	BRadioButton* beforeRadioButton = new BRadioButton("",
 		B_TRANSLATE("Before"), new BMessage(kSettingsContentsModified));
 
 	BRadioButton* afterRadioButton = new BRadioButton("",
 		B_TRANSLATE("After"), new BMessage(kSettingsContentsModified));
-
-	formatBox->AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(beforeRadioButton)
-		.Add(afterRadioButton)
-		.SetInsets(spacing, 0, spacing, 0)
-		.TopView());
 
 	_UpdateExamples();
 	_ParseDateFormat();
@@ -327,13 +318,14 @@ FormatView::FormatView(const BLocale& locale)
 	fCurrencyBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
 		.SetInsets(spacing, spacing, spacing, spacing)
 		.Add(currencySymbol)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.AddGlue()
+			.Add(beforeRadioButton)
+			.Add(afterRadioButton)
+			.End()
 		.Add(currencyNegative)
 		.Add(currencyDecimal)
 		.Add(currencyLeadingZero)
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(formatBox)
-			.AddGlue()
-			.End()
 		.View());
 
 
