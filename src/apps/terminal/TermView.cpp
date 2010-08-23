@@ -1112,12 +1112,8 @@ TermView::_DrawLinePart(int32 x1, int32 y1, uint32 attr, char *buf,
 	// color attribute
 	int forecolor = IS_FORECOLOR(attr);
 	int backcolor = IS_BACKCOLOR(attr);
-
-	// if (IS_FORESET(attr))
-		rgb_fore = kTermColorTable[forecolor];
-
-	// if (IS_BACKSET(attr))
-		rgb_back = kTermColorTable[backcolor];
+	rgb_fore = kTermColorTable[forecolor];
+	rgb_back = kTermColorTable[backcolor];
 
 	// Selection check.
 	if (cursor) {
@@ -1373,9 +1369,9 @@ TermView::Draw(BRect updateRect)
 					rect.bottom = rect.top + fFontHeight - 1;
 
 					int t = 1;
-					while(count == 0 && i - t > 0) {
-						count = fVisibleTextBuffer->GetString(j - firstVisible, i - t,
-							lastColumn, buf, attr);
+					while (count == 0 && i - t > 0) {
+						count = fVisibleTextBuffer->GetString(j - firstVisible,
+							i - t, lastColumn, buf, attr);
 						t++;
 					}
 
