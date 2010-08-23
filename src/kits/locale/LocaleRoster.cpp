@@ -230,6 +230,37 @@ BLocaleRoster::GetAvailableCountries(BMessage* countries) const
 
 
 status_t
+BLocaleRoster::GetAvailableTimeZones(BMessage* timeZones) const
+{
+	if (!timeZones)
+		return B_BAD_VALUE;
+
+	status_t status = B_OK;
+
+	int32 i;
+	StringEnumeration* zoneList = TimeZone::createEnumeration();
+
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	int32 count = zoneList->count(icuStatus);
+	if (U_SUCCESS(icuStatus)) {
+		for (i = 0; i < count; ++i) {
+			const char* zoneID = zoneList->next(NULL, icuStatus);
+			if (zoneID == NULL || !U_SUCCESS(icuStatus)) {
+				status = B_ERROR;
+				break;
+			}
+ 			timeZones->AddString("timeZone", zoneID);
+		}
+	} else
+		status = B_ERROR;
+
+	delete zoneList;
+
+	return status;
+}
+
+
+status_t
 BLocaleRoster::GetInstalledCatalogs(BMessage*  languageList,
 		const char* sigPattern,	const char* langPattern, int32 fingerprint) const
 {
