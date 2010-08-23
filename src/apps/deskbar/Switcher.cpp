@@ -308,7 +308,7 @@ OKToUse(const TTeamGroup* teamGroup)
 	if ((teamGroup->Flags() & B_BACKGROUND_APP) != 0)
 		return false;
 
-	// skip the Deakbar itself
+	// skip the Deskbar itself
 	if (strcasecmp(teamGroup->Signature(), kDeskbarSignature) == 0)
 		return false;
 
@@ -858,6 +858,23 @@ void
 TSwitchManager::CycleApp(bool forward, bool activateNow)
 {
 	int32 startIndex = fCurrentIndex;
+
+	if (_FindNextValidApp(forward)) {
+		// if we're here then we found a good one
+		SwitchToApp(startIndex, fCurrentIndex, forward);
+
+		if (!activateNow)
+			return;
+
+		ActivateApp(false, false);
+	}
+}
+
+
+bool
+TSwitchManager::_FindNextValidApp(bool forward)
+{
+	int32 startIndex = fCurrentIndex;
 	int32 max = fGroupList.CountItems();
 
 	for (;;) {
@@ -873,23 +890,15 @@ TSwitchManager::CycleApp(bool forward, bool activateNow)
 		if (fCurrentIndex == startIndex) {
 			// we've gone completely through the list without finding
 			// a good app. Oh well.
-			return;
+			break;
 		}
 
-		if (!OKToUse((TTeamGroup*)fGroupList.ItemAt(fCurrentIndex)))
-			continue;
-
-		// if we're here then we found a good one
-		SwitchToApp(startIndex, fCurrentIndex, forward);
-
-		if (!activateNow)
-			break;
-
-		if (ActivateApp(false, false))
-			break;
+		if (OKToUse((TTeamGroup*)fGroupList.ItemAt(fCurrentIndex)))
+			return true;
 	}
-}
 
+	return false;
+}
 
 void
 TSwitchManager::SwitchToApp(int32 previousIndex, int32 newIndex, bool forward)
@@ -897,6 +906,9 @@ TSwitchManager::SwitchToApp(int32 previousIndex, int32 newIndex, bool forward)
 	int32 previousSlot = fCurrentSlot;
 
 	fCurrentIndex = newIndex;
+	if (!OKToUse((TTeamGroup *)fGroupList.ItemAt(fCurrentIndex)))
+		_FindNextValidApp(forward);
+
 	fCurrentSlot = fWindow->SlotOf(fCurrentIndex);
 	fCurrentWindow = 0;
 

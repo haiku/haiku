@@ -85,6 +85,8 @@ private:
 								bool allowWorkspaceSwitch);
 			void			ActivateWindow(int32 windowID = -1);
 			void			_SortApps();
+			
+			bool			_FindNextValidApp(bool forward);
 
 			TSwitcherWindow* fWindow;
 			sem_id			fMainMonitor;
