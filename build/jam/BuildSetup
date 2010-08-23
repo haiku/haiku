@@ -1319,8 +1319,8 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons translators stxt ;
 	EnableWerror src add-ons translators tga ;
 	EnableWerror src add-ons translators tiff ;
-#	EnableWerror src add-ons translators wonderbrush ;
-#	EnableWerror src add-ons print ;
+	EnableWerror src add-ons translators wonderbrush ;
+	EnableWerror src add-ons print ;
 	EnableWerror src bin package ;
 	EnableWerror src apps ;
 	EnableWerror src kits ;
