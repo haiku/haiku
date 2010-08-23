@@ -1395,6 +1395,15 @@ TermView::Draw(BRect updateRect)
 				i += count;
 			}
 		}
+
+		if (y2 == fRows - 1) {
+			// There may be some empty space below the last line
+			BRect rect(updateRect.left, _LineOffset(fRows),
+				updateRect.right, 0);
+			rect.bottom = rect.top + fFontHeight - 1;
+			FillRect(rect);
+		}
+
 	}
 
 	if (fInline && fInline->IsActive())
