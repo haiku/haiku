@@ -434,8 +434,6 @@ RosterData::_LoadLocaleSettings()
 	BMessage settings;
 	if (status == B_OK)
 		status = settings.Unflatten(&file);
-	if (status == B_OK)
-		status = _SetPreferredLanguages(&settings);
 
 	if (status == B_OK) {
 		BString codeName;
@@ -454,6 +452,9 @@ RosterData::_LoadLocaleSettings()
 
 		return B_OK;
 	}
+	if (status == B_OK)
+		status = _SetPreferredLanguages(&settings);
+
 
 	// Something went wrong (no settings file or invalid BMessage), so we
 	// set everything to default values
@@ -481,9 +482,9 @@ RosterData::_LoadTimeSettings()
 	if (status == B_OK)
 		status = settings.Unflatten(&file);
 	if (status == B_OK) {
-		BString timeZoneCode;
-		if (settings.FindString("timezone", &timeZoneCode) == B_OK)
-			_SetDefaultTimeZone(BTimeZone(timeZoneCode.String()));
+		BString timeZoneID;
+		if (settings.FindString("timezone", &timeZoneID) == B_OK)
+			_SetDefaultTimeZone(BTimeZone(timeZoneID.String()));
 		else
 			_SetDefaultTimeZone(BTimeZone(BTimeZone::kNameOfGmtZone));
 
@@ -564,6 +565,15 @@ RosterData::_SetDefaultLocale(const BLocale& newLocale)
 {
 	fDefaultLocale = newLocale;
 
+	UErrorCode icuError = U_ZERO_ERROR;
+	Locale icuLocale = Locale::createCanonical(newLocale.Code());
+	if (icuLocale.isBogus())
+		return B_ERROR;
+
+	Locale::setDefault(icuLocale, icuError);
+	if (!U_SUCCESS(icuError))
+		return B_ERROR;
+
 	return B_OK;
 }
 
@@ -573,7 +583,7 @@ RosterData::_SetDefaultTimeZone(const BTimeZone& newZone)
 {
 	fDefaultTimeZone = newZone;
 
-	TimeZone* timeZone = TimeZone::createTimeZone(newZone.Code().String());
+	TimeZone* timeZone = TimeZone::createTimeZone(newZone.ID().String());
 	if (timeZone == NULL)
 		return B_ERROR;
 	TimeZone::adoptDefault(timeZone);
@@ -588,15 +598,6 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 	BString langName;
 	if (languages != NULL
 		&& languages->FindString("language", &langName) == B_OK) {
-		UErrorCode icuError = U_ZERO_ERROR;
-		Locale icuLocale = Locale::createCanonical(langName.String());
-		if (icuLocale.isBogus())
-			return B_ERROR;
-
-		Locale::setDefault(icuLocale, icuError);
-		if (!U_SUCCESS(icuError))
-			return B_ERROR;
-
 		fDefaultLocale.SetCollator(BCollator(langName.String()));
 		fDefaultLanguage.SetTo(langName.String());
 
@@ -637,7 +638,7 @@ RosterData::_AddDefaultCountryToMessage(BMessage* message) const
 status_t
 RosterData::_AddDefaultTimeZoneToMessage(BMessage* message) const
 {
-	status_t status = message->AddString("timezone", fDefaultTimeZone.Code());
+	status_t status = message->AddString("timezone", fDefaultTimeZone.ID());
 
 	// add the offset, too, since that is used by clockconfig when setting
 	// up timezone state during boot

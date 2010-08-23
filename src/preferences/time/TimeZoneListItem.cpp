@@ -109,12 +109,12 @@ TimeZoneListItem::TimeZone() const
 
 
 const BString&
-TimeZoneListItem::Code() const
+TimeZoneListItem::ID() const
 {
 	if (fTimeZone == NULL)
 		return skDefaultString;
 
-	return fTimeZone->Code();
+	return fTimeZone->ID();
 }
 
 

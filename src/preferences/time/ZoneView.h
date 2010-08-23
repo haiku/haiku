@@ -18,6 +18,7 @@ class BMessage;
 class BPopUpMenu;
 class BOutlineListView;
 class BButton;
+class BTextToolTip;
 class TTZDisplay;
 class TimeZoneListItem;
 
@@ -31,6 +32,9 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 			bool				CheckCanRevert();
 
+protected:
+	virtual	bool				GetToolTipAt(BPoint point, BToolTip** _tip);
+
 private:
 			void				_UpdateDateTime(BMessage* message);
 
@@ -41,7 +45,7 @@ private:
 			BString				_FormatTime(TimeZoneListItem* zoneItem);
 
 			void				_InitView();
-			void				_BuildRegionMenu();
+			void				_BuildZoneMenu();
 
 			void				_Revert();
 
@@ -50,6 +54,8 @@ private:
 			BButton*			fSetZone;
 			TTZDisplay*			fCurrent;
 			TTZDisplay*			fPreview;
+
+			BTextToolTip*		fToolTip;
 
 			int32				fLastUpdateMinute;
 

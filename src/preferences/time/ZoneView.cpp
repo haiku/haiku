@@ -15,6 +15,7 @@
 
 #include <stdlib.h>
 
+#include <map>
 #include <new>
 
 #include <AutoDeleter.h>
@@ -37,6 +38,7 @@
 #include <Window.h>
 
 #include <syscalls.h>
+#include <ToolTip.h>
 
 #include <unicode/datefmt.h>
 #include <unicode/utmscale.h>
@@ -52,9 +54,21 @@ using BPrivate::gMutableLocaleRoster;
 using BPrivate::ObjectDeleter;
 
 
+struct TimeZoneItemLess {
+	bool operator()(const BString& first, const BString& second)
+	{
+		return fCollator.Compare(first.String(), second.String()) < 0;
+	}
+private:
+	BCollator fCollator;
+};
+
+
+
 TimeZoneView::TimeZoneView(BRect frame)
 	:
 	BView(frame, "timeZoneView", B_FOLLOW_NONE, B_WILL_DRAW | B_NAVIGABLE_JUMP),
+	fToolTip(NULL),
 	fCurrentZoneItem(NULL),
 	fOldZoneItem(NULL),
 	fInitialized(false)
@@ -70,26 +84,9 @@ TimeZoneView::CheckCanRevert()
 }
 
 
-void
-TimeZoneView::_Revert()
-{
-	fCurrentZoneItem = fOldZoneItem;
-
-	if (fCurrentZoneItem != NULL) {
-		int32 currentZoneIndex = fZoneList->IndexOf(fCurrentZoneItem);
-		fZoneList->Select(currentZoneIndex);
-	} else
-		fZoneList->DeselectAll();
-	fZoneList->ScrollToSelection();
-
-	_SetSystemTimeZone();
-	_UpdatePreview();
-	_UpdateCurrent();
-}
-
-
 TimeZoneView::~TimeZoneView()
 {
+	delete fToolTip;
 }
 
 
@@ -165,6 +162,29 @@ TimeZoneView::MessageReceived(BMessage* message)
 }
 
 
+bool
+TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
+{
+	TimeZoneListItem* item = static_cast<TimeZoneListItem*>(
+		fZoneList->ItemAt(fZoneList->IndexOf(point)));
+	if (item == NULL || !item->HasTimeZone())
+		return false;
+
+	BString toolTip = item->Text();
+	toolTip << '\n' << item->TimeZone().ShortName() << " / "
+			<< item->TimeZone().ShortDaylightSavingName();
+
+	delete fToolTip;
+	fToolTip = new (std::nothrow) BTextToolTip(toolTip.String());
+	if (fToolTip == NULL)
+		return false;
+
+	*_tip = fToolTip;
+
+	return true;
+}
+
+
 void
 TimeZoneView::_UpdateDateTime(BMessage* message)
 {
@@ -195,7 +215,7 @@ TimeZoneView::_InitView()
 	fZoneList->SetSelectionMessage(new BMessage(H_CITY_CHANGED));
 	fZoneList->SetInvocationMessage(new BMessage(H_SET_TIME_ZONE));
 
-	_BuildRegionMenu();
+	_BuildZoneMenu();
 
 	BScrollView* scrollList = new BScrollView("scrollList", fZoneList,
 		B_FOLLOW_ALL, 0, false, true);
@@ -230,7 +250,7 @@ TimeZoneView::_InitView()
 
 
 void
-TimeZoneView::_BuildRegionMenu()
+TimeZoneView::_BuildZoneMenu()
 {
 	BTimeZone defaultTimeZone = NULL;
 	be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
@@ -239,75 +259,119 @@ TimeZoneView::_BuildRegionMenu()
 	// AddUnder() them (only if there are multiple ones).
 	// Finally expand the current country and highlight the active TZ.
 
-	BMessage countryList;
-	be_locale_roster->GetAvailableCountries(&countryList);
+	BMessage zoneList;
+	be_locale_roster->GetAvailableTimeZones(&zoneList);
 
-	BString countryCode;
-	for (int i = 0; countryList.FindString("countries", i, &countryCode)
-			== B_OK; i++) {
-		BCountry country("", countryCode);
-		BString fullName;
-		country.GetName(fullName);
+	typedef	std::map<BString, TimeZoneListItem*, TimeZoneItemLess> ZoneItemMap;
+	ZoneItemMap zoneMap;
+	const char* supportedRegions[] = {
+		"Africa", "America", "Antarctica", "Arctic", "Asia", "Atlantic",
+		"Australia", "Etc", "Europe", "Indian", "Pacific", NULL
+	};
+	for (const char** region = supportedRegions; *region != NULL; ++region)
+		zoneMap[*region] = NULL;
 
-		// Now list the timezones for this country
-		BList tzList;
+	BString zoneID;
+	for (int i = 0; zoneList.FindString("timeZone", i, &zoneID) == B_OK; i++) {
+		int32 slashPos = zoneID.FindFirst('/');
 
-		BTimeZone* timeZone;
-		TimeZoneListItem* countryItem;
-		switch (country.GetTimeZones(tzList))
-		{
-			case 0:
-				// No TZ info for this country. Sorry guys!
-				break;
-			case 1:
-				// Only one Timezone, no need to add it to the list
-				timeZone = (BTimeZone*)tzList.ItemAt(0);
-				countryItem
-					= new TimeZoneListItem(fullName, &country, timeZone);
-				fZoneList->AddItem(countryItem);
-				if (timeZone->Code() == defaultTimeZone.Code())
-					fCurrentZoneItem = countryItem;
-				break;
-			default:
-				countryItem = new TimeZoneListItem(fullName, &country, NULL);
+		// ignore any "global" timezones, as those are just aliases of regional
+		// ones
+		if (slashPos <= 0)
+			continue;
+
+		BString region(zoneID, slashPos);
+
+		// just accept timezones from "known" regions, as all others are aliases
+		ZoneItemMap::iterator regionIter = zoneMap.find(region);
+		if (regionIter == zoneMap.end())
+			continue;
+
+		TimeZoneListItem* regionItem = regionIter->second;
+		if (regionItem == NULL) {
+			regionItem = new TimeZoneListItem(region, NULL, NULL);
+			regionItem->SetOutlineLevel(0);
+			regionItem->SetExpanded(false);
+			zoneMap[region] = regionItem;
+		}
+
+		BTimeZone* timeZone = new BTimeZone(zoneID);
+		BString tzName = timeZone->Name();
+		if (tzName == "GMT+00:00")
+			tzName = "GMT";
+		int32 openParenthesisPos = tzName.FindFirst('(');
+		BString country;
+		if (openParenthesisPos >= 0) {
+			if (openParenthesisPos > 0)
+				country.SetTo(tzName, openParenthesisPos - 1);
+			tzName.Remove(0, openParenthesisPos + 1);
+			int32 closeParenthesisPos = tzName.FindLast(')');
+			if (closeParenthesisPos >= 0)
+				tzName.Truncate(closeParenthesisPos);
+		}
+		BString fullCountryID = region;
+		if (country.Length() > 0 && country != region)
+			fullCountryID << "/" << country;
+		BString fullZoneID = fullCountryID;
+		fullZoneID << "/" << tzName;
+
+		// skip duplicates
+		ZoneItemMap::iterator zoneIter = zoneMap.find(fullZoneID);
+		if (zoneIter != zoneMap.end()) {
+			delete timeZone;
+			continue;
+		}
+
+		TimeZoneListItem* countryItem = NULL;
+		if (country.Length() > 0) {
+			ZoneItemMap::iterator countryIter = zoneMap.find(fullCountryID);
+			if (countryIter == zoneMap.end()) {
+				countryItem = new TimeZoneListItem(country, NULL, NULL);
+				countryItem->SetOutlineLevel(1);
 				countryItem->SetExpanded(false);
-				fZoneList->AddItem(countryItem);
+				zoneMap[fullCountryID] = countryItem;
+			} else
+				countryItem = countryIter->second;
+		}
 
-				for (int j = 0;
-						(timeZone = (BTimeZone*)tzList.ItemAt(j)) != NULL;
-						j++) {
-					TimeZoneListItem* tzItem = new TimeZoneListItem(
-						timeZone->Name(), NULL, timeZone);
-					fZoneList->AddUnder(tzItem, countryItem);
-					if (timeZone->Code() == defaultTimeZone.Code())
-					{
-						fCurrentZoneItem = tzItem;
-						countryItem->SetExpanded(true);
-					}
-				}
-				break;
+		TimeZoneListItem* zoneItem
+			= new TimeZoneListItem(tzName, NULL, timeZone);
+		zoneItem->SetOutlineLevel(countryItem == NULL ? 1 : 2);
+		zoneMap[fullZoneID] = zoneItem;
+
+		if (timeZone->ID() == defaultTimeZone.ID()) {
+			fCurrentZoneItem = zoneItem;
+			if (countryItem != NULL)
+				countryItem->SetExpanded(true);
+			regionItem->SetExpanded(true);
 		}
 	}
 
-	// add an artifical (i.e. belongs to no country) entry for GMT/UTC
-	BTimeZone* gmtZone = new(std::nothrow) BTimeZone(BTimeZone::kNameOfGmtZone);
-	TimeZoneListItem* gmtItem
-		= new TimeZoneListItem("- GMT/UTC (Universal Time) -", NULL, gmtZone);
-	fZoneList->AddItem(gmtItem);
-	if (gmtZone->Code() == defaultTimeZone.Code())
-		fCurrentZoneItem = gmtItem;
-
 	fOldZoneItem = fCurrentZoneItem;
 
-	struct ListSorter {
-		static int compare(const BListItem* first, const BListItem* second)
-		{
-			static BCollator collator;
-			return collator.Compare(((BStringItem*)first)->Text(),
-				((BStringItem*)second)->Text());
-		}
-	};
-	fZoneList->SortItemsUnder(NULL, false, ListSorter::compare);
+	ZoneItemMap::iterator zoneIter;
+	for (zoneIter = zoneMap.begin(); zoneIter != zoneMap.end(); ++zoneIter)
+		fZoneList->AddItem(zoneIter->second);
+
+	fZoneList->Select(fZoneList->IndexOf(fCurrentZoneItem));
+}
+
+
+void
+TimeZoneView::_Revert()
+{
+	fCurrentZoneItem = fOldZoneItem;
+
+	if (fCurrentZoneItem != NULL) {
+		int32 currentZoneIndex = fZoneList->IndexOf(fCurrentZoneItem);
+		fZoneList->Select(currentZoneIndex);
+	} else
+		fZoneList->DeselectAll();
+	fZoneList->ScrollToSelection();
+
+	_SetSystemTimeZone();
+	_UpdatePreview();
+	_UpdateCurrent();
 }
 
 
@@ -315,12 +379,16 @@ void
 TimeZoneView::_UpdatePreview()
 {
 	int32 selection = fZoneList->CurrentSelection();
-	if (selection < 0)
-		return;
+	TimeZoneListItem* item
+		= selection < 0
+			? NULL
+			: (TimeZoneListItem*)fZoneList->ItemAt(selection);
 
-	TimeZoneListItem* item = (TimeZoneListItem*)fZoneList->ItemAt(selection);
-	if (!item->HasTimeZone())
+	if (item == NULL || !item->HasTimeZone()) {
+		fPreview->SetText("");
+		fPreview->SetTime("");
 		return;
+	}
 
 	BString timeString = _FormatTime(item);
 	fPreview->SetText(item->Text());
@@ -360,8 +428,8 @@ TimeZoneView::_SetSystemTimeZone()
 
 	gMutableLocaleRoster->SetDefaultTimeZone(timeZone);
 
-	_kern_set_timezone(timeZone.OffsetFromGMT(), timeZone.Code().String(),
-		timeZone.Code().Length());
+	_kern_set_timezone(timeZone.OffsetFromGMT(), timeZone.ID().String(),
+		timeZone.ID().Length());
 
 	fSetZone->SetEnabled(false);
 	fLastUpdateMinute = -1;

@@ -405,7 +405,7 @@ BLocale::FormatTime(BString* string, time_t time, bool longFormat,
 
 	if (timeZone != NULL) {
 		ObjectDeleter<TimeZone> icuTimeZone
-			= TimeZone::createTimeZone(timeZone->Code().String());
+			= TimeZone::createTimeZone(timeZone->ID().String());
 		if (icuTimeZone.Get() == NULL)
 			return B_NO_MEMORY;
 		timeFormatter->setTimeZone(*icuTimeZone.Get());

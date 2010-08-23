@@ -29,7 +29,7 @@ public:
 
 			bool				HasTimeZone() const;
 			const BTimeZone&	TimeZone() const;
-			const BString&		Code() const;
+			const BString&		ID() const;
 			const BString&		Name() const;
 			int					OffsetFromGMT() const;
 

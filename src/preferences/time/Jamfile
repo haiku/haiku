@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences time ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders locale shared [ FDirName libroot time ] ;
+UsePrivateHeaders interface locale shared [ FDirName libroot time ] ;
 UsePrivateSystemHeaders ;
 
 local sources =
@@ -28,7 +28,7 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_ICU_HEADERS_DEPENDENCY) ;
 
 Preference Time
 	: $(sources)
-	: be libshared.a $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS)
+	: be libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: Time.rdef
 	;
 
