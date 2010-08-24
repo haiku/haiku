@@ -4,8 +4,7 @@
 // This file may be used under the terms of the Be Sample Code License.
 #include "MediaFileInfoView.h"
 
-#include <string.h>
-
+#include <ControlLook.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 #include <String.h>
@@ -13,13 +12,17 @@
 #include "Strings.h"
 
 
-MediaFileInfoView::MediaFileInfoView(BRect frame, uint32 resizingMode)
-	: BView(frame, "MediaFileInfoView", resizingMode,
-			B_FULL_UPDATE_ON_RESIZE | B_WILL_DRAW)
-	, fRef()
-	, fMediaFile(NULL)
-	, fDuration(0)
+const float kSpacing = 5.0f;
+
+
+MediaFileInfoView::MediaFileInfoView()
+	:
+	BView("MediaFileInfoView", B_WILL_DRAW | B_SUPPORTS_LAYOUT),
+	fMinMaxValid(false),
+	fRef(),
+	fMediaFile(NULL)
 {
+	SetFont(be_plain_font);
 }
 
 
@@ -31,57 +34,102 @@ MediaFileInfoView::~MediaFileInfoView()
 void 
 MediaFileInfoView::Draw(BRect /*update*/)
 {
+	_ValidateMinMax();
+
+	_SetFontFace(B_BOLD_FACE);
+
 	font_height fh;
 	GetFontHeight(&fh);
-	BPoint p(2, fh.ascent + fh.leading);
-	BFont font;
-	GetFont(&font);
-	font.SetFace(B_BOLD_FACE);
-	font.SetSize(12);
-	SetFont(&font);
+	BPoint labelStart(kSpacing, fh.ascent + fh.leading + 1);
 
 	if (fMediaFile == NULL) {
-		DrawString(NO_FILE_LABEL, p);
+		DrawString(NO_FILE_LABEL, labelStart);
 		return;
 	}
 
-	BString aFmt, vFmt, aDetails, vDetails, duration;
-	_GetFileInfo(&aFmt, &vFmt, &aDetails, &vDetails, &duration);
-	
 	// draw filename
-	DrawString(fRef.name, p);
-	float lineHeight = fh.ascent + fh.descent + fh.leading;
-	p.y += (float)ceil(lineHeight * 1.5);
+	DrawString(fRef.name, labelStart);
+	labelStart.y += fLineHeight + kSpacing;
+	BPoint infoStart(labelStart.x + fMaxLabelWidth + kSpacing, labelStart.y);
 	
-	float durLen = StringWidth(DURATION_LABEL) + 5;
-	float audLen = StringWidth(AUDIO_INFO_LABEL) + 5;
-	float vidLen = StringWidth(VIDEO_INFO_LABEL) + 5;
-	float maxLen = MAX(durLen, audLen);
-	maxLen = MAX(maxLen, vidLen);
-			
 	// draw labels
-	DrawString(AUDIO_INFO_LABEL, p + BPoint(maxLen - audLen, 0));
-	BPoint p2 = p;
-	p2.x += maxLen + 4;
-	p.y += lineHeight * 2;
-	DrawString(VIDEO_INFO_LABEL, p + BPoint(maxLen - vidLen, 0));
-	p.y += lineHeight * 2;
-	DrawString(DURATION_LABEL, p + BPoint(maxLen - durLen, 0));
+	DrawString(AUDIO_INFO_LABEL, labelStart);
+	labelStart.y += fLineHeight * 2;
+
+	DrawString(VIDEO_INFO_LABEL, labelStart);
+	labelStart.y += fLineHeight * 2;
+
+	DrawString(DURATION_LABEL, labelStart);
+	labelStart.y += fLineHeight * 2;
 
 	// draw audio/video/duration info
-	font.SetFace(B_REGULAR_FACE);
-	font.SetSize(10);
-	SetFont(&font);
+	_SetFontFace(B_REGULAR_FACE);
 	
-	DrawString(aFmt.String(), p2);
-	p2.y += lineHeight;
-	DrawString(aDetails.String(), p2);
-	p2.y += lineHeight;
-	DrawString(vFmt.String(), p2);
-	p2.y += lineHeight;
-	DrawString(vDetails.String(), p2);
-	p2.y += lineHeight;
-	DrawString(duration.String(), p2);
+	BString* infoStrings[5] = {&fInfo.audio.format, &fInfo.audio.details,
+		&fInfo.video.format, &fInfo.video.details, &fInfo.duration};
+	for (int32 i = 0; i < 5; i++) {
+		DrawString(*infoStrings[i], infoStart);
+		infoStart.y += fLineHeight;
+	}
+}
+
+
+BSize
+MediaFileInfoView::MinSize()
+{
+	_ValidateMinMax();
+	return fMinSize;
+}
+
+
+BSize
+MediaFileInfoView::MaxSize()
+{
+	return fMinSize;
+}
+
+
+BSize
+MediaFileInfoView::PreferredSize()
+{
+	_ValidateMinMax();
+	return fMinSize;
+}
+
+
+BAlignment
+MediaFileInfoView::LayoutAlignment()
+{
+	return BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
+}
+
+
+void
+MediaFileInfoView::InvalidateLayout(bool /*children*/)
+{
+	fMinMaxValid = false;
+	BView::InvalidateLayout();
+}
+
+
+void
+MediaFileInfoView::SetFont(const BFont* font, uint32 mask)
+{
+	BView::SetFont(font, mask);
+	if (mask == B_FONT_FACE)
+		return;
+
+	fLineHeight = _LineHeight();
+	BFont bold(font);
+	bold.SetFace(B_BOLD_FACE);
+	fMaxLabelWidth = 0;
+
+	BString labels[] = {VIDEO_INFO_LABEL, DURATION_LABEL, AUDIO_INFO_LABEL};
+	int32 labelCount = sizeof(labels) / sizeof(BString);
+	fMaxLabelWidth = _MaxLineWidth(labels, labelCount, bold);
+
+	fNoFileLabelWidth = ceilf(bold.StringWidth(NO_FILE_LABEL));
+	InvalidateLayout();
 }
 
 
@@ -107,89 +155,77 @@ MediaFileInfoView::Update(BMediaFile* file, entry_ref* ref)
 	else
 		fRef = entry_ref();
 
+	fInfo.LoadInfo(file);
+
+	InvalidateLayout();
 	Invalidate();
 }
 
 
-// #pragma mark -
-
-
-void 
-MediaFileInfoView::_GetFileInfo(BString* audioFormat, BString* videoFormat,
-	BString* audioDetails, BString* videoDetails, BString* duration)
+float
+MediaFileInfoView::_LineHeight()
 {
-	fDuration = 0;
-	if (fMediaFile == NULL)
-		return;
-	
-	BMediaTrack* track;
-	media_format format;
-	memset(&format, 0, sizeof(format));
-	media_codec_info codecInfo;
-	bool audioDone(false), videoDone(false);
-	bigtime_t audioDuration = 0;
-	bigtime_t videoDuration = 0;
-	int32 tracks = fMediaFile->CountTracks();
-	int64 videoFrames = 0;
-	int64 audioFrames = 0;
-	for (int32 i = 0; i < tracks && (!audioDone || !videoDone); i++) {
-		track = fMediaFile->TrackAt(i);
-		if (track != NULL) {
-			track->EncodedFormat(&format);
-			if (format.IsVideo()) {
-				memset(&format, 0, sizeof(format));
-				format.type = B_MEDIA_RAW_VIDEO;
-				track->DecodedFormat(&format);
-				media_raw_video_format *rvf = &(format.u.raw_video);
-
-				track->GetCodecInfo(&codecInfo);
-				*videoFormat << codecInfo.pretty_name;
-				videoDuration = track->Duration();
-				videoFrames = track->CountFrames();
-
-				*videoDetails << (int32)format.Width() << "x" << (int32)format.Height()
-							 << " " << (int32)(rvf->field_rate / rvf->interlace)
-							 << " fps / "  << videoFrames << " frames";
-
-				videoDone = true;
-
-			} else if (format.IsAudio()) {
-				memset(&format, 0, sizeof(format));
-				format.type = B_MEDIA_RAW_AUDIO;
-				track->DecodedFormat(&format);
-				media_raw_audio_format *raf = &(format.u.raw_audio);
-				char bytesPerSample = (char)(raf->format & 0xf);
-				if (bytesPerSample == 1) {
-					*audioDetails << "8 bit ";
-				} else if (bytesPerSample == 2) {
-					*audioDetails << "16 bit ";
-				} else {
-					*audioDetails << bytesPerSample << "byte ";
-				}
-
-				track->GetCodecInfo(&codecInfo);
-				*audioFormat << codecInfo.pretty_name;
-				audioDuration = track->Duration();
-				audioFrames = track->CountFrames();
-
-				*audioDetails << (float)(raf->frame_rate / 1000.0f) << " kHz";
-				if (raf->channel_count == 1) {
-					*audioDetails << " mono / ";
-				} else if (raf->channel_count == 2) {
-					*audioDetails << " stereo / ";
-				} else {
-					*audioDetails << (int32)raf->channel_count << " channel / " ;
-				}
-				*audioDetails << audioFrames << " frames";
-				audioDone = true;
-			}
-			fMediaFile->ReleaseTrack(track);
-		}	
-	}
-
-	fDuration = MAX(audioDuration, videoDuration);
-	*duration << (int32)(fDuration / 1000000)
-			  << " seconds";
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	return ceilf(fontHeight.ascent + fontHeight.descent + fontHeight.leading);
 }
 
+
+float
+MediaFileInfoView::_MaxLineWidth(BString* strings, int32 count,
+	const BFont& font)
+{
+	float width = 0;
+	for (int32 i = 0; i < count; i++)
+		width = max_c(font.StringWidth(strings[i]), width);
+
+	return ceilf(width);
+}
+
+
+void
+MediaFileInfoView::_ValidateMinMax()
+{
+	if (fMinMaxValid)
+		return;
+
+	BFont font;
+	GetFont(&font);
+
+	BFont bold(font);
+	bold.SetFace(B_BOLD_FACE);
+	fMinSize.Set(0, 0);
+
+	if (fMediaFile == NULL) {
+		fMinSize.width =  fNoFileLabelWidth + kSpacing * 2;
+		fMinSize.height = fLineHeight + kSpacing;
+		return;
+	}
+
+	fMinSize.height += fLineHeight + kSpacing + 1;
+	fMinSize.width = ceilf(bold.StringWidth(fRef.name));
+
+	BString strings[5] = {fInfo.audio.format, fInfo.audio.details,
+		fInfo.video.format, fInfo.video.details, fInfo.duration};
+	float maxInfoWidth = _MaxLineWidth(strings, 5, font);
+
+	fMinSize.width = max_c(fMinSize.width, fMaxLabelWidth
+		+ maxInfoWidth + kSpacing);
+	fMinSize.width += kSpacing;
+
+	fMinSize.height += fLineHeight * 5 + 2 * kSpacing;
+		// 5 lines of info, w/ spacing above and below (not between lines)
+
+	ResetLayoutInvalidation();
+	fMinMaxValid = true;
+}
+
+
+void
+MediaFileInfoView::_SetFontFace(uint16 face)
+{
+	BFont font;
+	font.SetFace(face);
+	SetFont(&font, B_FONT_FACE);
+}
 

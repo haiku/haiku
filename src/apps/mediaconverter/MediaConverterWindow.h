@@ -75,25 +75,25 @@ class MediaConverterWindow : public BWindow {
 
 	private:
 			void				_UpdateLabels();
+			void				_UpdateBBoxLayoutInsets(BBox* box);
 			void				_CreateMenu();
 			void				_DestroyMenu();
 			void				_SetOutputFolder(BEntry entry);
 
-			media_format		fDummyFormat;
 			BButton*			fConvertButton;
 
 			BButton*			fDestButton;
 			BButton*			fPreviewButton;
-			BBox*				fBox1;
-			BBox*				fBox2;
-			BBox*				fBox3;
+			BBox*				fSourcesBox;
+			BBox*				fInfoBox;
+			BBox*				fOutputBox;
 
 			BMenuBar*			fMenuBar;
 			BMenuField*			fFormatMenu;
 			BMenuField*			fVideoMenu;
 			BMenuField*			fAudioMenu;
-			StatusView*			fStatusView;
-			StatusView*			fStatusView2;
+			BStringView*		fFileStatus;
+			BStringView*		fStatus;
 			MediaFileListView*	fListView;
 			MediaFileInfoView*	fInfoView;
 			BStringView*		fOutputFolder;

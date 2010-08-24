@@ -93,8 +93,9 @@ MediaConverterApp::ReadyToRun()
 	fWin->PostMessage(INIT_FORMAT_MENUS);
 }
 
+
 void
-MediaConverterApp::RefsReceived(BMessage *msg)
+MediaConverterApp::RefsReceived(BMessage* msg)
 {
 	entry_ref ref;
 	int32 i = 0;
@@ -122,10 +123,10 @@ MediaConverterApp::RefsReceived(BMessage *msg)
 	if (errors) {
 		BString alertText;
 		alertText << errors << ((errors > 1) ? FILES : FILE)
-				  << NOTRECOGNIZE << "\n";
+				<< NOTRECOGNIZE << "\n";
 		alertText << errorFiles;
-		BAlert *alert = new BAlert(ERROR_LOAD_STRING, alertText.String(),
-						CONTINUE_STRING	, NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		BAlert* alert = new BAlert(ERROR_LOAD_STRING, alertText.String(),
+			CONTINUE_STRING	, NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->Go();
 	}
 }
@@ -163,7 +164,7 @@ MediaConverterApp::StartConverting()
 
 
 void
-MediaConverterApp::SetStatusMessage(const char *message)
+MediaConverterApp::SetStatusMessage(const char* message)
 {
 	if (fWin != NULL && fWin->Lock()) {
 		fWin->SetStatusMessage(message);

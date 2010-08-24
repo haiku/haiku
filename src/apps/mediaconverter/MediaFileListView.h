@@ -26,8 +26,7 @@ public:
 
 class MediaFileListView : public BListView {
 public:
-								MediaFileListView(BRect frame,
-									uint32 resizingMode);
+								MediaFileListView();
 	virtual						~MediaFileListView();
 
 protected:

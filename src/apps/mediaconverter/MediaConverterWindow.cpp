@@ -1,6 +1,7 @@
 // Copyright 1999, Be Incorporated. All Rights Reserved.
 // Copyright 2000-2004, Jun Suzuki. All Rights Reserved.
 // Copyright 2007, Stephan Aßmus. All Rights Reserved.
+// Copyright 2010, Haiku, Inc. All Rights Reserved.
 // This file may be used under the terms of the Be Sample Code License.
 #include "MediaConverterWindow.h"
 
@@ -11,7 +12,9 @@
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <FilePanel.h>
+#include <LayoutBuilder.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -28,7 +31,6 @@
 #include "MediaFileInfoView.h"
 #include "MediaFileListView.h"
 #include "MessageConstants.h"
-#include "StatusView.h"
 #include "Strings.h"
 
 
@@ -59,7 +61,8 @@ public:
 
 
 FileFormatMenuItem::FileFormatMenuItem(media_file_format *format)
-	: BMenuItem(format->pretty_name, new BMessage(FORMAT_SELECT_MESSAGE))
+	:
+	BMenuItem(format->pretty_name, new BMessage(FORMAT_SELECT_MESSAGE))
 {
 	memcpy(&fFileFormat, format, sizeof(fFileFormat));
 }
@@ -83,7 +86,8 @@ class CodecMenuItem : public BMenuItem {
 
 
 CodecMenuItem::CodecMenuItem(media_codec_info *ci, uint32 msg_type)
-	: BMenuItem(ci->pretty_name, new BMessage(msg_type))
+	:
+	BMenuItem(ci->pretty_name, new BMessage(msg_type))
 {
 	memcpy(&fCodecInfo, ci, sizeof(fCodecInfo));
 }
@@ -98,20 +102,17 @@ CodecMenuItem::~CodecMenuItem()
 
 
 MediaConverterWindow::MediaConverterWindow(BRect frame)
-	: BWindow(frame, "MediaConverter", B_TITLED_WINDOW_LOOK,
-		B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
-
-	, fVideoQuality(75)
-	, fAudioQuality(75)
-
-	, fSaveFilePanel(NULL)
-	, fOpenFilePanel(NULL)
-
-	, fOutputDirSpecified(false)
-
-	, fEnabled(true)
-	, fConverting(false)
-	, fCancelling(false)
+	:
+	BWindow(frame, "MediaConverter", B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
+	fVideoQuality(75),
+	fAudioQuality(75),
+	fSaveFilePanel(NULL),
+	fOpenFilePanel(NULL),
+	fOutputDirSpecified(false),
+	fEnabled(true),
+	fConverting(false),
+	fCancelling(false)
 {
 	char defaultdirectory[] = "/boot/home";
 	fOutputDir.SetTo(defaultdirectory);
@@ -132,177 +133,109 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 
 #endif
 
-	BRect dummyRect(0, 0, 10, 10);
-	fMenuBar = new BMenuBar(dummyRect, "menubar");
+	fMenuBar = new BMenuBar("menubar");
 	_CreateMenu();
-	AddChild(fMenuBar);
 
-	// background
-	BRect r(frame);
-	r.OffsetTo(0, 0);
-	BView *background = new BView(r, NULL, B_FOLLOW_ALL_SIDES, 0);
-	rgb_color c = ui_color(B_PANEL_BACKGROUND_COLOR);
-	background->SetViewColor(c);
-	background->SetLowColor(c);
-	r.InsetBy(5, 25);
+	fListView = new MediaFileListView();
+	fListView->SetExplicitMinSize(BSize(100, B_SIZE_UNSET));
+	BScrollView* scroller = new BScrollView(NULL, fListView, 0, false, true);
 
 	// file list view box
-	BRect r2(r);
-	r2.bottom = r2.top + 420;
-	r2.right = r2.left + 150;
-	fBox1 = new BBox(r2, NULL, B_FOLLOW_ALL);
+	fSourcesBox = new BBox(B_FANCY_BORDER, scroller);
+	fSourcesBox->SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
+	// We give fSourcesBox a layout to provide insets for the sources list
+	// said insets are adjusted in _UpdateLabels
 
-	BRect r3(r2);
-	r3.OffsetTo(0, 0);
-	r3.InsetBy(8, 8);
-	r3.top += be_bold_font->Size() - 3;
-	bool useHorizontalScrollBar = false;
-	if (useHorizontalScrollBar)
-		r3.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	r3.right -= B_V_SCROLL_BAR_WIDTH;
-	fListView = new MediaFileListView(r3, B_FOLLOW_ALL);
-	BScrollView *scroller = new BScrollView(NULL, fListView,
-		B_FOLLOW_ALL, 0, useHorizontalScrollBar, true);
-	fBox1->AddChild(scroller);
-	background->AddChild(fBox1);
+	fInfoView = new MediaFileInfoView();
+	fInfoBox = new BBox(B_FANCY_BORDER, fInfoView);
+	fInfoBox->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
+			B_ALIGN_USE_FULL_HEIGHT));
 
-	// info box
-	r2.left = r2.right + 5;
-	r2.right = r.right - 5;
-	r2.bottom = r2.top + 120;
-	fBox2 = new BBox(r2, NULL, B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	// Output format box
+	fOutputBox = new BBox(B_FANCY_BORDER, NULL);
+	float padding = be_control_look->DefaultItemSpacing();
+	BGridLayout* ouputGrid = new BGridLayout(padding, padding);
+	fOutputBox->SetLayout(ouputGrid);
+	// fOutputBox's layout is also adjusted in _UpdateLabels
 
-	r3 = r2;
-	r3.OffsetTo(0, 0);
-	r3.InsetBy(5, 5);
-	r3.top += 12;
-	fInfoView = new MediaFileInfoView(r3, B_FOLLOW_ALL);
-	fBox2->AddChild(fInfoView);
-	background->AddChild(fBox2);
-
-	r2.top = r2.bottom + 5;
-	r2.bottom = r2.top + 295;
-	fBox3 = new BBox(r2, NULL, B_FOLLOW_RIGHT | B_FOLLOW_TOP_BOTTOM);
-
-	r3 = r2;
-	r3.OffsetTo(0, 0);
-	r3.InsetBy(8, 8);
-	r3.top += be_bold_font->Size() - 3;
-
-	BRect r4(r3);
-	r4.bottom = r4.top + 20;
 	BPopUpMenu* popmenu = new BPopUpMenu("");
-	fFormatMenu = new BMenuField(r4, NULL, FORMAT_LABEL, popmenu,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fBox3->AddChild(fFormatMenu);
+	fFormatMenu = new BMenuField(NULL, FORMAT_LABEL, popmenu);
 
-	r4.top = r4.bottom + 5;
-	r4.bottom = r4.top + 20;
 	popmenu = new BPopUpMenu("");
-	fAudioMenu = new BMenuField(r4, NULL, AUDIO_LABEL, popmenu,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fBox3->AddChild(fAudioMenu);
+	fAudioMenu = new BMenuField(NULL, AUDIO_LABEL, popmenu);
 
-	r4.top = r4.bottom + 5;
-	r4.bottom = r4.top + 20;
 	popmenu = new BPopUpMenu("");
-	fVideoMenu = new BMenuField(r4, NULL, VIDEO_LABEL, popmenu,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fBox3->AddChild(fVideoMenu);
+	fVideoMenu = new BMenuField(NULL, VIDEO_LABEL, popmenu);
 
 	// output folder
-	r4.top = r4.bottom + 5;
-	r4.bottom = r4.top + 20;
-	r4.right = 80;
-	fDestButton = new BButton(r4, NULL, OUTPUT_FOLDER_LABEL,
-		new BMessage(OUTPUT_FOLDER_MESSAGE),
-		B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	fBox3->AddChild(fDestButton);
-	fDestButton->ResizeToPreferred();
-	BRect buttonFrame2(fDestButton->Frame());
-	buttonFrame2.OffsetTo(r.right - buttonFrame2.Width(),
-		r.bottom - buttonFrame2.Height());
-
-	fOutputFolder = new BStringView(r4, NULL, defaultdirectory,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW);
-	fBox3->AddChild(fOutputFolder);
-	fOutputFolder->MoveBy(buttonFrame2.Width() + 10, 5);
-	fOutputFolder->ResizeToPreferred();
+	fDestButton = new BButton(OUTPUT_FOLDER_LABEL,
+		new BMessage(OUTPUT_FOLDER_MESSAGE));
+	BAlignment labelAlignment(be_control_look->DefaultLabelAlignment());
+	fOutputFolder = new BStringView(NULL, defaultdirectory);
+	fOutputFolder->SetExplicitAlignment(labelAlignment);
 
 	// start/end duration
-	r4.top = r4.bottom + 10;
-	r4.bottom = r4.top + 20;
-	r4.right = r3.right;
-	fStartDurationTC = new BTextControl(r4, NULL, "", "0", NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fBox3->AddChild(fStartDurationTC);
+	fStartDurationTC = new BTextControl(NULL, NULL, NULL);
 	fStartDurationTC->SetText("0");
 
-	r4.top = r4.bottom + 5;
-	r4.bottom = r4.top + 20;
-	fEndDurationTC = new BTextControl(r4, NULL, "", "0", NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
-	fBox3->AddChild(fEndDurationTC);
+	fEndDurationTC = new BTextControl(NULL, NULL, NULL);
 	fEndDurationTC->SetText("0");
 
-	r4.top = r4.bottom + 5;
-	r4.bottom = r4.top + 50;
-
 	// Video Quality
-	fVideoQualitySlider = new BSlider(r4, "VSlider", "" ,
-		new BMessage(VIDEO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL,
-		B_BLOCK_THUMB, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fVideoQualitySlider = new BSlider("VSlider", "" ,
+		new BMessage(VIDEO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL);
 	fVideoQualitySlider->SetValue(fVideoQuality);
 	fVideoQualitySlider->SetEnabled(false);
-	fBox3->AddChild(fVideoQualitySlider);
-
-	r4.top = r4.bottom + 5;
-	r4.bottom = r4.top + 50;
 
 	// Audio Quality
-	fAudioQualitySlider = new BSlider(r4,"ASlider", "" ,
-		new BMessage(AUDIO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL,
-		B_BLOCK_THUMB, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	fAudioQualitySlider = new BSlider("ASlider", "" ,
+		new BMessage(AUDIO_QUALITY_CHANGED_MESSAGE), 1, 100, B_HORIZONTAL);
 	fAudioQualitySlider->SetValue(fAudioQuality);
 	fAudioQualitySlider->SetEnabled(false);
-	fBox3->AddChild(fAudioQualitySlider);
-	background->AddChild(fBox3);
+
+	BLayoutBuilder::Grid<>(ouputGrid)
+		.SetInsets(padding, padding, padding, padding)
+		.AddMenuField(fFormatMenu, 0, 0)
+		.AddMenuField(fAudioMenu, 0, 1)
+		.AddMenuField(fVideoMenu, 0, 2)
+		.Add(fDestButton, 0, 3)
+		.Add(fOutputFolder, 1, 3)
+		.AddTextControl(fStartDurationTC, 0, 4)
+		.AddTextControl(fEndDurationTC, 0, 5)
+		.Add(fVideoQualitySlider, 0, 6, 2, 1)
+		.Add(fAudioQualitySlider, 0, 7, 2, 1);
 
 	// buttons
-	r2.top = r2.bottom + 15;
-	r2.bottom = r2.top + 20;
-	r2.left = r.left - 120;
-	r2.right = r.right;
-
-	fPreviewButton = new BButton(r2, NULL, PREVIEW_BUTTON_LABEL,
-		new BMessage(PREVIEW_MESSAGE), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	background->AddChild(fPreviewButton);
+	fPreviewButton = new BButton(PREVIEW_BUTTON_LABEL,
+		new BMessage(PREVIEW_MESSAGE));
 	fPreviewButton->SetEnabled(false);
 
-	fConvertButton = new BButton(r2, NULL, CONVERT_LABEL,
-		new BMessage(CONVERT_BUTTON_MESSAGE),
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	background->AddChild(fConvertButton);
+	fConvertButton = new BButton(CONVERT_LABEL,
+		new BMessage(CONVERT_BUTTON_MESSAGE));
 
-	// Status view
-	r2.bottom = r2.top + 20;
-	r2.left = r.left;
-	r2.right = r.right;
-
-	fStatusView2 = new StatusView(r2, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	background->AddChild(fStatusView2);
-
-	r2.top += 15;
-	r2.bottom += 20;
-
-	fStatusView = new StatusView(r2, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
-	background->AddChild(fStatusView);
-	AddChild(background);
+	// Status views
+	fStatus = new BStringView(NULL, NULL);
+	fStatus->SetExplicitAlignment(labelAlignment);
+	fFileStatus= new BStringView(NULL, NULL);
+	fFileStatus->SetExplicitAlignment(labelAlignment);
 
 	SetStatusMessage("");
 	_UpdateLabels();
 
-	SetSizeLimits(frame.Width(), 32000, frame.Height(), 32000);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, 0, 0, 0)
+		.Add(fMenuBar)
+		.AddGrid(padding, padding)
+			.SetInsets(padding, padding, padding, padding)
+			.Add(fSourcesBox, 0, 0, 1, 2)
+			.Add(fInfoBox,	1, 0, 1, 1)
+			.Add(fOutputBox, 1, 1, 1, 1)
+			.AddGrid(padding, padding, 0, 2, 2, 1)
+				.SetInsets(0, 0, 0, 0)
+				.Add(fStatus, 0, 0)
+				.Add(fFileStatus, 0, 1)
+				.Add(fPreviewButton, 2, 0)
+				.Add(fConvertButton, 3, 0);
 }
 
 
@@ -335,7 +268,7 @@ MediaConverterWindow::DispatchMessage(BMessage *msg, BHandler *handler)
 
 
 void
-MediaConverterWindow::MessageReceived(BMessage *msg)
+MediaConverterWindow::MessageReceived(BMessage* msg)
 {
 	status_t status;
 	entry_ref ref;
@@ -487,7 +420,8 @@ MediaConverterWindow::MessageReceived(BMessage *msg)
 					VERSION"\n"
 					B_UTF8_COPYRIGHT" 1999, Be Incorporated.\n"
 					B_UTF8_COPYRIGHT" 2000-2004 Jun Suzuki\n"
-					B_UTF8_COPYRIGHT" 2007 Stephan Aßmus",
+					B_UTF8_COPYRIGHT" 2007 Stephan Aßmus\n",
+					B_UTF8_COPYRIGHT" 2010 Haiku, Inc.",
 					OK_LABEL))->Go();
 			break;
 		}
@@ -737,16 +671,18 @@ MediaConverterWindow::BuildFormatMenu()
 	}
 }
 
+
 void
 MediaConverterWindow::SetFileMessage(const char *message)
 {
-	fStatusView->SetStatus(message);
+	fFileStatus->SetText(message);
 }
+
 
 void
 MediaConverterWindow::SetStatusMessage(const char *message)
 {
-	fStatusView2->SetStatus(message);
+	fStatus->SetText(message);
 }
 
 
@@ -902,107 +838,73 @@ MediaConverterWindow::SetVideoQualityLabel(const char* label)
 void
 MediaConverterWindow::_UpdateLabels()
 {
-	char buffer[255];
+	if (fSourcesBox != NULL) {
+		fSourcesBox->SetLabel(SOURCE_BOX_LABEL);
+		_UpdateBBoxLayoutInsets(fSourcesBox);
+	}
 
-	if (fBox1 != NULL)
-		fBox1->SetLabel(SOURCE_BOX_LABEL);
-	if (fBox2 != NULL)
-		fBox2->SetLabel(INFO_BOX_LABEL);
-	if (fBox3 != NULL)
-		fBox3->SetLabel(OUTPUT_BOX_LABEL);
+	if (fInfoBox != NULL)
+		fInfoBox->SetLabel(INFO_BOX_LABEL);
 
-	BRect r(Bounds());
-	float w = 0;
+	if (fOutputBox != NULL) {
+		fOutputBox->SetLabel(OUTPUT_BOX_LABEL);
+		_UpdateBBoxLayoutInsets(fOutputBox);
+	}
 
-	if (fConvertButton != NULL) {
+	if (fConvertButton != NULL)
 		fConvertButton->SetLabel(CONVERT_LABEL);
-		fConvertButton->ResizeToPreferred();
-		BRect buttonFrame(fConvertButton->Frame());
-		w = buttonFrame.Width();
-		buttonFrame.OffsetTo(r.right - w - 10, r.bottom - buttonFrame.Height() - 25);
-		fConvertButton->MoveTo(buttonFrame.LeftTop());
-	}
 
-	if (fPreviewButton != NULL) {
+	if (fPreviewButton != NULL)
 		fPreviewButton->SetLabel(PREVIEW_BUTTON_LABEL);
-		fPreviewButton->ResizeToPreferred();
-		BRect buttonFrame(fPreviewButton->Frame());
-		w = buttonFrame.Width();
-		buttonFrame.OffsetTo(r.right - w - buttonFrame.Width() - 40,
-						 r.bottom - buttonFrame.Height() - 25);
-		fPreviewButton->MoveTo(buttonFrame.LeftTop());
-	}
 
-	if (fDestButton != NULL) {
+	if (fDestButton != NULL)
 		fDestButton->SetLabel(OUTPUT_FOLDER_LABEL);
-		fDestButton->ResizeToPreferred();
-	}
 
-	if (fOutputFolder != NULL) {
-		BRect destrect;
-		destrect = fDestButton->Frame();
-		fOutputFolder->MoveTo(destrect.right + 10, destrect.top + 5);
-		fOutputFolder->ResizeToPreferred();
-	}
-
-	sprintf(buffer, VIDEO_QUALITY_LABEL, (int8)fVideoQuality);
 	if (fVideoQualitySlider != NULL) {
+		char buffer[40];
+		sprintf(buffer, VIDEO_QUALITY_LABEL, (int8)fVideoQuality);
 		fVideoQualitySlider->SetLabel(buffer);
 		fVideoQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
 			SLIDER_HIGH_LABEL);
 	}
 
-	sprintf(buffer, AUDIO_QUALITY_LABEL, (int8)fAudioQuality);
-
 	if (fAudioQualitySlider != NULL) {
+		char buffer[40];
+		sprintf(buffer, AUDIO_QUALITY_LABEL, (int8)fAudioQuality);
 		fAudioQualitySlider->SetLabel(buffer);
 		fAudioQualitySlider->SetLimitLabels(SLIDER_LOW_LABEL,
 			SLIDER_HIGH_LABEL);
 	}
 
-	float maxLabelLen = 0;
-	if (fStartDurationTC != NULL) {
+	if (fStartDurationTC != NULL)
 		fStartDurationTC->SetLabel(START_LABEL);
-		maxLabelLen = fStartDurationTC->StringWidth(START_LABEL);
-	}
-	if (fEndDurationTC != NULL) {
+
+	if (fEndDurationTC != NULL)
 		fEndDurationTC->SetLabel(END_LABEL);
-		maxLabelLen = MAX(maxLabelLen, fEndDurationTC->StringWidth(END_LABEL));
-	}
-	if (fStartDurationTC != NULL)
-		fStartDurationTC->SetDivider(maxLabelLen + 5);
-	if (fEndDurationTC != NULL)
-		fEndDurationTC->SetDivider(maxLabelLen + 5);
 
-	if (fFormatMenu != NULL) {
-		fFormatMenu->SetLabel(FORMAT_LABEL);
-		maxLabelLen = MAX(maxLabelLen, fFormatMenu->StringWidth(
-			fFormatMenu->Label()));
-	}
-	if (fAudioMenu != NULL) {
-		fAudioMenu->SetLabel(AUDIO_LABEL);
-		maxLabelLen = MAX(maxLabelLen, fAudioMenu->StringWidth(
-			fAudioMenu->Label()));
-	}
-	if (fVideoMenu != NULL) {
-		fVideoMenu->SetLabel(VIDEO_LABEL);
-		maxLabelLen = MAX(maxLabelLen, fVideoMenu->StringWidth(
-			fVideoMenu->Label()));
-	}
-	maxLabelLen += 10;
-
-	if (fStartDurationTC != NULL)
-		fStartDurationTC->SetDivider(maxLabelLen);
-	if (fEndDurationTC != NULL)
-		fEndDurationTC->SetDivider(maxLabelLen);
 	if (fFormatMenu != NULL)
-		fFormatMenu->SetDivider(maxLabelLen + 3);
+		fFormatMenu->SetLabel(FORMAT_LABEL);
+
 	if (fAudioMenu != NULL)
-		fAudioMenu->SetDivider(maxLabelLen + 3);
+		fAudioMenu->SetLabel(AUDIO_LABEL);
+
 	if (fVideoMenu != NULL)
-		fVideoMenu->SetDivider(maxLabelLen + 3);
+		fVideoMenu->SetLabel(VIDEO_LABEL);
 
 	SetFileMessage(DROP_MEDIA_FILE_LABEL);
+}
+
+
+void
+MediaConverterWindow::_UpdateBBoxLayoutInsets(BBox* box)
+{
+	BTwoDimensionalLayout* layout
+		= dynamic_cast<BTwoDimensionalLayout*>(box->GetLayout());
+	if (layout) {
+		float padding = be_control_look->DefaultItemSpacing();
+		layout->SetInsets(padding, box->TopBorderOffset() + padding, padding,
+			padding);
+	}
 }
 
 
@@ -1026,14 +928,15 @@ MediaConverterWindow::_CreateMenu()
 
 	menu = new BMenu(FILE_MENU_LABEL);
 	item = new BMenuItem(OPEN_MENU_LABEL B_UTF8_ELLIPSIS,
-		new BMessage(OPEN_FILE_MESSAGE));
+		new BMessage(OPEN_FILE_MESSAGE), 'O');
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
+
 	item = new BMenuItem(ABOUT_MENU_LABEL B_UTF8_ELLIPSIS,
 		new BMessage(DISP_ABOUT_MESSAGE));
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
-	item = new BMenuItem(QUIT_MENU_LABEL, new BMessage(QUIT_MESSAGE));
+	item = new BMenuItem(QUIT_MENU_LABEL, new BMessage(QUIT_MESSAGE), 'Q');
 	menu->AddItem(item);
 
 	fMenuBar->AddItem(menu);

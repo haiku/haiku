@@ -6,9 +6,9 @@ Application MediaConverter :
 	MediaConverterApp.cpp
 	MediaConverterWindow.cpp
 	MediaEncoderWindow.cpp
+	MediaFileInfo.cpp
 	MediaFileInfoView.cpp
 	MediaFileListView.cpp
-	StatusView.cpp
 
 	: be media tracker $(TARGET_LIBSTDC++)
 	: MediaConverter.rdef

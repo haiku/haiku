@@ -9,15 +9,25 @@
 #include <Entry.h>
 #include <View.h>
 
+#include "MediaFileInfo.h"
+
 
 class BMediaFile;
 class BString;
 
 class MediaFileInfoView : public BView {
 	public:
-								MediaFileInfoView(BRect frame,
-									uint32 resizingMode);
+								MediaFileInfoView();
 	virtual						~MediaFileInfoView();
+
+	virtual BSize				MinSize();
+	virtual BSize				MaxSize();
+	virtual BSize				PreferredSize();
+	virtual	BAlignment			LayoutAlignment();
+	virtual	void				InvalidateLayout(bool children = false);
+
+	virtual	void				SetFont(const BFont* font,
+									uint32 mask = B_FONT_ALL);
 
 	protected:
 	virtual void				Draw(BRect updateRect);
@@ -26,18 +36,23 @@ class MediaFileInfoView : public BView {
 	public:
 			void				Update(BMediaFile* file, entry_ref* ref);
 			bigtime_t			Duration() const
-									{ return fDuration; }
+									{ return fInfo.useconds; }
 
 	private:
-			void				_GetFileInfo(BString* audioFormat,
-									BString* videoFormat,
-									BString* audioDetails,
-									BString* videoDetails,
-									BString* duration);
+			void				_ValidateMinMax();
+			float				_MaxLineWidth(BString* strings,
+									int32 stringCount, const BFont& font);
+			float				_LineHeight();
+			void				_SetFontFace(uint16 face);
 
+			bool				fMinMaxValid;
+			BSize				fMinSize;
+			float				fMaxLabelWidth;
+			float				fNoFileLabelWidth;
+			float				fLineHeight;
 			entry_ref			fRef;
 			BMediaFile*			fMediaFile;
-			bigtime_t			fDuration;
+			MediaFileInfo		fInfo;
 };
 
 #endif // MEDIA_FILE_INFO_VIEW_H

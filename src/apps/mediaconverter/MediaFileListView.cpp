@@ -37,9 +37,10 @@ MediaFileListItem::~MediaFileListItem()
 // #pragma mark - MediaFileListView
 
 
-MediaFileListView::MediaFileListView(BRect frame, uint32 resizingMode)
-	: BListView(frame, "MediaFileListView", B_SINGLE_SELECTION_LIST, resizingMode,
-				B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
+MediaFileListView::MediaFileListView()
+	:
+	BListView("MediaFileListView", B_SINGLE_SELECTION_LIST, B_WILL_DRAW
+			| B_NAVIGABLE | B_FRAME_EVENTS)
 {
 	fEnabled = true;
 }
