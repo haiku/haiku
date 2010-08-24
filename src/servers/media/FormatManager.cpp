@@ -277,3 +277,28 @@ FormatManager::MakeFormatFor(BMessage& message)
 	message.SendReply(&reply, (BHandler*)NULL, TIMEOUT);
 }
 
+
+void
+FormatManager::RemoveFormat(const media_format& format)
+{
+	BAutolock locker(fLock);
+
+	int32 foundIndex = -1;
+	for (int32 i = fList.CountItems() - 1; i >= 0; i--) {
+		meta_format* metaFormat = fList.ItemAt(i);
+		if (metaFormat->format == format) {
+			if (foundIndex != -1) {
+				printf("FormatManager::RemoveFormat() - format already "
+					"present at previous index: %ld\n", foundIndex);
+			}
+			foundIndex = i;
+		}
+	}
+
+	if (foundIndex >= 0)
+		delete fList.RemoveItemAt(foundIndex);
+	else
+		printf("FormatManager::RemoveFormat() - format not found!\n");
+
+	fLastUpdate = system_time();
+}

@@ -26,6 +26,7 @@ public:
 
 			void				GetFormats(BMessage& message);
 			void				MakeFormatFor(BMessage& message);
+			void				RemoveFormat(const media_format& format);
 
 private:
 	typedef BPrivate::media::meta_format meta_format;
