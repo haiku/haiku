@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the GNU L-GPL license.
  */
 
@@ -138,6 +138,9 @@ private:
 	static	off_t				_Seek(void* cookie, off_t offset, int whence);
 
 			status_t			_NextPacket(bool reuse);
+
+			int64_t				_ConvertToStreamTimeBase(bigtime_t time) const;
+			bigtime_t			_ConvertFromStreamTimeBase(int64_t time) const;
 
 private:
 			BPositionIO*		fSource;
@@ -720,8 +723,7 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	// unfortunately, libavformat itself seems to set the time_base and
 	// duration wrongly sometimes. :-(
 	if ((int64)fStream->duration != kNoPTSValue) {
-		*duration = (bigtime_t)(1000000LL * fStream->duration
-			* fStream->time_base.num / fStream->time_base.den);
+		*duration = _ConvertFromStreamTimeBase(fStream->duration);
 		TRACE("  stream duration: %lld, time_base %.4f (%d/%d)\n",
 			fStream->duration, av_q2d(fStream->time_base),
 			fStream->time_base.num, fStream->time_base.den);
@@ -760,12 +762,6 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	if (fContext == NULL || fStream == NULL)
 		return B_NO_INIT;
 
-	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0) {
-		TRACE_SEEK("AVFormatReader::StreamCookie::Seek() - "
-			"B_MEDIA_SEEK_CLOSEST_FORWARD not supported.\n");
-		return B_NOT_SUPPORTED;
-	}
-
 	TRACE_SEEK("AVFormatReader::StreamCookie::Seek(%ld, %s %s %s %s, %lld, "
 		"%lld)\n", VirtualIndex(),
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? "B_MEDIA_SEEK_TO_FRAME" : "",
@@ -774,6 +770,8 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? "B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		*frame, *time);
 
+	// Seeking is always based on time, initialize it when client seeks
+	// based on frame.
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
 		*time = (bigtime_t)(*frame * 1000000LL / FrameRate());
 
@@ -795,16 +793,7 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	ret = av_seek_frame(fContext, Index(), pos, seekFlags);
 #endif
 
-
-	int64_t timeStamp;
-	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-		// Can use frame, because stream timeStamp is actually in frame
-		// units.
-		timeStamp = *frame;
-	} else {
-		timeStamp = *time * fStream->time_base.num
-			/ ((int64_t)fStream->time_base.den * 1000000);
-	}
+	int64_t timeStamp = _ConvertToStreamTimeBase(*time);
 
 	TRACE_SEEK("  time: %.5fs -> %lld, current DTS: %lld (time_base: %d/%d)\n",
 		*time / 1000000.0, timeStamp, fStream->cur_dts, fStream->time_base.num,
@@ -842,15 +831,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
 		*time = (bigtime_t)(*frame * 1000000LL / frameRate);
 
-	int64_t timeStamp;
-	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-		// Can use frame, because stream timeStamp is actually in frame
-		// units.
-		timeStamp = *frame;
-	} else {
-		timeStamp = *time * fStream->time_base.num
-			/ ((int64_t)fStream->time_base.den * 1000000);
-	}
+	int64_t timeStamp = _ConvertToStreamTimeBase(*time);
 
 	TRACE_SEEK("  time: %.2fs -> %lld (time_base: %d/%d)\n", *time / 1000000.0,
 		timeStamp, fStream->time_base.num, fStream->time_base.den);
@@ -871,12 +852,11 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 
 	const AVIndexEntry& entry = fStream->index_entries[index];
 	timeStamp = entry.timestamp;
-	*time = (bigtime_t)(timeStamp * 1000000 * fStream->time_base.num
-		/ fStream->time_base.den);
+	*time = _ConvertFromStreamTimeBase(timeStamp);
 
 	TRACE_SEEK("  seeked time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-		*frame = timeStamp;//*time * frameRate / 1000000LL;
+		*frame = *time * frameRate / 1000000LL;
 		TRACE_SEEK("  seeked frame: %lld\n", *frame);
 	}
 
@@ -1068,6 +1048,21 @@ AVFormatReader::StreamCookie::_NextPacket(bool reuse)
 }
 
 
+int64_t
+AVFormatReader::StreamCookie::_ConvertToStreamTimeBase(bigtime_t time) const
+{
+	return time * fStream->time_base.den
+		/ (1000000LL * fStream->time_base.num);
+}
+
+
+bigtime_t
+AVFormatReader::StreamCookie::_ConvertFromStreamTimeBase(int64_t time) const
+{
+	return 1000000LL * time * fStream->time_base.num / fStream->time_base.den;
+}
+
+
 // #pragma mark - AVFormatReader
 
 
@@ -1217,12 +1212,12 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 	}
 
 	if (context->iformat->long_name != NULL)
-		strcpy(mff->pretty_name, context->iformat->long_name);
+		sprintf(mff->pretty_name, "%s (FFmpeg)", context->iformat->long_name);
 	else {
 		if (format != NULL)
-			strcpy(mff->pretty_name, format->pretty_name);
+			sprintf(mff->pretty_name, "%s (FFmpeg)", format->pretty_name);
 		else
-			strcpy(mff->pretty_name, "");
+			strcpy(mff->pretty_name, "Unknown (FFmpeg)");
 	}
 }
 
