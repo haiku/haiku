@@ -729,8 +729,8 @@ NodeManager::RegisterAddOn(const entry_ref& ref, media_addon_id* _newID)
 
 	media_addon_id id = fNextAddOnID++;
 
-	printf("NodeManager::RegisterAddOn: ref-name \"%s\", assigning id %ld\n",
-		ref.name, id);
+//	printf("NodeManager::RegisterAddOn: ref-name \"%s\", assigning id %ld\n",
+//		ref.name, id);
 
 	try {
 		fPathMap.insert(std::make_pair(id, ref));

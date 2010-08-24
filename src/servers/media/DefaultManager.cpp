@@ -89,39 +89,41 @@ DefaultManager::LoadState()
 
 	BFile file(path.Path(), B_READ_ONLY);
 
-	uint32 category_count;
-	if (file.Read(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
+	uint32 categoryCount;
+	ssize_t size = sizeof(uint32) * 3;
+	if (file.Read(fBeginHeader, size) < size)
 		return B_ERROR;
 	TRACE("0x%08lx %ld\n", fBeginHeader[0], fBeginHeader[0]);
 	TRACE("0x%08lx %ld\n", fBeginHeader[1], fBeginHeader[1]);
 	TRACE("0x%08lx %ld\n", fBeginHeader[2], fBeginHeader[2]);
-	if (file.Read(&category_count, sizeof(uint32)) < (int32)sizeof(uint32)) {
+	size = sizeof(uint32);
+	if (file.Read(&categoryCount, size) < size) {
 		fprintf(stderr,
-			"DefaultManager::LoadState() failed to read category_count\n");
+			"DefaultManager::LoadState() failed to read categoryCount\n");
 		return B_ERROR;
 	}
-	TRACE("DefaultManager::LoadState() category_count %ld\n", category_count);
-	while (category_count--) {
+	TRACE("DefaultManager::LoadState() categoryCount %ld\n", categoryCount);
+	while (categoryCount--) {
 		BMessage settings;
 		uint32 msg_header;
 		uint32 default_type;
-		if (file.Read(&msg_header, sizeof(uint32)) < (int32)sizeof(uint32)) {
+		if (file.Read(&msg_header, size) < size) {
 			fprintf(stderr,
 				"DefaultManager::LoadState() failed to read msg_header\n");
 			return B_ERROR;
 		}
-		if (file.Read(&default_type, sizeof(uint32)) < (int32)sizeof(uint32)) {
+		if (file.Read(&default_type, size) < size) {
 			fprintf(stderr,
 				"DefaultManager::LoadState() failed to read default_type\n");
 			return B_ERROR;
 		}
-		if (settings.Unflatten(&file) == B_OK) {
-			settings.PrintToStream();
+		if (settings.Unflatten(&file) == B_OK)
 			fMsgList.AddItem(new BMessage(settings));
-		} else
+		else
 			fprintf(stderr, "DefaultManager::LoadState() failed to unflatten\n");
 	}
-	if (file.Read(fEndHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3) {
+	size = sizeof(uint32) * 3;
+	if (file.Read(fEndHeader,size) < size) {
 		fprintf(stderr,
 			"DefaultManager::LoadState() failed to read fEndHeader\n");
 		return B_ERROR;
@@ -188,11 +190,11 @@ DefaultManager::SaveState(NodeManager *node_manager)
 
 	if (file.Write(fBeginHeader, sizeof(uint32)*3) < (int32)sizeof(uint32)*3)
 		return B_ERROR;
-	int32 category_count = list.CountItems();
-	if (file.Write(&category_count, sizeof(uint32)) < (int32)sizeof(uint32))
+	int32 categoryCount = list.CountItems();
+	if (file.Write(&categoryCount, sizeof(uint32)) < (int32)sizeof(uint32))
 		return B_ERROR;
 
-	for (int32 i = 0; i < category_count; i++) {
+	for (int32 i = 0; i < categoryCount; i++) {
 		BMessage *settings = (BMessage *)list.ItemAt(i);
 		uint32 default_type;
 		if (settings->FindInt32(kDefaultManagerType,
@@ -393,10 +395,10 @@ DefaultManager::_RescanThread()
 		if (!fMixerConnected && fAudioMixer != -1 && fPhysicalAudioOut != -1) {
 			fMixerConnected = B_OK == _ConnectMixerToOutput();
 			if (!fMixerConnected)
-				ERROR("DefaultManager: failed to connect mixer and"
+				TRACE("DefaultManager: failed to connect mixer and "
 					"soundcard\n");
 		} else {
-			ERROR("DefaultManager: Did not try to connect mixer and"
+			TRACE("DefaultManager: Did not try to connect mixer and "
 				"soundcard\n");
 		}
 
@@ -458,7 +460,7 @@ DefaultManager::_FindPhysical(volatile media_node_id *id, uint32 default_type,
 		isInput ? B_BUFFER_PRODUCER | B_PHYSICAL_INPUT
 			: B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
 	if (rv != B_OK || count < 1) {
-		ERROR("Couldn't find physical %s %s node\n",
+		TRACE("Couldn't find physical %s %s node\n",
 			isAudio ? "audio" : "video", isInput ? "input" : "output");
 		return;
 	}
@@ -538,15 +540,15 @@ DefaultManager::_FindTimeSource()
 				BMediaRoster::Roster()->StartTimeSource(clone,
 					system_time() + 1000);
 				BMediaRoster::Roster()->ReleaseNode(clone);
-				printf("Default DAC timesource created!\n");
+				TRACE("Default DAC timesource created!\n");
 				return;
 			}
 			BMediaRoster::Roster()->ReleaseNode(clone);
 		} else {
-			printf("Default DAC is not a timesource!\n");
+			TRACE("Default DAC is not a timesource!\n");
 		}
 	} else {
-		printf("Default DAC node does not exist!\n");
+		TRACE("Default DAC node does not exist!\n");
 	}
 
 	/* Now try to find another physical audio out node
@@ -569,14 +571,14 @@ DefaultManager::_FindTimeSource()
 			// skip the Firewire audio driver
 			if (0 != strstr(info[i].name, "DV Output"))
 				continue;
-			printf("Default DAC timesource \"%s\" created!\n", info[i].name);
+			TRACE("Default DAC timesource \"%s\" created!\n", info[i].name);
 			fTimeSource = info[i].node.node;
 			BMediaRoster::Roster()->StartTimeSource(info[i].node,
 				system_time() + 1000);
 			return;
 		}
 	} else {
-		printf("Couldn't find DAC timesource node\n");
+		TRACE("Couldn't find DAC timesource node\n");
 	}
 
 	/* XXX we might use other audio or video clock timesources
@@ -595,11 +597,11 @@ DefaultManager::_FindAudioMixer()
 	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, NULL, NULL, NULL,
 		B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER);
 	if (rv != B_OK || count != 1) {
-		printf("Couldn't find audio mixer node\n");
+		TRACE("Couldn't find audio mixer node\n");
 		return;
 	}
 	fAudioMixer = info.node.node;
-	printf("Default audio mixer node created\n");
+	TRACE("Default audio mixer node created\n");
 }
 
 
@@ -625,7 +627,7 @@ DefaultManager::_ConnectMixerToOutput()
 
 	rv = roster->GetNodeFor(fPhysicalAudioOut, &soundcard);
 	if (rv != B_OK) {
-		printf("DefaultManager: failed to find soundcard (physical audio "
+		TRACE("DefaultManager: failed to find soundcard (physical audio "
 			"output)\n");
 		return B_ERROR;
 	}
@@ -633,7 +635,7 @@ DefaultManager::_ConnectMixerToOutput()
 	rv = roster->GetNodeFor(fAudioMixer, &mixer);
 	if (rv != B_OK) {
 		roster->ReleaseNode(soundcard);
-		printf("DefaultManager: failed to find mixer\n");
+		TRACE("DefaultManager: failed to find mixer\n");
 		return B_ERROR;
 	}
 
@@ -643,7 +645,7 @@ DefaultManager::_ConnectMixerToOutput()
 	rv = roster->GetFreeOutputsFor(mixer, &output, 1, &count,
 		B_MEDIA_RAW_AUDIO);
 	if (rv != B_OK || count != 1) {
-		printf("DefaultManager: can't find free mixer output\n");
+		TRACE("DefaultManager: can't find free mixer output\n");
 		rv = B_ERROR;
 		goto finish;
 	}
@@ -651,7 +653,7 @@ DefaultManager::_ConnectMixerToOutput()
 	rv = roster->GetFreeInputsFor(soundcard, inputs, MAX_INPUT_INFOS, &count,
 		B_MEDIA_RAW_AUDIO);
 	if (rv != B_OK || count < 1) {
-		printf("DefaultManager: can't find free soundcard inputs\n");
+		TRACE("DefaultManager: can't find free soundcard inputs\n");
 		rv = B_ERROR;
 		goto finish;
 	}
@@ -665,20 +667,20 @@ DefaultManager::_ConnectMixerToOutput()
 	for (int i = 0; i < 6; i++) {
 		switch (i) {
 			case 0:
-				printf("DefaultManager: Trying connect in native format (1)\n");
+				TRACE("DefaultManager: Trying connect in native format (1)\n");
 				if (B_OK != roster->GetFormatFor(input, &format)) {
 					ERROR("DefaultManager: GetFormatFor failed\n");
 					continue;
 				}
 				// XXX BeOS R5 multiaudio node bug workaround
 				if (format.u.raw_audio.channel_count == 1) {
-					printf("##### WARNING! DefaultManager: ignored mono format\n");
+					TRACE("##### WARNING! DefaultManager: ignored mono format\n");
 					continue;
 				}
 				break;
 
 			case 1:
-				printf("DefaultManager: Trying connect in format 1\n");
+				TRACE("DefaultManager: Trying connect in format 1\n");
 				memset(&format, 0, sizeof(format));
 				format.type = B_MEDIA_RAW_AUDIO;
 				format.u.raw_audio.frame_rate = 44100;
@@ -687,7 +689,7 @@ DefaultManager::_ConnectMixerToOutput()
 				break;
 
 			case 2:
-				printf("DefaultManager: Trying connect in format 2\n");
+				TRACE("DefaultManager: Trying connect in format 2\n");
 				memset(&format, 0, sizeof(format));
 				format.type = B_MEDIA_RAW_AUDIO;
 				format.u.raw_audio.frame_rate = 48000;
@@ -696,14 +698,14 @@ DefaultManager::_ConnectMixerToOutput()
 				break;
 
 			case 3:
-				printf("DefaultManager: Trying connect in format 3\n");
+				TRACE("DefaultManager: Trying connect in format 3\n");
 				memset(&format, 0, sizeof(format));
 				format.type = B_MEDIA_RAW_AUDIO;
 				break;
 
 			case 4:
 				// BeOS R5 multiaudio node bug workaround
-				printf("DefaultManager: Trying connect in native format (2)\n");
+				TRACE("DefaultManager: Trying connect in native format (2)\n");
 				if (B_OK != roster->GetFormatFor(input, &format)) {
 					ERROR("DefaultManager: GetFormatFor failed\n");
 					continue;
@@ -711,7 +713,7 @@ DefaultManager::_ConnectMixerToOutput()
 				break;
 
 			case 5:
-				printf("DefaultManager: Trying connect in format 4\n");
+				TRACE("DefaultManager: Trying connect in format 4\n");
 				memset(&format, 0, sizeof(format));
 				break;
 
