@@ -56,8 +56,8 @@ public:
 private:
 			void				_RegisterAddOns();
 
-			status_t			_RegisterAddOn(BEntry& entry);
-			status_t			_UnregisterAddOn(BEntry& entry);
+			status_t			_RegisterAddOn(const entry_ref& ref);
+			status_t			_UnregisterAddOn(const entry_ref& ref);
 
 			void				_RegisterReader(ReaderPlugin* reader,
 									const entry_ref& ref);

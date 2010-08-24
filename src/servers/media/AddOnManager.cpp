@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Haiku. All rights reserved.
+ * Copyright 2004-2010, Haiku. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -252,9 +252,7 @@ AddOnManager::_RegisterAddOns()
 			entry_ref ref;
 			make_entry_ref(entryInfo->dir_nref.device,
 				entryInfo->dir_nref.node, entryInfo->name, &ref);
-			BEntry entry(&ref, false);
-			if (entry.InitCheck() == B_OK)
-				fManager->_RegisterAddOn(entry);
+			fManager->_RegisterAddOn(ref);
 		}
 
 		virtual void AddOnDisabled(const add_on_entry_info* entryInfo)
@@ -262,9 +260,7 @@ AddOnManager::_RegisterAddOns()
 			entry_ref ref;
 			make_entry_ref(entryInfo->dir_nref.device,
 				entryInfo->dir_nref.node, entryInfo->name, &ref);
-			BEntry entry(&ref, false);
-			if (entry.InitCheck() == B_OK)
-				fManager->_UnregisterAddOn(entry);
+			fManager->_UnregisterAddOn(ref);
 		}
 
 		virtual void AddOnRemoved(const add_on_entry_info* entryInfo)
@@ -314,20 +310,16 @@ AddOnManager::_RegisterAddOns()
 
 
 status_t
-AddOnManager::_RegisterAddOn(BEntry& entry)
+AddOnManager::_RegisterAddOn(const entry_ref& ref)
 {
-	BPath path(&entry);
-
-	entry_ref ref;
-	status_t status = entry.GetRef(&ref);
-	if (status < B_OK)
-		return status;
+	BPath path(&ref);
 
 	printf("AddOnManager::_RegisterAddOn(): trying to load \"%s\"\n",
 		path.Path());
 
 	ImageLoader loader(path);
-	if ((status = loader.InitCheck()) != B_OK)
+	status_t status = loader.InitCheck();
+	if (status != B_OK)
 		return status;
 
 	MediaPlugin* (*instantiate_plugin_func)();
@@ -345,8 +337,6 @@ AddOnManager::_RegisterAddOn(BEntry& entry)
 			"returned NULL\n", path.Path());
 		return B_ERROR;
 	}
-
-	// TODO: Remove any old formats describing this add-on!!
 
 	ReaderPlugin* reader = dynamic_cast<ReaderPlugin*>(plugin);
 	if (reader != NULL)
@@ -371,18 +361,13 @@ AddOnManager::_RegisterAddOn(BEntry& entry)
 
 
 status_t
-AddOnManager::_UnregisterAddOn(BEntry& entry)
+AddOnManager::_UnregisterAddOn(const entry_ref& ref)
 {
-BPath path(&entry);
+BPath path(&ref);
 printf("AddOnManager::_UnregisterAddOn(): trying to unload \"%s\"\n",
 	path.Path());
 
 	BAutolock locker(fLock);
-
-	entry_ref ref;
-	status_t status = entry.GetRef(&ref);
-	if (status != B_OK)
-		return status;
 
 	// Remove any Readers exported by this add-on
 	reader_info* readerInfo;
