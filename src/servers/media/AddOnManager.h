@@ -69,6 +69,10 @@ private:
 			void				_RegisterEncoder(EncoderPlugin* encoder,
 									const entry_ref& ref);
 
+			bool				_FindDecoder(const media_format& format,
+									const BPath& path,
+									xfer_entry_ref* _decoderRef);
+
 private:
 			struct reader_info {
 				entry_ref			ref;

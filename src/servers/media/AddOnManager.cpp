@@ -57,6 +57,13 @@ private:
 };
 
 
+static const directory_which sDirectories[] = {
+	B_USER_ADDONS_DIRECTORY,
+	B_COMMON_ADDONS_DIRECTORY,
+	B_BEOS_ADDONS_DIRECTORY,
+};
+
+
 //	#pragma mark -
 
 
@@ -112,21 +119,20 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 	printf("AddOnManager::GetDecoderForFormat: searching decoder for encoding "
 		"%ld\n", format.Encoding());
 
-	decoder_info* info;
-	for (fDecoderList.Rewind(); fDecoderList.GetNext(&info);) {
-		media_format* decoderFormat;
-		for (info->formats.Rewind(); info->formats.GetNext(&decoderFormat);) {
-			// check if the decoder matches the supplied format
-			if (!decoderFormat->Matches(&format))
-				continue;
+	// Since the list of decoders is unsorted, we need to search for
+	// an decoder by add-on directory, in order to maintain the shadowing
+	// of system add-ons by user add-ons, in case they offer decorders
+	// for the same format.
 
-			printf("AddOnManager::GetDecoderForFormat: found decoder %s for "
-				"encoding %ld\n", info->ref.name, decoderFormat->Encoding());
-
-			*_decoderRef = info->ref;
-			return B_OK;
+	BPath path;
+	for (uint i = 0; i < sizeof(sDirectories) / sizeof(directory_which); i++) {
+		if (find_directory(sDirectories[i], &path) == B_OK
+			&& path.Append("media/plugins") == B_OK) {
+			if (_FindDecoder(format, path, _decoderRef))
+				return B_OK;
 		}
 	}
+
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -268,12 +274,6 @@ AddOnManager::_RegisterAddOns()
 		}
 	};
 
-	const directory_which directories[] = {
-		B_USER_ADDONS_DIRECTORY,
-		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY,
-	};
-
 	fAddOnMonitorHandler = new CodecHandler(this);
 	fAddOnMonitor = new AddOnMonitor(fAddOnMonitorHandler);
 
@@ -293,11 +293,11 @@ AddOnManager::_RegisterAddOns()
 	node_ref nref;
 	BDirectory directory;
 	BPath path;
-	for (uint i = 0 ; i < sizeof(directories) / sizeof(directory_which) ; i++) {
+	for (uint i = 0; i < sizeof(sDirectories) / sizeof(directory_which); i++) {
 		if (disableUserAddOns && i <= 1)
 			continue;
 
-		if (find_directory(directories[i], &path) == B_OK
+		if (find_directory(sDirectories[i], &path) == B_OK
 			&& path.Append("media/plugins") == B_OK
 			&& directory.SetTo(path.Path()) == B_OK
 			&& directory.GetNodeRef(&nref) == B_OK) {
@@ -384,6 +384,11 @@ printf("removing reader '%s'\n", readerInfo->ref.name);
 	for (fDecoderList.Rewind(); fDecoderList.GetNext(&decoderInfo);) {
 		if (decoderInfo->ref == ref) {
 printf("removing decoder '%s'\n", decoderInfo->ref.name);
+			media_format* format;
+			for (decoderInfo->formats.Rewind();
+				decoderInfo->formats.GetNext(&format);) {
+				gFormatManager->RemoveFormat(*format);
+			}
 			fDecoderList.RemoveCurrent();
 			break;
 		}
@@ -560,4 +565,37 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 	}
 }
 
+
+bool
+AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
+	xfer_entry_ref* _decoderRef)
+{
+	node_ref nref;
+	BDirectory directory;
+	if (directory.SetTo(path.Path()) != B_OK
+		|| directory.GetNodeRef(&nref) != B_OK) {
+		return B_ERROR;
+	}
+
+	decoder_info* info;
+	for (fDecoderList.Rewind(); fDecoderList.GetNext(&info);) {
+		if (info->ref.directory != nref.node)
+			continue;
+
+		media_format* decoderFormat;
+		for (info->formats.Rewind(); info->formats.GetNext(&decoderFormat);) {
+			// check if the decoder matches the supplied format
+			if (!decoderFormat->Matches(&format))
+				continue;
+
+			printf("AddOnManager::GetDecoderForFormat: found decoder %s/%s "
+				"for encoding %ld\n", path.Path(), info->ref.name,
+				decoderFormat->Encoding());
+
+			*_decoderRef = info->ref;
+			return true;
+		}
+	}
+	return false;
+}
 
