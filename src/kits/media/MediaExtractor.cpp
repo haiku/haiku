@@ -71,7 +71,7 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 	}
 #endif
 
-	fInitStatus = _plugin_manager.CreateReader(&fReader, &fStreamCount,
+	fInitStatus = gPluginManager.CreateReader(&fReader, &fStreamCount,
 		&fFileFormat, source);
 	if (fInitStatus != B_OK)
 		return;
@@ -155,7 +155,7 @@ MediaExtractor::~MediaExtractor()
 		delete fStreamInfo[i].chunkCache;
 	}
 
-	_plugin_manager.DestroyReader(fReader);
+	gPluginManager.DestroyReader(fReader);
 
 	delete[] fStreamInfo;
 	// fSource is owned by the BMediaFile
@@ -328,7 +328,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 	// TODO: Here we should work out a way so that if there is a setup
 	// failure we can try the next decoder
 	Decoder* decoder;
-	status = _plugin_manager.CreateDecoder(&decoder,
+	status = gPluginManager.CreateDecoder(&decoder,
 		fStreamInfo[stream].encodedFormat);
 	if (status != B_OK) {
 #if DEBUG
@@ -336,7 +336,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 		string_for_format(fStreamInfo[stream].encodedFormat, formatString,
 			sizeof(formatString));
 
-		ERROR("MediaExtractor::CreateDecoder _plugin_manager.CreateDecoder "
+		ERROR("MediaExtractor::CreateDecoder gPluginManager.CreateDecoder "
 			"failed for stream %ld, format: %s: %s\n", stream, formatString,
 			strerror(status));
 #endif
@@ -346,7 +346,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 	ChunkProvider* chunkProvider
 		= new(std::nothrow) MediaExtractorChunkProvider(this, stream);
 	if (chunkProvider == NULL) {
-		_plugin_manager.DestroyDecoder(decoder);
+		gPluginManager.DestroyDecoder(decoder);
 		ERROR("MediaExtractor::CreateDecoder can't create chunk provider "
 			"for stream %ld\n", stream);
 		return B_NO_MEMORY;
@@ -357,15 +357,15 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder** _decoder,
 	status = decoder->Setup(&fStreamInfo[stream].encodedFormat,
 		fStreamInfo[stream].infoBuffer, fStreamInfo[stream].infoBufferSize);
 	if (status != B_OK) {
-		_plugin_manager.DestroyDecoder(decoder);
+		gPluginManager.DestroyDecoder(decoder);
 		ERROR("MediaExtractor::CreateDecoder Setup failed for stream %ld: %s\n",
 			stream, strerror(status));
 		return status;
 	}
 
-	status = _plugin_manager.GetDecoderInfo(decoder, codecInfo);
+	status = gPluginManager.GetDecoderInfo(decoder, codecInfo);
 	if (status != B_OK) {
-		_plugin_manager.DestroyDecoder(decoder);
+		gPluginManager.DestroyDecoder(decoder);
 		ERROR("MediaExtractor::CreateDecoder GetCodecInfo failed for stream "
 			"%ld: %s\n", stream, strerror(status));
 		return status;

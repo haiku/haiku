@@ -41,7 +41,7 @@ BMediaDecoder::BMediaDecoder(const media_codec_info *mci)
 /* virtual */
 BMediaDecoder::~BMediaDecoder()
 {
-	_plugin_manager.DestroyDecoder(fDecoder);
+	gPluginManager.DestroyDecoder(fDecoder);
 }
 
 
@@ -57,10 +57,10 @@ BMediaDecoder::SetTo(const media_format *in_format,
 					 const void *info,
 					 size_t info_size)
 {
-	_plugin_manager.DestroyDecoder(fDecoder);
+	gPluginManager.DestroyDecoder(fDecoder);
 	fDecoder = NULL;
 
-	status_t err = _plugin_manager.CreateDecoder(&fDecoder, *in_format);
+	status_t err = gPluginManager.CreateDecoder(&fDecoder, *in_format);
 	if (err < B_OK)
 		goto fail;
 
@@ -76,7 +76,7 @@ BMediaDecoder::SetTo(const media_format *in_format,
 	return B_OK;
 
 fail:
-	_plugin_manager.DestroyDecoder(fDecoder);
+	gPluginManager.DestroyDecoder(fDecoder);
 	fDecoder = NULL;
 	fInitStatus = B_NO_INIT;
 	return err;
@@ -86,10 +86,10 @@ fail:
 status_t 
 BMediaDecoder::SetTo(const media_codec_info *mci)
 {
-	_plugin_manager.DestroyDecoder(fDecoder);
+	gPluginManager.DestroyDecoder(fDecoder);
 	fDecoder = NULL;
 
-	status_t err = _plugin_manager.CreateDecoder(&fDecoder, *mci);
+	status_t err = gPluginManager.CreateDecoder(&fDecoder, *mci);
 	if (err < B_OK)
 		goto fail;
 
@@ -101,7 +101,7 @@ BMediaDecoder::SetTo(const media_codec_info *mci)
 	return B_OK;
 
 fail:
-	_plugin_manager.DestroyDecoder(fDecoder);
+	gPluginManager.DestroyDecoder(fDecoder);
 	fDecoder = NULL;
 	fInitStatus = B_NO_INIT;
 	return err;
@@ -177,7 +177,7 @@ BMediaDecoder::GetDecoderInfo(media_codec_info *out_info) const
 	if (!fDecoder)
 		return B_NO_INIT;
 
-	return _plugin_manager.GetDecoderInfo(fDecoder, out_info);
+	return gPluginManager.GetDecoderInfo(fDecoder, out_info);
 }
 
 

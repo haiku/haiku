@@ -81,6 +81,6 @@ private:
 
 using namespace BPrivate::media;
 
-extern PluginManager _plugin_manager;
+extern PluginManager gPluginManager;
 
 #endif // _PLUGIN_MANAGER_H

@@ -78,9 +78,9 @@ private:
 BMediaTrack::~BMediaTrack()
 {
 	CALLED();
-	_plugin_manager.DestroyDecoder(fRawDecoder);
-	_plugin_manager.DestroyDecoder(fDecoder);
-	_plugin_manager.DestroyEncoder(fEncoder);
+	gPluginManager.DestroyDecoder(fRawDecoder);
+	gPluginManager.DestroyDecoder(fDecoder);
+	gPluginManager.DestroyEncoder(fEncoder);
 }
 
 /*************************************************************
@@ -148,7 +148,7 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 	if (!fExtractor || !fDecoder)
 		return B_NO_INIT;
 
-	_plugin_manager.DestroyDecoder(fRawDecoder);
+	gPluginManager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 
 #ifdef TRACE_MEDIA_TRACK
@@ -856,7 +856,7 @@ BMediaTrack::SetupWorkaround()
 bool
 BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 {
-	_plugin_manager.DestroyDecoder(fRawDecoder);
+	gPluginManager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 
 #ifdef TRACE_MEDIA_TRACK
@@ -865,7 +865,7 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 	printf("BMediaTrack::SetupFormatTranslation: from: %s\n", s);
 #endif
 
-	status_t res = _plugin_manager.CreateDecoder(&fRawDecoder, from);
+	status_t res = gPluginManager.CreateDecoder(&fRawDecoder, from);
 	if (res != B_OK) {
 		ERROR("BMediaTrack::SetupFormatTranslation: CreateDecoder failed\n");
 		return false;
@@ -913,7 +913,7 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 	return true;
 
 error:
-	_plugin_manager.DestroyDecoder(fRawDecoder);
+	gPluginManager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = NULL;
 	return false;
 }

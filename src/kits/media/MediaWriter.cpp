@@ -53,7 +53,7 @@ MediaWriter::MediaWriter(BDataIO* target, const media_file_format& fileFormat)
 {
 	CALLED();
 
-	_plugin_manager.CreateWriter(&fWriter, fFileFormat, fTarget);
+	gPluginManager.CreateWriter(&fWriter, fFileFormat, fTarget);
 }
 
 
@@ -68,7 +68,7 @@ MediaWriter::~MediaWriter()
 		for (fStreamInfos.Rewind(); fStreamInfos.GetNext(&info);)
 			fWriter->FreeCookie(info->cookie);
 
-		_plugin_manager.DestroyWriter(fWriter);
+		gPluginManager.DestroyWriter(fWriter);
 	}
 
 	// fTarget is owned by the BMediaFile
@@ -107,9 +107,9 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	// TODO: Here we should work out a way so that if there is a setup
 	// failure we can try the next encoder.
 	Encoder* encoder;
-	status_t ret = _plugin_manager.CreateEncoder(&encoder, codecInfo, flags);
+	status_t ret = gPluginManager.CreateEncoder(&encoder, codecInfo, flags);
 	if (ret != B_OK) {
-		ERROR("MediaWriter::CreateEncoder _plugin_manager.CreateEncoder "
+		ERROR("MediaWriter::CreateEncoder gPluginManager.CreateEncoder "
 			"failed, codec: %s\n", codecInfo->pretty_name);
 		return ret;
 	}
@@ -117,14 +117,14 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	StreamInfo info;
 	ret = fWriter->AllocateCookie(&info.cookie, format, codecInfo);
 	if (ret != B_OK) {
-		_plugin_manager.DestroyEncoder(encoder);
+		gPluginManager.DestroyEncoder(encoder);
 		return ret;
 	}
 
 	int32 streamIndex = fStreamInfos.CountItems();
 
 	if (!fStreamInfos.Insert(info)) {
-		_plugin_manager.DestroyEncoder(encoder);
+		gPluginManager.DestroyEncoder(encoder);
 		ERROR("MediaWriter::CreateEncoder can't create StreamInfo "
 			"for stream %ld\n", streamIndex);
 		return B_NO_MEMORY;
@@ -133,7 +133,7 @@ MediaWriter::CreateEncoder(Encoder** _encoder,
 	ChunkWriter* chunkWriter = new(std::nothrow) MediaExtractorChunkWriter(
 		this, streamIndex);
 	if (chunkWriter == NULL) {
-		_plugin_manager.DestroyEncoder(encoder);
+		gPluginManager.DestroyEncoder(encoder);
 		ERROR("MediaWriter::CreateEncoder can't create ChunkWriter "
 			"for stream %ld\n", streamIndex);
 		return B_NO_MEMORY;

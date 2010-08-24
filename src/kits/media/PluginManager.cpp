@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+ * Copyright 2004-2010, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the OpenBeOS License.
  */
 
@@ -12,7 +12,7 @@
 #include "debug.h"
 
 
-PluginManager _plugin_manager;
+PluginManager gPluginManager;
 
 
 // #pragma mark - Readers/Decoders
@@ -418,9 +418,10 @@ PluginManager::_LoadPlugin(const entry_ref& ref, MediaPlugin** plugin,
 
 	image_id id;
 	id = load_add_on(p.Path());
-	TRACE("  loaded add-on: %ld\n", id);
-	if (id < 0)
+	if (id < 0) {
+		printf("PluginManager: Error, load_add_on(): %s\n", strerror(id));
 		return B_ERROR;
+	}
 		
 	MediaPlugin* (*instantiate_plugin_func)();
 	
