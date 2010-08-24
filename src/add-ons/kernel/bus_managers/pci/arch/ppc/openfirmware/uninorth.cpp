@@ -243,6 +243,7 @@ ppc_openfirmware_probe_uninorth(int deviceNode,
 
 	if (bytesRead < 0) {
 		dprintf("ppc_openfirmware_probe_uninorth: Could not get ranges.\n");
+		free(bridge);
 		return B_ERROR;
 	}
 	bridge->range_count = bytesRead / sizeof(uninorth_range);
@@ -269,11 +270,13 @@ ppc_openfirmware_probe_uninorth(int deviceNode,
 
 	if (ioRange == NULL) {
 		dprintf("ppc_openfirmware_probe_uninorth: Can't find io range.\n");
+		free(bridge);
 		return B_ERROR;
 	}
 
 	if (memoryRangeCount == 0) {
 		dprintf("ppc_openfirmware_probe_uninorth: Can't find mem ranges.\n");
+		free(bridge);
 		return B_ERROR;
 	}
 
