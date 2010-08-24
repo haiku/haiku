@@ -1,10 +1,10 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "Handle.h"
-#include "machine.h"
+
+#include <string.h>
 
 #include <boot/platform.h>
 #include <boot/vfs.h>
@@ -16,7 +16,8 @@
 #include <platform/openfirmware/openfirmware.h>
 #include <util/kernel_cpp.h>
 
-#include <string.h>
+#include "Handle.h"
+#include "machine.h"
 
 
 char sBootPath[192];
@@ -175,7 +176,8 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 		}
 
 		Handle *device = new(nothrow) Handle(handle);
-		printf("\t\t(could open device, handle = %p, node = %p)\n", (void *)handle, device);
+		printf("\t\t(could open device, handle = %p, node = %p)\n",
+			(void *)handle, device);
 
 		devicesList->Add(device);
 	}
@@ -183,6 +185,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 
 	return B_OK;
 }
+
 
 status_t 
 platform_register_boot_device(Node *device)

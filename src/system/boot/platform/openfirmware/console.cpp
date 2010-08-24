@@ -54,7 +54,8 @@ FILE *stdin, *stdout, *stderr;
 
 
 ConsoleHandle::ConsoleHandle()
-	: Handle()
+	:
+	Handle()
 {
 }
 
@@ -117,9 +118,10 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 
 
 InputConsoleHandle::InputConsoleHandle()
-	: ConsoleHandle()
-	, fStart(0)
-	, fCount(0)
+	:
+	ConsoleHandle(),
+	fStart(0),
+	fCount(0)
 {
 }
 

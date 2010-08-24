@@ -4,14 +4,15 @@
  */
 
 
+#include <string.h>
+
 #include <OS.h>
+
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/heap.h>
 #include <platform/openfirmware/openfirmware.h>
 #include <platform_arch.h>
-
-#include <string.h>
 
 #include "console.h"
 #include "machine.h"
@@ -61,7 +62,8 @@ determine_machine(void)
 	int root = of_finddevice("/");
 	char buffer[64];
 	int length;
-	if ((length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1)) == OF_FAILED)
+	if ((length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1))
+			== OF_FAILED)
 		return;
 	buffer[length] = '\0';
 
@@ -72,7 +74,8 @@ determine_machine(void)
 	else if (!strcasecmp("bootrom", buffer))
 		gMachine = MACHINE_MAC;
 
-	if ((length = of_getprop(root, "model", buffer, sizeof(buffer) - 1)) == OF_FAILED)
+	if ((length = of_getprop(root, "model", buffer, sizeof(buffer) - 1))
+			== OF_FAILED)
 		return;
 	buffer[length] = '\0';
 
@@ -143,7 +146,8 @@ start(void *openFirmwareEntry)
 	of_init((int (*)(void*))openFirmwareEntry);
 
 	// check for arguments
-	if (of_getprop(gChosen, "bootargs", bootargs, sizeof(bootargs)) != OF_FAILED) {
+	if (of_getprop(gChosen, "bootargs", bootargs, sizeof(bootargs))
+			!= OF_FAILED) {
 		static const char *sArgs[] = { NULL, NULL };
 		sArgs[0] = (const char *)bootargs;
 		args.arguments = sArgs;
@@ -152,7 +156,7 @@ start(void *openFirmwareEntry)
 	determine_machine();
 	console_init();
 
-	// Initialize and take over MMU and set the OpenFirmware callbacks - it 
+	// Initialize and take over MMU and set the OpenFirmware callbacks - it
 	// will ask us for memory after that instead of maintaining it itself
 	// (the kernel will need to adjust the callback later on as well)
 	arch_mmu_init();

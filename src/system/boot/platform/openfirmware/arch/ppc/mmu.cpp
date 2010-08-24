@@ -4,6 +4,8 @@
  */
 
 
+#include <OS.h>
+
 #include <platform_arch.h>
 #include <boot/addr_range.h>
 #include <boot/kernel_args.h>
@@ -14,8 +16,6 @@
 #include <arch_cpu.h>
 #include <arch_mmu.h>
 #include <kernel.h>
-
-#include <OS.h>
 
 
 // set protection to WIMGNPP: -----PP

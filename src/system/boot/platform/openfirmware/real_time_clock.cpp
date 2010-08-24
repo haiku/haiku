@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "real_time_clock.h"
 
 #include <stdio.h>
@@ -11,6 +12,7 @@
 #include <boot/stage2.h>
 #include <platform/openfirmware/devices.h>
 #include <platform/openfirmware/openfirmware.h>
+
 
 status_t
 init_real_time_clock(void)

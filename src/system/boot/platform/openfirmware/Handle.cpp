@@ -1,14 +1,15 @@
 /*
- * Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2003, Axel Dörfler, axeld@pinc-software.de.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
+#include "Handle.h"
+
 #include <SupportDefs.h>
+
 #include <platform/openfirmware/openfirmware.h>
 #include <util/kernel_cpp.h>
-
-#include "Handle.h"
 
 
 Handle::Handle(int handle, bool takeOwnership)
