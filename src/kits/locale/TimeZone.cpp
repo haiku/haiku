@@ -12,8 +12,11 @@
 
 #include <new>
 
+#include <unicode/locid.h>
 #include <unicode/timezone.h>
 #include <ICUWrapper.h>
+
+#include <Locale.h>
 
 
 const char* BTimeZone::kNameOfGmtZone = "GMT";
@@ -33,13 +36,14 @@ static const uint32 skSupportsDaylightSavingField   = 1U << 7;
 static const uint32 skOffsetFromGMTField			= 1U << 8;
 
 
-BTimeZone::BTimeZone(const char* zoneID)
+BTimeZone::BTimeZone(const char* zoneID, const BLocale* locale)
 	:
 	fIcuTimeZone(NULL),
+	fIcuLocale(NULL),
 	fInitStatus(B_NO_INIT),
 	fInitializedFields(0)
 {
-	SetTo(zoneID);
+	SetTo(zoneID, locale);
 }
 
 
@@ -48,6 +52,9 @@ BTimeZone::BTimeZone(const BTimeZone& other)
 	fIcuTimeZone(other.fIcuTimeZone == NULL
 		? NULL
 		: other.fIcuTimeZone->clone()),
+	fIcuLocale(other.fIcuLocale == NULL
+		? NULL
+		: other.fIcuLocale->clone()),
 	fInitStatus(other.fInitStatus),
 	fInitializedFields(other.fInitializedFields),
 	fZoneID(other.fZoneID),
@@ -63,6 +70,7 @@ BTimeZone::BTimeZone(const BTimeZone& other)
 
 BTimeZone::~BTimeZone()
 {
+	delete fIcuLocale;
 	delete fIcuTimeZone;
 }
 
@@ -73,6 +81,9 @@ BTimeZone& BTimeZone::operator=(const BTimeZone& source)
 	fIcuTimeZone = source.fIcuTimeZone == NULL
 		? NULL
 		: source.fIcuTimeZone->clone();
+	fIcuLocale = source.fIcuLocale == NULL
+		? NULL
+		: source.fIcuLocale->clone();
 	fInitStatus = source.fInitStatus;
 	fInitializedFields = source.fInitializedFields;
 	fZoneID = source.fZoneID;
@@ -99,8 +110,13 @@ BTimeZone::Name() const
 {
 	if ((fInitializedFields & skNameField) == 0) {
 		UnicodeString unicodeString;
-		fIcuTimeZone->getDisplayName(false, TimeZone::GENERIC_LOCATION,
-			unicodeString);
+		if (fIcuLocale != NULL) {
+			fIcuTimeZone->getDisplayName(false, TimeZone::GENERIC_LOCATION,
+				*fIcuLocale, unicodeString);
+		} else {
+			fIcuTimeZone->getDisplayName(false, TimeZone::GENERIC_LOCATION,
+				unicodeString);
+		}
 		BStringByteSink sink(&fName);
 		unicodeString.toUTF8(sink);
 		fInitializedFields |= skNameField;
@@ -115,8 +131,13 @@ BTimeZone::DaylightSavingName() const
 {
 	if ((fInitializedFields & skDaylightSavingNameField) == 0) {
 		UnicodeString unicodeString;
-		fIcuTimeZone->getDisplayName(true, TimeZone::GENERIC_LOCATION,
-			unicodeString);
+		if (fIcuLocale != NULL) {
+			fIcuTimeZone->getDisplayName(true, TimeZone::GENERIC_LOCATION,
+				*fIcuLocale, unicodeString);
+		} else {
+			fIcuTimeZone->getDisplayName(true, TimeZone::GENERIC_LOCATION,
+				unicodeString);
+		}
 		BStringByteSink sink(&fDaylightSavingName);
 		unicodeString.toUTF8(sink);
 		fInitializedFields |= skDaylightSavingNameField;
@@ -131,8 +152,13 @@ BTimeZone::ShortName() const
 {
 	if ((fInitializedFields & skShortNameField) == 0) {
 		UnicodeString unicodeString;
-		fIcuTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
-			unicodeString);
+		if (fIcuLocale != NULL) {
+			fIcuTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
+				*fIcuLocale, unicodeString);
+		} else {
+			fIcuTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
+				unicodeString);
+		}
 		BStringByteSink sink(&fShortName);
 		unicodeString.toUTF8(sink);
 		fInitializedFields |= skShortNameField;
@@ -147,8 +173,13 @@ BTimeZone::ShortDaylightSavingName() const
 {
 	if ((fInitializedFields & skShortDaylightSavingNameField) == 0) {
 		UnicodeString unicodeString;
-		fIcuTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
-			unicodeString);
+		if (fIcuLocale != NULL) {
+			fIcuTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
+				*fIcuLocale, unicodeString);
+		} else {
+			fIcuTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
+				unicodeString);
+		}
 		BStringByteSink sink(&fShortDaylightSavingName);
 		unicodeString.toUTF8(sink);
 		fInitializedFields |= skShortDaylightSavingNameField;
@@ -201,8 +232,17 @@ BTimeZone::InitCheck() const
 
 
 status_t
-BTimeZone::SetTo(const char* zoneID)
+BTimeZone::SetLocale(const BLocale* locale)
 {
+	return SetTo(fZoneID, locale);
+}
+
+
+status_t
+BTimeZone::SetTo(const char* zoneID, const BLocale* locale)
+{
+	delete fIcuLocale;
+	fIcuLocale = NULL;
 	delete fIcuTimeZone;
 	fInitializedFields = 0;
 
@@ -214,6 +254,14 @@ BTimeZone::SetTo(const char* zoneID)
 	if (fIcuTimeZone == NULL) {
 		fInitStatus = B_NAME_NOT_FOUND;
 		return fInitStatus;
+	}
+
+	if (locale != NULL) {
+		fIcuLocale = new Locale(locale->Code());
+		if (fIcuLocale == NULL) {
+			fInitStatus = B_NO_MEMORY;
+			return fInitStatus;
+		}
 	}
 
 	UnicodeString unicodeString;

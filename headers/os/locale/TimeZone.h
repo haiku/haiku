@@ -10,13 +10,16 @@
 
 
 namespace icu_44 {
+	class Locale;
 	class TimeZone;
 }
+class BLocale;
 
 
 class BTimeZone {
 public:
-								BTimeZone(const char* zoneID = NULL);
+								BTimeZone(const char* zoneID = NULL,
+									const BLocale* locale = NULL);
 								BTimeZone(const BTimeZone& other);
 								~BTimeZone();
 
@@ -32,12 +35,16 @@ public:
 
 			status_t			InitCheck() const;
 
-			status_t			SetTo(const char* zoneID);
+			status_t			SetTo(const char* zoneID,
+									const BLocale* locale = NULL);
+
+			status_t			SetLocale(const BLocale* locale);
 
 	static  const char*			kNameOfGmtZone;
 
 private:
 			icu_44::TimeZone*	fIcuTimeZone;
+			icu_44::Locale*		fIcuLocale;
 			status_t			fInitStatus;
 
 	mutable uint32				fInitializedFields;
