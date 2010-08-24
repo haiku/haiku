@@ -13,13 +13,13 @@ namespace icu_44 {
 	class Locale;
 	class TimeZone;
 }
-class BLocale;
+class BLanguage;
 
 
 class BTimeZone {
 public:
 								BTimeZone(const char* zoneID = NULL,
-									const BLocale* locale = NULL);
+									const BLanguage* language = NULL);
 								BTimeZone(const BTimeZone& other);
 								~BTimeZone();
 
@@ -36,9 +36,9 @@ public:
 			status_t			InitCheck() const;
 
 			status_t			SetTo(const char* zoneID,
-									const BLocale* locale = NULL);
+									const BLanguage* language = NULL);
 
-			status_t			SetLocale(const BLocale* locale);
+			status_t			SetLanguage(const BLanguage* language);
 
 	static  const char*			kNameOfGmtZone;
 

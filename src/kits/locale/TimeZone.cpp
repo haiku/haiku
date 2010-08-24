@@ -16,7 +16,7 @@
 #include <unicode/timezone.h>
 #include <ICUWrapper.h>
 
-#include <Locale.h>
+#include <Language.h>
 
 
 const char* BTimeZone::kNameOfGmtZone = "GMT";
@@ -36,14 +36,14 @@ static const uint32 skSupportsDaylightSavingField   = 1U << 7;
 static const uint32 skOffsetFromGMTField			= 1U << 8;
 
 
-BTimeZone::BTimeZone(const char* zoneID, const BLocale* locale)
+BTimeZone::BTimeZone(const char* zoneID, const BLanguage* language)
 	:
 	fIcuTimeZone(NULL),
 	fIcuLocale(NULL),
 	fInitStatus(B_NO_INIT),
 	fInitializedFields(0)
 {
-	SetTo(zoneID, locale);
+	SetTo(zoneID, language);
 }
 
 
@@ -232,14 +232,14 @@ BTimeZone::InitCheck() const
 
 
 status_t
-BTimeZone::SetLocale(const BLocale* locale)
+BTimeZone::SetLanguage(const BLanguage* language)
 {
-	return SetTo(fZoneID, locale);
+	return SetTo(fZoneID, language);
 }
 
 
 status_t
-BTimeZone::SetTo(const char* zoneID, const BLocale* locale)
+BTimeZone::SetTo(const char* zoneID, const BLanguage* language)
 {
 	delete fIcuLocale;
 	fIcuLocale = NULL;
@@ -256,8 +256,8 @@ BTimeZone::SetTo(const char* zoneID, const BLocale* locale)
 		return fInitStatus;
 	}
 
-	if (locale != NULL) {
-		fIcuLocale = new Locale(locale->Code());
+	if (language != NULL) {
+		fIcuLocale = new Locale(language->Code());
 		if (fIcuLocale == NULL) {
 			fInitStatus = B_NO_MEMORY;
 			return fInitStatus;
