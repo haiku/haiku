@@ -27,6 +27,13 @@ typedef enum {
 	B_DATE_ELEMENT_SECOND
 } BDateElement;
 
+typedef enum {
+	B_NUMBER_ELEMENT_INVALID = B_BAD_DATA,
+	B_NUMBER_ELEMENT_INTEGER = 0,
+	B_NUMBER_ELEMENT_FRACTIONAL,
+	B_NUMBER_ELEMENT_CURRENCY
+} BNumberElement;
+
 
 class BLocale {
 public:
@@ -110,6 +117,11 @@ public:
 			ssize_t				FormatMonetary(char* string, size_t maxSize,
 									double value);
 			ssize_t				FormatMonetary(BString* string, double value);
+			status_t			FormatMonetary(BString* string,
+									int*& fieldPositions,
+									BNumberElement*& fieldTypes,
+									int& fieldCount, double value);
+			status_t			GetCurrencySymbol(BString& result);
 
 			// Collator short-hands
 			int					StringCompare(const char* s1,
