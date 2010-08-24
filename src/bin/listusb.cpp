@@ -14,14 +14,61 @@
 #include <stdio.h>
 
 
+const char*
+ClassName(int classNumber) {
+	switch (classNumber) {
+		case 0:
+			return "Per-interface classes";
+		case 1:
+			return "Audio";
+		case 2:
+			return "Communication";
+		case 3:
+			return "HID";
+		case 5:
+			return "Physical";
+		case 6:
+			return "Image";
+		case 7:
+			return "Printer";
+		case 8:
+			return "Mass storage";
+		case 9:
+			return "Hub";
+		case 10:
+			return "CDC-Data";
+		case 11:
+			return "Smart card";
+		case 13:
+			return "Content security";
+		case 14:
+			return "Video";
+		case 15:
+			return "Personal Healthcare";
+		case 0xDC:
+			return "Diagnostic device";
+		case 0xE0:
+			return "Wireless controller";
+		case 0xEF:
+			return "Miscelaneous";
+		case 0xFE:
+			return "Application specific";
+		case 0xFF:
+			return "Vendor specific";
+	}
+
+	return "Unknown";
+};
+
+
 static void
 DumpInterface(const BUSBInterface *interface)
 {
 	if (!interface)
 		return;
 
-	printf("                Class .............. 0x%02x\n",
-		interface->Class());
+	printf("                Class .............. 0x%02x (%s)\n",
+		interface->Class(), ClassName(interface->Class()));
 	printf("                Subclass ........... 0x%02x\n",
 		interface->Subclass());
 	printf("                Protocol ........... 0x%02x\n",
@@ -104,7 +151,8 @@ DumpInfo(BUSBDevice &device, bool verbose)
 	}
 
 	printf("[Device /dev/bus/usb%s]\n", device.Location());
-	printf("    Class .................. 0x%02x\n", device.Class());
+	printf("    Class .................. 0x%02x (%s)\n", device.Class(),
+		ClassName(device.Class()));
 	printf("    Subclass ............... 0x%02x\n", device.Subclass());
 	printf("    Protocol ............... 0x%02x\n", device.Protocol());
 	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
