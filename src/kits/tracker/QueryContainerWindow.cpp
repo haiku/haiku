@@ -120,7 +120,7 @@ BQueryContainerWindow::AddWindowMenu(BMenu *menu)
 void 
 BQueryContainerWindow::AddWindowContextMenus(BMenu *menu)
 {
-	BMenuItem* resizeItem = new BMenuItem(B_TRANSLATE("Resize to Fit"),
+	BMenuItem* resizeItem = new BMenuItem(B_TRANSLATE("Resize to fit"),
 		new BMessage(kResizeToFit), 'Y');
 	menu->AddItem(resizeItem);
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Select"B_UTF8_ELLIPSIS),
