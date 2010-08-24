@@ -77,6 +77,8 @@ private:
 			BStringView*		fMonetaryView;
 
 			BTextControl*		fCurrencySymbolView;
+			BRadioButton*		fCurrencySymbolBefore;
+			BRadioButton*		fCurrencySymbolAfter;
 
 			bool				f24HrClock;
 

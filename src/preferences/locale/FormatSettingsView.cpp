@@ -234,10 +234,10 @@ FormatView::FormatView(const BLocale& locale)
 	BCheckBox* currencyLeadingZero = new BCheckBox("",
 		B_TRANSLATE("Leading 0"), new BMessage(kSettingsContentsModified));
 
-	BRadioButton* beforeRadioButton = new BRadioButton("",
+	fCurrencySymbolBefore = new BRadioButton("CurrencySymbolPosition",
 		B_TRANSLATE("Before"), new BMessage(kSettingsContentsModified));
 
-	BRadioButton* afterRadioButton = new BRadioButton("",
+	fCurrencySymbolAfter = new BRadioButton("CurrencySymbolPosition",
 		B_TRANSLATE("After"), new BMessage(kSettingsContentsModified));
 
 	fMonetaryView = new BStringView("", "");
@@ -327,8 +327,8 @@ FormatView::FormatView(const BLocale& locale)
 		.Add(fCurrencySymbolView)
 		.AddGroup(B_HORIZONTAL, spacing)
 			.AddGlue()
-			.Add(beforeRadioButton)
-			.Add(afterRadioButton)
+			.Add(fCurrencySymbolBefore)
+			.Add(fCurrencySymbolAfter)
 			.End()
 		.Add(currencyNegative)
 		.Add(currencyDecimal)
@@ -674,6 +674,10 @@ FormatView::_ParseCurrencyFormat()
 		switch (fieldID[i]) {
 			case B_NUMBER_ELEMENT_CURRENCY:
 				fCurrencySymbolView->SetText(currentSymbol);
+				if (i > fieldCount / 2)
+					fCurrencySymbolAfter->SetValue(1);
+				else
+					fCurrencySymbolBefore->SetValue(1);
 				break;
 			default:
 				break;
