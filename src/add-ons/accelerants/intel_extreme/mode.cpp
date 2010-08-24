@@ -158,13 +158,25 @@ create_mode_list(void)
 	bus.get_signals = &get_i2c_signals;
 	ddc2_init_timing(&bus);
 
-	if (ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL) == B_OK) {
+	status_t error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
+	if (error == B_OK) {
 		edid_dump(&gInfo->edid_info);
 		gInfo->has_edid = true;
 	} else {
-		TRACE(("intel_extreme: getting EDID failed!\n"));
+		TRACE(("intel_extreme: getting EDID on port A (analog) failed : %s. "
+			"Trying on port C (lvds)\n", strerror(error)));
+		bus.cookie = (void*)INTEL_I2C_IO_C;
+		error = ddc2_read_edid1(&bus, &gInfo->edid_info, NULL, NULL);
+		if (error == B_OK) {
+			edid_dump(&gInfo->edid_info);
+			gInfo->has_edid = true;
+		} else {
+			TRACE(("intel_extreme: getting EDID on port C failed : %s\n",
+				strerror(error)));
+		}
 	}
 
+#if 0
 	// TODO: support lower modes via scaling and windowing
 	if (gInfo->head_mode & HEAD_MODE_LVDS_PANEL
 		&& ((gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0)) {
@@ -185,6 +197,7 @@ create_mode_list(void)
 		gInfo->shared_info->mode_count = 1;
 		return B_OK;
 	}
+#endif
 
 	// Otherwise return the 'real' list of modes
 	display_mode *list;
