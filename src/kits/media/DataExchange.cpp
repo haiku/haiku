@@ -37,7 +37,7 @@ find_media_server_port()
 {
 	sMediaServerPort = find_port(MEDIA_SERVER_PORT_NAME);
 	if (sMediaServerPort < 0) {
-		ERROR("couldn't find sMediaServerPort\n");
+		TRACE("couldn't find sMediaServerPort\n");
 		sMediaServerPort = BAD_MEDIA_SERVER_PORT; // make this a unique number
 	}
 }
@@ -48,7 +48,7 @@ find_media_addon_server_port()
 {
 	sMediaAddonServerPort = find_port(MEDIA_ADDON_SERVER_PORT_NAME);
 	if (sMediaAddonServerPort < 0) {
-		ERROR("couldn't find sMediaAddonServerPort\n");
+		TRACE("couldn't find sMediaAddonServerPort\n");
 		sMediaAddonServerPort = BAD_MEDIA_ADDON_SERVER_PORT; // make this a unique number
 	}
 }
