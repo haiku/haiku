@@ -15,7 +15,9 @@
 #include <unicode/dcfmtsym.h>
 #include <unicode/decimfmt.h>
 #include <unicode/dtfmtsym.h>
+#include <unicode/numfmt.h>
 #include <unicode/smpdtfmt.h>
+#include <unicode/ustring.h>
 #include <ICUWrapper.h>
 
 #include <vector>
@@ -671,6 +673,89 @@ BLocale::FormatMonetary(BString* string, double value)
 	ICUString.toUTF8(stringConverter);
 
 	return string->Length();
+}
+
+
+status_t
+BLocale::FormatMonetary(BString* string, int*& fieldPositions,
+	BNumberElement*& fieldTypes, int& fieldCount, double value)
+{
+	UErrorCode err = U_ZERO_ERROR;
+	ObjectDeleter<NumberFormat> numberFormatter
+		= NumberFormat::createCurrencyInstance(*fICULocale, err);
+	if (U_FAILURE(err))
+		return B_NO_MEMORY;
+
+	string->Truncate(0);
+
+	fieldPositions = NULL;
+	fieldTypes = NULL;
+	ICU_VERSION::FieldPositionIterator positionIterator;
+	UnicodeString ICUString;
+	ICUString = numberFormatter->format(value, ICUString, &positionIterator,
+		err);
+
+	if (err != U_ZERO_ERROR)
+		return B_ERROR;
+
+	ICU_VERSION::FieldPosition field;
+	std::vector<int> fieldPosStorage;
+	std::vector<int> fieldTypeStorage;
+	fieldCount  = 0;
+	while (positionIterator.next(field)) {
+		fieldTypeStorage.push_back(field.getField());
+		fieldPosStorage.push_back(field.getBeginIndex() | (field.getEndIndex() << 16));
+		fieldCount ++;
+
+	}
+
+	fieldPositions = (int*) malloc(fieldCount * sizeof(int));
+	fieldTypes = (BNumberElement*) malloc(fieldCount * sizeof(BNumberElement));
+
+	for (int i = 0 ; i < fieldCount ; i++ ) {
+		fieldPositions[i] = fieldPosStorage[i];
+		switch (fieldTypeStorage[i]) {
+			case NumberFormat::kCurrencyField:
+				fieldTypes[i] = B_NUMBER_ELEMENT_CURRENCY;
+				break;
+			case NumberFormat::kIntegerField:
+				fieldTypes[i] = B_NUMBER_ELEMENT_INTEGER;
+				break;
+			case NumberFormat::kFractionField:
+				fieldTypes[i] = B_NUMBER_ELEMENT_FRACTIONAL;
+				break;
+			default:
+				fieldTypes[i] = B_NUMBER_ELEMENT_INVALID;
+				break;
+		}
+	}
+
+	BStringByteSink stringConverter(string);
+
+	ICUString.toUTF8(stringConverter);
+
+	return B_OK;
+}
+
+
+status_t
+BLocale::GetCurrencySymbol(BString& result)
+{
+	UErrorCode error = U_ZERO_ERROR;
+	NumberFormat* format = NumberFormat::createCurrencyInstance(*fICULocale,
+		error);
+
+	if (U_FAILURE(error))
+		return B_ERROR;
+
+	char* symbol = (char*)malloc(20);
+	u_strToUTF8(symbol, 20, NULL, format->getCurrency(), -1, &error);
+	if (U_FAILURE(error))
+		return B_BAD_DATA;
+	result.Append(symbol);
+	delete format;
+	delete symbol;
+	return B_OK;
 }
 
 

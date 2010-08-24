@@ -54,6 +54,7 @@ private:
 			void				_UpdateExamples();
 			void				_SendNotices();
 			void				_ParseDateFormat();
+			void				_ParseCurrencyFormat();
 			void				_UpdateLongDateFormatString();
 
 private:
@@ -73,6 +74,9 @@ private:
 			BStringView*		fLongTimeExampleView;
 			BStringView*		fShortTimeExampleView;
 			BStringView*		fNumberFormatExampleView;
+			BStringView*		fMonetaryView;
+
+			BTextControl*		fCurrencySymbolView;
 
 			bool				f24HrClock;
 

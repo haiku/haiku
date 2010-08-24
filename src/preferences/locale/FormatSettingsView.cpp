@@ -32,6 +32,9 @@
 #include <TextControl.h>
 #include <Window.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 
 using BPrivate::gMutableLocaleRoster;
 
@@ -87,7 +90,7 @@ CreateDateMenu(BMenuField** field, bool longFormat = true)
 		dayMenu->AddItem(new DateMenuItem(B_TRANSLATE("Day in year"),
 			"D", *field));
 		dayMenu->AddItem(new DateMenuItem(B_TRANSLATE("Day in year (2 digits)"),
-			 "DD", *field));
+			"DD", *field));
 		dayMenu->AddItem(new DateMenuItem(B_TRANSLATE("Day in year (3 digits)"),
 			"DDD", *field));
 		*/
@@ -215,7 +218,7 @@ FormatView::FormatView(const BLocale& locale)
 		new BMessage(kSettingsContentsModified));
 	// Unit system (US/Metric) (radio)
 
-	BTextControl* currencySymbol = new BTextControl("",
+	fCurrencySymbolView = new BTextControl("",
 		B_TRANSLATE("Currency symbol:"), "",
 		new BMessage(kSettingsContentsModified));
 	menu = new BPopUpMenu(B_TRANSLATE("Negative marker"));
@@ -237,8 +240,11 @@ FormatView::FormatView(const BLocale& locale)
 	BRadioButton* afterRadioButton = new BRadioButton("",
 		B_TRANSLATE("After"), new BMessage(kSettingsContentsModified));
 
+	fMonetaryView = new BStringView("", "");
+
 	_UpdateExamples();
 	_ParseDateFormat();
+	_ParseCurrencyFormat();
 
 	fDateBox = new BBox(B_TRANSLATE("Date"));
 	fTimeBox = new BBox(B_TRANSLATE("Time"));
@@ -317,7 +323,8 @@ FormatView::FormatView(const BLocale& locale)
 
 	fCurrencyBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
 		.SetInsets(spacing, spacing, spacing, spacing)
-		.Add(currencySymbol)
+		.Add(fMonetaryView)
+		.Add(fCurrencySymbolView)
 		.AddGroup(B_HORIZONTAL, spacing)
 			.AddGlue()
 			.Add(beforeRadioButton)
@@ -557,8 +564,10 @@ FormatView::SetLocale(const BLocale& locale)
 	if (separator >= kNoSeparator && separator < kSeparatorsEnd)
 		fSeparatorMenuField->Menu()->ItemAt((int32)separator)->SetMarked(true);
 	*/
+
 	_UpdateExamples();
 	_ParseDateFormat();
+	_ParseCurrencyFormat();
 }
 
 
@@ -640,6 +649,39 @@ FormatView::_SendNotices()
 	notificationMessage.AddBool("24HrClock", settings.ClockIs24Hr());
 	tracker->SendNotices(kDateFormatChanged, &notificationMessage);
 	*/
+}
+
+
+void
+FormatView::_ParseCurrencyFormat()
+{
+	BString currencySample;
+	int* fieldPos = NULL;
+	int fieldCount;
+	BNumberElement* fieldID = NULL;
+	if (fLocale.FormatMonetary(&currencySample, fieldPos, fieldID, fieldCount,
+			-1234.56) != B_OK) {
+		fMonetaryView->SetText("ERROR");
+		return;
+	}
+
+	fMonetaryView->SetText(currencySample);
+
+	for (int i = 0; i < fieldCount; i++) {
+		BString currentSymbol;
+		currentSymbol.AppendChars(currencySample.CharAt(fieldPos[i]&0xFFFF),
+			(fieldPos[i]>>16) - (fieldPos[i]&0xFFFF));
+		switch (fieldID[i]) {
+			case B_NUMBER_ELEMENT_CURRENCY:
+				fCurrencySymbolView->SetText(currentSymbol);
+				break;
+			default:
+				break;
+		}
+	}
+
+	free(fieldPos);
+	free(fieldID);
 }
 
 
