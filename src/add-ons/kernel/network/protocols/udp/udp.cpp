@@ -73,42 +73,44 @@ class UdpDomainSupport;
 
 class UdpEndpoint : public net_protocol, public DatagramSocket<> {
 public:
-	UdpEndpoint(net_socket *socket);
+								UdpEndpoint(net_socket* socket);
 
-	status_t				Bind(const sockaddr *newAddr);
-	status_t				Unbind(sockaddr *newAddr);
-	status_t				Connect(const sockaddr *newAddr);
+			status_t			Bind(const sockaddr* newAddr);
+			status_t			Unbind(sockaddr* newAddr);
+			status_t			Connect(const sockaddr* newAddr);
 
-	status_t				Open();
-	status_t				Close();
-	status_t				Free();
+			status_t			Open();
+			status_t			Close();
+			status_t			Free();
 
-	status_t				SendRoutedData(net_buffer *buffer,
-								net_route *route);
-	status_t				SendData(net_buffer *buffer);
+			status_t			SendRoutedData(net_buffer* buffer,
+									net_route* route);
+			status_t			SendData(net_buffer* buffer);
 
-	ssize_t					BytesAvailable();
-	status_t				FetchData(size_t numBytes, uint32 flags,
-								net_buffer **_buffer);
+			ssize_t				BytesAvailable();
+			status_t			FetchData(size_t numBytes, uint32 flags,
+									net_buffer** _buffer);
 
-	status_t				StoreData(net_buffer *buffer);
-	status_t				DeliverData(net_buffer *buffer);
+			status_t			StoreData(net_buffer* buffer);
+			status_t			DeliverData(net_buffer* buffer);
 
-	// only the domain support will change/check the Active flag so
-	// we don't really need to protect it with the socket lock.
-	bool					IsActive() const { return fActive; }
-	void					SetActive(bool newValue) { fActive = newValue; }
+			// only the domain support will change/check the Active flag so
+			// we don't really need to protect it with the socket lock.
+			bool				IsActive() const { return fActive; }
+			void				SetActive(bool newValue) { fActive = newValue; }
 
-	UdpEndpoint				*&HashTableLink() { return fLink; }
+			UdpEndpoint*&		HashTableLink() { return fLink; }
+
+			void				Dump() const;
 
 private:
-	UdpDomainSupport		*fManager;
-	bool					fActive;
-								// an active UdpEndpoint is part of the
-								// endpoint hash (and it is bound and optionally
-								// connected)
+			UdpDomainSupport*	fManager;
+			bool				fActive;
+									// an active UdpEndpoint is part of the
+									// endpoint hash (and it is bound and
+									// optionally connected)
 
-	UdpEndpoint				*fLink;
+			UdpEndpoint*		fLink;
 };
 
 
@@ -400,15 +402,8 @@ UdpDomainSupport::DumpEndpoints() const
 
 	EndpointTable::Iterator it = fActiveEndpoints.GetIterator();
 
-	while (it.HasNext()) {
-		UdpEndpoint *endpoint = it.Next();
-
-		char localBuf[64], peerBuf[64];
-		endpoint->LocalAddress().AsString(localBuf, sizeof(localBuf), true);
-		endpoint->PeerAddress().AsString(peerBuf, sizeof(peerBuf), true);
-
-		kprintf("%p %20s %20s %8lu\n", endpoint, localBuf, peerBuf,
-			endpoint->AvailableData());
+	while (UdpEndpoint* endpoint = it.Next()) {
+		endpoint->Dump();
 	}
 }
 
@@ -879,7 +874,11 @@ UdpEndpointManager::_GetDomain(net_buffer* buffer)
 
 
 UdpEndpoint::UdpEndpoint(net_socket *socket)
-	: DatagramSocket<>("udp endpoint", socket), fActive(false) {}
+	:
+	DatagramSocket<>("udp endpoint", socket),
+	fActive(false)
+{
+}
 
 
 // #pragma mark - activation
@@ -1009,7 +1008,7 @@ UdpEndpoint::FetchData(size_t numBytes, uint32 flags, net_buffer **_buffer)
 	TRACE_EP("FetchData(%ld, 0x%lx)", numBytes, flags);
 
 	status_t status = Dequeue(flags, _buffer);
-	TRACE_EP("  FetchData(): returned from fifo status=0x%lx", status);
+	TRACE_EP("  FetchData(): returned from fifo status: %s", strerror(status));
 	if (status != B_OK)
 		return status;
 
@@ -1043,6 +1042,18 @@ UdpEndpoint::DeliverData(net_buffer *_buffer)
 	}
 
 	return Enqueue(buffer);
+}
+
+
+void
+UdpEndpoint::Dump() const
+{
+	char local[64];
+	LocalAddress().AsString(local, sizeof(local), true);
+	char peer[64];
+	PeerAddress().AsString(peer, sizeof(peer), true);
+
+	kprintf("%p %20s %20s %8lu\n", this, local, peer, fCurrentBytes);
 }
 
 
