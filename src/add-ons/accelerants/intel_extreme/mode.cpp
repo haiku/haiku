@@ -664,31 +664,24 @@ if (first) {
 	write32(INTEL_VGA_DISPLAY_CONTROL, VGA_DISPLAY_DISABLED);
 	read32(INTEL_VGA_DISPLAY_CONTROL);
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_85x)) {
-	}
-
 	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
 		pll_divisors divisors;
 		compute_pll_divisors(target, divisors, true);
 
-		uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL;
+		uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_ENABLED;
 		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
 			 dpll |= LVDS_PLL_MODE_LVDS;
 			 	// DPLL mode LVDS for i915+
 		}
 
 		// compute bitmask from p1 value
-		dpll |= (1 << (divisors.post1 - 1)) << 16;
+		dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 		switch (divisors.post2) {
 			case 5:
 			case 7:
 				dpll |= DISPLAY_PLL_DIVIDE_HIGH;
 				break;
 		}
-
-		dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
-
-		dpll |= DISPLAY_PLL_ENABLED;
 
 		write32(INTEL_PANEL_FIT_CONTROL, 0);
 
@@ -779,7 +772,7 @@ if (first) {
 		read32(INTEL_DISPLAY_B_PIPE_CONTROL);
 	}
 
-	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
+	if ((gInfo->head_mode & HEAD_MODE_A_ANALOG) != 0) {
 		pll_divisors divisors;
 		compute_pll_divisors(target, divisors,false);
 
