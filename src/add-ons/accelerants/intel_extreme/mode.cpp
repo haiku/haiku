@@ -651,6 +651,7 @@ if (first) {
 			set_frame_buffer_base();
 		}
 
+		TRACE(("intel_extreme : Failed to allocate framebuffer !\n"));
 		return B_NO_MEMORY;
 	}
 
@@ -687,12 +688,6 @@ if (first) {
 
 		dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 
-		uint32 displayControl = ~(DISPLAY_CONTROL_COLOR_MASK
-			| DISPLAY_CONTROL_GAMMA) | colorMode;
-		displayControl |= 1 << 24; // select pipe B
-
-		// runs in dpms also?
-		displayControl |= DISPLAY_PIPE_ENABLED;
 		dpll |= DISPLAY_PLL_ENABLED;
 
 		write32(INTEL_PANEL_FIT_CONTROL, 0);
@@ -775,6 +770,9 @@ if (first) {
 		write32(INTEL_DISPLAY_B_POS, 0);
 		write32(INTEL_DISPLAY_B_PIPE_SIZE, ((uint32)(target.timing.v_display - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
+
+		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
+			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
 
 		write32(INTEL_DISPLAY_B_PIPE_CONTROL,
 			read32(INTEL_DISPLAY_B_PIPE_CONTROL) | DISPLAY_PIPE_ENABLED);
