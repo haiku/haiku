@@ -607,9 +607,16 @@ intel_set_display_mode(display_mode *mode)
 	display_mode target = *mode;
 	if (intel_propose_display_mode(&target, mode, mode))
 		return B_BAD_VALUE;
+		// TODO : it may be acceptable to continue when using panel fitting,
+		// since the data from propose_display_mode will not actually get any
+		// use
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
+
+	// TODO : do not go further if the mode is identical to the current one.
+	// This would avoid the screen being off when switching workspaces when they
+	// have the same resolution.
 
 #if 0
 static bool first = true;
@@ -642,7 +649,8 @@ if (first) {
 	uint32 base;
 	if (intel_allocate_memory(bytesPerRow * target.virtual_height, 0,
 			base) < B_OK) {
-		// oh, how did that happen? Unfortunately, there is no really good way back
+		// oh, how did that happen? Unfortunately, there is no really good way
+		// back
 		if (intel_allocate_memory(sharedInfo.current_mode.virtual_height
 				* sharedInfo.bytes_per_row, 0, base) == B_OK) {
 			sharedInfo.frame_buffer = base;
@@ -665,13 +673,49 @@ if (first) {
 	read32(INTEL_VGA_DISPLAY_CONTROL);
 
 	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
+		// For LVDS panels, we actuallyalways set the native mode in hardware
+		// Then we use the panel fitter to scale the picture to that.
+		display_mode hardware_target;
+		bool needs_scaling = false;
+
+		if (gInfo->has_edid) {
+			hardware_target.space = target.space;
+			hardware_target.virtual_width
+				= gInfo->edid_info.std_timing[0].h_size;
+			hardware_target.virtual_height
+				= gInfo->edid_info.std_timing[0].v_size;
+			// TODO : use the info from EDID 1.2
+			/* Each detailed_monitor has a type, find the first one which is
+			* actually a detailed_timing
+			hardware_target.virtual_width = gInfo->edid_info
+				.detailed_monitor[0].data.detailed_timing.h_visible;
+			hardware_target.virtual_height = gInfo->edid_info
+				.detailed_monitor[0].data.detailed_timing.v_visible;
+			*/
+			TRACE(("intel_extreme : hardware mode will actually be %dx%d\n",
+				hardware_target.virtual_width, hardware_target.virtual_height));
+			if ((hardware_target.virtual_width <= target.virtual_width
+				&& hardware_target.virtual_height <= target.virtual_height
+				&& hardware_target.space <= target.space)
+				|| intel_propose_display_mode(&hardware_target, mode, mode)) {
+				hardware_target = target;
+			} else
+				needs_scaling = true;
+		} else {
+			// we don't have EDID data, try to set the requested mode directly
+			hardware_target = target;
+		}
+
 		pll_divisors divisors;
-		compute_pll_divisors(target, divisors, true);
+		if (needs_scaling)
+			compute_pll_divisors(hardware_target, divisors, true);
+		else
+			compute_pll_divisors(target, divisors, true);
 
 		uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_ENABLED;
 		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-			 dpll |= LVDS_PLL_MODE_LVDS;
-			 	// DPLL mode LVDS for i915+
+			dpll |= LVDS_PLL_MODE_LVDS;
+				// DPLL mode LVDS for i915+
 		}
 
 		// compute bitmask from p1 value
@@ -683,7 +727,8 @@ if (first) {
 				break;
 		}
 
-		write32(INTEL_PANEL_FIT_CONTROL, 0);
+		// Disable panel fitting, but enable 8 to 6-bit dithering
+		write32(INTEL_PANEL_FIT_CONTROL, 0x4);
 
 		if ((dpll & DISPLAY_PLL_ENABLED) != 0) {
 			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
@@ -700,6 +745,10 @@ if (first) {
 
 		uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT)
 			| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
+
+		// TODO : do not do this if the connected panel is 24-bit
+		// (I don't know how to detect that)
+		lvds |= LVDS_18BIT_DITHER;
 
 		float referenceClock = gInfo->shared_info->pll_info.reference_frequency
 			/ 1000.0f;
@@ -731,8 +780,14 @@ if (first) {
 		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
 			float adjusted = ((referenceClock * divisors.m) / divisors.n)
 				/ divisors.post;
-			uint32 pixelMultiply = uint32(adjusted
-				/ (target.timing.pixel_clock / 1000.0f));
+			uint32 pixelMultiply;
+			if (needs_scaling) {
+		   		pixelMultiply = uint32(adjusted
+					/ (hardware_target.timing.pixel_clock / 1000.0f));
+			} else {
+		   		pixelMultiply = uint32(adjusted
+					/ (target.timing.pixel_clock / 1000.0f));
+			}
 
 			write32(INTEL_DISPLAY_B_PLL_MULTIPLIER_DIVISOR, (0 << 24)
 				| ((pixelMultiply - 1) << 8));
@@ -743,19 +798,37 @@ if (first) {
 		spin(150);
 
 		// update timing parameters
-		write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
-			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
-			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_B_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
-			| ((uint32)target.timing.h_sync_start - 1));
+		// TODO : when harware_target != target, shift hsync and vsync to center
+		// the display area on the panel
+		if (needs_scaling) {
+			write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(hardware_target.timing.h_total - 1) << 16)
+				| ((uint32)target.timing.h_display - 1));
+			write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(hardware_target.timing.h_total - 1) << 16)
+				| ((uint32)target.timing.h_display - 1));
+			write32(INTEL_DISPLAY_B_HSYNC, ((uint32)(hardware_target.timing.h_sync_end - 1) << 16)
+				| ((uint32)hardware_target.timing.h_sync_start - 1));
 
-		write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
-			| ((uint32)target.timing.v_sync_start - 1));
+			write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(hardware_target.timing.v_total - 1) << 16)
+				| ((uint32)target.timing.v_display - 1));
+			write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(hardware_target.timing.v_total - 1) << 16)
+				| ((uint32)target.timing.v_display - 1));
+			write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(hardware_target.timing.v_sync_end - 1) << 16)
+				| ((uint32)hardware_target.timing.v_sync_start - 1));
+		} else {
+			write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
+				| ((uint32)target.timing.h_display - 1));
+			write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
+				| ((uint32)target.timing.h_display - 1));
+			write32(INTEL_DISPLAY_B_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
+				| ((uint32)target.timing.h_sync_start - 1));
+
+			write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
+				| ((uint32)target.timing.v_display - 1));
+			write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
+				| ((uint32)target.timing.v_display - 1));
+			write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
+				| ((uint32)target.timing.v_sync_start - 1));
+		}
 
 		write32(INTEL_DISPLAY_B_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));

@@ -287,6 +287,7 @@ struct intel_free_graphics_memory {
 #define LVDS_PIPEB_SELECT				(1 << 30)
 #define LVDS_B0B3PAIRS_POWER_UP			(3 << 2)
 #define LVDS_PLL_MODE_LVDS				(2 << 26)
+#define LVDS_18BIT_DITHER				(1 << 25)
 
 // PLL flags
 #define DISPLAY_PLL_ENABLED				(1UL << 31)
