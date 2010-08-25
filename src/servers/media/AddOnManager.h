@@ -72,6 +72,9 @@ private:
 			bool				_FindDecoder(const media_format& format,
 									const BPath& path,
 									xfer_entry_ref* _decoderRef);
+			void				_GetReaders(const BPath& path,
+									xfer_entry_ref* outRefs, int32* outCount,
+									int32 maxCount);
 
 private:
 			struct reader_info {

@@ -146,13 +146,21 @@ AddOnManager::GetReaders(xfer_entry_ref* outRefs, int32* outCount,
 {
 	BAutolock locker(fLock);
 
-	fReaderList.Rewind();
-	reader_info* info;
-	for (*outCount = 0; fReaderList.GetNext(&info) && *outCount < maxCount;
-			(*outCount)++) {
-		outRefs[*outCount] = info->ref;
-	}
+	*outCount = 0;
 
+	// See GetDecoderForFormat() for why we need to scan the list by path.
+
+	BPath path;
+	for (uint i = 0; i < sizeof(sDirectories) / sizeof(directory_which); i++) {
+		if (find_directory(sDirectories[i], &path) != B_OK
+			|| path.Append("media/plugins") != B_OK) {
+			printf("AddOnManager::GetReaders: failed to construct "
+				"path for directory %u\n", i);
+			continue;
+		}
+		_GetReaders(path, outRefs, outCount, maxCount);
+	}
+	
 	return B_OK;
 }
 
@@ -602,3 +610,25 @@ AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
 	return false;
 }
 
+
+void
+AddOnManager::_GetReaders(const BPath& path, xfer_entry_ref* outRefs,
+	int32* outCount, int32 maxCount)
+{
+	node_ref nref;
+	BDirectory directory;
+	if (directory.SetTo(path.Path()) != B_OK
+		|| directory.GetNodeRef(&nref) != B_OK) {
+		return;
+	}
+
+	reader_info* info;
+	for (fReaderList.Rewind(); fReaderList.GetNext(&info)
+		&& *outCount < maxCount;) {
+		if (info->ref.directory != nref.node)
+			continue;
+
+		outRefs[*outCount] = info->ref;
+		(*outCount)++;
+	}
+}
