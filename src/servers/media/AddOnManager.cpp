@@ -126,11 +126,14 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref* _decoderRef,
 
 	BPath path;
 	for (uint i = 0; i < sizeof(sDirectories) / sizeof(directory_which); i++) {
-		if (find_directory(sDirectories[i], &path) == B_OK
-			&& path.Append("media/plugins") == B_OK) {
-			if (_FindDecoder(format, path, _decoderRef))
-				return B_OK;
+		if (find_directory(sDirectories[i], &path) != B_OK
+			|| path.Append("media/plugins") != B_OK) {
+			printf("AddOnManager::GetDecoderForFormat: failed to construct "
+				"path for directory %u\n", i);
+			continue;
 		}
+		if (_FindDecoder(format, path, _decoderRef))
+			return B_OK;
 	}
 
 	return B_ENTRY_NOT_FOUND;
@@ -574,7 +577,9 @@ AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
 	BDirectory directory;
 	if (directory.SetTo(path.Path()) != B_OK
 		|| directory.GetNodeRef(&nref) != B_OK) {
-		return B_ERROR;
+		printf("AddOnManager::_FindDecoder() - failed to init BDirectory "
+			"for %s\n", path.Path());
+		return false;
 	}
 
 	decoder_info* info;
