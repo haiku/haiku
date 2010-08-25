@@ -1579,7 +1579,8 @@ ipv4_receive_data(net_buffer* buffer)
 		return B_BAD_DATA;
 
 	// lower layers notion of broadcast or multicast have no relevance to us
-	// TODO: they actually have when deciding whether to send an ICMP error
+	// other than deciding whether to send an ICMP error
+	bool wasMulticast = (buffer->flags & (MSG_BCAST | MSG_MCAST)) != 0;
 	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	sockaddr_in destination;
@@ -1587,27 +1588,41 @@ ipv4_receive_data(net_buffer* buffer)
 
 	if (header.destination == INADDR_BROADCAST) {
 		buffer->flags |= MSG_BCAST;
+
+		// Find first interface with a matching family
+		// TODO: support for ethernet broadcasts!
+		// TODO: we might need to send it to all interfaces if it's an ethernet
+		// broadcast as well!
+		sDatalinkModule->is_local_link_address(sDomain, true,
+			buffer->destination, &buffer->interface_address);
 	} else if (IN_MULTICAST(ntohl(header.destination))) {
 		buffer->flags |= MSG_MCAST;
+		// TODO: must set buffer->interface_address!
 	} else {
 		uint32 matchedAddressType = 0;
 
 		// test if the packet is really for us
 		if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
-				&buffer->interface_address, &matchedAddressType)
-			&& !sDatalinkModule->is_local_link_address(sDomain, true,
-				buffer->destination, &buffer->interface_address)) {
-			TRACE("  ipv4_receive_data(): packet was not for us %x -> %x",
-				ntohl(header.source), ntohl(header.destination));
+				&buffer->interface_address, &matchedAddressType)) {
+			sDatalinkModule->is_local_link_address(sDomain, true,
+				buffer->destination, &buffer->interface_address);
+		} else {
+			// copy over special address types (MSG_BCAST or MSG_MCAST):
+			buffer->flags |= matchedAddressType;
+		}
+	}
 
+	if (buffer->interface_address == NULL) {
+		TRACE("  ipv4_receive_data(): packet was not for us %x -> %x",
+			ntohl(header.source), ntohl(header.destination));
+
+		if (!wasMulticast) {
 			// Send ICMP error: Host unreachable
 			sDomain->module->error_reply(NULL, buffer, B_NET_ERROR_UNREACH_HOST,
 				NULL);
-			return B_ERROR;
 		}
 
-		// copy over special address types (MSG_BCAST or MSG_MCAST):
-		buffer->flags |= matchedAddressType;
+		return B_ERROR;
 	}
 
 	// set net_buffer's source/destination address
