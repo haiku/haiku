@@ -577,8 +577,6 @@ AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
 	BDirectory directory;
 	if (directory.SetTo(path.Path()) != B_OK
 		|| directory.GetNodeRef(&nref) != B_OK) {
-		printf("AddOnManager::_FindDecoder() - failed to init BDirectory "
-			"for %s\n", path.Path());
 		return false;
 	}
 
