@@ -69,6 +69,7 @@ TTimeWindow::MessageReceived(BMessage* message)
 
 		case kRTCUpdate:
 			fDateTimeView->MessageReceived(message);
+			fTimeZoneView->MessageReceived(message);
 			SetRevertStatus();
 			break;
 

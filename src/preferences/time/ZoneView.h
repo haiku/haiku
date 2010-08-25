@@ -14,13 +14,14 @@
 #include <View.h>
 
 
-class BMessage;
-class BPopUpMenu;
-class BOutlineListView;
 class BButton;
+class BMessage;
+class BOutlineListView;
+class BPopUpMenu;
 class BTextToolTip;
-class TTZDisplay;
+class BTimeZone;
 class TimeZoneListItem;
+class TTZDisplay;
 
 
 class TimeZoneView : public BView {
@@ -29,6 +30,7 @@ public:
 	virtual						~TimeZoneView();
 
 	virtual	void				AttachedToWindow();
+	virtual	void				AllAttached();
 	virtual	void				MessageReceived(BMessage* message);
 			bool				CheckCanRevert();
 
@@ -42,7 +44,8 @@ private:
 
 			void				_UpdatePreview();
 			void				_UpdateCurrent();
-			BString				_FormatTime(TimeZoneListItem* zoneItem);
+			BString				_FormatTime(const BTimeZone& timeZone,
+									bool compensateForLocalOffset = true);
 
 			void				_InitView();
 			void				_BuildZoneMenu();

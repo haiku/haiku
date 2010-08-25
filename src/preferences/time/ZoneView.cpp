@@ -57,6 +57,12 @@ using BPrivate::ObjectDeleter;
 struct TimeZoneItemLess {
 	bool operator()(const BString& first, const BString& second)
 	{
+		// sort anything starting with '<' behind anything else
+		if (first.ByteAt(0) == '<') {
+			if (second.ByteAt(0) != '<')
+				return false;
+		} else if (second.ByteAt(0) == '<')
+			return true;
 		return fCollator.Compare(first.String(), second.String()) < 0;
 	}
 private:
@@ -93,9 +99,16 @@ TimeZoneView::~TimeZoneView()
 void
 TimeZoneView::AttachedToWindow()
 {
+	BView::AttachedToWindow();
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
+}
 
+
+void
+TimeZoneView::AllAttached()
+{
+	BView::AllAttached();
 	if (!fInitialized) {
 		fInitialized = true;
 
@@ -103,18 +116,10 @@ TimeZoneView::AttachedToWindow()
 		fZoneList->SetTarget(this);
 
 		// update displays
-		int32 czone = 0;
 		if (fCurrentZoneItem != NULL) {
-			czone = fZoneList->IndexOf(fCurrentZoneItem);
-		} else {
-			// TODO : else, select ??!
-			fCurrentZoneItem = (TimeZoneListItem*)fZoneList->ItemAt(0);
+			fZoneList->Select(fZoneList->IndexOf(fCurrentZoneItem));
+			fCurrent->SetText(fCurrentZoneItem->Text());
 		}
-
-		fZoneList->Select(czone);
-
-		fZoneList->ScrollToSelection();
-		fCurrent->SetText(fCurrentZoneItem->Text());
 	}
 	fZoneList->ScrollToSelection();
 }
@@ -140,6 +145,10 @@ TimeZoneView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case H_CITY_CHANGED:
+			_UpdatePreview();
+			break;
+
 		case H_SET_TIME_ZONE:
 		{
 			_SetSystemTimeZone();
@@ -151,7 +160,8 @@ TimeZoneView::MessageReceived(BMessage* message)
 			_Revert();
 			break;
 
-		case H_CITY_CHANGED:
+		case kRTCUpdate:
+			_UpdateCurrent();
 			_UpdatePreview();
 			break;
 
@@ -172,7 +182,8 @@ TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
 
 	BString toolTip = item->Text();
 	toolTip << '\n' << item->TimeZone().ShortName() << " / "
-			<< item->TimeZone().ShortDaylightSavingName();
+			<< item->TimeZone().ShortDaylightSavingName()
+			<< "\nNow: " << _FormatTime(item->TimeZone(), false).String();
 
 	delete fToolTip;
 	fToolTip = new (std::nothrow) BTextToolTip(toolTip.String());
@@ -252,23 +263,27 @@ TimeZoneView::_InitView()
 void
 TimeZoneView::_BuildZoneMenu()
 {
-	BTimeZone defaultTimeZone = NULL;
+	BTimeZone defaultTimeZone;
 	be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
 
-	// Get a list of countries and, for each country, get all the timezones and
-	// AddUnder() them (only if there are multiple ones).
-	// Finally expand the current country and highlight the active TZ.
+	BLanguage defaultLanguage;
+	be_locale_roster->GetDefaultLanguage(&defaultLanguage);
 
+	/*
+	 * Group timezones by regions, but filter out unwanted (duplicate) regions
+	 * and add an additional region with generic GMT-offset timezones at the end
+	 */
 	BMessage zoneList;
 	be_locale_roster->GetAvailableTimeZones(&zoneList);
 
 	typedef	std::map<BString, TimeZoneListItem*, TimeZoneItemLess> ZoneItemMap;
 	ZoneItemMap zoneMap;
-	const char* supportedRegions[] = {
+	const char* kOtherRegion = "<Other>";
+	const char* kSupportedRegions[] = {
 		"Africa", "America", "Antarctica", "Arctic", "Asia", "Atlantic",
-		"Australia", "Etc", "Europe", "Indian", "Pacific", NULL
+		"Australia", "Europe", "Indian", "Pacific", kOtherRegion, NULL
 	};
-	for (const char** region = supportedRegions; *region != NULL; ++region)
+	for (const char** region = kSupportedRegions; *region != NULL; ++region)
 		zoneMap[*region] = NULL;
 
 	BString zoneID;
@@ -281,6 +296,9 @@ TimeZoneView::_BuildZoneMenu()
 			continue;
 
 		BString region(zoneID, slashPos);
+
+		if (region == "Etc")
+			region = kOtherRegion;
 
 		// just accept timezones from "known" regions, as all others are aliases
 		ZoneItemMap::iterator regionIter = zoneMap.find(region);
@@ -295,7 +313,7 @@ TimeZoneView::_BuildZoneMenu()
 			zoneMap[region] = regionItem;
 		}
 
-		BTimeZone* timeZone = new BTimeZone(zoneID);
+		BTimeZone* timeZone = new BTimeZone(zoneID, &defaultLanguage);
 		BString tzName = timeZone->Name();
 		if (tzName == "GMT+00:00")
 			tzName = "GMT";
@@ -352,8 +370,6 @@ TimeZoneView::_BuildZoneMenu()
 	ZoneItemMap::iterator zoneIter;
 	for (zoneIter = zoneMap.begin(); zoneIter != zoneMap.end(); ++zoneIter)
 		fZoneList->AddItem(zoneIter->second);
-
-	fZoneList->Select(fZoneList->IndexOf(fCurrentZoneItem));
 }
 
 
@@ -390,7 +406,7 @@ TimeZoneView::_UpdatePreview()
 		return;
 	}
 
-	BString timeString = _FormatTime(item);
+	BString timeString = _FormatTime(item->TimeZone());
 	fPreview->SetText(item->Text());
 	fPreview->SetTime(timeString.String());
 
@@ -404,7 +420,7 @@ TimeZoneView::_UpdateCurrent()
 	if (fCurrentZoneItem == NULL)
 		return;
 
-	BString timeString = _FormatTime(fCurrentZoneItem);
+	BString timeString = _FormatTime(fCurrentZoneItem->TimeZone());
 	fCurrent->SetText(fCurrentZoneItem->Text());
 	fCurrent->SetTime(timeString.String());
 }
@@ -416,15 +432,19 @@ TimeZoneView::_SetSystemTimeZone()
 	/*	Set sytem timezone for all different API levels. How to do this?
 	 *	1) tell locale-roster about new default timezone
 	 *	2) tell kernel about new timezone offset
-	 *	3) write new POSIX-timezone-info file
 	 */
 
 	int32 selection = fZoneList->CurrentSelection();
 	if (selection < 0)
 		return;
 
-	fCurrentZoneItem = (TimeZoneListItem*)(fZoneList->ItemAt(selection));
-	const BTimeZone& timeZone = fCurrentZoneItem->TimeZone();
+	TimeZoneListItem* item
+		= static_cast<TimeZoneListItem*>(fZoneList->ItemAt(selection));
+	if (item == NULL || !item->HasTimeZone())
+		return;
+
+	fCurrentZoneItem = item;
+	const BTimeZone& timeZone = item->TimeZone();
 
 	gMutableLocaleRoster->SetDefaultTimeZone(timeZone);
 
@@ -438,22 +458,24 @@ TimeZoneView::_SetSystemTimeZone()
 
 
 BString
-TimeZoneView::_FormatTime(TimeZoneListItem* zoneItem)
+TimeZoneView::_FormatTime(const BTimeZone& timeZone,
+	bool compensateForLocalOffset)
 {
 	BString result;
-
-	if (zoneItem == NULL)
-		return result;
 
 	BLocale locale;
 	be_locale_roster->GetDefaultLocale(&locale);
 	time_t now = time(NULL);
 	bool rtcIsGMT;
 	_kern_get_real_time_clock_is_gmt(&rtcIsGMT);
-	if (!rtcIsGMT) {
-		now -= zoneItem->OffsetFromGMT() - fCurrentZoneItem->OffsetFromGMT();
+	if (!rtcIsGMT && compensateForLocalOffset) {
+		int32 currentOffset
+			= fCurrentZoneItem != NULL && fCurrentZoneItem->HasTimeZone()
+				? fCurrentZoneItem->OffsetFromGMT()
+				: 0;
+		now -= timeZone.OffsetFromGMT() - currentOffset;
 	}
-	locale.FormatTime(&result, now, false, &zoneItem->TimeZone());
+	locale.FormatTime(&result, now, false, &timeZone);
 
 	return result;
 }
