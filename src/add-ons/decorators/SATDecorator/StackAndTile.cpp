@@ -257,7 +257,7 @@ StackAndTile::WindowMinimized(Window* window, bool minimize)
 	for (int i = 0; i < group->CountItems(); i++) {
 		SATWindow* listWindow = group->WindowAt(i);
 		if (listWindow != satWindow)
-			desktop->MinimizeWindow(listWindow->GetWindow(), minimize);
+			listWindow->GetWindow()->ServerWindow()->NotifyMinimize(minimize);
 	}
 }
 
