@@ -234,8 +234,10 @@ public:
 	static	int					DumpEndpoints(int argc, char *argv[]);
 
 private:
-			UdpDomainSupport*	_GetDomain(net_domain *domain, bool create);
-			UdpDomainSupport*	_GetDomain(net_buffer* buffer);
+	inline	net_domain*			_GetDomain(net_buffer* buffer);
+			UdpDomainSupport*	_GetDomainSupport(net_domain* domain,
+									bool create);
+			UdpDomainSupport*	_GetDomainSupport(net_buffer* buffer);
 
 			mutex				fLock;
 			status_t			fStatus;
@@ -504,23 +506,21 @@ UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
 
 
 status_t
-UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
+UdpDomainSupport::_DemuxBroadcast(net_buffer* buffer)
 {
-	sockaddr *peerAddr = buffer->source;
-	sockaddr *broadcastAddr = buffer->destination;
-	sockaddr *mask = NULL;
-	if (buffer->interface_address != NULL)
-		mask = (sockaddr *)buffer->interface_address->mask;
-
-	TRACE_DOMAIN("_DemuxBroadcast(%p)", buffer);
-
+	sockaddr* peerAddr = buffer->source;
+	sockaddr* broadcastAddr = buffer->destination;
 	uint16 incomingPort = AddressModule()->get_port(broadcastAddr);
 
-	EndpointTable::Iterator it = fActiveEndpoints.GetIterator();
+	sockaddr* mask = NULL;
+	if (buffer->interface_address != NULL)
+		mask = (sockaddr*)buffer->interface_address->mask;
 
-	while (it.HasNext()) {
-		UdpEndpoint *endpoint = it.Next();
+	TRACE_DOMAIN("_DemuxBroadcast(%p): mask %p\n", buffer, mask);
 
+	EndpointTable::Iterator iterator = fActiveEndpoints.GetIterator();
+
+	while (UdpEndpoint* endpoint = iterator.Next()) {
 		TRACE_DOMAIN("  _DemuxBroadcast(): checking endpoint %s...",
 			AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
 
@@ -540,7 +540,7 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer *buffer)
 		}
 
 		if (endpoint->LocalAddress().MatchMasked(broadcastAddr, mask)
-			|| endpoint->LocalAddress().IsEmpty(false)) {
+			|| mask == NULL || endpoint->LocalAddress().IsEmpty(false)) {
 			// address matches, dispatch to this endpoint:
 			endpoint->StoreData(buffer);
 		}
@@ -675,7 +675,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 {
 	TRACE_EPM("ReceiveData(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 
-	UdpDomainSupport* domainSupport = _GetDomain(buffer);
+	UdpDomainSupport* domainSupport = _GetDomainSupport(buffer);
 	if (domainSupport == NULL) {
 		// we don't instantiate domain supports in the receiving path, as
 		// we are only interested in delivering data to existing sockets.
@@ -710,7 +710,7 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 	if (buffer->size < 4)
 		return B_BAD_VALUE;
 
-	UdpDomainSupport* domainSupport = _GetDomain(buffer);
+	UdpDomainSupport* domainSupport = _GetDomainSupport(buffer);
 	if (domainSupport == NULL) {
 		// we don't instantiate domain supports in the receiving path, as
 		// we are only interested in delivering data to existing sockets.
@@ -738,25 +738,23 @@ UdpEndpointManager::ReceiveError(status_t error, net_buffer* buffer)
 
 
 status_t
-UdpEndpointManager::Deframe(net_buffer *buffer)
+UdpEndpointManager::Deframe(net_buffer* buffer)
 {
 	TRACE_EPM("Deframe(%p [%ld bytes])", buffer, buffer->size);
 
 	NetBufferHeaderReader<udp_header> bufferHeader(buffer);
-	if (bufferHeader.Status() < B_OK)
+	if (bufferHeader.Status() != B_OK)
 		return bufferHeader.Status();
 
-	udp_header &header = bufferHeader.Data();
+	udp_header& header = bufferHeader.Data();
 
-	if (buffer->interface_address == NULL
-		|| buffer->interface_address->domain == NULL) {
+	net_domain* domain = _GetDomain(buffer);
+	if (domain == NULL) {
 		TRACE_EPM("  Deframe(): UDP packed dropped as there was no domain "
 			"specified (interface address %p).", buffer->interface_address);
 		return B_BAD_VALUE;
 	}
-
-	net_domain *domain = buffer->interface_address->domain;
-	net_address_module_info *addressModule = domain->address_module;
+	net_address_module_info* addressModule = domain->address_module;
 
 	SocketAddress source(addressModule, buffer->source);
 	SocketAddress destination(addressModule, buffer->destination);
@@ -799,7 +797,7 @@ UdpEndpointManager::OpenEndpoint(UdpEndpoint *endpoint)
 {
 	MutexLocker _(fLock);
 
-	UdpDomainSupport *domain = _GetDomain(endpoint->Domain(), true);
+	UdpDomainSupport* domain = _GetDomainSupport(endpoint->Domain(), true);
 	if (domain)
 		domain->Ref();
 	return domain;
@@ -823,10 +821,23 @@ UdpEndpointManager::FreeEndpoint(UdpDomainSupport *domain)
 // #pragma mark -
 
 
-UdpDomainSupport *
-UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
+inline net_domain*
+UdpEndpointManager::_GetDomain(net_buffer* buffer)
 {
-	UdpDomainList::Iterator it = fDomains.GetIterator();
+	if (buffer->interface_address != NULL)
+		return buffer->interface_address->domain;
+
+	return gStackModule->get_domain(buffer->destination->sa_family);
+}
+
+
+UdpDomainSupport*
+UdpEndpointManager::_GetDomainSupport(net_domain* domain, bool create)
+{
+	ASSERT_LOCKED_MUTEX(&fLock);
+
+	if (domain == NULL)
+		return NULL;
 
 	// TODO convert this into a Hashtable or install per-domain
 	//      receiver handlers that forward the requests to the
@@ -834,8 +845,8 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 	//      being constructed UdpDomainSupport could call
 	//      register_domain_receiving_protocol() with the right
 	//      family.
-	while (it.HasNext()) {
-		UdpDomainSupport *domainSupport = it.Next();
+	UdpDomainList::Iterator iterator = fDomains.GetIterator();
+	while (UdpDomainSupport* domainSupport = iterator.Next()) {
 		if (domainSupport->Domain() == domain)
 			return domainSupport;
 	}
@@ -843,8 +854,8 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 	if (!create)
 		return NULL;
 
-	UdpDomainSupport *domainSupport =
-		new (std::nothrow) UdpDomainSupport(domain);
+	UdpDomainSupport* domainSupport
+		= new (std::nothrow) UdpDomainSupport(domain);
 	if (domainSupport == NULL || domainSupport->Init() < B_OK) {
 		delete domainSupport;
 		return NULL;
@@ -855,14 +866,16 @@ UdpEndpointManager::_GetDomain(net_domain *domain, bool create)
 }
 
 
+/*!	Retrieves the UdpDomainSupport object responsible for this buffer, if the
+	domain can be determined. This is only successful if the domain support is
+	already existing, ie. there must already be an endpoint for the domain.
+*/
 UdpDomainSupport*
-UdpEndpointManager::_GetDomain(net_buffer* buffer)
+UdpEndpointManager::_GetDomainSupport(net_buffer* buffer)
 {
-	if (buffer->interface_address == NULL)
-		return NULL;
-
 	MutexLocker _(fLock);
-	return _GetDomain(buffer->interface_address->domain, false);
+
+	return _GetDomainSupport(_GetDomain(buffer), false);
 		// TODO: we don't want to hold to the manager's lock during the
 		// whole RX path, we may not hold an endpoint's lock with the
 		// manager lock held.

@@ -1581,6 +1581,7 @@ ipv4_receive_data(net_buffer* buffer)
 	// lower layers notion of broadcast or multicast have no relevance to us
 	// other than deciding whether to send an ICMP error
 	bool wasMulticast = (buffer->flags & (MSG_BCAST | MSG_MCAST)) != 0;
+	bool notForUs = false;
 	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	sockaddr_in destination;
@@ -1590,29 +1591,33 @@ ipv4_receive_data(net_buffer* buffer)
 		buffer->flags |= MSG_BCAST;
 
 		// Find first interface with a matching family
-		// TODO: support for ethernet broadcasts!
-		// TODO: we might need to send it to all interfaces if it's an ethernet
-		// broadcast as well!
-		sDatalinkModule->is_local_link_address(sDomain, true,
-			buffer->destination, &buffer->interface_address);
+		if (!sDatalinkModule->is_local_link_address(sDomain, true,
+				buffer->destination, &buffer->interface_address))
+			notForUs = wasMulticast;
 	} else if (IN_MULTICAST(ntohl(header.destination))) {
 		buffer->flags |= MSG_MCAST;
-		// TODO: must set buffer->interface_address!
 	} else {
 		uint32 matchedAddressType = 0;
 
 		// test if the packet is really for us
 		if (!sDatalinkModule->is_local_address(sDomain, (sockaddr*)&destination,
-				&buffer->interface_address, &matchedAddressType)) {
-			sDatalinkModule->is_local_link_address(sDomain, true,
-				buffer->destination, &buffer->interface_address);
+				&buffer->interface_address, &matchedAddressType)
+			&& !sDatalinkModule->is_local_link_address(sDomain, true,
+				buffer->destination, &buffer->interface_address)) {
+			notForUs = true;
 		} else {
 			// copy over special address types (MSG_BCAST or MSG_MCAST):
 			buffer->flags |= matchedAddressType;
 		}
 	}
 
-	if (buffer->interface_address == NULL) {
+	// set net_buffer's source/destination address
+	fill_sockaddr_in((struct sockaddr_in*)buffer->source, header.source);
+	memcpy(buffer->destination, &destination, sizeof(sockaddr_in));
+
+	buffer->protocol = header.protocol;
+
+	if (notForUs) {
 		TRACE("  ipv4_receive_data(): packet was not for us %x -> %x",
 			ntohl(header.source), ntohl(header.destination));
 
@@ -1624,12 +1629,6 @@ ipv4_receive_data(net_buffer* buffer)
 
 		return B_ERROR;
 	}
-
-	// set net_buffer's source/destination address
-	fill_sockaddr_in((struct sockaddr_in*)buffer->source, header.source);
-	memcpy(buffer->destination, &destination, sizeof(sockaddr_in));
-
-	buffer->protocol = header.protocol;
 
 	// remove any trailing/padding data
 	status_t status = gBufferModule->trim(buffer, packetLength);
