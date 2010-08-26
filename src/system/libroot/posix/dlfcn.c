@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -107,9 +107,7 @@ dladdr(void *addr, Dl_info *info)
 			while (get_nth_image_symbol(imageInfo.id, symIndex, curSymName,
 					&symNameLength, &symType, &symLocation) == B_OK) {
 				// check if symbol is the nearest until now
-				if (symType == B_SYMBOL_TYPE_TEXT
-					&& symLocation <= addr
-					&& symLocation >= info->dli_saddr) {
+				if (symLocation <= addr && symLocation >= info->dli_saddr) {
 					strlcpy(symName, curSymName, NAME_MAX);
 					info->dli_saddr = symLocation;
 
