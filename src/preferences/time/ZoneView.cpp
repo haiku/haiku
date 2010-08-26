@@ -92,7 +92,8 @@ TimeZoneView::CheckCanRevert()
 
 TimeZoneView::~TimeZoneView()
 {
-	delete fToolTip;
+	if (fToolTip)
+		fToolTip->ReleaseReference();
 }
 
 
