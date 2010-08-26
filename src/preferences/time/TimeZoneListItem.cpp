@@ -27,7 +27,7 @@ static const BString skDefaultString;
 TimeZoneListItem::TimeZoneListItem(const char* text, BCountry* country,
 	BTimeZone* timeZone)
 	:
-	BStringItem(text),
+	BStringItem(text, 0, false),
 	fIcon(NULL),
 	fTimeZone(timeZone)
 {

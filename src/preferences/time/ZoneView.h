@@ -44,8 +44,7 @@ private:
 
 			void				_UpdatePreview();
 			void				_UpdateCurrent();
-			BString				_FormatTime(const BTimeZone& timeZone,
-									bool compensateForLocalOffset = true);
+			BString				_FormatTime(const BTimeZone& timeZone);
 
 			void				_InitView();
 			void				_BuildZoneMenu();
