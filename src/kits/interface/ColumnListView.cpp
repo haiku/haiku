@@ -143,7 +143,7 @@ static const rgb_color kColor[B_COLOR_TOTAL] =
 
 static const int32 kMaxDepth = 1024;
 static const float kLeftMargin = kLatchWidth;
-static const float kRightMargin = kLatchWidth;
+static const float kRightMargin = 8;
 static const float kOutlineLevelIndent = kLatchWidth;
 static const float kColumnResizeAreaWidth = 10.0;
 static const float kRowDragSensitivity = 5.0;
@@ -184,6 +184,8 @@ public:
 
 			void				SetEditMode(bool state)
 									{ fEditMode = state; }
+
+			float				MarginWidth() const;
 
 private:
 			void				GetTitleRect(BColumn* column, BRect* _rect);
@@ -1846,10 +1848,22 @@ BColumnListView::PreferredSize()
 	BSize size = MinSize();
 	size.height += ceilf(be_plain_font->Size()) * 20;
 
+	// return MinSize().width if there are no columns.
 	int32 count = CountColumns();
 	if (count > 0) {
-		// return MinSize().width if there are no columns.
-		size.width = 40.0f;
+		BRect titleRect;
+		BRect outlineRect;
+		BRect vScrollBarRect;
+		BRect hScrollBarRect;
+		_GetChildViewRects(Bounds(), !fHorizontalScrollBar->IsHidden(),
+			titleRect, outlineRect, vScrollBarRect, hScrollBarRect);
+		// Start with the extra width for border and scrollbars etc.
+		size.width = titleRect.left - Bounds().left;
+		size.width += Bounds().right - titleRect.right;
+		// If we want all columns to be visible at their preferred width,
+		// we also need to add the extra margin width that the TitleView
+		// uses to compute its _VirtualWidth() for the horizontal scroll bar.
+		size.width += fTitleView->MarginWidth();
 		for (int32 i = 0; i < count; i++) {
 			BColumn* column = ColumnAt(i);
 			if (column != NULL)
@@ -2243,6 +2257,13 @@ TitleView::SetColumnFlags(column_flags flags)
 }
 
 
+float
+TitleView::MarginWidth() const
+{
+	return MAX(kLeftMargin, fMasterView->LatchWidth()) + kRightMargin;
+}
+
+
 void
 TitleView::ResizeSelectedColumn(BPoint position, bool preferred)
 {
@@ -2502,7 +2523,7 @@ TitleView::DrawTitle(BView* view, BRect rect, BColumn* column, bool depressed)
 float
 TitleView::_VirtualWidth() const
 {
-	float width = 0.0f;
+	float width = MarginWidth();
 
 	int32 count = fColumns->CountItems();
 	for (int32 i = 0; i < count; i++) {
@@ -2510,8 +2531,7 @@ TitleView::_VirtualWidth() const
 		width += column->Width();
 	}
 
-	return width + MAX(kLeftMargin,
-		fMasterView->LatchWidth()) + kRightMargin * 2;
+	return width;
 }
 
 
