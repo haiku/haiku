@@ -107,5 +107,4 @@ uninit_notifications()
 {
 	if (sNotificationModule != NULL)
 		put_module(NET_NOTIFICATIONS_MODULE_NAME);
-
 }
