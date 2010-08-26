@@ -512,15 +512,24 @@ AboutView::AboutView()
 	// GCC version
 	BEntry gccFourHybrid("/boot/system/lib/gcc2/libstdc++.r4.so");
 	BEntry gccTwoHybrid("/boot/system/lib/gcc4/libsupc++.so");
-	if (gccFourHybrid.Exists() || gccTwoHybrid.Exists())
+	bool isHybrid = gccFourHybrid.Exists() || gccTwoHybrid.Exists();
+
+	if (isHybrid) {
 		snprintf(string, sizeof(string), B_TRANSLATE("GCC %d Hybrid"),
 			__GNUC__);
-	else
+	} else
 		snprintf(string, sizeof(string), "GCC %d", __GNUC__);
 
 	BStringView* gccView = new BStringView("gcctext", string);
 	gccView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
+
+#if __GNUC__ == 2
+	if (isHybrid) {
+		// do now show the GCC version if it's the default
+		gccView->Hide();
+	}
+#endif
 
 	// CPU count, type and clock speed
 	char processorLabel[256];
