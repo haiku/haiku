@@ -2323,8 +2323,20 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 		if (error != B_OK) {
 			if (appThread >= 0)
 				kill_thread(appThread);
-			if (!isScript)
+			if (!isScript) {
 				_RemovePreRegApp(appToken);
+
+				if (!wasDocument) {
+					// Remove app hint if it's this one
+					BMimeType appType(signature);
+					entry_ref hintRef;
+
+					if (appType.InitCheck() == B_OK
+						&& appType.GetAppHint(&hintRef) == B_OK
+						&& appRef == hintRef)
+						appType.SetAppHint(NULL);
+				}
+			}
 		}
 	}
 
@@ -2451,9 +2463,12 @@ BRoster::_ResolveApp(const char* inType, entry_ref* ref,
 		char signature[B_MIME_TYPE_LENGTH];
 		if (appFileInfo.SetTo(&appFile) == B_OK
 			&& appFileInfo.GetSignature(signature) == B_OK) {
-			if (!strcasecmp(appMeta.Type(), signature))
-				appMeta.SetAppHint(&appRef);
-			else {
+			if (!strcasecmp(appMeta.Type(), signature)) {
+				// Only set the app hint if there is none yet
+				entry_ref dummyRef;
+				if (appMeta.GetAppHint(&dummyRef) != B_OK)
+					appMeta.SetAppHint(&appRef);
+			} else {
 				appMeta.SetAppHint(NULL);
 				appMeta.SetTo(signature);
 			}
