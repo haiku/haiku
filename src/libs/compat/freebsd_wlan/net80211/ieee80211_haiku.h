@@ -27,8 +27,21 @@
 #ifndef _FBSD_COMPAT_NET80211_IEEE80211_HAIKU_H_
 #define _FBSD_COMPAT_NET80211_IEEE80211_HAIKU_H_
 
+
+#include <stdint.h>
+
+
 #ifdef _KERNEL
 
+#	ifdef __cplusplus
+// Those includes are needed to avoid C/C++ function export clashes
+#		include <new>
+#		include <thread.h>
+extern "C" {
+#	endif
+
+
+#include <sys/kernel.h>
 #include <sys/mutex.h>
 #include <sys/sysctl.h>
 #include <sys/taskqueue.h>
@@ -291,6 +304,10 @@ typedef int ieee80211_ioctl_setfunc(struct ieee80211vap *,
     struct ieee80211req *);
 SET_DECLARE(ieee80211_ioctl_setset, ieee80211_ioctl_setfunc);
 #define	IEEE80211_IOCTL_SET(_name, _set) TEXT_SET(ieee80211_ioctl_setset, _set)
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* _KERNEL */
 
 /*

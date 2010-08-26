@@ -103,7 +103,7 @@ ieee80211_rate2phytype(const struct ieee80211_rate_table *rt, uint8_t rate)
 {
 	uint8_t rix = rt->rateCodeToIndex[rate];
 	KASSERT(rix != (uint8_t)-1, ("rate %d has no info", rate));
-	return rt->info[rix].phy;
+	return (enum ieee80211_phytype)rt->info[rix].phy;
 }
 
 static __inline__ int

@@ -35,12 +35,12 @@
  */
 
 
-#include <SupportDefs.h>
+#include "ieee80211_haiku.h"
 
+extern "C" {
 #include <sys/kernel.h>
 #include <sys/mbuf.h>
 #include <sys/bus.h>
-#include <sys/haiku-module.h>
 #include <sys/sockio.h>
 
 #include <net/if.h>
@@ -48,10 +48,16 @@
 #include <net/if_types.h>
 #include <net/if_var.h>
 
-#include <ieee80211_var.h>
+#include "ieee80211_var.h"
+};
+
+#include <SupportDefs.h>
+
+#include <util/KMessage.h>
 
 #include <ether_driver.h>
 #include <bosii_driver.h>
+#include <net_notifications.h>
 
 #include <shared.h>
 
@@ -62,21 +68,42 @@ do {														\
 } while (/* CONSTCOND */ 0)
 
 
+static net_notifications_module_info* sNotificationModule;
+
+
+static struct ifnet*
+get_ifnet(device_t device, int& i)
+{
+	int unit = device_get_unit(device);
+
+	for (i = 0; i < MAX_DEVICES; i++) {
+		if (gDevices[i] != NULL && gDevices[i]->if_dunit == unit)
+			return gDevices[i];
+	}
+
+	return NULL;
+}
+
+
 status_t
-init_wlan_stack()
+init_wlan_stack(void)
 {
 	ieee80211_phy_init();
 	ieee80211_auth_setup();
 	ieee80211_ht_init();
+
+	get_module(NET_NOTIFICATIONS_MODULE_NAME,
+		(module_info**)&sNotificationModule);
 
 	return B_OK;
 }
 
 
 void
-uninit_wlan_stack()
+uninit_wlan_stack(void)
 {
-
+	if (sNotificationModule != NULL)
+		put_module(NET_NOTIFICATIONS_MODULE_NAME);
 }
 
 
@@ -84,21 +111,11 @@ status_t
 start_wlan(device_t device)
 {
 	int i;
-	int unit = device_get_unit(device);
-	struct ifnet* ifp;
-	struct ieee80211com* ic;
-	struct ieee80211vap* vap;
+	struct ifnet* ifp = get_ifnet(device, i);
+	if (ifp == NULL)
+		return B_BAD_VALUE;
 
-	for (i = 0; i < MAX_DEVICES; i++) {
-		if (gDevices[i] != NULL && gDevices[i]->if_dunit == unit)
-			break;
-	}
-
-	if (i == MAX_DEVICES)
-		return B_ERROR;
-
-	ifp = gDevices[i];
-
+// TODO: review this and find a cleaner solution!
 	// This ensures that the cloned device gets
 	// the same index assigned as the base device
 	// Resulting in the same device name
@@ -106,11 +123,10 @@ start_wlan(device_t device)
 	//       /dev/net/atheros/1
 	gDevices[i] = NULL;
 
-	ic = ifp->if_l2com;
+	struct ieee80211com* ic = (ieee80211com*)ifp->if_l2com;
 
-	vap = ic->ic_vap_create(ic,
-		"wlan",
-		unit,
+	struct ieee80211vap* vap = ic->ic_vap_create(ic, "wlan",
+		device_get_unit(device),
 		IEEE80211_M_STA,		// mode
 		0,						// flags
 		NULL,					// BSSID
@@ -140,30 +156,21 @@ status_t
 stop_wlan(device_t device)
 {
 	int i;
-	int unit = device_get_unit(device);
-	struct ifnet* ifp;
-	struct ieee80211com* ic;
-	struct ieee80211vap* vap;
+	struct ifnet* ifp = get_ifnet(device, i);
+	if (ifp == NULL)
+		return B_BAD_VALUE;
 
-	for (i = 0; i < MAX_DEVICES; i++) {
-		if (gDevices[i] != NULL && gDevices[i]->if_dunit == unit)
-			break;
+	if (ifp->if_type == IFT_IEEE80211) {
+		// This happens when there was an error in starting the wlan before,
+		// resulting in never creating a clone device
+		return B_OK;
 	}
-
-	if (i == MAX_DEVICES)
-		return B_ERROR;
-
-	ifp = gDevices[i];
-	if (ifp->if_type == IFT_IEEE80211)
-			// This happens when there was an error
-			// in starting the wlan before, resulting
-			// in never creating a clone device
-			return B_OK;
 
 	delete_sem(ifp->scan_done_sem);
 
-	vap = ifp->if_softc;
-	ic = vap->iv_ic;
+	struct ieee80211vap* vap = (ieee80211vap*)ifp->if_softc;
+	struct ieee80211com* ic = vap->iv_ic;
+
 	ic->ic_vap_delete(vap);
 
 	// ic_vap_delete freed gDevices[i]
@@ -179,7 +186,7 @@ stop_wlan(device_t device)
 status_t
 wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 {
-	struct ifnet* ifp = cookie;
+	struct ifnet* ifp = (struct ifnet*)cookie;
 
 	switch (op) {
 		case BOSII_DEVICE:
@@ -237,7 +244,7 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 
 			// Tell the user space how much data was copied
 			networkRequest->mtu = request.i_len;
-			if (user_memcpy(arg + offsetof(struct ifreq, ifr_route.mtu),
+			if (user_memcpy(&((struct ifreq*)arg)->ifr_route.mtu,
 				&networkRequest->mtu, sizeof(networkRequest->mtu)) < B_OK)
 				return B_BAD_ADDRESS;
 
@@ -256,19 +263,17 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 			if (length < sizeof(struct ifreq))
 				return B_BAD_VALUE;
 
-			if (user_memcpy(&ifRequest, arg, sizeof(ifRequest)) < B_OK)
+			if (user_memcpy(&ifRequest, arg, sizeof(ifRequest)) != B_OK
+				|| user_memcpy(&network, networkRequest->source,
+						sizeof(ieee80211req_scan_result)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			if (user_memcpy(&network, networkRequest->source,
-				sizeof(network)) < B_OK)
-				return B_BAD_ADDRESS;
-
-			memset(&request, 0, sizeof(request));
+			memset(&request, 0, sizeof(ieee80211req));
 
 			request.i_type = IEEE80211_IOC_SSID;
 			request.i_val = 0;
 			request.i_len = network.isr_ssid_len;
-			request.i_data = ((void*) networkRequest->source)
+			request.i_data = (uint8*)networkRequest->source
 				+ network.isr_ie_off;
 			if (ifp->if_ioctl(ifp, SIOCS80211, (caddr_t)&request) < B_OK)
 				return B_ERROR;
@@ -312,8 +317,8 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 
 			// Tell the user space how much data was copied
 			networkRequest->mtu = request.i_len;
-			if (user_memcpy(arg + offsetof(struct ifreq, ifr_route.mtu),
-				&networkRequest->mtu, sizeof(networkRequest->mtu)) < B_OK)
+			if (user_memcpy(&((struct ifreq*)arg)->ifr_route.mtu,
+					&networkRequest->mtu, sizeof(networkRequest->mtu)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			return B_OK;
@@ -321,9 +326,25 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 
 		case SIOCG80211:
 		case SIOCS80211:
+		{
 			// Allowing FreeBSD based WLAN ioctls to pass, as those will become
 			// the future Haiku WLAN ioctls anyway.
-			return ifp->if_ioctl(ifp, op, (caddr_t)arg);
+
+			// FreeBSD drivers assume that the request structure has already
+			// been copied into kernel space
+			struct ieee80211req request;
+			if (user_memcpy(&request, arg, sizeof(struct ieee80211req)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			status_t status = ifp->if_ioctl(ifp, op, (caddr_t)&request);
+			if (status != B_OK)
+				return status;
+
+			if (op == SIOCG80211 && user_memcpy(arg, &request,
+					sizeof(struct ieee80211req)) != B_OK)
+				return B_BAD_ADDRESS;
+			return B_OK;
+		}
 	}
 
 	return B_BAD_VALUE;
@@ -333,7 +354,7 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 status_t
 wlan_close(void* cookie)
 {
-	struct ifnet* ifp = cookie;
+	struct ifnet* ifp = (struct ifnet*)cookie;
 
 	ifp->if_flags &= ~IFF_UP;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
@@ -345,7 +366,7 @@ wlan_close(void* cookie)
 status_t
 wlan_if_l2com_alloc(void* data)
 {
-	struct ifnet* ifp = data;
+	struct ifnet* ifp = (struct ifnet*)data;
 
 	ifp->if_l2com = _kernel_malloc(sizeof(struct ieee80211com), M_ZERO);
 	((struct ieee80211com*)(ifp->if_l2com))->ic_ifp = ifp;
@@ -358,7 +379,7 @@ wlan_if_l2com_alloc(void* data)
 void
 get_random_bytes(void* p, size_t n)
 {
-	uint8_t* dp = p;
+	uint8_t* dp = (uint8_t*)p;
 
 	while (n > 0) {
 		uint32_t v = arc4random();
@@ -388,7 +409,7 @@ ieee80211_getmgtframe(uint8_t** frm, int headroom, int pktlen)
 	}
 	if (m != NULL) {
 		m->m_data += headroom;
-		*frm = m->m_data;
+		*frm = (uint8_t*)m->m_data;
 	}
 	return m;
 }
@@ -546,6 +567,17 @@ ieee80211_notify_node_join(struct ieee80211_node* ni, int newassoc)
 
 	if (ni == vap->iv_bss)
 		if_link_state_change(ifp, LINK_STATE_UP);
+
+	if (sNotificationModule != NULL) {
+		char messageBuffer[512];
+		KMessage message;
+		message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
+		message.AddInt32("opcode", B_NETWORK_WLAN_JOINED);
+		message.AddString("interface", ifp->if_xname);
+		// TODO: add data about the node
+
+		sNotificationModule->send_notification(&message);
+	}
 }
 
 
@@ -557,6 +589,17 @@ ieee80211_notify_node_leave(struct ieee80211_node* ni)
 
 	if (ni == vap->iv_bss)
 		if_link_state_change(ifp, LINK_STATE_DOWN);
+
+	if (sNotificationModule != NULL) {
+		char messageBuffer[512];
+		KMessage message;
+		message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
+		message.AddInt32("opcode", B_NETWORK_WLAN_LEFT);
+		message.AddString("interface", ifp->if_xname);
+		// TODO: add data about the node
+
+		sNotificationModule->send_notification(&message);
+	}
 }
 
 
@@ -565,6 +608,16 @@ ieee80211_notify_scan_done(struct ieee80211vap* vap)
 {
 	release_sem_etc(vap->iv_ifp->scan_done_sem, 1,
 		B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
+
+	if (sNotificationModule != NULL) {
+		char messageBuffer[512];
+		KMessage message;
+		message.SetTo(messageBuffer, sizeof(messageBuffer), B_NETWORK_MONITOR);
+		message.AddInt32("opcode", B_NETWORK_WLAN_SCANNED);
+		message.AddString("interface", vap->iv_ifp->if_xname);
+
+		sNotificationModule->send_notification(&message);
+	}
 }
 
 

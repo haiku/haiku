@@ -35,15 +35,21 @@ struct net_notifications_control {
 // TODO: the following part of this header should end up in a public header
 // some day!
 
-#define B_NETWORK_INTERFACE_ADDED		0x01
-#define B_NETWORK_INTERFACE_REMOVED		0x02
-#define B_NETWORK_INTERFACE_CHANGED		0x03
-#define B_NETWORK_DEVICE_LINK_CHANGED	0x10
+#define B_NETWORK_INTERFACE_ADDED				0x0001
+#define B_NETWORK_INTERFACE_REMOVED				0x0002
+#define B_NETWORK_INTERFACE_CHANGED				0x0003
+#define B_NETWORK_DEVICE_LINK_CHANGED			0x0010
+#define B_NETWORK_WLAN_JOINED					0x0100
+#define B_NETWORK_WLAN_LEFT						0x0200
+#define B_NETWORK_WLAN_SCANNED					0x0300
+#define B_NETWORK_WLAN_MESSAGE_INTEGRITY_FAILED	0x0400
+
 // TODO: add routes, stack unloaded/loaded, ... events
 
 enum {
 	B_WATCH_NETWORK_INTERFACE_CHANGES	= 0x000f,
-	B_WATCH_NETWORK_LINK_CHANGES	 	= 0x00f0
+	B_WATCH_NETWORK_LINK_CHANGES	 	= 0x00f0,
+	B_WATCH_NETWORK_WLAN_CHANGES		= 0x0f00
 };
 
 #define B_NETWORK_MONITOR				'_NTN'
