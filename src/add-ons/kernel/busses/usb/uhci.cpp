@@ -1764,7 +1764,7 @@ UHCI::Interrupt()
 	uint16 status = ReadReg16(UHCI_USBSTS);
 	if ((status & fEnabledInterrupts) == 0) {
 		if (status != 0) {
-			TRACE("discarding not enabled interrupts 0x%08lx\n", status);
+			TRACE("discarding not enabled interrupts 0x%08x\n", status);
 			WriteReg16(UHCI_USBSTS, status);
 		}
 
