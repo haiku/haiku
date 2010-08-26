@@ -4042,42 +4042,49 @@ OutlineView::RemoveRow(BRow* row)
 
 	BRow* parentRow;
 	bool parentIsVisible;
-	float subTreeHeight = row->Height();
-	if (FindParent(row, &parentRow, &parentIsVisible)) {
-		// adjust height
-		if (parentIsVisible && (parentRow == 0 || parentRow->fIsExpanded)) {
-			if (row->fIsExpanded) {
-				for (RecursiveOutlineIterator iterator(row->fChildList);
-					iterator.CurrentRow(); iterator.GoToNext())
-					subTreeHeight += iterator.CurrentRow()->Height();
-			}
+	FindParent(row, &parentRow, &parentIsVisible);
+		// NOTE: This could be a root row without a parent, in which case
+		// it is always visible, though.
+
+	// Adjust height for the visible sub-tree that is going to be removed.
+	float subTreeHeight = 0.0f;
+	if (parentIsVisible && (parentRow == NULL || parentRow->fIsExpanded)) {
+		// The row itself is visible at least.
+		subTreeHeight = row->Height() + 1;
+		if (row->fIsExpanded) {
+			// Adjust for the height of visible sub-items as well.
+			// (By default, the iterator follows open branches only.)
+			for (RecursiveOutlineIterator iterator(row->fChildList);
+				iterator.CurrentRow(); iterator.GoToNext())
+				subTreeHeight += iterator.CurrentRow()->Height() + 1;
+		}
+		BRect invalid;
+		if (FindRect(row, &invalid)) {
+			invalid.bottom = Bounds().bottom;
+			if (invalid.IsValid())
+				Invalidate(invalid);
 		}
 	}
-	if (parentRow != NULL) {
-		if (parentRow->fIsExpanded)
-			fItemsHeight -= subTreeHeight + 1;
-	} else {
-		fItemsHeight -= subTreeHeight + 1;
-	}
+
+	fItemsHeight -= subTreeHeight;
+
 	FixScrollBar(false);
-	if (parentRow)
+	if (parentRow != NULL) {
 		parentRow->fChildList->RemoveItem(row);
-	else
+		if (parentRow->fChildList->CountItems() == 0) {
+			delete parentRow->fChildList;
+			parentRow->fChildList = 0;
+			// It was the last child row of the parent, which also means the
+			// latch disappears.
+			BRect parentRowRect;
+			if (parentIsVisible && FindRect(parentRow, &parentRowRect))
+				Invalidate(parentRowRect);
+		}
+	} else
 		fRows.RemoveItem(row);
 
-	if (parentRow != 0 && parentRow->fChildList->CountItems() == 0) {
-		delete parentRow->fChildList;
-		parentRow->fChildList = 0;
-		if (parentIsVisible)
-			Invalidate();	// xxx crude way of redrawing latch
-	}
-
-	if (parentIsVisible && (parentRow == 0 || parentRow->fIsExpanded))
-		Invalidate();	// xxx make me smarter.
-
-
 	// Adjust focus row if necessary.
-	if (fFocusRow && FindRect(fFocusRow, &fFocusRowRect) == false) {
+	if (fFocusRow && !FindRect(fFocusRow, &fFocusRowRect)) {
 		// focus row is in a subtree that is gone, move it up to the parent.
 		fFocusRow = parentRow;
 		if (fFocusRow)
