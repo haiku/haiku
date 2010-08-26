@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2010, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold (ingo_weinhold@gmx.de)
  *		Axel Dörfler, axeld@pinc-software.de
  */
+
 
 /*!	BRoster class lets you launch apps and keeps track of apps
 	that are running.
