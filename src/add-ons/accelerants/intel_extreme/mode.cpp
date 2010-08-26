@@ -699,8 +699,8 @@ if (first) {
 			TRACE(("intel_extreme : hardware mode will actually be %dx%d\n",
 				hardwareTarget.virtual_width, hardwareTarget.virtual_height));
 			if ((hardwareTarget.virtual_width <= target.virtual_width
-				&& hardwareTarget.virtual_height <= target.virtual_height
-				&& hardwareTarget.space <= target.space)
+					&& hardwareTarget.virtual_height <= target.virtual_height
+					&& hardwareTarget.space <= target.space)
 				|| intel_propose_display_mode(&hardwareTarget, mode, mode)) {
 				hardwareTarget = target;
 			} else
@@ -821,15 +821,15 @@ if (first) {
 				+ (hardwareTarget.timing.h_total
 				- target.timing.h_display) / 2;
 
-			write32(INTEL_DISPLAY_B_HTOTAL, (
-				(uint32)(hardwareTarget.timing.h_total - 1) << 16)
+			write32(INTEL_DISPLAY_B_HTOTAL,
+				((uint32)(hardwareTarget.timing.h_total - 1) << 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HBLANK, (
-				(uint32)(hardwareTarget.timing.h_total - borderWidth / 2 - 1)
+			write32(INTEL_DISPLAY_B_HBLANK,
+				((uint32)(hardwareTarget.timing.h_total - borderWidth / 2 - 1)
 					<< 16)
 				| ((uint32)target.timing.h_display + borderWidth / 2 - 1));
-			write32(INTEL_DISPLAY_B_HSYNC, (
-				(uint32)(syncCenter + syncWidth / 2 - 1) << 16)
+			write32(INTEL_DISPLAY_B_HSYNC,
+				((uint32)(syncCenter + syncWidth / 2 - 1) << 16)
 				| ((uint32)syncCenter - syncWidth / 2 - 1));
 
 			uint32 borderHeight = hardwareTarget.timing.v_display
@@ -842,11 +842,11 @@ if (first) {
 				+ (hardwareTarget.timing.v_total
 				- target.timing.v_display) / 2;
 
-			write32(INTEL_DISPLAY_B_VTOTAL, (
-				(uint32)(hardwareTarget.timing.v_total - 1) << 16)
+			write32(INTEL_DISPLAY_B_VTOTAL,
+				((uint32)(hardwareTarget.timing.v_total - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VBLANK, (
-				(uint32)(hardwareTarget.timing.v_total - borderHeight / 2 - 1)
+			write32(INTEL_DISPLAY_B_VBLANK,
+				((uint32)(hardwareTarget.timing.v_total - borderHeight / 2 - 1)
 					<< 16)
 				| ((uint32)target.timing.v_display
 					+ borderHeight / 2 - 1));
@@ -859,37 +859,39 @@ if (first) {
 			// sync)
 			// write32(0x61020, 0x00FF0000);
 		} else {
-			write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(target.timing.h_total - 1)
-					<< 16)
+			write32(INTEL_DISPLAY_B_HTOTAL,
+				((uint32)(target.timing.h_total - 1) << 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(target.timing.h_total - 1)
-					<< 16)
+			write32(INTEL_DISPLAY_B_HBLANK,
+				((uint32)(target.timing.h_total - 1) << 16)
 				| ((uint32)target.timing.h_display - 1));
 			write32(INTEL_DISPLAY_B_HSYNC, (
 				(uint32)(target.timing.h_sync_end - 1) << 16)
 				| ((uint32)target.timing.h_sync_start - 1));
 
-			write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(target.timing.v_total - 1)
-					<< 16)
+			write32(INTEL_DISPLAY_B_VTOTAL,
+				((uint32)(target.timing.v_total - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(target.timing.v_total - 1)
-					<< 16)
+			write32(INTEL_DISPLAY_B_VBLANK,
+				((uint32)(target.timing.v_total - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
 			write32(INTEL_DISPLAY_B_VSYNC, (
 				(uint32)(target.timing.v_sync_end - 1) << 16)
 				| ((uint32)target.timing.v_sync_start - 1));
 		}
 
-		write32(INTEL_DISPLAY_B_IMAGE_SIZE, (
-			(uint32)(target.timing.h_display - 1) << 16)
+		write32(INTEL_DISPLAY_B_IMAGE_SIZE,
+			((uint32)(target.timing.h_display - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
 
 		write32(INTEL_DISPLAY_B_POS, 0);
-		write32(INTEL_DISPLAY_B_PIPE_SIZE, ((uint32)(target.timing.v_display - 1) << 16)
+		write32(INTEL_DISPLAY_B_PIPE_SIZE,
+			((uint32)(target.timing.v_display - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
 
 		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
-			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
+				& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
+			| colorMode);
 
 		write32(INTEL_DISPLAY_B_PIPE_CONTROL,
 			read32(INTEL_DISPLAY_B_PIPE_CONTROL) | DISPLAY_PIPE_ENABLED);
@@ -901,9 +903,12 @@ if (first) {
 		compute_pll_divisors(target, divisors, false);
 
 		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
-			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
-			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
+			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+				& DISPLAY_PLL_N_DIVISOR_MASK)
+			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
+				& DISPLAY_PLL_M1_DIVISOR_MASK)
+			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+				& DISPLAY_PLL_M2_DIVISOR_MASK));
 
 		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
 		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
@@ -926,8 +931,8 @@ if (first) {
 			pll |= DISPLAY_PLL_2X_CLOCK;
 
 			if (divisors.post1 > 2) {
-				pll |= (((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-					& DISPLAY_PLL_POST1_DIVISOR_MASK);
+				pll |= ((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+					& DISPLAY_PLL_POST1_DIVISOR_MASK;
 			} else
 				pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 		}
@@ -940,27 +945,38 @@ if (first) {
 		spin(150);
 
 		// update timing parameters
-		write32(INTEL_DISPLAY_A_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_HTOTAL,
+			((uint32)(target.timing.h_total - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_A_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_HBLANK,
+			((uint32)(target.timing.h_total - 1) << 16)
 			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_A_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
+		write32(INTEL_DISPLAY_A_HSYNC,
+			((uint32)(target.timing.h_sync_end - 1) << 16)
 			| ((uint32)target.timing.h_sync_start - 1));
 
-		write32(INTEL_DISPLAY_A_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_VTOTAL,
+			((uint32)(target.timing.v_total - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_A_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
+		write32(INTEL_DISPLAY_A_VBLANK,
+			((uint32)(target.timing.v_total - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_A_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
+		write32(INTEL_DISPLAY_A_VSYNC,
+			((uint32)(target.timing.v_sync_end - 1) << 16)
 			| ((uint32)target.timing.v_sync_start - 1));
 
-		write32(INTEL_DISPLAY_A_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+		write32(INTEL_DISPLAY_A_IMAGE_SIZE,
+			((uint32)(target.timing.h_display - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
 
-		write32(INTEL_DISPLAY_A_ANALOG_PORT, (read32(INTEL_DISPLAY_A_ANALOG_PORT)
-			& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
-			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
-			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
+		write32(INTEL_DISPLAY_A_ANALOG_PORT,
+			(read32(INTEL_DISPLAY_A_ANALOG_PORT)
+				& ~(DISPLAY_MONITOR_POLARITY_MASK
+					| DISPLAY_MONITOR_VGA_POLARITY))
+			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0
+				? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
+			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0
+				? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
 
 		// TODO: verify the two comments below: the X driver doesn't seem to
 		//		care about both of them!
@@ -969,20 +985,24 @@ if (first) {
 		// that the second head always must adopt the color space of the first
 		// head.
 		write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
-			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
+				& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
+			| colorMode);
 
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-			write32(INTEL_DISPLAY_B_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+		if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
+			write32(INTEL_DISPLAY_B_IMAGE_SIZE,
+				((uint32)(target.timing.h_display - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
 
 			write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
-				& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
+					& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
+				| colorMode);
 		}
 	}
 
 	set_display_power_mode(sharedInfo.dpms_mode);
 
-	// changing bytes per row seems to be ignored if the plane/pipe is turned off
+	// Changing bytes per row seems to be ignored if the plane/pipe is turned
+	// off
 
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
 		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
