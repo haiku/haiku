@@ -605,16 +605,17 @@ intel_set_display_mode(display_mode *mode)
 		return B_BAD_VALUE;
 
 	display_mode target = *mode;
+
+	// TODO: it may be acceptable to continue when using panel fitting or
+	// centering, since the data from propose_display_mode will not actually be
+	// used as is in this case.
 	if (intel_propose_display_mode(&target, mode, mode))
 		return B_BAD_VALUE;
-		// TODO : it may be acceptable to continue when using panel fitting,
-		// since the data from propose_display_mode will not actually get any
-		// use
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
 
-	// TODO : do not go further if the mode is identical to the current one.
+	// TODO: do not go further if the mode is identical to the current one.
 	// This would avoid the screen being off when switching workspaces when they
 	// have the same resolution.
 
@@ -673,42 +674,45 @@ if (first) {
 	read32(INTEL_VGA_DISPLAY_CONTROL);
 
 	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
-		// For LVDS panels, we actuallyalways set the native mode in hardware
+		// For LVDS panels, we actually always set the native mode in hardware
 		// Then we use the panel fitter to scale the picture to that.
-		display_mode hardware_target;
-		bool needs_scaling = false;
+		display_mode hardwareTarget;
+		bool needsScaling = false;
 
+		// Try to get the panel preferred screen mode from EDID info
 		if (gInfo->has_edid) {
-			hardware_target.space = target.space;
-			hardware_target.virtual_width
+			hardwareTarget.space = target.space;
+			hardwareTarget.virtual_width
 				= gInfo->edid_info.std_timing[0].h_size;
-			hardware_target.virtual_height
+			hardwareTarget.virtual_height
 				= gInfo->edid_info.std_timing[0].v_size;
-			// TODO : use the info from EDID 1.2
-			/* Each detailed_monitor has a type, find the first one which is
-			* actually a detailed_timing
-			hardware_target.virtual_width = gInfo->edid_info
-				.detailed_monitor[0].data.detailed_timing.h_visible;
-			hardware_target.virtual_height = gInfo->edid_info
-				.detailed_monitor[0].data.detailed_timing.v_visible;
-			*/
+			for (int i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; i++) {
+				if (gInfo->edid_info.detailed_monitor[i].monitor_desc_type
+						== EDID1_IS_DETAILED_TIMING) {
+					hardwareTarget.virtual_width = gInfo->edid_info
+						.detailed_monitor[i].data.detailed_timing.h_active;
+					hardwareTarget.virtual_height = gInfo->edid_info
+						.detailed_monitor[i].data.detailed_timing.v_active;
+					break;
+				}
+			}
 			TRACE(("intel_extreme : hardware mode will actually be %dx%d\n",
-				hardware_target.virtual_width, hardware_target.virtual_height));
-			if ((hardware_target.virtual_width <= target.virtual_width
-				&& hardware_target.virtual_height <= target.virtual_height
-				&& hardware_target.space <= target.space)
-				|| intel_propose_display_mode(&hardware_target, mode, mode)) {
-				hardware_target = target;
+				hardwareTarget.virtual_width, hardwareTarget.virtual_height));
+			if ((hardwareTarget.virtual_width <= target.virtual_width
+				&& hardwareTarget.virtual_height <= target.virtual_height
+				&& hardwareTarget.space <= target.space)
+				|| intel_propose_display_mode(&hardwareTarget, mode, mode)) {
+				hardwareTarget = target;
 			} else
-				needs_scaling = true;
+				needsScaling = true;
 		} else {
-			// we don't have EDID data, try to set the requested mode directly
-			hardware_target = target;
+			// We don't have EDID data, try to set the requested mode directly
+			hardwareTarget = target;
 		}
 
 		pll_divisors divisors;
-		if (needs_scaling)
-			compute_pll_divisors(hardware_target, divisors, true);
+		if (needsScaling)
+			compute_pll_divisors(hardwareTarget, divisors, true);
 		else
 			compute_pll_divisors(target, divisors, true);
 
@@ -718,7 +722,7 @@ if (first) {
 				// DPLL mode LVDS for i915+
 		}
 
-		// compute bitmask from p1 value
+		// Compute bitmask from p1 value
 		dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
 		switch (divisors.post2) {
 			case 5:
@@ -729,6 +733,8 @@ if (first) {
 
 		// Disable panel fitting, but enable 8 to 6-bit dithering
 		write32(INTEL_PANEL_FIT_CONTROL, 0x4);
+			// TODO: do not do this if the connected panel is 24-bit
+			// (I don't know how to detect that)
 
 		if ((dpll & DISPLAY_PLL_ENABLED) != 0) {
 			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
@@ -746,9 +752,9 @@ if (first) {
 		uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT)
 			| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
 
-		// TODO : do not do this if the connected panel is 24-bit
-		// (I don't know how to detect that)
 		lvds |= LVDS_18BIT_DITHER;
+			// TODO: do not do this if the connected panel is 24-bit
+			// (I don't know how to detect that)
 
 		float referenceClock = gInfo->shared_info->pll_info.reference_frequency
 			/ 1000.0f;
@@ -781,11 +787,11 @@ if (first) {
 			float adjusted = ((referenceClock * divisors.m) / divisors.n)
 				/ divisors.post;
 			uint32 pixelMultiply;
-			if (needs_scaling) {
-		   		pixelMultiply = uint32(adjusted
-					/ (hardware_target.timing.pixel_clock / 1000.0f));
+			if (needsScaling) {
+				pixelMultiply = uint32(adjusted
+					/ (hardwareTarget.timing.pixel_clock / 1000.0f));
 			} else {
-		   		pixelMultiply = uint32(adjusted
+				pixelMultiply = uint32(adjusted
 					/ (target.timing.pixel_clock / 1000.0f));
 			}
 
@@ -798,39 +804,84 @@ if (first) {
 		spin(150);
 
 		// update timing parameters
-		// TODO : when harware_target != target, shift hsync and vsync to center
-		// the display area on the panel
-		if (needs_scaling) {
-			write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(hardware_target.timing.h_total - 1) << 16)
-				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(hardware_target.timing.h_total - 1) << 16)
-				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HSYNC, ((uint32)(hardware_target.timing.h_sync_end - 1) << 16)
-				| ((uint32)hardware_target.timing.h_sync_start - 1));
+		if (needsScaling) {
+			// TODO: Alternatively, it should be possible to use the panel
+			// fitter and scale the picture.
 
-			write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(hardware_target.timing.v_total - 1) << 16)
+			// TODO: Perform some sanity check, for example if the target is
+			// wider than the hardware mode we end up with negative borders and
+			// broken timings
+			uint32 borderWidth = hardwareTarget.timing.h_display
+				- target.timing.h_display;
+
+			uint32 syncWidth = hardwareTarget.timing.h_sync_end
+				- hardwareTarget.timing.h_sync_start;
+
+			uint32 syncCenter = target.timing.h_display
+				+ (hardwareTarget.timing.h_total
+				- target.timing.h_display) / 2;
+
+			write32(INTEL_DISPLAY_B_HTOTAL, (
+				(uint32)(hardwareTarget.timing.h_total - 1) << 16)
+				| ((uint32)target.timing.h_display - 1));
+			write32(INTEL_DISPLAY_B_HBLANK, (
+				(uint32)(hardwareTarget.timing.h_total - borderWidth / 2 - 1)
+					<< 16)
+				| ((uint32)target.timing.h_display + borderWidth / 2 - 1));
+			write32(INTEL_DISPLAY_B_HSYNC, (
+				(uint32)(syncCenter + syncWidth / 2 - 1) << 16)
+				| ((uint32)syncCenter - syncWidth / 2 - 1));
+
+			uint32 borderHeight = hardwareTarget.timing.v_display
+				- target.timing.v_display;
+
+			uint32 syncHeight = hardwareTarget.timing.v_sync_end
+				- hardwareTarget.timing.v_sync_start;
+
+			syncCenter = target.timing.v_display
+				+ (hardwareTarget.timing.v_total
+				- target.timing.v_display) / 2;
+
+			write32(INTEL_DISPLAY_B_VTOTAL, (
+				(uint32)(hardwareTarget.timing.v_total - 1) << 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(hardware_target.timing.v_total - 1) << 16)
-				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(hardware_target.timing.v_sync_end - 1) << 16)
-				| ((uint32)hardware_target.timing.v_sync_start - 1));
+			write32(INTEL_DISPLAY_B_VBLANK, (
+				(uint32)(hardwareTarget.timing.v_total - borderHeight / 2 - 1)
+					<< 16)
+				| ((uint32)target.timing.v_display
+					+ borderHeight / 2 - 1));
+			write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(syncCenter
+					+ syncHeight / 2 - 1) << 16)
+				| ((uint32)syncCenter - syncHeight / 2 - 1));
+
+			// This is useful for debugging: it sets the border to red, so you
+			// can see what is border and what is porch (black area around the
+			// sync)
+			// write32(0x61020, 0x00FF0000);
 		} else {
-			write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
+			write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(target.timing.h_total - 1)
+					<< 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
+			write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(target.timing.h_total - 1)
+					<< 16)
 				| ((uint32)target.timing.h_display - 1));
-			write32(INTEL_DISPLAY_B_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
+			write32(INTEL_DISPLAY_B_HSYNC, (
+				(uint32)(target.timing.h_sync_end - 1) << 16)
 				| ((uint32)target.timing.h_sync_start - 1));
 
-			write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
+			write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(target.timing.v_total - 1)
+					<< 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
+			write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(target.timing.v_total - 1)
+					<< 16)
 				| ((uint32)target.timing.v_display - 1));
-			write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
+			write32(INTEL_DISPLAY_B_VSYNC, (
+				(uint32)(target.timing.v_sync_end - 1) << 16)
 				| ((uint32)target.timing.v_sync_start - 1));
 		}
 
-		write32(INTEL_DISPLAY_B_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+		write32(INTEL_DISPLAY_B_IMAGE_SIZE, (
+			(uint32)(target.timing.h_display - 1) << 16)
 			| ((uint32)target.timing.v_display - 1));
 
 		write32(INTEL_DISPLAY_B_POS, 0);
@@ -847,7 +898,7 @@ if (first) {
 
 	if ((gInfo->head_mode & HEAD_MODE_A_ANALOG) != 0) {
 		pll_divisors divisors;
-		compute_pll_divisors(target, divisors,false);
+		compute_pll_divisors(target, divisors, false);
 
 		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
 			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
