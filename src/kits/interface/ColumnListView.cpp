@@ -4053,7 +4053,7 @@ OutlineView::RemoveRow(BRow* row)
 			}
 		}
 	}
-	if (parentRow) {
+	if (parentRow != NULL) {
 		if (parentRow->fIsExpanded)
 			fItemsHeight -= subTreeHeight + 1;
 	} else {
@@ -4688,24 +4688,25 @@ OutlineView::SelectRange(BRow* start, BRow* end)
 
 
 bool
-OutlineView::FindParent(BRow* row, BRow** outParent, bool* out_parentIsVisible)
+OutlineView::FindParent(BRow* row, BRow** outParent, bool* outParentIsVisible)
 {
 	bool result = false;
-	if (row && outParent) {
+	if (row != NULL && outParent != NULL) {
 		*outParent = row->fParent;
 
-		// Walk up the parent chain to determine if this row is visible
-		bool isVisible = true;
-		for (BRow* currentRow = row->fParent; currentRow; currentRow = currentRow->fParent) {
-			if (!currentRow->fIsExpanded) {
-				isVisible = false;
-				break;
+		if (outParentIsVisible != NULL) {
+			// Walk up the parent chain to determine if this row is visible
+			*outParentIsVisible = true;
+			for (BRow* currentRow = row->fParent; currentRow != NULL;
+				currentRow = currentRow->fParent) {
+				if (!currentRow->fIsExpanded) {
+					*outParentIsVisible = false;
+					break;
+				}
 			}
 		}
 
-		if (out_parentIsVisible)
-			*out_parentIsVisible = isVisible;
-		result = (NULL != *outParent);
+		result = *outParent != NULL;
 	}
 
 	return result;
