@@ -164,7 +164,8 @@ BLocale::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 
 
 status_t
-BLocale::FormatDate(BString *string, time_t time, bool longFormat)
+BLocale::FormatDate(BString *string, time_t time, bool longFormat,
+	const BTimeZone* timeZone)
 {
 	string->Truncate(0);
 		// We make the string empty, this way even in cases where ICU fail we at
@@ -174,11 +175,18 @@ BLocale::FormatDate(BString *string, time_t time, bool longFormat)
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
+	if (timeZone != NULL) {
+		ObjectDeleter<TimeZone> icuTimeZone
+			= TimeZone::createTimeZone(timeZone->ID().String());
+		if (icuTimeZone.Get() == NULL)
+			return B_NO_MEMORY;
+		dateFormatter->setTimeZone(*icuTimeZone.Get());
+	}
+
 	UnicodeString ICUString;
 	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
 
 	BStringByteSink stringConverter(string);
-
 	ICUString.toUTF8(stringConverter);
 
 	return B_OK;
@@ -364,6 +372,42 @@ BLocale::FormatDateTime(char* target, size_t maxSize, time_t time,
 
 	if (stringConverter.Overflowed())
 		return B_BAD_VALUE;
+
+	return B_OK;
+}
+
+
+status_t
+BLocale::FormatDateTime(BString* target, time_t time, bool longFormat,
+	const BTimeZone* timeZone)
+{
+	ObjectDeleter<DateFormat> dateFormatter = CreateDateFormat(longFormat,
+		*fICULocale, longFormat ? fLongDateFormat : fShortDateFormat);
+	if (dateFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<DateFormat> timeFormatter = CreateTimeFormat(longFormat,
+		*fICULocale, longFormat ? fLongTimeFormat : fShortTimeFormat);
+	if (timeFormatter.Get() == NULL)
+		return B_NO_MEMORY;
+
+	if (timeZone != NULL) {
+		ObjectDeleter<TimeZone> icuTimeZone
+			= TimeZone::createTimeZone(timeZone->ID().String());
+		if (icuTimeZone.Get() == NULL)
+			return B_NO_MEMORY;
+		timeFormatter->setTimeZone(*icuTimeZone.Get());
+	}
+
+	UnicodeString ICUString;
+	ICUString = dateFormatter->format((UDate)time * 1000, ICUString);
+
+	ICUString.append(UnicodeString::fromUTF8(", "));
+
+	ICUString = timeFormatter->format((UDate)time * 1000, ICUString);
+
+	BStringByteSink stringConverter(target);
+	ICUString.toUTF8(stringConverter);
 
 	return B_OK;
 }

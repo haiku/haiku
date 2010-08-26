@@ -62,7 +62,8 @@ public:
 			status_t			FormatDateTime(char* target, size_t maxSize,
 									time_t time, bool longFormat);
 			status_t			FormatDateTime(BString* buffer, time_t time,
-									bool longFormat);
+									bool longFormat,
+									const BTimeZone* timeZone = NULL);
 
 								// Date
 
@@ -71,7 +72,8 @@ public:
 			status_t			FormatDate(char* string, size_t maxSize,
 									time_t time, bool longFormat);
 			status_t			FormatDate(BString* string, time_t time,
-									bool longFormat);
+									bool longFormat,
+									const BTimeZone* timeZone = NULL);
 			status_t			FormatDate(BString* string,
 									int*& fieldPositions, int& fieldCount,
 									time_t time, bool longFormat);
