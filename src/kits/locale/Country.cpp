@@ -123,39 +123,3 @@ BCountry::Measurement() const
 			return B_METRIC;
 	}
 }
-
-
-// #pragma mark - Timezones
-
-
-int
-BCountry::GetTimeZones(BList& timezones) const
-{
-	ObjectDeleter<StringEnumeration> icuTimeZoneList
-		= TimeZone::createEnumeration(fICULocale->getCountry());
-	if (icuTimeZoneList.Get() == NULL)
-		return 0;
-
-	UErrorCode error = U_ZERO_ERROR;
-
-	const char* tzName;
-	std::map<BString, BTimeZone*> timeZoneMap;
-		// The map allows us to remove duplicates and get a count of the
-		// remaining zones after that
-	while ((tzName = icuTimeZoneList->next(NULL, error)) != NULL) {
-		if (error == U_ZERO_ERROR) {
-			BTimeZone* timeZone = new(std::nothrow) BTimeZone(tzName);
-			timeZoneMap.insert(std::pair<BString, BTimeZone*>(timeZone->Name(),
-				timeZone));
-		} else
-			error = U_ZERO_ERROR;
-	}
-
-	std::map<BString, BTimeZone*>::const_iterator tzIter;
-	for (tzIter = timeZoneMap.begin(); tzIter != timeZoneMap.end(); ++tzIter)
-		timezones.AddItem(tzIter->second);
-
-	return timezones.CountItems();
-}
-
-

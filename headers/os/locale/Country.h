@@ -47,10 +47,6 @@ public:
 
 			int8				Measurement() const;
 
-								// timezones
-
-			int					GetTimeZones(BList& timezones) const;
-
 private:
 			icu_44::Locale*		fICULocale;
 };

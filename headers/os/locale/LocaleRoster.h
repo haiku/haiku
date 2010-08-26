@@ -44,8 +44,13 @@ public:
 									// 'language'-string-fields which
 									// contain the language-name(s)
 
-			status_t			GetAvailableCountries(BMessage* message) const;
-			status_t			GetAvailableTimeZones(BMessage* message) const;
+			status_t			GetAvailableCountries(
+									BMessage* timeZones) const;
+			status_t			GetAvailableTimeZones(
+									BMessage* timeZones) const;
+			status_t			GetAvailableTimeZonesForCountry(
+									BMessage* message,
+									const char* countryCode) const;
 
 			status_t			GetInstalledCatalogs(BMessage* message,
 									const char* sigPattern = NULL,

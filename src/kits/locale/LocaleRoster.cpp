@@ -237,13 +237,44 @@ BLocaleRoster::GetAvailableTimeZones(BMessage* timeZones) const
 
 	status_t status = B_OK;
 
-	int32 i;
 	StringEnumeration* zoneList = TimeZone::createEnumeration();
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
 	int32 count = zoneList->count(icuStatus);
 	if (U_SUCCESS(icuStatus)) {
-		for (i = 0; i < count; ++i) {
+		for (int i = 0; i < count; ++i) {
+			const char* zoneID = zoneList->next(NULL, icuStatus);
+			if (zoneID == NULL || !U_SUCCESS(icuStatus)) {
+				status = B_ERROR;
+				break;
+			}
+ 			timeZones->AddString("timeZone", zoneID);
+		}
+	} else
+		status = B_ERROR;
+
+	delete zoneList;
+
+	return status;
+}
+
+
+status_t
+BLocaleRoster::GetAvailableTimeZonesForCountry(BMessage* timeZones,
+	const char* countryCode) const
+{
+	if (!timeZones)
+		return B_BAD_VALUE;
+
+	status_t status = B_OK;
+
+	StringEnumeration* zoneList = TimeZone::createEnumeration(countryCode);
+		// countryCode == NULL will yield all timezones not bound to a country
+
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	int32 count = zoneList->count(icuStatus);
+	if (U_SUCCESS(icuStatus)) {
+		for (int i = 0; i < count; ++i) {
 			const char* zoneID = zoneList->next(NULL, icuStatus);
 			if (zoneID == NULL || !U_SUCCESS(icuStatus)) {
 				status = B_ERROR;
