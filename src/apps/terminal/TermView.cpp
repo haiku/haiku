@@ -1354,9 +1354,14 @@ TermView::Draw(BRect updateRect)
 			if (k < 0)
 				k = 0;
 
-			int32 lastColumn = (int)updateRect.right / fFontWidth;
-			for (int32 i = k; i <= lastColumn;) {
+			int32 terminalEnd = (int)updateRect.right / fFontWidth;
+				// physical limit of the terminal
+			for (int32 i = k; i < terminalEnd;) {
+				int32 lastColumn = terminalEnd;
 				bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
+					// This will clip lastColumn to the selection start or end
+					// to ensure the selection is not drawn at the same time as
+					// something else
 				int32 count = fVisibleTextBuffer->GetString(j - firstVisible, i,
 					lastColumn, buf, attr);
 
@@ -1364,21 +1369,39 @@ TermView::Draw(BRect updateRect)
 // j - firstVisible, i, lastColumn, count, (int)count, buf, insideSelection);
 
 				if (count == 0) {
+					// No chars to draw : we just fill the rectangle with the
+					// back color of the last char at the left
 					BRect rect(fFontWidth * i, _LineOffset(j),
 						fFontWidth * (lastColumn + 1) - 1, 0);
 					rect.bottom = rect.top + fFontHeight - 1;
 
-					int t = 1;
-					while (count == 0 && i - t > 0) {
-						count = fVisibleTextBuffer->GetString(j - firstVisible,
-							i - t, lastColumn, buf, attr);
-						t++;
+					if (insideSelection) {
+						// This area is selected, fill it with the select color
+						SetHighColor(fSelectBackColor);
+						FillRect(rect);
+					} else {
+						// We are not in the selection, so we have to try to
+						// guess the color for this line from the last char
+						// that was drawn in it.
+						int t = 1;
+						while (count == 0 && i - t > 0) {
+							count = fVisibleTextBuffer->GetString(
+								j - firstVisible,
+								i - t, lastColumn, buf, attr);
+							t++;
+						}
+
+						// If the line is completely empty, we use the default
+						// back color.
+						// TODO: It would be better to look at the line above,
+						// or ensure each line is always initialized with an
+						// attribute telling wat color to set.
+						SetHighColor(count ? kTermColorTable[IS_BACKCOLOR(attr)]
+							: kTermColorTable[0]);
+						FillRect(rect);
 					}
 
-					SetHighColor(insideSelection ? fSelectBackColor
-						: kTermColorTable[IS_BACKCOLOR(attr)]);
-					FillRect(rect);
-
+					// Go on to the next block
 					i = lastColumn + 1;
 					continue;
 				}
