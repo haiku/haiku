@@ -837,18 +837,23 @@ usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
-	commandBlock[0] = SCSI_READ_10;
+	commandBlock[0] = 0xA8;
 	commandBlock[1] = lun->logical_unit_number << 5;
 	commandBlock[2] = blockPosition >> 24;
 	commandBlock[3] = blockPosition >> 16;
 	commandBlock[4] = blockPosition >> 8;
 	commandBlock[5] = blockPosition;
-	commandBlock[7] = *length >> 8;
-	commandBlock[8] = *length;
-	// TODO: blockCount ?
+	commandBlock[6] = blockCount >> 24;
+	commandBlock[7] = blockCount >> 16;
+	commandBlock[8] = blockCount >> 8;
+	commandBlock[9] = blockCount;
 
-	status_t result = usb_disk_operation(lun, commandBlock, buffer, length,
-		true);
+	status_t result;
+	do {
+		snooze(10000);
+		result = usb_disk_operation(lun, commandBlock, buffer, length,
+			true);
+	} while (result != B_OK);
 	return result;
 }
 
@@ -860,18 +865,24 @@ usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
-	commandBlock[0] = SCSI_WRITE_10;
+	commandBlock[0] = 0xAA;
 	commandBlock[1] = lun->logical_unit_number << 5;
 	commandBlock[2] = blockPosition >> 24;
 	commandBlock[3] = blockPosition >> 16;
 	commandBlock[4] = blockPosition >> 8;
 	commandBlock[5] = blockPosition;
-	commandBlock[7] = *length >> 8;
-	commandBlock[8] = *length;
-	// TOOD: blockCount ?
+	commandBlock[6] = blockCount >> 24;
+	commandBlock[7] = blockCount >> 16;
+	commandBlock[8] = blockCount >> 8;
+	commandBlock[9] = blockCount;
 
-	status_t result = usb_disk_operation(lun, commandBlock, buffer, length,
-		false);
+	status_t result;
+	do {
+		snooze(10000);
+		result = usb_disk_operation(lun, commandBlock, buffer, length,
+			true);
+	} while (result != B_OK);
+
 	if (result == B_OK)
 		lun->should_sync = true;
 	return result;
