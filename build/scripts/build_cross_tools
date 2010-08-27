@@ -147,7 +147,7 @@ sysIncludeDir=$installDir/i586-pc-haiku/sys-include
 rm -rf $sysIncludeDir/be $sysIncludeDir/posix
 
 # remove the objects dir
-#rm -rf $objDir
+rm -rf $objDir
 
 
 echo "binutils and gcc for cross compilation have been built successfully!"
