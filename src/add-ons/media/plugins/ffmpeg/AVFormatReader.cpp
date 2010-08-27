@@ -32,11 +32,13 @@ extern "C" {
 #	define TRACE printf
 #	define TRACE_IO(a...)
 #	define TRACE_SEEK(a...)
+#	define TRACE_FIND(a...)
 #	define TRACE_PACKET(a...)
 #else
 #	define TRACE(a...)
 #	define TRACE_IO(a...)
 #	define TRACE_SEEK(a...)
+#	define TRACE_FIND(a...)
 #	define TRACE_PACKET(a...)
 #endif
 
@@ -160,6 +162,8 @@ private:
 			bool				fReusePacket;
 
 			media_format		fFormat;
+
+			bool				fStreamBuildsIndexWhileReading;
 };
 
 
@@ -175,7 +179,9 @@ AVFormatReader::StreamCookie::StreamCookie(BPositionIO* source,
 	fStream(NULL),
 	fVirtualIndex(-1),
 
-	fReusePacket(false)
+	fReusePacket(false),
+
+	fStreamBuildsIndexWhileReading(false)
 {
 	memset(&fIOBuffer, 0, sizeof(fIOBuffer));
 	memset(&fFormat, 0, sizeof(media_format));
@@ -222,6 +228,16 @@ AVFormatReader::StreamCookie::Open()
 
 	TRACE("AVFormatReader::StreamCookie::Open() - "
 		"av_probe_input_format(): %s\n", inputFormat->name);
+	TRACE("  flags:%s%s%s%s%s\n",
+		(inputFormat->flags & AVFMT_GLOBALHEADER) ? " AVFMT_GLOBALHEADER" : "",
+		(inputFormat->flags & AVFMT_NOTIMESTAMPS) ? " AVFMT_NOTIMESTAMPS" : "",
+		(inputFormat->flags & AVFMT_GENERIC_INDEX) ? " AVFMT_GENERIC_INDEX" : "",
+		(inputFormat->flags & AVFMT_TS_DISCONT) ? " AVFMT_TS_DISCONT" : "",
+		(inputFormat->flags & AVFMT_VARIABLE_FPS) ? " AVFMT_VARIABLE_FPS" : ""
+	);
+
+	fStreamBuildsIndexWhileReading
+		= (inputFormat->flags & AVFMT_GENERIC_INDEX) != 0;
 
 	const DemuxerFormat* demuxerFormat = demuxer_format_for(inputFormat);
 	if (demuxerFormat == NULL) {
@@ -257,7 +273,8 @@ AVFormatReader::StreamCookie::Open()
 	}
 
 	TRACE("AVFormatReader::StreamCookie::Open() - "
-		"av_find_stream_info() success!\n");
+		"av_find_stream_info() success! Seek should be by bytes: %d\n",
+		(inputFormat->flags & AVFMT_TS_DISCONT) != 0);
 
 	return B_OK;
 }
@@ -426,6 +443,10 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 					description.family = B_QUICKTIME_FORMAT_FAMILY;
 					codecTag = B_BENDIAN_TO_HOST_INT32('.mp3');
 					break;
+				case CODEC_ID_AAC:
+					description.family = B_MISC_FORMAT_FAMILY;
+					codecTag = 'mp4a';
+					break;
 				default:
 					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
 						"unknown 0x%x\n", codecContext->codec_id);
@@ -460,7 +481,7 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				else if (codecContext->codec_id == CODEC_ID_MP2)
 					description.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_2;
 				else if (codecContext->codec_id == CODEC_ID_MP3)
-					description.u.mpeg.id = B_MPEG_1_AUDIO_LAYER_3;
+					description.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_3;
 				// TODO: Add some more...
 				else
 					description.u.mpeg.id = B_MPEG_ANY;
@@ -717,6 +738,13 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	double frameRate = FrameRate();
 	TRACE("  frameRate: %.4f\n", frameRate);
 
+	if (fStream->start_time != kNoPTSValue) {
+		bigtime_t startTime = _ConvertFromStreamTimeBase(fStream->start_time);
+		TRACE("  start_time: %lld or %.5fs\n", startTime,
+			startTime / 1000000.0);
+		// TODO: Handle start time in FindKeyFrame()?!
+	}
+
 	// TODO: This is obviously not working correctly for all stream types...
 	// It seems that the calculations here are correct, because they work
 	// for a couple of streams and are in line with the documentation, but
@@ -736,15 +764,43 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 		TRACE("  stream duration: N/A\n");
 	}
 
-	TRACE("  duration: %lld or %.2fs\n", *duration, *duration / 1000000.0);
+	TRACE("  duration: %lld or %.5fs\n", *duration, *duration / 1000000.0);
+
+	#if 0
+	if (fStream->nb_index_entries > 0) {
+		TRACE("  dump of index entries:\n");
+		int count = 5;
+		int firstEntriesCount = min_c(fStream->nb_index_entries, count);
+		int i = 0;
+		for (; i < firstEntriesCount; i++) {
+			AVIndexEntry& entry = fStream->index_entries[i];
+			bigtime_t timeGlobal = entry.timestamp;
+			bigtime_t timeNative = _ConvertFromStreamTimeBase(timeGlobal);
+			TRACE("    [%d] native: %.5fs global: %.5fs\n", i,
+				timeNative / 1000000.0f, timeGlobal / 1000000.0f);
+		}
+		if (fStream->nb_index_entries - count > i) {
+			i = fStream->nb_index_entries - count;
+			TRACE("    ...\n");
+			for (; i < fStream->nb_index_entries; i++) {
+				AVIndexEntry& entry = fStream->index_entries[i];
+				bigtime_t timeGlobal = entry.timestamp;
+				bigtime_t timeNative = _ConvertFromStreamTimeBase(timeGlobal);
+				TRACE("    [%d] native: %.5fs global: %.5fs\n", i,
+					timeNative / 1000000.0f, timeGlobal / 1000000.0f);
+			}
+		}
+	}
+	#endif
 
 	*frameCount = fStream->nb_frames;
-	if (*frameCount == 0) {
+//	if (*frameCount == 0) {
 		// Calculate from duration and frame rate
 		*frameCount = (int64)(*duration * frameRate / 1000000LL);
-		TRACE("  frameCount (calculated): %lld\n", *frameCount);
-	} else
-		TRACE("  frameCount: %lld\n", *frameCount);
+		TRACE("  frameCount calculated: %lld, from context: %lld\n",
+			*frameCount, fStream->nb_frames);
+//	} else
+//		TRACE("  frameCount: %lld\n", *frameCount);
 
 	*format = fFormat;
 
@@ -762,18 +818,18 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	if (fContext == NULL || fStream == NULL)
 		return B_NO_INIT;
 
-	TRACE_SEEK("AVFormatReader::StreamCookie::Seek(%ld, %s %s %s %s, %lld, "
+	TRACE_SEEK("AVFormatReader::StreamCookie::Seek(%ld,%s%s%s%s, %lld, "
 		"%lld)\n", VirtualIndex(),
-		(flags & B_MEDIA_SEEK_TO_FRAME) ? "B_MEDIA_SEEK_TO_FRAME" : "",
-		(flags & B_MEDIA_SEEK_TO_TIME) ? "B_MEDIA_SEEK_TO_TIME" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? "B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? "B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		*frame, *time);
 
 	// Seeking is always based on time, initialize it when client seeks
 	// based on frame.
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = (bigtime_t)(*frame * 1000000LL / FrameRate());
+		*time = (bigtime_t)(*frame * 1000000LL / FrameRate() + 0.5);
 
 #if 0
 	// This happens in ffplay.c:
@@ -799,10 +855,25 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 		*time / 1000000.0, timeStamp, fStream->cur_dts, fStream->time_base.num,
 		fStream->time_base.den);
 
-	if (av_seek_frame(fContext, Index(), timeStamp, 0) < 0) {
+	int searchFlags = AVSEEK_FLAG_BACKWARD;
+	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0)
+		searchFlags = 0;
+
+#if 0
+	bigtime_t oneSecond = 1000000;
+	int64_t minTimeStamp = timeStamp - _ConvertToStreamTimeBase(oneSecond);
+	int64_t maxTimeStamp = timeStamp + _ConvertToStreamTimeBase(oneSecond);
+	if (avformat_seek_file(fContext, Index(), minTimeStamp, timeStamp,
+		maxTimeStamp, searchFlags) < 0) {
+		TRACE_SEEK("  avformat_seek_file() failed.\n");
+		return B_ERROR;
+	}
+#else
+	if (av_seek_frame(fContext, Index(), timeStamp, searchFlags) < 0) {
 		TRACE_SEEK("  av_seek_frame() failed.\n");
 		return B_ERROR;
 	}
+#endif
 
 	// Our last packet is toast in any case.
 	av_free_packet(&fPacket);
@@ -819,21 +890,21 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	if (fContext == NULL || fStream == NULL)
 		return B_NO_INIT;
 
-	TRACE_SEEK("AVFormatReader::StreamCookie::FindKeyFrame(%ld, %s %s %s %s, "
+	TRACE_FIND("AVFormatReader::StreamCookie::FindKeyFrame(%ld,%s%s%s%s, "
 		"%lld, %lld)\n", VirtualIndex(),
-		(flags & B_MEDIA_SEEK_TO_FRAME) ? "B_MEDIA_SEEK_TO_FRAME" : "",
-		(flags & B_MEDIA_SEEK_TO_TIME) ? "B_MEDIA_SEEK_TO_TIME" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? "B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? "B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		*frame, *time);
 
 	double frameRate = FrameRate();
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = (bigtime_t)(*frame * 1000000LL / frameRate);
+		*time = (bigtime_t)(*frame * 1000000LL / frameRate + 0.5);
 
 	int64_t timeStamp = _ConvertToStreamTimeBase(*time);
 
-	TRACE_SEEK("  time: %.2fs -> %lld (time_base: %d/%d)\n", *time / 1000000.0,
+	TRACE_FIND("  time: %.2fs -> %lld (time_base: %d/%d)\n", *time / 1000000.0,
 		timeStamp, fStream->time_base.num, fStream->time_base.den);
 
 	int searchFlags = AVSEEK_FLAG_BACKWARD;
@@ -842,22 +913,32 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 
 	int index = av_index_search_timestamp(fStream, timeStamp, searchFlags);
 	if (index < 0) {
-		TRACE_SEEK("  av_index_search_timestamp() failed.\n");
-		// Just seek to the beginning of the stream and assume it is a
-		// keyframe...
-		*frame = 0;
-		*time = 0;
-		return B_OK;
+		TRACE_FIND("  av_index_search_timestamp() failed.\n");
+		// Best is to assume we can somehow seek to the time/frame
+		// and leave them as they are.
+	} else {
+		const AVIndexEntry& entry = fStream->index_entries[index];
+		timeStamp = entry.timestamp;
+		bigtime_t foundTime = _ConvertFromStreamTimeBase(timeStamp);
+		bigtime_t timeDiff = foundTime > *time
+			? foundTime - *time : *time - foundTime;
+	
+		if (fStreamBuildsIndexWhileReading && timeDiff > 1000000) {
+			// If the stream is building the index on the fly while parsing
+			// it, we only have entries in the index for positions already
+			// decoded, i.e. we cannot seek into the future. In that case,
+			// just assume that we can seek where we want and leave time/frame
+			// unmodified.
+			TRACE_FIND("  Not trusting generic index entry. "
+				"(Current count: %d)\n", fStream->nb_index_entries);
+		} else
+			*time = foundTime;
 	}
-
-	const AVIndexEntry& entry = fStream->index_entries[index];
-	timeStamp = entry.timestamp;
-	*time = _ConvertFromStreamTimeBase(timeStamp);
-
-	TRACE_SEEK("  seeked time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
+	
+	TRACE_FIND("  found time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-		*frame = *time * frameRate / 1000000LL;
-		TRACE_SEEK("  seeked frame: %lld\n", *frame);
+		*frame = *time * frameRate / 1000000LL + 0.5;
+		TRACE_FIND("  found frame: %lld\n", *frame);
 	}
 
 	return B_OK;
