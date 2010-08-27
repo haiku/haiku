@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  *
  * Distributed under the terms of the MIT License.
@@ -29,8 +29,8 @@
 
 
 #define MAX_SOCKET_ADDRESS_LENGTH	(sizeof(sockaddr_storage))
-#define MAX_SOCKET_OPTION_LEN	128
-#define MAX_ANCILLARY_DATA_LEN	1024
+#define MAX_SOCKET_OPTION_LENGTH	128
+#define MAX_ANCILLARY_DATA_LENGTH	1024
 
 #define GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor)	\
 	do {												\
@@ -980,8 +980,8 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 			return B_BAD_ADDRESS;
 		if (message.msg_controllen < 0)
 			return B_BAD_VALUE;
-		if (message.msg_controllen > MAX_ANCILLARY_DATA_LEN)
-			message.msg_controllen = MAX_ANCILLARY_DATA_LEN;
+		if (message.msg_controllen > MAX_ANCILLARY_DATA_LENGTH)
+			message.msg_controllen = MAX_ANCILLARY_DATA_LENGTH;
 
 		message.msg_control = ancillary = malloc(message.msg_controllen);
 		if (message.msg_control == NULL)
@@ -1082,7 +1082,7 @@ _user_sendmsg(int socket, const struct msghdr *userMessage, int flags)
 		if (!IS_USER_ADDRESS(userAncillary))
 			return B_BAD_ADDRESS;
 		if (message.msg_controllen < 0
-				|| message.msg_controllen > MAX_ANCILLARY_DATA_LEN) {
+				|| message.msg_controllen > MAX_ANCILLARY_DATA_LENGTH) {
 			return B_BAD_VALUE;
 		}
 
@@ -1119,11 +1119,11 @@ _user_getsockopt(int socket, int level, int option, void *userValue,
 	if (user_memcpy(&length, _length, sizeof(socklen_t)) != B_OK)
 		return B_BAD_ADDRESS;
 
-	if (length > MAX_SOCKET_OPTION_LEN)
+	if (length > MAX_SOCKET_OPTION_LENGTH)
 		return B_BAD_VALUE;
 
 	// getsockopt()
-	char value[MAX_SOCKET_OPTION_LEN];
+	char value[MAX_SOCKET_OPTION_LENGTH];
 	SyscallRestartWrapper<status_t> error;
 	error = common_getsockopt(socket, level, option, value, &length,
 		false);
@@ -1143,11 +1143,11 @@ _user_setsockopt(int socket, int level, int option, const void *userValue,
 	socklen_t length)
 {
 	// check params
-	if (userValue == NULL || length > MAX_SOCKET_OPTION_LEN)
+	if (userValue == NULL || length > MAX_SOCKET_OPTION_LENGTH)
 		return B_BAD_VALUE;
 
 	// copy value from userland
-	char value[MAX_SOCKET_OPTION_LEN];
+	char value[MAX_SOCKET_OPTION_LENGTH];
 	if (!IS_USER_ADDRESS(userValue)
 			|| user_memcpy(value, userValue, length) != B_OK) {
 		return B_BAD_ADDRESS;
