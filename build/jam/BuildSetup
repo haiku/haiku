@@ -1250,11 +1250,11 @@ if $(HAIKU_NO_WERROR) != 1 {
 	EnableWerror src add-ons kernel file_systems udf ;
 	EnableWerror src add-ons kernel file_systems userlandfs ;
 	EnableWerror src add-ons kernel generic ;
-	EnableWerror src add-ons kernel network atalink_protocols ;
+	EnableWerror src add-ons kernel network datalink_protocols ;
 	EnableWerror src add-ons kernel network devices ;
 	EnableWerror src add-ons kernel network notifications ;
 	EnableWerror src add-ons kernel network ppp ;
-#	EnableWerror src add-ons kernel network protocols ;
+	EnableWerror src add-ons kernel network protocols ;
 #	EnableWerror src add-ons kernel network stack ;
 	EnableWerror src add-ons kernel partitioning_systems ;
 	EnableWerror src add-ons locale ;
