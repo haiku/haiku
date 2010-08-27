@@ -129,10 +129,10 @@ status_t	usb_disk_transfer_data(disk_device *device, bool directionIn,
 status_t	usb_disk_receive_csw(disk_device *device,
 				command_status_wrapper *status);
 status_t	usb_disk_operation(device_lun *lun, uint8* operation,
-				uint32 logicalBlockAddress,
-				uint16 transferLength, void *data, uint32 *dataLength,
+				void *data, uint32 *dataLength,
 				bool directionIn);
 
+status_t	usb_disk_send_diagnostic(device_lun *lun);
 status_t	usb_disk_request_sense(device_lun *lun);
 status_t	usb_disk_mode_sense(device_lun *lun);
 status_t	usb_disk_test_unit_ready(device_lun *lun);
@@ -173,6 +173,7 @@ usb_disk_reset_recovery(disk_device *device)
 {
 	gUSBModule->clear_feature(device->bulk_in, USB_FEATURE_ENDPOINT_HALT);
 	gUSBModule->clear_feature(device->bulk_out, USB_FEATURE_ENDPOINT_HALT);
+	gUSBModule->clear_feature(device->interrupt, USB_FEATURE_ENDPOINT_HALT);
 }
 
 
@@ -242,26 +243,24 @@ usb_disk_receive_csw(disk_device *device, command_status_wrapper *status)
 
 status_t
 usb_disk_operation(device_lun *lun, uint8* operation,
-	uint32 logicalBlockAddress, uint16 transferLength, void *data,
-	uint32 *dataLength, bool directionIn)
+	void *data,	uint32 *dataLength, bool directionIn)
 {
 	// TODO: remove transferLength
-	TRACE("operation: lun: %u; op: 0x%x; lba: %lu; tlen: %u; data: %p;"
-		"	dlen: %p (%lu); in: %c\n", lun->logical_unit_number, operation[0],
-		logicalBlockAddress, transferLength, data, dataLength,
+	TRACE("operation: lun: %u; op: 0x%x; data: %p; dlen: %p (%lu); in: %c\n",
+		lun->logical_unit_number, operation[0], data, dataLength,
 		dataLength ? *dataLength : 0, directionIn ? 'y' : 'n');
 
 	disk_device* device = lun->device;
 
 	// Step 1 : send the SCSI operation as a class specific request
-	size_t actualLength = 0;
+	size_t actualLength = 12;
 	status_t result = gUSBModule->send_request(device->device,
-		USB_REQTYPE_CLASS | USB_REQTYPE_INTERFACE_OUT, 0, 0,
-		device->interface, 12, operation, &actualLength);
+		USB_REQTYPE_CLASS | USB_REQTYPE_INTERFACE_OUT, 0 /*request*/, 0/*value*/,
+		device->interface/*index*/, 12, operation, &actualLength);
 
 	if (result != B_OK || actualLength != 12) {
-		TRACE("Command stage: wrote %ld bytes (%s) (interface = %d)\n",
-			actualLength, strerror(result), device->interface);
+		TRACE("Command stage: wrote %ld bytes (error: %s)\n",
+			actualLength, strerror(result));
 		return B_ERROR;
 	}
 
@@ -270,8 +269,10 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 	if (data != NULL && dataLength != NULL && *dataLength > 0) {
 		// we have data to transfer in a data stage
 		result = usb_disk_transfer_data(device, directionIn, data, *dataLength);
-		if (result != B_OK)
+		if (result != B_OK) {
+			TRACE("Error %s in data phase\n", strerror(result));
 			return result;
+		}
 
 		transferedData = device->actual_length;
 		if (device->status != B_OK || transferedData != *dataLength) {
@@ -289,22 +290,30 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 	}
 
 	// step 3 : wait for the device to send the interrupt ACK
-	command_status_wrapper status;
-	result =  usb_disk_receive_csw(device, &status);
-	if (result != B_OK) {
-		// in case of a stall or error clear the stall and try again
-		gUSBModule->clear_feature(device->bulk_in, USB_FEATURE_ENDPOINT_HALT);
-		result = usb_disk_receive_csw(device, &status);
-	}
+	if (operation[0] != SCSI_REQUEST_SENSE_6) {
+		command_status_wrapper status;
+		result =  usb_disk_receive_csw(device, &status);
+		if (result != B_OK) {
+			// in case of a stall or error clear the stall and try again
+			TRACE("Error receiving interrupt: %s. Retrying...\n", strerror(result));
+			gUSBModule->clear_feature(device->bulk_in, USB_FEATURE_ENDPOINT_HALT);
+			result = usb_disk_receive_csw(device, &status);
+		}
 
-	if (result != B_OK) {
-		TRACE_ALWAYS("receiving the command status interrupt failed\n");
-		usb_disk_reset_recovery(device);
-		return result;
-	}
+		if (result != B_OK) {
+			TRACE_ALWAYS("receiving the command status interrupt failed\n");
+			usb_disk_reset_recovery(device);
+			return result;
+		}
 
+		// wait for the device to finish the operation.
+		result = usb_disk_request_sense(lun);
+	}
+	return result;
+	/*
 	switch (status.status) {
 		case 0:
+			TRACE("Command finished ! Everything ok !\n");
 			return B_OK;
 		default:
 			TRACE("Interrupt returned non-zero code : %x/%x\n", status.status,
@@ -317,12 +326,36 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 			// the drive, anyway.
 			return B_OK;
 	}
+	*/
 }
 
 
 //
 //#pragma mark - Helper/Convenience Functions
 //
+
+
+status_t
+usb_disk_send_diagnostic(device_lun *lun)
+{
+	uint8 commandBlock[12];
+	memset(commandBlock, 0, sizeof(commandBlock));
+
+	commandBlock[0] = 0x1D;
+	commandBlock[1] = (lun->logical_unit_number << 5) | 4;
+
+	status_t result = usb_disk_operation(lun, commandBlock, NULL,
+		NULL, false);
+
+	while(result == B_DEV_NO_MEDIA) {
+		snooze(10000);
+		result = usb_disk_request_sense(lun);
+	}
+
+	if (result != B_OK)
+		TRACE("Send Diagnostic failed: %s\n", strerror(result));
+	return result;
+}
 
 
 status_t
@@ -338,8 +371,8 @@ usb_disk_request_sense(device_lun *lun)
 	commandBlock[4] = dataLength;
 
 	scsi_request_sense_6_parameter parameter;
-	status_t result = usb_disk_operation(lun, commandBlock, 0,
-		dataLength, &parameter, &dataLength, true);
+	status_t result = usb_disk_operation(lun, commandBlock, &parameter,
+		&dataLength, true);
 	if (result != B_OK) {
 		TRACE_ALWAYS("getting request sense data failed\n");
 		return result;
@@ -412,8 +445,7 @@ usb_disk_mode_sense(device_lun *lun)
 
 	scsi_mode_sense_6_parameter parameter;
 	status_t result = usb_disk_operation(lun, commandBlock,
-		SCSI_MODE_PAGE_DEVICE_CONFIGURATION, dataLength, &parameter,
-		&dataLength, true);
+		&parameter, &dataLength, true);
 	if (result != B_OK) {
 		TRACE_ALWAYS("getting mode sense data failed\n");
 		return result;
@@ -429,9 +461,7 @@ usb_disk_mode_sense(device_lun *lun)
 status_t
 usb_disk_test_unit_ready(device_lun *lun)
 {
-	// if unsupported we assume the unit is fixed and therefore always ok
-	if (!lun->device->tur_supported)
-		return B_OK;
+	return B_OK;
 
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
@@ -439,14 +469,7 @@ usb_disk_test_unit_ready(device_lun *lun)
 	commandBlock[0] = SCSI_TEST_UNIT_READY_6;
 	commandBlock[1] = lun->logical_unit_number << 5;
 
-	status_t result;
-	result = usb_disk_operation(lun, commandBlock, 0, 0,
-		NULL, NULL, false);
-
-	if (result == B_DEV_INVALID_IOCTL) {
-		lun->device->tur_supported = false;
-		return B_OK;
-	}
+	status_t result = usb_disk_operation(lun, commandBlock, NULL, NULL, false);
 
 	return result;
 }
@@ -468,8 +491,8 @@ usb_disk_inquiry(device_lun *lun)
 	scsi_inquiry_6_parameter parameter;
 	status_t result = B_ERROR;
 	for (uint32 tries = 0; tries < 3; tries++) {
-		result = usb_disk_operation(lun, commandBlock, 0, dataLength,
-			&parameter, &dataLength, true);
+		result = usb_disk_operation(lun, commandBlock, &parameter, &dataLength,
+			true);
 		if (result == B_OK)
 			break;
 	}
@@ -522,8 +545,8 @@ usb_disk_update_capacity(device_lun *lun)
 	// on the device or the device only clears the unit atention for capacity
 	// reads.
 	for (int32 i = 0; i < 3; i++) {
-		result = usb_disk_operation(lun, commandBlock, 0, 0,
-			&parameter, &dataLength, true);
+		result = usb_disk_operation(lun, commandBlock, &parameter, &dataLength,
+			true);
 		if (result == B_OK)
 			break;
 	}
@@ -579,7 +602,6 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	device->interface = 0xff;
 	device->current_tag = 0;
 	device->sync_support = SYNC_SUPPORT_RELOAD;
-	device->tur_supported = true;
 	device->is_atapi = false;
 	device->luns = NULL;
 
@@ -693,7 +715,11 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 		// initialize this lun
 		result = usb_disk_inquiry(lun);
-		TRACE("Probing unit %d\n", lun->logical_unit_number);
+
+		// Reset the device
+		// If we don't do it all the other commands except inquiry and send
+		// diagnostics will be stalled.
+		result = usb_disk_send_diagnostic(lun);
 		for (uint32 tries = 0; tries < 3; tries++) {
 			status_t ready = usb_disk_test_unit_ready(lun);
 			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {
@@ -815,9 +841,10 @@ usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	commandBlock[5] = blockPosition;
 	commandBlock[7] = *length >> 8;
 	commandBlock[8] = *length;
+	// TODO: blockCount ?
 
-	status_t result = usb_disk_operation(lun, commandBlock, blockPosition,
-		blockCount, buffer, length, true);
+	status_t result = usb_disk_operation(lun, commandBlock, buffer, length,
+		true);
 	return result;
 }
 
@@ -837,9 +864,10 @@ usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	commandBlock[5] = blockPosition;
 	commandBlock[7] = *length >> 8;
 	commandBlock[8] = *length;
+	// TOOD: blockCount ?
 
-	status_t result = usb_disk_operation(lun, commandBlock, blockPosition,
-		blockCount, buffer, length, false);
+	status_t result = usb_disk_operation(lun, commandBlock, buffer, length,
+		false);
 	if (result == B_OK)
 		lun->should_sync = true;
 	return result;
@@ -1020,8 +1048,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			commandBlock[1] = lun->logical_unit_number << 5;
 			commandBlock[4] = 2;
 
-			result = usb_disk_operation(lun, commandBlock, 0, 2,
-				NULL, NULL, false);
+			result = usb_disk_operation(lun, commandBlock, NULL, NULL, false);
 			break;
 		}
 
@@ -1034,8 +1061,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			commandBlock[1] = lun->logical_unit_number << 5;
 			commandBlock[4] = 3;
 
-			result = usb_disk_operation(lun, commandBlock, 0, 3,
-				NULL, NULL, false);
+			result = usb_disk_operation(lun, commandBlock, NULL, NULL, false);
 			break;
 		}
 
