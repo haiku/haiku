@@ -37,7 +37,12 @@
 #include "utility.h"
 
 
-#define ADD_DEBUGGER_COMMANDS
+//#define TRACE_SOCKET
+#ifdef TRACE_SOCKET
+#	define TRACE(x...) dprintf(STACK_DEBUG_PREFIX x)
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 struct net_socket_private;
@@ -110,6 +115,8 @@ net_socket_private::net_socket_private()
 
 net_socket_private::~net_socket_private()
 {
+	TRACE("delete net_socket %p\n", this);
+
 	if (parent != NULL)
 		panic("socket still has a parent!");
 
@@ -186,10 +193,19 @@ create_socket(int family, int type, int protocol, net_socket_private** _socket)
 	socket->protocol = protocol;
 
 	status_t status = get_domain_protocols(socket);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		delete socket;
 		return status;
 	}
+
+	TRACE("create net_socket %p (%u.%u.%u):\n", socket, socket->family,
+		socket->type, socket->protocol);
+
+#ifdef TRACE_SOCKET
+	net_protocol* current = socket->first_protocol;
+	for (int i = 0; current != NULL; current = current->next, i++)
+		TRACE("  [%d] %p  %s\n", i, current, current->module->info.name);
+#endif
 
 	*_socket = socket;
 	return B_OK;
@@ -315,7 +331,8 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 }
 
 
-#ifdef ADD_DEBUGGER_COMMANDS
+#if ENABLE_DEBUGGER_COMMANDS
+
 
 static void
 print_socket_line(net_socket_private* socket, const char* prefix)
@@ -395,7 +412,8 @@ dump_sockets(int argc, char** argv)
 	return 0;
 }
 
-#endif	// ADD_DEBUGGER_COMMANDS
+
+#endif	// ENABLE_DEBUGGER_COMMANDS
 
 
 //	#pragma mark -
@@ -406,11 +424,11 @@ socket_open(int family, int type, int protocol, net_socket** _socket)
 {
 	net_socket_private* socket;
 	status_t status = create_socket(family, type, protocol, &socket);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	status = socket->first_info->open(socket->first_protocol);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		delete socket;
 		return status;
 	}
@@ -462,7 +480,7 @@ socket_writev(net_socket* socket, const iovec* vecs, size_t vecCount,
 	if (socket->address.ss_len == 0) {
 		// try to bind first
 		status_t status = socket_bind(socket, NULL, 0);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
@@ -585,8 +603,7 @@ socket_receive_data(net_socket* socket, size_t length, uint32 flags,
 {
 	status_t status = socket->first_info->read_data(socket->first_protocol,
 		length, flags, _buffer);
-
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	if (*_buffer && length < (*_buffer)->size) {
@@ -650,10 +667,10 @@ socket_acquire(net_socket* _socket)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
 
-	// During destruction, the socket might still be accessible over its endpoint
-	// protocol. We need to make sure the endpoint cannot acquire the socket
-	// anymore -- while not obvious, the endpoint protocol is responsible for the
-	// proper locking here.
+	// During destruction, the socket might still be accessible over its
+	// endpoint protocol. We need to make sure the endpoint cannot acquire the
+	// socket anymore -- while not obvious, the endpoint protocol is responsible
+	// for the proper locking here.
 	if (socket->CountReferences() == 0)
 		return false;
 
@@ -675,6 +692,8 @@ socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 {
 	net_socket_private* parent = (net_socket_private*)_parent;
 
+	TRACE("%s(%p)\n", __FUNCTION__, parent);
+
 	MutexLocker locker(parent->lock);
 
 	// We actually accept more pending connections to compensate for those
@@ -686,7 +705,7 @@ socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 	net_socket_private* socket;
 	status_t status = create_socket(parent->family, parent->type,
 		parent->protocol, &socket);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	// inherit parent's properties
@@ -794,6 +813,8 @@ socket_connected(net_socket* _socket)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
 
+	TRACE("socket_connected(%p)\n", socket);
+
 	WeakReference<net_socket_private> parent = socket->parent;
 	if (parent.Get() == NULL)
 		return B_BAD_VALUE;
@@ -819,6 +840,8 @@ status_t
 socket_aborted(net_socket* _socket)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
+
+	TRACE("socket_aborted(%p)\n", socket);
 
 	WeakReference<net_socket_private> parent = socket->parent;
 	if (parent.Get() == NULL)
@@ -853,7 +876,7 @@ socket_request_notification(net_socket* _socket, uint8 event, selectsync* sync)
 
 	mutex_unlock(&socket->lock);
 
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	// check if the event is already present
@@ -947,7 +970,7 @@ socket_accept(net_socket* socket, struct sockaddr* address,
 	net_socket* accepted;
 	status_t status = socket->first_info->accept(socket->first_protocol,
 		&accepted);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	if (address && *_addressLength > 0) {
@@ -979,7 +1002,7 @@ socket_bind(net_socket* socket, const struct sockaddr* address,
 	if (socket->address.ss_len != 0) {
 		status_t status = socket->first_info->unbind(socket->first_protocol,
 			(sockaddr*)&socket->address);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
@@ -988,7 +1011,7 @@ socket_bind(net_socket* socket, const struct sockaddr* address,
 
 	status_t status = socket->first_info->bind(socket->first_protocol,
 		(sockaddr*)address);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		// clear address again, as binding failed
 		socket->address.ss_len = 0;
 	}
@@ -1007,7 +1030,7 @@ socket_connect(net_socket* socket, const struct sockaddr* address,
 	if (socket->address.ss_len == 0) {
 		// try to bind first
 		status_t status = socket_bind(socket, NULL, 0);
-		if (status < B_OK)
+		if (status != B_OK)
 			return status;
 	}
 
@@ -1201,7 +1224,7 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 
 	status_t status = socket->first_info->read_data(
 		socket->first_protocol, totalLength, flags, &buffer);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	// process ancillary data
@@ -1440,7 +1463,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 			status = socket->first_info->send_data(socket->first_protocol,
 				buffer);
 		}
-		if (status < B_OK) {
+		if (status != B_OK) {
 			size_t sizeAfterSend = buffer->size;
 			gNetBufferModule.free(buffer);
 
@@ -1666,7 +1689,7 @@ socket_std_ops(int32 op, ...)
 			new (&sSocketList) SocketList;
 			mutex_init(&sSocketLock, "socket list");
 
-#ifdef ADD_DEBUGGER_COMMANDS
+#if ENABLE_DEBUGGER_COMMANDS
 			add_debugger_command("sockets", dump_sockets, "lists all sockets");
 			add_debugger_command("socket", dump_socket, "dumps a socket");
 #endif
@@ -1676,7 +1699,7 @@ socket_std_ops(int32 op, ...)
 			ASSERT(sSocketList.IsEmpty());
 			mutex_destroy(&sSocketLock);
 
-#ifdef ADD_DEBUGGER_COMMANDS
+#if ENABLE_DEBUGGER_COMMANDS
 			remove_debugger_command("socket", dump_socket);
 			remove_debugger_command("sockets", dump_sockets);
 #endif
