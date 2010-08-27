@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -499,7 +499,7 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 		default:
 			dprintf("%s: Unknown stream type %d!\n", __func__, type);
 			free(stream);
-			stream = NULL;
+			return NULL;
 	}
 
 	// find I/O and Pin widgets for this stream
