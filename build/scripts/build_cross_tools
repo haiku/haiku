@@ -28,6 +28,14 @@ if [ ! -d $buildToolsDir ]; then
 	exit 1
 fi
 
+if ! grep "$haikuRequiredLegacyGCCVersion" \
+		$buildToolsDir/gcc/gcc/version.c >/dev/null 2>&1 ; then
+	echo "*** Mismatching compiler versions between configure script and" >&2
+	echo "*** $buildToolsDir/gcc/gcc/version.c" >&2
+	echo "*** Did you perhaps update only one of haiku & buildtools?" >&2
+	exit 1
+fi
+
 
 # create the output dir
 mkdir -p $haikuOutputDir || exit 1
@@ -139,7 +147,7 @@ sysIncludeDir=$installDir/i586-pc-haiku/sys-include
 rm -rf $sysIncludeDir/be $sysIncludeDir/posix
 
 # remove the objects dir
-rm -rf $objDir
+#rm -rf $objDir
 
 
 echo "binutils and gcc for cross compilation have been built successfully!"
