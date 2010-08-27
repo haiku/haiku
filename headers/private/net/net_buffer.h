@@ -29,6 +29,7 @@ typedef struct net_buffer {
 		}					fragment;
 		uint32				sequence;
 		uint32				offset;
+		uint32				index;
 		int32				type;
 	};
 	uint32					flags;
