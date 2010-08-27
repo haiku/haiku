@@ -104,8 +104,11 @@ device_consumer_thread(void* _interface)
 				buffer = NULL;
 		} else {
 			sockaddr_dl& linkAddress = *(sockaddr_dl*)buffer->source;
+			int32 genericType = buffer->type;
 			int32 specificType = B_NET_FRAME_TYPE(linkAddress.sdl_type,
 				linkAddress.sdl_e_type);
+
+			buffer->index = interface->device->index;
 
 			// Find handler for this packet
 
@@ -118,7 +121,7 @@ device_consumer_thread(void* _interface)
 
 				// If the handler returns B_OK, it consumed the buffer - first
 				// handler wins.
-				if ((handler->type == buffer->type
+				if ((handler->type == genericType
 						|| handler->type == specificType)
 					&& handler->func(handler->cookie, device, buffer) == B_OK)
 					buffer = NULL;
