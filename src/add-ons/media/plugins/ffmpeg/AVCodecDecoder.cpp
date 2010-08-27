@@ -112,9 +112,9 @@ AVCodecDecoder::~AVCodecDecoder()
 
 #ifdef DO_PROFILING
 	if (profileCounter > 0) {
-			printf("[%c] profile: d1 = %lld, d2 = %lld (%Ld)\n",
-				fIsAudio?('a'):('v'), decodingTime / profileCounter, conversionTime / profileCounter,
-				fFrame);
+		printf("[%c] profile: d1 = %lld, d2 = %lld (%Ld)\n",
+			fIsAudio?('a'):('v'), decodingTime / profileCounter,
+			conversionTime / profileCounter, fFrame);
 	}
 #endif
 
@@ -157,8 +157,11 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 	fIsAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
 	TRACE("[%c] AVCodecDecoder::Setup()\n", fIsAudio?('a'):('v'));
 
-	if (fIsAudio && !fOutputBuffer)
-		fOutputBuffer = new char[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+	if (fIsAudio && fOutputBuffer == NULL) {
+		fOutputBuffer = new(std::nothrow) char[AVCODEC_MAX_AUDIO_FRAME_SIZE];
+		if (fOutputBuffer == NULL)
+			return B_NO_MEMORY;
+	}
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
@@ -271,9 +274,8 @@ AVCodecDecoder::Seek(uint32 seekTo, int64 seekFrame, int64* frame,
 	// Reset the FFmpeg codec to flush buffers, so we keep the sync
 #if 1
 	if (fCodecInitDone) {
-		fCodecInitDone = false;
 		avcodec_close(fContext);
-		fCodecInitDone = (avcodec_open(fContext, fCodec) >= 0);
+		fCodecInitDone = avcodec_open(fContext, fCodec) >= 0;
 	}
 #else
 	// For example, this doesn't work on the H.264 codec. :-/
@@ -297,6 +299,13 @@ AVCodecDecoder::Seek(uint32 seekTo, int64 seekFrame, int64* frame,
 		*frame = seekFrame;
 	} else
 		return B_BAD_VALUE;
+
+	// Flush internal buffers as well.
+	fChunkBuffer = NULL;
+	fChunkBufferOffset = 0;
+	fChunkBufferSize = 0;
+	fOutputBufferOffset = 0;
+	fOutputBufferSize = 0;
 
 	fFrame = *frame;
 	fStartTime = *time;
@@ -365,11 +374,17 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		= fInputFormat.u.encoded_audio.output.channel_count;
 	outputAudioFormat.format = fInputFormat.u.encoded_audio.output.format;
 	// Check that format is not still a wild card!
-	if (outputAudioFormat.format == 0)
+	if (outputAudioFormat.format == 0) {
+		TRACE("  format still a wild-card, assuming B_AUDIO_SHORT.\n");
 		outputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
+	}
+	// Check that channel count is not still a wild card!
+	if (outputAudioFormat.channel_count == 0) {
+		TRACE("  channel_count still a wild-card, assuming stereo.\n");
+		outputAudioFormat.channel_count = 2;
+	}
 
-	outputAudioFormat.buffer_size
-		= 1024 * fInputFormat.u.encoded_audio.output.channel_count;
+	outputAudioFormat.buffer_size = 1024 * outputAudioFormat.channel_count;
 	inOutFormat->type = B_MEDIA_RAW_AUDIO;
 	inOutFormat->u.raw_audio = outputAudioFormat;
 
@@ -377,7 +392,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fContext->frame_size = (int)fInputFormat.u.encoded_audio.frame_size;
 	fContext->sample_rate
 		= (int)fInputFormat.u.encoded_audio.output.frame_rate;
-	fContext->channels = fInputFormat.u.encoded_audio.output.channel_count;
+	fContext->channels = outputAudioFormat.channel_count;
 	fContext->block_align = fBlockAlign;
 	fContext->extradata = (uint8_t*)fExtraData;
 	fContext->extradata_size = fExtraDataSize;
@@ -425,6 +440,8 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fAudioDecodeError = false;
 	fOutputBufferOffset = 0;
 	fOutputBufferSize = 0;
+
+	av_init_packet(&fAudioTempPacket);
 
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
@@ -547,43 +564,53 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 
 
 status_t
-AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
+AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 	media_header* mediaHeader, media_decode_info* info)
 {
-	TRACE_AUDIO("AVCodecDecoder::_DecodeAudio()\n");
-//	TRACE_AUDIO("  audio start_time %.6f\n",
-//		mediaHeader->start_time / 1000000.0);
+	TRACE_AUDIO("AVCodecDecoder::_DecodeAudio(audio start_time %.6fs)\n",
+		mediaHeader->start_time / 1000000.0);
 
-	char* output_buffer = (char*)outBuffer;
 	*outFrameCount = 0;
+
+	uint8* buffer = reinterpret_cast<uint8*>(_buffer);
 	while (*outFrameCount < fOutputFrameCount) {
+		// Check conditions which would hint at broken code below.
 		if (fOutputBufferSize < 0) {
-			TRACE_AUDIO("  ############ fOutputBufferSize %ld\n",
-				fOutputBufferSize);
+			debugger("Decoding read past the end of the output buffer!");
 			fOutputBufferSize = 0;
 		}
 		if (fChunkBufferSize < 0) {
-			TRACE_AUDIO("  ############ fChunkBufferSize %ld\n",
-				fChunkBufferSize);
+			debugger("Decoding read past the end of the chunk buffer!");
 			fChunkBufferSize = 0;
 		}
 
 		if (fOutputBufferSize > 0) {
+			// We still have decoded audio frames from the last
+			// invokation, which start at fOutputBuffer + fOutputBufferOffset
+			// and are of fOutputBufferSize. Copy those into the buffer,
+			// but not more than it can hold.
 			int32 frames = min_c(fOutputFrameCount - *outFrameCount,
 				fOutputBufferSize / fOutputFrameSize);
-			memcpy(output_buffer, fOutputBuffer + fOutputBufferOffset,
-				frames * fOutputFrameSize);
-			fOutputBufferOffset += frames * fOutputFrameSize;
-			fOutputBufferSize -= frames * fOutputFrameSize;
-			output_buffer += frames * fOutputFrameSize;
+			if (frames == 0)
+				debugger("fOutputBufferSize not multiple of frame size!");
+			size_t remainingSize = frames * fOutputFrameSize;
+			memcpy(buffer, fOutputBuffer + fOutputBufferOffset, remainingSize);
+			fOutputBufferOffset += remainingSize;
+			fOutputBufferSize -= remainingSize;
+			buffer += remainingSize;
 			*outFrameCount += frames;
 			fStartTime += (bigtime_t)((1000000LL * frames) / fOutputFrameRate);
 			continue;
 		}
 		if (fChunkBufferSize == 0) {
+			// Time to read the next chunk buffer. We use a separate
+			// media_header, since the chunk header may not belong to
+			// the start of the decoded audio frames we return. For
+			// example we may have used frames from a previous invokation,
+			// or we may have to read several chunks until we fill up the
+			// output buffer.
 			media_header chunkMediaHeader;
-			status_t err;
-			err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize,
+			status_t err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize,
 				&chunkMediaHeader);
 			if (err == B_LAST_BUFFER_ERROR) {
 				TRACE_AUDIO("  Last Chunk with chunk size %ld\n",
@@ -600,38 +627,40 @@ AVCodecDecoder::_DecodeAudio(void* outBuffer, int64* outFrameCount,
 			fStartTime = chunkMediaHeader.start_time;
 			if (*outFrameCount == 0)
 				mediaHeader->start_time = chunkMediaHeader.start_time;
-			continue;
 		}
-		if (fOutputBufferSize == 0) {
-			int len;
-			int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-			len = avcodec_decode_audio2(fContext, (short *)fOutputBuffer,
-				&out_size, (uint8_t*)fChunkBuffer + fChunkBufferOffset,
-				fChunkBufferSize);
-			if (len < 0) {
-				if (!fAudioDecodeError) {
-					printf("########### audio decode error, "
-						"fChunkBufferSize %ld, fChunkBufferOffset %ld\n",
-						fChunkBufferSize, fChunkBufferOffset);
-					fAudioDecodeError = true;
-				}
-				out_size = 0;
-				len = 0;
-				fChunkBufferOffset = 0;
-				fChunkBufferSize = 0;
-			} else
-				fAudioDecodeError = false;
 
-			fChunkBufferOffset += len;
-			fChunkBufferSize -= len;
-			fOutputBufferOffset = 0;
-			fOutputBufferSize = out_size;
+		fAudioTempPacket.data = (uint8_t*)fChunkBuffer + fChunkBufferOffset;
+		fAudioTempPacket.size = fChunkBufferSize;
+		// Initialize decodedBytes to the output buffer size.
+		int decodedBytes = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+		int usedBytes = avcodec_decode_audio3(fContext,
+			(int16*)fOutputBuffer, &decodedBytes, &fAudioTempPacket);
+		if (usedBytes < 0 && !fAudioDecodeError) {
+			// Failure
+			printf("########### audio decode error, "
+				"fChunkBufferSize %ld, fChunkBufferOffset %ld\n",
+				fChunkBufferSize, fChunkBufferOffset);
+			fAudioDecodeError = true;
 		}
+		if (usedBytes <= 0) {
+			// Error or failure to produce decompressed output.
+			// Skip the chunk buffer data entirely.
+			usedBytes = fChunkBufferSize;
+			decodedBytes = 0;
+		} else {
+			// Success
+			fAudioDecodeError = false;
+		}
+//printf("  chunk size: %d, decoded: %d, used: %d\n",
+//fAudioTempPacket.size, decodedBytes, usedBytes);
+
+		fChunkBufferOffset += usedBytes;
+		fChunkBufferSize -= usedBytes;
+		fOutputBufferOffset = 0;
+		fOutputBufferSize = decodedBytes;
 	}
-	TRACE_AUDIO("  frame count: %lld\n", *outFrameCount);
 	fFrame += *outFrameCount;
-
-//	TRACE("Played %Ld frames at time %Ld\n",*outFrameCount, mediaHeader->start_time);
+	TRACE_AUDIO("  frame count: %lld current: %lld\n", *outFrameCount, fFrame);
 	return B_OK;
 }
 

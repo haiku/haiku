@@ -105,6 +105,7 @@ private:
 			int32				fOutputBufferOffset;
 			int32				fOutputBufferSize;
 
+			AVPacket			fAudioTempPacket;
 };
 
 #endif // AVCODEC_DECODER_H
