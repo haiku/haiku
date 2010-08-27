@@ -24,8 +24,9 @@ static const DemuxerFormat gDemuxerTable[] = {
 //		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
 //	},
 //	{
-//		// Tested with a limited amount of streams and works ok, keep using
-//		// the avi_reader implementation by Marcus Overhagen.
+//		// Tested with many streams and either works ok, or has inconsistent
+//		// seeking results for audio, i.e. often audio is not in sync.
+//		// Keep using the avi_reader implementation by Marcus Overhagen.
 //		"avi", "AVI (Audio Video Interleaved)", "video/x-msvideo",
 //		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
 //	},
@@ -42,40 +43,41 @@ static const DemuxerFormat gDemuxerTable[] = {
 		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
 //	{
-//		// Tested and appears to work ok with the one clip I have...
+//		// Tested and appears to work ok with regards to video,
+//		// audio seems a problem.
 //		"matroska", "Matroska Movie", "video/x-matroska",
-//		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
+//		B_MISC_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 //	},
 //	{
 //		// Plays the limited amount of files I could test with.
 //		"mov", "Quicktime Movie", "video/x-mov",
 //		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 //	},
-//	{
-//		// Plays the limited amount of files I could test with.
-//		"mp4", "MPEG-4 Movie", "video/x-mp4",
-//		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
-//	},
-//	{
-// 		// TODO: Broken because of buggy FindKeyFrame() or Seek() support.
-//		"mp3", "MPEG (Motion Picture Experts Group)", "audio/mpg",
-//		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
-//	},
+	{
+		// Plays all files I could test with perfectly.
+		"mp4", "MPEG-4 Movie", "video/x-mp4",
+		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+	},
+	{
+ 		// Works very well with all files I tested.
+		"mp3", "MPEG-3", "audio/mpg",
+		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
+	},
 	{
 		// NOTE: Tested with a couple of files and only audio works ok.
 		// On some files, the duration and time_base is detected incorrectly
 		// by libavformat and those streams don't play at all.
-		"mpg", "MPEG (Motion Picture Experts Group)", "video/mpeg",
+		"mpg", "MPEG", "video/mpeg",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
 	{
 		// NOTE: keep this before "mpeg" so it detects "mpegts" first.
-		"mpegts", "MPEG (Motion Picture Experts Group)", "video/mpeg",
+		"mpegts", "MPEG TS", "video/mpeg",
 		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
 	},
 	{
 		// TODO: Also covers "mpegvideo", plus see mpegts.
-		"mpeg", "MPEG (Motion Picture Experts Group)", "video/mpeg",
+		"mpeg", "MPEG", "video/mpeg",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
 	{

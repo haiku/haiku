@@ -10,8 +10,6 @@ SubInclude HAIKU_TOP src add-ons media plugins avi_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg ;
 SubInclude HAIKU_TOP src add-ons media plugins matroska ;
 SubInclude HAIKU_TOP src add-ons media plugins mov_reader ;
-SubInclude HAIKU_TOP src add-ons media plugins mp3_decoder ;
-SubInclude HAIKU_TOP src add-ons media plugins mp3_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins mp4_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins musepack ;
 SubInclude HAIKU_TOP src add-ons media plugins ogg ;
