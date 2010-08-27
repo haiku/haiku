@@ -86,7 +86,7 @@ AVCodecEncoder::~AVCodecEncoder()
 
 	avpicture_free(&fDstFrame);
 	// NOTE: Do not use avpicture_free() on fSrcFrame!! We fill the picture
-	// data on the file with the media buffer data passed to Encode().
+	// data on the fly with the media buffer data passed to Encode().
 
 	if (fFrame != NULL) {
 		fFrame->data[0] = NULL;
@@ -155,7 +155,7 @@ AVCodecEncoder::GetEncodeParameters(encode_parameters* parameters) const
 // a user specified (via SetEncodeParameters()) bit_rate. At this point, the
 // fContext->bit_rate may not yet have been specified (_Setup() was never
 // called yet). So it cannot work like the code below, but in any case, it's
-// showing how to convert between the values (Albeit untested).
+// showing how to convert between the values (albeit untested).
 //	int avgBytesPerSecond = fContext->bit_rate / 8;
 //	int maxBytesPerSecond = (fContext->bit_rate
 //		+ fContext->bit_rate_tolerance) / 8;
@@ -489,6 +489,8 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 			if (ret != B_OK)
 				break;
 		}
+
+		delete[] tempBuffer;
 	} else {
 		// Raw audio. The number of bytes returned from avcodec_encode_audio()
 		// is always the same as the number of input bytes.
