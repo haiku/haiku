@@ -880,7 +880,14 @@ usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	do {
 		snooze(10000);
 		result = usb_disk_operation(lun, commandBlock, buffer, length,
-			true);
+			false);
+
+		TRACE("write result : %s\n", strerror(result));
+
+		do {
+			snooze(10000);
+			result = usb_disk_request_sense(lun);
+		} while (result != B_OK);
 	} while (result != B_OK);
 
 	if (result == B_OK)
