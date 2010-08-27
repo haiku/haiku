@@ -147,9 +147,6 @@ status_t	usb_disk_synchronize(device_lun *lun, bool force);
 //
 
 
-// FIXME: should be part of the device struct.
-static unsigned char interruptBuffer[2];
-sem_id interruptLock;
 
 
 void
@@ -158,7 +155,7 @@ usb_disk_free_device_and_luns(disk_device *device)
 	mutex_lock(&device->lock);
 	mutex_destroy(&device->lock);
 	delete_sem(device->notify);
-	delete_sem(interruptLock);
+	delete_sem(device->interruptLock);
 	for (uint8 i = 0; i < device->lun_count; i++)
 		free(device->luns[i]);
 	free(device->luns);
@@ -216,13 +213,14 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 void
 usb_disk_interrupt(void* cookie, int32 status, void* data, uint32 length)
 {
-	char* stRep = (char*)data;
-	TRACE("interrupt of length %ld! status: %d misc: %d\n", length,
-		stRep[0], stRep[1]);
-	release_sem(interruptLock);
+	if (length != 2)
+		TRACE_ALWAYS("interrupt of length %ld! (expected 2)\n", length);
+	disk_device* dev = (disk_device*)cookie;
+	release_sem(dev->interruptLock);
 
-	gUSBModule->queue_interrupt(((disk_device*)cookie)->interrupt,
-		interruptBuffer, 2, usb_disk_interrupt, cookie);
+	// Reschedule the interrupt for next time
+	gUSBModule->queue_interrupt(dev->interrupt, dev->interruptBuffer, 2,
+		usb_disk_interrupt, cookie);
 }
 
 
@@ -231,12 +229,12 @@ usb_disk_receive_csw(disk_device *device, command_status_wrapper *status)
 {
 	TRACE("Waiting for result...\n");
 	gUSBModule->queue_interrupt(device->interrupt,
-		interruptBuffer, 2, usb_disk_interrupt, device);
+		device->interruptBuffer, 2, usb_disk_interrupt, device);
 
-	acquire_sem(interruptLock);
+	acquire_sem(device->interruptLock);
 
-	status->status = interruptBuffer[0];
-	status->misc = interruptBuffer[1];
+	status->status = device->interruptBuffer[0];
+	status->misc = device->interruptBuffer[1];
 
 	return B_OK;
 }
@@ -247,10 +245,11 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 	uint32 logicalBlockAddress, uint16 transferLength, void *data,
 	uint32 *dataLength, bool directionIn)
 {
-	TRACE("operation: lun: %u; op: %u; lba: %lu; tlen: %u; data: %p; dlen: %p (%lu); in: %c\n",
-		lun->logical_unit_number, operation[0], logicalBlockAddress,
-		transferLength, data, dataLength, dataLength ? *dataLength : 0,
-		directionIn ? 'y' : 'n');
+	// TODO: remove transferLength
+	TRACE("operation: lun: %u; op: 0x%x; lba: %lu; tlen: %u; data: %p;"
+		"	dlen: %p (%lu); in: %c\n", lun->logical_unit_number, operation[0],
+		logicalBlockAddress, transferLength, data, dataLength,
+		dataLength ? *dataLength : 0, directionIn ? 'y' : 'n');
 
 	disk_device* device = lun->device;
 
@@ -261,8 +260,8 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 		device->interface, 12, operation, &actualLength);
 
 	if (result != B_OK || actualLength != 12) {
-		TRACE("Command stage: wrote %ld bytes (%s) (interface = %d)\n", actualLength, strerror(result),
-			device->interface);
+		TRACE("Command stage: wrote %ld bytes (%s) (interface = %d)\n",
+			actualLength, strerror(result), device->interface);
 		return B_ERROR;
 	}
 
@@ -307,12 +306,16 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 	switch (status.status) {
 		case 0:
 			return B_OK;
-		default: {
-			// command status wrapper is not meaningful
-			TRACE_ALWAYS("command status wrapper has invalid status\n");
-			usb_disk_reset_recovery(device);
-			return B_ERROR;
-		}
+		default:
+			TRACE("Interrupt returned non-zero code : %x/%x\n", status.status,
+				status.misc);
+			// Maybe we should pass the code to the caller ? But we can't handle
+			// everything as errors at this level, for example test unit ready
+			// will return a "not ready code if there is no disk, but this is
+			// not an operation error.
+			// The code is also available as data by sending a status request to
+			// the drive, anyway.
+			return B_OK;
 	}
 }
 
@@ -433,12 +436,12 @@ usb_disk_test_unit_ready(device_lun *lun)
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
-	commandBlock[0] = SCSI_INQUIRY_6;
+	commandBlock[0] = SCSI_TEST_UNIT_READY_6;
 	commandBlock[1] = lun->logical_unit_number << 5;
 
 	status_t result;
 	result = usb_disk_operation(lun, commandBlock, 0, 0,
-		NULL, NULL, true);
+		NULL, NULL, false);
 
 	if (result == B_DEV_INVALID_IOCTL) {
 		lun->device->tur_supported = false;
@@ -655,11 +658,11 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		return device->notify;
 	}
 
-	interruptLock = create_sem(0, "usb_disk interrupt lock");
-	if (interruptLock < B_OK) {
+	device->interruptLock = create_sem(0, "usb_disk interrupt lock");
+	if (device->interruptLock < B_OK) {
 		mutex_destroy(&device->lock);
 		free(device);
-		return interruptLock;
+		return device->interruptLock;
 	}
 
 	// TODO: handle more than 1 unit
@@ -690,6 +693,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 
 		// initialize this lun
 		result = usb_disk_inquiry(lun);
+		TRACE("Probing unit %d\n", lun->logical_unit_number);
 		for (uint32 tries = 0; tries < 3; tries++) {
 			status_t ready = usb_disk_test_unit_ready(lun);
 			if (ready == B_OK || ready == B_DEV_NO_MEDIA) {

@@ -54,6 +54,10 @@ typedef struct disk_device_s {
 	status_t	status;
 	size_t		actual_length;
 
+	// used to store interrupt result
+	unsigned char interruptBuffer[2];
+	sem_id interruptLock;
+
 	// logical units of this device
 	uint8		lun_count;
 	device_lun **luns;
