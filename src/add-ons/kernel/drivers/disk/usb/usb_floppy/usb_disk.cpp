@@ -261,6 +261,11 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 	if (result != B_OK || actualLength != 12) {
 		TRACE("Command stage: wrote %ld bytes (error: %s)\n",
 			actualLength, strerror(result));
+
+		// There was an error, we have to do a request sense to reset the device
+		if (operation[0] != SCSI_REQUEST_SENSE_6) {
+			result = usb_disk_request_sense(lun);
+		}
 		return B_ERROR;
 	}
 
@@ -544,12 +549,11 @@ usb_disk_update_capacity(device_lun *lun)
 	// changed, which is more or less expected if it is the first operation
 	// on the device or the device only clears the unit atention for capacity
 	// reads.
-	for (int32 i = 0; i < 3; i++) {
+	do {
+		snooze(10000);
 		result = usb_disk_operation(lun, commandBlock, &parameter, &dataLength,
 			true);
-		if (result == B_OK)
-			break;
-	}
+	} while (result != B_OK);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("failed to update capacity\n");
