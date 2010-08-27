@@ -187,7 +187,7 @@ private:
 	status_t _FinishBind(UdpEndpoint *endpoint, const sockaddr *address);
 
 	UdpEndpoint *_FindActiveEndpoint(const sockaddr *ourAddress,
-		const sockaddr *peerAddress);
+		const sockaddr *peerAddress, uint32 index = 0);
 	status_t _DemuxBroadcast(net_buffer *buffer);
 	status_t _DemuxUnicast(net_buffer *buffer);
 
@@ -493,7 +493,7 @@ UdpDomainSupport::_FinishBind(UdpEndpoint *endpoint, const sockaddr *address)
 
 UdpEndpoint *
 UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
-	const sockaddr *peerAddress)
+	const sockaddr *peerAddress, uint32 index)
 {
 	ASSERT_LOCKED_MUTEX(&fLock);
 
@@ -501,7 +501,20 @@ UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
 		AddressString(fDomain, ourAddress, true).Data(),
 		AddressString(fDomain, peerAddress, true).Data());
 
-	return fActiveEndpoints.Lookup(std::make_pair(ourAddress, peerAddress));
+	UdpEndpoint* endpoint = fActiveEndpoints.Lookup(
+		std::make_pair(ourAddress, peerAddress));
+
+	// Make sure the bound_to_device constraint is fulfilled
+	while (endpoint != NULL && index != 0
+		&& endpoint->socket->bound_to_device != index) {
+		endpoint = endpoint->HashTableLink();
+		if (endpoint != NULL
+			&& (!endpoint->LocalAddress().EqualTo(ourAddress, true)
+				|| !endpoint->PeerAddress().EqualTo(peerAddress, true)))
+			return NULL;
+	}
+
+	return endpoint;
 }
 
 
@@ -523,6 +536,10 @@ UdpDomainSupport::_DemuxBroadcast(net_buffer* buffer)
 	while (UdpEndpoint* endpoint = iterator.Next()) {
 		TRACE_DOMAIN("  _DemuxBroadcast(): checking endpoint %s...",
 			AddressString(fDomain, *endpoint->LocalAddress(), true).Data());
+
+		if (endpoint->socket->bound_to_device != 0
+			&& buffer->index != endpoint->socket->bound_to_device)
+			continue;
 
 		if (endpoint->LocalAddress().Port() != incomingPort) {
 			// ports don't match, so we do not dispatch to this endpoint...
@@ -559,19 +576,20 @@ UdpDomainSupport::_DemuxUnicast(net_buffer* buffer)
 	const sockaddr* peerAddress = buffer->source;
 
 	// look for full (most special) match:
-	UdpEndpoint* endpoint = _FindActiveEndpoint(localAddress, peerAddress);
+	UdpEndpoint* endpoint = _FindActiveEndpoint(localAddress, peerAddress,
+		buffer->index);
 	if (endpoint == NULL) {
 		// look for endpoint matching local address & port:
-		endpoint = _FindActiveEndpoint(localAddress, NULL);
+		endpoint = _FindActiveEndpoint(localAddress, NULL, buffer->index);
 		if (endpoint == NULL) {
 			// look for endpoint matching peer address & port and local port:
 			SocketAddressStorage local(AddressModule());
 			local.SetToEmpty();
 			local.SetPort(AddressModule()->get_port(localAddress));
-			endpoint = _FindActiveEndpoint(*local, peerAddress);
+			endpoint = _FindActiveEndpoint(*local, peerAddress, buffer->index);
 			if (endpoint == NULL) {
 				// last chance: look for endpoint matching local port only:
-				endpoint = _FindActiveEndpoint(*local, NULL);
+				endpoint = _FindActiveEndpoint(*local, NULL, buffer->index);
 			}
 		}
 	}
