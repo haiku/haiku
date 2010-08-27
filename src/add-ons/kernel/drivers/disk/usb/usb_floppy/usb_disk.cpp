@@ -40,7 +40,7 @@ static mutex gDeviceListLock;
 static char **gDeviceNames = NULL;
 
 static uint8 kDeviceIcon[] = {
-		0x6e, 0x63, 0x69, 0x66, 0x0c, 0x03, 0x01, 0x00, 0x00, 0x01, 0x01, 0x00,
+	0x6e, 0x63, 0x69, 0x66, 0x0c, 0x03, 0x01, 0x00, 0x00, 0x01, 0x01, 0x00,
 	0x00, 0x6a, 0x02, 0x00, 0x16, 0x02, 0x38, 0x6a, 0xad, 0x38, 0xeb, 0x7a,
 	0xbb, 0x77, 0x73, 0x3a, 0xde, 0x88, 0x48, 0xce, 0xdc, 0x4a, 0x75, 0xed,
 	0x00, 0x8a, 0xff, 0x4b, 0x02, 0x00, 0x16, 0x02, 0x38, 0x6a, 0xad, 0x38,
@@ -195,10 +195,19 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 void
 usb_disk_interrupt(void* cookie, int32 status, void* data, uint32 length)
 {
-	if (length != 2)
-		TRACE_ALWAYS("interrupt of length %ld! (expected 2)\n", length);
 	disk_device* dev = (disk_device*)cookie;
+	// We release the lock even if the interrupt is invalid. This way there
+	// is at least a chance for the driver to terminate properly.
 	release_sem(dev->interruptLock);
+
+	if (length != 2) {
+		TRACE_ALWAYS("interrupt of length %ld! (expected 2)\n", length);
+		// In this case we do not reschedule the interrupt. This means the
+		// driver will be locked. The interrupt should perhaps be scheduled
+		// when starting a transfer instead. But getting there means something
+		// is really broken, so...
+		return;
+	}
 
 	// Reschedule the interrupt for next time
 	gUSBModule->queue_interrupt(dev->interrupt, dev->interruptBuffer, 2,
@@ -245,9 +254,9 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 
 		// There was an error, we have to do a request sense to reset the device
 		if (operation[0] != SCSI_REQUEST_SENSE_6) {
-			result = usb_disk_request_sense(lun);
+			usb_disk_request_sense(lun);
 		}
-		return B_ERROR;
+		return result;
 	}
 
 	// Step 2 : data phase : send or receive data
@@ -296,23 +305,6 @@ usb_disk_operation(device_lun *lun, uint8* operation,
 		result = usb_disk_request_sense(lun);
 	}
 	return result;
-	/*
-	switch (status.status) {
-		case 0:
-			TRACE("Command finished ! Everything ok !\n");
-			return B_OK;
-		default:
-			TRACE("Interrupt returned non-zero code : %x/%x\n", status.status,
-				status.misc);
-			// Maybe we should pass the code to the caller ? But we can't handle
-			// everything as errors at this level, for example test unit ready
-			// will return a "not ready code if there is no disk, but this is
-			// not an operation error.
-			// The code is also available as data by sending a status request to
-			// the drive, anyway.
-			return B_OK;
-	}
-	*/
 }
 
 
@@ -333,9 +325,11 @@ usb_disk_send_diagnostic(device_lun *lun)
 	status_t result = usb_disk_operation(lun, commandBlock, NULL,
 		NULL, false);
 
-	while(result == B_DEV_NO_MEDIA) {
+	int retry = 100;
+	while(result == B_DEV_NO_MEDIA && retry > 0) {
 		snooze(10000);
 		result = usb_disk_request_sense(lun);
+		retry--;
 	}
 
 	if (result != B_OK)
@@ -525,16 +519,15 @@ usb_disk_update_capacity(device_lun *lun)
 	commandBlock[0] = SCSI_READ_CAPACITY_10;
 	commandBlock[1] = lun->logical_unit_number << 5;
 
-	// Retry reading the capacity up to three times. The first try might only
-	// yield a unit attention telling us that the device or media status
-	// changed, which is more or less expected if it is the first operation
-	// on the device or the device only clears the unit atention for capacity
-	// reads.
-	do {
-		snooze(10000);
+	for (int tries = 0; tries < 5; tries++) {
 		result = usb_disk_operation(lun, commandBlock, &parameter, &dataLength,
 			true);
-	} while (result != B_OK);
+		if (result == B_DEV_NO_MEDIA || result == B_TIMED_OUT
+				|| result == B_DEV_STALLED)
+			snooze(10000);
+		else
+			break;
+	}
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("failed to update capacity\n");
@@ -829,12 +822,15 @@ usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	commandBlock[8] = blockCount >> 8;
 	commandBlock[9] = blockCount;
 
-	status_t result;
-	do {
-		snooze(10000);
+	status_t result = B_OK;
+	for (int tries = 0; tries < 5; tries++) {
 		result = usb_disk_operation(lun, commandBlock, buffer, length,
 			true);
-	} while (result != B_OK);
+		if (result == B_OK)
+			break;
+		else
+			snooze(10000);
+	}
 	return result;
 }
 
@@ -858,18 +854,15 @@ usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	commandBlock[9] = blockCount;
 
 	status_t result;
-	do {
+	result = usb_disk_operation(lun, commandBlock, buffer, length,
+		false);
+
+	int retry = 10;
+	while (result == B_DEV_NO_MEDIA && retry > 0) {
 		snooze(10000);
-		result = usb_disk_operation(lun, commandBlock, buffer, length,
-			false);
-
-		TRACE("write result : %s\n", strerror(result));
-
-		do {
-			snooze(10000);
-			result = usb_disk_request_sense(lun);
-		} while (result != B_OK);
-	} while (result != B_OK);
+		result = usb_disk_request_sense(lun);
+		retry--;
+	}
 
 	if (result == B_OK)
 		lun->should_sync = true;
