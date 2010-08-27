@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -87,19 +87,19 @@ update_cursor(struct console_desc *console, int x, int y)
 
 
 static void
-gotoxy(struct console_desc *console, int new_x, int new_y)
+gotoxy(struct console_desc *console, int newX, int newY)
 {
-	if (new_x >= console->columns)
-		new_x = console->columns - 1;
-	if (new_x < 0)
-		new_x = 0;
-	if (new_y >= console->lines)
-		new_y = console->lines - 1;
-	if (new_y < 0)
-		new_y = 0;
+	if (newX >= console->columns)
+		newX = console->columns - 1;
+	if (newX < 0)
+		newX = 0;
+	if (newY >= console->lines)
+		newY = console->lines - 1;
+	if (newY < 0)
+		newY = 0;
 
-	console->x = new_x;
-	console->y = new_y;
+	console->x = newX;
+	console->y = newY;
 }
 
 
@@ -114,8 +114,8 @@ reset_console(struct console_desc *console)
 }
 
 
-/** scroll from the cursor line up to the top of the scroll region up one line */
-
+/*!	Scroll from the cursor line up to the top of the scroll region up one line.
+*/
 static void
 scrup(struct console_desc *console)
 {
@@ -130,12 +130,14 @@ scrup(struct console_desc *console)
 	}
 
 	// clear the bottom line
-	console->module->fill_glyph(0, console->y, console->columns, 1, ' ', console->attr);
+	console->module->fill_glyph(0, console->y, console->columns, 1, ' ',
+		console->attr);
 }
 
 
-/** scroll from the cursor line down to the bottom of the scroll region down one line */
-
+/*!	Scroll from the cursor line down to the bottom of the scroll region down
+	one line.
+*/
 static void
 scrdown(struct console_desc *console)
 {
@@ -150,7 +152,8 @@ scrdown(struct console_desc *console)
 	}
 
 	// clear the top line
-	console->module->fill_glyph(0, console->y, console->columns, 1, ' ', console->attr);
+	console->module->fill_glyph(0, console->y, console->columns, 1, ' ',
+		console->attr);
 }
 
 
@@ -211,10 +214,12 @@ erase_line(struct console_desc *console, erase_line_mode mode)
 {
 	switch (mode) {
 		case LINE_ERASE_WHOLE:
-			console->module->fill_glyph(0, console->y, console->columns, 1, ' ', console->attr);
+			console->module->fill_glyph(0, console->y, console->columns, 1, ' ',
+				console->attr);
 			break;
 		case LINE_ERASE_LEFT:
-			console->module->fill_glyph(0, console->y, console->x+1, 1, ' ', console->attr);
+			console->module->fill_glyph(0, console->y, console->x + 1, 1, ' ',
+				console->attr);
 			break;
 		case LINE_ERASE_RIGHT:
 			console->module->fill_glyph(console->x, console->y,
@@ -234,11 +239,12 @@ erase_screen(struct console_desc *console, erase_screen_mode mode)
 			console->module->clear(console->attr);
 			break;
 		case SCREEN_ERASE_UP:
-			console->module->fill_glyph(0, 0, console->columns, console->y + 1, ' ', console->attr);
+			console->module->fill_glyph(0, 0, console->columns, console->y + 1,
+				' ', console->attr);
 			break;
 		case SCREEN_ERASE_DOWN:
-			console->module->fill_glyph(console->y, 0,
-				console->columns, console->lines - console->y, ' ', console->attr);
+			console->module->fill_glyph(console->y, 0, console->columns,
+				console->lines - console->y, ' ', console->attr);
 			break;
 		default:
 			return;
@@ -247,21 +253,23 @@ erase_screen(struct console_desc *console, erase_screen_mode mode)
 
 
 static void
-save_cur(struct console_desc *console, bool save_attrs)
+save_cur(struct console_desc *console, bool saveAttrs)
 {
 	console->saved_x = console->x;
 	console->saved_y = console->y;
-	if (save_attrs)
+
+	if (saveAttrs)
 		console->saved_attr = console->attr;
 }
 
 
 static void
-restore_cur(struct console_desc *console, bool restore_attrs)
+restore_cur(struct console_desc *console, bool restoreAttrs)
 {
 	console->x = console->saved_x;
 	console->y = console->saved_y;
-	if (restore_attrs)
+
+	if (restoreAttrs)
 		console->attr = console->saved_attr;
 }
 
@@ -273,7 +281,7 @@ console_putch(struct console_desc *console, const char c)
 		cr(console);
 		lf(console);
 	}
-	console->module->put_glyph(console->x-1, console->y, c, console->attr);
+	console->module->put_glyph(console->x - 1, console->y, c, console->attr);
 	return c;
 }
 
@@ -336,7 +344,8 @@ set_vt100_attributes(struct console_desc *console, int32 *args, int32 argCount)
 				break;
 			case 7: // reverse
 				console->reverse_attr = true;
-				console->attr = ((console->attr & BMASK) >> 4) | ((console->attr & FMASK) << 4);
+				console->attr = ((console->attr & BMASK) >> 4)
+					| ((console->attr & FMASK) << 4);
 				if (console->bright_attr)
 					console->attr |= 0x08;
 				break;
@@ -378,8 +387,9 @@ process_vt100_command(struct console_desc *console, const char c,
 
 	if (seenBracket) {
 		switch(c) {
-			case 'H': /* set cursor position */
-			case 'f': {
+			case 'H': // set cursor position
+			case 'f':
+			{
 				int32 row = argCount > 0 ? args[0] : 1;
 				int32 col = argCount > 1 ? args[1] : 1;
 				if (row > 0)
@@ -389,65 +399,73 @@ process_vt100_command(struct console_desc *console, const char c,
 				gotoxy(console, col, row);
 				break;
 			}
-			case 'A': { /* move up */
-				int32 deltay = argCount > 0 ? -args[0] : -1;
-				if (deltay == 0)
-					deltay = -1;
-				gotoxy(console, console->x, console->y + deltay);
+			case 'A':	// move up
+			{
+				int32 deltaY = argCount > 0 ? -args[0] : -1;
+				if (deltaY == 0)
+					deltaY = -1;
+				gotoxy(console, console->x, console->y + deltaY);
 				break;
 			}
 			case 'e':
-			case 'B': { /* move down */
-				int32 deltay = argCount > 0 ? args[0] : 1;
-				if (deltay == 0)
-					deltay = 1;
-				gotoxy(console, console->x, console->y + deltay);
+			case 'B':	// move down
+			{
+				int32 deltaY = argCount > 0 ? args[0] : 1;
+				if (deltaY == 0)
+					deltaY = 1;
+				gotoxy(console, console->x, console->y + deltaY);
 				break;
 			}
-			case 'D': { /* move left */
-				int32 deltax = argCount > 0 ? -args[0] : -1;
-				if (deltax == 0)
-					deltax = -1;
-				gotoxy(console, console->x + deltax, console->y);
+			case 'D':	// move left
+			{
+				int32 deltaX = argCount > 0 ? -args[0] : -1;
+				if (deltaX == 0)
+					deltaX = -1;
+				gotoxy(console, console->x + deltaX, console->y);
 				break;
 			}
 			case 'a':
-			case 'C': { /* move right */
-				int32 deltax = argCount > 0 ? args[0] : 1;
-				if (deltax == 0)
-					deltax = 1;
-				gotoxy(console, console->x + deltax, console->y);
+			case 'C':	// move right
+			{
+				int32 deltaX = argCount > 0 ? args[0] : 1;
+				if (deltaX == 0)
+					deltaX = 1;
+				gotoxy(console, console->x + deltaX, console->y);
 				break;
 			}
 			case '`':
-			case 'G': { /* set X position */
-				int32 newx = argCount > 0 ? args[0] : 1;
-				if (newx > 0)
-					newx--;
-				gotoxy(console, newx, console->y);
+			case 'G':	// set X position
+			{
+				int32 newX = argCount > 0 ? args[0] : 1;
+				if (newX > 0)
+					newX--;
+				gotoxy(console, newX, console->y);
 				break;
 			}
-			case 'd': { /* set y position */
-				int32 newy = argCount > 0 ? args[0] : 1;
-				if (newy > 0)
-					newy--;
-				gotoxy(console, console->x, newy);
+			case 'd':	// set y position
+			{
+				int32 newY = argCount > 0 ? args[0] : 1;
+				if (newY > 0)
+					newY--;
+				gotoxy(console, console->x, newY);
 				break;
 			}
-			case 's': /* save current cursor */
+			case 's':	// save current cursor
 				save_cur(console, false);
 				break;
-			case 'u': /* restore cursor */
+			case 'u':	// restore cursor
 				restore_cur(console, false);
 				break;
-			case 'r': { /* set scroll region */
+			case 'r':	// set scroll region
+			{
 				int32 low = argCount > 0 ? args[0] : 1;
 				int32 high = argCount > 1 ? args[1] : console->lines;
 				if (low <= high)
 					set_scroll_region(console, low - 1, high - 1);
 				break;
 			}
-			case 'L': { /* scroll virtual down at cursor */
+			case 'L':	// scroll virtual down at cursor
+			{
 				int32 lines = argCount > 0 ? args[0] : 1;
 				while (lines > 0) {
 					scrdown(console);
@@ -455,7 +473,8 @@ process_vt100_command(struct console_desc *console, const char c,
 				}
 				break;
 			}
-			case 'M': { /* scroll virtual up at cursor */
+			case 'M':	// scroll virtual up at cursor
+			{
 				int32 lines = argCount > 0 ? args[0] : 1;
 				while (lines > 0) {
 					scrup(console);
@@ -519,13 +538,13 @@ process_vt100_command(struct console_desc *console, const char c,
 
 
 static ssize_t
-_console_write(struct console_desc *console, const void *buf, size_t len)
+_console_write(struct console_desc *console, const void *buffer, size_t length)
 {
 	const char *c;
 	size_t pos = 0;
 
-	while (pos < len) {
-		c = &((const char *)buf)[pos++];
+	while (pos < length) {
+		c = &((const char *)buffer)[pos++];
 
 		switch (console->state) {
 			case CONSOLE_STATE_NORMAL:
@@ -551,7 +570,7 @@ _console_write(struct console_desc *console, const void *buf, size_t len)
 						break;
 					case 0x1b:
 						// escape character
-						console->arg_count = -1;
+						console->arg_count = 0;
 						console->state = CONSOLE_STATE_GOT_ESCAPE;
 						break;
 					default:
@@ -559,15 +578,18 @@ _console_write(struct console_desc *console, const void *buf, size_t len)
 				}
 				break;
 			case CONSOLE_STATE_GOT_ESCAPE:
-				// look for either commands with no argument, or the '[' character
+				// Look for either commands with no argument, or the '['
+				// character
 				switch (*c) {
 					case '[':
 						console->state = CONSOLE_STATE_SEEN_BRACKET;
 						break;
 					default:
-						console->args[console->arg_count] = 0;
-						process_vt100_command(console, *c, false, console->args, console->arg_count + 1);
+						console->args[0] = 0;
+						process_vt100_command(console, *c, false, console->args,
+							0);
 						console->state = CONSOLE_STATE_NORMAL;
+						break;
 				}
 				break;
 			case CONSOLE_STATE_SEEN_BRACKET:
@@ -578,12 +600,16 @@ _console_write(struct console_desc *console, const void *buf, size_t len)
 						console->state = CONSOLE_STATE_PARSING_ARG;
 						break;
 					case '?':
-						// private DEC mode parameter follows - we ignore those anyway
-						// ToDo: check if it was really used in combination with a mode command
+						// Private DEC mode parameter follows - we ignore those
+						// anyway
+						// TODO: check if it was really used in combination with
+						// a mode command
 						break;
 					default:
-						process_vt100_command(console, *c, true, console->args, console->arg_count + 1);
+						process_vt100_command(console, *c, true, console->args,
+							console->arg_count + 1);
 						console->state = CONSOLE_STATE_NORMAL;
+						break;
 				}
 				break;
 			case CONSOLE_STATE_NEW_ARG:
@@ -598,8 +624,10 @@ _console_write(struct console_desc *console, const void *buf, size_t len)
 						console->state = CONSOLE_STATE_PARSING_ARG;
 						break;
 					default:
-						process_vt100_command(console, *c, true, console->args, console->arg_count + 1);
+						process_vt100_command(console, *c, true, console->args,
+							console->arg_count + 1);
 						console->state = CONSOLE_STATE_NORMAL;
+						break;
 				}
 				break;
 			case CONSOLE_STATE_PARSING_ARG:
@@ -613,8 +641,10 @@ _console_write(struct console_desc *console, const void *buf, size_t len)
 						console->state = CONSOLE_STATE_NEW_ARG;
 						break;
 					default:
-						process_vt100_command(console, *c, true, console->args, console->arg_count + 1);
+						process_vt100_command(console, *c, true, console->args,
+							console->arg_count + 1);
 						console->state = CONSOLE_STATE_NORMAL;
+						break;
 				}
 		}
 	}
@@ -767,7 +797,7 @@ const char **
 publish_devices(void)
 {
 	static const char *devices[] = {
-		DEVICE_NAME, 
+		DEVICE_NAME,
 		NULL
 	};
 

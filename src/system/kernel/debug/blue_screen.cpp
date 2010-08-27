@@ -1,6 +1,9 @@
 /*
- * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
  */
 
 
@@ -298,7 +301,8 @@ set_vt100_attributes(int32 *args, int32 argCount)
 
 
 static bool
-process_vt100_command(const char c, bool seenBracket, int32 *args, int32 argCount)
+process_vt100_command(const char c, bool seenBracket, int32 *args,
+	int32 argCount)
 {
 	bool ret = true;
 
@@ -307,8 +311,9 @@ process_vt100_command(const char c, bool seenBracket, int32 *args, int32 argCoun
 
 	if (seenBracket) {
 		switch (c) {
-			case 'H': /* set cursor position */
-			case 'f': {
+			case 'H':	// set cursor position
+			case 'f':
+			{
 				int32 row = argCount > 0 ? args[0] : 1;
 				int32 col = argCount > 1 ? args[1] : 1;
 				if (row > 0)
@@ -318,66 +323,74 @@ process_vt100_command(const char c, bool seenBracket, int32 *args, int32 argCoun
 				move_cursor(col, row);
 				break;
 			}
-			case 'A': { /* move up */
-				int32 deltay = argCount > 0 ? -args[0] : -1;
-				if (deltay == 0)
-					deltay = -1;
-				move_cursor(sScreen.x, sScreen.y + deltay);
+			case 'A':	// move up
+			{
+				int32 deltaY = argCount > 0 ? -args[0] : -1;
+				if (deltaY == 0)
+					deltaY = -1;
+				move_cursor(sScreen.x, sScreen.y + deltaY);
 				break;
 			}
 			case 'e':
-			case 'B': { /* move down */
-				int32 deltay = argCount > 0 ? args[0] : 1;
-				if (deltay == 0)
-					deltay = 1;
-				move_cursor(sScreen.x, sScreen.y + deltay);
+			case 'B':	// move down
+			{
+				int32 deltaY = argCount > 0 ? args[0] : 1;
+				if (deltaY == 0)
+					deltaY = 1;
+				move_cursor(sScreen.x, sScreen.y + deltaY);
 				break;
 			}
-			case 'D': { /* move left */
-				int32 deltax = argCount > 0 ? -args[0] : -1;
-				if (deltax == 0)
-					deltax = -1;
-				move_cursor(sScreen.x + deltax, sScreen.y);
+			case 'D':	// move left
+			{
+				int32 deltaX = argCount > 0 ? -args[0] : -1;
+				if (deltaX == 0)
+					deltaX = -1;
+				move_cursor(sScreen.x + deltaX, sScreen.y);
 				break;
 			}
 			case 'a':
-			case 'C': { /* move right */
-				int32 deltax = argCount > 0 ? args[0] : 1;
-				if (deltax == 0)
-					deltax = 1;
-				move_cursor(sScreen.x + deltax, sScreen.y);
+			case 'C':	// move right
+			{
+				int32 deltaX = argCount > 0 ? args[0] : 1;
+				if (deltaX == 0)
+					deltaX = 1;
+				move_cursor(sScreen.x + deltaX, sScreen.y);
 				break;
 			}
 			case '`':
-			case 'G': { /* set X position */
-				int32 newx = argCount > 0 ? args[0] : 1;
-				if (newx > 0)
-					newx--;
-				move_cursor(newx, sScreen.y);
+			case 'G':	// set X position
+			{
+				int32 newX = argCount > 0 ? args[0] : 1;
+				if (newX > 0)
+					newX--;
+				move_cursor(newX, sScreen.y);
 				break;
 			}
-			case 'd': { /* set y position */
-				int32 newy = argCount > 0 ? args[0] : 1;
-				if (newy > 0)
-					newy--;
-				move_cursor(sScreen.x, newy);
+			case 'd':	// set y position
+			{
+				int32 newY = argCount > 0 ? args[0] : 1;
+				if (newY > 0)
+					newY--;
+				move_cursor(sScreen.x, newY);
 				break;
 			}
 #if 0
-			case 's': /* save current cursor */
+			case 's':	// save current cursor
 				save_cur(console, false);
 				break;
-			case 'u': /* restore cursor */
+			case 'u':	// restore cursor
 				restore_cur(console, false);
 				break;
-			case 'r': { /* set scroll region */
+			case 'r':	// set scroll region
+			{
 				int32 low = argCount > 0 ? args[0] : 1;
 				int32 high = argCount > 1 ? args[1] : sScreen.lines;
 				if (low <= high)
 					set_scroll_region(console, low - 1, high - 1);
 				break;
 			}
-			case 'L': { /* scroll virtual down at cursor */
+			case 'L':	// scroll virtual down at cursor
+			{
 				int32 lines = argCount > 0 ? args[0] : 1;
 				while (lines > 0) {
 					scrdown(console);
@@ -385,7 +398,8 @@ process_vt100_command(const char c, bool seenBracket, int32 *args, int32 argCoun
 				}
 				break;
 			}
-			case 'M': { /* scroll virtual up at cursor */
+			case 'M':	// scroll virtual up at cursor
+			{
 				int32 lines = argCount > 0 ? args[0] : 1;
 				while (lines > 0) {
 					scrup(console);
@@ -467,7 +481,7 @@ parse_character(char c)
 					back_space();
 					break;
 				case '\t':
-					// ToDo: real tab...
+					// TODO: real tab...
 					sScreen.x = (sScreen.x + 8) & ~7;
 					if (sScreen.x >= sScreen.columns)
 						next_line();
@@ -480,7 +494,7 @@ parse_character(char c)
 
 				case 0x1b:
 					// escape character
-					sScreen.arg_count = -1;
+					sScreen.arg_count = 0;
 					sScreen.state = CONSOLE_STATE_GOT_ESCAPE;
 					break;
 				default:
@@ -494,9 +508,8 @@ parse_character(char c)
 					sScreen.state = CONSOLE_STATE_SEEN_BRACKET;
 					break;
 				default:
-					sScreen.args[sScreen.arg_count] = 0;
-					process_vt100_command(c, false, sScreen.args,
-						sScreen.arg_count + 1);
+					sScreen.args[0] = 0;
+					process_vt100_command(c, false, sScreen.args, 0);
 					sScreen.state = CONSOLE_STATE_NORMAL;
 			}
 			break;
@@ -504,7 +517,7 @@ parse_character(char c)
 			switch (c) {
 				case '0'...'9':
 					sScreen.arg_count = 0;
-					sScreen.args[sScreen.arg_count] = c - '0';
+					sScreen.args[0] = c - '0';
 					sScreen.state = CONSOLE_STATE_PARSING_ARG;
 					break;
 				case '?':
@@ -515,13 +528,13 @@ parse_character(char c)
 					process_vt100_command(c, true, sScreen.args,
 						sScreen.arg_count + 1);
 					sScreen.state = CONSOLE_STATE_NORMAL;
+					break;
 			}
 			break;
 		case CONSOLE_STATE_NEW_ARG:
 			switch (c) {
 				case '0'...'9':
-					sScreen.arg_count++;
-					if (sScreen.arg_count == MAX_ARGS) {
+					if (++sScreen.arg_count == MAX_ARGS) {
 						sScreen.state = CONSOLE_STATE_NORMAL;
 						break;
 					}
@@ -532,6 +545,7 @@ parse_character(char c)
 					process_vt100_command(c, true, sScreen.args,
 						sScreen.arg_count + 1);
 					sScreen.state = CONSOLE_STATE_NORMAL;
+					break;
 			}
 			break;
 		case CONSOLE_STATE_PARSING_ARG:
@@ -548,6 +562,7 @@ parse_character(char c)
 					process_vt100_command(c, true, sScreen.args,
 						sScreen.arg_count + 1);
 					sScreen.state = CONSOLE_STATE_NORMAL;
+					break;
 			}
 	}
 }
