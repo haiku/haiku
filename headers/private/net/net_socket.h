@@ -32,7 +32,7 @@ typedef struct net_socket {
 
 	int						options;
 	int						linger;
-	int						bound_to_device;
+	uint32					bound_to_device;
 
 	struct {
 		uint32		buffer_size;

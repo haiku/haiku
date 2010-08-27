@@ -363,7 +363,7 @@ dump_socket(int argc, char** argv)
 	kprintf("  first module_info:    %p\n", socket->first_info);
 	kprintf("  options:              %x\n", socket->options);
 	kprintf("  linger:               %d\n", socket->linger);
-	kprintf("  bound to device:      %d\n", socket->bound_to_device);
+	kprintf("  bound to device:      %" B_PRIu32 "\n", socket->bound_to_device);
 	kprintf("  owner:                %ld\n", socket->owner);
 	kprintf("  max backlog:          %ld\n", socket->max_backlog);
 	kprintf("  is connected:         %d\n", socket->is_connected);
@@ -1490,6 +1490,8 @@ socket_set_option(net_socket* socket, int level, int option, const void* value,
 	if (level != SOL_SOCKET)
 		return ENOPROTOOPT;
 
+	TRACE("%s(socket %p, option %d\n", __FUNCTION__, socket, option);
+
 	switch (option) {
 		// TODO: implement other options!
 		case SO_LINGER:
@@ -1586,16 +1588,12 @@ socket_set_option(net_socket* socket, int level, int option, const void* value,
 
 		case SO_BINDTODEVICE:
 		{
-			if (length != sizeof(int32))
-				return B_BAD_VALUE;
-
-			int index = *(const int32*)value;
-			if (index < 0)
+			if (length != sizeof(uint32))
 				return B_BAD_VALUE;
 
 			// TODO: we might want to check if the device exists at all
 			// (although it doesn't really harm when we don't)
-			socket->bound_to_device = index;
+			socket->bound_to_device = *(const uint32*)value;
 			return B_OK;
 		}
 

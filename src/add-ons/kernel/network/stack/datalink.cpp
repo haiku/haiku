@@ -414,7 +414,7 @@ datalink_send_data(net_protocol* protocol, net_domain* domain,
 	net_route* route = NULL;
 	status_t status;
 	if (protocol != NULL && protocol->socket != NULL
-		&& protocol->socket->bound_to_device > 0) {
+		&& protocol->socket->bound_to_device != 0) {
 		status = get_device_route(domain, protocol->socket->bound_to_device,
 			&route);
 	} else
