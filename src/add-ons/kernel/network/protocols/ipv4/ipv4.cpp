@@ -22,7 +22,6 @@
 #include <KernelExport.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
-#include <util/khash.h>
 #include <util/DoublyLinkedList.h>
 #include <util/MultiHashTable.h>
 
@@ -68,6 +67,7 @@ struct ipv4_packet_key {
 	uint8		protocol;
 };
 
+
 class FragmentPacket {
 public:
 								FragmentPacket(const ipv4_packet_key& key);
@@ -81,21 +81,53 @@ public:
 									{ return fReceivedLastFragment
 										&& fBytesLeft == 0; }
 
-	static	uint32				Hash(void* _packet, const void* _key,
-									uint32 range);
-	static	int					Compare(void* _packet, const void* _key);
-	static	int32				NextOffset()
-									{ return offsetof(FragmentPacket, fNext); }
+			const ipv4_packet_key& Key() const { return fKey; }
+			FragmentPacket*&	HashTableLink() { return fNext; }
+
 	static	void				StaleTimer(struct net_timer* timer, void* data);
 
 private:
 			FragmentPacket*		fNext;
 			struct ipv4_packet_key fKey;
+			uint32				fIndex;
 			bool				fReceivedLastFragment;
 			int32				fBytesLeft;
 			FragmentList		fFragments;
 			net_timer			fTimer;
 };
+
+
+struct FragmentHashDefinition {
+	typedef ipv4_packet_key KeyType;
+	typedef FragmentPacket ValueType;
+
+	size_t HashKey(const KeyType& key) const
+	{
+		return (key.source ^ key.destination ^ key.protocol ^ key.id);
+	}
+
+	size_t Hash(ValueType* value) const
+	{
+		return HashKey(value->Key());
+	}
+
+	bool Compare(const KeyType& key, ValueType* value) const
+	{
+		const ipv4_packet_key& packetKey = value->Key();
+
+		return packetKey.id == key.id
+			&& packetKey.source == key.source
+			&& packetKey.destination == key.destination
+			&& packetKey.protocol == key.protocol;
+	}
+
+	ValueType*& GetLink(ValueType* value) const
+	{
+		return value->HashTableLink();
+	}
+};
+
+typedef BOpenHashTable<FragmentHashDefinition, false, true> FragmentTable;
 
 
 class RawSocket
@@ -167,7 +199,7 @@ static int32 sPacketID;
 static RawSocketList sRawSockets;
 static mutex sRawSocketsLock;
 static mutex sFragmentLock;
-static hash_table* sFragmentHash;
+static FragmentTable sFragmentHash;
 static mutex sMulticastGroupsLock;
 
 typedef MultiHashTable<MulticastStateHash> MulticastState;
@@ -199,9 +231,10 @@ RawSocket::RawSocket(net_socket* socket)
 //	#pragma mark -
 
 
-FragmentPacket::FragmentPacket(const ipv4_packet_key &key)
+FragmentPacket::FragmentPacket(const ipv4_packet_key& key)
 	:
 	fKey(key),
+	fIndex(0),
 	fReceivedLastFragment(false),
 	fBytesLeft(IP_MAXPACKET)
 {
@@ -256,6 +289,9 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 		gBufferModule->free(buffer);
 		return B_OK;
 	}
+
+	fIndex = buffer->index;
+		// adopt the buffer's device index
 
 	TRACE("    previous: %p, next: %p", previous, next);
 
@@ -384,35 +420,10 @@ FragmentPacket::Reassemble(net_buffer* to)
 	if (buffer != to)
 		panic("ipv4 packet reassembly did not work correctly.");
 
+	to->index = fIndex;
+		// reset the buffer's device index
+
 	return B_OK;
-}
-
-
-int
-FragmentPacket::Compare(void* _packet, const void* _key)
-{
-	const ipv4_packet_key* key = (ipv4_packet_key*)_key;
-	ipv4_packet_key* packetKey = &((FragmentPacket*)_packet)->fKey;
-
-	if (packetKey->id == key->id
-		&& packetKey->source == key->source
-		&& packetKey->destination == key->destination
-		&& packetKey->protocol == key->protocol)
-		return 0;
-
-	return 1;
-}
-
-
-uint32
-FragmentPacket::Hash(void* _packet, const void* _key, uint32 range)
-{
-	const struct ipv4_packet_key* key = (struct ipv4_packet_key*)_key;
-	FragmentPacket* packet = (FragmentPacket*)_packet;
-	if (packet != NULL)
-		key = &packet->fKey;
-
-	return (key->source ^ key->destination ^ key->protocol ^ key->id) % range;
 }
 
 
@@ -423,7 +434,7 @@ FragmentPacket::StaleTimer(struct net_timer* timer, void* data)
 	TRACE("Assembling FragmentPacket %p timed out!", packet);
 
 	MutexLocker locker(&sFragmentLock);
-	hash_remove(sFragmentHash, packet);
+	sFragmentHash.Remove(packet);
 	locker.Unlock();
 
 	if (!packet->fFragments.IsEmpty()) {
@@ -529,7 +540,7 @@ reassemble_fragments(const ipv4_header &header, net_buffer** _buffer)
 	// TODO: Make locking finer grained.
 	MutexLocker locker(&sFragmentLock);
 
-	FragmentPacket* packet = (FragmentPacket*)hash_lookup(sFragmentHash, &key);
+	FragmentPacket* packet = sFragmentHash.Lookup(key);
 	if (packet == NULL) {
 		// New fragment packet
 		packet = new (std::nothrow) FragmentPacket(key);
@@ -537,7 +548,7 @@ reassemble_fragments(const ipv4_header &header, net_buffer** _buffer)
 			return B_NO_MEMORY;
 
 		// add packet to hash
-		status = hash_insert(sFragmentHash, packet);
+		status = sFragmentHash.Insert(packet);
 		if (status != B_OK) {
 			delete packet;
 			return status;
@@ -561,7 +572,7 @@ reassemble_fragments(const ipv4_header &header, net_buffer** _buffer)
 		return status;
 
 	if (packet->IsComplete()) {
-		hash_remove(sFragmentHash, packet);
+		sFragmentHash.Remove(packet);
 			// no matter if reassembling succeeds, we won't need this packet
 			// anymore
 
@@ -969,7 +980,7 @@ ipv4_generic_delta_membership(ipv4_protocol* protocol, int option,
 	const sockaddr_storage* _sourceAddr)
 {
 	if (_groupAddr->ss_family != AF_INET
-		|| _sourceAddr != NULL && _sourceAddr->ss_family != AF_INET)
+		|| (_sourceAddr != NULL && _sourceAddr->ss_family != AF_INET))
 		return B_BAD_VALUE;
 
 	const in_addr* groupAddr = &((const sockaddr_in*)_groupAddr)->sin_addr;
@@ -1822,9 +1833,9 @@ init_ipv4()
 	if (status != B_OK)
 		goto err5;
 
-	sFragmentHash = hash_init(MAX_HASH_FRAGMENTS, FragmentPacket::NextOffset(),
-		&FragmentPacket::Compare, &FragmentPacket::Hash);
-	if (sFragmentHash == NULL)
+	new (&sFragmentHash) FragmentTable();
+	status = sFragmentHash.Init(256);
+	if (status != B_OK)
 		goto err5;
 
 	new (&sRawSockets) RawSocketList;
@@ -1848,7 +1859,7 @@ init_ipv4()
 	return B_OK;
 
 err6:
-	hash_uninit(sFragmentHash);
+	sFragmentHash.~FragmentTable();
 err5:
 	delete sMulticastState;
 err4:
@@ -1877,7 +1888,7 @@ uninit_ipv4()
 	mutex_unlock(&sReceivingProtocolLock);
 
 	delete sMulticastState;
-	hash_uninit(sFragmentHash);
+	sFragmentHash.~FragmentTable();
 
 	mutex_destroy(&sMulticastGroupsLock);
 	mutex_destroy(&sFragmentLock);
