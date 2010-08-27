@@ -533,7 +533,8 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 {
 	TRACE("icmp_error_reply(code %s)\n", net_error_to_string(error));
 
-	uint8 icmpType, icmpCode;
+	uint8 icmpType = 0;
+	uint8 icmpCode = 0;
 	net_error_to_icmp(error, icmpType, icmpCode);
 
 	TRACE("  icmp type %u, code %u\n", icmpType, icmpCode);
