@@ -249,6 +249,7 @@ AddDriversToHaikuImage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus			: usb_raw fw_raw ;
 AddDriversToHaikuImage disk floppy	: $(X86_ONLY)pc_floppy ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
+AddDriversToHaikuImage disk usb		: usb_floppy ;
 AddDriversToHaikuImage printer usb	: usb_printer ;
 AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;

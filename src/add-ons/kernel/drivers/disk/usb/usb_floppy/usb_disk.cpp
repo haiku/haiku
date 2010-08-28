@@ -21,13 +21,13 @@
 #define DEVICE_NAME			DEVICE_NAME_BASE"%ld/%d/raw"
 
 
-#define TRACE_USB_DISK
+//#define TRACE_USB_DISK
 #ifdef TRACE_USB_DISK
-#define TRACE(x...)			dprintf(DRIVER_NAME": "x)
-#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME": "x)
+#define TRACE(x...)			dprintf("\x1B[35m"DRIVER_NAME"\x1B[0m: "x)
+#define TRACE_ALWAYS(x...)	dprintf("\x1B[35m"DRIVER_NAME"\x1B[0m: "x)
 #else
 #define TRACE(x...)			/* nothing */
-#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME": "x)
+#define TRACE_ALWAYS(x...)	dprintf("\x1B[35m"DRIVER_NAME"\x1B[0m: "x)
 #endif
 
 
@@ -126,8 +126,6 @@ status_t	usb_disk_synchronize(device_lun *lun, bool force);
 //
 //#pragma mark - Device Allocation Helper Functions
 //
-
-
 
 
 void
@@ -319,7 +317,7 @@ usb_disk_send_diagnostic(device_lun *lun)
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
-	commandBlock[0] = 0x1D;
+	commandBlock[0] = SCSI_SEND_DIAGNOSTIC;
 	commandBlock[1] = (lun->logical_unit_number << 5) | 4;
 
 	status_t result = usb_disk_operation(lun, commandBlock, NULL,
@@ -811,7 +809,7 @@ usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
-	commandBlock[0] = 0xA8;
+	commandBlock[0] = SCSI_READ_12;
 	commandBlock[1] = lun->logical_unit_number << 5;
 	commandBlock[2] = blockPosition >> 24;
 	commandBlock[3] = blockPosition >> 16;
@@ -842,7 +840,7 @@ usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
-	commandBlock[0] = 0xAA;
+	commandBlock[0] = SCSI_WRITE_12;
 	commandBlock[1] = lun->logical_unit_number << 5;
 	commandBlock[2] = blockPosition >> 24;
 	commandBlock[3] = blockPosition >> 16;
