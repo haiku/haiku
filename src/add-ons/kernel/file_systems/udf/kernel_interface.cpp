@@ -5,7 +5,9 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 /*! \file kernel_interface.cpp */
+
 
 #include <Drivers.h>
 #include <ctype.h>
@@ -166,7 +168,7 @@ udf_read_fs_stat(fs_volume *_volume, struct fs_info *info)
 
 
 static status_t
-udf_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
+udf_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *node, int *_type,
 	uint32 *_flags, bool reenter)
 {
 	TRACE(("udf_get_vnode: _volume = %p, _node = %p, reenter = %s\n",
@@ -176,25 +178,25 @@ udf_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_node, int *_type,
 
 	// Convert the given vnode id to an address, and create
 	// and return a corresponding Icb object for it.
-	TRACE(("udf_get_vnode: id = %Ld, blockSize = %lu\n", id, volume->BlockSize()));
+	TRACE(("udf_get_vnode: id = %Ld, blockSize = %lu\n", id,
+		volume->BlockSize()));
+
 	Icb *icb = new(std::nothrow) Icb(volume,
 		to_long_address(id, volume->BlockSize()));
-	if (icb) {
-		if(icb->InitCheck() == B_OK) {
-			if (_node)
-				_node->private_node = icb;
-				_node->ops = &gUDFVnodeOps;
-				*_type = icb->Mode();
-				*_flags = 0;
-		} else {
-			TRACE_ERROR(("udf_get_vnode: InitCheck failed\n"));
-			delete icb;
-			return B_ERROR;
-		}
-	} else
+	if (icb == NULL)
 		return B_NO_MEMORY;
 
-	return B_OK;
+	if (icb->InitCheck() == B_OK) {
+		node->private_node = icb;
+		node->ops = &gUDFVnodeOps;
+		*_type = icb->Mode();
+		*_flags = 0;
+		return B_OK;
+	}
+
+	TRACE_ERROR(("udf_get_vnode: InitCheck failed\n"));
+	delete icb;
+	return B_ERROR;
 }
 
 
