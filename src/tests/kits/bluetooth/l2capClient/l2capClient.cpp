@@ -96,5 +96,7 @@ int main(int argc, char **argv)
 
 	printf("Transmission done ... (press key to close socket)\n");
 	getchar();
+	getchar();
+	printf("Closing ... \n");
 	close(sock);
 }
