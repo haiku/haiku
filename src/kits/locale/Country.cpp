@@ -10,11 +10,10 @@
 #include <AutoDeleter.h>
 #include <IconUtils.h>
 #include <List.h>
+#include <LocaleRoster.h>
 #include <Resources.h>
 #include <String.h>
-#include <TimeZone.h>
 
-#include <unicode/datefmt.h>
 #include <unicode/locid.h>
 #include <unicode/ulocdata.h>
 #include <ICUWrapper.h>
@@ -107,6 +106,13 @@ BCountry::GetIcon(BBitmap* result) const
 		}
 	}
 	return B_BAD_DATA;
+}
+
+
+status_t
+BCountry::GetAvailableTimeZones(BMessage* timeZones) const
+{
+	return be_locale_roster->GetAvailableTimeZonesForCountry(timeZones, Code());
 }
 
 

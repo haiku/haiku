@@ -43,7 +43,8 @@ public:
 
 			const char*			GetLocalizedString(uint32 id) const;
 
-								// measurements
+			status_t			GetAvailableTimeZones(
+									BMessage* timeZones) const;
 
 			int8				Measurement() const;
 
