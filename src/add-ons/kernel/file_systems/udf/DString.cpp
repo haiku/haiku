@@ -3,9 +3,11 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "DString.h"
 
 #include <string.h>
+
 
 /*! \brief Creates a useless, empty string object. */
 DString::DString()
@@ -51,13 +53,19 @@ DString::DString(const char *utf8, uint8 fieldLength)
 }
 
 
+DString::~DString()
+{
+	delete[] fString;
+}
+
+
 void
 DString::SetTo(const DString &ref)
 {
 	_Clear();
 	if (ref.Length() > 0) {
 		fString = new(nothrow) uint8[ref.Length()];
-		if (fString) {
+		if (fString != NULL) {
 			fLength = ref.Length();
 			memcpy(fString, ref.String(), fLength);
 		}
@@ -94,7 +102,7 @@ DString::SetTo(const UdfString &string, uint8 fieldLength)
 				if (destLength < fieldLength - 1)
 					memset(&fString[destLength], 0, fieldLength - 1 - destLength);
 				// Write the string length to the last character in the field
-				fString[fieldLength - 1] = destLength;				 
+				fString[fieldLength - 1] = destLength;
 			} else {
 				// Empty strings are to contain all zeros
 				memset(fString, 0, fieldLength);
@@ -120,7 +128,7 @@ void
 DString::_Clear()
 {
 	DEBUG_INIT("DString");
-	delete [] fString;
+	delete[] fString;
 	fString = NULL;
 	fLength = 0;
 }
