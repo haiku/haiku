@@ -1563,8 +1563,6 @@ release_advisory_lock(struct vnode* vnode, struct flock* flock)
 
 				// we've detached the locking from the vnode, so we can
 				// safely delete it
-				delete_sem(locking->lock);
-				delete_sem(locking->wait_sem);
 				delete locking;
 			} else {
 				// the locking is in use again
@@ -1601,7 +1599,6 @@ acquire_advisory_lock(struct vnode* vnode, pid_t session, struct flock* flock,
 	// TODO: do deadlock detection!
 
 	struct advisory_locking* locking;
-	sem_id waitForLock;
 
 	while (true) {
 		// if this vnode has an advisory_locking structure attached,
@@ -1612,7 +1609,7 @@ acquire_advisory_lock(struct vnode* vnode, pid_t session, struct flock* flock,
 
 		locking = vnode->advisory_locking;
 		team_id team = team_get_current_team_id();
-		waitForLock = -1;
+		sem_id waitForLock = -1;
 
 		// test for collisions
 		LockList::Iterator iterator = locking->locks.GetIterator();
@@ -1654,9 +1651,7 @@ acquire_advisory_lock(struct vnode* vnode, pid_t session, struct flock* flock,
 	struct advisory_lock* lock = (struct advisory_lock*)malloc(
 		sizeof(struct advisory_lock));
 	if (lock == NULL) {
-		if (waitForLock >= B_OK)
-			release_sem_etc(waitForLock, 1, B_RELEASE_ALL);
-		release_sem(locking->lock);
+		put_advisory_locking(locking);
 		return B_NO_MEMORY;
 	}
 
