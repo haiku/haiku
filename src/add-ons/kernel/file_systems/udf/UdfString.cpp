@@ -1,10 +1,12 @@
 #include "UdfString.h"
 
-#include "ByteOrder.h"
+#include <ByteOrder.h>
+
+#include <AutoDeleter.h>
 
 
 /*! \brief Converts the given unicode character to utf8.
-	
+
 	\param c The unicode character.
 	\param out Pointer to a C-string of at least 4 characters
 	           long into which the output utf8 characters will
@@ -16,8 +18,7 @@
 	           upon returning, out will point to a pointer to
 	           the fifth character in \c str.
 */
-static
-void
+static void
 unicode_to_utf8(uint32 c, char **out)
 {
 	char *s = *out;
@@ -46,12 +47,11 @@ unicode_to_utf8(uint32 c, char **out)
 	          will be read. *in will be incremented to reflect
 	          the number of characters read, similarly to the
 	          \c out parameter for unicode_to_utf8().
-	          
+
 	\return The 4-byte unicode character, or **in if passed an
 	        invalid character, or 0 if passed any NULL pointers.
 */
-static
-uint32
+static uint32
 utf8_to_unicode(const char **in)
 {
 	if (!in)
@@ -90,6 +90,9 @@ utf8_to_unicode(const char **in)
 	*in += length;
 	return c;
 }
+
+
+// #pragma mark -
 
 
 /*! \brief Creates an empty string object. */
@@ -162,12 +165,14 @@ UdfString::SetTo(const char *utf8)
 		return;
 	}
 
+	ArrayDeleter<uint32> rawDeleter(raw);
+
 	const char *in = utf8;
 	uint32 rawLength = 0;
-	for (uint32 i = 0; i < length && uint32(in - utf8) < length; i++, rawLength++) 
+	for (uint32 i = 0; i < length && uint32(in - utf8) < length; i++, rawLength++)
 		raw[i] = utf8_to_unicode(&in);
 
-	// Check for invalids. 
+	// Check for invalids.
 	uint32 mask = 0xffff0000;
 	for (uint32 i = 0; i < rawLength; i++) {
 		if (raw[i] & mask) {
@@ -191,20 +196,20 @@ UdfString::SetTo(const char *utf8)
 	if (canUse8bit) {
 		fCs0Length = rawLength + 1;
 		fCs0String = new(nothrow) char[fCs0Length];
-		if (fCs0String) {
+		if (fCs0String != NULL) {
 			fCs0String[0] = '\x08';	// 8-bit compressed unicode
 			for (uint32 i = 0; i < rawLength; i++)
 				fCs0String[i + 1] = raw[i] % 256;
 		} else {
 			TRACE_ERROR(("UdfString::SetTo: fCs0String[%ld] allocation failed\n",
 				fCs0Length));
-			_Clear();			
+			_Clear();
 			return;
 		}
 	} else {
-		fCs0Length = rawLength * 2 + 1;	
+		fCs0Length = rawLength * 2 + 1;
 		fCs0String = new(nothrow) char[fCs0Length];
-		if (fCs0String) {
+		if (fCs0String != NULL) {
 			uint32 pos = 0;
 			fCs0String[pos++] = '\x10';	// 16-bit unicode
 			for (uint32 i = 0; i < rawLength; i++) {
@@ -222,9 +227,6 @@ UdfString::SetTo(const char *utf8)
 			return;
 		}
 	}
-	// Clean up
-	delete [] raw;
-	raw = NULL;	
 }
 
 
@@ -232,7 +234,7 @@ UdfString::SetTo(const char *utf8)
 void
 UdfString::SetTo(const char *cs0, uint32 length)
 {
-	DEBUG_INIT_ETC("UdfString", ("cs0: %p, length: %ld", cs0, length));	
+	DEBUG_INIT_ETC("UdfString", ("cs0: %p, length: %ld", cs0, length));
 
 	_Clear();
 	if (length == 0)
@@ -240,7 +242,7 @@ UdfString::SetTo(const char *cs0, uint32 length)
 	if (!cs0) {
 		PRINT(("passed NULL cs0 string\n"));
 		return;
-	}		
+	}
 
 	// First copy the Cs0 string and length
 	fCs0String = new(nothrow) char[length];
@@ -253,7 +255,7 @@ UdfString::SetTo(const char *cs0, uint32 length)
 	}
 
 	// Now convert to utf8
-	
+
 	// The first byte of the CS0 string is the compression ID.
 	// - 8: 1 byte characters
 	// - 16: 2 byte, big endian characters
@@ -261,16 +263,16 @@ UdfString::SetTo(const char *cs0, uint32 length)
 	// - 255: "CS0 expansion is empty and unique", 2 byte, big endian characters
 	PRINT(("compression ID: %d\n", cs0[0]));
 	switch (reinterpret_cast<const uint8*>(cs0)[0]) {
-		case 8:			
+		case 8:
 		case 254:
 		{
 			const uint8 *inputString = reinterpret_cast<const uint8*>(&(cs0[1]));
 			int32 maxLength = length-1;				// Max length of input string in uint8 characters
 			int32 allocationLength = maxLength*2+1;	// Need at most 2 utf8 chars per uint8 char
-			fUtf8String = new(nothrow) char[allocationLength];	
+			fUtf8String = new(nothrow) char[allocationLength];
 			if (fUtf8String) {
 				char *outputString = fUtf8String;
-	
+
 				for (int32 i = 0; i < maxLength && inputString[i]; i++) {
 					unicode_to_utf8(inputString[i], &outputString);
 				}
@@ -278,7 +280,7 @@ UdfString::SetTo(const char *cs0, uint32 length)
 			} else {
 				PRINT(("new fUtf8String[%ld] allocation failed\n", allocationLength));
 			}
-				
+
 			break;
 		}
 
@@ -299,10 +301,10 @@ UdfString::SetTo(const char *cs0, uint32 length)
 			} else {
 				PRINT(("new fUtf8String[%ld] allocation failed\n", allocationLength));
 			}
-			
+
 			break;
 		}
-		
+
 		default:
 			PRINT(("invalid compression id!\n"));
 			break;
@@ -312,7 +314,7 @@ UdfString::SetTo(const char *cs0, uint32 length)
 void
 UdfString::_Clear()
 {
-	DEBUG_INIT("UdfString");	
+	DEBUG_INIT("UdfString");
 
 	delete [] fCs0String;
 	fCs0String = NULL;
