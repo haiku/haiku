@@ -595,7 +595,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 			continue;
 
 		if (interface->descr->interface_class == 0x08 /* mass storage */
-			|| interface->descr->interface_subclass == 0x04 /* UFI (floppy) */
+			&& interface->descr->interface_subclass == 0x04 /* UFI (floppy) */
 			&& interface->descr->interface_protocol == 0x00) {
 
 			bool hasIn = false;
