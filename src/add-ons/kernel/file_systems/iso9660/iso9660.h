@@ -198,7 +198,7 @@ struct iso9660_volume {
 	uint16			mPathTblLoc[2];		// Loc (Logical block #) of "Type M" path table		byte149-152
 	uint16			optMPathTblLoc[2];		// Loc (Logical block #) of optional Type M path tbl	byte153-156
 	iso9660_inode			rootDirRec;			// Directory record for root directory					byte157-190
-	char			volSetIDString[29];	// Name of multi-volume set where vol is member		byte191-318
+	char			volSetIDString[129]; // Name of multi-volume set where vol is member		byte191-318
 	char			pubIDString[129];	// Name of publisher									byte319-446
 	char			dataPreparer[129];	// Name of data preparer								byte447-574
 	char			appIDString[129];	// Identifies data fomrat								byte575-702
