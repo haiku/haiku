@@ -505,8 +505,8 @@ UdpDomainSupport::_FindActiveEndpoint(const sockaddr *ourAddress,
 		std::make_pair(ourAddress, peerAddress));
 
 	// Make sure the bound_to_device constraint is fulfilled
-	while (endpoint != NULL && index != 0
-		&& endpoint->socket->bound_to_device != index) {
+	while (endpoint != NULL && endpoint->socket->bound_to_device != 0
+		&& index != 0 && endpoint->socket->bound_to_device != index) {
 		endpoint = endpoint->HashTableLink();
 		if (endpoint != NULL
 			&& (!endpoint->LocalAddress().EqualTo(ourAddress, true)
