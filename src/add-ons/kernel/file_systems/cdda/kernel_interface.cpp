@@ -1265,18 +1265,19 @@ Inode::AddAttribute(Attribute* attribute, bool overwrite)
 
 
 status_t
-Inode::AddAttribute(const char* name, type_code type,
-	bool overwrite, const uint8* data, size_t length)
+Inode::AddAttribute(const char* name, type_code type, bool overwrite,
+	const uint8* data, size_t length)
 {
 	Attribute* attribute = new Attribute(name, type);
-	status_t status = attribute != NULL ? B_OK : B_NO_MEMORY;
-	if (status == B_OK)
-		status = attribute->InitCheck();
+	if (attribute == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = attribute->InitCheck();
 	if (status == B_OK && data != NULL && length != 0)
 		status = attribute->WriteAt(0, data, &length);
 	if (status == B_OK)
 		status = AddAttribute(attribute, overwrite);
-	if (status < B_OK) {
+	if (status != B_OK) {
 		delete attribute;
 		return status;
 	}
