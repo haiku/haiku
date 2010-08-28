@@ -12,7 +12,6 @@
 #include <new>
 
 #include <unicode/calendar.h>
-#include <unicode/tmunit.h>
 #include <unicode/utypes.h>
 
 #include <AutoDeleter.h>
