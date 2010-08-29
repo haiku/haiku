@@ -47,14 +47,14 @@ void
 AddOnMonitorHandler::MessageReceived(BMessage* msg)
 {
 	if (msg->what == B_PULSE)
-		_HandlePulse();
+		_HandlePendingEntries();
 
 	inherited::MessageReceived(msg);
 }
 
 
 status_t
-AddOnMonitorHandler::AddDirectory(const node_ref* nref)
+AddOnMonitorHandler::AddDirectory(const node_ref* nref, bool sync)
 {
 	// Keep the looper thread locked, since this method is likely to be called
 	// in a thread other than the looper thread. Otherwise we may access the
@@ -97,6 +97,9 @@ AddOnMonitorHandler::AddDirectory(const node_ref* nref)
 
 		fPendingEntries.push_back(entryInfo);
 	}
+
+	if (sync)
+		_HandlePendingEntries();
 
 	return B_OK;
 }
@@ -441,7 +444,7 @@ AddOnMonitorHandler::StatChanged(ino_t node, dev_t device)
 
 //!	Process pending entries.
 void
-AddOnMonitorHandler::_HandlePulse()
+AddOnMonitorHandler::_HandlePendingEntries()
 {
 	BDirectory directory;
 	EntryList::iterator iter = fPendingEntries.begin();

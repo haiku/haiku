@@ -40,7 +40,10 @@ public:
 	// Note that directories are not watched recursively, and all entries
 	// are reported as add-ons regardless of their node type (files,
 	// directories, symlinks).
-	virtual	status_t			AddDirectory(const node_ref* nref);
+	// If sync is true all pending add-on entries are handled immediately.
+	// Including entries from other directories.
+	virtual	status_t			AddDirectory(const node_ref* nref,
+									bool sync = false);
 
 protected:
 	// hooks for sub-class
@@ -66,7 +69,7 @@ protected:
 	virtual	void				StatChanged(ino_t node, dev_t device);
 
 private:
-			void				_HandlePulse();
+			void				_HandlePendingEntries();
 			void				_EntryCreated(add_on_entry_info& info);
 
 			typedef NodeMonitorHandler inherited;
