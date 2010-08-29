@@ -1354,10 +1354,8 @@ TermView::Draw(BRect updateRect)
 			if (k < 0)
 				k = 0;
 
-			int32 terminalEnd = (int)updateRect.right / fFontWidth;
-				// physical limit of the terminal
-			for (int32 i = k; i < terminalEnd;) {
-				int32 lastColumn = terminalEnd;
+			for (int32 i = k; i <= x2;) {
+				int32 lastColumn = x2;
 				bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
 					// This will clip lastColumn to the selection start or end
 					// to ensure the selection is not drawn at the same time as
@@ -1384,7 +1382,7 @@ TermView::Draw(BRect updateRect)
 						// guess the color for this line from the last char
 						// that was drawn in it.
 						int t = 1;
-						while (count == 0 && i - t > 0) {
+						while (count == 0 && i - t >= 0) {
 							count = fVisibleTextBuffer->GetString(
 								j - firstVisible,
 								i - t, lastColumn, buf, attr);
