@@ -451,7 +451,8 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 							slDone = true;
 							break;
 					}
-					slName[slNameSize] = '\0';
+					if (slName != NULL)
+						slName[slNameSize] = '\0';
 					lastCompFlag = compFlag;
 					bytePos += compLen;
 					TRACE(("Current sl name is \'%s\'\n", slName));
