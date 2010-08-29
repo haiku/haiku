@@ -1,5 +1,6 @@
 /*
  * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2010, Andreas Färber <andreas.faerber@web.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef _BOOT_NET_DEFS_H
@@ -158,6 +159,7 @@ struct ip_header {
 #define IP_DEFAULT_TIME_TO_LIVE		64		/* default ttl, from RFC 1340 */
 
 // IP protocols
+#define IPPROTO_TCP					6
 #define IPPROTO_UDP					17
 
 
@@ -172,6 +174,29 @@ struct udp_header
 	uint16	destination;	// destination port
 	uint16	length;			// length of UDP packet (header + data)
 	uint16	checksum;		// checksum
+} __attribute__ ((__packed__));
+
+
+// Transmission Control Protocol (TCP)
+
+// TCP header (RFC 793, RFC 3168)
+struct tcp_header
+{
+	uint16	source;			// source port
+	uint16	destination;	// destination port
+	uint32	seqNumber;		// sequence number
+	uint32	ackNumber;		// acknowledgment number
+#if __BYTE_ORDER == __BIG_ENDIAN
+	uint8	dataOffset : 4;	// data offset
+	uint8	reserved : 4;	// reserved
+#elif __BYTE_ORDER == __LITTLE_ENDIAN
+	uint8	reserved : 4;
+	uint8	dataOffset : 4;
+#endif
+	uint8	flags;			// ACK, SYN, FIN, etc.
+	uint16	window;			// window size
+	uint16	checksum;		// checksum
+	uint16	urgentPointer;	// urgent pointer
 } __attribute__ ((__packed__));
 
 
