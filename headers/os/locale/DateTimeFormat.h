@@ -21,7 +21,8 @@ public:
 
 								// no-frills version: Simply appends the
 								// formatted date to the string buffer.
-								// Can fail only with B_NO_MEMORY or B_BAD_VALUE.
+								// Can fail only with B_NO_MEMORY or
+								// B_BAD_VALUE.
 	virtual	status_t 			Format(bigtime_t value, BString* buffer) const;
 
 								// TODO: ... basically, all of it!

@@ -15,16 +15,19 @@ BDateTimeFormat::BDateTimeFormat()
 {
 }
 
+
 // copy constructor
 BDateTimeFormat::BDateTimeFormat(const BDateTimeFormat &other)
 	: BFormat(other)
 {
 }
 
+
 // destructor
 BDateTimeFormat::~BDateTimeFormat()
 {
 }
+
 
 // Format
 status_t
