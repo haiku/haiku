@@ -766,8 +766,7 @@ AttributeEntry *
 AttributeFile::FindAttribute(const char *name, uint32 *index)
 {
 	for (uint32 i = 0; i < fFile->entry_count; i++) {
-		if (strncmp(fEntries[i]->Name(), name, fEntries[i]->NameLength())
-				== 0) {
+		if (strcmp(fEntries[i]->Name(), name) == 0) {
 			if (index)
 				*index = i;
 
