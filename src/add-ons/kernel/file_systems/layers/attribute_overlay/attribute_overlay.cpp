@@ -1,10 +1,11 @@
 /*
- * Copyright 2009, Haiku Inc. All rights reserved.
+ * Copyright 2009-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
+
 
 #include <new>
 #include <stdlib.h>
@@ -24,14 +25,33 @@
 
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
-#define TRACE(x...)			dprintf("attribute_overlay: " x)
-#define TRACE_VOLUME(x...)	dprintf("attribute_overlay: " x)
-#define TRACE_ALWAYS(x...)	dprintf("attribute_overlay: " x)
+#	define TRACE(x...)			dprintf("attribute_overlay: " x)
+#	define TRACE_VOLUME(x...)	dprintf("attribute_overlay: " x)
+#	define TRACE_ALWAYS(x...)	dprintf("attribute_overlay: " x)
 #else
-#define TRACE(x...)			/* nothing */
-#define TRACE_VOLUME(x...)	/* nothing */
-#define TRACE_ALWAYS(x...)	dprintf("attribute_overlay: " x)
+#	define TRACE(x...)			/* nothing */
+#	define TRACE_VOLUME(x...)	/* nothing */
+#	define TRACE_ALWAYS(x...)	dprintf("attribute_overlay: " x)
 #endif
+
+
+#define ATTRIBUTE_OVERLAY_FILE_MAGIC			'attr'
+#define ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME	"_HAIKU"
+
+
+#define OVERLAY_CALL(op, params...) \
+	TRACE("relaying op: " #op "\n"); \
+	OverlayInode *node = (OverlayInode *)vnode->private_node; \
+	fs_vnode *superVnode = node->SuperVnode(); \
+	if (superVnode->ops->op != NULL) \
+		return superVnode->ops->op(volume->super_volume, superVnode, params); \
+	return B_UNSUPPORTED;
+
+
+#define OVERLAY_VOLUME_CALL(op, params...) \
+	TRACE_VOLUME("relaying volume op: " #op "\n"); \
+	if (volume->super_volume->ops->op != NULL) \
+		return volume->super_volume->ops->op(volume->super_volume, params);
 
 
 namespace attribute_overlay {
@@ -86,108 +106,108 @@ private:
 
 class AttributeFile {
 public:
-							AttributeFile(fs_volume *overlay, fs_volume *volume,
-								fs_vnode *vnode);
-							~AttributeFile();
+								AttributeFile(fs_volume *overlay,
+									fs_volume *volume, fs_vnode *vnode);
+								~AttributeFile();
 
-		status_t			InitCheck() { return fStatus; }
+			status_t			InitCheck() { return fStatus; }
 
-		dev_t				VolumeID() { return fVolumeID; }
-		ino_t				FileInode() { return fFileInode; }
+			dev_t				VolumeID() { return fVolumeID; }
+			ino_t				FileInode() { return fFileInode; }
 
-		status_t			CreateEmpty();
-		status_t			WriteAttributeFile(fs_volume *overlay,
-								fs_volume *volume, fs_vnode *vnode);
-		status_t			RemoveAttributeFile(fs_volume *overlay,
-								fs_volume *volume, fs_vnode *vnode);
+			status_t			CreateEmpty();
+			status_t			WriteAttributeFile(fs_volume *overlay,
+									fs_volume *volume, fs_vnode *vnode);
+			status_t			RemoveAttributeFile(fs_volume *overlay,
+									fs_volume *volume, fs_vnode *vnode);
 
-		status_t			ReadAttributeDir(struct dirent *dirent,
-								size_t bufferSize, uint32 *numEntries,
-								uint32 *index);
+			status_t			ReadAttributeDir(struct dirent *dirent,
+									size_t bufferSize, uint32 *numEntries,
+									uint32 *index);
 
-		uint32				CountAttributes();
-		AttributeEntry *	FindAttribute(const char *name,
-								uint32 *index = NULL);
+			uint32				CountAttributes();
+			AttributeEntry *	FindAttribute(const char *name,
+									uint32 *index = NULL);
 
-		status_t			CreateAttribute(const char *name, type_code type,
-								int openMode, AttributeEntry **entry);
-		status_t			OpenAttribute(const char *name, int openMode,
-								AttributeEntry **entry);
-		status_t			RemoveAttribute(const char *name,
-								AttributeEntry **entry);
-		status_t			AddAttribute(AttributeEntry *entry);
+			status_t			CreateAttribute(const char *name, type_code type,
+									int openMode, AttributeEntry **entry);
+			status_t			OpenAttribute(const char *name, int openMode,
+									AttributeEntry **entry);
+			status_t			RemoveAttribute(const char *name,
+									AttributeEntry **entry);
+			status_t			AddAttribute(AttributeEntry *entry);
 
 private:
-		#define ATTRIBUTE_OVERLAY_FILE_MAGIC			'attr'
-		#define ATTRIBUTE_OVERLAY_ATTRIBUTE_DIR_NAME	"_HAIKU"
+			struct attribute_file {
+				uint32			magic;
+					// ATTRIBUTE_OVERLAY_FILE_MAGIC
+				uint32			entry_count;
+				uint8			entries[1];
+			} _PACKED;
 
-		struct attribute_file {
-			uint32			magic; // 'attr'
-			uint32			entry_count;
-			uint8			entries[1];
-		} _PACKED;
-
-		status_t			fStatus;
-		dev_t				fVolumeID;
-		ino_t				fFileInode;
-		ino_t				fDirectoryInode;
-		ino_t				fAttributeDirInode;
-		ino_t				fAttributeFileInode;
-		attribute_file *	fFile;
-		uint32				fAttributeDirIndex;
-		AttributeEntry **	fEntries;
+			status_t			fStatus;
+			dev_t				fVolumeID;
+			ino_t				fFileInode;
+			ino_t				fDirectoryInode;
+			ino_t				fAttributeDirInode;
+			ino_t				fAttributeFileInode;
+			attribute_file *	fFile;
+			uint32				fAttributeDirIndex;
+			AttributeEntry **	fEntries;
 };
 
 
 class AttributeEntry {
 public:
-							AttributeEntry(AttributeFile *parent,
-								uint8 *buffer);
-							AttributeEntry(AttributeFile *parent,
-								const char *name, type_code type);
-							~AttributeEntry();
+								AttributeEntry(AttributeFile *parent,
+									uint8 *buffer);
+								AttributeEntry(AttributeFile *parent,
+									const char *name, type_code type);
+								~AttributeEntry();
 
-		status_t			InitCheck() { return fStatus; }
+			status_t			InitCheck() { return fStatus; }
 
-		uint8 *				Entry() { return (uint8 *)fEntry; }
-		size_t				EntrySize();
-		uint8 *				Data() { return fData; }
-		size_t				DataSize() { return fEntry->size; }
+			uint8 *				Entry() { return (uint8 *)fEntry; }
+			size_t				EntrySize();
+			uint8 *				Data() { return fData; }
+			size_t				DataSize() { return fEntry->size; }
 
-		status_t			SetType(type_code type);
-		type_code			Type() { return fEntry->type; }
+			status_t			SetType(type_code type);
+			type_code			Type() { return fEntry->type; }
 
-		status_t			SetSize(size_t size);
-		uint32				Size() { return fEntry->size; }
+			status_t			SetSize(size_t size);
+			uint32				Size() { return fEntry->size; }
 
-		status_t			SetName(const char *name);
-		const char *		Name() { return fEntry->name; }
-		uint8				NameLength() { return fEntry->name_length; }
+			status_t			SetName(const char *name);
+			const char *		Name() { return fEntry->name; }
+			uint8				NameLength() { return fEntry->name_length; }
 
-		status_t			FillDirent(struct dirent *dirent,
-								size_t bufferSize, uint32 *numEntries);
+			status_t			FillDirent(struct dirent *dirent,
+									size_t bufferSize, uint32 *numEntries);
 
-		status_t			Read(off_t position, void *buffer, size_t *length);
-		status_t			Write(off_t position, const void *buffer,
-								size_t *length);
+			status_t			Read(off_t position, void *buffer,
+									size_t *length);
+			status_t			Write(off_t position, const void *buffer,
+									size_t *length);
 
-		status_t			ReadStat(struct stat *stat);
-		status_t			WriteStat(const struct stat *stat, uint32 statMask);
+			status_t			ReadStat(struct stat *stat);
+			status_t			WriteStat(const struct stat *stat,
+									uint32 statMask);
 
 private:
-		struct attribute_entry {
-			type_code		type;
-			uint32			size;
-			uint8			name_length; // including 0 byte
-			char			name[1]; // 0 terminated, followed by data
-		} _PACKED;
+			struct attribute_entry {
+				type_code		type;
+				uint32			size;
+				uint8			name_length; // including 0 byte
+				char			name[1]; // 0 terminated, followed by data
+			} _PACKED;
 
-		AttributeFile *		fParent;
-		attribute_entry *	fEntry;
-		uint8 *				fData;
-		status_t			fStatus;
-		bool				fAllocatedEntry;
-		bool				fAllocatedData;
+			AttributeFile *		fParent;
+			attribute_entry *	fEntry;
+			uint8 *				fData;
+			status_t			fStatus;
+			bool				fAllocatedEntry;
+			bool				fAllocatedData;
 };
 
 
@@ -195,7 +215,8 @@ private:
 
 
 OverlayVolume::OverlayVolume(fs_volume *volume)
-	:	fVolume(volume)
+	:
+	fVolume(volume)
 {
 }
 
@@ -210,10 +231,11 @@ OverlayVolume::~OverlayVolume()
 
 OverlayInode::OverlayInode(OverlayVolume *volume, fs_vnode *superVnode,
 	ino_t inodeNumber)
-	:	fVolume(volume),
-		fSuperVnode(*superVnode),
-		fInodeNumber(inodeNumber),
-		fAttributeFile(NULL)
+	:
+	fVolume(volume),
+	fSuperVnode(*superVnode),
+	fInodeNumber(inodeNumber),
+	fAttributeFile(NULL)
 {
 	TRACE("inode created\n");
 }
@@ -297,15 +319,16 @@ OverlayInode::RemoveAttributeFile()
 
 AttributeFile::AttributeFile(fs_volume *overlay, fs_volume *volume,
 	fs_vnode *vnode)
-	:	fStatus(B_NO_INIT),
-		fVolumeID(volume->id),
-		fFileInode(0),
-		fDirectoryInode(0),
-		fAttributeDirInode(0),
-		fAttributeFileInode(0),
-		fFile(NULL),
-		fAttributeDirIndex(0),
-		fEntries(NULL)
+	:
+	fStatus(B_NO_INIT),
+	fVolumeID(volume->id),
+	fFileInode(0),
+	fDirectoryInode(0),
+	fAttributeDirInode(0),
+	fAttributeFileInode(0),
+	fFile(NULL),
+	fAttributeDirIndex(0),
+	fEntries(NULL)
 {
 	if (vnode->ops->get_vnode_name == NULL) {
 		TRACE_ALWAYS("cannot get vnode name, hook missing\n");
@@ -604,16 +627,18 @@ AttributeFile::WriteAttributeFile(fs_volume *overlay, fs_volume *volume,
 			return result;
 		}
 
-		result = get_vnode(overlay, fAttributeFileInode, (void **)&overlayInode);
+		result = get_vnode(overlay, fAttributeFileInode,
+			(void **)&overlayInode);
 		if (result != B_OK) {
-			TRACE_ALWAYS("getting attribute file vnode after create failed: %s\n",
-				strerror(result));
+			TRACE_ALWAYS("getting attribute file vnode after create failed: "
+				"%s\n", strerror(result));
 			return result;
 		}
 
 		currentVnode = *overlayInode->SuperVnode();
 	} else {
-		result = get_vnode(overlay, fAttributeFileInode, (void **)&overlayInode);
+		result = get_vnode(overlay, fAttributeFileInode,
+			(void **)&overlayInode);
 		if (result != B_OK) {
 			TRACE_ALWAYS("getting attribute file vnode failed: %s\n",
 				strerror(result));
@@ -741,7 +766,8 @@ AttributeEntry *
 AttributeFile::FindAttribute(const char *name, uint32 *index)
 {
 	for (uint32 i = 0; i < fFile->entry_count; i++) {
-		if (strncmp(fEntries[i]->Name(), name, fEntries[i]->NameLength()) == 0) {
+		if (strncmp(fEntries[i]->Name(), name, fEntries[i]->NameLength())
+				== 0) {
 			if (index)
 				*index = i;
 
@@ -759,7 +785,7 @@ AttributeFile::CreateAttribute(const char *name, type_code type, int openMode,
 {
 	AttributeEntry *existing = FindAttribute(name);
 	if (existing != NULL) {
-		if (openMode & O_TRUNC)
+		if ((openMode & O_TRUNC) != 0)
 			existing->SetSize(0);
 
 		// attribute already exists, only allow if the attribute type is
@@ -875,12 +901,13 @@ AttributeFile::ReadAttributeDir(struct dirent *dirent, size_t bufferSize,
 
 
 AttributeEntry::AttributeEntry(AttributeFile *parent, uint8 *buffer)
-	:	fParent(parent),
-		fEntry(NULL),
-		fData(NULL),
-		fStatus(B_NO_INIT),
-		fAllocatedEntry(false),
-		fAllocatedData(false)
+	:
+	fParent(parent),
+	fEntry(NULL),
+	fData(NULL),
+	fStatus(B_NO_INIT),
+	fAllocatedEntry(false),
+	fAllocatedData(false)
 {
 	if (buffer == NULL)
 		return;
@@ -893,12 +920,13 @@ AttributeEntry::AttributeEntry(AttributeFile *parent, uint8 *buffer)
 
 AttributeEntry::AttributeEntry(AttributeFile *parent, const char *name,
 	type_code type)
-	:	fParent(parent),
-		fEntry(NULL),
-		fData(NULL),
-		fStatus(B_NO_INIT),
-		fAllocatedEntry(false),
-		fAllocatedData(false)
+	:
+	fParent(parent),
+	fEntry(NULL),
+	fData(NULL),
+	fStatus(B_NO_INIT),
+	fAllocatedEntry(false),
+	fAllocatedData(false)
 {
 	fStatus = SetName(name);
 	if (fStatus != B_OK)
@@ -1073,15 +1101,6 @@ AttributeEntry::WriteStat(const struct stat *stat, uint32 statMask)
 
 
 //	#pragma mark - vnode ops
-
-
-#define OVERLAY_CALL(op, params...) \
-	TRACE("relaying op: " #op "\n"); \
-	OverlayInode *node = (OverlayInode *)vnode->private_node; \
-	fs_vnode *superVnode = node->SuperVnode(); \
-	if (superVnode->ops->op != NULL) \
-		return superVnode->ops->op(volume->super_volume, superVnode, params); \
-	return B_UNSUPPORTED;
 
 
 static status_t
@@ -1624,7 +1643,8 @@ overlay_create_special_node(fs_volume *volume, fs_vnode *vnode,
 	const char *name, fs_vnode *subVnode, mode_t mode, uint32 flags,
 	fs_vnode *_superVnode, ino_t *nodeID)
 {
-	OVERLAY_CALL(create_special_node, name, subVnode, mode, flags, _superVnode, nodeID)
+	OVERLAY_CALL(create_special_node, name, subVnode, mode, flags, _superVnode,
+		nodeID)
 }
 
 
@@ -1705,12 +1725,6 @@ static fs_vnode_ops sOverlayVnodeOps = {
 
 
 //	#pragma mark - volume ops
-
-
-#define OVERLAY_VOLUME_CALL(op, params...) \
-	TRACE_VOLUME("relaying volume op: " #op "\n"); \
-	if (volume->super_volume->ops->op != NULL) \
-		return volume->super_volume->ops->op(volume->super_volume, params);
 
 
 static status_t
@@ -2004,7 +2018,7 @@ overlay_std_ops(int32 op, ...)
 
 static file_system_module_info sOverlayFileSystem = {
 	{
-		"file_systems/attribute_overlay"B_CURRENT_FS_API_VERSION,
+		"file_systems/attribute_overlay" B_CURRENT_FS_API_VERSION,
 		0,
 		overlay_std_ops,
 	},
