@@ -462,7 +462,6 @@ RosterData::_LoadLocaleSettings()
 	fPreferredLanguages.MakeEmpty();
 	fPreferredLanguages.AddString("language", "en");
 	_SetDefaultLocale("en_US");
-	fDefaultLanguage.SetTo("en");
 
 	return status;
 }
@@ -599,7 +598,7 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 	if (languages != NULL
 		&& languages->FindString("language", &langName) == B_OK) {
 		fDefaultLocale.SetCollator(BCollator(langName.String()));
-		fDefaultLanguage.SetTo(langName.String());
+		fDefaultLocale.SetLanguage(langName.String());
 
 		fPreferredLanguages.RemoveName("language");
 		for (int i = 0; languages->FindString("language", i, &langName) == B_OK;
@@ -610,7 +609,6 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 		fPreferredLanguages.MakeEmpty();
 		fPreferredLanguages.AddString("language", "en");
 		fDefaultLocale.SetCollator(BCollator("en"));
-		fDefaultLanguage.SetTo("en");
 	}
 
 	return B_OK;
@@ -917,3 +915,5 @@ MutableLocaleRoster::UnloadCatalog(BCatalogAddOn* catalog)
 
 
 BLocaleRoster* be_locale_roster = &BPrivate::gLocaleRoster;
+
+const BLocale* be_locale = &BPrivate::gRosterData.fDefaultLocale;

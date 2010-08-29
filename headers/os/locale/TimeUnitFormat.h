@@ -6,11 +6,15 @@
 #define _B_TIME_UNIT_FORMAT_H_
 
 
-#include <DateTimeFormat.h>
+#include <Format.h>
 #include <SupportDefs.h>
 
 
 class BString;
+
+namespace icu_44 {
+	class TimeUnitFormat;
+}
 
 
 enum time_unit_style {
@@ -33,11 +37,23 @@ enum time_unit_element {
 
 
 class BTimeUnitFormat : public BFormat {
+	typedef	BFormat				Inherited;
+
 public:
+								BTimeUnitFormat();
+								BTimeUnitFormat(const BTimeUnitFormat& other);
+	virtual						~BTimeUnitFormat();
+
+			BTimeUnitFormat&	operator=(const BTimeUnitFormat& other);
+
+	virtual	status_t			SetLocale(const BLocale* locale);
 			status_t			Format(int32 value, time_unit_element unit,
 									BString* buffer,
 									time_unit_style style = B_TIME_UNIT_FULL
 									) const;
+
+private:
+			icu_44::TimeUnitFormat*	fFormatter;
 };
 
 

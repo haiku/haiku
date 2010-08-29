@@ -6,18 +6,43 @@
 #define _B_DURATION_FORMAT_H_
 
 
-#include <DateTimeFormat.h>
+#include <Format.h>
 #include <String.h>
 #include <TimeUnitFormat.h>
 
 
+class BTimeZone;
+
+namespace icu_44 {
+	class GregorianCalendar;
+}
+
+
 class BDurationFormat : public BFormat {
+	typedef	BFormat				Inherited;
+
 public:
+								BDurationFormat(
+									const BString& separator = ", ");
+								BDurationFormat(const BDurationFormat& other);
+	virtual						~BDurationFormat();
+
+			BDurationFormat&	operator=(const BDurationFormat& other);
+
+			void				SetSeparator(const BString& separator);
+
+	virtual	status_t			SetLocale(const BLocale* locale);
+			status_t			SetTimeZone(const BTimeZone* timeZone);
+
 			status_t			Format(bigtime_t startValue,
 									bigtime_t stopValue, BString* buffer,
-									time_unit_style style = B_TIME_UNIT_FULL,
-									const BString& separator = ", "
+									time_unit_style style = B_TIME_UNIT_FULL
 									) const;
+
+private:
+			BString				fSeparator;
+			BTimeUnitFormat		fTimeUnitFormat;
+			icu_44::GregorianCalendar*	fCalendar;
 };
 
 

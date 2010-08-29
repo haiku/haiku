@@ -9,6 +9,7 @@
 #include <Collator.h>
 #include <Country.h>
 #include <Language.h>
+#include <Locker.h>
 
 
 class BCatalog;
@@ -40,12 +41,13 @@ public:
 								BLocale(const char* languageAndCountryCode
 									= "en_US");
 								BLocale(const BLocale& other);
-								BLocale& operator=(const BLocale& other);
 								~BLocale();
 
-			const BCollator*	Collator() const { return &fCollator; }
-			const BCountry*		Country() const { return &fCountry; }
-			const BLanguage*	Language() const { return &fLanguage; }
+			BLocale&			operator=(const BLocale& other);
+
+			status_t			GetCollator(BCollator* collator) const;
+			status_t			GetLanguage(BLanguage* language) const;
+			status_t			GetCountry(BCountry* country) const;
 			const char*			Code() const;
 			bool				GetName(BString& name) const;
 
@@ -135,6 +137,7 @@ public:
 									BString* key) const;
 
 protected:
+	mutable	BLocker				fLock;
 			BCollator			fCollator;
 			BCountry			fCountry;
 			BLanguage			fLanguage;
@@ -145,6 +148,10 @@ protected:
 			BString				fLongTimeFormat;
 			BString				fShortTimeFormat;
 };
+
+
+// global locale object
+extern const BLocale* be_locale;
 
 
 //--- collator short-hands inlines ---

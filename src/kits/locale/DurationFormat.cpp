@@ -11,14 +11,14 @@
 
 #include <new>
 
-#include <unicode/calendar.h>
+#include <unicode/gregocal.h>
 #include <unicode/utypes.h>
 
-#include <AutoDeleter.h>
-#include <TimeUnitFormat.h>
+#include <Locale.h>
+#include <LocaleRoster.h>
+#include <TimeZone.h>
 
-
-using BPrivate::ObjectDeleter;
+#include <TimeZoneAccessor.h>
 
 
 // maps our unit element to the corresponding ICU unit
@@ -33,37 +33,130 @@ static const UCalendarDateFields skUnitMap[] = {
 };
 
 
-status_t BDurationFormat::Format(bigtime_t startValue, bigtime_t stopValue,
-	BString* buffer, time_unit_style style, const BString& separator) const
+BDurationFormat::BDurationFormat(const BString& separator)
+	:
+	Inherited(),
+	fSeparator(separator),
+	fTimeUnitFormat()
+{
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	fCalendar = new GregorianCalendar(icuStatus);
+	if (fCalendar == NULL) {
+		fInitStatus = B_NO_MEMORY;
+		return;
+	}
+
+	fInitStatus = SetLocale(fLocale);
+}
+
+
+BDurationFormat::BDurationFormat(const BDurationFormat& other)
+	:
+	Inherited(other),
+	fSeparator(other.fSeparator),
+	fTimeUnitFormat(other.fTimeUnitFormat),
+	fCalendar(other.fCalendar != NULL
+		? new GregorianCalendar(*other.fCalendar) : NULL)
+{
+	if (fCalendar == NULL && other.fCalendar != NULL)
+		fInitStatus = B_NO_MEMORY;
+}
+
+
+BDurationFormat::~BDurationFormat()
+{
+	delete fCalendar;
+}
+
+
+BDurationFormat&
+BDurationFormat::operator=(const BDurationFormat& other)
+{
+	if (this == &other)
+		return *this;
+
+	fSeparator = other.fSeparator;
+	fTimeUnitFormat = other.fTimeUnitFormat;
+	delete fCalendar;
+	fCalendar = other.fCalendar != NULL
+		? new GregorianCalendar(*other.fCalendar) : NULL;
+
+	if (fCalendar == NULL && other.fCalendar != NULL)
+		fInitStatus = B_NO_MEMORY;
+
+	return *this;
+}
+
+
+void
+BDurationFormat::SetSeparator(const BString& separator)
+{
+	fSeparator = separator;
+}
+
+
+status_t
+BDurationFormat::SetLocale(const BLocale* locale)
+{
+	status_t result = Inherited::SetLocale(locale);
+	if (result != B_OK)
+		return result;
+
+	return fTimeUnitFormat.SetLocale(locale);
+}
+
+
+status_t
+BDurationFormat::SetTimeZone(const BTimeZone* timeZone)
+{
+	if (fCalendar == NULL)
+		return B_NO_INIT;
+
+	BTimeZone::Accessor zoneAccessor;
+	if (timeZone == NULL) {
+		BTimeZone defaultTimeZone;
+		status_t result
+			= be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
+		if (result != B_OK)
+			return result;
+		zoneAccessor.SetTo(&defaultTimeZone);
+	} else
+		zoneAccessor.SetTo(timeZone);
+
+	TimeZone* icuTimeZone = zoneAccessor.IcuTimeZone();
+	if (icuTimeZone != NULL)
+		fCalendar->setTimeZone(*icuTimeZone);
+
+	return B_OK;
+}
+
+
+status_t
+BDurationFormat::Format(bigtime_t startValue, bigtime_t stopValue,
+	BString* buffer, time_unit_style style) const
 {
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
 	UErrorCode icuStatus = U_ZERO_ERROR;
-	ObjectDeleter<Calendar> calendar = Calendar::createInstance(icuStatus);
-	if (calendar.Get() == NULL)
-		return B_NO_MEMORY;
+	fCalendar->setTime((UDate)startValue / 1000, icuStatus);
 	if (!U_SUCCESS(icuStatus))
 		return B_ERROR;
 
-	calendar->setTime((UDate)startValue / 1000, icuStatus);
-	if (!U_SUCCESS(icuStatus))
-		return B_ERROR;
-
-	BTimeUnitFormat timeUnitFormat;
 	UDate stop = (UDate)stopValue / 1000;
 	bool needSeparator = false;
 	for (int unit = 0; unit <= B_TIME_UNIT_LAST; ++unit) {
-		int delta = calendar->fieldDifference(stop, skUnitMap[unit], icuStatus);
+		int delta
+			= fCalendar->fieldDifference(stop, skUnitMap[unit], icuStatus);
 		if (!U_SUCCESS(icuStatus))
 			return B_ERROR;
 
 		if (delta != 0) {
 			if (needSeparator)
-				buffer->Append(separator);
+				buffer->Append(fSeparator);
 			else
 				needSeparator = true;
-			status_t status = timeUnitFormat.Format(delta,
+			status_t status = fTimeUnitFormat.Format(delta,
 				(time_unit_element)unit, buffer, style);
 			if (status != B_OK)
 				return status;

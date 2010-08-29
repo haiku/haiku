@@ -36,16 +36,22 @@ struct format_field_position {
 };
 
 
-class BFormatImpl;
+class BLocale;
 
 class BFormat {
+public:
+			status_t			InitCheck() const;
+
+	virtual	status_t			SetLocale(const BLocale* locale);
 protected:
+								BFormat();
 								BFormat(const BFormat& other);
 	virtual 					~BFormat();
 
 			BFormat&			operator=(const BFormat& other);
 
-								BFormat();
+			status_t			fInitStatus;
+			BLocale*			fLocale;
 };
 
 

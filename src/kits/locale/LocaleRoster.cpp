@@ -88,7 +88,7 @@ BLocaleRoster::GetDefaultCollator(BCollator* collator) const
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	*collator = *gRosterData.fDefaultLocale.Collator();
+	gRosterData.fDefaultLocale.GetCollator(collator);
 
 	return B_OK;
 }
@@ -104,7 +104,7 @@ BLocaleRoster::GetDefaultLanguage(BLanguage* language) const
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	*language = gRosterData.fDefaultLanguage;
+	gRosterData.fDefaultLocale.GetLanguage(language);
 
 	return B_OK;
 }
@@ -120,7 +120,7 @@ BLocaleRoster::GetDefaultCountry(BCountry* country) const
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	*country = *gRosterData.fDefaultLocale.Country();
+	gRosterData.fDefaultLocale.GetCountry(country);
 
 	return B_OK;
 }

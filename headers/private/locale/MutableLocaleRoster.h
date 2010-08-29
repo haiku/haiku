@@ -109,7 +109,6 @@ struct RosterData {
 			BMessage			fPreferredLanguages;
 
 			BLocale				fDefaultLocale;
-			BLanguage			fDefaultLanguage;
 			BTimeZone			fDefaultTimeZone;
 
 								RosterData();

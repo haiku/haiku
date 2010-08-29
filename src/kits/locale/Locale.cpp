@@ -5,10 +5,12 @@
 
 
 #include <AutoDeleter.h>
+#include <Autolock.h>
 #include <CalendarView.h>
 #include <Catalog.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
+#include <MutableLocaleRoster.h>
 #include <TimeZone.h>
 
 #include <unicode/datefmt.h>
@@ -82,6 +84,54 @@ BLocale::operator=(const BLocale& other)
 BLocale::~BLocale()
 {
 	delete fICULocale;
+}
+
+
+status_t
+BLocale::GetCollator(BCollator* collator) const
+{
+	if (!collator)
+		return B_BAD_VALUE;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	*collator = fCollator;
+
+	return B_OK;
+}
+
+
+status_t
+BLocale::GetLanguage(BLanguage* language) const
+{
+	if (!language)
+		return B_BAD_VALUE;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	*language = fLanguage;
+
+	return B_OK;
+}
+
+
+status_t
+BLocale::GetCountry(BCountry* country) const
+{
+	if (!country)
+		return B_BAD_VALUE;
+
+	BAutolock lock(fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	*country = fCountry;
+
+	return B_OK;
 }
 
 
@@ -170,8 +220,11 @@ BLocale::FormatDate(BString *string, time_t time, bool longFormat,
 	string->Truncate(0);
 		// We make the string empty, this way even in cases where ICU fail we at
 		// least return something sane
+	BLanguage defaultLanguage;
+	be_locale_roster->GetDefaultLanguage(&defaultLanguage);
+	Locale locale(defaultLanguage.Code());
 	ObjectDeleter<DateFormat> dateFormatter = CreateDateFormat(longFormat,
-		*fICULocale, longFormat ? fLongDateFormat : fShortDateFormat);
+		locale, longFormat ? fLongDateFormat : fShortDateFormat);
 	if (dateFormatter.Get() == NULL)
 		return B_NO_MEMORY;
 
