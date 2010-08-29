@@ -2,9 +2,9 @@
  * Copyright 2005, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef _BOOT_NET_DEFS_H
 #define _BOOT_NET_DEFS_H
+
 
 #include <string.h>
 
@@ -12,6 +12,7 @@
 #include <SupportDefs.h>
 
 #include <util/kernel_cpp.h>
+
 
 // Ethernet
 
@@ -208,5 +209,6 @@ public:
 private:
 	const char	*fName;
 };
+
 
 #endif	// _BOOT_NET_DEFS_H
