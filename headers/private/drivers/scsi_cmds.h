@@ -388,6 +388,29 @@ typedef struct scsi_cmd_rw_12 {
 } _PACKED scsi_cmd_rw_12;
 
 
+// READ (16), WRITE (16)
+
+typedef struct scsi_cmd_rw_16 {
+	uint8	opcode;
+	LBITFIELD8_6(
+		_res1_0 : 1,
+		force_unit_access_non_volatile : 1,
+		_res1_2 : 1,
+		force_unit_access : 1,
+		disable_page_out : 1,
+		read_protect : 3
+	);
+	uint64	lba;					// big endian
+	uint32	length;
+	LBITFIELD8_3(
+		group_number : 5,
+		_res_14_5 : 2,
+		_res_14_7 : 1
+	);
+	uint8	control;
+} _PACKED scsi_cmd_rw_16;
+
+
 // REQUEST SENSE
 
 typedef struct scsi_cmd_request_sense {
