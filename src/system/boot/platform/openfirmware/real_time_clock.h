@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+extern int gRTC;
+
 status_t init_real_time_clock(void);
 
 #ifdef __cplusplus

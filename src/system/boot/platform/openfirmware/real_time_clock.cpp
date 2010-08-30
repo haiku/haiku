@@ -1,5 +1,6 @@
 /*
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2010, Andreas Färber <andreas.faerber@web.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +15,9 @@
 #include <platform/openfirmware/openfirmware.h>
 
 
+int gRTC = OF_FAILED;
+
+
 status_t
 init_real_time_clock(void)
 {
@@ -23,6 +27,12 @@ init_real_time_clock(void)
 			gKernelArgs.platform_args.rtc_path,
 			sizeof(gKernelArgs.platform_args.rtc_path)) != B_OK) {
 		printf("init_real_time_clock(): Found no RTC device!");
+		return B_ERROR;
+	}
+
+	gRTC = of_open(gKernelArgs.platform_args.rtc_path);
+	if (gRTC == OF_FAILED) {
+		printf("%s(): Could not open RTC device!\n", __func__);
 		return B_ERROR;
 	}
 
