@@ -56,29 +56,30 @@ public:
 			void				SetLanguage(const char* languageCode);
 
 			// see definitions in LocaleStrings.h
-			const char*			GetString(uint32 id);
+			const char*			GetString(uint32 id) const;
 
 			void				FormatString(char* target, size_t maxSize,
-									char* fmt, ...);
-			void				FormatString(BString* buffer, char* fmt, ...);
+									char* fmt, ...) const;
+			void				FormatString(BString* buffer, char* fmt,
+									...) const;
 			status_t			FormatDateTime(char* target, size_t maxSize,
-									time_t time, bool longFormat);
+									time_t time, bool longFormat) const;
 			status_t			FormatDateTime(BString* buffer, time_t time,
 									bool longFormat,
-									const BTimeZone* timeZone = NULL);
+									const BTimeZone* timeZone = NULL) const;
 
 								// Date
 
 								// TODO: drop some of these once BDateFormat
 								//       has been implemented!
 			status_t			FormatDate(char* string, size_t maxSize,
-									time_t time, bool longFormat);
+									time_t time, bool longFormat) const;
 			status_t			FormatDate(BString* string, time_t time,
 									bool longFormat,
-									const BTimeZone* timeZone = NULL);
+									const BTimeZone* timeZone = NULL) const;
 			status_t			FormatDate(BString* string,
 									int*& fieldPositions, int& fieldCount,
-									time_t time, bool longFormat);
+									time_t time, bool longFormat) const;
 			status_t			GetDateFields(BDateElement*& fields,
 									int& fieldCount, bool longFormat) const;
 			status_t			GetDateFormat(BString&, bool longFormat) const;
@@ -92,13 +93,13 @@ public:
 								// TODO: drop some of these once BTimeFormat
 								//       has been implemented!
 			status_t			FormatTime(char* string, size_t maxSize,
-									time_t time, bool longFormat);
+									time_t time, bool longFormat) const;
 			status_t			FormatTime(BString* string, time_t time,
 									bool longFormat,
-									const BTimeZone* timeZone = NULL);
+									const BTimeZone* timeZone = NULL) const;
 			status_t			FormatTime(BString* string,
 									int*& fieldPositions, int& fieldCount,
-									time_t time, bool longFormat);
+									time_t time, bool longFormat) const;
 			status_t			GetTimeFields(BDateElement*& fields,
 									int& fieldCount, bool longFormat) const;
 
@@ -110,22 +111,25 @@ public:
 								// numbers
 
 			status_t			FormatNumber(char* string, size_t maxSize,
-									double value);
-			status_t			FormatNumber(BString* string, double value);
+									double value) const;
+			status_t			FormatNumber(BString* string,
+									double value) const;
 			status_t			FormatNumber(char* string, size_t maxSize,
-									int32 value);
-			status_t			FormatNumber(BString* string, int32 value);
+									int32 value) const;
+			status_t			FormatNumber(BString* string,
+									int32 value) const;
 
 								// monetary
 
 			ssize_t				FormatMonetary(char* string, size_t maxSize,
-									double value);
-			ssize_t				FormatMonetary(BString* string, double value);
+									double value) const;
+			ssize_t				FormatMonetary(BString* string,
+									double value) const;
 			status_t			FormatMonetary(BString* string,
 									int*& fieldPositions,
 									BNumberElement*& fieldTypes,
-									int& fieldCount, double value);
-			status_t			GetCurrencySymbol(BString& result);
+									int& fieldCount, double value) const;
+			status_t			GetCurrencySymbol(BString& result) const;
 
 			// Collator short-hands
 			int					StringCompare(const char* s1,

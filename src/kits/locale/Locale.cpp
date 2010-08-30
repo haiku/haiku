@@ -136,7 +136,7 @@ BLocale::GetCountry(BCountry* country) const
 
 
 const char *
-BLocale::GetString(uint32 id)
+BLocale::GetString(uint32 id) const
 {
 	// Note: this code assumes a certain order of the string bases
 
@@ -192,7 +192,8 @@ BLocale::GetName(BString& name) const
 
 
 status_t
-BLocale::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
+BLocale::FormatDate(char* string, size_t maxSize, time_t time,
+	bool longFormat) const
 {
 	ObjectDeleter<DateFormat> dateFormatter = CreateDateFormat(longFormat,
 		*fICULocale, longFormat ? fLongDateFormat : fShortDateFormat);
@@ -215,14 +216,12 @@ BLocale::FormatDate(char* string, size_t maxSize, time_t time, bool longFormat)
 
 status_t
 BLocale::FormatDate(BString *string, time_t time, bool longFormat,
-	const BTimeZone* timeZone)
+	const BTimeZone* timeZone) const
 {
 	string->Truncate(0);
 		// We make the string empty, this way even in cases where ICU fail we at
 		// least return something sane
-	BLanguage defaultLanguage;
-	be_locale_roster->GetDefaultLanguage(&defaultLanguage);
-	Locale locale(defaultLanguage.Code());
+	Locale locale(fLanguage.Code());
 	ObjectDeleter<DateFormat> dateFormatter = CreateDateFormat(longFormat,
 		locale, longFormat ? fLongDateFormat : fShortDateFormat);
 	if (dateFormatter.Get() == NULL)
@@ -248,7 +247,7 @@ BLocale::FormatDate(BString *string, time_t time, bool longFormat,
 
 status_t
 BLocale::FormatDate(BString* string, int*& fieldPositions, int& fieldCount,
-	time_t time, bool longFormat)
+	time_t time, bool longFormat) const
 {
 	string->Truncate(0);
 
@@ -401,7 +400,7 @@ BLocale::StartOfWeek() const
 
 status_t
 BLocale::FormatDateTime(char* target, size_t maxSize, time_t time,
-	bool longFormat)
+	bool longFormat) const
 {
 	ObjectDeleter<DateFormat> dateFormatter = CreateDateFormat(longFormat,
 		*fICULocale, longFormat ? fLongDateFormat : fShortDateFormat);
@@ -432,7 +431,7 @@ BLocale::FormatDateTime(char* target, size_t maxSize, time_t time,
 
 status_t
 BLocale::FormatDateTime(BString* target, time_t time, bool longFormat,
-	const BTimeZone* timeZone)
+	const BTimeZone* timeZone) const
 {
 	ObjectDeleter<DateFormat> dateFormatter = CreateDateFormat(longFormat,
 		*fICULocale, longFormat ? fLongDateFormat : fShortDateFormat);
@@ -470,7 +469,8 @@ BLocale::FormatDateTime(BString* target, time_t time, bool longFormat,
 
 
 status_t
-BLocale::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
+BLocale::FormatTime(char* string, size_t maxSize, time_t time,
+	bool longFormat) const
 {
 	ObjectDeleter<DateFormat> timeFormatter = CreateTimeFormat(longFormat,
 		*fICULocale, longFormat ? fLongTimeFormat : fShortTimeFormat);
@@ -493,7 +493,7 @@ BLocale::FormatTime(char* string, size_t maxSize, time_t time, bool longFormat)
 
 status_t
 BLocale::FormatTime(BString* string, time_t time, bool longFormat,
-	const BTimeZone* timeZone)
+	const BTimeZone* timeZone) const
 {
 	string->Truncate(0);
 
@@ -523,7 +523,7 @@ BLocale::FormatTime(BString* string, time_t time, bool longFormat,
 
 status_t
 BLocale::FormatTime(BString* string, int*& fieldPositions, int& fieldCount,
-	time_t time, bool longFormat)
+	time_t time, bool longFormat) const
 {
 	string->Truncate(0);
 
@@ -666,7 +666,7 @@ BLocale::GetTimeFormat(BString& format, bool longFormat) const
 
 
 status_t
-BLocale::FormatNumber(char* string, size_t maxSize, double value)
+BLocale::FormatNumber(char* string, size_t maxSize, double value) const
 {
 	BString fullString;
 	status_t status = FormatNumber(&fullString, value);
@@ -678,7 +678,7 @@ BLocale::FormatNumber(char* string, size_t maxSize, double value)
 
 
 status_t
-BLocale::FormatNumber(BString* string, double value)
+BLocale::FormatNumber(BString* string, double value) const
 {
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter	= NumberFormat::createInstance(
@@ -701,7 +701,7 @@ BLocale::FormatNumber(BString* string, double value)
 
 
 status_t
-BLocale::FormatNumber(char* string, size_t maxSize, int32 value)
+BLocale::FormatNumber(char* string, size_t maxSize, int32 value) const
 {
 	BString fullString;
 	status_t status = FormatNumber(&fullString, value);
@@ -713,7 +713,7 @@ BLocale::FormatNumber(char* string, size_t maxSize, int32 value)
 
 
 status_t
-BLocale::FormatNumber(BString* string, int32 value)
+BLocale::FormatNumber(BString* string, int32 value) const
 {
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter	= NumberFormat::createInstance(
@@ -736,7 +736,7 @@ BLocale::FormatNumber(BString* string, int32 value)
 
 
 ssize_t
-BLocale::FormatMonetary(char* string, size_t maxSize, double value)
+BLocale::FormatMonetary(char* string, size_t maxSize, double value) const
 {
 	BString fullString;
 	ssize_t written = FormatMonetary(&fullString, value);
@@ -748,7 +748,7 @@ BLocale::FormatMonetary(char* string, size_t maxSize, double value)
 
 
 ssize_t
-BLocale::FormatMonetary(BString* string, double value)
+BLocale::FormatMonetary(BString* string, double value) const
 {
 	if (string == NULL)
 		return B_BAD_VALUE;
@@ -775,7 +775,7 @@ BLocale::FormatMonetary(BString* string, double value)
 
 status_t
 BLocale::FormatMonetary(BString* string, int*& fieldPositions,
-	BNumberElement*& fieldTypes, int& fieldCount, double value)
+	BNumberElement*& fieldTypes, int& fieldCount, double value) const
 {
 	UErrorCode err = U_ZERO_ERROR;
 	ObjectDeleter<NumberFormat> numberFormatter
@@ -836,7 +836,7 @@ BLocale::FormatMonetary(BString* string, int*& fieldPositions,
 
 
 status_t
-BLocale::GetCurrencySymbol(BString& result)
+BLocale::GetCurrencySymbol(BString& result) const
 {
 	UErrorCode error = U_ZERO_ERROR;
 	NumberFormat* format = NumberFormat::createCurrencyInstance(*fICULocale,
