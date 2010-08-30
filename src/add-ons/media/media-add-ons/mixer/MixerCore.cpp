@@ -128,19 +128,19 @@ MixerCore::SetOutputAttenuation(float gain)
 }
 
 
-MixerInput *
-MixerCore::AddInput(const media_input &input)
+MixerInput*
+MixerCore::AddInput(const media_input& input)
 {
 	ASSERT_LOCKED();
-	MixerInput *in = new MixerInput(this, input, fMixBufferFrameRate,
+	MixerInput* in = new MixerInput(this, input, fMixBufferFrameRate,
 		fMixBufferFrameCount);
 	fInputs->AddItem(in);
 	return in;
 }
 
 
-MixerOutput *
-MixerCore::AddOutput(const media_output &output)
+MixerOutput*
+MixerCore::AddOutput(const media_output& output)
 {
 	ASSERT_LOCKED();
 	if (fOutput) {
@@ -410,7 +410,7 @@ MixerCore::StartMixThread()
 	ASSERT(fOutput);
 	fRunning = true;
 	fMixThreadWaitSem = create_sem(0, "mix thread wait");
-	fMixThread = spawn_thread(_mix_thread_, "Yeah baby, very shagadelic", 120,
+	fMixThread = spawn_thread(MixThreadEntry, "Yeah baby, very shagadelic", 120,
 		this);
 	resume_thread(fMixThread);
 }
@@ -434,9 +434,9 @@ MixerCore::StopMixThread()
 
 
 int32
-MixerCore::_mix_thread_(void *arg)
+MixerCore::MixThreadEntry(void* arg)
 {
-	static_cast<MixerCore *>(arg)->MixThread();
+	static_cast<MixerCore*>(arg)->MixThread();
 	return 0;
 }
 
@@ -444,20 +444,12 @@ MixerCore::_mix_thread_(void *arg)
 void
 MixerCore::MixThread()
 {
-	bigtime_t event_time;
-	bigtime_t time_base;
-	bigtime_t latency;
-	bigtime_t start;
-	bigtime_t buffer_request_timeout;
-	int64 frame_base;
-	int64 frame_pos;
-
 	// The broken BeOS R5 multiaudio node starts with time 0,
 	// then publishes negative times for about 50ms, publishes 0
 	// again until it finally reaches time values > 0
 	if (!LockFromMixThread())
 		return;
-	start = fTimeSource->Now();
+	bigtime_t start = fTimeSource->Now();
 	Unlock();
 	while (start <= 0) {
 		TRACE("MixerCore: delaying MixThread start, timesource is at %Ld\n",
@@ -471,49 +463,48 @@ MixerCore::MixThread()
 
 	if (!LockFromMixThread())
 		return;
-	latency = max(3600LL, bigtime_t(0.4 * buffer_duration(
+	bigtime_t latency = max(3600LL, bigtime_t(0.4 * buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio)));
 
 	// TODO: when the format changes while running, everything is wrong!
-	buffer_request_timeout = buffer_duration(
+	bigtime_t bufferRequestTimeout = buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio) / 2;
 
 	TRACE("MixerCore: starting MixThread at %Ld with latency %Ld and "
-		"downstream latency %Ld, buffer_request_timeout %Ld\n", start, latency,
-		fDownstreamLatency, buffer_request_timeout);
+		"downstream latency %Ld, bufferRequestTimeout %Ld\n", start, latency,
+		fDownstreamLatency, bufferRequestTimeout);
 
 	// We must read from the input buffer at a position (pos) that is always
 	// a multiple of fMixBufferFrameCount.
 	int64 temp = frames_for_duration(fMixBufferFrameRate, start);
-	frame_base = ((temp / fMixBufferFrameCount) + 1) * fMixBufferFrameCount;
-	time_base = duration_for_frames(fMixBufferFrameRate, frame_base);
+	int64 frameBase = ((temp / fMixBufferFrameCount) + 1)
+		* fMixBufferFrameCount;
+	bigtime_t timeBase = duration_for_frames(fMixBufferFrameRate, frameBase);
 	Unlock();
 
-	TRACE("MixerCore: starting MixThread, start %Ld, time_base %Ld, "
-		"frame_base %Ld\n", start, time_base, frame_base);
+	TRACE("MixerCore: starting MixThread, start %Ld, timeBase %Ld, "
+		"frameBase %Ld\n", start, timeBase, frameBase);
 
 	ASSERT(fMixBufferFrameCount > 0);
 
 #if DEBUG
-	uint64 buffer_num = 0;
+	uint64 bufferIndex = 0;
 #endif
 
 	RtList<chan_info> InputChanInfos[MAX_CHANNEL_TYPES];
 	RtList<chan_info> MixChanInfos[fMixBufferChannelCount];
 		// TODO: this does not support changing output channel count
 
-	event_time = time_base;
-	frame_pos = 0;
+	bigtime_t eventTime = timeBase;
+	int64 framePos = 0;
 	for (;;) {
-		bigtime_t wait_until;
 		if (!LockFromMixThread())
 			return;
-		wait_until = fTimeSource->RealTimeFor(event_time, 0)
+		bigtime_t waitUntil = fTimeSource->RealTimeFor(eventTime, 0)
 			- latency - fDownstreamLatency;
 		Unlock();
-		status_t rv;
-		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT,
-			wait_until);
+		status_t rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT,
+			waitUntil);
 		if (rv == B_INTERRUPTED)
 			continue;
 		if (rv != B_TIMED_OUT && rv < B_OK)
@@ -528,29 +519,29 @@ MixerCore::MixThread()
 		// empty buffer
 		if (fInputs->IsEmpty() || fOutput->IsMuted()) {
 			int size = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
-			BBuffer* buf = fBufferGroup->RequestBuffer(size,
-				buffer_request_timeout);
-			if (buf) {
-				memset(buf->Data(), 0, size);
+			BBuffer* buffer = fBufferGroup->RequestBuffer(size,
+				bufferRequestTimeout);
+			if (buffer != NULL) {
+				memset(buffer->Data(), 0, size);
 				// fill in the buffer header
-				media_header* hdr = buf->Header();
+				media_header* hdr = buffer->Header();
 				hdr->type = B_MEDIA_RAW_AUDIO;
 				hdr->size_used = size;
 				hdr->time_source = fTimeSource->ID();
-				hdr->start_time = event_time;
-				if (fNode->SendBuffer(buf, fOutput) != B_OK) {
+				hdr->start_time = eventTime;
+				if (fNode->SendBuffer(buffer, fOutput) != B_OK) {
 #if DEBUG
 					ERROR("MixerCore: SendBuffer failed for buffer %Ld\n",
-						buffer_num);
+						bufferIndex);
 #else
 					ERROR("MixerCore: SendBuffer failed\n");
 #endif
-					buf->Recycle();
+					buffer->Recycle();
 				}
 			} else {
 #if DEBUG
 				ERROR("MixerCore: RequestBuffer failed for buffer %Ld\n",
-					buffer_num);
+					bufferIndex);
 #else
 				ERROR("MixerCore: RequestBuffer failed\n");
 #endif
@@ -558,96 +549,97 @@ MixerCore::MixThread()
 			goto schedule_next_event;
 		}
 
-		int64 cur_framepos;
-		cur_framepos = frame_base + frame_pos;
+		int64 currentFramePos;
+		currentFramePos = frameBase + framePos;
 
 		// mix all data from all inputs into the mix buffer
-		ASSERT(cur_framepos % fMixBufferFrameCount == 0);
+		ASSERT(currentFramePos % fMixBufferFrameCount == 0);
 
 		PRINT(4, "create new buffer event at %Ld, reading input frames at "
-			"%Ld\n", event_time, cur_framepos);
+			"%Ld\n", eventTime, currentFramePos);
 
-		MixerInput *input;
-		for (int i = 0; (input = Input(i)) != 0; i++) {
+		for (int i = 0; MixerInput* input = Input(i); i++) {
 			int count = input->GetMixerChannelCount();
-			for (int chan = 0; chan < count; chan++) {
+			for (int channel = 0; channel < count; channel++) {
 				int type;
-				const float *base;
-				uint32 sample_offset;
+				const float* base;
+				uint32 sampleOffset;
 				float gain;
-				if (!input->GetMixerChannelInfo(chan, cur_framepos, event_time,
-						&base, &sample_offset, &type, &gain))
+				if (!input->GetMixerChannelInfo(channel, currentFramePos,
+						eventTime, &base, &sampleOffset, &type, &gain)) {
 					continue;
+				}
 				if (type < 0 || type >= MAX_CHANNEL_TYPES)
 					continue;
-				chan_info *info = InputChanInfos[type].Create();
-				info->base = (const char *)base;
-				info->sample_offset = sample_offset;
+				chan_info* info = InputChanInfos[type].Create();
+				info->base = (const char*)base;
+				info->sample_offset = sampleOffset;
 				info->gain = gain;
 			}
 		}
 
-		for (int chan = 0; chan < fMixBufferChannelCount; chan++) {
-			int sourcecount = fOutput->GetOutputChannelSourceCount(chan);
-			for (int i = 0; i < sourcecount; i++) {
+		for (int channel = 0; channel < fMixBufferChannelCount; channel++) {
+			int sourceCount = fOutput->GetOutputChannelSourceCount(channel);
+			for (int i = 0; i < sourceCount; i++) {
 				int type;
 				float gain;
-				fOutput->GetOutputChannelSourceInfoAt(chan, i, &type, &gain);
+				fOutput->GetOutputChannelSourceInfoAt(channel, i, &type,
+					&gain);
 				if (type < 0 || type >= MAX_CHANNEL_TYPES)
 					continue;
 				int count = InputChanInfos[type].CountItems();
 				for (int j = 0; j < count; j++) {
-					chan_info *info = InputChanInfos[type].ItemAt(j);
-					chan_info *newinfo = MixChanInfos[chan].Create();
-					newinfo->base = info->base;
-					newinfo->sample_offset = info->sample_offset;
-					newinfo->gain = info->gain * gain;
+					chan_info* info = InputChanInfos[type].ItemAt(j);
+					chan_info* newInfo = MixChanInfos[channel].Create();
+					newInfo->base = info->base;
+					newInfo->sample_offset = info->sample_offset;
+					newInfo->gain = info->gain * gain;
 				}
 			}
 		}
 
 		memset(fMixBuffer, 0,
 			fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
-		for (int chan = 0; chan < fMixBufferChannelCount; chan++) {
-			PRINT(5, "MixThread: chan %d has %d sources\n", chan,
-				MixChanInfos[chan].CountItems());
+		for (int channel = 0; channel < fMixBufferChannelCount; channel++) {
+			PRINT(5, "MixThread: channel %d has %d sources\n", channel,
+				MixChanInfos[channel].CountItems());
 
-			int count = MixChanInfos[chan].CountItems();
+			int count = MixChanInfos[channel].CountItems();
 			for (int i = 0; i < count; i++) {
-				chan_info *info = MixChanInfos[chan].ItemAt(i);
+				chan_info* info = MixChanInfos[channel].ItemAt(i);
 				PRINT(5, "MixThread:   base %p, sample-offset %2d, gain %.3f\n",
 					info->base, info->sample_offset, info->gain);
 				// This looks slightly ugly, but the current GCC will generate
 				// the fastest code this way.
 				// fMixBufferFrameCount is always > 0.
-				uint32 dst_sample_offset
+				uint32 dstSampleOffset
 					= fMixBufferChannelCount * sizeof(float);
-				uint32 src_sample_offset = info->sample_offset;
-				register char *dst = (char *)&fMixBuffer[chan];
-				register char *src = (char *)info->base;
+				uint32 srcSampleOffset = info->sample_offset;
+				register char* dst = (char*)&fMixBuffer[channel];
+				register char* src = (char*)info->base;
 				register float gain = info->gain;
 				register int j = fMixBufferFrameCount;
 				do {
-					*(float *)dst += *(const float *)src * gain;
-					dst += dst_sample_offset;
-					src += src_sample_offset;
+					*(float*)dst += *(const float*)src * gain;
+					dst += dstSampleOffset;
+					src += srcSampleOffset;
 				 } while (--j);
 			}
 		}
 
 		// request a buffer
-		BBuffer	*buf;
-		buf = fBufferGroup->RequestBuffer(
+		BBuffer* buffer;
+		buffer = fBufferGroup->RequestBuffer(
 			fOutput->MediaOutput().format.u.raw_audio.buffer_size,
-			buffer_request_timeout);
-		if (buf) {
+			bufferRequestTimeout);
+		if (buffer != NULL) {
 			// copy data from mix buffer into output buffer
 			for (int i = 0; i < fMixBufferChannelCount; i++) {
 				fResampler[i]->Resample(
-					reinterpret_cast<char *>(fMixBuffer) + i * sizeof(float),
+					reinterpret_cast<char*>(fMixBuffer) + i * sizeof(float),
 					fMixBufferChannelCount * sizeof(float),
 					fMixBufferFrameCount,
-					reinterpret_cast<char *>(buf->Data())
+					reinterpret_cast<char*>(buffer->Data())
 						+ (i * bytes_per_sample(
 							fOutput->MediaOutput().format.u.raw_audio)),
 					bytes_per_frame(fOutput->MediaOutput().format.u.raw_audio),
@@ -660,31 +652,31 @@ MixerCore::MixThread()
 				frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
 
 			// fill in the buffer header
-			media_header* hdr = buf->Header();
+			media_header* hdr = buffer->Header();
 			hdr->type = B_MEDIA_RAW_AUDIO;
 			hdr->size_used
 				= fOutput->MediaOutput().format.u.raw_audio.buffer_size;
 			hdr->time_source = fTimeSource->ID();
-			hdr->start_time = event_time;
+			hdr->start_time = eventTime;
 
 			// swap byte order if necessary
-			fOutput->AdjustByteOrder(buf);
+			fOutput->AdjustByteOrder(buffer);
 
 			// send the buffer
-			status_t res = fNode->SendBuffer(buf, fOutput);
+			status_t res = fNode->SendBuffer(buffer, fOutput);
 			if (res != B_OK) {
 #if DEBUG
 				ERROR("MixerCore: SendBuffer failed for buffer %Ld\n",
-					buffer_num);
+					bufferIndex);
 #else
 				ERROR("MixerCore: SendBuffer failed\n");
 #endif
-				buf->Recycle();
+				buffer->Recycle();
 			}
 		} else {
 #if DEBUG
 			ERROR("MixerCore: RequestBuffer failed for buffer %Ld\n",
-				buffer_num);
+				bufferIndex);
 #else
 			ERROR("MixerCore: RequestBuffer failed\n");
 #endif
@@ -698,12 +690,12 @@ MixerCore::MixThread()
 
 schedule_next_event:
 		// schedule next event
-		frame_pos += fMixBufferFrameCount;
-		event_time = time_base + bigtime_t((1000000LL * frame_pos)
+		framePos += fMixBufferFrameCount;
+		eventTime = timeBase + bigtime_t((1000000LL * framePos)
 			/ fMixBufferFrameRate);
 		Unlock();
 #if DEBUG
-		buffer_num++;
+		bufferIndex++;
 #endif
 	}
 }

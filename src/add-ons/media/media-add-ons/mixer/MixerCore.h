@@ -67,7 +67,7 @@ public:
 
 			void				SetOutputBufferGroup(BBufferGroup* group);
 			void				SetTimingInfo(BTimeSource* timeSource,
-									bigtime_t downstream_latency);
+									bigtime_t downstreamLatency);
 			void				EnableOutput(bool enabled);
 			bool				Start();
 			bool				Stop();
@@ -78,7 +78,7 @@ public:
 
 private:
 			void				ApplyOutputFormat();
-	static	int32				_mix_thread_(void* arg);
+	static	int32				MixThreadEntry(void* arg);
 			void				MixThread();
 
 private:
