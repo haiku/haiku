@@ -712,8 +712,12 @@ Controller::SetFramePosition(int32 value)
 {
 	BAutolock _(this);
 
-	int32 seekFrame = max_c(0, min_c(Duration(), value));
-	int32 currentFrame = CurrentFrame();
+	int64 seekFrame = max_c(0, min_c(Duration(), value));
+	int64 currentFrame = CurrentFrame();
+	// Snap to video keyframe, since that will be the fastest
+	// to display and seeking will feel more snappy.
+	if (Duration() > 240 && fVideoTrackSupplier != NULL)
+		fVideoTrackSupplier->FindKeyFrameForFrame(&seekFrame);
 	if (seekFrame != currentFrame) {
 		fSeekFrame = seekFrame;
 		fSeekRequested = true;
