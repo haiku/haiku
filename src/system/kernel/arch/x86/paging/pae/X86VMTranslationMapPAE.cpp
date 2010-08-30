@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -147,8 +147,10 @@ X86VMTranslationMapPAE::Init(bool kernel)
 		pae_page_directory_pointer_table_entry* pdpt
 			= (pae_page_directory_pointer_table_entry*)
 				method->Allocate32BitPage(physicalPDPT, pdptHandle);
-		if (pdpt == NULL)
+		if (pdpt == NULL) {
 			free(virtualPageDirs[0]);
+			return B_NO_MEMORY;
+		}
 
 		// init the PDPT entries
 		for (int32 i = 0; i < 4; i++) {
