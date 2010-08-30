@@ -168,8 +168,7 @@ struct ip_header {
 // User Datagram Protocol (UDP)
 
 // UDP header (RFC 768)
-struct udp_header
-{
+struct udp_header {
 	uint16	source;			// source port
 	uint16	destination;	// destination port
 	uint16	length;			// length of UDP packet (header + data)
@@ -180,8 +179,7 @@ struct udp_header
 // Transmission Control Protocol (TCP)
 
 // TCP header (RFC 793, RFC 3168)
-struct tcp_header
-{
+struct tcp_header {
 	uint16	source;			// source port
 	uint16	destination;	// destination port
 	uint32	seqNumber;		// sequence number
