@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Stephan Amßus <superstippi@gmx.de>
+ * Copyright 2009-2010, Stephan Amßus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -15,6 +15,7 @@ extern "C" {
 	#include "rational.h"
 }
 
+#include "EncoderTable.h"
 #include "gfx_util.h"
 
 
@@ -36,6 +37,7 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	:
 	Encoder(),
 	fBitRateScale(bitRateScale),
+	fCodecID((enum CodecID)codecID),
 	fCodec(NULL),
 	fContext(avcodec_alloc_context()),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
@@ -49,8 +51,10 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 {
 	TRACE("AVCodecEncoder::AVCodecEncoder()\n");
 
-	fCodec = avcodec_find_encoder((enum CodecID)codecID);
-	TRACE("  found AVCodec for %lu: %p\n", codecID, fCodec);
+	if (fCodecID > 0) {
+		fCodec = avcodec_find_encoder(fCodecID);
+		TRACE("  found AVCodec for %u: %p\n", fCodecID, fCodec);
+	}
 
 	memset(&fInputFormat, 0, sizeof(media_format));
 
@@ -131,11 +135,22 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 {
 	TRACE("AVCodecEncoder::SetUp()\n");
 
-	if (fContext == NULL || fCodec == NULL)
+	if (fContext == NULL)
 		return B_NO_INIT;
 
 	if (inputFormat == NULL)
 		return B_BAD_VALUE;
+
+	// Codec IDs for raw-formats may need to be figured out here.
+	if (fCodec == NULL && fCodecID == CODEC_ID_NONE) {
+		fCodecID = raw_audio_codec_id_for(*inputFormat);
+		if (fCodecID != CODEC_ID_NONE)
+			fCodec = avcodec_find_encoder(fCodecID);
+	}
+	if (fCodec == NULL) {
+		TRACE("  encoder not found!\n");
+		return B_NO_INIT;
+	}
 
 	_CloseCodecIfNeeded();
 

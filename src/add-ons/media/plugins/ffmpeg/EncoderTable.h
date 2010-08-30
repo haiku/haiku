@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef ENCODER_TABLE_H
@@ -7,6 +7,10 @@
 
 
 #include <MediaFormats.h>
+
+extern "C" {
+	#include "avcodec.h"
+}
 
 
 struct EncoderDescription {
@@ -20,6 +24,8 @@ struct EncoderDescription {
 
 extern const EncoderDescription gEncoderTable[];
 extern const size_t gEncoderCount;
+
+CodecID raw_audio_codec_id_for(const media_format& format);
 
 
 #endif // ENCODER_TABLE_H

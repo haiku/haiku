@@ -23,6 +23,7 @@ extern "C" {
 }
 
 #include "DemuxerTable.h"
+#include "EncoderTable.h"
 #include "gfx_util.h"
 
 
@@ -119,6 +120,8 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
 	// or something similar...
 	fStream->codec->codec_id = (CodecID)codecInfo->sub_id;
+	if (fStream->codec->codec_id == CODEC_ID_NONE)
+		fStream->codec->codec_id = raw_audio_codec_id_for(*format);
 
 	// Setup the stream according to the media format...
 	if (format->type == B_MEDIA_RAW_VIDEO) {
@@ -430,6 +433,7 @@ AVFormatWriter::CommitHeader()
 	else
 		fHeaderWritten = true;
 
+	#if TRACE_AVFORMAT_WRITER
 	TRACE("  wrote header\n");
 	for (unsigned i = 0; i < fContext->nb_streams; i++) {
 		AVStream* stream = fContext->streams[i];
@@ -437,6 +441,7 @@ AVFormatWriter::CommitHeader()
 			i, stream->time_base.num, stream->time_base.den,
 			stream->codec->time_base.num, stream->codec->time_base.den);
 	}
+	#endif // TRACE_AVFORMAT_WRITER
 
 	return result == 0 ? B_OK : B_ERROR;
 }
