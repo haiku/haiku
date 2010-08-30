@@ -680,7 +680,7 @@ status_t
 AudioMixer::SetBufferGroup(const media_source &for_source,
 	BBufferGroup *newGroup)
 {
-	PRINT("AudioMixer::SetBufferGroup\n");
+	TRACE("AudioMixer::SetBufferGroup\n");
 	// the downstream consumer (soundcard) node asks us to use another
 	// BBufferGroup (might be NULL). We only have one output (id 0)
 	if (for_source.port != ControlPort() || for_source.id != 0)
