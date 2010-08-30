@@ -42,9 +42,10 @@ public:
 
 	static  const char*			kNameOfGmtZone;
 
-			struct Accessor;
-	friend	struct BTimeZone::Accessor;
+			class Private;
 private:
+	friend	class Private;
+
 			icu_44::TimeZone*	fIcuTimeZone;
 			icu_44::Locale*		fIcuLocale;
 			status_t			fInitStatus;

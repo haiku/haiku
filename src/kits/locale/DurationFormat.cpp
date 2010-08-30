@@ -18,7 +18,7 @@
 #include <LocaleRoster.h>
 #include <TimeZone.h>
 
-#include <TimeZoneAccessor.h>
+#include <TimeZonePrivate.h>
 
 
 // maps our unit element to the corresponding ICU unit
@@ -112,18 +112,18 @@ BDurationFormat::SetTimeZone(const BTimeZone* timeZone)
 	if (fCalendar == NULL)
 		return B_NO_INIT;
 
-	BTimeZone::Accessor zoneAccessor;
+	BTimeZone::Private zonePrivate;
 	if (timeZone == NULL) {
 		BTimeZone defaultTimeZone;
 		status_t result
 			= be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
 		if (result != B_OK)
 			return result;
-		zoneAccessor.SetTo(&defaultTimeZone);
+		zonePrivate.SetTo(&defaultTimeZone);
 	} else
-		zoneAccessor.SetTo(timeZone);
+		zonePrivate.SetTo(timeZone);
 
-	TimeZone* icuTimeZone = zoneAccessor.IcuTimeZone();
+	TimeZone* icuTimeZone = zonePrivate.IcuTimeZone();
 	if (icuTimeZone != NULL)
 		fCalendar->setTimeZone(*icuTimeZone);
 
