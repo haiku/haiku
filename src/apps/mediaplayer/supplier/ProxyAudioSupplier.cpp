@@ -90,8 +90,8 @@ status_t
 ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 	bigtime_t startTime, bigtime_t endTime)
 {
-	TRACE("GetFrames(%p, %lld, %lld, %lld)\n", buffer, frameCount,
-		startTime, endTime);
+	TRACE("GetFrames(%p, frameCount: %lld, time interval: %lld - %lld)\n",
+		buffer, frameCount, startTime, endTime);
 
 	// Create a list of playing intervals which compose the supplied
 	// performance time interval.
@@ -137,6 +137,10 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 		return B_ERROR;
 
 	// retrieve the audio data for each interval.
+	#ifdef TRACE_PROXY_AUDIO_SUPPLIER
+	int32 intervalIndex = 0;
+	#endif
+
 	int64 framesRead = 0;
 	while (!playingIntervals.IsEmpty()) {
 		PlayingInterval* interval
@@ -145,10 +149,6 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 			delete interval;
 			continue;
 		}
-
-		TRACE("GetFrames() - interval [%lld, %lld]: [%lld, %lld]\n",
-			interval->start_time, interval->end_time,
-			interval->x_start_time, interval->x_end_time);
 
 		// get playing direction
 		int32 playingDirection = 0;
@@ -159,6 +159,13 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 		float absSpeed = interval->speed * playingDirection;
 		int64 framesToRead = _AudioFrameForTime(interval->end_time)
 			- _AudioFrameForTime(interval->start_time);
+
+		TRACE("GetFrames() - interval (%ld) [%lld, %lld]: [%lld, %lld], "
+			"frames: %lld\n", intervalIndex,
+			interval->start_time, interval->end_time,
+			interval->x_start_time, interval->x_end_time,
+			framesToRead);
+
 		// not playing
 		if (absSpeed == 0)
 			_ReadSilence(buffer, framesToRead);
@@ -180,6 +187,10 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 		framesRead += framesToRead;
 		buffer = _SkipFrames(buffer, framesToRead);
 		delete interval;
+
+		#ifdef TRACE_PROXY_AUDIO_SUPPLIER
+		intervalIndex++;
+		#endif
 	}
 	// read silence on error
 	if (error != B_OK) {
