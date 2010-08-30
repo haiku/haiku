@@ -1,6 +1,10 @@
 /*
  * Copyright 2007-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -409,8 +413,8 @@ suggest_mount_flags(const BPartition* partition, uint32* _flags)
 				"unintentional data loss because of errors in Haiku.");
 		}
 
-		BAlert* alert = new BAlert(B_TRANSLATE("Mount warning"), 
-			string.String(), B_TRANSLATE("Mount read/write"), 
+		BAlert* alert = new BAlert(B_TRANSLATE("Mount warning"),
+			string.String(), B_TRANSLATE("Mount read/write"),
 			B_TRANSLATE("Cancel"), B_TRANSLATE("Mount read-only"),
 			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
 		alert->SetShortcut(1, B_ESCAPE);
@@ -621,7 +625,7 @@ AutoMounter::_UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
 	else
 		status = fs_unmount_volume(mountPoint.Path(), 0);
 
-	if (status < B_OK) {
+	if (status != B_OK) {
 		if (!_SuggestForceUnmount(name, status))
 			return;
 
@@ -631,8 +635,8 @@ AutoMounter::_UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
 			status = fs_unmount_volume(mountPoint.Path(), B_FORCE_UNMOUNT);
 	}
 
-	if (status < B_OK) {
-		_ReportUnmountError(partition->ContentName(), status);
+	if (status != B_OK) {
+		_ReportUnmountError(name, status);
 		return;
 	}
 
