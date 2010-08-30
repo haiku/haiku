@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Shortcuts	312003716
+1	russian	x-vnd.Haiku-Shortcuts	3991607483
 OK	ShortcutsWindow		Oк
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
 Cancel	ShortcutsWindow		Отмена
@@ -8,9 +8,11 @@ Open KeySet…	ShortcutsWindow		Открыть список горячих кл�
 Shortcuts\n\nBased on SpicyKeys for BeOS made by Jeremy Friesner.	ShortcutsApp		Горячие клавиши\n\nОсновано на утилите SpicyKeys для BeOS разработанной Jeremy Friesner.
 Revert to saved	ShortcutsWindow		Вернуться к сохраненной версии
 Shortcuts	ShortcutsWindow		Горячие клавиши
+(Choose application with file requester)	ShortcutsWindow		(Выбрать программу)
 Window	ShortcutsSpec	Name for modifier on keyboard	Окно
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не удалось открыть список горячих клавиш!
 Save	ShortcutsWindow		Сохранить
+Remove selected shortcut	ShortcutsWindow		Удалить выделенную горячую клавишу
 Add new shortcut	ShortcutsWindow		Добавить горячую клавишу
 Save & apply	ShortcutsWindow		Сохранить
 OK	ShortcutsApp		Oк
@@ -18,6 +20,7 @@ Append	ShortcutsWindow		Совместить
 File	ShortcutsWindow		Файл
 Quit	ShortcutsWindow		Выход
 Don't save	ShortcutsWindow		Не сохранять
+Application	ShortcutsWindow		Приложение
 Save KeySet as…	ShortcutsWindow		Сохранить набор как…
 Open	ShortcutsWindow		Открыть
 Really quit without saving your changes?	ShortcutsWindow		Действительно выйти без сохранения изменений?
