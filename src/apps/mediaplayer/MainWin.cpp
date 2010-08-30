@@ -1414,11 +1414,10 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 		item->SetMarked(i == current);
 		audioTrackMenu->AddItem(item);
 	}
-	if (!count) {
+	if (count == 0) {
 		audioTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 		audioTrackMenu->ItemAt(0)->SetMarked(true);
 	}
-	audioTrackMenu->SetEnabled(count > 1);
 
 
 	count = fController->VideoTrackCount();
@@ -1430,11 +1429,10 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 		item->SetMarked(i == current);
 		videoTrackMenu->AddItem(item);
 	}
-	if (!count) {
+	if (count == 0) {
 		videoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 		videoTrackMenu->ItemAt(0)->SetMarked(true);
 	}
-	videoTrackMenu->SetEnabled(count > 1);
 }
 
 
