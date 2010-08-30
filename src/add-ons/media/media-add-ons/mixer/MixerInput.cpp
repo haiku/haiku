@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -68,8 +68,10 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input,
 
 	// initialize fInputChannelInfo
 	for (int i = 0; i < fInputChannelCount; i++) {
-		fInputChannelInfo[i].buffer_base = 0;	// will be set by SetMixBufferFormat()
-		fInputChannelInfo[i].destination_mask = 0;	// will be set by UpdateInputChannelDestinationMask()
+		fInputChannelInfo[i].buffer_base = 0;
+			// will be set by SetMixBufferFormat()
+		fInputChannelInfo[i].destination_mask = 0;
+			// will be set by UpdateInputChannelDestinationMask()
 		fInputChannelInfo[i].gain = 1.0;
 	}
 
@@ -77,10 +79,12 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input,
 	fResampler = new Resampler * [fInputChannelCount];
 	for (int i = 0; i < fInputChannelCount; i++) {
 		// TODO create Interpolate instead of Resampler if the settings says so
-		fResampler[i] = new Resampler(fInput.format.u.raw_audio.format, media_raw_audio_format::B_AUDIO_FLOAT);
+		fResampler[i] = new Resampler(fInput.format.u.raw_audio.format,
+			media_raw_audio_format::B_AUDIO_FLOAT);
 	}
 
-	// fMixerChannelInfo and fMixerChannelCount will be initialized by UpdateInputChannelDestinations()
+	// fMixerChannelInfo and fMixerChannelCount will be initialized by
+	// UpdateInputChannelDestinations()
 	SetMixBufferFormat((int32)mixFrameRate, mixFrameCount);
 }
 
@@ -111,16 +115,19 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	bigtime_t buffer_duration;
 
 	if (!fMixBuffer) {
-		ERROR("MixerInput::BufferReceived: dropped incoming buffer as we don't have a mix buffer\n");
+		ERROR("MixerInput::BufferReceived: dropped incoming buffer as we "
+			"don't have a mix buffer\n");
 		return;
 	}
 
 	data = buffer->Data();
 	size = buffer->SizeUsed();
 	start = buffer->Header()->start_time;
-	buffer_duration = duration_for_frames(fInput.format.u.raw_audio.frame_rate, size / bytes_per_frame(fInput.format.u.raw_audio));
+	buffer_duration = duration_for_frames(fInput.format.u.raw_audio.frame_rate,
+		size / bytes_per_frame(fInput.format.u.raw_audio));
 	if (start < 0) {
-		ERROR("MixerInput::BufferReceived: buffer with negative start time of %Ld dropped\n", start);
+		ERROR("MixerInput::BufferReceived: buffer with negative start time of "
+			"%Ld dropped\n", start);
 		return;
 	}
 
@@ -128,12 +135,15 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	if (fInputByteSwap)
 		fInputByteSwap->Swap(data, size);
 
-	int offset = frames_for_duration(fMixBufferFrameRate, start) % fMixBufferFrameCount;
+	int offset = frames_for_duration(fMixBufferFrameRate, start)
+		% fMixBufferFrameCount;
 
-	PRINT(4, "MixerInput::BufferReceived: buffer start %10Ld, offset %6d\n", start, offset);
+	PRINT(4, "MixerInput::BufferReceived: buffer start %10Ld, offset %6d\n",
+		start, offset);
 
 	int in_frames = size / bytes_per_frame(fInput.format.u.raw_audio);
-	double frames = double(in_frames * fMixBufferFrameRate) / fInput.format.u.raw_audio.frame_rate;
+	double frames = double(in_frames * fMixBufferFrameRate)
+		/ fInput.format.u.raw_audio.frame_rate;
 	int out_frames = int(frames);
 	fFractionalFrames += frames - double(out_frames);
 	if (fFractionalFrames >= 1.0) {
@@ -144,98 +154,139 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	// if fLastDataFrameWritten != -1, then we have a valid last position
 	// and can do glitch compensation
 	if (fLastDataFrameWritten >= 0) {
-		int expected_frame = (fLastDataFrameWritten + 1) % fMixBufferFrameCount;
+		int expected_frame = (fLastDataFrameWritten + 1)
+			% fMixBufferFrameCount;
 		if (offset != expected_frame) {
 			// due to rounding and other errors, offset might be off by +/- 1
 			// this is not really a bad glitch, we just adjust the position
 			if (offset == fLastDataFrameWritten) {
-				//printf("MixerInput::BufferReceived: -1 frame GLITCH! last frame was %ld, expected frame was %d, new frame is %d\n", fLastDataFrameWritten, expected_frame, offset);
+//				printf("MixerInput::BufferReceived: -1 frame GLITCH! last "
+//					"frame was %ld, expected frame was %d, new frame is %d\n",
+//					fLastDataFrameWritten, expected_frame, offset);
 				offset = expected_frame;
-			} else if (offset == ((fLastDataFrameWritten + 2) % fMixBufferFrameCount)) {
-				//printf("MixerInput::BufferReceived: +1 frame GLITCH! last frame was %ld, expected frame was %d, new frame is %d\n", fLastDataFrameWritten, expected_frame, offset);
+			} else if (offset == ((fLastDataFrameWritten + 2)
+				% fMixBufferFrameCount)) {
+//				printf("MixerInput::BufferReceived: +1 frame GLITCH! last "
+//					"frame was %ld, expected frame was %d, new frame is %d\n",
+//					fLastDataFrameWritten, expected_frame, offset);
 				offset = expected_frame;
 			} else {
-				printf("MixerInput::BufferReceived: GLITCH! last frame was %4ld, expected frame was %4d, new frame is %4d\n", fLastDataFrameWritten, expected_frame, offset);
+				printf("MixerInput::BufferReceived: GLITCH! last frame was "
+					"%4ld, expected frame was %4d, new frame is %4d\n",
+					fLastDataFrameWritten, expected_frame, offset);
 
 				if (start > fLastDataAvailableTime) {
-					if ((start - fLastDataAvailableTime) < (buffer_duration / 10)) {
+					if ((start - fLastDataAvailableTime)
+						< (buffer_duration / 10)) {
 						// buffer is less than 10% of buffer duration too late
-						printf("short glitch, buffer too late, time delta %Ld\n", start - fLastDataAvailableTime);
+						printf("short glitch, buffer too late, time delta "
+							"%Ld\n", start - fLastDataAvailableTime);
 						offset = expected_frame;
 						out_frames++;
 					} else {
 						// buffer more than 10% of buffer duration too late
-						// XXX zerofill buffer
-						printf("MAJOR glitch, buffer too late, time delta %Ld\n", start - fLastDataAvailableTime);
+						// TODO: zerofill buffer
+						printf("MAJOR glitch, buffer too late, time delta "
+							"%Ld\n", start - fLastDataAvailableTime);
 					}
 				} else { // start <= fLastDataAvailableTime
 					// the new buffer is too early
-					if ((fLastDataAvailableTime - start) < (buffer_duration / 10)) {
+					if ((fLastDataAvailableTime - start)
+						< (buffer_duration / 10)) {
 						// buffer is less than 10% of buffer duration too early
-						printf("short glitch, buffer too early, time delta %Ld\n", fLastDataAvailableTime - start);
+						printf("short glitch, buffer too early, time delta "
+							"%Ld\n", fLastDataAvailableTime - start);
 						offset = expected_frame;
 						out_frames--;
 						if (out_frames < 1)
 							out_frames = 1;
 					} else {
 						// buffer more than 10% of buffer duration too early
-						// XXX zerofill buffer
-						printf("MAJOR glitch, buffer too early, time delta %Ld\n", fLastDataAvailableTime - start);
+						// TODO: zerofill buffer
+						printf("MAJOR glitch, buffer too early, time delta "
+							"%Ld\n", fLastDataAvailableTime - start);
 					}
 				}
 			}
 		}
 	}
 
-	//printf("data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames);
+//	printf("data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n",
+//		start,
+//		start + duration_for_frames(fInput.format.u.raw_audio.frame_rate,
+//		frames_per_buffer(fInput.format.u.raw_audio)), offset,
+//		offset + out_frames);
 	if (offset + out_frames > fMixBufferFrameCount) {
 		int out_frames1 = fMixBufferFrameCount - offset;
 		int out_frames2 = out_frames - out_frames1;
 		int in_frames1 = (out_frames1 * in_frames) / out_frames;
 		int in_frames2 = in_frames - in_frames1;
 
-		//printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames1 - 1, 0, out_frames2 - 1);
-		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames1 - 1, 0, out_frames2 - 1);
-		PRINT(5, "  in_frames %5d, out_frames %5d, in_frames1 %5d, out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
-			  in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
+//		printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at "
+//			"frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(),
+//			start,
+//			start + duration_for_frames(fInput.format.u.raw_audio.frame_rate,
+//			frames_per_buffer(fInput.format.u.raw_audio)), offset,
+//			offset + out_frames1 - 1, 0, out_frames2 - 1);
+		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at "
+			"frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(),
+			start,
+			start + duration_for_frames(fInput.format.u.raw_audio.frame_rate,
+			frames_per_buffer(fInput.format.u.raw_audio)), offset,
+			offset + out_frames1 - 1, 0, out_frames2 - 1);
+		PRINT(5, "  in_frames %5d, out_frames %5d, in_frames1 %5d, "
+			"out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
+			in_frames, out_frames, in_frames1, out_frames1, in_frames2,
+			out_frames2);
 
 		fLastDataFrameWritten = out_frames2 - 1;
 
-		offset *= sizeof(float) * fInputChannelCount; // convert offset from frames into bytes
+		// convert offset from frames into bytes
+		offset *= sizeof(float) * fInputChannelCount;
 
 		for (int i = 0; i < fInputChannelCount; i++) {
-			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
-									bytes_per_frame(fInput.format.u.raw_audio),
-									in_frames1,
-									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base) + offset,
-									fInputChannelCount * sizeof(float),
-									out_frames1,
-									fInputChannelInfo[i].gain);
+			fResampler[i]->Resample(
+				reinterpret_cast<char *>(data)
+					+ i * bytes_per_sample(fInput.format.u.raw_audio),
+				bytes_per_frame(fInput.format.u.raw_audio), in_frames1,
+				reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base)
+					+ offset, fInputChannelCount * sizeof(float), out_frames1,
+				fInputChannelInfo[i].gain);
 
-			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio) + in_frames1 * bytes_per_frame(fInput.format.u.raw_audio),
-									bytes_per_frame(fInput.format.u.raw_audio),
-									in_frames2,
-									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base),
-									fInputChannelCount * sizeof(float),
-									out_frames2,
-									fInputChannelInfo[i].gain);
+			fResampler[i]->Resample(
+				reinterpret_cast<char *>(data)
+					+ i * bytes_per_sample(fInput.format.u.raw_audio)
+					+ in_frames1 * bytes_per_frame(fInput.format.u.raw_audio),
+				bytes_per_frame(fInput.format.u.raw_audio), in_frames2,
+				reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base),
+				fInputChannelCount * sizeof(float), out_frames2,
+				fInputChannelInfo[i].gain);
 
 		}
 	} else {
-		//printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames - 1);
-		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames - 1);
+//		printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at "
+//			"frames %ld to %ld\n", fCore->fTimeSource->Now(), start,
+//			start + duration_for_frames(fInput.format.u.raw_audio.frame_rate,
+//			frames_per_buffer(fInput.format.u.raw_audio)), offset,
+//			offset + out_frames - 1);
+		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at "
+			"frames %ld to %ld\n", fCore->fTimeSource->Now(), start,
+			start + duration_for_frames(fInput.format.u.raw_audio.frame_rate,
+			frames_per_buffer(fInput.format.u.raw_audio)), offset,
+			offset + out_frames - 1);
 		PRINT(5, "  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
 
 		fLastDataFrameWritten = offset + out_frames - 1;
-		offset *= sizeof(float) * fInputChannelCount; // convert offset from frames into bytes
+		// convert offset from frames into bytes
+		offset *= sizeof(float) * fInputChannelCount;
 		for (int i = 0; i < fInputChannelCount; i++) {
-			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_sample(fInput.format.u.raw_audio),
-									bytes_per_frame(fInput.format.u.raw_audio),
-									in_frames,
-									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base) + offset,
-									fInputChannelCount * sizeof(float),
-									out_frames,
-									fInputChannelInfo[i].gain);
+			fResampler[i]->Resample(
+				reinterpret_cast<char *>(data)
+					+ i * bytes_per_sample(fInput.format.u.raw_audio),
+				bytes_per_frame(fInput.format.u.raw_audio), in_frames,
+				reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base)
+					+ offset, fInputChannelCount * sizeof(float),
+				out_frames, fInputChannelInfo[i].gain);
 		}
 	}
 	fLastDataAvailableTime = start + buffer_duration;
@@ -277,7 +328,9 @@ MixerInput::AddInputChannelDestination(int channel, int destination_type)
 
 	// verify that no other channel has id
 	if (-1 != GetInputChannelForDestination(destination_type)) {
-		ERROR("MixerInput::AddInputChannelDestination: destination_type %d already assigned to channel %d\n", destination_type, GetInputChannelForDestination(destination_type));
+		ERROR("MixerInput::AddInputChannelDestination: destination_type %d "
+			"already assigned to channel %d\n", destination_type,
+			GetInputChannelForDestination(destination_type));
 		return;
 	}
 
@@ -316,7 +369,8 @@ MixerInput::HasInputChannelDestination(int channel, int destination_type)
 		return false;
 	if (destination_type < 0 || destination_type >= MAX_CHANNEL_TYPES)
 		return false;
-	return fInputChannelInfo[channel].destination_mask & ChannelTypeToChannelMask(destination_type);
+	return fInputChannelInfo[channel].destination_mask
+		& ChannelTypeToChannelMask(destination_type);
 }
 
 
@@ -374,36 +428,54 @@ MixerInput::UpdateInputChannelDestinationMask()
 	TRACE("UpdateInputChannelDestinationMask: enter\n");
 
 	// first apply a 1:1 mapping
-	for (int i = 0; i < fInputChannelCount; i++)
-		fInputChannelInfo[i].destination_mask = GetChannelMask(i, fInputChannelMask);
+	for (int i = 0; i < fInputChannelCount; i++) {
+		fInputChannelInfo[i].destination_mask = GetChannelMask(i,
+			fInputChannelMask);
+	}
 
 	// specialize this, depending on the available physical output channels
 	if (fCore->OutputChannelCount() <= 2) {
 		// less or equal two channels
-		if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
+		if (fInputChannelCount == 1
+			&& (GetChannelMask(0, fInputChannelMask)
+				& (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
 			fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
 		}
 	} else {
 		// more than two channel output card
-		if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
+		if (fInputChannelCount == 1
+			&& (GetChannelMask(0, fInputChannelMask)
+				& (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
 			fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
 		}
-		if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_LEFT)) {
-			fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+		if (fInputChannelCount == 2
+			&& (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_LEFT)) {
+			fInputChannelInfo[0].destination_mask
+				= B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
 		}
-		if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_RIGHT)) {
-			fInputChannelInfo[0].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+		if (fInputChannelCount == 2
+			&& (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_RIGHT)) {
+			fInputChannelInfo[0].destination_mask
+				= B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
 		}
-		if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_LEFT)) {
-			fInputChannelInfo[1].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+		if (fInputChannelCount == 2
+			&& (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_LEFT)) {
+			fInputChannelInfo[1].destination_mask
+				= B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
 		}
-		if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_RIGHT)) {
-			fInputChannelInfo[1].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+		if (fInputChannelCount == 2
+			&& (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_RIGHT)) {
+			fInputChannelInfo[1].destination_mask
+				= B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
 		}
 	}
 
-	for (int i = 0; i < fInputChannelCount; i++)
-		TRACE("UpdateInputChannelDestinationMask: input channel %d, destination_mask 0x%08lX, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+	for (int i = 0; i < fInputChannelCount; i++) {
+		TRACE("UpdateInputChannelDestinationMask: input channel %d, "
+			"destination_mask 0x%08lX, base %p, gain %.3f\n", i,
+			fInputChannelInfo[i].destination_mask,
+			fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+	}
 	TRACE("UpdateInputChannelDestinationMask: leave\n");
 }
 
@@ -416,8 +488,12 @@ MixerInput::UpdateInputChannelDestinations()
 	uint32 mask;
 
 	TRACE("UpdateInputChannelDestinations: enter\n");
-	for (int i = 0; i < fInputChannelCount; i++)
-		TRACE("UpdateInputChannelDestinations: input channel %d, destination_mask 0x%08lX, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+	for (int i = 0; i < fInputChannelCount; i++) {
+		TRACE("UpdateInputChannelDestinations: input channel %d, "
+			"destination_mask 0x%08lX, base %p, gain %.3f\n", i,
+			fInputChannelInfo[i].destination_mask,
+			fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+	}
 
 	all_bits = 0;
 	for (int i = 0; i < fInputChannelCount; i++)
@@ -426,7 +502,9 @@ MixerInput::UpdateInputChannelDestinations()
 	TRACE("UpdateInputChannelDestinations: all_bits = %08lx\n", all_bits);
 
 	channel_count = count_nonzero_bits(all_bits);
-	TRACE("UpdateInputChannelDestinations: %d input channels, %d mixer channels (%d old)\n", fInputChannelCount, channel_count, fMixerChannelCount);
+	TRACE("UpdateInputChannelDestinations: %d input channels, %d mixer "
+		"channels (%d old)\n", fInputChannelCount, channel_count,
+		fMixerChannelCount);
 	if (channel_count != fMixerChannelCount) {
 		delete [] fMixerChannelInfo;
 		fMixerChannelInfo = new mixer_chan_info[channel_count];
@@ -440,7 +518,8 @@ MixerInput::UpdateInputChannelDestinations()
 		while (mask != 0 && (all_bits & mask) == 0)
 			mask <<= 1;
 		fMixerChannelInfo[i].destination_type = ChannelMaskToChannelType(mask);
-		fMixerChannelInfo[i].destination_gain = fChannelTypeGain[fMixerChannelInfo[i].destination_type];
+		fMixerChannelInfo[i].destination_gain
+			= fChannelTypeGain[fMixerChannelInfo[i].destination_type];
 		mask <<= 1;
 	}
 
@@ -448,8 +527,11 @@ MixerInput::UpdateInputChannelDestinations()
 	for (int i = 0; i < fMixerChannelCount; i++) {
 		int j;
 		for (j = 0; j < fInputChannelCount; j++) {
-			if (fInputChannelInfo[j].destination_mask & ChannelTypeToChannelMask(fMixerChannelInfo[i].destination_type)) {
-				fMixerChannelInfo[i].buffer_base = fMixBuffer ? &fMixBuffer[j] : 0;
+			if (fInputChannelInfo[j].destination_mask
+					& ChannelTypeToChannelMask(
+						fMixerChannelInfo[i].destination_type)) {
+				fMixerChannelInfo[i].buffer_base = fMixBuffer ? &fMixBuffer[j]
+					: 0;
 				break;
 			}
 		}
@@ -459,8 +541,12 @@ MixerInput::UpdateInputChannelDestinations()
 		}
 	}
 
-	for (int i = 0; i < fMixerChannelCount; i++)
-		TRACE("UpdateInputChannelDestinations: mixer channel %d, type %2d, base %p, gain %.3f\n", i, fMixerChannelInfo[i].destination_type, fMixerChannelInfo[i].buffer_base, fMixerChannelInfo[i].destination_gain);
+	for (int i = 0; i < fMixerChannelCount; i++) {
+		TRACE("UpdateInputChannelDestinations: mixer channel %d, type %2d, "
+			"base %p, gain %.3f\n", i, fMixerChannelInfo[i].destination_type,
+			fMixerChannelInfo[i].buffer_base,
+			fMixerChannelInfo[i].destination_gain);
+	}
 
 	TRACE("UpdateInputChannelDestinations: leave\n");
 }
@@ -470,9 +556,11 @@ MixerInput::UpdateInputChannelDestinations()
 // and is about to be modified at a later point
 /*
 void
-MixerInput::SetInputChannelDestinationGain(int channel, int destination_type, float gain)
+MixerInput::SetInputChannelDestinationGain(int channel, int destination_type,
+	float gain)
 {
-	TRACE("SetInputChannelDestinationGain: channel %d, destination_type %d, gain %.4f\n", channel, destination_type, gain);
+	TRACE("SetInputChannelDestinationGain: channel %d, destination_type %d,
+		gain %.4f\n", channel, destination_type, gain);
 	// we don't need the channel, as each destination_type can only exist
 	// once for each MixerInput, but we use it for parameter validation
 	// and to have a interface similar to MixerOutput
@@ -579,16 +667,19 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	// make fMixBufferFrameCount an integral multiple of frames,
 	// but at least 3 times duration of our input buffer
 	// and at least 2 times duration of the output buffer
-	bigtime_t inputBufferLength  = duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio));
+	bigtime_t inputBufferLength  = duration_for_frames(
+		fInput.format.u.raw_audio.frame_rate,
+		frames_per_buffer(fInput.format.u.raw_audio));
 	bigtime_t outputBufferLength = duration_for_frames(framerate, frames);
-	bigtime_t mixerBufferLength = max_c(3 * inputBufferLength, 2 * outputBufferLength);
+	bigtime_t mixerBufferLength
+		= max_c(3 * inputBufferLength, 2 * outputBufferLength);
 	int temp = frames_for_duration(framerate, mixerBufferLength);
 	fMixBufferFrameCount = ((temp / frames) + 1) * frames;
 
-	TRACE("  inputBufferLength  %10Ld\n", inputBufferLength);
-	TRACE("  outputBufferLength %10Ld\n", outputBufferLength);
-	TRACE("  mixerBufferLength  %10Ld\n", mixerBufferLength);
-	TRACE("  fMixBufferFrameCount   %10d\n", fMixBufferFrameCount);
+	TRACE("  inputBufferLength    %10Ld\n", inputBufferLength);
+	TRACE("  outputBufferLength   %10Ld\n", outputBufferLength);
+	TRACE("  mixerBufferLength    %10Ld\n", mixerBufferLength);
+	TRACE("  fMixBufferFrameCount %10d\n", fMixBufferFrameCount);
 
 	ASSERT((fMixBufferFrameCount % frames) == 0);
 
@@ -602,7 +693,7 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	if (rtm_create_pool(&fRtmPool, size) != B_OK)
 		fRtmPool = NULL;
 
-	fMixBuffer = (float *)rtm_alloc(fRtmPool, size);
+	fMixBuffer = (float*)rtm_alloc(fRtmPool, size);
 	if (fMixBuffer == NULL)
 		return;
 
