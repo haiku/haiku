@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,33 +25,32 @@ class StyledEditWindow;
 
 
 class StyledEditApp : public BApplication {
-	public:
-						StyledEditApp();
-		virtual			~StyledEditApp();
+public:
+								StyledEditApp();
+	virtual						~StyledEditApp();
 
-		virtual void	MessageReceived(BMessage *message);
-		virtual void	ArgvReceived(int32 argc, char** argv);
-		virtual void	RefsReceived(BMessage *message);
-		virtual void	ReadyToRun();
+	virtual void				MessageReceived(BMessage* message);
+	virtual void				ArgvReceived(int32 argc, char** argv);
+	virtual void				RefsReceived(BMessage* message);
+	virtual void				ReadyToRun();
 
-		int32			NumberOfWindows();
-		void			OpenDocument();
-		status_t		OpenDocument(entry_ref *ref);
-		void			CloseDocument();
+			int32				NumberOfWindows();
+			void				OpenDocument();
+			status_t			OpenDocument(entry_ref* ref);
+			void				CloseDocument();
 
-	private:
-		void			ArgvReceivedEx(int32 argc, const char *argv[], const char * cwd);
+private:
+			void				ArgvReceivedEx(int32 argc, const char* argv[],
+									const char* cwd);
 
-	private:
-		BFilePanel		*fOpenPanel;
-		BMenu			*fOpenPanelEncodingMenu;
-		uint32			fOpenAsEncoding;
-		int32			fWindowCount;
-		int32			fNextUntitledWindow;
-		bool			fBadArguments;
+private:
+			BFilePanel*			fOpenPanel;
+			BMenu*				fOpenPanelEncodingMenu;
+			uint32				fOpenAsEncoding;
+			int32				fWindowCount;
+			int32				fNextUntitledWindow;
+			bool				fBadArguments;
 };
 
-extern StyledEditApp* styled_edit_app;
 
 #endif	// STYLED_EDIT_APP
-

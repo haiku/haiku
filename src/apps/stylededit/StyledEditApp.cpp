@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,7 +32,6 @@
 using namespace BPrivate;
 
 
-StyledEditApp * styled_edit_app;
 BRect gWindowRect(7-15, 26-15, 507, 426);
 
 
@@ -80,21 +79,26 @@ namespace
 
 //	#pragma mark -
 
+
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Open_and_SaveAsPanel"
 
+
 StyledEditApp::StyledEditApp()
-	: BApplication(APP_SIGNATURE),
+	:
+	BApplication(APP_SIGNATURE),
 	fOpenPanel(NULL)
 {
 	fOpenPanel = new BFilePanel();
-	BMenuBar* menuBar =
-		dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
 
 	fOpenAsEncoding = 0;
-	fOpenPanelEncodingMenu= new BMenu(B_TRANSLATE("Encoding"));
-	menuBar->AddItem(fOpenPanelEncodingMenu);
+	fOpenPanelEncodingMenu = new BMenu(B_TRANSLATE("Encoding"));
 	fOpenPanelEncodingMenu->SetRadioMode(true);
+
+	BMenuBar* menuBar
+		= dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
+	if (menuBar != NULL)
+		menuBar->AddItem(fOpenPanelEncodingMenu);
 
 	BCharacterSetRoster roster;
 	BCharacterSet charset;
@@ -122,14 +126,14 @@ StyledEditApp::StyledEditApp()
 	fWindowCount = 0;
 	fNextUntitledWindow = 1;
 	fBadArguments = false;
-
-	styled_edit_app = this;
 }
 
 
 StyledEditApp::~StyledEditApp()
 {
 	delete fOpenPanel;
+	if (fOpenPanelEncodingMenu->Supermenu() == NULL)
+		delete fOpenPanelEncodingMenu;
 }
 
 
@@ -150,7 +154,8 @@ StyledEditApp::MessageReceived(BMessage* message)
 			void* ptr;
 			if (message->FindPointer("source", &ptr) == B_OK
 				&& fOpenPanelEncodingMenu != 0) {
-				fOpenAsEncoding = (uint32)fOpenPanelEncodingMenu->IndexOf((BMenuItem*)ptr);
+				fOpenAsEncoding = (uint32)fOpenPanelEncodingMenu->IndexOf(
+					(BMenuItem*)ptr);
 			}
 			break;
 

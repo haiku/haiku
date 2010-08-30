@@ -861,7 +861,8 @@ void
 StyledEditWindow::Quit()
 {
 	SaveAttrs();
-	styled_edit_app->CloseDocument();
+	if (StyledEditApp* app = dynamic_cast<StyledEditApp*>(be_app))
+		app->CloseDocument();
 	BWindow::Quit();
 }
 
