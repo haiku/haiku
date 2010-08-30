@@ -1604,7 +1604,7 @@ ipv4_receive_data(net_buffer* buffer)
 		// Find first interface with a matching family
 		if (!sDatalinkModule->is_local_link_address(sDomain, true,
 				buffer->destination, &buffer->interface_address))
-			notForUs = wasMulticast;
+			notForUs = !wasMulticast;
 	} else if (IN_MULTICAST(ntohl(header.destination))) {
 		buffer->flags |= MSG_MCAST;
 	} else {
@@ -1615,7 +1615,12 @@ ipv4_receive_data(net_buffer* buffer)
 				&buffer->interface_address, &matchedAddressType)
 			&& !sDatalinkModule->is_local_link_address(sDomain, true,
 				buffer->destination, &buffer->interface_address)) {
-			notForUs = true;
+			// if the buffer was a link layer multicast, regard it as a
+			// broadcast, and let the upper levels decide what to do with it
+			if (wasMulticast)
+				buffer->flags |= MSG_BCAST;
+			else
+				notForUs = true;
 		} else {
 			// copy over special address types (MSG_BCAST or MSG_MCAST):
 			buffer->flags |= matchedAddressType;
