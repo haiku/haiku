@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -353,15 +353,14 @@ IOSchedulerSimple::_Finisher()
 
 		// notify request and remove operation
 		IORequest* request = operation->Parent();
-		if (request != NULL) {
-			generic_size_t operationOffset = operation->OriginalOffset()
-				- request->Offset();
-			request->OperationFinished(operation, operation->Status(),
-				operation->TransferredBytes() < operation->OriginalLength(),
-				operation->Status() == B_OK
-					? operationOffset + operation->OriginalLength()
-					: operationOffset);
-		}
+
+		generic_size_t operationOffset
+			= operation->OriginalOffset() - request->Offset();
+		request->OperationFinished(operation, operation->Status(),
+			operation->TransferredBytes() < operation->OriginalLength(),
+			operation->Status() == B_OK
+				? operationOffset + operation->OriginalLength()
+				: operationOffset);
 
 		// recycle the operation
 		MutexLocker _(fLock);
