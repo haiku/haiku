@@ -138,6 +138,15 @@ assertparams()
 	fi
 }
 
+# real_path
+#
+# returns the realpath of a symbolic link.
+#
+real_path()
+{
+	perl -MCwd=realpath -e'print realpath($ARGV[0]), "\n"' "$1"
+}
+
 # standard_gcc_settings
 #
 # Sets the variables for a GCC platform.
@@ -148,8 +157,10 @@ standard_gcc_settings()
 		readlink="greadlink -e"
 	elif which realpath > /dev/null 2>&1; then
 		readlink=realpath
-	else
+	elif readlink -e / > /dev/null 2>&1; then
 		readlink="readlink -e"
+	else
+		readlink=real_path
 	fi
 
 	# PLATFORM_LINKLIBS
