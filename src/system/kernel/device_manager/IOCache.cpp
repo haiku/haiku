@@ -49,6 +49,7 @@ IOCache::IOCache(DMAResource* resource, size_t cacheLineSize)
 	fPages(NULL),
 	fVecs(NULL)
 {
+	ASSERT(resource != NULL);
 	TRACE("%p->IOCache::IOCache(%p, %" B_PRIuSIZE ")\n", this, resource,
 		cacheLineSize);
 
@@ -461,8 +462,7 @@ IOCache::_TransferRequestLineUncached(IORequest* request, off_t lineOffset,
 			// Keep the request in unfinished state. ScheduleRequest() will set
 			// the final status and notify.
 
-		if (fDMAResource != NULL)
-			fDMAResource->RecycleBuffer(operation.Buffer());
+		fDMAResource->RecycleBuffer(operation.Buffer());
 
 		if (error != B_OK) {
 			TRACE("%p->IOCache::_TransferRequestLineUncached(): operation at "
@@ -558,8 +558,7 @@ IOCache::_TransferPages(size_t firstPage, size_t pageCount, bool isWrite,
 
 		request.RemoveOperation(&operation);
 
-		if (fDMAResource != NULL)
-			fDMAResource->RecycleBuffer(operation.Buffer());
+		fDMAResource->RecycleBuffer(operation.Buffer());
 
 		if (error != B_OK) {
 			TRACE("%p->IOCache::_TransferLine(): operation at %" B_PRIdOFF
