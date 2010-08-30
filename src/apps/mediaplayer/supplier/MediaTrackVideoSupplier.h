@@ -28,6 +28,7 @@ class MediaTrackVideoSupplier : public VideoTrackSupplier {
 									bigtime_t* performanceTime,
 									const media_format* format,
 									bool& wasCached);
+	virtual	status_t			FindKeyFrameForFrame(int64* frame);
 	virtual	status_t			SeekToTime(bigtime_t* performanceTime);
 	virtual	status_t			SeekToFrame(int64* frame);
 

@@ -25,6 +25,7 @@ class VideoTrackSupplier {
 									bigtime_t* performanceTime,
 									const media_format* format,
 									bool& wasCached) = 0;
+	virtual	status_t			FindKeyFrameForFrame(int64* frame) = 0;
 	virtual	status_t			SeekToTime(bigtime_t* performanceTime) = 0;
 	virtual	status_t			SeekToFrame(int64* frame) = 0;
 

@@ -142,6 +142,17 @@ delete bitmap;
 
 
 status_t
+MediaTrackVideoSupplier::FindKeyFrameForFrame(int64* frame)
+{
+	if (!fVideoTrack)
+		return B_NO_INIT;
+
+	return fVideoTrack->FindKeyFrameForFrame(frame,
+		B_MEDIA_SEEK_CLOSEST_BACKWARD);
+}
+
+
+status_t
 MediaTrackVideoSupplier::SeekToTime(bigtime_t* performanceTime)
 {
 	if (!fVideoTrack)
