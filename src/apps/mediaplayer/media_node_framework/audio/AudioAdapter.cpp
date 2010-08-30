@@ -37,23 +37,29 @@ AudioAdapter::AudioAdapter(AudioReader* source, const media_format& format)
 	fFormat.u.raw_audio.byte_order = hostByteOrder;
 	if (source && source->Format().type == B_MEDIA_RAW_AUDIO) {
 
-		if (fFormat.u.raw_audio.format != source->Format().u.raw_audio.format
-			|| source->Format().u.raw_audio.byte_order != hostByteOrder) {
+		if (fFormat.u.raw_audio.format != 0
+			&& (fFormat.u.raw_audio.format
+					!= source->Format().u.raw_audio.format
+				|| source->Format().u.raw_audio.byte_order != hostByteOrder)) {
 			TRACE("AudioAdapter() - using format converter\n");
 			fFormatConverter = new (nothrow) AudioFormatConverter(source,
 				fFormat.u.raw_audio.format, hostByteOrder);
 			source = fFormatConverter;
 		}
 
-		if (fFormat.u.raw_audio.frame_rate
+		if (fFormat.u.raw_audio.frame_rate != 0
+			&& fFormat.u.raw_audio.frame_rate
 				!= source->Format().u.raw_audio.frame_rate) {
-			TRACE("AudioAdapter() - using resampler\n");
+			TRACE("AudioAdapter() - using resampler (%.1f -> %.1f)\n",
+				source->Format().u.raw_audio.frame_rate,
+				fFormat.u.raw_audio.frame_rate);
 			fResampler = new (nothrow) AudioResampler(source,
 				fFormat.u.raw_audio.frame_rate);
 			source = fResampler;
 		}
 
-		if (fFormat.u.raw_audio.channel_count
+		if (fFormat.u.raw_audio.channel_count != 0
+			&& fFormat.u.raw_audio.channel_count
 				!= source->Format().u.raw_audio.channel_count) {
 			TRACE("AudioAdapter() - using channel converter (%ld -> %ld)\n",
 				source->Format().u.raw_audio.channel_count,
@@ -87,13 +93,13 @@ AudioAdapter::InitialLatency() const
 status_t
 AudioAdapter::Read(void* buffer, int64 pos, int64 frames)
 {
-//	TRACE("AudioAdapter::Read(%p, %Ld, %Ld)\n", buffer, pos, frames);
+	TRACE("AudioAdapter::Read(%p, %Ld, %Ld)\n", buffer, pos, frames);
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;
 	pos += fOutOffset;
 	status_t ret = fFinalConverter->Read(buffer, pos, frames);
-//	TRACE("AudioAdapter::Read() done: %s\n", strerror(ret));
+	TRACE("AudioAdapter::Read() done: %s\n", strerror(ret));
 	return ret;
 }
 
