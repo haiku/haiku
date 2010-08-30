@@ -1,11 +1,11 @@
 /*
+ * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2000-2010, Stephan Aßmus <superstippi@gmx.de>,
+ * Copyright 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
+ * All Rights Reserved. Distributed under the terms of the MIT license.
+ *
  * Copyright (c) 1998-99, Be Incorporated, All Rights Reserved.
  * Distributed under the terms of the Be Sample Code license.
- *
- * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
- * Copyright 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
- * All Rights Reserved. Distributed under the terms of the MIT license.
  */
 
 
@@ -808,8 +808,14 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 	BBuffer* buffer = fBufferGroup->RequestBuffer(
 		fOutput.format.u.raw_audio.buffer_size, BufferDuration());
 
-	if (!buffer) {
-		ERROR("AudioProducer::_FillNextBuffer() - no buffer\n");
+	if (buffer == NULL) {
+		static bool errorPrinted = false;
+		if (!errorPrinted) {
+			ERROR("AudioProducer::_FillNextBuffer() - no buffer "
+				"(size: %ld, duration: %lld)\n",
+				fOutput.format.u.raw_audio.buffer_size, BufferDuration());
+			errorPrinted = true;
+		}
 		return NULL;
 	}
 
