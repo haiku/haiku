@@ -33,6 +33,8 @@ public:
 								MutableLocaleRoster();
 								~MutableLocaleRoster();
 
+			status_t			GetDefaultLocale(BLocale* locale) const;
+
 			status_t			SetDefaultCountry(const BCountry& country);
 			status_t			SetDefaultLocale(const BLocale& locale);
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);

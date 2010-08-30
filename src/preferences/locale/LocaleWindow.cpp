@@ -76,9 +76,6 @@ LocaleWindow::LocaleWindow()
 	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE
 		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BLocale defaultLocale;
-	be_locale_roster->GetDefaultLocale(&defaultLocale);
-
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	float spacing = be_control_look->DefaultItemSpacing();
@@ -199,7 +196,7 @@ LocaleWindow::LocaleWindow()
 			= new LanguageListItem(countryName, countryCode,
 				NULL);
 		listView->AddItem(item);
-		if (!strcmp(countryCode, defaultLocale.Code()))
+		if (!strcmp(countryCode, be_locale->Code()))
 			currentItem = item;
 	}
 
@@ -211,7 +208,7 @@ LocaleWindow::LocaleWindow()
 	listView->SetExplicitMinSize(
 		BSize(25 * be_plain_font->Size(), B_SIZE_UNSET));
 
-	fFormatView = new FormatView(defaultLocale);
+	fFormatView = new FormatView(*be_locale);
 
 	countryTab->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, spacing)
 		.AddGroup(B_VERTICAL, 3)

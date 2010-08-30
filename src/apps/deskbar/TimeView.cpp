@@ -41,7 +41,6 @@ All rights reserved.
 #include <Country.h>
 #include <Debug.h>
 #include <Locale.h>
-#include <LocaleRoster.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
 #include <PopUpMenu.h>
@@ -91,7 +90,7 @@ TTimeView::TTimeView(float maxWidth, float height, bool showSeconds,
 	fLastDateStr[0] = 0;
 	fNeedToUpdate = true;
 
-	be_locale_roster->GetDefaultLocale(&fLocale);
+	fLocale = *be_locale;
 }
 
 
@@ -105,7 +104,7 @@ TTimeView::TTimeView(BMessage* data)
 	data->FindBool("interval", &fInterval);
 	fShowingDate = false;
 
-	be_locale_roster->GetDefaultCountry(&fLocale);
+	fLocale = *be_locale;
 }
 #endif
 
@@ -461,7 +460,7 @@ TTimeView::AllowFullDate(bool allow)
 void
 TTimeView::Update()
 {
-	be_locale_roster->GetDefaultLocale(&fLocale);
+	fLocale = *be_locale;
 	GetCurrentTime();
 	GetCurrentDate();
 

@@ -555,6 +555,15 @@ RosterData::_SetDefaultCountry(const BCountry& newCountry)
 {
 	fDefaultLocale.SetCountry(newCountry);
 
+	UErrorCode icuError = U_ZERO_ERROR;
+	Locale icuLocale = Locale::createCanonical(newCountry.Code());
+	if (icuLocale.isBogus())
+		return B_ERROR;
+
+	Locale::setDefault(icuLocale, icuError);
+	if (!U_SUCCESS(icuError))
+		return B_ERROR;
+
 	return B_OK;
 }
 
@@ -706,6 +715,22 @@ status_t
 MutableLocaleRoster::SetPreferredLanguages(const BMessage* languages)
 {
 	return gRosterData.SetPreferredLanguages(languages);
+}
+
+
+status_t
+MutableLocaleRoster::GetDefaultLocale(BLocale* locale) const
+{
+	if (!locale)
+		return B_BAD_VALUE;
+
+	BAutolock lock(gRosterData.fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	*locale = gRosterData.fDefaultLocale;
+
+	return B_OK;
 }
 
 

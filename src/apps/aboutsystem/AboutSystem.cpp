@@ -196,7 +196,7 @@ TranslationComparator(const void* left, const void* right)
 		rightName = rightTranslation->languageCode;
 
 	BCollator collator;
-	be_locale_roster->GetDefaultCollator(&collator);
+	be_locale->GetCollator(&collator);
 	return collator.Compare(leftName.String(), rightName.String());
 }
 
@@ -1114,9 +1114,7 @@ AboutView::_CreateCreditsView()
 		fCreditsView->Insert(langName);
 		fCreditsView->Insert("\n");
 		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
-		fCreditsView->Insert(
-			translation.names
-		);
+		fCreditsView->Insert(translation.names);
 	}
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);

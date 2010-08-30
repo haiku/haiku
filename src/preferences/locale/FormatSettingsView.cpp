@@ -503,9 +503,7 @@ FormatView::SetDefaults()
 	settings.SetClockTo24Hr(false);
 	*/
 
-	BLocale defaultLocale;
-	be_locale_roster->GetDefaultLocale(&defaultLocale);
-	fLocale = defaultLocale;
+	fLocale = *be_locale;
 		// We work on a copy of the default country and set the changes when
 		// closing the preflet
 	_UpdateExamples();

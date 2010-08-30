@@ -9,7 +9,6 @@
 #include <Catalog.h>
 #include <FindDirectory.h>
 #include <Locale.h>
-#include <LocaleRoster.h>
 #include <MessageRunner.h>
 #include <Roster.h>
 #include <String.h>
@@ -84,10 +83,7 @@ TimedAlert::GetLabel(BString &string)
 	time(&t);
 	localtime_r(&t, &tm);
 
-	BLocale here;
-	be_locale_roster->GetDefaultLocale(&here);
-
-	here.FormatTime(timestring, 15, t, false);
+	be_locale->FormatTime(timestring, 15, t, false);
 
 	string += " ";
 	string += timestring;

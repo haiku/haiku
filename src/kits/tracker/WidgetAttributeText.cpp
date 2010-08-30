@@ -215,7 +215,7 @@ TruncFileSizeBase(BString *result, int64 value, const View *view, float width)
 	// ToDo:
 	// if slow, replace float divisions with shifts
 	// if fast enough, try fitting more decimal places
-	
+
 	// TODO: reuse libshared's string_for_size
 
 	// format file size value
@@ -292,15 +292,11 @@ TruncTimeBase(BString *result, int64 value, const View *view, float width)
 
 	time_t timeValue = (time_t)value;
 
-	BLocale here;
-	be_locale_roster->GetDefaultLocale(&here);
-
-	if (here.FormatDateTime(buffer, 256, timeValue, true) == B_OK) {
+	if (be_locale->FormatDateTime(buffer, 256, timeValue, true) == B_OK)
 		resultWidth = view->StringWidth(buffer);
-	}
-	
-	if (resultWidth > width && here.FormatDateTime(buffer, 256, timeValue,
-			false) == B_OK) {
+
+	if (resultWidth > width
+		&& be_locale->FormatDateTime(buffer, 256, timeValue, false) == B_OK) {
 		resultWidth = view->StringWidth(buffer);
 	}
 

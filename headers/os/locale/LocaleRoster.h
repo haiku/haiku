@@ -28,10 +28,6 @@ public:
 								BLocaleRoster();
 								~BLocaleRoster();
 
-			status_t			GetDefaultCollator(BCollator* collator) const;
-			status_t			GetDefaultLanguage(BLanguage* language) const;
-			status_t			GetDefaultCountry(BCountry* country) const;
-			status_t			GetDefaultLocale(BLocale* locale) const;
 			status_t			GetDefaultTimeZone(BTimeZone* timezone) const;
 
 			status_t			GetLanguage(const char* languageCode,

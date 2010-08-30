@@ -17,7 +17,6 @@
 
 #include <List.h>
 #include <Locale.h>
-#include <LocaleRoster.h>
 #include <String.h>
 #include <Window.h>
 
@@ -277,12 +276,9 @@ TTimeEdit::BuildDispatch(BMessage* message)
 void
 TTimeEdit::_UpdateFields()
 {
-	BLocale locale;
-	be_locale_roster->GetDefaultLocale(&locale);
-
 	time_t time = fTime.Time_t();
-	locale.FormatTime(&fText, fFieldPositions, fFieldPosCount, time, true);
-	locale.GetTimeFields(fFields, fFieldCount, true);
+	be_locale->FormatTime(&fText, fFieldPositions, fFieldPosCount, time, true);
+	be_locale->GetTimeFields(fFields, fFieldCount, true);
 }
 
 
@@ -678,12 +674,9 @@ TDateEdit::BuildDispatch(BMessage* message)
 void
 TDateEdit::_UpdateFields()
 {
-	BLocale locale;
-	be_locale_roster->GetDefaultLocale(&locale);
-
 	time_t time = BDateTime(fDate, BTime()).Time_t();
-	locale.FormatDate(&fText, fFieldPositions, fFieldPosCount, time, false);
-	locale.GetDateFields(fFields, fFieldCount, false);
+	be_locale->FormatDate(&fText, fFieldPositions, fFieldPosCount, time, false);
+	be_locale->GetDateFields(fFields, fFieldCount, false);
 }
 
 

@@ -183,13 +183,11 @@ TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
 		return false;
 
 	BString nowInTimeZone;
-	BLocale locale;
-	be_locale_roster->GetDefaultLocale(&locale);
 	time_t now = time(NULL);
-	locale.FormatTime(&nowInTimeZone, now, false, &item->TimeZone());
+	be_locale->FormatTime(&nowInTimeZone, now, false, &item->TimeZone());
 
 	BString dateInTimeZone;
-	locale.FormatDate(&dateInTimeZone, now, false, &item->TimeZone());
+	be_locale->FormatDate(&dateInTimeZone, now, false, &item->TimeZone());
 
 	BString toolTip = item->Text();
 	toolTip << '\n' << item->TimeZone().ShortName() << " / "
@@ -278,8 +276,8 @@ TimeZoneView::_BuildZoneMenu()
 	BTimeZone defaultTimeZone;
 	be_locale_roster->GetDefaultTimeZone(&defaultTimeZone);
 
-	BLanguage defaultLanguage;
-	be_locale_roster->GetDefaultLanguage(&defaultLanguage);
+	BLanguage language;
+	be_locale->GetLanguage(&language);
 
 	BMessage countryList;
 	be_locale_roster->GetAvailableCountries(&countryList);
@@ -352,7 +350,7 @@ TimeZoneView::_BuildZoneMenu()
 				zoneMap[region] = regionItem;
 			}
 
-			BTimeZone* timeZone = new BTimeZone(zoneID, &defaultLanguage);
+			BTimeZone* timeZone = new BTimeZone(zoneID, &language);
 			BString tzName = timeZone->Name();
 			if (tzName == "GMT+00:00")
 				tzName = "GMT";
@@ -524,8 +522,6 @@ TimeZoneView::_FormatTime(const BTimeZone& timeZone)
 {
 	BString result;
 
-	BLocale locale;
-	be_locale_roster->GetDefaultLocale(&locale);
 	time_t now = time(NULL);
 	bool rtcIsGMT;
 	_kern_get_real_time_clock_is_gmt(&rtcIsGMT);
@@ -536,7 +532,7 @@ TimeZoneView::_FormatTime(const BTimeZone& timeZone)
 				: 0;
 		now -= timeZone.OffsetFromGMT() - currentOffset;
 	}
-	locale.FormatTime(&result, now, false, &timeZone);
+	be_locale->FormatTime(&result, now, false, &timeZone);
 
 	return result;
 }
