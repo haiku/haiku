@@ -13,6 +13,7 @@
 
 //#define TRACE_AUDIO_CONVERTER
 #ifdef TRACE_AUDIO_CONVERTER
+#	include <stdio.h>
 #	define TRACE(x...)	printf(x)
 #else
 #	define TRACE(x...)
@@ -147,7 +148,7 @@ swap_sample_byte_order(void* buffer, uint32 format, size_t length)
 
 
 AudioFormatConverter::AudioFormatConverter(AudioReader* source, uint32 format,
-		uint32 byte_order)
+		uint32 byteOrder)
 	:
 	AudioReader(),
 	fSource(NULL)
@@ -158,7 +159,7 @@ AudioFormatConverter::AudioFormatConverter(AudioReader* source, uint32 format,
 		&& source->Format().u.raw_audio.byte_order == hostByteOrder) {
 		fFormat = source->Format();
 		fFormat.u.raw_audio.format = format;
-		fFormat.u.raw_audio.byte_order = byte_order;
+		fFormat.u.raw_audio.byte_order = byteOrder;
 		int32 inSampleSize = source->Format().u.raw_audio.format
 			& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 		int32 outSampleSize = fFormat.u.raw_audio.format
@@ -202,7 +203,6 @@ AudioFormatConverter::Read(void* buffer, int64 pos, int64 frames)
 		TRACE("AudioFormatConverter::Read() done 2\n");
 		return fSource->Read(buffer, pos, frames);
 	}
-
 
 	int32 inSampleSize = fSource->Format().u.raw_audio.format
 		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
