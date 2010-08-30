@@ -1001,27 +1001,28 @@ StyledEditWindow::SaveAs(BMessage* message)
 
 		BMenuBar* menuBar = dynamic_cast<BMenuBar*>(
 			fSavePanel->Window()->FindView("MenuBar"));
+		if (menuBar != NULL) {
+			fSavePanelEncodingMenu = new BMenu(B_TRANSLATE("Encoding"));
+			fSavePanelEncodingMenu->SetRadioMode(true);
+			menuBar->AddItem(fSavePanelEncodingMenu);
 
-		fSavePanelEncodingMenu= new BMenu(B_TRANSLATE("Encoding"));
-		menuBar->AddItem(fSavePanelEncodingMenu);
-		fSavePanelEncodingMenu->SetRadioMode(true);
-
-		BCharacterSetRoster roster;
-		BCharacterSet charset;
-		while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
-			BString name(charset.GetPrintName());
-			const char* mime = charset.GetMIMEName();
-			if (mime) {
-				name.Append(" (");
-				name.Append(mime);
-				name.Append(")");
+			BCharacterSetRoster roster;
+			BCharacterSet charset;
+			while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
+				BString name(charset.GetPrintName());
+				const char* mime = charset.GetMIMEName();
+				if (mime) {
+					name.Append(" (");
+					name.Append(mime);
+					name.Append(")");
+				}
+				BMenuItem * item = new BMenuItem(name.String(),
+					new BMessage(SAVE_AS_ENCODING));
+				item->SetTarget(this);
+				fSavePanelEncodingMenu->AddItem(item);
+				if (charset.GetFontID() == fTextView->GetEncoding())
+					item->SetMarked(true);
 			}
-			BMenuItem * item = new BMenuItem(name.String(),
-				new BMessage(SAVE_AS_ENCODING));
-			item->SetTarget(this);
-			fSavePanelEncodingMenu->AddItem(item);
-			if (charset.GetFontID() == fTextView->GetEncoding())
-				item->SetMarked(true);
 		}
 	}
 

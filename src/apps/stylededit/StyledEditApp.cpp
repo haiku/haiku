@@ -92,36 +92,39 @@ StyledEditApp::StyledEditApp()
 	fOpenPanel = new BFilePanel();
 
 	fOpenAsEncoding = 0;
-	fOpenPanelEncodingMenu = new BMenu(B_TRANSLATE("Encoding"));
-	fOpenPanelEncodingMenu->SetRadioMode(true);
 
 	BMenuBar* menuBar
 		= dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
-	if (menuBar != NULL)
+	if (menuBar != NULL) {
+		fOpenPanelEncodingMenu = new BMenu(B_TRANSLATE("Encoding"));
+		fOpenPanelEncodingMenu->SetRadioMode(true);
+
 		menuBar->AddItem(fOpenPanelEncodingMenu);
 
-	BCharacterSetRoster roster;
-	BCharacterSet charset;
-	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
-		BString name;
-		if (charset.GetFontID() == B_UNICODE_UTF8)
-			name = B_TRANSLATE("Default");
-		else
-			name = charset.GetPrintName();
+		BCharacterSetRoster roster;
+		BCharacterSet charset;
+		while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
+			BString name;
+			if (charset.GetFontID() == B_UNICODE_UTF8)
+				name = B_TRANSLATE("Default");
+			else
+				name = charset.GetPrintName();
 
-		const char* mime = charset.GetMIMEName();
-		if (mime) {
-			name.Append(" (");
-			name.Append(mime);
-			name.Append(")");
+			const char* mime = charset.GetMIMEName();
+			if (mime != NULL) {
+				name.Append(" (");
+				name.Append(mime);
+				name.Append(")");
+			}
+			BMenuItem* item =
+				new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
+			item->SetTarget(this);
+			fOpenPanelEncodingMenu->AddItem(item);
+			if (charset.GetFontID() == fOpenAsEncoding)
+				item->SetMarked(true);
 		}
-		BMenuItem* item =
-			new BMenuItem(name.String(), new BMessage(OPEN_AS_ENCODING));
-		item->SetTarget(this);
-		fOpenPanelEncodingMenu->AddItem(item);
-		if (charset.GetFontID() == fOpenAsEncoding)
-			item->SetMarked(true);
-	}
+	} else
+		fOpenPanelEncodingMenu = NULL;
 
 	fWindowCount = 0;
 	fNextUntitledWindow = 1;
@@ -132,8 +135,6 @@ StyledEditApp::StyledEditApp()
 StyledEditApp::~StyledEditApp()
 {
 	delete fOpenPanel;
-	if (fOpenPanelEncodingMenu->Supermenu() == NULL)
-		delete fOpenPanelEncodingMenu;
 }
 
 
@@ -153,7 +154,7 @@ StyledEditApp::MessageReceived(BMessage* message)
 		case OPEN_AS_ENCODING:
 			void* ptr;
 			if (message->FindPointer("source", &ptr) == B_OK
-				&& fOpenPanelEncodingMenu != 0) {
+				&& fOpenPanelEncodingMenu != NULL) {
 				fOpenAsEncoding = (uint32)fOpenPanelEncodingMenu->IndexOf(
 					(BMenuItem*)ptr);
 			}
