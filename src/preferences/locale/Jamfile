@@ -5,7 +5,7 @@ UsePrivateHeaders shared ;
 
 local sources =
 	LanguageListView.cpp
-	Locale.cpp
+	LocalePreflet.cpp
 	LocaleSettings.cpp
 	LocaleWindow.cpp
 	FormatSettingsView.cpp
@@ -18,9 +18,7 @@ Preference Locale
 	: Locale.rdef
 ;
 
-DoCatalogs Locale : x-vnd.Haiku-Locale :
-	LanguageListView.cpp
-	Locale.cpp
-	LocaleWindow.cpp
-	FormatSettingsView.cpp
-;
+ECHO $(SYSHDRS) ;
+ECHO $(SUBDIRSYSHDRS) ;
+
+DoCatalogs Locale : x-vnd.Haiku-Locale : $(sources) ;

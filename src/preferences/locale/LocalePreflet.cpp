@@ -5,9 +5,8 @@
  */
 
 
-#include "Locale.h"
-#include "LocaleSettings.h"
-#include "LocaleWindow.h"
+#include <stdio.h>
+#include <string.h>
 
 #include <AboutWindow.h>
 #include <Application.h>
@@ -16,8 +15,9 @@
 #include <TextView.h>
 #include <Locale.h>
 
-#include <stdio.h>
-#include <string.h>
+#include "LocalePreflet.h"
+#include "LocaleSettings.h"
+#include "LocaleWindow.h"
 
 
 #undef B_TRANSLATE_CONTEXT

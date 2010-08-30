@@ -5,9 +5,7 @@
  */
 
 
-#include "Locale.h"
 #include "LocaleWindow.h"
-#include "LanguageListView.h"
 
 #include <iostream>
 
@@ -27,6 +25,8 @@
 #include <UnicodeChar.h>
 
 #include "FormatSettingsView.h"
+#include "LocalePreflet.h"
+#include "LanguageListView.h"
 
 
 #undef B_TRANSLATE_CONTEXT
