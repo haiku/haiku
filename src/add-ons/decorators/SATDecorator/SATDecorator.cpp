@@ -219,7 +219,7 @@ SATDecorator::_DoLayout()
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
 		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK
-				|| fLook == kLeftTitledWindowLook) ? 10 : 18;
+			|| fLook == kLeftTitledWindowLook) ? 10 : 18;
 
 		font_height fontHeight;
 		fDrawState.Font().GetHeight(fontHeight);
