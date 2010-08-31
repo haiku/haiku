@@ -16,6 +16,7 @@ const char *const kEthernetServiceName = "ethernet";
 const char *const kARPServiceName = "arp";
 const char *const kIPServiceName = "ip";
 const char *const kUDPServiceName = "udp";
+const char *const kTCPServiceName = "tcp";
 
 
 // constructor

@@ -13,6 +13,7 @@ KernelStaticLibrary boot_net :
 	NetStack.cpp
 	RemoteDisk.cpp
 	UDP.cpp
+	TCP.cpp
 
 	: -fno-pic
 ;

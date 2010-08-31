@@ -13,6 +13,7 @@ class EthernetService;
 class ARPService;
 class IPService;
 class UDPService;
+class TCPService;
 
 
 class NetStack {
@@ -34,6 +35,7 @@ public:
 	ARPService *GetARPService() const			{ return fARPService; }
 	IPService *GetIPService() const				{ return fIPService; }
 	UDPService *GetUDPService() const			{ return fUDPService; }
+	TCPService *GetTCPService() const			{ return fTCPService; }
 
 private:
 	static NetStack		*sNetStack;
@@ -43,6 +45,7 @@ private:
 	ARPService			*fARPService;
 	IPService			*fIPService;
 	UDPService			*fUDPService;
+	TCPService			*fTCPService;
 };
 
 

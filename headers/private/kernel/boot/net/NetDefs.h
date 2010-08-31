@@ -197,6 +197,15 @@ struct tcp_header {
 	uint16	urgentPointer;	// urgent pointer
 } __attribute__ ((__packed__));
 
+#define TCP_FIN		(1 << 0)
+#define TCP_SYN		(1 << 1)
+#define TCP_RST		(1 << 2)
+#define TCP_PSH		(1 << 3)
+#define TCP_ACK		(1 << 4)
+#define TCP_URG		(1 << 5)
+#define TCP_ECE		(1 << 6)	// RFC 3168
+#define TCP_CWR		(1 << 7)	// RFC 3168
+
 
 // #pragma mark -
 
@@ -207,6 +216,7 @@ extern const char *const kEthernetServiceName;
 extern const char *const kARPServiceName;
 extern const char *const kIPServiceName;
 extern const char *const kUDPServiceName;
+extern const char *const kTCPServiceName;
 
 class NetService {
 public:
