@@ -15,7 +15,7 @@
 #include <platform/openfirmware/openfirmware.h>
 
 
-int gRTC = OF_FAILED;
+static int sHandle = OF_FAILED;
 
 
 status_t
@@ -30,8 +30,8 @@ init_real_time_clock(void)
 		return B_ERROR;
 	}
 
-	gRTC = of_open(gKernelArgs.platform_args.rtc_path);
-	if (gRTC == OF_FAILED) {
+	sHandle = of_open(gKernelArgs.platform_args.rtc_path);
+	if (sHandle == OF_FAILED) {
 		printf("%s(): Could not open RTC device!\n", __func__);
 		return B_ERROR;
 	}
@@ -39,3 +39,19 @@ init_real_time_clock(void)
 	return B_OK;
 }
 
+
+bigtime_t
+real_time_clock_usecs(void)
+{
+	if (sHandle == OF_FAILED)
+		return OF_FAILED;
+	int second, minute, hour, day, month, year;
+	if (of_call_method(sHandle, "get-time", 0, 6, &year, &month, &day,
+			&hour, &minute, &second) == OF_FAILED)
+		return OF_FAILED;
+	int days = day;
+		// TODO: Apply algorithm from kernel
+		// to assure monotonically increasing date.
+	return (((days * 24 + hour) * 60ULL + minute) * 60ULL + second)
+		* 1000000ULL;
+}

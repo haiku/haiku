@@ -14,9 +14,8 @@
 extern "C" {
 #endif
 
-extern int gRTC;
-
 status_t init_real_time_clock(void);
+bigtime_t real_time_clock_usecs(void);
 
 #ifdef __cplusplus
 }   // extern "C"
