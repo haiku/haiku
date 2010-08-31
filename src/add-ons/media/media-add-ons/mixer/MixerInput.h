@@ -25,7 +25,8 @@ class MixerInput {
 public:
 								MixerInput(MixerCore* core,
 									const media_input& input,
-									float mixFrameRate, int32 mixFrameCount);
+									float mixFrameRate, int32 mixFrameCount,
+									int resamplingAlgorithm);
 								~MixerInput();
 
 			int32				ID();

@@ -14,13 +14,14 @@
 #include <TimeSource.h> // TODO: debug only
 
 #include "ByteSwap.h"
+#include "Interpolate.h"
 #include "MixerInput.h"
 #include "MixerUtils.h"
 #include "Resampler.h"
 
 
 MixerInput::MixerInput(MixerCore *core, const media_input &input,
-	float mixFrameRate, int32 mixFrameCount)
+	float mixFrameRate, int32 mixFrameCount, int resamplingAlgorithm)
 	:
 	fCore(core),
  	fInput(input),
@@ -78,9 +79,17 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input,
 	// create resamplers
 	fResampler = new Resampler * [fInputChannelCount];
 	for (int i = 0; i < fInputChannelCount; i++) {
-		// TODO create Interpolate instead of Resampler if the settings says so
-		fResampler[i] = new Resampler(fInput.format.u.raw_audio.format,
-			media_raw_audio_format::B_AUDIO_FLOAT);
+		switch (resamplingAlgorithm) {
+			case 2:
+				fResampler[i] = new Interpolate(
+					fInput.format.u.raw_audio.format,
+					media_raw_audio_format::B_AUDIO_FLOAT);
+				break;
+			default:
+				fResampler[i] = new Resampler(
+					fInput.format.u.raw_audio.format,
+					media_raw_audio_format::B_AUDIO_FLOAT);
+		}
 	}
 
 	// fMixerChannelInfo and fMixerChannelCount will be initialized by

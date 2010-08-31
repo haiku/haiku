@@ -106,7 +106,7 @@ MixerCore::~MixerCore()
 	if (fResampler) {
 		for (int i = 0; i < fMixBufferChannelCount; i++)
 			delete fResampler[i];
-		delete [] fResampler;
+		delete[] fResampler;
 	}
 
 	delete fMixBufferChannelTypes;
@@ -133,7 +133,7 @@ MixerCore::AddInput(const media_input& input)
 {
 	ASSERT_LOCKED();
 	MixerInput* in = new MixerInput(this, input, fMixBufferFrameRate,
-		fMixBufferFrameCount);
+		fMixBufferFrameCount, Settings()->ResamplingAlgorithm());
 	fInputs->AddItem(in);
 	return in;
 }
@@ -286,16 +286,17 @@ MixerCore::ApplyOutputFormat()
 		 	= ChannelMaskToChannelType(GetChannelMask(i, format.channel_mask));
 	}
 
-	fMixBuffer = (float *)rtm_alloc(NULL, sizeof(float) * fMixBufferFrameCount * fMixBufferChannelCount);
-	ASSERT(fMixBuffer);
+	fMixBuffer = (float*)rtm_alloc(NULL, sizeof(float) * fMixBufferFrameCount
+		* fMixBufferChannelCount);
+	ASSERT(fMixBuffer != NULL);
 
-	if (fResampler) {
+	if (fResampler != NULL) {
 		for (int i = 0; i < fMixBufferChannelCount; i++)
 			delete fResampler[i];
-		delete [] fResampler;
+		delete[] fResampler;
 	}
 
-	fResampler = new Resampler * [fMixBufferChannelCount];
+	fResampler = new Resampler*[fMixBufferChannelCount];
 	for (int i = 0; i < fMixBufferChannelCount; i++) {
 		switch (Settings()->ResamplingAlgorithm()) {
 			case 2:
@@ -491,8 +492,8 @@ MixerCore::MixThread()
 	uint64 bufferIndex = 0;
 #endif
 
-	RtList<chan_info> InputChanInfos[MAX_CHANNEL_TYPES];
-	RtList<chan_info> MixChanInfos[fMixBufferChannelCount];
+	RtList<chan_info> inputChanInfos[MAX_CHANNEL_TYPES];
+	RtList<chan_info> mixChanInfos[fMixBufferChannelCount];
 		// TODO: this does not support changing output channel count
 
 	bigtime_t eventTime = timeBase;
@@ -558,6 +559,7 @@ MixerCore::MixThread()
 		PRINT(4, "create new buffer event at %Ld, reading input frames at "
 			"%Ld\n", eventTime, currentFramePos);
 
+		// Init the channel information for each MixerInput.
 		for (int i = 0; MixerInput* input = Input(i); i++) {
 			int count = input->GetMixerChannelCount();
 			for (int channel = 0; channel < count; channel++) {
@@ -571,7 +573,7 @@ MixerCore::MixThread()
 				}
 				if (type < 0 || type >= MAX_CHANNEL_TYPES)
 					continue;
-				chan_info* info = InputChanInfos[type].Create();
+				chan_info* info = inputChanInfos[type].Create();
 				info->base = (const char*)base;
 				info->sample_offset = sampleOffset;
 				info->gain = gain;
@@ -587,10 +589,10 @@ MixerCore::MixThread()
 					&gain);
 				if (type < 0 || type >= MAX_CHANNEL_TYPES)
 					continue;
-				int count = InputChanInfos[type].CountItems();
+				int count = inputChanInfos[type].CountItems();
 				for (int j = 0; j < count; j++) {
-					chan_info* info = InputChanInfos[type].ItemAt(j);
-					chan_info* newInfo = MixChanInfos[channel].Create();
+					chan_info* info = inputChanInfos[type].ItemAt(j);
+					chan_info* newInfo = mixChanInfos[channel].Create();
 					newInfo->base = info->base;
 					newInfo->sample_offset = info->sample_offset;
 					newInfo->gain = info->gain * gain;
@@ -602,11 +604,11 @@ MixerCore::MixThread()
 			fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
 		for (int channel = 0; channel < fMixBufferChannelCount; channel++) {
 			PRINT(5, "MixThread: channel %d has %d sources\n", channel,
-				MixChanInfos[channel].CountItems());
+				mixChanInfos[channel].CountItems());
 
-			int count = MixChanInfos[channel].CountItems();
+			int count = mixChanInfos[channel].CountItems();
 			for (int i = 0; i < count; i++) {
-				chan_info* info = MixChanInfos[channel].ItemAt(i);
+				chan_info* info = mixChanInfos[channel].ItemAt(i);
 				PRINT(5, "MixThread:   base %p, sample-offset %2d, gain %.3f\n",
 					info->base, info->sample_offset, info->gain);
 				// This looks slightly ugly, but the current GCC will generate
@@ -684,9 +686,9 @@ MixerCore::MixThread()
 
 		// make all lists empty
 		for (int i = 0; i < MAX_CHANNEL_TYPES; i++)
-			InputChanInfos[i].MakeEmpty();
+			inputChanInfos[i].MakeEmpty();
 		for (int i = 0; i < fOutput->GetOutputChannelCount(); i++)
-			MixChanInfos[i].MakeEmpty();
+			mixChanInfos[i].MakeEmpty();
 
 schedule_next_event:
 		// schedule next event
