@@ -931,16 +931,27 @@ ServerPicture::~ServerPicture()
 bool
 ServerPicture::SetOwner(ServerApp* owner)
 {
+	if (owner == fOwner)
+		return true;
+
+	// Acquire an extra reference, since calling RemovePicture()
+	// May remove the last reference and then we will self-destruct right then.
+	// Setting fOwner to NULL would access free'd memory. If owner is another
+	// ServerApp, it's expected to already have a reference of course.
+	Reference<ServerPicture> _(this);
+
 	if (fOwner != NULL)
 		fOwner->RemovePicture(this);
 
-	if (owner != NULL && owner->AddPicture(this)) {
-		fOwner = owner;
-		return true;
-	}
-
 	fOwner = NULL;
-	return false;
+	if (owner == NULL)
+		return true;
+
+	if (!owner->AddPicture(this))
+		return false;
+
+	fOwner = owner;
+	return true;
 }
 
 
@@ -1107,6 +1118,7 @@ ServerPicture::NestPicture(ServerPicture* picture)
 	if (fPictures == NULL || !fPictures->AddItem(picture))
 		return false;
 
+	picture->AcquireReference();
 	return true;
 }
 

@@ -38,6 +38,7 @@ public:
 
 			int32				Token() { return fToken; }
 			bool				SetOwner(ServerApp* owner);
+			ServerApp*			Owner() const { return fOwner; }
 
 			bool				ReleaseClientReference();
 
