@@ -4,6 +4,11 @@ UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM)
 
 SubDirC++Flags -fno-rtti ;
 
+local tcp = ;
+if $(TARGET_ARCH) = ppc {
+	tcp = TCP.cpp ;
+}
+
 KernelStaticLibrary boot_net :
 	ARP.cpp
 	ChainBuffer.cpp
@@ -13,7 +18,7 @@ KernelStaticLibrary boot_net :
 	NetStack.cpp
 	RemoteDisk.cpp
 	UDP.cpp
-	TCP.cpp
+	$(tcp)
 
 	: -fno-pic
 ;

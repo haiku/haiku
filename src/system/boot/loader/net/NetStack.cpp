@@ -76,6 +76,7 @@ NetStack::Init()
 	if (error != B_OK)
 		return error;
 
+#ifdef __POWERPC__
 	// TCP service
 	fTCPService = new(nothrow) TCPService(fIPService);
 	if (fTCPService == NULL)
@@ -83,6 +84,7 @@ NetStack::Init()
 	error = fTCPService->Init();
 	if (error != B_OK)
 		return error;
+#endif
 
 	return B_OK;
 }
