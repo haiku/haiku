@@ -56,6 +56,8 @@ protected:
 		void			_DrawTab(BRect r);
 		void			_LayoutTabItems(const BRect& tabRect);
 
+		bool			_SetTabLocation(float location,
+							BRegion* updateRegion = NULL);
 private:
 		bool			fTabHighlighted;
 		bool			fBordersHighlighted;

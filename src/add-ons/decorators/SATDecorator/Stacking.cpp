@@ -28,6 +28,9 @@
 using namespace BPrivate;
 
 
+const float kMaxTabWidth = 135.;
+
+
 bool
 StackingEventHandler::HandleMessage(SATWindow* sender,
 	BPrivate::ServerLink& link)
@@ -357,8 +360,6 @@ SATStacking::_AdjustWindowTabs()
 		return false;
 
 	BRect frame = fSATWindow->CompleteWindowFrame();
-
-	const float kMaxTabWidth = 120.;
 
 	const SATWindowList& stackedWindows = area->WindowList();
 

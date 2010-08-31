@@ -218,10 +218,7 @@ SATDecorator::_DoLayout()
 	if (hasTab) {
 		// distance from one item of the tab bar to another.
 		// In this case the text and close/zoom rects
-		if (fStackedMode && false)
-			fTextOffset = 5;
-		else
-			fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK
+		fTextOffset = (fLook == B_FLOATING_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook) ? 10 : 18;
 
 		font_height fontHeight;
@@ -396,8 +393,26 @@ SATDecorator::_LayoutTabItems(const BRect& tabRect)
 		fZoomRect.Set(0, 0, 0, 0);
 		size = (fTabRect.right - fCloseRect.right) - fTextOffset * 2 + inset;
 	}
+	uint8 truncateMode = B_TRUNCATE_MIDDLE;
+	if (fStackedMode)
+		truncateMode = B_TRUNCATE_END;
+
+	if (fStackedMode) {
+		float titleWidth = fDrawState.Font().StringWidth(Title(),
+			BString(Title()).Length());
+		if (size < titleWidth) {
+			float oldTextOffset = fTextOffset;
+			fTextOffset -= (titleWidth - size) / 2;
+			const float kMinTextOffset = 5.;
+			if (fTextOffset < kMinTextOffset)
+				fTextOffset = kMinTextOffset;
+			size += oldTextOffset * 2;
+			size -= fTextOffset * 2;
+		}
+	}
+
 	fTruncatedTitle = Title();
-	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_MIDDLE, size);
+	fDrawState.Font().TruncateString(&fTruncatedTitle, truncateMode, size);
 	fTruncatedTitleLength = fTruncatedTitle.Length();
 }
 
@@ -472,6 +487,47 @@ SATDecorator::_DrawTab(BRect invalid)
 	}
 	else if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
 		_DrawZoom(fZoomRect);
+}
+
+
+bool
+SATDecorator::_SetTabLocation(float location, BRegion* updateRegion)
+{
+	STRACE(("DefaultDecorator: Set Tab Location(%.1f)\n", location));
+	if (!fTabRect.IsValid())
+		return false;
+
+	if (location < 0)
+		location = 0;
+
+	float maxLocation = 0.;
+	if (fStackedMode)
+		maxLocation = fRightBorder.right - fLeftBorder.left - fStackedTabLength;
+	else
+		maxLocation = fRightBorder.right - fLeftBorder.left - fTabRect.Width();
+	if (location > maxLocation)
+		location = maxLocation;
+
+	float delta = location - fTabOffset;
+	if (delta == 0.0)
+		return false;
+
+	// redraw old rect (1 pix on the border also must be updated)
+	BRect trect(fTabRect);
+	trect.bottom++;
+	updateRegion->Include(trect);
+
+	fTabRect.OffsetBy(delta, 0);
+	fTabOffset = (int32)location;
+	_LayoutTabItems(fTabRect);
+
+	fTabLocation = maxLocation > 0.0 ? fTabOffset / maxLocation : 0.0;
+
+	// redraw new rect as well
+	trect = fTabRect;
+	trect.bottom++;
+	updateRegion->Include(trect);
+	return true;
 }
 
 
