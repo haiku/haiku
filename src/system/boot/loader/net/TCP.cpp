@@ -24,6 +24,8 @@
 #include <boot/net/ChainBuffer.h>
 #include <boot/net/NetStack.h>
 
+#include "real_time_clock.h"
+
 
 //#define TRACE_TCP
 //#define TRACE_TCP_RANDOMNESS
@@ -46,7 +48,7 @@ _rand32(void)
 {
 	static unsigned int next = 0;
 	if (next == 0)
-		next = system_time() / 1000;
+		next = real_time_clock_usecs() / 1000000;
 
 	next = (next >> 1) ^ (unsigned int)(-(next & 1U) & 0xd0000001U);
 		// characteristic polynomial: x^32 + x^31 + x^29 + x + 1
