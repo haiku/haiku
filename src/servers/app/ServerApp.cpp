@@ -2963,16 +2963,21 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			BRect bounds;
 			link.Read<BRect>(&bounds);
 
+			bool success = false;
+
 			ServerBitmap* bitmap = GetBitmap(token);
 			if (bitmap != NULL) {
-				if (fDesktop->GetDrawingEngine()->ReadBitmap(bitmap,
-						drawCursor, bounds) == B_OK) {
-					fLink.StartMessage(B_OK);
-				} else
-					fLink.StartMessage(B_BAD_VALUE);
-
+				if (fDesktop->GetDrawingEngine()->LockExclusiveAccess()) {
+					success = fDesktop->GetDrawingEngine()->ReadBitmap(bitmap,
+						drawCursor, bounds) == B_OK;
+					fDesktop->GetDrawingEngine()->UnlockExclusiveAccess();
+				}
 				bitmap->ReleaseReference();
-			} else
+			}
+
+			if (success)
+				fLink.StartMessage(B_OK);
+			else
 				fLink.StartMessage(B_BAD_VALUE);
 
 			fLink.Flush();
