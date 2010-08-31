@@ -1032,7 +1032,7 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 
 	// TODO: should the "not in current workspace" be handled anyway?
 	//	(the code below would have to be changed then, though)
-	if (window == BackWindow()
+	if ((behindOf == NULL && window == BackWindow())
 		|| !window->InWorkspace(fCurrentWorkspace)
 		|| (behindOf != NULL && !behindOf->InWorkspace(fCurrentWorkspace))) {
 		UnlockAllWindows();
@@ -1047,19 +1047,21 @@ Desktop::SendWindowBehind(Window* window, Window* behindOf)
 	// might be dirty after the window is send to back
 	BRegion dirty(window->VisibleRegion());
 
-	// detach window and re-attach at desired position
-	Window* backmost = window->Backmost(behindOf);
-
 	CurrentWindows().RemoveWindow(window);
-	CurrentWindows().AddWindow(window, backmost
-		? backmost->NextWindow(fCurrentWorkspace) : BackWindow());
+	CurrentWindows().AddWindow(window, behindOf
+		? behindOf : BackWindow());
 
 	BRegion dummy;
 	_RebuildClippingForAllWindows(dummy);
 
-	// mark everything dirty that is no longer visible
+	// if we send a window to the bottom mark everything dirty that is no
+	// longer visible, if behindOf is not NULL the window may has rose so
+	// include the visible region
 	BRegion clean(window->VisibleRegion());
-	dirty.Exclude(&clean);
+	if (!behindOf)
+		dirty.Exclude(&clean);
+	else
+		dirty.Include(&clean);
 	MarkDirty(dirty);
 
 	_UpdateFronts();
