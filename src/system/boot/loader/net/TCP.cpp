@@ -492,7 +492,7 @@ TCPSocket::_DequeuePacket()
 		if (fFirstPacket == NULL)
 			fLastPacket = NULL;
 		packet->SetNext(NULL);
-		dprintf("TCP: Dequeuing %lx - %lx from front.\n",
+		TRACE("TCP: Dequeuing %lx - %lx from front.\n",
 			packet->SequenceNumber(),
 			packet->SequenceNumber() + packet->DataSize() - 1);
 		return packet;
@@ -506,7 +506,7 @@ TCPSocket::_DequeuePacket()
 			packet->SetNext(nextPacket->Next());
 			if (fLastPacket == nextPacket)
 				fLastPacket = packet;
-			dprintf("TCP: Dequeuing %lx - %lx.\n",
+			TRACE("TCP: Dequeuing %lx - %lx.\n",
 				nextPacket->SequenceNumber(),
 				nextPacket->SequenceNumber() + nextPacket->DataSize() - 1);
 			return nextPacket;
