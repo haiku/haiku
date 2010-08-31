@@ -357,12 +357,15 @@ StackAndTile::_ActivateWindow(SATWindow* satWindow)
 	if (!desktop)
 		return;
 
+	desktop->ActivateWindow(satWindow->GetWindow());
+
 	for (int i = 0; i < group->CountItems(); i++) {
 		SATWindow* listWindow = group->WindowAt(i);
-		if (listWindow != satWindow)
-			desktop->ActivateWindow(listWindow->GetWindow());
+		if (listWindow == satWindow)
+			continue;
+		desktop->SendWindowBehind(listWindow->GetWindow(),
+			satWindow->GetWindow());
 	}
-	desktop->ActivateWindow(satWindow->GetWindow());
 }
 
 
