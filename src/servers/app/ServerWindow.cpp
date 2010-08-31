@@ -3379,8 +3379,7 @@ ServerWindow::_MessageLooper()
 
 		int32 messagesProcessed = 0;
 		bigtime_t processingStart = system_time();
-		bool lockedDesktop = false;
-		bool needsAllWindowsLocked = false;
+		bool lockedDesktopSingleWindow = false;
 
 		while (true) {
 			if (code == AS_DELETE_WINDOW || code == kMsgQuitLooper) {
@@ -3393,7 +3392,7 @@ ServerWindow::_MessageLooper()
 					fLink.Flush();
 				}
 
-				if (lockedDesktop)
+				if (lockedDesktopSingleWindow)
 					fDesktop->UnlockSingleWindow();
 
 				quitLoop = true;
@@ -3404,21 +3403,24 @@ ServerWindow::_MessageLooper()
 				break;
 			}
 
-			needsAllWindowsLocked = _MessageNeedsAllWindowsLocked(code);
-
-			if (!lockedDesktop && !needsAllWindowsLocked) {
-				// only lock it once
-				fDesktop->LockSingleWindow();
-				lockedDesktop = true;
-			} else if (lockedDesktop && !needsAllWindowsLocked) {
-				// nothing to do
-			} else if (needsAllWindowsLocked) {
-				if (lockedDesktop) {
-					// unlock single before locking all
+			// Acquire the appropriate lock
+			bool needsAllWindowsLocked = _MessageNeedsAllWindowsLocked(code);
+			if (needsAllWindowsLocked) {
+				// We may already still hold the read-lock from the previous
+				// inner-loop iteration.
+				if (lockedDesktopSingleWindow) {
 					fDesktop->UnlockSingleWindow();
-					lockedDesktop = false;
+					lockedDesktopSingleWindow = false;
 				}
 				fDesktop->LockAllWindows();
+			} else {
+				// We never keep the write-lock across inner-loop iterations,
+				// so there is nothing else to do besides read-locking unless
+				// we already have the read-lock from the previous iteration.
+				if (!lockedDesktopSingleWindow) {
+					fDesktop->LockSingleWindow();
+					lockedDesktopSingleWindow = true;
+				}
 			}
 
 			if (atomic_and(&fRedrawRequested, 0) != 0) {
@@ -3465,7 +3467,7 @@ ServerWindow::_MessageLooper()
 			// Desktop locked), but don't hold the lock longer than 10 ms
 			if (!receiver.HasMessages() || ++messagesProcessed > 70
 				|| system_time() - processingStart > 10000) {
-				if (lockedDesktop)
+				if (lockedDesktopSingleWindow)
 					fDesktop->UnlockSingleWindow();
 				break;
 			}
@@ -3475,7 +3477,7 @@ ServerWindow::_MessageLooper()
 			if (status != B_OK) {
 				// that shouldn't happen, it's our port
 				printf("Someone deleted our message port!\n");
-				if (lockedDesktop)
+				if (lockedDesktopSingleWindow)
 					fDesktop->UnlockSingleWindow();
 
 				// try to let our client die happily
