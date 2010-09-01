@@ -422,6 +422,7 @@ BMediaTrack::SeekToFrame(int64 *inout_frame, int32 flags)
 	// can do is "reset" their decoder state, since they are made
 	// aware of the fact that there will be a jump in the data. Maybe
 	// rename the codec method?
+	seekFrame = frame;
 	result = fDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToFrame: decoder seek failed\n");
@@ -440,7 +441,8 @@ BMediaTrack::SeekToFrame(int64 *inout_frame, int32 flags)
 	fCurrentFrame = frame;
 	fCurrentTime = time;
 
-	PRINT(1, "BMediaTrack::SeekToTime SeekToFrame, requested %Ld, result %Ld\n", seekFrame, *inout_frame);
+	PRINT(1, "BMediaTrack::SeekToTime SeekToFrame, requested %Ld, "
+		"result %Ld\n", seekFrame, *inout_frame);
 
 	return B_OK;
 }
