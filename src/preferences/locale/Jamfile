@@ -18,7 +18,4 @@ Preference Locale
 	: Locale.rdef
 ;
 
-ECHO $(SYSHDRS) ;
-ECHO $(SUBDIRSYSHDRS) ;
-
 DoCatalogs Locale : x-vnd.Haiku-Locale : $(sources) ;
