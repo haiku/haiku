@@ -921,7 +921,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 
 	double frameRate = FrameRate();
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = (bigtime_t)(*frame * 1000000LL / frameRate + 0.5);
+		*time = (bigtime_t)(*frame * 1000000.0 / frameRate + 0.5);
 
 	int64_t timeStamp = _ConvertToStreamTimeBase(*time);
 
@@ -941,6 +941,11 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		const AVIndexEntry& entry = fStream->index_entries[index];
 		timeStamp = entry.timestamp;
 		bigtime_t foundTime = _ConvertFromStreamTimeBase(timeStamp);
+		// It's really important that we can convert this back to the
+		// same time-stamp (i.e. FindKeyFrame() with the time we return
+		// should return the same time again)!
+		if (_ConvertToStreamTimeBase(foundTime) < timeStamp)
+			foundTime++;
 		bigtime_t timeDiff = foundTime > *time
 			? foundTime - *time : *time - foundTime;
 	
@@ -958,7 +963,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	
 	TRACE_FIND("  found time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-		*frame = *time * frameRate / 1000000LL + 0.5;
+		*frame = int64_t(*time * frameRate / 1000000.0 + 0.5);
 		TRACE_FIND("  found frame: %lld\n", *frame);
 	}
 
@@ -1152,15 +1157,16 @@ AVFormatReader::StreamCookie::_NextPacket(bool reuse)
 int64_t
 AVFormatReader::StreamCookie::_ConvertToStreamTimeBase(bigtime_t time) const
 {
-	return time * fStream->time_base.den
-		/ (1000000LL * fStream->time_base.num);
+	return int64_t((double)time * fStream->time_base.den
+		/ (1000000.0 * fStream->time_base.num) + 0.5);
 }
 
 
 bigtime_t
 AVFormatReader::StreamCookie::_ConvertFromStreamTimeBase(int64_t time) const
 {
-	return 1000000LL * time * fStream->time_base.num / fStream->time_base.den;
+	return bigtime_t(1000000.0 * time * fStream->time_base.num
+		/ fStream->time_base.den + 0.5);
 }
 
 
