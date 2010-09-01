@@ -447,6 +447,10 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 					description.family = B_MISC_FORMAT_FAMILY;
 					codecTag = 'mp4a';
 					break;
+				case CODEC_ID_DTS:
+					description.family = B_WAV_FORMAT_FAMILY;
+					codecTag = ' DTS';
+					break;
 				default:
 					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
 						"unknown 0x%x\n", codecContext->codec_id);
@@ -524,12 +528,13 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 		case B_MEDIA_RAW_AUDIO:
 			format->u.raw_audio.frame_rate = (float)codecContext->sample_rate;
 			format->u.raw_audio.channel_count = codecContext->channels;
+			format->u.raw_audio.channel_mask = codecContext->channel_layout;
 			format->u.raw_audio.byte_order
 				= avformat_to_beos_byte_order(codecContext->sample_fmt);
 			format->u.raw_audio.format
 				= avformat_to_beos_format(codecContext->sample_fmt);
 			format->u.raw_audio.buffer_size = 0;
-
+			
 			// Read one packet and mark it for later re-use. (So our first
 			// GetNextChunk() call does not read another packet.)
 			if (_NextPacket(true) == B_OK) {
@@ -547,8 +552,11 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				= media_multi_audio_format::wildcard;
 			format->u.encoded_audio.output.frame_rate
 				= (float)codecContext->sample_rate;
+			// Channel layout bits match in Be API and FFmpeg.
 			format->u.encoded_audio.output.channel_count
 				= codecContext->channels;
+			format->u.encoded_audio.multi_info.channel_mask
+				= codecContext->channel_layout;
 			format->u.encoded_audio.output.byte_order
 				= avformat_to_beos_byte_order(codecContext->sample_fmt);
 			format->u.encoded_audio.output.format
@@ -870,7 +878,7 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	}
 #else
 	if (av_seek_frame(fContext, Index(), timeStamp, searchFlags) < 0) {
-		TRACE_SEEK("  av_seek_frame() failed.\n");
+		printf("  av_seek_frame() failed.\n");
 		return B_ERROR;
 	}
 #endif
