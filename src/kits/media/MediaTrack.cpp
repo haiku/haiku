@@ -372,6 +372,7 @@ BMediaTrack::SeekToTime(bigtime_t* inOutTime, int32 flags)
 	// can do is "reset" their decoder state, since they are made
 	// aware of the fact that there will be a jump in the data. Maybe
 	// rename the Decoder method?
+	seekTime = time;
 	result = fDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToTime: decoder seek failed\n");
