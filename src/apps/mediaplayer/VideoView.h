@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef VIDEO_VIEW_H
@@ -46,11 +46,14 @@ public:
 
 			void				SetPlaying(bool playing);
 			void				SetFullscreen(bool fullScreen);
+			void				SetVideoFrame(const BRect& frame);
 
 private:
 			void				_DrawBitmap(const BBitmap* bitmap);
 			void				_AdoptGlobalSettings();
 
+private:
+			BRect				fVideoFrame;
 			bool				fOverlayMode;
 			overlay_restrictions fOverlayRestrictions;
 			rgb_color			fOverlayKeyColor;

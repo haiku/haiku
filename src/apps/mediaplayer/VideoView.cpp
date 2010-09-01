@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -21,6 +21,7 @@
 #endif
 
 #include <Application.h>
+#include <Region.h>
 #include <WindowScreen.h>
 
 #include "Settings.h"
@@ -30,6 +31,7 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	:
 	BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
 		| B_PULSE_NEEDED),
+	fVideoFrame(Bounds()),
 	fOverlayMode(false),
 	fIsPlaying(false),
 	fIsFullscreen(false),
@@ -37,7 +39,6 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fGlobalSettingsListener(this)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-		// might be reset to overlay key color if overlays are used
 	SetHighColor(0, 0, 0);
 
 	// create some hopefully sensible default overlay restrictions
@@ -61,19 +62,21 @@ VideoView::~VideoView()
 void
 VideoView::Draw(BRect updateRect)
 {
-	bool fillBlack = true;
+	BRegion outSideVideoRegion(updateRect);
 
 	if (LockBitmap()) {
 		if (const BBitmap* bitmap = GetBitmap()) {
-			fillBlack = false;
+			outSideVideoRegion.Exclude(fVideoFrame);
 			if (!fOverlayMode)
 				_DrawBitmap(bitmap);
+			else
+				FillRect(fVideoFrame & updateRect, B_SOLID_LOW);
 		}
 		UnlockBitmap();
 	}
 
-	if (fillBlack)
-		FillRect(updateRect);
+	if (outSideVideoRegion.CountRects() > 0)
+		FillRegion(&outSideVideoRegion);
 }
 
 
@@ -147,15 +150,14 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 				// init overlay
 				rgb_color key;
 				status_t ret = SetViewOverlay(bitmap, bitmap->Bounds(),
-					Bounds(), &key, B_FOLLOW_ALL,
+					fVideoFrame, &key, B_FOLLOW_ALL,
 					B_OVERLAY_FILTER_HORIZONTAL
 					| B_OVERLAY_FILTER_VERTICAL);
 				if (ret == B_OK) {
 					fOverlayKeyColor = key;
-					SetViewColor(key);
 					SetLowColor(key);
 					snooze(20000);
-					FillRect(Bounds(), B_SOLID_LOW);
+					FillRect(fVideoFrame, B_SOLID_LOW);
 					Sync();
 					// use overlay from here on
 					fOverlayMode = true;
@@ -168,13 +170,13 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 				} else {
 					// try again next time
 					// synchronous draw
-					FillRect(Bounds());
+					FillRect(fVideoFrame);
 					Sync();
 				}
 			} else {
 				// transfer overlay channel
 				rgb_color key;
-				SetViewOverlay(bitmap, bitmap->Bounds(), Bounds(),
+				SetViewOverlay(bitmap, bitmap->Bounds(), fVideoFrame,
 					&key, B_FOLLOW_ALL, B_OVERLAY_FILTER_HORIZONTAL
 						| B_OVERLAY_FILTER_VERTICAL
 						| B_OVERLAY_TRANSFER_CHANNEL);
@@ -270,6 +272,20 @@ VideoView::SetFullscreen(bool fullScreen)
 }
 
 
+void
+VideoView::SetVideoFrame(const BRect& frame)
+{
+	if (fVideoFrame == frame)
+		return;
+
+	BRegion invalid(fVideoFrame | frame);
+	invalid.Exclude(frame);
+	Invalidate(&invalid);
+
+	fVideoFrame = frame;
+}
+
+
 // #pragma mark -
 
 
@@ -278,9 +294,9 @@ VideoView::_DrawBitmap(const BBitmap* bitmap)
 {
 #ifdef __HAIKU__
 	uint32 options = fUseBilinearScaling ? B_FILTER_BITMAP_BILINEAR : 0;
-	DrawBitmap(bitmap, bitmap->Bounds(), Bounds(), options);
+	DrawBitmap(bitmap, bitmap->Bounds(), fVideoFrame, options);
 #else
-	DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
+	DrawBitmap(bitmap, bitmap->Bounds(), fVideoFrame);
 #endif
 }
 

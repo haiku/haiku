@@ -1666,11 +1666,16 @@ MainWin::_ResizeVideoView(int x, int y, int width, int height)
 	if (renderHeight > height)
 		renderHeight = height;
 
-	int xOffset = x + (width - renderWidth) / 2;
-	int yOffset = y + (height - renderHeight) / 2;
+	int xOffset = (width - renderWidth) / 2;
+	int yOffset = (height - renderHeight) / 2;
 
-	fVideoView->MoveTo(xOffset, yOffset);
-	fVideoView->ResizeTo(renderWidth - 1, renderHeight - 1);
+	fVideoView->MoveTo(x, y);
+	fVideoView->ResizeTo(width - 1, height - 1);
+
+	BRect videoFrame(xOffset, yOffset,
+		xOffset + renderWidth - 1, yOffset + renderHeight - 1);
+
+	fVideoView->SetVideoFrame(videoFrame);
 }
 
 
