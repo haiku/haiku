@@ -373,18 +373,25 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	outputAudioFormat.channel_count
 		= fInputFormat.u.encoded_audio.output.channel_count;
 	outputAudioFormat.format = fInputFormat.u.encoded_audio.output.format;
+	outputAudioFormat.buffer_size
+		= inOutFormat->u.raw_audio.buffer_size;
 	// Check that format is not still a wild card!
 	if (outputAudioFormat.format == 0) {
 		TRACE("  format still a wild-card, assuming B_AUDIO_SHORT.\n");
 		outputAudioFormat.format = media_raw_audio_format::B_AUDIO_SHORT;
 	}
+	size_t sampleSize = outputAudioFormat.format
+		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	// Check that channel count is not still a wild card!
 	if (outputAudioFormat.channel_count == 0) {
 		TRACE("  channel_count still a wild-card, assuming stereo.\n");
 		outputAudioFormat.channel_count = 2;
 	}
 
-	outputAudioFormat.buffer_size = 1024 * outputAudioFormat.channel_count;
+	if (outputAudioFormat.buffer_size == 0) {
+		outputAudioFormat.buffer_size = 512
+			* sampleSize * outputAudioFormat.channel_count;
+	}
 	inOutFormat->type = B_MEDIA_RAW_AUDIO;
 	inOutFormat->u.raw_audio = outputAudioFormat;
 
@@ -423,8 +430,6 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fCodecInitDone = (result >= 0);
 
 	fStartTime = 0;
-	size_t sampleSize = outputAudioFormat.format
-		& media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
 	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 	fOutputFrameRate = outputAudioFormat.frame_rate;
