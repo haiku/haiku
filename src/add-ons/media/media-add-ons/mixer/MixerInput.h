@@ -25,13 +25,15 @@ class MixerInput {
 public:
 								MixerInput(MixerCore* core,
 									const media_input& input,
-									float mixFrameRate, int32 mixFrameCount,
-									int resamplingAlgorithm);
+									float mixFrameRate, int32 mixFrameCount);
 								~MixerInput();
 
 			int32				ID();
-			void				BufferReceived(BBuffer* buffer);
 			media_input&		MediaInput();
+
+			void				BufferReceived(BBuffer* buffer);
+
+			void				UpdateResamplingAlgorithm();
 
 	// The physical input channels
 			int					GetInputChannelCount();
@@ -74,8 +76,8 @@ protected:
 									int32 frames);
 
 private:
-			void				UpdateInputChannelDestinationMask();
-			void				UpdateInputChannelDestinations();
+			void				_UpdateInputChannelDestinationMask();
+			void				_UpdateInputChannelDestinations();
 
 	struct input_chan_info {
 		float*					buffer_base;

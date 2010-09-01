@@ -36,6 +36,7 @@ public:
 	virtual						~MixerCore();
 
 			MixerSettings*		Settings();
+			void				UpdateResamplingAlgorithm();
 
 	// To avoid calling Settings()->AttenuateOutput() for every outgoing
 	// buffer, this setting is cached in fOutputGain and must be set by
@@ -77,9 +78,11 @@ public:
 			uint32				OutputChannelCount();
 
 private:
-			void				ApplyOutputFormat();
-	static	int32				MixThreadEntry(void* arg);
-			void				MixThread();
+			void				_UpdateResamplers(
+									const media_multi_audio_format& format);
+			void				_ApplyOutputFormat();
+	static	int32				_MixThreadEntry(void* arg);
+			void				_MixThread();
 
 private:
 			BLocker*			fLocker;

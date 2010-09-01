@@ -20,26 +20,26 @@
 #include "Resampler.h"
 
 
-MixerInput::MixerInput(MixerCore *core, const media_input &input,
-	float mixFrameRate, int32 mixFrameCount, int resamplingAlgorithm)
+MixerInput::MixerInput(MixerCore* core, const media_input& input,
+	float mixFrameRate, int32 mixFrameCount)
 	:
 	fCore(core),
  	fInput(input),
-	fInputByteSwap(0),
+	fInputByteSwap(NULL),
 	fEnabled(true),
-	fInputChannelInfo(0),
+	fInputChannelInfo(NULL),
 	fInputChannelCount(0),
 	fInputChannelMask(0),
 	fMixerChannelInfo(0),
 	fMixerChannelCount(0),
-	fMixBuffer(0),
+	fMixBuffer(NULL),
 	fMixBufferFrameRate(0),
 	fMixBufferFrameCount(0),
 	fLastDataFrameWritten(-1),
 	fLastDataAvailableTime(-1),
 	fFractionalFrames(0.0),
-	fResampler(0),
-	fRtmPool(0),
+	fResampler(NULL),
+	fRtmPool(NULL),
 	fUserOverridesChannelDestinations(false)
 {
 	fix_multiaudio_format(&fInput.format.u.raw_audio);
@@ -72,28 +72,14 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input,
 		fInputChannelInfo[i].buffer_base = 0;
 			// will be set by SetMixBufferFormat()
 		fInputChannelInfo[i].destination_mask = 0;
-			// will be set by UpdateInputChannelDestinationMask()
+			// will be set by _UpdateInputChannelDestinationMask()
 		fInputChannelInfo[i].gain = 1.0;
 	}
 
-	// create resamplers
-	fResampler = new Resampler * [fInputChannelCount];
-	for (int i = 0; i < fInputChannelCount; i++) {
-		switch (resamplingAlgorithm) {
-			case 2:
-				fResampler[i] = new Interpolate(
-					fInput.format.u.raw_audio.format,
-					media_raw_audio_format::B_AUDIO_FLOAT);
-				break;
-			default:
-				fResampler[i] = new Resampler(
-					fInput.format.u.raw_audio.format,
-					media_raw_audio_format::B_AUDIO_FLOAT);
-		}
-	}
+	UpdateResamplingAlgorithm();
 
 	// fMixerChannelInfo and fMixerChannelCount will be initialized by
-	// UpdateInputChannelDestinations()
+	// _UpdateInputChannelDestinations()
 	SetMixBufferFormat((int32)mixFrameRate, mixFrameCount);
 }
 
@@ -104,21 +90,37 @@ MixerInput::~MixerInput()
 		rtm_free(fMixBuffer);
 	if (fRtmPool)
 		rtm_delete_pool(fRtmPool);
-	delete [] fInputChannelInfo;
-	delete [] fMixerChannelInfo;
+	delete[] fInputChannelInfo;
+	delete[] fMixerChannelInfo;
 
 	// delete resamplers
-	for (int i = 0; i < fInputChannelCount; i++)
-		delete fResampler[i];
-	delete [] fResampler;
+	if (fResampler != NULL) {
+		for (int i = 0; i < fInputChannelCount; i++)
+			delete fResampler[i];
+		delete[] fResampler;
+	}
 	delete fInputByteSwap;
 }
 
 
-void
-MixerInput::BufferReceived(BBuffer *buffer)
+int32
+MixerInput::ID()
 {
-	void *data;
+	return fInput.destination.id;
+}
+
+
+media_input&
+MixerInput::MediaInput()
+{
+	return fInput;
+}
+
+
+void
+MixerInput::BufferReceived(BBuffer* buffer)
+{
+	void* data;
 	size_t size;
 	bigtime_t start;
 	bigtime_t buffer_duration;
@@ -255,19 +257,19 @@ MixerInput::BufferReceived(BBuffer *buffer)
 
 		for (int i = 0; i < fInputChannelCount; i++) {
 			fResampler[i]->Resample(
-				reinterpret_cast<char *>(data)
+				reinterpret_cast<char*>(data)
 					+ i * bytes_per_sample(fInput.format.u.raw_audio),
 				bytes_per_frame(fInput.format.u.raw_audio), in_frames1,
-				reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base)
+				reinterpret_cast<char*>(fInputChannelInfo[i].buffer_base)
 					+ offset, fInputChannelCount * sizeof(float), out_frames1,
 				fInputChannelInfo[i].gain);
 
 			fResampler[i]->Resample(
-				reinterpret_cast<char *>(data)
+				reinterpret_cast<char*>(data)
 					+ i * bytes_per_sample(fInput.format.u.raw_audio)
 					+ in_frames1 * bytes_per_frame(fInput.format.u.raw_audio),
 				bytes_per_frame(fInput.format.u.raw_audio), in_frames2,
-				reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base),
+				reinterpret_cast<char*>(fInputChannelInfo[i].buffer_base),
 				fInputChannelCount * sizeof(float), out_frames2,
 				fInputChannelInfo[i].gain);
 
@@ -290,10 +292,10 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		offset *= sizeof(float) * fInputChannelCount;
 		for (int i = 0; i < fInputChannelCount; i++) {
 			fResampler[i]->Resample(
-				reinterpret_cast<char *>(data)
+				reinterpret_cast<char*>(data)
 					+ i * bytes_per_sample(fInput.format.u.raw_audio),
 				bytes_per_frame(fInput.format.u.raw_audio), in_frames,
-				reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base)
+				reinterpret_cast<char*>(fInputChannelInfo[i].buffer_base)
 					+ offset, fInputChannelCount * sizeof(float),
 				out_frames, fInputChannelInfo[i].gain);
 		}
@@ -302,17 +304,29 @@ MixerInput::BufferReceived(BBuffer *buffer)
 }
 
 
-media_input &
-MixerInput::MediaInput()
+void
+MixerInput::UpdateResamplingAlgorithm()
 {
-	return fInput;
-}
-
-
-int32
-MixerInput::ID()
-{
-	return fInput.destination.id;
+	if (fResampler != NULL) {
+		for (int i = 0; i < fInputChannelCount; i++)
+			delete fResampler[i];
+		delete[] fResampler;
+	}
+	// create resamplers
+	fResampler = new Resampler*[fInputChannelCount];
+	for (int i = 0; i < fInputChannelCount; i++) {
+		switch (fCore->Settings()->ResamplingAlgorithm()) {
+			case 2:
+				fResampler[i] = new Interpolate(
+					fInput.format.u.raw_audio.format,
+					media_raw_audio_format::B_AUDIO_FLOAT);
+				break;
+			default:
+				fResampler[i] = new Resampler(
+					fInput.format.u.raw_audio.format,
+					media_raw_audio_format::B_AUDIO_FLOAT);
+		}
+	}
 }
 
 
@@ -347,7 +361,7 @@ MixerInput::AddInputChannelDestination(int channel, int destination_type)
 	fInputChannelInfo[channel].destination_mask |= mask;
 
 	fUserOverridesChannelDestinations = true;
-	UpdateInputChannelDestinations();
+	_UpdateInputChannelDestinations();
 }
 
 
@@ -367,7 +381,7 @@ MixerInput::RemoveInputChannelDestination(int channel, int destination_type)
 	fInputChannelInfo[channel].destination_mask &= ~mask;
 
 	fUserOverridesChannelDestinations = true;
-	UpdateInputChannelDestinations();
+	_UpdateInputChannelDestinations();
 }
 
 
@@ -428,13 +442,13 @@ MixerInput::GetInputChannelGain(int channel)
 
 
 void
-MixerInput::UpdateInputChannelDestinationMask()
+MixerInput::_UpdateInputChannelDestinationMask()
 {
 	// is the user already messed with the assignmens, don't do anything.
 	if (fUserOverridesChannelDestinations)
 		return;
 
-	TRACE("UpdateInputChannelDestinationMask: enter\n");
+	TRACE("_UpdateInputChannelDestinationMask: enter\n");
 
 	// first apply a 1:1 mapping
 	for (int i = 0; i < fInputChannelCount; i++) {
@@ -480,25 +494,25 @@ MixerInput::UpdateInputChannelDestinationMask()
 	}
 
 	for (int i = 0; i < fInputChannelCount; i++) {
-		TRACE("UpdateInputChannelDestinationMask: input channel %d, "
+		TRACE("_UpdateInputChannelDestinationMask: input channel %d, "
 			"destination_mask 0x%08lX, base %p, gain %.3f\n", i,
 			fInputChannelInfo[i].destination_mask,
 			fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
 	}
-	TRACE("UpdateInputChannelDestinationMask: leave\n");
+	TRACE("_UpdateInputChannelDestinationMask: leave\n");
 }
 
 
 void
-MixerInput::UpdateInputChannelDestinations()
+MixerInput::_UpdateInputChannelDestinations()
 {
 	int channel_count;
 	uint32 all_bits;
 	uint32 mask;
 
-	TRACE("UpdateInputChannelDestinations: enter\n");
+	TRACE("_UpdateInputChannelDestinations: enter\n");
 	for (int i = 0; i < fInputChannelCount; i++) {
-		TRACE("UpdateInputChannelDestinations: input channel %d, "
+		TRACE("_UpdateInputChannelDestinations: input channel %d, "
 			"destination_mask 0x%08lX, base %p, gain %.3f\n", i,
 			fInputChannelInfo[i].destination_mask,
 			fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
@@ -508,10 +522,10 @@ MixerInput::UpdateInputChannelDestinations()
 	for (int i = 0; i < fInputChannelCount; i++)
 		all_bits |= fInputChannelInfo[i].destination_mask;
 
-	TRACE("UpdateInputChannelDestinations: all_bits = %08lx\n", all_bits);
+	TRACE("_UpdateInputChannelDestinations: all_bits = %08lx\n", all_bits);
 
 	channel_count = count_nonzero_bits(all_bits);
-	TRACE("UpdateInputChannelDestinations: %d input channels, %d mixer "
+	TRACE("_UpdateInputChannelDestinations: %d input channels, %d mixer "
 		"channels (%d old)\n", fInputChannelCount, channel_count,
 		fMixerChannelCount);
 	if (channel_count != fMixerChannelCount) {
@@ -551,13 +565,13 @@ MixerInput::UpdateInputChannelDestinations()
 	}
 
 	for (int i = 0; i < fMixerChannelCount; i++) {
-		TRACE("UpdateInputChannelDestinations: mixer channel %d, type %2d, "
+		TRACE("_UpdateInputChannelDestinations: mixer channel %d, type %2d, "
 			"base %p, gain %.3f\n", i, fMixerChannelInfo[i].destination_type,
 			fMixerChannelInfo[i].buffer_base,
 			fMixerChannelInfo[i].destination_gain);
 	}
 
-	TRACE("UpdateInputChannelDestinations: leave\n");
+	TRACE("_UpdateInputChannelDestinations: leave\n");
 }
 
 
@@ -668,8 +682,8 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 			fInputChannelInfo[i].buffer_base = 0;
 		fMixBufferFrameCount = 0;
 
-		UpdateInputChannelDestinationMask();
-		UpdateInputChannelDestinations();
+		_UpdateInputChannelDestinationMask();
+		_UpdateInputChannelDestinations();
 		return;
 	}
 
@@ -711,6 +725,6 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	for (int i = 0; i < fInputChannelCount; i++)
 		fInputChannelInfo[i].buffer_base = &fMixBuffer[i];
 
-	UpdateInputChannelDestinationMask();
-	UpdateInputChannelDestinations();
+	_UpdateInputChannelDestinationMask();
+	_UpdateInputChannelDestinations();
 }

@@ -1475,7 +1475,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when, const void *value,
 				if (size != sizeof(int32))
 					goto err;
 				fCore->Settings()->SetResamplingAlgorithm(static_cast<const int32 *>(value)[0]);
-				// XXX tell the core to change the algorithm
+				fCore->UpdateResamplingAlgorithm();
 				break;
 			case 80:	// Refuse output format changes
 				if (size != sizeof(int32))

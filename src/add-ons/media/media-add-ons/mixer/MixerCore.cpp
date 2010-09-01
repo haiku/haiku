@@ -121,6 +121,21 @@ MixerCore::Settings()
 
 
 void
+MixerCore::UpdateResamplingAlgorithm()
+{
+	ASSERT_LOCKED();
+
+	_UpdateResamplers(fOutput->MediaOutput().format.u.raw_audio);
+
+	for (int32 i = fInputs->CountItems() - 1; i >= 0; i--) {
+		MixerInput* input
+			= reinterpret_cast<MixerInput*>(fInputs->ItemAtFast(i));
+		input->UpdateResamplingAlgorithm();
+	}
+}
+
+
+void
 MixerCore::SetOutputAttenuation(float gain)
 {
 	ASSERT_LOCKED();
@@ -133,7 +148,7 @@ MixerCore::AddInput(const media_input& input)
 {
 	ASSERT_LOCKED();
 	MixerInput* in = new MixerInput(this, input, fMixBufferFrameRate,
-		fMixBufferFrameCount, Settings()->ResamplingAlgorithm());
+		fMixBufferFrameCount);
 	fInputs->AddItem(in);
 	return in;
 }
@@ -149,7 +164,7 @@ MixerCore::AddOutput(const media_output& output)
 	}
 	fOutput = new MixerOutput(this, output);
 	// the output format might have been adjusted inside MixerOutput
-	ApplyOutputFormat();
+	_ApplyOutputFormat();
 
 	ASSERT(!fRunning);
 	if (fStarted && fOutputEnabled)
@@ -252,73 +267,10 @@ MixerCore::OutputFormatChanged(const media_multi_audio_format &format)
 		Stop();
 
 	fOutput->ChangeFormat(format);
-	ApplyOutputFormat();
+	_ApplyOutputFormat();
 
 	if (was_started)
 		Start();
-}
-
-
-void
-MixerCore::ApplyOutputFormat()
-{
-	ASSERT_LOCKED();
-
-	media_multi_audio_format format = fOutput->MediaOutput().format.u.raw_audio;
-
-	if (fMixBuffer != NULL)
-		rtm_free(fMixBuffer);
-
-	delete fMixBufferChannelTypes;
-
-	fMixBufferFrameRate = (int32)(0.5 + format.frame_rate);
-	fMixBufferFrameCount = frames_per_buffer(format);
-	if (fDoubleRateMixing) {
-		fMixBufferFrameRate *= 2;
-		fMixBufferFrameCount *= 2;
-	}
-	fMixBufferChannelCount = format.channel_count;
-	ASSERT(fMixBufferChannelCount == fOutput->GetOutputChannelCount());
-	fMixBufferChannelTypes = new int32 [format.channel_count];
-
-	for (int i = 0; i < fMixBufferChannelCount; i++) {
-		 fMixBufferChannelTypes[i]
-		 	= ChannelMaskToChannelType(GetChannelMask(i, format.channel_mask));
-	}
-
-	fMixBuffer = (float*)rtm_alloc(NULL, sizeof(float) * fMixBufferFrameCount
-		* fMixBufferChannelCount);
-	ASSERT(fMixBuffer != NULL);
-
-	if (fResampler != NULL) {
-		for (int i = 0; i < fMixBufferChannelCount; i++)
-			delete fResampler[i];
-		delete[] fResampler;
-	}
-
-	fResampler = new Resampler*[fMixBufferChannelCount];
-	for (int i = 0; i < fMixBufferChannelCount; i++) {
-		switch (Settings()->ResamplingAlgorithm()) {
-			case 2:
-				fResampler[i] = new Interpolate(
-					media_raw_audio_format::B_AUDIO_FLOAT, format.format);
-				break;
-			default:
-				fResampler[i] = new Resampler(
-					media_raw_audio_format::B_AUDIO_FLOAT, format.format);
-		}
-	}
-
-	TRACE("MixerCore::OutputFormatChanged:\n");
-	TRACE("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);
-	TRACE("  fMixBufferFrameCount %ld\n", fMixBufferFrameCount);
-	TRACE("  fMixBufferChannelCount %ld\n", fMixBufferChannelCount);
-	for (int i = 0; i < fMixBufferChannelCount; i++)
-		TRACE("  fMixBufferChannelTypes[%i] %ld\n", i, fMixBufferChannelTypes[i]);
-
-	MixerInput *input;
-	for (int i = 0; (input = Input(i)); i++)
-		input->SetMixBufferFormat(fMixBufferFrameRate, fMixBufferFrameCount);
 }
 
 
@@ -411,8 +363,8 @@ MixerCore::StartMixThread()
 	ASSERT(fOutput);
 	fRunning = true;
 	fMixThreadWaitSem = create_sem(0, "mix thread wait");
-	fMixThread = spawn_thread(MixThreadEntry, "Yeah baby, very shagadelic", 120,
-		this);
+	fMixThread = spawn_thread(_MixThreadEntry, "Yeah baby, very shagadelic",
+		120, this);
 	resume_thread(fMixThread);
 }
 
@@ -434,16 +386,92 @@ MixerCore::StopMixThread()
 }
 
 
-int32
-MixerCore::MixThreadEntry(void* arg)
+// #pragma mark - private
+
+
+void
+MixerCore::_UpdateResamplers(const media_multi_audio_format& format)
 {
-	static_cast<MixerCore*>(arg)->MixThread();
+	ASSERT_LOCKED();
+
+	if (fResampler != NULL) {
+		for (int i = 0; i < fMixBufferChannelCount; i++)
+			delete fResampler[i];
+		delete[] fResampler;
+	}
+
+	fResampler = new Resampler*[fMixBufferChannelCount];
+	for (int i = 0; i < fMixBufferChannelCount; i++) {
+		switch (Settings()->ResamplingAlgorithm()) {
+			case 2:
+				fResampler[i] = new Interpolate(
+					media_raw_audio_format::B_AUDIO_FLOAT, format.format);
+				break;
+			default:
+				fResampler[i] = new Resampler(
+					media_raw_audio_format::B_AUDIO_FLOAT, format.format);
+		}
+	}
+}
+
+
+void
+MixerCore::_ApplyOutputFormat()
+{
+	ASSERT_LOCKED();
+
+	const media_multi_audio_format& format
+		= fOutput->MediaOutput().format.u.raw_audio;
+
+	if (fMixBuffer != NULL)
+		rtm_free(fMixBuffer);
+
+	delete fMixBufferChannelTypes;
+
+	fMixBufferFrameRate = (int32)(0.5 + format.frame_rate);
+	fMixBufferFrameCount = frames_per_buffer(format);
+	if (fDoubleRateMixing) {
+		fMixBufferFrameRate *= 2;
+		fMixBufferFrameCount *= 2;
+	}
+	fMixBufferChannelCount = format.channel_count;
+	ASSERT(fMixBufferChannelCount == fOutput->GetOutputChannelCount());
+	fMixBufferChannelTypes = new int32 [format.channel_count];
+
+	for (int i = 0; i < fMixBufferChannelCount; i++) {
+		 fMixBufferChannelTypes[i]
+		 	= ChannelMaskToChannelType(GetChannelMask(i, format.channel_mask));
+	}
+
+	fMixBuffer = (float*)rtm_alloc(NULL, sizeof(float) * fMixBufferFrameCount
+		* fMixBufferChannelCount);
+	ASSERT(fMixBuffer != NULL);
+
+	_UpdateResamplers(format);
+
+	TRACE("MixerCore::OutputFormatChanged:\n");
+	TRACE("  fMixBufferFrameRate %ld\n", fMixBufferFrameRate);
+	TRACE("  fMixBufferFrameCount %ld\n", fMixBufferFrameCount);
+	TRACE("  fMixBufferChannelCount %ld\n", fMixBufferChannelCount);
+	for (int i = 0; i < fMixBufferChannelCount; i++)
+		TRACE("  fMixBufferChannelTypes[%i] %ld\n", i, fMixBufferChannelTypes[i]);
+
+	MixerInput *input;
+	for (int i = 0; (input = Input(i)); i++)
+		input->SetMixBufferFormat(fMixBufferFrameRate, fMixBufferFrameCount);
+}
+
+
+int32
+MixerCore::_MixThreadEntry(void* arg)
+{
+	static_cast<MixerCore*>(arg)->_MixThread();
 	return 0;
 }
 
 
 void
-MixerCore::MixThread()
+MixerCore::_MixThread()
 {
 	// The broken BeOS R5 multiaudio node starts with time 0,
 	// then publishes negative times for about 50ms, publishes 0
@@ -453,7 +481,7 @@ MixerCore::MixThread()
 	bigtime_t start = fTimeSource->Now();
 	Unlock();
 	while (start <= 0) {
-		TRACE("MixerCore: delaying MixThread start, timesource is at %Ld\n",
+		TRACE("MixerCore: delaying _MixThread start, timesource is at %Ld\n",
 			start);
 		snooze(5000);
 		if (!LockFromMixThread())
@@ -471,7 +499,7 @@ MixerCore::MixThread()
 	bigtime_t bufferRequestTimeout = buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio) / 2;
 
-	TRACE("MixerCore: starting MixThread at %Ld with latency %Ld and "
+	TRACE("MixerCore: starting _MixThread at %Ld with latency %Ld and "
 		"downstream latency %Ld, bufferRequestTimeout %Ld\n", start, latency,
 		fDownstreamLatency, bufferRequestTimeout);
 
@@ -483,7 +511,7 @@ MixerCore::MixThread()
 	bigtime_t timeBase = duration_for_frames(fMixBufferFrameRate, frameBase);
 	Unlock();
 
-	TRACE("MixerCore: starting MixThread, start %Ld, timeBase %Ld, "
+	TRACE("MixerCore: starting _MixThread, start %Ld, timeBase %Ld, "
 		"frameBase %Ld\n", start, timeBase, frameBase);
 
 	ASSERT(fMixBufferFrameCount > 0);
@@ -603,13 +631,13 @@ MixerCore::MixThread()
 		memset(fMixBuffer, 0,
 			fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
 		for (int channel = 0; channel < fMixBufferChannelCount; channel++) {
-			PRINT(5, "MixThread: channel %d has %d sources\n", channel,
+			PRINT(5, "_MixThread: channel %d has %d sources\n", channel,
 				mixChanInfos[channel].CountItems());
 
 			int count = mixChanInfos[channel].CountItems();
 			for (int i = 0; i < count; i++) {
 				chan_info* info = mixChanInfos[channel].ItemAt(i);
-				PRINT(5, "MixThread:   base %p, sample-offset %2d, gain %.3f\n",
+				PRINT(5, "_MixThread:   base %p, sample-offset %2d, gain %.3f\n",
 					info->base, info->sample_offset, info->gain);
 				// This looks slightly ugly, but the current GCC will generate
 				// the fastest code this way.
