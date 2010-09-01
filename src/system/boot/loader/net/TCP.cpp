@@ -218,8 +218,10 @@ TCPSocket::Connect(ip_addr_t address, uint16 port)
 		return B_NO_MEMORY;
 	error = packet->SetTo(NULL, 0, fAddress, fPort, address, port,
 		fSequenceNumber, fAcknowledgeNumber, TCP_SYN);
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete packet;
 		return error;
+	}
 	error = _Send(packet);
 	if (error != B_OK)
 		return error;
@@ -248,8 +250,10 @@ TCPSocket::Close()
 		return B_NO_MEMORY;
 	status_t error = packet->SetTo(NULL, 0, fAddress, fPort, fRemoteAddress,
 		fRemotePort, fSequenceNumber, fAcknowledgeNumber, TCP_FIN | TCP_ACK);
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete packet;
 		return error;
+	}
 	error = _Send(packet);
 	if (error != B_OK)
 		return error;
@@ -354,8 +358,10 @@ TCPSocket::Write(const void* buffer, size_t bufferSize)
 	status_t error = packet->SetTo(buffer, bufferSize, fAddress, fPort,
 		fRemoteAddress, fRemotePort, fSequenceNumber, fAcknowledgeNumber,
 		TCP_ACK);
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete packet;
 		return error;
+	}
 	return _Send(packet);
 }
 
@@ -589,9 +595,12 @@ TCPSocket::_Ack()
 		return B_NO_MEMORY;
 	status_t error = packet->SetTo(NULL, 0, fAddress, fPort, fRemoteAddress,
 		fRemotePort, fSequenceNumber, fAcknowledgeNumber, TCP_ACK);
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete packet;
 		return error;
+	}
 	error = _Send(packet, false);
+	delete packet;
 	if (error != B_OK)
 		return error;
 	return B_OK;
