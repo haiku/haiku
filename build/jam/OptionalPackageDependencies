@@ -15,6 +15,7 @@ OptionalPackageDependencies GetText : LibIconv ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies ICU-devel : DevelopmentBase ;
 OptionalPackageDependencies LibLayout : DevelopmentBase ;
+OptionalPackageDependencies Man : Groff ;
 OptionalPackageDependencies Tar : LibIconv ;
 OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;

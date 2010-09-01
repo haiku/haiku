@@ -39,6 +39,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	GetText					- a framework to help produce multi-lingual messages.
 #	Git						- the distributed version control system
 #	GPerf					- the perfect hash function generator.
+#	Groff					- text formatter used for man pages
 #	ICU-devel				- the headers and lib-links for ICU (for development)
 #	KeymapSwitcher			- Easy to use keymap switcher
 #	LibEvent				- An event notification library
@@ -47,6 +48,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	LibXML2					- the XML support libary
 #	LibXSLT					- xslt library and utility
 #	Links					- the web browser
+#	Man						- standard commands to read man pages
 #	Mercurial				- the distributed version control system
 #	Nano					- the command line text editor
 #	Neon					- support libraries used for example by SVN
@@ -297,14 +299,10 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 		Echo "No optional package Bzip available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			bzip2-1.0.5-r1a2-x86-gcc2-2010-04-21-a.zip
-			: $(baseURL)/bzip2-1.0.5-r1a2-x86-gcc2-2010-04-21-a.zip
+			bzip2-1.0.5-x86-gcc2-2010-09-01.zip
+			: $(baseURL)/bzip2-1.0.5-x86-gcc2-2010-09-01.zip
 			:
 			: true
-			: true
-		;
-		InstallSourceArchive bzip2-1.0.5_haiku-2010-04-29.tar.xz
-			: $(baseSourceURL)/bzip2-1.0.5_haiku-2010-04-29.tar.xz
 		;
 	}
 }
@@ -369,13 +367,11 @@ if [ IsOptionalHaikuImagePackageAdded CMake ] {
 		Echo "No optional package CMake available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			cmake-2.8.0-r1a2-x86-gcc2-2010-04-22-a.zip
-			: $(baseURL)/cmake-2.8.0-r1a2-x86-gcc2-2010-04-22-a.zip
+			cmake-2.8.1-x86-gcc2-2010-09-01.zip
+			: $(baseURL)/cmake-2.8.1-x86-gcc2-2010-09-01.zip
 			:
 			: true
 		;
-		InstallSourceArchive cmake-2.8.0_haiku-2010-04-29.tar.xz
-			: $(baseSourceURL)/cmake-2.8.0_haiku-2010-04-29.tar.xz ;
 	}
 }
 
@@ -714,6 +710,20 @@ if [ IsOptionalHaikuImagePackageAdded GPerf ] {
 }
 
 
+# Groff
+if [ IsOptionalHaikuImagePackageAdded Groff ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Groff available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			 groff-1.20.1-x86-gcc2-2010-08-31.zip
+			: $(baseURL)/groff-1.20.1-x86-gcc2-2010-08-31.zip
+			:
+		;
+	}
+}
+
+
 # ICU
 if [ IsOptionalHaikuImagePackageAdded ICU ] {
 	if $(TARGET_ARCH) != x86 {
@@ -906,6 +916,20 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 }
 
 
+# Man
+if [ IsOptionalHaikuImagePackageAdded Man ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Man available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			 man-1.6f-x86-gcc2-2010-09-01.zip
+			: $(baseURL)/man-1.6f-x86-gcc2-2010-09-01.zip
+			:
+		;
+	}
+}
+
+
 # MandatoryPackages
 if [ IsOptionalHaikuImagePackageAdded MandatoryPackages ] {
 	# Pseudo package for grouping packages, which are added to all images.
@@ -1056,8 +1080,8 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 				"variable to be set!" ;
 		}
 		InstallOptionalHaikuImagePackage
-			openssh-5.6p1-x86-gcc2-2010-08-23.zip
-			: $(baseURL)/openssh-5.6p1-x86-gcc2-2010-08-23.zip
+			openssh-5.6p1-x86-gcc2-2010-08-31.zip
+			: $(baseURL)/openssh-5.6p1-x86-gcc2-2010-08-31.zip
 			:
 		;
 
@@ -1095,12 +1119,10 @@ if [ IsOptionalHaikuImagePackageAdded P7zip ] {
 			;
 		} else {
 			InstallOptionalHaikuImagePackage
-				p7zip-9.04-r1a2-x86-gcc2-2010-05-06.zip
-				: $(baseURL)/p7zip-9.04-r1a2-x86-gcc2-2010-05-06.zip
+				p7zip-9.04-x86-gcc2-2010-09-01.zip
+				: $(baseURL)/p7zip-9.04-x86-gcc2-2010-09-01.zip
 				:
 			;
-			InstallSourceArchive p7zip-9.04_haiku-2010-05-06.tar.xz
-				: $(baseSourceURL)/p7zip-9.04_haiku-2010-05-06.tar.xz ;
 		}
 		AddExpanderRuleToHaikuImage "application/x-7z-compressed" : .7z
 			: "7za l \\0045s"
