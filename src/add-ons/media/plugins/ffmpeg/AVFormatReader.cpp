@@ -27,7 +27,7 @@ extern "C" {
 #include "gfx_util.h"
 
 
-#define TRACE_AVFORMAT_READER
+//#define TRACE_AVFORMAT_READER
 #ifdef TRACE_AVFORMAT_READER
 #	define TRACE printf
 #	define TRACE_IO(a...)
@@ -836,8 +836,9 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 
 	// Seeking is always based on time, initialize it when client seeks
 	// based on frame.
+	double frameRate = FrameRate();
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = (bigtime_t)(*frame * 1000000LL / FrameRate() + 0.5);
+		*time = (bigtime_t)(*frame * 1000000LL / frameRate + 0.5);
 
 #if 0
 	// This happens in ffplay.c:
@@ -883,9 +884,19 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	}
 #endif
 
-	// Our last packet is toast in any case.
-	av_free_packet(&fPacket);
+	// Our last packet is toast in any case. Read the next one so we
+	// know where we really seeked.
 	fReusePacket = false;
+	if (_NextPacket(true) == B_OK) {
+		*time = _ConvertFromStreamTimeBase(fPacket.pts);
+		TRACE_SEEK("  seeked time: %.2fs\n", *time / 1000000.0);
+		if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
+			*frame = *time * frameRate / 1000000LL + 0.5;
+			TRACE_SEEK("  seeked frame: %lld\n", *frame);
+		}
+	} else {
+		TRACE_SEEK("  _NextPacket() failed!\n");
+	}
 
 	return B_OK;
 }
@@ -992,14 +1003,13 @@ AVFormatReader::StreamCookie::GetNextChunk(const void** chunkBuffer,
 //TRACE("  PTS: %lld (time_base.num: %d, .den: %d), stream DTS: %lld\n",
 //fPacket.pts, fStream->time_base.num, fStream->time_base.den,
 //fStream->cur_dts);
-			mediaHeader->start_time = (bigtime_t)(1000000.0 * fPacket.pts
-				* fStream->time_base.num / fStream->time_base.den);
+			mediaHeader->start_time = _ConvertFromStreamTimeBase(fPacket.pts);
 		} else {
 //TRACE("  PTS (stream): %lld (time_base.num: %d, .den: %d), stream DTS: %lld\n",
 //lastStreamDTS, fStream->time_base.num, fStream->time_base.den,
 //fStream->cur_dts);
-			mediaHeader->start_time = (bigtime_t)(1000000.0 * lastStreamDTS
-				* fStream->time_base.num / fStream->time_base.den);
+			mediaHeader->start_time
+				= _ConvertFromStreamTimeBase(lastStreamDTS);
 		}
 		mediaHeader->file_pos = fPacket.pos;
 		mediaHeader->data_offset = 0;
