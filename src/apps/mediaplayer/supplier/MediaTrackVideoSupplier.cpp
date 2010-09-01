@@ -117,9 +117,8 @@ MediaTrackVideoSupplier::ReadFrame(void* buffer, bigtime_t* performanceTime,
 			fprintf(stderr, "MediaTrackVideoSupplier::ReadFrame() - "
 				"error while reading frame of track: %s\n", strerror(ret));
 		}
-	} else {
+	} else
 		fPerformanceTime = mediaHeader.start_time;
-	}
 
 	fCurrentFrame = fVideoTrack->CurrentFrame();
 	if (performanceTime)
@@ -148,8 +147,11 @@ MediaTrackVideoSupplier::FindKeyFrameForFrame(int64* frame)
 	if (!fVideoTrack)
 		return B_NO_INIT;
 
-	return fVideoTrack->FindKeyFrameForFrame(frame,
+//int64 wantedFrame = *frame;
+	status_t ret = fVideoTrack->FindKeyFrameForFrame(frame,
 		B_MEDIA_SEEK_CLOSEST_BACKWARD);
+//printf("found keyframe for frame %lld -> %lld\n", wantedFrame, *frame);
+	return ret;
 }
 
 
@@ -184,31 +186,47 @@ MediaTrackVideoSupplier::SeekToFrame(int64* frame)
 		return B_NO_INIT;
 
 	int64 wantFrame = *frame;
-	int64 currentFrame = fVideoTrack->CurrentFrame();
 
-	if (wantFrame == currentFrame)
+	if (wantFrame == fCurrentFrame)
 		return B_OK;
 
 	status_t ret = fVideoTrack->FindKeyFrameForFrame(frame,
 		B_MEDIA_SEEK_CLOSEST_BACKWARD);
-	if (ret < B_OK)
+	if (ret != B_OK)
 		return ret;
+	if (wantFrame > *frame) {
+		// Work around a rounding problem with some extractors and
+		// converting frames <-> time <-> internal time.
+		int64 nextWantFrame = wantFrame + 1;
+		if (fVideoTrack->FindKeyFrameForFrame(&nextWantFrame,
+			B_MEDIA_SEEK_CLOSEST_BACKWARD) == B_OK) {
+			if (nextWantFrame == wantFrame)
+				*frame = wantFrame + 1;
+		}
+	}
 
-	if (*frame < currentFrame && wantFrame > currentFrame) {
-		*frame = currentFrame;
+//if (wantFrame != *frame) {
+//	printf("keyframe for frame: %lld -> %lld\n", wantFrame, *frame);
+//}
+
+	if (*frame <= fCurrentFrame && wantFrame > fCurrentFrame) {
+		// The current frame is already closer to the wanted frame
+		// than the next keyframe before it.
+		*frame = fCurrentFrame;
 		return B_OK;
 	}
 
-if (wantFrame != *frame) {
-	printf("seeked by frame: %lld -> %lld, was %lld\n", wantFrame, *frame,
-		currentFrame);
-}
-
 	ret = fVideoTrack->SeekToFrame(frame);
-	if (ret == B_OK) {
-		fCurrentFrame = *frame;
-		fPerformanceTime = fVideoTrack->CurrentTime();
-	}
+	if (ret != B_OK)
+		return ret;
+
+//if (wantFrame != *frame) {
+//	printf("seeked by frame: %lld -> %lld, was %lld\n", wantFrame, *frame,
+//		fCurrentFrame);
+//}
+
+	fCurrentFrame = *frame;
+	fPerformanceTime = fVideoTrack->CurrentTime();
 
 	return ret;
 }
