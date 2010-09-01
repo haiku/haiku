@@ -12,6 +12,11 @@
 #include "VideoTarget.h"
 
 
+enum {
+	M_HIDE_FULL_SCREEN_CONTROLS = 'hfsc'
+};
+
+
 class VideoView : public BView, public VideoTarget {
 public:
 								VideoView(BRect frame, const char* name,

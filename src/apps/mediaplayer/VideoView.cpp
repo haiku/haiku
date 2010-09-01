@@ -100,17 +100,19 @@ VideoView::Pulse()
 		return;
 
 	bigtime_t now = system_time();
-	if (now - fLastMouseMove > 2LL * 1000000) {
+	if (now - fLastMouseMove > 1500000) {
 		fLastMouseMove = now;
 		// take care of disabling the screen saver
 		BPoint where;
 		uint32 buttons;
 		GetMouse(&where, &buttons, false);
 		if (buttons == 0) {
+			BMessage message(M_HIDE_FULL_SCREEN_CONTROLS);
+			message.AddPoint("where", where);
+			Window()->PostMessage(&message, Window());
+
 			ConvertToScreen(&where);
 			set_mouse_position((int32)where.x, (int32)where.y);
-			// hide the mouse cursor until the user moves it
-			be_app->ObscureCursor();
 		}
 	}
 }

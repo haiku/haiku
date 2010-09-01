@@ -355,8 +355,6 @@ Controller::SetTo(const PlaylistItemRef& item)
 		const media_format& audioTrackFormat = fAudioTrackSupplier->Format();
 		audioFrameRate = audioTrackFormat.u.raw_audio.frame_rate;
 		audioChannels = audioTrackFormat.u.raw_audio.channel_count;
-//		if (fVideoTrackSupplier == NULL)
-//			fVideoFrameRate = audioFrameRate;
 	}
 
 	if (InitCheck() != B_OK) {
@@ -497,6 +495,17 @@ Controller::CurrentAudioTrack()
 		return -1;
 
 	return fAudioTrackSupplier->TrackIndex();
+}
+
+
+int
+Controller::AudioTrackChannelCount()
+{
+	media_format format;
+	if (GetEncodedAudioFormat(&format) == B_OK)
+		return format.u.encoded_audio.output.channel_count;
+
+	return 2;
 }
 
 

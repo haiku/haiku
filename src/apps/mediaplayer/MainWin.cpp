@@ -101,7 +101,10 @@ enum {
 
 	M_FILE_DELETE,
 
-	M_SHOW_IF_NEEDED
+	M_SHOW_IF_NEEDED,
+
+	M_SLIDE_CONTROLS,
+	M_FINISH_SLIDING_CONTROLS
 };
 
 
@@ -162,13 +165,19 @@ MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	fIsFullscreen(false),
 	fAlwaysOnTop(false),
 	fNoInterface(false),
+	fShowsFullscreenControls(false),
 	fSourceWidth(-1),
 	fSourceHeight(-1),
 	fWidthAspect(0),
 	fHeightAspect(0),
 	fSavedFrame(),
 	fNoVideoFrame(),
+
 	fMouseDownTracking(false),
+	fLastMousePos(0, 0),
+	fLastMouseMovedTime(system_time()),
+	fMouseMoveDist(0),
+
 	fGlobalSettingsListener(this),
 	fInitialSeekPosition(0)
 {
@@ -376,17 +385,20 @@ MainWin::DispatchMessage(BMessage* msg, BHandler* handler)
 {
 	if ((msg->what == B_MOUSE_DOWN)
 		&& (handler == fBackground || handler == fVideoView
-			|| handler == fControls))
+			|| handler == fControls)) {
 		_MouseDown(msg, dynamic_cast<BView*>(handler));
+	}
 
 	if ((msg->what == B_MOUSE_MOVED)
 		&& (handler == fBackground || handler == fVideoView
-			|| handler == fControls))
+			|| handler == fControls)) {
 		_MouseMoved(msg, dynamic_cast<BView*>(handler));
+	}
 
 	if ((msg->what == B_MOUSE_UP)
-		&& (handler == fBackground || handler == fVideoView))
+		&& (handler == fBackground || handler == fVideoView)) {
 		_MouseUp(msg);
+	}
 
 	if ((msg->what == B_KEY_DOWN)
 		&& (handler == fBackground || handler == fVideoView)) {
@@ -642,6 +654,7 @@ MainWin::MessageReceived(BMessage* msg)
 					item->SetMarked(i == index);
 					i++;
 				}
+				_UpdateAudioChannelCount(index);
 			}
 			break;
 		}
@@ -836,6 +849,48 @@ MainWin::MessageReceived(BMessage* msg)
 
 		case M_SHOW_IF_NEEDED:
 			_ShowIfNeeded();
+			break;
+
+		case M_SLIDE_CONTROLS:
+		{
+			float offset;
+			if (msg->FindFloat("offset", &offset) == B_OK) {
+				fControls->MoveBy(0, offset);
+				UpdateIfNeeded();
+				snooze(15000);
+			}
+			break;
+		}
+		case M_FINISH_SLIDING_CONTROLS:
+		{
+			float offset;
+			bool show;
+			if (msg->FindFloat("offset", &offset) == B_OK
+				&& msg->FindBool("show", &show) == B_OK) {
+				if (show)
+					fControls->MoveTo(fControls->Frame().left, offset);
+				else {
+					fControls->RemoveSelf();
+					fControls->MoveTo(fVideoView->Frame().left,
+						fVideoView->Frame().bottom + 1);
+					fBackground->AddChild(fControls);
+					while (!fControls->IsHidden())
+						fControls->Hide();
+				}
+			}
+			break;
+		}
+		case M_HIDE_FULL_SCREEN_CONTROLS:
+			if (fIsFullscreen) {
+				BPoint videoViewWhere;
+				if (msg->FindPoint("where", &videoViewWhere) == B_OK) {
+					if (!fControls->Frame().Contains(videoViewWhere)) {
+						_ShowFullscreenControls(false);
+						// hide the mouse cursor until the user moves it
+						be_app->ObscureCursor();
+					}
+				}
+			}
 			break;
 
 		default:
@@ -1204,6 +1259,7 @@ MainWin::_SetupWindow()
 //	printf("MainWin::_SetupWindow\n");
 	// Populate the track menus
 	_SetupTrackMenus(fAudioTrackMenu, fVideoTrackMenu);
+	_UpdateAudioChannelCount(fController->CurrentAudioTrack());
 
 	fVideoMenu->SetEnabled(fHasVideo);
 	fAudioMenu->SetEnabled(fHasAudio);
@@ -1433,6 +1489,13 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 		videoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 		videoTrackMenu->ItemAt(0)->SetMarked(true);
 	}
+}
+
+
+void
+MainWin::_UpdateAudioChannelCount(int32 audioTrackIndex)
+{
+	fControls->SetAudioChannelCount(fController->AudioTrackChannelCount());
 }
 
 
@@ -1682,18 +1745,18 @@ MainWin::_MouseMoved(BMessage* msg, BView* originalHandler)
 
 	BPoint mousePos;
 	uint32 buttons = msg->FindInt32("buttons");
+	// On Zeta, only "screen_where" is reliable, "where"
+	// and "be:view_where" seem to be broken
+	if (msg->FindPoint("screen_where", &mousePos) != B_OK) {
+		// TODO: remove
+		// Workaround for BeOS R5, it has no "screen_where"
+		if (!originalHandler || msg->FindPoint("where", &mousePos) < B_OK)
+			return;
+		originalHandler->ConvertToScreen(&mousePos);
+	}
 
 	if (buttons == B_PRIMARY_MOUSE_BUTTON && fMouseDownTracking
 		&& !fIsFullscreen) {
-		// On Zeta, only "screen_where" is reliable, "where"
-		// and "be:view_where" seem to be broken
-		if (msg->FindPoint("screen_where", &mousePos) != B_OK) {
-			// TODO: remove
-			// Workaround for BeOS R5, it has no "screen_where"
-			if (!originalHandler || msg->FindPoint("where", &mousePos) < B_OK)
-				return;
-			originalHandler->ConvertToScreen(&mousePos);
-		}
 //		printf("screen where: %.0f, %.0f => ", mousePos.x, mousePos.y);
 		float delta_x = mousePos.x - fMouseDownMousePos.x;
 		float delta_y = mousePos.y - fMouseDownMousePos.y;
@@ -1702,6 +1765,25 @@ MainWin::_MouseMoved(BMessage* msg, BView* originalHandler)
 //		printf("move window to %.0f, %.0f\n", x, y);
 		MoveTo(x, y);
 	}
+
+	bigtime_t eventTime;
+	if (msg->FindInt64("when", &eventTime) != B_OK)
+		eventTime = system_time();
+
+	if (buttons == 0 && fIsFullscreen) {
+		BPoint moveDelta = mousePos - fLastMousePos;
+		float moveDeltaDist
+			= sqrtf(moveDelta.x * moveDelta.x + moveDelta.y * moveDelta.y);
+		if (eventTime - fLastMouseMovedTime < 200000)
+			fMouseMoveDist += moveDeltaDist;
+		else
+			fMouseMoveDist = moveDeltaDist;
+		if (fMouseMoveDist > 5)
+			_ShowFullscreenControls(true);
+	}
+
+	fLastMousePos = mousePos;
+	fLastMouseMovedTime =eventTime;
 }
 
 
@@ -1931,6 +2013,7 @@ MainWin::_ToggleFullscreen()
 
 	} else {
 		// switch back from full screen mode
+		_ShowFullscreenControls(false, false);
 
 		Hide();
 		MoveTo(fSavedFrame.left, fSavedFrame.top);
@@ -1996,6 +2079,54 @@ MainWin::_ShowIfNeeded()
 	if (IsHidden()) {
 		Show();
 		UpdateIfNeeded();
+	}
+}
+
+
+void
+MainWin::_ShowFullscreenControls(bool show, bool animate)
+{
+	if (fShowsFullscreenControls == show)
+		return;
+
+	fShowsFullscreenControls = show;
+
+	if (show) {
+		fControls->RemoveSelf();
+		fControls->MoveTo(fVideoView->Bounds().left,
+			fVideoView->Bounds().bottom + 1);
+		fVideoView->AddChild(fControls);
+		while (fControls->IsHidden())
+			fControls->Show();
+	}
+
+	if (animate) {
+		// Slide the controls into view. We need to do this with
+		// messages, otherwise we block the video playback for the
+		// time of the animation.
+		const float kAnimationOffsets[] = { 0.05, 0.2, 0.5, 0.2, 0.05 };
+		const int32 steps = sizeof(kAnimationOffsets) / sizeof(float);
+		float moveDist = show ? -fControlsHeight : fControlsHeight;
+		float originalY = fControls->Frame().top;
+		for (int32 i = 0; i < steps; i++) {
+			BMessage message(M_SLIDE_CONTROLS);
+			message.AddFloat("offset",
+				floorf(moveDist * kAnimationOffsets[i]));
+			PostMessage(&message, this);
+		}
+		BMessage finalMessage(M_FINISH_SLIDING_CONTROLS);
+		finalMessage.AddFloat("offset", originalY + moveDist);
+		finalMessage.AddBool("show", show);
+		PostMessage(&finalMessage, this);
+	} else {
+		if (!show) {
+			fControls->RemoveSelf();
+			fControls->MoveTo(fVideoView->Frame().left,
+				fVideoView->Frame().bottom + 1);
+			fBackground->AddChild(fControls);
+			while (!fControls->IsHidden())
+				fControls->Hide();
+		}
 	}
 }
 

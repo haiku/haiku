@@ -90,6 +90,7 @@ private:
 			void				_SetupVideoAspectItems(BMenu* menu);
 			void				_SetupTrackMenus(BMenu* audioTrackMenu,
 									BMenu* videoTrackMenu);
+			void				_UpdateAudioChannelCount(int32 audioTrackIndex);
 
 			void				_GetMinimumWindowSize(int& width,
 										int& height) const;
@@ -115,6 +116,8 @@ private:
 			void				_ToggleAlwaysOnTop();
 			void				_ToggleNoInterface();
 			void				_ShowIfNeeded();
+			void				_ShowFullscreenControls(bool show,
+									bool animate = true);
 
 			void				_SetFileAttributes();
 			void				_UpdateControlsEnabledStatus();
@@ -155,9 +158,12 @@ private:
 			PlaylistObserver*	fPlaylistObserver;
 			Controller*			fController;
 			ControllerObserver*	fControllerObserver;
-	volatile bool				fIsFullscreen;
-	volatile bool				fAlwaysOnTop;
-	volatile bool				fNoInterface;
+
+			bool				fIsFullscreen;
+			bool				fAlwaysOnTop;
+			bool				fNoInterface;
+			bool				fShowsFullscreenControls;
+
 			int					fSourceWidth;
 			int					fSourceHeight;
 			int					fWidthAspect;
@@ -169,9 +175,13 @@ private:
 			int					fNoVideoWidth;
 			BRect				fSavedFrame;
 			BRect				fNoVideoFrame;
+
 			bool				fMouseDownTracking;
 			BPoint				fMouseDownMousePos;
 			BPoint				fMouseDownWindowPos;
+			BPoint				fLastMousePos;
+			bigtime_t			fLastMouseMovedTime;
+			float				fMouseMoveDist;
 
 			ListenerAdapter		fGlobalSettingsListener;
 			bool				fCloseWhenDonePlayingMovie;

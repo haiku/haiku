@@ -98,6 +98,7 @@ public:
 
 			status_t			SelectAudioTrack(int n);
 			int					CurrentAudioTrack();
+			int					AudioTrackChannelCount();
 			status_t			SelectVideoTrack(int n);
 			int					CurrentVideoTrack();
 
