@@ -1,10 +1,12 @@
 /*
+ * Copyright (C) 2001-2010 Stephan Aßmus. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
  * Copyright (C) 1998-1999 Be Incorporated. All rights reseved.
  * Distributed under the terms of the Be Sample Code license.
- *
- * Copyright (C) 2001-2008 Stephan Aßmus. All rights reserved.
- * Distributed under the terms of the MIT license.
  */
+
+
 #include "PeakView.h"
 
 #include <new>
@@ -21,66 +23,60 @@
 
 using std::nothrow;
 
+
 enum {
 	MSG_PULSE		= 'puls',
 	MSG_LOCK_PEAKS	= 'lpks'
 };
 
-// constructor
+
 PeakView::PeakView(const char* name, bool useGlobalPulse, bool displayLabels)
-	: BView(BRect(0.0, 0.0, 155.0 + 4.0, 10.0 + 4.0),
+	:
+	BView(BRect(0.0, 0.0, 155.0 + 4.0, 10.0 + 4.0),
 		name, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			useGlobalPulse ? B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS
+		useGlobalPulse ? B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS
 			: B_WILL_DRAW | B_FRAME_EVENTS),
-	  fUseGlobalPulse(useGlobalPulse),
-	  fDisplayLabels(displayLabels),
-	  fPeakLocked(false),
+	fUseGlobalPulse(useGlobalPulse),
+	fDisplayLabels(displayLabels),
+	fPeakLocked(false),
 
-	  fRefreshDelay(20000),
-	  fPulse(NULL),
+	fRefreshDelay(20000),
+	fPulse(NULL),
 
-	  fCurrentMaxL(0.0),
-	  fLastMaxL(0.0),
-	  fOvershotL(false),
+	fChannelInfos(NULL),
+	fChannelCount(0),
 
-	  fCurrentMaxR(0.0),
-	  fLastMaxR(0.0),
-	  fOvershotR(false),
-
-	  fBackBitmap(new BBitmap(BRect(0.0, 0.0, 256.0, 18.0), B_CMAP8)),
-	  fPeakNotificationWhat(0)
+	fBackBitmap(NULL),
+	fPeakNotificationWhat(0)
 {
 	GetFontHeight(&fFontHeight);
 
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetViewColor(B_TRANSPARENT_COLOR);
 
-	FrameResized(Bounds().Width(), Bounds().Height());
-
 	if (fDisplayLabels)
 		ResizeBy(0, ceilf(fFontHeight.ascent + fFontHeight.descent));
+
+	SetChannelCount(2);
 }
 
-// destructor
+
 PeakView::~PeakView()
 {
 	delete fPulse;
 	delete fBackBitmap;
+	delete[] fChannelInfos;
 }
 
-// MessageReceived
+
 void
 PeakView::MessageReceived(BMessage* message)
 {
 	if (message->what == fPeakNotificationWhat) {
-		float maxL;
-		if (message->FindFloat("max", 0, &maxL) < B_OK)
-			maxL = 0.0;
-		float maxR;
-		if (message->FindFloat("max", 1, &maxR) < B_OK)
-			maxR = 0.0;
-		SetMax(maxL, maxR);
-		return;	
+		float max;
+		for (int32 i = 0; message->FindFloat("max", i, &max) == B_OK; i++)
+			SetMax(max, i);
+		return;
 	}
 
 	switch (message->what) {
@@ -98,7 +94,7 @@ PeakView::MessageReceived(BMessage* message)
 	}
 }
 
-// AttachedToWindow
+
 void
 PeakView::AttachedToWindow()
 {
@@ -106,11 +102,11 @@ PeakView::AttachedToWindow()
 		delete fPulse;
 		BMessage message(MSG_PULSE);
 		fPulse = new BMessageRunner(BMessenger(this), &message,
-									fRefreshDelay);
+			fRefreshDelay);
 	}
 }
 
-// DetachedFromWindow
+
 void
 PeakView::DetachedFromWindow()
 {
@@ -118,7 +114,7 @@ PeakView::DetachedFromWindow()
 	fPulse = NULL;
 }
 
-// MouseDown
+
 void
 PeakView::MouseDown(BPoint where)
 {
@@ -127,13 +123,17 @@ PeakView::MouseDown(BPoint where)
 		buttons = B_PRIMARY_MOUSE_BUTTON;
 
 	if (buttons & B_PRIMARY_MOUSE_BUTTON) {
-		fOvershotL = false;
-		fOvershotR = false;
-		fLastMaxL = fCurrentMaxL;
-		fLastMaxR = fCurrentMaxR;
+		// Reset the overshot flag and set the observed max to the current
+		// value.
+		for (uint32 i = 0; i < fChannelCount; i++) {
+			fChannelInfos[i].overshot = false;
+			fChannelInfos[i].last_max = fChannelInfos[i].current_max;
+		}
 	} else if (buttons & B_TERTIARY_MOUSE_BUTTON) {
+		// Toggle locking of the observed max value.
 		fPeakLocked = !fPeakLocked;
 	} else {
+		// Display context menu
 		BPopUpMenu* menu = new BPopUpMenu("peak context menu");
 		BMenuItem* item = new BMenuItem("Lock Peaks",
 			new BMessage(MSG_LOCK_PEAKS));
@@ -158,7 +158,7 @@ PeakView::MouseDown(BPoint where)
 	}
 }
 
-// Draw
+
 void
 PeakView::Draw(BRect area)
 {
@@ -171,7 +171,7 @@ PeakView::Draw(BRect area)
 	float width = r.Width();
 	r.InsetBy(-2.0, -2.0);
 	// frame
-	BeginLineArray(9);
+	BeginLineArray(8);
 		AddLine(BPoint(r.left, r.bottom), BPoint(r.left, r.top), lightShadow);
 		AddLine(BPoint(r.left + 1.0, r.top), BPoint(r.right, r.top),
 			lightShadow);
@@ -188,8 +188,6 @@ PeakView::Draw(BRect area)
 		AddLine(BPoint(r.right - 1.0, r.bottom),
 			BPoint(r.left + 1.0, r.bottom), lightShadow);
 		r.InsetBy(1.0, 1.0);
-		AddLine(BPoint(r.left, (r.top + r.bottom) / 2.0),
-			BPoint(r.right, (r.top + r.bottom) / 2.0), black);
 	EndLineArray();
 
 	// peak bitmap
@@ -208,39 +206,39 @@ PeakView::Draw(BRect area)
 	}
 }
 
-// FrameResized
+
 void
 PeakView::FrameResized(float width, float height)
 {
 	BRect bitmapFrame = _BackBitmapFrame();
-	_ResizeBackBitmap(bitmapFrame.IntegerWidth() + 1);
+	_ResizeBackBitmap(bitmapFrame.IntegerWidth() + 1, fChannelCount);
 	_UpdateBackBitmap();
 }
 
-// Pulse
+
 void
 PeakView::Pulse()
 {
-	if (!fBackBitmap)
+	if (fBackBitmap == NULL)
 		return;
 
 	if (!fPeakLocked) {
-		fLastMaxL = 0.90 * fLastMaxL;
-		if (fCurrentMaxL > fLastMaxL)
-			fLastMaxL = fCurrentMaxL;
-		fLastMaxR = 0.90 * fLastMaxR;
-		if (fCurrentMaxR > fLastMaxR)
-			fLastMaxR = fCurrentMaxR;
+		for (uint32 i = 0; i < fChannelCount; i++) {
+			fChannelInfos[i].last_max *= 0.90f;
+			if (fChannelInfos[i].current_max > fChannelInfos[i].last_max)
+				fChannelInfos[i].last_max = fChannelInfos[i].current_max;
+		}
 	}
 	_UpdateBackBitmap();
-	fCurrentMaxL = 0.0;
-	fCurrentMaxR = 0.0;
+
+	for (uint32 i = 0; i < fChannelCount; i++)
+		fChannelInfos[i].current_max = 0.0f;
 
 	_DrawBitmap();
 	Flush();
 }
 
-// GetPreferredSize
+
 void
 PeakView::GetPreferredSize(float* _width, float* _height)
 {
@@ -262,49 +260,74 @@ PeakView::GetPreferredSize(float* _width, float* _height)
 		*_height = minHeight;
 }
 
-// IsValid
+
 bool
 PeakView::IsValid() const
 {
-	return fBackBitmap && fBackBitmap->IsValid();
+	return fBackBitmap != NULL && fBackBitmap->IsValid()
+		&& fChannelInfos != NULL;
 }
 
-// SetPeakRefreshDelay
+
 void
 PeakView::SetPeakRefreshDelay(bigtime_t delay)
 {
 	if (fRefreshDelay == delay)
 		return;
+
 	fRefreshDelay = delay;
-	if (fPulse)
+
+	if (fPulse != NULL)
 		fPulse->SetInterval(fRefreshDelay);
 }
 
-// SetPeakNotificationWhat
+
 void
 PeakView::SetPeakNotificationWhat(uint32 what)
 {
 	fPeakNotificationWhat = what;
 }
 
-// SetMax
-void
-PeakView::SetMax(float maxL, float maxR)
-{
-	if (fCurrentMaxL < maxL)
-		fCurrentMaxL = maxL;
-	if (fCurrentMaxR < maxR)
-		fCurrentMaxR = maxR;
 
-	if (fCurrentMaxL > 1.0)
-		fOvershotL = true;
-	if (fCurrentMaxR > 1.0)
-		fOvershotR = true;
+void
+PeakView::SetChannelCount(uint32 channelCount)
+{
+	if (channelCount == fChannelCount)
+		return;
+
+	delete[] fChannelInfos;
+	fChannelInfos = new(std::nothrow) ChannelInfo[channelCount];
+	if (fChannelInfos != NULL) {
+		fChannelCount = channelCount;
+		for (uint32 i = 0; i < fChannelCount; i++) {
+			fChannelInfos[i].current_max = 0.0f;
+			fChannelInfos[i].last_max = 0.0f;
+			fChannelInfos[i].overshot = false;
+		}
+		_ResizeBackBitmap(_BackBitmapFrame().IntegerWidth() + 1,
+			fChannelCount);
+	} else
+		fChannelCount = 0;
 }
+
+
+void
+PeakView::SetMax(float max, uint32 channel)
+{
+	if (channel >= fChannelCount)
+		return;
+
+	if (fChannelInfos[channel].current_max < max)
+		fChannelInfos[channel].current_max = max;
+
+	if (fChannelInfos[channel].current_max > 1.0)
+		fChannelInfos[channel].overshot = true;
+}
+
 
 // #pragma mark -
 
-// _BackBitmapFrame
+
 BRect
 PeakView::_BackBitmapFrame() const
 {
@@ -315,17 +338,23 @@ PeakView::_BackBitmapFrame() const
 	return frame;
 }
 
-// _ResizeBackBitmap
+
 void
-PeakView::_ResizeBackBitmap(int32 width)
+PeakView::_ResizeBackBitmap(int32 width, int32 channels)
 {
-	if (fBackBitmap) {
-		if (fBackBitmap->Bounds().IntegerWidth() + 1 == width)
+	if (fBackBitmap != NULL) {
+		if (fBackBitmap->Bounds().IntegerWidth() + 1 == width
+			&& fBackBitmap->Bounds().IntegerHeight() + 1 == channels) {
 			return;
+		}
 	}
+	if (channels <= 0)
+		channels = 2;
+
 	delete fBackBitmap;
-	fBackBitmap = new (nothrow) BBitmap(BRect(0, 0, width - 1, 1), 0, B_RGB32);
-	if (!fBackBitmap || !fBackBitmap->IsValid()) {
+	BRect bounds(0, 0, width - 1, channels - 1);
+	fBackBitmap = new(std::nothrow) BBitmap(bounds, 0, B_RGB32);
+	if (fBackBitmap == NULL || !fBackBitmap->IsValid()) {
 		delete fBackBitmap;
 		fBackBitmap = NULL;
 		return;
@@ -333,21 +362,23 @@ PeakView::_ResizeBackBitmap(int32 width)
 	memset(fBackBitmap->Bits(), 0, fBackBitmap->BitsLength());
 }
 
-// _UpdateBackBitmap
+
 void
 PeakView::_UpdateBackBitmap()
 {
 	if (!fBackBitmap)
 		return;
 
-	uint8* l = (uint8*)fBackBitmap->Bits();
-	uint8* r = l + fBackBitmap->BytesPerRow();
+	uint8* span = (uint8*)fBackBitmap->Bits();
 	uint32 width = fBackBitmap->Bounds().IntegerWidth() + 1;
-	_RenderSpan(l, width, fCurrentMaxL, fLastMaxL, fOvershotL);
-	_RenderSpan(r, width, fCurrentMaxR, fLastMaxR ,fOvershotR);
+	for (uint32 i = 0; i < fChannelCount; i++) {
+		_RenderSpan(span, width, fChannelInfos[i].current_max,
+			fChannelInfos[i].last_max, fChannelInfos[i].overshot);
+		span += fBackBitmap->BytesPerRow();
+	}
 }
 
-// _RenderSpan
+
 void
 PeakView:: _RenderSpan(uint8* span, uint32 width, float current, float peak,
 	bool overshot)
@@ -412,20 +443,26 @@ PeakView:: _RenderSpan(uint8* span, uint32 width, float current, float peak,
 	}
 }
 
-// _DrawBitmap
+
 void
 PeakView::_DrawBitmap()
 {
-	BRect r = _BackBitmapFrame();
-	BRect topHalf = r;
-	topHalf.bottom = (r.top + r.bottom) / 2.0 - 1;
-	BRect bottomHalf = r;
-	bottomHalf.top = topHalf.bottom + 2;
+	SetHighColor(0, 0, 0);
+	BRect bitmapFrame = _BackBitmapFrame();
 	BRect bitmapRect = fBackBitmap->Bounds();
 	bitmapRect.bottom = bitmapRect.top;
-	DrawBitmapAsync(fBackBitmap, bitmapRect, topHalf);
-	bitmapRect.OffsetBy(0, 1);
-	DrawBitmapAsync(fBackBitmap, bitmapRect, bottomHalf);
+	float channelHeight = (bitmapFrame.Height() + 2) / fChannelCount;
+	for (uint32 i = 0; i < fChannelCount; i++) {
+		BRect viewRect(bitmapFrame);
+		viewRect.top += floorf(i * channelHeight);
+		viewRect.bottom = viewRect.top + ceilf(channelHeight - 2);
+		DrawBitmapAsync(fBackBitmap, bitmapRect, viewRect);
+		if (i < fChannelCount - 1) {
+			StrokeLine(BPoint(viewRect.left, viewRect.bottom + 1),
+				BPoint(viewRect.right, viewRect.bottom + 1));
+		}
+		bitmapRect.OffsetBy(0, 1);
+	}
 }
 
 

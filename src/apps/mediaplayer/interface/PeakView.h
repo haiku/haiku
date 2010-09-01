@@ -58,16 +58,19 @@ public:
 			bool				IsValid() const;
 			void				SetPeakRefreshDelay(bigtime_t delay);
 			void				SetPeakNotificationWhat(uint32 what);
-			void				SetMax(float maxL, float maxR);
 
- private:
+			void				SetChannelCount(uint32 count);
+			void				SetMax(float max, uint32 channel);
+
+private:
 			BRect				_BackBitmapFrame() const;
-			void				_ResizeBackBitmap(int32 width);
+			void				_ResizeBackBitmap(int32 width, int32 channels);
 			void				_UpdateBackBitmap();
 			void				_RenderSpan(uint8* span, uint32 width,
 									float current, float peak, bool overshot);
 			void				_DrawBitmap();
 
+private:
 			bool				fUseGlobalPulse;
 			bool				fDisplayLabels;
 			bool				fPeakLocked;
@@ -75,13 +78,14 @@ public:
 			bigtime_t			fRefreshDelay;
 			BMessageRunner*		fPulse;
 
-			float				fCurrentMaxL;
-			float				fLastMaxL;
-			bool				fOvershotL;
+			struct ChannelInfo {
+				float			current_max;
+				float			last_max;
+				bool			overshot;
+			};
 
-			float				fCurrentMaxR;
-			float				fLastMaxR;
-			bool				fOvershotR;
+			ChannelInfo*		fChannelInfos;
+			uint32				fChannelCount;
 
 			BBitmap*			fBackBitmap;
 			font_height			fFontHeight;
