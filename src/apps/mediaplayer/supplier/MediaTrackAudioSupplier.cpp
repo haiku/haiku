@@ -55,16 +55,17 @@ MediaTrackAudioSupplier::Buffer::CompareOffset(const void* a, const void* b)
 
 MediaTrackAudioSupplier::MediaTrackAudioSupplier(BMediaTrack* mediaTrack,
 		int32 trackIndex)
-	: AudioTrackSupplier(),
-	  fMediaTrack(mediaTrack),
-	  fBuffer(NULL),
-	  fBufferOffset(0),
-	  fBufferSize(0),
-	  fBuffers(10),
-	  fHasKeyFrames(false),
-	  fCountFrames(0),
-	  fReportSeekError(true),
-	  fTrackIndex(trackIndex)
+	:
+	AudioTrackSupplier(),
+	fMediaTrack(mediaTrack),
+	fBuffer(NULL),
+	fBufferOffset(0),
+	fBufferSize(0),
+	fBuffers(10),
+	fHasKeyFrames(false),
+	fCountFrames(0),
+	fReportSeekError(true),
+	fTrackIndex(trackIndex)
 {
 	_InitFromTrack();
 }
@@ -235,13 +236,18 @@ MediaTrackAudioSupplier::InitCheck() const
 void
 MediaTrackAudioSupplier::_InitFromTrack()
 {
+	TRACE("_InitFromTrack()\n");
+	// Try to suggest a big buffer size, we do a lot of caching...
+	fFormat.u.raw_audio.buffer_size = 16384;
 	if (fMediaTrack && fMediaTrack->DecodedFormat(&fFormat) == B_OK
 		&& fFormat.type == B_MEDIA_RAW_AUDIO) {
 
 		#ifdef TRACE_AUDIO_SUPPLIER
 			char formatString[256];
 			string_for_format(fFormat, formatString, 256);
-			TRACE("MediaTrackAudioSupplier: format is: %s\n", formatString);
+			TRACE("_InitFromTrack(): format is: %s\n", formatString);
+			TRACE("_InitFromTrack(): buffer size: %ld\n",
+				fFormat.u.raw_audio.buffer_size);
 		#endif
 
 		fBuffer = new (nothrow) char[fFormat.u.raw_audio.buffer_size];
@@ -263,9 +269,9 @@ MediaTrackAudioSupplier::_InitFromTrack()
 		// get the length of the track
 		fCountFrames = fMediaTrack->CountFrames();
 
-		TRACE("MediaTrackAudioSupplier: keyframes: %d, frame count: %lld\n",
+		TRACE("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
 			fHasKeyFrames, fCountFrames);
-		printf("MediaTrackAudioSupplier: keyframes: %d, frame count: %lld\n",
+		printf("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
 			fHasKeyFrames, fCountFrames);
 	} else
 		fMediaTrack = NULL;
@@ -384,7 +390,8 @@ MediaTrackAudioSupplier::Buffer*
 MediaTrackAudioSupplier::_FindUnusedBuffer() const
 {
 	Buffer* buffer = NULL;
-	for (int32 i = 0; ((buffer = _BufferAt(i))) && buffer->size != 0; i++);
+	for (int32 i = 0; ((buffer = _BufferAt(i))) && buffer->size != 0; i++)
+		;
 	return buffer;
 }
 
@@ -418,7 +425,7 @@ MediaTrackAudioSupplier::Buffer*
 MediaTrackAudioSupplier::_FindUsableBufferFor(int64 position) const
 {
 	Buffer* buffer = _FindBufferAtFrame(position);
-	if (!buffer)
+	if (buffer == NULL)
 		buffer = _FindUsableBuffer();
 	return buffer;
 }
@@ -471,7 +478,8 @@ MediaTrackAudioSupplier::_ReadBuffer(Buffer* buffer, int64 position,
 {
 	status_t error = fMediaTrack->ReadFrames(buffer->data, &buffer->size);
 
-	TRACE("Read(%p, %lld): %s\n", buffer->data, buffer->size, strerror(error));
+	TRACE("_ReadBuffer(%p, %lld): %s\n", buffer->data, buffer->size,
+		strerror(error));
 
 	buffer->offset = position;
 	buffer->time_stamp = time;
@@ -542,16 +550,21 @@ MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 	if (frames > 0) {
 		error = _SeekToKeyFrameBackward(currentPos);
 		TRACE("_ReadUncachedFrames() - seeked to position: %lld\n", currentPos);
+		if (position - currentPos > 100000)
+			printf("MediaTrackAudioSupplier::_ReadUncachedFrames() - "
+				"keyframe was far away: %lld -> %lld\n", position, currentPos);
 	}
 	// read the frames
+	// TODO: Calculate timeout, 0.25 times duration of "frames" seems good.
+	bigtime_t timeout = 10000;
 	while (error == B_OK && frames > 0) {
 		Buffer* cacheBuffer = _FindUsableBufferFor(currentPos);
-		TRACE("_ReadUncachedFrames() - usable buffer found: %p\n", cacheBuffer);
+		TRACE("_ReadUncachedFrames() - usable buffer found: %p, "
+			"position: %lld/%lld\n", cacheBuffer, currentPos, position);
 		error = _ReadBuffer(cacheBuffer, currentPos, time);
 		if (error == B_OK) {
 			int64 size = min(position + frames,
-							 cacheBuffer->offset + cacheBuffer->size)
-						 - position;
+				cacheBuffer->offset + cacheBuffer->size) - position;
 			if (size > 0) {
 				_CopyFrames(cacheBuffer, buffer, position, position, size);
 				buffer = SkipFrames(buffer, size);
@@ -560,9 +573,13 @@ MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 			}
 			currentPos += cacheBuffer->size;
 		}
+		if (system_time() - time > timeout) {
+			error = B_TIMED_OUT;
+			break;
+		}
 	}
 
-#if 1
+#if 0
 	// Ensure that all frames up to the next key frame are cached.
 	// This avoids, that each read reaches the BMediaTrack.
 	if (error == B_OK) {
@@ -652,21 +669,29 @@ MediaTrackAudioSupplier::_SeekToKeyFrameForward(int64& position)
 status_t
 MediaTrackAudioSupplier::_SeekToKeyFrameBackward(int64& position)
 {
-	if (position == fMediaTrack->CurrentFrame())
+	int64 currentPosition = fMediaTrack->CurrentFrame();
+	if (position == currentPosition)
 		return B_OK;
 
 	status_t error = B_OK;
 	if (fHasKeyFrames) {
-		int64 oldPosition = position;
+		int64 wantedPosition = position;
 		error = fMediaTrack->FindKeyFrameForFrame(&position,
 			B_MEDIA_SEEK_CLOSEST_BACKWARD);
+		if (error == B_OK && currentPosition > position
+			&& currentPosition < wantedPosition) {
+			// The current position is before the wanted position,
+			// but later than the keyframe, so seeking is worse.
+			position = currentPosition;
+			return B_OK;
+		}
 		if (error == B_OK)
 			error = fMediaTrack->SeekToFrame(&position, 0);
 		if (error != B_OK) {
 			position = fMediaTrack->CurrentFrame();
 //			if (fReportSeekError) {
 				printf("  seek to key frame backward: %lld -> %lld (%lld) "
-					"- %s\n", oldPosition, position,
+					"- %s\n", wantedPosition, position,
 					fMediaTrack->CurrentFrame(), strerror(error));
 				fReportSeekError = false;
 //			}
