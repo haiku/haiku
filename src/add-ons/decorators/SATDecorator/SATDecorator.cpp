@@ -69,9 +69,10 @@ SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
 	fBordersHighlighted(false),
 
 	fStackedMode(false),
-	fStackedDrawZoom(false),
 	fStackedTabLength(0)
 {
+	fStackedDrawZoom = IsFocus();
+
 	// all colors are state based
 	fNonHighlightFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
 	fNonHighlightFrameColors[1] = (rgb_color){ 240, 240, 240, 255 };
@@ -169,10 +170,9 @@ SATDecorator::SetStackedMode(bool stacked, BRegion* dirty)
 
 
 void
-SATDecorator::SetStackedTabLength(float length, bool drawZoom, BRegion* dirty)
+SATDecorator::SetStackedTabLength(float length, BRegion* dirty)
 {
 	fStackedTabLength = length;
-	fStackedDrawZoom = drawZoom;
 
 	dirty->Include(fTabRect);
 	_DoLayout();
@@ -528,6 +528,24 @@ SATDecorator::_SetTabLocation(float location, BRegion* updateRegion)
 	trect.bottom++;
 	updateRegion->Include(trect);
 	return true;
+}
+
+
+void
+SATDecorator::_SetFocus()
+{
+	DefaultDecorator::_SetFocus();
+
+	if (!fStackedMode)
+		return;
+
+	if (IsFocus())
+		fStackedDrawZoom = true;
+	else
+		fStackedDrawZoom = false;
+
+	_DoLayout();
+
 }
 
 

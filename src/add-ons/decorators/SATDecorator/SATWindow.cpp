@@ -564,12 +564,12 @@ SATWindow::SetStackedMode(bool stacked)
 
 
 bool
-SATWindow::SetStackedTabLength(float length, bool drawZoom)
+SATWindow::SetStackedTabLength(float length)
 {
 	if (!fDecorator)
 		return false;
 	BRegion dirty;
-	fDecorator->SetStackedTabLength(length, drawZoom, &dirty);
+	fDecorator->SetStackedTabLength(length, &dirty);
 	fDesktop->RebuildAndRedrawAfterWindowChange(fWindow, dirty);
 	return true;
 }

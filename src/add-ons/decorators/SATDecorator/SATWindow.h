@@ -114,7 +114,7 @@ public:
 		bool				IsBordersHighlighted();
 
 		bool				SetStackedMode(bool stacked = true);
-		bool				SetStackedTabLength(float length, bool drawZoom);
+		bool				SetStackedTabLength(float length);
 		bool				SetStackedTabMoving(bool moving = true);
 		void				TabLocationMoved(float location, bool shifting);
 

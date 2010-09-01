@@ -293,7 +293,6 @@ SATStacking::TabLocationMoved(float location, bool shifting)
 	ASSERT(windowIndex >= 0);
 	float tabLength = stackedWindows.ItemAt(0)->GetDecorator()
 		->StackedTabLength();
-	float tabLengthZoom = tabLength + decorator->GetZoomOffsetToRight();
 
 	float oldTabPosition = windowIndex * (tabLength + 1);
 	if (fabs(oldTabPosition - location) < tabLength / 2)
@@ -312,16 +311,6 @@ SATStacking::TabLocationMoved(float location, bool shifting)
 	float newNeighbourPosition = windowIndex * (tabLength + 1);
 	area->MoveWindowToPosition(fSATWindow, neighbourIndex);
 	desktop->SetWindowTabLocation(neighbour->GetWindow(), newNeighbourPosition);
-
-	// update zoom buttons
-	if (windowIndex == stackedWindows.CountItems() - 1) {
-		fSATWindow->SetStackedTabLength(tabLength, false);
-		neighbour->SetStackedTabLength(tabLengthZoom, true);
-	}
-	else if (neighbourIndex == stackedWindows.CountItems() - 1) {
-		neighbour->SetStackedTabLength(tabLength, false);
-		fSATWindow->SetStackedTabLength(tabLengthZoom, true);
-	}
 }
 
 
@@ -363,8 +352,7 @@ SATStacking::_AdjustWindowTabs()
 
 	const SATWindowList& stackedWindows = area->WindowList();
 
-	float zoomOffset = decorator->GetZoomOffsetToRight();
-	float tabBarLength = frame.Width() - zoomOffset;
+	float tabBarLength = frame.Width();
 
 	ASSERT(tabBarLength > 0);
 	float tabLength = tabBarLength / stackedWindows.CountItems();
@@ -374,11 +362,7 @@ SATStacking::_AdjustWindowTabs()
 	float location = 0;
 	for (int i = 0; i < stackedWindows.CountItems(); i++) {
 		SATWindow* window = stackedWindows.ItemAt(i);
-		if (i == stackedWindows.CountItems() - 1)
-			window->SetStackedTabLength(tabLength - 1 + zoomOffset, true);
-				// last tab
-		else
-			window->SetStackedTabLength(tabLength - 1, false);
+		window->SetStackedTabLength(tabLength - 1);
 
 		desktop->SetWindowTabLocation(window->GetWindow(), location);
 		location += tabLength;

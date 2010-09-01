@@ -47,8 +47,7 @@ public:
 
 		/*! Set the tab length if the decorator is in stacked mode and if the 
 		tab is the last one in the tab bar. */
-		void			SetStackedTabLength(float length, bool drawZoom,
-							BRegion* dirty);
+		void			SetStackedTabLength(float length, BRegion* dirty);
 		float			StackedTabLength() { return fStackedTabLength; }
 
 protected:
@@ -58,6 +57,8 @@ protected:
 
 		bool			_SetTabLocation(float location,
 							BRegion* updateRegion = NULL);
+		void			_SetFocus();
+
 private:
 		bool			fTabHighlighted;
 		bool			fBordersHighlighted;
