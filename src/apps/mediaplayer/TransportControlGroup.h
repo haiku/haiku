@@ -66,6 +66,7 @@ public:
 			void				SetMuted(bool mute);
 
 			void				SetVolume(float value);
+			void				SetAudioChannelCount(int32 count);
 			void				SetPosition(float value, bigtime_t position,
 									bigtime_t duration);
 			float				Position() const;

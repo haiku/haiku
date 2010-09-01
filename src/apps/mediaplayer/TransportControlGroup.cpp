@@ -453,6 +453,13 @@ TransportControlGroup::SetVolume(float value)
 
 
 void
+TransportControlGroup::SetAudioChannelCount(int32 count)
+{
+	fPeakView->SetChannelCount(count);
+}
+
+
+void
 TransportControlGroup::SetPosition(float value, bigtime_t position,
 	bigtime_t duration)
 {
