@@ -25,14 +25,15 @@ using std::nothrow;
 // constructor
 MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track,
 		int32 trackIndex, status_t& initStatus)
-	: VideoTrackSupplier()
-	, fVideoTrack(track)
+	:
+	VideoTrackSupplier(),
+	fVideoTrack(track),
 
-	, fPerformanceTime(0)
-	, fDuration(0)
-	, fCurrentFrame(0)
+	fPerformanceTime(0),
+	fDuration(0),
+	fCurrentFrame(0),
 
-	, fTrackIndex(trackIndex)
+	fTrackIndex(trackIndex)
 {
 	if (!fVideoTrack) {
 		printf("MediaTrackVideoSupplier() - no video track\n");
