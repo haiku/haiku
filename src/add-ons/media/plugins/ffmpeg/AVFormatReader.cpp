@@ -746,12 +746,14 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	double frameRate = FrameRate();
 	TRACE("  frameRate: %.4f\n", frameRate);
 
+	#if TRACE_AVFORMAT_READER
 	if (fStream->start_time != kNoPTSValue) {
 		bigtime_t startTime = _ConvertFromStreamTimeBase(fStream->start_time);
 		TRACE("  start_time: %lld or %.5fs\n", startTime,
 			startTime / 1000000.0);
 		// TODO: Handle start time in FindKeyFrame()?!
 	}
+	#endif // TRACE_AVFORMAT_READER
 
 	// TODO: This is obviously not working correctly for all stream types...
 	// It seems that the calculations here are correct, because they work
