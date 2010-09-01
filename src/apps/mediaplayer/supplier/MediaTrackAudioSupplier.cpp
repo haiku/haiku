@@ -550,9 +550,9 @@ MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 	if (frames > 0) {
 		error = _SeekToKeyFrameBackward(currentPos);
 		TRACE("_ReadUncachedFrames() - seeked to position: %lld\n", currentPos);
-		if (position - currentPos > 100000)
-			printf("MediaTrackAudioSupplier::_ReadUncachedFrames() - "
-				"keyframe was far away: %lld -> %lld\n", position, currentPos);
+//		if (position - currentPos > 100000)
+//			printf("MediaTrackAudioSupplier::_ReadUncachedFrames() - "
+//				"keyframe was far away: %lld -> %lld\n", position, currentPos);
 	}
 	// read the frames
 	// TODO: Calculate timeout, 0.25 times duration of "frames" seems good.
