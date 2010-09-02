@@ -342,6 +342,9 @@ StackAndTile::_StartSAT()
 		return;
 
 	group->RemoveWindow(fCurrentSATWindow);
+	// Bring window to the front. (in focus follow mouse this is not
+	// automatically the case)
+	_ActivateWindow(fCurrentSATWindow);
 
 	fCurrentSATWindow->FindSnappingCandidates();
 }
