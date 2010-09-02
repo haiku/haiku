@@ -1,25 +1,29 @@
 /*
- * Copyright 2009 Haiku Inc. All rights reserved.
+ * Copyright 2009-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
+ *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
-
 #ifndef CAPABILITIES_VIEW_H
 #define CAPABILITIES_VIEW_H
 
 
-#include <View.h>
+#include <GridView.h>
 
-class CapabilitiesView : public BView {
+#include <GL/gl.h>
+
+
+class CapabilitiesView : public BGridView {
 public:
     CapabilitiesView();
     virtual ~CapabilitiesView();
 
-	virtual	void MessageReceived(BMessage* message);
-	virtual	void AttachedToWindow();
-	virtual	void DetachedFromWindow();
+private:
+			void _AddCapability(GLenum capability, const char* name);
+			void _AddCapabilityView(const char* name, const char* value);
+			void _AddConvolutionCapability();
 };
 
 #endif /* CAPABILITIES_VIEW_H */

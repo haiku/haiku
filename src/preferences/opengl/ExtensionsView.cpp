@@ -1,8 +1,9 @@
 /*
- * Copyright 2009 Haiku Inc. All rights reserved.
+ * Copyright 2009-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
+ *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
 #include "ExtensionsView.h"
@@ -24,55 +25,26 @@
 
 
 ExtensionsView::ExtensionsView()
-	: BView(B_TRANSLATE("Extensions"), 0, NULL)
+	:
+	BGroupView(B_TRANSLATE("Extensions"), B_VERTICAL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	const float kInset = 10;
-
 	ExtensionsList *extList = new ExtensionsList();
-
 	_AddExtensionsList(extList, (char*) glGetString(GL_EXTENSIONS));
 	_AddExtensionsList(extList, (char*) gluGetString(GLU_EXTENSIONS));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(extList)
-		.SetInsets(kInset, kInset, kInset, kInset)
-	);
+	AddChild(extList);
+	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 
 ExtensionsView::~ExtensionsView()
 {
-
 }
 
-
-void
-ExtensionsView::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		default:
-			BView::MessageReceived(message);
-	}
-}
-
-
-void
-ExtensionsView::AttachedToWindow()
-{
-
-}
-
-
-void
-ExtensionsView::DetachedFromWindow()
-{
-
-}
 
 // #pragma mark
+
 
 void
 ExtensionsView::_AddExtensionsList(ExtensionsList *extList, char* stringList)

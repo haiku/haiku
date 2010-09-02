@@ -1,19 +1,21 @@
 /*
- * Copyright 2009 Haiku Inc. All rights reserved.
+ * Copyright 2009-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
+ *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
 #include "OpenGLView.h"
 
 #include <stdio.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <GroupLayout.h>
-#include <TabView.h>
+
+#include <GLView.h>
+#include <LayoutBuilder.h>
 #include <SpaceLayoutItem.h>
+#include <TabView.h>
+
 #include "CapabilitiesView.h"
 #include "ExtensionsView.h"
 #include "InfoView.h"
@@ -21,43 +23,34 @@
 
 
 OpenGLView::OpenGLView()
-	: BView("OpenGLView", 0, NULL)
+	:
+	BGroupView("OpenGLView", B_VERTICAL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	const float kInset = 10;
-	BRect dummy(0, 0, 2, 2);
-
-	fGLView = new BGLView(dummy, "gl info", B_FOLLOW_NONE, 0,
+	BGLView* glView = new BGLView(BRect(0, 0, 1, 1), "gl info", B_FOLLOW_NONE, 0,
 		BGL_RGB | BGL_DOUBLE);
-	fGLView->Hide();
-	AddChild(fGLView);
+	glView->Hide();
+	AddChild(glView);
 
-	fGLView->LockGL();
+	glView->LockGL();
 
-	LogoView *logoView = new LogoView(dummy);
+	LogoView *logoView = new LogoView();
 
 	BTabView *tabView = new BTabView("tab view", B_WIDTH_FROM_LABEL);
+	tabView->AddTab(new InfoView());
+	tabView->AddTab(new CapabilitiesView());
+	tabView->AddTab(new ExtensionsView());
 
-	InfoView *infoView = new InfoView();
-	tabView->AddTab(infoView);
+	glView->UnlockGL();
 
-	CapabilitiesView *capabilitiesView = new CapabilitiesView();
-	tabView->AddTab(capabilitiesView);
-
-	ExtensionsView *extensionsView = new ExtensionsView();
-	tabView->AddTab(extensionsView);
-
-	fGLView->UnlockGL();
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	GroupLayout()->SetSpacing(0);
+	BLayoutBuilder::Group<>(this)
+		.SetInsets(0, 0, 0, 0)
 		.Add(logoView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL)
 			.Add(tabView)
-			.SetInsets(kInset, kInset, kInset, kInset)
-		)
-	);
+			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 
@@ -65,26 +58,3 @@ OpenGLView::~OpenGLView()
 {
 }
 
-
-void
-OpenGLView::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		default:
-			BView::MessageReceived(message);
-	}	
-}
-
-
-void
-OpenGLView::AttachedToWindow()
-{
-	
-}
-
-
-void
-OpenGLView::DetachedFromWindow()
-{
-		
-}

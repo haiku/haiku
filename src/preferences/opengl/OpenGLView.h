@@ -1,8 +1,9 @@
 /*
- * Copyright 2009 Haiku Inc. All rights reserved.
+ * Copyright 2009-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
+ *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
@@ -10,20 +11,12 @@
 #define OPENGL_VIEW_H
 
 
-#include <GLView.h>
-#include <View.h>
+#include <GroupView.h>
 
-class OpenGLView : public BView {
+class OpenGLView : public BGroupView {
 public:
     OpenGLView();
     virtual ~OpenGLView();
-
-	virtual	void MessageReceived(BMessage* message);
-	virtual	void AttachedToWindow();
-	virtual	void DetachedFromWindow();
-
-private:
-    BGLView* fGLView;
 };
 
 #endif /* OPENGL_VIEW_H */

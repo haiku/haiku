@@ -10,16 +10,15 @@
 #define INFO_VIEW_H
 
 
-#include <View.h>
+#include <GridView.h>
 
-class InfoView : public BView {
+class InfoView : public BGridView {
 public:
-    InfoView();
-    virtual ~InfoView();
+    					InfoView();
+    virtual 			~InfoView();
 
-	virtual	void MessageReceived(BMessage* message);
-	virtual	void AttachedToWindow();
-	virtual	void DetachedFromWindow();
+private:
+			void		_AddString(const char* label, const char* value);
 };
 
 #endif /* INFO_VIEW_H */

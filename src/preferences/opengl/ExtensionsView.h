@@ -9,19 +9,15 @@
 #ifndef EXTENSIONS_VIEW_H
 #define EXTENSIONS_VIEW_H
 
-#include <View.h>
+#include <GroupView.h>
 
 class ExtensionsList;
 
-class ExtensionsView : public BView {
+class ExtensionsView : public BGroupView {
 public:
     ExtensionsView();
     virtual ~ExtensionsView();
 
-	virtual	void MessageReceived(BMessage* message);
-	virtual	void AttachedToWindow();
-	virtual	void DetachedFromWindow();
-	
 private:
 			void _AddExtensionsList(ExtensionsList *extList, char* stringList);
 

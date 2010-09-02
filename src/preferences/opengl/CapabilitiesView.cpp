@@ -1,230 +1,137 @@
 /*
- * Copyright 2009 Haiku Inc. All rights reserved.
+ * Copyright 2009-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
+ *		Alex Wilson <yourpalal2@gmail.com>
  *		Artur Wyszynski <harakash@gmail.com>
  */
 
 #include "CapabilitiesView.h"
 
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Message.h>
 #include <String.h>
 #include <StringView.h>
-#include <SpaceLayoutItem.h>
-#include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+
+#include <stdio.h>
 
 
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Capabilities"
 
 
-void
-AddStringView(BView* view, const char* viewName, const char* name,
-	const char* value, bool spacer)
-{
-	if (!view)
-		return;
-
-	BRect dummyRect(0, 0, 0, 0);
-	const float kSpacer = 5;
-
-	BString tempViewName(viewName);
-	BStringView *nameView = new BStringView(dummyRect, tempViewName.String(),
-		name, B_FOLLOW_NONE);
-	tempViewName.Append("Value");
-	BStringView *valueView = new BStringView(dummyRect, tempViewName.String(),
-		value, B_FOLLOW_NONE);
-
-	if (spacer) {
-		view->AddChild(BGroupLayoutBuilder(B_VERTICAL)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-				.Add(nameView)
-				.Add(BSpaceLayoutItem::CreateGlue())
-				.Add(valueView)
-			)
-			.Add(BSpaceLayoutItem::CreateVerticalStrut(kSpacer))
-		);
-	} else {
-		view->AddChild(BGroupLayoutBuilder(B_VERTICAL)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-				.Add(nameView)
-				.Add(BSpaceLayoutItem::CreateGlue())
-				.Add(valueView)
-			)
-		);
-	}
-}
+const BAlignment kNameAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
+const BAlignment kValueAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_UNSET);
 
 
 CapabilitiesView::CapabilitiesView()
-	: BView(B_TRANSLATE("Capabilities"), 0, NULL)
+	:
+	BGridView(B_TRANSLATE("Capabilities"))
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLayout(new BGroupLayout(B_VERTICAL));
+	_AddCapability(GL_AUX_BUFFERS, B_TRANSLATE("Auxiliary buffer(s):"));
 
-	const float kInset = 10;
+	_AddCapability(GL_MAX_MODELVIEW_STACK_DEPTH,
+		B_TRANSLATE("Model stack size:"));
 
-	int lights = 0;
-	int clippingPlanes = 0;
-	int modelStack = 0;
-	int projectionStack = 0;
-	int textureStack = 0;
-	int maxTex3d = 0;
-	int maxTex2d = 0;
-	int nameStack = 0;
-	int listStack = 0;
-	int maxPoly = 0;
-	int attribStack = 0;
-	int buffers = 0;
-	int convolutionWidth = 0;
-	int convolutionHeight = 0;
-	int maxIndex = 0;
-	int maxVertex = 0;
-	int textureUnits = 0;
+	_AddCapability(GL_MAX_PROJECTION_STACK_DEPTH,
+		B_TRANSLATE("Projection stack size:"));
 
-	glGetIntegerv(GL_MAX_LIGHTS, &lights);
-	glGetIntegerv(GL_MAX_CLIP_PLANES, &clippingPlanes);
-	glGetIntegerv(GL_MAX_MODELVIEW_STACK_DEPTH, &modelStack);
-	glGetIntegerv(GL_MAX_PROJECTION_STACK_DEPTH, &projectionStack);
-	glGetIntegerv(GL_MAX_TEXTURE_STACK_DEPTH, &textureStack);
-	glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE, &maxTex3d);
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTex2d);
-	glGetIntegerv(GL_MAX_NAME_STACK_DEPTH, &nameStack);
-	glGetIntegerv(GL_MAX_LIST_NESTING, &listStack);
-	glGetIntegerv(GL_MAX_EVAL_ORDER, &maxPoly);
-	glGetIntegerv(GL_MAX_ATTRIB_STACK_DEPTH, &attribStack);
-	glGetIntegerv(GL_AUX_BUFFERS, &buffers);
-	glGetIntegerv(GL_MAX_CONVOLUTION_WIDTH, &convolutionWidth);
-	glGetIntegerv(GL_MAX_CONVOLUTION_HEIGHT, &convolutionHeight);
-	glGetIntegerv(GL_MAX_ELEMENTS_INDICES, &maxIndex);
-	glGetIntegerv(GL_MAX_ELEMENTS_VERTICES, &maxVertex);
-	glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &textureUnits);
+	_AddCapability(GL_MAX_TEXTURE_STACK_DEPTH, 
+		B_TRANSLATE("Texture stack size:"));
 
-	BString tempString;
-	BView *rootView = new BView("root view", 0, NULL);
-	rootView->SetLayout(new BGroupLayout(B_VERTICAL));
+	_AddCapability(GL_MAX_NAME_STACK_DEPTH, B_TRANSLATE("Name stack size:"));
 
-	tempString << (int32) buffers;
-	AddStringView(rootView, "Buffers", B_TRANSLATE("Auxiliary buffer(s):"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_LIST_NESTING, B_TRANSLATE("List stack size:"));
 
-	tempString.SetTo("");
-	tempString << (int32) modelStack;
-	AddStringView(rootView, "ModelStack", B_TRANSLATE("Model stack size:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_ATTRIB_STACK_DEPTH,
+		B_TRANSLATE("Attributes stack size:"));
 
-	tempString.SetTo("");
-	tempString << (int32) projectionStack;
-	AddStringView(rootView, "ProjectionStack",
-		B_TRANSLATE("Projection stack size:"), tempString.String(), true);
+	_AddCapability(GL_MAX_TEXTURE_SIZE, B_TRANSLATE("Max. 2D texture size:"));
 
-	tempString.SetTo("");
-	tempString << (int32) textureStack;
-	AddStringView(rootView, "TextureStack", B_TRANSLATE("Texture stack size:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_3D_TEXTURE_SIZE,
+		B_TRANSLATE("Max. 3D texture size:"));
 
-	tempString.SetTo("");
-	tempString << (int32) nameStack;
-	AddStringView(rootView, "NameStack", B_TRANSLATE("Name stack size:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_TEXTURE_UNITS_ARB,
+		B_TRANSLATE("Max. texture units:"));
 
-	tempString.SetTo("");
-	tempString << (int32) listStack;
-	AddStringView(rootView, "ListStack", B_TRANSLATE("List stack size:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_LIGHTS, B_TRANSLATE("Max. lights:"));
 
-	tempString.SetTo("");
-	tempString << (int32) attribStack;
-	AddStringView(rootView, "AttribStack", B_TRANSLATE("Attributes stack size:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_CLIP_PLANES, B_TRANSLATE("Max. clipping planes:"));
 
-	tempString.SetTo("");
-	tempString << (int32) maxTex3d;
-	AddStringView(rootView, "MaxTex3D", B_TRANSLATE("Max. 3D texture size:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_EVAL_ORDER,
+		B_TRANSLATE("Max. evaluators equation order:"));
 
-	tempString.SetTo("");
-	tempString << (int32) maxTex2d;
-	AddStringView(rootView, "MaxTex2D", B_TRANSLATE("Max. 2D texture size:"),
-		tempString.String(), true);
+	_AddConvolutionCapability();
 
-	tempString.SetTo("");
-	tempString << (int32) textureUnits;
-	AddStringView(rootView, "MaxTexUnits", B_TRANSLATE("Max. texture units:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_ELEMENTS_INDICES,
+		B_TRANSLATE("Max. recommended index elements:"));
 
-	tempString.SetTo("");
-	tempString << (int32) lights;
-	AddStringView(rootView, "MaxLights", B_TRANSLATE("Max. lights:"),
-		tempString.String(), true);
+	_AddCapability(GL_MAX_ELEMENTS_VERTICES,
+		B_TRANSLATE("Max. recommended vertex elements:"));
 
-	tempString.SetTo("");
-	tempString << (int32) clippingPlanes;
-	AddStringView(rootView, "MaxClippingPlanes",
-		B_TRANSLATE("Max. clipping planes:"), tempString.String(), true);
+	BGridLayout* layout = GridLayout();
+	layout->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 
-	tempString.SetTo("");
-	tempString << (int32) maxPoly;
-	AddStringView(rootView, "MaxPoly",
-		B_TRANSLATE("Max. evaluators equation order:"),
-		tempString.String(), true);
+	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, layout->CountRows(),
+		layout->CountColumns(), 1);
 
-	tempString.SetTo("");
-	tempString << (int32) convolutionWidth << "x" << convolutionHeight;
-	AddStringView(rootView, "MaxConvultion", B_TRANSLATE("Max. convolution:"),
-		tempString.String(), true);
-
-	tempString.SetTo("");
-	tempString << (int32) maxIndex;
-	AddStringView(rootView, "MaxIndex",
-		B_TRANSLATE("Max. recommended index elements:"),
-		tempString.String(), true);
-
-	tempString.SetTo("");
-	tempString << (int32) maxVertex;
-	AddStringView(rootView, "MaxVertex",
-		B_TRANSLATE("Max. recommended vertex elements:"),
-		tempString.String(), true);
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(rootView)
-		.SetInsets(kInset, kInset, kInset, kInset)
-	);
+	float spacing = be_control_look->DefaultItemSpacing();
+	layout->SetHorizontalSpacing(spacing / 2.0f);
+		// divide by two to compensate for empty column 1
 }
 
 
 CapabilitiesView::~CapabilitiesView()
 {
-
 }
 
 
 void
-CapabilitiesView::MessageReceived(BMessage* message)
+CapabilitiesView::_AddCapability(GLenum capability, const char* name)
 {
-	switch (message->what) {
-		default:
-			BView::MessageReceived(message);
-	}
+	int value = 0;
+	glGetIntegerv(capability, &value);
+	_AddCapabilityView(name, BString() << (int32)value);
 }
 
 
 void
-CapabilitiesView::AttachedToWindow()
+CapabilitiesView::_AddCapabilityView(const char* name, const char* value)
 {
+	BStringView *nameView = new BStringView(NULL, name);
+	nameView->SetExplicitAlignment(kNameAlignment);
 
+	BStringView *valueView = new BStringView(NULL, value);
+	valueView->SetExplicitAlignment(kValueAlignment);
+
+	// Add the items at the bottom of our grid with a column inbetween
+	int32 row = GridLayout()->CountRows();
+	BLayoutBuilder::Grid<>(this)
+		.Add(nameView, 0, row)
+		.Add(valueView, 2, row);
 }
 
 
 void
-CapabilitiesView::DetachedFromWindow()
+CapabilitiesView::_AddConvolutionCapability()
 {
+	int width = 0;
+	glGetConvolutionParameteriv(GL_CONVOLUTION_2D,
+		GL_MAX_CONVOLUTION_WIDTH, &width);
 
+	int height = 0;
+	glGetConvolutionParameteriv(GL_CONVOLUTION_2D,
+		GL_MAX_CONVOLUTION_HEIGHT, &height);
+
+	BString convolution;
+	convolution << (int32) width << 'x' << (int32) height;
+	_AddCapabilityView(B_TRANSLATE("Max. convolution:"), convolution);
 }
+

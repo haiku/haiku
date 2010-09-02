@@ -15,7 +15,7 @@
 
 class LogoView : public BView {
 public:
-    LogoView(const BRect& frame);
+    LogoView();
     virtual ~LogoView();
     
     virtual void Draw(BRect update);

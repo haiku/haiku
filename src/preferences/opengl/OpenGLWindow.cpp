@@ -8,6 +8,7 @@
 
 #include "OpenGLWindow.h"
 
+#include <Application.h>
 #include <GroupLayout.h>
 #include "OpenGLView.h"
 

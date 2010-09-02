@@ -16,9 +16,9 @@
 #include <TranslatorFormats.h>
 
 
-LogoView::LogoView(const BRect& frame)
-	: BView(frame, "LogoView", B_FOLLOW_ALL, B_WILL_DRAW
-		| B_FULL_UPDATE_ON_RESIZE),
+LogoView::LogoView()
+	:	
+	BView("LogoView", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE, NULL),
 	fLogo(NULL)
 {
 	SetViewColor(255, 255, 255);
