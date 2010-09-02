@@ -127,7 +127,7 @@ public:
 	virtual bool			JoinCandidates() = 0;
 	/*! Update the window tab values, solve the layout and move all windows in
 	the group accordantly. */
-	virtual void			DoGroupLayout() = 0;
+	virtual void			DoWindowLayout() = 0;
 	virtual void			RemovedFromArea(WindowArea* area) {}
 	virtual void			TabLocationMoved(float location, bool shifting) {}
 };

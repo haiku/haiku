@@ -254,7 +254,7 @@ SATStacking::JoinCandidates()
 
 
 void
-SATStacking::DoGroupLayout()
+SATStacking::DoWindowLayout()
 {
 	_AdjustWindowTabs();
 }

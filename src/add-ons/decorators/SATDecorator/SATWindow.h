@@ -100,6 +100,7 @@ public:
 
 		void				FindSnappingCandidates();
 		bool				JoinCandidates();
+		void				DoWindowLayout();
 		void				DoGroupLayout();
 
 		//! \return the complete window frame including the Decorator

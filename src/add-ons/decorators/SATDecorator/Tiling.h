@@ -22,7 +22,7 @@ public:
 
 		bool				FindSnappingCandidates(SATGroup* group);
 		bool				JoinCandidates();
-		void				DoGroupLayout();
+		void				DoWindowLayout();
 
 private:
 		bool				_FindFreeAreaInGroup(SATGroup* group);

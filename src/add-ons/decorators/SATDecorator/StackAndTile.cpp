@@ -185,6 +185,17 @@ StackAndTile::WindowResized(Window* window)
 		// after solve the layout update the size constraints of all windows in
 		// the group
 		satWindow->UpdateGroupWindowsSize();
+
+		// Do a window layout for all windows. TODO: mybe do it a bit more
+		// efficient
+		SATGroup* group = satWindow->GetGroup();
+		if (!group)
+			return;
+		for (int i = 0; i < group->CountItems(); i++) {
+			SATWindow* listWindow = group->WindowAt(i);
+			if (listWindow != satWindow)
+				listWindow->DoWindowLayout();
+		}
 	}
 }
 
@@ -357,15 +368,18 @@ StackAndTile::_ActivateWindow(SATWindow* satWindow)
 	if (!desktop)
 		return;
 
-	desktop->ActivateWindow(satWindow->GetWindow());
+	//desktop->ActivateWindow(satWindow->GetWindow());
 
 	for (int i = 0; i < group->CountItems(); i++) {
 		SATWindow* listWindow = group->WindowAt(i);
 		if (listWindow == satWindow)
 			continue;
-		desktop->SendWindowBehind(listWindow->GetWindow(),
-			satWindow->GetWindow());
+		//desktop->SendWindowBehind(listWindow->GetWindow(),
+		//	satWindow->GetWindow());
+		desktop->ActivateWindow(listWindow->GetWindow());
 	}
+
+	desktop->ActivateWindow(satWindow->GetWindow());
 }
 
 

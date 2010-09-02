@@ -457,6 +457,14 @@ SATWindow::JoinCandidates()
 
 
 void
+SATWindow::DoWindowLayout()
+{
+	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
+		fSATSnappingBehaviourList.ItemAt(i)->DoWindowLayout();
+}
+
+
+void
 SATWindow::DoGroupLayout()
 {
 	if (!PositionManagedBySAT())
@@ -464,8 +472,7 @@ SATWindow::DoGroupLayout()
 
 	fGroupCookie->DoGroupLayout(this);
 
-	for (int i = 0; i < fSATSnappingBehaviourList.CountItems(); i++)
-		fSATSnappingBehaviourList.ItemAt(i)->DoGroupLayout();
+	DoWindowLayout();
 }
 
 

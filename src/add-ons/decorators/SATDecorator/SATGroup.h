@@ -253,6 +253,7 @@ private:
 
 protected:
 		SATWindowList		fSATWindowList;
+
 		LinearSpec			fLinearSpec;
 
 private:

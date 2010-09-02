@@ -79,7 +79,7 @@ SATTiling::JoinCandidates()
 
 
 void
-SATTiling::DoGroupLayout()
+SATTiling::DoWindowLayout()
 {
 
 }

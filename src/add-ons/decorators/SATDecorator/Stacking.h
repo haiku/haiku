@@ -30,7 +30,8 @@ public:
 
 		bool				FindSnappingCandidates(SATGroup* group);
 		bool				JoinCandidates();
-		void				DoGroupLayout();
+		void				DoWindowLayout();
+
 		void				RemovedFromArea(WindowArea* area);
 		void				TabLocationMoved(float location, bool shifting);
 
