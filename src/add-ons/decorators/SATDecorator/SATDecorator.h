@@ -34,8 +34,6 @@ public:
 						SATDecorator(DesktopSettings& settings,
 							BRect frame, window_look look, uint32 flags);
 
-		float			GetZoomOffsetToRight();
-
 		void 			HighlightTab(bool active, BRegion* dirty);
 		void 			HighlightBorders(bool active, BRegion* dirty);
 		bool			IsTabHighlighted() { return fTabHighlighted; }

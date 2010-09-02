@@ -97,18 +97,6 @@ SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
 }
 
 
-float
-SATDecorator::GetZoomOffsetToRight()
-{
-	float offset;
-	float size;
-	float inset;
-	_GetButtonSizeAndOffset(fTabRect, &offset, &size, &inset);
-
-	return 2 * offset + size;
-}
-
-
 void
 SATDecorator::HighlightTab(bool active, BRegion* dirty)
 {
