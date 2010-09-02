@@ -352,17 +352,25 @@ SATStacking::_AdjustWindowTabs()
 
 	const SATWindowList& stackedWindows = area->WindowList();
 
-	float tabBarLength = frame.Width();
-
-	ASSERT(tabBarLength > 0);
-	float tabLength = tabBarLength / stackedWindows.CountItems();
+	int stackCount = stackedWindows.CountItems();
+	float titleBarLength = frame.Width();
+	ASSERT(titleBarLength > 0);
+	// floor to avoid drawing issues
+	float tabLength = floorf(titleBarLength / stackCount);
+	// the part that we lost due to the floor
+	float roundingError = 0;
 	if (tabLength > kMaxTabWidth)
 		tabLength = kMaxTabWidth;
+	else
+		roundingError = titleBarLength - stackCount * tabLength;
 
 	float location = 0;
-	for (int i = 0; i < stackedWindows.CountItems(); i++) {
+	for (int i = 0; i < stackCount; i++) {
 		SATWindow* window = stackedWindows.ItemAt(i);
-		window->SetStackedTabLength(tabLength - 1);
+		if (i == stackCount - 1)
+			window->SetStackedTabLength(tabLength - 1 + roundingError);
+		else
+			window->SetStackedTabLength(tabLength - 1);
 
 		desktop->SetWindowTabLocation(window->GetWindow(), location);
 		location += tabLength;
