@@ -182,9 +182,6 @@ StackAndTile::WindowResized(Window* window)
 		satWindow->FindSnappingCandidates();
 	else {
 		satWindow->DoGroupLayout();
-		// after solve the layout update the size constraints of all windows in
-		// the group
-		satWindow->UpdateGroupWindowsSize();
 
 		// Do a window layout for all windows. TODO: mybe do it a bit more
 		// efficient

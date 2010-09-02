@@ -32,7 +32,6 @@ public:
 
 		void				DoGroupLayout(SATWindow* triggerWindow);
 		void				MoveWindow(int32 workspace);
-		void				UpdateWindowSize();
 
 		SATGroup*			GetGroup() { return fSATGroup.Get(); }
 
@@ -41,6 +40,8 @@ public:
 		bool				PropagateToGroup(SATGroup* group, WindowArea* area);
 
 private:
+		void				_UpdateWindowSize(const BRect& frame);
+
 		SATWindow*			fSATWindow;
 
 		BReference<SATGroup>	fSATGroup;
@@ -84,9 +85,6 @@ public:
 								BPrivate::ServerLink& link);
 
 		bool				PropagateToGroup(SATGroup* group, WindowArea* area);
-
-		void				UpdateGroupWindowsSize();
-		void				UpdateWindowSize();
 
 		//! Move the window to the tab's position. 
 		void				MoveWindowToSAT(int32 workspace);

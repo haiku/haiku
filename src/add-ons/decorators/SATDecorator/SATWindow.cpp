@@ -51,6 +51,9 @@ GroupCookie::~GroupCookie()
 }
 
 
+const uint32 kExtentPenalty = 10;
+
+
 void
 GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 {
@@ -89,12 +92,13 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 			break;
 		}
 	}
+	_UpdateWindowSize(frame);
 
 	// set penalties back to normal
-	fWidthConstraint->SetPenaltyNeg(10);
-	fWidthConstraint->SetPenaltyPos(10);
-	fHeightConstraint->SetPenaltyNeg(10);
-	fHeightConstraint->SetPenaltyPos(10);
+	fWidthConstraint->SetPenaltyNeg(kExtentPenalty);
+	fWidthConstraint->SetPenaltyPos(kExtentPenalty);
+	fHeightConstraint->SetPenaltyNeg(kExtentPenalty);
+	fHeightConstraint->SetPenaltyPos(kExtentPenalty);
 
 	fLeftConstraint->SetPenaltyNeg(1);
 	fLeftConstraint->SetPenaltyPos(1);
@@ -118,17 +122,8 @@ GroupCookie::MoveWindow(int32 workspace)
 		fTopBorder->Value() - frame.top);
 	desktop->ResizeWindowBy(window, fRightBorder->Value() - frame.right,
 		fBottomBorder->Value() - frame.bottom);
-}
 
-
-void
-GroupCookie::UpdateWindowSize()
-{
-	BRect frame = fSATWindow->CompleteWindowFrame();
-
-	// adjust window size soft constraints
-	fWidthConstraint->SetRightSide(frame.Width());
-	fHeightConstraint->SetRightSide(frame.Height());
+	_UpdateWindowSize(frame);
 }
 
 
@@ -167,15 +162,17 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 		fRightBorder, OperatorType(LE), -minWidth);
 	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fTopBorder, -1.0,
 		fBottomBorder, OperatorType(LE), -minHeight);
-
+	
 	// The width and height constraints have higher penalties than the
 	// position constraints (left, top), so a window will keep its size
 	// unless explicitly resized.
 	fWidthConstraint = linearSpec->AddConstraint(-1.0, fLeftBorder, 1.0,
-		fRightBorder, OperatorType(EQ), frame.Width(), 10, 10);
+		fRightBorder, OperatorType(EQ), frame.Width(), kExtentPenalty,
+		kExtentPenalty);
 	fHeightConstraint = linearSpec->AddConstraint(-1.0, fTopBorder, 1.0,
-		fBottomBorder, OperatorType(EQ), frame.Height(), 10, 10);
-	
+		fBottomBorder, OperatorType(EQ), frame.Height(), kExtentPenalty,
+		kExtentPenalty);
+
 	if (!fLeftConstraint || !fTopConstraint || !fMinWidthConstraint
 		|| !fMinHeightConstraint || !fWidthConstraint || !fHeightConstraint) {
 		// clean up
@@ -256,6 +253,15 @@ GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
 }
 
 
+void
+GroupCookie::_UpdateWindowSize(const BRect& frame)
+{
+	// adjust window size soft constraints
+	fWidthConstraint->SetRightSide(frame.Width());
+	fHeightConstraint->SetRightSide(frame.Height());
+}
+
+
 SATWindow::SATWindow(StackAndTile* sat, Window* window)
 	:
 	fWindow(window),
@@ -324,29 +330,6 @@ bool
 SATWindow::PropagateToGroup(SATGroup* group, WindowArea* area)
 {
 	return fGroupCookie->PropagateToGroup(group, area);
-}
-
-
-void
-SATWindow::UpdateGroupWindowsSize()
-{
-	SATGroup* group = GetGroup();
-	if (!group)
-		return;
-
-	for (int i = 0; i < group->CountItems(); i++) {
-		SATWindow* window = group->WindowAt(i);
-		if (window == this)
-			continue;
-		window->UpdateWindowSize();
-	}
-}
-
-
-void
-SATWindow::UpdateWindowSize()
-{
-	fGroupCookie->UpdateWindowSize();
 }
 
 
