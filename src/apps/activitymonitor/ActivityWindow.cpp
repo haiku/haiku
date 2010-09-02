@@ -44,7 +44,7 @@ ActivityWindow::ActivityWindow()
 	}
 
 #ifdef __HAIKU__
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
 	SetLayout(layout);
 
 	// create GUI
