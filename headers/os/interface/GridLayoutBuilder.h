@@ -9,9 +9,9 @@
 
 class BGridLayoutBuilder {
 public:
-								BGridLayoutBuilder(
-									float horizontalSpacing = 0.0f,
-									float verticalSpacing = 0.0f);
+								BGridLayoutBuilder(float horizontal
+										= B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING);
 								BGridLayoutBuilder(BGridLayout* layout);
 								BGridLayoutBuilder(BGridView* view);
 

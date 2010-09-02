@@ -10,7 +10,7 @@
 class BGroupLayout : public BTwoDimensionalLayout {
 public:
 								BGroupLayout(enum orientation orientation,
-									float spacing = 0.0f);
+									float spacing = B_USE_DEFAULT_SPACING);
 								BGroupLayout(BMessage* from);
 	virtual						~BGroupLayout();
 

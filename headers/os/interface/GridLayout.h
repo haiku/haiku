@@ -10,8 +10,9 @@
 
 class BGridLayout : public BTwoDimensionalLayout {
 public:
-								BGridLayout(float horizontal = 0.0f,
-									float vertical = 0.0f);
+								BGridLayout(float horizontal
+										= B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING);
 								BGridLayout(BMessage* from);
 	virtual						~BGridLayout();
 

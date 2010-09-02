@@ -50,6 +50,18 @@ BControlLook::DefaultItemSpacing() const
 }
 
 
+float
+BControlLook::ComposeItemSpacing(float spacing)
+{
+	if (spacing != B_USE_DEFAULT_SPACING)
+		return spacing;
+
+	if (be_control_look)
+		return be_control_look->DefaultItemSpacing();
+	return 0;
+}
+
+
 uint32
 BControlLook::Flags(BControl* control) const
 {

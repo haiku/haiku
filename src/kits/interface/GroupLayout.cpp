@@ -7,6 +7,7 @@
 
 #include <GroupLayout.h>
 
+#include <ControlLook.h>
 #include <LayoutItem.h>
 #include <Message.h>
 
@@ -67,6 +68,7 @@ BGroupLayout::Spacing() const
 void
 BGroupLayout::SetSpacing(float spacing)
 {
+	spacing = BControlLook::ComposeItemSpacing(spacing);
 	if (spacing != fHSpacing) {
 		fHSpacing = spacing;
 		fVSpacing = spacing;

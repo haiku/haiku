@@ -13,7 +13,7 @@ class BGroupLayoutBuilder {
 public:
 								BGroupLayoutBuilder(
 									enum orientation orientation = B_HORIZONTAL,
-									float spacing = 0.0f);
+									float spacing = B_USE_DEFAULT_SPACING);
 								BGroupLayoutBuilder(BGroupLayout* layout);
 								BGroupLayoutBuilder(BGroupView* view);
 
@@ -29,7 +29,8 @@ public:
 			BGroupLayoutBuilder& Add(BLayoutItem* item, float weight);
 
 			BGroupLayoutBuilder& AddGroup(enum orientation orientation,
-									float spacing = 0.0f, float weight = 1.0f);
+									float spacing = B_USE_DEFAULT_SPACING,
+									float weight = 1.0f);
 			BGroupLayoutBuilder& End();
 
 			BGroupLayoutBuilder& AddGlue(float weight = 1.0f);

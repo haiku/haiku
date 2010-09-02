@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <ControlLook.h>
 #include <LayoutContext.h>
 #include <LayoutItem.h>
 #include <LayoutUtils.h>
@@ -286,10 +287,10 @@ void
 BTwoDimensionalLayout::SetInsets(float left, float top, float right,
 	float bottom)
 {
-	fLeftInset = left;
-	fTopInset = top;
-	fRightInset = right;
-	fBottomInset = bottom;
+	fLeftInset = BControlLook::ComposeItemSpacing(left);
+	fTopInset = BControlLook::ComposeItemSpacing(top);
+	fRightInset = BControlLook::ComposeItemSpacing(right);
+	fBottomInset = BControlLook::ComposeItemSpacing(bottom);
 
 	InvalidateLayout();
 }

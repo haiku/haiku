@@ -223,6 +223,8 @@ enum vertical_alignment {
 	B_ALIGN_USE_FULL_HEIGHT		= -2L
 };
 
+const float B_USE_DEFAULT_SPACING = -2.0f;
+
 
 // Line join and cap modes
 

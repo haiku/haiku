@@ -51,10 +51,10 @@ public:
 public:
 	inline						Group(enum orientation orientation
 										= B_HORIZONTAL,
-									float spacing = 0.0f);
+									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Group(BWindow* window,
 									enum orientation orientation = B_HORIZONTAL,
-									float spacing = 0.0f);
+									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Group(BGroupLayout* layout);
 	inline						Group(BGroupView* view);
 
@@ -69,14 +69,16 @@ public:
 	inline	ThisBuilder&		Add(BLayoutItem* item, float weight);
 
 	inline	GroupBuilder		AddGroup(enum orientation orientation,
-									float spacing = 0.0f, float weight = 1.0f);
+									float spacing = B_USE_DEFAULT_SPACING,
+									float weight = 1.0f);
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,
 									float weight = 1.0f);
 	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout,
 									float weight = 1.0f);
 
-	inline	GridBuilder			AddGrid(float horizontalSpacing = 0.0f,
-									float verticalSpacing = 0.0f,
+	inline	GridBuilder			AddGrid(float horizontal
+										= B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING,
 									float weight = 1.0f);
 	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
 									float weight = 1.0f);
@@ -84,7 +86,8 @@ public:
 									float weight = 1.0f);
 
 	inline	SplitBuilder		AddSplit(enum orientation orientation,
-									float spacing = 0.0f, float weight = 1.0f);
+									float spacing = B_USE_DEFAULT_SPACING,
+									float weight = 1.0f);
 	inline	SplitBuilder		AddSplit(BSplitView* splitView,
 									float weight = 1.0f);
 
@@ -110,11 +113,12 @@ public:
 	typedef Split<ThisBuilder>		SplitBuilder;
 
 public:
-	inline						Grid(float horizontalSpacing = 0.0f,
-									float verticalSpacing = 0.0f);
+	inline						Grid(float horizontal
+										= B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING);
 	inline						Grid(BWindow* window,
-									float horizontalSpacing = 0.0f,
-									float verticalSpacing = 0.0f);
+									float horizontal = B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING);
 	inline						Grid(BGridLayout* layout);
 	inline						Grid(BGridView* view);
 
@@ -190,7 +194,7 @@ public:
 public:
 	inline						Split(enum orientation orientation
 										= B_HORIZONTAL,
-									float spacing = 0.0f);
+									float spacing = B_USE_DEFAULT_SPACING);
 	inline						Split(BSplitView* view);
 
 	inline	BSplitView*			View() const;
@@ -203,14 +207,16 @@ public:
 	inline	ThisBuilder&		Add(BLayoutItem* item, float weight);
 
 	inline	GroupBuilder		AddGroup(enum orientation orientation,
-									float spacing = 0.0f, float weight = 1.0f);
+									float spacing = B_USE_DEFAULT_SPACING,
+									float weight = 1.0f);
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,
 									float weight = 1.0f);
 	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout,
 									float weight = 1.0f);
 
-	inline	GridBuilder			AddGrid(float horizontalSpacing = 0.0f,
-									float verticalSpacing = 0.0f,
+	inline	GridBuilder			AddGrid(float horizontal
+											= B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING,
 									float weight = 1.0f);
 	inline	GridBuilder			AddGrid(BGridView* gridView,
 									float weight = 1.0f);
@@ -218,7 +224,8 @@ public:
 									float weight = 1.0f);
 
 	inline	SplitBuilder		AddSplit(enum orientation orientation,
-									float spacing = 0.0f, float weight = 1.0f);
+									float spacing = B_USE_DEFAULT_SPACING,
+									float weight = 1.0f);
 	inline	SplitBuilder		AddSplit(BSplitView* splitView,
 									float weight = 1.0f);
 

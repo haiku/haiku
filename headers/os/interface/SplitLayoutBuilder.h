@@ -11,7 +11,7 @@ class BSplitLayoutBuilder {
 public:
 								BSplitLayoutBuilder(
 									enum orientation orientation = B_HORIZONTAL,
-									float spacing = 0.0f);
+									float spacing = B_USE_DEFAULT_SPACING);
 								BSplitLayoutBuilder(BSplitView* view);
 
 			BSplitView*			SplitView() const;

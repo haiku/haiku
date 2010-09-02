@@ -9,6 +9,7 @@
 #include <new>
 #include <stdio.h>
 
+#include <ControlLook.h>
 #include <LayoutItem.h>
 #include <LayoutUtils.h>
 #include <Message.h>
@@ -161,7 +162,7 @@ BSplitLayout::BSplitLayout(enum orientation orientation,
 	fTopInset(0),
 	fBottomInset(0),
 	fSplitterSize(6),
-	fSpacing(spacing),
+	fSpacing(BControlLook::ComposeItemSpacing(spacing)),
 
 	fSplitterItems(),
 	fVisibleItems(),
@@ -259,10 +260,10 @@ BSplitLayout::~BSplitLayout()
 void
 BSplitLayout::SetInsets(float left, float top, float right, float bottom)
 {
-	fLeftInset = left;
-	fTopInset = top;
-	fRightInset = right;
-	fBottomInset = bottom;
+	fLeftInset = BControlLook::ComposeItemSpacing(left);
+	fTopInset = BControlLook::ComposeItemSpacing(top);
+	fRightInset = BControlLook::ComposeItemSpacing(right);
+	fBottomInset = BControlLook::ComposeItemSpacing(bottom);
 
 	InvalidateLayout();
 }
@@ -293,6 +294,7 @@ BSplitLayout::Spacing() const
 void
 BSplitLayout::SetSpacing(float spacing)
 {
+	spacing = BControlLook::ComposeItemSpacing(spacing);
 	if (spacing != fSpacing) {
 		fSpacing = spacing;
 

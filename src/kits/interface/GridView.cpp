@@ -16,6 +16,15 @@ BGridView::BGridView(float horizontalSpacing, float verticalSpacing)
 }
 
 
+BGridView::BGridView(const char* name, float horizontalSpacing,
+	float verticalSpacing)
+	:
+	BView(name, 0, new BGridLayout(horizontalSpacing, verticalSpacing))
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+
+
 BGridView::BGridView(BMessage* from)
 	:
 	BView(from)

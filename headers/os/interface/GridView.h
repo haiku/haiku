@@ -11,8 +11,12 @@
 
 class BGridView : public BView {
 public:
-								BGridView(float horizontalSpacing = 0.0f,
-									float verticalSpacing = 0.0f);
+								BGridView(float horizontal
+										= B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING);
+								BGridView(const char* name,
+									float horizontal = B_USE_DEFAULT_SPACING,
+									float vertical = B_USE_DEFAULT_SPACING);
 								BGridView(BMessage* from);
 	virtual						~BGridView();
 

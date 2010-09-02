@@ -15,7 +15,7 @@ public:
 								BSplitView(
 									enum orientation orientation
 										= B_HORIZONTAL,
-									float spacing = 0.0f);
+									float spacing = B_USE_DEFAULT_SPACING);
 								BSplitView(BMessage* from);
 	virtual						~BSplitView();
 

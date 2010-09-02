@@ -11,6 +11,7 @@
 #include <new>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <LayoutItem.h>
 #include <List.h>
 #include <Message.h>
@@ -252,6 +253,7 @@ BGridLayout::VerticalSpacing() const
 void
 BGridLayout::SetHorizontalSpacing(float spacing)
 {
+	spacing = BControlLook::ComposeItemSpacing(spacing);
 	if (spacing != fHSpacing) {
 		fHSpacing = spacing;
 
@@ -263,6 +265,7 @@ BGridLayout::SetHorizontalSpacing(float spacing)
 void
 BGridLayout::SetVerticalSpacing(float spacing)
 {
+	spacing = BControlLook::ComposeItemSpacing(spacing);
 	if (spacing != fVSpacing) {
 		fVSpacing = spacing;
 
@@ -274,6 +277,8 @@ BGridLayout::SetVerticalSpacing(float spacing)
 void
 BGridLayout::SetSpacing(float horizontal, float vertical)
 {
+	horizontal = BControlLook::ComposeItemSpacing(horizontal);
+	vertical = BControlLook::ComposeItemSpacing(vertical);
 	if (horizontal != fHSpacing || vertical != fVSpacing) {
 		fHSpacing = horizontal;
 		fVSpacing = vertical;
