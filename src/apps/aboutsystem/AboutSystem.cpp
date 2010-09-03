@@ -591,9 +591,9 @@ AboutView::AboutView()
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
-		.AddGroup(B_VERTICAL)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(new LogoView())
-			.AddGroup(B_VERTICAL)
+			.AddGroup(B_VERTICAL, 0)
 				.Add(_CreateLabel("oslabel", B_TRANSLATE("Version:")))
 				.Add(versionView)
 				.Add(gccView)
