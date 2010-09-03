@@ -271,8 +271,6 @@ MediaTrackAudioSupplier::_InitFromTrack()
 
 		TRACE("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
 			fHasKeyFrames, fCountFrames);
-		printf("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
-			fHasKeyFrames, fCountFrames);
 	} else
 		fMediaTrack = NULL;
 }
