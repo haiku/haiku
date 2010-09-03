@@ -577,7 +577,7 @@ ioapic_init(kernel_args* args)
 	if (sIOAPIC == NULL)
 		return;
 
-	if (!get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, true)) {
+	if (get_safemode_boolean(B_SAFEMODE_DISABLE_IOAPIC, true)) {
 		dprintf("ioapic explicitly disabled, not using ioapics for interrupt "
 			"routing\n");
 		return;
@@ -588,9 +588,6 @@ ioapic_init(kernel_args* args)
 		dprintf("ioapic seems inaccessible, not using it\n");
 		return;
 	}
-
-// disable io apic for now
-return;
 
 	// load acpi module
 	status_t status;
