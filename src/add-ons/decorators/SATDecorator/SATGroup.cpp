@@ -18,6 +18,8 @@
 WindowArea::WindowArea(Crossing* leftTop, Crossing* rightTop,
 	Crossing* leftBottom, Crossing* rightBottom)
 	:
+	fGroup(NULL),
+
 	fLeftTopCrossing(leftTop),
 	fRightTopCrossing(rightTop),
 	fLeftBottomCrossing(leftBottom),
@@ -27,9 +29,24 @@ WindowArea::WindowArea(Crossing* leftTop, Crossing* rightTop,
 }
 
 
+bool
+WindowArea::SetGroup(SATGroup* group)
+{
+	if (group && !group->fWindowAreaList.AddItem(this))
+		return false;
+
+	if (fGroup)
+		fGroup->fWindowAreaList.RemoveItem(this);
+
+	fGroup = group;
+	return true;
+}
+
+
 WindowArea::~WindowArea()
 {
 	_CleanupCorners();
+	SetGroup(NULL);
 }
 
 
@@ -613,6 +630,11 @@ SATGroup::AddWindow(SATWindow* window, Tab* left, Tab* top, Tab* right,
 		leftBottomRef, rightBottomRef);
 	if (!area)
 		return false;
+	// the area register itself in our area list
+	if (!area->SetGroup(this)) {
+		delete area;
+		return false;
+	}
 	// delete the area if AddWindow failed / release our reference on it
 	BReference<WindowArea> areaRef(area, true);
 
@@ -649,8 +671,9 @@ SATGroup::RemoveWindow(SATWindow* window)
 
 	_SplitGroupIfNecessary(window);
 
-	if (window->GetWindowArea())
-		window->GetWindowArea()->_RemoveWindow(window);
+	WindowArea* area = window->GetWindowArea();
+	if (area)
+		area->_RemoveWindow(window);
 
 	for (int i = 0; i < CountItems(); i++)
 		WindowAt(i)->DoGroupLayout();

@@ -162,7 +162,7 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 		fRightBorder, OperatorType(LE), -minWidth);
 	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fTopBorder, -1.0,
 		fBottomBorder, OperatorType(LE), -minHeight);
-	
+
 	// The width and height constraints have higher penalties than the
 	// position constraints (left, top), so a window will keep its size
 	// unless explicitly resized.
@@ -179,7 +179,7 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 		Uninit();
 		return false;
 	}
-	
+
 	fLeftBorderConstraint = area->LeftTab()->Connect(fLeftBorder);
 	fTopBorderConstraint = area->TopTab()->Connect(fTopBorder);
 	fRightBorderConstraint = area->RightTab()->Connect(fRightBorder);
@@ -244,7 +244,7 @@ GroupCookie::PropagateToGroup(SATGroup* group, WindowArea* area)
 	if (!Init(group, area))
 		return false;
 
-	if (!group->fSATWindowList.AddItem(fSATWindow)) {
+	if (!area->SetGroup(group) || !group->fSATWindowList.AddItem(fSATWindow)) {
 		Uninit();
 		return false;
 	}

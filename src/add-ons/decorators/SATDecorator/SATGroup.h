@@ -130,6 +130,8 @@ public:
 									Crossing* rightBottom);
 								~WindowArea();
 
+		bool					SetGroup(SATGroup* group);
+
 		const SATWindowList&	WindowList() { return fWindowList; }
 		bool					MoveWindowToPosition(SATWindow* window,
 									int32 index);
@@ -173,6 +175,8 @@ private:
 		// Find crossing by tab position in group and if not exist create it.
 		BReference<Crossing>	_CrossingByPosition(Crossing* crossing,
 									SATGroup* group);
+
+		SATGroup*				fGroup;
 
 		SATWindowList			fWindowList;
 
@@ -252,6 +256,7 @@ private:
 								BRect& screen);
 
 protected:
+		WindowAreaList		fWindowAreaList;
 		SATWindowList		fSATWindowList;
 
 		LinearSpec			fLinearSpec;
