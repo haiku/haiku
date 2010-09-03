@@ -25,19 +25,7 @@ class BMediaRoster;
 enum {
 	msg_filename	= 'file',
 
-	msg_rate_15s	= 'r15s',
-	msg_rate_30s	= 'r30s',
-	msg_rate_1m		= 'r1m ',
-	msg_rate_5m		= 'r5m ',
-	msg_rate_10m	= 'r10m',
-	msg_rate_15m	= 'r15m',
-	msg_rate_30m	= 'r30m',
-	msg_rate_1h		= 'r1h ',	
-	msg_rate_2h		= 'r2h ',	
-	msg_rate_4h		= 'r4h ',	
-	msg_rate_8h		= 'r8h ',	
-	msg_rate_24h	= 'r24h',
-	msg_rate_never	= 'nevr',	
+	msg_rate_changed = 'rate',
 
 	msg_translate	= 'tran',
 
@@ -60,32 +48,42 @@ enum {
 };
 
 
-const char* kCaptureRate[] = {
-	// NOTE: These are translated once the app catalog is loaded.
-	"Every 15 seconds",
-	"Every 30 seconds",
-	"Every minute",
-	"Every 5 minutes",
-	"Every 10 minutes",
-	"Every 15 minutes",
-	"Every 30 minutes",
-	"Every hour",
-	"Every 2 hours",
-	"Every 4 hours",
-	"Every 8 hours",
-	"Every 24 hours",
-	"Never",	
-	0
+struct capture_rate {
+	const char* name;
+	time_t		seconds;
 };
 
 
-const char* kUploadClient[] = {
+// NOTE: These are translated once the app catalog is loaded.
+capture_rate kCaptureRates[] = {
+	{"Every 15 seconds", 15 },
+	{"Every 30 seconds", 30 },
+	{"Every minute", 60 },
+	{"Every 5 minutes", 5 * 60 },
+	{"Every 10 minutes", 10 * 60 },
+	{"Every 15 minutes", 15 * 60 },
+	{"Every 30 minutes", 30 * 60 },
+	{"Every hour", 60 * 60 },
+	{"Every 2 hours", 2 * 60 * 60 },
+	{"Every 4 hours", 4 * 60 * 60 },
+	{"Every 8 hours", 8 * 60 * 60 },
+	{"Every 24 hours", 24 * 60 * 60 },
+	{"Never", 0 }
+};
+
+
+const int32 kCaptureRatesCount = sizeof(kCaptureRates) / sizeof(capture_rate);
+
+
+const char* kUploadClients[] = {
 	// NOTE: These are translated once the app catalog is loaded.
 	"FTP",
 	"SFTP",
-	"Local",
-	0
+	"Local"
 };
+
+
+const int32 kUploadClientsCount = sizeof(kUploadClients) / sizeof(char*);
 
 
 class CodyCam : public BApplication {
@@ -129,7 +127,7 @@ public:
 			BStringView*	StatusLine();
 
 private:
-			void			_BuildCaptureControls(BView* theView);
+			void			_BuildCaptureControls();
 
 			void			_SetUpSettings(const char* filename,
 								const char* dirname);
@@ -140,7 +138,6 @@ private:
 			media_node*		fProducer;
 			port_id*		fPortPtr;
 
-			BView*			fView;
 			BView*			fVideoView;
 
 			BTextControl*	fFileName;

@@ -16,9 +16,11 @@
 Settings* settings = NULL;
 
 
-StringValueSetting::StringValueSetting(const char* name, const char* defaultValue,
-	const char* valueExpectedErrorString, const char* wrongValueErrorString)
-	: SettingsArgvDispatcher(name),
+StringValueSetting::StringValueSetting(const char* name,
+	const char* defaultValue, const char* valueExpectedErrorString,
+	const char* wrongValueErrorString)
+	:
+	SettingsArgvDispatcher(name),
 	fDefaultValue(defaultValue),
 	fValueExpectedErrorString(valueExpectedErrorString),
 	fWrongValueErrorString(wrongValueErrorString),
@@ -55,7 +57,7 @@ StringValueSetting::Value() const
 void 
 StringValueSetting::SaveSettingValue(Settings* settings)
 {
-	printf("-------StringValueSetting::SaveSettingValue %s %s\n", Name(), fValue);
+	printf("-----StringValueSetting::SaveSettingValue %s %s\n", Name(), fValue);
 	settings->Write("\"%s\"", fValue);
 }
 
@@ -83,11 +85,13 @@ StringValueSetting::Handle(const char *const *argv)
 
 
 EnumeratedStringValueSetting::EnumeratedStringValueSetting(const char* name,
-	const char* defaultValue, const char *const *values,
+	const char* defaultValue, StringEnumerator enumerator,
 	const char* valueExpectedErrorString,
 	const char* wrongValueErrorString)
-	: StringValueSetting(name, defaultValue, valueExpectedErrorString, wrongValueErrorString),
-	fValues(values)
+	:
+	StringValueSetting(name, defaultValue, valueExpectedErrorString,
+		wrongValueErrorString),
+	fEnumerator(enumerator)
 {
 }
 
@@ -97,16 +101,7 @@ EnumeratedStringValueSetting::ValueChanged(const char* newValue)
 {
 #if DEBUG
 	// must be one of the enumerated values
-	bool found = false;
-	for (int32 index = 0; ; index++) {
-		if (!fValues[index])
-			break;
-		if (strcmp(fValues[index], newValue) != 0) 
-			continue;
-		found = true;
-		break;
-	}
-	ASSERT(found);
+	ASSERT(_ValidateString(newValue));
 #endif
 	StringValueSetting::ValueChanged(newValue);
 }
@@ -118,22 +113,26 @@ EnumeratedStringValueSetting::Handle(const char *const *argv)
 	if (!*++argv) 
 		return fValueExpectedErrorString;
 
-	printf("-----EnumeratedStringValueSetting::Handle %s %s\n", *(argv-1), *argv);
-	bool found = false;
-	for (int32 index = 0; ; index++) {
-		if (!fValues[index])
-			break;
-		if (strcmp(fValues[index], *argv) != 0) 
-			continue;
-		found = true;
-		break;
-	}	
-				
-	if (!found)
+	printf("---EnumeratedStringValueSetting::Handle %s %s\n", *(argv-1), *argv);
+	if (!_ValidateString(*argv))
 		return fWrongValueErrorString;
 	
 	ValueChanged(*argv);	
 	return 0;
+}
+
+
+bool
+EnumeratedStringValueSetting::_ValidateString(const char* string)
+{
+	for (int32 i = 0;; i++) {
+		const char* enumString = fEnumerator(i);
+		if (!enumString)
+			return false;
+		if (strcmp(enumString, string) == 0)
+			return true;
+	}
+	return false;
 }
 
 

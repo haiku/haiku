@@ -6,9 +6,7 @@
 
 #include <Alert.h>
 #include <Button.h>
-#include <GridLayout.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <MediaRoster.h>
@@ -18,7 +16,6 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <scheduler.h>
-#include <SpaceLayoutItem.h>
 #include <TabView.h>
 #include <TextControl.h>
 #include <TimeSource.h>
@@ -46,9 +43,6 @@ const int32 kMenuHeight = 15;
 const int32 kButtonHeight = 15;
 const int32 kSliderViewRectHeight = 40;
 
-static void ErrorAlert(const char* message, status_t err, BWindow *window);
-static status_t AddTranslationItems(BMenu* intoMenu, uint32 fromType);
-
 #define	CALL		printf
 #define ERROR		printf
 #define FTPINFO		printf
@@ -57,7 +51,9 @@ static status_t AddTranslationItems(BMenu* intoMenu, uint32 fromType);
 
 // Utility functions
 
-static void
+namespace {
+
+void
 ErrorAlert(const char* message, status_t err, BWindow *window = NULL)
 {
 	BAlert *alert = new BAlert("", message, B_TRANSLATE("OK"));
@@ -121,11 +117,30 @@ AddTranslationItems(BMenu* intoMenu, uint32 fromType)
 }
 
 
+// functions for EnumeratedStringValueSettings
+
+const char* CaptureRateAt(int32 i)
+{
+	return (i >= 0 && i < kCaptureRatesCount) ? kCaptureRates[i].name : NULL;
+}
+
+
+const char* UploadClientAt(int32 i)
+{
+	return (i >= 0 && i < kUploadClientsCount) ? kUploadClients[i] : NULL;
+}
+
+
+}; // end anonymous namespace
+
+
+
 //	#pragma mark -
 
 
 CodyCam::CodyCam()
-	: BApplication("application/x-vnd.Haiku.CodyCam"),
+	:
+	BApplication("application/x-vnd.Haiku.CodyCam"),
 	fMediaRoster(NULL),
 	fVideoConsumer(NULL),
 	fWindow(NULL),
@@ -133,24 +148,24 @@ CodyCam::CodyCam()
 	fVideoControlWindow(NULL)
 {
 	int32 index = 0;
-	kCaptureRate[index++] = B_TRANSLATE("Every 15 seconds");
-	kCaptureRate[index++] = B_TRANSLATE("Every 30 seconds");
-	kCaptureRate[index++] = B_TRANSLATE("Every minute");
-	kCaptureRate[index++] = B_TRANSLATE("Every 5 minutes");
-	kCaptureRate[index++] = B_TRANSLATE("Every 10 minutes");
-	kCaptureRate[index++] = B_TRANSLATE("Every 15 minutes");
-	kCaptureRate[index++] = B_TRANSLATE("Every 30 minutes");
-	kCaptureRate[index++] = B_TRANSLATE("Every hour");
-	kCaptureRate[index++] = B_TRANSLATE("Every 2 hours");
-	kCaptureRate[index++] = B_TRANSLATE("Every 4 hours");
-	kCaptureRate[index++] = B_TRANSLATE("Every 8 hours");
-	kCaptureRate[index++] = B_TRANSLATE("Every 24 hours");
-	kCaptureRate[index++] = B_TRANSLATE("Never");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 15 seconds");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 30 seconds");
+	kCaptureRates[index++].name = B_TRANSLATE("Every minute");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 5 minutes");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 10 minutes");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 15 minutes");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 30 minutes");
+	kCaptureRates[index++].name = B_TRANSLATE("Every hour");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 2 hours");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 4 hours");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 8 hours");
+	kCaptureRates[index++].name = B_TRANSLATE("Every 24 hours");
+	kCaptureRates[index++].name = B_TRANSLATE("Never");
 
 	index = 0;
-	kUploadClient[index++] = B_TRANSLATE("FTP");
-	kUploadClient[index++] = B_TRANSLATE("SFTP");
-	kUploadClient[index++] = B_TRANSLATE("Local");
+	kUploadClients[index++] = B_TRANSLATE("FTP");
+	kUploadClients[index++] = B_TRANSLATE("SFTP");
+	kUploadClients[index++] = B_TRANSLATE("Local");
 
 	chdir("/boot/home");
 }
@@ -454,7 +469,6 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 	:
 	BWindow(frame, title, type, flags),
 	fPortPtr(consumerPort),
-	fView(NULL),
 	fVideoView(NULL)
 {
 	fFtpInfo.port = 0;
@@ -509,16 +523,21 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 
 	menuBar->AddItem(menu);
 
-	/* give it a gray background view */
-	fView = new BView(B_TRANSLATE("Background View"), B_WILL_DRAW);
- 	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	/* add some controls */
-	_BuildCaptureControls(fView);
+	_BuildCaptureControls();
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(menuBar);
-	AddChild(fView);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, 0, 0, 0)
+		.Add(menuBar)
+		.AddGroup(B_VERTICAL, kYBuffer)
+			.SetInsets(kXBuffer, kYBuffer, kXBuffer, kYBuffer)
+			.Add(fVideoView)
+			.AddGroup(B_HORIZONTAL, kXBuffer)
+				.SetInsets(0, 0, 0, 0)
+				.Add(fCaptureSetupBox)
+				.Add(fFtpSetupBox)
+				.End()
+			.Add(fStatusLine);
 
 	Show();
 }
@@ -549,75 +568,24 @@ VideoWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case msg_filename:
 			if (control != NULL) {
-				strncpy(fFtpInfo.fileNameText, ((BTextControl*)control)->Text(), 63);
+				strncpy(fFtpInfo.fileNameText,
+					((BTextControl*)control)->Text(), 63);
 				FTPINFO("file is '%s'\n", fFtpInfo.fileNameText);
 			}
 			break;
 
-		case msg_rate_15s:
-			FTPINFO("fifteen seconds\n");
-			fFtpInfo.rate = (bigtime_t)(15 * 1000000);
+		case msg_rate_changed: {
+			int32 seconds;
+			message->FindInt32("seconds", &seconds);
+			if (seconds == 0) {
+				FTPINFO("never\n");
+				fFtpInfo.rate = (bigtime_t)(B_INFINITE_TIMEOUT);
+			} else {
+				FTPINFO("%ld seconds\n", (long)seconds);
+				fFtpInfo.rate = (bigtime_t)(seconds * 1000000LL);
+			}
 			break;
-
-		case msg_rate_30s:
-			FTPINFO("thirty seconds\n");
-			fFtpInfo.rate = (bigtime_t)(30 * 1000000);
-			break;
-
-		case msg_rate_1m:
-			FTPINFO("one minute\n");
-			fFtpInfo.rate = (bigtime_t)(1 * 60 * 1000000);
-			break;
-
-		case msg_rate_5m:
-			FTPINFO("five minute\n");
-			fFtpInfo.rate = (bigtime_t)(5 * 60 * 1000000);
-			break;
-
-		case msg_rate_10m:
-			FTPINFO("ten minute\n");
-			fFtpInfo.rate = (bigtime_t)(10 * 60 * 1000000);
-			break;
-
-		case msg_rate_15m:
-			FTPINFO("fifteen minute\n");
-			fFtpInfo.rate = (bigtime_t)(15 * 60 * 1000000);
-			break;
-
-		case msg_rate_30m:
-			FTPINFO("thirty minute\n");
-			fFtpInfo.rate = (bigtime_t)(30 * 60 * 1000000);
-			break;
-
-		case msg_rate_1h:
-			FTPINFO("one hour\n");
-			fFtpInfo.rate = (bigtime_t)(60LL * 60LL * 1000000LL);
-			break;
-
-		case msg_rate_2h:
-			FTPINFO("two hour\n");
-			fFtpInfo.rate = (bigtime_t)(2LL * 60LL * 60LL * 1000000LL);
-			break;
-
-		case msg_rate_4h:
-			FTPINFO("four hour\n");
-			fFtpInfo.rate = (bigtime_t)(4LL * 60LL * 60LL * 1000000LL);
-			break;
-
-		case msg_rate_8h:
-			FTPINFO("eight hour\n");
-			fFtpInfo.rate = (bigtime_t)(8LL * 60LL * 60LL * 1000000LL);
-			break;
-
-		case msg_rate_24h:
-			FTPINFO("24 hour\n");
-			fFtpInfo.rate = (bigtime_t)(24LL * 60LL * 60LL * 1000000LL);
-			break;
-
-		case msg_rate_never:
-			FTPINFO("never\n");
-			fFtpInfo.rate = (bigtime_t)(B_INFINITE_TIMEOUT);
-			break;
+		}
 
 		case msg_translate:
 			message->FindInt32("be:type", (int32*)&(fFtpInfo.imageFormat));
@@ -632,28 +600,32 @@ VideoWindow::MessageReceived(BMessage* message)
 
 		case msg_server:
 			if (control != NULL) {
-				strncpy(fFtpInfo.serverText, ((BTextControl*)control)->Text(), 64);
+				strncpy(fFtpInfo.serverText,
+					((BTextControl*)control)->Text(), 64);
 				FTPINFO("server = '%s'\n", fFtpInfo.serverText);
 			}
 			break;
 
 		case msg_login:
 			if (control != NULL) {
-				strncpy(fFtpInfo.loginText, ((BTextControl*)control)->Text(), 64);
+				strncpy(fFtpInfo.loginText,
+					((BTextControl*)control)->Text(), 64);
 				FTPINFO("login = '%s'\n", fFtpInfo.loginText);
 			}
 			break;
 
 		case msg_password:
 			if (control != NULL) {
-				strncpy(fFtpInfo.passwordText, ((BTextControl*)control)->Text(), 64);
+				strncpy(fFtpInfo.passwordText,
+					((BTextControl*)control)->Text(), 64);
 				FTPINFO("password = '%s'\n", fFtpInfo.passwordText);
 			}
 			break;
 
 		case msg_directory:
 			if (control != NULL) {
-				strncpy(fFtpInfo.directoryText, ((BTextControl*)control)->Text(), 64);
+				strncpy(fFtpInfo.directoryText,
+					((BTextControl*)control)->Text(), 64);
 				FTPINFO("directory = '%s'\n", fFtpInfo.directoryText);
 			}
 			break;
@@ -692,7 +664,7 @@ VideoWindow::StatusLine()
 
 
 void
-VideoWindow::_BuildCaptureControls(BView* theView)
+VideoWindow::_BuildCaptureControls()
 {
 	// a view to hold the video image
 	fVideoView = new BView("Video View", B_WILL_DRAW);
@@ -707,10 +679,12 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	controlsLayout->SetInsets(10, 15, 5, 5);
 	fCaptureSetupBox->SetLayout(controlsLayout);
 
+	// file name
 	fFileName = new BTextControl("File Name", B_TRANSLATE("File name:"),
 		fFilenameSetting->Value(), new BMessage(msg_filename));
 	fFileName->SetTarget(BMessenger(NULL, this));
 
+	// format menu
 	fImageFormatMenu = new BPopUpMenu(B_TRANSLATE("Image Format Menu"));
 	AddTranslationItems(fImageFormatMenu, B_TRANSLATOR_BITMAP);
 	fImageFormatMenu->SetTargetForItems(this);
@@ -727,58 +701,33 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	fImageFormatSelector = new BMenuField("Format", B_TRANSLATE("Format:"),
 		fImageFormatMenu, NULL);
 
+	// capture rate
 	fCaptureRateMenu = new BPopUpMenu(B_TRANSLATE("Capture Rate Menu"));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[0],
-		new BMessage(msg_rate_15s)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[1],
-		new BMessage(msg_rate_30s)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[2],
-		new BMessage(msg_rate_1m)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[3],
-		new BMessage(msg_rate_5m)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[4],
-		new BMessage(msg_rate_10m)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[5],
-		new BMessage(msg_rate_15m)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[6],
-		new BMessage(msg_rate_30m)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[7],
-		new BMessage(msg_rate_1h)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[8],
-		new BMessage(msg_rate_2h)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[9],
-		new BMessage(msg_rate_4h)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[10],
-		new BMessage(msg_rate_8h)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[11],
-		new BMessage(msg_rate_24h)));
-	fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRate[12],
-		new BMessage(msg_rate_never)));
+	for (int32 i = 0; i < kCaptureRatesCount; i++) {
+		BMessage* itemMessage = new BMessage(msg_rate_changed);
+		itemMessage->AddInt32("seconds", kCaptureRates[i].seconds);
+		fCaptureRateMenu->AddItem(new BMenuItem(kCaptureRates[i].name,
+			itemMessage));
+	}
 	fCaptureRateMenu->SetTargetForItems(this);
 	fCaptureRateMenu->FindItem(fCaptureRateSetting->Value())->SetMarked(true);
 	fCaptureRateSelector = new BMenuField("Rate", B_TRANSLATE("Rate:"),
 		fCaptureRateMenu, NULL);
 
-	controlsLayout->AddItem(fFileName->CreateLabelLayoutItem(), 0, 0);
-	controlsLayout->AddItem(fFileName->CreateTextViewLayoutItem(), 1, 0);
-	controlsLayout->AddItem(fImageFormatSelector->CreateLabelLayoutItem(), 0, 
-		1);
-	controlsLayout->AddItem(fImageFormatSelector->CreateMenuBarLayoutItem(), 1,
-		1);
-	controlsLayout->AddItem(fCaptureRateSelector->CreateLabelLayoutItem(), 0,
-		2);
-	controlsLayout->AddItem(fCaptureRateSelector->CreateMenuBarLayoutItem(), 1,
-		2);
-	controlsLayout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, 3, 2);
+	BLayoutBuilder::Grid<>(controlsLayout)
+		.AddTextControl(fFileName, 0, 0)
+		.AddMenuField(fImageFormatSelector, 0, 1)
+		.AddMenuField(fCaptureRateSelector, 0, 2)
+		.Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2, 1);
 
 	// FTP setup box
-	fFtpSetupBox = new BBox(B_TRANSLATE("FTP Setup"), B_WILL_DRAW);
+	fFtpSetupBox = new BBox("FTP Setup", B_WILL_DRAW);
 
 	fUploadClientMenu = new BPopUpMenu(B_TRANSLATE("Send to" B_UTF8_ELLIPSIS));
-	for (int i = 0; kUploadClient[i]; i++) {
+	for (int i = 0; i < kUploadClientsCount; i++) {
 		BMessage *m = new BMessage(msg_upl_client);
 		m->AddInt32("client", i);
-		fUploadClientMenu->AddItem(new BMenuItem(kUploadClient[i], m));
+		fUploadClientMenu->AddItem(new BMenuItem(kUploadClients[i], m));
 	}
 	fUploadClientMenu->SetTargetForItems(this);
 	fUploadClientMenu->FindItem(fUploadClientSetting->Value())->SetMarked(true);
@@ -818,38 +767,16 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	fPassiveFtp->SetTarget(this);
 	fPassiveFtp->SetValue(fPassiveFtpSetting->Value());
 
-	ftpLayout->AddItem(fUploadClientSelector->CreateLabelLayoutItem(), 0, 0);
-	ftpLayout->AddItem(fUploadClientSelector->CreateMenuBarLayoutItem(), 1, 0);
-	ftpLayout->AddItem(fServerName->CreateLabelLayoutItem(), 0, 1);
-	ftpLayout->AddItem(fServerName->CreateTextViewLayoutItem(), 1, 1);
-	ftpLayout->AddItem(fLoginId->CreateLabelLayoutItem(), 0, 2);
-	ftpLayout->AddItem(fLoginId->CreateTextViewLayoutItem(), 1, 2);
-	ftpLayout->AddItem(fPassword->CreateLabelLayoutItem(), 0, 3);
-	ftpLayout->AddItem(fPassword->CreateTextViewLayoutItem(), 1, 3);
-	ftpLayout->AddItem(fDirectory->CreateLabelLayoutItem(), 0, 4);
-	ftpLayout->AddItem(fDirectory->CreateTextViewLayoutItem(), 1, 4);
-	ftpLayout->AddView(fPassiveFtp, 0, 5, 2);
+	BLayoutBuilder::Grid<>(ftpLayout)
+		.AddMenuField(fUploadClientSelector, 0, 0)
+		.AddTextControl(fServerName, 0, 1)
+		.AddTextControl(fLoginId, 0, 2)
+		.AddTextControl(fPassword, 0, 3)
+		.AddTextControl(fDirectory, 0, 4)
+		.Add(fPassiveFtp, 0, 5, 2, 1);
 
-	fStatusLine = new BStringView("Status Line", B_TRANSLATE("Waiting" B_UTF8_ELLIPSIS));
-
-	BGroupLayout *groupLayout = new BGroupLayout(B_VERTICAL);
-	groupLayout->SetInsets(kXBuffer, kYBuffer, kXBuffer, kYBuffer);
-
-	theView->SetLayout(groupLayout);
-
-	theView->AddChild(BSpaceLayoutItem::CreateVerticalStrut(kYBuffer));
-	theView->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(0.0))
-		.Add(fVideoView)
-		.Add(BSpaceLayoutItem::CreateHorizontalStrut(0.0))
-	);
-	theView->AddChild(BSpaceLayoutItem::CreateVerticalStrut(kYBuffer));
-	theView->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, kXBuffer)
-		.Add(fCaptureSetupBox)
-		.Add(fFtpSetupBox)
-	);
-	theView->AddChild(BSpaceLayoutItem::CreateVerticalStrut(kYBuffer));
-	theView->AddChild(fStatusLine);
+	fStatusLine = new BStringView("Status Line",
+		B_TRANSLATE("Waiting" B_UTF8_ELLIPSIS));
 }
 
 
@@ -880,24 +807,32 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 	fSettings = new Settings(filename, dirname);
 
 	fServerSetting = new StringValueSetting("Server", "ftp.my.server",
-		B_TRANSLATE("server address expected"), "");
+		B_TRANSLATE("server address expected"));
+
 	fLoginSetting = new StringValueSetting("Login", "loginID",
-		B_TRANSLATE("login ID expected"), "");
+		B_TRANSLATE("login ID expected"));
+
 	fPasswordSetting = new StringValueSetting("Password", 
-		B_TRANSLATE("password"), B_TRANSLATE("password expected"), "");
+		B_TRANSLATE("password"), B_TRANSLATE("password expected"));
+
 	fDirectorySetting = new StringValueSetting("Directory", "web/images",
-		B_TRANSLATE("destination directory expected"), "");
+		B_TRANSLATE("destination directory expected"));
+
 	fPassiveFtpSetting = new BooleanValueSetting("PassiveFtp", 1);
+
 	fFilenameSetting = new StringValueSetting("StillImageFilename",
-		"codycam.jpg", B_TRANSLATE("still image filename expected"), "");
+		"codycam.jpg", B_TRANSLATE("still image filename expected"));
+
 	fImageFormatSettings = new StringValueSetting("ImageFileFormat",
-		B_TRANSLATE("JPEG image"), B_TRANSLATE("image file format expected"), 
-		"");
+		B_TRANSLATE("JPEG image"), B_TRANSLATE("image file format expected"));
+
 	fCaptureRateSetting = new EnumeratedStringValueSetting("CaptureRate",
-		kCaptureRate[3], kCaptureRate, B_TRANSLATE("capture rate expected"),
+		kCaptureRates[3].name, &CaptureRateAt,
+		B_TRANSLATE("capture rate expected"),
 		"unrecognized capture rate specified");
+
 	fUploadClientSetting = new EnumeratedStringValueSetting("UploadClient",
-		B_TRANSLATE("FTP"), kUploadClient, 
+		B_TRANSLATE("FTP"), &UploadClientAt, 
 		B_TRANSLATE("upload client name expected"),
 		B_TRANSLATE("unrecognized upload client specified"));
 
@@ -950,8 +885,9 @@ VideoWindow::_QuitSettings()
 
 ControlWindow::ControlWindow(const BRect& frame, BView* controls, 
 	media_node node)
-	: BWindow(frame, B_TRANSLATE("Video settings"), B_TITLED_WINDOW, 
-	B_ASYNCHRONOUS_CONTROLS)
+	:
+	BWindow(frame, B_TRANSLATE("Video settings"), B_TITLED_WINDOW, 
+		B_ASYNCHRONOUS_CONTROLS)
 {
 	fView = controls;
 	fNode = node;
