@@ -2,7 +2,7 @@
  * MainWin.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
- * Copyright (C) 2007-2009 Stephan Aßmus <superstippi@gmx.de> (GPL->MIT ok)
+ * Copyright (C) 2007-2010 Stephan Aßmus <superstippi@gmx.de> (GPL->MIT ok)
  * Copyright (C) 2007-2009 Fredrik Modéen <[FirstName]@[LastName].se> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
@@ -529,14 +529,8 @@ MainWin::MessageReceived(BMessage* msg)
 			break;
 		case B_SIMPLE_DATA:
 			printf("MainWin::MessageReceived: B_SIMPLE_DATA\n");
-			if (msg->HasRef("refs")) {
-				// add to recent documents as it's not done with drag-n-drop
-				entry_ref ref;
-				for (int32 i = 0; msg->FindRef("refs", i, &ref) == B_OK; i++) {
-					be_roster->AddToRecentDocuments(&ref, kAppSig);
-				}
+			if (msg->HasRef("refs"))
 				_RefsReceived(msg);
-			}
 			break;
 		case M_OPEN_PREVIOUS_PLAYLIST:
 			OpenPlaylist(msg);
@@ -1246,7 +1240,7 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 	_SetupWindow();
 
 	if (result == B_OK)
-		_SetFileAttributes();
+		_UpdatePlaylistItemFile();
 }
 
 
@@ -1324,15 +1318,19 @@ MainWin::_CreateMenu()
 		new BMessage(M_FILE_NEWPLAYER), 'N'));
 	fFileMenu->AddSeparatorItem();
 
-//	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS,
-//		new BMessage(M_FILE_OPEN), 'O'));
-	// Add recent files
+#if 0
+	// Plain "Open File" entry
+	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS,
+		new BMessage(M_FILE_OPEN), 'O'));
+#else
+	// Add recent files to "Open File" entry as sub-menu.
 	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
 	BMenuItem* item = new BMenuItem(recentFiles.NewFileListMenu(
 		"Open file"B_UTF8_ELLIPSIS, new BMessage(B_REFS_RECEIVED),
 		NULL, this, 10, false, NULL, 0, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
 	fFileMenu->AddItem(item);
+#endif
 
 	fFileMenu->AddItem(new BMenuItem("File info"B_UTF8_ELLIPSIS,
 		new BMessage(M_FILE_INFO), 'I'));
@@ -2136,11 +2134,8 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 // #pragma mark -
 
 
-/*!	Sets some standard attributes of the currently played file.
-	This should only be a temporary solution.
-*/
 void
-MainWin::_SetFileAttributes()
+MainWin::_UpdatePlaylistItemFile()
 {
 	BAutolock locker(fPlaylist);
 	const FilePlaylistItem* item
@@ -2148,29 +2143,37 @@ MainWin::_SetFileAttributes()
 	if (item == NULL)
 		return;
 
-	if (!fHasVideo && fHasAudio) {
-		BNode node(&item->Ref());
-		if (node.InitCheck())
-			return;
+	if (!fHasVideo && !fHasAudio)
+		return;
 
-		locker.Unlock();
+	BNode node(&item->Ref());
+	if (node.InitCheck())
+		return;
 
-		// write duration
+	// Add to recent documents
+	be_roster->AddToRecentDocuments(&item->Ref(), kAppSig);
 
-		attr_info info;
-		status_t status = node.GetAttrInfo("Audio:Length", &info);
-		if (status != B_OK || info.size == 0) {
-			time_t duration = fController->TimeDuration() / 1000000L;
+	locker.Unlock();
 
-			char text[256];
-			snprintf(text, sizeof(text), "%02ld:%02ld", duration / 60,
-				duration % 60);
-			node.WriteAttr("Audio:Length", B_STRING_TYPE, 0, text,
-				strlen(text) + 1);
-		}
+	// Set some standard attributes of the currently played file.
+	// This should only be a temporary solution.
 
-		// write bitrate
+	// Write duration
+	const char* kDurationAttrName = "Media:Length";
+	attr_info info;
+	status_t status = node.GetAttrInfo(kDurationAttrName, &info);
+	if (status != B_OK || info.size == 0) {
+		time_t duration = fController->TimeDuration() / 1000000L;
 
+		char text[256];
+		snprintf(text, sizeof(text), "%02ld:%02ld", duration / 60,
+			duration % 60);
+		node.WriteAttr(kDurationAttrName, B_STRING_TYPE, 0, text,
+			strlen(text) + 1);
+	}
+
+	// Write audio bitrate
+	if (fHasAudio && !fHasVideo) {
 		status = node.GetAttrInfo("Audio:Bitrate", &info);
 		if (status != B_OK || info.size == 0) {
 			media_format format;

@@ -2,7 +2,7 @@
  * MainWin.h - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
- * Copyright (C) 2007-2009 Stephan Aßmus <superstippi@gmx.de> (MIT ok)
+ * Copyright (C) 2007-2010 Stephan Aßmus <superstippi@gmx.de> (MIT ok)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -119,7 +119,7 @@ private:
 			void				_ShowFullscreenControls(bool show,
 									bool animate = true);
 
-			void				_SetFileAttributes();
+			void				_UpdatePlaylistItemFile();
 			void				_UpdateControlsEnabledStatus();
 			void				_UpdatePlaylistMenu();
 			void				_AddPlaylistItem(PlaylistItem* item,
