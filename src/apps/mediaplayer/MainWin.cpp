@@ -711,9 +711,6 @@ MainWin::MessageReceived(BMessage* msg)
 		case M_FILE_PLAYLIST:
 			ShowPlaylistWindow();
 			break;
-		case B_ABOUT_REQUESTED:
-			be_app->PostMessage(msg);
-			break;
 		case M_FILE_CLOSE:
 			PostMessage(B_QUIT_REQUESTED);
 			break;
@@ -1344,8 +1341,10 @@ MainWin::_CreateMenu()
 	fPlaylistMenu->Superitem()->SetMessage(new BMessage(M_FILE_PLAYLIST));
 
 	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem("About " NAME B_UTF8_ELLIPSIS,
-		new BMessage(B_ABOUT_REQUESTED)));
+	item = new BMenuItem("About " NAME B_UTF8_ELLIPSIS,
+		new BMessage(B_ABOUT_REQUESTED));
+	fFileMenu->AddItem(item);
+	item->SetTarget(be_app);
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W'));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));
@@ -1839,8 +1838,6 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("About " NAME B_UTF8_ELLIPSIS,
-		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));
 
