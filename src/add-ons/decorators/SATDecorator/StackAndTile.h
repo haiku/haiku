@@ -121,13 +121,12 @@ public:
 
 		void			Rewind();
 		/*! Iterates over all areas in the group and return the windows in the
-		areas. Within on area the windows are ordered by layer position. The
-		bottommost window comes first. */
+		areas. Within one area the windows are ordered by their layer position.
+		If reverseLayerOrder is false the bottommost window comes first. */
 		SATWindow*		NextWindow();
 		
 
 private:
-		/*! The windows in the area are returned in reverse order. */
 		SATWindow*		_ReverseNextWindow();
 		void			_ReverseRewind();
 

@@ -51,7 +51,7 @@ GroupCookie::~GroupCookie()
 }
 
 
-const uint32 kExtentPenalty = 10;
+const uint32 kExtentPenalty = 25;
 
 
 void
