@@ -133,6 +133,7 @@ public:
 		bool					SetGroup(SATGroup* group);
 
 		const SATWindowList&	WindowList() { return fWindowList; }
+		const SATWindowList&	LayerOrder() { return fWindowLayerOrder; }
 		bool					MoveWindowToPosition(SATWindow* window,
 									int32 index);
 
@@ -153,6 +154,8 @@ public:
 		BRect					Frame();
 
 		bool					PropagateToGroup(SATGroup* group);
+
+		bool					MoveToTopLayer(SATWindow* window);
 
 private:
 		friend class SATGroup;
@@ -179,6 +182,8 @@ private:
 		SATGroup*				fGroup;
 
 		SATWindowList			fWindowList;
+
+		SATWindowList			fWindowLayerOrder;
 
 		BReference<Crossing>	fLeftTopCrossing;
 		BReference<Crossing>	fRightTopCrossing;
@@ -214,6 +219,8 @@ public:
 		int32				CountItems();
 		SATWindow*			WindowAt(int32 index);
 
+		const WindowAreaList&	GetAreaList() { return fWindowAreaList; }
+		
 		/*! \return a sorted tab list. */
 		const TabList*		HorizontalTabs();
 		const TabList*		VerticalTabs();

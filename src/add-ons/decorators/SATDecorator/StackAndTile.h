@@ -114,6 +114,32 @@ private:
 };
 
 
+class WindowIterator {
+public:
+						WindowIterator(SATGroup* group,
+							bool reverseLayerOrder = false);
+
+		void			Rewind();
+		/*! Iterates over all areas in the group and return the windows in the
+		areas. Within on area the windows are ordered by layer position. The
+		bottommost window comes first. */
+		SATWindow*		NextWindow();
+		
+
+private:
+		/*! The windows in the area are returned in reverse order. */
+		SATWindow*		_ReverseNextWindow();
+		void			_ReverseRewind();
+
+		SATGroup*		fGroup;
+		bool			fReverseLayerOrder;
+
+		WindowArea*		fCurrentArea;
+		int32			fAreaIndex;
+		int32			fWindowIndex;
+};
+
+
 class SATSnappingBehaviour {
 public:
 	virtual					~SATSnappingBehaviour();

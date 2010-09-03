@@ -84,6 +84,7 @@ WindowArea::_AddWindow(SATWindow* window, SATWindow* after)
 	if (fWindowList.CountItems() <= 1)
 		_InitCorners();
 
+	fWindowLayerOrder.AddItem(window);
 	return true;
 }
 
@@ -94,6 +95,7 @@ WindowArea::_RemoveWindow(SATWindow* window)
 	if (!fWindowList.RemoveItem(window))
 		return false;
 
+	fWindowLayerOrder.RemoveItem(window);
 	window->RemovedFromArea(this);
 	ReleaseReference();
 	return true;
@@ -162,6 +164,15 @@ WindowArea::PropagateToGroup(SATGroup* group)
 		fWindowList.ItemAt(i)->PropagateToGroup(group, this);
 
 	return true;
+}
+
+
+bool
+WindowArea::MoveToTopLayer(SATWindow* window)
+{
+	if (!fWindowLayerOrder.RemoveItem(window))
+		return false;
+	return fWindowLayerOrder.AddItem(window);
 }
 
 

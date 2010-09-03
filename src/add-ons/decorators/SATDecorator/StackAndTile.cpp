@@ -220,8 +220,9 @@ StackAndTile::WindowSentBehind(Window* window, Window* behindOf)
 	if (!desktop)
 		return;
 
-	for (int i = 0; i < group->CountItems(); i++) {
-		SATWindow* listWindow = group->WindowAt(i);
+	WindowIterator iter(group, true);
+	for (SATWindow* listWindow = iter.NextWindow(); listWindow != NULL;
+		listWindow = iter.NextWindow()) {
 		if (listWindow != satWindow)
 			desktop->SendWindowBehind(listWindow->GetWindow(), behindOf);
 	}
@@ -367,16 +368,20 @@ StackAndTile::_ActivateWindow(SATWindow* satWindow)
 	Desktop* desktop = satWindow->GetWindow()->Desktop();
 	if (!desktop)
 		return;
+	WindowArea* area = satWindow->GetWindowArea();
+	if (!area)
+		return;
+	area->MoveToTopLayer(satWindow);
 
 	//desktop->ActivateWindow(satWindow->GetWindow());
 
-	for (int i = 0; i < group->CountItems(); i++) {
-		SATWindow* listWindow = group->WindowAt(i);
-		if (listWindow == satWindow)
-			continue;
-		//desktop->SendWindowBehind(listWindow->GetWindow(),
-		//	satWindow->GetWindow());
-		desktop->ActivateWindow(listWindow->GetWindow());
+	WindowIterator iter(group);
+	for (SATWindow* listWindow = iter.NextWindow(); listWindow != NULL;
+		listWindow = iter.NextWindow()) {
+		if (listWindow != satWindow)
+			//desktop->SendWindowBehind(listWindow->GetWindow(),
+			//	satWindow->GetWindow());
+				desktop->ActivateWindow(listWindow->GetWindow());
 	}
 
 	desktop->ActivateWindow(satWindow->GetWindow());
@@ -423,6 +428,71 @@ GroupIterator::NextGroup()
 
 	fCurrentGroup = group;
 	return fCurrentGroup;
+}
+
+
+WindowIterator::WindowIterator(SATGroup* group, bool reverseLayerOrder)
+	:
+	fGroup(group),
+	fReverseLayerOrder(reverseLayerOrder)
+{
+	if (fReverseLayerOrder)
+		_ReverseRewind();
+	else
+		Rewind();
+}
+
+
+void
+WindowIterator::Rewind()
+{
+	fAreaIndex = 0;
+	fWindowIndex = 0;
+	fCurrentArea = fGroup->GetAreaList().ItemAt(fAreaIndex);
+}
+
+
+SATWindow*
+WindowIterator::NextWindow()
+{
+	if (fReverseLayerOrder)
+		return _ReverseNextWindow();
+
+	if (fWindowIndex == fCurrentArea->LayerOrder().CountItems()) {
+		fAreaIndex++;
+		fWindowIndex = 0;
+		fCurrentArea = fGroup->GetAreaList().ItemAt(fAreaIndex);
+		if (!fCurrentArea)
+			return NULL;
+	}
+	SATWindow* window = fCurrentArea->LayerOrder().ItemAt(fWindowIndex);
+	fWindowIndex++;
+	return window;
+}
+
+
+SATWindow*
+WindowIterator::_ReverseNextWindow()
+{
+	if (fWindowIndex < 0) {
+		fAreaIndex++;
+		fCurrentArea = fGroup->GetAreaList().ItemAt(fAreaIndex);
+		if (!fCurrentArea)
+			return NULL;
+		fWindowIndex = fCurrentArea->LayerOrder().CountItems() - 1;
+	}
+	SATWindow* window = fCurrentArea->LayerOrder().ItemAt(fWindowIndex);
+	fWindowIndex--;
+	return window;
+}
+
+
+void
+WindowIterator::_ReverseRewind()
+{
+	Rewind();
+	if (fCurrentArea)
+		fWindowIndex = fCurrentArea->LayerOrder().CountItems() - 1;
 }
 
 
