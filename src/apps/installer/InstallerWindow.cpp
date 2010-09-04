@@ -236,9 +236,9 @@ InstallerWindow::InstallerWindow()
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(mainMenu)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
 			.Add(logoView)
 			.Add(fStatusView)
 		)

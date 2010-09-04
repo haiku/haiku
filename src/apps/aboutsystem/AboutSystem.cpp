@@ -587,7 +587,7 @@ AboutView::AboutView()
 
 	const float offset = 5;
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
