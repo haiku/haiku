@@ -197,7 +197,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		* fInputPreferredFormat.u.raw_audio.channel_count;
 
 
-	if (config) {
+	if (config != NULL) {
 		fConfig = *config;
 		PRINT_OBJECT(*config);
 	}
@@ -211,7 +211,7 @@ MultiAudioNode::~MultiAudioNode()
 	CALLED();
 	fAddOn->GetConfigurationFor(this, NULL);
 
-	_StopThread();
+	_StopOutputThread();
 	BMediaEventLooper::Quit();
 
 	fWeb = NULL;
@@ -272,9 +272,8 @@ MultiAudioNode::GetFormat(media_format* format)
 }
 
 
-// -------------------------------------------------------- //
-// implementation of BMediaNode
-// -------------------------------------------------------- //
+//#pragma mark - BMediaNode
+
 
 BMediaAddOn*
 MultiAudioNode::AddOn(int32* _internalID) const
@@ -410,7 +409,7 @@ MultiAudioNode::NodeRegistered()
 	fWeb = MakeParameterWeb();
 	SetParameterWeb(fWeb);
 
-	/* apply configuration */
+	// Apply configuration
 #ifdef PRINTING
 	bigtime_t start = system_time();
 #endif
@@ -468,12 +467,12 @@ MultiAudioNode::SetTimeSource(BTimeSource* timeSource)
 //	#pragma mark - BBufferConsumer
 
 
-// Check to make sure the format is okay, then remove
-// any wildcards corresponding to our requirements.
 status_t
 MultiAudioNode::AcceptFormat(const media_destination& dest,
 	media_format* format)
 {
+	// Check to make sure the format is okay, then remove
+	// any wildcards corresponding to our requirements.
 	CALLED();
 
 	if (format == NULL)
@@ -628,14 +627,14 @@ MultiAudioNode::Connected(const media_source& producer,
 {
 	CALLED();
 	if (out_input == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
+		fprintf(stderr, "<- B_BAD_VALUE\n");
 		return B_BAD_VALUE; // no crashing
 	}
 
 	node_input *channel = _FindInput(where);
 
-	if(channel==NULL) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+	if (channel == NULL) {
+		fprintf(stderr, "<- B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
 
@@ -646,8 +645,7 @@ MultiAudioNode::Connected(const media_source& producer,
 	channel->fInput.format = with_format;
 	*out_input = channel->fInput;
 
-	// we are sure the thread is started
-	_StartThread();
+	_StartOutputThreadIfNeeded();
 
 	return B_OK;
 }
@@ -956,8 +954,7 @@ MultiAudioNode::Connect(status_t error, const media_source& source,
 	if (!channel->fBufferGroup)
 		_AllocateBuffers(*channel);
 
-	// we are sure the thread is started
-	_StartThread();
+	_StartOutputThreadIfNeeded();
 }
 
 
@@ -1096,8 +1093,6 @@ MultiAudioNode::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 }
 
 
-// TODO: how should we handle late buffers? drop them?
-// notify the producer?
 status_t
 MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 	bigtime_t lateness, bool realTimeEvent)
@@ -1132,6 +1127,8 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 		buffer->Recycle();
 	} else {
 		//WriteBuffer(buffer, *channel);
+		// TODO: This seems like a very fragile mechanism to wait until
+		// the previous buffer for this channel has been processed...
 		if (channel->fBuffer != NULL) {
 			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId : %li, how_early:%Ld\n", channel->fChannelId, howEarly));
 			//channel->fBuffer->Recycle();
@@ -1209,7 +1206,7 @@ MultiAudioNode::_HandleStop(const media_timed_event* event, bigtime_t lateness,
 	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
 		BTimedEventQueue::B_HANDLE_BUFFER);
 
-	//_StopThread();
+	//_StopOutputThread();
 	return B_OK;
 }
 
@@ -1244,7 +1241,7 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 			PRINT(("TimeSourceOp op B_TIMESOURCE_START\n"));
 			if (RunState() != BMediaEventLooper::B_STARTED) {
 				fTimeSourceStarted = true;
-				_StartThread();
+				_StartOutputThreadIfNeeded();
 
 				media_timed_event startEvent(0, BTimedEventQueue::B_START);
 				EventQueue()->AddEvent(startEvent);
@@ -1256,7 +1253,7 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
-				_StopThread();
+				_StopOutputThread();
 				PublishTime(0, 0, 0);
 			}
 			break;
@@ -1266,7 +1263,7 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
-				_StopThread();
+				_StopOutputThread();
 				PublishTime(0, 0, 0);
 			}
 			break;
@@ -1658,7 +1655,7 @@ MultiAudioNode::_CreateFrequencyParameterGroup(BParameterGroup* parentGroup,
 
 
 int32
-MultiAudioNode::_RunThread()
+MultiAudioNode::_OutputThread()
 {
 	CALLED();
 	multi_buffer_info bufferInfo;
@@ -1678,8 +1675,9 @@ MultiAudioNode::_RunThread()
 	while (true) {
 		// TODO: why this semaphore??
 		if (acquire_sem_etc(fBufferFreeSem, 1, B_RELATIVE_TIMEOUT, 0)
-				== B_BAD_SEM_ID)
+				== B_BAD_SEM_ID) {
 			return B_OK;
+		}
 
 		BAutolock locker(fBufferLock);
 			// make sure the buffers don't change while we're playing with them
@@ -1737,9 +1735,12 @@ MultiAudioNode::_RunThread()
 			}
 		}
 
-		PRINT(("MultiAudioNode::RunThread: recorded_real_time : %Ld\n", bufferInfo.recorded_real_time));
-		PRINT(("MultiAudioNode::RunThread: recorded_frames_count : %Ld\n", bufferInfo.recorded_frames_count));
-		PRINT(("MultiAudioNode::RunThread: record_buffer_cycle : %li\n", bufferInfo.record_buffer_cycle));
+		PRINT(("MultiAudioNode::RunThread: recorded_real_time : %Ld\n",
+			bufferInfo.recorded_real_time));
+		PRINT(("MultiAudioNode::RunThread: recorded_frames_count : %Ld\n",
+			bufferInfo.recorded_frames_count));
+		PRINT(("MultiAudioNode::RunThread: record_buffer_cycle : %li\n",
+			bufferInfo.record_buffer_cycle));
 
 		for (int32 i = 0; i < fOutputs.CountItems(); i++) {
 			node_output* output = (node_output*)fOutputs.ItemAt(i);
@@ -1855,9 +1856,8 @@ void
 MultiAudioNode::_FillWithZeros(node_input& input)
 {
 	CALLED();
-	for (int32 i = 0; i < fDevice->BufferList().return_playback_buffers; i++) {
+	for (int32 i = 0; i < fDevice->BufferList().return_playback_buffers; i++)
 		_WriteZeros(input, i);
-	}
 }
 
 
@@ -2081,11 +2081,11 @@ MultiAudioNode::_FillNextBuffer(node_input& input, BBuffer* buffer)
 
 
 status_t
-MultiAudioNode::_StartThread()
+MultiAudioNode::_StartOutputThreadIfNeeded()
 {
 	CALLED();
 	// the thread is already started ?
-	if (fThread > B_OK)
+	if (fThread >= 0)
 		return B_OK;
 
 	// allocate buffer free semaphore
@@ -2097,7 +2097,7 @@ MultiAudioNode::_StartThread()
 
 	PublishTime(-50, 0, 0);
 
-	fThread = spawn_thread(_run_thread_, "multi_audio audio output",
+	fThread = spawn_thread(_OutputThreadEntry, "multi_audio audio output",
 		B_REAL_TIME_PRIORITY, this);
 	if (fThread < B_OK) {
 		delete_sem(fBufferFreeSem);
@@ -2110,12 +2110,14 @@ MultiAudioNode::_StartThread()
 
 
 status_t
-MultiAudioNode::_StopThread()
+MultiAudioNode::_StopOutputThread()
 {
 	CALLED();
 	delete_sem(fBufferFreeSem);
 
-	wait_for_thread(fThread, &fThread);
+	status_t exitValue;
+	wait_for_thread(fThread, &exitValue);
+	fThread = -1;
 	return B_OK;
 }
 
@@ -2129,7 +2131,8 @@ MultiAudioNode::_AllocateBuffers(node_output &channel)
 	size_t size = channel.fOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(fLatency / BufferDuration() + 1 + 1);
 
-	PRINT(("\tlatency = %Ld, buffer duration = %Ld\n", fLatency, BufferDuration()));
+	PRINT(("\tlatency = %Ld, buffer duration = %Ld\n", fLatency,
+		BufferDuration()));
 	PRINT(("\tcreating group of %ld buffers, size = %lu\n", count, size));
 	channel.fBufferGroup = new BBufferGroup(size, count);
 }
@@ -2143,7 +2146,8 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
 	if (!fTimeSourceStarted || oldInfo.played_real_time == 0)
 		return;
 
-	fTimeComputer.AddTimeStamp(info.played_real_time, info.played_frames_count);
+	fTimeComputer.AddTimeStamp(info.played_real_time,
+		info.played_frames_count);
 	PublishTime(fTimeComputer.PerformanceTime(), fTimeComputer.RealTime(),
 		fTimeComputer.Drift());
 }
@@ -2180,7 +2184,8 @@ MultiAudioNode::_FillNextBuffer(multi_buffer_info &info, node_output &channel)
 	// now fill it with data, continuing where the last buffer left off
 	memcpy(buffer->Data(),
 		fDevice->BufferList().record_buffers[info.record_buffer_cycle]
-			[channel.fChannelId - fDevice->Description().output_channel_count].base,
+			[channel.fChannelId
+				- fDevice->Description().output_channel_count].base,
 		channel.fOutput.format.u.raw_audio.buffer_size);
 
 	// fill in the buffer header
@@ -2298,10 +2303,10 @@ MultiAudioNode::_FindInput(int32 destinationId)
 
 
 /*static*/ status_t
-MultiAudioNode::_run_thread_(void* data)
+MultiAudioNode::_OutputThreadEntry(void* data)
 {
 	CALLED();
-	return static_cast<MultiAudioNode*>(data)->_RunThread();
+	return static_cast<MultiAudioNode*>(data)->_OutputThread();
 }
 
 

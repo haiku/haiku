@@ -171,10 +171,10 @@ private:
 			void			_FillNextBuffer(node_input& channel,
 								BBuffer* buffer);
 
-	static	int32			_run_thread_(void* data);
-			int32			_RunThread();
-			status_t		_StartThread();
-			status_t		_StopThread();
+	static	int32			_OutputThreadEntry(void* data);
+			int32			_OutputThread();
+			status_t		_StartOutputThreadIfNeeded();
+			status_t		_StopOutputThread();
 
 			void 			_AllocateBuffers(node_output& channel);
 			BBuffer* 		_FillNextBuffer(multi_buffer_info& info,
