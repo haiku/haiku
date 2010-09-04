@@ -50,7 +50,7 @@ _rand32(void)
 	if (next == 0)
 		next = real_time_clock_usecs() / 1000000;
 
-	next = (next >> 1) ^ (unsigned int)(-(next & 1U) & 0xd0000001U);
+	next = (next >> 1) ^ (unsigned int)((0 - (next & 1U)) & 0xd0000001U);
 		// characteristic polynomial: x^32 + x^31 + x^29 + x + 1
 	return next;
 }
@@ -194,6 +194,15 @@ TCPSocket::~TCPSocket()
 {
 	if (fTCPService != NULL && fPort != 0)
 		fTCPService->UnbindSocket(this);
+}
+
+
+uint16
+TCPSocket::WindowSize() const
+{
+	size_t windowSize = 2048;
+		// TODO Implement dynamic window size.
+	return windowSize;
 }
 
 
@@ -422,7 +431,7 @@ TCPSocket::ProcessPacket(TCPPacket* packet)
 	// acknowledged. "If it's important, they'll send it again."
 	// TODO PAWS
 	if (packet->SequenceNumber() < fNextSequence) {
-		TRACE("TCPSocket::ProcessPacket(): not queuing due to seq number\n");
+		TRACE("TCPSocket::ProcessPacket(): not queuing due to wraparound\n");
 		delete packet;
 		return;
 	}
@@ -528,7 +537,7 @@ TCPSocket::_Send(TCPPacket* packet, bool enqueue)
 	ChainBuffer buffer((void*)packet->Data(), packet->DataSize());
 	status_t error = fTCPService->Send(fPort, fRemoteAddress, fRemotePort,
 		packet->SequenceNumber(), fAcknowledgeNumber, packet->Flags(),
-		&buffer);
+		WindowSize(), &buffer);
 	if (error != B_OK)
 		return error;
 	if (packet->SequenceNumber() == fSequenceNumber)
@@ -548,7 +557,7 @@ TCPSocket::_ResendQueue()
 		ChainBuffer buffer((void*)packet->Data(), packet->DataSize());
 		status_t error = fTCPService->Send(fPort, fRemoteAddress, fRemotePort,
 			packet->SequenceNumber(), fAcknowledgeNumber, packet->Flags(),
-			&buffer);
+			WindowSize(), &buffer);
 		if (error != B_OK)
 			return error;
 	}
@@ -730,7 +739,8 @@ TCPService::HandleIPPacket(IPService* ipService, ip_addr_t sourceIP,
 status_t
 TCPService::Send(uint16 sourcePort, ip_addr_t destinationAddress,
 	uint16 destinationPort, uint32 sequenceNumber,
-	uint32 acknowledgmentNumber, uint8 flags, ChainBuffer* buffer)
+	uint32 acknowledgmentNumber, uint8 flags, uint16 windowSize,
+	ChainBuffer* buffer)
 {
 	TRACE("TCPService::Send(): seq = %lu, ack = %lu\n",
 		sequenceNumber, acknowledgmentNumber);
@@ -748,9 +758,7 @@ TCPService::Send(uint16 sourcePort, ip_addr_t destinationAddress,
 	header.ackNumber = htonl(acknowledgmentNumber);
 	header.dataOffset = 5;
 	header.flags = flags;
-	header.window = htons(4096);
-		// We throttle packet reception a little here.
-		// TODO Implement socket-based dynamic window size.
+	header.window = htons(windowSize);
 
 	header.checksum = 0;
 	header.checksum = htons(_ChecksumBuffer(&headerBuffer,

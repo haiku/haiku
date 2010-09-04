@@ -65,6 +65,7 @@ public:
 
 	ip_addr_t Address() const	{ return fAddress; }
 	uint16 Port() const			{ return fPort; }
+	uint16 WindowSize() const;
 
 	status_t Connect(ip_addr_t address, uint16 port);
 	status_t Close();
@@ -114,7 +115,8 @@ public:
 
 	status_t Send(uint16 sourcePort, ip_addr_t destinationAddress,
 		uint16 destinationPort, uint32 sequenceNumber,
-		uint32 acknowledgmentNumber, uint8 flags, ChainBuffer* buffer);
+		uint32 acknowledgmentNumber, uint8 flags, uint16 windowSize,
+		ChainBuffer* buffer);
 
 	void ProcessIncomingPackets();
 
