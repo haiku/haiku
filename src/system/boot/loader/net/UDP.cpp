@@ -3,9 +3,11 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include <boot/net/UDP.h>
 
 #include <stdio.h>
+
 #include <KernelExport.h>
 
 #include <boot/net/ChainBuffer.h>
@@ -22,31 +24,32 @@
 
 // #pragma mark - UDPPacket
 
-// constructor
+
 UDPPacket::UDPPacket()
-	: fNext(NULL),
-		fData(NULL),
-		fSize(0)
+	:
+	fNext(NULL),
+	fData(NULL),
+	fSize(0)
 {
 }
 
-// destructor
+
 UDPPacket::~UDPPacket()
 {
 	free(fData);
 }
 
-// SetTo
+
 status_t
 UDPPacket::SetTo(const void *data, size_t size, ip_addr_t sourceAddress,
 	uint16 sourcePort, ip_addr_t destinationAddress, uint16 destinationPort)
 {
-	if (!data)
+	if (data == NULL)
 		return B_BAD_VALUE;
 
 	// clone the data
 	fData = malloc(size);
-	if (!fData)
+	if (fData == NULL)
 		return B_NO_MEMORY;
 	memcpy(fData, data, size);
 
@@ -59,56 +62,56 @@ UDPPacket::SetTo(const void *data, size_t size, ip_addr_t sourceAddress,
 	return B_OK;
 }
 
-// Next
+
 UDPPacket *
 UDPPacket::Next() const
 {
 	return fNext;
 }
 
-// SetNext
+
 void
 UDPPacket::SetNext(UDPPacket *next)
 {
 	fNext = next;
 }
 
-// Data
+
 const void *
 UDPPacket::Data() const
 {
 	return fData;
 }
 
-// DataSize
+
 size_t
 UDPPacket::DataSize() const
 {
 	return fSize;
 }
 
-// SourceAddress
+
 ip_addr_t
 UDPPacket::SourceAddress() const
 {
 	return fSourceAddress;
 }
 
-// SourcePort
+
 uint16
 UDPPacket::SourcePort() const
 {
 	return fSourcePort;
 }
 
-// DestinationAddress
+
 ip_addr_t
 UDPPacket::DestinationAddress() const
 {
 	return fDestinationAddress;
 }
 
-// DestinationPort
+
 uint16
 UDPPacket::DestinationPort() const
 {
@@ -118,28 +121,29 @@ UDPPacket::DestinationPort() const
 
 // #pragma mark - UDPSocket
 
-// constructor
+
 UDPSocket::UDPSocket()
-	: fUDPService(NetStack::Default()->GetUDPService()),
-	  fFirstPacket(NULL),
-	  fLastPacket(NULL),
-	  fAddress(INADDR_ANY),
-	  fPort(0)
+	:
+	fUDPService(NetStack::Default()->GetUDPService()),
+	fFirstPacket(NULL),
+	fLastPacket(NULL),
+	fAddress(INADDR_ANY),
+	fPort(0)
 {
 }
 
-// destructor
+
 UDPSocket::~UDPSocket()
 {
-	if (fPort != 0 && fUDPService)
+	if (fPort != 0 && fUDPService != NULL)
 		fUDPService->UnbindSocket(this);
 }
 
-// Bind
+
 status_t
 UDPSocket::Bind(ip_addr_t address, uint16 port)
 {
-	if (!fUDPService) {
+	if (fUDPService == NULL) {
 		printf("UDPSocket::Bind(): no UDP service\n");
 		return B_NO_INIT;
 	}
@@ -151,7 +155,8 @@ UDPSocket::Bind(ip_addr_t address, uint16 port)
 
 	if (fPort != 0) {
 		printf("UDPSocket::Bind(): already bound\n");
-		return EALREADY; // correct code?
+		return EALREADY;
+			// correct code?
 	}
 
 	status_t error = fUDPService->BindSocket(this, address, port);
@@ -166,44 +171,45 @@ UDPSocket::Bind(ip_addr_t address, uint16 port)
 	return B_OK;
 }
 
-// Send
+
 status_t
 UDPSocket::Send(ip_addr_t destinationAddress, uint16 destinationPort,
 	ChainBuffer *buffer)
 {
-	if (!fUDPService)
+	if (fUDPService == NULL)
 		return B_NO_INIT;
 
 	return fUDPService->Send(fPort, destinationAddress, destinationPort,
 		buffer);
 }
 
-// Send
+
 status_t
 UDPSocket::Send(ip_addr_t destinationAddress, uint16 destinationPort,
 	const void *data, size_t size)
 {
-	if (!data)
+	if (data == NULL)
 		return B_BAD_VALUE;
 
 	ChainBuffer buffer((void*)data, size);
 	return Send(destinationAddress, destinationPort, &buffer);
 }
 
-// Receive
+
 status_t
 UDPSocket::Receive(UDPPacket **_packet, bigtime_t timeout)
 {
-	if (!fUDPService)
+	if (fUDPService == NULL)
 		return B_NO_INIT;
 
-	if (!_packet)
+	if (_packet == NULL)
 		return B_BAD_VALUE;
 
 	bigtime_t startTime = system_time();
 	for (;;) {
 		fUDPService->ProcessIncomingPackets();
-		if ((*_packet = PopPacket()))
+		*_packet = PopPacket();
+		if (*_packet != NULL)
 			return B_OK;
 	
 		if (system_time() - startTime > timeout)
@@ -211,11 +217,11 @@ UDPSocket::Receive(UDPPacket **_packet, bigtime_t timeout)
 	}
 }
 
-// PushPacket
+
 void
 UDPSocket::PushPacket(UDPPacket *packet)
 {
-	if (fLastPacket)
+	if (fLastPacket != NULL)
 		fLastPacket->SetNext(packet);
 	else
 		fFirstPacket = packet;
@@ -224,17 +230,17 @@ UDPSocket::PushPacket(UDPPacket *packet)
 	packet->SetNext(NULL);
 }
 
-// PopPacket
+
 UDPPacket *
 UDPSocket::PopPacket()
 {
-	if (!fFirstPacket)
+	if (fFirstPacket == NULL)
 		return NULL;
 
 	UDPPacket *packet = fFirstPacket;
 	fFirstPacket = packet->Next();
 
-	if (!fFirstPacket)
+	if (fFirstPacket == NULL)
 		fLastPacket = NULL;
 
 	packet->SetNext(NULL);
@@ -244,39 +250,40 @@ UDPSocket::PopPacket()
 
 // #pragma mark - UDPService
 
-// constructor
+
 UDPService::UDPService(IPService *ipService)
-	: IPSubService(kUDPServiceName),
-		fIPService(ipService)
+	:
+	IPSubService(kUDPServiceName),
+	fIPService(ipService)
 {
 }
 
-// destructor
+
 UDPService::~UDPService()
 {
-	if (fIPService)
+	if (fIPService != NULL)
 		fIPService->UnregisterIPSubService(this);
 }
 
-// Init
+
 status_t
 UDPService::Init()
 {
-	if (!fIPService)
+	if (fIPService == NULL)
 		return B_BAD_VALUE;
 	if (!fIPService->RegisterIPSubService(this))
 		return B_NO_MEMORY;
 	return B_OK;
 }
 
-// IPProtocol
+
 uint8
 UDPService::IPProtocol() const
 {
 	return IPPROTO_UDP;
 }
 
-// HandleIPPacket
+
 void
 UDPService::HandleIPPacket(IPService *ipService, ip_addr_t sourceIP,
 	ip_addr_t destinationIP, const void *data, size_t size)
@@ -285,7 +292,7 @@ UDPService::HandleIPPacket(IPService *ipService, ip_addr_t sourceIP,
 		"%lu - %lu bytes\n", sourceIP, destinationIP, size,
 		sizeof(udp_header)));
 
-	if (!data || size < sizeof(udp_header))
+	if (data == NULL || size < sizeof(udp_header))
 		return;
 
 	const udp_header *header = (const udp_header*)data;
@@ -304,12 +311,12 @@ UDPService::HandleIPPacket(IPService *ipService, ip_addr_t sourceIP,
 
 	// find the target socket
 	UDPSocket *socket = _FindSocket(destinationIP, destination);
-	if (!socket)
+	if (socket == NULL)
 		return;
 
 	// create a UDPPacket and queue it in the socket
 	UDPPacket *packet = new(nothrow) UDPPacket;
-	if (!packet)
+	if (packet == NULL)
 		return;
 	status_t error = packet->SetTo((uint8*)data + sizeof(udp_header),
 		length - sizeof(udp_header), sourceIP, source, destinationIP,
@@ -320,19 +327,19 @@ UDPService::HandleIPPacket(IPService *ipService, ip_addr_t sourceIP,
 		delete packet;
 }
 
-// Send
+
 status_t
 UDPService::Send(uint16 sourcePort, ip_addr_t destinationAddress,
 	uint16 destinationPort, ChainBuffer *buffer)
 {
 	TRACE(("UDPService::Send(source port: %hu, to: %08lx:%hu, %lu bytes)\n",
 		sourcePort, destinationAddress, destinationPort,
-		(buffer ? buffer->TotalSize() : 0)));
+		(buffer != NULL ? buffer->TotalSize() : 0)));
 
-	if (!fIPService)
+	if (fIPService == NULL)
 		return B_NO_INIT;
 
-	if (!buffer)
+	if (buffer == NULL)
 		return B_BAD_VALUE;
 
 	// prepend the UDP header
@@ -354,22 +361,22 @@ UDPService::Send(uint16 sourcePort, ip_addr_t destinationAddress,
 	return fIPService->Send(destinationAddress, IPPROTO_UDP, &headerBuffer);
 }
 
-// ProcessIncomingPackets
+
 void
 UDPService::ProcessIncomingPackets()
 {
-	if (fIPService)
+	if (fIPService != NULL)
 		fIPService->ProcessIncomingPackets();
 }
 
-// BindSocket
+
 status_t
 UDPService::BindSocket(UDPSocket *socket, ip_addr_t address, uint16 port)
 {
-	if (!socket)
+	if (socket == NULL)
 		return B_BAD_VALUE;
 
-	if (_FindSocket(address, port)) {
+	if (_FindSocket(address, port) != NULL) {
 		printf("UDPService::BindSocket(): address in use\n");
 		return EADDRINUSE;
 	}
@@ -377,14 +384,14 @@ UDPService::BindSocket(UDPSocket *socket, ip_addr_t address, uint16 port)
 	return fSockets.Add(socket);
 }
 
-// UnbindSocket
+
 void
 UDPService::UnbindSocket(UDPSocket *socket)
 {
 	fSockets.Remove(socket);
 }
 
-// _ChecksumBuffer
+
 uint16
 UDPService::_ChecksumBuffer(ChainBuffer *buffer, ip_addr_t source,
 	ip_addr_t destination, uint16 length)
@@ -412,7 +419,7 @@ UDPService::_ChecksumBuffer(ChainBuffer *buffer, ip_addr_t source,
 	return checksum;
 }
 
-// _ChecksumData
+
 uint16
 UDPService::_ChecksumData(const void *data, uint16 length, ip_addr_t source,
 	ip_addr_t destination)
@@ -421,7 +428,7 @@ UDPService::_ChecksumData(const void *data, uint16 length, ip_addr_t source,
 	return _ChecksumBuffer(&buffer, source, destination, length);
 }
 
-// _FindSocket
+
 UDPSocket *
 UDPService::_FindSocket(ip_addr_t address, uint16 port)
 {

@@ -775,7 +775,7 @@ TCPService::BindSocket(TCPSocket* socket)
 	if (socket == NULL)
 		return B_BAD_VALUE;
 
-	if (_FindSocket(socket->Address(), socket->Port()))
+	if (_FindSocket(socket->Address(), socket->Port()) != NULL)
 		return EADDRINUSE;
 
 	return fSockets.Add(socket);
