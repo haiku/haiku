@@ -1,12 +1,15 @@
 SubDir HAIKU_TOP src system boot loader net ;
 
 UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders drivers ;
 
-SubDirC++Flags -fno-rtti ;
+SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
 
 local tcp = ;
+local iscsi = ;
 if $(TARGET_ARCH) = ppc {
 	tcp = TCP.cpp ;
+	iscsi = iSCSITarget.cpp ;
 }
 
 KernelStaticLibrary boot_net :
@@ -19,6 +22,7 @@ KernelStaticLibrary boot_net :
 	RemoteDisk.cpp
 	UDP.cpp
 	$(tcp)
+	$(iscsi)
 
 	: -fno-pic
 ;

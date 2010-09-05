@@ -9,6 +9,7 @@ local librootFunctions =
 	memcmp.o
 	memmove.o
 	strdup.o
+	strndup.o
 	strlen.o
 	strnlen.o
 	strcmp.o
