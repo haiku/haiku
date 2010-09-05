@@ -671,8 +671,8 @@ ioapic_init(kernel_args* args)
 		config |= irqDescriptor.polarity;
 		config |= irqDescriptor.interrupt_mode;
 		
-		int32 num = -1;
-		for (int a = 0; a < 16; a++) {
+		int32 num = entry.source_index;		
+		for (int a = 0; a < 16 && num == 0; a++) {
 			if (irqDescriptor.irq >> i & 0x01) {
 				num = a;
 				break;
