@@ -29,6 +29,8 @@
 
 //#define TRACE_TCP
 //#define TRACE_TCP_RANDOMNESS
+//#define TRACE_TCP_CHECKSUM
+//#define TRACE_TCP_QUEUE
 
 
 #ifdef TRACE_TCP
@@ -40,6 +42,16 @@
 #	define TRACE_PORT(x, ...) dprintf(x, ## __VA_ARGS__)
 #else
 #	define TRACE_PORT(x, ...) ;
+#endif
+#if defined(TRACE_TCP_CHECKSUM)
+#	define TRACE_CHECKSUM(x, ...) dprintf(x, ## __VA_ARGS__)
+#else
+#	define TRACE_CHECKSUM(x, ...) ;
+#endif
+#if defined(TRACE_TCP_QUEUE)
+#	define TRACE_QUEUE(x, ...) dprintf(x, ## __VA_ARGS__)
+#else
+#	define TRACE_QUEUE(x, ...) ;
 #endif
 
 
@@ -200,9 +212,18 @@ TCPSocket::~TCPSocket()
 uint16
 TCPSocket::WindowSize() const
 {
-	size_t windowSize = 2048;
-		// TODO Implement dynamic window size.
+	// TODO A large window size leads to read timeouts
+	// due to resends occuring too late.
+#if 0
+	size_t windowSize = 0xffff;
+	for (TCPPacket* packet = fFirstPacket;
+			packet != NULL && windowSize > packet->DataSize();
+			packet = packet->Next())
+		windowSize -= packet->DataSize();
 	return windowSize;
+#else
+	return 4096;
+#endif
 }
 
 
@@ -293,13 +314,15 @@ TCPSocket::Read(void* buffer, size_t bufferSize, size_t* bytesRead,
 		fTCPService->ProcessIncomingPackets();
 		//_ResendQueue();
 		packet = _PeekPacket();
-		if (packet != NULL && fRemoteState != TCP_SOCKET_STATE_OPEN)
+		if (packet == NULL && fRemoteState != TCP_SOCKET_STATE_OPEN)
 			return B_ERROR;
 		if (packet == NULL && timeout > 0LL)
 			_Ack();
 	} while (packet == NULL && system_time() - startTime < timeout);
 	if (packet == NULL) {
+#ifdef TRACE_TCP_QUEUE
 		_DumpQueue();
+#endif
 		return (timeout == 0) ? B_WOULD_BLOCK : B_TIMED_OUT;
 	}
 	uint32 packetOffset = fNextSequence - packet->SequenceNumber();
@@ -343,10 +366,12 @@ TCPSocket::Read(void* buffer, size_t bufferSize, size_t* bytesRead,
 			fNextSequence += readBytes;
 		} while (readBytes < bufferSize &&
 			system_time() - startTime < timeout);
+#ifdef TRACE_TCP_QUEUE
 		if (readBytes < bufferSize) {
-			dprintf("TCP: Unable to deliver more data!\n");
+			TRACE_QUEUE("TCP: Unable to deliver more data!\n");
 			_DumpQueue();
 		}
+#endif
 	}
 
 	return B_OK;
@@ -430,8 +455,8 @@ TCPSocket::ProcessPacket(TCPPacket* packet)
 	// For now rather protect us against being flooded with packets already
 	// acknowledged. "If it's important, they'll send it again."
 	// TODO PAWS
-	if (packet->SequenceNumber() < fNextSequence) {
-		TRACE("TCPSocket::ProcessPacket(): not queuing due to wraparound\n");
+	if (packet->SequenceNumber() < fAcknowledgeNumber) {
+		TRACE_QUEUE("TCPSocket::ProcessPacket(): not queuing due to wraparound\n");
 		delete packet;
 		return;
 	}
@@ -450,18 +475,23 @@ TCPSocket::ProcessPacket(TCPPacket* packet)
 	} else if (fFirstPacket->SequenceNumber() > packet->SequenceNumber()) {
 		// enqueue in front
 		TRACE("TCPSocket::ProcessPacket(): enqueue in front\n");
-		dprintf("TCP: Enqueuing %lx - %lx in front!\n",
+		TRACE_QUEUE("TCP: Enqueuing %lx - %lx in front! (next is %lx)\n",
 			packet->SequenceNumber(),
-			packet->SequenceNumber() + packet->DataSize() - 1);
+			packet->SequenceNumber() + packet->DataSize() - 1,
+			fNextSequence);
 		packet->SetNext(fFirstPacket);
 		fFirstPacket = packet;
+	} else if (fFirstPacket->SequenceNumber() == packet->SequenceNumber()) {
+		TRACE_QUEUE("%s(): dropping due to identical first packet\n", __func__);
+		delete packet;
+		return;
 	} else {
 		// enqueue in middle
 		TRACE("TCPSocket::ProcessPacket(): enqueue in middle\n");
 		for (TCPPacket* queuedPacket = fFirstPacket; queuedPacket != NULL;
 				queuedPacket = queuedPacket->Next()) {
 			if (queuedPacket->SequenceNumber() == packet->SequenceNumber()) {
-				TRACE("TCPSocket::EnqueuePacket(): TCP packet dropped\n");
+				TRACE_QUEUE("TCPSocket::EnqueuePacket(): TCP packet dropped\n");
 				// we may be waiting for a previous packet
 				delete packet;
 				return;
@@ -474,10 +504,10 @@ TCPSocket::ProcessPacket(TCPPacket* packet)
 			}
 		}
 	}
-	if (packet->SequenceNumber() == fAcknowledgeNumber)
+	while (packet != NULL && packet->SequenceNumber() == fAcknowledgeNumber) {
 		fAcknowledgeNumber = packet->SequenceNumber() + packet->DataSize();
-			// XXX Might be greater than that in case we already received
-			// following packets. Either check the queue or use ECN.
+		packet = packet->Next();
+	}
 }
 
 
@@ -527,6 +557,7 @@ TCPSocket::_DequeuePacket()
 			return nextPacket;
 		}
 	}
+	TRACE_QUEUE("dequeue failed!\n");
 	return NULL;
 }
 
@@ -542,8 +573,10 @@ TCPSocket::_Send(TCPPacket* packet, bool enqueue)
 		return error;
 	if (packet->SequenceNumber() == fSequenceNumber)
 		fSequenceNumber += packet->DataSize();
+
 	if (enqueue)
 		_EnqueueOutgoingPacket(packet);
+
 	return B_OK;
 }
 
@@ -577,23 +610,27 @@ TCPSocket::_EnqueueOutgoingPacket(TCPPacket* packet)
 }
 
 
+#ifdef TRACE_TCP_QUEUE
+
 inline void
 TCPSocket::_DumpQueue()
 {
+	TRACE_QUEUE("TCP: waiting for %lx (ack'ed %lx)\n", fNextSequence, fAcknowledgeNumber);
 	if (fFirstPacket == NULL)
-		dprintf("TCP: Queue is empty.\n");
+		TRACE_QUEUE("TCP: Queue is empty.\n");
 	else {
-		dprintf("TCP: waiting for %lx\n", fNextSequence);
 		for (TCPPacket* packet = fFirstPacket; packet != NULL;
 				packet = packet->Next()) {
-			dprintf("TCP: Queue: %lx\n", packet->SequenceNumber());
+			TRACE_QUEUE("TCP: Queue: %lx\n", packet->SequenceNumber());
 		}
 	}
 	if (fFirstSentPacket != NULL)
-		dprintf("TCP: Send queue is non-empty.\n");
+		TRACE_QUEUE("TCP: Send queue is non-empty.\n");
 	else
-		dprintf("TCP: Send queue is empty.\n");
+		TRACE_QUEUE("TCP: Send queue is empty.\n");
 }
+
+#endif
 
 
 status_t
@@ -681,6 +718,15 @@ TCPService::HandleIPPacket(IPService* ipService, ip_addr_t sourceIP,
 		return;
 
 	const tcp_header* header = (const tcp_header*)data;
+
+	uint16 chksum = _ChecksumData(data, size, sourceIP, destinationIP);
+	if (chksum != 0) {
+		TRACE_CHECKSUM("TCPService::HandleIPPacket(): invalid checksum "
+			"(%04x vs. %04x), padding %lu\n",
+			header->checksum, chksum, size % 2);
+		return;
+	}
+
 	uint16 source = ntohs(header->source);
 	uint16 destination = ntohs(header->destination);
 	uint32 sequenceNumber = ntohl(header->seqNumber);
@@ -696,20 +742,18 @@ TCPService::HandleIPPacket(IPService* ipService, ip_addr_t sourceIP,
 		uint8* option = (uint8*)data + sizeof(tcp_header);
 		while ((uint32*)option < (uint32*)data + header->dataOffset) {
 			uint8 optionKind = option[0];
+			if (optionKind == 0)
+				break;
 			uint8 optionLength = 1;
-			if (optionKind > 1)
+			if (optionKind > 1) {
 				optionLength = option[1];
-			TRACE("\tTCP option kind %u, length %u\n",
-				optionKind, optionLength);
+				TRACE("\tTCP option kind %u, length %u\n",
+					optionKind, optionLength);
+				if (optionKind == 2)
+					TRACE("\tTCP MSS = %04hu\n", *(uint16_t*)&option[2]);
+			}
 			option += optionLength;
 		}
-	}
-
-	uint16 chksum = _ChecksumData(data, size, sourceIP, destinationIP);
-	if (chksum != 0) {
-		TRACE("TCPService::HandleIPPacket(): invalid checksum (%04x)\n",
-			header->checksum);
-		return;
 	}
 
 	TCPSocket* socket = _FindSocket(destinationIP, destination);
