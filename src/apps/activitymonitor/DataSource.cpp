@@ -875,12 +875,16 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 	fShortLabel = fLabel;
 	fLabel << " usage";
 
-	const rgb_color kColors[] = {
+	const rgb_color kColors[B_MAX_CPU_COUNT] = {
 		// TODO: find some better defaults...
 		{200, 0, 200},
 		{0, 200, 200},
 		{80, 80, 80},
 		{230, 150, 50},
+		{255, 0, 0},
+		{0, 255, 0},
+		{0, 0, 255},
+		{0, 150, 230}
 	};
 	const uint32 kNumColors = sizeof(kColors) / sizeof(kColors[0]);
 
