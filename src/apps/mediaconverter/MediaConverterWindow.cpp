@@ -420,7 +420,7 @@ MediaConverterWindow::MessageReceived(BMessage* msg)
 					VERSION"\n"
 					B_UTF8_COPYRIGHT" 1999, Be Incorporated.\n"
 					B_UTF8_COPYRIGHT" 2000-2004 Jun Suzuki\n"
-					B_UTF8_COPYRIGHT" 2007 Stephan Aßmus\n",
+					B_UTF8_COPYRIGHT" 2007 Stephan Aßmus\n"
 					B_UTF8_COPYRIGHT" 2010 Haiku, Inc.",
 					OK_LABEL))->Go();
 			break;
