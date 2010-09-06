@@ -302,7 +302,7 @@ static inline av_const int av_ceil_log2(int x)
 #include "mem.h"
 
 #ifdef HAVE_AV_CONFIG_H
-#    include "internal.h"
+#    include "libavutil/internal.h"
 #endif /* HAVE_AV_CONFIG_H */
 
 #endif /* AVUTIL_COMMON_H */
