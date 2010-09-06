@@ -497,7 +497,7 @@ void
 AudioProducer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 	bigtime_t performanceTime)
 {
-	ERROR("%p->AudioProducer::LateNoticeReceived(%lld, %lld)\n", this, howMuch,
+	TRACE("%p->AudioProducer::LateNoticeReceived(%lld, %lld)\n", this, howMuch,
 		performanceTime);
 	// If we're late, we need to catch up. Respond in a manner appropriate
 	// to our current run mode.
