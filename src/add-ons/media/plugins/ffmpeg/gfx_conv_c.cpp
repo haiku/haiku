@@ -63,7 +63,7 @@ void gfx_conv_yuv410p_ycbcr422_c(AVFrame *in, AVFrame *out, int width, int heigh
 			y2 = *pi++;
 			u = *pi2;
 			v = *pi3;
-			a = (long)(y1 & 0x0FF | ((u& 0x0FF) << 8) | ((y1 & 0x0FF00) << 8) | ((v & 0x0FF) << 24));
+			a = (long)((y1 & 0x0FF) | ((u& 0x0FF) << 8) | ((y1 & 0x0FF00) << 8) | ((v & 0x0FF) << 24));
 			b = (long)(((y1 & 0x0FF0000) >> 16) | ((u& 0x0FF) << 8) | ((y1 & 0x0FF000000) >> 8) | ((v & 0x0FF) << 24));
 			c = (long)(y2 & 0x0FF | ((u& 0x0FF00)) | ((y2 & 0x0FF00) << 8) | ((v & 0x0FF00) << 16));
 			d = (long)(((y2 & 0x0FF0000) >> 16) | ((u& 0x0FF00)) | ((y2 & 0x0FF000000) >> 8) | ((v & 0x0FF00) << 16));
