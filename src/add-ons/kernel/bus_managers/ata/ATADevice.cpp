@@ -148,8 +148,12 @@ ATADevice::Inquiry(ATARequest *request)
 	// the following fields are *much* to small, sigh...
 	memcpy(data.vendor_ident, fInfoBlock.model_number,
 		sizeof(data.vendor_ident));
+	swap_words(data.vendor_ident, sizeof(data.vendor_ident));
+
 	memcpy(data.product_ident, fInfoBlock.model_number + 8,
 		sizeof(data.product_ident));
+	swap_words(data.product_ident, sizeof(data.product_ident));
+
 	memcpy(data.product_rev, "    ", sizeof(data.product_rev));
 
 	uint32 allocationLength = command->allocation_length;
