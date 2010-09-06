@@ -62,7 +62,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fSettings(*settings),
 	fPreferences(NULL)
 {
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
 	SetLayout(layout);
 
 	_AddMenuBar(layout);

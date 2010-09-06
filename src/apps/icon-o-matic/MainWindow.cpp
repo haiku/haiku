@@ -601,11 +601,12 @@ MainWindow::_CreateGUI(BRect bounds)
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	BGridLayout* layout = new BGridLayout();
+	layout->SetSpacing(0, 0);
 	BView* rootView = new BView("root view", 0, layout);
 	AddChild(rootView);
 	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BGroupView* leftTopView = new BGroupView(B_VERTICAL);
+	BGroupView* leftTopView = new BGroupView(B_VERTICAL, 0);
 	layout->AddView(leftTopView, 0, 0);
 	leftTopView->SetExplicitMinSize(BSize(splitWidth, B_SIZE_UNSET));
 
@@ -658,7 +659,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftTopView->AddChild(iconPreviews);
 
 	
-	BGroupView* leftSideView = new BGroupView(B_VERTICAL);
+	BGroupView* leftSideView = new BGroupView(B_VERTICAL, 0);
 	layout->AddView(leftSideView, 0, 1);
 	leftSideView->SetExplicitMinSize(BSize(splitWidth, B_SIZE_UNSET));
 
@@ -719,6 +720,7 @@ MainWindow::_CreateGUI(BRect bounds)
 	leftSideView->AddChild(propScrollView);
 
 	BGroupLayout* topSide = new BGroupLayout(B_HORIZONTAL);
+	topSide->SetSpacing(0);
 	BView* topSideView = new BView("top side view", 0, topSide);
 	layout->AddView(topSideView, 1, 0);
 
@@ -763,6 +765,7 @@ MainWindow::_CreateGUI(BRect bounds)
 
 	// swatch group
 	BGroupLayout* swatchGroup = new BGroupLayout(B_VERTICAL);
+	swatchGroup->SetSpacing(0);
 	BView* swatchGroupView = new BView("swatch group", 0, swatchGroup);
 	topSide->AddView(swatchGroupView);
 

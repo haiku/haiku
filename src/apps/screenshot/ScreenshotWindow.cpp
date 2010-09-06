@@ -199,12 +199,12 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	gridLayout->SetMinColumnWidth(1,
 		menuField->StringWidth("SomethingLongHere"));
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10.0)
 			.Add(fPreview)
-			.AddGroup(B_VERTICAL)
+			.AddGroup(B_VERTICAL, 0)
 				.Add(fActiveWindow)
 				.Add(fWindowBorder)
 				.Add(fShowCursor)
@@ -214,7 +214,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 					.Add(seconds)
 					.End()
 				.AddStrut(10.0)
-				.Add(gridLayout->View())
+				.Add(gridLayout)
 				.AddGlue()
 				.End())
 		.AddStrut(10)

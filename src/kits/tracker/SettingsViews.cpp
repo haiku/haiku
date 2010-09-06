@@ -191,10 +191,10 @@ DesktopSettingsView::DesktopSettingsView()
 	const float spacing = be_control_look->DefaultItemSpacing();
 
 	BGroupLayoutBuilder(this)
-		.AddGroup(B_VERTICAL)
+		.AddGroup(B_VERTICAL, 0)
 			.Add(fShowDisksIconRadioButton)
 			.Add(fMountVolumesOntoDesktopRadioButton)
-			.AddGroup(B_VERTICAL)
+			.AddGroup(B_VERTICAL, 0)
 				.Add(fMountSharedVolumesOntoDesktopCheckBox)
 				.SetInsets(20, 0, 0, 0)
 			.End()
@@ -434,8 +434,8 @@ WindowsSettingsView::WindowsSettingsView()
 	const float spacing = be_control_look->DefaultItemSpacing();
 
 	BGroupLayoutBuilder(this)
-		.AddGroup(B_VERTICAL)
-			.AddGroup(B_VERTICAL)
+		.AddGroup(B_VERTICAL, 0)
+			.AddGroup(B_VERTICAL, 0)
 				.Add(fShowFullPathInTitleBarCheckBox)
 				.Add(fSingleWindowBrowseCheckBox)
 			.End()
@@ -443,7 +443,7 @@ WindowsSettingsView::WindowsSettingsView()
 				.Add(fShowNavigatorCheckBox)
 				.SetInsets(20, 0, 0, 0)
 			.End()
-			.AddGroup(B_VERTICAL)
+			.AddGroup(B_VERTICAL, 0)
 				.Add(fOutlineSelectionCheckBox)
 				.Add(fSortFolderNamesFirstCheckBox)
 				.Add(fTypeAheadFilteringCheckBox)
@@ -730,12 +730,13 @@ SpaceBarSettingsView::SpaceBarSettingsView()
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 
-	BGroupLayoutBuilder(this)
-		.AddGroup(B_VERTICAL)
-			.Add(fSpaceBarShowCheckBox)
-			.Add(box)
+	BGroupLayout* layout = GroupLayout();
+	layout->SetOrientation(B_VERTICAL);
+	layout->SetSpacing(0);
+	BGroupLayoutBuilder(layout)
+		.Add(fSpaceBarShowCheckBox)
+		.Add(box)
 		.AddGlue()
-		.End()
 		.SetInsets(spacing, spacing, spacing, spacing);
 
 }
@@ -947,12 +948,13 @@ TrashSettingsView::TrashSettingsView()
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 
-	BGroupLayoutBuilder(this)
-		.AddGroup(B_VERTICAL)
-			.Add(fDontMoveFilesToTrashCheckBox)
-			.Add(fAskBeforeDeleteFileCheckBox)
-			.AddGlue()
-		.End()
+	BGroupLayout* layout = GroupLayout();
+	layout->SetOrientation(B_VERTICAL);
+	layout->SetSpacing(0);
+	BGroupLayoutBuilder(layout)
+		.Add(fDontMoveFilesToTrashCheckBox)
+		.Add(fAskBeforeDeleteFileCheckBox)
+		.AddGlue()
 		.SetInsets(spacing, spacing, spacing, spacing);
 
 }
