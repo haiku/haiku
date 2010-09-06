@@ -72,7 +72,7 @@ swap_words(void *data, size_t size)
 	uint16 *word = (uint16 *)data;
 	size_t count = size / 2;
 	while (count--) {
-		*word = (*word << 8) | (*word >> 8);
+		*word = B_BENDIAN_TO_HOST_INT16(*word);
 		word++;
 	}
 }
