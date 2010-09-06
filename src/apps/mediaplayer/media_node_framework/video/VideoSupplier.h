@@ -10,7 +10,7 @@
 #include <SupportDefs.h>
 
 
-struct media_format;
+struct media_raw_video_format;
 
 
 class VideoSupplier {
@@ -19,7 +19,7 @@ class VideoSupplier {
 	virtual						~VideoSupplier();
 
 	virtual	status_t			FillBuffer(int64 startFrame, void* buffer,
-									const media_format* format,
+									const media_raw_video_format& format,
 									bool& wasCached) = 0;
 
 	virtual	void				DeleteCaches();

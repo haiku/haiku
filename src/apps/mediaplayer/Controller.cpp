@@ -261,6 +261,9 @@ Controller::SetTo(const PlaylistItemRef& item)
 	fDuration = 0;
 	fVideoFrameRate = 25.0;
 
+	fSeekFrame = -1;
+	fSeekRequested = false;
+
 	if (fItem.Get() == NULL)
 		return B_BAD_VALUE;
 
@@ -369,7 +372,6 @@ Controller::SetTo(const PlaylistItemRef& item)
 
 	_NotifyFileChanged(item.Get(), B_OK);
 
-	SetPosition(0.0);
 	if (fAutoplay)
 		StartPlaying(true);
 
@@ -1080,7 +1082,7 @@ Controller::NotifyFPSChanged(float fps) const
 
 
 void
-Controller::NotifyCurrentFrameChanged(int32 frame) const
+Controller::NotifyCurrentFrameChanged(int64 frame) const
 {
 	// check if we are still waiting to reach the seekframe,
 	// don't pass the event on to the listeners in that case

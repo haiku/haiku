@@ -1,5 +1,5 @@
 /*
- * Copyright © 2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2008 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT licensce.
  */
 #ifndef PROXY_VIDEO_SUPPLIER_H
@@ -19,7 +19,7 @@ public:
 	virtual						~ProxyVideoSupplier();
 
 	virtual	status_t			FillBuffer(int64 startFrame, void* buffer,
-									const media_format* format,
+									const media_raw_video_format& format,
 									bool& wasCached);
 
 	virtual	void				DeleteCaches();
@@ -30,6 +30,11 @@ private:
 			BLocker				fSupplierLock;
 
 			VideoTrackSupplier*	fSupplier;
+
+			void*				fCachedFrame;
+			size_t				fCachedFrameSize;
+			bool				fCachedFrameValid;
+			bool				fUseFrameCaching;
 };
 
 #endif	// PROXY_VIDEO_SUPPLIER_H

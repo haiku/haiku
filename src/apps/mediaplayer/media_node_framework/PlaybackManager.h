@@ -71,7 +71,7 @@ public:
 			int32				PlayMode() const;
 			int32				LoopMode() const;
 			bool				IsLoopingEnabled() const;
-			int32				CurrentFrame() const;
+			int64				CurrentFrame() const;
 			float				Speed() const;
 
 	virtual	void				SetFramesPerSecond(float framesPerSecond);
@@ -165,7 +165,7 @@ public:
 									bool enabled) const;
 	virtual	void				NotifyVideoBoundsChanged(BRect bounds) const;
 	virtual	void				NotifyFPSChanged(float fps) const;
-	virtual	void				NotifyCurrentFrameChanged(int32 frame) const;
+	virtual	void				NotifyCurrentFrameChanged(int64 frame) const;
 	virtual	void				NotifySpeedChanged(float speed) const;
 	virtual	void				NotifyFrameDropped() const;
 	virtual	void				NotifyStopFrameReached() const;

@@ -85,7 +85,7 @@ MediaTrackVideoSupplier::GetCodecInfo(media_codec_info* info) const
 
 status_t
 MediaTrackVideoSupplier::ReadFrame(void* buffer, bigtime_t* performanceTime,
-	const media_format* format, bool& wasCached)
+	const media_raw_video_format& format, bool& wasCached)
 {
 	if (!fVideoTrack)
 		return B_NO_INIT;
@@ -93,12 +93,12 @@ MediaTrackVideoSupplier::ReadFrame(void* buffer, bigtime_t* performanceTime,
 		return B_BAD_VALUE;
 
 	status_t ret = B_OK;
-	if (format->u.raw_video.display.format
+	if (format.display.format
 			!= fFormat.u.raw_video.display.format
 		|| fFormat.u.raw_video.display.bytes_per_row
-			!= format->u.raw_video.display.bytes_per_row) {
-		ret = _SwitchFormat(format->u.raw_video.display.format,
-			format->u.raw_video.display.bytes_per_row);
+			!= format.display.bytes_per_row) {
+		ret = _SwitchFormat(format.display.format,
+			format.display.bytes_per_row);
 		if (ret < B_OK) {
 			fprintf(stderr, "MediaTrackVideoSupplier::ReadFrame() - "
 				"unable to switch media format: %s\n", strerror(ret));
@@ -200,8 +200,10 @@ MediaTrackVideoSupplier::SeekToFrame(int64* frame)
 		int64 nextWantFrame = wantFrame + 1;
 		if (fVideoTrack->FindKeyFrameForFrame(&nextWantFrame,
 			B_MEDIA_SEEK_CLOSEST_BACKWARD) == B_OK) {
-			if (nextWantFrame == wantFrame)
-				*frame = wantFrame + 1;
+			if (nextWantFrame == wantFrame) {
+				wantFrame++;
+				*frame = wantFrame;
+			}
 		}
 	}
 
@@ -209,7 +211,7 @@ MediaTrackVideoSupplier::SeekToFrame(int64* frame)
 //	printf("keyframe for frame: %lld -> %lld\n", wantFrame, *frame);
 //}
 
-	if (*frame <= fCurrentFrame && wantFrame > fCurrentFrame) {
+	if (*frame <= fCurrentFrame && wantFrame >= fCurrentFrame) {
 		// The current frame is already closer to the wanted frame
 		// than the next keyframe before it.
 		*frame = fCurrentFrame;

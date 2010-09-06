@@ -168,7 +168,7 @@ private:
 									bool enabled) const;
 	virtual	void				NotifyVideoBoundsChanged(BRect bounds) const;
 	virtual	void				NotifyFPSChanged(float fps) const;
-	virtual	void				NotifyCurrentFrameChanged(int32 frame) const;
+	virtual	void				NotifyCurrentFrameChanged(int64 frame) const;
 	virtual	void				NotifySpeedChanged(float speed) const;
 	virtual	void				NotifyFrameDropped() const;
 	virtual	void				NotifyStopFrameReached() const;

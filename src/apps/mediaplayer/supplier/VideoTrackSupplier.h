@@ -23,7 +23,7 @@ class VideoTrackSupplier {
 	virtual	status_t			GetCodecInfo(media_codec_info* info) const = 0;
 	virtual	status_t			ReadFrame(void* buffer,
 									bigtime_t* performanceTime,
-									const media_format* format,
+									const media_raw_video_format& format,
 									bool& wasCached) = 0;
 	virtual	status_t			FindKeyFrameForFrame(int64* frame) = 0;
 	virtual	status_t			SeekToTime(bigtime_t* performanceTime) = 0;

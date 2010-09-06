@@ -26,7 +26,7 @@ class MediaTrackVideoSupplier : public VideoTrackSupplier {
 
 	virtual	status_t			ReadFrame(void* buffer,
 									bigtime_t* performanceTime,
-									const media_format* format,
+									const media_raw_video_format& format,
 									bool& wasCached);
 	virtual	status_t			FindKeyFrameForFrame(int64* frame);
 	virtual	status_t			SeekToTime(bigtime_t* performanceTime);

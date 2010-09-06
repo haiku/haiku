@@ -323,7 +323,7 @@ PlaybackManager::IsLoopingEnabled() const
 }
 
 
-int32
+int64
 PlaybackManager::CurrentFrame() const
 {
 	return PlaylistFrameAtFrame(FrameForTime(fPerformanceTime));
@@ -940,11 +940,11 @@ PlaybackManager::SetPerformanceFrame(int64 frame)
 void
 PlaybackManager::SetPerformanceTime(bigtime_t time)
 {
-	int32 oldCurrentFrame = CurrentFrame();
+	int64 oldCurrentFrame = CurrentFrame();
 	fPerformanceTime = time;
 	_UpdateStates();
 	_UpdateSpeedInfos();
-	int32 currentFrame = CurrentFrame();
+	int64 currentFrame = CurrentFrame();
 
 //printf("PlaybackManager::SetPerformanceTime(%lld): %ld -> %ld\n",
 //	time, oldCurrentFrame, currentFrame);
@@ -1049,7 +1049,7 @@ PlaybackManager::NotifyFPSChanged(float fps) const
 
 
 void
-PlaybackManager::NotifyCurrentFrameChanged(int32 frame) const
+PlaybackManager::NotifyCurrentFrameChanged(int64 frame) const
 {
 	for (int32 i = 0;
 		 PlaybackListener* listener = (PlaybackListener*)fListeners.ItemAt(i);
@@ -1123,6 +1123,9 @@ PlaybackManager::PrintStateAtFrame(int64 frame)
 }
 
 
+// #pragma mark -
+
+
 /*!	Appends the supplied state to the list of states. If the state would
 	become active at the same time as _LastState() the latter is removed
 	and deleted. However, the activation time for the new state is adjusted,
@@ -1150,18 +1153,23 @@ TRACE("PlaybackManager::_PushState()\n");
 	int64 activationFrame = max(max(state->activation_frame,
 									lastState->activation_frame),
 								NextFrame());
-TRACE("  state activation frame: %lld, last state activation frame: %lld, "
-"NextFrame(): %lld\n", state->activation_frame, lastState->activation_frame,
-NextFrame());
-
 	int64 currentFrame = 0;
 	// remember the current frame, if necessary
-	if (adjustCurrentFrame)
+	if (adjustCurrentFrame) {
 		currentFrame = PlaylistFrameAtFrame(activationFrame);
-	// check whether it is active
+		if (currentFrame == CurrentFrame()) {
+			// Seems to be paused, force using the next frame
+			currentFrame++;
+		}
+	}
+	// Check whether the last state has already become active
 	// (NOTE: We may want to keep the last state, if it is not active,
 	//  but then the new state should become active after the last one.
 	//  Thus we had to replace `NextFrame()' with `activationFrame'.)
+TRACE("  state activation frame: %lld, last state activation frame: %lld, "
+"NextFrame(): %lld, currentFrame: %lld, next currentFrame: %lld\n",
+state->activation_frame, lastState->activation_frame, NextFrame(),
+CurrentFrame(), currentFrame);
 	if (lastState->activation_frame >= NextFrame()) {
 		// it isn't -- remove it
 		fStates.RemoveItem(fStates.CountItems() - 1);

@@ -797,15 +797,13 @@ h->start_time = 0;
 						h->u.raw_video.line_count
 							= fConnectedFormat.display.line_count;
 						// Fill in a frame
-						media_format mf;
-						mf.type = B_MEDIA_RAW_VIDEO;
-						mf.u.raw_video = fConnectedFormat;
 						TRACE("_FrameGeneratorThread: frame: %Ld, "
 							"playlistFrame: %Ld\n", fFrame, playlistFrame);
 						bool forceOrWasCached = forceSendingBuffer;
 
 						err = fSupplier->FillBuffer(playlistFrame,
-							buffer->Data(), &mf, forceOrWasCached);
+							buffer->Data(), fConnectedFormat,
+							forceOrWasCached);
 						// clean the buffer if something went wrong
 						if (err != B_OK) {
 							// TODO: should use "back value" according
