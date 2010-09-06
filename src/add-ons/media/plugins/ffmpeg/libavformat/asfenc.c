@@ -203,21 +203,19 @@ static void put_guid(ByteIOContext *s, const ff_asf_guid *g)
     put_buffer(s, *g, sizeof(*g));
 }
 
-static void put_str16_nolen(ByteIOContext *s, const char *tag);
 static void put_str16(ByteIOContext *s, const char *tag)
 {
-    put_le16(s,strlen(tag) + 1);
-    put_str16_nolen(s, tag);
-}
+    int len;
+    uint8_t *pb;
+    ByteIOContext *dyn_buf;
+    if (url_open_dyn_buf(&dyn_buf) < 0)
+        return;
 
-static void put_str16_nolen(ByteIOContext *s, const char *tag)
-{
-    int c;
-
-    do{
-        c = (uint8_t)*tag++;
-        put_le16(s, c);
-    }while(c);
+    ff_put_str16_nolen(dyn_buf, tag);
+    len = url_close_dyn_buf(dyn_buf, &pb);
+    put_le16(s, len);
+    put_buffer(s, pb, len);
+    av_freep(&pb);
 }
 
 static int64_t put_header(ByteIOContext *pb, const ff_asf_guid *g)
@@ -272,7 +270,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
 {
     ASFContext *asf = s->priv_data;
     ByteIOContext *pb = s->pb;
-    AVMetadataTag *title, *author, *copyright, *comment;
+    AVMetadataTag *tags[5];
     int header_size, n, extra_size, extra_size2, wav_extra_size, file_time;
     int has_title;
     int metadata_count;
@@ -281,13 +279,14 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
     int bit_rate;
     int64_t duration;
 
-    title     = av_metadata_get(s->metadata, "title"    , NULL, 0);
-    author    = av_metadata_get(s->metadata, "author"   , NULL, 0);
-    copyright = av_metadata_get(s->metadata, "copyright", NULL, 0);
-    comment   = av_metadata_get(s->metadata, "comment"  , NULL, 0);
+    tags[0] = av_metadata_get(s->metadata, "title"    , NULL, 0);
+    tags[1] = av_metadata_get(s->metadata, "author"   , NULL, 0);
+    tags[2] = av_metadata_get(s->metadata, "copyright", NULL, 0);
+    tags[3] = av_metadata_get(s->metadata, "comment"  , NULL, 0);
+    tags[4] = av_metadata_get(s->metadata, "rating"   , NULL, 0);
 
     duration = asf->duration + PREROLL_TIME * 10000;
-    has_title = title || author || copyright || comment;
+    has_title = tags[0] || tags[1] || tags[2] || tags[3] || tags[4];
     metadata_count = s->metadata ? s->metadata->count : 0;
 
     bit_rate = 0;
@@ -335,16 +334,22 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
 
     /* title and other infos */
     if (has_title) {
+        int len;
+        uint8_t *buf;
+        ByteIOContext *dyn_buf;
+
+        if (url_open_dyn_buf(&dyn_buf) < 0)
+            return AVERROR(ENOMEM);
+
         hpos = put_header(pb, &ff_asf_comment_header);
-        put_le16(pb, title     ? 2 * (strlen(title->value    ) + 1) : 0);
-        put_le16(pb, author    ? 2 * (strlen(author->value   ) + 1) : 0);
-        put_le16(pb, copyright ? 2 * (strlen(copyright->value) + 1) : 0);
-        put_le16(pb, comment   ? 2 * (strlen(comment->value  ) + 1) : 0);
-        put_le16(pb, 0);
-        if (title    ) put_str16_nolen(pb, title->value    );
-        if (author   ) put_str16_nolen(pb, author->value   );
-        if (copyright) put_str16_nolen(pb, copyright->value);
-        if (comment  ) put_str16_nolen(pb, comment->value  );
+
+        for (n = 0; n < FF_ARRAY_ELEMS(tags); n++) {
+            len = tags[n] ? ff_put_str16_nolen(dyn_buf, tags[n]->value) : 0;
+            put_le16(pb, len);
+        }
+        len = url_close_dyn_buf(dyn_buf, &buf);
+        put_buffer(pb, buf, len);
+        av_freep(&buf);
         end_header(pb, hpos);
     }
     if (metadata_count) {
@@ -352,14 +357,9 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
         hpos = put_header(pb, &ff_asf_extended_content_header);
         put_le16(pb, metadata_count);
         while ((tag = av_metadata_get(s->metadata, "", tag, AV_METADATA_IGNORE_SUFFIX))) {
-            put_le16(pb, 2*(strlen(tag->key) + 3) + 1);
-            put_le16(pb, 'W');
-            put_le16(pb, 'M');
-            put_le16(pb, '/');
-            put_str16_nolen(pb, tag->key);
+            put_str16(pb, tag->key);
             put_le16(pb, 0);
-            put_le16(pb, 2*strlen(tag->value) + 1);
-            put_str16_nolen(pb, tag->value);
+            put_str16(pb, tag->value);
         }
         end_header(pb, hpos);
     }
@@ -375,13 +375,13 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
 
 
         switch(enc->codec_type) {
-        case CODEC_TYPE_AUDIO:
+        case AVMEDIA_TYPE_AUDIO:
             wav_extra_size = 0;
             extra_size = 18 + wav_extra_size;
             extra_size2 = 8;
             break;
         default:
-        case CODEC_TYPE_VIDEO:
+        case AVMEDIA_TYPE_VIDEO:
             wav_extra_size = enc->extradata_size;
             extra_size = 0x33 + wav_extra_size;
             extra_size2 = 0;
@@ -389,7 +389,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
         }
 
         hpos = put_header(pb, &ff_asf_stream_header);
-        if (enc->codec_type == CODEC_TYPE_AUDIO) {
+        if (enc->codec_type == AVMEDIA_TYPE_AUDIO) {
             put_guid(pb, &ff_asf_audio_stream);
             put_guid(pb, &ff_asf_audio_conceal_spread);
         } else {
@@ -403,7 +403,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
         put_le16(pb, n + 1); /* stream number */
         put_le32(pb, 0); /* ??? */
 
-        if (enc->codec_type == CODEC_TYPE_AUDIO) {
+        if (enc->codec_type == AVMEDIA_TYPE_AUDIO) {
             /* WAVEFORMATEX header */
             int wavsize = ff_put_wav_header(pb, enc);
             if ((enc->codec_id != CODEC_ID_MP3) && (enc->codec_id != CODEC_ID_MP2) && (enc->codec_id != CODEC_ID_ADPCM_IMA_WAV) && (enc->extradata_size==0)) {
@@ -449,26 +449,41 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size, int64_t data
     put_le32(pb, s->nb_streams);
     for(n=0;n<s->nb_streams;n++) {
         AVCodec *p;
+        const char *desc;
+        int len;
+        uint8_t *buf;
+        ByteIOContext *dyn_buf;
 
         enc = s->streams[n]->codec;
         p = avcodec_find_encoder(enc->codec_id);
 
-        if(enc->codec_type == CODEC_TYPE_AUDIO)
+        if(enc->codec_type == AVMEDIA_TYPE_AUDIO)
             put_le16(pb, 2);
-        else if(enc->codec_type == CODEC_TYPE_VIDEO)
+        else if(enc->codec_type == AVMEDIA_TYPE_VIDEO)
             put_le16(pb, 1);
         else
             put_le16(pb, -1);
 
         if(enc->codec_id == CODEC_ID_WMAV2)
-            put_str16(pb, "Windows Media Audio V8");
+            desc = "Windows Media Audio V8";
         else
-            put_str16(pb, p ? p->name : enc->codec_name);
+            desc = p ? p->name : enc->codec_name;
+
+        if ( url_open_dyn_buf(&dyn_buf) < 0)
+            return AVERROR(ENOMEM);
+
+        ff_put_str16_nolen(dyn_buf, desc);
+        len = url_close_dyn_buf(dyn_buf, &buf);
+        put_le16(pb, len / 2); // "number of characters" = length in bytes / 2
+
+        put_buffer(pb, buf, len);
+        av_freep(&buf);
+
         put_le16(pb, 0); /* no parameters */
 
 
         /* id */
-        if (enc->codec_type == CODEC_TYPE_AUDIO) {
+        if (enc->codec_type == AVMEDIA_TYPE_AUDIO) {
             put_le16(pb, 2);
             put_le16(pb, enc->codec_tag);
         } else {
@@ -653,7 +668,7 @@ static void put_payload_header(
     int val;
 
     val = stream->num;
-    if (flags & PKT_FLAG_KEY)
+    if (flags & AV_PKT_FLAG_KEY)
         val |= ASF_PL_FLAG_KEY_FRAME;
     put_byte(pb, val);
 
@@ -707,7 +722,7 @@ static void put_frame(
             // multi payloads
             frag_len1 = asf->packet_size_left - PAYLOAD_HEADER_SIZE_MULTIPLE_PAYLOADS - PACKET_HEADER_MIN_SIZE - 1;
 
-            if(frag_len1 < payload_len && avst->codec->codec_type == CODEC_TYPE_AUDIO){
+            if(frag_len1 < payload_len && avst->codec->codec_type == AVMEDIA_TYPE_AUDIO){
                 flush_packet(s);
                 continue;
             }
@@ -755,8 +770,8 @@ static int asf_write_packet(AVFormatContext *s, AVPacket *pkt)
     codec = s->streams[pkt->stream_index]->codec;
     stream = &asf->streams[pkt->stream_index];
 
-    if(codec->codec_type == CODEC_TYPE_AUDIO)
-        flags &= ~PKT_FLAG_KEY;
+    if(codec->codec_type == AVMEDIA_TYPE_AUDIO)
+        flags &= ~AV_PKT_FLAG_KEY;
 
     pts = (pkt->pts != AV_NOPTS_VALUE) ? pkt->pts : pkt->dts;
     assert(pts != AV_NOPTS_VALUE);
@@ -767,7 +782,7 @@ static int asf_write_packet(AVFormatContext *s, AVPacket *pkt)
     put_frame(s, stream, s->streams[pkt->stream_index], pkt->dts, pkt->data, pkt->size, flags);
 
     /* check index */
-    if ((!asf->is_streamed) && (flags & PKT_FLAG_KEY)) {
+    if ((!asf->is_streamed) && (flags & AV_PKT_FLAG_KEY)) {
         start_sec = (int)(duration / INT64_C(10000000));
         if (start_sec != (int)(asf->last_indexed_pts / INT64_C(10000000))) {
             for(i=asf->nb_index_count;i<start_sec;i++) {

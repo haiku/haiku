@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavformat/sierravmd.c
+ * @file
  * Sierra VMD file demuxer
  * by Vladimir "VAG" Gneushev (vagsoft at mail.ru)
  * for more information on the Sierra VMD file format, visit:
@@ -61,9 +61,16 @@ typedef struct VmdDemuxContext {
 
 static int vmd_probe(AVProbeData *p)
 {
+    int w, h;
+    if (p->buf_size < 16)
+        return 0;
     /* check if the first 2 bytes of the file contain the appropriate size
      * of a VMD header chunk */
     if (AV_RL16(&p->buf[0]) != VMD_HEADER_SIZE - 2)
+        return 0;
+    w = AV_RL16(&p->buf[12]);
+    h = AV_RL16(&p->buf[14]);
+    if (!w || w > 2048 || !h || h > 2048)
         return 0;
 
     /* only return half certainty since this check is a bit sketchy */
@@ -102,7 +109,7 @@ static int vmd_read_header(AVFormatContext *s,
         return AVERROR(ENOMEM);
     av_set_pts_info(vst, 33, 1, 10);
     vmd->video_stream_index = vst->index;
-    vst->codec->codec_type = CODEC_TYPE_VIDEO;
+    vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     vst->codec->codec_id = vmd->is_indeo3 ? CODEC_ID_INDEO3 : CODEC_ID_VMDVIDEO;
     vst->codec->codec_tag = 0;  /* no fourcc */
     vst->codec->width = AV_RL16(&vmd->vmd_header[12]);
@@ -122,7 +129,7 @@ static int vmd_read_header(AVFormatContext *s,
         if (!st)
             return AVERROR(ENOMEM);
         vmd->audio_stream_index = st->index;
-        st->codec->codec_type = CODEC_TYPE_AUDIO;
+        st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
         st->codec->codec_id = CODEC_ID_VMDAUDIO;
         st->codec->codec_tag = 0;  /* no fourcc */
         st->codec->channels = (vmd->vmd_header[811] & 0x80) ? 2 : 1;
@@ -154,7 +161,7 @@ static int vmd_read_header(AVFormatContext *s,
     vmd->frame_table = NULL;
     sound_buffers = AV_RL16(&vmd->vmd_header[808]);
     raw_frame_table_size = vmd->frame_count * 6;
-    if(vmd->frame_count * vmd->frames_per_block  >= UINT_MAX / sizeof(vmd_frame)){
+    if(vmd->frame_count * vmd->frames_per_block >= UINT_MAX / sizeof(vmd_frame) - sound_buffers){
         av_log(s, AV_LOG_ERROR, "vmd->frame_count * vmd->frames_per_block too large\n");
         return -1;
     }

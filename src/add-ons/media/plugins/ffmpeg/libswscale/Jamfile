@@ -30,6 +30,7 @@ StaticLibrary libswscale.a :
 	options.c
 	rgb2rgb.c
 	swscale.c
+	utils.c
 	yuv2rgb.c
 
 	$(archSources)

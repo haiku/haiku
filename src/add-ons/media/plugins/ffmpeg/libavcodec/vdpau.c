@@ -1,6 +1,6 @@
 /*
  * Video Decode and Presentation API for UNIX (VDPAU) is used for
- * HW decode acceleration for MPEG-1/2, H.264 and VC-1.
+ * HW decode acceleration for MPEG-1/2, MPEG-4 ASP, H.264 and VC-1.
  *
  * Copyright (c) 2008 NVIDIA
  *
@@ -54,7 +54,7 @@ void ff_vdpau_h264_set_reference_frames(MpegEncContext *s)
 
     for (list = 0; list < 2; ++list) {
         Picture **lp = list ? h->long_ref : h->short_ref;
-        int ls = list ? h->long_ref_count : h->short_ref_count;
+        int ls = list ? 16 : h->short_ref_count;
 
         for (i = 0; i < ls; ++i) {
             pic = lp[i];
@@ -127,7 +127,7 @@ void ff_vdpau_add_data_chunk(MpegEncContext *s,
     render->bitstream_buffers_used++;
 }
 
-void ff_vdpau_h264_picture_complete(MpegEncContext *s)
+void ff_vdpau_h264_picture_start(MpegEncContext *s)
 {
     H264Context *h = s->avctx->priv_data;
     struct vdpau_render_state *render;
@@ -136,10 +136,6 @@ void ff_vdpau_h264_picture_complete(MpegEncContext *s)
     render = (struct vdpau_render_state *)s->current_picture_ptr->data[0];
     assert(render);
 
-    render->info.h264.slice_count = h->slice_num;
-    if (render->info.h264.slice_count < 1)
-        return;
-
     for (i = 0; i < 2; ++i) {
         int foc = s->current_picture_ptr->field_poc[i];
         if (foc == INT_MAX)
@@ -147,8 +143,22 @@ void ff_vdpau_h264_picture_complete(MpegEncContext *s)
         render->info.h264.field_order_cnt[i] = foc;
     }
 
+    render->info.h264.frame_num = h->frame_num;
+}
+
+void ff_vdpau_h264_picture_complete(MpegEncContext *s)
+{
+    H264Context *h = s->avctx->priv_data;
+    struct vdpau_render_state *render;
+
+    render = (struct vdpau_render_state *)s->current_picture_ptr->data[0];
+    assert(render);
+
+    render->info.h264.slice_count = h->slice_num;
+    if (render->info.h264.slice_count < 1)
+        return;
+
     render->info.h264.is_reference                           = (s->current_picture_ptr->reference & 3) ? VDP_TRUE : VDP_FALSE;
-    render->info.h264.frame_num                              = h->frame_num;
     render->info.h264.field_pic_flag                         = s->picture_structure != PICT_FRAME;
     render->info.h264.bottom_field_flag                      = s->picture_structure == PICT_BOTTOM_FIELD;
     render->info.h264.num_ref_frames                         = h->sps.ref_frame_count;
@@ -303,6 +313,60 @@ void ff_vdpau_vc1_decode_picture(MpegEncContext *s, const uint8_t *buf,
 
     ff_draw_horiz_band(s, 0, s->avctx->height);
     render->bitstream_buffers_used        = 0;
+}
+
+void ff_vdpau_mpeg4_decode_picture(MpegEncContext *s, const uint8_t *buf,
+                                   int buf_size)
+{
+    struct vdpau_render_state *render, *last, *next;
+    int i;
+
+    if (!s->current_picture_ptr) return;
+
+    render = (struct vdpau_render_state *)s->current_picture_ptr->data[0];
+    assert(render);
+
+    /* fill VdpPictureInfoMPEG4Part2 struct */
+    render->info.mpeg4.trd[0]                            = s->pp_time;
+    render->info.mpeg4.trb[0]                            = s->pb_time;
+    render->info.mpeg4.trd[1]                            = s->pp_field_time >> 1;
+    render->info.mpeg4.trb[1]                            = s->pb_field_time >> 1;
+    render->info.mpeg4.vop_time_increment_resolution     = s->avctx->time_base.den;
+    render->info.mpeg4.vop_coding_type                   = 0;
+    render->info.mpeg4.vop_fcode_forward                 = s->f_code;
+    render->info.mpeg4.vop_fcode_backward                = s->b_code;
+    render->info.mpeg4.resync_marker_disable             = !s->resync_marker;
+    render->info.mpeg4.interlaced                        = !s->progressive_sequence;
+    render->info.mpeg4.quant_type                        = s->mpeg_quant;
+    render->info.mpeg4.quarter_sample                    = s->quarter_sample;
+    render->info.mpeg4.short_video_header                = s->avctx->codec->id == CODEC_ID_H263;
+    render->info.mpeg4.rounding_control                  = s->no_rounding;
+    render->info.mpeg4.alternate_vertical_scan_flag      = s->alternate_scan;
+    render->info.mpeg4.top_field_first                   = s->top_field_first;
+    for (i = 0; i < 64; ++i) {
+        render->info.mpeg4.intra_quantizer_matrix[i]     = s->intra_matrix[i];
+        render->info.mpeg4.non_intra_quantizer_matrix[i] = s->inter_matrix[i];
+    }
+    render->info.mpeg4.forward_reference                 = VDP_INVALID_HANDLE;
+    render->info.mpeg4.backward_reference                = VDP_INVALID_HANDLE;
+
+    switch (s->pict_type) {
+    case FF_B_TYPE:
+        next = (struct vdpau_render_state *)s->next_picture.data[0];
+        assert(next);
+        render->info.mpeg4.backward_reference     = next->surface;
+        render->info.mpeg4.vop_coding_type        = 2;
+        // no break here, going to set forward prediction
+    case FF_P_TYPE:
+        last = (struct vdpau_render_state *)s->last_picture.data[0];
+        assert(last);
+        render->info.mpeg4.forward_reference      = last->surface;
+    }
+
+    ff_vdpau_add_data_chunk(s, buf, buf_size);
+
+    ff_draw_horiz_band(s, 0, s->avctx->height);
+    render->bitstream_buffers_used = 0;
 }
 
 /* @}*/

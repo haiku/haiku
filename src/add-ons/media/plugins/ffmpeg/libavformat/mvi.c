@@ -77,16 +77,15 @@ static int read_header(AVFormatContext *s, AVFormatParameters *ap)
     }
 
     av_set_pts_info(ast, 64, 1, ast->codec->sample_rate);
-    ast->codec->codec_type      = CODEC_TYPE_AUDIO;
+    ast->codec->codec_type      = AVMEDIA_TYPE_AUDIO;
     ast->codec->codec_id        = CODEC_ID_PCM_U8;
     ast->codec->channels        = 1;
     ast->codec->bits_per_coded_sample = 8;
     ast->codec->bit_rate        = ast->codec->sample_rate * 8;
 
     av_set_pts_info(vst, 64, msecs_per_frame, 1000000);
-    vst->codec->codec_type = CODEC_TYPE_VIDEO;
+    vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     vst->codec->codec_id   = CODEC_ID_MOTIONPIXELS;
-    vst->codec->pix_fmt    = PIX_FMT_RGB555;
 
     mvi->get_int = (vst->codec->width * vst->codec->height < (1 << 16)) ? get_le16 : get_le24;
 

@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavformat/ipmovie.c
+ * @file
  * Interplay MVE file demuxer
  * by Mike Melanson (melanson@pcisys.net)
  * For more information regarding the Interplay MVE file format, visit:
@@ -46,8 +46,6 @@
 static inline void debug_ipmovie(const char *format, ...) { }
 #endif
 
-#define IPMOVIE_SIGNATURE "Interplay MVE File\x1A\0"
-#define IPMOVIE_SIGNATURE_SIZE 20
 #define CHUNK_PREAMBLE_SIZE 4
 #define OPCODE_PREAMBLE_SIZE 4
 
@@ -95,6 +93,7 @@ typedef struct IPMVEContext {
 
     uint64_t frame_pts_inc;
 
+    unsigned int video_bpp;
     unsigned int video_width;
     unsigned int video_height;
     int64_t video_pts;
@@ -377,6 +376,11 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
             }
             s->video_width = AV_RL16(&scratch[0]) * 8;
             s->video_height = AV_RL16(&scratch[2]) * 8;
+            if (opcode_version < 2 || !AV_RL16(&scratch[6])) {
+                s->video_bpp = 8;
+            } else {
+                s->video_bpp = 16;
+            }
             debug_ipmovie("video resolution: %d x %d\n",
                 s->video_width, s->video_height);
             break;
@@ -499,12 +503,18 @@ static int process_ipmovie_chunk(IPMVEContext *s, ByteIOContext *pb,
     return chunk_type;
 }
 
+static const char signature[] = "Interplay MVE File\x1A\0\x1A";
+
 static int ipmovie_probe(AVProbeData *p)
 {
-    if (strncmp(p->buf, IPMOVIE_SIGNATURE, IPMOVIE_SIGNATURE_SIZE) != 0)
-        return 0;
+    uint8_t *b = p->buf;
+    uint8_t *b_end = p->buf + p->buf_size - sizeof(signature);
+    do {
+        if (memcmp(b++, signature, sizeof(signature)) == 0)
+            return AVPROBE_SCORE_MAX;
+    } while (b < b_end);
 
-    return AVPROBE_SCORE_MAX;
+    return 0;
 }
 
 static int ipmovie_read_header(AVFormatContext *s,
@@ -516,14 +526,22 @@ static int ipmovie_read_header(AVFormatContext *s,
     AVStream *st;
     unsigned char chunk_preamble[CHUNK_PREAMBLE_SIZE];
     int chunk_type;
+    uint8_t signature_buffer[sizeof(signature)];
 
+    get_buffer(pb, signature_buffer, sizeof(signature_buffer));
+    while (memcmp(signature_buffer, signature, sizeof(signature))) {
+        memmove(signature_buffer, signature_buffer + 1, sizeof(signature_buffer) - 1);
+        signature_buffer[sizeof(signature_buffer) - 1] = get_byte(pb);
+        if (url_feof(pb))
+            return AVERROR_EOF;
+    }
     /* initialize private context members */
     ipmovie->video_pts = ipmovie->audio_frame_count = 0;
     ipmovie->audio_chunk_offset = ipmovie->video_chunk_offset =
     ipmovie->decode_map_chunk_offset = 0;
 
     /* on the first read, this will position the stream at the first chunk */
-    ipmovie->next_chunk_offset = IPMOVIE_SIGNATURE_SIZE + 6;
+    ipmovie->next_chunk_offset = url_ftell(pb) + 4;
 
     /* process the first chunk which should be CHUNK_INIT_VIDEO */
     if (process_ipmovie_chunk(ipmovie, pb, &pkt) != CHUNK_INIT_VIDEO)
@@ -548,11 +566,12 @@ static int ipmovie_read_header(AVFormatContext *s,
         return AVERROR(ENOMEM);
     av_set_pts_info(st, 63, 1, 1000000);
     ipmovie->video_stream_index = st->index;
-    st->codec->codec_type = CODEC_TYPE_VIDEO;
+    st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_INTERPLAY_VIDEO;
     st->codec->codec_tag = 0;  /* no fourcc */
     st->codec->width = ipmovie->video_width;
     st->codec->height = ipmovie->video_height;
+    st->codec->bits_per_coded_sample = ipmovie->video_bpp;
 
     /* palette considerations */
     st->codec->palctrl = &ipmovie->palette_control;
@@ -563,7 +582,7 @@ static int ipmovie_read_header(AVFormatContext *s,
             return AVERROR(ENOMEM);
         av_set_pts_info(st, 32, 1, ipmovie->audio_sample_rate);
         ipmovie->audio_stream_index = st->index;
-        st->codec->codec_type = CODEC_TYPE_AUDIO;
+        st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
         st->codec->codec_id = ipmovie->audio_type;
         st->codec->codec_tag = 0;  /* no tag */
         st->codec->channels = ipmovie->audio_channels;

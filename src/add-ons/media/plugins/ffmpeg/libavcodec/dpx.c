@@ -92,6 +92,7 @@ static int decode_frame(AVCodecContext *avctx,
 
     // Need to end in 0x323 to read the bits per color
     buf += 3;
+    avctx->bits_per_raw_sample =
     bits_per_color = buf[0];
 
     switch (descriptor) {
@@ -215,7 +216,7 @@ static av_cold int decode_end(AVCodecContext *avctx)
 
 AVCodec dpx_decoder = {
     "dpx",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_DPX,
     sizeof(DPXContext),
     decode_init,

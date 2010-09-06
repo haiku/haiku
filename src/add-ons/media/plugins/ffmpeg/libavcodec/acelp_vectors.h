@@ -25,6 +25,16 @@
 
 #include <stdint.h>
 
+/** Sparse representation for the algebraic codebook (fixed) vector */
+typedef struct {
+    int      n;
+    int      x[10];
+    float    y[10];
+    int      no_repeat_mask;
+    int      pitch_lag;
+    float    pitch_fac;
+} AMRFixed;
+
 /**
  * Track|Pulse|        Positions
  * -------------------------------------------------------------------------
@@ -103,6 +113,26 @@ extern const uint8_t ff_fc_2pulses_9bits_track1_gray[16];
 extern const uint8_t ff_fc_2pulses_9bits_track2_gray[32];
 
 /**
+ * b60 hamming windowed sinc function coefficients
+ */
+extern const float ff_b60_sinc[61];
+
+/**
+ * Table of pow(0.7,n)
+ */
+extern const float ff_pow_0_7[10];
+
+/**
+ * Table of pow(0.75,n)
+ */
+extern const float ff_pow_0_75[10];
+
+/**
+ * Table of pow(0.55,n)
+ */
+extern const float ff_pow_0_55[10];
+
+/**
  * Decode fixed-codebook vector (3.8 and D.5.8 of G.729, 5.7.1 of AMR).
  * @param fc_v [out] decoded fixed codebook vector (2.13)
  * @param tab1 table used for first pulse_count pulses
@@ -116,14 +146,31 @@ extern const uint8_t ff_fc_2pulses_9bits_track2_gray[32];
  *
  * Used in G.729 @8k, G.729 @4.4k, G.729 @6.4k, AMR @7.95k, AMR @7.40k
  */
-void ff_acelp_fc_pulse_per_track(
-        int16_t* fc_v,
-        const uint8_t *tab1,
-        const uint8_t *tab2,
-        int pulse_indexes,
-        int pulse_signs,
-        int pulse_count,
-        int bits);
+void ff_acelp_fc_pulse_per_track(int16_t* fc_v,
+                                 const uint8_t *tab1,
+                                 const uint8_t *tab2,
+                                 int pulse_indexes,
+                                 int pulse_signs,
+                                 int pulse_count,
+                                 int bits);
+
+/**
+ * Decode the algebraic codebook index to pulse positions and signs and
+ * construct the algebraic codebook vector for MODE_12k2.
+ *
+ * @note: The positions and signs are explicitly coded in MODE_12k2.
+ *
+ * @param fixed_index          positions of the ten pulses
+ * @param fixed_sparse         pointer to the algebraic codebook vector
+ * @param gray_decode          gray decoding table
+ * @param half_pulse_count     number of couples of pulses
+ * @param bits                 length of one pulse index in bits
+ */
+void ff_decode_10_pulses_35bits(const int16_t *fixed_index,
+                                AMRFixed *fixed_sparse,
+                                const uint8_t *gray_decode,
+                                int half_pulse_count, int bits);
+
 
 /**
  * weighted sum of two vectors with rounding.
@@ -140,15 +187,14 @@ void ff_acelp_fc_pulse_per_track(
  *
  *  out[i] = (in_a[i]*weight_a + in_b[i]*weight_b + rounder) >> shift
  */
-void ff_acelp_weighted_vector_sum(
-        int16_t* out,
-        const int16_t *in_a,
-        const int16_t *in_b,
-        int16_t weight_coeff_a,
-        int16_t weight_coeff_b,
-        int16_t rounder,
-        int shift,
-        int length);
+void ff_acelp_weighted_vector_sum(int16_t* out,
+                                  const int16_t *in_a,
+                                  const int16_t *in_b,
+                                  int16_t weight_coeff_a,
+                                  int16_t weight_coeff_b,
+                                  int16_t rounder,
+                                  int shift,
+                                  int length);
 
 /**
  * float implementation of weighted sum of two vectors.
@@ -162,6 +208,57 @@ void ff_acelp_weighted_vector_sum(
  * @note It is safe to pass the same buffer for out and in_a or in_b.
  */
 void ff_weighted_vector_sumf(float *out, const float *in_a, const float *in_b,
-                             float weight_coeff_a, float weight_coeff_b, int length);
+                             float weight_coeff_a, float weight_coeff_b,
+                             int length);
+
+/**
+ * Adaptive gain control (as used in AMR postfiltering)
+ *
+ * @param out output buffer for filtered speech data
+ * @param in the input speech buffer (may be the same as out)
+ * @param speech_energ input energy
+ * @param size the input buffer size
+ * @param alpha exponential filter factor
+ * @param gain_mem a pointer to the filter memory (single float of size)
+ */
+void ff_adaptive_gain_control(float *out, const float *in, float speech_energ,
+                              int size, float alpha, float *gain_mem);
+
+/**
+ * Set the sum of squares of a signal by scaling
+ *
+ * @param out output samples
+ * @param in input samples
+ * @param sum_of_squares new sum of squares
+ * @param n number of samples
+ *
+ * @note If the input is zero (or its energy underflows), the output is zero.
+ *       This is the behavior of AGC in the AMR reference decoder. The QCELP
+ *       reference decoder seems to have undefined behavior.
+ *
+ * TIA/EIA/IS-733 2.4.8.3-2/3/4/5, 2.4.8.6
+ * 3GPP TS 26.090 6.1 (6)
+ */
+void ff_scale_vector_to_given_sum_of_squares(float *out, const float *in,
+                                             float sum_of_squares, const int n);
+
+/**
+ * Add fixed vector to an array from a sparse representation
+ *
+ * @param out fixed vector with pitch sharpening
+ * @param in sparse fixed vector
+ * @param scale number to multiply the fixed vector by
+ * @param size the output vector size
+ */
+void ff_set_fixed_vector(float *out, const AMRFixed *in, float scale, int size);
+
+/**
+ * Clear array values set by set_fixed_vector
+ *
+ * @param out fixed vector to be cleared
+ * @param in sparse fixed vector
+ * @param size the output vector size
+ */
+void ff_clear_fixed_vector(float *out, const AMRFixed *in, int size);
 
 #endif /* AVCODEC_ACELP_VECTORS_H */

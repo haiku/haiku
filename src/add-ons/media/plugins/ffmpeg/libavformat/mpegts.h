@@ -27,6 +27,8 @@
 #define TS_FEC_PACKET_SIZE 204
 #define TS_DVHS_PACKET_SIZE 192
 #define TS_PACKET_SIZE 188
+#define TS_MAX_PACKET_SIZE 204
+
 #define NB_PID_MAX 8192
 #define MAX_SECTION_SIZE 4096
 
@@ -56,9 +58,9 @@
 
 typedef struct MpegTSContext MpegTSContext;
 
-MpegTSContext *mpegts_parse_open(AVFormatContext *s);
-int mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
-                        const uint8_t *buf, int len);
-void mpegts_parse_close(MpegTSContext *ts);
+MpegTSContext *ff_mpegts_parse_open(AVFormatContext *s);
+int ff_mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
+                           const uint8_t *buf, int len);
+void ff_mpegts_parse_close(MpegTSContext *ts);
 
 #endif /* AVFORMAT_MPEGTS_H */

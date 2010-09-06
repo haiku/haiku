@@ -36,6 +36,8 @@ typedef struct {
     int ext_sampling_index;
     int ext_sample_rate;
     int ext_chan_config;
+    int channels;
+    int ps;  //< -1 implicit, 1 presence
 } MPEG4AudioConfig;
 
 extern const int ff_mpeg4audio_sample_rates[16];
@@ -56,7 +58,7 @@ enum AudioObjectType {
     AOT_AAC_LC,                ///< Y                       Low Complexity
     AOT_AAC_SSR,               ///< N (code in SoC repo)    Scalable Sample Rate
     AOT_AAC_LTP,               ///< N (code in SoC repo)    Long Term Prediction
-    AOT_SBR,                   ///< N (in progress)         Spectral Band Replication
+    AOT_SBR,                   ///< Y                       Spectral Band Replication
     AOT_AAC_SCALABLE,          ///< N                       Scalable
     AOT_TWINVQ,                ///< N                       Twin Vector Quantizer
     AOT_CELP,                  ///< N                       Code Excited Linear Prediction
@@ -84,7 +86,7 @@ enum AudioObjectType {
     AOT_L2,                    ///< Y                       Layer 2
     AOT_L3,                    ///< Y                       Layer 3
     AOT_DST,                   ///< N                       Direct Stream Transfer
-    AOT_ALS,                   ///< N                       Audio LosslesS
+    AOT_ALS,                   ///< Y                       Audio LosslesS
     AOT_SLS,                   ///< N                       Scalable LosslesS
     AOT_SLS_NON_CORE,          ///< N                       Scalable LosslesS (non core)
     AOT_ER_AAC_ELD,            ///< N                       Error Resilient Enhanced Low Delay
@@ -92,7 +94,8 @@ enum AudioObjectType {
     AOT_SMR_MAIN,              ///< N                       Symbolic Music Representation Main
     AOT_USAC_NOSBR,            ///< N                       Unified Speech and Audio Coding (no SBR)
     AOT_SAOC,                  ///< N                       Spatial Audio Object Coding
-    AOT_USAC             = 45, ///< N                       Unified Speech and Audio Coding
+    AOT_LD_SURROUND,           ///< N                       Low Delay MPEG Surround
+    AOT_USAC,                  ///< N                       Unified Speech and Audio Coding
 };
 
 #define MAX_PCE_SIZE 304 ///<Maximum size of a PCE including the 3-bit ID_PCE

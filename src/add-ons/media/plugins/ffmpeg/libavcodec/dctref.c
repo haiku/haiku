@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/dctref.c
+ * @file
  * reference discrete cosine transform (double precision)
  *
  * @author Dylan Yudaken (dyudaken at gmail)
@@ -30,6 +30,8 @@
  */
 
 #include "libavutil/mathematics.h"
+#include "dctref.h"
+
 static double coefficients[8 * 8];
 
 /**

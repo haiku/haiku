@@ -24,7 +24,7 @@
 
 /**
  * SoX native format demuxer
- * @file libavformat/soxdec.c
+ * @file
  * @author Daniel Verkamp
  * @sa http://wiki.multimedia.cx/index.php?title=SoX_native_intermediate_format
  */
@@ -53,7 +53,7 @@ static int sox_read_header(AVFormatContext *s,
     if (!st)
         return AVERROR(ENOMEM);
 
-    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
 
     if (get_le32(pb) == SOX_TAG) {
         st->codec->codec_id = CODEC_ID_PCM_S32LE;
@@ -93,21 +93,21 @@ static int sox_read_header(AVFormatContext *s,
         return -1;
     }
 
-    if (comment_size &&
-        comment_size + FF_INPUT_BUFFER_PADDING_SIZE >= comment_size) {
-        char *comment = av_mallocz(comment_size + FF_INPUT_BUFFER_PADDING_SIZE);
+    if (comment_size && comment_size < UINT_MAX) {
+        char *comment = av_malloc(comment_size+1);
         if (get_buffer(pb, comment, comment_size) != comment_size) {
             av_freep(&comment);
-            return AVERROR_IO;
+            return AVERROR(EIO);
         }
-        av_metadata_set(&s->metadata, "comment", comment);
-        av_freep(&comment);
+        comment[comment_size] = 0;
+
+        av_metadata_set2(&s->metadata, "comment", comment,
+                               AV_METADATA_DONT_STRDUP_VAL);
     }
 
     url_fskip(pb, header_size - SOX_FIXED_HDR - comment_size);
 
     st->codec->sample_rate           = sample_rate;
-    st->codec->sample_fmt            = SAMPLE_FMT_S32;
     st->codec->bits_per_coded_sample = 32;
     st->codec->bit_rate              = st->codec->sample_rate *
                                        st->codec->bits_per_coded_sample *

@@ -45,7 +45,7 @@ void ff_acelp_interpolate(int16_t* out, const int16_t* in,
 {
     int n, i;
 
-    assert(pitch_delay_frac >= 0 && pitch_delay_frac < precision);
+    assert(frac_pos >= 0 && frac_pos < precision);
 
     for (n = 0; n < length; n++) {
         int idx = 0;
@@ -73,6 +73,26 @@ void ff_acelp_interpolate(int16_t* out, const int16_t* in,
     }
 }
 
+void ff_acelp_interpolatef(float *out, const float *in,
+                           const float *filter_coeffs, int precision,
+                           int frac_pos, int filter_length, int length)
+{
+    int n, i;
+
+    for (n = 0; n < length; n++) {
+        int idx = 0;
+        float v = 0;
+
+        for (i = 0; i < filter_length;) {
+            v += in[n + i] * filter_coeffs[idx + frac_pos];
+            idx += precision;
+            i++;
+            v += in[n - i] * filter_coeffs[idx - frac_pos];
+        }
+        out[n] = v;
+    }
+}
+
 
 void ff_acelp_high_pass_filter(int16_t* out, int hpf_f[2],
                                const int16_t* in, int length)
@@ -94,7 +114,7 @@ void ff_acelp_high_pass_filter(int16_t* out, int hpf_f[2],
     }
 }
 
-void ff_acelp_apply_order_2_transfer_function(float *buf,
+void ff_acelp_apply_order_2_transfer_function(float *out, const float *in,
                                               const float zero_coeffs[2],
                                               const float pole_coeffs[2],
                                               float gain, float mem[2], int n)
@@ -103,10 +123,23 @@ void ff_acelp_apply_order_2_transfer_function(float *buf,
     float tmp;
 
     for (i = 0; i < n; i++) {
-        tmp = gain * buf[i] - pole_coeffs[0] * mem[0] - pole_coeffs[1] * mem[1];
-        buf[i] =        tmp + zero_coeffs[0] * mem[0] + zero_coeffs[1] * mem[1];
+        tmp = gain * in[i] - pole_coeffs[0] * mem[0] - pole_coeffs[1] * mem[1];
+        out[i] =       tmp + zero_coeffs[0] * mem[0] + zero_coeffs[1] * mem[1];
 
         mem[1] = mem[0];
         mem[0] = tmp;
     }
 }
+
+void ff_tilt_compensation(float *mem, float tilt, float *samples, int size)
+{
+    float new_tilt_mem = samples[size - 1];
+    int i;
+
+    for (i = size - 1; i > 0; i--)
+        samples[i] -= tilt * samples[i - 1];
+
+    samples[0] -= tilt * *mem;
+    *mem = new_tilt_mem;
+}
+

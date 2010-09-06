@@ -20,7 +20,7 @@
  */
 
 /**
-* @file libavcodec/libschroedingerenc.c
+* @file
 * Dirac encoder support via libschroedinger-1.0 libraries. More details about
 * the Schroedinger project can be found at http://www.diracvideo.org/.
 * The library implements Dirac Specification Version 2.2
@@ -407,13 +407,13 @@ static int libschroedinger_encode_close(AVCodecContext *avccontext)
 
 AVCodec libschroedinger_encoder = {
     "libschroedinger",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_DIRAC,
     sizeof(FfmpegSchroEncoderParams),
     libschroedinger_encode_init,
     libschroedinger_encode_frame,
     libschroedinger_encode_close,
    .capabilities = CODEC_CAP_DELAY,
-   .pix_fmts     = (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_YUV444P, PIX_FMT_NONE},
+   .pix_fmts     = (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_YUV444P, PIX_FMT_NONE},
    .long_name    = NULL_IF_CONFIG_SMALL("libschroedinger Dirac 2.2"),
 };

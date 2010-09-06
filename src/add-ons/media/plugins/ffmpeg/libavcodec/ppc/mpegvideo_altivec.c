@@ -28,6 +28,9 @@
 
 #include "dsputil_ppc.h"
 #include "util_altivec.h"
+#include "types_altivec.h"
+#include "dsputil_altivec.h"
+
 // Swaps two variables (used for altivec registers)
 #define SWAP(a,b) \
 do { \
@@ -66,7 +69,7 @@ do { \
 
 #define FOUROF(a) {a,a,a,a}
 
-int dct_quantize_altivec(MpegEncContext* s,
+static int dct_quantize_altivec(MpegEncContext* s,
                          DCTELEM* data, int n,
                          int qscale, int* overflow)
 {
@@ -473,7 +476,7 @@ int dct_quantize_altivec(MpegEncContext* s,
 
 /* AltiVec version of dct_unquantize_h263
    this code assumes `block' is 16 bytes-aligned */
-void dct_unquantize_h263_altivec(MpegEncContext *s,
+static void dct_unquantize_h263_altivec(MpegEncContext *s,
                                  DCTELEM *block, int n, int qscale)
 {
 POWERPC_PERF_DECLARE(altivec_dct_unquantize_h263_num, 1);
@@ -504,29 +507,16 @@ POWERPC_PERF_START_COUNT(altivec_dct_unquantize_h263_num, 1);
 
     {
         register const vector signed short vczero = (const vector signed short)vec_splat_s16(0);
-        DECLARE_ALIGNED_16(short, qmul8[]) =
-            {
-              qmul, qmul, qmul, qmul,
-              qmul, qmul, qmul, qmul
-            };
-        DECLARE_ALIGNED_16(short, qadd8[]) =
-            {
-              qadd, qadd, qadd, qadd,
-              qadd, qadd, qadd, qadd
-            };
-        DECLARE_ALIGNED_16(short, nqadd8[]) =
-            {
-              -qadd, -qadd, -qadd, -qadd,
-              -qadd, -qadd, -qadd, -qadd
-            };
+        DECLARE_ALIGNED(16, short, qmul8) = qmul;
+        DECLARE_ALIGNED(16, short, qadd8) = qadd;
         register vector signed short blockv, qmulv, qaddv, nqaddv, temp1;
         register vector bool short blockv_null, blockv_neg;
         register short backup_0 = block[0];
         register int j = 0;
 
-        qmulv = vec_ld(0, qmul8);
-        qaddv = vec_ld(0, qadd8);
-        nqaddv = vec_ld(0, nqadd8);
+        qmulv = vec_splat((vec_s16)vec_lde(0, &qmul8), 0);
+        qaddv = vec_splat((vec_s16)vec_lde(0, &qadd8), 0);
+        nqaddv = vec_sub(vczero, qaddv);
 
 #if 0   // block *is* 16 bytes-aligned, it seems.
         // first make sure block[j] is 16 bytes-aligned
@@ -582,9 +572,6 @@ POWERPC_PERF_START_COUNT(altivec_dct_unquantize_h263_num, 1);
 POWERPC_PERF_STOP_COUNT(altivec_dct_unquantize_h263_num, nCoeffs == 63);
 }
 
-
-void idct_put_altivec(uint8_t *dest, int line_size, int16_t *block);
-void idct_add_altivec(uint8_t *dest, int line_size, int16_t *block);
 
 void MPV_common_init_altivec(MpegEncContext *s)
 {

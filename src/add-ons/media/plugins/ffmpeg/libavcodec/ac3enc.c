@@ -20,14 +20,14 @@
  */
 
 /**
- * @file libavcodec/ac3enc.c
+ * @file
  * The simplest AC-3 encoder.
  */
 //#define DEBUG
 //#define DEBUG_BITALLOC
 #include "libavutil/crc.h"
 #include "avcodec.h"
-#include "get_bits.h" // for ff_reverse
+#include "libavutil/common.h" /* for av_reverse */
 #include "put_bits.h"
 #include "ac3.h"
 #include "audioconvert.h"
@@ -138,7 +138,7 @@ static void fft(IComplex *z, int ln)
 
     /* reverse */
     for(j=0;j<np;j++) {
-        int k = ff_reverse[j] >> (8 - ln);
+        int k = av_reverse[j] >> (8 - ln);
         if (k < j)
             FFSWAP(IComplex, z[k], z[j]);
     }
@@ -1393,16 +1393,16 @@ void test_ac3(void)
 
 AVCodec ac3_encoder = {
     "ac3",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_AC3,
     sizeof(AC3EncodeContext),
     AC3_encode_init,
     AC3_encode_frame,
     AC3_encode_close,
     NULL,
-    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("ATSC A/52A (AC-3)"),
-    .channel_layouts = (int64_t[]){
+    .channel_layouts = (const int64_t[]){
         CH_LAYOUT_MONO,
         CH_LAYOUT_STEREO,
         CH_LAYOUT_2_1,

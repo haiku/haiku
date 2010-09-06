@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/xan.c
+ * @file
  * Xan video decoder for Wing Commander III computer game
  * by Mario Brito (mbrito@student.dei.uc.pt)
  * and Mike Melanson (melanson@pcisys.net)
@@ -74,15 +74,16 @@ static av_cold int xan_decode_init(AVCodecContext *avctx)
 
     avctx->pix_fmt = PIX_FMT_PAL8;
 
-    if(avcodec_check_dimensions(avctx, avctx->width, avctx->height))
-        return -1;
-
     s->buffer1_size = avctx->width * avctx->height;
     s->buffer1 = av_malloc(s->buffer1_size);
+    if (!s->buffer1)
+        return -1;
     s->buffer2_size = avctx->width * avctx->height;
     s->buffer2 = av_malloc(s->buffer2_size + 130);
-    if (!s->buffer1 || !s->buffer2)
+    if (!s->buffer2) {
+        av_freep(&s->buffer1);
         return -1;
+    }
 
     return 0;
 }
@@ -156,12 +157,8 @@ static void xan_unpack(unsigned char *dest, const unsigned char *src, int dest_l
             av_memcpy_backptr(dest, back, size2);
             dest += size2;
         } else {
-            int finish;
-            size = ((opcode & 0x1f) << 2) + 4;
-
-            finish = size > 0x70;
-            if (finish)
-                size = opcode & 3;
+            int finish = opcode >= 0xfc;
+            size = finish ? opcode & 3 : ((opcode & 0x1f) << 2) + 4;
 
             memcpy(dest, src, size);  dest += size;  src += size;
             if (finish)
@@ -185,13 +182,14 @@ static inline void xan_wc3_output_pixel_run(XanContext *s,
     line_inc = stride - width;
     index = y * stride + x;
     current_x = x;
-    while((pixel_count--) && (index < s->frame_size)) {
+    while(pixel_count && (index < s->frame_size)) {
+        int count = FFMIN(pixel_count, width - current_x);
+        memcpy(palette_plane + index, pixel_buffer, count);
+        pixel_count  -= count;
+        index        += count;
+        pixel_buffer += count;
+        current_x    += count;
 
-        /* don't do a memcpy() here; keyframes generally copy an entire
-         * frame of data and the stride needs to be accounted for */
-        palette_plane[index++] = *pixel_buffer++;
-
-        current_x++;
         if (current_x >= width) {
             index += line_inc;
             current_x = 0;
@@ -217,18 +215,21 @@ static inline void xan_wc3_copy_pixel_run(XanContext *s,
     curframe_x = x;
     prevframe_index = (y + motion_y) * stride + x + motion_x;
     prevframe_x = x + motion_x;
-    while((pixel_count--) && (curframe_index < s->frame_size)) {
+    while(pixel_count && (curframe_index < s->frame_size)) {
+        int count = FFMIN3(pixel_count, width - curframe_x, width - prevframe_x);
 
-        palette_plane[curframe_index++] =
-            prev_palette_plane[prevframe_index++];
+        memcpy(palette_plane + curframe_index, prev_palette_plane + prevframe_index, count);
+        pixel_count     -= count;
+        curframe_index  += count;
+        prevframe_index += count;
+        curframe_x      += count;
+        prevframe_x     += count;
 
-        curframe_x++;
         if (curframe_x >= width) {
             curframe_index += line_inc;
             curframe_x = 0;
         }
 
-        prevframe_x++;
         if (prevframe_x >= width) {
             prevframe_index += line_inc;
             prevframe_x = 0;
@@ -373,7 +374,7 @@ static int xan_decode_frame(AVCodecContext *avctx,
 
     palette_control->palette_changed = 0;
     memcpy(s->current_frame.data[1], palette_control->palette,
-        AVPALETTE_SIZE);
+           AVPALETTE_SIZE);
     s->current_frame.palette_has_changed = 1;
 
     s->buf = buf;
@@ -408,15 +409,15 @@ static av_cold int xan_decode_end(AVCodecContext *avctx)
     if (s->current_frame.data[0])
         avctx->release_buffer(avctx, &s->current_frame);
 
-    av_free(s->buffer1);
-    av_free(s->buffer2);
+    av_freep(&s->buffer1);
+    av_freep(&s->buffer2);
 
     return 0;
 }
 
 AVCodec xan_wc3_decoder = {
     "xan_wc3",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_XAN_WC3,
     sizeof(XanContext),
     xan_decode_init,
@@ -430,7 +431,7 @@ AVCodec xan_wc3_decoder = {
 /*
 AVCodec xan_wc4_decoder = {
     "xan_wc4",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_XAN_WC4,
     sizeof(XanContext),
     xan_decode_init,
@@ -438,5 +439,6 @@ AVCodec xan_wc4_decoder = {
     xan_decode_end,
     xan_decode_frame,
     CODEC_CAP_DR1,
+    .long_name = NULL_IF_CONFIG_SMALL("Wing Commander IV / Xxan"),
 };
 */

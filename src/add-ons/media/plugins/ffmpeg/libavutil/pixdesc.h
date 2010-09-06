@@ -19,12 +19,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef AVCODEC_PIXDESC_H
-#define AVCODEC_PIXDESC_H
+#ifndef AVUTIL_PIXDESC_H
+#define AVUTIL_PIXDESC_H
 
 #include <inttypes.h>
-
-#include "libavutil/intreadwrite.h"
 
 typedef struct AVComponentDescriptor{
     uint16_t plane        :2;            ///< which of the 4 planes contains the component
@@ -55,13 +53,14 @@ typedef struct AVComponentDescriptor{
  */
 typedef struct AVPixFmtDescriptor{
     const char *name;
-    uint8_t nb_channels;        ///< The number of components each pixel has, (1-4)
+    uint8_t nb_components;      ///< The number of components each pixel has, (1-4)
 
     /**
      * Amount to shift the luma width right to find the chroma width.
      * For YV12 this is 1 for example.
      * chroma_width = -((-luma_width) >> log2_chroma_w)
      * The note above is needed to ensure rounding up.
+     * This value only refers to the chroma components.
      */
     uint8_t log2_chroma_w;      ///< chroma_width = -((-luma_width )>>log2_chroma_w)
 
@@ -70,15 +69,23 @@ typedef struct AVPixFmtDescriptor{
      * For YV12 this is 1 for example.
      * chroma_height= -((-luma_height) >> log2_chroma_h)
      * The note above is needed to ensure rounding up.
+     * This value only refers to the chroma components.
      */
     uint8_t log2_chroma_h;
     uint8_t flags;
-    AVComponentDescriptor comp[4]; ///< parameters that describe how pixels are packed
+
+    /**
+     * Parameters that describe how pixels are packed. If the format
+     * has chroma components, they must be stored in comp[1] and
+     * comp[2].
+     */
+    AVComponentDescriptor comp[4];
 }AVPixFmtDescriptor;
 
-#define PIX_FMT_BE        1 ///< big-endian
+#define PIX_FMT_BE        1 ///< Pixel format is big-endian.
 #define PIX_FMT_PAL       2 ///< Pixel format has a palette in data[1], values are indexes in this palette.
 #define PIX_FMT_BITSTREAM 4 ///< All values of a component are bit-wise packed end to end.
+#define PIX_FMT_HWACCEL   8 ///< Pixel format is an HW accelerated format.
 
 /**
  * The array of all the pixel format descriptors.
@@ -86,8 +93,8 @@ typedef struct AVPixFmtDescriptor{
 extern const AVPixFmtDescriptor av_pix_fmt_descriptors[];
 
 /**
- * Reads a line from an image, and writes to dst the values of the
- * pixel format component c.
+ * Reads a line from an image, and writes the values of the
+ * pixel format component c to dst.
  *
  * @param data the array containing the pointers to the planes of the image
  * @param linesizes the array containing the linesizes of the image
@@ -97,50 +104,12 @@ extern const AVPixFmtDescriptor av_pix_fmt_descriptors[];
  * @param w the width of the line to read, that is the number of
  * values to write to dst
  * @param read_pal_component if not zero and the format is a paletted
- * format writes to dst the values corresponding to the palette
- * component c in data[1], rather than the palette indexes in
+ * format writes the values corresponding to the palette
+ * component c in data[1] to dst, rather than the palette indexes in
  * data[0]. The behavior is undefined if the format is not paletted.
  */
-static inline void read_line(uint16_t *dst, const uint8_t *data[4], const int linesize[4],
-                             const AVPixFmtDescriptor *desc, int x, int y, int c, int w, int read_pal_component)
-{
-    AVComponentDescriptor comp= desc->comp[c];
-    int plane= comp.plane;
-    int depth= comp.depth_minus1+1;
-    int mask = (1<<depth)-1;
-    int shift= comp.shift;
-    int step = comp.step_minus1+1;
-    int flags= desc->flags;
-
-    if (flags & PIX_FMT_BITSTREAM){
-        int skip = x*step + comp.offset_plus1-1;
-        const uint8_t *p = data[plane] + y*linesize[plane] + (skip>>3);
-        int shift = 8 - depth - (skip&7);
-
-        while(w--){
-            int val = (*p >> shift) & mask;
-            if(read_pal_component)
-                val= data[1][4*val + c];
-            shift -= step;
-            p -= shift>>3;
-            shift &= 7;
-            *dst++= val;
-        }
-    } else {
-        const uint8_t *p = data[plane]+ y*linesize[plane] + x*step + comp.offset_plus1-1;
-
-        while(w--){
-            int val;
-            if(flags & PIX_FMT_BE) val= AV_RB16(p);
-            else                   val= AV_RL16(p);
-            val = (val>>shift) & mask;
-            if(read_pal_component)
-                val= data[1][4*val + c];
-            p+= step;
-            *dst++= val;
-        }
-    }
-}
+void read_line(uint16_t *dst, const uint8_t *data[4], const int linesize[4],
+               const AVPixFmtDescriptor *desc, int x, int y, int c, int w, int read_pal_component);
 
 /**
  * Writes the values from src to the pixel format component c of an
@@ -156,42 +125,21 @@ static inline void read_line(uint16_t *dst, const uint8_t *data[4], const int li
  * @param w the width of the line to write, that is the number of
  * values to write to the image line
  */
-static inline void write_line(const uint16_t *src, uint8_t *data[4], const int linesize[4],
-                              const AVPixFmtDescriptor *desc, int x, int y, int c, int w)
-{
-    AVComponentDescriptor comp = desc->comp[c];
-    int plane = comp.plane;
-    int depth = comp.depth_minus1+1;
-    int step  = comp.step_minus1+1;
-    int flags = desc->flags;
+void write_line(const uint16_t *src, uint8_t *data[4], const int linesize[4],
+                const AVPixFmtDescriptor *desc, int x, int y, int c, int w);
 
-    if (flags & PIX_FMT_BITSTREAM) {
-        int skip = x*step + comp.offset_plus1-1;
-        uint8_t *p = data[plane] + y*linesize[plane] + (skip>>3);
-        int shift = 8 - depth - (skip&7);
-
-        while (w--) {
-            *p |= *src++ << shift;
-            shift -= step;
-            p -= shift>>3;
-            shift &= 7;
-        }
-    } else {
-        int shift = comp.shift;
-        uint8_t *p = data[plane]+ y*linesize[plane] + x*step + comp.offset_plus1-1;
-
-        while (w--) {
-            if (flags & PIX_FMT_BE) {
-                uint16_t val = AV_RB16(p) | (*src++<<shift);
-                AV_WB16(p, val);
-            } else {
-                uint16_t val = AV_RL16(p) | (*src++<<shift);
-                AV_WL16(p, val);
-            }
-            p+= step;
-        }
-    }
-}
+/**
+ * Returns the pixel format corresponding to name.
+ *
+ * If there is no pixel format with name name, then looks for a
+ * pixel format with the name corresponding to the native endian
+ * format of name.
+ * For example in a little-endian system, first looks for "gray16",
+ * then for "gray16le".
+ *
+ * Finally if no pixel format has been found, returns PIX_FMT_NONE.
+ */
+enum PixelFormat av_get_pix_fmt(const char *name);
 
 /**
  * Returns the number of bits per pixel used by the pixel format
@@ -203,4 +151,4 @@ static inline void write_line(const uint16_t *src, uint8_t *data[4], const int l
  */
 int av_get_bits_per_pixel(const AVPixFmtDescriptor *pixdesc);
 
-#endif /* AVCODEC_PIXDESC_H */
+#endif /* AVUTIL_PIXDESC_H */

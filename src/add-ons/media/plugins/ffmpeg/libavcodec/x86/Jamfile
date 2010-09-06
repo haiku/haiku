@@ -21,11 +21,14 @@ if $(HAIKU_FFMPEG_USE_MMX) = 1 {
 		dsputil_mmx.c
 		dsputilenc_mmx.c
 		fdct_mmx.c
+		fft.c
 		idct_mmx_xvid.c
+		lpc_mmx.c
 		motion_est_mmx.c
 		mpegvideo_mmx.c
 		rv40dsp_mmx.c
 		simple_idct_mmx.c
+		snowdsp_mmx.c
 		vc1dsp_mmx.c
 		vp3dsp_mmx.c
 		vp6dsp_mmx.c

@@ -248,7 +248,7 @@ static int ape_read_header(AVFormatContext * s, AVFormatParameters * ap)
     }
     ape->frames       = av_malloc(ape->totalframes * sizeof(APEFrame));
     if(!ape->frames)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
     ape->firstframe   = ape->junklength + ape->descriptorlength + ape->headerlength + ape->seektablelength + ape->wavheaderlength;
     ape->currentframe = 0;
 
@@ -301,7 +301,7 @@ static int ape_read_header(AVFormatContext * s, AVFormatParameters * ap)
 
     total_blocks = (ape->totalframes == 0) ? 0 : ((ape->totalframes - 1) * ape->blocksperframe) + ape->finalframeblocks;
 
-    st->codec->codec_type      = CODEC_TYPE_AUDIO;
+    st->codec->codec_type      = AVMEDIA_TYPE_AUDIO;
     st->codec->codec_id        = CODEC_ID_APE;
     st->codec->codec_tag       = MKTAG('A', 'P', 'E', ' ');
     st->codec->channels        = ape->channels;
@@ -310,8 +310,8 @@ static int ape_read_header(AVFormatContext * s, AVFormatParameters * ap)
     st->codec->frame_size      = MAC_SUBFRAME_SIZE;
 
     st->nb_frames = ape->totalframes;
-    s->start_time = 0;
-    s->duration   = (int64_t) total_blocks * AV_TIME_BASE / ape->samplerate;
+    st->start_time = 0;
+    st->duration  = total_blocks / MAC_SUBFRAME_SIZE;
     av_set_pts_info(st, 64, MAC_SUBFRAME_SIZE, ape->samplerate);
 
     st->codec->extradata = av_malloc(APE_EXTRADATA_SIZE);
@@ -338,9 +338,9 @@ static int ape_read_packet(AVFormatContext * s, AVPacket * pkt)
     uint32_t extra_size = 8;
 
     if (url_feof(s->pb))
-        return AVERROR_IO;
+        return AVERROR(EIO);
     if (ape->currentframe > ape->totalframes)
-        return AVERROR_IO;
+        return AVERROR(EIO);
 
     url_fseek (s->pb, ape->frames[ape->currentframe].pos, SEEK_SET);
 
@@ -351,7 +351,7 @@ static int ape_read_packet(AVFormatContext * s, AVPacket * pkt)
         nblocks = ape->blocksperframe;
 
     if (av_new_packet(pkt,  ape->frames[ape->currentframe].size + extra_size) < 0)
-        return AVERROR_NOMEM;
+        return AVERROR(ENOMEM);
 
     AV_WL32(pkt->data    , nblocks);
     AV_WL32(pkt->data + 4, ape->frames[ape->currentframe].skip);

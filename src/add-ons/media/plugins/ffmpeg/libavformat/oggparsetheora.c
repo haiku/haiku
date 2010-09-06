@@ -104,11 +104,12 @@ theora_header (AVFormatContext * s, int idx)
         thp->gpshift = get_bits(&gb, 5);
         thp->gpmask = (1 << thp->gpshift) - 1;
 
-        st->codec->codec_type = CODEC_TYPE_VIDEO;
+        st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
         st->codec->codec_id = CODEC_ID_THEORA;
+        st->need_parsing = AVSTREAM_PARSE_HEADERS;
 
     } else if (os->buf[os->pstart] == 0x83) {
-        vorbis_comment (s, os->buf + os->pstart + 7, os->psize - 8);
+        ff_vorbis_comment (s, &st->metadata, os->buf + os->pstart + 7, os->psize - 8);
     }
 
     st->codec->extradata = av_realloc (st->codec->extradata,
@@ -123,7 +124,7 @@ theora_header (AVFormatContext * s, int idx)
 }
 
 static uint64_t
-theora_gptopts(AVFormatContext *ctx, int idx, uint64_t gp)
+theora_gptopts(AVFormatContext *ctx, int idx, uint64_t gp, int64_t *dts)
 {
     struct ogg *ogg = ctx->priv_data;
     struct ogg_stream *os = ogg->streams + idx;
@@ -135,7 +136,10 @@ theora_gptopts(AVFormatContext *ctx, int idx, uint64_t gp)
         iframe++;
 
     if(!pframe)
-        os->pflags |= PKT_FLAG_KEY;
+        os->pflags |= AV_PKT_FLAG_KEY;
+
+    if (dts)
+        *dts = iframe + pframe;
 
     return iframe + pframe;
 }

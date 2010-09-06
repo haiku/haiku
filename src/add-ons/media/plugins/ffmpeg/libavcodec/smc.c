@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/smc.c
+ * @file
  * QT SMC Video Decoder by Mike Melanson (melanson@pcisys.net)
  * For more information about the SMC format, visit:
  *   http://www.pcisys.net/~melanson/codecs/
@@ -366,16 +366,11 @@ static void smc_decode_stream(SmcContext *s)
                     flags_a = xx012456, flags_b = xx89A37B
                 */
                 /* build the color flags */
-                color_flags_a = color_flags_b = 0;
                 color_flags_a =
-                    (s->buf[stream_ptr + 0] << 16) |
-                    ((s->buf[stream_ptr + 1] & 0xF0) << 8) |
-                    ((s->buf[stream_ptr + 2] & 0xF0) << 4) |
-                    ((s->buf[stream_ptr + 2] & 0x0F) << 4) |
-                    ((s->buf[stream_ptr + 3] & 0xF0) >> 4);
+                    ((AV_RB16(s->buf + stream_ptr    ) & 0xFFF0) << 8) |
+                     (AV_RB16(s->buf + stream_ptr + 2) >> 4);
                 color_flags_b =
-                    (s->buf[stream_ptr + 4] << 16) |
-                    ((s->buf[stream_ptr + 5] & 0xF0) << 8) |
+                    ((AV_RB16(s->buf + stream_ptr + 4) & 0xFFF0) << 8) |
                     ((s->buf[stream_ptr + 1] & 0x0F) << 8) |
                     ((s->buf[stream_ptr + 3] & 0x0F) << 4) |
                     (s->buf[stream_ptr + 5] & 0x0F);
@@ -478,7 +473,7 @@ static av_cold int smc_decode_end(AVCodecContext *avctx)
 
 AVCodec smc_decoder = {
     "smc",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_SMC,
     sizeof(SmcContext),
     smc_decode_init,

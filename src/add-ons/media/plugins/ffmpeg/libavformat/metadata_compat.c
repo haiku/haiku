@@ -45,8 +45,11 @@ static const struct {
     { "creator",         SIZE_OFFSET(author)    },
     { "written_by",      SIZE_OFFSET(author)    },
     { "lead_performer",  SIZE_OFFSET(author)    },
+    { "composer",        SIZE_OFFSET(author)    },
+    { "performer",       SIZE_OFFSET(author)    },
     { "description",     SIZE_OFFSET(comment)   },
     { "albumtitle",      SIZE_OFFSET(album)     },
+    { "date",            SIZE_OFFSET(year)      },
     { "date_written",    SIZE_OFFSET(year)      },
     { "date_released",   SIZE_OFFSET(year)      },
     { "tracknumber",     SIZE_OFFSET(track)     },
@@ -106,7 +109,7 @@ void ff_metadata_demux_compat(AVFormatContext *ctx)
 
 #define FILL_METADATA(s, key, value) {                                        \
     if (value && *value && !av_metadata_get(s->metadata, #key, NULL, 0))      \
-        av_metadata_set(&s->metadata, #key, value);                           \
+        av_metadata_set2(&s->metadata, #key, value, 0);                       \
     }
 #define FILL_METADATA_STR(s, key)  FILL_METADATA(s, key, s->key)
 #define FILL_METADATA_INT(s, key) {                                           \

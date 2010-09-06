@@ -21,7 +21,7 @@
  */
 
 /**
- * @file libavcodec/vc1dec.c
+ * @file
  * VC-1 and WMV3 decoder
  *
  */
@@ -29,6 +29,7 @@
 #include "dsputil.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
+#include "h263.h"
 #include "vc1.h"
 #include "vc1data.h"
 #include "vc1acdata.h"
@@ -124,10 +125,6 @@ static int vc1_init_common(VC1Context *v)
                      &vc1_ac_tables[i][0][1], 8, 4,
                      &vc1_ac_tables[i][0][0], 8, 4, INIT_VLC_USE_NEW_STATIC);
         }
-        //FIXME: switching to INIT_VLC_STATIC() results in incorrect decoding
-        init_vlc(&ff_msmp4_mb_i_vlc, MB_INTRA_VLC_BITS, 64,
-                 &ff_msmp4_mb_i_table[0][1], 4, 2,
-                 &ff_msmp4_mb_i_table[0][0], 4, 2, INIT_VLC_USE_STATIC);
         done = 1;
     }
 
@@ -2997,7 +2994,7 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
         avctx->idct_algo=FF_IDCT_WMV2;
     }
 
-    if(ff_h263_decode_init(avctx) < 0)
+    if(ff_msmpeg4_decode_init(avctx) < 0)
         return -1;
     if (vc1_init_common(v) < 0) return -1;
 
@@ -3041,7 +3038,7 @@ static av_cold int vc1_decode_init(AVCodecContext *avctx)
         }
 
         buf2 = av_mallocz(avctx->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
-        if(start[0]) start++; // in WVC1 extradata first byte is its size
+        start = find_next_marker(start, end); // in WVC1 extradata first byte is its size, but can be 0 in mkv
         next = start;
         for(; next < end; start = next){
             next = find_next_marker(start + 4, end);
@@ -3193,6 +3190,8 @@ static int vc1_decode_frame(AVCodecContext *avctx,
 
             buf_size2 = vc1_unescape_buffer(buf, divider - buf, buf2);
             // TODO
+            if(!v->warn_interlaced++)
+                av_log(v->s.avctx, AV_LOG_ERROR, "Interlaced WVC1 support is not implemented\n");
             av_free(buf2);return -1;
         }else{
             buf_size2 = vc1_unescape_buffer(buf, buf_size, buf2);
@@ -3320,7 +3319,7 @@ static av_cold int vc1_decode_end(AVCodecContext *avctx)
 
 AVCodec vc1_decoder = {
     "vc1",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_VC1,
     sizeof(VC1Context),
     vc1_decode_init,
@@ -3336,7 +3335,7 @@ AVCodec vc1_decoder = {
 #if CONFIG_WMV3_DECODER
 AVCodec wmv3_decoder = {
     "wmv3",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_WMV3,
     sizeof(VC1Context),
     vc1_decode_init,
@@ -3353,7 +3352,7 @@ AVCodec wmv3_decoder = {
 #if CONFIG_WMV3_VDPAU_DECODER
 AVCodec wmv3_vdpau_decoder = {
     "wmv3_vdpau",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_WMV3,
     sizeof(VC1Context),
     vc1_decode_init,
@@ -3363,14 +3362,14 @@ AVCodec wmv3_vdpau_decoder = {
     CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_HWACCEL_VDPAU,
     NULL,
     .long_name = NULL_IF_CONFIG_SMALL("Windows Media Video 9 VDPAU"),
-    .pix_fmts = (enum PixelFormat[]){PIX_FMT_VDPAU_WMV3, PIX_FMT_NONE}
+    .pix_fmts = (const enum PixelFormat[]){PIX_FMT_VDPAU_WMV3, PIX_FMT_NONE}
 };
 #endif
 
 #if CONFIG_VC1_VDPAU_DECODER
 AVCodec vc1_vdpau_decoder = {
     "vc1_vdpau",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_VC1,
     sizeof(VC1Context),
     vc1_decode_init,
@@ -3380,6 +3379,6 @@ AVCodec vc1_vdpau_decoder = {
     CODEC_CAP_DR1 | CODEC_CAP_DELAY | CODEC_CAP_HWACCEL_VDPAU,
     NULL,
     .long_name = NULL_IF_CONFIG_SMALL("SMPTE VC-1 VDPAU"),
-    .pix_fmts = (enum PixelFormat[]){PIX_FMT_VDPAU_VC1, PIX_FMT_NONE}
+    .pix_fmts = (const enum PixelFormat[]){PIX_FMT_VDPAU_VC1, PIX_FMT_NONE}
 };
 #endif

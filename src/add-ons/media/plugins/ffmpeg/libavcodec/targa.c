@@ -189,7 +189,6 @@ static int decode_frame(AVCodecContext *avctx,
                 *pal++ = (b << 16) | (g << 8) | r;
             }
             p->palette_has_changed = 1;
-            avctx->palctrl->palette_changed = 0;
         }
     }
     if((compr & (~TGA_RLE)) == TGA_NODATA)
@@ -244,7 +243,7 @@ static av_cold int targa_end(AVCodecContext *avctx){
 
 AVCodec targa_decoder = {
     "targa",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_TARGA,
     sizeof(TargaContext),
     targa_init,

@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/truemotion2.c
+ * @file
  * Duck TrueMotion2 decoder.
  */
 
@@ -813,9 +813,6 @@ static av_cold int decode_init(AVCodecContext *avctx){
     TM2Context * const l = avctx->priv_data;
     int i;
 
-    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
-        return -1;
-    }
     if((avctx->width & 3) || (avctx->height & 3)){
         av_log(avctx, AV_LOG_ERROR, "Width and height must be multiple of 4\n");
         return -1;
@@ -848,6 +845,7 @@ static av_cold int decode_init(AVCodecContext *avctx){
 
 static av_cold int decode_end(AVCodecContext *avctx){
     TM2Context * const l = avctx->priv_data;
+    AVFrame *pic = &l->pic;
     int i;
 
     if(l->last)
@@ -865,12 +863,16 @@ static av_cold int decode_end(AVCodecContext *avctx){
         av_free(l->U2);
         av_free(l->V2);
     }
+
+    if (pic->data[0])
+        avctx->release_buffer(avctx, pic);
+
     return 0;
 }
 
 AVCodec truemotion2_decoder = {
     "truemotion2",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_TRUEMOTION2,
     sizeof(TM2Context),
     decode_init,

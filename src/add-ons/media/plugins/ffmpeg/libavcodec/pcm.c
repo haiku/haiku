@@ -20,99 +20,26 @@
  */
 
 /**
- * @file libavcodec/pcm.c
+ * @file
  * PCM codecs
  */
 
 #include "avcodec.h"
-#include "get_bits.h" // for ff_reverse
+#include "libavutil/common.h" /* for av_reverse */
 #include "bytestream.h"
+#include "pcm_tablegen.h"
 
 #define MAX_CHANNELS 64
-
-/* from g711.c by SUN microsystems (unrestricted use) */
-
-#define         SIGN_BIT        (0x80)      /* Sign bit for a A-law byte. */
-#define         QUANT_MASK      (0xf)       /* Quantization field mask. */
-#define         NSEGS           (8)         /* Number of A-law segments. */
-#define         SEG_SHIFT       (4)         /* Left shift for segment number. */
-#define         SEG_MASK        (0x70)      /* Segment field mask. */
-
-#define         BIAS            (0x84)      /* Bias for linear code. */
-
-/*
- * alaw2linear() - Convert an A-law value to 16-bit linear PCM
- *
- */
-static av_cold int alaw2linear(unsigned char a_val)
-{
-        int t;
-        int seg;
-
-        a_val ^= 0x55;
-
-        t = a_val & QUANT_MASK;
-        seg = ((unsigned)a_val & SEG_MASK) >> SEG_SHIFT;
-        if(seg) t= (t + t + 1 + 32) << (seg + 2);
-        else    t= (t + t + 1     ) << 3;
-
-        return (a_val & SIGN_BIT) ? t : -t;
-}
-
-static av_cold int ulaw2linear(unsigned char u_val)
-{
-        int t;
-
-        /* Complement to obtain normal u-law value. */
-        u_val = ~u_val;
-
-        /*
-         * Extract and bias the quantization bits. Then
-         * shift up by the segment number and subtract out the bias.
-         */
-        t = ((u_val & QUANT_MASK) << 3) + BIAS;
-        t <<= ((unsigned)u_val & SEG_MASK) >> SEG_SHIFT;
-
-        return (u_val & SIGN_BIT) ? (BIAS - t) : (t - BIAS);
-}
-
-/* 16384 entries per table */
-static uint8_t linear_to_alaw[16384];
-static uint8_t linear_to_ulaw[16384];
-
-static av_cold void build_xlaw_table(uint8_t *linear_to_xlaw,
-                             int (*xlaw2linear)(unsigned char),
-                             int mask)
-{
-    int i, j, v, v1, v2;
-
-    j = 0;
-    for(i=0;i<128;i++) {
-        if (i != 127) {
-            v1 = xlaw2linear(i ^ mask);
-            v2 = xlaw2linear((i + 1) ^ mask);
-            v = (v1 + v2 + 4) >> 3;
-        } else {
-            v = 8192;
-        }
-        for(;j<v;j++) {
-            linear_to_xlaw[8192 + j] = (i ^ mask);
-            if (j > 0)
-                linear_to_xlaw[8192 - j] = (i ^ (mask ^ 0x80));
-        }
-    }
-    linear_to_xlaw[0] = linear_to_xlaw[1];
-}
 
 static av_cold int pcm_encode_init(AVCodecContext *avctx)
 {
     avctx->frame_size = 1;
     switch(avctx->codec->id) {
     case CODEC_ID_PCM_ALAW:
-        build_xlaw_table(linear_to_alaw, alaw2linear, 0xd5);
+        pcm_alaw_tableinit();
         break;
     case CODEC_ID_PCM_MULAW:
-        build_xlaw_table(linear_to_ulaw, ulaw2linear, 0xff);
+        pcm_ulaw_tableinit();
         break;
     default:
         break;
@@ -194,8 +121,8 @@ static int pcm_encode_frame(AVCodecContext *avctx,
         break;
     case CODEC_ID_PCM_S24DAUD:
         for(;n>0;n--) {
-            uint32_t tmp = ff_reverse[(*samples >> 8) & 0xff] +
-                           (ff_reverse[*samples & 0xff] << 8);
+            uint32_t tmp = av_reverse[(*samples >> 8) & 0xff] +
+                           (av_reverse[*samples & 0xff] << 8);
             tmp <<= 4; // sync flags would go here
             bytestream_put_be24(&dst, tmp);
             samples++;
@@ -396,8 +323,8 @@ static int pcm_decode_frame(AVCodecContext *avctx,
         for(;n>0;n--) {
           uint32_t v = bytestream_get_be24(&src);
           v >>= 4; // sync flags are here
-          *samples++ = ff_reverse[(v >> 8) & 0xff] +
-                       (ff_reverse[v & 0xff] << 8);
+          *samples++ = av_reverse[(v >> 8) & 0xff] +
+                       (av_reverse[v & 0xff] << 8);
         }
         break;
     case CODEC_ID_PCM_S16LE_PLANAR:
@@ -516,14 +443,14 @@ static int pcm_decode_frame(AVCodecContext *avctx,
 #define PCM_ENCODER(id,sample_fmt_,name,long_name_) \
 AVCodec name ## _encoder = {                    \
     #name,                                      \
-    CODEC_TYPE_AUDIO,                           \
+    AVMEDIA_TYPE_AUDIO,                         \
     id,                                         \
     0,                                          \
     pcm_encode_init,                            \
     pcm_encode_frame,                           \
     pcm_encode_close,                           \
     NULL,                                       \
-    .sample_fmts = (enum SampleFormat[]){sample_fmt_,SAMPLE_FMT_NONE}, \
+    .sample_fmts = (const enum SampleFormat[]){sample_fmt_,SAMPLE_FMT_NONE}, \
     .long_name = NULL_IF_CONFIG_SMALL(long_name_), \
 };
 #else
@@ -534,14 +461,14 @@ AVCodec name ## _encoder = {                    \
 #define PCM_DECODER(id,sample_fmt_,name,long_name_)         \
 AVCodec name ## _decoder = {                    \
     #name,                                      \
-    CODEC_TYPE_AUDIO,                           \
+    AVMEDIA_TYPE_AUDIO,                         \
     id,                                         \
     sizeof(PCMDecode),                          \
     pcm_decode_init,                            \
     NULL,                                       \
     NULL,                                       \
     pcm_decode_frame,                           \
-    .sample_fmts = (enum SampleFormat[]){sample_fmt_,SAMPLE_FMT_NONE}, \
+    .sample_fmts = (const enum SampleFormat[]){sample_fmt_,SAMPLE_FMT_NONE}, \
     .long_name = NULL_IF_CONFIG_SMALL(long_name_), \
 };
 #else

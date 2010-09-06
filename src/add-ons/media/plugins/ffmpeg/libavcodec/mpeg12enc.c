@@ -21,7 +21,7 @@
  */
 
 /**
- * @file libavcodec/mpeg12enc.c
+ * @file
  * MPEG1/2 encoder
  */
 
@@ -327,7 +327,12 @@ static av_always_inline void put_qscale(MpegEncContext *s)
 }
 
 void ff_mpeg1_encode_slice_header(MpegEncContext *s){
-    put_header(s, SLICE_MIN_START_CODE + s->mb_y);
+    if (s->height > 2800) {
+        put_header(s, SLICE_MIN_START_CODE + (s->mb_y & 127));
+        put_bits(&s->pb, 3, s->mb_y >> 7);  /* slice_vertical_position_extension */
+    } else {
+        put_header(s, SLICE_MIN_START_CODE + s->mb_y);
+    }
     put_qscale(s);
     put_bits(&s->pb, 1, 0); /* slice extra information */
 }
@@ -927,28 +932,28 @@ static void mpeg1_encode_block(MpegEncContext *s,
 
 AVCodec mpeg1video_encoder = {
     "mpeg1video",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_MPEG1VIDEO,
     sizeof(MpegEncContext),
     encode_init,
     MPV_encode_picture,
     MPV_encode_end,
     .supported_framerates= ff_frame_rate_tab+1,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
     .capabilities= CODEC_CAP_DELAY,
     .long_name= NULL_IF_CONFIG_SMALL("MPEG-1 video"),
 };
 
 AVCodec mpeg2video_encoder = {
     "mpeg2video",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_MPEG2VIDEO,
     sizeof(MpegEncContext),
     encode_init,
     MPV_encode_picture,
     MPV_encode_end,
     .supported_framerates= ff_frame_rate_tab+1,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_NONE},
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_NONE},
     .capabilities= CODEC_CAP_DELAY,
     .long_name= NULL_IF_CONFIG_SMALL("MPEG-2 video"),
 };

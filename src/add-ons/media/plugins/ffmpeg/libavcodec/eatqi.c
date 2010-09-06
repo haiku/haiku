@@ -20,7 +20,7 @@
  */
 
 /**
- * @file eatqi.c
+ * @file
  * Electronic Arts TQI Video Decoder
  * by Peter Ross <pross@xvid.org>
  *
@@ -40,7 +40,7 @@ typedef struct TqiContext {
     AVFrame frame;
     void *bitstream_buf;
     unsigned int bitstream_buf_size;
-    DECLARE_ALIGNED_16(DCTELEM, block[6][64]);
+    DECLARE_ALIGNED(16, DCTELEM, block)[6][64];
 } TqiContext;
 
 static av_cold int tqi_decode_init(AVCodecContext *avctx)
@@ -156,7 +156,7 @@ static av_cold int tqi_decode_end(AVCodecContext *avctx)
 
 AVCodec eatqi_decoder = {
     "eatqi",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_TQI,
     sizeof(TqiContext),
     tqi_decode_init,

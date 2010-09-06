@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/xl.c
+ * @file
  * Miro VideoXL codec.
  */
 
@@ -128,14 +128,24 @@ static av_cold int decode_init(AVCodecContext *avctx){
     return 0;
 }
 
+static av_cold int decode_end(AVCodecContext *avctx){
+    VideoXLContext * const a = avctx->priv_data;
+    AVFrame *pic = &a->pic;
+
+    if (pic->data[0])
+        avctx->release_buffer(avctx, pic);
+
+    return 0;
+}
+
 AVCodec xl_decoder = {
     "xl",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_VIXL,
     sizeof(VideoXLContext),
     decode_init,
     NULL,
-    NULL,
+    decode_end,
     decode_frame,
     CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("Miro VideoXL"),

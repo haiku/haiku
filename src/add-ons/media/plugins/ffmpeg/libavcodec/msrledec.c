@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/msrledec.c
+ * @file
  * MS RLE decoder based on decoder by Mike Melanson and my own for TSCC
  * For more information about the MS RLE format, visit:
  *   http://www.multimedia.cx/msrle.txt
@@ -28,6 +28,7 @@
 
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
+#include "msrledec.h"
 
 #define FETCH_NEXT_STREAM_BYTE() \
     if (stream_ptr >= data_size) \
@@ -167,7 +168,8 @@ static int msrle_decode_8_16_24_32(AVCodecContext *avctx, AVPicture *pic, int de
                 continue;
             }
             // Copy data
-            if (output + p2 * (depth >> 3) > output_end) {
+            if ((pic->linesize[0] > 0 && output + p2 * (depth >> 3) > output_end)
+              ||(pic->linesize[0] < 0 && output + p2 * (depth >> 3) < output_end)) {
                 src += p2 * (depth >> 3);
                 continue;
             }
@@ -211,7 +213,8 @@ static int msrle_decode_8_16_24_32(AVCodecContext *avctx, AVPicture *pic, int de
                      src += 4;
                      break;
             }
-            if (output + p1 * (depth >> 3) > output_end)
+            if ((pic->linesize[0] > 0 && output + p1 * (depth >> 3) > output_end)
+              ||(pic->linesize[0] < 0 && output + p1 * (depth >> 3) < output_end))
                 continue;
             for(i = 0; i < p1; i++) {
                 switch(depth){

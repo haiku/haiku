@@ -1,5 +1,5 @@
 /**
- * @file libavcodec/vp56.h
+ * @file
  * VP5 and VP6 compatible video decoder (common features)
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
@@ -28,14 +28,13 @@
 #include "dsputil.h"
 #include "get_bits.h"
 #include "bytestream.h"
-
+#include "vp56dsp.h"
 
 typedef struct vp56_context VP56Context;
 typedef struct vp56_mv VP56mv;
 
 typedef void (*VP56ParseVectorAdjustment)(VP56Context *s,
                                           VP56mv *vect);
-typedef int  (*VP56Adjust)(int v, int t);
 typedef void (*VP56Filter)(VP56Context *s, uint8_t *dst, uint8_t *src,
                            int offset1, int offset2, int stride,
                            VP56mv mv, int mask, int select, int luma);
@@ -90,6 +89,7 @@ typedef struct {
 struct vp56_context {
     AVCodecContext *avctx;
     DSPContext dsp;
+    VP56DSPContext vp56dsp;
     ScanTable scantable;
     AVFrame frames[4];
     AVFrame *framep[6];
@@ -110,6 +110,7 @@ struct vp56_context {
     int quantizer;
     uint16_t dequant_dc;
     uint16_t dequant_ac;
+    int8_t *qscale_table;
 
     /* DC predictors management */
     VP56RefDc *above_blocks;
@@ -120,7 +121,7 @@ struct vp56_context {
     /* blocks / macroblock */
     VP56mb mb_type;
     VP56Macroblock *macroblocks;
-    DECLARE_ALIGNED_16(DCTELEM, block_coeff[6][64]);
+    DECLARE_ALIGNED(16, DCTELEM, block_coeff)[6][64];
 
     /* motion vectors */
     VP56mv mv[6];  /* vectors for each block in MB */
@@ -148,7 +149,6 @@ struct vp56_context {
 
     const uint8_t *vp56_coord_div;
     VP56ParseVectorAdjustment parse_vector_adjustment;
-    VP56Adjust adjust;
     VP56Filter filter;
     VP56ParseCoeff parse_coeff;
     VP56DefaultModelsInit default_models_init;

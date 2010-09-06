@@ -1,5 +1,5 @@
 /**
- * @file libavcodec/vp56.c
+ * @file
  * VP5 and VP6 compatible video decoder (common features)
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
@@ -33,6 +33,7 @@ void vp56_init_dequant(VP56Context *s, int quantizer)
     s->quantizer = quantizer;
     s->dequant_dc = vp56_dc_dequant[quantizer] << 2;
     s->dequant_ac = vp56_ac_dequant[quantizer] << 2;
+    memset(s->qscale_table, quantizer, s->mb_width);
 }
 
 static int vp56_get_vectors_predictors(VP56Context *s, int row, int col,
@@ -299,27 +300,12 @@ static void vp56_add_predictors_dc(VP56Context *s, VP56Frame ref_frame)
     }
 }
 
-static void vp56_edge_filter(VP56Context *s, uint8_t *yuv,
-                             int pix_inc, int line_inc, int t)
-{
-    int pix2_inc = 2 * pix_inc;
-    int i, v;
-
-    for (i=0; i<12; i++) {
-        v = (yuv[-pix2_inc] + 3*(yuv[0]-yuv[-pix_inc]) - yuv[pix_inc] + 4) >>3;
-        v = s->adjust(v, t);
-        yuv[-pix_inc] = av_clip_uint8(yuv[-pix_inc] + v);
-        yuv[0] = av_clip_uint8(yuv[0] - v);
-        yuv += line_inc;
-    }
-}
-
 static void vp56_deblock_filter(VP56Context *s, uint8_t *yuv,
                                 int stride, int dx, int dy)
 {
     int t = vp56_filter_threshold[s->quantizer];
-    if (dx)  vp56_edge_filter(s, yuv +         10-dx ,      1, stride, t);
-    if (dy)  vp56_edge_filter(s, yuv + stride*(10-dy), stride,      1, t);
+    if (dx)  s->vp56dsp.edge_filter_hor(yuv +         10-dx , stride, t);
+    if (dy)  s->vp56dsp.edge_filter_ver(yuv + stride*(10-dy), stride, t);
 }
 
 static void vp56_mc(VP56Context *s, int b, int plane, uint8_t *src,
@@ -481,6 +467,7 @@ static int vp56_size_changed(AVCodecContext *avctx)
         return -1;
     }
 
+    s->qscale_table = av_realloc(s->qscale_table, s->mb_width);
     s->above_blocks = av_realloc(s->above_blocks,
                                  (4*s->mb_width+6) * sizeof(*s->above_blocks));
     s->macroblocks = av_realloc(s->macroblocks,
@@ -504,8 +491,12 @@ int vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     int is_alpha, av_uninit(alpha_offset);
 
     if (s->has_alpha) {
+        if (remaining_buf_size < 3)
+            return -1;
         alpha_offset = bytestream_get_be24(&buf);
         remaining_buf_size -= 3;
+        if (remaining_buf_size < alpha_offset)
+            return -1;
     }
 
     for (is_alpha=0; is_alpha < 1+s->has_alpha; is_alpha++) {
@@ -639,6 +630,9 @@ int vp56_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
     FFSWAP(AVFrame *, s->framep[VP56_FRAME_CURRENT],
                       s->framep[VP56_FRAME_PREVIOUS]);
 
+    p->qstride = 0;
+    p->qscale_table = s->qscale_table;
+    p->qscale_type = FF_QSCALE_TYPE_VP56;
     *(AVFrame*)data = *p;
     *data_size = sizeof(AVFrame);
 
@@ -656,6 +650,7 @@ av_cold void vp56_init(AVCodecContext *avctx, int flip, int has_alpha)
     if (avctx->idct_algo == FF_IDCT_AUTO)
         avctx->idct_algo = FF_IDCT_VP3;
     dsputil_init(&s->dsp, avctx);
+    ff_vp56dsp_init(&s->vp56dsp, avctx->codec->id);
     ff_init_scantable(s->dsp.idct_permutation, &s->scantable,ff_zigzag_direct);
 
     for (i=0; i<4; i++)
@@ -687,9 +682,10 @@ av_cold int vp56_free(AVCodecContext *avctx)
 {
     VP56Context *s = avctx->priv_data;
 
-    av_free(s->above_blocks);
-    av_free(s->macroblocks);
-    av_free(s->edge_emu_buffer_alloc);
+    av_freep(&s->qscale_table);
+    av_freep(&s->above_blocks);
+    av_freep(&s->macroblocks);
+    av_freep(&s->edge_emu_buffer_alloc);
     if (s->framep[VP56_FRAME_GOLDEN]->data[0])
         avctx->release_buffer(avctx, s->framep[VP56_FRAME_GOLDEN]);
     if (s->framep[VP56_FRAME_GOLDEN2]->data[0])

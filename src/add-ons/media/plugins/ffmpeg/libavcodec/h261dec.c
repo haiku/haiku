@@ -21,13 +21,14 @@
  */
 
 /**
- * @file libavcodec/h261dec.c
+ * @file
  * H.261 decoder.
  */
 
 #include "dsputil.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
+#include "h263.h"
 #include "h261.h"
 #include "h261data.h"
 
@@ -170,7 +171,7 @@ static int ff_h261_resync(H261Context *h){
         //OK, it is not where it is supposed to be ...
         s->gb= s->last_resync_gb;
         align_get_bits(&s->gb);
-        left= s->gb.size_in_bits - get_bits_count(&s->gb);
+        left= get_bits_left(&s->gb);
 
         for(;left>15+1+4+5; left-=8){
             if(show_bits(&s->gb, 15)==0){
@@ -444,7 +445,7 @@ static int h261_decode_picture_header(H261Context *h){
     int format, i;
     uint32_t startcode= 0;
 
-    for(i= s->gb.size_in_bits - get_bits_count(&s->gb); i>24; i-=1){
+    for(i= get_bits_left(&s->gb); i>24; i-=1){
         startcode = ((startcode << 1) | get_bits(&s->gb, 1)) & 0x000FFFFF;
 
         if(startcode == 0x10)
@@ -642,7 +643,7 @@ static av_cold int h261_decode_end(AVCodecContext *avctx)
 
 AVCodec h261_decoder = {
     "h261",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_H261,
     sizeof(H261Context),
     h261_decode_init,

@@ -35,7 +35,7 @@ static int nc_probe(AVProbeData *probe_packet)
     size = AV_RL16(probe_packet->buf + 5);
 
     if (size + 20 > probe_packet->buf_size)
-        return 3*AVPROBE_SCORE_MAX/2;
+        return AVPROBE_SCORE_MAX/4;
 
     if (AV_RB32(probe_packet->buf+16+size) == NC_VIDEO_FLAG)
         return AVPROBE_SCORE_MAX;
@@ -50,7 +50,7 @@ static int nc_read_header(AVFormatContext *s, AVFormatParameters *ap)
     if (!st)
         return AVERROR(ENOMEM);
 
-    st->codec->codec_type = CODEC_TYPE_VIDEO;
+    st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id   = CODEC_ID_MPEG4;
     st->need_parsing      = AVSTREAM_PARSE_FULL;
 

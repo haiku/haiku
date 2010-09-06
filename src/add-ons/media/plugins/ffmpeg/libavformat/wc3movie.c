@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavformat/wc3movie.c
+ * @file
  * Wing Commander III Movie file demuxer
  * by Mike Melanson (melanson@pcisys.net)
  * for more information on the WC3 .mve file format, visit:
@@ -140,10 +140,9 @@ static int wc3_read_header(AVFormatContext *s,
     unsigned int fourcc_tag;
     unsigned int size;
     AVStream *st;
-    char buffer[513];
     int ret = 0;
     int current_palette = 0;
-    int bytes_to_read;
+    char *buffer;
     int i;
     unsigned char rotate;
 
@@ -185,14 +184,14 @@ static int wc3_read_header(AVFormatContext *s,
 
         case BNAM_TAG:
             /* load up the name */
-            if ((unsigned)size < 512)
-                bytes_to_read = size;
-            else
-                bytes_to_read = 512;
-            if ((ret = get_buffer(pb, buffer, bytes_to_read)) != bytes_to_read)
+            buffer = av_malloc(size+1);
+            if (!buffer)
+                return AVERROR(ENOMEM);
+            if ((ret = get_buffer(pb, buffer, size)) != size)
                 return AVERROR(EIO);
-            buffer[bytes_to_read] = 0;
-            av_metadata_set(&s->metadata, "title", buffer);
+            buffer[size] = 0;
+            av_metadata_set2(&s->metadata, "title", buffer,
+                                   AV_METADATA_DONT_STRDUP_VAL);
             break;
 
         case SIZE_TAG:
@@ -244,7 +243,7 @@ static int wc3_read_header(AVFormatContext *s,
         return AVERROR(ENOMEM);
     av_set_pts_info(st, 33, 1, WC3_FRAME_FPS);
     wc3->video_stream_index = st->index;
-    st->codec->codec_type = CODEC_TYPE_VIDEO;
+    st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_XAN_WC3;
     st->codec->codec_tag = 0;  /* no fourcc */
     st->codec->width = wc3->width;
@@ -258,7 +257,7 @@ static int wc3_read_header(AVFormatContext *s,
         return AVERROR(ENOMEM);
     av_set_pts_info(st, 33, 1, WC3_FRAME_FPS);
     wc3->audio_stream_index = st->index;
-    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
     st->codec->codec_id = CODEC_ID_PCM_S16LE;
     st->codec->codec_tag = 1;
     st->codec->channels = WC3_AUDIO_CHANNELS;

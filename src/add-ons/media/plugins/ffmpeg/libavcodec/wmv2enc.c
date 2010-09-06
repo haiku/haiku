@@ -23,6 +23,7 @@
 #include "mpegvideo.h"
 #include "msmpeg4.h"
 #include "msmpeg4data.h"
+#include "h263.h"
 #include "wmv2.h"
 
 
@@ -212,12 +213,12 @@ void ff_wmv2_encode_mb(MpegEncContext * s,
 
 AVCodec wmv2_encoder = {
     "wmv2",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_WMV2,
     sizeof(Wmv2Context),
     wmv2_encode_init,
     MPV_encode_picture,
     MPV_encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
     .long_name= NULL_IF_CONFIG_SMALL("Windows Media Video 8"),
 };

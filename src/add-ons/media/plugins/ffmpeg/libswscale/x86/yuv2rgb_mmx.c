@@ -49,14 +49,22 @@ DECLARE_ASM_CONST(8, uint64_t, mmx_grnmask) = 0xfcfcfcfcfcfcfcfcULL;
 #define HAVE_MMX2 0
 #define HAVE_AMD3DNOW 0
 #define RENAME(a) a ## _MMX
+#if CONFIG_GPL
 #include "yuv2rgb_template.c"
+#else
+#include "yuv2rgb_template2.c"
+#endif
 
 //MMX2 versions
 #undef RENAME
 #undef HAVE_MMX2
 #define HAVE_MMX2 1
 #define RENAME(a) a ## _MMX2
+#if CONFIG_GPL
 #include "yuv2rgb_template.c"
+#else
+#include "yuv2rgb_template2.c"
+#endif
 
 SwsFunc ff_yuv2rgb_init_mmx(SwsContext *c)
 {
@@ -72,7 +80,8 @@ SwsFunc ff_yuv2rgb_init_mmx(SwsContext *c)
                 if (HAVE_7REGS) return yuva420_bgr32_MMX2;
                 break;
             } else return yuv420_bgr32_MMX2;
-        case PIX_FMT_BGR24:  return yuv420_rgb24_MMX2;
+        case PIX_FMT_RGB24:  return yuv420_rgb24_MMX2;
+        case PIX_FMT_BGR24:  return yuv420_bgr24_MMX2;
         case PIX_FMT_RGB565: return yuv420_rgb16_MMX2;
         case PIX_FMT_RGB555: return yuv420_rgb15_MMX2;
         }
@@ -89,7 +98,8 @@ SwsFunc ff_yuv2rgb_init_mmx(SwsContext *c)
                 if (HAVE_7REGS) return yuva420_bgr32_MMX;
                 break;
             } else return yuv420_bgr32_MMX;
-        case PIX_FMT_BGR24:  return yuv420_rgb24_MMX;
+        case PIX_FMT_RGB24:  return yuv420_rgb24_MMX;
+        case PIX_FMT_BGR24:  return yuv420_bgr24_MMX;
         case PIX_FMT_RGB565: return yuv420_rgb16_MMX;
         case PIX_FMT_RGB555: return yuv420_rgb15_MMX;
         }

@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavutil/integer.c
+ * @file
  * arbitrary precision integers
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
@@ -110,8 +110,8 @@ AVInteger av_mod_i(AVInteger *quot, AVInteger a, AVInteger b){
     AVInteger quot_temp;
     if(!quot) quot = &quot_temp;
 
-    assert((int16_t)a[AV_INTEGER_SIZE-1] >= 0 && (int16_t)b[AV_INTEGER_SIZE-1] >= 0);
-    assert(av_log2(b)>=0);
+//    assert((int16_t)a[AV_INTEGER_SIZE-1] >= 0 && (int16_t)b[AV_INTEGER_SIZE-1] >= 0);
+//    assert(av_log2(b)>=0);
 
     if(i > 0)
         b= av_shr_i(b, -i);

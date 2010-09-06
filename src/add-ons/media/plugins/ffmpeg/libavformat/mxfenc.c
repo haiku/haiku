@@ -86,7 +86,7 @@ static const struct {
     { CODEC_ID_MPEG2VIDEO, 0 },
     { CODEC_ID_PCM_S24LE,  1 },
     { CODEC_ID_PCM_S16LE,  1 },
-    { 0 }
+    { CODEC_ID_NONE }
 };
 
 static void mxf_write_wav_desc(AVFormatContext *s, AVStream *st);
@@ -1415,7 +1415,7 @@ static int mxf_write_header(AVFormatContext *s)
             return AVERROR(ENOMEM);
         st->priv_data = sc;
 
-        if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
+        if (st->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
             if (i != 0) {
                 av_log(s, AV_LOG_ERROR, "video stream must be first track\n");
                 return -1;
@@ -1455,7 +1455,7 @@ static int mxf_write_header(AVFormatContext *s)
                 mxf->edit_unit_byte_count += 16 + 4 + 4 + samples_per_frame[0]*8*4;
                 mxf->edit_unit_byte_count += klv_fill_size(mxf->edit_unit_byte_count);
             }
-        } else if (st->codec->codec_type == CODEC_TYPE_AUDIO) {
+        } else if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
             if (st->codec->sample_rate != 48000) {
                 av_log(s, AV_LOG_ERROR, "only 48khz is implemented\n");
                 return -1;
@@ -1717,7 +1717,7 @@ static int mxf_write_packet(AVFormatContext *s, AVPacket *pkt)
     mxf_write_klv_fill(s);
     put_buffer(pb, sc->track_essence_element_key, 16); // write key
     if (s->oformat == &mxf_d10_muxer) {
-        if (st->codec->codec_type == CODEC_TYPE_VIDEO)
+        if (st->codec->codec_type == AVMEDIA_TYPE_VIDEO)
             mxf_write_d10_video_packet(s, st, pkt);
         else
             mxf_write_d10_audio_packet(s, st, pkt);
@@ -1807,22 +1807,13 @@ static int mxf_write_footer(AVFormatContext *s)
 
 static int mxf_interleave_get_packet(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush)
 {
-    AVPacketList *pktl;
-    int stream_count = 0;
-    int streams[MAX_STREAMS];
+    int i, stream_count = 0;
 
-    memset(streams, 0, sizeof(streams));
-    pktl = s->packet_buffer;
-    while (pktl) {
-        //av_log(s, AV_LOG_DEBUG, "show st:%d dts:%lld\n", pktl->pkt.stream_index, pktl->pkt.dts);
-        if (!streams[pktl->pkt.stream_index])
-            stream_count++;
-        streams[pktl->pkt.stream_index]++;
-        pktl = pktl->next;
-    }
+    for (i = 0; i < s->nb_streams; i++)
+        stream_count += !!s->streams[i]->last_in_packet_buffer;
 
     if (stream_count && (s->nb_streams == stream_count || flush)) {
-        pktl = s->packet_buffer;
+        AVPacketList *pktl = s->packet_buffer;
         if (s->nb_streams != stream_count) {
             AVPacketList *last = NULL;
             // find last packet in edit unit
@@ -1836,6 +1827,9 @@ static int mxf_interleave_get_packet(AVFormatContext *s, AVPacket *out, AVPacket
             // purge packet queue
             while (pktl) {
                 AVPacketList *next = pktl->next;
+
+                if(s->streams[pktl->pkt.stream_index]->last_in_packet_buffer == pktl)
+                    s->streams[pktl->pkt.stream_index]->last_in_packet_buffer= NULL;
                 av_free_packet(&pktl->pkt);
                 av_freep(&pktl);
                 pktl = next;
@@ -1844,6 +1838,7 @@ static int mxf_interleave_get_packet(AVFormatContext *s, AVPacket *out, AVPacket
                 last->next = NULL;
             else {
                 s->packet_buffer = NULL;
+                s->packet_buffer_end= NULL;
                 goto out;
             }
             pktl = s->packet_buffer;
@@ -1852,6 +1847,10 @@ static int mxf_interleave_get_packet(AVFormatContext *s, AVPacket *out, AVPacket
         *out = pktl->pkt;
         //av_log(s, AV_LOG_DEBUG, "out st:%d dts:%lld\n", (*out).stream_index, (*out).dts);
         s->packet_buffer = pktl->next;
+        if(s->streams[pktl->pkt.stream_index]->last_in_packet_buffer == pktl)
+            s->streams[pktl->pkt.stream_index]->last_in_packet_buffer= NULL;
+        if(!s->packet_buffer)
+            s->packet_buffer_end= NULL;
         av_freep(&pktl);
         return 1;
     } else {

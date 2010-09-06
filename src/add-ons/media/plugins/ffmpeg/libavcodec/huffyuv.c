@@ -24,7 +24,7 @@
  */
 
 /**
- * @file libavcodec/huffyuv.c
+ * @file
  * huffyuv codec for libavcodec.
  */
 
@@ -39,10 +39,12 @@
 #define B 3
 #define G 2
 #define R 1
+#define A 0
 #else
 #define B 0
 #define G 1
 #define R 2
+#define A 3
 #endif
 
 typedef enum Predictor{
@@ -129,47 +131,6 @@ static const unsigned char classic_add_chroma[256] = {
     6, 12,  8, 10,  7,  9,  6,  4,  6,  2,  2,  3,  3,  3,  3,  2,
 };
 
-static inline int add_left_prediction(uint8_t *dst, uint8_t *src, int w, int acc){
-    int i;
-
-    for(i=0; i<w-1; i++){
-        acc+= src[i];
-        dst[i]= acc;
-        i++;
-        acc+= src[i];
-        dst[i]= acc;
-    }
-
-    for(; i<w; i++){
-        acc+= src[i];
-        dst[i]= acc;
-    }
-
-    return acc;
-}
-
-static inline void add_left_prediction_bgr32(uint8_t *dst, uint8_t *src, int w, int *red, int *green, int *blue){
-    int i;
-    int r,g,b;
-    r= *red;
-    g= *green;
-    b= *blue;
-
-    for(i=0; i<w; i++){
-        b+= src[4*i+B];
-        g+= src[4*i+G];
-        r+= src[4*i+R];
-
-        dst[4*i+B]= b;
-        dst[4*i+G]= g;
-        dst[4*i+R]= r;
-    }
-
-    *red= r;
-    *green= g;
-    *blue= b;
-}
-
 static inline int sub_left_prediction(HYuvContext *s, uint8_t *dst, uint8_t *src, int w, int left){
     int i;
     if(w<32){
@@ -232,7 +193,7 @@ static int read_len_table(uint8_t *dst, GetBitContext *gb){
     return 0;
 }
 
-static int generate_bits_table(uint32_t *dst, uint8_t *len_table){
+static int generate_bits_table(uint32_t *dst, const uint8_t *len_table){
     int len, index;
     uint32_t bits=0;
 
@@ -270,7 +231,7 @@ static void heap_sift(HeapElem *h, int root, int size)
     }
 }
 
-static void generate_len_table(uint8_t *dst, uint64_t *stats, int size){
+static void generate_len_table(uint8_t *dst, const uint64_t *stats, int size){
     HeapElem h[size];
     int up[2*size];
     int len[2*size];
@@ -377,7 +338,7 @@ static void generate_joint_tables(HYuvContext *s){
     }
 }
 
-static int read_huffman_tables(HYuvContext *s, uint8_t *src, int length){
+static int read_huffman_tables(HYuvContext *s, const uint8_t *src, int length){
     GetBitContext gb;
     int i;
 
@@ -447,9 +408,7 @@ static av_cold void alloc_temp(HYuvContext *s){
             s->temp[i]= av_malloc(s->width + 16);
         }
     }else{
-        for(i=0; i<2; i++){
-            s->temp[i]= av_malloc(4*s->width + 16);
-        }
+        s->temp[0]= av_mallocz(4*s->width + 16);
     }
 }
 
@@ -493,6 +452,9 @@ s->bgr32=1;
     if(s->version==2){
         int method, interlace;
 
+        if (avctx->extradata_size < 4)
+            return -1;
+
         method= ((uint8_t*)avctx->extradata)[0];
         s->decorrelate= method&64 ? 1 : 0;
         s->predictor= method&63;
@@ -503,7 +465,7 @@ s->bgr32=1;
         s->interlaced= (interlace==1) ? 1 : (interlace==2) ? 0 : s->interlaced;
         s->context= ((uint8_t*)avctx->extradata)[2] & 0x40 ? 1 : 0;
 
-        if(read_huffman_tables(s, ((uint8_t*)avctx->extradata)+4, avctx->extradata_size) < 0)
+        if(read_huffman_tables(s, ((uint8_t*)avctx->extradata)+4, avctx->extradata_size-4) < 0)
             return -1;
     }else{
         switch(avctx->bits_per_coded_sample&7){
@@ -567,7 +529,7 @@ s->bgr32=1;
 #endif /* CONFIG_HUFFYUV_DECODER || CONFIG_FFVHUFF_DECODER */
 
 #if CONFIG_HUFFYUV_ENCODER || CONFIG_FFVHUFF_ENCODER
-static int store_table(HYuvContext *s, uint8_t *len, uint8_t *buf){
+static int store_table(HYuvContext *s, const uint8_t *len, uint8_t *buf){
     int i;
     int index= 0;
 
@@ -736,7 +698,7 @@ static void decode_422_bitstream(HYuvContext *s, int count){
 
     count/=2;
 
-    if(count >= (s->gb.size_in_bits - get_bits_count(&s->gb))/(31*4)){
+    if(count >= (get_bits_left(&s->gb))/(31*4)){
         for(i=0; i<count && get_bits_count(&s->gb) < s->gb.size_in_bits; i++){
             READ_2PIX(s->temp[0][2*i  ], s->temp[1][i], 1);
             READ_2PIX(s->temp[0][2*i+1], s->temp[2][i], 2);
@@ -754,7 +716,7 @@ static void decode_gray_bitstream(HYuvContext *s, int count){
 
     count/=2;
 
-    if(count >= (s->gb.size_in_bits - get_bits_count(&s->gb))/(31*2)){
+    if(count >= (get_bits_left(&s->gb))/(31*2)){
         for(i=0; i<count && get_bits_count(&s->gb) < s->gb.size_in_bits; i++){
             READ_2PIX(s->temp[0][2*i  ], s->temp[0][2*i+1], 0);
         }
@@ -879,7 +841,7 @@ static av_always_inline void decode_bgr_1(HYuvContext *s, int count, int decorre
             s->temp[0][4*i+R] = get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3);
         }
         if(alpha)
-            get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3); //?!
+            s->temp[0][4*i+A] = get_vlc2(&s->gb, s->vlc[2].table, VLC_BITS, 3);
     }
 }
 
@@ -983,6 +945,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
     if (!s->bitstream_buffer)
         return AVERROR(ENOMEM);
 
+    memset(s->bitstream_buffer + buf_size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
     s->dsp.bswap_buf((uint32_t*)s->bitstream_buffer, (const uint32_t*)buf, buf_size/4);
 
     if(p->data[0])
@@ -1035,10 +998,10 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
             case LEFT:
             case PLANE:
                 decode_422_bitstream(s, width-2);
-                lefty= add_left_prediction(p->data[0] + 2, s->temp[0], width-2, lefty);
+                lefty= s->dsp.add_hfyu_left_prediction(p->data[0] + 2, s->temp[0], width-2, lefty);
                 if(!(s->flags&CODEC_FLAG_GRAY)){
-                    leftu= add_left_prediction(p->data[1] + 1, s->temp[1], width2-1, leftu);
-                    leftv= add_left_prediction(p->data[2] + 1, s->temp[2], width2-1, leftv);
+                    leftu= s->dsp.add_hfyu_left_prediction(p->data[1] + 1, s->temp[1], width2-1, leftu);
+                    leftv= s->dsp.add_hfyu_left_prediction(p->data[2] + 1, s->temp[2], width2-1, leftv);
                 }
 
                 for(cy=y=1; y<s->height; y++,cy++){
@@ -1049,7 +1012,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
 
                         ydst= p->data[0] + p->linesize[0]*y;
 
-                        lefty= add_left_prediction(ydst, s->temp[0], width, lefty);
+                        lefty= s->dsp.add_hfyu_left_prediction(ydst, s->temp[0], width, lefty);
                         if(s->predictor == PLANE){
                             if(y>s->interlaced)
                                 s->dsp.add_bytes(ydst, ydst - fake_ystride, width);
@@ -1065,10 +1028,10 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
                     vdst= p->data[2] + p->linesize[2]*cy;
 
                     decode_422_bitstream(s, width);
-                    lefty= add_left_prediction(ydst, s->temp[0], width, lefty);
+                    lefty= s->dsp.add_hfyu_left_prediction(ydst, s->temp[0], width, lefty);
                     if(!(s->flags&CODEC_FLAG_GRAY)){
-                        leftu= add_left_prediction(udst, s->temp[1], width2, leftu);
-                        leftv= add_left_prediction(vdst, s->temp[2], width2, leftv);
+                        leftu= s->dsp.add_hfyu_left_prediction(udst, s->temp[1], width2, leftu);
+                        leftv= s->dsp.add_hfyu_left_prediction(vdst, s->temp[2], width2, leftv);
                     }
                     if(s->predictor == PLANE){
                         if(cy>s->interlaced){
@@ -1086,10 +1049,10 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
             case MEDIAN:
                 /* first line except first 2 pixels is left predicted */
                 decode_422_bitstream(s, width-2);
-                lefty= add_left_prediction(p->data[0] + 2, s->temp[0], width-2, lefty);
+                lefty= s->dsp.add_hfyu_left_prediction(p->data[0] + 2, s->temp[0], width-2, lefty);
                 if(!(s->flags&CODEC_FLAG_GRAY)){
-                    leftu= add_left_prediction(p->data[1] + 1, s->temp[1], width2-1, leftu);
-                    leftv= add_left_prediction(p->data[2] + 1, s->temp[2], width2-1, leftv);
+                    leftu= s->dsp.add_hfyu_left_prediction(p->data[1] + 1, s->temp[1], width2-1, leftu);
+                    leftv= s->dsp.add_hfyu_left_prediction(p->data[2] + 1, s->temp[2], width2-1, leftv);
                 }
 
                 cy=y=1;
@@ -1097,20 +1060,20 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
                 /* second line is left predicted for interlaced case */
                 if(s->interlaced){
                     decode_422_bitstream(s, width);
-                    lefty= add_left_prediction(p->data[0] + p->linesize[0], s->temp[0], width, lefty);
+                    lefty= s->dsp.add_hfyu_left_prediction(p->data[0] + p->linesize[0], s->temp[0], width, lefty);
                     if(!(s->flags&CODEC_FLAG_GRAY)){
-                        leftu= add_left_prediction(p->data[1] + p->linesize[2], s->temp[1], width2, leftu);
-                        leftv= add_left_prediction(p->data[2] + p->linesize[1], s->temp[2], width2, leftv);
+                        leftu= s->dsp.add_hfyu_left_prediction(p->data[1] + p->linesize[2], s->temp[1], width2, leftu);
+                        leftv= s->dsp.add_hfyu_left_prediction(p->data[2] + p->linesize[1], s->temp[2], width2, leftv);
                     }
                     y++; cy++;
                 }
 
                 /* next 4 pixels are left predicted too */
                 decode_422_bitstream(s, 4);
-                lefty= add_left_prediction(p->data[0] + fake_ystride, s->temp[0], 4, lefty);
+                lefty= s->dsp.add_hfyu_left_prediction(p->data[0] + fake_ystride, s->temp[0], 4, lefty);
                 if(!(s->flags&CODEC_FLAG_GRAY)){
-                    leftu= add_left_prediction(p->data[1] + fake_ustride, s->temp[1], 2, leftu);
-                    leftv= add_left_prediction(p->data[2] + fake_vstride, s->temp[2], 2, leftv);
+                    leftu= s->dsp.add_hfyu_left_prediction(p->data[1] + fake_ustride, s->temp[1], 2, leftu);
+                    leftv= s->dsp.add_hfyu_left_prediction(p->data[2] + fake_vstride, s->temp[2], 2, leftv);
                 }
 
                 /* next line except the first 4 pixels is median predicted */
@@ -1158,11 +1121,11 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
         }
     }else{
         int y;
-        int leftr, leftg, leftb;
+        int leftr, leftg, leftb, lefta;
         const int last_line= (height-1)*p->linesize[0];
 
         if(s->bitstream_bpp==32){
-            skip_bits(&s->gb, 8);
+            lefta= p->data[0][last_line+A]= get_bits(&s->gb, 8);
             leftr= p->data[0][last_line+R]= get_bits(&s->gb, 8);
             leftg= p->data[0][last_line+G]= get_bits(&s->gb, 8);
             leftb= p->data[0][last_line+B]= get_bits(&s->gb, 8);
@@ -1170,6 +1133,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
             leftr= p->data[0][last_line+R]= get_bits(&s->gb, 8);
             leftg= p->data[0][last_line+G]= get_bits(&s->gb, 8);
             leftb= p->data[0][last_line+B]= get_bits(&s->gb, 8);
+            lefta= p->data[0][last_line+A]= 255;
             skip_bits(&s->gb, 8);
         }
 
@@ -1178,13 +1142,14 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, AVPac
             case LEFT:
             case PLANE:
                 decode_bgr_bitstream(s, width-1);
-                add_left_prediction_bgr32(p->data[0] + last_line+4, s->temp[0], width-1, &leftr, &leftg, &leftb);
+                s->dsp.add_hfyu_left_prediction_bgr32(p->data[0] + last_line+4, s->temp[0], width-1, &leftr, &leftg, &leftb, &lefta);
 
                 for(y=s->height-2; y>=0; y--){ //Yes it is stored upside down.
                     decode_bgr_bitstream(s, width);
 
-                    add_left_prediction_bgr32(p->data[0] + p->linesize[0]*y, s->temp[0], width, &leftr, &leftg, &leftb);
+                    s->dsp.add_hfyu_left_prediction_bgr32(p->data[0] + p->linesize[0]*y, s->temp[0], width, &leftr, &leftg, &leftb, &lefta);
                     if(s->predictor == PLANE){
+                        if(s->bitstream_bpp!=32) lefta=0;
                         if((y&s->interlaced)==0 && y<s->height-1-s->interlaced){
                             s->dsp.add_bytes(p->data[0] + p->linesize[0]*y,
                                              p->data[0] + p->linesize[0]*y + fake_ystride, fake_ystride);
@@ -1225,6 +1190,9 @@ static av_cold int decode_end(AVCodecContext *avctx)
 {
     HYuvContext *s = avctx->priv_data;
     int i;
+
+    if (s->picture.data[0])
+        avctx->release_buffer(avctx, &s->picture);
 
     common_end(s);
     av_freep(&s->bitstream_buffer);
@@ -1449,7 +1417,7 @@ static av_cold int encode_end(AVCodecContext *avctx)
 #if CONFIG_HUFFYUV_DECODER
 AVCodec huffyuv_decoder = {
     "huffyuv",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_HUFFYUV,
     sizeof(HYuvContext),
     decode_init,
@@ -1465,7 +1433,7 @@ AVCodec huffyuv_decoder = {
 #if CONFIG_FFVHUFF_DECODER
 AVCodec ffvhuff_decoder = {
     "ffvhuff",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_FFVHUFF,
     sizeof(HYuvContext),
     decode_init,
@@ -1481,13 +1449,13 @@ AVCodec ffvhuff_decoder = {
 #if CONFIG_HUFFYUV_ENCODER
 AVCodec huffyuv_encoder = {
     "huffyuv",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_HUFFYUV,
     sizeof(HYuvContext),
     encode_init,
     encode_frame,
     encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV422P, PIX_FMT_RGB32, PIX_FMT_NONE},
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV422P, PIX_FMT_RGB32, PIX_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Huffyuv / HuffYUV"),
 };
 #endif
@@ -1495,13 +1463,13 @@ AVCodec huffyuv_encoder = {
 #if CONFIG_FFVHUFF_ENCODER
 AVCodec ffvhuff_encoder = {
     "ffvhuff",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_FFVHUFF,
     sizeof(HYuvContext),
     encode_init,
     encode_frame,
     encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_RGB32, PIX_FMT_NONE},
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_YUV422P, PIX_FMT_RGB32, PIX_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Huffyuv FFmpeg variant"),
 };
 #endif

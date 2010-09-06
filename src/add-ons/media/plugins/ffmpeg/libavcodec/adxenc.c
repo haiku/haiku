@@ -24,7 +24,7 @@
 #include "adx.h"
 
 /**
- * @file libavcodec/adxenc.c
+ * @file
  * SEGA CRI adx codecs.
  *
  * Reference documents:
@@ -185,13 +185,13 @@ static int adx_encode_frame(AVCodecContext *avctx,
 
 AVCodec adpcm_adx_encoder = {
     "adpcm_adx",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_ADPCM_ADX,
     sizeof(ADXContext),
     adx_encode_init,
     adx_encode_frame,
     adx_encode_close,
     NULL,
-    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("SEGA CRI ADX ADPCM"),
 };

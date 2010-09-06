@@ -48,6 +48,7 @@ typedef struct rtp_payload_data
         int rap_flag;
         int streamstate;
     } *au_headers;
+    int au_headers_allocated;
     int nb_au_headers;
     int au_headers_length_bytes;
     int cur_au_index;
@@ -66,12 +67,29 @@ void rtp_parse_set_dynamic_protocol(RTPDemuxContext *s, PayloadContext *ctx,
 int rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
                      const uint8_t *buf, int len);
 void rtp_parse_close(RTPDemuxContext *s);
-
+#if (LIBAVFORMAT_VERSION_MAJOR <= 53)
 int rtp_get_local_port(URLContext *h);
+#endif
+int rtp_get_local_rtp_port(URLContext *h);
+int rtp_get_local_rtcp_port(URLContext *h);
+
 int rtp_set_remote_url(URLContext *h, const char *uri);
 #if (LIBAVFORMAT_VERSION_MAJOR <= 52)
 void rtp_get_file_handles(URLContext *h, int *prtp_fd, int *prtcp_fd);
 #endif
+
+/**
+ * Send a dummy packet on both port pairs to set up the connection
+ * state in potential NAT routers, so that we're able to receive
+ * packets.
+ *
+ * Note, this only works if the NAT router doesn't remap ports. This
+ * isn't a standardized procedure, but it works in many cases in practice.
+ *
+ * The same routine is used with RDT too, even if RDT doesn't use normal
+ * RTP packets otherwise.
+ */
+void rtp_send_punch_packets(URLContext* rtp_handle);
 
 /**
  * some rtp servers assume client is dead if they don't hear from them...
@@ -119,7 +137,7 @@ typedef int (*DynamicPayloadPacketHandlerProc) (AVFormatContext *ctx,
 struct RTPDynamicProtocolHandler_s {
     // fields from AVRtpDynamicPayloadType_s
     const char enc_name[50];    /* XXX: still why 50 ? ;-) */
-    enum CodecType codec_type;
+    enum AVMediaType codec_type;
     enum CodecID codec_id;
 
     // may be null
@@ -127,7 +145,7 @@ struct RTPDynamicProtocolHandler_s {
                              int st_index,
                              PayloadContext *priv_data,
                              const char *line); ///< Parse the a= line from the sdp field
-    PayloadContext *(*open) (); ///< allocate any data needed by the rtp parsing for this dynamic data.
+    PayloadContext *(*open) (void); ///< allocate any data needed by the rtp parsing for this dynamic data.
     void (*close)(PayloadContext *protocol_data); ///< free any data needed by the rtp parsing for this dynamic data.
     DynamicPayloadPacketHandlerProc parse_packet; ///< parse handler for this dynamic packet.
 
@@ -144,6 +162,7 @@ struct RTPDemuxContext {
     uint32_t timestamp;
     uint32_t base_timestamp;
     uint32_t cur_timestamp;
+    int64_t  range_start_offset;
     int max_payload_size;
     struct MpegTSContext *ts;   /* only used for MP2T payloads */
     int read_buf_index;
@@ -180,7 +199,7 @@ struct RTPDemuxContext {
 extern RTPDynamicProtocolHandler *RTPFirstDynamicPayloadHandler;
 void ff_register_dynamic_payload_handler(RTPDynamicProtocolHandler *handler);
 
-int rtsp_next_attr_and_value(const char **p, char *attr, int attr_size, char *value, int value_size); ///< from rtsp.c, but used by rtp dynamic protocol handlers.
+int ff_rtsp_next_attr_and_value(const char **p, char *attr, int attr_size, char *value, int value_size); ///< from rtsp.c, but used by rtp dynamic protocol handlers.
 
 void av_register_rtp_dynamic_payload_handlers(void);
 

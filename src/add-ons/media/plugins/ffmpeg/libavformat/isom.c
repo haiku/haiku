@@ -32,6 +32,7 @@ const AVCodecTag ff_mp4_obj_type[] = {
     { CODEC_ID_MPEG4     , 0x20 },
     { CODEC_ID_H264      , 0x21 },
     { CODEC_ID_AAC       , 0x40 },
+    { CODEC_ID_MP4ALS    , 0x40 }, /* 14496-3 ALS */
     { CODEC_ID_MPEG2VIDEO, 0x61 }, /* MPEG2 Main */
     { CODEC_ID_MPEG2VIDEO, 0x60 }, /* MPEG2 Simple */
     { CODEC_ID_MPEG2VIDEO, 0x62 }, /* MPEG2 SNR */
@@ -54,7 +55,7 @@ const AVCodecTag ff_mp4_obj_type[] = {
     { CODEC_ID_VORBIS    , 0xDD }, /* non standard, gpac uses it */
     { CODEC_ID_DVD_SUBTITLE, 0xE0 }, /* non standard, see unsupported-embedded-subs-2.mp4 */
     { CODEC_ID_QCELP     , 0xE1 },
-    { 0, 0 },
+    { CODEC_ID_NONE      ,    0 },
 };
 
 const AVCodecTag codec_movvideo_tags[] = {
@@ -64,7 +65,9 @@ const AVCodecTag codec_movvideo_tags[] = {
     { CODEC_ID_RAWVIDEO, MKTAG('y', 'u', 'v', '2') }, /* Uncompressed YUV422 */
     { CODEC_ID_RAWVIDEO, MKTAG('A', 'V', 'U', 'I') }, /* YUV with alpha-channel (AVID Uncompressed) */
     { CODEC_ID_RAWVIDEO, MKTAG('2', 'v', 'u', 'y') }, /* UNCOMPRESSED 8BIT 4:2:2 */
+    { CODEC_ID_RAWVIDEO, MKTAG('y', 'u', 'v', 's') }, /* same as 2vuy but byte swapped */
 
+    { CODEC_ID_R210,   MKTAG('r', '2', '1', '0') }, /* UNCOMPRESSED 10BIT RGB */
     { CODEC_ID_V210,   MKTAG('v', '2', '1', '0') }, /* UNCOMPRESSED 10BIT 4:2:2 */
 
     { CODEC_ID_MJPEG,  MKTAG('j', 'p', 'e', 'g') }, /* PhotoJPEG */
@@ -168,6 +171,8 @@ const AVCodecTag codec_movvideo_tags[] = {
 
     { CODEC_ID_DIRAC, MKTAG('d', 'r', 'a', 'c') },
     { CODEC_ID_DNXHD, MKTAG('A', 'V', 'd', 'n') }, /* AVID DNxHD */
+    { CODEC_ID_RAWVIDEO, MKTAG('A', 'V', '1', 'x') }, /* AVID 1:1x */
+    { CODEC_ID_RAWVIDEO, MKTAG('A', 'V', 'u', 'p') },
     { CODEC_ID_SGI,   MKTAG('s', 'g', 'i', ' ') }, /* SGI  */
     { CODEC_ID_DPX,   MKTAG('d', 'p', 'x', ' ') }, /* DPX */
 
@@ -183,7 +188,9 @@ const AVCodecTag codec_movaudio_tags[] = {
     { CODEC_ID_PCM_S16LE, MKTAG('s', 'o', 'w', 't') }, /*  */
     { CODEC_ID_PCM_S16LE, MKTAG('l', 'p', 'c', 'm') },
     { CODEC_ID_PCM_F32BE, MKTAG('f', 'l', '3', '2') },
+    { CODEC_ID_PCM_F32LE, MKTAG('f', 'l', '3', '2') },
     { CODEC_ID_PCM_F64BE, MKTAG('f', 'l', '6', '4') },
+    { CODEC_ID_PCM_F64LE, MKTAG('f', 'l', '6', '4') },
     { CODEC_ID_PCM_S8,    MKTAG('s', 'o', 'w', 't') },
     { CODEC_ID_PCM_U8,    MKTAG('r', 'a', 'w', ' ') }, /* 8 bits unsigned */
     { CODEC_ID_PCM_U8,    MKTAG('N', 'O', 'N', 'E') }, /* uncompressed */
@@ -237,35 +244,35 @@ const AVCodecTag ff_codec_movsubtitle_tags[] = {
 /* cf. QTFileFormat.pdf p253, qtff.pdf p205 */
 /* http://developer.apple.com/documentation/mac/Text/Text-368.html */
 /* deprecated by putting the code as 3*5bit ascii */
-static const char * const mov_mdhd_language_map[] = {
+static const char mov_mdhd_language_map[][4] = {
     /* 0-9 */
     "eng", "fra", "ger", "ita", "dut", "sve", "spa", "dan", "por", "nor",
     "heb", "jpn", "ara", "fin", "gre", "ice", "mlt", "tur", "hr "/*scr*/, "chi"/*ace?*/,
-    "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav",  NULL,
-    "fo ",  NULL, "rus", "chi",  NULL, "iri", "alb", "ron", "ces", "slk",
+    "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav",    "",
+    "fo ",    "", "rus", "chi",    "", "iri", "alb", "ron", "ces", "slk",
     "slv", "yid", "sr ", "mac", "bul", "ukr", "bel", "uzb", "kaz", "aze",
     /*?*/
-    "aze", "arm", "geo", "mol", "kir", "tgk", "tuk", "mon",  NULL, "pus",
+    "aze", "arm", "geo", "mol", "kir", "tgk", "tuk", "mon",    "", "pus",
     "kur", "kas", "snd", "tib", "nep", "san", "mar", "ben", "asm", "guj",
-    "pa ", "ori", "mal", "kan", "tam", "tel",  NULL, "bur", "khm", "lao",
+    "pa ", "ori", "mal", "kan", "tam", "tel",    "", "bur", "khm", "lao",
     /*                   roman? arabic? */
     "vie", "ind", "tgl", "may", "may", "amh", "tir", "orm", "som", "swa",
     /*==rundi?*/
-    NULL, "run",  NULL, "mlg", "epo",  NULL,  NULL,  NULL,  NULL,  NULL,
+       "", "run",    "", "mlg", "epo",    "",    "",    "",    "",    "",
     /* 100 */
-    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,
-    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,
-    NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL,  NULL, "wel", "baq",
+       "",    "",    "",    "",    "",    "",    "",    "",    "",    "",
+       "",    "",    "",    "",    "",    "",    "",    "",    "",    "",
+       "",    "",    "",    "",    "",    "",    "",    "", "wel", "baq",
     "cat", "lat", "que", "grn", "aym", "tat", "uig", "dzo", "jav"
 };
 
-int ff_mov_iso639_to_lang(const char *lang, int mp4)
+int ff_mov_iso639_to_lang(const char lang[4], int mp4)
 {
     int i, code = 0;
 
     /* old way, only for QT? */
-    for (i = 0; !mp4 && i < FF_ARRAY_ELEMS(mov_mdhd_language_map); i++) {
-        if (mov_mdhd_language_map[i] && !strcmp(lang, mov_mdhd_language_map[i]))
+    for (i = 0; lang[0] && !mp4 && i < FF_ARRAY_ELEMS(mov_mdhd_language_map); i++) {
+        if (!strcmp(lang, mov_mdhd_language_map[i]))
             return i;
     }
     /* XXX:can we do that in mov too? */
@@ -276,20 +283,20 @@ int ff_mov_iso639_to_lang(const char *lang, int mp4)
         lang = "und";
     /* 5bit ascii */
     for (i = 0; i < 3; i++) {
-        unsigned char c = (unsigned char)lang[i];
-        if (c < 0x60)
-            return -1;
-        if (c > 0x60 + 0x1f)
+        uint8_t c = lang[i];
+        c -= 0x60;
+        if (c > 0x1f)
             return -1;
         code <<= 5;
-        code |= (c - 0x60);
+        code |= c;
     }
     return code;
 }
 
-int ff_mov_lang_to_iso639(unsigned code, char *to)
+int ff_mov_lang_to_iso639(unsigned code, char to[4])
 {
     int i;
+    memset(to, 0, 4);
     /* is it the mangled iso code? */
     /* see http://www.geocities.com/xhelmboyx/quicktime/formats/mp4-layout.txt */
     if (code > 138) {
@@ -302,8 +309,8 @@ int ff_mov_lang_to_iso639(unsigned code, char *to)
     /* old fashion apple lang code */
     if (code >= FF_ARRAY_ELEMS(mov_mdhd_language_map))
         return 0;
-    if (!mov_mdhd_language_map[code])
+    if (!mov_mdhd_language_map[code][0])
         return 0;
-    strncpy(to, mov_mdhd_language_map[code], 4);
+    memcpy(to, mov_mdhd_language_map[code], 4);
     return 1;
 }

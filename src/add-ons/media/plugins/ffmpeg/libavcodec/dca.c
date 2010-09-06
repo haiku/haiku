@@ -22,21 +22,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/**
- * @file libavcodec/dca.c
- */
-
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 
+#include "libavutil/intmath.h"
+#include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 #include "dsputil.h"
+#include "fft.h"
 #include "get_bits.h"
 #include "put_bits.h"
 #include "dcadata.h"
 #include "dcahuff.h"
 #include "dca.h"
+#include "synth_filter.h"
+#include "dcadsp.h"
 
 //#define TRACE
 
@@ -227,15 +228,16 @@ typedef struct {
 
     /* Subband samples history (for ADPCM) */
     float subband_samples_hist[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][4];
-    DECLARE_ALIGNED_16(float, subband_fir_hist[DCA_PRIM_CHANNELS_MAX][512]);
-    float subband_fir_noidea[DCA_PRIM_CHANNELS_MAX][32];
+    DECLARE_ALIGNED(16, float, subband_fir_hist)[DCA_PRIM_CHANNELS_MAX][512];
+    DECLARE_ALIGNED(16, float, subband_fir_noidea)[DCA_PRIM_CHANNELS_MAX][32];
     int hist_index[DCA_PRIM_CHANNELS_MAX];
+    DECLARE_ALIGNED(16, float, raXin)[32];
 
     int output;                 ///< type of output
     float add_bias;             ///< output bias
     float scale_bias;           ///< output scale
 
-    DECLARE_ALIGNED_16(float, samples[1536]);  /* 6 * 256 = 1536, might only need 5 */
+    DECLARE_ALIGNED(16, float, samples)[1536];  /* 6 * 256 = 1536, might only need 5 */
     const float *samples_chanptr[6];
 
     uint8_t dca_buffer[DCA_MAX_FRAME_SIZE];
@@ -249,7 +251,9 @@ typedef struct {
 
     int debug_flag;             ///< used for suppressing repeated error messages output
     DSPContext dsp;
-    MDCTContext imdct;
+    FFTContext imdct;
+    SynthFilterContext synth;
+    DCADSPContext dcadsp;
 } DCAContext;
 
 static const uint16_t dca_vlc_offs[] = {
@@ -608,7 +612,7 @@ static int dca_subframe_header(DCAContext * s)
                 s->joint_scale_factor[j][k] = scale;    /*joint_scale_table[scale]; */
             }
 
-            if (!s->debug_flag & 0x02) {
+            if (!(s->debug_flag & 0x02)) {
                 av_log(s->avctx, AV_LOG_DEBUG,
                        "Joint stereo coding not supported\n");
                 s->debug_flag |= 0x02;
@@ -750,12 +754,9 @@ static void qmf_32_subbands(DCAContext * s, int chans,
                             float scale, float bias)
 {
     const float *prCoeff;
-    int i, j;
-    DECLARE_ALIGNED_16(float, raXin[32]);
+    int i;
 
-    int hist_index= s->hist_index[chans];
-    float *subband_fir_hist2 = s->subband_fir_noidea[chans];
-
+    int sb_act = s->subband_activity[chans];
     int subindex;
 
     scale *= sqrt(1/8.0);
@@ -768,48 +769,24 @@ static void qmf_32_subbands(DCAContext * s, int chans,
 
     /* Reconstructed channel sample index */
     for (subindex = 0; subindex < 8; subindex++) {
-        float *subband_fir_hist = s->subband_fir_hist[chans] + hist_index;
         /* Load in one sample from each subband and clear inactive subbands */
-        for (i = 0; i < s->subband_activity[chans]; i++){
-            if((i-1)&2) raXin[i] = -samples_in[i][subindex];
-            else        raXin[i] =  samples_in[i][subindex];
+        for (i = 0; i < sb_act; i++){
+            uint32_t v = AV_RN32A(&samples_in[i][subindex]) ^ ((i-1)&2)<<30;
+            AV_WN32A(&s->raXin[i], v);
         }
         for (; i < 32; i++)
-            raXin[i] = 0.0;
+            s->raXin[i] = 0.0;
 
-        ff_imdct_half(&s->imdct, subband_fir_hist, raXin);
-
-        /* Multiply by filter coefficients */
-        for (i = 0; i < 16; i++){
-            float a= subband_fir_hist2[i   ];
-            float b= subband_fir_hist2[i+16];
-            float c= 0;
-            float d= 0;
-            for (j = 0; j < 512-hist_index; j += 64){
-                a += prCoeff[i+j   ]*(-subband_fir_hist[15-i+j]);
-                b += prCoeff[i+j+16]*( subband_fir_hist[   i+j]);
-                c += prCoeff[i+j+32]*( subband_fir_hist[16+i+j]);
-                d += prCoeff[i+j+48]*( subband_fir_hist[31-i+j]);
-            }
-            for (     ; j < 512; j += 64){
-                a += prCoeff[i+j   ]*(-subband_fir_hist[15-i+j-512]);
-                b += prCoeff[i+j+16]*( subband_fir_hist[   i+j-512]);
-                c += prCoeff[i+j+32]*( subband_fir_hist[16+i+j-512]);
-                d += prCoeff[i+j+48]*( subband_fir_hist[31-i+j-512]);
-            }
-            samples_out[i   ] = a * scale + bias;
-            samples_out[i+16] = b * scale + bias;
-            subband_fir_hist2[i   ] = c;
-            subband_fir_hist2[i+16] = d;
-        }
+        s->synth.synth_filter_float(&s->imdct,
+                              s->subband_fir_hist[chans], &s->hist_index[chans],
+                              s->subband_fir_noidea[chans], prCoeff,
+                              samples_out, s->raXin, scale, bias);
         samples_out+= 32;
 
-        hist_index = (hist_index-32)&511;
     }
-    s->hist_index[chans]= hist_index;
 }
 
-static void lfe_interpolation_fir(int decimation_select,
+static void lfe_interpolation_fir(DCAContext *s, int decimation_select,
                                   int num_deci_sample, float *samples_in,
                                   float *samples_out, float scale,
                                   float bias)
@@ -822,30 +799,24 @@ static void lfe_interpolation_fir(int decimation_select,
      * samples_out: An array holding interpolated samples
      */
 
-    int decifactor, k, j;
+    int decifactor;
     const float *prCoeff;
-
-    int interp_index = 0;       /* Index to the interpolated samples */
     int deciindex;
 
     /* Select decimation filter */
     if (decimation_select == 1) {
-        decifactor = 128;
+        decifactor = 64;
         prCoeff = lfe_fir_128;
     } else {
-        decifactor = 64;
+        decifactor = 32;
         prCoeff = lfe_fir_64;
     }
     /* Interpolation */
     for (deciindex = 0; deciindex < num_deci_sample; deciindex++) {
-        /* One decimated sample generates decifactor interpolated ones */
-        for (k = 0; k < decifactor; k++) {
-            float rTmp = 0.0;
-            //FIXME the coeffs are symetric, fix that
-            for (j = 0; j < 512 / decifactor; j++)
-                rTmp += samples_in[deciindex - j] * prCoeff[k + j * decifactor];
-            samples_out[interp_index++] = (rTmp * scale) + bias;
-        }
+        s->dcadsp.lfe_fir(samples_out, samples_in, prCoeff, decifactor,
+                          scale, bias);
+        samples_in++;
+        samples_out += 2 * decifactor;
     }
 }
 
@@ -920,8 +891,9 @@ static int decode_blockcode(int code, int levels, int *values)
     int offset = (levels - 1) >> 1;
 
     for (i = 0; i < 4; i++) {
-        values[i] = (code % levels) - offset;
-        code /= levels;
+        int div = FASTDIV(code, levels);
+        values[i] = code - offset - div*levels;
+        code = div;
     }
 
     if (code == 0)
@@ -943,7 +915,8 @@ static int dca_subsubframe(DCAContext * s)
     const float *quant_step_table;
 
     /* FIXME */
-    float subband_samples[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][8];
+    LOCAL_ALIGNED_16(float, subband_samples, [DCA_PRIM_CHANNELS_MAX], [DCA_SUBBANDS][8]);
+    LOCAL_ALIGNED_16(int, block, [8]);
 
     /*
      * Audio data
@@ -963,7 +936,6 @@ static int dca_subsubframe(DCAContext * s)
             int abits = s->bitalloc[k][l];
 
             float quant_step_size = quant_step_table[abits];
-            float rscale;
 
             /*
              * Determine quantization index code book and its type
@@ -977,44 +949,38 @@ static int dca_subsubframe(DCAContext * s)
              */
             if(!abits){
                 memset(subband_samples[k][l], 0, 8 * sizeof(subband_samples[0][0][0]));
-            }else if(abits >= 11 || !dca_smpl_bitalloc[abits].vlc[sel].table){
-                if(abits <= 7){
-                    /* Block code */
-                    int block_code1, block_code2, size, levels;
-                    int block[8];
+            } else {
+                /* Deal with transients */
+                int sfi = s->transition_mode[k][l] && subsubframe >= s->transition_mode[k][l];
+                float rscale = quant_step_size * s->scale_factor[k][l][sfi] * s->scalefactor_adj[k][sel];
 
-                    size = abits_sizes[abits-1];
-                    levels = abits_levels[abits-1];
+                if(abits >= 11 || !dca_smpl_bitalloc[abits].vlc[sel].table){
+                    if(abits <= 7){
+                        /* Block code */
+                        int block_code1, block_code2, size, levels;
 
-                    block_code1 = get_bits(&s->gb, size);
-                    /* FIXME Should test return value */
-                    decode_blockcode(block_code1, levels, block);
-                    block_code2 = get_bits(&s->gb, size);
-                    decode_blockcode(block_code2, levels, &block[4]);
-                    for (m = 0; m < 8; m++)
-                        subband_samples[k][l][m] = block[m];
+                        size = abits_sizes[abits-1];
+                        levels = abits_levels[abits-1];
+
+                        block_code1 = get_bits(&s->gb, size);
+                        /* FIXME Should test return value */
+                        decode_blockcode(block_code1, levels, block);
+                        block_code2 = get_bits(&s->gb, size);
+                        decode_blockcode(block_code2, levels, &block[4]);
+                    }else{
+                        /* no coding */
+                        for (m = 0; m < 8; m++)
+                            block[m] = get_sbits(&s->gb, abits - 3);
+                    }
                 }else{
-                    /* no coding */
+                    /* Huffman coded */
                     for (m = 0; m < 8; m++)
-                        subband_samples[k][l][m] = get_sbits(&s->gb, abits - 3);
+                        block[m] = get_bitalloc(&s->gb, &dca_smpl_bitalloc[abits], sel);
                 }
-            }else{
-                /* Huffman coded */
-                for (m = 0; m < 8; m++)
-                    subband_samples[k][l][m] = get_bitalloc(&s->gb, &dca_smpl_bitalloc[abits], sel);
+
+                s->dsp.int32_to_float_fmul_scalar(subband_samples[k][l],
+                                                  block, rscale, 8);
             }
-
-            /* Deal with transients */
-            if (s->transition_mode[k][l] &&
-                subsubframe >= s->transition_mode[k][l])
-                rscale = quant_step_size * s->scale_factor[k][l][1];
-            else
-                rscale = quant_step_size * s->scale_factor[k][l][0];
-
-            rscale *= s->scalefactor_adj[k][sel];
-
-            for (m = 0; m < 8; m++)
-                subband_samples[k][l][m] *= rscale;
 
             /*
              * Inverse ADPCM if in prediction mode
@@ -1094,7 +1060,7 @@ static int dca_subsubframe(DCAContext * s)
     if (s->output & DCA_LFE) {
         int lfe_samples = 2 * s->lfe * s->subsubframes;
 
-        lfe_interpolation_fir(s->lfe, 2 * s->lfe,
+        lfe_interpolation_fir(s, s->lfe, 2 * s->lfe,
                               s->lfe_data + lfe_samples +
                               2 * s->lfe * subsubframe,
                               &s->samples[256 * dca_lfe_index[s->amode]],
@@ -1270,6 +1236,10 @@ static int dca_decode_frame(AVCodecContext * avctx,
         } else
             s->channel_order_tab = dca_channel_reorder_nolfe[s->amode];
 
+        if (s->prim_channels > 0 &&
+            s->channel_order_tab[s->prim_channels - 1] < 0)
+            return -1;
+
         if(avctx->request_channels == 2 && s->prim_channels > 2) {
             channels = 2;
             s->output = DCA_STEREO;
@@ -1319,12 +1289,14 @@ static av_cold int dca_decode_init(AVCodecContext * avctx)
 
     dsputil_init(&s->dsp, avctx);
     ff_mdct_init(&s->imdct, 6, 1, 1.0);
+    ff_synth_filter_init(&s->synth);
+    ff_dcadsp_init(&s->dcadsp);
 
     for(i = 0; i < 6; i++)
         s->samples_chanptr[i] = s->samples + i * 256;
     avctx->sample_fmt = SAMPLE_FMT_S16;
 
-    if(s->dsp.float_to_int16 == ff_float_to_int16_c) {
+    if(s->dsp.float_to_int16_interleave == ff_float_to_int16_interleave_c) {
         s->add_bias = 385.0f;
         s->scale_bias = 1.0 / 32768.0;
     } else {
@@ -1351,7 +1323,7 @@ static av_cold int dca_decode_end(AVCodecContext * avctx)
 
 AVCodec dca_decoder = {
     .name = "dca",
-    .type = CODEC_TYPE_AUDIO,
+    .type = AVMEDIA_TYPE_AUDIO,
     .id = CODEC_ID_DTS,
     .priv_data_size = sizeof(DCAContext),
     .init = dca_decode_init,

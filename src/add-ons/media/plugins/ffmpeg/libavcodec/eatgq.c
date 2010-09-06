@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/eatgq.c
+ * @file
  * Electronic Arts TGQ Video Decoder
  * @author Peter Ross <pross@xvid.org>
  *
@@ -42,7 +42,7 @@ typedef struct TgqContext {
     int width,height;
     ScanTable scantable;
     int qtable[64];
-    DECLARE_ALIGNED_16(DCTELEM, block[6][64]);
+    DECLARE_ALIGNED(16, DCTELEM, block)[6][64];
 } TgqContext;
 
 static av_cold int tgq_decode_init(AVCodecContext *avctx){
@@ -245,7 +245,7 @@ static av_cold int tgq_decode_end(AVCodecContext *avctx){
 
 AVCodec eatgq_decoder = {
     "eatgq",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_TGQ,
     sizeof(TgqContext),
     tgq_decode_init,

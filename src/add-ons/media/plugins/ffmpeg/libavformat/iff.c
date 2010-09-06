@@ -1,6 +1,8 @@
 /*
  * IFF (.iff) file demuxer
  * Copyright (c) 2008 Jaikrishnan Menon <realityman@gmx.net>
+ * Copyright (c) 2010 Peter Ross <pross@xvid.org>
+ * Copyright (c) 2010 Sebastian Vater <cdgs.basty@googlemail.com>
  *
  * This file is part of FFmpeg.
  *
@@ -20,7 +22,7 @@
  */
 
 /**
- * @file libavformat/iff.c
+ * @file
  * IFF file demuxer
  * by Jaikrishnan Menon
  * for more information on the .iff file format, visit:
@@ -28,6 +30,7 @@
  */
 
 #include "libavutil/intreadwrite.h"
+#include "libavcodec/iff.h"
 #include "avformat.h"
 
 #define ID_8SVX       MKTAG('8','S','V','X')
@@ -35,6 +38,10 @@
 #define ID_ATAK       MKTAG('A','T','A','K')
 #define ID_RLSE       MKTAG('R','L','S','E')
 #define ID_CHAN       MKTAG('C','H','A','N')
+#define ID_PBM        MKTAG('P','B','M',' ')
+#define ID_ILBM       MKTAG('I','L','B','M')
+#define ID_BMHD       MKTAG('B','M','H','D')
+#define ID_CMAP       MKTAG('C','M','A','P')
 
 #define ID_FORM       MKTAG('F','O','R','M')
 #define ID_ANNO       MKTAG('A','N','N','O')
@@ -46,6 +53,7 @@
 #define ID_NAME       MKTAG('N','A','M','E')
 #define ID_TEXT       MKTAG('T','E','X','T')
 #define ID_BODY       MKTAG('B','O','D','Y')
+#define ID_ANNO       MKTAG('A','N','N','O')
 
 #define LEFT    2
 #define RIGHT   4
@@ -53,9 +61,19 @@
 
 #define PACKET_SIZE 1024
 
-typedef enum {COMP_NONE, COMP_FIB, COMP_EXP} svx8_compression_type;
+typedef enum {
+    COMP_NONE,
+    COMP_FIB,
+    COMP_EXP
+} svx8_compression_type;
+
+typedef enum {
+    BITMAP_RAW,
+    BITMAP_BYTERUN1
+} bitmap_compression_type;
 
 typedef struct {
+    uint64_t  body_pos;
     uint32_t  body_size;
     uint32_t  sent_bytes;
     uint32_t  audio_frame_count;
@@ -79,7 +97,7 @@ static int iff_probe(AVProbeData *p)
     const uint8_t *d = p->buf;
 
     if ( AV_RL32(d)   == ID_FORM &&
-         AV_RL32(d+8) == ID_8SVX)
+         (AV_RL32(d+8) == ID_8SVX || AV_RL32(d+8) == ID_PBM || AV_RL32(d+8) == ID_ILBM) )
         return AVPROBE_SCORE_MAX;
     return 0;
 }
@@ -91,68 +109,138 @@ static int iff_read_header(AVFormatContext *s,
     ByteIOContext *pb = s->pb;
     AVStream *st;
     uint32_t chunk_id, data_size;
-    int padding, done = 0;
+    int compression = -1;
+    char *buf;
 
     st = av_new_stream(s, 0);
     if (!st)
-      return AVERROR(ENOMEM);
+        return AVERROR(ENOMEM);
 
     st->codec->channels = 1;
-    url_fskip(pb, 12);
+    url_fskip(pb, 8);
+    // codec_tag used by ByteRun1 decoder to distinguish progressive (PBM) and interlaced (ILBM) content
+    st->codec->codec_tag = get_le32(pb);
 
-    while(!done && !url_feof(pb)) {
+    while(!url_feof(pb)) {
+        uint64_t orig_pos;
         chunk_id = get_le32(pb);
         data_size = get_be32(pb);
-        padding = data_size & 1;
+        orig_pos = url_ftell(pb);
 
         switch(chunk_id) {
         case ID_VHDR:
+            st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
+
+            if (data_size < 14)
+                return AVERROR_INVALIDDATA;
             url_fskip(pb, 12);
             st->codec->sample_rate = get_be16(pb);
-            url_fskip(pb, 1);
-            st->codec->codec_tag = get_byte(pb);
-            url_fskip(pb, 4);
+            if (data_size >= 16) {
+                url_fskip(pb, 1);
+                compression        = get_byte(pb);
+            }
             break;
 
         case ID_BODY:
+            iff->body_pos = url_ftell(pb);
             iff->body_size = data_size;
-            done = 1;
             break;
 
         case ID_CHAN:
+            if (data_size < 4)
+                return AVERROR_INVALIDDATA;
             st->codec->channels = (get_be32(pb) < 6) ? 1 : 2;
             break;
 
-        default:
-            url_fseek(pb, data_size + padding, SEEK_CUR);
+        case ID_CMAP:
+            st->codec->extradata_size = data_size;
+            st->codec->extradata      = av_malloc(data_size);
+            if (!st->codec->extradata)
+                return AVERROR(ENOMEM);
+            if (get_buffer(pb, st->codec->extradata, data_size) < 0)
+                return AVERROR(EIO);
+            break;
+
+        case ID_BMHD:
+            st->codec->codec_type            = AVMEDIA_TYPE_VIDEO;
+            if (data_size <= 8)
+                return AVERROR_INVALIDDATA;
+            st->codec->width                 = get_be16(pb);
+            st->codec->height                = get_be16(pb);
+            url_fskip(pb, 4); // x, y offset
+            st->codec->bits_per_coded_sample = get_byte(pb);
+            if (data_size >= 11) {
+                url_fskip(pb, 1); // masking
+                compression                  = get_byte(pb);
+            }
+            if (data_size >= 16) {
+                url_fskip(pb, 3); // paddding, transparent
+                st->sample_aspect_ratio.num  = get_byte(pb);
+                st->sample_aspect_ratio.den  = get_byte(pb);
+            }
+            break;
+
+        case ID_ANNO:
+            buf = av_malloc(data_size + 1);
+            if (!buf)
+                break;
+            get_buffer(pb, buf, data_size);
+            buf[data_size] = 0;
+            av_metadata_set2(&s->metadata, "comment", buf, AV_METADATA_DONT_STRDUP_VAL);
             break;
         }
+
+        url_fskip(pb, data_size - (url_ftell(pb) - orig_pos) + (data_size & 1));
     }
 
-    if(!st->codec->sample_rate)
-        return AVERROR_INVALIDDATA;
+    url_fseek(pb, iff->body_pos, SEEK_SET);
 
-    av_set_pts_info(st, 32, 1, st->codec->sample_rate);
-    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    switch(st->codec->codec_type) {
+    case AVMEDIA_TYPE_AUDIO:
+        av_set_pts_info(st, 32, 1, st->codec->sample_rate);
 
-    switch(st->codec->codec_tag) {
-    case COMP_NONE:
-        st->codec->codec_id = CODEC_ID_PCM_S8;
+        switch(compression) {
+        case COMP_NONE:
+            st->codec->codec_id = CODEC_ID_PCM_S8;
+            break;
+        case COMP_FIB:
+            st->codec->codec_id = CODEC_ID_8SVX_FIB;
+            break;
+        case COMP_EXP:
+            st->codec->codec_id = CODEC_ID_8SVX_EXP;
+            break;
+        default:
+            av_log(s, AV_LOG_ERROR, "iff: unknown compression method\n");
+            return -1;
+        }
+
+        st->codec->bits_per_coded_sample = 8;
+        st->codec->bit_rate = st->codec->channels * st->codec->sample_rate * st->codec->bits_per_coded_sample;
+        st->codec->block_align = st->codec->channels * st->codec->bits_per_coded_sample;
         break;
-    case COMP_FIB:
-        st->codec->codec_id = CODEC_ID_8SVX_FIB;
-        break;
-    case COMP_EXP:
-        st->codec->codec_id = CODEC_ID_8SVX_EXP;
+
+    case AVMEDIA_TYPE_VIDEO:
+        switch (compression) {
+        case BITMAP_RAW:
+            if (st->codec->codec_tag == ID_ILBM) {
+                st->codec->codec_id = CODEC_ID_IFF_ILBM;
+            } else {
+                st->codec->codec_id = CODEC_ID_RAWVIDEO;
+                st->codec->pix_fmt  = PIX_FMT_PAL8;
+                st->codec->codec_tag = 0;
+            }
+            break;
+        case BITMAP_BYTERUN1:
+            st->codec->codec_id = CODEC_ID_IFF_BYTERUN1;
+            break;
+        default:
+            av_log(s, AV_LOG_ERROR, "unknown compression method\n");
+            return AVERROR_INVALIDDATA;
+        }
         break;
     default:
-        av_log(s, AV_LOG_ERROR, "iff: unknown compression method\n");
         return -1;
     }
-
-    st->codec->bits_per_coded_sample = 8;
-    st->codec->bit_rate = st->codec->channels * st->codec->sample_rate * st->codec->bits_per_coded_sample;
-    st->codec->block_align = st->codec->channels * st->codec->bits_per_coded_sample;
 
     return 0;
 }
@@ -162,9 +250,10 @@ static int iff_read_packet(AVFormatContext *s,
 {
     IffDemuxContext *iff = s->priv_data;
     ByteIOContext *pb = s->pb;
+    AVStream *st = s->streams[0];
     int ret;
 
-    if(iff->sent_bytes > iff->body_size)
+    if(iff->sent_bytes >= iff->body_size)
         return AVERROR(EIO);
 
     if(s->streams[0]->codec->channels == 2) {
@@ -176,18 +265,37 @@ static int iff_read_packet(AVFormatContext *s,
             return AVERROR(ENOMEM);
         }
         interleave_stereo(sample_buffer, pkt->data, PACKET_SIZE);
-    }
-    else {
+    } else if (s->streams[0]->codec->codec_id == CODEC_ID_RAWVIDEO) {
+        if(av_new_packet(pkt, iff->body_size + AVPALETTE_SIZE) < 0) {
+            return AVERROR(ENOMEM);
+        }
+
+        ret = ff_cmap_read_palette(st->codec, (uint32_t*)(pkt->data + iff->body_size));
+        if (ret < 0)
+            return ret;
+        av_freep(&st->codec->extradata);
+        st->codec->extradata_size = 0;
+
+        ret = get_buffer(pb, pkt->data, iff->body_size);
+    } else if (s->streams[0]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+        ret = av_get_packet(pb, pkt, iff->body_size);
+    } else {
         ret = av_get_packet(pb, pkt, PACKET_SIZE);
     }
 
     if(iff->sent_bytes == 0)
-        pkt->flags |= PKT_FLAG_KEY;
+        pkt->flags |= AV_PKT_FLAG_KEY;
 
-    iff->sent_bytes += PACKET_SIZE;
+    if(s->streams[0]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        iff->sent_bytes += PACKET_SIZE;
+    } else {
+        iff->sent_bytes = iff->body_size;
+    }
     pkt->stream_index = 0;
-    pkt->pts = iff->audio_frame_count;
-    iff->audio_frame_count += ret / s->streams[0]->codec->channels;
+    if(s->streams[0]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        pkt->pts = iff->audio_frame_count;
+        iff->audio_frame_count += ret / s->streams[0]->codec->channels;
+    }
     return ret;
 }
 

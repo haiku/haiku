@@ -20,13 +20,14 @@
  */
 
 /**
- * @file libavcodec/indeo2.c
+ * @file
  * Intel Indeo 2 decoder.
  */
 #define ALT_BITSTREAM_READER_LE
 #include "avcodec.h"
 #include "get_bits.h"
 #include "indeo2data.h"
+#include "libavutil/common.h"
 
 typedef struct Ir2Context{
     AVCodecContext *avctx;
@@ -160,7 +161,7 @@ static int ir2_decode_frame(AVCodecContext *avctx,
     /* decide whether frame uses deltas or not */
 #ifndef ALT_BITSTREAM_READER_LE
     for (i = 0; i < buf_size; i++)
-        buf[i] = ff_reverse[buf[i]];
+        buf[i] = av_reverse[buf[i]];
 #endif
     start = 48; /* hardcoded for now */
 
@@ -213,14 +214,24 @@ static av_cold int ir2_decode_init(AVCodecContext *avctx){
     return 0;
 }
 
+static av_cold int ir2_decode_end(AVCodecContext *avctx){
+    Ir2Context * const ic = avctx->priv_data;
+    AVFrame *pic = &ic->picture;
+
+    if (pic->data[0])
+        avctx->release_buffer(avctx, pic);
+
+    return 0;
+}
+
 AVCodec indeo2_decoder = {
     "indeo2",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_INDEO2,
     sizeof(Ir2Context),
     ir2_decode_init,
     NULL,
-    NULL,
+    ir2_decode_end,
     ir2_decode_frame,
     CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("Intel Indeo 2"),

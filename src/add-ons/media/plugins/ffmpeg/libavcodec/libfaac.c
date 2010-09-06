@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/libfaac.c
+ * @file
  * Interface to libfaac for aac encoding.
  */
 
@@ -147,12 +147,12 @@ static av_cold int Faac_encode_close(AVCodecContext *avctx)
 
 AVCodec libfaac_encoder = {
     "libfaac",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_AAC,
     sizeof(FaacAudioContext),
     Faac_encode_init,
     Faac_encode_frame,
     Faac_encode_close,
-    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("libfaac AAC (Advanced Audio Codec)"),
 };

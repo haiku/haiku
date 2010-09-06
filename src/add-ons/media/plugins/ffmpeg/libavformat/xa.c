@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavformat/xa.c
+ * @file
  * Maxis XA File Demuxer
  * by Robert Marston (rmarston@gmail.com)
  * for more information on the XA audio format see
@@ -42,13 +42,24 @@ typedef struct MaxisXADemuxContext {
 
 static int xa_probe(AVProbeData *p)
 {
+    int channels, srate, bits_per_sample;
+    if (p->buf_size < 24)
+        return 0;
     switch(AV_RL32(p->buf)) {
     case XA00_TAG:
     case XAI0_TAG:
     case XAJ0_TAG:
-        return AVPROBE_SCORE_MAX;
+        break;
+    default:
+        return 0;
     }
-    return 0;
+    channels        = AV_RL16(p->buf + 10);
+    srate           = AV_RL32(p->buf + 12);
+    bits_per_sample = AV_RL16(p->buf + 22);
+    if (!channels || channels > 8 || !srate || srate > 192000 ||
+        bits_per_sample < 4 || bits_per_sample > 32)
+        return 0;
+    return AVPROBE_SCORE_MAX/2;
 }
 
 static int xa_read_header(AVFormatContext *s,
@@ -63,7 +74,7 @@ static int xa_read_header(AVFormatContext *s,
     if (!st)
         return AVERROR(ENOMEM);
 
-    st->codec->codec_type   = CODEC_TYPE_AUDIO;
+    st->codec->codec_type   = AVMEDIA_TYPE_AUDIO;
     st->codec->codec_id     = CODEC_ID_ADPCM_EA_MAXIS_XA;
     url_fskip(pb, 4);       /* Skip the XA ID */
     xa->out_size            =  get_le32(pb);
@@ -95,8 +106,8 @@ static int xa_read_packet(AVFormatContext *s,
     packet_size = 15*st->codec->channels;
 
     ret = av_get_packet(pb, pkt, packet_size);
-    if(ret != packet_size)
-        return AVERROR(EIO);
+    if(ret < 0)
+        return ret;
 
     pkt->stream_index = st->index;
     xa->sent_bytes += packet_size;

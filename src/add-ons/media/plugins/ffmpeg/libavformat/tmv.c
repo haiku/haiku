@@ -21,7 +21,7 @@
 
 /**
  * 8088flex TMV file demuxer
- * @file libavformat/tmv.c
+ * @file
  * @author Daniel Verkamp
  * @sa http://www.oldskool.org/pc/8088_Corruption
  */
@@ -43,10 +43,22 @@ typedef struct TMVContext {
     unsigned stream_index;
 } TMVContext;
 
+#define TMV_HEADER_SIZE       12
+
+#define PROBE_MIN_SAMPLE_RATE 5000
+#define PROBE_MAX_FPS         120
+#define PROBE_MIN_AUDIO_SIZE  (PROBE_MIN_SAMPLE_RATE / PROBE_MAX_FPS)
+
 static int tmv_probe(AVProbeData *p)
 {
-    if (AV_RL32(p->buf) == TMV_TAG)
-        return AVPROBE_SCORE_MAX;
+    if (AV_RL32(p->buf)   == TMV_TAG &&
+        AV_RL16(p->buf+4) >= PROBE_MIN_SAMPLE_RATE &&
+        AV_RL16(p->buf+6) >= PROBE_MIN_AUDIO_SIZE  &&
+               !p->buf[8] && // compression method
+                p->buf[9] && // char cols
+                p->buf[10])  // char rows
+        return AVPROBE_SCORE_MAX /
+            ((p->buf[9] == 40 && p->buf[10] == 25) ? 1 : 4);
     return 0;
 }
 
@@ -68,6 +80,11 @@ static int tmv_read_header(AVFormatContext *s, AVFormatParameters *ap)
         return AVERROR(ENOMEM);
 
     ast->codec->sample_rate = get_le16(pb);
+    if (!ast->codec->sample_rate) {
+        av_log(s, AV_LOG_ERROR, "invalid sample rate\n");
+        return -1;
+    }
+
     tmv->audio_chunk_size   = get_le16(pb);
     if (!tmv->audio_chunk_size) {
         av_log(s, AV_LOG_ERROR, "invalid audio chunk size\n");
@@ -92,9 +109,8 @@ static int tmv_read_header(AVFormatContext *s, AVFormatParameters *ap)
         return -1;
     }
 
-    ast->codec->codec_type            = CODEC_TYPE_AUDIO;
+    ast->codec->codec_type            = AVMEDIA_TYPE_AUDIO;
     ast->codec->codec_id              = CODEC_ID_PCM_U8;
-    ast->codec->sample_fmt            = SAMPLE_FMT_U8;
     ast->codec->channels              = features & TMV_STEREO ? 2 : 1;
     ast->codec->bits_per_coded_sample = 8;
     ast->codec->bit_rate              = ast->codec->sample_rate *
@@ -105,7 +121,7 @@ static int tmv_read_header(AVFormatContext *s, AVFormatParameters *ap)
     fps.den = tmv->audio_chunk_size;
     av_reduce(&fps.num, &fps.den, fps.num, fps.den, 0xFFFFFFFFLL);
 
-    vst->codec->codec_type = CODEC_TYPE_VIDEO;
+    vst->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     vst->codec->codec_id   = CODEC_ID_TMV;
     vst->codec->pix_fmt    = PIX_FMT_PAL8;
     vst->codec->width      = char_cols * 8;
@@ -140,9 +156,26 @@ static int tmv_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     pkt->stream_index  = tmv->stream_index;
     tmv->stream_index ^= 1;
-    pkt->flags        |= PKT_FLAG_KEY;
+    pkt->flags        |= AV_PKT_FLAG_KEY;
 
     return ret;
+}
+
+static int tmv_read_seek(AVFormatContext *s, int stream_index,
+                         int64_t timestamp, int flags)
+{
+    TMVContext *tmv = s->priv_data;
+    int64_t pos;
+
+    if (stream_index)
+        return -1;
+
+    pos = timestamp *
+          (tmv->audio_chunk_size + tmv->video_chunk_size + tmv->padding);
+
+    url_fseek(s->pb, pos + TMV_HEADER_SIZE, SEEK_SET);
+    tmv->stream_index = 0;
+    return 0;
 }
 
 AVInputFormat tmv_demuxer = {
@@ -152,5 +185,7 @@ AVInputFormat tmv_demuxer = {
     tmv_probe,
     tmv_read_header,
     tmv_read_packet,
+    NULL,
+    tmv_read_seek,
     .flags = AVFMT_GENERIC_INDEX,
 };

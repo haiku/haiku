@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/h264pred.c
+ * @file
  * H.264 / AVC / MPEG4 part10 prediction functions.
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
@@ -1172,4 +1172,6 @@ void ff_h264_pred_init(H264PredContext *h, int codec_id){
     h->pred8x8_add  [ HOR_PRED8x8]= pred8x8_horizontal_add_c;
     h->pred16x16_add[VERT_PRED8x8]= pred16x16_vertical_add_c;
     h->pred16x16_add[ HOR_PRED8x8]= pred16x16_horizontal_add_c;
+
+    if (ARCH_ARM) ff_h264_pred_init_arm(h, codec_id);
 }

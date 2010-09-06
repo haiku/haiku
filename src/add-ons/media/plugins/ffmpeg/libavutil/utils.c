@@ -16,14 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config.h"
 #include "avutil.h"
 
 /**
- * @file libavutil/utils.c
+ * @file
  * various utility functions
  */
 
 unsigned avutil_version(void)
 {
     return LIBAVUTIL_VERSION_INT;
+}
+
+const char *avutil_configuration(void)
+{
+    return FFMPEG_CONFIGURATION;
+}
+
+const char *avutil_license(void)
+{
+#define LICENSE_PREFIX "libavutil license: "
+    return LICENSE_PREFIX FFMPEG_LICENSE + sizeof(LICENSE_PREFIX) - 1;
 }

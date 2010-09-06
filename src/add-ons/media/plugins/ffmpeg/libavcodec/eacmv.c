@@ -20,9 +20,9 @@
  */
 
 /**
- * @file libavcodec/eacmv.c
+ * @file
  * Electronic Arts CMV Video Decoder
- * by Peter Ross (suxen_drol at hotmail dot com)
+ * by Peter Ross (pross@xvid.org)
  *
  * Technical details here:
  * http://wiki.multimedia.cx/index.php?title=Electronic_Arts_CMV
@@ -205,7 +205,7 @@ static av_cold int cmv_decode_end(AVCodecContext *avctx){
 
 AVCodec eacmv_decoder = {
     "eacmv",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_CMV,
     sizeof(CmvContext),
     cmv_decode_init,

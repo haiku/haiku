@@ -54,7 +54,7 @@ static int voc_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st = av_new_stream(s, 0);
     if (!st)
         return AVERROR(ENOMEM);
-    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
 
     voc->remaining_size = 0;
     return 0;
@@ -76,6 +76,11 @@ voc_get_packet(AVFormatContext *s, AVPacket *pkt, AVStream *st, int max_size)
         if (type == VOC_TYPE_EOF)
             return AVERROR(EIO);
         voc->remaining_size = get_le24(pb);
+        if (!voc->remaining_size) {
+            if (url_is_streamed(s->pb))
+                return AVERROR(EIO);
+            voc->remaining_size = url_fsize(pb) - url_ftell(pb);
+        }
         max_size -= 4;
 
         switch (type) {

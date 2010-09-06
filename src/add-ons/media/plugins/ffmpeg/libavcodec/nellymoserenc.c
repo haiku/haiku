@@ -22,7 +22,7 @@
  */
 
 /**
- * @file libavcodec/nellymoserenc.c
+ * @file
  * Nellymoser encoder
  * by Bartlomiej Wolowiec
  *
@@ -38,6 +38,7 @@
 #include "nellymoser.h"
 #include "avcodec.h"
 #include "dsputil.h"
+#include "fft.h"
 
 #define BITSTREAM_WRITER_LE
 #include "put_bits.h"
@@ -52,10 +53,10 @@ typedef struct NellyMoserEncodeContext {
     int             bufsel;
     int             have_saved;
     DSPContext      dsp;
-    MDCTContext     mdct_ctx;
-    DECLARE_ALIGNED_16(float, mdct_out[NELLY_SAMPLES]);
-    DECLARE_ALIGNED_16(float, in_buff[NELLY_SAMPLES]);
-    DECLARE_ALIGNED_16(float, buf[2][3 * NELLY_BUF_LEN]);     ///< sample buffer
+    FFTContext      mdct_ctx;
+    DECLARE_ALIGNED(16, float, mdct_out)[NELLY_SAMPLES];
+    DECLARE_ALIGNED(16, float, in_buff)[NELLY_SAMPLES];
+    DECLARE_ALIGNED(16, float, buf)[2][3 * NELLY_BUF_LEN];     ///< sample buffer
     float           (*opt )[NELLY_BANDS];
     uint8_t         (*path)[NELLY_BANDS];
 } NellyMoserEncodeContext;
@@ -110,7 +111,7 @@ static const float quant_lut_mul[7] = { 0.0,  0.0,  2.0,  2.0,  5.0, 12.0,  36.6
 static const float quant_lut_add[7] = { 0.0,  0.0,  2.0,  7.0, 21.0, 56.0, 157.0 };
 static const uint8_t quant_lut_offset[8] = { 0, 0, 1, 4, 11, 32, 81, 230 };
 
-void apply_mdct(NellyMoserEncodeContext *s)
+static void apply_mdct(NellyMoserEncodeContext *s)
 {
     memcpy(s->in_buff, s->buf[s->bufsel], NELLY_BUF_LEN * sizeof(float));
     s->dsp.vector_fmul(s->in_buff, ff_sine_128, NELLY_BUF_LEN);
@@ -383,7 +384,7 @@ static int encode_frame(AVCodecContext *avctx, uint8_t *frame, int buf_size, voi
 
 AVCodec nellymoser_encoder = {
     .name = "nellymoser",
-    .type = CODEC_TYPE_AUDIO,
+    .type = AVMEDIA_TYPE_AUDIO,
     .id = CODEC_ID_NELLYMOSER,
     .priv_data_size = sizeof(NellyMoserEncodeContext),
     .init = encode_init,

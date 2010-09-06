@@ -19,13 +19,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/base64.h"
 #include "libavutil/avstring.h"
 #include "avformat.h"
 #include <unistd.h>
 #include <strings.h>
+#include "internal.h"
 #include "network.h"
 #include "os_support.h"
+#include "httpauth.h"
 
 /* XXX: POST protocol is not completely implemented because ffmpeg uses
    only a subset of it. */
@@ -43,6 +44,7 @@ typedef struct {
     int64_t chunksize;      /**< Used if "Transfer-Encoding: chunked" otherwise -1. */
     int64_t off, filesize;
     char location[URL_SIZE];
+    HTTPAuthState auth_state;
 } HTTPContext;
 
 static int http_connect(URLContext *h, const char *path, const char *hoststr,
@@ -59,6 +61,7 @@ static int http_open_cnx(URLContext *h)
     char path1[1024];
     char buf[1024];
     int port, use_proxy, err, location_changed = 0, redirects = 0;
+    HTTPAuthType cur_auth_type;
     HTTPContext *s = h->priv_data;
     URLContext *hd = NULL;
 
@@ -69,17 +72,13 @@ static int http_open_cnx(URLContext *h)
     /* fill the dest addr */
  redo:
     /* needed in any case to build the host string */
-    url_split(NULL, 0, auth, sizeof(auth), hostname, sizeof(hostname), &port,
-              path1, sizeof(path1), s->location);
-    if (port > 0) {
-        snprintf(hoststr, sizeof(hoststr), "%s:%d", hostname, port);
-    } else {
-        av_strlcpy(hoststr, hostname, sizeof(hoststr));
-    }
+    ff_url_split(NULL, 0, auth, sizeof(auth), hostname, sizeof(hostname), &port,
+                 path1, sizeof(path1), s->location);
+    ff_url_join(hoststr, sizeof(hoststr), NULL, NULL, hostname, port, NULL);
 
     if (use_proxy) {
-        url_split(NULL, 0, auth, sizeof(auth), hostname, sizeof(hostname), &port,
-                  NULL, 0, proxy_path);
+        ff_url_split(NULL, 0, auth, sizeof(auth), hostname, sizeof(hostname), &port,
+                     NULL, 0, proxy_path);
         path = s->location;
     } else {
         if (path1[0] == '\0')
@@ -90,14 +89,22 @@ static int http_open_cnx(URLContext *h)
     if (port < 0)
         port = 80;
 
-    snprintf(buf, sizeof(buf), "tcp://%s:%d", hostname, port);
+    ff_url_join(buf, sizeof(buf), "tcp", NULL, hostname, port, NULL);
     err = url_open(&hd, buf, URL_RDWR);
     if (err < 0)
         goto fail;
 
     s->hd = hd;
+    cur_auth_type = s->auth_state.auth_type;
     if (http_connect(h, path, hoststr, auth, &location_changed) < 0)
         goto fail;
+    if (s->http_code == 401) {
+        if (cur_auth_type == HTTP_AUTH_NONE && s->auth_state.auth_type != HTTP_AUTH_NONE) {
+            url_close(hd);
+            goto redo;
+        } else
+            goto fail;
+    }
     if ((s->http_code == 302 || s->http_code == 303) && location_changed == 1) {
         /* url moved, get next */
         url_close(hd);
@@ -128,6 +135,7 @@ static int http_open(URLContext *h, const char *uri, int flags)
     s->filesize = -1;
     s->chunksize = -1;
     s->off = 0;
+    memset(&s->auth_state, 0, sizeof(s->auth_state));
     av_strlcpy(s->location, uri, URL_SIZE);
 
     ret = http_open_cnx(h);
@@ -196,8 +204,9 @@ static int process_line(URLContext *h, char *line, int line_count,
 
         dprintf(NULL, "http_code=%d\n", s->http_code);
 
-        /* error codes are 4xx and 5xx */
-        if (s->http_code >= 400 && s->http_code < 600)
+        /* error codes are 4xx and 5xx, but regard 401 as a success, so we
+         * don't abort until all headers have been parsed. */
+        if (s->http_code >= 400 && s->http_code < 600 && s->http_code != 401)
             return -1;
     } else {
         while (*p != '\0' && *p != ':')
@@ -228,6 +237,10 @@ static int process_line(URLContext *h, char *line, int line_count,
         } else if (!strcmp (tag, "Transfer-Encoding") && !strncasecmp(p, "chunked", 7)) {
             s->filesize = -1;
             s->chunksize = 0;
+        } else if (!strcmp (tag, "WWW-Authenticate")) {
+            ff_http_auth_handle_header(&s->auth_state, tag, p);
+        } else if (!strcmp (tag, "Authentication-Info")) {
+            ff_http_auth_handle_header(&s->auth_state, tag, p);
         }
     }
     return 1;
@@ -239,32 +252,33 @@ static int http_connect(URLContext *h, const char *path, const char *hoststr,
     HTTPContext *s = h->priv_data;
     int post, err;
     char line[1024];
-    char *auth_b64;
-    int auth_b64_len = (strlen(auth) + 2) / 3 * 4 + 1;
+    char *authstr = NULL;
     int64_t off = s->off;
 
 
     /* send http header */
     post = h->flags & URL_WRONLY;
-    auth_b64 = av_malloc(auth_b64_len);
-    av_base64_encode(auth_b64, auth_b64_len, auth, strlen(auth));
+    authstr = ff_http_auth_create_response(&s->auth_state, auth, path,
+                                        post ? "POST" : "GET");
     snprintf(s->buffer, sizeof(s->buffer),
              "%s %s HTTP/1.1\r\n"
              "User-Agent: %s\r\n"
              "Accept: */*\r\n"
              "Range: bytes=%"PRId64"-\r\n"
              "Host: %s\r\n"
-             "Authorization: Basic %s\r\n"
+             "%s"
              "Connection: close\r\n"
+             "%s"
              "\r\n",
              post ? "POST" : "GET",
              path,
              LIBAVFORMAT_IDENT,
              s->off,
              hoststr,
-             auth_b64);
+             authstr ? authstr : "",
+             post ? "Transfer-Encoding: chunked\r\n" : "");
 
-    av_freep(&auth_b64);
+    av_freep(&authstr);
     if (http_write(h, s->buffer, strlen(s->buffer)) < 0)
         return AVERROR(EIO);
 
@@ -275,6 +289,8 @@ static int http_connect(URLContext *h, const char *path, const char *hoststr,
     s->off = 0;
     s->filesize = -1;
     if (post) {
+        /* always use chunked encoding for upload data */
+        s->chunksize = 0;
         return 0;
     }
 
@@ -344,16 +360,45 @@ static int http_read(URLContext *h, uint8_t *buf, int size)
 /* used only when posting data */
 static int http_write(URLContext *h, uint8_t *buf, int size)
 {
+    char temp[11];  /* 32-bit hex + CRLF + nul */
+    int ret;
+    char crlf[] = "\r\n";
     HTTPContext *s = h->priv_data;
-    return url_write(s->hd, buf, size);
+
+    if (s->chunksize == -1) {
+        /* headers are sent without any special encoding */
+        return url_write(s->hd, buf, size);
+    }
+
+    /* silently ignore zero-size data since chunk encoding that would
+     * signal EOF */
+    if (size > 0) {
+        /* upload data using chunked encoding */
+        snprintf(temp, sizeof(temp), "%x\r\n", size);
+
+        if ((ret = url_write(s->hd, temp, strlen(temp))) < 0 ||
+            (ret = url_write(s->hd, buf, size)) < 0 ||
+            (ret = url_write(s->hd, crlf, sizeof(crlf) - 1)) < 0)
+            return ret;
+    }
+    return size;
 }
 
 static int http_close(URLContext *h)
 {
+    int ret = 0;
+    char footer[] = "0\r\n\r\n";
     HTTPContext *s = h->priv_data;
+
+    /* signal end of chunked encoding if used */
+    if ((h->flags & URL_WRONLY) && s->chunksize != -1) {
+        ret = url_write(s->hd, footer, sizeof(footer) - 1);
+        ret = ret > 0 ? 0 : ret;
+    }
+
     url_close(s->hd);
     av_free(s);
-    return 0;
+    return ret;
 }
 
 static int64_t http_seek(URLContext *h, int64_t off, int whence)
@@ -361,6 +406,8 @@ static int64_t http_seek(URLContext *h, int64_t off, int whence)
     HTTPContext *s = h->priv_data;
     URLContext *old_hd = s->hd;
     int64_t old_off = s->off;
+    uint8_t old_buf[BUFFER_SIZE];
+    int old_buf_size;
 
     if (whence == AVSEEK_SIZE)
         return s->filesize;
@@ -368,6 +415,8 @@ static int64_t http_seek(URLContext *h, int64_t off, int whence)
         return -1;
 
     /* we save the old context in case the seek fails */
+    old_buf_size = s->buf_end - s->buf_ptr;
+    memcpy(old_buf, s->buf_ptr, old_buf_size);
     s->hd = NULL;
     if (whence == SEEK_CUR)
         off += s->off;
@@ -377,6 +426,9 @@ static int64_t http_seek(URLContext *h, int64_t off, int whence)
 
     /* if it fails, continue on old connection */
     if (http_open_cnx(h) < 0) {
+        memcpy(s->buffer, old_buf, old_buf_size);
+        s->buf_ptr = s->buffer;
+        s->buf_end = s->buffer + old_buf_size;
         s->hd = old_hd;
         s->off = old_off;
         return -1;

@@ -22,6 +22,7 @@ StaticLibrary libavutil.a :
 	base64.c
 	crc.c
 	des.c
+	error.c
 	fifo.c
 	integer.c
 	intfloat_readwrite.c
@@ -33,6 +34,7 @@ StaticLibrary libavutil.a :
 	md5.c
 	mem.c
 	pca.c
+	pixdesc.c
 	random_seed.c
 	rational.c
 	rc4.c

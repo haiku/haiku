@@ -21,11 +21,12 @@
  */
 
 /**
- * @file libavcodec/rv20enc.c
+ * @file
  * RV20 encoder
  */
 
 #include "mpegvideo.h"
+#include "h263.h"
 #include "put_bits.h"
 
 void rv20_encode_picture_header(MpegEncContext *s, int picture_number){
@@ -58,12 +59,12 @@ void rv20_encode_picture_header(MpegEncContext *s, int picture_number){
 
 AVCodec rv20_encoder = {
     "rv20",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_RV20,
     sizeof(MpegEncContext),
     MPV_encode_init,
     MPV_encode_picture,
     MPV_encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
     .long_name= NULL_IF_CONFIG_SMALL("RealVideo 2.0"),
 };

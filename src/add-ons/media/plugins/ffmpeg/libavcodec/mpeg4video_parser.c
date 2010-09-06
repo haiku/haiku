@@ -22,6 +22,7 @@
 
 #include "parser.h"
 #include "mpegvideo.h"
+#include "mpeg4video.h"
 #include "mpeg4video_parser.h"
 
 
@@ -82,7 +83,7 @@ static int av_mpeg4_decode_header(AVCodecParserContext *s1,
 
     init_get_bits(gb, buf, 8 * buf_size);
     ret = ff_mpeg4_decode_picture_header(s, gb);
-    if (s->width) {
+    if (s->width && (!avctx->width || !avctx->height || !avctx->coded_width || !avctx->coded_height)) {
         avcodec_set_dimensions(avctx, s->width, s->height);
     }
     s1->pict_type= s->pict_type;

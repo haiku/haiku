@@ -21,13 +21,14 @@
  */
 
 /**
- * @file libavcodec/h261enc.c
+ * @file
  * H.261 encoder.
  */
 
 #include "dsputil.h"
 #include "avcodec.h"
 #include "mpegvideo.h"
+#include "h263.h"
 #include "h261.h"
 #include "h261data.h"
 
@@ -322,13 +323,13 @@ static void h261_encode_block(H261Context * h, DCTELEM * block, int n){
 
 AVCodec h261_encoder = {
     "h261",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_H261,
     sizeof(H261Context),
     MPV_encode_init,
     MPV_encode_picture,
     MPV_encode_end,
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUV420P, PIX_FMT_NONE},
     .long_name= NULL_IF_CONFIG_SMALL("H.261"),
 };
 

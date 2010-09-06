@@ -22,7 +22,7 @@
 #define SWSCALE_SWSCALE_H
 
 /**
- * @file libswscale/swscale.h
+ * @file
  * @brief
  *     external api for the swscale stuff
  */
@@ -30,8 +30,8 @@
 #include "libavutil/avutil.h"
 
 #define LIBSWSCALE_VERSION_MAJOR 0
-#define LIBSWSCALE_VERSION_MINOR 7
-#define LIBSWSCALE_VERSION_MICRO 1
+#define LIBSWSCALE_VERSION_MINOR 11
+#define LIBSWSCALE_VERSION_MICRO 0
 
 #define LIBSWSCALE_VERSION_INT  AV_VERSION_INT(LIBSWSCALE_VERSION_MAJOR, \
                                                LIBSWSCALE_VERSION_MINOR, \
@@ -47,6 +47,16 @@
  * Returns the LIBSWSCALE_VERSION_INT constant.
  */
 unsigned swscale_version(void);
+
+/**
+ * Returns the libswscale build-time configuration.
+ */
+const char *swscale_configuration(void);
+
+/**
+ * Returns the libswscale license.
+ */
+const char *swscale_license(void);
 
 /* values for the flags, the stuff on the command line is different */
 #define SWS_FAST_BILINEAR     1
@@ -93,6 +103,14 @@ unsigned swscale_version(void);
 #define SWS_CS_SMPTE240M      7
 #define SWS_CS_DEFAULT        5
 
+/**
+ * Returns a pointer to yuv<->rgb coefficients for the given colorspace
+ * suitable for sws_setColorspaceDetails().
+ *
+ * @param colorspace One of the SWS_CS_* macros. If invalid,
+ * SWS_CS_DEFAULT is used.
+ */
+const int *sws_getCoefficients(int colorspace);
 
 
 // when used for filters they must have an odd number of elements
@@ -112,6 +130,22 @@ typedef struct {
 
 struct SwsContext;
 
+/**
+ * Returns a positive value if pix_fmt is a supported input format, 0
+ * otherwise.
+ */
+int sws_isSupportedInput(enum PixelFormat pix_fmt);
+
+/**
+ * Returns a positive value if pix_fmt is a supported output format, 0
+ * otherwise.
+ */
+int sws_isSupportedOutput(enum PixelFormat pix_fmt);
+
+/**
+ * Frees the swscaler context swsContext.
+ * If swsContext is NULL, then does nothing.
+ */
 void sws_freeContext(struct SwsContext *swsContext);
 
 /**
@@ -137,6 +171,10 @@ struct SwsContext *sws_getContext(int srcW, int srcH, enum PixelFormat srcFormat
  * slice in the image in dst. A slice is a sequence of consecutive
  * rows in an image.
  *
+ * Slices have to be provided in sequential order, either in
+ * top-bottom or bottom-top order. If slices are provided in
+ * non-sequential order the behavior of the function is undefined.
+ *
  * @param context   the scaling context previously created with
  *                  sws_getContext()
  * @param srcSlice  the array containing the pointers to the planes of
@@ -154,13 +192,13 @@ struct SwsContext *sws_getContext(int srcW, int srcH, enum PixelFormat srcFormat
  *                  the destination image
  * @return          the height of the output slice
  */
-int sws_scale(struct SwsContext *context, uint8_t* srcSlice[], int srcStride[],
-              int srcSliceY, int srcSliceH, uint8_t* dst[], int dstStride[]);
+int sws_scale(struct SwsContext *context, const uint8_t* const srcSlice[], const int srcStride[],
+              int srcSliceY, int srcSliceH, uint8_t* const dst[], const int dstStride[]);
 #if LIBSWSCALE_VERSION_MAJOR < 1
 /**
  * @deprecated Use sws_scale() instead.
  */
-int sws_scale_ordered(struct SwsContext *context, uint8_t* src[],
+int sws_scale_ordered(struct SwsContext *context, const uint8_t* const src[],
                       int srcStride[], int srcSliceY, int srcSliceH,
                       uint8_t* dst[], int dstStride[]) attribute_deprecated;
 #endif
@@ -263,5 +301,30 @@ struct SwsContext *sws_getCachedContext(struct SwsContext *context,
                                         int dstW, int dstH, enum PixelFormat dstFormat,
                                         int flags, SwsFilter *srcFilter,
                                         SwsFilter *dstFilter, const double *param);
+
+/**
+ * Converts an 8bit paletted frame into a frame with a color depth of 32-bits.
+ *
+ * The output frame will have the same packed format as the palette.
+ *
+ * @param src        source frame buffer
+ * @param dst        destination frame buffer
+ * @param num_pixels number of pixels to convert
+ * @param palette    array with [256] entries, which must match color arrangement (RGB or BGR) of src
+ */
+void sws_convertPalette8ToPacked32(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+
+/**
+ * Converts an 8bit paletted frame into a frame with a color depth of 24 bits.
+ *
+ * With the palette format "ABCD", the destination frame ends up with the format "ABC".
+ *
+ * @param src        source frame buffer
+ * @param dst        destination frame buffer
+ * @param num_pixels number of pixels to convert
+ * @param palette    array with [256] entries, which must match color arrangement (RGB or BGR) of src
+ */
+void sws_convertPalette8ToPacked24(const uint8_t *src, uint8_t *dst, long num_pixels, const uint8_t *palette);
+
 
 #endif /* SWSCALE_SWSCALE_H */

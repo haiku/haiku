@@ -45,7 +45,7 @@ typedef struct {
     AVFrame         buf_ptrs    [16];
     AVPicture       flipped_ptrs[16];
 
-    DECLARE_ALIGNED_16(DCTELEM, dct_block[64]);
+    DECLARE_ALIGNED(16, DCTELEM, dct_block)[64];
 
     GetBitContext   gb;
     ScanTable       scantable;
@@ -380,7 +380,7 @@ static av_cold int mimic_decode_end(AVCodecContext *avctx)
 
 AVCodec mimic_decoder = {
     "mimic",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_MIMIC,
     sizeof(MimicContext),
     mimic_decode_init,

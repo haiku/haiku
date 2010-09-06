@@ -23,7 +23,7 @@
 /* Encoding development sponsored by http://fh-campuswien.ac.at */
 
 /**
- * @file libavcodec/flashsvenc.c
+ * @file
  * Flash Screen Video encoder
  * @author Alex Beregszaszi
  * @author Benjamin Larsson
@@ -105,10 +105,6 @@ static av_cold int flashsv_encode_init(AVCodecContext *avctx)
 
     if ((avctx->width > 4095) || (avctx->height > 4095)) {
         av_log(avctx, AV_LOG_ERROR, "Input dimensions too large, input must be max 4096x4096 !\n");
-        return -1;
-    }
-
-    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
         return -1;
     }
 
@@ -286,13 +282,13 @@ static av_cold int flashsv_encode_end(AVCodecContext *avctx)
 
 AVCodec flashsv_encoder = {
     "flashsv",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_FLASHSV,
     sizeof(FlashSVContext),
     flashsv_encode_init,
     flashsv_encode_frame,
     flashsv_encode_end,
-    .pix_fmts = (enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_NONE},
+    .pix_fmts = (const enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Flash Screen Video"),
 };
 

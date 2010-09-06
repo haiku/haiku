@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/mlpdec.c
+ * @file
  * MLP decoder
  */
 
@@ -61,6 +61,9 @@ typedef struct SubStream {
     uint8_t     max_matrix_channel;
     //! For each channel output by the matrix, the output channel to map it to
     uint8_t     ch_assign[MAX_CHANNELS];
+
+    //! Channel coding parameters for channels in the substream
+    ChannelParams channel_params[MAX_CHANNELS];
 
     //! The left shift applied to random noise in 0x31ea substreams.
     uint8_t     noise_shift;
@@ -137,8 +140,6 @@ typedef struct MLPDecodeContext {
 
     SubStream   substream[MAX_SUBSTREAMS];
 
-    ChannelParams channel_params[MAX_CHANNELS];
-
     int         matrix_changed;
     int         filter_changed[MAX_CHANNELS][NUM_FILTERS];
 
@@ -155,15 +156,17 @@ static VLC huff_vlc[3];
 
 static av_cold void init_static(void)
 {
-    INIT_VLC_STATIC(&huff_vlc[0], VLC_BITS, 18,
-                &ff_mlp_huffman_tables[0][0][1], 2, 1,
-                &ff_mlp_huffman_tables[0][0][0], 2, 1, 512);
-    INIT_VLC_STATIC(&huff_vlc[1], VLC_BITS, 16,
-                &ff_mlp_huffman_tables[1][0][1], 2, 1,
-                &ff_mlp_huffman_tables[1][0][0], 2, 1, 512);
-    INIT_VLC_STATIC(&huff_vlc[2], VLC_BITS, 15,
-                &ff_mlp_huffman_tables[2][0][1], 2, 1,
-                &ff_mlp_huffman_tables[2][0][0], 2, 1, 512);
+    if (!huff_vlc[0].bits) {
+        INIT_VLC_STATIC(&huff_vlc[0], VLC_BITS, 18,
+                    &ff_mlp_huffman_tables[0][0][1], 2, 1,
+                    &ff_mlp_huffman_tables[0][0][0], 2, 1, 512);
+        INIT_VLC_STATIC(&huff_vlc[1], VLC_BITS, 16,
+                    &ff_mlp_huffman_tables[1][0][1], 2, 1,
+                    &ff_mlp_huffman_tables[1][0][0], 2, 1, 512);
+        INIT_VLC_STATIC(&huff_vlc[2], VLC_BITS, 15,
+                    &ff_mlp_huffman_tables[2][0][1], 2, 1,
+                    &ff_mlp_huffman_tables[2][0][0], 2, 1, 512);
+    }
 
     ff_mlp_init_crc();
 }
@@ -171,8 +174,8 @@ static av_cold void init_static(void)
 static inline int32_t calculate_sign_huff(MLPDecodeContext *m,
                                           unsigned int substr, unsigned int ch)
 {
-    ChannelParams *cp = &m->channel_params[ch];
     SubStream *s = &m->substream[substr];
+    ChannelParams *cp = &s->channel_params[ch];
     int lsb_bits = cp->huff_lsbs - s->quant_step_size[ch];
     int sign_shift = lsb_bits + (cp->codebook ? 2 - cp->codebook : -1);
     int32_t sign_huff_offset = cp->huff_offset;
@@ -200,7 +203,7 @@ static inline int read_huff_channels(MLPDecodeContext *m, GetBitContext *gbp,
             m->bypassed_lsbs[pos + s->blockpos][mat] = get_bits1(gbp);
 
     for (channel = s->min_channel; channel <= s->max_channel; channel++) {
-        ChannelParams *cp = &m->channel_params[channel];
+        ChannelParams *cp = &s->channel_params[channel];
         int codebook = cp->codebook;
         int quant_step_size = s->quant_step_size[channel];
         int lsb_bits = cp->huff_lsbs - quant_step_size;
@@ -395,7 +398,7 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
     if (m->avctx->request_channels > 0
         && s->max_channel + 1 >= m->avctx->request_channels
         && substr < m->max_decoded_substream) {
-        av_log(m->avctx, AV_LOG_INFO,
+        av_log(m->avctx, AV_LOG_DEBUG,
                "Extracting %d channel downmix from substream %d. "
                "Further substreams will be skipped.\n",
                s->max_channel + 1, substr);
@@ -448,7 +451,7 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
     memset(s->quant_step_size, 0, sizeof(s->quant_step_size));
 
     for (ch = s->min_channel; ch <= s->max_channel; ch++) {
-        ChannelParams *cp = &m->channel_params[ch];
+        ChannelParams *cp = &s->channel_params[ch];
         cp->filter_params[FIR].order = 0;
         cp->filter_params[IIR].order = 0;
         cp->filter_params[FIR].shift = 0;
@@ -470,9 +473,11 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
 /** Read parameters for one of the prediction filters. */
 
 static int read_filter_params(MLPDecodeContext *m, GetBitContext *gbp,
-                              unsigned int channel, unsigned int filter)
+                              unsigned int substr, unsigned int channel,
+                              unsigned int filter)
 {
-    FilterParams *fp = &m->channel_params[channel].filter_params[filter];
+    SubStream *s = &m->substream[substr];
+    FilterParams *fp = &s->channel_params[channel].filter_params[filter];
     const int max_order = filter ? MAX_IIR_ORDER : MAX_FIR_ORDER;
     const char fchar = filter ? 'I' : 'F';
     int i, order;
@@ -495,7 +500,7 @@ static int read_filter_params(MLPDecodeContext *m, GetBitContext *gbp,
     fp->order = order;
 
     if (order > 0) {
-        int32_t *fcoeff = m->channel_params[channel].coeff[filter];
+        int32_t *fcoeff = s->channel_params[channel].coeff[filter];
         int coeff_bits, coeff_shift;
 
         fp->shift = get_bits(gbp, 4);
@@ -608,19 +613,19 @@ static int read_matrix_params(MLPDecodeContext *m, unsigned int substr, GetBitCo
 static int read_channel_params(MLPDecodeContext *m, unsigned int substr,
                                GetBitContext *gbp, unsigned int ch)
 {
-    ChannelParams *cp = &m->channel_params[ch];
+    SubStream *s = &m->substream[substr];
+    ChannelParams *cp = &s->channel_params[ch];
     FilterParams *fir = &cp->filter_params[FIR];
     FilterParams *iir = &cp->filter_params[IIR];
-    SubStream *s = &m->substream[substr];
 
     if (s->param_presence_flags & PARAM_FIR)
         if (get_bits1(gbp))
-            if (read_filter_params(m, gbp, ch, FIR) < 0)
+            if (read_filter_params(m, gbp, substr, ch, FIR) < 0)
                 return -1;
 
     if (s->param_presence_flags & PARAM_IIR)
         if (get_bits1(gbp))
-            if (read_filter_params(m, gbp, ch, IIR) < 0)
+            if (read_filter_params(m, gbp, substr, ch, IIR) < 0)
                 return -1;
 
     if (fir->order + iir->order > 8) {
@@ -695,7 +700,7 @@ static int read_decoding_params(MLPDecodeContext *m, GetBitContext *gbp,
     if (s->param_presence_flags & PARAM_QUANTSTEP)
         if (get_bits1(gbp))
             for (ch = 0; ch <= s->max_channel; ch++) {
-                ChannelParams *cp = &m->channel_params[ch];
+                ChannelParams *cp = &s->channel_params[ch];
 
                 s->quant_step_size[ch] = get_bits(gbp, 4);
 
@@ -719,12 +724,12 @@ static void filter_channel(MLPDecodeContext *m, unsigned int substr,
                            unsigned int channel)
 {
     SubStream *s = &m->substream[substr];
-    const int32_t *fircoeff = m->channel_params[channel].coeff[FIR];
+    const int32_t *fircoeff = s->channel_params[channel].coeff[FIR];
     int32_t state_buffer[NUM_FILTERS][MAX_BLOCKSIZE + MAX_FIR_ORDER];
     int32_t *firbuf = state_buffer[FIR] + MAX_BLOCKSIZE;
     int32_t *iirbuf = state_buffer[IIR] + MAX_BLOCKSIZE;
-    FilterParams *fir = &m->channel_params[channel].filter_params[FIR];
-    FilterParams *iir = &m->channel_params[channel].filter_params[IIR];
+    FilterParams *fir = &s->channel_params[channel].filter_params[FIR];
+    FilterParams *iir = &s->channel_params[channel].filter_params[IIR];
     unsigned int filter_shift = fir->shift;
     int32_t mask = MSB_MASK(s->quant_step_size[channel]);
 
@@ -957,7 +962,7 @@ static int read_access_unit(AVCodecContext *avctx, void* data, int *data_size,
 
     length = (AV_RB16(buf) & 0xfff) * 2;
 
-    if (length > buf_size)
+    if (length < 4 || length > buf_size)
         return -1;
 
     init_get_bits(&gb, (buf + 4), (length - 4) * 8);
@@ -1132,10 +1137,9 @@ error:
     return -1;
 }
 
-#if CONFIG_MLP_DECODER
 AVCodec mlp_decoder = {
     "mlp",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_MLP,
     sizeof(MLPDecodeContext),
     mlp_decode_init,
@@ -1144,12 +1148,11 @@ AVCodec mlp_decoder = {
     read_access_unit,
     .long_name = NULL_IF_CONFIG_SMALL("MLP (Meridian Lossless Packing)"),
 };
-#endif /* CONFIG_MLP_DECODER */
 
 #if CONFIG_TRUEHD_DECODER
 AVCodec truehd_decoder = {
     "truehd",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_TRUEHD,
     sizeof(MLPDecodeContext),
     mlp_decode_init,

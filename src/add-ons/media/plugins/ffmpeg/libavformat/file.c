@@ -26,6 +26,7 @@
 #include <io.h>
 #endif
 #include <unistd.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <stdlib.h>
 #include "os_support.h"
@@ -52,7 +53,7 @@ static int file_open(URLContext *h, const char *filename, int flags)
 #endif
     fd = open(filename, access, 0666);
     if (fd == -1)
-        return AVERROR(ENOENT);
+        return AVERROR(errno);
     h->priv_data = (void *) (intptr_t) fd;
     return 0;
 }
@@ -73,6 +74,11 @@ static int file_write(URLContext *h, unsigned char *buf, int size)
 static int64_t file_seek(URLContext *h, int64_t pos, int whence)
 {
     int fd = (intptr_t) h->priv_data;
+    if (whence == AVSEEK_SIZE) {
+        struct stat st;
+        int ret = fstat(fd, &st);
+        return ret < 0 ? AVERROR(errno) : st.st_size;
+    }
     return lseek(fd, pos, whence);
 }
 

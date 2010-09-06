@@ -20,7 +20,8 @@
  */
 
 /**
- * @file libavcodec/mpc.h Musepack decoder
+ * @file
+ * Musepack decoder
  * MPEG Audio Layer 1/2 -like codec with frames of 1152 samples
  * divided into 32 subbands.
  */
@@ -65,9 +66,9 @@ typedef struct {
     AVLFG rnd;
     int frames_to_skip;
     /* for synthesis */
-    DECLARE_ALIGNED_16(MPA_INT, synth_buf[MPA_MAX_CHANNELS][512*2]);
+    DECLARE_ALIGNED(16, MPA_INT, synth_buf)[MPA_MAX_CHANNELS][512*2];
     int synth_buf_offset[MPA_MAX_CHANNELS];
-    DECLARE_ALIGNED_16(int32_t, sb_samples[MPA_MAX_CHANNELS][36][SBLIMIT]);
+    DECLARE_ALIGNED(16, int32_t, sb_samples)[MPA_MAX_CHANNELS][36][SBLIMIT];
 } MPCContext;
 
 void ff_mpc_init(void);

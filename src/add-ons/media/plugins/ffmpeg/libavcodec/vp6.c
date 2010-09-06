@@ -1,5 +1,5 @@
 /**
- * @file libavcodec/vp6.c
+ * @file
  * VP6 compatible video decoder
  *
  * Copyright (C) 2006  Aurelien Jacobs <aurel@gnuage.org>
@@ -227,6 +227,7 @@ static void vp6_build_huff_tree(VP56Context *s, uint8_t coeff_model[],
         nodes[map[2*i+1]].count = b + !b;
     }
 
+    free_vlc(vlc);
     /* then build the huffman tree accodring to probabilities */
     ff_huff_build_tree(s->avctx, vlc, size, nodes, vp6_huff_cmp,
                        FF_HUFFMAN_FLAG_HNODE_FIRST);
@@ -480,19 +481,6 @@ static void vp6_parse_coeff(VP56Context *s)
     }
 }
 
-static int vp6_adjust(int v, int t)
-{
-    int V = v, s = v >> 31;
-    V ^= s;
-    V -= s;
-    if (V-t-1 >= (unsigned)(t-1))
-        return v;
-    V = 2*t - V;
-    V += s;
-    V ^= s;
-    return V;
-}
-
 static int vp6_block_variance(uint8_t *src, int stride)
 {
     int sum = 0, square_sum = 0;
@@ -591,7 +579,6 @@ static av_cold int vp6_decode_init(AVCodecContext *avctx)
                      avctx->codec->id == CODEC_ID_VP6A);
     s->vp56_coord_div = vp6_coord_div;
     s->parse_vector_adjustment = vp6_parse_vector_adjustment;
-    s->adjust = vp6_adjust;
     s->filter = vp6_filter;
     s->default_models_init = vp6_default_models_init;
     s->parse_vector_models = vp6_parse_vector_models;
@@ -601,14 +588,31 @@ static av_cold int vp6_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
+static av_cold int vp6_decode_free(AVCodecContext *avctx)
+{
+    VP56Context *s = avctx->priv_data;
+    int pt, ct, cg;
+
+    vp56_free(avctx);
+
+    for (pt=0; pt<2; pt++) {
+        free_vlc(&s->dccv_vlc[pt]);
+        free_vlc(&s->runv_vlc[pt]);
+        for (ct=0; ct<3; ct++)
+            for (cg=0; cg<6; cg++)
+                free_vlc(&s->ract_vlc[pt][ct][cg]);
+    }
+    return 0;
+}
+
 AVCodec vp6_decoder = {
     "vp6",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_VP6,
     sizeof(VP56Context),
     vp6_decode_init,
     NULL,
-    vp56_free,
+    vp6_decode_free,
     vp56_decode_frame,
     CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("On2 VP6"),
@@ -617,12 +621,12 @@ AVCodec vp6_decoder = {
 /* flash version, not flipped upside-down */
 AVCodec vp6f_decoder = {
     "vp6f",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_VP6F,
     sizeof(VP56Context),
     vp6_decode_init,
     NULL,
-    vp56_free,
+    vp6_decode_free,
     vp56_decode_frame,
     CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("On2 VP6 (Flash version)"),
@@ -631,12 +635,12 @@ AVCodec vp6f_decoder = {
 /* flash version, not flipped upside-down, with alpha channel */
 AVCodec vp6a_decoder = {
     "vp6a",
-    CODEC_TYPE_VIDEO,
+    AVMEDIA_TYPE_VIDEO,
     CODEC_ID_VP6A,
     sizeof(VP56Context),
     vp6_decode_init,
     NULL,
-    vp56_free,
+    vp6_decode_free,
     vp56_decode_frame,
     CODEC_CAP_DR1,
     .long_name = NULL_IF_CONFIG_SMALL("On2 VP6 (Flash version, with alpha channel)"),

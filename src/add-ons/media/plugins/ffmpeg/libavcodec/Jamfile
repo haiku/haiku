@@ -23,6 +23,7 @@ StaticLibrary libavcodec.a :
 	aac_ac3_parser.c
 	aac_adtstoasc_bsf.c
 	aac_parser.c
+	aacsbr.c
 	aactab.c
 	aandcttab.c
 	aasc.c
@@ -39,15 +40,26 @@ StaticLibrary libavcodec.a :
 	adxdec.c
 	alac.c
 	allcodecs.c
+	alsdec.c
+	amrnbdec.c
+	anm.c
 	apedec.c
 	asv1.c
+	atrac.c
+	atrac1.c
 	atrac3.c
 	audioconvert.c
+	aura.c
+	avfft.c
 	avpacket.c
 	avs.c
 	beosthread.c
 	bethsoftvideo.c
+	bgmc.c
 	bfi.c
+	bink.c
+	binkaudio.c
+	binkidct.c
 	bitstream.c
 	bitstream_filter.c
 	bmp.c
@@ -57,15 +69,21 @@ StaticLibrary libavcodec.a :
 	cavs_parser.c
 	cavsdec.c
 	cavsdsp.c
+#	cbrt_tablegen.c
+	cdgraphics.c
 	celp_filters.c
 	celp_math.c
 	cinepak.c
 	cljr.c
 	cook.c
+#	costablegen.c
 	cscd.c
 	cyuv.c
 	dca.c
 	dca_parser.c
+	dcadsp.c
+	dct.c
+	dirac.c
 	dirac_parser.c
 	dnxhd_parser.c
 	dnxhddata.c
@@ -75,12 +93,18 @@ StaticLibrary libavcodec.a :
 	dsputil.c
 	dump_extradata_bsf.c
 	dv.c
+#	dv_tablegen.c
 	dvbsub.c
 	dvbsub_parser.c
 	dvbsubdec.c
+	dvdata.c
 	dvdsub_parser.c
 	dvdsubdec.c
+	dwt.c
 	dxa.c
+#	dxva2.c
+#	dxva2_h264.c
+#	dxva2_vc1.c
 	eac3dec.c
 	eac3dec_data.c
 	eacmv.c
@@ -103,7 +127,10 @@ StaticLibrary libavcodec.a :
 	flacdec.c
 	flashsv.c
 	flicvideo.c
+	flvenc.c
+	flvdec.c
 	fraps.c
+	frwu.c
 	g726.c
 #	g729dec.c
 	gif.c
@@ -116,27 +143,43 @@ StaticLibrary libavcodec.a :
 	h263_parser.c
 	h263dec.c
 	h264.c
+	h264_cabac.c
+	h264_cavlc.c
+	h264_direct.c
+	h264_loopfilter.c
 	h264_mp4toannexb_bsf.c
 	h264_parser.c
+	h264_ps.c
+	h264_refs.c
+	h264_sei.c
+	h264dsp.c
 #	h264dspenc.c
 	h264idct.c
 	h264pred.c
 	huffman.c
 	huffyuv.c
 	idcinvideo.c
+	iff.c
 	imc.c
 	imgconvert.c
 	imx_dump_header_bsf.c
 	indeo2.c
 	indeo3.c
+	indeo5.c
+	intelh263dec.c
 	interplayvideo.c
 	intrax8.c
 	intrax8dsp.c
+	ituh263dec.c
+	ituh263enc.c
+	ivi_common.c
+	ivi_dsp.c
 	jfdctfst.c
 	jfdctint.c
 	jpegls.c
 	jpeglsdec.c
 	jrevdct.c
+	kgv1dec.c
 	kmvc.c
 	lcldec.c
 #	lclenc.c
@@ -148,6 +191,7 @@ StaticLibrary libavcodec.a :
 #	lzwenc.c
 	mace.c
 	mdct.c
+#	mdct_tablegen.c
 	mdec.c
 	mimic.c
 	mjpeg.c
@@ -163,6 +207,7 @@ StaticLibrary libavcodec.a :
 	mmvideo.c
 	motion_est.c
 	motionpixels.c
+#	motionpixels_tablegen.c
 	movsub_bsf.c
 	mp3_header_compress_bsf.c
 	mp3_header_decompress_bsf.c
@@ -170,12 +215,16 @@ StaticLibrary libavcodec.a :
 	mpc7.c
 	mpc8.c
 	mpeg4audio.c
+	mpeg4video.c
 	mpeg4video_parser.c
+	mpeg4videoenc.c
+	mpeg4videodec.c
 	mpeg12.c
 	mpeg12data.c
 	mpeg12enc.c
 	mpegaudio.c
 	mpegaudio_parser.c
+#	mpegaudio_tablegen.c
 	mpegaudiodata.c
 	mpegaudiodec.c
 	mpegaudiodecheader.c
@@ -195,21 +244,28 @@ StaticLibrary libavcodec.a :
 	nuv.c
 	opt.c
 	options.c
+	pamenc.c
 	parser.c
 	pcm.c
+	pcm-mpeg.c
+#	pcm_tablegen.c
 	pcx.c
+	pgssubdec.c
 	png.c
 	pngdec.c
 	pnm.c
 	pnm_parser.c
+	pnmdec.c
 #	pnmenc.c
 	pthread.c
 	ptx.c
 	qcelpdec.c
 	qdm2.c
+#	qdm2_tablegen.c
 	qdrw.c
 	qpeg.c
 	qtrle.c
+	r210dec.c
 	ra144.c
 	ra288.c
 	rangecoder.c
@@ -239,15 +295,19 @@ StaticLibrary libavcodec.a :
 	sgidec.c
 	shorten.c
 	simple_idct.c
+	sipr.c
+	sipr16k.c
 	smacker.c
 	smc.c
-#	snow.c
+	snow.c
 	sonic.c
 	sp5xdec.c
 	sunrast.c
 	svq1.c
 	svq1dec.c
-#	svq3.c	- Included by h264
+	svq3.c
+	synth_filter.c
+	tableprint.c
 	targa.c
 	tiertexseqv.c
 	tiff.c
@@ -257,9 +317,11 @@ StaticLibrary libavcodec.a :
 	truespeech.c
 	tscc.c
 	tta.c
+	twinvq.c
 	txd.c
 	ulti.c
 	utils.c
+#	vaapi_h264.c
 	vb.c
 	vc1.c
 	vc1dec.c
@@ -278,12 +340,15 @@ StaticLibrary libavcodec.a :
 	vp5.c
 	vp56.c
 	vp56data.c
+	vp56dsp.c
 	vp6.c
 	vp6dsp.c
 	vqavideo.c
 	wavpack.c
 	wma.c
 	wmadec.c
+	wmaprodec.c
+	wmavoice.c
 	wmv2.c
 	wmv2dec.c
 	wnv1.c
@@ -292,6 +357,7 @@ StaticLibrary libavcodec.a :
 	xiph.c
 	xl.c
 	xsubdec.c
+	yop.c
 	zmbv.c
 ;
 

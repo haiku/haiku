@@ -21,6 +21,7 @@
 
 #include "avformat.h"
 #include "voc.h"
+#include "libavutil/intreadwrite.h"
 
 typedef struct {
     uint16_t index;
@@ -43,13 +44,16 @@ typedef struct {
 
 static int probe(AVProbeData *p)
 {
-    if (p->buf[0] == 0x01 && p->buf[1] == 0x00 &&
-        p->buf[4] == 0x01 + p->buf[2] &&
-        p->buf[8] == p->buf[4] + p->buf[6] &&
-        p->buf[12] == p->buf[8] + p->buf[10])
-        return AVPROBE_SCORE_MAX;
-
-    return 0;
+    int i;
+    int index = 1;
+    if (p->buf_size < 16)
+        return 0;
+    for (i = 0; i < 16; i += 4) {
+        if (AV_RL16(p->buf + i) != index || !p->buf[i + 2] || !p->buf[i + 3])
+            return 0;
+        index += p->buf[i + 2];
+    }
+    return AVPROBE_SCORE_MAX;
 }
 
 static int read_header(AVFormatContext *s,
@@ -79,7 +83,7 @@ static int read_header(AVFormatContext *s,
     if (!video)
         return AVERROR(ENOMEM);
 
-    video->codec->codec_type = CODEC_TYPE_VIDEO;
+    video->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     video->codec->codec_id = CODEC_ID_C93;
     video->codec->width = 320;
     video->codec->height = 192;
@@ -116,13 +120,13 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
                 c93->audio = av_new_stream(s, 1);
                 if (!c93->audio)
                     return AVERROR(ENOMEM);
-                c93->audio->codec->codec_type = CODEC_TYPE_AUDIO;
+                c93->audio->codec->codec_type = AVMEDIA_TYPE_AUDIO;
             }
             url_fskip(pb, 26); /* VOC header */
             ret = voc_get_packet(s, pkt, c93->audio, datasize - 26);
             if (ret > 0) {
                 pkt->stream_index = 1;
-                pkt->flags |= PKT_FLAG_KEY;
+                pkt->flags |= AV_PKT_FLAG_KEY;
                 return ret;
             }
         }
@@ -178,7 +182,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
 
     /* only the first frame is guaranteed to not reference previous frames */
     if (c93->current_block == 0 && c93->current_frame == 0) {
-        pkt->flags |= PKT_FLAG_KEY;
+        pkt->flags |= AV_PKT_FLAG_KEY;
         pkt->data[0] |= C93_FIRST_FRAME;
     }
     return 0;

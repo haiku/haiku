@@ -46,6 +46,7 @@ typedef struct DNXHDEncContext {
     const CIDEntry *cid_table;
     uint8_t *msip; ///< Macroblock Scan Indexes Payload
     uint32_t *slice_size;
+    uint32_t *slice_offs;
 
     struct DNXHDEncContext *thread[MAX_THREADS];
 
@@ -54,7 +55,7 @@ typedef struct DNXHDEncContext {
     int interlaced;
     int cur_field;
 
-    DECLARE_ALIGNED_16(DCTELEM, blocks[8][64]);
+    DECLARE_ALIGNED(16, DCTELEM, blocks)[8][64];
 
     int      (*qmatrix_c)     [64];
     int      (*qmatrix_l)     [64];

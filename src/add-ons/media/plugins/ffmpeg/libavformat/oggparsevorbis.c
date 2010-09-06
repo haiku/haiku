@@ -30,47 +30,67 @@
 #include "avformat.h"
 #include "oggdec.h"
 
-/**
- * VorbisComment metadata conversion mapping.
- * from Ogg Vorbis I format specification: comment field and header specification
- * http://xiph.org/vorbis/doc/v-comment.html
- */
-const AVMetadataConv ff_vorbiscomment_metadata_conv[] = {
-    { "ARTIST"     , "author" },
-    { "TITLE"      , "title"  },
-    { "ALBUM"      , "album"  },
-    { "DATE"       , "year"   },
-    { "TRACKNUMBER", "track"  },
-    { "GENRE"      , "genre"  },
-    { 0 }
-};
+static int ogm_chapter(AVFormatContext *as, uint8_t *key, uint8_t *val)
+{
+    int i, cnum, h, m, s, ms, keylen = strlen(key);
+    AVChapter *chapter = NULL;
+
+    if (keylen < 9 || sscanf(key, "CHAPTER%02d", &cnum) != 1)
+        return 0;
+
+    if (keylen == 9) {
+        if (sscanf(val, "%02d:%02d:%02d.%03d", &h, &m, &s, &ms) < 4)
+            return 0;
+
+        ff_new_chapter(as, cnum, (AVRational){1,1000},
+                       ms + 1000*(s + 60*(m + 60*h)),
+                       AV_NOPTS_VALUE, NULL);
+        av_free(val);
+    } else if (!strcmp(key+9, "NAME")) {
+        for(i = 0; i < as->nb_chapters; i++)
+            if (as->chapters[i]->id == cnum) {
+                chapter = as->chapters[i];
+                break;
+            }
+        if (!chapter)
+            return 0;
+
+        av_metadata_set2(&chapter->metadata, "title", val,
+                         AV_METADATA_DONT_STRDUP_VAL);
+    } else
+        return 0;
+
+    av_free(key);
+    return 1;
+}
 
 int
-vorbis_comment(AVFormatContext * as, uint8_t *buf, int size)
+ff_vorbis_comment(AVFormatContext * as, AVMetadata **m, const uint8_t *buf, int size)
 {
     const uint8_t *p = buf;
     const uint8_t *end = buf + size;
-    unsigned s, n, j;
+    unsigned n, j;
+    int s;
 
     if (size < 8) /* must have vendor_length and user_comment_list_length */
         return -1;
 
     s = bytestream_get_le32(&p);
 
-    if (end - p < s)
+    if (end - p - 4 < s || s < 0)
         return -1;
 
     p += s;
 
     n = bytestream_get_le32(&p);
 
-    while (p < end && n > 0) {
+    while (end - p >= 4 && n > 0) {
         const char *t, *v;
         int tl, vl;
 
         s = bytestream_get_le32(&p);
 
-        if (end - p < s)
+        if (end - p < s || s < 0)
             break;
 
         t = p;
@@ -104,15 +124,15 @@ vorbis_comment(AVFormatContext * as, uint8_t *buf, int size)
             memcpy(ct, v, vl);
             ct[vl] = 0;
 
-            av_metadata_set(&as->metadata, tt, ct);
-
-            av_freep(&tt);
-            av_freep(&ct);
+            if (!ogm_chapter(as, tt, ct))
+                av_metadata_set2(m, tt, ct,
+                                   AV_METADATA_DONT_STRDUP_KEY |
+                                   AV_METADATA_DONT_STRDUP_VAL);
         }
     }
 
     if (p != end)
-        av_log(as, AV_LOG_INFO, "%ti bytes of comment header remain\n", p-end);
+        av_log(as, AV_LOG_INFO, "%ti bytes of comment header remain\n", end-p);
     if (n > 0)
         av_log(as, AV_LOG_INFO,
                "truncated comment header, %i comments not found\n", n);
@@ -157,6 +177,7 @@ fixup_vorbis_headers(AVFormatContext * as, struct oggvorbis_private *priv,
     for (i = 0; i < 3; i++) {
         memcpy(&ptr[offset], priv->packet[i], priv->len[i]);
         offset += priv->len[i];
+        av_freep(&priv->packet[i]);
     }
     *buf = av_realloc(*buf, offset + FF_INPUT_BUFFER_PADDING_SIZE);
     return offset;
@@ -170,23 +191,24 @@ vorbis_header (AVFormatContext * s, int idx)
     struct ogg_stream *os = ogg->streams + idx;
     AVStream *st = s->streams[idx];
     struct oggvorbis_private *priv;
+    int pkt_type = os->buf[os->pstart];
 
-    if (os->seq > 2)
+    if (!(pkt_type & 1))
         return 0;
 
-    if (os->seq == 0) {
+    if (!os->private) {
         os->private = av_mallocz(sizeof(struct oggvorbis_private));
         if (!os->private)
             return 0;
     }
 
-    if (os->psize < 1)
+    if (os->psize < 1 || pkt_type > 5)
         return -1;
 
     priv = os->private;
-    priv->len[os->seq] = os->psize;
-    priv->packet[os->seq] = av_mallocz(os->psize);
-    memcpy(priv->packet[os->seq], os->buf + os->pstart, os->psize);
+    priv->len[pkt_type >> 1] = os->psize;
+    priv->packet[pkt_type >> 1] = av_mallocz(os->psize);
+    memcpy(priv->packet[pkt_type >> 1], os->buf + os->pstart, os->psize);
     if (os->buf[os->pstart] == 1) {
         const uint8_t *p = os->buf + os->pstart + 7; /* skip "\001vorbis" tag */
         unsigned blocksize, bs0, bs1;
@@ -215,20 +237,20 @@ vorbis_header (AVFormatContext * s, int idx)
         if (bytestream_get_byte(&p) != 1) /* framing_flag */
             return -1;
 
-        st->codec->codec_type = CODEC_TYPE_AUDIO;
+        st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
         st->codec->codec_id = CODEC_ID_VORBIS;
 
         st->time_base.num = 1;
         st->time_base.den = st->codec->sample_rate;
     } else if (os->buf[os->pstart] == 3) {
         if (os->psize > 8)
-            vorbis_comment (s, os->buf + os->pstart + 7, os->psize - 8);
+            ff_vorbis_comment (s, &st->metadata, os->buf + os->pstart + 7, os->psize - 8);
     } else {
         st->codec->extradata_size =
             fixup_vorbis_headers(s, priv, &st->codec->extradata);
     }
 
-    return os->seq < 3;
+    return 1;
 }
 
 const struct ogg_codec ff_vorbis_codec = {

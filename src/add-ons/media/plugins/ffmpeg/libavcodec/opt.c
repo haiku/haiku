@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/opt.c
+ * @file
  * AVOptions
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
@@ -112,10 +112,8 @@ int av_set_string3(void *obj, const char *name, const char *val, int alloc, cons
     const AVOption *o= av_find_opt(obj, name, NULL, 0, 0);
     if (o_out)
         *o_out = o;
-    if(!o) {
-        av_log(obj, AV_LOG_ERROR, "Unknown option '%s'\n", name);
+    if(!o)
         return AVERROR(ENOENT);
-    }
     if(!val || o->offset<=0)
         return AVERROR(EINVAL);
 
@@ -158,7 +156,7 @@ int av_set_string3(void *obj, const char *name, const char *val, int alloc, cons
                 buf[i]= val[i];
             buf[i]=0;
 
-            d = ff_eval2(buf, const_values, const_names, NULL, NULL, NULL, NULL, NULL, &error);
+            d = ff_parse_and_eval_expr(buf, const_values, const_names, NULL, NULL, NULL, NULL, NULL, &error);
             if(isnan(d)) {
                 const AVOption *o_named= av_find_opt(obj, buf, o->unit, 0, 0);
                 if(o_named && o_named->type == FF_OPT_TYPE_CONST)
@@ -426,7 +424,7 @@ void av_opt_set_defaults2(void *s, int mask, int flags)
             break;
             case FF_OPT_TYPE_INT64:
                 if((double)(opt->default_val+0.6) == opt->default_val)
-                    av_log(s, AV_LOG_DEBUG, "loss of precission in default of %s\n", opt->name);
+                    av_log(s, AV_LOG_DEBUG, "loss of precision in default of %s\n", opt->name);
                 av_set_int(s, opt->name, opt->default_val);
             break;
             case FF_OPT_TYPE_FLOAT: {

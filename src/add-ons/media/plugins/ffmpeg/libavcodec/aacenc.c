@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/aacenc.c
+ * @file
  * AAC encoder
  */
 
@@ -170,6 +170,14 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
         av_log(avctx, AV_LOG_ERROR, "Unsupported number of channels: %d\n", avctx->channels);
         return -1;
     }
+    if (avctx->profile != FF_PROFILE_UNKNOWN && avctx->profile != FF_PROFILE_AAC_LOW) {
+        av_log(avctx, AV_LOG_ERROR, "Unsupported profile %d\n", avctx->profile);
+        return -1;
+    }
+    if (1024.0 * avctx->bit_rate / avctx->sample_rate > 6144 * avctx->channels) {
+        av_log(avctx, AV_LOG_ERROR, "Too many bits per frame requested\n");
+        return -1;
+    }
     s->samplerate_index = i;
 
     dsputil_init(&s->dsp, avctx);
@@ -178,8 +186,8 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
     // window init
     ff_kbd_window_init(ff_aac_kbd_long_1024, 4.0, 1024);
     ff_kbd_window_init(ff_aac_kbd_short_128, 6.0, 128);
-    ff_sine_window_init(ff_sine_1024, 1024);
-    ff_sine_window_init(ff_sine_128, 128);
+    ff_init_ff_sine_windows(10);
+    ff_init_ff_sine_windows(7);
 
     s->samples            = av_malloc(2 * 1024 * avctx->channels * sizeof(s->samples[0]));
     s->cpe                = av_mallocz(sizeof(ChannelElement) * aac_chan_configs[avctx->channels-1][0]);
@@ -553,6 +561,7 @@ static int aac_encode_frame(AVCodecContext *avctx,
             chans    = tag == TYPE_CPE ? 2 : 1;
             cpe      = &s->cpe[i];
             for (j = 0; j < chans; j++) {
+                s->cur_channel = start_ch + j;
                 s->coder->search_for_quantizers(avctx, s, &cpe->ch[j], s->lambda);
             }
             cpe->common_window = 0;
@@ -568,6 +577,7 @@ static int aac_encode_frame(AVCodecContext *avctx,
                     }
                 }
             }
+            s->cur_channel = start_ch;
             if (cpe->common_window && s->coder->search_for_ms)
                 s->coder->search_for_ms(s, cpe, s->lambda);
             adjust_frame_information(s, cpe, chans);
@@ -629,13 +639,13 @@ static av_cold int aac_encode_end(AVCodecContext *avctx)
 
 AVCodec aac_encoder = {
     "aac",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_AAC,
     sizeof(AACEncContext),
     aac_encode_init,
     aac_encode_frame,
     aac_encode_end,
-    .capabilities = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
-    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .capabilities = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY | CODEC_CAP_EXPERIMENTAL,
+    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Advanced Audio Coding"),
 };

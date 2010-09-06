@@ -9,22 +9,19 @@
  *
  * This file is part of FFmpeg.
  *
- * FFmpeg is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
  * FFmpeg is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with FFmpeg; if not, write to the Free Software
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *
- * The C code (not assembly, MMX, ...) of this file can be used
- * under the LGPL license.
  */
 
 #include <stddef.h>
@@ -34,7 +31,6 @@
 #undef EMMS
 #undef SFENCE
 #undef MMREG_SIZE
-#undef PREFETCHW
 #undef PAVGB
 
 #if HAVE_SSE2
@@ -45,15 +41,12 @@
 
 #if HAVE_AMD3DNOW
 #define PREFETCH  "prefetch"
-#define PREFETCHW "prefetchw"
 #define PAVGB     "pavgusb"
 #elif HAVE_MMX2
 #define PREFETCH "prefetchnta"
-#define PREFETCHW "prefetcht0"
 #define PAVGB     "pavgb"
 #else
 #define PREFETCH  " # nop"
-#define PREFETCHW " # nop"
 #endif
 
 #if HAVE_AMD3DNOW
@@ -76,11 +69,11 @@ static inline void RENAME(rgb24tobgr32)(const uint8_t *src, uint8_t *dst, long s
     uint8_t *dest = dst;
     const uint8_t *s = src;
     const uint8_t *end;
-    #if HAVE_MMX
+#if HAVE_MMX
     const uint8_t *mm_end;
-    #endif
+#endif
     end = s + src_size;
-    #if HAVE_MMX
+#if HAVE_MMX
     __asm__ volatile(PREFETCH"    %0"::"m"(*s):"memory");
     mm_end = end - 23;
     __asm__ volatile("movq        %0, %%mm7"::"m"(mask32a):"memory");
@@ -111,23 +104,60 @@ static inline void RENAME(rgb24tobgr32)(const uint8_t *src, uint8_t *dst, long s
     }
     __asm__ volatile(SFENCE:::"memory");
     __asm__ volatile(EMMS:::"memory");
-    #endif
+#endif
     while (s < end) {
-    #if HAVE_BIGENDIAN
+#if HAVE_BIGENDIAN
         /* RGB24 (= R,G,B) -> RGB32 (= A,B,G,R) */
         *dest++ = 255;
         *dest++ = s[2];
         *dest++ = s[1];
         *dest++ = s[0];
         s+=3;
-    #else
+#else
         *dest++ = *s++;
         *dest++ = *s++;
         *dest++ = *s++;
         *dest++ = 255;
-    #endif
+#endif
     }
 }
+
+#define STORE_BGR24_MMX \
+            "psrlq         $8, %%mm2    \n\t" \
+            "psrlq         $8, %%mm3    \n\t" \
+            "psrlq         $8, %%mm6    \n\t" \
+            "psrlq         $8, %%mm7    \n\t" \
+            "pand "MANGLE(mask24l)", %%mm0\n\t" \
+            "pand "MANGLE(mask24l)", %%mm1\n\t" \
+            "pand "MANGLE(mask24l)", %%mm4\n\t" \
+            "pand "MANGLE(mask24l)", %%mm5\n\t" \
+            "pand "MANGLE(mask24h)", %%mm2\n\t" \
+            "pand "MANGLE(mask24h)", %%mm3\n\t" \
+            "pand "MANGLE(mask24h)", %%mm6\n\t" \
+            "pand "MANGLE(mask24h)", %%mm7\n\t" \
+            "por        %%mm2, %%mm0    \n\t" \
+            "por        %%mm3, %%mm1    \n\t" \
+            "por        %%mm6, %%mm4    \n\t" \
+            "por        %%mm7, %%mm5    \n\t" \
+ \
+            "movq       %%mm1, %%mm2    \n\t" \
+            "movq       %%mm4, %%mm3    \n\t" \
+            "psllq        $48, %%mm2    \n\t" \
+            "psllq        $32, %%mm3    \n\t" \
+            "pand "MANGLE(mask24hh)", %%mm2\n\t" \
+            "pand "MANGLE(mask24hhh)", %%mm3\n\t" \
+            "por        %%mm2, %%mm0    \n\t" \
+            "psrlq        $16, %%mm1    \n\t" \
+            "psrlq        $32, %%mm4    \n\t" \
+            "psllq        $16, %%mm5    \n\t" \
+            "por        %%mm3, %%mm1    \n\t" \
+            "pand  "MANGLE(mask24hhhh)", %%mm5\n\t" \
+            "por        %%mm5, %%mm4    \n\t" \
+ \
+            MOVNTQ"     %%mm0,   %0     \n\t" \
+            MOVNTQ"     %%mm1,  8%0     \n\t" \
+            MOVNTQ"     %%mm4, 16%0"
+
 
 static inline void RENAME(rgb32tobgr24)(const uint8_t *src, uint8_t *dst, long src_size)
 {
@@ -152,43 +182,9 @@ static inline void RENAME(rgb32tobgr24)(const uint8_t *src, uint8_t *dst, long s
             "movq       %%mm1, %%mm3    \n\t"
             "movq       %%mm4, %%mm6    \n\t"
             "movq       %%mm5, %%mm7    \n\t"
-            "psrlq         $8, %%mm2    \n\t"
-            "psrlq         $8, %%mm3    \n\t"
-            "psrlq         $8, %%mm6    \n\t"
-            "psrlq         $8, %%mm7    \n\t"
-            "pand          %2, %%mm0    \n\t"
-            "pand          %2, %%mm1    \n\t"
-            "pand          %2, %%mm4    \n\t"
-            "pand          %2, %%mm5    \n\t"
-            "pand          %3, %%mm2    \n\t"
-            "pand          %3, %%mm3    \n\t"
-            "pand          %3, %%mm6    \n\t"
-            "pand          %3, %%mm7    \n\t"
-            "por        %%mm2, %%mm0    \n\t"
-            "por        %%mm3, %%mm1    \n\t"
-            "por        %%mm6, %%mm4    \n\t"
-            "por        %%mm7, %%mm5    \n\t"
-
-            "movq       %%mm1, %%mm2    \n\t"
-            "movq       %%mm4, %%mm3    \n\t"
-            "psllq        $48, %%mm2    \n\t"
-            "psllq        $32, %%mm3    \n\t"
-            "pand          %4, %%mm2    \n\t"
-            "pand          %5, %%mm3    \n\t"
-            "por        %%mm2, %%mm0    \n\t"
-            "psrlq        $16, %%mm1    \n\t"
-            "psrlq        $32, %%mm4    \n\t"
-            "psllq        $16, %%mm5    \n\t"
-            "por        %%mm3, %%mm1    \n\t"
-            "pand          %6, %%mm5    \n\t"
-            "por        %%mm5, %%mm4    \n\t"
-
-            MOVNTQ"     %%mm0,   %0     \n\t"
-            MOVNTQ"     %%mm1,  8%0     \n\t"
-            MOVNTQ"     %%mm4, 16%0"
+            STORE_BGR24_MMX
             :"=m"(*dest)
-            :"m"(*s),"m"(mask24l),
-            "m"(mask24h),"m"(mask24hh),"m"(mask24hhh),"m"(mask24hhhh)
+            :"m"(*s)
             :"memory");
         dest += 24;
         s += 32;
@@ -978,43 +974,10 @@ static inline void RENAME(rgb15tobgr24)(const uint8_t *src, uint8_t *dst, long s
             "movq       %%mm0, %%mm2    \n\t"
             "movq       %%mm1, %%mm3    \n\t"
 
-            "psrlq         $8, %%mm2    \n\t"
-            "psrlq         $8, %%mm3    \n\t"
-            "psrlq         $8, %%mm6    \n\t"
-            "psrlq         $8, %%mm7    \n\t"
-            "pand          %2, %%mm0    \n\t"
-            "pand          %2, %%mm1    \n\t"
-            "pand          %2, %%mm4    \n\t"
-            "pand          %2, %%mm5    \n\t"
-            "pand          %3, %%mm2    \n\t"
-            "pand          %3, %%mm3    \n\t"
-            "pand          %3, %%mm6    \n\t"
-            "pand          %3, %%mm7    \n\t"
-            "por        %%mm2, %%mm0    \n\t"
-            "por        %%mm3, %%mm1    \n\t"
-            "por        %%mm6, %%mm4    \n\t"
-            "por        %%mm7, %%mm5    \n\t"
-
-            "movq       %%mm1, %%mm2    \n\t"
-            "movq       %%mm4, %%mm3    \n\t"
-            "psllq        $48, %%mm2    \n\t"
-            "psllq        $32, %%mm3    \n\t"
-            "pand          %4, %%mm2    \n\t"
-            "pand          %5, %%mm3    \n\t"
-            "por        %%mm2, %%mm0    \n\t"
-            "psrlq        $16, %%mm1    \n\t"
-            "psrlq        $32, %%mm4    \n\t"
-            "psllq        $16, %%mm5    \n\t"
-            "por        %%mm3, %%mm1    \n\t"
-            "pand          %6, %%mm5    \n\t"
-            "por        %%mm5, %%mm4    \n\t"
-
-            MOVNTQ"     %%mm0,   %0     \n\t"
-            MOVNTQ"     %%mm1,  8%0     \n\t"
-            MOVNTQ"     %%mm4, 16%0"
+            STORE_BGR24_MMX
 
             :"=m"(*d)
-            :"m"(*s),"m"(mask24l),"m"(mask24h),"m"(mask24hh),"m"(mask24hhh),"m"(mask24hhhh)
+            :"m"(*s)
             :"memory");
         d += 24;
         s += 8;
@@ -1117,43 +1080,10 @@ static inline void RENAME(rgb16tobgr24)(const uint8_t *src, uint8_t *dst, long s
             "movq       %%mm0, %%mm2    \n\t"
             "movq       %%mm1, %%mm3    \n\t"
 
-            "psrlq         $8, %%mm2    \n\t"
-            "psrlq         $8, %%mm3    \n\t"
-            "psrlq         $8, %%mm6    \n\t"
-            "psrlq         $8, %%mm7    \n\t"
-            "pand          %2, %%mm0    \n\t"
-            "pand          %2, %%mm1    \n\t"
-            "pand          %2, %%mm4    \n\t"
-            "pand          %2, %%mm5    \n\t"
-            "pand          %3, %%mm2    \n\t"
-            "pand          %3, %%mm3    \n\t"
-            "pand          %3, %%mm6    \n\t"
-            "pand          %3, %%mm7    \n\t"
-            "por        %%mm2, %%mm0    \n\t"
-            "por        %%mm3, %%mm1    \n\t"
-            "por        %%mm6, %%mm4    \n\t"
-            "por        %%mm7, %%mm5    \n\t"
-
-            "movq       %%mm1, %%mm2    \n\t"
-            "movq       %%mm4, %%mm3    \n\t"
-            "psllq        $48, %%mm2    \n\t"
-            "psllq        $32, %%mm3    \n\t"
-            "pand          %4, %%mm2    \n\t"
-            "pand          %5, %%mm3    \n\t"
-            "por        %%mm2, %%mm0    \n\t"
-            "psrlq        $16, %%mm1    \n\t"
-            "psrlq        $32, %%mm4    \n\t"
-            "psllq        $16, %%mm5    \n\t"
-            "por        %%mm3, %%mm1    \n\t"
-            "pand          %6, %%mm5    \n\t"
-            "por        %%mm5, %%mm4    \n\t"
-
-            MOVNTQ"     %%mm0,   %0     \n\t"
-            MOVNTQ"     %%mm1,  8%0     \n\t"
-            MOVNTQ"     %%mm4, 16%0"
+            STORE_BGR24_MMX
 
             :"=m"(*d)
-            :"m"(*s),"m"(mask24l),"m"(mask24h),"m"(mask24hh),"m"(mask24hhh),"m"(mask24hhhh)
+            :"m"(*s)
             :"memory");
         d += 24;
         s += 8;
@@ -1436,7 +1366,7 @@ static inline void RENAME(yuvPlanartoyuy2)(const uint8_t *ysrc, const uint8_t *u
     const x86_reg chromWidth= width>>1;
     for (y=0; y<height; y++) {
 #if HAVE_MMX
-//FIXME handle 2 lines at once (fewer prefetches, reuse some chroma, but very likely memory-limited anyway)
+        //FIXME handle 2 lines at once (fewer prefetches, reuse some chroma, but very likely memory-limited anyway)
         __asm__ volatile(
             "xor                 %%"REG_a", %%"REG_a"   \n\t"
             ASMALIGN(4)
@@ -1586,7 +1516,7 @@ static inline void RENAME(yuvPlanartouyvy)(const uint8_t *ysrc, const uint8_t *u
     const x86_reg chromWidth= width>>1;
     for (y=0; y<height; y++) {
 #if HAVE_MMX
-//FIXME handle 2 lines at once (fewer prefetches, reuse some chroma, but very likely memory-limited anyway)
+        //FIXME handle 2 lines at once (fewer prefetches, reuse some chroma, but very likely memory-limited anyway)
         __asm__ volatile(
             "xor                %%"REG_a", %%"REG_a"    \n\t"
             ASMALIGN(4)
@@ -2356,7 +2286,7 @@ static inline void RENAME(rgb24toyv12)(const uint8_t *src, uint8_t *ydst, uint8_
     }
 }
 
-static void RENAME(interleaveBytes)(uint8_t *src1, uint8_t *src2, uint8_t *dest,
+static void RENAME(interleaveBytes)(const uint8_t *src1, const uint8_t *src2, uint8_t *dest,
                              long width, long height, long src1Stride,
                              long src2Stride, long dstStride)
 {

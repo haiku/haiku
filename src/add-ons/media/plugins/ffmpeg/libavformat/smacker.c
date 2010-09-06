@@ -158,7 +158,7 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st->codec->width = smk->width;
     st->codec->height = smk->height;
     st->codec->pix_fmt = PIX_FMT_PAL8;
-    st->codec->codec_type = CODEC_TYPE_VIDEO;
+    st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
     st->codec->codec_id = CODEC_ID_SMACKVIDEO;
     st->codec->codec_tag = smk->magic;
     /* Smacker uses 100000 as internal timebase */
@@ -169,21 +169,29 @@ static int smacker_read_header(AVFormatContext *s, AVFormatParameters *ap)
     tbase = 100000;
     av_reduce(&tbase, &smk->pts_inc, tbase, smk->pts_inc, (1UL<<31)-1);
     av_set_pts_info(st, 33, smk->pts_inc, tbase);
+    st->duration = smk->frames;
     /* handle possible audio streams */
     for(i = 0; i < 7; i++) {
         smk->indexes[i] = -1;
-        if((smk->rates[i] & 0xFFFFFF) && !(smk->rates[i] & SMK_AUD_BINKAUD)){
+        if(smk->rates[i] & 0xFFFFFF){
             ast[i] = av_new_stream(s, 0);
             smk->indexes[i] = ast[i]->index;
-            ast[i]->codec->codec_type = CODEC_TYPE_AUDIO;
-            ast[i]->codec->codec_id = (smk->rates[i] & SMK_AUD_PACKED) ? CODEC_ID_SMACKAUDIO : CODEC_ID_PCM_U8;
-            ast[i]->codec->codec_tag = MKTAG('S', 'M', 'K', 'A');
+            ast[i]->codec->codec_type = AVMEDIA_TYPE_AUDIO;
+            if (smk->rates[i] & SMK_AUD_BINKAUD) {
+                ast[i]->codec->codec_id = CODEC_ID_BINKAUDIO_RDFT;
+            } else if (smk->rates[i] & SMK_AUD_USEDCT) {
+                ast[i]->codec->codec_id = CODEC_ID_BINKAUDIO_DCT;
+            } else if (smk->rates[i] & SMK_AUD_PACKED){
+                ast[i]->codec->codec_id = CODEC_ID_SMACKAUDIO;
+                ast[i]->codec->codec_tag = MKTAG('S', 'M', 'K', 'A');
+            } else {
+                ast[i]->codec->codec_id = CODEC_ID_PCM_U8;
+            }
             ast[i]->codec->channels = (smk->rates[i] & SMK_AUD_STEREO) ? 2 : 1;
             ast[i]->codec->sample_rate = smk->rates[i] & 0xFFFFFF;
             ast[i]->codec->bits_per_coded_sample = (smk->rates[i] & SMK_AUD_16BITS) ? 16 : 8;
             if(ast[i]->codec->bits_per_coded_sample == 16 && ast[i]->codec->codec_id == CODEC_ID_PCM_U8)
                 ast[i]->codec->codec_id = CODEC_ID_PCM_S16LE;
-            ast[i]->codec->sample_fmt = ast[i]->codec->bits_per_coded_sample == 8 ? SAMPLE_FMT_U8 : SAMPLE_FMT_S16;
             av_set_pts_info(ast[i], 64, 1, ast[i]->codec->sample_rate
                     * ast[i]->codec->channels * ast[i]->codec->bits_per_coded_sample / 8);
         }

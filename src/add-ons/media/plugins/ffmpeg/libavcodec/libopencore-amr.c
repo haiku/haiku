@@ -141,7 +141,7 @@ static int amr_nb_decode_frame(AVCodecContext *avctx, void *data,
 
 AVCodec libopencore_amrnb_decoder = {
     "libopencore_amrnb",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_AMR_NB,
     sizeof(AMRContext),
     amr_nb_decode_init,
@@ -215,14 +215,14 @@ static int amr_nb_encode_frame(AVCodecContext *avctx,
 
 AVCodec libopencore_amrnb_encoder = {
     "libopencore_amrnb",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_AMR_NB,
     sizeof(AMRContext),
     amr_nb_encode_init,
     amr_nb_encode_frame,
     amr_nb_encode_close,
     NULL,
-    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("OpenCORE Adaptive Multi-Rate (AMR) Narrow-Band"),
 };
 
@@ -312,7 +312,7 @@ static int amr_wb_decode_close(AVCodecContext *avctx)
 
 AVCodec libopencore_amrwb_decoder = {
     "libopencore_amrwb",
-    CODEC_TYPE_AUDIO,
+    AVMEDIA_TYPE_AUDIO,
     CODEC_ID_AMR_WB,
     sizeof(AMRWBContext),
     amr_wb_decode_init,

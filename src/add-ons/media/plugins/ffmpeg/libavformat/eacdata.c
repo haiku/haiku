@@ -20,9 +20,9 @@
  */
 
 /**
- * @file libavformat/eacdata.c
+ * @file
  * Electronic Arts cdata Format Demuxer
- * by Peter Ross (suxen_drol at hotmail dot com)
+ * by Peter Ross (pross@xvid.org)
  *
  * Technical details here:
  *  http://wiki.multimedia.cx/index.php?title=EA_Command_And_Conquer_3_Audio_Codec
@@ -67,7 +67,7 @@ static int cdata_read_header(AVFormatContext *s, AVFormatParameters *ap)
     st = av_new_stream(s, 0);
     if (!st)
         return AVERROR(ENOMEM);
-    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
     st->codec->codec_tag = 0; /* no fourcc */
     st->codec->codec_id = CODEC_ID_ADPCM_EA_XAS;
     st->codec->channels = cdata->channels;
@@ -83,10 +83,11 @@ static int cdata_read_packet(AVFormatContext *s, AVPacket *pkt)
     CdataDemuxContext *cdata = s->priv_data;
     int packet_size = 76*cdata->channels;
 
-    if (av_get_packet(s->pb, pkt, packet_size) != packet_size)
-        return AVERROR(EIO);
+    int ret = av_get_packet(s->pb, pkt, packet_size);
+    if (ret < 0)
+        return ret;
     pkt->pts = cdata->audio_pts++;
-    return 1;
+    return 0;
 }
 
 AVInputFormat ea_cdata_demuxer = {

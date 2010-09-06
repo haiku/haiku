@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/qcelpdec.c
+ * @file
  * QCELP decoder
  * @author Reynaldo H. Verdejo Pinochet
  * @remark FFmpeg merging spearheaded by Kenan Gillet
@@ -37,6 +37,7 @@
 
 #include "celp_math.h"
 #include "celp_filters.h"
+#include "acelp_filters.h"
 #include "acelp_vectors.h"
 #include "lsp.h"
 
@@ -74,6 +75,11 @@ typedef struct
     uint8_t  pitch_lag[4];
     uint16_t first16bits;
     uint8_t  warned_buf_mismatch_bitrate;
+
+    /* postfilter */
+    float    postfilter_synth_mem[10];
+    float    postfilter_agc_mem;
+    float    postfilter_tilt_mem;
 } QCELPContext;
 
 /**
@@ -406,31 +412,6 @@ static void compute_svector(QCELPContext *q, const float *gain,
 }
 
 /**
- * Compute the gain control
- *
- * @param v_in gain-controlled vector
- * @param v_ref vector to control gain of
- *
- * @return gain control
- *
- * FIXME: If v_ref is a zero vector, it energy is zero
- *        and the behavior of the gain control is
- *        undefined in the specs.
- *
- * TIA/EIA/IS-733 2.4.8.3-2/3/4/5, 2.4.8.6
- */
-static float compute_gain_ctrl(const float *v_ref, const float *v_in, const int len)
-{
-    float scalefactor = ff_dot_productf(v_in, v_in, len);
-
-    if(scalefactor)
-        scalefactor = sqrt(ff_dot_productf(v_ref, v_ref, len) / scalefactor);
-    else
-        av_log_missing_feature(NULL, "Zero energy for gain control", 1);
-    return scalefactor;
-}
-
-/**
  * Apply generic gain control.
  *
  * @param v_out output vector
@@ -442,15 +423,13 @@ static float compute_gain_ctrl(const float *v_ref, const float *v_in, const int 
 static void apply_gain_ctrl(float *v_out, const float *v_ref,
                             const float *v_in)
 {
-    int   i, j, len;
-    float scalefactor;
+    int i;
 
-    for(i=0, j=0; i<4; i++)
-    {
-        scalefactor = compute_gain_ctrl(v_ref + j, v_in + j, 40);
-        for(len=j+40; j<len; j++)
-            v_out[j] = scalefactor * v_in[j];
-    }
+    for (i = 0; i < 160; i += 40)
+        ff_scale_vector_to_given_sum_of_squares(v_out + i, v_in + i,
+                                                ff_dot_productf(v_ref + i,
+                                                                v_ref + i, 40),
+                                                40);
 }
 
 /**
@@ -605,7 +584,7 @@ static void lspf2lpc(const float *lspf, float *lpc)
     for (i=0; i<10; i++)
         lsp[i] = cos(M_PI * lspf[i]);
 
-    ff_acelp_lspd2lpc(lsp, lpc);
+    ff_acelp_lspd2lpc(lsp, lpc, 5);
 
     for (i=0; i<10; i++)
     {
@@ -625,8 +604,8 @@ static void lspf2lpc(const float *lspf, float *lpc)
  * @param lpc float vector for the resulting LPC
  * @param subframe_num frame number in decoded stream
  */
-void interpolate_lpc(QCELPContext *q, const float *curr_lspf, float *lpc,
-                     const int subframe_num)
+static void interpolate_lpc(QCELPContext *q, const float *curr_lspf,
+                            float *lpc, const int subframe_num)
 {
     float interpolated_lspf[10];
     float weight;
@@ -720,6 +699,36 @@ static void warn_insufficient_frame_quality(AVCodecContext *avctx,
 {
     av_log(avctx, AV_LOG_WARNING, "Frame #%d, IFQ: %s\n", avctx->frame_number,
            message);
+}
+
+static void postfilter(QCELPContext *q, float *samples, float *lpc)
+{
+    static const float pow_0_775[10] = {
+        0.775000, 0.600625, 0.465484, 0.360750, 0.279582,
+        0.216676, 0.167924, 0.130141, 0.100859, 0.078166
+    }, pow_0_625[10] = {
+        0.625000, 0.390625, 0.244141, 0.152588, 0.095367,
+        0.059605, 0.037253, 0.023283, 0.014552, 0.009095
+    };
+    float lpc_s[10], lpc_p[10], pole_out[170], zero_out[160];
+    int n;
+
+    for (n = 0; n < 10; n++) {
+        lpc_s[n] = lpc[n] * pow_0_625[n];
+        lpc_p[n] = lpc[n] * pow_0_775[n];
+    }
+
+    ff_celp_lp_zero_synthesis_filterf(zero_out, lpc_s,
+                                      q->formant_mem + 10, 160, 10);
+    memcpy(pole_out, q->postfilter_synth_mem,       sizeof(float) * 10);
+    ff_celp_lp_synthesis_filterf(pole_out + 10, lpc_p, zero_out, 160, 10);
+    memcpy(q->postfilter_synth_mem, pole_out + 160, sizeof(float) * 10);
+
+    ff_tilt_compensation(&q->postfilter_tilt_mem, 0.3, pole_out + 10, 160);
+
+    ff_adaptive_gain_control(samples, pole_out + 10,
+        ff_dot_productf(q->formant_mem + 10, q->formant_mem + 10, 160),
+        160, 0.9375, &q->postfilter_agc_mem);
 }
 
 static int qcelp_decode_frame(AVCodecContext *avctx, void *data, int *data_size,
@@ -819,15 +828,11 @@ erasure:
                                      10);
         formant_mem += 40;
     }
+
+    // postfilter, as per TIA/EIA/IS-733 2.4.8.6
+    postfilter(q, outbuffer, lpc);
+
     memcpy(q->formant_mem, q->formant_mem + 160, 10 * sizeof(float));
-
-    // FIXME: postfilter and final gain control should be here.
-    // TIA/EIA/IS-733 2.4.8.6
-
-    formant_mem = q->formant_mem + 10;
-    for(i=0; i<160; i++)
-        *outbuffer++ = av_clipf(*formant_mem++, QCELP_CLIP_LOWER_BOUND,
-                                QCELP_CLIP_UPPER_BOUND);
 
     memcpy(q->prev_lspf, quantized_lspf, sizeof(q->prev_lspf));
     q->prev_bitrate = q->bitrate;
@@ -840,7 +845,7 @@ erasure:
 AVCodec qcelp_decoder =
 {
     .name   = "qcelp",
-    .type   = CODEC_TYPE_AUDIO,
+    .type   = AVMEDIA_TYPE_AUDIO,
     .id     = CODEC_ID_QCELP,
     .init   = qcelp_decode_init,
     .decode = qcelp_decode_frame,

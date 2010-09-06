@@ -46,7 +46,7 @@ av_metadata_get(AVMetadata *m, const char *key, const AVMetadataTag *prev, int f
     return NULL;
 }
 
-int av_metadata_set(AVMetadata **pm, const char *key, const char *value)
+int av_metadata_set2(AVMetadata **pm, const char *key, const char *value, int flags)
 {
     AVMetadata *m= *pm;
     AVMetadataTag *tag= av_metadata_get(m, key, NULL, AV_METADATA_MATCH_CASE);
@@ -55,6 +55,8 @@ int av_metadata_set(AVMetadata **pm, const char *key, const char *value)
         m=*pm= av_mallocz(sizeof(*m));
 
     if(tag){
+        if (flags & AV_METADATA_DONT_OVERWRITE)
+            return 0;
         av_free(tag->value);
         av_free(tag->key);
         *tag= m->elems[--m->count];
@@ -66,7 +68,13 @@ int av_metadata_set(AVMetadata **pm, const char *key, const char *value)
             return AVERROR(ENOMEM);
     }
     if(value){
+        if(flags & AV_METADATA_DONT_STRDUP_KEY){
+            m->elems[m->count].key  = key;
+        }else
         m->elems[m->count].key  = av_strdup(key  );
+        if(flags & AV_METADATA_DONT_STRDUP_VAL){
+            m->elems[m->count].value= value;
+        }else
         m->elems[m->count].value= av_strdup(value);
         m->count++;
     }
@@ -77,6 +85,13 @@ int av_metadata_set(AVMetadata **pm, const char *key, const char *value)
 
     return 0;
 }
+
+#if LIBAVFORMAT_VERSION_MAJOR == 52
+int av_metadata_set(AVMetadata **pm, const char *key, const char *value)
+{
+    return av_metadata_set2(pm, key, value, 0);
+}
+#endif
 
 void av_metadata_free(AVMetadata **pm)
 {
@@ -92,7 +107,7 @@ void av_metadata_free(AVMetadata **pm)
     av_freep(pm);
 }
 
-static void metadata_conv(AVMetadata **pm, const AVMetadataConv *d_conv,
+void metadata_conv(AVMetadata **pm, const AVMetadataConv *d_conv,
                                            const AVMetadataConv *s_conv)
 {
     /* TODO: use binary search to look up the two conversion tables
@@ -107,18 +122,18 @@ static void metadata_conv(AVMetadata **pm, const AVMetadataConv *d_conv,
         if (s_conv != d_conv) {
             if (s_conv)
                 for (sc=s_conv; sc->native; sc++)
-                if (!strcasecmp(key, sc->native)) {
-                    key = sc->generic;
-                    break;
-                }
+                    if (!strcasecmp(key, sc->native)) {
+                        key = sc->generic;
+                        break;
+                    }
             if (d_conv)
                 for (dc=d_conv; dc->native; dc++)
                     if (!strcasecmp(key, dc->generic)) {
-                    key = dc->native;
-                    break;
-                }
+                        key = dc->native;
+                        break;
+                    }
         }
-        av_metadata_set(&dst, key, mtag->value);
+        av_metadata_set2(&dst, key, mtag->value, 0);
     }
     av_metadata_free(pm);
     *pm = dst;

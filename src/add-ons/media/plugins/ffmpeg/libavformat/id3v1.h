@@ -26,12 +26,12 @@
 
 #define ID3v1_TAG_SIZE 128
 
-#define ID3v1_GENRE_MAX 125
+#define ID3v1_GENRE_MAX 147
 
 /**
  * ID3v1 genres
  */
-extern const char *ff_id3v1_genre_str[ID3v1_GENRE_MAX + 1];
+extern const char * const ff_id3v1_genre_str[ID3v1_GENRE_MAX + 1];
 
 /**
  * Read an ID3v1 tag

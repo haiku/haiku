@@ -20,7 +20,7 @@
  */
 
 /**
- * @file libavcodec/mpegaudiodecheader.c
+ * @file
  * MPEG Audio header decoder.
  */
 
@@ -28,6 +28,7 @@
 #include "avcodec.h"
 #include "mpegaudio.h"
 #include "mpegaudiodata.h"
+#include "mpegaudiodecheader.h"
 
 
 int ff_mpegaudio_decode_header(MPADecodeHeader *s, uint32_t header)

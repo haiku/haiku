@@ -17,7 +17,7 @@
  */
 
 /**
- * @file libavcodec/internal.h
+ * @file
  * common internal api header.
  */
 
@@ -41,5 +41,11 @@ int ff_is_hwaccel_pix_fmt(enum PixelFormat pix_fmt);
  * @return the hardware accelerated codec, or NULL if none was found.
  */
 AVHWAccel *ff_find_hwaccel(enum CodecID codec_id, enum PixelFormat pix_fmt);
+
+/**
+ * Return the index into tab at which {a,b} match elements {[0],[1]} of tab.
+ * If there is no such matching pair then size is returned.
+ */
+int ff_match_2uint16(const uint16_t (*tab)[2], int size, int a, int b);
 
 #endif /* AVCODEC_INTERNAL_H */

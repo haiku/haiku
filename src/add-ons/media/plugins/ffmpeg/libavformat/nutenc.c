@@ -152,7 +152,7 @@ static void build_frame_code(AVFormatContext *s){
         int start2= start + (end-start)*stream_id / s->nb_streams;
         int end2  = start + (end-start)*(stream_id+1) / s->nb_streams;
         AVCodecContext *codec = s->streams[stream_id]->codec;
-        int is_audio= codec->codec_type == CODEC_TYPE_AUDIO;
+        int is_audio= codec->codec_type == AVMEDIA_TYPE_AUDIO;
         int intra_only= /*codec->intra_only || */is_audio;
         int pred_count;
 
@@ -394,9 +394,9 @@ static int write_streamheader(NUTContext *nut, ByteIOContext *bc, AVStream *st, 
     AVCodecContext *codec = st->codec;
     put_v(bc, i);
     switch(codec->codec_type){
-    case CODEC_TYPE_VIDEO: put_v(bc, 0); break;
-    case CODEC_TYPE_AUDIO: put_v(bc, 1); break;
-    case CODEC_TYPE_SUBTITLE: put_v(bc, 2); break;
+    case AVMEDIA_TYPE_VIDEO: put_v(bc, 0); break;
+    case AVMEDIA_TYPE_AUDIO: put_v(bc, 1); break;
+    case AVMEDIA_TYPE_SUBTITLE: put_v(bc, 2); break;
     default              : put_v(bc, 3); break;
     }
     put_v(bc, 4);
@@ -415,12 +415,12 @@ static int write_streamheader(NUTContext *nut, ByteIOContext *bc, AVStream *st, 
     put_buffer(bc, codec->extradata, codec->extradata_size);
 
     switch(codec->codec_type){
-    case CODEC_TYPE_AUDIO:
+    case AVMEDIA_TYPE_AUDIO:
         put_v(bc, codec->sample_rate);
         put_v(bc, 1);
         put_v(bc, codec->channels);
         break;
-    case CODEC_TYPE_VIDEO:
+    case AVMEDIA_TYPE_VIDEO:
         put_v(bc, codec->width);
         put_v(bc, codec->height);
 
@@ -448,7 +448,7 @@ static int add_info(ByteIOContext *bc, const char *type, const char *value){
 
 static int write_globalinfo(NUTContext *nut, ByteIOContext *bc){
     AVFormatContext *s= nut->avf;
-    AVMetadataTag *title, *author, *copyright;
+    AVMetadataTag *t = NULL;
     ByteIOContext *dyn_bc;
     uint8_t *dyn_buf=NULL;
     int count=0, dyn_size;
@@ -456,15 +456,8 @@ static int write_globalinfo(NUTContext *nut, ByteIOContext *bc){
     if(ret < 0)
         return ret;
 
-    title     = av_metadata_get(s->metadata, "Title"    , NULL, 0);
-    author    = av_metadata_get(s->metadata, "Author"   , NULL, 0);
-    copyright = av_metadata_get(s->metadata, "Copyright", NULL, 0);
-
-    if(title    ) count+= add_info(dyn_bc, "Title"    , title->value);
-    if(author   ) count+= add_info(dyn_bc, "Author"   , author->value);
-    if(copyright) count+= add_info(dyn_bc, "Copyright", copyright->value);
-    if(!(s->streams[0]->codec->flags & CODEC_FLAG_BITEXACT))
-                        count+= add_info(dyn_bc, "Encoder"  , LIBAVFORMAT_IDENT);
+    while ((t = av_metadata_get(s->metadata, "", t, AV_METADATA_IGNORE_SUFFIX)))
+        count += add_info(dyn_bc, t->key, t->value);
 
     put_v(bc, 0); //stream_if_plus1
     put_v(bc, 0); //chapter_id
@@ -610,7 +603,7 @@ static int write_header(AVFormatContext *s){
 static int get_needed_flags(NUTContext *nut, StreamContext *nus, FrameCode *fc, AVPacket *pkt){
     int flags= 0;
 
-    if(pkt->flags & PKT_FLAG_KEY                ) flags |= FLAG_KEY;
+    if(pkt->flags & AV_PKT_FLAG_KEY             ) flags |= FLAG_KEY;
     if(pkt->stream_index != fc->stream_id       ) flags |= FLAG_STREAM_ID;
     if(pkt->size / fc->size_mul                 ) flags |= FLAG_SIZE_MSB;
     if(pkt->pts - nus->last_pts != fc->pts_delta) flags |= FLAG_CODED_PTS;
@@ -651,7 +644,7 @@ static int write_packet(AVFormatContext *s, AVPacket *pkt){
     FrameCode *fc;
     int64_t coded_pts;
     int best_length, frame_code, flags, needed_flags, i, header_idx, best_header_idx;
-    int key_frame = !!(pkt->flags & PKT_FLAG_KEY);
+    int key_frame = !!(pkt->flags & AV_PKT_FLAG_KEY);
     int store_sp=0;
     int ret;
 
@@ -684,7 +677,8 @@ static int write_packet(AVFormatContext *s, AVPacket *pkt){
         }
         if(dummy.pos == INT64_MAX)
             dummy.pos= 0;
-        sp= av_tree_find(nut->syncpoints, &dummy, ff_nut_sp_pos_cmp, NULL);
+        sp= av_tree_find(nut->syncpoints, &dummy, (void *) ff_nut_sp_pos_cmp,
+                         NULL);
 
         nut->last_syncpoint_pos= url_ftell(bc);
         ret = url_open_dyn_buf(&dyn_bc);
@@ -804,6 +798,9 @@ static int write_trailer(AVFormatContext *s){
     while(nut->header_count<3)
         write_headers(nut, bc);
     put_flush_packet(bc);
+    ff_nut_free_sp(nut);
+    av_freep(&nut->stream);
+    av_freep(&nut->time_base);
 
     return 0;
 }
@@ -827,4 +824,5 @@ AVOutputFormat nut_muxer = {
     write_trailer,
     .flags = AVFMT_GLOBALHEADER | AVFMT_VARIABLE_FPS,
     .codec_tag= (const AVCodecTag* const []){ff_codec_bmp_tags, ff_codec_wav_tags, ff_nut_subtitle_tags, 0},
+    .metadata_conv = ff_nut_metadata_conv,
 };

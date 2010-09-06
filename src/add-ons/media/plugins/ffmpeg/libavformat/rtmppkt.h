@@ -25,7 +25,7 @@
 #include "avformat.h"
 
 /** maximum possible number of different RTMP channels */
-#define RTMP_CHANNELS 64
+#define RTMP_CHANNELS 65599
 
 /**
  * channels used to for RTMP packets with different purposes (i.e. data, network
@@ -34,6 +34,7 @@
 enum RTMPChannel {
     RTMP_NETWORK_CHANNEL = 2,   ///< channel for network-related messages (bandwidth report, ping, etc)
     RTMP_SYSTEM_CHANNEL,        ///< channel for sending server control messages
+    RTMP_SOURCE_CHANNEL,        ///< channel for sending a/v to server
     RTMP_VIDEO_CHANNEL = 8,     ///< channel for video data
     RTMP_AUDIO_CHANNEL,         ///< channel for audio data
 };
@@ -72,9 +73,10 @@ enum RTMPPacketSize {
  * structure for holding RTMP packets
  */
 typedef struct RTMPPacket {
-    uint8_t        channel_id; ///< RTMP channel ID (nothing to do with audio/video channels though)
+    int            channel_id; ///< RTMP channel ID (nothing to do with audio/video channels though)
     RTMPPacketType type;       ///< packet payload type
-    uint32_t       timestamp;  ///< packet full timestamp or timestamp increment to the previous one in milliseconds (latter only for media packets)
+    uint32_t       timestamp;  ///< packet full timestamp
+    uint32_t       ts_delta;   ///< timestamp increment to the previous one in milliseconds (latter only for media packets)
     uint32_t       extra;      ///< probably an additional channel ID used during streaming data
     uint8_t        *data;      ///< packet payload
     int            data_size;  ///< packet payload size
@@ -108,7 +110,7 @@ void ff_rtmp_packet_destroy(RTMPPacket *pkt);
  * @param chunk_size current chunk size
  * @param prev_pkt   previously read packet headers for all channels
  *                   (may be needed for restoring incomplete packet header)
- * @return zero on success, negative value otherwise
+ * @return number of bytes read on success, negative value otherwise
  */
 int ff_rtmp_packet_read(URLContext *h, RTMPPacket *p,
                         int chunk_size, RTMPPacket *prev_pkt);
@@ -121,10 +123,18 @@ int ff_rtmp_packet_read(URLContext *h, RTMPPacket *p,
  * @param chunk_size current chunk size
  * @param prev_pkt   previously sent packet headers for all channels
  *                   (may be used for packet header compressing)
- * @return zero on success, negative value otherwise
+ * @return number of bytes written on success, negative value otherwise
  */
 int ff_rtmp_packet_write(URLContext *h, RTMPPacket *p,
                          int chunk_size, RTMPPacket *prev_pkt);
+
+/**
+ * Prints information and contents of RTMP packet.
+ *
+ * @param h          output context
+ * @param p          packet to dump
+ */
+void ff_rtmp_packet_dump(void *ctx, RTMPPacket *p);
 
 /**
  * @defgroup amffuncs functions used to work with AMF format (which is also used in .flv)

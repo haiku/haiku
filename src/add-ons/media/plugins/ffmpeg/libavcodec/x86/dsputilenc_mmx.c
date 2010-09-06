@@ -902,7 +902,7 @@ static void diff_bytes_mmx(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w){
         dst[i+0] = src1[i+0]-src2[i+0];
 }
 
-static void sub_hfyu_median_prediction_mmx2(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w, int *left, int *left_top){
+static void sub_hfyu_median_prediction_mmx2(uint8_t *dst, const uint8_t *src1, const uint8_t *src2, int w, int *left, int *left_top){
     x86_reg i=0;
     uint8_t l, lt;
 
@@ -1063,7 +1063,7 @@ static void sub_hfyu_median_prediction_mmx2(uint8_t *dst, uint8_t *src1, uint8_t
 
 #define HADAMARD8_DIFF_MMX(cpu) \
 static int hadamard8_diff_##cpu(void *s, uint8_t *src1, uint8_t *src2, int stride, int h){\
-    DECLARE_ALIGNED_8(uint64_t, temp[13]);\
+    DECLARE_ALIGNED(8, uint64_t, temp)[13];\
     int sum;\
 \
     assert(h==8);\
@@ -1146,7 +1146,7 @@ WRAPPER8_16_SQ(hadamard8_diff_##cpu, hadamard8_diff16_##cpu)
 
 #define HADAMARD8_DIFF_SSE2(cpu) \
 static int hadamard8_diff_##cpu(void *s, uint8_t *src1, uint8_t *src2, int stride, int h){\
-    DECLARE_ALIGNED_16(uint64_t, temp[4]);\
+    DECLARE_ALIGNED(16, uint64_t, temp)[4];\
     int sum;\
 \
     assert(h==8);\
@@ -1348,11 +1348,6 @@ static int ssd_int8_vs_int16_mmx(const int8_t *pix1, const int16_t *pix2, int si
 #endif //HAVE_SSSE3
 
 
-/* FLAC specific */
-void ff_flac_compute_autocorr_sse2(const int32_t *data, int len, int lag,
-                                   double *autoc);
-
-
 void dsputilenc_init_mmx(DSPContext* c, AVCodecContext *avctx)
 {
     if (mm_flags & FF_MM_MMX) {
@@ -1414,8 +1409,9 @@ void dsputilenc_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->sum_abs_dctelem= sum_abs_dctelem_sse2;
             c->hadamard8_diff[0]= hadamard8_diff16_sse2;
             c->hadamard8_diff[1]= hadamard8_diff_sse2;
-            if (CONFIG_FLAC_ENCODER)
-                c->flac_compute_autocorr = ff_flac_compute_autocorr_sse2;
+#if CONFIG_LPC
+            c->lpc_compute_autocorr = ff_lpc_compute_autocorr_sse2;
+#endif
         }
 
 #if HAVE_SSSE3

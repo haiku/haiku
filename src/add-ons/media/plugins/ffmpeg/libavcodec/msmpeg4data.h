@@ -23,7 +23,7 @@
  */
 
 /**
- * @file libavcodec/msmpeg4data.h
+ * @file
  * MSMPEG4 data tables.
  */
 
@@ -51,19 +51,6 @@ extern VLC ff_msmp4_dc_chroma_vlc[2];
 
 /* intra picture macroblock coded block pattern */
 extern const uint16_t ff_msmp4_mb_i_table[64][2];
-
-extern const uint8_t cbpy_tab[16][2];
-
-extern const uint8_t DCtab_lum[13][2];
-extern const uint8_t DCtab_chrom[13][2];
-
-extern const uint8_t mvtab[33][2];
-
-extern const uint8_t intra_MCBPC_code[9];
-extern const uint8_t intra_MCBPC_bits[9];
-
-extern const uint8_t inter_MCBPC_code[28];
-extern const uint8_t inter_MCBPC_bits[28];
 
 #define WMV1_SCANTABLE_COUNT 4
 
