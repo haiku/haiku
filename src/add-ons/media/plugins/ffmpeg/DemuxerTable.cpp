@@ -42,12 +42,12 @@ static const DemuxerFormat gDemuxerTable[] = {
 		"flv", "Flash Video", "video/x-flv",
 		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
-//	{
-//		// Tested and appears to work ok with regards to video,
-//		// audio seems a problem.
-//		"matroska", "Matroska Movie", "video/x-matroska",
-//		B_MISC_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
-//	},
+	{
+		// Tested and appears to work ok with regards to video,
+		// audio seems a problem.
+		"matroska", "Matroska Movie", "video/x-matroska",
+		B_MISC_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+	},
 //	{
 //		// Plays the limited amount of files I could test with.
 //		"mov", "Quicktime Movie", "video/x-mov",
