@@ -520,12 +520,15 @@ AudioProducer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 
 			SetEventLatency(fLatency + fInternalLatency);
 		} else {
+			// Skip one buffer ahead in the audio data.
 			size_t sampleSize
 				= fOutput.format.u.raw_audio.format
 					& media_raw_audio_format::B_AUDIO_SIZE_MASK;
-			size_t nSamples
+			size_t samplesPerBuffer
 				= fOutput.format.u.raw_audio.buffer_size / sampleSize;
-			fFramesSent += nSamples;
+			size_t framesPerBuffer
+				= samplesPerBuffer / fOutput.format.u.raw_audio.channel_count;
+			fFramesSent += framesPerBuffer;
 		}
 	}
 }
