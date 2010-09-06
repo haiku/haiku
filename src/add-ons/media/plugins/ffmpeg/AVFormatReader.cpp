@@ -45,10 +45,6 @@ extern "C" {
 #define ERROR(a...) fprintf(stderr, a)
 
 
-static const size_t kIOBufferSize = 64 * 1024;
-	// TODO: This could depend on the BMediaFile creation flags, IIRC,
-	// they allow to specify a buffering mode.
-
 static const int64 kNoPTSValue = 0x8000000000000000LL;
 	// NOTE: For some reasons, I have trouble with the avcodec.h define:
 	// #define AV_NOPTS_VALUE          INT64_C(0x8000000000000000)
@@ -156,7 +152,6 @@ private:
 			int32				fVirtualIndex;
 
 			ByteIOContext		fIOContext;
-			uint8				fIOBuffer[kIOBufferSize];
 
 			AVPacket			fPacket;
 			bool				fReusePacket;
@@ -183,7 +178,6 @@ AVFormatReader::StreamCookie::StreamCookie(BPositionIO* source,
 
 	fStreamBuildsIndexWhileReading(false)
 {
-	memset(&fIOBuffer, 0, sizeof(fIOBuffer));
 	memset(&fFormat, 0, sizeof(media_format));
 	av_new_packet(&fPacket, 0);
 }
@@ -201,16 +195,17 @@ AVFormatReader::StreamCookie::Open()
 {
 	// Init probing data
 	size_t probeSize = 2048;
+	uint8* probeBuffer = (uint8*)malloc(probeSize);
 	AVProbeData probeData;
 	probeData.filename = "";
-	probeData.buf = fIOBuffer;
+	probeData.buf = probeBuffer;
 	probeData.buf_size = probeSize;
 
 	// Read a bit of the input...
 	// NOTE: Even if other streams have already read from the source,
 	// it is ok to not seek first, since our fPosition is 0, so the necessary
 	// seek will happen automatically in _Read().
-	if (_Read(this, fIOBuffer, probeSize) != (ssize_t)probeSize)
+	if (_Read(this, probeBuffer, probeSize) != (ssize_t)probeSize)
 		return B_IO_ERROR;
 	// ...and seek back to the beginning of the file. This is important
 	// since libavformat will assume the stream to be at offset 0, the
@@ -250,7 +245,7 @@ AVFormatReader::StreamCookie::Open()
 
 	// Init I/O context with buffer and hook functions, pass ourself as
 	// cookie.
-	if (init_put_byte(&fIOContext, fIOBuffer, kIOBufferSize, 0, this,
+	if (init_put_byte(&fIOContext, probeBuffer, probeSize, 0, this,
 			_Read, 0, _Seek) != 0) {
 		TRACE("AVFormatReader::StreamCookie::Open() - "
 			"init_put_byte() failed!\n");
@@ -751,7 +746,7 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 		bigtime_t startTime = _ConvertFromStreamTimeBase(fStream->start_time);
 		TRACE("  start_time: %lld or %.5fs\n", startTime,
 			startTime / 1000000.0);
-		// TODO: Handle start time in FindKeyFrame()?!
+		// TODO: Handle start time in FindKeyFrame() and Seek()?!
 	}
 	#endif // TRACE_AVFORMAT_READER
 
@@ -840,7 +835,7 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	// based on frame.
 	double frameRate = FrameRate();
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = (bigtime_t)(*frame * 1000000LL / frameRate + 0.5);
+		*time = (bigtime_t)(*frame * 1000000.0 / frameRate + 0.5);
 
 #if 0
 	// This happens in ffplay.c:
@@ -860,7 +855,13 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	ret = av_seek_frame(fContext, Index(), pos, seekFlags);
 #endif
 
+#if 0
+	int streamIndex = -1;
+	int64_t timeStamp = *time / AV_TIME_BASE;
+#else
+	int streamIndex = Index();
 	int64_t timeStamp = _ConvertToStreamTimeBase(*time);
+#endif
 
 	TRACE_SEEK("  time: %.5fs -> %lld, current DTS: %lld (time_base: %d/%d)\n",
 		*time / 1000000.0, timeStamp, fStream->cur_dts, fStream->time_base.num,
@@ -874,13 +875,13 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	bigtime_t oneSecond = 1000000;
 	int64_t minTimeStamp = timeStamp - _ConvertToStreamTimeBase(oneSecond);
 	int64_t maxTimeStamp = timeStamp + _ConvertToStreamTimeBase(oneSecond);
-	if (avformat_seek_file(fContext, Index(), minTimeStamp, timeStamp,
+	if (avformat_seek_file(fContext, streamIndex, minTimeStamp, timeStamp,
 		maxTimeStamp, searchFlags) < 0) {
 		TRACE_SEEK("  avformat_seek_file() failed.\n");
 		return B_ERROR;
 	}
 #else
-	if (av_seek_frame(fContext, Index(), timeStamp, searchFlags) < 0) {
+	if (av_seek_frame(fContext, streamIndex, timeStamp, searchFlags) < 0) {
 		printf("  av_seek_frame() failed.\n");
 		return B_ERROR;
 	}
@@ -890,7 +891,8 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	// know where we really seeked.
 	fReusePacket = false;
 	if (_NextPacket(true) == B_OK) {
-		*time = _ConvertFromStreamTimeBase(fPacket.pts);
+		if (fPacket.pts != kNoPTSValue)
+			*time = _ConvertFromStreamTimeBase(fPacket.pts);
 		TRACE_SEEK("  seeked time: %.2fs\n", *time / 1000000.0);
 		if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
 			*frame = *time * frameRate / 1000000LL + 0.5;
@@ -938,8 +940,17 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		// Best is to assume we can somehow seek to the time/frame
 		// and leave them as they are.
 	} else {
-		const AVIndexEntry& entry = fStream->index_entries[index];
-		timeStamp = entry.timestamp;
+		if (index > 0) {
+			const AVIndexEntry& entry = fStream->index_entries[index];
+			timeStamp = entry.timestamp;
+		} else {
+			// Some demuxers use the first index entry to store some
+			// other information, like the total playing time for example.
+			// Assume the timeStamp of the first entry is alays 0.
+			// TODO: Handle start-time offset?
+			timeStamp = 0;
+		}
+			
 		bigtime_t foundTime = _ConvertFromStreamTimeBase(timeStamp);
 		// It's really important that we can convert this back to the
 		// same time-stamp (i.e. FindKeyFrame() with the time we return
@@ -949,7 +960,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		bigtime_t timeDiff = foundTime > *time
 			? foundTime - *time : *time - foundTime;
 	
-		if (fStreamBuildsIndexWhileReading && timeDiff > 1000000) {
+		if (timeDiff > 1000000 && index == fStream->nb_index_entries - 1) {
 			// If the stream is building the index on the fly while parsing
 			// it, we only have entries in the index for positions already
 			// decoded, i.e. we cannot seek into the future. In that case,
