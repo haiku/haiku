@@ -9,25 +9,25 @@
 #define BACKGROUNDS_VIEW_H
 
 
-#include <View.h>
-#include <ColorControl.h>
-#include <Message.h>
+#include <Box.h>
 #include <Button.h>
+#include <CheckBox.h>
+#include <ColorControl.h>
+#include <Control.h>
+#include <Cursor.h>
+#include <Entry.h>
+#include <FilePanel.h>
+#include <Menu.h>
+#include <MenuItem.h>
+#include <Message.h>
+#include <Picture.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <ScrollBar.h>
 #include <String.h>
-#include <Box.h>
-#include <CheckBox.h>
-#include <TextControl.h>
-#include <Menu.h>
-#include <MenuItem.h>
-#include <Entry.h>
-#include <Screen.h>
-#include <Control.h>
-#include <Picture.h>
-#include <FilePanel.h>
 #include <StringView.h>
-#include <Cursor.h>
+#include <TextControl.h>
+#include <View.h>
 
 #include "BackgroundImage.h"
 
@@ -81,6 +81,7 @@ private:
 class PreView : public BControl {
 public:
 							PreView();
+			virtual			~PreView();
 
 			BPoint			fPoint;
 			BRect			fImageBounds;
@@ -96,8 +97,8 @@ protected:
 			float			fXRatio;
 			float			fYRatio;
 			display_mode	fMode;
-
-			BCursor			fMoveHandCursor;
+			BCursor*		fGrabbingCursor;
+			BCursor*		fGrabCursor;
 };
 
 

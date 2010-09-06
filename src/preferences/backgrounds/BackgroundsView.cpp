@@ -16,6 +16,7 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <Cursor.h>
 #include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -57,45 +58,6 @@ static const uint32 kMsgIconLabelOutline = 'ilol';
 
 static const uint32 kMsgImagePlacement = 'xypl';
 static const uint32 kMsgUpdatePreviewPlacement = 'pvpl';
-
-
-const uint8 kHandCursorData[68] = {
-	16, 1, 2, 2,
-
-	0, 0,		// 0000000000000000
-	7, 128,		// 0000011110000000
-	61, 112,	// 0011110101110000
-	37, 40,		// 0010010100101000
-	36, 168,	// 0010010010101000
-	18, 148,	// 0001001010010100
-	18, 84,		// 0001001001010100
-	9, 42,		// 0000100100101010
-	8, 1,		// 0000100000000001
-	60, 1,		// 0011110000000001
-	76, 1,		// 0100110000000001
-	66, 1,		// 0100001000000001
-	48, 1,		// 0011000000000001
-	12, 1,		// 0000110000000001
-	2, 0,		// 0000001000000000
-	1, 0,		// 0000000100000000
-
-	0, 0,		// 0000000000000000
-	7, 128,		// 0000011110000000
-	63, 240,	// 0011111111110000
-	63, 248,	// 0011111111111000
-	63, 248,	// 0011111111111000
-	31, 252,	// 0001111111111100
-	31, 252,	// 0001111111111100
-	15, 254,	// 0000111111111110
-	15, 255,	// 0000111111111111
-	63, 255,	// 0011111111111111
-	127, 255,	// 0111111111111111
-	127, 255,	// 0111111111111111
-	63, 255,	// 0011111111111111
-	15, 255,	// 0000111111111111
-	3, 254,		// 0000001111111110
-	1, 248		// 0000000111111000
-};
 
 
 BackgroundsView::BackgroundsView()
@@ -1185,7 +1147,8 @@ BackgroundsView::FoundPositionSetting()
 PreView::PreView()
 	:
 	BControl("PreView", NULL, NULL, B_WILL_DRAW | B_SUBPIXEL_PRECISE),
-	fMoveHandCursor(kHandCursorData)
+	fGrabbingCursor(new BCursor(B_CURSOR_ID_GRABBING)),
+	fGrabCursor(new BCursor(B_CURSOR_ID_GRAB))
 {
 	float aspectRatio = BScreen().Frame().Width() / BScreen().Frame().Height();
 	float previewWidth = 120.0f;
@@ -1194,6 +1157,13 @@ PreView::PreView()
 	ResizeTo(previewWidth, previewHeight);
 	SetExplicitMinSize(BSize(previewWidth, previewHeight));
 	SetExplicitMaxSize(BSize(previewWidth, previewHeight));
+}
+
+
+PreView::~PreView()
+{
+	delete fGrabbingCursor;
+	delete fGrabCursor;
 }
 
 
@@ -1220,6 +1190,7 @@ PreView::MouseDown(BPoint point)
 			fYRatio = Bounds().Height() / fMode.virtual_height;
 			SetMouseEventMask(B_POINTER_EVENTS,
 				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+			SetViewCursor(fGrabbingCursor);
 		}
 	}
 }
@@ -1228,20 +1199,19 @@ PreView::MouseDown(BPoint point)
 void
 PreView::MouseUp(BPoint point)
 {
-	if (IsTracking())
+	if (IsTracking()) {
 		SetTracking(false);
+		SetViewCursor(fGrabCursor);
+	}
 }
 
 
 void
 PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
-	if (IsEnabled())
-		SetViewCursor(&fMoveHandCursor);
-	else
-		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
-
-	if (IsTracking()) {
+	if (!IsTracking())
+		SetViewCursor(IsEnabled() ? fGrabCursor : B_CURSOR_SYSTEM_DEFAULT);
+	else {
 		float x, y;
 		x = fPoint.x + (point.x - fOldPoint.x) / fXRatio;
 		y = fPoint.y + (point.y - fOldPoint.y) / fYRatio;
@@ -1289,6 +1259,7 @@ PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 			messenger.SendMessage(kMsgUpdatePreviewPlacement);
 		}
 	}
+
 	BControl::MouseMoved(point, transit, message);
 }
 
