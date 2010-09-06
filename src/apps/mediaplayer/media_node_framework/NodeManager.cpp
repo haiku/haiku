@@ -86,13 +86,13 @@ NodeManager::Init(BRect videoBounds, float videoFrameRate,
 	PlaybackManager::Init(videoFrameRate, loopingMode, loopingEnabled, speed);
 
 	// get some objects from a derived class
-	if (!fVideoTarget)
+	if (fVideoTarget == NULL)
 		fVideoTarget = CreateVideoTarget();
 
-	if (!fVideoSupplier)
+	if (fVideoSupplier == NULL)
 		fVideoSupplier = CreateVideoSupplier();
 
-	if (!fAudioSupplier)
+	if (fAudioSupplier == NULL)
 		fAudioSupplier = CreateAudioSupplier();
 
 	return FormatChanged(videoBounds, videoFrameRate, preferredVideoFormat,
@@ -145,11 +145,8 @@ NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 		return B_OK;
 	}
 
-	if (videoFrameRate != FramesPerSecond()) {
-		TRACE("   -> need to Init()\n");
-		PlaybackManager::Init(videoFrameRate, LoopMode(), IsLoopingEnabled(),
-			Speed(), MODE_PLAYING_PAUSED_FORWARD, CurrentFrame());
-	}
+	PlaybackManager::Init(videoFrameRate, LoopMode(), IsLoopingEnabled(),
+		Speed(), MODE_PLAYING_PAUSED_FORWARD, CurrentFrame());
 
 	_StopNodes();
 	_TearDownNodes();
