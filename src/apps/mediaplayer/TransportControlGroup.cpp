@@ -169,7 +169,7 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 TransportControlGroup::~TransportControlGroup()
 {
 	if (!fSeekSlider->IsEnabled())
-		delete fPositionToolTip;
+		fPositionToolTip->ReleaseReference();
 }
 
 
