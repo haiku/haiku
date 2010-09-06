@@ -23,13 +23,12 @@ static const DemuxerFormat gDemuxerTable[] = {
 //		"asf", "ASF Movie", "video/x-asf",
 //		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
 //	},
-//	{
-//		// Tested with many streams and either works ok, or has inconsistent
-//		// seeking results for audio, i.e. often audio is not in sync.
-//		// Keep using the avi_reader implementation by Marcus Overhagen.
-//		"avi", "AVI (Audio Video Interleaved)", "video/x-msvideo",
-//		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
-//	},
+	{
+		// Tested with many streams and works very well, with many older
+		// files, the native AVI reader does not work.
+		"avi", "AVI (Audio Video Interleaved)", "video/x-msvideo",
+		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
+	},
 	{
 		"dv", "DV Movie", "video/dv",
 		B_WAV_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY

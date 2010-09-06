@@ -140,7 +140,7 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	#legacy.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
-	aiff_reader asf_reader au_reader avi_reader $(X86_ONLY)ffmpeg
+	aiff_reader asf_reader au_reader $(X86_ONLY)ffmpeg
 	mov_reader musepack ogg raw_decoder speex
 	$(X86_ONLY)ape_reader
 	# theora
