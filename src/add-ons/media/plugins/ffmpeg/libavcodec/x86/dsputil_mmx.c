@@ -1685,6 +1685,7 @@ QPEL_2TAP(avg_,  8, 3dnow)
 static void just_return(void) { return; }
 #endif
 
+#if __GNUC__ >= 3
 static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int oy,
                     int dxx, int dxy, int dyx, int dyy, int shift, int r, int width, int height){
     const int w = 8;
@@ -1802,6 +1803,7 @@ static void gmc_mmx(uint8_t *dst, uint8_t *src, int stride, int h, int ox, int o
         src += 4-h*stride;
     }
 }
+#endif // #if __GNUC__ >= 3
 
 #define PREFETCH(name, op) \
 static void name(void *mem, int stride, int h){\
@@ -2601,7 +2603,9 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
         SET_HPEL_FUNCS(avg, 1, 8, mmx);
         SET_HPEL_FUNCS(avg_no_rnd, 1, 8, mmx);
 
+#if __GNUC__ >= 3
         c->gmc= gmc_mmx;
+#endif
 
         c->add_bytes= add_bytes_mmx;
         c->add_bytes_l2= add_bytes_l2_mmx;
@@ -2953,7 +2957,9 @@ void ff_h264dsp_init_x86(H264DSPContext *c)
             c->h264_h_loop_filter_chroma= h264_h_loop_filter_chroma_mmx2;
             c->h264_v_loop_filter_chroma_intra= h264_v_loop_filter_chroma_intra_mmx2;
             c->h264_h_loop_filter_chroma_intra= h264_h_loop_filter_chroma_intra_mmx2;
+#if __GNUC__ >= 3
             c->h264_loop_filter_strength= h264_loop_filter_strength_mmx2;
+#endif
 
             c->weight_h264_pixels_tab[0]= ff_h264_weight_16x16_mmx2;
             c->weight_h264_pixels_tab[1]= ff_h264_weight_16x8_mmx2;
