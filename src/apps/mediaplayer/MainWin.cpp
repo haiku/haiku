@@ -753,10 +753,14 @@ MainWin::MessageReceived(BMessage* msg)
 			float dx = msg->FindFloat("be:wheel_delta_x");
 			float dy = msg->FindFloat("be:wheel_delta_y");
 			bool inv = modifiers() & B_COMMAND_KEY;
-			if (dx > 0.1)	PostMessage(inv ? M_VOLUME_DOWN : M_SKIP_PREV);
-			if (dx < -0.1)	PostMessage(inv ? M_VOLUME_UP : M_SKIP_NEXT);
-			if (dy > 0.1)	PostMessage(inv ? M_SKIP_PREV : M_VOLUME_DOWN);
-			if (dy < -0.1)	PostMessage(inv ? M_SKIP_NEXT : M_VOLUME_UP);
+			if (dx > 0.1)
+				PostMessage(inv ? M_VOLUME_DOWN : M_SKIP_PREV);
+			if (dx < -0.1)
+				PostMessage(inv ? M_VOLUME_UP : M_SKIP_NEXT);
+			if (dy > 0.1)
+				PostMessage(inv ? M_SKIP_PREV : M_VOLUME_DOWN);
+			if (dy < -0.1)
+				PostMessage(inv ? M_SKIP_NEXT : M_VOLUME_UP);
 			break;
 		}
 
