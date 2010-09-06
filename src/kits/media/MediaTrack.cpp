@@ -313,12 +313,9 @@ BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
 		result = fDecoder->Decode(buffer, _frameCount, _header, info);
 	if (result == B_OK) {
 		fCurrentFrame += *_frameCount;
-		// TODO: This changes the meaning of fCurrentTime from pointing
-		// to the next chunk start time (i.e. after seeking) to the start time
-		// of the last chunk. Asking the extractor for the current time will
-		// not work so well because of the chunk cache. But providing a
-		// "duration" field in the media_header could be useful.
-		fCurrentTime = fCurrentTime = _header->start_time;
+		bigtime_t framesDuration = (bigtime_t)(*_frameCount * 1000000
+			/ _FrameRate());
+		fCurrentTime = _header->start_time + framesDuration;
 	} else {
 		ERROR("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n",
 			result, strerror(result));
