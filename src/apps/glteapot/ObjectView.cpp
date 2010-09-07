@@ -166,9 +166,6 @@ ObjectView::ObjectView(BRect rect, const char *name, ulong resizingMode,
 	quittingSem = create_sem(1, "quitting sem");
 	drawEvent = create_sem(0, "draw event");
 
-	fGrabbingCursor = new BCursor(B_CURSOR_ID_GRABBING);
-	fGrabCursor = new BCursor(B_CURSOR_ID_GRAB);
-
 	char findDir[PATH_MAX];
 	find_directory(B_SYSTEM_DATA_DIRECTORY, -1, true, findDir, PATH_MAX);
 	sprintf(teapotPath, "%s/%s", findDir, teapotData);
@@ -182,8 +179,6 @@ ObjectView::~ObjectView()
 {
 	delete_sem(quittingSem);
 	delete_sem(drawEvent);
-	delete fGrabCursor;
-	delete fGrabbingCursor;
 }
 
 
@@ -439,7 +434,9 @@ ObjectView::MouseDown(BPoint point)
 
 			SetMouseEventMask(B_POINTER_EVENTS,
 						B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
-			SetViewCursor(fGrabbingCursor);
+
+			BCursor grabbingCursor(B_CURSOR_ID_GRABBING);
+			SetViewCursor(&grabbingCursor);
 		} else {
 			ConvertToScreen(&point);
 			object->MenuInvoked(point);
@@ -473,7 +470,8 @@ ObjectView::MouseUp(BPoint point)
 		fTrackingInfo.lastDx = 0.0f;
 		fTrackingInfo.lastDy = 0.0f;
 
-		SetViewCursor(fGrabCursor);
+		BCursor grabCursor(B_CURSOR_ID_GRAB);
+		SetViewCursor(&grabCursor);
 	}
 }
 
@@ -520,7 +518,9 @@ ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 		}
 	} else {
 		GLObject* object = reinterpret_cast<GLObject*>(fObjects.ItemAt(ObjectAtPoint(point)));
-		SetViewCursor(object != NULL ? fGrabCursor : B_CURSOR_SYSTEM_DEFAULT);
+		BCursor cursor(object != NULL ?
+			B_CURSOR_ID_GRAB : B_CURSOR_ID_SYSTEM_DEFAULT);
+		SetViewCursor(&cursor);
 	}
 }
 

@@ -1146,9 +1146,7 @@ BackgroundsView::FoundPositionSetting()
 
 PreView::PreView()
 	:
-	BControl("PreView", NULL, NULL, B_WILL_DRAW | B_SUBPIXEL_PRECISE),
-	fGrabbingCursor(new BCursor(B_CURSOR_ID_GRABBING)),
-	fGrabCursor(new BCursor(B_CURSOR_ID_GRAB))
+	BControl("PreView", NULL, NULL, B_WILL_DRAW | B_SUBPIXEL_PRECISE)
 {
 	float aspectRatio = BScreen().Frame().Width() / BScreen().Frame().Height();
 	float previewWidth = 120.0f;
@@ -1157,13 +1155,6 @@ PreView::PreView()
 	ResizeTo(previewWidth, previewHeight);
 	SetExplicitMinSize(BSize(previewWidth, previewHeight));
 	SetExplicitMaxSize(BSize(previewWidth, previewHeight));
-}
-
-
-PreView::~PreView()
-{
-	delete fGrabbingCursor;
-	delete fGrabCursor;
 }
 
 
@@ -1190,7 +1181,9 @@ PreView::MouseDown(BPoint point)
 			fYRatio = Bounds().Height() / fMode.virtual_height;
 			SetMouseEventMask(B_POINTER_EVENTS,
 				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
-			SetViewCursor(fGrabbingCursor);
+
+			BCursor grabbingCursor(B_CURSOR_ID_GRABBING);
+			SetViewCursor(&grabbingCursor);
 		}
 	}
 }
@@ -1201,7 +1194,8 @@ PreView::MouseUp(BPoint point)
 {
 	if (IsTracking()) {
 		SetTracking(false);
-		SetViewCursor(fGrabCursor);
+		BCursor grabCursor(B_CURSOR_ID_GRAB);
+		SetViewCursor(&grabCursor);
 	}
 }
 
@@ -1209,9 +1203,10 @@ PreView::MouseUp(BPoint point)
 void
 PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
-	if (!IsTracking())
-		SetViewCursor(IsEnabled() ? fGrabCursor : B_CURSOR_SYSTEM_DEFAULT);
-	else {
+	if (!IsTracking()) {
+		BCursor cursor(IsEnabled() ? B_CURSOR_ID_GRAB : B_CURSOR_ID_SYSTEM_DEFAULT);
+		SetViewCursor(&cursor);
+	} else {
 		float x, y;
 		x = fPoint.x + (point.x - fOldPoint.x) / fXRatio;
 		y = fPoint.y + (point.y - fOldPoint.y) / fYRatio;

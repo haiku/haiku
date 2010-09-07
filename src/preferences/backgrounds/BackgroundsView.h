@@ -81,7 +81,6 @@ private:
 class PreView : public BControl {
 public:
 							PreView();
-			virtual			~PreView();
 
 			BPoint			fPoint;
 			BRect			fImageBounds;
@@ -97,8 +96,6 @@ protected:
 			float			fXRatio;
 			float			fYRatio;
 			display_mode	fMode;
-			BCursor*		fGrabbingCursor;
-			BCursor*		fGrabCursor;
 };
 
 

@@ -40,7 +40,6 @@ enum lights {
 
 class ResScroll;
 class GLObject;
-class BCursor;
 
 struct TrackingInfo {
 	float		lastX;
@@ -91,8 +90,6 @@ class ObjectView : public BGLView {
 		float			fLastYXRatio, fYxRatio, fFpsHistory[HISTSIZE];
 		float			fObjectDistance, fLastObjectDistance;
 		TrackingInfo	fTrackingInfo;
-		BCursor*		fGrabCursor;
-		BCursor*		fGrabbingCursor;
 };
 
 #endif // OBJECT_VIEW_H
