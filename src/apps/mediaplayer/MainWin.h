@@ -186,6 +186,8 @@ private:
 			ListenerAdapter		fGlobalSettingsListener;
 			bool				fCloseWhenDonePlayingMovie;
 			bool				fCloseWhenDonePlayingSound;
+			bool				fLoopMovies;
+			bool				fLoopSounds;
 			bigtime_t			fInitialSeekPosition;
 
 	static	int					sNoVideoWidth;

@@ -604,9 +604,19 @@ MainWin::MessageReceived(BMessage* msg)
 			bool hadNext = fPlaylist->SetCurrentItemIndex(
 				fPlaylist->CurrentItemIndex() + 1);
 			if (!hadNext) {
+				// Reached end of playlist
+				// Handle "quit when done" settings
 				if ((fHasVideo && fCloseWhenDonePlayingMovie)
 					|| (!fHasVideo && fCloseWhenDonePlayingSound))
 					PostMessage(B_QUIT_REQUESTED);
+				// Handle "loop by default" settings
+				if ((fHasVideo && fLoopMovies)
+					|| (!fHasVideo && fLoopSounds)) {
+					if (fPlaylist->CountItems() > 1)
+						fPlaylist->SetCurrentItemIndex(0);
+					else
+						fController->Play();
+				}
 			}
 			break;
 		}
@@ -2287,6 +2297,8 @@ MainWin::_AdoptGlobalSettings()
 
 	fCloseWhenDonePlayingMovie = settings.closeWhenDonePlayingMovie;
 	fCloseWhenDonePlayingSound = settings.closeWhenDonePlayingSound;
+	fLoopMovies = settings.loopMovie;
+	fLoopSounds = settings.loopSound;
 }
 
 

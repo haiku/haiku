@@ -1,9 +1,10 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Fredrik Modéen <fredrik@modeen.se>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
  
 #include "SettingsWindow.h"
@@ -261,10 +262,6 @@ SettingsWindow::SettingsWindow(BRect frame)
 	view->AddChild(bbox);
 	AddChild(view);
 #endif
-
-	// disable currently unsupported features
-	fLoopMoviesCB->SetEnabled(false);
-	fLoopSoundsCB->SetEnabled(false);
 }
 
 
