@@ -8,14 +8,17 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
  
+
+#include "CpuCapabilities.h"
+
 #include <string.h>
 #include <cpu_type.h>
 
-#include "CpuCapabilities.h"
 
 CPUCapabilities::~CPUCapabilities()
 {
 }
+
 
 CPUCapabilities::CPUCapabilities()
 {
@@ -26,6 +29,8 @@ CPUCapabilities::CPUCapabilities()
 	PrintCapabilities();
 }
 
+
+#ifdef __INTEL__
 void
 CPUCapabilities::setIntelCapabilities()
 {
@@ -84,6 +89,8 @@ CPUCapabilities::setIntelCapabilities()
 		}
 	}
 }
+#endif // __INTEL__
+
 
 bool
 CPUCapabilities::HasMMX()
@@ -91,11 +98,13 @@ CPUCapabilities::HasMMX()
 	return capabilities >= CAPABILITY_MMX;
 }
 
+
 bool
 CPUCapabilities::HasSSE1()
 {
 	return capabilities >= CAPABILITY_SSE1;
 }
+
 
 bool
 CPUCapabilities::HasSSE2()
@@ -103,11 +112,13 @@ CPUCapabilities::HasSSE2()
 	return capabilities >= CAPABILITY_SSE2;
 }
 
+
 bool
 CPUCapabilities::HasSSE3()
 {
 	return capabilities >= CAPABILITY_SSE3;
 }
+
 
 bool
 CPUCapabilities::HasSSSE3()
@@ -115,17 +126,20 @@ CPUCapabilities::HasSSSE3()
 	return capabilities >= CAPABILITY_SSSE3;
 }
 
+
 bool
 CPUCapabilities::HasSSE41()
 {
 	return capabilities >= CAPABILITY_SSE41;
 }
 
+
 bool
 CPUCapabilities::HasSSE42()
 {
 	return capabilities >= CAPABILITY_SSE42;
 }
+
 
 void
 CPUCapabilities::PrintCapabilities()
