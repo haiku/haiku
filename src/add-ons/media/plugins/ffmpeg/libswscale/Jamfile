@@ -12,10 +12,8 @@ local archSources ;
 archSources = ;
 
 if $(TARGET_ARCH) = x86 {
-	if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
-		archSources += yuv2rgb_mmx.c ;
-		SubDirHdrs [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
-	}
+	archSources += yuv2rgb_mmx.c ;
+	SubDirHdrs [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
 } else if $(TARGET_ARCH) = ppc {
 	archSources += swscale_altivec_template.c  yuv2rgb_altivec.c ;
 } else if $(TARGET_ARCH) = sparc {
