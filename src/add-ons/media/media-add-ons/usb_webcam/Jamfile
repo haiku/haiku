@@ -71,7 +71,7 @@ rule USBWebcamHeaderGen header : macro : sources
 
 actions USBWebcamHeaderGen1
 {
-	grep -h $(GREP_DEFINE) $(2) > $(1) ;
+	grep -h -a $(GREP_DEFINE) $(2) > $(1) ;
 }
 
 USBWebcamHeaderGen CamInternalAddons.h : B_WEBCAM_MKINTFUNC : $(addonSources) ;
