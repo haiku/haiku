@@ -9,32 +9,40 @@
 
 #include <fs_cache.h>
 
+#include "Transaction.h"
 #include "Volume.h"
 
 
 class CachedBlock {
 public:
-					CachedBlock(Volume* volume);
-					CachedBlock(Volume* volume, uint32 block);
-					~CachedBlock();
+							CachedBlock(Volume* volume);
+							CachedBlock(Volume* volume, uint32 block);
+							~CachedBlock();
 
-			void	Keep();
-			void	Unset();
+			void			Keep();
+			void			Unset();
 
-	const	uint8*	SetTo(uint32 block);
+			const uint8*	SetTo(uint32 block);
+			uint8*			SetToWritable(Transaction& transaction, 
+								uint32 block, bool empty = false);
+			uint8*			SetToWritableWithoutTransaction(uint32 block,
+								bool empty = false);
 
-	const	uint8*	Block() const { return fBlock; }
-			off_t	BlockNumber() const { return fBlockNumber; }
+			const uint8*	Block() const { return fBlock; }
+			off_t			BlockNumber() const { return fBlockNumber; }
 
 private:
-					CachedBlock(const CachedBlock &);
-					CachedBlock &operator=(const CachedBlock &);
-						// no implementation
+							CachedBlock(const CachedBlock &);
+							CachedBlock &operator=(const CachedBlock &);
+								// no implementation
+						
+			uint8*			_SetToWritableEtc(int32 transaction, uint32 block,
+								bool empty);
 
 protected:
-	Volume*			fVolume;
-	uint32			fBlockNumber;
-	uint8*			fBlock;
+			Volume*			fVolume;
+			uint32			fBlockNumber;
+			uint8*			fBlock;
 };
 
 
@@ -92,6 +100,37 @@ CachedBlock::SetTo(uint32 block)
 	Unset();
 	fBlockNumber = block;
 	return fBlock = (uint8 *)block_cache_get(fVolume->BlockCache(), block);
+}
+
+
+inline uint8*
+CachedBlock::SetToWritable(Transaction& transaction, uint32 block, bool empty)
+{
+	return _SetToWritableEtc(transaction.ID(), block, empty);
+}
+
+
+inline uint8*
+CachedBlock::SetToWritableWithoutTransaction(uint32 block, bool empty)
+{
+	return _SetToWritableEtc((int32)-1, block, empty);
+}
+
+inline uint8*
+CachedBlock::_SetToWritableEtc(int32 transaction, uint32 block, bool empty)
+{
+	Unset();
+	fBlockNumber = block;
+
+	if (empty) {
+		fBlock = (uint8*)block_cache_get_empty(fVolume->BlockCache(),
+			block, transaction);
+	} else {
+		fBlock = (uint8*)block_cache_get_writable(fVolume->BlockCache(),
+			block, transaction);
+	}
+
+	return fBlock;
 }
 
 #endif	// CACHED_BLOCK_H

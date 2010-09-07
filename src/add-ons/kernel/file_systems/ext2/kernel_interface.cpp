@@ -11,12 +11,18 @@
 #include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <fs_info.h>
+#include <io_requests.h>
+#include <NodeMonitor.h>
+#include <util/AutoLock.h>
 
 #include "AttributeIterator.h"
+#include "CachedBlock.h"
 #include "DirectoryIterator.h"
 #include "ext2.h"
 #include "HTree.h"
 #include "Inode.h"
+#include "Journal.h"
+#include "Utility.h"
 
 
 //#define TRACE_EXT2
@@ -35,20 +41,26 @@ struct identify_cookie {
 };
 
 
-/*!	Converts the open mode, the open flags given to bfs_open(), into
-	access modes, e.g. since O_RDONLY requires read access to the
-	file, it will be converted to R_OK.
-*/
-int
-open_mode_to_access(int openMode)
+//!	ext2_io() callback hook
+static status_t
+iterative_io_get_vecs_hook(void* cookie, io_request* request, off_t offset,
+	size_t size, struct file_io_vec* vecs, size_t* _count)
 {
-	openMode &= O_RWMASK;
-	if (openMode == O_RDONLY)
-		return R_OK;
-	else if (openMode == O_WRONLY)
-		return W_OK;
+	Inode* inode = (Inode*)cookie;
 
-	return R_OK | W_OK;
+	return file_map_translate(inode->Map(), offset, size, vecs, _count,
+		inode->GetVolume()->BlockSize());
+}
+
+
+//!	ext2_io() callback hook
+static status_t
+iterative_io_finished_hook(void* cookie, io_request* request, status_t status,
+	bool partialTransfer, size_t bytesTransferred)
+{
+	Inode* inode = (Inode*)cookie;
+	rw_lock_read_unlock(inode->Lock());
+	return B_OK;
 }
 
 
@@ -116,6 +128,7 @@ ext2_mount(fs_volume* _volume, const char* device, uint32 flags,
 
 	status_t status = volume->Mount(device, flags);
 	if (status != B_OK) {
+		TRACE("Failed mounting the volume. Error: %s\n", strerror(status));
 		delete volume;
 		return status;
 	}
@@ -148,7 +161,7 @@ ext2_read_fs_info(fs_volume* _volume, struct fs_info* info)
 	info->io_size = EXT2_IO_SIZE;
 	info->block_size = volume->BlockSize();
 	info->total_blocks = volume->NumBlocks();
-	info->free_blocks = volume->FreeBlocks();
+	info->free_blocks = volume->NumFreeBlocks();
 
 	// Volume name
 	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
@@ -198,6 +211,50 @@ ext2_put_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 {
 	delete (Inode*)_node->private_node;
 	return B_OK;
+}
+
+
+static status_t
+ext2_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
+{
+	TRACE("ext2_remove_vnode()\n");
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+	ObjectDeleter<Inode> inodeDeleter(inode);
+
+	if (!inode->IsDeleted())
+		return B_OK;
+
+	TRACE("ext2_remove_vnode(): Starting transaction\n");
+	Transaction transaction(volume->GetJournal());
+
+	if (!inode->IsSymLink() || inode->Size() >= EXT2_SHORT_SYMLINK_LENGTH) {
+		TRACE("ext2_remove_vnode(): Truncating\n");
+		status_t status = inode->Resize(transaction, 0);
+		if (status != B_OK)
+			return status;
+	}
+
+	TRACE("ext2_remove_vnode(): Removing from orphan list\n");
+	status_t status = volume->RemoveOrphan(transaction, inode->ID());
+	if (status != B_OK)
+		return status;
+
+	TRACE("ext2_remove_vnode(): Setting deletion time\n");
+	inode->Node().SetDeletionTime(real_time_clock());
+
+	status = inode->WriteBack(transaction);
+	if (status != B_OK)
+		return status;
+	
+	TRACE("ext2_remove_vnode(): Freeing inode\n");
+	status = volume->FreeInode(transaction, inode->ID(), inode->IsDirectory());
+
+	// TODO: When Transaction::Done() fails, do we have to re-add the vnode?
+	if (status == B_OK)
+		status = transaction.Done();
+
+	return status;
 }
 
 
@@ -253,9 +310,85 @@ ext2_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 
 static status_t
+ext2_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (inode->FileCache() == NULL)
+		return B_BAD_VALUE;
+
+	rw_lock_read_lock(inode->Lock());
+
+	uint32 vecIndex = 0;
+	size_t vecOffset = 0;
+	size_t bytesLeft = *_numBytes;
+	status_t status;
+
+	while (true) {
+		file_io_vec fileVecs[8];
+		size_t fileVecCount = 8;
+
+		status = file_map_translate(inode->Map(), pos, bytesLeft, fileVecs,
+			&fileVecCount, 0);
+		if (status != B_OK && status != B_BUFFER_OVERFLOW)
+			break;
+
+		bool bufferOverflow = status == B_BUFFER_OVERFLOW;
+
+		size_t bytes = bytesLeft;
+		status = write_file_io_vec_pages(volume->Device(), fileVecs,
+			fileVecCount, vecs, count, &vecIndex, &vecOffset, &bytes);
+		if (status != B_OK || !bufferOverflow)
+			break;
+
+		pos += bytes;
+		bytesLeft -= bytes;
+	}
+
+	rw_lock_read_unlock(inode->Lock());
+
+	return status;
+}
+
+
+static status_t
+ext2_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+#ifndef EXT2_SHELL
+	if (io_request_is_write(request) && volume->IsReadOnly()) {
+		notify_io_request(request, B_READ_ONLY_DEVICE);
+		return B_READ_ONLY_DEVICE;
+	}
+#endif
+
+	if (inode->FileCache() == NULL) {
+#ifndef EXT2_SHELL
+		notify_io_request(request, B_BAD_VALUE);
+#endif
+		return B_BAD_VALUE;
+	}
+
+	// We lock the node here and will unlock it in the "finished" hook.
+	rw_lock_read_lock(inode->Lock());
+
+	return do_iterative_fd_io(volume->Device(), request,
+		iterative_io_get_vecs_hook, iterative_io_finished_hook, inode);
+}
+
+
+static status_t
 ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 	size_t size, struct file_io_vec* vecs, size_t* _count)
 {
+	TRACE("ext2_get_file_map()\n");
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 	size_t index = 0, max = *_count;
@@ -294,7 +427,7 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		if (size <= vecs[index - 1].length || offset >= inode->Size()) {
 			// We're done!
 			*_count = index;
-			TRACE("ext2_get_file_map for inode %ld\n", inode->ID());
+			TRACE("ext2_get_file_map for inode %ld\n", (long)inode->ID());
 			return B_OK;
 		}
 	}
@@ -311,6 +444,8 @@ static status_t
 ext2_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	ino_t* _vnodeID)
 {
+	TRACE("ext2_lookup: name address: %p\n", name);
+	TRACE("ext2_lookup: name: %s\n", name);
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* directory = (Inode*)_directory->private_node;
 
@@ -328,19 +463,74 @@ ext2_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	
 	ObjectDeleter<DirectoryIterator> iteratorDeleter(iterator);
 
-	while (true) {
-		char buffer[B_FILE_NAME_LENGTH];
-		size_t length = sizeof(buffer);
-		status = iterator->GetNext(buffer, &length, _vnodeID);
-		if (status != B_OK)
-			return status;
-		TRACE("ext2_lookup() %s\n", buffer);
+	status = iterator->FindEntry(name, _vnodeID);
+	if (status != B_OK)
+		return status;
+	
+	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
+}
 
-		if (!strcmp(buffer, name))
-			break;
+
+static status_t
+ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
+	void* buffer, size_t bufferLength)
+{
+	TRACE("ioctl: %lu\n", cmd);
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	switch (cmd) {
+		case 56742:
+		{
+			TRACE("ioctl: Test the block allocator\n");
+			// Test the block allocator
+			TRACE("ioctl: Creating transaction\n");
+			Transaction transaction(volume->GetJournal());
+			TRACE("ioctl: Creating cached block\n");
+			CachedBlock cached(volume);
+			uint32 blocksPerGroup = volume->BlocksPerGroup();
+			uint32 blockSize  = volume->BlockSize();
+			uint32 firstBlock = volume->FirstDataBlock();
+			uint32 start = 0;
+			uint32 group = 0;
+			uint32 length;
+
+			TRACE("ioctl: blocks per group: %lu, block size: %lu, "
+				"first block: %lu, start: %lu, group: %lu\n", blocksPerGroup,
+				blockSize, firstBlock, start, group);
+
+			while (volume->AllocateBlocks(transaction, 1, 2048, group, start,
+					length) == B_OK) {
+				TRACE("ioctl: Allocated blocks in group %lu: %lu-%lu\n", group,
+					start, start + length);
+				uint32 blockNum = start + group * blocksPerGroup - firstBlock;
+
+				for (uint32 i = 0; i < length; ++i) {
+					uint8* block = cached.SetToWritable(transaction, blockNum);
+					memset(block, 0, blockSize);
+					blockNum++;
+				}
+
+				TRACE("ioctl: Blocks cleared\n");
+				
+				transaction.Done();
+				transaction.Start(volume->GetJournal());
+			}
+
+			TRACE("ioctl: Done\n");
+
+			return B_OK;
+		}
 	}
 
-	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
+	return B_OK;
+}
+
+
+static status_t
+ext2_fsync(fs_volume* _volume, fs_vnode* _node)
+{
+	Inode* inode = (Inode*)_node->private_node;
+	return inode->Sync();
 }
 
 
@@ -371,9 +561,492 @@ ext2_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 }
 
 
+status_t
+ext2_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
+	uint32 mask)
+{
+	TRACE("ext2_write_stat\n");
+	Volume* volume = (Volume*)_volume->private_volume;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	Inode* inode = (Inode*)_node->private_node;
+
+	status_t status = inode->CheckPermissions(W_OK);
+	if (status < B_OK)
+		return status;
+
+	TRACE("ext2_write_stat: Starting transaction\n");
+	Transaction transaction(volume->GetJournal());
+	inode->WriteLockInTransaction(transaction);
+
+	bool updateTime = false;
+
+	if ((mask & B_STAT_SIZE) != 0) {
+		if (inode->IsDirectory())
+			return B_IS_A_DIRECTORY;
+		if (!inode->IsFile())
+			return B_BAD_VALUE;
+
+		TRACE("ext2_write_stat: Old size: %ld, new size: %ld\n",
+			(long)inode->Size(), (long)stat->st_size);
+		if (inode->Size() != stat->st_size) {
+			off_t oldSize = inode->Size();
+
+			status = inode->Resize(transaction, stat->st_size);
+			if(status != B_OK)
+				return status;
+
+			if ((mask & B_STAT_SIZE_INSECURE) == 0) {
+				rw_lock_write_unlock(inode->Lock());
+				inode->FillGapWithZeros(oldSize, inode->Size());
+				rw_lock_write_lock(inode->Lock());
+			}
+
+			updateTime = true;
+		}
+	}
+
+	ext2_inode& node = inode->Node();
+
+	if ((mask & B_STAT_MODE) != 0) {
+		node.UpdateMode(stat->st_mode, S_IUMSK);
+		updateTime = true;
+	}
+
+	if ((mask & B_STAT_UID) != 0) {
+		node.SetUserID(stat->st_uid);
+		updateTime = true;
+	}
+	if ((mask & B_STAT_GID) != 0) {
+		node.SetGroupID(stat->st_gid);
+		updateTime = true;
+	}
+
+	if ((mask & B_STAT_MODIFICATION_TIME) != 0 || updateTime
+		|| (mask & B_STAT_CHANGE_TIME) != 0) {
+		time_t newTime = 0;
+
+		if ((mask & B_STAT_MODIFICATION_TIME) != 0)
+			newTime = stat->st_mtim.tv_sec;
+
+		if ((mask & B_STAT_CHANGE_TIME) != 0)
+			newTime = newTime > stat->st_ctim.tv_sec ? newTime
+				: stat->st_ctim.tv_sec;
+
+		if (newTime == 0)
+			newTime = real_time_clock();
+
+		node.SetModificationTime(newTime);
+	}
+	if ((mask & B_STAT_CREATION_TIME) != 0)
+		node.SetCreationTime(stat->st_crtim.tv_sec);
+
+	status = inode->WriteBack(transaction);
+	if (status == B_OK)
+		status = transaction.Done();
+	if (status == B_OK)
+		notify_stat_changed(volume->ID(), inode->ID(), mask);
+
+	return status;
+}
+
+
+static status_t
+ext2_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
+	int openMode, int mode, void** _cookie, ino_t* _vnodeID)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	TRACE("ext2_create()\n");
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (!directory->IsDirectory())
+		return B_BAD_TYPE;
+
+	TRACE("ext2_create(): Creating cookie\n");
+
+	// Allocate cookie
+	file_cookie* cookie = new(std::nothrow) file_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<file_cookie> cookieDeleter(cookie);
+
+	cookie->open_mode = openMode;
+	cookie->last_size = 0;
+	cookie->last_notification = system_time();
+
+	TRACE("ext2_create(): Starting transaction\n");
+
+	Transaction transaction(volume->GetJournal());
+
+	TRACE("ext2_create(): Creating inode\n");
+
+	Inode* inode;
+	bool created;
+	status_t status = Inode::Create(transaction, directory, name,
+		S_FILE | (mode & S_IUMSK), openMode, EXT2_TYPE_FILE, &created, _vnodeID,
+		&inode, &gExt2VnodeOps);
+	if (status != B_OK)
+		return status;
+
+	TRACE("ext2_create(): Created inode\n");
+
+	if ((openMode & O_NOCACHE) != 0 && !inode->IsFileCacheDisabled()) {
+		status = inode->DisableFileCache();
+		if (status != B_OK)
+			return status;
+	}
+
+	entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
+
+	status = transaction.Done();
+	if (status != B_OK) {
+		entry_cache_remove(volume->ID(), directory->ID(), name);
+		return status;
+	}
+
+	*_cookie = cookie;
+	cookieDeleter.Detach();
+
+	if (created)
+		notify_entry_created(volume->ID(), directory->ID(), name, *_vnodeID);
+
+	return B_OK;
+}
+
+
+static status_t
+ext2_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
+	const char* path, int mode)
+{
+	TRACE("ext2_create_symlink()\n");
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (!directory->IsDirectory())
+		return B_BAD_TYPE;
+
+	status_t status = directory->CheckPermissions(W_OK);
+	if (status != B_OK)
+		return status;
+
+	TRACE("ext2_create_symlink(): Starting transaction\n");
+	Transaction transaction(volume->GetJournal());
+
+	Inode* link;
+	ino_t id;
+	status = Inode::Create(transaction, directory, name, S_SYMLINK | 0777,
+		0, (uint8)EXT2_TYPE_SYMLINK, NULL, &id, &link);
+	if (status < B_OK)
+		return status;
+
+	// TODO: We have to prepare the link before publishing?
+
+	size_t length = strlen(path);
+	TRACE("ext2_create_symlink(): Path (%s) length: %d\n", path, (int)length);
+	if (length < EXT2_SHORT_SYMLINK_LENGTH) {
+		strcpy(link->Node().symlink, path);
+		link->Node().SetSize((uint32)length);
+
+		TRACE("ext2_create_symlink(): Publishing vnode\n");
+		publish_vnode(volume->FSVolume(), id, link, &gExt2VnodeOps,
+			link->Mode(), 0);
+		put_vnode(volume->FSVolume(), id);
+	} else {
+		TRACE("ext2_create_symlink(): Publishing vnode\n");
+		publish_vnode(volume->FSVolume(), id, link, &gExt2VnodeOps,
+			link->Mode(), 0);
+		put_vnode(volume->FSVolume(), id);
+
+		if (link->IsFileCacheDisabled()) {
+			status = link->EnableFileCache();
+			if (status != B_OK)
+				return status;
+		}
+
+		size_t written = length;
+		status = link->WriteAt(transaction, 0, (const uint8*)path, &written);
+		if (status == B_OK && written != length)
+			status = B_IO_ERROR;
+	}
+
+	if (status == B_OK)
+		status = link->WriteBack(transaction);
+
+	entry_cache_add(volume->ID(), directory->ID(), name, id);
+
+	status = transaction.Done();
+	if (status != B_OK) {
+		entry_cache_remove(volume->ID(), directory->ID(), name);
+		return status;
+	}
+
+	notify_entry_created(volume->ID(), directory->ID(), name, id);
+
+	TRACE("ext2_create_symlink(): Done\n");
+
+	return status;
+}
+
+
+static status_t
+ext2_link(fs_volume* volume, fs_vnode* dir, const char* name, fs_vnode* node)
+{
+	// TODO
+	
+	return B_NOT_SUPPORTED;
+}
+
+
+static status_t
+ext2_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
+{
+	TRACE("ext2_unlink()\n");
+	if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+		return B_NOT_ALLOWED;
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	status_t status = directory->CheckPermissions(W_OK);
+	if (status != B_OK)
+		return status;
+
+	TRACE("ext2_unlink(): Starting transaction\n");
+	Transaction transaction(volume->GetJournal());
+
+	directory->WriteLockInTransaction(transaction);
+
+	TRACE("ext2_unlink(): Looking up for directory entry\n");
+	HTree htree(volume, directory);
+	DirectoryIterator* directoryIterator;
+
+	status = htree.Lookup(name, &directoryIterator);
+	if (status != B_OK)
+		return status;
+
+	ino_t id;
+	status = directoryIterator->FindEntry(name, &id);
+	if (status != B_OK)
+		return status;
+
+	Vnode vnode(volume, id);
+	Inode* inode;
+	status = vnode.Get(&inode);
+	if (status != B_OK)
+		return status;
+
+	inode->WriteLockInTransaction(transaction);
+
+	status = inode->Unlink(transaction);
+	if (status != B_OK)
+		return status;
+
+	status = directoryIterator->RemoveEntry(transaction);
+	if (status != B_OK)
+		return status;
+
+	entry_cache_remove(volume->ID(), directory->ID(), name);
+
+	status = transaction.Done();
+	if (status != B_OK)
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+	else
+		notify_entry_removed(volume->ID(), directory->ID(), name, id);
+
+	return status;
+}
+
+
+static status_t
+ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
+	fs_vnode* _newDir, const char* newName)
+{
+	TRACE("ext2_rename()\n");
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* oldDirectory = (Inode*)_oldDir->private_node;
+	Inode* newDirectory = (Inode*)_newDir->private_node;
+
+	if (oldDirectory == newDirectory && strcmp(oldName, newName) == 0)
+		return B_OK;
+
+	Transaction transaction(volume->GetJournal());
+
+	oldDirectory->WriteLockInTransaction(transaction);
+	if (oldDirectory != newDirectory)
+		newDirectory->WriteLockInTransaction(transaction);
+
+	status_t status = oldDirectory->CheckPermissions(W_OK);
+	if (status == B_OK)
+		status = newDirectory->CheckPermissions(W_OK);
+	if (status != B_OK)
+		return status;
+
+	HTree oldHTree(volume, oldDirectory);
+	DirectoryIterator* oldIterator;
+
+	status = oldHTree.Lookup(oldName, &oldIterator);
+	if (status != B_OK)
+		return status;
+
+	ObjectDeleter<DirectoryIterator> oldIteratorDeleter(oldIterator);
+
+	ino_t oldID;
+	status = oldIterator->FindEntry(oldName, &oldID);
+	if (status != B_OK)
+		return status;
+
+	if (oldDirectory != newDirectory) {
+		TRACE("ext2_rename(): Different parent directories\n");
+		CachedBlock cached(volume);
+
+		ino_t parentID = newDirectory->ID();
+		ino_t oldDirID = oldDirectory->ID();
+
+		do {
+			Vnode vnode(volume, parentID);
+			Inode* parent;
+
+			status = vnode.Get(&parent);
+			if (status != B_OK)
+				return B_IO_ERROR;
+
+			uint32 blockNum;
+			status = parent->FindBlock(0, blockNum);
+			if (status != B_OK)
+				return status;
+
+			const HTreeRoot* data = (const HTreeRoot*)cached.SetTo(blockNum);
+			parentID = data->dotdot.InodeID();
+		} while (parentID != oldID && parentID != oldDirID 
+			&& parentID != EXT2_ROOT_NODE);
+
+		if (parentID == oldID)
+			return B_BAD_VALUE;
+	}
+
+	HTree newHTree(volume, newDirectory);
+	DirectoryIterator* newIterator;
+
+	status = newHTree.Lookup(newName, &newIterator);
+	if (status != B_OK)
+		return status;
+
+	ObjectDeleter<DirectoryIterator> newIteratorDeleter(newIterator);
+
+	Vnode vnode(volume, oldID);
+	Inode* inode;
+
+	status = vnode.Get(&inode);
+	if (status != B_OK)
+		return status;
+
+	uint8 fileType;
+
+	// TODO: Support all file types?
+	if (inode->IsDirectory())
+		fileType = EXT2_TYPE_DIRECTORY;
+	else if (inode->IsSymLink())
+		fileType = EXT2_TYPE_SYMLINK;
+	else
+		fileType = EXT2_TYPE_FILE;
+
+	// Add entry in destination directory
+	ino_t existentID;
+	status = newIterator->FindEntry(newName, &existentID);
+	if (status == B_OK) {
+		if (existentID == oldID) {
+			// Remove entry in oldID
+			// return inode->Unlink();
+			return B_BAD_VALUE;
+		}
+
+		Vnode vnodeExistent(volume, existentID);
+		Inode* existent;
+
+		if (vnodeExistent.Get(&existent) != B_OK)
+			return B_NAME_IN_USE;
+
+		if (existent->IsDirectory() != inode->IsDirectory()) {
+			return existent->IsDirectory() ? B_IS_A_DIRECTORY
+				: B_NOT_A_DIRECTORY;
+		}
+
+		// TODO: Perhaps we have to revert this in case of error?
+		status = newIterator->ChangeEntry(transaction, oldID, fileType);
+		if (status != B_OK)
+			return status;
+
+		notify_entry_removed(volume->ID(), newDirectory->ID(), newName,
+			existentID);
+	} else if (status == B_ENTRY_NOT_FOUND) {
+		newIterator->Restart();
+
+		status = newIterator->AddEntry(transaction, newName, strlen(newName),
+			oldID, fileType);
+		if (status != B_OK)
+			return status;
+	} else
+		return status;
+	
+	// Remove entry from source folder
+	status = oldIterator->RemoveEntry(transaction);
+	if (status != B_OK)
+		return status;
+
+	inode->WriteLockInTransaction(transaction);
+
+	if (oldDirectory != newDirectory && inode->IsDirectory()) {
+		DirectoryIterator inodeIterator(inode);
+
+		status = inodeIterator.FindEntry("..");
+		if (status == B_ENTRY_NOT_FOUND) {
+			TRACE("Corrupt file sytem. Missing \"..\" in directory %ld\n",
+				(int32)inode->ID());
+			return B_BAD_DATA;
+		} else if (status != B_OK)
+			return status;
+
+		inodeIterator.ChangeEntry(transaction, newDirectory->ID(),
+			(uint8)EXT2_TYPE_DIRECTORY);
+	}
+
+	status = inode->WriteBack(transaction);
+	if (status != B_OK)
+		return status;
+
+	entry_cache_remove(volume->ID(), oldDirectory->ID(), oldName);
+	entry_cache_add(volume->ID(), newDirectory->ID(), newName, oldID);
+
+	status = transaction.Done();
+	if (status != B_OK) {
+		entry_cache_remove(volume->ID(), oldDirectory->ID(), newName);
+		entry_cache_add(volume->ID(), newDirectory->ID(), oldName, oldID);
+	
+		return status;
+	}
+
+	notify_entry_moved(volume->ID(), oldDirectory->ID(), oldName,
+		newDirectory->ID(), newName, oldID);
+
+	return B_OK;
+}
+
+
 static status_t
 ext2_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 {
+	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
 	// opening a directory read-only is allowed, although you can't read
@@ -381,26 +1054,115 @@ ext2_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0)
 		return B_IS_A_DIRECTORY;
 
-	if ((openMode & O_TRUNC) != 0)
-		return B_READ_ONLY_DEVICE;
-
-	return inode->CheckPermissions(open_mode_to_access(openMode)
+	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode)
 		| (openMode & O_TRUNC ? W_OK : 0));
+	if (status != B_OK)
+		return status;
+
+	// Prepare the cookie
+	file_cookie* cookie = new(std::nothrow) file_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<file_cookie> cookieDeleter(cookie);
+
+	cookie->open_mode = openMode & EXT2_OPEN_MODE_USER_MASK;
+	cookie->last_size = inode->Size();
+	cookie->last_notification = system_time();
+
+	if ((openMode & O_NOCACHE) != 0) {
+		status = inode->DisableFileCache();
+		if (status != B_OK)
+			return status;
+	}
+
+	// Should we truncate the file?
+	if ((openMode & O_TRUNC) != 0) {
+		if ((openMode & O_RWMASK) == O_RDONLY)
+			return B_NOT_ALLOWED;
+
+		Transaction transaction(volume->GetJournal());
+		inode->WriteLockInTransaction(transaction);
+
+		status_t status = inode->Resize(transaction, 0);
+		if (status == B_OK)
+			status = inode->WriteBack(transaction);
+		if (status == B_OK)
+			status = transaction.Done();
+		if (status != B_OK)
+			return status;
+
+		// TODO: No need to notify file size changed?
+	}
+
+	cookieDeleter.Detach();
+	*_cookie = cookie;
+
+	return B_OK;
 }
 
 
 static status_t
-ext2_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
-	void *buffer, size_t *_length)
+ext2_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
+	void* buffer, size_t* _length)
 {
-	Inode *inode = (Inode *)_node->private_node;
+	Inode* inode = (Inode*)_node->private_node;
 
 	if (!inode->IsFile()) {
 		*_length = 0;
 		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
 	}
 
-	return inode->ReadAt(pos, (uint8 *)buffer, _length);
+	return inode->ReadAt(pos, (uint8*)buffer, _length);
+}
+
+
+static status_t
+ext2_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
+	const void* buffer, size_t* _length)
+{
+	TRACE("ext2_write()\n");
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (inode->IsDirectory()) {
+		*_length = 0;
+		return B_IS_A_DIRECTORY;
+	}
+
+	TRACE("ext2_write(): Preparing cookie\n");
+
+	file_cookie* cookie = (file_cookie*)_cookie;
+
+	if ((cookie->open_mode & O_APPEND) != 0)
+		pos = inode->Size();
+
+	TRACE("ext2_write(): Creating transaction\n");
+	Transaction transaction;
+
+	status_t status = inode->WriteAt(transaction, pos, (const uint8*)buffer,
+		_length);
+	if (status == B_OK)
+		status = transaction.Done();
+	if (status == B_OK) {
+		TRACE("ext2_write(): Finalizing\n");
+		ReadLocker lock(*inode->Lock());
+
+		if (cookie->last_size != inode->Size()
+			&& system_time() > cookie->last_notification
+				+ INODE_NOTIFICATION_INTERVAL) {
+			notify_stat_changed(volume->ID(), inode->ID(),
+				B_STAT_MODIFICATION_TIME | B_STAT_SIZE | B_STAT_INTERIM_UPDATE);
+			cookie->last_size = inode->Size();
+			cookie->last_notification = system_time();
+		}
+	}
+
+	TRACE("ext2_write(): Done\n");
+
+	return status;
 }
 
 
@@ -412,8 +1174,16 @@ ext2_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 
 
 static status_t
-ext2_free_cookie(fs_volume* _volume, fs_vnode* _node, void* cookie)
+ext2_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
+	file_cookie* cookie = (file_cookie*)_cookie;
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (inode->Size() != cookie->last_size)
+		notify_stat_changed(volume->ID(), inode->ID(), B_STAT_SIZE);
+
+	delete cookie;
 	return B_OK;
 }
 
@@ -450,9 +1220,118 @@ ext2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 
 
 static status_t
-ext2_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
+ext2_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name,
+	int mode)
+{ 
+	TRACE("ext2_create_dir()\n");
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (!directory->IsDirectory())
+		return B_BAD_TYPE;
+
+	status_t status = directory->CheckPermissions(W_OK);
+	if (status != B_OK)
+		return status;
+
+	TRACE("ext2_create_dir(): Starting transaction\n");
+	Transaction transaction(volume->GetJournal());
+
+	ino_t id;
+	status = Inode::Create(transaction, directory, name,
+		S_DIRECTORY | (mode & S_IUMSK), 0, EXT2_TYPE_DIRECTORY, NULL, &id);
+	if (status != B_OK)
+		return status;
+
+	put_vnode(volume->FSVolume(), id);
+
+	entry_cache_add(volume->ID(), directory->ID(), name, id);
+
+	status = transaction.Done();
+	if (status != B_OK) {
+		entry_cache_remove(volume->ID(), directory->ID(), name);
+		return status;
+	}
+
+	notify_entry_created(volume->ID(), directory->ID(), name, id);
+
+	TRACE("ext2_create_dir(): Done\n");
+
+	return B_OK;
+}
+
+
+static status_t
+ext2_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
 {
-	Inode *inode = (Inode *)_node->private_node;
+	TRACE("ext2_remove_dir()\n");
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* directory = (Inode*)_directory->private_node;
+
+	status_t status = directory->CheckPermissions(W_OK);
+	if (status != B_OK)
+		return status;
+
+	TRACE("ext2_remove_dir(): Starting transaction\n");
+	Transaction transaction(volume->GetJournal());
+
+	directory->WriteLockInTransaction(transaction);
+
+	TRACE("ext2_remove_dir(): Looking up for directory entry\n");
+	HTree htree(volume, directory);
+	DirectoryIterator* directoryIterator;
+
+	status = htree.Lookup(name, &directoryIterator);
+	if (status != B_OK)
+		return status;
+
+	ino_t id;
+	status = directoryIterator->FindEntry(name, &id);
+	if (status != B_OK)
+		return status;
+
+	Vnode vnode(volume, id);
+	Inode* inode;
+	status = vnode.Get(&inode);
+	if (status != B_OK)
+		return status;
+
+	inode->WriteLockInTransaction(transaction);
+
+	status = inode->Unlink(transaction);
+	if (status != B_OK)
+		return status;
+
+	status = directory->Unlink(transaction);
+	if (status != B_OK)
+		return status;
+
+	status = directoryIterator->RemoveEntry(transaction);
+	if (status != B_OK)
+		return status;
+
+	entry_cache_remove(volume->ID(), directory->ID(), name);
+	entry_cache_remove(volume->ID(), id, "..");
+
+	status = transaction.Done();
+	if (status != B_OK) {
+		entry_cache_add(volume->ID(), directory->ID(), name, id);
+		entry_cache_add(volume->ID(), id, "..", id);
+	} else
+		notify_entry_removed(volume->ID(), directory->ID(), name, id);
+
+	return status;
+}
+
+
+static status_t
+ext2_open_dir(fs_volume* _volume, fs_vnode* _node, void** _cookie)
+{
+	Inode* inode = (Inode*)_node->private_node;
 	status_t status = inode->CheckPermissions(R_OK);
 	if (status < B_OK)
 		return status;
@@ -477,11 +1356,15 @@ ext2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 	size_t length = bufferSize;
 	ino_t id;
-	status_t status = iterator->GetNext(dirent->d_name, &length, &id);
+	status_t status = iterator->Get(dirent->d_name, &length, &id);
 	if (status == B_ENTRY_NOT_FOUND) {
 		*_num = 0;
 		return B_OK;
 	} else if (status != B_OK)
+		return status;
+
+	status = iterator->Next();
+	if (status != B_OK && status != B_ENTRY_NOT_FOUND)
 		return status;
 
 	Volume* volume = (Volume*)_volume->private_volume;
@@ -513,7 +1396,7 @@ ext2_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void * /*_cookie*/)
 static status_t
 ext2_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	delete (DirectoryIterator *)_cookie;
+	delete (DirectoryIterator*)_cookie;
 	return B_OK;
 }
 
@@ -662,7 +1545,7 @@ ext2_read_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
 	TRACE("%s()\n", __FUNCTION__);
 
 	Inode* inode = (Inode*)_node->private_node;
-	Volume* volume = (Volume*)_volume->private_volume;
+	//Volume* volume = (Volume*)_volume->private_volume;
 	ext2_xattr_entry *entry = (ext2_xattr_entry *)cookie;
 
 	if (!entry->IsValid())
@@ -736,46 +1619,46 @@ fs_vnode_ops gExt2VnodeOps = {
 	&ext2_lookup,
 	NULL,
 	&ext2_put_vnode,
-	NULL,
+	&ext2_remove_vnode,
 
 	/* VM file access */
 	&ext2_can_page,
 	&ext2_read_pages,
-	NULL,
+	&ext2_write_pages,
 
 	NULL,	// io()
 	NULL,	// cancel_io()
 
 	&ext2_get_file_map,
 
-	NULL,
+	&ext2_ioctl,
 	NULL,
 	NULL,	// fs_select
 	NULL,	// fs_deselect
-	NULL,
+	&ext2_fsync,
 
 	&ext2_read_link,
-	NULL,
+	&ext2_create_symlink,
 
-	NULL,
-	NULL,
-	NULL,
+	&ext2_link,
+	&ext2_unlink,
+	&ext2_rename,
 
 	&ext2_access,
 	&ext2_read_stat,
-	NULL,
+	&ext2_write_stat,
 
 	/* file operations */
-	NULL,
+	&ext2_create,
 	&ext2_open,
 	&ext2_close,
 	&ext2_free_cookie,
 	&ext2_read,
-	NULL,
+	&ext2_write,
 
 	/* directory operations */
-	NULL,
-	NULL,
+	&ext2_create_dir,
+	&ext2_remove_dir,
 	&ext2_open_dir,
 	&ext2_close_dir,
 	&ext2_free_dir_cookie,

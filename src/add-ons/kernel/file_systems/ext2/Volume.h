@@ -9,8 +9,12 @@
 #include <lock.h>
 
 #include "ext2.h"
+#include "BlockAllocator.h"
+#include "InodeAllocator.h"
+#include "Transaction.h"
 
 class Inode;
+class Journal;
 
 
 enum volume_flags {
@@ -18,7 +22,7 @@ enum volume_flags {
 };
 
 
-class Volume {
+class Volume : public TransactionListener {
 public:
 								Volume(fs_volume* volume);
 								~Volume();
@@ -30,6 +34,8 @@ public:
 			bool				IsReadOnly() const
 									{ return (fFlags & VOLUME_READ_ONLY) != 0; }
 
+			bool				HasExtendedAttributes() const;
+
 			Inode*				RootNode() const { return fRootNode; }
 			int					Device() const { return fDevice; }
 
@@ -40,35 +46,76 @@ public:
 
 			uint32				NumInodes() const
 									{ return fNumInodes; }
+			uint32				NumGroups() const
+									{ return fNumGroups; }
 			off_t				NumBlocks() const
 									{ return fSuperBlock.NumBlocks(); }
-			off_t				FreeBlocks() const
-									{ return fSuperBlock.FreeBlocks(); }
+			off_t				NumFreeBlocks() const
+									{ return fFreeBlocks; }
+			uint32				FirstDataBlock() const
+									{ return fFirstDataBlock; }
 
 			uint32				BlockSize() const { return fBlockSize; }
 			uint32				BlockShift() const { return fBlockShift; }
+			uint32				BlocksPerGroup() const
+									{ return fSuperBlock.BlocksPerGroup(); }
 			uint32				InodeSize() const
 									{ return fSuperBlock.InodeSize(); }
+			uint32				InodesPerGroup() const
+									{ return fSuperBlock.InodesPerGroup(); }
 			ext2_super_block&	SuperBlock() { return fSuperBlock; }
 
 			status_t			GetInodeBlock(ino_t id, uint32& block);
 			uint32				InodeBlockIndex(ino_t id) const;
 			status_t			GetBlockGroup(int32 index,
 									ext2_block_group** _group);
-			
+			status_t			WriteBlockGroup(Transaction& transaction,
+									int32 index);
+
+			Journal*			GetJournal() { return fJournal; }
+
 			bool				IndexedDirectories() const
 									{ return (fSuperBlock.CompatibleFeatures()
 										& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
+			uint8				DefaultHashVersion() const
+									{ return fSuperBlock.default_hash_version; }
+
+			status_t			SaveOrphan(Transaction& transaction,
+									ino_t newID, ino_t &oldID);
+			status_t			RemoveOrphan(Transaction& transaction,
+									ino_t id);
+
+			status_t			AllocateInode(Transaction& transaction,
+									Inode* parent, int32 mode, ino_t& id);
+			status_t			FreeInode(Transaction& transaction, ino_t id,
+									bool isDirectory);
+
+			status_t			AllocateBlocks(Transaction& transaction,
+									uint32 minimum, uint32 maximum,
+									uint32& blockGroup, uint32& start,
+									uint32& length);
+			status_t			FreeBlocks(Transaction& transaction,
+									uint32 start, uint32 length);
+
+			status_t			LoadSuperBlock();
+			status_t			WriteSuperBlock(Transaction& transaction);
 
 			// cache access
 			void*				BlockCache() { return fBlockCache; }
 
+			status_t			FlushDevice();
+			status_t			Sync();
+
 	static	status_t			Identify(int fd, ext2_super_block* superBlock);
+
+			// TransactionListener functions
+			void				TransactionDone(bool success);
+			void				RemovedFromTransaction();
 
 private:
 	static	uint32				_UnsupportedIncompatibleFeatures(
 									ext2_super_block& superBlock);
-			off_t				_GroupBlockOffset(uint32 blockIndex);
+			uint32				_GroupDescriptorBlock(uint32 blockIndex);
 
 private:
 			mutex				fLock;
@@ -76,12 +123,21 @@ private:
 			int					fDevice;
 			ext2_super_block	fSuperBlock;
 			char				fName[32];
+
+			BlockAllocator		fBlockAllocator;
+			InodeAllocator		fInodeAllocator;
+			Journal*			fJournal;
+			Inode*				fJournalInode;
+
 			uint32				fFlags;
 			uint32				fBlockSize;
 			uint32				fBlockShift;
 			uint32				fFirstDataBlock;
+
 			uint32				fNumInodes;
 			uint32				fNumGroups;
+			uint32				fFreeBlocks;
+			uint32				fFreeInodes;
 			uint32				fGroupsPerBlock;
 			ext2_block_group**	fGroupBlocks;
 			uint32				fInodesPerBlock;

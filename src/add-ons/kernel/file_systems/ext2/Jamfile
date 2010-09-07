@@ -7,17 +7,27 @@ SubDir HAIKU_TOP src add-ons kernel file_systems ext2 ;
 }
 
 #UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
 UsePrivateKernelHeaders ;
 
 KernelAddon ext2 :
 	Volume.cpp
+	DataStream.cpp
 	Inode.cpp
 	AttributeIterator.cpp
 	DirectoryIterator.cpp
-	IndexedDirectoryIterator.cpp
 	HTree.cpp
 	HTreeEntryIterator.cpp
+	RevokeManager.cpp
+	HashRevokeManager.cpp
+	Journal.cpp
+	NoJournal.cpp
+	InodeJournal.cpp
+	Transaction.cpp
+	BitmapBlock.cpp
+	BlockAllocator.cpp
+	InodeAllocator.cpp
 
 	kernel_interface.cpp
 ;

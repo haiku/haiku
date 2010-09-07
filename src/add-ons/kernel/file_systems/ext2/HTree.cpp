@@ -7,6 +7,7 @@
  */
 
 
+#include "CachedBlock.h"
 #include "HTree.h"
 
 #include <new>
@@ -16,6 +17,8 @@
 #include "Inode.h"
 #include "Volume.h"
 
+
+//#define COLLISION_TEST
 
 //#define TRACE_EXT2
 #ifdef TRACE_EXT2
@@ -79,86 +82,124 @@ HTree::~HTree()
 
 
 status_t
+HTree::PrepareForHash()
+{
+	uint32 blockNum;
+	status_t status = fDirectory->FindBlock(0, blockNum);
+	if (status != B_OK)
+		return status;
+
+	CachedBlock cached(fDirectory->GetVolume());
+	const uint8* block = cached.SetTo(blockNum);
+
+	HTreeRoot* root = (HTreeRoot*)block;
+
+	if (root == NULL)
+		return B_IO_ERROR;
+	if (!root->IsValid())
+		return B_BAD_DATA;
+
+	fHashVersion = root->hash_version;
+
+	return B_OK;
+}
+
+
+status_t
 HTree::Lookup(const char* name, DirectoryIterator** iterator)
 {
+	TRACE("HTree::Lookup()\n");
 	if (!fIndexed || (name[0] == '.'
 		&& (name[1] == '\0' || (name[1] == '.' && name[2] == '0')))) {
 		// No HTree support or looking for trivial directories
-		// TODO: Does these directories get hashed?
-		*iterator = new(std::nothrow) DirectoryIterator(fDirectory);
-		
-		if (*iterator == NULL)
-			return B_NO_MEMORY;
-		return B_OK;
+		return _FallbackToLinearIteration(iterator);
 	}
 	
-	HTreeRoot root;
-	size_t length = sizeof(root);
+	uint32 blockNum;
+	status_t status = fDirectory->FindBlock(0, blockNum);
+	if (status != B_OK)
+		return _FallbackToLinearIteration(iterator);
+
+	CachedBlock cached(fDirectory->GetVolume());
+	const uint8* block = cached.SetTo(blockNum);
+
+	HTreeRoot* root = (HTreeRoot*)block;
 	
-	status_t status = fDirectory->ReadAt(0, (uint8*)&root, &length);
-	if (status < B_OK)
-		return status;
+	if (root == NULL || !root->IsValid())
+		return _FallbackToLinearIteration(iterator);
+
+	fHashVersion = root->hash_version;
 	
-	if (length != sizeof(root) || !root.IsValid()) {
-		// Fallback to linear search
-		*iterator = new(std::nothrow) DirectoryIterator(fDirectory);
-		if (*iterator == NULL)
-			return B_NO_MEMORY;
-		
-		return B_OK;
-	}
+	size_t _nameLength = strlen(name);
+	uint8 nameLength = _nameLength >= 256 ? 255 : (uint8)_nameLength;
+
+	uint32 hash = Hash(name, nameLength);
 	
-	uint32 hash = _Hash(name, root.hash_version);
-	
-	off_t start = (off_t)root.root_info_length
+	off_t start = (off_t)root->root_info_length
 		+ 2 * (sizeof(HTreeFakeDirEntry) + 4);
+
+	fRootEntryDeleter.Unset();
 
 	fRootEntry = new(std::nothrow) HTreeEntryIterator(start, fDirectory);
 	if (fRootEntry == NULL)
 		return B_NO_MEMORY;
+
+	fRootEntryDeleter.SetTo(fRootEntry);
 	
-	fRootDeleter.SetTo(fRootEntry);
 	status = fRootEntry->Init();
 	if (status != B_OK)
 		return status;
 	
-	return fRootEntry->Lookup(hash, (uint32)root.indirection_levels, iterator);
+	bool detachRoot = false;
+	status = fRootEntry->Lookup(hash, (uint32)root->indirection_levels,
+		iterator, detachRoot);
+	TRACE("HTree::Lookup(): detach root: %c\n", detachRoot ? 't' : 'f');
+
+	if (detachRoot)
+		fRootEntryDeleter.Detach();
+	
+	return status;
 }
 
 
 uint32
-HTree::_Hash(const char* name, uint8 version)
+HTree::Hash(const char* name, uint8 length)
 {
 	uint32 hash;
 	
-	switch (version) {
+#ifndef COLLISION_TEST
+	switch (fHashVersion) {
 		case HTREE_HASH_LEGACY:
-			hash = _HashLegacy(name);
+			hash = _HashLegacy(name, length);
 			break;
 		case HTREE_HASH_HALF_MD4:
-			hash = _HashHalfMD4(name);
+			hash = _HashHalfMD4(name, length);
 			break;
 		case HTREE_HASH_TEA:
-			hash = _HashTEA(name);
+			hash = _HashTEA(name, length);
 			break;
 		default:
 			panic("Hash verification succeeded but then failed?");
 			hash = 0;
 	};
+#else
+	hash = 0;
+#endif
 
-	TRACE("Filename hash: %u\n", hash);
+	TRACE("HTree::_Hash(): filename hash 0x%lX\n", hash);
 	
 	return hash & ~1;
 }
 
 
 uint32
-HTree::_HashLegacy(const char* name)
+HTree::_HashLegacy(const char* name, uint8 length)
 {
+	TRACE("HTree::_HashLegacy()\n");
 	uint32 hash = 0x12a3fe2d;
 	uint32 previous = 0x37abe8f9;
 	
-	for (; *name != '\0'; ++name) {
+	for (; length > 0; --length, ++name) {
 		uint32 next = previous + (hash ^ (*name * 7152373));
 		
 		if ((next & 0x80000000) != 0)
@@ -168,7 +209,7 @@ HTree::_HashLegacy(const char* name)
 		hash = next;
 	}
 	
-	return hash;
+	return hash << 1;
 }
 
 
@@ -230,8 +271,8 @@ HTree::_HalfMD4Transform(uint32 buffer[4], uint32 blocks[8])
 	shifts[2] = 9;
 	shifts[3] = 13;
 
-	for (int j = 0; j < 2; ++j) {
-		for (int i = j; i < 4; i += 2) {
+	for (int j = 1; j >= 0; --j) {
+		for (int i = j; i < 8; i += 2) {
 			a += _MD4G(b, c, d) + blocks[i] + 013240474631UL;
 			uint32 shift = shifts[i / 2];
 			a = (a << shift) | (a >> (32 - shift));
@@ -247,13 +288,13 @@ HTree::_HalfMD4Transform(uint32 buffer[4], uint32 blocks[8])
 
 	for (int i = 0; i < 4; ++i) {
 		a += _MD4H(b, c, d) + blocks[3 - i] + 015666365641UL;
-		uint32 shift = shifts[i*2];
+		uint32 shift = shifts[i * 2 % 4];
 		a = (a << shift) | (a >> (32 - shift));
 		
 		_MD4RotateVars(a, b, c, d);
 		
 		a += _MD4H(b, c, d) + blocks[7 - i] + 015666365641UL;
-		shift = shifts[i*2 + 1];
+		shift = shifts[(i * 2 + 1) % 4];
 		a = (a << shift) | (a >> (32 - shift));
 		
 		_MD4RotateVars(a, b, c, d);
@@ -267,19 +308,21 @@ HTree::_HalfMD4Transform(uint32 buffer[4], uint32 blocks[8])
 
 
 uint32
-HTree::_HashHalfMD4(const char* name)
+HTree::_HashHalfMD4(const char* name, uint8 _length)
 {
+	TRACE("HTree::_HashHalfMD4()\n");
 	uint32 buffer[4];
+	int32 length = (uint32)_length;
 
 	buffer[0] = fHashSeed[0];
 	buffer[1] = fHashSeed[1];
 	buffer[2] = fHashSeed[2];
 	buffer[3] = fHashSeed[3];
 	
-	for (int length = strlen(name); length > 0; length -= 32) {
+	for (; length > 0; length -= 32) {
 		uint32 blocks[8];
 		
-		_PrepareBlocksForHash(name, length, blocks, 8);	
+		_PrepareBlocksForHash(name, (uint32)length, blocks, 8);	
 		_HalfMD4Transform(buffer, blocks);
 		
 		name += 32;
@@ -316,19 +359,21 @@ HTree::_TEATransform(uint32 buffer[4], uint32 blocks[4])
 
 
 uint32
-HTree::_HashTEA(const char* name)
+HTree::_HashTEA(const char* name, uint8 _length)
 {
+	TRACE("HTree::_HashTEA()\n");
 	uint32 buffer[4];
+	int32 length = _length;
 
 	buffer[0] = fHashSeed[0];
 	buffer[1] = fHashSeed[1];
 	buffer[2] = fHashSeed[2];
 	buffer[3] = fHashSeed[3];
 	
-	for (int length = strlen(name); length > 0; length -= 16) {
+	for (; length > 0; length -= 16) {
 		uint32 blocks[4];
 		
-		_PrepareBlocksForHash(name, length, blocks, 4);
+		_PrepareBlocksForHash(name, (uint32)length, blocks, 4);
 		TRACE("_HashTEA %lx %lx %lx\n", blocks[0], blocks[1], blocks[2]);
 		_TEATransform(buffer, blocks);
 		
@@ -340,21 +385,21 @@ HTree::_HashTEA(const char* name)
 
 
 void
-HTree::_PrepareBlocksForHash(const char* string, int length, uint32* blocks,
-	int numBlocks)
+HTree::_PrepareBlocksForHash(const char* string, uint32 length, uint32* blocks,
+	uint32 numBlocks)
 {
 	uint32 padding = (uint32)length;
 	padding = (padding << 8) | padding;
 	padding = (padding << 16) | padding;
 	
-	int numBytes = numBlocks * 4;
+	uint32 numBytes = numBlocks * 4;
 	if (length > numBytes)
 		length = numBytes;
 	
-	int completeIterations = length / 4;
+	uint32 completeIterations = length / 4;
 	
-	for (int i = 0; i < completeIterations; ++i) {
-		uint32 value = 0 | *(string++);
+	for (uint32 i = 0; i < completeIterations; ++i) {
+		uint32 value = (padding << 8) | *(string++);
 		value = (value << 8) | *(string++);
 		value = (value << 8) | *(string++);
 		value = (value << 8) | *(string++);
@@ -362,15 +407,24 @@ HTree::_PrepareBlocksForHash(const char* string, int length, uint32* blocks,
 	}
 	
 	if (completeIterations < numBlocks) {
-		int remainingBytes = length % 4;
+		uint32 remainingBytes = length % 4;
 		
 		uint32 value = padding;
-		for (int i = 0; i < remainingBytes; ++i)
+		for (uint32 i = 0; i < remainingBytes; ++i)
 			value = (value << 8) + *(string++);
 		
 		blocks[completeIterations] = value;
 		
-		for (int i = completeIterations + 1; i < numBlocks; ++i)
+		for (uint32 i = completeIterations + 1; i < numBlocks; ++i)
 			blocks[i] = padding;
 	}
+}
+
+
+/*inline*/ status_t
+HTree::_FallbackToLinearIteration(DirectoryIterator** iterator)
+{
+	*iterator = new(std::nothrow) DirectoryIterator(fDirectory);
+
+	return *iterator == NULL ? B_NO_MEMORY : B_OK;
 }

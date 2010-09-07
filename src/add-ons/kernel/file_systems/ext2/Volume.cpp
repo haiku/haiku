@@ -20,7 +20,10 @@
 
 #include <util/AutoLock.h>
 
+#include "CachedBlock.h"
 #include "Inode.h"
+#include "InodeJournal.h"
+#include "NoJournal.h"
 
 
 //#define TRACE_EXT2
@@ -199,7 +202,7 @@ ext2_super_block::IsValid()
 	// TODO: check some more values!
 	if (Magic() != (uint32)EXT2_SUPER_BLOCK_MAGIC)
 		return false;
-
+	
 	return true;
 }
 
@@ -210,6 +213,9 @@ ext2_super_block::IsValid()
 Volume::Volume(fs_volume* volume)
 	:
 	fFSVolume(volume),
+	fBlockAllocator(this),
+	fInodeAllocator(this),
+	fJournalInode(NULL),
 	fFlags(0),
 	fGroupBlocks(NULL),
 	fRootNode(NULL)
@@ -220,6 +226,7 @@ Volume::Volume(fs_volume* volume)
 
 Volume::~Volume()
 {
+	TRACE("Volume destructor.\n");
 	if (fGroupBlocks != NULL) {
 		uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1)
 			/ fGroupsPerBlock;
@@ -239,6 +246,13 @@ Volume::IsValidSuperBlock()
 }
 
 
+bool
+Volume::HasExtendedAttributes() const
+{
+	return (fSuperBlock.CompatibleFeatures() & EXT2_FEATURE_EXT_ATTR) != 0;
+}
+
+
 const char*
 Volume::Name() const
 {
@@ -252,8 +266,14 @@ Volume::Name() const
 status_t
 Volume::Mount(const char* deviceName, uint32 flags)
 {
-	flags |= B_MOUNT_READ_ONLY;
+	// flags |= B_MOUNT_READ_ONLY;
 		// we only support read-only for now
+	
+	if ((flags & B_MOUNT_READ_ONLY) != 0) {
+		TRACE("Volume::Mount(): Read only\n");
+	} else {
+		TRACE("Volume::Mount(): Read write\n");
+	}
 
 	DeviceOpener opener(deviceName, (flags & B_MOUNT_READ_ONLY) != 0
 		? O_RDONLY : O_RDWR);
@@ -278,10 +298,17 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fBlockSize = 1UL << fSuperBlock.BlockShift();
 	fFirstDataBlock = fSuperBlock.FirstDataBlock();
 
-	fNumInodes = fSuperBlock.NumInodes();
-	fNumGroups = (fSuperBlock.NumBlocks() - fFirstDataBlock - 1)
-		/ fSuperBlock.BlocksPerGroup() + 1;
+	fFreeBlocks = fSuperBlock.FreeBlocks();
+	fFreeInodes = fSuperBlock.FreeInodes();
+
+	uint32 numBlocks = fSuperBlock.NumBlocks() - fFirstDataBlock;
+	uint32 blocksPerGroup = fSuperBlock.BlocksPerGroup();
+	fNumGroups = numBlocks / blocksPerGroup;
+	if (numBlocks % blocksPerGroup != 0)
+		fNumGroups++;
+
 	fGroupsPerBlock = fBlockSize / sizeof(ext2_block_group);
+	fNumInodes = fSuperBlock.NumInodes();
 
 	TRACE("block size %ld, num groups %ld, groups per block %ld, first %lu\n",
 		fBlockSize, fNumGroups, fGroupsPerBlock, fFirstDataBlock);
@@ -309,7 +336,59 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fBlockCache = opener.InitCache(NumBlocks(), fBlockSize);
 	if (fBlockCache == NULL)
 		return B_ERROR;
+	
+	TRACE("Volume::Mount(): Initialized block cache: %p\n", fBlockCache);
 
+	// initialize journal
+	if ((fSuperBlock.CompatibleFeatures() & EXT2_FEATURE_HAS_JOURNAL) != 0) {
+		// TODO: There should be a mount option to ignore the existent journal
+		if (fSuperBlock.JournalInode() != 0) {
+			fJournalInode = new(std::nothrow) Inode(this, 
+				fSuperBlock.JournalInode());
+
+			if (fJournalInode == NULL)
+				return B_NO_MEMORY;
+
+			TRACE("Opening an on disk, inode mapped journal.\n");
+			fJournal = new(std::nothrow) InodeJournal(fJournalInode);
+		} else {
+			// TODO: external journal
+			TRACE("Can not open an external journal.\n");
+			return B_NOT_SUPPORTED;
+		}
+	} else {
+		TRACE("Opening a fake journal (NoJournal).\n");
+		fJournal = new(std::nothrow) NoJournal(this);
+	}
+
+	if (fJournal == NULL) {
+		TRACE("No memory to create the journal\n");
+		return B_NO_MEMORY;
+	}
+
+	TRACE("Volume::Mount(): Checking if journal was initialized\n");
+	status = fJournal->InitCheck();
+	if (status != B_OK)
+		return status;
+
+	// TODO: Only recover if asked to
+	TRACE("Volume::Mount(): Asking journal to recover\n");
+	status = fJournal->Recover();
+	if (status != B_OK)
+		return status;
+
+	TRACE("Volume::Mount(): Restart journal log\n");
+	status = fJournal->StartLog();
+	if (status != B_OK)
+		return status;
+
+	// Initialize allocators
+	TRACE("Volume::Mount(): Initialize block allocator\n");
+	status = fBlockAllocator.Initialize();
+	if (status != B_OK)
+		return status;
+
+	// ready
 	status = get_vnode(fFSVolume, EXT2_ROOT_NODE, (void**)&fRootNode);
 	if (status != B_OK) {
 		TRACE("could not create root node: get_vnode() failed!\n");
@@ -342,11 +421,22 @@ Volume::Mount(const char* deviceName, uint32 flags)
 status_t
 Volume::Unmount()
 {
+	TRACE("Volume::Unmount()\n");
+
+	status_t status = fJournal->Uninit();
+
+	delete fJournal;
+	delete fJournalInode;
+
+	TRACE("Volume::Unmount(): Putting root node\n");
 	put_vnode(fFSVolume, RootNode()->ID());
+	TRACE("Volume::Unmount(): Deleting the block cache\n");
 	block_cache_delete(fBlockCache, !IsReadOnly());
+	TRACE("Volume::Unmount(): Closing device\n");
 	close(fDevice);
 
-	return B_OK;
+	TRACE("Volume::Unmount(): Done\n");
+	return status;
 }
 
 
@@ -391,13 +481,13 @@ Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
 }
 
 
-off_t
-Volume::_GroupBlockOffset(uint32 blockIndex)
+uint32
+Volume::_GroupDescriptorBlock(uint32 blockIndex)
 {
 	if ((fSuperBlock.IncompatibleFeatures()
 			& EXT2_INCOMPATIBLE_FEATURE_META_GROUP) == 0
 		|| blockIndex < fSuperBlock.FirstMetaBlockGroup())
-		return off_t(fFirstDataBlock + blockIndex + 1) << fBlockShift;
+		return fFirstDataBlock + blockIndex + 1;
 
 	panic("meta block");
 	return 0;
@@ -419,18 +509,16 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 	MutexLocker _(fLock);
 
 	if (fGroupBlocks[blockIndex] == NULL) {
+		CachedBlock cached(this);
+		const uint8* block = cached.SetTo(_GroupDescriptorBlock(blockIndex));
+		if (block == NULL)
+			return B_IO_ERROR;
+
 		ext2_block_group* groupBlock = (ext2_block_group*)malloc(fBlockSize);
 		if (groupBlock == NULL)
 			return B_NO_MEMORY;
 
-		ssize_t bytesRead = read_pos(fDevice, _GroupBlockOffset(blockIndex),
-			groupBlock, fBlockSize);
-		if (bytesRead >= B_OK && (uint32)bytesRead != fBlockSize)
-			bytesRead = B_IO_ERROR;
-		if (bytesRead < B_OK) {
-			free(groupBlock);
-			return bytesRead;
-		}
+		memcpy((uint8*)groupBlock, block, fBlockSize);
 
 		fGroupBlocks[blockIndex] = groupBlock;
 
@@ -440,6 +528,261 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 
 	*_group = fGroupBlocks[blockIndex] + index % fGroupsPerBlock;
 	return B_OK;
+}
+
+
+status_t
+Volume::WriteBlockGroup(Transaction& transaction, int32 index)
+{
+	if (index < 0 || (uint32)index > fNumGroups)
+		return B_BAD_VALUE;
+
+	TRACE("Volume::WriteBlockGroup()\n");
+
+	int32 blockIndex = index / fGroupsPerBlock;
+
+	MutexLocker _(fLock);
+
+	if (fGroupBlocks[blockIndex] == NULL)
+		return B_BAD_VALUE;
+
+	CachedBlock cached(this);
+	uint8* block = cached.SetToWritable(transaction,
+		_GroupDescriptorBlock(blockIndex));
+	if (block == NULL)
+		return B_IO_ERROR;
+
+	memcpy(block, (const uint8*)fGroupBlocks[blockIndex], fBlockSize);
+
+	// TODO: Write copies
+
+	return B_OK;
+}
+
+
+status_t
+Volume::SaveOrphan(Transaction& transaction, ino_t newID, ino_t& oldID)
+{
+	oldID = fSuperBlock.LastOrphan();
+	TRACE("Volume::SaveOrphan(): Old: %d, New: %d\n", (int)oldID, (int)newID);
+	fSuperBlock.SetLastOrphan(newID);
+
+	return WriteSuperBlock(transaction);
+}
+
+
+status_t
+Volume::RemoveOrphan(Transaction& transaction, ino_t id)
+{
+	ino_t currentID = fSuperBlock.LastOrphan();
+	TRACE("Volume::RemoveOrphan(): ID: %d\n", (int)id);
+	if (currentID == 0)
+		return B_OK;
+
+	CachedBlock cached(this);
+
+	uint32 blockNum;
+	status_t status = GetInodeBlock(currentID, blockNum);
+	if (status != B_OK)
+		return status;
+
+	uint8* block = cached.SetToWritable(transaction, blockNum);
+	if (block == NULL)
+		return B_IO_ERROR;
+
+	ext2_inode* inode = (ext2_inode*)(block
+		+ InodeBlockIndex(currentID) * InodeSize());
+	
+	if (currentID == id) {
+		TRACE("Volume::RemoveOrphan(): First entry. Updating head to: %d\n",
+			(int)inode->NextOrphan());
+		fSuperBlock.SetLastOrphan(inode->NextOrphan());
+
+		return WriteSuperBlock(transaction);
+	}
+
+	currentID = inode->NextOrphan();
+	if (currentID == 0)
+		return B_OK;
+
+	do {
+		uint32 lastBlockNum = blockNum;
+		status = GetInodeBlock(currentID, blockNum);
+		if (status != B_OK)
+			return status;
+
+		if (blockNum != lastBlockNum) {
+			block = cached.SetToWritable(transaction, blockNum);
+			if (block == NULL)
+				return B_IO_ERROR;
+		}
+
+		ext2_inode* inode = (ext2_inode*)(block
+			+ InodeBlockIndex(currentID) * InodeSize());
+
+		currentID = inode->NextOrphan();
+		if (currentID == 0)
+			return B_OK;
+	} while(currentID != id);
+
+	CachedBlock cachedRemoved(this);
+
+	status = GetInodeBlock(id, blockNum);
+	if (status != B_OK)
+		return status;
+
+	uint8* removedBlock = cachedRemoved.SetToWritable(transaction, blockNum);
+	if (removedBlock == NULL)
+		return B_IO_ERROR;
+
+	ext2_inode* removedInode = (ext2_inode*)(removedBlock
+		+ InodeBlockIndex(id) * InodeSize());
+
+	// Next orphan is stored inside deletion time
+	inode->deletion_time = removedInode->deletion_time;
+	TRACE("Volume::RemoveOrphan(): Updated pointer to %d\n",
+		(int)inode->NextOrphan());
+
+	return status;
+}
+
+
+status_t
+Volume::AllocateInode(Transaction& transaction, Inode* parent, int32 mode,
+	ino_t& id)
+{
+	status_t status = fInodeAllocator.New(transaction, parent, mode, id);
+	if (status != B_OK)
+		return status;
+
+	--fFreeInodes;
+
+	return WriteSuperBlock(transaction);
+}
+
+
+status_t
+Volume::FreeInode(Transaction& transaction, ino_t id, bool isDirectory)
+{
+	status_t status = fInodeAllocator.Free(transaction, id, isDirectory);
+	if (status != B_OK)
+		return status;
+
+	++fFreeInodes;
+
+	return WriteSuperBlock(transaction);
+}
+
+
+status_t
+Volume::AllocateBlocks(Transaction& transaction, uint32 minimum, uint32 maximum,
+	uint32& blockGroup, uint32& start, uint32& length)
+{
+	TRACE("Volume::AllocateBlocks()\n");
+	if (IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	TRACE("Volume::AllocateBlocks(): Calling the block allocator\n");
+
+	status_t status = fBlockAllocator.AllocateBlocks(transaction, minimum,
+		maximum, blockGroup, start, length);
+	if (status != B_OK)
+		return status;
+
+	TRACE("Volume::AllocateBlocks(): Allocated %lu blocks\n", length);
+
+	fFreeBlocks -= length;
+
+	return WriteSuperBlock(transaction);
+}
+
+
+status_t
+Volume::FreeBlocks(Transaction& transaction, uint32 start, uint32 length)
+{
+	TRACE("Volume::FreeBlocks(%lu, %lu)\n", start, length);
+	if (IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	status_t status = fBlockAllocator.Free(transaction, start, length);
+	if (status != B_OK)
+		return status;
+
+	TRACE("Volume::FreeBlocks(): number of free blocks (before): %lu\n",
+		fFreeBlocks);
+	fFreeBlocks += length;
+	TRACE("Volume::FreeBlocks(): number of free blocks (after): %lu\n",
+		fFreeBlocks);
+
+	return WriteSuperBlock(transaction);
+}
+
+
+status_t
+Volume::LoadSuperBlock()
+{
+	CachedBlock cached(this);
+	const uint8* block = cached.SetTo(fFirstDataBlock);
+
+	if (block == NULL)
+		return B_IO_ERROR;
+
+	if (fFirstDataBlock == 0)
+		memcpy(&fSuperBlock, block + 1024, sizeof(fSuperBlock));
+	else
+		memcpy(&fSuperBlock, block, sizeof(fSuperBlock));
+
+	fFreeBlocks = fSuperBlock.FreeBlocks();
+	fFreeInodes = fSuperBlock.FreeInodes();
+
+	return B_OK;
+}
+
+
+status_t
+Volume::WriteSuperBlock(Transaction& transaction)
+{
+	TRACE("Volume::WriteSuperBlock()\n");
+	fSuperBlock.SetFreeBlocks(fFreeBlocks);
+	fSuperBlock.SetFreeInodes(fFreeInodes);
+	// TODO: Rest of fields that can be modified
+
+	TRACE("Volume::WriteSuperBlock(): free blocks: %lu, free inodes: %lu\n",
+		fSuperBlock.FreeBlocks(), fSuperBlock.FreeInodes());
+
+	CachedBlock cached(this);
+	uint8* block = cached.SetToWritable(transaction, fFirstDataBlock);
+
+	if (block == NULL)
+		return B_IO_ERROR;
+
+	TRACE("Volume::WriteSuperBlock(): first data block: %lu, block: %p, "
+		"superblock: %p\n", fFirstDataBlock, block, &fSuperBlock);
+
+	if (fFirstDataBlock == 0)
+		memcpy(block + 1024, &fSuperBlock, sizeof(fSuperBlock));
+	else
+		memcpy(block, &fSuperBlock, sizeof(fSuperBlock));
+
+	TRACE("Volume::WriteSuperBlock(): Done\n");
+
+	return B_OK;
+}
+
+
+status_t
+Volume::FlushDevice()
+{
+	TRACE("Volume::FlushDevice(): %p, %p\n", this, fBlockCache);
+	return block_cache_sync(fBlockCache);
+}
+
+
+status_t
+Volume::Sync()
+{
+	TRACE("Volume::Sync()\n");
+	return fJournal->FlushLogAndBlocks();
 }
 
 
@@ -460,3 +803,20 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 		? B_OK : B_NOT_SUPPORTED;
 }
 
+
+void
+Volume::TransactionDone(bool success)
+{
+	if (!success) {
+		status_t status = LoadSuperBlock();
+		if (status != B_OK)
+			panic("Failed to reload ext2 superblock.\n");
+	}
+}
+
+
+void
+Volume::RemovedFromTransaction()
+{
+	// TODO: Does it make a difference?
+}
