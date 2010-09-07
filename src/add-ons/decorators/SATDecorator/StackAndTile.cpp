@@ -117,7 +117,7 @@ StackAndTile::KeyPressed(uint32 what, int32 key, int32 modifiers)
 		if (!wasPressed && fSATKeyPressed)
 			_StartSAT();
 	}
-	
+
 	return;
 }
 
@@ -128,6 +128,13 @@ StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;
+
+	int32 modifiers = message->FindInt32("modifiers");
+	int32 buttons = message->FindInt32("buttons");
+	if (satWindow->GetDecorator()->MouseAction(message, where, buttons,
+		modifiers) != CLICK_DRAG)
+		return;
+
 	ASSERT(fCurrentSATWindow == NULL);
 	fCurrentSATWindow = satWindow;
 
