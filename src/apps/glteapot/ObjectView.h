@@ -40,12 +40,13 @@ enum lights {
 
 class ResScroll;
 class GLObject;
+class BCursor;
 
 struct TrackingInfo {
 	float		lastX;
 	float		lastY;
 	float		lastDx;
-	float		lastDy;	
+	float		lastDy;
 	bool		isTracking;
 	GLObject	*pickedObject;
 	uint32		buttons;
@@ -60,7 +61,7 @@ class ObjectView : public BGLView {
 		virtual	void	MouseDown(BPoint point);
 		virtual	void	MouseUp(BPoint point);
 		virtual	void	MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
-		
+
 		virtual	void	MessageReceived(BMessage* msg);
 		virtual	void	AttachedToWindow();
 		virtual	void	DetachedFromWindow();
@@ -71,11 +72,11 @@ class ObjectView : public BGLView {
 		virtual	void	Pulse();
 				void	EnforceState();
 				bool	RepositionView();
-		
+
 		sem_id			drawEvent;
 		sem_id			quittingSem;
-		
-	private:				
+
+	private:
 		thread_id		fDrawThread;
 		ResScroll*		fResScroll;
 		BList			fObjects;
@@ -89,7 +90,9 @@ class ObjectView : public BGLView {
 		bool			fLastFog, fFog, fForceRedraw;
 		float			fLastYXRatio, fYxRatio, fFpsHistory[HISTSIZE];
 		float			fObjectDistance, fLastObjectDistance;
-		TrackingInfo	fTrackingInfo;		
+		TrackingInfo	fTrackingInfo;
+		BCursor*		fGrabCursor;
+		BCursor*		fGrabbingCursor;
 };
 
 #endif // OBJECT_VIEW_H
