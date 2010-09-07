@@ -2390,7 +2390,7 @@ void ff_x264_deblock_h_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, in
 void ff_x264_deblock_v_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int beta);
 void ff_x264_deblock_h_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int beta);
 
-#if HAVE_YASM && ARCH_X86_32
+#if CONFIG_GPL && HAVE_YASM && ARCH_X86_32
 void ff_x264_deblock_v8_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta);
 static void ff_x264_deblock_v_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta)
 {
