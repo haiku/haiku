@@ -3,9 +3,12 @@
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
- 
 #ifndef __CPU_CAPABILITIES__
 #define __CPU_CAPABILITIES__
+
+
+#include <SupportDefs.h>
+
 
 #define CAPABILITY_MMX 1
 #define CAPABILITY_SSE1 2
