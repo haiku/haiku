@@ -140,7 +140,7 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	#legacy.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
-	aiff_reader asf_reader au_reader $(X86_ONLY)ffmpeg
+	aiff_reader asf_reader au_reader ffmpeg
 	mov_reader musepack ogg raw_decoder speex
 	$(X86_ONLY)ape_reader
 	# theora
@@ -575,6 +575,7 @@ AddDirectoryToHaikuImage home config add-ons kernel drivers dev ;
 AddDirectoryToHaikuImage home config add-ons input_server devices ;
 AddDirectoryToHaikuImage home config add-ons input_server filters ;
 AddDirectoryToHaikuImage home config add-ons input_server methods ;
+AddDirectoryToHaikuImage home config add-ons media plugins ;
 AddDirectoryToHaikuImage home config add-ons Tracker ;
 AddDirectoryToHaikuImage home config add-ons Print ;
 AddDirectoryToHaikuImage home config add-ons Screen\ Savers ;
