@@ -741,7 +741,7 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	double frameRate = FrameRate();
 	TRACE("  frameRate: %.4f\n", frameRate);
 
-	#if TRACE_AVFORMAT_READER
+	#ifdef TRACE_AVFORMAT_READER
 	if (fStream->start_time != kNoPTSValue) {
 		bigtime_t startTime = _ConvertFromStreamTimeBase(fStream->start_time);
 		TRACE("  start_time: %lld or %.5fs\n", startTime,
