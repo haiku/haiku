@@ -2,7 +2,11 @@
 #ifndef FFMPEG_CONFIG_H
 #define FFMPEG_CONFIG_H
 #define FFMPEG_CONFIGURATION "--prefix=/boot/common --enable-shared --disable-debug --disable-mmx --disable-demuxer=audio-beos --disable-muxer=audio-beos"
-#define FFMPEG_LICENSE "nonfree and unredistributable"
+#if CONFIG_GPL
+#	define FFMPEG_LICENSE "GPL version 2 or later"
+#else
+#	define FFMPEG_LICENSE "LGPL version 2.1 or later"
+#endif
 #define FFMPEG_DATADIR "/boot/common/share/ffmpeg"
 #define CC_TYPE "gcc"
 #define CC_VERSION __VERSION__
@@ -57,7 +61,6 @@
 #define HAVE_ARPA_INET_H 1
 #define HAVE_ATTRIBUTE_MAY_ALIAS 1
 #define HAVE_ATTRIBUTE_PACKED 1
-#define HAVE_BIGENDIAN 0
 #define HAVE_BSWAP 1
 #define HAVE_CLOSESOCKET 0
 #define HAVE_CMOV 0
@@ -75,10 +78,10 @@
 #define HAVE_EBP_AVAILABLE 1
 // We use position independant code so no EBX
 #define HAVE_EBX_AVAILABLE 0
-#define HAVE_EXP2 0
-#define HAVE_EXP2F 0
+#define HAVE_EXP2 1
+#define HAVE_EXP2F 1
 #define HAVE_FAST_64BIT 0
-#define HAVE_FAST_CLZ 0
+#define HAVE_FAST_CLZ 1
 #define HAVE_FAST_CMOV 0
 #define HAVE_FAST_UNALIGNED 1
 #define HAVE_FORK 1
@@ -206,11 +209,11 @@
 #define CONFIG_MPEGAUDIO_HP 1
 #define CONFIG_NETWORK 0
 #define CONFIG_NONFREE 0
-#define CONFIG_PIC 0
+#define CONFIG_PIC 1
 #define CONFIG_POSTPROC 0
 #define CONFIG_POWERPC_PERF 0
 #define CONFIG_RDFT 1
-#define CONFIG_RUNTIME_CPUDETECT 0
+#define CONFIG_RUNTIME_CPUDETECT 1
 #define CONFIG_SHARED 0
 #define CONFIG_SMALL 0
 #define CONFIG_SRAM 0
