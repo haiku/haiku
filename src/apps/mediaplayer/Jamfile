@@ -30,6 +30,7 @@ Application MediaPlayer :
 	PositionToolTip.cpp
 	SeekSlider.cpp
 	TransportButton.cpp
+	TransportControlGroup.cpp
 	VolumeSlider.cpp
 
 	# media_node_framework
@@ -103,7 +104,6 @@ Application MediaPlayer :
 	InfoWin.cpp
 	MainApp.cpp
 	MainWin.cpp
-	TransportControlGroup.cpp
 	VideoView.cpp
 
 	: be game media tracker translation textencoding $(TARGET_LIBSTDC++)
