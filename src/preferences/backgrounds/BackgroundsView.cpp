@@ -1204,7 +1204,8 @@ void
 PreView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	if (!IsTracking()) {
-		BCursor cursor(IsEnabled() ? B_CURSOR_ID_GRAB : B_CURSOR_ID_SYSTEM_DEFAULT);
+		BCursor cursor(IsEnabled() ?
+			B_CURSOR_ID_GRAB : B_CURSOR_ID_SYSTEM_DEFAULT);
 		SetViewCursor(&cursor);
 	} else {
 		float x, y;

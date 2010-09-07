@@ -517,7 +517,7 @@ ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 			setEvent(drawEvent);
 		}
 	} else {
-		GLObject* object = reinterpret_cast<GLObject*>(fObjects.ItemAt(ObjectAtPoint(point)));
+		void* object = fObjects.ItemAt(ObjectAtPoint(point));
 		BCursor cursor(object != NULL ?
 			B_CURSOR_ID_GRAB : B_CURSOR_ID_SYSTEM_DEFAULT);
 		SetViewCursor(&cursor);
