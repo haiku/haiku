@@ -518,8 +518,8 @@ ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 		}
 	} else {
 		void* object = fObjects.ItemAt(ObjectAtPoint(point));
-		BCursor cursor(object != NULL ?
-			B_CURSOR_ID_GRAB : B_CURSOR_ID_SYSTEM_DEFAULT);
+		BCursor cursor(object != NULL
+			? B_CURSOR_ID_GRAB : B_CURSOR_ID_SYSTEM_DEFAULT);
 		SetViewCursor(&cursor);
 	}
 }
