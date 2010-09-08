@@ -1,56 +1,47 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef VOLUME_SLIDER_H
 #define VOLUME_SLIDER_H
 
-#include <Control.h>
 
-class VolumeSlider : public BControl {
- public:
-								VolumeSlider(BRect frame,
-											 const char* name,
-											 int32 minValue,
-											 int32 maxValue,
-											 BMessage* message = NULL,
-											 BHandler* target = NULL);
+#include <Slider.h>
+
+
+class VolumeSlider : public BSlider {
+public:
+								VolumeSlider(const char* name,
+									int32 minValue, int32 maxValue,
+									int32 snapValue, BMessage* message = NULL);
 
 	virtual						~VolumeSlider();
 
-								// BControl
-	virtual	void				AttachedToWindow();
-	virtual	void				SetValue(int32 value);
-			void				SetValueNoInvoke(int32 value);
-	virtual void				SetEnabled(bool enable);
-	virtual void				Draw(BRect updateRect);
-	virtual void				MouseDown(BPoint where);
+	// BSlider interface
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
-										   const BMessage* dragMessage);
-	virtual	void				MouseUp(BPoint where);
+									const BMessage* dragMessage);
 
-								// VolumeSlider
-			bool				IsValid() const;
+	virtual BRect				ThumbFrame() const;
+	virtual	void				DrawThumb();
+
+	// VolumeSlider
 			void				SetMuted(bool mute);
 			bool				IsMuted() const
 									{ return fMuted; }
 
- private:
-			void				_MakeBitmaps();
-			void				_DimBitmap(BBitmap* bitmap);
-			int32				_ValueFor(float xPos) const;
+private:
+			float				_PointForValue(int32 value) const;
 
-			BBitmap*			fLeftSideBits;
-			BBitmap*			fRightSideBits;
-			BBitmap*			fKnobBits;
-			bool				fTracking;
+private:
 			bool				fMuted;
-			int32				fMinValue;
-			int32				fMaxValue;
+
+			int32				fSnapValue;
+			bool				fSnapping;
+			float				fMinSnap;
+			float				fMaxSnap;
 };
 
 #endif	// VOLUME_SLIDER_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef TRANSPORT_CONTROL_GROUP_H
@@ -11,14 +11,15 @@
 // removed. -Stephan Aßmus
 
 
-#include <View.h>
+#include <GroupView.h>
 
 
+class BShape;
 class PeakView;
 class PlayPauseButton;
 class PositionToolTip;
-class TransportButton;
 class SeekSlider;
+class SymbolButton;
 class VolumeSlider;
 
 enum {
@@ -32,7 +33,7 @@ enum {
 };
 
 
-class TransportControlGroup : public BView {
+class TransportControlGroup : public BGroupView {
 public:
 								TransportControlGroup(BRect frame,
 									bool useSkipButtons, bool usePeakView,
@@ -77,12 +78,6 @@ public:
 			void				SetDisabledString(const char* string);
 
 private:
-			void				_LayoutControls(BRect frame) const;
-			BRect				_MinFrame() const;
-			void				_LayoutControl(BView* view, BRect frame,
-								   bool resizeWidth = false,
-								   bool resizeHeight = false) const;
-
 			void				_TogglePlaying();
 			void				_Stop();
 			void				_Rewind();
@@ -98,21 +93,28 @@ private:
 			float				_DbToGain(float db);
 			float				_GainToDb(float gain);
 
+			BShape*				_CreateSkipBackwardsShape(float height) const;
+			BShape*				_CreateSkipForwardShape(float height) const;
+			BShape*				_CreateRewindShape(float height) const;
+			BShape*				_CreateForwardShape(float height) const;
+			BShape*				_CreatePlayShape(float height) const;
+			BShape*				_CreatePauseShape(float height) const;
+			BShape*				_CreateStopShape(float height) const;
+			BShape*				_CreateSpeakerShape(float height) const;
+
+private:
 			SeekSlider*			fSeekSlider;
 			PositionToolTip*	fPositionToolTip;
 			PeakView*			fPeakView;
 			VolumeSlider*		fVolumeSlider;
 
-			TransportButton*	fSkipBack;
-			TransportButton*	fSkipForward;
-			TransportButton*	fRewind;
-			TransportButton*	fForward;
+			SymbolButton*		fSkipBack;
+			SymbolButton*		fSkipForward;
+			SymbolButton*		fRewind;
+			SymbolButton*		fForward;
 			PlayPauseButton*	fPlayPause;
-			TransportButton*	fStop;
-			TransportButton*	fMute;
-
-			float				fBottomControlHeight;
-			float				fPeakViewMinWidth;
+			SymbolButton*		fStop;
+			SymbolButton*		fMute;
 };
 
 #endif	// TRANSPORT_CONTROL_GROUP_H

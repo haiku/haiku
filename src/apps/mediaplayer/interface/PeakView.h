@@ -51,8 +51,7 @@ public:
 	virtual	void				Draw(BRect area);
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				Pulse();
-	virtual	void				GetPreferredSize(float* _width,
-									float* _height);
+	virtual	BSize				MinSize();
 
 	// PeakView
 			bool				IsValid() const;
@@ -81,7 +80,7 @@ private:
 			struct ChannelInfo {
 				float			current_max;
 				float			last_max;
-				bool			overshot;
+				bigtime_t		last_overshot_time;
 			};
 
 			ChannelInfo*		fChannelInfos;

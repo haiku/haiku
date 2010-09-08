@@ -14,14 +14,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Shape.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 
-#include "ButtonBitmaps.h"
 #include "PeakView.h"
 #include "PlaybackState.h"
+#include "PlayPauseButton.h"
 #include "PositionToolTip.h"
 #include "SeekSlider.h"
-#include "TransportButton.h"
+#include "SymbolButton.h"
 #include "VolumeSlider.h"
 
 enum {
@@ -49,120 +51,124 @@ enum {
 #define kVolumeDbExpPositive 1.4	// for dB values > 0
 #define kVolumeDbExpNegative 1.9	// for dB values < 0
 
-#define kVolumeFactor	1000
+#define kVolumeFactor	100
 #define kPositionFactor	3000
 
 
 TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 		bool usePeakView, bool useWindButtons)
 	:
-	BView(frame, "transport control group", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_FRAME_EVENTS),
-	fBottomControlHeight(0.0),
-	fPeakViewMinWidth(0.0)
+	BGroupView(B_VERTICAL, 0)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	frame.Set(0.0, 0.0, 10.0, 10.0);
+	float symbolHeight = 9;
 
     // Seek Slider
-	fSeekSlider = new SeekSlider(frame, "seek slider", new BMessage(MSG_SEEK),
+	fSeekSlider = new SeekSlider("seek slider", new BMessage(MSG_SEEK),
 		0, kPositionFactor);
-	fSeekSlider->ResizeToPreferred();
-	AddChild(fSeekSlider);
+	GroupLayout()->AddView(fSeekSlider);
 
 	fPositionToolTip = new PositionToolTip();
 	fSeekSlider->SetToolTip(fPositionToolTip);
 
+	BGroupView* controlGroup = new BGroupView(B_HORIZONTAL, 0);
+	controlGroup->GroupLayout()->SetInsets(7, 5, 7, 5);
+	GroupLayout()->AddView(controlGroup);
+	BGroupLayout* controlLayout = controlGroup->GroupLayout();
+
+	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL, 0);
+	BGroupLayout* buttonLayout = buttonGroup->GroupLayout();
+	controlLayout->AddView(buttonGroup, 0.6f);
+
+	uint32 topBottomBorder = BControlLook::B_TOP_BORDER
+		| BControlLook::B_BOTTOM_BORDER;
+
     // Buttons
+
 	if (useSkipButtons) {
 		// Skip Back
-		frame.right = kRewindBitmapWidth - 1;
-		frame.bottom = kRewindBitmapHeight - 1;
-		fBottomControlHeight = kRewindBitmapHeight - 1.0;
-		fSkipBack = new TransportButton(frame, B_EMPTY_STRING,
-			kSkipBackBitmapBits, kPressedSkipBackBitmapBits,
-			kDisabledSkipBackBitmapBits, new BMessage(MSG_SKIP_BACKWARDS));
-		AddChild(fSkipBack);
-
-		// Skip Foward
-		fSkipForward = new TransportButton(frame, B_EMPTY_STRING,
-			kSkipForwardBitmapBits, kPressedSkipForwardBitmapBits,
-			kDisabledSkipForwardBitmapBits, new BMessage(MSG_SKIP_FORWARD));
-		AddChild(fSkipForward);
-	} else {
+		fSkipBack = new SymbolButton(B_EMPTY_STRING,
+			_CreateSkipBackwardsShape(symbolHeight),
+			new BMessage(MSG_SKIP_BACKWARDS),
+			BControlLook::B_LEFT_BORDER | topBottomBorder);
+		buttonLayout->AddView(fSkipBack);
+	} else
 		fSkipBack = NULL;
-		fSkipForward = NULL;
-	}
+
+	if (useWindButtons) {
+		// Rewind
+		fRewind = new SymbolButton(B_EMPTY_STRING,
+			_CreateRewindShape(symbolHeight), new BMessage(MSG_REWIND),
+			useSkipButtons ? topBottomBorder
+				: BControlLook::B_LEFT_BORDER | topBottomBorder);
+		buttonLayout->AddView(fRewind);
+	} else
+		fRewind = NULL;
+
+	// Play Pause
+	fPlayPause = new PlayPauseButton(B_EMPTY_STRING,
+		_CreatePlayShape(symbolHeight), _CreatePauseShape(symbolHeight),
+		new BMessage(MSG_PLAY), topBottomBorder);
+
+	buttonLayout->AddView(fPlayPause);
+
+	// Stop
+	fStop = new SymbolButton(B_EMPTY_STRING,
+		_CreateStopShape(symbolHeight), new BMessage(MSG_STOP),
+		topBottomBorder);
+	buttonLayout->AddView(fStop);
 
 	if (useWindButtons) {
 		// Forward
-		fForward = new TransportButton(frame, B_EMPTY_STRING,
-			kForwardBitmapBits, kPressedForwardBitmapBits,
-			kDisabledForwardBitmapBits, new BMessage(MSG_FORWARD));
-		AddChild(fForward);
-
-		// Rewind
-		fRewind = new TransportButton(frame, B_EMPTY_STRING,
-			kRewindBitmapBits, kPressedRewindBitmapBits,
-			kDisabledRewindBitmapBits, new BMessage(MSG_REWIND));
-		AddChild(fRewind);
-	} else {
+		fForward = new SymbolButton(B_EMPTY_STRING,
+			_CreateForwardShape(symbolHeight), new BMessage(MSG_FORWARD),
+			useSkipButtons ? topBottomBorder
+				: BControlLook::B_RIGHT_BORDER | topBottomBorder);
+		buttonLayout->AddView(fForward);
+	} else
 		fForward = NULL;
-		fRewind = NULL;
-	}
 
-	// Play Pause
-	frame.right = kPlayPauseBitmapWidth - 1;
-	frame.bottom = kPlayPauseBitmapHeight - 1;
-	if (fBottomControlHeight < kPlayPauseBitmapHeight - 1.0)
-		fBottomControlHeight = kPlayPauseBitmapHeight - 1.0;
-	fPlayPause = new PlayPauseButton(frame, B_EMPTY_STRING,
-		kPlayButtonBitmapBits, kPressedPlayButtonBitmapBits,
-		kDisabledPlayButtonBitmapBits, kPlayingPlayButtonBitmapBits,
-		kPressedPlayingPlayButtonBitmapBits, kPausedPlayButtonBitmapBits,
-		kPressedPausedPlayButtonBitmapBits, new BMessage(MSG_PLAY));
+	if (useSkipButtons) {
+		// Skip Foward
+		fSkipForward = new SymbolButton(B_EMPTY_STRING,
+			_CreateSkipForwardShape(symbolHeight),
+			new BMessage(MSG_SKIP_FORWARD),
+			BControlLook::B_RIGHT_BORDER | topBottomBorder);
+		buttonLayout->AddView(fSkipForward);
+	} else
+		fSkipForward = NULL;
 
-	AddChild(fPlayPause);
-
-	// Stop
-	frame.right = kStopBitmapWidth - 1;
-	frame.bottom = kStopBitmapHeight - 1;
-	if (fBottomControlHeight < kStopBitmapHeight - 1.0)
-		fBottomControlHeight = kStopBitmapHeight - 1.0;
-	fStop = new TransportButton(frame, B_EMPTY_STRING, kStopButtonBitmapBits,
-		kPressedStopButtonBitmapBits, kDisabledStopButtonBitmapBits,
-		new BMessage(MSG_STOP));
-	AddChild(fStop);
+	controlGroup->GroupLayout()->AddItem(
+		BSpaceLayoutItem::CreateHorizontalStrut(5));
 
 	// Mute
-	frame.right = kSpeakerIconBitmapWidth - 1;
-	frame.bottom = kSpeakerIconBitmapHeight - 1;
-	if (fBottomControlHeight < kSpeakerIconBitmapHeight - 1.0)
-		fBottomControlHeight = kSpeakerIconBitmapHeight - 1.0;
-	fMute = new TransportButton(frame, B_EMPTY_STRING, kSpeakerIconBits,
-		kPressedSpeakerIconBits, kSpeakerIconBits, new BMessage(MSG_SET_MUTE));
-
-	AddChild(fMute);
+	BShape* speakerShape = _CreateSpeakerShape(8);
+	fMute = new SymbolButton(B_EMPTY_STRING, speakerShape,
+		new BMessage(MSG_SET_MUTE), 0);
+	fMute->SetExplicitMinSize(BSize(speakerShape->Bounds().Width(),
+		speakerShape->Bounds().Height()));
+	controlLayout->AddView(fMute);
 
 	// Volume Slider
-	fVolumeSlider = new VolumeSlider(BRect(0.0, 0.0, VOLUME_MIN_WIDTH,
-		kVolumeSliderBitmapHeight - 1.0), "volume slider",
+	fVolumeSlider = new VolumeSlider("volume slider",
 		_DbToGain(_ExponentialToLinear(kVolumeDbMin)) * kVolumeFactor,
 		_DbToGain(_ExponentialToLinear(kVolumeDbMax)) * kVolumeFactor,
-		new BMessage(MSG_SET_VOLUME));
+		kVolumeFactor, new BMessage(MSG_SET_VOLUME));
 	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(0.0))
 		* kVolumeFactor);
-	AddChild(fVolumeSlider);
+	controlLayout->AddView(fVolumeSlider);
 
 	// Peak view
 	if (usePeakView) {
 		fPeakView = new PeakView("peak view", false, false);
-		AddChild(fPeakView);
-		fPeakView->GetPreferredSize(&fPeakViewMinWidth, NULL);
-	} else {
+		controlLayout->AddView(fPeakView, 0.6f);
+	} else
 		fPeakView = NULL;
-	}
+
+	BSize size = controlLayout->MinSize();
+	size.width *= 3;
+	controlLayout->SetExplicitMaxSize(size);
+	controlLayout->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+		B_ALIGN_TOP));
 }
 
 
@@ -192,30 +198,24 @@ TransportControlGroup::AttachedToWindow()
 	fPlayPause->SetTarget(this);
 	fStop->SetTarget(this);
 	fMute->SetTarget(this);
-
-	FrameResized(Bounds().Width(), Bounds().Height());
 }
 
 
 void
 TransportControlGroup::FrameResized(float width, float height)
 {
-	// layout controls
-	BRect r(Bounds());
-	r.InsetBy(BORDER_INSET, BORDER_INSET);
-	_LayoutControls(r);
+	DoLayout();
 }
 
 
 void
-TransportControlGroup::GetPreferredSize(float* width, float* height)
+TransportControlGroup::GetPreferredSize(float* _width, float* _height)
 {
-	BRect r(_MinFrame());
-
-	if (width)
-		*width = r.Width();
-	if (height)
-		*height = r.Height();
+	BSize size = GroupLayout()->MinSize();
+	if (_width != NULL)
+		*_width = size.width;
+	if (_height != NULL)
+		*_height = size.height;
 }
 
 
@@ -301,7 +301,6 @@ TransportControlGroup::_LinearToExponential(float dbIn)
 		db = pow(db, kVolumeDbExpNegative);
 		db = -db;
 	}
-	printf("_LinearToExponential %.4f => %.4f\n", dbIn, db);
 	return db;
 }
 
@@ -321,7 +320,6 @@ TransportControlGroup::_ExponentialToLinear(float dbIn)
 			(1.0 / kVolumeDbExpNegative)));
 		db = -db;
 	}
-	//printf("_ExponentialToLinear %.4f => %.4f\n", dbIn, db);
 	return db;
 }
 
@@ -448,7 +446,7 @@ TransportControlGroup::SetVolume(float value)
 	float gain = _DbToGain(exponential);
 	int32 pos = (int32)(floorf(gain * kVolumeFactor + 0.5));
 
-	fVolumeSlider->SetValueNoInvoke(pos);
+	fVolumeSlider->SetValue(pos);
 }
 
 
@@ -486,147 +484,6 @@ TransportControlGroup::SetDisabledString(const char* string)
 
 
 // #pragma mark -
-
-
-void
-TransportControlGroup::_LayoutControls(BRect frame) const
-{
-	BRect r(frame);
-	// calculate absolutly minimal width
-	float minWidth = 0.0;
-	if (fSkipBack)
-		minWidth += fSkipBack->Bounds().Width();
-	if (fRewind)
-		minWidth += fRewind->Bounds().Width();
-	minWidth += fStop->Bounds().Width();
-	minWidth += fPlayPause->Bounds().Width();
-	if (fForward)
-		minWidth += fForward->Bounds().Width();
-	if (fSkipForward)
-		minWidth += fSkipForward->Bounds().Width();
-	minWidth += fMute->Bounds().Width();
-	minWidth += VOLUME_MIN_WIDTH;
-	if (fPeakView)
-		minWidth += fPeakViewMinWidth;
-
-	// layout seek slider
-	r.bottom = r.top + fSeekSlider->Bounds().Height();
-	_LayoutControl(fSeekSlider, r, true);
-
-	// prevent spreading the controls too much
-	if (frame.Width() > minWidth * 2.0)
-		frame.right = frame.left + ceilf(minWidth * 2.0);
-
-	float currentWidth = frame.Width();
-	float space = (currentWidth - minWidth) / 6.0;
-	// apply weighting
-	space = min_c(MIN_SPACE + (space - MIN_SPACE) / VOLUME_SLIDER_LAYOUT_WEIGHT,
-		MIN_SPACE * 2.0);
-	// layout controls with "space" inbetween
-	r.left = frame.left;
-	r.top = r.bottom + MIN_SPACE + 1.0;
-	r.bottom = frame.bottom;
-	// skip back
-	if (fSkipBack) {
-		r.right = r.left + fSkipBack->Bounds().Width();
-		_LayoutControl(fSkipBack, r);
-		r.left = r.right + space;
-	}
-	// rewind
-	if (fRewind) {
-		r.right = r.left + fRewind->Bounds().Width();
-		_LayoutControl(fRewind, r);
-		r.left = r.right + space;
-	}
-	// stop
-	r.right = r.left + fStop->Bounds().Width();
-	_LayoutControl(fStop, r);
-	r.left = r.right + space;
-	// play/pause
-	r.right = r.left + fPlayPause->Bounds().Width();
-	_LayoutControl(fPlayPause, r);
-	r.left = r.right + space;
-	// forward
-	if (fForward) {
-		r.right = r.left + fForward->Bounds().Width();
-		_LayoutControl(fForward, r);
-		r.left = r.right + space;
-	}
-	// skip forward
-	if (fSkipForward) {
-		r.right = r.left + fSkipForward->Bounds().Width();
-		_LayoutControl(fSkipForward, r);
-		r.left = r.right + space;
-	}
-	// speaker icon
-	r.left = r.right + space + space;
-	r.right = r.left + fMute->Bounds().Width();
-	_LayoutControl(fMute, r);
-
-	// volume slider
-	r.left = r.right + SPEAKER_SLIDER_DIST;
-		// keep speaker icon and volume slider attached
-	// layout volume slider
-	float peakViewWidth = 0.0;
-	if (fPeakView)
-		peakViewWidth = (frame.right - r.left) / 2 + space;
-
-	r.right = frame.right - peakViewWidth;
-	_LayoutControl(fVolumeSlider, r, true);
-
-	if (fPeakView) {
-		peakViewWidth -= space;
-		r.left = r.right + space;
-		r.right = r.left + peakViewWidth;
-		_LayoutControl(fPeakView, r, true, true);
-	}
-}
-
-
-BRect
-TransportControlGroup::_MinFrame() const
-{
-	// add up width of controls along bottom (seek slider will likely adopt)
-	float minWidth = 2 * BORDER_INSET;
-	if (fSkipBack)
-		minWidth += fSkipBack->Bounds().Width() + MIN_SPACE;
-	if (fRewind)
-		minWidth += fRewind->Bounds().Width() + MIN_SPACE;
-	minWidth += fStop->Bounds().Width() + MIN_SPACE;
-	minWidth += fPlayPause->Bounds().Width() + MIN_SPACE;
-	if (fForward)
-		minWidth += fForward->Bounds().Width() + MIN_SPACE;
-	if (fSkipForward)
-		minWidth += fSkipForward->Bounds().Width() + MIN_SPACE + MIN_SPACE;
-	minWidth += fMute->Bounds().Width() + SPEAKER_SLIDER_DIST;
-	minWidth += VOLUME_MIN_WIDTH;
-	if (fPeakView)
-		minWidth += fPeakViewMinWidth;
-
-	// add up height of seek slider and heighest control on bottom
-	float minHeight = 2 * BORDER_INSET;
-	minHeight += fSeekSlider->Bounds().Height() + MIN_SPACE + MIN_SPACE / 2.0;
-	minHeight += fBottomControlHeight;
-	return BRect(0.0, 0.0, minWidth - 1.0, minHeight - 1.0);
-}
-
-
-void
-TransportControlGroup::_LayoutControl(BView* view, BRect frame,
-	bool resizeWidth, bool resizeHeight) const
-{
-	if (!resizeHeight)
-		// center vertically
-		frame.top = (frame.top + frame.bottom - view->Bounds().Height()) / 2.0;
-	if (!resizeWidth)
-		// center horizontally
-		frame.left = (frame.left + frame.right - view->Bounds().Width()) / 2.0;
-	view->MoveTo(frame.LeftTop());
-	float width = resizeWidth ? frame.Width() : view->Bounds().Width();
-	float height = resizeHeight ? frame.Height() : view->Bounds().Height();
-	if (resizeWidth || resizeHeight)
-		view->ResizeTo(width, height);
-}
 
 
 void
@@ -678,7 +535,6 @@ TransportControlGroup::_UpdateVolume()
 	float pos = fVolumeSlider->Value() / (float)kVolumeFactor;
 	float db = _ExponentialToLinear(_GainToDb(pos));
 	float gain = _DbToGain(db);
-	printf("_SetVolume: pos %.4f, db %.4f, gain %.4f\n", pos, db, gain);
 	VolumeChanged(gain);
 }
 
@@ -696,3 +552,224 @@ TransportControlGroup::_UpdatePosition()
 {
 	PositionChanged(fSeekSlider->Value() / (float)kPositionFactor);
 }
+
+
+// #pragma mark -
+
+
+BShape*
+TransportControlGroup::_CreateSkipBackwardsShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	float stopWidth = ceilf(height / 6);
+
+	shape->MoveTo(BPoint(-stopWidth, height));
+	shape->LineTo(BPoint(0, height));
+	shape->LineTo(BPoint(0, 0));
+	shape->LineTo(BPoint(-stopWidth, 0));
+	shape->Close();
+
+	shape->MoveTo(BPoint(0, height / 2));
+	shape->LineTo(BPoint(height, height));
+	shape->LineTo(BPoint(height, 0));
+	shape->Close();
+
+	shape->MoveTo(BPoint(height, height / 2));
+	shape->LineTo(BPoint(height * 2, height));
+	shape->LineTo(BPoint(height * 2, 0));
+	shape->Close();
+
+	return shape;
+}
+
+
+BShape*
+TransportControlGroup::_CreateSkipForwardShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	shape->MoveTo(BPoint(height, height / 2));
+	shape->LineTo(BPoint(0, height));
+	shape->LineTo(BPoint(0, 0));
+	shape->Close();
+
+	shape->MoveTo(BPoint(height * 2, height / 2));
+	shape->LineTo(BPoint(height, height));
+	shape->LineTo(BPoint(height, 0));
+	shape->Close();
+
+	float stopWidth = ceilf(height / 6);
+
+	shape->MoveTo(BPoint(height * 2, height));
+	shape->LineTo(BPoint(height * 2 + stopWidth, height));
+	shape->LineTo(BPoint(height * 2 + stopWidth, 0));
+	shape->LineTo(BPoint(height * 2, 0));
+	shape->Close();
+
+	return shape;
+}
+
+
+BShape*
+TransportControlGroup::_CreateRewindShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	shape->MoveTo(BPoint(0, height / 2));
+	shape->LineTo(BPoint(height, height));
+	shape->LineTo(BPoint(height, 0));
+	shape->Close();
+
+	shape->MoveTo(BPoint(height, height / 2));
+	shape->LineTo(BPoint(height * 2, height));
+	shape->LineTo(BPoint(height * 2, 0));
+	shape->Close();
+
+	return shape;
+}
+
+
+BShape*
+TransportControlGroup::_CreateForwardShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	shape->MoveTo(BPoint(height, height / 2));
+	shape->LineTo(BPoint(0, height));
+	shape->LineTo(BPoint(0, 0));
+	shape->Close();
+
+	shape->MoveTo(BPoint(height * 2, height / 2));
+	shape->LineTo(BPoint(height, height));
+	shape->LineTo(BPoint(height, 0));
+	shape->Close();
+
+	return shape;
+}
+
+
+BShape*
+TransportControlGroup::_CreatePlayShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	float step = floorf(height / 8);
+
+	shape->MoveTo(BPoint(height + step, height / 2));
+	shape->LineTo(BPoint(-step, height + step));
+	shape->LineTo(BPoint(-step, 0 - step));
+	shape->Close();
+
+	return shape;
+}
+
+
+BShape*
+TransportControlGroup::_CreatePauseShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	float stemWidth = floorf(height / 3);
+
+	shape->MoveTo(BPoint(0, height));
+	shape->LineTo(BPoint(stemWidth, height));
+	shape->LineTo(BPoint(stemWidth, 0));
+	shape->LineTo(BPoint(0, 0));
+	shape->Close();
+
+	shape->MoveTo(BPoint(height - stemWidth, height));
+	shape->LineTo(BPoint(height, height));
+	shape->LineTo(BPoint(height, 0));
+	shape->LineTo(BPoint(height - stemWidth, 0));
+	shape->Close();
+
+	return shape;
+}
+
+
+BShape*
+TransportControlGroup::_CreateStopShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	shape->MoveTo(BPoint(0, height));
+	shape->LineTo(BPoint(height, height));
+	shape->LineTo(BPoint(height, 0));
+	shape->LineTo(BPoint(0, 0));
+	shape->Close();
+
+	return shape;
+}
+
+
+static void
+add_bow(BShape* shape, float offset, float size, float height, float step)
+{
+	float width = floorf(size * 2 / 3);
+	float outerControlHeight = size * 2 / 3;
+	float outerControlWidth = size / 4;
+	float innerControlHeight = size / 2;
+	float innerControlWidth = size / 5;
+	// left/bottom
+	shape->MoveTo(BPoint(offset, height / 2 + size));
+	// outer bow, to middle
+	shape->BezierTo(
+		BPoint(offset + outerControlWidth, height / 2 + size),
+		BPoint(offset + width, height / 2 + outerControlHeight),
+		BPoint(offset + width, height / 2)
+	);
+	// outer bow, to left/top
+	shape->BezierTo(
+		BPoint(offset + width, height / 2 - outerControlHeight),
+		BPoint(offset + outerControlWidth, height / 2 - size),
+		BPoint(offset, height / 2 - size)
+	);
+	// inner bow, to middle
+	shape->BezierTo(
+		BPoint(offset + innerControlWidth, height / 2 - size),
+		BPoint(offset + width - step, height / 2 - innerControlHeight),
+		BPoint(offset + width - step, height / 2)
+	);
+	// inner bow, back to left/bottom
+	shape->BezierTo(
+		BPoint(offset + width - step, height / 2 + innerControlHeight),
+		BPoint(offset + innerControlWidth, height / 2 + size),
+		BPoint(offset, height / 2 + size)
+	);
+	shape->Close();
+}
+
+
+BShape*
+TransportControlGroup::_CreateSpeakerShape(float height) const
+{
+	BShape* shape = new BShape();
+
+	float step = floorf(height / 8);
+	float magnetWidth = floorf(height / 5);
+	float chassieWidth = floorf(height / 1.5);
+	float chassieHeight = floorf(height / 4);
+
+	shape->MoveTo(BPoint(0, height - step));
+	shape->LineTo(BPoint(magnetWidth, height - step));
+	shape->LineTo(BPoint(magnetWidth, height / 2 + chassieHeight));
+	shape->LineTo(BPoint(magnetWidth + chassieWidth - step, height + step));
+	shape->LineTo(BPoint(magnetWidth + chassieWidth, height + step));
+	shape->LineTo(BPoint(magnetWidth + chassieWidth, -step));
+	shape->LineTo(BPoint(magnetWidth + chassieWidth - step, -step));
+	shape->LineTo(BPoint(magnetWidth, height / 2 - chassieHeight));
+	shape->LineTo(BPoint(magnetWidth, step));
+	shape->LineTo(BPoint(0, step));
+	shape->Close();
+
+	float offset = magnetWidth + chassieWidth + step * 2;
+	add_bow(shape, offset, 3 * step, height, step * 2);
+	offset += step * 2;
+	add_bow(shape, offset, 5 * step, height, step * 2);
+	offset += step * 2;
+	add_bow(shape, offset, 7 * step, height, step * 2);
+
+	return shape;
+}
+

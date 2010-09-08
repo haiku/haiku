@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
@@ -32,10 +33,8 @@ enum {
 
 PeakView::PeakView(const char* name, bool useGlobalPulse, bool displayLabels)
 	:
-	BView(BRect(0.0, 0.0, 155.0 + 4.0, 10.0 + 4.0),
-		name, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		useGlobalPulse ? B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS
-			: B_WILL_DRAW | B_FRAME_EVENTS),
+	BView(name, (useGlobalPulse ? 0 : B_PULSE_NEEDED)
+		| B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE),
 	fUseGlobalPulse(useGlobalPulse),
 	fDisplayLabels(displayLabels),
 	fPeakLocked(false),
@@ -53,9 +52,6 @@ PeakView::PeakView(const char* name, bool useGlobalPulse, bool displayLabels)
 
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetViewColor(B_TRANSPARENT_COLOR);
-
-	if (fDisplayLabels)
-		ResizeBy(0, ceilf(fFontHeight.ascent + fFontHeight.descent));
 
 	SetChannelCount(2);
 }
@@ -126,7 +122,7 @@ PeakView::MouseDown(BPoint where)
 		// Reset the overshot flag and set the observed max to the current
 		// value.
 		for (uint32 i = 0; i < fChannelCount; i++) {
-			fChannelInfos[i].overshot = false;
+			fChannelInfos[i].last_overshot_time = -5000000;
 			fChannelInfos[i].last_max = fChannelInfos[i].current_max;
 		}
 	} else if (buttons & B_TERTIARY_MOUSE_BUTTON) {
@@ -160,41 +156,19 @@ PeakView::MouseDown(BPoint where)
 
 
 void
-PeakView::Draw(BRect area)
+PeakView::Draw(BRect updateRect)
 {
-	rgb_color background = LowColor();
-	rgb_color lightShadow = tint_color(background, B_DARKEN_1_TINT);
-	rgb_color darkShadow = tint_color(background, B_DARKEN_4_TINT);
-	rgb_color light = tint_color(background, B_LIGHTEN_MAX_TINT);
-	rgb_color black = tint_color(background, B_DARKEN_MAX_TINT);
 	BRect r(_BackBitmapFrame());
 	float width = r.Width();
 	r.InsetBy(-2.0, -2.0);
-	// frame
-	BeginLineArray(8);
-		AddLine(BPoint(r.left, r.bottom), BPoint(r.left, r.top), lightShadow);
-		AddLine(BPoint(r.left + 1.0, r.top), BPoint(r.right, r.top),
-			lightShadow);
-		AddLine(BPoint(r.right, r.top + 1.0), BPoint(r.right, r.bottom),
-			light);
-		AddLine(BPoint(r.right - 1.0, r.bottom),
-			BPoint(r.left + 1.0, r.bottom), light);
-		r.InsetBy(1.0, 1.0);
-		AddLine(BPoint(r.left, r.bottom), BPoint(r.left, r.top), darkShadow);
-		AddLine(BPoint(r.left + 1.0, r.top), BPoint(r.right, r.top),
-			darkShadow);
-		AddLine(BPoint(r.right, r.top + 1.0), BPoint(r.right, r.bottom),
-			lightShadow);
-		AddLine(BPoint(r.right - 1.0, r.bottom),
-			BPoint(r.left + 1.0, r.bottom), lightShadow);
-		r.InsetBy(1.0, 1.0);
-	EndLineArray();
+
+	be_control_look->DrawTextControlBorder(this, r, updateRect, LowColor());
 
 	// peak bitmap
 	if (fBackBitmap)
 		_DrawBitmap();
 
-	// dB
+	// dB labels
 	if (fDisplayLabels) {
 		font_height fh;
 		GetFontHeight(&fh);
@@ -224,7 +198,7 @@ PeakView::Pulse()
 
 	if (!fPeakLocked) {
 		for (uint32 i = 0; i < fChannelCount; i++) {
-			fChannelInfos[i].last_max *= 0.90f;
+			fChannelInfos[i].last_max *= 0.96f;
 			if (fChannelInfos[i].current_max > fChannelInfos[i].last_max)
 				fChannelInfos[i].last_max = fChannelInfos[i].current_max;
 		}
@@ -239,25 +213,18 @@ PeakView::Pulse()
 }
 
 
-void
-PeakView::GetPreferredSize(float* _width, float* _height)
+BSize
+PeakView::MinSize()
 {
-	float minWidth = 0;
-	float minHeight = 0;
-	if (fBackBitmap) {
-		minWidth = 20 + 4;
-		minHeight = 3 + 4;
-	}
+	float minWidth = 20 + 4;
+	float minHeight = 2 * 8 - 1 + 4;
 	if (fDisplayLabels) {
 		font_height fh;
 		GetFontHeight(&fh);
 		minWidth = max_c(60.0, minWidth);
 		minHeight += ceilf(fh.ascent + fh.descent);
 	}
-	if (_width)
-		*_width = minWidth;
-	if (_height)
-		*_height = minHeight;
+	return BSize(minWidth, minHeight);
 }
 
 
@@ -302,7 +269,7 @@ PeakView::SetChannelCount(uint32 channelCount)
 		for (uint32 i = 0; i < fChannelCount; i++) {
 			fChannelInfos[i].current_max = 0.0f;
 			fChannelInfos[i].last_max = 0.0f;
-			fChannelInfos[i].overshot = false;
+			fChannelInfos[i].last_overshot_time = -5000000;
 		}
 		_ResizeBackBitmap(_BackBitmapFrame().IntegerWidth() + 1,
 			fChannelCount);
@@ -321,7 +288,7 @@ PeakView::SetMax(float max, uint32 channel)
 		fChannelInfos[channel].current_max = max;
 
 	if (fChannelInfos[channel].current_max > 1.0)
-		fChannelInfos[channel].overshot = true;
+		fChannelInfos[channel].last_overshot_time = system_time();
 }
 
 
@@ -373,7 +340,8 @@ PeakView::_UpdateBackBitmap()
 	uint32 width = fBackBitmap->Bounds().IntegerWidth() + 1;
 	for (uint32 i = 0; i < fChannelCount; i++) {
 		_RenderSpan(span, width, fChannelInfos[i].current_max,
-			fChannelInfos[i].last_max, fChannelInfos[i].overshot);
+			fChannelInfos[i].last_max,
+			system_time() - fChannelInfos[i].last_overshot_time < 2000000);
 		span += fBackBitmap->BytesPerRow();
 	}
 }
@@ -403,16 +371,17 @@ PeakView:: _RenderSpan(uint8* span, uint32 width, float current, float peak,
 	uint8 overG = 89;
 	uint8 overB = 7;
 
-	uint8 kFadeFactor = 180;
+	uint8 kFadeFactor = 100;
 
-	uint32 split = (uint32)(current * (width - 2) + 0.5);
+	uint32 evenWidth = width - width % 2;
+	uint32 split = (uint32)(current * (evenWidth - 1) + 0.5);
 	split += split & 1;
-	uint32 last = (uint32)(peak * (width - 2) + 0.5);
+	uint32 last = (uint32)(peak * (evenWidth - 1) + 0.5);
 	last += last & 1;
-	uint32 over = overshot ? width - 1 : width;
+	uint32 over = overshot ? evenWidth : evenWidth + 1;
 	over += over & 1;
 
-	for (uint32 x = 0; x < width - 1; x += 2) {
+	for (uint32 x = 0; x < width; x += 2) {
 		uint8 fadedB = (uint8)(((int)span[0] * kFadeFactor) >> 8);
 		uint8 fadedG = (uint8)(((int)span[1] * kFadeFactor) >> 8);
 		uint8 fadedR = (uint8)(((int)span[2] * kFadeFactor) >> 8);
@@ -451,16 +420,18 @@ PeakView::_DrawBitmap()
 	BRect bitmapFrame = _BackBitmapFrame();
 	BRect bitmapRect = fBackBitmap->Bounds();
 	bitmapRect.bottom = bitmapRect.top;
-	float channelHeight = (bitmapFrame.Height() + 2) / fChannelCount;
+	float channelHeight = (bitmapFrame.Height() + 1) / fChannelCount;
 	for (uint32 i = 0; i < fChannelCount; i++) {
 		BRect viewRect(bitmapFrame);
-		viewRect.top += floorf(i * channelHeight);
-		viewRect.bottom = viewRect.top + ceilf(channelHeight - 2);
-		DrawBitmapAsync(fBackBitmap, bitmapRect, viewRect);
+		viewRect.bottom = viewRect.top;
+		viewRect.top += floorf(i * channelHeight + 0.5);
 		if (i < fChannelCount - 1) {
+			viewRect.bottom += floorf((i + 1) * channelHeight + 0.5) - 2;
 			StrokeLine(BPoint(viewRect.left, viewRect.bottom + 1),
 				BPoint(viewRect.right, viewRect.bottom + 1));
-		}
+		} else
+			viewRect.bottom += floorf((i + 1) * channelHeight + 0.5) - 1;
+		DrawBitmapAsync(fBackBitmap, bitmapRect, viewRect);
 		bitmapRect.OffsetBy(0, 1);
 	}
 }
