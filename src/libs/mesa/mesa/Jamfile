@@ -362,6 +362,7 @@ if $(TARGET_ARCH) = x86 {
 MergeObject <mesa>glapi-dispatching.o :
 
 	glapi.c
+	glapi_getproc.c
 	glthread.c
 
 	$(arch_sources)
