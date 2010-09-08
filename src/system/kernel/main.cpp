@@ -64,6 +64,7 @@
 #endif
 
 bool gKernelStartup = true;
+bool gKernelShutdown = false;
 
 static kernel_args sKernelArgs;
 static uint32 sCpuRendezvous;

@@ -49,6 +49,7 @@
 
 /* during kernel startup, interrupts are disabled (among other things) */
 extern bool gKernelStartup;
+extern bool gKernelShutdown;
 
 
 #ifdef __cplusplus

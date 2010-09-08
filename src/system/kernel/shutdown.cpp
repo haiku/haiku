@@ -15,6 +15,8 @@ system_shutdown(bool reboot)
 	int32 cookie = 0;
 	team_info info;
 	
+	gKernelShutdown = true;
+	
 	// Now shutdown all system services!
 	// TODO: Once we are sure we can shutdown the system on all hardware
 	// checking reboot may not be necessary anymore.

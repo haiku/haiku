@@ -604,7 +604,7 @@ EcSpaceHandler(uint32 function, acpi_physical_address address, uint32 width,
 	 * (Not sure if it's needed)
 	 */
 
-	if (gKernelStartup || sc->ec_suspending) {
+	if (gKernelStartup || gKernelShutdown || sc->ec_suspending) {
 		if ((EC_GET_CSR(sc) & EC_EVENT_SCI)) {
 			//CTR0(KTR_ACPI, "ec running gpe handler directly");
 			EcGpeQueryHandler(sc);
@@ -667,7 +667,7 @@ EcWaitEvent(struct acpi_ec_cookie* sc, EC_EVENT event, int32 generationCount)
 	int32 count, i;
 
 	// int need_poll = cold || rebooting || ec_polled_mode || sc->ec_suspending;
-	int needPoll = ec_polled_mode || sc->ec_suspending || gKernelStartup;
+	int needPoll = ec_polled_mode || sc->ec_suspending || gKernelStartup || gKernelShutdown;
 
 	// The main CPU should be much faster than the EC.  So the status should
 	// be "not ready" when we start waiting.  But if the main CPU is really
