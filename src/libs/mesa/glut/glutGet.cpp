@@ -224,6 +224,10 @@ int glutGetModifiers() {
 
 #ifdef __HAIKU__
 
+extern "C" {
+GLUTproc __glutGetProcAddress(const char* procName);
+}
+
 GLUTproc
 __glutGetProcAddress(const char* procName)
 {
