@@ -14,23 +14,24 @@ class BGLDispatcher
 		// Private unimplemented copy constructors
 		BGLDispatcher(const BGLDispatcher &);
 		BGLDispatcher & operator=(const BGLDispatcher &);
-	
+
 	public:
 		BGLDispatcher();
 		~BGLDispatcher();
-		
+
 		void 					SetCurrentContext(void * context);
 		void *					CurrentContext();
-		
+
 		struct _glapi_table * 	Table();
 		status_t				CheckTable(const struct _glapi_table *dispatch = NULL);
 		status_t				SetTable(struct _glapi_table *dispatch);
 		uint32					TableSize();
-		
-		const _glapi_proc 		operator[](const char *function_name);
+
+		const _glapi_proc 		operator[](const char *functionName);
 		const char *			operator[](uint32 offset);
-	
-		uint32					OffsetOf(const char *function_name);
+
+		const _glapi_proc		AddressOf(const char *functionName);
+		uint32					OffsetOf(const char *functionName);
 };
 
 // Inlines methods
@@ -58,9 +59,9 @@ inline uint32 BGLDispatcher::TableSize()
 }
 
 
-inline const _glapi_proc BGLDispatcher::operator[](const char *function_name)
+inline const _glapi_proc BGLDispatcher::operator[](const char *functionName)
 {
-	return _glapi_get_proc_address(function_name);
+	return _glapi_get_proc_address(functionName);
 }
 
 
@@ -70,9 +71,15 @@ inline const char * BGLDispatcher::operator[](uint32 offset)
 }
 
 
-inline uint32 BGLDispatcher::OffsetOf(const char *function_name)
+inline const _glapi_proc BGLDispatcher::AddressOf(const char *functionName)
 {
-	return (uint32) _glapi_get_proc_offset(function_name);
+	return _glapi_get_proc_address(functionName);
+}
+
+
+inline uint32 BGLDispatcher::OffsetOf(const char *functionName)
+{
+	return (uint32) _glapi_get_proc_offset(functionName);
 }
 
 
