@@ -176,24 +176,30 @@ static struct name_address_pair glut_functions[] = {
 };
 
 
+#ifdef __HAIKU__
+extern GLUTproc __glutGetProcAddress(const char* procName);
+#endif
+
 /* XXX This isn't an official GLUT function, yet */
 GLUTproc GLUTAPIENTRY
 glutGetProcAddress(const char *procName)
 {
-   /* Try GLUT functions first */
-   int i;
-   for (i = 0; glut_functions[i].name; i++) {
-      if (strcmp(glut_functions[i].name, procName) == 0)
-         return glut_functions[i].address;
-   }
+	/* Try GLUT functions first */
+	int i;
+	for (i = 0; glut_functions[i].name; i++) {
+		if (strcmp(glut_functions[i].name, procName) == 0)
+			return glut_functions[i].address;
+	}
 
-   /* Try core GL functions */
+	/* Try core GL functions */
 #if defined(_WIN32)
-  return (GLUTProc) wglGetProcAddress((LPCSTR) procName);
+	return (GLUTProc) wglGetProcAddress((LPCSTR) procName);
 #elif defined(GLX_ARB_get_proc_address)
-  return (GLUTProc) glXGetProcAddressARB((const GLubyte *) procName);
+	return (GLUTProc) glXGetProcAddressARB((const GLubyte *) procName);
+#elif defined(__HAIKU__)
+	return __glutGetProcAddress(procName);
 #else
-  return NULL;
+	return NULL;
 #endif
 }
 
