@@ -18,6 +18,7 @@
 #include <SpaceLayoutItem.h>
 #include <String.h>
 
+#include "DurationView.h"
 #include "PeakView.h"
 #include "PlaybackState.h"
 #include "PlayPauseButton.h"
@@ -62,13 +63,25 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 {
 	float symbolHeight = 9;
 
-    // Seek Slider
+	BGroupView* seekGroup = new BGroupView(B_HORIZONTAL, 0);
+	BGroupLayout* seekLayout = seekGroup->GroupLayout();
+	GroupLayout()->AddView(seekGroup);
+
+    // Seek slider
 	fSeekSlider = new SeekSlider("seek slider", new BMessage(MSG_SEEK),
 		0, kPositionFactor);
-	GroupLayout()->AddView(fSeekSlider);
+	seekLayout->AddView(fSeekSlider);
 
 	fPositionToolTip = new PositionToolTip();
 	fSeekSlider->SetToolTip(fPositionToolTip);
+
+    // Duration view
+	fDurationView = new DurationView("duration view");
+	seekLayout->AddView(fDurationView);
+
+	seekLayout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(5));
+
+    // Buttons
 
 	BGroupView* controlGroup = new BGroupView(B_HORIZONTAL, 0);
 	controlGroup->GroupLayout()->SetInsets(7, 5, 7, 5);
@@ -81,8 +94,6 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 
 	uint32 topBottomBorder = BControlLook::B_TOP_BORDER
 		| BControlLook::B_BOTTOM_BORDER;
-
-    // Buttons
 
 	if (useSkipButtons) {
 		// Skip Back
@@ -137,8 +148,7 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	} else
 		fSkipForward = NULL;
 
-	controlGroup->GroupLayout()->AddItem(
-		BSpaceLayoutItem::CreateHorizontalStrut(5));
+	controlLayout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(5));
 
 	// Mute
 	BShape* speakerShape = _CreateSpeakerShape(8);
@@ -461,10 +471,12 @@ void
 TransportControlGroup::SetPosition(float value, bigtime_t position,
 	bigtime_t duration)
 {
+	fPositionToolTip->Update(position, duration);
+	fDurationView->Update(position, duration);
+
 	if (fSeekSlider->IsTracking())
 		return;
 
-	fPositionToolTip->Update(position, duration);
 	fSeekSlider->SetPosition(value);
 }
 

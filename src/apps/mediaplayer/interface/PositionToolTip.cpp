@@ -10,6 +10,8 @@
 
 #include <StringView.h>
 
+#include "DurationToString.h"
+
 
 class PositionToolTip::PositionView : public BStringView {
 public:
@@ -48,9 +50,14 @@ public:
 			fDuration = duration;
 		}
 
+		char positionText[32];
+		duration_to_string(fPosition, positionText, sizeof(positionText));
+
+		char durationText[32];
+		duration_to_string(fDuration, durationText, sizeof(durationText));
+
 		char text[64];
-		snprintf(text, sizeof(text), "%02ld:%02ld / %02ld:%02ld",
-			fPosition / 60, fPosition % 60, fDuration / 60, fDuration % 60);
+		snprintf(text, sizeof(text), "%s / %s", positionText, durationText);
 		SetText(text);
 
 		UnlockLooper();

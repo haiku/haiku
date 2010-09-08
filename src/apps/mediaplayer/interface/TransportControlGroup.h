@@ -15,6 +15,7 @@
 
 
 class BShape;
+class DurationView;
 class PeakView;
 class PlayPauseButton;
 class PositionToolTip;
@@ -104,6 +105,7 @@ private:
 
 private:
 			SeekSlider*			fSeekSlider;
+			DurationView*		fDurationView;
 			PositionToolTip*	fPositionToolTip;
 			PeakView*			fPeakView;
 			VolumeSlider*		fVolumeSlider;

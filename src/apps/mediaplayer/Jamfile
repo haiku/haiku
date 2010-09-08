@@ -25,6 +25,7 @@ for sourceDir in $(sourceDirs) {
 
 Application MediaPlayer :
 	# interface
+	DurationView.cpp
 	PeakView.cpp
 	PlayPauseButton.cpp
 	PositionToolTip.cpp
@@ -87,6 +88,7 @@ Application MediaPlayer :
 	ColorSpaceToString.cpp
 	Command.cpp
 	CommandStack.cpp
+	DurationToString.cpp
 	Event.cpp
 	EventQueue.cpp
 	FileReadWrite.cpp
