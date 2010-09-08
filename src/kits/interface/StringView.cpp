@@ -294,10 +294,14 @@ BStringView::SetText(const char* text)
 	if ((text && fText && !strcmp(text, fText)) || (!text && !fText))
 		return;
 
+	float oldWidth = StringWidth(fText);
+
 	free(fText);
 	fText = text ? strdup(text) : NULL;
 
-	InvalidateLayout();
+	if (oldWidth != StringWidth(fText))
+		InvalidateLayout();
+
 	Invalidate();
 }
 
