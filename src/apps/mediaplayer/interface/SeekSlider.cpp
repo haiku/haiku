@@ -3,9 +3,6 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-// NOTE: Based on my code in the BeOS interface for the VLC media player
-// that I did during the VLC 0.4.3 - 0.4.6 times. Code not written by me
-// removed. -Stephan Aßmus
 
 #include "SeekSlider.h"
 
@@ -15,8 +12,6 @@
 #include <ControlLook.h>
 #include <Region.h>
 #include <Shape.h>
-
-#include "DrawingTidbits.h"
 
 
 const rgb_color kThumbRed = (rgb_color){ 255, 52, 52, 255 };
