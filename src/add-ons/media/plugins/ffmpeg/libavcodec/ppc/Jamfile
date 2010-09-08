@@ -18,7 +18,6 @@ SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
 
 StaticLibrary libavcodec_ppc.a :
 	check_altivec.c
-    int_altivec.c
 	dsputil_altivec.c
 	dsputil_ppc.c
     fdct_altivec.c
@@ -26,7 +25,6 @@ StaticLibrary libavcodec_ppc.a :
     float_altivec.c
     gmc_altivec.c
     h264_altivec.c
-#   h264_template_altivec.c
     idct_altivec.c
     int_altivec.c
     mpegvideo_altivec.c
