@@ -15,7 +15,7 @@ if $(TARGET_ARCH) = x86 {
 	archSources += yuv2rgb_mmx.c ;
 	SubDirHdrs [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
 } else if $(TARGET_ARCH) = ppc {
-	archSources += swscale_altivec_template.c  yuv2rgb_altivec.c ;
+	archSources += yuv2rgb_altivec.c ;
 } else if $(TARGET_ARCH) = sparc {
 	archSources += yuv2rgb_vis.cyuv2rgb_vis.c ;
 }
