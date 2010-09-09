@@ -78,11 +78,9 @@ private:
 
 private:
 			char*				fText;
-			float				fTextWidth;
+			float				fStringWidth;
 			alignment			fAlign;
 			BSize				fPreferredSize;
-
-			uint32				_reserved[1];
 };
 
 #endif // _STRING_VIEW_H
