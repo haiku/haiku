@@ -78,6 +78,7 @@ private:
 
 private:
 			char*				fText;
+			float				fTextWidth;
 			alignment			fAlign;
 			BSize				fPreferredSize;
 

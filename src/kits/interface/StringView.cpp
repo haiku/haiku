@@ -29,6 +29,7 @@ BStringView::BStringView(BRect frame, const char* name, const char* text,
 			uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask, flags | B_FULL_UPDATE_ON_RESIZE),
 		fText(text ? strdup(text) : NULL),
+		fTextWidth(text ? StringWidth(text) : 0.0),
 		fAlign(B_ALIGN_LEFT),
 		fPreferredSize(-1, -1)
 {
@@ -38,6 +39,7 @@ BStringView::BStringView(BRect frame, const char* name, const char* text,
 BStringView::BStringView(const char* name, const char* text, uint32 flags)
 	:	BView(name, flags | B_FULL_UPDATE_ON_RESIZE),
 		fText(text ? strdup(text) : NULL),
+		fTextWidth(text ? StringWidth(text) : 0.0),
 		fAlign(B_ALIGN_LEFT),
 		fPreferredSize(-1, -1)
 {
@@ -47,6 +49,7 @@ BStringView::BStringView(const char* name, const char* text, uint32 flags)
 BStringView::BStringView(BMessage* data)
 	:	BView(data),
 		fText(NULL),
+		fTextWidth(0.0),
 		fPreferredSize(-1, -1)
 {
 	int32 align;
@@ -241,11 +244,11 @@ BStringView::Draw(BRect updateRect)
 	float x;
 	switch (fAlign) {
 		case B_ALIGN_RIGHT:
-			x = bounds.Width() - StringWidth(fText);
+			x = bounds.Width() - fTextWidth;
 			break;
 
 		case B_ALIGN_CENTER:
-			x = (bounds.Width() - StringWidth(fText)) / 2.0;
+			x = (bounds.Width() - fTextWidth) / 2.0;
 			break;
 
 		default:
@@ -294,13 +297,14 @@ BStringView::SetText(const char* text)
 	if ((text && fText && !strcmp(text, fText)) || (!text && !fText))
 		return;
 
-	float oldWidth = StringWidth(fText);
-
 	free(fText);
 	fText = text ? strdup(text) : NULL;
 
-	if (oldWidth != StringWidth(fText))
+	float newTextWidth = StringWidth(fText);
+	if (fTextWidth != newTextWidth) {
+		fTextWidth = newTextWidth;
 		InvalidateLayout();
+	}
 
 	Invalidate();
 }
@@ -347,6 +351,8 @@ void
 BStringView::SetFont(const BFont* font, uint32 mask)
 {
 	BView::SetFont(font, mask);
+
+	fTextWidth = StringWidth(fText);
 
 	Invalidate();
 	InvalidateLayout();
@@ -434,13 +440,13 @@ BStringView::_ValidatePreferredSize()
 {
 	if (fPreferredSize.width < 0) {
 		// width
-		fPreferredSize.width = ceilf(StringWidth(fText));
+		fPreferredSize.width = ceilf(fTextWidth);
 
 		// height
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
-	
-		fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent 
+
+		fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent
 			+ fontHeight.leading);
 
 		ResetLayoutInvalidation();
