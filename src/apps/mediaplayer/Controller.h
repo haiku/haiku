@@ -66,6 +66,7 @@ public:
 
 		virtual	void			PlaybackStateChanged(uint32 state);
 		virtual	void			PositionChanged(float position);
+		virtual	void			SeekHandled(int64 seekFrame);
 		virtual	void			VolumeChanged(float volume);
 		virtual	void			MutedChanged(bool muted);
 	};
@@ -117,9 +118,10 @@ public:
 			void				VolumeUp();
 			void				VolumeDown();
 			void				ToggleMute();
-			void				SetPosition(float value);
-			void				SetFramePosition(int32 frame);
-			void				SetTimePosition(bigtime_t position);
+
+			int64				SetPosition(float value);
+			int64				SetFramePosition(int64 frame);
+			int64				SetTimePosition(bigtime_t position);
 
 			bool				HasFile();
 			status_t			GetFileFormatInfo(
@@ -145,6 +147,8 @@ private:
 			void				_AdoptGlobalSettings();
 
 			uint32				_PlaybackState(int32 playingMode) const;
+			int64				_FrameDuration() const;
+			bigtime_t			_TimePosition() const;
 
 			void				_NotifyFileChanged(PlaylistItem* item,
 									status_t result) const;
@@ -157,6 +161,7 @@ private:
 
 			void				_NotifyPlaybackStateChanged(uint32 state) const;
 			void				_NotifyPositionChanged(float position) const;
+			void				_NotifySeekHandled(int64 seekFrame) const;
 			void				_NotifyVolumeChanged(float volume) const;
 			void				_NotifyMutedChanged(bool muted) const;
 
@@ -172,7 +177,7 @@ private:
 	virtual	void				NotifySpeedChanged(float speed) const;
 	virtual	void				NotifyFrameDropped() const;
 	virtual	void				NotifyStopFrameReached() const;
-	virtual	void				NotifySeekHandled() const;
+	virtual	void				NotifySeekHandled(int64 seekedFrame) const;
 
 
 			VideoView*			fVideoView;
@@ -191,12 +196,12 @@ private:
 			BList				fAudioTrackList;
 			BList				fVideoTrackList;
 
-	mutable	bigtime_t			fPosition;
+	mutable	int64				fCurrentFrame;
 			bigtime_t			fDuration;
 			float				fVideoFrameRate;
 
-	mutable	bool				fSeekRequested;
-	mutable int32				fSeekFrame;
+	mutable	int32				fPendingSeekRequests;
+	mutable int64				fSeekFrame;
 
 			ListenerAdapter		fGlobalSettingsListener;
 

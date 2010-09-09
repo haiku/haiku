@@ -189,6 +189,7 @@ private:
 			bool				fLoopMovies;
 			bool				fLoopSounds;
 			bigtime_t			fInitialSeekPosition;
+			bool				fAllowWinding;
 
 	static	int					sNoVideoWidth;
 };

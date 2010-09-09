@@ -83,7 +83,8 @@ NodeManager::Init(BRect videoBounds, float videoFrameRate,
 	float speed, uint32 enabledNodes, bool useOverlays)
 {
 	// init base class
-	PlaybackManager::Init(videoFrameRate, loopingMode, loopingEnabled, speed);
+	PlaybackManager::Init(videoFrameRate, true, loopingMode, loopingEnabled,
+		speed);
 
 	// get some objects from a derived class
 	if (fVideoTarget == NULL)
@@ -142,14 +143,17 @@ NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 		// TODO: if enabledNodes would indicate that audio or video
 		// is no longer needed, or, worse yet, suddenly needed when
 		// it wasn't before, then we should not return here!
+		PlaybackManager::Init(videoFrameRate, false, LoopMode(),
+			IsLoopingEnabled(), Speed(), MODE_PLAYING_PAUSED_FORWARD,
+			CurrentFrame());
 		return B_OK;
 	}
 
-	PlaybackManager::Init(videoFrameRate, LoopMode(), IsLoopingEnabled(),
-		Speed(), MODE_PLAYING_PAUSED_FORWARD, CurrentFrame());
-
 	_StopNodes();
 	_TearDownNodes();
+
+	PlaybackManager::Init(videoFrameRate, true, LoopMode(), IsLoopingEnabled(),
+		Speed(), MODE_PLAYING_PAUSED_FORWARD, CurrentFrame());
 
 	SetVideoBounds(videoBounds);
 

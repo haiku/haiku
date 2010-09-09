@@ -36,6 +36,9 @@ tdebug(const char* str)
 }
 
 
+#define SUPPORT_SPEED_CHANGES 0
+
+
 struct PlaybackManager::PlayingState {
 	int64		start_frame;
 	int64		end_frame;
@@ -75,6 +78,7 @@ struct PlaybackManager::PlayingState {
 };
 
 
+#if SUPPORT_SPEED_CHANGES
 struct PlaybackManager::SpeedInfo {
 	int64		activation_frame;		// absolute video frame
 	bigtime_t	activation_time;		// performance time
@@ -82,22 +86,25 @@ struct PlaybackManager::SpeedInfo {
 										// is 1.0 if not playing
 	float		set_speed;				// speed set by the user
 };
+#endif
 
 
 // #pragma mark - PlaybackManager
 
 
 PlaybackManager::PlaybackManager()
-	: BLooper("playback manager"),
-	  fStates(10),
-	  fSpeeds(10),
-	  fCurrentAudioTime(0),
-	  fCurrentVideoTime(0),
-	  fPerformanceTime(0),
-	  fFrameRate(1.0),
-	  fStopPlayingFrame(-1),
-	  fListeners(),
-	  fNoAudio(false)
+	:
+	BLooper("playback manager"),
+	fStates(10),
+	fSpeeds(10),
+	fCurrentAudioTime(0),
+	fCurrentVideoTime(0),
+	fPerformanceTime(0),
+	fPerformanceTimeEvent(NULL),
+	fFrameRate(1.0),
+	fStopPlayingFrame(-1),
+	fListeners(),
+	fNoAudio(false)
 {
 	Run();
 }
@@ -110,19 +117,23 @@ PlaybackManager::~PlaybackManager()
 
 
 void
-PlaybackManager::Init(float frameRate, int32 loopingMode, bool loopingEnabled,
-	float playbackSpeed, int32 playMode, int32 currentFrame)
+PlaybackManager::Init(float frameRate, bool initPerformanceTimes,
+	int32 loopingMode, bool loopingEnabled, float playbackSpeed,
+	int32 playMode, int32 currentFrame)
 {
 	// cleanup first
 	Cleanup();
 
 	// set the new frame rate
 	fFrameRate = frameRate;
-	fCurrentAudioTime = 0;
-	fCurrentVideoTime = 0;
-	fPerformanceTime = 0;
+	if (initPerformanceTimes) {
+		fCurrentAudioTime = 0;
+		fCurrentVideoTime = 0;
+		fPerformanceTime = 0;
+	}
 	fStopPlayingFrame = -1;
 
+#if SUPPORT_SPEED_CHANGES
 	// set up the initial speed
 	SpeedInfo* speed = new SpeedInfo;
 	speed->activation_frame = 0;
@@ -130,6 +141,7 @@ PlaybackManager::Init(float frameRate, int32 loopingMode, bool loopingEnabled,
 	speed->speed = playbackSpeed;
 	speed->set_speed = playbackSpeed;
 	_PushSpeedInfo(speed);
+#endif
 
 	// set up the initial state
 	PlayingState* state = new PlayingState;
@@ -165,15 +177,20 @@ PlaybackManager::Init(float frameRate, int32 loopingMode, bool loopingEnabled,
 void
 PlaybackManager::Cleanup()
 {
+	if (EventQueue::Default().RemoveEvent(fPerformanceTimeEvent))
+		delete fPerformanceTimeEvent;
+	fPerformanceTimeEvent = NULL;
 	// delete states
 	for (int32 i = 0; PlayingState* state = _StateAt(i); i++)
 		delete state;
 	fStates.MakeEmpty();
 
+#if SUPPORT_SPEED_CHANGES
 	// delete speed infos
 	for (int32 i = 0; SpeedInfo* speed = _SpeedInfoAt(i); i++)
 		delete speed;
 	fSpeeds.MakeEmpty();
+#endif
 }
 
 
@@ -182,9 +199,25 @@ PlaybackManager::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_EVENT:
-			SetPerformanceTime(TimeForRealTime(system_time()));
-//TRACE("MSG_EVENT: rt: %lld, pt: %lld\n", system_time(), fPerformanceTime);
+		{
+			if (fPerformanceTimeEvent == NULL) {
+				// Stale event message. There is a natural race
+				// condition when removing the event from the queue,
+				// it may have already fired, but we have not processed
+				// the message yet. Simply ignore the event.
+				break;
+			}
+
+//			bigtime_t eventTime;
+//			message->FindInt64("time", &eventTime);
+			bigtime_t now = system_time();
+			fPerformanceTimeEvent = NULL;
+
+			SetPerformanceTime(TimeForRealTime(now));
+//TRACE("MSG_EVENT: rt: %lld, pt: %lld\n", now, fPerformanceTime);
+//printf("MSG_EVENT: et: %lld, rt: %lld, pt: %lld\n", eventTime, now, fPerformanceTime);
 			break;
+		}
 
 		case MSG_PLAYBACK_FORCE_UPDATE:
 		{
@@ -333,9 +366,13 @@ PlaybackManager::CurrentFrame() const
 float
 PlaybackManager::Speed() const
 {
+#if SUPPORT_SPEED_CHANGES
 	if (!_LastState())
 		return 1.0;
 	return _LastSpeedInfo()->set_speed;
+#else
+	return 1.0;
+#endif
 }
 
 
@@ -384,8 +421,8 @@ PlaybackManager::DurationChanged()
 void
 PlaybackManager::SetCurrentFrame(int64 frame)
 {
-	if (_LastState()->current_frame == frame) {
-		NotifySeekHandled();
+	if (CurrentFrame() == frame) {
+		NotifySeekHandled(frame);
 		return;
 	}
 	PlayingState* newState = new PlayingState(*_LastState());
@@ -465,6 +502,7 @@ PlaybackManager::SetLoopingEnabled(bool enabled, bool continuePlaying)
 void
 PlaybackManager::SetSpeed(float speed)
 {
+#if SUPPORT_SPEED_CHANGES
 	SpeedInfo* lastSpeed = _LastSpeedInfo();
 	if (speed != lastSpeed->set_speed) {
 		SpeedInfo* info = new SpeedInfo(*lastSpeed);
@@ -476,6 +514,7 @@ PlaybackManager::SetSpeed(float speed)
 			info->speed = 1.0;
 		_PushSpeedInfo(info);
 	}
+#endif
 }
 
 
@@ -676,10 +715,12 @@ PlaybackManager::NextChangeFrame(int64 startFrame, int64 endFrame) const
 	int32 endIndex = _IndexForFrame(endFrame);
 	if (startIndex < endIndex)
 		endFrame = _StateAt(startIndex + 1)->activation_frame;
+#if SUPPORT_SPEED_CHANGES
 	startIndex = _SpeedInfoIndexForFrame(startFrame);
 	endIndex = _SpeedInfoIndexForFrame(endFrame);
 	if (startIndex < endIndex)
 		endFrame = _SpeedInfoAt(startIndex + 1)->activation_frame;
+#endif
 	return endFrame;
 }
 
@@ -693,10 +734,12 @@ PlaybackManager::NextChangeTime(bigtime_t startTime, bigtime_t endTime) const
 	int32 endIndex = _IndexForTime(endTime);
 	if (startIndex < endIndex)
 		endTime = TimeForFrame(_StateAt(startIndex + 1)->activation_frame);
+#if SUPPORT_SPEED_CHANGES
 	startIndex = _SpeedInfoIndexForTime(startTime);
 	endIndex = _SpeedInfoIndexForTime(endTime);
 	if (startIndex < endIndex)
 		endTime = TimeForFrame(_SpeedInfoAt(startIndex + 1)->activation_frame);
+#endif
 	return endTime;
 }
 
@@ -751,7 +794,9 @@ PlaybackManager::GetPlaylistTimeInterval(bigtime_t startTime,
 	// be greater than necessary, but that doesn't harm.
 	int64 startFrame = FrameForTime(startTime);
 	int64 endFrame = FrameForTime(endTime) + 1;
-	SpeedInfo* info = _SpeedInfoForFrame(startFrame);
+#if SUPPORT_SPEED_CHANGES
+	SpeedInfo* info = _SpeedInfoForFrame(startFrame)->speed;
+#endif
 	// Get the Playlist frame interval that belongs to the frame interval.
 	int64 xStartFrame;
 	int64 xEndFrame;
@@ -769,33 +814,37 @@ PlaybackManager::GetPlaylistTimeInterval(bigtime_t startTime,
 		// forward
 		case 1:
 		{
-//			xStartTime = PlaylistTimeForFrame(xStartFrame)
-//						 + startTime - TimeForFrame(startFrame);
-//			xEndTime = xStartTime + intervalLength;
-
+#if SUPPORT_SPEED_CHANGES
 // TODO: The current method does not handle the times the same way.
 //       It may happen, that for the same performance time different
 //       Playlist times (within a frame) are returned when passing it
 //       one time as a start time and another time as an end time.
 			xStartTime = PlaylistTimeForFrame(xStartFrame)
 				+ bigtime_t(double(startTime - TimeForFrame(startFrame))
-							* info->speed);
+					* info->speed);
 			xEndTime = xStartTime
-					   + bigtime_t((double)intervalLength * info->speed);
+				+ bigtime_t((double)intervalLength * info->speed);
+#else
+			xStartTime = PlaylistTimeForFrame(xStartFrame)
+				+ startTime - TimeForFrame(startFrame);
+			xEndTime = xStartTime + intervalLength;
+#endif
 			break;
 		}
 		// backward
 		case -1:
 		{
-//			xEndTime = PlaylistTimeForFrame(xEndFrame)
-//					   - startTime + TimeForFrame(startFrame);
-//			xStartTime = xEndTime - intervalLength;
-
+#if SUPPORT_SPEED_CHANGES
 			xEndTime = PlaylistTimeForFrame(xEndFrame)
 				- bigtime_t(double(startTime - TimeForFrame(startFrame))
-							* info->speed);
+					* info->speed);
 			xStartTime = xEndTime
-					   - bigtime_t((double)intervalLength * info->speed);
+				- bigtime_t((double)intervalLength * info->speed);
+#else
+			xEndTime = PlaylistTimeForFrame(xEndFrame)
+				- startTime + TimeForFrame(startFrame);
+			xStartTime = xEndTime - intervalLength;
+#endif
 			break;
 		}
 		// not playing
@@ -805,7 +854,11 @@ PlaybackManager::GetPlaylistTimeInterval(bigtime_t startTime,
 			xEndTime = xStartTime;
 			break;
 	}
+#if SUPPORT_SPEED_CHANGES
 	playingSpeed = (float)playingDirection * info->speed;
+#else
+	playingSpeed = (float)playingDirection;
+#endif
 }
 
 
@@ -815,11 +868,10 @@ int64
 PlaybackManager::FrameForTime(bigtime_t time) const
 {
 //TRACE("PlaybackManager::FrameForTime(%lld)\n", time);
-//	return (int64)((double)time * (double)fFrameRate / 1000000.0);
 	// In order to avoid problems caused by rounding errors, we check
 	// if for the resulting frame holds
 	// TimeForFrame(frame) <= time < TimeForFrame(frame + 1).
-//	int64 frame = (int64)((double)time * (double)fFrameRate / 1000000.0);
+#if SUPPORT_SPEED_CHANGES
 	SpeedInfo* info = _SpeedInfoForTime(time);
 if (!info) {
 	fprintf(stderr, "PlaybackManager::FrameForTime() - no SpeedInfo!\n");
@@ -828,6 +880,10 @@ if (!info) {
 	int64 frame = (int64)(((double)time - info->activation_time)
 		* (double)fFrameRate * info->speed / 1000000.0)
 		+ info->activation_frame;
+
+#else
+	int64 frame = (int64)((double)time * (double)fFrameRate / 1000000.0);
+#endif
 	if (TimeForFrame(frame) > time)
 		frame--;
 	else if (TimeForFrame(frame + 1) <= time)
@@ -843,19 +899,18 @@ if (!info) {
 bigtime_t
 PlaybackManager::TimeForFrame(int64 frame) const
 {
-//	return (bigtime_t)((double)frame * 1000000.0 / (double)fFrameRate);
+#if SUPPORT_SPEED_CHANGES
 	SpeedInfo* info = _SpeedInfoForFrame(frame);
 if (!info) {
 	fprintf(stderr, "PlaybackManager::TimeForFrame() - no SpeedInfo!\n");
 	return 0;
 }
-//	return (bigtime_t)((double)(frame - info->activation_frame) * 1000000.0
-//					   / ((double)fFrameRate * info->speed))
-// 		   + info->activation_time;
-bigtime_t result = (bigtime_t)((double)(frame - info->activation_frame) * 1000000.0
-/ ((double)fFrameRate * info->speed)) + info->activation_time;
-//fprintf(stderr, "PlaybackManager::TimeForFrame(%lld): %lld\n", frame, result);
-return result;
+	return (bigtime_t)((double)(frame - info->activation_frame) * 1000000.0
+					   / ((double)fFrameRate * info->speed))
+ 		   + info->activation_time;
+#else
+	return (bigtime_t)((double)frame * 1000000.0 / (double)fFrameRate);
+#endif
 }
 
 
@@ -892,11 +947,13 @@ PlaybackManager::SetCurrentAudioTime(bigtime_t time)
 TRACE("PlaybackManager::SetCurrentAudioTime(%lld)\n", time);
 	bigtime_t lastFrameTime = _TimeForLastFrame();
 	fCurrentAudioTime = time;
-//	_UpdateStates();
 	bigtime_t newLastFrameTime = _TimeForLastFrame();
 	if (lastFrameTime != newLastFrameTime) {
-		bigtime_t eventTime = RealTimeForTime(newLastFrameTime);
-		EventQueue::Default().AddEvent(new MessageEvent(eventTime, this));
+		if (fPerformanceTimeEvent == NULL) {
+			bigtime_t eventTime = RealTimeForTime(newLastFrameTime);
+			fPerformanceTimeEvent = new MessageEvent(eventTime, this);
+			EventQueue::Default().AddEvent(fPerformanceTimeEvent);
+		}
 		_CheckStopPlaying();
 	}
 }
@@ -917,11 +974,13 @@ PlaybackManager::SetCurrentVideoTime(bigtime_t time)
 TRACE("PlaybackManager::SetCurrentVideoTime(%lld)\n", time);
 	bigtime_t lastFrameTime = _TimeForLastFrame();
 	fCurrentVideoTime = time;
-//	_UpdateStates();
 	bigtime_t newLastFrameTime = _TimeForLastFrame();
 	if (lastFrameTime != newLastFrameTime) {
-		bigtime_t eventTime = RealTimeForTime(newLastFrameTime);
-		EventQueue::Default().AddEvent(new MessageEvent(eventTime, this));
+		if (fPerformanceTimeEvent == NULL) {
+			bigtime_t eventTime = RealTimeForTime(newLastFrameTime);
+			fPerformanceTimeEvent = new MessageEvent(eventTime, this);
+			EventQueue::Default().AddEvent(fPerformanceTimeEvent);
+		}
 		_CheckStopPlaying();
 	}
 }
@@ -931,11 +990,11 @@ TRACE("PlaybackManager::SetCurrentVideoTime(%lld)\n", time);
 void
 PlaybackManager::SetPerformanceFrame(int64 frame)
 {
-	SetPerformanceFrame(TimeForFrame(frame));
+	SetPerformanceTime(TimeForFrame(frame));
 }
 
 
-/*!	Similar to SetPerformanceTime() just with a time instead of a frame
+/*!	Similar to SetPerformanceFrame() just with a time instead of a frame
 	argument. */
 void
 PlaybackManager::SetPerformanceTime(bigtime_t time)
@@ -1089,7 +1148,7 @@ PlaybackManager::NotifyStopFrameReached() const
 
 
 void
-PlaybackManager::NotifySeekHandled() const
+PlaybackManager::NotifySeekHandled(int64 frame) const
 {
 	// not currently implemented in PlaybackListener interface
 }
@@ -1175,6 +1234,7 @@ CurrentFrame(), currentFrame);
 		fStates.RemoveItem(fStates.CountItems() - 1);
 TRACE("deleting last \n");
 PrintState(lastState);
+		_NotifySeekHandledIfNecessary(lastState);
 		delete lastState;
 	} else {
 		// it is -- keep it
@@ -1199,6 +1259,7 @@ PrintState(lastState);
 	fStates.AddItem(state);
 PrintState(state);
 TRACE("_PushState: state count: %ld\n", fStates.CountItems());
+#if SUPPORT_SPEED_CHANGES
 	// push a new speed info
 	SpeedInfo* speedInfo = new SpeedInfo(*_LastSpeedInfo());
 	if (playingDirection == 0)
@@ -1207,6 +1268,7 @@ TRACE("_PushState: state count: %ld\n", fStates.CountItems());
 		speedInfo->speed = speedInfo->set_speed;
 	speedInfo->activation_frame = state->activation_frame;
 	_PushSpeedInfo(speedInfo);
+#endif
 	// If the new state is a playing state and looping is turned off,
 	// determine when playing shall stop.
 	if (playingDirection != 0 && !state->looping_enabled) {
@@ -1252,19 +1314,18 @@ PlaybackManager::_UpdateStates()
 	// Performance time should always be the least one.
 	int32 firstActive = _IndexForTime(fPerformanceTime);
 //TRACE("firstActive: %ld, numStates: %ld\n", firstActive, fStates.CountItems());
-	for (int32 i = 0; i < firstActive; i++)
-		delete _StateAt(i);
+	for (int32 i = 0; i < firstActive; i++) {
+		PlayingState* state = _StateAt(i);
+		_NotifySeekHandledIfNecessary(state);
+		delete state;
+	}
 	if (firstActive > 0)
 {
 		fStates.RemoveItems(0, firstActive);
 TRACE("_UpdateStates: states removed: %ld, state count: %ld\n",
 firstActive, fStates.CountItems());
 }
-	PlayingState* currentState = _StateAt(firstActive);
-	if (currentState != NULL && currentState->is_seek_request) {
-		currentState->is_seek_request = false;
-		NotifySeekHandled();
-	}
+	_NotifySeekHandledIfNecessary(_StateAt(0));
 }
 
 
@@ -1476,7 +1537,7 @@ frameCount);
 		index = (index % frameCount + frameCount) % frameCount;
 
 	// get the frame for the index
-	int32 frame = startFrame;
+	int64 frame = startFrame;
 	switch (state->loop_mode) {
 		case LOOPING_ALL:
 		case LOOPING_RANGE:
@@ -1512,38 +1573,48 @@ PlaybackManager::_NextFrameInRange(PlayingState* state, int64 frame)
 void
 PlaybackManager::_PushSpeedInfo(SpeedInfo* info)
 {
-	if (info) {
-		// check the last state
-		if (SpeedInfo* lastSpeed = _LastSpeedInfo()) {
-			// set the activation time
-			info->activation_time = TimeForFrame(info->activation_frame);
-			// Remove the last state, if it won't be activated.
-			if (lastSpeed->activation_frame == info->activation_frame) {
+#if SUPPORT_SPEED_CHANGES
+	if (info == NULL)
+		return;
+	// check the last state
+	if (SpeedInfo* lastSpeed = _LastSpeedInfo()) {
+		// set the activation time
+		info->activation_time = TimeForFrame(info->activation_frame);
+		// Remove the last state, if it won't be activated.
+		if (lastSpeed->activation_frame == info->activation_frame) {
 //fprintf(stderr, "  replacing last speed info\n");
-				fSpeeds.RemoveItem(lastSpeed);
-				delete lastSpeed;
-			}
+			fSpeeds.RemoveItem(lastSpeed);
+			delete lastSpeed;
 		}
-		fSpeeds.AddItem(info);
+	}
+	fSpeeds.AddItem(info);
 //fprintf(stderr, "  speed info pushed: activation frame: %lld, "
 //"activation time: %lld, speed: %f\n", info->activation_frame,
 //info->activation_time, info->speed);
-		// ...
-	}
+	// ...
+#endif
 }
 
 
 PlaybackManager::SpeedInfo*
 PlaybackManager::_LastSpeedInfo() const
 {
+#if SUPPORT_SPEED_CHANGES
 	return (SpeedInfo*)fSpeeds.ItemAt(fSpeeds.CountItems() - 1);
+#else
+	return NULL;
+#endif
 }
 
 
 PlaybackManager::SpeedInfo*
 PlaybackManager::_SpeedInfoAt(int32 index) const
 {
+#if SUPPORT_SPEED_CHANGES
 	return (SpeedInfo*)fSpeeds.ItemAt(index);
+#else
+	return NULL;
+#endif
 }
 
 
@@ -1551,6 +1622,7 @@ int32
 PlaybackManager::_SpeedInfoIndexForFrame(int64 frame) const
 {
 	int32 index = 0;
+#if SUPPORT_SPEED_CHANGES
 	SpeedInfo* info;
 	while (((info = _SpeedInfoAt(index + 1)))
 		   && info->activation_frame <= frame) {
@@ -1558,6 +1630,7 @@ PlaybackManager::_SpeedInfoIndexForFrame(int64 frame) const
 	}
 //fprintf(stderr, "PlaybackManager::_SpeedInfoIndexForFrame(%lld): %ld\n",
 //frame, index);
+#endif
 	return index;
 }
 
@@ -1566,6 +1639,7 @@ int32
 PlaybackManager::_SpeedInfoIndexForTime(bigtime_t time) const
 {
 	int32 index = 0;
+#if SUPPORT_SPEED_CHANGES
 	SpeedInfo* info;
 	while (((info = _SpeedInfoAt(index + 1)))
 		   && info->activation_time <= time) {
@@ -1573,6 +1647,7 @@ PlaybackManager::_SpeedInfoIndexForTime(bigtime_t time) const
 	}
 //fprintf(stderr, "PlaybackManager::_SpeedInfoIndexForTime(%lld): %ld\n",
 //time, index);
+#endif
 	return index;
 }
 
@@ -1594,12 +1669,14 @@ PlaybackManager::_SpeedInfoForTime(bigtime_t time) const
 void
 PlaybackManager::_UpdateSpeedInfos()
 {
+#if SUPPORT_SPEED_CHANGES
 	int32 firstActive = _SpeedInfoIndexForTime(fPerformanceTime);
 	for (int32 i = 0; i < firstActive; i++)
 		delete _SpeedInfoAt(i);
 	if (firstActive > 0)
 		fSpeeds.RemoveItems(0, firstActive);
 //fprintf(stderr, "  speed infos 0 - %ld removed\n", firstActive);
+#endif
 }
 
 
@@ -1635,3 +1712,12 @@ PlaybackManager::_CheckStopPlaying()
 	}
 }
 
+
+void
+PlaybackManager::_NotifySeekHandledIfNecessary(PlayingState* state)
+{
+	if (state->is_seek_request) {
+		state->is_seek_request = false;
+		NotifySeekHandled(state->current_frame);
+	}
+}

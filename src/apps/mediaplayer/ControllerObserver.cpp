@@ -134,6 +134,19 @@ ControllerObserver::PositionChanged(float position)
 
 
 void
+ControllerObserver::SeekHandled(int64 seekFrame)
+{
+	if (!(fObserveFlags & OBSERVE_POSITION_CHANGES))
+		return;
+
+	BMessage message(MSG_CONTROLLER_SEEK_HANDLED);
+	message.AddInt64("seek frame", seekFrame);
+
+	DeliverMessage(message);
+}
+
+
+void
 ControllerObserver::VolumeChanged(float volume)
 {
 	if (!(fObserveFlags & OBSERVE_VOLUME_CHANGES))

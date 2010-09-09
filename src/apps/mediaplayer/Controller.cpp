@@ -77,6 +77,7 @@ void Controller::Listener::VideoStatsChanged() {}
 void Controller::Listener::AudioStatsChanged() {}
 void Controller::Listener::PlaybackStateChanged(uint32) {}
 void Controller::Listener::PositionChanged(float) {}
+void Controller::Listener::SeekHandled(int64 seekFrame) {}
 void Controller::Listener::VolumeChanged(float) {}
 void Controller::Listener::MutedChanged(bool) {}
 
@@ -108,10 +109,12 @@ Controller::Controller()
 	fAudioTrackList(4),
 	fVideoTrackList(2),
 
-	fPosition(0),
+	fCurrentFrame(0),
 	fDuration(0),
 	fVideoFrameRate(25.0),
-	fSeekRequested(false),
+
+	fPendingSeekRequests(0),
+	fSeekFrame(-1),
 
 	fGlobalSettingsListener(this),
 
@@ -167,12 +170,7 @@ Controller::MessageReceived(BMessage* message)
 int64
 Controller::Duration()
 {
-	// This should really be total frames (video frames at that)
-	// TODO: It is not so nice that the MediaPlayer still measures
-	// in video frames if only playing audio. Here for example, it will
-	// return a duration of 0 if the audio clip happens to be shorter than
-	// one video frame at 25 fps.
-	return (int64)((double)fDuration * fVideoFrameRate / 1000000.0);
+	return _FrameDuration();
 }
 
 
@@ -258,11 +256,12 @@ Controller::SetTo(const PlaylistItemRef& item)
 	fVideoTrackSupplier = NULL;
 	fAudioTrackSupplier = NULL;
 
+	fCurrentFrame = 0;
 	fDuration = 0;
 	fVideoFrameRate = 25.0;
 
+	fPendingSeekRequests = 0;
 	fSeekFrame = -1;
-	fSeekRequested = false;
 
 	if (fItem.Get() == NULL)
 		return B_BAD_VALUE;
@@ -641,7 +640,7 @@ Controller::TimePosition()
 {
 	BAutolock _(this);
 
-	return fPosition;
+	return _TimePosition();
 }
 
 
@@ -649,8 +648,7 @@ void
 Controller::SetVolume(float value)
 {
 //	printf("Controller::SetVolume %.4f\n", value);
-	if (!Lock())
-		return;
+	BAutolock _(this);
 
 	value = max_c(0.0, min_c(2.0, value));
 
@@ -663,8 +661,6 @@ Controller::SetVolume(float value)
 
 		_NotifyVolumeChanged(fVolume);
 	}
-
-	Unlock();
 }
 
 void
@@ -684,8 +680,7 @@ Controller::VolumeDown()
 void
 Controller::ToggleMute()
 {
-	if (!Lock())
-		return;
+	BAutolock _(this);
 
 	fMuted = !fMuted;
 
@@ -695,8 +690,6 @@ Controller::ToggleMute()
 		fAudioSupplier->SetVolume(fVolume);
 
 	_NotifyMutedChanged(fMuted);
-
-	Unlock();
 }
 
 
@@ -709,40 +702,50 @@ Controller::Volume()
 }
 
 
-void
+int64
 Controller::SetPosition(float value)
 {
 	BAutolock _(this);
 
-	SetFramePosition(Duration() * value);
+	return SetFramePosition(_FrameDuration() * value);
 }
 
 
-void
-Controller::SetFramePosition(int32 value)
+int64
+Controller::SetFramePosition(int64 value)
 {
 	BAutolock _(this);
 
-	int64 seekFrame = max_c(0, min_c(Duration(), value));
-	int64 currentFrame = CurrentFrame();
+	fPendingSeekRequests++;
+	fSeekFrame = max_c(0, min_c(_FrameDuration(), value));
+
 	// Snap to video keyframe, since that will be the fastest
 	// to display and seeking will feel more snappy.
 	if (Duration() > 240 && fVideoTrackSupplier != NULL)
-		fVideoTrackSupplier->FindKeyFrameForFrame(&seekFrame);
-	if (seekFrame != currentFrame) {
-		fSeekFrame = seekFrame;
-		fSeekRequested = true;
-		SetCurrentFrame(seekFrame);
-	}
+		fVideoTrackSupplier->FindKeyFrameForFrame(&fSeekFrame);
+
+	int64 currentFrame = CurrentFrame();
+//printf("SetFramePosition(%lld) -> %lld (current: %lld, duration: %lld) "
+//"(video: %p)\n", value, fSeekFrame, currentFrame, _FrameDuration(),
+//fVideoTrackSupplier);
+	if (fSeekFrame != currentFrame) {
+		int64 seekFrame = fSeekFrame;
+		SetCurrentFrame(fSeekFrame);
+			// May trigger the notification and reset fSeekFrame,
+			// if next current frame == seek frame.
+		return seekFrame;
+	} else
+		NotifySeekHandled(fSeekFrame);
+	return currentFrame;
 }
 
 
-void
+int64
 Controller::SetTimePosition(bigtime_t value)
 {
 	BAutolock _(this);
 
-	SetPosition((float)value / TimeDuration());
+	return SetPosition((float)value / TimeDuration());
 }
 
 
@@ -924,6 +927,39 @@ Controller::_PlaybackState(int32 playingMode) const
 }
 
 
+bigtime_t
+Controller::_TimePosition() const
+{
+	if (fDuration == 0)
+		return 0;
+
+	// Check if we are still waiting to reach the seekframe,
+	// pass the last pending seek frame back to the caller, so
+	// that the view of the current frame/time from the outside
+	// does not depend on the internal latency to reach requested
+	// frames asynchronously.
+	int64 frame;
+	if (fPendingSeekRequests > 0)
+		frame = fSeekFrame;
+	else
+		frame = fCurrentFrame;
+
+	return frame * fDuration / _FrameDuration();
+}
+
+
+int64
+Controller::_FrameDuration() const
+{
+	// This should really be total frames (video frames at that)
+	// TODO: It is not so nice that the MediaPlayer still measures
+	// in video frames if only playing audio. Here for example, it will
+	// return a duration of 0 if the audio clip happens to be shorter than
+	// one video frame at 25 fps.
+	return (int64)((double)fDuration * fVideoFrameRate / 1000000.0);
+}
+
+
 // #pragma mark - Notifications
 
 
@@ -1024,6 +1060,18 @@ Controller::_NotifyPositionChanged(float position) const
 
 
 void
+Controller::_NotifySeekHandled(int64 seekFrame) const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		Listener* listener = (Listener*)listeners.ItemAtFast(i);
+		listener->SeekHandled(seekFrame);
+	}
+}
+
+
+void
 Controller::_NotifyVolumeChanged(float volume) const
 {
 	BList listeners(fListeners);
@@ -1084,20 +1132,8 @@ Controller::NotifyFPSChanged(float fps) const
 void
 Controller::NotifyCurrentFrameChanged(int64 frame) const
 {
-	// check if we are still waiting to reach the seekframe,
-	// don't pass the event on to the listeners in that case
-	if (fSeekRequested && fSeekFrame != frame)
-		return;
-
-	fSeekFrame = -1;
-	fSeekRequested = false;
-
-	float position = 0.0;
-	double duration = (double)fDuration * fVideoFrameRate / 1000000.0;
-	if (duration > 0)
-		position = (float)frame / duration;
-	fPosition = (bigtime_t)(position * fDuration + 0.5);
-	_NotifyPositionChanged(position);
+	fCurrentFrame = frame;
+	_NotifyPositionChanged((float)_TimePosition() / fDuration);
 }
 
 
@@ -1124,9 +1160,15 @@ Controller::NotifyStopFrameReached() const
 
 
 void
-Controller::NotifySeekHandled() const
+Controller::NotifySeekHandled(int64 seekedFrame) const
 {
-	fSeekRequested = false;
-	fSeekFrame = -1;
+	if (fPendingSeekRequests == 0)
+		return;
+
+	fPendingSeekRequests--;
+	if (fPendingSeekRequests == 0)
+		fSeekFrame = -1;
+
+	_NotifySeekHandled(seekedFrame);
 }
 

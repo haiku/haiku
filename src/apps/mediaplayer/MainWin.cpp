@@ -81,6 +81,7 @@ enum {
 	M_VOLUME_DOWN,
 	M_SKIP_NEXT,
 	M_SKIP_PREV,
+	M_WIND,
 
 	// The common display aspect ratios
 	M_ASPECT_SAME_AS_SOURCE,
@@ -179,7 +180,8 @@ MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	fMouseMoveDist(0),
 
 	fGlobalSettingsListener(this),
-	fInitialSeekPosition(0)
+	fInitialSeekPosition(0),
+	fAllowWinding(true)
 {
 	// Handle window position and size depending on whether this is the
 	// first window or not. Use the window size from the window that was
@@ -675,9 +677,13 @@ MainWin::MessageReceived(BMessage* msg)
 			if (msg->FindFloat("position", &position) == B_OK) {
 				fControls->SetPosition(position, fController->TimePosition(),
 					fController->TimeDuration());
+				fAllowWinding = true;
 			}
 			break;
 		}
+		case MSG_CONTROLLER_SEEK_HANDLED:
+			break;
+
 		case MSG_CONTROLLER_VOLUME_CHANGED:
 		{
 			float volume;
@@ -781,6 +787,32 @@ MainWin::MessageReceived(BMessage* msg)
 		case M_SKIP_PREV:
 			fControls->SkipBackward();
 			break;
+
+		case M_WIND:
+		{
+			if (!fAllowWinding)
+				break;
+
+			bigtime_t howMuch;
+			if (msg->FindInt64("how much", &howMuch) != B_OK)
+				break;
+
+			if (fController->Lock()) {
+				bigtime_t seekTime = fController->TimePosition() + howMuch;
+				if (seekTime < 0) {
+					fInitialSeekPosition = seekTime;
+					PostMessage(M_SKIP_PREV);
+				} else if (seekTime > fController->TimeDuration()) {
+					fInitialSeekPosition = 0;
+					PostMessage(M_SKIP_NEXT);
+				} else
+					fController->SetTimePosition(seekTime);
+				fController->Unlock();
+
+				fAllowWinding = false;
+			}
+			break;
+		}
 
 		case M_VOLUME_UP:
 			fController->VolumeUp();
@@ -1248,6 +1280,10 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 		fHasAudio = fController->AudioTrackCount() != 0;
 		SetTitle(item->Name().String());
 
+		if (fInitialSeekPosition < 0) {
+			fInitialSeekPosition
+				= fController->TimeDuration() + fInitialSeekPosition;
+		}
 		fController->SetTimePosition(fInitialSeekPosition);
 		fInitialSeekPosition = 0;
 	}
@@ -1401,7 +1437,7 @@ MainWin::_CreateMenu()
 		new BMessage(M_TOGGLE_NO_INTERFACE), 'B');
 	fSettingsMenu->AddItem(fNoInterfaceMenuItem);
 	fSettingsMenu->AddItem(new BMenuItem("Always on top",
-		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'T'));
+		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
 	fSettingsMenu->AddSeparatorItem();
 	item = new BMenuItem("Settings"B_UTF8_ELLIPSIS,
 		new BMessage(M_SETTINGS), 'S');
@@ -1872,8 +1908,8 @@ MainWin::_KeyDown(BMessage* msg)
 	uint32 rawChar = msg->FindInt32("raw_char");
 	uint32 modifier = msg->FindInt32("modifiers");
 
-	printf("key 0x%lx, rawChar 0x%lx, modifiers 0x%lx\n", key, rawChar,
-		modifier);
+//	printf("key 0x%lx, rawChar 0x%lx, modifiers 0x%lx\n", key, rawChar,
+//		modifier);
 
 	// ignore the system modifier namespace
 	if ((modifier & (B_CONTROL_KEY | B_COMMAND_KEY))
@@ -1923,16 +1959,28 @@ MainWin::_KeyDown(BMessage* msg)
 
 		case B_RIGHT_ARROW:
 			if ((modifier & B_COMMAND_KEY) != 0)
-				PostMessage(M_VOLUME_UP);
-			else
 				PostMessage(M_SKIP_NEXT);
+			else if (fAllowWinding) {
+				BMessage windMessage(M_WIND);
+				if ((modifier & B_SHIFT_KEY) != 0)
+					windMessage.AddInt64("how much", 30000000LL);
+				else
+					windMessage.AddInt64("how much", 5000000LL);
+				PostMessage(&windMessage);
+			}
 			return true;
 
 		case B_LEFT_ARROW:
 			if ((modifier & B_COMMAND_KEY) != 0)
-				PostMessage(M_VOLUME_DOWN);
-			else
 				PostMessage(M_SKIP_PREV);
+			else if (fAllowWinding) {
+				BMessage windMessage(M_WIND);
+				if ((modifier & B_SHIFT_KEY) != 0)
+					windMessage.AddInt64("how much", -30000000LL);
+				else
+					windMessage.AddInt64("how much", -5000000LL);
+				PostMessage(&windMessage);
+			}
 			return true;
 
 		case B_PAGE_UP:
@@ -1942,6 +1990,19 @@ MainWin::_KeyDown(BMessage* msg)
 		case B_PAGE_DOWN:
 			PostMessage(M_SKIP_PREV);
 			return true;
+
+		case B_DELETE:
+		case 'd': 			// d for delete
+		case 't':			// t for Trash
+			if ((modifiers() & B_COMMAND_KEY) != 0) {
+				BAutolock _(fPlaylist);
+				BMessage removeMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH);
+				removeMessage.AddInt32("playlist index",
+					fPlaylist->CurrentItemIndex());
+				fPlaylistWindow->PostMessage(&removeMessage);
+				return true;
+			}
+			break;
 	}
 
 	switch (key) {
@@ -1976,19 +2037,6 @@ MainWin::_KeyDown(BMessage* msg)
 		case 0x48:			// numeric keypad left arrow
 			PostMessage(M_SKIP_PREV);
 			return true;
-
-		case 0x34:			// delete button
-		case 0x3e: 			// d for delete
-		case 0x2b:			// t for Trash
-			if ((modifiers() & B_COMMAND_KEY) != 0) {
-				BAutolock _(fPlaylist);
-				BMessage removeMessage(M_PLAYLIST_REMOVE_AND_PUT_INTO_TRASH);
-				removeMessage.AddInt32("playlist index",
-					fPlaylist->CurrentItemIndex());
-				fPlaylistWindow->PostMessage(&removeMessage);
-				return true;
-			}
-			break;
 	}
 
 	return false;

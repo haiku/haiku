@@ -17,6 +17,7 @@
 #include <Rect.h>
 
 
+class MessageEvent;
 class PlaybackListener;
 
 
@@ -52,11 +53,13 @@ public:
 	virtual						~PlaybackManager();
 
 			void				Init(float frameRate,
-									 int32 loopingMode = LOOPING_ALL,
-									 bool loopingEnabled = true,
-									 float speed = 1.0,
-									 int32 playMode = MODE_PLAYING_PAUSED_FORWARD,
-									 int32 currentFrame = 0);
+									bool initPerformanceTimes,
+									int32 loopingMode = LOOPING_ALL,
+									bool loopingEnabled = true,
+									float speed = 1.0,
+									int32 playMode
+										= MODE_PLAYING_PAUSED_FORWARD,
+									int32 currentFrame = 0);
 			void				Cleanup();
 
 	// BHandler interface
@@ -132,7 +135,6 @@ public:
 									int64& xStartFrame, int64& xEndFrame,
 									int32& playingDirection) const;
 
-	// PlaybackManagerInterface
 	virtual	void				GetPlaylistTimeInterval(
 									bigtime_t startTime, bigtime_t& endTime,
 									bigtime_t& xStartTime, bigtime_t& xEndTime,
@@ -169,7 +171,7 @@ public:
 	virtual	void				NotifySpeedChanged(float speed) const;
 	virtual	void				NotifyFrameDropped() const;
 	virtual	void				NotifyStopFrameReached() const;
-	virtual	void				NotifySeekHandled() const;
+	virtual	void				NotifySeekHandled(int64 seekedFrame) const;
 
 			// debugging
 			void				PrintState(PlayingState* state);
@@ -215,21 +217,26 @@ public:
 			bigtime_t			_TimeForLastFrame() const;
 			bigtime_t			_TimeForNextFrame() const;
 
+			void				_NotifySeekHandledIfNecessary(
+									PlayingState* state);
 			void				_CheckStopPlaying();
 
- private:
+private:
 			BList				fStates;
 			BList				fSpeeds;
 	volatile bigtime_t			fCurrentAudioTime;
 	volatile bigtime_t			fCurrentVideoTime;
 	volatile bigtime_t			fPerformanceTime;
+
+			MessageEvent*		fPerformanceTimeEvent;
+
 	volatile float				fFrameRate;			// video frame rate
 	volatile bigtime_t			fStopPlayingFrame;	// frame at which playing
 													// shall be stopped,
 													// disabled: -1
 
 			BList				fListeners;
- protected:
+protected:
  			bool				fNoAudio;
 };
 
