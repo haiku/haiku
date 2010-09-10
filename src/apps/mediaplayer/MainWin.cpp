@@ -1403,8 +1403,8 @@ MainWin::_CreateMenu()
 
 	fFileMenu->AddSeparatorItem();
 
-	fNoInterfaceMenuItem = new BMenuItem("No interface",
-		new BMessage(M_TOGGLE_NO_INTERFACE), 'B');
+	fNoInterfaceMenuItem = new BMenuItem("Hide interface",
+		new BMessage(M_TOGGLE_NO_INTERFACE), 'H');
 	fFileMenu->AddItem(fNoInterfaceMenuItem);
 	fFileMenu->AddItem(new BMenuItem("Always on top",
 		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
@@ -1632,12 +1632,33 @@ MainWin::_CurrentVideoSizeInPercent() const
 	int viewWidth = fVideoView->Bounds().IntegerWidth() + 1;
 	int viewHeight = fVideoView->Bounds().IntegerHeight() + 1;
 
-	int widthPercent = videoWidth * 100 / viewWidth;
-	int heightPercent = videoHeight * 100 / viewHeight;
+	int widthPercent = viewWidth * 100 / videoWidth;
+	int heightPercent = viewHeight * 100 / videoHeight;
 
 	if (widthPercent > heightPercent)
 		return widthPercent;
 	return heightPercent;
+}
+
+
+void
+MainWin::_ZoomVideoView(int percentDiff)
+{
+	if (!fHasVideo)
+		return;
+
+	int percent = _CurrentVideoSizeInPercent();
+	int newSize = percent * (100 + percentDiff) / 100;
+
+	if (newSize < 25)
+		newSize = 25;
+	if (newSize > 400)
+		newSize = 400;
+	if (newSize != percent) {
+		BMessage message(M_VIEW_SIZE);
+		message.AddInt32("size", newSize);
+		PostMessage(&message);
+	}
 }
 
 
@@ -1723,9 +1744,6 @@ MainWin::_ResizeWindow(int percent, bool useNoVideoWidth, bool stayOnScreen)
 void
 MainWin::_ResizeVideoView(int x, int y, int width, int height)
 {
-	printf("_ResizeVideoView: %d,%d, width %d, height %d\n", x, y,
-		width, height);
-
 	// Keep aspect ratio, place video view inside
 	// the background area (may create black bars).
 	int videoWidth;
@@ -1928,8 +1946,6 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 bool
 MainWin::_KeyDown(BMessage* msg)
 {
-	// TODO: use the shortcut mechanism instead!
-
 	uint32 key = msg->FindInt32("key");
 	uint32 rawChar = msg->FindInt32("raw_char");
 	uint32 modifier = msg->FindInt32("modifiers");
@@ -1945,6 +1961,10 @@ MainWin::_KeyDown(BMessage* msg)
 	switch (rawChar) {
 		case B_SPACE:
 			fController->TogglePlaying();
+			return true;
+
+		case 'm':
+			fController->ToggleMute();
 			return true;
 
 		case B_ESCAPE:
@@ -2017,6 +2037,20 @@ MainWin::_KeyDown(BMessage* msg)
 			PostMessage(M_SKIP_PREV);
 			return true;
 
+		case '+':
+			if ((modifier & B_COMMAND_KEY) == 0) {
+				_ZoomVideoView(10);
+				return true;
+			}
+			break;
+
+		case '-':
+			if ((modifier & B_COMMAND_KEY) == 0) {
+				_ZoomVideoView(-10);
+				return true;
+			}
+			break;
+
 		case B_DELETE:
 		case 'd': 			// d for delete
 		case 't':			// t for Trash
@@ -2034,14 +2068,14 @@ MainWin::_KeyDown(BMessage* msg)
 	switch (key) {
 		case 0x3a:  		// numeric keypad +
 			if ((modifier & B_COMMAND_KEY) == 0) {
-				PostMessage(M_VOLUME_UP);
+				_ZoomVideoView(10);
 				return true;
 			}
 			break;
 
 		case 0x25:  		// numeric keypad -
 			if ((modifier & B_COMMAND_KEY) == 0) {
-				PostMessage(M_VOLUME_DOWN);
+				_ZoomVideoView(-10);
 				return true;
 			}
 			break;
@@ -2062,6 +2096,24 @@ MainWin::_KeyDown(BMessage* msg)
 		case 0x5a:			// numeric keypad page down
 		case 0x48:			// numeric keypad left arrow
 			PostMessage(M_SKIP_PREV);
+			return true;
+
+		// Playback controls along the bottom of the keyboard:
+		// Z X C V B  for US International
+		case 0x4c:
+			PostMessage(M_SKIP_PREV);
+			return true;
+		case 0x4d:
+			fController->Play();
+			return true;
+		case 0x4e:
+			fController->Pause();
+			return true;
+		case 0x4f:
+			fController->Stop();
+			return true;
+		case 0x50:
+			PostMessage(M_SKIP_NEXT);
 			return true;
 	}
 
