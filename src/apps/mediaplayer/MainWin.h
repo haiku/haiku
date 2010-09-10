@@ -146,7 +146,7 @@ private:
 			BMenu*				fVideoAspectMenu;
 			BMenu*				fAudioTrackMenu;
 			BMenu*				fVideoTrackMenu;
-			BMenu*				fSettingsMenu;
+			BMenu*				fAttributesMenu;
 			BMenuItem*			fNoInterfaceMenuItem;
 			BMenu*				fPlaylistMenu;
 

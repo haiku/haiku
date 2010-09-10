@@ -1351,20 +1351,19 @@ MainWin::_CreateMenu()
 	fAudioMenu = new BMenu("Audio");
 	fVideoMenu = new BMenu("Video");
 	fVideoAspectMenu = new BMenu("Aspect ratio");
-	fSettingsMenu = new BMenu("Settings");
 	fAudioTrackMenu = new BMenu("Track");
 	fVideoTrackMenu = new BMenu("Track");
+	fAttributesMenu = new BMenu("Attributes");
 
 	fMenuBar->AddItem(fFileMenu);
 	fMenuBar->AddItem(fAudioMenu);
 	fMenuBar->AddItem(fVideoMenu);
-	fMenuBar->AddItem(fSettingsMenu);
+	fMenuBar->AddItem(fAttributesMenu);
 
 	BMenuItem* item = new BMenuItem("New player"B_UTF8_ELLIPSIS,
 		new BMessage(M_NEW_PLAYER), 'N');
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
-	fFileMenu->AddSeparatorItem();
 
 #if 0
 	// Plain "Open File" entry
@@ -1380,6 +1379,8 @@ MainWin::_CreateMenu()
 	fFileMenu->AddItem(item);
 #endif
 
+	fFileMenu->AddSeparatorItem();
+
 	fFileMenu->AddItem(new BMenuItem("File info"B_UTF8_ELLIPSIS,
 		new BMessage(M_FILE_INFO), 'I'));
 	fFileMenu->AddItem(fPlaylistMenu);
@@ -1387,11 +1388,27 @@ MainWin::_CreateMenu()
 	fPlaylistMenu->Superitem()->SetMessage(new BMessage(M_FILE_PLAYLIST));
 
 	fFileMenu->AddSeparatorItem();
+
+	fNoInterfaceMenuItem = new BMenuItem("No interface",
+		new BMessage(M_TOGGLE_NO_INTERFACE), 'B');
+	fFileMenu->AddItem(fNoInterfaceMenuItem);
+	fFileMenu->AddItem(new BMenuItem("Always on top",
+		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
+
+	item = new BMenuItem("Settings"B_UTF8_ELLIPSIS,
+		new BMessage(M_SETTINGS), 'S');
+	fFileMenu->AddItem(item);
+	item->SetTarget(be_app);
+
+	fFileMenu->AddSeparatorItem();
+
 	item = new BMenuItem("About " NAME B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED));
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
+
 	fFileMenu->AddSeparatorItem();
+
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W'));
 	fFileMenu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));
 
@@ -1431,16 +1448,9 @@ MainWin::_CreateMenu()
 	_SetupVideoAspectItems(fVideoAspectMenu);
 	fVideoMenu->AddItem(fVideoAspectMenu);
 
-	fNoInterfaceMenuItem = new BMenuItem("No interface",
-		new BMessage(M_TOGGLE_NO_INTERFACE), 'B');
-	fSettingsMenu->AddItem(fNoInterfaceMenuItem);
-	fSettingsMenu->AddItem(new BMenuItem("Always on top",
-		new BMessage(M_TOGGLE_ALWAYS_ON_TOP), 'A'));
-	fSettingsMenu->AddSeparatorItem();
-	item = new BMenuItem("Settings"B_UTF8_ELLIPSIS,
-		new BMessage(M_SETTINGS), 'S');
-	fSettingsMenu->AddItem(item);
-	item->SetTarget(be_app);
+	item = new BMenuItem("<- This space for rent ->", NULL);
+	item->SetEnabled(false);
+	fAttributesMenu->AddItem(item);
 }
 
 
@@ -1883,8 +1893,6 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 	item->SetEnabled(fHasVideo);
 
 	menu->AddSeparatorItem();
-
-	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));
 
 	menu->SetTargetForItems(this);
@@ -2083,7 +2091,7 @@ MainWin::_ToggleFullscreen()
 
 	fVideoView->SetFullscreen(fIsFullscreen);
 
-	_MarkItem(fSettingsMenu, M_TOGGLE_FULLSCREEN, fIsFullscreen);
+	_MarkItem(fFileMenu, M_TOGGLE_FULLSCREEN, fIsFullscreen);
 
 	printf("_ToggleFullscreen leave\n");
 }
@@ -2094,7 +2102,7 @@ MainWin::_ToggleAlwaysOnTop()
 	fAlwaysOnTop = !fAlwaysOnTop;
 	SetFeel(fAlwaysOnTop ? B_FLOATING_ALL_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL);
 
-	_MarkItem(fSettingsMenu, M_TOGGLE_ALWAYS_ON_TOP, fAlwaysOnTop);
+	_MarkItem(fFileMenu, M_TOGGLE_ALWAYS_ON_TOP, fAlwaysOnTop);
 }
 
 
@@ -2124,7 +2132,7 @@ MainWin::_ToggleNoInterface()
 		SetLook(B_TITLED_WINDOW_LOOK);
 	}
 
-	_MarkItem(fSettingsMenu, M_TOGGLE_NO_INTERFACE, fNoInterface);
+	_MarkItem(fFileMenu, M_TOGGLE_NO_INTERFACE, fNoInterface);
 
 	printf("_ToggleNoInterface leave\n");
 }
