@@ -43,6 +43,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
+#include <TypeConstants.h>
 #include <View.h>
 
 #include "AudioProducer.h"
@@ -97,6 +98,8 @@ enum {
 	M_SELECT_VIDEO_TRACK		= 0x00010000,
 	M_SELECT_VIDEO_TRACK_END	= 0x000fffff,
 
+	M_SET_RATING,
+
 	M_SET_PLAYLIST_POSITION,
 
 	M_FILE_DELETE,
@@ -140,6 +143,9 @@ static property_info sPropertyInfo[] = {
 	},
 	{ 0, { 0 }, { 0 }, 0, 0 }
 };
+
+
+static const char* kRatingAttrName = "Media:Rating";
 
 
 //#define printf(a...)
@@ -926,6 +932,14 @@ MainWin::MessageReceived(BMessage* msg)
 			}
 			break;
 
+		case M_SET_RATING:
+		{
+			int32 rating;
+			if (msg->FindInt32("rating", &rating) == B_OK)
+				_SetRating(rating);
+			break;
+		}
+
 		default:
 			if (msg->what >= M_SELECT_AUDIO_TRACK
 				&& msg->what <= M_SELECT_AUDIO_TRACK_END) {
@@ -1448,9 +1462,15 @@ MainWin::_CreateMenu()
 	_SetupVideoAspectItems(fVideoAspectMenu);
 	fVideoMenu->AddItem(fVideoAspectMenu);
 
-	item = new BMenuItem("<- This space for rent ->", NULL);
-	item->SetEnabled(false);
-	fAttributesMenu->AddItem(item);
+	fRatingMenu = new BMenu("Rating");
+	fAttributesMenu->AddItem(fRatingMenu);
+	for (int32 i = 1; i <= 10; i++) {
+		char label[16];
+		snprintf(label, sizeof(label), "%ld", i);
+		BMessage* setRatingMsg = new BMessage(M_SET_RATING);
+		setRatingMsg->AddInt32("rating", i);
+		fRatingMenu->AddItem(new BMenuItem(label, setRatingMsg));
+	}
 }
 
 
@@ -2255,6 +2275,56 @@ MainWin::_UpdatePlaylistItemFile()
 			}
 		}
 	}
+
+	_UpdateAttributesMenu(node);
+}
+
+
+void
+MainWin::_UpdateAttributesMenu(const BNode& node)
+{
+	int32 rating = -1;
+
+	attr_info info;
+	status_t status = node.GetAttrInfo(kRatingAttrName, &info);
+	if (status == B_OK && info.type == B_INT32_TYPE) {
+		// Node has the Rating attribute.
+		node.ReadAttr(kRatingAttrName, B_INT32_TYPE, 0, &rating,
+			sizeof(rating));
+	}
+
+	for (int32 i = 0; BMenuItem* item = fRatingMenu->ItemAt(i); i++)
+		item->SetMarked(i + 1 == rating);
+}
+
+
+void
+MainWin::_SetRating(int32 rating)
+{
+	BAutolock locker(fPlaylist);
+	const FilePlaylistItem* item
+		= dynamic_cast<const FilePlaylistItem*>(fController->Item());
+	if (item == NULL)
+		return;
+
+	BNode node(&item->Ref());
+	if (node.InitCheck())
+		return;
+
+	locker.Unlock();
+
+	node.WriteAttr(kRatingAttrName, B_INT32_TYPE, 0, &rating, sizeof(rating));
+
+	// TODO: The whole mechnism should work like this:
+	// * There is already an attribute API for PlaylistItem, flesh it out!
+	// * FilePlaylistItem node-monitors it's file somehow.
+	// * FilePlaylistItem keeps attributes in sync and sends notications.
+	// * MainWin updates the menu according to FilePlaylistItem notifications.
+	// * PlaylistWin shows columns with attribute and other info.
+	// * PlaylistWin updates also upon FilePlaylistItem notifications.
+	// * This keeps attributes in sync when another app changes them.
+
+	_UpdateAttributesMenu(node);
 }
 
 
@@ -2280,6 +2350,7 @@ MainWin::_UpdateControlsEnabledStatus()
 	fControls->SetEnabled(enabledButtons);
 
 	fNoInterfaceMenuItem->SetEnabled(fHasVideo);
+	fAttributesMenu->SetEnabled(fHasAudio || fHasVideo);
 }
 
 

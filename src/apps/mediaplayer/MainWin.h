@@ -120,6 +120,9 @@ private:
 									bool animate = true);
 
 			void				_UpdatePlaylistItemFile();
+			void				_UpdateAttributesMenu(const BNode& node);
+			void				_SetRating(int32 rating);
+
 			void				_UpdateControlsEnabledStatus();
 			void				_UpdatePlaylistMenu();
 			void				_AddPlaylistItem(PlaylistItem* item,
@@ -131,6 +134,7 @@ private:
 
 			void				_AdoptGlobalSettings();
 
+private:
 			bigtime_t			fCreationTime;
 
 			BMenuBar*			fMenuBar;
@@ -141,14 +145,15 @@ private:
 			PlaylistWindow*		fPlaylistWindow;
 
 			BMenu*				fFileMenu;
+			BMenu*				fPlaylistMenu;
 			BMenu*				fAudioMenu;
 			BMenu*				fVideoMenu;
 			BMenu*				fVideoAspectMenu;
 			BMenu*				fAudioTrackMenu;
 			BMenu*				fVideoTrackMenu;
-			BMenu*				fAttributesMenu;
 			BMenuItem*			fNoInterfaceMenuItem;
-			BMenu*				fPlaylistMenu;
+			BMenu*				fAttributesMenu;
+			BMenu*				fRatingMenu;
 
 			bool				fHasFile;
 			bool				fHasVideo;
