@@ -115,6 +115,7 @@ Controller::Controller()
 
 	fPendingSeekRequests(0),
 	fSeekFrame(-1),
+	fRequestedSeekFrame(-1),
 
 	fGlobalSettingsListener(this),
 
@@ -262,6 +263,7 @@ Controller::SetTo(const PlaylistItemRef& item)
 
 	fPendingSeekRequests = 0;
 	fSeekFrame = -1;
+	fRequestedSeekFrame = -1;
 
 	if (fItem.Get() == NULL)
 		return B_BAD_VALUE;
@@ -717,10 +719,14 @@ Controller::SetFramePosition(int64 value)
 	BAutolock _(this);
 
 	fPendingSeekRequests++;
-	fSeekFrame = max_c(0, min_c(_FrameDuration(), value));
+	fRequestedSeekFrame = max_c(0, min_c(_FrameDuration(), value));
+	fSeekFrame = fRequestedSeekFrame;
 
-	// Snap to video keyframe, since that will be the fastest
-	// to display and seeking will feel more snappy.
+	// Snap to a video keyframe, since that will be the fastest
+	// to display and seeking will feel more snappy. Note that we
+	// don't store this change in fSeekFrame, since we still want
+	// to report the originally requested seek frame in TimePosition()
+	// until we could reach that frame.
 	if (Duration() > 240 && fVideoTrackSupplier != NULL)
 		fVideoTrackSupplier->FindKeyFrameForFrame(&fSeekFrame);
 
@@ -735,7 +741,7 @@ Controller::SetFramePosition(int64 value)
 			// if next current frame == seek frame.
 		return seekFrame;
 	} else
-		NotifySeekHandled(fSeekFrame);
+		NotifySeekHandled(fRequestedSeekFrame);
 	return currentFrame;
 }
 
@@ -940,7 +946,7 @@ Controller::_TimePosition() const
 	// frames asynchronously.
 	int64 frame;
 	if (fPendingSeekRequests > 0)
-		frame = fSeekFrame;
+		frame = fRequestedSeekFrame;
 	else
 		frame = fCurrentFrame;
 
@@ -1166,8 +1172,10 @@ Controller::NotifySeekHandled(int64 seekedFrame) const
 		return;
 
 	fPendingSeekRequests--;
-	if (fPendingSeekRequests == 0)
+	if (fPendingSeekRequests == 0) {
 		fSeekFrame = -1;
+		fRequestedSeekFrame = -1;
+	}
 
 	_NotifySeekHandled(seekedFrame);
 }

@@ -202,6 +202,7 @@ private:
 
 	mutable	int32				fPendingSeekRequests;
 	mutable int64				fSeekFrame;
+	mutable int64				fRequestedSeekFrame;
 
 			ListenerAdapter		fGlobalSettingsListener;
 
