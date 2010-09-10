@@ -68,7 +68,6 @@ int MainWin::sNoVideoWidth = MIN_WIDTH;
 enum {
 	M_DUMMY = 0x100,
 	M_FILE_OPEN = 0x1000,
-	M_FILE_NEWPLAYER,
 	M_FILE_INFO,
 	M_FILE_PLAYLIST,
 	M_FILE_CLOSE,
@@ -700,9 +699,6 @@ MainWin::MessageReceived(BMessage* msg)
 		}
 
 		// menu item messages
-		case M_FILE_NEWPLAYER:
-			gMainApp->NewWindow();
-			break;
 		case M_FILE_OPEN:
 		{
 			BMessenger target(this);
@@ -1364,8 +1360,10 @@ MainWin::_CreateMenu()
 	fMenuBar->AddItem(fVideoMenu);
 	fMenuBar->AddItem(fSettingsMenu);
 
-	fFileMenu->AddItem(new BMenuItem("New player"B_UTF8_ELLIPSIS,
-		new BMessage(M_FILE_NEWPLAYER), 'N'));
+	BMenuItem* item = new BMenuItem("New player"B_UTF8_ELLIPSIS,
+		new BMessage(M_NEW_PLAYER), 'N');
+	fFileMenu->AddItem(item);
+	item->SetTarget(be_app);
 	fFileMenu->AddSeparatorItem();
 
 #if 0
@@ -1375,7 +1373,7 @@ MainWin::_CreateMenu()
 #else
 	// Add recent files to "Open File" entry as sub-menu.
 	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
-	BMenuItem* item = new BMenuItem(recentFiles.NewFileListMenu(
+	item = new BMenuItem(recentFiles.NewFileListMenu(
 		"Open file"B_UTF8_ELLIPSIS, new BMessage(B_REFS_RECEIVED),
 		NULL, this, 10, false, NULL, 0, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);

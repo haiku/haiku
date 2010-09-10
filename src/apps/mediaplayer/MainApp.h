@@ -29,6 +29,7 @@
 
 
 enum  {
+	M_NEW_PLAYER				= 'nwpl',
 	M_PLAYER_QUIT				= 'plqt',
 	M_SETTINGS					= 'stng',
 

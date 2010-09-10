@@ -273,6 +273,13 @@ void
 MainApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case M_NEW_PLAYER:
+		{
+			MainWin* window = NewWindow();
+			if (window != NULL)
+				window->Show();
+			break;
+		}
 		case M_PLAYER_QUIT:
 		{
 			// store the window settings of this instance
