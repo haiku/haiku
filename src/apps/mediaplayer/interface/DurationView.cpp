@@ -52,14 +52,14 @@ DurationView::MouseDown(BPoint where)
 BSize
 DurationView::MinSize()
 {
-// If we wanted to have a fixed size:
-//	BSize size;
-//	size.width = StringWidth("-00:00:00");
-//	font_height fontHeight;
-//	GetFontHeight(&fontHeight);
-//	size.height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
-//	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
-	return BStringView::MinSize();
+	BSize size;
+	char string[64];
+	duration_to_string(int32(fDuration / -1000000LL), string, sizeof(string));
+	size.width = StringWidth(string);
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	size.height = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
 
@@ -80,7 +80,10 @@ DurationView::Update(bigtime_t position, bigtime_t duration)
 		return;
 
 	fPosition = position;
-	fDuration = duration;
+	if (fDuration != duration) {
+		fDuration = duration;
+		InvalidateLayout();
+	}
 	_Update();
 }
 
