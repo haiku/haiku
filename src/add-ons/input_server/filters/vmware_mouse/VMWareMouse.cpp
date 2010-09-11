@@ -56,6 +56,8 @@ VMWareMouseFilter::Filter(BMessage *message, BList *outList)
 		return B_DISPATCH_MESSAGE;
 
 	switch(message->what) {
+		case B_MOUSE_UP:
+		case B_MOUSE_DOWN:
 		case B_MOUSE_MOVED:
 		{
 			uint16 status, numWords;
