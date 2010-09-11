@@ -61,7 +61,10 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	:
 	BGroupView(B_VERTICAL, 0)
 {
-	float symbolHeight = 9;
+	// Pick a symbol size based on the current system font size, but make
+	// sure the size is uneven, so the pointy shapes have their middle on
+	// a pixel instead of between two pixels.
+	float symbolHeight = int(be_plain_font->Size() / 1.33) | 1;
 
 	BGroupView* seekGroup = new BGroupView(B_HORIZONTAL, 0);
 	BGroupLayout* seekLayout = seekGroup->GroupLayout();
@@ -71,6 +74,15 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	fSeekSlider = new SeekSlider("seek slider", new BMessage(MSG_SEEK),
 		0, kPositionFactor);
 	seekLayout->AddView(fSeekSlider);
+
+	// Figure out the visual insets of the slider bounds towards the slider
+	// bar, and use that as insets for the rest of the layout.
+	float inset = fSeekSlider->BarFrame().left;
+	float hInset = inset - fSeekSlider->BarFrame().top;
+	if (hInset < 0.0f)
+		hInset = 0.0f;
+
+	seekLayout->SetInsets(0, hInset, 0, 0);
 
 	fPositionToolTip = new PositionToolTip();
 	fSeekSlider->SetToolTip(fPositionToolTip);
@@ -84,7 +96,7 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
     // Buttons
 
 	BGroupView* controlGroup = new BGroupView(B_HORIZONTAL, 0);
-	controlGroup->GroupLayout()->SetInsets(7, 5, 7, 5);
+	controlGroup->GroupLayout()->SetInsets(inset, hInset, inset, inset);
 	GroupLayout()->AddView(controlGroup);
 	BGroupLayout* controlLayout = controlGroup->GroupLayout();
 
