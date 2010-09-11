@@ -65,8 +65,8 @@ ICUTimeConversion::TZSet(const char* timeZoneID)
 		return B_ERROR;
 	}
 
-	*fDataBridge->addrOfTimezone = (rawOffset + dstOffset) / 1000;
-		// we want seconds, not ms (which ICU gives us)
+	*fDataBridge->addrOfTimezone = -1 * (rawOffset + dstOffset) / 1000;
+		// we want seconds, not the ms that ICU gives us
 
 	*fDataBridge->addrOfDaylight = icuTimeZone->useDaylightTime();
 
