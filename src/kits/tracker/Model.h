@@ -38,6 +38,7 @@ All rights reserved.
 #define _NU_MODEL_H
 
 #include <AppFileInfo.h>
+#include <Debug.h>
 #include <Mime.h>
 #include <StorageDefs.h>
 #include <String.h>
@@ -113,8 +114,8 @@ class Model {
 
 		BNode *Node() const;
 			// returns null if not Open
-		void GetPath(BPath *) const;	
-		void GetEntry(BEntry *) const;	
+		void GetPath(BPath *) const;
+		void GetEntry(BEntry *) const;
 
 		const char *MimeType() const;
 		const char *PreferredAppSignature() const;
@@ -258,7 +259,7 @@ class ModelNodeLazyOpener {
 	// and have close up model when done, etc.
 	public:
 		// consider failing when open does not succeed
-	
+
 		ModelNodeLazyOpener(Model *model, bool writable = false, bool openLater = true);
 		~ModelNodeLazyOpener();
 
@@ -339,14 +340,14 @@ Model::StatBuf() const
 }
 
 
-inline IconSource 
+inline IconSource
 Model::IconFrom() const
 {
 	return (IconSource)fIconFrom;
 }
 
 
-inline void 
+inline void
 Model::SetIconFrom(IconSource from)
 {
 	fIconFrom = from;
@@ -470,21 +471,21 @@ ModelNodeLazyOpener::~ModelNodeLazyOpener()
 }
 
 
-inline bool 
+inline bool
 ModelNodeLazyOpener::IsOpen() const
 {
 	return fModel->IsNodeOpen();
 }
 
 
-inline bool 
+inline bool
 ModelNodeLazyOpener::IsOpenForWriting() const
 {
 	return fModel->IsNodeOpenForWriting();
 }
 
 
-inline bool 
+inline bool
 ModelNodeLazyOpener::IsOpen(bool forWriting) const
 {
 	return forWriting ? fModel->IsNodeOpenForWriting() : fModel->IsNodeOpen();
@@ -498,7 +499,7 @@ ModelNodeLazyOpener::TargetModel() const
 }
 
 
-inline status_t 
+inline status_t
 ModelNodeLazyOpener::OpenNode(bool writable)
 {
 	if (writable) {
@@ -506,7 +507,7 @@ ModelNodeLazyOpener::OpenNode(bool writable)
 			return fModel->OpenNode(true);
 	} else if (!fModel->IsNodeOpen())
 		return fModel->OpenNode();
-	
+
 	return B_OK;
 }
 
