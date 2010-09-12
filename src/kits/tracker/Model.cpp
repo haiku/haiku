@@ -1252,7 +1252,8 @@ Model::GetVersionString(BString &result, version_kind kind)
 void
 Model::PrintToStream(int32 level, bool deep)
 {
-	PRINT(("model name %s, entry name %s, inode %Lx, dev %x, directory inode %Lx\n",
+	PRINT(("model name %s, entry name %s, inode %" B_PRIdINO ", dev %" B_PRIdDEV
+		", directory inode %" B_PRIdINO "\n",
 		Name() ? Name() : "**empty name**",
 		EntryRef()->name ? EntryRef()->name : "**empty ref name**",
 		NodeRef()->node,
@@ -1344,7 +1345,8 @@ Model::PrintToStream(int32 level, bool deep)
 	if (IsNodeOpen()) {
 		node_ref nodeRef;
 		fNode->GetNodeRef(&nodeRef);
-		PRINT(("node ref of open Node %Lx %x\n", nodeRef.node, nodeRef.device));
+		PRINT(("node ref of open Node %" B_PRIdINO " %" B_PRIdDEV "\n",
+			nodeRef.node, nodeRef.device));
 	}
 
 	if (deep && IsSymLink()) {

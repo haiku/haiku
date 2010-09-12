@@ -1493,8 +1493,8 @@ CopyFolder(BEntry *srcEntry, BDirectory *destDir, CopyLoopControl *loopControl,
 
 			// entry is a mount point, do not copy it
 			if (statbuf.st_dev != sourceDeviceID) {
-				PRINT(("Avoiding mount point %d, %d	\n", statbuf.st_dev,
-					sourceDeviceID));
+				PRINT(("Avoiding mount point %" B_PRIdDEV ", %" B_PRIdDEV "\n",
+					statbuf.st_dev, sourceDeviceID));
 				continue;
 			}
 

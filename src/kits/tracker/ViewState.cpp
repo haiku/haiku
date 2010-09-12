@@ -325,7 +325,7 @@ BViewState::BViewState(const BMessage &message)
 	message.FindInt32(kViewStateViewModeName, (int32 *)&fViewMode);
 	message.FindInt32(kViewStateLastIconModeName, (int32 *)&fLastIconMode);
 	message.FindInt32(kViewStateLastIconSizeName,(int32 *)&fLastIconSize);
-	message.FindInt32(kViewStateIconSizeName, (int32 *)&fIconSize);	
+	message.FindInt32(kViewStateIconSizeName, (int32 *)&fIconSize);
 	message.FindPoint(kViewStateListOriginName, &fListOrigin);
 	message.FindPoint(kViewStateIconOriginName, &fIconOrigin);
 	message.FindInt32(kViewStatePrimarySortAttrName,
@@ -493,8 +493,9 @@ BViewState::_Sanitize(BViewState *state, bool fixOnly)
 			&& state->fLastIconMode != kIconMode
 			&& state->fLastIconMode != kMiniIconMode
 			&& state->fLastIconMode != 0)) {
-		PRINT(("Bad data instantiating ViewState, view mode %x, lastIconMode %x\n",
-			state->fViewMode, state->fLastIconMode));
+		PRINT(("Bad data instantiating ViewState, view mode %" B_PRIx32
+			", lastIconMode %" B_PRIx32 "\n", state->fViewMode,
+			state->fLastIconMode));
 
 		delete state;
 		return NULL;

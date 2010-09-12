@@ -1220,7 +1220,8 @@ FindPanel::BuildAttrQuery(BQuery *query, bool &dynamicDate) const
 						DEBUG_ONLY(time_t result =)
 						parsedate_etc(textControl->TextView()->Text(), -1, &flags);
 						dynamicDate = (flags & PARSEDATE_RELATIVE_TIME) != 0;
-						PRINT(("parsedate_etc - date is %srelative, %l\n",
+						PRINT(("parsedate_etc - date is %srelative, %"
+							B_PRIdTIME "\n",
 							dynamicDate ? "" : "not ", result));
 
 						query->PushDate(textControl->TextView()->Text());

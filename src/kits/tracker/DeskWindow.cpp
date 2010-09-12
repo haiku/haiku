@@ -195,7 +195,7 @@ BDeskWindow::MenusBeginning()
 		// remove all current addon shortcuts
 		for (std::set<uint32>::iterator it= fCurrentAddonShortcuts.begin();
 			it != fCurrentAddonShortcuts.end(); it++) {
-			PRINT(("removing shortcut %c\n", *it));
+			PRINT(("removing shortcut %c\n", (int)*it));
 			RemoveShortcut(*it, B_OPTION_KEY | B_COMMAND_KEY);
 		}
 

@@ -1499,7 +1499,7 @@ status_t
 TTracker::NeedMoreNodeMonitors()
 {
 	fNodeMonitorCount += kNodeMonitorBumpValue;
-	PRINT(("bumping nodeMonitorCount to %d\n", fNodeMonitorCount));
+	PRINT(("bumping nodeMonitorCount to %" B_PRId32 "\n", fNodeMonitorCount));
 
 	struct rlimit rl;
 	rl.rlim_cur = fNodeMonitorCount;

@@ -1074,7 +1074,8 @@ StringFromStream(BString *string, BMallocIO *stream, bool endianSwap)
 
 	if (length < 0 || length > 10000) {
 		// TODO: should fail here
-		PRINT(("problems instatiating a string, length probably wrong %d\n", length));
+		PRINT(("problems instatiating a string, length probably wrong %"
+			B_PRId32 "\n", length));
 		return;
 	}
 
@@ -1637,7 +1638,7 @@ void
 _ThrowOnError(status_t error, const char *DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
 {
 	if (error != B_OK) {
-		PRINT(("failing %s at %s:%d\n", strerror(error), file, line));
+		PRINT(("failing %s at %s:%d\n", strerror(error), file, (int)line));
 		throw error;
 	}
 }
@@ -1647,7 +1648,7 @@ void
 _ThrowIfNotSize(ssize_t size, const char *DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
 {
 	if (size < B_OK) {
-		PRINT(("failing %s at %s:%d\n", strerror(size), file, line));
+		PRINT(("failing %s at %s:%d\n", strerror(size), file, (int)line));
 		throw (status_t)size;
 	}
 }
@@ -1658,7 +1659,8 @@ _ThrowOnError(status_t error, const char *DEBUG_ONLY(debugString),
 	const char *DEBUG_ONLY(file), int32 DEBUG_ONLY(line))
 {
 	if (error != B_OK) {
-		PRINT(("failing %s, %s at %s:%d\n", debugString, strerror(error), file, line));
+		PRINT(("failing %s, %s at %s:%d\n", debugString, strerror(error), file,
+			(int)line));
 		throw error;
 	}
 }
