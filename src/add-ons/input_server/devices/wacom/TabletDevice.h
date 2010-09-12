@@ -31,6 +31,7 @@ class TabletDevice : public PointingDevice {
 									uint32 mode = DEVICE_INTUOS);
 
 			void				ReadData(const uchar* data,
+									int dataBytes,
 									bool& hasContact,
 									uint32& mode,
 									uint32& buttons,
@@ -76,6 +77,7 @@ class TabletDevice : public PointingDevice {
 		DEVICE_PENSTATION,
 		DEVICE_CINTIQ,
 		DEVICE_BAMBOO,
+		DEVICE_BAMBOO_PT,
 	};
 
 	enum {

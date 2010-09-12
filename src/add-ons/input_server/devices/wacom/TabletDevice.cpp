@@ -223,6 +223,21 @@ TabletDevice::DetectDevice(const DeviceReader* reader)
 		case 0xB2:
 			SetDevice(60960.0, 45720.0, DEVICE_INTUOS3);
 			break;
+		case 0xD0:	// Wacom Bamboo 2FG (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD1:	// Wacom BambooFun 2FG 4x5 (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD2:	// Wacom Bamboo Craft (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD3:	// Wacom BambooFun 2FG 6x8 (from Linux Wacom Project)
+			SetDevice(21648.0, 13530.0, DEVICE_BAMBOO_PT);
+			break;
+		case 0xD4:	// Wacom Bamboo 4x5 (from Linux Wacom Project)
+			SetDevice(14720.0, 9200.0, DEVICE_BAMBOO_PT);
+			break;
 		default:
 			status = B_BAD_VALUE;
 			break;
@@ -243,8 +258,8 @@ TabletDevice::SetDevice(float maxX, float maxY, uint32 mode)
 
 // ReadData
 void
-TabletDevice::ReadData(const uchar* data, bool& hasContact, uint32& mode,
-	uint32& buttons, float& x, float& y, float& pressure,
+TabletDevice::ReadData(const uchar* data, int dataBytes, bool& hasContact,
+	uint32& mode, uint32& buttons, float& x, float& y, float& pressure,
 	int32& clicks, int32& eraser, float& wheelX, float& wheelY,
 	float& tiltX, float& tiltY) const
 {
@@ -301,6 +316,25 @@ TabletDevice::ReadData(const uchar* data, bool& hasContact, uint32& mode,
 			thirdButton = (data[1] & 0x04);
 
 			break;
+		}
+		case DEVICE_BAMBOO_PT:
+		{
+			if (dataBytes < 20) {	// ignore touch-packets
+				xPos = data[3] << 8 | data[2];
+				yPos = data[5] << 8 | data[4];
+	
+				hasContact = (data[1] & 0x10) && (data[1] & 0x20);		
+	
+				uint16 pressureData = data[7] << 8 | data[6];
+				pressure = (float)pressureData / 1023.0;
+				eraser = (data[1] & 0x08);
+	
+				firstButton = (data[1] & 0x01);
+				secondButton = (data[1] & 0x02);
+				thirdButton = (data[1] & 0x04);
+	
+				break;
+			}
 		}
 		case DEVICE_INTUOS:
 		case DEVICE_INTUOS3:
@@ -598,7 +632,7 @@ TabletDevice::poll_usb_device(void* arg)
 			float tiltX = 0.0;
 			float tiltY = 0.0;
 			// let the device extract all information from the data
-			tabletDevice->ReadData(data, hasContact, mode, buttons,
+			tabletDevice->ReadData(data, dataBytes, hasContact, mode, buttons,
 								   x, y, pressure, clicks, eraser,
 								   wheelX, wheelY, tiltX, tiltY);
 			if (hasContact) {
@@ -766,6 +800,23 @@ TabletDevice::_GetName(uint16 productID, const char** name) const
 		case 0xB2:
 			*name = "Wacom Intuos3 9x12 USB";
 			break;
+
+		case 0xD0:
+			*name = "Wacom Bamboo 2FG USB";
+			break;
+		case 0xD1:
+			*name = "Wacom BambooFun 2FG 4x5\" USB";
+			break;
+		case 0xD2:
+			*name = "Wacom Bamboo Craft USB";
+			break;
+		case 0xD3:
+			*name = "Wacom BambooFun 2FG 6x8\" USB";
+			break;
+		case 0xD4:
+			*name = "Wacom Bamboo 4x5\" USB";
+			break;
+
 		default:
 			*name = "<unkown wacom tablet>";
 			break;
