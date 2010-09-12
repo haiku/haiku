@@ -1775,7 +1775,7 @@ AttributeView::Draw(BRect)
 		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Link to:"))),
 			lineBase));
 		SetHighColor(kAttrTitleColor);
-		DrawString(B_TRANSLATE("Link To:"));
+		DrawString(B_TRANSLATE("Link to:"));
 		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
 		SetHighColor(kLinkColor);
 
