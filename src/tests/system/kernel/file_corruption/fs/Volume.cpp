@@ -37,7 +37,7 @@ Volume::Volume(uint32 flags)
 	fFSVolume(NULL),
 	fFD(-1),
 	fFlags(B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
-		| (flags & B_FS_IS_READONLY != 0 ? B_FS_IS_READONLY : 0)),
+		| ((flags & B_FS_IS_READONLY) != 0 ? B_FS_IS_READONLY : 0)),
 	fBlockCache(NULL),
 	fTotalBlocks(0),
 	fName(NULL),
