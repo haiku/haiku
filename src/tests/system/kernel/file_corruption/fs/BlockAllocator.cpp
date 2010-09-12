@@ -552,7 +552,7 @@ BlockAllocator::_AllocateInBitmapBlock(uint64 base, uint32 count,
 	// we have.
 	uint32 remaining = count;
 
-	while (remaining > 0 & bits < bitsEnd) {
+	while (remaining > 0 && bits < bitsEnd) {
 		PRINT("  remaining: %" B_PRIu32 ", index: %" B_PRIu32 ".%" B_PRIu32
 			", bits: %#" B_PRIx32 "\n", remaining,
 			kBlocksPerBitmapBlock - (bitsEnd - bits), bitOffset, *bits);
