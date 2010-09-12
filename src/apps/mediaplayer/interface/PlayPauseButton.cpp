@@ -167,10 +167,17 @@ PlayPauseButton::SetStopped()
 void
 PlayPauseButton::SetSymbols(BShape* playSymbolShape, BShape* pauseSymbolShape)
 {
+	BSize oldSize = MinSize();
+
 	delete fPlaySymbol;
 	fPlaySymbol = playSymbolShape;
 	delete fPauseSymbol;
 	fPauseSymbol = pauseSymbolShape;
+
+	if (MinSize() != oldSize)
+		InvalidateLayout();
+
+	Invalidate();
 }
 
 

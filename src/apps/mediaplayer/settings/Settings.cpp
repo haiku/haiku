@@ -21,6 +21,7 @@ mpSettings::operator!=(const mpSettings& other) const
 		|| loopSound != other.loopSound
 		|| useOverlays != other.useOverlays
 		|| scaleBilinear != other.scaleBilinear
+		|| scaleFullscreenControls != other.scaleFullscreenControls
 		|| backgroundMovieVolumeMode != other.backgroundMovieVolumeMode
 		|| filePanelFolder != other.filePanelFolder
 		|| audioPlayerWindowFrame != other.audioPlayerWindowFrame;
@@ -49,7 +50,9 @@ Settings::LoadSettings(mpSettings& settings) const
 	settings.loopSound = fSettingsMessage.GetValue("loopSound", false);
 
 	settings.useOverlays = fSettingsMessage.GetValue("useOverlays", true);
-	settings.scaleBilinear = fSettingsMessage.GetValue("scaleBilinear", false);
+	settings.scaleBilinear = fSettingsMessage.GetValue("scaleBilinear", true);
+	settings.scaleFullscreenControls
+		= fSettingsMessage.GetValue("scaleFullscreenControls", true);
 
 	settings.backgroundMovieVolumeMode
 		= fSettingsMessage.GetValue("bgMovieVolumeMode",
@@ -80,6 +83,8 @@ Settings::SaveSettings(const mpSettings& settings)
 
 	fSettingsMessage.SetValue("useOverlays", settings.useOverlays);
 	fSettingsMessage.SetValue("scaleBilinear", settings.scaleBilinear);
+	fSettingsMessage.SetValue("scaleFullscreenControls",
+		settings.scaleFullscreenControls);
 
 	fSettingsMessage.SetValue("bgMovieVolumeMode",
 		settings.backgroundMovieVolumeMode);

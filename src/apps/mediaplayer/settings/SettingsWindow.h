@@ -41,6 +41,7 @@ private:
 
 		BCheckBox*				fUseOverlaysCB;
 		BCheckBox*				fScaleBilinearCB;
+		BCheckBox*				fScaleFullscreenControlsCB;
 
 		BRadioButton*			fFullVolumeBGMoviesRB; 
 		BRadioButton*			fHalfVolumeBGMoviesRB; 

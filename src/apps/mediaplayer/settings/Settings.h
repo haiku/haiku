@@ -23,6 +23,7 @@ struct mpSettings {
 			bool				loopSound;
 			bool				useOverlays;
 			bool				scaleBilinear;
+			bool				scaleFullscreenControls;
 			enum {
 				BG_MOVIES_FULL_VOLUME = 0,
 				BG_MOVIES_HALF_VLUME = 1,

@@ -194,6 +194,7 @@ private:
 			bool				fCloseWhenDonePlayingSound;
 			bool				fLoopMovies;
 			bool				fLoopSounds;
+			bool				fScaleFullscreenControls;
 			bigtime_t			fInitialSeekPosition;
 			bool				fAllowWinding;
 

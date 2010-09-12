@@ -913,6 +913,7 @@ MainWin::MessageReceived(BMessage* msg)
 					fControls->MoveTo(fVideoView->Frame().left,
 						fVideoView->Frame().bottom + 1);
 					fBackground->AddChild(fControls);
+					fControls->SetSymbolScale(1.0f);
 					while (!fControls->IsHidden())
 						fControls->Hide();
 				}
@@ -2236,6 +2237,8 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 		fControls->MoveTo(fVideoView->Bounds().left,
 			fVideoView->Bounds().bottom + 1);
 		fVideoView->AddChild(fControls);
+		if (fScaleFullscreenControls)
+			fControls->SetSymbolScale(1.5f);
 		while (fControls->IsHidden())
 			fControls->Show();
 	}
@@ -2246,7 +2249,8 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 		// time of the animation.
 		const float kAnimationOffsets[] = { 0.05, 0.2, 0.5, 0.2, 0.05 };
 		const int32 steps = sizeof(kAnimationOffsets) / sizeof(float);
-		float moveDist = show ? -fControlsHeight : fControlsHeight;
+		float height = fControls->Bounds().Height();
+		float moveDist = show ? -height : height;
 		float originalY = fControls->Frame().top;
 		for (int32 i = 0; i < steps; i++) {
 			BMessage message(M_SLIDE_CONTROLS);
@@ -2264,6 +2268,7 @@ MainWin::_ShowFullscreenControls(bool show, bool animate)
 			fControls->MoveTo(fVideoView->Frame().left,
 				fVideoView->Frame().bottom + 1);
 			fBackground->AddChild(fControls);
+			fControls->SetSymbolScale(1.0f);
 			while (!fControls->IsHidden())
 				fControls->Hide();
 		}
@@ -2476,6 +2481,7 @@ MainWin::_AdoptGlobalSettings()
 	fCloseWhenDonePlayingSound = settings.closeWhenDonePlayingSound;
 	fLoopMovies = settings.loopMovie;
 	fLoopSounds = settings.loopSound;
+	fScaleFullscreenControls = settings.scaleFullscreenControls;
 }
 
 

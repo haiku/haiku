@@ -86,9 +86,11 @@ SymbolButton::MinSize()
 	if (fSymbol == NULL)
 		return BButton::MinSize();
 
+	float scale = fBorders != 0 ? 2.5f : 1.0f;
+
 	BSize size;
-	size.width = ceilf(fSymbol->Bounds().Width() * 2.5f);
-	size.height = ceilf(fSymbol->Bounds().Height() * 2.5f);
+	size.width = ceilf(fSymbol->Bounds().Width() * scale);
+	size.height = ceilf(fSymbol->Bounds().Height() * scale);
 	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
 }
 
@@ -97,7 +99,8 @@ BSize
 SymbolButton::MaxSize()
 {
 	BSize size(MinSize());
-	size.width = ceilf(size.width * 1.5f);
+	if (fBorders != 0)
+		size.width = ceilf(size.width * 1.5f);
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), size);
 }
 
@@ -105,7 +108,14 @@ SymbolButton::MaxSize()
 void
 SymbolButton::SetSymbol(BShape* symbolShape)
 {
+	BSize oldSize = MinSize();
+
 	delete fSymbol;
 	fSymbol = symbolShape;
+
+	if (MinSize() != oldSize)
+		InvalidateLayout();
+
+	Invalidate();
 }
 

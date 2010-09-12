@@ -43,7 +43,6 @@ public:
 
 	// BView interface
 	virtual	void				AttachedToWindow();
-	virtual	void				FrameResized(float width, float height);
 	virtual	void				GetPreferredSize(float* width, float* height);
 	virtual	void				MessageReceived(BMessage* message);
 
@@ -77,6 +76,7 @@ public:
 									{ return fPeakView; }
 
 			void				SetDisabledString(const char* string);
+			void				SetSymbolScale(float scale);
 
 private:
 			void				_TogglePlaying();
@@ -117,6 +117,11 @@ private:
 			PlayPauseButton*	fPlayPause;
 			SymbolButton*		fStop;
 			SymbolButton*		fMute;
+
+			BGroupLayout*		fSeekLayout;
+			BGroupLayout*		fControlLayout;
+
+			float				fSymbolScale;
 };
 
 #endif	// TRANSPORT_CONTROL_GROUP_H

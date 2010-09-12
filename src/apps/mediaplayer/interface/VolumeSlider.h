@@ -32,6 +32,8 @@ public:
 			bool				IsMuted() const
 									{ return fMuted; }
 
+			float				PreferredBarThickness() const;
+
 private:
 			float				_PointForValue(int32 value) const;
 

@@ -35,6 +35,8 @@ public:
 			uint32				Mode() const
 									{ return fMode; }
 
+			void				SetSymbolScale(float scale);
+
 private:
 			void				_Update();
 			void				_GenerateString(bigtime_t duration);

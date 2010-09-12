@@ -26,12 +26,13 @@ SeekSlider::SeekSlider(const char* name, BMessage* message, int32 minValue,
 		B_TRIANGLE_THUMB),
 	fTracking(false),
 	fLastTrackTime(0),
-	fDisabledString(kDisabledSeekMessage)
+	fDisabledString(kDisabledSeekMessage),
+	fScale(0.0f)
 {
 	BFont font(be_plain_font);
 	font.SetSize(9.0);
 	SetFont(&font);
-	SetBarThickness(15.0);
+	SetSymbolScale(1.0);
 	rgb_color fillColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 		B_DARKEN_3_TINT);
 	UseFillColor(true, &fillColor);
@@ -49,6 +50,23 @@ SeekSlider::Invoke(BMessage* message)
 {
 	fLastTrackTime = system_time();
 	return BSlider::Invoke(message);
+}
+
+
+BRect
+SeekSlider::ThumbFrame() const
+{
+	BRect frame = BSlider::ThumbFrame();
+
+	float center = (frame.left + frame.right) / 2.0f;
+	float height = ceilf(frame.Height() * fScale);
+	float width = ceilf(frame.Width() * fScale);
+
+	frame.left = floorf(center - width / 2) + 1;
+	frame.right = frame.left + width;
+	frame.bottom = frame.top + height;
+
+	return frame;
 }
 
 
@@ -112,6 +130,41 @@ SeekSlider::GetPreferredSize(float* _width, float* _height)
 		float minWidth = 15.0 + StringWidth(fDisabledString.String()) + 15.0;
 		*_width = max_c(*_width, minWidth);
 	}
+	if (_height != NULL) {
+		BRect unscaledThumbFrame = BSlider::ThumbFrame();
+		BRect scaledThumbFrame = ThumbFrame();
+		*_height += scaledThumbFrame.Height() - unscaledThumbFrame.Height();
+	}
+}
+
+
+BSize
+SeekSlider::MinSize()
+{
+printf("SeekSlider::MinSize()\n");
+	BSize size = BSlider::MinSize();
+
+	BRect unscaledThumbFrame = BSlider::ThumbFrame();
+	BRect scaledThumbFrame = ThumbFrame();
+printf("height: %.1f/%.1f\n", unscaledThumbFrame.Height(), scaledThumbFrame.Height());
+	size.height += scaledThumbFrame.Height() - unscaledThumbFrame.Height();
+
+	return size;
+}
+
+
+BSize
+SeekSlider::MaxSize()
+{
+printf("SeekSlider::MaxSize()\n");
+	BSize size = BSlider::MaxSize();
+
+	BRect unscaledThumbFrame = BSlider::ThumbFrame();
+	BRect scaledThumbFrame = ThumbFrame();
+printf("height: %.1f/%.1f\n", unscaledThumbFrame.Height(), scaledThumbFrame.Height());
+	size.height += scaledThumbFrame.Height() - unscaledThumbFrame.Height();
+
+	return size;
 }
 
 
@@ -137,6 +190,19 @@ SeekSlider::SetDisabledString(const char* string)
 
 	if (!IsEnabled())
 		Invalidate();
+}
+
+
+void
+SeekSlider::SetSymbolScale(float scale)
+{
+	if (scale == fScale)
+		return;
+printf("SeekSlider::SetSymbolScale(%.1f)\n", scale);
+
+	fScale = scale;
+	SetBarThickness(fScale * 15.0);
+	InvalidateLayout();
 }
 
 

@@ -59,7 +59,20 @@ enum {
 TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 		bool usePeakView, bool useWindButtons)
 	:
-	BGroupView(B_VERTICAL, 0)
+	BGroupView(B_VERTICAL, 0),
+	fSeekSlider(NULL),
+	fDurationView(NULL),
+	fPositionToolTip(NULL),
+	fPeakView(NULL),
+	fVolumeSlider(NULL),
+	fSkipBack(NULL),
+	fSkipForward(NULL),
+	fRewind(NULL),
+	fForward(NULL),
+	fPlayPause(NULL),
+	fStop(NULL),
+	fMute(NULL),
+	fSymbolScale(1.0f)
 {
 	// Pick a symbol size based on the current system font size, but make
 	// sure the size is uneven, so the pointy shapes have their middle on
@@ -67,42 +80,22 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 	float symbolHeight = int(be_plain_font->Size() / 1.33) | 1;
 
 	BGroupView* seekGroup = new BGroupView(B_HORIZONTAL, 0);
-	BGroupLayout* seekLayout = seekGroup->GroupLayout();
+	fSeekLayout = seekGroup->GroupLayout();
 	GroupLayout()->AddView(seekGroup);
 
     // Seek slider
 	fSeekSlider = new SeekSlider("seek slider", new BMessage(MSG_SEEK),
 		0, kPositionFactor);
-	seekLayout->AddView(fSeekSlider);
-
-	// Figure out the visual insets of the slider bounds towards the slider
-	// bar, and use that as insets for the rest of the layout.
-	float inset = fSeekSlider->BarFrame().left;
-	float hInset = inset - fSeekSlider->BarFrame().top;
-	if (hInset < 0.0f)
-		hInset = 0.0f;
-
-	seekLayout->SetInsets(0, hInset, 0, 0);
+	fSeekLayout->AddView(fSeekSlider);
 
 	fPositionToolTip = new PositionToolTip();
 	fSeekSlider->SetToolTip(fPositionToolTip);
 
     // Duration view
 	fDurationView = new DurationView("duration view");
-	seekLayout->AddView(fDurationView);
-
-	seekLayout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(5));
+	fSeekLayout->AddView(fDurationView);
 
     // Buttons
-
-	BGroupView* controlGroup = new BGroupView(B_HORIZONTAL, 0);
-	controlGroup->GroupLayout()->SetInsets(inset, hInset, inset, inset);
-	GroupLayout()->AddView(controlGroup);
-	BGroupLayout* controlLayout = controlGroup->GroupLayout();
-
-	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL, 0);
-	BGroupLayout* buttonLayout = buttonGroup->GroupLayout();
-	controlLayout->AddView(buttonGroup, 0.6f);
 
 	uint32 topBottomBorder = BControlLook::B_TOP_BORDER
 		| BControlLook::B_BOTTOM_BORDER;
@@ -113,9 +106,12 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 			_CreateSkipBackwardsShape(symbolHeight),
 			new BMessage(MSG_SKIP_BACKWARDS),
 			BControlLook::B_LEFT_BORDER | topBottomBorder);
-		buttonLayout->AddView(fSkipBack);
-	} else
-		fSkipBack = NULL;
+		// Skip Foward
+		fSkipForward = new SymbolButton(B_EMPTY_STRING,
+			_CreateSkipForwardShape(symbolHeight),
+			new BMessage(MSG_SKIP_FORWARD),
+			BControlLook::B_RIGHT_BORDER | topBottomBorder);
+	}
 
 	if (useWindButtons) {
 		// Rewind
@@ -123,52 +119,30 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 			_CreateRewindShape(symbolHeight), new BMessage(MSG_REWIND),
 			useSkipButtons ? topBottomBorder
 				: BControlLook::B_LEFT_BORDER | topBottomBorder);
-		buttonLayout->AddView(fRewind);
-	} else
-		fRewind = NULL;
-
-	// Play Pause
-	fPlayPause = new PlayPauseButton(B_EMPTY_STRING,
-		_CreatePlayShape(symbolHeight), _CreatePauseShape(symbolHeight),
-		new BMessage(MSG_PLAY), topBottomBorder);
-
-	buttonLayout->AddView(fPlayPause);
-
-	// Stop
-	fStop = new SymbolButton(B_EMPTY_STRING,
-		_CreateStopShape(symbolHeight), new BMessage(MSG_STOP),
-		topBottomBorder);
-	buttonLayout->AddView(fStop);
-
-	if (useWindButtons) {
 		// Forward
 		fForward = new SymbolButton(B_EMPTY_STRING,
 			_CreateForwardShape(symbolHeight), new BMessage(MSG_FORWARD),
 			useSkipButtons ? topBottomBorder
 				: BControlLook::B_RIGHT_BORDER | topBottomBorder);
-		buttonLayout->AddView(fForward);
-	} else
-		fForward = NULL;
+	}
 
-	if (useSkipButtons) {
-		// Skip Foward
-		fSkipForward = new SymbolButton(B_EMPTY_STRING,
-			_CreateSkipForwardShape(symbolHeight),
-			new BMessage(MSG_SKIP_FORWARD),
-			BControlLook::B_RIGHT_BORDER | topBottomBorder);
-		buttonLayout->AddView(fSkipForward);
-	} else
-		fSkipForward = NULL;
+	// Play Pause
+	fPlayPause = new PlayPauseButton(B_EMPTY_STRING,
+		_CreatePlayShape(symbolHeight), _CreatePauseShape(symbolHeight),
+		new BMessage(MSG_PLAY), useWindButtons || useSkipButtons
+			? topBottomBorder
+			: topBottomBorder | BControlLook::B_LEFT_BORDER);
 
-	controlLayout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(5));
+	// Stop
+	fStop = new SymbolButton(B_EMPTY_STRING,
+		_CreateStopShape(symbolHeight), new BMessage(MSG_STOP),
+		useWindButtons || useSkipButtons ? topBottomBorder
+			: topBottomBorder | BControlLook::B_RIGHT_BORDER);
 
 	// Mute
-	BShape* speakerShape = _CreateSpeakerShape(8);
-	fMute = new SymbolButton(B_EMPTY_STRING, speakerShape,
+	fMute = new SymbolButton(B_EMPTY_STRING,
+		_CreateSpeakerShape(floorf(symbolHeight * 0.9)),
 		new BMessage(MSG_SET_MUTE), 0);
-	fMute->SetExplicitMinSize(BSize(speakerShape->Bounds().Width(),
-		speakerShape->Bounds().Height()));
-	controlLayout->AddView(fMute);
 
 	// Volume Slider
 	fVolumeSlider = new VolumeSlider("volume slider",
@@ -177,19 +151,52 @@ TransportControlGroup::TransportControlGroup(BRect frame, bool useSkipButtons,
 		kVolumeFactor, new BMessage(MSG_SET_VOLUME));
 	fVolumeSlider->SetValue(_DbToGain(_ExponentialToLinear(0.0))
 		* kVolumeFactor);
-	controlLayout->AddView(fVolumeSlider);
 
 	// Peak view
-	if (usePeakView) {
+	if (usePeakView)
 		fPeakView = new PeakView("peak view", false, false);
-		controlLayout->AddView(fPeakView, 0.6f);
-	} else
-		fPeakView = NULL;
 
-	BSize size = controlLayout->MinSize();
+	// Layout the controls
+
+	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL, 0);
+	BGroupLayout* buttonLayout = buttonGroup->GroupLayout();
+
+	if (fSkipBack != NULL)
+		buttonLayout->AddView(fSkipBack);
+	if (fRewind != NULL)
+		buttonLayout->AddView(fRewind);
+	buttonLayout->AddView(fPlayPause);
+	buttonLayout->AddView(fStop);
+	if (fForward != NULL)
+		buttonLayout->AddView(fForward);
+	if (fSkipForward != NULL)
+		buttonLayout->AddView(fSkipForward);
+
+	BGroupView* controlGroup = new BGroupView(B_HORIZONTAL, 0);
+	GroupLayout()->AddView(controlGroup);
+	fControlLayout = controlGroup->GroupLayout();
+	fControlLayout->AddView(buttonGroup, 0.6f);
+	fControlLayout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(5));
+	fControlLayout->AddView(fMute);
+	fControlLayout->AddView(fVolumeSlider);
+	if (fPeakView != NULL)
+		fControlLayout->AddView(fPeakView, 0.6f);
+
+	// Figure out the visual insets of the slider bounds towards the slider
+	// bar, and use that as insets for the rest of the layout.
+	float inset = fSeekSlider->BarFrame().left;
+	float hInset = inset - fSeekSlider->BarFrame().top;
+	if (hInset < 0.0f)
+		hInset = 0.0f;
+
+	fSeekLayout->SetInsets(0, hInset, 5, 0);
+	fControlLayout->SetInsets(inset, hInset, inset, inset);
+
+	BSize size = fControlLayout->MinSize();
 	size.width *= 3;
-	controlLayout->SetExplicitMaxSize(size);
-	controlLayout->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	size.height = B_SIZE_UNSET;
+	fControlLayout->SetExplicitMaxSize(size);
+	fControlLayout->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
 		B_ALIGN_TOP));
 }
 
@@ -220,13 +227,6 @@ TransportControlGroup::AttachedToWindow()
 	fPlayPause->SetTarget(this);
 	fStop->SetTarget(this);
 	fMute->SetTarget(this);
-}
-
-
-void
-TransportControlGroup::FrameResized(float width, float height)
-{
-	DoLayout();
 }
 
 
@@ -506,6 +506,58 @@ TransportControlGroup::SetDisabledString(const char* string)
 	fSeekSlider->SetDisabledString(string);
 }
 
+
+void
+TransportControlGroup::SetSymbolScale(float scale)
+{
+	if (scale == fSymbolScale)
+		return;
+
+	fSymbolScale = scale;
+
+	if (fSeekSlider != NULL)
+		fSeekSlider->SetSymbolScale(scale);
+	if (fVolumeSlider != NULL) {
+		fVolumeSlider->SetBarThickness(fVolumeSlider->PreferredBarThickness()
+			* scale);
+	}
+	if (fDurationView != NULL)
+		fDurationView->SetSymbolScale(scale);
+
+	float symbolHeight = int(scale * be_plain_font->Size() / 1.33) | 1;
+
+	if (fSkipBack != NULL)
+		fSkipBack->SetSymbol(_CreateSkipBackwardsShape(symbolHeight));
+	if (fSkipForward != NULL)
+		fSkipForward->SetSymbol(_CreateSkipForwardShape(symbolHeight));
+	if (fRewind != NULL)
+		fRewind->SetSymbol(_CreateRewindShape(symbolHeight));
+	if (fForward != NULL)
+		fForward->SetSymbol(_CreateForwardShape(symbolHeight));
+	if (fPlayPause != NULL) {
+		fPlayPause->SetSymbols(_CreatePlayShape(symbolHeight),
+			_CreatePauseShape(symbolHeight));
+	}
+	if (fStop != NULL)
+		fStop->SetSymbol(_CreateStopShape(symbolHeight));
+	if (fMute != NULL)
+		fMute->SetSymbol(_CreateSpeakerShape(floorf(symbolHeight * 0.9)));
+
+	// Figure out the visual insets of the slider bounds towards the slider
+	// bar, and use that as insets for the rest of the layout.
+	float barInset = fSeekSlider->BarFrame().left;
+	float inset = barInset * scale;
+	float hInset = inset - fSeekSlider->BarFrame().top;
+	if (hInset < 0.0f)
+		hInset = 0.0f;
+
+	fSeekLayout->SetInsets(inset - barInset, hInset, inset, 0);
+	fSeekLayout->SetSpacing(inset - barInset);
+	fControlLayout->SetInsets(inset, hInset, inset, inset);
+	fControlLayout->SetSpacing(inset - barInset);
+
+	ResizeTo(Bounds().Width(), GroupLayout()->MinSize().height);
+}
 
 // #pragma mark -
 

@@ -20,9 +20,7 @@ DurationView::DurationView(const char* name)
 	fDuration(0),
 	fDisplayDuration(0)
 {
-	BFont font(be_bold_font);
-	font.SetSize(font.Size() * 1.2);
-	SetFont(&font);
+	SetSymbolScale(1.0f);
 
 	SetAlignment(B_ALIGN_RIGHT);
 
@@ -96,6 +94,16 @@ DurationView::SetMode(uint32 mode)
 
 	fMode = mode;
 	_Update();
+}
+
+
+void
+DurationView::SetSymbolScale(float scale)
+{
+	BFont font(be_bold_font);
+	font.SetSize(font.Size() * scale * 1.2);
+	SetFont(&font);
+	InvalidateLayout();
 }
 
 

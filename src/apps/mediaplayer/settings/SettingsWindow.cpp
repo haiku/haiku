@@ -33,6 +33,7 @@ enum {
 	M_LOOP_SOUND,
 	M_USE_OVERLAYS,
 	M_SCALE_BILINEAR,
+	M_SCALE_CONTROLS,
 	M_START_FULL_VOLUME,
 	M_START_HALF_VOLUME,
 	M_START_MUTE_VOLUME,
@@ -101,6 +102,10 @@ SettingsWindow::SettingsWindow(BRect frame)
 		"Scale movies smoothly (non-overlay mode)",
 		new BMessage(M_SCALE_BILINEAR));
 
+	fScaleFullscreenControlsCB = new BCheckBox("chkBoxScaleControls",
+		"Scale controls in full-screen mode",
+		new BMessage(M_SCALE_CONTROLS));
+
 	fFullVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
 		"Full volume", new BMessage(M_START_FULL_VOLUME));
 	
@@ -149,6 +154,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
 					.Add(fUseOverlaysCB)
 					.Add(fScaleBilinearCB)
+					.Add(fScaleFullscreenControlsCB)
 				)
 			)
 			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
@@ -303,6 +309,7 @@ SettingsWindow::MessageReceived(BMessage* message)
 		case M_LOOP_SOUND:
 		case M_USE_OVERLAYS:
 		case M_SCALE_BILINEAR:
+		case M_SCALE_CONTROLS:
 		case M_START_FULL_VOLUME:
 		case M_START_HALF_VOLUME:
 		case M_START_MUTE_VOLUME:
@@ -344,6 +351,7 @@ SettingsWindow::AdoptSettings()
 
 	fUseOverlaysCB->SetValue(fSettings.useOverlays);
 	fScaleBilinearCB->SetValue(fSettings.scaleBilinear);
+	fScaleFullscreenControlsCB->SetValue(fSettings.scaleFullscreenControls);
 
 	fFullVolumeBGMoviesRB->SetValue(fSettings.backgroundMovieVolumeMode
 		== mpSettings::BG_MOVIES_FULL_VOLUME);
@@ -369,6 +377,8 @@ SettingsWindow::ApplySettings()
 
 	fSettings.useOverlays = fUseOverlaysCB->Value() == B_CONTROL_ON;
 	fSettings.scaleBilinear = fScaleBilinearCB->Value() == B_CONTROL_ON;
+	fSettings.scaleFullscreenControls
+		= fScaleFullscreenControlsCB->Value() == B_CONTROL_ON;
 
 	if (fFullVolumeBGMoviesRB->Value() == B_CONTROL_ON) {
 		fSettings.backgroundMovieVolumeMode

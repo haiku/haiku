@@ -19,22 +19,28 @@ public:
 
 	// BSlider interface
 	virtual	status_t			Invoke(BMessage* message);
+	virtual BRect				ThumbFrame() const;
 	virtual void				DrawBar();
 	virtual	void				DrawThumb();
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				GetPreferredSize(float* _width,
 									float* _height);
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
 
 	// SeekSlider
 			bool				IsTracking() const;
 			void				SetDisabledString(const char* string);
+
+			void				SetSymbolScale(float scale);
 
 private:
 			bool				fTracking;
 			bigtime_t			fLastTrackTime;
 
 			BString				fDisabledString;
+			float				fScale;
 };
 
 

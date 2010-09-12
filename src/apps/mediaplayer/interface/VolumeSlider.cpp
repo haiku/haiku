@@ -29,11 +29,7 @@ VolumeSlider::VolumeSlider(const char* name, int32 minValue, int32 maxValue,
 {
 	SetModificationMessage(message);
 	UseFillColor(true, &kGreen);
-#if KNOB_EMBEDDED
-	SetBarThickness(10);
-#else
-	SetBarThickness(8);
-#endif
+	SetBarThickness(PreferredBarThickness());
 }
 
 
@@ -220,6 +216,17 @@ VolumeSlider::SetMuted(bool mute)
 	UseFillColor(true, &fillColor);
 
 	Invalidate();
+}
+
+
+float
+VolumeSlider::PreferredBarThickness() const
+{
+#if KNOB_EMBEDDED
+	return 10.0f;
+#else
+	return 8.0f;
+#endif
 }
 
 
