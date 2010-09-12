@@ -86,7 +86,7 @@ Transaction::Start()
 
 
 status_t
-Transaction::StartAndAddNode(Node* node, uint32 flags = 0)
+Transaction::StartAndAddNode(Node* node, uint32 flags)
 {
 	status_t error = Start();
 	if (error != B_OK)
