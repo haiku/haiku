@@ -326,6 +326,7 @@ static uint16 nvidia_device_list[] = {
 	0x03d1, /* Nvidia Geforce 6100 nForce 405 */
 	0x03d2, /* Nvidia Geforce 6100 nForce 400 */
 	0x03d5, /* Nvidia Geforce 6100 nForce 420 */
+	0x03d6, /* Nvidia Geforce 7025 / nForce 630a */
 	0x07e1, /* Nvidia Geforce 7100 / nForce 630i */
 	0
 };

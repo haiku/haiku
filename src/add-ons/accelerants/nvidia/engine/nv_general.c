@@ -1274,6 +1274,13 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
+	case 0x03d610de: /* Nvidia Geforce 7025 nForce 630a */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		sprintf(si->adi.name, "Nvidia Geforce 7025 nForce 630a");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
 	case 0x07e110de: /* Nvidia Geforce 7100 nForce 630i */
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
