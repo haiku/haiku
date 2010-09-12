@@ -171,7 +171,7 @@ StackAndTile::WindowMoved(Window* window)
 	if (!satWindow)
 		return;
 
-	if (SATKeyPressed())
+	if (SATKeyPressed() && fCurrentSATWindow)
 		satWindow->FindSnappingCandidates();
 	else
 		satWindow->DoGroupLayout();
@@ -185,7 +185,7 @@ StackAndTile::WindowResized(Window* window)
 	if (!satWindow)
 		return;
 
-	if (SATKeyPressed())
+	if (SATKeyPressed() && fCurrentSATWindow)
 		satWindow->FindSnappingCandidates();
 	else {
 		satWindow->DoGroupLayout();
