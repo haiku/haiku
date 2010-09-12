@@ -49,11 +49,11 @@ All rights reserved.
 #include <new>
 
 // don't include <Debug.h>
-#ifndef ASSERT
-#	define ASSERT(E)               (void)0
+#ifndef _OPEN_HASH_TABLE_ASSERT
+#	define _OPEN_HASH_TABLE_ASSERT(E)	(void)0
 #endif
-#ifndef TRESPASS
-#	define TRESPASS()              (void)0
+#ifndef _OPEN_HASH_TABLE_TRESPASS
+#	define _OPEN_HASH_TABLE_TRESPASS()	(void)0
 #endif
 
 namespace BPrivate {
@@ -207,7 +207,7 @@ template<class Element, class ElementVec>
 Element *
 OpenHashTable<Element, ElementVec>::FindFirst(uint32 hash) const
 {
-	ASSERT(fElementVector);
+	_OPEN_HASH_TABLE_ASSERT(fElementVector);
 	hash %= fArraySize;
 	if (fHashArray[hash] < 0)
 		return 0;
@@ -255,7 +255,7 @@ template<class Element, class ElementVec>
 Element *
 OpenHashTable<Element, ElementVec>::Add(uint32 hash)
 {
-	ASSERT(fElementVector);
+	_OPEN_HASH_TABLE_ASSERT(fElementVector);
 	_RehashIfNeeded();
 	hash %= fArraySize;
 	Element *result = fElementVector->Add();
@@ -275,7 +275,7 @@ OpenHashTable<Element, ElementVec>::Remove(Element *element, bool dontRehash)
 		_RehashIfNeeded();
 	uint32 hash = element->Hash() % fArraySize;
 	int32 next = fHashArray[hash];
-	ASSERT(next >= 0);
+	_OPEN_HASH_TABLE_ASSERT(next >= 0);
 
 	if (&fElementVector->At(next) == element) {
 		fHashArray[hash] = element->fNext;
@@ -288,7 +288,7 @@ OpenHashTable<Element, ElementVec>::Remove(Element *element, bool dontRehash)
 		// look for an existing match in table
 		next = fElementVector->At(index).fNext;
 		if (next < 0) {
-			TRESPASS();
+			_OPEN_HASH_TABLE_TRESPASS();
 			return;
 		}
 
@@ -410,7 +410,7 @@ template<class Element>
 Element &
 OpenHashElementArray<Element>::At(int32 index)
 {
-	ASSERT(index < fSize);
+	_OPEN_HASH_TABLE_ASSERT(index < fSize);
 	return fData[index];
 }
 
@@ -418,7 +418,7 @@ template<class Element>
 const Element &
 OpenHashElementArray<Element>::At(int32 index) const
 {
-	ASSERT(index < fSize);
+	_OPEN_HASH_TABLE_ASSERT(index < fSize);
 	return fData[index];
 }
 
@@ -488,7 +488,7 @@ OpenHashElementArray<Element>::Add()
 
 	new (&At(index)) Element;
 		// call placement new to initialize the element properly
-	ASSERT(At(index).fNext == -1);
+	_OPEN_HASH_TABLE_ASSERT(At(index).fNext == -1);
 
 	return &At(index);
 }
@@ -499,7 +499,7 @@ OpenHashElementArray<Element>::Remove(int32 index)
 {
 	// delete by chaining empty elements in a single linked
 	// list, reusing the next field
-	ASSERT(index < fSize);
+	_OPEN_HASH_TABLE_ASSERT(index < fSize);
 	At(index).~Element();
 		// call the destructor explicitly to destroy the element
 		// properly
