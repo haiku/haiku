@@ -1842,6 +1842,99 @@ test_timeconversions()
 }
 
 
+// #pragma mark - printf -------------------------------------------------------
+
+
+struct sprintf_data {
+	const char* format;
+	double value;
+	const char* result;
+};
+
+
+void
+test_sprintf(const char* locale, const sprintf_data data[])
+{
+	setlocale(LC_ALL, locale);
+	printf("sprintf for '%s'\n", locale);
+
+	int problemCount = 0;
+	for(int i = 0; data[i].format != NULL; ++i) {
+		char buf[100];
+		if (strchr(data[i].format, 'd') != NULL)
+			sprintf(buf, data[i].format, (int)data[i].value);
+		else if (strchr(data[i].format, 'f') != NULL)
+			sprintf(buf, data[i].format, data[i].value);
+		if (strcmp(buf, data[i].result) != 0) {
+			printf("\tPROBLEM: sprintf(\"%s\") = \"%s\" (expected \"%s\")\n",
+				data[i].format, buf, data[i].result);
+			problemCount++;
+		}
+	}
+	if (problemCount)
+		printf("\t%d problem(s) found!\n", problemCount);
+	else
+		printf("\tall fine\n");
+}
+
+
+void
+test_sprintf()
+{
+	const sprintf_data sprintf_posix[] = {
+		{ "%d", 123, "123" },
+		{ "%d", -123, "-123" },
+		{ "%d", 123456, "123456" },
+		{ "%'d", 123456, "123456" },
+		{ "%f", 123, "123.000000" },
+		{ "%f", -123, "-123.000000" },
+		{ "%.2f", 123456.789, "123456.79" },
+		{ "%'.2f", 123456.789, "123456.79" },
+		{ NULL, NULL }
+	};
+	test_sprintf("POSIX", sprintf_posix);
+
+	const sprintf_data sprintf_de[] = {
+		{ "%d", 123, "123" },
+		{ "%d", -123, "-123" },
+		{ "%d", 123456, "123456" },
+		{ "%'d", 123456, "123.456" },
+		{ "%f", 123, "123,000000" },
+		{ "%f", -123, "-123,000000" },
+		{ "%.2f", 123456.789, "123456,79" },
+		{ "%'.2f", 123456.789, "123.456,79" },
+		{ NULL, NULL }
+	};
+	test_sprintf("de_DE.UTF-8", sprintf_de);
+
+	const sprintf_data sprintf_gu[] = {
+		{ "%d", 123, "123" },
+		{ "%d", -123, "-123" },
+		{ "%d", 123456, "123456" },
+		{ "%'d", 123456, "123,456" },
+		{ "%f", 123, "123.000000" },
+		{ "%f", -123, "-123.000000" },
+		{ "%.2f", 123456.789, "123456.79" },
+		{ "%'.2f", 123456.789, "1,23,456.79" },
+		{ NULL, NULL }
+	};
+	test_sprintf("gu_IN", sprintf_gu);
+
+	const sprintf_data sprintf_nb[] = {
+		{ "%d", 123, "123" },
+		{ "%d", -123, "-123" },
+		{ "%d", 123456, "123456" },
+		{ "%'d", 123456, "123 456" },
+		{ "%f", 123, "123,000000" },
+		{ "%f", -123, "-123,000000" },
+		{ "%.2f", 123456.789, "123456,79" },
+		{ "%'.2f", 123456.789, "123 456,79" },
+		{ NULL, NULL }
+	};
+	test_sprintf("nb_NO", sprintf_nb);
+}
+
+
 // #pragma mark - main ---------------------------------------------------------
 
 
@@ -1861,6 +1954,7 @@ main(void)
 	test_langinfo();
 	test_collation();
 	test_timeconversions();
+	test_sprintf();
 
 	return 0;
 }
