@@ -842,6 +842,10 @@ TermWindow::_AddTab(Arguments* args)
 		session->windowTitle = fInitialTitle;
 		fSessions.AddItem(session);
 
+		BFont font;
+		_GetPreferredFont(font);
+		view->SetTermFont(&font);
+
 		int width, height;
 		view->GetFontSize(&width, &height);
 
@@ -878,10 +882,6 @@ TermWindow::_AddTab(Arguments* args)
 		view->SetMouseClipboard(gMouseClipboard);
 		view->SetEncoding(EncodingID(
 			PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
-
-		BFont font;
-		_GetPreferredFont(font);
-		view->SetTermFont(&font);
 
 		_SetTermColors(containerView);
 
