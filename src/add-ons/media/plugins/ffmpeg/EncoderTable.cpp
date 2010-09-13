@@ -10,7 +10,7 @@
 const EncoderDescription gEncoderTable[] = {
 	{
 		{
-			"MPEG4 Video",
+			"MPEG4 video",
 			"mpeg4",
 			0,
 			CODEC_ID_MPEG4,
@@ -23,7 +23,7 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
-			"MPEG1 Video",
+			"MPEG1 video",
 			"mpeg1video",
 			0,
 			CODEC_ID_MPEG1VIDEO,
@@ -36,7 +36,7 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
-			"MPEG2 Video",
+			"MPEG2 video",
 			"mpeg2video",
 			0,
 			CODEC_ID_MPEG2VIDEO,
@@ -49,7 +49,20 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
-			"Raw Audio",
+			"Theora video",
+			"theora",
+			0,
+			CODEC_ID_THEORA,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_VIDEO,
+		B_MEDIA_ENCODED_VIDEO,
+		23
+	},
+	{
+		{
+			"Raw audio",
 			"pcm",
 			0,
 			0,
@@ -66,6 +79,19 @@ const EncoderDescription gEncoderTable[] = {
 			"ac3",
 			0,
 			CODEC_ID_AC3,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_AUDIO,
+		B_MEDIA_ENCODED_AUDIO,
+		10
+	},
+	{
+		{
+			"Vorbis audio",
+			"vorbis",
+			0,
+			CODEC_ID_VORBIS,
 			{ 0 }
 		},
 		B_ANY_FORMAT_FAMILY,

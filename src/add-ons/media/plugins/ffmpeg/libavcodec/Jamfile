@@ -2,8 +2,12 @@ SubDir HAIKU_TOP src add-ons media plugins ffmpeg libavcodec ;
 
 SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(TARGET_ARCH) ] ;
-SubDirHdrs [ FDirName $(SUBDIR) ../libavutil ] ;
-SubDirHdrs [ FDirName $(SUBDIR) ../libswscale ] ;
+SubDirHdrs [ FDirName $(SUBDIR) .. libavutil ] ;
+SubDirHdrs [ FDirName $(SUBDIR) .. libswscale ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) .. libogg include ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) .. libtheora include ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) .. libvorbis include ] ;
+
 
 UseLibraryHeaders zlib ;
 
@@ -14,6 +18,7 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 SubDirCcFlags $(HAIKU_FFMPEG_GCC_EXTRA_FLAGS) ;
 SubDirCcFlags $(HAIKU_FFMPEG_DEFINES) ;
 SubDirC++Flags $(HAIKU_FFMPEG_DEFINES) ;
+
 
 StaticLibrary libavcodec.a :
 	4xm.c
@@ -183,6 +188,8 @@ StaticLibrary libavcodec.a :
 	kmvc.c
 	lcldec.c
 #	lclenc.c
+	libtheoraenc.c
+	libvorbis.c
 #	ljpegenc.c
 	loco.c
 	lpc.c
@@ -360,6 +367,12 @@ StaticLibrary libavcodec.a :
 	yop.c
 	zmbv.c
 ;
+
+# GCC2 needs this in order to find codec.h in each of these directories
+# respectively and to find the correct codec.h, we need to define this
+# per individual file.
+SourceHdrs libvorbis.c : [ FDirName $(SUBDIR) .. libvorbis include vorbis ] ;
+SourceHdrs libtheoraenc.c : [ FDirName $(SUBDIR) .. libtheora include theora ] ;
 
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavcodec
 	$(TARGET_ARCH) ;
