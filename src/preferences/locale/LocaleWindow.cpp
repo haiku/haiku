@@ -73,8 +73,9 @@ compare_void_list_items(const void* _a, const void* _b)
 
 LocaleWindow::LocaleWindow()
 	:
-	BWindow(BRect(0, 0, 0, 0), "Locale", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE
-		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Locale"), B_TITLED_WINDOW,
+		B_QUIT_ON_WINDOW_CLOSE | B_ASYNCHRONOUS_CONTROLS
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
