@@ -1,11 +1,11 @@
-1	russian	x-vnd.Haiku-Locale	634081185
+1	russian	x-vnd.Haiku-Locale	626460109
 Day in month (2 digits)	TimeFormatSettings		День в месяце (2 цифры)
 Available languages	Locale Preflet Window		Доступные языки
 Day of week (name)	TimeFormatSettings		День недели (название)
 Separator:	TimeFormatSettings		Разделитель:
 Year (4 digits)	TimeFormatSettings		Год (4 цифры)
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не удаётся найти доступные языки! Вы не можете использовать данные настройки!
-Thousand separator: 	TimeFormatSettings		Разделитель тысячи:
+Thousand separator: 	TimeFormatSettings		Разделитель тысяч: 
 After	TimeFormatSettings		После
 Month name	TimeFormatSettings		Название месяца
 Long format:	TimeFormatSettings		Длинный формат:
@@ -20,30 +20,30 @@ Language	Locale Preflet Window		Язык
 Month number	TimeFormatSettings		Номер месяца
 Year (2 digits)	TimeFormatSettings		Год (2 цифры)
 Preferred languages	Locale Preflet Window		Предпочтительные языки
-Decimal separator: 	TimeFormatSettings		Десятичный разделитель
-Symbol position	TimeFormatSettings		Символ позиции
+Decimal separator: 	TimeFormatSettings		Десятичный разделитель: 
+Symbol position	TimeFormatSettings		Позициия символа 
 Day of week (short name)	TimeFormatSettings		День недели (короткое название)
 Numbers	TimeFormatSettings		Числа
-24 hour	TimeFormatSettings		24 Часа
+24 hour	TimeFormatSettings		24 часовой формат
 (unknown format)	TimeFormatSettings		 (неизвестный формат)
-Negative marker:	TimeFormatSettings		Отрицательный маркер:
+Negative marker:	TimeFormatSettings		Отрицательный знак:
 Day in month	TimeFormatSettings		День в месяце
 Defaults	Locale Preflet Window		По умолчанию
 Separator	TimeFormatSettings		Разделитель
 Country	Locale Preflet Window		Страна
 Month number (2 digits)	TimeFormatSettings		Номер месяца (2 цифры)
 Revert	Locale Preflet Window		Вернуть
-Negative marker	TimeFormatSettings		Отрицательный маркер
-OK	Locale Preflet Window		Ок
+Negative marker	TimeFormatSettings		Отрицательный знак
+OK	Locale Preflet Window		ОК
 Day of week	TimeFormatSettings		День недели
-List separator: 	TimeFormatSettings		Разделитель списка:
+List separator: 	TimeFormatSettings		Разделитель списка: 
 Time	TimeFormatSettings		Время
 Date	TimeFormatSettings		Дата
-12 hour	TimeFormatSettings		12 часов
-Locale	Locale Preflet		Локаль
+12 hour	TimeFormatSettings		12 часовой формат 
+Locale	Locale Preflet Window		Локаль
 None	TimeFormatSettings		Ни один
 Example:	TimeFormatSettings		Пример:
 Day	TimeFormatSettings		День
-Leading 0	TimeFormatSettings		Ведущий 0
+Leading 0	TimeFormatSettings		Ведущий ноль
 Month	TimeFormatSettings		Месяц
-already chosen	LanguageListView		уже выбрано
+already chosen	LanguageListView		уже выбран

@@ -3,21 +3,21 @@ Click to activate	SettingsView		Нажать для активации
 Mouse type:	SettingsView		Тип мыши:
 Warp	SettingsView		Перемещение
 2-Button	SettingsView		Двухкнопочная
-Double-click test area	SettingsView		Область для проверки двойного щелчка 
+Double-click test area	SettingsView		Область для проверки двойного клика 
 Revert	MouseWindow		Вернуть
 ...by Andrew Edward McCall	MouseApplication		...разработал Andrew Edward McCall
-Mouse acceleration	SettingsView		Ускорение указателя
-Click to focus	SettingsView		Щелкнуть для установки фокуса
+Mouse acceleration	SettingsView		Ускорение курсора
+Click to focus	SettingsView		Нажать для фокусировки
 3-Button	SettingsView		Трёхкнопочная
-Mouse speed	SettingsView		Скорость движения указателя
+Mouse speed	SettingsView		Скорость курсора
 Focus mode:	SettingsView		Режим фокуса:
 Instant warp	SettingsView		Мгновенное перемещение
-Dig Deal	MouseApplication		Отлично
+Dig Deal	MouseApplication		Делов-то!
 1-Button	SettingsView		Однокнопочная
-Double-click speed	SettingsView		Скорость двойного щелчка
+Double-click speed	SettingsView		Скорость двойного нажатия
 Defaults	MouseWindow		По умолчанию
 Focus follows mouse	SettingsView		Фокус следует за мышью
-Accept first click	SettingsView		Принимать первый щелчок
+Accept first click	SettingsView		Принимать первое нажатие
 Fast	SettingsView		Быстро
 Normal	SettingsView		Обычно
 Mouse	MouseWindow		Мышь

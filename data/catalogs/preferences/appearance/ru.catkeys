@@ -21,7 +21,7 @@ Antialiasing	APRWindow		Сглаживание
 Navigation base	Colors tab		Основа навигации
 Window tab text	Colors tab		Текст заголовка окна
 Document text	Colors tab		Текст документа
-Navigation pulse	Colors tab		Навигация pulse
+Navigation pulse	Colors tab		Навигационная пульсация
 Selected menu item text	Colors tab		Текст выделенного пункта меню
 Menu background	Colors tab		Фон меню
 Appearance	APRWindow		Внешний вид
@@ -38,6 +38,6 @@ LCD subpixel	AntialiasingSettingsView		Субпиксельное сглажив
 Selected menu item border	Colors tab		Рамка выделенного пункта меню
 Strong	AntialiasingSettingsView		Сильный
 Panel text	Colors tab		Текст панели
-Monospaced fonts only	AntialiasingSettingsView		Только моноширные шрифты
+Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
 Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
 Glyph hinting:	AntialiasingSettingsView		Уточнение:

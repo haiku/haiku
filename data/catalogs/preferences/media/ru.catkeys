@@ -9,7 +9,7 @@ Stopping media server…	Media Window		Остановка медиа серве�
 Video output:	Media views		Видео выход:
 Enable real-time audio	Media views		Включить аудио режим реального времени
 Quit	Media Window		Выход
-OK	Media Window		Ок
+OK	Media Window		ОК
 Enabling real-time video allows system to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM.\n\nOnly enable this feature if you need the lowest latency possible.	Media views		Режим реального времени для видео позволяет системе выполнять видео операции так быстро и гладко, насколько это возможно. Это достигается за счёт большей загрузки процессора и оперативной памяти.\n\nВключите эту функцию, только если вам нужна низкая латентность.
 Default nodes	Media views		Узлы по умолчанию
 Starting media server…	Media Window		Запуск медиа сервера…

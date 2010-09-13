@@ -19,7 +19,7 @@ Remove	PrintersWindow		Удалить
 Add …	PrintersWindow		Добавить …
 Print jobs for 	PrintersWindow		Задания печати для 
 Failed	JobListView		Не удалось
-%.2f KB	JobListView		%.2f КБ
+%.2f KB	JobListView		%.2f Кбайт
 Completed	JobListView		Завершено
 Print jobs: No printer selected	PrintersWindow		Не выбран принтер
 Unknown status	JobListView		Статус неизвестен

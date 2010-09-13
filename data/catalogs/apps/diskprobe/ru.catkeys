@@ -1,0 +1,136 @@
++1	russian	x-vnd.Haiku-DiskProbe	3928365237
+File offset: 	ProbeView		Смещение файла: 
+DiskProbe	OpenWindow		DiskProbe
+64 bit unsigned value:	TypeEditors		64-х битное беззнаковое значение:
+Find again	ProbeView		Найти далее
+Text	FindWindow		Текст
+Find…	ProbeView		Найти…
+Case sensitive	FindWindow		Учитывать регистр
+Cancel	OpenWindow		Отмена
+Close	AttributeWindow		Закрыть
+File	ProbeView		Файл
+Attribute	ProbeView		Атрибут
+Floating-point value:	TypeEditors		Значение с плавающей точкой:
+16 bit	TypeEditors		16 бит
+Attributes	ProbeView		Атрибуты
+Device offset: 	ProbeView		Смещение устройства: 
+Selection	ProbeView		Выделение
+File	FileWindow		Файл
+OK	DiskProbe		Oк
+Paste	ProbeView		Вставить
+PNG format	TypeEditors		PNG формат
+Font size	ProbeView		Размер шрифта
+Attribute type: 	ProbeView		Тип атрибута: 
+Attribute	AttributeWindow		Атрибут
+8 bit signed value:	TypeEditors		8-ми битное знаковое значение:
+Number:	TypeEditors		Число:
+Save	ProbeView		Сохранить
+Number editor	TypeEditors		Редактор чисел
+No type editor available	AttributeWindow		Нет доступного редактора данного для типа
+Double precision floating-point value:	TypeEditors		Значение плавающей запятой двойной точности:
+Device: 	ProbeView		Устройство: 
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Вы действительно хотите удалить атрибут \"%s\" из файла \"%s\"?\n\nЭту операцию будет невозможно отменить.
+8 bit unsigned value:	TypeEditors		8-ми битное беззнаковое значение:
+Block	ProbeView		Блок
+Back	ProbeView		Назад
+Device	ProbeView		Устройство
+Unknown type	TypeEditors		Неизвестный тип
+Block 0x%Lx	ProbeView		Блок 0x%Lx
+Quit	FileWindow		Выход
+Undo	ProbeView		Вернуть
+Close	ProbeView		Закрыть
+16 bit signed value:	TypeEditors		16-ти битное знаковое значение:
+64 bit signed offset:	TypeEditors		64-х битный знаковый сдвиг:
+Copy	ProbeView		Копировать
+Boolean value:	TypeEditors		Булевое значение:
+32 bit size or status:	TypeEditors		32-х битный размер или статус:
+8 bit palette	TypeEditors		8 битная палитра
+Probe device	OpenWindow		Исследовать устройство
+Unknown format	TypeEditors		Неизвестный формат
+MIME type:	TypeEditors		MIME тип:
+Page setup…	ProbeView		Настройка печати…
+New…	FileWindow		Новый…
+DiskProbe request	AttributeWindow		Запрос DiskProbe
+Save changes before closing?	ProbeView		Сохранить изменения перед закрытием?
+Type editor	AttributeWindow		Редактор типа
+Native: 0x%0*Lx	ProbeView		Родной: 0x%0*Lx
+Raw editor	AttributeWindow		Raw редактор
+Message View	TypeEditors		Вид сообщения
+DiskProbe request	ProbeView		Запрос DiskProbe
+32 bit unsigned size:	TypeEditors		32-х битное беззнаковый размер:
+Flattened bitmap	TypeEditors		Плоский образ
+Open file…	FileWindow		Открыть файл…
+Next	ProbeView		Вперед
+Close	FileWindow		Закрыть
+Attribute: 	ProbeView		Атрибут: 
+Remove from file	AttributeWindow		Удалить из файла
+Don't save	ProbeView		Не сохранять
+Previous	ProbeView			Предыдущий
+64 bit signed value:	TypeEditors		64-х битное знаковоме значение:
+Icon	TypeEditors		Значок
+Block: 	ProbeView		Блок: 
+Examine device:	OpenWindow		Исследовать устройство:
+Offset: 	ProbeView		Смещение: 
+OK	ProbeView		Oк
+Add	ProbeView		Добавить
+Edit	ProbeView		Изменить
+Native: %Ld (0x%0*Lx)	ProbeView		Родной: %Ld (0x%0*Lx)
+32 bit unsigned value:	TypeEditors		32-х битное беззнаковое значение:
+Cancel	AttributeWindow		Отмена
+Type editor not supported	ProbeView		Редактор типа не поддерживается
+MIME type editor	TypeEditors		Редактор MIME типа
+Swapped: %Ld (0x%0*Lx)	ProbeView		Перевернутый: %Ld (0x%0*Lx)
+Remove	AttributeWindow		Удалить
+Print…	ProbeView		Печать…
+Block %Ld (0x%Lx)	ProbeView		Блок %Ld (0x%Lx)
+Could not open file \"%s\": %s\n	DiskProbe		Невозможно открыть файл \"%s\": %s\n
+Select all	ProbeView		Выделить всё
+Probe file…	OpenWindow		Исследовать файл…
+Icon view	TypeEditors		Большие значки
+Bookmarks	ProbeView		Закладки
+Find	FindWindow		Найти
+Mode:	FindWindow		Режим:
+15 bit	TypeEditors		15 бит
+Open device	FileWindow		Открыть устройство
+Could not find search string.	ProbeView		Невозможно найти искомую строку.
+16 bit unsigned value:	TypeEditors		16-ти битное беззнаковое значение:
+Attribute offset: 	ProbeView		Смещение атрибута: 
+Redo	ProbeView		Повторить
+File: 	ProbeView		Файл: 
+32 bit unsigned pointer:	TypeEditors		32-х битный беззнаковый указатель:
+of 	ProbeView		из 
+DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\n\tразработал Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nОригинальную Be версию разработал Robert Polic\n
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Не удалось записать в файл:\n%s\n\nВсе изменения будут потеряны при выходе.
+32 bit	TypeEditors		32 бит
+Cancel	ProbeView		Отмена
+Swapped: 0x%0*Lx	ProbeView		Перевернутый: 0x%0*Lx
+Grayscale	TypeEditors		Оттенки серого
+32 bit signed value:	TypeEditors		32-х битное знаковое значение:
+DiskProbe request	DiskProbe		Запрос DiskProbe
+Type editor	ProbeView		Редактор типа
+Contents:	TypeEditors		Содержимое:
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
+Boolean	TypeEditors	This is the type of editor	Boolean
+Stop	ProbeView		Стоп
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шестнадцатеричная
+Text	TypeEditors	This is the type of editor	Текст
+Number	TypeEditors	This is the type of editor	Число
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Десятичная
+String editor	TypeEditors		Редактор строк
+Boolean editor	TypeEditors		Булев редактор
+none	ProbeView	No attributes	нет
+Fit	ProbeView	Size of fonts, fits to available room	Подгонять
+(native)	ProbeView		(родной)
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шестнадцатеричный
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Невозможно прочитать образ
+Message	TypeEditors	This is the type of view	Сообщение
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Невозможно открыть \"%s\":\n%s
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Просмотр изображения
+Image	TypeEditors	This is the type of view	Изображение
+BlockSize	ProbeView	A menu item, a shortened form from block size.	Размер блока
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system.	Система счисления
+View	ProbeView	This is the last menubar item.	Вид
+About DiskProbe…	FileWindow		О программе…
+Find	FindWindow		Найти
+%ld (native)	ProbeView		%ld (родной)
+

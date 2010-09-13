@@ -3,7 +3,7 @@ Use as background…	Menus		Использовать как фоновый ри�
 5 seconds	Menus		5 секунд
 Slide delay	Menus		Задержка слайд шоу 
 Zoom in	Menus		Увеличить
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его?
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' был изменен. Вы хотите закрыть его без сохраниения?
 8 seconds	Menus		8 секунд
 Previous page	Menus		Предыдущая страница
 View	Menus		Вид
@@ -31,26 +31,26 @@ Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1
 Apply	ResizerWindow		Применить
 Keep original proportions	ResizerWindow		Сохранить пропорции
 9 seconds	Menus		9 секунд
-Flip left to right	Menus		Отобразить слева на право
+Flip left to right	Menus		Отобразить слева направо
 Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
 DPI:	PrintOptionsWindow		Разрешение (DPI):
 Next file	Menus		Следующий файл
 4 seconds	Menus		4 секунды
-Zoom to window	Menus		Под размер окна
+Zoom to window	Menus		Увеличивать до размеров окна
 Close document	ClosePrompt		Закрыть документ
-ShowImage	LoadAlerts		Просмотрщик изображений
+ShowImage	LoadAlerts		Просмотр изображений
 Height: 	PrintOptionsWindow		Высота: 
 Cancel	ClosePrompt		Отмена
 Resize…	Menus		Изменить размер…
 Print options	PrintOptionsWindow		Настройки печати
 Width:	ResizerWindow		Ширина:
-ShowImage	AboutWindow		Просмотрщик изображений
+ShowImage	AboutWindow		ShowImage
 7 seconds	Menus		7 секунд
 Last page	Menus		Последняя страница
 Previous file	Menus		Предыдущий файл
 Resize	ResizerWindow		Изменить размер
 Slide show	Menus		Слайд шоу
-Fit image to page	PrintOptionsWindow		Подогнать изображение под окно
+Fit image to page	PrintOptionsWindow		Подгонять изображение под окно
 Flip top to bottom	Menus		Отобразить сверху вниз
 Zoom factor in %:	PrintOptionsWindow		Увеличение в %:
 Width:	PrintOptionsWindow		Ширина:
@@ -59,19 +59,19 @@ Rotate clockwise	Menus		Повернуть по часовой стрелке
 Job setup	PrintOptionsWindow		Настройка задания
 Original size	Menus		Оригинальный размер
 Next page	Menus		Следующая страница
-Shrink to window	Menus		Уменьшить до размеров окна
+Shrink to window	Menus		Уменьшать до размеров окна
 OK	SaveToFile		Oк
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Progress monitor	ProgressWindow		Монитор состояния
 Paste	Menus		Вставить
 File	Menus		Файл
-Page setup…	Menus		Настройка печати...
-Print…	Menus		Печать...
+Page setup…	Menus		Настройка печати…
+Print…	Menus		Печать…
 Quit	Menus		Выход
 Clear	Menus		Очистить
 Edit	Menus		Изменить
 Close	Menus		Закрыть
-Copy	Menus		Копипровать
+Copy	Menus		Копировать
 Cut	Menus		Вырезать
 Select all	Menus		Выделить всё
-Save as…	Menus		Сохранить как...
+Save as…	Menus		Сохранить как…

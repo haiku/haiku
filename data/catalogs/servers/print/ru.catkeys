@@ -1,8 +1,8 @@
 1	russian	x-vnd.Be-PSRV	219268753
-Undefined	ConfigWindow		Неопределено
+Undefined	ConfigWindow		не определены
 Cancel	PrintServerApp		Отмена
 Page setup:	ConfigWindow		Настройка печати:
-OK	ConfigWindow		Ok
+OK	ConfigWindow		ОК
 Cancel	ConfigWindow		Отмена
 Yes	PrintServerApp		Да
 Would you like to set one up now?	PrintServerApp		Хотите настроить принтер сейчас?
