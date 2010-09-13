@@ -478,7 +478,7 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 	fAttributeBox->SetLabel(B_TRANSLATE("Extra attributes"));
 
 	fAddAttributeButton = new BButton("add attr",
-		"Add" B_UTF8_ELLIPSIS, new BMessage(kMsgAddAttribute));
+		B_TRANSLATE("Add" B_UTF8_ELLIPSIS), new BMessage(kMsgAddAttribute));
 	fAddAttributeButton->SetExplicitMaxSize(
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
