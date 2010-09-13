@@ -487,7 +487,7 @@ FindTextView::GetData(BMessage& message)
 
 FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 		const BMessage* settings)
-	: BWindow(_rect, "Find", B_TITLED_WINDOW,
+	: BWindow(_rect, B_TRANSLATE("Find"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_CLOSE_ON_ESCAPE),
 	fTarget(target)
 {
