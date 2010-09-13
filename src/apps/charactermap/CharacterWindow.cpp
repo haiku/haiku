@@ -497,7 +497,7 @@ CharacterWindow::_CreateFontMenu()
 				font_style style;
 				uint32 flags;
 				if (get_font_style(family, j, &style, &flags) == B_OK) {
-					item = new BMenuItem(style,	new BMessage(kMsgFontSelected));
+					item = new BMenuItem(style, new BMessage(kMsgFontSelected));
 					subMenu->AddItem(item);
 
 					if (!strcmp(family, currentFamily)
