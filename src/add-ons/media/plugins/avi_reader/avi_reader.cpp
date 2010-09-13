@@ -242,7 +242,8 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		// TODO: this doesn't seem to work (it's not even a fourcc)
 		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32 *)format->user_data = audio_format->format_tag; format->user_data[4] = 0;
+		*(uint32 *)format->user_data = audio_format->format_tag;
+		format->user_data[4] = 0;
 		
 		// put the wave_format_ex struct, including extra data, into the format meta data.
 		size_t size;
@@ -295,7 +296,8 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			format->type = B_MEDIA_ENCODED_VIDEO;
 			
 		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32 *)format->user_data = description.u.avi.codec; format->user_data[4] = 0;
+		*(uint32 *)format->user_data = description.u.avi.codec;
+		format->user_data[4] = 0;
 		format->u.encoded_video.max_bit_rate = 8 * fFile->AviMainHeader()->max_bytes_per_sec;
 		format->u.encoded_video.avg_bit_rate = (format->u.encoded_video.max_bit_rate * 3 / 4); // XXX fix this
 		format->u.encoded_video.output.field_rate = cookie->frames_per_sec_rate / (float)cookie->frames_per_sec_scale;
