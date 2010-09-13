@@ -114,10 +114,10 @@ bool
 DVBMediaAddon::WantsAutoStart()
 {
 #if BUILD_FOR_HAIKU
-	printf("DVB: DVBMediaAddon::WantsAutoStart - NO\n");
+//	printf("DVB: DVBMediaAddon::WantsAutoStart - NO\n");
 	return false;
 #else
-	printf("DVB: DVBMediaAddon::WantsAutoStart - YES\n");
+//	printf("DVB: DVBMediaAddon::WantsAutoStart - YES\n");
 	return true;
 #endif
 }
