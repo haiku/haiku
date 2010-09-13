@@ -555,8 +555,9 @@ AddFilesToHaikuImage system add-ons disk_systems
 	: <disk_system>intel <disk_system>bfs ;
 
 # decorators
+AddDirectoryToHaikuImage home config add-ons decorators ;
 AddFilesToHaikuImage home config add-ons decorators :
-	MacDecorator WinDecorator ClassicBe ;
+	MacDecorator WinDecorator ClassicBe SATDecorator ;
 
 # create directories that will remain empty
 AddDirectoryToHaikuImage common bin ;
