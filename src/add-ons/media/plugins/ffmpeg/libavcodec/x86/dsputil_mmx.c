@@ -2878,7 +2878,9 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
         if(mm_flags & FF_MM_SSE2){
             c->int32_to_float_fmul_scalar = int32_to_float_fmul_scalar_sse2;
             c->float_to_int16 = float_to_int16_sse2;
-            c->float_to_int16_interleave = float_to_int16_interleave_sse2;
+// NOTE (Haiku modification): Disabled because it crashes.
+//            c->float_to_int16_interleave = float_to_int16_interleave_sse2;
+            c->float_to_int16_interleave = float_to_int16_interleave_sse;
 #if HAVE_YASM
             c->scalarproduct_int16 = ff_scalarproduct_int16_sse2;
             c->scalarproduct_and_madd_int16 = ff_scalarproduct_and_madd_int16_sse2;
