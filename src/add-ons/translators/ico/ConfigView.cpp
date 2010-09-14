@@ -7,67 +7,72 @@
 #include "ConfigView.h"
 #include "ICOTranslator.h"
 
-#include <StringView.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
+#include <SpaceLayoutItem.h>
+#include <StringView.h>
 
 #include <stdio.h>
 #include <string.h>
 
 
-ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
-	: BView(frame, "ICOTranslator Settings", resize, flags)
+ConfigView::ConfigView()
+	:
+	BGroupView("ICOTranslator Settings", B_VERTICAL, 0)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);	
 
-	font_height fontHeight;
-	be_bold_font->GetHeight(&fontHeight);
-	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
-
-	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", "Windows icon images");
+	BStringView* stringView = new BStringView("title", "Windows icon images");
 	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
+	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
 
-	rect.OffsetBy(0, height + 10);
+	float spacing = be_control_look->DefaultItemSpacing();
+	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+
 	char version[256];
 	sprintf(version, "Version %d.%d.%d, %s",
 		int(B_TRANSLATION_MAJOR_VERSION(ICO_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(ICO_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(ICO_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView(rect, "version", version);
-	stringView->ResizeToPreferred();
+	stringView = new BStringView("version", version);
+	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
 
-	GetFontHeight(&fontHeight);
-	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
-
-	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "copyright", B_UTF8_COPYRIGHT "2005-2006 Haiku Inc.");
-	stringView->ResizeToPreferred();
+	stringView = new BStringView("copyright",
+		B_UTF8_COPYRIGHT "2005-2006 Haiku Inc.");
+	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
-	
-	rect.OffsetBy(0, height + 20);
-	BCheckBox *checkBox = new BCheckBox(rect, "color", "Write 32 bit images on true color input", NULL);
-	checkBox->ResizeToPreferred();
+
+	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+
+	BCheckBox *checkBox = new BCheckBox("color", "Write 32 bit images on"
+		" true color input", NULL);
+	checkBox->SetExplicitAlignment(leftAlignment);
 	AddChild(checkBox);
 
-	rect.OffsetBy(0, height + 10);
-	checkBox = new BCheckBox(rect, "size", "Enforce valid icon sizes", NULL);
-	checkBox->ResizeToPreferred();
+	checkBox = new BCheckBox("size", "Enforce valid icon sizes", NULL);
 	checkBox->SetValue(1);
+	checkBox->SetExplicitAlignment(leftAlignment);
 	AddChild(checkBox);
 
-	rect.OffsetBy(0, height + 15);
-	stringView = new BStringView(rect, "valid1", "Valid icon sizes are 16, 32, or 48");
-	stringView->ResizeToPreferred();
+	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+
+	stringView = new BStringView("valid1", "Valid icon sizes are"
+		" 16, 32, or 48");
+	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
 
-	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "valid2", "pixel in either direction.");
-	stringView->ResizeToPreferred();
+	stringView = new BStringView("valid2", "pixel in either direction.");
+	stringView->SetExplicitAlignment(leftAlignment);
 	AddChild(stringView);
+
+	AddChild(BSpaceLayoutItem::CreateGlue());
+	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 
+		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+
+	SetExplicitPreferredSize(GroupLayout()->MinSize());
 }
 
 

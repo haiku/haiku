@@ -168,7 +168,7 @@ ICOTranslator::DerivedCanHandleImageSize(float width, float height) const
 BView *
 ICOTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new ConfigView(BRect(0, 0, 225, 175));
+	return new ConfigView();
 }
 
 

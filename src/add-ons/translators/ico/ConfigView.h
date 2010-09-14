@@ -6,13 +6,12 @@
 #define CONFIG_VIEW_H
 
 
-#include <View.h>
+#include <GroupView.h>
 
 
-class ConfigView : public BView {
+class ConfigView : public BGroupView {
 	public:
-		ConfigView(const BRect &frame, uint32 resize = B_FOLLOW_ALL,
-			uint32 flags = B_WILL_DRAW);	
+		ConfigView();	
 		virtual ~ConfigView();
 };
 
