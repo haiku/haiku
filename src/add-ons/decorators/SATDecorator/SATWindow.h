@@ -62,6 +62,8 @@ private:
 		Constraint*			fTopConstraint;
 		Constraint*			fMinWidthConstraint;
 		Constraint*			fMinHeightConstraint;
+		Constraint*			fMaxWidthConstraint;
+		Constraint*			fMaxHeightConstraint;
 		Constraint*			fWidthConstraint;
 		Constraint*			fHeightConstraint;
 };
@@ -103,6 +105,8 @@ public:
 
 		//! \return the complete window frame including the Decorator
 		BRect				CompleteWindowFrame();
+		void				GetSizeLimits(int32* minWidth, int32* maxWidth,
+								int32* minHeight, int32* maxHeight) const;
 
 		//! \return true if window is in a group with a least another window
 		bool				PositionManagedBySAT();

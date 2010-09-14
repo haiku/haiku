@@ -38,6 +38,8 @@ GroupCookie::GroupCookie(SATWindow* satWindow)
 	fTopConstraint(NULL),
 	fMinWidthConstraint(NULL),
 	fMinHeightConstraint(NULL),
+	fMaxWidthConstraint(NULL),
+	fMaxHeightConstraint(NULL),
 	fWidthConstraint(NULL),
 	fHeightConstraint(NULL)
 {
@@ -51,7 +53,7 @@ GroupCookie::~GroupCookie()
 }
 
 
-const uint32 kExtentPenalty = 25;
+const uint32 kExtentPenalty = 10;
 
 
 void
@@ -71,6 +73,13 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	fLeftConstraint->SetRightSide(frame.left);
 	fTopConstraint->SetRightSide(frame.top);
 
+	int32 minWidth, maxWidth, minHeight, maxHeight;
+	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fMinWidthConstraint->SetRightSide(minWidth);
+	fMinHeightConstraint->SetRightSide(minHeight);
+	fMaxWidthConstraint->SetRightSide(maxWidth);
+	fMaxHeightConstraint->SetRightSide(maxHeight);
+
 	fWidthConstraint->SetPenaltyNeg(110);
 	fWidthConstraint->SetPenaltyPos(110);
 	fHeightConstraint->SetPenaltyNeg(110);
@@ -85,9 +94,7 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	ResultType result;
 	for (int32 tries = 0; tries < 15; tries++) {
 		result = fSATGroup->GetLinearSpec()->Solve();
-		if (result == INFEASIBLE)
-			break;
-		if (result == OPTIMAL) {
+		if (result == OPTIMAL || result == INFEASIBLE) {
 			fSATGroup->AdjustWindows(triggerWindow);
 			break;
 		}
@@ -132,7 +139,6 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 {
 	ASSERT(fSATGroup.Get() == NULL);
 
-	Window* window = fSATWindow->GetWindow();
 	fSATGroup.SetTo(group);
 	fWindowArea = area;
 
@@ -157,11 +163,15 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 		OperatorType(EQ), frame.top, 1, 1);
 
 	int32 minWidth, maxWidth, minHeight, maxHeight;
-	window->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	fMinWidthConstraint = linearSpec->AddConstraint(1.0, fLeftBorder, -1.0,
-		fRightBorder, OperatorType(LE), -minWidth);
-	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fTopBorder, -1.0,
-		fBottomBorder, OperatorType(LE), -minHeight);
+	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fMinWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
+		fLeftBorder, OperatorType(GE), minWidth);
+	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
+		fTopBorder, OperatorType(GE), minHeight);
+	fMaxWidthConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
+		fTopBorder, OperatorType(LE), maxHeight);
+	fMaxHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
+		fTopBorder, OperatorType(LE), maxHeight);
 
 	// The width and height constraints have higher penalties than the
 	// position constraints (left, top), so a window will keep its size
@@ -220,12 +230,16 @@ GroupCookie::Uninit()
 	delete fTopConstraint;
 	delete fMinWidthConstraint;
 	delete fMinHeightConstraint;
+	delete fMaxWidthConstraint;
+	delete fMaxHeightConstraint;
 	delete fWidthConstraint;
 	delete fHeightConstraint;
 	fLeftConstraint = NULL;
 	fTopConstraint = NULL;
 	fMinWidthConstraint = NULL;
 	fMinHeightConstraint = NULL;
+	fMaxWidthConstraint = NULL;
+	fMaxHeightConstraint = NULL;
 	fWidthConstraint = NULL;
 	fHeightConstraint = NULL;
 
@@ -477,6 +491,20 @@ SATWindow::CompleteWindowFrame()
 	frame.bottom += 5;		
 
 	return frame;
+}
+
+
+void
+SATWindow::GetSizeLimits(int32* minWidth, int32* maxWidth, int32* minHeight,
+	int32* maxHeight) const
+{
+	fWindow->GetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
+
+	// TODO get this values from the decorator
+	*minWidth += 11;
+	*minHeight += 11;
+	*maxWidth += 32;
+	*maxHeight += 32;
 }
 
 

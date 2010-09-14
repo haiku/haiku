@@ -752,8 +752,6 @@ SATGroup::AdjustWindows(SATWindow* triggerWindow)
 	// set window locations and sizes
 	for (int i = 0; i < fSATWindowList.CountItems(); i++) {
 		SATWindow* windowSAT = fSATWindowList.ItemAt(i);
-		if (windowSAT == triggerWindow)
-			continue;
 		windowSAT->MoveWindowToSAT(
 			triggerWindow->GetWindow()->CurrentWorkspace());
 	}
