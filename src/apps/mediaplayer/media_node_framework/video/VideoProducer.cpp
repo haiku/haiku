@@ -691,7 +691,7 @@ VideoProducer::_FrameGeneratorThread()
 				// get the times for the current and the next frame
 				performanceTime = fManager->TimeForFrame(fFrame);
 				nextPerformanceTime = fManager->TimeForFrame(fFrame + 1);
-				maxRenderTime = min_c(bigtime_t(33334 * 0.9),
+				maxRenderTime = min_c(bigtime_t(40000),
 					max_c(fSupplier->ProcessingLatency(), maxRenderTime));
 				playingMode = fManager->PlayModeAtFrame(fFrame);
 
