@@ -141,12 +141,10 @@ SeekSlider::GetPreferredSize(float* _width, float* _height)
 BSize
 SeekSlider::MinSize()
 {
-printf("SeekSlider::MinSize()\n");
 	BSize size = BSlider::MinSize();
 
 	BRect unscaledThumbFrame = BSlider::ThumbFrame();
 	BRect scaledThumbFrame = ThumbFrame();
-printf("height: %.1f/%.1f\n", unscaledThumbFrame.Height(), scaledThumbFrame.Height());
 	size.height += scaledThumbFrame.Height() - unscaledThumbFrame.Height();
 
 	return size;
@@ -156,12 +154,10 @@ printf("height: %.1f/%.1f\n", unscaledThumbFrame.Height(), scaledThumbFrame.Heig
 BSize
 SeekSlider::MaxSize()
 {
-printf("SeekSlider::MaxSize()\n");
 	BSize size = BSlider::MaxSize();
 
 	BRect unscaledThumbFrame = BSlider::ThumbFrame();
 	BRect scaledThumbFrame = ThumbFrame();
-printf("height: %.1f/%.1f\n", unscaledThumbFrame.Height(), scaledThumbFrame.Height());
 	size.height += scaledThumbFrame.Height() - unscaledThumbFrame.Height();
 
 	return size;
@@ -198,7 +194,6 @@ SeekSlider::SetSymbolScale(float scale)
 {
 	if (scale == fScale)
 		return;
-printf("SeekSlider::SetSymbolScale(%.1f)\n", scale);
 
 	fScale = scale;
 	SetBarThickness(fScale * 15.0);
