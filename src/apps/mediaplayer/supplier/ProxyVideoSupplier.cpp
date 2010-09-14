@@ -37,6 +37,8 @@ status_t
 ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 	const media_raw_video_format& format, bool& wasCached)
 {
+	bigtime_t now = system_time();
+
 	BAutolock _(fSupplierLock);
 //printf("ProxyVideoSupplier::FillBuffer(%lld)\n", startFrame);
 	if (fSupplier == NULL)
@@ -99,6 +101,8 @@ ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 		memcpy(fCachedFrame, buffer, fCachedFrameSize);
 		fCachedFrameValid = true;
 	}
+
+	fProcessingLatency = system_time() - now;
 
 	return ret;
 }
