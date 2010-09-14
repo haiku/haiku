@@ -208,12 +208,13 @@ PlaybackManager::MessageReceived(BMessage* message)
 				break;
 			}
 
-//			bigtime_t eventTime;
-//			message->FindInt64("time", &eventTime);
-			bigtime_t now = system_time();
+			bigtime_t eventTime;
+			message->FindInt64("time", &eventTime);
+//			bigtime_t now = system_time();
 			fPerformanceTimeEvent = NULL;
 
-			SetPerformanceTime(TimeForRealTime(now));
+//			SetPerformanceTime(TimeForRealTime(now));
+			SetPerformanceTime(TimeForRealTime(eventTime));
 //TRACE("MSG_EVENT: rt: %lld, pt: %lld\n", now, fPerformanceTime);
 //printf("MSG_EVENT: et: %lld, rt: %lld, pt: %lld\n", eventTime, now, fPerformanceTime);
 			break;
