@@ -100,7 +100,7 @@
 
 /* Specify use of the basic linear algebra subroutine library                */
 /* ------------------------------------------------------------------------- */
-#define libBLAS                  2        /* 0: No, 1: Internal, 2: External */
+#define libBLAS                  1        /* 0: No, 1: Internal, 2: External */
 #define libnameBLAS        "myBLAS"
 
 
