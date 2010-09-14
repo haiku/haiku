@@ -14,7 +14,7 @@ struct media_raw_video_format;
 
 
 class VideoSupplier {
- public:
+public:
 								VideoSupplier();
 	virtual						~VideoSupplier();
 
@@ -27,7 +27,7 @@ class VideoSupplier {
  	inline	bigtime_t			ProcessingLatency() const
  									{ return fProcessingLatency; }
 
- protected:
+protected:
 		 	bigtime_t			fProcessingLatency;
 };
 
