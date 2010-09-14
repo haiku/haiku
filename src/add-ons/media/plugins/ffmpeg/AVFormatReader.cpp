@@ -446,6 +446,31 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 					description.family = B_WAV_FORMAT_FAMILY;
 					codecTag = ' DTS';
 					break;
+				case CODEC_ID_THEORA:
+					// Use the same format description as the native Ogg
+					// reader and decoder did.
+					description.family = B_MISC_FORMAT_FAMILY;
+// TODO: The rest of this plugin (Decoders/Encoders) does not support
+// this yet, specifying it would throw off the format matching.
+//					description.u.misc.file_format = 'OggS';
+					codecTag = 'theo';
+					break;
+				case CODEC_ID_SPEEX:
+					// Use the same format description as the native Ogg
+					// reader and decoder did.
+					description.family = B_MISC_FORMAT_FAMILY;
+// TODO: See above.
+//					description.u.misc.file_format = 'OggS';
+					codecTag = 'spex';
+					break;
+				case CODEC_ID_VORBIS:
+					// Use the same format description as the native Ogg
+					// reader and decoder did.
+					description.family = B_MISC_FORMAT_FAMILY;
+// TODO: See above.
+//					description.u.misc.file_format = 'OggS';
+					codecTag = 'vorb';
+					break;
 				default:
 					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
 						"unknown 0x%x\n", codecContext->codec_id);
@@ -627,6 +652,8 @@ if (format->u.encoded_video.output.field_rate == 50.0f)
 				= codecContext->width;
 			format->u.encoded_video.output.display.line_count
 				= codecContext->height;
+			TRACE("  width/height: %d/%d\n", codecContext->width,
+				codecContext->height);
 			format->u.encoded_video.output.display.bytes_per_row = 0;
 			format->u.encoded_video.output.display.pixel_offset = 0;
 			format->u.encoded_video.output.display.line_offset = 0;
@@ -647,10 +674,10 @@ if (format->u.encoded_video.output.field_rate == 50.0f)
 	}
 
 	TRACE("  extradata_size: %d\n", codecContext->extradata_size);
-	TRACE("  intra_matrix: %p\n", codecContext->intra_matrix);
-	TRACE("  inter_matrix: %p\n", codecContext->inter_matrix);
-	TRACE("  get_buffer(): %p\n", codecContext->get_buffer);
-	TRACE("  release_buffer(): %p\n", codecContext->release_buffer);
+//	TRACE("  intra_matrix: %p\n", codecContext->intra_matrix);
+//	TRACE("  inter_matrix: %p\n", codecContext->inter_matrix);
+//	TRACE("  get_buffer(): %p\n", codecContext->get_buffer);
+//	TRACE("  release_buffer(): %p\n", codecContext->release_buffer);
 
 #ifdef TRACE_AVFORMAT_READER
 	char formatString[512];

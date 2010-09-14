@@ -12,11 +12,7 @@ SubInclude HAIKU_TOP src add-ons media plugins matroska ;
 SubInclude HAIKU_TOP src add-ons media plugins mov_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins mp4_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins musepack ;
-SubInclude HAIKU_TOP src add-ons media plugins ogg ;
 SubInclude HAIKU_TOP src add-ons media plugins raw_decoder ;
-SubInclude HAIKU_TOP src add-ons media plugins speex ;
-#SubInclude HAIKU_TOP src add-ons media plugins theora ;
-SubInclude HAIKU_TOP src add-ons media plugins vorbis ;
 SubInclude HAIKU_TOP src add-ons media plugins wav_reader ;
 
 # The following add-ons are GPL licensed, and can only be used with

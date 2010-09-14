@@ -7,6 +7,7 @@ SubDirHdrs [ FDirName $(SUBDIR) .. libswscale ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) .. libogg include ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) .. libtheora include ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) .. libvorbis include ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) .. libspeex include ] ;
 
 
 UseLibraryHeaders zlib ;
@@ -188,6 +189,7 @@ StaticLibrary libavcodec.a :
 	kmvc.c
 	lcldec.c
 #	lclenc.c
+	libspeexdec.c
 	libtheoraenc.c
 	libvorbis.c
 #	ljpegenc.c
@@ -373,6 +375,7 @@ StaticLibrary libavcodec.a :
 # per individual file.
 SourceHdrs libvorbis.c : [ FDirName $(SUBDIR) .. libvorbis include vorbis ] ;
 SourceHdrs libtheoraenc.c : [ FDirName $(SUBDIR) .. libtheora include theora ] ;
+SourceHdrs libspeexdec.c : [ FDirName $(SUBDIR) .. libspeex include speex ] ;
 
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavcodec
 	$(TARGET_ARCH) ;

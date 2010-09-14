@@ -34,6 +34,7 @@ Addon ffmpeg :
 	libswscale.a
 
 	libvorbis_ffmpeg.a
+	libspeex_ffmpeg.a
 	libtheora_ffmpeg.a
 	libogg_ffmpeg.a
 
@@ -109,5 +110,6 @@ SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavformat ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavutil ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libogg ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libswscale ;
+SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libspeex ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libtheora ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libvorbis ;
