@@ -41,6 +41,9 @@
 #endif
 
 #define USE_SWS_FOR_COLOR_SPACE_CONVERSION 0
+// NOTE: David's color space conversion is much faster than the FFmpeg
+// version. Perhaps the SWS code can be used for unsupported conversions?
+// Otherwise the alternative code could simply be removed from this file.
 
 
 struct wave_format_ex {
@@ -494,6 +497,8 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 	// But libavcodec doesn't seem to offer any way to tell the decoder
 	// which format it should use.
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
+	if (fSwsContext != NULL)
+		sws_freeContext(fSwsContext);
 	fSwsContext = NULL;
 #else
 	fFormatConversionFunc = 0;
@@ -852,20 +857,23 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 			decodingTime += formatConversionStart - startTime;
 			conversionTime += doneTime - formatConversionStart;
 			profileCounter++;
-			if (!(fFrame % 10)) {
+			if (!(fFrame % 5)) {
 				if (info) {
-					printf("[v] profile: d1 = %lld, d2 = %lld (%Ld) required "
+					printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
 						"%Ld\n",
 						decodingTime / profileCounter,
 						conversionTime / profileCounter,
 						fFrame, info->time_to_decode);
 				} else {
-					printf("[v] profile: d1 = %lld, d2 = %lld (%Ld) required "
+					printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required "
 						"%Ld\n",
 						decodingTime / profileCounter,
 						conversionTime / profileCounter,
 						fFrame, bigtime_t(1000000LL / fOutputFrameRate));
 				}
+				decodingTime = 0;
+				conversionTime = 0;
+				profileCounter = 0;
 			}
 #endif
 			return B_OK;
