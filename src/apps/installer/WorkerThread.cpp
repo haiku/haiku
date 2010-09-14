@@ -520,7 +520,7 @@ static void
 make_partition_label(BPartition* partition, char* label, char* menuLabel,
 	bool showContentType)
 {
-	char size[15];
+	char size[20];
 	string_for_size(partition->Size(), size, sizeof(size));
 
 	BPath path;
