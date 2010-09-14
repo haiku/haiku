@@ -227,6 +227,9 @@ Constraint::SetRightSide(double value)
 	if (!fIsValid)
 		return;
 
+	if (fRightSide == value)
+		return;
+
 	fRightSide = value;
 	if (!set_rh(fLS->fLP, Index(), fRightSide))
 		STRACE(("Error in set_rh."));
