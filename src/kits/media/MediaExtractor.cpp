@@ -24,7 +24,7 @@
 #define DISABLE_CHUNK_CACHE 0
 
 
-static const size_t kMaxCacheBytes = 1024 * 1024;
+static const size_t kMaxCacheBytes = 3 * 1024 * 1024;
 
 
 class MediaExtractorChunkProvider : public ChunkProvider {
