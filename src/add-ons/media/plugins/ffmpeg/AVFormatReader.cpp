@@ -740,7 +740,15 @@ AVFormatReader::StreamCookie::FrameRate() const
 			frameRate = (double)fStream->codec->sample_rate;
 			break;
 		case CODEC_TYPE_VIDEO:
-			frameRate = av_q2d(fStream->avg_frame_rate);
+			if (fStream->avg_frame_rate.den && fStream->avg_frame_rate.num)
+				frameRate = av_q2d(fStream->avg_frame_rate);
+			else if (fStream->r_frame_rate.den && fStream->r_frame_rate.num)
+				frameRate = av_q2d(fStream->r_frame_rate);
+			else if (fStream->time_base.den && fStream->time_base.num)
+				frameRate = 1 / av_q2d(fStream->time_base);
+			else if (fStream->codec->time_base.den && fStream->codec->time_base.num)
+				frameRate = 1 / av_q2d(fStream->codec->time_base);
+			
 			// TODO: Fix up interlaced video for real
 			if (frameRate == 50.0f)
 				frameRate = 25.0f;
