@@ -38,16 +38,7 @@ public:
 	
 	virtual	BMediaAddOn*		AddOn(long* cookie) const;
 	
- protected:
-
-	virtual void				Start(bigtime_t performanceTime);
-	virtual void				Stop(bigtime_t performanceTime,
-									bool immediate);
-	virtual void				Seek(bigtime_t mediaTime,
-									bigtime_t performanceTime);
-	virtual void				TimeWarp(bigtime_t atRealTime,
-									bigtime_t toPerformanceTime);
-
+protected:
 	virtual void				NodeRegistered();
 	virtual	status_t		 	RequestCompleted(
 									const media_request_info& info);
@@ -102,24 +93,30 @@ public:
 			void				SetTarget(VideoTarget* target);
 			void				SetTryOverlay(bool tryOverlay);
 
- private:
+private:
+			void				_SetPerformanceTimeBase(
+									bigtime_t performanceTime);
+			void				_HandleBuffer(BBuffer* buffer);
+			void				_UnsetTargetBuffer();
+
+private:
 			uint32				fInternalID;
 			BMediaAddOn*		fAddOn;
 
 			bool				fConnectionActive;
 			media_input			fIn;
-			media_destination	fDestination;
 			bigtime_t			fMyLatency;
+			bigtime_t			fPerformanceTimeBase;
 
 			BBitmap*			fBitmap[kBufferCount];
 			bool				fOurBuffers;
 			BBufferGroup*		fBuffers;
-			uint32				fBufferMap[kBufferCount];	
+			BBuffer*			fBufferMap[kBufferCount];	
 
 			NodeManager*		fManager;
 			BLocker				fTargetLock;	// locks the following variable
 			VideoTarget* volatile	fTarget;
-			int32				fTargetBufferIndex;
+			int32				fLastBufferIndex;
 
 			bool				fTryOverlay;
 };

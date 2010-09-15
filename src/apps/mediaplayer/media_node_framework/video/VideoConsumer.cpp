@@ -43,7 +43,7 @@
 #endif
 
 #define M1 ((double)1000000.0)
-#define JITTER		20000
+static const bigtime_t kMaxBufferLateness = 20000LL;
 
 
 VideoConsumer::VideoConsumer(const char* name, BMediaAddOn* addon,
@@ -55,13 +55,13 @@ VideoConsumer::VideoConsumer(const char* name, BMediaAddOn* addon,
 	  fInternalID(internal_id),
 	  fAddOn(addon),
 	  fConnectionActive(false),
-	  fMyLatency(20000),
+	  fMyLatency(3000),
 	  fOurBuffers(false),
 	  fBuffers(NULL),
 	  fManager(manager),
 	  fTargetLock(),
 	  fTarget(target),
-	  fTargetBufferIndex(-1),
+	  fLastBufferIndex(-1),
 	  fTryOverlay(true)
 {
 	FUNCTION("VideoConsumer::VideoConsumer\n");
@@ -71,7 +71,7 @@ VideoConsumer::VideoConsumer(const char* name, BMediaAddOn* addon,
 	
 	for (uint32 i = 0; i < kBufferCount; i++) {
 		fBitmap[i] = NULL;
-		fBufferMap[i] = 0;
+		fBufferMap[i] = NULL;
 	}
 	
 	SetPriority(B_DISPLAY_PRIORITY);
@@ -92,36 +92,6 @@ VideoConsumer::AddOn(long* cookie) const
 	// do the right thing if we're ever used with an add-on
 	*cookie = fInternalID;
 	return fAddOn;
-}
-
-
-// This implementation is required to get around a bug in
-// the ppc compiler.
-void 
-VideoConsumer::Start(bigtime_t performance_time)
-{
-	BMediaEventLooper::Start(performance_time);
-}
-
-
-void 
-VideoConsumer::Stop(bigtime_t performance_time, bool immediate)
-{
-	BMediaEventLooper::Stop(performance_time, immediate);
-}
-
-
-void 
-VideoConsumer::Seek(bigtime_t media_time, bigtime_t performance_time)
-{
-	BMediaEventLooper::Seek(media_time, performance_time);
-}
-
-
-void 
-VideoConsumer::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
-{
-	BMediaEventLooper::TimeWarp(at_real_time, to_performance_time);
 }
 
 
@@ -266,7 +236,7 @@ VideoConsumer::CreateBuffers(const media_format& format)
 			info.buffer = 0;
 				// the media buffer id
 
-			BBuffer *buffer = NULL;
+			BBuffer* buffer = NULL;
 			if ((status = fBuffers->AddBuffer(info, &buffer)) != B_OK) {
 				ERROR("VideoConsumer::CreateBuffers - ERROR ADDING BUFFER "
 					"TO GROUP (%ld): %s\n", i, strerror(status));
@@ -275,6 +245,7 @@ VideoConsumer::CreateBuffers(const media_format& format)
 				PROGRESS("VideoConsumer::CreateBuffers - SUCCESSFUL ADD "
 					"BUFFER TO GROUP\n");
 			}
+			fBufferMap[i] = buffer;
 		} else {
 			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING "
 				"BUFFER (%ld): %s\n", i, strerror(status));
@@ -282,25 +253,6 @@ VideoConsumer::CreateBuffers(const media_format& format)
 		}	
 	}
 	
-	BBuffer** buffList = new BBuffer*[kBufferCount];
-	for (uint32 i = 0; i < kBufferCount; i++)
-		buffList[i] = 0;
-	
-	if ((status = fBuffers->GetBufferList(kBufferCount, buffList)) == B_OK) {
-		for (uint32 i = 0; i < kBufferCount; i++) {
-			if (buffList[i] != NULL) {
-				fBufferMap[i] = (uint32)buffList[i];
-				PROGRESS(" i = %lu buffer = %08lx\n", i, fBufferMap[i]);
-			} else {
-				ERROR("VideoConsumer::CreateBuffers ERROR MAPPING RING BUFFER\n");
-				return B_ERROR;
-			}
-		}
-	} else
-		ERROR("VideoConsumer::CreateBuffers ERROR IN GET BUFFER LIST\n");
-
-	delete[] buffList;
-		
 	FUNCTION("VideoConsumer::CreateBuffers - EXIT\n");
 	return status;
 }
@@ -312,10 +264,10 @@ VideoConsumer::DeleteBuffers()
 	FUNCTION("VideoConsumer::DeleteBuffers\n");
 	if (fBuffers) {
 		fTargetLock.Lock();
-		if (fTargetBufferIndex >= 0) {
+		if (fLastBufferIndex >= 0) {
 			if (fTarget)
 				fTarget->SetBitmap(NULL);
-			fTargetBufferIndex = -1;
+			fLastBufferIndex = -1;
 		}
 		fTargetLock.Unlock();
 
@@ -339,8 +291,8 @@ VideoConsumer::SetTarget(VideoTarget* target)
 	if (fTarget)
 		fTarget->SetBitmap(NULL);
 	fTarget = target;
-	if (fTarget && fTargetBufferIndex >= 0)
-		fTarget->SetBitmap(fBitmap[fTargetBufferIndex]);
+	if (fTarget && fLastBufferIndex >= 0)
+		fTarget->SetBitmap(fBitmap[fLastBufferIndex]);
 	fTargetLock.Unlock();
 }
 
@@ -365,13 +317,15 @@ VideoConsumer::Connected(const media_source& producer,
 	sprintf(fIn.name, "Video Consumer");
 	*outInput = fIn;
 
-	uint32 user_data = 0;
-	int32 change_tag = 1;	
+	uint32 userData = 0;
+	int32 changeTag = 1;	
 	if (CreateBuffers(format) == B_OK) {
-		BBufferConsumer::SetOutputBuffersFor(producer, fDestination, 
-											 fBuffers, (void *)&user_data,
-											 &change_tag, true);
-		fIn.format.u.raw_video.display.bytes_per_row = fBitmap[0]->BytesPerRow();
+		status_t ret = SetOutputBuffersFor(producer, fIn.destination, 
+			fBuffers, &userData, &changeTag, true);
+		if (ret != B_OK)
+			printf("SetOutputBuffersFor() failed: %s\n", strerror(ret));
+		fIn.format.u.raw_video.display.bytes_per_row
+			= fBitmap[0]->BytesPerRow();
 	} else {
 		ERROR("VideoConsumer::Connected - COULDN'T CREATE BUFFERS\n");
 		return B_ERROR;
@@ -380,7 +334,7 @@ VideoConsumer::Connected(const media_source& producer,
 	*outInput = fIn;
 		// bytes per row might have changed
 	fConnectionActive = true;
-		
+
 	FUNCTION("VideoConsumer::Connected - EXIT\n");
 	return B_OK;
 }
@@ -397,8 +351,8 @@ VideoConsumer::Disconnected(const media_source& producer,
 
 	// reclaim our buffers
 	int32 changeTag = 0;
-	BBufferConsumer::SetOutputBuffersFor(producer, fDestination, NULL,
-		NULL, &changeTag, false);
+	SetOutputBuffersFor(producer, fIn.destination, NULL, NULL, &changeTag,
+		false);
 	if (fOurBuffers) {
 		status_t reclaimError = fBuffers->ReclaimAllBuffers();
 		if (reclaimError != B_OK) {
@@ -413,15 +367,7 @@ VideoConsumer::Disconnected(const media_source& producer,
 	// Unset the target's bitmap. Just to be safe -- since it is usually
 	// done when the stop event arrives, but someone may disonnect
 	// without stopping us before.
-	fTargetLock.Lock();
-	if (fTargetBufferIndex >= 0) {
-		if (fTarget)
-			fTarget->SetBitmap(NULL);
-		if (fOurBuffers)
-			((BBuffer*)fBufferMap[fTargetBufferIndex])->Recycle();
-		fTargetBufferIndex = -1;
-	}
-	fTargetLock.Unlock();
+	_UnsetTargetBuffer();
 }
 
 
@@ -517,18 +463,16 @@ VideoConsumer::DisposeInputCookie(int32 /*cookie*/)
 
 
 status_t
-VideoConsumer::GetLatencyFor(
-	const media_destination &for_whom,
-	bigtime_t * out_latency,
-	media_node_id * out_timesource)
+VideoConsumer::GetLatencyFor(const media_destination& whom,
+	bigtime_t* _latency, media_node_id* _timeSource)
 {
 	FUNCTION("VideoConsumer::GetLatencyFor\n");
 	
-	if (for_whom != fIn.destination)
+	if (whom != fIn.destination)
 		return B_MEDIA_BAD_DESTINATION;
 	
-	*out_latency = fMyLatency;
-	*out_timesource = TimeSource()->ID();
+	*_latency = fMyLatency;
+	*_timeSource = TimeSource()->ID();
 	return B_OK;
 }
 
@@ -558,100 +502,120 @@ VideoConsumer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 {
 	LOOP("VideoConsumer::HandleEvent\n");
 	
-	BBuffer* buffer;
-
 	switch (event->type) {
 		case BTimedEventQueue::B_START:
 			PROGRESS("VideoConsumer::HandleEvent - START\n");
+			_SetPerformanceTimeBase(event->event_time);
+			break;
+		case BTimedEventQueue::B_WARP:
+		case BTimedEventQueue::B_SEEK:
+			PROGRESS("VideoConsumer::HandleEvent - WARP or SEEK\n");
+			_SetPerformanceTimeBase(event->bigdata);
 			break;
 
 		case BTimedEventQueue::B_STOP:
 			PROGRESS("VideoConsumer::HandleEvent - STOP\n");
 			EventQueue()->FlushEvents(event->event_time, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
 			// unset the target's bitmap
-			fTargetLock.Lock();
-			if (fTargetBufferIndex >= 0) {
-				if (fTarget)
-					fTarget->SetBitmap(NULL);
-				if (fOurBuffers)
-					((BBuffer*)fBufferMap[fTargetBufferIndex])->Recycle();
-				fTargetBufferIndex = -1;
-			}
-			fTargetLock.Unlock();
+			_UnsetTargetBuffer();
 			break;
 
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 			LOOP("VideoConsumer::HandleEvent - HANDLE BUFFER\n");
-			buffer = (BBuffer *) event->pointer;
-
-			if (RunState() == B_STARTED && fConnectionActive) {
-				// see if this is one of our buffers
-				uint32 index = 0;
-				fOurBuffers = true;
-				while (index < kBufferCount) {
-					if ((uint32)buffer == fBufferMap[index])
-						break;
-					else
-						index++;
-				}
-				if (index == kBufferCount) {
-					// no, buffers belong to consumer
-					fOurBuffers = false;
-					index = (fTargetBufferIndex + 1) % kBufferCount;
-				}
-
-				bool dropped = false;
-				bool recycle = true;
-				if ((RunMode() == B_OFFLINE)
-// TODO: Fix the runmode stuff! Setting the consumer to B_OFFLINE does
-// not do the trick. I made the VideoConsumer check the performance
-// time of the buffer and if it is 0, it plays it regardless.
-|| (buffer->Header()->start_time == 2 * fMyLatency + SchedulingLatency())
-					|| (/*(TimeSource()->Now()
-						> (buffer->Header()->start_time - JITTER)) &&*/
-						(TimeSource()->Now() < (buffer->Header()->start_time
-							+ JITTER)))) {
-					if (!fOurBuffers) {
-						memcpy(fBitmap[index]->Bits(), buffer->Data(),
-							fBitmap[index]->BitsLength());
-					}
-
-					fTargetLock.Lock();
-					if (fTarget) {
-						fTarget->SetBitmap(fBitmap[index]);
-						if (fOurBuffers) {
-							// recycle the previous but not the current buffer
-							if (fTargetBufferIndex >= 0) {
-								((BBuffer*)fBufferMap[fTargetBufferIndex])
-									->Recycle();
-							}
-							recycle = false;
-						}
-						fTargetBufferIndex = index;
-					}
-					fTargetLock.Unlock();
-				} else {
-					dropped = true;
-					PROGRESS("VideoConsumer::HandleEvent - DROPPED FRAME\n"
-						"   start_time: %lld, current: %lld, latency: %lld\n",
-						buffer->Header()->start_time, TimeSource()->Now(),
-						SchedulingLatency());
-				}
-				if (dropped) {
-					if (fManager->LockWithTimeout(10000) == B_OK) {
-						fManager->FrameDropped();
-						fManager->Unlock();
-					}
-				}
-				if (recycle)
-					buffer->Recycle();
-			} else {
-				TRACE("RunState() != B_STARTED\n");
-				buffer->Recycle();
-			}
+			_HandleBuffer(static_cast<BBuffer*>(event->pointer));
 			break;
 		default:
 			ERROR("VideoConsumer::HandleEvent - BAD EVENT\n");
 			break;
 	}			
+}
+
+
+void
+VideoConsumer::_SetPerformanceTimeBase(bigtime_t performanceTime)
+{
+	fPerformanceTimeBase = performanceTime;
+}
+
+
+void
+VideoConsumer::_HandleBuffer(BBuffer* buffer)
+{
+	if (RunState() != B_STARTED || !fConnectionActive) {
+		TRACE("RunState() != B_STARTED\n");
+		buffer->Recycle();
+		return;
+	}
+
+	// see if this is one of our buffers
+	uint32 index = 0;
+	fOurBuffers = true;
+	while (index < kBufferCount) {
+		if (buffer->ID() == fBufferMap[index]->ID())
+			break;
+		else
+			index++;
+	}
+	if (index == kBufferCount) {
+		// no, buffers belong to consumer
+		fOurBuffers = false;
+		index = (fLastBufferIndex + 1) % kBufferCount;
+	}
+
+	bool dropped = false;
+	bool recycle = true;
+	bigtime_t now = TimeSource()->Now();
+	if (RunMode() == B_OFFLINE
+		|| now < buffer->Header()->start_time
+			+ kMaxBufferLateness) {
+		if (!fOurBuffers) {
+			memcpy(fBitmap[index]->Bits(), buffer->Data(),
+				fBitmap[index]->BitsLength());
+		}
+		bigtime_t tooEarly = buffer->Header()->start_time - now;
+		if (tooEarly > 3000)
+			snooze(tooEarly);
+
+		fTargetLock.Lock();
+		if (fTarget) {
+			fTarget->SetBitmap(fBitmap[index]);
+			if (fOurBuffers) {
+				// recycle the previous but not the current buffer
+				if (fLastBufferIndex >= 0)
+					fBufferMap[fLastBufferIndex]->Recycle();
+				recycle = false;
+			}
+			fLastBufferIndex = index;
+		}
+		fTargetLock.Unlock();
+	} else {
+		dropped = true;
+		PROGRESS("VideoConsumer::HandleEvent - DROPPED FRAME\n"
+			"   start_time: %lld, current: %lld, latency: %lld\n",
+			buffer->Header()->start_time, TimeSource()->Now(),
+			SchedulingLatency());
+	}
+	if (dropped) {
+		if (fManager->LockWithTimeout(10000) == B_OK) {
+			fManager->FrameDropped();
+			fManager->Unlock();
+		}
+	}
+	if (recycle)
+		buffer->Recycle();
+}
+
+
+void
+VideoConsumer::_UnsetTargetBuffer()
+{
+	fTargetLock.Lock();
+	if (fLastBufferIndex >= 0) {
+		if (fTarget)
+			fTarget->SetBitmap(NULL);
+		if (fOurBuffers)
+			fBufferMap[fLastBufferIndex]->Recycle();
+		fLastBufferIndex = -1;
+	}
+	fTargetLock.Unlock();
 }
