@@ -18,18 +18,13 @@
 ProxyVideoSupplier::ProxyVideoSupplier()
 	:
 	fSupplierLock("video supplier lock"),
-	fSupplier(NULL),
-	fCachedFrame(NULL),
-	fCachedFrameSize(0),
-	fCachedFrameValid(false),
-	fUseFrameCaching(true)
+	fSupplier(NULL)
 {
 }
 
 
 ProxyVideoSupplier::~ProxyVideoSupplier()
 {
-	free(fCachedFrame);
 }
 
 
@@ -44,35 +39,12 @@ ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 	if (fSupplier == NULL)
 		return B_NO_INIT;
 
-	if (fUseFrameCaching) {
-		size_t bufferSize = format.display.bytes_per_row
-			* format.display.line_count;
-		if (fCachedFrame == NULL || fCachedFrameSize != bufferSize) {
-			// realloc cached frame
-			fCachedFrameValid = false;
-			void* cachedFrame = realloc(fCachedFrame, bufferSize);
-			if (cachedFrame != NULL) {
-				fCachedFrame = cachedFrame, 
-				fCachedFrameSize = bufferSize;
-			} else
-				fUseFrameCaching = false;
-			fCachedFrameValid = false;
-		}
-	}
-
 	if (fSupplier->CurrentFrame() == startFrame + 1) {
-		if (fCachedFrameValid) {
-			memcpy(buffer, fCachedFrame, fCachedFrameSize);
-			wasCached = true;
-			return B_OK;
-		}
-// TODO: The problem here is hidden in PlaybackManager::_PushState()
-// not computing the correct current_frame for the new PlayingState.
-		printf("ProxyVideoSupplier::FillBuffer(%lld) - TODO: Avoid "
-			"asking for the same frame twice (%lld)!\n", startFrame,
-			fSupplier->CurrentFrame());
+		wasCached = true;
+		return B_OK;
 	}
 
+	wasCached = false;
 	status_t ret = B_OK;
 	bigtime_t performanceTime = 0;
 	if (fSupplier->CurrentFrame() != startFrame) {
@@ -96,11 +68,6 @@ ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 	}
 
 	ret = fSupplier->ReadFrame(buffer, &performanceTime, format, wasCached);
-
-	if (fUseFrameCaching && ret == B_OK) {
-		memcpy(fCachedFrame, buffer, fCachedFrameSize);
-		fCachedFrameValid = true;
-	}
 
 	fProcessingLatency = system_time() - now;
 

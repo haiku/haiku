@@ -30,11 +30,6 @@ private:
 			BLocker				fSupplierLock;
 
 			VideoTrackSupplier*	fSupplier;
-
-			void*				fCachedFrame;
-			size_t				fCachedFrameSize;
-			bool				fCachedFrameValid;
-			bool				fUseFrameCaching;
 };
 
 #endif	// PROXY_VIDEO_SUPPLIER_H

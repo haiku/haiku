@@ -132,6 +132,8 @@ protected:
 		int64				fFrame;
 		int64				fFrameBase;
 		bigtime_t			fPerformanceTimeBase;
+		bigtime_t			fBufferDuration;
+		bigtime_t			fBufferLatency;
 		media_output		fOutput;
 		media_raw_video_format	fConnectedFormat;
 		bool				fRunning;

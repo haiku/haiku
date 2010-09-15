@@ -51,6 +51,10 @@ VideoProducer::VideoProducer(BMediaAddOn* addon, const char* name,
 	  fUsedBufferGroup(NULL),
 	  fThread(-1),
 	  fFrameSync(-1),
+	  fFrame(0),
+	  fFrameBase(0),
+	  fPerformanceTimeBase(0),
+	  fBufferLatency(0),
 	  fRunning(false),
 	  fConnected(false),
 	  fEnabled(false),
@@ -422,9 +426,6 @@ VideoProducer::PrepareToConnect(const media_source& source,
 }
 
 
-#define NODE_LATENCY 20000
-
-
 void
 VideoProducer::Connect(status_t error, const media_source& source,
 	const media_destination& destination, const media_format& format,
@@ -454,29 +455,25 @@ VideoProducer::Connect(status_t error, const media_source& source,
 
 	fOutput.destination = destination;
 	strcpy(_name, fOutput.name);
+	fConnectedFormat = format.u.raw_video;
+	fBufferDuration = 20000;
 
-	if (fOutput.format.u.raw_video.field_rate != 0.0f) {
+	if (fConnectedFormat.field_rate != 0.0f) {
 		fPerformanceTimeBase = fPerformanceTimeBase
 			+ (bigtime_t)((fFrame - fFrameBase)
-				* 1000000 / fOutput.format.u.raw_video.field_rate);
+				* 1000000LL / fConnectedFormat.field_rate);
 		fFrameBase = fFrame;
+		fBufferDuration = 1000000LL / fConnectedFormat.field_rate;
 	}
 
-	fConnectedFormat = format.u.raw_video;
 	if (fConnectedFormat.display.bytes_per_row == 0) {
 		ERROR("Connect() - connected format still has BPR wildcard!\n");
 		fConnectedFormat.display.bytes_per_row
 			= 4 * fConnectedFormat.display.line_width;
 	}
 
-	// get the latency
-	bigtime_t latency = 0;
-	media_node_id tsID = 0;
-	FindLatencyFor(fOutput.destination, &latency, &tsID);
-	SetEventLatency(latency + NODE_LATENCY);
-
 	// Create the buffer group
-	if (!fUsedBufferGroup) {
+	if (fUsedBufferGroup == NULL) {
 		fBufferGroup = new BBufferGroup(fConnectedFormat.display.bytes_per_row
 			* fConnectedFormat.display.line_count, BUFFER_COUNT);
 		status_t err = fBufferGroup->InitCheck();
@@ -488,6 +485,20 @@ VideoProducer::Connect(status_t error, const media_source& source,
 		}
 		fUsedBufferGroup = fBufferGroup;
 	}
+
+	// get the latency
+	fBufferLatency = (BUFFER_COUNT - 1) * fBufferDuration;
+
+	int32 bufferCount;
+	if (fUsedBufferGroup->CountBuffers(&bufferCount) == B_OK) {
+		// recompute the latency
+		fBufferLatency = (bufferCount - 1) * fBufferDuration;
+	}
+
+	bigtime_t latency = 0;
+	media_node_id tsID = 0;
+	FindLatencyFor(fOutput.destination, &latency, &tsID);
+	SetEventLatency(latency + fBufferLatency);
 
 	fConnected = true;
 	fEnabled = true;
@@ -665,8 +676,6 @@ int32
 VideoProducer::_FrameGeneratorThread()
 {
 	bool forceSendingBuffer = true;
-	bigtime_t lastFrameSentAt = 0;
-	int64 lastPlaylistFrame = 0;
 	int32 droppedFrames = 0;
 	const int32 kMaxDroppedFrames = 15;
 	bool running = true;
@@ -680,7 +689,6 @@ VideoProducer::_FrameGeneratorThread()
 		bigtime_t nextPerformanceTime = 0;
 		bigtime_t waitUntil = 0;
 		bigtime_t nextWaitUntil = 0;
-		bigtime_t maxRenderTime = 0;
 		int32 playingDirection = 0;
 		int32 playingMode = 0;
 		int64 playlistFrame = 0;
@@ -691,14 +699,11 @@ VideoProducer::_FrameGeneratorThread()
 				// get the times for the current and the next frame
 				performanceTime = fManager->TimeForFrame(fFrame);
 				nextPerformanceTime = fManager->TimeForFrame(fFrame + 1);
-				maxRenderTime = min_c(bigtime_t(40000),
-					max_c(fSupplier->ProcessingLatency(), maxRenderTime));
 				playingMode = fManager->PlayModeAtFrame(fFrame);
-
 				waitUntil = TimeSource()->RealTimeFor(fPerformanceTimeBase
-					+ performanceTime, 0) - maxRenderTime;
+					+ performanceTime, fBufferLatency);
 				nextWaitUntil = TimeSource()->RealTimeFor(fPerformanceTimeBase
-					+ nextPerformanceTime, 0) - maxRenderTime;
+					+ nextPerformanceTime, fBufferLatency);
 				// get playing direction and playlist frame for the current
 				// frame
 				bool newPlayingState;
@@ -707,10 +712,6 @@ VideoProducer::_FrameGeneratorThread()
 				TRACE("_FrameGeneratorThread: performance time: %Ld, "
 					"playlist frame: %lld\n", performanceTime, playlistFrame);
 				forceSendingBuffer |= newPlayingState;
-				if (lastPlaylistFrame != playlistFrame) {
-					forceSendingBuffer = true;
-					lastPlaylistFrame = playlistFrame;
-				}
 				fManager->SetCurrentVideoTime(nextPerformanceTime);
 				fManager->Unlock();
 				break;
@@ -748,7 +749,7 @@ VideoProducer::_FrameGeneratorThread()
 				if (ignoreEvent || !fRunning || !fEnabled) {
 					TRACE("_FrameGeneratorThread: ignore event\n");
 					// nothing to do
-				} else if (nextWaitUntil < system_time()
+				} else if (nextWaitUntil < system_time() - fBufferLatency
 					&& droppedFrames < kMaxDroppedFrames) {
 					// Drop frame if it's at least a frame late.
 					printf("VideoProducer: dropped frame (%Ld)\n", fFrame);
@@ -765,78 +766,72 @@ VideoProducer::_FrameGeneratorThread()
 					TRACE("_FrameGeneratorThread: produce frame\n");
 					BAutolock _(fLock);
 					// Fetch a buffer from the buffer group
+					fUsedBufferGroup->WaitForBuffers();
 					BBuffer* buffer = fUsedBufferGroup->RequestBuffer(
 						fConnectedFormat.display.bytes_per_row
 						* fConnectedFormat.display.line_count, 0LL);
-					if (buffer != NULL) {
-						// Fill out the details about this buffer.
-						media_header* h = buffer->Header();
-						h->type = B_MEDIA_RAW_VIDEO;
-						h->time_source = TimeSource()->ID();
-						h->size_used = fConnectedFormat.display.bytes_per_row
-							* fConnectedFormat.display.line_count;
-						// For a buffer originating from a device, you might
-						// want to calculate this based on the
-						// PerformanceTimeFor the time your buffer arrived at
-						// the hardware (plus any applicable adjustments).
-						h->start_time = fPerformanceTimeBase + performanceTime;
-// TODO: Fix the runmode stuff! Setting the consumer to B_OFFLINE does
-// not do the trick. I made the VideoConsumer check the performance
-// time of the buffer and if it is 0, it plays it regardless.
-if (playingMode < 0 || droppedFrames >= kMaxDroppedFrames) {
-h->start_time = 0;
-}
-						h->file_pos = 0;
-						h->orig_size = 0;
-						h->data_offset = 0;
-						h->u.raw_video.field_gamma = 1.0;
-						h->u.raw_video.field_sequence = fFrame;
-						h->u.raw_video.field_number = 0;
-						h->u.raw_video.pulldown_number = 0;
-						h->u.raw_video.first_active_line = 1;
-						h->u.raw_video.line_count
-							= fConnectedFormat.display.line_count;
-						// Fill in a frame
-						TRACE("_FrameGeneratorThread: frame: %Ld, "
-							"playlistFrame: %Ld\n", fFrame, playlistFrame);
-						bool forceOrWasCached = forceSendingBuffer;
-
-						err = fSupplier->FillBuffer(playlistFrame,
-							buffer->Data(), fConnectedFormat,
-							forceOrWasCached);
-						// clean the buffer if something went wrong
-						if (err != B_OK) {
-							// TODO: should use "back value" according
-							// to color space!
-							memset(buffer->Data(), 0, h->size_used);
-							err = B_OK;
-						}
-						// Send the buffer on down to the consumer
-						if (SendBuffer(buffer, fOutput.source,
-								fOutput.destination) < B_OK) {
-							ERROR("_FrameGeneratorThread: Error "
-								"sending buffer\n");
-							// If there is a problem sending the buffer,
-							// or if we don't send the buffer because its
-							// contents are the same as the last one,
-							// return it to its buffer group.
-							buffer->Recycle();
-							// we tell the supplier to delete
-							// its caches if there was a problem sending
-							// the buffer
-							fSupplier->DeleteCaches();
-						}
-						// Only if everything went fine we clear the flag
-						// that forces us to send a buffer even if not
-						// playing.
-						if (err == B_OK) {
-							forceSendingBuffer = false;
-							lastFrameSentAt = performanceTime;
-						}
-					} else {
+					if (buffer == NULL) {
+						// Wait until a buffer becomes available again
 						TRACE("_FrameGeneratorThread: no buffer!\n");
 //						ERROR("_FrameGeneratorThread: no buffer!\n");
+						break;
 					}
+					// Fill out the details about this buffer.
+					media_header* h = buffer->Header();
+					h->type = B_MEDIA_RAW_VIDEO;
+					h->time_source = TimeSource()->ID();
+					h->size_used = fConnectedFormat.display.bytes_per_row
+						* fConnectedFormat.display.line_count;
+					// For a buffer originating from a device, you might
+					// want to calculate this based on the
+					// PerformanceTimeFor the time your buffer arrived at
+					// the hardware (plus any applicable adjustments).
+					h->start_time = fPerformanceTimeBase + performanceTime;
+					h->file_pos = 0;
+					h->orig_size = 0;
+					h->data_offset = 0;
+					h->u.raw_video.field_gamma = 1.0;
+					h->u.raw_video.field_sequence = fFrame;
+					h->u.raw_video.field_number = 0;
+					h->u.raw_video.pulldown_number = 0;
+					h->u.raw_video.first_active_line = 1;
+					h->u.raw_video.line_count
+						= fConnectedFormat.display.line_count;
+					// Fill in a frame
+					TRACE("_FrameGeneratorThread: frame: %Ld, "
+						"playlistFrame: %Ld\n", fFrame, playlistFrame);
+					bool wasCached = false;
+					err = fSupplier->FillBuffer(playlistFrame,
+						buffer->Data(), fConnectedFormat, wasCached);
+					// clean the buffer if something went wrong
+					if (err != B_OK) {
+						// TODO: should use "back value" according
+						// to color space!
+						memset(buffer->Data(), 0, h->size_used);
+						err = B_OK;
+					}
+					// Send the buffer on down to the consumer
+					if (wasCached || (err = SendBuffer(buffer, fOutput.source,
+							fOutput.destination) != B_OK)) {
+						// If there is a problem sending the buffer,
+						// or if we don't send the buffer because its
+						// contents are the same as the last one,
+						// return it to its buffer group.
+						buffer->Recycle();
+						// we tell the supplier to delete
+						// its caches if there was a problem sending
+						// the buffer
+						if (err != B_OK) {
+							ERROR("_FrameGeneratorThread: Error "
+								"sending buffer\n");
+							fSupplier->DeleteCaches();
+						}
+					}
+					// Only if everything went fine we clear the flag
+					// that forces us to send a buffer even if not
+					// playing.
+					if (err == B_OK)
+						forceSendingBuffer = false;
 					// next frame
 					fFrame++;
 					droppedFrames = 0;
