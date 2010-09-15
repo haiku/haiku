@@ -312,7 +312,6 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 
 	// Get a pointer to the AVCodecContext for the stream at streamIndex.
 	AVCodecContext* codecContext = fStream->codec;
-	AVStream* stream = fStream;
 
 #if 0
 // stippi: Here I was experimenting with the question if some fields of the
@@ -606,11 +605,7 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 //			format->u.encoded_video.forward_history = 0;
 //			format->u.encoded_video.backward_history = 0;
 
-			// TODO: Fix up for interlaced video
-			format->u.encoded_video.output.field_rate
-				= av_q2d(stream->r_frame_rate);
-if (format->u.encoded_video.output.field_rate == 50.0f)
-	format->u.encoded_video.output.field_rate = 25.0f;
+			format->u.encoded_video.output.field_rate = FrameRate();
 			format->u.encoded_video.output.interlace = 1;
 
 			format->u.encoded_video.output.first_active = 0;
@@ -745,7 +740,10 @@ AVFormatReader::StreamCookie::FrameRate() const
 			frameRate = (double)fStream->codec->sample_rate;
 			break;
 		case CODEC_TYPE_VIDEO:
-			frameRate = av_q2d(fStream->r_frame_rate);
+			frameRate = av_q2d(fStream->avg_frame_rate);
+			// TODO: Fix up interlaced video for real
+			if (frameRate == 50.0f)
+				frameRate = 25.0f;
 			break;
 		default:
 			frameRate = 1.0;
