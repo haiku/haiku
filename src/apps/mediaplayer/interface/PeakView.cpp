@@ -44,6 +44,7 @@ PeakView::PeakView(const char* name, bool useGlobalPulse, bool displayLabels)
 
 	fChannelInfos(NULL),
 	fChannelCount(0),
+	fGotData(true),
 
 	fBackBitmap(NULL),
 	fPeakNotificationWhat(0)
@@ -72,6 +73,7 @@ PeakView::MessageReceived(BMessage* message)
 		float max;
 		for (int32 i = 0; message->FindFloat("max", i, &max) == B_OK; i++)
 			SetMax(max, i);
+		fGotData = true;
 		return;
 	}
 
@@ -193,6 +195,9 @@ PeakView::FrameResized(float width, float height)
 void
 PeakView::Pulse()
 {
+	if (!fGotData)
+		return;
+
 	if (fBackBitmap == NULL)
 		return;
 
@@ -207,6 +212,7 @@ PeakView::Pulse()
 
 	for (uint32 i = 0; i < fChannelCount; i++)
 		fChannelInfos[i].current_max = 0.0f;
+	fGotData = false;
 
 	_DrawBitmap();
 	Flush();
@@ -327,6 +333,7 @@ PeakView::_ResizeBackBitmap(int32 width, int32 channels)
 		return;
 	}
 	memset(fBackBitmap->Bits(), 0, fBackBitmap->BitsLength());
+	fGotData = true;
 }
 
 

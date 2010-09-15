@@ -85,6 +85,7 @@ private:
 
 			ChannelInfo*		fChannelInfos;
 			uint32				fChannelCount;
+			bool				fGotData;
 
 			BBitmap*			fBackBitmap;
 			font_height			fFontHeight;
