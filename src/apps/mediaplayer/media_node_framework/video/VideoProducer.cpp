@@ -463,7 +463,7 @@ VideoProducer::Connect(status_t error, const media_source& source,
 			+ (bigtime_t)((fFrame - fFrameBase)
 				* 1000000LL / fConnectedFormat.field_rate);
 		fFrameBase = fFrame;
-		fBufferDuration = 1000000LL / fConnectedFormat.field_rate;
+		fBufferDuration = bigtime_t(1000000LL / fConnectedFormat.field_rate);
 	}
 
 	if (fConnectedFormat.display.bytes_per_row == 0) {
