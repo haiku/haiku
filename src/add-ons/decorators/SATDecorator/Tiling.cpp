@@ -441,17 +441,17 @@ SATTiling::_HighlightWindows(SATGroup* group, bool highlight)
 	const TabList* vTabs = group->VerticalTabs();
 	// height light windows at all four sites
 	_SearchHighlightWindow(fFreeAreaLeft, fFreeAreaTop, fFreeAreaBottom, hTabs,
-		Corner::kLeftBottom, highlight);
+		fFreeAreaTop ? Corner::kLeftBottom : Corner::kLeftTop, highlight);
 
 	_SearchHighlightWindow(fFreeAreaTop, fFreeAreaLeft, fFreeAreaRight, vTabs,
-		Corner::kRightTop, highlight);
+		fFreeAreaLeft ? Corner::kRightTop : Corner::kLeftTop, highlight);
 
 	_SearchHighlightWindow(fFreeAreaRight, fFreeAreaTop, fFreeAreaBottom, hTabs,
-		Corner::kRightBottom, highlight);
+		fFreeAreaTop ? Corner::kRightBottom : Corner::kRightTop, highlight);
 
 	_SearchHighlightWindow(fFreeAreaBottom, fFreeAreaLeft, fFreeAreaRight,
-		vTabs, Corner::kRightBottom, highlight);
-
+		vTabs, fFreeAreaLeft ? Corner::kRightBottom : Corner::kLeftBottom,
+		highlight);
 }
 
 
@@ -485,11 +485,11 @@ SATTiling::_SearchHighlightWindow(Tab* tab, Tab* firstOrthTab,
 
 	for (; index < orthTabs->CountItems() && index >= 0; index += searchDir) {
 		Tab* orthTab = orthTabs->ItemAt(index);
+		if (orthTab == endOrthTab)
+ 			break;
 		Crossing* crossing = tab->FindCrossing(orthTab);
 		if (!crossing)
 			continue;
-		if (orthTab == endOrthTab)
-			break;
 		Corner* corner = crossing->GetCorner(areaCorner);
 		if (corner->windowArea)
 			_HighlightWindows(corner->windowArea, highlight);
