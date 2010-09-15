@@ -645,13 +645,13 @@ printf("B_START: start time: %lld\n", fStartTime);
 			if (RunState() == BMediaEventLooper::B_STARTED
 				&& fOutput.destination != media_destination::null) {
 				BBuffer* buffer = _FillNextBuffer(event->event_time);
-				if (buffer) {
+				if (buffer != NULL) {
 					status_t err = B_ERROR;
 					if (fOutputEnabled) {
 						err = SendBuffer(buffer, fOutput.source,
 							fOutput.destination);
 					}
-					if (err)
+					if (err != B_OK)
 						buffer->Recycle();
 				}
 				size_t sampleSize = fOutput.format.u.raw_audio.format
@@ -810,6 +810,7 @@ AudioProducer::_AllocateBuffers(const media_format& format)
 BBuffer*
 AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 {
+	fBufferGroup->WaitForBuffers();
 	BBuffer* buffer = fBufferGroup->RequestBuffer(
 		fOutput.format.u.raw_audio.buffer_size, BufferDuration());
 
