@@ -869,31 +869,9 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
 		*time = (bigtime_t)(*frame * 1000000.0 / frameRate + 0.5);
 
-#if 0
-	// This happens in ffplay.c:
-
-	int64_t pos = get_master_clock(cur_stream);
-		// The master clock seems to be the current system time
-		// with an offset for the current PTS value of the respective
-		// stream.
-	pos += incr;
-		// depends on the seek direction...
-
-	pos = (int64_t)(pos * AV_TIME_BASE);
-	uint32_t seekFlags = incr < 0 ? AVSEEK_FLAG_BACKWARD : 0;
-
-	pos = av_rescale_q(pos, AV_TIME_BASE_Q, fStream->time_base);
-
-	ret = av_seek_frame(fContext, Index(), pos, seekFlags);
-#endif
-
-#if 0
-	int streamIndex = -1;
-	int64_t timeStamp = *time / AV_TIME_BASE;
-#else
-	int streamIndex = Index();
-	int64_t timeStamp = _ConvertToStreamTimeBase(*time);
-#endif
+	int64_t timeStamp = *time;
+	int64_t minTimeStamp = timeStamp - 1000000;
+	int64_t maxTimeStamp = timeStamp + 1000000;
 
 	TRACE_SEEK("  time: %.5fs -> %lld, current DTS: %lld (time_base: %d/%d)\n",
 		*time / 1000000.0, timeStamp, fStream->cur_dts, fStream->time_base.num,
@@ -903,21 +881,11 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0)
 		searchFlags = 0;
 
-#if 0
-	bigtime_t oneSecond = 1000000;
-	int64_t minTimeStamp = timeStamp - _ConvertToStreamTimeBase(oneSecond);
-	int64_t maxTimeStamp = timeStamp + _ConvertToStreamTimeBase(oneSecond);
-	if (avformat_seek_file(fContext, streamIndex, minTimeStamp, timeStamp,
+	if (avformat_seek_file(fContext, -1, minTimeStamp, timeStamp,
 		maxTimeStamp, searchFlags) < 0) {
 		TRACE_SEEK("  avformat_seek_file() failed.\n");
 		return B_ERROR;
 	}
-#else
-	if (av_seek_frame(fContext, streamIndex, timeStamp, searchFlags) < 0) {
-		printf("  av_seek_frame() failed.\n");
-		return B_ERROR;
-	}
-#endif
 
 	// Our last packet is toast in any case. Read the next one so we
 	// know where we really seeked.
