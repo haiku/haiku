@@ -158,7 +158,7 @@ private:
 
 			media_format		fFormat;
 
-			bool				fStreamBuildsIndexWhileReading;
+	mutable	bool				fStreamBuildsIndexWhileReading;
 };
 
 
@@ -960,12 +960,19 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		bigtime_t timeDiff = foundTime > *time
 			? foundTime - *time : *time - foundTime;
 	
-		if (timeDiff > 1000000 && index == fStream->nb_index_entries - 1) {
+		if (timeDiff > 1000000
+			&& (fStreamBuildsIndexWhileReading
+				|| index == fStream->nb_index_entries - 1)) {
 			// If the stream is building the index on the fly while parsing
 			// it, we only have entries in the index for positions already
 			// decoded, i.e. we cannot seek into the future. In that case,
 			// just assume that we can seek where we want and leave time/frame
-			// unmodified.
+			// unmodified. Since successfully seeking one time will generate
+			// index entries for the seeked to position, we need to remember
+			// this in fStreamBuildsIndexWhileReading, since when seeking back
+			// there will be later index entries, but we still want to ignore
+			// the found entry.
+			fStreamBuildsIndexWhileReading = true;
 			TRACE_FIND("  Not trusting generic index entry. "
 				"(Current count: %d)\n", fStream->nb_index_entries);
 		} else
