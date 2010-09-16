@@ -37,6 +37,7 @@ Addon ffmpeg :
 	libspeex_ffmpeg.a
 	libtheora_ffmpeg.a
 	libogg_ffmpeg.a
+	libbz2_ffmpeg.a
 
 	be
 	libmedia.so
@@ -108,6 +109,7 @@ HAIKU_FFMPEG_DEFINES = [ FDefines $(HAIKU_FFMPEG_DEFINES) ] ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavcodec ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavformat ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libavutil ;
+SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libbz2 ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libogg ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libswscale ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg libspeex ;

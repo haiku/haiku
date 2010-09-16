@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src add-ons media plugins ffmpeg libavformat ;
 
 SubDirHdrs [ FDirName $(SUBDIR) .. ] ;
-SubDirHdrs [ FDirName $(SUBDIR) ../libavcodec ] ;
-SubDirHdrs [ FDirName $(SUBDIR) ../libavutil ] ;
+SubDirHdrs [ FDirName $(SUBDIR) .. libavcodec ] ;
+SubDirHdrs [ FDirName $(SUBDIR) .. libavutil ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) .. libbz2 ] ;
 
 UseLibraryHeaders zlib ;
 
