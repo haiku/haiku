@@ -16,6 +16,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	ABI-compliance-checker	- tool for checking ABI compatibility between libs
 #	APR						- support libraries used for example by Subversion
 #	APR-util				- Apache portable runtime utility library
+#	Bazaar					- the distributed version control system
 #	BeAE					- open source Audio Editor
 #	Beam					- powerful native e-mail client
 #	BeBook					- the classic BeOS API documentation
@@ -24,6 +25,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	BePDF					- native PDF reader
 #	BeZillaBrowser			- fork of Mozilla's 1.8 branch.
 #	Bluetooth				- experimental Haiku components for Bluetooth
+#	BurnItNow				- CD burning app
 #	Bzip					- file archiving utility
 #	CCache					- fast compiler cache
 #	CDRecord				- the command line CD writing tools
@@ -139,15 +141,38 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 }
 
 
+# Bazaar
+if [ IsOptionalHaikuImagePackageAdded Bazaar ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package BeAE available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage bzr-2.2.0-gcc4-2010-09-15.zip
+			: $(baseURL)/bzr-2.2.0-x86-gcc4-2010-09-15.zip
+			:
+ 		;
+	} else {
+		InstallOptionalHaikuImagePackage bzr-2.2.0-x86-gcc2-2010-09-15.zip
+			: $(baseURL)/bzr-2.2.0-x86-gcc2-2010-09-16.zip
+			:
+		;
+	}
+}
+
+
 # BeAE
 if [ IsOptionalHaikuImagePackageAdded BeAE ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeAE available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package BeAE available for gcc4" ;
+		InstallOptionalHaikuImagePackage beae-22-x86-gcc4-2010-09-15.zip
+			: $(baseURL)/beae-22-x86-gcc4-2010-09-15.zip
+			:
+ 		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BeAE/BeAE ;
 	} else {
-		InstallOptionalHaikuImagePackage beae-20-x86-gcc2-2010-09-09.zip
-			: $(baseURL)/beae-20-x86-gcc2-2010-09-09.zip
+		InstallOptionalHaikuImagePackage beae-22-x86-gcc2-2010-09-15.zip
+			: $(baseURL)/beae-22-x86-gcc2-2010-09-15.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
@@ -293,6 +318,28 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 		local abi = gcc$(HAIKU_GCC_VERSION[1]) ;
 		AddSymlinkToHaikuHybridImage develop abi $(arch) $(abi) lib
 			: /system/lib libbluetooth.so : : true ;
+	}
+}
+
+
+# BurnItNow
+if [ IsOptionalHaikuImagePackageAdded BurnItNow ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package BurnItNow available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage burnitnow-39-x86-gcc4-2010-09-15.zip
+			: $(baseURL)/burnitnow-39-x86-gcc4-2010-09-15.zip
+			:
+ 		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BurnItNow/BurnItNow ;
+	} else {
+		InstallOptionalHaikuImagePackage burnitnow-39-x86-gcc2-2010-09-15.zip
+			: $(baseURL)/burnitnow-39-x86-gcc2-2010-09-15.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/BurnItNow/BurnItNow ;
 	}
 }
 

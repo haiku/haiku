@@ -7,6 +7,7 @@
 OptionalPackageDependencies APR-util : APR Expat ;
 OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL PCRE ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
+OptionalPackageDependencies BurnItNow : CDRecord ;
 OptionalPackageDependencies CDRecord : LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
