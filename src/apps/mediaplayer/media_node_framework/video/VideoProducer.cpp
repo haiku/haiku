@@ -745,6 +745,14 @@ VideoProducer::_FrameGeneratorThread()
 					err = fSupplier->FillBuffer(playlistFrame,
 						buffer->Data(), fConnectedFormat, forceSendingBuffer,
 						wasCached);
+					if (err == B_TIMED_OUT) {
+						// Don't send the buffer if there was insufficient
+						// time for rendering, this will leave the last
+						// valid frame on screen until we catch up, instead
+						// of going black.
+						wasCached = true;
+						err = B_OK;
+					}
 					// clean the buffer if something went wrong
 					if (err != B_OK) {
 						// TODO: should use "back value" according
