@@ -87,14 +87,14 @@ SettingsView::SettingsView (bool isVideo)
 
 	float divider = StringWidth(fIsVideo ? B_TRANSLATE("Video output:")
 		: B_TRANSLATE("Audio output:")) + 5;
-	fMenu1 = new BPopUpMenu("<none>");
+	fMenu1 = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fMenu1->SetLabelFromMarked(true);
 	BMenuField *menuField1 = new BMenuField("menuField1",
 		fIsVideo ? B_TRANSLATE("Video input:")
 			: B_TRANSLATE("Audio input:"), fMenu1, NULL);
 	menuField1->SetDivider(divider);
 
-	fMenu2 = new BPopUpMenu("<none>");
+	fMenu2 = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fMenu2->SetLabelFromMarked(true);
 	BMenuField *menuField2 = new BMenuField("menuField2",
 		fIsVideo ? B_TRANSLATE("Video output:")
@@ -106,7 +106,7 @@ SettingsView::SettingsView (bool isVideo)
 
 	BMenuField *menuField3 = NULL;
 	if (!fIsVideo) {
-		fMenu3 = new BPopUpMenu("<none>");
+		fMenu3 = new BPopUpMenu(B_TRANSLATE("<none>"));
 		fMenu3->SetLabelFromMarked(true);
 		menuField3 = new BMenuField("menuField3",
 			B_TRANSLATE("Channel:"), fMenu3, NULL);

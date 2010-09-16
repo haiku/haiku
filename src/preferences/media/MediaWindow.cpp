@@ -325,10 +325,10 @@ MediaWindow::InitMedia(bool first)
 	fVideoView->AddNodes(fVideoOutputs, false);
 	fVideoView->AddNodes(fVideoInputs, true);
 
-	fListView->AddItem(audio = new MediaListItem("Audio settings", 0, false, &fIcons));
-	fListView->AddItem(video = new MediaListItem("Video settings", 0, true, &fIcons));
+	fListView->AddItem(audio = new MediaListItem(B_TRANSLATE("Audio settings"), 0, false, &fIcons));
+	fListView->AddItem(video = new MediaListItem(B_TRANSLATE("Video settings"), 0, true, &fIcons));
 
-	fListView->AddItem(mixer = new MediaListItem("Audio mixer", 1, false, &fIcons));
+	fListView->AddItem(mixer = new MediaListItem(B_TRANSLATE("Audio mixer"), 1, false, &fIcons));
 	mixer->SetAudioMixer(true);
 
 	fListView->SortItems(&MediaListItem::Compare);
