@@ -1988,8 +1988,9 @@ FileStatToString(StatStruct *stat, char *buffer, int32 length)
 	tm timeData;
 	localtime_r(&stat->st_mtime, &timeData);
 
-	sprintf(buffer, "\n\t(%Ld bytes, ", stat->st_size);
-	uint32 pos = strlen(buffer);
+
+	uint32 pos = sprintf(buffer,
+		B_TRANSLATE("\n\t(%Ld bytes, "), stat->st_size);
 	strftime(buffer + pos, length - pos,"%b %d %Y, %I:%M:%S %p)", &timeData);
 }
 

@@ -431,7 +431,8 @@ BInfoWindow::MessageReceived(BMessage *message)
 		case kEditItem:
 		{
 			BEntry entry(fModel->EntryRef());
-			if (ConfirmChangeIfWellKnownDirectory(&entry, "rename"))
+			if (ConfirmChangeIfWellKnownDirectory(&entry,
+				B_TRANSLATE("rename")))
 				fAttributeView->BeginEditingTitle();
 			break;
 		}
@@ -1220,7 +1221,8 @@ AttributeView::MouseDown(BPoint point)
 	} else if (fTitleRect.Contains(point)) {
 		// You can't change the name of the trash
 		if (!fModel->IsTrash()
-			&& ConfirmChangeIfWellKnownDirectory(&entry, "rename", true)
+			&& ConfirmChangeIfWellKnownDirectory(&entry,
+				B_TRANSLATE("rename"), true)
 			&& fTitleEditView == 0)
 			BeginEditingTitle();
 	} else if (fTitleEditView) {

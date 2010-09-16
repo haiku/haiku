@@ -4263,7 +4263,8 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 				char name[B_FILE_NAME_LENGTH];
 				BFile file;
 				if (CreateClippingFile(poseView, file, name, &targetDirectory, message,
-					"Untitled clipping", !targetPose, dropPt) != B_OK)
+					B_TRANSLATE("Untitled clipping"),
+					!targetPose, dropPt) != B_OK)
 					return false;
 
 				// here is a file for the drag initiator, it is up to it now to stuff it
@@ -4415,7 +4416,8 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 
 			BFile file;
 			if (CreateClippingFile(poseView, file, name, &targetDirectory, message,
-					"Untitled clipping", !targetPose, dropPt) != B_OK)
+					B_TRANSLATE("Untitled clipping"),
+					!targetPose, dropPt) != B_OK)
 				return false;
 
 			// write out the file
@@ -4468,7 +4470,7 @@ BPoseView::HandleDropCommon(BMessage *message, Model *targetModel, BPose *target
 
 			BFile file;
 			if (CreateClippingFile(poseView, file, name, &targetDirectory, message,
-				"Untitled bitmap", !targetPose, dropPt) != B_OK)
+				B_TRANSLATE("Untitled bitmap"), !targetPose, dropPt) != B_OK)
 				return false;
 
 			int32 size = embeddedBitmap.FlattenedSize();
@@ -4753,7 +4755,7 @@ BPoseView::MoveSelectionInto(Model *destFolder, BContainerWindow *srcWindow,
 	if (srcWindow->TargetModel()->IsQuery()
 		&& !forceCopy && !destIsTrash && !createLink) {
 		srcWindow->UpdateIfNeeded();
-		BAlert *alert = new BAlert("", 
+		BAlert *alert = new BAlert("",
 			B_TRANSLATE("Are you sure you want to move or copy the selected "
 			"item(s) to this folder?"), B_TRANSLATE("Cancel"),
 			B_TRANSLATE("Move"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
@@ -5957,9 +5959,9 @@ BPoseView::SelectMatchingEntries(const BMessage *message)
 		regExpression.SetTo(expression);
 
 		if (regExpression.InitCheck() != B_OK) {
-			BString message;
-			message << B_TRANSLATE("Error in regular expression:\n\n'");
-			message << regExpression.ErrorString() << "'";
+			BString message(
+				B_TRANSLATE("Error in regular expression:\n\n'%errstring'"));
+			message.ReplaceFirst("%errstring", regExpression.ErrorString());
 			(new BAlert("", message.String(), B_TRANSLATE("OK"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 			return 0;

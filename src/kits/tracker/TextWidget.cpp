@@ -36,6 +36,7 @@ All rights reserved.
 #include <stdlib.h>
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <MessageFilter.h>
@@ -53,6 +54,9 @@ All rights reserved.
 #include "Utilities.h"
 #include "WidgetAttributeText.h"
 
+
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "libtracker"
 
 const float kWidthMargin = 20;
 
@@ -326,8 +330,8 @@ BTextWidget::StartEdit(BRect bounds, BPoseView *view, BPose *pose)
 		return;
 
 	BEntry entry(pose->TargetModel()->EntryRef());
-	if (entry.InitCheck() == B_OK 
-		&& !ConfirmChangeIfWellKnownDirectory(&entry, "rename"))
+	if (entry.InitCheck() == B_OK
+		&& !ConfirmChangeIfWellKnownDirectory(&entry, B_TRANSLATE("rename")))
 		return;
 
 	// get bounds with full text length

@@ -62,7 +62,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 
 	strView = new BStringView(BRect(kColumnLabelMiddle - kColumnLabelWidth / 2,
 		kColumnLabelTop, kColumnLabelMiddle + kColumnLabelWidth / 2, kColumnLabelBottom),
-		"", "Owner");
+		"", B_TRANSLATE("Owner"));
 	AddChild(strView);
 	strView->SetAlignment(B_ALIGN_CENTER);
 	strView->SetFontSize(kAttribFontHeight);
@@ -221,7 +221,7 @@ FilePermissionsView::ModelChanged(Model *model)
 					user << nodeOwner;
 				fOwnerTextControl->SetText(user.String());
 			} else
-				fOwnerTextControl->SetText("Unknown");
+				fOwnerTextControl->SetText(B_TRANSLATE("Unknown"));
 
 			if (node.GetGroup(&nodeGroup) == B_OK) {
 				BString group;
@@ -234,7 +234,7 @@ FilePermissionsView::ModelChanged(Model *model)
 					group << nodeGroup;
 				fGroupTextControl->SetText(group.String());
 			} else
-				fGroupTextControl->SetText("Unknown");
+				fGroupTextControl->SetText(B_TRANSLATE("Unknown"));
 
 			// Unless we're root, only allow the owner to transfer the ownership,
 			// i.e. disable text controls if uid:s doesn't match:

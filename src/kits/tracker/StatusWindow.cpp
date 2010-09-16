@@ -661,8 +661,8 @@ BStatusView::Draw(BRect updateRect)
 	if (IsPaused())
 		DrawString(B_TRANSLATE("Paused: click to resume or stop"), tp);
 	else if (fDestDir.Length()) {
-		BString buffer;
-		buffer << "To: " << fDestDir;
+		BString buffer(B_TRANSLATE("To: %dir"));
+		buffer.ReplaceFirst("%dir", fDestDir);
 		SetHighColor(0, 0, 0);
 		DrawString(buffer.String(), tp);
 
@@ -681,24 +681,26 @@ BStatusView::Draw(BRect updateRect)
 			// Draw speed info
 			if (fBytesPerSecond != 0.0) {
 				char sizeBuffer[128];
-				buffer = "(";
-				buffer << string_for_size((double)fSizeProcessed, sizeBuffer,
-					sizeof(sizeBuffer));
-				buffer << " of ";
-				buffer << string_for_size((double)fTotalSize, sizeBuffer,
-					sizeof(sizeBuffer));
-				buffer << ", ";
-				buffer << string_for_size(fBytesPerSecond, sizeBuffer,
-					sizeof(sizeBuffer));
-				buffer << "/s)";
+				buffer.SetTo(B_TRANSLATE(
+					"(%SizeProcessed of %TotalSize, %BytesPerSecond/s)"));
+				buffer.ReplaceFirst("%SizeProcessed",
+					string_for_size((double)fSizeProcessed, sizeBuffer,
+					sizeof(sizeBuffer)));
+				buffer.ReplaceFirst("%TotalSize",
+					string_for_size((double)fTotalSize, sizeBuffer,
+					sizeof(sizeBuffer)));
+				buffer.ReplaceFirst("%BytesPerSecond",
+					string_for_size(fBytesPerSecond, sizeBuffer,
+					sizeof(sizeBuffer)));
 				tp.x = fStatusBar->Frame().right - StringWidth(buffer.String());
 				if (tp.x > rightDivider)
 					DrawString(buffer.String(), tp);
 				else {
 					// complete string too wide, try with shorter version
-					buffer << string_for_size(fBytesPerSecond, sizeBuffer,
-						sizeof(sizeBuffer));
-					buffer << "/s";
+					buffer << B_TRANSLATE("%BytesPerSecond/s");
+					buffer.ReplaceFirst("%BytesPerSecond",
+						string_for_size(fBytesPerSecond, sizeBuffer,
+						sizeof(sizeBuffer)));
 					tp.x = fStatusBar->Frame().right
 						- StringWidth(buffer.String());
 					if (tp.x > rightDivider)
