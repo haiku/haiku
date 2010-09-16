@@ -623,7 +623,6 @@ AudioProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 			if (RunState() != B_STARTED) {
 				fFramesSent = 0;
 				fStartTime = event->event_time + fSupplier->InitialLatency();
-printf("B_START: start time: %lld\n", fStartTime);
 				media_timed_event firstBufferEvent(
 					fStartTime - fSupplier->InitialLatency(),
 					BTimedEventQueue::B_HANDLE_BUFFER);
