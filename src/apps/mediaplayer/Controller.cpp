@@ -722,15 +722,18 @@ Controller::SetFramePosition(int64 value)
 	fRequestedSeekFrame = max_c(0, min_c(_FrameDuration(), value));
 	fSeekFrame = fRequestedSeekFrame;
 
+	int64 currentFrame = CurrentFrame();
+
 	// Snap to a video keyframe, since that will be the fastest
 	// to display and seeking will feel more snappy. Note that we
 	// don't store this change in fSeekFrame, since we still want
 	// to report the originally requested seek frame in TimePosition()
 	// until we could reach that frame.
-	if (Duration() > 240 && fVideoTrackSupplier != NULL)
+	if (Duration() > 240 && fVideoTrackSupplier != NULL
+		&& abs(value - currentFrame) > 5) {
 		fVideoTrackSupplier->FindKeyFrameForFrame(&fSeekFrame);
+	}
 
-	int64 currentFrame = CurrentFrame();
 //printf("SetFramePosition(%lld) -> %lld (current: %lld, duration: %lld) "
 //"(video: %p)\n", value, fSeekFrame, currentFrame, _FrameDuration(),
 //fVideoTrackSupplier);
