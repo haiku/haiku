@@ -796,19 +796,27 @@ MainWin::MessageReceived(BMessage* msg)
 				break;
 
 			bigtime_t howMuch;
-			if (msg->FindInt64("how much", &howMuch) != B_OK)
+			int64 frames;
+			if (msg->FindInt64("how much", &howMuch) != B_OK
+				|| msg->FindInt64("frames", &frames) != B_OK) {
 				break;
+			}
 
 			if (fController->Lock()) {
-				bigtime_t seekTime = fController->TimePosition() + howMuch;
-				if (seekTime < 0) {
-					fInitialSeekPosition = seekTime;
-					PostMessage(M_SKIP_PREV);
-				} else if (seekTime > fController->TimeDuration()) {
-					fInitialSeekPosition = 0;
-					PostMessage(M_SKIP_NEXT);
-				} else
-					fController->SetTimePosition(seekTime);
+				if (fHasVideo && !fController->IsPlaying()) {
+					int64 newFrame = fController->CurrentFrame() + frames;
+					fController->SetFramePosition(newFrame);
+				} else {
+					bigtime_t seekTime = fController->TimePosition() + howMuch;
+					if (seekTime < 0) {
+						fInitialSeekPosition = seekTime;
+						PostMessage(M_SKIP_PREV);
+					} else if (seekTime > fController->TimeDuration()) {
+						fInitialSeekPosition = 0;
+						PostMessage(M_SKIP_NEXT);
+					} else
+						fController->SetTimePosition(seekTime);
+				}
 				fController->Unlock();
 
 				fAllowWinding = false;
@@ -2009,10 +2017,13 @@ MainWin::_KeyDown(BMessage* msg)
 				PostMessage(M_SKIP_NEXT);
 			else if (fAllowWinding) {
 				BMessage windMessage(M_WIND);
-				if ((modifier & B_SHIFT_KEY) != 0)
+				if ((modifier & B_SHIFT_KEY) != 0) {
 					windMessage.AddInt64("how much", 30000000LL);
-				else
+					windMessage.AddInt64("frames", 5);
+				} else {
 					windMessage.AddInt64("how much", 5000000LL);
+					windMessage.AddInt64("frames", 1);
+				}
 				PostMessage(&windMessage);
 			}
 			return true;
@@ -2022,10 +2033,13 @@ MainWin::_KeyDown(BMessage* msg)
 				PostMessage(M_SKIP_PREV);
 			else if (fAllowWinding) {
 				BMessage windMessage(M_WIND);
-				if ((modifier & B_SHIFT_KEY) != 0)
+				if ((modifier & B_SHIFT_KEY) != 0) {
 					windMessage.AddInt64("how much", -30000000LL);
-				else
+					windMessage.AddInt64("frames", -5);
+				} else {
 					windMessage.AddInt64("how much", -5000000LL);
+					windMessage.AddInt64("frames", -1);
+				}
 				PostMessage(&windMessage);
 			}
 			return true;
