@@ -547,7 +547,7 @@ VideoConsumer::_HandleBuffer(BBuffer* buffer)
 		return;
 	}
 
-	// see if this is one of our buffers
+	// See if this is one of our BBitmap buffers
 	uint32 index = 0;
 	fOurBuffers = true;
 	while (index < kBufferCount) {
@@ -557,17 +557,20 @@ VideoConsumer::_HandleBuffer(BBuffer* buffer)
 			index++;
 	}
 	if (index == kBufferCount) {
-		// no, buffers belong to consumer
+		// Buffers belong to consumer
+		// NOTE: We maintain this in a member variable, since we still need
+		// to recycle this buffer later on, in case it was the last buffer
+		// received before shutting down.
 		fOurBuffers = false;
 		index = (fLastBufferIndex + 1) % kBufferCount;
 	}
 
-	bool dropped = false;
 	bool recycle = true;
 	bigtime_t now = TimeSource()->Now();
 	if (RunMode() == B_OFFLINE
-		|| now < buffer->Header()->start_time
-			+ kMaxBufferLateness) {
+		|| now < buffer->Header()->start_time + kMaxBufferLateness) {
+		// Only display the buffer if it's not too late, or if we are
+		// in B_OFFLINE run-mode.
 		if (!fOurBuffers) {
 			memcpy(fBitmap[index]->Bits(), buffer->Data(),
 				fBitmap[index]->BitsLength());
@@ -589,17 +592,15 @@ VideoConsumer::_HandleBuffer(BBuffer* buffer)
 		}
 		fTargetLock.Unlock();
 	} else {
-		dropped = true;
-		PROGRESS("VideoConsumer::HandleEvent - DROPPED FRAME\n"
-			"   start_time: %lld, current: %lld, latency: %lld\n",
-			buffer->Header()->start_time, TimeSource()->Now(),
-			SchedulingLatency());
-	}
-	if (dropped) {
+		// Drop the buffer if it's too late.
 		if (fManager->LockWithTimeout(10000) == B_OK) {
 			fManager->FrameDropped();
 			fManager->Unlock();
 		}
+		PROGRESS("VideoConsumer::HandleEvent - DROPPED FRAME\n"
+			"   start_time: %lld, current: %lld, latency: %lld\n",
+			buffer->Header()->start_time, TimeSource()->Now(),
+			SchedulingLatency());
 	}
 	if (recycle)
 		buffer->Recycle();
