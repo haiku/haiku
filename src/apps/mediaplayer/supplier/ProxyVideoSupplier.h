@@ -20,7 +20,7 @@ public:
 
 	virtual	status_t			FillBuffer(int64 startFrame, void* buffer,
 									const media_raw_video_format& format,
-									bool& wasCached);
+									bool forceGeneration, bool& wasCached);
 
 	virtual	void				DeleteCaches();
 

@@ -30,7 +30,8 @@ ProxyVideoSupplier::~ProxyVideoSupplier()
 
 status_t
 ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
-	const media_raw_video_format& format, bool& wasCached)
+	const media_raw_video_format& format, bool forceGeneration,
+	bool& wasCached)
 {
 	bigtime_t now = system_time();
 
@@ -56,7 +57,7 @@ ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 		// But don't do it for more than 5 frames, or we will take too much
 		// time. Doing it this way will still catch up to the next keyframe
 		// eventually (we may return the wrong frames until the next keyframe).
-		if (startFrame - frame > 5)
+		if (!forceGeneration && startFrame - frame > 5)
 			return B_TIMED_OUT;
 		while (frame < startFrame) {
 			ret = fSupplier->ReadFrame(buffer, &performanceTime, format,

@@ -80,13 +80,6 @@ VideoProducer::~VideoProducer()
 }
 
 
-port_id
-VideoProducer::ControlPort() const
-{
-	return BMediaNode::ControlPort();
-}
-
-
 BMediaAddOn*
 VideoProducer::AddOn(int32* _internalId) const
 {
@@ -108,13 +101,6 @@ VideoProducer::SetTimeSource(BTimeSource* timeSource)
 {
 	// Tell frame generation thread to recalculate delay value
 	release_sem(fFrameSync);
-}
-
-
-status_t
-VideoProducer::RequestCompleted(const media_request_info& info)
-{
-	return BMediaNode::RequestCompleted(info);
 }
 
 
@@ -174,29 +160,6 @@ VideoProducer::Seek(bigtime_t media_time, bigtime_t performanceTime)
 
 
 void
-VideoProducer::TimeWarp(bigtime_t at_real_time, bigtime_t to_performance_time)
-{
-	BMediaEventLooper::TimeWarp(at_real_time, to_performance_time);
-}
-
-
-status_t
-VideoProducer::AddTimer(bigtime_t at_performance_time, int32 cookie)
-{
-	return BMediaEventLooper::AddTimer(at_performance_time, cookie);
-}
-
-
-void
-VideoProducer::SetRunMode(run_mode mode)
-{
-printf("VideoProducer::SetRunMode(%d)\n", mode);
-	TRACE("SetRunMode(%d)\n", mode);
-	BMediaEventLooper::SetRunMode(mode);
-}
-
-
-void
 VideoProducer::HandleEvent(const media_timed_event* event,
 		bigtime_t lateness, bool realTimeEvent)
 {
@@ -222,27 +185,6 @@ VideoProducer::HandleEvent(const media_timed_event* event,
 			TRACE("HandleEvent: Unhandled event -- %lx\n", event->type);
 			break;
 	}
-}
-
-
-void
-VideoProducer::CleanUpEvent(const media_timed_event *event)
-{
-	BMediaEventLooper::CleanUpEvent(event);
-}
-
-
-bigtime_t
-VideoProducer::OfflineTime()
-{
-	return BMediaEventLooper::OfflineTime();
-}
-
-
-void
-VideoProducer::ControlLoop()
-{
-	BMediaEventLooper::ControlLoop();
 }
 
 
@@ -444,7 +386,7 @@ VideoProducer::Connect(status_t error, const media_source& source,
 		ERROR("Connect() - wrong source.\n");
 		return;
 	}
-	if (error < B_OK) {
+	if (error != B_OK) {
 		ERROR("Connect() - consumer error: %s\n", strerror(error));
 		return;
 	}
@@ -696,6 +638,8 @@ VideoProducer::_FrameGeneratorThread()
 			case B_OK: {
 				TRACE("_FrameGeneratorThread: node manager successfully "
 					"locked\n");
+				if (droppedFrames > 0)
+					fManager->FrameDropped();
 				// get the times for the current and the next frame
 				performanceTime = fManager->TimeForFrame(fFrame);
 				nextPerformanceTime = fManager->TimeForFrame(fFrame + 1);
@@ -749,14 +693,12 @@ VideoProducer::_FrameGeneratorThread()
 				if (ignoreEvent || !fRunning || !fEnabled) {
 					TRACE("_FrameGeneratorThread: ignore event\n");
 					// nothing to do
-				} else if (nextWaitUntil < system_time() - fBufferLatency
+				} else if (!forceSendingBuffer
+					&& nextWaitUntil < system_time() - fBufferLatency
 					&& droppedFrames < kMaxDroppedFrames) {
 					// Drop frame if it's at least a frame late.
-					printf("VideoProducer: dropped frame (%Ld)\n", fFrame);
-					if (fManager->LockWithTimeout(10000) == B_OK) {
-						fManager->FrameDropped();
-						fManager->Unlock();
-					}
+					if (playingDirection > 0)
+						printf("VideoProducer: dropped frame (%Ld)\n", fFrame);
 					// next frame
 					droppedFrames++;
 					fFrame++;
@@ -772,8 +714,7 @@ VideoProducer::_FrameGeneratorThread()
 						* fConnectedFormat.display.line_count, 0LL);
 					if (buffer == NULL) {
 						// Wait until a buffer becomes available again
-						TRACE("_FrameGeneratorThread: no buffer!\n");
-//						ERROR("_FrameGeneratorThread: no buffer!\n");
+						ERROR("_FrameGeneratorThread: no buffer!\n");
 						break;
 					}
 					// Fill out the details about this buffer.
@@ -802,7 +743,8 @@ VideoProducer::_FrameGeneratorThread()
 						"playlistFrame: %Ld\n", fFrame, playlistFrame);
 					bool wasCached = false;
 					err = fSupplier->FillBuffer(playlistFrame,
-						buffer->Data(), fConnectedFormat, wasCached);
+						buffer->Data(), fConnectedFormat, forceSendingBuffer,
+						wasCached);
 					// clean the buffer if something went wrong
 					if (err != B_OK) {
 						// TODO: should use "back value" according

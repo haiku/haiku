@@ -36,13 +36,11 @@ public:
 	
 	// BMediaNode interface
 public:
-	virtual port_id			ControlPort() const;
 	virtual	BMediaAddOn*	AddOn(int32* _internalId) const;
 	virtual	status_t	 	HandleMessage(int32 message, const void* data,
 								size_t size);
 protected:	
 	virtual void			SetTimeSource(BTimeSource* timeSource);
-	virtual status_t		RequestCompleted(const media_request_info& info);
 	
 	// BMediaEventLooper interface
 protected:
@@ -51,17 +49,9 @@ protected:
 	virtual void			Stop(bigtime_t performanceTime, bool immediate);
 	virtual void			Seek(bigtime_t mediaTime,
 								bigtime_t performanceTime);
-	virtual void			TimeWarp(bigtime_t atRealTime,
-								bigtime_t toPerformanceTime);
-	virtual status_t		AddTimer(bigtime_t atPerformanceTime,
-								int32 cookie);
-	virtual void			SetRunMode(run_mode mode);
 	virtual void			HandleEvent(const media_timed_event* event,
 								bigtime_t lateness,
 								bool realTimeEvent = false);
-	virtual void			CleanUpEvent(const media_timed_event* event);
-	virtual bigtime_t		OfflineTime();
-	virtual void			ControlLoop();
 	virtual status_t		DeleteHook(BMediaNode* node);
 	
 	// BBufferProducer interface
