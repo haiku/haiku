@@ -734,7 +734,7 @@ double
 AVFormatReader::StreamCookie::FrameRate() const
 {
 	// TODO: Find a way to always calculate a correct frame rate...
-	double frameRate;
+	double frameRate = 1.0;
 	switch (fStream->codec->codec_type) {
 		case CODEC_TYPE_AUDIO:
 			frameRate = (double)fStream->codec->sample_rate;
@@ -754,7 +754,6 @@ AVFormatReader::StreamCookie::FrameRate() const
 				frameRate = 25.0f;
 			break;
 		default:
-			frameRate = 1.0;
 			break;
 	}
 	if (frameRate <= 0.0)
