@@ -111,12 +111,17 @@ NodeManager::InitCheck()
 void
 NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 {
-//	if (fMediaRoster && fMediaRoster->Lock()) {
-//		BMediaNode::run_mode runMode = mode > 0 ?
-//			BMediaNode::B_DROP_DATA : BMediaNode::B_OFFLINE;
-//		fMediaRoster->SetRunModeNode(fVideoConnection.consumer, runMode);
-//		fMediaRoster->Unlock();
-//	}
+	if (fMediaRoster != NULL && fMediaRoster->Lock()) {
+		BMediaNode::run_mode runMode = mode > 0 ?
+			BMediaNode::B_DROP_DATA : BMediaNode::B_OFFLINE;
+		status_t ret = fMediaRoster->SetRunModeNode(fVideoConnection.consumer,
+			runMode);
+		if (ret != B_OK) {
+			printf("NodeManager::SetPlayMode(%ld), setting run mode failed: "
+				"%s\n", mode, strerror(ret));
+		}
+		fMediaRoster->Unlock();
+	}
 
 	PlaybackManager::SetPlayMode(mode, continuePlaying);
 }
@@ -690,8 +695,6 @@ NodeManager::_StartNodes()
 
 	bigtime_t perf = timeSource->PerformanceTimeFor(real + latency
 		+ initLatency);
-printf("performance time for %lld: %lld\n", real + latency
-	+ initLatency, perf);
 
 	timeSource->Release();
 
