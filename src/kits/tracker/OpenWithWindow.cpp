@@ -677,11 +677,12 @@ OpenWithPoseView::OpenSelection(BPose *pose, int32 *)
 	if (OpenWithRelation(pose->TargetModel()) == kNoRelation) {
 		if (!fIterator->GenericFilesOnly()) {
 			BString warning(B_TRANSLATE(
-				"The application \"%appname\" does not support the type of document you are "
-				"about to open. Are you sure you want to proceed? If you know that "
-				"the application supports the document type, you should contact the "
-				"publisher of the application and ask them to update their application "
-				"to list the type of your document as supported."));
+				"The application \"%appname\" does not support the type of "
+				"document you are about to open. Are you sure you want to "
+				"proceed? If you know that the application supports the "
+				"document type, you should contact the publisher of the "
+				"application and ask them to update their application to list "
+				"the type of your document as supported."));
 			warning.ReplaceFirst("%appname", pose->TargetModel()->Name());
 
 			BAlert* alert = new BAlert("", warning.String(),
