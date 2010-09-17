@@ -69,8 +69,9 @@
 <tr><td>设置：
 </td><td></td><td><span class="path">~/config/settings/Mail/*</span></td></tr>
 </table>
-<p>Haiku provides a system that retrieves e-mail regularly via a Mail Service (also known as mail_daemon) and saves each mail as a single text file. It parses the mail and fills its attributes with all necessary header information, like from, to, subject and its unread status. Now it can be queried by you or any application. This system also makes switching e-mail clients easy as all the data and your configuration stays the same.<br />
-The configuration is done in the E-Mail preference panel.</p>
+<p>Haiku提供了邮件系统，它通过邮件服务（mail_daemon）检索电子邮箱，并且将邮件保存为单个文本文件。它将邮件分为几个部分，并且将所有必须的头信息保存为邮件属性，例如发件人，收件人，主题以及未读状态。目前所有的邮件可以被您或者任何的程序所查询。该系统还可以在保持所有的数据和配置不变的情况下，切换电子邮箱客户端。
+<br />
+邮箱的配置可以在电子邮箱首选项面板中完成。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -78,16 +79,16 @@ The configuration is done in the E-Mail preference panel.</p>
 <p>让我们开始了解有关邮箱账户的设置过程。<br />
 您可以点击 <span class="button">Add</span> 按钮新建一个未命名账户。它将会打开一个用于填写有关您的账户信息的面板：</p>
 <img src="../images/prefs-images/e-mail-new-account.png" alt="e-mail-new-account.png" />
-<p>首先， declare the <i>Account Type</i> which is either <span class="menu">Receive Mail Only</span>, <span class="menu">Send Mail Only</span>, or the most usual type, <span class="menu">Send and Receive Mail</span>. Then you set how you get your mail, via <span class="menu">POP3</span> or <span class="menu">IMAP</span>.</p>
-<p>Now you enter your <i>E-mail Address</i>, <i>Login Name</i> and <i>Password</i>, give an <i>Account Name</i> under which it will be known under Haiku and your <i>Real Name</i>.</p>
-<p>If your account is from a major e-mail provider, Haiku already knows all technical details like server IP addresses and the following information is already filled in automatically. If that is not the case, just follow this guide and fill in the details to your e-mail account accordingly.</p>
+<p>首先，声明<i>账户类型</i>：<span class="menu">Receive Mail Only</span> ，<span class="menu">Send Mail Only</span> ，或常用的 <span class="menu">Send and Receive Mail</span>。然后您需要设置如何接收邮件，<span class="menu">POP3</span> 或 <span class="menu">IMAP</span>。</p>
+<p>接下来，输入您的 <i>邮箱地址</i>，<i>登陆名</i> 和 <i>密码</i>；之后，给出您的 <i>账户名</i> 以及 <i>真实姓名</i>，它们将在Haiku中始终可见。</p>
+<p>如果您的账户来自于主要的电子邮箱提供商，Haiku已经知道了所有的技术细节，例如服务器IP地址，并且 下述信息已经被自动填写。如果不是这种情况，您只需要按照提示，填写邮箱账户的相应信息。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="incoming" name="incoming">收件箱的设置</a></h2>
-<p>Click on <span class="menu">Incoming</span> under your account's name to set up how e-mails are received.</p>
+<p>点击您的账户名下的 <span class="menu">Incoming</span> 设置如何进行邮件的接收。</p>
 <img src="../images/prefs-images/e-mail-in.png" alt="e-mail-in.png" />
-<p>From the pop-up menu you choose the protocol used by your provider. <span class="menu">IMAP</span> and <span class="menu">POP3</span> are supported.</p>
+<p>从弹出菜单中，选择您的提供商所使用的协议。目前支持的协议有 <span class="menu">IMAP</span> 和 <span class="menu">POP3</span> 。</p>
 <p>Next is the <span class="menu">Mail Server</span> address for incoming mails. If your provider needs you to log into a specific port, you add that to the address, separated by a colon. For example, <tt>pop.your-provider.org:1400</tt>.</p>
 <p>Then you enter your login information, <i>Username</i> and <i>Password</i>, and if necessary change the <i>Login Type</i> from the default <span class="menu">Plain Text</span> to <span class="menu">APOP</span> for authentication.</p>
 <p>If you use <i>POP3</i> and retrieve mails of this account from different computers, you may want to activate the option to <span class="menu">Leave mail on server</span> and only <span class="menu">Remove mail from server when deleted</span> locally.</p>

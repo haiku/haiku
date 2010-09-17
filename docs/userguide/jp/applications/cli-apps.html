@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Commandline Applications</title>
+	<title>コマンドライン・アプリケーション</title>
 	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
 </head>
 <body>
@@ -46,60 +48,58 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Commandline applications</h2>
+<h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />コマンドライン・アプリケーション</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Location:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
+<tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in either <span class="path">/boot/system/bin</span> or <span class="path">/boot/common/bin</span>. Your own or additionally installed commandline apps should go in <span class="path">~/config/bin</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Haikuに同梱されているすべてのコマンドライン・アプリケーションは、<span class="path">/boot/system/bin</span>または<span class="path">/boot/common/bin</span>にあります。あなた自身が作ったコマンドライン・アプリケーションやあなたが追加インストールしたコマンドライン・アプリケーションは、<span class="path">~/config/bin</span>に配置する必要があります。これらの場所はPATH環境変数に含まれているため、自動的に検出されます。<br />
+以下はHaiku固有のすべてのCLIアプリケーションを網羅的にリスト・アップしたものではなく、一例として示すのに最も効果的なアプリケーションのいくつかに注目したに過ぎません。ほんの少し勇気を出して、ご自身で<span class="path">bin/</span>フォルダ内に何があるのか探索してみてください。<tt>--help</tt>という引数を付けてアプリケーションを実行すると、そのコマンドの使い方と様々なオプションすべてに関する説明が表示されます。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-attributes" name="cli-attributes">Relating to attributes: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
-<p>These commands are used to display, read out, add and remove attributes of files. Remember that these meta data are currently only available on BFS formatted volumes. Moving files onto other file systems will strip all attributes!<br />
-All these commands are described in topic <a href="../attributes.html#attributes-terminal">Attributes in Terminal</a>.</p>
+<a id="cli-attributes" name="cli-attributes">属性に関するコマンド: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
+<p>これらのコマンドは、ファイルの属性を表示、出力、追加、削除するために使用します。現在のところ、これらのメタ・データはBFSで初期化されたボリュームでのみ使用できることに注意してください。BFS以外のファイル・システムにファイルを移動させると、すべての属性が失われてしまいます!<br />
+これらすべてのコマンドについては、<a href="../attributes.html#attributes-terminal">Terminalにおける属性</a>というトピックで解説しています。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-index" name="cli-index">Relating to the index: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
-<p>With these commands you list, make, reindex and remove attributes to BFS' index. Every volume has it's own index, remember that when copying files from one volume to another.<br />
-These commands are described in topic <a href="../index.html">Index</a>.</p>
+<a id="cli-index" name="cli-index">インデックスに関するコマンド: <span class="cli">lsindex</span>, <span class="cli">mkindex</span>, <span class="cli">reindex</span>, <span class="cli">rmindex</span></a></h3>
+<p>これらのコマンドを使用することにより、インデックスの一覧表示やインデックスの生成・再生生、BFSのインデックスへ結びつけられた属性の削除が行えます。各ボリュームは固有のインデックスを保持しています。ファイルをあるボリュームから別のボリュームへコピーするときには、この点に注意してください。<br />
+これらのコマンドについては、<a href="../index.html">インデックス</a>というトピックで解説しています。</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-scripting" name="cli-scripting">Useful scripting commands</a></h3>
-<p>Here are a few commandline tools that are especially useful for scripting (see also topic <a href="../bash-scripting.html">Bash and Scripting</a>).</p>
+<a id="cli-scripting" name="cli-scripting">スクリプト処理に役立つコマンド</a></h3>
+<p>以下では、スクリプト処理(<a href="../bash-scripting.html">Bashとスクリプト処理</a>のトピックも合わせてご覧ください)に対して特に便利なコマンドライン・ツールを紹介します。</p>
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">alert</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">alert</span> conjures up the typical alert window with a pre-defined icon, explanatory text and up to three buttons. It will return the title of the pressed button and an exit status (starting with 0). For example, this is made of the line:</p>
+		<td valign="top"><p><span class="cli">alert</span>は既定のアイコンと説明文、および3つのボタンの付いた典型的な警告ウィンドウを表示します。このコマンドは、クリックされたボタンのタイトルと終了ステータス(0から始まります)を返します。下の例は、次の1行で作成されます:</p>
 <pre class="terminal">alert --idea "FantasticApp(tm) installed successfully!
 Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-alert.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">filepanel</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">filepanel</span> displays a load or save file panel and lets the user choose a file or location. As a return value you'll get the chosen file or folder's path. There are several parameters available, for example to set a starting directory, a window title, a default name when saving or restrictions to the allowed types of files. This is an example of</p>
+		<td valign="top"><p><span class="cli">filepanel</span>はファイルの読み込みまたは書き込みパネルを表示して、ユーザーがファイルや場所を選択できるようにします。戻り値として選択されたファイルまたはフォルダのパスが得られます。既定のディレクトリを指定したり、ウィンドウのタイトルを設定したり、ファイルを保存するときの既定のファイル名および許可するファイル・タイプを指定したりするための引数がいくつかあります。下は次のコマンドを実行した場合の例です:</p>
 <pre class="terminal">filepanel -s -t "Save your logfile" -d ~/config/settings -n Fantastic.log</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">waitfor</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">waitfor</span> is a nice way to wait for a particular application or thread to be started or to have ended.</p>
+		<td valign="top"><p><span class="cli">waitfor</span>はアプリケーションやスレッドの開始および終了を待つのにピッタリの方法です。</p>
 </td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">query</span> is the commandline version of the Find panel. In fact, a quick way to generate the search term is to build a query in the Find panel, switch to <span class="menu">by formula</span>, add double quotes (<tt>"</tt>) in front and back and paste the whole string after your <span class="cli">query</span> command in Terminal or your script.</p>
-</td></tr></table>
+		<td valign="top"><p><span class="cli">query</span>はFindパネルのコマンドライン・バージョンです。さらに、Findパネルでクエリを生成し、<span class="menu">by formula</span>に切り替えて先頭と末尾にダブル・クオート(<tt>"</tt>)を追加し、その文字列全体をTerminalまたはスクリプトの<span class="cli">query</span>コマンドの後に貼り付けることで、素早く検索語句を生成することができます。</p></td></tr></table>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-other" name="cli-other">Other commands</a></h3>
+<a id="cli-other" name="cli-other">他のコマンド</a></h3>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add the volume or device name and it'll run through every file and correct inconsistencies where possible.</p>
+		<td><p><span class="cli">checkfs</span>はファイル・システムのエラーをチェックするための重要なツールです。実行は単にボリューム名またはデバイス名を追加するだけです。すると、すべてのファイルを走査して、可能な場合は不整合を修復します。</p>
 </td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">open</span> is a very handy little tool. With it you open any file with its preferred application, or start a specific application by its signature without the need to know its exact path. It also works with URLs and even with the "virtual" directories <tt>.</tt> for the current directory and <tt>..</tt> for the parent, opening the folder in Tracker.</p>
+		<td valign="top"><p><span class="cli">open</span>は非常に便利な小さいツールです。このコマンドを使うと任意のファイルを適切なアプリケーションで開くことや、シグナチャーを用いることで正確なパスを知ることなしにアプリケーションを起動することができます。このコマンドはURLや「仮想的な」ディレクトリを用いることさえできます。ディレクトリの場合は<tt>.</tt>でカレント・ディレクトリを、<tt>..</tt>で親ディレクトリを表すことができ、Trackerでそのフォルダを開くことができます。</p>
 </td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">desklink</span> can install an icon for any file, folder, query or application in the Deskbar tray. It also offers the option to provide a context menu when right-clicking an icon to execute special actions. As an example, try this to add <span class="app">Screenshot</span> with various options (the "<tt>\</tt>" in the first line is just for the line break in Terminal):</p>
+		<td valign="top"><p><span class="cli">desklink</span>を使用すると、任意のファイルやフォルダ、クエリ、アプリケーションのアイコンをDeskbarトレイにインストールすることができます。特別なアクションを実行するためにアイコンを右クリックしたときに表示されるコンテクスト・メニューを定義するためのオプションもあります。例として、次のように色々なオプション(1行目の"<tt>/</tt>"はTerminalでの改行を表します)を付けて<span class="app">Screenshot</span>をDeskbarに追加してみましょう:</p>
 <pre class="terminal">desklink "cmd=Active window (2s):/boot/system/apps/Screenshot --window --border --delay 2" \
 "cmd=Remove replicant:desklink --remove=Screenshot" /boot/system/apps/Screenshot
 </pre>

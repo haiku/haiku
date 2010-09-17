@@ -9,12 +9,14 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		log-1
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Boot Loader</title>
+	<title>ブートローダー</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -48,19 +50,18 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
-<h1>Boot Loader</h1>
+<h1>ブートローダー</h1>
 
-<p>Haiku's Boot Loader can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick).<br />
-It's also handy after you installed a software component that acts up and prevents you from booting the system to remove it again. The <i>Disable user add-ons</i> option that's mentioned below, will start Haiku without loading user installed components, e.g. a driver.</p>
-<p>To enter the Boot Loader options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
+<p>ハードウェア周りに問題が生じた場合や、Haikuを2つ以上インストールしていて(おそらくインストールCD上あるいはUSBメモリ上のHaiku)、そのいずれかを選択したい場合にHaikuのブートローダーは役立ちます。<br />
+また、あるソフトウェア・コンポーネントをインストールしたもののそれが正しく動作せず、システムの起動を妨げてしまうような状況で、そのコンポーネントを再度削除するのにもHaikuのブートローダーは役立ちます。後で述べるように、<i>Disable user add-ons</i>オプションを有効にすると、ドライバーといったユーザーがインストールしたコンポーネントを読み込まずにHaikuが起動します。</p>
+<p>ブートローダーのオプションに入るには、Haikuの起動プロセスが始まる前に<span class="key">SHIFT</span>キーを押しっぱなしにする必要があります。ブートマネージャーがインストールされている場合は、Haikuのブート・エントリーを実行する前に<span class="key">SHIFT</span>を押し続ける動作を始めても構いません。Haikuがそのマシンの唯一のオペレーティング・システムである場合、BIOSからのブート・メッセージがまだ表示されている状態からSHIFTキーを押し続ける動作を始めることができます。</p>
 <p><br /></p>
-<p>Once it's there, you're offered four menus:</p>
+<p>ブートローダーのオプションに入ると、次の4つのメニューが表示されます:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Select boot volume</b></td><td> </td><td>Choose which Haiku installation to start.</td></tr>
+<tr><td><b>Select boot volume</b></td><td> </td><td>インストールされたHaikuのうち、どれを起動するのか選択します。</td></tr>
 <tr><td><b>Select safe mode options</b><br />
-</td><td> </td><td>There are several options to try in case of hardware related trouble. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.
+</td><td> </td><td>ハードウェア周りに問題が生じた場合に試してみるべきオプションがいくつかあります。選択バーをあるオプションに移動させると、画面の下部に短い説明が表示されます。
 <p><i>- Safe mode</i><br />
 <i>- Disable user add-ons</i><br />
 <i>- Disable IDE DMA</i><br />
@@ -72,31 +73,31 @@ It's also handy after you installed a software component that acts up and preven
 <i>- Disable ACPI</i>
 </p></td></tr>
 <tr><td><b>Select debug options</b><br />
-</td><td> </td><td>Here you'll find several options that help with debugging or getting details for a bug report. Again, a short explanation for each option is displayed at the bottom.
+</td><td> </td><td>これを選択すると、いくつかのデバッグするのに役立つオプションや、バグ報告のために詳細な情報を取得するのに役立つオプションが現れます。ここでも、各オプションに関する短い説明が画面の下部に表示されます。
 <p><i>- Enable serial debug output</i><br />
 <i>- Enable on screen debug output</i><br />
 <i>- Enable debug syslog</i>
 </p>
-<p>If "debug syslog" is enabled, a warm reboot after a crash shows these additional options:</p>
+<p>"debug syslog"を有効にした場合、クラッシュ後にソフトウェア・リセットを行うと、次の追加のオプションが表示されます:</p>
 <p><i>- Display syslog from previous session</i><br />
 <i>- Save syslog from previous session</i>
 </p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td>If you had to activate the option <i>Use fail-safe video mode</i>, you can set resolution and color depth.</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b></td><td> </td><td><i>Use fail-safe video mode</i>を有効にしなければならないときに、解像度と色深度を設定することができます。</td></tr>
 </table>
 <p><br /></p>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<p>1つ以上のオプションを有効にしてメイン・メニューに戻り、起動を続行すると、このブート・スクリーンが表示されます:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>すべてが順調に進むと、各シンボルが次々に点灯して行きます。<br />
+異なるシンボルは大まかに次のブート・ステージに対応します:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Boot disk</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Chip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Folder</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rocket</b></td><td> </td><td>Boot script starting the system.</td></tr>
+	<tr><td><b>原子</b></td><td style="width:10px;"> </td><td>モジュールの初期化。</td></tr>
+	<tr><td><b>ディスク + 虫眼鏡</b></td><td> </td><td>rootfs (<span class="path">/</span>)の作成とdevfs (<span class="path">/dev</span>)のマウント。</td></tr>
+	<tr><td><b>プラグ・イン カード</b></td><td> </td><td>デバイス・マネージャーの初期化。</td></tr>
+	<tr><td><b>ブート・ディスク</b></td><td> </td><td>起動ディスクのマウント。</td></tr>
+	<tr><td><b>ICチップ</b></td><td> </td><td>CPU固有のモジュールの読み込み。</td></tr>
+	<tr><td><b>フォルダ</b></td><td> </td><td>サブシステムの最終初期化。</td></tr>
+	<tr><td><b>ロケット</b></td><td> </td><td>起動スクリプトによるシステムの起動。</td></tr>
 </table>
 
 </div>

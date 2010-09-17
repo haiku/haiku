@@ -11,6 +11,7 @@
  *              Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Pengphei Han
+ *		dgy18787
  *
 -->
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -22,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>用户指南</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -41,19 +42,19 @@
 <li><a href="../../en/applications/icon-o-matic.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="expander.html">档案管理器</a> 
+ «  <a href="expander.html">Expander</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="installer.html">Installer（安装器）</a>  »
+::  <a href="installer.html">Installer</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>索引</td></tr>
-<tr class="index"><td><a href="#bitmap-vector">位图图标和矢量图标</a><br />
+<tr class="index"><td><a href="#bitmap-vector">点阵图标和矢量图标</a><br />
                 <a href="#icons-attributes">图标属性</a><br />
                 <a href="#i-o-m">创建图标</a><br />
                   <a href="#i-o-m-path">路径</a><br />
@@ -75,28 +76,28 @@
 
 <p><br /></p>
 
-<p>Before we come to the actual creating of icons in Icon-O-Matic, a few words on Haiku's icons in general.</p>
+<p>在开始正式使用 Icon-O-Matic 创建图标之前，我们需要了解一些有关Haiku图标的基本信息。</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bitmap-vector" name="bitmap-vector">位图图标和矢量图标</a></h2>
-<p>Contrary to the BeOS, Haiku uses vector icons instead of bitmap icons. A special Haiku Vector Icon Format (HVIF) was developed that is highly optimized for small file sizes and fast rendering. That's why our icons are for the most part <i>much</i> smaller than either a bitmap or the widely used SVG format. Also, unlike BeOS' bitmap icons, Haiku isn't limited to an 8bit palette (256 colors).<br />
-Take this icon of the Terminal, for example:</p>
+<p>与BeOS相反，Haiku使用矢量图标而非点阵图标。Haiku项目已经开发了一种特殊的矢量图标格式（HVIF），并且对文件大小和快速渲染做了充分的优化。这就是我们的大部分图标所占的空间要比点阵图标和常用的SVG格式图标小 <i>非常多</i> 的原因。同时，和BeOS的点阵图标不同，Haiku图标并没有限制于8位的调色板（256色）。<br />
+以下面的终端图标为例：</p>
 <table border="0" cellpadding="10">
-        <tr align="center"><td><b>Bitmap</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
+        <tr align="center"><td><b>点阵图标</b></td><td><b>SVG</b></td><td><b>HVIF</b></td></tr>
         <tr align="center"><td><img src="../../images/apps-images/i-o-m-terminal-bitmap32.png" alt="i-o-m-terminal-bitmap32" width="32" height="32" /> <img src="../../images/apps-images/i-o-m-terminal-bitmap16.png" alt="i-o-m-terminal-bitmap16" width="16" height="16" /></td><td style="width:100px"><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td><td><img src="../../images/apps-images/terminal-icon_32.png" alt="terminal-icon_32" width="32" height="32" /></td></tr>
-        <tr align="center"><td>1,024 byte<br />+ 256 byte</td><td> 7,192 byte </td><td> 768 byte </td></tr>
+        <tr align="center"><td>1,024 字节<br />+ 256 字节</td><td> 7,192 字节</td><td> 768 字节</td></tr>
 </table>
-<p>Note that the BeOS used two versions of an icon, one 16x16 and one 32x32, to achieve good visuals in List and Icon View mode.</p>
-<p>This trick isn't needed with vector icons. Besides only taking up a few hundred bytes in a file, vector icons also scale much better than bitmaps. (Note: BeOS offered only a 16x16 and 32x32 display.)</p>
+<p>注意，BeOS使用了两个版本的图标，16x16 和 32x32，分别为了在列表和图标视图模式获得良好的视觉效果。</p>
+<p>矢量图标则无需这种技巧。它们除了仅需使用几百字节的空间，而且缩放效果也要比点阵图标好很多。（注意：BeOS仅提供了16x16和32x32两种图标。）</p>
 <table border="0" cellpadding="10">
         <tr align="center"><td> </td><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td><td><b>128x128</b></td></tr>
-        <tr align="center"><td><b>Bitmap</b></td>
+        <tr align="center"><td><b>点阵图标</b></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap16.png" alt="i-o-m-bitmap16" width="16" height="16" /></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap32.png" alt="i-o-m-bitmap32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap64.png" alt="i-o-m-bitmap64" width="64" height="64" /></td>
                 <td><img src="../../images/apps-images/i-o-m-bitmap128.png" alt="i-o-m-bitmap128" width="128" height="128" /></td></tr>
-        <tr align="center"><td><b>Vector</b></td>
+        <tr align="center"><td><b>矢量图标</b></td>
                 <td><img src="../../images/apps-images/i-o-m-vector16.png" alt="i-o-m-vector16" width="16" height="16" /></td>
                 <td><img src="../../images/apps-images/i-o-m-vector32.png" alt="i-o-m-vector32" width="32" height="32" /></td>
                 <td><img src="../../images/apps-images/i-o-m-vector64.png" alt="i-o-m-vector64" width="64" height="64" /></td>
@@ -343,9 +344,9 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="expander.html">档案管理器</a> 
+ «  <a href="expander.html">Expander</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">应用程序</a> 
-::  <a href="installer.html">Installer（安装器）</a>  »
+::  <a href="installer.html">Installer</a>  »
 </span></div>
 </div>
 
