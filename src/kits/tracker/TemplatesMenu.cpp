@@ -54,7 +54,7 @@ All rights reserved.
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "TemplatesMenu"
 
 
 namespace BPrivate {

@@ -51,7 +51,7 @@ All rights reserved.
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "VolumeWindow"
 
 BVolumeWindow::BVolumeWindow(LockingList<BWindow> *windowList, uint32 openFlags)
 	:	BContainerWindow(windowList, openFlags)

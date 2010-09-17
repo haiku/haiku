@@ -50,7 +50,7 @@ const int frameThickness = 9;
 const uint32 kSelectButtonPressed = 'sbpr';
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "SelectionWindow"
 
 SelectionWindow::SelectionWindow(BContainerWindow* window)
 	:

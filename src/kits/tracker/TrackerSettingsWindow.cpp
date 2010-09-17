@@ -67,7 +67,7 @@ const uint32 kRevertButtonPressed = 'Rebp';
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "TrackerSettingsWindow"
 
 TrackerSettingsWindow::TrackerSettingsWindow()
 	:

@@ -48,7 +48,7 @@ All rights reserved.
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "QueryContainerWindow"
 
 BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow> *windowList,
 	uint32 containerWindowFlags, window_look look,

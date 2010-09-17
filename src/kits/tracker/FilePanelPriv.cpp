@@ -136,7 +136,7 @@ key_down_filter(BMessage *message, BHandler **, BMessageFilter *filter)
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "FilePanelPriv"
 
 TFilePanel::TFilePanel(file_panel_mode mode, BMessenger *target,
 		const BEntry *startDir, uint32 nodeFlavors, bool multipleSelection,

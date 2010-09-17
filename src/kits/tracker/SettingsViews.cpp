@@ -83,7 +83,7 @@ send_bool_notices(uint32 what, const char *name, bool value)
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "SettingsView"
 
 SettingsView::SettingsView(const char* name)
 	:

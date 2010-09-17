@@ -58,7 +58,7 @@ All rights reserved.
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "FavoritesMenu"
 
 FavoritesMenu::FavoritesMenu(const char *title, BMessage *openFolderMessage,
 	BMessage *openFileMessage, const BMessenger &target,

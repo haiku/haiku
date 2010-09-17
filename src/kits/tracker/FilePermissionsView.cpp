@@ -48,7 +48,7 @@ const uint32 kNewGroupEntered = 'nwgr';
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "FilePermissionsView"
 
 FilePermissionsView::FilePermissionsView(BRect rect, Model *model)
 	:	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),

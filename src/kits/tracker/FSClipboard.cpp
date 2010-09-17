@@ -109,7 +109,7 @@ CompareModeAndRefName(const char *modeName, const char *refName)
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "FSClipBoard"
 
 bool
 FSClipboardHasRefs()

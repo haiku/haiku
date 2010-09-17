@@ -157,7 +157,7 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "MountMenu"
 
 MountMenu::MountMenu(const char *name)
 	: BMenu(name)

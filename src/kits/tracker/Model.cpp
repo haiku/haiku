@@ -86,7 +86,7 @@ bool CheckNodeIconHintPrivate(const BNode *, bool);
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "Model"
 
 Model::Model()
 	:

@@ -56,7 +56,7 @@ All rights reserved.
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "TextWidget"
 
 const float kWidthMargin = 20;
 

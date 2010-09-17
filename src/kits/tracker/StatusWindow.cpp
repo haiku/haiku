@@ -185,7 +185,7 @@ public:
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "StatusWindow"
 
 
 BStatusWindow::BStatusWindow()

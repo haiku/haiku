@@ -56,7 +56,7 @@ const uint32 kBootMountSettingsChanged = 'bchg';
 const uint32 kEjectWhenUnmountingChanged = 'ejct';
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "AutoMounterSettings"
 
 class AutomountSettingsPanel : public BBox {
 public:

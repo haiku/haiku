@@ -55,7 +55,7 @@ All rights reserved.
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "DirMenu"
 
 BDirMenu::BDirMenu(BMenuBar *bar, uint32 command, const char *entryName)
 	:	BPopUpMenu("directories"),

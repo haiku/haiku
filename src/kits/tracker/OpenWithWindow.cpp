@@ -74,7 +74,7 @@ const rgb_color kOpenWithDefaultColor = { 0xFF, 0xFF, 0xCC, 255};
 
 
 #undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "libtracker"
+#define B_TRANSLATE_CONTEXT "OpenWithWindow"
 
 OpenWithContainerWindow::OpenWithContainerWindow(BMessage *entriesToOpen,
 		LockingList<BWindow> *windowList, window_look look, window_feel feel,
