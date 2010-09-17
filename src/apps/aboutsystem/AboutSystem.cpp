@@ -1134,6 +1134,8 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		B_TRANSLATE("Google & their Google Summer of Code program\n\n"));
 	fCreditsView->Insert(
+		B_TRANSLATE("The University of Auckland and Christof Lutteroth\n\n"));
+	fCreditsView->Insert(
 		B_TRANSLATE("... and the many people making donations!\n\n"));
 
 	// copyrights for various projects we use
