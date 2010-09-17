@@ -136,6 +136,7 @@ public:
 		const SATWindowList&	LayerOrder() { return fWindowLayerOrder; }
 		bool					MoveWindowToPosition(SATWindow* window,
 									int32 index);
+		void					UpdateSizeLimits();
 
 		Crossing*				LeftTopCrossing()
 									{ return fLeftTopCrossing.Get(); }

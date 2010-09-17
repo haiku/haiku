@@ -291,14 +291,16 @@ StackAndTile::WindowTabLocationChanged(Window* window, float location)
 
 
 void
-StackAndTile::SizeLimitChanged(Window* window, int32 minWidth, int32 maxWidth,
+StackAndTile::SizeLimitsChanged(Window* window, int32 minWidth, int32 maxWidth,
 	int32 minHeight, int32 maxHeight)
 {
 	SATWindow*	satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;
-
-	satWindow->SizeLimitChanged(minWidth, maxWidth, minHeight, maxHeight);
+	WindowArea* area = satWindow->GetWindowArea();
+	if (!area)
+		return;
+	area->UpdateSizeLimits();
 }
 
 

@@ -87,8 +87,10 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	ResultType result;
 	for (int32 tries = 0; tries < 15; tries++) {
 		result = fSATGroup->GetLinearSpec()->Solve();
-		if (result == INFEASIBLE)
+		if (result == INFEASIBLE) {
+			debug_printf("can't solve constraints!\n");
 			break;
+		}
 		if (result == OPTIMAL) {
 			fSATGroup->AdjustWindows(triggerWindow);
 			break;
@@ -130,7 +132,7 @@ GroupCookie::MoveWindow(int32 workspace)
 
 
 void
-GroupCookie::SetSizeLimit(int32 minWidth, int32 maxWidth, int32 minHeight,
+GroupCookie::SetSizeLimits(int32 minWidth, int32 maxWidth, int32 minHeight,
 	int32 maxHeight)
 {
 	fMinWidthConstraint->SetRightSide(minWidth);
@@ -375,9 +377,7 @@ SATWindow::AddedToGroup(SATGroup* group, WindowArea* area)
 		return false;
 	}
 
-	int32 minWidth, maxWidth, minHeight, maxHeight;
-	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	fGroupCookie->SetSizeLimit(minWidth, maxWidth, minHeight, maxHeight);
+	area->UpdateSizeLimits();
 
 	return true;
 }
@@ -485,11 +485,10 @@ SATWindow::DoGroupLayout()
 
 
 void
-SATWindow::SizeLimitChanged(int32 minWidth, int32 maxWidth, int32 minHeight,
+SATWindow::SetSizeLimits(int32 minWidth, int32 maxWidth, int32 minHeight,
 	int32 maxHeight)
 {
-	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	fGroupCookie->SetSizeLimit(minWidth, maxWidth, minHeight, maxHeight);
+	fGroupCookie->SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 }
 
 

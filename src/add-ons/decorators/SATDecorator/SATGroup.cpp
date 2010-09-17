@@ -68,6 +68,31 @@ WindowArea::MoveWindowToPosition(SATWindow* window, int32 index)
 }
 
 
+void
+WindowArea::UpdateSizeLimits()
+{
+	int32 minWidth, maxWidth, minHeight, maxHeight;
+	minWidth = minHeight = 1;
+	maxWidth = maxHeight = 1;
+
+	for (int i = 0; i < fWindowList.CountItems(); i++) {
+		int32 minW, maxW, minH, maxH;
+		fWindowList.ItemAt(i)->GetSizeLimits(&minW, &maxW, &minH, &maxH);
+		if (minW > minWidth)
+			minWidth = minW;
+		if (maxW > maxWidth)
+			maxWidth = maxW;
+		if (minH > minHeight)
+			minHeight = minH;
+		if (maxH > maxHeight)
+			maxHeight = maxH;
+	}
+	for (int i = 0; i < fWindowList.CountItems(); i++)
+		fWindowList.ItemAt(i)->SetSizeLimits(minWidth, maxWidth, minHeight,
+			maxHeight);
+}
+
+
 bool
 WindowArea::_AddWindow(SATWindow* window, SATWindow* after)
 {
