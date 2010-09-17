@@ -73,13 +73,6 @@ GroupCookie::DoGroupLayout(SATWindow* triggerWindow)
 	fLeftConstraint->SetRightSide(frame.left);
 	fTopConstraint->SetRightSide(frame.top);
 
-	int32 minWidth, maxWidth, minHeight, maxHeight;
-	fSATWindow->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	fMinWidthConstraint->SetRightSide(minWidth);
-	fMinHeightConstraint->SetRightSide(minHeight);
-	fMaxWidthConstraint->SetRightSide(maxWidth);
-	fMaxHeightConstraint->SetRightSide(maxHeight);
-
 	fWidthConstraint->SetPenaltyNeg(110);
 	fWidthConstraint->SetPenaltyPos(110);
 	fHeightConstraint->SetPenaltyNeg(110);
@@ -136,6 +129,17 @@ GroupCookie::MoveWindow(int32 workspace)
 }
 
 
+void
+GroupCookie::SetSizeLimit(int32 minWidth, int32 maxWidth, int32 minHeight,
+	int32 maxHeight)
+{
+	fMinWidthConstraint->SetRightSide(minWidth);
+	fMinHeightConstraint->SetRightSide(minHeight);
+	fMaxWidthConstraint->SetRightSide(maxWidth);
+	fMaxHeightConstraint->SetRightSide(maxHeight);
+}
+
+
 bool
 GroupCookie::Init(SATGroup* group, WindowArea* area)
 {
@@ -170,8 +174,8 @@ GroupCookie::Init(SATGroup* group, WindowArea* area)
 		fLeftBorder, OperatorType(GE), minWidth);
 	fMinHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
 		fTopBorder, OperatorType(GE), minHeight);
-	fMaxWidthConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
-		fTopBorder, OperatorType(LE), maxHeight);
+	fMaxWidthConstraint = linearSpec->AddConstraint(1.0, fRightBorder, -1.0,
+		fLeftBorder, OperatorType(LE), maxWidth);
 	fMaxHeightConstraint = linearSpec->AddConstraint(1.0, fBottomBorder, -1.0,
 		fTopBorder, OperatorType(LE), maxHeight);
 
@@ -371,6 +375,10 @@ SATWindow::AddedToGroup(SATGroup* group, WindowArea* area)
 		return false;
 	}
 
+	int32 minWidth, maxWidth, minHeight, maxHeight;
+	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fGroupCookie->SetSizeLimit(minWidth, maxWidth, minHeight, maxHeight);
+
 	return true;
 }
 
@@ -451,6 +459,7 @@ SATWindow::JoinCandidates()
 		return false;
 	bool status = fOngoingSnapping->JoinCandidates();
 	fOngoingSnapping = NULL;
+
 	return status;
 }
 
@@ -472,6 +481,15 @@ SATWindow::DoGroupLayout()
 	fGroupCookie->DoGroupLayout(this);
 
 	DoWindowLayout();
+}
+
+
+void
+SATWindow::SizeLimitChanged(int32 minWidth, int32 maxWidth, int32 minHeight,
+	int32 maxHeight)
+{
+	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
+	fGroupCookie->SetSizeLimit(minWidth, maxWidth, minHeight, maxHeight);
 }
 
 

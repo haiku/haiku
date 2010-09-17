@@ -32,6 +32,8 @@ public:
 
 		void				DoGroupLayout(SATWindow* triggerWindow);
 		void				MoveWindow(int32 workspace);
+		void				SetSizeLimit(int32 minWidth, int32 maxWidth,
+								int32 minHeight, int32 maxHeight);
 
 		SATGroup*			GetGroup() { return fSATGroup.Get(); }
 
@@ -102,6 +104,9 @@ public:
 		bool				JoinCandidates();
 		void				DoWindowLayout();
 		void				DoGroupLayout();
+
+		void				SizeLimitChanged(int32 minWidth, int32 maxWidth,
+								int32 minHeight, int32 maxHeight);
 
 		//! \return the complete window frame including the Decorator
 		BRect				CompleteWindowFrame();

@@ -37,65 +37,69 @@ typedef std::map<Window*, SATWindow*> SATWindowMap;
 
 class StackAndTile : public DesktopListener {
 public:
-							StackAndTile();
-	virtual					~StackAndTile();
+								StackAndTile();
+	virtual						~StackAndTile();
 
-	virtual int32			Identifier();
+	virtual int32				Identifier();
 
 	// DesktopListener hooks
-	virtual void			ListenerRegistered(Desktop* desktop);
-	virtual	void			ListenerUnregistered();
+	virtual void				ListenerRegistered(Desktop* desktop);
+	virtual	void				ListenerUnregistered();
 
-	virtual bool			HandleMessage(Window* sender,
-								BPrivate::ServerLink& link);
+	virtual bool				HandleMessage(Window* sender,
+									BPrivate::ServerLink& link);
 
-	virtual void			WindowAdded(Window* window);
-	virtual void			WindowRemoved(Window* window);
+	virtual void				WindowAdded(Window* window);
+	virtual void				WindowRemoved(Window* window);
 	
-	virtual void			KeyPressed(uint32 what, int32 key,
-								int32 modifiers);
-	virtual void			MouseEvent(BMessage* message) {}
-	virtual void			MouseDown(Window* window, BMessage* message,
+	virtual void				KeyPressed(uint32 what, int32 key,
+									int32 modifiers);
+	virtual void				MouseEvent(BMessage* message) {}
+	virtual void				MouseDown(Window* window, BMessage* message,
 									const BPoint& where);
-	virtual void			MouseUp(Window* window, BMessage* message,
+	virtual void				MouseUp(Window* window, BMessage* message,
 									const BPoint& where);
-	virtual void			MouseMoved(Window* window, BMessage* message,
+	virtual void				MouseMoved(Window* window, BMessage* message,
 									const BPoint& where) {}
 
-	virtual void			WindowMoved(Window* window);
-	virtual void			WindowResized(Window* window);
-	virtual void			WindowActitvated(Window* window);
-	virtual void			WindowSentBehind(Window* window, Window* behindOf);
-	virtual void			WindowWorkspacesChanged(Window* window,
+	virtual void				WindowMoved(Window* window);
+	virtual void				WindowResized(Window* window);
+	virtual void				WindowActitvated(Window* window);
+	virtual void				WindowSentBehind(Window* window,
+									Window* behindOf);
+	virtual void				WindowWorkspacesChanged(Window* window,
 									uint32 workspaces);
-	virtual void			WindowMinimized(Window* window, bool minimize);
+	virtual void				WindowMinimized(Window* window, bool minimize);
 
-	virtual void			WindowTabLocationChanged(Window* window,
-								float location);
+	virtual void				WindowTabLocationChanged(Window* window,
+									float location);
+	virtual void				SizeLimitChanged(Window* window, int32 minWidth,
+									int32 maxWidth, int32 minHeight,
+									int32 maxHeight);
 
-	virtual bool			SetDecoratorSettings(Window* window,
-								const BMessage& settings);
-	virtual void			GetDecoratorSettings(Window* window,
-								BMessage& settings);
+	virtual bool				SetDecoratorSettings(Window* window,
+									const BMessage& settings);
+	virtual void				GetDecoratorSettings(Window* window,
+									BMessage& settings);
 
-		bool				SATKeyPressed()
-								{ return fSATKeyPressed; }
+			bool				SATKeyPressed()
+									{ return fSATKeyPressed; }
 
-		SATWindow*			GetSATWindow(Window* window);
+		SATWindow*				GetSATWindow(Window* window);
 
 private:
-		void				_StartSAT();
-		void				_StopSAT();
-		void				_ActivateWindow(SATWindow* window);
+			void				_StartSAT();
+			void				_StopSAT();
+			void				_ActivateWindow(SATWindow* window);
 
-		bool				fSATKeyPressed;
+			bool				fSATKeyPressed;
 		
-		SATWindowMap		fSATWindowMap;
-		SATWindowList		fGrouplessWindows;
+			SATWindowMap		fSATWindowMap;
+			SATWindowList		fGrouplessWindows;
 
-		SATWindow*			fCurrentSATWindow;
+			SATWindow*			fCurrentSATWindow;
 
-		bool				fTabIsShifting;
+			bool				fTabIsShifting;
 };
 
 

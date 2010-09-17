@@ -252,6 +252,21 @@ DesktopObservable::NotifyWindowTabLocationChanged(Window* window,
 }
 
 
+void
+DesktopObservable::NotifySizeLimitChanged(Window* window, int32 minWidth,
+	int32 maxWidth, int32 minHeight, int32 maxHeight)
+{
+	if (fWeAreInvoking)
+		return;
+	InvokeGuard invokeGuard(fWeAreInvoking);
+
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->SizeLimitChanged(window, minWidth, maxWidth, minHeight,
+			maxHeight);
+}
+
+
 bool
 DesktopObservable::SetDecoratorSettings(Window* window,
 	const BMessage& settings)
