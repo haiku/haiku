@@ -203,7 +203,7 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 
 	fBufferList = BPrivate::SharedBufferList::Get();
 	if (fBufferList == NULL) {
-		ERROR("BBuffer::BBuffer: _shared_buffer_list::Clone() failed\n");
+		ERROR("BBuffer::BBuffer: BPrivate::SharedBufferList::Get() failed\n");
 		return;
 	}
 
