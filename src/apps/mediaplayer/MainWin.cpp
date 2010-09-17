@@ -32,6 +32,7 @@
 #include <Autolock.h>
 #include <Debug.h>
 #include <fs_attr.h>
+#include <Language.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -1548,7 +1549,18 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 	int count = fController->AudioTrackCount();
 	int current = fController->CurrentAudioTrack();
 	for (int i = 0; i < count; i++) {
-		sprintf(s, "Track %d", i + 1);
+		BMessage metaData;
+		const char* languageString = NULL;
+		if (fController->GetAudioMetaData(i, &metaData) == B_OK)
+			metaData.FindString("language", &languageString);
+		if (languageString != NULL) {
+			BLanguage language(languageString);
+			BString languageName;
+			if (language.GetTranslatedName(languageName) == B_OK)
+				languageString = languageName.String();
+			snprintf(s, sizeof(s), "%s", languageString);
+		} else
+			snprintf(s, sizeof(s), "Track %d", i + 1);
 		BMenuItem* item = new BMenuItem(s,
 			new BMessage(M_SELECT_AUDIO_TRACK + i));
 		item->SetMarked(i == current);
@@ -1563,7 +1575,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 	count = fController->VideoTrackCount();
 	current = fController->CurrentVideoTrack();
 	for (int i = 0; i < count; i++) {
-		sprintf(s, "Track %d", i + 1);
+		snprintf(s, sizeof(s), "Track %d", i + 1);
 		BMenuItem* item = new BMenuItem(s,
 			new BMessage(M_SELECT_VIDEO_TRACK + i));
 		item->SetMarked(i == current);

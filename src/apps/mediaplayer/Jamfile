@@ -108,7 +108,7 @@ Application MediaPlayer :
 	MainWin.cpp
 	VideoView.cpp
 
-	: be game media tracker translation textencoding $(TARGET_LIBSTDC++)
+	: be game locale media tracker translation textencoding $(TARGET_LIBSTDC++)
 	: MediaPlayer.rdef
 ;
 

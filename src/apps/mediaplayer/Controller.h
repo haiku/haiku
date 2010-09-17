@@ -134,6 +134,12 @@ public:
 			status_t			GetEncodedAudioFormat(media_format* format);
 			status_t			GetAudioCodecInfo(media_codec_info* info);
 
+			status_t			GetMetaData(BMessage* metaData);
+			status_t			GetVideoMetaData(int32 track,
+									BMessage* metaData);
+			status_t			GetAudioMetaData(int32 track,
+									BMessage* metaData);
+
 	// video view
 			void				SetVideoView(VideoView *view);
 

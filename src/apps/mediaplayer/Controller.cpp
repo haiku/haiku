@@ -852,6 +852,41 @@ Controller::GetAudioCodecInfo(media_codec_info* info)
 }
 
 
+status_t
+Controller::GetMetaData(BMessage* metaData)
+{
+	// TODO: Move API into supplier classes
+	if (fMediaFile == NULL)
+		return B_NO_INIT;
+
+	return fMediaFile->GetMetaData(metaData);
+}
+
+
+status_t
+Controller::GetVideoMetaData(int32 index, BMessage* metaData)
+{
+	// TODO: Move API into supplier classes
+	BMediaTrack* track = (BMediaTrack*)fVideoTrackList.ItemAt(index);
+	if (track == NULL)
+		return B_BAD_INDEX;
+
+	return track->GetMetaData(metaData);
+}
+
+
+status_t
+Controller::GetAudioMetaData(int32 index, BMessage* metaData)
+{
+	// TODO: Move API into supplier classes
+	BMediaTrack* track = (BMediaTrack*)fAudioTrackList.ItemAt(index);
+	if (track == NULL)
+		return B_BAD_INDEX;
+
+	return track->GetMetaData(metaData);
+}
+
+
 // #pragma mark -
 
 
