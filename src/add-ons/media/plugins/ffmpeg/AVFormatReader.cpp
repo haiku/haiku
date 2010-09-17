@@ -51,7 +51,7 @@ static const int64 kNoPTSValue = 0x8000000000000000LL;
 	// INT64_C is not defined here.
 
 
-uint32
+static uint32
 avformat_to_beos_format(SampleFormat format)
 {
 	switch (format) {
@@ -67,10 +67,27 @@ avformat_to_beos_format(SampleFormat format)
 }
 
 
-uint32
+static uint32
 avformat_to_beos_byte_order(SampleFormat format)
 {
+	// TODO: Huh?
 	return B_MEDIA_HOST_ENDIAN;
+}
+
+
+static void
+avmetadata_to_message(AVMetadata* metaData, BMessage* message)
+{
+	if (metaData == NULL)
+		return;
+
+	AVMetadataTag* tag = NULL;
+	while ((tag = av_metadata_get(metaData, "", tag,
+		AV_METADATA_IGNORE_SUFFIX))) {
+		// TODO: Make sure we eventually follow a defined convention for
+		// the names of meta-data keys.
+		message->AddString(tag->key, tag->value);
+	}
 }
 
 
@@ -98,10 +115,13 @@ public:
 	inline	int32				VirtualIndex() const
 									{ return fVirtualIndex; }
 
+			status_t			GetMetaData(BMessage* data);
+
 	inline	const media_format&	Format() const
 									{ return fFormat; }
 
 			double				FrameRate() const;
+			bigtime_t			Duration() const;
 
 	// Support for AVFormatReader
 			status_t			GetStreamInfo(int64* frameCount,
@@ -159,6 +179,7 @@ private:
 			media_format		fFormat;
 
 	mutable	bool				fStreamBuildsIndexWhileReading;
+			bool				fSeekByBytes;
 };
 
 
@@ -176,7 +197,8 @@ AVFormatReader::StreamCookie::StreamCookie(BPositionIO* source,
 
 	fReusePacket(false),
 
-	fStreamBuildsIndexWhileReading(false)
+	fStreamBuildsIndexWhileReading(false),
+	fSeekByBytes(false)
 {
 	memset(&fFormat, 0, sizeof(media_format));
 	av_new_packet(&fPacket, 0);
@@ -231,9 +253,6 @@ AVFormatReader::StreamCookie::Open()
 		(inputFormat->flags & AVFMT_VARIABLE_FPS) ? " AVFMT_VARIABLE_FPS" : ""
 	);
 
-	fStreamBuildsIndexWhileReading
-		= (inputFormat->flags & AVFMT_GENERIC_INDEX) != 0;
-
 	const DemuxerFormat* demuxerFormat = demuxer_format_for(inputFormat);
 	if (demuxerFormat == NULL) {
 		// We could support this format, but we don't want to. Bail out.
@@ -267,9 +286,13 @@ AVFormatReader::StreamCookie::Open()
 		return B_NOT_SUPPORTED;
 	}
 
+	fStreamBuildsIndexWhileReading
+		= (inputFormat->flags & AVFMT_GENERIC_INDEX) != 0;
+	fSeekByBytes = (inputFormat->flags & AVFMT_TS_DISCONT) != 0;
+
 	TRACE("AVFormatReader::StreamCookie::Open() - "
-		"av_find_stream_info() success! Seek should be by bytes: %d\n",
-		(inputFormat->flags & AVFMT_TS_DISCONT) != 0);
+		"av_find_stream_info() success! Seeking by bytes: %d\n",
+		fSeekByBytes);
 
 	return B_OK;
 }
@@ -730,6 +753,15 @@ AVFormatReader::StreamCookie::StreamIndexFor(int32 virtualIndex) const
 }
 
 
+status_t
+AVFormatReader::StreamCookie::GetMetaData(BMessage* data)
+{
+	avmetadata_to_message(fStream->metadata, data);
+
+	return B_OK;
+}
+
+
 double
 AVFormatReader::StreamCookie::FrameRate() const
 {
@@ -762,6 +794,23 @@ AVFormatReader::StreamCookie::FrameRate() const
 }
 
 
+bigtime_t
+AVFormatReader::StreamCookie::Duration() const
+{
+	// TODO: This is not working correctly for all stream types...
+	// It seems that the calculations here are correct, because they work
+	// for a couple of streams and are in line with the documentation, but
+	// unfortunately, libavformat itself seems to set the time_base and
+	// duration wrongly sometimes. :-(
+	if ((int64)fStream->duration != kNoPTSValue)
+		return _ConvertFromStreamTimeBase(fStream->duration);
+	else if ((int64)fContext->duration != kNoPTSValue)
+		return (bigtime_t)fContext->duration;
+
+	return 0;
+}
+
+
 status_t
 AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	bigtime_t* duration, media_format* format, const void** infoBuffer,
@@ -782,24 +831,7 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 	}
 	#endif // TRACE_AVFORMAT_READER
 
-	// TODO: This is obviously not working correctly for all stream types...
-	// It seems that the calculations here are correct, because they work
-	// for a couple of streams and are in line with the documentation, but
-	// unfortunately, libavformat itself seems to set the time_base and
-	// duration wrongly sometimes. :-(
-	if ((int64)fStream->duration != kNoPTSValue) {
-		*duration = _ConvertFromStreamTimeBase(fStream->duration);
-		TRACE("  stream duration: %lld, time_base %.4f (%d/%d)\n",
-			fStream->duration, av_q2d(fStream->time_base),
-			fStream->time_base.num, fStream->time_base.den);
-	} else if ((int64)fContext->duration != kNoPTSValue) {
-		*duration = (bigtime_t)(1000000LL * fContext->duration / AV_TIME_BASE);
-		TRACE("  stream duration: %lld (from AVFormatContext)\n",
-			*duration);
-	} else {
-		*duration = 0;
-		TRACE("  stream duration: N/A\n");
-	}
+	*duration = Duration();
 
 	TRACE("  duration: %lld or %.5fs\n", *duration, *duration / 1000000.0);
 
@@ -871,6 +903,8 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 
 	int64_t timeStamp = *time;
 	int64_t minTimeStamp = timeStamp - 1000000;
+	if (minTimeStamp < 0)
+		minTimeStamp = 0;
 	int64_t maxTimeStamp = timeStamp + 1000000;
 
 	TRACE_SEEK("  time: %.5fs -> %lld, current DTS: %lld (time_base: %d/%d)\n",
@@ -881,9 +915,24 @@ AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
 	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0)
 		searchFlags = 0;
 
+	if (fSeekByBytes) {
+		searchFlags |= AVSEEK_FLAG_BYTE;
+		BAutolock _(fStreamLock);
+		off_t fileSize;
+		if (fSource->GetSize(&fileSize) != B_OK)
+			return B_NOT_SUPPORTED;
+		int64_t duration = Duration();
+		if (duration == 0)
+			return B_NOT_SUPPORTED;
+
+		timeStamp = fileSize * timeStamp / duration;
+		minTimeStamp = INT64_MIN;
+		maxTimeStamp = INT64_MAX;
+	}
+
 	if (avformat_seek_file(fContext, -1, minTimeStamp, timeStamp,
 		maxTimeStamp, searchFlags) < 0) {
-		TRACE_SEEK("  avformat_seek_file() failed.\n");
+		TRACE("  avformat_seek_file() failed.\n");
 		return B_ERROR;
 	}
 
@@ -920,6 +969,9 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		*frame, *time);
+
+	if (fSeekByBytes)
+		return B_OK;
 
 	double frameRate = FrameRate();
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
@@ -1347,6 +1399,43 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 }
 
 
+status_t
+AVFormatReader::GetMetaData(BMessage* _data)
+{
+	// The first cookie is always there!
+	const AVFormatContext* context = fStreams[0]->Context();
+
+	if (context == NULL)
+		return B_NO_INIT;
+
+	avmetadata_to_message(context->metadata, _data);
+
+	// Add chapter info
+	for (unsigned i = 0; i < context->nb_chapters; i++) {
+		AVChapter* chapter = context->chapters[i];
+		BMessage chapterData;
+		chapterData.AddInt64("start", bigtime_t(1000000.0
+			* chapter->start * chapter->time_base.num
+			/ chapter->time_base.den + 0.5));
+		chapterData.AddInt64("end", bigtime_t(1000000.0
+			* chapter->end * chapter->time_base.num
+			/ chapter->time_base.den + 0.5));
+
+		avmetadata_to_message(chapter->metadata, &chapterData);
+		_data->AddMessage("be:chapter", &chapterData);
+	}
+
+	// Add program info
+	for (unsigned i = 0; i < context->nb_programs; i++) {
+		BMessage progamData;
+		avmetadata_to_message(context->programs[i]->metadata, &progamData);
+		_data->AddMessage("be:program", &progamData);
+	}
+
+	return B_OK;
+}
+
+
 // #pragma mark -
 
 
@@ -1435,6 +1524,14 @@ AVFormatReader::GetStreamInfo(void* _cookie, int64* frameCount,
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->GetStreamInfo(frameCount, duration, format, infoBuffer,
 		infoSize);
+}
+
+
+status_t
+AVFormatReader::GetStreamMetaData(void* _cookie, BMessage* _data)
+{
+	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
+	return cookie->GetMetaData(_data);
 }
 
 
