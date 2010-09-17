@@ -23,6 +23,7 @@ public:
 	virtual	status_t			Sniff(int32* streamCount) = 0;
 
 	virtual	void				GetFileFormatInfo(media_file_format* mff) = 0;
+	virtual	status_t			GetMetaData(BMessage* _data);
 
 	virtual	status_t			AllocateCookie(int32 streamNumber,
 									void** cookie) = 0;
@@ -41,6 +42,9 @@ public:
 	virtual	status_t			GetNextChunk(void* cookie,
 									const void** chunkBuffer, size_t* chunkSize,
 									media_header* mediaHeader) = 0;
+
+	virtual	status_t			GetStreamMetaData(void* cookie,
+									BMessage* _data);
 
 			BDataIO*			Source() const;
 

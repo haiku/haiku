@@ -233,6 +233,21 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 }
 
 
+status_t
+BMediaTrack::GetMetaData(BMessage* _data) const
+{
+	CALLED();
+	if (fExtractor == NULL)
+		return B_NO_INIT;
+	if (_data == NULL)
+		return B_BAD_VALUE;
+
+	_data->MakeEmpty();
+
+	return fExtractor->GetStreamMetaData(fStream, _data);
+}
+
+
 int64
 BMediaTrack::CountFrames() const
 {

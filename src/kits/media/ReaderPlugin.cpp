@@ -1,4 +1,7 @@
 /*
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2004, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -22,6 +25,13 @@ Reader::~Reader()
 
 
 status_t
+Reader::GetMetaData(BMessage* _data)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
 Reader::Seek(void* cookie, uint32 flags, int64* frame, bigtime_t* time)
 {
 	return B_NOT_SUPPORTED;
@@ -30,6 +40,13 @@ Reader::Seek(void* cookie, uint32 flags, int64* frame, bigtime_t* time)
 
 status_t
 Reader::FindKeyFrame(void* cookie, uint32 flags, int64* frame, bigtime_t* time)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+Reader::GetStreamMetaData(void* cookie, BMessage* _data)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -54,6 +71,7 @@ Reader::Perform(perform_code code, void* _data)
 {
 	return B_OK;
 }
+
 
 void Reader::_ReservedReader1() {}
 void Reader::_ReservedReader2() {}

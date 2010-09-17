@@ -24,6 +24,7 @@ namespace BPrivate {
 
 // forward declarations
 class BMediaTrack;
+class BMessage;
 class BParameterWeb;
 class BView;
 
@@ -78,6 +79,12 @@ public:
 	// Get info about the underlying file format.
 			status_t			GetFileFormatInfo(
 									media_file_format* mfi) const;
+
+	// Returns in _data hierarchical meta-data about the stream.
+	// The fields in the message shall follow a defined naming-scheme,
+	// such that applications can find the same information in different
+	// types of files.
+			status_t			GetMetaData(BMessage* _data) const;
 
 	//
 	// These functions are for read-only access to a media file.

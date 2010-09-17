@@ -43,6 +43,7 @@ public:
 
 			void				GetFileFormatInfo(
 									media_file_format* fileFormat) const;
+			status_t			GetMetaData(BMessage* _data) const;
 
 			int32				StreamCount();
 
@@ -64,6 +65,9 @@ public:
 
 			status_t			CreateDecoder(int32 stream, Decoder** _decoder,
 									media_codec_info* codecInfo);
+
+			status_t			GetStreamMetaData(int32 stream,
+									BMessage* _data) const;
 
 private:
 			void				_RecycleLastChunk(stream_info& info);

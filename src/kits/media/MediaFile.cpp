@@ -129,7 +129,6 @@ BMediaFile::InitCheck() const
 }
 
 
-// Get info about the underlying file format.
 status_t
 BMediaFile::GetFileFormatInfo(media_file_format* mfi) const
 {
@@ -140,6 +139,20 @@ BMediaFile::GetFileFormatInfo(media_file_format* mfi) const
 		return B_ERROR;
 	*mfi = fMFI;
 	return B_OK;
+}
+
+
+status_t
+BMediaFile::GetMetaData(BMessage* _data) const
+{
+	if (fExtractor == NULL)
+		return B_NO_INIT;
+	if (_data == NULL)
+		return B_BAD_VALUE;
+
+	_data->MakeEmpty();
+
+	return fExtractor->GetMetaData(_data);
 }
 
 

@@ -16,6 +16,7 @@ namespace BPrivate { namespace media {
 	class MediaWriter;
 } }
 
+class BMessage;
 class BView;
 class BParameterWeb;
 
@@ -89,6 +90,12 @@ public:
 
 			int64				CountFrames() const;
 			bigtime_t			Duration() const;
+
+	// Returns in _data hierarchical meta-data about the track.
+	// The fields in the message shall follow a defined naming-scheme,
+	// such that applications can find the same information in different
+	// types of tracks.
+			status_t			GetMetaData(BMessage* _data) const;
 
 	// CurrentFrame and CurrentTime return the current position (expressed in
 	// microseconds) within the track, expressed in frame index and time.
