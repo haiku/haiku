@@ -473,6 +473,8 @@ VideoProducer::Disconnect(const media_source& source,
 		// Always delete the buffer group, even if it is not ours.
 		// (See BeBook::SetBufferGroup()).
 		delete fUsedBufferGroup;
+		if (fBufferGroup != fUsedBufferGroup)
+			delete fBufferGroup;
 		fUsedBufferGroup = NULL;
 		fBufferGroup = NULL;
 		fLock.Unlock();
