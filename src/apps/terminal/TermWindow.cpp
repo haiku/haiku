@@ -104,7 +104,7 @@ struct TermWindow::Session {
 		id(id),
 		containerView(containerView)
 	{
-		name = "Shell ";
+		name = B_TRANSLATE("Shell ");
 		name << id;
 	}
 };
