@@ -504,8 +504,8 @@ SATWindow::GetSizeLimits(int32* minWidth, int32* maxWidth, int32* minHeight,
 
 	// TODO get this values from the decorator
 	*minWidth += 11;
-	*minHeight += 11;
-	*maxWidth += 32;
+	*minHeight += 32;
+	*maxWidth += 11;
 	*maxHeight += 32;
 }
 
