@@ -334,7 +334,7 @@ AutomountSettingsDialog::RunAutomountSettings(const BMessenger& target)
 	status_t ret = target.SendMessage(&message, &reply, 2500000);
 	if (ret != B_OK) {
 		(new BAlert(B_TRANSLATE("Mount server error"),
-			B_TRANSLATE("The mount server could not be  contacted."),
+			B_TRANSLATE("The mount server could not be contacted."),
 			B_TRANSLATE("OK"),
 			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 		return;
