@@ -88,6 +88,7 @@ extern unsigned int 	atoui(const char *string);
 extern unsigned long	atoul(const char *string);
 
 extern double			strtod(const char *string, char **end);
+extern long double		strtold(const char *string, char **end);
 extern float			strtof(const char *string, char **end);
 extern long				strtol(const char *string, char **end, int base);
 extern unsigned long	strtoul(const char *string, char **end, int base);

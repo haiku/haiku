@@ -36,6 +36,7 @@ MergeObject posix_gnu_stdlib.o :
 	srand48.c
 	srand48_r.c
 	strtod.c
+	strtold.c
 	strtof.c
 	wcstombs.c
 	wctomb.c

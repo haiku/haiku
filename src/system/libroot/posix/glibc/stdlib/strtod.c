@@ -1574,18 +1574,3 @@ STRTOF (nptr, endptr LOCALE_PARAM)
 {
   return INTERNAL (STRTOF) (nptr, endptr, 0 LOCALE_PARAM);
 }
-
-
-// XXX this is not correct
-
-long double __strtold_internal(const char *number, char **_end, int group);
-
-long double
-#ifdef weak_function
-weak_function
-#endif
-__strtold_internal(const char *number, char **_end, int group)
-{
-	return __strtod_internal(number, _end, group);
-}
-
