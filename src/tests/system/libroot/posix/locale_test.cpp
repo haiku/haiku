@@ -691,13 +691,16 @@ test_ctype(const char* locale, const unsigned short int classInfos[],
 	int problemCount = 0;
 	for (int i = -1; i < 256; ++i) {
 		unsigned short classInfo = determineFullClassInfo(i);
-		char iAsChar = (char)i;
-		unsigned short classInfoFromChar = determineFullClassInfo(iAsChar);
 
-		if (classInfo != classInfoFromChar) {
-			printf("\tPROBLEM: ctype((int)%d)=%x, but ctype((char)%d)=%x\n", i,
-				classInfo, i, classInfoFromChar);
-			problemCount++;
+		if (i < 255) {
+			char iAsChar = (char)i;
+			unsigned short classInfoFromChar = determineFullClassInfo(iAsChar);
+
+			if (classInfo != classInfoFromChar) {
+				printf("\tPROBLEM: ctype((int)%d)=%x, but ctype((char)%d)=%x\n",
+					i, classInfo, i, classInfoFromChar);
+				problemCount++;
+			}
 		}
 		if (classInfo != classInfos[i + 1]) {
 			printf("\tPROBLEM: ctype(%d) = %x (expected %x)\n", i, classInfo,
