@@ -145,7 +145,7 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 if [ IsOptionalHaikuImagePackageAdded Bazaar ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeAE available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage bzr-2.2.0-gcc4-2010-09-15.zip
 			: $(baseURL)/bzr-2.2.0-x86-gcc4-2010-09-15.zip
 			:
@@ -163,7 +163,7 @@ if [ IsOptionalHaikuImagePackageAdded Bazaar ] {
 if [ IsOptionalHaikuImagePackageAdded BeAE ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BeAE available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage beae-22-x86-gcc4-2010-09-15.zip
 			: $(baseURL)/beae-22-x86-gcc4-2010-09-15.zip
 			:
@@ -326,7 +326,7 @@ if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
 if [ IsOptionalHaikuImagePackageAdded BurnItNow ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package BurnItNow available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage burnitnow-39-x86-gcc4-2010-09-15.zip
 			: $(baseURL)/burnitnow-39-x86-gcc4-2010-09-15.zip
 			:
