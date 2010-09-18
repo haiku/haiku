@@ -691,7 +691,14 @@ test_ctype(const char* locale, const unsigned short int classInfos[],
 	int problemCount = 0;
 	for (int i = -1; i < 256; ++i) {
 		unsigned short classInfo = determineFullClassInfo(i);
+		char iAsChar = (char)i;
+		unsigned short classInfoFromChar = determineFullClassInfo(iAsChar);
 
+		if (classInfo != classInfoFromChar) {
+			printf("\tPROBLEM: ctype((int)%d)=%x, but ctype((char)%d)=%x\n", i,
+				classInfo, i, classInfoFromChar);
+			problemCount++;
+		}
 		if (classInfo != classInfos[i + 1]) {
 			printf("\tPROBLEM: ctype(%d) = %x (expected %x)\n", i, classInfo,
 				classInfos[i + 1]);
@@ -1890,7 +1897,7 @@ test_sprintf()
 		{ "%f", -123, "-123.000000" },
 		{ "%.2f", 123456.789, "123456.79" },
 		{ "%'.2f", 123456.789, "123456.79" },
-		{ NULL, NULL }
+		{ NULL, 0.0, NULL }
 	};
 	test_sprintf("POSIX", sprintf_posix);
 
@@ -1903,7 +1910,7 @@ test_sprintf()
 		{ "%f", -123, "-123,000000" },
 		{ "%.2f", 123456.789, "123456,79" },
 		{ "%'.2f", 123456.789, "123.456,79" },
-		{ NULL, NULL }
+		{ NULL, 0.0, NULL }
 	};
 	test_sprintf("de_DE.UTF-8", sprintf_de);
 
@@ -1916,7 +1923,7 @@ test_sprintf()
 		{ "%f", -123, "-123.000000" },
 		{ "%.2f", 123456.789, "123456.79" },
 		{ "%'.2f", 123456.789, "1,23,456.79" },
-		{ NULL, NULL }
+		{ NULL, 0.0, NULL }
 	};
 	test_sprintf("gu_IN", sprintf_gu);
 
@@ -1929,7 +1936,7 @@ test_sprintf()
 		{ "%f", -123, "-123,000000" },
 		{ "%.2f", 123456.789, "123456,79" },
 		{ "%'.2f", 123456.789, "123 456,79" },
-		{ NULL, NULL }
+		{ NULL, 0.0, NULL }
 	};
 	test_sprintf("nb_NO", sprintf_nb);
 }
