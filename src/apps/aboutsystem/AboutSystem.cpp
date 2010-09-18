@@ -1132,7 +1132,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		B_TRANSLATE("The BeGeistert team\n"));
 	fCreditsView->Insert(
-		B_TRANSLATE("Google & their Google Summer of Code program\n\n"));
+		B_TRANSLATE("Google & their Google Summer of Code program\n"));
 	fCreditsView->Insert(
 		B_TRANSLATE("The University of Auckland and Christof Lutteroth\n\n"));
 	fCreditsView->Insert(
