@@ -129,10 +129,10 @@ public:
 									const void** infoBuffer,
 									size_t* infoSize) const;
 
-			status_t			Seek(uint32 flags, int64* frame,
-									bigtime_t* time);
 			status_t			FindKeyFrame(uint32 flags, int64* frame,
 									bigtime_t* time) const;
+			status_t			Seek(uint32 flags, int64* frame,
+									bigtime_t* time);
 
 			status_t			GetNextChunk(const void** chunkBuffer,
 									size_t* chunkSize,
@@ -180,6 +180,13 @@ private:
 
 	mutable	bool				fStreamBuildsIndexWhileReading;
 			bool				fSeekByBytes;
+
+			struct KeyframeInfo {
+				bigtime_t		time;
+				int64			frame;
+				int64			streamTimeStamp;
+			};
+	mutable	KeyframeInfo		fLastReportedKeyframe;
 };
 
 
@@ -202,6 +209,10 @@ AVFormatReader::StreamCookie::StreamCookie(BPositionIO* source,
 {
 	memset(&fFormat, 0, sizeof(media_format));
 	av_new_packet(&fPacket, 0);
+
+	fLastReportedKeyframe.time = 0;
+	fLastReportedKeyframe.frame = 0;
+	fLastReportedKeyframe.streamTimeStamp = 0;
 }
 
 
@@ -286,9 +297,10 @@ AVFormatReader::StreamCookie::Open()
 		return B_NOT_SUPPORTED;
 	}
 
-	fStreamBuildsIndexWhileReading
-		= (inputFormat->flags & AVFMT_GENERIC_INDEX) != 0;
 	fSeekByBytes = (inputFormat->flags & AVFMT_TS_DISCONT) != 0;
+	fStreamBuildsIndexWhileReading
+		= (inputFormat->flags & AVFMT_GENERIC_INDEX) != 0
+			|| fSeekByBytes;
 
 	TRACE("AVFormatReader::StreamCookie::Open() - "
 		"av_find_stream_info() success! Seeking by bytes: %d\n",
@@ -881,81 +893,6 @@ AVFormatReader::StreamCookie::GetStreamInfo(int64* frameCount,
 
 
 status_t
-AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
-	bigtime_t* time)
-{
-	if (fContext == NULL || fStream == NULL)
-		return B_NO_INIT;
-
-	TRACE_SEEK("AVFormatReader::StreamCookie::Seek(%ld,%s%s%s%s, %lld, "
-		"%lld)\n", VirtualIndex(),
-		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
-		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
-		*frame, *time);
-
-	// Seeking is always based on time, initialize it when client seeks
-	// based on frame.
-	double frameRate = FrameRate();
-	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
-		*time = (bigtime_t)(*frame * 1000000.0 / frameRate + 0.5);
-
-	int64_t timeStamp = *time;
-	int64_t minTimeStamp = timeStamp - 1000000;
-	if (minTimeStamp < 0)
-		minTimeStamp = 0;
-	int64_t maxTimeStamp = timeStamp + 1000000;
-
-	TRACE_SEEK("  time: %.5fs -> %lld, current DTS: %lld (time_base: %d/%d)\n",
-		*time / 1000000.0, timeStamp, fStream->cur_dts, fStream->time_base.num,
-		fStream->time_base.den);
-
-	int searchFlags = AVSEEK_FLAG_BACKWARD;
-	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0)
-		searchFlags = 0;
-
-	if (fSeekByBytes) {
-		searchFlags |= AVSEEK_FLAG_BYTE;
-		BAutolock _(fStreamLock);
-		off_t fileSize;
-		if (fSource->GetSize(&fileSize) != B_OK)
-			return B_NOT_SUPPORTED;
-		int64_t duration = Duration();
-		if (duration == 0)
-			return B_NOT_SUPPORTED;
-
-		timeStamp = fileSize * timeStamp / duration;
-		minTimeStamp = INT64_MIN;
-		maxTimeStamp = INT64_MAX;
-	}
-
-	if (avformat_seek_file(fContext, -1, minTimeStamp, timeStamp,
-		maxTimeStamp, searchFlags) < 0) {
-		TRACE("  avformat_seek_file() failed.\n");
-		return B_ERROR;
-	}
-
-	// Our last packet is toast in any case. Read the next one so we
-	// know where we really seeked.
-	fReusePacket = false;
-	if (_NextPacket(true) == B_OK) {
-		if (fPacket.pts != kNoPTSValue)
-			*time = _ConvertFromStreamTimeBase(fPacket.pts);
-		TRACE_SEEK("  seeked time: %.2fs\n", *time / 1000000.0);
-		if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
-			*frame = *time * frameRate / 1000000LL + 0.5;
-			TRACE_SEEK("  seeked frame: %lld\n", *frame);
-		}
-	} else {
-		TRACE_SEEK("  _NextPacket() failed!\n");
-	}
-
-	return B_OK;
-}
-
-
-status_t
 AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 	bigtime_t* time) const
 {
@@ -969,9 +906,6 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		*frame, *time);
-
-	if (fSeekByBytes)
-		return B_OK;
 
 	double frameRate = FrameRate();
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0)
@@ -988,7 +922,7 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 
 	int index = av_index_search_timestamp(fStream, timeStamp, searchFlags);
 	if (index < 0) {
-		TRACE_FIND("  av_index_search_timestamp() failed.\n");
+		TRACE("  av_index_search_timestamp() failed.\n");
 		// Best is to assume we can somehow seek to the time/frame
 		// and leave them as they are.
 	} else {
@@ -1030,11 +964,180 @@ AVFormatReader::StreamCookie::FindKeyFrame(uint32 flags, int64* frame,
 		} else
 			*time = foundTime;
 	}
-	
+
 	TRACE_FIND("  found time: %.2fs (%lld)\n", *time / 1000000.0, timeStamp);
 	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
 		*frame = int64_t(*time * frameRate / 1000000.0 + 0.5);
 		TRACE_FIND("  found frame: %lld\n", *frame);
+	}
+
+	fLastReportedKeyframe.frame = *frame;
+	fLastReportedKeyframe.time = *time;
+	fLastReportedKeyframe.streamTimeStamp = *time;
+
+	return B_OK;
+}
+
+
+status_t
+AVFormatReader::StreamCookie::Seek(uint32 flags, int64* frame,
+	bigtime_t* time)
+{
+	if (fContext == NULL || fStream == NULL)
+		return B_NO_INIT;
+
+	TRACE_SEEK("AVFormatReader::StreamCookie::Seek(%ld,%s%s%s%s, %lld, "
+		"%lld)\n", VirtualIndex(),
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		*frame, *time);
+
+	int64_t timeStamp;
+
+	// Seeking is always based on time, initialize it when client seeks
+	// based on frame.
+	double frameRate = FrameRate();
+	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
+		*time = (bigtime_t)(*frame * 1000000.0 / frameRate + 0.5);
+		if (fLastReportedKeyframe.frame == *frame)
+			timeStamp = fLastReportedKeyframe.streamTimeStamp;
+		else
+			timeStamp = *time;
+	} else {
+		if (fLastReportedKeyframe.time == *time)
+			timeStamp = fLastReportedKeyframe.streamTimeStamp;
+		else
+			timeStamp = *time;
+	}
+
+	TRACE_SEEK("  time: %.5fs -> %lld, current DTS: %lld (time_base: %d/%d)\n",
+		*time / 1000000.0, timeStamp, fStream->cur_dts, fStream->time_base.num,
+		fStream->time_base.den);
+
+	int searchFlags = AVSEEK_FLAG_BACKWARD;
+	if ((flags & B_MEDIA_SEEK_CLOSEST_FORWARD) != 0)
+		searchFlags = 0;
+
+	if (fSeekByBytes) {
+		searchFlags = AVSEEK_FLAG_BYTE;
+		BAutolock _(fStreamLock);
+		int64_t fileSize;
+		if (fSource->GetSize(&fileSize) != B_OK)
+			return B_NOT_SUPPORTED;
+		int64_t duration = Duration();
+		if (duration == 0)
+			return B_NOT_SUPPORTED;
+
+		timeStamp = int64_t(fileSize * ((double)timeStamp / duration));
+
+		bool seekAgain = true;
+		bool seekForward = true;
+		bigtime_t lastFoundTime = -1;
+		int64_t closestTimeStampBackwards = -1;
+		while (seekAgain) {
+			if (avformat_seek_file(fContext, -1, INT64_MIN, timeStamp,
+				INT64_MAX, searchFlags) < 0) {
+				TRACE("  avformat_seek_file() (by bytes) failed.\n");
+				return B_ERROR;
+			}
+			seekAgain = false;
+	
+			// Our last packet is toast in any case. Read the next one so we
+			// know where we really seeked.
+			fReusePacket = false;
+			if (_NextPacket(true) == B_OK) {
+				while (fPacket.pts == kNoPTSValue) {
+					fReusePacket = false;
+					if (_NextPacket(true) != B_OK)
+						return B_ERROR;
+				}
+				if (fPacket.pos >= 0)
+					timeStamp = fPacket.pos;
+				bigtime_t foundTime
+					= _ConvertFromStreamTimeBase(fPacket.pts);
+				if (foundTime != lastFoundTime) {
+					lastFoundTime = foundTime;
+					if (foundTime > *time) {
+						if (closestTimeStampBackwards >= 0) {
+							timeStamp = closestTimeStampBackwards;
+							seekAgain = true;
+							seekForward = false;
+							continue;
+						}
+						int64_t diff = int64_t(fileSize
+							* ((double)(foundTime - *time) / (2 * duration)));
+						if (diff < 8192)
+							break;
+						timeStamp -= diff;
+						TRACE_SEEK("  need to seek back (%lld) (time: %.2f "
+							"-> %.2f)\n", timeStamp, *time / 1000000.0,
+							foundTime / 1000000.0);
+						if (timeStamp < 0)
+							foundTime = 0;
+						else {
+							seekAgain = true;
+							continue;
+						}
+					} else if (seekForward && foundTime < *time - 100000) {
+						closestTimeStampBackwards = timeStamp;
+						int64_t diff = int64_t(fileSize
+							* ((double)(*time - foundTime) / (2 * duration)));
+						if (diff < 8192)
+							break;
+						timeStamp += diff;
+						TRACE_SEEK("  need to seek forward (%lld) (time: "
+							"%.2f -> %.2f)\n", timeStamp, *time / 1000000.0,
+							foundTime / 1000000.0);
+						if (timeStamp > duration)
+							foundTime = duration;
+						else {
+							seekAgain = true;
+							continue;
+						}
+					}
+				}
+				TRACE_SEEK("  found time: %lld -> %lld (%.2f)\n", *time,
+					foundTime, foundTime / 1000000.0);
+				*time = foundTime;
+				if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
+					*frame = *time * frameRate / 1000000LL + 0.5;
+					TRACE_SEEK("  seeked frame: %lld\n", *frame);
+				}
+			} else {
+				TRACE_SEEK("  _NextPacket() failed!\n");
+				return B_ERROR;
+			}
+		}
+
+	} else {
+		int64_t minTimeStamp = timeStamp - 1000000;
+		if (minTimeStamp < 0)
+			minTimeStamp = 0;
+		int64_t maxTimeStamp = timeStamp + 1000000;
+
+		if (avformat_seek_file(fContext, -1, minTimeStamp, timeStamp,
+			maxTimeStamp, searchFlags) < 0) {
+			TRACE("  avformat_seek_file() failed.\n");
+			return B_ERROR;
+		}
+	
+		// Our last packet is toast in any case. Read the next one so we
+		// know where we really seeked.
+		fReusePacket = false;
+		if (_NextPacket(true) == B_OK) {
+			if (fPacket.pts != kNoPTSValue) {
+				*time = _ConvertFromStreamTimeBase(fPacket.pts);
+				TRACE_SEEK("  seeked time: %.2fs\n", *time / 1000000.0);
+				if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
+					*frame = *time * frameRate / 1000000LL + 0.5;
+					TRACE_SEEK("  seeked frame: %lld\n", *frame);
+				}
+			} else
+				TRACE_SEEK("  no PTS in packet after seeking\n");
+		} else
+			TRACE_SEEK("  _NextPacket() failed!\n");
 	}
 
 	return B_OK;
