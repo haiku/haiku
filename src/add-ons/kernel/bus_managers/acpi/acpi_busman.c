@@ -172,6 +172,14 @@ acpi_std_ops(int32 op,...)
 				goto err;
 			}
 
+			ACPI_OBJECT arg;
+			arg.Integer.Type = ACPI_TYPE_INTEGER;
+			arg.Integer.Value = 0;
+
+			ACPI_OBJECT_LIST parameter = {1, &arg};
+	
+			AcpiEvaluateObject(NULL, "\\_PIC", &parameter, NULL);
+
 			flags = acpiAvoidFullInit ?
 					ACPI_NO_DEVICE_INIT | ACPI_NO_OBJECT_INIT :
 					ACPI_FULL_INITIALIZATION;
