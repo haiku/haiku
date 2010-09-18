@@ -29,7 +29,7 @@
 int
 isalnum(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & (_ISupper | _ISlower | _ISdigit);
 
 	return 0;
@@ -39,7 +39,7 @@ isalnum(int c)
 int
 isalpha(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & (_ISupper | _ISlower);
 
 	return 0;
@@ -57,7 +57,7 @@ isascii(int c)
 int
 isblank(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISblank;
 
 	return 0;
@@ -67,7 +67,7 @@ isblank(int c)
 int
 iscntrl(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _IScntrl;
 
 	return 0;
@@ -77,7 +77,7 @@ iscntrl(int c)
 int
 isdigit(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISdigit;
 
 	return 0;
@@ -87,7 +87,7 @@ isdigit(int c)
 int
 isgraph(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISgraph;
 
 	return 0;
@@ -97,7 +97,7 @@ isgraph(int c)
 int
 islower(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISlower;
 
 	return 0;
@@ -107,7 +107,7 @@ islower(int c)
 int
 isprint(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISprint;
 
 	return 0;
@@ -117,7 +117,7 @@ isprint(int c)
 int
 ispunct(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISpunct;
 
 	return 0;
@@ -127,7 +127,7 @@ ispunct(int c)
 int
 isspace(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISspace;
 
 	return 0;
@@ -137,7 +137,7 @@ isspace(int c)
 int
 isupper(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISupper;
 
 	return 0;
@@ -147,7 +147,7 @@ isupper(int c)
 int
 isxdigit(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_b[c] & _ISxdigit;
 
 	return 0;
@@ -165,7 +165,7 @@ toascii(int c)
 int
 tolower(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_tolower[c];
 
 	return c;
@@ -175,7 +175,7 @@ tolower(int c)
 int
 toupper(int c)
 {
-	if (c >= 0 && c < 256)
+	if (c >= -128 && c < 256)
 		return __ctype_toupper[c];
 
 	return c;

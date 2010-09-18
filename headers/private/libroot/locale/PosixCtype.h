@@ -10,13 +10,16 @@ namespace BPrivate {
 
 
 /*
- * the following arrays have 257 elements where the first is a
- * dummy element (containing the neutral/identity value) used when
- * the array is accessed as in 'isblank(EOF)' (i.e. with index -1).
+ * The following arrays have 384 elements where the elements at index -128..-2
+ * mirror the elements at index 128..255 (to protect against invocations of
+ * ctype macros with negative character values).
+ * The element at index -1 is a dummy element containing the neutral/identity
+ * value used when the array is accessed as in 'isblank(EOF)' (i.e. with
+ * index -1).
  */
-extern const unsigned short gPosixClassInfo[257];
-extern const int gPosixToLowerMap[257];
-extern const int gPosixToUpperMap[257];
+extern const unsigned short gPosixClassInfo[384];
+extern const int gPosixToLowerMap[384];
+extern const int gPosixToUpperMap[384];
 
 
 }	// namespace BPrivate

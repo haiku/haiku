@@ -28,11 +28,30 @@ namespace BPrivate {
 
 
 /*
- * the following arrays have 257 elements where the first is a
- * dummy element (containing the neutral/identity value) used when
- * the array is accessed as in 'isblank(EOF)' (i.e. with index -1).
+ * The following arrays have 384 elements where the elements at index -128..-2
+ * mirror the elements at index 128..255 (to protect against invocations of
+ * ctype macros with negative character values).
+ * The element at index -1 is a dummy element containing the neutral/identity
+ * value used when the array is accessed as in 'isblank(EOF)' (i.e. with
+ * index -1).
  */
-const unsigned short gPosixClassInfo[257] = {
+const unsigned short gPosixClassInfo[384] = {
+	/*-128 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/*-120 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/*-112 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/*-104 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -96 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -88 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -80 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -72 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -64 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -56 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -48 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -40 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -32 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -24 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/* -16 */	0, 0, 0, 0, 0, 0, 0, 0,
+	/*  -8 */	0, 0, 0, 0, 0, 0, 0,
 	/*  -1 */   0,	// neutral value
 	/*   0 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
 	/*   8 */	_IScntrl, _ISblank|_IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl, _IScntrl,
@@ -68,7 +87,23 @@ const unsigned short gPosixClassInfo[257] = {
 	/* 248 */	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-const int gPosixToLowerMap[257] = {
+const int gPosixToLowerMap[384] = {
+	/*-128 */	128, 129, 130, 131, 132, 133, 134, 135,
+	/*-120 */	136, 137, 138, 139, 140, 141, 142, 143,
+	/*-112 */	144, 145, 146, 147, 148, 149, 150, 151,
+	/*-104 */	152, 153, 154, 155, 156, 157, 158, 159,
+	/* -96 */	160, 161, 162, 163, 164, 165, 166, 167,
+	/* -88 */	168, 169, 170, 171, 172, 173, 174, 175,
+	/* -80 */	176, 177, 178, 179, 180, 181, 182, 183,
+	/* -72 */	184, 185, 186, 187, 188, 189, 190, 191,
+	/* -64 */	192, 193, 194, 195, 196, 197, 198, 199,
+	/* -56 */	200, 201, 202, 203, 204, 205, 206, 207,
+	/* -48 */	208, 209, 210, 211, 212, 213, 214, 215,
+	/* -40 */	216, 217, 218, 219, 220, 221, 222, 223,
+	/* -32 */	224, 225, 226, 227, 228, 229, 230, 231,
+	/* -24 */	232, 233, 234, 235, 236, 237, 238, 239,
+	/* -16 */	240, 241, 242, 243, 244, 245, 246, 247,
+	/*  -8 */	248, 249, 250, 251, 252, 253, 254,
 	/*  -1 */    -1,	// identity value
 	/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 	/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
@@ -105,7 +140,23 @@ const int gPosixToLowerMap[257] = {
 };
 
 
-const int gPosixToUpperMap[257] = {
+const int gPosixToUpperMap[384] = {
+	/*-128 */	128, 129, 130, 131, 132, 133, 134, 135,
+	/*-120 */	136, 137, 138, 139, 140, 141, 142, 143,
+	/*-112 */	144, 145, 146, 147, 148, 149, 150, 151,
+	/*-104 */	152, 153, 154, 155, 156, 157, 158, 159,
+	/* -96 */	160, 161, 162, 163, 164, 165, 166, 167,
+	/* -88 */	168, 169, 170, 171, 172, 173, 174, 175,
+	/* -80 */	176, 177, 178, 179, 180, 181, 182, 183,
+	/* -72 */	184, 185, 186, 187, 188, 189, 190, 191,
+	/* -64 */	192, 193, 194, 195, 196, 197, 198, 199,
+	/* -56 */	200, 201, 202, 203, 204, 205, 206, 207,
+	/* -48 */	208, 209, 210, 211, 212, 213, 214, 215,
+	/* -40 */	216, 217, 218, 219, 220, 221, 222, 223,
+	/* -32 */	224, 225, 226, 227, 228, 229, 230, 231,
+	/* -24 */	232, 233, 234, 235, 236, 237, 238, 239,
+	/* -16 */	240, 241, 242, 243, 244, 245, 246, 247,
+	/*  -8 */	248, 249, 250, 251, 252, 253, 254,
 	/*  -1 */    -1,	// identity value
 	/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 	/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
@@ -275,6 +326,6 @@ const char* gPosixLanginfo[_NL_LANGINFO_LAST] = {
 }	// namespace BPrivate
 
 
-const unsigned short* 	__ctype_b 		= &BPrivate::gPosixClassInfo[1];
-const int* 				__ctype_tolower = &BPrivate::gPosixToLowerMap[1];
-const int* 				__ctype_toupper = &BPrivate::gPosixToUpperMap[1];
+const unsigned short* 	__ctype_b 		= &BPrivate::gPosixClassInfo[128];
+const int* 				__ctype_tolower = &BPrivate::gPosixToLowerMap[128];
+const int* 				__ctype_toupper = &BPrivate::gPosixToUpperMap[128];

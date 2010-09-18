@@ -30,9 +30,9 @@ ICUCtypeData::~ICUCtypeData()
 void
 ICUCtypeData::Initialize(LocaleCtypeDataBridge* dataBridge)
 {
-	*dataBridge->addrOfClassInfoTable = &fClassInfo[1];
-	*dataBridge->addrOfToLowerTable = &fToLowerMap[1];
-	*dataBridge->addrOfToUpperTable = &fToUpperMap[1];
+	*dataBridge->addrOfClassInfoTable = &fClassInfo[128];
+	*dataBridge->addrOfToLowerTable = &fToLowerMap[128];
+	*dataBridge->addrOfToUpperTable = &fToUpperMap[128];
 	fDataBridge = dataBridge;
 }
 
@@ -97,9 +97,15 @@ ICUCtypeData::SetTo(const Locale& locale, const char* posixLocaleName)
 			if (U_SUCCESS(icuStatus))
 				toUpper = (unsigned char)buffer[0];
 		}
-		fClassInfo[i + 1] = classInfo;
-		fToLowerMap[i + 1] = toLower;
-		fToUpperMap[i + 1] = toUpper;
+		fClassInfo[i + 128] = classInfo;
+		fToLowerMap[i + 128] = toLower;
+		fToUpperMap[i + 128] = toUpper;
+		if (i >= 128 && i < 255) {
+			// mirror upper half at negative indices (except for -1 [=EOF])
+			fClassInfo[i - 128] = classInfo;
+			fToLowerMap[i - 128] = toLower;
+			fToUpperMap[i - 128] = toUpper;
+		}
 	}
 
 	return B_OK;
