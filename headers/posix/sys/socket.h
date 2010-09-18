@@ -184,7 +184,7 @@ int     setsockopt(int socket, int level, int option, const void *value,
 			socklen_t length);
 int		shutdown(int socket, int how);
 int		socket(int domain, int type, int protocol);
-int		sockatmark(int );
+int		sockatmark(int descriptor);
 int		socketpair(int domain, int type, int protocol, int socketVector[2]);
 
 #if __cplusplus

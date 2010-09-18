@@ -31,8 +31,8 @@ struct statvfs {
 extern "C" {
 #endif
 
-int statvfs(const char *, struct statvfs *);
-int fstatvfs(int, struct statvfs *);
+int statvfs(const char *path, struct statvfs *buf);
+int fstatvfs(int fildes, struct statvfs *buf);
 
 #ifdef __cplusplus
 }
