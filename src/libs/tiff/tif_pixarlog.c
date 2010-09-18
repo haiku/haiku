@@ -1,4 +1,4 @@
-/* $Id: tif_pixarlog.c,v 1.15.2.3 2009-01-01 00:10:43 bfriesen Exp $ */
+/* $Id: tif_pixarlog.c,v 1.15.2.4 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1996-1997 Sam Leffler
@@ -1362,3 +1362,10 @@ bad:
 #endif /* PIXARLOG_SUPPORT */
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

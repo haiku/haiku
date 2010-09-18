@@ -1,4 +1,4 @@
-/* $Id: tif_open.c,v 1.33 2006/06/08 14:27:17 dron Exp $ */
+/* $Id: tif_open.c,v 1.33.2.1 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -686,3 +686,10 @@ TIFFGetUnmapFileProc(TIFF* tif)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

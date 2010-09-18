@@ -1,4 +1,4 @@
-/* $Id: tif_dirinfo.c,v 1.65.2.7 2009-09-17 18:00:28 bfriesen Exp $ */
+/* $Id: tif_dirinfo.c,v 1.65.2.9 2010-06-09 21:15:27 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -217,10 +217,10 @@ tiffFieldInfo[] = {
       0,	0,	"YCbCrSubsampling" },
     { TIFFTAG_YCBCRPOSITIONING,	 1, 1,	TIFF_SHORT,	FIELD_YCBCRPOSITIONING,
       0,	0,	"YCbCrPositioning" },
-    { TIFFTAG_REFERENCEBLACKWHITE, 6, 6, TIFF_RATIONAL,	FIELD_CUSTOM,
+    { TIFFTAG_REFERENCEBLACKWHITE, 6, 6, TIFF_RATIONAL,	FIELD_REFBLACKWHITE,
       1,	0,	"ReferenceBlackWhite" },
 /* XXX temporarily accept LONG for backwards compatibility */
-    { TIFFTAG_REFERENCEBLACKWHITE, 6, 6, TIFF_LONG,	FIELD_CUSTOM,
+    { TIFFTAG_REFERENCEBLACKWHITE, 6, 6, TIFF_LONG,	FIELD_REFBLACKWHITE,
       1,	0,	"ReferenceBlackWhite" },
     { TIFFTAG_XMLPACKET,	-3,-3,	TIFF_BYTE,	FIELD_CUSTOM,
       0,	1,	"XMLPacket" },
@@ -879,3 +879,10 @@ _TIFFCreateAnonFieldInfo(TIFF *tif, ttag_t tag, TIFFDataType field_type)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

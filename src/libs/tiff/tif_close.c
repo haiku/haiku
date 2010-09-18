@@ -1,4 +1,4 @@
-/* $Id: tif_close.c,v 1.10 2006/03/25 03:09:24 joris Exp $ */
+/* $Id: tif_close.c,v 1.10.2.1 2010-06-08 18:50:41 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -117,3 +117,10 @@ TIFFClose(TIFF* tif)
 	(void) (*closeproc)(fd);
 }
 
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

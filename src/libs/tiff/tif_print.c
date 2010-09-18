@@ -1,4 +1,4 @@
-/* $Id: tif_print.c,v 1.36.2.2 2009-09-17 18:00:28 bfriesen Exp $ */
+/* $Id: tif_print.c,v 1.36.2.4 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -144,7 +144,7 @@ _TIFFPrettyPrintField(TIFF* tif, FILE* fd, ttag_t tag,
 			uint16 i;
 
 			fprintf(fd, "  Reference Black/White:\n");
-			for (i = 0; i < td->td_samplesperpixel; i++)
+			for (i = 0; i < 3; i++)
 			fprintf(fd, "    %2d: %5g %5g\n", i,
 				((float *)raw_data)[2*i+0],
 				((float *)raw_data)[2*i+1]);
@@ -637,3 +637,10 @@ _TIFFprintAsciiTag(FILE* fd, const char* name, const char* value)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

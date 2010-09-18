@@ -1,4 +1,4 @@
-/* $Id: tif_dir.c,v 1.75.2.2 2009-01-01 00:10:43 bfriesen Exp $ */
+/* $Id: tif_dir.c,v 1.75.2.5 2010-06-09 21:15:27 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -376,6 +376,10 @@ _TIFFVSetField(TIFF* tif, ttag_t tag, va_list ap)
 		for (i = 0; i < v; i++)
 			_TIFFsetShortArray(&td->td_transferfunction[i],
 			    va_arg(ap, uint16*), 1L<<td->td_bitspersample);
+		break;
+	case TIFFTAG_REFERENCEBLACKWHITE:
+		/* XXX should check for null range */
+		_TIFFsetFloatArray(&td->td_refblackwhite, va_arg(ap, float*), 6);
 		break;
 	case TIFFTAG_INKNAMES:
 		v = va_arg(ap, uint32);
@@ -815,6 +819,9 @@ _TIFFVGetField(TIFF* tif, ttag_t tag, va_list ap)
                 *va_arg(ap, uint16**) = td->td_transferfunction[2];
             }
             break;
+	case TIFFTAG_REFERENCEBLACKWHITE:
+	    *va_arg(ap, float**) = td->td_refblackwhite;
+	    break;
 	case TIFFTAG_INKNAMES:
             *va_arg(ap, char**) = td->td_inknames;
             break;
@@ -989,6 +996,7 @@ TIFFFreeDirectory(TIFF* tif)
 	CleanupField(td_sampleinfo);
 	CleanupField(td_subifd);
 	CleanupField(td_inknames);
+	CleanupField(td_refblackwhite);
 	CleanupField(td_transferfunction[0]);
 	CleanupField(td_transferfunction[1]);
 	CleanupField(td_transferfunction[2]);
@@ -1099,6 +1107,11 @@ TIFFDefaultDirectory(TIFF* tif)
 	 * Should we also be clearing stuff like INSUBIFD?
 	 */
 	tif->tif_flags &= ~TIFF_ISTILED;
+        /*
+         * Clear other directory-specific fields.
+         */
+        tif->tif_tilesize = -1;
+        tif->tif_scanlinesize = -1;
 
 	return (1);
 }
@@ -1367,3 +1380,10 @@ TIFFReassignTagToIgnore (enum TIFFIgnoreSense task, int TIFFtagID)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

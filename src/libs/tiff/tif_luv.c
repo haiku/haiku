@@ -1,4 +1,4 @@
-/* $Id: tif_luv.c,v 1.17.2.3 2009-06-30 17:06:25 fwarmerdam Exp $ */
+/* $Id: tif_luv.c,v 1.17.2.4 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1997 Greg Ward Larson
@@ -1620,3 +1620,10 @@ bad:
 #endif /* LOGLUV_SUPPORT */
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

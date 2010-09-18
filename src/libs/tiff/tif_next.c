@@ -1,4 +1,4 @@
-/* $Id: tif_next.c,v 1.8 2006/10/12 15:00:49 dron Exp $ */
+/* $Id: tif_next.c,v 1.8.2.1 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -145,3 +145,10 @@ TIFFInitNeXT(TIFF* tif, int scheme)
 #endif /* NEXT_SUPPORT */
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

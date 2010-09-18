@@ -1,4 +1,4 @@
-/* $Id: tif_lzw.c,v 1.29.2.5 2009-06-22 04:57:31 fwarmerdam Exp $ */
+/* $Id: tif_lzw.c,v 1.29.2.6 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -1120,3 +1120,10 @@ bad:
 #endif /* LZW_SUPPORT */
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

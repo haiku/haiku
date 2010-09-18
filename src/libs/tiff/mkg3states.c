@@ -1,4 +1,4 @@
-/* "$Id: mkg3states.c,v 1.10 2007/02/22 11:27:17 dron Exp $ */
+/* "$Id: mkg3states.c,v 1.10.2.1 2010-06-08 18:50:41 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1991-1997 Sam Leffler
@@ -442,3 +442,10 @@ main(int argc, char* argv[])
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

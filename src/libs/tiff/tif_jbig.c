@@ -1,4 +1,4 @@
-/* $Id: tif_jbig.c,v 1.2.2.2 2008-10-21 13:13:07 dron Exp $ */
+/* $Id: tif_jbig.c,v 1.2.2.3 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -376,3 +376,10 @@ int TIFFInitJBIG(TIFF* tif, int scheme)
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
 
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

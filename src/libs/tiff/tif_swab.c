@@ -1,4 +1,4 @@
-/* $Id: tif_swab.c,v 1.4 2005/04/13 14:06:21 dron Exp $ */
+/* $Id: tif_swab.c,v 1.4.2.1 2010-06-08 18:50:43 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -233,3 +233,10 @@ TIFFReverseBits(register unsigned char* cp, register unsigned long n)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

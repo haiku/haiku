@@ -1,4 +1,4 @@
-/* $Id: tif_unix.c,v 1.12 2006/03/21 16:37:51 dron Exp $ */
+/* $Id: tif_unix.c,v 1.12.2.1 2010-06-08 18:50:43 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -291,3 +291,10 @@ unixErrorHandler(const char* module, const char* fmt, va_list ap)
 	fprintf(stderr, ".\n");
 }
 TIFFErrorHandler _TIFFerrorHandler = unixErrorHandler;
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

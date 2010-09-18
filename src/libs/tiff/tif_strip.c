@@ -1,4 +1,4 @@
-/* $Id: tif_strip.c,v 1.19 2006/03/25 18:04:35 joris Exp $ */
+/* $Id: tif_strip.c,v 1.19.2.1 2010-06-08 18:50:43 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1991-1997 Sam Leffler
@@ -361,3 +361,10 @@ TIFFRasterScanlineSize(TIFF* tif)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

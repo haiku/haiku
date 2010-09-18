@@ -1,4 +1,4 @@
-/* $Id: tif_read.c,v 1.16 2007/02/22 11:33:44 dron Exp $ */
+/* $Id: tif_read.c,v 1.16.2.3 2010-06-09 14:32:47 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -600,16 +600,18 @@ TIFFReadBufferSetup(TIFF* tif, tdata_t bp, tsize_t size)
 			_TIFFfree(tif->tif_rawdata);
 		tif->tif_rawdata = NULL;
 	}
+
 	if (bp) {
 		tif->tif_rawdatasize = size;
 		tif->tif_rawdata = (tidata_t) bp;
 		tif->tif_flags &= ~TIFF_MYBUFFER;
 	} else {
 		tif->tif_rawdatasize = TIFFroundup(size, 1024);
-		tif->tif_rawdata = (tidata_t) _TIFFmalloc(tif->tif_rawdatasize);
+		if (tif->tif_rawdatasize > 0)
+			tif->tif_rawdata = (tidata_t) _TIFFmalloc(tif->tif_rawdatasize);
 		tif->tif_flags |= TIFF_MYBUFFER;
 	}
-	if (tif->tif_rawdata == NULL) {
+	if ((tif->tif_rawdata == NULL) || (tif->tif_rawdatasize == 0)) {
 		TIFFErrorExt(tif->tif_clientdata, module,
 		    "%s: No space for data buffer at scanline %ld",
 		    tif->tif_name, (long) tif->tif_row);
@@ -739,3 +741,10 @@ _TIFFSwab64BitData(TIFF* tif, tidata_t buf, tsize_t cc)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

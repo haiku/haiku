@@ -1,4 +1,4 @@
-/* $Id: tif_predict.c,v 1.11.2.3 2009-01-23 15:57:18 fwarmerdam Exp $ */
+/* $Id: tif_predict.c,v 1.11.2.4 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -727,3 +727,10 @@ TIFFPredictorCleanup(TIFF* tif)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */

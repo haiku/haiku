@@ -1,4 +1,4 @@
-/* $Id: tif_dirwrite.c,v 1.37.2.6 2009-10-31 21:51:08 bfriesen Exp $ */
+/* $Id: tif_dirwrite.c,v 1.37.2.7 2010-06-08 18:50:42 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -1405,3 +1405,10 @@ TIFFLinkDirectory(TIFF* tif)
 }
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */
