@@ -45,10 +45,7 @@ class XvidDecoder : public Decoder {
 	virtual	status_t			Decode(void* outBuffer, int64* outFrameCount,
 									media_header* mh, media_decode_info* info);
 
-	virtual	status_t			Seek(uint32 inToWhat, int64 inRequiredFrame,
-									int64* _inOutFrame,
-									bigtime_t inRequiredTime,
-									bigtime_t* _inOutTime);
+	virtual	status_t			SeekedTo(int64 frame, bigtime_t time);
 
  private:
 			int					_XvidInit();

@@ -253,7 +253,7 @@ BMediaTrack::CountFrames() const
 {
 	CALLED();
 	int64 frames = fExtractor ? fExtractor->CountFrames(fStream) : 0;
-//	printf("BMediaTrack::CountFrames: %Ld\n", frames);
+//	printf("BMediaTrack::CountFrames: %lld\n", frames);
 	return frames;
 }
 
@@ -263,7 +263,7 @@ BMediaTrack::Duration() const
 {
 	CALLED();
 	bigtime_t duration = fExtractor ? fExtractor->Duration(fStream) : 0;
-//	printf("BMediaTrack::Duration: %Ld\n", duration);
+//	printf("BMediaTrack::Duration: %lld\n", duration);
 	return duration;
 }
 
@@ -338,7 +338,7 @@ BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
 	}
 
 //	PRINT(1, "BMediaTrack::ReadFrames: stream %ld, start-time %5Ld.%06Ld, "
-//		"%Ld frames\n", fStream,  _header->start_time / 1000000,
+//		"%lld frames\n", fStream,  _header->start_time / 1000000,
 //		_header->start_time % 1000000, *out_frameCount);
 
 	return result;
@@ -360,157 +360,144 @@ BMediaTrack::ReplaceFrames(const void* inBuffer, int64* inOutFrameCount,
 
 
 status_t
-BMediaTrack::SeekToTime(bigtime_t* inOutTime, int32 flags)
+BMediaTrack::SeekToTime(bigtime_t* _time, int32 flags)
 {
 	CALLED();
-	if (!fDecoder || !fExtractor)
+	if (fDecoder == NULL || fExtractor == NULL)
 		return B_NO_INIT;
-	if (!inOutTime)
+	if (_time == NULL)
 		return B_BAD_VALUE;
 
-	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
-		| B_MEDIA_SEEK_TO_TIME;
-	bigtime_t seekTime = *inOutTime;
+	// Make sure flags are valid
+	flags = (flags & B_MEDIA_SEEK_DIRECTION_MASK) | B_MEDIA_SEEK_TO_TIME;
 
+	#if DEBUG
+	bigtime_t requestedTime = *_time;
+	#endif
 	int64 frame = 0;
-	bigtime_t time = seekTime;
-	status_t result = fExtractor->Seek(fStream, seekTo, &frame, &time);
+
+	status_t result = fExtractor->Seek(fStream, flags, &frame, _time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToTime: extractor seek failed\n");
 		return result;
 	}
 
-	// TODO: Codecs cannot actually "seek" in the stream, all they
-	// can do is "reset" their decoder state, since they are made
-	// aware of the fact that there will be a jump in the data. Maybe
-	// rename the Decoder method?
-	seekTime = time;
-	result = fDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
+	result = fDecoder->SeekedTo(frame, *_time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToTime: decoder seek failed\n");
 		return result;
 	}
 
 	if (fRawDecoder) {
-		result = fRawDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
+		result = fRawDecoder->SeekedTo(frame, *_time);
 		if (result != B_OK) {
 			ERROR("BMediaTrack::SeekToTime: raw decoder seek failed\n");
 			return result;
 		}
 	}
 
-	*inOutTime = time;
 	fCurrentFrame = frame;
-	fCurrentTime = time;
+	fCurrentTime = *_time;
 
 	PRINT(1, "BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n",
-		seekTime / 1000000.0, *inOutTime / 1000000.0);
+		requestedTime / 1000000.0, *_time / 1000000.0);
 
 	return B_OK;
 }
 
 
 status_t
-BMediaTrack::SeekToFrame(int64 *inout_frame, int32 flags)
+BMediaTrack::SeekToFrame(int64* _frame, int32 flags)
 {
 	CALLED();
-	if (!fDecoder || !fExtractor)
+	if (fDecoder == NULL || fExtractor == NULL)
 		return B_NO_INIT;
-	if (!inout_frame)
+	if (_frame == NULL)
 		return B_BAD_VALUE;
 
-	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
-		| B_MEDIA_SEEK_TO_FRAME;
-	int64 seekFrame = *inout_frame;
+	// Make sure flags are valid
+	flags = (flags & B_MEDIA_SEEK_DIRECTION_MASK) | B_MEDIA_SEEK_TO_FRAME;
 
-	int64 frame = seekFrame;
+	#if DEBUG
+	int64 requestedFrame = *_frame;
+	#endif
 	bigtime_t time = 0;
-	status_t result = fExtractor->Seek(fStream, seekTo, &frame, &time);
+
+	status_t result = fExtractor->Seek(fStream, flags, _frame, &time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToFrame: extractor seek failed\n");
 		return result;
 	}
 
-	// TODO: Codecs cannot actually "seek" in the stream, all they
-	// can do is "reset" their decoder state, since they are made
-	// aware of the fact that there will be a jump in the data. Maybe
-	// rename the codec method?
-	seekFrame = frame;
-	result = fDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
+	result = fDecoder->SeekedTo(*_frame, time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::SeekToFrame: decoder seek failed\n");
 		return result;
 	}
 
-	if (fRawDecoder) {
-		result = fRawDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
+	if (fRawDecoder != NULL) {
+		result = fRawDecoder->SeekedTo(*_frame, time);
 		if (result != B_OK) {
 			ERROR("BMediaTrack::SeekToFrame: raw decoder seek failed\n");
 			return result;
 		}
 	}
 
-	*inout_frame = frame;
-	fCurrentFrame = frame;
+	fCurrentFrame = *_frame;
 	fCurrentTime = time;
 
-	PRINT(1, "BMediaTrack::SeekToTime SeekToFrame, requested %Ld, "
-		"result %Ld\n", seekFrame, *inout_frame);
+	PRINT(1, "BMediaTrack::SeekToTime SeekToFrame, requested %lld, "
+		"result %lld\n", requestedFrame, *_frame);
 
 	return B_OK;
 }
 
 
 status_t
-BMediaTrack::FindKeyFrameForTime(bigtime_t *inoutTime, int32 flags) const
+BMediaTrack::FindKeyFrameForTime(bigtime_t* _time, int32 flags) const
 {
 	CALLED();
-	if (!fExtractor)
+	if (fExtractor == NULL)
 		return B_NO_INIT;
-	if (!inoutTime)
+	if (_time == NULL)
 		return B_BAD_VALUE;
 
-	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
-		| B_MEDIA_SEEK_TO_TIME;
+	// Make sure flags are valid
+	flags = (flags & B_MEDIA_SEEK_DIRECTION_MASK) | B_MEDIA_SEEK_TO_TIME;
 
 	int64 frame = 0;
 		// dummy frame, will be ignored because of flags
-	status_t result = fExtractor->FindKeyFrame(fStream, seekTo, &frame,
-		inoutTime);
+	status_t result = fExtractor->FindKeyFrame(fStream, flags, &frame, _time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::FindKeyFrameForTime: extractor seek failed: %s\n",
 			strerror(result));
-		return result;
 	}
 
-	return B_OK;
+	return result;
 }
 
 
 status_t
-BMediaTrack::FindKeyFrameForFrame(int64 *inoutFrame,
-								  int32 flags) const
+BMediaTrack::FindKeyFrameForFrame(int64* _frame, int32 flags) const
 {
 	CALLED();
-	if (!fExtractor)
+	if (fExtractor == NULL)
 		return B_NO_INIT;
-	if (!inoutFrame)
+	if (_frame == NULL)
 		return B_BAD_VALUE;
 
-	uint32 seekTo = (flags & B_MEDIA_SEEK_DIRECTION_MASK)
-		| B_MEDIA_SEEK_TO_FRAME;
+	// Make sure flags are valid
+	flags = (flags & B_MEDIA_SEEK_DIRECTION_MASK) | B_MEDIA_SEEK_TO_FRAME;
 
 	bigtime_t time = 0;
 		// dummy time, will be ignored because of flags
-	status_t result = fExtractor->FindKeyFrame(fStream, seekTo, inoutFrame,
-		&time);
+	status_t result = fExtractor->FindKeyFrame(fStream, flags, _frame, &time);
 	if (result != B_OK) {
 		ERROR("BMediaTrack::FindKeyFrameForFrame: extractor seek failed: %s\n",
 			strerror(result));
-		return result;
 	}
 
-	return B_OK;
+	return result;
 }
 
 
@@ -1032,7 +1019,7 @@ RawDecoderChunkProvider::GetNextChunk(const void **chunkBuffer, size_t *chunkSiz
 	if (res == B_OK) {
 		*chunkBuffer = fBuffer;
 		*chunkSize = frames * fFrameSize;
-//		printf("RawDecoderChunkProvider::GetNextChunk, %Ld frames, %ld bytes, start-time %Ld\n", frames, *chunkSize, mediaHeader->start_time);
+//		printf("RawDecoderChunkProvider::GetNextChunk, %lld frames, %ld bytes, start-time %lld\n", frames, *chunkSize, mediaHeader->start_time);
 	} else {
 		ERROR("RawDecoderChunkProvider::GetNextChunk failed\n");
 	}

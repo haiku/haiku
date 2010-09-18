@@ -42,9 +42,7 @@ public:
 									media_header* mediaHeader,
 									media_decode_info* info);
 
-	virtual	status_t			Seek(uint32 seekTo, int64 seekFrame,
-									int64* frame, bigtime_t seekTime,
-									bigtime_t* time);
+	virtual	status_t			SeekedTo(int64 trame, bigtime_t time);
 
 
 private:

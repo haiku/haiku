@@ -560,52 +560,12 @@ XvidDecoder::Decode(void* outBuffer, int64* outFrameCount, media_header* mh,
 
 
 status_t
-XvidDecoder::Seek(uint32 inToWhat, int64 inRequiredFrame, int64 *_inOutFrame,
-	bigtime_t inRequiredTime, bigtime_t *_inOutTime)
+XvidDecoder::SeekedTo(int64 frame, bigtime_t time)
 {
-	PRINT(("%p->XvidDecoder::Seek(flags=%ld, inRequiredFrame=%lld, "
-		"_inOutFrame=%lld, inRequiredTime=%lld, _inOutTime=%lld)\n",
-		this, inToWhat, inRequiredFrame, *_inOutFrame, inRequiredTime,
-		*_inOutTime));
+	PRINT(("%p->XvidDecoder::SeekedTo(frame=%lld, time=%lld)\n",
+		this, frame, time));
 
-#if PROPER_SEEKING
-	status_t ret = B_OK;
-	if (inToWhat == B_SEEK_BY_FRAME) {
-
-printf("%p->XvidDecoder::Reset(B_SEEK_BY_FRAME, inRequiredFrame=%lld,\n"
-"    _inOutFrame=%lld, inRequiredTime=%lld, _inOutTime=%lld)\n",
-this, inRequiredFrame, *_inOutFrame, inRequiredTime, *_inOutTime);
-
-//		int64 wantedFrame = *_inOutFrame;
-//		ret = fTrack->FindKeyFrameForFrame(_inOutFrame, B_MEDIA_SEEK_CLOSEST_BACKWARD);
-//		if (ret == B_OK && *_inOutFrame != wantedFrame) {
-//			ret = fTrack->SeekToFrame(_inOutFrame, 0);
-//			// note, this might cause us to enter the function
-//			// again, but that's ok as long as we can seek to the frame
-//		}
-	} else if (inToWhat == B_SEEK_BY_TIME) {
-
-printf("%p->XvidDecoder::Reset(B_SEEK_BY_TIME, inRequiredFrame=%lld,\n"
-"    _inOutFrame=%lld, inRequiredTime=%lld, _inOutTime=%lld)\n",
-this, inRequiredFrame, *_inOutFrame, inRequiredTime, *_inOutTime);
-
-//		bigtime_t wantedTime = *_inOutTime;
-//		ret = fTrack->FindKeyFrameForTime(_inOutTime, B_MEDIA_SEEK_CLOSEST_BACKWARD);
-//		if (ret == B_OK && *_inOutTime != wantedTime) {
-//			ret = fTrack->SeekToTime(_inOutTime, 0);
-//			// note, this might cause us to enter the function
-//			// again, but that's ok as long as we can seek to the frame
-//			*_inOutFrame = fTrack->CurrentFrame();
-//		}
-	}
-
-	if (ret != B_OK) {
-		fprintf(stderr, "%p->XvidDecoder::Reset() - failed to seek\n", this);
-		return ret;
-	}
-#endif // PROPER_SEEKING
-
-	fFrame = *_inOutFrame;
+	fFrame = frame;
 
 	fChunkBuffer = NULL;
 	fChunkBufferHandle = NULL;

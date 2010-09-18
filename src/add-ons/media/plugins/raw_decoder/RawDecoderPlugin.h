@@ -37,9 +37,7 @@ public:
 					  
 	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 	
-	status_t	Seek(uint32 seekTo,
-					 int64 seekFrame, int64 *frame,
-					 bigtime_t seekTime, bigtime_t *time);
+	status_t	SeekedTo(int64 frame, bigtime_t time);
 							 
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);

@@ -38,9 +38,7 @@ public:
 
 	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 
-	status_t	Seek(uint32 seekTo,
-					 int64 seekFrame, int64 *frame,
-					 bigtime_t seekTime, bigtime_t *time);
+	status_t	SeekedTo(int64 frame, bigtime_t time);
 
 	bool		GetStreamInfo();
 							 

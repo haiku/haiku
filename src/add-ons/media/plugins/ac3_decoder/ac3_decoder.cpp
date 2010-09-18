@@ -261,29 +261,12 @@ AC3Decoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 
 
 status_t
-AC3Decoder::Seek(uint32 seekTo,
-				 int64 seekFrame, int64 *frame,
-				 bigtime_t seekTime, bigtime_t *time)
+AC3Decoder::SeekedTo(int64 frame, bigtime_t time)
 {
 	fInputChunkSize = 0;
 	fInputBufferSize = 0;
 
-	TRACE("AC3Decoder::Seek called\n");
-
-	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
-		TRACE("AC3Decoder::Seek by time ");
-		TRACE("from frame %Ld and time %Ld TO Required Time %Ld. ", *frame, *time, seekTime);
-
-		*frame = (int64)(*time / (fFrameSize * 1000000.0 / fFrameRate));
-	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
-		TRACE("AC3Decoder::Seek by Frame ");
-		TRACE("from Current Time %Ld and frame %Ld TO Required Frame %Ld. ", *time, *frame, seekFrame);
-
-		*time = (bigtime_t)(*frame * fFrameSize * 1000000.0 / fFrameRate);
-	} else
-		return B_BAD_VALUE;
-
-	TRACE("so new frame is %Ld at time %Ld\n", *frame, *time);
+	TRACE("AC3Decoder::SeekedTo called\n");
 
 	return B_OK;
 }

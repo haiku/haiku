@@ -66,7 +66,7 @@ MusePackDecoder::NegotiateOutputFormat(media_format *format)
 
 
 status_t 
-MusePackDecoder::Seek(uint32 seekTo, int64 seekFrame, int64 *frame, bigtime_t seekTime, bigtime_t *time)
+MusePackDecoder::SeekedTo(int64 frame, bigtime_t time)
 {
 	fFramePosition = 0;
 	return B_ERROR;

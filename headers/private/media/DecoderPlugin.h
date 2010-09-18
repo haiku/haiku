@@ -34,9 +34,7 @@ public:
 	virtual	status_t			NegotiateOutputFormat(
 									media_format* ioDecodedFormat) = 0;
 	
-	virtual	status_t			Seek(uint32 seekTo, int64 seekFrame,
-									int64* frame, bigtime_t seekTime,
-									bigtime_t* time) = 0;
+	virtual	status_t			SeekedTo(int64 frame, bigtime_t time) = 0;
 							 
 	virtual status_t			Decode(void* buffer, int64* frameCount,
 									media_header* mediaHeader,

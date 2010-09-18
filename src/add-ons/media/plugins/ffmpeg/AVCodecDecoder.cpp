@@ -271,37 +271,22 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 
 
 status_t
-AVCodecDecoder::Seek(uint32 seekTo, int64 seekFrame, int64* frame,
-	bigtime_t seekTime, bigtime_t* time)
+AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 {
+	status_t ret = B_OK;
 	// Reset the FFmpeg codec to flush buffers, so we keep the sync
 #if 1
 	if (fCodecInitDone) {
 		avcodec_close(fContext);
 		fCodecInitDone = avcodec_open(fContext, fCodec) >= 0;
+		if (!fCodecInitDone)
+			ret = B_ERROR;
 	}
 #else
 	// For example, this doesn't work on the H.264 codec. :-/
 	if (fCodecInitDone)
 		avcodec_flush_buffers(fContext);
 #endif
-
-	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
-		TRACE("AVCodecDecoder::Seek by time ");
-		TRACE("from frame %Ld and time %.6f TO Required Time %.6f. ",
-			fFrame, fStartTime / 1000000.0, seekTime / 1000000.0);
-
-		*frame = (int64)(seekTime * fOutputFrameRate / 1000000LL);
-		*time = seekTime;
-	} else if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
-		TRACE("AVCodecDecoder::Seek by Frame ");
-		TRACE("from time %.6f and frame %Ld TO Required Frame %Ld. ",
-			fStartTime / 1000000.0, fFrame, seekFrame);
-
-		*time = (bigtime_t)(seekFrame * 1000000LL / fOutputFrameRate);
-		*frame = seekFrame;
-	} else
-		return B_BAD_VALUE;
 
 	// Flush internal buffers as well.
 	fChunkBuffer = NULL;
@@ -310,10 +295,10 @@ AVCodecDecoder::Seek(uint32 seekTo, int64 seekFrame, int64* frame,
 	fOutputBufferOffset = 0;
 	fOutputBufferSize = 0;
 
-	fFrame = *frame;
-	fStartTime = *time;
-	TRACE("so new frame is %Ld at time %.6f\n", *frame, *time / 1000000.0);
-	return B_OK;
+	fFrame = frame;
+	fStartTime = time;
+
+	return ret;
 }
 
 
