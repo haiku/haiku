@@ -24,7 +24,13 @@ NO_HAIKU_FBSD_MII_DRIVER();
 NO_HAIKU_REENABLE_INTERRUPTS();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(44417);
-HAIKU_FIRMWARE_NAME_MAP(1) = {{"iwnfw", "iwlwifi-4965-1.ucode"}};
+HAIKU_FIRMWARE_NAME_MAP(5) = {
+	{"iwn1000fw", "iwlwifi-1000-3.ucode"},
+	{"iwn4965fw", "iwlwifi-4965-2.ucode"},
+	{"iwn5000fw", "iwlwifi-5000-2.ucode"},
+	{"iwn5150fw", "iwlwifi-5150-2.ucode"},
+	{"iwn6000fw", "iwlwifi-6000-4.ucode"}
+};
 
 
 int
@@ -33,12 +39,12 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	struct iwn_softc* sc = (struct iwn_softc*)device_get_softc(dev);
 	uint32 r1, r2;
 
-	r1 = IWN_READ(sc, IWN_INTR);
-	r2 = IWN_READ(sc, IWN_INTR_STATUS);
+	r1 = IWN_READ(sc, IWN_INT);
+	r2 = IWN_READ(sc, IWN_FH_INT);
 
 	if (r1 == 0 && r2 == 0) {
 		// not for us
-		IWN_WRITE(sc, IWN_MASK, IWN_INTR_MASK);
+		IWN_WRITE(sc, IWN_INT_MASK, sc->int_mask);
 		return 0;
 	}
 
@@ -50,7 +56,7 @@ HAIKU_CHECK_DISABLE_INTERRUPTS(device_t dev)
 	atomic_set((int32*)&sc->sc_intr_status_1, r1);
 	atomic_set((int32*)&sc->sc_intr_status_2, r2);
 
-	IWN_WRITE(sc, IWN_MASK, 0);
+	IWN_WRITE(sc, IWN_INT_MASK, 0);
 		// disable interrupts
 
 	return 1;
