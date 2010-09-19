@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -97,26 +97,6 @@ PlaylistItem::TrackNumber() const
 	if (GetAttribute(ATTR_INT32_TRACK, trackNumber) != B_OK)
 		trackNumber = 0;
 	return trackNumber;
-}
-
-
-int32
-PlaylistItem::BitRate() const
-{
-	int32 bitrate;
-	if (GetAttribute(ATTR_INT32_BIT_RATE, bitrate) != B_OK)
-		bitrate = 0;
-	return bitrate;
-}
-
-
-bigtime_t
-PlaylistItem::Duration() const
-{
-	bigtime_t duration;
-	if (GetAttribute(ATTR_INT64_DURATION, duration) != B_OK)
-		duration = 0;
-	return duration;
 }
 
 

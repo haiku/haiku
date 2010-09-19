@@ -1,9 +1,10 @@
 /*
- * Copyright 2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef PLAYLIST_ITEM_H
 #define PLAYLIST_ITEM_H
+
 
 #include <Archivable.h>
 #include <List.h>
@@ -11,12 +12,13 @@
 #include <Referenceable.h>
 #include <String.h>
 
-class BBitmap;
-class BDataIO;
-class BMediaFile;
-class BMessage;
 
-class PlaylistItem : public BArchivable, public Referenceable {
+class BBitmap;
+class BMessage;
+class TrackSupplier;
+
+
+class PlaylistItem : public BArchivable, public BReferenceable {
 public:
 	class Listener {
 	public:
@@ -38,19 +40,20 @@ public:
 
 	// attributes
 	typedef enum {
-		ATTR_STRING_NAME		= 'name',
-		ATTR_STRING_KEYWORDS	= 'kwrd',
+		ATTR_STRING_NAME			= 'name',
+		ATTR_STRING_KEYWORDS		= 'kwrd',
 
-		ATTR_STRING_AUTHOR		= 'auth',
-		ATTR_STRING_ALBUM		= 'albm',
-		ATTR_STRING_TITLE		= 'titl',
+		ATTR_STRING_ARTIST			= 'arst',
+		ATTR_STRING_AUTHOR			= 'auth',
+		ATTR_STRING_ALBUM			= 'albm',
+		ATTR_STRING_TITLE			= 'titl',
+		ATTR_STRING_AUDIO_BITRATE	= 'abtr',
+		ATTR_STRING_VIDEO_BITRATE	= 'vbtr',
+		ATTR_STRING_DURATION		= 'drtn',
 
-		ATTR_INT32_TRACK		= 'trck',
-		ATTR_INT32_YEAR			= 'year',
-		ATTR_INT32_RATING		= 'rtng',
-		ATTR_INT32_BIT_RATE		= 'btrt',
-
-		ATTR_INT64_DURATION		= 'drtn'
+		ATTR_INT32_TRACK			= 'trck',
+		ATTR_INT32_YEAR				= 'year',
+		ATTR_INT32_RATING			= 'rtng'
 	} Attribute;
 
 	virtual	status_t			SetAttribute(const Attribute& attribute,
@@ -75,9 +78,6 @@ public:
 			BString				Title() const;
 
 			int32				TrackNumber() const;
-			int32				BitRate() const;
-
-			bigtime_t			Duration() const;
 
 	// methods
 	virtual	BString				LocationURI() const = 0;
@@ -88,7 +88,7 @@ public:
 	virtual	status_t			RestoreFromTrash() = 0;
 
 	// playback
-	virtual	BMediaFile*			CreateMediaFile() const = 0;
+	virtual	TrackSupplier*		CreateTrackSupplier() const = 0;
 
 			void				SetPlaybackFailed();
 			bool				PlaybackFailed() const
@@ -106,6 +106,6 @@ private:
 			bool				fPlaybackFailed;
 };
 
-typedef Reference<PlaylistItem> PlaylistItemRef;
+typedef BReference<PlaylistItem> PlaylistItemRef;
 
 #endif // PLAYLIST_ITEM_H

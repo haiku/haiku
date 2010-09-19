@@ -36,13 +36,10 @@
 
 
 class AudioTrackSupplier;
-class BBitmap;
-class BMediaFile;
-class BMediaTrack;
+class TrackSupplier;
 class PlaylistItem;
 class ProxyAudioSupplier;
 class ProxyVideoSupplier;
-class SoundOutput;
 class VideoTrackSupplier;
 class VideoView;
 
@@ -186,21 +183,19 @@ private:
 	virtual	void				NotifySeekHandled(int64 seekedFrame) const;
 
 
+private:
 			VideoView*			fVideoView;
 			float				fVolume;
 			float				fActiveVolume;
 			bool				fMuted;
 
 			PlaylistItemRef		fItem;
-			BMediaFile*			fMediaFile;
+			TrackSupplier*		fTrackSupplier;
 
 			ProxyVideoSupplier*	fVideoSupplier;
 			ProxyAudioSupplier*	fAudioSupplier;
 			VideoTrackSupplier*	fVideoTrackSupplier;
 			AudioTrackSupplier*	fAudioTrackSupplier;
-
-			BList				fAudioTrackList;
-			BList				fVideoTrackList;
 
 	mutable	int64				fCurrentFrame;
 			bigtime_t			fDuration;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -14,6 +14,8 @@
 #include <FindDirectory.h>
 #include <MediaFile.h>
 #include <Path.h>
+
+#include "MediaFileTrackSupplier.h"
 
 
 static const char* kPathKey = "path";
@@ -91,7 +93,39 @@ status_t
 FilePlaylistItem::SetAttribute(const Attribute& attribute,
 	const BString& string)
 {
-	return B_NOT_SUPPORTED;
+	switch (attribute) {
+		case ATTR_STRING_NAME:
+		{
+			BEntry entry(&fRef, false);
+			return entry.Rename(string.String(), false);
+		}
+	
+		case ATTR_STRING_KEYWORDS:
+			return _SetAttribute("Meta:Keywords", B_STRING_TYPE,
+				string.String(), string.Length());
+
+		case ATTR_STRING_ARTIST:
+			return _SetAttribute("Audio:Artist", B_STRING_TYPE,
+				string.String(), string.Length());
+		case ATTR_STRING_AUTHOR:
+			return _SetAttribute("Media:Author", B_STRING_TYPE,
+				string.String(), string.Length());
+		case ATTR_STRING_ALBUM:
+			return _SetAttribute("Audio:Album", B_STRING_TYPE,
+				string.String(), string.Length());
+		case ATTR_STRING_TITLE:
+			return _SetAttribute("Media:Title", B_STRING_TYPE,
+				string.String(), string.Length());
+		case ATTR_STRING_AUDIO_BITRATE:
+			return _SetAttribute("Audio:Bitrate", B_STRING_TYPE,
+				string.String(), string.Length());
+		case ATTR_STRING_VIDEO_BITRATE:
+			return _SetAttribute("Video:Bitrate", B_STRING_TYPE,
+				string.String(), string.Length());
+
+		default:
+			return B_NOT_SUPPORTED;
+	}
 }
 
 
@@ -103,6 +137,7 @@ FilePlaylistItem::GetAttribute(const Attribute& attribute,
 		string = fRef.name;
 		return B_OK;
 	}
+
 	return B_NOT_SUPPORTED;
 }
 
@@ -111,7 +146,20 @@ status_t
 FilePlaylistItem::SetAttribute(const Attribute& attribute,
 	const int32& value)
 {
-	return B_NOT_SUPPORTED;
+	switch (attribute) {
+		case ATTR_INT32_TRACK:
+			return _SetAttribute("Audio:Track", B_INT32_TYPE, &value,
+				sizeof(int32));
+		case ATTR_INT32_YEAR:
+			return _SetAttribute("Media:Year", B_INT32_TYPE, &value,
+				sizeof(int32));
+		case ATTR_INT32_RATING:
+			return _SetAttribute("Media:Rating", B_INT32_TYPE, &value,
+				sizeof(int32));
+
+		default:
+			return B_NOT_SUPPORTED;
+	}
 }
 
 
@@ -292,9 +340,55 @@ BEntry entry(path.Path());
 // #pragma mark -
 
 
-BMediaFile*
-FilePlaylistItem::CreateMediaFile() const
+TrackSupplier*
+FilePlaylistItem::CreateTrackSupplier() const
 {
-	return new (std::nothrow) BMediaFile(&fRef);
+	BMediaFile* mediaFile = new(std::nothrow) BMediaFile(&fRef);
+	if (mediaFile == NULL)
+		return NULL;
+	TrackSupplier* supplier
+		= new(std::nothrow) MediaFileTrackSupplier(mediaFile);
+	if (supplier == NULL)
+		delete mediaFile;
+
+	return supplier;
+}
+
+
+status_t
+FilePlaylistItem::_SetAttribute(const char* attrName, type_code type,
+	const void* data, size_t size)
+{
+	BEntry entry(&fRef, true);
+	BNode node(&entry);
+	if (node.InitCheck() != B_OK)
+		return node.InitCheck();
+
+	ssize_t written = node.WriteAttr(attrName, type, 0, data, size);
+	if (written != (ssize_t)size) {
+		if (written < 0)
+			return (status_t)written;
+		return B_IO_ERROR;
+	}
+	return B_OK;
+}
+
+
+status_t
+FilePlaylistItem::_GetAttribute(const char* attrName, type_code type,
+	void* data, size_t size)
+{
+	BEntry entry(&fRef, true);
+	BNode node(&entry);
+	if (node.InitCheck() != B_OK)
+		return node.InitCheck();
+
+	ssize_t read = node.ReadAttr(attrName, type, 0, data, size);
+	if (read != (ssize_t)size) {
+		if (read < 0)
+			return (status_t)read;
+		return B_IO_ERROR;
+	}
+	return B_OK;
 }
 

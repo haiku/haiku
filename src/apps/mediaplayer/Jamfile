@@ -77,10 +77,12 @@ Application MediaPlayer :
 
 	# supplier
 	AudioTrackSupplier.cpp
+	MediaFileTrackSupplier.cpp
 	MediaTrackAudioSupplier.cpp
 	MediaTrackVideoSupplier.cpp
 	ProxyAudioSupplier.cpp
 	ProxyVideoSupplier.cpp
+	TrackSupplier.cpp
 	VideoTrackSupplier.cpp
 
 	# support

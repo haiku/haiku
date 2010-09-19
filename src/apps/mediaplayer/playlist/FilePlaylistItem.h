@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef FILE_PLAYLIST_ITEM_H
@@ -48,9 +48,17 @@ public:
 	virtual	status_t			RestoreFromTrash();
 
 	// playback
-	virtual	BMediaFile*			CreateMediaFile() const;
+	virtual	TrackSupplier*		CreateTrackSupplier() const;
 
 			const entry_ref&	Ref() const { return fRef; }
+
+private:
+			status_t			_SetAttribute(const char* attrName,
+									type_code type, const void* data,
+									size_t size);
+			status_t			_GetAttribute(const char* attrName,
+									type_code type, void* data,
+									size_t size);
 
 private:
 			entry_ref			fRef;
