@@ -73,7 +73,7 @@ public:
 
 	virtual void				WindowTabLocationChanged(Window* window,
 									float location);
-	virtual void				SizeLimitChanged(Window* window,
+	virtual void				SizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
 
