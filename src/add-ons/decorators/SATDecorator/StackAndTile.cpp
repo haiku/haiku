@@ -126,7 +126,7 @@ void
 StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 {
 	SATWindow* satWindow = GetSATWindow(window);
-	if (!satWindow)
+	if (!satWindow || !satWindow->GetDecorator())
 		return;
 
 	int32 modifiers = message->FindInt32("modifiers");
