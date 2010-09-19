@@ -14,7 +14,7 @@
 #include "AudioReader.h"
 
 class AudioTrackSupplier : public AudioReader {
- public:
+public:
 								AudioTrackSupplier();
 	virtual						~AudioTrackSupplier();
 

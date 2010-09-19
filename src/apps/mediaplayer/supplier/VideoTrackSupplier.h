@@ -13,7 +13,7 @@
 #include <MediaFormats.h>
 
 class VideoTrackSupplier {
- public:
+public:
 								VideoTrackSupplier();
 	virtual						~VideoTrackSupplier();
 
