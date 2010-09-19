@@ -522,8 +522,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ]
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
-		InstallOptionalHaikuImagePackage gcc-4.3.3-r1a2-x86-gcc4-2010-04-25-1.zip
-			: $(baseURL)/gcc-4.3.3-r1a2-x86-gcc4-2010-04-25-1.zip ;
+		InstallOptionalHaikuImagePackage gcc-4.4.4-r1a2-x86-gcc4-2010-07-05.zip
+			: $(baseURL)/gcc-4.4.4-r1a2-x86-gcc4-2010-07-05.zip ;
 	}
 
 	if $(HAIKU_GCC_VERSION[1]) = 4 {
