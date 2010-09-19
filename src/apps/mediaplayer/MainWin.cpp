@@ -49,6 +49,7 @@
 
 #include "AudioProducer.h"
 #include "ControllerObserver.h"
+#include "DurationToString.h"
 #include "FilePlaylistItem.h"
 #include "MainApp.h"
 #include "PeakView.h"
@@ -2337,23 +2338,40 @@ MainWin::_UpdatePlaylistItemFile()
 		time_t duration = fController->TimeDuration() / 1000000L;
 
 		char text[256];
-		snprintf(text, sizeof(text), "%02ld:%02ld", duration / 60,
-			duration % 60);
+		duration_to_string(duration, text, sizeof(text));
 		node.WriteAttr(kDurationAttrName, B_STRING_TYPE, 0, text,
 			strlen(text) + 1);
 	}
 
 	// Write audio bitrate
-	if (fHasAudio && !fHasVideo) {
+	if (fHasAudio) {
 		status = node.GetAttrInfo("Audio:Bitrate", &info);
 		if (status != B_OK || info.size == 0) {
 			media_format format;
 			if (fController->GetEncodedAudioFormat(&format) == B_OK
 				&& format.type == B_MEDIA_ENCODED_AUDIO) {
-				int32 bitrate = (int32)(format.u.encoded_audio.bit_rate / 1000);
+				int32 bitrate = (int32)(format.u.encoded_audio.bit_rate
+					/ 1000);
 				char text[256];
 				snprintf(text, sizeof(text), "%ld kbit", bitrate);
 				node.WriteAttr("Audio:Bitrate", B_STRING_TYPE, 0, text,
+					strlen(text) + 1);
+			}
+		}
+	}
+
+	// Write video bitrate
+	if (fHasVideo) {
+		status = node.GetAttrInfo("Video:Bitrate", &info);
+		if (status != B_OK || info.size == 0) {
+			media_format format;
+			if (fController->GetEncodedVideoFormat(&format) == B_OK
+				&& format.type == B_MEDIA_ENCODED_VIDEO) {
+				int32 bitrate = (int32)(format.u.encoded_video.avg_bit_rate
+					/ 1000);
+				char text[256];
+				snprintf(text, sizeof(text), "%ld kbit", bitrate);
+				node.WriteAttr("Video:Bitrate", B_STRING_TYPE, 0, text,
 					strlen(text) + 1);
 			}
 		}
