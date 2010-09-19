@@ -69,6 +69,7 @@ const struct supported_device {
 	{0x29c0, 0x29c2, INTEL_TYPE_G33, "Q35"},
 	{0x29d0, 0x29d2, INTEL_TYPE_G33, "Q33"},
 
+	{0x2e30, 0x2e32, INTEL_TYPE_GM45, "GMA_X4500_VGA"},
 	{0x2a40, 0x2a42, INTEL_TYPE_GM45, "GM45"},
 };
 
