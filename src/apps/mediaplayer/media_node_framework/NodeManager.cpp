@@ -111,7 +111,8 @@ NodeManager::InitCheck()
 void
 NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 {
-	if (fMediaRoster != NULL && fMediaRoster->Lock()) {
+	if (fVideoConsumer != NULL && fMediaRoster != NULL
+		&& fMediaRoster->Lock()) {
 		BMediaNode::run_mode runMode = mode > 0 ?
 			BMediaNode::B_DROP_DATA : BMediaNode::B_OFFLINE;
 		status_t ret = fMediaRoster->SetRunModeNode(fVideoConnection.consumer,
