@@ -862,7 +862,8 @@ void
 SATGroup::_SplitGroupIfNecessary(SATWindow* removedWindow)
 {
 	// if there are windows stacked in the area we don't need to split
-	if (removedWindow->GetWindowArea()->WindowList().CountItems() > 1)
+	WindowArea* area = removedWindow->GetWindowArea();
+	if (!area || area->WindowList().CountItems() > 1)
 		return;
 
 	WindowAreaList neighbourWindows;
