@@ -253,7 +253,7 @@ DesktopObservable::NotifyWindowTabLocationChanged(Window* window,
 
 
 void
-DesktopObservable::NotifySizeLimitChanged(Window* window, int32 minWidth,
+DesktopObservable::NotifySizeLimitsChanged(Window* window, int32 minWidth,
 	int32 maxWidth, int32 minHeight, int32 maxHeight)
 {
 	if (fWeAreInvoking)
@@ -262,7 +262,7 @@ DesktopObservable::NotifySizeLimitChanged(Window* window, int32 minWidth,
 
 	for (DesktopListener* listener = fDesktopListenerList.First();
 		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
-		listener->SizeLimitChanged(window, minWidth, maxWidth, minHeight,
+		listener->SizeLimitsChanged(window, minWidth, maxWidth, minHeight,
 			maxHeight);
 }
 

@@ -58,9 +58,9 @@ public:
 
 	virtual void				WindowTabLocationChanged(Window* window,
 									float location) = 0;
-	virtual void				SizeLimitChanged(Window* window, int32 minWidth,
-									int32 maxWidth, int32 minHeight,
-									int32 maxHeight) = 0;
+	virtual void				SizeLimitsChanged(Window* window,
+									int32 minWidth, int32 maxWidth,
+									int32 minHeight, int32 maxHeight) = 0;
 
 	virtual bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings) = 0;
@@ -109,7 +109,7 @@ public:
 
 			void				NotifyWindowTabLocationChanged(Window* window,
 									float location);
-			void				NotifySizeLimitChanged(Window* window,
+			void				NotifySizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
 

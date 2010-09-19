@@ -962,7 +962,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			fLink.Flush();
 
-			fDesktop->NotifySizeLimitChanged(fWindow, minWidth, maxWidth,
+			fDesktop->NotifySizeLimitsChanged(fWindow, minWidth, maxWidth,
 				minHeight, maxHeight);
 			break;
 		}
