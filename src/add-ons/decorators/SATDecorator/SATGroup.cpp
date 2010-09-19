@@ -861,6 +861,10 @@ SATGroup::_FindTab(const TabList& list, float position)
 void
 SATGroup::_SplitGroupIfNecessary(SATWindow* removedWindow)
 {
+	// if there are windows stacked in the area we don't need to split
+	if (removedWindow->GetWindowArea()->WindowList().CountItems() > 1)
+		return;
+
 	WindowAreaList neighbourWindows;
 
 	_FillNeighbourList(neighbourWindows, removedWindow->GetWindowArea());
