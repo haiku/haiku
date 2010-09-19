@@ -1491,6 +1491,8 @@ Desktop::SetWindowLook(Window* window, window_look newLook)
 		// finds out it needs to resize itself...
 
 	RebuildAndRedrawAfterWindowChange(window, dirty);
+
+	NotifyWindowLookChanged(window, newLook);
 }
 
 

@@ -267,6 +267,19 @@ DesktopObservable::NotifySizeLimitsChanged(Window* window, int32 minWidth,
 }
 
 
+void
+DesktopObservable::NotifyWindowLookChanged(Window* window, window_look look)
+{
+	if (fWeAreInvoking)
+		return;
+	InvokeGuard invokeGuard(fWeAreInvoking);
+
+	for (DesktopListener* listener = fDesktopListenerList.First();
+		listener != NULL; listener = fDesktopListenerList.GetNext(listener))
+		listener->WindowLookChanged(window, look);
+}
+
+
 bool
 DesktopObservable::SetDecoratorSettings(Window* window,
 	const BMessage& settings)

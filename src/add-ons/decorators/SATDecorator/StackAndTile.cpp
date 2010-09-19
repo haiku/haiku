@@ -281,7 +281,7 @@ StackAndTile::WindowMinimized(Window* window, bool minimize)
 void
 StackAndTile::WindowTabLocationChanged(Window* window, float location)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
+	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;
 
@@ -294,7 +294,7 @@ void
 StackAndTile::SizeLimitsChanged(Window* window, int32 minWidth, int32 maxWidth,
 	int32 minHeight, int32 maxHeight)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
+	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;
 	WindowArea* area = satWindow->GetWindowArea();
@@ -304,10 +304,27 @@ StackAndTile::SizeLimitsChanged(Window* window, int32 minWidth, int32 maxWidth,
 }
 
 
+void
+StackAndTile::WindowLookChanged(Window* window, window_look look)
+{
+	// if the decorator has been removed remove it from the stacking group
+	if (look != B_NO_BORDER_WINDOW_LOOK)
+		return;
+
+	SATWindow* satWindow = GetSATWindow(window);
+	if (!satWindow)
+		return;
+	SATGroup* group = satWindow->GetGroup();
+	if (!group)
+		return;
+	group->RemoveWindow(satWindow);	
+}
+
+
 bool
 StackAndTile::SetDecoratorSettings(Window* window, const BMessage& settings)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
+	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return false;
 
@@ -319,7 +336,7 @@ StackAndTile::SetDecoratorSettings(Window* window, const BMessage& settings)
 void
 StackAndTile::GetDecoratorSettings(Window* window, BMessage& settings)
 {
-	SATWindow*	satWindow = GetSATWindow(window);
+	SATWindow* satWindow = GetSATWindow(window);
 	if (!satWindow)
 		return;
 

@@ -14,6 +14,7 @@
 #include <Point.h>
 
 #include <ServerLink.h>
+#include "Window.h"
 
 
 class BMessage;
@@ -61,6 +62,8 @@ public:
 	virtual void				SizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight) = 0;
+	virtual void				WindowLookChanged(Window* window,
+									window_look look) = 0;
 
 	virtual bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings) = 0;
@@ -112,6 +115,8 @@ public:
 			void				NotifySizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
+			void				NotifyWindowLookChanged(Window* window,
+									window_look look);
 
 			bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings);

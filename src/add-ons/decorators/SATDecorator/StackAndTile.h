@@ -76,6 +76,8 @@ public:
 	virtual void				SizeLimitsChanged(Window* window,
 									int32 minWidth, int32 maxWidth,
 									int32 minHeight, int32 maxHeight);
+	virtual void				WindowLookChanged(Window* window,
+									window_look look);
 
 	virtual bool				SetDecoratorSettings(Window* window,
 									const BMessage& settings);
