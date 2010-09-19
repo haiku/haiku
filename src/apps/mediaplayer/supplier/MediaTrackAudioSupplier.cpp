@@ -239,40 +239,47 @@ MediaTrackAudioSupplier::_InitFromTrack()
 	TRACE("_InitFromTrack()\n");
 	// Try to suggest a big buffer size, we do a lot of caching...
 	fFormat.u.raw_audio.buffer_size = 16384;
-	if (fMediaTrack && fMediaTrack->DecodedFormat(&fFormat) == B_OK
-		&& fFormat.type == B_MEDIA_RAW_AUDIO) {
-
-		#ifdef TRACE_AUDIO_SUPPLIER
-			char formatString[256];
-			string_for_format(fFormat, formatString, 256);
-			TRACE("_InitFromTrack(): format is: %s\n", formatString);
-			TRACE("_InitFromTrack(): buffer size: %ld\n",
-				fFormat.u.raw_audio.buffer_size);
-		#endif
-
-		fBuffer = new (nothrow) char[fFormat.u.raw_audio.buffer_size];
-		_AllocateBuffers();
-
-		// Find out, if the track has key frames: as a heuristic we
-		// check, if the first and the second frame have the same backward
-		// key frame.
-		// Note: It shouldn't harm that much, if we're wrong and the
-		// track has key frame although we found out that it has not.
-		int64 keyFrame0 = 0;
-		int64 keyFrame1 = 1;
-		fMediaTrack->FindKeyFrameForFrame(&keyFrame0,
-			B_MEDIA_SEEK_CLOSEST_BACKWARD);
-		fMediaTrack->FindKeyFrameForFrame(&keyFrame1,
-			B_MEDIA_SEEK_CLOSEST_BACKWARD);
-		fHasKeyFrames = (keyFrame0 == keyFrame1);
-
-		// get the length of the track
-		fCountFrames = fMediaTrack->CountFrames();
-
-		TRACE("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
-			fHasKeyFrames, fCountFrames);
-	} else
+	if (fMediaTrack == NULL || fMediaTrack->DecodedFormat(&fFormat) != B_OK
+		|| fFormat.type != B_MEDIA_RAW_AUDIO) {
 		fMediaTrack = NULL;
+		return;
+	}
+
+	#ifdef TRACE_AUDIO_SUPPLIER
+		char formatString[256];
+		string_for_format(fFormat, formatString, 256);
+		TRACE("_InitFromTrack(): format is: %s\n", formatString);
+		TRACE("_InitFromTrack(): buffer size: %ld\n",
+			fFormat.u.raw_audio.buffer_size);
+	#endif
+
+	fBuffer = new (nothrow) char[fFormat.u.raw_audio.buffer_size];
+	_AllocateBuffers();
+
+	// Find out, if the track has key frames: as a heuristic we
+	// check, if the first and the second frame have the same backward
+	// key frame.
+	// Note: It shouldn't harm that much, if we're wrong and the
+	// track has key frame although we found out that it has not.
+#if 0
+	int64 keyFrame0 = 0;
+	int64 keyFrame1 = 1;
+	fMediaTrack->FindKeyFrameForFrame(&keyFrame0,
+		B_MEDIA_SEEK_CLOSEST_BACKWARD);
+	fMediaTrack->FindKeyFrameForFrame(&keyFrame1,
+		B_MEDIA_SEEK_CLOSEST_BACKWARD);
+	fHasKeyFrames = (keyFrame0 == keyFrame1);
+#else
+	fHasKeyFrames = true;
+#endif
+
+	// get the length of the track
+	fCountFrames = fMediaTrack->CountFrames();
+
+	TRACE("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
+		fHasKeyFrames, fCountFrames);
+	printf("_InitFromTrack(): keyframes: %d, frame count: %lld\n",
+		fHasKeyFrames, fCountFrames);
 }
 
 // _FramesPerBuffer
