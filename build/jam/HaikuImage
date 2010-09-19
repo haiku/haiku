@@ -191,6 +191,13 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 		AddWifiFirmwareToHaikuImage $(driver) : $(package) : $(archive)
 			: $(extract) ;
 	}
+	local packages = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGES) ] ;
+	local archives = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVES) ] ;
+	for archive in $(archives) {
+		AddWifiFirmwareToHaikuImage $(driver) : $(packages[1]) : $(archive)
+			: $(extract) ;
+		packages = $(packages[2-]) ;
+	}
 }
 
 

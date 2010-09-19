@@ -24,7 +24,13 @@ KernelAddon iprowifi4965 :
 	libfreebsd_network.a
 	;
 
-HAIKU_WIFI_FIRMWARE_PACKAGE on iprowifi4965 = iwlwifi-4965-ucode-4.44.1.20 ;
-HAIKU_WIFI_FIRMWARE_ARCHIVE on iprowifi4965 = iwlwifi-4965-ucode-4.44.1.20.tgz ;
+HAIKU_WIFI_FIRMWARE_PACKAGES on iprowifi4965 = 
+	iwlwifi-1000-ucode-128.50.3.1 iwlwifi-4965-ucode-4.44.1.20
+	iwlwifi-5000-ucode-8.24.2.12 iwlwifi-5150-ucode-8.24.2.2
+	iwlwifi-6000-ucode-9.221.4.1 iwlwifi-6050-ucode-9.201.4.1 ;
+HAIKU_WIFI_FIRMWARE_ARCHIVES on iprowifi4965 = 
+	iwlwifi-1000-ucode-128.50.3.1.tgz iwlwifi-4965-ucode-4.44.1.20.tgz
+	iwlwifi-5000-ucode-8.24.2.12.tgz iwlwifi-5150-ucode-8.24.2.2.tgz
+	iwlwifi-6000-ucode-9.221.4.1.tgz iwlwifi-6050-ucode-9.201.4.1.tgz ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on iprowifi4965 = true ;
 
