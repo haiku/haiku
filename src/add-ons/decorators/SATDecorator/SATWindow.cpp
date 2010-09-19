@@ -297,7 +297,6 @@ SATWindow::SATWindow(StackAndTile* sat, Window* window)
 	fSATTiling(this),
 	fShutdown(false)
 {
-	fDecorator = dynamic_cast<SATDecorator*>(fWindow->Decorator());
 	fDesktop = fWindow->Desktop();
 
 	fGroupCookie = &fOwnGroupCookie;
@@ -316,6 +315,13 @@ SATWindow::~SATWindow()
 		fForeignGroupCookie.GetGroup()->RemoveWindow(this);
 	if (fOwnGroupCookie.GetGroup())
 		fOwnGroupCookie.GetGroup()->RemoveWindow(this);
+}
+
+
+SATDecorator*
+SATWindow::GetDecorator()
+{
+	return static_cast<SATDecorator*>(fWindow->Decorator());
 }
 
 
@@ -540,14 +546,15 @@ SATWindow::PositionManagedBySAT()
 bool
 SATWindow::HighlightTab(bool active)
 {
-	if (!fDecorator)
+	SATDecorator* decorator = GetDecorator();
+	if (!decorator)
 		return false;
 
 	if (IsTabHighlighted() == active)
 		return false;
 
 	BRegion dirty;
-	fDecorator->HighlightTab(active, &dirty);
+	decorator->HighlightTab(active, &dirty);
 	fWindow->ProcessDirtyRegion(dirty);
 
 	return true;
@@ -557,14 +564,15 @@ SATWindow::HighlightTab(bool active)
 bool
 SATWindow::HighlightBorders(bool active)
 {
-	if (!fDecorator)
+	SATDecorator* decorator = GetDecorator();
+	if (!decorator)
 		return false;
 
 	if (IsBordersHighlighted() == active)
 		return false;
 
 	BRegion dirty;
-	fDecorator->HighlightBorders(active, &dirty);
+	decorator->HighlightBorders(active, &dirty);
 	fWindow->ProcessDirtyRegion(dirty);
 	return true;
 }
@@ -573,8 +581,9 @@ SATWindow::HighlightBorders(bool active)
 bool
 SATWindow::IsTabHighlighted()
 {
-	if (fDecorator)
-		return fDecorator->IsTabHighlighted();
+	SATDecorator* decorator = GetDecorator();
+	if (decorator)
+		return decorator->IsTabHighlighted();
 	return false;
 }
 
@@ -582,8 +591,9 @@ SATWindow::IsTabHighlighted()
 bool
 SATWindow::IsBordersHighlighted()
 {
-	if (fDecorator)
-		return fDecorator->IsBordersHighlighted();
+	SATDecorator* decorator = GetDecorator();
+	if (decorator)
+		return decorator->IsBordersHighlighted();
 	return false;
 }
 
@@ -591,10 +601,11 @@ SATWindow::IsBordersHighlighted()
 bool
 SATWindow::SetStackedMode(bool stacked)
 {
-	if (!fDecorator)
+	SATDecorator* decorator = GetDecorator();
+	if (!decorator)
 		return false;
 	BRegion dirty;
-	fDecorator->SetStackedMode(stacked, &dirty);
+	decorator->SetStackedMode(stacked, &dirty);
 	fDesktop->RebuildAndRedrawAfterWindowChange(fWindow, dirty);
 	return true;
 }
@@ -603,10 +614,11 @@ SATWindow::SetStackedMode(bool stacked)
 bool
 SATWindow::SetStackedTabLength(float length)
 {
-	if (!fDecorator)
+	SATDecorator* decorator = GetDecorator();
+	if (!decorator)
 		return false;
 	BRegion dirty;
-	fDecorator->SetStackedTabLength(length, &dirty);
+	decorator->SetStackedTabLength(length, &dirty);
 	fDesktop->RebuildAndRedrawAfterWindowChange(fWindow, dirty);
 	return true;
 }
@@ -615,7 +627,8 @@ SATWindow::SetStackedTabLength(float length)
 bool
 SATWindow::SetStackedTabMoving(bool moving)
 {
-	if (!fDecorator)
+	SATDecorator* decorator = GetDecorator();
+	if (!decorator)
 		return false;
 
 	if (!moving)

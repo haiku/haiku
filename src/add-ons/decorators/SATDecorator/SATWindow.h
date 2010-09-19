@@ -77,7 +77,7 @@ public:
 							~SATWindow();
 
 		Window*				GetWindow() { return fWindow; }
-		SATDecorator*		GetDecorator() { return fDecorator; }
+		SATDecorator*		GetDecorator();
 		StackAndTile*		GetStackAndTile() { return fStackAndTile; }
 		Desktop*			GetDesktop() { return fDesktop; }
 		//! Can be NULL if memory allocation failed!
@@ -130,7 +130,6 @@ private:
 		void						_InitGroup();
 
 		Window*						fWindow;
-		SATDecorator*				fDecorator;
 		StackAndTile*				fStackAndTile;
 		Desktop*					fDesktop;
 
