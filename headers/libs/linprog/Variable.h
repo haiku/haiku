@@ -7,7 +7,7 @@
 #define	VARIABLE_H
 
 #include <File.h>
-#include <List.h>
+#include <ObjectList.h>
 #include <String.h>
 #include <SupportDefs.h>
 
@@ -60,7 +60,7 @@ protected:
 
 private:
 			LinearSpec*			fLS;
-			BList*				fUsingSummands;
+			BObjectList<Summand>	fUsingSummands;
 				// All Summands that link to this Variable
 			double				fValue;
 			double				fMin;

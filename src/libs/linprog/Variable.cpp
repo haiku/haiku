@@ -97,11 +97,7 @@ Variable::Min() const
 void
 Variable::SetMin(double min)
 {
-	if (!fIsValid)
-		return;
-
-	fMin = min;
-	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
+	SetRange(min, fMax);
 }
 
 
@@ -125,11 +121,7 @@ Variable::Max() const
 void
 Variable::SetMax(double max)
 {
-	if (!fIsValid)
-		return;
-
-	fMax = max;
-	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
+	SetRange(fMin, max);
 }
 
 
@@ -325,8 +317,9 @@ Variable::Invalidate()
  * Constructor.
  */
 Variable::Variable(LinearSpec* ls)
-	: fLS(ls),
-	fUsingSummands(new BList()),
+	:
+	fLS(ls),
+
 	fValue(NAN),
 	fMin(0),
 	fMax(DBL_MAX),
@@ -353,6 +346,5 @@ Variable::Variable(LinearSpec* ls)
 Variable::~Variable()
 {
 	Invalidate();
-	delete fUsingSummands;
 }
 

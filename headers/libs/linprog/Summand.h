@@ -3,7 +3,6 @@
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef	SUMMAND_H
 #define	SUMMAND_H
 
@@ -17,20 +16,19 @@ class Variable;
  * A summand of a linear term.
  */
 class Summand {
-
 public:
-	double			Coeff();
-	void			SetCoeff(double coeff);
-	Variable*		Var();
-	void			SetVar(Variable* var);
-					Summand(double coeff, Variable* var);
-					~Summand();
+								Summand(double coeff, Variable* var);
+								~Summand();
+
+			double				Coeff();
+			void				SetCoeff(double coeff);
+			Variable*			Var();
+			void				SetVar(Variable* var);
 
 private:
-	double			fCoeff;
-	Variable*		fVar;
-	bool    fUsedInPenaltyFunction;  //not set yet
-
+			double				fCoeff;
+			Variable*			fVar;
+			bool    			fUsedInPenaltyFunction;  //not set yet
 };
 
 }	// namespace LinearProgramming
