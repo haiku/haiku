@@ -16,8 +16,6 @@ LinearSpec::LinearSpec()
 	fLpPresolved(NULL),
 	fOptimization(MINIMIZE),
 	fObjFunction(new BList()),
-	fVariables(new BList()),
-	fConstraints(new BList()),
 	fResult(ERROR),
 	fObjectiveValue(NAN),
 	fSolvingTime(NAN)
@@ -37,13 +35,15 @@ LinearSpec::LinearSpec()
 LinearSpec::~LinearSpec()
 {
 	RemovePresolved();
-	for (int32 i=0; i<fConstraints->CountItems(); i++)
-		delete (Constraint*)fConstraints->ItemAt(i);
-	for (int32 i=0; i<fObjFunction->CountItems(); i++)
+	for (int32 i = 0; i < fConstraints.CountItems(); i++)
+		delete (Constraint*)fConstraints.ItemAt(i);
+	for (int32 i = 0; i < fObjFunction->CountItems(); i++)
 		delete (Summand*)fObjFunction->ItemAt(i);
-	for (int32 i=0; i<fVariables->CountItems(); i++)
-		delete (Variable*)fVariables->ItemAt(i);
+	for (int32 i = 0; i < fVariables.CountItems(); i++)
+		delete (Variable*)fVariables.ItemAt(i);
 	delete_lp(fLP);
+
+	delete fObjFunction;
 }
 
 
@@ -426,9 +426,9 @@ LinearSpec::Presolve()
 	fObjectiveValue = get_objective(fLpPresolved);
 
 	if (fResult == OPTIMAL) {
-		int32 size = fVariables->CountItems();
+		int32 size = fVariables.CountItems();
 		for (int32 i = 0; i < size; i++) {
-			Variable* current = (Variable*)fVariables->ItemAt(i);
+			Variable* current = (Variable*)fVariables.ItemAt(i);
 			current->SetValue(get_var_primalresult(fLpPresolved,
 					get_Norig_rows(fLpPresolved) + current->Index()));
 		}
@@ -460,14 +460,14 @@ LinearSpec::Solve()
 	fObjectiveValue = get_objective(fLP);
 
 	if (fResult == OPTIMAL) {
-		int32 size = fVariables->CountItems();
+		int32 size = fVariables.CountItems();
 		double x[size];
 		if (!get_variables(fLP, &x[0]))
 			printf("Error in get_variables.");
 
 		int32 i = 0;
 		while (i < size) {
-			((Variable*)fVariables->ItemAt(i))->SetValue(x[i]);
+			((Variable*)fVariables.ItemAt(i))->SetValue(x[i]);
 			i++;
 		}
 	}
@@ -543,7 +543,7 @@ LinearSpec::SetOptimization(OptimizationType value)
 BList*
 LinearSpec::Variables() const
 {
-	return fVariables;
+	return const_cast<BList*>(&fVariables);
 }
 
 
@@ -555,7 +555,7 @@ LinearSpec::Variables() const
 BList*
 LinearSpec::Constraints() const
 {
-	return fConstraints;
+	return const_cast<BList*>(&fConstraints);
 }
 
 
@@ -607,14 +607,14 @@ void
 LinearSpec::GetString(BString& string) const
 {
 	string << "LinearSpec " << (int32)this << ":\n";
-	for (int i = 0; i < fVariables->CountItems(); i++) {
-		Variable* variable = static_cast<Variable*>(fVariables->ItemAt(i));
+	for (int i = 0; i < fVariables.CountItems(); i++) {
+		Variable* variable = static_cast<Variable*>(fVariables.ItemAt(i));
 		variable->GetString(string);
 		string << "=" << (float)variable->Value() << " ";
 	}
 	string << "\n";
-	for (int i = 0; i < fConstraints->CountItems(); i++) {
-		Constraint* c = static_cast<Constraint*>(fConstraints->ItemAt(i));
+	for (int i = 0; i < fConstraints.CountItems(); i++) {
+		Constraint* c = static_cast<Constraint*>(fConstraints.ItemAt(i));
 		string << i << ": ";
 		c->GetString(string);
 		string << "\n";

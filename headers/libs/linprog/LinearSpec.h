@@ -112,8 +112,8 @@ private:
 	OptimizationType	fOptimization;
 	lprec*				fLP;
 	BList*				fObjFunction;
-	BList*				fVariables;
-	BList*				fConstraints;
+	BList				fVariables;
+	BList				fConstraints;
 	ResultType			fResult;
 	double 				fObjectiveValue;
 	double 				fSolvingTime;
