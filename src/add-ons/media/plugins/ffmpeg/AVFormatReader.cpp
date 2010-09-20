@@ -27,12 +27,12 @@ extern "C" {
 #include "gfx_util.h"
 
 
-//#define TRACE_AVFORMAT_READER
+#define TRACE_AVFORMAT_READER
 #ifdef TRACE_AVFORMAT_READER
 #	define TRACE printf
 #	define TRACE_IO(a...)
-#	define TRACE_SEEK(a...)
-#	define TRACE_FIND(a...)
+#	define TRACE_SEEK(a...) printf(a)
+#	define TRACE_FIND(a...) printf(a)
 #	define TRACE_PACKET(a...)
 #else
 #	define TRACE(a...)

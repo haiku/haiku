@@ -16,13 +16,13 @@ extern "C" {
 
 
 static const DemuxerFormat gDemuxerTable[] = {
-//	{
-//		// Tested with a limited number of streams. Some videos show bad
-//		// artifacts on keyframes with our own ASF Reader, while they play
-//		// fine with this Reader. But seeking seems to be a problem.
-//		"asf", "ASF Movie", "video/x-asf",
-//		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
-//	},
+	{
+		// Tested with a limited number of streams. Some videos show bad
+		// artifacts on keyframes with our own ASF Reader, while they play
+		// fine with this Reader. But seeking seems to be a problem.
+		"asf", "ASF Movie", "video/x-asf",
+		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
+	},
 	{
 		// Tested with many streams and works very well, with many older
 		// files, the native AVI reader does not work.
