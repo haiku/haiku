@@ -325,15 +325,14 @@ Constraint::SetPenaltyPos(double value)
 const char*
 Constraint::Label()
 {
-	return fLabel;
+	return fLabel.String();
 }
 
 
 void
 Constraint::SetLabel(const char* label)
 {
-	fLabel = (char*) malloc(strlen(label) + 1);
-	strcpy(fLabel, label);
+	fLabel = label;
 }
 
 
@@ -471,8 +470,7 @@ void
 Constraint::GetString(BString& string) const
 {
 	string << "Constraint ";
-	if (fLabel)
-		string << fLabel;
+	string << fLabel;
 	string << "(" << (int32)this << "): ";
 
 	if (fIsValid) {
@@ -504,7 +502,6 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	fOp(op),
 	fRightSide(rightSide),
 	fOwner(NULL),
-	fLabel(NULL),
 	fIsValid(true)
 {
 	double coeffs[summands->CountItems() + 2];

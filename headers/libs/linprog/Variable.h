@@ -3,13 +3,13 @@
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef	VARIABLE_H
 #define	VARIABLE_H
 
 #include <File.h>
-#include <SupportDefs.h>
 #include <List.h>
+#include <String.h>
+#include <SupportDefs.h>
 
 
 namespace LinearProgramming {
@@ -22,52 +22,52 @@ class Summand;
  * Contains minimum and maximum values.
  */
 class Variable {
-
 public:
-	int32				Index() const;
-	LinearSpec*			LS() const;
-	double				Value() const;
-	void				SetValue(double value);
-	double				Min() const;
-	void				SetMin(double min);
-	double				Max() const;
-	void				SetMax(double max);
-	void				SetRange(double min, double max);
+			int32				Index() const;
+			LinearSpec*			LS() const;
+			double				Value() const;
+			void				SetValue(double value);
+			double				Min() const;
+			void				SetMin(double min);
+			double				Max() const;
+			void				SetMax(double max);
+			void				SetRange(double min, double max);
 
-	const char*			Label();
-	void				SetLabel(const char* label);
+			const char*			Label();
+			void				SetLabel(const char* label);
 
-						operator BString() const;
-	void				GetString(BString& string) const;
+								operator BString() const;
+			void				GetString(BString& string) const;
 
-	Constraint*			IsEqual(Variable* var);
-	Constraint*			IsSmallerOrEqual(Variable* var);
-	Constraint*			IsGreaterOrEqual(Variable* var);
+			Constraint*			IsEqual(Variable* var);
+			Constraint*			IsSmallerOrEqual(Variable* var);
+			Constraint*			IsGreaterOrEqual(Variable* var);
 
-	Constraint*			IsEqual(Variable* var,
-							double penaltyNeg, double penaltyPos);
-	Constraint*			IsSmallerOrEqual(Variable* var,
-							double penaltyNeg, double penaltyPos);
-	Constraint*			IsGreaterOrEqual(Variable* var,
-							double penaltyNeg, double penaltyPos);
+			Constraint*			IsEqual(Variable* var,
+									double penaltyNeg, double penaltyPos);
+			Constraint*			IsSmallerOrEqual(Variable* var,
+									double penaltyNeg, double penaltyPos);
+			Constraint*			IsGreaterOrEqual(Variable* var,
+									double penaltyNeg, double penaltyPos);
 
-	bool				IsValid();
-	void				Invalidate();
+			bool				IsValid();
+			void				Invalidate();
 
-	virtual				~Variable();
+			virtual				~Variable();
 
 protected:
-						Variable(LinearSpec* ls);
+								Variable(LinearSpec* ls);
 
 private:
-	LinearSpec*			fLS;
-	BList*				fUsingSummands;  // All Summands that link to this Variable
-	double				fValue;
-	double				fMin;
-	double				fMax;
-	char*				fLabel;
+			LinearSpec*			fLS;
+			BList*				fUsingSummands;
+				// All Summands that link to this Variable
+			double				fValue;
+			double				fMin;
+			double				fMax;
+			BString				fLabel;
 
-	bool				fIsValid;
+			bool				fIsValid;
 
 public:
 	friend class		LinearSpec;

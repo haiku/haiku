@@ -154,15 +154,14 @@ Variable::SetRange(double min, double max)
 const char*
 Variable::Label()
 {
-	return fLabel;
+	return fLabel.String();
 }
 
 
 void
 Variable::SetLabel(const char* label)
 {
-	fLabel = (char*) malloc(strlen(label) + 1);
-	strcpy(fLabel, label);
+	fLabel = label;
 }
 
 
@@ -298,7 +297,7 @@ Variable::Invalidate()
 	fLS->Variables()->RemoveItem(this);
 
 	// invalidate all constraints that use this variable
-	BList* markedForInvalidation = new BList();
+	BList markedForInvalidation;
 	BList* constraints = fLS->Constraints();
 	for (int i = 0; i < constraints->CountItems(); i++) {
 		Constraint* constraint = static_cast<Constraint*>(
@@ -311,15 +310,14 @@ Variable::Invalidate()
 		for (int j = 0; j < summands->CountItems(); j++) {
 			Summand* summand = static_cast<Summand*>(summands->ItemAt(j));
 			if (summand->Var() == this) {
-				markedForInvalidation->AddItem(constraint);
+				markedForInvalidation.AddItem(constraint);
 				break;
 			}
 		}
 	}
-	for (int i = 0; i < markedForInvalidation->CountItems(); i++)
-		static_cast<Constraint*>(markedForInvalidation->ItemAt(i))
+	for (int i = 0; i < markedForInvalidation.CountItems(); i++)
+		static_cast<Constraint*>(markedForInvalidation.ItemAt(i))
 			->Invalidate();
-	delete markedForInvalidation;
 }
 
 
@@ -355,7 +353,6 @@ Variable::Variable(LinearSpec* ls)
 Variable::~Variable()
 {
 	Invalidate();
-	free(fLabel);
 	delete fUsingSummands;
 }
 
