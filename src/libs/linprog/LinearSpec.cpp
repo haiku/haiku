@@ -12,7 +12,8 @@
  * Creates a new specification for a linear programming problem.
  */
 LinearSpec::LinearSpec()
-	: fCountColumns(0),
+	:
+	fCountColumns(0),
 	fLpPresolved(NULL),
 	fOptimization(MINIMIZE),
 	fObjFunction(new BList()),

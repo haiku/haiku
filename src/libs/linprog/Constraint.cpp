@@ -339,40 +339,41 @@ Constraint::SetLabel(const char* label)
 void
 Constraint::WriteXML(BFile* file)
 {
-	if (file->IsWritable() && fOwner == NULL) {
-		char buffer[200];
+	if (!file->IsWritable())
+		return;
 
-		file->Write(buffer, sprintf(buffer, "\t<constraint>\n"));
-		file->Write(buffer, sprintf(buffer, "\t\t<leftside>\n"));
+	char buffer[200];
 
-		Summand* summand;
-		for (int32 i = 0; i < fLeftSide->CountItems(); i++) {
-			summand = (Summand*)fLeftSide->ItemAt(i);
-			file->Write(buffer, sprintf(buffer, "\t\t\t<summand>\n"));
-			file->Write(buffer, sprintf(buffer, "\t\t\t\t<coeff>%f</coeff>\n",
-				summand->Coeff()));
-			BString varStr = *(summand->Var());
-			file->Write(buffer, sprintf(buffer, "\t\t\t\t<var>%s</var>\n",
-				varStr.String()));
-			file->Write(buffer, sprintf(buffer, "\t\t\t</summand>\n"));
-		}
+	file->Write(buffer, sprintf(buffer, "\t<constraint>\n"));
+	file->Write(buffer, sprintf(buffer, "\t\t<leftside>\n"));
 
-		file->Write(buffer, sprintf(buffer, "\t\t</leftside>\n"));
-
-		const char* op = "??";
-		if (fOp == OperatorType(EQ))
-			op = "EQ";
-		else if (fOp == OperatorType(LE))
-			op = "LE";
-		else if (fOp == OperatorType(GE))
-			op = "GE";
-
-		file->Write(buffer, sprintf(buffer, "\t\t<op>%s</op>\n", op));
-		file->Write(buffer, sprintf(buffer, "\t\t<rightside>%f</rightside>\n", fRightSide));
-		//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltyneg>%s</penaltyneg>\n", PenaltyNeg()));
-		//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltypos>%s</penaltypos>\n", PenaltyPos()));
-		file->Write(buffer, sprintf(buffer, "\t</constraint>\n"));
+	Summand* summand;
+	for (int32 i = 0; i < fLeftSide->CountItems(); i++) {
+		summand = (Summand*)fLeftSide->ItemAt(i);
+		file->Write(buffer, sprintf(buffer, "\t\t\t<summand>\n"));
+		file->Write(buffer, sprintf(buffer, "\t\t\t\t<coeff>%f</coeff>\n",
+			summand->Coeff()));
+		BString varStr = *(summand->Var());
+		file->Write(buffer, sprintf(buffer, "\t\t\t\t<var>%s</var>\n",
+			varStr.String()));
+		file->Write(buffer, sprintf(buffer, "\t\t\t</summand>\n"));
 	}
+
+	file->Write(buffer, sprintf(buffer, "\t\t</leftside>\n"));
+
+	const char* op = "??";
+	if (fOp == OperatorType(EQ))
+		op = "EQ";
+	else if (fOp == OperatorType(LE))
+		op = "LE";
+	else if (fOp == OperatorType(GE))
+		op = "GE";
+
+	file->Write(buffer, sprintf(buffer, "\t\t<op>%s</op>\n", op));
+	file->Write(buffer, sprintf(buffer, "\t\t<rightside>%f</rightside>\n", fRightSide));
+	//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltyneg>%s</penaltyneg>\n", PenaltyNeg()));
+	//~ file->Write(buffer, sprintf(buffer, "\t\t<penaltypos>%s</penaltypos>\n", PenaltyPos()));
+	file->Write(buffer, sprintf(buffer, "\t</constraint>\n"));
 }
 
 
@@ -401,20 +402,6 @@ Constraint::DPos() const
 	if (fDPosObjSummand == NULL)
 		return NULL;
 	return fDPosObjSummand->Var();
-}
-
-
-void
-Constraint::SetOwner(void* owner)
-{
-	fOwner = owner;
-}
-
-
-void*
-Constraint::Owner() const
-{
-	return fOwner;
 }
 
 
@@ -497,11 +484,11 @@ Constraint::GetString(BString& string) const
  */
 Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	double rightSide, double penaltyNeg, double penaltyPos)
-	: fLS(ls),
+	:
+	fLS(ls),
 	fLeftSide(summands),
 	fOp(op),
 	fRightSide(rightSide),
-	fOwner(NULL),
 	fIsValid(true)
 {
 	double coeffs[summands->CountItems() + 2];

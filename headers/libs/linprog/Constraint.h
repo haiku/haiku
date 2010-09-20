@@ -62,9 +62,6 @@ public:
 			Variable*			DNeg() const;
 			Variable*			DPos() const;
 
-			void				SetOwner(void* owner);
-			void*				Owner() const;
-
 			bool				IsValid();
 			void				Invalidate();
 
@@ -85,7 +82,6 @@ private:
 			double				fRightSide;
 			Summand*			fDNegObjSummand;
 			Summand*			fDPosObjSummand;
-			void*				fOwner;
 			BString				fLabel;
 
 			bool				fIsValid;

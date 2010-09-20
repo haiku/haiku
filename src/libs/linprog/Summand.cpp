@@ -4,9 +4,9 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "LinearSpec.h"
 #include "Summand.h"
 #include "Variable.h"
-#include "LinearSpec.h"
 
 
 /**
@@ -76,4 +76,3 @@ Summand::Summand(double coeff, Variable* var)
 	fUsedInPenaltyFunction = false;
 	fVar->fUsingSummands.AddItem(this);
 }
-

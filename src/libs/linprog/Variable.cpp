@@ -319,7 +319,6 @@ Variable::Invalidate()
 Variable::Variable(LinearSpec* ls)
 	:
 	fLS(ls),
-
 	fValue(NAN),
 	fMin(0),
 	fMax(DBL_MAX),
