@@ -602,16 +602,16 @@ BALMLayout::SetPerformancePath(char* path)
 BSize
 BALMLayout::CalculateMinSize()
 {
-	BList* oldObjFunction = ObjFunction();
-	BList* newObjFunction = new BList(2);
+	SummandList* oldObjFunction = ObjFunction();
+	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(1.0, fRight));
 	newObjFunction->AddItem(new Summand(1.0, fBottom));
 	SetObjFunction(newObjFunction);
 	SolveLayout();
 	SetObjFunction(oldObjFunction);
 	UpdateObjFunction();
-	delete (Summand*)newObjFunction->ItemAt(0);
-	delete (Summand*)newObjFunction->ItemAt(1);
+	delete newObjFunction->ItemAt(0);
+	delete newObjFunction->ItemAt(1);
 	delete newObjFunction;
 
 	if (Result() == UNBOUNDED)
@@ -631,16 +631,16 @@ BALMLayout::CalculateMinSize()
 BSize
 BALMLayout::CalculateMaxSize()
 {
-	BList* oldObjFunction = ObjFunction();
-	BList* newObjFunction = new BList(2);
+	SummandList* oldObjFunction = ObjFunction();
+	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(-1.0, fRight));
 	newObjFunction->AddItem(new Summand(-1.0, fBottom));
 	SetObjFunction(newObjFunction);
 	SolveLayout();
 	SetObjFunction(oldObjFunction);
 	UpdateObjFunction();
-	delete (Summand*)newObjFunction->ItemAt(0);
-	delete (Summand*)newObjFunction->ItemAt(1);
+	delete newObjFunction->ItemAt(0);
+	delete newObjFunction->ItemAt(1);
 	delete newObjFunction;
 
 	if (Result() == UNBOUNDED)

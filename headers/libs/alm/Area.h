@@ -18,10 +18,13 @@
 #include "Area.h"
 #include "Row.h"
 #include "Column.h"
-#include "Constraint.h"
+
+
+class Constraint;
 
 
 namespace BALM {
+
 
 class BALMLayout;
 

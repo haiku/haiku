@@ -43,7 +43,7 @@ Constraint::Index() const
  *
  * @return pointer to a BList containing the summands on the left side of the constraint
  */
-BList*
+SummandList*
 Constraint::LeftSide()
 {
 	return fLeftSide;
@@ -57,7 +57,7 @@ Constraint::LeftSide()
  * @param summands	a BList containing the Summand objects that make up the new left side
  */
 void
-Constraint::SetLeftSide(BList* summands)
+Constraint::SetLeftSide(SummandList* summands)
 {
 	if (!fIsValid)
 		return;
@@ -77,7 +77,7 @@ Constraint::UpdateLeftSide()
 	int varIndexes[fLeftSide->CountItems() + 2];
 	int32 i;
 	for (i = 0; i < fLeftSide->CountItems(); i++) {
-		Summand* s = (Summand*)fLeftSide->ItemAt(i);
+		Summand* s = fLeftSide->ItemAt(i);
 		coeffs[i] = s->Coeff();
 		varIndexes[i] = s->Var()->Index();
 	}
@@ -109,7 +109,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1)
 		return;
 
 	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete (Summand*)fLeftSide->ItemAt(i);
+		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
 	fLeftSide->AddItem(new Summand(coeff1, var1));
 	UpdateLeftSide();
@@ -124,7 +124,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 		return;
 
 	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete (Summand*)fLeftSide->ItemAt(i);
+		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
 	fLeftSide->AddItem(new Summand(coeff1, var1));
 	fLeftSide->AddItem(new Summand(coeff2, var2));
@@ -141,7 +141,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 		return;
 
 	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete (Summand*)fLeftSide->ItemAt(i);
+		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
 	fLeftSide->AddItem(new Summand(coeff1, var1));
 	fLeftSide->AddItem(new Summand(coeff2, var2));
@@ -160,7 +160,7 @@ Constraint::SetLeftSide(double coeff1, Variable* var1,
 		return;
 
 	for (int i=0; i<fLeftSide->CountItems(); i++)
-		delete (Summand*)fLeftSide->ItemAt(i);
+		delete fLeftSide->ItemAt(i);
 	fLeftSide->MakeEmpty();
 	fLeftSide->AddItem(new Summand(coeff1, var1));
 	fLeftSide->AddItem(new Summand(coeff2, var2));
@@ -482,7 +482,7 @@ Constraint::GetString(BString& string) const
 /**
  * Constructor.
  */
-Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
+Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 	double rightSide, double penaltyNeg, double penaltyPos)
 	:
 	fLS(ls),
@@ -495,7 +495,7 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	int varIndexes[summands->CountItems() + 2];
 	int32 i;
 	for (i = 0; i < summands->CountItems(); i++) {
-		Summand* s = (Summand*)summands->ItemAt(i);
+		Summand* s = summands->ItemAt(i);
 		coeffs[i] = s->Coeff();
 		varIndexes[i] = s->Var()->Index();
 	}

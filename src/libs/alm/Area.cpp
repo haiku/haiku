@@ -4,22 +4,24 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <algorithm>	// for max
+
+#include <Button.h>
+#include <CheckBox.h>
+#include <PictureButton.h>
+#include <RadioButton.h>
+#include <StatusBar.h>
+#include <StringView.h>
+
 #include "Area.h"
-#include "Column.h"
 #include "BALMLayout.h"
+#include "Column.h"
+#include "Constraint.h"
 #include "OperatorType.h"
 #include "Row.h"
 #include "XTab.h"
 #include "YTab.h"
 
-#include <Button.h>
-#include <RadioButton.h>
-#include <CheckBox.h>
-#include <StringView.h>
-#include <PictureButton.h>
-#include <StatusBar.h>
-
-#include <algorithm>	// for max
 
 using namespace std;
 

@@ -16,7 +16,7 @@ LinearSpec::LinearSpec()
 	fCountColumns(0),
 	fLpPresolved(NULL),
 	fOptimization(MINIMIZE),
-	fObjFunction(new BList()),
+	fObjFunction(new SummandList()),
 	fResult(ERROR),
 	fObjectiveValue(NAN),
 	fSolvingTime(NAN)
@@ -70,7 +70,8 @@ LinearSpec::AddVariable()
  * @return the new constraint
  */
 Constraint*
-LinearSpec::AddConstraint(BList* summands, OperatorType op, double rightSide)
+LinearSpec::AddConstraint(SummandList* summands, OperatorType op,
+	double rightSide)
 {
 	Constraint* c = new Constraint(this, summands, op, rightSide,
 		INFINITY, INFINITY);
@@ -92,7 +93,7 @@ Constraint*
 LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	OperatorType op, double rightSide)
 {
-	BList* summands = new BList(1);
+	SummandList* summands = new SummandList(1);
 	summands->AddItem(new Summand(coeff1, var1));
 	Constraint* c = new Constraint(this, summands, op, rightSide,
 		INFINITY, INFINITY);
@@ -116,7 +117,7 @@ Constraint*
 LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	double coeff2, Variable* var2, OperatorType op, double rightSide)
 {
-	BList* summands = new BList(2);
+	SummandList* summands = new SummandList(2);
 	summands->AddItem(new Summand(coeff1, var1));
 	summands->AddItem(new Summand(coeff2, var2));
 	Constraint* c = new Constraint(this, summands, op, rightSide,
@@ -144,7 +145,7 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		double coeff2, Variable* var2, double coeff3, Variable* var3,
 		OperatorType op, double rightSide)
 {
-	BList* summands = new BList(3);
+	SummandList* summands = new SummandList(3);
 	summands->AddItem(new Summand(coeff1, var1));
 	summands->AddItem(new Summand(coeff2, var2));
 	summands->AddItem(new Summand(coeff3, var3));
@@ -175,7 +176,7 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		double coeff2, Variable* var2, double coeff3, Variable* var3,
 		double coeff4, Variable* var4, OperatorType op, double rightSide)
 {
-	BList* summands = new BList(3);
+	SummandList* summands = new SummandList(3);
 	summands->AddItem(new Summand(coeff1, var1));
 	summands->AddItem(new Summand(coeff2, var2));
 	summands->AddItem(new Summand(coeff3, var3));
@@ -199,7 +200,7 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
 Constraint*
-LinearSpec::AddConstraint(BList* summands, OperatorType op,
+LinearSpec::AddConstraint(SummandList* summands, OperatorType op,
 		double rightSide, double penaltyNeg, double penaltyPos)
 {
 	Constraint* c = new Constraint(this, summands, op, rightSide,
@@ -223,7 +224,7 @@ Constraint*
 LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		OperatorType op, double rightSide, double penaltyNeg, double penaltyPos)
 {
-	BList* summands = new BList(1);
+	SummandList* summands = new SummandList(1);
 	summands->AddItem(new Summand(coeff1, var1));
 	Constraint* c = new Constraint(this, summands, op, rightSide,
 		penaltyNeg, penaltyPos);
@@ -249,7 +250,7 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	double coeff2, Variable* var2, OperatorType op, double rightSide,
 	double penaltyNeg, double penaltyPos)
 {
-	BList* summands = new BList(2);
+	SummandList* summands = new SummandList(2);
 	summands->AddItem(new Summand(coeff1, var1));
 	summands->AddItem(new Summand(coeff2, var2));
 	Constraint* c = new Constraint(this, summands, op, rightSide,
@@ -278,7 +279,7 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	double coeff2, Variable* var2, double coeff3, Variable* var3,
 	OperatorType op, double rightSide, double penaltyNeg, double penaltyPos)
 {
-	BList* summands = new BList(2);
+	SummandList* summands = new SummandList(2);
 	summands->AddItem(new Summand(coeff1, var1));
 	summands->AddItem(new Summand(coeff2, var2));
 	summands->AddItem(new Summand(coeff3, var3));
@@ -311,7 +312,7 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 	double coeff4, Variable* var4, OperatorType op, double rightSide,
 	double penaltyNeg, double penaltyPos)
 {
-	BList* summands = new BList(2);
+	SummandList* summands = new SummandList(2);
 	summands->AddItem(new Summand(coeff1, var1));
 	summands->AddItem(new Summand(coeff2, var2));
 	summands->AddItem(new Summand(coeff3, var3));
@@ -343,7 +344,7 @@ LinearSpec::AddPenaltyFunction(Variable* var, BList* xs, BList* gs)
  *
  * @return BList containing the objective function's summands
  */
-BList*
+SummandList*
 LinearSpec::ObjFunction()
 {
 	return fObjFunction;
@@ -357,7 +358,7 @@ LinearSpec::ObjFunction()
  * @param summands	BList containing the objective function's summands
  */
 void
-LinearSpec::SetObjFunction(BList* summands)
+LinearSpec::SetObjFunction(SummandList* summands)
 {
 	fObjFunction = summands;
 	UpdateObjFunction();

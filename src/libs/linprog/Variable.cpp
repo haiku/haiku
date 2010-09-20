@@ -298,9 +298,9 @@ Variable::Invalidate()
 		if (!constraint->IsValid())
 			continue;
 
-		BList* summands = constraint->LeftSide();
+		SummandList* summands = constraint->LeftSide();
 		for (int j = 0; j < summands->CountItems(); j++) {
-			Summand* summand = static_cast<Summand*>(summands->ItemAt(j));
+			Summand* summand = summands->ItemAt(j);
 			if (summand->Var() == this) {
 				markedForInvalidation.AddItem(constraint);
 				break;

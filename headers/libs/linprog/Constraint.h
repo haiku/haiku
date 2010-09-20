@@ -9,7 +9,7 @@
 #include <math.h>
 
 #include <File.h>
-#include <List.h>
+#include <ObjectList.h>
 #include <String.h>
 #include <SupportDefs.h>
 
@@ -31,8 +31,8 @@ class Constraint {
 public:
 			int32				Index() const;
 
-			BList*				LeftSide();
-			void				SetLeftSide(BList* summands);
+			SummandList*		LeftSide();
+			void				SetLeftSide(SummandList* summands);
 			void				UpdateLeftSide();
 			void				SetLeftSide(double coeff1, Variable* var1);
 			void				SetLeftSide(double coeff1, Variable* var1,
@@ -71,13 +71,14 @@ public:
 								~Constraint();
 
 protected:
-								Constraint(LinearSpec* ls, BList* summands,
-										OperatorType op, double rightSide,
-										double penaltyNeg, double penaltyPos);
+								Constraint(LinearSpec* ls,
+									SummandList* summands, OperatorType op,
+									double rightSide, double penaltyNeg,
+									double penaltyPos);
 
 private:
 			LinearSpec*			fLS;
-			BList*				fLeftSide;
+			SummandList*		fLeftSide;
 			OperatorType		fOp;
 			double				fRightSide;
 			Summand*			fDNegObjSummand;
@@ -90,6 +91,10 @@ public:
 	friend class		LinearSpec;
 
 };
+
+
+typedef BObjectList<Constraint> ConstraintList;
+
 
 }	// namespace LinearProgramming
 

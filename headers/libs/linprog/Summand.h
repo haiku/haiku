@@ -6,6 +6,8 @@
 #ifndef	SUMMAND_H
 #define	SUMMAND_H
 
+#include <ObjectList.h>
+
 
 namespace LinearProgramming {
 
@@ -31,9 +33,13 @@ private:
 			bool    			fUsedInPenaltyFunction;  //not set yet
 };
 
+typedef BObjectList<Summand> SummandList;
+
 }	// namespace LinearProgramming
 
 using LinearProgramming::Summand;
+using LinearProgramming::SummandList;
+
 
 #endif	// OBJ_FUNCTION_SUMMAND_H
 

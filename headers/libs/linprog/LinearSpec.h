@@ -43,7 +43,7 @@ public:
 
 			Variable*			AddVariable();
 
-			Constraint*			AddConstraint(BList* summands,
+			Constraint*			AddConstraint(SummandList* summands,
 									OperatorType op, double rightSide);
 			Constraint*			AddConstraint(double coeff1, Variable* var1,
 									OperatorType op, double rightSide);
@@ -60,7 +60,7 @@ public:
 									double coeff4, Variable* var4,
 									OperatorType op, double rightSide);
 
-			Constraint*			AddConstraint(BList* summands,
+			Constraint*			AddConstraint(SummandList* summands,
 									OperatorType op, double rightSide,
 									double penaltyNeg, double penaltyPos);
 			Constraint*			AddConstraint(double coeff1, Variable* var1,
@@ -85,8 +85,8 @@ public:
 			PenaltyFunction*	AddPenaltyFunction(Variable* var, BList* xs,
 									BList* gs);
 
-			BList*				ObjFunction();
-			void				SetObjFunction(BList* summands);
+			SummandList*		ObjFunction();
+			void				SetObjFunction(SummandList* summands);
 			void				UpdateObjFunction();
 
 			ResultType			Presolve();
@@ -115,7 +115,7 @@ private:
 			lprec*				fLpPresolved;
 			OptimizationType	fOptimization;
 			lprec*				fLP;
-			BList*				fObjFunction;
+			SummandList*		fObjFunction;
 			BList				fVariables;
 			BList				fConstraints;
 			ResultType			fResult;
