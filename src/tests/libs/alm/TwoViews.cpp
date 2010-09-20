@@ -35,7 +35,7 @@ public:
 
 		// add a constraint: 2*x1 == right
 		// i.e. x1 is in the middle of the layout 
-		layout->AddConstraint(2, x1, -1, layout->Right(),
+		layout->Solver()->AddConstraint(2, x1, -1, layout->Right(),
 			OperatorType(EQ), 0);
 	}
 	
