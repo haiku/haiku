@@ -22,7 +22,7 @@
 
 RunningTeamsWindow::RunningTeamsWindow()
     : BWindow(BRect(100, 100, 500, 250), "Running Teams", B_DOCUMENT_WINDOW,
-        B_ASYNCHRONOUS_CONTROLS)
+        B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS)
 {
     BMessage settings;
     _LoadSettings(settings);
@@ -34,18 +34,22 @@ RunningTeamsWindow::RunningTeamsWindow()
     }
 
     // Add a teams list view
-    BRect rect = Bounds();
-    rect.right -= B_V_SCROLL_BAR_WIDTH;
-    fTeamsListView = new TeamsListView(rect, "RunningTeamsList", B_FOLLOW_ALL);
+	frame = Bounds();
+    frame.right -= B_V_SCROLL_BAR_WIDTH;
 
-    // Set the message sent on team list item invocation
+    fTeamsListView = new TeamsListView(frame, "RunningTeamsList");
     fTeamsListView->SetInvocationMessage(new BMessage(kMsgDebugThisTeam));
 
-    BScrollView * scroller = new BScrollView("RunningTeamsListScroller",
-        fTeamsListView, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS,
-        false, true);	// Vertical scrollbar only
+    BScrollView * teamsScroller = new BScrollView("RunningTeamsListScroller",
+        fTeamsListView, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER);
 
-    AddChild(scroller);
+	AddChild(teamsScroller);
+
+	// small visual tweak
+	if (BScrollBar* scrollBar = teamsScroller->ScrollBar(B_VERTICAL)) {
+		scrollBar->MoveBy(0, -1);
+		scrollBar->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
+	}
 }
 
 

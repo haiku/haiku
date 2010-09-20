@@ -41,8 +41,7 @@ class TeamListItem : public BStringItem {
 
 class TeamsListView : public BListView {
     public:
-        TeamsListView(BRect rect, const char* name,
-            uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP);
+        TeamsListView(BRect frame, const char* name);
         virtual ~TeamsListView();
 
         TeamListItem* FindItem(team_id teamId);

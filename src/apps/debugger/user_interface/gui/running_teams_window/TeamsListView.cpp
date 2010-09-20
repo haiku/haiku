@@ -171,13 +171,17 @@ TeamListItem::_SetTo(team_info & info)
 //	#pragma mark -
 
 
-TeamsListView::TeamsListView(BRect rect, const char* name, uint32 resizingMode)
-    : BListView(rect, name, B_SINGLE_SELECTION_LIST, resizingMode),
+TeamsListView::TeamsListView(BRect frame, const char* name)
+    : BListView(frame, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL),
     fUpdateRunner(NULL)
 {
     team_info tmi;
     get_team_info(B_CURRENT_TEAM, &tmi);
     fThisTeam = tmi.team;
+
+#ifdef __HAIKU__
+	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
+#endif
 }
 
 
