@@ -15,7 +15,6 @@
 #include <SupportDefs.h>
 
 #include "Constraint.h"
-
 #include "OperatorType.h"
 #include "OptimizationType.h"
 #include "PenaltyFunction.h"
@@ -25,13 +24,8 @@
 
 #include "lp_lib.h"
 
+
 namespace LinearProgramming {
-
-class Constraint;
-class ObjFunctionSummand;
-class PenaltyFunction;
-class Variable;
-
 
 /*!
  * Specification of a linear programming problem.
@@ -106,8 +100,8 @@ public:
 			void				GetString(BString& string) const;
 
 protected:
-			BList*				Variables() const;
-			BList*				Constraints() const;
+			VariableList*		Variables() const;
+			ConstraintList*		Constraints() const;
 
 			int32 				fCountColumns;
 
@@ -116,8 +110,8 @@ private:
 			OptimizationType	fOptimization;
 			lprec*				fLP;
 			SummandList*		fObjFunction;
-			BList				fVariables;
-			BList				fConstraints;
+			VariableList		fVariables;
+			ConstraintList		fConstraints;
 			ResultType			fResult;
 			double 				fObjectiveValue;
 			double 				fSolvingTime;

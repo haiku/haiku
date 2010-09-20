@@ -542,10 +542,10 @@ LinearSpec::SetOptimization(OptimizationType value)
  *
  * @return the variables
  */
-BList*
+VariableList*
 LinearSpec::Variables() const
 {
-	return const_cast<BList*>(&fVariables);
+	return const_cast<VariableList*>(&fVariables);
 }
 
 
@@ -554,10 +554,10 @@ LinearSpec::Variables() const
  *
  * @return the constraints
  */
-BList*
+ConstraintList*
 LinearSpec::Constraints() const
 {
-	return const_cast<BList*>(&fConstraints);
+	return const_cast<ConstraintList*>(&fConstraints);
 }
 
 

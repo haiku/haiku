@@ -289,11 +289,10 @@ Variable::Invalidate()
 	fLS->Variables()->RemoveItem(this);
 
 	// invalidate all constraints that use this variable
-	BList markedForInvalidation;
-	BList* constraints = fLS->Constraints();
+	ConstraintList markedForInvalidation;
+	ConstraintList* constraints = fLS->Constraints();
 	for (int i = 0; i < constraints->CountItems(); i++) {
-		Constraint* constraint = static_cast<Constraint*>(
-			constraints->ItemAt(i));
+		Constraint* constraint = constraints->ItemAt(i);
 
 		if (!constraint->IsValid())
 			continue;
@@ -308,8 +307,7 @@ Variable::Invalidate()
 		}
 	}
 	for (int i = 0; i < markedForInvalidation.CountItems(); i++)
-		static_cast<Constraint*>(markedForInvalidation.ItemAt(i))
-			->Invalidate();
+		markedForInvalidation.ItemAt(i)->Invalidate();
 }
 
 

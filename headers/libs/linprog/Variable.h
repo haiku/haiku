@@ -76,8 +76,13 @@ public:
 
 };
 
+
+typedef BObjectList<Variable> VariableList;
+
+
 }	// namespace LinearProgramming
 
 using LinearProgramming::Variable;
+using LinearProgramming::VariableList;
 
 #endif	// VARIABLE_H

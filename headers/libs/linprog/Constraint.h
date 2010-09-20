@@ -99,6 +99,7 @@ typedef BObjectList<Constraint> ConstraintList;
 }	// namespace LinearProgramming
 
 using LinearProgramming::Constraint;
+using LinearProgramming::ConstraintList;
 
 #endif	// CONSTRAINT_H
 
