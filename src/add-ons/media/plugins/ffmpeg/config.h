@@ -59,7 +59,11 @@
 #define HAVE_ALSA_ASOUNDLIB_H 0
 // #define HAVE_ALTIVEC_H 0
 #define HAVE_ARPA_INET_H 1
-#define HAVE_ATTRIBUTE_MAY_ALIAS 1
+#if __GNUC__ >= 3
+#	define HAVE_ATTRIBUTE_MAY_ALIAS 1
+#else
+#	define HAVE_ATTRIBUTE_MAY_ALIAS 0
+#endif
 #define HAVE_ATTRIBUTE_PACKED 1
 #define HAVE_BSWAP 1
 #define HAVE_CLOSESOCKET 0
@@ -78,10 +82,16 @@
 #define HAVE_EBP_AVAILABLE 1
 // We use position independant code so no EBX
 #define HAVE_EBX_AVAILABLE 0
-#define HAVE_EXP2 1
-#define HAVE_EXP2F 1
+#if __GNUC__ >= 3
+#	define HAVE_EXP2 1
+#	define HAVE_EXP2F 1
+#	define HAVE_FAST_CLZ 1
+#else
+#	define HAVE_EXP2 0
+#	define HAVE_EXP2F 0
+#	define HAVE_FAST_CLZ 0
+#endif // __GNUC__ >= 3
 #define HAVE_FAST_64BIT 0
-#define HAVE_FAST_CLZ 1
 #define HAVE_FAST_CMOV 0
 #define HAVE_FAST_UNALIGNED 1
 #define HAVE_FORK 1
@@ -137,7 +147,11 @@
 #define HAVE_SYS_SELECT_H 1
 #define HAVE_SYS_SOUNDCARD_H 0
 #define HAVE_SYS_VIDEOIO_H 0
-#define HAVE_TEN_OPERANDS 1
+#if __GNUC__ >= 3
+#	define HAVE_TEN_OPERANDS 1
+#else
+#	define HAVE_TEN_OPERANDS 0
+#endif
 #define HAVE_TERMIOS_H 1
 #define HAVE_THREADS 1
 #define HAVE_TRUNCF 1
