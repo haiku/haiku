@@ -13,11 +13,11 @@
 #include <SupportDefs.h>
 #include <View.h>
 
+#include "Column.h"
+#include "LinearSpec.h"
+#include "Row.h"
 #include "XTab.h"
 #include "YTab.h"
-#include "Area.h"
-#include "Row.h"
-#include "Column.h"
 
 
 class Constraint;
@@ -25,8 +25,6 @@ class Constraint;
 
 namespace BALM {
 
-
-class BALMLayout;
 
 /**
  * Rectangular area in the GUI, defined by a tab on each side.
@@ -96,22 +94,22 @@ public:
 			BList*				HasSameSizeAs(Area* area);
 
 protected:
-								Area(BALMLayout* ls, XTab* left, YTab* top,
-										XTab* right, YTab* bottom,
-										BView* content,
-										BSize minContentSize);
-								Area(BALMLayout* ls, Row* row, Column* column,
-										BView* content,
-										BSize minContentSize);
+								Area(BALMLayout* layout,
+									LinearSpec* ls, XTab* left, YTab* top,
+									XTab* right, YTab* bottom, BView* content,
+									BSize minContentSize);
+								Area(BALMLayout* layout,
+									LinearSpec* ls, Row* row, Column* column,
+									BView* content, BSize minContentSize);
 			void				DoLayout();
 
 private:
 			void				InitChildArea();
 			void				UpdateHorizontal();
 			void				UpdateVertical();
-			void				Init(BALMLayout* ls, XTab* left, YTab* top,
-									XTab* right, YTab* bottom,
-									BView* content,
+			void				Init(BALMLayout* layout,
+									LinearSpec* ls, XTab* left, YTab* top,
+									XTab* right, YTab* bottom, BView* content,
 									BSize minContentSize);
 
 public:
@@ -124,7 +122,10 @@ protected:
 			BList*				fConstraints;
 
 private:
-			BALMLayout*			fLS;
+			// TODO remove the layout pointer when making Area a LayoutItem
+			BALMLayout*			fALMLayout;
+
+			LinearSpec*			fLS;
 			XTab*				fLeft;
 			XTab*				fRight;
 			YTab*				fTop;

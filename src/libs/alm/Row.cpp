@@ -206,7 +206,7 @@ Row::~Row()
 /**
  * Constructor.
  */
-Row::Row(BALMLayout* ls)
+Row::Row(LinearSpec* ls)
 {
 	fLS = ls;
 	fTop = new YTab(ls);

@@ -3,31 +3,30 @@
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
  * Distributed under the terms of the MIT License.
  */
-
 #ifndef	Y_TAB_H
 #define	Y_TAB_H
 
+#include "LinearSpec.h"
 #include "Variable.h"
 
+
 namespace BALM {
-	
-class BALMLayout;
+
 
 /**
  * Horizontal grid line (y-tab).
  */
 class YTab : public Variable {
-	
 protected:
-						YTab(BALMLayout* ls);
+								YTab(LinearSpec* ls);
 
 protected:
-	/**
-	 * Property signifying if there is a constraint which relates
-	 * this tab to a different tab that is further to the top.
-	 * Only used for reverse engineering.
-	 */
-	bool				fTopLink;
+			/**
+			* Property signifying if there is a constraint which relates
+			* this tab to a different tab that is further to the top.
+			* Only used for reverse engineering.
+			*/
+			bool				fTopLink;
 
 public:
 	friend class			Area;

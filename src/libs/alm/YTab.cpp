@@ -5,13 +5,12 @@
  */
 
 #include "YTab.h"
-#include "BALMLayout.h"
 
 
 /**
  * Constructor.
  */
-YTab::YTab(BALMLayout* ls)
+YTab::YTab(LinearSpec* ls)
 	: Variable(ls)
 {
 	fTopLink = false;

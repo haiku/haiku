@@ -204,7 +204,7 @@ Column::~Column()
 /**
  * Constructor.
  */
-Column::Column(BALMLayout* ls)
+Column::Column(LinearSpec* ls)
 {
 	fLS = ls;
 	fLeft = new XTab(ls);

@@ -27,7 +27,7 @@ namespace BALM {
 /**
  * A GUI layout engine using the ALM.
  */
-class BALMLayout : public BAbstractLayout, public LinearSpec {
+class BALMLayout : public BAbstractLayout {
 public:
 								BALMLayout();
 			void				SolveLayout();
@@ -80,6 +80,8 @@ public:
 			char*				PerformancePath() const;
 			void				SetPerformancePath(char* path);
 
+			LinearSpec*			Solver();
+
 private:
 			BSize				CalculateMinSize();
 			BSize				CalculateMaxSize();
@@ -88,6 +90,8 @@ private:
 private:
 			LayoutStyleType		fLayoutStyle;
 			bool				fActivated;
+
+			LinearSpec			fSolver;
 
 			BList*				fAreas;
 			XTab*				fLeft;

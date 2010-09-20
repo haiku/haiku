@@ -21,17 +21,16 @@
  */
 BALMLayout::BALMLayout()
 	:
-	BAbstractLayout(),
-	LinearSpec()
+	BAbstractLayout()
 {
 	fLayoutStyle = FIT_TO_SIZE;
 	fActivated = true;
 
 	fAreas = new BList(1);
-	fLeft = new XTab(this);
-	fRight = new XTab(this);
-	fTop = new YTab(this);
-	fBottom = new YTab(this);
+	fLeft = new XTab(&fSolver);
+	fRight = new XTab(&fSolver);
+	fTop = new YTab(&fSolver);
+	fBottom = new YTab(&fSolver);
 
 	// the Left tab is always at x-position 0, and the Top tab is always at y-position 0
 	fLeft->SetRange(0, 0);
@@ -75,12 +74,13 @@ BALMLayout::SolveLayout()
 
 	ResultType result;
 	for (int32 tries = 0; tries < 15; tries++) {
-		result = Solve();
+		result = fSolver.Solve();
 		if (fPerformancePath != NULL) {
-			char buffer [100];
+			/*char buffer [100];
 			file->Write(buffer, sprintf(buffer, "%d\t%fms\t#vars=%ld\t"
-				"#constraints=%ld\n", result, SolvingTime(),
-				Variables()->CountItems(), Constraints()->CountItems()));
+				"#constraints=%ld\n", result, fSolver.SolvingTime(),
+				fSolver.Variables()->CountItems(),
+				fSolver.Constraints()->CountItems()));*/
 		}
 		if (result == OPTIMAL || result == INFEASIBLE)
 			break;
@@ -97,7 +97,7 @@ BALMLayout::SolveLayout()
 XTab*
 BALMLayout::AddXTab()
 {
-	return new XTab(this);
+	return new XTab(&fSolver);
 }
 
 
@@ -109,7 +109,7 @@ BALMLayout::AddXTab()
 YTab*
 BALMLayout::AddYTab()
 {
-	return new YTab(this);
+	return new YTab(&fSolver);
 }
 
 
@@ -121,7 +121,7 @@ BALMLayout::AddYTab()
 Row*
 BALMLayout::AddRow()
 {
-	return new Row(this);
+	return new Row(&fSolver);
 }
 
 
@@ -135,7 +135,7 @@ BALMLayout::AddRow()
 Row*
 BALMLayout::AddRow(YTab* top, YTab* bottom)
 {
-	Row* row = new Row(this);
+	Row* row = new Row(&fSolver);
 	if (top != NULL)
 		row->Constraints()->AddItem(row->Top()->IsEqual(top));
 	if (bottom != NULL)
@@ -152,7 +152,7 @@ BALMLayout::AddRow(YTab* top, YTab* bottom)
 Column*
 BALMLayout::AddColumn()
 {
-	return new Column(this);
+	return new Column(&fSolver);
 }
 
 
@@ -166,7 +166,7 @@ BALMLayout::AddColumn()
 Column*
 BALMLayout::AddColumn(XTab* left, XTab* right)
 {
-	Column* column = new Column(this);
+	Column* column = new Column(&fSolver);
 	if (left != NULL) column->Constraints()->AddItem(column->Left()->IsEqual(left));
 	if (right != NULL) column->Constraints()->AddItem(column->Right()->IsEqual(right));
 	return column;
@@ -191,7 +191,8 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	InvalidateLayout();
 	if (content != NULL)
 		TargetView()->AddChild(content);
-	Area* area = new Area(this, left, top, right, bottom, content, minContentSize);
+	Area* area = new Area(this, &fSolver, left, top, right, bottom, content,
+		minContentSize);
 	fAreas->AddItem(area);
 	return area;
 }
@@ -213,7 +214,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content,
 	InvalidateLayout();
 	if (content != NULL)
 		TargetView()->AddChild(content);
-	Area* area = new Area(this, row, column, content, minContentSize);
+	Area* area = new Area(this, &fSolver, row, column, content, minContentSize);
 	fAreas->AddItem(area);
 	return area;
 }
@@ -236,7 +237,8 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	InvalidateLayout();
 	if (content != NULL)
 		TargetView()->AddChild(content);
-	Area* area = new Area(this, left, top, right, bottom, content, BSize(0, 0));
+	Area* area = new Area(this, &fSolver, left, top, right, bottom, content,
+		BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
 	fAreas->AddItem(area);
@@ -258,7 +260,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 	InvalidateLayout();
 	if (content != NULL)
 		TargetView()->AddChild(content);
-	Area* area = new Area(this, row, column, content, BSize(0, 0));
+	Area* area = new Area(this, &fSolver, row, column, content, BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
 	fAreas->AddItem(area);
@@ -546,14 +548,15 @@ BALMLayout::DerivedLayoutItems()
 	SolveLayout();
 
 	// if new layout is infasible, use previous layout
-	if (Result() == INFEASIBLE) {
+	if (fSolver.Result() == INFEASIBLE) {
 		fActivated = true; // now layout calculation is allowed to run again
 		return;
 	}
 
-	if (Result() != OPTIMAL) {
-		Save("failed-layout.txt");
-		printf("Could not solve the layout specification (%d). ", Result());
+	if (fSolver.Result() != OPTIMAL) {
+		fSolver.Save("failed-layout.txt");
+		printf("Could not solve the layout specification (%d). ",
+			fSolver.Result());
 		printf("Saved specification in file failed-layout.txt\n");
 	}
 
@@ -596,32 +599,41 @@ BALMLayout::SetPerformancePath(char* path)
 }
 
 
+LinearSpec*
+BALMLayout::Solver()
+{
+	return &fSolver;
+}
+
+
 /**
  * Caculates the miminum size.
  */
 BSize
 BALMLayout::CalculateMinSize()
 {
-	SummandList* oldObjFunction = ObjFunction();
+	SummandList* oldObjFunction = fSolver.ObjFunction();
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(1.0, fRight));
 	newObjFunction->AddItem(new Summand(1.0, fBottom));
-	SetObjFunction(newObjFunction);
+	fSolver.SetObjFunction(newObjFunction);
 	SolveLayout();
-	SetObjFunction(oldObjFunction);
-	UpdateObjFunction();
+	fSolver.SetObjFunction(oldObjFunction);
+	fSolver.UpdateObjFunction();
 	delete newObjFunction->ItemAt(0);
 	delete newObjFunction->ItemAt(1);
 	delete newObjFunction;
 
-	if (Result() == UNBOUNDED)
+	if (fSolver.Result() == UNBOUNDED)
 		return Area::kMinSize;
-	if (Result() != OPTIMAL) {
-		Save("failed-layout.txt");
-		printf("Could not solve the layout specification (%d). Saved specification in file failed-layout.txt", Result());
+	if (fSolver.Result() != OPTIMAL) {
+		fSolver.Save("failed-layout.txt");
+		printf("Could not solve the layout specification (%d). "
+			"Saved specification in file failed-layout.txt", fSolver.Result());
 	}
 
-	return BSize(Right()->Value() - Left()->Value(), Bottom()->Value() - Top()->Value());
+	return BSize(Right()->Value() - Left()->Value(),
+		Bottom()->Value() - Top()->Value());
 }
 
 
@@ -631,26 +643,28 @@ BALMLayout::CalculateMinSize()
 BSize
 BALMLayout::CalculateMaxSize()
 {
-	SummandList* oldObjFunction = ObjFunction();
+	SummandList* oldObjFunction = fSolver.ObjFunction();
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(-1.0, fRight));
 	newObjFunction->AddItem(new Summand(-1.0, fBottom));
-	SetObjFunction(newObjFunction);
+	fSolver.SetObjFunction(newObjFunction);
 	SolveLayout();
-	SetObjFunction(oldObjFunction);
-	UpdateObjFunction();
+	fSolver.SetObjFunction(oldObjFunction);
+	fSolver.UpdateObjFunction();
 	delete newObjFunction->ItemAt(0);
 	delete newObjFunction->ItemAt(1);
 	delete newObjFunction;
 
-	if (Result() == UNBOUNDED)
+	if (fSolver.Result() == UNBOUNDED)
 		return Area::kMaxSize;
-	if (Result() != OPTIMAL) {
-		Save("failed-layout.txt");
-		printf("Could not solve the layout specification (%d). Saved specification in file failed-layout.txt", Result());
+	if (fSolver.Result() != OPTIMAL) {
+		fSolver.Save("failed-layout.txt");
+		printf("Could not solve the layout specification (%d). "
+			"Saved specification in file failed-layout.txt", fSolver.Result());
 	}
 
-	return BSize(Right()->Value() - Left()->Value(), Bottom()->Value() - Top()->Value());
+	return BSize(Right()->Value() - Left()->Value(),
+		Bottom()->Value() - Top()->Value());
 }
 
 
@@ -661,11 +675,13 @@ BSize
 BALMLayout::CalculatePreferredSize()
 {
 	SolveLayout();
-	if (Result() != OPTIMAL) {
-		Save("failed-layout.txt");
-		printf("Could not solve the layout specification (%d). Saved specification in file failed-layout.txt", Result());
+	if (fSolver.Result() != OPTIMAL) {
+		fSolver.Save("failed-layout.txt");
+		printf("Could not solve the layout specification (%d). "
+			"Saved specification in file failed-layout.txt", fSolver.Result());
 	}
 
-	return BSize(Right()->Value() - Left()->Value(), Bottom()->Value() - Top()->Value());
+	return BSize(Right()->Value() - Left()->Value(),
+		Bottom()->Value() - Top()->Value());
 }
 
