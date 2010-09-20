@@ -11,7 +11,6 @@
 #include "DurationToString.h"
 
 
-// constructor
 DurationView::DurationView(const char* name)
 	:
 	BStringView(name, ""),
@@ -100,9 +99,13 @@ DurationView::SetMode(uint32 mode)
 void
 DurationView::SetSymbolScale(float scale)
 {
-	BFont font(be_bold_font);
-	font.SetSize(font.Size() * scale * 1.2);
-	SetFont(&font);
+	if (scale != 1.0f) {
+		BFont font(be_bold_font);
+		font.SetSize(font.Size() * scale * 1.2);
+		SetFont(&font);
+	} else
+		SetFont(be_plain_font);
+
 	InvalidateLayout();
 }
 
