@@ -269,7 +269,7 @@ Controller::SetTo(const PlaylistItemRef& item)
 
 	status_t err = trackSupplier->InitCheck();
 	if (err != B_OK) {
-		printf("Controller::SetTo: initcheck failed\n");
+		printf("Controller::SetTo: InitCheck failed\n");
 		_NotifyFileChanged(item.Get(), err);
 		return err;
 	}
