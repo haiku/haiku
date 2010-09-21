@@ -34,17 +34,21 @@ static const DemuxerFormat gDemuxerTable[] = {
 		B_WAV_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
 	{
-		"flac", "FLAC", "audio/x-flac",
+		"flac", "Free Lossless Audio", "audio/x-flac",
 		B_WAV_FORMAT_FAMILY, B_ANY_FORMAT_FAMILY
 	},
 	{
-		"flv", "Flash Video", "video/x-flv",
+		"flv", "Flash video", "video/x-flv",
+		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+	},
+	{
+		"swf", "Shockwave video", "application/x-shockwave-flash",
 		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
 	{
 		// Tested and appears to work ok with regards to video,
 		// audio seems a problem.
-		"matroska", "Matroska Movie", "video/x-matroska",
+		"matroska", "Matroska movie", "video/x-matroska",
 		B_MISC_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
 //	{
@@ -54,7 +58,7 @@ static const DemuxerFormat gDemuxerTable[] = {
 //	},
 	{
 		// Plays all files I could test with perfectly.
-		"mp4", "MPEG-4 Movie", "video/x-mp4",
+		"mp4", "MPEG-4 movie", "video/x-mp4",
 		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
 	{
@@ -81,7 +85,7 @@ static const DemuxerFormat gDemuxerTable[] = {
 	},
 	{
 		// TODO: untested!
-		"nsv", "NSV (NullSoft Video File)", "video/nsv",
+		"nsv", "NSV (NullSoft video file)", "video/nsv",
 		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
 	{
@@ -93,12 +97,11 @@ static const DemuxerFormat gDemuxerTable[] = {
 	},
 	{
 		// TODO: untested!
-		"rm", "RM (RealVideo Clip)", "video/vnd.rn-realvideo",
+		"rm", "RM (RealVideo clip)", "video/vnd.rn-realvideo",
 		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
 	},
 	{
-		// TODO: untested!
-		"vob", "VOB Movie", "video/x-vob",
+		"vob", "VOB movie", "video/x-vob",
 		B_MPEG_FORMAT_FAMILY, B_MPEG_FORMAT_FAMILY
 	},
 	{
