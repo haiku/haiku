@@ -77,6 +77,9 @@ ControllerView::MessageReceived(BMessage* message)
 			_CheckSkippable();
 			break;
 
+		case MSG_PLAYLIST_IMPORT_FAILED:
+			break;
+
 		default:
 			TransportControlGroup::MessageReceived(message);
 	}

@@ -533,11 +533,9 @@ MainWin::MessageReceived(BMessage* msg)
 		}
 
 		case B_REFS_RECEIVED:
-			printf("MainWin::MessageReceived: B_REFS_RECEIVED\n");
 			_RefsReceived(msg);
 			break;
 		case B_SIMPLE_DATA:
-			printf("MainWin::MessageReceived: B_SIMPLE_DATA\n");
 			if (msg->HasRef("refs"))
 				_RefsReceived(msg);
 			break;
@@ -602,6 +600,15 @@ MainWin::MessageReceived(BMessage* msg)
 				OpenPlaylistItem(item);
 				_MarkPlaylistItem(index);
 			}
+			break;
+		}
+		case MSG_PLAYLIST_IMPORT_FAILED:
+		{
+			BAlert* alert = new BAlert("Nothing to Play", "None of the files "
+				"you wanted to play appear to be media files.", "OK");
+			alert->Go();
+
+			_ShowIfNeeded();
 			break;
 		}
 

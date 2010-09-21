@@ -53,6 +53,7 @@ void Playlist::Listener::ItemAdded(PlaylistItem* item, int32 index) {}
 void Playlist::Listener::ItemRemoved(int32 index) {}
 void Playlist::Listener::ItemsSorted() {}
 void Playlist::Listener::CurrentItemChanged(int32 newIndex) {}
+void Playlist::Listener::ImportFailed() {}
 
 
 // #pragma mark -
@@ -537,6 +538,14 @@ Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 }
 
 
+void
+Playlist::NotifyImportFailed()
+{
+	BAutolock _(this);
+	_NotifyImportFailed();
+}
+
+
 // #pragma mark - private
 
 
@@ -664,3 +673,14 @@ Playlist::_NotifyCurrentItemChanged(int32 newIndex) const
 	}
 }
 
+
+void
+Playlist::_NotifyImportFailed() const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		Listener* listener = (Listener*)listeners.ItemAtFast(i);
+		listener->ImportFailed();
+	}
+}

@@ -12,7 +12,8 @@ enum {
 	MSG_PLAYLIST_ITEM_ADDED				= 'plia',
 	MSG_PLAYLIST_ITEM_REMOVED			= 'plir',
 	MSG_PLAYLIST_ITEMS_SORTED			= 'plis',
-	MSG_PLAYLIST_CURRENT_ITEM_CHANGED	= 'plcc'
+	MSG_PLAYLIST_CURRENT_ITEM_CHANGED	= 'plcc',
+	MSG_PLAYLIST_IMPORT_FAILED			= 'plif'
 };
 
 class PlaylistObserver : public Playlist::Listener, public AbstractLOAdapter {
@@ -26,6 +27,8 @@ public:
 	virtual	void				ItemsSorted();
 
 	virtual	void				CurrentItemChanged(int32 newIndex);
+
+	virtual	void				ImportFailed();
 };
 
 #endif // PLAYLIST_OBSERVER_H

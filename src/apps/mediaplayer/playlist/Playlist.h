@@ -55,6 +55,8 @@ public:
 		virtual	void	ItemsSorted();
 
 		virtual	void	CurrentItemChanged(int32 newIndex);
+
+		virtual	void	ImportFailed();
 	};
 
 public:
@@ -106,6 +108,8 @@ public:
 	static	void				AppendPlaylistToPlaylist(const entry_ref& ref,
 									Playlist* playlist);
 
+			void				NotifyImportFailed();
+
 private:
 								Playlist(const Playlist& other);
 			Playlist&			operator=(const Playlist& other);
@@ -122,6 +126,7 @@ private:
 			void				_NotifyItemRemoved(int32 index) const;
 			void				_NotifyItemsSorted() const;
 			void				_NotifyCurrentItemChanged(int32 newIndex) const;
+			void				_NotifyImportFailed() const;
 
 private:
 			BList				fItems;

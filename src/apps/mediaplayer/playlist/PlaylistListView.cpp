@@ -320,6 +320,8 @@ PlaylistListView::MessageReceived(BMessage* message)
 				_SetCurrentPlaylistIndex(index);
 			break;
 		}
+		case MSG_PLAYLIST_IMPORT_FAILED:
+			break;
 
 		// ControllerObserver messages
 		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED:
@@ -442,8 +444,10 @@ PlaylistListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 void
 PlaylistListView::RefsReceived(BMessage* message, int32 appendIndex)
 {
-	fCommandStack->Perform(new (nothrow) ImportPLItemsCommand(fPlaylist,
-		message, appendIndex));
+	if (fCommandStack->Perform(new (nothrow) ImportPLItemsCommand(fPlaylist,
+		message, appendIndex)) != B_OK) {
+		fPlaylist->NotifyImportFailed();
+	}
 }
 
 

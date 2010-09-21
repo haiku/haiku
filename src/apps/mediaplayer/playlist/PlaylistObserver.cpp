@@ -1,9 +1,11 @@
 /*
- * Copyright 2007-2009 Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2007-2010 Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "PlaylistObserver.h"
+
+#include <stdio.h>
 
 #include <Message.h>
 
@@ -58,4 +60,14 @@ PlaylistObserver::CurrentItemChanged(int32 newIndex)
 
 	DeliverMessage(message);
 }
+
+
+void
+PlaylistObserver::ImportFailed()
+{
+	BMessage message(MSG_PLAYLIST_IMPORT_FAILED);
+
+	DeliverMessage(message);
+}
+
 
