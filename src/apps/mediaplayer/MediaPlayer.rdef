@@ -19,6 +19,7 @@ resource file_types message {
 	"types" = "application/ogg",
 	"types" = "application/x-ogg",
 	"types" = "application/x-asf",
+	"types" = "application/x-shockwave-flash",
 	"types" = "audio",
 	"types" = "audio/32kadpcm",
 	"types" = "audio/aac",
