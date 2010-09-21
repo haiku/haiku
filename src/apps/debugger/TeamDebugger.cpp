@@ -362,7 +362,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		return error;
 	}
 
-	fUserInterface->Show();
+	Activate();
 
 	// if requested, stop the given thread
 	if (threadID >= 0) {
@@ -380,7 +380,16 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, bool stopInMain)
 		}
 	}
 
+	fListener->TeamDebuggerStarted(this);
+
 	return B_OK;
+}
+
+
+void
+TeamDebugger::Activate()
+{
+	fUserInterface->Show();
 }
 
 

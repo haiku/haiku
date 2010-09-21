@@ -38,6 +38,8 @@ public:
 			status_t			Init(team_id teamID, thread_id threadID,
 									bool stopInMain);
 
+			void				Activate();
+
 			team_id				TeamID() const	{ return fTeamID; }
 
 	virtual	void				MessageReceived(BMessage* message);
@@ -144,6 +146,7 @@ class TeamDebugger::Listener {
 public:
 	virtual						~Listener();
 
+	virtual void				TeamDebuggerStarted(TeamDebugger* debugger) = 0;
 	virtual	void				TeamDebuggerQuit(TeamDebugger* debugger) = 0;
 };
 

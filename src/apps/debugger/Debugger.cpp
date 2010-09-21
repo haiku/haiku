@@ -23,6 +23,7 @@
 #include "MessageCodes.h"
 #include "SettingsManager.h"
 #include "TeamDebugger.h"
+#include "TeamsWindow.h"
 #include "TypeHandlerRoster.h"
 #include "ValueHandlerRoster.h"
 
@@ -153,12 +154,16 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 		exclusiveParams++;
 
 	if (exclusiveParams == 0) {
+
+/*
 		// TODO: Support!
 		if (noOutput)
 			return false;
 		fprintf(stderr, "Sorry, running without team/thread to debug not "
 			"supported yet.\n");
 		exit(1);
+*/
+		return true;
 	} else if (exclusiveParams != 1) {
 		if (noOutput)
 			return false;
@@ -169,196 +174,297 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 }
 
 
+// #pragma mark -
+
 class Debugger : public BApplication, private TeamDebugger::Listener {
 public:
-	Debugger()
-		:
-		BApplication(kDebuggerSignature),
-		fRunningTeamDebuggers(0)
-	{
-	}
+						Debugger();
+						~Debugger();
 
-	~Debugger()
-	{
-		ValueHandlerRoster::DeleteDefault();
-		TypeHandlerRoster::DeleteDefault();
-	}
-
-	status_t Init()
-	{
-		status_t error = TypeHandlerRoster::CreateDefault();
-		if (error != B_OK)
-			return error;
-
-		error = ValueHandlerRoster::CreateDefault();
-		if (error != B_OK)
-			return error;
-
-		return fSettingsManager.Init();
-	}
-
-	virtual void MessageReceived(BMessage* message)
-	{
-		switch (message->what) {
-			case MSG_TEAM_DEBUGGER_QUIT:
-			{
-				int32 threadID;
-				if (message->FindInt32("thread", &threadID) == B_OK)
-					wait_for_thread(threadID, NULL);
-
-				if (--fRunningTeamDebuggers == 0)
-					Quit();
-				break;
-			}
-			default:
-				BApplication::MessageReceived(message);
-				break;
-		}
-	}
-
-	virtual void ReadyToRun()
-	{
-	}
-
-	virtual void ArgvReceived(int32 argc, char** argv)
-	{
-		Options options;
-		if (!parse_arguments(argc, argv, true, options))
-{
-printf("Debugger::ArgvReceived(): parsing args failed!\n");
-			return;
-}
-
-		team_id team = options.team;
-		thread_id thread = options.thread;
-		bool stopInMain = false;
-
-		// If command line arguments were given, start the program.
-		if (options.commandLineArgc > 0) {
-printf("loading program: \"%s\" ...\n", options.commandLineArgv[0]);
-			// TODO: What about the CWD?
-			thread = load_program(options.commandLineArgv,
-				options.commandLineArgc, false);
-			if (thread < 0) {
-				// TODO: Notify the user!
-				fprintf(stderr, "Error: Failed to load program \"%s\": %s\n",
-					options.commandLineArgv[0], strerror(thread));
-				return;
-			}
-
-			team = thread;
-				// main thread ID == team ID
-			stopInMain = true;
-		}
-
-		// If we've got
-		if (team < 0) {
-printf("no team yet, getting thread info...\n");
-			thread_info threadInfo;
-			status_t error = get_thread_info(thread, &threadInfo);
-			if (error != B_OK) {
-				// TODO: Notify the user!
-				fprintf(stderr, "Error: Failed to get info for thread \"%ld\": "
-					"%s\n", thread, strerror(error));
-				return;
-			}
-
-			team = threadInfo.team;
-		}
-printf("team: %ld, thread: %ld\n", team, thread);
-
-		TeamDebugger* debugger = _TeamDebuggerForTeam(team);
-		if (debugger != NULL) {
-			// TODO: Activate the respective window!
-printf("There's already a debugger for team: %ld\n", team);
-			return;
-		}
-
-		UserInterface* userInterface = new(std::nothrow) GraphicalUserInterface;
-		if (userInterface == NULL) {
-			// TODO: Notify the user!
-			fprintf(stderr, "Error: Out of memory!\n");
-		}
-		Reference<UserInterface> userInterfaceReference(userInterface, true);
-
-		debugger = new(std::nothrow) TeamDebugger(this, userInterface,
-			&fSettingsManager);
-		if (debugger == NULL) {
-			// TODO: Notify the user!
-			fprintf(stderr, "Error: Out of memory!\n");
-		}
-
-		status_t error = debugger->Init(team, thread, stopInMain);
-		if (debugger->Thread())
-			fRunningTeamDebuggers++;
-
-		if (error == B_OK && fTeamDebuggers.AddItem(debugger)) {
-printf("debugger for team %ld created and initialized successfully!\n", team);
-		} else
-			delete debugger;
-	}
+			status_t	Init();
+	virtual void 		MessageReceived(BMessage* message);
+	virtual void 		ReadyToRun();
+	virtual void 		ArgvReceived(int32 argc, char** argv);
 
 private:
 	typedef BObjectList<TeamDebugger>	TeamDebuggerList;
 
 private:
 	// TeamDebugger::Listener
-	virtual void TeamDebuggerQuit(TeamDebugger* debugger)
-	{
-		// Note: Locking here only works, since we're never locking the other
-		// way around. If we even need to do that, we'll have to introduce a
-		// separate lock to protect the list.
-		AutoLocker<Debugger> locker(this);
-		fTeamDebuggers.RemoveItem(debugger);
-		locker.Unlock();
+	virtual void 		TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual void 		TeamDebuggerQuit(TeamDebugger* debugger);
 
-		if (debugger->Thread() >= 0) {
-			BMessage message(MSG_TEAM_DEBUGGER_QUIT);
-			message.AddInt32("thread", debugger->Thread());
-			PostMessage(&message);
-		}
-	}
+	virtual bool 		QuitRequested();
+	virtual void 		Quit();
 
-	virtual bool QuitRequested()
-	{
-		// NOTE: The default implementation will just ask all windows'
-		// QuitRequested() hooks. This in turn will ask the TeamWindows.
-		// For now, this is what we want. If we have more windows later,
-		// like the global TeamsWindow, then we want to just ask the
-		// TeamDebuggers, the TeamsWindow should of course not go away already
-		// if one or more TeamDebuggers want to stay later. There are multiple
-		// ways how to do this. For examaple, TeamDebugger could get a
-		// QuitReqested() hook or the TeamsWindow and other global windows
-		// could always return false in their QuitRequested().
-		return BApplication::QuitRequested();
-			// TODO: This is ugly. The team debuggers own the windows, not the
-			// other way around.
-	}
-
-	virtual void Quit()
-	{
-		// don't quit before all team debuggers have been quit
-		if (fRunningTeamDebuggers <= 0)
-			BApplication::Quit();
-	}
-
-	TeamDebugger* _TeamDebuggerForTeam(team_id teamID) const
-	{
-		for (int32 i = 0; TeamDebugger* debugger = fTeamDebuggers.ItemAt(i);
-				i++) {
-			if (debugger->TeamID() == teamID)
-				return debugger;
-		}
-
-		return NULL;
-	}
-
+		TeamDebugger* 	_FindTeamDebugger(team_id teamID) const;
+		TeamDebugger* 	_StartTeamDebugger(team_id teamID,
+							thread_id threadID = -1, bool stopInMain = false);
 private:
 	SettingsManager		fSettingsManager;
 	TeamDebuggerList	fTeamDebuggers;
 	int32				fRunningTeamDebuggers;
+	TeamsWindow*		fTeamsWindow;
 };
 
+
+Debugger::Debugger()
+	:
+	BApplication(kDebuggerSignature),
+	fRunningTeamDebuggers(0),
+	fTeamsWindow(NULL)
+{
+}
+
+
+Debugger::~Debugger()
+{
+	ValueHandlerRoster::DeleteDefault();
+	TypeHandlerRoster::DeleteDefault();
+}
+
+
+status_t
+Debugger::Init()
+{
+	status_t error = TypeHandlerRoster::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	error = ValueHandlerRoster::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	return fSettingsManager.Init();
+}
+
+
+void
+Debugger::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_SHOW_TEAMS_WINDOW:
+		{
+            if (fTeamsWindow)
+               	fTeamsWindow->Activate(true);
+            else {
+   	            fTeamsWindow = new TeamsWindow();
+       	        fTeamsWindow->Show();
+           	}
+			break;
+		}
+		case MSG_TEAMS_WINDOW_CLOSED:
+		{
+			fTeamsWindow = NULL;
+			Quit();
+			break;
+		}
+		case MSG_DEBUG_THIS_TEAM:
+		{
+			int32 teamID;
+			if (message->FindInt32("team", &teamID) != B_OK)
+				break;
+
+			_StartTeamDebugger(teamID);
+			break;
+		}
+		case MSG_TEAM_DEBUGGER_QUIT:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) == B_OK)
+				wait_for_thread(threadID, NULL);
+
+			--fRunningTeamDebuggers;
+			Quit();
+			break;
+		}
+		default:
+			BApplication::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+Debugger::ReadyToRun()
+{
+	if (fRunningTeamDebuggers == 0)
+	   PostMessage(MSG_SHOW_TEAMS_WINDOW);
+}
+
+
+void
+Debugger::ArgvReceived(int32 argc, char** argv)
+{
+	Options options;
+	if (!parse_arguments(argc, argv, true, options)) {
+		printf("Debugger::ArgvReceived(): parsing args failed!\n");
+		return;
+	}
+
+	team_id team = options.team;
+	thread_id thread = options.thread;
+	bool stopInMain = false;
+
+	// If command line arguments were given, start the program.
+	if (options.commandLineArgc > 0) {
+		printf("loading program: \"%s\" ...\n", options.commandLineArgv[0]);
+		// TODO: What about the CWD?
+		thread = load_program(options.commandLineArgv,
+			options.commandLineArgc, false);
+		if (thread < 0) {
+			// TODO: Notify the user!
+			fprintf(stderr, "Error: Failed to load program \"%s\": %s\n",
+				options.commandLineArgv[0], strerror(thread));
+			return;
+		}
+
+		team = thread;
+			// main thread ID == team ID
+		stopInMain = true;
+	}
+
+	// If we've got
+	if (team < 0) {
+		printf("no team yet, getting thread info...\n");
+		thread_info threadInfo;
+		status_t error = get_thread_info(thread, &threadInfo);
+		if (error != B_OK) {
+			// TODO: Notify the user!
+			fprintf(stderr, "Error: Failed to get info for thread \"%ld\": "
+				"%s\n", thread, strerror(error));
+			return;
+		}
+
+		team = threadInfo.team;
+	}
+	printf("team: %ld, thread: %ld\n", team, thread);
+
+	TeamDebugger* debugger = _FindTeamDebugger(team);
+	if (debugger != NULL) {
+		printf("There's already a debugger for team: %ld\n", team);
+		debugger->Activate();
+		return;
+	}
+
+	_StartTeamDebugger(team, thread, stopInMain);
+}
+
+// TeamDebugger::Listener
+
+void
+Debugger::TeamDebuggerStarted(TeamDebugger* debugger)
+{
+	printf("debugger for team %ld started...\n",
+		debugger->TeamID());
+
+ 	// Note: see TeamDebuggerQuit() note about locking
+	AutoLocker<Debugger> locker(this);
+	fTeamDebuggers.AddItem(debugger);
+	fRunningTeamDebuggers++;
+	locker.Unlock();
+}
+
+
+void
+Debugger::TeamDebuggerQuit(TeamDebugger* debugger)
+{
+	// Note: Locking here only works, since we're never locking the other
+	// way around. If we even need to do that, we'll have to introduce a
+	// separate lock to protect the list.
+
+	printf("debugger for team %ld quit.\n",
+		debugger->TeamID());
+
+	AutoLocker<Debugger> locker(this);
+	fTeamDebuggers.RemoveItem(debugger);
+	locker.Unlock();
+
+	if (debugger->Thread() >= 0) {
+		BMessage message(MSG_TEAM_DEBUGGER_QUIT);
+		message.AddInt32("thread", debugger->Thread());
+		PostMessage(&message);
+	}
+}
+
+
+bool
+Debugger::QuitRequested()
+{
+	// NOTE: The default implementation will just ask all windows'
+	// QuitRequested() hooks. This in turn will ask the TeamWindows.
+	// For now, this is what we want. If we have more windows later,
+	// like the global TeamsWindow, then we want to just ask the
+	// TeamDebuggers, the TeamsWindow should of course not go away already
+	// if one or more TeamDebuggers want to stay later. There are multiple
+	// ways how to do this. For example, TeamDebugger could get a
+	// QuitRequested() hook or the TeamsWindow and other global windows
+	// could always return false in their QuitRequested().
+	return BApplication::QuitRequested();
+		// TODO: This is ugly. The team debuggers own the windows, not the
+		// other way around.
+}
+
+void
+Debugger::Quit()
+{
+	printf("Debugger::Quit(): fRunningTeamDebuggers = %ld, fTeamsWindow = %p\n",
+		fRunningTeamDebuggers, fTeamsWindow);
+
+	// don't quit before all team debuggers have been quit
+	if (fRunningTeamDebuggers <= 0 && fTeamsWindow == NULL)
+		BApplication::Quit();
+}
+
+
+TeamDebugger*
+Debugger::_FindTeamDebugger(team_id teamID) const
+{
+	for (int32 i = 0; TeamDebugger* debugger = fTeamDebuggers.ItemAt(i);
+			i++) {
+		if (debugger->TeamID() == teamID)
+			return debugger;
+	}
+
+	return NULL;
+}
+
+
+TeamDebugger*
+Debugger::_StartTeamDebugger(team_id teamID, thread_id threadID, bool stopInMain)
+{
+	if (teamID < 0)
+		return NULL;
+
+	UserInterface* userInterface = new(std::nothrow) GraphicalUserInterface;
+	if (userInterface == NULL) {
+		// TODO: Notify the user!
+		fprintf(stderr, "Error: Out of memory!\n");
+		return NULL;
+	}
+	Reference<UserInterface> userInterfaceReference(userInterface, true);
+
+	status_t error = B_NO_MEMORY;
+
+	TeamDebugger* debugger = new(std::nothrow) TeamDebugger(this, userInterface,
+		&fSettingsManager);
+	if (debugger)
+		error = debugger->Init(teamID, threadID, stopInMain);
+
+	if (error != B_OK) {
+		printf("Error: debugger for team %ld failed to init: %s!\n",
+			teamID, strerror(error));
+		delete debugger;
+		return NULL;
+	} else
+		printf("debugger for team %ld created and initialized successfully!\n",
+			teamID);
+
+	return debugger;
+}
+
+
+// #pragma mark -
 
 int
 main(int argc, const char* const* argv)

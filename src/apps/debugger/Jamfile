@@ -22,6 +22,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
@@ -164,6 +165,10 @@ Application Debugger :
 	VariablesViewState.cpp
 	VariablesViewStateHistory.cpp
 
+	# user_interface/gui/teams_window
+	TeamsWindow.cpp
+	TeamsListView.cpp
+
 	# user_interface/gui/team_window
 	BreakpointListView.cpp
 	BreakpointsView.cpp
@@ -248,4 +253,3 @@ Application Debugger :
 HaikuSubInclude arch x86 disasm ;
 HaikuSubInclude demangler ;
 HaikuSubInclude dwarf ;
-HaikuSubInclude user_interface gui running_teams_window ;

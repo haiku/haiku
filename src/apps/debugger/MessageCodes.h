@@ -41,7 +41,10 @@ enum {
 	MSG_VALUE_NODE_CHILDREN_DELETED				= 'vncd',
 	MSG_VALUE_NODE_VALUE_CHANGED				= 'vnvc',
 
-	MSG_TEAM_DEBUGGER_QUIT						= 'dbqt'
+	MSG_TEAM_DEBUGGER_QUIT						= 'dbqt',
+	MSG_SHOW_TEAMS_WINDOW						= 'stsw',
+	MSG_TEAMS_WINDOW_CLOSED						= 'tswc',
+	MSG_DEBUG_THIS_TEAM							= 'dbtt'
 };
 
 
