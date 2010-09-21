@@ -5,14 +5,16 @@
  */
 
 #include "BALMLayout.h"
+
+#include <math.h>		// for floor
+#include <new>
+
 #include "Area.h"
 #include "Column.h"
 #include "ResultType.h"
 #include "Row.h"
 #include "XTab.h"
 #include "YTab.h"
-
-#include <math.h>		// for floor
 
 
 /**
@@ -26,7 +28,6 @@ BALMLayout::BALMLayout()
 	fLayoutStyle = FIT_TO_SIZE;
 	fActivated = true;
 
-	fAreas = new BList(1);
 	fLeft = new XTab(&fSolver);
 	fRight = new XTab(&fSolver);
 	fTop = new YTab(&fSolver);
@@ -46,6 +47,12 @@ BALMLayout::BALMLayout()
 }
 
 
+BALMLayout::~BALMLayout()
+{
+	
+}
+
+
 /**
  * Solves the layout.
  */
@@ -54,11 +61,9 @@ BALMLayout::SolveLayout()
 {
 	// if autoPreferredContentSize is set on an area,
 	// readjust its preferredContentSize and penalties settings
-	int32 sizeAreas = fAreas->CountItems();
-	Area* currentArea;
-	for (int32 i = 0; i < sizeAreas; i++) {
-		currentArea = (Area*)fAreas->ItemAt(i);
-		if (currentArea->AutoPreferredContentSize())
+	for (int32 i = 0; i < CountItems(); i++) {
+		Area* currentArea = _AreaForItem(ItemAt(i));
+		if (currentArea && currentArea->AutoPreferredContentSize())
 			currentArea->SetDefaultBehavior();
 	}
 
@@ -167,8 +172,10 @@ Column*
 BALMLayout::AddColumn(XTab* left, XTab* right)
 {
 	Column* column = new Column(&fSolver);
-	if (left != NULL) column->Constraints()->AddItem(column->Left()->IsEqual(left));
-	if (right != NULL) column->Constraints()->AddItem(column->Right()->IsEqual(right));
+	if (left != NULL)
+		column->Constraints()->AddItem(column->Left()->IsEqual(left));
+	if (right != NULL)
+		column->Constraints()->AddItem(column->Right()->IsEqual(right));
 	return column;
 }
 
@@ -188,12 +195,13 @@ Area*
 BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	BView* content, BSize minContentSize)
 {
-	InvalidateLayout();
-	if (content != NULL)
-		TargetView()->AddChild(content);
-	Area* area = new Area(this, &fSolver, left, top, right, bottom, content,
+	BLayoutItem* item = AddView(content);
+	Area* area = _AreaForItem(item);
+	if (!area)
+		return NULL;
+
+	area->Init(&fSolver, left, top, right, bottom, content,
 		minContentSize);
-	fAreas->AddItem(area);
 	return area;
 }
 
@@ -211,11 +219,12 @@ Area*
 BALMLayout::AddArea(Row* row, Column* column, BView* content,
 	BSize minContentSize)
 {
-	InvalidateLayout();
-	if (content != NULL)
-		TargetView()->AddChild(content);
-	Area* area = new Area(this, &fSolver, row, column, content, minContentSize);
-	fAreas->AddItem(area);
+	BLayoutItem* item = AddView(content);
+	Area* area = _AreaForItem(item);
+	if (!area)
+		return NULL;
+
+	area->Init(&fSolver, row, column, content, minContentSize);
 	return area;
 }
 
@@ -234,14 +243,15 @@ Area*
 BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	BView* content)
 {
-	InvalidateLayout();
-	if (content != NULL)
-		TargetView()->AddChild(content);
-	Area* area = new Area(this, &fSolver, left, top, right, bottom, content,
+	BLayoutItem* item = AddView(content);
+	Area* area = _AreaForItem(item);
+	if (!area)
+		return NULL;
+
+	area->Init(&fSolver, left, top, right, bottom, content,
 		BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
-	fAreas->AddItem(area);
 	return area;
 }
 
@@ -257,13 +267,14 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 Area*
 BALMLayout::AddArea(Row* row, Column* column, BView* content)
 {
-	InvalidateLayout();
-	if (content != NULL)
-		TargetView()->AddChild(content);
-	Area* area = new Area(this, &fSolver, row, column, content, BSize(0, 0));
+	BLayoutItem* item = AddView(content);
+	Area* area = _AreaForItem(item);
+	if (!area)
+		return NULL;
+
+	area->Init(&fSolver, row, column, content, BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
-	fAreas->AddItem(area);
 	return area;
 }
 
@@ -277,25 +288,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 Area*
 BALMLayout::AreaOf(BView* control)
 {
-	Area* area;
-	for (int32 i = 0; i < fAreas->CountItems(); i++) {
-		area = (Area*)fAreas->ItemAt(i);
-		if (area->Content() == control)
-			return area;
-	}
-	return NULL;
-}
-
-
-/**
- * Gets the ares.
- *
- * @return the areas
- */
-BList*
-BALMLayout::Areas() const
-{
-	return fAreas;
+	return _AreaForItem(ItemAt(IndexOfView(control)));
 }
 
 
@@ -368,76 +361,6 @@ BALMLayout::SetLayoutStyle(LayoutStyleType style)
 
 
 /**
- * Adds view to layout.
- */
-BLayoutItem*
-BALMLayout::AddView(BView* child)
-{
-	return NULL;
-}
-
-
-/**
- * Adds view to layout.
- */
-BLayoutItem*
-BALMLayout::AddView(int32 index, BView* child)
-{
-return NULL;
-}
-
-
-/**
- * Adds item to layout.
- */
-bool
-BALMLayout::AddItem(BLayoutItem* item)
-{
-	return false;
-}
-
-
-/**
- * Adds item to layout.
- */
-bool
-BALMLayout::AddItem(int32 index, BLayoutItem* item)
-{
-	return false;
-}
-
-
-/**
- * Removes view from layout.
- */
-bool
-BALMLayout::RemoveView(BView* child)
-{
-	return false;
-}
-
-
-/**
- * Removes item from layout.
- */
-bool
-BALMLayout::RemoveItem(BLayoutItem* item)
-{
-	return false;
-}
-
-
-/**
- * Removes item from layout.
- */
-BLayoutItem*
-BALMLayout::RemoveItem(int32 index)
-{
-	return NULL;
-}
-
-
-/**
  * Gets minimum size.
  */
 BSize
@@ -486,23 +409,6 @@ BALMLayout::BaseAlignment()
 
 
 /**
- * Gets whether the height of the layout depends on its width.
- */
-bool
-BALMLayout::HasHeightForWidth()
-{
-	return false;
-}
-
-
-/**
- * Gets height constraints for a given width.
- */
-void
-BALMLayout::GetHeightForWidth(float width, float* min, float* max, float* preferred) {}
-
-
-/**
  * Invalidates the layout.
  * Resets minimum/maximum/preferred size.
  */
@@ -513,6 +419,24 @@ BALMLayout::InvalidateLayout(bool children)
 	fMinSize = Area::kUndefinedSize;
 	fMaxSize = Area::kUndefinedSize;
 	fPreferredSize = Area::kUndefinedSize;
+}
+
+
+bool
+BALMLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
+{
+	item->SetLayoutData(new(std::nothrow) Area(this, item));
+	return item->LayoutData() != NULL;
+}
+
+
+void
+BALMLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
+{
+	if (Area* area = _AreaForItem(item)) {
+		item->SetLayoutData(NULL);
+		delete area;
+	}
 }
 
 
@@ -532,6 +456,9 @@ BALMLayout::DerivedLayoutItems()
 
 	if (Owner() == NULL)
 		return;
+
+//TODO
+//	_UpdateConstraints();
 
 	// reverse engineer a layout specification if none was given
 	//~ if (this == NULL) RecoverLayout(View());
@@ -568,8 +495,8 @@ BALMLayout::DerivedLayoutItems()
 	}
 
 	// set the calculated positions and sizes for every area
-	for (int32 i = 0; i < Areas()->CountItems(); i++)
-		((Area*)Areas()->ItemAt(i))->DoLayout();
+	for (int32 i = 0; i < CountItems(); i++)
+		_AreaForItem(ItemAt(i))->DoLayout();
 
 	fActivated = true;
 }
@@ -685,3 +612,11 @@ BALMLayout::CalculatePreferredSize()
 		Bottom()->Value() - Top()->Value());
 }
 
+
+Area*
+BALMLayout::_AreaForItem(BLayoutItem* item) const
+{
+	if (!item)
+		return NULL;
+	return static_cast<Area*>(item->LayoutData());
+}

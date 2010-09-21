@@ -33,6 +33,8 @@ class Area {
 public:
 								~Area();
 
+			BView*				View();
+
 			XTab*				Left() const;
 			void				SetLeft(XTab* left);
 			XTab*				Right() const;
@@ -47,13 +49,12 @@ public:
 			Column*				GetColumn() const;
 			void				SetColumn(Column* column);
 
-			BView*				Content() const;
-			void				SetContent(BView* content);
 			XTab*				ContentLeft() const;
 			YTab*				ContentTop() const;
 			XTab*				ContentRight() const;
 			YTab*				ContentBottom() const;
 			BSize				MinContentSize() const;
+			
 			void				SetMinContentSize(BSize min);
 			BSize				MaxContentSize() const;
 			void				SetMaxContentSize(BSize max);
@@ -62,16 +63,16 @@ public:
 			double				ContentAspectRatio() const;
 			void				SetContentAspectRatio(double ratio);
 
+			void				SetExplicitAlignment(BAlignment alignment);
+
+			void				SetHorizontalAlignment(alignment horizontal);
+			void				SetVerticalAlignment(
+									vertical_alignment vertical);
+
 			BSize				ShrinkPenalties() const;
 			void				SetShrinkPenalties(BSize shrink);
 			BSize				GrowPenalties() const;
 			void				SetGrowPenalties(BSize grow);
-
-			BAlignment			Alignment() const;
-			void				SetAlignment(BAlignment alignment);
-			void				SetHorizontalAlignment(alignment horizontal);
-			void				SetVerticalAlignment(
-									vertical_alignment vertical);
 
 			int32				LeftInset() const;
 			void				SetLeftInset(int32 left);
@@ -94,23 +95,20 @@ public:
 			BList*				HasSameSizeAs(Area* area);
 
 protected:
-								Area(BALMLayout* layout,
-									LinearSpec* ls, XTab* left, YTab* top,
+								Area(BALMLayout* layout, BLayoutItem* item);
+
+			void				Init(LinearSpec* ls, XTab* left, YTab* top,
 									XTab* right, YTab* bottom, BView* content,
 									BSize minContentSize);
-								Area(BALMLayout* layout,
-									LinearSpec* ls, Row* row, Column* column,
+			void				Init(LinearSpec* ls, Row* row, Column* column,
 									BView* content, BSize minContentSize);
+
 			void				DoLayout();
 
 private:
 			void				InitChildArea();
 			void				UpdateHorizontal();
 			void				UpdateVertical();
-			void				Init(BALMLayout* layout,
-									LinearSpec* ls, XTab* left, YTab* top,
-									XTab* right, YTab* bottom, BView* content,
-									BSize minContentSize);
 
 public:
 			static BSize		kMaxSize;
@@ -118,12 +116,12 @@ public:
 			static BSize		kUndefinedSize;
 
 protected:
-			BView*				fContent;
 			BList*				fConstraints;
 
 private:
 			// TODO remove the layout pointer when making Area a LayoutItem
 			BALMLayout*			fALMLayout;
+			BLayoutItem*		fLayoutItem;
 
 			LinearSpec*			fLS;
 			XTab*				fLeft;

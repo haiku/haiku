@@ -30,6 +30,8 @@ namespace BALM {
 class BALMLayout : public BAbstractLayout {
 public:
 								BALMLayout();
+	virtual						~BALMLayout();
+
 			void				SolveLayout();
 
 			XTab*				AddXTab();
@@ -39,15 +41,15 @@ public:
 			Column*				AddColumn();
 			Column*				AddColumn(XTab* left, XTab* right);
 			
-			Area*				AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
-										BView* content, BSize minContentSize);
-			Area*				AddArea(Row* row, Column* column, BView* content,
-										BSize minContentSize);
-			Area*				AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
-										BView* content);
-			Area*				AddArea(Row* row, Column* column, BView* content);
+			Area*				AddArea(XTab* left, YTab* top, XTab* right,
+									YTab* bottom, BView* content, BSize minContentSize);
+			Area*				AddArea(Row* row, Column* column,
+									BView* content, BSize minContentSize);
+			Area*				AddArea(XTab* left, YTab* top, XTab* right,
+									YTab* bottom, BView* content);
+			Area*				AddArea(Row* row, Column* column,
+									BView* content);
 			Area*				AreaOf(BView* control);
-			BList*				Areas() const;
 
 			XTab*				Left() const;
 			XTab*				Right() const;
@@ -59,23 +61,16 @@ public:
 			LayoutStyleType		LayoutStyle() const;
 			void				SetLayoutStyle(LayoutStyleType style);
 
-			BLayoutItem*		AddView(BView* child);
-			BLayoutItem*		AddView(int32 index, BView* child);
-			bool				AddItem(BLayoutItem* item);
-			bool				AddItem(int32 index, BLayoutItem* item);
-			bool				RemoveView(BView* child);
-			bool				RemoveItem(BLayoutItem* item);
-			BLayoutItem*		RemoveItem(int32 index);
-
 			BSize				BaseMinSize();
 			BSize				BaseMaxSize();
 			BSize				BasePreferredSize();
 			BAlignment			BaseAlignment();
-			bool				HasHeightForWidth();
-			void				GetHeightForWidth(float width, float* min,
-										float* max, float* preferred);
-			void				InvalidateLayout(bool children = false);
-			virtual void		DerivedLayoutItems();
+
+	virtual	void				InvalidateLayout(bool children = false);
+
+	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
+	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
+	virtual	void				DerivedLayoutItems();
 			
 			char*				PerformancePath() const;
 			void				SetPerformancePath(char* path);
@@ -83,6 +78,8 @@ public:
 			LinearSpec*			Solver();
 
 private:
+			Area*				_AreaForItem(BLayoutItem* item) const;
+
 			BSize				CalculateMinSize();
 			BSize				CalculateMaxSize();
 			BSize				CalculatePreferredSize();
@@ -93,7 +90,6 @@ private:
 
 			LinearSpec			fSolver;
 
-			BList*				fAreas;
 			XTab*				fLeft;
 			XTab*				fRight;
 			YTab*				fTop;

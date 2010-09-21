@@ -30,6 +30,13 @@ BSize Area::kMinSize(0, 0);
 BSize Area::kUndefinedSize(-1, -1);
 
 
+BView*
+Area::View()
+{
+	return fLayoutItem->View();
+}
+
+
 /**
  * Gets the auto preferred content size.
  *
@@ -230,28 +237,6 @@ Area::SetColumn(Column* column)
 	SetLeft(column->Left());
 	SetRight(column->Right());
 	fColumn = column;
-	fALMLayout->InvalidateLayout();
-}
-
-
-/**
- * Gets the control that is the content of the area.
- */
-BView*
-Area::Content() const
-{
-	return (fChildArea == NULL) ? fContent : fChildArea->Content();
-}
-
-
-/**
- * Sets the control that is the content of the area.
- */
-void
-Area::SetContent(BView* content)
-{
-	if (fChildArea == NULL) fContent = content;
-	else fChildArea->fContent = content;
 	fALMLayout->InvalidateLayout();
 }
 
@@ -488,24 +473,15 @@ Area::SetContentAspectRatio(double ratio)
 
 
 /**
- * Gets alignment of the content in its area.
- */
-BAlignment
-Area::Alignment() const
-{
-	return fAlignment;
-}
-
-
-/**
  * Sets alignment of the content in its area.
  */
 void
-Area::SetAlignment(BAlignment alignment)
+Area::SetExplicitAlignment(BAlignment alignment)
 {
 	fAlignment = alignment;
 	UpdateHorizontal();
 	UpdateVertical();
+
 	fALMLayout->InvalidateLayout();
 }
 
@@ -625,24 +601,24 @@ Area::SetBottomInset(int32 bottom)
 void
 Area::SetDefaultBehavior()
 {
-	if (Content() == NULL) {
+	if (View() == NULL) {
 		SetPreferredContentSize(BSize(0, 0));
 		SetShrinkPenalties(BSize(0, 0));
 		SetGrowPenalties(BSize(0, 0));
 		return;
 	}
 
-	if (PreferredContentSize() != Content()->PreferredSize()){
-		SetPreferredContentSize(Content()->PreferredSize());
+	if (PreferredContentSize() != View()->PreferredSize()){
+		SetPreferredContentSize(View()->PreferredSize());
 		fALMLayout->InvalidateLayout();
 	}
 
-	if (dynamic_cast<BButton*>(Content()) != NULL
-		|| dynamic_cast<BRadioButton*>(Content()) != NULL
-		|| dynamic_cast<BCheckBox*>(Content()) != NULL
-		|| dynamic_cast<BStringView*>(Content()) != NULL
-		|| dynamic_cast<BPictureButton*>(Content()) != NULL
-		|| dynamic_cast<BStatusBar*>(Content()) != NULL) {
+	if (dynamic_cast<BButton*>(View()) != NULL
+		|| dynamic_cast<BRadioButton*>(View()) != NULL
+		|| dynamic_cast<BCheckBox*>(View()) != NULL
+		|| dynamic_cast<BStringView*>(View()) != NULL
+		|| dynamic_cast<BPictureButton*>(View()) != NULL
+		|| dynamic_cast<BStatusBar*>(View()) != NULL) {
 		fShrinkPenalties = BSize(4, 4);
 		fGrowPenalties = BSize(3, 3);
 	} else {
@@ -727,10 +703,10 @@ Area::HasSameSizeAs(Area* area)
  */
 Area::~Area()
 {
-	if (fChildArea != NULL) delete fChildArea;
+	if (fChildArea != NULL)
+		delete fChildArea;
 	for (int32 i = 0; i < fConstraints->CountItems(); i++)
 		delete (Constraint*)fConstraints->ItemAt(i);
-	fALMLayout->Areas()->RemoveItem(this);
 }
 
 
@@ -738,25 +714,12 @@ Area::~Area()
  * Constructor.
  * Uses XTabs and YTabs.
  */
-Area::Area(BALMLayout* layout, LinearSpec* ls, XTab* left, YTab* top,
-	XTab* right, YTab* bottom, BView* content, BSize minContentSize)
-{
-	Init(layout, ls, left, top, right, bottom, content, minContentSize);
-}
-
-
-/**
- * Constructor.
- * Uses Rows and Columns.
- */
-Area::Area(BALMLayout* layout, LinearSpec* ls, Row* row, Column* column,
-	BView* content, BSize minContentSize)
+Area::Area(BALMLayout* layout, BLayoutItem* item)
+	:
+	fALMLayout(layout),
+	fLayoutItem(item)
 {
 
-	Init(layout, ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
-			content, minContentSize);
-	fRow = row;
-	fColumn = column;
 }
 
 
@@ -764,11 +727,9 @@ Area::Area(BALMLayout* layout, LinearSpec* ls, Row* row, Column* column,
  * Initialize variables.
  */
 void
-Area::Init(BALMLayout* layout, LinearSpec* ls, XTab* left, YTab* top,
+Area::Init(LinearSpec* ls, XTab* left, YTab* top,
 	XTab* right, YTab* bottom, BView* content, BSize minContentSize)
 {
-	fALMLayout = layout;
-
 	fConstraints = new BList(2);
 	fMaxContentSize = kMaxSize;
 
@@ -804,7 +765,6 @@ Area::Init(BALMLayout* layout, LinearSpec* ls, XTab* left, YTab* top,
 	fRight = right;
 	fTop = top;
 	fBottom = bottom;
-	SetContent(content);
 	fMinContentSize = minContentSize;
 
 	// adds the two essential constraints of the area that make sure that the left x-tab is
@@ -819,23 +779,34 @@ Area::Init(BALMLayout* layout, LinearSpec* ls, XTab* left, YTab* top,
 }
 
 
+void
+Area::Init(LinearSpec* ls, Row* row, Column* column,
+	BView* content, BSize minContentSize)
+{
+	Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
+			content, minContentSize);
+	fRow = row;
+	fColumn = column;
+}
+
+
 /**
  * Perform layout on the area.
  */
 void Area::DoLayout()
 {
-	if (Content() == NULL)
+	if (View() == NULL)
 		return; // empty areas need no layout
 
 	// if there is a childArea, then it is the childArea that actually contains the content
 	Area* area = (fChildArea != NULL) ? fChildArea : this;
 
 	// set content location and size
-	area->Content()->MoveTo(floor(area->Left()->Value() + 0.5),
+	area->View()->MoveTo(floor(area->Left()->Value() + 0.5),
 			floor(area->Top()->Value() + 0.5));
 	int32 width = (int32)floor(area->Right()->Value() - area->Left()->Value() + 0.5);
 	int32 height = (int32)floor(area->Bottom()->Value() - area->Top()->Value() + 0.5);
-	area->Content()->ResizeTo(width, height);
+	area->View()->ResizeTo(width, height);
 }
 
 
@@ -850,8 +821,10 @@ Area::InitChildArea()
 	// add a child area with new tabs,
 	// and add constraints that set its tabs to be equal to the
 	// coresponding tabs of this area (for a start)
-	fChildArea = new Area(fALMLayout, fLS, new XTab(fLS), new YTab(fLS),
-		new XTab(fLS), new YTab(fLS), fContent, BSize(0, 0));
+	fChildArea = new Area(fALMLayout, fLayoutItem);
+	fChildArea->Init(fLS, new XTab(fLS), new YTab(fLS), new XTab(fLS),
+		new YTab(fLS), View(), BSize(0, 0));
+
 	fLeftConstraint = fLeft->IsEqual(fChildArea->Left());
 	fConstraints->AddItem(fLeftConstraint);
 	fTopConstraint = fTop->IsEqual(fChildArea->Top());
