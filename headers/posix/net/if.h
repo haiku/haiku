@@ -114,7 +114,7 @@ extern "C" {
 #endif
 
 unsigned if_nametoindex(const char* name);
-char* if_indextoname(unsigned ifindex, char* nameBuffer);
+char* if_indextoname(unsigned interfaceIndex, char* nameBuffer);
 struct if_nameindex* if_nameindex(void);
 void if_freenameindex(struct if_nameindex* interfaceArray);
 

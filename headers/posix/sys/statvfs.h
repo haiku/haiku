@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STAT_VFS_H_
@@ -31,8 +31,8 @@ struct statvfs {
 extern "C" {
 #endif
 
-int statvfs(const char *path, struct statvfs *buf);
-int fstatvfs(int fildes, struct statvfs *buf);
+int statvfs(const char *path, struct statvfs *buffer);
+int fstatvfs(int descriptor, struct statvfs *buffer);
 
 #ifdef __cplusplus
 }
