@@ -6,6 +6,7 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders shared libbe ;
 UseHeaders [ FDirName $(HAIKU_COMMON_DEBUG_OBJECT_DIR) servers input ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src kits ] ;
 
 # for RWLockManager only
 UsePrivateSystemHeaders ;
@@ -19,6 +20,7 @@ StaticLibrary libshared.a :
 	DragTrackingFilter.cpp
 	HashString.cpp
 	Keymap.cpp
+	QueryFile.cpp
 	RWLockManager.cpp
 	SHA256.cpp
 	ShakeTrackingFilter.cpp
