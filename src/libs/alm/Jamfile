@@ -4,7 +4,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders lp_solve linprog alm ;
 UsePrivateHeaders shared ;
-UsePrivateHeaders [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits interface ] ;
 
 
 SharedLibrary libalm.so : 
