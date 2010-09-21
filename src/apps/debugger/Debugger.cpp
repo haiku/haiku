@@ -154,15 +154,6 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 		exclusiveParams++;
 
 	if (exclusiveParams == 0) {
-
-/*
-		// TODO: Support!
-		if (noOutput)
-			return false;
-		fprintf(stderr, "Sorry, running without team/thread to debug not "
-			"supported yet.\n");
-		exit(1);
-*/
 		return true;
 	} else if (exclusiveParams != 1) {
 		if (noOutput)
