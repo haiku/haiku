@@ -22,7 +22,7 @@
 
 RunningTeamsWindow::RunningTeamsWindow()
     : BWindow(BRect(100, 100, 500, 250), "Running Teams", B_DOCUMENT_WINDOW,
-        B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS)
+        B_ASYNCHRONOUS_CONTROLS)
 {
     BMessage settings;
     _LoadSettings(settings);
