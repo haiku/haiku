@@ -54,12 +54,7 @@ public:
 			XTab*				ContentRight() const;
 			YTab*				ContentBottom() const;
 			BSize				MinContentSize() const;
-			
-			void				SetMinContentSize(BSize min);
-			BSize				MaxContentSize() const;
-			void				SetMaxContentSize(BSize max);
-			BSize				PreferredContentSize() const;
-			void				SetPreferredContentSize(BSize preferred);
+
 			double				ContentAspectRatio() const;
 			void				SetContentAspectRatio(double ratio);
 
@@ -94,6 +89,8 @@ public:
 			Constraint*			HasSameHeightAs(Area* area);
 			BList*				HasSameSizeAs(Area* area);
 
+			void				InvalidateSizeConstraints();
+
 protected:
 								Area(BALMLayout* layout, BLayoutItem* item);
 
@@ -106,9 +103,13 @@ protected:
 			void				DoLayout();
 
 private:
-			void				InitChildArea();
-			void				UpdateHorizontal();
-			void				UpdateVertical();
+			void				_InitChildArea();
+			void				_UpdateHorizontal();
+			void				_UpdateVertical();
+
+			void				_UpdateMinSizeConstraint(BSize min);
+			void				_UpdateMaxSizeConstraint(BSize max);
+			void				_UpdatePreferredConstraint(BSize preferred);
 
 public:
 			static BSize		kMaxSize;

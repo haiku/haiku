@@ -457,8 +457,7 @@ BALMLayout::DerivedLayoutItems()
 	if (Owner() == NULL)
 		return;
 
-//TODO
-//	_UpdateConstraints();
+	_UpdateAreaConstraints();
 
 	// reverse engineer a layout specification if none was given
 	//~ if (this == NULL) RecoverLayout(View());
@@ -539,6 +538,8 @@ BALMLayout::Solver()
 BSize
 BALMLayout::CalculateMinSize()
 {
+	_UpdateAreaConstraints();
+
 	SummandList* oldObjFunction = fSolver.ObjFunction();
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(1.0, fRight));
@@ -570,6 +571,8 @@ BALMLayout::CalculateMinSize()
 BSize
 BALMLayout::CalculateMaxSize()
 {
+	_UpdateAreaConstraints();
+
 	SummandList* oldObjFunction = fSolver.ObjFunction();
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(-1.0, fRight));
@@ -601,6 +604,8 @@ BALMLayout::CalculateMaxSize()
 BSize
 BALMLayout::CalculatePreferredSize()
 {
+	_UpdateAreaConstraints();
+
 	SolveLayout();
 	if (fSolver.Result() != OPTIMAL) {
 		fSolver.Save("failed-layout.txt");
@@ -619,4 +624,12 @@ BALMLayout::_AreaForItem(BLayoutItem* item) const
 	if (!item)
 		return NULL;
 	return static_cast<Area*>(item->LayoutData());
+}
+
+
+void
+BALMLayout::_UpdateAreaConstraints()
+{
+	for (int i = 0; i < CountItems(); i++)
+		_AreaForItem(ItemAt(i))->InvalidateSizeConstraints();
 }

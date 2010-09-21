@@ -79,6 +79,7 @@ public:
 
 private:
 			Area*				_AreaForItem(BLayoutItem* item) const;
+			void				_UpdateAreaConstraints();
 
 			BSize				CalculateMinSize();
 			BSize				CalculateMaxSize();
