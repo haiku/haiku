@@ -5,7 +5,7 @@
  */
 
 #include "Column.h"
-#include "BALMLayout.h"
+#include "ALMLayout.h"
 #include "OperatorType.h"
 #include "XTab.h"
 
