@@ -350,8 +350,8 @@ if [ IsOptionalHaikuImagePackageAdded Bzip ] {
 		Echo "No optional package Bzip available for $(TARGET_ARCH)" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			bzip2-1.0.5-x86-gcc2-2010-09-01.zip
-			: $(baseURL)/bzip2-1.0.5-x86-gcc2-2010-09-01.zip
+			bzip2-1.0.6-x86-gcc2-2010-09-21.zip
+			: $(baseURL)/bzip2-1.0.6-x86-gcc2-2010-09-21.zip
 			:
 			: true
 		;
