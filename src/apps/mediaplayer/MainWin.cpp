@@ -149,6 +149,8 @@ static property_info sPropertyInfo[] = {
 
 static const char* kRatingAttrName = "Media:Rating";
 
+static const char* kDisabledSeekMessage = "Drop files to play";
+
 
 //#define printf(a...)
 
@@ -249,6 +251,7 @@ MainWin::MainWin(bool isFirstWindow, BMessage* message)
 	fControlsHeight = (int)fControls->Frame().Height() + 1;
 	fControlsWidth = (int)fControls->Frame().Width() + 1;
 	fControls->SetResizingMode(B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
+	fControls->SetDisabledString(kDisabledSeekMessage);
 
 	fPlaylist->AddListener(fPlaylistObserver);
 	fController->SetVideoView(fVideoView);
@@ -607,8 +610,7 @@ MainWin::MessageReceived(BMessage* msg)
 			BAlert* alert = new BAlert("Nothing to Play", "None of the files "
 				"you wanted to play appear to be media files.", "OK");
 			alert->Go();
-
-			_ShowIfNeeded();
+			fControls->SetDisabledString(kDisabledSeekMessage);
 			break;
 		}
 
@@ -1253,10 +1255,9 @@ MainWin::_RefsReceived(BMessage* message)
 	// so that undo/redo is used for modifying the playlist
 	fPlaylistWindow->PostMessage(message);
 
-	if (message->FindRect("window frame", &fNoVideoFrame) != B_OK) {
+	if (message->FindRect("window frame", &fNoVideoFrame) != B_OK)
 		fNoVideoFrame = BRect();
-		_ShowIfNeeded();
-	}
+	_ShowIfNeeded();
 }
 
 
@@ -1293,6 +1294,7 @@ MainWin::_PlaylistItemOpened(const PlaylistItemRef& item, status_t result)
 				message << "Error: " << strerror(result);
 			}
 			(new BAlert("error", message.String(), "OK"))->Go();
+			fControls->SetDisabledString(kDisabledSeekMessage);
 		} else {
 			// Just go to the next file and don't bother user (yet)
 			fPlaylist->SetCurrentItemIndex(fPlaylist->CurrentItemIndex() + 1);
@@ -1347,11 +1349,6 @@ MainWin::_SetupWindow()
 	}
 	_UpdateControlsEnabledStatus();
 
-	if (!fHasVideo && fNoVideoFrame.IsValid()) {
-		MoveTo(fNoVideoFrame.LeftTop());
-		ResizeTo(fNoVideoFrame.Width(), fNoVideoFrame.Height());
-	}
-	fNoVideoFrame = BRect();
 	_ShowIfNeeded();
 
 	// Adopt the size and window layout if necessary
@@ -2250,6 +2247,12 @@ MainWin::_ShowIfNeeded()
 {
 	if (find_thread(NULL) != Thread())
 		return;
+
+	if (!fHasVideo && fNoVideoFrame.IsValid()) {
+		MoveTo(fNoVideoFrame.LeftTop());
+		ResizeTo(fNoVideoFrame.Width(), fNoVideoFrame.Height());
+	}
+	fNoVideoFrame = BRect();
 
 	if (IsHidden()) {
 		Show();

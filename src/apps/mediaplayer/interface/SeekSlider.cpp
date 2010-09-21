@@ -14,9 +14,7 @@
 #include <Shape.h>
 
 
-const rgb_color kThumbRed = (rgb_color){ 255, 52, 52, 255 };
-
-const char* kDisabledSeekMessage = "Drop files to play";
+static const rgb_color kThumbRed = (rgb_color){ 255, 52, 52, 255 };
 
 
 SeekSlider::SeekSlider(const char* name, BMessage* message, int32 minValue,
@@ -26,7 +24,7 @@ SeekSlider::SeekSlider(const char* name, BMessage* message, int32 minValue,
 		B_TRIANGLE_THUMB),
 	fTracking(false),
 	fLastTrackTime(0),
-	fDisabledString(kDisabledSeekMessage),
+	fDisabledString(""),
 	fScale(0.0f)
 {
 	BFont font(be_plain_font);
@@ -177,7 +175,7 @@ void
 SeekSlider::SetDisabledString(const char* string)
 {
 	if (string == NULL)
-		string = kDisabledSeekMessage;
+		string = "";
 
 	if (fDisabledString == string)
 		return;
