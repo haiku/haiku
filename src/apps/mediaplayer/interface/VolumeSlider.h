@@ -27,6 +27,8 @@ public:
 	virtual BRect				ThumbFrame() const;
 	virtual	void				DrawThumb();
 
+	virtual	BSize				MinSize();
+
 	// VolumeSlider
 			void				SetMuted(bool mute);
 			bool				IsMuted() const

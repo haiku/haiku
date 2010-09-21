@@ -13,6 +13,7 @@
 
 
 #define KNOB_EMBEDDED 0
+#define ROUND_KNOB 0
 
 static const rgb_color kGreen = (rgb_color){ 116, 224, 0, 255 };
 
@@ -22,7 +23,7 @@ VolumeSlider::VolumeSlider(const char* name, int32 minValue, int32 maxValue,
 		int32 snapValue, BMessage* message)
 	:
 	BSlider(name, NULL, NULL, minValue, maxValue, B_HORIZONTAL,
-		B_TRIANGLE_THUMB),
+		B_BLOCK_THUMB),
 	fMuted(false),
 	fSnapValue(snapValue),
 	fSnapping(false)
@@ -95,17 +96,24 @@ VolumeSlider::MouseMoved(BPoint where, uint32 transit,
 BRect
 VolumeSlider::ThumbFrame() const
 {
+#if !ROUND_KNOB
+	BRect rect = BSlider::ThumbFrame();
+	rect.InsetBy(2, 2);
+	rect.bottom += 1;
+#else
 	BRect rect(BarFrame());
-#if KNOB_EMBEDDED
+#	if KNOB_EMBEDDED
 	// Knob embedded in bar frame
 	rect.InsetBy(0, 1);
-#else
+#	else
 	// Knob extends outside the bar frame
 	rect.InsetBy(0, -1);
-#endif
+#	endif
 	rect.InsetBy(rect.Height() / 2, 0);
 	rect.left = rect.left + rect.Width() * Position() - rect.Height() / 2;
 	rect.right = rect.left + rect.Height();
+#endif
+
 	return rect;
 }
 
@@ -113,6 +121,7 @@ VolumeSlider::ThumbFrame() const
 void
 VolumeSlider::DrawThumb()
 {
+#if ROUND_KNOB
 	// Draw a round thumb
 	BRect rect(ThumbFrame());
 
@@ -196,6 +205,18 @@ VolumeSlider::DrawThumb()
 	gradient.SetStart(rect.LeftTop());
 	gradient.SetEnd(rect.LeftBottom());
 	FillEllipse(rect, gradient);
+#else
+	BSlider::DrawThumb();
+#endif
+}
+
+
+BSize
+VolumeSlider::MinSize()
+{
+	BSize size = BSlider::MinSize();
+	size.width *= 2;
+	return size;
 }
 
 
