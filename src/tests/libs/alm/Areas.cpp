@@ -17,6 +17,9 @@ public:
 		button3 = new BButton("3");
 		button4 = new BButton("4");
 
+		button1->SetExplicitMinSize(BSize(0, 0));
+		button1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+
 		// create a new BALMLayout and use  it for this window
 		BALMLayout* layout = new BALMLayout();
 		SetLayout(layout);
@@ -45,6 +48,7 @@ public:
 			layout->Right(), y3,
 			button3);
 		a3->SetHorizontalAlignment(B_ALIGN_HORIZONTAL_CENTER);
+		a3->SetVerticalAlignment(B_ALIGN_VERTICAL_CENTER);
 		a3->HasSameHeightAs(a1);
 
 		Area* a4 = layout->AddArea(

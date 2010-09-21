@@ -14,6 +14,9 @@ public:
 		BWindow(frame, "ALM Two Views", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
 	{
 		button1 = new BButton("View 1");
+		button1->SetExplicitMinSize(BSize(0, 0));
+		button1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+
 		textView1 = new BTextView("textView1");
 		textView1->SetText("View 2");
 

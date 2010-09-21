@@ -28,6 +28,13 @@ public:
 			fLayout->Left(), fLayout->Top(), 
 			fLayout->Right(), fLayout->Bottom(),
 			button1);
+		button1->SetExplicitMinSize(BSize(0, 50));
+		button1->SetExplicitMaxSize(BSize(500, 500));
+
+		// test size limits
+		BSize min = fLayout->MinSize();
+		BSize max = fLayout->MaxSize();
+		SetSizeLimits(min.Width(), max.Width(), min.Height(), max.Height());
 	}
 	
 private:

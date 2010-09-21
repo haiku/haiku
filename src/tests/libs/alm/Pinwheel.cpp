@@ -24,6 +24,15 @@ public:
 		textView1 = new BTextView("textView1");
 		textView1->SetText("5");	
 
+		button1->SetExplicitMinSize(BSize(0, 0));
+		button1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+		button2->SetExplicitMinSize(BSize(0, 0));
+		button2->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+		button3->SetExplicitMinSize(BSize(0, 0));
+		button3->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+		button4->SetExplicitMinSize(BSize(0, 0));
+		button4->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
+
 		// create a new BALMLayout and use  it for this window
 		BALMLayout* layout = new BALMLayout();
 		SetLayout(layout);
