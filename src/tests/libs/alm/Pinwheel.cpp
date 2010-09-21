@@ -18,8 +18,8 @@
 class PinwheelWindow : public BWindow {
 public:
 	PinwheelWindow(BRect frame) 
-		: BWindow(frame, "ALM Pinwheel",
-			B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+		:
+		BWindow(frame, "ALM Pinwheel", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
 	{
 		button1 = new BButton("1");
 		button2 = new BButton("2");
@@ -47,30 +47,17 @@ public:
 		YTab* y1 = layout->AddYTab();
 		YTab* y2 = layout->AddYTab();
 
-		Area* a1 = layout->AddArea(
-			layout->Left(), layout->Top(), 
-			x2, y1,
+		Area* a1 = layout->AddArea(layout->Left(), layout->Top(), x2, y1,
 			button1);
-		Area* a2 = layout->AddArea(
-			x2, layout->Top(), 
-			layout->Right(), y2,
-			button2);
-		Area* a3 = layout->AddArea(
-			x1, y2, 
-			layout->Right(), layout->Bottom(),
+		layout->AddArea(x2, layout->Top(), layout->Right(), y2, button2);
+		Area* a3 = layout->AddArea(x1, y2, layout->Right(), layout->Bottom(),
 			button3);
-		Area* a4 = layout->AddArea(
-			layout->Left(), y1, 
-			x1, layout->Bottom(),
-			button4);
-		Area* a5 = layout->AddArea(
-			x1, y1,
-			x2, y2,
-			textView1);
+		layout->AddArea(layout->Left(), y1, x1, layout->Bottom(), button4);
+		layout->AddArea(x1, y1, x2, y2, textView1);
 
 		a1->HasSameSizeAs(a3);
 	}
-	
+
 private:
 	BButton* button1;
 	BButton* button2;
@@ -83,7 +70,8 @@ private:
 class Pinwheel : public BApplication {
 public:
 	Pinwheel() 
-		: BApplication("application/x-vnd.haiku.Pinwheel") 
+		:
+		BApplication("application/x-vnd.haiku.Pinwheel") 
 	{
 		BRect frameRect;
 		frameRect.Set(100, 100, 300, 300);

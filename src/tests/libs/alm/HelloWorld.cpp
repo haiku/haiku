@@ -17,8 +17,9 @@
 class HelloWorldWindow : public BWindow {
 public:
 	HelloWorldWindow(BRect frame) 
-		: BWindow(frame, "ALM Hello World",
-			B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+		:
+		BWindow(frame, "ALM Hello World", B_TITLED_WINDOW,
+			B_QUIT_ON_WINDOW_CLOSE)
 	{
 		button1 = new BButton("Hello World!");
 
@@ -48,7 +49,8 @@ private:
 class HelloWorld : public BApplication {
 public:
 	HelloWorld() 
-		: BApplication("application/x-vnd.haiku.HelloWorld") 
+		:
+		BApplication("application/x-vnd.haiku.HelloWorld") 
 	{
 		BRect frameRect;
 		frameRect.Set(100, 100, 300, 300);

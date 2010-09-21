@@ -34,13 +34,9 @@ public:
 		// create an extra tab
 		XTab* x1 = layout->AddXTab();
 
-		Area* a1 = layout->AddArea(
-			layout->Left(), layout->Top(), 
-			x1, layout->Bottom(),
+		layout->AddArea(layout->Left(), layout->Top(), x1, layout->Bottom(),
 			button1);
-		Area* a2 = layout->AddArea(
-			x1, layout->Top(), 
-			layout->Right(), layout->Bottom(),
+		layout->AddArea(x1, layout->Top(), layout->Right(), layout->Bottom(),
 			textView1);
 
 		// add a constraint: 2*x1 == right
