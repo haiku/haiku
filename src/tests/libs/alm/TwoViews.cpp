@@ -10,8 +10,8 @@
 class TwoViewsWindow : public BWindow {
 public:
 	TwoViewsWindow(BRect frame) 
-		: BWindow(frame, "ALM Two Views",
-			B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+		:
+		BWindow(frame, "ALM Two Views", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
 	{
 		button1 = new BButton("View 1");
 		textView1 = new BTextView("textView1");
@@ -48,7 +48,8 @@ private:
 class TwoViews : public BApplication {
 public:
 	TwoViews() 
-		: BApplication("application/x-vnd.haiku.TwoViews") 
+		:
+		BApplication("application/x-vnd.haiku.TwoViews") 
 	{
 		BRect frameRect;
 		frameRect.Set(100, 100, 300, 300);

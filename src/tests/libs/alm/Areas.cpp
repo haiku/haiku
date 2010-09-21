@@ -9,8 +9,8 @@
 class AreasWindow : public BWindow {
 public:
 	AreasWindow(BRect frame) 
-		: BWindow(frame, "ALM Areas",
-			B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+		:
+		BWindow(frame, "ALM Areas", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
 	{
 		button1 = new BButton("1");
 		button2 = new BButton("2");
@@ -65,7 +65,8 @@ private:
 class Areas : public BApplication {
 public:
 	Areas() 
-		: BApplication("application/x-vnd.haiku.Areas") 
+		:
+		BApplication("application/x-vnd.haiku.Areas") 
 	{
 		BRect frameRect;
 		frameRect.Set(100, 100, 300, 300);
