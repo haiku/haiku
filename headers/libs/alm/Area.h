@@ -109,11 +109,6 @@ private:
 			void				_UpdateMaxSizeConstraint(BSize max);
 			void				_UpdatePreferredConstraint(BSize preferred);
 
-public:
-			static BSize		kMaxSize;
-			static BSize		kMinSize;
-			static BSize		kUndefinedSize;
-
 protected:
 			BList*				fConstraints;
 
@@ -129,13 +124,10 @@ private:
 			YTab*				fBottom;
 			Row*				fRow;
 			Column*				fColumn;
-			BSize				fMinContentSize;
-			BSize				fMaxContentSize;
 			Constraint*			fMinContentWidth;
 			Constraint*			fMaxContentWidth;
 			Constraint*			fMinContentHeight;
 			Constraint*			fMaxContentHeight;
-			BSize				fPreferredContentSize;
 			BSize				fShrinkPenalties;
 			BSize				fGrowPenalties;
 			double				fContentAspectRatio;
@@ -155,7 +147,7 @@ private:
 			Constraint*			fBottomConstraint;
 
 public:
-	friend class		BALMLayout;
+	//friend class		BALMLayout;
 
 };
 

@@ -18,6 +18,11 @@
 #include "YTab.h"
 
 
+const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
+const BSize kMinSize(0, 0);
+const BSize kMaxSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
+
+
 /**
  * Constructor.
  * Creates new layout engine.
@@ -40,9 +45,9 @@ BALMLayout::BALMLayout()
 
 	// cached layout values
 	// need to be invalidated whenever the layout specification is changed
-	fMinSize = Area::kUndefinedSize;
-	fMaxSize = Area::kUndefinedSize;
-	fPreferredSize = Area::kUndefinedSize;
+	fMinSize = kUnsetSize;
+	fMaxSize = kUnsetSize;
+	fPreferredSize = kUnsetSize;
 
 	fPerformancePath = NULL;
 }
@@ -366,7 +371,7 @@ BALMLayout::SetLayoutStyle(LayoutStyleType style)
  */
 BSize
 BALMLayout::BaseMinSize() {
-	if (fMinSize == Area::kUndefinedSize)
+	if (fMinSize == kUnsetSize)
 		fMinSize = CalculateMinSize();
 	return fMinSize;
 }
@@ -378,7 +383,7 @@ BALMLayout::BaseMinSize() {
 BSize
 BALMLayout::BaseMaxSize()
 {
-	if (fMaxSize == Area::kUndefinedSize)
+	if (fMaxSize == kUnsetSize)
 		fMaxSize = CalculateMaxSize();
 	return fMaxSize;
 }
@@ -390,7 +395,7 @@ BALMLayout::BaseMaxSize()
 BSize
 BALMLayout::BasePreferredSize()
 {
-	if (fPreferredSize == Area::kUndefinedSize)
+	if (fPreferredSize == kUnsetSize)
 		fPreferredSize = CalculatePreferredSize();
 	return fPreferredSize;
 }
@@ -417,9 +422,9 @@ void
 BALMLayout::InvalidateLayout(bool children)
 {
 	BLayout::InvalidateLayout(children);
-	fMinSize = Area::kUndefinedSize;
-	fMaxSize = Area::kUndefinedSize;
-	fPreferredSize = Area::kUndefinedSize;
+	fMinSize = kUnsetSize;
+	fMaxSize = kUnsetSize;
+	fPreferredSize = kUnsetSize;
 }
 
 
@@ -554,7 +559,7 @@ BALMLayout::CalculateMinSize()
 	delete newObjFunction;
 
 	if (fSolver.Result() == UNBOUNDED)
-		return Area::kMinSize;
+		return kMinSize;
 	if (fSolver.Result() != OPTIMAL) {
 		fSolver.Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). "
@@ -587,7 +592,7 @@ BALMLayout::CalculateMaxSize()
 	delete newObjFunction;
 
 	if (fSolver.Result() == UNBOUNDED)
-		return Area::kMaxSize;
+		return kMaxSize;
 	if (fSolver.Result() != OPTIMAL) {
 		fSolver.Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). "

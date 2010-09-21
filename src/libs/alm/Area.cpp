@@ -25,10 +25,6 @@
 
 using namespace std;
 
-BSize Area::kMaxSize(INT_MAX, INT_MAX);
-BSize Area::kMinSize(0, 0);
-BSize Area::kUndefinedSize(-1, -1);
-
 
 BView*
 Area::View()
@@ -631,12 +627,10 @@ Area::Init(LinearSpec* ls, XTab* left, YTab* top,
 	XTab* right, YTab* bottom, BView* content, BSize minContentSize)
 {
 	fConstraints = new BList(2);
-	fMaxContentSize = kMaxSize;
 
 	fMaxContentWidth = NULL;
 	fMaxContentHeight = NULL;
 
-	fPreferredContentSize = kUndefinedSize;
 	fShrinkPenalties = BSize(2, 2);
 	fGrowPenalties = BSize(1, 1);
 	fContentAspectRatio = 0;
@@ -665,7 +659,6 @@ Area::Init(LinearSpec* ls, XTab* left, YTab* top,
 	fRight = right;
 	fTop = top;
 	fBottom = bottom;
-	fMinContentSize = minContentSize;
 
 	// adds the two essential constraints of the area that make sure that the left x-tab is
 	// really to the left of the right x-tab, and the top y-tab really above the bottom y-tab
@@ -747,8 +740,6 @@ Area::_InitChildArea()
 	// change them so that they refer to the tabs of the childArea
 	// and copy the minimum content size settings to the childArea
 	if (fMaxContentWidth != NULL) {
-		fChildArea->fMaxContentSize = fMaxContentSize;
-
 		fChildArea->fMaxContentWidth = fMaxContentWidth;
 		fMaxContentWidth->SetLeftSide(
 			-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
@@ -762,7 +753,6 @@ Area::_InitChildArea()
 	// change them so that they refer to the tabs of the childArea
 	// and copy the preferred content size settings to the childArea
 	if (fPreferredContentHeight != NULL) {
-		fChildArea->fPreferredContentSize = fPreferredContentSize;
 		fChildArea->fShrinkPenalties = fShrinkPenalties;
 		fChildArea->fGrowPenalties = fGrowPenalties;
 
@@ -891,9 +881,8 @@ void
 Area::_UpdateMinSizeConstraint(BSize min)
 {
 	if (fChildArea == NULL) {
-		fMinContentSize = min;
-		fMinContentWidth->SetRightSide(fMinContentSize.Width());
-		fMinContentHeight->SetRightSide(fMinContentSize.Height());
+		fMinContentWidth->SetRightSide(min.Width());
+		fMinContentHeight->SetRightSide(min.Height());
 	} else
 		fChildArea->_UpdateMinSizeConstraint(min);
 }
@@ -903,18 +892,17 @@ void
 Area::_UpdateMaxSizeConstraint(BSize max)
 {
 	if (fChildArea == NULL) {
-		fMaxContentSize = max;
 		if (fMaxContentWidth == NULL) {
 			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
-				OperatorType(LE), fMaxContentSize.Width());
+				OperatorType(LE), max.Width());
 			fConstraints->AddItem(fMaxContentWidth);
 
 			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-				OperatorType(LE), fMaxContentSize.Height());
+				OperatorType(LE), max.Height());
 			fConstraints->AddItem(fMaxContentHeight);
 		} else {
-			fMaxContentWidth->SetRightSide(fMaxContentSize.Width());
-			fMaxContentHeight->SetRightSide(fMaxContentSize.Height());
+			fMaxContentWidth->SetRightSide(max.Width());
+			fMaxContentHeight->SetRightSide(max.Height());
 		}
 	} else
 		fChildArea->_UpdateMaxSizeConstraint(max);
@@ -931,17 +919,16 @@ void
 Area::_UpdatePreferredConstraint(BSize preferred)
 {
 	if (fChildArea == NULL) {
-		fPreferredContentSize = preferred;
 		if (fPreferredContentWidth == NULL) {
 			fPreferredContentWidth = fLS->AddConstraint(
 				-1.0, fLeft, 1.0, fRight, OperatorType(EQ),
-				fPreferredContentSize.Width(), fShrinkPenalties.Width(),
+				preferred.Width(), fShrinkPenalties.Width(),
 				fGrowPenalties.Width());
 			fConstraints->AddItem(fPreferredContentWidth);
 
 			fPreferredContentHeight = fLS->AddConstraint(
 				-1.0, fTop, 1.0, fBottom, OperatorType(EQ),
-				fPreferredContentSize.Height(), fShrinkPenalties.Height(),
+				preferred.Height(), fShrinkPenalties.Height(),
 				fGrowPenalties.Height());
 			fConstraints->AddItem(fPreferredContentHeight);
 		} else {
