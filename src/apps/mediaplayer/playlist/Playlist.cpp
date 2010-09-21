@@ -40,6 +40,8 @@
 #include <Roster.h>
 #include <String.h>
 
+#include <QueryFile.h>
+
 #include "FilePlaylistItem.h"
 #include "FileReadWrite.h"
 
@@ -436,13 +438,18 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 	for (int i = 0; refsReceivedMessage->FindRef("refs", i, &ref) == B_OK;
 			i++) {
 		Playlist subPlaylist;
-		if (_IsPlaylist(_MIMEString(&ref))) {
+		BString type = _MIMEString(&ref);
+		if (_IsPlaylist(type)) {
 			AppendPlaylistToPlaylist(ref, &subPlaylist);
 			// Do not sort the whole playlist anymore, as that
 			// will screw up the ordering in the saved playlist.
 			sortPlaylist = false;
 		} else {
-			AppendToPlaylistRecursive(ref, &subPlaylist);
+			if (_IsQuery(type))
+				AppendQueryToPlaylist(ref, &subPlaylist);
+			else
+				AppendToPlaylistRecursive(ref, &subPlaylist);
+
 			// At least sort this subsection of the playlist
 			// if the whole playlist is not sorted anymore.
 			if (!sortPlaylist)
@@ -538,6 +545,22 @@ Playlist::AppendPlaylistToPlaylist(const entry_ref& ref, Playlist* playlist)
 }
 
 
+/*static*/ void
+Playlist::AppendQueryToPlaylist(const entry_ref& ref, Playlist* playlist)
+{
+	BQueryFile query(&ref);
+	if (query.InitCheck() != B_OK)
+		return;
+
+	entry_ref foundRef;
+	while (query.GetNextRef(&foundRef) == B_OK) {
+		PlaylistItem* item = new (std::nothrow) FilePlaylistItem(foundRef);
+		if (item == NULL || !playlist->AddItem(item))
+			delete item;
+	}
+}
+
+
 void
 Playlist::NotifyImportFailed()
 {
@@ -602,6 +625,13 @@ Playlist::_IsBinaryPlaylist(const BString& mimeString)
 Playlist::_IsPlaylist(const BString& mimeString)
 {
 	return _IsTextPlaylist(mimeString) || _IsBinaryPlaylist(mimeString);
+}
+
+
+/*static*/ bool
+Playlist::_IsQuery(const BString& mimeString)
+{
+	return mimeString.Compare(BQueryFile::MimeType()) == 0;
 }
 
 

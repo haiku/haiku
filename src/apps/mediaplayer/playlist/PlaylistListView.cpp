@@ -445,7 +445,7 @@ void
 PlaylistListView::RefsReceived(BMessage* message, int32 appendIndex)
 {
 	if (fCommandStack->Perform(new (nothrow) ImportPLItemsCommand(fPlaylist,
-		message, appendIndex)) != B_OK) {
+			message, appendIndex)) != B_OK) {
 		fPlaylist->NotifyImportFailed();
 	}
 }

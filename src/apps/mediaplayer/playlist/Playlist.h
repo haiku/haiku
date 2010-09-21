@@ -107,6 +107,8 @@ public:
 									Playlist* playlist);
 	static	void				AppendPlaylistToPlaylist(const entry_ref& ref,
 									Playlist* playlist);
+	static	void				AppendQueryToPlaylist(const entry_ref& ref,
+									Playlist* playlist);
 
 			void				NotifyImportFailed();
 
@@ -119,6 +121,7 @@ private:
 	static	bool				_IsTextPlaylist(const BString& mimeString);
 	static	bool				_IsBinaryPlaylist(const BString& mimeString);
 	static	bool				_IsPlaylist(const BString& mimeString);
+	static	bool				_IsQuery(const BString& mimeString);
 	static	BString				_MIMEString(const entry_ref* ref);
 
 			void				_NotifyItemAdded(PlaylistItem*,
