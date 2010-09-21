@@ -3,7 +3,7 @@
 #include <List.h>
 #include <Window.h>
 
-#include "BALMLayout.h"
+#include "ALMLayout.h"
 
 
 class AreasWindow : public BWindow {

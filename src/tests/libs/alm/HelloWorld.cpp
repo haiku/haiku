@@ -1,13 +1,17 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <Application.h>
 #include <Button.h>
 #include <List.h>
 #include <Window.h>
 
 // include this for ALM
-#include "XTab.h"
-#include "YTab.h"
-#include "Area.h"
-#include "BALMLayout.h"
+#include "ALMLayout.h"
 
 
 class HelloWorldWindow : public BWindow {
@@ -24,10 +28,8 @@ public:
 
 		// add an area containing the button
 		// use the borders of the layout as the borders for the area
-		Area* a = fLayout->AddArea(
-			fLayout->Left(), fLayout->Top(), 
-			fLayout->Right(), fLayout->Bottom(),
-			button1);
+		fLayout->AddArea(fLayout->Left(), fLayout->Top(), fLayout->Right(),
+			fLayout->Bottom(), button1);
 		button1->SetExplicitMinSize(BSize(0, 50));
 		button1->SetExplicitMaxSize(BSize(500, 500));
 
