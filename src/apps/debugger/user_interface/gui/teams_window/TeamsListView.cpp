@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <new>
 
 #include <stdio.h>
 #include <string.h>
@@ -242,8 +243,11 @@ TeamsListView::MessageReceived(BMessage* message)
 			if (message->FindInt32("be:team", &team) != B_OK)
 				break;
 
-			AddItem(new TeamListItem(team));
-			SortItems(&TeamListItem::Compare);
+			TeamListItem* item = new(std::nothrow) TeamListItem(team);
+			if (item != NULL) {
+				AddItem(new TeamListItem(team));
+				SortItems(&TeamListItem::Compare);
+			}
 			break;
 		}
 
@@ -324,12 +328,14 @@ TeamsListView::_UpdateList()
 		}
 
 		if (!item || tmi.team != item->TeamID()) {
-			// Team not found in known teams list: insert an new item
-			TeamListItem* newItem = new TeamListItem(tmi);
-			if (!item)
-				index++;	// No item with team id bigger found: insert at list end
+			// Team not found in previously known teams list: insert a new item
+			TeamListItem* newItem = new(std::nothrow) TeamListItem(tmi);
+			if (newItem != NULL) {
+				if (!item)
+					index++;	// No item found with bigger team id: insert at end
 
-			AddItem(newItem, index);
+				AddItem(newItem, index);
+			}
 		}
 		index++;	// Move list sync head.
 	}

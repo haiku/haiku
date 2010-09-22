@@ -19,11 +19,14 @@ public:
 								TeamsWindow(SettingsManager* settingsManager);
 	virtual						~TeamsWindow();
 
+	static	TeamsWindow*		Create(SettingsManager* settingsManager);
+									// throws
+
 	virtual void				MessageReceived(BMessage* message);
 	virtual bool				QuitRequested();
 
 private:
-
+			void				_Init();
 			status_t			_OpenSettings(BFile& file, uint32 mode);
 			status_t			_LoadSettings(BMessage& settings);
 			status_t			_SaveSettings();

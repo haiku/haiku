@@ -238,11 +238,18 @@ Debugger::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_SHOW_TEAMS_WINDOW:
 		{
-            if (fTeamsWindow)
+            if (fTeamsWindow) {
                	fTeamsWindow->Activate(true);
-            else {
-   	            fTeamsWindow = new(std::nothrow) TeamsWindow(&fSettingsManager);
-       	        fTeamsWindow->Show();
+               	break;
+            }
+
+           	try {
+				fTeamsWindow = TeamsWindow::Create(&fSettingsManager);
+				if (fTeamsWindow != NULL)
+					fTeamsWindow->Show();
+           	} catch(...) {
+				// TODO: Notify the user!
+				fprintf(stderr, "Error: Failed to create Teams window\n");
            	}
 			break;
 		}
@@ -343,7 +350,9 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 	_StartTeamDebugger(team, thread, stopInMain);
 }
 
+
 // TeamDebugger::Listener
+
 
 void
 Debugger::TeamDebuggerStarted(TeamDebugger* debugger)

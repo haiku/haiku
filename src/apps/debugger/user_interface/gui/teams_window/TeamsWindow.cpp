@@ -26,43 +26,30 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	:
 	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
+	fTeamsListView(NULL),
 	fSettingsManager(settingsManager)
 {
-	BMessage settings;
-	_LoadSettings(settings);
-
-	BRect frame;
-	if (settings.FindRect("teams window frame", &frame) == B_OK) {
-		MoveTo(frame.LeftTop());
-		ResizeTo(frame.Width(), frame.Height());
-	}
-
-	// TODO: add button to start a team debugger
-	// TODO: add UI to setup arguments and environ, launch a program
-	//       and start his team debugger
-
-	// Add a teams list view
-	frame = Bounds();
-	frame.right -= B_V_SCROLL_BAR_WIDTH;
-
-	fTeamsListView = new TeamsListView(frame, "TeamsList");
-	fTeamsListView->SetInvocationMessage(new BMessage(kMsgDebugThisTeam));
-
-	BScrollView * teamsScroller = new BScrollView("TeamsListScroller",
-		fTeamsListView, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER);
-
-	AddChild(teamsScroller);
-
-	// small visual tweak
-	if (BScrollBar* scrollBar = teamsScroller->ScrollBar(B_VERTICAL)) {
-		scrollBar->MoveBy(0, -1);
-		scrollBar->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
-	}
 }
 
 
 TeamsWindow::~TeamsWindow()
 {
+}
+
+
+/*static*/ TeamsWindow*
+TeamsWindow::Create(SettingsManager* settingsManager)
+{
+	TeamsWindow* self = new TeamsWindow(settingsManager);
+
+	try {
+		self->_Init();
+	} catch(...) {
+		delete self;
+		throw;
+	}
+
+	return self;
 }
 
 
@@ -101,6 +88,42 @@ TeamsWindow::QuitRequested()
 
 
 // #pragma mark --
+
+
+void
+TeamsWindow::_Init()
+{
+	BMessage settings;
+	_LoadSettings(settings);
+
+	BRect frame;
+	if (settings.FindRect("teams window frame", &frame) == B_OK) {
+		MoveTo(frame.LeftTop());
+		ResizeTo(frame.Width(), frame.Height());
+	}
+
+	// TODO: add button to start a team debugger
+	// TODO: add UI to setup arguments and environ, launch a program
+	//       and start his team debugger
+
+	// Add a teams list view
+	frame = Bounds();
+	frame.right -= B_V_SCROLL_BAR_WIDTH;
+
+	fTeamsListView = new TeamsListView(frame, "TeamsList");
+	fTeamsListView->SetInvocationMessage(new BMessage(kMsgDebugThisTeam));
+
+	BScrollView * teamsScroller = new BScrollView("TeamsListScroller",
+		fTeamsListView, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER);
+
+	AddChild(teamsScroller);
+
+	// small visual tweak
+	if (BScrollBar* scrollBar = teamsScroller->ScrollBar(B_VERTICAL)) {
+		scrollBar->MoveBy(0, -1);
+		scrollBar->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
+	}
+}
 
 
 status_t
