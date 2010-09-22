@@ -4,6 +4,8 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "Area.h"
+
 #include <algorithm>	// for max
 
 #include <Button.h>
@@ -13,14 +15,7 @@
 #include <StatusBar.h>
 #include <StringView.h>
 
-#include "Area.h"
 #include "ALMLayout.h"
-#include "Column.h"
-#include "Constraint.h"
-#include "OperatorType.h"
-#include "Row.h"
-#include "XTab.h"
-#include "YTab.h"
 
 
 using namespace std;
@@ -81,14 +76,12 @@ Area::SetLeft(XTab* left)
 
 	fColumn = NULL;
 
-	if (fChildArea == NULL) {
-		fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 
-		if (fMaxContentWidth != NULL)
-			fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-	} else
-		_UpdateHorizontal();
-	fALMLayout->InvalidateLayout();
+	if (fMaxContentWidth != NULL)
+		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -116,14 +109,12 @@ Area::SetRight(XTab* right)
 
 	fColumn = NULL;
 
-	if (fChildArea == NULL) {
-		fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 
-		if (fMaxContentWidth != NULL)
-			fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-	} else
-		_UpdateHorizontal();
-	fALMLayout->InvalidateLayout();
+	if (fMaxContentWidth != NULL)
+		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
+
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -147,14 +138,12 @@ Area::SetTop(YTab* top)
 
 	fRow = NULL;
 
-	if (fChildArea == NULL) {
-		fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 
-		if (fMaxContentHeight != NULL)
-			fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-	} else
-		_UpdateVertical();
-	fALMLayout->InvalidateLayout();
+	if (fMaxContentHeight != NULL)
+		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -178,14 +167,12 @@ Area::SetBottom(YTab* bottom)
 
 	fRow = NULL;
 
-	if (fChildArea == NULL) {
-		fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 
-		if (fMaxContentHeight != NULL)
-			fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-	} else
-		_UpdateVertical();
-	fALMLayout->InvalidateLayout();
+	if (fMaxContentHeight != NULL)
+		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
+
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -209,7 +196,7 @@ Area::SetRow(Row* row)
 	SetTop(row->Top());
 	SetBottom(row->Bottom());
 	fRow = row;
-	fALMLayout->InvalidateLayout();
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -233,7 +220,7 @@ Area::SetColumn(Column* column)
 	SetLeft(column->Left());
 	SetRight(column->Right());
 	fColumn = column;
-	fALMLayout->InvalidateLayout();
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -243,7 +230,7 @@ Area::SetColumn(Column* column)
 XTab*
 Area::ContentLeft() const
 {
-	return (fChildArea == NULL) ? fLeft : fChildArea->fLeft;
+	return fLeft;
 }
 
 
@@ -253,7 +240,7 @@ Area::ContentLeft() const
 YTab*
 Area::ContentTop() const
 {
-	return (fChildArea == NULL) ? fTop : fChildArea->fTop;
+	return fTop;
 }
 
 
@@ -263,7 +250,7 @@ Area::ContentTop() const
 XTab*
 Area::ContentRight() const
 {
-	return (fChildArea == NULL) ? fRight : fChildArea->fRight;
+	return fRight;
 }
 
 
@@ -273,7 +260,7 @@ Area::ContentRight() const
 YTab*
 Area::ContentBottom() const
 {
-	return (fChildArea == NULL) ? fBottom : fChildArea->fBottom;
+	return fBottom;
 }
 
 
@@ -284,20 +271,17 @@ Area::ContentBottom() const
 BSize
 Area::ShrinkPenalties() const
 {
-	return (fChildArea == NULL) ? fShrinkPenalties : fChildArea->fShrinkPenalties;
+	return fShrinkPenalties;
 }
 
 
 void Area::SetShrinkPenalties(BSize shrink) {
-	if (fChildArea == NULL) {
-		fShrinkPenalties = shrink;
-		if (fPreferredContentWidth != NULL) {
-			fPreferredContentWidth->SetPenaltyNeg(shrink.Width());
-			fPreferredContentHeight->SetPenaltyNeg(shrink.Height());
-		}
-	} else
-		fChildArea->SetShrinkPenalties(shrink);
-	fALMLayout->InvalidateLayout();
+	fShrinkPenalties = shrink;
+	if (fPreferredContentWidth != NULL) {
+		fPreferredContentWidth->SetPenaltyNeg(shrink.Width());
+		fPreferredContentHeight->SetPenaltyNeg(shrink.Height());
+	}
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -308,22 +292,19 @@ void Area::SetShrinkPenalties(BSize shrink) {
 BSize
 Area::GrowPenalties() const
 {
-	return (fChildArea == NULL) ? fGrowPenalties : fChildArea->fGrowPenalties;
+	return fGrowPenalties;
 }
 
 
 void
 Area::SetGrowPenalties(BSize grow)
 {
-	if (fChildArea == NULL) {
-		fGrowPenalties = grow;
-		if (fPreferredContentWidth != NULL) {
-			fPreferredContentWidth->SetPenaltyPos(grow.Width());
-			fPreferredContentHeight->SetPenaltyPos(grow.Height());
-		}
-	} else
-		fChildArea->SetGrowPenalties(grow);
-	fALMLayout->InvalidateLayout();
+	fGrowPenalties = grow;
+	if (fPreferredContentWidth != NULL) {
+		fPreferredContentWidth->SetPenaltyPos(grow.Width());
+		fPreferredContentHeight->SetPenaltyPos(grow.Height());
+	}
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -333,8 +314,7 @@ Area::SetGrowPenalties(BSize grow)
 double
 Area::ContentAspectRatio() const
 {
-	return (fChildArea == NULL) ? fContentAspectRatio
-		: fChildArea->fContentAspectRatio;
+	return fContentAspectRatio;
 }
 
 
@@ -345,56 +325,16 @@ Area::ContentAspectRatio() const
 void
 Area::SetContentAspectRatio(double ratio)
 {
-	if (fChildArea == NULL) {
-		fContentAspectRatio = ratio;
-		if (fContentAspectRatioC == NULL) {
-			fContentAspectRatioC = fLS->AddConstraint(
-				-1.0, fLeft, 1.0, fRight, ratio, fTop, -ratio, fBottom,
-				OperatorType(EQ), 0.0);
-			fConstraints->AddItem(fContentAspectRatioC);
-		} else {
-			fContentAspectRatioC->SetLeftSide(
-				-1.0, fLeft, 1.0, fRight, ratio, fTop, -ratio, fBottom);
-		}
-	} else
-		fChildArea->SetContentAspectRatio(ratio);
-	fALMLayout->InvalidateLayout();
-}
-
-
-/**
- * Sets alignment of the content in its area.
- */
-void
-Area::SetExplicitAlignment(BAlignment alignment)
-{
-	fAlignment = alignment;
-	_UpdateHorizontal();
-	_UpdateVertical();
-
-	fALMLayout->InvalidateLayout();
-}
-
-
-/**
- * Sets horizontal alignment of the content in its area.
- */
-void Area::SetHorizontalAlignment(alignment horizontal) {
-	fAlignment.SetHorizontal(horizontal);
-	_UpdateHorizontal();
-	fALMLayout->InvalidateLayout();
-}
-
-
-/**
- * Sets vertical alignment of the content in its area.
- */
-void
-Area::SetVerticalAlignment(vertical_alignment vertical)
-{
-	fAlignment.SetVertical(vertical);
-	_UpdateVertical();
-	fALMLayout->InvalidateLayout();
+	fContentAspectRatio = ratio;
+	if (fContentAspectRatioC == NULL) {
+		fContentAspectRatioC = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
+			ratio, fTop, -ratio, fBottom, OperatorType(EQ), 0.0);
+		fConstraints.AddItem(fContentAspectRatioC);
+	} else {
+		fContentAspectRatioC->SetLeftSide(-1.0, fLeft, 1.0, fRight, ratio,
+			fTop, -ratio, fBottom);
+	}
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -415,8 +355,7 @@ void
 Area::SetLeftInset(int32 left)
 {
 	fLeftInset = left;
-	_UpdateHorizontal();
-	fALMLayout->InvalidateLayout();
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -437,8 +376,7 @@ void
 Area::SetTopInset(int32 top)
 {
 	fTopInset = top;
-	_UpdateVertical();
-	fALMLayout->InvalidateLayout();
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -459,7 +397,6 @@ void
 Area::SetRightInset(int32 right)
 {
 	fRightInset = right;
-	_UpdateHorizontal();
 }
 
 
@@ -480,7 +417,6 @@ void
 Area::SetBottomInset(int32 bottom)
 {
 	fBottomInset = bottom;
-	_UpdateVertical();
 }
 
 
@@ -600,9 +536,8 @@ Area::InvalidateSizeConstraints()
  */
 Area::~Area()
 {
-	delete fChildArea;
-	for (int32 i = 0; i < fConstraints->CountItems(); i++)
-		delete (Constraint*)fConstraints->ItemAt(i);
+	for (int32 i = 0; i < fConstraints.CountItems(); i++)
+		delete (Constraint*)fConstraints.ItemAt(i);
 }
 
 
@@ -610,9 +545,8 @@ Area::~Area()
  * Constructor.
  * Uses XTabs and YTabs.
  */
-Area::Area(BALMLayout* layout, BLayoutItem* item)
+Area::Area(BLayoutItem* item)
 	:
-	fALMLayout(layout),
 	fLayoutItem(item)
 {
 
@@ -626,8 +560,6 @@ void
 Area::Init(LinearSpec* ls, XTab* left, YTab* top,
 	XTab* right, YTab* bottom, BView* content, BSize minContentSize)
 {
-	fConstraints = new BList(2);
-
 	fMaxContentWidth = NULL;
 	fMaxContentHeight = NULL;
 
@@ -641,9 +573,6 @@ Area::Init(LinearSpec* ls, XTab* left, YTab* top,
 	fPreferredContentWidth = NULL;
 	fPreferredContentHeight = NULL;
 
-	fChildArea = NULL;
-
-	fAlignment = BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 	fLeftInset = 0;
 	fTopInset = 0;
 	fRightInset = 0;
@@ -664,17 +593,17 @@ Area::Init(LinearSpec* ls, XTab* left, YTab* top,
 	// really to the left of the right x-tab, and the top y-tab really above the bottom y-tab
 	fMinContentWidth = ls->AddConstraint(-1.0, left, 1.0, right, OperatorType(GE),
 			minContentSize.Width());
-	fConstraints->AddItem(fMinContentWidth);
+	fConstraints.AddItem(fMinContentWidth);
 
 	fMinContentHeight = ls->AddConstraint(-1.0, top, 1.0, bottom, OperatorType(GE),
 			minContentSize.Height());
-	fConstraints->AddItem(fMinContentHeight);
+	fConstraints.AddItem(fMinContentHeight);
 }
 
 
 void
-Area::Init(LinearSpec* ls, Row* row, Column* column,
-	BView* content, BSize minContentSize)
+Area::Init(LinearSpec* ls, Row* row, Column* column, BView* content,
+	BSize minContentSize)
 {
 	Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
 			content, minContentSize);
@@ -688,224 +617,59 @@ Area::Init(LinearSpec* ls, Row* row, Column* column,
  */
 void Area::DoLayout()
 {
-	if (View() == NULL)
-		return; // empty areas need no layout
+	BRect areaFrame(round(Left()->Value()), round(Top()->Value()),
+		round(Right()->Value()), round(Bottom()->Value()));
+	areaFrame.left += fLeftInset;
+	areaFrame.right -= fRightInset;
+	areaFrame.top += fTopInset;
+	areaFrame.bottom -= fBottomInset;
 
-	// if there is a childArea, then it is the childArea that actually contains the content
-	Area* area = (fChildArea != NULL) ? fChildArea : this;
-
-	// set content location and size
-	area->View()->MoveTo(floor(area->Left()->Value() + 0.5),
-			floor(area->Top()->Value() + 0.5));
-	int32 width = (int32)floor(area->Right()->Value() - area->Left()->Value() + 0.5);
-	int32 height = (int32)floor(area->Bottom()->Value() - area->Top()->Value() + 0.5);
-	area->View()->ResizeTo(width, height);
-}
-
-
-/**
- * Adds a childArea to this area, together with constraints that specify the relative location
- * of the childArea within this area. It is called when such a childArea becomes necessary,
- * i.e. when the user requests insets or special alignment.
- */
-void
-Area::_InitChildArea()
-{
-	// add a child area with new tabs,
-	// and add constraints that set its tabs to be equal to the
-	// coresponding tabs of this area (for a start)
-	fChildArea = new Area(fALMLayout, fLayoutItem);
-	fChildArea->Init(fLS, new XTab(fLS), new YTab(fLS), new XTab(fLS),
-		new YTab(fLS), View(), BSize(0, 0));
-
-	fLeftConstraint = fLeft->IsEqual(fChildArea->Left());
-	fConstraints->AddItem(fLeftConstraint);
-	fTopConstraint = fTop->IsEqual(fChildArea->Top());
-	fConstraints->AddItem(fTopConstraint);
-	fRightConstraint = fRight->IsEqual(fChildArea->Right());
-	fConstraints->AddItem(fRightConstraint);
-	fBottomConstraint = fBottom->IsEqual(fChildArea->Bottom());
-	fConstraints->AddItem(fBottomConstraint);
-
-	// remove the minimum content size constraints from this area
-	// and copy the minimum content size setting to the childArea
-	fConstraints->RemoveItem(fMinContentWidth);
-	delete fMinContentWidth;
-	fMinContentWidth = fChildArea->fMinContentWidth;
-	fConstraints->RemoveItem(fMinContentHeight);
-	delete fMinContentHeight;
-	fMinContentHeight = fChildArea->fMinContentHeight;
-
-	// if there are maximum content size constraints on this area,
-	// change them so that they refer to the tabs of the childArea
-	// and copy the minimum content size settings to the childArea
-	if (fMaxContentWidth != NULL) {
-		fChildArea->fMaxContentWidth = fMaxContentWidth;
-		fMaxContentWidth->SetLeftSide(
-			-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
-
-		fChildArea->fMaxContentHeight = fMaxContentHeight;
-		fMaxContentHeight->SetLeftSide(
-			-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
-	}
-
-	// if there are preferred content size constraints on this area,
-	// change them so that they refer to the tabs of the childArea
-	// and copy the preferred content size settings to the childArea
-	if (fPreferredContentHeight != NULL) {
-		fChildArea->fShrinkPenalties = fShrinkPenalties;
-		fChildArea->fGrowPenalties = fGrowPenalties;
-
-		fChildArea->fPreferredContentWidth = fPreferredContentWidth;
-		fPreferredContentWidth->SetLeftSide(
-			-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
-
-		fChildArea->fPreferredContentHeight = fPreferredContentHeight;
-		fPreferredContentHeight->SetLeftSide(
-			-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
-	}
-}
-
-
-/**
- * Update the constraints for horizontal insets and alignment.
- */
-void
-Area::_UpdateHorizontal()
-{
-	// if the area does not have a childAdrea yet, this is the time to add it
-	if (fChildArea == NULL)
-		_InitChildArea();
-
-	// change the constraints leftConstraint and rightConstraint so that the horizontal
-	// alignment and insets of the childArea within this area are as specified by the user
-	if (fAlignment.Horizontal() == B_ALIGN_LEFT) {
-		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
-		fLeftConstraint->SetOp(OperatorType(EQ));
-		fLeftConstraint->SetRightSide(fLeftInset);
-
-		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
-		fRightConstraint->SetOp(OperatorType(GE));
-		fRightConstraint->SetRightSide(fRightInset);
-	} else if (fAlignment.Horizontal() == B_ALIGN_RIGHT) {
-		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
-		fLeftConstraint->SetOp(OperatorType(GE));
-		fLeftConstraint->SetRightSide(fLeftInset);
-
-		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
-		fRightConstraint->SetOp(OperatorType(EQ));
-		fRightConstraint->SetRightSide(fRightInset);
-	} else if (fAlignment.Horizontal() == B_ALIGN_HORIZONTAL_CENTER) {
-		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
-		fLeftConstraint->SetOp(OperatorType(GE));
-		fLeftConstraint->SetRightSide(max(fLeftInset, fRightInset));
-
-		fRightConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left(), 1.0, fChildArea->Right(), -1.0, fRight);
-		fRightConstraint->SetOp(OperatorType(EQ));
-		fRightConstraint->SetRightSide(0);
-	} else if (fAlignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH) {
-		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
-		fLeftConstraint->SetOp(OperatorType(EQ));
-		fLeftConstraint->SetRightSide(fLeftInset);
-
-		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
-		fRightConstraint->SetOp(OperatorType(EQ));
-		fRightConstraint->SetRightSide(fRightInset);
-	} else if (fAlignment.Horizontal() == B_ALIGN_HORIZONTAL_UNSET) {
-		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
-		fLeftConstraint->SetOp(OperatorType(GE));
-		fLeftConstraint->SetRightSide(fLeftInset);
-
-		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
-		fRightConstraint->SetOp(OperatorType(GE));
-		fRightConstraint->SetRightSide(fRightInset);
-	}
-}
-
-
-/**
- * Update the constraints for vertical insets and alignment.
- */
-void Area::_UpdateVertical() {
-	// if the area does not have a childAdrea yet, this is the time to add it
-	if (fChildArea == NULL)
-		_InitChildArea();
-
-	// change the constraints topConstraint and bottomConstraint so that the vertical
-	// alignment and insets of the childArea within this area are as specified by the user
-	if (fAlignment.Vertical() == B_ALIGN_TOP) {
-		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
-		fTopConstraint->SetOp(OperatorType(EQ));
-		fTopConstraint->SetRightSide(fTopInset);
-
-		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
-		fBottomConstraint->SetOp(OperatorType(GE));
-		fBottomConstraint->SetRightSide(fBottomInset);
-	} else if (fAlignment.Vertical() == B_ALIGN_BOTTOM) {
-		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
-		fTopConstraint->SetOp(OperatorType(GE));
-		fTopConstraint->SetRightSide(fTopInset);
-
-		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
-		fBottomConstraint->SetOp(OperatorType(EQ));
-		fBottomConstraint->SetRightSide(fBottomInset);
-	} else if (fAlignment.Vertical() == B_ALIGN_VERTICAL_CENTER) {
-		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
-		fTopConstraint->SetOp(OperatorType(GE));
-		fTopConstraint->SetRightSide(max(fTopInset, fBottomInset));
-
-		fBottomConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top(), 1.0, fChildArea->Bottom(), -1.0, fBottom);
-		fBottomConstraint->SetOp(OperatorType(EQ));
-		fBottomConstraint->SetRightSide(0);
-	} else if (fAlignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
-		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
-		fTopConstraint->SetOp(OperatorType(EQ));
-		fTopConstraint->SetRightSide(fTopInset);
-
-		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
-		fBottomConstraint->SetOp(OperatorType(EQ));
-		fBottomConstraint->SetRightSide(fBottomInset);
-	} else if (fAlignment.Vertical() == B_ALIGN_VERTICAL_UNSET) {
-		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
-		fTopConstraint->SetOp(OperatorType(GE));
-		fTopConstraint->SetRightSide(fTopInset);
-
-		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
-		fBottomConstraint->SetOp(OperatorType(GE));
-		fBottomConstraint->SetRightSide(fBottomInset);
-	}
+	fLayoutItem->AlignInFrame(areaFrame);
 }
 
 
 void
 Area::_UpdateMinSizeConstraint(BSize min)
 {
-	if (fChildArea == NULL) {
-		fMinContentWidth->SetRightSide(min.Width());
-		fMinContentHeight->SetRightSide(min.Height());
-	} else
-		fChildArea->_UpdateMinSizeConstraint(min);
+	fMinContentWidth->SetRightSide(min.Width() + fLeftInset + fRightInset);
+	fMinContentHeight->SetRightSide(min.Height() + fTopInset + fBottomInset);
 }
 
 
 void
 Area::_UpdateMaxSizeConstraint(BSize max)
 {
-	if (fChildArea == NULL) {
+	max.width += fLeftInset + fRightInset;
+	max.height += fTopInset + fBottomInset;
+
+	BAlignment alignment = fLayoutItem->Alignment();
+	if (alignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
+		if (fMaxContentHeight == NULL) {
+			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
+				OperatorType(LE), max.Height());
+			fConstraints.AddItem(fMaxContentHeight);
+		} else
+			fMaxContentHeight->SetRightSide(max.Height());
+	}
+	else {
+		fConstraints.RemoveItem(fMaxContentHeight);
+		delete fMaxContentHeight;
+		fMaxContentHeight = NULL;
+	}
+
+	if (alignment.Vertical() == B_ALIGN_USE_FULL_WIDTH) {
 		if (fMaxContentWidth == NULL) {
 			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
 				OperatorType(LE), max.Width());
-			fConstraints->AddItem(fMaxContentWidth);
-
-			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
-				OperatorType(LE), max.Height());
-			fConstraints->AddItem(fMaxContentHeight);
-		} else {
+			fConstraints.AddItem(fMaxContentWidth);
+		} else
 			fMaxContentWidth->SetRightSide(max.Width());
-			fMaxContentHeight->SetRightSide(max.Height());
-		}
-	} else
-		fChildArea->_UpdateMaxSizeConstraint(max);
+	}
+	else {
+		fConstraints.RemoveItem(fMaxContentWidth);
+		delete fMaxContentWidth;
+		fMaxContentWidth = NULL;
+	}
 }
 
 
@@ -918,23 +682,20 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 void
 Area::_UpdatePreferredConstraint(BSize preferred)
 {
-	if (fChildArea == NULL) {
-		if (fPreferredContentWidth == NULL) {
-			fPreferredContentWidth = fLS->AddConstraint(
-				-1.0, fLeft, 1.0, fRight, OperatorType(EQ),
-				preferred.Width(), fShrinkPenalties.Width(),
-				fGrowPenalties.Width());
-			fConstraints->AddItem(fPreferredContentWidth);
+	preferred.width += fLeftInset + fRightInset;
+	preferred.height += fTopInset + fBottomInset;
+	if (fPreferredContentWidth == NULL) {
+		fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0,
+			fRight, OperatorType(EQ), preferred.Width(),
+			fShrinkPenalties.Width(), fGrowPenalties.Width());
+		fConstraints.AddItem(fPreferredContentWidth);
 
-			fPreferredContentHeight = fLS->AddConstraint(
-				-1.0, fTop, 1.0, fBottom, OperatorType(EQ),
-				preferred.Height(), fShrinkPenalties.Height(),
-				fGrowPenalties.Height());
-			fConstraints->AddItem(fPreferredContentHeight);
-		} else {
-			fPreferredContentWidth->SetRightSide(preferred.Width());
-			fPreferredContentHeight->SetRightSide(preferred.Height());
-		}
-	} else
-		fChildArea->_UpdatePreferredConstraint(preferred);
+		fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0,
+			fBottom, OperatorType(EQ), preferred.Height(),
+			fShrinkPenalties.Height(), fGrowPenalties.Height());
+		fConstraints.AddItem(fPreferredContentHeight);
+	} else {
+		fPreferredContentWidth->SetRightSide(preferred.Width());
+		fPreferredContentHeight->SetRightSide(preferred.Height());
+	}
 }

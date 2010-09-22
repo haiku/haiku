@@ -60,10 +60,10 @@ public:
 			LayoutStyleType		LayoutStyle() const;
 			void				SetLayoutStyle(LayoutStyleType style);
 
-			BSize				BaseMinSize();
-			BSize				BaseMaxSize();
-			BSize				BasePreferredSize();
-			BAlignment			BaseAlignment();
+	virtual	BSize				BaseMinSize();
+	virtual	BSize				BaseMaxSize();
+	virtual	BSize				BasePreferredSize();
+	virtual	BAlignment			BaseAlignment();
 
 	virtual	void				InvalidateLayout(bool children = false);
 

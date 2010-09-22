@@ -56,12 +56,6 @@ public:
 			double				ContentAspectRatio() const;
 			void				SetContentAspectRatio(double ratio);
 
-			void				SetExplicitAlignment(BAlignment alignment);
-
-			void				SetHorizontalAlignment(alignment horizontal);
-			void				SetVerticalAlignment(
-									vertical_alignment vertical);
-
 			BSize				ShrinkPenalties() const;
 			void				SetShrinkPenalties(BSize shrink);
 			BSize				GrowPenalties() const;
@@ -90,7 +84,7 @@ public:
 			void				InvalidateSizeConstraints();
 
 protected:
-								Area(BALMLayout* layout, BLayoutItem* item);
+								Area(BLayoutItem* item);
 
 			void				Init(LinearSpec* ls, XTab* left, YTab* top,
 									XTab* right, YTab* bottom, BView* content,
@@ -101,53 +95,51 @@ protected:
 			void				DoLayout();
 
 private:
-			void				_InitChildArea();
-			void				_UpdateHorizontal();
-			void				_UpdateVertical();
-
 			void				_UpdateMinSizeConstraint(BSize min);
 			void				_UpdateMaxSizeConstraint(BSize max);
 			void				_UpdatePreferredConstraint(BSize preferred);
 
 protected:
-			BList*				fConstraints;
+			BList				fConstraints;
 
 private:
-			// TODO remove the layout pointer when making Area a LayoutItem
-			BALMLayout*			fALMLayout;
 			BLayoutItem*		fLayoutItem;
 
 			LinearSpec*			fLS;
+
 			XTab*				fLeft;
 			XTab*				fRight;
 			YTab*				fTop;
 			YTab*				fBottom;
-			Row*				fRow;
-			Column*				fColumn;
-			Constraint*			fMinContentWidth;
-			Constraint*			fMaxContentWidth;
-			Constraint*			fMinContentHeight;
-			Constraint*			fMaxContentHeight;
-			BSize				fShrinkPenalties;
-			BSize				fGrowPenalties;
-			double				fContentAspectRatio;
-			Constraint*			fContentAspectRatioC;
-			bool				fAutoPreferredContentSize;
-			Constraint*			fPreferredContentWidth;
-			Constraint*			fPreferredContentHeight;
-			Area*				fChildArea;
-			BAlignment			fAlignment;
-			int32				fLeftInset;
-			int32				fTopInset;
-			int32				fRightInset;
-			int32				fBottomInset;
 			Constraint*			fLeftConstraint;
 			Constraint*			fTopConstraint;
 			Constraint*			fRightConstraint;
 			Constraint*			fBottomConstraint;
 
+			Constraint*			fMinContentWidth;
+			Constraint*			fMaxContentWidth;
+			Constraint*			fMinContentHeight;
+			Constraint*			fMaxContentHeight;
+			bool				fAutoPreferredContentSize;
+			Constraint*			fPreferredContentWidth;
+			Constraint*			fPreferredContentHeight;
+
+			double				fContentAspectRatio;
+			Constraint*			fContentAspectRatioC;
+
+			Row*				fRow;
+			Column*				fColumn;
+			
+			BSize				fShrinkPenalties;
+			BSize				fGrowPenalties;
+
+			int32				fLeftInset;
+			int32				fTopInset;
+			int32				fRightInset;
+			int32				fBottomInset;
+
 public:
-	//friend class		BALMLayout;
+	friend class		BALMLayout;
 
 };
 

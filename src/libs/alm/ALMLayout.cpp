@@ -431,7 +431,7 @@ BALMLayout::InvalidateLayout(bool children)
 bool
 BALMLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 {
-	item->SetLayoutData(new(std::nothrow) Area(this, item));
+	item->SetLayoutData(new(std::nothrow) Area(item));
 	return item->LayoutData() != NULL;
 }
 
