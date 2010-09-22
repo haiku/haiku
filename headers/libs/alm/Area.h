@@ -95,27 +95,11 @@ private:
 private:
 			BLayoutItem*		fLayoutItem;
 			LinearSpec*			fLS;
-			BList				fConstraints;
 
 			XTab*				fLeft;
 			XTab*				fRight;
 			YTab*				fTop;
 			YTab*				fBottom;
-			Constraint*			fLeftConstraint;
-			Constraint*			fTopConstraint;
-			Constraint*			fRightConstraint;
-			Constraint*			fBottomConstraint;
-
-			Constraint*			fMinContentWidth;
-			Constraint*			fMaxContentWidth;
-			Constraint*			fMinContentHeight;
-			Constraint*			fMaxContentHeight;
-			bool				fAutoPreferredContentSize;
-			Constraint*			fPreferredContentWidth;
-			Constraint*			fPreferredContentHeight;
-
-			double				fContentAspectRatio;
-			Constraint*			fContentAspectRatioC;
 
 			Row*				fRow;
 			Column*				fColumn;
@@ -127,6 +111,17 @@ private:
 			int32				fTopInset;
 			int32				fRightInset;
 			int32				fBottomInset;
+
+			BList				fConstraints;
+			Constraint*			fMinContentWidth;
+			Constraint*			fMaxContentWidth;
+			Constraint*			fMinContentHeight;
+			Constraint*			fMaxContentHeight;
+			bool				fAutoPreferredContentSize;
+			Constraint*			fPreferredContentWidth;
+			Constraint*			fPreferredContentHeight;
+			double				fContentAspectRatio;
+			Constraint*			fContentAspectRatioC;
 
 public:
 	friend class		BALMLayout;

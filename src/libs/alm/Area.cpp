@@ -538,11 +538,6 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top,
 	fRightInset = 0;
 	fBottomInset = 0;
 
-	fLeftConstraint = NULL;
-	fTopConstraint = NULL;
-	fRightConstraint = NULL;
-	fBottomConstraint = NULL;
-
 	fLS = ls;
 	fLeft = left;
 	fRight = right;
