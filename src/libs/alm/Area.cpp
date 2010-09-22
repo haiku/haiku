@@ -65,6 +65,38 @@ Area::Left() const
 
 
 /**
+ * Gets the right tab of the area.
+ *
+ * @return the right tab of the area
+ */
+XTab*
+Area::Right() const
+{
+	return fRight;
+}
+
+
+/**
+ * Gets the top tab of the area.
+ */
+YTab*
+Area::Top() const
+{
+	return fTop;
+}
+
+
+/**
+ * Gets the bottom tab of the area.
+ */
+YTab*
+Area::Bottom() const
+{
+	return fBottom;
+}
+
+
+/**
  * Sets the left tab of the area.
  *
  * @param left	the left tab of the area
@@ -82,18 +114,6 @@ Area::SetLeft(XTab* left)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 
 	fLayoutItem->Layout()->InvalidateLayout();
-}
-
-
-/**
- * Gets the right tab of the area.
- *
- * @return the right tab of the area
- */
-XTab*
-Area::Right() const
-{
-	return fRight;
 }
 
 
@@ -119,16 +139,6 @@ Area::SetRight(XTab* right)
 
 
 /**
- * Gets the top tab of the area.
- */
-YTab*
-Area::Top() const
-{
-	return fTop;
-}
-
-
-/**
  * Sets the top tab of the area.
  */
 void
@@ -144,16 +154,6 @@ Area::SetTop(YTab* top)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 
 	fLayoutItem->Layout()->InvalidateLayout();
-}
-
-
-/**
- * Gets the bottom tab of the area.
- */
-YTab*
-Area::Bottom() const
-{
-	return fBottom;
 }
 
 
@@ -187,6 +187,16 @@ Area::GetRow() const
 
 
 /**
+ * Gets the column that defines the left and right tabs.
+ */
+Column*
+Area::GetColumn() const
+{
+	return fColumn;
+}
+
+
+/**
  * Sets the row that defines the top and bottom tabs.
  * May be null.
  */
@@ -197,16 +207,6 @@ Area::SetRow(Row* row)
 	SetBottom(row->Bottom());
 	fRow = row;
 	fLayoutItem->Layout()->InvalidateLayout();
-}
-
-
-/**
- * Gets the column that defines the left and right tabs.
- */
-Column*
-Area::GetColumn() const
-{
-	return fColumn;
 }
 
 
@@ -225,46 +225,6 @@ Area::SetColumn(Column* column)
 
 
 /**
- * Left tab of the area's content. May be different from the left tab of the area.
- */
-XTab*
-Area::ContentLeft() const
-{
-	return fLeft;
-}
-
-
-/**
- * Top tab of the area's content. May be different from the top tab of the area.
- */
-YTab*
-Area::ContentTop() const
-{
-	return fTop;
-}
-
-
-/**
- * Right tab of the area's content. May be different from the right tab of the area.
- */
-XTab*
-Area::ContentRight() const
-{
-	return fRight;
-}
-
-
-/**
- * Bottom tab of the area's content. May be different from the bottom tab of the area.
- */
-YTab*
-Area::ContentBottom() const
-{
-	return fBottom;
-}
-
-
-/**
  * The reluctance with which the area's content shrinks below its preferred size.
  * The bigger the less likely is such shrinking.
  */
@@ -272,16 +232,6 @@ BSize
 Area::ShrinkPenalties() const
 {
 	return fShrinkPenalties;
-}
-
-
-void Area::SetShrinkPenalties(BSize shrink) {
-	fShrinkPenalties = shrink;
-	if (fPreferredContentWidth != NULL) {
-		fPreferredContentWidth->SetPenaltyNeg(shrink.Width());
-		fPreferredContentHeight->SetPenaltyNeg(shrink.Height());
-	}
-	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -293,6 +243,16 @@ BSize
 Area::GrowPenalties() const
 {
 	return fGrowPenalties;
+}
+
+
+void Area::SetShrinkPenalties(BSize shrink) {
+	fShrinkPenalties = shrink;
+	if (fPreferredContentWidth != NULL) {
+		fPreferredContentWidth->SetPenaltyNeg(shrink.Width());
+		fPreferredContentHeight->SetPenaltyNeg(shrink.Height());
+	}
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -349,6 +309,36 @@ Area::LeftInset() const
 
 
 /**
+ * Gets top inset between area and its content.
+ */
+int32
+Area::TopInset() const
+{
+	return fTopInset;
+}
+
+
+/**
+ * Gets right inset between area and its content.
+ */
+int32
+Area::RightInset() const
+{
+	return fRightInset;
+}
+
+
+/**
+ * Gets bottom inset between area and its content.
+ */
+int32
+Area::BottomInset() const
+{
+	return fBottomInset;
+}
+
+
+/**
  * Sets left inset between area and its content.
  */
 void
@@ -356,16 +346,6 @@ Area::SetLeftInset(int32 left)
 {
 	fLeftInset = left;
 	fLayoutItem->Layout()->InvalidateLayout();
-}
-
-
-/**
- * Gets top inset between area and its content.
- */
-int32
-Area::TopInset() const
-{
-	return fTopInset;
 }
 
 
@@ -381,32 +361,12 @@ Area::SetTopInset(int32 top)
 
 
 /**
- * Gets right inset between area and its content.
- */
-int32
-Area::RightInset() const
-{
-	return fRightInset;
-}
-
-
-/**
  * Sets right inset between area and its content.
  */
 void
 Area::SetRightInset(int32 right)
 {
 	fRightInset = right;
-}
-
-
-/**
- * Gets bottom inset between area and its content.
- */
-int32
-Area::BottomInset() const
-{
-	return fBottomInset;
 }
 
 
@@ -557,7 +517,7 @@ Area::Area(BLayoutItem* item)
  * Initialize variables.
  */
 void
-Area::Init(LinearSpec* ls, XTab* left, YTab* top,
+Area::_Init(LinearSpec* ls, XTab* left, YTab* top,
 	XTab* right, YTab* bottom, BView* content, BSize minContentSize)
 {
 	fMaxContentWidth = NULL;
@@ -602,10 +562,10 @@ Area::Init(LinearSpec* ls, XTab* left, YTab* top,
 
 
 void
-Area::Init(LinearSpec* ls, Row* row, Column* column, BView* content,
+Area::_Init(LinearSpec* ls, Row* row, Column* column, BView* content,
 	BSize minContentSize)
 {
-	Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
+	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
 			content, minContentSize);
 	fRow = row;
 	fColumn = column;
@@ -615,7 +575,7 @@ Area::Init(LinearSpec* ls, Row* row, Column* column, BView* content,
 /**
  * Perform layout on the area.
  */
-void Area::DoLayout()
+void Area::_DoLayout()
 {
 	BRect areaFrame(round(Left()->Value()), round(Top()->Value()),
 		round(Right()->Value()), round(Bottom()->Value()));

@@ -34,40 +34,34 @@ public:
 			BView*				View();
 
 			XTab*				Left() const;
-			void				SetLeft(XTab* left);
 			XTab*				Right() const;
-			void				SetRight(XTab* right);
 			YTab*				Top() const;
-			void				SetTop(YTab* top);
 			YTab*				Bottom() const;
+			void				SetLeft(XTab* left);
+			void				SetRight(XTab* right);
+			void				SetTop(YTab* top);
 			void				SetBottom(YTab* bottom);
 
 			Row*				GetRow() const;
-			void				SetRow(Row* row);
 			Column*				GetColumn() const;
+			void				SetRow(Row* row);
 			void				SetColumn(Column* column);
-
-			XTab*				ContentLeft() const;
-			YTab*				ContentTop() const;
-			XTab*				ContentRight() const;
-			YTab*				ContentBottom() const;
-			BSize				MinContentSize() const;
 
 			double				ContentAspectRatio() const;
 			void				SetContentAspectRatio(double ratio);
 
 			BSize				ShrinkPenalties() const;
-			void				SetShrinkPenalties(BSize shrink);
 			BSize				GrowPenalties() const;
+			void				SetShrinkPenalties(BSize shrink);
 			void				SetGrowPenalties(BSize grow);
 
 			int32				LeftInset() const;
-			void				SetLeftInset(int32 left);
 			int32				TopInset() const;
-			void				SetTopInset(int32 top);
 			int32				RightInset() const;
-			void				SetRightInset(int32 right);
 			int32				BottomInset() const;
+			void				SetLeftInset(int32 left);
+			void				SetTopInset(int32 top);
+			void				SetRightInset(int32 right);
 			void				SetBottomInset(int32 bottom);
 
 			void				SetDefaultBehavior();
@@ -83,29 +77,25 @@ public:
 
 			void				InvalidateSizeConstraints();
 
-protected:
+private:
 								Area(BLayoutItem* item);
 
-			void				Init(LinearSpec* ls, XTab* left, YTab* top,
+			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
 									XTab* right, YTab* bottom, BView* content,
 									BSize minContentSize);
-			void				Init(LinearSpec* ls, Row* row, Column* column,
+			void				_Init(LinearSpec* ls, Row* row, Column* column,
 									BView* content, BSize minContentSize);
 
-			void				DoLayout();
+			void				_DoLayout();
 
-private:
 			void				_UpdateMinSizeConstraint(BSize min);
 			void				_UpdateMaxSizeConstraint(BSize max);
 			void				_UpdatePreferredConstraint(BSize preferred);
 
-protected:
-			BList				fConstraints;
-
 private:
 			BLayoutItem*		fLayoutItem;
-
 			LinearSpec*			fLS;
+			BList				fConstraints;
 
 			XTab*				fLeft;
 			XTab*				fRight;

@@ -162,7 +162,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	if (!area)
 		return NULL;
 
-	area->Init(&fSolver, left, top, right, bottom, content,
+	area->_Init(&fSolver, left, top, right, bottom, content,
 		minContentSize);
 	return area;
 }
@@ -186,7 +186,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content,
 	if (!area)
 		return NULL;
 
-	area->Init(&fSolver, row, column, content, minContentSize);
+	area->_Init(&fSolver, row, column, content, minContentSize);
 	return area;
 }
 
@@ -210,7 +210,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	if (!area)
 		return NULL;
 
-	area->Init(&fSolver, left, top, right, bottom, content,
+	area->_Init(&fSolver, left, top, right, bottom, content,
 		BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
@@ -234,7 +234,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 	if (!area)
 		return NULL;
 
-	area->Init(&fSolver, row, column, content, BSize(0, 0));
+	area->_Init(&fSolver, row, column, content, BSize(0, 0));
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
 	return area;
@@ -403,7 +403,7 @@ BALMLayout::DerivedLayoutItems()
 
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
-		_AreaForItem(ItemAt(i))->DoLayout();
+		_AreaForItem(ItemAt(i))->_DoLayout();
 }
 
 
