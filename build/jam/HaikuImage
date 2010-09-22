@@ -139,11 +139,7 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	firewire_dv.media_addon
 	#legacy.media_addon
 ;
-SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
-	aiff_reader asf_reader au_reader $(X86_ONLY)ffmpeg
-	mov_reader musepack raw_decoder $(X86_ONLY)ape_reader
-	wav_reader
-;
+SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(X86_ONLY)ffmpeg raw_decoder ;
 SYSTEM_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible
 	PCL5\ Compatible PCL6\ Compatible PDF\ Writer PS\ Compatible Preview
 ;

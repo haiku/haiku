@@ -73,7 +73,6 @@ AVCodecDecoder::AVCodecDecoder()
 	fOutputVideoFormat(),
 	fFrame(0),
 	fIsAudio(false),
-	fCodecIndexInTable(-1),
 	fCodec(NULL),
 	fContext(avcodec_alloc_context()),
 	fInputPicture(avcodec_alloc_frame()),
@@ -141,11 +140,10 @@ AVCodecDecoder::~AVCodecDecoder()
 void
 AVCodecDecoder::GetCodecInfo(media_codec_info* mci)
 {
-	sprintf(mci->short_name, "ff:%s", fCodec->name);
-	sprintf(mci->pretty_name, "%s (libavcodec %s)",
-		gCodecTable[fCodecIndexInTable].prettyname, fCodec->name);
+	snprintf(mci->short_name, 32, "%s", fCodec->name);
+	snprintf(mci->pretty_name, 96, "%s", fCodec->long_name);
 	mci->id = 0;
-	mci->sub_id = gCodecTable[fCodecIndexInTable].id;
+	mci->sub_id = fCodec->id;
 }
 
 
@@ -177,94 +175,62 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 		ioEncodedFormat->MetaDataSize());
 #endif
 
-	media_format_description descr;
-	for (int32 i = 0; gCodecTable[i].id; i++) {
-		fCodecIndexInTable = i;
-		uint64 cid;
+	media_format_description description;
+	if (BMediaFormats().GetCodeFor(*ioEncodedFormat,
+			B_MISC_FORMAT_FAMILY, &description) == B_OK) {
+		if (description.u.misc.file_format != 'ffmp')
+			return B_NOT_SUPPORTED;
+		fCodec = avcodec_find_decoder(static_cast<CodecID>(
+			description.u.misc.codec));
+		if (fCodec == NULL) {
+			TRACE("  unable to find the correct FFmpeg "
+				"decoder (id = %lu)\n", description.u.misc.codec);
+			return B_ERROR;
+		}
+		TRACE("  found decoder %s\n", fCodec->name);
 
-		if (BMediaFormats().GetCodeFor(*ioEncodedFormat,
-				gCodecTable[i].family, &descr) == B_OK
-		    && gCodecTable[i].type == ioEncodedFormat->type) {
-			switch(gCodecTable[i].family) {
-				case B_WAV_FORMAT_FAMILY:
-					cid = descr.u.wav.codec;
-					break;
-				case B_AIFF_FORMAT_FAMILY:
-					cid = descr.u.aiff.codec;
-					break;
-				case B_AVI_FORMAT_FAMILY:
-					cid = descr.u.avi.codec;
-					break;
-				case B_MPEG_FORMAT_FAMILY:
-					cid = descr.u.mpeg.id;
-					break;
-				case B_QUICKTIME_FORMAT_FAMILY:
-					cid = descr.u.quicktime.codec;
-					break;
-				case B_MISC_FORMAT_FAMILY:
-					cid = (((uint64)descr.u.misc.file_format) << 32)
-						| descr.u.misc.codec;
-					break;
-				default:
-					puts("ERR family");
-					return B_ERROR;
+		const void* extraData = infoBuffer;
+		fExtraDataSize = infoSize;
+		if (description.family == B_WAV_FORMAT_FAMILY
+				&& infoSize >= sizeof(wave_format_ex)) {
+			TRACE("  trying to use wave_format_ex\n");
+			// Special case extra data in B_WAV_FORMAT_FAMILY
+			const wave_format_ex* waveFormatData
+				= (const wave_format_ex*)infoBuffer;
+
+			size_t waveFormatSize = infoSize;
+			if (waveFormatData != NULL && waveFormatSize > 0) {
+				fBlockAlign = waveFormatData->block_align;
+				TRACE("  found block align: %d\n", fBlockAlign);
+				fExtraDataSize = waveFormatData->extra_size;
+				// skip the wave_format_ex from the extra data.
+				extraData = waveFormatData + 1;
 			}
-
-			if (gCodecTable[i].family == descr.family
-				&& gCodecTable[i].fourcc == cid) {
-
-				TRACE("  0x%04lx codec id = \"%c%c%c%c\"\n", uint32(cid),
-					(char)((cid >> 24) & 0xff), (char)((cid >> 16) & 0xff),
-					(char)((cid >> 8) & 0xff), (char)(cid & 0xff));
-
-				fCodec = avcodec_find_decoder(gCodecTable[i].id);
-				if (fCodec == NULL) {
-					TRACE("  unable to find the correct FFmpeg "
-						"decoder (id = %d)\n", gCodecTable[i].id);
-					return B_ERROR;
-				}
-				TRACE("  found decoder %s\n", fCodec->name);
-
-				const void* extraData = infoBuffer;
-				fExtraDataSize = infoSize;
-				if (gCodecTable[i].family == B_WAV_FORMAT_FAMILY
-						&& infoSize >= sizeof(wave_format_ex)) {
-					TRACE("  trying to use wave_format_ex\n");
-					// Special case extra data in B_WAV_FORMAT_FAMILY
-					const wave_format_ex* waveFormatData
-						= (const wave_format_ex*)infoBuffer;
-
-					size_t waveFormatSize = infoSize;
-					if (waveFormatData != NULL && waveFormatSize > 0) {
-						fBlockAlign = waveFormatData->block_align;
-						TRACE("  found block align: %d\n", fBlockAlign);
-						fExtraDataSize = waveFormatData->extra_size;
-						// skip the wave_format_ex from the extra data.
-						extraData = waveFormatData + 1;
-					}
-				} else {
-					if (fIsAudio) {
-						fBlockAlign
-							= ioEncodedFormat->u.encoded_audio.output
-								.buffer_size;
-						TRACE("  using buffer_size as block align: %d\n",
-							fBlockAlign);
-					}
-				}
-				if (extraData != NULL && fExtraDataSize > 0) {
-					TRACE("AVCodecDecoder: extra data size %ld\n", infoSize);
-					fExtraData = new(std::nothrow) char[fExtraDataSize];
-					if (fExtraData != NULL)
-						memcpy(fExtraData, infoBuffer, fExtraDataSize);
-					else
-						fExtraDataSize = 0;
-				}
-
-				fInputFormat = *ioEncodedFormat;
-				return B_OK;
+		} else {
+			if (fIsAudio) {
+				fBlockAlign
+					= ioEncodedFormat->u.encoded_audio.output
+						.buffer_size;
+				TRACE("  using buffer_size as block align: %d\n",
+					fBlockAlign);
 			}
 		}
+		if (extraData != NULL && fExtraDataSize > 0) {
+			TRACE("AVCodecDecoder: extra data size %ld\n", infoSize);
+			delete[] fExtraData;
+			fExtraData = new(std::nothrow) char[fExtraDataSize];
+			if (fExtraData != NULL)
+				memcpy(fExtraData, infoBuffer, fExtraDataSize);
+			else
+				fExtraDataSize = 0;
+		}
+
+		fInputFormat = *ioEncodedFormat;
+		return B_OK;
+	} else {
+		TRACE("AVCodecDecoder: BMediaFormats().GetCodeFor() failed.\n");
 	}
+
 	printf("AVCodecDecoder::Setup failed!\n");
 	return B_ERROR;
 }

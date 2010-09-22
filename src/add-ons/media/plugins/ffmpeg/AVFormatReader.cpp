@@ -264,15 +264,6 @@ AVFormatReader::StreamCookie::Open()
 		(inputFormat->flags & AVFMT_VARIABLE_FPS) ? " AVFMT_VARIABLE_FPS" : ""
 	);
 
-	const DemuxerFormat* demuxerFormat = demuxer_format_for(inputFormat);
-	if (demuxerFormat == NULL) {
-		// We could support this format, but we don't want to. Bail out.
-		ERROR("AVFormatReader::StreamCookie::Open() - "
-			"support for demuxer '%s' is not enabled. "
-			"See DemuxerTable.cpp\n", inputFormat->name);
-		return B_NOT_SUPPORTED;
-	}
-
 	// Init I/O context with buffer and hook functions, pass ourself as
 	// cookie.
 	if (init_put_byte(&fIOContext, probeBuffer, probeSize, 0, this,
@@ -326,12 +317,6 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 
 	TRACE("  context stream index: %ld\n", streamIndex);
 
-	const DemuxerFormat* demuxerFormat = demuxer_format_for(fContext->iformat);
-	if (demuxerFormat == NULL) {
-		TRACE("  unknown AVInputFormat!\n");
-		return B_NOT_SUPPORTED;
-	}
-
 	// We need to remember the virtual index so that
 	// AVFormatReader::FreeCookie() can clear the correct stream entry.
 	fVirtualIndex = virtualIndex;
@@ -380,22 +365,26 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 
 	// Set format family and type depending on codec_type of the stream.
 	switch (codecContext->codec_type) {
-		case CODEC_TYPE_AUDIO:
+		case AVMEDIA_TYPE_AUDIO:
 			if ((codecContext->codec_id >= CODEC_ID_PCM_S16LE)
 				&& (codecContext->codec_id <= CODEC_ID_PCM_U8)) {
 				TRACE("  raw audio\n");
 				format->type = B_MEDIA_RAW_AUDIO;
 				description.family = B_ANY_FORMAT_FAMILY;
+				// This will then apparently be handled by the (built into
+				// BMediaTrack) RawDecoder.
 			} else {
 				TRACE("  encoded audio\n");
 				format->type = B_MEDIA_ENCODED_AUDIO;
-				description.family = demuxerFormat->audio_family;
+				description.family = B_MISC_FORMAT_FAMILY;
+				description.u.misc.file_format = 'ffmp';
 			}
 			break;
-		case CODEC_TYPE_VIDEO:
+		case AVMEDIA_TYPE_VIDEO:
 			TRACE("  encoded video\n");
 			format->type = B_MEDIA_ENCODED_VIDEO;
-			description.family = demuxerFormat->video_family;
+			description.family = B_MISC_FORMAT_FAMILY;
+			description.u.misc.file_format = 'ffmp';
 			break;
 		default:
 			TRACE("  unknown type\n");
@@ -404,6 +393,7 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 	}
 
 	if (format->type == B_MEDIA_RAW_AUDIO) {
+		// We cannot describe all raw-audio formats, some are unsupported.
 		switch (codecContext->codec_id) {
 			case CODEC_ID_PCM_S16LE:
 				format->u.raw_audio.format
@@ -444,126 +434,8 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 				break;
 		}
 	} else {
-		uint32 codecTag = codecContext->codec_tag;
-		if (codecTag == 0) {
-			// Ugh, no codec_tag. Let's try to fake some known codecs.
-			// Such a situation seems to occur for the "mpegts" demuxer for
-			// example. These are some tags I could test with.
-			switch (codecContext->codec_id) {
-				case CODEC_ID_H264:
-					codecTag = 'h264';
-					break;
-				case CODEC_ID_DVVIDEO:
-					codecTag = 'pcvd';
-					break;
-				case CODEC_ID_AC3:
-					description.family = B_WAV_FORMAT_FAMILY;
-					codecTag = 0x2000;
-					break;
-				case CODEC_ID_FLAC:
-					description.family = B_WAV_FORMAT_FAMILY;
-					codecTag = 'flac';
-					break;
-				case CODEC_ID_VP6F:
-					description.family = B_QUICKTIME_FORMAT_FAMILY;
-					codecTag = B_BENDIAN_TO_HOST_INT32('VP6F');
-					break;
-				case CODEC_ID_MP3:
-					description.family = B_QUICKTIME_FORMAT_FAMILY;
-					codecTag = B_BENDIAN_TO_HOST_INT32('.mp3');
-					break;
-				case CODEC_ID_AAC:
-					description.family = B_MISC_FORMAT_FAMILY;
-					codecTag = 'mp4a';
-					break;
-				case CODEC_ID_DTS:
-					description.family = B_WAV_FORMAT_FAMILY;
-					codecTag = ' DTS';
-					break;
-				case CODEC_ID_THEORA:
-					// Use the same format description as the native Ogg
-					// reader and decoder did.
-					description.family = B_MISC_FORMAT_FAMILY;
-// TODO: The rest of this plugin (Decoders/Encoders) does not support
-// this yet, specifying it would throw off the format matching.
-//					description.u.misc.file_format = 'OggS';
-					codecTag = 'theo';
-					break;
-				case CODEC_ID_SPEEX:
-					// Use the same format description as the native Ogg
-					// reader and decoder did.
-					description.family = B_MISC_FORMAT_FAMILY;
-// TODO: See above.
-//					description.u.misc.file_format = 'OggS';
-					codecTag = 'spex';
-					break;
-				case CODEC_ID_VORBIS:
-					// Use the same format description as the native Ogg
-					// reader and decoder did.
-					description.family = B_MISC_FORMAT_FAMILY;
-// TODO: See above.
-//					description.u.misc.file_format = 'OggS';
-					codecTag = 'vorb';
-					break;
-				default:
-					fprintf(stderr, "ffmpeg codecTag is null, codec_id "
-						"unknown 0x%x\n", codecContext->codec_id);
-					// TODO: Add more...
-					break;
-			}
-		}
-		switch (description.family) {
-			case B_AIFF_FORMAT_FAMILY:
-				TRACE("  B_AIFF_FORMAT_FAMILY\n");
-				description.u.aiff.codec = codecTag;
-				break;
-			case B_ASF_FORMAT_FAMILY:
-				TRACE("  B_ASF_FORMAT_FAMILY\n");
-//				description.u.asf.guid = GUID(codecTag);
-				return B_NOT_SUPPORTED;
-				break;
-			case B_AVI_FORMAT_FAMILY:
-				TRACE("  B_AVI_FORMAT_FAMILY\n");
-				description.u.avi.codec = codecTag;
-				break;
-			case B_AVR_FORMAT_FAMILY:
-				TRACE("  B_AVR_FORMAT_FAMILY\n");
-				description.u.avr.id = codecTag;
-				break;
-			case B_MPEG_FORMAT_FAMILY:
-				TRACE("  B_MPEG_FORMAT_FAMILY\n");
-				if (codecContext->codec_id == CODEC_ID_MPEG1VIDEO)
-					description.u.mpeg.id = B_MPEG_1_VIDEO;
-				else if (codecContext->codec_id == CODEC_ID_MPEG2VIDEO)
-					description.u.mpeg.id = B_MPEG_2_VIDEO;
-				else if (codecContext->codec_id == CODEC_ID_MP2)
-					description.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_2;
-				else if (codecContext->codec_id == CODEC_ID_MP3)
-					description.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_3;
-				// TODO: Add some more...
-				else
-					description.u.mpeg.id = B_MPEG_ANY;
-				break;
-			case B_QUICKTIME_FORMAT_FAMILY:
-				TRACE("  B_QUICKTIME_FORMAT_FAMILY\n");
-				description.u.quicktime.codec
-					= B_HOST_TO_BENDIAN_INT32(codecTag);
-				break;
-			case B_WAV_FORMAT_FAMILY:
-				TRACE("  B_WAV_FORMAT_FAMILY\n");
-				description.u.wav.codec = codecTag;
-				break;
-			case B_MISC_FORMAT_FAMILY:
-				TRACE("  B_MISC_FORMAT_FAMILY\n");
-				description.u.misc.codec = codecTag;
-				break;
-
-			default:
-				break;
-		}
-		TRACE("  codecTag '%.4s' or %ld\n", (char*)&codecTag, codecTag);
-		TRACE("  fourcc '%.4s' or %d\n", (char*)&codecContext->codec_id,
-			codecContext->codec_id);
+		if (description.family == B_MISC_FORMAT_FAMILY)
+			description.u.misc.codec = codecContext->codec_id;
 
 		BMediaFormats formats;
 		status_t status = formats.GetFormatFor(description, format);
@@ -571,11 +443,11 @@ AVFormatReader::StreamCookie::Init(int32 virtualIndex)
 			TRACE("  formats.GetFormatFor() error: %s\n", strerror(status));
 
 		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32*)format->user_data = codecTag;
+		*(uint32*)format->user_data = codecContext->codec_tag;
 		format->user_data[4] = 0;
 	}
 
-//	format->require_flags = 0;
+	format->require_flags = 0;
 	format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
 	switch (format->type) {

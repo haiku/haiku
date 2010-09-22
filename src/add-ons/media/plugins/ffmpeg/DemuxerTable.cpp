@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -10,19 +10,18 @@ extern "C" {
 }
 
 
-// NOTE: AVFormatReader will refuse any streams which do not match to any
-// of these formats from the table. It could very well be that it could play
-// these streams, but testing has to be done first.
+// NOTE: AVFormatReader uses this table only for better pretty names and
+// the MIME type info, the latter which is unavailable from AVInputFormat.
 
 
 static const DemuxerFormat gDemuxerTable[] = {
-//	{
-//		// Tested with a limited number of streams. Some videos show bad
-//		// artifacts on keyframes with our own ASF Reader, while they play
-//		// fine with this Reader. But seeking seems to be a problem.
-//		"asf", "ASF Movie", "video/x-asf",
-//		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
-//	},
+	{
+		// Tested with a limited number of streams. Some videos show bad
+		// artifacts on keyframes with our own ASF Reader, while they play
+		// fine with this Reader. But seeking seems to be a problem.
+		"asf", "ASF Movie", "video/x-asf",
+		B_WAV_FORMAT_FAMILY, B_AVI_FORMAT_FAMILY
+	},
 	{
 		// Tested with many streams and works very well, with many older
 		// files, the native AVI reader does not work.
@@ -51,11 +50,11 @@ static const DemuxerFormat gDemuxerTable[] = {
 		"matroska", "Matroska movie", "video/x-matroska",
 		B_MISC_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
 	},
-//	{
-//		// Plays the limited amount of files I could test with.
-//		"mov", "Quicktime Movie", "video/x-mov",
-//		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
-//	},
+	{
+		// Plays the limited amount of files I could test with.
+		"mov", "Quicktime Movie", "video/x-mov",
+		B_QUICKTIME_FORMAT_FAMILY, B_QUICKTIME_FORMAT_FAMILY
+	},
 	{
 		// Plays all files I could test with perfectly.
 		"mp4", "MPEG-4 movie", "video/x-mp4",
