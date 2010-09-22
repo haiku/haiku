@@ -5,6 +5,7 @@
 #ifndef	X_TAB_H
 #define	X_TAB_H
 
+
 #include "LinearSpec.h"
 #include "Variable.h"
 

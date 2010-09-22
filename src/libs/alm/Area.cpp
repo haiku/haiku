@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "Area.h"
 
 #include <algorithm>	// for max
@@ -517,8 +518,8 @@ Area::Area(BLayoutItem* item)
  * Initialize variables.
  */
 void
-Area::_Init(LinearSpec* ls, XTab* left, YTab* top,
-	XTab* right, YTab* bottom, BView* content, BSize minContentSize)
+Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
+	BView* content)
 {
 	fMaxContentWidth = NULL;
 	fMaxContentHeight = NULL;
@@ -544,24 +545,24 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top,
 	fTop = top;
 	fBottom = bottom;
 
-	// adds the two essential constraints of the area that make sure that the left x-tab is
-	// really to the left of the right x-tab, and the top y-tab really above the bottom y-tab
-	fMinContentWidth = ls->AddConstraint(-1.0, left, 1.0, right, OperatorType(GE),
-			minContentSize.Width());
-	fConstraints.AddItem(fMinContentWidth);
+	// adds the two essential constraints of the area that make sure that the
+	// left x-tab is really to the left of the right x-tab, and the top y-tab
+	// really above the bottom y-tab
+	fMinContentWidth = ls->AddConstraint(-1.0, left, 1.0, right,
+		OperatorType(GE), 0);
+	fMinContentHeight = ls->AddConstraint(-1.0, top, 1.0, bottom,
+		OperatorType(GE), 0);
 
-	fMinContentHeight = ls->AddConstraint(-1.0, top, 1.0, bottom, OperatorType(GE),
-			minContentSize.Height());
+	fConstraints.AddItem(fMinContentWidth);
 	fConstraints.AddItem(fMinContentHeight);
 }
 
 
 void
-Area::_Init(LinearSpec* ls, Row* row, Column* column, BView* content,
-	BSize minContentSize)
+Area::_Init(LinearSpec* ls, Row* row, Column* column, BView* content)
 {
 	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
-			content, minContentSize);
+		  content);
 	fRow = row;
 	fColumn = column;
 }

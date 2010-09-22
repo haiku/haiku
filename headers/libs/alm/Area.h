@@ -5,6 +5,7 @@
 #ifndef	AREA_H
 #define	AREA_H
 
+
 #include <Alignment.h>
 #include <List.h>
 #include <Size.h>
@@ -81,10 +82,9 @@ private:
 								Area(BLayoutItem* item);
 
 			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
-									XTab* right, YTab* bottom, BView* content,
-									BSize minContentSize);
+									XTab* right, YTab* bottom, BView* content);
 			void				_Init(LinearSpec* ls, Row* row, Column* column,
-									BView* content, BSize minContentSize);
+									BView* content);
 
 			void				_DoLayout();
 

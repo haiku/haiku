@@ -5,6 +5,7 @@
 #ifndef	ALM_LAYOUT_H
 #define	ALM_LAYOUT_H
 
+
 #include <AbstractLayout.h>
 #include <File.h>
 #include <List.h>
@@ -22,8 +23,8 @@
 
 namespace BALM {
 	
-/**
- * A GUI layout engine using the ALM.
+/*!
+ * A GUI layout engine using the Auckland Layout Model (ALM).
  */
 class BALMLayout : public BAbstractLayout {
 public:
@@ -36,11 +37,7 @@ public:
 			Row*				AddRow(YTab* top, YTab* bottom);
 			Column*				AddColumn();
 			Column*				AddColumn(XTab* left, XTab* right);
-			
-			Area*				AddArea(XTab* left, YTab* top, XTab* right,
-									YTab* bottom, BView* content, BSize minContentSize);
-			Area*				AddArea(Row* row, Column* column,
-									BView* content, BSize minContentSize);
+
 			Area*				AddArea(XTab* left, YTab* top, XTab* right,
 									YTab* bottom, BView* content);
 			Area*				AddArea(Row* row, Column* column,
@@ -62,7 +59,7 @@ public:
 	virtual	bool				ItemAdded(BLayoutItem* item, int32 atIndex);
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 	virtual	void				DerivedLayoutItems();
-			
+
 			char*				PerformancePath() const;
 			void				SetPerformancePath(char* path);
 

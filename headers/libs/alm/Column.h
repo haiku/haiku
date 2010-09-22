@@ -5,6 +5,7 @@
 #ifndef	COLUMN_H
 #define	COLUMN_H
 
+
 #include <List.h>
 
 #include "Constraint.h"

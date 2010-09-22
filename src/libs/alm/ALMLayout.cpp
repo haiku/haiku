@@ -5,6 +5,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "ALMLayout.h"
 
 #include <math.h>		// for floor
@@ -143,55 +144,6 @@ BALMLayout::AddColumn(XTab* left, XTab* right)
 
 
 /**
- * Adds a new area to the specification, setting only the necessary minimum size constraints.
- *
- * @param left				left border
- * @param top				top border
- * @param right			right border
- * @param bottom			bottom border
- * @param content			the control which is the area content
- * @param minContentSize	minimum content size
- * @return the new area
- */
-Area*
-BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
-	BView* content, BSize minContentSize)
-{
-	BLayoutItem* item = AddView(content);
-	Area* area = _AreaForItem(item);
-	if (!area)
-		return NULL;
-
-	area->_Init(&fSolver, left, top, right, bottom, content,
-		minContentSize);
-	return area;
-}
-
-
-/**
- * Adds a new area to the specification, setting only the necessary minimum size constraints.
- *
- * @param row				the row that defines the top and bottom border
- * @param column			the column that defines the left and right border
- * @param content			the control which is the area content
- * @param minContentSize	minimum content size
- * @return the new area
- */
-Area*
-BALMLayout::AddArea(Row* row, Column* column, BView* content,
-	BSize minContentSize)
-{
-	BLayoutItem* item = AddView(content);
-	Area* area = _AreaForItem(item);
-	if (!area)
-		return NULL;
-
-	area->_Init(&fSolver, row, column, content, minContentSize);
-	return area;
-}
-
-
-/**
  * Adds a new area to the specification, automatically setting preferred size constraints.
  *
  * @param left			left border
@@ -210,8 +162,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 	if (!area)
 		return NULL;
 
-	area->_Init(&fSolver, left, top, right, bottom, content,
-		BSize(0, 0));
+	area->_Init(&fSolver, left, top, right, bottom, content);
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
 	return area;
@@ -234,7 +185,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 	if (!area)
 		return NULL;
 
-	area->_Init(&fSolver, row, column, content, BSize(0, 0));
+	area->_Init(&fSolver, row, column, content);
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
 	return area;
