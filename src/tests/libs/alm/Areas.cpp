@@ -19,8 +19,6 @@ public:
 
 		button1->SetExplicitMinSize(BSize(0, 0));
 		button1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-		//button1->SetExplicitAlignment(
-			//BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT));
 
 		// create a new BALMLayout and use  it for this window
 		BALMLayout* layout = new BALMLayout();
