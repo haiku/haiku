@@ -8,6 +8,7 @@
 #ifndef STACK_AND_TILE_H
 #define STACK_AND_TILE_H
 
+
 #include <map>
 
 #include <Message.h>
@@ -107,60 +108,63 @@ private:
 
 class GroupIterator {
 public:
-						GroupIterator(StackAndTile* sat, Desktop* desktop);
+								GroupIterator(StackAndTile* sat,
+									Desktop* desktop);
 
-		void			RewindToFront();
-		SATGroup*		NextGroup();
+			void				RewindToFront();
+			SATGroup*			NextGroup();
 
 private:
-		StackAndTile*	fStackAndTile;
-		Desktop*		fDesktop;
-		Window*			fCurrentWindow;
-		SATGroup*		fCurrentGroup;
+			StackAndTile*		fStackAndTile;
+			Desktop*			fDesktop;
+			Window*				fCurrentWindow;
+			SATGroup*			fCurrentGroup;
 };
 
 
 class WindowIterator {
 public:
-						WindowIterator(SATGroup* group,
-							bool reverseLayerOrder = false);
+								WindowIterator(SATGroup* group,
+									bool reverseLayerOrder = false);
 
-		void			Rewind();
-		/*! Iterates over all areas in the group and return the windows in the
-		areas. Within one area the windows are ordered by their layer position.
-		If reverseLayerOrder is false the bottommost window comes first. */
-		SATWindow*		NextWindow();
+			void				Rewind();
+			/*! Iterates over all areas in the group and return the windows in
+			the areas. Within one area the windows are ordered by their layer
+			position. If reverseLayerOrder is false the bottommost window comes
+			first. */
+			SATWindow*			NextWindow();
 		
 
 private:
-		SATWindow*		_ReverseNextWindow();
-		void			_ReverseRewind();
+			SATWindow*			_ReverseNextWindow();
+			void				_ReverseRewind();
 
-		SATGroup*		fGroup;
-		bool			fReverseLayerOrder;
+			SATGroup*			fGroup;
+			bool				fReverseLayerOrder;
 
-		WindowArea*		fCurrentArea;
-		int32			fAreaIndex;
-		int32			fWindowIndex;
+			WindowArea*			fCurrentArea;
+			int32				fAreaIndex;
+			int32				fWindowIndex;
 };
 
 
 class SATSnappingBehaviour {
 public:
-	virtual					~SATSnappingBehaviour();
+	virtual						~SATSnappingBehaviour();
 
 	/*! Find all window candidates which possibly can join the group. Found
 	candidates are marked here visual. */
-	virtual bool			FindSnappingCandidates(SATGroup* group) = 0;
+	virtual bool				FindSnappingCandidates(SATGroup* group) = 0;
 	/*! Join all candidates found in FindSnappingCandidates to the group.
 	Previously visually mark should be removed here. \return true if
 	integration has been succeed. */
-	virtual bool			JoinCandidates() = 0;
+	virtual bool				JoinCandidates() = 0;
 	/*! Update the window tab values, solve the layout and move all windows in
 	the group accordantly. */
-	virtual void			DoWindowLayout() = 0;
-	virtual void			RemovedFromArea(WindowArea* area) {}
-	virtual void			TabLocationMoved(float location, bool shifting) {}
+	virtual void				DoWindowLayout() = 0;
+	virtual void				RemovedFromArea(WindowArea* area) {}
+	virtual void				TabLocationMoved(float location, bool shifting)
+									{}
 };
 
 

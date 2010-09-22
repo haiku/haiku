@@ -6,6 +6,7 @@
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
+
 #include "StackAndTile.h"
 
 #include <Debug.h>

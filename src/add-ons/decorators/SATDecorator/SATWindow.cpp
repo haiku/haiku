@@ -6,6 +6,7 @@
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
+
 #include "SATWindow.h"
 
 #include <Debug.h>
@@ -118,14 +119,14 @@ GroupCookie::MoveWindow(int32 workspace)
 	Desktop* desktop = window->Desktop();
 
 	BRect frame = fSATWindow->CompleteWindowFrame();
-	desktop->MoveWindowBy(window, fLeftBorder->Value() - frame.left,
-		fTopBorder->Value() - frame.top, workspace);
+	desktop->MoveWindowBy(window, round(fLeftBorder->Value() - frame.left),
+		round(fTopBorder->Value() - frame.top), workspace);
 
 	// Update frame to the new position
-	frame.OffsetBy(fLeftBorder->Value() - frame.left,
-		fTopBorder->Value() - frame.top);
-	desktop->ResizeWindowBy(window, fRightBorder->Value() - frame.right,
-		fBottomBorder->Value() - frame.bottom);
+	frame.OffsetBy(round(fLeftBorder->Value() - frame.left),
+		round(fTopBorder->Value() - frame.top));
+	desktop->ResizeWindowBy(window, round(fRightBorder->Value() - frame.right),
+		round(fBottomBorder->Value() - frame.bottom));
 
 	_UpdateWindowSize(frame);
 }

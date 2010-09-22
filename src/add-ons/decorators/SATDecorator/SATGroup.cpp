@@ -6,6 +6,7 @@
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
+
 #include "SATGroup.h"
 
 #include <Debug.h>
