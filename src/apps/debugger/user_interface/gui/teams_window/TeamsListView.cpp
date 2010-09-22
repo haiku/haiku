@@ -20,8 +20,9 @@
 #include "TeamsListView.h"
 
 
-TeamListItem::TeamListItem(team_info & info)
-	: BStringItem("", false),
+TeamListItem::TeamListItem(team_info& info)
+	:
+	BStringItem("", false),
 	fIcon(NULL)
 {
 	_SetTo(info);
@@ -29,7 +30,8 @@ TeamListItem::TeamListItem(team_info & info)
 
 
 TeamListItem::TeamListItem(team_id team)
-	: BStringItem("", false),
+	:
+	BStringItem("", false),
 	fIcon(NULL)
 {
 	team_info info;
@@ -45,7 +47,7 @@ TeamListItem::~TeamListItem()
 
 
 void
-TeamListItem::DrawItem(BView *owner, BRect frame, bool complete)
+TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	BRect rect = frame;
 
@@ -87,7 +89,7 @@ TeamListItem::DrawItem(BView *owner, BRect frame, bool complete)
 
 
 void
-TeamListItem::Update(BView *owner, const BFont *font)
+TeamListItem::Update(BView* owner, const BFont* font)
 {
 		BStringItem::Update(owner, font);
 
@@ -106,10 +108,10 @@ TeamListItem::Update(BView *owner, const BFont *font)
 int
 TeamListItem::Compare(const void* a, const void* b)
 {
-	const BListItem *itemA = *static_cast<const BListItem * const *>(a);
-	const BListItem *itemB = *static_cast<const BListItem * const *>(b);
-	const TeamListItem *teamItemA = dynamic_cast<const TeamListItem *>(itemA);
-	const TeamListItem *teamItemB = dynamic_cast<const TeamListItem *>(itemB);
+	const BListItem*itemA = *static_cast<const BListItem* const *>(a);
+	const BListItem*itemB = *static_cast<const BListItem* const *>(b);
+	const TeamListItem*teamItemA = dynamic_cast<const TeamListItem*>(itemA);
+	const TeamListItem*teamItemB = dynamic_cast<const TeamListItem*>(itemB);
 
 	if (teamItemA != NULL && teamItemB != NULL) {
 		return teamItemA->fTeamInfo.team - teamItemB->fTeamInfo.team;
@@ -120,7 +122,7 @@ TeamListItem::Compare(const void* a, const void* b)
 
 
 status_t
-TeamListItem::_SetTo(team_info & info)
+TeamListItem::_SetTo(team_info& info)
 {
 	BPath systemPath;
 	team_info teamInfo = fTeamInfo = info;
@@ -174,7 +176,8 @@ TeamListItem::_SetTo(team_info & info)
 
 
 TeamsListView::TeamsListView(BRect frame, const char* name)
-	: BListView(frame, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL),
+	:
+	BListView(frame, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL),
 	fUpdateRunner(NULL)
 {
 	team_info tmi;
@@ -250,7 +253,7 @@ TeamsListView::MessageReceived(BMessage* message)
 			if (message->FindInt32("be:team", &team) != B_OK)
 				break;
 
-			TeamListItem *item = FindItem(team);
+			TeamListItem* item = FindItem(team);
 			if (item != NULL) {
 				RemoveItem(item);
 				delete item;
@@ -264,7 +267,7 @@ TeamsListView::MessageReceived(BMessage* message)
 }
 
 
-TeamListItem *
+TeamListItem*
 TeamsListView::FindItem(team_id teamId)
 {
 	for (int32 i = CountItems(); i-- > 0;) {
@@ -287,7 +290,7 @@ TeamsListView::_InitList()
 	team_info tmi;
 
 	while (get_next_team_info(&tmi_cookie, &tmi) == B_OK) {
-		TeamListItem * item = new TeamListItem(tmi);
+		TeamListItem* item = new TeamListItem(tmi);
 
 		if (tmi.team == B_SYSTEM_TEAM ||
 			tmi.team == fThisTeam) {
@@ -307,34 +310,34 @@ TeamsListView::_UpdateList()
 {
 	int32 tmi_cookie = 0;
 	team_info tmi;
-	TeamListItem *item;
+	TeamListItem* item;
 	int32 index = 0;
 
-	// NOTA: assuming get_next_team_info() returns team ordered by team ID...
+	// NOTA: assuming get_next_team_info() returns teams ordered by team ID...
 	while (get_next_team_info(&tmi_cookie, &tmi) == B_OK) {
 
-		item = (TeamListItem *) ItemAt(index);
+		item = (TeamListItem*) ItemAt(index);
 		while (item && tmi.team > item->TeamID()) {
 				RemoveItem(item);
 				delete item;
-				item = (TeamListItem *) ItemAt(index);
+				item = (TeamListItem*) ItemAt(index);
 		}
 
 		if (!item || tmi.team != item->TeamID()) {
 			// Team not found in known teams list: insert an new item
-			TeamListItem * item = new TeamListItem(tmi);
+			TeamListItem* newItem = new TeamListItem(tmi);
 			if (!item)
 				index++;	// No item with team id bigger found: insert at list end
 
-			AddItem(item, index);
+			AddItem(newItem, index);
 		}
 		index++;	// Move list sync head.
 	}
 
 	// Remove tail list items, if we don't walk list thru the end
-	while ((item = (TeamListItem *) ItemAt(index)) != NULL) {
+	while ((item = (TeamListItem*) ItemAt(index)) != NULL) {
 		RemoveItem(item);
 		delete item;
-		item = (TeamListItem *) ItemAt(++index);
+		item = (TeamListItem*) ItemAt(++index);
 	}
 }

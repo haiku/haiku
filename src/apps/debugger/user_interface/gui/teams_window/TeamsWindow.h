@@ -11,24 +11,26 @@
 class BListView;
 class BFile;
 class BMessage;
+class SettingsManager;
 
 
 class TeamsWindow : public BWindow {
 public:
-					TeamsWindow();
-	virtual			~TeamsWindow();
+								TeamsWindow(SettingsManager* settingsManager);
+	virtual						~TeamsWindow();
 
-	virtual void	MessageReceived(BMessage* message);
-	virtual bool	QuitRequested();
-
-private:
-
-	status_t		_OpenSettings(BFile& file, uint32 mode);
-	status_t		_LoadSettings(BMessage& settings);
-	status_t		_SaveSettings();
+	virtual void				MessageReceived(BMessage* message);
+	virtual bool				QuitRequested();
 
 private:
-	BListView*		fTeamsListView;
+
+			status_t			_OpenSettings(BFile& file, uint32 mode);
+			status_t			_LoadSettings(BMessage& settings);
+			status_t			_SaveSettings();
+
+private:
+			BListView*			fTeamsListView;
+			SettingsManager*	fSettingsManager;
 
 };
 

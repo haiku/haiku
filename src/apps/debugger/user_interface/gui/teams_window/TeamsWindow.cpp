@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <new>
 
 #include <stdio.h>
 #include <string.h>
@@ -16,13 +17,16 @@
 #include <Path.h>
 
 #include "MessageCodes.h"
+#include "SettingsManager.h"
 #include "TeamsWindow.h"
 #include "TeamsListView.h"
 
 
-TeamsWindow::TeamsWindow()
-	: BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS)
+TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
+	:
+	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS),
+	fSettingsManager(settingsManager)
 {
 	BMessage settings;
 	_LoadSettings(settings);

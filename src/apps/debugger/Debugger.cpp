@@ -165,37 +165,39 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 }
 
 
-// #pragma mark -
+// #pragma mark - Debugger application class
+
 
 class Debugger : public BApplication, private TeamDebugger::Listener {
 public:
-						Debugger();
-						~Debugger();
+								Debugger();
+								~Debugger();
 
-			status_t	Init();
-	virtual void 		MessageReceived(BMessage* message);
-	virtual void 		ReadyToRun();
-	virtual void 		ArgvReceived(int32 argc, char** argv);
+			status_t			Init();
+	virtual void 				MessageReceived(BMessage* message);
+	virtual void 				ReadyToRun();
+	virtual void 				ArgvReceived(int32 argc, char** argv);
 
 private:
-	typedef BObjectList<TeamDebugger>	TeamDebuggerList;
+			typedef BObjectList<TeamDebugger>	TeamDebuggerList;
 
 private:
 	// TeamDebugger::Listener
-	virtual void 		TeamDebuggerStarted(TeamDebugger* debugger);
-	virtual void 		TeamDebuggerQuit(TeamDebugger* debugger);
+	virtual void 				TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual void 				TeamDebuggerQuit(TeamDebugger* debugger);
 
-	virtual bool 		QuitRequested();
-	virtual void 		Quit();
+	virtual bool 				QuitRequested();
+	virtual void 				Quit();
 
-		TeamDebugger* 	_FindTeamDebugger(team_id teamID) const;
-		TeamDebugger* 	_StartTeamDebugger(team_id teamID,
-							thread_id threadID = -1, bool stopInMain = false);
+			TeamDebugger* 		_FindTeamDebugger(team_id teamID) const;
+			TeamDebugger* 		_StartTeamDebugger(team_id teamID,
+									thread_id threadID = -1,
+									bool stopInMain = false);
 private:
-	SettingsManager		fSettingsManager;
-	TeamDebuggerList	fTeamDebuggers;
-	int32				fRunningTeamDebuggers;
-	TeamsWindow*		fTeamsWindow;
+			SettingsManager		fSettingsManager;
+			TeamDebuggerList	fTeamDebuggers;
+			int32				fRunningTeamDebuggers;
+			TeamsWindow*		fTeamsWindow;
 };
 
 
@@ -239,7 +241,7 @@ Debugger::MessageReceived(BMessage* message)
             if (fTeamsWindow)
                	fTeamsWindow->Activate(true);
             else {
-   	            fTeamsWindow = new TeamsWindow();
+   	            fTeamsWindow = new(std::nothrow) TeamsWindow(&fSettingsManager);
        	        fTeamsWindow->Show();
            	}
 			break;
@@ -399,9 +401,6 @@ Debugger::QuitRequested()
 void
 Debugger::Quit()
 {
-	printf("Debugger::Quit(): fRunningTeamDebuggers = %ld, fTeamsWindow = %p\n",
-		fRunningTeamDebuggers, fTeamsWindow);
-
 	// don't quit before all team debuggers have been quit
 	if (fRunningTeamDebuggers <= 0 && fTeamsWindow == NULL)
 		BApplication::Quit();
