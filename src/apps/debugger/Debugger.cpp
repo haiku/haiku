@@ -247,7 +247,7 @@ Debugger::MessageReceived(BMessage* message)
 				fTeamsWindow = TeamsWindow::Create(&fSettingsManager);
 				if (fTeamsWindow != NULL)
 					fTeamsWindow->Show();
-           	} catch(...) {
+           	} catch (...) {
 				// TODO: Notify the user!
 				fprintf(stderr, "Error: Failed to create Teams window\n");
            	}

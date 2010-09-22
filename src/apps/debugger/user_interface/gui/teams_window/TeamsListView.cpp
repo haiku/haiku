@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <new>
 
 #include <stdio.h>
@@ -245,7 +246,7 @@ TeamsListView::MessageReceived(BMessage* message)
 
 			TeamListItem* item = new(std::nothrow) TeamListItem(team);
 			if (item != NULL) {
-				AddItem(new TeamListItem(team));
+				AddItem(item);
 				SortItems(&TeamListItem::Compare);
 			}
 			break;

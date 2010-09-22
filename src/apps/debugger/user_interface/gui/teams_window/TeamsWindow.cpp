@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <new>
 
 #include <stdio.h>
@@ -44,7 +45,7 @@ TeamsWindow::Create(SettingsManager* settingsManager)
 
 	try {
 		self->_Init();
-	} catch(...) {
+	} catch (...) {
 		delete self;
 		throw;
 	}
