@@ -14,7 +14,6 @@
 
 #include "Area.h"
 #include "Column.h"
-#include "LayoutStyleType.h"
 #include "LinearSpec.h"
 #include "Row.h"
 #include "XTab.h"
@@ -30,8 +29,6 @@ class BALMLayout : public BAbstractLayout {
 public:
 								BALMLayout();
 	virtual						~BALMLayout();
-
-			void				SolveLayout();
 
 			XTab*				AddXTab();
 			YTab*				AddYTab();
@@ -54,11 +51,6 @@ public:
 			XTab*				Right() const;
 			YTab*				Top() const;
 			YTab*				Bottom() const;
-			
-			void				RecoverLayout(BView* parent);
-			
-			LayoutStyleType		LayoutStyle() const;
-			void				SetLayoutStyle(LayoutStyleType style);
 
 	virtual	BSize				BaseMinSize();
 	virtual	BSize				BaseMaxSize();
@@ -77,16 +69,15 @@ public:
 			LinearSpec*			Solver();
 
 private:
+			void				_SolveLayout();
+
 			Area*				_AreaForItem(BLayoutItem* item) const;
 			void				_UpdateAreaConstraints();
 
-			BSize				CalculateMinSize();
-			BSize				CalculateMaxSize();
-			BSize				CalculatePreferredSize();
+			BSize				_CalculateMinSize();
+			BSize				_CalculateMaxSize();
+			BSize				_CalculatePreferredSize();
 
-private:
-			LayoutStyleType		fLayoutStyle;
-			bool				fActivated;
 
 			LinearSpec			fSolver;
 

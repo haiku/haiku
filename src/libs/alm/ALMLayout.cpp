@@ -31,9 +31,6 @@ BALMLayout::BALMLayout()
 	:
 	BAbstractLayout()
 {
-	fLayoutStyle = FIT_TO_SIZE;
-	fActivated = true;
-
 	fLeft = new XTab(&fSolver);
 	fRight = new XTab(&fSolver);
 	fTop = new YTab(&fSolver);
@@ -56,47 +53,6 @@ BALMLayout::BALMLayout()
 BALMLayout::~BALMLayout()
 {
 	
-}
-
-
-/**
- * Solves the layout.
- */
-void
-BALMLayout::SolveLayout()
-{
-	// if autoPreferredContentSize is set on an area,
-	// readjust its preferredContentSize and penalties settings
-	for (int32 i = 0; i < CountItems(); i++) {
-		Area* currentArea = _AreaForItem(ItemAt(i));
-		if (currentArea && currentArea->AutoPreferredContentSize())
-			currentArea->SetDefaultBehavior();
-	}
-
-	// Try to solve the layout until the result is OPTIMAL or INFEASIBLE,
-	// maximally 15 tries sometimes the solving algorithm encounters numerical
-	// problems (NUMFAILURE), and repeating the solving often helps to overcome
-	// them.
-	BFile* file = NULL;
-	if (fPerformancePath != NULL) {
-		file = new BFile(fPerformancePath,
-			B_READ_WRITE | B_CREATE_FILE | B_OPEN_AT_END);
-	}
-
-	ResultType result;
-	for (int32 tries = 0; tries < 15; tries++) {
-		result = fSolver.Solve();
-		if (fPerformancePath != NULL) {
-			/*char buffer [100];
-			file->Write(buffer, sprintf(buffer, "%d\t%fms\t#vars=%ld\t"
-				"#constraints=%ld\n", result, fSolver.SolvingTime(),
-				fSolver.Variables()->CountItems(),
-				fSolver.Constraints()->CountItems()));*/
-		}
-		if (result == OPTIMAL || result == INFEASIBLE)
-			break;
-	}
-	delete file;
 }
 
 
@@ -339,40 +295,12 @@ BALMLayout::Bottom() const
 
 
 /**
- * Reverse engineers a GUI and recovers an ALM specification.
- * @param parent	the parent container of the GUI
- */
-void
-BALMLayout::RecoverLayout(BView* parent) {}	// Still working on it.
-
-
-/**
- * Gets the current layout style.
- */
-LayoutStyleType
-BALMLayout::LayoutStyle() const
-{
-	return fLayoutStyle;
-}
-
-
-/**
- * Sets the current layout style.
- */
-void
-BALMLayout::SetLayoutStyle(LayoutStyleType style)
-{
-	fLayoutStyle = style;
-}
-
-
-/**
  * Gets minimum size.
  */
 BSize
 BALMLayout::BaseMinSize() {
 	if (fMinSize == kUnsetSize)
-		fMinSize = CalculateMinSize();
+		fMinSize = _CalculateMinSize();
 	return fMinSize;
 }
 
@@ -384,7 +312,7 @@ BSize
 BALMLayout::BaseMaxSize()
 {
 	if (fMaxSize == kUnsetSize)
-		fMaxSize = CalculateMaxSize();
+		fMaxSize = _CalculateMaxSize();
 	return fMaxSize;
 }
 
@@ -396,7 +324,7 @@ BSize
 BALMLayout::BasePreferredSize()
 {
 	if (fPreferredSize == kUnsetSize)
-		fPreferredSize = CalculatePreferredSize();
+		fPreferredSize = _CalculatePreferredSize();
 	return fPreferredSize;
 }
 
@@ -453,37 +381,18 @@ BALMLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 void
 BALMLayout::DerivedLayoutItems()
 {
-	// TODO: modify to allow for viewlessness
-	// make sure that layout events occuring during layout are ignored
-	// i.e. activated is set to false during layout calculation
-	if (!fActivated)
-		return;
-	fActivated = false;
-
-	if (Owner() == NULL)
-		return;
-
 	_UpdateAreaConstraints();
 
-	// reverse engineer a layout specification if none was given
-	//~ if (this == NULL) RecoverLayout(View());
+	// Enforced absolute positions of Right and Bottom
+	BRect area(LayoutArea());
+	Right()->SetRange(area.right, area.right);
+	Bottom()->SetRange(area.bottom, area.bottom);
 
-	// if the layout engine is set to fit the GUI to the given size,
-	// then the given size is enforced by setting absolute positions
-	// for Right and Bottom
-	if (fLayoutStyle == FIT_TO_SIZE) {
-		BRect area(LayoutArea());
-		Right()->SetRange(area.right, area.right);
-		Bottom()->SetRange(area.bottom, area.bottom);
-	}
-
-	SolveLayout();
+	_SolveLayout();
 
 	// if new layout is infasible, use previous layout
-	if (fSolver.Result() == INFEASIBLE) {
-		fActivated = true; // now layout calculation is allowed to run again
+	if (fSolver.Result() == INFEASIBLE)
 		return;
-	}
 
 	if (fSolver.Result() != OPTIMAL) {
 		fSolver.Save("failed-layout.txt");
@@ -492,18 +401,9 @@ BALMLayout::DerivedLayoutItems()
 		printf("Saved specification in file failed-layout.txt\n");
 	}
 
-	// change the size of the GUI according to the calculated size
-	// if the layout engine was configured to do so
-	if (fLayoutStyle == ADJUST_SIZE) {
-		Owner()->ResizeTo(floor(Right()->Value() - Left()->Value() + 0.5),
-				floor(Bottom()->Value() - Top()->Value() + 0.5));
-	}
-
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
 		_AreaForItem(ItemAt(i))->DoLayout();
-
-	fActivated = true;
 }
 
 
@@ -538,11 +438,49 @@ BALMLayout::Solver()
 }
 
 
+void
+BALMLayout::_SolveLayout()
+{
+	// if autoPreferredContentSize is set on an area,
+	// readjust its preferredContentSize and penalties settings
+	for (int32 i = 0; i < CountItems(); i++) {
+		Area* currentArea = _AreaForItem(ItemAt(i));
+		if (currentArea && currentArea->AutoPreferredContentSize())
+			currentArea->SetDefaultBehavior();
+	}
+
+	// Try to solve the layout until the result is OPTIMAL or INFEASIBLE,
+	// maximally 15 tries sometimes the solving algorithm encounters numerical
+	// problems (NUMFAILURE), and repeating the solving often helps to overcome
+	// them.
+	BFile* file = NULL;
+	if (fPerformancePath != NULL) {
+		file = new BFile(fPerformancePath,
+			B_READ_WRITE | B_CREATE_FILE | B_OPEN_AT_END);
+	}
+
+	ResultType result;
+	for (int32 tries = 0; tries < 15; tries++) {
+		result = fSolver.Solve();
+		if (fPerformancePath != NULL) {
+			/*char buffer [100];
+			file->Write(buffer, sprintf(buffer, "%d\t%fms\t#vars=%ld\t"
+				"#constraints=%ld\n", result, fSolver.SolvingTime(),
+				fSolver.Variables()->CountItems(),
+				fSolver.Constraints()->CountItems()));*/
+		}
+		if (result == OPTIMAL || result == INFEASIBLE)
+			break;
+	}
+	delete file;
+}
+
+
 /**
  * Caculates the miminum size.
  */
 BSize
-BALMLayout::CalculateMinSize()
+BALMLayout::_CalculateMinSize()
 {
 	_UpdateAreaConstraints();
 
@@ -551,7 +489,7 @@ BALMLayout::CalculateMinSize()
 	newObjFunction->AddItem(new Summand(1.0, fRight));
 	newObjFunction->AddItem(new Summand(1.0, fBottom));
 	fSolver.SetObjFunction(newObjFunction);
-	SolveLayout();
+	_SolveLayout();
 	fSolver.SetObjFunction(oldObjFunction);
 	fSolver.UpdateObjFunction();
 	delete newObjFunction->ItemAt(0);
@@ -575,7 +513,7 @@ BALMLayout::CalculateMinSize()
  * Caculates the maximum size.
  */
 BSize
-BALMLayout::CalculateMaxSize()
+BALMLayout::_CalculateMaxSize()
 {
 	_UpdateAreaConstraints();
 
@@ -584,7 +522,7 @@ BALMLayout::CalculateMaxSize()
 	newObjFunction->AddItem(new Summand(-1.0, fRight));
 	newObjFunction->AddItem(new Summand(-1.0, fBottom));
 	fSolver.SetObjFunction(newObjFunction);
-	SolveLayout();
+	_SolveLayout();
 	fSolver.SetObjFunction(oldObjFunction);
 	fSolver.UpdateObjFunction();
 	delete newObjFunction->ItemAt(0);
@@ -608,11 +546,11 @@ BALMLayout::CalculateMaxSize()
  * Caculates the preferred size.
  */
 BSize
-BALMLayout::CalculatePreferredSize()
+BALMLayout::_CalculatePreferredSize()
 {
 	_UpdateAreaConstraints();
 
-	SolveLayout();
+	_SolveLayout();
 	if (fSolver.Result() != OPTIMAL) {
 		fSolver.Save("failed-layout.txt");
 		printf("Could not solve the layout specification (%d). "
