@@ -642,6 +642,8 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 	max.width += fLeftInset + fRightInset;
 	max.height += fTopInset + fBottomInset;
 
+	// we only need max constraints if the alignment is full height/width
+	// otherwise we can just align the item in the free space
 	BAlignment alignment = fLayoutItem->Alignment();
 	if (alignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
 		if (fMaxContentHeight == NULL) {
@@ -657,7 +659,7 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 		fMaxContentHeight = NULL;
 	}
 
-	if (alignment.Vertical() == B_ALIGN_USE_FULL_WIDTH) {
+	if (alignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH) {
 		if (fMaxContentWidth == NULL) {
 			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
 				OperatorType(LE), max.Width());
