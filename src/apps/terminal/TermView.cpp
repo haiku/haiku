@@ -1171,7 +1171,7 @@ TermView::_DrawCursor()
 	int32 firstVisible = _LineAt(0);
 
 	UTF8Char character;
-	uint32 attr;
+	uint32 attr = 0;
 
 	bool cursorVisible = _IsCursorVisible();
 
@@ -1340,6 +1340,28 @@ TermView::Draw(BRect updateRect)
 	int32 y1 = _LineAt(updateRect.top);
 	int32 y2 = std::min(_LineAt(updateRect.bottom), (int32)fRows - 1);
 
+	// clear the area to the right of the line ends
+	if (y1 <= y2) {
+		float clearLeft = fColumns * fFontWidth;
+		if (clearLeft <= updateRect.right) {
+			BRect rect(clearLeft, updateRect.top, updateRect.right,
+				updateRect.bottom);
+			SetHighColor(kTermColorTable[0]);
+			FillRect(rect);
+		}
+	}
+
+	// clear the area below the last line
+	if (y2 == fRows - 1) {
+		float clearTop = _LineOffset(fRows);
+		if (clearTop <= updateRect.bottom) {
+			BRect rect(updateRect.left, clearTop, updateRect.right,
+				updateRect.bottom);
+			SetHighColor(kTermColorTable[0]);
+			FillRect(rect);
+		}
+	}
+
 	// draw the affected line parts
 	if (x1 <= x2) {
 		uint32 attr = 0;
@@ -1412,15 +1434,6 @@ TermView::Draw(BRect updateRect)
 				i += count;
 			}
 		}
-
-		if (y2 == fRows - 1) {
-			// There may be some empty space below the last line
-			BRect rect(updateRect.left, _LineOffset(fRows),
-				updateRect.right, 0);
-			rect.bottom = rect.top + fFontHeight - 1;
-			FillRect(rect);
-		}
-
 	}
 
 	if (fInline && fInline->IsActive())
