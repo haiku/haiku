@@ -584,8 +584,7 @@ TermWindow::MessageReceived(BMessage *message)
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fSavedFrame = Frame();
 				BScreen screen(this);
-				if (fTabView->CountTabs() == 1)
-					_ActiveTermView()->ScrollBar()->Hide();
+				_ActiveTermView()->ScrollBar()->ResizeBy(0, (B_H_SCROLL_BAR_HEIGHT - 2));
 
 				fMenubar->Hide();
 				fTabView->ResizeBy(0, mbHeight);
@@ -600,7 +599,7 @@ TermWindow::MessageReceived(BMessage *message)
 				_ActiveTermView()->DisableResizeView();
 				float mbHeight = fMenubar->Bounds().Height() + 1;
 				fMenubar->Show();
-				_ActiveTermView()->ScrollBar()->Show();
+				_ActiveTermView()->ScrollBar()->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
 				fTabView->ResizeBy(0, -mbHeight);
