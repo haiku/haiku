@@ -263,7 +263,11 @@ void
 Area::SetContentAspectRatio(double ratio)
 {
 	fContentAspectRatio = ratio;
-	if (fContentAspectRatioC == NULL) {
+	if (fContentAspectRatio <= 0) {
+		delete fContentAspectRatioC;
+		fContentAspectRatioC = NULL;
+	}
+	else if (fContentAspectRatioC == NULL) {
 		fContentAspectRatioC = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
 			ratio, fTop, -ratio, fBottom, OperatorType(EQ), 0.0);
 		fConstraints.AddItem(fContentAspectRatioC);
@@ -491,7 +495,7 @@ Area::Area(BLayoutItem* item)
 	fPreferredContentWidth(NULL),
 	fPreferredContentHeight(NULL),
 
-	fContentAspectRatio(0),
+	fContentAspectRatio(-1),
 	fContentAspectRatioC(NULL)
 {
 
