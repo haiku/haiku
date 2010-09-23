@@ -549,8 +549,7 @@ Area::Area(BLayoutItem* item)
  * Initialize variables.
  */
 void
-Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
-	BView* content)
+Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 {
 	fShrinkPenalties = BSize(2, 2);
 	fGrowPenalties = BSize(1, 1);
@@ -578,10 +577,9 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 
 
 void
-Area::_Init(LinearSpec* ls, Row* row, Column* column, BView* content)
+Area::_Init(LinearSpec* ls, Row* row, Column* column)
 {
-	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom(),
-		  content);
+	_Init(ls, column->Left(), row->Top(), column->Right(), row->Bottom());
 	fRow = row;
 	fColumn = column;
 }

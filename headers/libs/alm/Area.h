@@ -81,9 +81,8 @@ private:
 								Area(BLayoutItem* item);
 
 			void				_Init(LinearSpec* ls, XTab* left, YTab* top,
-									XTab* right, YTab* bottom, BView* content);
-			void				_Init(LinearSpec* ls, Row* row, Column* column,
-									BView* content);
+									XTab* right, YTab* bottom);
+			void				_Init(LinearSpec* ls, Row* row, Column* column);
 
 			void				_DoLayout();
 

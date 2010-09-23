@@ -11,6 +11,8 @@
 #include <math.h>		// for floor
 #include <new>
 
+#include "ViewLayoutItem.h"
+
 #include "Area.h"
 #include "Column.h"
 #include "ResultType.h"
@@ -144,6 +146,20 @@ BALMLayout::AddColumn(XTab* left, XTab* right)
 }
 
 
+BLayoutItem*
+BALMLayout::AddView(BView* child)
+{
+	return AddView(-1, child);
+}
+
+
+BLayoutItem*
+BALMLayout::AddView(int32 index, BView* child)
+{
+	return BAbstractLayout::AddView(index, child);
+}
+
+
 /**
  * Adds a new area to the specification, automatically setting preferred size constraints.
  *
@@ -155,17 +171,15 @@ BALMLayout::AddColumn(XTab* left, XTab* right)
  * @return the new area
  */
 Area*
-BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
-	BView* content)
+BALMLayout::AddView(BView* view, XTab* left, YTab* top, XTab* right,
+	YTab* bottom)
 {
-	BLayoutItem* item = AddView(content);
-	Area* area = _AreaForItem(item);
-	if (!area)
+	BLayoutItem* item = _CreateLayoutItem(view);
+	Area* area = AddItem(item, left, top, right, bottom);
+	if (!area) {
+		delete item;
 		return NULL;
-
-	area->_Init(&fSolver, left, top, right, bottom, content);
-	area->SetDefaultBehavior();
-	area->SetAutoPreferredContentSize(false);
+	}
 	return area;
 }
 
@@ -179,17 +193,206 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
  * @return the new area
  */
 Area*
-BALMLayout::AddArea(Row* row, Column* column, BView* content)
+BALMLayout::AddView(BView* view, Row* row, Column* column)
 {
-	BLayoutItem* item = AddView(content);
+	BLayoutItem* item = _CreateLayoutItem(view);
+	Area* area = AddItem(item, row, column);
+	if (!area) {
+		delete item;
+		return NULL;
+	}
+	return area;
+}
+
+
+Area*
+BALMLayout::AddViewToRight(BView* view, Area* leftArea, XTab* right, YTab* top,
+	YTab* bottom)
+{
+	BLayoutItem* item = _CreateLayoutItem(view);
+	Area* area = AddItemToRight(item, leftArea, right, top, bottom);
+	if (!area) {
+		delete item;
+		return NULL;
+	}
+	return area;
+}
+
+
+Area*
+BALMLayout::AddViewToLeft(BView* view, Area* rightArea, XTab* left, YTab* top,
+	YTab* bottom)
+{
+	BLayoutItem* item = _CreateLayoutItem(view);
+	Area* area = AddItemToLeft(item, rightArea, left, top, bottom);
+	if (!area) {
+		delete item;
+		return NULL;
+	}
+	return area;
+}
+
+
+Area*
+BALMLayout::AddViewToTop(BView* view, Area* bottomArea, YTab* top, XTab* left,
+	XTab* right)
+{
+	BLayoutItem* item = _CreateLayoutItem(view);
+	Area* area = AddItemToTop(item, bottomArea, top, left, right);
+	if (!area) {
+		delete item;
+		return NULL;
+	}
+	return area;
+}
+
+
+Area*
+BALMLayout::AddViewToBottom(BView* view, Area* topArea, YTab* bottom,
+	XTab* left, XTab* right)
+{
+	BLayoutItem* item = _CreateLayoutItem(view);
+	Area* area = AddItemToBottom(item, topArea, bottom, left, right);
+	if (!area) {
+		delete item;
+		return NULL;
+	}
+	return area;
+}
+
+
+bool
+BALMLayout::AddItem(BLayoutItem* item)
+{
+	return AddItem(-1, item);
+}
+
+
+bool
+BALMLayout::AddItem(int32 index, BLayoutItem* item)
+{
+	if (!item)
+		return NULL;
+
+	// simply add the item at the upper right corner of the previous item
+	// TODO maybe find a more elegant solution
+	XTab* left = Left();
+	YTab* top = Top();
+	XTab* right = AddXTab();
+	YTab* bottom = AddYTab();
+
+	// check range
+	if (index < 0 || index > CountItems())
+		index = CountItems();
+
+	// for index = 0 we already have set the right tabs
+	if (index != 0) {
+		BLayoutItem* prevItem = ItemAt(index - 1);
+		Area* area = _AreaForItem(prevItem);
+		if (area) {
+			left = area->Right();
+			top = area->Top();
+		}
+	}
+	Area* area = AddItem(item, left, top, right, bottom);
+	return area ? true : false;
+}
+
+
+Area*
+BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
+	YTab* bottom)
+{
+	if (!BAbstractLayout::AddItem(-1, item))
+		return NULL;
 	Area* area = _AreaForItem(item);
 	if (!area)
 		return NULL;
 
-	area->_Init(&fSolver, row, column, content);
+	area->_Init(&fSolver, left, top, right, bottom);
 	area->SetDefaultBehavior();
 	area->SetAutoPreferredContentSize(false);
 	return area;
+}
+
+
+Area*
+BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
+{
+	if (!BAbstractLayout::AddItem(-1, item))
+		return NULL;
+	Area* area = _AreaForItem(item);
+	if (!area)
+		return NULL;
+
+	area->_Init(&fSolver, row, column);
+	area->SetDefaultBehavior();
+	area->SetAutoPreferredContentSize(false);
+	return area;
+}
+
+
+Area*
+BALMLayout::AddItemToRight(BLayoutItem* item, Area* leftArea, XTab* right,
+	YTab* top, YTab* bottom)
+{
+	XTab* left = leftArea->Right();
+	if (!right)
+		right = AddXTab();
+	if (!top)
+		top = leftArea->Top();
+	if (!bottom)
+		bottom = leftArea->Bottom();
+
+	return AddItem(item, left, top, right, bottom);
+}
+
+
+Area*
+BALMLayout::AddItemToLeft(BLayoutItem* item, Area* rightArea, XTab* left,
+	YTab* top, YTab* bottom)
+{
+	if (!left)
+		left = AddXTab();
+	XTab* right = rightArea->Left();
+	if (!top)
+		top = rightArea->Top();
+	if (!bottom)
+		bottom = rightArea->Bottom();
+
+	return AddItem(item, left, top, right, bottom);
+}
+
+
+Area*
+BALMLayout::AddItemToTop(BLayoutItem* item, Area* bottomArea, YTab* top,
+	XTab* left, XTab* right)
+{
+	if (!left)
+		left = bottomArea->Left();
+	if (!right)
+		right = bottomArea->Right();
+	if (!top)
+		top = AddYTab();
+	YTab* bottom = bottomArea->Top();
+
+	return AddItem(item, left, top, right, bottom);
+}
+
+
+Area*
+BALMLayout::AddItemToBottom(BLayoutItem* item, Area* topArea, YTab* bottom,
+	XTab* left, XTab* right)
+{
+	if (!left)
+		left = topArea->Left();
+	if (!right)
+		right = topArea->Right();
+	YTab* top = topArea->Bottom();
+	if (!bottom)
+		bottom = AddYTab();
+
+	return AddItem(item, left, top, right, bottom);
 }
 
 
@@ -415,6 +618,13 @@ float
 BALMLayout::Spacing()
 {
 	return fSpacing;
+}
+
+
+BLayoutItem*
+BALMLayout::_CreateLayoutItem(BView* view)
+{
+	return new(std::nothrow) BViewLayoutItem(view);
 }
 
 
