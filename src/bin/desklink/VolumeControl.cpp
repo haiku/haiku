@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc.
+ * Copyright 2003-2010, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -223,14 +223,22 @@ VolumeControl::MouseMoved(BPoint where, uint32 transit,
 		if (ModificationMessage() != NULL)
 			Messenger().SendMessage(ModificationMessage());
 
+		float snapPoint = _PointForValue(0);
+		const float kMinSnapOffset = 6;
+
 		if (oldValue > newValue) {
 			// movement from right to left
 			fMinSnap = _PointForValue(-4);
+			if (fabs(snapPoint - fMinSnap) < kMinSnapOffset)
+				fMinSnap = snapPoint - kMinSnapOffset;
+
 			fMaxSnap = _PointForValue(1);
 		} else {
 			// movement from left to right
 			fMinSnap = _PointForValue(-1);
 			fMaxSnap = _PointForValue(4);
+			if (fabs(snapPoint - fMaxSnap) < kMinSnapOffset)
+				fMaxSnap = snapPoint + kMinSnapOffset;
 		}
 
 		fSnapping = true;
