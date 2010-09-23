@@ -55,7 +55,8 @@ public:
 		layout->AddArea(layout->Left(), y1, x1, layout->Bottom(), button4);
 		layout->AddArea(x1, y1, x2, y2, textView1);
 
-		a1->HasSameSizeAs(a3);
+		a1->SetWidthAs(a3);
+		a1->SetHeightAs(a3);
 	}
 
 private:

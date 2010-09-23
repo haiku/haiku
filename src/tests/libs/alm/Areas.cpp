@@ -38,19 +38,18 @@ public:
 		a1->SetRightInset(10);
 
 		layout->AddArea(layout->Left(), y1, layout->Right(), y2, button2);
-		button2->SetExplicitAlignment(
-			BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
+		button2->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 
 		Area* a3 = layout->AddArea(layout->Left(), y2, layout->Right(), y3,
 			button3);
-		button3->SetExplicitAlignment(
-			BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
-		a3->HasSameHeightAs(a1);
+		button3->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+			B_ALIGN_VERTICAL_CENTER));
+		a3->SetHeightAs(a1);
 
 		layout->AddArea(layout->Left(), y3, layout->Right(), layout->Bottom(),
 			button4);
-		button4->SetExplicitAlignment(
-			BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));	
+		button4->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+			B_ALIGN_BOTTOM));	
 	}
 	
 private:
