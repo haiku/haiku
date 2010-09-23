@@ -29,8 +29,8 @@ public:
 
 		// add an area containing the button
 		// use the borders of the layout as the borders for the area
-		fLayout->AddArea(fLayout->Left(), fLayout->Top(), fLayout->Right(),
-			fLayout->Bottom(), button1);
+		fLayout->AddView(button1, fLayout->Left(), fLayout->Top(),
+			fLayout->Right(), fLayout->Bottom());
 		button1->SetExplicitMinSize(BSize(0, 50));
 		button1->SetExplicitMaxSize(BSize(500, 500));
 		button1->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,

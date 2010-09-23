@@ -49,16 +49,33 @@ public:
 		YTab* y1 = layout->AddYTab();
 		YTab* y2 = layout->AddYTab();
 
-		Area* a1 = layout->AddArea(layout->Left(), layout->Top(), x2, y1,
-			button1);
-		layout->AddArea(x2, layout->Top(), layout->Right(), y2, button2);
-		Area* a3 = layout->AddArea(x1, y2, layout->Right(), layout->Bottom(),
-			button3);
-		layout->AddArea(layout->Left(), y1, x1, layout->Bottom(), button4);
-		layout->AddArea(x1, y1, x2, y2, textView1);
+		Area* a1 = layout->AddView(button1, layout->Left(), layout->Top(), x2,
+			y1);
+		layout->AddView(button2, x2, layout->Top(), layout->Right(), y2);
+		Area* a3 = layout->AddView(button3, x1, y2, layout->Right(),
+			layout->Bottom());
+		layout->AddView(button4, layout->Left(), y1, x1, layout->Bottom());
+		layout->AddView(textView1, x1, y1, x2, y2);
 
 		a1->SetWidthAs(a3);
 		a1->SetHeightAs(a3);
+
+		// alternative setup
+		/* 
+		layout->AddView(button1);
+		Area* a1 = layout->AreaOf(button1);
+		Area* a2 = layout->AddViewToRight(button2, a1, layout->Right(), NULL,
+			layout->AddYTab());
+		Area* a3 = layout->AddViewToBottom(button3, a2, layout->Bottom(),
+			layout->AddXTab(), NULL);
+		Area* a4 = layout->AddViewToLeft(button4, a3, layout->Left(),
+			a1->Bottom());
+
+		layout->AddView(textView1, a4->Right(), a1->Bottom(), a2->Left(),
+			a3->Top());
+		a1->SetWidthAs(a3);
+		a1->SetHeightAs(a3);
+		*/
 	}
 
 private:

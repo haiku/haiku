@@ -34,10 +34,10 @@ public:
 		// create an extra tab
 		XTab* x1 = layout->AddXTab();
 
-		layout->AddArea(layout->Left(), layout->Top(), x1, layout->Bottom(),
-			button1);
-		layout->AddArea(x1, layout->Top(), layout->Right(), layout->Bottom(),
-			textView1);
+		layout->AddView(button1, layout->Left(), layout->Top(), x1,
+			layout->Bottom());
+		layout->AddView(textView1, x1, layout->Top(), layout->Right(),
+			layout->Bottom());
 
 		// add a constraint: 2*x1 == right
 		// i.e. x1 is in the middle of the layout 

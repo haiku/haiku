@@ -29,25 +29,23 @@ public:
 		YTab* y2 = layout->AddYTab();
 		YTab* y3 = layout->AddYTab();
 
-		Area* a1 = layout->AddArea(
-			layout->Left(), layout->Top(), 
-			layout->Right(), y1,
-			button1);
+		Area* a1 = layout->AddView(button1, layout->Left(), layout->Top(), 
+			layout->Right(), y1);
 		a1->SetTopInset(10);
 		a1->SetLeftInset(10);
 		a1->SetRightInset(10);
 
-		layout->AddArea(layout->Left(), y1, layout->Right(), y2, button2);
+		layout->AddView(button2, layout->Left(), y1, layout->Right(), y2);
 		button2->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 
-		Area* a3 = layout->AddArea(layout->Left(), y2, layout->Right(), y3,
-			button3);
+		Area* a3 = layout->AddView(button3, layout->Left(), y2, layout->Right(),
+			y3);
 		button3->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 			B_ALIGN_VERTICAL_CENTER));
 		a3->SetHeightAs(a1);
 
-		layout->AddArea(layout->Left(), y3, layout->Right(), layout->Bottom(),
-			button4);
+		layout->AddView(button4, layout->Left(), y3, layout->Right(),
+			layout->Bottom());
 		button4->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 			B_ALIGN_BOTTOM));	
 	}

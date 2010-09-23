@@ -30,16 +30,16 @@ public:
 		r2->InsertAfter(r1);
 		
 		BButton* b1 = new BButton("A1");
-		layout->AddArea(r1, c1, b1);
+		layout->AddView(b1, r1, c1);
 		b1->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 		
 		BButton* b2 = new BButton("A2");
-		layout->AddArea(r2, c1, b2);
+		layout->AddView(b2, r2, c1);
 		b2->SetExplicitAlignment(BAlignment(
 			B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
 				
 		BButton* b3 = new BButton("A3");
-		layout->AddArea(r3, c1, b3);
+		layout->AddView(b3, r3, c1);
 		b3->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 		
 		r2->HasSameHeightAs(r1);
