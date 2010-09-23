@@ -28,7 +28,7 @@ namespace BALM {
  */
 class BALMLayout : public BAbstractLayout {
 public:
-								BALMLayout();
+								BALMLayout(float spacing = 0.0f);
 	virtual						~BALMLayout();
 
 			XTab*				AddXTab();
@@ -65,6 +65,12 @@ public:
 
 			LinearSpec*			Solver();
 
+			void				SetInset(float inset);
+			float				Inset();
+
+			void				SetSpacing(float spacing);
+			float				Spacing();
+
 private:
 			void				_SolveLayout();
 
@@ -86,6 +92,9 @@ private:
 			BSize				fMaxSize;
 			BSize				fPreferredSize;
 			char*				fPerformancePath;
+
+			float				fInset;
+			float				fSpacing;
 };
 
 }	// namespace BALM

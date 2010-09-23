@@ -93,6 +93,7 @@ private:
 
 private:
 			BLayoutItem*		fLayoutItem;
+
 			LinearSpec*			fLS;
 
 			XTab*				fLeft;
@@ -106,10 +107,8 @@ private:
 			BSize				fShrinkPenalties;
 			BSize				fGrowPenalties;
 
-			int32				fLeftInset;
-			int32				fTopInset;
-			int32				fRightInset;
-			int32				fBottomInset;
+			BSize				fTopLeftInset;
+			BSize				fRightBottomInset;
 
 			BList				fConstraints;
 			Constraint*			fMinContentWidth;

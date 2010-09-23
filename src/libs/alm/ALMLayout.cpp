@@ -28,9 +28,10 @@ const BSize kMaxSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
  * Constructor.
  * Creates new layout engine.
  */
-BALMLayout::BALMLayout()
+BALMLayout::BALMLayout(float spacing)
 	:
-	BAbstractLayout()
+	fInset(0.0f),
+	fSpacing(spacing)
 {
 	fLeft = new XTab(&fSolver);
 	fRight = new XTab(&fSolver);
@@ -386,6 +387,34 @@ LinearSpec*
 BALMLayout::Solver()
 {
 	return &fSolver;
+}
+
+
+void
+BALMLayout::SetInset(float inset)
+{
+	fInset = inset;
+}
+
+
+float
+BALMLayout::Inset()
+{
+	return fInset;
+}
+
+
+void
+BALMLayout::SetSpacing(float spacing)
+{
+	fSpacing = spacing;
+}
+
+
+float
+BALMLayout::Spacing()
+{
+	return fSpacing;
 }
 
 

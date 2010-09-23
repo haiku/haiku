@@ -305,7 +305,13 @@ Area::SetContentAspectRatio(double ratio)
 int32
 Area::LeftInset() const
 {
-	return fLeftInset;
+	if (fTopLeftInset.IsWidthSet())
+		return fTopLeftInset.Width();
+
+	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
+	if (fLeft == layout->Left())
+		return layout->Inset();
+	return layout->Spacing() / 2;
 }
 
 
@@ -315,7 +321,13 @@ Area::LeftInset() const
 int32
 Area::TopInset() const
 {
-	return fTopInset;
+	if (fTopLeftInset.IsHeightSet())
+		return fTopLeftInset.Height();
+
+	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
+	if (fTop == layout->Top())
+		return layout->Inset();
+	return layout->Spacing() / 2;
 }
 
 
@@ -325,7 +337,13 @@ Area::TopInset() const
 int32
 Area::RightInset() const
 {
-	return fRightInset;
+	if (fRightBottomInset.IsWidthSet())
+		return fRightBottomInset.Width();
+
+	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
+	if (fRight == layout->Right())
+		return layout->Inset();
+	return layout->Spacing() / 2;
 }
 
 
@@ -335,7 +353,13 @@ Area::RightInset() const
 int32
 Area::BottomInset() const
 {
-	return fBottomInset;
+	if (fRightBottomInset.IsHeightSet())
+		return fRightBottomInset.Height();
+
+	BALMLayout* layout = static_cast<BALMLayout*>(fLayoutItem->Layout());
+	if (fBottom == layout->Bottom())
+		return layout->Inset();
+	return layout->Spacing() / 2;
 }
 
 
@@ -345,7 +369,7 @@ Area::BottomInset() const
 void
 Area::SetLeftInset(int32 left)
 {
-	fLeftInset = left;
+	fTopLeftInset.width = left;
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
@@ -356,7 +380,7 @@ Area::SetLeftInset(int32 left)
 void
 Area::SetTopInset(int32 top)
 {
-	fTopInset = top;
+	fTopLeftInset.height = top;
 	fLayoutItem->Layout()->InvalidateLayout();
 }
 
@@ -367,7 +391,8 @@ Area::SetTopInset(int32 top)
 void
 Area::SetRightInset(int32 right)
 {
-	fRightInset = right;
+	fRightBottomInset.width = right;
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -377,7 +402,8 @@ Area::SetRightInset(int32 right)
 void
 Area::SetBottomInset(int32 bottom)
 {
-	fBottomInset = bottom;
+	fRightBottomInset.height = bottom;
+	fLayoutItem->Layout()->InvalidateLayout();
 }
 
 
@@ -532,11 +558,6 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 
 	fAutoPreferredContentSize = false;
 
-	fLeftInset = 0;
-	fTopInset = 0;
-	fRightInset = 0;
-	fBottomInset = 0;
-
 	fLS = ls;
 	fLeft = left;
 	fRight = right;
@@ -578,10 +599,10 @@ Area::_DoLayout()
 
 	BRect areaFrame(round(fLeft->Value()), round(fTop->Value()),
 		round(fRight->Value()), round(fBottom->Value()));
-	areaFrame.left += fLeftInset;
-	areaFrame.right -= fRightInset;
-	areaFrame.top += fTopInset;
-	areaFrame.bottom -= fBottomInset;
+	areaFrame.left += LeftInset();
+	areaFrame.right -= RightInset();
+	areaFrame.top += TopInset();
+	areaFrame.bottom -= BottomInset();
 
 	fLayoutItem->AlignInFrame(areaFrame);
 }
@@ -590,16 +611,16 @@ Area::_DoLayout()
 void
 Area::_UpdateMinSizeConstraint(BSize min)
 {
-	fMinContentWidth->SetRightSide(min.Width() + fLeftInset + fRightInset);
-	fMinContentHeight->SetRightSide(min.Height() + fTopInset + fBottomInset);
+	fMinContentWidth->SetRightSide(min.Width() + LeftInset() + RightInset());
+	fMinContentHeight->SetRightSide(min.Height() + TopInset() + BottomInset());
 }
 
 
 void
 Area::_UpdateMaxSizeConstraint(BSize max)
 {
-	max.width += fLeftInset + fRightInset;
-	max.height += fTopInset + fBottomInset;
+	max.width += LeftInset() + RightInset();
+	max.height += TopInset() + BottomInset();
 
 	// we only need max constraints if the alignment is full height/width
 	// otherwise we can just align the item in the free space
@@ -643,8 +664,8 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 void
 Area::_UpdatePreferredConstraint(BSize preferred)
 {
-	preferred.width += fLeftInset + fRightInset;
-	preferred.height += fTopInset + fBottomInset;
+	preferred.width += LeftInset() + RightInset();
+	preferred.height += TopInset() + BottomInset();
 	if (fPreferredContentWidth == NULL) {
 		fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0,
 			fRight, OperatorType(EQ), preferred.Width(),

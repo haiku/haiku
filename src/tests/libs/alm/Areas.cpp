@@ -21,7 +21,7 @@ public:
 		button1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 		// create a new BALMLayout and use  it for this window
-		BALMLayout* layout = new BALMLayout();
+		BALMLayout* layout = new BALMLayout(6);
 		SetLayout(layout);
 
 		// create extra tabs
