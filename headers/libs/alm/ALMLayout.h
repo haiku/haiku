@@ -22,7 +22,7 @@
 
 
 namespace BALM {
-	
+
 /*!
  * A GUI layout engine using the Auckland Layout Model (ALM).
  */

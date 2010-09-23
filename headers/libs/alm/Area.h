@@ -72,9 +72,8 @@ public:
 								operator BString() const;
 			void				GetString(BString& string) const;
 
-			Constraint*			HasSameWidthAs(Area* area);
-			Constraint*			HasSameHeightAs(Area* area);
-			BList*				HasSameSizeAs(Area* area);
+			Constraint*			SetWidthAs(Area* area, float factor = 1.0f);
+			Constraint*			SetHeightAs(Area* area, float factor = 1.0f);
 
 			void				InvalidateSizeConstraints();
 

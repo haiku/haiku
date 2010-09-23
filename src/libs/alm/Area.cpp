@@ -432,55 +432,43 @@ Area::GetString(BString& string) const
 }
 
 
-/**
- * Sets the width of the area to be the same as the width of the given area.
+/*!
+ * Sets the width of the area times factor to be the same as the width of the
+ * given area.
  *
  * @param area	the area that should have the same width
  * @return the same-width constraint
  */
 Constraint*
-Area::HasSameWidthAs(Area* area)
+Area::SetWidthAs(Area* area, float factor)
 {
-	return fLS->AddConstraint(
-		-1.0, fLeft, 1.0, fRight, 1.0, area->fLeft, -1.0, area->fRight,
-		OperatorType(EQ), 0.0);
+	return fLS->AddConstraint(-factor, fLeft, factor, fRight, 1.0, area->Left(),
+		-1.0, area->Right(), OperatorType(EQ), 0.0);
 }
 
 
-/**
- * Sets the height of the area to be the same as the height of the given area.
+/*!
+ * Sets the height of the area times factor to be the same as the height of the
+ * given area.
  *
  * @param area	the area that should have the same height
  * @return the same-height constraint
  */
 Constraint*
-Area::HasSameHeightAs(Area* area)
+Area::SetHeightAs(Area* area, float factor)
 {
-	return fLS->AddConstraint(
-		-1.0, fTop, 1.0, fBottom, 1.0, area->fTop, -1.0, area->fBottom,
-		OperatorType(EQ), 0.0);
-}
-
-
-/**
- * Sets the size of the area to be the same as the size of the given area.
- *
- * @param area	the area that should have the same size
- * @return a list containing a same-width and same-height constraint
- */
-BList*
-Area::HasSameSizeAs(Area* area)
-{
-	BList* constraints = new BList(2);
-	constraints->AddItem(this->HasSameWidthAs(area));
-	constraints->AddItem(this->HasSameHeightAs(area));
-	return constraints;
+	return fLS->AddConstraint(-factor, fTop, factor, fBottom, 1.0, area->Top(),
+		-1.0, area->Bottom(), OperatorType(EQ), 0.0);
 }
 
 
 void
 Area::InvalidateSizeConstraints()
 {
+	// check if if we are initialized
+	if (!fLeft)
+		return;
+
 	BSize minSize = fLayoutItem->MinSize();
 	BSize maxSize = fLayoutItem->MaxSize();
 	BSize prefSize = fLayoutItem->PreferredSize();
@@ -508,7 +496,24 @@ Area::~Area()
  */
 Area::Area(BLayoutItem* item)
 	:
-	fLayoutItem(item)
+	fLayoutItem(item),
+
+	fLS(NULL),
+	fLeft(NULL),
+	fRight(NULL),
+	fTop(NULL),
+	fBottom(NULL),
+
+	fRow(NULL),
+	fColumn(NULL),
+
+	fMinContentWidth(NULL),
+	fMaxContentWidth(NULL),
+	fMinContentHeight(NULL),
+	fMaxContentHeight(NULL),
+	fPreferredContentWidth(NULL),
+	fPreferredContentHeight(NULL),
+	fContentAspectRatioC(NULL)
 {
 
 }
@@ -521,18 +526,11 @@ void
 Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	BView* content)
 {
-	fMaxContentWidth = NULL;
-	fMaxContentHeight = NULL;
-
 	fShrinkPenalties = BSize(2, 2);
 	fGrowPenalties = BSize(1, 1);
 	fContentAspectRatio = 0;
-	fContentAspectRatioC = NULL;
 
 	fAutoPreferredContentSize = false;
-
-	fPreferredContentWidth = NULL;
-	fPreferredContentHeight = NULL;
 
 	fLeftInset = 0;
 	fTopInset = 0;
@@ -571,10 +569,15 @@ Area::_Init(LinearSpec* ls, Row* row, Column* column, BView* content)
 /**
  * Perform layout on the area.
  */
-void Area::_DoLayout()
+void
+Area::_DoLayout()
 {
-	BRect areaFrame(round(Left()->Value()), round(Top()->Value()),
-		round(Right()->Value()), round(Bottom()->Value()));
+	// check if if we are initialized
+	if (!fLeft)
+		return;
+
+	BRect areaFrame(round(fLeft->Value()), round(fTop->Value()),
+		round(fRight->Value()), round(fBottom->Value()));
 	areaFrame.left += fLeftInset;
 	areaFrame.right -= fRightInset;
 	areaFrame.top += fTopInset;
