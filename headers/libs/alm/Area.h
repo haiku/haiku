@@ -65,10 +65,6 @@ public:
 			void				SetRightInset(int32 right);
 			void				SetBottomInset(int32 bottom);
 
-			void				SetDefaultBehavior();
-			bool				AutoPreferredContentSize() const;
-			void				SetAutoPreferredContentSize(bool value);
-
 								operator BString() const;
 			void				GetString(BString& string) const;
 
@@ -114,7 +110,6 @@ private:
 			Constraint*			fMaxContentWidth;
 			Constraint*			fMinContentHeight;
 			Constraint*			fMaxContentHeight;
-			bool				fAutoPreferredContentSize;
 			Constraint*			fPreferredContentWidth;
 			Constraint*			fPreferredContentHeight;
 			double				fContentAspectRatio;

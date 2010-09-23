@@ -310,8 +310,6 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
 		return NULL;
 
 	area->_Init(&fSolver, left, top, right, bottom);
-	area->SetDefaultBehavior();
-	area->SetAutoPreferredContentSize(false);
 	return area;
 }
 
@@ -326,8 +324,6 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 		return NULL;
 
 	area->_Init(&fSolver, row, column);
-	area->SetDefaultBehavior();
-	area->SetAutoPreferredContentSize(false);
 	return area;
 }
 
@@ -631,14 +627,6 @@ BALMLayout::_CreateLayoutItem(BView* view)
 void
 BALMLayout::_SolveLayout()
 {
-	// if autoPreferredContentSize is set on an area,
-	// readjust its preferredContentSize and penalties settings
-	for (int32 i = 0; i < CountItems(); i++) {
-		Area* currentArea = _AreaForItem(ItemAt(i));
-		if (currentArea && currentArea->AutoPreferredContentSize())
-			currentArea->SetDefaultBehavior();
-	}
-
 	// Try to solve the layout until the result is OPTIMAL or INFEASIBLE,
 	// maximally 15 tries sometimes the solving algorithm encounters numerical
 	// problems (NUMFAILURE), and repeating the solving often helps to overcome

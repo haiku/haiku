@@ -30,30 +30,6 @@ Area::View()
 
 
 /**
- * Gets the auto preferred content size.
- *
- * @return the auto preferred content size
- */
-bool
-Area::AutoPreferredContentSize() const
-{
-	return fAutoPreferredContentSize;
-}
-
-
-/**
- * Sets the auto preferred content size true or false.
- *
- * @param value	the auto preferred content size
- */
-void
-Area::SetAutoPreferredContentSize(bool value)
-{
-	fAutoPreferredContentSize = value;
-}
-
-
-/**
  * Gets the left tab of the area.
  *
  * @return the left tab of the area
@@ -407,34 +383,6 @@ Area::SetBottomInset(int32 bottom)
 }
 
 
-/**
- * Sets the preferred size according to the content's PreferredSize method,
- * and the penalties according to heuristics.
- */
-void
-Area::SetDefaultBehavior()
-{
-	if (View() == NULL) {
-		SetShrinkPenalties(BSize(0, 0));
-		SetGrowPenalties(BSize(0, 0));
-		return;
-	}
-
-	if (dynamic_cast<BButton*>(View()) != NULL
-		|| dynamic_cast<BRadioButton*>(View()) != NULL
-		|| dynamic_cast<BCheckBox*>(View()) != NULL
-		|| dynamic_cast<BStringView*>(View()) != NULL
-		|| dynamic_cast<BPictureButton*>(View()) != NULL
-		|| dynamic_cast<BStatusBar*>(View()) != NULL) {
-		fShrinkPenalties = BSize(4, 4);
-		fGrowPenalties = BSize(3, 3);
-	} else {
-		fShrinkPenalties = BSize(2, 2);
-		fGrowPenalties = BSize(1, 1);
-	}
-}
-
-
 Area::operator BString() const
 {
 	BString string;
@@ -533,12 +481,17 @@ Area::Area(BLayoutItem* item)
 	fRow(NULL),
 	fColumn(NULL),
 
+	fShrinkPenalties(2, 2),
+	fGrowPenalties(1, 1),
+
 	fMinContentWidth(NULL),
 	fMaxContentWidth(NULL),
 	fMinContentHeight(NULL),
 	fMaxContentHeight(NULL),
 	fPreferredContentWidth(NULL),
 	fPreferredContentHeight(NULL),
+
+	fContentAspectRatio(0),
 	fContentAspectRatioC(NULL)
 {
 
@@ -551,12 +504,6 @@ Area::Area(BLayoutItem* item)
 void
 Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 {
-	fShrinkPenalties = BSize(2, 2);
-	fGrowPenalties = BSize(1, 1);
-	fContentAspectRatio = 0;
-
-	fAutoPreferredContentSize = false;
-
 	fLS = ls;
 	fLeft = left;
 	fRight = right;
