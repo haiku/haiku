@@ -725,12 +725,13 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 /*static*/ int
 StreamBase::_Read(void* cookie, uint8* buffer, int bufferSize)
 {
-	TRACE_IO("StreamBase::_Read(%p, %p, %d)\n",
-		cookie, buffer, bufferSize);
-
 	StreamBase* stream = reinterpret_cast<StreamBase*>(cookie);
 
 	BAutolock _(stream->fSourceLock);
+
+	TRACE_IO("StreamBase::_Read(%p, %p, %d) position: %lld/%lld\n",
+		cookie, buffer, bufferSize, stream->fPosition,
+		stream->fSource->Position());
 
 	if (stream->fPosition != stream->fSource->Position()) {
 		off_t position
@@ -977,6 +978,7 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 		default:
 			TRACE("  unknown type\n");
 			format->type = B_MEDIA_UNKNOWN_TYPE;
+			return B_ERROR;
 			break;
 	}
 
@@ -1277,17 +1279,41 @@ AVFormatReader::Stream::FindKeyFrame(uint32 flags, int64* frame,
 		"%lld, %lld)\n", VirtualIndex(),
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
 		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
-		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD)
+			? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD)
+			? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
 		*frame, *time);
 
-	if (((flags & B_MEDIA_SEEK_TO_FRAME) != 0
-			&& *frame == fLastReportedKeyframe.reportedFrame)
-		|| ((flags & B_MEDIA_SEEK_TO_FRAME) == 0
-			&& *time == fLastReportedKeyframe.reportedTime)) {
+	bool inLastRequestedRange = false;
+	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
+		if (fLastReportedKeyframe.reportedFrame
+			<= fLastReportedKeyframe.requestedFrame) {
+			inLastRequestedRange
+				= *frame >= fLastReportedKeyframe.reportedFrame
+					&& *frame <= fLastReportedKeyframe.requestedFrame;
+		} else {
+			inLastRequestedRange
+				= *frame >= fLastReportedKeyframe.requestedFrame
+					&& *frame <= fLastReportedKeyframe.reportedFrame;
+		}
+	} else if ((flags & B_MEDIA_SEEK_TO_FRAME) == 0) {
+		if (fLastReportedKeyframe.reportedTime
+			<= fLastReportedKeyframe.requestedTime) {
+			inLastRequestedRange
+				= *time >= fLastReportedKeyframe.reportedTime
+					&& *time <= fLastReportedKeyframe.requestedTime;
+		} else {
+			inLastRequestedRange
+				= *time >= fLastReportedKeyframe.requestedTime
+					&& *time <= fLastReportedKeyframe.reportedTime;
+		}
+	}
+
+	if (inLastRequestedRange) {
 		*frame = fLastReportedKeyframe.reportedFrame;
 		*time = fLastReportedKeyframe.reportedTime;
-		TRACE_FIND("  same as last reported frame\n");
+		TRACE_FIND("  same as last reported keyframe\n");
 		return B_OK;
 	}
 
@@ -1353,10 +1379,32 @@ AVFormatReader::Stream::Seek(uint32 flags, int64* frame, bigtime_t* time)
 	// that the sought frame/time will then match the reported values.
 	// TODO: Will not work if client changes seek flags (from backwards to
 	// forward or vice versa)!!
-	if (((flags & B_MEDIA_SEEK_TO_FRAME) != 0
-			&& fLastReportedKeyframe.reportedFrame == *frame)
-		|| ((flags & B_MEDIA_SEEK_TO_TIME) != 0
-			&& fLastReportedKeyframe.reportedTime == *time)) {
+	bool inLastRequestedRange = false;
+	if ((flags & B_MEDIA_SEEK_TO_FRAME) != 0) {
+		if (fLastReportedKeyframe.reportedFrame
+			<= fLastReportedKeyframe.requestedFrame) {
+			inLastRequestedRange
+				= *frame >= fLastReportedKeyframe.reportedFrame
+					&& *frame <= fLastReportedKeyframe.requestedFrame;
+		} else {
+			inLastRequestedRange
+				= *frame >= fLastReportedKeyframe.requestedFrame
+					&& *frame <= fLastReportedKeyframe.reportedFrame;
+		}
+	} else if ((flags & B_MEDIA_SEEK_TO_FRAME) == 0) {
+		if (fLastReportedKeyframe.reportedTime
+			<= fLastReportedKeyframe.requestedTime) {
+			inLastRequestedRange
+				= *time >= fLastReportedKeyframe.reportedTime
+					&& *time <= fLastReportedKeyframe.requestedTime;
+		} else {
+			inLastRequestedRange
+				= *time >= fLastReportedKeyframe.requestedTime
+					&& *time <= fLastReportedKeyframe.reportedTime;
+		}
+	}
+
+	if (inLastRequestedRange) {
 		*frame = fLastReportedKeyframe.requestedFrame;
 		*time = fLastReportedKeyframe.requestedTime;
 		flags = fLastReportedKeyframe.seekFlags;
