@@ -105,6 +105,10 @@ AVCodecDecoder::AVCodecDecoder()
 	fOutputBufferSize(0)
 {
 	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
+
+	fContext->error_recognition = FF_ER_CAREFUL;
+	fContext->error_concealment = 3;
+	avcodec_thread_init(fContext, 1);
 }
 
 
@@ -241,18 +245,8 @@ AVCodecDecoder::SeekedTo(int64 frame, bigtime_t time)
 {
 	status_t ret = B_OK;
 	// Reset the FFmpeg codec to flush buffers, so we keep the sync
-#if 1
-	if (fCodecInitDone) {
-		avcodec_close(fContext);
-		fCodecInitDone = avcodec_open(fContext, fCodec) >= 0;
-		if (!fCodecInitDone)
-			ret = B_ERROR;
-	}
-#else
-	// For example, this doesn't work on the H.264 codec. :-/
 	if (fCodecInitDone)
 		avcodec_flush_buffers(fContext);
-#endif
 
 	// Flush internal buffers as well.
 	fChunkBuffer = NULL;
@@ -304,8 +298,6 @@ AVCodecDecoder::Decode(void* outBuffer, int64* outFrameCount,
 		ret = _DecodeAudio(outBuffer, outFrameCount, mediaHeader, info);
 	else
 		ret = _DecodeVideo(outBuffer, outFrameCount, mediaHeader, info);
-
-	fStartTime = (bigtime_t)(1000000LL * fFrame / fOutputFrameRate);
 
 	return ret;
 }
@@ -400,7 +392,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fOutputBufferOffset = 0;
 	fOutputBufferSize = 0;
 
-	av_init_packet(&fAudioTempPacket);
+	av_init_packet(&fTempPacket);
 
 	inOutFormat->require_flags = 0;
 	inOutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
@@ -586,18 +578,16 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 			}
 			fChunkBufferOffset = 0;
 			fStartTime = chunkMediaHeader.start_time;
-			if (*outFrameCount == 0)
-				mediaHeader->start_time = chunkMediaHeader.start_time;
 		}
 
-		fAudioTempPacket.data = (uint8_t*)fChunkBuffer + fChunkBufferOffset;
-		fAudioTempPacket.size = fChunkBufferSize;
+		fTempPacket.data = (uint8_t*)fChunkBuffer + fChunkBufferOffset;
+		fTempPacket.size = fChunkBufferSize;
 		// Initialize decodedBytes to the output buffer size.
 		int decodedBytes = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 		int usedBytes = avcodec_decode_audio3(fContext,
-			(int16*)fOutputBuffer, &decodedBytes, &fAudioTempPacket);
+			(int16*)fOutputBuffer, &decodedBytes, &fTempPacket);
 		if (usedBytes < 0 && !fAudioDecodeError) {
-			// Failure
+			// Report failure if not done already
 			printf("########### audio decode error, "
 				"fChunkBufferSize %ld, fChunkBufferOffset %ld\n",
 				fChunkBufferSize, fChunkBufferOffset);
@@ -608,12 +598,14 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 			// Skip the chunk buffer data entirely.
 			usedBytes = fChunkBufferSize;
 			decodedBytes = 0;
+			// Assume the audio decoded until now is broken.
+			memset(_buffer, 0, buffer - (uint8*)_buffer);
 		} else {
 			// Success
 			fAudioDecodeError = false;
 		}
 //printf("  chunk size: %d, decoded: %d, used: %d\n",
-//fAudioTempPacket.size, decodedBytes, usedBytes);
+//fTempPacket.size, decodedBytes, usedBytes);
 
 		fChunkBufferOffset += usedBytes;
 		fChunkBufferSize -= usedBytes;
@@ -622,6 +614,7 @@ AVCodecDecoder::_DecodeAudio(void* _buffer, int64* outFrameCount,
 	}
 	fFrame += *outFrameCount;
 	TRACE_AUDIO("  frame count: %lld current: %lld\n", *outFrameCount, fFrame);
+
 	return B_OK;
 }
 
@@ -654,7 +647,8 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 			firstRun = false;
 
 			mediaHeader->type = B_MEDIA_RAW_VIDEO;
-//			mediaHeader->start_time = chunkMediaHeader.start_time;
+			mediaHeader->start_time = chunkMediaHeader.start_time;
+			fStartTime = chunkMediaHeader.start_time;
 			mediaHeader->file_pos = 0;
 			mediaHeader->orig_size = 0;
 			mediaHeader->u.raw_video.field_gamma = 1.0;
@@ -681,9 +675,11 @@ AVCodecDecoder::_DecodeVideo(void* outBuffer, int64* outFrameCount,
 		// packet buffers are supposed to contain complete frames only so we
 		// don't seem to be required to buffer any packets because not the
 		// complete packet has been read.
+		fTempPacket.data = (uint8_t*)data;
+		fTempPacket.size = size;
 		int gotPicture = 0;
-		int len = avcodec_decode_video(fContext, fInputPicture, &gotPicture,
-			(uint8_t*)data, size);
+		int len = avcodec_decode_video2(fContext, fInputPicture, &gotPicture,
+			&fTempPacket);
 		if (len < 0) {
 			TRACE("[v] AVCodecDecoder: error in decoding frame %lld: %d\n",
 				fFrame, len);
