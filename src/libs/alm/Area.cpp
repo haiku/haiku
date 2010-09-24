@@ -86,7 +86,7 @@ Area::SetLeft(XTab* left)
 	fColumn = NULL;
 
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-
+	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 
@@ -107,7 +107,7 @@ Area::SetRight(XTab* right)
 	fColumn = NULL;
 
 	fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
-
+	fPreferredContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	if (fMaxContentWidth != NULL)
 		fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 
@@ -126,7 +126,7 @@ Area::SetTop(YTab* top)
 	fRow = NULL;
 
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-
+	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 	if (fMaxContentHeight != NULL)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 
@@ -145,7 +145,7 @@ Area::SetBottom(YTab* bottom)
 	fRow = NULL;
 
 	fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
-
+	fPreferredContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 	if (fMaxContentHeight != NULL)
 		fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 
@@ -266,8 +266,7 @@ Area::SetContentAspectRatio(double ratio)
 	if (fContentAspectRatio <= 0) {
 		delete fContentAspectRatioC;
 		fContentAspectRatioC = NULL;
-	}
-	else if (fContentAspectRatioC == NULL) {
+	} else if (fContentAspectRatioC == NULL) {
 		fContentAspectRatioC = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
 			ratio, fTop, -ratio, fBottom, OperatorType(EQ), 0.0);
 		fConstraints.AddItem(fContentAspectRatioC);
@@ -485,8 +484,8 @@ Area::Area(BLayoutItem* item)
 	fRow(NULL),
 	fColumn(NULL),
 
-	fShrinkPenalties(2, 2),
-	fGrowPenalties(1, 1),
+	fShrinkPenalties(5, 5),
+	fGrowPenalties(5, 5),
 
 	fMinContentWidth(NULL),
 	fMaxContentWidth(NULL),
@@ -517,13 +516,23 @@ Area::_Init(LinearSpec* ls, XTab* left, YTab* top, XTab* right, YTab* bottom)
 	// adds the two essential constraints of the area that make sure that the
 	// left x-tab is really to the left of the right x-tab, and the top y-tab
 	// really above the bottom y-tab
-	fMinContentWidth = ls->AddConstraint(-1.0, left, 1.0, right,
+	fMinContentWidth = ls->AddConstraint(-1.0, fLeft, 1.0, fRight,
 		OperatorType(GE), 0);
-	fMinContentHeight = ls->AddConstraint(-1.0, top, 1.0, bottom,
+	fMinContentHeight = ls->AddConstraint(-1.0, fTop, 1.0, fBottom,
 		OperatorType(GE), 0);
 
 	fConstraints.AddItem(fMinContentWidth);
 	fConstraints.AddItem(fMinContentHeight);
+
+	fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight,
+		OperatorType(EQ), 0, fShrinkPenalties.Height(), fGrowPenalties.Width());
+
+	fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom,
+		OperatorType(EQ), 0, fShrinkPenalties.Height(),
+		fGrowPenalties.Height());
+
+	fConstraints.AddItem(fPreferredContentWidth);
+	fConstraints.AddItem(fPreferredContentHeight);
 }
 
 
@@ -560,8 +569,15 @@ Area::_DoLayout()
 void
 Area::_UpdateMinSizeConstraint(BSize min)
 {
-	fMinContentWidth->SetRightSide(min.Width() + LeftInset() + RightInset());
-	fMinContentHeight->SetRightSide(min.Height() + TopInset() + BottomInset());
+	float width = 0.;
+	float height = 0.;
+	if (min.width > 0)
+		width = min.Width() + LeftInset() + RightInset();
+	if (min.height > 0)
+		height = min.Height() + TopInset() + BottomInset();
+
+	fMinContentWidth->SetRightSide(width);
+	fMinContentHeight->SetRightSide(height);
 }
 
 
@@ -604,29 +620,16 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 }
 
 
-/**
- * Sets Preferred size of the area's content.
- * May be different from the preferred size of the area.
- * Manual changes of PreferredContentSize are ignored unless
- * autoPreferredContentSize is set to false.
- */
 void
 Area::_UpdatePreferredConstraint(BSize preferred)
 {
-	preferred.width += LeftInset() + RightInset();
-	preferred.height += TopInset() + BottomInset();
-	if (fPreferredContentWidth == NULL) {
-		fPreferredContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0,
-			fRight, OperatorType(EQ), preferred.Width(),
-			fShrinkPenalties.Width(), fGrowPenalties.Width());
-		fConstraints.AddItem(fPreferredContentWidth);
+	float width = 64000;
+	float height = 64000;
+	if (preferred.width > 0)
+		width = preferred.Width() + LeftInset() + RightInset();
+	if (preferred.height > 0)
+		height = preferred.Height() + TopInset() + BottomInset();
 
-		fPreferredContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0,
-			fBottom, OperatorType(EQ), preferred.Height(),
-			fShrinkPenalties.Height(), fGrowPenalties.Height());
-		fConstraints.AddItem(fPreferredContentHeight);
-	} else {
-		fPreferredContentWidth->SetRightSide(preferred.Width());
-		fPreferredContentHeight->SetRightSide(preferred.Height());
-	}
+	fPreferredContentWidth->SetRightSide(width);
+	fPreferredContentHeight->SetRightSide(height);
 }
