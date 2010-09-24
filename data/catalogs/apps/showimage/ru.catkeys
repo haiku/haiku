@@ -23,7 +23,7 @@ First page	Menus		Первая страница
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
 About ShowImage…	Menus		О программе…
 Open	Menus		Открыть
-OK	LoadAlerts		Oк
+OK	LoadAlerts		ОК
 Close	ClosePrompt		Закрыть
 Height:	ResizerWindow		Высота:
 Undo	Menus		Вернуть
@@ -60,7 +60,7 @@ Job setup	PrintOptionsWindow		Настройка задания
 Original size	Menus		Оригинальный размер
 Next page	Menus		Следующая страница
 Shrink to window	Menus		Уменьшать до размеров окна
-OK	SaveToFile		Oк
+OK	SaveToFile		ОК
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Progress monitor	ProgressWindow		Монитор состояния
 Paste	Menus		Вставить

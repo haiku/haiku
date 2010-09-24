@@ -1,5 +1,5 @@
 1	russian	x-vnd.Haiku-StyledEdit	2750476595
-OK	LoadAlert		Oк
+OK	LoadAlert		ОК
 ???	LoadAlert		???
 Left	Menus		По левому краю
 Revert to the last version of \"%s\"? 	RevertToSavedAlert		Вернуться к последней версии \"%s\"? 
@@ -26,7 +26,7 @@ Replace all	FindandReplaceWindow		Заменить все
 Default	Open_and_SaveAsPanel		По умолчанию
 Cancel	FindandReplaceWindow		Отмена
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Ошибка при открытии \"%s\":\n\tФормат не поддерживается
-OK	RevertToSavedAlert		Oк
+OK	RevertToSavedAlert		ОК
 Don't save	QuitAlert		Не сохранять
 Align	Menus		Выровнить
 Color	Menus		Цвет
@@ -49,7 +49,7 @@ Find…	Menus		Найти…
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s
 Black	Menus		Черный
 Untitled 	StyledEditWindow		Новый документ 
-OK	SaveAlert		Oк
+OK	SaveAlert		ОК
 Find	FindandReplaceWindow		Найти
 Encoding	Open_and_SaveAsPanel		Кодировка
 Replace…	Menus		Заменить…

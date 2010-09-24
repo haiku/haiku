@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	3909863154
+1	russian	x-vnd.Haiku-Terminal	3460363657
 Not found.	Terminal TermWindow		Не найдено
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -54,6 +54,7 @@ Use text:	Terminal FindWindow		Использовать текст:
 Cancel	Terminal TermWindow		Отмена
 OK	Terminal TermApp		ОК
 Find failed	Terminal TermWindow		Строка не найдена
+Shell 	Terminal TermWindow		Консоль 
 Search forward	Terminal FindWindow		Искать сверху вниз
 Find previous	Terminal TermWindow		Найти ранее
 About Terminal…	Terminal TermWindow		О программе…

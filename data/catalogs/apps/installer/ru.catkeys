@@ -7,7 +7,7 @@ Installation completed. Boot sector has been written to '%s'. Press Quit to rest
 Install progress:  	InstallerWindow		Прогресс установки:  
 Starting Installation.	InstallProgress		Запуск установки.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Вы уверены, что хотите начать установку на текущий загрузочный диск? Установщику потребуется перезагрузка компьютера, если вы продолжите.
-OK	InstallProgress		Oк
+OK	InstallProgress		ОК
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		В выпадающих меню выберите источник и раздел, на который хотите установить Haiku. Затем нажмите \"Начать\".
 Install from:	InstallerWindow		Установить с:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld из %2ld
@@ -57,11 +57,11 @@ The target volume is not empty. Are you sure you want to install anyway?\n\nNote
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?
 Restart system	InstallerWindow		Перезагрузить компьютер
 Quit	InstallerApp		Выход
-OK	InstallerApp		Oк
+OK	InstallerApp		ОК
 Continue	InstallerWindow	In alert after pressing Stop	Продолжить
-OK	InstallerWindow		Oк
+OK	InstallerWindow		ОК
 Cancel	InstallerWindow		Отмена
-Additional disk space required: 0.0 KiB	InstallerWindow		Необходимо дополнительного пространства: 0.0 КиБ
+Additional disk space required: 0.0 KiB	InstallerWindow		Необходимо дополнительного пространства: 0.0 Кбайт
 The mount point could not be retrieved.	InstallProgress		Невозможно определить точку подключения.
 Bootman, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Bootman, приложение для настройки загрузочного меню Haiku, не найдено.
 Quit Boot Manager	InstallerWindow		Закрыть менеджер загрузки

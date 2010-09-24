@@ -1,5 +1,5 @@
 1	russian	x-vnd.Haiku-Shortcuts	3727835933
-OK	ShortcutsWindow		Oк
+OK	ShortcutsWindow		ОК
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Не удалось сохранить список горячих клавиш.
 Cancel	ShortcutsWindow		Отмена
 Append KeySet…	ShortcutsWindow		Добавить список горячих клавиш…
@@ -14,7 +14,7 @@ Save	ShortcutsWindow		Сохранить
 Remove selected shortcut	ShortcutsWindow		Удалить выделенную горячую клавишу
 Add new shortcut	ShortcutsWindow		Добавить горячую клавишу
 Save & apply	ShortcutsWindow		Применить
-OK	ShortcutsApp		Oк
+OK	ShortcutsApp		ОК
 Append	ShortcutsWindow		Совместить
 File	ShortcutsWindow		Файл
 Quit	ShortcutsWindow		Выход
@@ -26,6 +26,6 @@ Really quit without saving your changes?	ShortcutsWindow		Сохранить и�
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Не удалось прочитать файл списка горячих клавиш!
 Select	ShortcutsWindow		Выбрать
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не удалось сохранить ваш файл список горячих клавиш!
-About Shortcuts	ShortcutsWindow		О программе...
+About Shortcuts	ShortcutsWindow		О программе…
 Oh no	ShortcutsWindow		О нет
-About Shortcuts	ShortcutsApp		О программе...
+About Shortcuts	ShortcutsApp		О программе…

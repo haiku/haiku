@@ -1,4 +1,4 @@
-+1	russian	x-vnd.Haiku-DiskProbe	3928365237
+1	russian	x-vnd.Haiku-DiskProbe	3737633890
 File offset: 	ProbeView		Смещение файла: 
 DiskProbe	OpenWindow		DiskProbe
 64 bit unsigned value:	TypeEditors		64-х битное беззнаковое значение:
@@ -16,7 +16,7 @@ Attributes	ProbeView		Атрибуты
 Device offset: 	ProbeView		Смещение устройства: 
 Selection	ProbeView		Выделение
 File	FileWindow		Файл
-OK	DiskProbe		Oк
+OK	DiskProbe		ОК
 Paste	ProbeView		Вставить
 PNG format	TypeEditors		PNG формат
 Font size	ProbeView		Размер шрифта
@@ -26,7 +26,7 @@ Attribute	AttributeWindow		Атрибут
 Number:	TypeEditors		Число:
 Save	ProbeView		Сохранить
 Number editor	TypeEditors		Редактор чисел
-No type editor available	AttributeWindow		Нет доступного редактора данного для типа
+No type editor available	AttributeWindow		Нет доступного редактора для данного типа
 Double precision floating-point value:	TypeEditors		Значение плавающей запятой двойной точности:
 Device: 	ProbeView		Устройство: 
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Вы действительно хотите удалить атрибут \"%s\" из файла \"%s\"?\n\nЭту операцию будет невозможно отменить.
@@ -71,7 +71,7 @@ Icon	TypeEditors		Значок
 Block: 	ProbeView		Блок: 
 Examine device:	OpenWindow		Исследовать устройство:
 Offset: 	ProbeView		Смещение: 
-OK	ProbeView		Oк
+OK	ProbeView		ОК
 Add	ProbeView		Добавить
 Edit	ProbeView		Изменить
 Native: %Ld (0x%0*Lx)	ProbeView		Родной: %Ld (0x%0*Lx)
@@ -86,7 +86,7 @@ Block %Ld (0x%Lx)	ProbeView		Блок %Ld (0x%Lx)
 Could not open file \"%s\": %s\n	DiskProbe		Невозможно открыть файл \"%s\": %s\n
 Select all	ProbeView		Выделить всё
 Probe file…	OpenWindow		Исследовать файл…
-Icon view	TypeEditors		Большие значки
+Icon view	TypeEditors		Значок
 Bookmarks	ProbeView		Закладки
 Find	FindWindow		Найти
 Mode:	FindWindow		Режим:
@@ -127,10 +127,9 @@ Message	TypeEditors	This is the type of view	Сообщение
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Невозможно открыть \"%s\":\n%s
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Просмотр изображения
 Image	TypeEditors	This is the type of view	Изображение
-BlockSize	ProbeView	A menu item, a shortened form from block size.	Размер блока
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system.	Система счисления
-View	ProbeView	This is the last menubar item.	Вид
+BlockSize	ProbeView	A menu item, a shortened form from "block size". This is in the same menu windowthan "Base" and "Font size"	Размер блока
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than "Font size" and "BlockSize"	Система счисления
+View	ProbeView	This is the last menubar item "File Edit Block View"	Вид
 About DiskProbe…	FileWindow		О программе…
 Find	FindWindow		Найти
 %ld (native)	ProbeView		%ld (родной)
-

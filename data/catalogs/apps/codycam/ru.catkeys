@@ -68,7 +68,7 @@ Connected…	VideoConsumer.cpp		Подключен…
 PASS <suppressed>  (real password sent)\n	FtpClient		ПАРОЛЬ <скрыт>  (реальный пароль отослан)\n
 Every 5 minutes	CodyCam		Каждые 5 минут
 read: %d\n	SftpClient		чтение: %d\n
-OK	CodyCam		Oк
+OK	CodyCam		ОК
 Capture controls	CodyCam		Управление захватом
 Every hour	CodyCam		Каждый час
 Cannot connect the video source to the video window	CodyCam		Невозможно подключить видео источник к видео окну
@@ -79,7 +79,7 @@ on or off expected	Settings	Do not translate 'on' and 'off'	укажите вк�
 Quit	CodyCam		Выход
 cmd: '%s'\n	FtpClient		команда: '%s'\n
 Never	CodyCam		Никогда
-CodyCam	CodyCam		Камера
+CodyCam	CodyCam		CodyCam
 Cannot create a video window	CodyCam		Невозможно создать видео окно
 Every 10 minutes	CodyCam		Каждые 10 минут
 Cannot start the video source	CodyCam		Невозможно запустить видео источник

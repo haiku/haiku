@@ -46,7 +46,7 @@ Unknown	LegacyBootDrive	Text is shown for an unknown partition type	Неизве
 Default Partition	DefaultPartitionPage	Title	Раздел по умолчанию
 Error reading partition table	BootManagerController	Title	Ошибка чтения таблицы разделов
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Все готово для записи загрузочного меню на диск. Вы уверены, что хотите продолжить?
-OK	BootManagerController	Button	Oк
+OK	BootManagerController	Button	ОК
 Backup Master Boot Record	BootManagerController	Title	Сохранить главную загрузочную запись (MBR)
 Haiku Boot Manager	BootManager	About text title	Haiku Boot Manager
 written by	BootManager		разработал

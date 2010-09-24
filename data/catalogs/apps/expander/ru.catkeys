@@ -28,7 +28,7 @@ Expand	ExpanderWindow		Извлечь
 Close	ExpanderMenu		Закрыть
 The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
 About Expander…	ExpanderMenu		О программе…
-OK	About		Oк
+OK	About		ОК
 Set source…	ExpanderMenu		Выбрать источник…
 Select '%s'	DirectoryFilePanel		Выбрать '%s'
 Show contents	ExpanderMenu		Показать содержимое

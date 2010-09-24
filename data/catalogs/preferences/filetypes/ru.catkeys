@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	1959260346
+1	russian	x-vnd.Haiku-FileTypes	525617155
 Args only	Application Type Window		Только аргументы
 Add group	New File Type Window		Добавить группу
 Remove	Application Type Window		Удалить
@@ -11,7 +11,7 @@ Add icon…	Icon View		Добавить значок…
 Do you want to save the changes?	Application Type Window		Хотите сохранить изменения?
 File type	FileType Window		Тип файла
 Could not change attributes	Attribute Window		Невозможно изменить атрибуты
-OK	FileTypes		Oк
+OK	FileTypes		ОК
 Save	Application Type Window		Сохранить
 Add	Extension Window		Добавить
 Select same preferred application as	FileType Window		Выбрать такое же предпочтительное приложение как у
@@ -133,3 +133,4 @@ Attribute	Attribute Window		Атрибут
 Group name:	New File Type Window		Имя группы:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Отображать как
 Right	Attribute Window	Attribute column alignment in Tracker	По правому краю
+%1 application type	Application Type Window		Тип приложения %1

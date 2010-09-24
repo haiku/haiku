@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Mail	1416961282
+1	russian	x-vnd.Haiku-Mail	3956156796
 Select account type	Config Views		Выберите тип аккаунта
 Mail checking	Config Window		Проверка почты
 Settings	Config Window		Настройки
@@ -7,8 +7,8 @@ While sending and receiving	Config Window		Во время отсылки и п�
 days	Config Window		дней
 Start mail services on startup	Config Window		Запускать почтовый сервис при старте
 Receive mail only	Config Views		Только для получения почты
-Account name:	Config Views		имя аккаунта:
-OK	Config Views		Oк
+Account name:	Config Views		Имя аккаунта:
+OK	Config Views		ОК
 The filter could not be moved. Deleting filter.	Config Views		Невозможно переименовать фильтр. Удаление фильтра.
 Revert	Config Window		Вернуть
 Accounts	Config Window		Аккаунты
@@ -31,18 +31,34 @@ Edit mailbox menu…	Config Window		Изменить меню…
 Remove	Config Views		Удалить
 Could not create inbound chain.	Account		Невозможно создать входяшую цепь.
 Check every	Config Window		Проверять каждые
-never	Config Window		Никогда
+never	Config Window		никогда
+Never	Config Window		Никогда
 Incoming mail filters	Config Views		Фильтры входящей почты
 Account settings	Config Views		Настройки аккаунта
 minutes	Config Window		минут
 Error retrieving general settings: %s\n	Config Window		Возникла ошибка при получении общих настроек: %s\n
-OK	Account		Oк
+OK	Account		ОК
 Apply	Config Window		Применить
 Could not create outbound chain.	Account		Невозможно создать исходящую цепь.
 Always	Config Window		Всегда
 Add filter	Config Views		Добавить фильтр
 Outgoing mail filters	Config Views		Фильтры исходящей почты
-\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля того, чтобы создать аккаунт нажмите кнопку Добавить.\n\nУдалить аккаунт можно при помощи кнопки Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
-· Outgoing	Account		· Исходящие
-· E-mail filters	Account		· Фильтры
-· Incoming	Account		· Входящие
+\n\nCreate a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		\n\nДля создания аккаунта нажмите кнопку Добавить.\n\nДля удаления выберите нужный аккаунт и нажмите кнопку Удалить.\n\nИзменить настройки аккаунта можно просто выбрав нужный из списка.
+   · Outgoing	Account		   · Исходящие
+   · E-mail filters	Account		   · Фильтры
+   · Incoming	Account		   · Входящие
+Account settings	Config Views	Настройки аккаунта		
+Account name:	Config Views		Имя аккаунта:
+Real name:	Config Views		Настоящее имя:
+Return address:	Config Views		Обратный адрес:
+Receive mail only	Config Views		Только для получения почты
+Send mail only	Config Views		Только для отправки почты
+Send and receive mail	Config Views		Для отправки и получения почты
+Account type:	Config Views		Тип аккаунта:
+Select account type	Config Views		Выберите тип аккаунта
+Incoming mail filters	Config Views		Фильтры входящей почты
+Outgoing mail filters	Config Views		Фильтры исходящей почты
+Add filter	Config Views		Добавить фильтр
+Remove	Config Views		Удалить
+The filter could not be moved. Deleting filter.	Config Views		Фильтр не может быть перемещен. Удаление фильтра.
+OK	Config Views		ОК

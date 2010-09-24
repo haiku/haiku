@@ -16,7 +16,7 @@ No	PrintServerApp		Нет
 Landscape	ConfigWindow		Альбом
 There are no printers set up.	PrintServerApp		Нет настроенных принтеров.
 There already exists a printer you are going to create, but it's not usable at all! Replace?	PrintServerApp		Принтер, который вы собираетесь создать, уже существует, но он не используется! Заменить?
-OK	PrintServerApp		Oк
+OK	PrintServerApp		ОК
 Print setup	ConfigWindow		Настройка печати
 Would you like to make @ the default printer?	PrintServerApp		Вы хотите сделать @ принтером по умолчанию?
 Page setup	ConfigWindow		Настройка печати

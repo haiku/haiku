@@ -1,9 +1,10 @@
-1	russian	x-vnd.Haiku-DriveSetup	4234569363
+1	russian	x-vnd.Haiku-DriveSetup	2094726518
 Delete	MainWindow		Удалить
+DriveSetup	MainWindow		DriveSetup
 Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Вы уверены, что хотите инициализировать выбранный раздел?\nПосле ввода параметров инициализации вы сможете отменить эту операцию непосредственно перед записью изменений на диск.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на выбранном разделе будут безвозвратно потеряны!
 Rescan	MainWindow		Пересканировать
-OK	MainWindow		Oк
+OK	MainWindow		ОК
 Could not aquire partitioning information.	MainWindow		Невозможно получить информацию о разделах.
 There's no space on the partition where a child partition could be created.	MainWindow		Недостаточно места на разделе, где можно было бы создать подраздел.
 <empty>	DiskView		<пусто>
@@ -48,7 +49,7 @@ Disk	MainWindow		Диск
 Volume name	PartitionList		Имя раздела
 Continue	MainWindow		Продолжить
 Cannot delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
-Mount all	MainWindow		Монтировать всё
+Mount all	MainWindow		Подключить все
 Cancel	CreateParamsPanel		Отмена
 Delete partition	MainWindow		Удалить раздел
 End: %ld MB	Support		Конец: %ld Мбайт
