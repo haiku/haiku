@@ -690,6 +690,12 @@ MediaTrackAudioSupplier::_SeekToKeyFrameBackward(int64& position)
 			position = currentPosition;
 			return B_OK;
 		}
+		if (error == B_OK && position > wantedPosition) {
+			// We asked to seek backwards, but the extractor seeked
+			// forwards! Returning an error here will cause silence
+			// to be produced.
+			return B_ERROR;
+		}
 		if (error == B_OK)
 			error = fMediaTrack->SeekToFrame(&position, 0);
 		if (error != B_OK) {
