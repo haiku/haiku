@@ -46,10 +46,10 @@ public:
 									media_header* mediaHeader);
 
 private:
-	class StreamCookie;
+			class Stream;
 
-			StreamCookie**		fStreams;
-			BLocker				fStreamLock;
+			Stream**			fStreams;
+			BLocker				fSourceLock;
 };
 
 
