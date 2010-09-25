@@ -2683,11 +2683,10 @@ BRoster::_TranslateType(const char* mimeType, BMimeType* appMeta,
 	secondarySignature[0] = '\0';
 
 	if (error == B_OK) {
+		BMimeType superType;
+		if (type.GetSupertype(&superType) == B_OK)
+			superType.GetPreferredApp(secondarySignature);
 		if (type.IsInstalled()) {
-			BMimeType superType;
-			if (type.GetSupertype(&superType) == B_OK)
-				superType.GetPreferredApp(secondarySignature);
-
 			if (type.GetPreferredApp(primarySignature) != B_OK) {
 				// The type is installed, but has no preferred app.
 				primarySignature[0] = '\0';
