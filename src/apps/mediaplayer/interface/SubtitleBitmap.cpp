@@ -119,7 +119,7 @@ SubtitleBitmap::_GenerateBitmap()
 struct ParseState {
 	ParseState()
 		:
-		color((rgb_color){ 255, 255, 255, 255 }),
+		color(rgb_color().set_to(255, 255, 255, 255)),
 		bold(false),
 		italic(false),
 		underlined(false),
