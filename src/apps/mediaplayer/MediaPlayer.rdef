@@ -20,6 +20,7 @@ resource file_types message {
 	"types" = "application/x-ogg",
 	"types" = "application/x-asf",
 	"types" = "application/x-shockwave-flash",
+	"types" = "application/vnd.rn-realmedia-vbr",
 	"types" = "audio",
 	"types" = "video"
 };
