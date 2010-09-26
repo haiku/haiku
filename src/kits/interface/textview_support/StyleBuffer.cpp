@@ -170,6 +170,9 @@ SetStyleFromMode(uint32 mode, const BFont *fromFont, BFont *toFont,
 
 		if (mode & B_FONT_SHEAR)
 			toFont->SetShear(fromFont->Shear());
+
+		if (mode & B_FONT_FALSE_BOLD_WIDTH)
+			toFont->SetFalseBoldWidth(fromFont->FalseBoldWidth());
 	}
 
 	if (fromColor != NULL && toColor != NULL
@@ -509,6 +512,12 @@ FixupMode(const STEStyle &firstStyle, const STEStyle &otherStyle, uint32 &mode,
 	if (mode & B_FONT_SHEAR) {
 		if (firstStyle.font.Shear() != otherStyle.font.Shear())
 			mode &= ~B_FONT_SHEAR;
+	}
+	if (mode & B_FONT_FALSE_BOLD_WIDTH) {
+		if (firstStyle.font.FalseBoldWidth()
+			!= otherStyle.font.FalseBoldWidth()) {
+			mode &= ~B_FONT_FALSE_BOLD_WIDTH;
+		}
 	}
 	if (firstStyle.color != otherStyle.color)
 		sameColor = false;
