@@ -163,9 +163,11 @@ find_next_tag(const BString& string, int32& tagPos, int32& tagLength,
 	tagPos = string.Length();
 	tagLength = 0;
 
+	// Find the next tag closest from the current position
+	// This way of doing it allows broken input with overlapping tags even.
 	BString tag;
 	for (int32 i = 0; i < kTagCount; i++) {
-		int32 nextTag = string.FindFirst(kTags[i], current);
+		int32 nextTag = string.IFindFirst(kTags[i], current);
 		if (nextTag >= current && nextTag < tagPos) {
 			tagPos = nextTag;
 			tag = kTags[i];
@@ -173,6 +175,7 @@ find_next_tag(const BString& string, int32& tagPos, int32& tagLength,
 	}
 
 	if (tag != "") {
+		// Tag found, ParseState will change.
 		tagLength = tag.Length();
 		if (tag == "<b>") {
 			state = new ParseState(state);
@@ -197,7 +200,7 @@ find_next_tag(const BString& string, int32& tagPos, int32& tagLength,
 			}
 		} else if (tag == "</b>" || tag == "</i>" || tag == "</u>"
 			|| tag == "</font>") {
-			// Pop state
+			// Closing tag, pop state
 			if (state->previous != NULL) {
 				ParseState* oldState = state;
 				state = state->previous;
@@ -245,6 +248,7 @@ parse_text(const BString& string, BTextView* textView, const BFont& font,
 		int32 tagLength;
 		bool stateChanged = find_next_tag(string, nextPos, tagLength, state);
 		if (nextPos > pos) {
+			// Insert text between last and next tags
 			BString subString;
 			string.CopyInto(subString, pos, nextPos - pos);
 			textView->Insert(subString.String());
@@ -252,6 +256,13 @@ parse_text(const BString& string, BTextView* textView, const BFont& font,
 		pos = nextPos + tagLength;
 		if (stateChanged)
 			apply_state(textView, state, font, changeColor);
+	}
+
+	// Cleanup states in case the input text had non-matching tags.
+	while (state->previous != NULL) {
+		ParseState* oldState = state->previous;
+		state = state->previous;
+		delete oldState;
 	}
 }
 
