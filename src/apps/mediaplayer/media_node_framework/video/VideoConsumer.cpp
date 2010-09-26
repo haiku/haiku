@@ -318,9 +318,10 @@ VideoConsumer::Connected(const media_source& producer,
 	*outInput = fIn;
 
 	uint32 userData = 0;
-	int32 changeTag = 1;	
-	if (CreateBuffers(format) == B_OK) {
-		status_t ret = SetOutputBuffersFor(producer, fIn.destination, 
+	int32 changeTag = 1;
+	status_t ret = CreateBuffers(format);
+	if (ret == B_OK) {
+		ret = SetOutputBuffersFor(producer, fIn.destination, 
 			fBuffers, &userData, &changeTag, true);
 		if (ret != B_OK)
 			printf("SetOutputBuffersFor() failed: %s\n", strerror(ret));
@@ -328,7 +329,7 @@ VideoConsumer::Connected(const media_source& producer,
 			= fBitmap[0]->BytesPerRow();
 	} else {
 		ERROR("VideoConsumer::Connected - COULDN'T CREATE BUFFERS\n");
-		return B_ERROR;
+		return ret;
 	}
 
 	*outInput = fIn;
