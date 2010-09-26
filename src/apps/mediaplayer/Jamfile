@@ -28,6 +28,7 @@ Application MediaPlayer :
 	PlayPauseButton.cpp
 	PositionToolTip.cpp
 	SeekSlider.cpp
+	SubtitleBitmap.cpp
 	SymbolButton.cpp
 	TransportControlGroup.cpp
 	VolumeSlider.cpp

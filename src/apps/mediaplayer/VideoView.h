@@ -17,6 +17,9 @@ enum {
 };
 
 
+class SubtitleBitmap;
+
+
 class VideoView : public BView, public VideoTarget {
 public:
 								VideoView(BRect frame, const char* name,
@@ -48,6 +51,8 @@ public:
 			void				SetFullscreen(bool fullScreen);
 			void				SetVideoFrame(const BRect& frame);
 
+			void				SetSubtitle(const char* text);
+
 private:
 			void				_DrawBitmap(const BBitmap* bitmap);
 			void				_AdoptGlobalSettings();
@@ -64,6 +69,9 @@ private:
 			ListenerAdapter		fGlobalSettingsListener;
 			bool				fUseOverlays;
 			bool				fUseBilinearScaling;
+
+			SubtitleBitmap*		fSubtitleBitmap;
+			bool				fHasSubtitle;
 };
 
 #endif // VIDEO_VIEW_H

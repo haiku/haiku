@@ -15,6 +15,7 @@
 #include <WindowScreen.h>
 
 #include "Settings.h"
+#include "SubtitleBitmap.h"
 
 
 VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
@@ -26,7 +27,9 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fIsPlaying(false),
 	fIsFullscreen(false),
 	fLastMouseMove(system_time()),
-	fGlobalSettingsListener(this)
+	fGlobalSettingsListener(this),
+	fSubtitleBitmap(new SubtitleBitmap),
+	fHasSubtitle(false)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(0, 0, 0);
@@ -40,12 +43,16 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 
 	Settings::Default()->AddListener(&fGlobalSettingsListener);
 	_AdoptGlobalSettings();
+
+//SetSubtitle("<b><i>This</i></b> is a <font color=\"#00ff00\">test</font>!"
+//	"\nWith a <i>short</i> line and a <b>long</b> line.");
 }
 
 
 VideoView::~VideoView()
 {
 	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
+	delete fSubtitleBitmap;
 }
 
 
@@ -177,8 +184,12 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 			ClearViewOverlay();
 			SetViewColor(B_TRANSPARENT_COLOR);
 		}
-		if (!fOverlayMode)
-			_DrawBitmap(bitmap);
+		if (!fOverlayMode) {
+			if (fHasSubtitle)
+				Invalidate(fVideoFrame);
+			else
+				_DrawBitmap(bitmap);
+		}
 
 		UnlockBitmap();
 	}
@@ -273,6 +284,21 @@ VideoView::SetVideoFrame(const BRect& frame)
 	Invalidate(&invalid);
 
 	fVideoFrame = frame;
+
+	fSubtitleBitmap->SetVideoBounds(fVideoFrame.OffsetToCopy(B_ORIGIN));
+}
+
+
+void
+VideoView::SetSubtitle(const char* text)
+{
+	if (text == NULL || text[0] == '\0') {
+		fHasSubtitle = false;
+		return;
+	}
+
+	fHasSubtitle = true;
+	fSubtitleBitmap->SetText(text);
 }
 
 
@@ -282,8 +308,21 @@ VideoView::SetVideoFrame(const BRect& frame)
 void
 VideoView::_DrawBitmap(const BBitmap* bitmap)
 {
+	SetDrawingMode(B_OP_COPY);
 	uint32 options = fUseBilinearScaling ? B_FILTER_BITMAP_BILINEAR : 0;
 	DrawBitmap(bitmap, bitmap->Bounds(), fVideoFrame, options);
+
+	if (fHasSubtitle) {
+		SetDrawingMode(B_OP_ALPHA);
+		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	
+		const BBitmap* subtitleBitmap = fSubtitleBitmap->Bitmap();
+		BPoint offset;
+		offset.x = (fVideoFrame.left + fVideoFrame.right
+			- subtitleBitmap->Bounds().Width()) / 2;
+		offset.y = fVideoFrame.bottom - subtitleBitmap->Bounds().Height();
+		DrawBitmap(subtitleBitmap, offset);
+	}
 }
 
 
