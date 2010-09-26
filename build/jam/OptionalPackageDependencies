@@ -21,7 +21,7 @@ OptionalPackageDependencies Tar : LibIconv ;
 OptionalPackageDependencies Python : Bzip ;
 OptionalPackageDependencies Mercurial : Python ;
 OptionalPackageDependencies NetFS : UserlandFS ;
-OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv ;
+OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv Libmng ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
 OptionalPackageDependencies Paladin : CCache Fastdep ;
 OptionalPackageDependencies Pe : PCRE ;

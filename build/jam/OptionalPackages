@@ -49,7 +49,8 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	LibEvent				- An event notification library
 #	LibIconv				- text encoding conversion library
 #	LibLayout				- GCC2 package needed by some BeOS apps to compile
-#	LibXML2					- the XML support libary
+#	Libmng					- mng support library
+#	LibXML2					- the XML support library
 #	LibXSLT					- xslt library and utility
 #	Links					- the web browser
 #	Man						- standard commands to read man pages
@@ -942,6 +943,21 @@ if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
 }
 
 
+# Libmng library
+if [ IsOptionalHaikuImagePackageAdded Libmng ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Libmng available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+		Echo "No optional package Libmng available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc2-2010-09-26.zip
+			: $(baseURL)/libmng-1.0.10-x86-gcc2-2010-09-26.zip
+			:
+		;
+	}
+}
+
+
 # LibXML2
 if [ IsOptionalHaikuImagePackageAdded LibXML2 ] {
 	if $(TARGET_ARCH) != x86 {
@@ -1099,15 +1115,12 @@ if [ IsOptionalHaikuImagePackageAdded NetSurf ] {
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package NetSurf available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage NetSurf-r9862b.zip
-			: $(baseURL)/NetSurf-r9862-x86-gcc2-2010-01-27.zip
+		InstallOptionalHaikuImagePackage netsurf-2.6-x86.gcc2-2010-09-26.zip
+			: $(baseURL)/netsurf-2.6-x86-gcc2-2010-09-26.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/netsurf/NetSurf ;
-		InstallSourceArchive netsurf-r9862.7z
-			: http://haiku-files.org/files/sources/2010/netsurf-r9862.7z
-		;
 	}
 }
 
