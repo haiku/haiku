@@ -4270,6 +4270,7 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum,
 	const BFont *font = NULL;
 	const rgb_color *color = NULL;
 	int32 numBytes;
+	drawing_mode defaultTextRenderingMode = DrawingMode();
 	// iterate through each style on this line
 	while ((numBytes = fStyles->Iterate(offset, length, fInline, &font,
 			&color)) != 0) {
@@ -4287,7 +4288,7 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum,
 				} while ((tabChars + numTabs) < numBytes);
 			}
 
-			drawing_mode textRenderingMode = B_OP_COPY;
+			drawing_mode textRenderingMode = defaultTextRenderingMode;
 
 			if (inputRegion.CountRects() > 0
 				&& ((offset <= fInline->Offset()
