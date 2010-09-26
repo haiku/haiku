@@ -57,7 +57,8 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 
 	SEARCH on $(sources) += $(SEARCH_SOURCE) ;
 
-	MakeLocatePlatform $(target) ;
+	MakeLocate $(target)
+		: [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(signature) ] ;
 	Depends $(target) : $(sources) <build>collectcatkeys ;
 	LocalClean clean : $(target).pre ;
 	ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(sources) ;
@@ -66,7 +67,6 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 actions ExtractCatalogEntries1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	mkdir -p "$(1:D)"
 	cat "$(2[2-])" \
 		| $(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) - > "$(1)".pre
 	$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
@@ -80,7 +80,8 @@ rule LinkApplicationCatalog target : sources : signature : language
 	# if the fingerprint matches the one from the untranslated catalog for the
 	# same file.
 
-	MakeLocateArch $(target) ;
+	MakeLocate $(target)
+		: [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(signature) ] ;
 	Depends $(target) : $(sources) <build>linkcatkeys ;
 	LocalClean clean : $(target) ;
 
@@ -92,12 +93,11 @@ rule LinkApplicationCatalog target : sources : signature : language
 actions LinkApplicationCatalog1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	mkdir -p "$(1:D)"
 	$(2[1]) "$(2[2-])" -l $(HAIKU_CATALOG_LANGUAGE) \
 		-s $(HAIKU_CATALOG_SIGNATURE) -o "$(1)"
 }
 
-rule DoCatalogs target : signature : sources : sourceLanguage : regexp : folder
+rule DoCatalogs target : signature : sources : sourceLanguage : regexp
 {
 	# DoCatalogs <target> : <signature> : <sources> [ : <sourceLanguage> ]
 	#	[ : <regexp> ]
@@ -114,9 +114,11 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp : folder
 	#					the sources. Optional: default is "en".
 	# regexp            The regular expression used to parse the files.
 	#                   Optional: default is matching be_catalog->GetString
-	# folder			Subfolder where to put the generated files. Optional.                  
 
-	local generatedCatalog = [ FGristFiles $(sourceLanguage:E=en:S=.catalog:D=$(folder)) ] ;
+	local generatedCatalog
+		= [ FGristFiles $(sourceLanguage:E=en:S=.catalog) ] ;
+	MakeLocate $(generatedCatalog)
+		: [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(signature) ] ;
 
 	# generate catkeys file from sources
 	ExtractCatalogEntries $(generatedCatalog:S=.catkeys)

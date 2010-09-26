@@ -218,7 +218,6 @@ StdBinCommands
 DoCatalogs dstcheck :
 	x-vnd.Haiku-cmd-dstconfig
 	: dstcheck.cpp
-	: : : dstcheck
 ;
 
 SubInclude HAIKU_TOP src bin addattr ;
