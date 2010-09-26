@@ -8,17 +8,7 @@
 
 #include <stdio.h>
 
-// XXX: Hack for BeOS: REMOVE ME later
-#ifndef __HAIKU__
-#define private public
-#define BitmapFlags(b) ((b)->fFlags)
-#else
-#define BitmapFlags(b) ((b)->Flags())
-#endif
 #include <Bitmap.h>
-#ifndef __HAIKU__
-#undef private
-#endif
 
 #include <Application.h>
 #include <Region.h>
@@ -145,7 +135,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 
 	if (LockBitmap()) {
 		if (fOverlayMode
-			|| (BitmapFlags(bitmap) & B_BITMAP_WILL_OVERLAY) != 0) {
+			|| (bitmap->Flags() & B_BITMAP_WILL_OVERLAY) != 0) {
 			if (!fOverlayMode) {
 				// init overlay
 				rgb_color key;
@@ -182,7 +172,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 						| B_OVERLAY_TRANSFER_CHANNEL);
 			}
 		} else if (fOverlayMode
-			&& (BitmapFlags(bitmap) & B_BITMAP_WILL_OVERLAY) == 0) {
+			&& (bitmap->Flags() & B_BITMAP_WILL_OVERLAY) == 0) {
 			fOverlayMode = false;
 			ClearViewOverlay();
 			SetViewColor(B_TRANSPARENT_COLOR);
@@ -292,12 +282,8 @@ VideoView::SetVideoFrame(const BRect& frame)
 void
 VideoView::_DrawBitmap(const BBitmap* bitmap)
 {
-#ifdef __HAIKU__
 	uint32 options = fUseBilinearScaling ? B_FILTER_BITMAP_BILINEAR : 0;
 	DrawBitmap(bitmap, bitmap->Bounds(), fVideoFrame, options);
-#else
-	DrawBitmap(bitmap, bitmap->Bounds(), fVideoFrame);
-#endif
 }
 
 

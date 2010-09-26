@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src apps mediaplayer ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 # for BRecentItems
 UsePublicHeaders [ FDirName be_apps Tracker ] ;
 UsePrivateHeaders interface shared ;

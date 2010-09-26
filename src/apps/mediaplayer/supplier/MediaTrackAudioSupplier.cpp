@@ -617,13 +617,10 @@ status_t
 MediaTrackAudioSupplier::_FindKeyFrameForward(int64& position)
 {
 	status_t error = B_OK;
-#ifdef __HAIKU__
 	if (fHasKeyFrames) {
 		error = fMediaTrack->FindKeyFrameForFrame(
 			&position, B_MEDIA_SEEK_CLOSEST_FORWARD);
-	} else
-#endif
-	{
+	} else {
 		int64 framesPerBuffer = _FramesPerBuffer();
 		position += framesPerBuffer - 1;
 		position = position % framesPerBuffer;
