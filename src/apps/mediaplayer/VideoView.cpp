@@ -299,8 +299,8 @@ VideoView::SetSubTitle(const char* text)
 		fSubtitleBitmap->SetText(text);
 	}
 	// TODO: Make smarter and invalidate only previous subtitle bitmap
-	// region;
-	if (!fIsPlaying && LockLooper()) {
+	// region. Fix locking, too...
+	if (!fIsPlaying && LockLooperWithTimeout(1000) == B_OK) {
 		Invalidate();
 		UnlockLooper();
 	}
