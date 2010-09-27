@@ -117,9 +117,9 @@ SubtitleBitmap::_GenerateBitmap()
 
 
 struct ParseState {
-	ParseState()
+	ParseState(rgb_color color)
 		:
-		color(rgb_color().set_to(255, 255, 255, 255)),
+		color(color),
 		bold(false),
 		italic(false),
 		underlined(false),
@@ -138,6 +138,7 @@ struct ParseState {
 		previous(previous)
 	{
 	}
+
 	rgb_color	color;
 	bool		bold;
 	bool		italic;
@@ -159,7 +160,7 @@ find_next_tag(const BString& string, int32& tagPos, int32& tagLength,
 	};
 	static const int32 kTagCount = sizeof(kTags) / sizeof(const char*);
 
-	int32 current = tagPos;
+	int32 startPos = tagPos;
 	tagPos = string.Length();
 	tagLength = 0;
 
@@ -167,49 +168,50 @@ find_next_tag(const BString& string, int32& tagPos, int32& tagLength,
 	// This way of doing it allows broken input with overlapping tags even.
 	BString tag;
 	for (int32 i = 0; i < kTagCount; i++) {
-		int32 nextTag = string.IFindFirst(kTags[i], current);
-		if (nextTag >= current && nextTag < tagPos) {
+		int32 nextTag = string.IFindFirst(kTags[i], startPos);
+		if (nextTag >= startPos && nextTag < tagPos) {
 			tagPos = nextTag;
 			tag = kTags[i];
 		}
 	}
 
-	if (tag != "") {
-		// Tag found, ParseState will change.
-		tagLength = tag.Length();
-		if (tag == "<b>") {
-			state = new ParseState(state);
-			state->bold = true;
-		} else if (tag == "<i>") {
-			state = new ParseState(state);
-			state->italic = true;
-		} else if (tag == "<u>") {
-			state = new ParseState(state);
-			state->underlined = true;
-		} else if (tag == "<font color=\"#") {
-			state = new ParseState(state);
-			char number[16];
-			snprintf(number, sizeof(number), "0x%.6s",
-				string.String() + tagPos + tag.Length());
-			int colorInt;
-			if (sscanf(number, "%x", &colorInt) == 1) {
-				state->color.red = (colorInt & 0xff0000) >> 16;
-				state->color.green = (colorInt & 0x00ff00) >> 8;
-				state->color.blue = (colorInt & 0x0000ff);
-				tagLength += 8;
-			}
-		} else if (tag == "</b>" || tag == "</i>" || tag == "</u>"
-			|| tag == "</font>") {
-			// Closing tag, pop state
-			if (state->previous != NULL) {
-				ParseState* oldState = state;
-				state = state->previous;
-				delete oldState;
-			}
+	if (tag.Length() == 0)
+		return false;
+
+	// Tag found, ParseState will change.
+	tagLength = tag.Length();
+	if (tag == "<b>") {
+		state = new ParseState(state);
+		state->bold = true;
+	} else if (tag == "<i>") {
+		state = new ParseState(state);
+		state->italic = true;
+	} else if (tag == "<u>") {
+		state = new ParseState(state);
+		state->underlined = true;
+	} else if (tag == "<font color=\"#") {
+		state = new ParseState(state);
+		char number[16];
+		snprintf(number, sizeof(number), "0x%.6s",
+			string.String() + tagPos + tag.Length());
+		int colorInt;
+		if (sscanf(number, "%x", &colorInt) == 1) {
+			state->color.red = (colorInt & 0xff0000) >> 16;
+			state->color.green = (colorInt & 0x00ff00) >> 8;
+			state->color.blue = (colorInt & 0x0000ff);
+			// skip 'RRGGBB">' part, too
+			tagLength += 8;
 		}
-		return true;
+	} else if (tag == "</b>" || tag == "</i>" || tag == "</u>"
+		|| tag == "</font>") {
+		// Closing tag, pop state
+		if (state->previous != NULL) {
+			ParseState* oldState = state;
+			state = state->previous;
+			delete oldState;
+		}
 	}
-	return false;
+	return true;
 }
 
 
@@ -223,6 +225,8 @@ apply_state(BTextView* textView, const ParseState* state, BFont font,
 			face |= B_BOLD_FACE;
 		if (state->italic)
 			face |= B_ITALIC_FACE;
+		// NOTE: This is probably not supported by the app_server (perhaps
+		// it is if the font contains a specific underline face).
 		if (state->underlined)
 			face |= B_UNDERSCORE_FACE;
 	} else
@@ -237,9 +241,11 @@ apply_state(BTextView* textView, const ParseState* state, BFont font,
 
 static void
 parse_text(const BString& string, BTextView* textView, const BFont& font,
-	bool changeColor)
+	const rgb_color& color, bool changeColor)
 {
-	ParseState rootState;
+	ParseState rootState(color);
+		// Colors may change, but alpha channel will be preserved
+
 	ParseState* state = &rootState;
 
 	int32 pos = 0;
@@ -294,14 +300,14 @@ SubtitleBitmap::_InsertText()
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &color);
 
 	fTextView->Insert(" ");
-	parse_text(fText, fTextView, font, true);
+	parse_text(fText, fTextView, font, color, true);
 
 	font.SetFalseBoldWidth(falseBoldWidth);
 	fShadowTextView->SetText(NULL);
 	fShadowTextView->SetFontAndColor(&font, B_FONT_ALL, &shadow);
 
 	fShadowTextView->Insert(" ");
-	parse_text(fText, fShadowTextView, font, false);
+	parse_text(fText, fShadowTextView, font, shadow, false);
 
 	// This causes the BTextView to calculate the layout of the text
 	fTextView->SetTextRect(BRect(0, 0, 0, 0));
