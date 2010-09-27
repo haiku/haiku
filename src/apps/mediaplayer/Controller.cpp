@@ -46,8 +46,8 @@
 #include "MediaTrackVideoSupplier.h"
 #include "ProxyAudioSupplier.h"
 #include "ProxyVideoSupplier.h"
-#include "TrackSupplier.h"
 #include "SubTitles.h"
+#include "TrackSupplier.h"
 #include "VideoTrackSupplier.h"
 
 using std::nothrow;
