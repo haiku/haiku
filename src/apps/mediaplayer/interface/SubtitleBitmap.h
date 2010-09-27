@@ -26,7 +26,8 @@ public:
 
 private:
 			void				_GenerateBitmap();
-			BRect				_InsertText();
+			void				_InsertText(BRect& bounds,
+									float& outlineRadius);
 
 private:
 			BBitmap*			fBitmap;

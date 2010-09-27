@@ -40,6 +40,7 @@ class TrackSupplier;
 class PlaylistItem;
 class ProxyAudioSupplier;
 class ProxyVideoSupplier;
+class SubTitles;
 class VideoTrackSupplier;
 class VideoView;
 
@@ -57,6 +58,7 @@ public:
 
 		virtual	void			VideoTrackChanged(int32 index);
 		virtual	void			AudioTrackChanged(int32 index);
+		virtual	void			SubTitleTrackChanged(int32 index);
 
 		virtual	void			VideoStatsChanged();
 		virtual	void			AudioStatsChanged();
@@ -93,12 +95,16 @@ public:
 
 			int					AudioTrackCount();
 			int					VideoTrackCount();
+			int					SubTitleTrackCount();
 
 			status_t			SelectAudioTrack(int n);
 			int					CurrentAudioTrack();
 			int					AudioTrackChannelCount();
 			status_t			SelectVideoTrack(int n);
 			int					CurrentVideoTrack();
+			status_t			SelectSubTitleTrack(int n);
+			int					CurrentSubTitleTrack();
+			const char*			SubTitleTrackName(int n);
 
 			void				Stop();
 			void				Play();
@@ -158,6 +164,7 @@ private:
 			void				_NotifyFileFinished() const;
 			void				_NotifyVideoTrackChanged(int32 index) const;
 			void				_NotifyAudioTrackChanged(int32 index) const;
+			void				_NotifySubTitleTrackChanged(int32 index) const;
 
 			void				_NotifyVideoStatsChanged() const;
 			void				_NotifyAudioStatsChanged() const;
@@ -196,6 +203,8 @@ private:
 			ProxyAudioSupplier*	fAudioSupplier;
 			VideoTrackSupplier*	fVideoTrackSupplier;
 			AudioTrackSupplier*	fAudioTrackSupplier;
+			const SubTitles*	fSubTitles;
+			int32				fSubTitlesIndex;
 
 	mutable	int64				fCurrentFrame;
 			bigtime_t			fDuration;

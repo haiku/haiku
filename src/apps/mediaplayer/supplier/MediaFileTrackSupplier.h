@@ -28,6 +28,7 @@ public:
 
 	virtual	int32				CountAudioTracks();
 	virtual	int32				CountVideoTracks();
+	virtual	int32				CountSubTitleTracks();
 
 	virtual	status_t			GetAudioMetaData(int32 index,
 									BMessage* metaData);
@@ -36,11 +37,15 @@ public:
 
 	virtual	AudioTrackSupplier*	CreateAudioTrackForIndex(int32 index);
 	virtual	VideoTrackSupplier*	CreateVideoTrackForIndex(int32 index);
+	virtual	const SubTitles*	SubTitleTrackForIndex(int32 index);
+
+			bool				AddSubTitles(SubTitles* subTitles);
 
 private:
 			BMediaFile*			fMediaFile;
 			BList				fAudioTracks;
 			BList				fVideoTracks;
+			BList				fSubTitleTracks;
 };
 
 

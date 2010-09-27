@@ -95,10 +95,12 @@ enum {
 	M_ASPECT_37_20,
 	M_ASPECT_47_20,
 
-	M_SELECT_AUDIO_TRACK		= 0x00000800,
-	M_SELECT_AUDIO_TRACK_END	= 0x00000fff,
-	M_SELECT_VIDEO_TRACK		= 0x00010000,
-	M_SELECT_VIDEO_TRACK_END	= 0x000fffff,
+	M_SELECT_AUDIO_TRACK			= 0x00000800,
+	M_SELECT_AUDIO_TRACK_END		= 0x00000fff,
+	M_SELECT_VIDEO_TRACK			= 0x00010000,
+	M_SELECT_VIDEO_TRACK_END		= 0x00010fff,
+	M_SELECT_SUB_TITLE_TRACK		= 0x00020000,
+	M_SELECT_SUB_TITLE_TRACK_END	= 0x00020fff,
 
 	M_SET_RATING,
 
@@ -680,6 +682,22 @@ MainWin::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
+		case MSG_CONTROLLER_SUB_TITLE_TRACK_CHANGED:
+		{
+			int32 index;
+			if (msg->FindInt32("index", &index) == B_OK) {
+				int32 i = 0;
+				while (BMenuItem* item = fSubTitleTrackMenu->ItemAt(i)) {
+					BMessage* message = item->Message();
+					if (message != NULL) {
+						item->SetMarked((int32)message->what
+							- M_SELECT_SUB_TITLE_TRACK == index);
+					}
+					i++;
+				}
+			}
+			break;
+		}
 		case MSG_CONTROLLER_PLAYBACK_STATE_CHANGED:
 		{
 			uint32 state;
@@ -969,6 +987,12 @@ MainWin::MessageReceived(BMessage* msg)
 			if (msg->what >= M_SELECT_VIDEO_TRACK
 				&& msg->what <= M_SELECT_VIDEO_TRACK_END) {
 				fController->SelectVideoTrack(msg->what - M_SELECT_VIDEO_TRACK);
+				break;
+			}
+			if ((int32)msg->what >= M_SELECT_SUB_TITLE_TRACK - 1
+				&& msg->what <= M_SELECT_SUB_TITLE_TRACK_END) {
+				fController->SelectSubTitleTrack((int32)msg->what
+					- M_SELECT_SUB_TITLE_TRACK);
 				break;
 			}
 			// let BWindow handle the rest
@@ -1329,7 +1353,7 @@ MainWin::_SetupWindow()
 {
 //	printf("MainWin::_SetupWindow\n");
 	// Populate the track menus
-	_SetupTrackMenus(fAudioTrackMenu, fVideoTrackMenu);
+	_SetupTrackMenus(fAudioTrackMenu, fVideoTrackMenu, fSubTitleTrackMenu);
 	_UpdateAudioChannelCount(fController->CurrentAudioTrack());
 
 	fVideoMenu->SetEnabled(fHasVideo);
@@ -1382,6 +1406,7 @@ MainWin::_CreateMenu()
 	fVideoAspectMenu = new BMenu("Aspect ratio");
 	fAudioTrackMenu = new BMenu("Track");
 	fVideoTrackMenu = new BMenu("Track");
+	fSubTitleTrackMenu = new BMenu("Subtitles");
 	fAttributesMenu = new BMenu("Attributes");
 
 	fMenuBar->AddItem(fFileMenu);
@@ -1446,6 +1471,7 @@ MainWin::_CreateMenu()
 	fAudioMenu->AddItem(fAudioTrackMenu);
 
 	fVideoMenu->AddItem(fVideoTrackMenu);
+	fVideoMenu->AddItem(fSubTitleTrackMenu);
 	fVideoMenu->AddSeparatorItem();
 	BMessage* resizeMessage = new BMessage(M_VIEW_SIZE);
 	resizeMessage->AddInt32("size", 50);
@@ -1544,10 +1570,12 @@ MainWin::_SetupVideoAspectItems(BMenu* menu)
 
 
 void
-MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
+MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
+	BMenu* subTitleTrackMenu)
 {
 	audioTrackMenu->RemoveItems(0, audioTrackMenu->CountItems(), true);
 	videoTrackMenu->RemoveItems(0, videoTrackMenu->CountItems(), true);
+	subTitleTrackMenu->RemoveItems(0, subTitleTrackMenu->CountItems(), true);
 
 	char s[100];
 
@@ -1589,6 +1617,33 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu)
 	if (count == 0) {
 		videoTrackMenu->AddItem(new BMenuItem("none", new BMessage(M_DUMMY)));
 		videoTrackMenu->ItemAt(0)->SetMarked(true);
+	}
+
+	count = fController->SubTitleTrackCount();
+	if (count > 0) {
+		current = fController->CurrentSubTitleTrack();
+		BMenuItem* item = new BMenuItem("Off",
+			new BMessage(M_SELECT_SUB_TITLE_TRACK - 1));
+		subTitleTrackMenu->AddItem(item);
+		item->SetMarked(current == -1);
+
+		subTitleTrackMenu->AddSeparatorItem();
+
+		for (int i = 0; i < count; i++) {
+			const char* name = fController->SubTitleTrackName(i);
+			if (name != NULL)
+				snprintf(s, sizeof(s), "%s", name);
+			else
+				snprintf(s, sizeof(s), "Track %d", i + 1);
+			item = new BMenuItem(s,
+				new BMessage(M_SELECT_SUB_TITLE_TRACK + i));
+			item->SetMarked(i == current);
+			subTitleTrackMenu->AddItem(item);
+		}
+	} else {
+		subTitleTrackMenu->AddItem(new BMenuItem("none",
+			new BMessage(M_DUMMY)));
+		subTitleTrackMenu->ItemAt(0)->SetMarked(true);
 	}
 }
 
@@ -1945,15 +2000,20 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 	// Add track selector menus
 	BMenu* audioTrackMenu = new BMenu("Audio track");
 	BMenu* videoTrackMenu = new BMenu("Video track");
-	_SetupTrackMenus(audioTrackMenu, videoTrackMenu);
+	BMenu* subTitleTrackMenu = new BMenu("Subtitles");
+	_SetupTrackMenus(audioTrackMenu, videoTrackMenu, subTitleTrackMenu);
 
 	audioTrackMenu->SetTargetForItems(this);
 	videoTrackMenu->SetTargetForItems(this);
+	subTitleTrackMenu->SetTargetForItems(this);
 
 	menu->AddItem(item = new BMenuItem(audioTrackMenu));
 	item->SetEnabled(fHasAudio);
 
 	menu->AddItem(item = new BMenuItem(videoTrackMenu));
+	item->SetEnabled(fHasVideo);
+
+	menu->AddItem(item = new BMenuItem(subTitleTrackMenu));
 	item->SetEnabled(fHasVideo);
 
 	menu->AddSeparatorItem();

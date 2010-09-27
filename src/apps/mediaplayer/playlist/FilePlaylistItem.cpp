@@ -16,6 +16,7 @@
 #include <Path.h>
 
 #include "MediaFileTrackSupplier.h"
+#include "SubTitlesSRT.h"
 
 
 static const char* kPathKey = "path";
@@ -346,10 +347,64 @@ FilePlaylistItem::CreateTrackSupplier() const
 	BMediaFile* mediaFile = new(std::nothrow) BMediaFile(&fRef);
 	if (mediaFile == NULL)
 		return NULL;
-	TrackSupplier* supplier
+	MediaFileTrackSupplier* supplier
 		= new(std::nothrow) MediaFileTrackSupplier(mediaFile);
-	if (supplier == NULL)
+	if (supplier == NULL) {
 		delete mediaFile;
+		return NULL;
+	}
+
+	// Search for subtitle files in the same folder
+	// TODO: Error checking
+	BEntry entry(&fRef, true);
+
+	char originalName[B_FILE_NAME_LENGTH];
+	entry.GetName(originalName);
+	BString nameWithoutExtension(originalName);
+	int32 extension = nameWithoutExtension.FindLast('.');
+	if (extension > 0)
+		nameWithoutExtension.Truncate(extension);
+
+	BPath path;
+	entry.GetPath(&path);
+	path.GetParent(&path);
+	BDirectory directory(path.Path());
+	while (directory.GetNextEntry(&entry) == B_OK) {
+		char name[B_FILE_NAME_LENGTH];
+		if (entry.GetName(name) != B_OK)
+			continue;
+		BString nameString(name);
+		if (nameString == originalName)
+			continue;
+		if (nameString.IFindFirst(nameWithoutExtension) < 0)
+			continue;
+
+		BFile file(&entry, B_READ_ONLY);
+		if (file.InitCheck() != B_OK)
+			continue;
+
+		int32 pos = nameString.FindLast('.');
+		if (pos < 0)
+			continue;
+
+		BString extensionString(nameString.String() + pos + 1);
+		extensionString.ToLower();
+
+		BString language = "default";
+		if (pos > 1) {
+			int32 end = pos;
+			while (pos > 0 && *(nameString.String() + pos - 1) != '.')
+				pos--;
+			language.SetTo(nameString.String() + pos, end - pos);
+		}
+
+		if (extensionString == "srt") {
+			SubTitles* subTitles
+				= new(std::nothrow) SubTitlesSRT(&file, language.String());
+			if (subTitles != NULL && !supplier->AddSubTitles(subTitles))
+				delete subTitles;
+		}
+	}
 
 	return supplier;
 }

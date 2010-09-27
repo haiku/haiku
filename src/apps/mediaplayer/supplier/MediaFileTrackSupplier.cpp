@@ -69,7 +69,9 @@ MediaFileTrackSupplier::~MediaFileTrackSupplier()
 {
 	delete fMediaFile;
 		// BMediaFile destructor will call ReleaseAllTracks()
-}
+ 	for (int32 i = fSubTitleTracks.CountItems() - 1; i >= 0; i--)
+ 		delete reinterpret_cast<SubTitles*>(fSubTitleTracks.ItemAtFast(i));
+ }
 
 
 status_t
@@ -112,6 +114,13 @@ int32
 MediaFileTrackSupplier::CountVideoTracks()
 {
 	return fVideoTracks.CountItems();
+}
+
+
+int32
+MediaFileTrackSupplier::CountSubTitleTracks()
+{
+	return fSubTitleTracks.CountItems();
 }
 
 
@@ -164,5 +173,19 @@ MediaFileTrackSupplier::CreateVideoTrackForIndex(int32 index)
 	}
 
 	return supplier;
+}
+
+
+const SubTitles*
+MediaFileTrackSupplier::SubTitleTrackForIndex(int32 index)
+{
+	return reinterpret_cast<SubTitles*>(fSubTitleTracks.ItemAt(index));
+}
+
+
+bool
+MediaFileTrackSupplier::AddSubTitles(SubTitles* subTitles)
+{
+	return fSubTitleTracks.AddItem(subTitles);
 }
 

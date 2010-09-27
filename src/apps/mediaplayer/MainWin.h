@@ -89,7 +89,8 @@ private:
 			void				_CreateMenu();
 			void				_SetupVideoAspectItems(BMenu* menu);
 			void				_SetupTrackMenus(BMenu* audioTrackMenu,
-									BMenu* videoTrackMenu);
+									BMenu* videoTrackMenu,
+									BMenu* subTitleTrackMenu);
 			void				_UpdateAudioChannelCount(int32 audioTrackIndex);
 
 			void				_GetMinimumWindowSize(int& width,
@@ -152,6 +153,7 @@ private:
 			BMenu*				fVideoAspectMenu;
 			BMenu*				fAudioTrackMenu;
 			BMenu*				fVideoTrackMenu;
+			BMenu*				fSubTitleTrackMenu;
 			BMenuItem*			fNoInterfaceMenuItem;
 			BMenu*				fAttributesMenu;
 			BMenu*				fRatingMenu;

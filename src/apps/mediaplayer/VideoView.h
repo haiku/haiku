@@ -51,7 +51,7 @@ public:
 			void				SetFullscreen(bool fullScreen);
 			void				SetVideoFrame(const BRect& frame);
 
-			void				SetSubtitle(const char* text);
+			void				SetSubTitle(const char* text);
 
 private:
 			void				_DrawBitmap(const BBitmap* bitmap);

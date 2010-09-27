@@ -11,6 +11,8 @@
 #include <Bitmap.h>
 #include <TextView.h>
 
+#include "StackBlurFilter.h"
+
 
 SubtitleBitmap::SubtitleBitmap()
 	:
@@ -77,10 +79,14 @@ SubtitleBitmap::_GenerateBitmap()
 
 	delete fBitmap;
 
-	BRect bounds = _InsertText();
+	BRect bounds;
+	float outlineRadius;
+	_InsertText(bounds, outlineRadius);
 
 	fBitmap = new BBitmap(bounds, B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
 	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
+
+	StackBlurFilter filter;
 
 	if (fBitmap->Lock()) {
 		fBitmap->AddChild(fShadowTextView);
@@ -97,8 +103,11 @@ SubtitleBitmap::_GenerateBitmap()
 		fShadowTextView->Sync();
 		fShadowTextView->RemoveSelf();
 
+		filter.Filter(fBitmap, outlineRadius * 2);
+
 		fBitmap->AddChild(fTextView);
 		fTextView->ResizeTo(bounds.Width(), bounds.Height());
+		fTextView->MoveTo(-outlineRadius / 2, -outlineRadius / 2);
 
 		fTextView->SetViewColor(0, 0, 0, 0);
 		fTextView->SetDrawingMode(B_OP_ALPHA);
@@ -273,12 +282,12 @@ parse_text(const BString& string, BTextView* textView, const BFont& font,
 }
 
 
-BRect
-SubtitleBitmap::_InsertText()
+void
+SubtitleBitmap::_InsertText(BRect& textRect, float& outlineRadius)
 {
 	BFont font(be_plain_font);
-	float fontSize = ceilf((fVideoBounds.Width() * 0.9) / 35);
-	float falseBoldWidth = ceilf(fontSize / 28.0);
+	float fontSize = ceilf((fVideoBounds.Width() * 0.9) / 36);
+	outlineRadius = ceilf(fontSize / 28.0);
 	font.SetSize(fontSize);
 
 	rgb_color shadow;
@@ -293,8 +302,8 @@ SubtitleBitmap::_InsertText()
 	color.blue = 255;
 	color.alpha = 240;
 
-	BRect textRect = fVideoBounds;
-	textRect.OffsetBy(falseBoldWidth, falseBoldWidth);
+	textRect = fVideoBounds;
+	textRect.OffsetBy(outlineRadius, outlineRadius);
 
 	fTextView->SetText(NULL);
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &color);
@@ -302,7 +311,7 @@ SubtitleBitmap::_InsertText()
 	fTextView->Insert(" ");
 	parse_text(fText, fTextView, font, color, true);
 
-	font.SetFalseBoldWidth(falseBoldWidth);
+	font.SetFalseBoldWidth(outlineRadius);
 	fShadowTextView->SetText(NULL);
 	fShadowTextView->SetFontAndColor(&font, B_FONT_ALL, &shadow);
 
@@ -316,9 +325,16 @@ SubtitleBitmap::_InsertText()
 	fShadowTextView->SetTextRect(textRect);
 
 	textRect = fTextView->TextRect();
-	textRect.InsetBy(-falseBoldWidth, -falseBoldWidth);
+	textRect.InsetBy(-outlineRadius, -outlineRadius);
 	textRect.OffsetTo(B_ORIGIN);
-	return textRect;
+
+	// Make sure the text rect really finishes behind the last line.
+	// We don't want any accidental extra space.
+	textRect.bottom = outlineRadius;
+	int32 lineCount = fTextView->CountLines();
+	for (int32 i = 0; i < lineCount; i++)
+		textRect.bottom += fTextView->LineHeight(i);
+	textRect.bottom += outlineRadius;
 }
 
 

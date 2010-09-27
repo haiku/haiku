@@ -290,15 +290,20 @@ VideoView::SetVideoFrame(const BRect& frame)
 
 
 void
-VideoView::SetSubtitle(const char* text)
+VideoView::SetSubTitle(const char* text)
 {
 	if (text == NULL || text[0] == '\0') {
 		fHasSubtitle = false;
-		return;
+	} else {
+		fHasSubtitle = true;
+		fSubtitleBitmap->SetText(text);
 	}
-
-	fHasSubtitle = true;
-	fSubtitleBitmap->SetText(text);
+	// TODO: Make smarter and invalidate only previous subtitle bitmap
+	// region;
+	if (!fIsPlaying && LockLooper()) {
+		Invalidate();
+		UnlockLooper();
+	}
 }
 
 

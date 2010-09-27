@@ -10,6 +10,7 @@
 #include <MediaFormats.h>
 
 #include "AudioTrackSupplier.h"
+#include "SubTitles.h"
 #include "VideoTrackSupplier.h"
 
 
@@ -31,6 +32,7 @@ public:
 
 	virtual	int32				CountAudioTracks() = 0;
 	virtual	int32				CountVideoTracks() = 0;
+	virtual	int32				CountSubTitleTracks() = 0;
 
 	virtual	status_t			GetAudioMetaData(int32 index,
 									BMessage* metaData) = 0;
@@ -39,6 +41,7 @@ public:
 
 	virtual	AudioTrackSupplier*	CreateAudioTrackForIndex(int32 index) = 0;
 	virtual	VideoTrackSupplier*	CreateVideoTrackForIndex(int32 index) = 0;
+	virtual	const SubTitles*	SubTitleTrackForIndex(int32 index) = 0;
 };
 
 

@@ -47,6 +47,7 @@
 #include "ProxyAudioSupplier.h"
 #include "ProxyVideoSupplier.h"
 #include "TrackSupplier.h"
+#include "SubTitles.h"
 #include "VideoTrackSupplier.h"
 
 using std::nothrow;
@@ -72,6 +73,7 @@ void Controller::Listener::FileFinished() {}
 void Controller::Listener::FileChanged(PlaylistItem* item, status_t result) {}
 void Controller::Listener::VideoTrackChanged(int32) {}
 void Controller::Listener::AudioTrackChanged(int32) {}
+void Controller::Listener::SubTitleTrackChanged(int32) {}
 void Controller::Listener::VideoStatsChanged() {}
 void Controller::Listener::AudioStatsChanged() {}
 void Controller::Listener::PlaybackStateChanged(uint32) {}
@@ -104,6 +106,8 @@ Controller::Controller()
 	fAudioSupplier(new ProxyAudioSupplier(this)),
 	fVideoTrackSupplier(NULL),
 	fAudioTrackSupplier(NULL),
+	fSubTitles(NULL),
+	fSubTitlesIndex(-1),
 
 	fCurrentFrame(0),
 	fDuration(0),
@@ -248,6 +252,8 @@ Controller::SetTo(const PlaylistItemRef& item)
 
 	fVideoTrackSupplier = NULL;
 	fAudioTrackSupplier = NULL;
+	fSubTitles = NULL;
+	fSubTitlesIndex = -1;
 
 	fCurrentFrame = 0;
 	fDuration = 0;
@@ -433,6 +439,17 @@ Controller::VideoTrackCount()
 }
 
 
+int
+Controller::SubTitleTrackCount()
+{
+	BAutolock _(this);
+
+	if (fTrackSupplier != NULL)
+		return fTrackSupplier->CountSubTitleTracks();
+	return 0;
+}
+
+
 status_t
 Controller::SelectAudioTrack(int n)
 {
@@ -524,6 +541,58 @@ Controller::CurrentVideoTrack()
 		return -1;
 
 	return fVideoTrackSupplier->TrackIndex();
+}
+
+
+status_t
+Controller::SelectSubTitleTrack(int n)
+{
+	BAutolock _(this);
+
+	if (fTrackSupplier == NULL)
+		return B_NO_INIT;
+
+	fSubTitlesIndex = n;
+	fSubTitles = fTrackSupplier->SubTitleTrackForIndex(n);
+
+	const SubTitle* subTitle = NULL;
+	if (fSubTitles != NULL)
+		subTitle = fSubTitles->SubTitleAt(_TimePosition());
+	if (subTitle != NULL)
+		fVideoView->SetSubTitle(subTitle->text.String());
+	else
+		fVideoView->SetSubTitle(NULL);
+
+	_NotifySubTitleTrackChanged(n);
+	return B_OK;
+}
+
+
+int
+Controller::CurrentSubTitleTrack()
+{
+	BAutolock _(this);
+
+	if (fSubTitles == NULL)
+		return -1;
+
+	return fSubTitlesIndex;
+}
+
+
+const char*
+Controller::SubTitleTrackName(int n)
+{
+	BAutolock _(this);
+
+	if (fTrackSupplier == NULL)
+		return NULL;
+
+	const SubTitles* subTitles = fTrackSupplier->SubTitleTrackForIndex(n);
+	if (subTitles == NULL)
+		return NULL;
+
+	return subTitles->Name();
 }
 
 
@@ -1015,6 +1084,18 @@ Controller::_NotifyAudioTrackChanged(int32 index) const
 
 
 void
+Controller::_NotifySubTitleTrackChanged(int32 index) const
+{
+	BList listeners(fListeners);
+	int32 count = listeners.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		Listener* listener = (Listener*)listeners.ItemAtFast(i);
+		listener->SubTitleTrackChanged(index);
+	}
+}
+
+
+void
 Controller::_NotifyVideoStatsChanged() const
 {
 	BList listeners(fListeners);
@@ -1136,7 +1217,16 @@ void
 Controller::NotifyCurrentFrameChanged(int64 frame) const
 {
 	fCurrentFrame = frame;
-	_NotifyPositionChanged((float)_TimePosition() / fDuration);
+	bigtime_t timePosition = _TimePosition();
+	_NotifyPositionChanged((float)timePosition / fDuration);
+
+	if (fSubTitles != NULL) {
+		const SubTitle* subTitle = fSubTitles->SubTitleAt(timePosition);
+		if (subTitle != NULL)
+			fVideoView->SetSubTitle(subTitle->text.String());
+		else
+			fVideoView->SetSubTitle(NULL);
+	}
 }
 
 

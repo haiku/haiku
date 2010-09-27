@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src apps mediaplayer ;
 # for BRecentItems
 UsePublicHeaders [ FDirName be_apps Tracker ] ;
 UsePrivateHeaders interface shared ;
+UseLibraryHeaders agg ;
 
 # source directories
 local sourceDirs =
@@ -82,6 +83,8 @@ Application MediaPlayer :
 	ProxyAudioSupplier.cpp
 	ProxyVideoSupplier.cpp
 	TrackSupplier.cpp
+	SubTitles.cpp
+	SubTitlesSRT.cpp
 	VideoTrackSupplier.cpp
 
 	# support
@@ -99,6 +102,7 @@ Application MediaPlayer :
 	Notifier.cpp
 	RWLocker.cpp
 	SettingsMessage.cpp
+	StackBlurFilter.cpp
 
 	# .
 	Controller.cpp

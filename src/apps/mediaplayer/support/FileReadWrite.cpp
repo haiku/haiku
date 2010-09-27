@@ -54,20 +54,22 @@ FileReadWrite::Next(BString& string)
 	while (fAmtRead > 0) {
 		while (fPositionInBuffer < fAmtRead) {
 			// Return true if we hit a newline or the end of the file
+			// TODO: If the source file is expected to have different encoding,
+			// don't we need to check for the line endings in that encoding?!
 			if (fBuffer[fPositionInBuffer] == '\n') {
 				fPositionInBuffer++;
-				// Convert begin
-				int32 state = 0;
-				int32 bufferLen = string.Length();
-				int32 destBufferLen = bufferLen;
-				char destination[destBufferLen];
-				if (fSourceEncoding) {
+				if (fSourceEncoding != -1) {
+					int32 state = 0;
+					int32 bufferLen = string.Length();
+					int32 destBufferLen = bufferLen;
+					char destination[destBufferLen];
 					convert_to_utf8(fSourceEncoding, string.String(),
 						&bufferLen, destination, &destBufferLen, &state);
+					string = destination;
 				}
-				string = destination;
 				return true;
 			}
+			// TODO: Adding one char at a time is very inefficient!
 			string += fBuffer[fPositionInBuffer]; 
 			fPositionInBuffer++;
 		} 

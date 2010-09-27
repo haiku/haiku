@@ -84,6 +84,19 @@ ControllerObserver::AudioTrackChanged(int32 index)
 
 
 void
+ControllerObserver::SubTitleTrackChanged(int32 index)
+{
+	if (!(fObserveFlags & OBSERVE_TRACK_CHANGES))
+		return;
+
+	BMessage message(MSG_CONTROLLER_SUB_TITLE_TRACK_CHANGED);
+	message.AddInt32("index", index);
+
+	DeliverMessage(message);
+}
+
+
+void
 ControllerObserver::VideoStatsChanged()
 {
 	if (!(fObserveFlags & OBSERVE_STAT_CHANGES))

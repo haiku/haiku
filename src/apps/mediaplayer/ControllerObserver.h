@@ -19,6 +19,7 @@ enum {
 
 	MSG_CONTROLLER_VIDEO_TRACK_CHANGED		= 'cnvt',
 	MSG_CONTROLLER_AUDIO_TRACK_CHANGED		= 'cnat',
+	MSG_CONTROLLER_SUB_TITLE_TRACK_CHANGED	= 'cnst',
 
 	MSG_CONTROLLER_VIDEO_STATS_CHANGED		= 'cnvs',
 	MSG_CONTROLLER_AUDIO_STATS_CHANGED		= 'cnas',
@@ -55,6 +56,7 @@ public:
 
 	virtual	void		VideoTrackChanged(int32 index);
 	virtual	void		AudioTrackChanged(int32 index);
+	virtual	void		SubTitleTrackChanged(int32 index);
 
 	virtual	void		VideoStatsChanged();
 	virtual	void		AudioStatsChanged();
