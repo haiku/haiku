@@ -28,7 +28,7 @@
 #include "IOSchedulerSimple.h"
 
 
-#define TRACE_CD_DISK
+//#define TRACE_CD_DISK
 #ifdef TRACE_CD_DISK
 #	define TRACE(x...) dprintf("scsi_cd: " x)
 #else
@@ -694,10 +694,9 @@ cd_init_device(void* _info, void** _cookie)
 {
 	cd_driver_info* info = (cd_driver_info*)_info;
 
-	// and get (initial) capacity
-	status_t status = update_capacity(info);
-	if (status != B_OK)
-		return status;
+	update_capacity(info);
+		// Get initial capacity, but ignore the result; we do not care
+		// whether or not a media is present
 
 	*_cookie = info;
 	return B_OK;
@@ -1122,7 +1121,7 @@ cd_register_device(device_node* node)
 static status_t
 cd_init_driver(device_node* node, void** _cookie)
 {
-	TRACE("cd_init_driver");
+	TRACE("cd_init_driver\n");
 
 	uint8 removable;
 	status_t status = sDeviceManager->get_attr_uint8(node, "removable",
