@@ -1652,7 +1652,7 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 				tty->settings->pgrp_id = groupID;
 			return error;
 		}
-		
+
 		// become controlling TTY
 		case TIOCSCTTY:
 		{
@@ -1674,7 +1674,7 @@ tty_ioctl(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		// get and set window size
 
 		case TIOCGWINSZ:
-			TRACE(("tty: set window size\n"));
+			TRACE(("tty: get window size\n"));
 			return user_memcpy(buffer, &tty->settings->window_size,
 				sizeof(struct winsize));
 
