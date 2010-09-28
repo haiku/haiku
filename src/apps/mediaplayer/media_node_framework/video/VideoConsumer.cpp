@@ -321,10 +321,15 @@ VideoConsumer::Connected(const media_source& producer,
 	int32 changeTag = 1;
 	status_t ret = CreateBuffers(format);
 	if (ret == B_OK) {
-		ret = SetOutputBuffersFor(producer, fIn.destination, 
-			fBuffers, &userData, &changeTag, true);
-		if (ret != B_OK)
-			printf("SetOutputBuffersFor() failed: %s\n", strerror(ret));
+		// TODO: With overlay bitmaps, there seems to be a problem with
+		// mapping the BBitmap areas into the BBuffers. Until that is fixed,
+		// don't enable a shared BBufferGroup.
+		if (!fTryOverlay) {
+			ret = SetOutputBuffersFor(producer, fIn.destination, 
+				fBuffers, &userData, &changeTag, true);
+			if (ret != B_OK)
+				ERROR("SetOutputBuffersFor() failed: %s\n", strerror(ret));
+		}
 		fIn.format.u.raw_video.display.bytes_per_row
 			= fBitmap[0]->BytesPerRow();
 	} else {
