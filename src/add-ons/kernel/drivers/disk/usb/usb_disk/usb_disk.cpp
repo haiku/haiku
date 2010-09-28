@@ -362,16 +362,14 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 
 	switch (status.status) {
 		case CSW_STATUS_COMMAND_PASSED:
-		case CSW_STATUS_COMMAND_FAILED: {
-			if (status.data_residue > command.data_transfer_length) {
-				// command status wrapper is not meaningful
-				TRACE_ALWAYS("command status wrapper has invalid residue\n");
-				usb_disk_reset_recovery(device);
-				return B_ERROR;
-			}
+		case CSW_STATUS_COMMAND_FAILED:
+		{
+			// The residue from "status.data_residue" is not maintained
+			// correctly by some devices, so calculate it instead.
+			uint32 residue = command.data_transfer_length - transferedData;
 
 			if (dataLength != NULL) {
-				*dataLength -= status.data_residue;
+				*dataLength -= residue;
 				if (transferedData < *dataLength) {
 					TRACE_ALWAYS("less data transfered than indicated\n");
 					*dataLength = transferedData;
@@ -393,14 +391,16 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 			}
 		}
 
-		case CSW_STATUS_PHASE_ERROR: {
+		case CSW_STATUS_PHASE_ERROR:
+		{
 			// a protocol or device error occured
 			TRACE_ALWAYS("phase error in operation 0x%02x\n", operation);
 			usb_disk_reset_recovery(device);
 			return B_ERROR;
 		}
 
-		default: {
+		default:
+		{
 			// command status wrapper is not meaningful
 			TRACE_ALWAYS("command status wrapper has invalid status\n");
 			usb_disk_reset_recovery(device);
