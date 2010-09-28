@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Haiku Inc. All rights reserved.
+ * Copyright 2008-2010, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -261,7 +261,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	uint32 logicalBlockAddress, uint16 transferLength, void *data,
 	uint32 *dataLength, bool directionIn)
 {
-	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %lu; tlen: %u; data: %p; dlen: %p (%lu); in: %c\n",
+	TRACE("operation: lun: %u; op: %u; oplen: %u; lba: %lu; tlen: %u; data: "
+		"%p; dlen: %p (%lu); in: %c\n",
 		lun->logical_unit_number, operation, opLength, logicalBlockAddress,
 		transferLength, data, dataLength, dataLength ? *dataLength : 0,
 		directionIn ? 'y' : 'n');
@@ -278,8 +279,10 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	memset(command.command_block, 0, sizeof(command.command_block));
 
 	switch (opLength) {
-		case 6: {
-			scsi_command_6 *commandBlock = (scsi_command_6 *)command.command_block;
+		case 6:
+		{
+			scsi_command_6 *commandBlock
+				= (scsi_command_6 *)command.command_block;
 			commandBlock->operation = operation;
 			commandBlock->lun = lun->logical_unit_number << 5;
 			commandBlock->allocation_length = (uint8)transferLength;
@@ -290,8 +293,10 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 			break;
 		}
 
-		case 10: {
-			scsi_command_10 *commandBlock = (scsi_command_10 *)command.command_block;
+		case 10:
+		{
+			scsi_command_10 *commandBlock
+				= (scsi_command_10 *)command.command_block;
 			commandBlock->operation = operation;
 			commandBlock->lun_flags = lun->logical_unit_number << 5;
 			commandBlock->logical_block_address = htonl(logicalBlockAddress);
@@ -320,7 +325,8 @@ usb_disk_operation(device_lun *lun, uint8 operation, uint8 opLength,
 	size_t transferedData = 0;
 	if (data != NULL && dataLength != NULL && *dataLength > 0) {
 		// we have data to transfer in a data stage
-		result = usb_disk_transfer_data(device, directionIn, data, *dataLength);
+		result = usb_disk_transfer_data(device, directionIn, data,
+			*dataLength);
 		if (result != B_OK)
 			return result;
 
@@ -429,8 +435,8 @@ usb_disk_request_sense(device_lun *lun)
 
 	if (parameter.sense_key > SCSI_SENSE_KEY_NOT_READY
 		&& parameter.sense_key != SCSI_SENSE_KEY_UNIT_ATTENTION) {
-		TRACE_ALWAYS("request_sense: key: 0x%02x; asc: 0x%02x; ascq: 0x%02x;\n",
-			parameter.sense_key, parameter.additional_sense_code,
+		TRACE_ALWAYS("request_sense: key: 0x%02x; asc: 0x%02x; ascq: "
+			"0x%02x;\n", parameter.sense_key, parameter.additional_sense_code,
 			parameter.additional_sense_code_qualifier);
 	}
 
@@ -449,7 +455,8 @@ usb_disk_request_sense(device_lun *lun)
 			return B_DEV_INVALID_IOCTL;
 
 		case SCSI_SENSE_KEY_UNIT_ATTENTION:
-			if (parameter.additional_sense_code != SCSI_ASC_MEDIUM_NOT_PRESENT) {
+			if (parameter.additional_sense_code
+					!= SCSI_ASC_MEDIUM_NOT_PRESENT) {
 				TRACE_ALWAYS("request_sense: media changed\n");
 				lun->media_changed = true;
 				lun->media_present = true;
@@ -492,7 +499,8 @@ usb_disk_mode_sense(device_lun *lun)
 	}
 
 	lun->write_protected
-		= (parameter.device_specific & SCSI_DEVICE_SPECIFIC_WRITE_PROTECT) != 0;
+		= (parameter.device_specific & SCSI_DEVICE_SPECIFIC_WRITE_PROTECT)
+			!= 0;
 	TRACE_ALWAYS("write protected: %s\n", lun->write_protected ? "yes" : "no");
 	return B_OK;
 }
@@ -542,14 +550,20 @@ usb_disk_inquiry(device_lun *lun)
 		return result;
 	}
 
-	TRACE("peripherial_device_type  0x%02x\n", parameter.peripherial_device_type);
-	TRACE("peripherial_qualifier    0x%02x\n", parameter.peripherial_qualifier);
-	TRACE("removable_medium         %s\n", parameter.removable_medium ? "yes" : "no");
+	TRACE("peripherial_device_type  0x%02x\n",
+		parameter.peripherial_device_type);
+	TRACE("peripherial_qualifier    0x%02x\n",
+		parameter.peripherial_qualifier);
+	TRACE("removable_medium         %s\n",
+		parameter.removable_medium ? "yes" : "no");
 	TRACE("version                  0x%02x\n", parameter.version);
 	TRACE("response_data_format     0x%02x\n", parameter.response_data_format);
-	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n", parameter.vendor_identification);
-	TRACE_ALWAYS("product_identification   \"%.16s\"\n", parameter.product_identification);
-	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n", parameter.product_revision_level);
+	TRACE_ALWAYS("vendor_identification    \"%.8s\"\n",
+		parameter.vendor_identification);
+	TRACE_ALWAYS("product_identification   \"%.16s\"\n",
+		parameter.product_identification);
+	TRACE_ALWAYS("product_revision_level   \"%.4s\"\n",
+		parameter.product_revision_level);
 	lun->device_type = parameter.peripherial_device_type; /* 1:1 mapping */
 	lun->removable = (parameter.removable_medium == 1);
 	return B_OK;
@@ -663,7 +677,8 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	device->luns = NULL;
 
 	// scan through the interfaces to find our bulk-only data interface
-	const usb_configuration_info *configuration = gUSBModule->get_configuration(newDevice);
+	const usb_configuration_info *configuration
+		= gUSBModule->get_configuration(newDevice);
 	if (configuration == NULL) {
 		free(device);
 		return B_ERROR;
@@ -1013,14 +1028,16 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 	status_t result = B_DEV_INVALID_IOCTL;
 	switch (op) {
-		case B_GET_MEDIA_STATUS: {
+		case B_GET_MEDIA_STATUS:
+		{
 			*(status_t *)buffer = usb_disk_test_unit_ready(lun);
 			TRACE("B_GET_MEDIA_STATUS: 0x%08lx\n", *(status_t *)buffer);
 			result = B_OK;
 			break;
 		}
 
-		case B_GET_GEOMETRY: {
+		case B_GET_GEOMETRY:
+		{
 			if (lun->media_changed) {
 				result = usb_disk_update_capacity(lun);
 				if (result != B_OK)
