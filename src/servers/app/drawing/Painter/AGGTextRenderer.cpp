@@ -88,7 +88,6 @@ void
 AGGTextRenderer::SetHinting(bool hinting)
 {
 	fHinted = hinting;
-//	fFontEngine.hinting(fEmbeddedTransformation.IsIdentity() && fHinted);
 }
 
 
@@ -97,6 +96,8 @@ AGGTextRenderer::SetAntialiasing(bool antialiasing)
 {
 	if (fAntialias != antialiasing) {
 		fAntialias = antialiasing;
+		// NOTE: The fSubpixRasterizer is not used when anti-aliasing is
+		// disbaled.
 		if (!fAntialias)
 			fRasterizer.gamma(agg::gamma_threshold(0.5));
 		else
@@ -116,6 +117,7 @@ typedef agg::conv_transform<FontCacheEntry::ContourConverter, Transformable>
 class AGGTextRenderer::StringRenderer {
 public:
 	StringRenderer(const IntRect& clippingFrame, bool dryRun,
+			bool subpixelAntiAliased,
 			FontCacheEntry::TransformedOutline& transformedGlyph,
 			FontCacheEntry::TransformedContourOutline& transformedContour,
 			const Transformable& transform,
@@ -127,9 +129,10 @@ public:
 		fTransformOffset(transformOffset),
 		fClippingFrame(clippingFrame),
 		fDryRun(dryRun),
+		fSubpixelAntiAliased(subpixelAntiAliased),
+		fVector(false),
 		fBounds(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN),
 		fNextCharPos(nextCharPos),
-		fVector(false),
 
 		fTransformedGlyph(transformedGlyph),
 		fTransformedContour(transformedContour),
@@ -146,7 +149,7 @@ public:
 	void Finish(double x, double y)
 	{
 		if (fVector) {
-			if (gSubpixelAntialiasing) {
+			if (fSubpixelAntiAliased) {
 				agg::render_scanlines(fRenderer.fSubpixRasterizer,
 					fRenderer.fSubpixScanline, fRenderer.fSubpixRenderer);
 			} else {
@@ -242,7 +245,7 @@ public:
 
 					case glyph_data_outline: {
 						fVector = true;
-						if (gSubpixelAntialiasing) {
+						if (fSubpixelAntiAliased) {
 							if (fRenderer.fContour.width() == 0.0) {
 								fRenderer.fSubpixRasterizer.add_path(
 									fTransformedGlyph);
@@ -268,7 +271,7 @@ public:
 	p.close_polygon();
 	agg::conv_stroke<agg::path_storage> ps(p);
 	ps.width(1.0);
-	if (gSubpixelAntialiasing) {
+	if (fSubpixelAntiAliased) {
 		fRenderer.fSubpixRasterizer.add_path(ps);
 	} else {
 		fRenderer.fRasterizer.add_path(ps);
@@ -295,9 +298,10 @@ private:
 	const BPoint&		fTransformOffset;
 	const IntRect&		fClippingFrame;
 	bool				fDryRun;
+	bool				fSubpixelAntiAliased;
+	bool				fVector;
 	IntRect				fBounds;
 	BPoint*				fNextCharPos;
-	bool				fVector;
 
 	FontCacheEntry::TransformedOutline& fTransformedGlyph;
 	FontCacheEntry::TransformedContourOutline& fTransformedContour;
@@ -331,6 +335,7 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	transform.Transform(&transformOffset);
 
 	StringRenderer renderer(clippingFrame, dryRun,
+		gSubpixelAntialiasing && fAntialias,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
 
@@ -365,6 +370,7 @@ AGGTextRenderer::RenderString(const char* string, uint32 length,
 	transform.Transform(&transformOffset);
 
 	StringRenderer renderer(clippingFrame, dryRun,
+		gSubpixelAntialiasing && fAntialias,
 		transformedOutline, transformedContourOutline,
 		transform, transformOffset, nextCharPos, *this);
 
