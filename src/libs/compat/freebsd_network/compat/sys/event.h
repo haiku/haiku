@@ -7,6 +7,7 @@
 
 
 struct knlist {
+	int	_dummy;
 };
 
 #endif
