@@ -305,11 +305,11 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	fBackgroundAppCheckBox = new BCheckBox("background",
 		B_TRANSLATE("Background app"), new BMessage(kMsgAppFlagsChanged));
 
-	flagsBox->AddChild(BGridLayoutBuilder()
+	flagsBox->AddChild(BGridLayoutBuilder(0, 0)
 		.Add(fSingleLaunchButton, 0, 0).Add(fArgsOnlyCheckBox, 1, 0)
 		.Add(fMultipleLaunchButton, 0, 1).Add(fBackgroundAppCheckBox, 1, 1)
 		.Add(fExclusiveLaunchButton, 0, 2)
-		.SetInsets(padding, padding, padding, padding)
+		.SetInsets(padding, padding / 2, padding, padding)
 		.View());
 	flagsBox->SetLabel(fFlagsCheckBox);
 
@@ -352,7 +352,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(fAddTypeButton, 1, 0, 1, 2)
 		.Add(fRemoveTypeButton, 1, 2, 1, 2)
 		.Add(iconHolder, 2, 1, 1, 2)
-		.SetInsets(padding, padding, padding, padding)
+		.SetInsets(padding, padding / 2, padding, padding)
 		.SetColumnWeight(0, 3)
 		.SetColumnWeight(1, 2)
 		.SetColumnWeight(2, 1)
@@ -409,7 +409,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	minScrollSize.width += fLongDescriptionView->MinSize().width;
 	scrollView->SetExplicitMinSize(minScrollSize);
 
-	versionBox->AddChild(BGridLayoutBuilder(padding / 2, padding)
+	versionBox->AddChild(BGridLayoutBuilder(padding, padding / 2)
 		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fMajorVersionControl->CreateTextViewLayoutItem(), 1, 0)
 		.Add(fMiddleVersionControl, 2, 0, 2)
@@ -420,7 +420,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 		.Add(fShortDescriptionControl->CreateTextViewLayoutItem(), 1, 1, 10)
 		.Add(longLabel, 0, 2)
 		.Add(scrollView, 1, 2, 10, 3)
-		.SetInsets(padding, padding, padding, padding)
+		.SetInsets(padding, padding / 2, padding, padding)
 		.SetRowWeight(3, 3)
 		.View());
 
