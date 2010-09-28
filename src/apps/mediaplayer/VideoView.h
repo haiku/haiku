@@ -56,6 +56,7 @@ public:
 private:
 			void				_DrawBitmap(const BBitmap* bitmap);
 			void				_AdoptGlobalSettings();
+			void				_SetOverlayMode(bool overlayMode);
 
 private:
 			BRect				fVideoFrame;

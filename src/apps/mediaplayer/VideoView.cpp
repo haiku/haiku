@@ -157,7 +157,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 					FillRect(fVideoFrame, B_SOLID_LOW);
 					Sync();
 					// use overlay from here on
-					fOverlayMode = true;
+					_SetOverlayMode(true);
 
 					// update restrictions
 					overlay_restrictions restrictions;
@@ -180,7 +180,7 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 			}
 		} else if (fOverlayMode
 			&& (bitmap->Flags() & B_BITMAP_WILL_OVERLAY) == 0) {
-			fOverlayMode = false;
+			_SetOverlayMode(false);
 			ClearViewOverlay();
 			SetViewColor(B_TRANSPARENT_COLOR);
 		}
@@ -255,7 +255,7 @@ VideoView::DisableOverlay()
 	ClearViewOverlay();
 	snooze(20000);
 	Sync();
-	fOverlayMode = false;
+	_SetOverlayMode(false);
 }
 
 
@@ -315,7 +315,7 @@ VideoView::_DrawBitmap(const BBitmap* bitmap)
 {
 	SetDrawingMode(B_OP_COPY);
 	uint32 options = fUseBilinearScaling ? B_FILTER_BITMAP_BILINEAR : 0;
-	DrawBitmap(bitmap, bitmap->Bounds(), fVideoFrame, options);
+	DrawBitmapAsync(bitmap, bitmap->Bounds(), fVideoFrame, options);
 
 	if (fHasSubtitle) {
 		SetDrawingMode(B_OP_ALPHA);
@@ -326,7 +326,7 @@ VideoView::_DrawBitmap(const BBitmap* bitmap)
 		offset.x = (fVideoFrame.left + fVideoFrame.right
 			- subtitleBitmap->Bounds().Width()) / 2;
 		offset.y = fVideoFrame.bottom - subtitleBitmap->Bounds().Height();
-		DrawBitmap(subtitleBitmap, offset);
+		DrawBitmapAsync(subtitleBitmap, offset);
 	}
 }
 
@@ -343,4 +343,13 @@ VideoView::_AdoptGlobalSettings()
 	if (!fIsPlaying && !fOverlayMode)
 		Invalidate();
 }
+
+
+void
+VideoView::_SetOverlayMode(bool overlayMode)
+{
+	fOverlayMode = overlayMode;
+	fSubtitleBitmap->SetOverlayMode(overlayMode);
+}
+
 

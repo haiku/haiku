@@ -21,13 +21,14 @@ public:
 
 			void				SetText(const char* text);
 			void				SetVideoBounds(BRect bounds);
+			void				SetOverlayMode(bool overlayMode);
 
 			const BBitmap*		Bitmap() const;
 
 private:
 			void				_GenerateBitmap();
 			void				_InsertText(BRect& bounds,
-									float& outlineRadius);
+									float& outlineRadius, bool overlayMode);
 
 private:
 			BBitmap*			fBitmap;
@@ -36,6 +37,8 @@ private:
 			BString				fText;
 
 			BRect				fVideoBounds;
+			bool				fUseSoftShadow;
+			bool				fOverlayMode;
 };
 
 

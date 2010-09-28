@@ -18,7 +18,9 @@ SubtitleBitmap::SubtitleBitmap()
 	:
 	fBitmap(NULL),
 	fTextView(new BTextView("offscreen text")),
-	fShadowTextView(new BTextView("offscreen text shadow"))
+	fShadowTextView(new BTextView("offscreen text shadow")),
+	fUseSoftShadow(true),
+	fOverlayMode(false)
 {
 	fTextView->SetStylable(true);
 	fTextView->MakeEditable(false);
@@ -60,6 +62,19 @@ SubtitleBitmap::SetVideoBounds(BRect bounds)
 
 	fVideoBounds = bounds;
 
+	fUseSoftShadow = true;
+	_GenerateBitmap();
+}
+
+
+void
+SubtitleBitmap::SetOverlayMode(bool overlayMode)
+{
+	if (overlayMode == fOverlayMode)
+		return;
+
+	fOverlayMode = overlayMode;
+
 	_GenerateBitmap();
 }
 
@@ -81,12 +96,14 @@ SubtitleBitmap::_GenerateBitmap()
 
 	BRect bounds;
 	float outlineRadius;
-	_InsertText(bounds, outlineRadius);
+	_InsertText(bounds, outlineRadius, fOverlayMode);
+
+	bigtime_t startTime = 0;
+	if (!fOverlayMode && fUseSoftShadow)
+		startTime = system_time();
 
 	fBitmap = new BBitmap(bounds, B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
 	memset(fBitmap->Bits(), 0, fBitmap->BitsLength());
-
-	StackBlurFilter filter;
 
 	if (fBitmap->Lock()) {
 		fBitmap->AddChild(fShadowTextView);
@@ -100,14 +117,20 @@ SubtitleBitmap::_GenerateBitmap()
 		fShadowTextView->Draw(bounds);
 		fShadowTextView->PopState();
 
-		fShadowTextView->Sync();
-		fShadowTextView->RemoveSelf();
+		if (!fOverlayMode && fUseSoftShadow) {
+			fShadowTextView->Sync();
+			StackBlurFilter filter;
+			filter.Filter(fBitmap, outlineRadius * 2);
+		}
 
-		filter.Filter(fBitmap, outlineRadius * 2);
+		fShadowTextView->RemoveSelf();
 
 		fBitmap->AddChild(fTextView);
 		fTextView->ResizeTo(bounds.Width(), bounds.Height());
-		fTextView->MoveTo(-outlineRadius / 2, -outlineRadius / 2);
+		if (!fOverlayMode && fUseSoftShadow)
+			fTextView->MoveTo(-outlineRadius / 2, -outlineRadius / 2);
+		else
+			fTextView->MoveTo(0, 0);
 
 		fTextView->SetViewColor(0, 0, 0, 0);
 		fTextView->SetDrawingMode(B_OP_ALPHA);
@@ -122,6 +145,9 @@ SubtitleBitmap::_GenerateBitmap()
 
 		fBitmap->Unlock();
 	}
+
+	if (!fOverlayMode && fUseSoftShadow && system_time() - startTime > 10000)
+		fUseSoftShadow = false;
 }
 
 
@@ -283,7 +309,8 @@ parse_text(const BString& string, BTextView* textView, const BFont& font,
 
 
 void
-SubtitleBitmap::_InsertText(BRect& textRect, float& outlineRadius)
+SubtitleBitmap::_InsertText(BRect& textRect, float& outlineRadius,
+	bool overlayMode)
 {
 	BFont font(be_plain_font);
 	float fontSize = ceilf((fVideoBounds.Width() * 0.9) / 36);
@@ -312,6 +339,7 @@ SubtitleBitmap::_InsertText(BRect& textRect, float& outlineRadius)
 	parse_text(fText, fTextView, font, color, true);
 
 	font.SetFalseBoldWidth(outlineRadius);
+	fShadowTextView->ForceFontAliasing(overlayMode);
 	fShadowTextView->SetText(NULL);
 	fShadowTextView->SetFontAndColor(&font, B_FONT_ALL, &shadow);
 
