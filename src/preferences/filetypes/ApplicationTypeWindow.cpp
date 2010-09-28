@@ -409,7 +409,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	minScrollSize.width += fLongDescriptionView->MinSize().width;
 	scrollView->SetExplicitMinSize(minScrollSize);
 
-	versionBox->AddChild(BGridLayoutBuilder(padding, padding / 2)
+	versionBox->AddChild(BGridLayoutBuilder(padding / 2, padding / 2)
 		.Add(fMajorVersionControl->CreateLabelLayoutItem(), 0, 0)
 		.Add(fMajorVersionControl->CreateTextViewLayoutItem(), 1, 0)
 		.Add(fMiddleVersionControl, 2, 0, 2)
