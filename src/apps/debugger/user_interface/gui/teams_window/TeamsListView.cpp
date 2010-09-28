@@ -332,10 +332,10 @@ TeamsListView::_UpdateList()
 			// Team not found in previously known teams list: insert a new item
 			TeamListItem* newItem = new(std::nothrow) TeamListItem(tmi);
 			if (newItem != NULL) {
-				if (!item)
-					index++;	// No item found with bigger team id: insert at end
-
-				AddItem(newItem, index);
+				if (!item) // No item found with bigger team id: append at end
+					AddItem(newItem);
+				else
+					AddItem(newItem, index);
 			}
 		}
 		index++;	// Move list sync head.
