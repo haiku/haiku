@@ -52,11 +52,14 @@ public:
 			void				SetVideoFrame(const BRect& frame);
 
 			void				SetSubTitle(const char* text);
+			void				SetSubTitleMaxBottom(float bottom);
 
 private:
 			void				_DrawBitmap(const BBitmap* bitmap);
+			void				_DrawSubtitle();
 			void				_AdoptGlobalSettings();
 			void				_SetOverlayMode(bool overlayMode);
+			void				_LayoutSubtitle();
 
 private:
 			BRect				fVideoFrame;
@@ -67,12 +70,17 @@ private:
 			bool				fIsFullscreen;
 			bigtime_t			fLastMouseMove;
 
+			SubtitleBitmap*		fSubtitleBitmap;
+			BRect				fSubtitleFrame;
+			float				fSubtitleMaxButtom;
+			bool				fHasSubtitle;
+			bool				fSubtitleChanged;
+
+			// Settings values:
 			ListenerAdapter		fGlobalSettingsListener;
 			bool				fUseOverlays;
 			bool				fUseBilinearScaling;
-
-			SubtitleBitmap*		fSubtitleBitmap;
-			bool				fHasSubtitle;
+			uint32				fSubtitlePlacement;
 };
 
 #endif // VIDEO_VIEW_H

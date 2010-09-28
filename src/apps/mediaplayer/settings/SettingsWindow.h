@@ -5,15 +5,19 @@
  * Authors:
  *		Fredrik Modéen <fredrik@modeen.se>
  */
- 
-#ifndef _SETTINGS_WINDOW_H
-#define _SETTINGS_WINDOW_H
+#ifndef SETTINGS_WINDOW_H
+#define SETTINGS_WINDOW_H
+
 
 #include <Window.h>
-#include <CheckBox.h>
-#include <RadioButton.h>
 
 #include "Settings.h"
+
+
+class BCheckBox;
+class BOptionPopUp;
+class BRadioButton;
+
 
 class SettingsWindow : public BWindow {
 public:
@@ -43,6 +47,9 @@ private:
 		BCheckBox*				fScaleBilinearCB;
 		BCheckBox*				fScaleFullscreenControlsCB;
 
+		BOptionPopUp*			fSubtitleSizeOP;
+		BOptionPopUp*			fSubtitlePlacementOP;
+
 		BRadioButton*			fFullVolumeBGMoviesRB; 
 		BRadioButton*			fHalfVolumeBGMoviesRB; 
 		BRadioButton*			fMutedVolumeBGMoviesRB;
@@ -50,4 +57,5 @@ private:
 		BButton*				fRevertB;
 };
 
-#endif
+
+#endif	// SETTINGS_WINDOW_H

@@ -18,6 +18,11 @@
 #include "SubtitleBitmap.h"
 
 
+enum {
+	MSG_INVALIDATE = 'ivdt'
+};
+
+
 VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	:
 	BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
@@ -27,9 +32,14 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fIsPlaying(false),
 	fIsFullscreen(false),
 	fLastMouseMove(system_time()),
-	fGlobalSettingsListener(this),
+
 	fSubtitleBitmap(new SubtitleBitmap),
-	fHasSubtitle(false)
+	fSubtitleFrame(),
+	fSubtitleMaxButtom(Bounds().bottom),
+	fHasSubtitle(false),
+	fSubtitleChanged(false),
+
+	fGlobalSettingsListener(this)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(0, 0, 0);
@@ -44,7 +54,7 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	Settings::Default()->AddListener(&fGlobalSettingsListener);
 	_AdoptGlobalSettings();
 
-//SetSubtitle("<b><i>This</i></b> is a <font color=\"#00ff00\">test</font>!"
+//SetSubTitle("<b><i>This</i></b> is a <font color=\"#00ff00\">test</font>!"
 //	"\nWith a <i>short</i> line and a <b>long</b> line.");
 }
 
@@ -74,6 +84,9 @@ VideoView::Draw(BRect updateRect)
 
 	if (outSideVideoRegion.CountRects() > 0)
 		FillRegion(&outSideVideoRegion);
+
+	if (fHasSubtitle)
+		_DrawSubtitle();
 }
 
 
@@ -87,6 +100,13 @@ VideoView::MessageReceived(BMessage* message)
 			// the global settings instance...
 			_AdoptGlobalSettings();
 			break;
+		case MSG_INVALIDATE:
+		{
+			BRect dirty;
+			if (message->FindRect("dirty", &dirty) == B_OK)
+				Invalidate(dirty);
+			break;
+		}
 		default:
 			BView::MessageReceived(message);
 	}
@@ -185,9 +205,13 @@ VideoView::SetBitmap(const BBitmap* bitmap)
 			SetViewColor(B_TRANSPARENT_COLOR);
 		}
 		if (!fOverlayMode) {
-			if (fHasSubtitle)
+			if (fSubtitleChanged) {
+				_LayoutSubtitle();
+				Invalidate(fVideoFrame | fSubtitleFrame);
+			} else if (fHasSubtitle
+				&& fVideoFrame.Intersects(fSubtitleFrame)) {
 				Invalidate(fVideoFrame);
-			else
+			} else
 				_DrawBitmap(bitmap);
 		}
 
@@ -286,24 +310,52 @@ VideoView::SetVideoFrame(const BRect& frame)
 	fVideoFrame = frame;
 
 	fSubtitleBitmap->SetVideoBounds(fVideoFrame.OffsetToCopy(B_ORIGIN));
+	_LayoutSubtitle();
 }
 
 
 void
 VideoView::SetSubTitle(const char* text)
 {
+	BRect oldSubtitleFrame = fSubtitleFrame;
+
 	if (text == NULL || text[0] == '\0') {
 		fHasSubtitle = false;
+		fSubtitleChanged = true;
 	} else {
 		fHasSubtitle = true;
-		fSubtitleBitmap->SetText(text);
+		// If the subtitle frame still needs to be invalidated during
+		// normal playback, make sure we don't unset the fSubtitleChanged
+		// flag. It will be reset after drawing the subtitle once.
+		fSubtitleChanged = fSubtitleBitmap->SetText(text) || fSubtitleChanged;
+		if (fSubtitleChanged)
+			_LayoutSubtitle();
 	}
-	// TODO: Make smarter and invalidate only previous subtitle bitmap
-	// region. Fix locking, too...
-	if (!fIsPlaying && LockLooperWithTimeout(1000) == B_OK) {
-		Invalidate();
-		UnlockLooper();
+
+	if (!fIsPlaying && Window() != NULL) {
+		// If we are playing, the new subtitle will be displayed,
+		// or the old one removed from screen, as soon as the next
+		// frame is shown. Otherwise we need to invalidate manually.
+		// But we are not in the window thread and we shall not lock
+		// it or we may dead-locks.
+		BMessage message(MSG_INVALIDATE);
+		message.AddRect("dirty", oldSubtitleFrame | fSubtitleFrame);
+		Window()->PostMessage(&message);
 	}
+}
+
+
+void
+VideoView::SetSubTitleMaxBottom(float bottom)
+{
+	if (bottom == fSubtitleMaxButtom)
+		return;
+
+	fSubtitleMaxButtom = bottom;
+
+	BRect oldSubtitleFrame = fSubtitleFrame;
+	_LayoutSubtitle();
+	Invalidate(fSubtitleFrame | oldSubtitleFrame);
 }
 
 
@@ -316,18 +368,20 @@ VideoView::_DrawBitmap(const BBitmap* bitmap)
 	SetDrawingMode(B_OP_COPY);
 	uint32 options = fUseBilinearScaling ? B_FILTER_BITMAP_BILINEAR : 0;
 	DrawBitmapAsync(bitmap, bitmap->Bounds(), fVideoFrame, options);
+}
 
-	if (fHasSubtitle) {
-		SetDrawingMode(B_OP_ALPHA);
-		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	
-		const BBitmap* subtitleBitmap = fSubtitleBitmap->Bitmap();
-		BPoint offset;
-		offset.x = (fVideoFrame.left + fVideoFrame.right
-			- subtitleBitmap->Bounds().Width()) / 2;
-		offset.y = fVideoFrame.bottom - subtitleBitmap->Bounds().Height();
-		DrawBitmapAsync(subtitleBitmap, offset);
-	}
+
+void
+VideoView::_DrawSubtitle()
+{
+	SetDrawingMode(B_OP_ALPHA);
+	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+
+	DrawBitmapAsync(fSubtitleBitmap->Bitmap(), fSubtitleFrame.LeftTop());
+
+	// Unless the subtitle frame intersects the video frame, we don't have
+	// to draw the subtitle again.
+	fSubtitleChanged = false;
 }
 
 
@@ -340,8 +394,22 @@ VideoView::_AdoptGlobalSettings()
 	fUseOverlays = settings.useOverlays;
 	fUseBilinearScaling = settings.scaleBilinear;
 
-	if (!fIsPlaying && !fOverlayMode)
-		Invalidate();
+	switch (settings.subtitleSize) {
+		case mpSettings::SUBTITLE_SIZE_SMALL:
+			fSubtitleBitmap->SetCharsPerLine(45.0);
+			break;
+		case mpSettings::SUBTITLE_SIZE_MEDIUM:
+			fSubtitleBitmap->SetCharsPerLine(36.0);
+			break;
+		case mpSettings::SUBTITLE_SIZE_LARGE:
+			fSubtitleBitmap->SetCharsPerLine(32.0);
+			break;
+	}
+
+	fSubtitlePlacement = settings.subtitlePlacement;
+
+	_LayoutSubtitle();
+	Invalidate();
 }
 
 
@@ -350,6 +418,42 @@ VideoView::_SetOverlayMode(bool overlayMode)
 {
 	fOverlayMode = overlayMode;
 	fSubtitleBitmap->SetOverlayMode(overlayMode);
+}
+
+
+void
+VideoView::_LayoutSubtitle()
+{
+	if (!fHasSubtitle)
+		return;
+
+	const BBitmap* subtitleBitmap = fSubtitleBitmap->Bitmap();
+	if (subtitleBitmap == NULL)
+		return;
+
+	fSubtitleFrame = subtitleBitmap->Bounds();
+
+	BPoint offset;
+	offset.x = (fVideoFrame.left + fVideoFrame.right
+		- fSubtitleFrame.Width()) / 2;
+	switch (fSubtitlePlacement) {
+		default:
+		case mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_VIDEO:
+			offset.y = fVideoFrame.bottom - fSubtitleFrame.Height();
+			break;
+		case mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_SCREEN:
+		{
+			// Center between video and screen bottom, if there is still
+			// enough room.
+			float centeredOffset = (fVideoFrame.bottom + fSubtitleMaxButtom
+				- fSubtitleFrame.Height()) / 2;
+			float maxOffset = fSubtitleMaxButtom - fSubtitleFrame.Height();
+			offset.y = min_c(centeredOffset, maxOffset);
+			break;
+		}
+	}
+
+	fSubtitleFrame.OffsetTo(offset);
 }
 
 

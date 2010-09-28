@@ -16,6 +16,21 @@
 #include "SettingsMessage.h"
 
 struct mpSettings {
+			enum {
+				SUBTITLE_SIZE_SMALL = 0,
+				SUBTITLE_SIZE_MEDIUM = 1,
+				SUBTITLE_SIZE_LARGE = 2
+			};
+			enum {
+				SUBTITLE_PLACEMENT_BOTTOM_OF_VIDEO = 0,
+				SUBTITLE_PLACEMENT_BOTTOM_OF_SCREEN = 1
+			};
+			enum {
+				BG_MOVIES_FULL_VOLUME = 0,
+				BG_MOVIES_HALF_VLUME = 1,
+				BG_MOVIES_MUTED = 2
+			};
+
 			bool				autostart;
 			bool				closeWhenDonePlayingMovie;
 			bool				closeWhenDonePlayingSound;
@@ -24,11 +39,8 @@ struct mpSettings {
 			bool				useOverlays;
 			bool				scaleBilinear;
 			bool				scaleFullscreenControls;
-			enum {
-				BG_MOVIES_FULL_VOLUME = 0,
-				BG_MOVIES_HALF_VLUME = 1,
-				BG_MOVIES_MUTED = 2
-			};
+			uint32				subtitleSize;
+			uint32				subtitlePlacement;
 			uint32				backgroundMovieVolumeMode;
 			entry_ref			filePanelFolder;
 		

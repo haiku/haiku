@@ -22,6 +22,8 @@ mpSettings::operator!=(const mpSettings& other) const
 		|| useOverlays != other.useOverlays
 		|| scaleBilinear != other.scaleBilinear
 		|| scaleFullscreenControls != other.scaleFullscreenControls
+		|| subtitleSize != other.subtitleSize
+		|| subtitlePlacement != other.subtitlePlacement
 		|| backgroundMovieVolumeMode != other.backgroundMovieVolumeMode
 		|| filePanelFolder != other.filePanelFolder
 		|| audioPlayerWindowFrame != other.audioPlayerWindowFrame;
@@ -29,8 +31,9 @@ mpSettings::operator!=(const mpSettings& other) const
 
 
 Settings::Settings(const char* filename)
-	: BLocker("settings lock"),
-	  fSettingsMessage(B_USER_SETTINGS_DIRECTORY, filename)
+	:
+	BLocker("settings lock"),
+	fSettingsMessage(B_USER_SETTINGS_DIRECTORY, filename)
 {
 	// The settings are loaded from disk in the SettingsMessage constructor.
 }
@@ -53,6 +56,13 @@ Settings::LoadSettings(mpSettings& settings) const
 	settings.scaleBilinear = fSettingsMessage.GetValue("scaleBilinear", true);
 	settings.scaleFullscreenControls
 		= fSettingsMessage.GetValue("scaleFullscreenControls", true);
+
+	settings.subtitleSize
+		= fSettingsMessage.GetValue("subtitleSize",
+			(uint32)mpSettings::SUBTITLE_SIZE_MEDIUM);
+	settings.subtitlePlacement
+		= fSettingsMessage.GetValue("subtitlePlacement",
+			(uint32)mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_VIDEO);
 
 	settings.backgroundMovieVolumeMode
 		= fSettingsMessage.GetValue("bgMovieVolumeMode",
@@ -85,6 +95,9 @@ Settings::SaveSettings(const mpSettings& settings)
 	fSettingsMessage.SetValue("scaleBilinear", settings.scaleBilinear);
 	fSettingsMessage.SetValue("scaleFullscreenControls",
 		settings.scaleFullscreenControls);
+
+	fSettingsMessage.SetValue("subtitleSize", settings.subtitleSize);
+	fSettingsMessage.SetValue("subtitlePlacement", settings.subtitlePlacement);
 
 	fSettingsMessage.SetValue("bgMovieVolumeMode",
 		settings.backgroundMovieVolumeMode);

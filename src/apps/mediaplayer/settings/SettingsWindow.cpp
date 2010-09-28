@@ -6,7 +6,8 @@
  *		Fredrik Modéen <fredrik@modeen.se>
  *		Stephan Aßmus <superstippi@gmx.de>
  */
- 
+
+
 #include "SettingsWindow.h"
 
 #include <stdio.h>
@@ -16,36 +17,31 @@
 #include <CheckBox.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <OptionPopUp.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
 #include <RadioButton.h>
 #include <View.h>
 
+
 enum {
-	M_AUTOSTART = 0x3000,
-	M_CLOSE_WINDOW_MOVIE,
-	M_CLOSE_WINDOW_SOUNDS,
-	M_LOOP_MOVIE,
-	M_LOOP_SOUND,
-	M_USE_OVERLAYS,
-	M_SCALE_BILINEAR,
-	M_SCALE_CONTROLS,
-	M_START_FULL_VOLUME,
-	M_START_HALF_VOLUME,
-	M_START_MUTE_VOLUME,
+	M_SETTINGS_CHANGED = 0x3000,
 
 	M_SETTINGS_SAVE,
 	M_SETTINGS_CANCEL,
 	M_SETTINGS_REVERT
 };
 
+
 #define SPACE 10
 #define SPACEING 7 
 #define BUTTONHEIGHT 20
 
+
 SettingsWindow::SettingsWindow(BRect frame)
- 	: BWindow(frame, "MediaPlayer settings", B_FLOATING_WINDOW_LOOK,
+ 	:
+ 	BWindow(frame, "MediaPlayer settings", B_FLOATING_WINDOW_LOOK,
  		B_FLOATING_APP_WINDOW_FEEL,
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
  			| B_AUTO_UPDATE_SIZE_LIMITS)
@@ -72,39 +68,52 @@ SettingsWindow::SettingsWindow(BRect frame)
 	bgMoviesModeLabel->SetFont(be_bold_font);
 
 	fAutostartCB = new BCheckBox("chkboxAutostart", 
-		"Automatically start playing", new BMessage(M_AUTOSTART));
+		"Automatically start playing", new BMessage(M_SETTINGS_CHANGED));
 
 	fCloseWindowMoviesCB = new BCheckBox("chkBoxCloseWindowMovies", 
 		"Close window when done playing movies",
-		new BMessage(M_CLOSE_WINDOW_MOVIE));
+		new BMessage(M_SETTINGS_CHANGED));
 	fCloseWindowSoundsCB = new BCheckBox("chkBoxCloseWindowSounds", 
 		"Close window when done playing sounds",
-		new BMessage(M_CLOSE_WINDOW_SOUNDS));
+		new BMessage(M_SETTINGS_CHANGED));
 
 	fLoopMoviesCB = new BCheckBox("chkBoxLoopMovie",
-		"Loop movies by default", new BMessage(M_LOOP_MOVIE));
+		"Loop movies by default", new BMessage(M_SETTINGS_CHANGED));
 	fLoopSoundsCB = new BCheckBox("chkBoxLoopSounds",
-		"Loop sounds by default", new BMessage(M_LOOP_SOUND));
+		"Loop sounds by default", new BMessage(M_SETTINGS_CHANGED));
 
 	fUseOverlaysCB = new BCheckBox("chkBoxUseOverlays",
 		"Use hardware video overlays if available",
-		new BMessage(M_USE_OVERLAYS));
+		new BMessage(M_SETTINGS_CHANGED));
 	fScaleBilinearCB = new BCheckBox("chkBoxScaleBilinear",
 		"Scale movies smoothly (non-overlay mode)",
-		new BMessage(M_SCALE_BILINEAR));
+		new BMessage(M_SETTINGS_CHANGED));
 
 	fScaleFullscreenControlsCB = new BCheckBox("chkBoxScaleControls",
 		"Scale controls in full-screen mode",
-		new BMessage(M_SCALE_CONTROLS));
+		new BMessage(M_SETTINGS_CHANGED));
+
+	fSubtitleSizeOP = new BOptionPopUp("subtitleSize",
+		"Subtitle size", new BMessage(M_SETTINGS_CHANGED));
+	fSubtitleSizeOP->AddOption("Small", mpSettings::SUBTITLE_SIZE_SMALL);
+	fSubtitleSizeOP->AddOption("Medium", mpSettings::SUBTITLE_SIZE_MEDIUM);
+	fSubtitleSizeOP->AddOption("Large", mpSettings::SUBTITLE_SIZE_LARGE);
+
+	fSubtitlePlacementOP = new BOptionPopUp("subtitlePlacement",
+		"Subtitle placement", new BMessage(M_SETTINGS_CHANGED));
+	fSubtitlePlacementOP->AddOption("Bottom of video",
+		mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_VIDEO);
+	fSubtitlePlacementOP->AddOption("Bottom of screen",
+		mpSettings::SUBTITLE_PLACEMENT_BOTTOM_OF_SCREEN);
 
 	fFullVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
-		"Full volume", new BMessage(M_START_FULL_VOLUME));
+		"Full volume", new BMessage(M_SETTINGS_CHANGED));
 	
 	fHalfVolumeBGMoviesRB = new BRadioButton("rdbtnhalfvolume", 
-		"Low volume", new BMessage(M_START_HALF_VOLUME));
+		"Low volume", new BMessage(M_SETTINGS_CHANGED));
 	
 	fMutedVolumeBGMoviesRB = new BRadioButton("rdbtnfullvolume",
-		"Muted", new BMessage(M_START_MUTE_VOLUME));
+		"Muted", new BMessage(M_SETTINGS_CHANGED));
 
 	fRevertB = new BButton("revert", "Revert", 
 		new BMessage(M_SETTINGS_REVERT));
@@ -146,6 +155,8 @@ SettingsWindow::SettingsWindow(BRect frame)
 					.Add(fUseOverlaysCB)
 					.Add(fScaleBilinearCB)
 					.Add(fScaleFullscreenControlsCB)
+					.Add(fSubtitleSizeOP)
+					.Add(fSubtitlePlacementOP)
 				)
 			)
 			.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
@@ -205,17 +216,7 @@ void
 SettingsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case M_AUTOSTART:
-		case M_CLOSE_WINDOW_MOVIE:
-		case M_CLOSE_WINDOW_SOUNDS:
-		case M_LOOP_MOVIE:
-		case M_LOOP_SOUND:
-		case M_USE_OVERLAYS:
-		case M_SCALE_BILINEAR:
-		case M_SCALE_CONTROLS:
-		case M_START_FULL_VOLUME:
-		case M_START_HALF_VOLUME:
-		case M_START_MUTE_VOLUME:
+		case M_SETTINGS_CHANGED:
 			ApplySettings();
 			break;
 
@@ -256,6 +257,9 @@ SettingsWindow::AdoptSettings()
 	fScaleBilinearCB->SetValue(fSettings.scaleBilinear);
 	fScaleFullscreenControlsCB->SetValue(fSettings.scaleFullscreenControls);
 
+	fSubtitleSizeOP->SetValue(fSettings.subtitleSize);
+	fSubtitlePlacementOP->SetValue(fSettings.subtitlePlacement);
+
 	fFullVolumeBGMoviesRB->SetValue(fSettings.backgroundMovieVolumeMode
 		== mpSettings::BG_MOVIES_FULL_VOLUME);
 	fHalfVolumeBGMoviesRB->SetValue(fSettings.backgroundMovieVolumeMode
@@ -282,6 +286,9 @@ SettingsWindow::ApplySettings()
 	fSettings.scaleBilinear = fScaleBilinearCB->Value() == B_CONTROL_ON;
 	fSettings.scaleFullscreenControls
 		= fScaleFullscreenControlsCB->Value() == B_CONTROL_ON;
+
+	fSettings.subtitleSize = fSubtitleSizeOP->Value();
+	fSettings.subtitlePlacement = fSubtitlePlacementOP->Value();
 
 	if (fFullVolumeBGMoviesRB->Value() == B_CONTROL_ON) {
 		fSettings.backgroundMovieVolumeMode

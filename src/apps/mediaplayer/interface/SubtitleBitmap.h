@@ -19,9 +19,10 @@ public:
 								SubtitleBitmap();
 	virtual						~SubtitleBitmap();
 
-			void				SetText(const char* text);
+			bool				SetText(const char* text);
 			void				SetVideoBounds(BRect bounds);
 			void				SetOverlayMode(bool overlayMode);
+			void				SetCharsPerLine(float charsPerLine);
 
 			const BBitmap*		Bitmap() const;
 
@@ -37,6 +38,7 @@ private:
 			BString				fText;
 
 			BRect				fVideoBounds;
+			float				fCharsPerLine;
 			bool				fUseSoftShadow;
 			bool				fOverlayMode;
 };

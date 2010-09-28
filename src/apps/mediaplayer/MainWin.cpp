@@ -932,6 +932,7 @@ MainWin::MessageReceived(BMessage* msg)
 			float offset;
 			if (msg->FindFloat("offset", &offset) == B_OK) {
 				fControls->MoveBy(0, offset);
+				fVideoView->SetSubTitleMaxBottom(fControls->Frame().top - 1);
 				UpdateIfNeeded();
 				snooze(15000);
 			}
@@ -943,9 +944,12 @@ MainWin::MessageReceived(BMessage* msg)
 			bool show;
 			if (msg->FindFloat("offset", &offset) == B_OK
 				&& msg->FindBool("show", &show) == B_OK) {
-				if (show)
+				if (show) {
 					fControls->MoveTo(fControls->Frame().left, offset);
-				else {
+					fVideoView->SetSubTitleMaxBottom(offset - 1);
+				} else {
+					fVideoView->SetSubTitleMaxBottom(
+						fVideoView->Bounds().bottom);
 					fControls->RemoveSelf();
 					fControls->MoveTo(fVideoView->Frame().left,
 						fVideoView->Frame().bottom + 1);
@@ -1850,6 +1854,7 @@ MainWin::_ResizeVideoView(int x, int y, int width, int height)
 		xOffset + renderWidth - 1, yOffset + renderHeight - 1);
 
 	fVideoView->SetVideoFrame(videoFrame);
+	fVideoView->SetSubTitleMaxBottom(height - 1);
 }
 
 
@@ -1990,8 +1995,8 @@ MainWin::_ShowContextMenu(const BPoint& screenPoint)
 	menu->AddItem(item = new BMenuItem(aspectSubMenu));
 	item->SetEnabled(fHasVideo);
 
-	menu->AddItem(item = new BMenuItem("No interface",
-		new BMessage(M_TOGGLE_NO_INTERFACE), 'B'));
+	menu->AddItem(item = new BMenuItem("Hide interface",
+		new BMessage(M_TOGGLE_NO_INTERFACE), 'H'));
 	item->SetMarked(fNoInterface);
 	item->SetEnabled(fHasVideo);
 

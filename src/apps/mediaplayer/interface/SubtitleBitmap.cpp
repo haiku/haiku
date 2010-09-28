@@ -19,6 +19,7 @@ SubtitleBitmap::SubtitleBitmap()
 	fBitmap(NULL),
 	fTextView(new BTextView("offscreen text")),
 	fShadowTextView(new BTextView("offscreen text shadow")),
+	fCharsPerLine(36),
 	fUseSoftShadow(true),
 	fOverlayMode(false)
 {
@@ -42,15 +43,16 @@ SubtitleBitmap::~SubtitleBitmap()
 }
 
 
-void
+bool
 SubtitleBitmap::SetText(const char* text)
 {
 	if (text == fText)
-		return;
+		return false;
 
 	fText = text;
 
 	_GenerateBitmap();
+	return true;
 }
 
 
@@ -75,6 +77,19 @@ SubtitleBitmap::SetOverlayMode(bool overlayMode)
 
 	fOverlayMode = overlayMode;
 
+	_GenerateBitmap();
+}
+
+
+void
+SubtitleBitmap::SetCharsPerLine(float charsPerLine)
+{
+	if (charsPerLine == fCharsPerLine)
+		return;
+
+	fCharsPerLine = charsPerLine;
+
+	fUseSoftShadow = true;
 	_GenerateBitmap();
 }
 
@@ -313,7 +328,7 @@ SubtitleBitmap::_InsertText(BRect& textRect, float& outlineRadius,
 	bool overlayMode)
 {
 	BFont font(be_plain_font);
-	float fontSize = ceilf((fVideoBounds.Width() * 0.9) / 36);
+	float fontSize = ceilf((fVideoBounds.Width() * 0.9) / fCharsPerLine);
 	outlineRadius = ceilf(fontSize / 28.0);
 	font.SetSize(fontSize);
 
