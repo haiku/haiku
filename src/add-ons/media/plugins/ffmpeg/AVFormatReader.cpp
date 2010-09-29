@@ -32,7 +32,7 @@ extern "C" {
 #	define TRACE printf
 #	define TRACE_IO(a...)
 #	define TRACE_SEEK(a...) printf(a)
-#	define TRACE_FIND(a...) printf(a)
+#	define TRACE_FIND(a...)
 #	define TRACE_PACKET(a...)
 #else
 #	define TRACE(a...)
@@ -554,7 +554,9 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 		int64_t streamTimeStamp = _ConvertToStreamTimeBase(*time);
 		int index = av_index_search_timestamp(fStream, streamTimeStamp,
 			searchFlags);
-		if (index >= 0) {
+		if (index < 0) {
+			TRACE("  av_index_search_timestamp() failed\n");
+		} else {
 			if (index > 0) {
 				const AVIndexEntry& entry = fStream->index_entries[index];
 				streamTimeStamp = entry.timestamp;
@@ -582,7 +584,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 				// since when seeking back there will be later index entries,
 				// but we still want to ignore the found entry.
 				fStreamBuildsIndexWhileReading = true;
-				TRACE_FIND("  Not trusting generic index entry. "
+				TRACE_SEEK("  Not trusting generic index entry. "
 					"(Current count: %d)\n", fStream->nb_index_entries);
 			} else {
 				// If we found a reasonably time, write it into *time.
@@ -595,9 +597,23 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 
 		if (avformat_seek_file(fContext, -1, INT64_MIN, timeStamp, INT64_MAX,
 				searchFlags) < 0) {
-			TRACE("  avformat_seek_file()%s failed.\n", fSeekByBytes
-				? " (by bytes)" : "");
-			return B_ERROR;
+			TRACE("  avformat_seek_file() failed.\n");
+			// Try to fall back to av_seek_frame()
+			timeStamp = _ConvertToStreamTimeBase(timeStamp);
+			if (av_seek_frame(fContext, fStream->index, timeStamp,
+				searchFlags) < 0) {
+				TRACE("  avformat_seek_frame() failed as well.\n");
+				// Fall back to seeking to the beginning by bytes
+				timeStamp = 0;
+				if (av_seek_frame(fContext, fStream->index, timeStamp,
+						AVSEEK_FLAG_BYTE) < 0) {
+					TRACE("  avformat_seek_frame() by bytes failed as "
+						"well.\n");
+					// Do not propagate error in any case. We fail if we can't
+					// read another packet.
+				} else
+					*time = 0;
+			}
 		}
 	
 		// Our last packet is toast in any case. Read the next one so
