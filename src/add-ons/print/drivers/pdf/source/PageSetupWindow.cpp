@@ -355,11 +355,16 @@ PageSetupWindow::Go()
 {
 	MoveTo(300,300);
 	Show();
-	acquire_sem(fExitSem);
-	Lock();
-	Quit();
 
-	return fResult;
+	while (acquire_sem(fExitSem) == B_INTERRUPTED) {
+	}
+
+	// Have to cache the value since we delete ourself on Quit()
+	status_t result = fResult;
+	if (Lock())
+		Quit();
+
+	return result;
 }
 
 
