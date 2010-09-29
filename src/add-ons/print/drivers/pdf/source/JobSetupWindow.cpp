@@ -2,13 +2,13 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001-2003 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -40,9 +40,9 @@ THE SOFTWARE.
 #include "DocInfoWindow.h"
 
 static const char* includeKeys[] = {
-	"doc_info", 
+	"doc_info",
 #if HAVE_FULLVERSION_PDF_LIB
-	"master_password", "user_password", "permissions", 
+	"master_password", "user_password", "permissions",
 #endif
 	NULL
 };
@@ -56,14 +56,14 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	fSetupMsg	= msg;
 	fExitSem 	= create_sem(0, "JobSetup");
 	fResult 	= B_ERROR;
-	
+
 	if (printerName) {
 		BString	title;
 		title << printerName << " Job Setup";
 		SetTitle(title.String());
 		fPrinterName = printerName;
 	}
-	
+
 	// ---- Ok, build a default job setup user interface
 	BRect			r;
 	BBox			*panel;
@@ -78,7 +78,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	int32           lastPage;
 	bool            allPages;
 	char            buffer[80];
-	
+
 	// PrinterDriver ensures that property exists
 	fSetupMsg->FindInt32("copies",     &copies);
 	fSetupMsg->FindInt32("first_page", &firstPage);
@@ -92,13 +92,13 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		fSetupMsg->AddMessage("doc_info", &doc_info);
 	}
 	AddFields(&fDocInfo, fSetupMsg, NULL, includeKeys);
-	
+
 	allPages = firstPage == 1 && lastPage == MAX_INT32;
 
 	r = Bounds();
 
 	// add a *dialog* background
-	panel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
+	panel = new BBox(r, "top_panel", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 		B_PLAIN_BORDER);
 
@@ -118,8 +118,8 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 
 	x = r.left + kMargin;
 	y = r.top + kMargin;
-	
-	
+
+
 	// add a "copies" input field
 
 /* Simon: temporarily removed this code
@@ -130,7 +130,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	fCopies->ResizeToPreferred();
 	fCopies->GetPreferredSize(&w, &h);
 	panel->AddChild(fCopies);
-	
+
 	y += h + kMargin;	// "new line"
 */
 	// add a "pages" label
@@ -167,9 +167,9 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	panel->AddChild(fRange);
 
 	x += w + kMargin;
-	
+
 	// add a "from" field
-	if (allPages) { 
+	if (allPages) {
 		buffer[0] = 0;
 	} else {
 		sprintf(buffer, "%d", (int)firstPage);
@@ -183,13 +183,13 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	panel->AddChild(fFrom);
 
 	x += w + kMargin;
-	
+
 	// add a "to" field
 	if (allPages) {
 		buffer[0] = 0;
 	} else {
 		sprintf(buffer, "%d", (int)lastPage);
-	} 
+	}
 	fTo = new BTextControl(BRect(x, y, x+100, y+20), "to_field", kToLabel, buffer,
 							new BMessage(RANGE_TO_MSG));
 	fTo->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
@@ -217,15 +217,15 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	ok->MoveTo(x, ok->Frame().top);	// put the ok bottom at bottom right corner
 	panel->AddChild(ok);
 
-	// add a "Cancel" button	
+	// add a "Cancel" button
 	cancel 	= new BButton(BRect(x, y, x + 100, y + 20), NULL, "Cancel", new BMessage(CANCEL_MSG), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	cancel->ResizeToPreferred();
 	cancel->GetPreferredSize(&w, &h);
 	cancel->MoveTo(x - w - kMargin, y);	// put cancel button left next the ok button
 	panel->AddChild(cancel);
 
-	// add a "DocInfo" button	
-	BButton *button = new BButton(r, NULL, "Doc Info", new BMessage(DOC_INFO_MSG), 
+	// add a "DocInfo" button
+	BButton *button = new BButton(r, NULL, "Doc Info", new BMessage(DOC_INFO_MSG),
 		B_FOLLOW_RIGHT | B_FOLLOW_TOP);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();
@@ -234,15 +234,15 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 
 	// Finally, add our panel to window
 	AddChild(panel);
-	
+
 	// Auto resize window
 	ResizeTo(ok->Frame().right + kMargin, ok->Frame().bottom + kMargin);
 }
 
 
 // --------------------------------------------------
-void 
-JobSetupWindow::UpdateJobMessage() 
+void
+JobSetupWindow::UpdateJobMessage()
 {
 	int32 copies = 1;
 
@@ -272,7 +272,7 @@ JobSetupWindow::~JobSetupWindow()
 
 
 // --------------------------------------------------
-bool 
+bool
 JobSetupWindow::QuitRequested()
 {
 	release_sem(fExitSem);
@@ -281,7 +281,7 @@ JobSetupWindow::QuitRequested()
 
 
 // --------------------------------------------------
-void 
+void
 JobSetupWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
@@ -290,7 +290,7 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			fResult = B_OK;
 			release_sem(fExitSem);
 			break;
-		
+
 		case CANCEL_MSG:
 			release_sem(fExitSem);
 			break;
@@ -309,17 +309,24 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			break;
 	}
 }
-			
+
 
 // --------------------------------------------------
-status_t 
+status_t
 JobSetupWindow::Go()
 {
 	MoveTo(300,300);
 	Show();
-	acquire_sem(fExitSem);
-	if (Lock()) Quit();
-	return fResult;
+
+	while (acquire_sem(fExitSem) == B_INTERRUPTED) {
+	}
+
+	// Cache the value as after Quit() this object is deleted.
+	status_t result = fResult;
+	if (Lock())
+		Quit();
+
+	return result;
 }
 
 

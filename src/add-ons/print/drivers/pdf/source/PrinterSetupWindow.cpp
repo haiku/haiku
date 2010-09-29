@@ -2,13 +2,13 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001 OpenBeOS.
 
-Authors: 
+Authors:
 	Philippe Houdoin
-	Simon Gauvin	
+	Simon Gauvin
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -50,17 +50,17 @@ PrinterSetupWindow::PrinterSetupWindow(char *printerName)
 		SetTitle(title.String());
 	} else
 		SetTitle("Printer Setup");
-	
+
 	// ---- Ok, build a default job setup user interface
 	BRect			r;
 	BButton 		*button;
 	float			x, y, w, h;
 	font_height		fh;
-	
+
 	r = Bounds();
 
 	// add a *dialog* background
-	BBox *panel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
+	BBox *panel = new BBox(r, "top_panel", B_FOLLOW_ALL,
 		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 		B_PLAIN_BORDER);
 
@@ -80,22 +80,22 @@ PrinterSetupWindow::PrinterSetupWindow(char *printerName)
 	w = Bounds().Width();
 	w -= 2 * kHorzMargin;
 	h = 150;
-	
+
 	BBox * model_group = new BBox(BRect(x, y, x+w, y+h), "model_group", B_FOLLOW_ALL_SIDES);
 	model_group->SetLabel(kModelLabel);
-	
+
 	BRect rlv = model_group->Bounds();
-	
+
 	rlv.InsetBy(kHorzMargin, kVertMargin);
 	rlv.top 	+= fh.ascent + fh.descent + fh.leading;
 	rlv.right	-= B_V_SCROLL_BAR_WIDTH;
 	fModelList		= new BListView(rlv, "model_list",
 											B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES );
-										
+
 	BScrollView * sv	= new BScrollView( "model_list_scrollview", fModelList,
 											B_FOLLOW_ALL_SIDES,	B_WILL_DRAW | B_FRAME_EVENTS, false, true );
 	model_group->AddChild(sv);
-	
+
 	panel->AddChild(model_group);
 
 	y += (h + kInterSpace);
@@ -115,7 +115,7 @@ PrinterSetupWindow::PrinterSetupWindow(char *printerName)
 
 	x -= kInterSpace;
 
-	// add a "Cancel" button	
+	// add a "Cancel" button
 	button 	= new BButton(BRect(x, y, x + 400, y), NULL, "Cancel", new BMessage(CANCEL_MSG), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->ResizeToPreferred();
 	button->GetPreferredSize(&w, &h);
@@ -127,7 +127,7 @@ PrinterSetupWindow::PrinterSetupWindow(char *printerName)
 
 	panel->ResizeTo(Bounds().Width(), y);
 	ResizeTo(Bounds().Width(), y);
-	
+
 	float minWidth, maxWidth, minHeight, maxHeight;
 
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
@@ -139,11 +139,11 @@ PrinterSetupWindow::PrinterSetupWindow(char *printerName)
 
 	BDirectory	Folder;
 	BEntry		entry;
-	
+
 	Folder.SetTo ("/boot/beos/etc/bubblejet");
 	if (Folder.InitCheck() != B_OK)
 		return;
-		
+
 	while (Folder.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 		char name[B_FILE_NAME_LENGTH];
 		if (entry.GetName(name) == B_NO_ERROR)
@@ -163,7 +163,7 @@ PrinterSetupWindow::~PrinterSetupWindow()
 
 
 // --------------------------------------------------
-bool 
+bool
 PrinterSetupWindow::QuitRequested()
 {
 	release_sem(fExitSem);
@@ -172,7 +172,7 @@ PrinterSetupWindow::QuitRequested()
 
 
 // --------------------------------------------------
-void 
+void
 PrinterSetupWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
@@ -181,48 +181,48 @@ PrinterSetupWindow::MessageReceived(BMessage *msg)
 				// Test model selection (if any), save it in printerName node and return
 				BNode  	spoolDir;
 				BPath *	path;
-	
+
 				if (fModelList->CurrentSelection() < 0)
 					break;
-	
+
 				BStringItem * item = dynamic_cast<BStringItem*>
 					(fModelList->ItemAt(fModelList->CurrentSelection()));
 
 				if (!item)
 					break;
-	
+
 				path = new BPath();
-	
+
 				find_directory(B_USER_SETTINGS_DIRECTORY, path);
 				path->Append("printers");
 				path->Append(fPrinterName);
-	
+
 				spoolDir.SetTo(path->Path());
 				delete path;
-	
+
 				if (spoolDir.InitCheck() != B_OK) {
-					BAlert * alert = new BAlert("Uh oh!", 
+					BAlert * alert = new BAlert("Uh oh!",
 						"Couldn't find printer spool directory.", "OK");
 					alert->Go();
-				} else {			
-					spoolDir.WriteAttr("printer_model", B_STRING_TYPE, 0, item->Text(), 
+				} else {
+					spoolDir.WriteAttr("printer_model", B_STRING_TYPE, 0, item->Text(),
 						strlen(item->Text()));
 					fResult = B_OK;
 				}
-				
+
 				release_sem(fExitSem);
 				break;
 			}
-		
+
 		case CANCEL_MSG:
 			fResult = B_ERROR;
 			release_sem(fExitSem);
 			break;
-		
+
 		case MODEL_MSG:
 			fOkButton->SetEnabled((fModelList->CurrentSelection() >= 0));
 			break;
-		
+
 		default:
 			inherited::MessageReceived(msg);
 			break;
@@ -231,14 +231,19 @@ PrinterSetupWindow::MessageReceived(BMessage *msg)
 
 
 // --------------------------------------------------
-status_t 
+status_t
 PrinterSetupWindow::Go()
 {
 	MoveTo(300, 300);
 	Show();
-	acquire_sem(fExitSem);
-	Lock();
-	Quit();
 
-	return fResult;
+	while (acquire_sem(fExitSem) == B_INTERRUPTED) {
+	}
+
+	// cache the value as after Quit() this object is deleted
+	status_t result = fResult;
+	if (Lock())
+		Quit();
+
+	return result;
 }
