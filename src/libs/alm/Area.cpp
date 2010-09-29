@@ -623,8 +623,8 @@ Area::_UpdateMaxSizeConstraint(BSize max)
 void
 Area::_UpdatePreferredConstraint(BSize preferred)
 {
-	float width = 64000;
-	float height = 64000;
+	float width = 32000;
+	float height = 32000;
 	if (preferred.width > 0)
 		width = preferred.Width() + LeftInset() + RightInset();
 	if (preferred.height > 0)

@@ -6,8 +6,6 @@
 #define	COLUMN_H
 
 
-#include <List.h>
-
 #include "Constraint.h"
 #include "LinearSpec.h"
 
@@ -22,19 +20,20 @@ class XTab;
  */
 class Column {
 public:
+								~Column();
+
 			XTab*				Left() const;
 			XTab*				Right() const;
 			Column*				Previous() const;
-			void					SetPrevious(Column* value);
+			void				SetPrevious(Column* value);
 			Column*				Next() const;
-			void					SetNext(Column* value);
-			//~ string				ToString();
-			void					InsertBefore(Column* column);
-			void					InsertAfter(Column* column);
+			void				SetNext(Column* value);
+
+			void				InsertBefore(Column* column);
+			void				InsertAfter(Column* column);
 			Constraint*			HasSameWidthAs(Column* column);
-			BList*				Constraints() const;
-			void					SetConstraints(BList* constraints);
-								~Column();
+
+			ConstraintList*		Constraints() const;
 
 protected:
 								Column(LinearSpec* ls);
@@ -49,7 +48,7 @@ private:
 			Column*				fNext;
 			Constraint*			fPreviousGlue;
 			Constraint*			fNextGlue;
-			BList*				fConstraints;
+			ConstraintList		fConstraints;
 
 public:
 	friend class			BALMLayout;

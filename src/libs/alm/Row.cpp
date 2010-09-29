@@ -122,11 +122,6 @@ Row::SetNext(Row* value)
 }
 
 
-//~ string Row::ToString() {
-	//~ return "Row(" + fTop.ToString() + ", " + fBottom.ToString() + ")";
-//~ }
-
-
 /**
  * Inserts the given row directly above this row.
  * 
@@ -165,7 +160,7 @@ Row::HasSameHeightAs(Row* row)
 	Constraint* constraint = fLS->AddConstraint(
 		-1.0, fTop, 1.0, fBottom, 1.0, row->fTop, -1.0, row->fBottom,
 		OperatorType(EQ), 0.0);
-	fConstraints->AddItem(constraint);
+	fConstraints.AddItem(constraint);
 	return constraint;
 }
 
@@ -173,20 +168,10 @@ Row::HasSameHeightAs(Row* row)
 /**
  * Gets the constraints.
  */
-BList*
+ConstraintList*
 Row::Constraints() const
 {
-	return fConstraints;
-}
-
-
-/**
- * Sets the constraints.
- */
-void
-Row::SetConstraints(BList* constraints)
-{
-	fConstraints = constraints;
+	return const_cast<ConstraintList*>(&fConstraints);
 }
 
 
@@ -198,8 +183,8 @@ Row::~Row()
 {
 	if (fPrevious != NULL) 
 		fPrevious->SetNext(fNext);
-	for (int32 i = 0; i < fConstraints->CountItems(); i++)
-		delete (Constraint*)fConstraints->ItemAt(i);
+	for (int32 i = 0; i < fConstraints.CountItems(); i++)
+		delete (Constraint*)fConstraints.ItemAt(i);
 	delete fTop;
 	delete fBottom;
 }
@@ -213,6 +198,5 @@ Row::Row(LinearSpec* ls)
 	fLS = ls;
 	fTop = new YTab(ls);
 	fBottom = new YTab(ls);
-	fConstraints = new BList(1);
 }
 

@@ -120,11 +120,6 @@ Column::SetNext(Column* value)
 }
 
 
-//~ string Column::ToString() {
-	//~ return "Column(" + fLeft.ToString() + ", " + fRight.ToString() + ")";
-//~ }
-
-
 /**
  * Inserts the given column directly to the left of this column.
  * 
@@ -163,28 +158,15 @@ Column::HasSameWidthAs(Column* column)
 	Constraint* constraint = fLS->AddConstraint(
 		-1.0, fLeft, 1.0, fRight, 1.0, column->fLeft, -1.0, column->fRight,
 		OperatorType(EQ), 0.0);
-	fConstraints->AddItem(constraint);
+	fConstraints.AddItem(constraint);
 	return constraint;
 }
 
 
-/**
- * Gets the constraints.
- */
-BList*
+ConstraintList*
 Column::Constraints() const
 {
-	return fConstraints;
-}
-
-
-/**
- * Sets the constraints.
- */
-void
-Column::SetConstraints(BList* constraints)
-{
-	fConstraints = constraints;
+	return const_cast<ConstraintList*>(&fConstraints);
 }
 
 
@@ -196,8 +178,8 @@ Column::~Column()
 {
 	if (fPrevious != NULL) 
 		fPrevious->SetNext(fNext);
-	for (int32 i = 0; i < fConstraints->CountItems(); i++)
-		delete (Constraint*)fConstraints->ItemAt(i);
+	for (int32 i = 0; i < fConstraints.CountItems(); i++)
+		delete fConstraints.ItemAt(i);
 	delete fLeft;
 	delete fRight;
 }
@@ -211,6 +193,5 @@ Column::Column(LinearSpec* ls)
 	fLS = ls;
 	fLeft = new XTab(ls);
 	fRight = new XTab(ls);
-	fConstraints = new BList(1);
 }
 

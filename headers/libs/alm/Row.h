@@ -6,8 +6,6 @@
 #define	ROW_H
 
 
-#include <List.h>
-
 #include "Constraint.h"
 #include "LinearSpec.h"
 
@@ -22,19 +20,18 @@ class YTab;
  */
 class Row {
 public:
+								~Row();
+
 			YTab*				Top() const;
 			YTab*				Bottom() const;
 			Row*				Previous() const;
-			void					SetPrevious(Row* value);
+			void				SetPrevious(Row* value);
 			Row*				Next() const;
-			void					SetNext(Row* value);
-			//~ string				ToString();
-			void					InsertBefore(Row* row);
-			void					InsertAfter(Row* row);
+			void				SetNext(Row* value);
+			void				InsertBefore(Row* row);
+			void				InsertAfter(Row* row);
 			Constraint*			HasSameHeightAs(Row* row);
-			BList*				Constraints() const;
-			void					SetConstraints(BList* constraints);
-								~Row();
+			ConstraintList*		Constraints() const;
 
 protected:
 								Row(LinearSpec* ls);
@@ -49,7 +46,7 @@ private:
 			Row*				fNext;
 			Constraint*			fPreviousGlue;
 			Constraint*			fNextGlue;
-			BList*				fConstraints;
+			ConstraintList		fConstraints;
 
 public:
 	friend class			BALMLayout;

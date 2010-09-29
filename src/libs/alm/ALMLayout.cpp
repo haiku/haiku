@@ -33,7 +33,8 @@ const BSize kMaxSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 BALMLayout::BALMLayout(float spacing)
 	:
 	fInset(0.0f),
-	fSpacing(spacing)
+	fSpacing(spacing),
+	fCurrentArea(NULL)
 {
 	fLeft = new XTab(&fSolver);
 	fRight = new XTab(&fSolver);
@@ -146,6 +147,56 @@ BALMLayout::AddColumn(XTab* left, XTab* right)
 }
 
 
+/**
+ * Finds the area that contains the given control.
+ *
+ * @param control	the control to look for
+ * @return the area that contains the control
+ */
+Area*
+BALMLayout::AreaFor(const BView* control) const
+{
+	return AreaFor(ItemAt(IndexOfView(const_cast<BView*>(control))));
+}
+
+
+Area*
+BALMLayout::AreaFor(const BLayoutItem* item) const
+{
+	if (!item)
+		return NULL;
+	return static_cast<Area*>(item->LayoutData());
+}
+
+
+Area*
+BALMLayout::CurrentArea() const
+{
+	return fCurrentArea;
+}
+
+
+void
+BALMLayout::SetCurrentArea(const Area* area)
+{
+	fCurrentArea = const_cast<Area*>(area);
+}
+
+
+void
+BALMLayout::SetCurrentArea(const BView* view)
+{
+	fCurrentArea = AreaFor(view);
+}
+
+
+void
+BALMLayout::SetCurrentArea(const BLayoutItem* item)
+{
+	fCurrentArea = AreaFor(item);
+}
+
+
 BLayoutItem*
 BALMLayout::AddView(BView* child)
 {
@@ -206,11 +257,10 @@ BALMLayout::AddView(BView* view, Row* row, Column* column)
 
 
 Area*
-BALMLayout::AddViewToRight(BView* view, Area* leftArea, XTab* right, YTab* top,
-	YTab* bottom)
+BALMLayout::AddViewToRight(BView* view, XTab* right, YTab* top, YTab* bottom)
 {
 	BLayoutItem* item = _CreateLayoutItem(view);
-	Area* area = AddItemToRight(item, leftArea, right, top, bottom);
+	Area* area = AddItemToRight(item, right, top, bottom);
 	if (!area) {
 		delete item;
 		return NULL;
@@ -220,11 +270,10 @@ BALMLayout::AddViewToRight(BView* view, Area* leftArea, XTab* right, YTab* top,
 
 
 Area*
-BALMLayout::AddViewToLeft(BView* view, Area* rightArea, XTab* left, YTab* top,
-	YTab* bottom)
+BALMLayout::AddViewToLeft(BView* view, XTab* left, YTab* top, YTab* bottom)
 {
 	BLayoutItem* item = _CreateLayoutItem(view);
-	Area* area = AddItemToLeft(item, rightArea, left, top, bottom);
+	Area* area = AddItemToLeft(item, left, top, bottom);
 	if (!area) {
 		delete item;
 		return NULL;
@@ -234,11 +283,10 @@ BALMLayout::AddViewToLeft(BView* view, Area* rightArea, XTab* left, YTab* top,
 
 
 Area*
-BALMLayout::AddViewToTop(BView* view, Area* bottomArea, YTab* top, XTab* left,
-	XTab* right)
+BALMLayout::AddViewToTop(BView* view, YTab* top, XTab* left, XTab* right)
 {
 	BLayoutItem* item = _CreateLayoutItem(view);
-	Area* area = AddItemToTop(item, bottomArea, top, left, right);
+	Area* area = AddItemToTop(item, top, left, right);
 	if (!area) {
 		delete item;
 		return NULL;
@@ -248,11 +296,10 @@ BALMLayout::AddViewToTop(BView* view, Area* bottomArea, YTab* top, XTab* left,
 
 
 Area*
-BALMLayout::AddViewToBottom(BView* view, Area* topArea, YTab* bottom,
-	XTab* left, XTab* right)
+BALMLayout::AddViewToBottom(BView* view, YTab* bottom, XTab* left, XTab* right)
 {
 	BLayoutItem* item = _CreateLayoutItem(view);
-	Area* area = AddItemToBottom(item, topArea, bottom, left, right);
+	Area* area = AddItemToBottom(item, bottom, left, right);
 	if (!area) {
 		delete item;
 		return NULL;
@@ -288,7 +335,7 @@ BALMLayout::AddItem(int32 index, BLayoutItem* item)
 	// for index = 0 we already have set the right tabs
 	if (index != 0) {
 		BLayoutItem* prevItem = ItemAt(index - 1);
-		Area* area = _AreaForItem(prevItem);
+		Area* area = AreaFor(prevItem);
 		if (area) {
 			left = area->Right();
 			top = area->Top();
@@ -305,9 +352,10 @@ BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
 {
 	if (!BAbstractLayout::AddItem(-1, item))
 		return NULL;
-	Area* area = _AreaForItem(item);
+	Area* area = AreaFor(item);
 	if (!area)
 		return NULL;
+	fCurrentArea = area;
 
 	area->_Init(&fSolver, left, top, right, bottom);
 	return area;
@@ -319,9 +367,10 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 {
 	if (!BAbstractLayout::AddItem(-1, item))
 		return NULL;
-	Area* area = _AreaForItem(item);
+	Area* area = AreaFor(item);
 	if (!area)
 		return NULL;
+	fCurrentArea = area;
 
 	area->_Init(&fSolver, row, column);
 	return area;
@@ -329,79 +378,65 @@ BALMLayout::AddItem(BLayoutItem* item, Row* row, Column* column)
 
 
 Area*
-BALMLayout::AddItemToRight(BLayoutItem* item, Area* leftArea, XTab* right,
-	YTab* top, YTab* bottom)
+BALMLayout::AddItemToRight(BLayoutItem* item, XTab* right, YTab* top,
+	YTab* bottom)
 {
-	XTab* left = leftArea->Right();
+	XTab* left = fCurrentArea->Right();
 	if (!right)
 		right = AddXTab();
 	if (!top)
-		top = leftArea->Top();
+		top = fCurrentArea->Top();
 	if (!bottom)
-		bottom = leftArea->Bottom();
+		bottom = fCurrentArea->Bottom();
 
 	return AddItem(item, left, top, right, bottom);
 }
 
 
 Area*
-BALMLayout::AddItemToLeft(BLayoutItem* item, Area* rightArea, XTab* left,
-	YTab* top, YTab* bottom)
+BALMLayout::AddItemToLeft(BLayoutItem* item, XTab* left, YTab* top,
+	YTab* bottom)
 {
 	if (!left)
 		left = AddXTab();
-	XTab* right = rightArea->Left();
+	XTab* right = fCurrentArea->Left();
 	if (!top)
-		top = rightArea->Top();
+		top = fCurrentArea->Top();
 	if (!bottom)
-		bottom = rightArea->Bottom();
+		bottom = fCurrentArea->Bottom();
 
 	return AddItem(item, left, top, right, bottom);
 }
 
 
 Area*
-BALMLayout::AddItemToTop(BLayoutItem* item, Area* bottomArea, YTab* top,
-	XTab* left, XTab* right)
+BALMLayout::AddItemToTop(BLayoutItem* item, YTab* top, XTab* left, XTab* right)
 {
 	if (!left)
-		left = bottomArea->Left();
+		left = fCurrentArea->Left();
 	if (!right)
-		right = bottomArea->Right();
+		right = fCurrentArea->Right();
 	if (!top)
 		top = AddYTab();
-	YTab* bottom = bottomArea->Top();
+	YTab* bottom = fCurrentArea->Top();
 
 	return AddItem(item, left, top, right, bottom);
 }
 
 
 Area*
-BALMLayout::AddItemToBottom(BLayoutItem* item, Area* topArea, YTab* bottom,
-	XTab* left, XTab* right)
+BALMLayout::AddItemToBottom(BLayoutItem* item, YTab* bottom, XTab* left,
+	XTab* right)
 {
 	if (!left)
-		left = topArea->Left();
+		left = fCurrentArea->Left();
 	if (!right)
-		right = topArea->Right();
-	YTab* top = topArea->Bottom();
+		right = fCurrentArea->Right();
+	YTab* top = fCurrentArea->Bottom();
 	if (!bottom)
 		bottom = AddYTab();
 
 	return AddItem(item, left, top, right, bottom);
-}
-
-
-/**
- * Finds the area that contains the given control.
- *
- * @param control	the control to look for
- * @return the area that contains the control
- */
-Area*
-BALMLayout::AreaOf(BView* control)
-{
-	return _AreaForItem(ItemAt(IndexOfView(control)));
 }
 
 
@@ -518,7 +553,7 @@ BALMLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
 void
 BALMLayout::ItemRemoved(BLayoutItem* item, int32 fromIndex)
 {
-	if (Area* area = _AreaForItem(item)) {
+	if (Area* area = AreaFor(item)) {
 		item->SetLayoutData(NULL);
 		delete area;
 	}
@@ -554,7 +589,7 @@ BALMLayout::DerivedLayoutItems()
 
 	// set the calculated positions and sizes for every area
 	for (int32 i = 0; i < CountItems(); i++)
-		_AreaForItem(ItemAt(i))->_DoLayout();
+		AreaFor(ItemAt(i))->_DoLayout();
 }
 
 
@@ -583,9 +618,9 @@ BALMLayout::SetPerformancePath(char* path)
 
 
 LinearSpec*
-BALMLayout::Solver()
+BALMLayout::Solver() const
 {
-	return &fSolver;
+	return const_cast<LinearSpec*>(&fSolver);
 }
 
 
@@ -597,7 +632,7 @@ BALMLayout::SetInset(float inset)
 
 
 float
-BALMLayout::Inset()
+BALMLayout::Inset() const
 {
 	return fInset;
 }
@@ -611,7 +646,7 @@ BALMLayout::SetSpacing(float spacing)
 
 
 float
-BALMLayout::Spacing()
+BALMLayout::Spacing() const
 {
 	return fSpacing;
 }
@@ -740,18 +775,9 @@ BALMLayout::_CalculatePreferredSize()
 }
 
 
-Area*
-BALMLayout::_AreaForItem(BLayoutItem* item) const
-{
-	if (!item)
-		return NULL;
-	return static_cast<Area*>(item->LayoutData());
-}
-
-
 void
 BALMLayout::_UpdateAreaConstraints()
 {
 	for (int i = 0; i < CountItems(); i++)
-		_AreaForItem(ItemAt(i))->InvalidateSizeConstraints();
+		AreaFor(ItemAt(i))->InvalidateSizeConstraints();
 }

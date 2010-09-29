@@ -46,29 +46,33 @@ public:
 			char*				PerformancePath() const;
 			void				SetPerformancePath(char* path);
 
-			LinearSpec*			Solver();
+			LinearSpec*			Solver() const;
 
 			void				SetInset(float inset);
-			float				Inset();
+			float				Inset() const;
 
 			void				SetSpacing(float spacing);
-			float				Spacing();
+			float				Spacing() const;
 
+			Area*				AreaFor(const BView* control) const;
+			Area*				AreaFor(const BLayoutItem* item) const;
+			Area*				CurrentArea() const;
+			void				SetCurrentArea(const Area* area);
+			void				SetCurrentArea(const BView* control);
+			void				SetCurrentArea(const BLayoutItem* item);
+	
 	virtual	BLayoutItem*		AddView(BView* child);
 	virtual	BLayoutItem*		AddView(int32 index, BView* child);
 	virtual	Area*				AddView(BView* view, XTab* left, YTab* top,
 									XTab* right, YTab* bottom);
 	virtual	Area*				AddView(BView* view, Row* row, Column* column);
-	virtual	Area*				AddViewToRight(BView* view, Area* leftArea,
-									XTab* right = NULL, YTab* top = NULL,
-									YTab* bottom = NULL);
-	virtual	Area*				AddViewToLeft(BView* view, Area* rightArea,
-									XTab* left = NULL, YTab* top = NULL,
-									YTab* bottom = NULL);
-	virtual	Area*				AddViewToTop(BView* view, Area* bottomArea,
-									YTab* top = NULL, XTab* left = NULL,
-									XTab* right = NULL);
-	virtual	Area*				AddViewToBottom(BView* view, Area* topArea,
+	virtual	Area*				AddViewToRight(BView* view, XTab* right = NULL,
+									YTab* top = NULL, YTab* bottom = NULL);
+	virtual	Area*				AddViewToLeft(BView* view, XTab* left = NULL,
+									YTab* top = NULL, YTab* bottom = NULL);
+	virtual	Area*				AddViewToTop(BView* view, YTab* top = NULL,
+									XTab* left = NULL, XTab* right = NULL);
+	virtual	Area*				AddViewToBottom(BView* view,
 									YTab* bottom = NULL, XTab* left = NULL,
 									XTab* right = NULL);
 
@@ -79,19 +83,17 @@ public:
 	virtual	Area*				AddItem(BLayoutItem* item, Row* row,
 									Column* column);
 	virtual	Area*				AddItemToRight(BLayoutItem* item,
-									Area* leftArea, XTab* right = NULL,
-									YTab* top = NULL, YTab* bottom = NULL);
+									XTab* right = NULL, YTab* top = NULL,
+									YTab* bottom = NULL);
 	virtual	Area*				AddItemToLeft(BLayoutItem* item,
-									Area* rightArea, XTab* left = NULL,
-									YTab* top = NULL, YTab* bottom = NULL);
+									XTab* left = NULL, YTab* top = NULL,
+									YTab* bottom = NULL);
 	virtual	Area*				AddItemToTop(BLayoutItem* item,
-									Area* bottomArea, YTab* top = NULL,
-									XTab* left = NULL, XTab* right = NULL);
+									YTab* top = NULL, XTab* left = NULL,
+									XTab* right = NULL);
 	virtual	Area*				AddItemToBottom(BLayoutItem* item,
-									Area* topArea, YTab* bottom = NULL,
-									XTab* left = NULL, XTab* right = NULL);
-
-	virtual	Area*				AreaOf(BView* control);
+									YTab* bottom = NULL, XTab* left = NULL,
+									XTab* right = NULL);
 
 	virtual	BSize				BaseMinSize();
 	virtual	BSize				BaseMaxSize();
@@ -110,7 +112,6 @@ private:
 
 			void				_SolveLayout();
 
-			Area*				_AreaForItem(BLayoutItem* item) const;
 			void				_UpdateAreaConstraints();
 
 			BSize				_CalculateMinSize();
@@ -131,6 +132,8 @@ private:
 
 			float				fInset;
 			float				fSpacing;
+
+			Area*				fCurrentArea;
 };
 
 }	// namespace BALM
