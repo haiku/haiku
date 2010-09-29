@@ -2410,12 +2410,10 @@ MainWin::_UpdatePlaylistItemFile()
 	attr_info info;
 	status_t status = node.GetAttrInfo(kDurationAttrName, &info);
 	if (status != B_OK || info.size == 0) {
-		time_t duration = fController->TimeDuration() / 1000000L;
-
-		char text[256];
-		duration_to_string(duration, text, sizeof(text));
-		node.WriteAttr(kDurationAttrName, B_STRING_TYPE, 0, text,
-			strlen(text) + 1);
+		bigtime_t duration = fController->TimeDuration();
+		// TODO: Tracker does not seem to care about endian for scalar types
+		node.WriteAttr(kDurationAttrName, B_INT64_TYPE, 0, &duration,
+			sizeof(int64));
 	}
 
 	// Write audio bitrate

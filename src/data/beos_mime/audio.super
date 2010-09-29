@@ -42,7 +42,7 @@ resource(6, "META:ATTR_INFO") message(233) {
 	"attr:type" = 'CSTR',
 	"attr:type" = 'CSTR',
 	"attr:type" = 'LONG',
-	"attr:type" = 'CSTR',
+	"attr:type" = 'LLNG',
 	"attr:type" = 'CSTR',
 	"attr:viewable" = true,
 	"attr:viewable" = true,
@@ -84,6 +84,16 @@ resource(6, "META:ATTR_INFO") message(233) {
 	"attr:alignment" = 0,
 	"attr:alignment" = 1,
 	"attr:alignment" = 1,
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "",
+	"attr:display_as" = "duration",
+	"attr:display_as" = "",
 	"type" = "audio"
 };
 

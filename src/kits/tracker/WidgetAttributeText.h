@@ -206,32 +206,46 @@ union GenericValueStruct {
 };
 
 
+//! Used for displaying mime extra attributes. Supports different formats.
 class GenericAttributeText : public StringAttributeText {
-	// used for displaying mime extra attributes
-	// supports different formats
-	public:
-		GenericAttributeText(const Model *model, const BColumn *column);
-		virtual bool CheckAttributeChanged();
+public:
+								GenericAttributeText(const Model* model,
+									const BColumn* column);
 
-		virtual float PreferredWidth(const BPoseView *view) const;
+	virtual	bool				CheckAttributeChanged();
+	virtual	float				PreferredWidth(const BPoseView* view) const;
 
-		virtual int Compare(WidgetAttributeText &, BPoseView *view);
+	virtual	int					Compare(WidgetAttributeText& other,
+									BPoseView* view);
 
-		virtual void SetUpEditing(BTextView *);
-		virtual bool CommitEditedText(BTextView *);
+	virtual	void				SetUpEditing(BTextView* view);
+	virtual	bool				CommitEditedText(BTextView* view);
 
-		virtual const char *ValueAsText(const BPoseView *view);
+	virtual	const char*			ValueAsText(const BPoseView* view);
 
-	private:
-		virtual bool CommitEditedTextFlavor(BTextView *);
+protected:
+	virtual	bool				CommitEditedTextFlavor(BTextView* view);
 
-		virtual void FitValue(BString *result, const BPoseView *);
-		virtual void ReadValue(BString *result);
+	virtual	void				FitValue(BString* result,
+									const BPoseView* view);
+	virtual void				ReadValue(BString* result);
 
-		// TODO:
-		// split this up into a scalar flavor and string flavor
-		// to save memory
-		GenericValueStruct fValue;
+protected:
+	// TODO: split this up into a scalar flavor and string flavor
+	// to save memory
+			GenericValueStruct	fValue;
+};
+
+
+//! Used for the display-as type "duration"
+class DurationAttributeText : public GenericAttributeText {
+public:
+								DurationAttributeText(const Model* model,
+									const BColumn* column);
+
+private:
+	virtual	void				FitValue(BString* result,
+									const BPoseView* view);
 };
 
 

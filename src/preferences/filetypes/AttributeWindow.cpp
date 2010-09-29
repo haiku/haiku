@@ -280,6 +280,9 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 
 	target->PlaceSubWindow(this);
 	AddToSubset(target);
+
+	_CheckDisplayAs();
+	_CheckAcceptable();
 }
 
 

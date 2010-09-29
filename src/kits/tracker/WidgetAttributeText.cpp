@@ -250,6 +250,11 @@ WidgetAttributeText::NewWidgetText(const Model* model,
 	if (strcmp(attrName, kAttrOriginalPath) == 0)
 		return new OriginalPathAttributeText(model, column);
 
+	if (column->DisplayAs() != NULL) {
+		if (!strncmp(column->DisplayAs(), "duration", 8))
+			return new DurationAttributeText(model, column);
+	}
+
 	return new GenericAttributeText(model, column);
 }
 
@@ -1057,7 +1062,8 @@ GenericAttributeText::CheckAttributeChanged()
 
 	// fDirty could already be true, in that case we mustn't set it to
 	// false, even if the attribute text hasn't changed
-	bool changed = (fValue.int64t != tmpValue.int64t) || (tmpString != fFullValueText);
+	bool changed = fValue.int64t != tmpValue.int64t
+		|| tmpString != fFullValueText;
 	if (changed)
 		fDirty = true;
 
@@ -1640,6 +1646,88 @@ GenericAttributeText::CommitEditedTextFlavor(BTextView* textView)
 
 	fValueIsDefined = true;
 	return true;
+}
+
+
+// #pragma mark - display as: duration
+
+
+DurationAttributeText::DurationAttributeText(const Model* model,
+	const BColumn* column)
+	:
+	GenericAttributeText(model, column)
+{
+}
+
+
+// TODO: support editing!
+
+
+void
+DurationAttributeText::FitValue(BString* result, const BPoseView* view)
+{
+	if (fValueDirty)
+		ReadValue(&fFullValueText);
+
+	fOldWidth = fColumn->Width();
+	fDirty = false;
+
+	if (!fValueIsDefined) {
+		*result = "-";
+		fTruncatedWidth = TruncString(result, fFullValueText.String(),
+			fFullValueText.Length(), view, fOldWidth);
+		return;
+	}
+
+	int64 time = 0;
+
+	switch (fColumn->AttrType()) {
+		case B_TIME_TYPE:
+			time = fValue.time_tt * 1000000LL;
+			break;
+
+		case B_INT8_TYPE:
+			time = fValue.int8t * 1000000LL;
+			break;
+
+		case B_INT16_TYPE:
+			time = fValue.int16t * 1000000LL;
+			break;
+
+		case B_INT32_TYPE:
+			time = fValue.int32t * 1000000LL;
+			break;
+
+		case B_INT64_TYPE:
+			time = fValue.int64t;
+			break;
+	}
+
+	// TODO: ignores micro seconds for now
+	int32 seconds = time / 1000000LL;
+
+	bool negative = seconds < 0;
+	if (negative)
+		seconds = -seconds;
+
+	int32 hours = seconds / 3600;
+	seconds -= hours * 3600;
+	int32 minutes = seconds / 60;
+	seconds = seconds % 60;
+
+	char buffer[256];
+	if (hours > 0) {
+		snprintf(buffer, sizeof(buffer), "%s%ld:%02ld:%02ld",
+			negative ? "-" : "", hours, minutes, seconds);
+	} else {
+		snprintf(buffer, sizeof(buffer), "%s%ld:%02ld",
+			negative ? "-" : "", minutes, seconds);
+	}
+
+	fFullValueText = buffer;
+
+	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		fFullValueText.Length(), view, fOldWidth);
 }
 
 

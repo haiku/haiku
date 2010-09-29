@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,6 +27,8 @@ const struct type_map kTypeMap[] = {
 const struct display_as_map kDisplayAsMap[] = {
 	{"Default",		NULL,		{}},
 	{"Rating",		"rating",	{B_INT32_TYPE, B_INT8_TYPE, B_INT16_TYPE}},
+	{"Duration",	"duration",
+		{B_TIME_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE, B_INT64_TYPE}},
 	{NULL,			NULL,		{}}
 };
 
@@ -126,7 +128,8 @@ create_attribute_item(BMessage& attributes, int32 index)
 AttributeItem::AttributeItem(const char* name, const char* publicName,
 		type_code type, const char* displayAs, int32 alignment,
 		int32 width, bool visible, bool editable)
-	: BStringItem(publicName),
+	:
+	BStringItem(publicName),
 	fName(name),
 	fType(type),
 	fDisplayAs(displayAs),
@@ -139,7 +142,8 @@ AttributeItem::AttributeItem(const char* name, const char* publicName,
 
 
 AttributeItem::AttributeItem()
-	: BStringItem(""),
+	:
+	BStringItem(""),
 	fType(B_STRING_TYPE),
 	fAlignment(B_ALIGN_LEFT),
 	fWidth(60),
@@ -150,7 +154,8 @@ AttributeItem::AttributeItem()
 
 
 AttributeItem::AttributeItem(const AttributeItem& other)
-	: BStringItem(other.PublicName())
+	:
+	BStringItem(other.PublicName())
 {
 	*this = other;
 }
@@ -179,7 +184,8 @@ AttributeItem::DrawItem(BView* owner, BRect frame, bool drawEverything)
 	else
 		owner->SetHighColor(black);
 
-	owner->MovePenTo(frame.left + frame.Width() / 2.0f + 5.0f, owner->PenLocation().y);
+	owner->MovePenTo(frame.left + frame.Width() / 2.0f + 5.0f,
+		owner->PenLocation().y);
 
 	BString type;
 	name_for_type(type, fType, fDisplayAs.String());
