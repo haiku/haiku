@@ -38,15 +38,15 @@ All rights reserved.
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <ControlLook.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
-#include <SpaceLayoutItem.h>
-#include <SeparatorView.h>
 #include <Message.h>
 #include <RadioButton.h>
+#include <SeparatorView.h>
+#include <SpaceLayoutItem.h>
 #include <Window.h>
 
 #include <MountServer.h>
