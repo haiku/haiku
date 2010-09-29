@@ -38,6 +38,7 @@ All rights reserved.
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <CheckBox.h>
 #include <Debug.h>
 #include <LayoutBuilder.h>
@@ -100,17 +101,17 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 	BBox("", B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_NO_BORDER),
 	fTarget(target)
 {
-	const float spacing = 8;
+	const float spacing = be_control_look->DefaultItemSpacing();
 
 	// "Automatic Disk Mounting" group
 
 	BBox* autoMountBox = new BBox("autoMountBox", B_WILL_DRAW | B_FRAME_EVENTS
 		| B_PULSE_NEEDED | B_NAVIGABLE_JUMP);
 	autoMountBox->SetLabel(B_TRANSLATE("Automatic disk mounting"));
-	BGroupLayout* autoMountLayout = new BGroupLayout(B_VERTICAL, spacing);
+	BGroupLayout* autoMountLayout = new BGroupLayout(B_VERTICAL, 0);
 	autoMountBox->SetLayout(autoMountLayout);
 	autoMountLayout->SetInsets(spacing,
-		autoMountBox->InnerFrame().top + spacing, spacing, spacing);
+		autoMountBox->InnerFrame().top + spacing / 2, spacing, spacing);
 
 	fScanningDisabledCheck = new BRadioButton("scanningOff",
 		B_TRANSLATE("Don't automount"),
@@ -127,10 +128,10 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 	BBox* bootMountBox = new BBox("", B_WILL_DRAW | B_FRAME_EVENTS
 		| B_PULSE_NEEDED | B_NAVIGABLE_JUMP);
 	bootMountBox->SetLabel(B_TRANSLATE("Disk mounting during boot"));
-	BGroupLayout* bootMountLayout = new BGroupLayout(B_VERTICAL, spacing);
+	BGroupLayout* bootMountLayout = new BGroupLayout(B_VERTICAL, 0);
 	bootMountBox->SetLayout(bootMountLayout);
 	bootMountLayout->SetInsets(spacing,
-		bootMountBox->InnerFrame().top + spacing, spacing, spacing);
+		bootMountBox->InnerFrame().top + spacing / 2, spacing, spacing);
 
 	fInitialDontMountCheck = new BRadioButton("initialNone",
 		B_TRANSLATE("Only the boot disk"),
@@ -184,11 +185,10 @@ AutomountSettingsPanel::AutomountSettingsPanel(BMessage* settings,
 			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL/*, B_FANCY_BORDER*/))
 		.AddGroup(B_HORIZONTAL, spacing)
-			.SetInsets(spacing, spacing, spacing, spacing)
+			.SetInsets(0, spacing, spacing, spacing)
 			.AddGlue()
 			.Add(fMountAllNow)
 			.Add(fDone);
-
 
 	// Apply the settings
 
