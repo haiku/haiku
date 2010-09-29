@@ -75,7 +75,6 @@ private:
 			AVFormatContext*	fContext;
 			AVStream*			fStream;
 			AVPacket			fPacket;
-			bool				fCalculatePTS;
 			// Since different threads may write to the target,
 			// we need to protect the file position and I/O by a lock.
 			BLocker*			fStreamLock;
@@ -88,7 +87,6 @@ AVFormatWriter::StreamCookie::StreamCookie(AVFormatContext* context,
 	:
 	fContext(context),
 	fStream(NULL),
-	fCalculatePTS(false),
 	fStreamLock(streamLock)
 {
 	av_init_packet(&fPacket);
@@ -160,8 +158,6 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 		// Some formats want stream headers to be separate
 		if ((fContext->oformat->flags & AVFMT_GLOBALHEADER) != 0)
 			fStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
-
-		fCalculatePTS = true;
 	} else if (format->type == B_MEDIA_RAW_AUDIO) {
 		fStream->codec->codec_type = CODEC_TYPE_AUDIO;
 #if GET_CONTEXT_DEFAULTS
@@ -170,11 +166,6 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 #endif
 		// frame rate
 		fStream->codec->sample_rate = (int)format->u.raw_audio.frame_rate;
-// NOTE: API example does not do this:
-//		fStream->codec->time_base.den = (int)format->u.raw_audio.frame_rate;
-//		fStream->codec->time_base.num = 1;
-//		fStream->time_base.den = (int)format->u.raw_audio.frame_rate;
-//		fStream->time_base.num = 1;
 
 		// channels
 		fStream->codec->channels = format->u.raw_audio.channel_count;
@@ -233,8 +224,6 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
 			fStream->codec->channel_layout = format->u.raw_audio.channel_mask;
 		}
-
-		fCalculatePTS = false;
 	}
 
 	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
@@ -249,8 +238,9 @@ status_t
 AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	size_t chunkSize, media_encode_info* encodeInfo)
 {
-	TRACE_PACKET("AVFormatWriter::StreamCookie::WriteChunk(%p, %ld, "
-		"start_time: %lld)\n", chunkBuffer, chunkSize, encodeInfo->start_time);
+	TRACE_PACKET("AVFormatWriter::StreamCookie[%d]::WriteChunk(%p, %ld, "
+		"start_time: %lld)\n", fStream->index, chunkBuffer, chunkSize,
+		encodeInfo->start_time);
 
 	BAutolock _(fStreamLock);
 
@@ -260,14 +250,13 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	fPacket.data = const_cast<uint8_t*>((const uint8_t*)chunkBuffer);
 	fPacket.size = chunkSize;
 
-	if (fCalculatePTS) {
-		fPacket.pts = (encodeInfo->start_time
-			* fStream->time_base.den / fStream->time_base.num) / 1000000;
-		TRACE_PACKET("  PTS: %lld  (stream->time_base: (%d/%d), "
-			"codec->time_base: (%d/%d))\n", fPacket.pts,
-			fStream->time_base.num, fStream->time_base.den,
-			fStream->codec->time_base.num, fStream->codec->time_base.den);
-	}
+	fPacket.pts = int64_t((double)encodeInfo->start_time
+		* fStream->time_base.den / (1000000.0 * fStream->time_base.num)
+		+ 0.5);
+	TRACE_PACKET("  PTS: %lld  (stream->time_base: (%d/%d), "
+		"codec->time_base: (%d/%d))\n", fPacket.pts,
+		fStream->time_base.num, fStream->time_base.den,
+		fStream->codec->time_base.num, fStream->codec->time_base.den);
 
 // From ffmpeg.c::do_audio_out():
 // TODO:
@@ -315,7 +304,6 @@ AVFormatWriter::AVFormatWriter()
 	:
 	fContext(avformat_alloc_context()),
 	fHeaderWritten(false),
-	fIOBuffer(NULL),
 	fStreamLock("stream lock")
 {
 	TRACE("AVFormatWriter::AVFormatWriter\n");
@@ -339,8 +327,7 @@ AVFormatWriter::~AVFormatWriter()
     }
 
 	av_free(fContext);
-
-	delete[] fIOBuffer;
+	av_free(fIOContext.buffer);
 }
 
 
@@ -352,14 +339,13 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 {
 	TRACE("AVFormatWriter::Init()\n");
 
-	delete[] fIOBuffer;
-	fIOBuffer = new(std::nothrow) uint8[kIOBufferSize];
-	if (fIOBuffer == NULL)
+	uint8* buffer = static_cast<uint8*>(av_malloc(kIOBufferSize));
+	if (buffer == NULL)
 		return B_NO_MEMORY;
 
 	// Init I/O context with buffer and hook functions, pass ourself as
 	// cookie.
-	if (init_put_byte(&fIOContext, fIOBuffer, kIOBufferSize, 0, this,
+	if (init_put_byte(&fIOContext, buffer, kIOBufferSize, 1, this,
 			0, _Write, _Seek) != 0) {
 		TRACE("  init_put_byte() failed!\n");
 		return B_ERROR;
@@ -369,7 +355,7 @@ AVFormatWriter::Init(const media_file_format* fileFormat)
 	fContext->pb = &fIOContext;
 
 	// Set the AVOutputFormat according to fileFormat...
-	fContext->oformat = guess_format(fileFormat->short_name,
+	fContext->oformat = av_guess_format(fileFormat->short_name,
 		fileFormat->file_extension, fileFormat->mime_type);
 	if (fContext->oformat == NULL) {
 		TRACE("  failed to find AVOuputFormat for %s\n",
@@ -430,10 +416,11 @@ AVFormatWriter::CommitHeader()
 	int result = av_write_header(fContext);
 	if (result < 0)
 		TRACE("  av_write_header(): %d\n", result);
-	else
-		fHeaderWritten = true;
 
-	#if TRACE_AVFORMAT_WRITER
+	// We need to close the codecs we opened, even in case of failure.
+	fHeaderWritten = true;
+
+	#ifdef TRACE_AVFORMAT_WRITER
 	TRACE("  wrote header\n");
 	for (unsigned i = 0; i < fContext->nb_streams; i++) {
 		AVStream* stream = fContext->streams[i];

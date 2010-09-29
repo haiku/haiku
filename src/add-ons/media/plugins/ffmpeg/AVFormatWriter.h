@@ -46,17 +46,15 @@ public:
 private:
 	static	int					_Write(void* cookie, uint8* buffer,
 									int bufferSize);
-
 	static	off_t				_Seek(void* cookie, off_t offset, int whence);
 
 private:
-	class StreamCookie;
+			class StreamCookie;
 
 			AVFormatContext*	fContext;
 			bool				fHeaderWritten;
 
 			ByteIOContext		fIOContext;
-			uint8*				fIOBuffer;
 
 			StreamCookie**		fStreams;
 			BLocker				fStreamLock;
