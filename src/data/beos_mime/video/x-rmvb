@@ -1,0 +1,16 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "video/x-rmvb";
+
+resource(2, "META:S:DESC") #'MSDC' "RealMedia Movie";
+
+resource(3, "META:L:DESC") #'MLDC' "RealMedia Variable Bitrate movie";
+
+resource(4, "META:EXTENS") message(234) {
+	"extensions" = "rmvb",
+	"type" = "video/x-rmvb"
+};
+
+resource(5, "META:SNIFF_RULE") "0.50 (\".RMF\")";
+
