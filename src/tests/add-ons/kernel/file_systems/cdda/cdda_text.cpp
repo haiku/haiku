@@ -1,16 +1,17 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include "cdda.h"
-#include "cddb.h"
-
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+
+#include "cdda.h"
+#include "cddb.h"
 
 
 extern const char* __progname;
@@ -46,8 +47,11 @@ main(int argc, char** argv)
 
 	uint8 buffer[1024];
 	scsi_toc_toc *toc = (scsi_toc_toc *)buffer;
-	if (read_table_of_contents(fd, toc, sizeof(buffer)) < 0) {
-		fprintf(stderr, "%s: Retrieving TOC failed", __progname);
+
+	status_t status = read_table_of_contents(fd, toc, sizeof(buffer));
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Retrieving TOC failed: %s\n", __progname,
+			strerror(status));
 		return -1;
 	}
 
