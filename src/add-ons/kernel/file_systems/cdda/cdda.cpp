@@ -285,6 +285,13 @@ is_string_id(uint8 id)
 }
 
 
+/*!	Parses a \a pack data into the provided text buffer; the corresponding
+	track number will be left in \a track, and the type of the data in \a id.
+	The pack data is explained in SCSI MMC-3.
+
+	\a id, \a track, and \a state must stay constant between calls to this
+	function. \a state must be initialized to zero for the first call.
+*/
 static bool
 parse_pack_data(cdtext_pack_data *&pack, uint32 &packLeft,
 	cdtext_pack_data *&lastPack, uint8 &id, uint8 &track, uint8 &state,
@@ -299,6 +306,7 @@ parse_pack_data(cdtext_pack_data *&pack, uint32 &packLeft,
 	if (state != 0) {
 		// we had a terminated string and a missing track
 		track++;
+
 		memcpy(buffer, lastPack->text + state, 12 - state);
 		if (pack->track - track == 1)
 			state = 0;
@@ -319,12 +327,14 @@ parse_pack_data(cdtext_pack_data *&pack, uint32 &packLeft,
 	}
 
 	while (id == pack->id && track == pack->track) {
-#if 1
+#if 0
 		dprintf("%u.%u.%u, %u.%u.%u, ", pack->id, pack->track, pack->number,
 			pack->double_byte, pack->block_number, pack->character_position);
 		for (int32 i = 0; i < 12; i++) {
 			if (isprint(pack->text[i]))
 				dprintf("%c", pack->text[i]);
+			else
+				dprintf("-");
 		}
 		dprintf("\n");
 #endif
@@ -520,11 +530,12 @@ read_cdtext(int fd, struct cdtext &cdtext)
 	cdtext_pack_data *pack = (cdtext_pack_data *)(header + 1);
 	cdtext_pack_data *lastPack = NULL;
 	uint8 state = 0;
+	uint8 track = 0;
+	uint8 id = 0;
 	char text[256];
 
 	while (true) {
 		size_t length = sizeof(text);
-		uint8 id = 0, track = 0;
 
 		if (!parse_pack_data(pack, packLength, lastPack, id, track,
 				state, text, length))
