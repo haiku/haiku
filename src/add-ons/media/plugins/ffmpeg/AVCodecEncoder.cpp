@@ -531,6 +531,8 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
 		return B_ERROR;
 	}
+	if (usedBytes == 0)
+		return B_OK;
 
 	// Maybe we need to use this PTS to calculate start_time:
 	if (fContext->coded_frame->pts != kNoPTSValue) {
