@@ -38,32 +38,32 @@ their respective holders. All rights reserved.
 #include <string.h>
 #include <stdlib.h>
 
-#include <Debug.h>
+#include "NavMenu.h"
 
-#include <StopWatch.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <Debug.h>
 #include <Directory.h>
 #include <Locale.h>
 #include <Query.h>
 #include <Path.h>
 #include <Screen.h>
-#include <VolumeRoster.h>
+#include <StopWatch.h>
 #include <Volume.h>
+#include <VolumeRoster.h>
 
 #include "Attributes.h"
 #include "Commands.h"
 #include "ContainerWindow.h"
 #include "DesktopPoseView.h"
+#include "FunctionObject.h"
 #include "Tracker.h"
 #include "FSUtils.h"
 #include "IconMenuItem.h"
 #include "MimeTypes.h"
-#include "NavMenu.h"
+#include "QueryPoseView.h"
 #include "PoseView.h"
 #include "Thread.h"
-#include "FunctionObject.h"
-#include "QueryPoseView.h"
 
 
 namespace BPrivate {
