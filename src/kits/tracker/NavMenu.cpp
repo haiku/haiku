@@ -45,8 +45,8 @@ their respective holders. All rights reserved.
 #include <Debug.h>
 #include <Directory.h>
 #include <Locale.h>
-#include <Query.h>
 #include <Path.h>
+#include <Query.h>
 #include <Screen.h>
 #include <StopWatch.h>
 #include <Volume.h>
@@ -57,13 +57,13 @@ their respective holders. All rights reserved.
 #include "ContainerWindow.h"
 #include "DesktopPoseView.h"
 #include "FunctionObject.h"
-#include "Tracker.h"
 #include "FSUtils.h"
 #include "IconMenuItem.h"
 #include "MimeTypes.h"
-#include "QueryPoseView.h"
 #include "PoseView.h"
+#include "QueryPoseView.h"
 #include "Thread.h"
+#include "Tracker.h"
 
 
 namespace BPrivate {
