@@ -251,8 +251,12 @@ WidgetAttributeText::NewWidgetText(const Model* model,
 		return new OriginalPathAttributeText(model, column);
 
 	if (column->DisplayAs() != NULL) {
+		if (!strncmp(column->DisplayAs(), "checkbox", 8))
+			return new CheckboxAttributeText(model, column);
 		if (!strncmp(column->DisplayAs(), "duration", 8))
 			return new DurationAttributeText(model, column);
+		if (!strncmp(column->DisplayAs(), "rating", 6))
+			return new RatingAttributeText(model, column);
 	}
 
 	return new GenericAttributeText(model, column);
@@ -1725,6 +1729,157 @@ DurationAttributeText::FitValue(BString* result, const BPoseView* view)
 	}
 
 	fFullValueText = buffer;
+
+	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		fFullValueText.Length(), view, fOldWidth);
+}
+
+
+// #pragma mark - display as: checkbox
+
+
+CheckboxAttributeText::CheckboxAttributeText(const Model* model,
+	const BColumn* column)
+	:
+	GenericAttributeText(model, column),
+	fOnChar("✖"),
+	fOffChar("-")
+{
+	// TODO: better have common data in the column object!
+	if (const char* separator = strchr(column->DisplayAs(), ':')) {
+		BString chars(separator + 1);
+		int32 length;
+		const char* c = chars.CharAt(0, &length);
+		fOnChar.SetTo(c, length);
+		if (c[length]) {
+			c = chars.CharAt(1, &length);
+			fOffChar.SetTo(c, length);
+		}
+	}
+}
+
+
+void
+CheckboxAttributeText::SetUpEditing(BTextView* view)
+{
+	// TODO: support editing for real!
+	BString result;
+	GenericAttributeText::FitValue(&result, NULL);
+	GenericAttributeText::SetUpEditing(view);
+}
+
+
+void
+CheckboxAttributeText::FitValue(BString* result, const BPoseView* view)
+{
+	if (fValueDirty)
+		ReadValue(&fFullValueText);
+
+	fOldWidth = fColumn->Width();
+	fDirty = false;
+
+	if (!fValueIsDefined) {
+		*result = fOffChar;
+		fTruncatedWidth = TruncString(result, fFullValueText.String(),
+			fFullValueText.Length(), view, fOldWidth);
+		return;
+	}
+
+	bool checked = false;
+
+	switch (fColumn->AttrType()) {
+		case B_BOOL_TYPE:
+			checked = fValue.boolt;
+			break;
+
+		case B_INT8_TYPE:
+		case B_UINT8_TYPE:
+			checked = fValue.int8t != 0;
+			break;
+
+		case B_INT16_TYPE:
+		case B_UINT16_TYPE:
+			checked = fValue.int16t != 0;
+			break;
+
+		case B_INT32_TYPE:
+		case B_UINT32_TYPE:
+			checked = fValue.int32t != 0;
+			break;
+	}
+
+	fFullValueText = checked ? fOnChar : fOffChar;
+
+	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		fFullValueText.Length(), view, fOldWidth);
+}
+
+
+// #pragma mark - display as: rating
+
+
+RatingAttributeText::RatingAttributeText(const Model* model,
+	const BColumn* column)
+	:
+	GenericAttributeText(model, column),
+	fCount(5),
+	fMax(10)
+{
+	// TODO: support different star counts/max via specifier
+}
+
+
+void
+RatingAttributeText::SetUpEditing(BTextView* view)
+{
+	// TODO: support editing for real!
+	BString result;
+	GenericAttributeText::FitValue(&result, NULL);
+	GenericAttributeText::SetUpEditing(view);
+}
+
+
+void
+RatingAttributeText::FitValue(BString* result, const BPoseView* view)
+{
+	if (fValueDirty)
+		ReadValue(&fFullValueText);
+
+	fOldWidth = fColumn->Width();
+	fDirty = false;
+
+	int64 rating = 0;
+
+	if (fValueIsDefined) {
+		switch (fColumn->AttrType()) {
+			case B_INT8_TYPE:
+				rating = fValue.int8t;
+				break;
+
+			case B_INT16_TYPE:
+				rating = fValue.int16t;
+				break;
+
+			case B_INT32_TYPE:
+				rating = fValue.int32t;
+				break;
+		}
+	}
+
+	if (rating > fMax)
+		rating = fMax;
+	if (rating < 0)
+		rating = 0;
+
+	int32 steps = fMax / fCount;
+	fFullValueText = "";
+
+	for (int32 i = 0; i < fCount; i++) {
+		if (rating > i * steps)
+			fFullValueText += "★";
+		else
+			fFullValueText += "☆";
+	}
 
 	fTruncatedWidth = TruncString(result, fFullValueText.String(),
 		fFullValueText.Length(), view, fOldWidth);

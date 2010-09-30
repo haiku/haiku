@@ -68,9 +68,9 @@ compare_display_as(const char* a, const char* b)
 	if (emptyA || emptyB)
 		return false;
 
-	const char* end = strstr(a, ": ");
+	const char* end = strchr(a, ':');
 	int32 lengthA = end ? end - a : strlen(a);
-	end = strstr(b, ": ");
+	end = strchr(b, ':');
 	int32 lengthB = end ? end - b : strlen(b);
 
 	if (lengthA != lengthB)
@@ -83,9 +83,9 @@ compare_display_as(const char* a, const char* b)
 static const char*
 display_as_parameter(const char* special)
 {
-	const char* parameter = strstr(special, ": ");
+	const char* parameter = strchr(special, ':');
 	if (parameter != NULL)
-		return parameter + 2;
+		return parameter + 1;
 
 	return NULL;
 }
@@ -392,7 +392,7 @@ AttributeWindow::_NewItemFromCurrent()
 			displayAs = identifier;
 
 			if (fSpecialControl->Text() && fSpecialControl->Text()[0]) {
-				displayAs += ": ";
+				displayAs += ":";
 				displayAs += fSpecialControl->Text();
 			}
 		}

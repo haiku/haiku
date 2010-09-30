@@ -249,6 +249,42 @@ private:
 };
 
 
+//! Used for the display-as type "checkbox"
+class CheckboxAttributeText : public GenericAttributeText {
+public:
+								CheckboxAttributeText(const Model* model,
+									const BColumn* column);
+
+	virtual	void				SetUpEditing(BTextView* view);
+
+private:
+	virtual	void				FitValue(BString* result,
+									const BPoseView* view);
+
+private:
+			BString				fOnChar;
+			BString				fOffChar;
+};
+
+
+//! Used for the display-as type "rating"
+class RatingAttributeText : public GenericAttributeText {
+public:
+								RatingAttributeText(const Model* model,
+									const BColumn* column);
+
+	virtual	void				SetUpEditing(BTextView* view);
+
+private:
+	virtual	void				FitValue(BString* result,
+									const BPoseView* view);
+
+private:
+			int32				fCount;
+			int32				fMax;
+};
+
+
 class TimeAttributeText : public ScalarAttributeText {
 	public:
 		TimeAttributeText(const Model *, const BColumn *);

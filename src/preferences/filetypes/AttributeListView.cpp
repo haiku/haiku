@@ -26,9 +26,11 @@ const struct type_map kTypeMap[] = {
 //	as well as a nice GUI for them.
 const struct display_as_map kDisplayAsMap[] = {
 	{"Default",		NULL,		{}},
-	{"Rating",		"rating",	{B_INT32_TYPE, B_INT8_TYPE, B_INT16_TYPE}},
+	{"Checkbox",	"checkbox",
+		{B_BOOL_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE}},
 	{"Duration",	"duration",
 		{B_TIME_TYPE, B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE, B_INT64_TYPE}},
+	{"Rating",		"rating",	{B_INT8_TYPE, B_INT16_TYPE, B_INT32_TYPE}},
 	{NULL,			NULL,		{}}
 };
 
@@ -40,7 +42,7 @@ add_display_as(BString& string, const char* displayAs)
 		return;
 
 	BString base(displayAs);
-	int32 end = base.FindFirst(": ");
+	int32 end = base.FindFirst(':');
 	if (end > 0)
 		base.Truncate(end);
 
