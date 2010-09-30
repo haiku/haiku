@@ -15,8 +15,7 @@
 #include "Column.h"
 #include "LinearSpec.h"
 #include "Row.h"
-#include "XTab.h"
-#include "YTab.h"
+#include "Tab.h"
 
 
 class Constraint;

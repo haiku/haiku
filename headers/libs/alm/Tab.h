@@ -18,25 +18,37 @@ namespace BALM {
  */
 class XTab : public Variable {
 protected:
-								XTab(LinearSpec* ls);
-
-protected:
-			/**
-			* Property signifying if there is a constraint which relates
-			* this tab to a different tab that is further to the left.
-			* Only used for reverse engineering.
-			*/
-			bool				fLeftLink;
+	XTab(LinearSpec* ls)
+		:
+		Variable(ls)
+	{
+		
+	}
 
 public:
-	friend class			Area;
-	friend class			Column;
-	friend class			BALMLayout;
-
+	friend	class				BALMLayout;
+	friend	class				Column;
 };
+
+
+class YTab : public Variable {
+protected:
+	YTab(LinearSpec* ls)
+		:
+		Variable(ls)
+	{
+		
+	}
+
+public:
+	friend	class				BALMLayout;
+	friend	class				Row;
+};
+
 
 }	// namespace BALM
 
 using BALM::XTab;
+using BALM::YTab;
 
 #endif	// X_TAB_H

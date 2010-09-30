@@ -12,8 +12,6 @@ SharedLibrary libalm.so :
 	Column.cpp
 	ALMLayout.cpp
 	Row.cpp
-	XTab.cpp
-	YTab.cpp
 	:
 	be liblpsolve55.so liblinprog.so $(TARGET_LIBSUPC++)
 ;

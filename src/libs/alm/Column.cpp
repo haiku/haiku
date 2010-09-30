@@ -9,7 +9,7 @@
 
 #include "ALMLayout.h"
 #include "OperatorType.h"
-#include "XTab.h"
+#include "Tab.h"
 
 #include <SupportDefs.h>
 

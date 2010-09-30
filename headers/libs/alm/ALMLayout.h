@@ -17,8 +17,7 @@
 #include "Column.h"
 #include "LinearSpec.h"
 #include "Row.h"
-#include "XTab.h"
-#include "YTab.h"
+#include "Tab.h"
 
 
 namespace BALM {
@@ -54,17 +53,26 @@ public:
 			void				SetSpacing(float spacing);
 			float				Spacing() const;
 
-			Area*				AreaFor(const BView* control) const;
+			Area*				AreaFor(const BView* view) const;
 			Area*				AreaFor(const BLayoutItem* item) const;
 			Area*				CurrentArea() const;
 			void				SetCurrentArea(const Area* area);
-			void				SetCurrentArea(const BView* control);
+			void				SetCurrentArea(const BView* view);
 			void				SetCurrentArea(const BLayoutItem* item);
 	
+			XTab*				LeftOf(const BView* view) const;
+			XTab*				LeftOf(const BLayoutItem* item) const;
+			XTab*				RightOf(const BView* view) const;
+			XTab*				RightOf(const BLayoutItem* item) const;
+			YTab*				TopOf(const BView* view) const;
+			YTab*				TopOf(const BLayoutItem* item) const;
+			YTab*				BottomOf(const BView* view) const;
+			YTab*				BottomOf(const BLayoutItem* item) const;
+
 	virtual	BLayoutItem*		AddView(BView* child);
 	virtual	BLayoutItem*		AddView(int32 index, BView* child);
 	virtual	Area*				AddView(BView* view, XTab* left, YTab* top,
-									XTab* right, YTab* bottom);
+									XTab* right = NULL, YTab* bottom = NULL);
 	virtual	Area*				AddView(BView* view, Row* row, Column* column);
 	virtual	Area*				AddViewToRight(BView* view, XTab* right = NULL,
 									YTab* top = NULL, YTab* bottom = NULL);
@@ -79,7 +87,8 @@ public:
 	virtual	bool				AddItem(BLayoutItem* item);
 	virtual	bool				AddItem(int32 index, BLayoutItem* item);
 	virtual	Area*				AddItem(BLayoutItem* item, XTab* left,
-									YTab* top, XTab* right, YTab* bottom);
+									YTab* top, XTab* right = NULL,
+									YTab* bottom = NULL);
 	virtual	Area*				AddItem(BLayoutItem* item, Row* row,
 									Column* column);
 	virtual	Area*				AddItemToRight(BLayoutItem* item,

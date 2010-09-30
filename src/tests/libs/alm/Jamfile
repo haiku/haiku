@@ -12,8 +12,8 @@ Application ALMHelloWorld :
 	be liblpsolve55.so liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
-Application ALMTwoViews :
-	TwoViews.cpp
+Application ALMViews :
+	Views.cpp
 	:
 	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;

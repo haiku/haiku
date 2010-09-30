@@ -13,12 +13,7 @@
 
 #include "ViewLayoutItem.h"
 
-#include "Area.h"
-#include "Column.h"
 #include "ResultType.h"
-#include "Row.h"
-#include "XTab.h"
-#include "YTab.h"
 
 
 const BSize kUnsetSize(B_SIZE_UNSET, B_SIZE_UNSET);
@@ -197,6 +192,62 @@ BALMLayout::SetCurrentArea(const BLayoutItem* item)
 }
 
 
+XTab*
+BALMLayout::LeftOf(const BView* view) const
+{
+	return AreaFor(view)->Left();
+}
+
+
+XTab*
+BALMLayout::LeftOf(const BLayoutItem* item) const
+{
+	return AreaFor(item)->Left();
+}
+
+
+XTab*
+BALMLayout::RightOf(const BView* view) const
+{
+	return AreaFor(view)->Right();
+}
+
+
+XTab*
+BALMLayout::RightOf(const BLayoutItem* item) const
+{
+	return AreaFor(item)->Right();
+}
+
+
+YTab*
+BALMLayout::TopOf(const BView* view) const
+{
+	return AreaFor(view)->Top();
+}
+
+
+YTab*
+BALMLayout::TopOf(const BLayoutItem* item) const
+{
+	return AreaFor(item)->Top();
+}
+
+
+YTab*
+BALMLayout::BottomOf(const BView* view) const
+{
+	return AreaFor(view)->Bottom();
+}
+
+
+YTab*
+BALMLayout::BottomOf(const BLayoutItem* item) const
+{
+	return AreaFor(item)->Bottom();
+}
+
+
 BLayoutItem*
 BALMLayout::AddView(BView* child)
 {
@@ -325,8 +376,6 @@ BALMLayout::AddItem(int32 index, BLayoutItem* item)
 	// TODO maybe find a more elegant solution
 	XTab* left = Left();
 	YTab* top = Top();
-	XTab* right = AddXTab();
-	YTab* bottom = AddYTab();
 
 	// check range
 	if (index < 0 || index > CountItems())
@@ -341,7 +390,7 @@ BALMLayout::AddItem(int32 index, BLayoutItem* item)
 			top = area->Top();
 		}
 	}
-	Area* area = AddItem(item, left, top, right, bottom);
+	Area* area = AddItem(item, left, top);
 	return area ? true : false;
 }
 
@@ -350,6 +399,11 @@ Area*
 BALMLayout::AddItem(BLayoutItem* item, XTab* left, YTab* top, XTab* right,
 	YTab* bottom)
 {
+	if (!right)
+		right = AddXTab();
+	if (!bottom)
+		bottom = AddYTab();
+
 	if (!BAbstractLayout::AddItem(-1, item))
 		return NULL;
 	Area* area = AreaFor(item);
