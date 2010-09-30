@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -111,6 +111,24 @@ CharacterView::ScrollToBlock(int32 blockIndex)
 		blockIndex = kNumUnicodeBlocks - 1;
 
 	BView::ScrollTo(0.0f, fTitleTops[blockIndex]);
+}
+
+
+void
+CharacterView::ScrollToCharacter(uint32 c)
+{
+	if (IsCharacterVisible(c))
+		return;
+
+	BRect frame = _FrameFor(c);
+	BView::ScrollTo(0.0f, frame.top);
+}
+
+
+bool
+CharacterView::IsCharacterVisible(uint32 c) const
+{
+	return Bounds().Contains(_FrameFor(c));
 }
 
 
@@ -424,7 +442,7 @@ CharacterView::DoLayout()
 
 
 int32
-CharacterView::_BlockAt(BPoint point)
+CharacterView::_BlockAt(BPoint point) const
 {
 	// TODO: use binary search
 	for (uint32 i = 0; i < kNumUnicodeBlocks; i++) {
@@ -441,7 +459,8 @@ CharacterView::_BlockAt(BPoint point)
 
 
 bool
-CharacterView::_GetCharacterAt(BPoint point, uint32& character, BRect* _frame)
+CharacterView::_GetCharacterAt(BPoint point, uint32& character,
+	BRect* _frame) const
 {
 	int32 i = _BlockAt(point);
 	if (i == -1)
@@ -569,7 +588,7 @@ CharacterView::_UpdateSize()
 
 
 bool
-CharacterView::_GetTopmostCharacter(uint32& character, int32& offset)
+CharacterView::_GetTopmostCharacter(uint32& character, int32& offset) const
 {
 	int32 top = (int32)Bounds().top;
 
@@ -594,7 +613,7 @@ CharacterView::_GetTopmostCharacter(uint32& character, int32& offset)
 
 
 BRect
-CharacterView::_FrameFor(uint32 character)
+CharacterView::_FrameFor(uint32 character) const
 {
 	// find block containing the character
 
@@ -609,7 +628,8 @@ CharacterView::_FrameFor(uint32 character)
 		}
 
 		int32 diff = character - kUnicodeBlocks[i].start;
-		int32 y = fTitleTops[i] + fTitleHeight + diff / fCharactersPerLine;
+		int32 y = fTitleTops[i] + fTitleHeight
+			+ (diff / fCharactersPerLine) * fCharacterHeight;
 		int32 x = fGap / 2 + diff % fCharactersPerLine;
 
 		return BRect(x, y, x + fCharacterWidth + fGap, y + fCharacterHeight);

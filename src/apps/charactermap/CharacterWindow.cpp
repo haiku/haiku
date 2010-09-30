@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -26,6 +26,7 @@
 #include <SplitLayoutBuilder.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <UnicodeChar.h>
 
 #include "CharacterView.h"
 #include "UnicodeBlockView.h"
@@ -256,6 +257,20 @@ CharacterWindow::~CharacterWindow()
 void
 CharacterWindow::MessageReceived(BMessage* message)
 {
+	if (message->WasDropped()) {
+		const char* text;
+		ssize_t size;
+		uint32 c;
+		if (message->FindInt32("character", (int32*)&c) == B_OK) {
+			fCharacterView->ScrollToCharacter(c);
+			return;
+		} else if (message->FindData("text/plain", B_MIME_TYPE,
+				(const void**)&text, &size) == B_OK) {
+			fCharacterView->ScrollToCharacter(BUnicodeChar::FromUTF8(text));
+			return;
+		}
+	}
+
 	switch (message->what) {
 		case B_COPY:
 			PostMessage(message, fCharacterView);

@@ -31,6 +31,8 @@ public:
 			bool			IsShowingBlock(int32 blockIndex) const;
 
 			void			ScrollToBlock(int32 blockIndex);
+			void			ScrollToCharacter(uint32 c);
+			bool			IsCharacterVisible(uint32 c) const;
 
 	static	void			UnicodeToUTF8(uint32 c, char* text,
 								size_t textSize);
@@ -56,14 +58,14 @@ protected:
 	virtual void			DoLayout();
 
 private:
-			int32			_BlockAt(BPoint point);
+			int32			_BlockAt(BPoint point) const;
 			bool 			_GetCharacterAt(BPoint point, uint32& character,
-								BRect* _frame = NULL);
+								BRect* _frame = NULL) const;
 			void			_UpdateFontSize();
 			void			_UpdateSize();
 			bool			_GetTopmostCharacter(uint32& character,
-								int32& offset);
-			BRect			_FrameFor(uint32 character);
+								int32& offset) const;
+			BRect			_FrameFor(uint32 character) const;
 			void			_CopyToClipboard(const char* text);
 
 private:

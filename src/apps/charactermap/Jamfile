@@ -11,6 +11,6 @@ Application CharacterMap :
 	UnicodeBlocks.cpp
 	UnicodeBlockView.cpp
 
-	: be $(TARGET_LIBSUPC++)
+	: be locale $(TARGET_LIBSUPC++)
 	: CharacterMap.rdef
 	;
