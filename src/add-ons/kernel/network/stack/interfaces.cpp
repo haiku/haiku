@@ -85,6 +85,22 @@ static AddressTable sAddressTable;
 static uint32 sInterfaceIndex;
 
 
+#if 0
+//! For debugging purposes only
+void
+dump_interface_refs(void)
+{
+	MutexLocker locker(sLock);
+
+	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
+	while (Interface* interface = iterator.Next()) {
+		dprintf("%p: %s, %ld\n", interface, interface->name,
+			interface->CountReferences());
+	}
+}
+#endif
+
+
 #if ENABLE_DEBUGGER_COMMANDS
 
 
@@ -1345,10 +1361,11 @@ get_interface(net_domain* domain, uint32 index)
 {
 	MutexLocker locker(sLock);
 
+	Interface* interface;
 	if (index == 0)
-		return sInterfaces.First();
-
-	Interface* interface = find_interface(index);
+		interface = sInterfaces.First();
+	else
+		interface = find_interface(index);
 	if (interface == NULL)
 		return NULL;
 
