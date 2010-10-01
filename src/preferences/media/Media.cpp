@@ -20,9 +20,10 @@
 
 
 Media::Media() 
-	: BApplication("application/x-vnd.Haiku-Media")
+	:
+	BApplication("application/x-vnd.Haiku-Media")
 {
-	BRect rect(32,64,637,462);
+	BRect rect(32, 64, 637, 462);
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -39,7 +40,8 @@ Media::Media()
 					i++;
 				}
 				int32 a, b, c, d;
-				if (sscanf(&buffer[i], " rect = %li,%li,%li,%li", &a, &b, &c, &d) > 0) {
+				const char* scanString = " rect = %li,%li,%li,%li";
+				if (sscanf(&buffer[i], scanString, &a, &b, &c, &d) == 4) {
 					if (c - a >= rect.IntegerWidth()) {
 						rect.left = a;
 						rect.right = c;
@@ -75,7 +77,7 @@ Media::InitCheck()
 
 
 void
-Media::MessageReceived(BMessage *message)
+Media::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_SOME_APP_LAUNCHED:

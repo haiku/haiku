@@ -14,18 +14,20 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
-// Includes -------------------------------------------------------------------------------------------------- //
+#include "MediaListItem.h"
+
 #include <string.h>
 
 #include <View.h>
 
-#include "MediaListItem.h"
 
 #define kITEM_MARGIN					  1
 
-// MediaListItem - Constructor
-MediaListItem::MediaListItem(dormant_node_info *info, uint32 level, bool isVideo, BList *icons, uint32 modifiers) 
-	: BListItem(level),
+
+MediaListItem::MediaListItem(dormant_node_info* info, uint32 level,
+		bool isVideo, BList* icons, uint32 modifiers) 
+	:
+	BListItem(level),
 	fIsAudioMixer(false),
 	fIsVideo(isVideo),
 	fIsDefaultInput(false),
@@ -38,8 +40,11 @@ MediaListItem::MediaListItem(dormant_node_info *info, uint32 level, bool isVideo
 	SetHeight(16 + kITEM_MARGIN);
 }
 
-MediaListItem::MediaListItem(const char *label, uint32 level, bool isVideo, BList *icons, uint32 modifiers) 
-	: BListItem(level),
+
+MediaListItem::MediaListItem(const char* label, uint32 level,
+		bool isVideo, BList* icons, uint32 modifiers) 
+	:
+	BListItem(level),
 	fLabel(label),
 	fIsAudioMixer(false),
 	fIsVideo(isVideo),
@@ -52,15 +57,15 @@ MediaListItem::MediaListItem(const char *label, uint32 level, bool isVideo, BLis
 	SetHeight(16 + kITEM_MARGIN);
 }
 
+
 MediaListItem::~MediaListItem()
 {
 }
-//--------------------------------------------------------------------------------------------------------------//
 
 
 //MediaListItem - DrawItem
 void 
-MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
+MediaListItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	rgb_color kHighlight = { 140,140,140,0 };
 	rgb_color kBlack = { 0,0,0,0 };
@@ -84,7 +89,8 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	
 	frame.left += 4;
 	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
+	iconFrame.Set(iconFrame.left, iconFrame.top+1,
+		iconFrame.left+15, iconFrame.top+16);
 	uint32 index = 0;
 	if (OutlineLevel()==0 || (fIsDefaultInput && fIsDefaultOutput)) {
 		if (fIsDefaultInput && fIsVideo)
@@ -92,7 +98,9 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 		else if (fIsDefaultInput && !fIsVideo)
 			index = 2;
 		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(static_cast<BBitmap*>(fIcons->ItemAt(index)), iconFrame);
+
+		BBitmap* icon = static_cast<BBitmap*>(fIcons->ItemAt(index));
+		owner->DrawBitmap(icon, iconFrame);
 		owner->SetDrawingMode(B_OP_COPY);
 	}
 	iconFrame.OffsetBy(16, 0);
@@ -111,22 +119,25 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 				index = 2;
 		}
 		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(static_cast<BBitmap*>(fIcons->ItemAt(index)), iconFrame);
+		BBitmap* icon = static_cast<BBitmap*>(fIcons->ItemAt(index));
+		owner->DrawBitmap(icon, iconFrame);
 		owner->SetDrawingMode(B_OP_COPY);
 	}
 
 	frame.left += 16 * (OutlineLevel() + 1);
 	owner->SetHighColor(kBlack);
 	
-	BFont		font = be_plain_font;
-	font_height	finfo;
-	font.GetHeight(&finfo);
+	BFont font = be_plain_font;
+	font_height	fontInfo;
+	font.GetHeight(&fontInfo);
+	float lineHeight = fontInfo.ascent + fontInfo.descent + fontInfo.leading;
 	owner->SetFont(&font);
-	owner->MovePenTo(frame.left+8, frame.top + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2) +
-					(finfo.ascent + finfo.descent) - 1);
+	owner->MovePenTo(frame.left + 8, frame.top
+		+ ((frame.Height() - (lineHeight)) / 2)
+		+ (fontInfo.ascent + fontInfo.descent) - 1);
 	owner->DrawString(fLabel);
 }
-//--------------------------------------------------------------------------------------------------------------//
+
 
 void 
 MediaListItem::SetDefault(bool isDefault, bool isInput)
@@ -137,14 +148,16 @@ MediaListItem::SetDefault(bool isDefault, bool isInput)
 		fIsDefaultOutput = isDefault;
 }
 
+
 void 
 MediaListItem::SetAudioMixer(bool isAudioMixer)
 {
 	fIsAudioMixer = isAudioMixer;
 }
 
+
 void 
-MediaListItem::Update(BView *owner, const BFont *finfo)
+MediaListItem::Update(BView* owner, const BFont* finfo)
 {
 	// we need to override the update method so we can make sure are
 	// list item size doesn't change
@@ -154,16 +167,20 @@ MediaListItem::Update(BView *owner, const BFont *finfo)
 	}
 }
 
+
 int 
-MediaListItem::Compare(const void *firstArg, const void *secondArg)
+MediaListItem::Compare(const void* firstArg, const void* secondArg)
 {
-	const MediaListItem *item1 = *static_cast<const MediaListItem * const *>(firstArg);
-	const MediaListItem *item2 = *static_cast<const MediaListItem * const *>(secondArg);
+	const MediaListItem* item1
+		= *static_cast<const MediaListItem * const *>(firstArg);
+	const MediaListItem* item2
+		= *static_cast<const MediaListItem * const *>(secondArg);
+
 	if (item1->fIsVideo != item2->fIsVideo)
 		return item1->fIsVideo ? 1 : -1;
-	if (item1->OutlineLevel()!=item2->OutlineLevel())
-		return item1->OutlineLevel()>item2->OutlineLevel() ? 1 : -1;
-	if (item1->fIsAudioMixer!=item2->fIsAudioMixer)
+	if (item1->OutlineLevel() != item2->OutlineLevel())
+		return item1->OutlineLevel() > item2->OutlineLevel() ? 1 : -1;
+	if (item1->fIsAudioMixer != item2->fIsAudioMixer)
 		return item2->fIsAudioMixer ? 1 : -1;
 	return strcmp(item1->fLabel, item2->fLabel);
 }

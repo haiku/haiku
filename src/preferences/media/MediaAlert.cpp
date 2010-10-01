@@ -41,10 +41,10 @@ private:
 
 
 MediaAlert::MediaAlert(BRect _rect, const char* title, const char* text)
-	: BWindow(_rect, title, B_MODAL_WINDOW, B_NOT_CLOSABLE | B_NOT_RESIZABLE)
+	:
+	BWindow(_rect, title, B_MODAL_WINDOW, B_NOT_CLOSABLE | B_NOT_RESIZABLE),
+	fTextView(NULL)
 {
-	fTextView = NULL;
-
 	// Set up the "_master_" view
 	TAlertView* masterView = new TAlertView(Bounds());
 	masterView->SetBitmap(InitIcon());
@@ -131,7 +131,8 @@ MediaAlert::InitIcon()
 
 
 TAlertView::TAlertView(BRect frame)
-	: BView(frame, "TAlertView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	:
+	BView(frame, "TAlertView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
 	fIconBitmap(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));

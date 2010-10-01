@@ -14,8 +14,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
-// Includes -------------------------------------------------------------------------------------------------- //
-#include <stdio.h>
+#include "MediaViews.h"
 
 #include <Box.h>
 #include <Button.h>
@@ -32,7 +31,7 @@
 #include <String.h>
 #include <TextView.h>
 
-#include "MediaViews.h"
+#include <stdio.h>
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -40,10 +39,12 @@
 
 
 BarView::BarView()
- : BView ("barView", B_WILL_DRAW ),
+	:
+	BView("barView", B_WILL_DRAW ),
  	fDisplay(true)
 {
 }
+
 
 void
 BarView::Draw(BRect updateRect)
@@ -65,12 +66,13 @@ BarView::Draw(BRect updateRect)
 
 
 SettingsView::SettingsView (bool isVideo)
- : BView ("SettingsView", B_WILL_DRAW | B_SUPPORTS_LAYOUT),
+	:
+	BView("SettingsView", B_WILL_DRAW | B_SUPPORTS_LAYOUT),
 	fIsVideo(isVideo)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BBox *defaultsBox = new BBox("defaults");
+	BBox* defaultsBox = new BBox("defaults");
 	defaultsBox->SetLabel(fIsVideo ? B_TRANSLATE("Default nodes")
 		: B_TRANSLATE("Defaults"));
 
@@ -89,14 +91,14 @@ SettingsView::SettingsView (bool isVideo)
 		: B_TRANSLATE("Audio output:")) + 5;
 	fMenu1 = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fMenu1->SetLabelFromMarked(true);
-	BMenuField *menuField1 = new BMenuField("menuField1",
+	BMenuField* menuField1 = new BMenuField("menuField1",
 		fIsVideo ? B_TRANSLATE("Video input:")
 			: B_TRANSLATE("Audio input:"), fMenu1, NULL);
 	menuField1->SetDivider(divider);
 
 	fMenu2 = new BPopUpMenu(B_TRANSLATE("<none>"));
 	fMenu2->SetLabelFromMarked(true);
-	BMenuField *menuField2 = new BMenuField("menuField2",
+	BMenuField* menuField2 = new BMenuField("menuField2",
 		fIsVideo ? B_TRANSLATE("Video output:")
 			: B_TRANSLATE("Audio output:"), fMenu2, NULL);
 	menuField2->SetDivider(divider);
@@ -104,7 +106,7 @@ SettingsView::SettingsView (bool isVideo)
 	inputField->GroupLayout()->AddView(menuField1);
 	outputField->GroupLayout()->AddView(menuField2);
 
-	BMenuField *menuField3 = NULL;
+	BMenuField* menuField3 = NULL;
 	if (!fIsVideo) {
 		fMenu3 = new BPopUpMenu(B_TRANSLATE("<none>"));
 		fMenu3->SetLabelFromMarked(true);
@@ -122,10 +124,10 @@ SettingsView::SettingsView (bool isVideo)
 	fRestartView->Hide();
 
 	// create the realtime box
-	BBox *realtimeBox = new BBox("realtime");
+	BBox* realtimeBox = new BBox("realtime");
 	realtimeBox->SetLabel(B_TRANSLATE("Real-time"));
 
-	BMessage *message = new BMessage(ML_ENABLE_REAL_TIME);
+	BMessage* message = new BMessage(ML_ENABLE_REAL_TIME);
 	message->AddBool("isVideo", fIsVideo);
 	fRealtimeCheckBox = new BCheckBox("realtimeCheckBox",
 		fIsVideo ? B_TRANSLATE("Enable real-time video")
@@ -137,7 +139,7 @@ SettingsView::SettingsView (bool isVideo)
 	if (flags & (fIsVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO))
 		fRealtimeCheckBox->SetValue(B_CONTROL_ON);
 
-	BTextView *textView = new BTextView("stringView");
+	BTextView* textView = new BTextView("stringView");
 	textView->Insert(fIsVideo ? B_TRANSLATE(
 		"Enabling real-time video allows system to "
 		"perform video operations as fast and smoothly as possible.  It "
@@ -145,8 +147,10 @@ SettingsView::SettingsView (bool isVideo)
 		"\n\nOnly enable this feature if you need the lowest latency possible.")
 		: B_TRANSLATE(
 		"Enabling real-time audio allows system to record and play audio "
-		"as fast as possible.  It achieves this performance by using more CPU and RAM."
-		"\n\nOnly enable this feature if you need the lowest latency possible."));
+		"as fast as possible.  It achieves this performance by using more"
+		" CPU and RAM.\n\nOnly enable this feature if you need the lowest"
+		" latency possible."));
+
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -161,7 +165,7 @@ SettingsView::SettingsView (bool isVideo)
 
 	// create the bottom line: volumen in deskbar checkbox and restart button
 	BGroupView* bottomView = new BGroupView(B_HORIZONTAL);
-	BButton *restartButton = new BButton("restartButton",
+	BButton* restartButton = new BButton("restartButton",
 		B_TRANSLATE("Restart media services"),
 		new BMessage(ML_RESTART_MEDIA_SERVER));
 
@@ -187,49 +191,57 @@ SettingsView::SettingsView (bool isVideo)
 	rootlayout->AddView(bottomView);
 }
 
+
 void
-SettingsView::AddNodes(BList &list, bool isInput)
+SettingsView::AddNodes(BList& list, bool isInput)
 {
-	BMenu *menu = isInput ? fMenu1 : fMenu2;
-	void *item;
+	BMenu* menu = isInput ? fMenu1 : fMenu2;
+	void* item;
 	while ((item = menu->RemoveItem((int32)0)) != NULL)
-		delete static_cast<dormant_node_info *>(item);
+		delete static_cast<dormant_node_info*>(item);
 
 	BMessage message(ML_DEFAULT_CHANGE);
 	message.AddBool("isVideo", fIsVideo);
 	message.AddBool("isInput", isInput);
 
 	for (int32 i = 0; i < list.CountItems(); i++) {
-		dormant_node_info *info = static_cast<dormant_node_info *>(list.ItemAt(i));
+		dormant_node_info* info
+			= static_cast<dormant_node_info*>(list.ItemAt(i));
 		menu->AddItem(new SettingsItem(info, new BMessage(message)));
 	}
 }
 
+
 void
 SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 {
-	BMenu *menu = isInput ? fMenu1 : fMenu2;
+	BMenu* menu = isInput ? fMenu1 : fMenu2;
 
 	for (int32 i = 0; i < menu->CountItems(); i++) {
-		SettingsItem *item = static_cast<SettingsItem *>(menu->ItemAt(i));
-		if (item->fInfo && item->fInfo->addon == info.addon && item->fInfo->flavor_id == info.flavor_id) {
+		SettingsItem* item = static_cast<SettingsItem*>(menu->ItemAt(i));
+		if (item->fInfo && item->fInfo->addon == info.addon
+			&& item->fInfo->flavor_id == info.flavor_id) {
 			item->SetMarked(true);
 			break;
 		}
 	}
 
-	if (!fIsVideo&&!isInput&&outputID>-1) {
-		BMenuItem *item;
+	if (!fIsVideo && !isInput && outputID >= 0) {
+		BMenuItem* item;
 		while ((item = fMenu3->RemoveItem((int32)0)) != NULL)
 			delete item;
-		BMediaRoster *roster = BMediaRoster::Roster();
+
+		BMediaRoster* roster = BMediaRoster::Roster();
 		media_node node;
 		media_node_id node_id;
 		status_t err;
-		if (roster->GetInstancesFor(info.addon, info.flavor_id, &node_id)!=B_OK)
-			err = roster->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
-		else
+		if (roster->GetInstancesFor(info.addon, info.flavor_id,
+			&node_id) != B_OK) {
+			err = roster->InstantiateDormantNode(info, &node, 
+				B_FLAVOR_IS_GLOBAL);
+		} else {
 			err = roster->GetNodeFor(node_id, &node);
+		}
 
 		if (err == B_OK) {
 			media_input inputs[16];
@@ -238,9 +250,11 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 				BMessage message(ML_DEFAULTOUTPUT_CHANGE);
 
 				for (int32 i = 0; i < inputCount; i++) {
-					media_input *input = new media_input();
+					media_input* input = new media_input();
 					memcpy(input, &inputs[i], sizeof(*input));
-					fMenu3->AddItem(item = new Settings2Item(&info, input, new BMessage(message)));
+					item = new Settings2Item(&info, input,
+						new BMessage(message));
+					fMenu3->AddItem(item);
 					if (inputs[i].destination.id == outputID)
 						item->SetMarked(true);
 				}
@@ -249,9 +263,11 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 	}
 }
 
-SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message,
-			char shortcut, uint32 modifiers)
-	: BMenuItem(info->name, message, shortcut, modifiers),
+
+SettingsItem::SettingsItem(dormant_node_info* info, BMessage* message,
+		char shortcut, uint32 modifiers)
+	:
+	BMenuItem(info->name, message, shortcut, modifiers),
 	fInfo(info)
 {
 
@@ -259,7 +275,7 @@ SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message,
 
 
 status_t
-SettingsItem::Invoke(BMessage *message)
+SettingsItem::Invoke(BMessage* message)
 {
 	if (IsMarked())
 		return B_OK;
@@ -267,13 +283,13 @@ SettingsItem::Invoke(BMessage *message)
 }
 
 
-Settings2Item::Settings2Item(dormant_node_info *info, media_input *input, BMessage *message,
-			char shortcut, uint32 modifiers)
-	: BMenuItem(input->name, message, shortcut, modifiers),
+Settings2Item::Settings2Item(dormant_node_info* info, media_input* input,
+		BMessage* message, char shortcut, uint32 modifiers)
+	:
+	BMenuItem(input->name, message, shortcut, modifiers),
 	fInfo(info),
 	fInput(input)
 {
-
 }
 
 
@@ -284,7 +300,7 @@ Settings2Item::~Settings2Item()
 
 
 status_t
-Settings2Item::Invoke(BMessage *message)
+Settings2Item::Invoke(BMessage* message)
 {
 	if (IsMarked())
 		return B_OK;

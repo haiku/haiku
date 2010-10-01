@@ -18,15 +18,15 @@
 
 
 class Media : public BApplication {
-	public:
-		Media();
-		virtual ~Media();
+public:
+								Media();
+	virtual						~Media();
 
-		virtual void MessageReceived(BMessage* message);
-		status_t InitCheck();
+	virtual	void				MessageReceived(BMessage* message);
+			status_t			InitCheck();
 
-	private:
-		MediaWindow* fWindow;
+private:
+			MediaWindow*		fWindow;
 };
 
 #endif	// MEDIA_H

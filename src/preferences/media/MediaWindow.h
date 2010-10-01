@@ -27,45 +27,53 @@
 #include "MediaListItem.h"
 #include "MediaAlert.h"
 
+
 #define SETTINGS_FILE "MediaPrefs Settings"
+
 
 class MediaWindow : public BWindow
 {
-	public:
-	MediaWindow(BRect frame);
-	    ~MediaWindow();
-	    virtual bool QuitRequested();
-	    virtual void MessageReceived(BMessage *message);
-	    virtual void FrameResized(float width, float height);
-	    status_t InitCheck();
-	private:
-		status_t InitMedia(bool first);
-		void FindNodes(media_type type, uint64 kind, BList &list);
-		void AddNodes(BList &list, bool isVideo);
-		MediaListItem *FindMediaListItem(dormant_node_info *info);
-		void InitWindow(void);
-		static status_t RestartMediaServices(void *data);
-		static bool UpdateProgress(int stage, const char * message, void * cookie);
-		
-		BBox *					fBox;
-		BListView*				fListView;
-		BStringView*				fTitleView;
-		BView*					fContentView;
-		SettingsView*				fAudioView;
-		SettingsView*				fVideoView;
-		BarView*				fBar;
-	    	    
-		media_node*				fCurrentNode;
-		BParameterWeb*				fParamWeb;
-		
-		BList					fAudioInputs;
-		BList					fAudioOutputs;
-		BList					fVideoInputs;
-		BList					fVideoOutputs;
-		
-		BList					fIcons;
-		MediaAlert				*fAlert;
-		status_t				fInitCheck;
+public:
+								MediaWindow(BRect frame);
+   								~MediaWindow();
+    virtual	bool 				QuitRequested();
+    virtual	void				MessageReceived(BMessage* message);
+    virtual	void				FrameResized(float width, float height);
+    		status_t			InitCheck();
+
+private:
+
+			status_t			InitMedia(bool first);
+			void				FindNodes(media_type type, uint64 kind,
+									BList &list);
+			void				AddNodes(BList &list, bool isVideo);
+
+			MediaListItem*		FindMediaListItem(dormant_node_info* info);
+			void				InitWindow();
+
+	static	status_t			RestartMediaServices(void* data);
+	static	bool				UpdateProgress(int stage, const char * message,
+									void * cookie);
+	
+			BBox*				fBox;
+			BListView*			fListView;
+			BStringView*		fTitleView;
+			BView*				fContentView;
+			SettingsView*		fAudioView;
+			SettingsView*		fVideoView;
+			BarView*			fBar;
+    			    
+			media_node*			fCurrentNode;
+			BParameterWeb*		fParamWeb;
+			
+			BList				fAudioInputs;
+			BList				fAudioOutputs;
+			BList				fVideoInputs;
+			BList				fVideoOutputs;
+	
+			BList				fIcons;
+			MediaAlert*			fAlert;
+			status_t			fInitCheck;
 };
 
 #endif
