@@ -3,7 +3,6 @@ SubDir HAIKU_TOP src tests add-ons kernel file_systems ;
 HaikuSubInclude bfs ;
 HaikuSubInclude cdda ;
 HaikuSubInclude consistency_check ;
-HaikuSubInclude ffsb ;
 HaikuSubInclude fs_shell ;
 HaikuSubInclude fragmenter ;
 HaikuSubInclude iso9660 ;

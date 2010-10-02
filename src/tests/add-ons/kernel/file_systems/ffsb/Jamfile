@@ -1,6 +1,0 @@
-SubDir HAIKU_TOP src tests add-ons kernel file_systems ffsb ;
-
-SimpleTest ffsb :
-cirlist.c  ffsb_fs.c  ffsb_stats.c  ffsb_thread.c  filelist.c  list.c  metaops.c  rand.c  rwlock.c
-ffsb_fc.c  ffsb_op.c  ffsb_tg.c     fh.c           fileops.c   main.c  parser.c   rbt.c   util.c
-;
