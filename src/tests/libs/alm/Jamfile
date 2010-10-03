@@ -36,3 +36,8 @@ Application ALMTableDemo :
 	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSUPC++)
 ;
 
+Application ALMOperator :
+	OperatorLayout.cpp
+	:
+	be liblpsolve55.so be liblinprog.so libalm.so $(TARGET_LIBSTDC++)
+;

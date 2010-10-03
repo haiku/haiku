@@ -24,7 +24,7 @@ class ViewsWindow : public BWindow {
 public:
 	ViewsWindow(BRect frame) 
 		:
-		BWindow(frame, "ALM Two Views", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+		BWindow(frame, "ALM Views", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
 	{
 		BButton* button1 = new BButton("BButton");
 		BRadioButton* radioButton = new BRadioButton("BRadioButton", NULL);

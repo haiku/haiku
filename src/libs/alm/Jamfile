@@ -13,5 +13,5 @@ SharedLibrary libalm.so :
 	ALMLayout.cpp
 	Row.cpp
 	:
-	be liblpsolve55.so liblinprog.so $(TARGET_LIBSUPC++)
+	be liblpsolve55.so liblinprog.so $(TARGET_LIBSTDC++)
 ;
