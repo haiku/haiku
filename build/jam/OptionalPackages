@@ -1364,6 +1364,8 @@ if [ IsOptionalHaikuImagePackageAdded Sed ] {
 			:
 			:
 		;
+		AddSymlinkToHaikuImage bin
+			: /boot/common/bin/sed ;
 		InstallSourceArchive sed-4.2.1_haiku-2010-04-29.tar.xz
 			: $(baseSourceURL)/sed-4.2.1_haiku-2010-04-29.tar.xz ;
 	}
