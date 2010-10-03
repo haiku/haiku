@@ -5,14 +5,9 @@
  */
 
 
-#include "ExpanderApp.h"
 #include "ExpanderWindow.h"
-#include "ExpanderThread.h"
-#include "ExpanderPreferences.h"
-
 
 #include <Alert.h>
-#include <Application.h>
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -31,6 +26,11 @@
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TextView.h>
+
+#include "ExpanderApp.h"
+#include "ExpanderThread.h"
+#include "ExpanderPreferences.h"
+#include "PasswordAlert.h"
 
 
 const uint32 MSG_SOURCE			= 'mSOU';
@@ -344,14 +344,22 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 			if (msg->FindString("error", &string) == B_OK
 				&& fExpandingStarted) {
 				fExpandingThread->SuspendExternalExpander();
-				BAlert* alert = new BAlert("stopAlert", string,
-					B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
-					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
-				if (alert->Go() == 0) {
+				if (strstr(string.String(), "password") != NULL) {
+					BString password;
+					PasswordAlert* alert = new PasswordAlert("passwordAlert", string);
+					alert->Go(password);
 					fExpandingThread->ResumeExternalExpander();
-					StopExpanding();
-				} else
-					fExpandingThread->ResumeExternalExpander();
+					fExpandingThread->PushInput(password);
+				} else {
+					BAlert* alert = new BAlert("stopAlert", string,
+						B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
+						B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+					if (alert->Go() == 0) {
+						fExpandingThread->ResumeExternalExpander();
+							StopExpanding();
+					} else
+						fExpandingThread->ResumeExternalExpander();
+				}
 			}
 			break;
 		}

@@ -3,15 +3,20 @@
  * Distributed under the terms of the MIT License.
  * Original code from ZipOMatic by jonas.sundstrom@kirilla.com
  */
-#include <Messenger.h>
-#include <Path.h>
 #include "ExpanderThread.h"
+
+#include <errno.h>
 #include <image.h>
 #include <signal.h>
+#include <termios.h>
 #include <unistd.h>
-#include <errno.h>
 
-const char * ExpanderThreadName	=	"ExpanderThread";
+#include <Messenger.h>
+#include <Path.h>
+
+
+const char * ExpanderThreadName = "ExpanderThread";
+
 
 ExpanderThread::ExpanderThread(BMessage * refs_message, BMessenger * messenger)
 	:	GenericThread(ExpanderThreadName, B_NORMAL_PRIORITY, refs_message),
@@ -84,7 +89,7 @@ ExpanderThread::ThreadStartup()
 	flags = fcntl(fStdErr, F_GETFL, 0);
 	flags |= O_NONBLOCK;
 	fcntl(fStdErr, F_SETFL, flags);
-
+	
 	fExpanderOutput = fdopen(fStdOut, "r");
 	fExpanderError = fdopen(fStdErr, "r");
 		
@@ -124,6 +129,14 @@ ExpanderThread::ExecuteUnit(void)
 	snooze(100000);
 
 	return B_OK;
+}
+
+
+void
+ExpanderThread::PushInput(BString text)
+{
+	text += "\n";
+	write(fStdIn, text.String(), text.Length());
 }
 
 
@@ -184,32 +197,60 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
 	// http://www.abisoft.com/faq/BeDevTalk_FAQ.html#FAQ-209
 
 	// Save current FDs
-	int old_in  =  dup(0);
-	int old_out  =  dup(1);
-	int old_err  =  dup(2);
+	int old_out = dup(1);
+	int old_err = dup(2);
 
 	int filedes[2];
 	
-	/* Create new pipe FDs as stdin, stdout, stderr */
-	pipe(filedes);  dup2(filedes[0], 0); close(filedes[0]);
-	in = filedes[1];  // Write to in, appears on cmd's stdin
+	/* Create new pipe FDs as stdout, stderr */
 	pipe(filedes);  dup2(filedes[1], 1); close(filedes[1]);
 	out = filedes[0]; // Read from out, taken from cmd's stdout
 	pipe(filedes);  dup2(filedes[1], 2); close(filedes[1]);
 	err = filedes[0]; // Read from err, taken from cmd's stderr
 
-	// "load" command.
-	thread_id ret  =  load_image(argc, argv, envp);
+	// taken from pty.cpp
+	// Create a tty for stdin, as utilities don't generally use stdin
+	int master = posix_openpt(O_RDWR);
+	if (master < 0)
+    	return -1;
 
-	if (ret < B_OK)
-		return ret;
+	int slave;
+	const char *ttyName;
+	if (grantpt(master) != 0 || unlockpt(master) != 0
+		|| (ttyName = ptsname(master)) == NULL
+		|| (slave = open(ttyName, O_RDWR | O_NOCTTY)) < 0) {
+		close(master);
+		return -1;
+	}
+	
+	int pid = fork();
+	if (pid < 0) {
+		close(master);
+		close(slave);
+		return -1;
+	}
+	// child
+	if (pid == 0) {
+		close(master);
+		
+		setsid();
+		if (ioctl(slave, TIOCSCTTY, NULL) != 0)
+			return -1;
+		dup2(slave, 0); 
+		close(slave);
+		
+		// "load" command.
+		execv(argv[0], (char *const *)argv);
 
-	// thread ret is now suspended.
+		// shouldn't return
+		return -1;
+	}
 
-	setpgid(ret, ret);
-
+	// parent
+	close (slave);
+	in = master;
+		
 	// Restore old FDs
-	close(0); dup(old_in); close(old_in);
 	close(1); dup(old_out); close(old_out);
 	close(2); dup(old_err); close(old_err);
 
@@ -217,7 +258,7 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
 	   the calls aren't very likely to fail, and that would 
 	   muddy up the example quite a bit.  YMMV. */
 
-	return ret;
+	return pid;
 }
 
 

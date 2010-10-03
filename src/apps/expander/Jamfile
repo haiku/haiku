@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps expander ;
 
+UseLibraryHeaders icon ;
+
 Application Expander : 
 	ExpanderApp.cpp
 	ExpanderWindow.cpp
@@ -9,6 +11,7 @@ Application Expander :
 	ExpanderPreferences.cpp
 	DirectoryFilePanel.cpp
 	ExpanderRules.cpp
+	PasswordAlert.cpp
 	: be tracker $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++)
 	: Expander.rdef
 ;

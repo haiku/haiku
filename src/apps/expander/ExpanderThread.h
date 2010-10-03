@@ -28,6 +28,7 @@ class ExpanderThread : public GenericThread
 		status_t ResumeExternalExpander();
 		status_t InterruptExternalExpander();
 		status_t WaitOnExternalExpander();
+		void PushInput(BString text);
 
 	private:
 
