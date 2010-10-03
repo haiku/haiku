@@ -335,6 +335,20 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 					fListingText->Insert(string.String());
 				}
 				fListingText->ScrollToSelection();
+			} else if (fExpandingStarted) {
+				BString string;
+				int32 i = 0;
+				while (msg->FindString("output", i++, &string) == B_OK) {
+					if (strstr(string.String(), "Enter password") != NULL) {
+						fExpandingThread->SuspendExternalExpander();
+						BString password;
+						PasswordAlert* alert = 
+							new PasswordAlert("passwordAlert", string);
+						alert->Go(password);
+						fExpandingThread->ResumeExternalExpander();
+						fExpandingThread->PushInput(password);
+					}
+				}
 			}
 			break;
 		
@@ -346,7 +360,8 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 				fExpandingThread->SuspendExternalExpander();
 				if (strstr(string.String(), "password") != NULL) {
 					BString password;
-					PasswordAlert* alert = new PasswordAlert("passwordAlert", string);
+					PasswordAlert* alert = new PasswordAlert("passwordAlert",
+						string);
 					alert->Go(password);
 					fExpandingThread->ResumeExternalExpander();
 					fExpandingThread->PushInput(password);
@@ -356,7 +371,7 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 						B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 					if (alert->Go() == 0) {
 						fExpandingThread->ResumeExternalExpander();
-							StopExpanding();
+						StopExpanding();
 					} else
 						fExpandingThread->ResumeExternalExpander();
 				}
