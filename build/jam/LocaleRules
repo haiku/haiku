@@ -101,7 +101,7 @@ actions LinkApplicationCatalog1
 		-s $(HAIKU_CATALOG_SIGNATURE) -o "$(1)"
 }
 
-rule DoCatalogs target : signature : sources : sourceLanguage : regexp : subdir
+rule DoCatalogs target : signature : sources : sourceLanguage : regexp : folder
 {
 	# DoCatalogs <target> : <signature> : <sources> [ : <sourceLanguage> ]
 	#	[ : <regexp> ] [ : <folder> ]
