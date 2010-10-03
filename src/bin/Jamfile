@@ -215,9 +215,12 @@ StdBinCommands
 	: libncurses.a : $(haiku-utils_rsrc) ;
 
 # Localization of some applications
-DoCatalogs dstcheck :
-	x-vnd.Haiku-cmd-dstconfig
+DoCatalogs dstcheck
+	: x-vnd.Haiku-cmd-dstconfig
 	: dstcheck.cpp
+	:
+	:
+	: dstcheck
 ;
 
 SubInclude HAIKU_TOP src bin addattr ;
