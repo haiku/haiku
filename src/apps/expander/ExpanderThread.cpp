@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Jérôme Duval. All rights reserved.
+ * Copyright 2004-2010, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  * Original code from ZipOMatic by jonas.sundstrom@kirilla.com
  */
@@ -21,8 +21,7 @@ ExpanderThread::ExpanderThread(BMessage * refs_message, BMessenger * messenger)
 	fStdOut(-1),
 	fStdErr(-1),
 	fExpanderOutput(NULL),
-	fExpanderOutputString(),
-	fExpanderOutputBuffer(new char [4096])
+	fExpanderError(NULL)
 {
 	SetDataStore(new BMessage(* refs_message));  // leak?
 	// prevents bug with B_SIMPLE_DATA
@@ -33,16 +32,15 @@ ExpanderThread::ExpanderThread(BMessage * refs_message, BMessenger * messenger)
 ExpanderThread::~ExpanderThread()
 {
 	delete fWindowMessenger;
-	delete [] fExpanderOutputBuffer;
 }
 
 
 status_t
 ExpanderThread::ThreadStartup()
 {
-	status_t	status	=	B_OK;
-	entry_ref	srcRef, destRef;
-	BString 	cmd;
+	status_t status = B_OK;
+	entry_ref srcRef, destRef;
+	BString cmd;
 
 	if ((status = GetDataStore()->FindRef("srcRef", &srcRef)) != B_OK)
 		return status;
@@ -63,9 +61,9 @@ ExpanderThread::ThreadStartup()
 	int32 argc = 3;
 	const char ** argv = new const char * [argc + 1];
 
-	argv[0]	=	strdup("/bin/sh");
-	argv[1]	=	strdup("-c");
-	argv[2]	=	strdup(cmd.String());
+	argv[0]	= strdup("/bin/sh");
+	argv[1]	= strdup("-c");
+	argv[2]	= strdup(cmd.String());
 	argv[argc] = NULL;
 
 	fThreadId = PipeCommand(argc, argv, fStdIn, fStdOut, fStdErr);
@@ -79,9 +77,17 @@ ExpanderThread::ThreadStartup()
 	set_thread_priority(fThreadId, B_LOW_PRIORITY);
 
 	resume_thread(fThreadId);
+	
+	int flags = fcntl(fStdOut, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	fcntl(fStdOut, F_SETFL, flags);
+	flags = fcntl(fStdErr, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	fcntl(fStdErr, F_SETFL, flags);
 
 	fExpanderOutput = fdopen(fStdOut, "r");
-
+	fExpanderError = fdopen(fStdErr, "r");
+		
 	return B_OK;
 }
 
@@ -89,23 +95,33 @@ ExpanderThread::ThreadStartup()
 status_t
 ExpanderThread::ExecuteUnit(void)
 {
-	// read output from command
+	// read output and error from command
 	// send it to window
-
-	char *output_string = fgets(fExpanderOutputBuffer , 4096 - 1, fExpanderOutput);
-
-	if (output_string == NULL)
-		return EOF;
-
+	
 	BMessage message('outp');
-	message.AddString("output", output_string);
-	for (int32 i = 0; i < 5; i++) {
-		output_string = fgets(fExpanderOutputBuffer , 4096 - 1, fExpanderOutput);
+	bool outputAdded = false;
+	for (int32 i = 0; i < 50; i++) {
+		char *output_string = fgets(fExpanderOutputBuffer , LINE_MAX, fExpanderOutput);
 		if (!output_string)
 			break;
 		message.AddString("output", output_string);
+		outputAdded = true;
 	}
-	fWindowMessenger->SendMessage(&message);
+	if (outputAdded)
+		fWindowMessenger->SendMessage(&message);
+	if (feof(fExpanderOutput))
+		return EOF;
+	
+	char *error_string = fgets(fExpanderOutputBuffer , LINE_MAX, fExpanderError);
+	if (error_string != NULL
+		&& strcmp(error_string, "\n")) {
+		BMessage message('errp');
+		message.AddString("error", error_string);
+		fWindowMessenger->SendMessage(&message);
+	}
+	
+	// streams are non blocking, sleep every 100ms
+	snooze(100000);
 
 	return B_OK;
 }
@@ -173,7 +189,7 @@ ExpanderThread::PipeCommand(int argc, const char **argv, int &in, int &out, int 
 	int old_err  =  dup(2);
 
 	int filedes[2];
-
+	
 	/* Create new pipe FDs as stdin, stdout, stderr */
 	pipe(filedes);  dup2(filedes[0], 0); close(filedes[0]);
 	in = filedes[1];  // Write to in, appears on cmd's stdin

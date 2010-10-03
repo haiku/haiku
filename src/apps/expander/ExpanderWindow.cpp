@@ -337,7 +337,24 @@ ExpanderWindow::MessageReceived(BMessage* msg)
 				fListingText->ScrollToSelection();
 			}
 			break;
-
+		
+		case 'errp': 
+		{
+			BString string;
+			if (msg->FindString("error", &string) == B_OK
+				&& fExpandingStarted) {
+				fExpandingThread->SuspendExternalExpander();
+				BAlert* alert = new BAlert("stopAlert", string,
+					B_TRANSLATE("Stop"), B_TRANSLATE("Continue"), NULL,
+					B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
+				if (alert->Go() == 0) {
+					fExpandingThread->ResumeExternalExpander();
+					StopExpanding();
+				} else
+					fExpandingThread->ResumeExternalExpander();
+			}
+			break;
+		}
 		case 'exit':
 			// thread has finished		(finished, quit, killed, we don't know)
 			// reset window state
