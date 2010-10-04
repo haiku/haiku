@@ -5,13 +5,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UseLibraryHeaders lp_solve linprog ;
 UsePrivateHeaders shared ;
 
-SharedLibrary liblinprog.so : 
+StaticLibrary liblinprog.a : 
 	Constraint.cpp
 	LinearSpec.cpp
 	Summand.cpp
 	PenaltyFunction.cpp
 	Variable.cpp
-	:
-	be liblpsolve55.so $(TARGET_LIBSUPC++)
 ;
 
