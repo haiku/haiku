@@ -277,7 +277,7 @@ BALMLayout::_ParseGroupItem(GroupItem& item, XTab* left, YTab* top, XTab* right,
 	else {
 		for (unsigned int i = 0; i < item.GroupItems().size(); i++) {
 			GroupItem& current = const_cast<GroupItem&>(
-				item.GroupItems().at(i));
+				item.GroupItems()[i]);
 			if (item.Orientation() == B_HORIZONTAL) {
 				XTab* r = (i == item.GroupItems().size() - 1) ? right
 					: AddXTab();
@@ -417,7 +417,7 @@ bool
 BALMLayout::AddItem(int32 index, BLayoutItem* item)
 {
 	if (!item)
-		return NULL;
+		return false;
 
 	// simply add the item at the upper right corner of the previous item
 	// TODO maybe find a more elegant solution

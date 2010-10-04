@@ -368,7 +368,7 @@ Area::SetContentAspectRatio(double ratio)
 /**
  * Gets left inset between area and its content.
  */
-int32
+float
 Area::LeftInset() const
 {
 	if (fTopLeftInset.IsWidthSet())
@@ -384,7 +384,7 @@ Area::LeftInset() const
 /**
  * Gets top inset between area and its content.
  */
-int32
+float
 Area::TopInset() const
 {
 	if (fTopLeftInset.IsHeightSet())
@@ -400,7 +400,7 @@ Area::TopInset() const
 /**
  * Gets right inset between area and its content.
  */
-int32
+float
 Area::RightInset() const
 {
 	if (fRightBottomInset.IsWidthSet())
@@ -416,7 +416,7 @@ Area::RightInset() const
 /**
  * Gets bottom inset between area and its content.
  */
-int32
+float
 Area::BottomInset() const
 {
 	if (fRightBottomInset.IsHeightSet())
@@ -433,7 +433,7 @@ Area::BottomInset() const
  * Sets left inset between area and its content.
  */
 void
-Area::SetLeftInset(int32 left)
+Area::SetLeftInset(float left)
 {
 	fTopLeftInset.width = left;
 	fLayoutItem->Layout()->InvalidateLayout();
@@ -444,7 +444,7 @@ Area::SetLeftInset(int32 left)
  * Sets top inset between area and its content.
  */
 void
-Area::SetTopInset(int32 top)
+Area::SetTopInset(float top)
 {
 	fTopLeftInset.height = top;
 	fLayoutItem->Layout()->InvalidateLayout();
@@ -455,7 +455,7 @@ Area::SetTopInset(int32 top)
  * Sets right inset between area and its content.
  */
 void
-Area::SetRightInset(int32 right)
+Area::SetRightInset(float right)
 {
 	fRightBottomInset.width = right;
 	fLayoutItem->Layout()->InvalidateLayout();
@@ -466,7 +466,7 @@ Area::SetRightInset(int32 right)
  * Sets bottom inset between area and its content.
  */
 void
-Area::SetBottomInset(int32 bottom)
+Area::SetBottomInset(float bottom)
 {
 	fRightBottomInset.height = bottom;
 	fLayoutItem->Layout()->InvalidateLayout();

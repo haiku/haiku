@@ -86,14 +86,14 @@ public:
 			void				SetShrinkPenalties(BSize shrink);
 			void				SetGrowPenalties(BSize grow);
 
-			int32				LeftInset() const;
-			int32				TopInset() const;
-			int32				RightInset() const;
-			int32				BottomInset() const;
-			void				SetLeftInset(int32 left);
-			void				SetTopInset(int32 top);
-			void				SetRightInset(int32 right);
-			void				SetBottomInset(int32 bottom);
+			float				LeftInset() const;
+			float				TopInset() const;
+			float				RightInset() const;
+			float				BottomInset() const;
+			void				SetLeftInset(float left);
+			void				SetTopInset(float top);
+			void				SetRightInset(float right);
+			void				SetBottomInset(float bottom);
 
 								operator BString() const;
 			void				GetString(BString& string) const;
