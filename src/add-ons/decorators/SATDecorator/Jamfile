@@ -21,5 +21,5 @@ Addon SATDecorator :
 	libbe.so
 	<nogrist>app_server
 	$(TARGET_LIBSTDC++)
-	liblpsolve55.so liblinprog.so
+	liblpsolve55.so liblinprog.a
 ;
