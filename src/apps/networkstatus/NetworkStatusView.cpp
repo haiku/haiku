@@ -326,7 +326,7 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 
 	if (strncmp("Broadcast", name, strlen(name)) == 0)
 		text = B_TRANSLATE("Broadcast information:\n");
-		
+
 	if (strncmp("Netmask", name, strlen(name)) == 0)
 		text = B_TRANSLATE("Netmask information:\n");
 
@@ -355,16 +355,16 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 		}
 
 		text += "\n";
-		
-		if (strncmp("Address", kInformationEntries[i].label, 
+
+		if (strncmp("Address", kInformationEntries[i].label,
 			strlen(kInformationEntries[i].label)) == 0)
 			text += B_TRANSLATE("Address");
 
-		if (strncmp("Broadcast", kInformationEntries[i].label, 
+		if (strncmp("Broadcast", kInformationEntries[i].label,
 			strlen(kInformationEntries[i].label)) == 0)
 			text += B_TRANSLATE("Broadcast");
-		
-		if (strncmp("Netmask", kInformationEntries[i].label, 
+
+		if (strncmp("Netmask", kInformationEntries[i].label,
 			strlen(kInformationEntries[i].label)) == 0)
 			text += B_TRANSLATE("Netmask");
 
@@ -414,7 +414,7 @@ NetworkStatusView::MouseDown(BPoint point)
 		new BMessage(kMsgOpenNetworkPreferences)));
 
 	if (fInDeskbar)
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"), 
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 			new BMessage(B_QUIT_REQUESTED)));
 	menu->SetTargetForItems(this);
 
