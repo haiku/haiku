@@ -1062,7 +1062,7 @@ user(char *name)
 		reply(530, "Sorry, only anonymous ftp allowed.");
 		return;
 	}
-		
+
 	if ((pw = sgetpwnam(name))) {
 		if ((shell = pw->pw_shell) == NULL || *shell == 0)
 			shell = _PATH_BSHELL;
@@ -2838,7 +2838,7 @@ myoob(void)
 		return (0);
 	}
 	cp = tmpline;
-	if (getline(cp, 7, stdin) == NULL) {
+	if (ftpd_getline(cp, 7, stdin) == NULL) {
 		reply(221, "You could at least say goodbye.");
 		dologout(0);
 	}
@@ -2930,7 +2930,7 @@ passive(void)
 #endif
 	else
 		goto pasv_error;
-		
+
 	p = (char *) &pasv_addr.su_port;
 
 #define UC(b) (((int) b) & 0xff)
@@ -2989,7 +2989,7 @@ long_passive(char *cmd, int pf)
 			return;
 		}
 	}
-		
+
 	pdata = socket(ctrl_addr.su_family, SOCK_STREAM, 0);
 	if (pdata < 0) {
 		perror_reply(425, "Can't open passive connection");
@@ -3128,7 +3128,7 @@ guniquefd(char *local, char **name)
 	/* -4 is for the .nn<null> we put on the end below */
 	(void) snprintf(new, sizeof(new) - 4, "%s", local);
 	cp = new + strlen(new);
-	/* 
+	/*
 	 * Don't generate dotfile unless requested explicitly.
 	 * This covers the case when basename gets truncated off
 	 * by buffer size.

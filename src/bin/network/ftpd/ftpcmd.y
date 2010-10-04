@@ -542,7 +542,7 @@ cmd
 				case MODE_S:
 					reply(200, "MODE S accepted.");
 					break;
-	
+
 				default:
 					reply(502, "Unimplemented MODE type.");
 				}
@@ -1194,10 +1194,10 @@ lookup(struct tab *p, char *cmd)
 #include <arpa/telnet.h>
 
 /*
- * getline - a hacked up version of fgets to ignore TELNET escape codes.
+ * ftpd_getline - a hacked up version of fgets to ignore TELNET escape codes.
  */
 char *
-getline(char *s, int n, FILE *iop)
+ftpd_getline(char *s, int n, FILE *iop)
 {
 	int c;
 	register char *cs;
@@ -1305,7 +1305,7 @@ yylex(void)
 		case CMD:
 			(void) signal(SIGALRM, toolong);
 			(void) alarm(timeout);
-			if (getline(cbuf, sizeof(cbuf)-1, stdin) == NULL) {
+			if (ftpd_getline(cbuf, sizeof(cbuf)-1, stdin) == NULL) {
 				reply(221, "You could at least say goodbye.");
 				dologout(0);
 			}
