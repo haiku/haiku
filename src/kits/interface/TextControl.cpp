@@ -1073,10 +1073,6 @@ BTextControl::_InitData(const char* label, const BMessage* archive)
 	if (label)
 		fDivider = floorf(bounds.Width() / 2.0f);
 
-	uint32 navigableFlags = Flags() & B_NAVIGABLE;
-	if (navigableFlags != 0)
-		BView::SetFlags(Flags() & ~B_NAVIGABLE);
-
 }
 
 
@@ -1119,6 +1115,10 @@ BTextControl::_InitText(const char* initialText, const BMessage* archive)
 
 		SetAlignment((alignment)labelAlignment, (alignment)textAlignment);
 	}
+
+	uint32 navigableFlags = Flags() & B_NAVIGABLE;
+	if (navigableFlags != 0)
+		BView::SetFlags(Flags() & ~B_NAVIGABLE);
 }
 
 
