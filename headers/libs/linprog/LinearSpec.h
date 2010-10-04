@@ -79,9 +79,12 @@ public:
 			PenaltyFunction*	AddPenaltyFunction(Variable* var, BList* xs,
 									BList* gs);
 
-			SummandList*		ObjFunction();
-			void				SetObjFunction(SummandList* summands);
-			void				UpdateObjFunction();
+			SummandList*		ObjectiveFunction();
+			//! Caller takes ownership of the Summand's and the SummandList.
+			SummandList*		ReplaceObjectiveFunction(
+									SummandList* objFunction);
+			void				SetObjectiveFunction(SummandList* objFunction);
+			void				UpdateObjectiveFunction();
 
 			ResultType			Presolve();
 			void				RemovePresolved();

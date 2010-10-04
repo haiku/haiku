@@ -28,13 +28,9 @@ public:
 		textView1 = new BTextView("textView1");
 		textView1->SetText("5");	
 
-		button1->SetExplicitMinSize(BSize(0, 0));
 		button1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-		button2->SetExplicitMinSize(BSize(0, 0));
 		button2->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-		button3->SetExplicitMinSize(BSize(0, 0));
 		button3->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-		button4->SetExplicitMinSize(BSize(0, 0));
 		button4->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 		// create a new BALMLayout and use  it for this window
@@ -76,6 +72,11 @@ public:
 		a1->SetWidthAs(a3);
 		a1->SetHeightAs(a3);
 		*/
+
+		// test size limits
+		BSize min = layout->MinSize();
+		BSize max = layout->MaxSize();
+		SetSizeLimits(min.Width(), max.Width(), min.Height(), max.Height());
 	}
 
 private:

@@ -798,17 +798,13 @@ BALMLayout::_CalculateMinSize()
 {
 	_UpdateAreaConstraints();
 
-	SummandList* oldObjFunction = fSolver.ObjFunction();
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(1.0, fRight));
 	newObjFunction->AddItem(new Summand(1.0, fBottom));
-	fSolver.SetObjFunction(newObjFunction);
+	SummandList* oldObjFunction = fSolver.ReplaceObjectiveFunction(
+		newObjFunction);
 	_SolveLayout();
-	fSolver.SetObjFunction(oldObjFunction);
-	fSolver.UpdateObjFunction();
-	delete newObjFunction->ItemAt(0);
-	delete newObjFunction->ItemAt(1);
-	delete newObjFunction;
+	fSolver.SetObjectiveFunction(oldObjFunction);
 
 	if (fSolver.Result() == UNBOUNDED)
 		return kMinSize;
@@ -831,17 +827,13 @@ BALMLayout::_CalculateMaxSize()
 {
 	_UpdateAreaConstraints();
 
-	SummandList* oldObjFunction = fSolver.ObjFunction();
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(-1.0, fRight));
 	newObjFunction->AddItem(new Summand(-1.0, fBottom));
-	fSolver.SetObjFunction(newObjFunction);
+	SummandList* oldObjFunction = fSolver.ReplaceObjectiveFunction(
+		newObjFunction);
 	_SolveLayout();
-	fSolver.SetObjFunction(oldObjFunction);
-	fSolver.UpdateObjFunction();
-	delete newObjFunction->ItemAt(0);
-	delete newObjFunction->ItemAt(1);
-	delete newObjFunction;
+	fSolver.SetObjectiveFunction(oldObjFunction);
 
 	if (fSolver.Result() == UNBOUNDED)
 		return kMaxSize;

@@ -45,10 +45,10 @@ PenaltyFunction::PenaltyFunction(LinearSpec* ls, Variable* var, BList* xs, BList
 			*(double*)(xs->ItemAt(i))));
 		
 		Summand* objSummand =  new Summand(*(double*)(gs->ItemAt(i + 1)) - *(double*)(gs->ItemAt(i)), dPos);
-		ls->ObjFunction()->AddItem(objSummand);
+		ls->ObjectiveFunction()->AddItem(objSummand);
 		fObjFunctionSummands->AddItem(objSummand);
 	}
-	ls->UpdateObjFunction();
+	ls->UpdateObjectiveFunction();
 }
 
 

@@ -342,26 +342,39 @@ LinearSpec::AddPenaltyFunction(Variable* var, BList* xs, BList* gs)
 /**
  * Gets the objective function.
  *
- * @return BList containing the objective function's summands
+ * @return SummandList containing the objective function's summands
  */
 SummandList*
-LinearSpec::ObjFunction()
+LinearSpec::ObjectiveFunction()
 {
 	return fObjFunction;
 }
 
 
+SummandList*
+LinearSpec::ReplaceObjectiveFunction(SummandList* objFunction)
+{
+	SummandList* list = fObjFunction;
+	fObjFunction = objFunction;
+	UpdateObjectiveFunction();
+	return list;
+}
+
+
 /**
  * Sets a new objective function.
- * The old objective function summands are NOT deleted.
  *
- * @param summands	BList containing the objective function's summands
+ * @param summands	SummandList containing the objective function's summands
  */
 void
-LinearSpec::SetObjFunction(SummandList* summands)
+LinearSpec::SetObjectiveFunction(SummandList* objFunction)
 {
-	fObjFunction = summands;
-	UpdateObjFunction();
+	for (int32 i = 0; i < fObjFunction->CountItems(); i++)
+		delete (Summand*)fObjFunction->ItemAt(i);
+	delete fObjFunction;
+
+	fObjFunction = objFunction;
+	UpdateObjectiveFunction();
 }
 
 
@@ -370,7 +383,7 @@ LinearSpec::SetObjFunction(SummandList* summands)
  * Must be called whenever the summands of the objective function are changed.
  */
 void
-LinearSpec::UpdateObjFunction()
+LinearSpec::UpdateObjectiveFunction()
 {
 	int32 size = fObjFunction->CountItems();
 	double coeffs[size];

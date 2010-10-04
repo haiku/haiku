@@ -97,7 +97,7 @@ Constraint::UpdateLeftSide()
 	if (!set_rowex(fLS->fLP, this->Index(), i, &coeffs[0], &varIndexes[0]))
 		STRACE(("Error in set_rowex."));
 
-	fLS->UpdateObjFunction();
+	fLS->UpdateObjectiveFunction();
 	fLS->RemovePresolved();
 }
 
@@ -266,9 +266,9 @@ Constraint::SetPenaltyNeg(double value)
 
 	if (fDNegObjSummand == NULL) {
 		fDNegObjSummand = new Summand(value, new Variable(fLS));
-		fLS->ObjFunction()->AddItem(fDNegObjSummand);
+		fLS->ObjectiveFunction()->AddItem(fDNegObjSummand);
 		UpdateLeftSide();
-		fLS->UpdateObjFunction();
+		fLS->UpdateObjectiveFunction();
 		return;
 	}
 
@@ -276,7 +276,7 @@ Constraint::SetPenaltyNeg(double value)
 		return;
 
 	fDNegObjSummand->SetCoeff(value);
-	fLS->UpdateObjFunction();
+	fLS->UpdateObjectiveFunction();
 }
 
 
@@ -308,9 +308,9 @@ Constraint::SetPenaltyPos(double value)
 
 	if (fDPosObjSummand == NULL) {
 		fDPosObjSummand = new Summand(value, new Variable(fLS));
-		fLS->ObjFunction()->AddItem(fDPosObjSummand);
+		fLS->ObjectiveFunction()->AddItem(fDPosObjSummand);
 		UpdateLeftSide();
-		fLS->UpdateObjFunction();
+		fLS->UpdateObjectiveFunction();
 		return;
 	}
 
@@ -318,7 +318,7 @@ Constraint::SetPenaltyPos(double value)
 		return;
 
 	fDPosObjSummand->SetCoeff(value);
-	fLS->UpdateObjFunction();
+	fLS->UpdateObjectiveFunction();
 }
 
 
@@ -428,13 +428,13 @@ Constraint::Invalidate()
 	fLeftSide = NULL;
 
 	if (fDNegObjSummand) {
-		fLS->ObjFunction()->RemoveItem(fDNegObjSummand);
+		fLS->ObjectiveFunction()->RemoveItem(fDNegObjSummand);
 		delete fDNegObjSummand->Var();
 		delete fDNegObjSummand;
 		fDNegObjSummand = NULL;
 	}
 	if (fDPosObjSummand) {
-		fLS->ObjFunction()->RemoveItem(fDPosObjSummand);
+		fLS->ObjectiveFunction()->RemoveItem(fDPosObjSummand);
 		delete fDPosObjSummand->Var();
 		delete fDPosObjSummand;
 		fDPosObjSummand = NULL;
@@ -528,7 +528,7 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 			: LE), rightSide))
 		STRACE(("Error in add_constraintex."));
 
-	fLS->UpdateObjFunction();
+	fLS->UpdateObjectiveFunction();
 	fLS->Constraints()->AddItem(this);
 }
 
