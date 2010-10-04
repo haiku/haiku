@@ -94,7 +94,6 @@ SYSTEM_LIBS =
 	$(HAIKU_SHARED_LIBSTDC++) $(HAIKU_SHARED_LIBSUPC++)
 ;
 PRIVATE_SYSTEM_LIBS =
-	libalm.so
 	libfluidsynth.so
 	libilmimf.so
 	liblinprog.so liblpsolve55.so
