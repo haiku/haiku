@@ -1,18 +1,19 @@
 /*
  * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
 
-#include "Variable.h"
-#include "Constraint.h"
-#include "LinearSpec.h"
-#include "OperatorType.h"
 
-#include "lp_lib.h"
+#include "Variable.h"
 
 #include <float.h>	// for DBL_MAX
 
+#include <File.h>
+
+#include "Constraint.h"
+#include "LinearSpec.h"
 
 // Toggle debug output
 //#define DEBUG_VARIABLE
@@ -32,12 +33,7 @@
 int32
 Variable::Index() const
 {
-	int32 i = fLS->Variables()->IndexOf(this);
-	if (i == -1) {
-		printf("Variable not part of fLS->Variables().");
-		return -1;
-	}
-	return i + 1;
+	return fLS->IndexOf(this);
 }
 
 
@@ -139,7 +135,7 @@ Variable::SetRange(double min, double max)
 
 	fMin = min;
 	fMax = max;
-	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
+	fLS->SetRange(this, fMin, fMax);
 }
 
 
@@ -279,20 +275,20 @@ Variable::IsValid()
 void
 Variable::Invalidate()
 {
-	STRACE(("Variable::Invalidate() on %s\n", ToString()));
+	STRACE(("Variable::Invalidate() on %s\n", BString(*this).String()));
 
 	if (!fIsValid)
 		return;
 
 	fIsValid = false;
-	del_column(fLS->fLP, Index());
-	fLS->Variables()->RemoveItem(this);
+	
+	fLS->RemoveVariable(this, false);
 
 	// invalidate all constraints that use this variable
 	ConstraintList markedForInvalidation;
-	ConstraintList* constraints = fLS->Constraints();
-	for (int i = 0; i < constraints->CountItems(); i++) {
-		Constraint* constraint = constraints->ItemAt(i);
+	const ConstraintList& constraints = fLS->Constraints();
+	for (int i = 0; i < constraints.CountItems(); i++) {
+		Constraint* constraint = constraints.ItemAt(i);
 
 		if (!constraint->IsValid())
 			continue;
@@ -321,18 +317,9 @@ Variable::Variable(LinearSpec* ls)
 	fMin(0),
 	fMax(DBL_MAX),
 	fLabel(NULL),
-	fIsValid(true)
+	fIsValid(false)
 {
-	fLS->Variables()->AddItem(this);
 
-	if (fLS->Variables()->CountItems() > fLS->CountColumns()) {
-		double d = 0;
-		int i = 0;
-		if (!add_columnex(fLS->fLP, 0, &d, &i))
-			printf("Error in add_columnex.");
-	}
-
-	SetRange(-20000, 20000);
 }
 
 
@@ -342,6 +329,6 @@ Variable::Variable(LinearSpec* ls)
  */
 Variable::~Variable()
 {
-	Invalidate();
+	fLS->RemoveVariable(this, false);
 }
 

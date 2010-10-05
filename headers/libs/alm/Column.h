@@ -8,12 +8,12 @@
 
 #include "Constraint.h"
 #include "LinearSpec.h"
+#include "Tab.h"
 
 
 namespace BALM {
 
 class BALMLayout;
-class XTab;
 
 /**
  * Represents a column defined by two x-tabs.
@@ -36,7 +36,7 @@ public:
 			ConstraintList*		Constraints() const;
 
 protected:
-								Column(LinearSpec* ls);
+								Column(BALMLayout* layout);
 
 protected:
 			LinearSpec*			fLS;

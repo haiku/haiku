@@ -8,13 +8,13 @@
 
 #include "Constraint.h"
 #include "LinearSpec.h"
+#include "Tab.h"
 
 
 namespace BALM {
 
 class BALMLayout;
-class YTab;
-	
+
 /**
  * Represents a row defined by two y-tabs.
  */
@@ -34,7 +34,7 @@ public:
 			ConstraintList*		Constraints() const;
 
 protected:
-								Row(LinearSpec* ls);
+								Row(BALMLayout* layout);
 
 protected:
 			LinearSpec*			fLS;

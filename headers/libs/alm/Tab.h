@@ -27,7 +27,6 @@ protected:
 
 public:
 	friend	class				BALMLayout;
-	friend	class				Column;
 };
 
 
@@ -42,7 +41,6 @@ protected:
 
 public:
 	friend	class				BALMLayout;
-	friend	class				Row;
 };
 
 

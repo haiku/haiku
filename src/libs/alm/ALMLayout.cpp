@@ -10,6 +10,7 @@
 
 #include <math.h>		// for floor
 #include <new>
+#include <iostream>
 
 #include "ViewLayoutItem.h"
 
@@ -31,10 +32,10 @@ BALMLayout::BALMLayout(float spacing)
 	fSpacing(spacing),
 	fCurrentArea(NULL)
 {
-	fLeft = new XTab(&fSolver);
-	fRight = new XTab(&fSolver);
-	fTop = new YTab(&fSolver);
-	fBottom = new YTab(&fSolver);
+	fLeft = AddXTab();
+	fRight = AddXTab();
+	fTop = AddYTab();
+	fBottom = AddYTab();
 
 	// the Left tab is always at x-position 0, and the Top tab is always at y-position 0
 	fLeft->SetRange(0, 0);
@@ -64,7 +65,15 @@ BALMLayout::~BALMLayout()
 XTab*
 BALMLayout::AddXTab()
 {
-	return new XTab(&fSolver);
+	XTab* tab = new XTab(&fSolver);
+	if (!tab)
+		return NULL;
+	if (!fSolver.AddVariable(tab)) {
+		delete tab;
+		return NULL;
+	}
+
+	return tab;
 }
 
 
@@ -76,7 +85,15 @@ BALMLayout::AddXTab()
 YTab*
 BALMLayout::AddYTab()
 {
-	return new YTab(&fSolver);
+	YTab* tab = new YTab(&fSolver);
+	if (!tab)
+		return NULL;
+	if (!fSolver.AddVariable(tab)) {
+		delete tab;
+		return NULL;
+	}
+
+	return tab;
 }
 
 
@@ -88,7 +105,7 @@ BALMLayout::AddYTab()
 Row*
 BALMLayout::AddRow()
 {
-	return new Row(&fSolver);
+	return new Row(this);
 }
 
 
@@ -102,7 +119,7 @@ BALMLayout::AddRow()
 Row*
 BALMLayout::AddRow(YTab* top, YTab* bottom)
 {
-	Row* row = new Row(&fSolver);
+	Row* row = new Row(this);
 	if (top != NULL)
 		row->Constraints()->AddItem(row->Top()->IsEqual(top));
 	if (bottom != NULL)
@@ -119,7 +136,7 @@ BALMLayout::AddRow(YTab* top, YTab* bottom)
 Column*
 BALMLayout::AddColumn()
 {
-	return new Column(&fSolver);
+	return new Column(this);
 }
 
 
@@ -133,7 +150,7 @@ BALMLayout::AddColumn()
 Column*
 BALMLayout::AddColumn(XTab* left, XTab* right)
 {
-	Column* column = new Column(&fSolver);
+	Column* column = new Column(this);
 	if (left != NULL)
 		column->Constraints()->AddItem(column->Left()->IsEqual(left));
 	if (right != NULL)
@@ -677,7 +694,7 @@ BALMLayout::DerivedLayoutItems()
 
 	_SolveLayout();
 
-	// if new layout is infasible, use previous layout
+	// if new layout is infeasible, use previous layout
 	if (fSolver.Result() == INFEASIBLE)
 		return;
 

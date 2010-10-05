@@ -1,6 +1,7 @@
 /*
  * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,8 +11,6 @@
 #include "ALMLayout.h"
 #include "OperatorType.h"
 #include "Tab.h"
-
-#include <SupportDefs.h>
 
 
 /**
@@ -72,7 +71,7 @@ Column::SetPrevious(Column* value)
 		
 	fPrevious = value;
 	fPrevious->fNext = this;
-	value->fNextGlue = value->fRight->IsEqual(fLeft);
+	value->fNextGlue = value->Right()->IsEqual(Left());
 	fPreviousGlue = value->fNextGlue;
 }
 
@@ -115,7 +114,7 @@ Column::SetNext(Column* value)
 		
 	fNext = value;
 	fNext->fPrevious = this;
-	value->fPreviousGlue = fRight->IsEqual(value->fLeft);
+	value->fPreviousGlue = Right()->IsEqual(value->Left());
 	fNextGlue = value->fPreviousGlue;
 }
 
@@ -156,7 +155,7 @@ Constraint*
 Column::HasSameWidthAs(Column* column)
 {
 	Constraint* constraint = fLS->AddConstraint(
-		-1.0, fLeft, 1.0, fRight, 1.0, column->fLeft, -1.0, column->fRight,
+		-1.0, Left(), 1.0, Right(), 1.0, column->Left(), -1.0, column->Right(),
 		OperatorType(EQ), 0.0);
 	fConstraints.AddItem(constraint);
 	return constraint;
@@ -188,10 +187,10 @@ Column::~Column()
 /**
  * Constructor.
  */
-Column::Column(LinearSpec* ls)
+Column::Column(BALMLayout* layout)
 {
-	fLS = ls;
-	fLeft = new XTab(ls);
-	fRight = new XTab(ls);
+	fLS = layout->Solver();
+	fLeft = layout->AddXTab();
+	fRight = layout->AddXTab();
 }
 

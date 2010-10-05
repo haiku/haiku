@@ -36,6 +36,12 @@ public:
 	virtual						~LinearSpec();
 
 			Variable*			AddVariable();
+			bool				AddVariable(Variable* variable);
+			bool				RemoveVariable(Variable* variable,
+									bool deleteVariable = true);
+			int32				IndexOf(const Variable* variable) const;
+			bool				SetRange(Variable* variable, double min,
+									double max);
 
 			Constraint*			AddConstraint(SummandList* summands,
 									OperatorType op, double rightSide);
@@ -86,8 +92,6 @@ public:
 			void				SetObjectiveFunction(SummandList* objFunction);
 			void				UpdateObjectiveFunction();
 
-			ResultType			Presolve();
-			void				RemovePresolved();
 			ResultType			Solve();
 			void				Save(const char* fileName);
 
@@ -102,13 +106,12 @@ public:
 			operator BString() const;
 			void				GetString(BString& string) const;
 
-protected:
-			VariableList*		Variables() const;
-			ConstraintList*		Constraints() const;
-
-			int32 				fCountColumns;
+	const	ConstraintList&		Constraints() const;
 
 private:
+			ResultType			Presolve();
+			void				RemovePresolved();
+
 			lprec*				fLpPresolved;
 			OptimizationType	fOptimization;
 			lprec*				fLP;
@@ -121,7 +124,6 @@ private:
 
 public:
 	friend class		Constraint;
-	friend class		Variable;
 
 };
 

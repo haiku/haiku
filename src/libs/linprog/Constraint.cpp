@@ -8,8 +8,6 @@
 #include "LinearSpec.h"
 #include "Variable.h"
 
-#include "lp_lib.h"
-
 
 // Toggle debug output
 //#define DEBUG_CONSTRAINT
@@ -29,7 +27,7 @@
 int32
 Constraint::Index() const
 {
-	int32 i = fLS->Constraints()->IndexOf(this);
+	int32 i = fLS->Constraints().IndexOf(this);
 	if (i == -1) {
 		STRACE(("Constraint not part of fLS->Constraints()."));
 		return -1;
@@ -265,7 +263,7 @@ Constraint::SetPenaltyNeg(double value)
 		return;
 
 	if (fDNegObjSummand == NULL) {
-		fDNegObjSummand = new Summand(value, new Variable(fLS));
+		fDNegObjSummand = new Summand(value, fLS->AddVariable());
 		fLS->ObjectiveFunction()->AddItem(fDNegObjSummand);
 		UpdateLeftSide();
 		fLS->UpdateObjectiveFunction();
@@ -307,7 +305,7 @@ Constraint::SetPenaltyPos(double value)
 		return;
 
 	if (fDPosObjSummand == NULL) {
-		fDPosObjSummand = new Summand(value, new Variable(fLS));
+		fDPosObjSummand = new Summand(value, fLS->AddVariable());
 		fLS->ObjectiveFunction()->AddItem(fDPosObjSummand);
 		UpdateLeftSide();
 		fLS->UpdateObjectiveFunction();
@@ -441,7 +439,7 @@ Constraint::Invalidate()
 	}
 
 	del_constraint(fLS->fLP, this->Index());
-	fLS->Constraints()->RemoveItem(this);
+	const_cast<ConstraintList&>(fLS->Constraints()).RemoveItem(this);
 }
 
 
@@ -502,7 +500,7 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 
 	if (penaltyNeg != INFINITY
 		&& fOp != OperatorType(LE)) {
-		fDNegObjSummand = new Summand(penaltyNeg, new Variable(fLS));
+		fDNegObjSummand = new Summand(penaltyNeg, ls->AddVariable());
 		fLS->fObjFunction->AddItem(fDNegObjSummand);
 		varIndexes[i] = fDNegObjSummand->Var()->Index();
 		coeffs[i] = 1.0;
@@ -513,7 +511,7 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 
 	if (penaltyPos != INFINITY
 		&& fOp != OperatorType(GE)) {
-		fDPosObjSummand = new Summand(penaltyPos, new Variable(fLS));
+		fDPosObjSummand = new Summand(penaltyPos, ls->AddVariable());
 		fLS->fObjFunction->AddItem(fDPosObjSummand);
 		varIndexes[i] = fDPosObjSummand->Var()->Index();
 		coeffs[i] = -1.0;
@@ -529,7 +527,7 @@ Constraint::Constraint(LinearSpec* ls, SummandList* summands, OperatorType op,
 		STRACE(("Error in add_constraintex."));
 
 	fLS->UpdateObjectiveFunction();
-	fLS->Constraints()->AddItem(this);
+	const_cast<ConstraintList&>(fLS->Constraints()).AddItem(this);
 }
 
 

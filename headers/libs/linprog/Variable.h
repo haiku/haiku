@@ -6,11 +6,9 @@
 #ifndef	VARIABLE_H
 #define	VARIABLE_H
 
-#include <File.h>
+
 #include <ObjectList.h>
 #include <String.h>
-#include <SupportDefs.h>
-
 
 namespace LinearProgramming {
 
@@ -51,15 +49,18 @@ public:
 									double penaltyNeg, double penaltyPos);
 
 			bool				IsValid();
+			//! Dangerous the variable don't belong to the LinearSpec anymore,
+			//! delete it yourself!
 			void				Invalidate();
 
-			virtual				~Variable();
+								~Variable();
 
 protected:
 								Variable(LinearSpec* ls);
 
 private:
 			LinearSpec*			fLS;
+
 			BObjectList<Summand>	fUsingSummands;
 				// All Summands that link to this Variable
 			double				fValue;
@@ -71,9 +72,7 @@ private:
 
 public:
 	friend class		LinearSpec;
-	friend class		Constraint;
 	friend class		Summand;
-
 };
 
 

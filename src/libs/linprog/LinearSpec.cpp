@@ -1,8 +1,10 @@
 /*
  * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
  * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "LinearSpec.h"
 
@@ -13,7 +15,6 @@
  */
 LinearSpec::LinearSpec()
 	:
-	fCountColumns(0),
 	fLpPresolved(NULL),
 	fOptimization(MINIMIZE),
 	fObjFunction(new SummandList()),
@@ -40,8 +41,9 @@ LinearSpec::~LinearSpec()
 		delete (Constraint*)fConstraints.ItemAt(i);
 	for (int32 i = 0; i < fObjFunction->CountItems(); i++)
 		delete (Summand*)fObjFunction->ItemAt(i);
-	for (int32 i = 0; i < fVariables.CountItems(); i++)
-		delete (Variable*)fVariables.ItemAt(i);
+	while (fVariables.CountItems() > 0)
+		RemoveVariable(fVariables.ItemAt(0));
+
 	delete_lp(fLP);
 
 	delete fObjFunction;
@@ -56,7 +58,75 @@ LinearSpec::~LinearSpec()
 Variable*
 LinearSpec::AddVariable()
 {
-	return new Variable(this);
+	Variable* variable = new Variable(this);
+	if (!variable)
+		return NULL;
+	if (!AddVariable(variable)) {
+		delete variable;
+		return NULL;
+	}
+
+	return variable;
+}
+
+
+bool
+LinearSpec::AddVariable(Variable* variable)
+{
+	double d = 0;
+	int i = 0;
+
+	if (!fVariables.AddItem(variable))
+		return false;
+	if (add_columnex(fLP, 0, &d, &i) == 0) {
+		fVariables.RemoveItem(variable);
+		return false;
+	}
+
+	if (!SetRange(variable, -20000, 20000)) {
+		RemoveVariable(variable, false);
+		return false;
+	}
+
+	variable->fIsValid = true;
+	return true;
+}
+
+
+bool
+LinearSpec::RemoveVariable(Variable* variable, bool deleteVariable)
+{
+	int32 index = IndexOf(variable);
+	if (index < 0)
+		return false;
+
+	if (!del_column(fLP, index))
+		return false;
+	fVariables.RemoveItemAt(index - 1);
+	variable->Invalidate();
+
+	if (deleteVariable)
+		delete variable;
+	return true;
+}
+
+
+int32
+LinearSpec::IndexOf(const Variable* variable) const
+{
+	int32 i = fVariables.IndexOf(variable);
+	if (i == -1) {
+		printf("Variable 0x%p not part of fLS->Variables().\n", variable);
+		return -1;
+	}
+	return i + 1;
+}
+
+
+bool
+LinearSpec::SetRange(Variable* variable, double min, double max)
+{
+	return set_bounds(fLP, IndexOf(variable), min, max);
 }
 
 
@@ -396,7 +466,7 @@ LinearSpec::UpdateObjectiveFunction()
 	}
 
 	if (!set_obj_fnex(fLP, size, &coeffs[0], &varIndexes[0]))
-		printf("Error in set_obj_fnex.");
+		printf("Error in set_obj_fnex.\n");
 
 	RemovePresolved();
 }
@@ -433,8 +503,8 @@ LinearSpec::Presolve()
 
 	if (fLpPresolved == NULL) {
 		fLpPresolved = copy_lp(fLP);
-		set_presolve(fLpPresolved, PRESOLVE_ROWS | PRESOLVE_COLS | PRESOLVE_LINDEP,
-				get_presolveloops(fLpPresolved));
+		set_presolve(fLpPresolved, PRESOLVE_ROWS | PRESOLVE_COLS
+			| PRESOLVE_LINDEP, get_presolveloops(fLpPresolved));
 	}
 
 	fResult = (ResultType)solve(fLpPresolved);
@@ -478,7 +548,7 @@ LinearSpec::Solve()
 		int32 size = fVariables.CountItems();
 		double x[size];
 		if (!get_variables(fLP, &x[0]))
-			printf("Error in get_variables.");
+			printf("Error in get_variables.\n");
 
 		int32 i = 0;
 		while (i < size) {
@@ -505,18 +575,6 @@ LinearSpec::Save(const char* fileName)
 {
 	// TODO: Constness should be fixed in liblpsolve API.
 	write_lp(fLP, const_cast<char*>(fileName));
-}
-
-
-/**
- * Gets the number of columns.
- *
- * @return the number of columns
- */
-int32
-LinearSpec::CountColumns() const
-{
-	return fCountColumns;
 }
 
 
@@ -551,26 +609,14 @@ LinearSpec::SetOptimization(OptimizationType value)
 
 
 /**
- * Gets the the variables.
- *
- * @return the variables
- */
-VariableList*
-LinearSpec::Variables() const
-{
-	return const_cast<VariableList*>(&fVariables);
-}
-
-
-/**
  * Gets the constraints.
  *
  * @return the constraints
  */
-ConstraintList*
+const ConstraintList&
 LinearSpec::Constraints() const
 {
-	return const_cast<ConstraintList*>(&fConstraints);
+	return fConstraints;
 }
 
 
