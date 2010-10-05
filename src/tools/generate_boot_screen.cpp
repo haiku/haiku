@@ -201,19 +201,18 @@ write_24bit_image(const char* baseName, int width, int height, png_bytep* rowPtr
 							}
 							buffer[0] = 0;
 						}
-						buffer[0]++;
-						buffer[buffer[0]] = row[x];
-					} else if (count > 0) {
-						buffer[0] = 1;
-						buffer[1] = row[x];
-						bufferActive = true;
-						if (count > 1) {
+					} else {
+						if (count > 0) {
 							fprintf(sOutput, "%d, ", count);
 							new_line_if_required();
 							fprintf(sOutput, "%d, ", currentValue);
 							new_line_if_required();
 						}
+						buffer[0] = 0;
+						bufferActive = true;
 					}
+					buffer[0]++;
+					buffer[buffer[0]] = row[x];
 					currentValue = row[x];
 				}
 			}
@@ -304,19 +303,18 @@ write_8bit_image(const char* baseName, int width, int height, unsigned char** ro
 						}
 						buffer[0] = 0;
 					}
-					buffer[0]++;
-					buffer[buffer[0]] = row[x];
-				} else if (count > 0) {
-					buffer[0] = 1;
-					buffer[1] = row[x];
-					bufferActive = true;
-					if (count > 1) {
+				} else {
+					if (count > 0) {
 						fprintf(sOutput, "%d, ", count);
 						new_line_if_required();
 						fprintf(sOutput, "%d, ", currentValue);
 						new_line_if_required();
 					}
+					buffer[0] = 0;
+					bufferActive = true;
 				}
+				buffer[0]++;
+				buffer[buffer[0]] = row[x];
 				currentValue = row[x];
 			}
 		}
