@@ -1,17 +1,12 @@
 /*
  * Copyright 2010, Alexander Shagarov, alexander.shagarov@gmail.com.
  * Copyright 2005, Stephan Aßmus, superstippi@yellowbites.com.
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
  * Distributed under the terms of the MIT license.
  */
 
-
-#include <Mime.h>
-#include <TypeConstants.h>
-
-#include <fs_attr.h>
 
 #include <ctype.h>
 #include <errno.h>
@@ -20,6 +15,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <fs_attr.h>
+#include <Mime.h>
+#include <String.h>
+#include <TypeConstants.h>
 
 
 /*!	Used to present the characters in the raw data view */
@@ -72,9 +72,6 @@ dumpRawData(const char *buffer, size_t size)
 static const char*
 type_to_string(uint32 type)
 {
-	if (type == B_RAW_TYPE)
-		return "raw_data";
-
 	static char buffer[32];
 
 	int32 missed = 0, shift = 24;
@@ -97,9 +94,48 @@ type_to_string(uint32 type)
 }
 
 
+static BString
+type_name(uint32 type)
+{
+	switch (type) {
+		case B_INT8_TYPE:
+			return "int8";
+		case B_UINT8_TYPE:
+			return "uint8";
+		case B_INT16_TYPE:
+			return "int16";
+		case B_UINT16_TYPE:
+			return "uint16";
+		case B_INT32_TYPE:
+			return "int32";
+		case B_UINT32_TYPE:
+			return "uint32";
+		case B_INT64_TYPE:
+			return "int64";
+		case B_UINT64_TYPE:
+			return "uint64";
+		case B_FLOAT_TYPE:
+			return "float";
+		case B_DOUBLE_TYPE:
+			return "double";
+		case B_BOOL_TYPE:
+			return "bool";
+		case B_STRING_TYPE:
+			return "string";
+		case B_MESSAGE_TYPE:
+			return "message";
+		case B_RAW_TYPE:
+			return "raw_data";
+
+		default:
+			return type_to_string(type);
+	}
+}
+
+
 static status_t
-catAttr(const char *attribute, const char *fileName, bool keepRaw = false,
-	bool resolveLinks = true)
+catAttr(const char *attribute, const char *fileName, bool keepRaw,
+	bool dataOnly, bool resolveLinks)
 {
 	int fd = open(fileName, O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
 	if (fd < 0)
@@ -177,57 +213,55 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false,
 		return written;
 	}
 
+	if (!dataOnly)
+		printf("%s : %s : ", fileName, type_name(info.type).String());
+
 	switch (info.type) {
 		case B_INT8_TYPE:
-			printf("%s : int8 : %d\n", fileName, *((int8 *)buffer));
+			printf("%d\n", *((int8*)buffer));
 			break;
 		case B_UINT8_TYPE:
-			printf("%s : uint8 : %u\n", fileName, *((uint8 *)buffer));
+			printf("%u\n", *((uint8*)buffer));
 			break;
 		case B_INT16_TYPE:
-			printf("%s : int16 : %d\n", fileName, *((int16 *)buffer));
+			printf("%d\n", *((int16*)buffer));
 			break;
 		case B_UINT16_TYPE:
-			printf("%s : uint16 : %u\n", fileName, *((uint16 *)buffer));
+			printf("%u\n", *((uint16*)buffer));
 			break;
 		case B_INT32_TYPE:
-			printf("%s : int32 : %ld\n", fileName, *((int32 *)buffer));
+			printf("%ld\n", *((int32*)buffer));
 			break;
 		case B_UINT32_TYPE:
-			printf("%s : uint32 : %lu\n", fileName, *((uint32 *)buffer));
+			printf("%lu\n", *((uint32*)buffer));
 			break;
 		case B_INT64_TYPE:
-			printf("%s : int64 : %Ld\n", fileName, *((int64 *)buffer));
+			printf("%Ld\n", *((int64*)buffer));
 			break;
 		case B_UINT64_TYPE:
-			printf("%s : uint64 : %Lu\n", fileName, *((uint64 *)buffer));
+			printf("%Lu\n", *((uint64*)buffer));
 			break;
 		case B_FLOAT_TYPE:
-			printf("%s : float : %f\n", fileName, *((float *)buffer));
+			printf("%f\n", *((float*)buffer));
 			break;
 		case B_DOUBLE_TYPE:
-			printf("%s : double : %f\n", fileName, *((double *)buffer));
+			printf("%f\n", *((double*)buffer));
 			break;
 		case B_BOOL_TYPE:
-			printf("%s : bool : %d\n", fileName, *((unsigned char *)buffer));
+			printf("%d\n", *((unsigned char*)buffer));
 			break;
 		case B_STRING_TYPE:
-			printf("%s : string : %s\n", fileName, buffer);
-			break;
-
 		case B_MIME_STRING_TYPE:
 		case 'MSIG':
 		case 'MSDC':
 		case 'MPTH':
-			printf("%s : %s : %s\n", fileName, type_to_string(info.type),
-				buffer);
+			printf("%s\n", buffer);
 			break;
 
 		case B_MESSAGE_TYPE:
 		{
 			BMessage message;
 			if (!cut && message.Unflatten(buffer) == B_OK) {
-				printf("%s : message :\n", fileName);
 				message.PrintToStream();
 				break;
 			}
@@ -236,7 +270,6 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false,
 
 		default:
 			// The rest of the attributes types are displayed as raw data
-			printf("%s : %s : \n", fileName, type_to_string(info.type));
 			dumpRawData(buffer, size);
 			break;
 	}
@@ -247,18 +280,16 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false,
 
 
 static int
-usage(const char* program)
+usage(const char* program, int returnCode)
 {
 	// Issue usage message
-	fprintf(stderr, "usage: %s [-P] [--raw|-r] <attribute-name> <file1> "
-		"[<file2>...]\n"
-		"\t-P : Don't resolve links\n"
-		"\t--raw|-r : Get the raw data of attributes\n", program);
-	// Be's original version -only- returned 1 if the
-	// amount of parameters was wrong, not if the file
-	// or attribute couldn't be found (!)
-	// In all other cases it returned 0
-	return 1;
+	fprintf(returnCode == EXIT_SUCCESS ? stdout : stderr,
+		"usage: %s [-P] [--raw|-r] <attribute-name> <file1> [<file2>...]\n"
+		"  -P\t\tDon't resolve links\n"
+		"  --raw,-r\tGet the raw data of attributes\n"
+		"  --data,-d\tShow the attribute data only\n", program);
+
+	return returnCode;
 }
 
 
@@ -271,40 +302,54 @@ main(int argc, char *argv[])
 	else
 		program++;
 
-	bool keepRaw = false;
-	bool resolveLinks = true;
-	const struct option longOptions[] = {
+	const struct option kLongOptions[] = {
 		{"raw", no_argument, NULL, 'r'},
+		{"data", no_argument, NULL, 'd'},
+		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
 
-	int rez;
-	while ((rez = getopt_long(argc, argv, "rP", longOptions, NULL)) != -1) {
-		switch (rez) {
+	bool keepRaw = false;
+	bool resolveLinks = true;
+	bool dataOnly = false;
+
+	int option;
+	while ((option = getopt_long(argc, argv, "rdPh", kLongOptions, NULL))
+			!= -1) {
+		switch (option) {
 			case 'r':
 				keepRaw = true;
 				break;
 			case 'P':
 				resolveLinks = false;
 				break;
+			case 'd':
+				dataOnly = true;
+				break;
+			case 'h':
+				return usage(program, EXIT_SUCCESS);
+
 			default:
-				return usage(program);
+				return usage(program, EXIT_FAILURE);
 		}
 	}
 
 	if (optind + 2 > argc)
-		return usage(program);
+		return usage(program, EXIT_FAILURE);
 
+	int succeeded = 0;
 	const char* attrName = argv[optind++];
+
 	while (optind < argc) {
 		const char* fileName = argv[optind++];
-		status_t status = catAttr(attrName, fileName, keepRaw,
-				resolveLinks);
+		status_t status = catAttr(attrName, fileName, keepRaw, dataOnly,
+			resolveLinks);
 		if (status != B_OK) {
 			fprintf(stderr, "%s: \"%s\", attribute \"%s\": %s\n",
-					program, fileName, attrName, strerror(status));
-		}
+				program, fileName, attrName, strerror(status));
+		} else
+			succeeded++;
 	}
 
-	return 0;
+	return succeeded != 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
