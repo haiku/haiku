@@ -1,46 +1,28 @@
 /*
  * Copyright 1999, Be Incorporated. All Rights Reserved.
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * This file may be used under the terms of the Be Sample Code License.
  *
  */
 
-#include "clock.h"
+
+#include <Application.h>
+
 #include "cl_wind.h"
 
 
-const char *kAppSignature = "application/x-vnd.Haiku-Clock";
-
-
-THelloApplication::THelloApplication()
-		  :BApplication(kAppSignature)
-{
-	BRect windowRect(100, 100, 182, 182);
-	myWindow = new TClockWindow(windowRect, "Clock");
-	myWindow->Show();
-}
-
-
-THelloApplication::~THelloApplication()
-{
-}
-
-
-void
-THelloApplication::MessageReceived(BMessage *msg)
-{
-	BApplication::MessageReceived(msg);
-}
-
-
-//	#pragma mark -
+const char* kAppSignature = "application/x-vnd.Haiku-Clock";
 
 
 int
 main(int argc, char* argv[])
 {
-	THelloApplication app;
+	BApplication app(kAppSignature);
+
+	BWindow* clockWindow = new TClockWindow(BRect(100, 100, 182, 182), "Clock");
+	clockWindow->Show();
+
 	app.Run();
 
 	return 0;
 }
-

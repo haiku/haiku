@@ -7,24 +7,6 @@
 #define _CLOCK_APPLICATION_H
 
 
-#include <Application.h>
-
-
-class TClockWindow;
-
-
-class THelloApplication : public BApplication {
-	public:
-						THelloApplication();
-		virtual			~THelloApplication();
-
-		virtual	void	MessageReceived(BMessage *msg);
-
-	private:
-		TClockWindow	*myWindow;
-};
-
-
 extern const char *kAppSignature;
 
 
