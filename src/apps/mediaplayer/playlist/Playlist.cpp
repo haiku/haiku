@@ -44,6 +44,7 @@
 
 #include "FilePlaylistItem.h"
 #include "FileReadWrite.h"
+#include "MainApp.h"
 
 using std::nothrow;
 
@@ -247,6 +248,13 @@ Playlist::CountItems() const
 }
 
 
+bool
+Playlist::IsEmpty() const
+{
+	return fItems.IsEmpty();
+}
+
+
 void
 Playlist::Sort()
 {
@@ -439,6 +447,7 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 			i++) {
 		Playlist subPlaylist;
 		BString type = _MIMEString(&ref);
+
 		if (_IsPlaylist(type)) {
 			AppendPlaylistToPlaylist(ref, &subPlaylist);
 			// Do not sort the whole playlist anymore, as that
@@ -455,6 +464,16 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 			if (!sortPlaylist)
 				subPlaylist.Sort();
 		}
+
+		if (!subPlaylist.IsEmpty()) {
+			// Add to recent documents
+			BEntry entry(&ref, true);
+			if (entry.IsDirectory())
+				be_roster->AddToRecentFolders(&ref, kAppSig);
+			else
+				be_roster->AddToRecentDocuments(&ref, kAppSig);
+		}
+
 		int32 subPlaylistCount = subPlaylist.CountItems();
 		AdoptPlaylist(subPlaylist, subAppendIndex);
 		subAppendIndex += subPlaylistCount;

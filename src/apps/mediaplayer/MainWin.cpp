@@ -1423,19 +1423,13 @@ MainWin::_CreateMenu()
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
 
-#if 0
-	// Plain "Open File" entry
-	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS,
-		new BMessage(M_FILE_OPEN), 'O'));
-#else
 	// Add recent files to "Open File" entry as sub-menu.
 	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
 	item = new BMenuItem(recentFiles.NewFileListMenu(
-		"Open file"B_UTF8_ELLIPSIS, new BMessage(B_REFS_RECEIVED),
-		NULL, this, 10, false, NULL, 0, kAppSig), new BMessage(M_FILE_OPEN));
+		"Open file"B_UTF8_ELLIPSIS, NULL, NULL, this, 10, true, NULL, kAppSig),
+		new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
 	fFileMenu->AddItem(item);
-#endif
 
 	fFileMenu->AddSeparatorItem();
 
@@ -2396,9 +2390,6 @@ MainWin::_UpdatePlaylistItemFile()
 	BNode node(&item->Ref());
 	if (node.InitCheck())
 		return;
-
-	// Add to recent documents
-	be_roster->AddToRecentDocuments(&item->Ref(), kAppSig);
 
 	locker.Unlock();
 

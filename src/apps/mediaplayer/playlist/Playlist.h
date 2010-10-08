@@ -46,17 +46,17 @@ class Playlist : public BLocker {
 public:
 	class Listener {
 	public:
-						Listener();
-		virtual			~Listener();
+								Listener();
+		virtual					~Listener();
 
-		virtual	void	ItemAdded(PlaylistItem* item, int32 index);
-		virtual	void	ItemRemoved(int32 index);
+		virtual	void			ItemAdded(PlaylistItem* item, int32 index);
+		virtual	void			ItemRemoved(int32 index);
 
-		virtual	void	ItemsSorted();
+		virtual	void			ItemsSorted();
 
-		virtual	void	CurrentItemChanged(int32 newIndex);
+		virtual	void			CurrentItemChanged(int32 newIndex);
 
-		virtual	void	ImportFailed();
+		virtual	void			ImportFailed();
 	};
 
 public:
@@ -73,6 +73,7 @@ public:
 			// list functionality
 			void				MakeEmpty(bool deleteItems = true);
 			int32				CountItems() const;
+			bool				IsEmpty() const;
 
 			void				Sort();
 
