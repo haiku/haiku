@@ -310,8 +310,10 @@ BTextControl::SetText(const char *text)
 
 	fText->SetText(text);
 
-	if (IsFocus())
+	if (fText->IsFocus()) {
 		fText->SetInitialText();
+		fText->SelectAll();
+	}
 
 	fText->Invalidate();
 }
