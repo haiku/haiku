@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -125,6 +125,10 @@ static vint32 sModifiedTemporaryPages;
 static ConditionVariable sFreePageCondition;
 static mutex sPageDeficitLock = MUTEX_INITIALIZER("page deficit");
 
+// This lock must be used whenever the free or clear page queues are changed.
+// If you need to work on both queues at the same time, you need to hold a write
+// lock, otherwise, a read lock suffices (each queue still has a spinlock to
+// guard against concurrent changes).
 static rw_lock sFreePageQueuesLock
 	= RW_LOCK_INITIALIZER("free/clear page queues");
 
@@ -3189,15 +3193,14 @@ allocate_page_run_cleanup(VMPageQueue::PageList& freePages,
 		DEBUG_PAGE_ACCESS_END(page);
 		sClearPageQueue.PrependUnlocked(page);
 	}
-
 }
 
 
 /*!	Tries to allocate the a contiguous run of \a length pages starting at
 	index \a start.
 
-	The must have write-locked the free/clear page queues. The function will
-	unlock regardless of whether it succeeds or fails.
+	The caller must have write-locked the free/clear page queues. The function
+	will unlock regardless of whether it succeeds or fails.
 
 	If the function fails, it cleans up after itself, i.e. it will free all
 	pages it managed to allocate.
@@ -3220,6 +3223,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 	uint32 pageState = flags & VM_PAGE_ALLOC_STATE;
 	ASSERT(pageState != PAGE_STATE_FREE);
 	ASSERT(pageState != PAGE_STATE_CLEAR);
+	ASSERT(start + length <= sNumPages);
 
 	TA(AllocatePageRun(length));
 
@@ -3298,8 +3302,11 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 
 			// free the page, if it is still cached
 			vm_page& page = sPages[nextIndex];
-			if (!free_cached_page(&page, false))
+			if (!free_cached_page(&page, false)) {
+				// TODO: if the page turns out to have been freed already,
+				// there would be no need to fail
 				break;
+			}
 
 			page.SetState(flags & VM_PAGE_ALLOC_STATE);
 			page.busy = (flags & VM_PAGE_ALLOC_BUSY) != 0;
@@ -3382,6 +3389,7 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 		end = std::max(restrictions->high_address / B_PAGE_SIZE,
 				sPhysicalPageOffset)
 			- sPhysicalPageOffset;
+		end = std::min(end, sNumPages);
 	} else
 		end = sNumPages;
 
