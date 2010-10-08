@@ -1456,11 +1456,16 @@ ShutdownProcess::_QuitApps(AppInfoList& list, bool systemApps)
 		char appName[B_FILE_NAME_LENGTH];
 		{
 			BAutolock _(fWorkerLock);
-			if (!list.IsEmpty()) {
+			while (!list.IsEmpty()) {
 				RosterAppInfo* info = *list.It();
 				team = info->team;
 				port = info->port;
 				strcpy(appName, info->ref.name);
+
+				if (info->IsRunning())
+					break;
+				list.RemoveInfo(info);
+				delete info;
 			}
 		}
 
