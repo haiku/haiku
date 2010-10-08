@@ -467,11 +467,7 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 
 		if (!subPlaylist.IsEmpty()) {
 			// Add to recent documents
-			BEntry entry(&ref, true);
-			if (entry.IsDirectory())
-				be_roster->AddToRecentFolders(&ref, kAppSig);
-			else
-				be_roster->AddToRecentDocuments(&ref, kAppSig);
+			be_roster->AddToRecentDocuments(&ref, kAppSig);
 		}
 
 		int32 subPlaylistCount = subPlaylist.CountItems();
