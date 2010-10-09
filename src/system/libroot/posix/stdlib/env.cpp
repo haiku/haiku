@@ -279,12 +279,16 @@ unsetenv(const char *name)
 	copy_environ_to_heap_if_needed();
 
 	env = find_variable(name, length, &index);
-	if (env != NULL) {
+	while (env != NULL) {
 		// we don't free the memory for the slot, we just move the array
 		// contents
 		free(env);
 		memmove(environ + index, environ + index + 1,
 			sizeof(char *) * (count_variables() - index));
+			
+		// search possible another occurence, introduced via putenv() 
+		// and renamed since
+		env = find_variable(name, length, &index);
 	}
 
 	unlock_variables();
