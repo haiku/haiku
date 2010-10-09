@@ -399,11 +399,12 @@ shell_end:
 	//.fill	(0x01fe - shell_end), 1, 0x55
 	.org	0x01fe
 	.word	0xaa55-1	// will be replaced by the one calculated by the build.
-				// we make sure we PCs don't try to execute it.
+		// we make sure PCs don't try to execute it.
 		// this bumps the "start" label to offset 0x0200 as
 		// expected by the BFS boot loader, and also marks
 		// this block as valid boot block for the BIOS
-		// XXX: actually TOS wants a real checksum here so sum is 0x1234!
+
+//XXX: put bfs_start here
 
 /*
  * \AUTO\HAIKU.PRG and ARAnyM BOOTSTRAP() support code
