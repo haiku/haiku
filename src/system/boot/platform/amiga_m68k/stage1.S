@@ -60,9 +60,29 @@
 #define	S_IFDIR						00000040000o
 
 // AmigaDOS calls
+// exec.library
+#define _FindResident			-0x60
+#define _OldOpenLibrary         -0x198
+#define _CloseLibrary           -0x19e
 // dos.library
-#define _OldOpenLibrary		-0x198
-#define _CloseLibrary		-0x19e
+#define Old_mode                        1005
+#define New_mode                        1006
+#define _Open					-0x0
+#define _Close					-0x6
+#define _Read                   -0xc
+#define _Write                  -0x12
+#define _Input					-0x18
+#define _Output					-0x1e
+#define _IoErr					-0x66
+#define _Delay					-0xa8
+/*
+#define _Open                   -0x1e
+#define _Close                  -0x24
+#define _Read                   -0x2a
+#define _Write                  -0x30
+*/
+// intuition.library
+#define _DisplayAlert			-90
 
 
 _floppy_entry:
@@ -77,20 +97,67 @@ _floppy_osversion: // ??
 _floppy_boot:
 	// seems like a6 is already set to ExecBase when called from the ROM ?
 	// copy it
-	lea	_execbase(%pc),%a2
-	move	%a6,(%a2)
+	move.l	4.w,%a6
+	lea		_execbase(%pc),%a2
+	move.l	%a6,(%a2)
+
+
 
 	lea	dosname_boot(%pc),%a1
+	jsr	_FindResident(%a6)
+	lea	_dosbase(%pc),%a2
+	tst.l	%d0
+	beq.s	_floppy_err
+	move.l	%d0,(%a2)
+//	bra _continue
+
+	move.l	%d0,%a6
+
+/*	lea		window_name(%pc),%a0
+	move.l	%a0,%d1
+	move.l	#Old_mode,%d2
+	jsr		_Open(%a6)
+	tst.l	%d0
+	beq.s	_floppy_err
+_loop_1:
+	bra		_loop_1
+
+
+_loop_2:
+	bra		_loop_2
+*/	
+
+	move.l	4.w,%a6
+	lea	intname_boot(%pc),%a1
 	jsr	_OldOpenLibrary(%a6)
+	tst.l	%d0
+	beq.s	_floppy_err
+	lea	_intbase(%pc),%a2
+	move.l	%d0,(%a2)
+	move.l	%d0,%a6
+
+	lea		alert_data(%pc),%a0
+	moveq	#0,%d0
+	move.l	#30,%d1
+	jsr		_DisplayAlert(%a6)
+
+
+	bra	_floppy_err
+
+	lea	dosname_boot(%pc),%a1
+	jsr	_FindResident(%a6)
 	lea	_dosbase(%pc),%a2
 	move	%d0,(%a2)
 
-	lea	dosname_boot(%pc),%a1
-	jsr	-0x60(%a6)	// FindResident()
+//	lea	dosname_boot(%pc),%a1
+////	jsr	-0x60(%a6)	// FindResident()
+//	move.l	4.w,%a6
+//	jsr	-96(%a6)
+
 
 	tst.l	%d0
 	beq.s	_floppy_err
-
+_continue:
 	move.l	%d0,%a0
 	move.l	0x16(%a0),%a0
 	moveq	#0,%d0
@@ -105,12 +172,26 @@ dosname_boot:
 	.ascii	"dos.library"
 	.byte	0
 
+intname_boot:
+	.ascii	"intuition.library"
+	.byte	0
+
+alert_data:
+	.word	10
+	.byte	12
+	.ascii	"Welcome to Haiku\0"
+alert_extra:
+	.ascii	"\0\0"
+	.byte	0
+
 window_name:
 	.ascii	"CON:0/0/640/255/plop\0"
 
 _execbase:
 	.long	0
 _dosbase:
+	.long	0
+_intbase:
 	.long	0
 
 end_buff:
