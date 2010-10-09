@@ -27,20 +27,6 @@ KernelMergeObject boot_platform_atari_m68k_shell.o :
 # cpu-specific stuff
 # should be moved to boot/arch/m68k/...
 # TODO: add 020+68851 support
-KernelMergeObject boot_arch_m68k_030.o :
-	mmu_030.cpp
-	: -fno-pic -Wno-unused -m68030
-;
-
-KernelMergeObject boot_arch_m68k_040.o :
-	mmu_040.cpp
-	: -fno-pic -Wno-unused -m68040
-;
-
-KernelMergeObject boot_arch_m68k_060.o :
-	mmu_060.cpp
-	: -fno-pic -Wno-unused -m68060
-;
 
 
 KernelMergeObject boot_platform_atari_m68k_other.o :
