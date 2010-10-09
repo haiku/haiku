@@ -21,7 +21,7 @@ sleep(unsigned seconds)
 
 	err = snooze_until(start + usecs, B_SYSTEM_TIMEBASE);
 	if (err)
-		return (unsigned)(system_time() - start);
+		return (unsigned)((system_time() - start) / 1000000);
 
 	return 0;
 }
