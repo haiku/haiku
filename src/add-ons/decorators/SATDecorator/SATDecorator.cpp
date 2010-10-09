@@ -382,10 +382,10 @@ SATDecorator::_LayoutTabItems(const BRect& tabRect)
 		size = (fTabRect.right - fCloseRect.right) - fTextOffset * 2 + inset;
 	}
 	uint8 truncateMode = B_TRUNCATE_MIDDLE;
-	if (fStackedMode)
-		truncateMode = B_TRUNCATE_END;
 
 	if (fStackedMode) {
+		if (fStackedTabLength < 100)
+			truncateMode = B_TRUNCATE_END;
 		float titleWidth = fDrawState.Font().StringWidth(Title(),
 			BString(Title()).Length());
 		if (size < titleWidth) {

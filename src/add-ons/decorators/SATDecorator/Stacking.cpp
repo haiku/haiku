@@ -28,7 +28,7 @@
 using namespace BPrivate;
 
 
-const float kMaxTabWidth = 135.;
+const float kMaxTabWidth = 165.;
 
 
 bool
