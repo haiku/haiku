@@ -1130,6 +1130,9 @@ test_wctype()
 }
 
 
+// #pragma mark - wctrans ------------------------------------------------------
+
+
 void
 test_wctrans(const char* locale, const wchar_t* text, wctrans_t transition,
 	const wchar_t* expectedResult)
@@ -1219,6 +1222,70 @@ test_wctrans()
 	test_wctrans("de_DE.ISO8859-15", text, toL, textL);
 	test_wctrans("de_DE.UTF-8", text, toL, textL);
 	test_wctrans("fr_Fr", text, toL, textL);
+}
+
+
+// #pragma mark - wcwidth ------------------------------------------------------
+
+
+void
+test_wcwidth()
+{
+	setlocale(LC_ALL, "fr_FR.UTF-8");
+	printf("wcwidth()\n");
+
+	/* many of the following tests have been copied from gnulib */
+
+	int problemCount = 0;
+	int result = 0;
+
+	/* Test width of ASCII characters.  */
+	for (wchar_t wc = 0x20; wc < 0x7F; wc++) {
+		result = wcwidth(wc);
+		if (result != 1) {
+			printf("\tPROBLEM: wcwidth(%x)=%x (expected %x)\n", wc, result, 1);
+			problemCount++;
+		}
+	}
+
+	struct {
+		wchar_t wc;
+		int result;
+	} data[] = {
+		{ 0x0, 0 },
+		{ 0x1, -1 },
+		{ 0x1F, -1 },
+		{ 0x80, -1 },
+		{ 0x9F, -1 },
+		{ 0xA0, 1 },
+		{ 0x0301, 0 },
+		{ 0x05B0, 0 },
+		{ 0x200E, 0 },
+		{ 0x2060, 0 },
+		{ 0xE0001, 0 },
+		{ 0xE0044, 0 },
+		{ 0x200B, 0 },
+		{ 0xFEFF, 0 },
+		{ 0x3000, 2 },
+		{ 0xB250, 2 },
+		{ 0xFF1A, 2 },
+		{ 0x20369, 2 },
+		{ 0x2F876, 2 },
+		{ 0x0, 0 },
+	};
+	for (int i = 0; data[i].wc != 0 || i == 0; i++) {
+		result = wcwidth(data[i].wc);
+		if (result != data[i].result) {
+			printf("\tPROBLEM: wcwidth(%x)=%x (expected %x)\n", data[i].wc,
+				result, data[i].result);
+			problemCount++;
+		}
+	}
+
+	if (problemCount)
+		printf("\t%d problem(s) found!\n", problemCount);
+	else
+		printf("\tall fine\n");
 }
 
 
@@ -1961,6 +2028,7 @@ main(void)
 	test_ctype();
 	test_wctype();
 	test_wctrans();
+	test_wcwidth();
 	test_langinfo();
 	test_collation();
 	test_timeconversions();
