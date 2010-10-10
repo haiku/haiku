@@ -560,6 +560,7 @@ mmu_init(void)
 
 	gMMUOps->initialize();
 
+#if 0
 	addr_t fastram_top = 0;
 	if (*TOSVARramvalid == TOSVARramvalid_MAGIC)
 		fastram_top = *TOSVARramtop;
@@ -627,7 +628,7 @@ mmu_init(void)
 	gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = *TOSVARphystop - video_base;
 	gKernelArgs.num_physical_allocated_ranges++;
 
-
+#endif
 }
 
 
