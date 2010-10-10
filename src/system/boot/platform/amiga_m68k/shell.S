@@ -44,17 +44,6 @@
 #define _FindResident			-0x60
 #define _OldOpenLibrary         -0x198
 #define _CloseLibrary           -0x19e
-// dos.library
-#define Old_mode                        1005
-#define New_mode                        1006
-#define _Open					-0x1e
-#define _Close					-0x24
-#define _Read                   -0x2a
-#define _Write                  -0x30
-#define _Input					-0x36
-#define _Output					-0x3c
-#define _IoErr					-0x84
-#define _Delay					-0xc6
 // intuition.library
 #define _DisplayAlert			-90
 
@@ -73,7 +62,7 @@
 
 #define SECTSIZE 512
 
-//.text
+// .text
 _bs_entry:
 	// Amiga boot sector
 _floppy_entry:
@@ -91,13 +80,15 @@ _floppy_osversion: // ??
 
 floppy_start:
 	// save some regs just in case
-	movem.l		%d1-%d7/%a0-%a6,-(%sp)
+	//movem.l		%d1-%d7/%a0-%a6,-(%sp)
+
 
 	// seems like a6 is already set to ExecBase when called from the ROM ?
 	move.l	4.w,%a6	// exec base
-	jsr	_FindResident(%a6)
+	//jsr	_FindResident(%a6)
 	lea	SysBase(%pc),%a2
 	move.l	%a6,(%a2)
+
 
 //	lea	dosname_boot(%pc),%a1
 //	move.l	4.w,%a6	// exec base
@@ -108,13 +99,19 @@ floppy_start:
 //	move.l	%d0,(%a2)
 
 	lea	intname_boot(%pc),%a1
-	jsr	_FindResident(%a6)
+	jsr	_OldOpenLibrary(%a6)
 	tst.l	%d0
 	beq.s	_floppy_err
 	lea	IntuitionBase(%pc),%a2
 	move.l	%d0,(%a2)
 
+	// allocate absolute memory to put the bootloader
+	
 
+
+	jsr		_display_alert
+
+	bra _floppy_err
 
 //_continue:
 //	lea	dosname_boot(%pc),%a1
@@ -133,21 +130,26 @@ floppy_start:
 
 _floppy_err:
 	// pop up saved regs
-	movem.l		(%sp)+,%d1-%d7/%a0-%a6
+	//movem.l		(%sp)+,%d1-%d7/%a0-%a6
 	moveq	#-1,%d0
 	rts
 
 
 _display_alert:
-	move.l	%a6,-(%sp)
-	move	IntuitionBase,%a6
+	//move.l	%a6,-(%sp)
+	lea		IntuitionBase(%pc),%a6
+	move.l	(%a6),%a6
 	lea		alert_data(%pc),%a0
 	moveq	#0,%d0
-	move.l	#30,%d1
+	move.l	#40,%d1
 	jsr		_DisplayAlert(%a6)
-	move.l	(%sp)+,%a6
+	//move.l	(%sp)+,%a6
 	rts
-	
+
+
+
+
+
 	
 	// ATARI
 #if 0
@@ -466,9 +468,9 @@ intname_boot:
 alert_data:
 	.word	10
 	.byte	12
-	.ascii	"Welcome to Haiku\0"
+	.ascii	"Error loading Haiku: "
 alert_extra:
-	.ascii	"\0\0"
+	.ascii	"0\0"
 	.byte	0
 
 GLOBAL(SysBase):
