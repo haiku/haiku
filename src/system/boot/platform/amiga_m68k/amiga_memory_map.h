@@ -7,17 +7,18 @@
 
 
 /* the DMA-accessible RAM */
-/*#define AMIGA_CHIPRAM_BASE			0x00000000*/
+#define AMIGA_CHIPRAM_BASE			0x00000000
+//XXX:
 /* actually, the first 2kB aren't usable */
-#define AMIGA_CHIPRAM_BASE			0x00001000
+//#define AMIGA_CHIPRAM_BASE			0x00001000
 #define AMIGA_CHIPRAM_MAX			0x00e00000
 #define AMIGA_CHIPRAM_LAST						\
 	(AMIGA_CHIPRAM_BASE + (AMIGA_CHIPRAM_MAX - 1))
 
-#define AMIGA_TOSROM_BASE			0x00e00000
-#define AMIGA_TOSROM_MAX			0x00100000
-#define AMIGA_TOSROM_LAST						\
-	(AMIGA_TOSROM_BASE + (AMIGA_TOSROM_MAX - 1))
+#define AMIGA_ROM_BASE			0x00f80000
+#define AMIGA_ROM_MAX			0x00080000
+#define AMIGA_ROM_LAST						\
+	(AMIGA_ROM_BASE + (AMIGA_ROM_MAX - 1))
 
 /* some reserved ST I/O there... */
 
