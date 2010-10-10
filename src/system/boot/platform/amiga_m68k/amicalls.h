@@ -44,7 +44,7 @@ extern "C" {
       register int _a1 __asm("a1");				\
       register rt _##name##_re __asm("d0");			\
       register void *const _##name##_bn __asm("a6") = (bn);	\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn)					\
       : "fp0", "fp1", "cc", "memory");				\
@@ -60,7 +60,7 @@ extern "C" {
       register int _a0 __asm("a0");				\
       register int _a1 __asm("a1");				\
       register void *const _##name##_bn __asm("a6") = (bn);	\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn)					\
       : "fp0", "fp1", "cc", "memory");				\
@@ -77,7 +77,7 @@ extern "C" {
       register rt _##name##_re __asm("d0");			\
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1)				\
       : "fp0", "fp1", "cc", "memory");				\
@@ -95,7 +95,7 @@ extern "C" {
       register int _a1 __asm("a1");				\
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1)				\
       : "fp0", "fp1", "cc", "memory");				\
@@ -113,7 +113,7 @@ extern "C" {
       register rt _##name##_re __asm("d0");			\
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
-      __asm volatile ("exg d7,a5\n\tjsr a6@(-"#offs":W)\n\texg d7,a5" \
+      __asm volatile ("exg d7,a5\n\tjsr %%a6@(-"#offs":W)\n\texg d7,a5" \
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1)				\
       : "fp0", "fp1", "cc", "memory");				\
@@ -132,7 +132,7 @@ extern "C" {
       register int _a1 __asm("a1");				\
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
-      __asm volatile ("exg d7,a5\n\tjsr a6@(-"#offs":W)\n\texg d7,a5" \
+      __asm volatile ("exg d7,a5\n\tjsr %%a6@(-"#offs":W)\n\texg d7,a5" \
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1)				\
       : "fp0", "fp1", "cc", "memory");				\
@@ -151,7 +151,7 @@ extern "C" {
       register rt _##name##_re __asm("d0");			\
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
-      __asm volatile ("exg d7,a5\n\tjsr a6@(-"#offs":W)\n\texg d7,a5" \
+      __asm volatile ("exg d7,a5\n\tjsr %%a6@(-"#offs":W)\n\texg d7,a5" \
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1)				\
       : "fp0", "fp1", "cc", "memory");				\
@@ -171,7 +171,7 @@ extern "C" {
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2)		\
       : "fp0", "fp1", "cc", "memory");				\
@@ -191,7 +191,7 @@ extern "C" {
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2)		\
       : "fp0", "fp1", "cc", "memory");				\
@@ -210,7 +210,7 @@ extern "C" {
       register rt _##name##_re __asm("d0");			\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r"(_n1), "rf"(_n2)					\
       : "fp0", "fp1", "cc", "memory");				\
@@ -232,7 +232,7 @@ extern "C" {
       register void *const _##name##_bn __asm("a6") = (bn);	\
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2)		\
       : "fp0", "fp1", "cc", "memory");				\
@@ -254,7 +254,7 @@ extern "C" {
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3)	\
       : "fp0", "fp1", "cc", "memory");				\
@@ -276,7 +276,7 @@ extern "C" {
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3)	\
       : "fp0", "fp1", "cc", "memory");				\
@@ -297,7 +297,7 @@ extern "C" {
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r"(_n1), "rf"(_n2), "rf"(_n3)				\
       : "fp0", "fp1", "cc", "memory");				\
@@ -319,7 +319,7 @@ extern "C" {
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r"(_n1), "rf"(_n2), "rf"(_n3)				\
       : "fp0", "fp1", "cc", "memory");				\
@@ -342,7 +342,7 @@ extern "C" {
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3)	\
       : "fp0", "fp1", "cc", "memory");				\
@@ -366,7 +366,7 @@ extern "C" {
       register t1 _n1 __asm(#r1) = _##name##_v1;		\
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3)	\
       : "fp0", "fp1", "cc", "memory");				\
@@ -389,7 +389,7 @@ extern "C" {
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -413,7 +413,7 @@ extern "C" {
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -438,7 +438,7 @@ extern "C" {
       register t2 _n2 __asm(#r2) = _##name##_v2;		\
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -464,7 +464,7 @@ extern "C" {
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -490,7 +490,7 @@ extern "C" {
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -517,7 +517,7 @@ extern "C" {
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -544,7 +544,7 @@ extern "C" {
       register t3 _n3 __asm(#r3) = _##name##_v3;		\
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
-      __asm volatile ("exg d7,a4\n\tjsr a6@(-"#offs":W)\n\texg d7,a4" \
+      __asm volatile ("exg d7,a4\n\tjsr %%a6@(-"#offs":W)\n\texg d7,a4" \
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -572,7 +572,7 @@ extern "C" {
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
       register t6 _n6 __asm(#r6) = _##name##_v6;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -600,7 +600,7 @@ extern "C" {
       register t4 _n4 __asm(#r4) = _##name##_v4;		\
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
       register t6 _n6 __asm(#r6) = _##name##_v6;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -629,7 +629,7 @@ extern "C" {
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
       register t6 _n6 __asm(#r6) = _##name##_v6;		\
       register t7 _n7 __asm(#r7) = _##name##_v7;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -659,7 +659,7 @@ extern "C" {
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
       register t6 _n6 __asm(#r6) = _##name##_v6;		\
       register t7 _n7 __asm(#r7) = _##name##_v7;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -689,7 +689,7 @@ extern "C" {
       register t5 _n5 __asm(#r5) = _##name##_v5;		\
       register t6 _n6 __asm(#r6) = _##name##_v6;		\
       register t7 _n7 __asm(#r7) = _##name##_v7;		\
-      __asm volatile ("exg d7,a4\n\tjsr a6@(-"#offs":W)\n\texg d7,a4" \
+      __asm volatile ("exg d7,a4\n\tjsr %%a6@(-"#offs":W)\n\texg d7,a4" \
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -725,7 +725,7 @@ extern "C" {
       register t6 _n6 __asm(#r6) = _##name##_v6;		\
       register t7 _n7 __asm(#r7) = _##name##_v7;		\
       register t8 _n8 __asm(#r8) = _##name##_v8;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7), "rf"(_n8) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -758,7 +758,7 @@ extern "C" {
       register t6 _n6 __asm(#r6) = _##name##_v6;		\
       register t7 _n7 __asm(#r7) = _##name##_v7;		\
       register t8 _n8 __asm(#r8) = _##name##_v8;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7), "rf"(_n8) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -792,7 +792,7 @@ extern "C" {
       register t7 _n7 __asm(#r7) = _##name##_v7;		\
       register t8 _n8 __asm(#r8) = _##name##_v8;		\
       register t9 _n9 __asm(#r9) = _##name##_v9;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7), "rf"(_n8), "rf"(_n9) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -827,7 +827,7 @@ extern "C" {
       register t7 _n7 __asm(#r7) = _##name##_v7;		\
       register t8 _n8 __asm(#r8) = _##name##_v8;		\
       register t9 _n9 __asm(#r9) = _##name##_v9;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7), "rf"(_n8), "rf"(_n9) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -863,7 +863,7 @@ extern "C" {
       register t8 _n8 __asm(#r8) = _##name##_v8;		\
       register t9 _n9 __asm(#r9) = _##name##_v9;		\
       register t10 _n10 __asm(#r10) = _##name##_v10;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7), "rf"(_n8), "rf"(_n9), "rf"(_n10) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -900,7 +900,7 @@ extern "C" {
       register t8 _n8 __asm(#r8) = _##name##_v8;		\
       register t9 _n9 __asm(#r9) = _##name##_v9;		\
       register t10 _n10 __asm(#r10) = _##name##_v10;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_d0), "=r" (_d1), "=r" (_a0), "=r" (_a1)		\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7), "rf"(_n8), "rf"(_n9), "rf"(_n10) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -938,7 +938,7 @@ extern "C" {
       register t9 _n9 __asm(#r9) = _##name##_v9;		\
       register t10 _n10 __asm(#r10) = _##name##_v10;		\
       register t11 _n11 __asm(#r11) = _##name##_v11;		\
-      __asm volatile ("jsr a6@(-"#offs":W)"			\
+      __asm volatile ("jsr %%a6@(-"#offs":W)"			\
       : "=r" (_##name##_re), "=r" (_d1), "=r" (_a0), "=r" (_a1)	\
       : "r" (_##name##_bn), "rf"(_n1), "rf"(_n2), "rf"(_n3), "rf"(_n4), "rf"(_n5), "rf"(_n6), "rf"(_n7), "rf"(_n8), "rf"(_n9), "rf"(_n10), "rf"(_n11) \
       : "fp0", "fp1", "cc", "memory");				\
@@ -946,7 +946,11 @@ extern "C" {
    });								\
 })
 
+typedef void *APTR;
+
 #endif /* __ASSEMBLER__ */
+
+//	#pragma mark -
 
 
 #ifndef __ASSEMBLER__
@@ -965,6 +969,7 @@ extern "C" {
 
 // <exec/library.h>
 
+struct Library;
 
 // <exec/execbase.h>
 
@@ -1028,9 +1033,28 @@ extern "C" {
 #define IOERR_SELFTEST		(-7)
 
 
+#define EXEC_BASE_NAME SysBase
+
 #ifndef __ASSEMBLER__
+
+extern Library *EXEC_BASE_NAME;
+
+#define CloseLibrary(last) \
+	LP1NR(0x19e, CloseLibrary, struct Library *, last, a1, \
+	, EXEC_BASE_NAME)
+
+#define OpenLibrary(par1, last) \
+	LP2(0x228, struct Library *, OpenLibrary, uint8 *, par1, a1, unsigned long, last, d0, \
+	, EXEC_BASE_NAME)
+
+
+
 extern "C" status_t exec_error(int32 err);
+
 #endif /* __ASSEMBLER__ */
+
+
+//	#pragma mark -
 
 
 // <intuition/intuition.h>
@@ -1039,6 +1063,18 @@ extern "C" status_t exec_error(int32 err);
 #define ALERT_TYPE		0x80000000
 #define RECOVERY_ALERT	0x00000000
 #define DEADEND_ALERT	0x80000000
+
+#define INTUITION_BASE_NAME IntuitionBase
+
+#ifndef __ASSEMBLER__
+
+extern Library *INTUITION_BASE_NAME;
+
+#define DisplayAlert(par1, par2, last) \
+	LP3(0x5a, bool, DisplayAlert, unsigned long, par1, d0, void *, par2, a0, unsigned long, last, d1, \
+	, INTUITION_BASE_NAME)
+
+#endif /* __ASSEMBLER__ */
 
 
 #ifdef __cplusplus
