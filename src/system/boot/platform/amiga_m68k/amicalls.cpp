@@ -24,17 +24,17 @@ exec_error(int32 err)
 		case IOERR_OPENFAIL:
 			return B_DEV_BAD_DRIVE_NUM;
 		case IOERR_ABORTED:
-			return EINTR;
+			return B_INTERRUPTED;
 		case IOERR_NOCMD:
-			return EINVAL;
+			return B_BAD_VALUE;
 		case IOERR_BADLENGTH:
-			return EINVAL;
+			return B_BAD_VALUE;
 		case IOERR_BADADDRESS:
-			return EFAULT;
+			return B_BAD_ADDRESS;
 		case IOERR_UNITBUSY:
 			return B_DEV_NOT_READY;
 		case IOERR_SELFTEST:
-			return B_ERROR;
+			return B_NOT_INITIALIZED;
 		default:
 			return B_ERROR;
 	}
