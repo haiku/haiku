@@ -257,7 +257,7 @@ load_sectors:
 	move.w		#0,%d5	// trackno
 	move.w		#1,%d4	// sectno
 	move.w		sNumSectors,%d3	// remainder
-	move.l		#ATARI_ZBEOS_BASE,%a5
+	move.l		#AMIGA_ZBEOS_BASE,%a5
 read_sectors_loop:	
 	bsr.s		read_sect
 	bne		read_sectors_fail
@@ -516,7 +516,7 @@ prg_start:
 	//or.w		#0x0700,%sr
 	
 	// setup stack
-	move.l		#ATARI_ZBEOS_STACK_END,%sp
+	move.l		#AMIGA_ZBEOS_STACK_END,%sp
 
 	lea		h5,%a0
 	bsr		puts
@@ -532,7 +532,7 @@ prg_start:
 	sub.w		#1,%d0
 	// load addresses
 	lea		_bs_entry,%a0
-	move.l		#ATARI_ZBEOS_BASE,%a1
+	move.l		#AMIGA_ZBEOS_BASE,%a1
 
 
 nextsect:
@@ -548,13 +548,13 @@ copysect_loop:
 	// all done
 super_done:
 	// XXX: copy the rest !
-	move.b		#ATARI_BOOT_DRVAPI_FLOPPY,ATARI_ZBEOS_BASE + gBootDriveAPI - _bs_entry 
-	move.b		#0,ATARI_ZBEOS_BASE + gBootDriveID - _bs_entry 
-	move.b		#1,ATARI_ZBEOS_BASE + gBootedFromImage - _bs_entry 
+	move.b		#AMIGA_BOOT_DRVAPI_FLOPPY,AMIGA_ZBEOS_BASE + gBootDriveAPI - _bs_entry 
+	move.b		#0,AMIGA_ZBEOS_BASE + gBootDriveID - _bs_entry 
+	move.b		#1,AMIGA_ZBEOS_BASE + gBootedFromImage - _bs_entry 
 
 	move.l		#0,%d0
 
-	//jmp			ATARI_ZBEOS_BASE+512
+	//jmp			AMIGA_ZBEOS_BASE+512
 	jmp			_start
 
 saved_super_stack:
@@ -562,9 +562,6 @@ saved_super_stack:
 
 GLOBAL(gBootedFromImage):
 	.byte	0
-
-GLOBAL(gBootDriveAPI):
-	.byte	ATARI_BOOT_DRVAPI_UNKNOWN
 
 GLOBAL(gBootDriveID):
 	.byte	0

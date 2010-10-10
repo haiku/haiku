@@ -8,7 +8,7 @@
 
 #include <SupportDefs.h>
 #include <string.h>
-#include "toscalls.h"
+#include "amicalls.h"
 #include <util/kernel_cpp.h>
 
 #include "Handle.h"

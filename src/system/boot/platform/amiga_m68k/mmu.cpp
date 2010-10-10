@@ -6,8 +6,8 @@
  */
 
 
-#include "atari_memory_map.h"
-#include "toscalls.h"
+#include "amiga_memory_map.h"
+#include "amicalls.h"
 #include "mmu.h"
 
 #include <boot/platform.h>
@@ -565,7 +565,7 @@ mmu_init(void)
 		fastram_top = *TOSVARramtop;
 	if (fastram_top) {
 		// we have some fastram, use it first
-		sNextPhysicalAddress = ATARI_FASTRAM_BASE;
+		sNextPhysicalAddress = AMIGA_FASTRAM_BASE;
 	}
 
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
@@ -574,9 +574,9 @@ mmu_init(void)
 		// remember the start of the allocated physical pages
 
 	// enable transparent translation of the first 256 MB
-	gMMUOps->set_tt(0, ATARI_CHIPRAM_BASE, 0x10000000, 0);
+	gMMUOps->set_tt(0, AMIGA_CHIPRAM_BASE, 0x10000000, 0);
 	// enable transparent translation of the 16MB ST shadow range for I/O
-	gMMUOps->set_tt(1, ATARI_SHADOW_BASE, 0x01000000, 0);
+	gMMUOps->set_tt(1, AMIGA_SHADOW_BASE, 0x01000000, 0);
 
 	init_page_directory();
 #if 0//XXX:HOLE
@@ -606,16 +606,16 @@ mmu_init(void)
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 
 	// st ram as 1st range
-	gKernelArgs.physical_memory_range[0].start = ATARI_CHIPRAM_BASE;
-	gKernelArgs.physical_memory_range[0].size = *TOSVARphystop - ATARI_CHIPRAM_BASE;
+	gKernelArgs.physical_memory_range[0].start = AMIGA_CHIPRAM_BASE;
+	gKernelArgs.physical_memory_range[0].size = *TOSVARphystop - AMIGA_CHIPRAM_BASE;
 	gKernelArgs.num_physical_memory_ranges = 1;
 
 	// fast ram as 2nd range
 	if (fastram_top) {
 		gKernelArgs.physical_memory_range[1].start =
-			ATARI_FASTRAM_BASE;
+			AMIGA_FASTRAM_BASE;
 		gKernelArgs.physical_memory_range[1].size =
-			fastram_top - ATARI_FASTRAM_BASE;
+			fastram_top - AMIGA_FASTRAM_BASE;
 		gKernelArgs.num_physical_memory_ranges++;
 
 	}
@@ -627,9 +627,6 @@ mmu_init(void)
 	gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = *TOSVARphystop - video_base;
 	gKernelArgs.num_physical_allocated_ranges++;
 
-
-	gKernelArgs.arch_args.plat_args.atari.nat_feat.nf_page =
-		get_next_physical_page() /*| 0xff000000*/;
 
 }
 
