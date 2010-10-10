@@ -32,6 +32,9 @@
 #define PIT_VENDOR_SPECIFIC		0xff
 
 
+// TODO handle disconnection of printer during printing
+// currently the USBPrinter will be deleted and USBTransport will still
+// access the memory
 class USBPrinter {
 public:
 	USBPrinter(const BString& id, const BString& name,
@@ -271,6 +274,7 @@ USBTransport::USBTransport(BDirectory *printer, BMessage *msg)
 
 USBTransport::~USBTransport()
 {
+	gUSBPrinterRoster.Stop();
 }
 
 
