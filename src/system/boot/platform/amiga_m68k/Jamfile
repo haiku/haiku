@@ -19,6 +19,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 #SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
+
 KernelMergeObject boot_platform_amiga_m68k_shell.o :
 	shell.S
 	: -Wa,--pcrel
@@ -55,6 +56,7 @@ KernelMergeObject boot_platform_amiga_m68k_other.o :
 	: -fno-pic #-Wa,--pcrel
 ;
 
+
 KernelMergeObject boot_platform_amiga_m68k.o :
 	: :
 	boot_platform_amiga_m68k_shell.o
@@ -63,9 +65,10 @@ KernelMergeObject boot_platform_amiga_m68k.o :
 	boot_arch_m68k_040.o
 ;
 
-# the bootsector in haiku_loader must be checksummed
 
-rule ChecksumAmigaLoader {
+# the bootsector in haiku_loader must be checksummed
+rule ChecksumAmigaLoader
+{
 	local haikuLoader = $(1) ;
 	local checksummer = <build>fixup_amiga_boot_checksum ;
 
@@ -75,7 +78,9 @@ rule ChecksumAmigaLoader {
 
 }
 
-actions ChecksumAmigaLoader bind TARGET_CHECKSUM {
+
+actions ChecksumAmigaLoader bind TARGET_CHECKSUM
+{
 	$(TARGET_CHECKSUM) $(1)
 }
 

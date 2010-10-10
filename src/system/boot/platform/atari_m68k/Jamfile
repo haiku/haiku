@@ -19,10 +19,12 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 #SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
+
 KernelMergeObject boot_platform_atari_m68k_shell.o :
 	shell.S
 	: -Wa,--pcrel
 ;
+
 
 # cpu-specific stuff
 # should be moved to boot/arch/m68k/...
@@ -59,6 +61,7 @@ KernelMergeObject boot_platform_atari_m68k_other.o :
 	: -fno-pic #-Wa,--pcrel
 ;
 
+
 KernelMergeObject boot_platform_atari_m68k.o :
 	: :
 	boot_platform_atari_m68k_shell.o
@@ -70,7 +73,9 @@ KernelMergeObject boot_platform_atari_m68k.o :
 
 # the bootsector in haiku_loader must be checksummed
 
-rule ChecksumAtariLoader {
+
+rule ChecksumAtariLoader
+{
 	local haikuLoader = $(1) ;
 	local checksummer = <build>fixup_tos_boot_checksum ;
 
@@ -79,6 +84,7 @@ rule ChecksumAtariLoader {
 	TARGET_CHECKSUM on $(haikuLoader) = $(checksummer) ;
 
 }
+
 
 actions ChecksumAtariLoader bind TARGET_CHECKSUM {
 	$(TARGET_CHECKSUM) $(1)
@@ -89,6 +95,7 @@ ChecksumAtariLoader haiku_loader ;
 
 
 # AUTO folder PRG target
+
 
 # based on KernelLd
 rule AtariBootPrgLd
@@ -116,10 +123,12 @@ rule AtariBootPrgLd
 
 }
 
+
 actions AtariBootPrgLd
 {
 	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
 }
+
 
 AtariBootPrgLd haiku.prg :
 	boot_loader_$(TARGET_BOOT_PLATFORM)

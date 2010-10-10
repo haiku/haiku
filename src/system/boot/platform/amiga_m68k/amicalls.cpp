@@ -21,15 +21,22 @@ extern "C" status_t
 exec_error(int32 err)
 {
 	switch (err) {
-	case IOERR_OPENFAIL:	return B_DEV_BAD_DRIVE_NUM;
-	case IOERR_ABORTED:		return EINTR;
-	case IOERR_NOCMD:		return EINVAL;
-	case IOERR_BADLENGTH:	return EINVAL;
-	case IOERR_BADADDRESS:	return EFAULT;
-	case IOERR_UNITBUSY:	return B_DEV_NOT_READY;
-	case IOERR_SELFTEST:	return B_ERROR;
-	default:
-		return B_ERROR;
+		case IOERR_OPENFAIL:
+			return B_DEV_BAD_DRIVE_NUM;
+		case IOERR_ABORTED:
+			return EINTR;
+		case IOERR_NOCMD:
+			return EINVAL;
+		case IOERR_BADLENGTH:
+			return EINVAL;
+		case IOERR_BADADDRESS:
+			return EFAULT;
+		case IOERR_UNITBUSY:
+			return B_DEV_NOT_READY;
+		case IOERR_SELFTEST:
+			return B_ERROR;
+		default:
+			return B_ERROR;
 	}
 }
 
