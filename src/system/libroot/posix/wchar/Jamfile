@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src system libroot posix wchar ;
+
+MergeObject posix_wchar.o :
+	wcwidth.c
+	wcswidth.c
+;

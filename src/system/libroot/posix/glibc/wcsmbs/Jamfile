@@ -55,10 +55,10 @@ MergeObject posix_gnu_wcsmbs.o :
 	wcstold.c
 	wcstoul.c
 	wcstoull.c
-	wcswidth.c
+#	wcswidth.c
 	wcsxfrm.c
 	wctob.c
-	wcwidth.c
+#	wcwidth.c
 	wmemchr.c
 	wmemcmp.c
 	wmemcpy.c

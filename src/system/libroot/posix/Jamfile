@@ -44,5 +44,6 @@ SubInclude HAIKU_TOP src system libroot posix string ;
 SubInclude HAIKU_TOP src system libroot posix sys ;
 SubInclude HAIKU_TOP src system libroot posix time ;
 SubInclude HAIKU_TOP src system libroot posix unistd ;
+SubInclude HAIKU_TOP src system libroot posix wchar ;
 
 SubInclude HAIKU_TOP src system libroot posix glibc ;

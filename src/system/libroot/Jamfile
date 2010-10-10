@@ -36,6 +36,7 @@ local librootObjects =
 	posix_sys.o
 	posix_time.o
 	posix_unistd.o
+	posix_wchar.o
 ;
 
 local librootDebugObjects =
