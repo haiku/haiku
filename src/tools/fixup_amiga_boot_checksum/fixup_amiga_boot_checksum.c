@@ -8,7 +8,8 @@
 
 int main(int argc, char **argv)
 {
-	int fd, i;
+	int fd;
+	unsigned int i;
 	uint32_t sum;
 	uint8_t bootblock[BB_SIZE];
 	uint32_t *p = (uint32_t *)bootblock;
@@ -34,7 +35,7 @@ int main(int argc, char **argv)
 			sum++;
 	}
 	sum = ~sum;
-	fprintf(stderr, "checksum: %lu\n", sum);
+	//fprintf(stderr, "checksum: 0x%lx\n", (long)sum);
 	// big endian
 	((uint32_t *)bootblock)[1] = htonl(sum);
 	lseek(fd, 0LL, SEEK_SET);
