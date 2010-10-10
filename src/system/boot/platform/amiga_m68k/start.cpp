@@ -17,7 +17,7 @@
 #include "cpu.h"
 #include "mmu.h"
 #include "keyboard.h"
-#include "toscalls.h"
+#include "amicalls.h"
 
 
 #define HEAP_SIZE 65536
@@ -113,8 +113,8 @@ extern "C" void
 platform_exit(void)
 {
 	// Terminate
-	// TODO: Puntaes() instead ?
-	Pterm0();
+	//TODO
+	while (true) {}
 }
 
 
@@ -122,32 +122,20 @@ extern "C" void
 _start(void)
 {
 	stage2_args args;
-	Bconout(DEV_CON, 'H');
 
 	//asm("cld");			// Ain't nothing but a GCC thang.
 	//asm("fninit");		// initialize floating point unit
 
 	clear_bss();
-	Bconout(DEV_CON, 'A');
 	call_ctors();
 		// call C++ constructors before doing anything else
-	Bconout(DEV_CON, 'I');
 
 	args.heap_size = HEAP_SIZE;
 	args.arguments = NULL;
 	
-	// so we can dprintf
-	init_nat_features();
-
 	//serial_init();
-	Bconout(DEV_CON, 'K');
 	console_init();
-	Bconout(DEV_CON, 'U');
-	dprintf("membot   = %p\n", (void*)*TOSVAR_membot);
-	dprintf("memtop   = %p\n", (void*)*TOSVAR_memtop);
-	dprintf("v_bas_ad = %p\n", *TOSVAR_v_bas_ad);
-	dprintf("phystop  = %p\n", (void*)*TOSVARphystop);
-	dprintf("ramtop   = %p\n", (void*)*TOSVARramtop);
+	dprintf("ramtop   = %p\n", NULL);
 	cpu_init();
 	mmu_init();
 

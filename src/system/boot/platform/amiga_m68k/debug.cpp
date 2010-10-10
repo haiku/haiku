@@ -10,6 +10,7 @@
 #include <boot/platform.h>
 #include <boot/stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include <Errors.h>
 
@@ -19,21 +20,20 @@ void
 panic(const char *format, ...)
 {
 	struct AlertMessage {
-		UWORD	column;
-		UBYTE	line;
+		uint16	column;
+		uint8	line;
 		char	messages[14+512];
 	} alert = {
 		10, 12,
 		"*** PANIC ***"
-	}
+	};
 
-	const char greetings[] = "\n*** PANIC ***";
 	char *buffer = &alert.messages[14];
 	va_list list;
 
 	//platform_switch_to_text_mode();
 
-	memset(buffer, 512);
+	memset(buffer, 0, 512);
 
 	va_start(list, format);
 	vsnprintf(buffer, 512-1, format, list);

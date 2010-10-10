@@ -5,7 +5,7 @@
 
 
 #include "keyboard.h"
-#include "toscalls.h"
+#include "amicalls.h"
 
 #include <boot/platform.h>
 
@@ -13,12 +13,8 @@
 static uint32
 check_for_key(void)
 {
-	union key k;
-	if (Bconstat(DEV_CON) == 0)
-		return 0;
-
-	k.d0 = Bconin(DEV_CON);
-	return k.d0;
+	//TODO
+	return 0;
 }
 
 
@@ -33,8 +29,8 @@ clear_key_buffer(void)
 extern "C" union key
 wait_for_key(void)
 {
+	//TODO
 	union key key;
-	key.d0 = Bconin(DEV_CON);
 
 	return key;
 }
