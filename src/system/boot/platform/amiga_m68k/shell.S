@@ -30,11 +30,35 @@
 
 /*
  * references :
- * http://ftp.netbsd.org/pub/NetBSD/NetBSD-release-3-0/src/sys/arch/atari/stand/xxboot/fdboot/fdboot.S
+ * http://ftp.netbsd.org/pub/NetBSD/NetBSD-release-4-0/src/sys/arch/amiga/stand/bootblock/
+ * http://wandel.ca/homepage/execdis/virus_disassembly.txt
+ * http://ciarang.com/wiki/page/Minimal_Amiga_Boot_Code
+ * 
  */
 
-#include "atari_memory_map.h"
-#include "toscalls.h"
+#include "amiga_memory_map.h"
+#include "amicalls.h"
+
+// AmigaDOS calls
+// exec.library
+#define _FindResident			-0x60
+#define _OldOpenLibrary         -0x198
+#define _CloseLibrary           -0x19e
+// dos.library
+#define Old_mode                        1005
+#define New_mode                        1006
+#define _Open					-0x1e
+#define _Close					-0x24
+#define _Read                   -0x2a
+#define _Write                  -0x30
+#define _Input					-0x36
+#define _Output					-0x3c
+#define _IoErr					-0x84
+#define _Delay					-0xc6
+// intuition.library
+#define _DisplayAlert			-90
+
+
 
 // 1 enabled verbose output
 //#define DEBUG 1
@@ -51,65 +75,77 @@
 
 //.text
 _bs_entry:
-/* main entry point, both from the floppy boot and .prg */
-	bra.s	real_entry
-
-//FAT lookalike to avoid nasty things from happening
-// http://alive.atari.org/alive10/btmania.php
-// MS-DOS values :
-// http://support.microsoft.com/kb/75131/en
-// http://alumnus.caltech.edu/~pje/dosfiles.html
-	.ascii	"Haiku "
-	.byte	0xbe, 0x50, 0x38 // id
-	//LITTLE ENDIAN!
-	.byte	0x00, 0x02	//BPS
-	.byte	0x02		//SPC
-	//.byte	0x00		//???
-	.byte	0x00, 0x02	//RES - number of reserved sectors
-	.byte	0x00		//NFATS
-	.byte	0x00, 0x00	//NDIRS
-	.byte	0x40, 0x0b	//NSECTS
-	.byte	0xf0		//MEDIA
-	.byte	0x05, 0x00	//SPF
-_fat_spt:	
-	.byte	0x12, 0x00	//SPT
-	.byte	0x02, 0x00	//NSIDES
-	.byte	0x00, 0x00	//NHID
-	// we're done
-
-sNumSectors:
-	// this location will contain the length of the boot loader as
-	// written by the "makeflop" command in 512 byte blocks
-	// 0x180 is the allowed maximum, as the zipped TAR with the
-	// kernel and the boot module might start at offset 192 kB
-	//.word	0x0300 //0x0180
-	.word	BOOT_ARCHIVE_IMAGE_OFFSET*2
-
-real_entry:
-
-// save the regs to return safely, like the NetBSD loader does:
-// http://ftp.netbsd.org/pub/NetBSD/NetBSD-release-3-0/src/sys/arch/atari/stand/xxboot/fdboot/fdboot.S
-	movem.l		%d1-%d7/%a0-%a6,-(%sp)
-
-	lea		str,%a0
-	bsr		puts
-
-	// first, determine if .prg (user) or bootsect (super)
-	// Super()
-	move.l		#SUP_INQUIRE,-(%sp)
-	move.w		#0x20,-(%sp)
-	trap		#GEMDOS_TRAP
-	addq.l		#6,%sp
-
-	cmp.l		#SUP_USER,%d0
-	bne			floppy_start
-	bra			prg_start
+	// Amiga boot sector
+_floppy_entry:
+	.ascii	"DOS"
+	.byte	0
+_floppy_checksum:
+	.long	0
+_floppy_osversion: // ??
+	//.long	0x370
+	.long	0x09D5A859 // dos private ???
 
 /*
  * floppy boot support code
  */
 
 floppy_start:
+	// save some regs just in case
+	movem.l		%d1-%d7/%a0-%a6,-(%sp)
+
+	// seems like a6 is already set to ExecBase when called from the ROM ?
+	// copy it
+	move.l	4.w,%a6
+	lea		_execbase(%pc),%a2
+	move.l	%a6,(%a2)
+
+	// 
+
+
+
+
+//_continue:
+//	lea	dosname_boot(%pc),%a1
+//	move.l	4.w,%a6	// exec base
+//	jsr	_FindResident(%a6)
+//	lea	_dosbase(%pc),%a2
+//	tst.l	%d0
+//	beq.s	_floppy_err
+//	move.l	%d0,(%a2)
+//	// pop up saved regs
+//	movem.l		(%sp)+,%d1-%d7/%a0-%a6
+//	move.l	_dosbase,%a0
+//	move.l	0x16(%a0),%a0
+//	moveq	#0,%d0
+//	rts
+
+_floppy_err:
+	// pop up saved regs
+	movem.l		(%sp)+,%d1-%d7/%a0-%a6
+	moveq	#-1,%d0
+	rts
+
+
+_display_alert:
+	move.l	4.w,%a6
+	lea	intname_boot(%pc),%a1
+	jsr	_OldOpenLibrary(%a6)
+	tst.l	%d0
+	beq.s	_floppy_err
+	lea	_intbase(%pc),%a2
+	move.l	%d0,(%a2)
+	move.l	%d0,%a6
+
+	lea		alert_data(%pc),%a0
+	moveq	#0,%d0
+	move.l	#30,%d1
+	jsr		_DisplayAlert(%a6)
+	rts
+	
+	
+	// ATARI
+#if 0
+
 	lea		label_floppy,%a0
 	bsr		puts
 	//bra floppy_start
@@ -403,6 +439,44 @@ shell_end:
 		// this bumps the "start" label to offset 0x0200 as
 		// expected by the BFS boot loader, and also marks
 		// this block as valid boot block for the BIOS
+#endif
+
+sNumSectors:
+	// this location will contain the length of the boot loader as
+	// written by the "makeflop" command in 512 byte blocks
+	// 0x180 is the allowed maximum, as the zipped TAR with the
+	// kernel and the boot module might start at offset 192 kB
+	//.word	0x0300 //0x0180
+	.word	BOOT_ARCHIVE_IMAGE_OFFSET*2
+
+dosname_boot:
+	.ascii	"dos.library"
+	.byte	0
+
+intname_boot:
+	.ascii	"intuition.library"
+	.byte	0
+
+alert_data:
+	.word	10
+	.byte	12
+	.ascii	"Welcome to Haiku\0"
+alert_extra:
+	.ascii	"\0\0"
+	.byte	0
+
+_execbase:
+	.long	0
+_dosbase:
+	.long	0
+_intbase:
+	.long	0
+
+end_buff:
+// equ *-_floppy_entry
+	.dcb.b	(1024)-(end_buff-_floppy_entry),0
+
+
 
 //XXX: put bfs_start here
 
