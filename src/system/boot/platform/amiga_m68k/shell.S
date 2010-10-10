@@ -37,7 +37,7 @@
  */
 
 #include "amiga_memory_map.h"
-#include "amicalls.h"
+#include "rom_calls.h"
 
 
 // 1 enabled verbose output

@@ -8,7 +8,7 @@
 
 
 #include "cpu.h"
-#include "amicalls.h"
+#include "rom_calls.h"
 
 #include <OS.h>
 #include <boot/platform.h>

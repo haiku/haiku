@@ -17,7 +17,7 @@
 #include "cpu.h"
 #include "mmu.h"
 #include "keyboard.h"
-#include "amicalls.h"
+#include "rom_calls.h"
 
 
 #define HEAP_SIZE 65536

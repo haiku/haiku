@@ -7,7 +7,7 @@
 
 
 #include "amiga_memory_map.h"
-#include "amicalls.h"
+#include "rom_calls.h"
 #include "mmu.h"
 
 #include <boot/platform.h>

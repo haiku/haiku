@@ -5,7 +5,7 @@
 
 
 #include "keyboard.h"
-#include "amicalls.h"
+#include "rom_calls.h"
 
 #include <boot/platform.h>
 

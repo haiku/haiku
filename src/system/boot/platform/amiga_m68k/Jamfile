@@ -29,7 +29,7 @@ KernelMergeObject boot_platform_amiga_m68k_shell.o :
 KernelMergeObject boot_platform_amiga_m68k_other.o :
 #	shell.S
 	start.cpp
-	amicalls.cpp
+	rom_calls.cpp
 	debug.cpp
 	#bios.S
 	console.cpp

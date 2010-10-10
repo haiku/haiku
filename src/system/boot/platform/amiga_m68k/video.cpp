@@ -4,7 +4,7 @@
  */
 
 
-#include "amicalls.h"
+#include "rom_calls.h"
 #include "video.h"
 //#include "mmu.h"
 //#include "images.h"

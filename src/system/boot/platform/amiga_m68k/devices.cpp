@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include "Handle.h"
-#include "amicalls.h"
+#include "rom_calls.h"
 
 //#define TRACE_DEVICES
 #ifdef TRACE_DEVICES

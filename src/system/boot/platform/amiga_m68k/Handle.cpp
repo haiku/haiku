@@ -9,7 +9,7 @@
 #include <util/kernel_cpp.h>
 
 #include "Handle.h"
-#include "amicalls.h"
+#include "rom_calls.h"
 
 /*
  * (X)BIOS supports char and block devices with a separate namespace
