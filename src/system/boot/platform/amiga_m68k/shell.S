@@ -39,15 +39,6 @@
 #include "amiga_memory_map.h"
 #include "amicalls.h"
 
-// AmigaDOS calls
-// exec.library
-#define _FindResident			-0x60
-#define _OldOpenLibrary         -0x198
-#define _CloseLibrary           -0x19e
-// intuition.library
-#define _DisplayAlert			-90
-
-
 
 // 1 enabled verbose output
 //#define DEBUG 1
@@ -85,21 +76,21 @@ floppy_start:
 
 	// seems like a6 is already set to ExecBase when called from the ROM ?
 	move.l	4.w,%a6	// exec base
-	//jsr	_FindResident(%a6)
+	//jsr	_LVOFindResident(%a6)
 	lea	SysBase(%pc),%a2
 	move.l	%a6,(%a2)
 
 
 //	lea	dosname_boot(%pc),%a1
 //	move.l	4.w,%a6	// exec base
-//	jsr	_FindResident(%a6)
+//	jsr	_LVOFindResident(%a6)
 //	lea	DosBase(%pc),%a2
 //	tst.l	%d0
 //	beq.s	_floppy_err
 //	move.l	%d0,(%a2)
 
 	lea	intname_boot(%pc),%a1
-	jsr	_OldOpenLibrary(%a6)
+	jsr	_LVOOldOpenLibrary(%a6)
 	tst.l	%d0
 	beq.s	_floppy_err
 	lea	IntuitionBase(%pc),%a2
@@ -116,7 +107,7 @@ floppy_start:
 //_continue:
 //	lea	dosname_boot(%pc),%a1
 //	move.l	4.w,%a6	// exec base
-//	jsr	_FindResident(%a6)
+//	jsr	_LVOFindResident(%a6)
 //	lea	_dosbase(%pc),%a2
 //	tst.l	%d0
 //	beq.s	_floppy_err
@@ -142,7 +133,7 @@ _display_alert:
 	lea		alert_data(%pc),%a0
 	moveq	#0,%d0
 	move.l	#40,%d1
-	jsr		_DisplayAlert(%a6)
+	jsr		_LVODisplayAlert(%a6)
 	//move.l	(%sp)+,%a6
 	rts
 

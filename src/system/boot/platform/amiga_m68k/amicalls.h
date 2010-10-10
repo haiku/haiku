@@ -1035,17 +1035,35 @@ struct Library;
 
 #define EXEC_BASE_NAME SysBase
 
+#define _LVOFindResident	(-0x60)
+#define _LVOAllocAbs		(-0xcc)
+#define _LVOOldOpenLibrary	(-0x198)
+#define _LVOCloseLibrary	(-0x19e)
+#define _LVODoIO			(-0x1c8)
+#define _LVOOpenLibrary		(-0x228)
+
+
 #ifndef __ASSEMBLER__
 
 extern Library *EXEC_BASE_NAME;
+
+#define AllocAbs(par1, last) \
+	LP2(0xcc, APTR, AllocAbs, unsigned long, par1, d0, APTR, last, a1, \
+	, EXEC_BASE_NAME)
 
 #define CloseLibrary(last) \
 	LP1NR(0x19e, CloseLibrary, struct Library *, last, a1, \
 	, EXEC_BASE_NAME)
 
-#define OpenLibrary(par1, last) \
-	LP2(0x228, struct Library *, OpenLibrary, uint8 *, par1, a1, unsigned long, last, d0, \
+#define DoIO(last) \
+	LP1(0x1c8, BYTE, DoIO, struct IORequest *, last, a1, \
 	, EXEC_BASE_NAME)
+
+#define OpenLibrary(par1, last) \
+	LP2(0x228, struct Library *, OpenLibrary, uint8 *, par1, a1, \
+	unsigned long, last, d0, \
+	, EXEC_BASE_NAME)
+
 
 
 
@@ -1066,12 +1084,15 @@ extern "C" status_t exec_error(int32 err);
 
 #define INTUITION_BASE_NAME IntuitionBase
 
+#define _LVODisplayAlert	(-0x5a)
+
 #ifndef __ASSEMBLER__
 
 extern Library *INTUITION_BASE_NAME;
 
 #define DisplayAlert(par1, par2, last) \
-	LP3(0x5a, bool, DisplayAlert, unsigned long, par1, d0, void *, par2, a0, unsigned long, last, d1, \
+	LP3(0x5a, bool, DisplayAlert, unsigned long, par1, d0, void *, \
+	par2, a0, unsigned long, last, d1, \
 	, INTUITION_BASE_NAME)
 
 #endif /* __ASSEMBLER__ */
