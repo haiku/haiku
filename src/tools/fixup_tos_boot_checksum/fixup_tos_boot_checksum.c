@@ -31,5 +31,6 @@ int main(int argc, char **argv)
 	*p++ = (uint8_t)sum;
 	//lseek(fd, 0LL, SEEK_SET);
 	write(fd, &sector[512-2], 2);
+	close(fd);
 	return 0;
 }
