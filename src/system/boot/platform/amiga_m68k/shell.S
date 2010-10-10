@@ -94,13 +94,25 @@ floppy_start:
 	movem.l		%d1-%d7/%a0-%a6,-(%sp)
 
 	// seems like a6 is already set to ExecBase when called from the ROM ?
-	// copy it
-	move.l	4.w,%a6
-	lea		_execbase(%pc),%a2
+	move.l	4.w,%a6	// exec base
+	jsr	_FindResident(%a6)
+	lea	SysBase(%pc),%a2
 	move.l	%a6,(%a2)
 
-	// 
+//	lea	dosname_boot(%pc),%a1
+//	move.l	4.w,%a6	// exec base
+//	jsr	_FindResident(%a6)
+//	lea	DosBase(%pc),%a2
+//	tst.l	%d0
+//	beq.s	_floppy_err
+//	move.l	%d0,(%a2)
 
+	lea	intname_boot(%pc),%a1
+	jsr	_FindResident(%a6)
+	tst.l	%d0
+	beq.s	_floppy_err
+	lea	IntuitionBase(%pc),%a2
+	move.l	%d0,(%a2)
 
 
 
@@ -127,19 +139,13 @@ _floppy_err:
 
 
 _display_alert:
-	move.l	4.w,%a6
-	lea	intname_boot(%pc),%a1
-	jsr	_OldOpenLibrary(%a6)
-	tst.l	%d0
-	beq.s	_floppy_err
-	lea	_intbase(%pc),%a2
-	move.l	%d0,(%a2)
-	move.l	%d0,%a6
-
+	move.l	%a6,-(%sp)
+	move	IntuitionBase,%a6
 	lea		alert_data(%pc),%a0
 	moveq	#0,%d0
 	move.l	#30,%d1
 	jsr		_DisplayAlert(%a6)
+	move.l	(%sp)+,%a6
 	rts
 	
 	
@@ -465,11 +471,11 @@ alert_extra:
 	.ascii	"\0\0"
 	.byte	0
 
-_execbase:
+GLOBAL(SysBase):
 	.long	0
-_dosbase:
+GLOBAL(DosBase):
 	.long	0
-_intbase:
+GLOBAL(IntuitionBase):
 	.long	0
 
 end_buff:
@@ -483,6 +489,8 @@ end_buff:
 /*
  * \AUTO\HAIKU.PRG and ARAnyM BOOTSTRAP() support code
  */
+
+#if 0
 
 prg_start:
 	lea		label_prg,%a0
@@ -553,6 +561,7 @@ super_done:
 	move.b		#1,AMIGA_ZBEOS_BASE + gBootedFromImage - _bs_entry 
 
 	move.l		#0,%d0
+#endif
 
 	//jmp			AMIGA_ZBEOS_BASE+512
 	jmp			_start
