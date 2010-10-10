@@ -24,24 +24,6 @@ KernelMergeObject boot_platform_amiga_m68k_shell.o :
 	: -Wa,--pcrel
 ;
 
-# cpu-specific stuff
-# should be moved to boot/arch/m68k/...
-# XXX: add 020+68851 support
-KernelMergeObject boot_arch_m68k_030.o :
-	mmu_030.cpp
-	: -fno-pic -Wno-unused -m68030
-;
-
-KernelMergeObject boot_arch_m68k_040.o :
-	mmu_040.cpp
-	: -fno-pic -Wno-unused -m68040
-;
-
-KernelMergeObject boot_arch_m68k_060.o :
-	mmu_060.cpp
-	: -fno-pic -Wno-unused -m68060
-;
-
 
 KernelMergeObject boot_platform_amiga_m68k_other.o :
 #	shell.S
@@ -79,45 +61,6 @@ KernelMergeObject boot_platform_amiga_m68k.o :
 	boot_platform_amiga_m68k_other.o
 	boot_arch_m68k_030.o
 	boot_arch_m68k_040.o
-;
-
-# AUTO folder PRG target
-
-# based on KernelLd
-rule AtariBootPrgLd
-{
-	# AtariBootPrgLd <name> : <objs> : <linkerscript> : <args> ;
-
-	LINK on $(1) = $(TARGET_LD) ;
-
-	LINKFLAGS on $(1) = $(4) ;
-	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
-
-	# Remove any preset LINKLIBS
-	LINKLIBS on $(1) = ;
-
-	# TODO: Do we really want to invoke SetupKernel here? The objects should
-	# have been compiled with KernelObjects anyway, so we're doing that twice.
-	SetupKernel $(2) ;
-
-	# Show that we depend on the libraries we need
-	LocalClean clean : $(1) ;
-	LocalDepends all : $(1) ;
-	Depends $(1) : $(2) ;
-
-	MakeLocateDebug $(1) ; 
-
-}
-
-actions AtariBootPrgLd
-{
-	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
-}
-
-AtariBootPrgLd haiku.prg :
-	boot_loader_$(TARGET_BOOT_PLATFORM)
-	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_$(TARGET_BOOT_PLATFORM).ld
-	: -Bstatic
 ;
 
 
