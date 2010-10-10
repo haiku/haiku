@@ -67,20 +67,14 @@
 // dos.library
 #define Old_mode                        1005
 #define New_mode                        1006
-#define _Open					-0x0
-#define _Close					-0x6
-#define _Read                   -0xc
-#define _Write                  -0x12
-#define _Input					-0x18
-#define _Output					-0x1e
-#define _IoErr					-0x66
-#define _Delay					-0xa8
-/*
-#define _Open                   -0x1e
-#define _Close                  -0x24
+#define _Open					-0x1e
+#define _Close					-0x24
 #define _Read                   -0x2a
 #define _Write                  -0x30
-*/
+#define _Input					-0x36
+#define _Output					-0x3c
+#define _IoErr					-0x84
+#define _Delay					-0xc6
 // intuition.library
 #define _DisplayAlert			-90
 
@@ -111,9 +105,10 @@ _floppy_boot:
 	move.l	%d0,(%a2)
 //	bra _continue
 
+/*
 	move.l	%d0,%a6
 
-/*	lea		window_name(%pc),%a0
+	lea		window_name(%pc),%a0
 	move.l	%a0,%d1
 	move.l	#Old_mode,%d2
 	jsr		_Open(%a6)
@@ -127,6 +122,32 @@ _loop_2:
 	bra		_loop_2
 */	
 
+	jsr _display_alert
+
+
+	bra	_floppy_err
+
+
+//	lea	dosname_boot(%pc),%a1
+////	jsr	-0x60(%a6)	// FindResident()
+//	move.l	4.w,%a6
+//	jsr	-96(%a6)
+
+
+	tst.l	%d0
+	beq.s	_floppy_err
+_continue:
+	move.l	_dosbase,%a0
+	move.l	0x16(%a0),%a0
+	moveq	#0,%d0
+
+	rts
+
+_floppy_err:
+	moveq	#-1,%d0
+	rts
+
+_display_alert:
 	move.l	4.w,%a6
 	lea	intname_boot(%pc),%a1
 	jsr	_OldOpenLibrary(%a6)
@@ -140,32 +161,6 @@ _loop_2:
 	moveq	#0,%d0
 	move.l	#30,%d1
 	jsr		_DisplayAlert(%a6)
-
-
-	bra	_floppy_err
-
-	lea	dosname_boot(%pc),%a1
-	jsr	_FindResident(%a6)
-	lea	_dosbase(%pc),%a2
-	move	%d0,(%a2)
-
-//	lea	dosname_boot(%pc),%a1
-////	jsr	-0x60(%a6)	// FindResident()
-//	move.l	4.w,%a6
-//	jsr	-96(%a6)
-
-
-	tst.l	%d0
-	beq.s	_floppy_err
-_continue:
-	move.l	%d0,%a0
-	move.l	0x16(%a0),%a0
-	moveq	#0,%d0
-
-	rts
-
-_floppy_err:
-	moveq	#-1,%d0
 	rts
 
 dosname_boot:
