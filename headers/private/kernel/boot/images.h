@@ -1,6 +1,9 @@
 /*
- * Copyright 2010, Philippe Houdoin <phoudoin at haiku-os dot org>.
+ * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Philippe Houdoin, phoudoin at haiku-os dot org
  */
 #ifndef KERNEL_BOOT_IMAGES_H
 #define KERNEL_BOOT_IMAGES_H
@@ -15,7 +18,4 @@
 #	include <boot/images-sans-tm.h>
 #endif
 
-
 #endif	/* KERNEL_BOOT_ARCH_H */
-
-
