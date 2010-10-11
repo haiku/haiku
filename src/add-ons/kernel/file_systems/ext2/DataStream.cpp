@@ -25,7 +25,7 @@ DataStream::DataStream(Volume* volume, ext2_data_stream* stream,
 	off_t size)
 	:
 	kBlockSize(volume->BlockSize()),
-	kIndirectsPerBlock(kBlockSize / 4),
+	kIndirectsPerBlock(kBlockSize / sizeof(uint32)),
 	kIndirectsPerBlock2(kIndirectsPerBlock * kIndirectsPerBlock),
 	kIndirectsPerBlock3(kIndirectsPerBlock2 * kIndirectsPerBlock),
 	kMaxDirect(EXT2_DIRECT_BLOCKS),
@@ -195,20 +195,9 @@ DataStream::_BlocksNeeded(uint32 numBlocks)
 					blocksNeeded += 2 + (numBlocks - kMaxIndirect - 1)
 						/ kIndirectsPerBlock;
 				} else {
-					blocksNeeded += (numBlocks - fNumBlocks)
-						/ kIndirectsPerBlock;
-
-					uint32 halfIndirectsPerBlock = kIndirectsPerBlock / 2;
-					uint32 remCurrent = (fNumBlocks - kMaxIndirect - 1)
-						% kIndirectsPerBlock;
-					uint32 remTarget = (numBlocks - kMaxIndirect - 1)
-						% kIndirectsPerBlock;
-
-					if ((remCurrent >= halfIndirectsPerBlock
-							&& remTarget < halfIndirectsPerBlock)
-						|| (remCurrent > halfIndirectsPerBlock
-							&& remTarget <= halfIndirectsPerBlock))
-						blocksNeeded++;
+					blocksNeeded += (numBlocks - kMaxIndirect - 1)
+						/ kIndirectsPerBlock - (fNumBlocks
+							- kMaxIndirect - 1) / kIndirectsPerBlock;
 				}
 
 				if (numBlocks > kMaxDoubleIndirect) {
@@ -216,21 +205,9 @@ DataStream::_BlocksNeeded(uint32 numBlocks)
 						blocksNeeded += 2 + (numBlocks - kMaxDoubleIndirect - 1)
 							/ kIndirectsPerBlock2;
 					} else {
-						blocksNeeded += (numBlocks - fNumBlocks)
-							/ kIndirectsPerBlock2;
-
-						uint32 halfIndirectsPerBlock2 = kIndirectsPerBlock2 / 2;
-						uint32 remCurrent = (fNumBlocks - kMaxDoubleIndirect
-								- 1)
-							% kIndirectsPerBlock2;
-						uint32 remTarget = (numBlocks - kMaxDoubleIndirect - 1)
-							% kIndirectsPerBlock2;
-
-						if ((remCurrent >= halfIndirectsPerBlock2
-								&& remTarget < halfIndirectsPerBlock2)
-							|| (remCurrent > halfIndirectsPerBlock2
-								&& remTarget <= halfIndirectsPerBlock2))
-							blocksNeeded++;
+						blocksNeeded += (numBlocks - kMaxDoubleIndirect - 1)
+							/ kIndirectsPerBlock - (fNumBlocks 
+								- kMaxDoubleIndirect - 1) / kIndirectsPerBlock;
 					}
 				}
 			}
@@ -260,6 +237,9 @@ DataStream::_GetBlock(Transaction& transaction, uint32& block)
 
 		fWaiting -= fAllocated;
 		fAllocatedPos += fVolume->BlocksPerGroup() * blockGroup + fFirstBlock;
+
+		TRACE("DataStream::_GetBlock(): newAllocated: %lu, newpos: %lu,"
+			"newwaiting: %lu\n", fAllocated, fAllocatedPos, fWaiting);
 	}
 
 	fAllocated--;
@@ -339,7 +319,7 @@ DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 start,
 	else if (recursion == 2)
 		elementWidth = kIndirectsPerBlock2;
 	else {
-		panic("Undefinied recursion level\n");
+		panic("Undefined recursion level\n");
 		elementWidth = 0;
 	}
 

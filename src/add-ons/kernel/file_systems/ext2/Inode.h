@@ -100,6 +100,8 @@ private:
 							off_t size);
 			status_t	_ShrinkDataStream(Transaction& transaction, off_t size);
 
+			uint64		_NumBlocks();
+			status_t	_SetNumBlocks(uint64 numBlocks);
 
 			rw_lock		fLock;
 			::Volume*	fVolume;

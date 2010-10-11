@@ -180,7 +180,7 @@ status_t
 AllocationBlockGroup::Allocate(Transaction& transaction, uint32 start,
 	uint32 length)
 {
-	TRACE("AllocationBlockGroup::Allocate()\n");
+	TRACE("AllocationBlockGroup::Allocate(%ld,%ld)\n", start, length);
 	uint32 end = start + length;
 	if (end > fNumBits)
 		return B_BAD_DATA;
@@ -463,7 +463,7 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, uint32 minimum,
 {
 	TRACE("BlockAllocator::AllocateBlocks()\n");
 	MutexLocker lock(fLock);
-	TRACE("BlockAllocator::AllocateBlocks(): Aquired lock\n");
+	TRACE("BlockAllocator::AllocateBlocks(): Acquired lock\n");
 
 	TRACE("BlockAllocator::AllocateBlocks(): transaction: %ld, min: %lu, "
 		"max: %lu, block group: %lu, start: %lu, num groups: %lu\n",

@@ -36,7 +36,7 @@ public:
 			void			FindLargestUnmarkedRange(uint32& start,
 								uint32& length);
 
-			uint32			NumBits() const;
+			uint32			NumBits() const { return fNumBits; }
 
 protected:
 			uint32*			fData;

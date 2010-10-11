@@ -32,6 +32,7 @@
 #else
 #	define TRACE(x...) ;
 #endif
+#	define FATAL(x...) dprintf("\33[34mext2:\33[0m " x)
 
 
 class DeviceOpener {
@@ -284,13 +285,17 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
 
-	// read the super block
-	if (Identify(fDevice, &fSuperBlock) != B_OK) {
-		//FATAL(("invalid super block!\n"));
-		return B_BAD_VALUE;
-	}
+	TRACE("features %lx, incompatible features %lx, read-only features %lx\n",
+		fSuperBlock.CompatibleFeatures(), fSuperBlock.IncompatibleFeatures(),
+		fSuperBlock.ReadOnlyFeatures());
 
-	if (_UnsupportedIncompatibleFeatures(fSuperBlock) != 0)
+	// read the super block
+	status_t status = Identify(fDevice, &fSuperBlock);
+	if (status != B_OK)
+		return status;
+	
+	// check read-only features if mounting read-write
+	if (!IsReadOnly() && _UnsupportedReadOnlyFeatures(fSuperBlock) != 0)
 		return B_NOT_SUPPORTED;
 
 	// initialize short hands to the super block (to save byte swapping)
@@ -312,10 +317,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	TRACE("block size %ld, num groups %ld, groups per block %ld, first %lu\n",
 		fBlockSize, fNumGroups, fGroupsPerBlock, fFirstDataBlock);
-	TRACE("features %lx, incompatible features %lx, read-only features %lx\n",
-		fSuperBlock.CompatibleFeatures(), fSuperBlock.IncompatibleFeatures(),
-		fSuperBlock.ReadOnlyFeatures());
-
+	
 	uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1) / fGroupsPerBlock;
 
 	fGroupBlocks = (ext2_block_group**)malloc(blockCount * sizeof(void*));
@@ -327,7 +329,7 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
-	status_t status = opener.GetSize(&diskSize);
+	status = opener.GetSize(&diskSize);
 	if (status != B_OK)
 		return status;
 	if (diskSize < (NumBlocks() << BlockShift()))
@@ -339,8 +341,9 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	
 	TRACE("Volume::Mount(): Initialized block cache: %p\n", fBlockCache);
 
-	// initialize journal
-	if ((fSuperBlock.CompatibleFeatures() & EXT2_FEATURE_HAS_JOURNAL) != 0) {
+	// initialize journal if mounted read-write
+	if (!IsReadOnly() &&
+		(fSuperBlock.CompatibleFeatures() & EXT2_FEATURE_HAS_JOURNAL) != 0) {
 		// TODO: There should be a mount option to ignore the existent journal
 		if (fSuperBlock.JournalInode() != 0) {
 			fJournalInode = new(std::nothrow) Inode(this, 
@@ -469,15 +472,32 @@ Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
 		| EXT2_INCOMPATIBLE_FEATURE_RECOVER
 		| EXT2_INCOMPATIBLE_FEATURE_JOURNAL
 		/*| EXT2_INCOMPATIBLE_FEATURE_META_GROUP*/;
+	uint32 unsupported = superBlock.IncompatibleFeatures() 
+		& ~supportedIncompatible;
 
-	if ((superBlock.IncompatibleFeatures() & ~supportedIncompatible) != 0) {
-		dprintf("ext2: incompatible features not supported: %lx (extents %x)\n",
-			superBlock.IncompatibleFeatures() & ~supportedIncompatible,
-			EXT2_INCOMPATIBLE_FEATURE_EXTENTS);
-		return superBlock.IncompatibleFeatures() & ~supportedIncompatible;
+	if (unsupported != 0) {
+		FATAL("ext2: incompatible features not supported: %lx (extents %x)\n",
+			unsupported, EXT2_INCOMPATIBLE_FEATURE_EXTENTS);
 	}
 
-	return 0;
+	return unsupported;
+}
+
+
+/*static*/ uint32
+Volume::_UnsupportedReadOnlyFeatures(ext2_super_block& superBlock)
+{
+	uint32 supportedReadOnly = EXT2_READ_ONLY_FEATURE_SPARSE_SUPER
+		| EXT2_READ_ONLY_FEATURE_HUGE_FILE;
+	// TODO actually implement EXT2_READ_ONLY_FEATURE_SPARSE_SUPER when
+	// implementing superblock backup copies
+
+	uint32 unsupported = superBlock.ReadOnlyFeatures() & ~supportedReadOnly;
+
+	if (unsupported != 0)
+		FATAL("ext2: readonly features not supported: %lx\n", unsupported);
+
+	return unsupported;
 }
 
 
@@ -796,8 +816,10 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 			sizeof(ext2_super_block)) != sizeof(ext2_super_block))
 		return B_IO_ERROR;
 
-	if (!superBlock->IsValid())
+	if (!superBlock->IsValid()) {
+		FATAL("invalid super block!\n");
 		return B_BAD_VALUE;
+	}
 
 	return _UnsupportedIncompatibleFeatures(*superBlock) == 0
 		? B_OK : B_NOT_SUPPORTED;

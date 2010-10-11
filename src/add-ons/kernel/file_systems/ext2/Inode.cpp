@@ -868,9 +868,8 @@ Inode::RemovedFromTransaction()
 status_t
 Inode::_EnlargeDataStream(Transaction& transaction, off_t size)
 {
-	// TODO: Update fNode.num_blocks
 	if (size < 0)
-		return B_BAD_DATA;
+		return B_BAD_VALUE;
 
 	TRACE("Inode::_EnlargeDataStream()\n");
 
@@ -883,7 +882,7 @@ Inode::_EnlargeDataStream(Transaction& transaction, off_t size)
 	if (size <= maxSize) {
 		// No need to allocate more blocks
 		TRACE("Inode::_EnlargeDataStream(): No need to allocate more blocks\n");
-		TRACE("Inode::_EnlargeDataStream(): Setting size to %ld\n", (long)size);
+		TRACE("Inode::_EnlargeDataStream(): Setting size to %Ld\n", size);
 		fNode.SetSize(size);
 		return B_OK;
 	}
@@ -892,13 +891,11 @@ Inode::_EnlargeDataStream(Transaction& transaction, off_t size)
 	DataStream stream(fVolume, &fNode.stream, oldSize);
 	stream.Enlarge(transaction, end);
 
-	TRACE("Inode::_EnlargeDataStream(): Setting size to %ld\n", (long)size);
+	TRACE("Inode::_EnlargeDataStream(): Setting size to %Ld\n", size);
 	fNode.SetSize(size);
 	TRACE("Inode::_EnlargeDataStream(): Setting allocated block count to %lu\n",
 		end);
-	fNode.SetNumBlocks(fNode.NumBlocks() + end * (fVolume->BlockSize() / 512));
-
-	return B_OK;
+	return _SetNumBlocks(_NumBlocks() + end * (fVolume->BlockSize() / 512));
 }
 
 
@@ -908,7 +905,7 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 	TRACE("Inode::_ShrinkDataStream()\n");
 
 	if (size < 0)
-		return B_BAD_DATA;
+		return B_BAD_VALUE;
 
 	uint32 blockSize = fVolume->BlockSize();
 	off_t oldSize = Size();
@@ -929,7 +926,40 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 	stream.Shrink(transaction, end);
 
 	fNode.SetSize(size);
-	fNode.SetNumBlocks(fNode.NumBlocks() - end * (fVolume->BlockSize() / 512));
+	return _SetNumBlocks(_NumBlocks() - end * (fVolume->BlockSize() / 512));
+}
 
+
+uint64
+Inode::_NumBlocks()
+{
+	if (fVolume->HugeFiles()) {
+		if (fNode.Flags() & EXT2_INODE_HUGE_FILE)
+			return fNode.NumBlocks64() * (fVolume->BlockSize() / 512);
+		else
+			return fNode.NumBlocks64();
+	} else
+		return fNode.NumBlocks();
+}
+
+
+status_t
+Inode::_SetNumBlocks(uint64 numBlocks)
+{
+	if (numBlocks <= 0xffffffff) {
+		fNode.SetNumBlocks(numBlocks);
+		fNode.ClearFlag(EXT2_INODE_HUGE_FILE);
+		return B_OK;
+	}
+	if (!fVolume->HugeFiles())
+		return E2BIG;
+
+	if (numBlocks > 0xffffffffffffULL) {
+		fNode.SetFlag(EXT2_INODE_HUGE_FILE);
+		numBlocks /= (fVolume->BlockSize() / 512);
+	} else 
+		fNode.ClearFlag(EXT2_INODE_HUGE_FILE);
+		
+	fNode.SetNumBlocks64(numBlocks);
 	return B_OK;
 }

@@ -79,6 +79,9 @@ public:
 										& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
 			uint8				DefaultHashVersion() const
 									{ return fSuperBlock.default_hash_version; }
+			bool				HugeFiles() const
+									{ return (fSuperBlock.ReadOnlyFeatures()
+										& EXT2_READ_ONLY_FEATURE_HUGE_FILE) != 0; }
 
 			status_t			SaveOrphan(Transaction& transaction,
 									ino_t newID, ino_t &oldID);
@@ -114,6 +117,8 @@ public:
 
 private:
 	static	uint32				_UnsupportedIncompatibleFeatures(
+									ext2_super_block& superBlock);
+	static	uint32				_UnsupportedReadOnlyFeatures(
 									ext2_super_block& superBlock);
 			uint32				_GroupDescriptorBlock(uint32 blockIndex);
 

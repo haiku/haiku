@@ -149,6 +149,7 @@ struct ext2_super_block {
 #define EXT2_READ_ONLY_FEATURE_SPARSE_SUPER		0x0001
 #define	EXT2_READ_ONLY_FEATURE_LARGE_FILE		0x0002
 #define EXT2_READ_ONLY_FEATURE_BTREE_DIRECTORY	0x0004
+#define EXT2_READ_ONLY_FEATURE_HUGE_FILE		0x0008
 
 // incompatible features
 #define EXT2_INCOMPATIBLE_FEATURE_COMPRESSION	0x0001
@@ -234,8 +235,13 @@ struct ext2_inode {
 		uint32	size_high;
 	};
 	uint32	fragment;
-	uint8	fragment_number;
-	uint8	fragment_size;
+	union {
+		struct {
+			uint8	fragment_number;
+			uint8	fragment_size;
+		};
+		uint16 num_blocks_high;
+	};
 	uint16	_padding;
 	uint16	uid_high;
 	uint16	gid_high;
@@ -247,6 +253,8 @@ struct ext2_inode {
 	uint32 Flags() const { return B_LENDIAN_TO_HOST_INT32(flags); }
 	uint16 NumLinks() const { return B_LENDIAN_TO_HOST_INT16(num_links); }
 	uint32 NumBlocks() const { return B_LENDIAN_TO_HOST_INT32(num_blocks); }
+	uint64 NumBlocks64() const { return B_LENDIAN_TO_HOST_INT32(num_blocks)
+		| ((uint64)B_LENDIAN_TO_HOST_INT32(num_blocks_high) << 32); }
 
 	time_t AccessTime() const { return B_LENDIAN_TO_HOST_INT32(access_time); }
 	time_t CreationTime() const { return B_LENDIAN_TO_HOST_INT32(creation_time); }
@@ -286,6 +294,11 @@ struct ext2_inode {
 		SetMode((Mode() & ~mask) | (newMode & mask));
 	}
 
+	void ClearFlag(uint32 mask)
+	{
+		flags &= ~B_HOST_TO_LENDIAN_INT32(mask);
+	}
+
 	void SetFlag(uint32 mask)
 	{
 		flags |= B_HOST_TO_LENDIAN_INT32(mask);
@@ -304,6 +317,12 @@ struct ext2_inode {
 	void SetNumBlocks(uint32 numBlocks)
 	{
 		num_blocks = B_HOST_TO_LENDIAN_INT32(numBlocks);
+	}
+
+	void SetNumBlocks64(uint64 numBlocks)
+	{
+		num_blocks = B_HOST_TO_LENDIAN_INT32(numBlocks & 0xffffffff);
+		num_blocks_high = B_HOST_TO_LENDIAN_INT32(numBlocks >> 32);
 	}
 
 	void SetAccessTime(time_t accessTime)
@@ -373,6 +392,7 @@ struct ext2_inode {
 #define EXT2_INODE_COMPRESSION_ERROR	0x00000800
 #define EXT2_INODE_BTREE				0x00001000
 #define EXT2_INODE_INDEXED				0x00001000
+#define EXT2_INODE_HUGE_FILE			0x00040000
 
 #define EXT2_NAME_LENGTH	255
 
