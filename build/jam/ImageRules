@@ -1397,6 +1397,13 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 
 actions BuildFloppyBootImage1
 {
+	haiku_loader_size=`stat -c %s $(>[1])`
+	archive_image_offset=`echo "$(ARCHIVE_IMAGE_OFFSET) * 1024" | bc`
+	if [ $haiku_loader_size -gt $archive_image_offset ] ; then
+		echo "Error: $(>[1]) is too big ($haiku_loader_size) to fit "
+		echo "       before the boot archive starting at $archive_image_offset!"
+		exit 1
+	fi
 	$(RM) $(<)
 	# make an empty image
 	dd if=/dev/zero of=$(<) bs=1k count=$(FLOPPY_IMAGE_SIZE)
