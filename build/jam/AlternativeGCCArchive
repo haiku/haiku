@@ -2,6 +2,12 @@
 # the rules building the archive. Included by HaikuImage.
 
 
+#sanity check - make sure the primary gcc is different than the alternative gcc
+if $(HAIKU_PRIMARY_GCC) = $(HAIKU_GCC_VERSION[1]) {
+	Exit "Error: Your alternative gcc is the same as the main gcc!"
+		"You need to reconfigure your generated directories." ;
+}
+
 #pragma mark - Build The Archive
 
 
