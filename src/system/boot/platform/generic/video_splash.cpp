@@ -12,15 +12,7 @@
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
 #include <boot/platform/generic/video.h>
-#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-#	ifdef HAIKU_OFFICIAL_RELEASE
-#		include <boot/images-tm.h>
-#	else
-#		include <boot/images-tm-development.h>
-#	endif
-#else
-#	include <boot/images-sans-tm.h>
-#endif
+#include <boot/images.h>
 
 #include <stdio.h>
 #include <stdlib.h>

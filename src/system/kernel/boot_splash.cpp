@@ -15,16 +15,7 @@
 #include <KernelExport.h>
 
 #define __BOOTSPLASH_KERNEL__
-#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
-#	ifdef HAIKU_OFFICIAL_RELEASE
-#		include <boot/images-tm.h>
-#	else
-#		include <boot/images-tm-development.h>
-#	endif
-#else
-#	include <boot/images-sans-tm.h>
-#endif
-
+#include <boot/images.h>
 
 #include <boot_item.h>
 #include <debug.h>
