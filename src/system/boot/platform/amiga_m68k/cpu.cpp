@@ -36,29 +36,29 @@
 static status_t
 check_cpu_features()
 {
-	uint16 AttnFlags = SysBase->AttnFlags;
+	uint16 flags = SysBase->AttnFlags;
 	int cpu = 0;
 	int fpu = 0;
 
 	// check fpu flags first, since they are also set for 040
 
-	if (AttnFlags & AFF_68881)
+	if ((flags & AFF_68881) != 0)
 			fpu = 68881;
-	if (AttnFlags & AFF_68882)
+	if ((flags & AFF_68882) != 0)
 			fpu = 68882;
 
-	//if (AttnFlags & AFF_68010)
+	//if ((flags & AFF_68010) != 0)
 	//	return B_ERROR;
-	//if (AttnFlags & AFF_68020)
+	//if ((flags & AFF_68020) != 0)
 	//	return B_ERROR;
-	if (AttnFlags & AFF_68030)
+	if ((flags & AFF_68030) != 0)
 			cpu = 68030;
-	if (AttnFlags & AFF_68040)
+	if ((flags & AFF_68040) != 0)
 			cpu = fpu = 68040;
-	//if (AttnFlags & AFF_FPU40)
+	//if ((flags & AFF_FPU40) != 0)
 	//		;
 
-	//panic("cpu %d fpu %d flags 0x%04x", cpu, fpu, AttnFlags);
+	//panic("cpu %d fpu %d flags 0x%04x", cpu, fpu, flags);
 	if (!cpu || !fpu)
 		return B_ERROR;
 
@@ -66,7 +66,7 @@ check_cpu_features()
 	gKernelArgs.arch_args.mmu_type = cpu;
 	gKernelArgs.arch_args.fpu_type = fpu;
 
-	//	if (AttnFlags & AFF_68060) true
+	//	if ((flags & AFF_68060) != 0) true
 	gKernelArgs.arch_args.has_lpstop = false;
 
 	gKernelArgs.arch_args.platform = M68K_PLATFORM_AMIGA;
