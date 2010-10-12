@@ -13,8 +13,7 @@
 #include <ColumnTypes.h>
 #include <ControlLook.h>
 #include <FilePanel.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <MenuBar.h>
 #include <MenuField.h>
@@ -317,7 +316,8 @@ main(int argc, char** argv)
 	layout->AddView(colorControl, 0, row, 4);
 
 	BTabView* tabView = new BTabView("tab view", B_WIDTH_FROM_WIDEST);
-	BView* content = BGroupLayoutBuilder(B_VERTICAL, kInset)
+	BGroupView* content = new BGroupView(B_VERTICAL, kInset);
+	BLayoutBuilder::Group<>(content)
 		.Add(scrollView)
 		.Add(columnListView)
 		.Add(controls)
@@ -362,19 +362,16 @@ main(int argc, char** argv)
 
 	BButton* okButton = new BButton("OK", new BMessage(B_QUIT_REQUESTED));
 
-	window->AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(window, B_VERTICAL, 0)
 		.Add(menuBar)
-		.Add(BGroupLayoutBuilder(B_VERTICAL, kInset)
-			.Add(tabView)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, kInset)
-				.Add(new BButton("Revert", new BMessage(MSG_TOGGLE_LOOK)))
-				.Add(BSpaceLayoutItem::CreateGlue())
-				.Add(new BButton("Cancel", NULL))
-				.Add(okButton)
-			)
+		.AddGroup(B_VERTICAL, kInset)
 			.SetInsets(kInset, kInset, kInset, kInset)
-		)
-	);
+			.Add(tabView)
+			.AddGroup(B_HORIZONTAL, kInset)
+				.Add(new BButton("Revert", new BMessage(MSG_TOGGLE_LOOK)))
+				.AddGlue()
+				.Add(new BButton("Cancel", NULL))
+				.Add(okButton);
 
 	window->SetDefaultButton(okButton);
 
