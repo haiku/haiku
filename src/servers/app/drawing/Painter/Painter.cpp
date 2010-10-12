@@ -389,8 +389,8 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		// special case dots
 		if (fPenSize == 1.0 && !fSubpixelPrecise) {
 			if (fClippingRegion->Contains(a)) {
-				agg::rgba8 dummyColor;
-				fPixelFormat.blend_pixel((int)a.x, (int)a.y, dummyColor, 255);
+				fPixelFormat.blend_pixel((int)a.x, (int)a.y, fRenderer.color(),
+					255);
 			}
 		} else {
 			fPath.move_to(a.x, a.y);
