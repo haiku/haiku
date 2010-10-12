@@ -120,7 +120,6 @@ platform_exit(void)
 extern "C" void
 _start(void)
 {
-	panic("plop %d", 1234);
 	stage2_args args;
 
 	//asm("cld");			// Ain't nothing but a GCC thang.
@@ -137,6 +136,7 @@ _start(void)
 	console_init();
 	dprintf("ramtop   = %p\n", NULL);
 	cpu_init();
+	panic("plop %d", 1234);
 	mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key

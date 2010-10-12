@@ -969,10 +969,38 @@ typedef void *APTR;
 
 // <exec/library.h>
 
-struct Library;
+// cf.
+// http://ftp.netbsd.org/pub/NetBSD/NetBSD-release-4-0/src/sys/arch/amiga/stand/bootblock/boot/amigatypes.h
+
+struct Library {
+	uint8	dummy1[10];
+	uint16	Version, Revision;
+	uint8	dummy2[34-24];
+};
 
 // <exec/execbase.h>
 
+struct MemHead {
+	struct MemHead	*next;
+	uint8	dummy1[9-4];
+	uint8	Pri;
+	uint8	dummy2[14-10];
+	uint16	Attribs;
+	uint32	First, Lower, Upper, Free;
+};
+
+struct ExecBase {
+	struct Library	LibNode;
+	uint8	dummy1[296-34];
+	uint16	AttnFlags;
+	uint8	dummy2[300-298];
+	void	*ResModules;
+	uint8	dummy3[322-304];
+	struct MemHead	*MemList;
+	uint8	dummy4[568-326];
+	uint32	EClockFreq;
+	uint8	dummy5[632-334];
+} _PACKED;
 
 #endif /* __ASSEMBLER__ */
 
@@ -994,6 +1022,29 @@ struct Library;
 
 // <exec/io.h>
 
+/*
+struct IORequest {
+	struct Message	io_Message;
+	struct Device	*io_Device;
+	struct Unit		*io_Unit;
+	uint16			io_Command;
+	uint8			io_Flags;
+	int8			io_Error;
+};
+
+struct IOStdReq {
+	struct Message	io_Message;
+	struct Device	*io_Device;
+	struct Unit		*io_Unit;
+	uint16			io_Command;
+	uint8			io_Flags;
+	int8			io_Error;
+	uint32			io_Actual;
+	uint32			io_Length;
+	void			*io_Data;
+	uint32			io_Offset;
+};
+*/
 
 #endif /* __ASSEMBLER__ */
 
@@ -1045,7 +1096,7 @@ struct Library;
 
 #ifndef __ASSEMBLER__
 
-extern Library *EXEC_BASE_NAME;
+extern ExecBase *EXEC_BASE_NAME;
 
 #define AllocAbs(par1, last) \
 	LP2(0xcc, APTR, AllocAbs, unsigned long, par1, d0, APTR, last, a1, \

@@ -36,8 +36,43 @@
 static status_t
 check_cpu_features()
 {
-	//TODO
-	return B_ERROR;
+	uint16 AttnFlags = SysBase->AttnFlags;
+	int cpu = 0;
+	int fpu = 0;
+
+	// check fpu flags first, since they are also set for 040
+
+	if (AttnFlags & AFF_68881)
+			fpu = 68881;
+	if (AttnFlags & AFF_68882)
+			fpu = 68882;
+
+	//if (AttnFlags & AFF_68010)
+	//	return B_ERROR;
+	//if (AttnFlags & AFF_68020)
+	//	return B_ERROR;
+	if (AttnFlags & AFF_68030)
+			cpu = 68030;
+	if (AttnFlags & AFF_68040)
+			cpu = fpu = 68040;
+	//if (AttnFlags & AFF_FPU40)
+	//		;
+
+	//panic("cpu %d fpu %d flags 0x%04x", cpu, fpu, AttnFlags);
+	if (!cpu || !fpu)
+		return B_ERROR;
+
+	gKernelArgs.arch_args.cpu_type = cpu;
+	gKernelArgs.arch_args.mmu_type = cpu;
+	gKernelArgs.arch_args.fpu_type = fpu;
+
+	//	if (AttnFlags & AFF_68060) true
+	gKernelArgs.arch_args.has_lpstop = false;
+
+	gKernelArgs.arch_args.platform = M68K_PLATFORM_AMIGA;
+	gKernelArgs.arch_args.machine = 0; //XXX
+
+	return B_OK;
 }
 
 #warning M68K: move and implement system_time()
@@ -65,7 +100,7 @@ extern "C" void
 cpu_init()
 {
 	if (check_cpu_features() != B_OK)
-		panic("You need a 68020 or higher in order to boot!\n");
+		panic("You need a 68030 or higher in order to boot!\n");
 
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
