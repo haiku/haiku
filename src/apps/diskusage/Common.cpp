@@ -78,6 +78,7 @@ read_resources(const char* appSignature)
 	kVolMenuLabel = LoadString("STR_VM_LABEL");
 	kOneFile = LoadString("STR_1_FILE");
 	kManyFiles = LoadString("STR_N_FILES");
+	kStrScan = LoadString("STR_SCAN");
 	kStrRescan = LoadString("STR_RESCAN");
 	kStrScanningX = LoadString("STR_SCN_X");
 	kStrUnavail = LoadString("STR_UNAVAIL");
@@ -94,6 +95,7 @@ read_resources(const char* appSignature)
 	kInfoTimeFmt = LoadString("STR_TIMEFMT");
 	kInfoKind = LoadString("STR_KIND");
 	kInfoPath = LoadString("STR_PATH");
+	kOutdatedStr = LoadString("STR_OUTDATED");
 
 	kWindowColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 	kOutlineColor = LoadColor("RGB_PIE_OL");

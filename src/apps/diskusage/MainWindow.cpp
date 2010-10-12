@@ -7,8 +7,6 @@
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
-
-
 #include "MainWindow.h"
 
 #include <Application.h>
@@ -16,58 +14,28 @@
 #include <Roster.h>
 #include <Screen.h>
 
+#include <LayoutBuilder.h>
+
 #include "Common.h"
 #include "ControlsView.h"
-#include "PieView.h"
-#include "StatusView.h"
-
-
-const float kMinWinSize = 275.0;
 
 
 MainWindow::MainWindow(BRect pieRect)
 	:
 	BWindow(pieRect, "DiskUsage", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
+		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	BRect r = Bounds();
-	r.bottom = r.top + 1.0;
-	fControlsView = new ControlsView(r);
-	float cvHeight = fControlsView->Bounds().Height();
-	AddChild(fControlsView);
+	fControlsView = new ControlsView();
 
-	r = Bounds();
-	r.top = r.bottom - 1.0;
-	fStatusView = new StatusView(r);
-	float svHeight = fStatusView->Bounds().Height();
+	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	float winHeight = pieRect.Height() + cvHeight + svHeight;
-	fStatusView->MoveTo(0.0, winHeight - svHeight);
-	ResizeTo(r.Width(), winHeight);
-
-	AddChild(fStatusView);
-
-	r = fControlsView->Frame();
-	r.top = r.bottom + 1.0;
-	r.bottom = fStatusView->Frame().top - 1.0;
-	fPieView = new PieView(r, this);
-	AddChild(fPieView);
-
-	Show();
-
-	// Note: The following code is semi-broken because BScreen::Frame()
-	// returns incorrect dimensions for the G200 in 1152x864 mode.  I reported
-	// this bug, and Be said it's not a bug -- the Matrox driver actually uses
-	// a resolution of 1152x900 in that mode.  Oh well.
-	Lock();
-	float extraHeight = fControlsView->Bounds().Height()
-		+ fStatusView->Bounds().Height();
-	float minHeight = kMinWinSize + extraHeight;
-	float maxHeight = BScreen(this).Frame().Height();
-	float maxWidth = maxHeight - extraHeight;
-	Unlock();
-
-	SetSizeLimits(kMinWinSize, maxWidth, minHeight, maxHeight);
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.Add(fControlsView)
+		.SetInsets(5, 5, 5, 5)
+	);
+	float maxHeight = BScreen(this).Frame().Height() - 12;
+	fControlsView->SetExplicitMaxSize(BSize(maxHeight, maxHeight));
 }
 
 
@@ -81,9 +49,11 @@ MainWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case kBtnRescan:
-		case kMenuSelectVol:
+			fControlsView->MessageReceived(message);
+			break;
+		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
-			fPieView->MessageReceived(message);
+			fControlsView->MessageReceived(message);
 			break;
 
 		case kBtnHelp:
@@ -109,16 +79,16 @@ MainWindow::QuitRequested()
 
 
 void
-MainWindow::ShowInfo(const FileInfo* info)
+MainWindow::SetRescanEnabled(bool enabled)
 {
-	fStatusView->ShowInfo(info);
+	fControlsView->SetRescanEnabled(enabled);
 }
 
 
 void
-MainWindow::SetRescanEnabled(bool enabled)
+MainWindow::ShowInfo(const FileInfo* info)
 {
-	fControlsView->SetRescanEnabled(enabled);
+	fControlsView->ShowInfo(info);
 }
 
 

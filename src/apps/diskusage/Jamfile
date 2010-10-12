@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps diskusage ;
 
-UsePrivateHeaders mount shared tracker ;
+UsePrivateHeaders mount shared tracker storage ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 Application DiskUsage :
@@ -14,6 +14,7 @@ Application DiskUsage :
 	Scanner.cpp
 	Snapshot.cpp
 	StatusView.cpp
+	VolumeView.cpp
 	: be $(TARGET_LIBSTDC++)
 	: DiskUsage.rdef
 ;

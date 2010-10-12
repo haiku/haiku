@@ -9,29 +9,32 @@
 #ifndef CONTROLS_VIEW_H
 #define CONTROLS_VIEW_H
 
-
 #include <Button.h>
 #include <View.h>
 
 
+class BMessage;
 class BVolume;
+
+struct FileInfo;
 
 class ControlsView: public BView {
 public:
-								ControlsView(BRect r);
+								ControlsView();
 	virtual						~ControlsView();
 
-			void				SetRescanEnabled(bool enable)
-									{ fRescanButton->SetEnabled(enable); }
+	virtual	void				MessageReceived(BMessage* msg);
 
 			BVolume*			FindDeviceFor(dev_t device,
 									bool invoke = false);
-			
-private:
-			class				VolumePopup;
 
-			VolumePopup*		fVolumePopup; 
-			BButton*			fRescanButton;
+			void				SetRescanEnabled(bool enabled);
+			void				ShowInfo(const FileInfo* info);
+
+private:
+			class 				VolumeTabView;
+
+			VolumeTabView*		fVolumeTabView;
 };
 
 

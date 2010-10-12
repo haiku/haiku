@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include <Directory.h>
+#include <PathMonitor.h>
 
 #include "Common.h"
 
@@ -31,18 +32,27 @@ Scanner::Scanner(BVolume *v, BHandler *handler)
 	fDesiredPath(),
 	fTask(),
 	fBusy(false),
-	fQuitRequested(false)
+	fQuitRequested(false),
+	fIsWatching(false),
+	fModifiedEntries()
 {
-	fDoneMessage.AddPointer(kNameVolPtr, fVolume);
-	fProgressMessage.AddPointer(kNameVolPtr, fVolume);
-
 	Run();
 }
 
 
 Scanner::~Scanner()
 {
+	if (fIsWatching) {
+		BPrivate::BPathMonitor::StopWatching(BMessenger(this, this));
+		fIsWatching = false;
+	}
 	delete fSnapshot;
+
+	while (fModifiedEntries.size() != 0) {
+		entry_ref* entry = *fModifiedEntries.begin();
+		delete entry;
+		fModifiedEntries.erase(fModifiedEntries.begin());
+	}
 }
 
 
@@ -56,6 +66,38 @@ Scanner::MessageReceived(BMessage* message)
 			if (message->FindPointer(kNameFilePtr, (void **)&startInfo) == B_OK)
 				_RunScan(startInfo);
 			break;
+		}
+
+		case B_PATH_MONITOR:
+		{
+			dev_t device;
+			ino_t directory;
+			const char* name = "";
+			const char* path;
+
+			if (((message->FindInt32("device", &device) != B_OK)
+					|| (message->FindInt64("directory", &directory) != B_OK)
+					|| (message->FindString("name", &name) != B_OK))
+				&& ((message->FindString("path", &path) != B_OK)
+					|| (message->FindInt32("device", &device) != B_OK)))
+				return;
+
+			entry_ref* reportedEntry;
+			if (strlen(name) > 0)
+				reportedEntry = new entry_ref(device, directory, name);
+			else {
+				BEntry entry(path);
+				reportedEntry = new entry_ref();
+				entry.GetRef(reportedEntry);
+			}
+
+			fModifiedEntries.push_back(reportedEntry);
+
+			if (IsOutdated()) {
+				BMessage msg(kOutdatedMsg);
+				fListener.SendMessage(&msg);
+			}
+
 		}
 
 		default:
@@ -72,6 +114,12 @@ Scanner::Refresh(FileInfo* startInfo)
 		return;
 
 	fBusy = true;
+
+	while (fModifiedEntries.size() != 0) {
+		entry_ref* entry = *fModifiedEntries.begin();
+		delete entry;
+		fModifiedEntries.erase(fModifiedEntries.begin());
+	}
 
 	// Remember the current directory, if any, so we can return to it after
 	// the scanning is done.
@@ -112,7 +160,41 @@ Scanner::RequestQuit()
 }
 
 
+bool
+Scanner::IsOutdated()
+{
+	FileInfo* currentDir = (fSnapshot->currentDir != NULL ?
+		fSnapshot->currentDir : fSnapshot->rootDir);
+
+	BDirectory currentDirectory(&(currentDir->ref));
+	
+	bool isOutdated = currentDirectory.InitCheck() != B_OK;
+
+	vector<entry_ref*>::iterator i = fModifiedEntries.begin();
+	while (!isOutdated && i != fModifiedEntries.end()) {
+		BEntry entry(*i);
+		isOutdated = _DirectoryContains(currentDir, *i)
+			|| currentDirectory.Contains(&entry);
+		i++;
+	}
+	return isOutdated;
+}
+
+
 // #pragma mark - private
+
+
+bool
+Scanner::_DirectoryContains(FileInfo* currentDir, entry_ref* ref)
+{
+	vector<FileInfo*>::iterator i = currentDir->children.begin();
+	bool contains = currentDir->ref == *ref;
+	while (!contains && i != currentDir->children.end()) {
+		contains |= _DirectoryContains((*i), ref);
+		i++;
+	}
+	return contains;
+}
 
 
 void
@@ -166,6 +248,16 @@ Scanner::_RunScan(FileInfo* startInfo)
 
 			delete startInfo;
 		}
+	}
+
+	if (!fIsWatching) {
+		string path;
+		fSnapshot->rootDir->GetPath(path);
+
+		BPrivate::BPathMonitor::StartWatching(path.c_str(),
+			B_WATCH_ALL | B_WATCH_RECURSIVELY, BMessenger(this, this));
+
+		fIsWatching = true;
 	}
 
 	fBusy = false;

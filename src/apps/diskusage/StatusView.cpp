@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2010 Philippe St-Pierre <stpere@gmail.com>. All rights reserved.
  * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT/X11 license.
  *
@@ -14,78 +15,89 @@
 #include <stdio.h>
 
 #include <Box.h>
+#include <Button.h>
 #include <Node.h>
 #include <String.h>
 #include <StringView.h>
+
+#include <LayoutBuilder.h>
 
 #include "Common.h"
 #include "Scanner.h"
 
 
-StatusView::StatusView(BRect rect)
+StatusView::StatusView()
 	:
-	BView(rect, NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW),
+	BView(NULL, B_WILL_DRAW),
 	fCurrentFileInfo(NULL)
 {
-	SetViewColor(kWindowColor);
+	SetViewColor(kPieBGColor);
+	SetLowColor(kPieBGColor);
 
-	struct font_height fh;
-	be_plain_font->GetHeight(&fh);
-	float plainHeight = ceilf(fh.ascent) + ceilf(fh.descent)
-		+ ceilf(fh.leading);
-	float fixedHeight = ceilf(fh.ascent) + ceilf(fh.descent)
-		+ ceilf(fh.leading);
-	ResizeTo(Bounds().Width(),
-		2.0 * kSmallVMargin + max_c(plainHeight, fixedHeight));
+	fSizeView = new BStringView(NULL, kEmptyStr);
+	fSizeView->SetExplicitMinSize(BSize(StringWidth("9999.99 GB"),
+		B_SIZE_UNSET));
+	fSizeView->SetExplicitMaxSize(BSize(StringWidth("9999.99 GB"),
+		B_SIZE_UNSET));
 
-	BRect r = Bounds();
-	r.top += kSmallVMargin;
-
-	// Size display
-	r.right -= kSmallHMargin;
-	r.left = r.right - StringWidth("9999.99 GB");
-	fSizeView = new BStringView(r, NULL, kEmptyStr,
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP_BOTTOM);
-	AddChild(fSizeView);
-
-	// Vertical divider
-	r.right = r.left - kSmallHMargin;
-	r.left = r.right - 1.0;
-	AddChild(new BBox(r.InsetByCopy(0, -5), NULL,
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP_BOTTOM));
-
-	// Count display
 	char testLabel[256];
 	sprintf(testLabel, kManyFiles, 999999);
-	r.right = r.left - kSmallHMargin;
-	r.left = r.right - (StringWidth(testLabel) + kSmallHMargin);
-	fCountView = new BStringView(r, NULL, kEmptyStr,
-		B_FOLLOW_RIGHT|B_FOLLOW_TOP_BOTTOM);
-	AddChild(fCountView);
 
-	// Vertical divider
-	r.right = r.left - kSmallHMargin;
-	r.left = r.right - 1.0;
-	AddChild(new BBox(r.InsetByCopy(0, -5), NULL,
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP_BOTTOM));
+	fCountView = new BStringView(NULL, kEmptyStr);
+	fCountView->SetExplicitMinSize(BSize(StringWidth(testLabel), B_SIZE_UNSET));
+	fCountView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	// Path display
-	r.right = r.left - kSmallHMargin;
-	r.left = kSmallHMargin;
-	fPathView = new BStringView(r, NULL, kEmptyStr,
-		B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP_BOTTOM);
-	AddChild(fPathView);
+	fPathView = new BStringView(NULL, kEmptyStr);
+	fPathView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
-	// Horizontal divider
-	r = Bounds();
-	r.bottom = r.top + 1.0;
-	AddChild(new BBox(r.InsetByCopy(-5, 0), NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW));
+	fRefreshBtn = new BButton(NULL, kStrScan, new BMessage(kBtnRescan));
+
+	fRefreshBtn->SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED));
+
+	BBox* divider1 = new BBox(BRect(), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
+
+	BBox* divider2 = new BBox(BRect(), B_EMPTY_STRING, B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
+
+	divider1->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
+	divider2->SetExplicitMaxSize(BSize(1, B_SIZE_UNLIMITED));
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL)
+		.AddGroup(B_VERTICAL)
+			.Add(fPathView)
+			.Add(divider1)
+			.AddGroup(B_HORIZONTAL)
+				.Add(fCountView)
+				.Add(divider2)
+				.Add(fSizeView)
+				.End()			
+			.End()
+		.AddStrut(kSmallHMargin)
+		.Add(fRefreshBtn)
+		.SetInsets(kSmallHMargin, kSmallVMargin, kSmallVMargin, kSmallVMargin)
+	);
 }
 
 
 StatusView::~StatusView()
 {
+}
+
+
+void
+StatusView::SetRescanEnabled(bool enabled)
+{
+	fRefreshBtn->SetEnabled(enabled);
+}
+
+
+void
+StatusView::SetBtnLabel(const char* label)
+{
+	fRefreshBtn->SetLabel(label);
 }
 
 

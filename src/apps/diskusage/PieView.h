@@ -20,6 +20,7 @@
 class AppMenuItem;
 class BEntry;
 class BMenu;
+class BPath;
 class BPopUpMenu;
 class BVolume;
 struct entry_ref;
@@ -33,18 +34,19 @@ using std::vector;
 
 class PieView: public BView {
 public:
-								PieView(BRect frame, MainWindow* window);
+								PieView(BVolume* volume);
 	virtual						~PieView();
 
+	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				MouseDown(BPoint where);
 	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 	virtual	void				Draw(BRect updateRect);
+			void				SetPath(BPath path);
 
 private:
-			void				_HandleArg(const BEntry* entry);
 			void				_ShowVolume(BVolume* volume);
 			void				_DrawProgressBar(BRect updateRect);
 			void				_DrawPieChart(BRect updateRect);
@@ -59,6 +61,7 @@ private:
 			void				_Launch(FileInfo* info,
 									const entry_ref* ref = NULL);
 			void				_OpenInfo(FileInfo* info, BPoint p);
+
 private:
 		struct Segment {
 			Segment()
@@ -76,12 +79,10 @@ private:
 		typedef vector<Segment> SegmentList;
 		typedef map<int, SegmentList> MouseOverInfo;
 
-		typedef map<BVolume*, Scanner*> ScannerMap;
-
 private:
 			MainWindow*			fWindow;
-			ScannerMap			fScanners;
-			BVolume*			fCurrentVolume;
+			Scanner*			fScanner;
+			BVolume*			fVolume;
 			FileInfo*			fCurrentDir;
 			MouseOverInfo		fMouseOverInfo;
 			BPopUpMenu*			fMouseOverMenu;
@@ -91,6 +92,7 @@ private:
 			bool				fDragging;
 			BPoint				fDragStart;
 			FileInfo*			fClickedFile;
+			bool				fOutdated;			
 };
 
 #endif // PIE_VIEW_H

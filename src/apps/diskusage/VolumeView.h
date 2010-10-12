@@ -1,39 +1,44 @@
 /*
- * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>.
- * Copyright (c) 2009 Philippe Saint-Pierre, stpere@gmail.com
+ * Copyright (c) 2010 Philippe Saint-Pierre, stpere@gmail.com
  * All rights reserved. Distributed under the terms of the MIT license.
  *
  * Copyright (c) 1999 Mike Steed. You are free to use and distribute this software
  * as long as it is accompanied by it's documentation and this copyright notice.
  * The software comes with no warranty, etc.
  */
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
 
-#include <Window.h>
+#ifndef VOLUMETAB_VIEW_H
+#define VOLUMETAB_VIEW_H
 
+#include <View.h>
 
+class BButton;
+class BPath;
+class BStringView;
 class BVolume;
-class ControlsView;
-struct FileInfo;
 class PieView;
+class MainWindow;
+class StatusView;
 
-class MainWindow: public BWindow {
+struct FileInfo;
+
+
+class VolumeView: public BView {
+	
 public:
-								MainWindow(BRect pieRect);
-	virtual						~MainWindow();
+								VolumeView(const char* name, BVolume* volume);
+	virtual						~VolumeView();
 
 	virtual	void				MessageReceived(BMessage* message);
-	virtual	bool				QuitRequested();
-
 			void				SetRescanEnabled(bool enabled);
-			BVolume*			FindDeviceFor(dev_t device,
-									bool invoke = false);
-
+			void				SetPath(BPath path);
 			void				ShowInfo(const FileInfo* info);
 
 private:
-			ControlsView*		fControlsView;
+	PieView*			fPieView;
+	StatusView*			fStatusView;
 };
 
-#endif // MAIN_WINDOW_H
+
+
+#endif

@@ -62,6 +62,7 @@ resource(101, "N_PIE_COLORS") (uint8)4;
 resource(103, "STR_N_FILES") "%d files";
 resource(102, "STR_1_FILE") "%d file";
 resource(101, "STR_VM_LABEL") "Volume:";
+resource(120, "STR_SCAN") "Scan";
 resource(104, "STR_RESCAN") "Rescan";
 resource(105, "STR_SCN_X") "Scanning ";
 resource(106, "STR_UNAVAIL") "file unavailable";
@@ -78,4 +79,4 @@ resource(116, "STR_MOD") "Modified";
 resource(117, "STR_TIMEFMT") "%a, %d %b %Y, %r";
 resource(118, "STR_KIND") "Kind";
 resource(119, "STR_PATH") "Path";
-
+resource(121, "STR_OUTDATED") "Outdated view";

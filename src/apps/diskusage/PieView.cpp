@@ -14,7 +14,6 @@
 #include <fs_info.h>
 #include <math.h>
 
-#include <Alert.h>
 #include <AppFileInfo.h>
 #include <Bitmap.h>
 #include <Entry.h>
@@ -41,8 +40,6 @@ static const int32 kIdxOpen = 1;
 static const int32 kIdxOpenWith = 2;
 static const int32 kIdxRescan = 3;
 
-// TODO: It would be nice to make a common base class for AppMenuItem and
-// VolMenuItem (menu items that include an icon).
 
 class AppMenuItem : public BMenuItem {
 public:
@@ -125,20 +122,17 @@ AppMenuItem::DrawContent()
 // #pragma mark - PieView
 
 
-PieView::PieView(BRect frame, MainWindow* window)
+PieView::PieView(BVolume* volume)
 	:
-	BView(frame, NULL, B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_SUBPIXEL_PRECISE),
-	fWindow(window),
-	fScanners(),
-	fCurrentVolume(NULL),
+	BView(NULL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_SUBPIXEL_PRECISE),
+	fWindow(NULL),
+	fScanner(NULL),
+	fVolume(volume),
 	fMouseOverInfo(),
 	fClicked(false),
-	fDragging(false)
+	fDragging(false),
+	fOutdated(false)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(kWindowColor);
-
 	fMouseOverMenu = new BPopUpMenu(kEmptyStr, false, false);
 	fMouseOverMenu->AddItem(new BMenuItem(kMenuGetInfo, NULL), kIdxGetInfo);
 	fMouseOverMenu->AddItem(new BMenuItem(kMenuOpen, NULL), kIdxOpen);
@@ -160,16 +154,19 @@ PieView::PieView(BRect frame, MainWindow* window)
 }
 
 
+void
+PieView::AttachedToWindow()
+{
+	fWindow = (MainWindow*)Window();
+}
+
+
 PieView::~PieView()
 {
 	delete fMouseOverMenu;
 	delete fFileUnavailableMenu;
-
-	while (fScanners.size() != 0) {
-		ScannerMap::iterator i = fScanners.begin();
-		(*i).second->RequestQuit();
-		fScanners.erase(i);
-	}
+	if (fScanner != NULL)
+		fScanner->RequestQuit();
 }
 
 
@@ -177,41 +174,31 @@ void
 PieView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case B_SIMPLE_DATA:
-		case B_REFS_RECEIVED:
-		{
-			entry_ref ref;
-			for (int i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
-				BEntry entry(&ref, true);
-				_HandleArg(&entry);
-			}
-			break;
-		}
-
 		case kBtnRescan:
-			if (fCurrentVolume != NULL) {
-				fScanners[fCurrentVolume]->Refresh();
+			if (fVolume != NULL) {
+				if (fScanner != NULL)
+					fScanner->Refresh();
+				else
+					_ShowVolume(fVolume);
+
+				fOutdated = false;
 				Invalidate();
 			}
 			break;
-
-		case kMenuSelectVol:
-		{
-			BVolume* volume;
-			if (message->FindPointer(kNameVolPtr, (void**)&volume) == B_OK)
-				_ShowVolume(volume);
-			break;
-		}
 
 		case kScanProgress:
 		case kScanDone:
 		{
-			BVolume* volume;
-			if (message->FindPointer(kNameVolPtr, (void**)&volume) == B_OK
-				&& volume == fCurrentVolume) {
+			Invalidate();
+			break;
+		}
+
+		case kOutdatedMsg:
+		{			
+			if (!fScanner->IsBusy()) {
+				fOutdated = true;
 				Invalidate();
 			}
-			break;
 		}
 
 		default:
@@ -251,14 +238,15 @@ PieView::MouseUp(BPoint where)
 	// If the primary button was released and there was no dragging happening,
 	// just zoom in or out.
 	if (fClicked && !fDragging) {
-		Scanner* scanner = fScanners[fCurrentVolume];
 		FileInfo* info = _FileAt(where);
 		if (info != NULL) {
-			if (info == scanner->CurrentDir()) {
-				scanner->ChangeDir(info->parent);
+			if (info == fScanner->CurrentDir()) {
+				fScanner->ChangeDir(info->parent);
+				fOutdated = fScanner->IsOutdated();
 				Invalidate();
 			} else if (info->children.size() > 0) {
-				scanner->ChangeDir(info);
+				fScanner->ChangeDir(info);
+				fOutdated = fScanner->IsOutdated();
 				Invalidate();
 			}
 		}
@@ -307,27 +295,32 @@ PieView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 void
 PieView::Draw(BRect updateRect)
 {
-	if (fScanners.find(fCurrentVolume) != fScanners.end()) {
+	if (fScanner != NULL) {
 		// There is a current volume.
-		Scanner* scanner = fScanners[fCurrentVolume];
-		if (scanner->IsBusy()) {
+		if (fScanner->IsBusy()) {
 			// Show progress of scanning.
 			_DrawProgressBar(updateRect);
-			fWindow->SetRescanEnabled(false);
+			if (fWindow != NULL)
+				fWindow->SetRescanEnabled(false);
 		} else {
 			_DrawPieChart(updateRect);
-			fWindow->SetRescanEnabled(true);
+			if (fWindow != NULL)
+				fWindow->SetRescanEnabled(true);
 		}
-	} else {
-		// No volume has been selected, so display a prompt for one.
-		FillRect(updateRect, B_SOLID_LOW);
-		BRect b = Bounds();
-		float strWidth = StringWidth(kVolPrompt);
-		float bx = (b.left + b.Width() - strWidth) / 2.0;
-		float by = (b.top + b.Height()) / 2.0;
-		SetHighColor(0x00, 0x00, 0x00);
-		DrawString(kVolPrompt, BPoint(bx, by));
-		fWindow->SetRescanEnabled(false);
+	}
+}
+
+
+void
+PieView::SetPath(BPath path)
+{
+	if (fScanner == NULL)
+		_ShowVolume(fVolume);
+
+	if (fScanner != NULL) {
+		string desiredPath(path.Path());
+		fScanner->SetDesiredPath(desiredPath);
+		Invalidate();
 	}
 }
 
@@ -336,56 +329,16 @@ PieView::Draw(BRect updateRect)
 
 
 void
-PieView::_HandleArg(const BEntry* entry)
-{
-	// Going through these seemingly pointless gyrations (instead of getting
-	// the dev_t directly from the BEntry) allows us to process volumes
-	// properly.  It looks like a dropped volume refers to dev_t 1 (why?), but
-	// getting the dev_t from the path allows us to get at the dev_t where the
-	// root directory actually lives.
-	BPath path;
-	entry->GetPath(&path);
-	dev_t device = dev_for_path(path.Path());
-
-	// Set the desired path in the scanner.
-	Scanner* scanner = NULL;
-	ScannerMap::iterator i = fScanners.begin();
-	while (i != fScanners.end()) {
-		if ((*i).second->Device() == device) {
-			scanner = (*i).second;
-			break;
-		}
-		i++;
-	}
-
-	if (scanner == NULL) {
-		BVolume* volume = fWindow->FindDeviceFor(device);
-		if (volume != NULL)
-			scanner = fScanners[volume] = new Scanner(volume, this);
-	}
-	if (scanner != NULL) {
-		string desiredPath(path.Path());
-		scanner->SetDesiredPath(desiredPath);
-
-		// Select the volume on the menu.
-		fWindow->FindDeviceFor(device, true);
-	}
-}
-
-
-void
 PieView::_ShowVolume(BVolume* volume)
 {
 	if (volume != NULL) {
-		if (fScanners.find(volume) == fScanners.end())
-			fScanners[volume] = new Scanner(volume, this);
-
-		Scanner* scanner = fScanners[volume];
-		if (scanner->Snapshot() == NULL)
-			scanner->Refresh();
+		if (fScanner == NULL)
+			fScanner = new Scanner(volume, this);
+		
+		if (fScanner->Snapshot() == NULL)
+			fScanner->Refresh();
 	}
 
-	fCurrentVolume = volume;
 	Invalidate();
 }
 
@@ -416,7 +369,7 @@ PieView::_DrawProgressBar(BRect updateRect)
 	bx += 1.0; by += 1.0;
 	ex -= 1.0; ey -= 1.0;
 	float mx = bx + floorf((kProgBarWidth - 2.0)
-		* fScanners[fCurrentVolume]->Progress() / 100.0 + 0.5);
+		* fScanner->Progress() / 100.0 + 0.5);
 	SetHighColor(tint_color(kWindowColor, B_DARKEN_1_TINT));
 	FillRect(BRect(mx, by, ex, ey));
 
@@ -433,7 +386,7 @@ PieView::_DrawProgressBar(BRect updateRect)
 	FillRect(BRect(bx, by, mx, ey));
 
 	// Tell what we are doing.
-	const char* task = fScanners[fCurrentVolume]->Task();
+	const char* task = fScanner->Task();
 	float strWidth = StringWidth(task);
 	bx = (b.left + b.Width() - strWidth) / 2.0;
 	by -= fFontHeight + 2.0 * kSmallVMargin;
@@ -465,7 +418,7 @@ PieView::_DrawPieChart(BRect updateRect)
 		pieRect.bottom += moveBy;
 	}
 	int colorIdx = 0;
-	FileInfo* currentDir = fScanners[fCurrentVolume]->CurrentDir();
+	FileInfo* currentDir = fScanner->CurrentDir();
 	FileInfo* parent = currentDir;
 	while (parent != NULL) {
 		parent = parent->parent;
@@ -473,16 +426,21 @@ PieView::_DrawPieChart(BRect updateRect)
 	}
 	_DrawDirectory(pieRect, currentDir, 0.0, 0.0, colorIdx % kBasePieColorCount,
 		0);
+	
+	if (fOutdated) {
+		
+		BRect b = Bounds();		
 
-	// This is just for the case when the mouse hovers over the view
-	// while the scanning process is running and then does not move
-	// until after the results are shown. In that case the info will
-	// not automatically update. (TODO: fix this and put into MessageReceived()
-	// kScanDone - currently, fileAt() returns NULL (mouseoverinfo...))
-	BPoint where;
-	uint32 ignore;
-	GetMouse(&where, &ignore, false);
-	fWindow->ShowInfo(_FileAt(where));
+		float strWidth = StringWidth(kOutdatedStr);
+		float bx = (b.Width() - strWidth - kSmallHMargin);
+
+		struct font_height fh;
+		be_plain_font->GetHeight(&fh);
+
+		float by = (b.Height() - ceil(fh.descent) - kSmallVMargin);
+		SetHighColor(0x00, 0x00, 0x00);
+		DrawString(kOutdatedStr, BPoint(bx, by));
+	}
 }
 
 
@@ -500,7 +458,7 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 	else if (info != NULL)
 		info->color = colorIdx;
 
-	VolumeSnapshot* snapshot = fScanners[fCurrentVolume]->Snapshot();
+	VolumeSnapshot* snapshot = fScanner->Snapshot();
 
 	float cx = floorf(b.left + b.Width() / 2.0 + 0.5);
 	float cy = floorf(b.top + b.Height() / 2.0 + 0.5);
@@ -525,7 +483,8 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 			FillEllipse(BPoint(cx, cy), kPieCenterSize, kPieCenterSize);
 
 			SetHighColor(kBasePieColor[0]);
-			FillArc(BPoint(cx, cy), kPieCenterSize, kPieCenterSize, 0.0, mySpan);
+			FillArc(BPoint(cx, cy), kPieCenterSize, kPieCenterSize, 0.0,
+				mySpan);
 
 			// Show total volume capacity.
 			char label[B_PATH_NAME_LENGTH];
@@ -560,7 +519,8 @@ PieView::_DrawDirectory(BRect b, FileInfo* info, float parentSpan,
 
 		SetPenSize(1.0);
 		SetHighColor(kOutlineColor);
-		StrokeEllipse(BPoint(cx, cy), kPieCenterSize + 0.5, kPieCenterSize + 0.5);
+		StrokeEllipse(BPoint(cx, cy), kPieCenterSize + 0.5,
+			kPieCenterSize + 0.5);
 
 		// Show the name of the volume or directory.
 		BString label(displayName);
@@ -803,7 +763,7 @@ PieView::_ShowContextMenu(FileInfo* info, BPoint p)
 					_Launch(info);
 					break;
 				case kIdxRescan:
-					fScanners[fCurrentVolume]->Refresh(info);
+					fScanner->Refresh(info);
 					Invalidate();
 					break;
 				default: // must be "Open With" submenu
@@ -843,6 +803,7 @@ PieView::_Launch(FileInfo* info, const entry_ref* appRef)
 		be_roster->Launch(appRef, &msg);
 	}
 }
+
 
 void
 PieView::_OpenInfo(FileInfo* info, BPoint p)

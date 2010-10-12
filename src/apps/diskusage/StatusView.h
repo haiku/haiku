@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2010 Philippe St-Pierre <stpere@gmail.com>. All rights reserved.
  * Copyright (c) 2008 Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT/X11 license.
  *
@@ -9,7 +10,7 @@
 #ifndef STATUS_VIEW_H
 #define STATUS_VIEW_H
 
-
+#include <Button.h>
 #include <View.h>
 #include <StringView.h>
 #include <Rect.h>
@@ -19,17 +20,22 @@ struct FileInfo;
 
 class StatusView: public BView {
 public:
-								StatusView(BRect frame);
+								StatusView();
 	virtual						~StatusView();
 
 			void				ShowInfo(const FileInfo* info);
+			void				SetBtnLabel(const char* label);
+			void				SetRescanEnabled(bool enabled);
 
 private:
 			BStringView*		fPathView;
 			BStringView*		fSizeView;
 			BStringView*		fCountView;
 			const FileInfo*		fCurrentFileInfo;
+	
+			BButton*			fRefreshBtn;
 };
 
 
 #endif // STATUS_VIEW_H
+

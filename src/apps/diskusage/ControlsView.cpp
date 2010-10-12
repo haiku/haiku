@@ -12,47 +12,44 @@
 
 #include <Bitmap.h>
 #include <Box.h>
-#include <MenuField.h>
-#include <MenuItem.h>
+#include <TabView.h>
 #include <NodeMonitor.h>
+#include <Path.h>
 #include <PopUpMenu.h>
 #include <SupportDefs.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 #include <Window.h>
 
+#include <LayoutBuilder.h>
+
 #include "Common.h"
+#include "VolumeView.h"
 
 
-class VolumeMenuItem: public BMenuItem {
+class VolumeTab: public BTab {
 public:
-						VolumeMenuItem(BVolume* volume, BMessage* message);
-	virtual				~VolumeMenuItem();
+								VolumeTab(BVolume* volume);
+	virtual						~VolumeTab();
 
-	virtual	void		GetContentSize(float* width, float* height);
-	virtual	void		DrawContent();
+			BVolume*			Volume() const
+									{ return fVolume; }
+			float				IconWidth() const;
 
-			BVolume*	Volume() const
-							{ return fVolume; }
-			status_t	Invoke(BMessage* mesage = NULL)
-							{ return BMenuItem::Invoke(); }
+	virtual	void				DrawLabel(BView* owner, BRect frame);
 
 private:
-			BBitmap*	fIcon;
-			BVolume*	fVolume;
+			BBitmap*			fIcon;
+			BVolume*			fVolume;
 };
 
 
-VolumeMenuItem::VolumeMenuItem(BVolume* volume, BMessage* message)
+VolumeTab::VolumeTab(BVolume* volume)
 	:
-	BMenuItem(kEmptyStr, message),
+	BTab(),
 	fIcon(new BBitmap(BRect(0, 0, 15, 15), B_RGBA32)),
 	fVolume(volume)
 {
-	char name[B_PATH_NAME_LENGTH];
-	fVolume->GetName(name);
-	SetLabel(name);
-
 	if (fVolume->GetIcon(fIcon, B_MINI_ICON) < B_OK) {
 		delete fIcon;
 		fIcon = NULL;
@@ -60,53 +57,56 @@ VolumeMenuItem::VolumeMenuItem(BVolume* volume, BMessage* message)
 }
 
 
-VolumeMenuItem::~VolumeMenuItem()
+float
+VolumeTab::IconWidth() const
+{
+	if (fIcon != NULL)
+		// add a small margin
+		return fIcon->Bounds().Width() + kSmallHMargin;
+	else
+		return 0.0f;
+}
+
+
+void
+VolumeTab::DrawLabel(BView* owner, BRect frame)
+{
+	owner->SetDrawingMode(B_OP_OVER);
+	if (fIcon != NULL) {
+		owner->MovePenTo(frame.left + kSmallHMargin,
+			(frame.top + frame.bottom - fIcon->Bounds().Height()) / 2.0);
+		owner->DrawBitmap(fIcon);
+	}
+
+	font_height fh;
+	owner->GetFontHeight(&fh);
+
+	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+	owner->DrawString(Label(),
+		BPoint(frame.left + IconWidth() + kSmallHMargin,
+			(frame.top + frame.bottom - fh.ascent - fh.descent) / 2.0
+				+ fh.ascent));
+}
+
+
+VolumeTab::~VolumeTab()
 {
 	delete fIcon;
 	delete fVolume;
 }
 
 
-void
-VolumeMenuItem::GetContentSize(float* width, float* height)
-{
-	*width = be_plain_font->StringWidth(Label());
-
-	struct font_height fh;
-	be_plain_font->GetHeight(&fh);
-	float fontHeight = fh.ascent + fh.descent + fh.leading;
-	if (fIcon) {
-		*height = max_c(fontHeight, fIcon->Bounds().Height());
-		*width += fIcon->Bounds().Width() + kSmallHMargin;
-	} else
-		*height = fontHeight;
-}
-
-
-void
-VolumeMenuItem::DrawContent()
-{
-	if (fIcon) {
-		Menu()->SetDrawingMode(B_OP_OVER);
-		Menu()->MovePenBy(0.0, -1.0);
-		Menu()->DrawBitmap(fIcon);
-		Menu()->SetDrawingMode(B_OP_COPY);
-		Menu()->MovePenBy(fIcon->Bounds().Width() + kSmallHMargin, 0.0);
-	}
-	BMenuItem::DrawContent();
-}
-
-
 // #pragma mark -
 
 
-class ControlsView::VolumePopup: public BMenuField {
+class ControlsView::VolumeTabView: public BTabView {
 public:
-								VolumePopup(BRect r);
-	virtual						~VolumePopup();
+								VolumeTabView();
+	virtual						~VolumeTabView();
 
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
+	virtual BRect				TabFrame(int32 index) const;
 
 			BVolume*			FindDeviceFor(dev_t device,
 									bool invoke = false);
@@ -119,16 +119,40 @@ private:
 };
 
 
-ControlsView::VolumePopup::VolumePopup(BRect r)
+ControlsView::VolumeTabView::VolumeTabView()
 	:
-	BMenuField(r, NULL, kVolMenuLabel, new BPopUpMenu(kVolMenuDefault), false,
-		B_FOLLOW_LEFT)
+	BTabView("volume_tabs", B_WIDTH_FROM_LABEL)
 {
-	SetViewColor(kWindowColor);
-	SetLowColor(kWindowColor);
+}
 
-	SetDivider(kSmallHMargin + StringWidth(kVolMenuLabel));
 
+ControlsView::VolumeTabView::~VolumeTabView()
+{
+	fVolumeRoster->StopWatching();
+	delete fVolumeRoster;
+}
+
+
+BRect
+ControlsView::VolumeTabView::TabFrame(int32 index) const
+{
+	float height = BTabView::TabFrame(index).Height();
+	float x = 0.0f;
+	for (int32 i = 0; i < index; i++) {
+		x += StringWidth(TabAt(i)->Label()) + 3.0f * kSmallHMargin
+			+ ((VolumeTab*)TabAt(i))->IconWidth();
+	}
+
+	return BRect(x, 0.0f,
+		x + StringWidth(TabAt(index)->Label()) + 3.0f * kSmallHMargin
+			+ ((VolumeTab*)TabAt(index))->IconWidth(),
+		height);
+}
+
+
+void
+ControlsView::VolumeTabView::AttachedToWindow()
+{
 	// Populate the menu with the persistent volumes.
 	fVolumeRoster = new BVolumeRoster();
 
@@ -136,32 +160,20 @@ ControlsView::VolumePopup::VolumePopup(BRect r)
 	while (fVolumeRoster->GetNextVolume(&tempVolume) == B_OK) {
 		if (tempVolume.IsPersistent()) {
 			BVolume* volume = new BVolume(tempVolume);
-			BMessage* message = new BMessage(kMenuSelectVol);
-			message->AddPointer(kNameVolPtr, volume);
-			VolumeMenuItem *item = new VolumeMenuItem(volume, message);
-			Menu()->AddItem(item);
+			VolumeTab *item = new VolumeTab(volume);
+			char name[B_PATH_NAME_LENGTH];
+			volume->GetName(name);			
+			AddTab(new VolumeView(name, volume), item);
 		}
 	}
-}
 
-
-ControlsView::VolumePopup::~VolumePopup()
-{
-	fVolumeRoster->StopWatching();
-	delete fVolumeRoster;
-}
-
-
-void
-ControlsView::VolumePopup::AttachedToWindow()
-{
 	// Begin watching mount and unmount events.
 	fVolumeRoster->StartWatching(BMessenger(this));
 }
 
 
 void
-ControlsView::VolumePopup::MessageReceived(BMessage* message)
+ControlsView::VolumeTabView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_NODE_MONITOR:
@@ -176,24 +188,50 @@ ControlsView::VolumePopup::MessageReceived(BMessage* message)
 			}
 			break;
 
+		case kBtnRescan:
+			ViewForTab(Selection())->MessageReceived(message);
+			break;
+
+		case B_SIMPLE_DATA:
+		case B_REFS_RECEIVED:
+		{
+			entry_ref ref;
+
+			for (int i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
+				BEntry entry(&ref, true);
+				BPath path;
+				entry.GetPath(&path);
+				dev_t device = dev_for_path(path.Path());
+
+				for (int j = 0; VolumeTab* item = (VolumeTab*)TabAt(j); j++) {
+					if (item->Volume()->Device() == device) {
+						Select(j);
+						((VolumeView*)(item->View()))->SetPath(path);
+						break;
+					}
+				}
+			}
+			break;
+		}
+
 		default:
-			BMenuField::MessageReceived(message);
+			BTabView::MessageReceived(message);
 			break;
 	}
 }
 
 
 BVolume*
-ControlsView::VolumePopup::FindDeviceFor(dev_t device, bool invoke)
+ControlsView::VolumeTabView::FindDeviceFor(dev_t device, bool invoke)
 {
 	BVolume* volume = NULL;
 
 	// Iterate through items looking for a BVolume representing this device.
-	for (int i = 0; VolumeMenuItem* item = (VolumeMenuItem*)Menu()->ItemAt(i); i++) {
+	for (int i = 0; VolumeTab* item = (VolumeTab*)TabAt(i); i++) {
 		if (item->Volume()->Device() == device) {
 			volume = item->Volume();
 			if (invoke)
-				item->Invoke();
+				Select(i);
 			break;
 		}
 	}
@@ -203,43 +241,36 @@ ControlsView::VolumePopup::FindDeviceFor(dev_t device, bool invoke)
 
 
 void
-ControlsView::VolumePopup::_AddVolume(dev_t device)
+ControlsView::VolumeTabView::_AddVolume(dev_t device)
 {
 	// Make sure the volume is not already in the menu.
-	for (int i = 0; i < Menu()->CountItems(); i++) {
-		VolumeMenuItem* item = (VolumeMenuItem*)Menu()->ItemAt(i);
+	for (int i = 0; VolumeTab* item = (VolumeTab*)TabAt(i); i++) {
 		if (item->Volume()->Device() == device)
 			return;
 	}
 
-	// Add the newly mounted volume to the menu.
 	BVolume* volume = new BVolume(device);
-	BMessage* message = new BMessage(kMenuSelectVol);
-	message->AddPointer(kNameVolPtr, volume);
-	VolumeMenuItem* item = new VolumeMenuItem(volume, message);
-	Menu()->AddItem(item);
+
+	VolumeTab* item = new VolumeTab(volume);
+	char name[B_PATH_NAME_LENGTH];
+	volume->GetName(name);
+
+	AddTab(new VolumeView(name, volume), item);
+	Invalidate();
 }
 
 
 void
-ControlsView::VolumePopup::_RemoveVolume(dev_t device)
+ControlsView::VolumeTabView::_RemoveVolume(dev_t device)
 {
-	for (int i = 0; i < Menu()->CountItems(); i++) {
-		VolumeMenuItem* item = (VolumeMenuItem*)Menu()->ItemAt(i);
+	for (int i = 0; VolumeTab* item = (VolumeTab*)TabAt(i); i++) {
 		if (item->Volume()->Device() == device) {
-			// If the volume being removed is currently selected, prompt for a
-			// different volume.
-			if (item->IsMarked()) {
-				// update the displayed volume label now that there is no marked
-				// item:
-				Menu()->Superitem()->SetLabel(kVolMenuDefault);
-
-				BMessage messae(kMenuSelectVol);
-				messae.AddPointer(kNameVolPtr, NULL);
-				Window()->PostMessage(&messae);
-			}
-
-			Menu()->RemoveItem(item);
+			if (i == 0)
+				Select(1);
+			else
+				Select(i - 1);
+			RemoveTab(i);
+			delete item;
 			return;
 		}
 	}
@@ -249,43 +280,34 @@ ControlsView::VolumePopup::_RemoveVolume(dev_t device)
 // #pragma mark -
 
 
-ControlsView::ControlsView(BRect r)
-	: BView(r, NULL, B_FOLLOW_LEFT_RIGHT, 0)
+ControlsView::ControlsView()
+	:
+	BView(NULL, B_WILL_DRAW)
 {
-	SetViewColor(kWindowColor);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	fVolumeTabView = new VolumeTabView();
+	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.Add(fVolumeTabView)
+	);
+}
 
-	r.top += kSmallVMargin;
-	r.right -= kSmallHMargin;
-	float buttonWidth = kButtonMargin + StringWidth(kHelpBtnLabel);
-	r.left = r.right - buttonWidth;
-	BButton* helpButton = new BButton(r, NULL, kHelpBtnLabel, new BMessage(kBtnHelp),
-		B_FOLLOW_RIGHT);
-	if (!kFoundHelpFile)
-		helpButton->SetEnabled(false);
 
-	r.right = r.left - kSmallHMargin;
-	buttonWidth = kButtonMargin + StringWidth(kStrRescan);
-	r.left = r.right - max_c(kMinButtonWidth, buttonWidth);
-	fRescanButton = new BButton(r, NULL, kStrRescan, new BMessage(kBtnRescan),
-		B_FOLLOW_RIGHT);
+void
+ControlsView::MessageReceived(BMessage* msg)
+{
+	switch (msg->what) {
+		case B_SIMPLE_DATA:
+		case B_REFS_RECEIVED:
+			fVolumeTabView->MessageReceived(msg);
+			break;
 
-	fVolumePopup = new VolumePopup(
-		BRect(kSmallHMargin, kSmallVMargin, r.left - kSmallHMargin, kSmallVMargin));
+		case kBtnRescan:
+			fVolumeTabView->MessageReceived(msg);
+			break;
 
-	float width, height;
-	fRescanButton->GetPreferredSize(&width, &height);
-	ResizeTo(Bounds().Width(), height + 6.0);
-
-	// Horizontal divider
-	r = Bounds();
-	r.top = r.bottom - 1.0;
-	r.left -= 5.0; r.right += 5.0;
-	BBox* divider = new BBox(r, NULL, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
-
-	AddChild(fVolumePopup);
-	AddChild(divider);
-	AddChild(fRescanButton);
-	AddChild(helpButton);
+		default:
+			BView::MessageReceived(msg);
+	}
 }
 
 
@@ -294,8 +316,24 @@ ControlsView::~ControlsView()
 }
 
 
+void
+ControlsView::ShowInfo(const FileInfo* info)
+{
+	((VolumeView*)fVolumeTabView->ViewForTab(
+		fVolumeTabView->Selection()))->ShowInfo(info);
+}
+
+
+void
+ControlsView::SetRescanEnabled(bool enabled)
+{
+	((VolumeView*)fVolumeTabView->ViewForTab(
+		fVolumeTabView->Selection()))->SetRescanEnabled(enabled);
+}
+
+
 BVolume*
 ControlsView::FindDeviceFor(dev_t device, bool invoke)
 {
-	return fVolumePopup->FindDeviceFor(device, invoke);
+	return fVolumeTabView->FindDeviceFor(device, invoke);
 }
