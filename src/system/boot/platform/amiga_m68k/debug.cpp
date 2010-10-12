@@ -19,16 +19,26 @@
 void
 panic(const char *format, ...)
 {
-	struct AlertMessage {
-		uint16	column;
-		uint8	line;
-		char	messages[14+512];
-	} alert = {
+	static struct AlertMessage {
+		uint16	column1;
+		uint8	line1;
+		char	message[14];
+		uint8	cont;
+		uint16	column2;
+		uint8	line2;
+		char	buffer[512];
+		uint8	end;
+		
+	} _PACKED alert = {
 		10, 12,
-		"*** PANIC ***"
+		"*** PANIC ***",
+		1,
+		10, 22,
+		"",
+		0
 	};
 
-	char *buffer = &alert.messages[14];
+	char *buffer = alert.buffer;
 	va_list list;
 
 	//platform_switch_to_text_mode();
@@ -36,10 +46,10 @@ panic(const char *format, ...)
 	memset(buffer, 0, 512);
 
 	va_start(list, format);
-	vsnprintf(buffer, 512-1, format, list);
+	vsnprintf(buffer, 512, format, list);
 	va_end(list);
 
-	DisplayAlert(DEADEND_ALERT, &alert, 30);
+	DisplayAlert(DEADEND_ALERT, &alert, 40);
 
 	clear_key_buffer();
 	wait_for_key();

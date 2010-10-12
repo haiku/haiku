@@ -493,7 +493,7 @@ sNumSectors:
 	// 0x180 is the allowed maximum, as the zipped TAR with the
 	// kernel and the boot module might start at offset 192 kB
 	//.word	0x0300 //0x0180
-	.word	6//BOOT_ARCHIVE_IMAGE_OFFSET*2
+	.word	BOOT_ARCHIVE_IMAGE_OFFSET*2
 
 sBootIOReq:
 	.long	0

@@ -117,13 +117,10 @@ platform_exit(void)
 	while (true) {}
 }
 
-extern "C" void _floppy_err_alert();
-
 extern "C" void
 _start(void)
 {
-_floppy_err_alert();
-	panic("plop");
+	panic("plop %d", 1234);
 	stage2_args args;
 
 	//asm("cld");			// Ain't nothing but a GCC thang.
