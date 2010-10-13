@@ -385,15 +385,17 @@ if [ IsOptionalHaikuImagePackageAdded Clockwerk ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Clockwerk available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage Clockwerk-0.0.2-x86-gcc4-2010-10-13.zip
-			: $(baseURL)/Clockwerk-0.0.2-x86-gcc4-2010-10-13.zip
+		InstallOptionalHaikuImagePackage
+			Clockwerk-0.0.2-x86-gcc4-2010-10-13-1.zip
+			: $(baseURL)/Clockwerk-0.0.2-x86-gcc4-2010-10-13-1.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/apps/Clockwerk/Clockwerk ;
 	} else {
-		InstallOptionalHaikuImagePackage Clockwerk-0.0.2-x86-gcc2-2010-10-13.zip
-			: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2010-10-13.zip
+		InstallOptionalHaikuImagePackage
+			Clockwerk-0.0.2-x86-gcc2-2010-10-13-1.zip
+			: $(baseURL)/Clockwerk-0.0.2-x86-gcc2-2010-10-13-1.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
