@@ -87,7 +87,7 @@ public:
 
 			SummandList*		ObjectiveFunction();
 			//! Caller takes ownership of the Summand's and the SummandList.
-			SummandList*		ReplaceObjectiveFunction(
+			SummandList*		SwapObjectiveFunction(
 									SummandList* objFunction);
 			void				SetObjectiveFunction(SummandList* objFunction);
 			void				UpdateObjectiveFunction();

@@ -422,7 +422,7 @@ LinearSpec::ObjectiveFunction()
 
 
 SummandList*
-LinearSpec::ReplaceObjectiveFunction(SummandList* objFunction)
+LinearSpec::SwapObjectiveFunction(SummandList* objFunction)
 {
 	SummandList* list = fObjFunction;
 	fObjFunction = objFunction;

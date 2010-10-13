@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src tests libs alm ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
 UseLibraryHeaders lp_solve linprog alm ;
 UsePrivateHeaders shared ;
 

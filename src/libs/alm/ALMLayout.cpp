@@ -818,7 +818,7 @@ BALMLayout::_CalculateMinSize()
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(1.0, fRight));
 	newObjFunction->AddItem(new Summand(1.0, fBottom));
-	SummandList* oldObjFunction = fSolver.ReplaceObjectiveFunction(
+	SummandList* oldObjFunction = fSolver.SwapObjectiveFunction(
 		newObjFunction);
 	_SolveLayout();
 	fSolver.SetObjectiveFunction(oldObjFunction);
@@ -847,7 +847,7 @@ BALMLayout::_CalculateMaxSize()
 	SummandList* newObjFunction = new SummandList(2);
 	newObjFunction->AddItem(new Summand(-1.0, fRight));
 	newObjFunction->AddItem(new Summand(-1.0, fBottom));
-	SummandList* oldObjFunction = fSolver.ReplaceObjectiveFunction(
+	SummandList* oldObjFunction = fSolver.SwapObjectiveFunction(
 		newObjFunction);
 	_SolveLayout();
 	fSolver.SetObjectiveFunction(oldObjFunction);
