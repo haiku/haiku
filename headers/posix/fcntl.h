@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FCNTL_H
@@ -57,9 +57,7 @@
 #define O_DIRECT		O_NOCACHE
 #define O_DIRECTORY		0x00200000	/* fail if not a directory */
 
-/* TODO: currently not implemented additions: */
-#define O_TEMPORARY		0x00400000	/* used to avoid writing temporary files to disk */
-
+/* flags for the *at() functions */
 #define AT_FDCWD		(-1)		/* CWD FD for the *at() functions */
 
 #define AT_SYMLINK_NOFOLLOW	0x01	/* fstatat(), fchmodat(), fchownat(),
