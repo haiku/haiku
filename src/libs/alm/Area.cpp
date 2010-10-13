@@ -498,8 +498,8 @@ Area::GetString(BString& string) const
 
 
 /*!
- * Sets the width of the area times factor to be the same as the width of the
- * given area.
+ * Sets the width of the area to be the same as the width of the given area
+ * times factor.
  *
  * @param area	the area that should have the same width
  * @return the same-width constraint
@@ -507,14 +507,14 @@ Area::GetString(BString& string) const
 Constraint*
 Area::SetWidthAs(Area* area, float factor)
 {
-	return fLS->AddConstraint(-factor, fLeft, factor, fRight, 1.0, area->Left(),
-		-1.0, area->Right(), OperatorType(EQ), 0.0);
+	return fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, factor, area->Left(),
+		-factor, area->Right(), OperatorType(EQ), 0.0);
 }
 
 
 /*!
- * Sets the height of the area times factor to be the same as the height of the
- * given area.
+ * Sets the height of the area to be the same as the height of the given area
+ * times factor.
  *
  * @param area	the area that should have the same height
  * @return the same-height constraint
@@ -522,8 +522,8 @@ Area::SetWidthAs(Area* area, float factor)
 Constraint*
 Area::SetHeightAs(Area* area, float factor)
 {
-	return fLS->AddConstraint(-factor, fTop, factor, fBottom, 1.0, area->Top(),
-		-1.0, area->Bottom(), OperatorType(EQ), 0.0);
+	return fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, factor, area->Top(),
+		-factor, area->Bottom(), OperatorType(EQ), 0.0);
 }
 
 
