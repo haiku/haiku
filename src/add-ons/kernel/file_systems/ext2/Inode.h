@@ -14,6 +14,14 @@
 #include "Volume.h"
 
 
+//#define TRACE_EXT2
+#ifdef TRACE_EXT2
+#	define TRACEI(x...) dprintf("\33[34mext2:\33[0m " x)
+#else
+#	define TRACEI(x...) ;
+#endif
+
+
 class Inode : public TransactionListener {
 public:
 						Inode(Volume* volume, ino_t id);
@@ -38,17 +46,33 @@ public:
 			status_t	CheckPermissions(int accessMode) const;
 
 			bool		IsDeleted() const { return fUnlinked; }
+			bool		HasExtraAttributes() const
+							{ return fHasExtraAttributes; }
 
 			mode_t		Mode() const { return fNode.Mode(); }
 			int32		Flags() const { return fNode.Flags(); }
 
 			off_t		Size() const { return fNode.Size(); }
-			time_t		ModificationTime() const
-							{ return fNode.ModificationTime(); }
-			time_t		CreationTime() const
-							{ return fNode.CreationTime(); }
-			time_t		AccessTime() const
-							{ return fNode.AccessTime(); }
+			void		GetChangeTime(struct timespec *timespec) const
+						{ fNode.GetChangeTime(timespec, fHasExtraAttributes); }
+			void		GetModificationTime(struct timespec *timespec) const
+						{ fNode.GetModificationTime(timespec, 
+							fHasExtraAttributes); }
+			void		GetCreationTime(struct timespec *timespec) const
+						{ fNode.GetCreationTime(timespec,
+							fHasExtraAttributes); }
+			void		GetAccessTime(struct timespec *timespec) const
+						{ fNode.GetAccessTime(timespec, fHasExtraAttributes); }
+			void		SetChangeTime(const struct timespec *timespec)
+						{ fNode.SetChangeTime(timespec, fHasExtraAttributes); }
+			void		SetModificationTime(const struct timespec *timespec)
+						{ fNode.SetModificationTime(timespec,
+							fHasExtraAttributes); }
+			void		SetCreationTime(const struct timespec *timespec) 
+						{ fNode.SetCreationTime(timespec,
+							fHasExtraAttributes); }
+			void		SetAccessTime(const struct timespec *timespec)
+						{ fNode.SetAccessTime(timespec, fHasExtraAttributes); }
 
 			//::Volume* _Volume() const { return fVolume; }
 			Volume*		GetVolume() const { return fVolume; }
@@ -76,7 +100,11 @@ public:
 							ino_t* _id = NULL, Inode** _inode = NULL,
 							fs_vnode_ops* vnodeOps = NULL,
 							uint32 publishFlags = 0);
-
+	static 	void		_BigtimeToTimespec(bigtime_t time,
+							struct timespec *timespec)
+						{ timespec->tv_sec = time / 1000000LL; 
+							timespec->tv_nsec = (time % 1000000LL) * 1000; }
+	
 			void*		FileCache() const { return fCache; }
 			void*		Map() const { return fMap; }
 			status_t	EnableFileCache();
@@ -84,6 +112,8 @@ public:
 			bool		IsFileCacheDisabled() const { return !fCached; }
 
 			status_t	Sync();
+
+
 
 protected:
 	virtual	void		TransactionDone(bool success);
@@ -98,8 +128,9 @@ private:
 
 			status_t	_EnlargeDataStream(Transaction& transaction,
 							off_t size);
-			status_t	_ShrinkDataStream(Transaction& transaction, off_t size);
-
+			status_t	_ShrinkDataStream(Transaction& transaction,
+							off_t size);
+	
 			uint64		_NumBlocks();
 			status_t	_SetNumBlocks(uint64 numBlocks);
 
@@ -110,9 +141,10 @@ private:
 			void*		fMap;
 			bool		fCached;
 			bool		fUnlinked;
+			bool		fHasExtraAttributes;
 			ext2_inode	fNode;
 			uint32		fNodeSize;
-				// Inodes have a varible size, but the important
+				// Inodes have a variable size, but the important
 				// information is always the same size (except in ext4)
 			ext2_xattr_header* fAttributesBlock;
 			status_t	fInitStatus;
@@ -173,31 +205,31 @@ public:
 
 	void Keep()
 	{
-		dprintf("Vnode::Keep()\n");
+		TRACEI("Vnode::Keep()\n");
 		fInode = NULL;
 	}
 
 	status_t Publish(Transaction& transaction, Inode* inode,
 		fs_vnode_ops* vnodeOps, uint32 publishFlags)
 	{
-		dprintf("Vnode::Publish()\n");
+		TRACEI("Vnode::Publish()\n");
 		Volume* volume = transaction.GetVolume();
 
 		status_t status = B_OK;
 
 		if (!inode->IsSymLink() && volume->ID() >= 0) {
-			dprintf("Vnode::Publish(): Publishing vnode: %d, %d, %p, %p, %x, "
+			TRACEI("Vnode::Publish(): Publishing vnode: %d, %d, %p, %p, %x, "
 				"%x\n", (int)volume->FSVolume(), (int)inode->ID(), inode,
 				vnodeOps != NULL ? vnodeOps : &gExt2VnodeOps, (int)inode->Mode(),
 				(int)publishFlags);
 			status = publish_vnode(volume->FSVolume(), inode->ID(), inode,
 				vnodeOps != NULL ? vnodeOps : &gExt2VnodeOps, inode->Mode(),
 				publishFlags);
-			dprintf("Vnode::Publish(): Result: %s\n", strerror(status));
+			TRACEI("Vnode::Publish(): Result: %s\n", strerror(status));
 		}
 
 		if (status == B_OK) {
-			dprintf("Vnode::Publish(): Preparing internal data\n");
+			TRACEI("Vnode::Publish(): Preparing internal data\n");
 			fInode = inode;
 			fStatus = B_OK;
 

@@ -91,8 +91,9 @@ HTreeEntryIterator::Init()
 	fCount = countLimit->Count();
 	fLimit = countLimit->Limit();
 
-	if (fCount >= fLimit) {
-		ERROR("HTreeEntryIterator::Init() bad fCount %lu\n", (uint32)fCount);
+	if (fCount > fLimit) {
+		ERROR("HTreeEntryIterator::Init() bad fCount %u (fLimit %u)\n",
+			fCount, fLimit);
 		fCount = fLimit = 0;
 		return B_ERROR;
 	}

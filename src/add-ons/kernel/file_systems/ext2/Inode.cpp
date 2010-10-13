@@ -43,6 +43,10 @@ Inode::Inode(Volume* volume, ino_t id)
 
 	fInitStatus = UpdateNodeFromDisk();
 	if (fInitStatus == B_OK) {
+		fHasExtraAttributes = (fNodeSize == sizeof(ext2_inode)
+			&& fNode.ExtraInodeSize() + EXT2_INODE_NORMAL_SIZE
+				== sizeof(ext2_inode));
+		
 		if (IsDirectory() || (IsSymLink() && Size() < 60)) {
 			TRACE("Inode::Inode(): Not creating the file cache\n");
 			fCached = false;
@@ -342,7 +346,9 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	WriteLocker writeLocker(fLock);
 
 	TRACE("Inode::WriteAt(): Updating modification time\n");
-	fNode.SetModificationTime(real_time_clock());
+	struct timespec timespec;
+	_BigtimeToTimespec(real_time_clock_usecs(), &timespec);
+	SetModificationTime(&timespec);
 
 	// NOTE: Debugging info to find why sometimes resize doesn't happen
 	size_t length = *_length;
@@ -699,10 +705,14 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	node.SetGroupID(parent != NULL ? parent->Node().GroupID() : getegid());
 	node.SetNumLinks(inode->IsDirectory() ? 2 : 1);
 	TRACE("Inode::Create(): Updating time\n");
-	time_t creationTime = real_time_clock();
-	node.SetAccessTime(creationTime);
-	node.SetCreationTime(creationTime);
-	node.SetModificationTime(creationTime);
+	struct timespec timespec;
+	_BigtimeToTimespec(real_time_clock_usecs(), &timespec);
+	inode->SetAccessTime(&timespec);
+	inode->SetCreationTime(&timespec);
+	inode->SetModificationTime(&timespec);
+	
+	if (sizeof(ext2_inode) < volume->InodeSize())
+		node.SetExtraInodeSize(sizeof(ext2_inode) - EXT2_INODE_NORMAL_SIZE);
 
 	TRACE("Inode::Create(): Updating ID\n");
 	inode->fID = id;
@@ -963,3 +973,4 @@ Inode::_SetNumBlocks(uint64 numBlocks)
 	fNode.SetNumBlocks64(numBlocks);
 	return B_OK;
 }
+

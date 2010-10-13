@@ -210,19 +210,21 @@ struct ext2_data_stream {
 	uint32 triple_indirect;
 } _PACKED;
 
+#define EXT2_INODE_NORMAL_SIZE		128
+
 struct ext2_inode {
 	uint16	mode;
 	uint16	uid;
 	uint32	size;
 	uint32	access_time;
-	uint32	creation_time;
+	uint32	change_time;
 	uint32	modification_time;
 	uint32	deletion_time;
 	uint16	gid;
 	uint16	num_links;
 	uint32	num_blocks;
 	uint32	flags;
-	uint32	_reserved1;
+	uint32	version;
 	union {
 		ext2_data_stream stream;
 		char symlink[EXT2_SHORT_SYMLINK_LENGTH];
@@ -246,8 +248,16 @@ struct ext2_inode {
 	uint16	uid_high;
 	uint16	gid_high;
 	uint32	_reserved2;
+	
+	// extra attributes
 	uint16	extra_inode_size;
 	uint16	_padding2;
+	uint32	change_time_extra;
+	uint32	modification_time_extra;
+	uint32	access_time_extra;
+	uint32	creation_time;
+	uint32	creation_time_extra;
+	uint32	version_high;
 
 	uint16 Mode() const { return B_LENDIAN_TO_HOST_INT16(mode); }
 	uint32 Flags() const { return B_LENDIAN_TO_HOST_INT32(flags); }
@@ -256,12 +266,79 @@ struct ext2_inode {
 	uint64 NumBlocks64() const { return B_LENDIAN_TO_HOST_INT32(num_blocks)
 		| ((uint64)B_LENDIAN_TO_HOST_INT32(num_blocks_high) << 32); }
 
-	time_t AccessTime() const { return B_LENDIAN_TO_HOST_INT32(access_time); }
-	time_t CreationTime() const { return B_LENDIAN_TO_HOST_INT32(creation_time); }
-	time_t ModificationTime() const { return B_LENDIAN_TO_HOST_INT32(modification_time); }
-	time_t DeletionTime() const { return B_LENDIAN_TO_HOST_INT32(deletion_time); }
-	ino_t  NextOrphan() const { return (ino_t)DeletionTime(); }
+	static void _DecodeTime(struct timespec *timespec, uint32 time,
+		uint32 time_extra, bool extra)
+	{
+		timespec->tv_sec = B_LENDIAN_TO_HOST_INT32(time);
+		if (extra && sizeof(timespec->tv_sec) > 4)
+			timespec->tv_sec |= 
+				(uint64)(B_LENDIAN_TO_HOST_INT32(time_extra) & 0x2) << 32;
+		if (extra)
+			timespec->tv_nsec = B_LENDIAN_TO_HOST_INT32(time_extra) >> 2;
+		else
+			timespec->tv_nsec = 0;
+	}
+	
+	void GetModificationTime(struct timespec *timespec, bool extra) const 
+		{ _DecodeTime(timespec, modification_time, modification_time_extra, 
+			extra); }
+	void GetAccessTime(struct timespec *timespec, bool extra) const 
+		{ _DecodeTime(timespec, access_time, access_time_extra, extra); }
+	void GetChangeTime(struct timespec *timespec, bool extra) const
+		{ _DecodeTime(timespec, change_time, change_time_extra, extra); }
+	void GetCreationTime(struct timespec *timespec, bool extra) const
+	{
+		if (extra)
+			_DecodeTime(timespec, creation_time, creation_time_extra, extra);
+		else {
+			timespec->tv_sec = 0;
+			timespec->tv_nsec = 0;
+		}
+	}
+	time_t DeletionTime() const
+		{ return B_LENDIAN_TO_HOST_INT32(deletion_time); }
 
+	static uint32 _EncodeTime(const struct timespec *timespec)
+	{
+		uint32 time = (timespec->tv_nsec << 2) & 0xfffffffc;
+		if (sizeof(timespec->tv_sec) > 4)
+			time |= (uint64)timespec->tv_sec >> 32;
+		return B_HOST_TO_LENDIAN_INT32(time);
+	}
+	
+	void SetModificationTime(const struct timespec *timespec, bool extra)
+	{
+		modification_time = B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_sec);
+		if (extra)
+			modification_time_extra = _EncodeTime(timespec);
+	}
+	void SetAccessTime(const struct timespec *timespec, bool extra)
+	{
+		access_time = B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_sec);
+		if (extra)
+			access_time_extra = _EncodeTime(timespec);
+	}
+	void SetChangeTime(const struct timespec *timespec, bool extra)
+	{
+		change_time = B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_sec);
+		if (extra)
+			change_time_extra = _EncodeTime(timespec);
+	}
+	void SetCreationTime(const struct timespec *timespec, bool extra)
+	{
+		if (extra) {
+			creation_time = B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_sec);
+			creation_time_extra = 
+				B_HOST_TO_LENDIAN_INT32((uint32)timespec->tv_nsec);
+		}
+	}
+	void SetDeletionTime(time_t deletionTime)
+	{
+		deletion_time = B_HOST_TO_LENDIAN_INT32((uint32)deletionTime);
+	}
+
+	ino_t  NextOrphan() const { return (ino_t)DeletionTime(); }
+	
 	off_t Size() const
 	{
 		if (S_ISREG(Mode())) {
@@ -271,6 +348,9 @@ struct ext2_inode {
 
 		return B_LENDIAN_TO_HOST_INT32(size);
 	}
+
+	uint16 ExtraInodeSize() const
+		{ return B_LENDIAN_TO_HOST_INT16(extra_inode_size); }
 
 	uint32 UserID() const
 	{
@@ -325,26 +405,6 @@ struct ext2_inode {
 		num_blocks_high = B_HOST_TO_LENDIAN_INT32(numBlocks >> 32);
 	}
 
-	void SetAccessTime(time_t accessTime)
-	{
-		access_time = B_HOST_TO_LENDIAN_INT32((uint32)accessTime);
-	}
-
-	void SetCreationTime(time_t creationTime)
-	{
-		creation_time = B_HOST_TO_LENDIAN_INT32((uint32)creationTime);
-	}
-
-	void SetModificationTime(time_t modificationTime)
-	{
-		modification_time = B_HOST_TO_LENDIAN_INT32((uint32)modificationTime);
-	}
-
-	void SetDeletionTime(time_t deletionTime)
-	{
-		deletion_time = B_HOST_TO_LENDIAN_INT32((uint32)deletionTime);
-	}
-
 	void SetNextOrphan(ino_t id)
 	{
 		deletion_time = B_HOST_TO_LENDIAN_INT32((uint32)id);
@@ -372,6 +432,11 @@ struct ext2_inode {
 	void SetExtendedAttributesBlock(uint32 block)
 	{
 		file_access_control = B_HOST_TO_LENDIAN_INT32(block);
+	}
+
+	void SetExtraInodeSize(uint16 newSize)
+	{
+		extra_inode_size = B_HOST_TO_LENDIAN_INT16(newSize);
 	}
 } _PACKED;
 

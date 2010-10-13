@@ -550,10 +550,11 @@ ext2_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 	stat->st_mode = node.Mode();
 	stat->st_type = 0;
 
-	stat->st_atime = node.AccessTime();
-	stat->st_mtime = stat->st_ctime = node.ModificationTime();
-	stat->st_crtime = node.CreationTime();
-
+	inode->GetAccessTime(&stat->st_atim);
+	inode->GetModificationTime(&stat->st_mtim);
+	inode->GetChangeTime(&stat->st_ctim);
+	inode->GetCreationTime(&stat->st_crtim);
+	
 	stat->st_size = inode->Size();
 	stat->st_blocks = (inode->Size() + 511) / 512;
 
@@ -626,22 +627,22 @@ ext2_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 
 	if ((mask & B_STAT_MODIFICATION_TIME) != 0 || updateTime
 		|| (mask & B_STAT_CHANGE_TIME) != 0) {
-		time_t newTime = 0;
+		struct timespec newTimespec = { 0, 0};
 
 		if ((mask & B_STAT_MODIFICATION_TIME) != 0)
-			newTime = stat->st_mtim.tv_sec;
+			newTimespec = stat->st_mtim;
 
-		if ((mask & B_STAT_CHANGE_TIME) != 0)
-			newTime = newTime > stat->st_ctim.tv_sec ? newTime
-				: stat->st_ctim.tv_sec;
+		if ((mask & B_STAT_CHANGE_TIME) != 0
+			&& stat->st_ctim.tv_sec > newTimespec.tv_sec)
+			newTimespec = stat->st_ctim;
 
-		if (newTime == 0)
-			newTime = real_time_clock();
+		if (newTimespec.tv_sec == 0)
+			Inode::_BigtimeToTimespec(real_time_clock_usecs(), &newTimespec);
 
-		node.SetModificationTime(newTime);
+		inode->SetModificationTime(&newTimespec);
 	}
 	if ((mask & B_STAT_CREATION_TIME) != 0)
-		node.SetCreationTime(stat->st_crtim.tv_sec);
+		inode->SetCreationTime(&stat->st_crtim);
 
 	status = inode->WriteBack(transaction);
 	if (status == B_OK)
