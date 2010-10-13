@@ -238,10 +238,12 @@ struct bfs_inode {
 		{ return ((int64)tv.tv_sec << INODE_TIME_SHIFT)
 			+ unique_from_nsec(tv.tv_nsec); }
 
-	static time_t ToSecs(bigtime_t time)
+	static time_t ToSecs(int64 time)
 		{ return time >> INODE_TIME_SHIFT; }
-	static uint32 ToUsecs(bigtime_t time)
+	static uint32 ToNsecs(int64 time)
 		{ return (time & INODE_TIME_MASK) << 14; }
+		// the 16 bits internal resolution shifted by 14 gives us 2^30
+		// which is roughly 10^9, the maximum value in nanoseconds
 } _PACKED;
 
 enum inode_flags {

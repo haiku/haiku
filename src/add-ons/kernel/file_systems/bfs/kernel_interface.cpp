@@ -35,13 +35,14 @@ extern void fill_stat_buffer(Inode* inode, struct stat& stat);
 static void
 fill_stat_time(const bfs_inode& node, struct stat& stat)
 {
-	stat.st_atim.tv_sec = real_time_clock();
-	stat.st_atim.tv_nsec = real_time_clock_usecs() % 1000000;
+	bigtime_t now = real_time_clock_usecs();
+	stat.st_atim.tv_sec = now / 1000000LL; 
+	stat.st_atim.tv_nsec = (now % 1000000LL) * 1000;
 
 	stat.st_mtim.tv_sec = bfs_inode::ToSecs(node.LastModifiedTime());
-	stat.st_mtim.tv_nsec = bfs_inode::ToUsecs(node.LastModifiedTime());
+	stat.st_mtim.tv_nsec = bfs_inode::ToNsecs(node.LastModifiedTime());
 	stat.st_crtim.tv_sec = bfs_inode::ToSecs(node.CreateTime());
-	stat.st_crtim.tv_nsec = bfs_inode::ToUsecs(node.CreateTime());
+	stat.st_crtim.tv_nsec = bfs_inode::ToNsecs(node.CreateTime());
 
 	// For BeOS compatibility, if on-disk ctime is invalid, fall back to mtime:
 	bigtime_t changeTime = node.StatusChangeTime();
@@ -49,7 +50,7 @@ fill_stat_time(const bfs_inode& node, struct stat& stat)
 		stat.st_ctim = stat.st_mtim;
 	else {
 		stat.st_ctim.tv_sec = bfs_inode::ToSecs(changeTime);
-		stat.st_ctim.tv_nsec = bfs_inode::ToUsecs(changeTime);
+		stat.st_ctim.tv_nsec = bfs_inode::ToNsecs(changeTime);
 	}
 }
 
