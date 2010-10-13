@@ -64,11 +64,11 @@ SerialTransport::SerialTransport(BDirectory* printer, BMessage* msg)
 	address[size] = 0; // make sure string is 0-terminated
 		
 	strcat(strcpy(device, "/dev/ports/"), address);
-	fFile = open(device, O_RDWR | O_EXCL | O_BINARY, 0);
+	fFile = open(device, O_RDWR | O_EXCL, 0);
 	if (fFile < 0) {
 		// Try unidirectional access mode
 		bidirectional = false;
-		fFile = open(device, O_WRONLY | O_EXCL | O_BINARY, 0);
+		fFile = open(device, O_WRONLY | O_EXCL, 0);
 	}
 
 	if (fFile < 0)

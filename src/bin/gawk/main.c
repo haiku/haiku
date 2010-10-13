@@ -506,7 +506,7 @@ out:
 		else	/* PRE_ASSIGN_FS */
 			cmdline_fs(preassigns[i].val);
 	free(preassigns);
-
+#ifdef O_BINARY
 	if ((BINMODE & 1) != 0)
 		if (os_setbinmode(fileno(stdin), O_BINARY) == -1)
 			fatal(_("can't set binary mode on stdin (%s)"), strerror(errno));
@@ -516,7 +516,7 @@ out:
 		if (os_setbinmode(fileno(stderr), O_BINARY) == -1)
 			fatal(_("can't set binary mode on stderr (%s)"), strerror(errno));
 	}
-
+#endif
 #ifdef GAWKDEBUG
 	setbuf(stdout, (char *) NULL);	/* make debugging easier */
 #endif

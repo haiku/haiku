@@ -1484,9 +1484,10 @@ do_system(NODE *tree)
 		ret = system(cmd);
 		if (ret != -1)
 			ret = WEXITSTATUS(ret);
+#ifdef O_BINARY
 		if ((BINMODE & 1) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);
-
+#endif
 		cmd[tmp->stlen] = save;
 	}
 	free_temp(tmp);

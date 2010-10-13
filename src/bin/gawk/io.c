@@ -894,9 +894,10 @@ close_redir(register struct redirect *rp, int exitwarn, two_way_close_type how)
 		}
 	} else if ((rp->flag & (RED_PIPE|RED_WRITE)) == (RED_PIPE|RED_WRITE)) { /* write to pipe */
 		status = pclose(rp->fp);
+#ifdef O_BINARY
 		if ((BINMODE & 1) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);
-
+#endif
 		rp->fp = NULL;
 	} else if (rp->fp != NULL) {	/* write to file */
 		status = fclose(rp->fp);
@@ -1079,8 +1080,10 @@ str2mode(const char *mode)
 		ret = 0;		/* lint */
 		cant_happen();
 	}
+#ifdef O_BINARY
 	if (strchr(mode, 'b') != NULL)
 		ret |= O_BINARY;
+#endif
 	return ret;
 }
 
@@ -2126,8 +2129,10 @@ gawk_popen(const char *cmd, struct redirect *rp)
 
 	os_restore_mode(fileno(stdin));
 	current = popen(cmd, binmode("r"));
+#ifdef O_BINARY
 	if ((BINMODE & 1) != 0)
 		os_setbinmode(fileno(stdin), O_BINARY);
+#endif
 	if (current == NULL)
 		return NULL;
 	os_close_on_exec(fileno(current), cmd, "pipe", "from");
