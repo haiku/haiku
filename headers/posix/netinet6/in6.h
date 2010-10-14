@@ -110,6 +110,10 @@ struct in6_pktinfo {
 	(IN6_IS_ADDR_MULTICAST(a) && __IPV6_ADDR_MC_SCOPE(a) \
 		== __IPV6_ADDR_SCOPE_GLOBAL)
 
+/* From RFC 2292 (Advanced Sockets API for IPv6) */
+#define IN6_ARE_ADDR_EQUAL(a, b) \
+	(!memcmp((a)->s6_addr, (b)->s6_addr, sizeof(struct in6_addr)))
+
 /* maximal length of the string representation of an IPv6 address */
 #define INET6_ADDRSTRLEN				46
 
