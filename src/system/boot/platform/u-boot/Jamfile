@@ -141,6 +141,7 @@ actions BuildUImageScript1
 # requires sfdisk and mtools packages on linux
 rule BuildUBootSDImage image : files 
 {
+	echo '$(image) $(files) $(HAIKU_BOOT_BOARD)'
 	Depends $(image) : $(files) ;
 	SDIMAGE_BLOCK_SIZE on $(image) = 1M ;
 	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
@@ -209,15 +210,15 @@ if $(HAIKU_BOARD_UBOOT_IMAGE) && $(HAIKU_BOARD_UBOOT_IMAGE_URL) {
 }
 
 # flash image targets
-BuildUBootFlashImage haiku_flash_image_raw.img : haiku_loader : 
+BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader : 
 	$(ubootFile) ;
-#BuildUBootFlashImage haiku_flash_image_elf.img : boot_loader_u-boot : 
+#BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img : boot_loader_u-boot : 
 #	$(ubootFile) ;
-BuildUBootFlashImage haiku_flash_image_uimage.img : haiku_loader.ub : 
+BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img : haiku_loader.ub : 
 	$(ubootFile) ;
 
 # SD/mmc image targets
-BuildUBootSDImage haiku.mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
+BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_BOARD_SDIMAGE_FILES) ;
 
 SEARCH on [ FGristFiles shell.S ]
 	= [ FDirName $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) arch $(TARGET_ARCH) ] ;
