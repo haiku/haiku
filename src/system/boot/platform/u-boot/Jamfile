@@ -141,7 +141,6 @@ actions BuildUImageScript1
 # requires sfdisk and mtools packages on linux
 rule BuildUBootSDImage image : files 
 {
-	echo '$(image) $(files) $(HAIKU_BOOT_BOARD)'
 	Depends $(image) : $(files) ;
 	SDIMAGE_BLOCK_SIZE on $(image) = 1M ;
 	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
