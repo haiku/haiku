@@ -10,7 +10,7 @@
 const EncoderDescription gEncoderTable[] = {
 	{
 		{
-			"MPEG4 video",
+			"MPEG-4 video",
 			"mpeg4",
 			0,
 			CODEC_ID_MPEG4,
@@ -23,7 +23,7 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
-			"MPEG1 video",
+			"MPEG-1 video",
 			"mpeg1video",
 			0,
 			CODEC_ID_MPEG1VIDEO,
@@ -36,7 +36,7 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
-			"MPEG2 video",
+			"MPEG-2 video",
 			"mpeg2video",
 			0,
 			CODEC_ID_MPEG2VIDEO,
@@ -58,7 +58,20 @@ const EncoderDescription gEncoderTable[] = {
 		B_ANY_FORMAT_FAMILY,
 		B_MEDIA_RAW_VIDEO,
 		B_MEDIA_ENCODED_VIDEO,
-		23
+		18
+	},
+	{
+		{
+			"DV (Digital Video)",
+			"dvvideo",
+			0,
+			CODEC_ID_DVVIDEO,
+			{ 0 }
+		},
+		B_MISC_FORMAT_FAMILY,
+		B_MEDIA_RAW_VIDEO,
+		B_MEDIA_ENCODED_VIDEO,
+		5
 	},
 	{
 		{
