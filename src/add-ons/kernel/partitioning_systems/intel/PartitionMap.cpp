@@ -833,11 +833,20 @@ PartitionMap::Check(off_t sessionSize) const
 		off_t nextOffset = 0;
 		for (int32 i = 0; i < byOffsetCount; i++) {
 			const Partition* partition = byOffset[i];
-			if (partition->Offset() < nextOffset) {
-				TRACE(("intel: PartitionMap::Check(): overlapping partitions!"
-					"\n"));
-				result = false;
-				break;
+			if (partition->Offset() < nextOffset && i > 0) {
+				Partition* previousPartition = (Partition*)byOffset[i - 1];
+				off_t previousSize = previousPartition->Size()
+					- (nextOffset - partition->Offset());
+				TRACE(("intel: PartitionMap::Check(): "));
+				if (previousSize == 0) {
+					previousPartition->Unset();
+					TRACE(("partition offset hides previous partition."
+					" Removing previous partition from disk layout.\n"));
+				} else {
+					TRACE(("overlapping partitions! Setting partition %ld "
+						"size to %lld\n", i - 1, previousSize));
+					previousPartition->SetSize(previousSize);
+				}
 			}
 			nextOffset = partition->Offset() + partition->Size();
 		}
@@ -847,7 +856,7 @@ PartitionMap::Check(off_t sessionSize) const
 		if (result) {
 			for (int32 i = 0; i < tableOffsetCount; i++) {
 				if (i > 0 && tableOffsets[i] == tableOffsets[i - 1]) {
-					TRACE(("intel: PartitionMap::Check(): same partition talbe "
+					TRACE(("intel: PartitionMap::Check(): same partition table "
 						"for different extended partitions!\n"));
 					result = false;
 					break;
