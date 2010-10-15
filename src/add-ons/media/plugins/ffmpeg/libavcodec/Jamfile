@@ -29,6 +29,9 @@ StaticLibrary libavcodec.a :
 	aac_ac3_parser.c
 	aac_adtstoasc_bsf.c
 	aac_parser.c
+	aaccoder.c
+	aacenc.c
+	aacpsy.c
 	aacsbr.c
 	aactab.c
 	aandcttab.c
@@ -131,6 +134,7 @@ StaticLibrary libavcodec.a :
 	flac.c
 	flacdata.c
 	flacdec.c
+	flacenc.c
 	flashsv.c
 	flicvideo.c
 	flvenc.c
@@ -166,6 +170,7 @@ StaticLibrary libavcodec.a :
 	huffyuv.c
 	idcinvideo.c
 	iff.c
+	iirfilter.c
 	imc.c
 	imgconvert.c
 	imx_dump_header_bsf.c
@@ -266,6 +271,7 @@ StaticLibrary libavcodec.a :
 	pnm_parser.c
 	pnmdec.c
 #	pnmenc.c
+	psymodel.c
 	pthread.c
 	ptx.c
 	qcelpdec.c
