@@ -338,7 +338,7 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	}
 
 	// The sem will be released unconditionally in the callback after the
-	// result data was filled in. Use a 1 second timeout for control transfers.
+	// result data was filled in. Use a 2 seconds timeout for control transfers.
 	if (acquire_sem_etc(fNotifySem, 1, B_RELATIVE_TIMEOUT, 2000000) < B_OK) {
 		TRACE_ERROR("timeout waiting for queued request to complete\n");
 
