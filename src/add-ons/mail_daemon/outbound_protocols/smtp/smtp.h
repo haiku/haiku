@@ -37,7 +37,7 @@ class SMTPProtocol : public BMailFilter {
 		status_t SendCommand(const char *cmd);
 
 	private:
-		status_t POP3Authentification();
+		status_t POP3Authentication();
 
 		int _fd;
 		BString fLog;

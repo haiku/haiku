@@ -252,10 +252,10 @@ SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
 	int32 authMethod = fSettings->FindInt32("auth_method");
 
 	if (authMethod == 2) {
-		// POP3 authentification is handled here instead of SMTPProtocol::Login()
+		// POP3 authentication is handled here instead of SMTPProtocol::Login()
 		// because some servers obviously don't like establishing the connection
 		// to the SMTP server first...
-		fStatus = POP3Authentification();
+		fStatus = POP3Authentication();
 		if (fStatus < B_OK) {
 			error_msg << MDR_DIALECT_CHOICE ("POP3 authentication failed. The server said:\n","POP3認証に失敗しました\n") << fLog;
 			runner->ShowError(error_msg.String());
@@ -532,7 +532,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 
 status_t
-SMTPProtocol::POP3Authentification()
+SMTPProtocol::POP3Authentication()
 {
 	// find the POP3 filter of the other chain - identify by name...
 	BList chains;
