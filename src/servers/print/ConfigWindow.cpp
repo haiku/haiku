@@ -117,14 +117,16 @@ LeftAlign(BView* view)
 {
 	return BGroupLayoutBuilder(B_HORIZONTAL)
 		.Add(view)
-		.AddGlue();
+		.AddGlue()
+		.SetInsets(0, 0, 0, 0);
 }
 
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	BMessage* settings, AutoReply* sender)
 	:
-	BWindow(ConfigWindow::GetWindowFrame(), B_TRANSLATE("Page setup"),
+	BWindow(ConfigWindow::GetWindowFrame(),
+		B_TRANSLATE("Page setup"),
 		B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fKind(kind),
@@ -174,8 +176,7 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	}
 
 	// separator line
-	BBox* separator = new BBox(dummyRect, "line",
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
+	BBox* separator = new BBox("separator");
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	// Cancel & OK button
@@ -191,41 +192,36 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 
 	builder
 		.Add(fPrinters)
-		.AddStrut(5)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 				.Add(fPageSetup)
-				.AddStrut(5)
-				.Add(BGroupLayoutBuilder(B_VERTICAL)
+				.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
 						.Add(LeftAlign(pageFormatTitle))
 						.Add(LeftAlign(fPageFormatText))
+						.SetInsets(0, 0, 0, 0)
 				)
 				.AddGlue()
 		);
 
 	if (fJobSetup != NULL) {
 		builder
-			.AddStrut(5)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
 					.Add(fJobSetup)
-					.AddStrut(5)
-					.Add(BGroupLayoutBuilder(B_VERTICAL)
+					.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
 							.Add(LeftAlign(jobSetupTitle))
 							.Add(LeftAlign(fJobSetupText))
+							.SetInsets(0, 0, 0, 0)
 					)
 					.AddGlue()
 			);
 	}
 
 	builder
-		.AddStrut(5)
+		.AddGlue()
 		.Add(separator)
-		.AddStrut(5)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-				.AddGlue()
-				.Add(cancel)
-				.AddStrut(5)
-				.Add(fOk)
-				.AddGlue()
+			.AddGlue()
+			.Add(cancel)
+			.Add(fOk)
 		)
 		.SetInsets(5, 5, 5, 5);
 
@@ -328,11 +324,13 @@ ConfigWindow::FrameMoved(BPoint p)
 BRect
 ConfigWindow::GetWindowFrame()
 {
+	BRect frame(0, 0, 10, 10);
 	BAutolock lock(gLock);
 	if (lock.IsLocked())
-		return Settings::GetSettings()->ConfigWindowFrame();
+		frame.OffsetBy(Settings::GetSettings()->ConfigWindowFrame().LeftTop());
 
-	return BRect(30, 30, 300, 300);
+	frame.OffsetBy(30, 30);
+	return frame;
 }
 
 

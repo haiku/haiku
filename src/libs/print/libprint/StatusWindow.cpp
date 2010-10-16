@@ -22,8 +22,8 @@
 StatusWindow::StatusWindow(bool oddPages, bool evenPages, uint32 firstPage, uint32 numPages, uint32 numCopies, uint32 nup)
 	: BWindow (BRect(200, 200, 650, 270), "Print Status", B_DOCUMENT_WINDOW, B_NOT_RESIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE)
 {
-	//	oddPages	- if true, only print odd umbered pages		
-	//	evenPages	- if true, only print even umbered pages	
+	//	oddPages	- if true, only print odd numbered pages
+	//	evenPages	- if true, only print even numbered pages
 	//  firstPage	- number of first page
 	//  numPages	- total number of pages (must be recalculate if odd/even is used)
 	//  numCopies - total number of document copies	

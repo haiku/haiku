@@ -37,6 +37,10 @@ THE SOFTWARE.
 
 
 #include <AppKit.h>
+#include <GridView.h>
+#include <GridLayout.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <SupportKit.h>
 #include <TextControl.h>
 
@@ -72,27 +76,88 @@ const rgb_color kWhite 	= { 255,255,255,0 };
 const rgb_color kGray 	= { 220,220,220,0 };
 
 
+PageView::PageView()
+: BView("pageView", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
+, fPageWidth(0)
+, fPageHeight(0)
+, fMargins(0, 0, 0, 0)
+{
+
+}
+
+
+void
+PageView::SetPageSize(float pageWidth, float pageHeight)
+{
+	fPageWidth = pageWidth;
+	fPageHeight = pageHeight;
+}
+
+
+void
+PageView::SetMargins(BRect margins)
+{
+	fMargins = margins;
+}
+
+
+void
+PageView::Draw(BRect bounds)
+{
+	BRect frame(Frame());
+	float totalWidth = frame.Width();
+	float totalHeight = frame.Height();
+
+	// fit page into available space
+	// keeping the ratio fPageWidth : fPageHeight
+	float pageWidth = totalWidth;
+	float pageHeight = totalWidth * fPageHeight / fPageWidth;
+	if (pageHeight > totalHeight) {
+		pageHeight = totalHeight;
+		pageWidth = totalHeight * fPageWidth / fPageHeight;
+	}
+
+	// center page
+	BPoint offset(0, 0);
+	offset.x = static_cast<int>((totalWidth - pageWidth) / 2);
+	offset.y = static_cast<int>((totalHeight - pageHeight) / 2);
+
+	// draw the page
+	SetHighColor(kWhite);
+	BRect r = BRect(0, 0, pageWidth, pageHeight);
+	r.OffsetBy(offset);
+	FillRect(r);
+	SetHighColor(kBlack);
+	StrokeRect(r);
+
+	// draw margin
+	SetHighColor(kRed);
+	SetLowColor(kWhite);
+	r.top += (fMargins.top / fPageHeight) * pageHeight;
+	r.right -= (fMargins.right / fPageWidth) * pageWidth;
+	r.bottom -= (fMargins.bottom / fPageHeight) * pageHeight;
+	r.left += (fMargins.left / fPageWidth) * pageWidth;
+	StrokeRect(r, kDots);
+}
+
+
 /**
  * Constructor
  *
- * @param frame, BRect that is the size of the view passed to the superclase
  * @param pageWidth, float that is the points value of the page width
  * @param pageHeight, float that is the points value of the page height
  * @param margins, BRect values of margins
  * @param units, unit32 enum for units used in view
  * @return void
  */
-MarginView::MarginView(BRect frame, int32 pageWidth, int32 pageHeight,
+MarginView::MarginView(int32 pageWidth, int32 pageHeight,
 	BRect margins, MarginUnit units)
-	: BBox(frame, NULL, B_FOLLOW_ALL)
+	: BBox("marginView")
 {
 	fMarginUnit = units;
 	fUnitValue = kUnitFormat[units];
 
 	SetLabel("Margins");
-
-	fMaxPageHeight = frame.Height() - kMinUnitHeight - kOffsetY;
-	fMaxPageWidth = frame.Width() - kMinFieldWidth - kOffsetX;
 
 	fMargins = margins;
 
@@ -125,73 +190,6 @@ MarginView::AttachedToWindow()
 		SetViewColor(Parent()->ViewColor());
 
 	_ConstructGUI();
-}
-
-
-/**
- * Draw
- *
- * @param BRect, the draw bounds
- * @return void
- */
-void
-MarginView::Draw(BRect rect)
-{
-	BBox::Draw(rect);
-
-	float y_offset = (float)kOffsetY;
-	float x_offset = (float)kOffsetX;
-	BRect r;
-
-	// Calculate offsets depending on orientation
-	if (fPageWidth < fPageHeight) { // Portrait
-		x_offset = (fMaxPageWidth/2 + kOffsetX) - fViewWidth/2;
-	} else { // landscape
-		y_offset = (fMaxPageHeight/2 + kOffsetY) - fViewHeight/2;
-	}
-
-	// draw the page
-	SetHighColor(kWhite);
-	r = BRect(0, 0, fViewWidth, fViewHeight);
-	r.OffsetBy(x_offset, y_offset);
-	FillRect(r);
-	SetHighColor(kBlack);
-	StrokeRect(r);
-
-	// draw margin
-	SetHighColor(kRed);
-	SetLowColor(kWhite);
-	r.top += fMargins.top;
-	r.right -= fMargins.right;
-	r.bottom -= fMargins.bottom;
-	r.left += fMargins.left;
-	StrokeRect(r, kDots);
-
-	// draw the page size label
-	SetHighColor(kBlack);
-	SetLowColor(kGray);
-	char str[kStringSize];
-	sprintf(str, "%2.1f x %2.1f", fPageWidth/fUnitValue, fPageHeight/fUnitValue);
-	SetFontSize(10);
-	DrawString((const char *)str, BPoint(x_offset, fMaxPageHeight + 40));
-}
-
-
-/**
- * BeOS Hook Function, change the size of the margin display
- *
- * @param width of the page
- * @param  height the page
- * @return void
- */
-void
-MarginView::FrameResized(float width, float height)
-{
-	fMaxPageHeight = height - kMinUnitHeight - kOffsetX;
-	fMaxPageWidth = width - kMinFieldWidth - kOffsetY;
-
-	_CalculateViewSize(MARGIN_CHANGED);
-	Invalidate();
 }
 
 
@@ -297,32 +295,32 @@ MarginView::Margin() const
 	BRect margin;
 
 	// convert the field text to values
-	float ftop 		= atof(fTop->Text());
-	float fright 	= atof(fRight->Text());
-	float fleft 	= atof(fLeft->Text());
-	float fbottom 	= atof(fBottom->Text());
+	float top = atof(fTop->Text());
+	float right = atof(fRight->Text());
+	float left = atof(fLeft->Text());
+	float bottom = atof(fBottom->Text());
 
 	// convert to units to points
 	switch (fMarginUnit) {
 		case kUnitInch:
 			// convert to points
-			ftop *= kInchUnits;
-			fright *= kInchUnits;
-			fleft *= kInchUnits;
-			fbottom *= kInchUnits;
+			top *= kInchUnits;
+			right *= kInchUnits;
+			left *= kInchUnits;
+			bottom *= kInchUnits;
 			break;
 		case kUnitCM:
 			// convert to points
-			ftop *= kCMUnits;
-			fright *= kCMUnits;
-			fleft *= kCMUnits;
-			fbottom *= kCMUnits;
+			top *= kCMUnits;
+			right *= kCMUnits;
+			left *= kCMUnits;
+			bottom *= kCMUnits;
 			break;
 		case kUnitPoint:
 			break;
 	}
 
-	margin.Set(fleft, ftop, fright, fbottom);
+	margin.Set(left, top, right, bottom);
 
 	return margin;
 }
@@ -353,7 +351,19 @@ void
 MarginView::UpdateView(uint32 msg)
 {
 	Window()->Lock();
-	_CalculateViewSize(msg);					// only Preview in Margins BBox!
+
+	{
+		char pageSize[kStringSize];
+		sprintf(pageSize, "%2.1f x %2.1f",
+			fPageWidth / fUnitValue,
+			fPageHeight / fUnitValue);
+		fPageSize->SetText(pageSize);
+
+		fPage->SetPageSize(fPageWidth, fPageHeight);
+		fPage->SetMargins(Margin());
+		fPage->Invalidate();
+	}
+
 	Invalidate();
 	Window()->Unlock();
 }
@@ -373,85 +383,53 @@ MarginView::UpdateView(uint32 msg)
 void
 MarginView::_ConstructGUI()
 {
+	fPage = new PageView();
+	fPage->SetViewColor(ViewColor());
+
+	fPageSize = new BStringView("pageSize", "?x?");
+
 	BString str;
 	// Create text fields
-	BRect r(Frame().Width() - be_plain_font->StringWidth("Top#") - kWidth,
-			kOffsetY, Frame().Width() - kOffsetX, kWidth);
 
 	// top
 	str << fMargins.top/fUnitValue;
-	fTop = new BTextControl( r, "top", "Top:", str.String(), NULL,
-				B_FOLLOW_RIGHT);
+	fTop = new BTextControl("top", "Top:", str.String(), NULL);
 
 	fTop->SetModificationMessage(new BMessage(TOP_MARGIN_CHANGED));
-	fTop->SetDivider(be_plain_font->StringWidth("Top#"));
 	fTop->SetTarget(this);
 	_AllowOnlyNumbers(fTop, kNumCount);
-	AddChild(fTop);
-
-
-
 
 	//left
-	r.OffsetBy(0, kOffsetY);
-	r.left = Frame().Width() - be_plain_font->StringWidth("Left#") - kWidth;
     str = "";
 	str << fMargins.left/fUnitValue;
-	fLeft = new BTextControl( r, "left", "Left:", str.String(), NULL,
-				B_FOLLOW_RIGHT);
+	fLeft = new BTextControl("left", "Left:", str.String(), NULL);
 
 	fLeft->SetModificationMessage(new BMessage(LEFT_MARGIN_CHANGED));
-	fLeft->SetDivider(be_plain_font->StringWidth("Left#"));
 	fLeft->SetTarget(this);
 	_AllowOnlyNumbers(fLeft, kNumCount);
-	AddChild(fLeft);
-
-
-
 
 	//bottom
-	r.OffsetBy(0, kOffsetY);
-	r.left = Frame().Width() - be_plain_font->StringWidth("Bottom#") - kWidth;
     str = "";
 	str << fMargins.bottom/fUnitValue;
-	fBottom = new BTextControl( r, "bottom", "Bottom:", str.String(), NULL,
-				B_FOLLOW_RIGHT);
+	fBottom = new BTextControl("bottom", "Bottom:", str.String(), NULL);
 
 	fBottom->SetModificationMessage(new BMessage(BOTTOM_MARGIN_CHANGED));
-	fBottom->SetDivider(be_plain_font->StringWidth("Bottom#"));
 	fBottom->SetTarget(this);
-
 	_AllowOnlyNumbers(fBottom, kNumCount);
-	AddChild(fBottom);
-
-
-
 
 	//right
-	r.OffsetBy(0, kOffsetY);
-	r.left = Frame().Width() - be_plain_font->StringWidth("Right#") - kWidth;
     str = "";
 	str << fMargins.right/fUnitValue;
-	fRight = new BTextControl( r, "right", "Right:", str.String(), NULL,
-				B_FOLLOW_RIGHT);
+	fRight = new BTextControl("right", "Right:", str.String(), NULL);
 
 	fRight->SetModificationMessage(new BMessage(RIGHT_MARGIN_CHANGED));
-	fRight->SetDivider(be_plain_font->StringWidth("Right#"));
 	fRight->SetTarget(this);
 	_AllowOnlyNumbers(fRight, kNumCount);
-	AddChild(fRight);
 
-
-
-// Create Units popup
-	r.OffsetBy(-kOffsetX, kOffsetY);
-	r.right += kOffsetY;
+	// Create Units popup
 
 	BPopUpMenu *menu = new BPopUpMenu("units");
-	BMenuField *mf = new BMenuField(r, "units", "Units", menu,
-			B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
-	mf->ResizeToPreferred();
-	mf->SetDivider(be_plain_font->StringWidth("Units#"));
+	BMenuField *units = new BMenuField("units", "Units:", menu);
 
 	BMenuItem *item;
 	// Construct menu items
@@ -463,10 +441,35 @@ MarginView::_ConstructGUI()
 		if (fMarginUnit == kUnitMsg[i])
 			item->SetMarked(true);
 	}
-	AddChild(mf);
 
-	// calculate the sizes for drawing page view
-	_CalculateViewSize(MARGIN_CHANGED);
+	BGridView* settings = new BGridView();
+	BGridLayout* settingsLayout = settings->GridLayout();
+	settingsLayout->AddItem(fTop->CreateLabelLayoutItem(), 0, 0);
+	settingsLayout->AddItem(fTop->CreateTextViewLayoutItem(), 1, 0);
+	settingsLayout->AddItem(fLeft->CreateLabelLayoutItem(), 0, 1);
+	settingsLayout->AddItem(fLeft->CreateTextViewLayoutItem(), 1, 1);
+	settingsLayout->AddItem(fBottom->CreateLabelLayoutItem(), 0, 2);
+	settingsLayout->AddItem(fBottom->CreateTextViewLayoutItem(), 1, 2);
+	settingsLayout->AddItem(fRight->CreateLabelLayoutItem(), 0, 3);
+	settingsLayout->AddItem(fRight->CreateTextViewLayoutItem(), 1, 3);
+	settingsLayout->AddItem(units->CreateLabelLayoutItem(), 0, 4);
+	settingsLayout->AddItem(units->CreateMenuBarLayoutItem(), 1, 4);
+	settingsLayout->SetSpacing(0, 0);
+
+	BGroupView* groupView = new BGroupView(B_HORIZONTAL, 10);
+	BGroupLayout* groupLayout = groupView->GroupLayout();
+	groupLayout->AddView(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(fPage)
+		.Add(fPageSize)
+		.SetInsets(0, 0, 0, 0)
+		.TopView()
+	);
+	groupLayout->AddView(settings);
+	groupLayout->SetInsets(5, 5, 5, 5);
+
+	AddChild(groupView);
+
+	UpdateView(MARGIN_CHANGED);
 }
 
 
@@ -489,6 +492,7 @@ MarginView::_AllowOnlyNumbers(BTextControl *textControl, int32 maxNum)
 		tv->AllowChar(i);
 
 	tv->AllowChar(B_BACKSPACE);
+	// TODO internationalization; e.g. "." or ","
 	tv->AllowChar('.');
 	tv->SetMaxBytes(maxNum);
 }
@@ -524,56 +528,56 @@ MarginView::_SetMarginUnit(MarginUnit unit)
 	fUnitValue = kUnitFormat[unit];
 
 	// convert the field text to values
-	float ftop 		= atof(fTop->Text());
-	float fright 	= atof(fRight->Text());
-	float fleft 	= atof(fLeft->Text());
-	float fbottom 	= atof(fBottom->Text());
+	float top = atof(fTop->Text());
+	float right = atof(fRight->Text());
+	float left = atof(fLeft->Text());
+	float bottom = atof(fBottom->Text());
 
 	// convert to target units
 	switch (fMarginUnit)
 	{
 		case kUnitInch:
 			// convert to points
-			ftop *= kInchUnits;
-			fright *= kInchUnits;
-			fleft *= kInchUnits;
-			fbottom *= kInchUnits;
+			top *= kInchUnits;
+			right *= kInchUnits;
+			left *= kInchUnits;
+			bottom *= kInchUnits;
 			// check for target unit is cm
 			if (unit == kUnitCM) {
-				ftop /= kCMUnits;
-				fright /= kCMUnits;
-				fleft /= kCMUnits;
-				fbottom /= kCMUnits;
+				top /= kCMUnits;
+				right /= kCMUnits;
+				left /= kCMUnits;
+				bottom /= kCMUnits;
 			}
 			break;
 		case kUnitCM:
 			// convert to points
-			ftop *= kCMUnits;
-			fright *= kCMUnits;
-			fleft *= kCMUnits;
-			fbottom *= kCMUnits;
+			top *= kCMUnits;
+			right *= kCMUnits;
+			left *= kCMUnits;
+			bottom *= kCMUnits;
 			// check for target unit is inches
 			if (unit == kUnitInch) {
-				ftop /= kInchUnits;
-				fright /= kInchUnits;
-				fleft /= kInchUnits;
-				fbottom /= kInchUnits;
+				top /= kInchUnits;
+				right /= kInchUnits;
+				left /= kInchUnits;
+				bottom /= kInchUnits;
 			}
 			break;
 		case kUnitPoint:
 			// check for target unit is cm
 			if (unit == kUnitCM) {
-				ftop /= kCMUnits;
-				fright /= kCMUnits;
-				fleft /= kCMUnits;
-				fbottom /= kCMUnits;
+				top /= kCMUnits;
+				right /= kCMUnits;
+				left /= kCMUnits;
+				bottom /= kCMUnits;
 			}
 			// check for target unit is inches
 			if (unit == kUnitInch) {
-				ftop /= kInchUnits;
-				fright /= kInchUnits;
-				fleft /= kInchUnits;
-				fbottom /= kInchUnits;
+				top /= kInchUnits;
+				right /= kInchUnits;
+				left /= kInchUnits;
+				bottom /= kInchUnits;
 			}
 			break;
 	}
@@ -584,137 +588,24 @@ MarginView::_SetMarginUnit(MarginUnit unit)
 
 	// set the fields to new units
 	BString str;
-	str << ftop;
+	str << top;
 	fTop->SetText(str.String());
 
 	str = "";
-	str << fleft;
+	str << left;
 	fLeft->SetText(str.String());
 
 	str = "";
-	str << fright;
+	str << right;
 	fRight->SetText(str.String());
 
 	str = "";
-	str << fbottom;
+	str << bottom;
 	fBottom->SetText(str.String());
 
 	// update UI
-	_CalculateViewSize(MARGIN_CHANGED);
 	Invalidate();
 
 	Window()->Unlock();
 }
 
-
-/**
- * CalculateViewSize
- *
- * calculate the size of the view that is used
- *	to show the page inside the margin box. This is dependent
- *	on the size of the box and the room we have to show it and
- *	the units that we are using and the orientation of the page.
- *
- * @param msg, the message for which field changed to check value bounds
- * @return void
- */
-void
-MarginView::_CalculateViewSize(uint32 msg)
-{
-	// determine page orientation
-	if (fPageHeight < fPageWidth) { // LANDSCAPE
-		fViewWidth = fMaxPageWidth;
-		fViewHeight = fPageHeight * (fViewWidth/fPageWidth);
-		float hdiff = fViewHeight - fMaxPageHeight;
-		if (hdiff > 0) {
-			fViewHeight -= hdiff;
-			fViewWidth -= hdiff;
-		}
-	} else { // PORTRAIT
-		fViewHeight = fMaxPageHeight;
-		fViewWidth = fPageWidth * (fViewHeight/fPageHeight);
-		float wdiff = fViewWidth - fMaxPageWidth;
-		if (wdiff > 0) {
-			fViewHeight -= wdiff;
-			fViewWidth -= wdiff;
-		}
-	}
-
-	// calculate margins based on view size
-
-	// find the length of 1 pixel in points
-	// 	ex: 80px/800pt = 0.1px/pt
-	float pixelLength = fViewHeight/fPageHeight;
-
-	// convert the margins to points
-	// The text field will have a number that us in the current unit
-	//  ex 0.2" * 72pt = 14.4pts
-	float ftop = atof(fTop->Text()) * fUnitValue;
-	float fright = atof(fRight->Text()) * fUnitValue;
-	float fbottom = atof(fBottom->Text()) * fUnitValue;
-	float fleft = atof(fLeft->Text()) * fUnitValue;
-
-	// Check that the margins don't overlap each other...
- 	float delta = 72.0;
- 		// minimum printable rect = 1 inch * 1 inch
-	float ph = fPageHeight-delta;
-	float pw = fPageWidth-delta;
- 	BString str;
-
-	//  Bounds calculation rules:
-	if (msg == TOP_MARGIN_CHANGED) {
-		//	top must be <= bottom
-		if (ftop > (ph - fbottom)) {
-			ftop = ph - fbottom;
-			str = "";
-			str << ftop / fUnitValue;
-			Window()->Lock();
-			fTop->SetText(str.String());
-			Window()->Unlock();
-		}
-
-	}
-
-	if (msg == BOTTOM_MARGIN_CHANGED) {
-		//	bottom must be <= pageHeight
-		if (fbottom > (ph - ftop)) {
-			fbottom = ph - ftop;
-			str = "";
-			str << fbottom / fUnitValue;
-			Window()->Lock();
-			fBottom->SetText(str.String());
-			Window()->Unlock();
-		}
-	}
-
-	if (msg == LEFT_MARGIN_CHANGED) {
-		// 	left must be <= right
-		if (fleft > (pw - fright)) {
-			fleft = pw - fright;
-			str = "";
-			str << fleft / fUnitValue;
-			Window()->Lock();
-			fLeft->SetText(str.String());
-			Window()->Unlock();
-		}
-	}
-
-	if (msg == RIGHT_MARGIN_CHANGED) {
-		//	right must be <= fPageWidth
-		if (fright > (pw - fleft)) {
-			fright = pw - fleft;
-			str = "";
-			str << fright / fUnitValue;
-			Window()->Lock();
-			fRight->SetText(str.String());
-			Window()->Unlock();
-		}
-	}
-
-	// convert the unit value to pixels
-	//  ex: 14.4pt * 0.1px/pt = 1.44px
-	fMargins.top = ftop * pixelLength;
-	fMargins.right = fright * pixelLength;
-	fMargins.bottom = fbottom * pixelLength;
-	fMargins.left = fleft * pixelLength;
-}

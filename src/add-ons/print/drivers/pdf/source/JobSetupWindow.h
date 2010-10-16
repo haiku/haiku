@@ -71,7 +71,6 @@ private:
 	status_t				fResult;
 	BMessage				*fSetupMsg;
 	BMessage                fDocInfo;
-	BTextControl			*fCopies;		
 	BRadioButton			*fAll;
 	BRadioButton			*fRange;
 	BTextControl			*fFrom;

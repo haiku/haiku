@@ -20,7 +20,8 @@ class MarginView;
 
 class PageSetupView : public BView {
 public:
-	PageSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
+	PageSetupView(JobData *job_data, PrinterData *printer_data,
+		const PrinterCap *printer_cap);
 	~PageSetupView();
 	virtual void AttachedToWindow();
 	bool UpdateJobData();
@@ -43,11 +44,13 @@ private:
 
 class PageSetupDlg : public DialogWindow {
 public:
-	PageSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
+	PageSetupDlg(JobData *job_data, PrinterData *printer_data,
+		const PrinterCap *printer_cap);
 	virtual void MessageReceived(BMessage *message);
 
 private:
-	BMessageFilter *fFilter;
+	BMessageFilter* fFilter;
+	PageSetupView* fPageSetupView;
 };
 
 #endif	/* __PAGESETUPDLG_H */

@@ -45,6 +45,9 @@ THE SOFTWARE.
 
 #include <Box.h>
 #include <Button.h>
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <MenuField.h>
 #include <Message.h>
 #include <PopUpMenu.h>
@@ -92,15 +95,16 @@ static const char *pdf_compatibility[] = { "1.3", "1.4", NULL };
 
 
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
-	: HWindow(BRect(0,0,400,220), "Page setup", B_TITLED_WINDOW_LOOK,
- 		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 		B_NOT_ZOOMABLE),
+	: HWindow(BRect(0, 0, 200, 100), "Page setup", B_TITLED_WINDOW_LOOK,
+ 		B_MODAL_APP_WINDOW_FEEL,
+ 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS),
 	 fResult(B_ERROR),
 	 fSetupMsg(msg),
 	 fAdvancedSettings(*msg),
 	 fPrinterDirName(printerName)
 {
-	fExitSem 	= create_sem(0, "PageSetup");
+	fExitSem = create_sem(0, "PageSetup");
 
 	if (printerName)
 		SetTitle(BString(printerName).Append(" page setup").String());
@@ -151,29 +155,13 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	if (fSetupMsg->FindMessage("fonts", &fonts) == B_OK)
 		fFonts->SetTo(&fonts);
 
-	// add a *dialog* background
-	BRect bounds(Bounds());
-	BBox *panel = new BBox(bounds, "background", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
-	AddChild(panel);
-
-	bounds.InsetBy(10.0, 10.0);
-	bounds.right = 230.0;
-	bounds.bottom = 160.0;
-	fMarginView = new MarginView(bounds, int32(width), int32(height), margin,
+	fMarginView = new MarginView(int32(width), int32(height), margin,
 		MarginUnit(units));
-	panel->AddChild(fMarginView);
-	fMarginView->SetResizingMode(B_FOLLOW_NONE);
 
-	BPopUpMenu* m = new BPopUpMenu("Page size");
-	m->SetRadioMode(true);
+	BPopUpMenu* pageSize = new BPopUpMenu("Page size");
+	pageSize->SetRadioMode(true);
 
-	bounds.OffsetBy(bounds.Width() + 10.0, 5.0);
-	float divider = be_plain_font->StringWidth("PDF compatibility: ");
-	fPageSizeMenu = new BMenuField(bounds, "page_size", "Page size:", m);
-	panel->AddChild(fPageSizeMenu);
-	fPageSizeMenu->ResizeToPreferred();
-	fPageSizeMenu->SetDivider(divider);
+	fPageSizeMenu = new BMenuField("page_size", "Page size:", pageSize);
 	fPageSizeMenu->Menu()->SetLabelFromMarked(true);
 
 	for (int32 i = 0; pageFormat[i].label != NULL; i++) {
@@ -181,98 +169,97 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		message->AddFloat("width", pageFormat[i].width);
 		message->AddFloat("height", pageFormat[i].height);
 		BMenuItem* item = new BMenuItem(pageFormat[i].label, message);
-		m->AddItem(item);
+		pageSize->AddItem(item);
 
 		if (label.Compare(pageFormat[i].label) == 0)
 			item->SetMarked(true);
 	}
 
-	m = new BPopUpMenu("Orientation");
-	m->SetRadioMode(true);
+	BPopUpMenu* orientationPopUpMenu = new BPopUpMenu("Orientation");
+	orientationPopUpMenu->SetRadioMode(true);
 
-	bounds.OffsetBy(0.0, fPageSizeMenu->Bounds().Height() + 10.0);
-	fOrientationMenu = new BMenuField(bounds, "orientation", "Orientation:", m);
-	panel->AddChild(fOrientationMenu);
-	fOrientationMenu->ResizeToPreferred();
-	fOrientationMenu->SetDivider(divider);
+	fOrientationMenu = new BMenuField("orientation", "Orientation:",
+		orientationPopUpMenu);
 	fOrientationMenu->Menu()->SetLabelFromMarked(true);
 
 	for (int32 i = 0; orientation[i].label != NULL; i++) {
 	 	BMessage* message = new BMessage(ORIENTATION_CHANGED);
 		message->AddInt32("orientation", orientation[i].orientation);
 		BMenuItem* item = new BMenuItem(orientation[i].label, message);
-		m->AddItem(item);
+		orientationPopUpMenu->AddItem(item);
 
 		if (fCurrentOrientation == orientation[i].orientation)
 			item->SetMarked(true);
 	}
 
-	m = new BPopUpMenu("PDF compatibility");
-	m->SetRadioMode(true);
+	BPopUpMenu* compatibility = new BPopUpMenu("PDF compatibility");
+	compatibility->SetRadioMode(true);
 
-	bounds.OffsetBy(0.0, fOrientationMenu->Bounds().Height() + 10.0);
-	fPDFCompatibilityMenu = new BMenuField(bounds, "pdf_compatibility",
-		"PDF compatibility:", m);
-	panel->AddChild(fPDFCompatibilityMenu);
-	fPDFCompatibilityMenu->ResizeToPreferred();
-	fPDFCompatibilityMenu->SetDivider(divider);
+	fPDFCompatibilityMenu = new BMenuField("pdf_compatibility",
+		"PDF compatibility:", compatibility);
 	fPDFCompatibilityMenu->Menu()->SetLabelFromMarked(true);
 
 	for (int32 i = 0; pdf_compatibility[i] != NULL; i++) {
 		BMenuItem* item = new BMenuItem(pdf_compatibility[i], NULL);
-		m->AddItem(item);
+		compatibility->AddItem(item);
 		if (setting_value == pdf_compatibility[i])
 			item->SetMarked(true);
 	}
 
-	bounds.OffsetBy(0.0, fPDFCompatibilityMenu->Bounds().Height() + 10.0);
-	fPDFCompressionSlider = new BSlider(bounds, "pdf_compression",
-		"Compression:", NULL, 0, 9);
-	panel->AddChild(fPDFCompressionSlider);
+	fPDFCompressionSlider = new BSlider("pdf_compression",
+		"Compression:", NULL, 0, 9, B_HORIZONTAL);
 	fPDFCompressionSlider->SetLimitLabels("None", "Best");
 	fPDFCompressionSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fPDFCompressionSlider->SetValue(compression);
-	fPDFCompressionSlider->ResizeToPreferred();
 
-	bounds = Bounds();
-	bounds.InsetBy(5.0, 0.0);
-	bounds.top = MAX(fPDFCompressionSlider->Frame().bottom,
-		fMarginView->Frame().bottom) + 10.0;
-	BBox *line = new BBox(BRect(bounds.left, bounds.top, bounds.right,
-		bounds.top + 1.0), NULL, B_FOLLOW_LEFT_RIGHT);
-	panel->AddChild(line);
+	BBox *separator = new BBox("separator");
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	bounds.InsetBy(5.0, 0.0);
-	bounds.OffsetBy(0.0, 11.0);
-	BButton *cancel = new BButton(bounds, NULL, "Cancel", new BMessage(CANCEL_MSG));
-	panel->AddChild(cancel);
-	cancel->ResizeToPreferred();
+	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL_MSG));
 
-	BButton *ok = new BButton(bounds, NULL, "OK", new BMessage(OK_MSG));
-	panel->AddChild(ok, cancel);
-	ok->ResizeToPreferred();
-
-	bounds.right = fPDFCompressionSlider->Frame().right;
-	ok->MoveTo(bounds.right - ok->Bounds().Width(), ok->Frame().top);
-
-	bounds = ok->Frame();
-	cancel->MoveTo(bounds.left - cancel->Bounds().Width() - 10.0, bounds.top);
-
+	BButton *ok = new BButton("ok", "OK", new BMessage(OK_MSG));
 	ok->MakeDefault(true);
-	ResizeTo(bounds.right + 10.0, bounds.bottom + 10.0);
 
-	BButton *button = new BButton(bounds, NULL, "Fonts" B_UTF8_ELLIPSIS,
+	BButton *fontsButton = new BButton("fonts", "Fonts" B_UTF8_ELLIPSIS,
 		new BMessage(FONTS_MSG));
-	panel->AddChild(button);
-	button->ResizeToPreferred();
-	button->MoveTo(fMarginView->Frame().left, bounds.top);
 
-	bounds = button->Frame();
-	button = new BButton(bounds, NULL, "Advanced" B_UTF8_ELLIPSIS,
+	BButton* advancedButton = new BButton("advanced",
+		"Advanced" B_UTF8_ELLIPSIS,
 		new BMessage(ADVANCED_MSG));
-	panel->AddChild(button);
-	button->ResizeToPreferred();
-	button->MoveTo(bounds.right + 10, bounds.top);
+
+	BGridView* settings = new BGridView();
+	BGridLayout* settingsLayout = settings->GridLayout();
+	settingsLayout->AddItem(fPageSizeMenu->CreateLabelLayoutItem(), 0, 0);
+	settingsLayout->AddItem(fPageSizeMenu->CreateMenuBarLayoutItem(), 1, 0);
+	settingsLayout->AddItem(fOrientationMenu->CreateLabelLayoutItem(), 0, 1);
+	settingsLayout->AddItem(fOrientationMenu->CreateMenuBarLayoutItem(), 1, 1);
+	settingsLayout->AddItem(fPDFCompatibilityMenu->CreateLabelLayoutItem(), 0, 2);
+	settingsLayout->AddItem(fPDFCompatibilityMenu->CreateMenuBarLayoutItem(), 1, 2);
+	settingsLayout->AddView(fPDFCompressionSlider, 0, 3, 2);
+	settingsLayout->SetSpacing(0, 0);
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.AddGroup(B_HORIZONTAL, 5, 1)
+			.AddGroup(B_VERTICAL, 0, 1.0f)
+				.Add(fMarginView)
+				.AddGlue()
+			.End()
+			.AddGroup(B_VERTICAL, 0, 1.0f)
+				.Add(settings)
+				.AddGlue()
+			.End()
+		.End()
+		.Add(separator)
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.Add(fontsButton)
+			.Add(advancedButton)
+			.AddGlue()
+			.Add(cancel)
+			.Add(ok)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	BRect winFrame(Frame());
 	BRect screenFrame(BScreen().Frame());

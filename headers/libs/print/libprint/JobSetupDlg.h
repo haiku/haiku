@@ -26,14 +26,15 @@ class PagesView;
 
 class JobSetupView : public BView {
 public:
-	JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
+	JobSetupView(JobData* job_data, PrinterData* printer_data,
+		const PrinterCap* printer_cap);
 	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage *msg);
+	virtual void MessageReceived(BMessage* msg);
 	bool UpdateJobData(bool showPreview);
 
 private:
 	void UpdateButtonEnabledState();
-	BRadioButton* AddPageSelectionItem(BView* parent, BRect rect, const char* name, const char* label, 
+	BRadioButton* CreatePageSelectionItem(const char* name, const char* label,
 		JobData::PageSelection pageSelection);
 	void AllowOnlyDigits(BTextView* textView, int maxDigits);
 	JobData::Color getColor();

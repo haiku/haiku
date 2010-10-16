@@ -37,7 +37,6 @@ THE SOFTWARE.
 
 #include "PrinterDriver.h"
 
-#include "PrinterSetupWindow.h"
 #include "PageSetupWindow.h"
 #include "JobSetupWindow.h"
 #include "StatusWindow.h"
@@ -222,10 +221,7 @@ status_t
 PrinterDriver::PrinterSetup(char *printerName)
 	// name of printer, to attach printer settings
 {
-	PrinterSetupWindow *psw;
-
-	psw = new PrinterSetupWindow(printerName);
-	return psw->Go();
+	return B_OK;
 }
 
 

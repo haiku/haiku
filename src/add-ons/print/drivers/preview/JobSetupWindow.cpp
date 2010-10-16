@@ -18,15 +18,19 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <RadioButton.h>
 #include <Screen.h>
 #include <TextControl.h>
 
 
 JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
-	:	BlockingWindow(BRect(0, 0, 300, 200), "Job Setup", B_TITLED_WINDOW_LOOK,
- 			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE),
+	: BlockingWindow(BRect(0, 0, 100, 100), "Job Setup",
+		B_TITLED_WINDOW_LOOK,
+ 		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
+ 			B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fPrinterName(printerName),
 	fSetupMsg(msg)
 {
@@ -40,42 +44,20 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	fSetupMsg->FindInt32("last_page", &lastPage);
 	bool allPages = firstPage == 1 && lastPage == LONG_MAX;
 
-	BRect bounds(Bounds());
-	BBox *panel = new BBox(bounds, "background", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
-	AddChild(panel);
-
-	bounds.InsetBy(10.0, 10.0);
-
-	fAll = new BRadioButton(bounds, "allPages", "Print all pages",
+	fAll = new BRadioButton("allPages", "Print all pages",
 		new BMessage(ALL_PAGES_MGS));
-	panel->AddChild(fAll);
-	fAll->ResizeToPreferred();
 	fAll->SetValue(allPages);
 
-	bounds.OffsetBy(0.0, fAll->Bounds().Height() + 10.0);
-	fRange = new BRadioButton(bounds, "pagesRange", "Print pages:",
+	fRange = new BRadioButton("pagesRange", "Print selected pages:",
 		new BMessage(RANGE_SELECTION_MSG));
-	panel->AddChild(fRange);
-	fRange->ResizeToPreferred();
 	fRange->SetValue(!allPages);
 
-	bounds.OffsetBy(0.0, fRange->Bounds().Height() + 5.0);
-	BRect rect(bounds);
-	rect.right = be_plain_font->StringWidth("From: SomeSpaceHere");
-	fFrom = new BTextControl(rect, "from", "From:", "SomeSpaceHere", NULL);
-	panel->AddChild(fFrom);
+	fFrom = new BTextControl("from", "From:", "SomeSpaceHere", NULL);
 	fFrom->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fFrom->ResizeToPreferred();
-	fFrom->SetDivider(be_plain_font->StringWidth("From: "));
 	fFrom->SetEnabled(!allPages);
 
-	rect = fFrom->Frame();
-	fTo = new BTextControl(rect, "to", "To:", "SomeSpaceHere", NULL);
-	panel->AddChild(fTo);
+	fTo = new BTextControl("to", "To:", "", NULL);
 	fTo->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fTo->SetDivider(be_plain_font->StringWidth("To: "));
-	fTo->MoveTo(fFrom->Frame().right + 10.0, fTo->Frame().top);
 	fTo->SetEnabled(!allPages);
 
 	BString buffer;
@@ -96,28 +78,37 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		fFrom->TextView()->DisallowChar(i);
 	}
 
-	bounds.OffsetBy(0.0, fTo->Bounds().Height() + 10.0);
-	BBox *line = new BBox(BRect(bounds.left - 5.0, bounds.top, bounds.right + 5.0,
-		bounds.top + 1.0), NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
-	panel->AddChild(line);
+	BBox *separator = new BBox("separator");
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	bounds.OffsetBy(0.0, 11.0);
-	BButton *cancel = new BButton(bounds, NULL, "Cancel", new BMessage(CANCEL_MSG));
-	panel->AddChild(cancel);
-	cancel->ResizeToPreferred();
+	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL_MSG));
 
-	BButton *ok = new BButton(bounds, NULL, "OK", new BMessage(OK_MSG));
-	panel->AddChild(ok, cancel);
-	ok->ResizeToPreferred();
-
-	bounds.right = fTo->Frame().right;
-	ok->MoveTo(bounds.right - ok->Bounds().Width(), ok->Frame().top);
-
-	bounds = ok->Frame();
-	cancel->MoveTo(bounds.left - cancel->Bounds().Width() - 10.0, bounds.top);
-
+	BButton *ok = new BButton("ok", "OK", new BMessage(OK_MSG));
 	ok->MakeDefault(true);
-	ResizeTo(bounds.right + 10.0, bounds.bottom + 10.0);
+
+	BGridView* settings = new BGridView();
+	BGridLayout* settingsLayout = settings->GridLayout();
+	settingsLayout->AddItem(fFrom->CreateLabelLayoutItem(), 0, 0);
+	settingsLayout->AddItem(fFrom->CreateTextViewLayoutItem(), 1, 0);
+	settingsLayout->AddItem(fTo->CreateLabelLayoutItem(), 0, 1);
+	settingsLayout->AddItem(fTo->CreateTextViewLayoutItem(), 1, 1);
+	settingsLayout->SetSpacing(0, 0);
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(fAll)
+		.Add(fRange)
+		.Add(settings)
+		.AddGlue()
+		.Add(separator)
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.AddGlue()
+			.Add(cancel)
+			.Add(ok)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
+
 
 	BRect winFrame(Frame());
 	BRect screenFrame(BScreen().Frame());
@@ -154,27 +145,27 @@ void
 JobSetupWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case OK_MSG: {
+		case OK_MSG:
 			UpdateJobMessage();
 			Quit(B_OK);
-		}	break;
+			break;
 
-		case CANCEL_MSG: {
+		case CANCEL_MSG:
 			Quit(B_ERROR);
-		}	break;
+			break;
 
-		case ALL_PAGES_MGS : {
+		case ALL_PAGES_MGS:
 			fTo->SetEnabled(false);
 			fFrom->SetEnabled(false);
-		}	break;
+			break;
 
-		case RANGE_SELECTION_MSG : {
+		case RANGE_SELECTION_MSG:
 			fTo->SetEnabled(true);
 			fFrom->SetEnabled(true);
-		}	break;
+			break;
 
-		default: {
+		default:
 			BlockingWindow::MessageReceived(msg);
-		}	break;
+			break;
 	}
 }

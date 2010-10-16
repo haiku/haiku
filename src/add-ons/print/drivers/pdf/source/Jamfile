@@ -35,7 +35,6 @@ Addon PDF\ Writer :
 	PrinterDriver.cpp
 	PrinterPrefs.cpp
 	PrinterSettings.cpp
-	PrinterSetupWindow.cpp
 	RegExp.cpp
 	Report.cpp
 	Scanner.cpp

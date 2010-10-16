@@ -20,6 +20,9 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <MenuField.h>
 #include <Message.h>
 #include <PopUpMenu.h>
@@ -90,9 +93,11 @@ static struct
 
 
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
-	:	BlockingWindow(BRect(0,0,400,220), "Page setup", B_TITLED_WINDOW_LOOK,
- 			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE),
+	: BlockingWindow(BRect(0, 0, 100, 100), "Page setup",
+			B_TITLED_WINDOW_LOOK,
+ 			B_MODAL_APP_WINDOW_FEEL,
+ 			B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
+				| B_AUTO_UPDATE_SIZE_LIMITS),
 	fSetupMsg(msg),
 	fPrinterDirName(printerName)
 {
@@ -134,28 +139,14 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		margin.Set(28.34, 28.34, 28.34, 28.34);		// 28.34 dots = 1cm
 	}
 
-	BRect bounds(Bounds());
-	BBox *panel = new BBox(bounds, "background", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
-	AddChild(panel);
 
-	bounds.InsetBy(10.0, 10.0);
-	bounds.right = 230.0;
-	bounds.bottom = 160.0;
-	fMarginView = new MarginView(bounds, int32(width), int32(height), margin,
+	fMarginView = new MarginView(int32(width), int32(height), margin,
 		MarginUnit(units));
-	panel->AddChild(fMarginView);
-	fMarginView->SetResizingMode(B_FOLLOW_NONE);
 
-	BPopUpMenu* m = new BPopUpMenu("Page size");
-	m->SetRadioMode(true);
+	BPopUpMenu* pageSizePopUpMenu = new BPopUpMenu("Page size");
+	pageSizePopUpMenu->SetRadioMode(true);
 
-	bounds.OffsetBy(bounds.Width() + 10.0, 5.0);
-	float divider = be_plain_font->StringWidth("Orientation: ");
-	fPageSizeMenu = new BMenuField(bounds, "page_size", "Page size:", m);
-	panel->AddChild(fPageSizeMenu);
-	fPageSizeMenu->ResizeToPreferred();
-	fPageSizeMenu->SetDivider(divider);
+	fPageSizeMenu = new BMenuField("page_size", "Page size:", pageSizePopUpMenu);
 	fPageSizeMenu->Menu()->SetLabelFromMarked(true);
 
 	for (int32 i = 0; pageFormat[i].label != NULL; i++) {
@@ -163,27 +154,24 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		message->AddFloat("width", pageFormat[i].width);
 		message->AddFloat("height", pageFormat[i].height);
 		BMenuItem* item = new BMenuItem(pageFormat[i].label, message);
-		m->AddItem(item);
+		pageSizePopUpMenu->AddItem(item);
 
 		if (label.Compare(pageFormat[i].label) == 0)
 			item->SetMarked(true);
 	}
 
-	m = new BPopUpMenu("Orientation");
-	m->SetRadioMode(true);
+	BPopUpMenu* orientationPopUpMenu = new BPopUpMenu("Orientation");
+	orientationPopUpMenu->SetRadioMode(true);
 
-	bounds.OffsetBy(0.0, fPageSizeMenu->Bounds().Height() + 10.0);
-	fOrientationMenu = new BMenuField(bounds, "orientation", "Orientation:", m);
-	panel->AddChild(fOrientationMenu);
-	fOrientationMenu->ResizeToPreferred();
-	fOrientationMenu->SetDivider(divider);
+	fOrientationMenu = new BMenuField("orientation", "Orientation:",
+		orientationPopUpMenu);
 	fOrientationMenu->Menu()->SetLabelFromMarked(true);
 
 	for (int32 i = 0; orientation[i].label != NULL; i++) {
 	 	BMessage* message = new BMessage(ORIENTATION_CHANGED);
 		message->AddInt32("orientation", orientation[i].orientation);
 		BMenuItem* item = new BMenuItem(orientation[i].label, message);
-		m->AddItem(item);
+		orientationPopUpMenu->AddItem(item);
 
 		if (fCurrentOrientation == orientation[i].orientation)
 			item->SetMarked(true);
@@ -196,13 +184,8 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	else
 		scale = "100";
 
-	bounds.OffsetBy(0.0, fOrientationMenu->Bounds().Height() + 10.0);
-	bounds.right -= 30.0;
-	fScaleControl = new BTextControl(bounds, "scale", "Scale [%]:",
+	fScaleControl = new BTextControl("scale", "Scale [%]:",
 		scale.String(), NULL);
-	panel->AddChild(fScaleControl);
-	fScaleControl->ResizeToPreferred();
-	fScaleControl->SetDivider(divider);
 
 	for (uint32 i = 0; i < '0'; i++)
 		fScaleControl->TextView()->DisallowChar(i);
@@ -212,32 +195,44 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 
 	fScaleControl->TextView()->SetMaxBytes(3);
 
-	bounds = Bounds();
-	bounds.InsetBy(5.0, 0.0);
-	bounds.top =
-		MAX(fScaleControl->Frame().bottom, fMarginView->Frame().bottom) + 10.0;
-	BBox *line = new BBox(BRect(bounds.left, bounds.top, bounds.right,
-		bounds.top + 1.0), NULL, B_FOLLOW_LEFT_RIGHT);
-	panel->AddChild(line);
+	BBox *separator = new BBox("separator");
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-	bounds.InsetBy(5.0, 0.0);
-	bounds.OffsetBy(0.0, 11.0);
-	BButton *cancel = new BButton(bounds, NULL, "Cancel", new BMessage(CANCEL_MSG));
-	panel->AddChild(cancel);
-	cancel->ResizeToPreferred();
+	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL_MSG));
 
-	BButton *ok = new BButton(bounds, NULL, "OK", new BMessage(OK_MSG));
-	panel->AddChild(ok, cancel);
-	ok->ResizeToPreferred();
-
-	bounds.right = fScaleControl->Frame().right;
-	ok->MoveTo(bounds.right - ok->Bounds().Width(), ok->Frame().top);
-
-	bounds = ok->Frame();
-	cancel->MoveTo(bounds.left - cancel->Bounds().Width() - 10.0, bounds.top);
-
+	BButton *ok = new BButton("ok", "OK", new BMessage(OK_MSG));
 	ok->MakeDefault(true);
-	ResizeTo(bounds.right + 10.0, bounds.bottom + 10.0);
+
+	BGridView* settings = new BGridView();
+	BGridLayout* settingsLayout = settings->GridLayout();
+	settingsLayout->AddItem(fPageSizeMenu->CreateLabelLayoutItem(), 0, 0);
+	settingsLayout->AddItem(fPageSizeMenu->CreateMenuBarLayoutItem(), 1, 0);
+	settingsLayout->AddItem(fOrientationMenu->CreateLabelLayoutItem(), 0, 1);
+	settingsLayout->AddItem(fOrientationMenu->CreateMenuBarLayoutItem(), 1, 1);
+	settingsLayout->AddItem(fScaleControl->CreateLabelLayoutItem(), 0, 2);
+	settingsLayout->AddItem(fScaleControl->CreateTextViewLayoutItem(), 1, 2);
+	settingsLayout->SetSpacing(0, 0);
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.AddGroup(B_HORIZONTAL, 5, 1)
+			.AddGroup(B_VERTICAL, 0, 1.0f)
+				.Add(fMarginView)
+				.AddGlue()
+			.End()
+			.AddGroup(B_VERTICAL, 0, 1.0f)
+				.Add(settings)
+				.AddGlue()
+			.End()
+		.End()
+		.Add(separator)
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.AddGlue()
+			.Add(cancel)
+			.Add(ok)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 
 	BRect winFrame(Frame());
 	BRect screenFrame(BScreen().Frame());

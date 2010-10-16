@@ -139,8 +139,14 @@ SYSTEM_ADD_ONS_MEDIA = cortex_audioadapter.media_addon
 	#legacy.media_addon
 ;
 SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(X86_ONLY)ffmpeg raw_decoder ;
-SYSTEM_ADD_ONS_PRINT = Canon\ LIPS3\ Compatible Canon\ LIPS4\ Compatible
-	PCL5\ Compatible PCL6\ Compatible PDF\ Writer PS\ Compatible Preview
+SYSTEM_ADD_ONS_PRINT = 
+	Canon\ LIPS3\ Compatible 
+	Canon\ LIPS4\ Compatible
+	PCL5\ Compatible
+	PCL6\ Compatible
+	PDF\ Writer
+	PS\ Compatible
+	Preview
 ;
 SYSTEM_ADD_ONS_PRINT_TRANSPORT = HP\ JetDirect IPP LPR Parallel\ Port
 	Print\ To\ File Serial\ Port USB\ Port

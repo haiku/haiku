@@ -14,9 +14,9 @@
 #include <string.h>
 
 
-JSDSlider::JSDSlider(BRect frame, const char* name, const char *label,
-	BMessage *msg, int32 min, int32 max, thumb_style t)
-	: BSlider(frame, name, label, msg, min, max, t)
+JSDSlider::JSDSlider(const char* name, const char* label,
+	BMessage* msg, int32 min, int32 max)
+	: BSlider(name, label, msg, min, max, B_HORIZONTAL)
 {
 }
 
@@ -26,10 +26,7 @@ JSDSlider::~JSDSlider()
 } 
 
 
-#ifdef __HAIKU__
-const
-#endif
-char*
+const char*
 JSDSlider::UpdateText() const
 {
 	// When the slider's Draw method is called, this method will also be called.
@@ -49,9 +46,5 @@ JSDSlider::UpdateText() const
 	}
 
 	fResult.SetTo(string);
-#ifdef __HAIKU__
 	return fResult.String();
-#else
-	return const_cast<char*>(fResult.String());
-#endif
 }

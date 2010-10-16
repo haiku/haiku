@@ -143,6 +143,24 @@ enum MarginUnit {
 	kUnitPoint
 };
 
+class PageView : public BView
+{
+public:
+					PageView();
+
+	void			SetPageSize(float pageWidth, float pageHeight);
+	void			SetMargins(BRect margins);
+
+	virtual	void	Draw(BRect bounds);
+
+
+private:
+	float	fPageWidth;
+	float	fPageHeight;
+
+	BRect	fMargins;
+};
+
 /**
  * Class MarginView
  */
@@ -151,7 +169,7 @@ class MarginView : public BBox
 friend class MarginManager;
 
 public:
-							MarginView(BRect rect, int32 pageWidth = 0,
+							MarginView(int32 pageWidth = 0,
 								int32 pageHeight = 0,
 								BRect margins = BRect(1, 1, 1, 1), // 1 inch
 								MarginUnit unit = kUnitInch);
@@ -159,8 +177,6 @@ public:
 	virtual					~MarginView();
 
 	virtual	void			AttachedToWindow();
-	virtual	void			Draw(BRect rect);
-	virtual	void			FrameResized(float width, float height);
 	virtual	void			MessageReceived(BMessage *msg);
 
 			// point.x = width, point.y = height
@@ -190,33 +206,25 @@ private:
 			// performed internally using the supplied popup
 			void			_SetMarginUnit(MarginUnit unit);
 
-			// Calculate the view size for the margins
-			void			_CalculateViewSize(uint32 msg);
-
 private:
 			BTextControl*	fTop;
 			BTextControl*	fBottom;
 			BTextControl*	fLeft;
 			BTextControl*	fRight;
 
-			// rect that holds the margins for the page as a set of point offsets
-			BRect			fMargins;
-
-			// the maximum size of the page view calculated from the view size
-			float			fMaxPageWidth;
-			float			fMaxPageHeight;
-
 			// the actual size of the page in points
 			float			fPageHeight;
 			float			fPageWidth;
+
+			// rect that holds the margins for the page as a set of point offsets
+			BRect			fMargins;
 
 			// the units used to calculate the page size
 			MarginUnit		fMarginUnit;
 			float			fUnitValue;
 
-			// the size of the drawing area we have to draw the view in pixels
-			float			fViewHeight;
-			float			fViewWidth;
+			PageView*		fPage;
+			BStringView*	fPageSize;
 };
 
 #endif // _MARGIN_VIEW_H

@@ -3,6 +3,7 @@
 PDF Writer printer driver.
 
 Copyright (c) 2001-2003 OpenBeOS.
+Copyright (c) 2010 Haiku, Inc.
 
 Authors:
 	Philippe Houdoin
@@ -29,6 +30,9 @@ THE SOFTWARE.
 
 */
 
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <InterfaceKit.h>
 #include <SupportKit.h>
 #include <stdlib.h>
@@ -40,51 +44,40 @@ THE SOFTWARE.
 #include "DocInfoWindow.h"
 
 static const char* includeKeys[] = {
-	"doc_info",
+	"doc_info", 
 #if HAVE_FULLVERSION_PDF_LIB
-	"master_password", "user_password", "permissions",
+	"master_password", "user_password", "permissions", 
 #endif
 	NULL
 };
 
 // --------------------------------------------------
 JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
-	:	HWindow(BRect(0, 0, 320, 160), "Job Setup", B_TITLED_WINDOW_LOOK,
- 			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE)
+	:	HWindow(BRect(0, 0, 100, 100), "Job Setup",
+			B_TITLED_WINDOW_LOOK,
+			B_MODAL_APP_WINDOW_FEEL,
+			B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
+				| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	fSetupMsg	= msg;
-	fExitSem 	= create_sem(0, "JobSetup");
-	fResult 	= B_ERROR;
-
+	fSetupMsg = msg;
+	fExitSem = create_sem(0, "JobSetup");
+	fResult	= B_ERROR;
+	
 	if (printerName) {
 		BString	title;
 		title << printerName << " Job Setup";
 		SetTitle(title.String());
 		fPrinterName = printerName;
 	}
-
-	// ---- Ok, build a default job setup user interface
-	BRect			r;
-	BBox			*panel;
-	BBox			*line;
-	BButton	 		*ok;
-	BButton			*cancel;
-	BStringView		*sv;
-	float			x, y, w, h;
-	float			indent;
-	int32           copies;
-	int32           firstPage;
-	int32           lastPage;
-	bool            allPages;
-	char            buffer[80];
-
+	
 	// PrinterDriver ensures that property exists
-	fSetupMsg->FindInt32("copies",     &copies);
+	int32 firstPage;
 	fSetupMsg->FindInt32("first_page", &firstPage);
+	int32 lastPage;
 	fSetupMsg->FindInt32("last_page",  &lastPage);
+
 	BMessage doc_info;
-	if (B_OK != fSetupMsg->FindMessage("doc_info", &doc_info)) {
+	if (fSetupMsg->FindMessage("doc_info", &doc_info) != B_OK) {
 		// default fields
 		doc_info.AddString("Author", "");
 		doc_info.AddString("Subject", "");
@@ -92,157 +85,84 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		fSetupMsg->AddMessage("doc_info", &doc_info);
 	}
 	AddFields(&fDocInfo, fSetupMsg, NULL, includeKeys);
+	
+	bool allPages = firstPage == 1 && lastPage == MAX_INT32;
 
-	allPages = firstPage == 1 && lastPage == MAX_INT32;
-
-	r = Bounds();
-
-	// add a *dialog* background
-	panel = new BBox(r, "top_panel", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-		B_PLAIN_BORDER);
-
-	const int kMargin = 6;
-
-	//const char *kCopiesLabel				= "Copies:";
-	const char *kCopiesLabelExtraSpace		= "Copies:##";
-	const char *kPagesRangeLabel			= "Pages:";
-	const char *kAllPagesLabel				= "All";
-	const char *kPagesRangeSelectionLabel	= "";
-	const char *kFromLabel					= "From:";
-	const char *kFromLabelExtraSpace		= "From:##";
-	const char *kToLabel					= "To:";
-	const char *kToLabelExtraSpace			= "To:##";
-
-	r = panel->Bounds();
-
-	x = r.left + kMargin;
-	y = r.top + kMargin;
-
-
-	// add a "copies" input field
-
-/* Simon: temporarily removed this code
-	sprintf(buffer, "%d", (int)copies);
-	fCopies = new BTextControl(BRect(x, y, x+100, y+20), "copies", kCopiesLabel,
-								buffer, new BMessage(NB_COPIES_MSG));
-	fCopies->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fCopies->ResizeToPreferred();
-	fCopies->GetPreferredSize(&w, &h);
-	panel->AddChild(fCopies);
-
-	y += h + kMargin;	// "new line"
-*/
-	// add a "pages" label
-	sv = new BStringView(BRect(x, y, x+100, y+20), "pages_range", kPagesRangeLabel);
-	panel->AddChild(sv);
-	sv->ResizeToPreferred();
-	sv->GetPreferredSize(&w, &h);
-
-	// align "copies" textcontrol field on the "allPages" radiobutton bellow...
-	indent = be_plain_font->StringWidth(kCopiesLabelExtraSpace);
-	w += kMargin;
-	if ( w > indent )
-		indent = w;
-	// fCopies->SetDivider(indent);
-
-	x += indent;
-
-	// add a "all" radiobutton
-	fAll = new BRadioButton(BRect(x, y, x+100, y+20), "all_pages", kAllPagesLabel,
-						new BMessage(ALL_PAGES_MGS));
-	fAll->ResizeToPreferred();
-	fAll->GetPreferredSize(&w, &h);
+	fAll = new BRadioButton("allPages", "Print all pages",
+		new BMessage(ALL_PAGES_MGS));
 	fAll->SetValue(allPages);
-	panel->AddChild(fAll);
 
-	y += h + kMargin;	// "new line"
-
-	// add a range selection raddiobutton
-	fRange = new BRadioButton(BRect(x, y, x+100, y+20), "pages_range_selection", kPagesRangeSelectionLabel,
-						new BMessage(RANGE_SELECTION_MSG));
-	fRange->ResizeToPreferred();
-	fRange->GetPreferredSize(&w, &h);
+	fRange = new BRadioButton("pagesRange", "Print pages:",
+		new BMessage(RANGE_SELECTION_MSG));
 	fRange->SetValue(!allPages);
-	panel->AddChild(fRange);
 
-	x += w + kMargin;
-
-	// add a "from" field
-	if (allPages) {
-		buffer[0] = 0;
-	} else {
-		sprintf(buffer, "%d", (int)firstPage);
-	}
-	fFrom = new BTextControl(BRect(x, y, x+100, y+20), "from_field", kFromLabel, buffer,
-							new BMessage(RANGE_FROM_MSG));
+	fFrom = new BTextControl("from", "From:", "SomeSpaceHere", NULL);
 	fFrom->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fFrom->SetDivider(be_plain_font->StringWidth(kFromLabelExtraSpace));
-	fFrom->ResizeToPreferred();
-	fFrom->GetPreferredSize(&w, &h);
-	panel->AddChild(fFrom);
+	fFrom->SetEnabled(!allPages);
 
-	x += w + kMargin;
-
-	// add a "to" field
-	if (allPages) {
-		buffer[0] = 0;
-	} else {
-		sprintf(buffer, "%d", (int)lastPage);
-	}
-	fTo = new BTextControl(BRect(x, y, x+100, y+20), "to_field", kToLabel, buffer,
-							new BMessage(RANGE_TO_MSG));
+	fTo = new BTextControl("to", "To:", "", NULL);
 	fTo->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fTo->SetDivider(be_plain_font->StringWidth(kToLabelExtraSpace));
-	fTo->ResizeToPreferred();
-	fTo->GetPreferredSize(&w, &h);
-	panel->AddChild(fTo);
+	fTo->SetEnabled(!allPages);
 
-	y += h + kMargin + kMargin;	// "new line"
-	x = r.left + kMargin;
+	BString buffer;
+	buffer << firstPage;
+	fFrom->SetText(buffer.String());
 
-	// add a separator line...
-	line = new BBox(BRect(r.left, y - 1, r.right, y), NULL,
-						 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
-	panel->AddChild(line);
+	buffer = "";
+	buffer << lastPage;
+	fTo->SetText(buffer.String());
 
-	y += 2 + kMargin + kMargin;	// "new line"
+	for (uint32 i = 0; i < '0'; i++) {
+		fTo->TextView()->DisallowChar(i);
+		fFrom->TextView()->DisallowChar(i);
+	}
 
-	// add a "OK" button, and make it default
-	ok 	= new BButton(BRect(x, y, x+100, y+20), NULL, "OK", new BMessage(OK_MSG), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
+	for (uint32 i = '9' + 1; i < 255; i++) {
+		fTo->TextView()->DisallowChar(i);
+		fFrom->TextView()->DisallowChar(i);
+	}
+
+	BBox *separator = new BBox("separator");
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
+
+	BButton *documentInfo = new BButton("documentInfo",
+		"Document"  B_UTF8_ELLIPSIS,
+		new BMessage(DOC_INFO_MSG));
+
+	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL_MSG));
+
+	BButton *ok = new BButton("ok", "OK", new BMessage(OK_MSG));
 	ok->MakeDefault(true);
-	ok->ResizeToPreferred();
-	ok->GetPreferredSize(&w, &h);
-	x = r.right - w - kMargin;
-	ok->MoveTo(x, ok->Frame().top);	// put the ok bottom at bottom right corner
-	panel->AddChild(ok);
 
-	// add a "Cancel" button
-	cancel 	= new BButton(BRect(x, y, x + 100, y + 20), NULL, "Cancel", new BMessage(CANCEL_MSG), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	cancel->ResizeToPreferred();
-	cancel->GetPreferredSize(&w, &h);
-	cancel->MoveTo(x - w - kMargin, y);	// put cancel button left next the ok button
-	panel->AddChild(cancel);
+	BGridView* settings = new BGridView();
+	BGridLayout* settingsLayout = settings->GridLayout();
+	settingsLayout->AddItem(fFrom->CreateLabelLayoutItem(), 0, 0);
+	settingsLayout->AddItem(fFrom->CreateTextViewLayoutItem(), 1, 0);
+	settingsLayout->AddItem(fTo->CreateLabelLayoutItem(), 0, 1);
+	settingsLayout->AddItem(fTo->CreateTextViewLayoutItem(), 1, 1);
+	settingsLayout->SetSpacing(0, 0);
 
-	// add a "DocInfo" button
-	BButton *button = new BButton(r, NULL, "Doc Info", new BMessage(DOC_INFO_MSG),
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(8, y);
-	panel->AddChild(button);
-
-	// Finally, add our panel to window
-	AddChild(panel);
-
-	// Auto resize window
-	ResizeTo(ok->Frame().right + kMargin, ok->Frame().bottom + kMargin);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(fAll)
+		.Add(fRange)
+		.Add(settings)
+		.AddGlue()
+		.Add(separator)
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.Add(documentInfo)
+			.AddGlue()
+			.Add(cancel)
+			.Add(ok)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 }
 
 
 // --------------------------------------------------
 void
-JobSetupWindow::UpdateJobMessage()
+JobSetupWindow::UpdateJobMessage() 
 {
 	int32 copies = 1;
 
@@ -290,14 +210,19 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			fResult = B_OK;
 			release_sem(fExitSem);
 			break;
-
+		
 		case CANCEL_MSG:
 			release_sem(fExitSem);
 			break;
 
-		case RANGE_FROM_MSG:
-		case RANGE_TO_MSG:
-			fRange->SetValue(B_CONTROL_ON);
+		case ALL_PAGES_MGS:
+			fTo->SetEnabled(false);
+			fFrom->SetEnabled(false);
+			break;
+
+		case RANGE_SELECTION_MSG:
+			fTo->SetEnabled(true);
+			fFrom->SetEnabled(true);
 			break;
 
 		case DOC_INFO_MSG:
@@ -309,7 +234,7 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			break;
 	}
 }
-
+			
 
 // --------------------------------------------------
 status_t

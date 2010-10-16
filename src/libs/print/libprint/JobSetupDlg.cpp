@@ -17,6 +17,9 @@
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <Looper.h>
 #include <MessageFilter.h>
 #include <MenuField.h>
@@ -44,292 +47,10 @@
 
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
-#else 
+#else
 #define std
 #endif
 
-//#define	PRINT_COPIES		100
-
-#define QUALITY_H			10
-#define QUALITY_V			10
-#define QUALITY_WIDTH		180
-
-	#define BPP_H			10
-	#define BPP_V			15
-	#define BPP_WIDTH		120
-	#define BPP_HEIGHT		16
-
-	#define DITHER_H        BPP_H
-	#define DITHER_V        BPP_V + BPP_HEIGHT + 10
-	#define DITHER_WIDTH    BPP_WIDTH
-	#define DITHER_HEIGHT   BPP_HEIGHT
-
-	#define GAMMA_H			BPP_H
-	#define GAMMA_V			DITHER_V + DITHER_HEIGHT + 10
-	#define GAMMA_WIDTH		QUALITY_WIDTH - 20
-	#define GAMMA_HEIGHT	55 // BPP_HEIGHT
-	
-	#define INK_DENSITY_H           BPP_H
-	#define INK_DENSITY_V           GAMMA_V + GAMMA_HEIGHT + 5
-	#define INK_DENSITY_WIDTH       GAMMA_WIDTH
-	#define INK_DENSITY_HEIGHT      55 // BPP_HEIGHT
-	
-	#define HALFTONE_H      INK_DENSITY_H
-	#define HALFTONE_V      INK_DENSITY_V + INK_DENSITY_HEIGHT + 5
-	#define HALFTONE_WIDTH  160
-	#define HALFTONE_HEIGHT 4*11 
-	
-#define QUALITY_HEIGHT		HALFTONE_V + HALFTONE_HEIGHT + 5
-
-#define PAGERABGE_H			QUALITY_H
-#define PAGERABGE_V			QUALITY_V + QUALITY_HEIGHT + 5
-#define PAGERABGE_WIDTH		QUALITY_WIDTH
-#define PAGERABGE_HEIGHT	70
-
-	#define ALL_H				 10
-	#define ALL_V				 20
-	#define ALL_WIDTH			 36
-	#define ALL_HEIGHT			 16
-
-	#define SELECTION_H			ALL_H
-	#define SELECTION_V			ALL_V + ALL_HEIGHT + 4
-	#define SELECTION_WIDTH		16
-	#define SELECTION_HEIGHT	16
-
-	#define FROM_H				(SELECTION_H + SELECTION_WIDTH + 1)
-	#define FROM_V				ALL_V + 19
-	#define FROM_WIDTH			73
-	#define FROM_HEIGHT			16
-
-	#define TO_H				(FROM_H + FROM_WIDTH + 7)
-	#define TO_V				FROM_V
-	#define TO_WIDTH			59
-	#define TO_HEIGHT			FROM_HEIGHT
-
-#define	PRINT_WIDTH			365
-#define PRINT_HEIGHT		QUALITY_HEIGHT + PAGERABGE_HEIGHT + 60
-
-#define PAPERFEED_H			QUALITY_H + QUALITY_WIDTH + 10
-#define PAPERFEED_V			QUALITY_V + 5
-#define PAPERFEED_WIDTH		160
-#define PAPERFEED_HEIGHT	16
-
-#define NUP_H			 	PAPERFEED_H
-#define NUP_V			 	PAPERFEED_V + PAPERFEED_HEIGHT + 7
-#define NUP_WIDTH		 	PAPERFEED_WIDTH
-#define NUP_HEIGHT		 	16
-#define	MENU_HEIGHT			16
-
-#define COPIES_H			PAPERFEED_H
-#define COPIES_V			NUP_V + NUP_HEIGHT + 10
-#define COPIES_WIDTH		140
-#define COPIES_HEIGHT		16
-
-#define DUPLEX_H			PAPERFEED_H
-#define DUPLEX_V			COPIES_V + COPIES_HEIGHT + 7
-#define DUPLEX_WIDTH		PAPERFEED_WIDTH
-#define DUPLEX_HEIGHT		16
-
-#define COLLATE_H			PAPERFEED_H
-#define COLLATE_V			DUPLEX_V + DUPLEX_HEIGHT + 5
-#define COLLATE_WIDTH		PAPERFEED_WIDTH
-#define COLLATE_HEIGHT		16
-
-#define REVERSE_H			PAPERFEED_H
-#define REVERSE_V			COLLATE_V + COLLATE_HEIGHT + 5
-#define REVERSE_WIDTH		PAPERFEED_WIDTH
-#define REVERSE_HEIGHT		16
-
-#define PAGES_H				PAPERFEED_H
-#define PAGES_V				REVERSE_V + REVERSE_HEIGHT + 5
-#define PAGES_WIDTH			PAPERFEED_WIDTH
-#define PAGES_HEIGHT		40
-
-#define PAGE_SELECTION_H      PAPERFEED_H
-#define PAGE_SELECTION_V      PAGES_V + PAGES_HEIGHT + 5
-#define PAGE_SELECTION_WIDTH  PAPERFEED_WIDTH
-#define PAGE_SELECTION_HEIGHT 3 * 16 + 30
-
-	#define PS_ALL_PAGES_H       10
-	#define PS_ALL_PAGES_V       20
-	#define PS_ALL_PAGES_WIDTH   PAGE_SELECTION_WIDTH - 20
-	#define PS_ALL_PAGES_HEIGHT  16
-
-	#define PS_ODD_PAGES_H       PS_ALL_PAGES_H
-	#define PS_ODD_PAGES_V       PS_ALL_PAGES_V + PS_ALL_PAGES_HEIGHT
-	#define PS_ODD_PAGES_WIDTH   PS_ALL_PAGES_WIDTH
-	#define PS_ODD_PAGES_HEIGHT  PS_ALL_PAGES_HEIGHT
-
-	#define PS_EVEN_PAGES_H       PS_ALL_PAGES_H
-	#define PS_EVEN_PAGES_V       PS_ODD_PAGES_V + PS_ODD_PAGES_HEIGHT
-	#define PS_EVEN_PAGES_WIDTH   PS_ALL_PAGES_WIDTH
-	#define PS_EVEN_PAGES_HEIGHT  PS_ALL_PAGES_HEIGHT
-
-#define PRINT_BUTTON_WIDTH	70
-#define PRINT_BUTTON_HEIGHT	20
-
-#define PRINT_LINE_V			(PRINT_HEIGHT - PRINT_BUTTON_HEIGHT - 23)
-
-#define PRINT_OK_BUTTON_H		(PRINT_WIDTH - PRINT_BUTTON_WIDTH - 10)
-#define PRINT_OK_BUTTON_V		(PRINT_HEIGHT - PRINT_BUTTON_HEIGHT - 11)
-
-#define PREVIEW_H				(PRINT_OK_BUTTON_H - PRINT_BUTTON_WIDTH - 12)
-#define PREVIEW_V				(PRINT_OK_BUTTON_V)
-
-#define PRINT_CANCEL_BUTTON_H		(PREVIEW_H	 - PRINT_BUTTON_WIDTH - 12)
-#define PRINT_CANCEL_BUTTON_V	PRINT_OK_BUTTON_V
-
-const BRect quality_rect(
-	QUALITY_H,
-	QUALITY_V,
-	QUALITY_H + QUALITY_WIDTH,
-	QUALITY_V + QUALITY_HEIGHT);
-
-BRect bpp_rect(
-	BPP_H,
-	BPP_V,
-	BPP_H + BPP_WIDTH,
-	BPP_V + BPP_HEIGHT);
-
-BRect dither_rect(
-	DITHER_H,
-	DITHER_V,
-	DITHER_H + DITHER_WIDTH,
-	DITHER_V + DITHER_HEIGHT);
-
-const BRect ink_density_rect(
-	INK_DENSITY_H,
-	INK_DENSITY_V,
-	INK_DENSITY_H + INK_DENSITY_WIDTH,
-	INK_DENSITY_V + INK_DENSITY_HEIGHT);
-
-const BRect halftone_rect(
-	HALFTONE_H,
-	HALFTONE_V,
-	HALFTONE_H + HALFTONE_WIDTH,
-	HALFTONE_V + HALFTONE_HEIGHT);
-
-const BRect gamma_rect(
-	GAMMA_H,
-	GAMMA_V,
-	GAMMA_H + GAMMA_WIDTH,
-	GAMMA_V + GAMMA_HEIGHT);
-
-const BRect pagerange_rect(
-	PAGERABGE_H,
-	PAGERABGE_V,
-	PAGERABGE_H + PAGERABGE_WIDTH,
-	PAGERABGE_V + PAGERABGE_HEIGHT);
-
-const BRect all_button_rect(
-	ALL_H,
-	ALL_V,
-	ALL_H + ALL_WIDTH,
-	ALL_V + ALL_HEIGHT);
-
-const BRect selection_rect(
-	SELECTION_H,
-	SELECTION_V,
-	SELECTION_H + SELECTION_WIDTH,
-	SELECTION_V + SELECTION_HEIGHT);
-
-const BRect from_rect(
-	FROM_H,
-	FROM_V,
-	FROM_H + FROM_WIDTH,
-	FROM_V + FROM_HEIGHT);
-
-const BRect to_rect(
-	TO_H,
-	TO_V,
-	TO_H + TO_WIDTH,
-	TO_V + TO_HEIGHT);
-
-const BRect paperfeed_rect(
-	PAPERFEED_H,
-	PAPERFEED_V,
-	PAPERFEED_H + PAPERFEED_WIDTH,
-	PAPERFEED_V + PAPERFEED_HEIGHT);
-
-BRect nup_rect(
-	NUP_H,
-	NUP_V,
-	NUP_H + NUP_WIDTH,
-	NUP_V + NUP_HEIGHT);
-
-const BRect copies_rect(
-	COPIES_H,
-	COPIES_V,
-	COPIES_H + COPIES_WIDTH,
-	COPIES_V + COPIES_HEIGHT);
-
-const BRect duplex_rect(
-	DUPLEX_H,
-	DUPLEX_V,
-	DUPLEX_H + DUPLEX_WIDTH,
-	DUPLEX_V + DUPLEX_HEIGHT);
-
-const BRect collate_rect(
-	COLLATE_H,
-	COLLATE_V,
-	COLLATE_H + COLLATE_WIDTH,
-	COLLATE_V + COLLATE_HEIGHT);
-
-const BRect reverse_rect(
-	REVERSE_H,
-	REVERSE_V,
-	REVERSE_H + REVERSE_WIDTH,
-	REVERSE_V + REVERSE_HEIGHT);
-
-const BRect pages_rect(
-	PAGES_H,
-	PAGES_V,
-	PAGES_H + PAGES_WIDTH,
-	PAGES_V + PAGES_HEIGHT);
-
-const BRect page_selection_rect(
-	PAGE_SELECTION_H,
-	PAGE_SELECTION_V,
-	PAGE_SELECTION_H + PAGE_SELECTION_WIDTH,
-	PAGE_SELECTION_V + PAGE_SELECTION_HEIGHT);
-
-const BRect page_selection_all_pages_rect(
-	PS_ALL_PAGES_H,
-	PS_ALL_PAGES_V,
-	PS_ALL_PAGES_H + PS_ALL_PAGES_WIDTH,
-	PS_ALL_PAGES_V + PS_ALL_PAGES_HEIGHT);
-
-const BRect page_selection_odd_pages_rect(
-	PS_ODD_PAGES_H,
-	PS_ODD_PAGES_V,
-	PS_ODD_PAGES_H + PS_ODD_PAGES_WIDTH,
-	PS_ODD_PAGES_V + PS_ODD_PAGES_HEIGHT);
-
-const BRect page_selection_even_pages_rect(
-	PS_EVEN_PAGES_H,
-	PS_EVEN_PAGES_V,
-	PS_EVEN_PAGES_H + PS_EVEN_PAGES_WIDTH,
-	PS_EVEN_PAGES_V + PS_EVEN_PAGES_HEIGHT);
-
-const BRect ok_rect(
-	PRINT_OK_BUTTON_H,
-	PRINT_OK_BUTTON_V,
-	PRINT_OK_BUTTON_H + PRINT_BUTTON_WIDTH,
-	PRINT_OK_BUTTON_V + PRINT_BUTTON_HEIGHT);
-
-const BRect cancel_rect(
-	PRINT_CANCEL_BUTTON_H,
-	PRINT_CANCEL_BUTTON_V,
-	PRINT_CANCEL_BUTTON_H + PRINT_BUTTON_WIDTH,
-	PRINT_CANCEL_BUTTON_V + PRINT_BUTTON_HEIGHT);
-
-const BRect preview_rect(
-	PREVIEW_H,
-	PREVIEW_V,
-	PREVIEW_H + PRINT_BUTTON_WIDTH,
-	PREVIEW_V + PRINT_BUTTON_HEIGHT);
-
-	
 
 struct SurfaceCap : public BaseCap {
 	color_space surface_type;
@@ -404,21 +125,24 @@ enum {
 	kMsgDuplexChanged,
 };
 
-JobSetupView::JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), fJobData(job_data), fPrinterData(printer_data), fPrinterCap(printer_cap)
+JobSetupView::JobSetupView(JobData *job_data, PrinterData *printer_data,
+	const PrinterCap *printer_cap)
+	: BView("jobSetup", B_WILL_DRAW)
+	, fJobData(job_data)
+	, fPrinterData(printer_data)
+	, fPrinterCap(printer_cap)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 BRadioButton* 
-JobSetupView::AddPageSelectionItem(BView* parent, BRect rect, const char* name, const char* label, 
+JobSetupView::CreatePageSelectionItem(const char* name, const char* label,
 	JobData::PageSelection pageSelection)
 {
-	BRadioButton* button = new BRadioButton(rect, name, label, NULL);
+	BRadioButton* button = new BRadioButton(name, label, NULL);
 	if (fJobData->getPageSelection() == pageSelection) {
 		button->SetValue(B_CONTROL_ON);
 	}
-	parent->AddChild(button);
 	return button;
 }
 
@@ -438,54 +162,22 @@ JobSetupView::AllowOnlyDigits(BTextView* textView, int maxDigits)
 void 
 JobSetupView::AttachedToWindow()
 {
-	BBox *box;
-	BMenuItem  *item = NULL;
-	BMenuField *menufield;
-	BButton *button;
-	float width;
-	bool marked;
-	int  count;
+	// quality
+	BBox* qualityBox = new BBox("quality");
+	qualityBox->SetLabel("Quality");
 
-	/* quality */
-
-	box = new BBox(quality_rect);
-	AddChild(box);
-	box->SetLabel("Quality");
-
-/*
-	// always B_RGB32
-	fSurfaceType = new BPopUpMenu("");
-	fSurfaceType->SetRadioMode(true);
-
-	count = sizeof(gSurfaces) / sizeof(gSurfaces[0]);
-	const SurfaceCap **surface_cap = gSurfaces;
-	uint32 support_flags;
-	while (count--) {
-		if (bitmaps_support_space((*surface_cap)->surface_type, &support_flags)) {
-			item = new BMenuItem((*surface_cap)->label.c_str(), NULL);
-			fSurfaceType->AddItem(item);
-			if ((*surface_cap)->surface_type == fJobData->getSurfaceType()) {
-				item->SetMarked(true);
-				marked = true;
-			}
-		}
-		surface_cap++;
-	}
-	menufield = new BMenuField(bpp_rect, "", "Surface Type", fSurfaceType);
-	box->AddChild(menufield);
-	width = StringWidth("Color") + 10;
-	menufield->SetDivider(width);
-*/
-
-	/* color */
-	marked = false;
-	fColorType = new BPopUpMenu("");
+	// color
+	fColorType = new BPopUpMenu("color");
 	fColorType->SetRadioMode(true);
 
-	count = fPrinterCap->countCap(PrinterCap::kColor);
-	const ColorCap **color_cap = (const ColorCap **)fPrinterCap->enumCap(PrinterCap::kColor);
+	int count = fPrinterCap->countCap(PrinterCap::kColor);
+	const ColorCap **color_cap = (const ColorCap **)fPrinterCap->enumCap(
+		PrinterCap::kColor);
+	bool marked = false;
+	BMenuItem* item = NULL;
 	while (count--) {
-		item = new BMenuItem((*color_cap)->label.c_str(), new BMessage(kMsgQuality));
+		item = new BMenuItem((*color_cap)->label.c_str(),
+			new BMessage(kMsgQuality));
 		fColorType->AddItem(item);
 		if ((*color_cap)->color == fJobData->getColor()) {
 			item->SetMarked(true);
@@ -495,23 +187,21 @@ JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	bpp_rect.right = bpp_rect.left + StringWidth("Color:") + fColorType->MaxContentWidth() + 10;
-	menufield = new BMenuField(bpp_rect, "color", "Color:", fColorType);
 
-	box->AddChild(menufield);
-	width = StringWidth("Color:") + 10;
-	menufield->SetDivider(width);
+	BMenuField* colorMenuField = new BMenuField("color", "Color:", fColorType);
 	fColorType->SetTargetForItems(this);
 	
-	/* dither type */
-	marked = false;
+	// dither type
 	fDitherType = new BPopUpMenu("");
 	fDitherType->SetRadioMode(true);
 
 	count = sizeof(gDitherTypes) / sizeof(gDitherTypes[0]);
 	const DitherCap **dither_cap = gDitherTypes;
+	marked = false;
+	item = NULL;
 	while (count--) {
-		item = new BMenuItem((*dither_cap)->label.c_str(), new BMessage(kMsgQuality));
+		item = new BMenuItem((*dither_cap)->label.c_str(),
+			new BMessage(kMsgQuality));
 		fDitherType->AddItem(item);
 		if ((*dither_cap)->dither_type == fJobData->getDitherType()) {
 			item->SetMarked(true);
@@ -521,68 +211,60 @@ JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	dither_rect.right = dither_rect.left + StringWidth("Dot Pattern:") + fDitherType->MaxContentWidth() + 20;
-	menufield = new BMenuField(dither_rect, "dithering", "Dot Pattern:", fDitherType);
-
-	box->AddChild(menufield);
-	width = StringWidth("Dot Pattern:") + 10;
-	menufield->SetDivider(width);
+	BMenuField* ditherMenuField = new BMenuField("dithering", "Dot Pattern:",
+		fDitherType);
 	fDitherType->SetTargetForItems(this);
 	
-	/* halftone preview view */
-	BRect rect(halftone_rect);
-	BBox* halftoneBorder = new BBox(rect.InsetByCopy(-1, -1));
-	box->AddChild(halftoneBorder);
-	halftoneBorder->SetBorder(B_PLAIN_BORDER);
+	// halftone preview view
+	BBox* halftoneBox = new BBox("halftoneBox");
+	halftoneBox->SetBorder(B_PLAIN_BORDER);
+
+	// TODO make layout compatible
+	BSize size(240, 14 * 4);
+	BRect rect(0, 0, size.width, size.height);
+	fHalftone = new HalftoneView(rect, "halftone",
+		B_FOLLOW_ALL, B_WILL_DRAW);
+	fHalftone->SetExplicitMinSize(size);
+	fHalftone->SetExplicitMaxSize(size);
 	
-	fHalftone = new HalftoneView(rect.OffsetToCopy(1, 1), "halftone", B_FOLLOW_ALL, B_WILL_DRAW); 
-	halftoneBorder->AddChild(fHalftone);
-	fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(), fJobData->getDitherType(), fJobData->getColor() != JobData::kMonochrome);
-	
-	/* gamma */
-	fGamma = new JSDSlider(gamma_rect, "gamma", "Gamma", new BMessage(kMsgQuality), -300, 300, B_BLOCK_THUMB);
+	// gamma
+	fGamma = new JSDSlider("gamma", "Gamma", new BMessage(kMsgQuality),
+		-300, 300);
 	
 	fGamma->SetLimitLabels("Lighter", "Darker");
 	fGamma->SetValue((int32)(100 * log(fJobData->getGamma()) / log(2.0)));
 	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
 	fGamma->SetHashMarkCount(7);
-	box->AddChild(fGamma);
 	fGamma->SetModificationMessage(new BMessage(kMsgQuality));
 	fGamma->SetTarget(this);
 
-	/* ink density */
-	fInkDensity = new JSDSlider(ink_density_rect, "inkDensity", "Ink Usage", new BMessage(kMsgQuality), 0, 127, B_BLOCK_THUMB);
+	// ink density
+	fInkDensity = new JSDSlider("inkDensity", "Ink Usage",
+		new BMessage(kMsgQuality), 0, 127);
 	
 	fInkDensity->SetLimitLabels("Min", "Max");
 	fInkDensity->SetValue((int32)fJobData->getInkDensity());
 	fInkDensity->SetHashMarks(B_HASH_MARKS_BOTH);
 	fInkDensity->SetHashMarkCount(10);
-	box->AddChild(fInkDensity);
 	fInkDensity->SetModificationMessage(new BMessage(kMsgQuality));
 	fInkDensity->SetTarget(this);
 
-	/* page range */
+	// page range
 
-	box = new BBox(pagerange_rect);
-	AddChild(box);
-	box->SetLabel("Page Range");
+	BBox* pageRangeBox = new BBox("pageRange");
+	pageRangeBox->SetLabel("Page Range");
 
-	fAll = new BRadioButton(all_button_rect, "all", "All", new BMessage(kMsgRangeAll));
-	box->AddChild(fAll);
+	fAll = new BRadioButton("all", "Print all Pages", new BMessage(kMsgRangeAll));
 
-	BRadioButton *from = new BRadioButton(selection_rect, "selection", "", new BMessage(kMsgRangeSelection));
-	box->AddChild(from);
+	BRadioButton *range = new BRadioButton("selection", "Print selected Pages:",
+		new BMessage(kMsgRangeSelection));
 
-	fFromPage = new BTextControl(from_rect, "from", "From", "", NULL);
-	box->AddChild(fFromPage);
+	fFromPage = new BTextControl("from", "From:", "", NULL);
 	fFromPage->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fFromPage->SetDivider(StringWidth("From") + 7);
 	AllowOnlyDigits(fFromPage->TextView(), 6);
 
-	fToPage = new BTextControl(to_rect, "to", "To", "", NULL);
-	box->AddChild(fToPage);
+	fToPage = new BTextControl("to", "To:", "", NULL);
 	fToPage->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fToPage->SetDivider(StringWidth("To") + 7);
 	AllowOnlyDigits(fToPage->TextView(), 6);
 
 	int first_page = fJobData->getFirstPage();
@@ -591,7 +273,7 @@ JobSetupView::AttachedToWindow()
 	if (first_page <= 1 && last_page <= 0) {
 		fAll->SetValue(B_CONTROL_ON);
 	} else {
-		from->SetValue(B_CONTROL_ON);
+		range->SetValue(B_CONTROL_ON);
 		if (first_page < 1)
 			first_page = 1;
 		if (first_page > last_page)
@@ -607,15 +289,16 @@ JobSetupView::AttachedToWindow()
 	}
 
 	fAll->SetTarget(this);
-	from->SetTarget(this);
+	range->SetTarget(this);
 
-	/* paper source */
-
-	marked = false;
+	// paper source
 	fPaperFeed = new BPopUpMenu("");
 	fPaperFeed->SetRadioMode(true);
 	count = fPrinterCap->countCap(PrinterCap::kPaperSource);
-	const PaperSourceCap **paper_source_cap = (const PaperSourceCap **)fPrinterCap->enumCap(PrinterCap::kPaperSource);
+	const PaperSourceCap **paper_source_cap =
+		(const PaperSourceCap **)fPrinterCap->enumCap(PrinterCap::kPaperSource);
+	marked = false;
+	item = NULL;
 	while (count--) {
 		item = new BMenuItem((*paper_source_cap)->label.c_str(), NULL);
 		fPaperFeed->AddItem(item);
@@ -627,18 +310,16 @@ JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(paperfeed_rect, "paperSource", "Paper Source:", fPaperFeed);
-	AddChild(menufield);
-	width = StringWidth("Number of Copies:") + 7;
-	menufield->SetDivider(width);
+	BMenuField* paperSourceMenufield = new BMenuField("paperSource",
+		"Paper Source:", fPaperFeed);
 
-	/* Page Per Sheet */
-
-	marked = false;
+	// Pages per sheet
 	fNup = new BPopUpMenu("");
 	fNup->SetRadioMode(true);
 	count = sizeof(gNups) / sizeof(gNups[0]);
 	const NupCap **nup_cap = gNups;
+	marked = false;
+	item = NULL;
 	while (count--) {
 		item = new BMenuItem((*nup_cap)->label.c_str(), NULL);
 		fNup->AddItem(item);
@@ -650,15 +331,13 @@ JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(nup_rect, "pagePerSheet", "Pages Per Sheet:", fNup);
-	menufield->SetDivider(StringWidth("Number of Copies:") + 7);
-	AddChild(menufield);
+	BMenuField* pagesPerSheet = new BMenuField("pagesPerSheet",
+		"Pages Per Sheet:", fNup);
 
-	/* duplex */
-
+	// duplex
 	if (fPrinterCap->isSupport(PrinterCap::kPrintStyle)) {
-		fDuplex = new BCheckBox(duplex_rect, "duplex", "Duplex", new BMessage(kMsgDuplexChanged));
-		AddChild(fDuplex);
+		fDuplex = new BCheckBox("duplex", "Duplex",
+			new BMessage(kMsgDuplexChanged));
 		if (fJobData->getPrintStyle() != JobData::kSimplex) {
 			fDuplex->SetValue(B_CONTROL_ON);
 		}
@@ -667,73 +346,157 @@ JobSetupView::AttachedToWindow()
 		fDuplex = NULL;
 	}
 
-	/* copies */
-
-	fCopies = new BTextControl(copies_rect, "copies", "Number of Copies:", "", NULL);
-	AddChild(fCopies);
-	fCopies->SetDivider(width);
+	// copies
+	fCopies = new BTextControl("copies", "Number of Copies:", "", NULL);
 	AllowOnlyDigits(fCopies->TextView(), 3);
 
-	BString oss4;
-	oss4 << fJobData->getCopies();
-	fCopies->SetText(oss4.String());
+	BString copies;
+	copies << fJobData->getCopies();
+	fCopies->SetText(copies.String());
 
-	/* collate */
-
-	fCollate = new BCheckBox(collate_rect, "collate", "Collate", new BMessage(kMsgCollateChanged));
-	fCollate->ResizeToPreferred();
-	AddChild(fCollate);
+	// collate
+	fCollate = new BCheckBox("collate", "Collate",
+		new BMessage(kMsgCollateChanged));
 	if (fJobData->getCollate()) {
 		fCollate->SetValue(B_CONTROL_ON);
 	}
 	fCollate->SetTarget(this);
 
-	/* reverse */
-
-	fReverse = new BCheckBox(reverse_rect, "reverse", "Reverse Order", new BMessage(kMsgReverseChanged));
-	fReverse->ResizeToPreferred();
-	AddChild(fReverse);
+	// reverse
+	fReverse = new BCheckBox("reverse", "Reverse Order",
+		new BMessage(kMsgReverseChanged));
 	if (fJobData->getReverse()) {
 		fReverse->SetValue(B_CONTROL_ON);
 	}
 	fReverse->SetTarget(this);
 
-	/* pages view */
-
-	fPages = new PagesView(pages_rect, "pages", B_FOLLOW_ALL, B_WILL_DRAW);
-	AddChild(fPages);
+	// pages view
+	// TODO make layout API compatible
+	fPages = new PagesView(BRect(0, 0, 150, 40), "pages", B_FOLLOW_ALL,
+		B_WILL_DRAW);
 	fPages->setCollate(fJobData->getCollate());
 	fPages->setReverse(fJobData->getReverse());
+	fPages->SetExplicitMinSize(BSize(150, 40));
+	fPages->SetExplicitMaxSize(BSize(150, 40));
 	
-	/* page selection */
-	BBox* pageSelectionBox = new BBox(page_selection_rect);
-	AddChild(pageSelectionBox);
+	// page selection
+	BBox* pageSelectionBox = new BBox("pageSelection");
 	pageSelectionBox->SetLabel("Page Selection");
 	
-	fAllPages = AddPageSelectionItem(pageSelectionBox, page_selection_all_pages_rect, "allPages", "All Pages", JobData::kAllPages);
-	fOddNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_odd_pages_rect, "oddPages", "Odd-Numbered Pages", JobData::kOddNumberedPages);
-	fEvenNumberedPages = AddPageSelectionItem(pageSelectionBox, page_selection_even_pages_rect, "evenPages", "Even-Numbered Pages", JobData::kEvenNumberedPages);
+	fAllPages = CreatePageSelectionItem("allPages", "All Pages",
+		JobData::kAllPages);
+	fOddNumberedPages = CreatePageSelectionItem("oddPages",
+		"Odd-Numbered Pages", JobData::kOddNumberedPages);
+	fEvenNumberedPages = CreatePageSelectionItem("evenPages",
+		"Even-Numbered Pages", JobData::kEvenNumberedPages);
 
+	// separator line
+	BBox *separator = new BBox("separator");
+	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
-
-	/* preview */
+	// buttons
+	BButton* preview = new BButton("preview", "Preview" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgPreview));
+	BButton* cancel = new BButton("cancel", "Cancel",
+		new BMessage(kMsgCancel));
+	BButton* ok = new BButton("ok", "OK", new BMessage(kMsgOK));
+	ok->MakeDefault(true);
 	
-	button = new BButton(preview_rect, "preview", "Preview" B_UTF8_ELLIPSIS, new BMessage(kMsgPreview));
-	AddChild(button);
+	BGroupView* halftoneGroup = new BGroupView(B_VERTICAL, 0);
+	BGroupLayout* halftoneLayout = halftoneGroup->GroupLayout();
+	halftoneLayout->AddView(fHalftone);
+	halftoneBox->AddChild(halftoneGroup);
 
-	
-	/* cancel */
+	BGridView* qualityGrid = new BGridView();
+	BGridLayout* qualityGridLayout = qualityGrid->GridLayout();
+	qualityGridLayout->AddItem(colorMenuField->CreateLabelLayoutItem(), 0, 0);
+	qualityGridLayout->AddItem(colorMenuField->CreateMenuBarLayoutItem(), 1, 0);
+	qualityGridLayout->AddItem(ditherMenuField->CreateLabelLayoutItem(), 0, 1);
+	qualityGridLayout->AddItem(ditherMenuField->CreateMenuBarLayoutItem(), 1,
+		1);
+	qualityGridLayout->AddView(fGamma, 0, 2, 2);
+	qualityGridLayout->AddView(fInkDensity, 0, 3, 2);
+	qualityGridLayout->AddView(halftoneBox, 0, 4, 2);
+	qualityGridLayout->SetSpacing(0, 0);
+	qualityGridLayout->SetInsets(5, 5, 5, 5);
+	qualityBox->AddChild(qualityGrid);
 
-	button = new BButton(cancel_rect, "cancel", "Cancel", new BMessage(kMsgCancel));
-	AddChild(button);
+	BGridView* pageRangeGrid = new BGridView();
+	BGridLayout* pageRangeLayout = pageRangeGrid->GridLayout();
+	pageRangeLayout->AddItem(fFromPage->CreateLabelLayoutItem(), 0, 0);
+	pageRangeLayout->AddItem(fFromPage->CreateTextViewLayoutItem(), 1, 0);
+	pageRangeLayout->AddItem(fToPage->CreateLabelLayoutItem(), 0, 1);
+	pageRangeLayout->AddItem(fToPage->CreateTextViewLayoutItem(), 1, 1);
+	pageRangeLayout->SetInsets(0, 0, 0, 0);
+	pageRangeLayout->SetSpacing(0, 0);
 
-	/* ok */
+	BGroupView* pageRangeGroup = new BGroupView(B_VERTICAL, 0);
+	BGroupLayout* pageRangeGroupLayout = pageRangeGroup->GroupLayout();
+	pageRangeGroupLayout->AddView(fAll);
+	pageRangeGroupLayout->AddView(range);
+	pageRangeGroupLayout->AddView(pageRangeGrid);
+	pageRangeGroupLayout->SetInsets(5, 5, 5, 5);
+	pageRangeBox->AddChild(pageRangeGroup);
 
-	// TODO OK or "Print"?
-	button = new BButton(ok_rect, "ok", "OK", new BMessage(kMsgOK));
-	AddChild(button);
-	button->MakeDefault(true);
-	
+	BGridView* settings = new BGridView();
+	BGridLayout* settingsLayout = settings->GridLayout();
+	settingsLayout->AddItem(paperSourceMenufield->CreateLabelLayoutItem(), 0,
+		0);
+	settingsLayout->AddItem(paperSourceMenufield->CreateMenuBarLayoutItem(), 1,
+		0);
+	settingsLayout->AddItem(pagesPerSheet->CreateLabelLayoutItem(), 0, 1);
+	settingsLayout->AddItem(pagesPerSheet->CreateMenuBarLayoutItem(), 1, 1);
+	int row = 2;
+	if (fDuplex != NULL) {
+		settingsLayout->AddView(fDuplex, 0, row, 2);
+		row ++;
+	}
+	settingsLayout->AddItem(fCopies->CreateLabelLayoutItem(), 0, row);
+	settingsLayout->AddItem(fCopies->CreateTextViewLayoutItem(), 1, row);
+	settingsLayout->SetSpacing(0, 0);
+
+
+	BGroupView* pageSelectionGroup = new BGroupView(B_VERTICAL, 0);
+	BGroupLayout* groupLayout = pageSelectionGroup->GroupLayout();
+	groupLayout->AddView(fAllPages);
+	groupLayout->AddView(fOddNumberedPages);
+	groupLayout->AddView(fEvenNumberedPages);
+	groupLayout->SetInsets(5, 5, 5, 5);
+	pageSelectionBox->AddChild(pageSelectionGroup);
+
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.AddGroup(B_VERTICAL, 10, 1.0f)
+				.Add(qualityBox)
+				.Add(pageRangeBox)
+				.AddGlue()
+			.End()
+			.AddGroup(B_VERTICAL, 0, 1.0f)
+				.Add(settings)
+				.AddStrut(5)
+				.Add(fCollate)
+				.Add(fReverse)
+				.Add(fPages)
+				.AddStrut(5)
+				.Add(pageSelectionBox)
+				.AddGlue()
+			.End()
+		.End()
+		.AddGlue()
+		.Add(separator)
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.AddGlue()
+			.Add(cancel)
+			.Add(preview)
+			.Add(ok)
+		.End()
+		.SetInsets(0, 0, 0, 0)
+	);
+
+	fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(),
+		fJobData->getDitherType(), fJobData->getColor() != JobData::kMonochrome);
+
 	UpdateButtonEnabledState();
 }
 
@@ -900,16 +663,22 @@ JobSetupView::UpdateJobData(bool showPreview)
 
 //====================================================================
 
-JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: DialogWindow(BRect(100, 100, 100 + PRINT_WIDTH, 100 + PRINT_HEIGHT),
+JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data,
+	const PrinterCap *printer_cap)
+	: DialogWindow(BRect(100, 100, 200, 200),
 		"PrintJob Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
+			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetResult(B_ERROR);
-	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	
-	fJobSetup = new JobSetupView(Bounds(), job_data, printer_data, printer_cap);
-	AddChild(fJobSetup);
+	fJobSetup = new JobSetupView(job_data, printer_data, printer_cap);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(fJobSetup)
+		.SetInsets(10, 10, 10, 10)
+	);
 }
 
 void 

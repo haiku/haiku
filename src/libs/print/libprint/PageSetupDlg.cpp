@@ -15,6 +15,9 @@
 #include <Box.h>
 #include <Button.h>
 #include <Font.h>
+#include <GridView.h>
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <Looper.h>
 #include <MessageFilter.h>
 #include <MenuField.h>
@@ -46,97 +49,6 @@ using namespace std;
 #define std
 #endif
 
-#define	MENU_HEIGHT			16
-#define MENU_WIDTH          200
-#define BUTTON_WIDTH		70
-#define BUTTON_HEIGHT		20
-#define TEXT_HEIGHT         16
-
-#define MARGIN_H            10
-#define MARGIN_V            10
-#define MARGIN_WIDTH        180
-#define MARGIN_HEIGHT       140
-
-#define	PAGESETUP_WIDTH		MARGIN_H + MARGIN_WIDTH + 15 + MENU_WIDTH + 10
-#define PAGESETUP_HEIGHT	MARGIN_V + MARGIN_HEIGHT + BUTTON_HEIGHT + 20
-
-#define PAPER_H				MARGIN_H + MARGIN_WIDTH + 15
-#define PAPER_V				10
-#define PAPER_WIDTH			MENU_WIDTH
-#define PAPER_HEIGHT		MENU_HEIGHT
-#define PAPER_TEXT			"Paper Size:"
-
-#define ORIENT_H			PAPER_H
-#define ORIENT_V			PAPER_V + 24
-#define ORIENT_WIDTH		MENU_WIDTH
-#define ORIENT_HEIGHT		MENU_HEIGHT
-#define ORIENTATION_TEXT    "Orientation:"
-#define PORTRAIT_TEXT		"Portrait"
-#define LANDSCAPE_TEXT		"Landscape"
-
-#define RES_H				PAPER_H
-#define RES_V				ORIENT_V + 24
-#define RES_WIDTH			MENU_WIDTH
-#define RES_HEIGHT			MENU_HEIGHT
-#define RES_TEXT			"Resolution:"
-
-#define SCALE_H				PAPER_H
-#define SCALE_V				RES_V + 24
-#define SCALE_WIDTH			100
-#define SCALE_HEIGHT		TEXT_HEIGHT
-#define SCALE_TEXT			"Scale [%]:"
-
-#define OK_H				(PAGESETUP_WIDTH  - BUTTON_WIDTH  - 11)
-#define OK_V				(PAGESETUP_HEIGHT - BUTTON_HEIGHT - 11)
-#define OK_TEXT				"OK"
-
-#define CANCEL_H			(OK_H - BUTTON_WIDTH - 12)
-#define CANCEL_V			OK_V
-#define CANCEL_TEXT			"Cancel"
-
-#define PRINT_LINE_V		(PAGESETUP_HEIGHT - BUTTON_HEIGHT - 23)
-
-const BRect MARGIN_RECT(
-	MARGIN_H,
-	MARGIN_V,
-	MARGIN_H + MARGIN_WIDTH,
-	MARGIN_V + MARGIN_HEIGHT);
-
-const BRect ORIENTATION_RECT(
-	ORIENT_H,
-	ORIENT_V,
-	ORIENT_H + ORIENT_WIDTH,
-	ORIENT_V + ORIENT_HEIGHT);
-
-const BRect PAPER_RECT(
-	PAPER_H,
-	PAPER_V,
-	PAPER_H + PAPER_WIDTH,
-	PAPER_V + PAPER_HEIGHT);
-
-const BRect RESOLUTION_RECT(
-	RES_H,
-	RES_V,
-	RES_H + RES_WIDTH,
-	RES_V + RES_HEIGHT);
-
-const BRect SCALE_RECT(
-	SCALE_H,
-	SCALE_V,
-	SCALE_H + SCALE_WIDTH,
-	SCALE_V + SCALE_HEIGHT);
-
-const BRect OK_RECT(
-	OK_H,
-	OK_V,
-	OK_H + BUTTON_WIDTH,
-	OK_V + BUTTON_HEIGHT);
-
-const BRect CANCEL_RECT(
-	CANCEL_H,
-	CANCEL_V,
-	CANCEL_H + BUTTON_WIDTH,
-	CANCEL_V + BUTTON_HEIGHT);
 
 enum MSGS {
 	kMsgCancel = 1,
@@ -145,8 +57,12 @@ enum MSGS {
 	kMsgPaperChanged,
 };
 
-PageSetupView::PageSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), fJobData(job_data), fPrinterData(printer_data), fPrinterCap(printer_cap)
+PageSetupView::PageSetupView(JobData *job_data, PrinterData *printer_data,
+	const PrinterCap *printer_cap)
+	: BView("pageSetupView", B_WILL_DRAW)
+	, fJobData(job_data)
+	, fPrinterData(printer_data)
+	, fPrinterCap(printer_cap)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -175,12 +91,10 @@ void
 PageSetupView::AttachedToWindow()
 {
 	BMenuItem  *item = NULL;
-	BMenuField *menuField;
-	BButton    *button;
 	bool       marked;
 	int        count;
 
-	/* margin */
+	// margin
 	MarginUnit units = fJobData->getMarginUnit();
 	BRect paper = fJobData->getPaperRect();
 	BRect margin = fJobData->getPrintableRect();
@@ -191,16 +105,14 @@ PageSetupView::AttachedToWindow()
 	margin.right = paper.right - margin.right;
 	margin.bottom = paper.bottom - margin.bottom;
 
-	fMarginView = new MarginView(MARGIN_RECT,
+	fMarginView = new MarginView(
 		paper.IntegerWidth(),
 		paper.IntegerHeight(),
 			margin, units);
-	AddChild(fMarginView);
 
-	/* paper selection */
-
+	// paper selection
 	marked = false;
-	fPaper = new BPopUpMenu("");
+	fPaper = new BPopUpMenu("paperSize");
 	fPaper->SetRadioMode(true);
 	count = fPrinterCap->countCap(PrinterCap::kPaper);
 	PaperCap **paper_cap = (PaperCap **)fPrinterCap->enumCap(PrinterCap::kPaper);
@@ -218,22 +130,18 @@ PageSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menuField = new BMenuField(PAPER_RECT, "", PAPER_TEXT, fPaper);
-	AddChild(menuField);
-	float width = StringWidth(PAPER_TEXT) + 7;
-	menuField->SetDivider(width);
+	BMenuField* paperSize = new BMenuField("paperSize", "Paper Size:", fPaper);
 
-	/* orientaion */
+	// orientation
 	fOrientation = new BPopUpMenu("orientation");
 	fOrientation->SetRadioMode(true);
 
-	menuField = new BMenuField(ORIENTATION_RECT, "orientation", ORIENTATION_TEXT, fOrientation);
-	menuField->SetDivider(width);
+	BMenuField* orientation = new BMenuField("orientation", "Orientation:", fOrientation);
 
 	count = fPrinterCap->countCap(PrinterCap::kOrientation);
 	if (count == 0) {
-		AddOrientationItem(PORTRAIT_TEXT, JobData::kPortrait);
-		AddOrientationItem(LANDSCAPE_TEXT, JobData::kLandscape);
+		AddOrientationItem("Portrait", JobData::kPortrait);
+		AddOrientationItem("Landscape", JobData::kLandscape);
 	} else {
 		OrientationCap **orientation_cap = (OrientationCap **)fPrinterCap->enumCap(PrinterCap::kOrientation);
 		while (count--) {
@@ -243,12 +151,9 @@ PageSetupView::AttachedToWindow()
 		}
 	}
 
-	AddChild(menuField);
-
-	/* resolution */
-
+	// resolution
 	marked = false;
-	fResolution = new BPopUpMenu("");
+	fResolution = new BPopUpMenu("resolution");
 	fResolution->SetRadioMode(true);
 	count = fPrinterCap->countCap(PrinterCap::kResolution);
 	ResolutionCap **resolution_cap = (ResolutionCap **)fPrinterCap->enumCap(PrinterCap::kResolution);
@@ -264,16 +169,14 @@ PageSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menuField = new BMenuField(RESOLUTION_RECT, "", RES_TEXT, fResolution);
-	AddChild(menuField);
-	menuField->SetDivider(width);
+	BMenuField* resolution = new BMenuField("resolution", "Resolution:", fResolution);
 
-	/* scale */
+	// scale
 	BString scale;
 	scale << (int)fJobData->getScaling();
-	fScaling = new BTextControl(SCALE_RECT, "scale", "Scale [%]:",
+	fScaling = new BTextControl("scale", "Scale [%]:",
 									scale.String(),
-	                                NULL, B_FOLLOW_RIGHT);
+	                                NULL);
 	int num;
 	for (num = 0; num <= 255; num++) {
 		fScaling->TextView()->DisallowChar(num);
@@ -282,20 +185,44 @@ PageSetupView::AttachedToWindow()
 		fScaling->TextView()->AllowChar('0' + num);
 	}
 	fScaling->TextView()->SetMaxBytes(3);
-	fScaling->SetDivider(width);
 
-	AddChild(fScaling);
+	// cancel and ok
+	BButton* cancel = new BButton("cancel", "Cancel", new BMessage(kMsgCancel));
+	BButton* ok = new BButton("ok", "OK", new BMessage(kMsgOK));
 
-	/* cancel */
+	ok->MakeDefault(true);
 
-	button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(kMsgCancel));
-	AddChild(button);
+	BGridView* settings = new BGridView();
+	BGridLayout* settingsLayout = settings->GridLayout();
+	settingsLayout->AddItem(paperSize->CreateLabelLayoutItem(), 0, 0);
+	settingsLayout->AddItem(paperSize->CreateMenuBarLayoutItem(), 1, 0);
+	settingsLayout->AddItem(orientation->CreateLabelLayoutItem(), 0, 1);
+	settingsLayout->AddItem(orientation->CreateMenuBarLayoutItem(), 1, 1);
+	settingsLayout->AddItem(resolution->CreateLabelLayoutItem(), 0, 2);
+	settingsLayout->AddItem(resolution->CreateMenuBarLayoutItem(), 1, 2);
+	settingsLayout->AddItem(fScaling->CreateLabelLayoutItem(), 0, 3);
+	settingsLayout->AddItem(fScaling->CreateTextViewLayoutItem(), 1, 3);
+	settingsLayout->SetSpacing(0, 0);
 
-	/* ok */
-
-	button = new BButton(OK_RECT, "", OK_TEXT, new BMessage(kMsgOK));
-	AddChild(button);
-	button->MakeDefault(true);
+	SetLayout(new BGroupLayout(B_VERTICAL));
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.AddGroup(B_HORIZONTAL, 5, 1.0f)
+			.AddGroup(B_VERTICAL, 0, 1.0f)
+				.Add(fMarginView)
+				.AddGlue()
+			.End()
+			.AddGroup(B_VERTICAL, 0, 1.0f)
+				.Add(settings)
+				.AddGlue()
+			.End()
+		.End()
+		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+			.AddGlue()
+			.Add(cancel)
+			.Add(ok)
+		.End()
+		.SetInsets(10, 10, 10, 10)
+	);
 }
 
 inline void
@@ -424,15 +351,22 @@ PageSetupView::MessageReceived(BMessage *msg)
 
 //====================================================================
 
+// TODO center window on screen
 PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: DialogWindow(BRect(100, 100, 100 + PAGESETUP_WIDTH, 100 + PAGESETUP_HEIGHT),
+	: DialogWindow(BRect(100, 100, 160, 160),
 		"Page Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
+		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
 
-	PageSetupView *view = new PageSetupView(Bounds(), job_data, printer_data, printer_cap);
-	AddChild(view);
+	fPageSetupView = new PageSetupView(job_data, printer_data,
+		printer_cap);
+
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+		.Add(fPageSetupView)
+	);
 
 	SetResult(B_ERROR);
 }
@@ -443,7 +377,7 @@ PageSetupDlg::MessageReceived(BMessage *msg)
 	switch (msg->what) {
 	case kMsgOK:
 		Lock();
-		((PageSetupView *)ChildAt(0))->UpdateJobData();
+		fPageSetupView->UpdateJobData();
 		Unlock();
 		SetResult(B_NO_ERROR);
 		PostMessage(B_QUIT_REQUESTED);
