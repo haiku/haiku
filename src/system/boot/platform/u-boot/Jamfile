@@ -139,13 +139,13 @@ actions BuildUImageScript1
 
 # SD/mmc image rule
 # requires sfdisk and mtools packages on linux
-rule BuildUBootSDImage image : files 
+rule BuildUBootSDImage image : files
 {
 	Depends $(image) : $(files) ;
 	SDIMAGE_BLOCK_SIZE on $(image) = 1M ;
 	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
 	SDIMAGE_FDISK on $(image) = $(HOST_SFDISK) ;
-	SDIMAGE_FDISK_SCRIPT on $(image) = 
+	SDIMAGE_FDISK_SCRIPT on $(image) =
 		"0,$(HAIKU_BOARD_SDIMAGE_FAT_SIZE),0c,-\\\n,,eb\\\n\\\n" ;
 	SDIMAGE_FDISK_H on $(image) = 255 ;
 	SDIMAGE_FDISK_S on $(image) = 63 ;
@@ -182,19 +182,19 @@ actions BuildUBootSDImage1
 }
 
 # uimage targets
-BuildUImage haiku_loader.ub : haiku_loader : 
+BuildUImage haiku_loader.ub : haiku_loader :
 	-A arm -O $(uImageFakeOS) -T kernel -C none
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_RAW)
 		-n 'haiku_loader' ;
 
 local tgzArchive = haiku-floppyboot.tgz ;
-BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) : 
+BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) :
 	-A arm -O $(uImageFakeOS) -T multi -C none
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
 		-n 'haiku_loader' ;
 
 if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
-	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) : 
+	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) :
 		$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT) ;
 }
 
@@ -204,16 +204,16 @@ if $(HAIKU_BOARD_MLO_IMAGE) && $(HAIKU_BOARD_MLO_IMAGE_URL) {
 
 if $(HAIKU_BOARD_UBOOT_IMAGE) && $(HAIKU_BOARD_UBOOT_IMAGE_URL) {
 	# Download the u-boot binary file.
-	ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE) 
+	ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
 		: $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
 }
 
 # flash image targets
-BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader : 
+BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_raw.img : haiku_loader :
 	$(ubootFile) ;
-#BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img : boot_loader_u-boot : 
+#BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_elf.img : boot_loader_u-boot :
 #	$(ubootFile) ;
-BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img : haiku_loader.ub : 
+BuildUBootFlashImage haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img : haiku_loader.ub :
 	$(ubootFile) ;
 
 # SD/mmc image targets
