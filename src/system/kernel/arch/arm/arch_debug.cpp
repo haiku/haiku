@@ -319,8 +319,11 @@ void
 arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
 	void (*function)(void*), void* parameter)
 {
-	// TODO: Implement! Most likely in assembly.
-	longjmp(jumpBuffer, 1);
+	// TODO: Implement fault handling! Most likely in assembly.
+	// (see src/system/kernel/arch/x86/arch_x86.S)
+
+	// For now, just call the function and hope we don't crash :P
+	function(parameter);
 }
 
 
