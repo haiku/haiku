@@ -3631,7 +3631,7 @@ vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
 
 	// find the vaddr to allocate at
 	addr_t virtualBase = allocate_early_virtual(args, virtualSize, alignment);
-	//dprintf("vm_allocate_early: vaddr 0x%lx\n", virtualAddress);
+	//dprintf("vm_allocate_early: vaddr 0x%lx\n", virtualBase);
 
 	// map the pages
 	for (uint32 i = 0; i < PAGE_ALIGN(physicalSize) / B_PAGE_SIZE; i++) {
