@@ -15,6 +15,8 @@
 #include <Locale.h>
 #include <Path.h>
 
+#include <driver_settings.h>
+
 #include "Support.h"
 
 
@@ -184,7 +186,8 @@ enum {
 	kFilesystemColumn,
 	kVolumeNameColumn,
 	kMountedAtColumn,
-	kSizeColumn
+	kSizeColumn,
+	kParametersColumn
 };
 
 
@@ -223,7 +226,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	}
 
 	if (partition->IsMounted() && partition->GetMountPoint(&path) == B_OK) {
-		SetField(new BStringField(path.Path()),  kMountedAtColumn);
+		SetField(new BStringField(path.Path()), kMountedAtColumn);
 	} else {
 		SetField(new BStringField(kUnavailableString), kMountedAtColumn);
 	}
@@ -231,6 +234,24 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	char size[1024];
 	SetField(new BStringField(string_for_size(partition->Size(), size,
 		sizeof(size))), kSizeColumn);
+
+	if (partition->Parameters() != NULL) {
+		BString parameters;
+
+		// check parameters
+		void* handle = parse_driver_settings_string(partition->Parameters());
+		if (handle != NULL) {
+			bool active = get_driver_boolean_parameter(handle, "active", false, true);
+			if (active)
+				parameters += "Active";
+
+			delete_driver_settings(handle);
+		}
+		
+		SetField(new BStringField(parameters), kParametersColumn);
+	} else {
+		SetField(new BStringField(kUnavailableString), kParametersColumn);
+	}
 }
 
 
@@ -273,6 +294,8 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 		B_TRUNCATE_MIDDLE), kMountedAtColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Size"), 100, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
+	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 150, 50, 500,
+		B_TRUNCATE_MIDDLE), kParametersColumn);
 
 	SetSortingEnabled(false);
 }

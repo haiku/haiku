@@ -805,15 +805,15 @@ PartitionMap::Check(off_t sessionSize) const
 
 	// 2. check overlapping of partitions and location of partition tables
 	bool result = true;
-	const Partition** byOffset = new(nothrow) const Partition*[partitionCount];
+	Partition** byOffset = new(nothrow) Partition*[partitionCount];
 	off_t* tableOffsets = new(nothrow) off_t[partitionCount - 3];
 	if (byOffset && tableOffsets) {
 		// fill the arrays
 		int32 byOffsetCount = 0;
 		int32 tableOffsetCount = 1;	// primary partition table
-		tableOffsets[0] = 0;			//
+		tableOffsets[0] = 0;
 		for (int32 i = 0; i < partitionCount; i++) {
-			const Partition* partition = PartitionAt(i);
+			Partition* partition = (Partition*)PartitionAt(i);
 			if (!partition->IsExtended())
 				byOffset[byOffsetCount++] = partition;
 
@@ -825,23 +825,23 @@ PartitionMap::Check(off_t sessionSize) const
 		}
 
 		// sort the arrays
-		qsort(byOffset, byOffsetCount, sizeof(const Partition*),
+		qsort(byOffset, byOffsetCount, sizeof(Partition*),
 			cmp_partition_offset);
 		qsort(tableOffsets, tableOffsetCount, sizeof(off_t), cmp_offset);
 
 		// check for overlappings
 		off_t nextOffset = 0;
 		for (int32 i = 0; i < byOffsetCount; i++) {
-			const Partition* partition = byOffset[i];
+			Partition* partition = byOffset[i];
 			if (partition->Offset() < nextOffset && i > 0) {
-				Partition* previousPartition = (Partition*)byOffset[i - 1];
+				Partition* previousPartition = byOffset[i - 1];
 				off_t previousSize = previousPartition->Size()
 					- (nextOffset - partition->Offset());
 				TRACE(("intel: PartitionMap::Check(): "));
 				if (previousSize == 0) {
 					previousPartition->Unset();
 					TRACE(("partition offset hides previous partition."
-					" Removing previous partition from disk layout.\n"));
+						" Removing previous partition from disk layout.\n"));
 				} else {
 					TRACE(("overlapping partitions! Setting partition %ld "
 						"size to %lld\n", i - 1, previousSize));
@@ -860,8 +860,8 @@ PartitionMap::Check(off_t sessionSize) const
 						"for different extended partitions!\n"));
 					result = false;
 					break;
-				} else if (is_inside_partitions(tableOffsets[i], byOffset,
-								byOffsetCount)) {
+				} else if (is_inside_partitions(tableOffsets[i], 
+						(const Partition**)byOffset, byOffsetCount)) {
 					TRACE(("intel: PartitionMap::Check(): a partition table "
 						"lies inside a non-extended partition!\n"));
 					result = false;
