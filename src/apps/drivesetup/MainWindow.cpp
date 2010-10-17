@@ -792,15 +792,13 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	char message[512];
 	if (partition->ContentName() && strlen(partition->ContentName()) > 0) {
 		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
-			"to initialize the partition \"%s\"? After entering the "
-			"initialization parameters, you can abort this operation "
-			"right before writing changes back to the disk."),
+			"to initialize the partition \"%s\"? You will be asked again "
+			"before changes are written to the disk."),
 			partition->ContentName());
 	} else {
 		snprintf(message, sizeof(message), B_TRANSLATE("Are you sure you want "
-			"to initialize the selected partition? After entering the "
-			"initialization parameters, you can abort this operation "
-			"right before writing changes back to the disk."));
+			"to initialize the partition? You will be asked again "
+			"before changes are written to the disk."));
 	}
 	BAlert* alert = new BAlert("first notice", message,
 		B_TRANSLATE("Continue"), B_TRANSLATE("Cancel"), NULL,
