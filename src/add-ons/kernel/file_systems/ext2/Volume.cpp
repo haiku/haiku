@@ -371,30 +371,38 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	TRACE("Volume::Mount(): Checking if journal was initialized\n");
 	status = fJournal->InitCheck();
-	if (status != B_OK)
+	if (status != B_OK) {
+		FATAL("could not initialize journal!\n");
 		return status;
+	}
 
 	// TODO: Only recover if asked to
 	TRACE("Volume::Mount(): Asking journal to recover\n");
 	status = fJournal->Recover();
-	if (status != B_OK)
+	if (status != B_OK) {
+		FATAL("could not recover journal!\n");
 		return status;
+	}
 
 	TRACE("Volume::Mount(): Restart journal log\n");
 	status = fJournal->StartLog();
-	if (status != B_OK)
+	if (status != B_OK) {
+		FATAL("could not initialize start journal!\n");
 		return status;
+	}
 
 	// Initialize allocators
 	TRACE("Volume::Mount(): Initialize block allocator\n");
 	status = fBlockAllocator.Initialize();
-	if (status != B_OK)
+	if (status != B_OK) {
+		FATAL("could not initialize block allocator!\n");
 		return status;
+	}
 
 	// ready
 	status = get_vnode(fFSVolume, EXT2_ROOT_NODE, (void**)&fRootNode);
 	if (status != B_OK) {
-		TRACE("could not create root node: get_vnode() failed!\n");
+		FATAL("could not create root node: get_vnode() failed!\n");
 		return status;
 	}
 
