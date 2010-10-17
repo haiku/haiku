@@ -285,9 +285,8 @@ init_page_directory()
         TRACE(("init_page_directory2\n"));
 
         // clear out the pgdir
-        for (uint32 i = 0; i < 4096; i++) {
+        for (uint32 i = 0; i < 4096; i++)
                sPageDirectory[i] = 0;
-        }
 
 	 uint32 *pageTable = NULL;
 	for (uint32 i=0; i < ARRAY_SIZE(LOADER_MEMORYMAP);i++){
@@ -543,7 +542,7 @@ mmu_free(void *virtualAddress, size_t size)
 extern "C" void
 mmu_init_for_kernel(void)
 {
-/*	TRACE(("mmu_init_for_kernel\n"));
+	TRACE(("mmu_init_for_kernel\n"));
 
 	// save the memory we've physically allocated
 	gKernelArgs.physical_allocated_range[0].size
@@ -555,7 +554,7 @@ mmu_init_for_kernel(void)
 	gKernelArgs.virtual_allocated_range[0].size
 		= sNextVirtualAddress - KERNEL_BASE;
 	gKernelArgs.num_virtual_allocated_ranges = 1;
-
+/*
 	// sort the address ranges
 	sort_addr_range(gKernelArgs.physical_memory_range,
 		gKernelArgs.num_physical_memory_ranges);
@@ -571,28 +570,36 @@ extern "C" void
 mmu_init(void)
 {
 	TRACE(("mmu_init\n"));
-	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));// access flag disabled, TEX remap disabled, mmu disabled
-	//calculate lowest RAM adress from MEMORYMAP
-	for(int i=0;i<ARRAY_SIZE(LOADER_MEMORYMAP);i++){
-		if(strcmp("RAM_free",LOADER_MEMORYMAP[i].name)==0){
-			sNextPhysicalAddress=LOADER_MEMORYMAP[i].start;
-		}
-		if(strcmp("RAM_pt",LOADER_MEMORYMAP[i].name)==0){
-			sNextPageTableAddress=LOADER_MEMORYMAP[i].start + MMU_L1_TABLE_SIZE;
-			kPageTableRegionEnd = LOADER_MEMORYMAP[i].end;
-			sPageDirectory = (uint32 *) LOADER_MEMORYMAP[i].start ;
 
+	mmu_write_C1(mmu_read_C1() & ~((1<<29)|(1<<28)|(1<<0)));// access flag disabled, TEX remap disabled, mmu disabled
+
+	uint32 highestRAMAddress = SDRAM_BASE;
+
+	//calculate lowest RAM adress from MEMORYMAP
+	for(int i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
+		if (strcmp("RAM_free", LOADER_MEMORYMAP[i].name) == 0)
+			sNextPhysicalAddress = LOADER_MEMORYMAP[i].start;
+
+		if (strcmp("RAM_pt", LOADER_MEMORYMAP[i].name) == 0) {
+			sNextPageTableAddress = LOADER_MEMORYMAP[i].start + MMU_L1_TABLE_SIZE;
+			kPageTableRegionEnd = LOADER_MEMORYMAP[i].end;
+			sPageDirectory = (uint32 *) LOADER_MEMORYMAP[i].start;
+		}
+
+		if (strncmp("RAM_", LOADER_MEMORYMAP[i].name, 4) == 0) {
+			if (LOADER_MEMORYMAP[i].end > highestRAMAddress)
+				highestRAMAddress = LOADER_MEMORYMAP[i].end;
 		}
 	}
 
+	gKernelArgs.physical_memory_range[0].start = SDRAM_BASE;
+	gKernelArgs.physical_memory_range[0].size = highestRAMAddress - SDRAM_BASE;
+	gKernelArgs.num_physical_memory_ranges = 1;
 
 	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
 	gKernelArgs.physical_allocated_range[0].size = 0;
 	gKernelArgs.num_physical_allocated_ranges = 1;
 		// remember the start of the allocated physical pages
-
-
-
 
 	init_page_directory();
 
