@@ -203,7 +203,7 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 SATStacking::SATStacking(SATWindow* window)
 	:
 	fSATWindow(window),
-	fStackingCandidate(NULL)
+	fStackingParent(NULL)
 {
 	
 }
@@ -221,16 +221,24 @@ SATStacking::FindSnappingCandidates(SATGroup* group)
 	_ClearSearchResult();
 
 	Window* window = fSATWindow->GetWindow();
-	BPoint leftTop = window->Decorator()->TabRect().LeftTop();
+	if (!window->Decorator())
+		return false;
+
+	BPoint mousePosition;
+	int32 buttons;
+	fSATWindow->GetDesktop()->GetLastMouseState(&mousePosition, &buttons);
+	// use the upper edge of the candidate window to find the parent window
+	mousePosition.y = window->Decorator()->TabRect().top;
 
 	for (int i = 0; i < group->CountItems(); i++) {
 		SATWindow* satWindow = group->WindowAt(i);
-		// search for stacking candidate
+		// search for stacking parent
 		Window* win = satWindow->GetWindow();
-		if (win != window && win->Decorator()
-			&& win->Decorator()->TabRect().Contains(leftTop)) {
-			// remember window as the candidate for stacking
-			fStackingCandidate = satWindow;
+		if (win == window || !win->Decorator())
+			continue;
+		if (win->Decorator()->TabRect().Contains(mousePosition)) {
+			// remember window as the parent for stacking
+			fStackingParent = satWindow;
 			_HighlightWindows(true);
 			return true;
 		}
@@ -243,10 +251,10 @@ SATStacking::FindSnappingCandidates(SATGroup* group)
 bool
 SATStacking::JoinCandidates()
 {
-	if (!fStackingCandidate)
+	if (!fStackingParent)
 		return false;
 
-	bool result = fStackingCandidate->StackWindow(fSATWindow);
+	bool result = fStackingParent->StackWindow(fSATWindow);
 
 	_ClearSearchResult();
 	return result;
@@ -317,11 +325,11 @@ SATStacking::TabLocationMoved(float location, bool shifting)
 void
 SATStacking::_ClearSearchResult()
 {
-	if (!fStackingCandidate)
+	if (!fStackingParent)
 		return;
 
 	_HighlightWindows(false);
-	fStackingCandidate = NULL;
+	fStackingParent = NULL;
 }
 
 
@@ -331,7 +339,7 @@ SATStacking::_HighlightWindows(bool highlight)
 	Desktop* desktop = fSATWindow->GetWindow()->Desktop();
 	if (!desktop)
 		return;
-	fStackingCandidate->HighlightTab(highlight);
+	fStackingParent->HighlightTab(highlight);
 	fSATWindow->HighlightTab(highlight);
 }
 

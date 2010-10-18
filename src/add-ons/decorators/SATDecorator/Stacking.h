@@ -42,7 +42,7 @@ private:
 
 		SATWindow*			fSATWindow;
 
-		SATWindow*			fStackingCandidate;
+		SATWindow*			fStackingParent;
 };
 
 #endif
