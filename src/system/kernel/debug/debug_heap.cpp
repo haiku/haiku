@@ -14,7 +14,7 @@
 
 #define INITIAL_HEAP_SIZE	B_PAGE_SIZE
 
-static char sInitialHeap[INITIAL_HEAP_SIZE];
+static char sInitialHeap[INITIAL_HEAP_SIZE] __attribute__ ((aligned (8)));
 static void* sHeapBase = sInitialHeap;
 static size_t sHeapSize = INITIAL_HEAP_SIZE;
 
