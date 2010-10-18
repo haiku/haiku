@@ -1974,6 +1974,7 @@ fs_vnode_ops kVnodeOps = {
 	NULL,	// access
 	&devfs_read_stat,
 	&devfs_write_stat,
+	NULL,
 
 	/* file */
 	&devfs_create,
