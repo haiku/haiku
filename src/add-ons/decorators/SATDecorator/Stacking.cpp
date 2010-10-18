@@ -227,6 +227,9 @@ SATStacking::FindSnappingCandidates(SATGroup* group)
 	BPoint mousePosition;
 	int32 buttons;
 	fSATWindow->GetDesktop()->GetLastMouseState(&mousePosition, &buttons);
+	if (!window->Decorator()->TabRect().Contains(mousePosition))
+		return false;
+
 	// use the upper edge of the candidate window to find the parent window
 	mousePosition.y = window->Decorator()->TabRect().top;
 
