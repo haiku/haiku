@@ -11,10 +11,10 @@
 FUNCTION(siglongjmp):
 FUNCTION(longjmp):
 FUNCTION(_longjmp):
-	str    r1,[r0]
-        ldmia  	r0,{r0-pc}^
-
-	bl	__longjmp_return
+	str	r1,[r0]
+        ldmia	r0,{r0-r14}
+	bx	lr
+//	bl	__longjmp_return
 FUNCTION_END(siglongjmp)
 FUNCTION_END(longjmp)
 FUNCTION_END(_longjmp)
