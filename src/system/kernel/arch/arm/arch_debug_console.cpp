@@ -34,32 +34,21 @@ arch_debug_install_interrupt_handlers(void)
 char
 arch_debug_blue_screen_getchar(void)
 {
-#warning ARM WRITEME
-	return 0;
-//M68KPlatform::Default()->BlueScreenGetChar();
+	return arch_debug_serial_getchar();
 }
 
 
 char
 arch_debug_serial_getchar(void)
 {
-#warning ARM WRITEME
-return uart_getc(0,FALSE);
-//	return 0;
-//M68KPlatform::Default()->SerialDebugGetChar();
+	return uart_getc(uart_debug_port(), FALSE);
 }
 
 
 void
 arch_debug_serial_putchar(const char c)
 {
-//uart_putc(0,c);
-//uart_putc(1,c);
-uart_putc(0,c);
-#warning ARM WRITEME
-
-//	return 0;
-//M68KPlatform::Default()->SerialDebugPutChar(c);
+	uart_putc(uart_debug_port(), c);
 }
 
 
@@ -77,22 +66,16 @@ void
 arch_debug_serial_early_boot_message(const char *string)
 {
 	// this function will only be called in fatal situations
+	arch_debug_serial_puts(string);
 }
 
 
 status_t
 arch_debug_console_init(kernel_args *args)
 {
+	uart_init_early();
 
-uart_init_early();
-uart_init();//todo
-uart_init_port(0,9600);
-uart_init_port(1,9600);
-uart_init_port(2,9600);
-#warning ARM WRITEME
-
-	return 0;
-//M68KPlatform::Default()->InitSerialDebug(args);
+	return B_OK;
 }
 
 
