@@ -1067,6 +1067,7 @@ static fs_vnode_ops sFIFOVnodeOps = {
 	NULL,	// fs_access()
 	&fifo_read_stat,
 	&fifo_write_stat,
+	NULL,
 
 	/* file */
 	NULL,	// create()

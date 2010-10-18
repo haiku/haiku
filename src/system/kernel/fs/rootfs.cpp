@@ -1023,13 +1023,6 @@ rootfs_read_stat(fs_volume* _volume, fs_vnode* _v, struct stat* stat)
 
 
 static status_t
-rootfs_preallocate(fs_volume*, fs_vnode*, off_t, off_t)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-static status_t
 rootfs_write_stat(fs_volume* _volume, fs_vnode* _vnode, const struct stat* stat,
 	uint32 statMask)
 {
@@ -1181,7 +1174,7 @@ fs_vnode_ops sVnodeOps = {
 	NULL,	// fs_access()
 	&rootfs_read_stat,
 	&rootfs_write_stat,
-	&rootfs_preallocate,
+	NULL,
 
 	/* file */
 	&rootfs_create,
