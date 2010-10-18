@@ -160,8 +160,7 @@ FUNCTION_END(atomic_test_and_set)
 /* int atomic_get(int *value) 
  */
 FUNCTION(atomic_get):
-	mov	r1, r0
-	swp	r0, r0, [r1]
+	ldr	r0, [r0]
         bx	lr
 FUNCTION_END(atomic_get)
 
