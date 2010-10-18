@@ -1627,6 +1627,7 @@ static fs_vnode_ops sGoogleFSVnodeOps = {
 	&googlefs_access,
 	&googlefs_rstat,
 	&googlefs_wstat,
+	NULL,	// fs_preallocate
 
 	/* file operations */
 	&googlefs_create,

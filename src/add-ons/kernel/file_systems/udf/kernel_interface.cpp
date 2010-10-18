@@ -671,6 +671,7 @@ fs_vnode_ops gUDFVnodeOps = {
 	&udf_access,
 	&udf_read_stat,
 	NULL,	// write_stat
+	NULL,	// preallocate
 
 	/* file operations */
 	NULL,	// create

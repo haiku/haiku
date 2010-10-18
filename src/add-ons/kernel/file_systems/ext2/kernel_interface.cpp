@@ -1648,6 +1648,7 @@ fs_vnode_ops gExt2VnodeOps = {
 	&ext2_access,
 	&ext2_read_stat,
 	&ext2_write_stat,
+	NULL,	// fs_preallocate
 
 	/* file operations */
 	&ext2_create,

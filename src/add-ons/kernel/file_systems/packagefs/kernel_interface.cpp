@@ -1122,6 +1122,7 @@ fs_vnode_ops gPackageFSVnodeOps = {
 	&packagefs_access,
 	&packagefs_read_stat,
 	NULL,	// write_stat,
+	NULL,	// preallocate,
 
 	// file operations
 	NULL,	// create,

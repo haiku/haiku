@@ -733,6 +733,7 @@ fs_vnode_ops gISO9660VnodeOps = {
 	&fs_access,
 	&fs_read_stat,
 	NULL,
+	NULL,
 
 	/* file */
 	NULL,

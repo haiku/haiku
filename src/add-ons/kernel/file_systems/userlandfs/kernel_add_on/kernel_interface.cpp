@@ -1209,6 +1209,7 @@ fs_vnode_ops gUserlandFSVnodeOps = {
 	&userlandfs_access,
 	&userlandfs_read_stat,
 	&userlandfs_write_stat,
+	NULL,	// preallocate()
 
 	// file operations
 	&userlandfs_create,

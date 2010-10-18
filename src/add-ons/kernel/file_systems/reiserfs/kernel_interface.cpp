@@ -783,6 +783,7 @@ fs_vnode_ops gReiserFSVnodeOps = {
 	&reiserfs_access,
 	&reiserfs_read_stat,
 	NULL,	// &reiserfs_write_stat,
+	NULL,	// &reiserfs_preallocate,
 
 	/* file operations */
 	NULL,	// &reiserfs_create,

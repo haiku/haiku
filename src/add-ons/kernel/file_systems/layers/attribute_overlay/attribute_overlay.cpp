@@ -1679,6 +1679,7 @@ static fs_vnode_ops sOverlayVnodeOps = {
 	&overlay_access,
 	&overlay_read_stat,
 	&overlay_write_stat,
+	NULL,	// fs_preallocate
 
 	/* file */
 	&overlay_create,

@@ -2354,6 +2354,7 @@ fs_vnode_ops gBFSVnodeOps = {
 	&bfs_access,
 	&bfs_read_stat,
 	&bfs_write_stat,
+	NULL,	// fs_preallocate
 
 	/* file operations */
 	&bfs_create,

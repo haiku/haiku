@@ -2505,6 +2505,7 @@ fs_vnode_ops sNFSVnodeOps = {
 	&fs_access,
 	&fs_rstat,
 	&fs_wstat,
+	NULL,	// fs_preallocate()
 
 	/* file operations */
 	&fs_create,

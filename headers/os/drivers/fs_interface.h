@@ -167,6 +167,8 @@ struct fs_vnode_ops {
 				struct stat* stat);
 	status_t (*write_stat)(fs_volume* volume, fs_vnode* vnode,
 				const struct stat* stat, uint32 statMask);
+	status_t (*preallocate)(fs_volume* volume, fs_vnode* vnode,
+				off_t pos, off_t length);
 
 	/* file operations */
 	status_t (*create)(fs_volume* volume, fs_vnode* dir, const char* name,

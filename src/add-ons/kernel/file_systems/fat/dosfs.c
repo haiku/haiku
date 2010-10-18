@@ -1351,6 +1351,7 @@ fs_vnode_ops gFATVnodeOps = {
 	&dosfs_access,
 	&dosfs_rstat,
 	&dosfs_wstat,
+	NULL,	// &fs_preallocate,
 
 	/* file operations */
 	&dosfs_create,

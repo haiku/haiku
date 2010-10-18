@@ -2201,6 +2201,7 @@ fs_vnode_ops gCDDAVnodeOps = {
 	NULL,	// fs_access()
 	cdda_read_stat,
 	NULL,	// fs_write_stat()
+	NULL,	// fs_preallocate()
 
 	// file
 	NULL,	// fs_create()

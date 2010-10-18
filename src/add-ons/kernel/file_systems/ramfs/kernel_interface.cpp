@@ -2100,6 +2100,7 @@ static file_system_module_info sRamFSModuleInfo = {
 	&ramfs_access,
 	&ramfs_read_stat,
 	&ramfs_write_stat,
+	NULL,	// &ramfs_preallocate,
 
 	/* file operations */
 	&ramfs_create,

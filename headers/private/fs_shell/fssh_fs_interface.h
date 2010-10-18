@@ -185,6 +185,8 @@ struct fssh_fs_vnode_ops {
 				struct fssh_stat *stat);
 	fssh_status_t (*write_stat)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
 				const struct fssh_stat *stat, uint32_t statMask);
+	fssh_status_t (*preallocate)(fssh_fs_volume* volume, fssh_fs_vnode* vnode,
+				fssh_off_t pos, fssh_off_t length);
 
 	/* file operations */
 	fssh_status_t (*create)(fssh_fs_volume *volume, fssh_fs_vnode *dir,
