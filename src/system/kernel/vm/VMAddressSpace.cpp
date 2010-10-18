@@ -195,8 +195,8 @@ VMAddressSpace::Create(team_id teamID, addr_t base, size_t size, bool kernel,
 		return status;
 	}
 
-	TRACE(("vm_create_aspace: team %ld (%skernel): %#lx bytes starting at "
-		"%#lx => %p\n", id, kernel ? "!" : "", size, base, addressSpace));
+	TRACE(("VMAddressSpace::Create(): team %ld (%skernel): %#lx bytes starting at "
+		"%#lx => %p\n", teamID, kernel ? "" : "!", size, base, addressSpace));
 
 	// create the corresponding translation map
 	status = arch_vm_translation_map_create_map(kernel,
