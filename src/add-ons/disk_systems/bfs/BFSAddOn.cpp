@@ -234,12 +234,13 @@ BFSPartitionHandle::Repair(bool checkOnly)
 	off_t counter = 0;
 
 	// check all files and report errors
-	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result, sizeof(result)) == 0) {
+	while (ioctl(fd, BFS_IOCTL_CHECK_NEXT_NODE, &result,
+			sizeof(result)) == 0) {
 		if (++counter % 50 == 0)
 			printf("%9Ld nodes processed\x1b[1A\n", counter);
 
 		if (result.errors) {
-			printf("%s (inode = %Ld)", result.name, result.inode);
+			printf("%s (inode = %lld)", result.name, result.inode);
 			if (result.errors & BFS_MISSING_BLOCKS)
 				printf(", some blocks weren't allocated");
 			if (result.errors & BFS_BLOCKS_ALREADY_SET)
@@ -274,11 +275,12 @@ BFSPartitionHandle::Repair(bool checkOnly)
 
 	close(fd);
 
-	printf("checked %Ld nodes, %Ld blocks not allocated, %Ld blocks already "
-		"set, %Ld blocks could be freed\n", counter, result.stats.missing,
-		result.stats.already_set, result.stats.freed);
-	printf("\tfiles\t\t%Ld\n\tdirectories\t%Ld\n\tattributes\t%Ld\n\tattr. "
-		"dirs\t%Ld\n\tindices\t\t%Ld\n", files, directories, attributes,
+	printf("\t%lld nodes checked,\n\t%lld blocks not allocated,"
+		"\n\t%lld blocks already set,\n\t%lld blocks could be freed\n\n",
+		counter, result.stats.missing, result.stats.already_set,
+		result.stats.freed);
+	printf("\tfiles\t\t%lld\n\tdirectories\t%lld\n\tattributes\t%lld\n\tattr. "
+		"dirs\t%lld\n\tindices\t\t%lld\n", files, directories, attributes,
 		attributeDirectories, indices);
 
 	if (result.status == B_ENTRY_NOT_FOUND)
