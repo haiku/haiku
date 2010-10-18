@@ -120,20 +120,8 @@ miss4:		ldrex   r12, [r0]
        		bne     miss4
 	        bx  lr
 #else
-        /* disable interrupts, do the mov, and reenable */
-        mrs     r2, cpsr
-        mov     r12, r2
-        orr     r2, r2, #(3<<6)
-        msr     cpsr_c, r2
-
-        /* ints disabled, old cpsr state in r12 */
-	
-        mov     r3, r0
-        ldr     r0, [r3]
-        str     r1, [r3]
-
-        /* restore interrupts and exit */
-        msr     cpsr_c, r12
+	mov	r3, r0
+	swp	r0, r1, [r3]
         bx      lr
 #endif
 FUNCTION_END(atomic_set)
@@ -142,7 +130,7 @@ FUNCTION_END(atomic_set)
  */
 FUNCTION(atomic_test_and_set):
 #if __ARM_ARCH__ >= 6
-/*miss5:  ldrex       r12, [r0]                       @ load from the address and mark it exclusive
+miss5:  ldrex       r12, [r0]                       @ load from the address and mark it exclusive
         cmp         r12, r2                         @ compare the value with the comperand(r2)
         strexeq     r3,  r1,  [r0]                  @ if they were equal, attempt to store the new value (r1)
         bne         differ                          @ if they were not equal jump to (differ) which clears the exclusive tag on the address and returns<
@@ -150,16 +138,31 @@ FUNCTION(atomic_test_and_set):
         beq         miss5                           @ go back to the start if it failed (0=success, 1=failure)
         bne         same                            @ if it succeeded, jump to (same) and return. there is no need to clrex if strex succeeded
 differ: clrex                           	    @ clrex
-same:   mov         r0,  r12*/
+same:   mov         r0,  r12
+#else
+        /* disable interrupts, and save state */
+        mrs     r3, cpsr
+        mov     r12, r3
+        orr     r3, r3, #(3<<6)
+        msr     cpsr_c, r3
+
+	mov	r3, r0
+	ldr	r0, [r3]
+	cmp	r0, r2
+	streq	r1, [r3]
+
+        /* restore interrupts and exit */
+        msr     cpsr_c, r12
 #endif
-#warning TODO TODO TODO
-        bx  lr
+        bx      lr
 FUNCTION_END(atomic_test_and_set)
 
 /* int atomic_get(int *value) 
  */
 FUNCTION(atomic_get):
-        bx  lr
+	mov	r1, r0
+	swp	r0, r0, [r1]
+        bx	lr
 FUNCTION_END(atomic_get)
 
 
