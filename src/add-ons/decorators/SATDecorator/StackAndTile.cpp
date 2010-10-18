@@ -132,8 +132,9 @@ StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 
 	int32 modifiers = message->FindInt32("modifiers");
 	int32 buttons = message->FindInt32("buttons");
-	if (satWindow->GetDecorator()->MouseAction(message, where, buttons,
-		modifiers) != CLICK_DRAG)
+	click_type clickArea = satWindow->GetDecorator()->MouseAction(message,
+		where, buttons, modifiers);
+	if (clickArea != CLICK_DRAG && clickArea < CLICK_RESIZE)
 		return;
 
 	ASSERT(fCurrentSATWindow == NULL);
