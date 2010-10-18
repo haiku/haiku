@@ -32,6 +32,11 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
+#include "PoseView.h"
+
+#include <algorithm>
+#include <functional>
+
 #include <ctype.h>
 #include <errno.h>
 #include <float.h>
@@ -83,7 +88,6 @@ All rights reserved.
 #include "Navigator.h"
 #include "NavMenu.h"
 #include "Pose.h"
-#include "PoseView.h"
 #include "InfoWindow.h"
 #include "Utilities.h"
 #include "Tests.h"
@@ -8717,6 +8721,19 @@ PoseCompareAddWidgetBinder(const BPose *p1, const BPose *p2, void *castToPoseVie
 }
 
 
+struct PoseComparator : public std::binary_function<const BPose *, 
+	const BPose *, bool>
+{
+	PoseComparator(BPoseView *poseView): fPoseView(poseView) { }
+
+	bool operator() (const BPose *p1, const BPose *p2) {
+		return PoseCompareAddWidget(p1, p2, fPoseView) < 0;
+	}
+
+	BPoseView * fPoseView;	
+};
+
+
 #if xDEBUG
 static BPose *
 DumpOne(BPose *pose, void *)
@@ -8737,9 +8754,13 @@ BPoseView::SortPoses()
 	PRINT(("===================\n"));
 #endif
 
-	fPoseList->SortItems(PoseCompareAddWidgetBinder, this);
-	if (fFiltering)
-		fFilteredPoseList->SortItems(PoseCompareAddWidgetBinder, this);
+	BPose **poses = reinterpret_cast<BPose **>(fPoseList->AsBList()->Items());
+	std::stable_sort(poses, &poses[fPoseList->CountItems()], PoseComparator(this));
+	if (fFiltering) {
+		poses = reinterpret_cast<BPose **>(fFilteredPoseList->AsBList()->Items());
+		std::stable_sort(poses, &poses[fPoseList->CountItems()], 
+			PoseComparator(this));
+	}
 }
 
 
