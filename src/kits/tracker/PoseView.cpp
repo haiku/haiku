@@ -3358,6 +3358,14 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 		// check good location on the desktop
 		|| (checkValidLocation && !IsValidLocation(rect))) {
 		NextSlot(pose, rect, viewBounds);
+		// we've scanned the entire desktop without finding an available position,
+		// give up and simply place it towards the top left.
+		if (checkValidLocation && !rect.Intersects(viewBounds)) {
+			fHintLocation = PinToGrid(BPoint(0.0, 0.0), fGrid, fOffset);
+			pose->SetLocation(fHintLocation, this);
+			rect = pose->CalcRect(this);
+			break;
+		}
 	}
 
 	rect.InsetBy(3, 0);
