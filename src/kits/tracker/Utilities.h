@@ -212,9 +212,9 @@ FetchNaturalChunk(natural_chunk& chunk, const char* source)
 		return pos;
 	}
 	
-	// skip leading zeros and spaces
+	// skip leading zeros and whitespace characters
 	int32 skip = 0;
-	while (source[0] == '0' || source[0] == ' ') {
+	while (source[0] == '0' || isspace(source[0])) {
 		source++;
 		skip++;
 	}
