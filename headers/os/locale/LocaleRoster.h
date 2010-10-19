@@ -9,6 +9,7 @@
 #include <String.h>
 
 
+class BBitmap;
 class BCatalog;
 class BCollator;
 class BCountry;
@@ -47,6 +48,9 @@ public:
 			status_t			GetAvailableTimeZonesForCountry(
 									BMessage* message,
 									const char* countryCode) const;
+
+			status_t			GetFlagIconForCountry(BBitmap* flagIcon,
+									const char* countryCode);
 
 			status_t			GetInstalledCatalogs(BMessage* message,
 									const char* sigPattern = NULL,

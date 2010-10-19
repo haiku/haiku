@@ -89,9 +89,9 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->SetHighColor(kBlack);
 	else {
 		owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_3_TINT));
-		text += " (";
+		text += "   [";
 		text += B_TRANSLATE("already chosen");
-		text += ")";
+		text += "]";
 	}
 
 	BFont font = be_plain_font;

@@ -182,7 +182,7 @@ TranslationComparator(const void* left, const void* right)
 	BString leftName;
 	if (be_locale_roster->GetLanguage(leftTranslation->languageCode, &language)
 			== B_OK) {
-		language->GetTranslatedName(leftName);
+		language->GetName(leftName);
 		delete language;
 	} else
 		leftName = leftTranslation->languageCode;
@@ -190,7 +190,7 @@ TranslationComparator(const void* left, const void* right)
 	BString rightName;
 	if (be_locale_roster->GetLanguage(rightTranslation->languageCode, &language)
 			== B_OK) {
-		language->GetTranslatedName(rightName);
+		language->GetName(rightName);
 		delete language;
 	} else
 		rightName = rightTranslation->languageCode;
@@ -1101,7 +1101,7 @@ AboutView::_CreateCreditsView()
 		langName.Truncate(0);
 		if (be_locale_roster->GetLanguage(translation.languageCode, &lang)
 			== B_OK) {
-			lang->GetTranslatedName(langName);
+			lang->GetName(langName);
 			delete lang;
 		} else {
 			// We failed to get the localized readable name,

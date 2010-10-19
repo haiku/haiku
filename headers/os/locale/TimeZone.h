@@ -46,8 +46,8 @@ public:
 private:
 	friend	class Private;
 
-			icu_44::TimeZone*	fIcuTimeZone;
-			icu_44::Locale*		fIcuLocale;
+			icu_44::TimeZone*	fICUTimeZone;
+			icu_44::Locale*		fICULocale;
 			status_t			fInitStatus;
 
 	mutable uint32				fInitializedFields;

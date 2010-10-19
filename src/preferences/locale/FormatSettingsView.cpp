@@ -50,12 +50,12 @@ public:
 		:
 		BMenuItem(label, _MenuMessage(code, field))
 	{
-		fIcuCode = code;
+		fICUCode = code;
 	}
 
 	const BString& ICUCode() const
 	{
-		return fIcuCode;
+		return fICUCode;
 	}
 
 private:
@@ -69,7 +69,7 @@ private:
 	}
 
 private:
-	BString			fIcuCode;
+	BString			fICUCode;
 };
 
 
@@ -414,31 +414,32 @@ FormatView::MessageReceived(BMessage* message)
 			menuField->MenuItem()->SetLabel(menuItem->Label());
 
 			_UpdateLongDateFormatString();
+			// fall through
 		}
-		// pass trough
+
 		case kSettingsContentsModified:
-			{
-				int32 separator = 0;
-				BMenuItem* item = fSeparatorMenuField->Menu()->FindMarked();
-				if (item) {
-					separator = fSeparatorMenuField->Menu()->IndexOf(item);
-					if (separator >= 0)
-						// settings.SetTimeFormatSeparator(
-						//	(FormatSeparator)separator);
-						;
-				}
-
-				// Make the notification message and send it to the tracker:
-				BMessage notificationMessage;
-				notificationMessage.AddInt32("TimeFormatSeparator", separator);
-				notificationMessage.AddBool("24HrClock",
-					f24HrRadioButton->Value() == 1);
-
-				_UpdateExamples();
-
-				Window()->PostMessage(kSettingsContentsModified);
-				break;
+		{
+			int32 separator = 0;
+			BMenuItem* item = fSeparatorMenuField->Menu()->FindMarked();
+			if (item) {
+				separator = fSeparatorMenuField->Menu()->IndexOf(item);
+				if (separator >= 0)
+					// settings.SetTimeFormatSeparator(
+					//	(FormatSeparator)separator);
+					;
 			}
+
+			// Make the notification message and send it to the tracker:
+			BMessage notificationMessage;
+			notificationMessage.AddInt32("TimeFormatSeparator", separator);
+			notificationMessage.AddBool("24HrClock",
+				f24HrRadioButton->Value() == 1);
+
+			_UpdateExamples();
+
+			Window()->PostMessage(kSettingsContentsModified);
+			break;
+		}
 
 		case kClockFormatChange:
 		{
@@ -489,39 +490,6 @@ FormatView::MessageReceived(BMessage* message)
 		default:
 			BView::MessageReceived(message);
 	}
-}
-
-
-void
-FormatView::SetDefaults()
-{
-	/*
-	TrackerSettings settings;
-
-	settings.SetTimeFormatSeparator(kSlashSeparator);
-	settings.SetDateOrderFormat(kMDYFormat);
-	settings.SetClockTo24Hr(false);
-	*/
-
-	fLocale = *be_locale;
-		// We work on a copy of the default country and set the changes when
-		// closing the preflet
-	_UpdateExamples();
-	_SendNotices();
-}
-
-
-bool
-FormatView::IsDefaultable() const
-{
-	/*
-	TrackerSettings settings;
-
-	return settings.TimeFormatSeparator() != kSlashSeparator
-		|| settings.DateOrderFormat() != kMDYFormat
-		|| settings.ClockIs24Hr() != false;
-	*/
-	return true;
 }
 
 
@@ -692,7 +660,6 @@ FormatView::_ParseCurrencyFormat()
 void
 FormatView::_ParseDateFormat()
 {
-	// TODO parse the short date too
 	BString dateFormatString;
 	fLocale.GetDateFormat(dateFormatString, true);
 	const char* dateFormat = dateFormatString.String();
@@ -704,7 +671,8 @@ FormatView::_ParseDateFormat()
 	for (int i = 0; i < 4; i++)
 	{
 		fieldBegin = parsePointer;
-		while (*parsePointer == *(parsePointer + 1)) parsePointer++ ;
+		while (*parsePointer == *(parsePointer + 1))
+			parsePointer++;
 		parsePointer++;
 		BString str;
 		str.Append(fieldBegin, parsePointer - fieldBegin);
@@ -731,11 +699,13 @@ FormatView::_ParseDateFormat()
 			fLongDateMenu[i]->MenuItem()->SetLabel(str.Append("*"));
 
 		fieldBegin = parsePointer;
-		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0'
-				&& *(parsePointer - 1) >= 0) {
+		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0') {
 			if (*parsePointer == '\'') {
 				parsePointer++;
-				while (*parsePointer != '\'') parsePointer++;
+				while (*parsePointer != '\0' && *parsePointer != '\'')
+					parsePointer++;
+				if (*parsePointer == '\0')
+					break;
 			}
 			parsePointer++;
 		}
@@ -754,7 +724,8 @@ FormatView::_ParseDateFormat()
 
 	for (int i = 0; i < 3; i++) {
 		fieldBegin = parsePointer;
-		while (*parsePointer == *(parsePointer + 1)) parsePointer++ ;
+		while (*parsePointer == *(parsePointer + 1))
+			parsePointer++;
 		parsePointer++;
 		BString str;
 		str.Append(fieldBegin, parsePointer - fieldBegin);
@@ -783,11 +754,13 @@ FormatView::_ParseDateFormat()
 		}
 
 		fieldBegin = parsePointer;
-		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0'
-				&& *(parsePointer - 1) >= 0) {
+		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0') {
 			if (*parsePointer == '\'') {
 				parsePointer++;
-				while (*parsePointer != '\'') parsePointer++;
+				while (*parsePointer != '\0' && *parsePointer != '\'')
+					parsePointer++;
+				if (*parsePointer == '\0')
+					break;
 			}
 			parsePointer++;
 		}

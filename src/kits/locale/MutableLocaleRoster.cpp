@@ -122,7 +122,7 @@ CatalogAddOnInfo::UnloadIfPossible()
 }
 
 
-// #pragma mark - MutableLocaleRoster
+// #pragma mark - RosterData
 
 
 RosterData gRosterData;
@@ -132,7 +132,8 @@ static const char* kPriorityAttr = "ADDON:priority";
 
 RosterData::RosterData()
 	:
-	fLock("LocaleRosterData")
+	fLock("LocaleRosterData"),
+	fAreResourcesLoaded(false)
 {
 	openlog_team("liblocale.so", LOG_PID, LOG_USER);
 #ifndef DEBUG
@@ -439,8 +440,10 @@ RosterData::_LoadLocaleSettings()
 		BString codeName;
 		BLocale newDefaultLocale;
 
-		if (settings.FindString("country", &codeName) == B_OK)
-			newDefaultLocale = BLocale(codeName);
+		if (settings.FindString("country", &codeName) == B_OK) {
+			BCountry country(codeName);
+			newDefaultLocale = BLocale(NULL, &country);
+		}
 
 		BString timeFormat;
 		if (settings.FindString("shortTimeFormat", &timeFormat) == B_OK)
@@ -461,7 +464,8 @@ RosterData::_LoadLocaleSettings()
 
 	fPreferredLanguages.MakeEmpty();
 	fPreferredLanguages.AddString("language", "en");
-	_SetDefaultLocale("en_US");
+	BLanguage defaultLanguage("en_US");
+	_SetDefaultLocale(BLocale(&defaultLanguage));
 
 	return status;
 }
@@ -574,7 +578,9 @@ RosterData::_SetDefaultLocale(const BLocale& newLocale)
 	fDefaultLocale = newLocale;
 
 	UErrorCode icuError = U_ZERO_ERROR;
-	Locale icuLocale = Locale::createCanonical(newLocale.Code());
+	BCountry defaultCountry;
+	newLocale.GetCountry(&defaultCountry);
+	Locale icuLocale = Locale::createCanonical(defaultCountry.Code());
 	if (icuLocale.isBogus())
 		return B_ERROR;
 
@@ -607,7 +613,7 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 	if (languages != NULL
 		&& languages->FindString("language", &langName) == B_OK) {
 		fDefaultLocale.SetCollator(BCollator(langName.String()));
-		fDefaultLocale.SetLanguage(langName.String());
+		fDefaultLocale.SetLanguage(BLanguage(langName.String()));
 
 		fPreferredLanguages.RemoveName("language");
 		for (int i = 0; languages->FindString("language", i, &langName) == B_OK;
@@ -627,7 +633,9 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 status_t
 RosterData::_AddDefaultCountryToMessage(BMessage* message) const
 {
-	status_t status = message->AddString("country", fDefaultLocale.Code());
+	BCountry defaultCountry;
+	fDefaultLocale.GetCountry(&defaultCountry);
+	status_t status = message->AddString("country", defaultCountry.Code());
 	BString timeFormat;
 	if (status == B_OK)
 		status = fDefaultLocale.GetTimeFormat(timeFormat, false);

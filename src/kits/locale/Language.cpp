@@ -110,10 +110,11 @@ BLanguage::GetString(uint32 id) const
 
 
 status_t
-BLanguage::GetName(BString& name) const
+BLanguage::GetNativeName(BString& name) const
 {
 	UnicodeString string;
 	fICULocale->getDisplayName(*fICULocale, string);
+	string.toTitle(NULL, *fICULocale);
 
 	name.Truncate(0);
 	BStringByteSink converter(&name);
@@ -124,13 +125,16 @@ BLanguage::GetName(BString& name) const
 
 
 status_t
-BLanguage::GetTranslatedName(BString& name) const
+BLanguage::GetName(BString& name, const BLanguage* displayLanguage) const
 {
-	BMessage preferredLanguage;
-	be_locale_roster->GetPreferredLanguages(&preferredLanguage);
-
 	BString appLanguage;
-	preferredLanguage.FindString("language", 0, &appLanguage);
+	if (displayLanguage == NULL) {
+		BMessage preferredLanguage;
+		be_locale_roster->GetPreferredLanguages(&preferredLanguage);
+		preferredLanguage.FindString("language", 0, &appLanguage);
+	} else {
+		appLanguage = displayLanguage->Code();
+	}
 
 	UnicodeString string;
 	fICULocale->getDisplayName(Locale(appLanguage), string);
@@ -151,13 +155,24 @@ BLanguage::Code() const
 
 
 const char*
-BLanguage::Country() const
+BLanguage::CountryCode() const
 {
 	const char* country = fICULocale->getCountry();
 	if (country == NULL || country[0] == '\0')
 		return NULL;
 
 	return country;
+}
+
+
+const char*
+BLanguage::ScriptCode() const
+{
+	const char* script = fICULocale->getScript();
+	if (script == NULL || script[0] == '\0')
+		return NULL;
+
+	return script;
 }
 
 
@@ -182,7 +197,7 @@ BLanguage::ID() const
 bool
 BLanguage::IsCountrySpecific() const
 {
-	return Country() != NULL;
+	return CountryCode() != NULL;
 }
 
 

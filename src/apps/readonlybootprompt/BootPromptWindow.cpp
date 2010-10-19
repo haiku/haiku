@@ -260,6 +260,9 @@ BootPromptWindow::_PopulateLanguages()
 	be_locale_roster->GetInstalledCatalogs(&installedCatalogs,
 		"x-vnd.Haiku-ReadOnlyBootPrompt");
 
+	BFont font;
+	fLanguagesListView->GetFont(&font);
+
 	// Try to instantiate a BCatalog for each language, it will only work
 	// for translations of this application. So the list of languages will be
 	//  limited to catalogs written for this application, which is on purpose!
@@ -270,14 +273,16 @@ BootPromptWindow::_PopulateLanguages()
 		BLanguage* language;
 		if (be_locale_roster->GetLanguage(languageString, &language) == B_OK) {
 			BString name;
-			language->GetName(name);
+			language->GetNativeName(name);
 
-			// TODO: as long as the app_server doesn't support font overlays,
-			// use the translated name if problematic characters are used...
-			const char* string = name.String();
-			while (uint32 code = BUnicodeChar::FromUTF8(&string)) {
-				if (code > 1424) {
-					language->GetTranslatedName(name);
+			// TODO: the following block fails to detect a couple of language
+			// names as containing glyphs we can't render. Why's that?
+			bool hasGlyphs[name.CountChars()];
+			font.GetHasGlyphs(name.String(), name.CountChars(), hasGlyphs);
+			for (int32 i = 0; i < name.CountChars(); ++i) {
+				if (!hasGlyphs[i]) {
+					// replace by name translated to current language
+					language->GetName(name);
 					break;
 				}
 			}

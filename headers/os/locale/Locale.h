@@ -38,8 +38,8 @@ typedef enum {
 
 class BLocale {
 public:
-								BLocale(const char* languageAndCountryCode
-									= "en_US");
+								BLocale(const BLanguage* language = NULL,
+									const BCountry* country = NULL);
 								BLocale(const BLocale& other);
 								~BLocale();
 
@@ -48,12 +48,12 @@ public:
 			status_t			GetCollator(BCollator* collator) const;
 			status_t			GetLanguage(BLanguage* language) const;
 			status_t			GetCountry(BCountry* country) const;
-			const char*			Code() const;
-			bool				GetName(BString& name) const;
 
 			void				SetCountry(const BCountry& newCountry);
 			void				SetCollator(const BCollator& newCollator);
-			void				SetLanguage(const char* languageCode);
+			void				SetLanguage(const BLanguage& newLanguage);
+
+			bool				GetName(BString& name) const;
 
 			// see definitions in LocaleStrings.h
 			const char*			GetString(uint32 id) const;
@@ -140,17 +140,19 @@ public:
 			void				GetSortKey(const char* string,
 									BString* key) const;
 
-protected:
+private:
+			void				_UpdateFormats();
+
 	mutable	BLocker				fLock;
 			BCollator			fCollator;
 			BCountry			fCountry;
 			BLanguage			fLanguage;
 
-			icu_44::Locale*		fICULocale;
 			BString				fLongDateFormat;
 			BString				fShortDateFormat;
 			BString				fLongTimeFormat;
 			BString				fShortTimeFormat;
+
 };
 
 

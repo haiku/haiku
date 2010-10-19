@@ -123,7 +123,7 @@ BDurationFormat::SetTimeZone(const BTimeZone* timeZone)
 	} else
 		zonePrivate.SetTo(timeZone);
 
-	TimeZone* icuTimeZone = zonePrivate.IcuTimeZone();
+	TimeZone* icuTimeZone = zonePrivate.ICUTimeZone();
 	if (icuTimeZone != NULL)
 		fCalendar->setTimeZone(*icuTimeZone);
 

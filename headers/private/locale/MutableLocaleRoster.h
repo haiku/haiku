@@ -15,6 +15,7 @@
 #include <Locker.h>
 #include <LocaleRoster.h>
 #include <Message.h>
+#include <Resources.h>
 #include <TimeZone.h>
 
 
@@ -112,6 +113,9 @@ struct RosterData {
 
 			BLocale				fDefaultLocale;
 			BTimeZone			fDefaultTimeZone;
+
+			bool				fAreResourcesLoaded;
+			BResources			fResources;
 
 								RosterData();
 								~RosterData();

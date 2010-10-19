@@ -24,9 +24,9 @@ public:
 	}
 
 	icu_44::TimeZone*
-	IcuTimeZone()
+	ICUTimeZone()
 	{
-		return fTimeZone->fIcuTimeZone;
+		return fTimeZone->fICUTimeZone;
 	}
 
 private:

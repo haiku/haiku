@@ -38,8 +38,8 @@ static const uint32 skOffsetFromGMTField			= 1U << 8;
 
 BTimeZone::BTimeZone(const char* zoneID, const BLanguage* language)
 	:
-	fIcuTimeZone(NULL),
-	fIcuLocale(NULL),
+	fICUTimeZone(NULL),
+	fICULocale(NULL),
 	fInitStatus(B_NO_INIT),
 	fInitializedFields(0)
 {
@@ -49,12 +49,12 @@ BTimeZone::BTimeZone(const char* zoneID, const BLanguage* language)
 
 BTimeZone::BTimeZone(const BTimeZone& other)
 	:
-	fIcuTimeZone(other.fIcuTimeZone == NULL
+	fICUTimeZone(other.fICUTimeZone == NULL
 		? NULL
-		: other.fIcuTimeZone->clone()),
-	fIcuLocale(other.fIcuLocale == NULL
+		: other.fICUTimeZone->clone()),
+	fICULocale(other.fICULocale == NULL
 		? NULL
-		: other.fIcuLocale->clone()),
+		: other.fICULocale->clone()),
 	fInitStatus(other.fInitStatus),
 	fInitializedFields(other.fInitializedFields),
 	fZoneID(other.fZoneID),
@@ -70,20 +70,20 @@ BTimeZone::BTimeZone(const BTimeZone& other)
 
 BTimeZone::~BTimeZone()
 {
-	delete fIcuLocale;
-	delete fIcuTimeZone;
+	delete fICULocale;
+	delete fICUTimeZone;
 }
 
 
 BTimeZone& BTimeZone::operator=(const BTimeZone& source)
 {
-	delete fIcuTimeZone;
-	fIcuTimeZone = source.fIcuTimeZone == NULL
+	delete fICUTimeZone;
+	fICUTimeZone = source.fICUTimeZone == NULL
 		? NULL
-		: source.fIcuTimeZone->clone();
-	fIcuLocale = source.fIcuLocale == NULL
+		: source.fICUTimeZone->clone();
+	fICULocale = source.fICULocale == NULL
 		? NULL
-		: source.fIcuLocale->clone();
+		: source.fICULocale->clone();
 	fInitStatus = source.fInitStatus;
 	fInitializedFields = source.fInitializedFields;
 	fZoneID = source.fZoneID;
@@ -110,11 +110,11 @@ BTimeZone::Name() const
 {
 	if ((fInitializedFields & skNameField) == 0) {
 		UnicodeString unicodeString;
-		if (fIcuLocale != NULL) {
-			fIcuTimeZone->getDisplayName(false, TimeZone::GENERIC_LOCATION,
-				*fIcuLocale, unicodeString);
+		if (fICULocale != NULL) {
+			fICUTimeZone->getDisplayName(false, TimeZone::GENERIC_LOCATION,
+				*fICULocale, unicodeString);
 		} else {
-			fIcuTimeZone->getDisplayName(false, TimeZone::GENERIC_LOCATION,
+			fICUTimeZone->getDisplayName(false, TimeZone::GENERIC_LOCATION,
 				unicodeString);
 		}
 		BStringByteSink sink(&fName);
@@ -131,11 +131,11 @@ BTimeZone::DaylightSavingName() const
 {
 	if ((fInitializedFields & skDaylightSavingNameField) == 0) {
 		UnicodeString unicodeString;
-		if (fIcuLocale != NULL) {
-			fIcuTimeZone->getDisplayName(true, TimeZone::GENERIC_LOCATION,
-				*fIcuLocale, unicodeString);
+		if (fICULocale != NULL) {
+			fICUTimeZone->getDisplayName(true, TimeZone::GENERIC_LOCATION,
+				*fICULocale, unicodeString);
 		} else {
-			fIcuTimeZone->getDisplayName(true, TimeZone::GENERIC_LOCATION,
+			fICUTimeZone->getDisplayName(true, TimeZone::GENERIC_LOCATION,
 				unicodeString);
 		}
 		BStringByteSink sink(&fDaylightSavingName);
@@ -152,11 +152,11 @@ BTimeZone::ShortName() const
 {
 	if ((fInitializedFields & skShortNameField) == 0) {
 		UnicodeString unicodeString;
-		if (fIcuLocale != NULL) {
-			fIcuTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
-				*fIcuLocale, unicodeString);
+		if (fICULocale != NULL) {
+			fICUTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
+				*fICULocale, unicodeString);
 		} else {
-			fIcuTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
+			fICUTimeZone->getDisplayName(false, TimeZone::SHORT_COMMONLY_USED,
 				unicodeString);
 		}
 		BStringByteSink sink(&fShortName);
@@ -173,11 +173,11 @@ BTimeZone::ShortDaylightSavingName() const
 {
 	if ((fInitializedFields & skShortDaylightSavingNameField) == 0) {
 		UnicodeString unicodeString;
-		if (fIcuLocale != NULL) {
-			fIcuTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
-				*fIcuLocale, unicodeString);
+		if (fICULocale != NULL) {
+			fICUTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
+				*fICULocale, unicodeString);
 		} else {
-			fIcuTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
+			fICUTimeZone->getDisplayName(true, TimeZone::SHORT_COMMONLY_USED,
 				unicodeString);
 		}
 		BStringByteSink sink(&fShortDaylightSavingName);
@@ -198,7 +198,7 @@ BTimeZone::OffsetFromGMT() const
 		UDate nowMillis = 1000 * (double)time(NULL);
 
 		UErrorCode error = U_ZERO_ERROR;
-		fIcuTimeZone->getOffset(nowMillis, FALSE, rawOffset, dstOffset, error);
+		fICUTimeZone->getOffset(nowMillis, FALSE, rawOffset, dstOffset, error);
 		if (!U_SUCCESS(error))
 			fOffsetFromGMT = 0;
 		else {
@@ -216,7 +216,7 @@ bool
 BTimeZone::SupportsDaylightSaving() const
 {
 	if ((fInitializedFields & skSupportsDaylightSavingField) == 0) {
-		fSupportsDaylightSaving = fIcuTimeZone->useDaylightTime();
+		fSupportsDaylightSaving = fICUTimeZone->useDaylightTime();
 		fInitializedFields |= skSupportsDaylightSavingField;
 	}
 
@@ -241,31 +241,31 @@ BTimeZone::SetLanguage(const BLanguage* language)
 status_t
 BTimeZone::SetTo(const char* zoneID, const BLanguage* language)
 {
-	delete fIcuLocale;
-	fIcuLocale = NULL;
-	delete fIcuTimeZone;
+	delete fICULocale;
+	fICULocale = NULL;
+	delete fICUTimeZone;
 	fInitializedFields = 0;
 
 	if (zoneID == NULL || zoneID[0] == '\0')
-		fIcuTimeZone = TimeZone::createDefault();
+		fICUTimeZone = TimeZone::createDefault();
 	else
-		fIcuTimeZone = TimeZone::createTimeZone(zoneID);
+		fICUTimeZone = TimeZone::createTimeZone(zoneID);
 
-	if (fIcuTimeZone == NULL) {
+	if (fICUTimeZone == NULL) {
 		fInitStatus = B_NAME_NOT_FOUND;
 		return fInitStatus;
 	}
 
 	if (language != NULL) {
-		fIcuLocale = new Locale(language->Code());
-		if (fIcuLocale == NULL) {
+		fICULocale = new Locale(language->Code());
+		if (fICULocale == NULL) {
 			fInitStatus = B_NO_MEMORY;
 			return fInitStatus;
 		}
 	}
 
 	UnicodeString unicodeString;
-	fIcuTimeZone->getID(unicodeString);
+	fICUTimeZone->getID(unicodeString);
 	BStringByteSink sink(&fZoneID);
 	unicodeString.toUTF8(sink);
 

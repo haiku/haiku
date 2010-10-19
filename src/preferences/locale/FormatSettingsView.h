@@ -43,8 +43,6 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
 
-	virtual	void				SetDefaults();
-	virtual	bool				IsDefaultable() const;
 	virtual	void				Revert();
 	virtual	void				SetLocale(const BLocale& locale);
 	virtual	void				RecordRevertSettings();

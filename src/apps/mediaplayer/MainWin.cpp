@@ -1587,7 +1587,7 @@ MainWin::_SetupTrackMenus(BMenu* audioTrackMenu, BMenu* videoTrackMenu,
 		if (languageString != NULL) {
 			BLanguage language(languageString);
 			BString languageName;
-			if (language.GetTranslatedName(languageName) == B_OK)
+			if (language.GetName(languageName) == B_OK)
 				languageString = languageName.String();
 			snprintf(s, sizeof(s), "%s", languageString);
 		} else

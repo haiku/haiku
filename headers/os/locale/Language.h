@@ -34,12 +34,17 @@ public:
 
 			BLanguage&			operator=(const BLanguage& source);
 
-			status_t			GetName(BString& name) const;
-			status_t			GetTranslatedName(BString& name) const;
+			status_t			GetNativeName(BString& name) const;
+			status_t			GetName(BString& name,
+									const BLanguage* displayLanguage = NULL
+									) const;
 
-			// ISO-639 language code, e.g. "en", "de"
 			const char*			Code() const;
-			const char*			Country() const;
+									// ISO-639-1
+			const char*			CountryCode() const;
+									// ISO-3166
+			const char*			ScriptCode() const;
+									// ISO-15924
 			const char*			Variant() const;
 			const char*			ID() const;
 
@@ -50,10 +55,12 @@ public:
 
 			status_t			SetTo(const char* language);
 
-			// see definitions below
 			const char*			GetString(uint32 id) const;
 
+			class Private;
 private:
+	friend	class Private;
+
 //			BString				fStrings[B_NUM_LANGUAGE_STRINGS];
 			uint8				fDirection;
 			icu_44::Locale*		fICULocale;

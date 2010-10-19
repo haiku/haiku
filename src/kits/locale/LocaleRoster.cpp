@@ -17,6 +17,7 @@
 
 #include <Autolock.h>
 #include <AppFileInfo.h>
+#include <Bitmap.h>
 #include <Catalog.h>
 #include <Collator.h>
 #include <Country.h>
@@ -24,6 +25,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <IconUtils.h>
 #include <Language.h>
 #include <Locale.h>
 #include <MutableLocaleRoster.h>
@@ -224,6 +226,39 @@ BLocaleRoster::GetAvailableTimeZonesForCountry(BMessage* timeZones,
 	delete zoneList;
 
 	return status;
+}
+
+
+status_t
+BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon, const char* countryCode)
+{
+	if (countryCode == NULL)
+		return B_BAD_DATA;
+
+	BAutolock lock(gRosterData.fLock);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	if (!gRosterData.fAreResourcesLoaded) {
+		status_t result = gRosterData.fResources.SetToImage(&gRosterData);
+		if (result != B_OK)
+			return result;
+
+		result = gRosterData.fResources.PreloadResourceType();
+		if (result != B_OK)
+			return result;
+
+		gRosterData.fAreResourcesLoaded = true;
+	}
+
+	size_t size;
+	const void* buffer = gRosterData.fResources.LoadResource(B_VECTOR_ICON_TYPE,
+		countryCode, &size);
+	if (buffer == NULL || size == 0)
+		return B_NAME_NOT_FOUND;
+
+	return BIconUtils::GetVectorIcon(static_cast<const uint8*>(buffer), size,
+		flagIcon);
 }
 
 
