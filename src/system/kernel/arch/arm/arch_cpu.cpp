@@ -42,9 +42,9 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 status_t 
 arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
-	//detect_cpu(curr_cpu);
+	if (curr_cpu != 0)
+		panic("No SMP support on ARM yet!\n");
 
-	// we only support one anyway...
 	return 0;
 }
 
@@ -57,7 +57,7 @@ arch_cpu_init(kernel_args *args)
 	arch_mmu_type = args->arch_args.mmu_type;
 	arch_platform = args->arch_args.platform;
 	arch_platform = args->arch_args.machine;
-#warning TODO arch_cpu_init
+
 	return B_OK;
 }
 
@@ -67,6 +67,7 @@ arch_cpu_init_post_vm(kernel_args *args)
 {
 	return B_OK;
 }
+
 
 status_t
 arch_cpu_init_post_modules(kernel_args *args)
@@ -78,72 +79,71 @@ arch_cpu_init_post_modules(kernel_args *args)
 }
 
 
+void
+arch_cpu_idle(void)
+{
+	uint32 Rd = 0;
+	asm volatile("mcr p15, 0, %[c7format], c7, c0, 4" : : [c7format] "r" (Rd) );
+}
+
+
+status_t
+arch_cpu_shutdown(bool reboot)
+{
+	while(1)
+		arch_cpu_idle();
+
+	// never reached
+	return B_ERROR;
+}
+
+
 void 
 arch_cpu_sync_icache(void *address, size_t len)
 {
-#warning ARM arch_cpu_sync_icache 
-
-//	cpu_ops.flush_icache((addr_t)address, len);
+	uint32 Rd = 0;
+	asm volatile ("mcr p15, 0, %[c7format], c7, c5, 0" : : [c7format] "r" (Rd) );
 }
 
 
 void
 arch_cpu_memory_read_barrier(void)
 {
-	asm volatile ("nop;" : : : "memory");
-#warning M68k: check arch_cpu_memory_read_barrier (FNOP ?)
+	asm volatile ("" : : : "memory");
 }
 
 
 void
 arch_cpu_memory_write_barrier(void)
 {
-	asm volatile ("nop;" : : : "memory");
-#warning M68k: check arch_cpu_memory_write_barrier (FNOP ?)
+	asm volatile ("" : : : "memory");
 }
 
 
 void 
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
-/*	int32 num_pages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
-	cpu_ops.flush_insn_pipeline();
+	int32 num_pages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
 	while (num_pages-- >= 0) {
-		cpu_ops.flush_atc_addr(start);
-		cpu_ops.flush_insn_pipeline();
+		asm volatile ("mcr p15, 0, %[c8format], c8, c6, 1" : : [c8format] "r" (start) );
 		start += B_PAGE_SIZE;
 	}
-	cpu_ops.flush_insn_pipeline();
-*/
-#warning WRITEME arch_cpu_invalidate_TLB_range
 }
 
 
 void 
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
-/*
-	int i;
-	
-	cpu_ops.flush_insn_pipeline();
-	for (i = 0; i < num_pages; i++) {
-		cpu_ops.flush_atc_addr(pages[i]);
-		cpu_ops.flush_insn_pipeline();
-	}
-	cpu_ops.flush_insn_pipeline();
-*/
-#warning WRITEME arch_cpu_invalidate_TLB_lis
+	for (int i = 0; i < num_pages; i++)
+		asm volatile ("mcr p15, 0, %[c8format], c8, c6, 1" : : [c8format] "r" (pages[i]) );
 }
 
 
 void 
 arch_cpu_global_TLB_invalidate(void)
 {
-/*	cpu_ops.flush_insn_pipeline();
-	cpu_ops.flush_atc_all();
-	cpu_ops.flush_insn_pipeline();
-*/
-#warning WRITEME arch_cpu_global_TLB_invalidate
+	uint32 Rd = 0;
+	asm volatile ("mcr p15, 0, %[c8format], c8, c7, 0" : : [c8format] "r" (Rd) );
 }
 
 
@@ -155,7 +155,6 @@ arch_cpu_user_TLB_invalidate(void)
 	cpu_ops.flush_insn_pipeline();
 */
 #warning WRITEME 
-
 }
 
 
@@ -248,27 +247,6 @@ error:
 	*faultHandler = oldFaultHandler;*/
 
 	return B_BAD_ADDRESS;
-}
-
-
-status_t
-arch_cpu_shutdown(bool reboot)
-{
-#warning WRITEME 
-//	M68KPlatform::Default()->ShutDown(reboot);
-	return B_ERROR;
-}
-
-
-void
-arch_cpu_idle(void)
-{
-#warning WRITEME 
-
-//	if (cpu_ops.idle)
-//		cpu_ops.idle();
-//#warning M68K: use LPSTOP ?
-	//asm volatile ("lpstop");
 }
 
 
