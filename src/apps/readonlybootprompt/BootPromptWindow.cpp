@@ -63,6 +63,18 @@ private:
 };
 
 
+static int
+compare_void_list_items(const void* _a, const void* _b)
+{
+	static BCollator collator;
+
+	LanguageItem* a = *(LanguageItem**)_a;
+	LanguageItem* b = *(LanguageItem**)_b;
+
+	return collator.Compare(a->Text(), b->Text());
+}
+
+
 BootPromptWindow::BootPromptWindow()
 	:
 	BWindow(BRect(0, 0, 450, 380), "",
@@ -268,6 +280,7 @@ BootPromptWindow::_PopulateLanguages()
 	//  limited to catalogs written for this application, which is on purpose!
 
 	const char* languageString;
+	LanguageItem* currentItem = NULL;
 	for (int32 i = 0; installedCatalogs.FindString("langs", i, &languageString)
 			== B_OK; i++) {
 		BLanguage* language;
@@ -291,16 +304,17 @@ BootPromptWindow::_PopulateLanguages()
 				languageString);
 			fLanguagesListView->AddItem(item);
 			// Select this item if it is the first preferred language
-			if (strcmp(firstPreferredLanguage, languageString) == 0) {
-				fLanguagesListView->Select(
-					fLanguagesListView->CountItems() - 1);
-			}
+			if (strcmp(firstPreferredLanguage, languageString) == 0)
+				currentItem = item;
 
 			delete language;
 		} else
 			printf("failed to get BLanguage for %s\n", languageString);
 	}
 
+	fLanguagesListView->SortItems(compare_void_list_items);
+	if (currentItem != NULL)
+		fLanguagesListView->Select(fLanguagesListView->IndexOf(currentItem));
 	fLanguagesListView->ScrollToSelection();
 
 	// Re-enable sending the selection message.
