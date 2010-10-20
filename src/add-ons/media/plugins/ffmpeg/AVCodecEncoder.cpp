@@ -272,9 +272,13 @@ AVCodecEncoder::_Setup()
 		// video size
 		fContext->width = fInputFormat.u.raw_video.display.line_width;
 		fContext->height = fInputFormat.u.raw_video.display.line_count;
-//		fContext->gop_size = 12;
+		fContext->gop_size = 12;
 		// TODO: Fix pixel format or setup conversion method...
-		fContext->pix_fmt = PIX_FMT_YUV420P;
+		for (int i = 0; fCodec->pix_fmts[i] != PIX_FMT_NONE; i++) {
+			// Use the last supported pixel format, which we hope is the
+			// one with the best quality.
+			fContext->pix_fmt = fCodec->pix_fmts[i];
+		}
 
 		// TODO: Setup rate control:
 //		fContext->rate_emu = 0;
@@ -551,6 +555,7 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 	// Setup media_encode_info, most important is the time stamp.
 	info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
 		/ fInputFormat.u.raw_audio.frame_rate);
+	info->flags = B_MEDIA_KEY_FRAME;
 
 	// Write the chunk
 	status_t ret = WriteChunk(fChunkBuffer, usedBytes, info);
@@ -590,12 +595,12 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			fInputFormat.u.raw_video.display.line_count, fDstFrame.data,
 			fDstFrame.linesize);
 
-		// TODO: Look into this... avcodec.h says we need to set it.
-		fFrame->pts++;
-
 		// Encode one video chunk/frame.
 		int usedBytes = avcodec_encode_video(fContext, fChunkBuffer,
 			kDefaultChunkBufferSize, fFrame);
+
+		// avcodec.h says we need to set it.
+		fFrame->pts++;
 
 		if (usedBytes < 0) {
 			TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
@@ -615,6 +620,10 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 		// Setup media_encode_info, most important is the time stamp.
 		info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
 			/ fInputFormat.u.raw_video.field_rate);
+
+		info->flags = 0;
+		if (fContext->coded_frame->key_frame)
+			info->flags |= B_MEDIA_KEY_FRAME;
 
 		// Write the chunk
 		ret = WriteChunk(fChunkBuffer, usedBytes, info);
