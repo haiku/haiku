@@ -1,6 +1,7 @@
 /*
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -37,6 +38,9 @@
 // ToDo: add more fine grained locking - maybe using a ref_count in the
 //		node_monitor structure?
 // ToDo: return another error code than B_NO_MEMORY if the team's maximum is hit
+
+
+const dev_t kWatchVolumeNode = (dev_t)-1;
 
 
 typedef struct monitor_listener monitor_listener;
@@ -541,6 +545,9 @@ NodeMonitorService::NotifyEntryCreatedOrRemoved(int32 opcode, dev_t device,
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
+	// ... for the volume
+	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_NAME,
+		interestedListeners, interestedListenerCount);
 	// ... for the node
 	if (opcode != B_ENTRY_CREATED) {
 		_GetInterestedMonitorListeners(device, node, B_WATCH_NAME,
@@ -584,8 +591,11 @@ NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
-	interested_monitor_listener_list interestedListeners[3];
+	interested_monitor_listener_list interestedListeners[4];
 	int32 interestedListenerCount = 0;
+	// ... for the volume
+	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_NAME,
+		interestedListeners, interestedListenerCount);
 	// ... for the node
 	_GetInterestedMonitorListeners(nodeDevice, node, B_WATCH_NAME,
 		interestedListeners, interestedListenerCount);
@@ -628,6 +638,9 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
+	// ... for the volume
+	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_STAT,
+		interestedListeners, interestedListenerCount);
 	// ... for the node, depending on wether its an interim update or not
 	_GetInterestedMonitorListeners(device, node,
 		(statFields & B_STAT_INTERIM_UPDATE) != 0
@@ -673,6 +686,9 @@ NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
+	// ... for the volume
+	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_ATTR,
+		interestedListeners, interestedListenerCount);
 	// ... for the node
 	_GetInterestedMonitorListeners(device, node, B_WATCH_ATTR,
 		interestedListeners, interestedListenerCount);

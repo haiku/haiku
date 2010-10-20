@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2003-2010, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NODE_MONITOR_H
@@ -83,10 +83,15 @@ class BLooper;
 class BHandler;
 
 
-extern status_t watch_node(const node_ref *node, uint32 flags, BMessenger target);
+extern status_t watch_volume(const dev_t volume, uint32 flags,
+					BMessenger target);
+extern status_t watch_volume(const dev_t volume, uint32 flags, 
+					const BHandler *handler, const BLooper *looper = NULL);
+
+extern status_t watch_node(const node_ref *node, uint32 flags,
+					BMessenger target);
 extern status_t watch_node(const node_ref *node, uint32 flags, 
-					const BHandler *handler,
-					const BLooper *looper = NULL);
+					const BHandler *handler, const BLooper *looper = NULL);
 
 extern status_t stop_watching(BMessenger target);
 extern status_t stop_watching(const BHandler *handler, const BLooper *looper = NULL);
