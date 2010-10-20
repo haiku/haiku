@@ -12,7 +12,7 @@ OptionalPackageDependencies CDRecord : LibIconv ;
 OptionalPackageDependencies Curl : OpenSSL ;
 OptionalPackageDependencies DevelopmentBase : CDRecord DevelopmentMin Yasm ;
 OptionalPackageDependencies Development : DevelopmentBase Perl ;
-OptionalPackageDependencies EtPan : Curl Expat LibIconv OpenSSH ;
+OptionalPackageDependencies EtPan : Curl Expat LibIconv OpenSSL ;
 OptionalPackageDependencies GetText : LibIconv ;
 OptionalPackageDependencies Git : Expat Curl OpenSSL LibIconv ;
 OptionalPackageDependencies ICU-devel : DevelopmentBase ;
