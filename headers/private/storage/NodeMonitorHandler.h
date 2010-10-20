@@ -27,14 +27,16 @@ static void		make_node_ref(dev_t device, ino_t node, node_ref * ref);
 protected:
 	// hooks for subclass
 	virtual void	EntryCreated(const char *name, ino_t directory,
-					             dev_t device, ino_t node);
-	virtual void	EntryRemoved(ino_t directory, dev_t device, ino_t node);
-	virtual void	EntryMoved(const char *name, ino_t from_directory,
-					           ino_t to_directory, dev_t device, ino_t node);
+						dev_t device, ino_t node);
+	virtual void	EntryRemoved(const char *name, ino_t directory,
+						dev_t device, ino_t node);
+	virtual void	EntryMoved(const char *name, const char *fromName,
+						ino_t from_directory, ino_t to_directory, dev_t device,
+						ino_t node, dev_t nodeDevice);
 	virtual void	StatChanged(ino_t node, dev_t device);
 	virtual void	AttrChanged(ino_t node, dev_t device);
 	virtual void	DeviceMounted(dev_t new_device, dev_t device,
-					              ino_t directory);
+						ino_t directory);
 	virtual void	DeviceUnmounted(dev_t new_device);
 
 private:

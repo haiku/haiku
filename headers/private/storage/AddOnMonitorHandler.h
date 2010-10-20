@@ -61,11 +61,12 @@ protected:
 protected:
 	virtual	void				EntryCreated(const char* name, ino_t directory,
 									dev_t device, ino_t node);
-	virtual	void				EntryRemoved(ino_t directory, dev_t device,
-									ino_t node);
-	virtual	void				EntryMoved(const char* name,
-									ino_t fromDirectory, ino_t toDirectory,
+	virtual	void				EntryRemoved(const char *name, ino_t directory,
 									dev_t device, ino_t node);
+	virtual	void				EntryMoved(const char *name,
+									const char *fromName, ino_t from_directory,
+									ino_t to_directory, dev_t device,
+									ino_t node, dev_t nodeDevice);
 	virtual	void				StatChanged(ino_t node, dev_t device);
 
 private:

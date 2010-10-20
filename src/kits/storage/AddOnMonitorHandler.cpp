@@ -149,7 +149,8 @@ AddOnMonitorHandler::EntryCreated(const char* name, ino_t directory,
 
 
 void
-AddOnMonitorHandler::EntryRemoved(ino_t directory, dev_t device, ino_t node)
+AddOnMonitorHandler::EntryRemoved(const char* name, ino_t directory,
+	dev_t device, ino_t node)
 {
 	node_ref entryNodeRef;
 	make_node_ref(device, node, &entryNodeRef);
@@ -212,15 +213,16 @@ AddOnMonitorHandler::EntryRemoved(ino_t directory, dev_t device, ino_t node)
 
 
 void
-AddOnMonitorHandler::EntryMoved(const char* name, ino_t fromDirectory,
-	ino_t toDirectory, dev_t device, ino_t node)
+AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
+	ino_t from_directory, ino_t to_directory, dev_t device, ino_t node,
+	dev_t nodeDevice)
 {
 	node_ref toNodeRef;
-	make_node_ref(device, toDirectory, &toNodeRef);
+	make_node_ref(device, to_directory, &toNodeRef);
 
 	// Search the "from" and "to" directory in the known directories
 	DirectoryList::iterator from_iter = fDirectories.begin();
-	bool watchingFromDirectory = _FindDirectory(fromDirectory, device,
+	bool watchingFromDirectory = _FindDirectory(from_directory, device,
 		from_iter);
 
 	DirectoryList::iterator to_iter = fDirectories.begin();
@@ -342,7 +344,7 @@ AddOnMonitorHandler::EntryMoved(const char* name, ino_t fromDirectory,
 		// the entry and readding it. TODO: This can temporarily enable add-ons
 		// which should in fact stay hidden (moving add-on from home to common
 		// folder or vice versa, the system add-on should remain hidden).
-		EntryRemoved(fromDirectory, device, node);
+		EntryRemoved(name, from_directory, device, node);
 		info.dir_nref = toNodeRef;
 		_EntryCreated(info);
 	} else {
