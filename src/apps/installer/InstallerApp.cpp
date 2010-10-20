@@ -106,26 +106,30 @@ InstallerApp::ReadyToRun()
 
 		"This is alpha-quality software! It means there is a high risk of "
 		"losing important data. Make frequent backups! You have been "
-		"warned.\n\n"
+		"warned.\n\n\n"
 
-		"1)  If you are installing Haiku onto real hardware (not inside an "
+		"1)   If you are installing Haiku onto real hardware (not inside an "
 		"emulator) it is recommended that you have already prepared a hard "
 		"disk partition. The Installer and the DriveSetup tool offer to "
 		"initialize existing partitions with the Haiku native file system, "
 		"but the options to change the actual partition layout may not have "
 		"been tested on a sufficiently great variety of computer "
-		"installations so we do not recommend using it.\n"
+		"configurations so we do not recommend using it.\n"
 		"If you have not created a partition yet, simply reboot, create the "
 		"partition using whatever tool you feel most comfortable with, and "
 		"reboot into Haiku to continue with the installation. You could for "
 		"example use the GParted Live-CD, it can also resize existing "
-		"partitions to make room.\n\n"
+		"partitions to make room.\n\n\n"
 
-		"2)  The Installer will take no steps to integrate Haiku into an "
-		"existing boot menu. The Haiku partition itself will be made "
-		"bootable. If you have GRUB already installed, edit your "
-		"/boot/grub/menu.lst by launching your favorite editor from a "
-		"Terminal like this:\n\n"
+		"2)   The Installer will make the Haiku partition itself bootable, "
+		"but takes no steps to integrate Haiku into an existing boot menu. "
+		"If you have GRUB already installed, you can add Haiku to its boot "
+		"menu. Depending on what version of GRUB you use, this is done "
+		"differently.\n\n\n"
+
+		"2.1) GRUB 1\n"
+		"Configure your /boot/grub/menu.lst by launching your favorite "
+		"editor from a Terminal like this:\n\n"
 
 		"\tsudo <your favorite text editor> /boot/grub/menu.lst\n\n"
 
@@ -134,11 +138,11 @@ InstallerApp::ReadyToRun()
 
 		"With GRUB it's: (hdN,n)\n\n"
 
-		"All harddisks start with \"hd\"\n"
+		"All hard disks start with \"hd\".\n"
 		"\"N\" is the hard disk number, starting with \"0\".\n"
 		"\"n\" is the partition number, also starting with \"0\".\n"
-		"The first logical partition always has the number 4, regardless of "
-		"the number of primary partitions.\n\n"
+		"The first logical partition always has the number \"4\", regardless "
+		"of the number of primary partitions.\n\n"
 
 		"So behind the other menu entries towards the bottom of the file, add "
 		"something similar to these lines:\n\n"
@@ -148,9 +152,50 @@ InstallerApp::ReadyToRun()
 		"\trootnoverify\t\t(hd0,6)\n"
 		"\tchainloader\t\t+1\n\n"
 
-		"You can see the correct partition in GParted for example.\n\n"
+		"You can see the correct partition in GParted for example.\n\n\n"
 
-		"3)  When you successfully boot into Haiku for the first time, make "
+		"2.2) GRUB 2\n"
+		"Newer versions of GRUB use an extra configuration file to add "
+		"custom entries to the boot menu. To add them to the top, you have "
+		"to create/edit a file by launching your favorite editor from a "
+		"Terminal like this:\n\n"
+
+		"\tsudo <your favorite text editor> /etc/grub.d/40_custom\n\n"
+
+		"NOTE: While the naming strategy for hard disks is still as described "
+		"under 2.1) the naming scheme for partitions has changed.\n\n"
+		
+		"GRUB's naming scheme is still: (hdN,n)\n\n"
+
+		"All hard disks start with \"hd\".\n"
+		"\"N\" is the hard disk number, starting with \"0\".\n"
+		"\"n\" is the partition number, which for GRUB 2 starts with \"1\"\n"
+		"With GRUB 2 the first logical partition always has the number \"5\", "
+		"regardless of the number of primary partitions.\n\n"
+
+		"So below the heading that must not be edited, add something similar "
+		"to these lines:\n\n"
+
+		"\t# Haiku on /dev/sda7\n"
+		"\tmenuentry \"Haiku Alpha\" {\n"
+		"\t\tset root=(hd0,7)\n"
+		"\t\tchainloader +1\n"
+		"\t}\n\n"
+
+		"Additionally you have to edit another file to actually display the "
+		"boot menu:\n\n"
+
+		"\tsudo <your favorite text editor> /etc/default/grub\n\n"
+
+		"Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by "
+		"putting a \"#\" in front of it in order to actually display the "
+		"boot menu.\n\n"
+
+		"Finally, you have to update the boot menu by entering:\n\n"
+
+		"\tsudo update-grub\n\n\n"
+
+		"3)   When you successfully boot into Haiku for the first time, make "
 		"sure to read our \"Welcome\" documentation, there is a link on the "
 		"Desktop.\n\n"
 
