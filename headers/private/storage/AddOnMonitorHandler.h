@@ -67,7 +67,8 @@ protected:
 									const char *fromName, ino_t fromDirectory,
 									ino_t toDirectory, dev_t device,
 									ino_t node, dev_t nodeDevice);
-	virtual	void				StatChanged(ino_t node, dev_t device);
+	virtual	void				StatChanged(ino_t node, dev_t device,
+									int32 statFields);
 
 private:
 			void				_HandlePendingEntries();

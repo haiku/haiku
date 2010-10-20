@@ -110,7 +110,7 @@ NodeMonitorHandler::EntryMoved(const char *name, const char *fromName,
 
 
 /* virtual */ void
-NodeMonitorHandler::StatChanged(ino_t node, dev_t device)
+NodeMonitorHandler::StatChanged(ino_t node, dev_t device, int32 statFields)
 {
 	// ignore
 }
@@ -208,11 +208,13 @@ NodeMonitorHandler::HandleStatChanged(BMessage * msg)
 {
 	ino_t node;
 	dev_t device;
+	int32 statFields;
 	if ((msg->FindInt64("node", &node) != B_OK) ||
-		(msg->FindInt32("device", &device) != B_OK)) {
+		(msg->FindInt32("device", &device) != B_OK) ||
+		(msg->FindInt32("fields", &statFields) != B_OK)) {
 		return B_MESSAGE_NOT_UNDERSTOOD;
 	}
-	StatChanged(node, device);
+	StatChanged(node, device, statFields);
 	return B_OK;
 }
 

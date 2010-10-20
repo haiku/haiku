@@ -413,7 +413,7 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 
 
 void
-AddOnMonitorHandler::StatChanged(ino_t node, dev_t device)
+AddOnMonitorHandler::StatChanged(ino_t node, dev_t device, int32 statFields)
 {
 	// This notification is received for the add-ons themselves.
 
