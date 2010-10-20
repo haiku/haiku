@@ -183,7 +183,8 @@ WatchedEntry::EntryRemoved(ino_t node)
 
 
 RosterLooper::RosterLooper(BUSBRoster *roster)
-	:	fRoster(roster),
+	:	BLooper("BUSBRoster looper"),
+		fRoster(roster),
 		fRoot(NULL),
 		fMessenger(NULL)
 {
