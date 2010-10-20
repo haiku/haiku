@@ -1,16 +1,13 @@
 /*!
 \class BLocaleRoster
 \ingroup locale
-\brief Main class for accessingthe locale kit data
+\brief Main class for accessing the locale kit data
 
-The Locale Roster is the central part of the locale roster.
-It is a blobal object (be_locale_roster) storing all the useful locale
+The Locale Roster is the central part of the locale kit.
+It is a global object (be_locale_roster) storing all the useful locale
 data. Other classes from the Locale Kit can be constructed on their own,
-but only hte Locale Roster allows you to do so while taking account of
+but only the Locale Roster allows you to do so while taking account of
 the user's locale settings.
-
-The Locale Roster also provides convenient short-hands to the most used
-methods of the Locale Kit.
 */
 
 /*!
