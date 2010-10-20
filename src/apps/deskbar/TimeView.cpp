@@ -297,9 +297,8 @@ TTimeView::MouseDown(BPoint point)
 	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		ShowClockOptions(ConvertToScreen(point));
 		return;
-	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) 
 		ShowCalendar(point);
-	}
 
 	// invalidate last time/date strings and call the pulse
 	// method directly to change the display instantly
