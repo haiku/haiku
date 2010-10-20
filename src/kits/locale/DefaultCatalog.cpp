@@ -601,8 +601,8 @@ default_catalog_get_available_languages(BMessage* availableLanguages,
 	while(dir.GetNextEntry(&file) == B_OK) {
 		file.GetName(fileName);
 		BString langName(fileName);
-		langName.Replace(kCatExtension,"",1);
-		availableLanguages->AddString("langs",langName);
+		langName.Replace(kCatExtension, "", 1);
+		availableLanguages->AddString("language", langName);
 	}
 
 	// search in data folders
@@ -628,8 +628,8 @@ default_catalog_get_available_languages(BMessage* availableLanguages,
 			while(dir.GetNextEntry(&file) == B_OK) {
 				file.GetName(fileName);
 				BString langName(fileName);
-				langName.Replace(kCatExtension,"",1);
-				availableLanguages->AddString("langs",langName);
+				langName.Replace(kCatExtension, "", 1);
+				availableLanguages->AddString("language", langName);
 			}
 		}
 	}

@@ -281,7 +281,7 @@ TimeZoneView::_BuildZoneMenu()
 
 	BMessage countryList;
 	be_locale_roster->GetAvailableCountries(&countryList);
-	countryList.AddString("countries", "");
+	countryList.AddString("country", "");
 
 	/*
 	 * Group timezones by regions, but filter out unwanted (duplicate) regions
@@ -298,7 +298,7 @@ TimeZoneView::_BuildZoneMenu()
 		zoneMap[*region] = NULL;
 
 	BString countryCode;
-	for (int c = 0; countryList.FindString("countries", c, &countryCode)
+	for (int c = 0; countryList.FindString("country", c, &countryCode)
 			== B_OK; c++) {
 		BCountry country("", countryCode);
 		BString countryName;

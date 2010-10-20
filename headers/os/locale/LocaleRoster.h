@@ -36,10 +36,7 @@ public:
 
 			status_t			GetPreferredLanguages(BMessage* message) const;
 
-			status_t			GetInstalledLanguages(BMessage* message) const;
-									// the message contains one or more
-									// 'language'-string-fields which
-									// contain the language-name(s)
+			status_t			GetAvailableLanguages(BMessage* message) const;
 
 			status_t			GetAvailableCountries(
 									BMessage* timeZones) const;

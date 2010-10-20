@@ -4,7 +4,7 @@
 \brief Main class for accessingthe locale kit data
 
 The Locale Roster is the central part of the locale roster.
-It is a blobal object (be_locale√_roster) storing all the useful locale
+It is a blobal object (be_locale_roster) storing all the useful locale
 data. Other classes from the Locale Kit can be constructed on their own,
 but only hte Locale Roster allows you to do so while taking account of
 the user's locale settings.
@@ -44,11 +44,11 @@ methods of the Locale Kit.
 */
 
 /*!
-\fn status_t BLocaleRoster::GetInstalledLanguages(BMessage* message) const
+\fn status_t BLocaleRoster::GetAvailableLanguages(BMessage* message) const
 \brief List the available languages
 
 This function fills the passed BMessage with one or more 'language' string
-fields, containing the language(s) code(s).
+fields, containing the language(s) ID(s).
 
 */
 
@@ -57,7 +57,7 @@ fields, containing the language(s) code(s).
 \brief List the available countries
 
 This function filles the passed BMessage with one or more 'country' string
-fields, containing the country names.
+fields, containing the (ISO-639) code of each country.
 
 */
 

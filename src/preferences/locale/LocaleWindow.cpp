@@ -102,11 +102,11 @@ LocaleWindow::LocaleWindow()
 
 	// Fill the language list from the LocaleRoster data
 	BMessage installedLanguages;
-	if (be_locale_roster->GetInstalledLanguages(&installedLanguages) == B_OK) {
+	if (be_locale_roster->GetAvailableLanguages(&installedLanguages) == B_OK) {
 		BString currentID;
 		LanguageListItem* lastAddedCountryItem = NULL;
 
-		for (int i = 0; installedLanguages.FindString("langs", i, &currentID)
+		for (int i = 0; installedLanguages.FindString("language", i, &currentID)
 				== B_OK; i++) {
 			// Now get the human-readable, native name for each language
 			BString name;
@@ -189,7 +189,7 @@ LocaleWindow::LocaleWindow()
 	BCountry defaultFormattingConvention;
 	be_locale->GetCountry(&defaultFormattingConvention);
 	for (int i = 0;
-		installedLanguages.FindString("langs", i, &formattingConventionCode)
+		installedLanguages.FindString("language", i, &formattingConventionCode)
 			== B_OK; i++) {
 		BCountry formattingConvention(formattingConventionCode);
 		BString formattingConventionName;

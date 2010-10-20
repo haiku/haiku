@@ -37,6 +37,7 @@
 #include <ICUWrapper.h>
 
 // ICU includes
+#include <unicode/locdspnm.h>
 #include <unicode/locid.h>
 #include <unicode/timezone.h>
 
@@ -128,24 +129,21 @@ BLocaleRoster::GetPreferredLanguages(BMessage* languages) const
 }
 
 
+/**
+ * \brief Fills \c message with 'language'-fields containing the language-
+ * ID(s) of all available languages.
+ */
 status_t
-BLocaleRoster::GetInstalledLanguages(BMessage* languages) const
+BLocaleRoster::GetAvailableLanguages(BMessage* languages) const
 {
 	if (!languages)
 		return B_BAD_VALUE;
 
-	int32 i;
-	UnicodeString icuLanguageName;
-	BString languageName;
-
 	int32_t localeCount;
-	const Locale* icuLocaleList
-		= Locale::getAvailableLocales(localeCount);
+	const Locale* icuLocaleList = Locale::getAvailableLocales(localeCount);
 
-	// TODO: Loop over the strings and add them to a std::set to remove
-	//       duplicates?
-	for (i = 0; i < localeCount; i++)
-		languages->AddString("langs", icuLocaleList[i].getName());
+	for (int i = 0; i < localeCount; i++)
+		languages->AddString("language", icuLocaleList[i].getName());
 
 	return B_OK;
 }
@@ -161,7 +159,7 @@ BLocaleRoster::GetAvailableCountries(BMessage* countries) const
 	const char* const* countryList = uloc_getISOCountries();
 
 	for (i = 0; countryList[i] != NULL; i++)
-		countries->AddString("countries", countryList[i]);
+		countries->AddString("country", countryList[i]);
 
 	return B_OK;
 }

@@ -82,7 +82,7 @@ BootPromptWindow::BootPromptWindow()
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Get the list of all known languages (suffice to do it only once)
-	be_locale_roster->GetInstalledLanguages(&fInstalledLanguages);
+	be_locale_roster->GetAvailableLanguages(&fInstalledLanguages);
 
 	fInfoTextView = new BTextView("info", be_plain_font, NULL, B_WILL_DRAW);
 	fInfoTextView->SetInsets(10, 10, 10, 10);
@@ -279,12 +279,12 @@ BootPromptWindow::_PopulateLanguages()
 	// for translations of this application. So the list of languages will be
 	//  limited to catalogs written for this application, which is on purpose!
 
-	const char* languageString;
+	const char* languageID;
 	LanguageItem* currentItem = NULL;
-	for (int32 i = 0; installedCatalogs.FindString("langs", i, &languageString)
+	for (int32 i = 0; installedCatalogs.FindString("language", i, &languageID)
 			== B_OK; i++) {
 		BLanguage* language;
-		if (be_locale_roster->GetLanguage(languageString, &language) == B_OK) {
+		if (be_locale_roster->GetLanguage(languageID, &language) == B_OK) {
 			BString name;
 			language->GetNativeName(name);
 
@@ -301,15 +301,15 @@ BootPromptWindow::_PopulateLanguages()
 			}
 
 			LanguageItem* item = new LanguageItem(name.String(),
-				languageString);
+				languageID);
 			fLanguagesListView->AddItem(item);
 			// Select this item if it is the first preferred language
-			if (strcmp(firstPreferredLanguage, languageString) == 0)
+			if (strcmp(firstPreferredLanguage, languageID) == 0)
 				currentItem = item;
 
 			delete language;
 		} else
-			printf("failed to get BLanguage for %s\n", languageString);
+			printf("failed to get BLanguage for %s\n", languageID);
 	}
 
 	fLanguagesListView->SortItems(compare_void_list_items);
