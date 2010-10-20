@@ -214,19 +214,19 @@ AddOnMonitorHandler::EntryRemoved(const char* name, ino_t directory,
 
 void
 AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
-	ino_t from_directory, ino_t to_directory, dev_t device, ino_t node,
+	ino_t fromDirectory, ino_t toDirectory, dev_t device, ino_t node,
 	dev_t nodeDevice)
 {
 	node_ref toNodeRef;
-	make_node_ref(device, to_directory, &toNodeRef);
+	make_node_ref(device, toDirectory, &toNodeRef);
 
 	// Search the "from" and "to" directory in the known directories
-	DirectoryList::iterator from_iter = fDirectories.begin();
-	bool watchingFromDirectory = _FindDirectory(from_directory, device,
-		from_iter);
+	DirectoryList::iterator fromIter = fDirectories.begin();
+	bool watchingFromDirectory = _FindDirectory(fromDirectory, device,
+		fromIter);
 
-	DirectoryList::iterator to_iter = fDirectories.begin();
-	bool watchingToDirectory = _FindDirectory(toNodeRef, to_iter);
+	DirectoryList::iterator toIter = fDirectories.begin();
+	bool watchingToDirectory = _FindDirectory(toNodeRef, toIter);
 
 	if (!watchingFromDirectory && !watchingToDirectory) {
 		// It seems the notification was for a directory we are not
@@ -241,8 +241,8 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 
 	if (!watchingToDirectory) {
 		// moved out of our view
-		EntryList::iterator eiter = from_iter->entries.begin();
-		if (!_FindEntry(entryNodeRef, from_iter->entries, eiter)) {
+		EntryList::iterator eiter = fromIter->entries.begin();
+		if (!_FindEntry(entryNodeRef, fromIter->entries, eiter)) {
 			// we don't know anything about this entry yet.. ignore it
 			return;
 		}
@@ -250,13 +250,13 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		// save the info and remove the entry
 		info = *eiter;
 		watch_node(&entryNodeRef, B_STOP_WATCHING, this);
-		from_iter->entries.erase(eiter);
+		fromIter->entries.erase(eiter);
 
 		// Start at the top again, and search until the from directory.
 		// If we find a add-on with the same name then the moved add-on
 		// was not enabled.  So we are done.
 		DirectoryList::iterator diter = fDirectories.begin();
-		for (; diter != from_iter; diter++) {
+		for (; diter != fromIter; diter++) {
 			eiter = diter->entries.begin();
 			if (_FindEntry(info.name, diter->entries, eiter))
 				return;
@@ -267,9 +267,9 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 
 		// Continue searching for a add-on below us.  If we find a add-on
 		// with the same name, we must enable it.
-		for (from_iter++; from_iter != fDirectories.end(); from_iter++) {
-			eiter = from_iter->entries.begin();
-			if (_FindEntry(info.name, from_iter->entries, eiter)) {
+		for (fromIter++; fromIter != fDirectories.end(); fromIter++) {
+			eiter = fromIter->entries.begin();
+			if (_FindEntry(info.name, fromIter->entries, eiter)) {
 				AddOnEnabled(&*eiter);
 				return;
 			}
@@ -296,7 +296,7 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		// If we find an add-on with the same name then the moved add-on
 		// is not to be enabled. So we are done.
 		DirectoryList::iterator diter = fDirectories.begin();
-		for (; diter != to_iter; diter++) {
+		for (; diter != toIter; diter++) {
 			if (_HasEntry(info.name, diter->entries)) {
 				// The new add-on is being shadowed.
 				return;
@@ -317,7 +317,7 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		AddOnEnabled(&info);
 
 		// put the new entry into the target directory
-		_AddNewEntry(to_iter->entries, info);
+		_AddNewEntry(toIter->entries, info);
 
 		// done
 		return;
@@ -325,8 +325,8 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 
 	// The add-on was renamed, or moved within our hierarchy.
 
-	EntryList::iterator eiter = from_iter->entries.begin();
-	if (_FindEntry(entryNodeRef, from_iter->entries, eiter)) {
+	EntryList::iterator eiter = fromIter->entries.begin();
+	if (_FindEntry(entryNodeRef, fromIter->entries, eiter)) {
 		// save the old info and remove the entry
 		info = *eiter;
 	} else {
@@ -344,18 +344,18 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		// the entry and readding it. TODO: This can temporarily enable add-ons
 		// which should in fact stay hidden (moving add-on from home to common
 		// folder or vice versa, the system add-on should remain hidden).
-		EntryRemoved(name, from_directory, device, node);
+		EntryRemoved(name, fromDirectory, device, node);
 		info.dir_nref = toNodeRef;
 		_EntryCreated(info);
 	} else {
 		// Erase the entry
-		from_iter->entries.erase(eiter);
+		fromIter->entries.erase(eiter);
 
 		// check to see if it was formerly enabled
 		bool wasEnabled = true;
-		DirectoryList::iterator old_iter = fDirectories.begin();
-		for (; old_iter != from_iter; old_iter++) {
-			if (_HasEntry(info.name, old_iter->entries)) {
+		DirectoryList::iterator oldIter = fDirectories.begin();
+		for (; oldIter != fromIter; oldIter++) {
+			if (_HasEntry(info.name, oldIter->entries)) {
 				wasEnabled = false;
 				break;
 			}
@@ -365,9 +365,9 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		// exists.
 		if (wasEnabled) {
 			AddOnDisabled(&info);
-			for (; old_iter != fDirectories.end(); old_iter++) {
-				eiter = old_iter->entries.begin();
-				if (_FindEntry(info.name, old_iter->entries, eiter)) {
+			for (; oldIter != fDirectories.end(); oldIter++) {
+				eiter = oldIter->entries.begin();
+				if (_FindEntry(info.name, oldIter->entries, eiter)) {
 					AddOnEnabled(&*eiter);
 					break;
 				}
@@ -386,9 +386,9 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 
 		// check to see if we are newly enabled
 		bool isEnabled = true;
-		DirectoryList::iterator new_iter = fDirectories.begin();
-		for (; new_iter != to_iter; new_iter++) {
-			if (_HasEntry(info.name, new_iter->entries)) {
+		DirectoryList::iterator newIter = fDirectories.begin();
+		for (; newIter != toIter; newIter++) {
+			if (_HasEntry(info.name, newIter->entries)) {
 				isEnabled = false;
 				break;
 			}
@@ -397,9 +397,9 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 		// if it is newly enabled, check under us for an enabled one, and
 		// disable that first
 		if (isEnabled) {
-			for (; new_iter != fDirectories.end(); new_iter++) {
-				eiter = new_iter->entries.begin();
-				if (_FindEntry(info.name, new_iter->entries, eiter)) {
+			for (; newIter != fDirectories.end(); newIter++) {
+				eiter = newIter->entries.begin();
+				if (_FindEntry(info.name, newIter->entries, eiter)) {
 					AddOnDisabled(&*eiter);
 					break;
 				}
@@ -407,7 +407,7 @@ AddOnMonitorHandler::EntryMoved(const char *name, const char *fromName,
 			AddOnEnabled(&info);
 		}
 		// put the new entry into the target directory
-		to_iter->entries.push_back(info);
+		toIter->entries.push_back(info);
 	}
 }
 

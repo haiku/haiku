@@ -102,7 +102,7 @@ NodeMonitorHandler::EntryRemoved(const char *name, ino_t directory,
 
 /* virtual */ void
 NodeMonitorHandler::EntryMoved(const char *name, const char *fromName,
-	ino_t from_directory, ino_t to_directory, dev_t device,ino_t node,
+	ino_t fromDirectory, ino_t toDirectory, dev_t device,ino_t node,
 	dev_t nodeDevice)
 {
 	// ignore
@@ -183,21 +183,21 @@ NodeMonitorHandler::HandleEntryMoved(BMessage * msg)
 {
 	const char *name;
 	const char *fromName;
-	ino_t from_directory;
-	ino_t to_directory;
+	ino_t fromDirectory;
+	ino_t toDirectory;
 	dev_t device;
 	ino_t node;
 	dev_t deviceNode;
 	if ((msg->FindString("name", &name) != B_OK) ||
 		(msg->FindString("from name", &fromName) != B_OK) ||
-		(msg->FindInt64("from directory", &from_directory) != B_OK) ||
-		(msg->FindInt64("to directory", &to_directory) != B_OK) ||
+		(msg->FindInt64("from directory", &fromDirectory) != B_OK) ||
+		(msg->FindInt64("to directory", &toDirectory) != B_OK) ||
 		(msg->FindInt32("device", &device) != B_OK) ||
 		(msg->FindInt32("node device", &deviceNode) != B_OK) ||
 		(msg->FindInt64("node", &node) != B_OK)) {
 		return B_MESSAGE_NOT_UNDERSTOOD;
 	}
-	EntryMoved(name, fromName, from_directory, to_directory, device, node,
+	EntryMoved(name, fromName, fromDirectory, toDirectory, device, node,
 		deviceNode);
 	return B_OK;
 }
