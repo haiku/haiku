@@ -75,6 +75,19 @@ const EncoderDescription gEncoderTable[] = {
 	},
 	{
 		{
+			"MJPEG (Motion JPEG)",
+			"mjpeg",
+			0,
+			CODEC_ID_MJPEG,
+			{ 0 }
+		},
+		B_ANY_FORMAT_FAMILY,
+		B_MEDIA_RAW_VIDEO,
+		B_MEDIA_ENCODED_VIDEO,
+		5
+	},
+	{
+		{
 			"Raw audio",
 			"pcm",
 			0,
