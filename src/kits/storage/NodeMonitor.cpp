@@ -19,6 +19,41 @@
 
 
 // watch_node
+/*!	\brief Subscribes a target to watch node changes on a volume.
+
+	Depending of \a flags the action performed by this function varies:
+	- \a flags contains at least one of \c B_WATCH_NAME, \c B_WATCH_STAT,
+	  or \c B_WATCH_ATTR: The target is subscribed to
+	  watching the specified aspects of any node on the volume.
+
+	\param volume dev_t referring to the volume to be watched.
+	\param flags Flags indicating the actions to be performed.
+	\param target Messenger referring to the target. Must be valid.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+watch_volume(const dev_t volume, uint32 flags, BMessenger target)
+{
+	if ((flags | B_WATCH_NAME) == 0 && (flags | B_WATCH_STAT)
+		&& (flags | B_WATCH_ATTR))
+		return B_BAD_VALUE;
+
+	BMessenger::Private messengerPrivate(target);
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+	return _kern_start_watching(volume, (ino_t)-1, flags, port, token);
+}
+
+
+status_t
+watch_volume(const dev_t volume, uint32 flags, const BHandler *handler,
+	const BLooper *looper)
+{
+	return watch_volume(volume, flags, BMessenger(handler, looper));
+}
+
+
+// watch_node
 /*!	\brief Subscribes a target to node and/or mount watching, or unsubscribes
 		   it from node watching.
 
