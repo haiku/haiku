@@ -349,6 +349,9 @@ struct ext2_inode {
 		return B_LENDIAN_TO_HOST_INT32(size);
 	}
 
+	uint32 ExtendedAttributesBlock() const
+	{	return B_LENDIAN_TO_HOST_INT32(file_access_control);}
+
 	uint16 ExtraInodeSize() const
 		{ return B_LENDIAN_TO_HOST_INT16(extra_inode_size); }
 

@@ -15,7 +15,7 @@ KernelAddon ext2 :
 	Volume.cpp
 	DataStream.cpp
 	Inode.cpp
-	AttributeIterator.cpp
+	Attribute.cpp
 	DirectoryIterator.cpp
 	HTree.cpp
 	HTreeEntryIterator.cpp

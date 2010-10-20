@@ -32,9 +32,11 @@ Inode::Inode(Volume* volume, ino_t id)
 	fCache(NULL),
 	fMap(NULL),
 	fCached(false),
+	fHasExtraAttributes(false),
 	fAttributesBlock(NULL)
 {
 	rw_lock_init(&fLock, "ext2 inode");
+	recursive_lock_init(&fSmallDataLock, "ext2 inode small data");
 
 	TRACE("Inode::Inode(): ext2_inode: %lu, disk inode: %lu\n",
 		sizeof(ext2_inode), fVolume->InodeSize());
@@ -70,6 +72,7 @@ Inode::Inode(Volume* volume)
 	fInitStatus(B_NO_INIT)
 {
 	rw_lock_init(&fLock, "ext2 inode");
+	recursive_lock_init(&fSmallDataLock, "ext2 inode small data");
 
 	TRACE("Inode::Inode(): ext2_inode: %lu, disk inode: %lu\n",
 		sizeof(ext2_inode), fVolume->InodeSize());
@@ -476,7 +479,7 @@ Inode::AttributeBlockReadAt(off_t pos, uint8* buffer, size_t* _length)
 	size_t length = *_length;
 
 	if (!fAttributesBlock) {
-		uint32 block = B_LENDIAN_TO_HOST_INT32(Node().file_access_control);
+		uint32 block = Node().ExtendedAttributesBlock();
 
 		if (block == 0)
 			return B_ENTRY_NOT_FOUND;

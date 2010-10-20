@@ -1,4 +1,5 @@
 /*
+ * Copyright 2010, Jérôme Duval, korli@users.berlios.de.
  * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
@@ -15,7 +16,7 @@
 #include <NodeMonitor.h>
 #include <util/AutoLock.h>
 
-#include "AttributeIterator.h"
+#include "Attribute.h"
 #include "CachedBlock.h"
 #include "DirectoryIterator.h"
 #include "ext2.h"
@@ -1416,11 +1417,11 @@ ext2_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 	if (!inode->IsFile())
 		return EINVAL;
 
-	AttributeIterator* iterator = new(std::nothrow) AttributeIterator(inode);
-	if (iterator == NULL)
+	int32 *index = new(std::nothrow) int32;
+	if (index == NULL)
 		return B_NO_MEMORY;
-
-	*_cookie = iterator;
+	*index = 0;
+	*(int32**)_cookie = index;
 	return B_OK;
 }
 
@@ -1436,7 +1437,7 @@ static status_t
 ext2_free_attr_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	TRACE("%s()\n", __FUNCTION__);
-	delete (AttributeIterator *)_cookie;
+	delete (int32 *)_cookie;
 	return B_OK;
 }
 
@@ -1447,16 +1448,21 @@ ext2_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
 				uint32* _num)
 {
 	Inode* inode = (Inode*)_node->private_node;
-	AttributeIterator *iterator = (AttributeIterator *)_cookie;
+	int32 index = *(int32 *)_cookie;
+	Attribute attribute(inode);
 	TRACE("%s()\n", __FUNCTION__);
 
 	size_t length = bufferSize;
-	status_t status = iterator->GetNext(dirent->d_name, &length);
+	status_t status = attribute.Find(index);
 	if (status == B_ENTRY_NOT_FOUND) {
 		*_num = 0;
 		return B_OK;
 	} else if (status != B_OK)
 		return status;
+
+	status = attribute.GetName(dirent->d_name, &length);
+	if (status != B_OK)
+		return B_OK;
 
 	Volume* volume = (Volume*)_volume->private_volume;
 
@@ -1465,6 +1471,7 @@ ext2_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
 	dirent->d_reclen = sizeof(struct dirent) + length;
 
 	*_num = 1;
+	*(int32*)_cookie = index + 1;
 	return B_OK;
 }
 
@@ -1472,9 +1479,9 @@ ext2_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
 static status_t
 ext2_rewind_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
-	AttributeIterator *iterator = (AttributeIterator *)_cookie;
+	*(int32*)_cookie = 0;
 	TRACE("%s()\n", __FUNCTION__);
-	return iterator->Rewind();
+	return B_OK;
 }
 
 
@@ -1492,31 +1499,15 @@ ext2_open_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 	int openMode, void** _cookie)
 {
 	TRACE("%s()\n", __FUNCTION__);
-	if ((openMode & O_RWMASK) != O_RDONLY)
-		return EROFS;
-
-	Inode* inode = (Inode*)_node->private_node;
+	
 	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+	Attribute attribute(inode);
 
 	if (!(volume->SuperBlock().CompatibleFeatures() & EXT2_FEATURE_EXT_ATTR))
 		return ENOSYS;
 
-	// on directories too ?
-	if (!inode->IsFile())
-		return EINVAL;
-
-	ext2_xattr_entry *entry = new ext2_xattr_entry;
-
-	AttributeIterator i(inode);
-	status_t status = i.Find(name, entry);
-	if (status == B_OK) {
-		//entry->Dump();
-		*_cookie = entry;
-		return B_OK;
-	}
-	
-	delete entry;
-	return status;
+	return attribute.Open(name, openMode, (attr_cookie**)_cookie);
 }
 
 
@@ -1532,31 +1523,23 @@ static status_t
 ext2_free_attr_cookie(fs_volume* _volume, fs_vnode* _node,
 	void* cookie)
 {
-	ext2_xattr_entry *entry = (ext2_xattr_entry *)cookie;
-
-	delete entry;
+	delete (attr_cookie*)cookie;
 	return B_OK;
 }
 
 
 static status_t
-ext2_read_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
-	off_t pos, void* buffer, size_t* length)
+ext2_read_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t pos, void* buffer, size_t* _length)
 {
 	TRACE("%s()\n", __FUNCTION__);
 
+	attr_cookie* cookie = (attr_cookie*)_cookie;
 	Inode* inode = (Inode*)_node->private_node;
-	//Volume* volume = (Volume*)_volume->private_volume;
-	ext2_xattr_entry *entry = (ext2_xattr_entry *)cookie;
 
-	if (!entry->IsValid())
-		return EINVAL;
+	Attribute attribute(inode, cookie);
 
-	if (pos < 0 || (pos + *length) > entry->ValueSize())
-		return ERANGE;
-
-	return inode->AttributeBlockReadAt(entry->ValueOffset() + pos,
-		(uint8 *)buffer, length);
+	return attribute.Read(cookie, pos, (uint8*)buffer, _length);
 }
 
 
@@ -1571,15 +1554,14 @@ ext2_write_attr(fs_volume* _volume, fs_vnode* _node, void* cookie,
 
 static status_t
 ext2_read_attr_stat(fs_volume* _volume, fs_vnode* _node,
-	void* cookie, struct stat* stat)
+	void* _cookie, struct stat* stat)
 {
-	ext2_xattr_entry *entry = (ext2_xattr_entry *)cookie;
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
 
-	stat->st_type = B_RAW_TYPE;
-	stat->st_size = entry->ValueSize();
-	TRACE("%s: st_size %d\n", __FUNCTION__, stat->st_size);
+	Attribute attribute(inode, cookie);
 
-	return B_OK;
+	return attribute.Stat(*stat);
 }
 
 

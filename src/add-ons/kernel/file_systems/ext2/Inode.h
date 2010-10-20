@@ -37,6 +37,8 @@ public:
 			status_t	UpdateNodeFromDisk();
 			status_t	WriteBack(Transaction& transaction);
 
+			recursive_lock&	SmallDataLock() { return fSmallDataLock; }
+
 			bool		IsDirectory() const
 							{ return S_ISDIR(Mode()); }
 			bool		IsFile() const
@@ -148,6 +150,8 @@ private:
 				// information is always the same size (except in ext4)
 			ext2_xattr_header* fAttributesBlock;
 			status_t	fInitStatus;
+
+			mutable recursive_lock fSmallDataLock;
 };
 
 
