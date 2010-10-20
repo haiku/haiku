@@ -199,7 +199,6 @@ TReplicantTray::RememberClockSettings()
 		desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 		settings->timeShowSeconds = fClock->ShowingSeconds();
-		settings->timeFullDate = fClock->ShowingFullDate();
 	}
 }
 
@@ -209,24 +208,6 @@ TReplicantTray::ShowingSeconds()
 {
 	if (fClock)
 		return fClock->ShowingSeconds();
-	return false;
-}
-
-
-bool
-TReplicantTray::ShowingFullDate()
-{
-	if (fClock && CanShowFullDate())
-		return fClock->ShowingFullDate();
-	return false;
-}
-
-
-bool
-TReplicantTray::CanShowFullDate()
-{
-	if (fClock)
-		return fClock->CanShowFullDate();
 	return false;
 }
 
@@ -241,12 +222,11 @@ TReplicantTray::DealWithClock(bool showClock)
 			desk_settings* settings = ((TBarApp*)be_app)->Settings();
 
 			fClock = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0,
-				settings->timeShowSeconds, settings->timeFullDate,
+				settings->timeShowSeconds,
 				false);
 			AddChild(fClock);
 
 			fClock->MoveTo(Bounds().right - fClock->Bounds().Width() - 1, 2);
-			fClock->AllowFullDate(!IsMultiRow());
 		}
 	} else {
 		if (fClock) {
@@ -1387,11 +1367,6 @@ void
 TReplicantTray::SetMultiRow(bool state)
 {
 	fMultiRowMode = state;
-
-	// in multi-row state, we only want the short date
-
-	if (fClock != NULL)
-		fClock->AllowFullDate(!state);
 }
 
 

@@ -53,7 +53,6 @@ private:
 			BCheckBox*		fAppsExpandNew;
 
 			BCheckBox*		fClockSeconds;
-			BCheckBox*		fClockFullDate;
 
 			BCheckBox*		fWindowAlwaysOnTop;
 			BCheckBox*		fWindowAutoRaise;

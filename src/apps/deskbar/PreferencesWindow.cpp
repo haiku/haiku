@@ -60,9 +60,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 
 	fClockSeconds = new BCheckBox(B_TRANSLATE("Show seconds"),
 		new BMessage(kShowSeconds));
-	fClockFullDate = new BCheckBox(B_TRANSLATE("Full date"),
-		new BMessage(kFullDate));
-
 	fWindowAlwaysOnTop = new BCheckBox(B_TRANSLATE("Always on top"),
 		new BMessage(kAlwaysTop));
 	fWindowAutoRaise = new BCheckBox(B_TRANSLATE("Auto-raise"),
@@ -121,11 +118,9 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	TReplicantTray* replicantTray = barApp->BarView()->fReplicantTray;
 
 	fClockSeconds->SetValue(replicantTray->ShowingSeconds());
-	fClockFullDate->SetValue(replicantTray->ShowingFullDate());
 
 	bool showingClock = barApp->BarView()->ShowingClock();
 	fClockSeconds->SetEnabled(showingClock);
-	fClockFullDate->SetEnabled(replicantTray->CanShowFullDate());
 
 	fWindowAlwaysOnTop->SetValue(appSettings->alwaysOnTop);
 	fWindowAutoRaise->SetValue(appSettings->autoRaise);
@@ -138,7 +133,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fAppsExpandNew->SetTarget(be_app);
 
 	fClockSeconds->SetTarget(replicantTray);
-	fClockFullDate->SetTarget(replicantTray);
 
 	fWindowAlwaysOnTop->SetTarget(be_app);
 	fWindowAutoRaise->SetTarget(be_app);
@@ -194,7 +188,6 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	view = BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, 1)
 			.Add(fClockSeconds)
-			.Add(fClockFullDate)
 			.AddGlue()
 			.SetInsets(10, 10, 10, 10)
 			.End()

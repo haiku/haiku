@@ -113,8 +113,6 @@ public:
 
 	bool ShowingSeconds(void);
 	bool ShowingMiltime(void);
-	bool ShowingFullDate(void);
-	bool CanShowFullDate(void);
 
 	void RememberClockSettings();
 	void DealWithClock(bool);
