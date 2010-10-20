@@ -153,9 +153,10 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		// Use the last supported pixel format of the AVCodec, which we hope
 		// is the one with the best quality (true for all currently supported
 		// encoders).
-		AVCodec* codec = fStream->codec->codec;
-		for (int i = 0; codec->pix_fmts[i] != PIX_FMT_NONE; i++)
-			fStream->codec->pix_fmt = codec->pix_fmts[i];
+//		AVCodec* codec = fStream->codec->codec;
+//		for (int i = 0; codec->pix_fmts[i] != PIX_FMT_NONE; i++)
+//			fStream->codec->pix_fmt = codec->pix_fmts[i];
+		fStream->codec->pix_fmt = PIX_FMT_YUV420P;
 
 	} else if (format->type == B_MEDIA_RAW_AUDIO) {
 		fStream->codec->codec_type = AVMEDIA_TYPE_AUDIO;
