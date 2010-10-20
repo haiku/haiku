@@ -2,8 +2,8 @@
  * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#ifndef ANTIALIASING_SETTINGS_VIEW_H
-#define ANTIALIASING_SETTINGS_VIEW_H
+#ifndef BLUETOOTH_SETTINGS_VIEW_H
+#define BLUETOOTH_SETTINGS_VIEW_H
 
 
 #include <View.h>
@@ -45,4 +45,4 @@ protected:
 
 };
 
-#endif // ANTIALIASING_SETTINGS_VIEW_H
+#endif // BLUETOOTH_SETTINGS_VIEW_H

@@ -30,14 +30,15 @@
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Settings view"
 
-static const int32 kMsgSetAntialiasing = 'anti';
+static const int32 kMsgSetConnectionPolicy = 'sCpo';
+
 static const int32 kMsgSetDeviceClassDesktop = 'sDCd';
 static const int32 kMsgSetDeviceClassServer = 'sDCs';
 static const int32 kMsgSetDeviceClassLaptop = 'sDCl';
 static const int32 kMsgSetDeviceClassHandheld = 'sDCh';
 static const int32 kMsgSetDeviceClassSmartPhone = 'sDCp';
 
-static const int32 kMsgSetAverageWeight = 'afEa';
+static const int32 kMsgSetInquiryTime = 'afEa';
 static const int32 kMsgLocalSwitched = 'lDsW';
 
 static const char* kAllLabel = B_TRANSLATE_MARK("From all devices");
@@ -59,11 +60,11 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	fLocalDevicesMenu(NULL)
 {
 	_BuildConnectionPolicy();
-	fPolicyMenuField = new BMenuField("antialiasing",
+	fPolicyMenuField = new BMenuField("policy",
 		B_TRANSLATE("Incoming connections policy:"), fPolicyMenu, NULL);
 
 	fInquiryTimeControl = new BSlider("time",
-		B_TRANSLATE("Default inquiry time:"), new BMessage(kMsgSetAverageWeight),
+		B_TRANSLATE("Default inquiry time:"), new BMessage(kMsgSetInquiryTime),
 		0, 255, B_HORIZONTAL);
 	fInquiryTimeControl->SetLimitLabels(B_TRANSLATE("15 secs"),
 		B_TRANSLATE("61 secs"));
@@ -200,25 +201,25 @@ BluetoothSettingsView::MessageReceived(BMessage* message)
 void
 BluetoothSettingsView::_BuildConnectionPolicy()
 {
+	BMessage* message = NULL;
+	BMenuItem* item = NULL;
+
 	fPolicyMenu = new BPopUpMenu(B_TRANSLATE("Policy..."));
 
-	BMessage* message = new BMessage(kMsgSetAntialiasing);
-	message->AddBool("antialiasing", false);
-
-	BMenuItem* item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAllLabel), message);
-
+	message = new BMessage(kMsgSetConnectionPolicy);
+	message->AddInt8("Policy", 1);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAllLabel), message);
 	fPolicyMenu->AddItem(item);
 
-	message = new BMessage(kMsgSetAntialiasing);
-	message->AddBool("antialiasing", true);
-
+	message = new BMessage(kMsgSetConnectionPolicy);
+	message->AddBool("Policy", 2);
 	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kTrustedLabel), message);
-
 	fPolicyMenu->AddItem(item);
 
-	BMenuItem* item2 = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAlwaysLabel), NULL);
-
-	fPolicyMenu->AddItem(item2);
+	message = new BMessage(kMsgSetConnectionPolicy);
+	message->AddBool("Policy", 3);
+	item = new BMenuItem(B_TRANSLATE_NOCOLLECT(kAlwaysLabel), NULL);
+	fPolicyMenu->AddItem(item);
 
 }
 
