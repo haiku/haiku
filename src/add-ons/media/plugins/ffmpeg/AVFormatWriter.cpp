@@ -61,7 +61,7 @@ public:
 									BLocker* streamLock);
 	virtual						~StreamCookie();
 
-			status_t			Init(const media_format* format,
+			status_t			Init(media_format* format,
 									const media_codec_info* codecInfo);
 
 			status_t			WriteChunk(const void* chunkBuffer,
@@ -99,7 +99,7 @@ AVFormatWriter::StreamCookie::~StreamCookie()
 
 
 status_t
-AVFormatWriter::StreamCookie::Init(const media_format* format,
+AVFormatWriter::StreamCookie::Init(media_format* format,
 	const media_codec_info* codecInfo)
 {
 	TRACE("AVFormatWriter::StreamCookie::Init()\n");
@@ -123,7 +123,7 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 
 	// Setup the stream according to the media format...
 	if (format->type == B_MEDIA_RAW_VIDEO) {
-		fStream->codec->codec_type = CODEC_TYPE_VIDEO;
+		fStream->codec->codec_type = AVMEDIA_TYPE_VIDEO;
 #if GET_CONTEXT_DEFAULTS
 // NOTE: API example does not do this:
 		avcodec_get_context_defaults(fStream->codec);
@@ -131,11 +131,6 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 		// frame rate
 		fStream->codec->time_base.den = (int)format->u.raw_video.field_rate;
 		fStream->codec->time_base.num = 1;
-// NOTE: API example does not do this:
-//		fStream->r_frame_rate.den = (int)format->u.raw_video.field_rate;
-//		fStream->r_frame_rate.num = 1;
-//		fStream->time_base.den = (int)format->u.raw_video.field_rate;
-//		fStream->time_base.num = 1;
 		// video size
 		fStream->codec->width = format->u.raw_video.display.line_width;
 		fStream->codec->height = format->u.raw_video.display.line_count;
@@ -151,15 +146,19 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 				fStream->codec->height, 255);
 		}
 
-		fStream->codec->sample_aspect_ratio = fStream->sample_aspect_ratio;
-		// TODO: Don't hard code this...
-		fStream->codec->pix_fmt = PIX_FMT_YUV420P;
+		fStream->codec->gop_size = 12;
 
-		// Some formats want stream headers to be separate
-		if ((fContext->oformat->flags & AVFMT_GLOBALHEADER) != 0)
-			fStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+		fStream->codec->sample_aspect_ratio = fStream->sample_aspect_ratio;
+
+		// Use the last supported pixel format of the AVCodec, which we hope
+		// is the one with the best quality (true for all currently supported
+		// encoders).
+		AVCodec* codec = fStream->codec->codec;
+		for (int i = 0; codec->pix_fmts[i] != PIX_FMT_NONE; i++)
+			fStream->codec->pix_fmt = codec->pix_fmts[i];
+
 	} else if (format->type == B_MEDIA_RAW_AUDIO) {
-		fStream->codec->codec_type = CODEC_TYPE_AUDIO;
+		fStream->codec->codec_type = AVMEDIA_TYPE_AUDIO;
 #if GET_CONTEXT_DEFAULTS
 // NOTE: API example does not do this:
 		avcodec_get_context_defaults(fStream->codec);
@@ -226,6 +225,10 @@ AVFormatWriter::StreamCookie::Init(const media_format* format,
 		}
 	}
 
+	// Some formats want stream headers to be separate
+	if ((fContext->oformat->flags & AVFMT_GLOBALHEADER) != 0)
+		fStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
+
 	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
 		fStream->time_base.num, fStream->time_base.den,
 		fStream->codec->time_base.num, fStream->codec->time_base.den);
@@ -244,26 +247,21 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 
 	BAutolock _(fStreamLock);
 
-	// TODO: Probably the AVCodecEncoder needs to pass packet data
-	// in encodeInfo...
-
 	fPacket.data = const_cast<uint8_t*>((const uint8_t*)chunkBuffer);
 	fPacket.size = chunkSize;
 
 	fPacket.pts = int64_t((double)encodeInfo->start_time
 		* fStream->time_base.den / (1000000.0 * fStream->time_base.num)
 		+ 0.5);
-	TRACE_PACKET("  PTS: %lld  (stream->time_base: (%d/%d), "
+
+	fPacket.flags = 0;
+	if ((encodeInfo->flags & B_MEDIA_KEY_FRAME) != 0)
+		fPacket.flags |= AV_PKT_FLAG_KEY;
+
+	TRACE_PACKET("  PTS: %lld (stream->time_base: (%d/%d), "
 		"codec->time_base: (%d/%d))\n", fPacket.pts,
 		fStream->time_base.num, fStream->time_base.den,
 		fStream->codec->time_base.num, fStream->codec->time_base.den);
-
-// From ffmpeg.c::do_audio_out():
-// TODO:
-//	if (enc->coded_frame && enc->coded_frame->pts != AV_NOPTS_VALUE)
-//		fPacket.pts = av_rescale_q(enc->coded_frame->pts,
-//		enc->time_base, ost->st->time_base);
-
 
 #if 0
 	// TODO: Eventually, we need to write interleaved packets, but
@@ -396,9 +394,9 @@ AVFormatWriter::CommitHeader()
 	if (av_set_parameters(fContext, NULL) < 0)
 		return B_ERROR;
 
+#if OPEN_CODEC_CONTEXT
 	for (unsigned i = 0; i < fContext->nb_streams; i++) {
 		AVStream* stream = fContext->streams[i];
-#if OPEN_CODEC_CONTEXT
 		// NOTE: Experimental, this should not be needed. Especially, since
 		// we have no idea (in the future) what CodecID some encoder uses,
 		// it may be an encoder from a different plugin.
@@ -407,11 +405,11 @@ AVFormatWriter::CommitHeader()
 		if (codec == NULL || avcodec_open(codecContext, codec) < 0) {
 			TRACE("  stream[%u] - failed to open AVCodecContext\n", i);
 		}
-#endif
 		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",
 			i, stream->time_base.num, stream->time_base.den,
 			stream->codec->time_base.num, stream->codec->time_base.den);
 	}
+#endif
 
 	int result = av_write_header(fContext);
 	if (result < 0)
@@ -463,7 +461,7 @@ AVFormatWriter::Close()
 
 
 status_t
-AVFormatWriter::AllocateCookie(void** _cookie, const media_format* format,
+AVFormatWriter::AllocateCookie(void** _cookie, media_format* format,
 	const media_codec_info* codecInfo)
 {
 	TRACE("AVFormatWriter::AllocateCookie()\n");

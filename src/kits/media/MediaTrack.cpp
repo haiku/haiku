@@ -331,6 +331,14 @@ BMediaTrack::ReadFrames(void* buffer, int64* _frameCount,
 		bigtime_t framesDuration = (bigtime_t)(*_frameCount * 1000000
 			/ _FrameRate());
 		fCurrentTime = _header->start_time + framesDuration;
+// This debug output shows drift between calculated fCurrentFrame and time-based
+// current frame, if there is any.
+//if (fFormat.type == B_MEDIA_RAW_AUDIO) {
+//printf("current frame: %lld / calculated: %lld (%.2f/%.2f)\r", fCurrentFrame,
+//int64(fCurrentTime * _FrameRate() / 1000000.0 + 0.5), fCurrentTime / 1000000.0,
+//(float)fCurrentFrame / _FrameRate());
+//fflush(stdout);
+//}
 	} else {
 		ERROR("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n",
 			result, strerror(result));
@@ -782,7 +790,7 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor* extractor,
 
 
 BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
-	int32 streamIndex, const media_format* format,
+	int32 streamIndex, media_format* format,
 	const media_codec_info* codecInfo)
 {
 	CALLED();
@@ -792,7 +800,6 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
 	fEncoderID = -1;
 		// TODO: Not yet sure what this was needed for...
 	fWriter = writer;
-	fFormat = *format;
 	fStream = streamIndex;
 	fInitStatus = B_OK;
 
@@ -803,13 +810,16 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaWriter* writer,
 		if (ret != B_OK) {
 			TRACE("BMediaTrack::BMediaTrack: Error: creating decoder failed: "
 				"%s\n", strerror(ret));
-			// We do not set fInitStatus here, because WriteChunk should still work.
+			// We do not set fInitStatus here, because WriteChunk should still
+			// work.
 			fEncoder = NULL;
 		} else {
 			fCodecInfo = *codecInfo;
-			fInitStatus = fEncoder->SetUp(&fFormat);
+			fInitStatus = fEncoder->SetUp(format);
 		}
 	}
+
+	fFormat = *format;
 
 	// not used:
 	fCurrentFrame = 0;

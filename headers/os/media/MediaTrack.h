@@ -227,8 +227,7 @@ private:
 	// For write-only access to a BMediaTrack
 								BMediaTrack(
 									BPrivate::media::MediaWriter* writer,
-									int32 streamIndex,
-									const media_format* format,
+									int32 streamIndex, media_format* format,
 									const media_codec_info* codecInfo);
 
 			void				SetupWorkaround();

@@ -1,6 +1,6 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef _MEDIA_WRITER_H
 #define _MEDIA_WRITER_H
@@ -27,8 +27,7 @@ public:
 
 			status_t			CreateEncoder(Encoder** _encoder,
 									const media_codec_info* codecInfo,
-									const media_format* format,
-									uint32 flags = 0);
+									media_format* format, uint32 flags = 0);
 
 			status_t			SetCopyright(int32 streamIndex,
 									const char* copyright);

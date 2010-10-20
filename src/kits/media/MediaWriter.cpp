@@ -1,6 +1,6 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
- * Distributed under the terms of the MIT license.
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>.
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
 
 
@@ -96,8 +96,7 @@ MediaWriter::GetFileFormatInfo(media_file_format* _fileFormat) const
 
 status_t
 MediaWriter::CreateEncoder(Encoder** _encoder,
-	const media_codec_info* codecInfo, const media_format* format,
-	uint32 flags)
+	const media_codec_info* codecInfo, media_format* format, uint32 flags)
 {
 	CALLED();
 
