@@ -71,14 +71,11 @@ class TTimeView : public BView {
 		void		FrameMoved(BPoint);
 		void		MessageReceived(BMessage*);
 		void		MouseDown(BPoint where);
-		void		MouseUp(BPoint where);
 		void		Pulse();
 
 		bool		ShowingSeconds() 	{ return fShowSeconds; }
 		void		ShowSeconds(bool);
 		void		ShowCalendar(BPoint where);
-		void		StartLongClickNotifier(BPoint where);
-		void		StopLongClickNotifier();
 
 		bool		Orientation() const;
 		void		SetOrientation(bool o);
@@ -118,7 +115,6 @@ class TTimeView : public BView {
 		BPoint		fDateLocation;
 
 		BMessenger	fCalendarWindow;
-		BMessageRunner*	fLongClickMessageRunner;
 
 		BLocale		fLocale; // For date and time localizing purposes
 };
