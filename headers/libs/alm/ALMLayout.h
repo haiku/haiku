@@ -134,7 +134,7 @@ private:
 			void				_ParseGroupItem(GroupItem& item, XTab* left,
 									YTab* top, XTab* right, YTab* bottom);
 
-			LinearSpec			fSolver;
+			LinearSpec&			fSolver;
 
 			XTab*				fLeft;
 			XTab*				fRight;

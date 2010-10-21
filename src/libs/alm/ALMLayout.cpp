@@ -22,12 +22,17 @@ const BSize kMinSize(0, 0);
 const BSize kMaxSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 
 
+static LinearSpec gLinearSolver;
+
+
 /**
  * Constructor.
  * Creates new layout engine.
  */
 BALMLayout::BALMLayout(float spacing)
 	:
+	fSolver(gLinearSolver),
+
 	fInset(0.0f),
 	fSpacing(spacing),
 	fCurrentArea(NULL)
