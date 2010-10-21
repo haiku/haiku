@@ -68,6 +68,7 @@ private:
 			// TODO: Refactor common base class from AVCodec[De|En]Coder!
 			CodecID				fCodecID;
 			AVCodec*			fCodec;
+			AVCodecContext*		fOwnContext;
 			AVCodecContext*		fContext;
 
 			enum {

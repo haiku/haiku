@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <Application.h>
+#include <Roster.h>
+
 extern "C" {
 	#include "rational.h"
 }
@@ -39,7 +42,8 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	fBitRateScale(bitRateScale),
 	fCodecID((enum CodecID)codecID),
 	fCodec(NULL),
-	fContext(avcodec_alloc_context()),
+	fOwnContext(avcodec_alloc_context()),
+	fContext(fOwnContext),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
 
 	fFrame(avcodec_alloc_frame()),
@@ -105,7 +109,7 @@ AVCodecEncoder::~AVCodecEncoder()
 		free(fFrame);
 	}
 
-	free(fContext);
+	free(fOwnContext);
 
 	delete[] fChunkBuffer;
 }
@@ -157,6 +161,23 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 	fInputFormat = *inputFormat;
 	fFramesWritten = 0;
 
+	const uchar* userData = inputFormat->user_data;
+	if (*(uint32*)userData == 'ffmp') {
+		userData += sizeof(uint32);
+		// The Writer plugin used is the FFmpeg plugin. It stores the
+		// AVCodecContext pointer in the user data section. Use this
+		// context instead of our own. It requires the Writer living in
+		// the same team, of course.
+		app_info appInfo;
+		if (be_app->GetAppInfo(&appInfo) == B_OK
+			&& *(team_id*)userData == appInfo.team) {
+			userData += sizeof(team_id);
+			// Use the AVCodecContext from the Writer. This works better
+			// than using our own context with some encoders.
+			fContext = *(AVCodecContext**)userData;
+		}
+	}
+
 	return _Setup();
 }
 
@@ -202,7 +223,11 @@ AVCodecEncoder::SetEncodeParameters(encode_parameters* parameters)
 		return B_NOT_SUPPORTED;
 
 	fEncodeParameters.quality = parameters->quality;
-	TRACE("  quality: %.1f\n", parameters->quality);
+	TRACE("  quality: %.5f\n", parameters->quality);
+	if (fEncodeParameters.quality == 0.0f) {
+		TRACE("  using default quality (1.0)\n");
+		fEncodeParameters.quality = 1.0f;
+	}
 
 // TODO: Auto-bit_rate versus user supplied. See above.
 //	int avgBytesPerSecond = 0;
@@ -401,13 +426,37 @@ AVCodecEncoder::_Setup()
 		return B_NOT_SUPPORTED;
 	}
 
-	int wantedBitRate = (int)(rawBitRate / fBitRateScale
-		* fEncodeParameters.quality);
-	TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f)\n", rawBitRate,
-		wantedBitRate, fEncodeParameters.quality);
 	// TODO: Support letting the user overwrite this via
 	// SetEncodeParameters(). See comments there...
+	int wantedBitRate = (int)(rawBitRate / fBitRateScale
+		* fEncodeParameters.quality);
+	if (wantedBitRate == 0)
+		wantedBitRate = (int)(rawBitRate / fBitRateScale);
+
 	fContext->bit_rate = wantedBitRate;
+
+	if (fInputFormat.type == B_MEDIA_RAW_AUDIO) {
+		// Some audio encoders support certain bitrates only. Use the
+		// closest match to the wantedBitRate.
+		const int kBitRates[] = {
+			32000, 40000, 48000, 56000, 64000, 80000, 96000, 112000, 128000,
+			160000, 192000, 224000, 256000, 320000, 384000, 448000, 512000,
+			576000, 640000
+		};
+		int diff = wantedBitRate;
+		for (int i = 0; i < sizeof(kBitRates) / sizeof(int); i++) {
+			int currentDiff = abs(wantedBitRate - kBitRates[i]);
+			if (currentDiff < diff) {
+				fContext->bit_rate = kBitRates[i];
+				diff = currentDiff;
+			} else
+				break;
+		}
+	}
+
+	TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f), "
+		"context bitrate: %d\n", rawBitRate, wantedBitRate,
+		fEncodeParameters.quality, fContext->bit_rate);
 
 	// Add some known fixes from the FFmpeg API example:
 	if (fContext->codec_id == CODEC_ID_MPEG2VIDEO) {
@@ -430,6 +479,12 @@ AVCodecEncoder::_Setup()
 bool
 AVCodecEncoder::_OpenCodecIfNeeded()
 {
+	if (fContext != fOwnContext) {
+		// We are using the AVCodecContext of the AVFormatWriter plugin,
+		// and don't maintain it's open/close state.
+		return true;
+	}
+
 	if (fCodecInitStatus == CODEC_INIT_DONE)
 		return true;
 
@@ -443,7 +498,7 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	else
 		fCodecInitStatus = CODEC_INIT_FAILED;
 
-	TRACE("  avcodec_open(): %d\n", result);
+	TRACE("  avcodec_open(%p, %p): %d\n", fContext, fCodec, result);
 
 	return fCodecInitStatus == CODEC_INIT_DONE;
 
@@ -453,6 +508,11 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 void
 AVCodecEncoder::_CloseCodecIfNeeded()
 {
+	if (fContext != fOwnContext) {
+		// See _OpenCodecIfNeeded().
+		return;
+	}
+
 	if (fCodecInitStatus == CODEC_INIT_DONE) {
 		avcodec_close(fContext);
 		fCodecInitStatus = CODEC_INIT_NEEDED;
@@ -536,7 +596,7 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		bufferSize, reinterpret_cast<const short*>(buffer));
 
 	if (usedBytes < 0) {
-		TRACE("  avcodec_encode_video() failed: %d\n", usedBytes);
+		TRACE("  avcodec_encode_audio() failed: %d\n", usedBytes);
 		return B_ERROR;
 	}
 	if (usedBytes == 0)

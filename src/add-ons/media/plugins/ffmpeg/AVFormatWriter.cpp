@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the GNU L-GPL license.
  */
 
@@ -11,12 +11,14 @@
 
 #include <new>
 
+#include <Application.h>
 #include <AutoDeleter.h>
 #include <Autolock.h>
 #include <ByteOrder.h>
 #include <DataIO.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
+#include <Roster.h>
 
 extern "C" {
 	#include "avformat.h"
@@ -233,6 +235,23 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
 		fStream->time_base.num, fStream->time_base.den,
 		fStream->codec->time_base.num, fStream->codec->time_base.den);
+
+#if 0
+	// Write the AVCodecContext pointer to the user data section of the
+	// media_format. For some encoders, it seems to be necessary to use
+	// the AVCodecContext of the AVStream in order to successfully encode
+	// anything and write valid media files. For example some codecs need
+	// to store meta data or global data in the container.
+	app_info appInfo;
+	if (be_app->GetAppInfo(&appInfo) == B_OK) {
+		uchar* userData = format->user_data;
+		*(uint32*)userData = 'ffmp';
+		userData += sizeof(uint32);
+		*(team_id*)userData = appInfo.team;
+		userData += sizeof(team_id);
+		*(AVCodecContext**)userData = fStream->codec;
+	}
+#endif
 
 	return B_OK;
 }
