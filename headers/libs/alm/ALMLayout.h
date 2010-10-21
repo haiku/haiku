@@ -27,7 +27,8 @@ namespace BALM {
  */
 class BALMLayout : public BAbstractLayout {
 public:
-								BALMLayout(float spacing = 0.0f);
+								BALMLayout(float spacing = 0.0f,
+									BALMLayout* friendLayout = NULL);
 	virtual						~BALMLayout();
 
 			XTab*				AddXTab();
@@ -134,7 +135,8 @@ private:
 			void				_ParseGroupItem(GroupItem& item, XTab* left,
 									YTab* top, XTab* right, YTab* bottom);
 
-			LinearSpec&			fSolver;
+			LinearSpec*			fSolver;
+			LinearSpec			fOwnSolver;
 
 			XTab*				fLeft;
 			XTab*				fRight;
