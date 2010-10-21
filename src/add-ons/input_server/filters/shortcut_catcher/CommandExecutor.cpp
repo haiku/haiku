@@ -22,6 +22,7 @@
 #include "CommandActuators.h"
 
 CommandExecutor::CommandExecutor()
+	: BLooper("Shortcuts commands executor")
 {
 	// empty
 }
@@ -33,9 +34,9 @@ CommandExecutor::~CommandExecutor()
 }
 
 
-// Returns true if it is returning valid results into (*setBegin) and 
-// (*setEnd). If returning true, (*setBegin) now points to the first char in a 
-// new word, and (*setEnd) now points to the char after the last char in the 
+// Returns true if it is returning valid results into (*setBegin) and
+// (*setEnd). If returning true, (*setBegin) now points to the first char in a
+// new word, and (*setEnd) now points to the char after the last char in the
 // word, which has been set to a NUL byte.
 bool
 CommandExecutor::GetNextWord(char** setBegin, char** setEnd) const
@@ -43,16 +44,16 @@ CommandExecutor::GetNextWord(char** setBegin, char** setEnd) const
 	char* next = *setEnd; // we'll start one after the end of the last one...
 
 	while (next++) {
-		if (*next == '\0') 
+		if (*next == '\0')
 			return false; // no words left!
-		else if (*next <= ' ') 
+		else if (*next <= ' ')
 			*next = '\0';
-		else 
+		else
 			break;	// found a non-whitespace char!
 	}
 
 	*setBegin = next;	// we found the first char!
-	
+
 	while (next++) {
 		if (*next <= ' ') {
 			*next = '\0';	// terminate the word
@@ -73,13 +74,13 @@ CommandExecutor::MessageReceived(BMessage* msg)
 		{
 			BMessage actMessage;
 			void* asyncData;
-			if ((msg->FindMessage("act", &actMessage) == B_NO_ERROR) 
+			if ((msg->FindMessage("act", &actMessage) == B_NO_ERROR)
 				&& (msg->FindPointer("adata", &asyncData) == B_NO_ERROR)) {
 				BArchivable* arcObj = instantiate_object(&actMessage);
 				if (arcObj) {
 					CommandActuator* act = dynamic_cast<CommandActuator*>(arcObj);
-				
-					if (act) 
+
+					if (act)
 						act->KeyEventAsync(msg, asyncData);
 					delete arcObj;
 				}

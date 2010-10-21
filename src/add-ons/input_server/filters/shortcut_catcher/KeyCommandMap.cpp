@@ -64,6 +64,7 @@ private:
 
 KeyCommandMap::KeyCommandMap(const char* file)
 	:
+	BLooper("Shortcuts map watcher"),
 	fSpecs(NULL)
 {
 	fFileName = new char[strlen(file) + 1];
