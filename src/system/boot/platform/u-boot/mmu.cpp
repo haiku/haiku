@@ -47,8 +47,7 @@ TODO:
 */
 
 /*!	The (physical) memory layout of the boot loader is currently as follows:
-	 0x000000000			interupt vectors
-	 0x???				u-boot
+	 0x00000000			u-boot (run from NOR flash)
 	 0xa0000000			u-boot stuff like kernel arguments afaik
 	 0xa0100000 - 0xa0ffffff	boot.tgz (up to 15MB probably never needed so big...)
 	 0xa1000000 - 0xa1ffffff	pagetables
@@ -78,13 +77,7 @@ struct memblock {
 
 
 static struct memblock LOADER_MEMORYMAP[] = {
-        {
-                "vectors",//interrupt vectors
-		VECT_BASE,
-		VECT_BASE + VECT_SIZE - 1,
-		MMU_L2_FLAG_B,
-        },
-        {
+	{
                 "devices",
 		DEVICE_BASE,
 		DEVICE_BASE + DEVICE_SIZE - 1,
