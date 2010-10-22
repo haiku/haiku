@@ -1102,12 +1102,16 @@ extern ExecBase *EXEC_BASE_NAME;
 	LP2(0xcc, APTR, AllocAbs, unsigned long, par1, d0, APTR, last, a1, \
 	, EXEC_BASE_NAME)
 
+#define OldOpenLibrary(last) \
+	LP1(0x198, struct Library *, OldOpenLibrary, /*UBYTE*/const char *, last, a1, \
+	, EXEC_BASE_NAME)
+
 #define CloseLibrary(last) \
 	LP1NR(0x19e, CloseLibrary, struct Library *, last, a1, \
 	, EXEC_BASE_NAME)
 
 #define DoIO(last) \
-	LP1(0x1c8, BYTE, DoIO, struct IORequest *, last, a1, \
+	LP1(0x1c8, int8, DoIO, struct IORequest *, last, a1, \
 	, EXEC_BASE_NAME)
 
 #define OpenLibrary(par1, last) \
@@ -1121,6 +1125,95 @@ extern ExecBase *EXEC_BASE_NAME;
 extern "C" status_t exec_error(int32 err);
 
 #endif /* __ASSEMBLER__ */
+
+//	#pragma mark -
+
+
+// <graphics/graphics.h>
+
+#define GRAPHICSNAME	"graphics.library"
+#define GRAPHICS_BASE_NAME	GraphicsBase
+
+#ifndef __ASSEMBLER__
+
+struct GfxBase {
+	struct Library	LibNode;
+	struct View		*ActiView;
+	struct copinit	*copinit;
+	int32	*cia;
+	int32	*blitter;
+	uint16	*LOFlist;
+	uint16	*SHFlist;
+	struct bltnode	*blthd;
+	struct bltnode	*blttl;
+	struct bltnode	*bsblthd;
+	struct bltnode	*bsblttl;
+	
+	//...
+};
+
+struct ViewPort {
+	struct ViewPort *Next;
+	struct ColorMap	*ColorMap;
+	struct CopList	*DspIns;
+	struct CopList	*SprIns;
+	struct CopList	*ClrIns;
+	struct UCopList	*UCopIns;
+	int16	DWidth, DHright;
+	int16	DxOffset, DyOffset;
+	uint16	Modes;
+	uint8	SpritePriorities;
+	uint8	ExtendedModes;
+	struct RastInfo	*RasInfo;
+};
+
+struct RastPort {
+	struct Layer	*Layer;
+	//...
+};
+
+// <graphics/text.h>
+
+struct TextAttr {
+	const char *taName;
+	uint16	ta_YSize;
+	uint8	ta_Style, ta_Flags;
+};
+
+struct TextFont;
+
+extern struct GfxBase *GRAPHICS_BASE_NAME;
+
+#define ClearScreen(last) \
+	LP1NR(0x30, ClearScreen, struct RastPort *, last, a1, \
+	, GRAPHICS_BASE_NAME)
+
+#define Text(par1, par2, last) \
+	LP3(0x3c, int32, Text, struct RastPort *, par1, a1, const char *, par2, a0, unsigned long, last, d0, \
+	, GRAPHICS_BASE_NAME)
+
+#define SetFont(par1, last) \
+	LP2(0x42, int32, SetFont, struct RastPort *, par1, a1, struct TextFont *, last, a0, \
+	, GRAPHICS_BASE_NAME)
+
+#define OpenFont(last) \
+	LP1(0x48, struct TextFont *, OpenFont, struct TextAttr *, last, a0, \
+	, GRAPHICS_BASE_NAME)
+
+#define LoadRGB4(par1, par2, last) \
+	LP3NR(0xc0, LoadRGB4, struct ViewPort *, par1, a0, const uint16 *, par2, a1, long, last, d0, \
+	, GRAPHICS_BASE_NAME)
+
+#define Move(par1, par2, last) \
+	LP3NR(0xf0, Move, struct RastPort *, par1, a1, long, par2, d0, long, last, d1, \
+	, GRAPHICS_BASE_NAME)
+
+#define SetDrMd(par1, last) \
+	LP2NR(0x162, SetDrMd, struct RastPort *, par1, a1, unsigned long, last, d0, \
+	, GRAPHICS_BASE_NAME)
+
+
+#endif
 
 
 //	#pragma mark -
@@ -1139,12 +1232,52 @@ extern "C" status_t exec_error(int32 err);
 
 #ifndef __ASSEMBLER__
 
-extern Library *INTUITION_BASE_NAME;
+// <intuition/screen.h>
+
+struct NewScreen {
+	int16	LeftEdge, TopEdge, Width, Height, Depth;
+	uint8	DetailPen, BlockPen;
+	uint16	ViewModes;
+	uint16	Type;
+	struct TextAttr	*Font;
+	/*UBYTE*/const char	*DefaultTitle;
+	struct Gadget	*Gadgets;
+	struct BitMap	*CustomBitMap;
+};
+
+
+struct Screen {
+	struct Screen	*NextScreen;
+	struct Window	*FirstWindow;
+	int16	LeftEdge, TopEdge;
+	int16	Width, Height;
+	int16	MouseX, MouseY;
+	uint16	Flags;
+	const char	*Title;
+	const char	*DefaultTitle;
+	int8	BarHeight, BarVBorder, BarHBorder, MenuVBorder, MenuHBorder;
+	int8	WBorTop, WBorLeft, WBorRight, WBorBottom;
+	struct TextAttr	*Font;
+	struct ViewPort	ViewPort;
+	struct RastPort	RastPort;
+	//...
+};
+
+extern struct Library *INTUITION_BASE_NAME;
+
+#define CloseScreen(last) \
+	LP1(0x42, bool, CloseScreen, struct Screen *, last, a0, \
+	, INTUITION_BASE_NAME)
 
 #define DisplayAlert(par1, par2, last) \
 	LP3(0x5a, bool, DisplayAlert, unsigned long, par1, d0, void *, \
 	par2, a0, unsigned long, last, d1, \
 	, INTUITION_BASE_NAME)
+
+#define OpenScreen(last) \
+	LP1(0xc6, struct Screen *, OpenScreen, struct NewScreen *, last, a0, \
+	, INTUITION_BASE_NAME)
+
 
 #endif /* __ASSEMBLER__ */
 

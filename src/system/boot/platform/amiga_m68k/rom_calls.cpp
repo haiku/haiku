@@ -14,6 +14,9 @@
 #include "rom_calls.h"
 
 
+struct GfxBase *GRAPHICS_BASE_NAME = NULL;
+
+
 
 /*! Maps Amiga error codes to native errors
  */
