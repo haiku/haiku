@@ -251,10 +251,14 @@ BLayout::IndexOfItem(const BLayoutItem* item) const
 int32
 BLayout::IndexOfView(BView* child) const
 {
+	if (child == NULL)
+		return -1;
+
 	int itemCount = fItems.CountItems();
 	for (int32 i = 0; i < itemCount; i++) {
 		BLayoutItem* item = (BLayoutItem*)fItems.ItemAt(i);
-		if (dynamic_cast<BViewLayoutItem*>(item) && item->View() == child)
+		if (item->View() == child && (dynamic_cast<BViewLayoutItem*>(item)
+				|| dynamic_cast<BLayout*>(item)))
 			return i;
 	}
 
