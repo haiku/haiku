@@ -1568,8 +1568,7 @@ BContainerWindow::MessageReceived(BMessage *message)
 						if (entry.InitCheck() == B_OK && entry.IsDirectory()) {
 							uint32 moveMode = kMoveSelectionTo;
 							int32 buttons = fDragMessage->FindInt32("buttons");
-							if (buttons & B_SECONDARY_MOUSE_BUTTON || modifiers() & B_CONTROL_KEY)
-							{
+							if (buttons & B_SECONDARY_MOUSE_BUTTON || modifiers() & B_CONTROL_KEY) {
 								BPoint dropPoint;
 								PoseView()->GetMouse(&dropPoint, NULL, true);
 								moveMode = ShowDropContextMenu(dropPoint);
