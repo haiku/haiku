@@ -960,6 +960,14 @@ typedef void *APTR;
 
 // <exec/nodes.h>
 
+// our VFS also has a struct Node...
+struct ListNode {
+	struct ANode	*ln_Succ;
+	struct ANode	*ln_Pred;
+	uint8	ln_Type;
+	uint8	ln_Pri;
+	const char *ln_Name;
+};
 
 // <exec/lists.h>
 
@@ -1002,6 +1010,12 @@ struct ExecBase {
 	uint8	dummy5[632-334];
 } _PACKED;
 
+struct Message {
+	struct ListNode	mn_Node;
+	struct MsgPort	*mn_ReplyPort;
+	uint16	mn_Length;
+} _PACKED;
+
 #endif /* __ASSEMBLER__ */
 
 
@@ -1030,7 +1044,7 @@ struct IORequest {
 	uint16			io_Command;
 	uint8			io_Flags;
 	int8			io_Error;
-};
+} _PACKED;
 
 struct IOStdReq {
 	struct Message	io_Message;
@@ -1043,7 +1057,7 @@ struct IOStdReq {
 	uint32			io_Length;
 	void			*io_Data;
 	uint32			io_Offset;
-};
+} _PACKED;
 */
 
 #endif /* __ASSEMBLER__ */
@@ -1150,7 +1164,7 @@ struct GfxBase {
 	struct bltnode	*bsblttl;
 	
 	//...
-};
+} _PACKED;
 
 struct ViewPort {
 	struct ViewPort *Next;
@@ -1165,12 +1179,12 @@ struct ViewPort {
 	uint8	SpritePriorities;
 	uint8	ExtendedModes;
 	struct RastInfo	*RasInfo;
-};
+} _PACKED;
 
 struct RastPort {
 	struct Layer	*Layer;
 	//...
-};
+} _PACKED;
 
 // <graphics/text.h>
 
@@ -1178,9 +1192,16 @@ struct TextAttr {
 	const char *taName;
 	uint16	ta_YSize;
 	uint8	ta_Style, ta_Flags;
-};
+} _PACKED;
 
-struct TextFont;
+struct TextFont {
+	struct Message	tf_Message;
+	uint16	tf_YSize;
+	uint8	tf_Style;
+	uint8	tf_Flags;
+	uint16	tf_XSize;
+	//...
+} _PACKED;
 
 extern struct GfxBase *GRAPHICS_BASE_NAME;
 
