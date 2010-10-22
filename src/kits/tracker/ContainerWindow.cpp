@@ -1566,6 +1566,16 @@ BContainerWindow::MessageReceived(BMessage *message)
 					//	don't copy to printers dir
 					if (!FSIsPrintersDir(&entry)) {
 						if (entry.InitCheck() == B_OK && entry.IsDirectory()) {
+							uint32 moveMode = kMoveSelectionTo;
+							int32 buttons = fDragMessage->FindInt32("buttons");
+							if (buttons & B_SECONDARY_MOUSE_BUTTON || modifiers() & B_CONTROL_KEY)
+							{
+								BPoint dropPoint;
+								PoseView()->GetMouse(&dropPoint, NULL, true);
+								moveMode = ShowDropContextMenu(dropPoint);
+								if (moveMode == kCancelButton)
+									break;
+							}
 							//
 							//	build of list of entry_refs from the list
 							//	in the drag message
@@ -1577,7 +1587,6 @@ BContainerWindow::MessageReceived(BMessage *message)
 							//
 							//	compare the target and one of the drag items' parent
 							//
-							uint32 moveMode = kMoveSelectionTo;
 							Model targetModel(&entry, true, false);
 							if (!CheckDevicesEqual(list->ItemAt(0), &targetModel))
 								moveMode = kCopySelectionTo;
