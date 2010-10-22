@@ -6,6 +6,9 @@
 
 #include "keyboard.h"
 #include "rom_calls.h"
+#include "Handle.h"
+#include "console.h"
+#include "keyboard.h"
 
 #include <boot/platform.h>
 #include <boot/stdio.h>
@@ -13,6 +16,8 @@
 #include <string.h>
 
 #include <Errors.h>
+
+extern FILE *dbgerr;
 
 /*!	This works only after console_init() was called.
 */
@@ -60,38 +65,17 @@ panic(const char *format, ...)
 void
 dprintf(const char *format, ...)
 {
-	static struct AlertMessage {
-		uint16	column1;
-		uint8	line1;
-		char	message[14];
-		uint8	cont;
-		uint16	column2;
-		uint8	line2;
-		char	buffer[512];
-		uint8	end;
-		
-	} _PACKED alert = {
-		10, 12,
-		"KERN: ",
-		1,
-		10, 22,
-		"",
-		0
-	};
-
-	char *buffer = alert.buffer;
+	char buffer[512];
 	va_list list;
 
 	//platform_switch_to_text_mode();
 
-	memset(buffer, 0, 512);
-
 	va_start(list, format);
-	vsnprintf(buffer, 512, format, list);
+	if (dbgerr)
+		vfprintf(dbgerr, format, list);
+	//vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
-
-	DisplayAlert(RECOVERY_ALERT, &alert, 40);
-
+	
 	//if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
 	//	Bconput(DEV_CONSOLE, buffer);
 }
