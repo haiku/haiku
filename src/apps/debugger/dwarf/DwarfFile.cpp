@@ -430,6 +430,8 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 		bool dwarf64;
 		off_t entryOffset = dataReader.Offset();
 		uint64 length = dataReader.ReadInitialLength(dwarf64);
+		TRACE_CFI("DwarfFile::UnwindCallFrame(): offset: %Lx, length: %Lx\n",
+			entryOffset, length);
 		if (length > (uint64)dataReader.BytesRemaining())
 			return B_BAD_DATA;
 		off_t lengthOffset = dataReader.Offset();
@@ -443,8 +445,10 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 					? cieID == 0xffffffffffffffffULL
 					: cieID == 0xffffffff)) {
 			// this is a CIE -- skip it
+			TRACE_CFI("Skipping CIE: %Lx\n", cieID);
 			previousCIE = entryOffset;
 		} else {
+			TRACE_CFI("Found FDE\n");
 			// this is a FDE
 			target_addr_t initialLocation = dataReader.ReadAddress(0);
 			target_size_t addressRange = dataReader.ReadAddress(0);
@@ -452,6 +456,8 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 			if (dataReader.HasOverflow())
 				return B_BAD_DATA;
 
+			TRACE_CFI("location: %Lx, initial location: %Lx, address range: %Lx\n",
+				location, initialLocation, addressRange);
 			if (location >= initialLocation
 				&& location < initialLocation + addressRange) {
 				// This is the FDE we're looking for.
@@ -1656,8 +1662,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				}
 				case DW_CFA_def_cfa_expression:
 				{
-					uint8* block = (uint8*)dataReader.Data();
 					uint64 blockLength = dataReader.ReadUnsignedLEB128(0);
+					uint8* block = (uint8*)dataReader.Data();
 					dataReader.Skip(blockLength);
 
 					TRACE_CFI("    DW_CFA_def_cfa_expression: %p, %llu\n",
@@ -1670,8 +1676,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				case DW_CFA_expression:
 				{
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
-					uint8* block = (uint8*)dataReader.Data();
 					uint64 blockLength = dataReader.ReadUnsignedLEB128(0);
+					uint8* block = (uint8*)dataReader.Data();
 					dataReader.Skip(blockLength);
 
 					TRACE_CFI("    DW_CFA_expression: reg: %lu, block: %p, "
@@ -1752,8 +1758,8 @@ DwarfFile::_ParseFrameInfoInstructions(CompilationUnit* unit,
 				case DW_CFA_val_expression:
 				{
 					uint32 reg = dataReader.ReadUnsignedLEB128(0);
-					uint8* block = (uint8*)dataReader.Data();
 					uint64 blockLength = dataReader.ReadUnsignedLEB128(0);
+					uint8* block = (uint8*)dataReader.Data();
 					dataReader.Skip(blockLength);
 
 					TRACE_CFI("    DW_CFA_val_expression: reg: %lu, block: %p, "
