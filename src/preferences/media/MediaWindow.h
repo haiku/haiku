@@ -31,6 +31,9 @@
 #define SETTINGS_FILE "MediaPrefs Settings"
 
 
+class BSeparatorView;
+
+
 class MediaWindow : public BWindow
 {
 public:
@@ -57,11 +60,10 @@ private:
 	
 			BBox*				fBox;
 			BListView*			fListView;
-			BStringView*		fTitleView;
+			BSeparatorView*		fTitleView;
 			BView*				fContentView;
 			SettingsView*		fAudioView;
 			SettingsView*		fVideoView;
-			BarView*			fBar;
     			    
 			media_node*			fCurrentNode;
 			BParameterWeb*		fParamWeb;

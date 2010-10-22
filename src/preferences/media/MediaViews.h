@@ -30,16 +30,6 @@ const uint32 ML_DEFAULT_CHANGE = 'dech';
 const uint32 ML_DEFAULTOUTPUT_CHANGE = 'doch';
 
 
-class BarView : public BView
-{
-public:
-								BarView();
-	virtual	void				Draw(BRect updateRect);
-
-			bool				fDisplay;
-};
-
-
 class SettingsItem : public BMenuItem
 {
 public:

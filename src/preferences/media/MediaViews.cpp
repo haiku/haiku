@@ -38,33 +38,6 @@
 #define B_TRANSLATE_CONTEXT "Media views"
 
 
-BarView::BarView()
-	:
-	BView("barView", B_WILL_DRAW ),
- 	fDisplay(true)
-{
-}
-
-
-void
-BarView::Draw(BRect updateRect)
-{
-	BRect r = Bounds();
-
-	if (fDisplay) {
-		// Display the 3D Look Divider Bar
-		SetHighColor(140,140,140,0);
-		StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
-		SetHighColor(255,255,255,0);
-		StrokeLine(BPoint(r.left,r.bottom),BPoint(r.right,r.bottom));
-	} else {
-		SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
-		StrokeLine(BPoint(r.left,r.bottom),BPoint(r.right,r.bottom));
-	}
-}
-
-
 SettingsView::SettingsView (bool isVideo)
 	:
 	BView("SettingsView", B_WILL_DRAW | B_SUPPORTS_LAYOUT),

@@ -26,6 +26,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
 #include <StorageKit.h>
 #include <String.h>
@@ -203,11 +204,9 @@ MediaWindow::InitWindow(void)
 	GetLayout()->AddView(fBox);
 
 	// StringViews
-	rgb_color titleFontColor = { 0, 0, 0, 0 };
-	fTitleView = new BStringView("AudioSettings",
-		B_TRANSLATE("Audio settings"), B_WILL_DRAW);
+	fTitleView = new BSeparatorView(B_HORIZONTAL, B_FANCY_BORDER);
+	fTitleView->SetLabel(B_TRANSLATE("Audio settings"));
 	fTitleView->SetFont(be_bold_font);
-	fTitleView->SetHighColor(titleFontColor);
 
 	fContentView = new BBox("contentView", B_WILL_DRAW | B_FRAME_EVENTS,
 		B_NO_BORDER);
@@ -215,16 +214,11 @@ MediaWindow::InitWindow(void)
 	fAudioView = new SettingsView(false);
 	fVideoView = new SettingsView(true);
 
-	fBar = new BarView();
-	BGroupView* titleGroupView = new BGroupView(B_HORIZONTAL);
-	titleGroupView->GroupLayout()->AddView(fTitleView);
-	titleGroupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
 	// Layout all views
 	BGroupView* rightView = new BGroupView(B_VERTICAL, 5);
 	rightView->GroupLayout()->SetInsets(14, 0, 0, 0);
-	rightView->GroupLayout()->AddView(titleGroupView);
-	rightView->GroupLayout()->AddView(fBar, 0);
+	rightView->GroupLayout()->AddView(fTitleView);
 	rightView->GroupLayout()->AddView(fContentView);
 
 	BGroupLayout* rootLayout = new BGroupLayout(B_HORIZONTAL);
@@ -602,7 +596,7 @@ MediaWindow::MessageReceived(BMessage* message)
 					delete fParamWeb;
 				fParamWeb = NULL;
 
-				fTitleView->SetText(item->GetLabel());
+				fTitleView->SetLabel(item->GetLabel());
 
 				if (item->OutlineLevel() == 0) {
 					if (item->IsVideo())
@@ -640,13 +634,6 @@ MediaWindow::MessageReceived(BMessage* message)
 						stringView->MoveBy((bounds.Width()-stringView->Bounds().Width())/2,
 							(bounds.Height()-stringView->Bounds().Height())/2);
 					}
-				}
-
-				bool barChanged = (item->OutlineLevel() == 0
-					|| fParamWeb == NULL || fParamWeb->CountGroups()<2);
-				if (barChanged != fBar->fDisplay) {
-					fBar->fDisplay = barChanged;
-					fBar->Invalidate();
 				}
 			}
 			break;
