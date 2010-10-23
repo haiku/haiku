@@ -123,9 +123,9 @@ public:
 			bool				SlideShowStarted() const { return fSlideShow; }
 			void				StartSlideShow();
 			void				StopSlideShow();
-			void				SetZoom(float zoom);
-			void				ZoomIn();
-			void				ZoomOut();
+			void				SetZoom(BPoint where, float zoom);
+			void				ZoomIn(BPoint where = BPoint(-1, -1));
+			void				ZoomOut(BPoint where = BPoint(-1, -1));
 
 			// Image manipulation
 			void				Rotate(int degree); // 90 and 270 only
@@ -280,7 +280,7 @@ private:
 				// in pulse rate units
 			int					fSlideShowCountDown;
 				// shows next image if it reaches zero
-	
+
 			bool				fShowCaption;
 			BString				fCaption;
 

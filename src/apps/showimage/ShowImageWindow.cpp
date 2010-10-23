@@ -258,6 +258,7 @@ ShowImageWindow::BuildContextMenu(BMenu* menu)
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "Menus"
 
+
 void
 ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 {
@@ -292,10 +293,12 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 
 	menu->AddSeparatorItem();
 
-	_AddItemMenu(menu, B_TRANSLATE("High-quality zooming"),
-		MSG_SCALE_BILINEAR, 0, 0, this);
+	if (!popupMenu) {
+		_AddItemMenu(menu, B_TRANSLATE("High-quality zooming"),
+			MSG_SCALE_BILINEAR, 0, 0, this);
 
-	menu->AddSeparatorItem();
+		menu->AddSeparatorItem();
+	}
 
 	_AddItemMenu(menu, B_TRANSLATE("Shrink to window"),
 		MSG_SHRINK_TO_WINDOW, 0, 0, this);
@@ -886,7 +889,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_ORIGINAL_SIZE:
-			fImageView->SetZoom(1.0);
+			fImageView->SetZoom(BPoint(-1, -1), 1.0);
 			break;
 
 		case MSG_SCALE_BILINEAR:

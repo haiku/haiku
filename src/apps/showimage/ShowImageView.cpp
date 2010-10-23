@@ -202,9 +202,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 
 	fBitmapLocationInView(0.0, 0.0),
 
-	fShrinkToBounds(false),
-	fZoomToBounds(false),
-	fShrinkOrZoomToBounds(false),
+	fShrinkToBounds(true),
+	fZoomToBounds(true),
+	fShrinkOrZoomToBounds(true),
 	fFullScreen(false),
 	fScrollingBitmap(false),
 	fCreatingSelection(false),
@@ -755,9 +755,9 @@ ShowImageView::_AlignBitmap()
 	if (width == 0 || height == 0)
 		return rect;
 
-	fShrinkOrZoomToBounds = (fShrinkToBounds &&
-		(bitmapWidth >= width || bitmapHeight >= height)) ||
-		(fZoomToBounds && (bitmapWidth < width && bitmapHeight < height));
+	fShrinkOrZoomToBounds = (fShrinkToBounds
+			&& (bitmapWidth >= width || bitmapHeight >= height))
+		|| (fZoomToBounds && (bitmapWidth < width && bitmapHeight < height));
 	if (fShrinkOrZoomToBounds) {
 		float s = width / bitmapWidth;
 
@@ -1688,15 +1688,20 @@ ShowImageView::_MouseWheelChanged(BMessage *msg)
 	if (msg->FindFloat("be:wheel_delta_y", &dy) == B_OK)
 		y = dy * kscrollBy;
 
-	if (modifiers() & B_SHIFT_KEY)
+	if ((modifiers() & B_SHIFT_KEY) != 0)
 		_ScrollRestrictedBy(x, y);
-	else if (modifiers() & B_COMMAND_KEY)
+	else if ((modifiers() & B_COMMAND_KEY) != 0)
 		_ScrollRestrictedBy(y, x);
 	else {
+		// Zoom in spot
+		BPoint where;
+		uint32 buttons;
+		GetMouse(&where, &buttons);
+
 		if (dy < 0)
-			ZoomIn();
+			ZoomIn(where);
 		else if (dy > 0)
-			ZoomOut();
+			ZoomOut(where);
 	}
 }
 
@@ -1839,14 +1844,17 @@ ShowImageView::FixupScrollBar(orientation o, float bitmapLength, float viewLengt
 void
 ShowImageView::FixupScrollBars()
 {
-	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
-	if (fBitmap) {
-		rctbitmap = _AlignBitmap();
-		rctbitmap.OffsetTo(0, 0);
+	BRect viewRect = Bounds();
+	BRect bitmapRect;
+	if (fBitmap != NULL) {
+		bitmapRect = _AlignBitmap();
+		bitmapRect.OffsetTo(0, 0);
 	}
 
-	FixupScrollBar(B_HORIZONTAL, rctbitmap.Width() + 2 * PEN_SIZE, rctview.Width());
-	FixupScrollBar(B_VERTICAL, rctbitmap.Height() + 2 * PEN_SIZE, rctview.Height());
+	FixupScrollBar(B_HORIZONTAL, bitmapRect.Width() + 2 * PEN_SIZE,
+		viewRect.Width());
+	FixupScrollBar(B_VERTICAL, bitmapRect.Height() + 2 * PEN_SIZE,
+		viewRect.Height());
 }
 
 
@@ -2288,30 +2296,47 @@ ShowImageView::_FirstFile()
 
 
 void
-ShowImageView::SetZoom(float zoom)
+ShowImageView::SetZoom(BPoint where, float zoom)
 {
-	if ((fScaleBilinear || fDither) && fZoom != zoom) {
+	if ((fScaleBilinear || fDither) && fZoom != zoom)
 		_DeleteScaler();
-	}
-	fZoom = zoom;
-	FixupScrollBars();
+
+	// Invalidate before scrolling, as that prevents the app_server
+	// to do the scrolling server side
 	Invalidate();
+
+	// zoom to center if not otherwise specified
+	if (where.x == -1)
+		where.Set(Bounds().Width() / 2, Bounds().Height() / 2);
+
+	BPoint offset = where - Bounds().LeftTop();
+
+	float oldZoom = fZoom;
+	fZoom = zoom;
+
+	FixupScrollBars();
+
+	if (fBitmap != NULL) {
+		offset.x = (int)(where.x * fZoom / oldZoom + 0.5) - offset.x;
+		offset.y = (int)(where.y * fZoom / oldZoom + 0.5) - offset.y;
+		ScrollTo(offset);
+	}
 }
 
 
 void
-ShowImageView::ZoomIn()
+ShowImageView::ZoomIn(BPoint where)
 {
 	if (fZoom < 16)
-		SetZoom(fZoom + 0.25);
+		SetZoom(where, fZoom + 0.25);
 }
 
 
 void
-ShowImageView::ZoomOut()
+ShowImageView::ZoomOut(BPoint where)
 {
 	if (fZoom > 0.25)
-		SetZoom(fZoom - 0.25);
+		SetZoom(where, fZoom - 0.25);
 }
 
 
@@ -2340,7 +2365,8 @@ ShowImageView::SetSlideShowDelay(float seconds)
 void
 ShowImageView::StartSlideShow()
 {
-	fSlideShow = true; fSlideShowCountDown = fSlideShowDelay;
+	fSlideShow = true;
+	fSlideShowCountDown = fSlideShowDelay;
 }
 
 
