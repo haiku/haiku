@@ -439,16 +439,20 @@ DwarfFile::UnwindCallFrame(CompilationUnit* unit,
 		// CIE ID/CIE pointer
 		uint64 cieID = dwarf64
 			? dataReader.Read<uint64>(0) : dataReader.Read<uint32>(0);
+			
+		// TODO: gcc4.4+ only specifies an eh_frame by default on 
+		// Haiku, and its format differs from the 2.x format
+		// we currently handle. Support for detecting and parsing 
+		// the appropriate format needs to be added, though this can 
+		// currently be worked around using -fno-dwarf2-cfi-asm
 		if (fUsingEHFrameSection
 				? cieID == 0
 				: (dwarf64
 					? cieID == 0xffffffffffffffffULL
 					: cieID == 0xffffffff)) {
 			// this is a CIE -- skip it
-			TRACE_CFI("Skipping CIE: %Lx\n", cieID);
 			previousCIE = entryOffset;
 		} else {
-			TRACE_CFI("Found FDE\n");
 			// this is a FDE
 			target_addr_t initialLocation = dataReader.ReadAddress(0);
 			target_size_t addressRange = dataReader.ReadAddress(0);
