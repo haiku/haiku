@@ -136,7 +136,6 @@ _start(void)
 	console_init();
 	dprintf("ramtop   = %p\n", NULL);
 	cpu_init();
-	panic("plop %d", 1234);
 	mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key

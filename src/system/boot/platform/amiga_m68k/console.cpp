@@ -70,9 +70,10 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 			break;
 		if (string[i] == '\n') {
 			//Text(&sScreen->RastPort, &string[i - len], len);
-			fY = 0;
-			fX++;
+			fX = 0;
+			fY++;
 			len = 0;
+			console_set_cursor(fX, fY);
 			continue;
 		}
 		Text(&sScreen->RastPort, &string[i], 1);
@@ -130,27 +131,9 @@ console_init(void)
 	sFontHeight = sScreen->Font->ta_YSize;
 	sFontWidth = font->tf_XSize;
 	
-	
 	ClearScreen(&sScreen->RastPort);
-	
-	//CloseScreen(sScreen);
 
-	//TODO
-	
 	dbgerr = stdout = stderr = (FILE *)&sOutput;
-
-//XXX: testing
-	Move(&sScreen->RastPort, 30, 30);
-	Text(&sScreen->RastPort, "kikou", 5);
-	
-// those crash for the moment. Stack alignment issue ?
-//	sOutput.WriteAt(NULL, 0LL, "abcdefgh", 10);
-//	dprintf("kk\nbb\n");
-
-//XXX
-	while (true) {}
-
-	//panic("console_init done\n");
 
 	return B_OK;
 }
