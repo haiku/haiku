@@ -196,3 +196,7 @@ for package in $(HAIKU_ADDED_OPTIONAL_PACKAGES) {
 if $(packageError) {
 	Exit ;
 }
+
+# Pseudo-target to build all targets that are localized.
+NotFile catkeys ;
+Depends catkeys : $(HAIKU_LOCALIZED_TARGETS) ;

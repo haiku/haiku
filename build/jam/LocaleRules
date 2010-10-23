@@ -120,6 +120,10 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp : folder
 	#                   Optional: default is matching be_catalog->GetString
 	# folder			Optional: the subdirectory containing *.catkeys
 
+	# Make a note of all targets that call this rule.
+	# This will be used for the pseudo-target catkeys
+	HAIKU_LOCALIZED_TARGETS += $(target) ;
+
 	local subdir = $(SUBDIR_TOKENS[2-]) $(folder) ;
 	HAIKU_CATALOGS_SUBDIR on $(signature) = $(subdir) ;
 
