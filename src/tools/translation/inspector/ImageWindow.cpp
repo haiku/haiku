@@ -138,12 +138,12 @@ ImageWindow::MessageReceived(BMessage *pmsg)
 		case M_SAVE_IMAGE:
 			if (fpimageView->HasImage()) {
 				BAlert *palert = new BAlert(NULL,
-					B_TRANSLATE("Save feature not implemented yet."), 
+					B_TRANSLATE("Save feature not implemented yet."),
 					B_TRANSLATE("Bummer"));
 				palert->Go();
 			} else {
 				BAlert *palert = new BAlert(NULL,
-					B_TRANSLATE("No image available to save."), 
+					B_TRANSLATE("No image available to save."),
 					B_TRANSLATE("OK"));
 				palert->Go();
 			}

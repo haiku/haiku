@@ -14,18 +14,18 @@
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -70,7 +70,7 @@ ImageView::ImageView(BRect rect, const char *name)
 	fpbitmap = NULL;
 	fdocumentIndex = 1;
 	fdocumentCount = 1;
-	
+
 	SetViewColor(192, 192, 192);
 	SetHighColor(0, 0, 0);
 	SetPenSize(PEN_SIZE);
@@ -101,7 +101,7 @@ ImageView::Draw(BRect rect)
 				BORDER_HEIGHT - PEN_SIZE,
 				fpbitmap->Bounds().Width() + BORDER_WIDTH + PEN_SIZE,
 				fpbitmap->Bounds().Height() + BORDER_HEIGHT + PEN_SIZE));
-		
+
 		DrawBitmap(fpbitmap, BPoint(BORDER_WIDTH, BORDER_HEIGHT));
 	}
 }
@@ -129,7 +129,7 @@ ImageView::MouseDown(BPoint point)
 {
 	if (!HasImage())
 		return;
-	
+
 	// Only accept left button clicks
 	BMessage *pmsg = Window()->CurrentMessage();
 	int32 button = pmsg->FindInt32("buttons");
@@ -170,7 +170,7 @@ ImageView::MessageReceived(BMessage *pmsg)
 		case B_COPY_TARGET:
 			SaveImageAtDropLocation(pmsg);
 			break;
-		
+
 		default:
 			BView::MessageReceived(pmsg);
 			break;
@@ -184,9 +184,9 @@ ImageView::SaveImageAtDropLocation(BMessage *pmsg)
 	// Find the location and name of the drop and
 	// write the image file there
 	BBitmapStream stream(fpbitmap);
-	
+
 	StatusCheck chk;
-		// throw an exception if this is assigned 
+		// throw an exception if this is assigned
 		// anything other than B_OK
 
 	try {
@@ -194,21 +194,21 @@ ImageView::SaveImageAtDropLocation(BMessage *pmsg)
 		chk = pmsg->FindRef("directory", &dirref);
 		const char *filename;
 		chk = pmsg->FindString("name", &filename);
-		
+
 		BDirectory dir(&dirref);
 		BFile file(&dir, filename, B_WRITE_ONLY | B_CREATE_FILE);
 		chk = file.InitCheck();
-		
+
 		BTranslatorRoster *proster = BTranslatorRoster::Default();
 		chk = proster->Translate(&stream, NULL, NULL, &file, B_TGA_FORMAT);
 
 	} catch (StatusNotOKException) {
 		BAlert *palert = new BAlert(NULL,
-			B_TRANSLATE("Sorry, unable to write the image file."), 
+			B_TRANSLATE("Sorry, unable to write the image file."),
 			B_TRANSLATE("OK"));
 		palert->Go();
 	}
-	
+
 	stream.DetachBitmap(&fpbitmap);
 }
 
@@ -219,7 +219,7 @@ ImageView::AdjustScrollBars()
 	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
 	if (HasImage())
 		rctbitmap = fpbitmap->Bounds();
-	
+
 	float prop, range;
 	BScrollBar *psb = ScrollBar(B_HORIZONTAL);
 	if (psb) {
@@ -231,7 +231,7 @@ ImageView::AdjustScrollBars()
 		psb->SetProportion(prop);
 		psb->SetSteps(10, 100);
 	}
-	
+
 	psb = ScrollBar(B_VERTICAL);
 	if (psb) {
 		range = rctbitmap.Height() + (BORDER_HEIGHT * 2) - rctview.Height();
@@ -245,7 +245,7 @@ ImageView::AdjustScrollBars()
 }
 
 
-struct ColorSpaceName { 
+struct ColorSpaceName {
 	color_space id;
 	const char *name;
 };
@@ -323,7 +323,7 @@ hex_format(uint32 num)
 {
 	static char str[11] = { 0 };
 	sprintf(str, "0x%.8lx", num);
-	
+
 	return str;
 }
 
@@ -336,7 +336,7 @@ char_format(uint32 num)
 	static char str[5] = { 0 };
 	uint32 bnum = B_HOST_TO_BENDIAN_INT32(num);
 	memcpy(str, &bnum, 4);
-	
+
 	return str;
 }
 
@@ -428,7 +428,7 @@ ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
 	str2[0] = '\0';
 	sprintf(str2, "%f", tinfo.capability);
 	bstr.ReplaceFirst("%16", str2);
-	
+
 	int32 document_count = 0, document_index = 0;
 	// Translator Info
 	const char *tranname = NULL, *traninfo = NULL;
@@ -468,7 +468,7 @@ ImageView::UpdateInfoWindow(const BPath &path, BMessage &ioExtension,
 			bstr.Append(str.String());
 		}
 		else
-			if (proster->GetTranslatorInfo(tinfo.translator, &tranname, 
+			if (proster->GetTranslatorInfo(tinfo.translator, &tranname,
 				&traninfo, &tranversion) == B_OK) {
 					BString str = B_TRANSLATE("\nTranslator Used:\n"
 						"Name: %1\n"
@@ -520,7 +520,7 @@ ImageView::SelectTranslatorRoster(BTranslatorRoster &roster)
 			}
 		}
 	}
-	
+
 	if (bNoneSelected)
 		return BTranslatorRoster::Default();
 	else
@@ -533,16 +533,16 @@ ImageView::SetImage(BMessage *pmsg)
 {
 	// Replace current image with the image
 	// specified in the given BMessage
-	
+
 	entry_ref ref;
 	if (!pmsg)
 		ref = fcurrentRef;
 	else if (pmsg->FindRef("refs", &ref) != B_OK)
 		// If refs not found, just ignore the message
 		return;
-	
+
 	StatusCheck chk;
-	
+
 	try {
 		BFile file(&ref, B_READ_ONLY);
 		chk = file.InitCheck();
@@ -561,7 +561,7 @@ ImageView::SetImage(BMessage *pmsg)
 		chk = ioExtension.AddInt32("/documentIndex", fdocumentIndex);
 		chk = proster->Identify(&file, &ioExtension, &tinfo, 0, NULL,
 			B_TRANSLATOR_BITMAP);
-			
+
 		// perform the actual translation
 		BBitmapStream outstream;
 		chk = proster->Translate(&file, &tinfo, &ioExtension, &outstream,
@@ -579,7 +579,7 @@ ImageView::SetImage(BMessage *pmsg)
 			fdocumentCount = documentCount;
 		else
 			fdocumentCount = 1;
-		
+
 		// Set the name of the Window to reflect the file name
 		BWindow *pwin = Window();
 		BEntry entry(&ref);
@@ -593,7 +593,7 @@ ImageView::SetImage(BMessage *pmsg)
 			pwin->SetTitle(IMAGEWINDOW_TITLE);
 		UpdateInfoWindow(path, ioExtension, tinfo, proster);
 
-		// Resize parent window and set size limits to 
+		// Resize parent window and set size limits to
 		// reflect the size of the new bitmap
 		float width, height;
 		BMenuBar *pbar = pwin->KeyMenuBar();
@@ -619,13 +619,13 @@ ImageView::SetImage(BMessage *pmsg)
 			// HACK: Need to fix case where window un-zooms
 			// when the window is already the correct size
 			// for the current image
-		
+
 		// repaint view
 		Invalidate();
 
 	} catch (StatusNotOKException) {
 		BAlert *palert = new BAlert(NULL,
-			B_TRANSLATE("Sorry, unable to load the image."), 
+			B_TRANSLATE("Sorry, unable to load the image."),
 			B_TRANSLATE("OK"));
 		palert->Go();
 	}
