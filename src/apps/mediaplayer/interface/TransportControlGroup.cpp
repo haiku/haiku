@@ -1,5 +1,5 @@
 /*
- * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2006-2010 Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -38,12 +38,6 @@ enum {
 	MSG_SET_VOLUME			= 'stvl',
 	MSG_SET_MUTE			= 'stmt',
 };
-
-#define BORDER_INSET 6.0
-#define MIN_SPACE 4.0
-#define SPEAKER_SLIDER_DIST 6.0
-#define VOLUME_MIN_WIDTH 70.0
-#define VOLUME_SLIDER_LAYOUT_WEIGHT 2.0
 
 // the range of the volume sliders (in dB)
 #define kVolumeDbMax	6.0
