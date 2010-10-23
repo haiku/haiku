@@ -5017,6 +5017,8 @@ static void rt2860_intr(void *arg)
 	uint32_t status;
 
 	sc = arg;
+
+#if !defined(__HAIKU__)
 	ifp = sc->ifp;
 
 	/* acknowledge interrupts */
@@ -5036,6 +5038,9 @@ static void rt2860_intr(void *arg)
 
 	if (!(ifp->if_drv_flags & IFF_DRV_RUNNING))
 		return;
+#else
+	status = sc->interrupt_status;
+#endif
 
 	if (status & RT2860_REG_INT_TX_COHERENT)
 		rt2860_tx_coherent_intr(sc);

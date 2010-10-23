@@ -407,6 +407,10 @@ struct rt2860_softc
 #ifdef RT2860_DEBUG
 	int debug;
 #endif
+
+#ifdef __HAIKU__
+	uint32_t interrupt_status;
+#endif
 };
 
 #endif /* #ifndef _RT2860_SOFTC_H_ */
