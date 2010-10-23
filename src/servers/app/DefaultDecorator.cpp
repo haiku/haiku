@@ -190,31 +190,27 @@ DefaultDecorator::MouseAction(const BMessage* message, BPoint point,
 	printf("\tButtons: %ld, Modifiers: 0x%lx\n", buttons, modifiers);
 #endif // DEBUG_DECORATOR
 
-	if (buttons != 0)
-		fWasDoubleClick = message->FindInt32("clicks") == 2;
+	click_type action = CLICK_NONE;
 
-	// In checking for hit test stuff, we start with the smallest rectangles
-	// the user might be clicking on and gradually work our way out into larger
-	// rectangles.
+	// We start with the smallest rectangles the user might be clicking
+	// on and gradually work our way out into larger rectangles.
 	if (!(fFlags & B_NOT_CLOSABLE) && fCloseRect.Contains(point))
-		return CLICK_CLOSE;
-
-	if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point))
-		return CLICK_ZOOM;
-
-	if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
-		return CLICK_MOVE_TO_BACK;
-
-	if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(point))
-		return CLICK_RESIZE;
-
-	if (fTabRect.Contains(point)) {
+		action = CLICK_CLOSE;
+	else if (!(fFlags & B_NOT_ZOOMABLE) && fZoomRect.Contains(point))
+		action = CLICK_ZOOM;
+	else if ((buttons & B_SECONDARY_MOUSE_BUTTON) != 0)
+		action = CLICK_MOVE_TO_BACK;
+	else if (fLook == B_DOCUMENT_WINDOW_LOOK && fResizeRect.Contains(point))
+		action = CLICK_RESIZE;
+	else if (fTabRect.Contains(point)) {
 		// Clicked in the tab
 
 		// tab sliding in any case if either shift key is held down
 		// except sliding up-down by moving mouse left-right would look strange
 		if ((modifiers & B_SHIFT_KEY) != 0 && fLook != kLeftTitledWindowLook)
-			return CLICK_SLIDE_TAB;
+			action = CLICK_SLIDE_TAB;
+		else
+			action = CLICK_DRAG;
 	} else if (fLeftBorder.Contains(point) || fRightBorder.Contains(point)
 		|| fTopBorder.Contains(point) || fBottomBorder.Contains(point)) {
 		// Clicked on border
@@ -229,19 +225,25 @@ DefaultDecorator::MouseAction(const BMessage* message, BPoint point,
 				fBottomBorder.bottom - kBorderResizeLength),
 				fBottomBorder.RightBottom());
 			if (resizeRect.Contains(point))
-				return CLICK_RESIZE;
-		}
-	} else {
-		// Guess user didn't click anything
-		return CLICK_NONE;
+				action = CLICK_RESIZE;
+		} else
+			action = CLICK_DRAG;
 	}
 
-	// Either tab or border was clicked
+	if (buttons != 0) {
+		fWasDoubleClick = message->FindInt32("clicks") == 2
+			&& fLastAction == action;
+	}
 
-	if (fWasDoubleClick && !(fFlags & B_NOT_MINIMIZABLE))
-		return CLICK_MINIMIZE;
+	// Transform double clicks on the border to minimize, if allowed
+	if (action == CLICK_DRAG && fWasDoubleClick
+		&& (fFlags & B_NOT_MINIMIZABLE) == 0)
+		action = CLICK_MINIMIZE;
 
-	return CLICK_DRAG;
+	if (message->what == B_MOUSE_DOWN)
+		fLastAction = action;
+
+	return action;
 }
 
 

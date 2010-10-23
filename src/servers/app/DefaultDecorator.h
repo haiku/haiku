@@ -133,6 +133,7 @@ protected:
 			int32				fTruncatedTitleLength;
 
 private:
+			click_type			fLastAction;
 			bool				fWasDoubleClick;
 };
 
