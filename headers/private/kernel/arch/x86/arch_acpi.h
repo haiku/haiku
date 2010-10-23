@@ -74,7 +74,7 @@ typedef struct acpi_io_apic {
 	uint8	length;					/* 12 bytes */
 	uint8	io_apic_id;				/* the id of this APIC */
 	uint8	reserved;
-	uint32	io_apic_address;		/* phyisical address of I/O APIC */
+	uint32	io_apic_address;		/* physical address of I/O APIC */
 	uint32	interrupt_base;			/* global system interrupt base */
 } _PACKED acpi_io_apic;
 
@@ -99,8 +99,8 @@ typedef struct acpi_nmi_source {
 } _PACKED acpi_nmi_source;
 
 typedef struct acpi_local_apic_nmi {
-	uint8	type;					/* 0 = processor local APIC */
-	uint8	length;					/* 8 bytes */
+	uint8	type;					/* 4 = local APIC NMI */
+	uint8	length;					/* 6 bytes */
 	uint8	acpi_processor_id;		/* Processor ID corresponding to processor
 									   ID in acpi_local_apic. 0xFF signals
 									   it applies to all processors */
@@ -109,5 +109,45 @@ typedef struct acpi_local_apic_nmi {
 	uint8   local_interrupt;		/* Local APIC interrupt input LINTn to which
 									   NMI is connected */
 } _PACKED acpi_local_apic_nmi;
+
+typedef struct acpi_local_apic_address_override {
+	uint8	type;					/* 5 = local APIC address override */
+	uint8	length;					/* 12 bytes */
+	uint16	reserved;				/* reserved (must be set to zero) */
+	uint64	local_apic_address;		/* Physical address of local APIC. See table
+										5-28 in ACPI Spec 4.0a for more */
+} _PACKED acpi_local_apic_address_override;
+
+typedef struct acpi_io_sapic {
+	uint8	type;					/* 6 = I/0 SAPIC (should be used if it
+									   exists instead of I/O APIC if both exists
+									   for a APIC ID.*/
+	uint8	length;					/* 16 bytes */
+	uint8	io_apic_id;				/* the id of this SAPIC */
+	uint8	reserved;				/* reserved (must be set to zero) */
+	uint32	interrupt_base;			/* global system interrupt base */
+	uint64	sapic_address;			/* The physical address to access this I/0
+									   SAPIC. Each SAPIC resides at a unique
+									   address */
+} _PACKED acpi_io_sapic;
+
+typedef struct acpi_local_sapic {
+	uint8	type;					/* 7 = processor local SAPIC */
+	uint8	length;					/* x bytes */
+	uint8	acpi_processor_id;
+	uint8	local_sapic_id;
+	uint8	local_sapic_eid;
+	uint8	reserved1;				/* reserved (must be set to zero) */
+	uint8	reserved2;				/* reserved (must be set to zero) */
+	uint8	reserved3;				/* reserved (must be set to zero) */
+	uint32	flags;					/* Local SAPIC flags, see table 5-22 in
+									   ACPI Spec 4.0a */
+	uint32	processor_uid_nr;		/* Matches _UID of a processor when it is a
+									   number */
+	char[]	processor_uid_str;		/* Matches _UID of a processor when it is a
+									   string. Null-terminated */
+} _PACKED acpi_local_sapic;
+
+
 
 #endif	/* _KERNEL_ARCH_x86_ARCH_ACPI_H */
