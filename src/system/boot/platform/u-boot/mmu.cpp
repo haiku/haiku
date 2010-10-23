@@ -614,9 +614,8 @@ mmu_init(void)
 	sPageDirectory[1023] = (uint32)sPageDirectory | kDefaultPageFlags;
 */
 	// also map it on the next vpage
-	gKernelArgs.arch_args.vir_pgdir = get_next_virtual_page(B_PAGE_SIZE);
-	map_page(gKernelArgs.arch_args.vir_pgdir, (uint32)sPageDirectory,
-		kDefaultPageFlags);
+	gKernelArgs.arch_args.vir_pgdir = mmu_map_physical_memory(
+		(addr_t)sPageDirectory, MMU_L1_TABLE_SIZE, kDefaultPageFlags);
 
 	// map in a kernel stack
 	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL,
