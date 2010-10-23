@@ -1229,12 +1229,24 @@ extern struct GfxBase *GRAPHICS_BASE_NAME;
 	LP3NR(0xf0, Move, struct RastPort *, par1, a1, long, par2, d0, long, last, d1, \
 	, GRAPHICS_BASE_NAME)
 
+#define SetAPen(par1, last) \
+	LP2NR(0x156, SetAPen, struct RastPort *, par1, a1, unsigned long, last, d0, \
+	, GRAPHICS_BASE_NAME)
+
+#define SetBPen(par1, last) \
+	LP2NR(0x15c, SetBPen, struct RastPort *, par1, a1, unsigned long, last, d0, \
+	, GRAPHICS_BASE_NAME)
+
 #define SetDrMd(par1, last) \
 	LP2NR(0x162, SetDrMd, struct RastPort *, par1, a1, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
 
 #endif
+
+/* drawing modes */
+#define JAM1	0	// only draw foreground
+#define JAM2	1	// draw both fg & bg
 
 
 //	#pragma mark -

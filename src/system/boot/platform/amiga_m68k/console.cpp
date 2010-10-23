@@ -29,9 +29,28 @@ class ConsoleHandle : public CharHandle {
 		uint16	fPen;
 };
 
+static const uint16 kPalette[] = {
+	0x000,
+	0x00a,
+	0x0a0,
+	0x0aa,
+	0xa00,
+	0xa0a,
+	0xa50,
+	0xaaa,
+	0x555,
+	0x55f,
+	0x5f5,
+	0x5ff,
+	0xf55,
+	0xf5f,
+	0xff5,
+	0xfff
+};
 
 static Screen *sScreen;
 static int16 sFontWidth, sFontHeight;
+static int sScreenTopOffset = 16;
 int16 ConsoleHandle::fX = 0;
 int16 ConsoleHandle::fY = 0;
 
@@ -102,10 +121,10 @@ console_init(void)
 	static NewScreen newScreen = {
 		0, 0,
 		640, -1,
-		2,
-		0, 1,
+		4,
+		BLACK, WHITE,
 		0x8000,
-		0x1,
+		0x11,
 		NULL,
 		"Haiku Loader",
 		NULL,
@@ -116,10 +135,10 @@ console_init(void)
 	if (sScreen == NULL)
 		panic("OpenScreen()\n");
 	
-	static const uint16 palette[] = {0xbb9, 0x0, 0xfff, 0x0f0};
-	LoadRGB4(&sScreen->ViewPort, palette, 4);
+	LoadRGB4(&sScreen->ViewPort, kPalette, 16);
 	
-	SetDrMd(&sScreen->RastPort, 0);
+	SetDrMd(&sScreen->RastPort, JAM2);
+	
 	// seems not necessary, there is a default font already set.
 	/*
 	TextAttr attrs = { "Topaz", 8, 0, 0};
@@ -131,9 +150,33 @@ console_init(void)
 	sFontHeight = sScreen->Font->ta_YSize;
 	sFontWidth = font->tf_XSize;
 	
-	ClearScreen(&sScreen->RastPort);
+	sScreenTopOffset = sScreen->BarHeight * 2; // ???
+
+	
+	//ClearScreen(&sScreen->RastPort);
 
 	dbgerr = stdout = stderr = (FILE *)&sOutput;
+
+	console_set_cursor(0, 0);
+	
+	/*
+	dprintf("LeftEdge %d\n", sScreen->LeftEdge);
+	dprintf("TopEdge %d\n", sScreen->TopEdge);
+	dprintf("Width %d\n", sScreen->Width);
+	dprintf("Height %d\n", sScreen->Height);
+	dprintf("MouseX %d\n", sScreen->MouseX);
+	dprintf("MouseY %d\n", sScreen->MouseY);
+	dprintf("Flags 0x%08x\n", sScreen->Flags);
+	dprintf("BarHeight %d\n", sScreen->BarHeight);
+	dprintf("BarVBorder %d\n", sScreen->BarVBorder);
+	dprintf("BarHBorder %d\n", sScreen->BarHBorder);
+	dprintf("MenuVBorder %d\n", sScreen->MenuVBorder);
+	dprintf("MenuHBorder %d\n", sScreen->MenuHBorder);
+	dprintf("WBorTop %d\n", sScreen->WBorTop);
+	dprintf("WBorLeft %d\n", sScreen->WBorLeft);
+	dprintf("WBorRight %d\n", sScreen->WBorRight);
+	dprintf("WBorBottom %d\n", sScreen->WBorBottom);
+	*/
 
 	return B_OK;
 }
@@ -152,7 +195,7 @@ console_clear_screen(void)
 int32
 console_width(void)
 {
-	int columnCount = 80; //XXX: check video mode
+	int columnCount = sScreen->Width / sFontWidth;
 	return columnCount;
 }
 
@@ -160,7 +203,7 @@ console_width(void)
 int32
 console_height(void)
 {
-	int lineCount = 25; //XXX: check video mode
+	int lineCount = (sScreen->Height - sScreenTopOffset) / sFontHeight;
 	return lineCount;
 }
 
@@ -168,7 +211,9 @@ console_height(void)
 void
 console_set_cursor(int32 x, int32 y)
 {
-	Move(&sScreen->RastPort, sFontWidth * x, sFontHeight * y);
+	Move(&sScreen->RastPort, sFontWidth * x,
+		sFontHeight * y + sScreenTopOffset);
+		// why do I have to add this to keep the title ?
 	
 }
 
@@ -176,7 +221,8 @@ console_set_cursor(int32 x, int32 y)
 void
 console_set_color(int32 foreground, int32 background)
 {
-	//TODO
+	SetAPen(&sScreen->RastPort, foreground);
+	SetBPen(&sScreen->RastPort, background);
 }
 
 
