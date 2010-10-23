@@ -61,6 +61,7 @@
 #define BORDER_HEIGHT 16
 #define PEN_SIZE 1.0f
 
+#undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ImageView"
 
 
