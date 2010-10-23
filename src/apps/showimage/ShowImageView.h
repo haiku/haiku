@@ -86,8 +86,6 @@ public:
 			void				FixupScrollBars();
 
 			void				Undo();
-			void				Cut();
-			void				Paste();
 			void				SelectAll();
 			void				ClearSelection();
 
@@ -137,15 +135,12 @@ private:
 				kNumberOfOrientations,
 			};
 
-			void				_RemoveSelection(bool bToClipboard,
-									bool neverCutBackground = false);
 			void				_SetHasSelection(bool bHasSelection);
 			void				_AnimateSelection(bool a);
 			void				_SendMessageToWindow(BMessage *message);
 			void				_SendMessageToWindow(uint32 code);
 			void				_Notify();
 			void				_UpdateStatusText();
-			void				_AddWhiteRect(BRect& rect);
 			void				_GetMergeRects(BBitmap* merge,
 									BRect selection, BRect& srcRect,
 									BRect& dstRect);
@@ -153,7 +148,6 @@ private:
 									BRect& dstRect);
 			status_t			_SetSelection(const entry_ref* ref,
 									BPoint point);
-			status_t			_PasteBitmap(BBitmap* bitmap, BPoint point);
 			void				_MergeWithBitmap(BBitmap* merge,
 									BRect selection);
 			void				_MergeSelection();
@@ -185,7 +179,6 @@ private:
 									bool rewind);
 			bool				_ShowNextImage(bool next, bool rewind);
 			bool				_FirstFile();
-			BBitmap*			_CopyFromRect(BRect srcRect);
 			BBitmap*			_CopySelection(uchar alpha = 255,
 									bool imageSize = true);
 			bool				_AddSupportedTypes(BMessage* message,
@@ -198,8 +191,7 @@ private:
 									const char* type,
 									translation_format* format);
 			void				_HandleDrop(BMessage* message);
-			void				_ScrollBitmap();
-			uint32				_GetMouseButtons();
+			void				_ScrollBitmap(BPoint point);
 			void				_UpdateSelectionRect(BPoint point, bool final);
 			void				_DrawBackground(BRect aroundFrame);
 			void				_LayoutCaption(BFont& font, BPoint& textPos,

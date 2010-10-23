@@ -555,34 +555,6 @@ ShowImageView::ConstrainToImage(BRect& rect) const
 }
 
 
-status_t
-ShowImageView::_SetSelection(const entry_ref *ref, BPoint point)
-{
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	if (!roster)
-		return B_ERROR;
-
-	BFile file(ref, B_READ_ONLY);
-	translator_info info;
-	memset(&info, 0, sizeof(translator_info));
-	if (roster->Identify(&file, NULL, &info, 0, NULL,
-			B_TRANSLATOR_BITMAP) != B_OK)
-		return B_ERROR;
-
-	// Translate image data and create a new ShowImage window
-	BBitmapStream outstream;
-	if (roster->Translate(&file, &info, NULL, &outstream,
-			B_TRANSLATOR_BITMAP) != B_OK)
-		return B_ERROR;
-
-	BBitmap *newBitmap = NULL;
-	if (outstream.DetachBitmap(&newBitmap) != B_OK)
-		return B_ERROR;
-
-	return _PasteBitmap(newBitmap, point);
-}
-
-
 void
 ShowImageView::SetShowCaption(bool show)
 {
@@ -882,29 +854,6 @@ ShowImageView::FrameResized(float /* width */, float /* height */)
 
 
 BBitmap*
-ShowImageView::_CopyFromRect(BRect srcRect)
-{
-	BRect rect(0, 0, srcRect.Width(), srcRect.Height());
-	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new(nothrow) BBitmap(rect, fBitmap->ColorSpace(), true);
-	if (bitmap == NULL || !bitmap->IsValid()) {
-		delete bitmap;
-		return NULL;
-	}
-
-	if (bitmap->Lock()) {
-		bitmap->AddChild(&view);
-		view.DrawBitmap(fBitmap, srcRect, rect);
-		view.Sync();
-		bitmap->RemoveChild(&view);
-		bitmap->Unlock();
-	}
-
-	return bitmap;
-}
-
-
-BBitmap*
 ShowImageView::_CopySelection(uchar alpha, bool imageSize)
 {
 	bool hasAlpha = alpha != 255;
@@ -1038,8 +987,8 @@ ShowImageView::_BeginDrag(BPoint sourcePoint)
 		// only use a transparent bitmap on selections less than 400x400
 		// (taking into account zooming)
 		BRect selectionRect = fSelectionBox.Bounds();
-		if ((selectionRect.Width() * fZoom) < 400.0
-			&& (selectionRect.Height() * fZoom) < 400.0) {
+		if (selectionRect.Width() * fZoom < 400.0
+			&& selectionRect.Height() * fZoom < 400.0) {
 			sourcePoint -= selectionRect.LeftTop();
 			sourcePoint.x *= fZoom;
 			sourcePoint.y *= fZoom;
@@ -1189,37 +1138,12 @@ ShowImageView::_HandleDrop(BMessage* msg)
 
 
 void
-ShowImageView::_ScrollBitmap()
+ShowImageView::_ScrollBitmap(BPoint point)
 {
-	BPoint point, delta;
-	uint32 buttons;
-	// get CURRENT position
-	GetMouse(&point, &buttons);
 	point = ConvertToScreen(point);
-	delta = fFirstPoint - point;
+	BPoint delta = fFirstPoint - point;
 	fFirstPoint = point;
 	_ScrollRestrictedBy(delta.x, delta.y);
-
-	// in case we miss MouseUp
-	if ((_GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0)
-		fScrollingBitmap = false;
-}
-
-
-uint32
-ShowImageView::_GetMouseButtons()
-{
-	uint32 buttons;
-	BPoint point;
-	GetMouse(&point, &buttons);
-	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-		if ((modifiers() & B_CONTROL_KEY) != 0) {
-			buttons = B_SECONDARY_MOUSE_BUTTON; // simulate second button
-		} else if ((modifiers() & B_SHIFT_KEY) != 0) {
-			buttons = B_TERTIARY_MOUSE_BUTTON; // simulate third button
-		}
-	}
-	return buttons;
 }
 
 
@@ -1286,71 +1210,28 @@ ShowImageView::_MergeWithBitmap(BBitmap* merge, BRect selection)
 
 
 void
-ShowImageView::_MergeSelection()
-{
-	if (!fHasSelection)
-		return;
-
-	if (fSelectionBitmap == NULL) {
-		// Even though the merge will not change the background image,
-		// undo information still needs to be saved here.
-		fUndo.SetTo(fSelectionBox.Bounds(), NULL, _CopySelection());
-		return;
-	}
-
-	// Merge selection with background
-	fUndo.SetTo(fSelectionBox.Bounds(), _CopyFromRect(fSelectionBox.Bounds()),
-		_CopySelection());
-	_MergeWithBitmap(fSelectionBitmap, fSelectionBox.Bounds());
-}
-
-
-void
 ShowImageView::MouseDown(BPoint position)
 {
-	BPoint point;
-	uint32 buttons;
 	MakeFocus(true);
 
-	point = ViewToImage(position);
-	buttons = _GetMouseButtons();
+	BPoint point = ViewToImage(position);
+	uint32 buttons = 0;
+	if (Window() != NULL & Window()->CurrentMessage() != NULL)
+		buttons = Window()->CurrentMessage()->FindInt32("buttons");
 
 	if (fHasSelection && fSelectionBox.Bounds().Contains(point)
 		&& (buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
 		if (!fSelectionBitmap)
 			fSelectionBitmap = _CopySelection();
 
-		BPoint sourcePoint = point;
-		_BeginDrag(sourcePoint);
-
-		while (buttons) {
-			// Keep reading mouse movement until
-			// the user lets up on all mouse buttons
-			GetMouse(&point, &buttons);
-			snooze(25 * 1000);
-				// sleep for 25 milliseconds to minimize CPU usage during loop
-		}
-
-		if (Bounds().Contains(point)) {
-			// If selection stayed inside this view
-			// (Some of the selection may be in the border area, which can be OK)
-			BPoint last = ViewToImage(point);
-			BPoint diff = last - sourcePoint;
-
-			fSelectionBox.SetBounds(this,
-				fSelectionBox.Bounds().OffsetByCopy(diff));
-		}
-
-		_AnimateSelection(true);
-	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-		_MergeSelection();
-			// If there is an existing selection,
-			// Make it part of the background image
-
+		_BeginDrag(point);
+	} else if (buttons == B_TERTIARY_MOUSE_BUTTON
+		|| (buttons == B_PRIMARY_MOUSE_BUTTON
+			&& (modifiers() & (B_COMMAND_KEY | B_CONTROL_KEY)) != 0)) {
 		// begin new selection
 		_SetHasSelection(true);
 		fCreatingSelection = true;
-		SetMouseEventMask(B_POINTER_EVENTS);
+		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		ConstrainToImage(point);
 		fFirstPoint = point;
 		fCopyFromRect.Set(point.x, point.y, point.x, point.y);
@@ -1358,9 +1239,9 @@ ShowImageView::MouseDown(BPoint position)
 		Invalidate();
 	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		_ShowPopUpMenu(ConvertToScreen(position));
-	} else if (buttons == B_TERTIARY_MOUSE_BUTTON) {
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		// move image in window
-		SetMouseEventMask(B_POINTER_EVENTS);
+		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		fScrollingBitmap = true;
 		fFirstPoint = ConvertToScreen(position);
 	}
@@ -1397,14 +1278,13 @@ ShowImageView::_UpdateSelectionRect(BPoint point, bool final)
 
 
 void
-ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *message)
+ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage* message)
 {
 	fHideCursorCountDown = HIDE_CURSOR_DELAY_TIME;
-	if (fCreatingSelection) {
+	if (fCreatingSelection)
 		_UpdateSelectionRect(point, false);
-	} else if (fScrollingBitmap) {
-		_ScrollBitmap();
-	}
+	else if (fScrollingBitmap)
+		_ScrollBitmap(point);
 }
 
 
@@ -1415,7 +1295,7 @@ ShowImageView::MouseUp(BPoint point)
 		_UpdateSelectionRect(point, true);
 		fCreatingSelection = false;
 	} else if (fScrollingBitmap) {
-		_ScrollBitmap();
+		_ScrollBitmap(point);
 		fScrollingBitmap = false;
 	}
 	_AnimateSelection(true);
@@ -1642,22 +1522,9 @@ ShowImageView::_SettingsSetBool(const char* name, bool value)
 
 
 void
-ShowImageView::MessageReceived(BMessage *message)
+ShowImageView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_SELECTION_BITMAP:
-		{
-			// In response to a B_SIMPLE_DATA message, a view will
-			// send this message and expect a reply with a pointer to
-			// the currently selected bitmap clip. Although this view
-			// allocates the BBitmap * sent in the reply, it is only
-			// to be used and deleted by the view that is being replied to.
-			BMessage msg;
-			msg.AddPointer("be:_bitmap_ptr", _CopySelection());
-			message->SendReply(&msg);
-			break;
-		}
-
 		case B_SIMPLE_DATA:
 			if (message->WasDropped()) {
 				uint32 type;
@@ -1666,39 +1533,8 @@ ShowImageView::MessageReceived(BMessage *message)
 				if (ret == B_OK && type == B_REF_TYPE) {
 					// If file was dropped, open it as the selection
 					entry_ref ref;
-					if (message->FindRef("refs", 0, &ref) == B_OK) {
-						BPoint point = message->DropPoint();
-						point = ConvertFromScreen(point);
-						point = ViewToImage(point);
-						_SetSelection(&ref, point);
-					}
-				} else {
-					// If a user drags a clip from another ShowImage window,
-					// request a BBitmap pointer to that clip, allocated by the
-					// other view, for use solely by this view, so that it can
-					// be dropped/pasted onto this view.
-					BMessenger retMsgr, localMsgr(this);
-					retMsgr = message->ReturnAddress();
-					if (retMsgr != localMsgr) {
-						BMessage msgReply;
-						retMsgr.SendMessage(MSG_SELECTION_BITMAP, &msgReply);
-						BBitmap *bitmap = NULL;
-						if (msgReply.FindPointer("be:_bitmap_ptr",
-							reinterpret_cast<void **>(&bitmap)) == B_OK) {
-							BRect sourceRect;
-							BPoint point, sourcePoint;
-							message->FindPoint("be:_source_point", &sourcePoint);
-							message->FindRect("be:_frame", &sourceRect);
-							point = message->DropPoint();
-							point.Set(point.x - (sourcePoint.x - sourceRect.left),
-								point.y - (sourcePoint.y - sourceRect.top));
-								// adjust drop point before scaling is factored in
-							point = ConvertFromScreen(point);
-							point = ViewToImage(point);
-
-							_PasteBitmap(bitmap, point);
-						}
-					}
+					if (message->FindRef("refs", 0, &ref) == B_OK)
+						SetImage(&ref);
 				}
 			}
 			break;
@@ -1708,9 +1544,6 @@ ShowImageView::MessageReceived(BMessage *message)
 			break;
 		case B_MOUSE_WHEEL_CHANGED:
 			_MouseWheelChanged(message);
-			break;
-		case MSG_INVALIDATE:
-			Invalidate();
 			break;
 
 		case kMsgPopUpMenuClosed:
@@ -1817,130 +1650,6 @@ ShowImageView::Undo()
 
 
 void
-ShowImageView::_AddWhiteRect(BRect &rect)
-{
-	// Paint white rectangle, using rect, into the background image
-	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
-	BBitmap *bitmap = new(nothrow) BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
-	if (bitmap == NULL || !bitmap->IsValid()) {
-		delete bitmap;
-		return;
-	}
-
-	if (bitmap->Lock()) {
-		bitmap->AddChild(&view);
-		view.DrawBitmap(fBitmap, fBitmap->Bounds());
-
-		view.FillRect(rect, B_SOLID_LOW);
-			// draw white rect
-
-		view.Sync();
-		bitmap->RemoveChild(&view);
-		bitmap->Unlock();
-
-		_DeleteBitmap();
-		fBitmap = bitmap;
-
-		_SendMessageToWindow(MSG_MODIFIED);
-	} else
-		delete bitmap;
-}
-
-
-void
-ShowImageView::_RemoveSelection(bool toClipboard, bool neverCutBackground)
-{
-	if (!fHasSelection)
-		return;
-
-	BRect rect = fSelectionBox.Bounds();
-	bool cutBackground = (fSelectionBitmap) ? false : true;
-	BBitmap* selection = _CopySelection();
-	BBitmap* restore = NULL;
-
-	if (toClipboard)
-		CopySelectionToClipboard();
-
-	_SetHasSelection(false);
-
-	if (!neverCutBackground && cutBackground) {
-		// If the user hasn't dragged the selection,
-		// paint a white rectangle where the selection was
-		restore = _CopyFromRect(rect);
-		_AddWhiteRect(rect);
-	}
-
-	fUndo.SetTo(rect, restore, selection);
-	Invalidate();
-}
-
-
-void
-ShowImageView::Cut()
-{
-	// Copy the selection to the clipboard,
-	// then remove it
-	_RemoveSelection(true);
-}
-
-
-status_t
-ShowImageView::_PasteBitmap(BBitmap* bitmap, BPoint point)
-{
-	if (bitmap == NULL || !bitmap->IsValid())
-		return B_BAD_VALUE;
-
-	_MergeSelection();
-
-	fCopyFromRect = BRect();
-	BRect selectionRect = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
-	_SetHasSelection(true);
-	delete fSelectionBitmap;
-	fSelectionBitmap = bitmap;
-
-	BRect offsetRect(selectionRect.OffsetToCopy(point));
-	if (fBitmap->Bounds().Intersects(offsetRect)) {
-		// Move the selection rectangle to desired origin,
-		// but only if the resulting selection rectangle
-		// intersects with the background bitmap rectangle
-		selectionRect = offsetRect;
-	}
-	fSelectionBox.SetBounds(this, selectionRect);
-
-	Invalidate();
-
-	return B_OK;
-}
-
-
-void
-ShowImageView::Paste()
-{
-	if (!be_clipboard->Lock())
-		return;
-
-	BMessage* data = be_clipboard->Data();
-	if (data != NULL) {
-		BMessage bitmapArchive;
-		if (data->FindMessage("image/bitmap", &bitmapArchive) == B_OK
-			|| data->FindMessage("image/x-be-bitmap", &bitmapArchive)
-				== B_OK) {
-			BBitmap* bitmap = dynamic_cast<BBitmap*>(
-				BBitmap::Instantiate(&bitmapArchive));
-			if (bitmap != NULL) {
-				BPoint point;
-				if (data->FindPoint("be:location", &point) != B_OK)
-					point = bitmap->Bounds().LeftTop();
-				_PasteBitmap(bitmap, point);
-			}
-		}
-	}
-
-	be_clipboard->Unlock();
-}
-
-
-void
 ShowImageView::SelectAll()
 {
 	_SetHasSelection(true);
@@ -1954,10 +1663,11 @@ ShowImageView::SelectAll()
 void
 ShowImageView::ClearSelection()
 {
-	// Remove the selection,
-	// DON'T copy it to the clipboard
-	// or white out the selection
-	_RemoveSelection(false, true);
+	if (!fHasSelection)
+		return;
+
+	_SetHasSelection(false);
+	Invalidate();
 }
 
 
@@ -2207,10 +1917,13 @@ ShowImageView::SetZoom(BPoint where, float zoom)
 	Invalidate();
 
 	// zoom to center if not otherwise specified
-	if (where.x == -1)
+	BPoint offset;
+	if (where.x == -1) {
 		where.Set(Bounds().Width() / 2, Bounds().Height() / 2);
-
-	BPoint offset = where - Bounds().LeftTop();
+		offset = where;
+		where += Bounds().LeftTop();
+	} else
+		offset = where - Bounds().LeftTop();
 
 	float oldZoom = fZoom;
 	fZoom = zoom;

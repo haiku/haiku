@@ -297,14 +297,14 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 			MSG_SCALE_BILINEAR, 0, 0, this);
 
 		menu->AddSeparatorItem();
+
+		_AddItemMenu(menu, B_TRANSLATE("Shrink to window"),
+			MSG_SHRINK_TO_WINDOW, 0, 0, this);
+		_AddItemMenu(menu, B_TRANSLATE("Zoom to window"),
+			MSG_ZOOM_TO_WINDOW, 0, 0, this);
+
+		menu->AddSeparatorItem();
 	}
-
-	_AddItemMenu(menu, B_TRANSLATE("Shrink to window"),
-		MSG_SHRINK_TO_WINDOW, 0, 0, this);
-	_AddItemMenu(menu, B_TRANSLATE("Zoom to window"),
-		MSG_ZOOM_TO_WINDOW, 0, 0, this);
-
-	menu->AddSeparatorItem();
 
 	_AddItemMenu(menu, B_TRANSLATE("Full screen"),
 		MSG_FULL_SCREEN, B_ENTER, 0, this);
@@ -369,12 +369,10 @@ ShowImageWindow::AddMenus(BMenuBar* bar)
 	menu = new BMenu(B_TRANSLATE("Edit"));
 	_AddItemMenu(menu, B_TRANSLATE("Undo"), B_UNDO, 'Z', 0, this, false);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, B_TRANSLATE("Cut"), B_CUT, 'X', 0, this, false);
 	_AddItemMenu(menu, B_TRANSLATE("Copy"), B_COPY, 'C', 0, this, false);
-	_AddItemMenu(menu, B_TRANSLATE("Paste"), B_PASTE, 'V', 0, this, false);
-	_AddItemMenu(menu, B_TRANSLATE("Clear"),
-		MSG_CLEAR_SELECT, 0, 0, this, false);
 	menu->AddSeparatorItem();
+	_AddItemMenu(menu, B_TRANSLATE("Clear selection"),
+		MSG_CLEAR_SELECT, 0, 0, this, false);
 	_AddItemMenu(menu, B_TRANSLATE("Select all"),
 		MSG_SELECT_ALL, 'A', 0, this);
 	bar->AddItem(menu);
@@ -710,16 +708,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fImageView->Undo();
 			break;
 
-		case B_CUT:
-			fImageView->Cut();
-			break;
-
 		case B_COPY:
 			fImageView->CopySelectionToClipboard();
-			break;
-
-		case B_PASTE:
-			fImageView->Paste();
 			break;
 
 		case MSG_CLEAR_SELECT:
