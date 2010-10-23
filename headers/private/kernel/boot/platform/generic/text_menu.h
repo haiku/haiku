@@ -3,8 +3,8 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#ifndef GENERIC_TEXT_CONSOLE_H
-#define GENERIC_TEXT_CONSOLE_H
+#ifndef GENERIC_TEXT_MENU_H
+#define GENERIC_TEXT_MENU_H
 
 class Menu;
 class MenuItem;
@@ -12,4 +12,4 @@ class MenuItem;
 void platform_generic_update_text_menu_item(Menu *menu, MenuItem *item);
 void platform_generic_run_text_menu(Menu *menu);
 
-#endif	/* GENERIC_TEXT_CONSOLE_H */
+#endif	/* GENERIC_TEXT_MENU_H */
