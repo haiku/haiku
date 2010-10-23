@@ -149,8 +149,8 @@ if $(HAIKU_OPENSSL_ENABLED) {
 
 AddOptionalHaikuImagePackages ICU ;
 
-# Evaluate optional package dependencies 
-include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ; 
+# Evaluate optional package dependencies
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackageDependencies ] ;
 
 # Optionally we allow not to include the "src" subdirectory.
 if $(HAIKU_DONT_INCLUDE_SRC) {
