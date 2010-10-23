@@ -123,6 +123,7 @@ fs_vnode_ops gNTFSVnodeOps = {
 	&fs_access,
 	&fs_rstat,
 	&fs_wstat,
+	NULL,	// fs_preallocate
 
 	/* file operations */
 	&fs_create,
