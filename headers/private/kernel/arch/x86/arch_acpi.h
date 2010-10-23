@@ -78,4 +78,36 @@ typedef struct acpi_io_apic {
 	uint32	interrupt_base;			/* global system interrupt base */
 } _PACKED acpi_io_apic;
 
+typedef struct acpi_int_source_override {
+	uint8	type;					/* 2 = Interrupt source override */
+	uint8	length;					/* 10 bytes */
+	uint8	bus;					/* 0 = ISA  */
+	uint8	source;					/* Bus-relative interrupt source (IRQ) */
+	uint32	interrupt;				/* global system interrupt this
+									   bus-relative source int will signal */
+	uint16	flags;					/* MPS INTI flags. See Table 5-25 in 
+									   ACPI Spec 4.0a or similar */
+} _PACKED acpi_int_source_override;
+
+typedef struct acpi_nmi_source {
+	uint8	type;					/* 3 = NMI */
+	uint8	length;					/* 8 bytes */
+	uint16	flags;					/* Same as MPS INTI flags. See Table 5-25 in
+									   ACPI Spec 4.0a or similar */
+	uint32  interrupt;				/* global system interrupt this
+									   non-maskable interrupt will trigger */
+} _PACKED acpi_nmi_source;
+
+typedef struct acpi_local_apic_nmi {
+	uint8	type;					/* 0 = processor local APIC */
+	uint8	length;					/* 8 bytes */
+	uint8	acpi_processor_id;		/* Processor ID corresponding to processor
+									   ID in acpi_local_apic. 0xFF signals
+									   it applies to all processors */
+	uint16	flags;					/* Same as MPS INTI flags. See Table 5-25 in
+									   ACPI Spec 4.0a or similar */
+	uint8   local_interrupt;		/* Local APIC interrupt input LINTn to which
+									   NMI is connected */
+} _PACKED acpi_local_apic_nmi;
+
 #endif	/* _KERNEL_ARCH_x86_ARCH_ACPI_H */
