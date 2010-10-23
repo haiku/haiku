@@ -32,8 +32,6 @@
 #define DELAYED_SCALING 1
 // the delay time in 1/10 seconds
 #define SCALING_DELAY_TIME 3
-// width of the black border stroked arround the bitmap
-#define PEN_SIZE 1.0f
 
 // the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
 #define HIDE_CURSOR_DELAY_TIME 20
@@ -75,7 +73,6 @@ public:
 									BBitmap* bitmap,
 									const translation_format* format);
 			void				SetDither(bool dither);
-			bool				GetDither() const { return fDither; }
 			void				SetScaleBilinear(bool b);
 			bool				GetScaleBilinear() { return fScaleBilinear; }
 			void				SetShowCaption(bool show);
@@ -130,7 +127,6 @@ public:
 			// Image manipulation
 			void				Rotate(int degree); // 90 and 270 only
 			void				Flip(bool vertical);
-			void				Invert();
 			void				ResizeImage(int width, int height);
 
 			void				SetIcon(bool clear);
@@ -212,7 +208,7 @@ private:
 			void				_ScrollBitmap();
 			uint32				_GetMouseButtons();
 			void				_UpdateSelectionRect(BPoint point, bool final);
-			void				_DrawBorder(BRect border);
+			void				_DrawBackground(BRect aroundFrame);
 			void				_LayoutCaption(BFont& font, BPoint& textPos,
 									BRect& background);
 			void				_DrawCaption();
@@ -256,7 +252,6 @@ private:
 #if DELAYED_SCALING
 			int					fScalingCountDown;
 #endif
-			bool				fInverted;
 
 			BPoint				fBitmapLocationInView;
 

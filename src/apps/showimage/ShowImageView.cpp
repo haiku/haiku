@@ -198,7 +198,6 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 #if DELAYED_SCALING
 	fScalingCountDown(SCALING_DELAY_TIME),
 #endif
-	fInverted(false),
 
 	fBitmapLocationInView(0.0, 0.0),
 
@@ -233,8 +232,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kBorderColor);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetPenSize(PEN_SIZE);
+	SetLowColor(0, 0, 0);
 }
 
 
@@ -487,12 +485,8 @@ ShowImageView::SetImage(const entry_ref *ref)
 	// restore orientation
 	int32 orientation;
 	fImageOrientation = k0;
-	fInverted = false;
 	if (file.ReadAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0,
 			&orientation, sizeof(orientation)) == sizeof(orientation)) {
-		if (orientation & 256)
-			_DoImageOperation(ImageProcessor::ImageProcessor::kInvert, true);
-
 		orientation &= 255;
 		switch (orientation) {
 			case k0:
@@ -669,13 +663,7 @@ ShowImageView::SetZoomToBounds(bool enable)
 void
 ShowImageView::SetFullScreen(bool fullScreen)
 {
-	if (fFullScreen != fullScreen) {
-		fFullScreen = fullScreen;
-		if (fFullScreen) {
-			SetLowColor(0, 0, 0, 255);
-		} else
-			SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	}
+	fFullScreen = fullScreen;
 }
 
 
@@ -745,12 +733,12 @@ ShowImageView::_AlignBitmap()
 	BRect rect(fBitmap->Bounds());
 
 	// the width/height of the bitmap (in pixels)
-	float bitmapWidth = rect.Width() + 1.0;
-	float bitmapHeight = rect.Height() + 1.0;
+	float bitmapWidth = rect.Width() + 1;
+	float bitmapHeight = rect.Height() + 1;
 
 	// the available width/height for layouting the bitmap (in pixels)
-	float width = Bounds().Width() - 2 * PEN_SIZE + 1.0;
-	float height = Bounds().Height() - 2 * PEN_SIZE + 1.0;
+	float width = Bounds().Width() + 1;
+	float height = Bounds().Height() + 1;
 
 	if (width == 0 || height == 0)
 		return rect;
@@ -789,7 +777,7 @@ ShowImageView::_AlignBitmap()
 		if (height > bitmapHeight)
 			rect.OffsetBy(0, floorf((height - bitmapHeight) / 2.0));
 	}
-	rect.OffsetBy(PEN_SIZE, PEN_SIZE);
+
 	return rect;
 }
 
@@ -804,7 +792,7 @@ ShowImageView::_Setup(BRect rect)
 
 
 void
-ShowImageView::_DrawBorder(BRect border)
+ShowImageView::_DrawBackground(BRect border)
 {
 	BRect bounds(Bounds());
 	// top
@@ -941,15 +929,7 @@ ShowImageView::Draw(BRect updateRect)
 	BRect rect = _AlignBitmap();
 	_Setup(rect);
 
-	BRect border(rect);
-	border.InsetBy(-PEN_SIZE, -PEN_SIZE);
-
-	_DrawBorder(border);
-
-	// Draw black rectangle around image
-	StrokeRect(border);
-
-	// Draw image
+	_DrawBackground(rect);
 	_DrawImage(rect);
 
 	if (fShowCaption)
@@ -1484,7 +1464,7 @@ ShowImageView::_UpdateSelectionRect(BPoint point, bool final)
 		BRect updateRect;
 		updateRect = oldSelection | fCopyFromRect;
 		updateRect = ImageToView(updateRect);
-		updateRect.InsetBy(-PEN_SIZE, -PEN_SIZE);
+		updateRect.InsetBy(-1, -1);
 		Invalidate(updateRect);
 	}
 }
@@ -1851,10 +1831,8 @@ ShowImageView::FixupScrollBars()
 		bitmapRect.OffsetTo(0, 0);
 	}
 
-	FixupScrollBar(B_HORIZONTAL, bitmapRect.Width() + 2 * PEN_SIZE,
-		viewRect.Width());
-	FixupScrollBar(B_VERTICAL, bitmapRect.Height() + 2 * PEN_SIZE,
-		viewRect.Height());
+	FixupScrollBar(B_HORIZONTAL, bitmapRect.Width(), viewRect.Width());
+	FixupScrollBar(B_VERTICAL, bitmapRect.Height(), viewRect.Height());
 }
 
 
@@ -2328,7 +2306,7 @@ void
 ShowImageView::ZoomIn(BPoint where)
 {
 	if (fZoom < 16)
-		SetZoom(where, fZoom + 0.25);
+		SetZoom(where, fZoom * 1.2);
 }
 
 
@@ -2336,7 +2314,7 @@ void
 ShowImageView::ZoomOut(BPoint where)
 {
 	if (fZoom > 0.25)
-		SetZoom(where, fZoom - 0.25);
+		SetZoom(where, fZoom * 0.8);
 }
 
 
@@ -2397,15 +2375,12 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 		ASSERT(ImageProcessor::kFlipLeftToRight < ImageProcessor::kNumberOfAffineTransformations);
 		ASSERT(ImageProcessor::kFlipTopToBottom < ImageProcessor::kNumberOfAffineTransformations);
 		fImageOrientation = fTransformation[op][fImageOrientation];
-	} else {
-		fInverted = !fInverted;
 	}
 
 	if (!quiet) {
 		// write orientation state
 		BNode node(&fCurrentRef);
 		int32 orientation = fImageOrientation;
-		if (fInverted) orientation += 256;
 		if (orientation != k0) {
 			node.WriteAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0,
 				&orientation, sizeof(orientation));
@@ -2458,17 +2433,6 @@ ShowImageView::Flip(bool vertical)
 
 
 void
-ShowImageView::Invert()
-{
-	if (fBitmap->ColorSpace() != B_CMAP8) {
-		// Only allow an invert operation if the
-		// bitmap color space is supported by the
-		// invert algorithm
-		_UserDoImageOperation(ImageProcessor::kInvert);
-	}
-}
-
-void
 ShowImageView::ResizeImage(int w, int h)
 {
 	if (fBitmap == NULL || w < 1 || h < 1)
@@ -2492,6 +2456,7 @@ ShowImageView::ResizeImage(int w, int h)
 
 	_Notify();
 }
+
 
 void
 ShowImageView::_SetIcon(bool clear, icon_size which)

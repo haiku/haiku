@@ -207,7 +207,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	BMenu* menu = new BMenu(B_TRANSLATE("View"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
-	_MarkMenuItem(fBar, MSG_DITHER_IMAGE, fImageView->GetDither());
 	UpdateTitle();
 
 	SetPulseRate(100000);
@@ -410,8 +409,6 @@ ShowImageWindow::AddMenus(BMenuBar* bar)
 	_AddItemMenu(menu, B_TRANSLATE("Flip top to bottom"),
 		MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
 	menu->AddSeparatorItem();
-	_AddItemMenu(menu, B_TRANSLATE("Invert colors"), MSG_INVERT, 0, 0, this);
-	menu->AddSeparatorItem();
 	fResizeItem = _AddItemMenu(menu, B_TRANSLATE("Resize" B_UTF8_ELLIPSIS),
 		MSG_OPEN_RESIZER_WINDOW, 0, 0, this);
 	bar->AddItem(menu);
@@ -454,16 +451,17 @@ ShowImageWindow::_AddDelayItem(BMenu* menu, const char* label, float value)
 
 
 void
-ShowImageWindow::WindowRedimension(BBitmap* pbitmap)
+ShowImageWindow::WindowRedimension(BBitmap* bitmap)
 {
 	BScreen screen;
 	if (!screen.IsValid())
 		return;
 
-	BRect r(pbitmap->Bounds());
-	float width = r.Width() + 2 * PEN_SIZE + B_V_SCROLL_BAR_WIDTH;
-	float height = r.Height() + 2 * PEN_SIZE + 1 + fBar->Frame().Height() +
-		B_H_SCROLL_BAR_HEIGHT;
+	// TODO: use View::GetPreferredSize() instead?
+	BRect r(bitmap->Bounds());
+	float width = r.Width() + B_V_SCROLL_BAR_WIDTH;
+	float height = r.Height() + 1 + fBar->Frame().Height()
+		+ B_H_SCROLL_BAR_HEIGHT;
 
 	BRect frame = screen.Frame();
 	const float windowBorder = 5;
@@ -644,13 +642,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				}
 			}
 
-			// Disable the Invert menu item if the bitmap color space
-			// is B_CMAP8. (B_CMAP8 is currently unsupported by the
-			// invert algorithm)
-			color_space colors = B_NO_COLOR_SPACE;
-			message->FindInt32("colors", reinterpret_cast<int32 *>(&colors));
-			_EnableMenuItem(fBar, MSG_INVERT, (colors != B_CMAP8));
-
 			BString status;
 			bool messageProvidesSize = false;
 			if (message->FindInt32("width", &fWidth) >= B_OK
@@ -781,10 +772,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			}
 		}	break;
 
-		case MSG_DITHER_IMAGE:
-			fImageView->SetDither(_ToggleMenuItem(message->what));
-			break;
-
 		case MSG_SHRINK_TO_WINDOW:
 			_ResizeToWindow(true, message->what);
 			break;
@@ -819,11 +806,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fImageView->Flip(false);
 			break;
 
-		case MSG_INVERT:
-			fImageView->Invert();
-			break;
-
-		case MSG_SLIDE_SHOW: {
+		case MSG_SLIDE_SHOW:
+		{
 			BMenuItem* item = fBar->FindItem(message->what);
 			if (!item)
 				break;
@@ -836,16 +820,19 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				fResizeItem->SetEnabled(false);
 				fImageView->StartSlideShow();
 			}
-		}	break;
+			break;
+		}
 
-		case MSG_SLIDE_SHOW_DELAY: {
+		case MSG_SLIDE_SHOW_DELAY:
+		{
 			float value;
 			if (message->FindFloat("value", &value) == B_OK) {
 				fImageView->SetSlideShowDelay(value);
 				// in case message is sent from popup menu
 				_MarkSlideShowDelay(value);
 			}
-		}	break;
+			break;
+		}
 
 		case MSG_FULL_SCREEN:
 			_ToggleFullScreen();
