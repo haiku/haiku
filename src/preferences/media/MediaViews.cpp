@@ -166,7 +166,7 @@ SettingsView::SettingsView (bool isVideo)
 
 
 void
-SettingsView::AddNodes(BList& list, bool isInput)
+SettingsView::AddNodes(NodeList& list, bool isInput)
 {
 	BMenu* menu = isInput ? fMenu1 : fMenu2;
 	void* item;
@@ -178,8 +178,7 @@ SettingsView::AddNodes(BList& list, bool isInput)
 	message.AddBool("isInput", isInput);
 
 	for (int32 i = 0; i < list.CountItems(); i++) {
-		dormant_node_info* info
-			= static_cast<dormant_node_info*>(list.ItemAt(i));
+		dormant_node_info* info = list.ItemAt(i);
 		menu->AddItem(new SettingsItem(info, new BMessage(message)));
 	}
 }

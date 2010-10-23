@@ -12,16 +12,18 @@
 //  Created :    June 25, 2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
 #ifndef __MEDIAWINDOWS_H__
 #define __MEDIAWINDOWS_H__
 
+
+#include <Box.h>
+#include <ListView.h>
 #include <MediaAddOn.h>
-#include <Window.h>
 #include <ParameterWeb.h>
 #include <StringView.h>
-#include <ListView.h>
-#include <Box.h>
+#include <Window.h>
+
+#include <ObjectList.h>
 
 #include "MediaViews.h"
 #include "MediaListItem.h"
@@ -46,10 +48,15 @@ public:
 
 private:
 
+	typedef BObjectList<dormant_node_info> NodeList;
+
+
 			status_t			InitMedia(bool first);
-			void				FindNodes(media_type type, uint64 kind,
-									BList &list);
-			void				AddNodes(BList &list, bool isVideo);
+			void				_FindNodes();
+			void				_FindNodes(media_type type, uint64 kind,
+									NodeList& into);
+			void				_AddNodeItems(NodeList& from, bool isVideo);
+			void				_EmptyNodeLists();
 
 			MediaListItem*		FindMediaListItem(dormant_node_info* info);
 			void				InitWindow();
@@ -68,10 +75,11 @@ private:
 			media_node*			fCurrentNode;
 			BParameterWeb*		fParamWeb;
 			
-			BList				fAudioInputs;
-			BList				fAudioOutputs;
-			BList				fVideoInputs;
-			BList				fVideoOutputs;
+
+			NodeList			fAudioInputs;
+			NodeList			fAudioOutputs;
+			NodeList			fVideoInputs;
+			NodeList			fVideoOutputs;
 	
 			BList				fIcons;
 			MediaAlert*			fAlert;

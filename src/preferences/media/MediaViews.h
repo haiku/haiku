@@ -12,8 +12,6 @@
 //  Created :    June 25, 2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
 #ifndef __MEDIAVIEWS_H__
 #define __MEDIAVIEWS_H__
 #include <CheckBox.h>
@@ -21,6 +19,8 @@
 #include <MenuItem.h>
 #include <StringView.h>
 #include <View.h>
+
+#include <ObjectList.h>
 
 
 const uint32 ML_RESTART_MEDIA_SERVER = 'resr';
@@ -59,8 +59,10 @@ public:
 class SettingsView : public BView
 {
 public:
+	typedef BObjectList<dormant_node_info> NodeList;
+
 								SettingsView(bool isVideo);
-			void				AddNodes(BList &list, bool isInput);
+			void				AddNodes(NodeList &nodes, bool isInput);
 			void				SetDefault(dormant_node_info &info,
 									bool isInput, int32 outputID = -1);
 

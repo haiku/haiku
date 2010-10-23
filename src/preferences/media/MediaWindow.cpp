@@ -50,6 +50,10 @@ MediaWindow::MediaWindow(BRect frame)
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fCurrentNode(NULL),
 	fParamWeb(NULL),
+	fAudioInputs(5, true),
+	fAudioOutputs(5, true),
+	fVideoInputs(5, true),
+	fVideoOutputs(5, true),
 	fAlert(NULL),
 	fInitCheck(B_OK)
 {
@@ -66,14 +70,7 @@ MediaWindow::InitCheck()
 
 MediaWindow::~MediaWindow()
 {
-	for (int i = 0; i < fAudioOutputs.CountItems(); i++)
-		delete static_cast<dormant_node_info*>(fAudioOutputs.ItemAt(i));
-	for (int i = 0; i < fAudioInputs.CountItems(); i++)
-		delete static_cast<dormant_node_info*>(fAudioInputs.ItemAt(i));
-	for (int i = 0; i < fVideoOutputs.CountItems(); i++)
-		delete static_cast<dormant_node_info*>(fVideoOutputs.ItemAt(i));
-	for (int i = 0; i < fVideoInputs.CountItems(); i++)
-		delete static_cast<dormant_node_info*>(fVideoInputs.ItemAt(i));
+	_EmptyNodeLists();
 
 	BMediaRoster* roster = BMediaRoster::Roster();
 	if (roster && fCurrentNode)
@@ -97,7 +94,21 @@ MediaWindow::~MediaWindow()
 
 
 void
-MediaWindow::FindNodes(media_type type, uint64 kind, BList &list)
+MediaWindow::_FindNodes()
+{
+	_FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_OUTPUT, fAudioOutputs);
+	_FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_INPUT, fAudioInputs);
+	_FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_OUTPUT, fAudioOutputs);
+	_FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_INPUT, fAudioInputs);
+	_FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_OUTPUT, fVideoOutputs);
+	_FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_INPUT, fVideoInputs);
+	_FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_OUTPUT, fVideoOutputs);
+	_FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_INPUT, fVideoInputs);
+}
+
+
+void
+MediaWindow::_FindNodes(media_type type, uint64 kind, NodeList& into)
 {
 	dormant_node_info node_info[64];
 	int32 node_info_count = 64;
@@ -115,18 +126,20 @@ MediaWindow::FindNodes(media_type type, uint64 kind, BList &list)
 
 	if (roster->GetDormantNodes(node_info, &node_info_count, format1, format2,
 			NULL, kind)!=B_OK) {
+		// TODO: better error reporting!
 		fprintf(stderr, "error\n");
 		return;
 	}
 
-	for (int32 i = 0; i<node_info_count; i++) {
+	for (int32 i = 0; i < node_info_count; i++) {
 		PRINT(("node : %s, media_addon %i, flavor_id %i\n",
 			node_info[i].name, node_info[i].addon, node_info[i].flavor_id));
+
 		dormant_node_info* info = new dormant_node_info();
-		strcpy(info->name, node_info[i].name);
+		strncpy(info->name, node_info[i].name, B_MEDIA_NAME_LENGTH);
 		info->flavor_id = node_info[i].flavor_id;
 		info->addon = node_info[i].addon;
-		list.AddItem(info);
+		into.AddItem(info);
 	}
 }
 
@@ -148,14 +161,24 @@ MediaWindow::FindMediaListItem(dormant_node_info* info)
 
 
 void
-MediaWindow::AddNodes(BList &list, bool isVideo)
+MediaWindow::_AddNodeItems(NodeList &list, bool isVideo)
 {
-	for (int32 i = 0; i<list.CountItems(); i++) {
-		dormant_node_info* info
-			= static_cast<dormant_node_info*>(list.ItemAt(i));
+	int32 count = list.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		dormant_node_info* info = list.ItemAt(i);
 		if (!FindMediaListItem(info))
 			fListView->AddItem(new MediaListItem(info, 1, isVideo, &fIcons));
 	}
+}
+
+
+void
+MediaWindow::_EmptyNodeLists()
+{
+	fAudioOutputs.MakeEmpty();
+	fAudioInputs.MakeEmpty();
+	fVideoOutputs.MakeEmpty();
+	fVideoInputs.MakeEmpty();
 }
 
 
@@ -283,34 +306,17 @@ MediaWindow::InitMedia(bool first)
 				B_TRANSLATE("Ready for use" B_UTF8_ELLIPSIS));
 	}
 
-	void* listItem;
-	while ((listItem = fListView->RemoveItem((int32)0)))
-		delete static_cast<MediaListItem *>(listItem);
-	while ((listItem = fAudioOutputs.RemoveItem((int32)0)))
-		delete static_cast<dormant_node_info *>(listItem);
-	while ((listItem = fAudioInputs.RemoveItem((int32)0)))
-		delete static_cast<dormant_node_info *>(listItem);
-	while ((listItem = fVideoOutputs.RemoveItem((int32)0)))
-		delete static_cast<dormant_node_info *>(listItem);
-	while ((listItem = fVideoInputs.RemoveItem((int32)0)))
-		delete static_cast<dormant_node_info *>(listItem);
+	_EmptyNodeLists();
 
 	// Grab Media Info
-	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_OUTPUT, fAudioOutputs);
-	FindNodes(B_MEDIA_RAW_AUDIO, B_PHYSICAL_INPUT, fAudioInputs);
-	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_OUTPUT, fAudioOutputs);
-	FindNodes(B_MEDIA_ENCODED_AUDIO, B_PHYSICAL_INPUT, fAudioInputs);
-	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_OUTPUT, fVideoOutputs);
-	FindNodes(B_MEDIA_RAW_VIDEO, B_PHYSICAL_INPUT, fVideoInputs);
-	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_OUTPUT, fVideoOutputs);
-	FindNodes(B_MEDIA_ENCODED_VIDEO, B_PHYSICAL_INPUT, fVideoInputs);
+	_FindNodes();
 
 	// Add video nodes first. They might have an additional audio
 	// output or input, but still should be listed as video node.
-	AddNodes(fVideoOutputs, true);
-	AddNodes(fVideoInputs, true);
-	AddNodes(fAudioOutputs, false);
-	AddNodes(fAudioInputs, false);
+	_AddNodeItems(fVideoOutputs, true);
+	_AddNodeItems(fVideoInputs, true);
+	_AddNodeItems(fAudioOutputs, false);
+	_AddNodeItems(fAudioInputs, false);
 
 	fAudioView->AddNodes(fAudioOutputs, false);
 	fAudioView->AddNodes(fAudioInputs, true);

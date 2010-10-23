@@ -7,7 +7,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 }
 
 UseLibraryHeaders icon ;
-UsePrivateHeaders media ;
+UsePrivateHeaders media shared ;
 
 Preference Media :
 	Media.cpp
