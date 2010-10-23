@@ -1,10 +1,11 @@
 /*
- * Copyright 2003-2009 Haiku Inc. All rights reserved.
+ * Copyright 2003-2010 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Pfeiffer, laplace@haiku-os.org
  */
+
 
 #include "ShowImageSettings.h"
 
@@ -46,35 +47,32 @@ bool
 ShowImageSettings::GetBool(const char* name, bool defaultValue)
 {
 	bool value;
-	if (fSettings.FindBool(name, &value) == B_OK) {
+	if (fSettings.FindBool(name, &value) == B_OK)
 		return value;
-	} else {
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 
-int32 
+int32
 ShowImageSettings::GetInt32(const char* name, int32 defaultValue)
 {
 	int32 value;
-	if (fSettings.FindInt32(name, &value) == B_OK) {
+	if (fSettings.FindInt32(name, &value) == B_OK)
 		return value;
-	} else {
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 
-float 
+float
 ShowImageSettings::GetFloat(const char* name, float defaultValue)
 {
 	float value;
-	if (fSettings.FindFloat(name, &value) == B_OK) {
+	if (fSettings.FindFloat(name, &value) == B_OK)
 		return value;
-	} else {
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 
@@ -82,11 +80,10 @@ BRect
 ShowImageSettings::GetRect(const char* name, BRect defaultValue)
 {
 	BRect value;
-	if (fSettings.FindRect(name, &value) == B_OK) {
+	if (fSettings.FindRect(name, &value) == B_OK)
 		return value;
-	} else {
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 
@@ -94,87 +91,75 @@ const char*
 ShowImageSettings::GetString(const char* name, const char* defaultValue)
 {
 	const char* value;
-	if (fSettings.FindString(name, &value) == B_OK) {
+	if (fSettings.FindString(name, &value) == B_OK)
 		return value;
-	} else {
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 
 void
 ShowImageSettings::SetBool(const char* name, bool value)
 {
-	if (fSettings.HasBool(name)) {
+	if (fSettings.HasBool(name))
 		fSettings.ReplaceBool(name, value);
-	} else {
+	else
 		fSettings.AddBool(name, value);
-	}
 }
 
 
 void
 ShowImageSettings::SetInt32(const char* name, int32 value)
 {
-	if (fSettings.HasInt32(name)) {
+	if (fSettings.HasInt32(name))
 		fSettings.ReplaceInt32(name, value);
-	} else {
+	else
 		fSettings.AddInt32(name, value);
-	}
 }
 
 
 void
 ShowImageSettings::SetFloat(const char* name, float value)
 {
-	if (fSettings.HasFloat(name)) {
+	if (fSettings.HasFloat(name))
 		fSettings.ReplaceFloat(name, value);
-	} else {
+	else
 		fSettings.AddFloat(name, value);
-	}
 }
 
 
 void
 ShowImageSettings::SetRect(const char* name, BRect value)
 {
-	if (fSettings.HasRect(name)) {
+	if (fSettings.HasRect(name))
 		fSettings.ReplaceRect(name, value);
-	} else {
+	else
 		fSettings.AddRect(name, value);
-	}
 }
 
 
 void
 ShowImageSettings::SetString(const char* name, const char* value)
 {
-	if (fSettings.HasString(name)) {
+	if (fSettings.HasString(name))
 		fSettings.ReplaceString(name, value);
-	} else {
+	else
 		fSettings.AddString(name, value);
-	}
 }
 
 
 bool
 ShowImageSettings::OpenSettingsFile(BFile* file, bool forReading)
 {
-	status_t st;
 	BPath path;
-	uint32 openMode;
-	
-	st = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (st != B_OK) return false;
-	
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return false;
+
 	path.Append("ShowImage_settings");
-	if (forReading) {
-		openMode = B_READ_ONLY;
-	} else {
-		openMode = B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE;
-	}
-	st = file->SetTo(path.Path(), openMode);
-	return st == B_OK;
+
+	return file->SetTo(path.Path(), forReading
+		? B_READ_ONLY : B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK;
 }
 
 
@@ -182,9 +167,8 @@ void
 ShowImageSettings::Load()
 {
 	BFile file;
-	if (OpenSettingsFile(&file, true)) {
+	if (OpenSettingsFile(&file, true))
 		fSettings.Unflatten(&file);
-	}
 }
 
 
@@ -192,8 +176,6 @@ void
 ShowImageSettings::Save()
 {
 	BFile file;
-	if (OpenSettingsFile(&file, false)) {
+	if (OpenSettingsFile(&file, false))
 		fSettings.Flatten(&file);
-	}
 }
-
