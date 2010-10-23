@@ -146,6 +146,28 @@ void bus_space_write_4(bus_space_tag_t tag, bus_space_handle_t handle,
 
 
 static inline void
+bus_space_read_region_1(bus_space_tag_t tag, bus_space_handle_t bsh,
+			bus_size_t offset, u_int8_t *addr, size_t count)
+{
+	if (tag == I386_BUS_SPACE_IO) {
+		int _port_ = bsh + offset;
+		__asm __volatile("							\n\
+			cld										\n\
+		1:	inb %w2,%%al							\n\
+			stosb									\n\
+			incl %2									\n\
+			loop 1b"								:
+		    "=D" (addr), "=c" (count), "=d" (_port_):
+		    "0" (addr), "1" (count), "2" (_port_)	:
+		    "%eax", "memory", "cc");
+	} else {
+		void* _port_ = (void*) (bsh + offset);
+		memcpy(addr, _port_, count);
+	}
+}
+
+
+static inline void
 bus_space_read_region_4(bus_space_tag_t tag, bus_space_handle_t bsh,
 	bus_size_t offset, u_int32_t *addr, size_t count)
 {
