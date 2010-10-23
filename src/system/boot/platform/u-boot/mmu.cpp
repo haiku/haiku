@@ -32,13 +32,10 @@
 #endif
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-/*#define TRACE_MEMORY_MAP
+#define TRACE_MEMORY_MAP
 	// Define this to print the memory map to serial debug,
 	// You also need to define ENABLE_SERIAL in serial.cpp
 	// for output to work.
-*/
-
-
 
 
 /*
@@ -547,15 +544,27 @@ mmu_init_for_kernel(void)
 	gKernelArgs.virtual_allocated_range[0].size
 		= sNextVirtualAddress - KERNEL_BASE;
 	gKernelArgs.num_virtual_allocated_ranges = 1;
-/*
-	// sort the address ranges
-	sort_addr_range(gKernelArgs.physical_memory_range,
-		gKernelArgs.num_physical_memory_ranges);
-	sort_addr_range(gKernelArgs.physical_allocated_range,
-		gKernelArgs.num_physical_allocated_ranges);
-	sort_addr_range(gKernelArgs.virtual_allocated_range,
-		gKernelArgs.num_virtual_allocated_ranges);
-*/
+
+#ifdef TRACE_MEMORY_MAP
+	{
+		uint32 i;
+
+		dprintf("phys memory ranges:\n");
+		for (i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_memory_range[i].start, gKernelArgs.physical_memory_range[i].size);
+		}
+
+		dprintf("allocated phys memory ranges:\n");
+		for (i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_allocated_range[i].start, gKernelArgs.physical_allocated_range[i].size);
+		}
+
+		dprintf("allocated virt memory ranges:\n");
+		for (i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.virtual_allocated_range[i].start, gKernelArgs.virtual_allocated_range[i].size);
+		}
+	}
+#endif
 }
 
 
