@@ -2296,8 +2296,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 				fCurrentView->ConvertToScreenForDrawing(&info.viewRect);
 
-				if ((info.options & B_WAIT_FOR_RETRACE) != 0)
-					fDesktop->HWInterface()->WaitForRetrace(20000);
+// TODO: Unbreak...
+//				if ((info.options & B_WAIT_FOR_RETRACE) != 0)
+//					fDesktop->HWInterface()->WaitForRetrace(20000);
 
 				drawingEngine->DrawBitmap(bitmap, info.bitmapRect,
 					info.viewRect, info.options);
