@@ -2278,7 +2278,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 
 #if 0
 			if (strcmp(fServerApp->SignatureLeaf(), "x-vnd.videolan-vlc") == 0)
-				options |= B_FILTER_BITMAP_BILINEAR;
+				info.options |= B_FILTER_BITMAP_BILINEAR;
 #endif
 
 			ServerBitmap* bitmap = fServerApp->GetBitmap(info.bitmapToken);
@@ -2295,6 +2295,9 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 					info.viewRect.right, info.viewRect.bottom));
 
 				fCurrentView->ConvertToScreenForDrawing(&info.viewRect);
+
+				if ((info.options & B_WAIT_FOR_RETRACE) != 0)
+					fDesktop->HWInterface()->WaitForRetrace(20000);
 
 				drawingEngine->DrawBitmap(bitmap, info.bitmapRect,
 					info.viewRect, info.options);

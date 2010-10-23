@@ -17,7 +17,6 @@ enum {
 };
 
 
-class BScreen;
 class SubtitleBitmap;
 
 
@@ -28,7 +27,6 @@ public:
 	virtual						~VideoView();
 
 	// BView interface
-	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				Pulse();
@@ -77,8 +75,6 @@ private:
 			float				fSubtitleMaxButtom;
 			bool				fHasSubtitle;
 			bool				fSubtitleChanged;
-
-			BScreen*			fScreen;
 
 			// Settings values:
 			ListenerAdapter		fGlobalSettingsListener;

@@ -39,8 +39,6 @@ VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
 	fHasSubtitle(false),
 	fSubtitleChanged(false),
 
-	fScreen(NULL),
-
 	fGlobalSettingsListener(this)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -65,15 +63,6 @@ VideoView::~VideoView()
 {
 	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
 	delete fSubtitleBitmap;
-	delete fScreen;
-}
-
-
-void
-VideoView::AttachedToWindow()
-{
-	delete fScreen;
-	fScreen = new BScreen(Window());
 }
 
 
@@ -377,11 +366,9 @@ void
 VideoView::_DrawBitmap(const BBitmap* bitmap)
 {
 	SetDrawingMode(B_OP_COPY);
-	uint32 options = fUseBilinearScaling ? B_FILTER_BITMAP_BILINEAR : 0;
-
-	// We don't care if the graphics driver actually supports this.
-	// On supported graphics hardware, this should avoid tearing.
-	fScreen->WaitForRetrace();
+	uint32 options = B_WAIT_FOR_RETRACE;
+	if (fUseBilinearScaling)
+		options |= B_FILTER_BITMAP_BILINEAR;
 
 	DrawBitmapAsync(bitmap, bitmap->Bounds(), fVideoFrame, options);
 }

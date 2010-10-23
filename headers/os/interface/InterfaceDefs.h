@@ -260,11 +260,12 @@ enum overlay_options {
 	B_OVERLAY_TRANSFER_CHANNEL	= 0x00080000
 };
 
-enum bitmap_filtering {
-	B_FILTER_BITMAP_BILINEAR	= 0x00000100
-		// TODO: Make this simply "SMOOTH_SCALE" and use
-		// better quality methods the faster the computer?
+enum bitmap_drawing_options {
+	B_FILTER_BITMAP_BILINEAR	= 0x00000100,
+
+	B_WAIT_FOR_RETRACE			= 0x00000800
 };
+
 
 // Default UI Colors
 
