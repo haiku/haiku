@@ -30,7 +30,7 @@ NO_HAIKU_FIRMWARE_NAME_MAP();
 NO_HAIKU_FBSD_MII_DRIVER();
 
 
-static void rt2860_intr_enable(struct rt2860_softc *sc, uint32_t intr_mask)
+static void rt2860_intr_enable(struct rt2860_softc* sc, uint32_t intr_mask)
 {
 	uint32_t tmp;
 
