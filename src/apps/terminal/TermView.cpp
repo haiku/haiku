@@ -1194,8 +1194,10 @@ TermView::_DrawCursor()
 	} else {
 		if (selected)
 			SetHighColor(fSelectBackColor);
-		else
-			SetHighColor(cursorVisible ? fCursorBackColor : kTermColorTable[IS_BACKCOLOR(attr)]);
+		else {
+			SetHighColor(cursorVisible
+				? fCursorBackColor : kTermColorTable[IS_BACKCOLOR(attr)]);
+		}
 
 		FillRect(rect);
 	}
