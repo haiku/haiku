@@ -1293,10 +1293,3 @@ ShowImageWindow::QuitRequested()
 
 	return quit;
 }
-
-
-void
-ShowImageWindow::ScreenChanged(BRect frame, color_space mode)
-{
-	fImageView->SetDither(mode == B_CMAP8);
-}

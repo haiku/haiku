@@ -192,12 +192,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 
 	fZoom(1.0),
 
-	fDither(BScreen().ColorSpace() == B_CMAP8),
 	fScaleBilinear(true),
-	fScaler(NULL),
-#if DELAYED_SCALING
-	fScalingCountDown(SCALING_DELAY_TIME),
-#endif
 
 	fBitmapLocationInView(0.0, 0.0),
 
@@ -222,7 +217,6 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	ShowImageSettings* settings;
 	settings = my_app->Settings();
 	if (settings->Lock()) {
-		fDither = settings->GetBool("Dither", fDither);
 		fShrinkToBounds = settings->GetBool("ShrinkToBounds", fShrinkToBounds);
 		fZoomToBounds = settings->GetBool("ZoomToBounds", fZoomToBounds);
 		fSlideShowDelay = settings->GetInt32("SlideShowDelay", fSlideShowDelay);
@@ -274,17 +268,6 @@ ShowImageView::Pulse()
 		else
 			fHideCursorCountDown--;
 	}
-
-#if DELAYED_SCALING
-	if (fBitmap && (fScaleBilinear || fDither) && fScalingCountDown > 0) {
-		if (fScalingCountDown == 1) {
-			fScalingCountDown = 0;
-			_GetScaler(_AlignBitmap());
-		} else {
-			fScalingCountDown --;
-		}
-	}
-#endif
 }
 
 
@@ -377,23 +360,8 @@ ShowImageView::_UpdateStatusText()
 
 
 void
-ShowImageView::_DeleteScaler()
-{
-	if (fScaler) {
-		fScaler->Stop();
-		delete fScaler;
-		fScaler = NULL;
-	}
-#if DELAYED_SCALING
-	fScalingCountDown = SCALING_DELAY_TIME;
-#endif
-}
-
-
-void
 ShowImageView::_DeleteBitmap()
 {
-	_DeleteScaler();
 	_DeleteSelectionBitmap();
 
 	if (fDisplayBitmap != fBitmap)
@@ -612,17 +580,6 @@ ShowImageView::_SetSelection(const entry_ref *ref, BPoint point)
 		return B_ERROR;
 
 	return _PasteBitmap(newBitmap, point);
-}
-
-
-void
-ShowImageView::SetDither(bool dither)
-{
-	if (fDither != dither) {
-		_SettingsSetBool("Dither", dither);
-		fDither = dither;
-		Invalidate();
-	}
 }
 
 
@@ -871,40 +828,9 @@ ShowImageView::_UpdateCaption()
 }
 
 
-Scaler*
-ShowImageView::_GetScaler(BRect rect)
-{
-	if (fScaler == NULL || !fScaler->Matches(rect, fDither)) {
-		_DeleteScaler();
-		BMessenger msgr(this, Window());
-		fScaler = new Scaler(fDisplayBitmap, rect, msgr, MSG_INVALIDATE, fDither);
-		fScaler->Start();
-	}
-	return fScaler;
-}
-
-
 void
 ShowImageView::_DrawImage(BRect rect)
 {
-	if (fDither) {
-#if DELAYED_SCALING
-		Scaler* scaler = fScaler;
-		if (scaler != NULL && !scaler->Matches(rect, fDither)) {
-			_DeleteScaler(); scaler = NULL;
-		}
-#else
-		Scaler* scaler = _GetScaler(rect);
-#endif
-		if (scaler != NULL && !scaler->IsRunning()) {
-			BBitmap* bitmap = scaler->GetBitmap();
-
-			if (bitmap) {
-				DrawBitmap(bitmap, BPoint(rect.left, rect.top));
-				return;
-			}
-		}
-	}
 	// TODO: fix composing of fBitmap with other bitmaps
 	// with regard to alpha channel
 	if (!fDisplayBitmap)
@@ -2276,9 +2202,6 @@ ShowImageView::_FirstFile()
 void
 ShowImageView::SetZoom(BPoint where, float zoom)
 {
-	if ((fScaleBilinear || fDither) && fZoom != zoom)
-		_DeleteScaler();
-
 	// Invalidate before scrolling, as that prevents the app_server
 	// to do the scrolling server side
 	Invalidate();

@@ -27,12 +27,6 @@
 #include <View.h>
 
 
-// Delay scaling operation, so that a sequence of zoom in/out operations works
-// smoother
-#define DELAYED_SCALING 1
-// the delay time in 1/10 seconds
-#define SCALING_DELAY_TIME 3
-
 // the delay time for hiding the cursor in 1/10 seconds (the pulse rate)
 #define HIDE_CURSOR_DELAY_TIME 20
 
@@ -72,7 +66,6 @@ public:
 			void				SaveToFile(BDirectory* dir, const char* name,
 									BBitmap* bitmap,
 									const translation_format* format);
-			void				SetDither(bool dither);
 			void				SetScaleBilinear(bool b);
 			bool				GetScaleBilinear() { return fScaleBilinear; }
 			void				SetShowCaption(bool show);
@@ -214,7 +207,6 @@ private:
 			void				_DrawCaption();
 			void				_UpdateCaption();
 
-			Scaler*				_GetScaler(BRect rect);
 			void				_DrawImage(BRect rect);
 			float				_LimitToRange(float v, orientation o,
 									bool absolute);
@@ -246,12 +238,7 @@ private:
 
 			float				fZoom;
 
-			bool				fDither;
 			bool				fScaleBilinear;
-			Scaler*				fScaler;
-#if DELAYED_SCALING
-			int					fScalingCountDown;
-#endif
 
 			BPoint				fBitmapLocationInView;
 
