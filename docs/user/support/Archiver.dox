@@ -71,9 +71,11 @@
 /*!
 	\fn status_t BArchiver::GetTokenForArchivable(BArchivable* archivable,
 		bool deep, int32& _token);
-	\brief Get a token representing \c archivable for this archiving
+	\brief Get a token representing a BArchivable object for this archiving
 		session.
 
+	\param archivable The BArchivable object for which you wish to get a
+		token.
 	\param deep Controls how \c archivable will be archived, if it has not yet
 		been archived in this session.
 	\param[out] _token The token representing \c archivable is stored here.

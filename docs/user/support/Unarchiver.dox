@@ -34,7 +34,7 @@
 	BUnarchiver helper classes, and want to maintain backwards compatibility
 	with old archive, this can be done using the IsArchiveManaged() method. 
 
- 	\Warning Calling methods on your BUnarchiver with a legacy archive (one that
+ 	\warning Calling methods on your BUnarchiver with a legacy archive (one that
 		was not managed by a BArchiver during archival) will result in a
 		call to debugger().
 */
@@ -260,7 +260,7 @@ MyArchivableClas::MyArchivableClass(BMessage* archive)
 	It must be called once for each class an object inherits from that
 	will use a BUnarchiver.
 
-	\warning This method \bold must be called \bold before a call to the
+	\warning This method \b must be called \b before a call to the
 		archive constructor of your parent class.
 
 	Notice the use of this method in the example provided below.

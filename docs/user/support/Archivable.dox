@@ -119,7 +119,7 @@
 	\retval You should return a pointer to the object you create with
 		\c archive, or \c NULL if unarchival fails.
 	\warning The default implementation will always return \c NULL. Even though
-		it is possible to store plain BArchive objects, it is impossible to
+		it is possible to store plain BArchivable objects, it is impossible to
 		restore them. 
 
 	\see instantiate_object(BMessage *from)
