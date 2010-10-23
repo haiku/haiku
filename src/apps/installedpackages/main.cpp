@@ -34,17 +34,14 @@ public:
 
 private:
 	UninstallWindow*	fWindow;
-	BCatalog			fAppCatalog;
 };
 
 
 UninstallApplication::UninstallApplication()
 	:
 	BApplication("application/x-vnd.Haiku-InstalledPackages"),
-	fWindow(NULL),
-	fAppCatalog(NULL)
+	fWindow(NULL)
 {
-	be_locale->GetAppCatalog(&fAppCatalog);
 	fWindow = new UninstallWindow();
 	fWindow->Show();
 }
