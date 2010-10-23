@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tools translation inspector ;
 
 AddResources Inspector : Inspector.rsrc ;
 
-Application Inspector : 
+Application Inspector :
 	TranslatorItem.cpp
 	StatusCheck.cpp
 	ActiveTranslatorsWindow.cpp
@@ -20,5 +20,6 @@ DoCatalogs Inspector :
 	ActiveTranslatorsWindow.cpp
 ;
 
-LinkAgainst Inspector : be tracker locale translation $(TARGET_LIBSUPC++) ;
+LinkAgainst Inspector :
+	be tracker translation $(TARGET_LIBSUPC++) $(HAIKU_LOCALE_LIBS) ;
 
