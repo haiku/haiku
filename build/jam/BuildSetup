@@ -393,6 +393,11 @@ HAIKU_KERNEL_WARNING_C++FLAGS = -Wall -Wno-trigraphs -Wno-multichar ;
 # debug flags
 HAIKU_DEBUG_FLAGS ?= -ggdb ;
 
+# TODO: remove once Debugger properly supports gcc4 .eh_frames
+if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	HAIKU_DEBUG_FLAGS += -fno-dwarf2-cfi-asm ;
+}
+
 # debug 0: suppress asserts
 HAIKU_DEBUG_0_CCFLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
 HAIKU_DEBUG_0_C++FLAGS = [ FDefines NDEBUG=$(NDEBUG) ] ;
