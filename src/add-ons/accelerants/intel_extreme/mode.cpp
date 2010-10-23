@@ -173,31 +173,32 @@ create_mode_list(void)
 		} else {
 			TRACE(("intel_extreme: getting EDID on port C failed : %s\n",
 				strerror(error)));
+
+			// We could not read any EDID info. Fallback to creating a list with
+			// only the mode set up by the BIOS.
+			// TODO: support lower modes via scaling and windowing
+			if (gInfo->head_mode & HEAD_MODE_LVDS_PANEL
+					&& ((gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0)) {
+				size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
+					& ~(B_PAGE_SIZE - 1);
+
+				display_mode *list;
+				area_id area = create_area("intel extreme modes",
+					(void **)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
+					B_READ_AREA | B_WRITE_AREA);
+				if (area < B_OK)
+					return area;
+
+				memcpy(list, &gInfo->lvds_panel_mode, sizeof(display_mode));
+
+				gInfo->mode_list_area = area;
+				gInfo->mode_list = list;
+				gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
+				gInfo->shared_info->mode_count = 1;
+				return B_OK;
+			}
 		}
 	}
-
-#if 0
-	// TODO: support lower modes via scaling and windowing
-	if (gInfo->head_mode & HEAD_MODE_LVDS_PANEL
-		&& ((gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0)) {
-		size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
-			& ~(B_PAGE_SIZE - 1);
-
-		display_mode *list;
-		area_id area = create_area("intel extreme modes", (void **)&list,
-			B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-		if (area < B_OK)
-			return area;
-
-		memcpy(list, &gInfo->lvds_panel_mode, sizeof(display_mode));
-
-		gInfo->mode_list_area = area;
-		gInfo->mode_list = list;
-		gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
-		gInfo->shared_info->mode_count = 1;
-		return B_OK;
-	}
-#endif
 
 	// Otherwise return the 'real' list of modes
 	display_mode *list;
@@ -219,9 +220,10 @@ create_mode_list(void)
 void
 wait_for_vblank(void)
 {
-	acquire_sem_etc(gInfo->shared_info->vblank_sem, 1, B_RELATIVE_TIMEOUT, 25000);
-		// With the output turned off via DPMS, we might not get any interrupts anymore
-		// that's why we don't wait forever for it.
+	acquire_sem_etc(gInfo->shared_info->vblank_sem, 1, B_RELATIVE_TIMEOUT,
+		25000);
+		// With the output turned off via DPMS, we might not get any interrupts
+		// anymore that's why we don't wait forever for it.
 }
 
 
