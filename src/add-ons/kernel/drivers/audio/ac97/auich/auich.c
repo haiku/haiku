@@ -212,9 +212,9 @@ auich_stream_commit_parms(auich_stream *stream)
 	page = stream->dmaops_log_base;
 
 	for (i = 0; i < AUICH_DMALIST_MAX; i++) {
-		page[2*i] = ((uint32)stream->buffer->phy_base)
+		page[2 * i] = ((uint32)stream->buffer->phy_base)
 			+ (i % stream->bufcount) * stream->blksize;
-		page[2*i + 1] = AUICH_DMAF_IOC | (stream->blksize
+		page[2 * i + 1] = AUICH_DMAF_IOC | (stream->blksize
 			/ (IS_SIS7012(&stream->card->config) ? 1 : 2));
 	}
 
