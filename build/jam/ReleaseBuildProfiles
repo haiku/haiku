@@ -19,7 +19,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 		HAIKU_IMAGE_SIZE = 690 ;
 
 		AddOptionalHaikuImagePackages TimGMSoundFont TrackerNewTemplates ;
-		AddOptionalHaikuImagePackages BePDF Clockwerk Pe Vision
+		AddOptionalHaikuImagePackages BePDF Pe Vision
 			WebPositive WonderBrush ;
 		AddOptionalHaikuImagePackages CVS Development Git Mercurial
 			Python Subversion OpenSSH OpenSSL ;
