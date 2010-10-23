@@ -188,25 +188,26 @@ auich_stream_set_audioparms(auich_stream *stream, uint8 channels,
 status_t
 auich_stream_commit_parms(auich_stream *stream)
 {
-	uint32      	*page;
-	uint32 			i;
+	uint32 *page;
+	uint32 i;
 	LOG(("auich_stream_commit_parms\n"));
 
 	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, 0);
 	snooze(10000); // 10 ms
 
-	auich_reg_write_8(&stream->card->config, stream->base + AUICH_REG_X_CR, CR_RR);
-	for (i = 10000; i>=0; i--) {
-		if (0 == auich_reg_read_8(&stream->card->config, stream->base + AUICH_REG_X_CR)) {
+	auich_reg_write_8(&stream->card->config, 
+		stream->base + AUICH_REG_X_CR, CR_RR);
+	for (i = 10000; i > 0; i--) {
+		if (0 == auich_reg_read_8(&stream->card->config, 
+			stream->base + AUICH_REG_X_CR)) {
 			LOG(("channel reset finished, %x, %d\n", stream->base, i));
 			break;
 		}
 		spin(1);
 	}
 
-	if (i < 0) {
-		LOG(("channel reset failed after 10ms\n"));
-	}
+	if (i == 0)
+		PRINT(("channel reset failed after 10ms\n"));
 
 	page = stream->dmaops_log_base;
 
