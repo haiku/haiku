@@ -177,6 +177,8 @@ private:
 			display_mode		fDisplayMode;
 			bool				fInitialModeSwitch;
 
+			sem_id				fRetraceSemaphore;
+
 	mutable	fill_rect_params*	fRectParams;
 	mutable	uint32				fRectParamsCount;
 	mutable	blit_params*		fBlitParams;

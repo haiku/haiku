@@ -138,6 +138,8 @@ AccelerantHWInterface::AccelerantHWInterface()
 
 	fInitialModeSwitch(true),
 
+	fRetraceSemaphore(-1),
+
 	fRectParams(new (nothrow) fill_rect_params[kDefaultParamsCount]),
 	fRectParamsCount(kDefaultParamsCount),
 	fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
@@ -1017,30 +1019,29 @@ AccelerantHWInterface::GetMonitorInfo(monitor_info* info)
 sem_id
 AccelerantHWInterface::RetraceSemaphore()
 {
+	AutoWriteLocker _(this);
+
+	if (fRetraceSemaphore != -1)
+		return fRetraceSemaphore;
+
 	accelerant_retrace_semaphore AccelerantRetraceSemaphore =
 		(accelerant_retrace_semaphore)fAccelerantHook(
 			B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
 	if (!AccelerantRetraceSemaphore)
-		return B_UNSUPPORTED;
+		fRetraceSemaphore = B_UNSUPPORTED;
+	else
+		fRetraceSemaphore = AccelerantRetraceSemaphore();
 
-	return AccelerantRetraceSemaphore();
+	return fRetraceSemaphore;
 }
 
 
 status_t
 AccelerantHWInterface::WaitForRetrace(bigtime_t timeout)
 {
-	AutoReadLocker _(this);
-
-	accelerant_retrace_semaphore AccelerantRetraceSemaphore
-		= (accelerant_retrace_semaphore)fAccelerantHook(
-			B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
-	if (!AccelerantRetraceSemaphore)
-		return B_UNSUPPORTED;
-
-	sem_id sem = AccelerantRetraceSemaphore();
+	sem_id sem = RetraceSemaphore();
 	if (sem < 0)
-		return B_ERROR;
+		return sem;
 
 	return acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
 }
