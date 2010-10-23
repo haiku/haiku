@@ -1,0 +1,346 @@
+/*!
+	\class BLayoutBuilder::Group<>
+	\ingroup interface
+	\ingroup layout
+	\brief BLayoutBuilder::Base subclass for building BGroupLayouts.
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Group<ParentBuilder>::GroupBuilder
+	\brief Shorthand for builders returned by this builder's AddGroup() methods.
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Group<ParentBuilder>::GridBuilder
+	\brief Shorthand for builders returned by this builder's AddGrid() methods.
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Group<ParentBuilder>::SplitBuilder
+	\brief Shorthand for builders returned by this builder's AddSplit() methods.
+*/
+
+
+/*!
+	\typedef BLayoutBuilder::Group<ParentBuilder>::ThisBuilder
+	\brief Shorthand representing the type of \c this.
+*/
+
+
+/*!
+	\name Constructors
+
+	@{
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Group<ParentBuilder>::Group(BWindow* window,
+		enum orientation, float spacing)
+	\brief Creates a new BGroupLayout, and attaches it to a BWindow.
+
+	\note The top BView* in \a window has its ViewColor set to
+		B_PANEL_BACKGROUND_COLOR.
+	\param window Thew BWindow* to attach the newly created BGroupLayout to.
+	\param orientation The orientation for the new BGroupLayout.
+	\param spacing The spacing for the new BGroupLayout.
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Group<ParentBuilder>::Group(BGroupLayout* layout)
+	\brief Creates a builder targeting a BGroupLayout.
+
+	Methods called on this builder will be directed to \a layout.
+	\param layout The BGroupLayout to target with this builder.
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Group<ParentBuilder>::Group(BGroupView* view)
+	\brief Creates a builder targeting a BGroupView.
+
+	Methods called on this builder will be directed to
+	\c view->GroupLayout().
+
+	\param view The BGroupView this builder will target.
+*/
+
+
+/*!
+	\fn template <ParentBuilder> BLayoutBuilder::Group<ParentBuilder>::Group(
+		enum orientation, float spacing)
+	\brief Creates a new BGroupView and targets it.
+
+	Methods called on this builder will be directed to the new BGroupView's
+	BGroupLayout.
+
+	\param orientation The orientation for the new BGroupView.
+	\param spacing The spacing for the new BGroupView.
+*/
+
+
+//@}
+
+
+/*!
+	\name Adding BViews and BLayoutItems
+
+	@{
+*/
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::Add(BView* view)
+	\brief Add a BView to the BGroupLayout this builder represents.
+
+	\param view The BView to be added.
+	\see BGroupLayout::AddView(BView*)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::Add(BView* view,
+		float weight)
+	\brief Add BView to the BGroupLayout this builder represents.
+
+	\param view The BView to be added.
+	\param weight The weight to give \a view.
+	\see BGroupLayout::AddView(BView* view, float weight)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::Add(
+		BLayoutItem* item)
+	\brief Add a BLayoutItem to the BGroupLayout this builder represents.
+
+	\param item The BLayoutItem to be added.
+	\see BGroupLayout::AddItem(BLayoutItem*)
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::Add(BLayoutItem*
+		item, float weight)
+	\brief Add a BLayoutItem the BGroupLayout this builder represents.
+
+	\param item The BLayoutItem to be added.
+	\param weight The weight to give \a item.
+	\see BGroupLayout::AddItem(BLayoutItem* item, float weight)
+*/
+
+
+//@}
+
+
+/*!
+	\name Adding BLayouts and their BView pairs
+	\brief A set of methods that add a BLayout or BView subclass and return a
+	BLayoutBuilder::Base subclass representing the newly added object. These
+	methods push a new builder on top of the stack, you will not be using
+	\c this builder again until you call End().
+
+	@{
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		enum orientation, float spacing, float weight)
+	\brief Construct and add a viewless BGroupLayout, then return a GroupBuilder
+		representing the newly added layout.
+
+	\param orientation The orientation to use for the new BGroupLayout.
+	\param spacing The spacing to use for the new BGroupLayout.
+	\param weight The weight for the new BGroupLayout in the BGroupLayout this
+		builder represents.
+	\returns A GroupBuilder representing the newly created BGroupLayout.
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(BGroupView*
+		groupView, float weight)
+	\brief Add BGroupView and return a builder representing the newly added
+		BGroupView.
+
+	\param groupView The BGroupView to be added.
+	\param weight The weight for \a groupView in the BGroupLayout this builder
+		represents.
+	\returns A GroupBuilder representing \a groupView.
+*/
+
+
+/*!
+	\fn GroupBuilder BLayoutBuilder::Group<ParentBuilder>::AddGroup(
+		BGroupLayout* groupLayout, float weight)
+	\brief Add a BGroupLayout and return a builder representing 
+		the newly added BGroupLayout.
+
+	\param groupLayout The BGroupLayout to be added.
+	\param weight The weight for \a groupLayout in the BGroupLayout this builder
+		represents.
+	\returns A GroupBuilder representing \a groupLayout.
+*/
+
+
+/*!
+	\fn GridBuilder	BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		float horizontalSpacing = 0.0f, float verticalSpacing = 0.0f,
+		float weight = 1.0f)
+	\brief Create and add a viewless BGridLayout, then return a builder
+		representing the newly created BGridLayout.
+
+	\param horizontalSpacing The horizontal spacing for the new BGridLayout.
+	\param verticalSpacing The vertical spacing for the new BGridLayout.
+	\param weight The weight for the new BGroupLayout in the BGroupLayout this
+		builder represents.
+	\returns A GridBuilder representing the newly created BGridLayout.
+*/
+
+
+/*!
+	\fn GridBuilder BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridLayout* gridLayout, float weight = 1.0f)
+	\brief Add a BGridLayout, then return a builder the newly added
+		BGridLayout.
+
+	\param gridLayout The BGridLayout to be added and used to construct the
+		returned GridBuilder.
+	\param weight The weight for \a groupLayout in the BGroupLayout this builder
+		represents.
+	\returns a GridBuilder representing \a gridLayout.
+*/
+
+
+/*!
+	\fn GridBuilder	BLayoutBuilder::Group<ParentBuilder>::AddGrid(
+		BGridView* gridView, float weight = 1.0f)
+	\brief Add a BGridView, then return a builder the newly added
+		BGridView.
+
+	\param gridView The BGridView to be added and used to construct the
+		returned GridBuilder.
+	\param weight The weight for \a groupLayout in the BGroupLayout this builder
+		represents.
+
+	\returns a GridBuilder representing \a gridView.
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		enum orientation, float spacing, float weight)
+
+	\brief Create and add a new BSplitView with a weight of \c weight, then
+		return a SplitBuilder representing the new BSplitView.
+
+	\param orientation The orientation of the new BSplitView.
+	\param spacing The spacing of the new BSplitView.
+	\param weight The weight, in this BGroupLayout for the new BSplitView.
+
+	\returns a SplitBuilder representing the new BSplitView.
+*/
+
+
+/*!
+	\fn SplitBuilder BLayoutBuilder::Group<ParentBuilder>::AddSplit(
+		BSplitView* splitView, float weight = 1.0f)
+	\brief Add a BSplitView to the BGroupLayout this builder represents and
+		return a SplitBuilder representing the BSplitView.
+
+	\param splitView The BSplitView to be added.
+	\param weight The weight of the BSplitView in the BGroupLayout this builder
+		represents.
+*/
+
+
+//@}
+
+
+/*!
+	\name Adding BSpaceLayoutItems
+	Some convenience methods for adding special BSpaceLayoutItems.
+
+	@{
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::AddGlue(
+		float weight = 1.0f)
+	\brief Add a BSpaceLayoutItem created by BSpaceLayoutItem::CreateGlue()
+		to the BGroupLayout this builder represents.
+
+	\param weight The weight of the BSpaceLayoutItem in the BGroupLayout this
+		builder represents
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::AddStrut(float size)
+	\brief Add a BSpaceLayoutItem created by
+		BSpaceLayoutItem::CreateHorizontalStrut() or
+		BSpaceLayoutItem::CreateVerticalStrut()	to the BGroupLayout this builder
+		 represents.
+
+	\param size The width or height of the strut to be created (depending on
+		the orientation of the BGroupLayout this builder represents).
+*/
+
+
+//!@}
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::SetInsets(float left,
+		 float top, float right, float bottom)
+	\brief Call the BTwoDimensionalLayout::SetInsets() method on the
+		BGroupLayout this builder represents.
+*/
+
+
+/*!
+	\name Accessors
+
+	@{
+*/
+
+
+/*!
+	\fn BGroupLayout* BLayoutBuilder::Group<ParentBuilder>::Layout() const
+	\brief Get the BGroupLayout this builder represents.
+*/
+
+
+/*!
+	\fn	BView* BLayoutBuilder::Group<ParentBuilder>::View() const
+	\brief Get the BView this builder's BGroupLayout is attached to.
+*/
+
+
+/*!
+	\fn ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::GetLayout(
+		BGroupLayout** _layout)
+	\brief Get the BGroupLayout this builder represents.
+	\param[out] _layout The BGroupLayout this builder represents.
+*/
+
+
+/*!
+	\fn	ThisBuilder& BLayoutBuilder::Group<ParentBuilder>::GetView(
+	BView** _view)
+	\brief Get the BView this builder's BGroupLayout is attached to.
+	\param[out] _view The BView this builder's BGroupLayout is attached to.
+*/
+
+
+/*!
+	\fn BLayoutBuilder::Group<ParentBuilder>::operator BGroupLayout*()
+	\brief Cast this builder into the BGroupLayout it represents.
+*/
+
+//!@}

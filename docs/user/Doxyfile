@@ -465,6 +465,7 @@ WARN_LOGFILE           =
 INPUT                  = . \
 						 app \
                          drivers \
+						 interface \
 						 locale \
                          midi \
                          midi2 \
@@ -473,6 +474,13 @@ INPUT                  = . \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_spec.h \
+						 ../../headers/os/interface/AbstractLayout.h \
+						 ../../headers/os/interface/GridLayout.h \
+						 ../../headers/os/interface/GroupLayout.h \
+						 ../../headers/os/interface/Layout.h \
+						 ../../headers/os/interface/LayoutBuilder.h \
+						 ../../headers/os/interface/LayoutItem.h \
+						 ../../headers/os/interface/TwoDimensionalLayout.h \
                          ../../headers/os/locale \
                          ../../headers/os/midi2 \
                          ../../headers/os/support \

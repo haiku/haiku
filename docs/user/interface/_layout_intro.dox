@@ -1,0 +1,161 @@
+/*
+ * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Documentation by:
+ *		Alex Wilson <yourpalal2@gmail.com>
+ */
+
+
+/*!
+	\page layout_intro Introducing the Layout API.
+
+	Haiku's Layout API is centered around the BLayoutItem and BLayout classes.
+	The BLayoutItem class represents thing that can be managed by a BLayout,
+	which is itself a BLayoutItem. Before we go any further, it is a good idea
+	to familiarize yourself with the different BLayouts available in Haiku:
+		\li BGroupLayout
+		\li BGridLayout
+		\li BCardLayout
+		\li BSplitView
+
+	You'll notice that BSplitView is not actually a BLayout, but a BView. The
+	BSplitView class uses a custom BLayout behind the scenes, but because it
+	must also be able to draw, a BView is required. Other BLayouts have
+	BViews that can be used for convenience.
+		\li BGroupLayout : BGroupView
+		\li BGridLayout : BGridView
+		\li BCardLayout : BTabView (also provides on-screen tabs)
+
+	Although it is not necessary to use these classes to make use of the
+	coresponding layouts, it does make things easier.
+
+	Once you have an understanding of what each BLayout does, you can start
+	designing an interface with them. Let's consider a very simple window,
+	with a single item in the center. For this, any of the layouts mentioned
+	above would work, but we'll use a BGroupLayout, because it suits this
+	purpose the best.
+
+	So, let's review the BGroupLayout constructor:
+
+\code
+BGroupLayout(enum orientation orientation, float spacing
+		= B_USE_DEFAULT_SPACING)
+\endcode
+
+	Because we only have one item in this layout, \c orientation and \c spacing
+	become irrelevant. Let's choose B_VERTICAL for \c orientation, and leave
+	\c spacing at its default.
+
+\code
+BGroupLayout* group = new BGroupLayout(B_VERTICAL);
+BWindow* window = MakeWindow();
+window->SetLayout(group);
+\endcode
+
+	Before we can add anything to our layout, we must attach it to something,
+	and here we've used the BWindow::SetLayout() method to accomplish that.
+	By doing this, \c window takes ownership of \c group, so there is no need
+	to manually  <tt> delete group </tt> when we're done with it.
+
+	Now that we've got our BGroupLayout in place, we can start adding things
+	to it, let's add a BStringView.
+
+\code
+group->AddView(MakeStringView("Haiku rocks!"));
+\endcode
+
+	That does it! Now we've got a BWindow with a horizontal BGroupLayout holding
+	a single BView. However, if we want to ensure that our BStringView is always
+	centered in the window, we should give it an explict BAlignment. So that
+	last line becomes:
+
+\code
+BLayoutItem* stringView = group->AddView(MakeStringView("Haiku rocks!"));
+stringView->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+		B_ALIGN_VERTICAL_CENTER);
+\endcode
+
+	Now our BStringView will always be right in the middle of the space
+	alloted to it, which at the moment is the whole of \c window.
+
+	Now let's take things one step further, and add a BMenuBar into the mix.
+
+\code
+group->AddView(0, MakeMenuBar());
+group->SetInsets(0, 0, 0, 0);
+\endcode
+
+	Because we want our BMenuBar to appear at the very top of the window, we
+	have to insert it at index \c 0, above the BStringView we added earlier.
+	We also use BTwoDimensionalLayout::SetInsets() to make sure that our
+	BMenuBar is flush to the edges of \c window. We also want a bit of
+	space between our BMenuBar and our BStringView, but \c group's spacing has
+	already been set by the BGroupLayout constructor, so we don't need to do
+	that.
+ 
+	Now that we've put our BGroupLayout to good use, we can rest easy, assured
+	that GUI will always look nice, no matter what font is used, or how big or
+	little \c window is stretched. Of course, very few interfaces are as simple
+	as this one.
+
+	Luckily, the layout classes can deal with complex layouts. Suppose, for
+	example, that we wanted to add a grid of BButtons under our BStringView.
+	We could use a BGridLayout for this. Let's review the BGridLayout
+	constructor:
+
+\code
+BGridLayout(float horizontal = B_USE_DEFAULT_SPACING,
+	float vertical = B_USE_DEFAULT_SPACING);
+\endcode
+
+	Because we want a bit of breathing room between our buttons, we'll leave 
+	vertical and horizontal spacing as is.
+
+\code
+BGridLayout* grid = new BGridLayout();
+group->AddItem(grid);
+\endcode
+
+	You'll notice that we've added \c grid directly to \c group. This means that
+	any BViews we add to \c grid will become children of \c window, but will be
+	positioned by \c grid.
+
+\code
+grid->AddView(MakeSmallButton(), 0, 0);
+grid->AddView(MakeSmallButton(), 1, 0);
+grid->AddView(MakeBigButton(), 0, 1, 2, 1);
+grid->AddView(MakeSmallButton(), 1, 2);
+\endcode
+
+	Now we've got a nice grid of BButtons, let's go over it quickly:
+		\li \c grid has two columns and three rows.
+		\li The cells (0, 0), (1, 0), and (1, 2) hold small buttons
+		\li The cells (0, 1) and (1, 1) hold a single button that spans both
+			cells.
+		\li The cell (0, 2) is empty.
+
+	How easy was that? Very easy!
+
+	One of the features you'll find incredibly handy in the layout API is the
+	builders in LayoutBuilder.h. Here's how our whole layout would look if it
+	were done with these builders:
+
+\code
+BLayoutBuilder::Group<>(window, B_VERTICAL)
+	.SetInsets(0, 0, 0, 0)
+	.Add(MakeMenuBar())
+	.Add(MakeStringView("Haiku rocks!"))
+	.AddGrid()
+		.Add(MakeSmallButton(), 0, 0)
+		.Add(MakeSmallButton(), 1, 0)
+		.Add(MakeBigButton(), 0, 1, 2, 1)
+		.Add(MakeSmallButton(), 1, 2);
+\endcode
+
+	This is only one way that you could build this layout, but it is probably
+	the most succinct. Functionally, this is equivalent to all the previous
+	code in this introduction.
+
+*/
+

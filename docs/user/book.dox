@@ -5,6 +5,7 @@
 
   - \ref app | \link app_intro \em Introduction \endlink
   - \ref drivers
+  - \ref interface | \link interface_intro \em Introduction \endlink
   - \ref locale | \link locale_intro \em Introduction \endlink
   - \ref midi1
   - \ref midi2 | \link midi2_intro \em Introduction \endlink
@@ -21,6 +22,8 @@
 /*!
   \defgroup app Application Kit
   \defgroup drivers Drivers
+  \defgroup interface Interface Kit
+  \brief API for displaying a graphical user interface.
   \defgroup midi2 MIDI 2 Kit
   \brief API for producing and consuming MIDI events.
   \defgroup libmidi2 (libmidi2.so)
@@ -37,4 +40,7 @@
 /*!
   \defgroup support_globals Global functions in the support kit
   \ingroup support
+
+  \defgroup layout Layout classes in the Interface Kit
+  \ingroup interface
 */

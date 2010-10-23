@@ -1,0 +1,36 @@
+/*!
+	\page layout_tips
+
+	\section layout_window_tips BWindow Tips
+
+	\li You can use the BLayoutBuilder classes to build a layout directly into
+		a BWindow.
+	\li Passing the B_AUTO_UPDATE_SIZE_LIMITS flag to a BWindow with a BLayout
+		will make sure that window is always big enough to accomadate everything
+		in it.
+
+	\section layout_view_tips BView Tips
+
+	\li When the main purpose of a BView is to hold a BLayout, consider nesting
+		the BLayout directly (i.e. without a BView)
+
+	\li When the main purpose of a BView is to hold another BView which has
+		children added to it, consider adding directly to the first BView.
+
+	\li When the main purpose of a BView is to hold a BLayout, but you also wish
+		to have a view color set for that area, considering using one of the
+		layout-related convenience classes (eg. BGroupView for BGroupLayout).
+
+	\li When the main purpose of a BView is to hold a BLayout, but it must be
+		populated before being attached to another BView or a BWindow,
+		consider using one of the layout-related convenience classes (eg.
+		BGroupView for BGroupLayout).
+
+
+	\section layout_layout_tips BLayout Tips
+
+	\li It is generally better to add BViews and BLayoutItems directly to the
+		BLayout subclass attached to a BView, rather than the BView itself. This
+		way, you can make full use of the specific features the subclass you're
+		using provides.
+*/

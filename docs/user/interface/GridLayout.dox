@@ -1,0 +1,193 @@
+/*!
+	\class BGridLayout
+	\ingroup interface
+	\ingroup layout
+	\ingroup libbe
+
+	\brief The BGridLayout class a BLayout subclass that arranges the items it
+	holds in a grid.
+
+	Each item in a BGridLayout receives a rectangular area which can span more
+	than a single row or column. The indexing of columns and rows is zero based,
+	starting in the top-left.
+
+	\warning This class is not yet finalized, if you use it in your software
+	assume that it will break some time in the future.
+*/
+
+
+/*!
+	\fn BGridLayout::BGridLayout(float horizontal = 0.0f, float vertical = 0.0f)
+	\brief Create a BGridLayout with \c horizontal space between columns and
+		\c vertical space between rows.
+*/
+
+
+/*!
+	\fn BGridLayout::BGridLayout(BMessage* from)
+	\brief Archive constructor.
+*/
+
+
+/*!
+	\fn int32 BGridLayout::CountColumns() const
+	\brief Returns the number of active columns in this layout.
+*/
+
+
+/*!
+	\fn int32 BGridLayout::CountRows() const
+	\brief Returns the number of active rows in this layout.
+*/
+
+
+/*!
+	\fn float BGridLayout::HorizontalSpacing() const
+	\brief Returns the spacing between columns for this layout.
+*/
+
+
+/*!
+	\fn float BGridLayout::VerticalSpacing() const
+	\brief Returns the spacing between rows for this layout.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetHorizontalSpacing(float spacing);
+	\brief Set the spacing between columns for this layout.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetVerticalSpacing(float spacing)
+	\brief Set the spacing between rows for this layout.
+*/
+
+
+/*!
+	\fn	void BGridLayout::SetSpacing(float horizontal, float vertical)
+	\brief Set the spacing between columns and rows for this layout.
+*/
+
+
+/*!
+	\fn float BGridLayout::ColumnWeight(int32 column) const
+	\brief Returns the weight for \c column.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetColumnWeight(int32 column, float weight)
+	\brief Set the weight for \c column to \c weight.
+*/
+
+
+/*!
+	\fn float BGridLayout::MinColumnWidth(int32 column) const
+	\brief Returns the minimum width for \c column.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetMinColumnWidth(int32 column, float width)
+	\brief Sets the minimum width for \c column to \c width.
+*/
+
+
+/*!
+	\fn float BGridLayout::MaxColumnWidth(int32 column) const
+	\brief Returns the maximum width for \c column.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetMaxColumnWidth(int32 column, float width)
+	\brief Sets the maximum width for \c column to \c width.
+*/
+
+
+/*!
+	\fn float BGridLayout::RowWeight(int32 row) const
+	\brief Returns the weight for \c row.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetRowWeight(int32 row, float weight)
+	\brief Set the weight for \c row to \c weight.
+*/
+
+
+/*!
+	\fn float BGridLayout::MinRowHeight(int32 row) const
+	\brief Returns the minimum height for \c row.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetMinRowHeight(int32 row, float height)
+	\brief Sets the minimum height for \c row to \c width.
+*/
+
+
+/*!
+	\fn float BGridLayout::MaxRowHeight(int32 row) const
+	\brief Returns the maximum height for \c row.
+*/
+
+
+/*!
+	\fn void BGridLayout::SetMaxRowHeight(int32 row, float height)
+	\brief Sets the maximum height for \c row to \c width.
+*/
+
+
+/*!
+	\fn BLayoutItem* BGridLayout::AddView(BView* child)
+	\brief Adds \c child to this layout in the first empty cell available, or
+		in a new column in the first row if there are no emtpy cells.
+*/
+
+
+/*!
+	\fn BLayoutItem* BGridLayout::AddView(int32 index, BView* child);
+	\copybrief BGridLayout::AddView(BView*)
+*/
+
+
+/*!
+	\fn BLayoutItem* BGridLayout::AddView(BView* child, int32 column, int32 row,
+			int32 columnCount = 1, int32 rowCount = 1);
+	\brief Adds \c child to this layout at \c column and \c row. \c child may
+		also occupy additional cells if \c columnCount or \c rowCount are
+		greater than 1.
+
+	Fails and returns NULL if the requested area is occupied, or if internal
+	memory allocations fail.
+*/
+
+
+/*!
+	\fn BLayoutItem* BGridLayout::AddItem(BLayoutItem* item)
+	\brief Adds \c item to this layout in the first empty cell available, or
+		in a new column in the first row if there are no emtpy cells.
+*/
+
+
+/*!
+	\fn BLayoutItem* BGridLayout::AddItem(int32 index, BLayoutItem* item);
+	\copybrief BGridLayout::AddItem(BLayoutItem*)
+*/
+
+
+/*!
+	\fn BLayoutItem* BGridLayout::AddItem(BLayoutItem* item, int32 column,
+		int32 row, int32 columnCount = 1, int32 rowCount = 1);
+	\brief Adds \c item to this layout at \c column and \c row. \c item may
+		also occupy additional cells if \c columnCount or \c rowCount are
+		greater than 1.
+
+	Fails and returns NULL if the requested area is occupied, or if internal
+	memory allocations fail.
+*/

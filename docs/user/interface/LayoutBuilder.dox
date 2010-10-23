@@ -1,0 +1,224 @@
+/*!
+	\class BLayoutBuilder::Base<>
+	\ingroup interface
+	\ingroup layout
+	\brief Base for all other layout builders in the BLayoutBuilder namespace.
+
+	This class provides the stack-like semantics for its subclasses. The
+	BLayoutBuilder::Group, BLayoutBuilder::Grid and BLayoutBuilder::Split all
+	provide methods such as AddGrid() AddGroup() and AddSplit(), which 
+	make a new builder, place it on top of your builder stack and return it.
+	Now you are operating on the new builder. When you call	the End() method on
+	the new builder, you are returned the one you had previously been using. At
+	any point, you are calling methods on whatever builder currently resides on
+	the top of the stack. Here's an example of how these classes work.
+
+\code
+BLayoutBuilder::Group<>(B_HORIZONTAL)
+\endcode
+
+	At this point our stack just contains a single builder, it looks like this:
+		\li Group<>
+
+\code
+	.AddGrid()
+\endcode
+
+	Now there is a Grid builder on top of the stack, so it looks like this \li Group<>::GridBuilder
+		\li Group<>
+
+	Notice that the Grid on top of the stack is not a plain Grid<>, but a nested
+	type from the Group<> class. This is an essential part of the builder
+	classes, as this is what allows you to pop builders off the stack and get
+	the correct type in return.
+
+\code
+		.AddSplit()
+\endcode
+
+	Now our stack looks like this:
+		\li Group<>::GridBuilder::SplitBuilder
+		\li Group<>::GridBuilder
+		\li Group<>
+
+	This could continue ad. nauseam, but at some point, you may finish with a
+	builder, and you might want to continue manipulating the builder below it
+	on the stack. To do this, you simply call the End() method like so:
+
+\code
+			.End()
+\endcode
+
+	And now the stack is back to this:
+		\li Group<>::GridBuilder
+		\li Group<>
+
+	So you are again working with the grid builder. You can add more
+	BLayoutItems or BViews, or even more builders. Here's how it will all look
+	together.
+
+\code
+BLayoutBuilder::Group<>(B_HORIZONTAL)
+	// working with the Group builder
+	.AddGrid()
+		// working with the Group<>::GridBuilder
+		.AddSplit()
+			// working with the Group<>::GridBuilder::SplitBuilder
+		.End()
+		// back to the Group<>::GridBuilder
+\endcode
+*/
+
+
+/*!
+	\fn void BLayoutBuilder::Base<ParentBuilder>::SetParent(ParentBuilder*
+		parent)
+	Internal method for use by BLayoutBuilder::Base subclasses, this is
+	essential to the builder stack semantics
+*/
+
+
+/*!
+	\fn ParentBuilder& BLayoutBuilder::Base<ParentBuilder>::End()
+	\brief Returns this builder's parent.
+*/
+
+
+
+/*
+
+
+template<typename ParentBuilder>
+class Grid : public Base<ParentBuilder> {
+public:
+	typedef Grid<ParentBuilder>		ThisBuilder;
+	typedef Group<ThisBuilder>		GroupBuilder;
+	typedef Grid<ThisBuilder>		GridBuilder;
+	typedef Split<ThisBuilder>		SplitBuilder;
+
+public:
+	inline						Grid(float horizontalSpacing = 0.0f,
+									float verticalSpacing = 0.0f);
+	inline						Grid(BWindow* window,
+									float horizontalSpacing = 0.0f,
+									float verticalSpacing = 0.0f);
+	inline						Grid(BGridLayout* layout);
+	inline						Grid(BGridView* view);
+
+	inline	BGridLayout*		Layout() const;
+	inline	BView*				View() const;
+	inline	ThisBuilder&		GetLayout(BGridLayout** _layout);
+	inline	ThisBuilder&		GetView(BView** _view);
+
+	inline	ThisBuilder&		Add(BView* view, int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	ThisBuilder&		Add(BLayoutItem* item, int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	ThisBuilder&		AddMenuField(BMenuField* menuField,
+									int32 column, int32 row,
+									alignment labelAlignment
+										= B_ALIGN_HORIZONTAL_UNSET,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	ThisBuilder&		AddTextControl(BTextControl* textControl,
+									int32 column, int32 row,
+									alignment labelAlignment
+										= B_ALIGN_HORIZONTAL_UNSET,
+									int32 columnCount = 1, int32 rowCount = 1);
+
+	inline	GroupBuilder		AddGroup(enum orientation orientation,
+									float spacing, int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	GroupBuilder		AddGroup(BGroupView* groupView,	int32 column,
+									int32 row, int32 columnCount = 1,
+									int32 rowCount = 1);
+	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout, 
+									int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+
+	inline	GridBuilder			AddGrid(float horizontalSpacing,
+									float verticalSpacing, int32 column,
+									int32 row, int32 columnCount = 1,
+									int32 rowCount = 1);
+	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
+									int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	GridBuilder			AddGrid(BGridView* gridView,
+									int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+
+	inline	SplitBuilder		AddSplit(enum orientation orientation,
+									float spacing, int32 column, int32 row,
+									int32 columnCount = 1, int32 rowCount = 1);
+	inline	SplitBuilder		AddSplit(BSplitView* splitView, int32 column,
+									int32 row, int32 columnCount = 1,
+									int32 rowCount = 1);
+
+	inline	ThisBuilder&		SetColumnWeight(int32 column, float weight);
+	inline	ThisBuilder&		SetRowWeight(int32 row, float weight);
+
+	inline	ThisBuilder&		SetInsets(float left, float top, float right,
+									float bottom);
+
+	inline						operator BGridLayout*();
+
+private:
+			BGridLayout*		fLayout;
+};
+
+
+template<typename ParentBuilder>
+class Split : public Base<ParentBuilder> {
+public:
+	typedef Split<ParentBuilder>	ThisBuilder;
+	typedef Group<ThisBuilder>		GroupBuilder;
+	typedef Grid<ThisBuilder>		GridBuilder;
+	typedef Split<ThisBuilder>		SplitBuilder;
+
+public:
+	inline						Split(enum orientation orientation
+										= B_HORIZONTAL,
+									float spacing = 0.0f);
+	inline						Split(BSplitView* view);
+
+	inline	BSplitView*			View() const;
+	inline	ThisBuilder&		GetView(BView** _view);
+	inline	ThisBuilder&		GetSplitView(BSplitView** _view);
+
+	inline	ThisBuilder&		Add(BView* view);
+	inline	ThisBuilder&		Add(BView* view, float weight);
+	inline	ThisBuilder&		Add(BLayoutItem* item);
+	inline	ThisBuilder&		Add(BLayoutItem* item, float weight);
+
+	inline	GroupBuilder		AddGroup(enum orientation orientation,
+									float spacing = 0.0f, float weight = 1.0f);
+	inline	GroupBuilder		AddGroup(BGroupView* groupView,
+									float weight = 1.0f);
+	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout,
+									float weight = 1.0f);
+
+	inline	GridBuilder			AddGrid(float horizontalSpacing = 0.0f,
+									float verticalSpacing = 0.0f,
+									float weight = 1.0f);
+	inline	GridBuilder			AddGrid(BGridView* gridView,
+									float weight = 1.0f);
+	inline	GridBuilder			AddGrid(BGridLayout* gridLayout,
+									float weight = 1.0f);
+
+	inline	SplitBuilder		AddSplit(enum orientation orientation,
+									float spacing = 0.0f, float weight = 1.0f);
+	inline	SplitBuilder		AddSplit(BSplitView* splitView,
+									float weight = 1.0f);
+
+	inline	ThisBuilder&		SetCollapsible(bool collapsible);
+	inline	ThisBuilder&		SetCollapsible(int32 index, bool collapsible);
+	inline	ThisBuilder&		SetCollapsible(int32 first, int32 last,
+									bool collapsible);
+
+	inline	ThisBuilder&		SetInsets(float left, float top, float right,
+									float bottom);
+
+	inline						operator BSplitView*();
+
+private:
+			BSplitView*			fView;
+};

@@ -1,0 +1,122 @@
+/*!
+	\class BAbstractLayout
+	\ingroup interface
+	\ingroup layout
+	\ingroup libbe
+
+	\brief BLayout subclass providing convenience methods for derived
+	implementations.
+	
+	This class is designed to reduce the amount of boilerplate code required to
+	write a BLayout subclass. In most cases, you classes should derive from
+	BAbstractLayout rather than BLayout.
+
+	When a BAbstractLayout is attached to a BView, many of the methods provided
+	by the BAbstractLayout class are forwarded to the BAbstractLayout's
+	owner BView. When a BAbstractLayout is viewless, these methods are handled
+	locally.
+
+	\warning This class is not yet finalized, if you use it in your software
+	assume that it will break some time in the future.
+*/
+
+
+/*!
+	\name Constructors
+
+	@{
+*/
+
+
+/*!
+	\fn BAbstractLayout::BAbstractLayout()
+	\brief Construct a BAbstractLayout.
+*/
+
+
+/*!
+	\fn BAbstractLayout::BAbstractLayout(BMessage* from);
+	\brief Archive constructor.
+*/
+
+
+//@}
+
+
+/*!
+	\fn BSize BAbstractLayout::MinSize()
+	\copydoc BLayoutItem::MinSize()
+
+	The return value for this method is composed (using
+	BLayoutUtils::ComposeSize()) from the values returned by BaseMinSize() and
+	ExplicitMinSize().
+*/
+
+
+/*!
+	\fn BSize BAbstractLayout::MaxSize()
+	\copydoc BLayoutItem::MaxSize()
+
+	The return value for this method is composed (using
+	BLayoutUtils::ComposeSize()) from the values returned by BaseMaxSize() and
+	ExplicitMaxSize().
+*/
+
+
+/*!
+	\fn BSize BAbstractLayout::PreferredSize()
+	\copydoc BLayoutItem::PreferredSize()
+
+	The return value for this method is composed (using
+	BLayoutUtils::ComposeSize()) from the values returned by BasePreferredSize()
+	and ExplicitPreferredSize().
+*/
+
+
+/*!
+	\fn BAlignment BAbstractLayout::Alignment()
+	\copydoc BLayoutItem::Alignment()
+
+	The return value for this method is composed (using
+	BLayoutUtils::ComposeAlignment()) from the values returned by
+	BaseAlignment() and
+	ExplicitAlignment()
+*/
+
+
+/*!
+	\name BAbstractLayout hooks
+
+	@{
+*/
+
+
+/*!
+	\fn BSize BAbstractLayout::BaseMinSize()
+	\brief Method to be implemented in derived classes return the minimum size
+	constraint for this BAbstractLayout.
+*/
+
+
+/*!
+	\fn BSize BAbstractLayout::BaseMaxSize()
+	\brief Method to be implemented in derived classes return the maximum size
+	constraint for this BAbstractLayout.
+*/
+
+
+/*!
+	\fn BSize BAbstractLayout::BasePreferredSize()
+	\brief Method to be implemented in derived classes return the preferred size
+	constraint for this BAbstractLayout.
+*/
+
+
+/*!
+	\fn BAlignment BAbstractLayout::BaseAlignment()
+	\brief Method to be implemented in derived classes return the preferred
+	alignment for this BAbstractLayout.
+*/
+
+
+//@}
