@@ -144,7 +144,7 @@ typedef struct acpi_local_sapic {
 									   ACPI Spec 4.0a */
 	uint32	processor_uid_nr;		/* Matches _UID of a processor when it is a
 									   number */
-	char[]	processor_uid_str;		/* Matches _UID of a processor when it is a
+	char	processor_uid_str[];	/* Matches _UID of a processor when it is a
 									   string. Null-terminated */
 } _PACKED acpi_local_sapic;
 
