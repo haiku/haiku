@@ -1216,7 +1216,7 @@ ShowImageView::MouseDown(BPoint position)
 
 	BPoint point = ViewToImage(position);
 	uint32 buttons = 0;
-	if (Window() != NULL & Window()->CurrentMessage() != NULL)
+	if (Window() != NULL && Window()->CurrentMessage() != NULL)
 		buttons = Window()->CurrentMessage()->FindInt32("buttons");
 
 	if (fHasSelection && fSelectionBox.Bounds().Contains(point)
