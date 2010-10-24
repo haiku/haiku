@@ -29,6 +29,20 @@ class ConsoleHandle : public CharHandle {
 		uint16	fPen;
 };
 
+class KeyboardDevice : public ExecDevice {
+	public:
+		KeyboardDevice();
+		virtual ~KeyboardDevice();
+
+		status_t	Open();
+
+		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
+		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
+
+	protected:
+};
+
+
 static const uint16 kPalette[] = {
 	0x000,
 	0x00a,
@@ -91,6 +105,8 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 			//Text(&sScreen->RastPort, &string[i - len], len);
 			fX = 0;
 			fY++;
+			if (fY >= console_height())
+				fY = 0;
 			len = 0;
 			console_set_cursor(fX, fY);
 			continue;
@@ -105,6 +121,65 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 static ConsoleHandle sOutput;
 static ConsoleHandle sErrorOutput;
 static ConsoleHandle sDebugOutput;
+
+
+// #pragma mark -
+
+
+KeyboardDevice::KeyboardDevice()
+	: ExecDevice()
+{
+}
+
+
+KeyboardDevice::~KeyboardDevice()
+{
+}
+
+
+status_t
+KeyboardDevice::Open()
+{
+	return ExecDevice::Open("keyboard.device");
+}
+
+
+ssize_t
+KeyboardDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	struct InputEvent event;
+	ssize_t actual;
+	
+	do {
+		fIOStdReq->io_Command = KBD_READEVENT;
+		fIOStdReq->io_Flags = IOF_QUICK;
+		fIOStdReq->io_Length = sizeof(event);
+		fIOStdReq->io_Data = &event;
+		status_t err = Do();
+		if (err < B_OK)
+			return err;
+	} while (event.ie_Code > IECODE_UP_PREFIX);
+
+	dprintf("key: class %d sclass %d code %d qual 0x%04x\n", event.ie_Class, event.ie_SubClass,
+		event.ie_Code, event.ie_Qualifier);
+	
+	actual = MapRawKey(&event, (char *)buffer, bufferSize, NULL);
+	dprintf("%s actual %d\n", __FUNCTION__, actual);
+	if (actual > 0) {
+		return actual;
+	}
+	return B_ERROR;
+}
+
+
+ssize_t
+KeyboardDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	return B_ERROR;
+}
+
+
+static KeyboardDevice sInput;
 
 
 //	#pragma mark -
@@ -178,6 +253,16 @@ console_init(void)
 	dprintf("WBorBottom %d\n", sScreen->WBorBottom);
 	*/
 
+	KEYMAP_BASE_NAME = (Library *)OldOpenLibrary(KEYMAPNAME);
+	if (KEYMAP_BASE_NAME == NULL)
+		panic("Cannot open %s", KEYMAPNAME);
+
+	sInput.AllocRequest(sizeof(struct IOStdReq));
+	sInput.Open();
+	stdin = (FILE *)&sInput;
+
+	
+
 	return B_OK;
 }
 
@@ -230,6 +315,9 @@ int
 console_wait_for_key(void)
 {
 	//TODO
+	char key;
+	sInput.Read(&key, 1);
+	dprintf("k: %02x '%c'\n", key, key);
 	return 0;
 }
 

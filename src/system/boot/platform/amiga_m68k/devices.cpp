@@ -36,6 +36,106 @@ static uint8 gScratchBuffer[SCRATCH_SIZE];
 //	#pragma mark -
 
 
+ExecDevice::ExecDevice(struct IORequest *ioRequest)
+{
+	fIORequest = ioRequest;
+	fIOStdReq = (struct IOStdReq *)ioRequest;
+}
+
+
+ExecDevice::ExecDevice(size_t requestSize)
+{
+	AllocRequest(requestSize);
+}
+
+
+ExecDevice::ExecDevice()
+{
+}
+
+
+ExecDevice::~ExecDevice()
+{
+	CloseDevice(fIORequest);
+	DeleteIORequest(fIORequest);
+}
+
+
+status_t
+ExecDevice::AllocRequest(size_t requestSize)
+{
+	struct MsgPort *inputPort = CreateMsgPort();
+	if (inputPort == NULL)
+		panic("CreateMsgPort()");
+	
+	fIORequest = (struct IORequest *)CreateIORequest(inputPort, requestSize);
+	if (fIORequest == NULL)
+		panic("CreateIORequest()");
+	fIOStdReq = (struct IOStdReq *)fIORequest;
+	return B_ERROR;
+}
+
+
+status_t
+ExecDevice::Open(const char *name, unsigned long unit, unsigned long flags)
+{
+	status_t err;
+	err = exec_error(OpenDevice((uint8 *)name, unit, fIORequest, flags));
+	if (err < B_OK)
+		return err;
+	return B_OK;
+}
+
+
+ssize_t
+ExecDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	fIOStdReq->io_Command = CMD_READ;
+	fIOStdReq->io_Length = bufferSize;
+	fIOStdReq->io_Data = buffer;
+	fIOStdReq->io_Offset = (uint32)pos;
+	status_t err = Do();
+	if (err < B_OK)
+		return err;
+	return (ssize_t)fIOStdReq->io_Actual;
+}
+
+
+ssize_t
+ExecDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	fIOStdReq->io_Command = CMD_WRITE;
+	fIOStdReq->io_Length = bufferSize;
+	fIOStdReq->io_Data = (void *)buffer;
+	fIOStdReq->io_Offset = (uint32)pos;
+	status_t err = Do();
+	if (err < B_OK)
+		return err;
+	return (ssize_t)fIOStdReq->io_Actual;
+}
+
+
+off_t 
+ExecDevice::Size() const
+{
+	
+	// ToDo: fix this!
+	return 1024LL * 1024 * 1024 * 1024;
+		// 1024 GB
+}
+
+status_t
+ExecDevice::Do()
+{
+	status_t err;
+	err = exec_error(DoIO(fIORequest));
+	return err;
+}
+
+
+//	#pragma mark -
+
+
 status_t 
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {

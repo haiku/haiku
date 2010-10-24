@@ -1036,7 +1036,7 @@ struct Message {
 
 // <exec/io.h>
 
-/*
+
 struct IORequest {
 	struct Message	io_Message;
 	struct Device	*io_Device;
@@ -1058,7 +1058,7 @@ struct IOStdReq {
 	void			*io_Data;
 	uint32			io_Offset;
 } _PACKED;
-*/
+
 
 #endif /* __ASSEMBLER__ */
 
@@ -1124,6 +1124,14 @@ extern ExecBase *EXEC_BASE_NAME;
 	LP1NR(0x19e, CloseLibrary, struct Library *, last, a1, \
 	, EXEC_BASE_NAME)
 
+#define OpenDevice(par1, par2, par3, last) \
+	LP4(0x1bc, int8, OpenDevice, /*UBYTE*/uint8 *, par1, a0, unsigned long, par2, d0, struct IORequest *, par3, a1, unsigned long, last, d1, \
+	, EXEC_BASE_NAME)
+
+#define CloseDevice(last) \
+	LP1NR(0x1c2, CloseDevice, struct IORequest *, last, a1, \
+	, EXEC_BASE_NAME)
+
 #define DoIO(last) \
 	LP1(0x1c8, int8, DoIO, struct IORequest *, last, a1, \
 	, EXEC_BASE_NAME)
@@ -1133,6 +1141,17 @@ extern ExecBase *EXEC_BASE_NAME;
 	unsigned long, last, d0, \
 	, EXEC_BASE_NAME)
 
+#define CreateIORequest(par1, last) \
+	LP2(0x28e, APTR, CreateIORequest, struct MsgPort *, par1, a0, unsigned long, last, d0, \
+	, EXEC_BASE_NAME)
+
+#define DeleteIORequest(last) \
+	LP1NR(0x294, DeleteIORequest, APTR, last, a0, \
+	, EXEC_BASE_NAME)
+
+#define CreateMsgPort() \
+	LP0(0x29a, struct MsgPort *, CreateMsgPort, \
+	, EXEC_BASE_NAME)
 
 
 
@@ -1314,6 +1333,61 @@ extern struct Library *INTUITION_BASE_NAME;
 
 #endif /* __ASSEMBLER__ */
 
+
+// <devices/keymap.h>
+
+#ifndef KEYMAP_BASE_NAME
+#define KEYMAP_BASE_NAME KeymapBase
+#endif
+
+#define KEYMAPNAME "keymap.library"
+
+#ifndef __ASSEMBLER__
+#define MapRawKey(par1, par2, par3, last) \
+	LP4(0x2a, int16, MapRawKey, struct InputEvent *, par1, a0, char *, par2, a1, long, par3, d1, struct KeyMap *, last, a2, \
+	, KEYMAP_BASE_NAME)
+
+extern struct Library *KEYMAP_BASE_NAME;
+
+#endif /* __ASSEMBLER__ */
+
+// <devices/keyboard.h>
+
+#define KBD_READEVENT (CMD_NONSTD+0)
+
+// <devices/inputevent.h>
+
+#ifndef __ASSEMBLER__
+
+struct InputEvent {
+	struct InputEvent	*ie_NextEvent;
+	uint8	ie_Class;
+	uint8	ie_SubClass;
+	uint16	ie_Code;
+	uint16	ie_Qualifier;
+	union {
+	struct {
+		int16	ie_x;
+		int16	ie_y;
+	}	ie_xy;
+	APTR	ie_addr;
+	struct {
+		uint8	ie_prev1DownCode;
+		uint8	ie_prev1DownQual;
+		uint8	ie_prev2DownCode;
+		uint8	ie_prev2DownQual;
+	}	ie_dead;
+	} ie_position;
+	/*struct timeval*/
+	struct { uint32 tv_secs, tv_micro; } ie_TimeStamp;
+};
+
+#endif /* __ASSEMBLER__ */
+
+#define IECLASS_RAWKEY 0x01
+#define IESUBCLASS_RAWKEY 0x01
+
+#define IECODE_UP_PREFIX 0x80
 
 #ifdef __cplusplus
 }
