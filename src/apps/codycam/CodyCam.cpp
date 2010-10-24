@@ -247,7 +247,7 @@ CodyCam::MessageReceived(BMessage *message)
 					BRect(2 * WINDOW_OFFSET_X + WINDOW_SIZE_X, WINDOW_OFFSET_Y,
 					2 * WINDOW_OFFSET_X + WINDOW_SIZE_X + view->Bounds().right,
 					WINDOW_OFFSET_Y + view->Bounds().bottom), view, node);
-				fMediaRoster->StartWatching(BMessenger(NULL, 
+				fMediaRoster->StartWatching(BMessenger(NULL,
 					fVideoControlWindow), node,	B_MEDIA_WEB_CHANGED);
 				fVideoControlWindow->Show();
 			}
@@ -280,7 +280,7 @@ CodyCam::_SetUpNodes()
 	/* find the media roster */
 	fMediaRoster = BMediaRoster::Roster(&status);
 	if (status != B_OK) {
-		ErrorAlert(B_TRANSLATE("Cannot find the media roster"), status, 
+		ErrorAlert(B_TRANSLATE("Cannot find the media roster"), status,
 			fWindow);
 		return status;
 	}
@@ -302,11 +302,11 @@ CodyCam::_SetUpNodes()
 	}
 
 	/* create the video consumer node */
-	fVideoConsumer = new VideoConsumer("CodyCam", 
+	fVideoConsumer = new VideoConsumer("CodyCam",
 		((VideoWindow*)fWindow)->VideoView(),
 		((VideoWindow*)fWindow)->StatusLine(), NULL, 0);
 	if (!fVideoConsumer) {
-		ErrorAlert(B_TRANSLATE("Cannot create a video window"), B_ERROR, 
+		ErrorAlert(B_TRANSLATE("Cannot create a video window"), B_ERROR,
 			fWindow);
 		return B_ERROR;
 	}
@@ -314,7 +314,7 @@ CodyCam::_SetUpNodes()
 	/* register the node */
 	status = fMediaRoster->RegisterNode(fVideoConsumer);
 	if (status != B_OK) {
-		ErrorAlert(B_TRANSLATE("Cannot register the video window"), status, 
+		ErrorAlert(B_TRANSLATE("Cannot register the video window"), status,
 			fWindow);
 		return status;
 	}
@@ -322,18 +322,18 @@ CodyCam::_SetUpNodes()
 
 	/* find free producer output */
 	int32 cnt = 0;
-	status = fMediaRoster->GetFreeOutputsFor(fProducerNode, &fProducerOut, 1, 
+	status = fMediaRoster->GetFreeOutputsFor(fProducerNode, &fProducerOut, 1,
 		&cnt, B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
-		ErrorAlert(B_TRANSLATE("Cannot find an available video stream"), 
+		ErrorAlert(B_TRANSLATE("Cannot find an available video stream"),
 			status,	fWindow);
 		return status;
 	}
 
 	/* find free consumer input */
 	cnt = 0;
-	status = fMediaRoster->GetFreeInputsFor(fVideoConsumer->Node(), 
+	status = fMediaRoster->GetFreeInputsFor(fVideoConsumer->Node(),
 		&fConsumerIn, 1, &cnt, B_MEDIA_RAW_VIDEO);
 	if (status != B_OK || cnt < 1) {
 		status = B_RESOURCE_UNAVAILABLE;
@@ -350,7 +350,7 @@ CodyCam::_SetUpNodes()
 	format.u.raw_video = vid_format;
 
 	/* connect producer to consumer */
-	status = fMediaRoster->Connect(fProducerOut.source, 
+	status = fMediaRoster->Connect(fProducerOut.source,
 		fConsumerIn.destination, &format, &fProducerOut, &fConsumerIn);
 	if (status != B_OK) {
 		ErrorAlert(B_TRANSLATE("Cannot connect the video source to the video "
@@ -360,7 +360,7 @@ CodyCam::_SetUpNodes()
 
 
 	/* set time sources */
-	status = fMediaRoster->SetTimeSourceFor(fProducerNode.node, 
+	status = fMediaRoster->SetTimeSourceFor(fProducerNode.node,
 		fTimeSourceNode.node);
 	if (status != B_OK) {
 		ErrorAlert(B_TRANSLATE("Cannot set the time source for the video "
@@ -368,7 +368,7 @@ CodyCam::_SetUpNodes()
 		return status;
 	}
 
-	status = fMediaRoster->SetTimeSourceFor(fVideoConsumer->ID(), 
+	status = fMediaRoster->SetTimeSourceFor(fVideoConsumer->ID(),
 		fTimeSourceNode.node);
 	if (status != B_OK) {
 		ErrorAlert(B_TRANSLATE("Cannot set the time source for the video "
@@ -413,7 +413,7 @@ CodyCam::_SetUpNodes()
 		}
 	}
 
-	bigtime_t perf = timeSource->PerformanceTimeFor(real + latency 
+	bigtime_t perf = timeSource->PerformanceTimeFor(real + latency
 		+ initLatency);
 	timeSource->Release();
 
@@ -490,19 +490,19 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 	BMenuItem* menuItem;
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 
-	menuItem = new BMenuItem(B_TRANSLATE("Video settings"), 
+	menuItem = new BMenuItem(B_TRANSLATE("Video settings"),
 		new BMessage(msg_video), 'P');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem(B_TRANSLATE("Start video"), 
+	menuItem = new BMenuItem(B_TRANSLATE("Start video"),
 		new BMessage(msg_start), 'A');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
 
-	menuItem = new BMenuItem(B_TRANSLATE("Stop video"), 
+	menuItem = new BMenuItem(B_TRANSLATE("Stop video"),
 		new BMessage(msg_stop), 'O');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
@@ -516,7 +516,7 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem(B_TRANSLATE("Quit"), 
+	menuItem = new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(B_QUIT_REQUESTED), 'Q');
 	menuItem->SetTarget(be_app);
 	menu->AddItem(menuItem);
@@ -812,7 +812,7 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 	fLoginSetting = new StringValueSetting("Login", "loginID",
 		B_TRANSLATE("login ID expected"));
 
-	fPasswordSetting = new StringValueSetting("Password", 
+	fPasswordSetting = new StringValueSetting("Password",
 		B_TRANSLATE("password"), B_TRANSLATE("password expected"));
 
 	fDirectorySetting = new StringValueSetting("Directory", "web/images",
@@ -832,7 +832,7 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 		"unrecognized capture rate specified");
 
 	fUploadClientSetting = new EnumeratedStringValueSetting("UploadClient",
-		B_TRANSLATE("FTP"), &UploadClientAt, 
+		B_TRANSLATE("FTP"), &UploadClientAt,
 		B_TRANSLATE("upload client name expected"),
 		B_TRANSLATE("unrecognized upload client specified"));
 
@@ -883,10 +883,10 @@ VideoWindow::_QuitSettings()
 //	#pragma mark -
 
 
-ControlWindow::ControlWindow(const BRect& frame, BView* controls, 
+ControlWindow::ControlWindow(const BRect& frame, BView* controls,
 	media_node node)
 	:
-	BWindow(frame, B_TRANSLATE("Video settings"), B_TITLED_WINDOW, 
+	BWindow(frame, B_TRANSLATE("Video settings"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS)
 {
 	fView = controls;

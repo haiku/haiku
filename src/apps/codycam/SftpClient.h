@@ -44,7 +44,7 @@ public:
 			bool				Chmod(const string& path, const string& mod);
 
 			void				SetPassive(bool on);
-	
+
 private:
 			const char*			_GetLongReadText() const;
 			const char*			_GetReadText() const;

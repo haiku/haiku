@@ -69,7 +69,7 @@ SftpClient::PrintWorkingDir(string& dir)
 
 
 bool
-SftpClient::Connect(const string& server, const string& login, 
+SftpClient::Connect(const string& server, const string& login,
 	const string& passwd)
 {
 	bool rc = false;
@@ -88,7 +88,7 @@ SftpClient::Connect(const string& server, const string& login,
 	rc = SpawningUploadClient::Connect(server, login, passwd);
 	BString reply;
 	ssize_t len;
-	
+
 	if ((len = ReadReply(&reply)) < 0) {
 		fprintf(stderr, _GetLongReadText(), len);
 		return false;
@@ -96,7 +96,7 @@ SftpClient::Connect(const string& server, const string& login,
 	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst("Connecting to ") != 0)
 		return false;
-	
+
 	if ((len = ReadReply(&reply)) < 0) {
 		fprintf(stderr, _GetLongReadText(), len);
 		return false;
@@ -104,10 +104,10 @@ SftpClient::Connect(const string& server, const string& login,
 	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply.FindFirst(/*[pP]*/"assword:") < 0)
 		return false;
-	
+
 	write(OutputPipe(), passwd.c_str(), strlen(passwd.c_str()));
 	write(OutputPipe(), "\n", 1);
-	
+
 	if ((len = ReadReply(&reply)) < 0) {
 		fprintf(stderr, _GetLongReadText(), len);
 		return false;
@@ -115,7 +115,7 @@ SftpClient::Connect(const string& server, const string& login,
 	fprintf(stderr, _GetReplyText(), reply.String());
 	if (reply != "\n")
 		return false;
-	
+
 	if ((len = ReadReply(&reply)) < 0) {
 		fprintf(stderr, _GetLongReadText(), len);
 		return false;
@@ -175,7 +175,7 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 {
 	bool rc = false;
 	int len;
-	
+
 	// sftpd can't rename to an existing file...
 	BString cmd("rm");
 	cmd << " " << newPath.c_str() << "\n";

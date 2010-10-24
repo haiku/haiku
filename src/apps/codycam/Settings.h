@@ -10,7 +10,7 @@ class StringValueSetting : public SettingsArgvDispatcher {
 	// simple string setting
 public:
 								StringValueSetting(const char* name,
-									const char* defaultValue, 
+									const char* defaultValue,
 									const char* valueExpectedErrorString,
 									const char* wrongValueErrorString = "");
 
@@ -18,7 +18,7 @@ public:
 
 			void				ValueChanged(const char* newValue);
 			const char*			Value() const;
-	virtual const char*			Handle(const char *const *argv);	
+	virtual const char*			Handle(const char *const *argv);
 
 protected:
 	virtual	void				SaveSettingValue(Settings*);
@@ -46,7 +46,7 @@ public:
 									const char* wrongValueErrorString);
 
 			void				ValueChanged(const char* newValue);
-	virtual const char*			Handle(const char *const *argv);	
+	virtual const char*			Handle(const char *const *argv);
 
 private:
 			bool				_ValidateString(const char* string);
@@ -67,7 +67,7 @@ public:
 			void				ValueChanged(int32 newValue);
 			int32				Value() const;
 			void				GetValueAsString(char*) const;
-	virtual const char*			Handle(const char *const *argv);	
+	virtual const char*			Handle(const char *const *argv);
 
 protected:
 	virtual void				SaveSettingValue(Settings*);
@@ -89,7 +89,7 @@ public:
 	virtual						~BooleanValueSetting();
 
 			bool				Value() const;
-	virtual	const char*			Handle(const char *const *argv);	
+	virtual	const char*			Handle(const char *const *argv);
 
 protected:
 	virtual	void				SaveSettingValue(Settings *);

@@ -75,7 +75,7 @@ class SettingsArgvDispatcher {
 		virtual ~SettingsArgvDispatcher() {};
 
 		void SaveSettings(Settings* settings, bool onlyIfNonDefault);
-	
+
 		const char* Name() const
 		{
 			return fName;
@@ -85,7 +85,7 @@ class SettingsArgvDispatcher {
 			// override this adding an argv parser that reads in the
 			// values in argv format for this setting
 			// return a pointer to an error message or null if parsed OK
-	
+
 		bool HandleRectValue(BRect&, const char* const *argv,
 			bool printError = true);
 

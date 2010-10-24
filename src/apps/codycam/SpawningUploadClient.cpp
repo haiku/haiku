@@ -111,7 +111,7 @@ SpawningUploadClient::getpty(char *pty, char *tty)
 	static const char minor[] = "0123456789abcdef";
 	uint32 i, j;
 	int32 fd = -1;
-	
+
 	for (i = 0; i < sizeof(major); i++)
 	{
 		for (j = 0; j < sizeof(minor); j++)
@@ -125,7 +125,7 @@ SpawningUploadClient::getpty(char *pty, char *tty)
 			}
 		}
 	}
-	
+
 	return fd;
 }
 

@@ -35,13 +35,13 @@ StringValueSetting::~StringValueSetting()
 }
 
 
-void 
+void
 StringValueSetting::ValueChanged(const char* newValue)
 {
 	if (newValue == fValue)
 		// guard against self assingment
 		return;
-		
+
 	free(fValue);
 	fValue = strdup(newValue);
 }
@@ -54,7 +54,7 @@ StringValueSetting::Value() const
 }
 
 
-void 
+void
 StringValueSetting::SaveSettingValue(Settings* settings)
 {
 	printf("-----StringValueSetting::SaveSettingValue %s %s\n", Name(), fValue);
@@ -62,7 +62,7 @@ StringValueSetting::SaveSettingValue(Settings* settings)
 }
 
 
-bool 
+bool
 StringValueSetting::NeedsSaving() const
 {
 	// needs saving if different than default
@@ -73,10 +73,10 @@ StringValueSetting::NeedsSaving() const
 const char*
 StringValueSetting::Handle(const char *const *argv)
 {
-	if (!*++argv) 
+	if (!*++argv)
 		return fValueExpectedErrorString;
-	
-	ValueChanged(*argv);	
+
+	ValueChanged(*argv);
 	return 0;
 }
 
@@ -96,7 +96,7 @@ EnumeratedStringValueSetting::EnumeratedStringValueSetting(const char* name,
 }
 
 
-void 
+void
 EnumeratedStringValueSetting::ValueChanged(const char* newValue)
 {
 #if DEBUG
@@ -110,14 +110,14 @@ EnumeratedStringValueSetting::ValueChanged(const char* newValue)
 const char*
 EnumeratedStringValueSetting::Handle(const char *const *argv)
 {
-	if (!*++argv) 
+	if (!*++argv)
 		return fValueExpectedErrorString;
 
 	printf("---EnumeratedStringValueSetting::Handle %s %s\n", *(argv-1), *argv);
 	if (!_ValidateString(*argv))
 		return fWrongValueErrorString;
-	
-	ValueChanged(*argv);	
+
+	ValueChanged(*argv);
 	return 0;
 }
 
@@ -158,7 +158,7 @@ ScalarValueSetting::~ScalarValueSetting()
 }
 
 
-void 
+void
 ScalarValueSetting::ValueChanged(int32 newValue)
 {
 	ASSERT(newValue > fMin);
@@ -174,7 +174,7 @@ ScalarValueSetting::Value() const
 }
 
 
-void 
+void
 ScalarValueSetting::GetValueAsString(char* buffer) const
 {
 	sprintf(buffer, "%ld", fValue);
@@ -184,26 +184,26 @@ ScalarValueSetting::GetValueAsString(char* buffer) const
 const char*
 ScalarValueSetting::Handle(const char *const *argv)
 {
-	if (!*++argv) 
+	if (!*++argv)
 		return fValueExpectedErrorString;
 
 	int32 newValue = atoi(*argv);
 	if (newValue < fMin || newValue > fMax)
 		return fWrongValueErrorString;
 
-	fValue = newValue;	
+	fValue = newValue;
 	return 0;
 }
 
 
-void 
+void
 ScalarValueSetting::SaveSettingValue(Settings* settings)
 {
 	settings->Write("%d", fValue);
 }
 
 
-bool 
+bool
 ScalarValueSetting::NeedsSaving() const
 {
 	return fValue != fDefaultValue;
@@ -224,7 +224,7 @@ BooleanValueSetting::~BooleanValueSetting()
 }
 
 
-bool 
+bool
 BooleanValueSetting::Value() const
 {
 	return fValue;
@@ -252,7 +252,7 @@ BooleanValueSetting::Handle(const char *const *argv)
 }
 
 
-void 
+void
 BooleanValueSetting::SaveSettingValue(Settings* settings)
 {
 	settings->Write(fValue ? "on" : "off");

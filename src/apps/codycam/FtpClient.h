@@ -15,12 +15,12 @@ using std::string;
 /*
  * Definitions for the TELNET protocol. Snarfed from the BSD source.
  */
-#define IAC     255             
-#define DONT    254             
-#define DO      253             
-#define WONT    252             
-#define WILL    251             
-#define xEOF    236  
+#define IAC     255
+#define DONT    254
+#define DO      253
+#define WONT    252
+#define WILL    251
+#define xEOF    236
 
 
 class FtpClient : public FileUploadClient {
@@ -44,7 +44,7 @@ class FtpClient : public FileUploadClient {
 		bool Chmod(const string& path, const string& mod);
 
 		void SetPassive(bool on);
-	
+
 	protected:
 		enum {
 			ftp_complete = 1UL,

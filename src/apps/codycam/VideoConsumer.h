@@ -25,7 +25,7 @@ typedef struct {
 	char		fileNameText[64];
 	char		serverText[64];
 	char		loginText[64];
-	char		passwordText[64];	
+	char		passwordText[64];
 	char		directoryText[64];
 } ftp_msg_info;
 
@@ -80,10 +80,10 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 	private:
 		virtual	void ProducerDataStatus(const media_destination &forWhom,
 			int32 status, bigtime_t atMediaTime);
-						
+
 		virtual	status_t GetLatencyFor(const media_destination& forWhom,
 			bigtime_t* outLatency, media_node_id* outId);
-	
+
 		virtual	status_t Connected(const media_source& producer,
 			const media_destination& where, const media_format& withFormat,
 			media_input* outInput);
@@ -101,11 +101,11 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 		status_t CreateBuffers(const media_format& withFormat);
 
 		void DeleteBuffers();
-				
+
 		static status_t FtpRun(void* data);
 
 		void FtpThread();
-							
+
 		void UpdateFtpStatus(const char* status);
 
 		status_t LocalSave(char* filename, BBitmap* bitmap);
@@ -129,11 +129,11 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 		BBitmap*			fBitmap[3];
 		bool				fOurBuffers;
 		BBufferGroup*		fBuffers;
-		uint32				fBufferMap[3];	
+		uint32				fBufferMap[3];
 
 		BBitmap*			fFtpBitmap;
-		volatile bool		fTimeToFtp;	
-		volatile bool		fFtpComplete;	
+		volatile bool		fTimeToFtp;
+		volatile bool		fFtpComplete;
 
 		bigtime_t			fRate;
 		uint32				fImageFormat;
@@ -143,7 +143,7 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 		char				fFileNameText[64];
 		char				fServerText[64];
 		char				fLoginText[64];
-		char				fPasswordText[64];	
+		char				fPasswordText[64];
 		char				fDirectoryText[64];
 };
 

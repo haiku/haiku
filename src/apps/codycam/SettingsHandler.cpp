@@ -82,18 +82,18 @@ ArgvParser::~ArgvParser()
 }
 
 
-void 
+void
 ArgvParser::MakeArgvEmpty()
 {
 	// done with current argv, free it up
 	for (int32 index = 0; index < fArgc; index++)
 		delete fCurrentArgv[index];
-	
+
 	fArgc = 0;
 }
 
 
-status_t 
+status_t
 ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void* passThru)
 {
 	if (fArgc) {
@@ -111,7 +111,7 @@ ArgvParser::SendArgv(ArgvHandler argvHandlerFunc, void* passThru)
 }
 
 
-void 
+void
 ArgvParser::NextArgv()
 {
 	if (fSawBackslash) {
@@ -120,7 +120,7 @@ ArgvParser::NextArgv()
 	}
 	fCurrentArgs[++fCurrentArgsPos] = '\0';
 		// terminate current arg pos
-	
+
 	// copy it as a string to the current argv slot
 	fCurrentArgv[fArgc] = new char [strlen(fCurrentArgs) + 1];
 	strcpy(fCurrentArgv[fArgc], fCurrentArgs);
@@ -129,7 +129,7 @@ ArgvParser::NextArgv()
 }
 
 
-void 
+void
 ArgvParser::NextArgvIfNotEmpty()
 {
 	if (!fSawBackslash && fCurrentArgsPos < 0)
@@ -139,7 +139,7 @@ ArgvParser::NextArgvIfNotEmpty()
 }
 
 
-char 
+char
 ArgvParser::GetCh()
 {
 	if (fPos < 0 || fBuffer[fPos] == 0) {
@@ -153,8 +153,8 @@ ArgvParser::GetCh()
 }
 
 
-status_t 
-ArgvParser::EachArgv(const char* name, ArgvHandler argvHandlerFunc, 
+status_t
+ArgvParser::EachArgv(const char* name, ArgvHandler argvHandlerFunc,
 	void* passThru)
 {
 	ArgvParser parser(name);
@@ -162,7 +162,7 @@ ArgvParser::EachArgv(const char* name, ArgvHandler argvHandlerFunc,
 }
 
 
-status_t 
+status_t
 ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 	void* passThru)
 {
@@ -191,7 +191,7 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 				result = B_ERROR;
 				break;
 			}
-			fLineNo++; 
+			fLineNo++;
 			if (fSawBackslash) {
 				fSawBackslash = false;
 				continue;
@@ -202,7 +202,7 @@ ArgvParser::EachArgvPrivate(const char* name, ArgvHandler argvHandlerFunc,
 				break;
 			continue;
 		}
-		
+
 		if (fEatComment)
 			continue;
 
@@ -260,7 +260,7 @@ SettingsArgvDispatcher::SettingsArgvDispatcher(const char* name)
 }
 
 
-void 
+void
 SettingsArgvDispatcher::SaveSettings(Settings* settings, bool onlyIfNonDefault)
 {
 	if (!onlyIfNonDefault || NeedsSaving()) {
@@ -271,7 +271,7 @@ SettingsArgvDispatcher::SaveSettings(Settings* settings, bool onlyIfNonDefault)
 }
 
 
-bool 
+bool
 SettingsArgvDispatcher::HandleRectValue(BRect &result, const char* const *argv,
 	bool printError)
 {
@@ -303,7 +303,7 @@ SettingsArgvDispatcher::HandleRectValue(BRect &result, const char* const *argv,
 }
 
 
-void 
+void
 SettingsArgvDispatcher::WriteRectValue(Settings* setting, BRect rect)
 {
 	setting->Write("%d %d %d %d", (int32)rect.left, (int32)rect.top,
@@ -340,7 +340,7 @@ Settings::~Settings()
 {
 	for (int32 index = 0; index < fCount; index++)
 		delete fList[index];
-	
+
 	free(fList);
 }
 
@@ -410,7 +410,7 @@ Settings::TryReadingSettings()
 }
 
 
-void 
+void
 Settings::SaveSettings(bool onlyIfNonDefault)
 {
 	ASSERT(SettingsHandler());
@@ -418,13 +418,13 @@ Settings::SaveSettings(bool onlyIfNonDefault)
 }
 
 
-void 
+void
 Settings::_MakeSettingsDirectory(BDirectory *resultingSettingsDir)
 {
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) != B_OK)
 		return;
-	
+
 	// make sure there is a directory
 	path.Append(fSettingsDir);
 	mkdir(path.Path(), 0777);
@@ -432,7 +432,7 @@ Settings::_MakeSettingsDirectory(BDirectory *resultingSettingsDir)
 }
 
 
-void 
+void
 Settings::_SaveCurrentSettings(bool onlyIfNonDefault)
 {
 	BDirectory fSettingsDir;
@@ -445,7 +445,7 @@ Settings::_SaveCurrentSettings(bool onlyIfNonDefault)
 	// nuke old settings
 	BEntry entry(&fSettingsDir, fFileName);
 	entry.Remove();
-	
+
 	BFile prefs(&entry, O_RDWR | O_CREAT);
 	if (prefs.InitCheck() != B_OK)
 		return;
@@ -459,7 +459,7 @@ Settings::_SaveCurrentSettings(bool onlyIfNonDefault)
 }
 
 
-void 
+void
 Settings::Write(const char* format, ...)
 {
 	va_list args;
@@ -470,7 +470,7 @@ Settings::Write(const char* format, ...)
 }
 
 
-void 
+void
 Settings::VSWrite(const char* format, va_list arg)
 {
 	char buffer[2048];
