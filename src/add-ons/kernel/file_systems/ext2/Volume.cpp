@@ -497,7 +497,8 @@ Volume::_UnsupportedReadOnlyFeatures(ext2_super_block& superBlock)
 {
 	uint32 supportedReadOnly = EXT2_READ_ONLY_FEATURE_SPARSE_SUPER
 		| EXT2_READ_ONLY_FEATURE_LARGE_FILE
-		| EXT2_READ_ONLY_FEATURE_HUGE_FILE;
+		| EXT2_READ_ONLY_FEATURE_HUGE_FILE
+		| EXT2_READ_ONLY_FEATURE_EXTRA_ISIZE;
 	// TODO actually implement EXT2_READ_ONLY_FEATURE_SPARSE_SUPER when
 	// implementing superblock backup copies
 

@@ -479,36 +479,6 @@ Inode::Resize(Transaction& transaction, off_t size)
 
 
 status_t
-Inode::AttributeBlockReadAt(off_t pos, uint8* buffer, size_t* _length)
-{
-	TRACE("Inode::%s(%Ld, , %lu)\n", __FUNCTION__, pos, *_length);
-	size_t length = *_length;
-
-	if (!fAttributesBlock) {
-		uint32 block = Node().ExtendedAttributesBlock();
-
-		if (block == 0)
-			return B_ENTRY_NOT_FOUND;
-
-		TRACE("inode %Ld attributes at block %lu\n", ID(), block);
-		fAttributesBlock = (ext2_xattr_header*)block_cache_get(
-			GetVolume()->BlockCache(), block);
-	}
-
-	if (!fAttributesBlock)
-		return B_ENTRY_NOT_FOUND;
-
-	if (pos < 0LL || ((uint32)pos + length) > GetVolume()->BlockSize())
-		return ERANGE;
-
-	memcpy(buffer, ((uint8 *)fAttributesBlock) + (uint32)pos, length);
-
-	*_length = length;
-	return B_NO_ERROR;
-}
-
-
-status_t
 Inode::InitDirectory(Transaction& transaction, Inode* parent)
 {
 	TRACE("Inode::InitDirectory()\n");

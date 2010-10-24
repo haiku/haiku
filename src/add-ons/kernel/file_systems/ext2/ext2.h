@@ -65,7 +65,7 @@ struct ext2_super_block {
 	uint32	hash_seed[4];
 	uint8	default_hash_version;
 	uint8	_reserved1;
-	uint16	_reserved2;
+	uint16	group_descriptor_size;
 	uint32	default_mount_options;
 	uint32	first_meta_block_group;
 	uint32	fs_creation_time;
@@ -116,6 +116,8 @@ struct ext2_super_block {
 		{ return (ino_t)B_LENDIAN_TO_HOST_INT32(last_orphan); }
 	uint32 HashSeed(uint8 i) const
 		{ return B_LENDIAN_TO_HOST_INT32(hash_seed[i]); }
+	uint16 GroupDescriptorSize() const
+		{ return B_LENDIAN_TO_HOST_INT16(group_descriptor_size); }
 
 	void SetFreeInodes(uint32 freeInodes)
 		{ free_inodes = B_HOST_TO_LENDIAN_INT32(freeInodes); }
@@ -152,6 +154,9 @@ struct ext2_super_block {
 #define EXT2_READ_ONLY_FEATURE_LARGE_FILE		0x0002
 #define EXT2_READ_ONLY_FEATURE_BTREE_DIRECTORY	0x0004
 #define EXT2_READ_ONLY_FEATURE_HUGE_FILE		0x0008
+#define EXT2_READ_ONLY_FEATURE_GDT_CSUM			0x0010
+#define EXT2_READ_ONLY_FEATURE_DIR_NLINK		0x0020
+#define EXT2_READ_ONLY_FEATURE_EXTRA_ISIZE		0x0040
 
 // incompatible features
 #define EXT2_INCOMPATIBLE_FEATURE_COMPRESSION	0x0001
@@ -508,7 +513,7 @@ struct ext2_dir_entry {
 } _PACKED;
 
 // file types
-#define EXT2_TYPE_UNKOWN		0
+#define EXT2_TYPE_UNKNOWN		0
 #define EXT2_TYPE_FILE			1
 #define EXT2_TYPE_DIRECTORY		2
 #define EXT2_TYPE_CHAR_DEVICE	3

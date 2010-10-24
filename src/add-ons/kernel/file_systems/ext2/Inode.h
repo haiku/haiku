@@ -87,9 +87,6 @@ public:
 
 			status_t	Resize(Transaction& transaction, off_t size);
 
-			status_t	AttributeBlockReadAt(off_t pos, uint8 *buffer,
-							size_t *length);
-
 			ext2_inode&	Node() { return fNode; }
 
 			status_t	InitDirectory(Transaction& transaction, Inode* parent);
