@@ -128,7 +128,7 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp : folder
 	HAIKU_CATALOGS_SUBDIR on $(signature) = $(subdir) ;
 
 	local generatedCatalog
-		= [ FGristFiles $(sourceLanguage:E=en:S=.catalog) ] ;
+		= $(sourceLanguage:G=$(signature):E=en:S=.catalog) ;
 	MakeLocate $(generatedCatalog)
 		: [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(subdir) ] ;
 

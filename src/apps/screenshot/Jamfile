@@ -29,4 +29,7 @@ DoCatalogs screenshot :
 	x-vnd.haiku-screenshot-cli
 	:
 	Utility.cpp
+	:
+	:
+	: cli
 ;
