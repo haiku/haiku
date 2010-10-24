@@ -112,6 +112,7 @@ platform_start_kernel(void)
 extern "C" void
 platform_exit(void)
 {
+	ColdReboot();
 	// Terminate
 	//TODO
 	while (true) {}
