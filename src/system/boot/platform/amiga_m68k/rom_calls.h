@@ -1389,6 +1389,13 @@ struct InputEvent {
 
 #define IECODE_UP_PREFIX 0x80
 
+#define IECODE_KEY_UP		0x4c
+#define IECODE_KEY_DOWN		0x4d
+#define IECODE_KEY_LEFT		0x4f
+#define IECODE_KEY_RIGHT	0x4e
+#define IECODE_KEY_PAGE_UP			0x67
+#define IECODE_KEY_PAGE_DOWN		0x66
+
 #ifdef __cplusplus
 }
 #endif

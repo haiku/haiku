@@ -39,6 +39,9 @@ class KeyboardDevice : public ExecDevice {
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
+		int	WaitForKey();
+		status_t	ReadEvent(struct InputEvent *event);
+
 	protected:
 };
 
@@ -144,31 +147,85 @@ KeyboardDevice::Open()
 }
 
 
+status_t
+KeyboardDevice::ReadEvent(struct InputEvent *event)
+{
+	fIOStdReq->io_Command = KBD_READEVENT;
+	fIOStdReq->io_Flags = IOF_QUICK;
+	fIOStdReq->io_Length = sizeof(struct InputEvent);
+	fIOStdReq->io_Data = event;
+	status_t err = Do();
+	if (err < B_OK)
+		return err;
+	/*
+	dprintf("key: class %d sclass %d code %d 0x%02x qual 0x%04x\n", 
+		event->ie_Class, event->ie_SubClass,
+		event->ie_Code, event->ie_Code, event->ie_Qualifier);
+	*/
+	return B_OK;
+}
+
+
 ssize_t
 KeyboardDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	struct InputEvent event;
 	ssize_t actual;
+	status_t err;
 	
 	do {
-		fIOStdReq->io_Command = KBD_READEVENT;
-		fIOStdReq->io_Flags = IOF_QUICK;
-		fIOStdReq->io_Length = sizeof(event);
-		fIOStdReq->io_Data = &event;
-		status_t err = Do();
+		err = ReadEvent(&event);
 		if (err < B_OK)
 			return err;
 	} while (event.ie_Code > IECODE_UP_PREFIX);
 
-	dprintf("key: class %d sclass %d code %d qual 0x%04x\n", event.ie_Class, event.ie_SubClass,
-		event.ie_Code, event.ie_Qualifier);
-	
 	actual = MapRawKey(&event, (char *)buffer, bufferSize, NULL);
-	dprintf("%s actual %d\n", __FUNCTION__, actual);
+	//dprintf("%s actual %d\n", __FUNCTION__, actual);
 	if (actual > 0) {
 		return actual;
 	}
 	return B_ERROR;
+}
+
+
+int
+KeyboardDevice::WaitForKey()
+{
+	struct InputEvent event;
+	char ascii;
+	ssize_t actual;
+	status_t err;
+	
+	do {
+		err = ReadEvent(&event);
+		if (err < B_OK)
+			return err;
+	} while (event.ie_Code < IECODE_UP_PREFIX);
+
+	event.ie_Code &= ~IECODE_UP_PREFIX;
+
+	switch (event.ie_Code) {
+		case IECODE_KEY_UP:
+			return TEXT_CONSOLE_KEY_UP;
+		case IECODE_KEY_DOWN:
+			return TEXT_CONSOLE_KEY_DOWN;
+		case IECODE_KEY_LEFT:
+			return TEXT_CONSOLE_KEY_LEFT;
+		case IECODE_KEY_RIGHT:
+			return TEXT_CONSOLE_KEY_RIGHT;
+		case IECODE_KEY_PAGE_UP:
+			return TEXT_CONSOLE_KEY_PAGE_UP;
+		case IECODE_KEY_PAGE_DOWN:
+			return TEXT_CONSOLE_KEY_PAGE_DOWN;
+		default:
+			break;
+	}
+	
+	actual = MapRawKey(&event, &ascii, 1, NULL);
+	//dprintf("%s actual %d\n", __FUNCTION__, actual);
+	if (actual > 0)
+		return ascii;
+	return TEXT_CONSOLE_NO_KEY;
 }
 
 
@@ -314,10 +371,8 @@ console_set_color(int32 foreground, int32 background)
 int
 console_wait_for_key(void)
 {
-	//TODO
-	char key;
-	sInput.Read(&key, 1);
-	dprintf("k: %02x '%c'\n", key, key);
-	return 0;
+	int key = sInput.WaitForKey();
+	//dprintf("k: %08x '%c'\n", key, key);
+	return key;
 }
 
