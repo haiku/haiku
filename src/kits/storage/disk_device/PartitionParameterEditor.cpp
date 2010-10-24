@@ -54,7 +54,7 @@ BPartitionParameterEditor::View()
 bool
 BPartitionParameterEditor::FinishedEditing()
 {
-	return true;
+	return false;
 }
 
 
@@ -89,7 +89,7 @@ BPartitionParameterEditor::GetParameters(BString* parameters)
 status_t
 BPartitionParameterEditor::PartitionTypeChanged(const char* type)
 {
-	return B_OK;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -105,5 +105,6 @@ BPartitionParameterEditor::PartitionTypeChanged(const char* type)
 status_t
 BPartitionParameterEditor::PartitionNameChanged(const char* name)
 {
-	return B_OK;
+	return B_NOT_SUPPORTED;
 }
+

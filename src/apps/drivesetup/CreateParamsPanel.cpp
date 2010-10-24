@@ -265,9 +265,11 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 		)
 	);
 
-	parent->GetChildCreationParameterEditor(NULL, &fEditor);
-	if (fEditor)
+	status_t err = parent->GetParameterEditor(B_CREATE_PARAMETER_EDITOR, &fEditor);
+	if (err == B_OK && fEditor != NULL)
 		AddChild(fEditor->View());
+	else
+		fEditor = NULL;
 
 	BButton* okButton = new BButton(B_TRANSLATE("Create"),
 		new BMessage(MSG_OK));
@@ -281,3 +283,4 @@ CreateParamsPanel::_CreateViewControls(BPartition* parent, off_t offset,
 	AddToSubset(fWindow);
 	layout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
+

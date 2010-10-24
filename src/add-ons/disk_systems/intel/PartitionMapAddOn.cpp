@@ -302,17 +302,19 @@ PartitionMapHandle::GetPartitioningInfo(BPartitioningInfo* info)
 
 
 status_t
-PartitionMapHandle::GetChildCreationParameterEditor(const char* type,
+PartitionMapHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
 {
 	*editor = NULL;
-
-	try {
-		*editor = new PrimaryPartitionEditor();
-	} catch (std::bad_alloc) {
-		return B_NO_MEMORY;
+	if (type == B_CREATE_PARAMETER_EDITOR) {
+		try {
+			*editor = new PrimaryPartitionEditor();
+		} catch (std::bad_alloc) {
+			return B_NO_MEMORY;
+		}
+		return B_OK;
 	}
-	return B_OK;
+	return B_NOT_SUPPORTED;
 }
 
 

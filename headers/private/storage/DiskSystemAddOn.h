@@ -5,6 +5,7 @@
 #ifndef _DISK_SYSTEM_ADD_ON_H
 #define _DISK_SYSTEM_ADD_ON_H
 
+#include <DiskDeviceDefs.h>
 #include <String.h>
 #include <SupportDefs.h>
 
@@ -31,9 +32,6 @@ public:
 
 	virtual	bool				CanInitialize(
 									const BMutablePartition* partition);
-	virtual	status_t			GetInitializationParameterEditor(
-									const BMutablePartition* partition,
-									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);
@@ -41,6 +39,9 @@ public:
 									const char* name, const char* parameters,
 									BPartitionHandle** handle);
 
+	virtual	status_t			GetParameterEditor(
+									B_PARAMETER_EDITOR_TYPE type,
+									BPartitionParameterEditor** editor);
 	virtual	status_t			GetTypeForContentType(const char* contentType,
 									BString* type);
 	virtual	bool				IsSubSystemFor(const BMutablePartition* child);
@@ -108,9 +109,7 @@ public:
 
 	virtual	status_t			GetContentParameterEditor(
 									BPartitionParameterEditor** editor);
-	virtual	status_t			GetParameterEditor(
-									const BMutablePartition* child,
-									BPartitionParameterEditor** editor);
+
 	virtual	status_t			ValidateSetContentParameters(
 									const char* parameters);
 	virtual	status_t			ValidateSetParameters(
@@ -120,8 +119,8 @@ public:
 	virtual	status_t			SetParameters(BMutablePartition* child,
 									const char* parameters);
 
-	virtual	status_t			GetChildCreationParameterEditor(
-									const char* type,
+	virtual	status_t			GetParameterEditor(
+									B_PARAMETER_EDITOR_TYPE type,
 									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateCreateChild(off_t* offset,
 									off_t* size, const char* type,

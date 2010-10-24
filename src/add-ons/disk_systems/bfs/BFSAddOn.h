@@ -16,12 +16,12 @@ public:
 	virtual	status_t			CreatePartitionHandle(
 									BMutablePartition* partition,
 									BPartitionHandle** handle);
+	virtual	status_t			GetParameterEditor(
+									B_PARAMETER_EDITOR_TYPE type,
+									BPartitionParameterEditor** editor);
 
 	virtual	bool				CanInitialize(
 									const BMutablePartition* partition);
-	virtual	status_t			GetInitializationParameterEditor(
-									const BMutablePartition* partition,
-									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);

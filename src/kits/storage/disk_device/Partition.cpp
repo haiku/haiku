@@ -1083,13 +1083,13 @@ BPartition::CanEditParameters() const
 
 // GetParameterEditor
 status_t
-BPartition::GetParameterEditor(BPartitionParameterEditor** editor)
+BPartition::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
+	BPartitionParameterEditor** editor)
 {
-	BPartition* parent = Parent();
-	if (!parent || !fDelegate)
+	if (!fDelegate)
 		return B_NO_INIT;
 
-	return parent->fDelegate->GetParameterEditor(fDelegate, editor);
+	return fDelegate->GetParameterEditor(type, editor);
 }
 
 
@@ -1112,17 +1112,6 @@ BPartition::CanEditContentParameters(bool* whileMounted) const
 	return _SupportsOperation(B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS,
 		B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED,
 		whileMounted);
-}
-
-
-// GetContentParameterEditor
-status_t
-BPartition::GetContentParameterEditor(BPartitionParameterEditor** editor)
-{
-	if (!fDelegate)
-		return B_NO_INIT;
-
-	return fDelegate->GetContentParameterEditor(editor);
 }
 
 
@@ -1190,18 +1179,6 @@ BPartition::CanInitialize(const char* diskSystem) const
 }
 
 
-// GetInitializationParameterEditor
-status_t
-BPartition::GetInitializationParameterEditor(const char* diskSystem,
-	BPartitionParameterEditor** editor) const
-{
-	if (!fDelegate)
-		return B_NO_INIT;
-
-	return fDelegate->GetInitializationParameterEditor(diskSystem, editor);
-}
-
-
 // ValidateInitialize
 status_t
 BPartition::ValidateInitialize(const char* diskSystem, BString* name,
@@ -1240,18 +1217,6 @@ bool
 BPartition::CanCreateChild() const
 {
 	return _SupportsChildOperation(NULL, B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD);
-}
-
-
-// GetChildCreationParameterEditor
-status_t
-BPartition::GetChildCreationParameterEditor(const char* type,
-	BPartitionParameterEditor** editor) const
-{
-	if (!fDelegate)
-		return B_NO_INIT;
-
-	return fDelegate->GetChildCreationParameterEditor(type, editor);
 }
 
 

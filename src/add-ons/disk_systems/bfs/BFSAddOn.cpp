@@ -96,21 +96,6 @@ BFSAddOn::CanInitialize(const BMutablePartition* partition)
 
 
 status_t
-BFSAddOn::GetInitializationParameterEditor(const BMutablePartition* partition,
-	BPartitionParameterEditor** editor)
-{
-	*editor = NULL;
-
-	try {
-		*editor = new InitializeBFSEditor();
-	} catch (std::bad_alloc) {
-		return B_NO_MEMORY;
-	}
-	return B_OK;
-}
-
-
-status_t
 BFSAddOn::ValidateInitialize(const BMutablePartition* partition, BString* name,
 	const char* parameterString)
 {
@@ -170,6 +155,23 @@ BFSAddOn::Initialize(BMutablePartition* partition, const char* name,
 	*_handle = handleDeleter.Detach();
 
 	return B_OK;
+}
+
+
+status_t
+BFSAddOn::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
+	BPartitionParameterEditor** editor)
+{
+	*editor = NULL;
+	if (type == B_INITIALIZE_PARAMETER_EDITOR) {
+		try {
+			*editor = new InitializeBFSEditor();
+		} catch (std::bad_alloc) {
+			return B_NO_MEMORY;
+		}
+		return B_OK;
+	}
+	return B_NOT_SUPPORTED;
 }
 
 

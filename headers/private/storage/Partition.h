@@ -3,6 +3,7 @@
  * Copyright 2003, Tyler Akidau, haiku@akidau.net.
  * Distributed under the terms of the MIT License.
  */
+
 #ifndef _PARTITION_H
 #define _PARTITION_H
 
@@ -129,13 +130,12 @@ public:
 
 			bool				CanEditParameters() const;
 			status_t			GetParameterEditor(
+									B_PARAMETER_EDITOR_TYPE type,
 									BPartitionParameterEditor** editor);
 			status_t			SetParameters(const char* parameters);
 
 			bool				CanEditContentParameters(
 									bool* whileMounted = NULL) const;
-			status_t			GetContentParameterEditor(
-									BPartitionParameterEditor** editor);
 			status_t			SetContentParameters(const char* parameters);
 
 			status_t			GetNextSupportedType(int32 *cookie,
@@ -151,9 +151,6 @@ public:
 			bool				IsSubSystem(const char* diskSystem) const;
 
 			bool				CanInitialize(const char* diskSystem) const;
-			status_t			GetInitializationParameterEditor(
-									const char* system,
-									BPartitionParameterEditor** editor) const;
 			status_t			ValidateInitialize(const char* diskSystem,
 									BString* name, const char* parameters);
 			status_t			Initialize(const char* diskSystem,
@@ -163,9 +160,6 @@ public:
 	// Modification of child partitions
 
 			bool				CanCreateChild() const;
-			status_t			GetChildCreationParameterEditor(
-									const char* type,
-									BPartitionParameterEditor** editor) const;
 			status_t			ValidateCreateChild(off_t* start, off_t* size,
 									const char* type, BString* name,
 									const char* parameters) const;

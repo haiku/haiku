@@ -21,9 +21,6 @@ public:
 
 	virtual	bool				CanInitialize(
 									const BMutablePartition* partition);
-	virtual	status_t			GetInitializationParameterEditor(
-									const BMutablePartition* partition,
-									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateInitialize(
 									const BMutablePartition* partition,
 									BString* name, const char* parameters);
@@ -52,8 +49,8 @@ public:
 
 	virtual	status_t			GetPartitioningInfo(BPartitioningInfo* info);
 
-	virtual	status_t			GetChildCreationParameterEditor(
-									const char* type,
+	virtual	status_t			GetParameterEditor(
+									B_PARAMETER_EDITOR_TYPE type,
 									BPartitionParameterEditor** editor);
 	virtual	status_t			ValidateCreateChild(off_t* offset,
 									off_t* size, const char* type,

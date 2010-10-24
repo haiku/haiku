@@ -26,7 +26,7 @@
 #include "DiskDeviceJob.h"
 #include "DiskDeviceJobGenerator.h"
 #include "DiskDeviceJobQueue.h"
-#include "DiskSystemAddOnManager.h"
+#include <DiskSystemAddOnManager.h>
 
 
 //#define TRACE_DISK_DEVICE

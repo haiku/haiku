@@ -16,6 +16,8 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <DiskSystemAddOn.h>
+#include <DiskSystemAddOnManager.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <Locale.h>
@@ -96,9 +98,21 @@ InitParamsPanel::InitParamsPanel(BWindow* window, const BString& diskSystem,
 
 	fOkButton = new BButton(B_TRANSLATE("Initialize"), new BMessage(MSG_OK));
 
-	partition->GetInitializationParameterEditor(diskSystem.String(),
-		&fEditor);
+	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
+	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
+	if (addOn) {
+		// put the add-on
+		manager->PutAddOn(addOn);
 
+		status_t err = addOn->GetParameterEditor(B_INITIALIZE_PARAMETER_EDITOR, &fEditor);
+		if (err != B_OK) {
+			fEditor = NULL;
+		}
+	} else {
+		fEditor = NULL;
+	}
+
+	// TODO: fEditor should be checked for NULL before adding.
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	const float spacing = be_control_look->DefaultItemSpacing();
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
@@ -197,6 +211,9 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 
 	if (!Lock())
 		return GO_CANCELED;
+
+	if (fEditor == NULL)
+		fReturnValue = B_BAD_VALUE;
 
 	if (fReturnValue == GO_SUCCESS) {
 		if (fEditor->FinishedEditing()) {

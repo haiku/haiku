@@ -98,16 +98,6 @@ ExtendedPartitionAddOn::CanInitialize(const BMutablePartition* partition)
 
 
 status_t
-ExtendedPartitionAddOn::GetInitializationParameterEditor(
-	const BMutablePartition* partition, BPartitionParameterEditor** editor)
-{
-	// Nothing to edit, really.
-	*editor = NULL;
-	return B_OK;
-}
-
-
-status_t
 ExtendedPartitionAddOn::ValidateInitialize(const BMutablePartition* partition,
 	BString* name, const char* parameters)
 {
@@ -317,11 +307,11 @@ ExtendedPartitionHandle::GetPartitioningInfo(BPartitioningInfo* info)
 
 
 status_t
-ExtendedPartitionHandle::GetChildCreationParameterEditor(const char* type,
+ExtendedPartitionHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
 {
 	*editor = NULL;
-	return B_OK;
+	return B_NOT_SUPPORTED;
 }
 
 

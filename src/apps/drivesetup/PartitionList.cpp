@@ -221,7 +221,10 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(kUnavailableString), kFilesystemColumn);
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	} else {
-		SetField(new BStringField(partition->Type()), kFilesystemColumn);
+		if (partition->ContainsFileSystem())
+			SetField(new BStringField(partition->Type()), kFilesystemColumn);
+		else
+			SetField(new BStringField(kUnavailableString), kFilesystemColumn);		
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	}
 

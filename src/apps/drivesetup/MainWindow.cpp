@@ -575,9 +575,13 @@ MainWindow::_UpdateMenus(BDiskDevice* disk,
 
 		// Mount items
 		if (partition) {
+			BDiskSystem partitionDiskSystem;
+			partition->GetDiskSystem(&partitionDiskSystem);
 			fInitMenu->SetEnabled(!partition->IsMounted()
 				&& !partition->IsReadOnly()
-				&& partition->Device()->HasMedia());
+				&& partition->Device()->HasMedia()
+				// Check if the current disk system allows initialzation.
+				&& partition->CanInitialize(partitionDiskSystem.PrettyName()));
 
 			fDeleteMI->SetEnabled(!partition->IsMounted()
 				&& !partition->IsDevice());

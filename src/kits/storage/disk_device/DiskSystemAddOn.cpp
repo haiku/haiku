@@ -5,6 +5,7 @@
 
 #include <DiskSystemAddOn.h>
 
+#include <DiskDeviceDefs.h>
 #include <Errors.h>
 
 
@@ -51,8 +52,8 @@ BDiskSystemAddOn::CanInitialize(const BMutablePartition* partition)
 
 // GetInitializationParameterEditor
 status_t
-BDiskSystemAddOn::GetInitializationParameterEditor(
-	const BMutablePartition* partition, BPartitionParameterEditor** editor)
+BDiskSystemAddOn::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
+	BPartitionParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -305,7 +306,7 @@ BPartitionHandle::GetContentParameterEditor(BPartitionParameterEditor** editor)
 
 // GetParameterEditor
 status_t
-BPartitionHandle::GetParameterEditor(const BMutablePartition* child,
+BPartitionHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
@@ -341,15 +342,6 @@ BPartitionHandle::SetContentParameters(const char* parameters)
 status_t
 BPartitionHandle::SetParameters(BMutablePartition* child,
 	const char* parameters)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-// GetChildCreationParameterEditor
-status_t
-BPartitionHandle::GetChildCreationParameterEditor(const char* type,
-	BPartitionParameterEditor** editor)
 {
 	return B_NOT_SUPPORTED;
 }

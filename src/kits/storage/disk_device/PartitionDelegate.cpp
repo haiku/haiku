@@ -8,9 +8,7 @@
 #include <stdio.h>
 
 #include <DiskSystemAddOn.h>
-
-#include "DiskSystemAddOnManager.h"
-
+#include <DiskSystemAddOnManager.h>
 
 //#define TRACE_PARTITION_DELEGATE
 #undef TRACE
@@ -336,31 +334,6 @@ BPartition::Delegate::SetType(Delegate* child, const char* type)
 }
 
 
-// GetContentParameterEditor
-status_t
-BPartition::Delegate::GetContentParameterEditor(
-	BPartitionParameterEditor** editor) const
-{
-	if (!fPartitionHandle)
-		return B_NO_INIT;
-
-	return fPartitionHandle->GetContentParameterEditor(editor);
-}
-
-
-// GetParameterEditor
-status_t
-BPartition::Delegate::GetParameterEditor(Delegate* child,
-	BPartitionParameterEditor** editor) const
-{
-	if (!fPartitionHandle || !child)
-		return B_NO_INIT;
-
-	return fPartitionHandle->GetParameterEditor(&child->fMutablePartition,
-		editor);
-}
-
-
 // SetContentParameters
 status_t
 BPartition::Delegate::SetContentParameters(const char* parameters)
@@ -425,6 +398,12 @@ BPartition::Delegate::IsSubSystem(Delegate* child, const char* diskSystem) const
 bool
 BPartition::Delegate::CanInitialize(const char* diskSystem) const
 {
+	// HACK TO HELP BLANK PARTITION'S BECOME INITIALIZED.
+	if (diskSystem == NULL)
+		return true;
+	if (strlen(diskSystem) < 1)
+		return true;
+
 	// get the disk system add-on
 	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
 	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
@@ -432,27 +411,6 @@ BPartition::Delegate::CanInitialize(const char* diskSystem) const
 		return false;
 
 	bool result = addOn->CanInitialize(&fMutablePartition);
-
-	// put the add-on
-	manager->PutAddOn(addOn);
-
-	return result;
-}
-
-
-// GetInitializationParameterEditor
-status_t
-BPartition::Delegate::GetInitializationParameterEditor(
-	const char* diskSystem, BPartitionParameterEditor** editor) const
-{
-	// get the disk system add-on
-	DiskSystemAddOnManager* manager = DiskSystemAddOnManager::Default();
-	BDiskSystemAddOn* addOn = manager->GetAddOn(diskSystem);
-	if (!addOn)
-		return B_ENTRY_NOT_FOUND;
-
-	status_t result = addOn->GetInitializationParameterEditor(
-		&fMutablePartition, editor);
 
 	// put the add-on
 	manager->PutAddOn(addOn);
@@ -537,15 +495,15 @@ BPartition::Delegate::GetPartitioningInfo(BPartitioningInfo* info)
 }
 
 
-// GetChildCreationParameterEditor
+// GetParameterEditor
 status_t
-BPartition::Delegate::GetChildCreationParameterEditor(const char* type,
+BPartition::Delegate::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor) const
 {
 	if (!fPartitionHandle)
 		return B_NO_INIT;
 
-	return fPartitionHandle->GetChildCreationParameterEditor(type, editor);
+	return fPartitionHandle->GetParameterEditor(type, editor);
 }
 
 

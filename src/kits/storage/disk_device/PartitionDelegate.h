@@ -5,6 +5,7 @@
 #ifndef _PARTITION_DELEGATE_H
 #define _PARTITION_DELEGATE_H
 
+#include <DiskSystemAddOn.h>
 #include <MutablePartition.h>
 #include <Partition.h>
 
@@ -66,23 +67,19 @@ public:
 									const char* type) const;
 			status_t			SetType(Delegate* child, const char* type);
 
-			status_t			GetContentParameterEditor(
-									BPartitionParameterEditor** editor) const;
-			status_t			GetParameterEditor(Delegate* child,
-									BPartitionParameterEditor** editor) const;
 			status_t			SetContentParameters(const char* parameters);
 			status_t			SetParameters(Delegate* child,
 									const char* parameters);
 
+			status_t			GetParameterEditor(
+									B_PARAMETER_EDITOR_TYPE type,
+									BPartitionParameterEditor** editor) const;
 			status_t			GetNextSupportedChildType(Delegate* child,
 									int32 *cookie, BString* type) const;
 			bool				IsSubSystem(Delegate* child,
 									const char* diskSystem) const;
 
 			bool				CanInitialize(const char* diskSystem) const;
-			status_t			GetInitializationParameterEditor(
-									const char* system,
-									BPartitionParameterEditor** editor) const;
 			status_t			ValidateInitialize(const char* diskSystem,
 									BString* name, const char* parameters);
 			status_t			Initialize(const char* diskSystem,
@@ -94,9 +91,6 @@ public:
 
 			status_t			GetPartitioningInfo(BPartitioningInfo* info);
 
-			status_t			GetChildCreationParameterEditor(
-									const char* system,
-									BPartitionParameterEditor** editor) const;
 			status_t			ValidateCreateChild(off_t* start, off_t* size,
 									const char* type, BString* name,
 									const char* parameters) const;
@@ -118,3 +112,4 @@ private:
 
 
 #endif	// _PARTITION_DELEGATE_H
+
