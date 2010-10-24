@@ -15,10 +15,13 @@
 
 #include <syscalls.h>
 
+#include "node_monitor_private.h"
+
+
 // TODO: Tests!
 
 
-// watch_node
+// watch_volume
 /*!	\brief Subscribes a target to watch node changes on a volume.
 
 	Depending of \a flags the action performed by this function varies:
@@ -32,11 +35,13 @@
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 status_t
-watch_volume(const dev_t volume, uint32 flags, BMessenger target)
+watch_volume(dev_t volume, uint32 flags, BMessenger target)
 {
 	if ((flags | B_WATCH_NAME) == 0 && (flags | B_WATCH_STAT)
 		&& (flags | B_WATCH_ATTR))
 		return B_BAD_VALUE;
+
+	flags |= B_WATCH_VOLUME;
 
 	BMessenger::Private messengerPrivate(target);
 	port_id port = messengerPrivate.Port();
@@ -46,7 +51,7 @@ watch_volume(const dev_t volume, uint32 flags, BMessenger target)
 
 
 status_t
-watch_volume(const dev_t volume, uint32 flags, const BHandler *handler,
+watch_volume(dev_t volume, uint32 flags, const BHandler *handler,
 	const BLooper *looper)
 {
 	return watch_volume(volume, flags, BMessenger(handler, looper));

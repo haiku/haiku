@@ -83,9 +83,8 @@ class BLooper;
 class BHandler;
 
 
-extern status_t watch_volume(const dev_t volume, uint32 flags,
-					BMessenger target);
-extern status_t watch_volume(const dev_t volume, uint32 flags, 
+extern status_t watch_volume(dev_t volume, uint32 flags, BMessenger target);
+extern status_t watch_volume(dev_t volume, uint32 flags,
 					const BHandler *handler, const BLooper *looper = NULL);
 
 extern status_t watch_node(const node_ref *node, uint32 flags,
