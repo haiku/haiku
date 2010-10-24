@@ -6,7 +6,6 @@
 
 #include "FormatSettingsView.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <Alert.h>
@@ -14,7 +13,8 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
-#include <Country.h>
+#include <GridLayout.h>
+#include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
@@ -29,6 +29,7 @@
 #include <ScrollView.h>
 #include <ScrollBar.h>
 #include <SeparatorView.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
 #include <TextControl.h>
@@ -44,446 +45,243 @@ using BPrivate::gMutableLocaleRoster;
 #define B_TRANSLATE_CONTEXT "TimeFormatSettings"
 
 
-class DateMenuItem: public BMenuItem {
-public:
-	DateMenuItem(const char* label, const char* code, BMenuField* field)
-		:
-		BMenuItem(label, _MenuMessage(code, field))
-	{
-		fICUCode = code;
-	}
-
-	const BString& ICUCode() const
-	{
-		return fICUCode;
-	}
-
-private:
-	static BMessage* _MenuMessage(const char* format, BMenuField* field)
-	{
-		BMessage* msg = new BMessage(kMenuMessage);
-		msg->AddPointer("dest", field);
-		msg->AddString("format", format);
-
-		return msg;
-	}
-
-private:
-	BString			fICUCode;
-};
-
-
-void
-CreateDateMenu(BMenuField** field, bool longFormat = true)
-{
-	BMenu* menu = new BMenu("");
-	*field = new BMenuField("", menu);
-
-	BPopUpMenu* dayMenu = new BPopUpMenu(B_TRANSLATE("Day"));
-	// Not all available ICU settings are listed here. It's possible to add some
-	// other things if you ever need.
-	menu->AddItem(dayMenu);
-		dayMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Day in month"), "d", *field));
-		dayMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Day in month (2 digits)"), "dd", *field));
-		/*
-		dayMenu->AddItem(new DateMenuItem(B_TRANSLATE("Day in year"),
-			"D", *field));
-		dayMenu->AddItem(new DateMenuItem(B_TRANSLATE("Day in year (2 digits)"),
-			"DD", *field));
-		dayMenu->AddItem(new DateMenuItem(B_TRANSLATE("Day in year (3 digits)"),
-			"DDD", *field));
-		*/
-		dayMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Day of week"), "e", *field));
-		// dayMenu->AddItem(new DateMenuItem("Day of week (short text)", "eee",
-		//	*field));
-		// dayMenu->AddItem(new DateMenuItem("Day of week (full text)", "eeee",
-		//	*field));
-		dayMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Day of week (short name)"), "E", *field));
-		dayMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Day of week (name)"), "EEEE", *field));
-		dayMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Day of week in month"), "F", *field));
-		// dayMenu->AddItem(new DateMenuItem(
-		//	B_TRANSLATE("julian day"), "g", *field));
-		// dayMenu->AddItem(new BMenuItem("c", msg));
-	BPopUpMenu* monthMenu = new BPopUpMenu(B_TRANSLATE("Month"));
-	menu->AddItem(monthMenu);
-		monthMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Month number"), "M", *field));
-		monthMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Month number (2 digits)"), "MM", *field));
-		monthMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Month name"), "MMMM", *field));
-		// monthMenu->AddItem(new DateMenuItem("L", "L", *field));
-	BPopUpMenu* yearMenu = new BPopUpMenu(B_TRANSLATE("Year"));
-	menu->AddItem(yearMenu);
-		// And here is some ICU kludge... sorry about that.
-		if (longFormat)
-			yearMenu->AddItem(new DateMenuItem(
-				B_TRANSLATE("Year"), "y", *field));
-		else {
-			yearMenu->AddItem(new DateMenuItem(
-				B_TRANSLATE("Year (4 digits)"), "yyyy", *field));
-		}
-		yearMenu->AddItem(new DateMenuItem(
-			B_TRANSLATE("Year (2 digits)"), "yy", *field));
-		// yearMenu->AddItem(new DateMenuItem("Y", "Y", *field));
-		// yearMenu->AddItem(new DateMenuItem("u", "u", *field));
-}
-
-
-bool
-IsSpecialDateChar(char charToTest)
-{
-	static const char* specials = "dDeEFgMLyYu";
-	for (int i = 0; i < 11; i++)
-		if (charToTest == specials[i])
-			return true;
-	return false;
-}
-
 // #pragma mark -
 
 
-FormatView::FormatView(const BLocale& locale)
+FormatSettingsView::FormatSettingsView()
 	:
-	BView("WindowsSettingsView", B_FRAME_EVENTS),
-	fLocale(locale)
+	BView("WindowsSettingsView", B_FRAME_EVENTS)
 {
+	fUseLanguageStringsCheckBox = new BCheckBox(
+		B_TRANSLATE("Use month/day-names from preferred language"),
+		new BMessage(kStringsLanguageChange));
+
+	BStringView* fullDateLabel
+		= new BStringView("", B_TRANSLATE("Full format:"));
+	fullDateLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* longDateLabel
+		= new BStringView("", B_TRANSLATE("Long format:"));
+	longDateLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* mediumDateLabel
+		= new BStringView("", B_TRANSLATE("Medium format:"));
+	mediumDateLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* shortDateLabel
+		= new BStringView("", B_TRANSLATE("Short format:"));
+	shortDateLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+
+	fFullDateExampleView = new BStringView("", "");
+	fFullDateExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 	fLongDateExampleView = new BStringView("", "");
-
-	for (int i = 0; i < 4; i++) {
-		CreateDateMenu(&fLongDateMenu[i]);
-		fLongDateSeparator[i] = new BTextControl("", "", "",
-			new BMessage(kSettingsContentsModified));
-		fLongDateSeparator[i]->SetModificationMessage(
-			new BMessage(kSettingsContentsModified));
-	}
-
+	fLongDateExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	fMediumDateExampleView = new BStringView("", "");
+	fMediumDateExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 	fShortDateExampleView = new BStringView("", "");
+	fShortDateExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
-	for (int i = 0; i < 3; i++) {
-		CreateDateMenu(&fDateMenu[i], false);
-	}
-
-	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Separator"));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("None"),
-		new BMessage(kSettingsContentsModified)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Space"),
-		new BMessage(kSettingsContentsModified)));
-	menu->AddItem(new BMenuItem("-", new BMessage(kSettingsContentsModified)));
-	menu->AddItem(new BMenuItem("/", new BMessage(kSettingsContentsModified)));
-	menu->AddItem(new BMenuItem("\\", new BMessage(kSettingsContentsModified)));
-	menu->AddItem(new BMenuItem(".", new BMessage(kSettingsContentsModified)));
-
-	fSeparatorMenuField = new BMenuField(B_TRANSLATE("Separator:"), menu);
-
-	f24HrRadioButton = new BRadioButton("", B_TRANSLATE("24 hour"),
+	f24HourRadioButton = new BRadioButton("", B_TRANSLATE("24 hour"),
 		new BMessage(kClockFormatChange));
-
-	f12HrRadioButton = new BRadioButton("", B_TRANSLATE("12 hour"),
+	f12HourRadioButton = new BRadioButton("", B_TRANSLATE("12 hour"),
 		new BMessage(kClockFormatChange));
-
-	fLocale.GetTimeFormat(fOriginalTimeFormat, false);
-	fLocale.GetTimeFormat(fOriginalLongTimeFormat, true);
-	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
-		f12HrRadioButton->SetValue(B_CONTROL_ON);
-		fLocaleIs24Hr = false;
-	} else {
-		f24HrRadioButton->SetValue(B_CONTROL_ON);
-		fLocaleIs24Hr = true;
-	}
 
 	float spacing = be_control_look->DefaultItemSpacing();
 
+	BStringView* fullTimeLabel
+		= new BStringView("", B_TRANSLATE("Full format:"));
+	fullTimeLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* longTimeLabel
+		= new BStringView("", B_TRANSLATE("Long format:"));
+	longTimeLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* mediumTimeLabel
+		= new BStringView("", B_TRANSLATE("Medium format:"));
+	mediumTimeLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* shortTimeLabel
+		= new BStringView("", B_TRANSLATE("Short format:"));
+	shortTimeLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+
+	fFullTimeExampleView = new BStringView("", "");
+	fFullTimeExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 	fLongTimeExampleView = new BStringView("", "");
+	fLongTimeExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	fMediumTimeExampleView = new BStringView("", "");
+	fMediumTimeExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 	fShortTimeExampleView = new BStringView("", "");
+	fShortTimeExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
-	fNumberFormatExampleView = new BStringView("", "");
+	BStringView* positiveNumberLabel
+		= new BStringView("", B_TRANSLATE("Positive:"));
+	positiveNumberLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* negativeNumberLabel
+		= new BStringView("", B_TRANSLATE("Negative:"));
+	negativeNumberLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
-	BTextControl* numberThousand = new BTextControl("",
-		B_TRANSLATE("Thousand separator: "), "",
-		new BMessage(kSettingsContentsModified));
-	BTextControl* numberDecimal = new BTextControl("",
-		B_TRANSLATE("Decimal separator: "),	"",
-		new BMessage(kSettingsContentsModified));
-	// TODO number of decimal digits (spinbox ?)
-	BCheckBox* numberLeadingZero = new BCheckBox("", B_TRANSLATE("Leading 0"),
-		new BMessage(kSettingsContentsModified));
-	BTextControl* numberList = new BTextControl("",
-		B_TRANSLATE("List separator: "), "",
-		new BMessage(kSettingsContentsModified));
-	// Unit system (US/Metric) (radio)
+	fPositiveNumberExampleView = new BStringView("", "");
+	fPositiveNumberExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_VERTICAL_UNSET));
+	fNegativeNumberExampleView = new BStringView("", "");
+	fNegativeNumberExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_VERTICAL_UNSET));
 
-	fCurrencySymbolView = new BTextControl("",
-		B_TRANSLATE("Currency symbol:"), "",
-		new BMessage(kSettingsContentsModified));
-	menu = new BPopUpMenu(B_TRANSLATE("Negative marker"));
-	menu->AddItem(new BMenuItem("-", new BMessage(kSettingsContentsModified)));
-	menu->AddItem(new BMenuItem("()", new BMessage(kSettingsContentsModified)));
+	BStringView* positiveMonetaryLabel
+		= new BStringView("", B_TRANSLATE("Positive:"));
+	positiveMonetaryLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
+	BStringView* negativeMonetaryLabel
+		= new BStringView("", B_TRANSLATE("Negative:"));
+	negativeMonetaryLabel->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+		B_ALIGN_VERTICAL_UNSET));
 
-	BMenuField* currencyNegative = new BMenuField(
-		B_TRANSLATE("Negative marker:"), menu);
+	fPositiveMonetaryExampleView = new BStringView("", "");
+	fPositiveMonetaryExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_VERTICAL_UNSET));
+	fNegativeMonetaryExampleView = new BStringView("", "");
+	fNegativeMonetaryExampleView->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
+		B_ALIGN_VERTICAL_UNSET));
 
-	BTextControl* currencyDecimal = new BTextControl("",
-		B_TRANSLATE("Decimal separator: "), "",
-		new BMessage(kSettingsContentsModified));
-	BCheckBox* currencyLeadingZero = new BCheckBox("",
-		B_TRANSLATE("Leading 0"), new BMessage(kSettingsContentsModified));
-
-	fCurrencySymbolBefore = new BRadioButton("CurrencySymbolPosition",
-		B_TRANSLATE("Before"), new BMessage(kSettingsContentsModified));
-
-	fCurrencySymbolAfter = new BRadioButton("CurrencySymbolPosition",
-		B_TRANSLATE("After"), new BMessage(kSettingsContentsModified));
-
-	fMonetaryView = new BStringView("", "");
-
-	_UpdateExamples();
-	_ParseDateFormat();
-	_ParseCurrencyFormat();
+	Refresh(true);
 
 	fDateBox = new BBox(B_TRANSLATE("Date"));
 	fTimeBox = new BBox(B_TRANSLATE("Time"));
-	fNumbersBox = new BBox(B_TRANSLATE("Numbers"));
-	fCurrencyBox = new BBox(B_TRANSLATE("Currency"));
+	fNumberBox = new BBox(B_TRANSLATE("Numbers"));
+	fMonetaryBox = new BBox(B_TRANSLATE("Currency"));
 
 	fDateBox->SetLabel(B_TRANSLATE("Date"));
 	fTimeBox->SetLabel(B_TRANSLATE("Time"));
-	fNumbersBox->SetLabel(B_TRANSLATE("Numbers"));
-	fCurrencyBox->SetLabel(B_TRANSLATE("Currency"));
+	fNumberBox->SetLabel(B_TRANSLATE("Numbers"));
+	fMonetaryBox->SetLabel(B_TRANSLATE("Currency"));
 
-	fDateBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
+	fDateBox->AddChild(BLayoutBuilder::Grid<>(spacing, spacing / 2)
 		.SetInsets(spacing, spacing, spacing, spacing)
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(new BStringView("", B_TRANSLATE("Long format:")))
-			.Add(fLongDateExampleView)
-			.AddGlue()
-			.End()
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(fLongDateMenu[0])
-			.Add(fLongDateSeparator[0])
-			.End()
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(fLongDateMenu[1])
-			.Add(fLongDateSeparator[1])
-			.End()
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(fLongDateMenu[2])
-			.Add(fLongDateSeparator[2])
-			.End()
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(fLongDateMenu[3])
-			.Add(fLongDateSeparator[3])
-			.End()
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(new BStringView("", B_TRANSLATE("Short format:")))
-			.Add(fShortDateExampleView)
-			.AddGlue()
-			.End()
-		.Add(fDateMenu[0])
-		.Add(fDateMenu[1])
-		.Add(fDateMenu[2])
+		.Add(fullDateLabel, 0, 0)
+		.Add(fFullDateExampleView, 1, 0)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 0)
+		.Add(longDateLabel, 0, 1)
+		.Add(fLongDateExampleView, 1, 1)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 1)
+		.Add(mediumDateLabel, 0, 2)
+		.Add(fMediumDateExampleView, 1, 2)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 2)
+		.Add(shortDateLabel, 0, 3)
+		.Add(fShortDateExampleView, 1, 3)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 3)
 		.View());
 
-	fTimeBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
+	fTimeBox->AddChild(BLayoutBuilder::Grid<>(spacing, spacing / 2)
 		.SetInsets(spacing, spacing, spacing, spacing)
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(new BStringView("", B_TRANSLATE("Long format:")))
-			.Add(fLongTimeExampleView)
+		.AddGroup(B_HORIZONTAL, spacing, 0, 0, 2)
+			.Add(f24HourRadioButton, 0)
+			.Add(f12HourRadioButton, 0)
 			.AddGlue()
 			.End()
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(new BStringView("", B_TRANSLATE("Short format:")))
-			.Add(fShortTimeExampleView)
-			.AddGlue()
-			.End()
-		.AddGroup(B_HORIZONTAL, spacing)
-			.Add(f24HrRadioButton)
-			.Add(f12HrRadioButton)
-			.AddGlue()
-			.End()
+		.Add(fullTimeLabel, 0, 1)
+		.Add(fFullTimeExampleView, 1, 1)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 1)
+		.Add(longTimeLabel, 0, 2)
+		.Add(fLongTimeExampleView, 1, 2)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 2)
+		.Add(mediumTimeLabel, 0, 3)
+		.Add(fMediumTimeExampleView, 1, 3)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 3)
+		.Add(shortTimeLabel, 0, 4)
+		.Add(fShortTimeExampleView, 1, 4)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 4)
 		.View());
 
-	fNumbersBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
+	fNumberBox->AddChild(BLayoutBuilder::Grid<>(spacing, spacing / 2)
 		.SetInsets(spacing, spacing, spacing, spacing)
-			.AddGroup(B_HORIZONTAL, spacing)
-				.Add(new BStringView("", B_TRANSLATE("Example:")))
-				.Add(fNumberFormatExampleView)
-				.AddGlue()
-				.End()
-			.Add(numberThousand)
-			.Add(numberDecimal)
-			.Add(numberLeadingZero)
-			.Add(numberList)
-			.View());
-
-	fCurrencyBox->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing / 2)
-		.SetInsets(spacing, spacing, spacing, spacing)
-		.Add(fMonetaryView)
-		.Add(fCurrencySymbolView)
-		.AddGroup(B_HORIZONTAL, spacing)
-			.AddGlue()
-			.Add(fCurrencySymbolBefore)
-			.Add(fCurrencySymbolAfter)
-			.End()
-		.Add(currencyNegative)
-		.Add(currencyDecimal)
-		.Add(currencyLeadingZero)
+		.Add(positiveNumberLabel, 0, 0)
+		.Add(fPositiveNumberExampleView, 1, 0)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 0)
+		.Add(negativeNumberLabel, 0, 1)
+		.Add(fNegativeNumberExampleView, 1, 1)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 1)
 		.View());
 
+	fMonetaryBox->AddChild(BLayoutBuilder::Grid<>(spacing, spacing / 2)
+		.SetInsets(spacing, spacing, spacing, spacing)
+		.Add(positiveMonetaryLabel, 0, 0)
+		.Add(fPositiveMonetaryExampleView, 1, 0)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 0)
+		.Add(negativeMonetaryLabel, 0, 1)
+		.Add(fNegativeMonetaryExampleView, 1, 1)
+		.Add(BSpaceLayoutItem::CreateGlue(), 2, 1)
+		.View());
 
-	BGroupLayout* rootLayout = new BGroupLayout(B_HORIZONTAL, spacing);
+	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL, spacing);
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLayout(rootLayout);
 	BLayoutBuilder::Group<>(rootLayout)
-		.AddGroup(B_VERTICAL, spacing)
-			.Add(fDateBox)
-			.Add(fTimeBox)
+		.Add(fUseLanguageStringsCheckBox)
+		.Add(fDateBox)
+		.Add(fTimeBox)
+		.AddGroup(B_HORIZONTAL, spacing)
+			.Add(fNumberBox)
+			.Add(fMonetaryBox)
 			.AddGlue()
 			.End()
-		.AddGroup(B_VERTICAL, spacing)
-			.Add(fNumbersBox)
-			.Add(fCurrencyBox)
-			.AddGlue();
+		.AddGlue();
 }
 
 
-FormatView::~FormatView()
+FormatSettingsView::~FormatSettingsView()
 {
-	gMutableLocaleRoster->SetDefaultLocale(fLocale);
 }
 
 
 void
-FormatView::AttachedToWindow()
+FormatSettingsView::AttachedToWindow()
 {
-	f24HrRadioButton->SetTarget(this);
-	f12HrRadioButton->SetTarget(this);
-
-	for (int j = 0; j < 4; j++) {
-		for (int i = 0; i < fLongDateMenu[j]->Menu()->CountItems(); i++)
-			fLongDateMenu[j]->Menu()->SubmenuAt(i)->SetTargetForItems(this);
-		fLongDateSeparator[j]->SetTarget(this);
-	}
-
-	for (int j = 0; j < 3; j++) {
-		for (int i = 0; i < fDateMenu[j]->Menu()->CountItems(); i++)
-			fDateMenu[j]->Menu()->SubmenuAt(i)->SetTargetForItems(this);
-	}
-
-	fSeparatorMenuField->Menu()->SetTargetForItems(this);
+	fUseLanguageStringsCheckBox->SetTarget(this);
+	f24HourRadioButton->SetTarget(this);
+	f12HourRadioButton->SetTarget(this);
 }
 
 
 void
-FormatView::MessageReceived(BMessage* message)
+FormatSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMenuMessage:
+		case kClockFormatChange:
 		{
-			// Update one of the dropdown menus
-			void* pointerFromMessage;
-			message->FindPointer("dest", &pointerFromMessage);
-			BMenuField* menuField
-			= static_cast<BMenuField*>(pointerFromMessage);
-			BString format;
-			message->FindString("format", &format);
-
-			for (int i = 0; i < 4; i++) {
-				if (fLongDateMenu[i]==menuField) {
-					fLongDateString[i] = format;
-					break;
-				}
-			}
-
-			for (int i = 0; i < 3; i++) {
-				if (fDateMenu[i]==menuField) {
-					fDateString[i] = format;
-					break;
-				}
-			}
-
-			message->FindPointer("source", &pointerFromMessage);
-			BMenuItem* menuItem = static_cast<BMenuItem*>(pointerFromMessage);
-
-			menuField->MenuItem()->SetLabel(menuItem->Label());
-
-			_UpdateLongDateFormatString();
-			// fall through
-		}
-
-		case kSettingsContentsModified:
-		{
-			int32 separator = 0;
-			BMenuItem* item = fSeparatorMenuField->Menu()->FindMarked();
-			if (item) {
-				separator = fSeparatorMenuField->Menu()->IndexOf(item);
-				if (separator >= 0)
-					// settings.SetTimeFormatSeparator(
-					//	(FormatSeparator)separator);
-					;
-			}
-
-			// Make the notification message and send it to the tracker:
-			BMessage notificationMessage;
-			notificationMessage.AddInt32("TimeFormatSeparator", separator);
-			notificationMessage.AddBool("24HrClock",
-				f24HrRadioButton->Value() == 1);
+			BFormattingConventions conventions;
+			be_locale->GetFormattingConventions(&conventions);
+			conventions.SetExplicitUse24HourClock(
+				f24HourRadioButton->Value() ? true : false);
+			gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
 
 			_UpdateExamples();
-
-			Window()->PostMessage(kSettingsContentsModified);
+			Window()->PostMessage(kMsgSettingsChanged);
 			break;
 		}
 
-		case kClockFormatChange:
+		case kStringsLanguageChange:
 		{
-			BMessage newMessage(kMsgSettingsChanged);
+			BFormattingConventions conventions;
+			be_locale->GetFormattingConventions(&conventions);
+			conventions.SetUseStringsFromPreferredLanguage(
+				fUseLanguageStringsCheckBox->Value() ? true : false);
+			gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
 
-			BString timeFormat;
-			timeFormat = fOriginalTimeFormat;
-			if (f24HrRadioButton->Value() == 1) {
-				if (!fLocaleIs24Hr) {
-					timeFormat.ReplaceAll("h", "H");
-					timeFormat.ReplaceAll("k", "K");
-					timeFormat.RemoveAll(" a");
-					timeFormat.RemoveAll("a");
-				}
-			} else {
-				if (fLocaleIs24Hr && timeFormat.FindFirst("a") == B_ERROR) {
-					timeFormat.ReplaceAll("K", "k");
-					timeFormat.ReplaceAll("H", "h");
-					timeFormat.Append(" a");
-				}
-			}
-			fLocale.SetTimeFormat(timeFormat.String(), false);
-			newMessage.AddString("shortTimeFormat", timeFormat);
-
-			timeFormat = fOriginalLongTimeFormat;
-			if (f24HrRadioButton->Value() == 1) {
-				if (!fLocaleIs24Hr) {
-					timeFormat.ReplaceAll("h", "H");
-					timeFormat.ReplaceAll("k", "K");
-					timeFormat.RemoveAll(" a");
-					timeFormat.RemoveAll("a");
-				}
-			} else {
-				if (fLocaleIs24Hr && timeFormat.FindFirst("a") == B_ERROR) {
-					timeFormat.ReplaceAll("K", "k");
-					timeFormat.ReplaceAll("H", "h");
-					timeFormat.Append(" a");
-				}
-			}
-			fLocale.SetTimeFormat(timeFormat.String(), true);
-			newMessage.AddString("longTimeFormat", timeFormat);
 			_UpdateExamples();
-			Window()->PostMessage(kSettingsContentsModified);
-			be_app_messenger.SendMessage(&newMessage);
+
+			Window()->PostMessage(kMsgSettingsChanged);
 			break;
 		}
 
@@ -494,306 +292,101 @@ FormatView::MessageReceived(BMessage* message)
 
 
 void
-FormatView::Revert()
+FormatSettingsView::Revert()
 {
-	/*
-	TrackerSettings settings;
-
-	settings.SetTimeFormatSeparator(fSeparator);
-	settings.SetDateOrderFormat(fFormat);
-	settings.SetClockTo24Hr(f24HrClock);
-	*/
-
-	// ShowCurrentSettings();
-	_SendNotices();
-}
-
-
-void
-FormatView::SetLocale(const BLocale& locale)
-{
-	fLocale = locale;
-
-	fLocale.GetTimeFormat(fOriginalTimeFormat, false);
-	fLocale.GetTimeFormat(fOriginalLongTimeFormat, true);
-
-	if (fOriginalTimeFormat.FindFirst("a") != B_ERROR) {
-		f12HrRadioButton->SetValue(B_CONTROL_ON);
-		fLocaleIs24Hr = false;
-	} else {
-		f24HrRadioButton->SetValue(B_CONTROL_ON);
-		fLocaleIs24Hr = true;
-	}
-
-	/*
-	FormatSeparator separator = settings.TimeFormatSeparator();
-
-	if (separator >= kNoSeparator && separator < kSeparatorsEnd)
-		fSeparatorMenuField->Menu()->ItemAt((int32)separator)->SetMarked(true);
-	*/
+	gMutableLocaleRoster->SetDefaultFormattingConventions(fInitialConventions);
 
 	_UpdateExamples();
-	_ParseDateFormat();
-	_ParseCurrencyFormat();
 }
 
 
 void
-FormatView::RecordRevertSettings()
+FormatSettingsView::Refresh(bool setInitial)
 {
-	/*
-	f24HrClock = settings.ClockIs24Hr();
-	fSeparator = settings.TimeFormatSeparator();
-	fFormat = settings.DateOrderFormat();
-	*/
+	BFormattingConventions conventions;
+	be_locale->GetFormattingConventions(&conventions);
+	if (setInitial)
+		fInitialConventions = conventions;
+
+	if (!conventions.Use24HourClock()) {
+		f12HourRadioButton->SetValue(B_CONTROL_ON);
+		fLocaleIs24Hour = false;
+	} else {
+		f24HourRadioButton->SetValue(B_CONTROL_ON);
+		fLocaleIs24Hour = true;
+	}
+
+	fUseLanguageStringsCheckBox->SetValue(
+		conventions.UseStringsFromPreferredLanguage()
+			? B_CONTROL_ON : B_CONTROL_OFF);
+
+	_UpdateExamples();
 }
 
 
-// Return true if the Revert button should be enabled (ie some setting was
+// Return true if the Revert button should be enabled (i.e. something has been
 // changed)
 bool
-FormatView::IsRevertable() const
+FormatSettingsView::IsReversible() const
 {
-	FormatSeparator separator;
+	BFormattingConventions conventions;
+	be_locale->GetFormattingConventions(&conventions);
 
-	BMenuItem* item = fSeparatorMenuField->Menu()->FindMarked();
-	if (item) {
-		int32 index = fSeparatorMenuField->Menu()->IndexOf(item);
-		if (index >= 0)
-			separator = (FormatSeparator)index;
-		else
-			return true;
-	} else
-		return true;
-
-	// TODO generate ICU string and compare to the initial one
-	BString dateFormat ;
-		// fYMDRadioButton->Value() ? kYMDFormat :
-		//(fDMYRadioButton->Value() ? kDMYFormat : kMDYFormat);
-
-	return f24HrClock != (f24HrRadioButton->Value() > 0)
-		|| separator != fSeparator
-		|| dateFormat != fDateFormat;
+	return conventions != fInitialConventions;
 }
 
 
 void
-FormatView::_UpdateExamples()
+FormatSettingsView::_UpdateExamples()
 {
 	time_t timeValue = (time_t)time(NULL);
-	BString timeFormat;
+	BString result;
 
-	fLocale.FormatDate(&timeFormat, timeValue, true);
-	fLongDateExampleView->SetText(timeFormat);
+	be_locale->FormatDate(&result, timeValue, B_FULL_DATE_FORMAT);
+	fFullDateExampleView->SetText(result);
 
-	fLocale.FormatDate(&timeFormat, timeValue, false);
-	fShortDateExampleView->SetText(timeFormat);
+	be_locale->FormatDate(&result, timeValue, B_LONG_DATE_FORMAT);
+	fLongDateExampleView->SetText(result);
 
-	fLocale.FormatTime(&timeFormat, timeValue, true);
-	fLongTimeExampleView->SetText(timeFormat);
+	be_locale->FormatDate(&result, timeValue, B_MEDIUM_DATE_FORMAT);
+	fMediumDateExampleView->SetText(result);
 
-	fLocale.FormatTime(&timeFormat, timeValue, false);
-	fShortTimeExampleView->SetText(timeFormat);
+	be_locale->FormatDate(&result, timeValue, B_SHORT_DATE_FORMAT);
+	fShortDateExampleView->SetText(result);
 
-	status_t Error = fLocale.FormatNumber(&timeFormat, 1234.5678);
-	if (Error == B_OK)
-		fNumberFormatExampleView->SetText(timeFormat);
+	be_locale->FormatTime(&result, timeValue, B_FULL_TIME_FORMAT);
+	fFullTimeExampleView->SetText(result);
+
+	be_locale->FormatTime(&result, timeValue, B_LONG_TIME_FORMAT);
+	fLongTimeExampleView->SetText(result);
+
+	be_locale->FormatTime(&result, timeValue, B_MEDIUM_TIME_FORMAT);
+	fMediumTimeExampleView->SetText(result);
+
+	be_locale->FormatTime(&result, timeValue, B_SHORT_TIME_FORMAT);
+	fShortTimeExampleView->SetText(result);
+
+	status_t status = be_locale->FormatNumber(&result, 1234.5678);
+	if (status == B_OK)
+		fPositiveNumberExampleView->SetText(result);
 	else
-		fNumberFormatExampleView->SetText("ERROR");
-}
+		fPositiveNumberExampleView->SetText("ERROR");
 
+	status = be_locale->FormatNumber(&result, -1234.5678);
+	if (status == B_OK)
+		fNegativeNumberExampleView->SetText(result);
+	else
+		fNegativeNumberExampleView->SetText("ERROR");
 
-void
-FormatView::_SendNotices()
-{
-	// Make the notification message and send it to the tracker:
-	/*
-	BMessage notificationMessage;
-	notificationMessage.AddInt32("TimeFormatSeparator",
-		(int32)settings.TimeFormatSeparator());
-	notificationMessage.AddInt32("DateOrderFormat",
-		(int32)settings.DateOrderFormat());
-	notificationMessage.AddBool("24HrClock", settings.ClockIs24Hr());
-	tracker->SendNotices(kDateFormatChanged, &notificationMessage);
-	*/
-}
+	status = be_locale->FormatMonetary(&result, 1234.56);
+	if (status == B_OK)
+		fPositiveMonetaryExampleView->SetText(result);
+	else
+		fPositiveMonetaryExampleView->SetText("ERROR");
 
-
-void
-FormatView::_ParseCurrencyFormat()
-{
-	BString currencySample;
-	int* fieldPos = NULL;
-	int fieldCount;
-	BNumberElement* fieldID = NULL;
-	if (fLocale.FormatMonetary(&currencySample, fieldPos, fieldID, fieldCount,
-			-1234.56) != B_OK) {
-		fMonetaryView->SetText("ERROR");
-		return;
-	}
-
-	fMonetaryView->SetText(currencySample);
-
-	for (int i = 0; i < fieldCount; i++) {
-		BString currentSymbol;
-		currentSymbol.AppendChars(currencySample.CharAt(fieldPos[i]&0xFFFF),
-			(fieldPos[i]>>16) - (fieldPos[i]&0xFFFF));
-		switch (fieldID[i]) {
-			case B_NUMBER_ELEMENT_CURRENCY:
-				fCurrencySymbolView->SetText(currentSymbol);
-				if (i > fieldCount / 2)
-					fCurrencySymbolAfter->SetValue(1);
-				else
-					fCurrencySymbolBefore->SetValue(1);
-				break;
-			default:
-				break;
-		}
-	}
-
-	free(fieldPos);
-	free(fieldID);
-}
-
-
-//! Get the date format from ICU and set the date fields accordingly
-void
-FormatView::_ParseDateFormat()
-{
-	BString dateFormatString;
-	fLocale.GetDateFormat(dateFormatString, true);
-	const char* dateFormat = dateFormatString.String();
-
-	// Travel through the string and parse it
-	const char* parsePointer = dateFormat;
-	const char* fieldBegin = dateFormat;
-
-	for (int i = 0; i < 4; i++)
-	{
-		fieldBegin = parsePointer;
-		while (*parsePointer == *(parsePointer + 1))
-			parsePointer++;
-		parsePointer++;
-		BString str;
-		str.Append(fieldBegin, parsePointer - fieldBegin);
-
-		fLongDateString[i] = str;
-
-		BMenu* subMenu;
-		bool isFound = false;
-		for (int subMenuIndex = 0; subMenuIndex < 3; subMenuIndex++) {
-			subMenu = fLongDateMenu[i]->Menu()->SubmenuAt(subMenuIndex);
-			BMenuItem* item;
-			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
-					itemIndex++) {
-				if (static_cast<DateMenuItem*>(item)->ICUCode() == str) {
-					item->SetMarked(true);
-					fLongDateMenu[i]->MenuItem()->SetLabel(item->Label());
-					isFound = true;
-				} else
-					item->SetMarked(false);
-			}
-		}
-
-		if (!isFound)
-			fLongDateMenu[i]->MenuItem()->SetLabel(str.Append("*"));
-
-		fieldBegin = parsePointer;
-		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0') {
-			if (*parsePointer == '\'') {
-				parsePointer++;
-				while (*parsePointer != '\0' && *parsePointer != '\'')
-					parsePointer++;
-				if (*parsePointer == '\0')
-					break;
-			}
-			parsePointer++;
-		}
-		str.Truncate(0);
-		str.Append(fieldBegin, parsePointer - fieldBegin);
-		fLongDateSeparator[i]->SetText(str);
-	}
-
-	// Short date is a bit more tricky, we want to extract the separator
-	fLocale.GetDateFormat(dateFormatString, false);
-	dateFormat = dateFormatString.String();
-
-	// Travel trough the string and parse it
-	parsePointer = dateFormat;
-	fieldBegin = dateFormat;
-
-	for (int i = 0; i < 3; i++) {
-		fieldBegin = parsePointer;
-		while (*parsePointer == *(parsePointer + 1))
-			parsePointer++;
-		parsePointer++;
-		BString str;
-		str.Append(fieldBegin, parsePointer - fieldBegin);
-
-		fLongDateString[i] = str;
-
-		BMenu* subMenu;
-		bool isFound = false;
-		for (int subMenuIndex = 0; subMenuIndex < 3; subMenuIndex++) {
-			subMenu = fDateMenu[i]->Menu()->SubmenuAt(subMenuIndex);
-			BMenuItem* item;
-			for (int itemIndex = 0; (item = subMenu->ItemAt(itemIndex)) != NULL;
-					itemIndex++) {
-				if (static_cast<DateMenuItem*>(item)->ICUCode() == str) {
-					item->SetMarked(true);
-					fDateMenu[i]->MenuItem()->SetLabel(item->Label());
-					isFound = true;
-				} else
-					item->SetMarked(false);
-			}
-		}
-
-		if (!isFound) {
-			fDateMenu[i]->MenuItem()->SetLabel(
-				str.Append(B_TRANSLATE(" (unknown format)")));
-		}
-
-		fieldBegin = parsePointer;
-		while ((!IsSpecialDateChar(*parsePointer)) && *parsePointer != '\0') {
-			if (*parsePointer == '\'') {
-				parsePointer++;
-				while (*parsePointer != '\0' && *parsePointer != '\'')
-					parsePointer++;
-				if (*parsePointer == '\0')
-					break;
-			}
-			parsePointer++;
-		}
-		if (parsePointer - fieldBegin > 0) {
-			str.Truncate(0);
-			str.Append(fieldBegin, parsePointer - fieldBegin);
-			fSeparatorMenuField->MenuItem()->SetLabel(str);
-		}
-	}
-}
-
-
-void
-FormatView::_UpdateLongDateFormatString()
-{
-	BString newDateFormat;
-
-	for (int i = 0; i < 4; i++) {
-		newDateFormat.Append(fLongDateString[i]);
-		newDateFormat.Append(fLongDateSeparator[i]->Text());
-	}
-
-	// TODO save this in the settings preflet and make the roster load it back
-	fLocale.SetDateFormat(newDateFormat.String());
-
-	newDateFormat.Truncate(0);
-
-	newDateFormat.Append(fDateString[0]);
-	newDateFormat.Append(fSeparatorMenuField->MenuItem()->Label());
-	newDateFormat.Append(fDateString[1]);
-	newDateFormat.Append(fSeparatorMenuField->MenuItem()->Label());
-	newDateFormat.Append(fDateString[2]);
-
-	// TODO save this in the settings preflet and make the roster load it back
-	fLocale.SetDateFormat(newDateFormat.String(), false);
+	status = be_locale->FormatMonetary(&result, -1234.56);
+	if (status == B_OK)
+		fNegativeMonetaryExampleView->SetText(result);
+	else
+		fNegativeMonetaryExampleView->SetText("ERROR");
 }

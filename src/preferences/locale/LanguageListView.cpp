@@ -18,7 +18,8 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
-#include <Country.h>
+#include <FormattingConventions.h>
+#include <LocaleRoster.h>
 #include <Window.h>
 
 
@@ -30,17 +31,15 @@
 
 
 LanguageListItem::LanguageListItem(const char* text, const char* id,
-	const char* code)
+	const char* code, const char* countryCode)
 	:
 	BStringItem(text),
 	fID(id),
 	fCode(code)
 {
-	// TODO: should probably keep the BCountry as a member of the class
-	BCountry country(id);
-
 	fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-	if (fIcon != NULL && country.GetIcon(fIcon) != B_OK) {
+	if (fIcon != NULL && be_locale_roster->GetFlagIconForCountry(fIcon,
+			countryCode) != B_OK) {
 		delete fIcon;
 		fIcon = NULL;
 	}

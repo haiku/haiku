@@ -6,7 +6,6 @@ UsePrivateHeaders shared ;
 local sources =
 	LanguageListView.cpp
 	LocalePreflet.cpp
-	LocaleSettings.cpp
 	LocaleWindow.cpp
 	FormatSettingsView.cpp
 ;

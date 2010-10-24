@@ -12,6 +12,7 @@ local sources =
 	Collator.cpp
 	Country.cpp
 	DefaultCatalog.cpp
+	FormattingConventions.cpp
 	HashMapCatalog.cpp
 	Language.cpp
 	LibbeLocaleBackend.cpp

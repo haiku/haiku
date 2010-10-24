@@ -30,16 +30,9 @@
 #define ICU_VERSION icu_44
 
 
-BCountry::BCountry(const char* languageCode, const char* countryCode)
+BCountry::BCountry(const char* countryCode)
 	:
-	fICULocale(new ICU_VERSION::Locale(languageCode, countryCode))
-{
-}
-
-
-BCountry::BCountry(const char* languageAndCountryCode)
-	:
-	fICULocale(new ICU_VERSION::Locale(languageAndCountryCode))
+	fICULocale(new ICU_VERSION::Locale("", countryCode))
 {
 }
 
@@ -98,6 +91,7 @@ BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 
 	UnicodeString uString;
 	fICULocale->getDisplayName(Locale(appLanguage), uString);
+	name.Truncate(0);
 	BStringByteSink stringConverter(&name);
 	uString.toUTF8(stringConverter);
 
@@ -108,7 +102,7 @@ BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 const char*
 BCountry::Code() const
 {
-	return fICULocale->getName();
+	return fICULocale->getCountry();
 }
 
 
@@ -128,17 +122,3 @@ BCountry::GetAvailableTimeZones(BMessage* timeZones) const
 	return be_locale_roster->GetAvailableTimeZonesForCountry(timeZones, Code());
 }
 
-
-// TODO does ICU even support this ? Is it in the keywords ?
-int8
-BCountry::Measurement() const
-{
-	UErrorCode error = U_ZERO_ERROR;
-	switch (ulocdata_getMeasurementSystem(Code(), &error)) {
-		case UMS_US:
-			return B_US;
-		case UMS_SI:
-		default:
-			return B_METRIC;
-	}
-}

@@ -6,6 +6,7 @@
 #define LOCALE_WINDOW_H
 
 
+#include <Message.h>
 #include <Window.h>
 
 
@@ -14,7 +15,7 @@ static const uint32 kMsgRevert = 'revt';
 
 class BButton;
 class BListView;
-class FormatView;
+class FormatSettingsView;
 class LanguageListItem;
 class LanguageListView;
 
@@ -26,14 +27,21 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
-
-			void				SettingsChanged();
-			void				SettingsReverted();
+	virtual void				Show();
 
 private:
+			void				_SettingsChanged();
+			void				_SettingsReverted();
+
+			bool				_IsReversible() const;
+
+			void				_Refresh(bool setInitial = false);
+			void				_Revert();
+
+			void				_SetPreferredLanguages(
+									const BMessage& languages);
 			void				_PreferredLanguagesChanged();
 			void				_EnableDisableLanguages();
-			void				_UpdatePreferredFromLocaleRoster();
 			void				_InsertPreferredLanguage(LanguageListItem* item,
 									int32 atIndex = -1);
 			void				_Defaults();
@@ -41,7 +49,11 @@ private:
 			BButton*			fRevertButton;
 			LanguageListView*	fLanguageListView;
 			LanguageListView*	fPreferredListView;
-			FormatView*			fFormatView;
+			LanguageListView*	fConventionsListView;
+			FormatSettingsView*	fFormatView;
+			LanguageListItem*	fInitialConventionsItem;
+			LanguageListItem*	fDefaultConventionsItem;
+			BMessage			fInitialPreferredLanguages;
 };
 
 

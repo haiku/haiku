@@ -18,12 +18,12 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Collator.h>
-#include <Country.h>
 #include <DefaultCatalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <FormattingConventions.h>
 #include <Language.h>
 #include <Locale.h>
 #include <Node.h>
@@ -128,6 +128,11 @@ CatalogAddOnInfo::UnloadIfPossible()
 RosterData gRosterData;
 
 static const char* kPriorityAttr = "ADDON:priority";
+
+static const char* kLanguageField = "language";
+
+static const char* kTimezoneField = "timezone";
+static const char* kOffsetField = "offset";
 
 
 RosterData::RosterData()
@@ -322,7 +327,8 @@ RosterData::CleanupCatalogAddOns()
 
 
 status_t
-RosterData::SetDefaultCountry(const BCountry& newCountry)
+RosterData::SetDefaultFormattingConventions(
+	const BFormattingConventions& newFormattingConventions)
 {
 	status_t status = B_OK;
 
@@ -330,40 +336,14 @@ RosterData::SetDefaultCountry(const BCountry& newCountry)
 	if (!lock.IsLocked())
 		return B_ERROR;
 
-	status = _SetDefaultCountry(newCountry);
+	status = _SetDefaultFormattingConventions(newFormattingConventions);
 
 	if (status == B_OK)
 		status = _SaveLocaleSettings();
 
 	if (status == B_OK) {
 		BMessage updateMessage(B_LOCALE_CHANGED);
-		status = _AddDefaultCountryToMessage(&updateMessage);
-		if (status == B_OK)
-			status = be_roster->Broadcast(&updateMessage);
-	}
-
-	return status;
-}
-
-
-status_t
-RosterData::SetDefaultLocale(const BLocale& newLocale)
-{
-	status_t status = B_OK;
-
-	BAutolock lock(fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	status = _SetDefaultLocale(newLocale);
-
-	if (status == B_OK)
-		status = _SaveLocaleSettings();
-
-	if (status == B_OK) {
-		BMessage updateMessage(B_LOCALE_CHANGED);
-		status = _AddDefaultCountryToMessage(&updateMessage);
-			// TODO : should be differenciated from country
+		status = _AddDefaultFormattingConventionsToMessage(&updateMessage);
 		if (status == B_OK)
 			status = be_roster->Broadcast(&updateMessage);
 	}
@@ -437,21 +417,8 @@ RosterData::_LoadLocaleSettings()
 		status = settings.Unflatten(&file);
 
 	if (status == B_OK) {
-		BString codeName;
-		BLocale newDefaultLocale;
-
-		if (settings.FindString("country", &codeName) == B_OK) {
-			BCountry country(codeName);
-			newDefaultLocale = BLocale(NULL, &country);
-		}
-
-		BString timeFormat;
-		if (settings.FindString("shortTimeFormat", &timeFormat) == B_OK)
-			newDefaultLocale.SetTimeFormat(timeFormat, false);
-		if (settings.FindString("longTimeFormat", &timeFormat) == B_OK)
-			newDefaultLocale.SetTimeFormat(timeFormat, true);
-
-		_SetDefaultLocale(newDefaultLocale);
+		BFormattingConventions conventions(&settings);
+		fDefaultLocale.SetFormattingConventions(conventions);
 
 		_SetPreferredLanguages(&settings);
 
@@ -463,9 +430,11 @@ RosterData::_LoadLocaleSettings()
 	// set everything to default values
 
 	fPreferredLanguages.MakeEmpty();
-	fPreferredLanguages.AddString("language", "en");
+	fPreferredLanguages.AddString(kLanguageField, "en");
 	BLanguage defaultLanguage("en_US");
-	_SetDefaultLocale(BLocale(&defaultLanguage));
+	fDefaultLocale.SetLanguage(defaultLanguage);
+	BFormattingConventions conventions("en_US");
+	fDefaultLocale.SetFormattingConventions(conventions);
 
 	return status;
 }
@@ -486,7 +455,7 @@ RosterData::_LoadTimeSettings()
 		status = settings.Unflatten(&file);
 	if (status == B_OK) {
 		BString timeZoneID;
-		if (settings.FindString("timezone", &timeZoneID) == B_OK)
+		if (settings.FindString(kTimezoneField, &timeZoneID) == B_OK)
 			_SetDefaultTimeZone(BTimeZone(timeZoneID.String()));
 		else
 			_SetDefaultTimeZone(BTimeZone(BTimeZone::kNameOfGmtZone));
@@ -506,7 +475,7 @@ status_t
 RosterData::_SaveLocaleSettings()
 {
 	BMessage settings;
-	status_t status = _AddDefaultCountryToMessage(&settings);
+	status_t status = _AddDefaultFormattingConventionsToMessage(&settings);
 	if (status == B_OK)
 		_AddPreferredLanguagesToMessage(&settings);
 
@@ -555,32 +524,13 @@ RosterData::_SaveTimeSettings()
 
 
 status_t
-RosterData::_SetDefaultCountry(const BCountry& newCountry)
+RosterData::_SetDefaultFormattingConventions(
+	const BFormattingConventions& newFormattingConventions)
 {
-	fDefaultLocale.SetCountry(newCountry);
+	fDefaultLocale.SetFormattingConventions(newFormattingConventions);
 
 	UErrorCode icuError = U_ZERO_ERROR;
-	Locale icuLocale = Locale::createCanonical(newCountry.Code());
-	if (icuLocale.isBogus())
-		return B_ERROR;
-
-	Locale::setDefault(icuLocale, icuError);
-	if (!U_SUCCESS(icuError))
-		return B_ERROR;
-
-	return B_OK;
-}
-
-
-status_t
-RosterData::_SetDefaultLocale(const BLocale& newLocale)
-{
-	fDefaultLocale = newLocale;
-
-	UErrorCode icuError = U_ZERO_ERROR;
-	BCountry defaultCountry;
-	newLocale.GetCountry(&defaultCountry);
-	Locale icuLocale = Locale::createCanonical(defaultCountry.Code());
+	Locale icuLocale = Locale::createCanonical(newFormattingConventions.ID());
 	if (icuLocale.isBogus())
 		return B_ERROR;
 
@@ -611,18 +561,18 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 {
 	BString langName;
 	if (languages != NULL
-		&& languages->FindString("language", &langName) == B_OK) {
+		&& languages->FindString(kLanguageField, &langName) == B_OK) {
 		fDefaultLocale.SetCollator(BCollator(langName.String()));
 		fDefaultLocale.SetLanguage(BLanguage(langName.String()));
 
-		fPreferredLanguages.RemoveName("language");
-		for (int i = 0; languages->FindString("language", i, &langName) == B_OK;
-			i++) {
-			fPreferredLanguages.AddString("language", langName);
+		fPreferredLanguages.RemoveName(kLanguageField);
+		for (int i = 0; languages->FindString(kLanguageField, i, &langName)
+				== B_OK; i++) {
+			fPreferredLanguages.AddString(kLanguageField, langName);
 		}
 	} else {
 		fPreferredLanguages.MakeEmpty();
-		fPreferredLanguages.AddString("language", "en");
+		fPreferredLanguages.AddString(kLanguageField, "en");
 		fDefaultLocale.SetCollator(BCollator("en"));
 	}
 
@@ -631,34 +581,26 @@ RosterData::_SetPreferredLanguages(const BMessage* languages)
 
 
 status_t
-RosterData::_AddDefaultCountryToMessage(BMessage* message) const
+RosterData::_AddDefaultFormattingConventionsToMessage(BMessage* message) const
 {
-	BCountry defaultCountry;
-	fDefaultLocale.GetCountry(&defaultCountry);
-	status_t status = message->AddString("country", defaultCountry.Code());
-	BString timeFormat;
-	if (status == B_OK)
-		status = fDefaultLocale.GetTimeFormat(timeFormat, false);
-	if (status == B_OK)
-		status = message->AddString("shortTimeFormat", timeFormat.String());
-	if (status == B_OK)
-		status = fDefaultLocale.GetTimeFormat(timeFormat, true);
-	if (status == B_OK)
-		status = message->AddString("longTimeFormat", timeFormat.String());
+	BFormattingConventions conventions;
+	fDefaultLocale.GetFormattingConventions(&conventions);
 
-	return status;
+	return conventions.Archive(message);
 }
 
 
 status_t
 RosterData::_AddDefaultTimeZoneToMessage(BMessage* message) const
 {
-	status_t status = message->AddString("timezone", fDefaultTimeZone.ID());
+	status_t status = message->AddString(kTimezoneField, fDefaultTimeZone.ID());
 
 	// add the offset, too, since that is used by clockconfig when setting
 	// up timezone state during boot
-	if (status == B_OK)
-		status = message->AddInt32("offset", fDefaultTimeZone.OffsetFromGMT());
+	if (status == B_OK) {
+		status = message->AddInt32(kOffsetField,
+			fDefaultTimeZone.OffsetFromGMT());
+	}
 
 	return status;
 }
@@ -672,7 +614,7 @@ RosterData::_AddPreferredLanguagesToMessage(BMessage* message) const
 	BString langName;
 	for (int i = 0; fPreferredLanguages.FindString("language", i,
 			&langName) == B_OK; i++) {
-		status = message->AddString("language", langName);
+		status = message->AddString(kLanguageField, langName);
 		if (status != B_OK)
 			break;
 	}
@@ -699,16 +641,9 @@ MutableLocaleRoster::~MutableLocaleRoster()
 
 
 status_t
-MutableLocaleRoster::SetDefaultCountry(const BCountry& newCountry)
+MutableLocaleRoster::SetDefaultFormattingConventions(const BFormattingConventions& newFormattingConventions)
 {
-	return gRosterData.SetDefaultCountry(newCountry);
-}
-
-
-status_t
-MutableLocaleRoster::SetDefaultLocale(const BLocale& newLocale)
-{
-	return gRosterData.SetDefaultLocale(newLocale);
+	return gRosterData.SetDefaultFormattingConventions(newFormattingConventions);
 }
 
 
@@ -723,22 +658,6 @@ status_t
 MutableLocaleRoster::SetPreferredLanguages(const BMessage* languages)
 {
 	return gRosterData.SetPreferredLanguages(languages);
-}
-
-
-status_t
-MutableLocaleRoster::GetDefaultLocale(BLocale* locale) const
-{
-	if (!locale)
-		return B_BAD_VALUE;
-
-	BAutolock lock(gRosterData.fLock);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	*locale = gRosterData.fDefaultLocale;
-
-	return B_OK;
 }
 
 

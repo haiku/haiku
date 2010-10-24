@@ -184,10 +184,12 @@ TimeZoneView::GetToolTipAt(BPoint point, BToolTip** _tip)
 
 	BString nowInTimeZone;
 	time_t now = time(NULL);
-	be_locale->FormatTime(&nowInTimeZone, now, false, &item->TimeZone());
+	be_locale->FormatTime(&nowInTimeZone, now, B_SHORT_TIME_FORMAT,
+		&item->TimeZone());
 
 	BString dateInTimeZone;
-	be_locale->FormatDate(&dateInTimeZone, now, false, &item->TimeZone());
+	be_locale->FormatDate(&dateInTimeZone, now, B_SHORT_DATE_FORMAT,
+		&item->TimeZone());
 
 	BString toolTip = item->Text();
 	toolTip << '\n' << item->TimeZone().ShortName() << " / "
@@ -300,7 +302,7 @@ TimeZoneView::_BuildZoneMenu()
 	BString countryCode;
 	for (int c = 0; countryList.FindString("country", c, &countryCode)
 			== B_OK; c++) {
-		BCountry country("", countryCode);
+		BCountry country(countryCode);
 		BString countryName;
 		country.GetName(countryName);
 
@@ -532,7 +534,7 @@ TimeZoneView::_FormatTime(const BTimeZone& timeZone)
 				: 0;
 		now -= timeZone.OffsetFromGMT() - currentOffset;
 	}
-	be_locale->FormatTime(&result, now, false, &timeZone);
+	be_locale->FormatTime(&result, now, B_SHORT_TIME_FORMAT, &timeZone);
 
 	return result;
 }

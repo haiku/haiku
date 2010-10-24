@@ -13,6 +13,7 @@ class BBitmap;
 class BCatalog;
 class BCollator;
 class BCountry;
+class BFormattingConventions;
 class BLanguage;
 class BLocale;
 class BMessage;
@@ -37,7 +38,6 @@ public:
 			status_t			GetPreferredLanguages(BMessage* message) const;
 
 			status_t			GetAvailableLanguages(BMessage* message) const;
-
 			status_t			GetAvailableCountries(
 									BMessage* timeZones) const;
 			status_t			GetAvailableTimeZones(
@@ -49,7 +49,7 @@ public:
 			status_t			GetFlagIconForCountry(BBitmap* flagIcon,
 									const char* countryCode);
 
-			status_t			GetInstalledCatalogs(BMessage* message,
+			status_t			GetAvailableCatalogs(BMessage* message,
 									const char* sigPattern = NULL,
 									const char* langPattern = NULL,
 									int32 fingerprint = 0) const;

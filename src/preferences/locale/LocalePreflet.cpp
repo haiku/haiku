@@ -16,7 +16,6 @@
 #include <Locale.h>
 
 #include "LocalePreflet.h"
-#include "LocaleSettings.h"
 #include "LocaleWindow.h"
 
 
@@ -32,12 +31,9 @@ class LocalePreflet : public BApplication {
 							LocalePreflet();
 		virtual				~LocalePreflet();
 
-		virtual	void		MessageReceived(BMessage* message);
 		virtual	void		AboutRequested();
 
 private:
-		LocaleSettings		fSettings;
-		LocaleSettings		fOriginalSettings;
 		LocaleWindow*		fLocaleWindow;
 };
 
@@ -51,52 +47,24 @@ LocalePreflet::LocalePreflet()
 {
 	fLocaleWindow = new LocaleWindow();
 
-	fOriginalSettings.Load();
-	fSettings = fOriginalSettings;
-
-	/*
-	if (fSettings.Message().HasPoint("window_location")) {
-		BPoint point = fSettings.Message().FindPoint("window_location");
-		fLocaleWindow->MoveTo(point);
-	}
-	*/
-
 	fLocaleWindow->Show();
 }
 
 
 LocalePreflet::~LocalePreflet()
 {
-	fSettings.Save();
-}
-
-
-void
-LocalePreflet::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case kMsgSettingsChanged:
-			fSettings.UpdateFrom(message);
-			break;
-
-		case kMsgRevert:
-			fSettings = fOriginalSettings;
-			break;
-
-		default:
-			BApplication::MessageReceived(message);
-			break;
-	}
 }
 
 
 void
 LocalePreflet::AboutRequested()
 {
-	const char* authors[3];
-	authors[0] = "Axel Dörfler";
-	authors[1] = "Adrien Destugues";
-	authors[2] = NULL;
+	const char* authors[] = {
+		"Axel Dörfler",
+		"Adrien Destugues",
+		"Oliver Tappe",
+		 NULL
+	};
 	BAboutWindow about(B_TRANSLATE("Locale"), 2005, authors);
 	about.Show();
 }

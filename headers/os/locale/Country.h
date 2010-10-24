@@ -22,18 +22,9 @@ namespace icu_44 {
 }
 
 
-enum {
-	B_METRIC = 0,
-	B_US
-};
-
-
 class BCountry {
 public:
-								BCountry(const char* languageCode,
-									const char* countryCode);
-								BCountry(const char* languageAndCountryCode
-									= "en_US");
+								BCountry(const char* countryCode = NULL);
 								BCountry(const BCountry& other);
 								BCountry& operator=(const BCountry& other);
 								~BCountry();
@@ -44,14 +35,11 @@ public:
 									) const;
 
 			const char*			Code() const;
+									// ISO-3166
 			status_t			GetIcon(BBitmap* result) const;
-
-			const char*			GetLocalizedString(uint32 id) const;
 
 			status_t			GetAvailableTimeZones(
 									BMessage* timeZones) const;
-
-			int8				Measurement() const;
 
 			class Private;
 private:

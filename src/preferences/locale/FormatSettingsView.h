@@ -7,11 +7,12 @@
 
 
 #include <Box.h>
-#include <Locale.h>
+#include <FormattingConventions.h>
 #include <String.h>
 #include <View.h>
 
 
+class BCheckBox;
 class BCountry;
 class BMenuField;
 class BMessage;
@@ -20,79 +21,54 @@ class BStringView;
 class BTextControl;
 
 
-enum FormatSeparator {
-		kNoSeparator,
-		kSpaceSeparator,
-		kMinusSeparator,
-		kSlashSeparator,
-		kBackslashSeparator,
-		kDotSeparator,
-		kSeparatorsEnd
-};
-
-const uint32 kSettingsContentsModified = 'Scmo';
-const uint32 kClockFormatChange = 'cfmc';
-const uint32 kMenuMessage = 'FRMT';
+static const uint32 kClockFormatChange = 'cfmc';
+static const uint32 kStringsLanguageChange = 'strc';
 
 
-class FormatView : public BView {
+class FormatSettingsView : public BView {
 public:
-								FormatView(const BLocale& locale);
-								~FormatView();
+								FormatSettingsView();
+								~FormatSettingsView();
 
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AttachedToWindow();
 
 	virtual	void				Revert();
-	virtual	void				SetLocale(const BLocale& locale);
-	virtual	void				RecordRevertSettings();
-	virtual	bool				IsRevertable() const;
+	virtual	void				Refresh(bool setInitial = false);
+	virtual	bool				IsReversible() const;
 
 private:
 			void				_UpdateExamples();
-			void				_SendNotices();
-			void				_ParseDateFormat();
-			void				_ParseCurrencyFormat();
-			void				_UpdateLongDateFormatString();
 
 private:
-			BRadioButton*		f24HrRadioButton;
-			BRadioButton*		f12HrRadioButton;
+			BCheckBox*			fUseLanguageStringsCheckBox;
 
-			BMenuField*			fLongDateMenu[4];
-			BString				fLongDateString[4];
-			BTextControl*		fLongDateSeparator[4];
-			BMenuField*			fDateMenu[3];
-			BString				fDateString[3];
+			BRadioButton*		f24HourRadioButton;
+			BRadioButton*		f12HourRadioButton;
 
-			BMenuField*			fSeparatorMenuField;
-
+			BStringView*		fFullDateExampleView;
 			BStringView*		fLongDateExampleView;
+			BStringView*		fMediumDateExampleView;
 			BStringView*		fShortDateExampleView;
+
+			BStringView*		fFullTimeExampleView;
 			BStringView*		fLongTimeExampleView;
+			BStringView*		fMediumTimeExampleView;
 			BStringView*		fShortTimeExampleView;
-			BStringView*		fNumberFormatExampleView;
-			BStringView*		fMonetaryView;
 
-			BTextControl*		fCurrencySymbolView;
-			BRadioButton*		fCurrencySymbolBefore;
-			BRadioButton*		fCurrencySymbolAfter;
+			BStringView*		fPositiveNumberExampleView;
+			BStringView*		fNegativeNumberExampleView;
+			BStringView*		fPositiveMonetaryExampleView;
+			BStringView*		fNegativeMonetaryExampleView;
 
-			bool				f24HrClock;
+			bool				fLocaleIs24Hour;
 
-			FormatSeparator		fSeparator;
-			BString				fDateFormat;
-
-			BString				fOriginalTimeFormat;
-			BString				fOriginalLongTimeFormat;
-			bool				fLocaleIs24Hr;
-
-			BLocale				fLocale;
+			BFormattingConventions	fInitialConventions;
 
 			BBox*				fDateBox;
 			BBox*				fTimeBox;
-			BBox*				fNumbersBox;
-			BBox*				fCurrencyBox;
+			BBox*				fNumberBox;
+			BBox*				fMonetaryBox;
 };
 
 

@@ -7,7 +7,7 @@
 
 
 #include <Collator.h>
-#include <Country.h>
+#include <FormattingConventions.h>
 #include <image.h>
 #include <Language.h>
 #include <List.h>
@@ -34,10 +34,8 @@ public:
 								MutableLocaleRoster();
 								~MutableLocaleRoster();
 
-			status_t			GetDefaultLocale(BLocale* locale) const;
-
-			status_t			SetDefaultCountry(const BCountry& country);
-			status_t			SetDefaultLocale(const BLocale& locale);
+			status_t			SetDefaultFormattingConventions(
+									const BFormattingConventions& conventions);
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);
 
 			status_t			SetPreferredLanguages(const BMessage* message);
@@ -127,8 +125,8 @@ struct RosterData {
 	static	int					CompareInfos(const void* left,
 									const void* right);
 
-			status_t			SetDefaultCountry(const BCountry& country);
-			status_t			SetDefaultLocale(const BLocale& locale);
+			status_t			SetDefaultFormattingConventions(
+									const BFormattingConventions& convetions);
 			status_t			SetDefaultTimeZone(const BTimeZone& zone);
 			status_t			SetPreferredLanguages(const BMessage* msg);
 private:
@@ -138,12 +136,12 @@ private:
 			status_t			_LoadTimeSettings();
 			status_t			_SaveTimeSettings();
 
-			status_t			_SetDefaultCountry(const BCountry& country);
-			status_t			_SetDefaultLocale(const BLocale& locale);
+			status_t			_SetDefaultFormattingConventions(
+									const BFormattingConventions& conventions);
 			status_t			_SetDefaultTimeZone(const BTimeZone& zone);
 			status_t			_SetPreferredLanguages(const BMessage* msg);
 
-			status_t			_AddDefaultCountryToMessage(
+			status_t			_AddDefaultFormattingConventionsToMessage(
 									BMessage* message) const;
 			status_t			_AddDefaultTimeZoneToMessage(
 									BMessage* message) const;

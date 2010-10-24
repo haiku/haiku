@@ -15,6 +15,7 @@
 #include <Font.h>
 #include <FindDirectory.h>
 #include <File.h>
+#include <FormattingConventions.h>
 #include <GroupLayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
@@ -212,8 +213,8 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 
 	gMutableLocaleRoster->SetPreferredLanguages(&settings);
 
-	BCountry country(language.String(), language.ToUpper());
-	gMutableLocaleRoster->SetDefaultCountry(country);
+	BFormattingConventions conventions(language.String());
+	gMutableLocaleRoster->SetDefaultFormattingConventions(conventions);
 }
 
 
@@ -269,7 +270,7 @@ BootPromptWindow::_PopulateLanguages()
 	}
 
 	BMessage installedCatalogs;
-	be_locale_roster->GetInstalledCatalogs(&installedCatalogs,
+	be_locale_roster->GetAvailableCatalogs(&installedCatalogs,
 		"x-vnd.Haiku-ReadOnlyBootPrompt");
 
 	BFont font;

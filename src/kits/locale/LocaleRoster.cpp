@@ -20,11 +20,11 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <Collator.h>
-#include <Country.h>
 #include <DefaultCatalog.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <FormattingConventions.h>
 #include <IconUtils.h>
 #include <Language.h>
 #include <Locale.h>
@@ -261,8 +261,8 @@ BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon, const char* countryCode)
 
 
 status_t
-BLocaleRoster::GetInstalledCatalogs(BMessage*  languageList,
-		const char* sigPattern,	const char* langPattern, int32 fingerprint) const
+BLocaleRoster::GetAvailableCatalogs(BMessage*  languageList,
+	const char* sigPattern,	const char* langPattern, int32 fingerprint) const
 {
 	if (languageList == NULL)
 		return B_BAD_VALUE;

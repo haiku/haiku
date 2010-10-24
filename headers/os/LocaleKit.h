@@ -13,6 +13,7 @@
 #include <Format.h>
 #include <FormatImpl.h>
 #include <FormatParameters.h>
+#include <FormattingConventions.h>
 #include <GenericNumberFormat.h>
 #include <IntegerFormat.h>
 #include <IntegerFormatImpl.h>

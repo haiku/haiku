@@ -38,7 +38,6 @@ All rights reserved.
 #include <string.h>
 
 #include <Catalog.h>
-#include <Country.h>
 #include <Debug.h>
 #include <Locale.h>
 #include <MenuItem.h>
@@ -251,7 +250,8 @@ TTimeView::ShowCalendar(BPoint where)
 void
 TTimeView::GetCurrentTime()
 {
-	fLocale.FormatTime(fTimeStr, 64, fTime, fShowSeconds);
+	fLocale.FormatTime(fTimeStr, 64, fTime,
+		fShowSeconds ? B_MEDIUM_TIME_FORMAT : B_SHORT_TIME_FORMAT);
 }
 
 
@@ -260,7 +260,7 @@ TTimeView::GetCurrentDate()
 {
 	char tmp[64];
 
-	fLocale.FormatDate(tmp, 64, fTime, true);
+	fLocale.FormatDate(tmp, 64, fTime, B_FULL_DATE_FORMAT);
 
 	//	remove leading 0 from date when month is less than 10 (MM/DD/YY)
 	//  or remove leading 0 from date when day is less than 10 (DD/MM/YY)
@@ -297,7 +297,7 @@ TTimeView::MouseDown(BPoint point)
 	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		ShowClockOptions(ConvertToScreen(point));
 		return;
-	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) 
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON)
 		ShowCalendar(point);
 
 	// invalidate last time/date strings and call the pulse
@@ -360,6 +360,7 @@ TTimeView::Update()
 	fLocale = *be_locale;
 	GetCurrentTime();
 	GetCurrentDate();
+
 
 	SetToolTip(fDateStr);
 
