@@ -101,10 +101,10 @@ actions LinkApplicationCatalog1
 		-s $(HAIKU_CATALOG_SIGNATURE) -o "$(1)"
 }
 
-rule DoCatalogs target : signature : sources : sourceLanguage : regexp : folder
+rule DoCatalogs target : signature : sources : sourceLanguage : regexp
 {
 	# DoCatalogs <target> : <signature> : <sources> [ : <sourceLanguage> ]
-	#	[ : <regexp> ] [ : <folder> ]
+	#	[ : <regexp> ]
 	#
 	# Extracts the catkeys from a target's source files, generates the
 	# default catalog from them, and also generates catalogs for all
@@ -118,13 +118,18 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp : folder
 	#					the sources. Optional: default is "en".
 	# regexp            The regular expression used to parse the files.
 	#                   Optional: default is matching be_catalog->GetString
-	# folder			Optional: the subdirectory containing *.catkeys
 
 	# Make a note of all targets that call this rule.
 	# This will be used for the pseudo-target catkeys
 	HAIKU_LOCALIZED_TARGETS += $(target) ;
 
-	local subdir = $(SUBDIR_TOKENS[2-]) $(folder) ;
+	local subdir ;
+	if [ on $(SUBDIR) return $(HAIKU_MULTIPLE_LOCALIZED_TARGETS) ] {
+		subdir = $(SUBDIR_TOKENS[2-]) $(target) ;
+	} else {
+		subdir = $(SUBDIR_TOKENS[2-]) ;
+	}
+
 	HAIKU_CATALOGS_SUBDIR on $(signature) = $(subdir) ;
 
 	local generatedCatalog

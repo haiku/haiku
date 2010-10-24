@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps screenshot ;
 
+HAIKU_MULTIPLE_LOCALIZED_TARGETS on $(SUBDIR) = 1 ;
+
 UsePrivateHeaders interface ;
 
 Application Screenshot :
@@ -29,7 +31,4 @@ DoCatalogs screenshot :
 	x-vnd.haiku-screenshot-cli
 	:
 	Utility.cpp
-	:
-	:
-	: cli
 ;

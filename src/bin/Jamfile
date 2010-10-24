@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src bin ;
 
+HAIKU_MULTIPLE_LOCALIZED_TARGETS on $(SUBDIR) = 1 ;
+
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddSubDirSupportedPlatforms libbe_test ;
@@ -218,9 +220,11 @@ StdBinCommands
 DoCatalogs dstcheck
 	: x-vnd.Haiku-cmd-dstconfig
 	: dstcheck.cpp
-	:
-	:
-	: dstcheck
+;
+
+DoCatalogs filepanel
+	: x-vnd.mmu_man.filepanel
+	: filepanel.cpp
 ;
 
 SubInclude HAIKU_TOP src bin addattr ;
