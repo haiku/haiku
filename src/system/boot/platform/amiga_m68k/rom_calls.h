@@ -1153,6 +1153,10 @@ extern ExecBase *EXEC_BASE_NAME;
 	LP0(0x29a, struct MsgPort *, CreateMsgPort, \
 	, EXEC_BASE_NAME)
 
+#define ColdReboot() \
+	LP0NR(0x2d6, ColdReboot, \
+	, EXEC_BASE_NAME)
+
 
 
 extern "C" status_t exec_error(int32 err);
