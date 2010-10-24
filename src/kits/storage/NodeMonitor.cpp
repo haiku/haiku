@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold, bonefish@@users.sf.net
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Clemens Zeidler <haiku@clemens-zeidler.de>
  */
 
 

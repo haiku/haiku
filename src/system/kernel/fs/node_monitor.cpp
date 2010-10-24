@@ -219,8 +219,9 @@ static NodeMonitorService sNodeMonitorService;
 
 
 /*!	\brief Notifies the listener of a live query that an entry has been added
-  		   to or removed from the query (for whatever reason).
-  	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
+  		   to or removed from or updated and still in the query (for whatever
+  		   reason).
+  	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED or \c B_ATTR_CHANGED.
   	\param port The target port of the listener.
   	\param token The BHandler token of the listener.
   	\param device The ID of the mounted FS, the entry lives in.
@@ -232,7 +233,7 @@ static NodeMonitorService sNodeMonitorService;
   	- another error code otherwise.
 */
 static status_t
-notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
+notify_query_entry_event(int32 opcode, port_id port, int32 token,
 	dev_t device, ino_t directory, const char *name, ino_t node)
 {
 	if (!name)
@@ -1195,7 +1196,7 @@ status_t
 notify_query_entry_created(port_id port, int32 token, dev_t device,
 	ino_t directory, const char *name, ino_t node)
 {
-	return notify_query_entry_created_or_removed(B_ENTRY_CREATED, port, token,
+	return notify_query_entry_event(B_ENTRY_CREATED, port, token,
 		device, directory, name, node);
 }
 
@@ -1216,7 +1217,28 @@ status_t
 notify_query_entry_removed(port_id port, int32 token, dev_t device,
 	ino_t directory, const char *name, ino_t node)
 {
-	return notify_query_entry_created_or_removed(B_ENTRY_REMOVED, port, token,
+	return notify_query_entry_event(B_ENTRY_REMOVED, port, token,
+		device, directory, name, node);
+}
+
+
+/*!	\brief Notifies the listener of a live query that an entry has been changed
+  		   and is still in the query (for whatever reason).
+  	\param port The target port of the listener.
+  	\param token The BHandler token of the listener.
+  	\param device The ID of the mounted FS, the entry lives in.
+  	\param directory The entry's parent directory ID.
+  	\param name The entry's name.
+  	\param node The ID of the node the entry refers to.
+  	\return
+  	- \c B_OK, if everything went fine,
+  	- another error code otherwise.
+*/
+status_t
+notify_query_attr_changed(port_id port, int32 token, dev_t device,
+	ino_t directory, const char* name, ino_t node)
+{
+	return notify_query_entry_event(B_ATTR_CHANGED, port, token,
 		device, directory, name, node);
 }
 

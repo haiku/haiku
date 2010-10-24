@@ -33,6 +33,8 @@ if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	fsShellCommandLibs = $(HOST_NETWORK_LIBS) ;
 }
 
+UsePrivateHeaders storage ;
+
 UsePrivateHeaders fs_shell ;
 
 local bfsSource =

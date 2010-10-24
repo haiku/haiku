@@ -22,9 +22,11 @@
 
 #include <MessengerPrivate.h>
 #include <syscalls.h>
+#include <query_private.h>
 
 #include "QueryPredicate.h"
 #include "storage_support.h"
+
 
 using namespace std;
 using namespace BPrivate::Storage;

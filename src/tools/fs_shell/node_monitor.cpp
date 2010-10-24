@@ -64,3 +64,12 @@ fssh_notify_query_entry_removed(fssh_port_id port, int32_t token,
 {
 	return FSSH_B_OK;
 }
+
+
+fssh_status_t
+fssh_notify_query_attr_changed(fssh_port_id port, int32_t token,
+	fssh_mount_id device, fssh_vnode_id directory, const char *name,
+	fssh_vnode_id node)
+{
+	return FSSH_B_OK;
+}

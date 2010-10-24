@@ -1,5 +1,6 @@
 /*
  * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * This file may be used under the terms of the MIT License.
  */
 
@@ -11,13 +12,15 @@
 */
 
 #include "Query.h"
+
+#include <query_private.h>
+
+#include "BPlusTree.h"
 #include "bfs.h"
 #include "Debug.h"
-#include "Volume.h"
-#include "Inode.h"
-#include "BPlusTree.h"
 #include "Index.h"
-
+#include "Inode.h"
+#include "Volume.h"
 
 // The parser has a very static design, but it will do what is required.
 //
@@ -1620,7 +1623,8 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 	status_t newStatus = fExpression->Root()->Match(inode, attribute, type,
 		newKey, newLength);
 
-	bool entryCreated;
+	bool entryCreated = false;
+	bool stillInQuery = false;
 
 	if (oldStatus != MATCH_OK) {
 		if (newStatus != MATCH_OK) {
@@ -1631,10 +1635,11 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 	} else if (newStatus != MATCH_OK) {
 		// entry got removed
 		entryCreated = false;
-	} else {
+	} else if ((fFlags & B_ATTR_CHANGE_NOTIFICATION) != 0) {
 		// The entry stays in the query
+		stillInQuery = true;
+	} else
 		return;
-	}
 
 	// we may need to get the name of the inode
 
@@ -1652,7 +1657,10 @@ Query::LiveUpdate(Inode* inode, const char* attribute, int32 type,
 
 	// notify query listeners
 
-	if (entryCreated) {
+	if (stillInQuery)
+		notify_query_attr_changed(fPort, fToken, fVolume->ID(),
+			fVolume->ToVnode(inode->Parent()), name, inode->ID());
+	else if (entryCreated) {
 		notify_query_entry_created(fPort, fToken, fVolume->ID(),
 			fVolume->ToVnode(inode->Parent()), name, inode->ID());
 	} else {

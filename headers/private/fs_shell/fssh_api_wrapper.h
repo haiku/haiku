@@ -945,6 +945,7 @@
 
 #define notify_query_entry_created	fssh_notify_query_entry_created
 #define notify_query_entry_removed	fssh_notify_query_entry_removed
+#define notify_query_attr_changed	fssh_notify_query_attr_changed
 
 
 ////////////////////////////////////////////////////////////////////////////////

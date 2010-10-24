@@ -356,6 +356,9 @@ extern status_t notify_query_entry_created(port_id port, int32 token,
 extern status_t notify_query_entry_removed(port_id port, int32 token,
 					dev_t device, ino_t directory, const char* name,
 					ino_t node);
+extern status_t notify_query_attr_changed(port_id port, int32 token,
+					dev_t device, ino_t directory, const char* name,
+					ino_t node);
 
 #ifdef __cplusplus
 }
