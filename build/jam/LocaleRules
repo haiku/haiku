@@ -158,5 +158,8 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp
 	HAIKU_LOCALIZED_TARGETS += $(target) ;
 
 	# For the pseudo-target catalogs
-	HAIKU_LOCALIZED_CATALOGS += $(catkeysFiles:S=.catalog) ;
+	HAIKU_LOCALE_CATALOGS += $(catkeysFiles:S=.catalog) ;
+
+	# For the pseudo-target catkeys
+	HAIKU_LOCALE_OUTPUT_CATKEYS += $(generatedCatalog:S=.catkeys) ;
 }
