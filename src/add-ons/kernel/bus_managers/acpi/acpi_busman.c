@@ -22,6 +22,7 @@
 
 #include "acpi.h"
 #include "accommon.h"
+#include "acdisasm.h"
 #include "acnamesp.h"
 #include "acpi_priv.h"
 
@@ -73,6 +74,33 @@ get_device_by_hid_callback(ACPI_HANDLE object, UINT32 depth, void* context,
 }
 
 
+static void dump_madt() {
+	ACPI_STATUS status;
+	ACPI_TABLE_HEADER *madt = NULL;
+	ACPI_SUBTABLE_HEADER *entry;
+	void *end;
+	int madtCount = -1;
+
+	while (true) {
+		status = AcpiGetTable (ACPI_SIG_MADT, ++madtCount, &madt);
+		if (status != AE_OK) break;
+		
+		dprintf("acpi: MADT TABLE:\n");
+		AcpiDmDumpDataTable( madt );
+/*		entry = madt + 44;
+		end = madt + madt->Header.Length;
+		while (entry < end) {
+			dprintf("\t\tType: %d\n", entry->Type);
+			entry += entry->Length;
+		};
+*/
+	};
+
+	dprintf("acpi: You have %d MADT tables.\n", madtCount);
+
+}
+
+
 //	#pragma mark - ACPI bus manager API
 
 
@@ -89,6 +117,7 @@ acpi_std_ops(int32 op,...)
 			void *settings;
 			bool acpiDisabled = false;
 			bool acpiAvoidFullInit = false;
+			bool acpiDumpMADT = false;
 
 			settings = load_driver_settings("kernel");
 			if (settings != NULL) {
@@ -96,6 +125,8 @@ acpi_std_ops(int32 op,...)
 					false, false);
 				acpiAvoidFullInit = get_driver_boolean_parameter(settings,
 					"acpi_avoid_full_init", false, false);
+				acpiDumpMADT = get_driver_boolean_parameter(settings,
+					"acpi_dump_MADT", false, false);
 				unload_driver_settings(settings);
 			}
 
@@ -148,6 +179,8 @@ acpi_std_ops(int32 op,...)
 					AcpiFormatException(status));
 				goto err;
 			}
+
+			if (acpiDumpMADT) dump_madt();
 
 			/* Install the default address space handlers. */
 			status = AcpiInstallAddressSpaceHandler(ACPI_ROOT_OBJECT,

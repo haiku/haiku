@@ -31,6 +31,12 @@ local hardware_src =
 	hwxface.c
 ;
 
+local common_src =
+	dmtable.c
+	dmtbdump.c
+	dmtbinfo.c
+;
+
 local debugger_src =
 	dbdisply.c
 	dbxface.c
@@ -171,6 +177,7 @@ StaticLibrary libacpi_ca.a :
 	$(resources_src)
 	$(tables_src)
 	$(utilities_src)
+	$(common_src)
 	 ;
 
 SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi events ] ;
@@ -182,6 +189,7 @@ SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-on
 SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi dispatcher ] ;
 SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi executer ] ;
 SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi parser ] ;
+SEARCH on [ FGristFiles $(common_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi common ] ;
 
 KernelAddon acpi :
 	oshaiku.cpp
