@@ -1679,7 +1679,7 @@ static file_system_module_info sExt2FileSystem = {
 
 	"ext2",						// short_name
 	"Ext2 File System",			// pretty_name
-	0,							// DDM flags
+	B_DISK_SYSTEM_SUPPORTS_WRITING,						// DDM flags
 
 	// scanning
 	ext2_identify_partition,
