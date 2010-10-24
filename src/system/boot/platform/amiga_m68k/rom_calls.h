@@ -1351,6 +1351,22 @@ extern struct Library *KEYMAP_BASE_NAME;
 
 #endif /* __ASSEMBLER__ */
 
+// <libraries/lowlevel.h>
+
+#ifndef LOWLEVEL_BASE_NAME
+#define LOWLEVEL_BASE_NAME LowLevelBase
+#endif
+
+#define GetKey() \
+	LP0(0x30, uint32, GetKey, \
+	, LOWLEVEL_BASE_NAME)
+
+#define QueryKeys(par1, last) \
+	LP2NR(0x36, QueryKeys, struct KeyQuery *, par1, a0, unsigned long, last, d1, \
+	, LOWLEVEL_BASE_NAME)
+
+
+
 // <devices/keyboard.h>
 
 #define KBD_READEVENT (CMD_NONSTD+0)

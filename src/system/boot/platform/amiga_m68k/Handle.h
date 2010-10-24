@@ -66,6 +66,7 @@ class ExecDevice : public ConsoleNode {
 
 		// *IO() call helpers
 		status_t	Do(void);
+		status_t	Clear(void);
 
 	protected:
 		struct IORequest	*fIORequest;

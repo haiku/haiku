@@ -124,12 +124,24 @@ ExecDevice::Size() const
 		// 1024 GB
 }
 
+
 status_t
 ExecDevice::Do()
 {
 	status_t err;
 	err = exec_error(DoIO(fIORequest));
 	return err;
+}
+
+
+status_t
+ExecDevice::Clear()
+{
+	fIOStdReq->io_Command = CMD_CLEAR;
+	status_t err = Do();
+	if (err < B_OK)
+		return err;
+	return B_OK;
 }
 
 
