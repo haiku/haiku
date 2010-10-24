@@ -330,6 +330,7 @@ console_init(void)
 void
 console_clear_screen(void)
 {
+	Move(&sScreen->RastPort, 0, sScreenTopOffset);
 	ClearScreen(&sScreen->RastPort);
 }
 
