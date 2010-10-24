@@ -29,6 +29,21 @@ class ConsoleHandle : public CharHandle {
 		uint16	fPen;
 };
 
+class ConsoleDevice : public ExecDevice {
+	public:
+		ConsoleDevice();
+		virtual ~ConsoleDevice();
+
+		status_t	Open();
+
+		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
+		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
+
+		int	WaitForKey();
+
+	protected:
+};
+
 class KeyboardDevice : public ExecDevice {
 	public:
 		KeyboardDevice();
@@ -121,9 +136,73 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 	return bufferSize;
 }
 
-static ConsoleHandle sOutput;
-static ConsoleHandle sErrorOutput;
-static ConsoleHandle sDebugOutput;
+
+// #pragma mark -
+
+
+ConsoleDevice::ConsoleDevice()
+	: ExecDevice()
+{
+}
+
+
+ConsoleDevice::~ConsoleDevice()
+{
+}
+
+
+status_t
+ConsoleDevice::Open()
+{
+	return ExecDevice::Open("console.device", -1);
+}
+
+
+ssize_t
+ConsoleDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	return ExecDevice::ReadAt(cookie, pos, buffer, bufferSize);
+}
+
+
+int
+ConsoleDevice::WaitForKey()
+{
+	char ascii;
+	ssize_t actual;
+	status_t err;
+	
+	if (Read(&ascii, 1) < 1) {
+		panic("WFK\n");
+		return 0;
+	}
+	dprintf("ascii %d %c\n", ascii, ascii);
+
+	switch (ascii) {
+		case IECODE_KEY_UP:
+			return TEXT_CONSOLE_KEY_UP;
+		case IECODE_KEY_DOWN:
+			return TEXT_CONSOLE_KEY_DOWN;
+		case IECODE_KEY_LEFT:
+			return TEXT_CONSOLE_KEY_LEFT;
+		case IECODE_KEY_RIGHT:
+			return TEXT_CONSOLE_KEY_RIGHT;
+		case IECODE_KEY_PAGE_UP:
+			return TEXT_CONSOLE_KEY_PAGE_UP;
+		case IECODE_KEY_PAGE_DOWN:
+			return TEXT_CONSOLE_KEY_PAGE_DOWN;
+		default:
+			break;
+	}
+	return ascii;
+}
+
+
+ssize_t
+ConsoleDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	return ExecDevice::WriteAt(cookie, pos, buffer, bufferSize);
+}
 
 
 // #pragma mark -
@@ -236,15 +315,20 @@ KeyboardDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t buff
 }
 
 
-static KeyboardDevice sInput;
-
-
 //	#pragma mark -
+
+
+static ConsoleHandle sOutput;
+static ConsoleHandle sErrorOutput;
+static ConsoleHandle sDebugOutput;
+
+static KeyboardDevice sInput;
 
 
 status_t
 console_init(void)
 {
+	status_t err;
 	
 	GRAPHICS_BASE_NAME = (GfxBase *)OldOpenLibrary(GRAPHICSNAME);
 	if (GRAPHICS_BASE_NAME == NULL)
@@ -315,7 +399,9 @@ console_init(void)
 		panic("Cannot open %s", KEYMAPNAME);
 
 	sInput.AllocRequest(sizeof(struct IOStdReq));
-	sInput.Open();
+	err = sInput.Open();
+	if (err < B_OK)
+		panic("sInput.Open() 0x%08lx\n", err);
 	stdin = (FILE *)&sInput;
 
 	
