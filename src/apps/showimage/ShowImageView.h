@@ -70,11 +70,11 @@ public:
 			bool				GetScaleBilinear() { return fScaleBilinear; }
 			void				SetShowCaption(bool show);
 			void				SetShrinkToBounds(bool enable);
-			bool				GetShrinkToBounds() const
+			bool				ShrinkToBounds() const
 									{ return fShrinkToBounds; }
-			void				SetZoomToBounds(bool enable);
-			bool				GetZoomToBounds() const
-									{ return fZoomToBounds; }
+			void				SetStretchToBounds(bool enable);
+			bool				StretchToBounds() const
+									{ return fStretchToBounds; }
 			void				SetFullScreen(bool fullScreen);
 
 			BBitmap*			GetBitmap();
@@ -111,9 +111,11 @@ public:
 			bool				SlideShowStarted() const { return fSlideShow; }
 			void				StartSlideShow();
 			void				StopSlideShow();
-			void				SetZoom(BPoint where, float zoom);
+			void				SetZoom(float zoom,
+									BPoint where = BPoint(-1, -1));
 			void				ZoomIn(BPoint where = BPoint(-1, -1));
 			void				ZoomOut(BPoint where = BPoint(-1, -1));
+			void				ResetZoom();
 
 			// Image manipulation
 			void				Rotate(int degree); // 90 and 270 only
@@ -155,21 +157,16 @@ private:
 			void				_DeleteBitmap();
 			void				_DeleteSelectionBitmap();
 
-			int32				_BytesPerPixel(color_space cs) const;
-			void				_CopyPixel(uchar* dest, int32 destX,
-									int32 destY, int32 destBPR, uchar* src,
-									int32 x, int32 y, int32 bpr, int32 bpp);
-			void				_InvertPixel(int32 x, int32 y, uchar* dest,
-									int32 destBPR, uchar* src, int32 bpr,
-									int32 bpp);
 			void				_DoImageOperation(
 									enum ImageProcessor::operation op,
 									bool quiet = false);
 			void				_UserDoImageOperation(
 									enum ImageProcessor::operation op,
 									bool quiet = false);
+			bool				_ShouldShrink() const;
+			bool				_ShouldStretch() const;
+			float				_FitToBoundsZoom() const;
 			BRect				_AlignBitmap();
-			void				_Setup(BRect r);
 			bool				_IsImage(const entry_ref* pref);
 	static	int					_CompareEntries(const void* a, const void* b);
 			void				_FreeEntries(BList* entries);
@@ -235,8 +232,8 @@ private:
 			BPoint				fBitmapLocationInView;
 
 			bool				fShrinkToBounds;
-			bool				fZoomToBounds;
-			bool				fShrinkOrZoomToBounds;
+			bool				fStretchToBounds;
+			float				fFitToBoundsZoom;
 			bool				fFullScreen;
 			bool				fScrollingBitmap;
 			bool				fCreatingSelection;

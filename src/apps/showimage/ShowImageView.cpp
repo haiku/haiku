@@ -197,8 +197,8 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fBitmapLocationInView(0.0, 0.0),
 
 	fShrinkToBounds(true),
-	fZoomToBounds(true),
-	fShrinkOrZoomToBounds(true),
+	fStretchToBounds(false),
+	fFitToBoundsZoom(1.0),
 	fFullScreen(false),
 	fScrollingBitmap(false),
 	fCreatingSelection(false),
@@ -218,7 +218,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	settings = my_app->Settings();
 	if (settings->Lock()) {
 		fShrinkToBounds = settings->GetBool("ShrinkToBounds", fShrinkToBounds);
-		fZoomToBounds = settings->GetBool("ZoomToBounds", fZoomToBounds);
+		fStretchToBounds = settings->GetBool("ZoomToBounds", fStretchToBounds);
 		fSlideShowDelay = settings->GetInt32("SlideShowDelay", fSlideShowDelay);
 		fScaleBilinear = settings->GetBool("ScaleBilinear", fScaleBilinear);
 		settings->Unlock();
@@ -382,7 +382,7 @@ ShowImageView::_DeleteSelectionBitmap()
 
 
 status_t
-ShowImageView::SetImage(const entry_ref *ref)
+ShowImageView::SetImage(const entry_ref* ref)
 {
 	// If no file was specified, load the specified page of
 	// the current file.
@@ -502,7 +502,9 @@ ShowImageView::SetImage(const entry_ref *ref)
 		fCaption << ", " << fDocumentIndex << "/" << fDocumentCount;
 
 	fCaption << ", " << fImageType;
-	fZoom = 1.0;
+
+	fFitToBoundsZoom = _FitToBoundsZoom();
+	ResetZoom();
 
 	be_roster->AddToRecentDocuments(&fCurrentRef, kApplicationSignature);
 
@@ -571,20 +573,20 @@ ShowImageView::SetShrinkToBounds(bool enable)
 	if (fShrinkToBounds != enable) {
 		_SettingsSetBool("ShrinkToBounds", enable);
 		fShrinkToBounds = enable;
-		FixupScrollBars();
-		Invalidate();
+		if (enable)
+			SetZoom(fFitToBoundsZoom);
 	}
 }
 
 
 void
-ShowImageView::SetZoomToBounds(bool enable)
+ShowImageView::SetStretchToBounds(bool enable)
 {
-	if (fZoomToBounds != enable) {
+	if (fStretchToBounds != enable) {
 		_SettingsSetBool("ZoomToBounds", enable);
-		fZoomToBounds = enable;
-		FixupScrollBars();
-		Invalidate();
+		fStretchToBounds = enable;
+		if (enable)
+			SetZoom(fFitToBoundsZoom);
 	}
 }
 
@@ -641,6 +643,7 @@ ShowImageView::SetScaleBilinear(bool enabled)
 void
 ShowImageView::AttachedToWindow()
 {
+	ResetZoom();
 	fUndo.SetWindow(Window());
 	FixupScrollBars();
 
@@ -653,6 +656,42 @@ ShowImageView::DetachedFromWindow()
 {
 	fProgressWindow->Lock();
 	fProgressWindow->Quit();
+}
+
+
+bool
+ShowImageView::_ShouldShrink() const
+{
+	return fShrinkToBounds && fBitmap->Bounds().Width() > Bounds().Width()
+		&& fBitmap->Bounds().Height() > Bounds().Height();
+}
+
+
+bool
+ShowImageView::_ShouldStretch() const
+{
+	return fStretchToBounds && fBitmap->Bounds().Width() < Bounds().Width()
+		&& fBitmap->Bounds().Height() < Bounds().Height();
+}
+
+
+float
+ShowImageView::_FitToBoundsZoom() const
+{
+	// the width/height of the bitmap (in pixels)
+	float bitmapWidth = fBitmap->Bounds().Width() + 1;
+	float bitmapHeight = fBitmap->Bounds().Height() + 1;
+
+	// the available width/height for layouting the bitmap (in pixels)
+	float width = Bounds().Width() + 1;
+	float height = Bounds().Height() + 1;
+
+	float zoom = width / bitmapWidth;
+
+	if (zoom * bitmapHeight <= height)
+		return zoom;
+
+	return height / bitmapHeight;
 }
 
 
@@ -672,51 +711,22 @@ ShowImageView::_AlignBitmap()
 	if (width == 0 || height == 0)
 		return rect;
 
-	fShrinkOrZoomToBounds = (fShrinkToBounds
-			&& (bitmapWidth >= width || bitmapHeight >= height))
-		|| (fZoomToBounds && (bitmapWidth < width && bitmapHeight < height));
-	if (fShrinkOrZoomToBounds) {
-		float s = width / bitmapWidth;
+	// zoom image
+	rect.right = floorf(bitmapWidth * fZoom) - 1;
+	rect.bottom = floorf(bitmapHeight * fZoom) - 1;
 
-		if (s * bitmapHeight <= height) {
-			rect.right = width - 1;
-			rect.bottom = static_cast<int>(s * bitmapHeight) - 1;
-			// center vertically
-			rect.OffsetBy(0, static_cast<int>((height - rect.Height()) / 2));
-		} else {
-			s = height / bitmapHeight;
-			rect.right = static_cast<int>(s * bitmapWidth) - 1;
-			rect.bottom = height - 1;
-			// center horizontally
-			rect.OffsetBy(static_cast<int>((width - rect.Width()) / 2), 0);
-		}
-	} else {
-		// zoom image
-		rect.right = floorf(bitmapWidth * fZoom) - 1;
-		rect.bottom = floorf(bitmapHeight * fZoom) - 1;
+	// update the bitmap size after the zoom
+	bitmapWidth = rect.Width() + 1.0;
+	bitmapHeight = rect.Height() + 1.0;
 
-		// update the bitmap size after the zoom
-		bitmapWidth = rect.Width() + 1.0;
-		bitmapHeight = rect.Height() + 1.0;
+	// always align in the center if the bitmap is smaller than the window
+	if (width > bitmapWidth)
+		rect.OffsetBy(floorf((width - bitmapWidth) / 2.0), 0);
 
-		// always align in the center
-		if (width > bitmapWidth)
-			rect.OffsetBy(floorf((width - bitmapWidth) / 2.0), 0);
-
-		if (height > bitmapHeight)
-			rect.OffsetBy(0, floorf((height - bitmapHeight) / 2.0));
-	}
+	if (height > bitmapHeight)
+		rect.OffsetBy(0, floorf((height - bitmapHeight) / 2.0));
 
 	return rect;
-}
-
-
-void
-ShowImageView::_Setup(BRect rect)
-{
-	fBitmapLocationInView.x = floorf(rect.left);
-	fBitmapLocationInView.y = floorf(rect.top);
-	fZoom = (rect.Width() + 1.0) / (fBitmap->Bounds().Width() + 1.0);
 }
 
 
@@ -825,7 +835,8 @@ ShowImageView::Draw(BRect updateRect)
 	}
 
 	BRect rect = _AlignBitmap();
-	_Setup(rect);
+	fBitmapLocationInView.x = floorf(rect.left);
+	fBitmapLocationInView.y = floorf(rect.top);
 
 	_DrawBackground(rect);
 	_DrawImage(rect);
@@ -847,9 +858,10 @@ ShowImageView::Draw(BRect updateRect)
 
 
 void
-ShowImageView::FrameResized(float /* width */, float /* height */)
+ShowImageView::FrameResized(float /*width*/, float /*height*/)
 {
-	FixupScrollBars();
+	fFitToBoundsZoom = _FitToBoundsZoom();
+	SetZoom(_ShouldStretch() ? fFitToBoundsZoom : fZoom);
 }
 
 
@@ -1910,8 +1922,19 @@ ShowImageView::_FirstFile()
 
 
 void
-ShowImageView::SetZoom(BPoint where, float zoom)
+ShowImageView::SetZoom(float zoom, BPoint where)
 {
+	if (zoom > 32)
+		zoom = 32;
+	if (zoom < fFitToBoundsZoom / 2)
+		zoom = fFitToBoundsZoom / 2;
+
+	if (zoom == fZoom) {
+		// window size might have changed
+		FixupScrollBars();
+		return;
+	}
+
 	// Invalidate before scrolling, as that prevents the app_server
 	// to do the scrolling server side
 	Invalidate();
@@ -1941,16 +1964,48 @@ ShowImageView::SetZoom(BPoint where, float zoom)
 void
 ShowImageView::ZoomIn(BPoint where)
 {
-	if (fZoom < 16)
-		SetZoom(where, fZoom * 1.2);
+	// snap zoom to "fit to bounds", and "original size"
+	float zoom = fZoom * 1.2;
+	float zoomSnap = fZoom * 1.25;
+	if (fZoom < fFitToBoundsZoom && zoomSnap > fFitToBoundsZoom)
+		zoom = fFitToBoundsZoom;
+	if (fZoom < 1.0 && zoomSnap > 1.0)
+		zoom = 1.0;
+
+	SetZoom(zoom, where);
 }
 
 
 void
 ShowImageView::ZoomOut(BPoint where)
 {
-	if (fZoom > 0.25)
-		SetZoom(where, fZoom * 0.8);
+	// snap zoom to "fit to bounds", and "original size"
+	float zoom = fZoom / 1.2;
+	float zoomSnap = fZoom / 1.25;
+	if (fZoom > fFitToBoundsZoom && zoomSnap < fFitToBoundsZoom)
+		zoom = fFitToBoundsZoom;
+	if (fZoom > 1.0 && zoomSnap < 1.0)
+		zoom = 1.0;
+
+	SetZoom(zoom, where);
+}
+
+
+/*!	Resets the zoom to what it should be when opening an image, depending
+	on the current settings.
+*/
+void
+ShowImageView::ResetZoom()
+{
+	if (fBitmap == NULL)
+		return;
+
+	fFitToBoundsZoom = _FitToBoundsZoom();
+
+	if (_ShouldShrink() || _ShouldStretch())
+		SetZoom(fFitToBoundsZoom);
+	else
+		SetZoom(1.0);
 }
 
 
@@ -2006,10 +2061,10 @@ ShowImageView::_DoImageOperation(ImageProcessor::operation op, bool quiet)
 	// update orientation state
 	if (op != ImageProcessor::kInvert) {
 		// Note: If one of these fails, check its definition in class ImageProcessor.
-		ASSERT(ImageProcessor::kRotateClockwise < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kRotateCounterClockwise < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kFlipLeftToRight < ImageProcessor::kNumberOfAffineTransformations);
-		ASSERT(ImageProcessor::kFlipTopToBottom < ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kRotateClockwise < ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kRotateCounterClockwise < ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kFlipLeftToRight < ImageProcessor::kNumberOfAffineTransformations);
+//		ASSERT(ImageProcessor::kFlipTopToBottom < ImageProcessor::kNumberOfAffineTransformations);
 		fImageOrientation = fTransformation[op][fImageOrientation];
 	}
 

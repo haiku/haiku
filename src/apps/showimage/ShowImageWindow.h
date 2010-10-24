@@ -48,8 +48,8 @@ private:
 
 			void				_BuildViewMenu(BMenu* menu, bool popupMenu);
 			BMenuItem*			_AddItemMenu(BMenu* menu, const char* label,
-									uint32 what, const char shortcut,
-									uint32 modifier, const BHandler* target,
+									uint32 what, char shortcut, uint32 modifier,
+									const BHandler* target,
 									bool enabled = true);
 			BMenuItem*			_AddDelayItem(BMenu* menu, const char* label,
 									float value);

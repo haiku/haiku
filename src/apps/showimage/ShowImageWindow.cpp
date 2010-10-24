@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2010, Haiku, Inc. All Rights Reserved.
  * Copyright 2004-2005 yellowTAB GmbH. All Rights Reserverd.
  * Copyright 2006 Bernd Korz. All Rights Reserved
  * Distributed under the terms of the MIT License.
@@ -11,6 +11,7 @@
  *		yellowTAB GmbH
  *		Bernd Korz
  */
+
 
 #include "ShowImageWindow.h"
 
@@ -213,6 +214,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 		// every 1/10 second; ShowImageView needs it for marching ants
 
 	WindowRedimension(fImageView->GetBitmap());
+	fImageView->ResetZoom();
 	fImageView->MakeFocus(true); // to receive KeyDown messages
 	Show();
 
@@ -292,7 +294,7 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 
 	menu->AddSeparatorItem();
 
-	if (!popupMenu) {
+	if (!popupMenu || fFullScreen) {
 		_AddItemMenu(menu, B_TRANSLATE("High-quality zooming"),
 			MSG_SCALE_BILINEAR, 0, 0, this);
 
@@ -300,8 +302,8 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 
 		_AddItemMenu(menu, B_TRANSLATE("Shrink to window"),
 			MSG_SHRINK_TO_WINDOW, 0, 0, this);
-		_AddItemMenu(menu, B_TRANSLATE("Zoom to window"),
-			MSG_ZOOM_TO_WINDOW, 0, 0, this);
+		_AddItemMenu(menu, B_TRANSLATE("Stretch to window"),
+			MSG_STRETCH_TO_WINDOW, 0, 0, this);
 
 		menu->AddSeparatorItem();
 	}
@@ -315,18 +317,8 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 	_MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
 
 	_MarkMenuItem(menu, MSG_SCALE_BILINEAR, fImageView->GetScaleBilinear());
-
-	bool shrink, zoom, enabled;
-
-	shrink = fImageView->GetShrinkToBounds();
-	zoom = fImageView->GetZoomToBounds();
-	_MarkMenuItem(menu, MSG_SHRINK_TO_WINDOW, shrink);
-	_MarkMenuItem(menu, MSG_ZOOM_TO_WINDOW, zoom);
-
-	enabled = !(shrink || zoom);
-	_EnableMenuItem(menu, MSG_ORIGINAL_SIZE, enabled);
-	_EnableMenuItem(menu, MSG_ZOOM_IN, enabled);
-	_EnableMenuItem(menu, MSG_ZOOM_OUT, enabled);
+	_MarkMenuItem(menu, MSG_SHRINK_TO_WINDOW, fImageView->ShrinkToBounds());
+	_MarkMenuItem(menu, MSG_STRETCH_TO_WINDOW, fImageView->StretchToBounds());
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
@@ -361,7 +353,7 @@ ShowImageWindow::AddMenus(BMenuBar* bar)
 		MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("About ShowImage" B_UTF8_ELLIPSIS),
-		B_ABOUT_REQUESTED, 0, 0, 	be_app);
+		B_ABOUT_REQUESTED, 0, 0, be_app);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q', 0, be_app);
 	bar->AddItem(menu);
@@ -418,9 +410,10 @@ ShowImageWindow::AddMenus(BMenuBar* bar)
 
 BMenuItem*
 ShowImageWindow::_AddItemMenu(BMenu* menu, const char* label, uint32 what,
-	const char shortcut, uint32 modifier, const BHandler* target, bool enabled)
+	char shortcut, uint32 modifier, const BHandler* target, bool enabled)
 {
-	BMenuItem* item = new BMenuItem(label, new BMessage(what), shortcut, modifier);
+	BMenuItem* item = new BMenuItem(label, new BMessage(what), shortcut,
+		modifier);
 	menu->AddItem(item);
 
 	item->SetTarget(target);
@@ -553,12 +546,7 @@ ShowImageWindow::_ResizeToWindow(bool shrink, uint32 what)
 	if (shrink)
 		fImageView->SetShrinkToBounds(enabled);
 	else
-		fImageView->SetZoomToBounds(enabled);
-
-	enabled = !(fImageView->GetShrinkToBounds() || fImageView->GetZoomToBounds());
-	_EnableMenuItem(fBar, MSG_ORIGINAL_SIZE, enabled);
-	_EnableMenuItem(fBar, MSG_ZOOM_IN, enabled);
-	_EnableMenuItem(fBar, MSG_ZOOM_OUT, enabled);
+		fImageView->SetStretchToBounds(enabled);
 }
 
 
@@ -657,8 +645,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 			if (messageProvidesSize) {
 				_UpdateResizerWindow(fWidth, fHeight);
-				if (!fImageView->GetZoomToBounds()
-					&& !fImageView->GetShrinkToBounds()
+				if (!fImageView->StretchToBounds()
+					&& !fImageView->ShrinkToBounds()
 					&& !fFullScreen)
 					WindowRedimension(fImageView->GetBitmap());
 			}
@@ -766,7 +754,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			_ResizeToWindow(true, message->what);
 			break;
 
-		case MSG_ZOOM_TO_WINDOW:
+		case MSG_STRETCH_TO_WINDOW:
 			_ResizeToWindow(false, message->what);
 			break;
 
@@ -866,7 +854,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_ORIGINAL_SIZE:
-			fImageView->SetZoom(BPoint(-1, -1), 1.0);
+			fImageView->SetZoom(1.0);
 			break;
 
 		case MSG_SCALE_BILINEAR:
