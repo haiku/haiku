@@ -11,7 +11,7 @@ StaticLibrary libtranslatorsutils.a :
 ;
 
 DoCatalogs libtranslatorsutils.a :
-	x-be-bitmap
+	x-pseudo.libtranslatorsutils
 	:
 	BaseTranslator.cpp
 	TranslatorWindow.cpp
