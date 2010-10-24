@@ -59,6 +59,7 @@ check_cpu_features()
 	//		;
 
 	//panic("cpu %d fpu %d flags 0x%04x", cpu, fpu, flags);
+	cpu = fpu = 68040; //XXX
 	if (!cpu || !fpu)
 		return B_ERROR;
 
