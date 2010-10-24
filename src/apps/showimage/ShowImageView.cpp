@@ -203,6 +203,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fScrollingBitmap(false),
 	fCreatingSelection(false),
 	fFirstPoint(0.0, 0.0),
+	fSelectionMode(false),
 	fAnimateSelection(true),
 	fHasSelection(false),
 	fSlideShow(false),
@@ -217,7 +218,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	ShowImageSettings* settings;
 	settings = my_app->Settings();
 	if (settings->Lock()) {
-		fShrinkToBounds = settings->GetBool("ShrinkToBounds", fShrinkToBounds);
+		fShrinkToBounds = settings->GetBool("ShrinksToBounds", fShrinkToBounds);
 		fStretchToBounds = settings->GetBool("ZoomToBounds", fStretchToBounds);
 		fSlideShowDelay = settings->GetInt32("SlideShowDelay", fSlideShowDelay);
 		fScaleBilinear = settings->GetBool("ScaleBilinear", fScaleBilinear);
@@ -571,7 +572,7 @@ void
 ShowImageView::SetShrinkToBounds(bool enable)
 {
 	if (fShrinkToBounds != enable) {
-		_SettingsSetBool("ShrinkToBounds", enable);
+		_SettingsSetBool("ShrinksToBounds", enable);
 		fShrinkToBounds = enable;
 		if (enable)
 			SetZoom(fFitToBoundsZoom);
@@ -1232,14 +1233,15 @@ ShowImageView::MouseDown(BPoint position)
 		buttons = Window()->CurrentMessage()->FindInt32("buttons");
 
 	if (fHasSelection && fSelectionBox.Bounds().Contains(point)
-		&& (buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
+		&& (buttons
+				& (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON)) != 0) {
 		if (!fSelectionBitmap)
 			fSelectionBitmap = _CopySelection();
 
 		_BeginDrag(point);
-	} else if (buttons == B_TERTIARY_MOUSE_BUTTON
-		|| (buttons == B_PRIMARY_MOUSE_BUTTON
-			&& (modifiers() & (B_COMMAND_KEY | B_CONTROL_KEY)) != 0)) {
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON
+			&& (fSelectionMode
+				|| (modifiers() & (B_COMMAND_KEY | B_CONTROL_KEY)) != 0)) {
 		// begin new selection
 		_SetHasSelection(true);
 		fCreatingSelection = true;
@@ -1251,7 +1253,8 @@ ShowImageView::MouseDown(BPoint position)
 		Invalidate();
 	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
 		_ShowPopUpMenu(ConvertToScreen(position));
-	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON
+		|| buttons == B_TERTIARY_MOUSE_BUTTON) {
 		// move image in window
 		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 		fScrollingBitmap = true;
@@ -1618,6 +1621,14 @@ int32
 ShowImageView::PageCount()
 {
 	return fDocumentCount;
+}
+
+
+void
+ShowImageView::SetSelectionMode(bool selectionMode)
+{
+	// The mode only has an effect in MouseDown()
+	fSelectionMode = selectionMode;
 }
 
 

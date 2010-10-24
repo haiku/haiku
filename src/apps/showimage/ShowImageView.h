@@ -70,10 +70,10 @@ public:
 			bool				GetScaleBilinear() { return fScaleBilinear; }
 			void				SetShowCaption(bool show);
 			void				SetShrinkToBounds(bool enable);
-			bool				ShrinkToBounds() const
+			bool				ShrinksToBounds() const
 									{ return fShrinkToBounds; }
 			void				SetStretchToBounds(bool enable);
-			bool				StretchToBounds() const
+			bool				StretchesToBounds() const
 									{ return fStretchToBounds; }
 			void				SetFullScreen(bool fullScreen);
 
@@ -85,6 +85,9 @@ public:
 									float bitmapLength, float viewLength);
 			void				FixupScrollBars();
 
+			void				SetSelectionMode(bool selectionMode);
+			bool				IsSelectionModeEnabled() const
+									{ return fSelectionMode; }
 			void				Undo();
 			void				SelectAll();
 			void				ClearSelection();
@@ -239,6 +242,7 @@ private:
 			bool				fCreatingSelection;
 			BPoint				fFirstPoint;
 				// first point in image space of selection
+			bool				fSelectionMode;
 			bool				fAnimateSelection;
 			bool				fHasSelection;
 			SelectionBox		fSelectionBox;

@@ -154,9 +154,9 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	const int32 kstatusWidth = 190;
 	BRect rect;
 	rect = Bounds();
-	rect.top	= viewFrame.bottom + 1;
-	rect.left 	= viewFrame.left + kstatusWidth;
-	rect.right	= viewFrame.right + 1;
+	rect.top = viewFrame.bottom + 1;
+	rect.left = viewFrame.left + kstatusWidth;
+	rect.right = viewFrame.right + 1;
 	rect.bottom += 1;
 	BScrollBar* horizontalScrollBar = new BScrollBar(rect, "hscroll",
 		fImageView, 0, 150, B_HORIZONTAL);
@@ -170,10 +170,10 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	AddChild(fStatusView);
 
 	rect = Bounds();
-	rect.top	= viewFrame.top - 1;
-	rect.left	= viewFrame.right + 1;
-	rect.bottom	= viewFrame.bottom + 1;
-	rect.right	+= 1;
+	rect.top = viewFrame.top - 1;
+	rect.left = viewFrame.right + 1;
+	rect.bottom = viewFrame.bottom + 1;
+	rect.right += 1;
 	BScrollBar* verticalScrollBar = new BScrollBar(rect, "vscroll", fImageView,
 		0, 150, B_VERTICAL);
 	AddChild(verticalScrollBar);
@@ -212,6 +212,9 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 
 	SetPulseRate(100000);
 		// every 1/10 second; ShowImageView needs it for marching ants
+
+	_MarkMenuItem(menu, MSG_SELECTION_MODE,
+		fImageView->IsSelectionModeEnabled());
 
 	WindowRedimension(fImageView->GetBitmap());
 	fImageView->ResetZoom();
@@ -317,8 +320,8 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 	_MarkMenuItem(menu, MSG_SHOW_CAPTION, fShowCaption);
 
 	_MarkMenuItem(menu, MSG_SCALE_BILINEAR, fImageView->GetScaleBilinear());
-	_MarkMenuItem(menu, MSG_SHRINK_TO_WINDOW, fImageView->ShrinkToBounds());
-	_MarkMenuItem(menu, MSG_STRETCH_TO_WINDOW, fImageView->StretchToBounds());
+	_MarkMenuItem(menu, MSG_SHRINK_TO_WINDOW, fImageView->ShrinksToBounds());
+	_MarkMenuItem(menu, MSG_STRETCH_TO_WINDOW, fImageView->StretchesToBounds());
 
 	if (popupMenu) {
 		menu->AddSeparatorItem();
@@ -339,12 +342,12 @@ ShowImageWindow::AddMenus(BMenuBar* bar)
 	fOpenMenu->Superitem()->SetTarget(be_app);
 	fOpenMenu->Superitem()->SetShortcut('O', 0);
 	menu->AddSeparatorItem();
-	BMenu *pmenuSaveAs = new BMenu(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
+	BMenu* menuSaveAs = new BMenu(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		B_ITEMS_IN_COLUMN);
-	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
+	BTranslationUtils::AddTranslationItems(menuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
-	menu->AddItem(pmenuSaveAs);
+	menu->AddItem(menuSaveAs);
 	_AddItemMenu(menu, B_TRANSLATE("Close"), B_QUIT_REQUESTED, 'W', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
@@ -363,6 +366,8 @@ ShowImageWindow::AddMenus(BMenuBar* bar)
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Copy"), B_COPY, 'C', 0, this, false);
 	menu->AddSeparatorItem();
+	_AddItemMenu(menu, B_TRANSLATE("Selection Mode"), MSG_SELECTION_MODE, 0, 0,
+		this);
 	_AddItemMenu(menu, B_TRANSLATE("Clear selection"),
 		MSG_CLEAR_SELECT, 0, 0, this, false);
 	_AddItemMenu(menu, B_TRANSLATE("Select all"),
@@ -576,7 +581,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fSavePanel = NULL;
 			break;
 
-		case MSG_UPDATE_STATUS: {
+		case MSG_UPDATE_STATUS:
+		{
 			int32 pages = fImageView->PageCount();
 			int32 curPage = fImageView->CurrentPage();
 
@@ -645,8 +651,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 			if (messageProvidesSize) {
 				_UpdateResizerWindow(fWidth, fHeight);
-				if (!fImageView->StretchToBounds()
-					&& !fImageView->ShrinkToBounds()
+				if (!fImageView->StretchesToBounds()
+					&& !fImageView->ShrinksToBounds()
 					&& !fFullScreen)
 					WindowRedimension(fImageView->GetBitmap());
 			}
@@ -654,9 +660,11 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fStatusView->SetText(status);
 
 			UpdateTitle();
-		}	break;
+			break;
+		}
 
-		case MSG_UPDATE_STATUS_TEXT: {
+		case MSG_UPDATE_STATUS_TEXT:
+		{
 			BString status;
 			status << fWidth << "x" << fHeight;
 			BString str;
@@ -664,33 +672,29 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				status << ", " << str;
 				fStatusView->SetText(status);
 			}
-		}	break;
+			break;
+		}
 
-		case MSG_SELECTION: {
+		case MSG_SELECTION:
+		{
 			// The view sends this message when a selection is
 			// made or the selection is cleared so that the window
 			// can update the state of the appropriate menu items
-			bool benable;
-			if (message->FindBool("has_selection", &benable) == B_OK) {
-				_EnableMenuItem(fBar, B_CUT, benable);
-				_EnableMenuItem(fBar, B_COPY, benable);
-				_EnableMenuItem(fBar, MSG_CLEAR_SELECT, benable);
+			bool enable;
+			if (message->FindBool("has_selection", &enable) == B_OK) {
+				_EnableMenuItem(fBar, B_COPY, enable);
+				_EnableMenuItem(fBar, MSG_CLEAR_SELECT, enable);
 			}
-		}	break;
+			break;
+		}
 
-		case MSG_UNDO_STATE: {
-			bool benable;
-			if (message->FindBool("can_undo", &benable) == B_OK)
-				_EnableMenuItem(fBar, B_UNDO, benable);
-		}	break;
-
-		case MSG_CLIPBOARD_CHANGED: {
-			// The app sends this message after it examines the clipboard in
-			// response to a B_CLIPBOARD_CHANGED message
-			bool bdata;
-			if (message->FindBool("data_available", &bdata) == B_OK)
-				_EnableMenuItem(fBar, B_PASTE, bdata);
-		}	break;
+		case MSG_UNDO_STATE:
+		{
+			bool enable;
+			if (message->FindBool("can_undo", &enable) == B_OK)
+				_EnableMenuItem(fBar, B_UNDO, enable);
+			break;
+		}
 
 		case B_UNDO:
 			fImageView->Undo();
@@ -698,6 +702,10 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case B_COPY:
 			fImageView->CopySelectionToClipboard();
+			break;
+
+		case MSG_SELECTION_MODE:
+			fImageView->SetSelectionMode(_ToggleMenuItem(MSG_SELECTION_MODE));
 			break;
 
 		case MSG_CLEAR_SELECT:
