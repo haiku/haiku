@@ -26,6 +26,8 @@
 #include <util/KMessage.h>
 #include <util/list.h>
 
+#include "node_monitor_private.h"
+
 
 //#define TRACE_MONITOR
 #ifdef TRACE_MONITOR
@@ -38,9 +40,6 @@
 // ToDo: add more fine grained locking - maybe using a ref_count in the
 //		node_monitor structure?
 // ToDo: return another error code than B_NO_MEMORY if the team's maximum is hit
-
-
-const dev_t kWatchVolumeNode = (dev_t)-1;
 
 
 typedef struct monitor_listener monitor_listener;
@@ -128,11 +127,15 @@ class NodeMonitorService : public NotificationService {
 		virtual const char* Name() { return "node monitor"; }
 
 	private:
-		void _RemoveMonitor(node_monitor *monitor);
+		void _RemoveMonitor(node_monitor *monitor, uint32 flags);
+		status_t _RemoveListener(io_context *context, dev_t device, ino_t node,
+			NotificationListener& notificationListener, bool isVolumeListener);
 		void _RemoveListener(monitor_listener *listener);
-		node_monitor *_MonitorFor(dev_t device, ino_t node);
+		node_monitor *_MonitorFor(dev_t device, ino_t node,
+			bool isVolumeListener);
 		status_t _GetMonitor(io_context *context, dev_t device, ino_t node,
-			bool addIfNecessary, node_monitor **_monitor);
+			bool addIfNecessary, node_monitor **_monitor,
+			bool isVolumeListener);
 		monitor_listener *_MonitorListenerFor(node_monitor* monitor,
 			NotificationListener& notificationListener);
 		status_t _AddMonitorListener(io_context *context,
@@ -143,6 +146,9 @@ class NodeMonitorService : public NotificationService {
 			NotificationListener &notificationListener);
 		void _GetInterestedMonitorListeners(dev_t device, ino_t node,
 			uint32 flags, interested_monitor_listener_list *interestedListeners,
+			int32 &interestedListenerCount);
+		void _GetInterestedVolumeListeners(dev_t device, uint32 flags,
+			interested_monitor_listener_list *interestedListeners,
 			int32 &interestedListenerCount);
 		status_t _SendNotificationMessage(KMessage &message,
 			interested_monitor_listener_list *interestedListeners,
@@ -178,7 +184,38 @@ class NodeMonitorService : public NotificationService {
 		};
 
 		typedef BOpenHashTable<HashDefinition> MonitorHash;
+
+		struct volume_hash_key {
+			dev_t	device;
+		};
+
+		struct VolumeHashDefinition {
+			typedef volume_hash_key* KeyType;
+			typedef	node_monitor ValueType;
+
+			size_t HashKey(volume_hash_key* key) const
+				{ return _Hash(key->device); }
+			size_t Hash(node_monitor *monitor) const
+				{ return _Hash(monitor->device); }
+
+			bool Compare(volume_hash_key* key, node_monitor *monitor) const
+			{
+				return key->device == monitor->device;
+			}
+
+			node_monitor*& GetLink(node_monitor* monitor) const
+				{ return monitor->hash_link; }
+
+			uint32 _Hash(dev_t device) const
+			{
+				return (uint32)(device >> 16) + (uint16)device;
+			}
+		};
+
+		typedef BOpenHashTable<VolumeHashDefinition> VolumeMonitorHash;
+
 		MonitorHash	fMonitors;
+		VolumeMonitorHash fVolumeMonitors;
 		recursive_lock fRecursiveLock;
 };
 
@@ -251,10 +288,41 @@ NodeMonitorService::InitCheck()
 	Must be called with monitors lock hold.
 */
 void
-NodeMonitorService::_RemoveMonitor(node_monitor *monitor)
+NodeMonitorService::_RemoveMonitor(node_monitor *monitor, uint32 flags)
 {
-	fMonitors.Remove(monitor);
+	if (flags | B_WATCH_VOLUME)
+		fVolumeMonitors.Remove(monitor);
+	else
+		fMonitors.Remove(monitor);
 	delete monitor;
+}
+
+
+status_t
+NodeMonitorService::_RemoveListener(io_context *context, dev_t device,
+	ino_t node, NotificationListener& notificationListener,
+	bool isVolumeListener)
+{
+	TRACE(("%s(dev = %ld, node = %Ld, listener = %p\n",
+		__PRETTY_FUNCTION__, device, node, &notificationListener));
+
+	RecursiveLocker _(fRecursiveLock);
+
+	// get the monitor for this device/node pair
+	node_monitor *monitor = _MonitorFor(device, node, isVolumeListener);
+	if (monitor == NULL)
+		return B_BAD_VALUE;
+
+	// see if it has the listener we are looking for
+	monitor_listener* listener = _MonitorListenerFor(monitor,
+		notificationListener);
+	if (listener == NULL)
+		return B_BAD_VALUE;
+
+	_RemoveListener(listener);
+	context->num_monitors--;
+
+	return B_OK;
 }
 
 
@@ -265,6 +333,7 @@ NodeMonitorService::_RemoveMonitor(node_monitor *monitor)
 void
 NodeMonitorService::_RemoveListener(monitor_listener *listener)
 {
+	uint32 flags = listener->flags;
 	node_monitor *monitor = listener->monitor;
 
 	// remove it from the listener and I/O context lists
@@ -280,7 +349,7 @@ NodeMonitorService::_RemoveListener(monitor_listener *listener)
 	delete listener;
 
 	if (monitor->listeners.IsEmpty())
-		_RemoveMonitor(monitor);
+		_RemoveMonitor(monitor, flags);
 }
 
 
@@ -288,8 +357,15 @@ NodeMonitorService::_RemoveListener(monitor_listener *listener)
 	Must be called with monitors lock hold.
 */
 node_monitor *
-NodeMonitorService::_MonitorFor(dev_t device, ino_t node)
+NodeMonitorService::_MonitorFor(dev_t device, ino_t node, bool isVolumeListener)
 {
+	if (isVolumeListener) {
+		struct volume_hash_key key;
+		key.device = device;
+
+		return fVolumeMonitors.Lookup(&key);
+	}
+
 	struct monitor_hash_key key;
 	key.device = device;
 	key.node = node;
@@ -304,9 +380,9 @@ NodeMonitorService::_MonitorFor(dev_t device, ino_t node)
 */
 status_t
 NodeMonitorService::_GetMonitor(io_context *context, dev_t device, ino_t node,
-	bool addIfNecessary, node_monitor** _monitor)
+	bool addIfNecessary, node_monitor** _monitor, bool isVolumeListener)
 {
-	node_monitor* monitor = _MonitorFor(device, node);
+	node_monitor* monitor = _MonitorFor(device, node, isVolumeListener);
 	if (monitor != NULL) {
 		*_monitor = monitor;
 		return B_OK;
@@ -330,7 +406,12 @@ NodeMonitorService::_GetMonitor(io_context *context, dev_t device, ino_t node,
 	monitor->device = device;
 	monitor->node = node;
 
-	if (fMonitors.Insert(monitor) < B_OK) {
+	status_t status;
+	if (isVolumeListener)
+		status = fVolumeMonitors.Insert(monitor);
+	else
+		status = fMonitors.Insert(monitor);
+	if (status < B_OK) {
 		delete monitor;
 		return B_NO_MEMORY;
 	}
@@ -369,7 +450,7 @@ NodeMonitorService::_AddMonitorListener(io_context *context,
 	if (listener == NULL) {
 		// no memory for the listener, so remove the monitor as well if needed
 		if (monitor->listeners.IsEmpty())
-			_RemoveMonitor(monitor);
+			_RemoveMonitor(monitor, flags);
 
 		return B_NO_MEMORY;
 	}
@@ -397,7 +478,8 @@ NodeMonitorService::AddListener(io_context *context, dev_t device, ino_t node,
 	RecursiveLocker _(fRecursiveLock);
 
 	node_monitor *monitor;
-	status_t status = _GetMonitor(context, device, node, true, &monitor);
+	status_t status = _GetMonitor(context, device, node, true, &monitor,
+		flags & B_WATCH_VOLUME);
 	if (status < B_OK)
 		return status;
 
@@ -418,7 +500,8 @@ NodeMonitorService::_UpdateListener(io_context *context, dev_t device,
 	RecursiveLocker _(fRecursiveLock);
 
 	node_monitor *monitor;
-	status_t status = _GetMonitor(context, device, node, false, &monitor);
+	status_t status = _GetMonitor(context, device, node, false, &monitor,
+		flags | B_WATCH_VOLUME);
 	if (status < B_OK)
 		return status;
 
@@ -464,7 +547,31 @@ NodeMonitorService::_GetInterestedMonitorListeners(dev_t device, ino_t node,
 	int32 &interestedListenerCount)
 {
 	// get the monitor for the node
-	node_monitor *monitor = _MonitorFor(device, node);
+	node_monitor *monitor = _MonitorFor(device, node, false);
+	if (monitor == NULL)
+		return;
+
+	// iterate through the listeners until we find one with matching flags
+	MonitorListenerList::Iterator iterator = monitor->listeners.GetIterator();
+	while (monitor_listener *listener = iterator.Next()) {
+		if (listener->flags & flags) {
+			interested_monitor_listener_list &list
+				= interestedListeners[interestedListenerCount++];
+			list.iterator = iterator;
+			list.flags = flags;
+			return;
+		}
+	}
+}
+
+
+void
+NodeMonitorService::_GetInterestedVolumeListeners(dev_t device, uint32 flags,
+	interested_monitor_listener_list *interestedListeners,
+	int32 &interestedListenerCount)
+{
+	// get the monitor for the node
+	node_monitor *monitor = _MonitorFor(device, -1, true);
 	if (monitor == NULL)
 		return;
 
@@ -546,7 +653,7 @@ NodeMonitorService::NotifyEntryCreatedOrRemoved(int32 opcode, dev_t device,
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
 	// ... for the volume
-	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_NAME,
+	_GetInterestedVolumeListeners(device, B_WATCH_NAME,
 		interestedListeners, interestedListenerCount);
 	// ... for the node
 	if (opcode != B_ENTRY_CREATED) {
@@ -594,7 +701,7 @@ NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 	interested_monitor_listener_list interestedListeners[4];
 	int32 interestedListenerCount = 0;
 	// ... for the volume
-	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_NAME,
+	_GetInterestedVolumeListeners(device, B_WATCH_NAME,
 		interestedListeners, interestedListenerCount);
 	// ... for the node
 	_GetInterestedMonitorListeners(nodeDevice, node, B_WATCH_NAME,
@@ -639,7 +746,7 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
 	// ... for the volume
-	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_STAT,
+	_GetInterestedVolumeListeners(device, B_WATCH_STAT,
 		interestedListeners, interestedListenerCount);
 	// ... for the node, depending on wether its an interim update or not
 	_GetInterestedMonitorListeners(device, node,
@@ -687,7 +794,7 @@ NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
 	// ... for the volume
-	_GetInterestedMonitorListeners(device, kWatchVolumeNode, B_WATCH_ATTR,
+	_GetInterestedVolumeListeners(device, B_WATCH_ATTR,
 		interestedListeners, interestedListenerCount);
 	// ... for the node
 	_GetInterestedMonitorListeners(device, node, B_WATCH_ATTR,
@@ -850,21 +957,11 @@ NodeMonitorService::RemoveListener(io_context *context, dev_t device,
 
 	RecursiveLocker _(fRecursiveLock);
 
-	// get the monitor for this device/node pair
-	node_monitor *monitor = _MonitorFor(device, node);
-	if (monitor == NULL)
-		return B_BAD_VALUE;
+	if (_RemoveListener(context, device, node, notificationListener, false)
+		== B_OK)
+		return B_OK;
 
-	// see if it has the listener we are looking for
-	monitor_listener* listener = _MonitorListenerFor(monitor,
-		notificationListener);
-	if (listener == NULL)
-		return B_BAD_VALUE;
-
-	_RemoveListener(listener);
-	context->num_monitors--;
-
-	return B_OK;
+	return _RemoveListener(context, device, node, notificationListener, true);
 }
 
 
@@ -908,7 +1005,8 @@ NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 	RecursiveLocker _(fRecursiveLock);
 
 	node_monitor *monitor;
-	status_t status = _GetMonitor(context, device, node, true, &monitor);
+	status_t status = _GetMonitor(context, device, node, true, &monitor,
+		flags | B_WATCH_VOLUME);
 	if (status < B_OK)
 		return status;
 
@@ -924,7 +1022,7 @@ NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 		userListener);
 	if (copiedListener == NULL) {
 		if (monitor->listeners.IsEmpty())
-			_RemoveMonitor(monitor);
+			_RemoveMonitor(monitor, flags);
 		return B_NO_MEMORY;
 	}
 
