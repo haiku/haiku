@@ -185,22 +185,18 @@ class NodeMonitorService : public NotificationService {
 
 		typedef BOpenHashTable<HashDefinition> MonitorHash;
 
-		struct volume_hash_key {
-			dev_t	device;
-		};
-
 		struct VolumeHashDefinition {
-			typedef volume_hash_key* KeyType;
+			typedef dev_t KeyType;
 			typedef	node_monitor ValueType;
 
-			size_t HashKey(volume_hash_key* key) const
-				{ return _Hash(key->device); }
+			size_t HashKey(dev_t key) const
+				{ return _Hash(key); }
 			size_t Hash(node_monitor *monitor) const
 				{ return _Hash(monitor->device); }
 
-			bool Compare(volume_hash_key* key, node_monitor *monitor) const
+			bool Compare(dev_t key, node_monitor *monitor) const
 			{
-				return key->device == monitor->device;
+				return key == monitor->device;
 			}
 
 			node_monitor*& GetLink(node_monitor* monitor) const
@@ -290,7 +286,7 @@ NodeMonitorService::InitCheck()
 void
 NodeMonitorService::_RemoveMonitor(node_monitor *monitor, uint32 flags)
 {
-	if (flags | B_WATCH_VOLUME)
+	if ((flags & B_WATCH_VOLUME) != 0)
 		fVolumeMonitors.Remove(monitor);
 	else
 		fMonitors.Remove(monitor);
@@ -298,6 +294,7 @@ NodeMonitorService::_RemoveMonitor(node_monitor *monitor, uint32 flags)
 }
 
 
+//! Helper function for the RemoveListener function.
 status_t
 NodeMonitorService::_RemoveListener(io_context *context, dev_t device,
 	ino_t node, NotificationListener& notificationListener,
@@ -359,12 +356,8 @@ NodeMonitorService::_RemoveListener(monitor_listener *listener)
 node_monitor *
 NodeMonitorService::_MonitorFor(dev_t device, ino_t node, bool isVolumeListener)
 {
-	if (isVolumeListener) {
-		struct volume_hash_key key;
-		key.device = device;
-
-		return fVolumeMonitors.Lookup(&key);
-	}
+	if (isVolumeListener)
+		return fVolumeMonitors.Lookup(device);
 
 	struct monitor_hash_key key;
 	key.device = device;
@@ -479,7 +472,7 @@ NodeMonitorService::AddListener(io_context *context, dev_t device, ino_t node,
 
 	node_monitor *monitor;
 	status_t status = _GetMonitor(context, device, node, true, &monitor,
-		flags & B_WATCH_VOLUME);
+		(flags & B_WATCH_VOLUME) != 0);
 	if (status < B_OK)
 		return status;
 
@@ -501,7 +494,7 @@ NodeMonitorService::_UpdateListener(io_context *context, dev_t device,
 
 	node_monitor *monitor;
 	status_t status = _GetMonitor(context, device, node, false, &monitor,
-		flags | B_WATCH_VOLUME);
+		(flags & B_WATCH_VOLUME) != 0);
 	if (status < B_OK)
 		return status;
 
@@ -1006,7 +999,7 @@ NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 
 	node_monitor *monitor;
 	status_t status = _GetMonitor(context, device, node, true, &monitor,
-		flags | B_WATCH_VOLUME);
+		(flags & B_WATCH_VOLUME) != 0);
 	if (status < B_OK)
 		return status;
 
