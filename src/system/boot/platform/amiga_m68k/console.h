@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+extern struct Screen *gScreen;
+
 extern status_t console_init(void);
 
 #ifdef __cplusplus

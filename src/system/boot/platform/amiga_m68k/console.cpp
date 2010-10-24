@@ -23,6 +23,9 @@ class ConsoleHandle : public CharHandle {
 			size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
 			size_t bufferSize);
+
+		void	MoveTo(int16 x, int16 y);
+
 	private:
 		static int16	fX;
 		static int16	fY;
@@ -80,7 +83,7 @@ static const uint16 kPalette[] = {
 	0xfff
 };
 
-static Screen *sScreen;
+struct Screen *gScreen;
 static int16 sFontWidth, sFontHeight;
 static int sScreenTopOffset = 16;
 int16 ConsoleHandle::fX = 0;
@@ -120,7 +123,7 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 		if (string[i] == '\0')
 			break;
 		if (string[i] == '\n') {
-			//Text(&sScreen->RastPort, &string[i - len], len);
+			//Text(&gScreen->RastPort, &string[i - len], len);
 			fX = 0;
 			fY++;
 			if (fY >= console_height())
@@ -129,11 +132,23 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 			console_set_cursor(fX, fY);
 			continue;
 		}
-		Text(&sScreen->RastPort, &string[i], 1);
+		Text(&gScreen->RastPort, &string[i], 1);
 	}
 
 	// not exactly, but we don't care...
 	return bufferSize;
+}
+
+
+void
+ConsoleHandle::MoveTo(int16 x, int16 y)
+{
+	fX = x;
+	fY = y;
+	Move(&gScreen->RastPort, sFontWidth * x,
+		sFontHeight * y + sScreenTopOffset);
+	// why do I have to add this to keep the title ?
+	
 }
 
 
@@ -169,8 +184,6 @@ int
 ConsoleDevice::WaitForKey()
 {
 	char ascii;
-	ssize_t actual;
-	status_t err;
 	
 	if (Read(&ascii, 1) < 1) {
 		panic("WFK\n");
@@ -347,51 +360,51 @@ console_init(void)
 		NULL
 	};
 	
-	sScreen = OpenScreen(&newScreen);
-	if (sScreen == NULL)
+	gScreen = OpenScreen(&newScreen);
+	if (gScreen == NULL)
 		panic("OpenScreen()\n");
 	
-	LoadRGB4(&sScreen->ViewPort, kPalette, 16);
+	LoadRGB4(&gScreen->ViewPort, kPalette, 16);
 	
-	SetDrMd(&sScreen->RastPort, JAM2);
+	SetDrMd(&gScreen->RastPort, JAM2);
 	
 	// seems not necessary, there is a default font already set.
 	/*
 	TextAttr attrs = { "Topaz", 8, 0, 0};
 	TextFont *font = OpenFont(&attrs);
 	*/
-	TextFont *font = OpenFont(sScreen->Font);
+	TextFont *font = OpenFont(gScreen->Font);
 	if (font == NULL)
 		panic("OpenFont()\n");
-	sFontHeight = sScreen->Font->ta_YSize;
+	sFontHeight = gScreen->Font->ta_YSize;
 	sFontWidth = font->tf_XSize;
 	
-	sScreenTopOffset = sScreen->BarHeight * 2; // ???
+	sScreenTopOffset = gScreen->BarHeight * 2; // ???
 
 	
-	//ClearScreen(&sScreen->RastPort);
+	//ClearScreen(&gScreen->RastPort);
 
 	dbgerr = stdout = stderr = (FILE *)&sOutput;
 
 	console_set_cursor(0, 0);
 	
 	/*
-	dprintf("LeftEdge %d\n", sScreen->LeftEdge);
-	dprintf("TopEdge %d\n", sScreen->TopEdge);
-	dprintf("Width %d\n", sScreen->Width);
-	dprintf("Height %d\n", sScreen->Height);
-	dprintf("MouseX %d\n", sScreen->MouseX);
-	dprintf("MouseY %d\n", sScreen->MouseY);
-	dprintf("Flags 0x%08x\n", sScreen->Flags);
-	dprintf("BarHeight %d\n", sScreen->BarHeight);
-	dprintf("BarVBorder %d\n", sScreen->BarVBorder);
-	dprintf("BarHBorder %d\n", sScreen->BarHBorder);
-	dprintf("MenuVBorder %d\n", sScreen->MenuVBorder);
-	dprintf("MenuHBorder %d\n", sScreen->MenuHBorder);
-	dprintf("WBorTop %d\n", sScreen->WBorTop);
-	dprintf("WBorLeft %d\n", sScreen->WBorLeft);
-	dprintf("WBorRight %d\n", sScreen->WBorRight);
-	dprintf("WBorBottom %d\n", sScreen->WBorBottom);
+	dprintf("LeftEdge %d\n", gScreen->LeftEdge);
+	dprintf("TopEdge %d\n", gScreen->TopEdge);
+	dprintf("Width %d\n", gScreen->Width);
+	dprintf("Height %d\n", gScreen->Height);
+	dprintf("MouseX %d\n", gScreen->MouseX);
+	dprintf("MouseY %d\n", gScreen->MouseY);
+	dprintf("Flags 0x%08x\n", gScreen->Flags);
+	dprintf("BarHeight %d\n", gScreen->BarHeight);
+	dprintf("BarVBorder %d\n", gScreen->BarVBorder);
+	dprintf("BarHBorder %d\n", gScreen->BarHBorder);
+	dprintf("MenuVBorder %d\n", gScreen->MenuVBorder);
+	dprintf("MenuHBorder %d\n", gScreen->MenuHBorder);
+	dprintf("WBorTop %d\n", gScreen->WBorTop);
+	dprintf("WBorLeft %d\n", gScreen->WBorLeft);
+	dprintf("WBorRight %d\n", gScreen->WBorRight);
+	dprintf("WBorBottom %d\n", gScreen->WBorBottom);
 	*/
 
 	KEYMAP_BASE_NAME = (Library *)OldOpenLibrary(KEYMAPNAME);
@@ -404,8 +417,13 @@ console_init(void)
 		panic("sInput.Open() 0x%08lx\n", err);
 	stdin = (FILE *)&sInput;
 
+	dprintf("BytesPerRow %d\n", gScreen->RastPort.BitMap->BytesPerRow);
+	dprintf("Rows %d\n", gScreen->RastPort.BitMap->Rows);
+	dprintf("Flags %02x\n", gScreen->RastPort.BitMap->Flags);
+	dprintf("Depth %d\n", gScreen->RastPort.BitMap->Depth);
+	for (int i = 0; i < 8; i++)
+		dprintf("Planes[%d] %p\n", i, gScreen->RastPort.BitMap->Planes[i]);
 	
-
 	return B_OK;
 }
 
@@ -416,15 +434,15 @@ console_init(void)
 void
 console_clear_screen(void)
 {
-	Move(&sScreen->RastPort, 0, sScreenTopOffset);
-	ClearScreen(&sScreen->RastPort);
+	Move(&gScreen->RastPort, 0, sScreenTopOffset);
+	ClearScreen(&gScreen->RastPort);
 }
 
 
 int32
 console_width(void)
 {
-	int columnCount = sScreen->Width / sFontWidth;
+	int columnCount = gScreen->Width / sFontWidth;
 	return columnCount;
 }
 
@@ -432,7 +450,7 @@ console_width(void)
 int32
 console_height(void)
 {
-	int lineCount = (sScreen->Height - sScreenTopOffset) / sFontHeight;
+	int lineCount = (gScreen->Height - sScreenTopOffset) / sFontHeight;
 	return lineCount;
 }
 
@@ -440,18 +458,15 @@ console_height(void)
 void
 console_set_cursor(int32 x, int32 y)
 {
-	Move(&sScreen->RastPort, sFontWidth * x,
-		sFontHeight * y + sScreenTopOffset);
-		// why do I have to add this to keep the title ?
-	
+	sOutput.MoveTo(x, y);
 }
 
 
 void
 console_set_color(int32 foreground, int32 background)
 {
-	SetAPen(&sScreen->RastPort, foreground);
-	SetBPen(&sScreen->RastPort, background);
+	SetAPen(&gScreen->RastPort, foreground);
+	SetBPen(&gScreen->RastPort, background);
 }
 
 

@@ -984,7 +984,7 @@ struct Library {
 	uint8	dummy1[10];
 	uint16	Version, Revision;
 	uint8	dummy2[34-24];
-};
+} _PACKED;
 
 // <exec/execbase.h>
 
@@ -995,7 +995,7 @@ struct MemHead {
 	uint8	dummy2[14-10];
 	uint16	Attribs;
 	uint32	First, Lower, Upper, Free;
-};
+} _PACKED;
 
 struct ExecBase {
 	struct Library	LibNode;
@@ -1165,6 +1165,28 @@ extern "C" status_t exec_error(int32 err);
 
 //	#pragma mark -
 
+// <graphics/gfx.h>
+
+#ifndef __ASSEMBLER__
+
+struct BitMap {
+	uint16	BytesPerRow;
+	uint16	Rows;
+	uint8	Flags;
+	uint8	Depth;
+	uint16	pad;
+	void	*Planes[8];
+};
+
+struct Rectangle {
+	int16	MinX, MinY, MaxX, MaxY;
+};
+
+struct Point {
+	int16	x, y;
+};
+
+#endif /* __ASSEMBLER__ */
 
 // <graphics/graphics.h>
 
@@ -1196,7 +1218,7 @@ struct ViewPort {
 	struct CopList	*SprIns;
 	struct CopList	*ClrIns;
 	struct UCopList	*UCopIns;
-	int16	DWidth, DHright;
+	int16	DWidth, DHeight;
 	int16	DxOffset, DyOffset;
 	uint16	Modes;
 	uint8	SpritePriorities;
@@ -1206,6 +1228,7 @@ struct ViewPort {
 
 struct RastPort {
 	struct Layer	*Layer;
+	struct BitMap	*BitMap;
 	//...
 } _PACKED;
 
@@ -1264,13 +1287,87 @@ extern struct GfxBase *GRAPHICS_BASE_NAME;
 	LP2NR(0x162, SetDrMd, struct RastPort *, par1, a1, unsigned long, last, d0, \
 	, GRAPHICS_BASE_NAME)
 
+#define FindDisplayInfo(last) \
+	LP1(0x2d6, DisplayInfoHandle, FindDisplayInfo, unsigned long, last, d0, \
+	, GRAPHICS_BASE_NAME)
 
-#endif
+#define NextDisplayInfo(last) \
+	LP1(0x2dc, uint32, NextDisplayInfo, unsigned long, last, d0, \
+	, GRAPHICS_BASE_NAME)
+
+#define GetDisplayInfoData(par1, par2, par3, par4, last) \
+	LP5(0x2f4, uint32, GetDisplayInfoData, DisplayInfoHandle, par1, a0, uint8 *, par2, a1, unsigned long, par3, d0, unsigned long, par4, d1, unsigned long, last, d2, \
+	, GRAPHICS_BASE_NAME)
+
+
+#endif /* __ASSEMBLER__ */
 
 /* drawing modes */
 #define JAM1	0	// only draw foreground
 #define JAM2	1	// draw both fg & bg
 
+// <graphics/modeid.h>
+
+#define INVALID_ID	(~0)
+
+// <graphics/displayinfo.h>
+
+#ifndef __ASSEMBLER__
+
+typedef void *DisplayInfoHandle;
+
+struct QueryHeader {
+	uint32	StructID;
+	uint32	DisplayID;
+	uint32	SkipID;
+	uint32	Length;
+};
+
+struct DisplayInfo {
+	struct QueryHeader	Header;
+	uint16	NotAvailable;
+	uint32	PropertyFlags;
+	struct Point	Resolution;
+	uint16	PixelSpeed;
+	uint16	NumStdSprites;
+	uint16	PaletteRange;
+	struct Point	SpriteResolution;
+	uint8	pad[4];
+	uint8	RedBits;
+	uint8	GreenBits;
+	uint8	BlueBits;
+	uint8	pad2[5];
+	uint32	reserved[2];
+};
+
+struct DimensionInfo {
+	struct QueryHeader	Header;
+	uint16	MaxDepth;
+	uint16	MinRasterWidth;
+	uint16	MinRasterHeight;
+	uint16	MaxRasterWidth;
+	uint16	MaxRasterHeight;
+	struct Rectangle	Nominal;
+	//... overscan stuff
+	struct Rectangle	overscanStuff[4];
+	uint8	pad[14];
+	uint32	reserved[2];
+};
+
+#define DISPLAYNAMELEN 32
+
+struct NameInfo {
+	struct QueryHeader	Header;
+	uchar	Name[DISPLAYNAMELEN];
+	uint32	reserved[2];
+};
+
+#endif /* __ASSEMBLER__ */
+
+#define DTAG_DISP	0x80000000
+#define DTAG_DIMS	0x80001000
+#define DTAG_MNTR	0x80002000
+#define DTAG_NAME	0x80003000
 
 //	#pragma mark -
 
@@ -1361,6 +1458,8 @@ extern struct Library *KEYMAP_BASE_NAME;
 #define LOWLEVEL_BASE_NAME LowLevelBase
 #endif
 
+#ifndef __ASSEMBLER__
+
 #define GetKey() \
 	LP0(0x30, uint32, GetKey, \
 	, LOWLEVEL_BASE_NAME)
@@ -1369,6 +1468,7 @@ extern struct Library *KEYMAP_BASE_NAME;
 	LP2NR(0x36, QueryKeys, struct KeyQuery *, par1, a0, unsigned long, last, d1, \
 	, LOWLEVEL_BASE_NAME)
 
+#endif /* __ASSEMBLER__ */
 
 
 // <devices/keyboard.h>
