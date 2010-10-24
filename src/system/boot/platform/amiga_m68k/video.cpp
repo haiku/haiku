@@ -104,11 +104,13 @@ video_mode_menu()
 			dimension.Nominal.MaxY - dimension.Nominal.MinY + 1,
 			dimension.MaxDepth, info.PropertyFlags);
 		*/
-		char label[64];
-		sprintf(label, "%ux%u %u bit",
+		char label[128];
+		sprintf(label, "%ux%u %u bit %08lx%s%s",
 			dimension.Nominal.MaxX - dimension.Nominal.MinX + 1,
 			dimension.Nominal.MaxY - dimension.Nominal.MinY + 1,
-			dimension.MaxDepth);
+			dimension.MaxDepth, info.PropertyFlags,
+			(info.PropertyFlags & DIPF_IS_LACE) ? "" : " i",
+			(info.PropertyFlags & DIPF_IS_PAL) ? "" : " pal");
 
 		menu->AddItem(item = new(nothrow) MenuItem(label));
 		item->SetData((void *)modeID);
