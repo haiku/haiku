@@ -198,5 +198,8 @@ if $(packageError) {
 }
 
 # Pseudo-target to build all targets that are localized.
-NotFile catkeys ;
-Depends catkeys : $(HAIKU_LOCALIZED_TARGETS) ;
+NotFile catalogs ;
+Depends catalogs : $(HAIKU_LOCALIZED_CATALOGS) ;
+
+NotFile LocalizedTargets ;
+Depends LocalizedTargets : $(HAIKU_LOCALIZED_TARGETS) ;

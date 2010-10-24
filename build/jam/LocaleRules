@@ -119,10 +119,6 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp
 	# regexp            The regular expression used to parse the files.
 	#                   Optional: default is matching be_catalog->GetString
 
-	# Make a note of all targets that call this rule.
-	# This will be used for the pseudo-target catkeys
-	HAIKU_LOCALIZED_TARGETS += $(target) ;
-
 	local subdir ;
 	if [ on $(SUBDIR) return $(HAIKU_MULTIPLE_LOCALIZED_TARGETS) ] {
 		subdir = $(SUBDIR_TOKENS[2-]) $(target) ;
@@ -157,4 +153,10 @@ rule DoCatalogs target : signature : sources : sourceLanguage : regexp
 
 	HAIKU_CATALOG_FILES on $(target) = $(catkeysFiles:S=.catalog) ;
 	HAIKU_CATALOG_SIGNATURE on $(target) = $(signature) ;
+
+	# For the pseudo-target LocalizedTargets
+	HAIKU_LOCALIZED_TARGETS += $(target) ;
+
+	# For the pseudo-target catalogs
+	HAIKU_LOCALIZED_CATALOGS += $(catkeysFiles:S=.catalog) ;
 }
