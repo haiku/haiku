@@ -129,6 +129,12 @@ Inode::WriteBack(Transaction& transaction)
 	if (status != B_OK)
 		return status;
 
+ 	if (Node().Size() > 0x7fffffffLL) {
+		status = fVolume->ActivateLargeFiles(transaction);
+		 if (status != B_OK)
+			  return status;
+	}
+	
 	CachedBlock cached(fVolume);
 	uint8* inodeBlockData = cached.SetToWritable(transaction, inodeBlock);
 	if (inodeBlockData == NULL)

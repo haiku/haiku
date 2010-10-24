@@ -496,6 +496,7 @@ Volume::_UnsupportedIncompatibleFeatures(ext2_super_block& superBlock)
 Volume::_UnsupportedReadOnlyFeatures(ext2_super_block& superBlock)
 {
 	uint32 supportedReadOnly = EXT2_READ_ONLY_FEATURE_SPARSE_SUPER
+		| EXT2_READ_ONLY_FEATURE_LARGE_FILE
 		| EXT2_READ_ONLY_FEATURE_HUGE_FILE;
 	// TODO actually implement EXT2_READ_ONLY_FEATURE_SPARSE_SUPER when
 	// implementing superblock backup copies
@@ -585,6 +586,20 @@ Volume::WriteBlockGroup(Transaction& transaction, int32 index)
 	// TODO: Write copies
 
 	return B_OK;
+}
+
+
+status_t
+Volume::ActivateLargeFiles(Transaction& transaction)
+{
+	if ((fSuperBlock.ReadOnlyFeatures() 
+		& EXT2_READ_ONLY_FEATURE_LARGE_FILE) != 0)
+		return B_OK;
+	
+	fSuperBlock.SetReadOnlyFeatures(fSuperBlock.ReadOnlyFeatures()
+		| EXT2_READ_ONLY_FEATURE_LARGE_FILE);
+	
+	return WriteSuperBlock(transaction);
 }
 
 

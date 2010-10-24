@@ -82,6 +82,7 @@ public:
 			bool				HugeFiles() const
 									{ return (fSuperBlock.ReadOnlyFeatures()
 										& EXT2_READ_ONLY_FEATURE_HUGE_FILE) != 0; }
+			status_t			ActivateLargeFiles(Transaction& transaction);
 
 			status_t			SaveOrphan(Transaction& transaction,
 									ino_t newID, ino_t &oldID);

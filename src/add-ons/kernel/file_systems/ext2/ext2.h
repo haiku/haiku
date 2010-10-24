@@ -123,7 +123,9 @@ struct ext2_super_block {
 		{ free_blocks = B_HOST_TO_LENDIAN_INT32(freeBlocks); }
 	void SetLastOrphan(ino_t id)
 		{ last_orphan = B_HOST_TO_LENDIAN_INT32((uint32)id); }
-
+	void SetReadOnlyFeatures(uint32 readOnlyFeatures) const
+		{ readOnlyFeatures = B_HOST_TO_LENDIAN_INT32(readOnlyFeatures); }
+	
 	bool IsValid();
 		// implemented in Volume.cpp
 } _PACKED;
@@ -147,7 +149,7 @@ struct ext2_super_block {
 
 // read-only compatible features
 #define EXT2_READ_ONLY_FEATURE_SPARSE_SUPER		0x0001
-#define	EXT2_READ_ONLY_FEATURE_LARGE_FILE		0x0002
+#define EXT2_READ_ONLY_FEATURE_LARGE_FILE		0x0002
 #define EXT2_READ_ONLY_FEATURE_BTREE_DIRECTORY	0x0004
 #define EXT2_READ_ONLY_FEATURE_HUGE_FILE		0x0008
 
