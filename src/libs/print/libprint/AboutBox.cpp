@@ -12,11 +12,9 @@
 
 #include "AboutBox.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else 
-#define std
-#endif
+
 
 enum {
 	kMsgOK = 'AbOK'

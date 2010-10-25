@@ -9,6 +9,7 @@
 const char *kSDDescription             = "_spool/Description";
 const char* kSDMimeType                = "_spool/MimeType";
 
+
 SpoolMetaData::SpoolMetaData(BFile* spool_file) 
 {
 	BString string;
@@ -23,6 +24,7 @@ SpoolMetaData::SpoolMetaData(BFile* spool_file)
 		fCreationTime = ctime(&time);
 	}
 }
+
 
 SpoolMetaData::~SpoolMetaData()
 {

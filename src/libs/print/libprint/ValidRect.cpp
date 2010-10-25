@@ -41,6 +41,7 @@ private:
 	INLINE void updateRightBound(const rgb_color *row);
 };
 
+
 bool 
 BoundsCalculator::isEmpty(const rgb_color *pixel)
 {
@@ -60,12 +61,14 @@ BoundsCalculator::isRowEmpty(const rgb_color *row)
 	return true;
 }
 
+
 const uchar *
 BoundsCalculator::getRow(int x, int y)
 {
 	return fBits + x + fBPR * y;
 }
-	
+
+
 int 
 BoundsCalculator::getTop()
 {	
@@ -81,6 +84,7 @@ BoundsCalculator::getTop()
 	
 	return top;
 }
+
 
 int
 BoundsCalculator::getBottom()
@@ -98,6 +102,7 @@ BoundsCalculator::getBottom()
 	return bottom;
 }
 
+
 void
 BoundsCalculator::updateLeftBound(const rgb_color *row)
 {
@@ -109,6 +114,7 @@ BoundsCalculator::updateLeftBound(const rgb_color *row)
 		row ++;
 	}
 }
+
 
 void
 BoundsCalculator::updateRightBound(const rgb_color *row)
@@ -122,6 +128,7 @@ BoundsCalculator::updateRightBound(const rgb_color *row)
 		row --;
 	}
 }
+
 
 // returns false if the bitmap is empty or has wrong color space.
 bool
@@ -185,11 +192,13 @@ BoundsCalculator::getValidRect(BBitmap *bitmap, RECT *rect)
 	return kRectIsValid;
 }
 
+
 bool get_valid_rect(BBitmap *a_bitmap, RECT *rc)
 {
 	BoundsCalculator calculator;
 	return calculator.getValidRect(a_bitmap, rc);
 }
+
 
 int color_space2pixel_depth(color_space cs)
 {

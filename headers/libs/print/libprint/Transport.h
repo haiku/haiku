@@ -12,11 +12,9 @@
 class BDataIO;
 class PrinterData;
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else 
-#define std
-#endif
+
 
 extern "C" {
 	typedef BDataIO *(*PFN_init_transport)(BMessage *);

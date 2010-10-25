@@ -29,11 +29,9 @@
 #include "ValidRect.h"
 #include "DbgMsg.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else 
-#define std
-#endif
+
 
 // Measure printJob() time. Either true or false.
 #define MEASURE_PRINT_JOB_TIME false

@@ -13,11 +13,9 @@
 #include <Rect.h>
 #include <Point.h>
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else 
-#define std
-#endif
+
 
 class BFile;
 class BPicture;

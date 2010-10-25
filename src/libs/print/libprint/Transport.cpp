@@ -15,11 +15,9 @@
 #include "PrinterData.h"
 #include "DbgMsg.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else 
-#define std
-#endif
+
 
 Transport::Transport(const PrinterData *printer_data)
 	: fImage(-1), fInitTransport(0), fExitTransport(0), fDataStream(0), fAbort(false)
@@ -74,6 +72,7 @@ Transport::Transport(const PrinterData *printer_data)
 	}
 }
 
+
 Transport::~Transport()
 {
 	if (fExitTransport) {
@@ -84,17 +83,23 @@ Transport::~Transport()
 	}
 }
 
-bool Transport::check_abort() const
+
+bool
+Transport::check_abort() const
 {
 	return fDataStream == 0;
 }
 
-const string &Transport::last_error() const
+
+const
+string &Transport::last_error() const
 {
 	return fLastErrorString;
 }
 
-bool Transport::is_print_to_file_canceled() const
+
+bool
+Transport::is_print_to_file_canceled() const
 {
 	// The BeOS "Print To File" transport add-on returns a non-NULL BDataIO *
 	// even after user filepanel cancellation!
@@ -102,13 +107,17 @@ bool Transport::is_print_to_file_canceled() const
 	return file != NULL && file->InitCheck() != B_OK;
 }
 
-void Transport::set_last_error(const char *e)
+
+void
+Transport::set_last_error(const char *e)
 {
 	fLastErrorString = e;
 	fAbort = true;
 }
 
-void Transport::write(const void *buffer, size_t size) throw(TransportException)
+
+void
+Transport::write(const void *buffer, size_t size) throw(TransportException)
 {
 	if (fDataStream) {
 		if (size == (size_t)fDataStream->Write(buffer, size)) {

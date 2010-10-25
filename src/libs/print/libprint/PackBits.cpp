@@ -13,11 +13,9 @@
 #include <string.h>
 #include "PackBits.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else 
-#define std
-#endif
+
 
 #define	MAXINBYTES		127
 #define CONTROL1(i)		-i

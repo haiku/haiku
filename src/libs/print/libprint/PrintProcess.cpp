@@ -10,6 +10,7 @@
 #include "PrintProcess.h"
 #include "DbgMsg.h"
 
+
 PictureData::PictureData(BFile *file)
 {
 	DBGMSG(("construct PictureData\n"));
@@ -30,17 +31,18 @@ PictureData::PictureData(BFile *file)
 	DBGMSG(("3: current seek position = 0x%x\n", (int)file->Position()));
 }
 
+
 PictureData::~PictureData()
 {
 	delete picture;
 }
 
-/*--------------------------------------------------*/
 
 PageData::PageData()
 {
 	fHollow = true;
 }
+
 
 PageData::PageData(BFile *file, bool reverse)
 {
@@ -62,7 +64,9 @@ PageData::PageData(BFile *file, bool reverse)
 	}
 }
 
-bool PageData::startEnum()
+
+bool
+PageData::startEnum()
 {
 	off_t offset;
 	uchar dummy[40];
@@ -84,7 +88,9 @@ bool PageData::startEnum()
 	return fPictureCount > 0;
 }
 
-bool PageData::enumObject(PictureData **picture_data)
+
+bool
+PageData::enumObject(PictureData **picture_data)
 {
 	if (fHollow || fPictureCount <= 0) {
 		*picture_data = NULL;
@@ -97,13 +103,8 @@ bool PageData::enumObject(PictureData **picture_data)
 	return false;
 }
 
-/*--------------------------------------------------*/
 
-SpoolData::SpoolData(
-	BFile *file,
-	int   page_count,
-	int   nup,
-	bool  reverse)
+SpoolData::SpoolData(BFile *file, int page_count, int nup, bool reverse)
 {
 	DBGMSG(("nup        = %d\n", nup));
 	DBGMSG(("page_count = %d\n", page_count));
@@ -138,6 +139,7 @@ SpoolData::SpoolData(
 	}
 }
 
+
 SpoolData::~SpoolData()
 {
 	for (fIt = fPages.begin(); fIt != fPages.end(); fIt++) {
@@ -145,13 +147,17 @@ SpoolData::~SpoolData()
 	}
 }
 
-bool SpoolData::startEnum()
+
+bool
+SpoolData::startEnum()
 {
 	fIt = fPages.begin();
 	return true;
 }
 
-bool SpoolData::enumObject(PageData **page_data)
+
+bool
+SpoolData::enumObject(PageData **page_data)
 {
 	*page_data = *fIt++;
 	if (fIt == fPages.end()) {

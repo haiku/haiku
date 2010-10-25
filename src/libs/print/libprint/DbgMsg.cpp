@@ -15,11 +15,9 @@
 
 #ifdef DBG
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else 
-#define std
-#endif
+
 
 void write_debug_stream(const char *format, ...)
 {

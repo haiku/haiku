@@ -9,11 +9,7 @@
 #include <string>
 #include <SerialPort.h>
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
-#else 
-#define std
-#endif
 
 class BNode;
 

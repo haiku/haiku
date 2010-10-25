@@ -6,10 +6,12 @@
 #ifndef	__UIDRIVER_H
 #define	__UIDRIVER_H
 
+
 class BMessage;
 class PrinterData;
 class PrinterCap;
 class JobData;
+
 
 class UIDriver {
 public:

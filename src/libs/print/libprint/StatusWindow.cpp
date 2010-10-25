@@ -101,6 +101,7 @@ StatusWindow::~StatusWindow(void)
 {
 }
 
+
 void 
 StatusWindow::ResetStatusBar(void)
 {
@@ -108,6 +109,7 @@ StatusWindow::ResetStatusBar(void)
 		fStatusBar->Reset("Page:  ");
 	Unlock();
 }
+
 
 bool 
 StatusWindow::UpdateStatusBar(uint32 page, uint32 copy)
@@ -144,6 +146,7 @@ StatusWindow::UpdateStatusBar(uint32 page, uint32 copy)
 	Unlock();
 	return fCancelBar;
 }
+
 
 void 
 StatusWindow::SetPageCopies(uint32 copies)
