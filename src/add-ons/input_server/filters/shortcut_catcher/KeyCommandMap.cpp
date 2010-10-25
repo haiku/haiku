@@ -71,6 +71,9 @@ KeyCommandMap::KeyCommandMap(const char* file)
 	strcpy(fFileName, file);
 
 	BEntry fileEntry(fFileName);
+	if (!fileEntry.Exists())
+		BFile file(fFileName, B_READ_ONLY|B_CREATE_FILE);
+	
 	if (fileEntry.InitCheck() == B_NO_ERROR) {
 		node_ref nref;
 
