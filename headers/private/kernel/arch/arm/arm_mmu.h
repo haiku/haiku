@@ -62,9 +62,11 @@
 #define CP_R1_XP 0x800000	// if XP=0 then use backwards comaptible
 				// translation tables
 
+#define VADDR_TO_PDENT(va)	((va) >> 20)
+#define VADDR_TO_PTENT(va)	(((va) & 0xff000) >> 12)
+#define VADDR_TO_PGOFF(va)	((va) & 0x0fff)
 
-
-
-
+#define ARM_PDE_ADDRESS_MASK	0xfffffc00
+#define ARM_PTE_ADDRESS_MASK	0xfffff000
 
 #endif /* _ARCH_ARM_ARM_MMU_H */
