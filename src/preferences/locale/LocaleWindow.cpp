@@ -197,7 +197,7 @@ LocaleWindow::LocaleWindow()
 			&& lastAddedConventionsItem != NULL
 			&& lastAddedConventionsItem->Code() == item->Code()) {
 			if (!strcmp(conventionID, defaultConventions.ID())) {
-				lastAddedConventionsItem->SetExpanded(true);
+				fConventionsListView->Expand(lastAddedConventionsItem);
 				fInitialConventionsItem = item;
 			}
 			fConventionsListView->AddUnder(item, lastAddedConventionsItem);
