@@ -25,7 +25,7 @@ RadioView::RadioView(BRect frame, const char* name, int32 resizingMode)
 	fPercent(0),
 	fPulse(NULL),
 	fPhase(0),
-	fMax(7)
+	fMax(DefaultMax())
 {
 }
 
@@ -87,6 +87,31 @@ RadioView::StopPulsing()
 }
 
 
+/*static*/ void
+RadioView::Draw(BView* view, BRect rect, int32 percent, int32 maxCount)
+{
+	view->PushState();
+
+	BPoint center;
+	int32 count;
+	float step;
+	_Compute(rect, center, count, maxCount, step);
+
+	for (int32 i = 0; i < count; i++) {
+		_SetColor(view, percent, 0, i, count);
+		_DrawBow(view, i, center, count, step);
+	}
+	view->PopState();
+}
+
+
+/*static*/ int32
+RadioView::DefaultMax()
+{
+	return 7;
+}
+
+
 void
 RadioView::AttachedToWindow()
 {
@@ -128,14 +153,14 @@ RadioView::Draw(BRect updateRect)
 	BPoint center;
 	int32 count;
 	float step;
-	_Compute(Bounds(), center, count, step);
+	_Compute(Bounds(), center, count, fMax, step);
 
 	for (int32 i = 0; i < count; i++) {
-		_SetColor(i, count);
-		if (step == kMinStep && _IsDisabled(i, count))
+		_SetColor(this, fPercent, fPhase, i, count);
+		if (step == kMinStep && _IsDisabled(fPercent, i, count))
 			continue;
 
-		_DrawBow(i, center, count, step);
+		_DrawBow(this, i, center, count, step);
 	}
 }
 
@@ -157,7 +182,7 @@ RadioView::_RestartPulsing()
 	BPoint center;
 	int32 count;
 	float step;
-	_Compute(Bounds(), center, count, step);
+	_Compute(Bounds(), center, count, fMax, step);
 
 	BMessage message(kMsgPulse);
 	fPulse = new BMessageRunner(this, &message, (bigtime_t)(kMinPulseInterval
@@ -165,54 +190,58 @@ RadioView::_RestartPulsing()
 }
 
 
-void
+/*static*/ void
 RadioView::_Compute(const BRect& bounds, BPoint& center, int32& count,
-	float& step) const
+	int32 max, float& step)
 {
 	center.Set(roundf(bounds.Width() / 2), bounds.bottom);
 	float size = min_c(center.x * 3 / 2, center.y);
-	step = floorf(size / fMax);
+	step = floorf(size / max);
 	if (step < kMinStep) {
 		count = (int32)(size / kMinStep);
 		step = kMinStep;
 	} else
-		count = fMax;
+		count = max;
+
+	center.x += bounds.left;
 }
 
 
-void
-RadioView::_DrawBow(int32 index, const BPoint& center, int32 count, float step)
+/*static*/ void
+RadioView::_DrawBow(BView* view, int32 index, const BPoint& center,
+	int32 count, float step)
 {
 	float radius = step * index + 1;
 
 	if (step < 4)
-		SetPenSize(step / 2);
+		view->SetPenSize(step / 2);
 	else
-		SetPenSize(step * 2 / 3);
+		view->SetPenSize(step * 2 / 3);
 
-	SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
-	StrokeArc(center, radius, radius, 50, 80);
+	view->SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
+	view->StrokeArc(center, radius, radius, 50, 80);
 }
 
 
-void
-RadioView::_SetColor(int32 index, int32 count)
+/*static*/ void
+RadioView::_SetColor(BView* view, int32 percent, int32 phase, int32 index,
+	int32 count)
 {
-	if (_IsDisabled(index, count)) {
+	if (_IsDisabled(percent, index, count)) {
 		// disabled
-		SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-	} else if (fPhase == 0 || fPhase % count != index) {
+		view->SetHighColor(tint_color(view->LowColor(), B_DARKEN_1_TINT));
+	} else if (phase == 0 || phase % count != index) {
 		// enabled
-		SetHighColor(tint_color(ViewColor(), B_DARKEN_3_TINT));
+		view->SetHighColor(tint_color(view->LowColor(), B_DARKEN_3_TINT));
 	} else {
 		// pulsing
-		SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
+		view->SetHighColor(tint_color(view->LowColor(), B_DARKEN_2_TINT));
 	}
 }
 
 
-bool
-RadioView::_IsDisabled(int32 index, int32 count) const
+/*static*/ bool
+RadioView::_IsDisabled(int32 percent, int32 index, int32 count)
 {
-	return fPercent < 100 * index / count;
+	return percent < 100 * index / count;
 }

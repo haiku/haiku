@@ -26,6 +26,10 @@ public:
 			bool				IsPulsing() const
 									{ return fPulse != NULL; }
 
+	static	void				Draw(BView* view, BRect rect, int32 percent,
+									int32 count);
+	static	int32				DefaultMax();
+
 protected:
 	virtual	void				AttachedToWindow();
 	virtual	void				DetachedFromWindow();
@@ -36,12 +40,16 @@ protected:
 
 private:
 			void				_RestartPulsing();
-			void				_Compute(const BRect& bounds, BPoint& center,
-									int32& count, float& step) const;
-			void				_DrawBow(int32 index, const BPoint& center,
-									int32 count, float step);
-			void				_SetColor(int32 index, int32 count);
-			bool				_IsDisabled(int32 index, int32 count) const;
+
+	static	void				_Compute(const BRect& bounds, BPoint& center,
+									int32& count, int32 max, float& step);
+	static	void				_DrawBow(BView* view, int32 index,
+									const BPoint& center, int32 count,
+									float step);
+	static	void				_SetColor(BView* view, int32 percent,
+									int32 phase, int32 index, int32 count);
+	static	bool				_IsDisabled(int32 percent, int32 index,
+									int32 count);
 
 private:
 			int32				fPercent;
