@@ -56,6 +56,8 @@ struct NupCap : public BaseCap {
 		fNup(nup)
 	{}
 
+	int	ID() const { return fNup; }
+
 	int	fNup;
 };
 
@@ -67,6 +69,8 @@ struct DitherCap : public BaseCap {
 		BaseCap(label, isDefault),
 		fDitherType(ditherType)
 	{}
+
+	int	ID() const { return fDitherType; }
 
 	Halftone::DitherType fDitherType;
 };
@@ -90,7 +94,7 @@ static const DitherCap gDitherFloydSteinberg("Floyd-Steinberg", false,
 	Halftone::kTypeFloydSteinberg);
 
 
-const NupCap *gNups[] = {
+const BaseCap *gNups[] = {
 	&gNup1,
 	&gNup2,
 	&gNup4,
@@ -103,7 +107,7 @@ const NupCap *gNups[] = {
 };
 
 
-const DitherCap *gDitherTypes[] = {
+const BaseCap *gDitherTypes[] = {
 	&gDitherType1,
 	&gDitherType2,
 	&gDitherType3,
@@ -121,6 +125,7 @@ enum {
 	kMsgCollateChanged,
 	kMsgReverseChanged,
 	kMsgDuplexChanged,
+	kMsgNone = 0
 };
 
 
@@ -172,48 +177,16 @@ JobSetupView::AttachedToWindow()
 	// color
 	fColorType = new BPopUpMenu("color");
 	fColorType->SetRadioMode(true);
-
-	int count = fPrinterCap->countCap(PrinterCap::kColor);
-	const ColorCap **color_cap = (const ColorCap **)fPrinterCap->enumCap(
-		PrinterCap::kColor);
-	bool marked = false;
-	BMenuItem* item = NULL;
-	while (count--) {
-		item = new BMenuItem((*color_cap)->fLabel.c_str(),
-			new BMessage(kMsgQuality));
-		fColorType->AddItem(item);
-		if ((*color_cap)->fColor == fJobData->getColor()) {
-			item->SetMarked(true);
-			marked = true;
-		}
-		color_cap++;
-	}
-	if (!marked && item)
-		item->SetMarked(true);
-
+	FillCapabilityMenu(fColorType, kMsgQuality, PrinterCap::kColor,
+		fJobData->getColor());
 	BMenuField* colorMenuField = new BMenuField("color", "Color:", fColorType);
 	fColorType->SetTargetForItems(this);
 	
 	// dither type
 	fDitherType = new BPopUpMenu("");
 	fDitherType->SetRadioMode(true);
-
-	count = sizeof(gDitherTypes) / sizeof(gDitherTypes[0]);
-	const DitherCap **dither_cap = gDitherTypes;
-	marked = false;
-	item = NULL;
-	while (count--) {
-		item = new BMenuItem((*dither_cap)->fLabel.c_str(),
-			new BMessage(kMsgQuality));
-		fDitherType->AddItem(item);
-		if ((*dither_cap)->fDitherType == fJobData->getDitherType()) {
-			item->SetMarked(true);
-			marked = true;
-		}
-		dither_cap++;
-	}
-	if (!marked && item)
-		item->SetMarked(true);
+	FillCapabilityMenu(fDitherType, kMsgQuality, gDitherTypes, sizeof(gDitherTypes) /
+		sizeof(gDitherTypes[0]), fJobData->getDitherType());
 	BMenuField* ditherMenuField = new BMenuField("dithering", "Dot Pattern:",
 		fDitherType);
 	fDitherType->SetTargetForItems(this);
@@ -297,43 +270,16 @@ JobSetupView::AttachedToWindow()
 	// paper source
 	fPaperFeed = new BPopUpMenu("");
 	fPaperFeed->SetRadioMode(true);
-	count = fPrinterCap->countCap(PrinterCap::kPaperSource);
-	const PaperSourceCap **paper_source_cap =
-		(const PaperSourceCap **)fPrinterCap->enumCap(PrinterCap::kPaperSource);
-	marked = false;
-	item = NULL;
-	while (count--) {
-		item = new BMenuItem((*paper_source_cap)->fLabel.c_str(), NULL);
-		fPaperFeed->AddItem(item);
-		if ((*paper_source_cap)->fPaperSource == fJobData->getPaperSource()) {
-			item->SetMarked(true);
-			marked = true;
-		}
-		paper_source_cap++;
-	}
-	if (!marked)
-		item->SetMarked(true);
+	FillCapabilityMenu(fPaperFeed, kMsgNone, PrinterCap::kPaperSource,
+		fJobData->getPaperSource());
 	BMenuField* paperSourceMenufield = new BMenuField("paperSource",
 		"Paper Source:", fPaperFeed);
 
 	// Pages per sheet
 	fNup = new BPopUpMenu("");
 	fNup->SetRadioMode(true);
-	count = sizeof(gNups) / sizeof(gNups[0]);
-	const NupCap **nup_cap = gNups;
-	marked = false;
-	item = NULL;
-	while (count--) {
-		item = new BMenuItem((*nup_cap)->fLabel.c_str(), NULL);
-		fNup->AddItem(item);
-		if ((*nup_cap)->fNup == fJobData->getNup()) {
-			item->SetMarked(true);
-			marked = true;
-		}
-		nup_cap++;
-	}
-	if (!marked)
-		item->SetMarked(true);
+	FillCapabilityMenu(fNup, kMsgNone, gNups, sizeof(gNups) / sizeof(gNups[0]),
+		fJobData->getNup());
 	BMenuField* pagesPerSheet = new BMenuField("pagesPerSheet",
 		"Pages Per Sheet:", fNup);
 
@@ -505,6 +451,72 @@ JobSetupView::AttachedToWindow()
 
 
 void
+JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+	PrinterCap::CapID category, int id)
+{
+	int count = fPrinterCap->countCap(category);
+	const BaseCap **capabilities = fPrinterCap->enumCap(category);
+	FillCapabilityMenu(menu, message, capabilities, count, id);
+}
+
+void
+JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+	const BaseCap** capabilities, int count, int id)
+{
+	bool marked = false;
+
+	BMenuItem* firstItem = NULL;
+	BMenuItem* defaultItem = NULL;
+	BMenuItem* item = NULL;
+	while (count--) {
+		const BaseCap* capability = *capabilities;
+		if (message != kMsgNone)
+			item = new BMenuItem(capability->fLabel.c_str(),
+				new BMessage(kMsgQuality));
+		else
+			item = new BMenuItem(capability->fLabel.c_str(), NULL);
+
+		menu->AddItem(item);
+
+		if (firstItem == NULL)
+			firstItem = item;
+
+		if (capability->fIsDefault)
+			defaultItem = item;
+
+
+		if (capability->ID() == id) {
+			item->SetMarked(true);
+			marked = true;
+		}
+
+		capabilities++;
+	}
+
+	if (marked)
+		return;
+
+	if (defaultItem != NULL)
+		defaultItem->SetMarked(true);
+	else if (firstItem != NULL)
+		firstItem->SetMarked(true);
+}
+
+
+int
+JobSetupView::GetID(const BaseCap** capabilities, int count, const char* label,
+	int defaultValue)
+{
+	while (count--) {
+		const BaseCap* capability = *capabilities;
+		if (capability->fLabel == label)
+			return capability->ID();
+	}
+	return defaultValue;
+}
+
+
+void
 JobSetupView::UpdateButtonEnabledState()
 {
 	bool pageRangeEnabled = fAll->Value() != B_CONTROL_ON;
@@ -530,7 +542,8 @@ JobSetupView::MessageReceived(BMessage *msg)
 		break;
 
 	case kMsgQuality:
-		fHalftone->preview(getGamma(), getInkDensity(), getDitherType(), getColor() != JobData::kMonochrome); 
+		fHalftone->preview(Gamma(), InkDensity(), DitherType(),
+			Color() != JobData::kMonochrome);
 		break;
 
 	case kMsgCollateChanged:
@@ -545,38 +558,29 @@ JobSetupView::MessageReceived(BMessage *msg)
 
 
 JobData::Color 
-JobSetupView::getColor()
+JobSetupView::Color()
 {
-	int count = fPrinterCap->countCap(PrinterCap::kColor);
-	const ColorCap **color_cap = (const ColorCap**)fPrinterCap->enumCap(PrinterCap::kColor);
-	const char *color_label = fColorType->FindMarked()->Label();
-	while (count--) {
-		if (!strcmp((*color_cap)->fLabel.c_str(), color_label)) {
-			return (*color_cap)->fColor;
-		}
-		color_cap++;
-	}
-	return JobData::kMonochrome;
+	const char *label = fColorType->FindMarked()->Label();
+	const BaseCap* capability = fPrinterCap->findCap(PrinterCap::kColor, label);
+	if (capability == NULL)
+		return JobData::kMonochrome;
+
+	const ColorCap* colorCap = static_cast<const ColorCap*>(capability);
+	return colorCap->fColor;
 }
 
 
 Halftone::DitherType 
-JobSetupView::getDitherType()
+JobSetupView::DitherType()
 {
-	int count = sizeof(gDitherTypes) / sizeof(gDitherTypes[0]);
-	const DitherCap **dither_cap = gDitherTypes;
-	const char *dithering_label = fDitherType->FindMarked()->Label();
-	while (count --) {
-		if (strcmp((*dither_cap)->fLabel.c_str(), dithering_label) == 0) {
-			return (*dither_cap)->fDitherType;
-		}
-		dither_cap ++;
-	}
-	return Halftone::kTypeFloydSteinberg;
+	const char *label = fDitherType->FindMarked()->Label();
+	int id = GetID(gDitherTypes, sizeof(gDitherTypes) / sizeof(gDitherTypes[0]),
+		label, Halftone::kTypeFloydSteinberg);
+	return static_cast<Halftone::DitherType>(id);
 }
 
 float 
-JobSetupView::getGamma()
+JobSetupView::Gamma()
 {
 	const float value = (float)fGamma->Value();
 	return pow(2.0, value / 100.0);
@@ -584,23 +588,34 @@ JobSetupView::getGamma()
 
 
 float 
-JobSetupView::getInkDensity()
+JobSetupView::InkDensity()
 {
 	const float value = (float)(127 - fInkDensity->Value());
 	return value;
 }
 
 
+JobData::PaperSource
+JobSetupView::PaperSource()
+{
+	const char *label = fPaperFeed->FindMarked()->Label();
+	const BaseCap* capability = fPrinterCap->findCap(PrinterCap::kPaperSource,
+		label);
+
+	if (capability == NULL)
+		capability = fPrinterCap->getDefaultCap(PrinterCap::kPaperSource);
+	return static_cast<const PaperSourceCap*>(capability)->fPaperSource;
+
+}
+
 bool 
 JobSetupView::UpdateJobData(bool showPreview)
 {
-	int count;
-
 	fJobData->setShowPreview(showPreview);
-	fJobData->setColor(getColor());	
-	fJobData->setGamma(getGamma());
-	fJobData->setInkDensity(getInkDensity());
-	fJobData->setDitherType(getDitherType());
+	fJobData->setColor(Color());
+	fJobData->setGamma(Gamma());
+	fJobData->setInkDensity(InkDensity());
+	fJobData->setDitherType(DitherType());
 
 	int first_page;
 	int last_page;
@@ -616,30 +631,14 @@ JobSetupView::UpdateJobData(bool showPreview)
 	fJobData->setFirstPage(first_page);
 	fJobData->setLastPage(last_page);
 
-	count = fPrinterCap->countCap(PrinterCap::kPaperSource);
-	const PaperSourceCap **paper_source_cap = (const PaperSourceCap **)fPrinterCap->enumCap(PrinterCap::kPaperSource);
-	const char *paper_source_label = fPaperFeed->FindMarked()->Label();
-	while (count--) {
-		if (!strcmp((*paper_source_cap)->fLabel.c_str(), paper_source_label)) {
-			fJobData->setPaperSource((*paper_source_cap)->fPaperSource);
-			break;
-		}
-		paper_source_cap++;
-	}
+	fJobData->setPaperSource(PaperSource());
 
-	count = sizeof(gNups) / sizeof(gNups[0]);
-	const NupCap **nup_cap = gNups;
-	const char *nup_label = fNup->FindMarked()->Label();
-	while (count--) {
-		if (!strcmp((*nup_cap)->fLabel.c_str(), nup_label)) {
-			fJobData->setNup((*nup_cap)->fNup);
-			break;
-		}
-		nup_cap++;
-	}
+	fJobData->setNup(GetID(gNups, sizeof(gNups) / sizeof(gNups[0]),
+		fNup->FindMarked()->Label(), 1));
 
 	if (fPrinterCap->isSupport(PrinterCap::kPrintStyle)) {
-		fJobData->setPrintStyle((B_CONTROL_ON == fDuplex->Value()) ? JobData::kDuplex : JobData::kSimplex);
+		fJobData->setPrintStyle((B_CONTROL_ON == fDuplex->Value())
+			? JobData::kDuplex : JobData::kSimplex);
 	}
 
 	fJobData->setCopies(atoi(fCopies->Text()));

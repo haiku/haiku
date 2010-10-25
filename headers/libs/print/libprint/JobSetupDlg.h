@@ -12,6 +12,7 @@
 #include "JobData.h"
 #include "Halftone.h"
 #include "JSDSlider.h"
+#include "PrinterCap.h"
 
 class BTextControl;
 class BTextView;
@@ -34,13 +35,20 @@ public:
 
 private:
 	void UpdateButtonEnabledState();
+	void FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+		PrinterCap::CapID category, int id);
+	void FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+		const BaseCap** capabilities, int count, int id);
+	int	GetID(const BaseCap** capabilities, int count, const char* label,
+		int defaultValue);
 	BRadioButton* CreatePageSelectionItem(const char* name, const char* label,
 		JobData::PageSelection pageSelection);
 	void AllowOnlyDigits(BTextView* textView, int maxDigits);
-	JobData::Color getColor();
-	Halftone::DitherType getDitherType();
-	float getGamma();
-	float getInkDensity();
+	JobData::Color Color();
+	Halftone::DitherType DitherType();
+	float Gamma();
+	float InkDensity();
+	JobData::PaperSource PaperSource();
 
 	BTextControl     *fCopies;
 	BTextControl     *fFromPage;

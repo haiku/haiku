@@ -14,6 +14,11 @@ BaseCap::BaseCap(const string &label, bool isDefault)
 }
 
 
+BaseCap::~BaseCap()
+{
+}
+
+
 PaperCap::PaperCap(const string &label, bool isDefault, JobData::Paper paper,
 	const BRect &paperRect, const BRect &physicalRect)
 	:
@@ -22,6 +27,13 @@ PaperCap::PaperCap(const string &label, bool isDefault, JobData::Paper paper,
 	fPaperRect(paperRect),
 	fPhysicalRect(physicalRect)
 {
+}
+
+
+int
+PaperCap::ID() const
+{
+	return fPaper;
 }
 
 
@@ -34,13 +46,28 @@ PaperSourceCap::PaperSourceCap(const string &label, bool isDefault,
 }
 
 
+int
+PaperSourceCap::ID() const
+{
+	return fPaperSource;
+}
+
+
 ResolutionCap::ResolutionCap(const string &label, bool isDefault,
-	int xResolution, int yResolution)
+	int id, int xResolution, int yResolution)
 	:
 	BaseCap(label, isDefault),
+	fID(id),
 	fXResolution(xResolution),
 	fYResolution(yResolution)
 {
+}
+
+
+int
+ResolutionCap::ID() const
+{
+	return fID;
 }
 
 
@@ -53,12 +80,26 @@ OrientationCap::OrientationCap(const string &label, bool isDefault,
 }
 
 
+int
+OrientationCap::ID() const
+{
+	return fOrientation;
+}
+
+
 PrintStyleCap::PrintStyleCap(const string &label, bool isDefault,
 	JobData::PrintStyle printStyle)
 	:
 	BaseCap(label, isDefault),
 	fPrintStyle(printStyle)
 {
+}
+
+
+int
+PrintStyleCap::ID() const
+{
+	return fPrintStyle;
 }
 
 
@@ -71,11 +112,25 @@ BindingLocationCap::BindingLocationCap(const string &label, bool isDefault,
 }
 
 
+int
+BindingLocationCap::ID() const
+{
+	return fBindingLocation;
+}
+
+
 ColorCap::ColorCap(const string &label, bool isDefault, JobData::Color color)
 	:
 	BaseCap(label, isDefault),
 	fColor(color)
 {
+}
+
+
+int
+ColorCap::ID() const
+{
+	return fColor;
 }
 
 
@@ -86,6 +141,13 @@ ProtocolClassCap::ProtocolClassCap(const string &label, bool isDefault,
 	fProtocolClass(protocolClass),
 	fDescription(description)
 {
+}
+
+
+int
+ProtocolClassCap::ID() const
+{
+	return fProtocolClass;
 }
 
 
@@ -101,21 +163,60 @@ PrinterCap::~PrinterCap()
 }
 
 
-const BaseCap *PrinterCap::getDefaultCap(CapID id) const
+const BaseCap *
+PrinterCap::getDefaultCap(CapID category) const
 {
-	int count = countCap(id);
-	if (count > 0) {
-		const BaseCap **base_cap = enumCap(id);
-		while (count--) {
-			if ((*base_cap)->fIsDefault) {
-				return *base_cap;
-			}
-			base_cap++;
+	int count = countCap(category);
+	if (count <= 0)
+		return NULL;
+
+	const BaseCap **base_cap = enumCap(category);
+	while (count--) {
+		if ((*base_cap)->fIsDefault) {
+			return *base_cap;
 		}
+		base_cap++;
+	}
+
+	return enumCap(category)[0];
+}
+
+
+const BaseCap*
+PrinterCap::findCap(CapID category, int id) const
+{
+	int count = countCap(category);
+	if (count <= 0)
+		return NULL;
+
+	const BaseCap **base_cap = enumCap(category);
+	while (count--) {
+		if ((*base_cap)->ID() == id) {
+			return *base_cap;
+		}
+		base_cap++;
 	}
 	return NULL;
 }
 
+
+const BaseCap*
+PrinterCap::findCap(CapID category, const char* label) const
+{
+	int count = countCap(category);
+	if (count <= 0)
+		return NULL;
+
+	const BaseCap **base_cap = enumCap(category);
+	while (count--) {
+		if ((*base_cap)->fLabel == label) {
+			return *base_cap;
+		}
+		base_cap++;
+	}
+	return NULL;
+
+}
 
 int
 PrinterCap::getProtocolClass() const {

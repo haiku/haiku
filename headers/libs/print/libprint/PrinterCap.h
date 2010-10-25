@@ -18,15 +18,21 @@ enum {
 
 struct BaseCap {
 							BaseCap(const string &label, bool isDefault);
+	virtual					~BaseCap();
+
+	virtual	int				ID() const = 0;
 
 			string			fLabel;
 			bool			fIsDefault;
+			string			fKey;
 };
 
 struct PaperCap : public BaseCap {
 							PaperCap(const string &label, bool isDefault,
 								JobData::Paper paper, const BRect &paperRect,
 								const BRect &physicalRect);
+
+			int				ID() const;
 
 			JobData::Paper	fPaper;
 			BRect			fPaperRect;
@@ -37,13 +43,18 @@ struct PaperSourceCap : public BaseCap {
 							PaperSourceCap(const string &label, bool isDefault,
 								JobData::PaperSource paperSource);
 
+			int				ID() const;
+
 			JobData::PaperSource	fPaperSource;
 };
 
 struct ResolutionCap : public BaseCap {
 							ResolutionCap(const string &label, bool isDefault,
-								int xResolution, int yResolution);
+								int id, int xResolution, int yResolution);
 
+			int				ID() const;
+
+			int				fID;
 			int				fXResolution;
 			int				fYResolution;
 };
@@ -52,12 +63,16 @@ struct OrientationCap : public BaseCap {
 							OrientationCap(const string &label, bool isDefault,
 									JobData::Orientation orientation);
 
+			int				ID() const;
+
 			JobData::Orientation	fOrientation;
 };
 
 struct PrintStyleCap : public BaseCap {
 							PrintStyleCap(const string &label, bool isDefault,
 								JobData::PrintStyle printStyle);
+
+			int				ID() const;
 
 			JobData::PrintStyle		fPrintStyle;
 };
@@ -67,12 +82,16 @@ struct BindingLocationCap : public BaseCap {
 								bool isDefault,
 								JobData::BindingLocation bindingLocation);
 
+			int				ID() const;
+
 			JobData::BindingLocation	fBindingLocation;
 };
 
 struct ColorCap : public BaseCap {
 							ColorCap(const string &label, bool isDefault,
 								JobData::Color color);
+
+			int				ID() const;
 
 			JobData::Color	fColor;
 };
@@ -81,6 +100,8 @@ struct ProtocolClassCap : public BaseCap {
 							ProtocolClassCap(const string &label,
 								bool isDefault, int protocolClass,
 								const string &description);
+
+			int				ID() const;
 
 			int			fProtocolClass;
 			string		fDescription;
@@ -108,16 +129,19 @@ public:
 		kCopyCommand,       // supports printer page copy command?
 	};
 
-	virtual	int				countCap(CapID) const = 0;
-	virtual	bool			isSupport(CapID) const = 0;
-	virtual	const BaseCap**	enumCap(CapID) const = 0;
-			const BaseCap*	getDefaultCap(CapID) const;
+	virtual	int				countCap(CapID category) const = 0;
+	virtual	bool			isSupport(CapID category) const = 0;
+	virtual	const BaseCap**	enumCap(CapID category) const = 0;
+			const BaseCap*	getDefaultCap(CapID category) const;
+			const BaseCap*	findCap(CapID category, int id) const;
+			const BaseCap*	findCap(CapID category, const char* label) const;
+
 			int				getPrinterId() const;
 			int				getProtocolClass() const;
 
 protected:
-							PrinterCap(const PrinterCap &);
-			PrinterCap&		operator=(const PrinterCap &);
+							PrinterCap(const PrinterCap &printerCap);
+			PrinterCap&		operator=(const PrinterCap &printerCap);
 
 			const PrinterData*	getPrinterData() const;
 			void				setPrinterId(int id);

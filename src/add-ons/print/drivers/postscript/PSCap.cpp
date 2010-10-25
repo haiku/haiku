@@ -68,9 +68,9 @@ const PaperCap legal(
 
 const PaperSourceCap autobin("Auto",  true,  JobData::kAuto);
 
-const ResolutionCap dpi300("300dpi", true, 300,  300);
-const ResolutionCap dpi600("600dpi", false, 600,  600);
-const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
+const ResolutionCap dpi300("300dpi", true, 0, 300,  300);
+const ResolutionCap dpi600("600dpi", false, 1, 600,  600);
+const ResolutionCap dpi1200("1200dpi", false, 2, 1200, 1200);
 
 const PaperCap* papers[] = {
 	&a4,

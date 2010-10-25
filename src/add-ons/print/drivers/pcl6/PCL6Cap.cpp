@@ -145,10 +145,10 @@ const PaperSourceCap envelopeTray("Envelope Tray", false,
 // since 2.0:
 const PaperSourceCap thridCassette("Thrid Cassette",  false,  JobData::kMiddle);
 
-const ResolutionCap dpi150("150dpi", false, 150, 150);
-const ResolutionCap dpi300("300dpi", true, 300, 300);
-const ResolutionCap dpi600("600dpi", false, 600, 600);
-const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
+const ResolutionCap dpi150("150dpi", false, 0, 150, 150);
+const ResolutionCap dpi300("300dpi", true, 1, 300, 300);
+const ResolutionCap dpi600("600dpi", false, 2, 600, 600);
+const ResolutionCap dpi1200("1200dpi", false, 3, 1200, 1200);
 
 const PrintStyleCap simplex("Simplex", true, JobData::kSimplex);
 const PrintStyleCap duplex("Duplex", false, JobData::kDuplex);

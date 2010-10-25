@@ -98,9 +98,9 @@ const PaperSourceCap upper("Upper",   false, JobData::kUpper);
 const PaperSourceCap middle("Middle", false, JobData::kMiddle);
 const PaperSourceCap lower("Lower",   false, JobData::kLower);
 
-const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
-const ResolutionCap dpi600("600dpi",   true,  600,  600);
-const ResolutionCap dpi300("300dpi",   false, 300,  300);
+const ResolutionCap dpi1200("1200dpi", false, 0, 1200, 1200);
+const ResolutionCap dpi600("600dpi",   true,  1, 600,  600);
+const ResolutionCap dpi300("300dpi",   false, 2, 300,  300);
 
 const PrintStyleCap simplex("Simplex", true,  JobData::kSimplex);
 const PrintStyleCap duplex("Duplex",   false, JobData::kDuplex);
