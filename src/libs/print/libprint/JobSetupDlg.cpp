@@ -45,32 +45,32 @@
 #include "PrinterCap.h"
 #include "DbgMsg.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
+
 using namespace std;
-#else
-#define std
-#endif
 
-
-struct SurfaceCap : public BaseCap {
-	color_space surface_type;
-	SurfaceCap(const string &s, bool d, color_space cs) : BaseCap(s, d), surface_type(cs) {}
-};
 
 struct NupCap : public BaseCap {
-	int nup;
-	NupCap(const string &s, bool d, int n) : BaseCap(s, d), nup(n) {}
+	NupCap(const string &label, bool isDefault, int nup)
+		:
+		BaseCap(label, isDefault),
+		fNup(nup)
+	{}
+
+	int	fNup;
 };
+
 
 struct DitherCap : public BaseCap {
-	Halftone::DitherType dither_type;
-	DitherCap(const string &s, bool d, Halftone::DitherType type) : BaseCap(s, d), dither_type(type) {}
+	DitherCap(const string &label, bool isDefault,
+		Halftone::DitherType ditherType)
+		:
+		BaseCap(label, isDefault),
+		fDitherType(ditherType)
+	{}
+
+	Halftone::DitherType fDitherType;
 };
 
-static const SurfaceCap gRGB32("RGB32", false, B_RGB32);
-static const SurfaceCap gCMAP8("CMAP8", true,  B_CMAP8);
-static const SurfaceCap gGray8("GRAY8", false, B_GRAY8);
-static const SurfaceCap gGray1("GRAY1", false, B_GRAY1);
 
 static const NupCap gNup1("1", true,  1);
 static const NupCap gNup2("2",   false, 2);
@@ -82,17 +82,13 @@ static const NupCap gNup25("25", false, 25);
 static const NupCap gNup32("32", false, 32);
 static const NupCap gNup36("36", false, 36);
 
+
 static const DitherCap gDitherType1("Crosshatch", false, Halftone::kType1);
 static const DitherCap gDitherType2("Grid", false, Halftone::kType2);
 static const DitherCap gDitherType3("Stipple", false, Halftone::kType3);
-static const DitherCap gDitherFloydSteinberg("Floyd-Steinberg", false, Halftone::kTypeFloydSteinberg);
+static const DitherCap gDitherFloydSteinberg("Floyd-Steinberg", false,
+	Halftone::kTypeFloydSteinberg);
 
-const SurfaceCap *gSurfaces[] = {
-	&gRGB32,
-	&gCMAP8,
-	&gGray8,
-	&gGray1
-};
 
 const NupCap *gNups[] = {
 	&gNup1,
@@ -106,12 +102,14 @@ const NupCap *gNups[] = {
 	&gNup36
 };
 
+
 const DitherCap *gDitherTypes[] = {
 	&gDitherType1,
 	&gDitherType2,
 	&gDitherType3,
 	&gDitherFloydSteinberg
 };
+
 
 enum {
 	kMsgRangeAll = 'JSdl',
@@ -125,15 +123,18 @@ enum {
 	kMsgDuplexChanged,
 };
 
+
 JobSetupView::JobSetupView(JobData *job_data, PrinterData *printer_data,
 	const PrinterCap *printer_cap)
-	: BView("jobSetup", B_WILL_DRAW)
-	, fJobData(job_data)
-	, fPrinterData(printer_data)
-	, fPrinterCap(printer_cap)
+	:
+	BView("jobSetup", B_WILL_DRAW),
+	fJobData(job_data),
+	fPrinterData(printer_data),
+	fPrinterCap(printer_cap)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
+
 
 BRadioButton* 
 JobSetupView::CreatePageSelectionItem(const char* name, const char* label,
@@ -145,6 +146,7 @@ JobSetupView::CreatePageSelectionItem(const char* name, const char* label,
 	}
 	return button;
 }
+
 
 void
 JobSetupView::AllowOnlyDigits(BTextView* textView, int maxDigits)
@@ -158,6 +160,7 @@ JobSetupView::AllowOnlyDigits(BTextView* textView, int maxDigits)
 	}
 	textView->SetMaxBytes(maxDigits);
 }
+
 
 void 
 JobSetupView::AttachedToWindow()
@@ -176,10 +179,10 @@ JobSetupView::AttachedToWindow()
 	bool marked = false;
 	BMenuItem* item = NULL;
 	while (count--) {
-		item = new BMenuItem((*color_cap)->label.c_str(),
+		item = new BMenuItem((*color_cap)->fLabel.c_str(),
 			new BMessage(kMsgQuality));
 		fColorType->AddItem(item);
-		if ((*color_cap)->color == fJobData->getColor()) {
+		if ((*color_cap)->fColor == fJobData->getColor()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -200,10 +203,10 @@ JobSetupView::AttachedToWindow()
 	marked = false;
 	item = NULL;
 	while (count--) {
-		item = new BMenuItem((*dither_cap)->label.c_str(),
+		item = new BMenuItem((*dither_cap)->fLabel.c_str(),
 			new BMessage(kMsgQuality));
 		fDitherType->AddItem(item);
-		if ((*dither_cap)->dither_type == fJobData->getDitherType()) {
+		if ((*dither_cap)->fDitherType == fJobData->getDitherType()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -300,9 +303,9 @@ JobSetupView::AttachedToWindow()
 	marked = false;
 	item = NULL;
 	while (count--) {
-		item = new BMenuItem((*paper_source_cap)->label.c_str(), NULL);
+		item = new BMenuItem((*paper_source_cap)->fLabel.c_str(), NULL);
 		fPaperFeed->AddItem(item);
-		if ((*paper_source_cap)->paper_source == fJobData->getPaperSource()) {
+		if ((*paper_source_cap)->fPaperSource == fJobData->getPaperSource()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -321,9 +324,9 @@ JobSetupView::AttachedToWindow()
 	marked = false;
 	item = NULL;
 	while (count--) {
-		item = new BMenuItem((*nup_cap)->label.c_str(), NULL);
+		item = new BMenuItem((*nup_cap)->fLabel.c_str(), NULL);
 		fNup->AddItem(item);
-		if ((*nup_cap)->nup == fJobData->getNup()) {
+		if ((*nup_cap)->fNup == fJobData->getNup()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -500,6 +503,7 @@ JobSetupView::AttachedToWindow()
 	UpdateButtonEnabledState();
 }
 
+
 void
 JobSetupView::UpdateButtonEnabledState()
 {
@@ -513,6 +517,7 @@ JobSetupView::UpdateButtonEnabledState()
 	fOddNumberedPages->SetEnabled(pageSelectionEnabled);
 	fEvenNumberedPages->SetEnabled(pageSelectionEnabled);
 }
+
 
 void 
 JobSetupView::MessageReceived(BMessage *msg)
@@ -538,6 +543,7 @@ JobSetupView::MessageReceived(BMessage *msg)
 	}
 }
 
+
 JobData::Color 
 JobSetupView::getColor()
 {
@@ -545,13 +551,14 @@ JobSetupView::getColor()
 	const ColorCap **color_cap = (const ColorCap**)fPrinterCap->enumCap(PrinterCap::kColor);
 	const char *color_label = fColorType->FindMarked()->Label();
 	while (count--) {
-		if (!strcmp((*color_cap)->label.c_str(), color_label)) {
-			return (*color_cap)->color;
+		if (!strcmp((*color_cap)->fLabel.c_str(), color_label)) {
+			return (*color_cap)->fColor;
 		}
 		color_cap++;
 	}
 	return JobData::kMonochrome;
 }
+
 
 Halftone::DitherType 
 JobSetupView::getDitherType()
@@ -560,8 +567,8 @@ JobSetupView::getDitherType()
 	const DitherCap **dither_cap = gDitherTypes;
 	const char *dithering_label = fDitherType->FindMarked()->Label();
 	while (count --) {
-		if (strcmp((*dither_cap)->label.c_str(), dithering_label) == 0) {
-			return (*dither_cap)->dither_type;
+		if (strcmp((*dither_cap)->fLabel.c_str(), dithering_label) == 0) {
+			return (*dither_cap)->fDitherType;
 		}
 		dither_cap ++;
 	}
@@ -575,6 +582,7 @@ JobSetupView::getGamma()
 	return pow(2.0, value / 100.0);
 }
 
+
 float 
 JobSetupView::getInkDensity()
 {
@@ -582,23 +590,12 @@ JobSetupView::getInkDensity()
 	return value;
 }
 
+
 bool 
 JobSetupView::UpdateJobData(bool showPreview)
 {
 	int count;
 
-/*
-	count = sizeof(gSurfaces) / sizeof(gSurfaces[0]);
-	const SurfaceCap **surface_cap = gSurfaces;
-	const char *surface_label = fSurfaceType->FindMarked()->Label();
-	while (count--) {
-		if (!strcmp((*surface_cap)->label.c_str(), surface_label)) {
-			fJobData->setSurfaceType((*surface_cap)->surface_type);
-			break;
-		}
-		surface_cap++;
-	}
-*/
 	fJobData->setShowPreview(showPreview);
 	fJobData->setColor(getColor());	
 	fJobData->setGamma(getGamma());
@@ -623,8 +620,8 @@ JobSetupView::UpdateJobData(bool showPreview)
 	const PaperSourceCap **paper_source_cap = (const PaperSourceCap **)fPrinterCap->enumCap(PrinterCap::kPaperSource);
 	const char *paper_source_label = fPaperFeed->FindMarked()->Label();
 	while (count--) {
-		if (!strcmp((*paper_source_cap)->label.c_str(), paper_source_label)) {
-			fJobData->setPaperSource((*paper_source_cap)->paper_source);
+		if (!strcmp((*paper_source_cap)->fLabel.c_str(), paper_source_label)) {
+			fJobData->setPaperSource((*paper_source_cap)->fPaperSource);
 			break;
 		}
 		paper_source_cap++;
@@ -634,8 +631,8 @@ JobSetupView::UpdateJobData(bool showPreview)
 	const NupCap **nup_cap = gNups;
 	const char *nup_label = fNup->FindMarked()->Label();
 	while (count--) {
-		if (!strcmp((*nup_cap)->label.c_str(), nup_label)) {
-			fJobData->setNup((*nup_cap)->nup);
+		if (!strcmp((*nup_cap)->fLabel.c_str(), nup_label)) {
+			fJobData->setNup((*nup_cap)->fNup);
 			break;
 		}
 		nup_cap++;
@@ -661,12 +658,12 @@ JobSetupView::UpdateJobData(bool showPreview)
 	return true;
 }
 
-//====================================================================
 
 JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data,
 	const PrinterCap *printer_cap)
-	: DialogWindow(BRect(100, 100, 200, 200),
-		"PrintJob Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+	:
+	DialogWindow(BRect(100, 100, 200, 200), "PrintJob Setup",
+		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -680,6 +677,7 @@ JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data,
 		.SetInsets(10, 10, 10, 10)
 	);
 }
+
 
 void 
 JobSetupDlg::MessageReceived(BMessage *msg)

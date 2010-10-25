@@ -87,7 +87,7 @@ enum MSGS {
 };
 
 ProtocolClassItem::ProtocolClassItem(const ProtocolClassCap* cap)
-	: BStringItem(cap->label.c_str())
+	: BStringItem(cap->fLabel.c_str())
 	, fProtocolClassCap(cap)
 {
 }
@@ -95,13 +95,13 @@ ProtocolClassItem::ProtocolClassItem(const ProtocolClassCap* cap)
 int 
 ProtocolClassItem::getProtocolClass()
 {
-	return fProtocolClassCap->protocolClass;
+	return fProtocolClassCap->fProtocolClass;
 }
 
 const char *
 ProtocolClassItem::getDescription()
 {
-	return fProtocolClassCap->description.c_str();
+	return fProtocolClassCap->fDescription.c_str();
 }
 
 
@@ -147,7 +147,7 @@ AddPrinterView::AttachedToWindow()
 		
 		BStringItem* item = new ProtocolClassItem(protocolClass);
 		fProtocolClassList->AddItem(item);
-		if (protocolClass->is_default) {
+		if (protocolClass->fIsDefault) {
 			int index = fProtocolClassList->IndexOf(item);
 			fProtocolClassList->Select(index);
 		}

@@ -133,7 +133,7 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fPaper = (Paper)msg->FindInt32(kJDPaper);
 	else if (cap->isSupport(PrinterCap::kPaper)) {
 		paperCap = (const PaperCap *)cap->getDefaultCap(PrinterCap::kPaper);
-		fPaper = paperCap->paper;
+		fPaper = paperCap->fPaper;
 	} else
 		fPaper = kA4;
 
@@ -142,7 +142,8 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		msg->FindInt64(kJDXRes, &xres64);
 		fXRes = xres64; 
 	} else if (cap->isSupport(PrinterCap::kResolution)) {
-		fXRes = ((const ResolutionCap *)cap->getDefaultCap(PrinterCap::kResolution))->xres;
+		fXRes = ((const ResolutionCap *)cap->getDefaultCap(
+			PrinterCap::kResolution))->fXResolution;
 	} else {
 		fXRes = 300; 
 	}
@@ -152,7 +153,8 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		msg->FindInt64(kJDYRes, &yres64);
 		fYRes = yres64;
 	} else if (cap->isSupport(PrinterCap::kResolution)) {
-		fYRes = ((const ResolutionCap *)cap->getDefaultCap(PrinterCap::kResolution))->yres;
+		fYRes = ((const ResolutionCap *)cap->getDefaultCap(
+			PrinterCap::kResolution))->fYResolution;
 	} else {
 		fYRes = 300;
 	}
@@ -160,7 +162,8 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	if (msg->HasInt32(kJDOrientation))
 		fOrientation = (Orientation)msg->FindInt32(kJDOrientation);
 	else if (cap->isSupport(PrinterCap::kOrientation))
-		fOrientation = ((const OrientationCap *)cap->getDefaultCap(PrinterCap::kOrientation))->orientation;
+		fOrientation = ((const OrientationCap *)cap->getDefaultCap(
+			PrinterCap::kOrientation))->fOrientation;
 	else
 		fOrientation = kPortrait;
 
@@ -172,7 +175,7 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	if (msg->HasRect(kJDPaperRect)) {
 		fPaperRect = msg->FindRect(kJDPaperRect);
 	} else if (paperCap != NULL) {
-		fPaperRect = paperCap->paper_rect;
+		fPaperRect = paperCap->fPaperRect;
 	}
 
 	if (msg->HasRect(kJDScaledPaperRect)) {
@@ -184,7 +187,7 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	if (msg->HasRect(kJDPrintableRect)) {
 		fPrintableRect = msg->FindRect(kJDPrintableRect);
 	} else if (paperCap != NULL) {
-		fPrintableRect = paperCap->physical_rect;
+		fPrintableRect = paperCap->fPhysicalRect;
 	}
 
 	if (msg->HasRect(kJDScaledPrintableRect)) {
@@ -196,7 +199,7 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	if (msg->HasRect(kJDPhysicalRect)) {
 		fPhysicalRect = msg->FindRect(kJDPhysicalRect);
 	} else if (paperCap != NULL) {
-		fPhysicalRect = paperCap->physical_rect;
+		fPhysicalRect = paperCap->fPhysicalRect;
 	}
 
 	if (msg->HasRect(kJDScaledPhysicalRect)) {
@@ -233,7 +236,8 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	if (msg->HasInt32(kJDPaperSource))
 		fPaperSource = (PaperSource)fMsg->FindInt32(kJDPaperSource);
 	else if (cap->isSupport(PrinterCap::kPaperSource))
-		fPaperSource = ((const PaperSourceCap *)cap->getDefaultCap(PrinterCap::kPaperSource))->paper_source;
+		fPaperSource = ((const PaperSourceCap *)cap->getDefaultCap(
+			PrinterCap::kPaperSource))->fPaperSource;
 	else
 		fPaperSource = kAuto;
 
@@ -255,14 +259,16 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	if (msg->HasInt32(kJDPrintStyle))
 		fPrintStyle = (PrintStyle)msg->FindInt32(kJDPrintStyle);
 	else if (cap->isSupport(PrinterCap::kPrintStyle))
-		fPrintStyle = ((const PrintStyleCap *)cap->getDefaultCap(PrinterCap::kPrintStyle))->print_style;
+		fPrintStyle = ((const PrintStyleCap *)cap->getDefaultCap(
+			PrinterCap::kPrintStyle))->fPrintStyle;
 	else
 		fPrintStyle = kSimplex;
 
 	if (msg->HasInt32(kJDBindingLocation))
 		fBindingLocation = (BindingLocation)msg->FindInt32(kJDBindingLocation);
 	else if (cap->isSupport(PrinterCap::kBindingLocation))
-		fBindingLocation = ((const BindingLocationCap *)cap->getDefaultCap(PrinterCap::kBindingLocation))->binding_location;
+		fBindingLocation = ((const BindingLocationCap *)cap->getDefaultCap(
+			PrinterCap::kBindingLocation))->fBindingLocation;
 	else
 		fBindingLocation = kLongEdgeLeft;
 
@@ -274,7 +280,8 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 	if (msg->HasInt32(kJDColor))
 		fColor = (Color)msg->FindInt32(kJDColor);
 	else if (cap->isSupport(PrinterCap::kColor))
-		fColor = ((const ColorCap *)cap->getDefaultCap(PrinterCap::kColor))->color;
+		fColor = ((const ColorCap *)cap->getDefaultCap(PrinterCap::kColor))
+			->fColor;
 	else
 		fColor = kMonochrome;
 	

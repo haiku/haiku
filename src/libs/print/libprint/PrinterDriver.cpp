@@ -100,7 +100,7 @@ PrinterDriver::AddPrinter(char* printerName)
 			const ProtocolClassCap* pcCap;
 			pcCap = (const ProtocolClassCap*)fPrinterCap->getDefaultCap(PrinterCap::kProtocolClass);
 			if (pcCap != NULL) {
-				fPrinterData->setProtocolClass(pcCap->protocolClass);
+				fPrinterData->setProtocolClass(pcCap->fProtocolClass);
 				fPrinterData->save();
 			}
 		}

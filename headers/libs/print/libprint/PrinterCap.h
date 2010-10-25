@@ -10,74 +10,80 @@
 #include <Rect.h>
 #include "JobData.h"
 
-#if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
-#else 
-#define std
-#endif
 
 enum {
 	kUnknownPrinter = 0
 };
 
 struct BaseCap {
-	string label;
-	bool is_default;
-	BaseCap(const string &n, bool d) : label(n), is_default(d) {}
+							BaseCap(const string &label, bool isDefault);
+
+			string			fLabel;
+			bool			fIsDefault;
 };
 
 struct PaperCap : public BaseCap {
-	JobData::Paper paper;
-	BRect paper_rect;
-	BRect physical_rect;
-	PaperCap(const string &n, bool d, JobData::Paper p, const BRect &r1, const BRect &r2)
-		: BaseCap(n, d), paper(p), paper_rect(r1), physical_rect(r2) {}
+							PaperCap(const string &label, bool isDefault,
+								JobData::Paper paper, const BRect &paperRect,
+								const BRect &physicalRect);
+
+			JobData::Paper	fPaper;
+			BRect			fPaperRect;
+			BRect			fPhysicalRect;
 };
 
 struct PaperSourceCap : public BaseCap {
-	JobData::PaperSource paper_source;
-	PaperSourceCap(const string &n, bool d, JobData::PaperSource f)
-		: BaseCap(n, d), paper_source(f) {}
+							PaperSourceCap(const string &label, bool isDefault,
+								JobData::PaperSource paperSource);
+
+			JobData::PaperSource	fPaperSource;
 };
 
 struct ResolutionCap : public BaseCap {
-	int xres;
-	int yres;
-	ResolutionCap(const string &n, bool d, int x, int y)
-		: BaseCap(n, d), xres(x), yres(y) {}
+							ResolutionCap(const string &label, bool isDefault,
+								int xResolution, int yResolution);
+
+			int				fXResolution;
+			int				fYResolution;
 };
 
 struct OrientationCap : public BaseCap {
-	JobData::Orientation orientation;
-	OrientationCap(const string &n, bool d, JobData::Orientation o)
-		: BaseCap(n, d), orientation(o) {}
+							OrientationCap(const string &label, bool isDefault,
+									JobData::Orientation orientation);
+
+			JobData::Orientation	fOrientation;
 };
 
 struct PrintStyleCap : public BaseCap {
-	JobData::PrintStyle print_style;
-	PrintStyleCap(const string &n, bool d, JobData::PrintStyle x)
-		: BaseCap(n, d), print_style(x) {}
+							PrintStyleCap(const string &label, bool isDefault,
+								JobData::PrintStyle printStyle);
+
+			JobData::PrintStyle		fPrintStyle;
 };
 
 struct BindingLocationCap : public BaseCap {
-	JobData::BindingLocation binding_location;
-	BindingLocationCap(const string &n, bool d, JobData::BindingLocation b)
-		: BaseCap(n, d), binding_location(b) {}
+							BindingLocationCap(const string &label,
+								bool isDefault,
+								JobData::BindingLocation bindingLocation);
+
+			JobData::BindingLocation	fBindingLocation;
 };
 
 struct ColorCap : public BaseCap {
-	JobData::Color color;
-	ColorCap(const string &n, bool d, JobData::Color c)
-		: BaseCap(n, d), color(c) {}
+							ColorCap(const string &label, bool isDefault,
+								JobData::Color color);
+
+			JobData::Color	fColor;
 };
 
 struct ProtocolClassCap : public BaseCap {
-	int protocolClass;
-	string description;
-	ProtocolClassCap(const string &n, bool d, int p, const string &desc)
-		: BaseCap(n, d)
-		, protocolClass(p) 
-		, description(desc) {}
+							ProtocolClassCap(const string &label,
+								bool isDefault, int protocolClass,
+								const string &description);
+
+			int			fProtocolClass;
+			string		fDescription;
 };
 
 
@@ -85,8 +91,8 @@ class PrinterData;
 
 class PrinterCap {
 public:
-	PrinterCap(const PrinterData *printer_data);
-	virtual ~PrinterCap();
+							PrinterCap(const PrinterData *printer_data);
+	virtual					~PrinterCap();
 
 	enum CapID {
 		kPaper,
@@ -102,37 +108,24 @@ public:
 		kCopyCommand,       // supports printer page copy command?
 	};
 
-	virtual int countCap(CapID) const = 0;
-	virtual bool isSupport(CapID) const = 0;
-	virtual const BaseCap **enumCap(CapID) const = 0;
-	const BaseCap *getDefaultCap(CapID) const;
-	int getPrinterId() const;
-	int getProtocolClass() const;
+	virtual	int				countCap(CapID) const = 0;
+	virtual	bool			isSupport(CapID) const = 0;
+	virtual	const BaseCap**	enumCap(CapID) const = 0;
+			const BaseCap*	getDefaultCap(CapID) const;
+			int				getPrinterId() const;
+			int				getProtocolClass() const;
 
 protected:
-	PrinterCap(const PrinterCap &);
-	PrinterCap &operator = (const PrinterCap &);
-	const PrinterData *getPrinterData() const;
-	void setPrinterId(int id);
+							PrinterCap(const PrinterCap &);
+			PrinterCap&		operator=(const PrinterCap &);
+
+			const PrinterData*	getPrinterData() const;
+			void				setPrinterId(int id);
 
 private:
-	const PrinterData *fPrinterData;
-	int fPrinterID;
+			const PrinterData*	fPrinterData;
+			int					fPrinterID;
 };
 
-inline const PrinterData *PrinterCap::getPrinterData() const
-{
-	return fPrinterData;
-}
-
-inline int PrinterCap::getPrinterId() const
-{
-	return fPrinterID;
-}
-
-inline void PrinterCap::setPrinterId(int id)
-{
-	fPrinterID = id;
-}
 
 #endif	/* __PRINTERCAP_H */
