@@ -151,11 +151,7 @@ get_next_virtual_address(size_t size)
 static addr_t
 get_next_virtual_address_alligned (size_t size, uint32 mask)
 {
-	TRACE(("\n NEXT VIRRUADRSSS: %lx\n", sNextVirtualAddress));
-
-	addr_t address = (sNextVirtualAddress) & mask ;
-	TRACE(("ADDR: %lx\n", address));
-
+	addr_t address = (sNextVirtualAddress) & mask;
 	sNextVirtualAddress = address + size;
 
 	return address;
@@ -248,11 +244,13 @@ get_next_page_table(uint32 type)
 			size = 4096;
 		break;
 	}
+
         addr_t address = sNextPageTableAddress;
-        if (address >= kPageTableRegionEnd){
-		TRACE(("outside of pagetableregion!"));
-                return (uint32 *)get_next_physical_address_alligned(size,0xffffffc0);
+        if (address >= kPageTableRegionEnd) {
+		TRACE(("outside of pagetableregion!\n"));
+                return (uint32 *)get_next_physical_address_alligned(size, 0xffffffc0);
 	}
+
         sNextPageTableAddress += size;
         return (uint32 *)address;
 }
@@ -261,6 +259,7 @@ get_next_page_table(uint32 type)
 void
 init_page_directory()
 {
+        TRACE(("init_page_directory\n"));
 	uint32 smalltype;
 
 	// see if subpages disabled
@@ -269,10 +268,7 @@ init_page_directory()
 	else
 		smalltype = MMU_L2_TYPE_SMALLEXT;
 
-        TRACE(("init_page_directory\n"));
-
         gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
-        TRACE(("init_page_directory2\n"));
 
         // clear out the pgdir
         for (uint32 i = 0; i < 4096; i++)
@@ -284,35 +280,24 @@ init_page_directory()
 		pageTable = get_next_page_table(MMU_L1_TYPE_COARSEPAGETABLE);
 		TRACE(("BLOCK: %s START: %lx END %lx\n",LOADER_MEMORYMAP[i].name,LOADER_MEMORYMAP[i].start,LOADER_MEMORYMAP[i].end));
 		addr_t pos = LOADER_MEMORYMAP[i].start;
-		int c=0;
-		while(pos< LOADER_MEMORYMAP[i].end){
-			pageTable[c]=pos |  LOADER_MEMORYMAP[i].flags | smalltype;
-//			TRACE(("PAGE TABLE: %lx = [%lx] \n",c, pageTable[c]));				
+
+		int c = 0;
+		while(pos < LOADER_MEMORYMAP[i].end) {
+			pageTable[c] = pos |  LOADER_MEMORYMAP[i].flags | smalltype;
+
 			c++;
-			if(c>255){ //we filled a pagetable => we need a new one
+			if (c > 255) { //we filled a pagetable => we need a new one
 				//there is 1MB per pagetable so:
-				sPageDirectory[ pos / (1024*1024) ]= (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
-//				TRACE(("DIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIR\n"));
-//				for(uint32 j=0; j<256;j++){
-//					TRACE(("%lx ",pageTable[j]));
-//				}
-//				TRACE(("\nPAGEDIR: [%lx] = %lx \n",pos / (1024*1024), sPageDirectory[ pos / (1024*1024)  ] ));				
-//				TRACE(("DIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIR\n"));
+				sPageDirectory[VADDR_TO_PDENT(pos)] = (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
 				pageTable = get_next_page_table(MMU_L1_TYPE_COARSEPAGETABLE);
 				c=0;
 			}
+
 			pos += B_PAGE_SIZE;
 		}
-		if(c>0){
-			sPageDirectory[ pos / (1024*1024)  ]= (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
-//			TRACE(("DIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIR\n"));
-//				for(uint32 j=0; j<256; j++){
-//					TRACE(("%lx ",pageTable[j]));
-//				}
-//			TRACE(("\nPAGEDIR: %lx = [%lx] \n",pos / (1024*1024), sPageDirectory[ pos / (1024*1024)  ] ));				
-//			TRACE(("DIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIRDIR\n"));
 
-		}
+		if (c > 0)
+			sPageDirectory[VADDR_TO_PDENT(pos)] = (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
 	}
 
 	mmu_flush_TLB();
@@ -349,7 +334,7 @@ add_page_table(addr_t base)
                 pageTable[i] = 0;
 
         // put the new page table into the page directory
-        sPageDirectory[base / (1024 * 1024)]
+        sPageDirectory[VADDR_TO_PDENT(base)]
                 = (uint32)pageTable | MMU_L1_TYPE_COARSEPAGETABLE;
 }
 
@@ -383,20 +368,17 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
 
 	// map the page to the correct page table
-	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
-		/ (1024 * 1024)] & 0xfffffc00);
-	TRACE(("map_page: pageTable 0x%lx\n", (sPageDirectory[virtualAddress
-                / (1024 * 1024)] & 0xfffffc00) ));
-	if(pageTable == NULL){
-//		TRACE(("panic"));
-//		panic("map:page no page_directory entry!!!");
+	uint32 *pageTable = (uint32 *)(sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
+		& ARM_PDE_ADDRESS_MASK);
+	TRACE(("map_page: pageTable 0x%lx\n", (sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
+		& ARM_PDE_ADDRESS_MASK) ));
+	if(pageTable == NULL) {
 		add_page_table(virtualAddress);
-		pageTable = (uint32 *)(sPageDirectory[virtualAddress
-                / (1024 * 1024)] & 0xfffffc00);
+		pageTable = (uint32 *)(sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
+			& ARM_PDE_ADDRESS_MASK);
 	}
 
-	uint32 tableEntry = (virtualAddress % (B_PAGE_SIZE * 256)) / B_PAGE_SIZE;
-
+	uint32 tableEntry = VADDR_TO_PTENT(virtualAddress);
 
 	TRACE(("map_page: inserting pageTable %p, tableEntry %ld, physicalAddress "
 		"%p\n", pageTable, tableEntry, physicalAddress));
@@ -439,12 +421,11 @@ unmap_page(addr_t virtualAddress)
         }
 
         // unmap the page from the correct page table
-        uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
-                / (B_PAGE_SIZE * 1024)] & 0xfffff000);
-        pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
+        uint32 *pageTable = (uint32 *)(sPageDirectory[VADDR_TO_PDENT(virtualAddress)]
+		& ARM_PDE_ADDRESS_MASK);
+        pageTable[VADDR_TO_PTENT(virtualAddress)] = 0;
 
 	mmu_flush_TLB();
-
 }
 
 
@@ -469,7 +450,7 @@ mmu_allocate(void *virtualAddress, size_t size)
 		if (address < KERNEL_BASE
 			|| address + size >= KERNEL_BASE + kMaxKernelSize){
 			TRACE(("mmu_allocate in illegal range\n address: %lx"
-				"  KERNELBASE: %lx KERNEL_BASE + kMaxKernelSize: %lx  address + size : %lx \n ",
+				"  KERNELBASE: %lx KERNEL_BASE + kMaxKernelSize: %lx  address + size : %lx \n",
 				(uint32)address , KERNEL_BASE,  KERNEL_BASE + kMaxKernelSize,(uint32)(address + size)));
 			return NULL;
 		}
@@ -578,7 +559,7 @@ mmu_init(void)
 	uint32 highestRAMAddress = SDRAM_BASE;
 
 	//calculate lowest RAM adress from MEMORYMAP
-	for(int i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
+	for(uint32 i = 0; i < ARRAY_SIZE(LOADER_MEMORYMAP); i++) {
 		if (strcmp("RAM_free", LOADER_MEMORYMAP[i].name) == 0)
 			sNextPhysicalAddress = LOADER_MEMORYMAP[i].start;
 
