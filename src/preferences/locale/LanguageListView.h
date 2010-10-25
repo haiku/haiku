@@ -31,6 +31,8 @@ public:
 	virtual	void			DrawItem(BView* owner, BRect frame,
 								bool complete = false);
 
+	virtual void			Update(BView* owner, const BFont* font);
+
 private:
 			BString			fID;
 			BString			fCode;

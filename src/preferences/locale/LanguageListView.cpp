@@ -30,6 +30,8 @@
 #define B_TRANSLATE_CONTEXT "LanguageListView"
 
 
+static const float kFlagWidth = 17.0;
+
 LanguageListItem::LanguageListItem(const char* text, const char* id,
 	const char* code, const char* countryCode)
 	:
@@ -104,10 +106,10 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->DrawString(text.String());
 
 	// Draw the icon
-	frame.left = frame.right - 17;
+	frame.left = frame.right - kFlagWidth;
 	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top + 1, iconFrame.left + 15,
-		iconFrame.top + 16);
+	iconFrame.Set(iconFrame.left, iconFrame.top + 1, iconFrame.left + kFlagWidth - 2,
+		iconFrame.top + kFlagWidth - 1);
 
 	if (fIcon != NULL && fIcon->IsValid()) {
 		owner->SetDrawingMode(B_OP_OVER);
@@ -115,6 +117,14 @@ LanguageListItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->SetDrawingMode(B_OP_COPY);
 	}
 
+}
+
+
+void
+LanguageListItem::Update(BView* owner, const BFont* font)
+{
+	BStringItem::Update(owner, font);
+	SetWidth(Width() + kFlagWidth);
 }
 
 
