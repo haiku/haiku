@@ -7,6 +7,7 @@
 
 
 #include <Locker.h>
+#include <NetworkNotifications.h>
 
 
 class BMessenger;
