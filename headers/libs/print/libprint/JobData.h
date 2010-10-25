@@ -226,6 +226,7 @@ public:
 private:
 	bool        fShowPreview;
 	Paper       fPaper;
+	int32       fResolutionID;
 	int32       fXRes;
 	int32       fYRes;
 	Orientation fOrientation;
@@ -270,6 +271,9 @@ public:
 
 	Paper getPaper() const { return fPaper; }
 	void  setPaper(Paper paper) { fPaper = paper; }
+
+	int32 getResolutionID() const { return fResolutionID; }
+	void setResolutionID(int32 resolution) { fResolutionID = resolution; }
 
 	int32 getXres() const { return fXRes; } 
 	void  setXres(int32 xres) { fXRes = xres; }

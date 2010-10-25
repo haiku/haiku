@@ -14,6 +14,7 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <Debug.h>
 #include <Font.h>
 #include <GridView.h>
 #include <GroupLayout.h>
@@ -266,18 +267,14 @@ PageSetupView::UpdateJobData()
 	BRect physical_rect = paperCap->fPhysicalRect;
 	fJobData->setPaper(paperCap->fPaper);
 
-	int count;
-
-	count = fPrinterCap->countCap(PrinterCap::kResolution);
-	ResolutionCap **resolution_cap = (ResolutionCap **)fPrinterCap->enumCap(PrinterCap::kResolution);
-	const char *resolution_label = fResolution->FindMarked()->Label();
-	while (count--) {
-		if (!strcmp((*resolution_cap)->fLabel.c_str(), resolution_label)) {
-			fJobData->setXres((*resolution_cap)->fXResolution);
-			fJobData->setYres((*resolution_cap)->fYResolution);
-			break;
-		}
-		resolution_cap++;
+	const char *resolutionLabel = fResolution->FindMarked()->Label();
+	const ResolutionCap* resolution = static_cast<const ResolutionCap*>(
+		fPrinterCap->findCap(PrinterCap::kResolution, resolutionLabel));
+	ASSERT(resolution != NULL);
+	if (resolution != NULL) {
+		fJobData->setXres(resolution->fXResolution);
+		fJobData->setYres(resolution->fYResolution);
+		fJobData->setResolutionID(resolution->ID());
 	}
 
 	// rotate paper and physical rectangle if landscape orientation

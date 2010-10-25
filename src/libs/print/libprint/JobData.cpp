@@ -38,6 +38,7 @@ static const char* kJDPageSelection         = "JJJJ_page_selection";
 static const char* kJDMarginUnit            = "JJJJ_margin_unit";
 static const char* kJDPhysicalRect          = "JJJJ_physical_rect";
 static const char* kJDScaledPhysicalRect    = "JJJJ_scaled_physical_rect";
+static const char* kJDResolution            = "JJJJ_resolution";
 
 JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
@@ -52,6 +53,7 @@ JobData::JobData(const JobData &job_data)
 {
 	fShowPreview           = job_data.fShowPreview;
 	fPaper                 = job_data.fPaper;
+	fResolutionID          = job_data.fResolutionID;
 	fXRes                  = job_data.fXRes;
 	fYRes                  = job_data.fYRes;
 	fOrientation           = job_data.fOrientation;
@@ -86,6 +88,7 @@ JobData &JobData::operator = (const JobData &job_data)
 {
 	fShowPreview           = job_data.fShowPreview;
 	fPaper                 = job_data.fPaper;
+	fResolutionID          = job_data.fResolutionID;
 	fXRes                  = job_data.fXRes;
 	fYRes                  = job_data.fYRes;
 	fOrientation           = job_data.fOrientation;
@@ -136,6 +139,17 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fPaper = paperCap->fPaper;
 	} else
 		fPaper = kA4;
+
+	if (msg->HasInt32(kJDResolution)) {
+		int32 resolution;
+		msg->FindInt32(kJDResolution, &resolution);
+		fResolutionID = resolution;
+	} else if (cap->isSupport(PrinterCap::kResolution)) {
+		fResolutionID = cap->getDefaultCap(PrinterCap::kResolution)->ID();
+	} else {
+		// should not reach here!
+		fResolutionID = 0;
+	}
 
 	if (msg->HasInt64(kJDXRes)) {
 		int64 xres64; 
@@ -310,6 +324,9 @@ void JobData::save(BMessage *msg)
 	// page settings
 	msg->RemoveName(kJDPaper);
 	msg->AddInt32(kJDPaper, fPaper);
+
+	msg->RemoveName(kJDResolution);
+	msg->AddInt32(kJDResolution, fResolutionID);
 
 	msg->RemoveName(kJDXRes);
 	msg->AddInt64(kJDXRes, fXRes);
