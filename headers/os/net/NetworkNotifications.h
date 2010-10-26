@@ -9,10 +9,7 @@
 #include <SupportDefs.h>
 
 
-class BHandler;
-class BLooper;
-class BMessenger;
-
+// Flags for the start_watching_network() calls.
 
 #define B_NETWORK_INTERFACE_ADDED				0x0001
 #define B_NETWORK_INTERFACE_REMOVED				0x0002
@@ -34,17 +31,24 @@ enum {
 #define B_NETWORK_MONITOR				'_NTN'
 
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(_KERNEL_MODE)
 
-status_t	start_watching_network(uint32 flags, const BMessenger& target);
-status_t	start_watching_network(uint32 flags, const BHandler* handler,
+// these are only needed for the function exports
+#include <Messenger.h>
+
+class BHandler;
+class BLooper;
+
+
+extern status_t	start_watching_network(uint32 flags, const BMessenger& target);
+extern status_t	start_watching_network(uint32 flags, const BHandler* handler,
 				const BLooper* looper = NULL);
 
-status_t	stop_watching_network(const BMessenger& target);
-status_t	stop_watching_network(const BHandler* handler,
+extern status_t	stop_watching_network(const BMessenger& target);
+extern status_t	stop_watching_network(const BHandler* handler,
 				const BLooper* looper = NULL);
 
-#endif	// __cplusplus
+#endif	// __cplusplus && !_KERNEL_MODE
 
 
 #endif	// _NETWORK_NOTIFICATIONS_H
