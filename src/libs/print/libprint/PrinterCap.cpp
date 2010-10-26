@@ -37,7 +37,7 @@ PaperCap::PaperCap(const string &label, bool isDefault, JobData::Paper paper,
 }
 
 
-int
+int32
 PaperCap::ID() const
 {
 	return fPaper;
@@ -53,7 +53,7 @@ PaperSourceCap::PaperSourceCap(const string &label, bool isDefault,
 }
 
 
-int
+int32
 PaperSourceCap::ID() const
 {
 	return fPaperSource;
@@ -61,7 +61,7 @@ PaperSourceCap::ID() const
 
 
 ResolutionCap::ResolutionCap(const string &label, bool isDefault,
-	int id, int xResolution, int yResolution)
+	int32 id, int xResolution, int yResolution)
 	:
 	BaseCap(label, isDefault),
 	fID(id),
@@ -71,7 +71,7 @@ ResolutionCap::ResolutionCap(const string &label, bool isDefault,
 }
 
 
-int
+int32
 ResolutionCap::ID() const
 {
 	return fID;
@@ -87,7 +87,7 @@ OrientationCap::OrientationCap(const string &label, bool isDefault,
 }
 
 
-int
+int32
 OrientationCap::ID() const
 {
 	return fOrientation;
@@ -103,7 +103,7 @@ PrintStyleCap::PrintStyleCap(const string &label, bool isDefault,
 }
 
 
-int
+int32
 PrintStyleCap::ID() const
 {
 	return fPrintStyle;
@@ -119,7 +119,7 @@ BindingLocationCap::BindingLocationCap(const string &label, bool isDefault,
 }
 
 
-int
+int32
 BindingLocationCap::ID() const
 {
 	return fBindingLocation;
@@ -134,7 +134,7 @@ ColorCap::ColorCap(const string &label, bool isDefault, JobData::Color color)
 }
 
 
-int
+int32
 ColorCap::ID() const
 {
 	return fColor;
@@ -142,7 +142,7 @@ ColorCap::ID() const
 
 
 ProtocolClassCap::ProtocolClassCap(const string &label, bool isDefault,
-	int protocolClass, const string &description)
+	int32 protocolClass, const string &description)
 	:
 	BaseCap(label, isDefault),
 	fProtocolClass(protocolClass),
@@ -151,7 +151,7 @@ ProtocolClassCap::ProtocolClassCap(const string &label, bool isDefault,
 }
 
 
-int
+int32
 ProtocolClassCap::ID() const
 {
 	return fProtocolClass;
@@ -159,7 +159,7 @@ ProtocolClassCap::ID() const
 
 
 DriverSpecificCap::DriverSpecificCap(const string& label, bool isDefault,
-	int category, Type type)
+	int32 category, Type type)
 	:
 	BaseCap(label, isDefault),
 	fCategory(category),
@@ -168,7 +168,7 @@ DriverSpecificCap::DriverSpecificCap(const string& label, bool isDefault,
 }
 
 
-int
+int32
 DriverSpecificCap::ID() const
 {
 	return fCategory;
@@ -176,8 +176,8 @@ DriverSpecificCap::ID() const
 
 
 PrinterCap::PrinterCap(const PrinterData *printer_data)
-	: fPrinterData(printer_data), 
-	fPrinterID(kUnknownPrinter)
+	:
+	fPrinterData(printer_data)
 {
 }
 
@@ -253,18 +253,3 @@ PrinterData *PrinterCap::getPrinterData() const
 {
 	return fPrinterData;
 }
-
-
-int
-PrinterCap::getPrinterId() const
-{
-	return fPrinterID;
-}
-
-
-void
-PrinterCap::setPrinterId(int id)
-{
-	fPrinterID = id;
-}
-

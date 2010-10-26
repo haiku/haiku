@@ -56,7 +56,7 @@ struct NupCap : public BaseCap {
 		fNup(nup)
 	{}
 
-	int	ID() const { return fNup; }
+	int32	ID() const { return fNup; }
 
 	int	fNup;
 };
@@ -70,7 +70,7 @@ struct DitherCap : public BaseCap {
 		fDitherType(ditherType)
 	{}
 
-	int	ID() const { return fDitherType; }
+	int32	ID() const { return fDitherType; }
 
 	Halftone::DitherType fDitherType;
 };

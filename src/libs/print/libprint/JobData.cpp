@@ -118,9 +118,7 @@ JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fPaper = kA4;
 
 	if (msg->HasInt32(kJDResolution)) {
-		int32 resolution;
-		msg->FindInt32(kJDResolution, &resolution);
-		fResolutionID = resolution;
+		msg->FindInt32(kJDResolution, &fResolutionID);
 	} else if (cap->isSupport(PrinterCap::kResolution)) {
 		fResolutionID = cap->getDefaultCap(PrinterCap::kResolution)->ID();
 	} else {
