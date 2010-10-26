@@ -624,21 +624,30 @@ MediaWindow::MessageReceived(BMessage* message)
 					if (roster->GetParameterWebFor(*fCurrentNode, &fParamWeb)==B_OK
 						&& (paramView = BMediaTheme::PreferredTheme()->ViewFor(fParamWeb)) != NULL) {
 						fContentView->AddChild(paramView);
-						paramView->ResizeTo(fContentView->Bounds().Width(), fContentView->Bounds().Height() - 10);
-
+						paramView->ResizeTo(1, 1);
+							// make sure we don't get stuck with a very large
+							// paramView
 						roster->StartWatching(this, *fCurrentNode, B_MEDIA_WILDCARD);
 					} else {
 						delete fParamWeb;
 						fParamWeb = NULL;
 
-						BRect bounds = fContentView->Bounds();
-						BStringView* stringView = new BStringView(bounds,
-							"noControls", B_TRANSLATE("This hardware has no controls."),
-							B_FOLLOW_V_CENTER | B_FOLLOW_H_CENTER);
-						stringView->ResizeToPreferred();
+						BStringView* stringView = new BStringView("noControls",
+							B_TRANSLATE("This hardware has no controls."));
+
+						BSize unlimited(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
+						stringView->SetExplicitMaxSize(unlimited);
+
+						BAlignment centered(B_ALIGN_HORIZONTAL_CENTER,
+							B_ALIGN_VERTICAL_CENTER);
+						stringView->SetExplicitAlignment(centered);
+						stringView->SetAlignment(B_ALIGN_CENTER);
+						
 						fContentView->AddChild(stringView);
-						stringView->MoveBy((bounds.Width()-stringView->Bounds().Width())/2,
-							(bounds.Height()-stringView->Bounds().Height())/2);
+
+						rgb_color panel = stringView->LowColor();
+						stringView->SetHighColor(tint_color(panel,
+							B_DISABLED_LABEL_TINT));
 					}
 				}
 			}
