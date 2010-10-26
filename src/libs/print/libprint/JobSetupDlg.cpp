@@ -129,16 +129,16 @@ enum {
 };
 
 
-JobSetupView::JobSetupView(JobData *job_data, PrinterData *printer_data,
-	const PrinterCap *printer_cap)
+JobSetupView::JobSetupView(JobData* jobData, PrinterData* printerData,
+	const PrinterCap *printerCap)
 	:
 	BView("jobSetup", B_WILL_DRAW),
 	fCopies(NULL),
 	fFromPage(NULL),
 	fToPage(NULL),
-	fJobData(job_data),
-	fPrinterData(printer_data),
-	fPrinterCap(printer_cap),
+	fJobData(jobData),
+	fPrinterData(printerData),
+	fPrinterCap(printerCap),
 	fColorType(NULL),
 	fDitherType(NULL),
 	fGamma(NULL),
@@ -426,13 +426,6 @@ JobSetupView::AttachedToWindow()
 		.SetInsets(0, 0, 0, 0)
 	);
 
-	/* TODO remove
-	if (IsHalftoneConfigurationNeeded())
-
-		fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(),
-			fJobData->getDitherType(),
-			fJobData->getColor() != JobData::kMonochrome);
-	*/
 	UpdateHalftonePreview();
 
 	UpdateButtonEnabledState();
@@ -577,9 +570,9 @@ JobSetupView::UpdateButtonEnabledState()
 
 
 void 
-JobSetupView::MessageReceived(BMessage *msg)
+JobSetupView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 	case kMsgRangeAll:
 	case kMsgRangeSelection:
 	case kMsgDuplexChanged:
@@ -700,8 +693,8 @@ JobSetupView::UpdateJobData(bool showPreview)
 
 	fJobData->setCopies(atoi(fCopies->Text()));
 
-	fJobData->setCollate((B_CONTROL_ON == fCollate->Value()) ? true : false);
-	fJobData->setReverse((B_CONTROL_ON == fReverse->Value()) ? true : false);
+	fJobData->setCollate(B_CONTROL_ON == fCollate->Value());
+	fJobData->setReverse(B_CONTROL_ON == fReverse->Value());
 
 	JobData::PageSelection pageSelection = JobData::kAllPages;
 	if (fOddNumberedPages->Value() == B_CONTROL_ON)
@@ -715,8 +708,8 @@ JobSetupView::UpdateJobData(bool showPreview)
 }
 
 
-JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data,
-	const PrinterCap *printer_cap)
+JobSetupDlg::JobSetupDlg(JobData* jobData, PrinterData* printerData,
+	const PrinterCap* printerCap)
 	:
 	DialogWindow(BRect(100, 100, 200, 200), "PrintJob Setup",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
@@ -726,7 +719,7 @@ JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data,
 	SetResult(B_ERROR);
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 	
-	fJobSetup = new JobSetupView(job_data, printer_data, printer_cap);
+	fJobSetup = new JobSetupView(jobData, printerData, printerCap);
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(fJobSetup)
@@ -736,12 +729,12 @@ JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data,
 
 
 void 
-JobSetupDlg::MessageReceived(BMessage *msg)
+JobSetupDlg::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 	case kMsgOK:
 	case kMsgPreview:
-		fJobSetup->UpdateJobData(msg->what == kMsgPreview);
+		fJobSetup->UpdateJobData(message->what == kMsgPreview);
 		SetResult(B_NO_ERROR);
 		PostMessage(B_QUIT_REQUESTED);
 		break;
@@ -751,7 +744,7 @@ JobSetupDlg::MessageReceived(BMessage *msg)
 		break;
 		
 	default:
-		DialogWindow::MessageReceived(msg);
+		DialogWindow::MessageReceived(message);
 		break;
 	}
 }

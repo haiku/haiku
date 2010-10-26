@@ -27,64 +27,67 @@ class PagesView;
 
 class JobSetupView : public BView {
 public:
-	JobSetupView(JobData* job_data, PrinterData* printer_data,
-		const PrinterCap* printer_cap);
-	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage* msg);
-	bool UpdateJobData(bool showPreview);
+					JobSetupView(JobData* jobData, PrinterData* printerData,
+						const PrinterCap* printerCap);
+	virtual	void	AttachedToWindow();
+	virtual void	MessageReceived(BMessage* message);
+			bool	UpdateJobData(bool showPreview);
 
 private:
-	void UpdateButtonEnabledState();
-	bool IsHalftoneConfigurationNeeded();
-	void CreateHalftoneConfigurationUI();
-	void FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
-		PrinterCap::CapID category, int id);
-	void FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
-		const BaseCap** capabilities, int count, int id);
-	int	GetID(const BaseCap** capabilities, int count, const char* label,
-		int defaultValue);
-	BRadioButton* CreatePageSelectionItem(const char* name, const char* label,
-		JobData::PageSelection pageSelection);
-	void AllowOnlyDigits(BTextView* textView, int maxDigits);
-	void UpdateHalftonePreview();
-	JobData::Color Color();
-	Halftone::DitherType DitherType();
-	float Gamma();
-	float InkDensity();
-	JobData::PaperSource PaperSource();
+			void	UpdateButtonEnabledState();
+			bool	IsHalftoneConfigurationNeeded();
+			void	CreateHalftoneConfigurationUI();
+			void	FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+						PrinterCap::CapID category, int id);
+			void	FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+						const BaseCap** capabilities, int count, int id);
+			int		GetID(const BaseCap** capabilities, int count,
+						const char* label, int defaultValue);
+			BRadioButton* CreatePageSelectionItem(const char* name,
+						const char* label,
+						JobData::PageSelection pageSelection);
+			void	AllowOnlyDigits(BTextView* textView, int maxDigits);
+			void	UpdateHalftonePreview();
 
-	BTextControl     *fCopies;
-	BTextControl     *fFromPage;
-	BTextControl     *fToPage;
-	JobData          *fJobData;
-	PrinterData      *fPrinterData;
-	const PrinterCap *fPrinterCap;
-	BPopUpMenu       *fColorType;
-	BPopUpMenu       *fDitherType;
-	BMenuField       *fDitherMenuField;
-	JSDSlider        *fGamma;
-	JSDSlider        *fInkDensity;
-	HalftoneView     *fHalftone;
-	BBox             *fHalftoneBox;
-	BRadioButton     *fAll;
-	BCheckBox        *fCollate;
-	BCheckBox        *fReverse;
-	PagesView        *fPages;
-	BPopUpMenu       *fPaperFeed;
-	BCheckBox        *fDuplex;
-	BPopUpMenu       *fNup;
-	BRadioButton     *fAllPages;
-	BRadioButton     *fOddNumberedPages;
-	BRadioButton     *fEvenNumberedPages;	
+			JobData::Color			Color();
+			Halftone::DitherType	DitherType();
+			float					Gamma();
+			float					InkDensity();
+			JobData::PaperSource	PaperSource();
+
+	BTextControl*		fCopies;
+	BTextControl*		fFromPage;
+	BTextControl*		fToPage;
+	JobData*			fJobData;
+	PrinterData*		fPrinterData;
+	const PrinterCap*	fPrinterCap;
+	BPopUpMenu*			fColorType;
+	BPopUpMenu*			fDitherType;
+	BMenuField*			fDitherMenuField;
+	JSDSlider*			fGamma;
+	JSDSlider*			fInkDensity;
+	HalftoneView*		fHalftone;
+	BBox*				fHalftoneBox;
+	BRadioButton*		fAll;
+	BCheckBox*			fCollate;
+	BCheckBox*			fReverse;
+	PagesView*			fPages;
+	BPopUpMenu*			fPaperFeed;
+	BCheckBox*			fDuplex;
+	BPopUpMenu*			fNup;
+	BRadioButton*		fAllPages;
+	BRadioButton*		fOddNumberedPages;
+	BRadioButton*		fEvenNumberedPages;
 };
 
 class JobSetupDlg : public DialogWindow {
 public:
-	JobSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
-	virtual	void MessageReceived(BMessage *message);
+					JobSetupDlg(JobData* jobData, PrinterData* printerData,
+						const PrinterCap* printerCap);
+	virtual	void	MessageReceived(BMessage* message);
 
 private:
-	JobSetupView *fJobSetup;
+	JobSetupView*	fJobSetup;
 };
 
 #endif	/* __JOBSETUPDLG_H */
