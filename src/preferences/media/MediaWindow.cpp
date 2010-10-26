@@ -306,6 +306,8 @@ MediaWindow::InitMedia(bool first)
 				B_TRANSLATE("Ready for use" B_UTF8_ELLIPSIS));
 	}
 
+	while (fListView->CountItems() > 0)
+		delete static_cast<MediaListItem*>(fListView->RemoveItem((int32)0));
 	_EmptyNodeLists();
 
 	// Grab Media Info
