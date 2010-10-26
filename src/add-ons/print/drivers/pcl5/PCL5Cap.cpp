@@ -152,6 +152,7 @@ PCL5Cap::isSupport(CapID capid) const
 		case kPaperSource:
 		case kResolution:
 		case kColor:
+		case kHalftone:
 			return true;
 		default:
 			return false;

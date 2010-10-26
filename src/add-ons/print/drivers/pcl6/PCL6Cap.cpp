@@ -335,6 +335,7 @@ PCL6Cap::isSupport(CapID capid) const
 		case kCopyCommand:
 		case kPrintStyle:
 		case kProtocolClass:
+		case kHalftone:
 			return true;
 		default:
 			return false;

@@ -19,6 +19,13 @@ BaseCap::~BaseCap()
 }
 
 
+const char*
+BaseCap::Key() const
+{
+	return fKey.c_str();
+}
+
+
 PaperCap::PaperCap(const string &label, bool isDefault, JobData::Paper paper,
 	const BRect &paperRect, const BRect &physicalRect)
 	:
@@ -151,6 +158,23 @@ ProtocolClassCap::ID() const
 }
 
 
+DriverSpecificCap::DriverSpecificCap(const string& label, bool isDefault,
+	int category, Type type)
+	:
+	BaseCap(label, isDefault),
+	fCategory(category),
+	fType(type)
+{
+}
+
+
+int
+DriverSpecificCap::ID() const
+{
+	return fCategory;
+}
+
+
 PrinterCap::PrinterCap(const PrinterData *printer_data)
 	: fPrinterData(printer_data), 
 	fPrinterID(kUnknownPrinter)
@@ -163,7 +187,7 @@ PrinterCap::~PrinterCap()
 }
 
 
-const BaseCap *
+const BaseCap*
 PrinterCap::getDefaultCap(CapID category) const
 {
 	int count = countCap(category);

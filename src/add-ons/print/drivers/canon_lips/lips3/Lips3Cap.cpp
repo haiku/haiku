@@ -155,6 +155,7 @@ Lips3Cap::isSupport(CapID capid) const
 		case kResolution:
 		case kColor:
 		case kCopyCommand:
+		case kHalftone:
 			return true;
 		default:
 			return false;

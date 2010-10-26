@@ -21,6 +21,7 @@ struct BaseCap {
 	virtual					~BaseCap();
 
 	virtual	int				ID() const = 0;
+			const char*		Key() const;
 
 			string			fLabel;
 			bool			fIsDefault;
@@ -108,6 +109,23 @@ struct ProtocolClassCap : public BaseCap {
 };
 
 
+struct DriverSpecificCap : public BaseCap {
+		enum Type {
+			kList,
+			kCheckBox,
+			kRange
+		};
+
+							DriverSpecificCap(const string& label,
+								bool isDefault, int category, Type type);
+
+			int				ID() const;
+
+			int				fCategory;
+			Type			fType;
+};
+
+
 class PrinterData;
 
 class PrinterCap {
@@ -124,9 +142,16 @@ public:
 		kBindingLocation,
 		kColor,
 		kProtocolClass,
+		kDriverSpecifcCapababilities,
+
 		// Static boolean settings follow.
 		// For them isSupport() has to be implemented only.
-		kCopyCommand,       // supports printer page copy command?
+		kCopyCommand,	// supports printer page copy command?
+		kHalftone,		// needs the printer driver the configuration
+						// for class Halftone?
+
+		// The driver specific generic capabilities start here
+		kDriverSpecificCapabablitiesBegin = 100
 	};
 
 	virtual	int				countCap(CapID category) const = 0;

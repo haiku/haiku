@@ -133,9 +133,27 @@ JobSetupView::JobSetupView(JobData *job_data, PrinterData *printer_data,
 	const PrinterCap *printer_cap)
 	:
 	BView("jobSetup", B_WILL_DRAW),
+	fCopies(NULL),
+	fFromPage(NULL),
+	fToPage(NULL),
 	fJobData(job_data),
 	fPrinterData(printer_data),
-	fPrinterCap(printer_cap)
+	fPrinterCap(printer_cap),
+	fColorType(NULL),
+	fDitherType(NULL),
+	fGamma(NULL),
+	fInkDensity(NULL),
+	fHalftone(NULL),
+	fAll(NULL),
+	fCollate(NULL),
+	fReverse(NULL),
+	fPages(NULL),
+	fPaperFeed(NULL),
+	fDuplex(NULL),
+	fNup(NULL),
+	fAllPages(NULL),
+	fOddNumberedPages(NULL),
+	fEvenNumberedPages(NULL)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -182,48 +200,8 @@ JobSetupView::AttachedToWindow()
 	BMenuField* colorMenuField = new BMenuField("color", "Color:", fColorType);
 	fColorType->SetTargetForItems(this);
 	
-	// dither type
-	fDitherType = new BPopUpMenu("");
-	fDitherType->SetRadioMode(true);
-	FillCapabilityMenu(fDitherType, kMsgQuality, gDitherTypes, sizeof(gDitherTypes) /
-		sizeof(gDitherTypes[0]), fJobData->getDitherType());
-	BMenuField* ditherMenuField = new BMenuField("dithering", "Dot Pattern:",
-		fDitherType);
-	fDitherType->SetTargetForItems(this);
-	
-	// halftone preview view
-	BBox* halftoneBox = new BBox("halftoneBox");
-	halftoneBox->SetBorder(B_PLAIN_BORDER);
-
-	// TODO make layout compatible
-	BSize size(240, 14 * 4);
-	BRect rect(0, 0, size.width, size.height);
-	fHalftone = new HalftoneView(rect, "halftone",
-		B_FOLLOW_ALL, B_WILL_DRAW);
-	fHalftone->SetExplicitMinSize(size);
-	fHalftone->SetExplicitMaxSize(size);
-	
-	// gamma
-	fGamma = new JSDSlider("gamma", "Gamma", new BMessage(kMsgQuality),
-		-300, 300);
-	
-	fGamma->SetLimitLabels("Lighter", "Darker");
-	fGamma->SetValue((int32)(100 * log(fJobData->getGamma()) / log(2.0)));
-	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
-	fGamma->SetHashMarkCount(7);
-	fGamma->SetModificationMessage(new BMessage(kMsgQuality));
-	fGamma->SetTarget(this);
-
-	// ink density
-	fInkDensity = new JSDSlider("inkDensity", "Ink Usage",
-		new BMessage(kMsgQuality), 0, 127);
-	
-	fInkDensity->SetLimitLabels("Min", "Max");
-	fInkDensity->SetValue((int32)fJobData->getInkDensity());
-	fInkDensity->SetHashMarks(B_HASH_MARKS_BOTH);
-	fInkDensity->SetHashMarkCount(10);
-	fInkDensity->SetModificationMessage(new BMessage(kMsgQuality));
-	fInkDensity->SetTarget(this);
+	if (IsHalftoneConfigurationNeeded())
+		CreateHalftoneConfigurationUI();
 
 	// page range
 
@@ -351,21 +329,26 @@ JobSetupView::AttachedToWindow()
 	BButton* ok = new BButton("ok", "OK", new BMessage(kMsgOK));
 	ok->MakeDefault(true);
 	
-	BGroupView* halftoneGroup = new BGroupView(B_VERTICAL, 0);
-	BGroupLayout* halftoneLayout = halftoneGroup->GroupLayout();
-	halftoneLayout->AddView(fHalftone);
-	halftoneBox->AddChild(halftoneGroup);
+	if (IsHalftoneConfigurationNeeded()) {
+		BGroupView* halftoneGroup = new BGroupView(B_VERTICAL, 0);
+		BGroupLayout* halftoneLayout = halftoneGroup->GroupLayout();
+		halftoneLayout->AddView(fHalftone);
+		fHalftoneBox->AddChild(halftoneGroup);
+	}
 
 	BGridView* qualityGrid = new BGridView();
 	BGridLayout* qualityGridLayout = qualityGrid->GridLayout();
 	qualityGridLayout->AddItem(colorMenuField->CreateLabelLayoutItem(), 0, 0);
 	qualityGridLayout->AddItem(colorMenuField->CreateMenuBarLayoutItem(), 1, 0);
-	qualityGridLayout->AddItem(ditherMenuField->CreateLabelLayoutItem(), 0, 1);
-	qualityGridLayout->AddItem(ditherMenuField->CreateMenuBarLayoutItem(), 1,
-		1);
-	qualityGridLayout->AddView(fGamma, 0, 2, 2);
-	qualityGridLayout->AddView(fInkDensity, 0, 3, 2);
-	qualityGridLayout->AddView(halftoneBox, 0, 4, 2);
+	if (IsHalftoneConfigurationNeeded()) {
+		qualityGridLayout->AddItem(fDitherMenuField->CreateLabelLayoutItem(),
+			0, 1);
+		qualityGridLayout->AddItem(fDitherMenuField->CreateMenuBarLayoutItem(),
+			1, 1);
+		qualityGridLayout->AddView(fGamma, 0, 2, 2);
+		qualityGridLayout->AddView(fInkDensity, 0, 3, 2);
+		qualityGridLayout->AddView(fHalftoneBox, 0, 4, 2);
+	}
 	qualityGridLayout->SetSpacing(0, 0);
 	qualityGridLayout->SetInsets(5, 5, 5, 5);
 	qualityBox->AddChild(qualityGrid);
@@ -443,10 +426,72 @@ JobSetupView::AttachedToWindow()
 		.SetInsets(0, 0, 0, 0)
 	);
 
-	fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(),
-		fJobData->getDitherType(), fJobData->getColor() != JobData::kMonochrome);
+	/* TODO remove
+	if (IsHalftoneConfigurationNeeded())
+
+		fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(),
+			fJobData->getDitherType(),
+			fJobData->getColor() != JobData::kMonochrome);
+	*/
+	UpdateHalftonePreview();
 
 	UpdateButtonEnabledState();
+}
+
+
+bool
+JobSetupView::IsHalftoneConfigurationNeeded()
+{
+	return fPrinterCap->isSupport(PrinterCap::kHalftone);
+}
+
+
+void
+JobSetupView::CreateHalftoneConfigurationUI()
+{
+	// dither type
+	fDitherType = new BPopUpMenu("");
+	fDitherType->SetRadioMode(true);
+	FillCapabilityMenu(fDitherType, kMsgQuality, gDitherTypes,
+		sizeof(gDitherTypes) / sizeof(gDitherTypes[0]),
+		fJobData->getDitherType());
+	fDitherMenuField = new BMenuField("dithering", "Dot Pattern:",
+		fDitherType);
+	fDitherType->SetTargetForItems(this);
+
+	// halftone preview view
+	fHalftoneBox = new BBox("halftoneBox");
+	fHalftoneBox->SetBorder(B_PLAIN_BORDER);
+
+	// TODO make layout compatible
+	BSize size(240, 14 * 4);
+	BRect rect(0, 0, size.width, size.height);
+	fHalftone = new HalftoneView(rect, "halftone",
+		B_FOLLOW_ALL, B_WILL_DRAW);
+	fHalftone->SetExplicitMinSize(size);
+	fHalftone->SetExplicitMaxSize(size);
+
+	// gamma
+	fGamma = new JSDSlider("gamma", "Gamma", new BMessage(kMsgQuality),
+		-300, 300);
+
+	fGamma->SetLimitLabels("Lighter", "Darker");
+	fGamma->SetValue((int32)(100 * log(fJobData->getGamma()) / log(2.0)));
+	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
+	fGamma->SetHashMarkCount(7);
+	fGamma->SetModificationMessage(new BMessage(kMsgQuality));
+	fGamma->SetTarget(this);
+
+	// ink density
+	fInkDensity = new JSDSlider("inkDensity", "Ink Usage",
+		new BMessage(kMsgQuality), 0, 127);
+
+	fInkDensity->SetLimitLabels("Min", "Max");
+	fInkDensity->SetValue((int32)fJobData->getInkDensity());
+	fInkDensity->SetHashMarks(B_HASH_MARKS_BOTH);
+	fInkDensity->SetHashMarkCount(10);
+	fInkDensity->SetModificationMessage(new BMessage(kMsgQuality));
+	fInkDensity->SetTarget(this);
 }
 
 
@@ -472,7 +517,7 @@ JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
 		const BaseCap* capability = *capabilities;
 		if (message != kMsgNone)
 			item = new BMenuItem(capability->fLabel.c_str(),
-				new BMessage(kMsgQuality));
+				new BMessage(message));
 		else
 			item = new BMenuItem(capability->fLabel.c_str(), NULL);
 
@@ -542,8 +587,7 @@ JobSetupView::MessageReceived(BMessage *msg)
 		break;
 
 	case kMsgQuality:
-		fHalftone->preview(Gamma(), InkDensity(), DitherType(),
-			Color() != JobData::kMonochrome);
+		UpdateHalftonePreview();
 		break;
 
 	case kMsgCollateChanged:
@@ -554,6 +598,17 @@ JobSetupView::MessageReceived(BMessage *msg)
 		fPages->setReverse(fReverse->Value() == B_CONTROL_ON);
 		break;	
 	}
+}
+
+
+void
+JobSetupView::UpdateHalftonePreview()
+{
+	if (!IsHalftoneConfigurationNeeded())
+		return;
+
+	fHalftone->preview(Gamma(), InkDensity(), DitherType(),
+		Color() != JobData::kMonochrome);
 }
 
 
@@ -613,9 +668,11 @@ JobSetupView::UpdateJobData(bool showPreview)
 {
 	fJobData->setShowPreview(showPreview);
 	fJobData->setColor(Color());
-	fJobData->setGamma(Gamma());
-	fJobData->setInkDensity(InkDensity());
-	fJobData->setDitherType(DitherType());
+	if (IsHalftoneConfigurationNeeded()) {
+		fJobData->setGamma(Gamma());
+		fJobData->setInkDensity(InkDensity());
+		fJobData->setDitherType(DitherType());
+	}
 
 	int first_page;
 	int last_page;

@@ -35,6 +35,8 @@ public:
 
 private:
 	void UpdateButtonEnabledState();
+	bool IsHalftoneConfigurationNeeded();
+	void CreateHalftoneConfigurationUI();
 	void FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
 		PrinterCap::CapID category, int id);
 	void FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
@@ -44,6 +46,7 @@ private:
 	BRadioButton* CreatePageSelectionItem(const char* name, const char* label,
 		JobData::PageSelection pageSelection);
 	void AllowOnlyDigits(BTextView* textView, int maxDigits);
+	void UpdateHalftonePreview();
 	JobData::Color Color();
 	Halftone::DitherType DitherType();
 	float Gamma();
@@ -58,9 +61,11 @@ private:
 	const PrinterCap *fPrinterCap;
 	BPopUpMenu       *fColorType;
 	BPopUpMenu       *fDitherType;
+	BMenuField       *fDitherMenuField;
 	JSDSlider        *fGamma;
 	JSDSlider        *fInkDensity;
 	HalftoneView     *fHalftone;
+	BBox             *fHalftoneBox;
 	BRadioButton     *fAll;
 	BCheckBox        *fCollate;
 	BCheckBox        *fReverse;

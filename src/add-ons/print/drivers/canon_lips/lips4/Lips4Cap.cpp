@@ -220,6 +220,7 @@ Lips4Cap::isSupport(CapID capid) const
 		case kBindingLocation:
 		case kColor:
 		case kCopyCommand:
+		case kHalftone:
 			return true;
 		default:
 			return false;
