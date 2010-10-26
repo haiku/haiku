@@ -16,12 +16,12 @@ MediaFileInfo::MediaFileInfo(BMediaFile* file)
 }
 
 
-void
+status_t
 MediaFileInfo::LoadInfo(BMediaFile* file)
 {
 	_Reset();
 	if (!file)
-		return;
+		return B_BAD_VALUE;
 	
 	BMediaTrack* track;
 	media_format format;
@@ -33,17 +33,33 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 	int32 tracks = file->CountTracks();
 	int64 videoFrames = 0;
 	int64 audioFrames = 0;
+	status_t ret = B_OK;
+
 	for (int32 i = 0; i < tracks && (!audioDone || !videoDone); i++) {
 		track = file->TrackAt(i);
+		ret = track->InitCheck();
+		if (ret != B_OK)
+			return ret;
+
 		if (track != NULL) {
-			track->EncodedFormat(&format);
+			ret = track->EncodedFormat(&format);
+			if (ret != B_OK)
+				return ret;
+
 			if (format.IsVideo()) {
 				memset(&format, 0, sizeof(format));
 				format.type = B_MEDIA_RAW_VIDEO;
-				track->DecodedFormat(&format);
+
+				ret = track->DecodedFormat(&format);
+				if (ret != B_OK)
+					return ret;
+
 				media_raw_video_format *rvf = &(format.u.raw_video);
 
-				track->GetCodecInfo(&codecInfo);
+				ret = track->GetCodecInfo(&codecInfo);
+				if (ret != B_OK)
+					return ret;
+
 				video.format << codecInfo.pretty_name;
 				videoDuration = track->Duration();
 				videoFrames = track->CountFrames();
@@ -58,7 +74,10 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 			} else if (format.IsAudio()) {
 				memset(&format, 0, sizeof(format));
 				format.type = B_MEDIA_RAW_AUDIO;
-				track->DecodedFormat(&format);
+				ret = track->DecodedFormat(&format);
+				if (ret != B_OK)
+					return ret;
+
 				media_raw_audio_format *raf = &(format.u.raw_audio);
 				char bytesPerSample = (char)(raf->format & 0xf);
 				if (bytesPerSample == 1) {
@@ -69,7 +88,10 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 					audio.details << bytesPerSample << "byte ";
 				}
 
-				track->GetCodecInfo(&codecInfo);
+				ret = track->GetCodecInfo(&codecInfo);
+				if (ret != B_OK)
+					return ret;
+
 				audio.format << codecInfo.pretty_name;
 				audioDuration = track->Duration();
 				audioFrames = track->CountFrames();
@@ -86,13 +108,17 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 				audio.details << audioFrames << " frames";
 				audioDone = true;
 			}
-			file->ReleaseTrack(track);
-		}	
+			ret = file->ReleaseTrack(track);
+			if (ret != B_OK)
+				return ret;
+		}
 	}
 
 	useconds = MAX(audioDuration, videoDuration);
 	duration << (int32)(useconds / 1000000)
 			  << " seconds";
+
+	return B_OK;
 }
 
 

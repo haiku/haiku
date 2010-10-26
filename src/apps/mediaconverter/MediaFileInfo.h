@@ -18,7 +18,7 @@ struct MediaInfo {
 
 struct MediaFileInfo {
 				MediaFileInfo(BMediaFile* file = NULL);
-	void		LoadInfo(BMediaFile* file);
+	status_t	LoadInfo(BMediaFile* file);
 
 	MediaInfo	audio;
 	MediaInfo	video;

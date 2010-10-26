@@ -4,6 +4,7 @@
 // This file may be used under the terms of the Be Sample Code License.
 #include "MediaFileInfoView.h"
 
+#include <Alert.h>
 #include <ControlLook.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
@@ -155,7 +156,15 @@ MediaFileInfoView::Update(BMediaFile* file, entry_ref* ref)
 	else
 		fRef = entry_ref();
 
-	fInfo.LoadInfo(file);
+	status_t ret = fInfo.LoadInfo(file);
+	if (ret != B_OK) {
+		BString error("An error has occurred reading the "
+			"file info.\n\nError : ");
+		error << strerror(ret);
+		BAlert* alert = new BAlert("File Error", error.String(),
+			"OK");
+		alert->Go(NULL);
+	}
 
 	InvalidateLayout();
 	Invalidate();
