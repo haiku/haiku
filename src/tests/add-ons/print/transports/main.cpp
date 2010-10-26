@@ -11,9 +11,9 @@
 
 int main (int argc, char *argv[])
 {
-	image_id addon;
+	image_id addon = -1;
 	char *transport;
-	
+
 	if (argc < 2) {
 		printf("Usage: %s <transport add-on name> [<file to print>]\n", argv[0]);
 		return B_ERROR;
@@ -23,40 +23,40 @@ int main (int argc, char *argv[])
 
 	transport = argv[1];
 
-	printf("Looking for %s transport addon:", transport);
+	printf("Looking for %s transport addon:\n", transport);
 
-	// try first in user add-ons directory
-	printf("In user add-ons directory...\n");
-
+	directory_which which[] = {
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_SYSTEM_ADDONS_DIRECTORY
+	};
 	BPath path;
-	find_directory(B_USER_ADDONS_DIRECTORY, &path);
-	path.Append("Print/transport");
-	path.Append(transport);
-	
-	addon = load_add_on(path.Path());
-	if (addon < 0) {
-		// on failure try in system add-ons directory
+	for (uint32 i = 0; i <sizeof(which) / sizeof(which[0]); i++) {
+		if (find_directory(which[i], &path, false) != B_OK)
+			continue;
 
-		printf("In system add-ons directory...\n");
-		find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
 		path.Append("Print/transport");
 		path.Append(transport);
 
+		printf("\t%s ?\n", path.Path());
 		addon = load_add_on(path.Path());
+		if (addon >= B_OK)
+			break;
 	}
 
-	if (addon < 0) {
+	if (addon == B_ERROR) {
 		// failed to load transport add-on
-		printf("Failed to load %s print transport add-on!\n", transport);
-		return B_ERROR;
+		printf("Failed to load \"%s\" print transport add-on!\n", transport);
+		return -1;
 	}
-	
-	printf("Loaded from %s\n", path.Path());
+
+	printf("Add-on %d = \"%s\" loaded from %s.\n", (int) addon,
+		transport, path.Path());
 
 	// get init & exit proc
 	BDataIO* (*init_proc)(BMessage*);
 	void (*exit_proc)(void);
-	
+
 	get_image_symbol(addon, "init_transport", B_SYMBOL_TYPE_TEXT, (void **) &init_proc);
 	get_image_symbol(addon, "exit_transport", B_SYMBOL_TYPE_TEXT, (void **) &exit_proc);
 
@@ -75,7 +75,7 @@ int main (int argc, char *argv[])
 	// TODO: create on the fly a temporary printer folder for testing purpose only
 	msg.AddString("printer_file", "/boot/home/config/settings/printers/test");
 	BDataIO *io = (*init_proc)(&msg);
-	
+
 	if (io) {
 		printf("done.\nTransport parameters msg =>\n");
 		msg.PrintToStream();
@@ -89,7 +89,7 @@ int main (int argc, char *argv[])
 			uint8 buffer[B_PAGE_SIZE];
 			ssize_t total = 0;
 			ssize_t sz;
-			
+
 			printf("Sending data read from %s file...\n", argv[2]);
 			while((sz = data.Read(buffer, sizeof(buffer))) > 0) {
 				if (io->Write(buffer, sz) < 0) {
@@ -101,12 +101,12 @@ int main (int argc, char *argv[])
 			printf("%ld data bytes sent.\n", total);
 		}	// data valid file
 	}	// optional data file
-	
+
 	if (exit_proc) {
 		printf("Exiting %s...\n", transport);
 		(*exit_proc)();
 	}
-	
+
 	unload_add_on(addon);
 	printf("%s unloaded.\n", transport);
 
