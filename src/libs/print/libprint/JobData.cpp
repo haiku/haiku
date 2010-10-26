@@ -40,51 +40,26 @@ static const char* kJDPhysicalRect          = "JJJJ_physical_rect";
 static const char* kJDScaledPhysicalRect    = "JJJJ_scaled_physical_rect";
 static const char* kJDResolution            = "JJJJ_resolution";
 
+
 JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
 	load(msg, cap, settings);
 }
 
+
 JobData::~JobData()
 {
 }
 
+
 JobData::JobData(const JobData &job_data)
 {
-	fShowPreview           = job_data.fShowPreview;
-	fPaper                 = job_data.fPaper;
-	fResolutionID          = job_data.fResolutionID;
-	fXRes                  = job_data.fXRes;
-	fYRes                  = job_data.fYRes;
-	fOrientation           = job_data.fOrientation;
-	fScaling               = job_data.fScaling;
-	fPaperRect             = job_data.fPaperRect;
-	fScaledPaperRect       = job_data.fScaledPaperRect;
-	fPrintableRect         = job_data.fPrintableRect;
-	fScaledPrintableRect   = job_data.fScaledPrintableRect;
-	fNup                   = job_data.fNup;
-	fFirstPage             = job_data.fFirstPage;
-	fLastPage              = job_data.fLastPage;
-	fGamma                 = job_data.fGamma;
-	fInkDensity            = job_data.fInkDensity;
-	fPaperSource           = job_data.fPaperSource;
-	fCopies                = job_data.fCopies;
-	fCollate               = job_data.fCollate;
-	fReverse               = job_data.fReverse;
-	fPrintStyle            = job_data.fPrintStyle;
-	fBindingLocation       = job_data.fBindingLocation;
-	fPageOrder             = job_data.fPageOrder;
-	fSettings              = job_data.fSettings;
-	fMsg                   = job_data.fMsg;
-	fColor                 = job_data.fColor;
-	fDitherType            = job_data.fDitherType;
-	fPageSelection         = job_data.fPageSelection;
-	fMarginUnit            = job_data.fMarginUnit;
-	fPhysicalRect          = job_data.fPhysicalRect;
-	fScaledPhysicalRect    = job_data.fScaledPhysicalRect;
+	*this = job_data;
 }
 
-JobData &JobData::operator = (const JobData &job_data)
+
+JobData&
+JobData::operator=(const JobData &job_data)
 {
 	fShowPreview           = job_data.fShowPreview;
 	fPaper                 = job_data.fPaper;
@@ -120,7 +95,9 @@ JobData &JobData::operator = (const JobData &job_data)
 	return *this;
 }
 
-void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
+
+void
+JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 {
 	fMsg = msg;
 	fSettings = settings;
@@ -315,7 +292,9 @@ void JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fMarginUnit = kUnitInch;
 }
 
-void JobData::save(BMessage *msg)
+
+void
+JobData::save(BMessage *msg)
 {
 	if (msg == NULL) {
 		msg = fMsg;
