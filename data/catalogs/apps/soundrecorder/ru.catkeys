@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-SoundRecorder	1392791586
+1	russian	x-vnd.Haiku-SoundRecorder	3406065052
 Loop	RecorderWindow		Закольцевать
 Cannot find default audio hardware	RecorderWindow		Не найдено аудио оборудование
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Не найден временный файл, созданный для хранения новой записи
@@ -36,3 +36,10 @@ Cannot record a sound that long	RecorderWindow		Невозможно запис�
 Cannot find an unused name to use for the new recording	RecorderWindow		Невозможно найти свободное имя для новой записи
 Save	RecorderWindow		Сохранить
 Cannot connect to media server	RecorderWindow		Невозможно подключиться к медиа серверу
+File name:	RecorderWindow		Имя файла:
+Format:	RecorderWindow		Формат:
+Compression:	RecorderWindow		Сжатие:
+Channels:	RecorderWindow		Каналы:
+Sample size:	RecorderWindow		Размер сэмпла:
+Sample rate:	RecorderWindow		Частота дискретизации:
+Duration:	RecorderWindow		Продолжительность:

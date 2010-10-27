@@ -12,7 +12,7 @@ Step up by CPU usage	Color Step View		Шаг вверх по производи�
 Dynamic stepping	CPU Frequency View		Динамическое изменение
 Stepping policy: 	CPU Frequency View		Настройка шага изменения частоты ЦП:
 Integration time [ms]: 	CPU Frequency View		Время интеграции [мс]:
-Open Speedstep preferences…	Status view		Открыть настройки SpeedStep
+Open Speedstep preferences…	Status view		Настроить частоту процессора…
 Revert	Pref Window		Вернуть
 Low energy	Status view		Экономия энергии
 Launching the CPU frequency preflet failed.\n\nError: 	Status view		Не удалось запустить настройки частоты ЦП.\n\nОшибка:

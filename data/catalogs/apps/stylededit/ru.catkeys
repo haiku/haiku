@@ -20,7 +20,7 @@ Replace in all windows	FindandReplaceWindow		Заменить во всех ок
 Wrap lines	Menus		Перенос строк
 Cancel	RevertToSavedAlert		Отмена
 Document	Menus		Документ
-Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в документе \"%s\"? 
+Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
 Font	Menus		Шрифт
 Replace all	FindandReplaceWindow		Заменить все
 Default	Open_and_SaveAsPanel		По умолчанию

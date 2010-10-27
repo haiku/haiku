@@ -1,7 +1,7 @@
-1	russian	x-vnd.Haiku-DriveSetup	2094726518
+1	russian	x-vnd.Haiku-DriveSetup	1943527736
 Delete	MainWindow		Удалить
 DriveSetup	MainWindow		DriveSetup
-Are you sure you want to initialize the selected partition? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Вы уверены, что хотите инициализировать выбранный раздел?\nПосле ввода параметров инициализации вы сможете отменить эту операцию непосредственно перед записью изменений на диск.
+Are you sure you want to initialize the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел \"%s\"?\nПовторый запрос будет выдан непосредственно перед записью изменений на диск.
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на выбранном разделе будут безвозвратно потеряны!
 Rescan	MainWindow		Пересканировать
 OK	MainWindow		ОК
@@ -19,7 +19,7 @@ The partition %s is already unmounted.	MainWindow		Раздел %s уже отк
 Failed to initialize the partition. No changes have been written to disk.	MainWindow		Инициализация раздела не удалась. Изменения не были записаны на диск.
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Не удалось удалить раздел. Изменения не были записаны на диск.
 Partition type:	CreateParamsPanel		Тип раздела:
-Are you sure you want to initialize the partition \"%s\"? After entering the initialization parameters, you can abort this operation right before writing changes back to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел \"%s\"?\nПосле ввода параметров инициализации вы сможете отменить эту операцию непосредственно перед записью изменений на диск.
+Are you sure you want to initialize the partition? You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите инициализировать раздел?\nПовторый запрос будет выдан непосредственно перед записью изменений на диск.
 Could not delete the selected partition.	MainWindow		Невозможно удалить выбранный раздел.
 Error: 	MainWindow	in any error alert	Ошибка: 
 Partition %ld	DiskView		Раздел %ld
@@ -73,3 +73,4 @@ Device	PartitionList		Устройство
 Cancel	MainWindow		Отмена
 Cancel	InitParamsPanel		Отмена
 %ld MiB	Support		%ld Мбайт
+Parameters	PartitionList		Параметры

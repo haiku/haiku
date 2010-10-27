@@ -1,5 +1,5 @@
-1	russian	x-vnd.Haiku-ShowImage	2071534767
-Use as background…	Menus		Использовать как фоновый рисунок…
+1	russian	x-vnd.Haiku-ShowImage	1529387143
+Use as background…	Menus		Сделать фоном рабочего стола…
 5 seconds	Menus		5 секунд
 Slide delay	Menus		Задержка слайд шоу 
 Zoom in	Menus		Увеличить
@@ -11,7 +11,6 @@ Full screen	Menus		На весь экран
 Go to page	Menus		Перейти к странице
 Zoom out	Menus		Уменьшить
 20 seconds	Menus		20 секунд
-Invert colors	Menus		Инвертировать цвета
 3 seconds	Menus		3 секунды
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
 10 seconds	Menus		10 секунд
@@ -31,12 +30,12 @@ Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1
 Apply	ResizerWindow		Применить
 Keep original proportions	ResizerWindow		Сохранить пропорции
 9 seconds	Menus		9 секунд
-Flip left to right	Menus		Отобразить слева направо
+Flip left to right	Menus		Повернуть слева направо
 Show caption in full screen mode	Menus		Показывать название в полноэкранном режиме
 DPI:	PrintOptionsWindow		Разрешение (DPI):
 Next file	Menus		Следующий файл
 4 seconds	Menus		4 секунды
-Zoom to window	Menus		Увеличивать до размеров окна
+Stretch to window	Menus		Растягивать до размеров окна
 Close document	ClosePrompt		Закрыть документ
 ShowImage	LoadAlerts		Просмотр изображений
 Height: 	PrintOptionsWindow		Высота: 
@@ -50,28 +49,27 @@ Last page	Menus		Последняя страница
 Previous file	Menus		Предыдущий файл
 Resize	ResizerWindow		Изменить размер
 Slide show	Menus		Слайд шоу
-Fit image to page	PrintOptionsWindow		Подгонять изображение под окно
-Flip top to bottom	Menus		Отобразить сверху вниз
+Fit image to page	PrintOptionsWindow		Подогнать размер изображения под страницу
+Flip top to bottom	Menus		Повернуть сверху вниз
 Zoom factor in %:	PrintOptionsWindow		Увеличение в %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Изображение
 Rotate clockwise	Menus		Повернуть по часовой стрелке
-Job setup	PrintOptionsWindow		Настройка задания
+Job setup	PrintOptionsWindow		Печать
 Original size	Menus		Оригинальный размер
 Next page	Menus		Следующая страница
-Shrink to window	Menus		Уменьшать до размеров окна
+Shrink to window	Menus		Сжимать до размеров окна
 OK	SaveToFile		ОК
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Progress monitor	ProgressWindow		Монитор состояния
-Paste	Menus		Вставить
 File	Menus		Файл
 Page setup…	Menus		Настройка печати…
 Print…	Menus		Печать…
 Quit	Menus		Выход
-Clear	Menus		Очистить
+Clear selection	Menus		Очистить выделение
 Edit	Menus		Изменить
 Close	Menus		Закрыть
 Copy	Menus		Копировать
-Cut	Menus		Вырезать
+Selection Mode	Menus		Режим выделения
 Select all	Menus		Выделить всё
 Save as…	Menus		Сохранить как…

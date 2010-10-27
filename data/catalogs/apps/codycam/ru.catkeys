@@ -97,3 +97,4 @@ Every 30 minutes	CodyCam		Каждые 30 минут
 FTP Setup	CodyCam		Настроить FTP
 reply: '%s'\n	SftpClient		ответ: '%s'\n
 Start video	CodyCam		Запустить видео
+CodyCam	CodyCam		Камера

@@ -99,7 +99,7 @@ Redo	ProbeView		Повторить
 File: 	ProbeView		Файл: 
 32 bit unsigned pointer:	TypeEditors		32-х битный беззнаковый указатель:
 of 	ProbeView		из 
-DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\n\tразработал Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nОригинальную Be версию разработал Robert Polic\n
+DiskProbe\n\twritten by Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nOriginal Be version by Robert Polic\n	DiskProbe		DiskProbe\n\tразработал Axel Dörfler\n\tCopyright 2004-2007, Haiku.\n\nОригинальную Be версию разработал Robert Polic\n
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Не удалось записать в файл:\n%s\n\nВсе изменения будут потеряны при выходе.
 32 bit	TypeEditors		32 бит
 Cancel	ProbeView		Отмена

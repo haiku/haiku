@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	617080576
+1	russian	x-vnd.Haiku-libtracker	4229036519
 1 item	CountView		объектов: 1
 Add current folder	FilePanelPriv		Добавить текущую папку
 Add	FindPanel		Добавить
@@ -87,7 +87,7 @@ Cut	FilePanelPriv		Вырезать
 Cut more	ContainerWindow		Вырезать ещё
 Decrease size	ContainerWindow		Уменьшить размер
 Decrease size	DeskWindow		Уменьшить размер
-Default application	InfoWindow		Приложении по умолчанию
+Default application	InfoWindow		приложении по умолчанию
 Defaults	TrackerSettingsWindow		По умолчанию
 Delete	ContainerWindow		Удалить
 Delete	FilePanelPriv		Удалить
@@ -97,7 +97,7 @@ Deleting: 	StatusWindow		Удаление:
 Description:	InfoWindow		Описание:
 Desktop	Model		Рабочий стол
 Desktop	TrackerSettingsWindow		Рабочий стол
-Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке:
+Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке
 Disk mount settings	AutoMounterSettings		Настройка подключения дисков
 Disks	DirMenu		Диски
 Disks	Model		Диски
@@ -169,11 +169,11 @@ Icon view	DeskWindow		Большие значки
 Icon view	VolumeWindow		Большие значки
 Identify	ContainerWindow		Опознать
 Identify	InfoWindow		Опознать
-If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Если вы %action папку config, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action папку config нажмите \"Сделать это\".
-If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Если вы %action папку home, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action папку home нажмите \"Сделать это\".
-If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Если вы %action настройки mime, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action настройки mime нажмите \"Сделать это\".
-If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Если вы %action папку settings, Haiku может начать работать неверно! Вы уверены, что хотите сделать это? Чтобы %action папку settings нажмите \"Сделать это\".
-If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %action папку system или её содержимое, Haiku больше не сможет загружаться! Вы уверены, что хотите сделать это? Чтобы %action папку system или её содержимое, зажмите клавишу Shift и нажмите \"Сделать это\".
+If you %action the config folder, Haiku may not behave properly! Are you sure you want to do this? To %action the config folder anyway, click \"Do it\".	FSUtils		Если вы %action папку config, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %action папку config нажмите \"Сделать это\".
+If you %action the home folder, Haiku may not behave properly! Are you sure you want to do this? To %action the home anyway, click \"Do it\".	FSUtils		Если вы %action папку home, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %action папку home нажмите \"Сделать это\".
+If you %action the mime settings, Haiku may not behave properly! Are you sure you want to do this? To %action the mime settings anyway, click \"Do it\".	FSUtils		Если вы %action настройки mime, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %action настройки mime нажмите \"Сделать это\".
+If you %action the settings folder, Haiku may not behave properly! Are you sure you want to do this? To %action the settings folder anyway, click \"Do it\".	FSUtils		Если вы %action папку settings, Haiku может начать работать неверно! \nВы уверены, что хотите сделать это? Чтобы %action папку settings нажмите \"Сделать это\".
+If you %action the system folder or its contents, you won't be able to boot Haiku! Are you sure you want to do this? To %action the system folder or its contents anyway, hold down the Shift key and click \"Do it\".	FSUtils		Если вы %action папку system или её содержимое, Haiku больше не сможет загружаться! \nВы уверены, что хотите сделать это? Чтобы %action папку system или её содержимое, зажмите клавишу Shift и нажмите \"Сделать это\".
 Ignore case	SelectionWindow		Игнорировать регистр
 Include trash	FindPanel		Включая корзину
 Increase size	ContainerWindow		Увеличить размер
@@ -275,7 +275,7 @@ Open %name with:	OpenWithWindow		Открыть %name с помощью:
 Open	OpenWithWindow		Открыть
 Open parent	ContainerWindow		На папку вверх
 Open selection with:	OpenWithWindow		Открыть выбранное с помощью:
-Opens with:	InfoWindow		Открыть в:
+Opens with:	InfoWindow		Открывать в:
 Open	VolumeWindow		Открыть
 Open with…	ContainerWindow		Открыть в…
 Or	FindPanel		или
@@ -284,6 +284,7 @@ Other	FilePermissionsView		Другие
 Outline selection rectangle only	SettingsView		Не использовать прозрачное выделение
 Owner	ContainerWindow		Владелец
 Owner	FilePermissionsView		Владелец
+parent folder	NavMenu		родительский каталог
 Paste	ContainerWindow		Вставить
 Paste	DeskWindow		Вставить
 Paste	FilePanelPriv		Вставить

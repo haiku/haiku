@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-FileTypes	525617155
+1	russian	x-vnd.Haiku-FileTypes	3867215334
 Args only	Application Type Window		Только аргументы
 Add group	New File Type Window		Добавить группу
 Remove	Application Type Window		Удалить
@@ -103,7 +103,7 @@ FileTypes	FileTypes Window		Типы файлов
 Open…	FileTypes Window		Открыть…
 FileTypes	FileTypes		FileTypes
 Extra attributes	FileTypes Window		Дополнительные атрибуты
-\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\n\tРазработал Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
+\twritten by Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n	FileTypes		\tРазработал Axel Dörfler\n\tCopyright 2006-2007, Haiku.\n
 Add…	FileTypes Window		Добавить…
 [Multiple files] file types	FileType Window		[Несколько файлов] типы файлов
 Quit	FileTypes Window		Выход
@@ -134,3 +134,25 @@ Group name:	New File Type Window		Имя группы:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Отображать как
 Right	Attribute Window	Attribute column alignment in Tracker	По правому краю
 %1 application type	Application Type Window		Тип приложения %1
+Development	Application Types Window		В разработке
+Alpha	Application Types Window		Альфа
+Beta	Application Types Window		Бета
+Gamma	Application Types Window		Гамма
+Golden master	Application Types Window		Золотая
+Final	Application Types Window		Финальная
+Progress	Application Types Window		Состояние
+Abort	Application Types Window		Отменить
+Application types	Application Types Window		Типы приложений
+Remove uninstalled	Application Types Window		Очистить удаленные
+Information	Application Types Window		Информация
+Name:	Application Types Window		Имя:
+Signature:	Application Types Window		Сигнатура:
+Path:	Application Types Window		Путь:
+Version	Application Types Window		Версия
+Version:	Application Types Window		Версия:
+Description:	Application Types Window		Описание:
+Edit…	Application Types Window		Изменить…
+Launch	Application Types Window		Запустить
+Show in Tracker…	Application Types Window		Отобразить в Tracker…
+Removing uninstalled application types	Application Types Window		Очищение удаленных типов приложений 
+%ld Application type%s could be removed.	Application Types Window		Удалось очистить типов приложений: %ld.
