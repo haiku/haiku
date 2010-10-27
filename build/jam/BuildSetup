@@ -266,8 +266,18 @@ switch $(HAIKU_CPU) {
 	case m68k :
 	{
 		HAIKU_DEFINES += __M68K__ ;
-		HAIKU_BOOT_PLATFORM = atari_m68k ;
-		HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
+		HAIKU_BOOT_PLATFORM ?= atari_m68k ;
+		switch $(HAIKU_BOOT_PLATFORM) {
+			case atari_m68k :
+			{
+				HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ; # in kB
+			}
+			case amiga_m68k :
+			{
+				# for now we have trouble reading from double-sided images
+				HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 880 ; # in kB
+			}
+		}
 		# offset in floppy image (>= sizeof(haiku_loader))
 		HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 150 ; # in kB
 		HAIKU_NO_WERROR = 1 ;
