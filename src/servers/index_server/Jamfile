@@ -1,0 +1,28 @@
+SubDir HAIKU_TOP src servers index_server ;
+
+AddResources index_server : index_server.rdef ;
+
+UsePrivateHeaders index_server shared storage kernel app ;
+UsePrivateSystemHeaders ;
+
+Server index_server :
+	CatchUpManager.cpp
+	main.cpp
+	IndexServer.cpp
+	IndexServerAddOn.cpp
+	ModifiedNotifications.cpp
+	VolumeWatcher.cpp
+
+	# storage
+	AddOnMonitorHandler.cpp
+	NodeMonitorHandler.cpp
+	:
+	be
+	$(TARGET_LIBSTDC++)
+;
+
+SEARCH on [ FGristFiles AddOnMonitorHandler.cpp NodeMonitorHandler.cpp ]
+	+= [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
+
+SEARCH on [ FGristFiles IndexServerAddOn.cpp ]
+	+= [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) add-ons index_server ] ;
