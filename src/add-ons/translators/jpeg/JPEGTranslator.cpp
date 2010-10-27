@@ -76,8 +76,7 @@ const translation_format gInputFormats[] = {
 	{ JPEG_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JPEG_MIME_STRING, JPEG_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
-		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{}
+		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION }
 };
 const int gInputFormatCount = sizeof(gInputFormats) / sizeof(translation_format);
 
@@ -86,8 +85,7 @@ const translation_format gOutputFormats[] = {
 	{ JPEG_FORMAT, B_TRANSLATOR_BITMAP, 0.5, 0.5,
 		JPEG_MIME_STRING, JPEG_DESCRIPTION },
 	{ B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.5, 0.5,
-		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION },
-	{}
+		B_TRANSLATOR_BITMAP_MIME_STRING, B_TRANSLATOR_BITMAP_DESCRIPTION }
 };
 const int gOutputFormatCount = sizeof(gOutputFormats) / sizeof(translation_format);
 
@@ -193,7 +191,7 @@ convert_from_cmap8_to_24(uint8* in, uint8* out, int32 inRowBytes)
 	int32 index2 = 0;
 	while (index < inRowBytes) {
 		rgb_color color = map->color_list[in[index++]];
-		
+
 		out[index2++] = color.red;
 		out[index2++] = color.green;
 		out[index2++] = color.blue;
@@ -210,7 +208,7 @@ convert_from_15_to_24(uint8* in, uint8* out, int32 inRowBytes)
 	while (index < inRowBytes) {
 		in_pixel = in[index] | (in[index + 1] << 8);
 		index += 2;
-		
+
 		out[index2++] = (((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12);
 		out[index2++] = (((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7);
 		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
@@ -227,7 +225,7 @@ convert_from_15b_to_24(uint8* in, uint8* out, int32 inRowBytes)
 	while (index < inRowBytes) {
 		in_pixel = in[index + 1] | (in[index] << 8);
 		index += 2;
-		
+
 		out[index2++] = (((in_pixel & 0x7c00)) >> 7) | (((in_pixel & 0x7c00)) >> 12);
 		out[index2++] = (((in_pixel & 0x3e0)) >> 2) | (((in_pixel & 0x3e0)) >> 7);
 		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
@@ -244,7 +242,7 @@ convert_from_16_to_24(uint8* in, uint8* out, int32 inRowBytes)
 	while (index < inRowBytes) {
 		in_pixel = in[index] | (in[index + 1] << 8);
 		index += 2;
-		
+
 		out[index2++] = (((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0xf800)) >> 13);
 		out[index2++] = (((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9);
 		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
@@ -261,7 +259,7 @@ convert_from_16b_to_24(uint8* in, uint8* out, int32 inRowBytes)
 	while (index < inRowBytes) {
 		in_pixel = in[index + 1] | (in[index] << 8);
 		index += 2;
-		
+
 		out[index2++] = (((in_pixel & 0xf800)) >> 8) | (((in_pixel & 0xf800)) >> 13);
 		out[index2++] = (((in_pixel & 0x7e0)) >> 3) | (((in_pixel & 0x7e0)) >> 9);
 		out[index2++] = (((in_pixel & 0x1f)) << 3) | (((in_pixel & 0x1f)) >> 2);
@@ -425,7 +423,7 @@ TranslatorReadView::TranslatorReadView(const char* name,
 		new BMessage(VIEW_MSG_SET_PHOTOSHOPCMYK));
 	if (fSettings->SetGetBool(JPEG_SET_PHOTOSHOP_CMYK, NULL))
 		fPhotoshopCMYK->SetValue(B_CONTROL_ON);
-	
+
 	fShowErrorBox = new BCheckBox("error", VIEW_LABEL_SHOWREADERRORBOX,
 		new BMessage(VIEW_MSG_SET_SHOWREADERRORBOX));
 	if (fSettings->SetGetBool(JPEG_SET_SHOWREADWARNING, NULL))
@@ -453,7 +451,7 @@ void
 TranslatorReadView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	
+
 	fAlwaysRGB32->SetTarget(this);
 	fPhotoshopCMYK->SetTarget(this);
 	fShowErrorBox->SetTarget(this);
@@ -572,7 +570,7 @@ void
 TranslatorWriteView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	
+
 	fQualitySlider->SetTarget(this);
 	fSmoothingSlider->SetTarget(this);
 	fProgress->SetTarget(this);
@@ -619,7 +617,7 @@ TranslatorWriteView::MessageReceived(BMessage* message)
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				bool boolValue = value;
-				fSettings->SetGetBool(JPEG_SET_OPT_COLORS, &boolValue); 
+				fSettings->SetGetBool(JPEG_SET_OPT_COLORS, &boolValue);
 				fSmallerFile->SetEnabled(value);
 				fSettings->SaveSettings();
 			}
@@ -671,11 +669,11 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	BStringView* version = new BStringView("Version", versionString);
 	version->SetExplicitAlignment(labelAlignment);
 
-	BTextView* infoView = new BTextView("info");	
+	BTextView* infoView = new BTextView("info");
 	infoView->SetText(gTranslatorInfo);
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
-	
+
 	float padding = 5.0f;
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, padding)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, padding)
@@ -698,7 +696,7 @@ TranslatorView::TranslatorView(const char* name, TranslatorSettings* settings)
 	AddTab(new TranslatorAboutView("About"));
 
 	settings->Release();
-	
+
  	BFont font;
  	GetFont(&font);
  	SetExplicitPreferredSize(
@@ -719,8 +717,8 @@ JPEGTranslator::NewConfigView(TranslatorSettings* settings)
 
 /*! Determine whether or not we can handle this data */
 status_t
-JPEGTranslator::DerivedIdentify(BPositionIO* inSource, 
-	const translation_format* inFormat, BMessage* ioExtension, 
+JPEGTranslator::DerivedIdentify(BPositionIO* inSource,
+	const translation_format* inFormat, BMessage* ioExtension,
 	translator_info* outInfo, uint32 outType)
 {
 	if (outType != 0 && outType != B_TRANSLATOR_BITMAP && outType != JPEG_FORMAT)
@@ -754,7 +752,7 @@ JPEGTranslator::DerivedIdentify(BPositionIO* inSource,
 
 status_t
 JPEGTranslator::DerivedTranslate(BPositionIO* inSource,
-	const translator_info* inInfo, BMessage* ioExtension, uint32 outType, 
+	const translator_info* inInfo, BMessage* ioExtension, uint32 outType,
 	BPositionIO* outDestination, int32 baseType)
 {
 	// If no specific type was requested, convert to the interchange format
@@ -807,7 +805,7 @@ JPEGTranslator::Copy(BPositionIO* in, BPositionIO* out)
 		block_size = 1024;
 	}
 	status_t err = B_OK;
-	
+
 	// Read until end of file or error
 	while (1) {
 		ssize_t to_read = block_size;
@@ -823,7 +821,7 @@ JPEGTranslator::Copy(BPositionIO* in, BPositionIO* out)
 		if (err != to_read) if (err >= 0) err = B_DEVICE_FULL;
 		if (err < B_OK) break;
 	}
-	
+
 	if (buffer != temp) free(buffer);
 	return (err >= 0) ? B_OK : err;
 }
@@ -1025,7 +1023,7 @@ JPEGTranslator::Compress(BPositionIO* in, BPositionIO* out,
 		// Read scanline
 		err = in->Read(in_scanline, in_row_bytes);
 		if (err < in_row_bytes)
-			return err < B_OK ? Error((j_common_ptr)&cinfo, err) 
+			return err < B_OK ? Error((j_common_ptr)&cinfo, err)
 				: Error((j_common_ptr)&cinfo, B_ERROR);
 
 		// Convert if needed
