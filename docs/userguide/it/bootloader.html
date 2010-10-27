@@ -11,18 +11,19 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		keepeasy
+ *		MichaelPeppers
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Boot Loader</title>
+	<title>Il Boot Loader</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
 
 <div id="banner">
-<div><span>Guida dell'utente</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -43,48 +44,47 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contenuti</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">La traduzione di questa pagina non è stata completata. Per questo motivo le parti non tradotte sono visibili in inglese.</div>
 
-<h1>Boot Loader</h1>
+<h1>Il Boot Loader</h1>
 
 <p>Il Boot Loader di Haiku può essere di aiuto quando hai problemi con l'hardware o vuoi scegliere quale installazione di Haiku far partire, se ne hai più di una (può essere da un CD di installazione o una penna USB).<br />
 Può tornare anche utile dopo che hai installato un componente software e che ti impedisce di caricare il sistema operativo. L'opzione <i>Disable user add-ons</i> (disabilita i componenti utente) che è discussa più avanti, farà partire Haiku senza caricare i componenti installati dall'utente, per esempio un driver.
 </p>
-<p>To enter the Boot Loader options, you have to press and keep holding the <span class="key">SHIFT</span> key before the beginning of Haiku's boot process. If there's a boot manager installed, you can start holding <span class="key">SHIFT</span> before invoking the boot entry for Haiku. If Haiku is the only operating system on the machine, you can begin holding the key while still seeing boot messages from the BIOS.</p>
+<p>Per entrare nelle opzioni del Boot Loader, devi tener premuto il tasto <span class="key">SHIFT</span> prima dell'inizio del processo di boot di Haiku. Se c'è un boot manager installato puoi iniziare a tener premuto il tasto <span class="key">SHIFT</span> prima di selezionare Haiku. Se Haiku è l'unico sistema operativo presente nel computer, puoi iniziare a tener premuto il tasto mentre stai ancora vedendo i messaggi di boot dal BIOS.</p>
 <p><br /></p>
-<p>Once it's there, you're offered four menus:</p>
+<p>Una volta che si è caricato, ti si presenteranno quattro menu:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
 <tr><td><b>Select boot volume</b>  (seleziona il disco di avvio) </td><td> </td><td>Sceglie quale installazione di Haiku caricare.</td></tr>
 <tr><td><b>Select safe mode options</b> (seleziona le opzioni di modalità sicura)<br />
-</td><td> </td><td>There are several options to try in case of hardware related trouble. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.
-<p><i>- Safe mode</i><br />
-<i>- Disable user add-ons</i><br />
-<i>- Disable IDE DMA</i><br />
-<i>- Use fail-safe video mode</i><br />
-<i>- Disable IO-APIC</i><br />
-<i>- Disable LOCAL APIC</i><br />
-<i>- Don't call the BIOS</i><br />
-<i>- Disable APM</i><br />
-<i>- Disable ACPI</i>
+</td><td> </td><td>Ci sono diverse opzioni da tentare in caso di problemi con l'hardware. Quando sposti la barra di selezione su un'opzione una breve descrizione compare sul margine inferiore dello schermo.
+<p><i>-Safe mode </i>(modalità sicura)<br />
+<i>-Disable user add-ons</i> (disabilita le aggiunte utente)<br />
+<i>-Disable IDE-DMA</i> (disabilita i DMA dell'IDE)<br />
+<i>-Usa fail-safe video mode</i> (Usa le modalità video sicure)<br />
+<i>-Disable IO-APIC</i> (Disabilita l'IO-APIC)<br />
+<i>-Disable LOCAL APIC</i> (Disabilita il LOCAL APIC)<br />
+<i>-Don't call the BIOS</i> (Non chiamare il BIOS)<br />
+<i>-Disable APM</i> (Disabilita l'APM)<br />
+<i>-Disable ACPI</i> (Disabilita l'ACPI)<br />
 </p></td></tr>
-<tr><td><b>Select debug options</b><br />
-</td><td> </td><td>Here you'll find several options that help with debugging or getting details for a bug report. Again, a short explanation for each option is displayed at the bottom.
-<p><i>- Enable serial debug output</i><br />
-<i>- Enable on screen debug output</i><br />
-<i>- Enable debug syslog</i>
+<tr><td><b>Select debug options</b> (Seleziona le opzioni di debug)<br />
+</td><td> </td><td>Qui trovarai molte opzioni per facilitare le operazioni di debug o ricevere importanti dettagli per un bug report. Una breve spiegazione per ogni opzione è indicata in fondo alla schermata.
+<p><i>- Enable serial debug output</i> (abilita l'output di debug seriale)<br />
+<i>- Enable on screen debug output</i> (abilita l'output di debug sullo schermo)<br />
+<i>- Enable debug syslog</i> (abilita il syslog di debug)
 </p>
-<p>If "debug syslog" is enabled, a warm reboot after a crash shows these additional options:</p>
-<p><i>- Display syslog from previous session</i><br />
-<i>- Save syslog from previous session</i>
+<p>Se il "syslog di debug" è abilitato, un riavvio immediato dopo un crash mostra queste opzioni addizionali:</p>
+<p><i>- Display syslog from previous session</i> (mostra il syslog della sessione precedente)<br />
+<i>- Save syslog from previous session</i> (salva il syslog della sessione precedente)
 </p></td></tr>
-<tr><td class="onelinetop"><b>Select fail safe video mode (Seleziona modalità video sicure)</b></td><td> </td><td>Se devi attivare l'opzione <i>Use fail-safe video mode</i> (Seleziona modalità video sicure), puoi impostare la profondità di colore e la risoluzione video.</td></tr>
+<tr><td class="onelinetop"><b>Select fail safe video mode</b> (Seleziona modalità video sicure)</td><td> </td><td>Se devi attivare l'opzione <i>Use fail-safe video mode</i> (Seleziona modalità video sicure), puoi impostare la profondità di colore e la risoluzione video.</td></tr>
 </table>
 <p><br /></p>
 <p>Dopo aver attivato una o più opzioni, puoi tornare tornare al menu principale e continuare il caricamento, che si presenterà con questa schermata di avvio:
@@ -110,7 +110,7 @@ Le diverse icone corrispondono approssimativamente a diverse fasi di caricamento
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contenuti</a> 
+    <a href="contents.html" class="uplink">Contents</a> 
 ::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
