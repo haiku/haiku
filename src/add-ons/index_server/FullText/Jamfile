@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons index_server FullText ;
+
+UsePrivateHeaders index_server shared ;
+
+SubDirSysHdrs $(HAIKU_CLUCENE_HEADERS) ;
+
+Addon FullTextAnalyser :
+	CLuceneDataBase.cpp
+	FullTextAnalyser.cpp
+
+	IndexServerAddOn.cpp
+	:
+	be translation $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
+;
+
+SEARCH on [ FGristFiles IndexServerAddOn.cpp ]
+	+= [ FDirName $(SUBDIR) $(DOTDOT) ] ;
