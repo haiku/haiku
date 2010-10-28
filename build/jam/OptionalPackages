@@ -413,7 +413,7 @@ if [ IsOptionalHaikuImagePackageAdded CLucene ] {
 		Echo "No optional package CLucene available for GCC2" ;
 	} else {
 		InstallOptionalHaikuImagePackage
-			clucene-0.9.21svn-x86-gcc4-haiku-2009-08-11.zip
+			clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip
 			: $(baseURL)/clucene-0.9.21-x86-gcc4-haiku-2009-08-11.zip
 			:
 			: true
