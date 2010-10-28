@@ -4,6 +4,7 @@ SubInclude HAIKU_TOP src servers app ;
 SubInclude HAIKU_TOP src servers bluetooth ;
 SubInclude HAIKU_TOP src servers cddb_daemon ;
 SubInclude HAIKU_TOP src servers debug ;
+SubInclude HAIKU_TOP src servers index_server ;
 SubInclude HAIKU_TOP src servers input ;
 SubInclude HAIKU_TOP src servers mail ;
 SubInclude HAIKU_TOP src servers media ;

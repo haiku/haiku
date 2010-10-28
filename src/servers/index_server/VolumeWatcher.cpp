@@ -10,6 +10,7 @@
 
 #include <sys/stat.h>
 
+#include <Autolock.h>
 #include <Directory.h>
 #include <NodeMonitor.h>
 #include <Path.h>
@@ -73,9 +74,9 @@ WatchNameHandler::StatChanged(ino_t node, dev_t device, int32 statFields)
 }
 
 
-AnalyserDispatcher::AnalyserDispatcher()
+AnalyserDispatcher::AnalyserDispatcher(const char* name)
 	:
-	BLooper(NULL, B_LOW_PRIORITY),
+	BLooper(name, B_LOW_PRIORITY),
 
 	fStopped(0)
 {
@@ -143,13 +144,11 @@ AnalyserDispatcher::AddAnalyser(FileAnalyser* analyser)
 		return false;
 
 	bool result;
-	Lock();
-	if (_FindAnalyser(analyser->Name())) {
-		Unlock();
+	BAutolock _(this);
+	if (_FindAnalyser(analyser->Name()))
 		return false;
-	}
+
 	result = fFileAnalyserList.AddItem(analyser);
-	Unlock();
 	return result;
 }
 
@@ -157,15 +156,13 @@ AnalyserDispatcher::AddAnalyser(FileAnalyser* analyser)
 bool
 AnalyserDispatcher::RemoveAnalyser(const BString& name)
 {
-	Lock();
+	BAutolock _(this);
 	FileAnalyser* analyser = _FindAnalyser(name);
 	if (analyser) {
 		fFileAnalyserList.RemoveItem(analyser);
 		delete analyser;
-		Unlock();
 		return true;
 	}
-	Unlock();
 	return false;
 }
 
@@ -216,6 +213,8 @@ AnalyserDispatcher::SetWatchingPosition(bigtime_t time)
 
 VolumeWorker::VolumeWorker(VolumeWatcher* watcher)
 	:
+	AnalyserDispatcher("VolumeWorker"),
+
 	fVolumeWatcher(watcher),
 	fBusy(0)
 {
@@ -262,15 +261,15 @@ VolumeWorker::_Work()
 		AnalyseEntry(collection.createdList->at(i));
 	collection.createdList->clear();
 
+	for (unsigned int i = 0; i < collection.deletedList->size() || Stopped();
+		i++)
+		DeleteEntry(collection.deletedList->at(i));
+	collection.deletedList->clear();
+
 	for (unsigned int i = 0; i < collection.modifiedList->size() || Stopped();
 		i++)
 		AnalyseEntry(collection.modifiedList->at(i));
 	collection.modifiedList->clear();
-
-	for (unsigned int i = 0; i < collection.createdList->size() || Stopped();
-		i++)
-		AnalyseEntry(collection.createdList->at(i));
-	collection.createdList->clear();
 
 	for (unsigned int i = 0; i < collection.movedList->size() || Stopped();
 		i++)
@@ -372,7 +371,7 @@ SwapEntryRefVector::SwapList()
 	EntryRefVector* temp = fCurrentList;
 	fCurrentList = fNextList;
 	fNextList = temp;
-	return fCurrentList;
+	return temp;
 }
 
 
@@ -400,7 +399,6 @@ VolumeWatcher::VolumeWatcher(const BVolume& volume)
 
 VolumeWatcher::~VolumeWatcher()
 {
-printf("~VolumeWatcher()\n");
 	Stop();
 	thread_id threadId = fVolumeWorker->Thread();
 	fVolumeWorker->PostMessage(B_QUIT_REQUESTED);
@@ -486,14 +484,12 @@ VolumeWatcher::AddAnalyser(FileAnalyser* analyser)
 	if (!fVolumeWorker->AddAnalyser(analyser))
 		return false;
 
-	Lock();
-	if (!fCatchUpManager.AddAnalyser(analyser)) {
-		Unlock();
+	BAutolock _(this);
+	if (!fCatchUpManager.AddAnalyser(analyser))
 		return false;
-	}
+
 	if (fWatching)
 		fCatchUpManager.CatchUp();
-	Unlock();
 
 	return true;
 }
@@ -505,9 +501,8 @@ VolumeWatcher::RemoveAnalyser(const BString& name)
 	if (!fVolumeWorker->RemoveAnalyser(name))
 		return false;
 
-	Lock();
+	BAutolock _(this);
 	fCatchUpManager.RemoveAnalyser(name);
-	Unlock();
 	return true;
 }
 
@@ -515,6 +510,7 @@ VolumeWatcher::RemoveAnalyser(const BString& name)
 void
 VolumeWatcher::GetSecureEntries(list_collection& collection)
 {
+	BAutolock _(this);
 	collection.createdList = fCreatedList.SwapList();
 	collection.deletedList = fDeleteList.SwapList();
 	collection.modifiedList = fModifiedList.SwapList();

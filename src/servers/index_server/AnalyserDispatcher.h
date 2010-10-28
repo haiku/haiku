@@ -20,7 +20,7 @@ class FileAnalyser;
 
 class AnalyserDispatcher : public BLooper {
 public:
-								AnalyserDispatcher();
+								AnalyserDispatcher(const char* name);
 								~AnalyserDispatcher();
 
 			void				Stop();

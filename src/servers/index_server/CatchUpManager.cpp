@@ -25,6 +25,8 @@ const bigtime_t kSecond = 1000000;
 CatchUpAnalyser::CatchUpAnalyser(const BVolume& volume, time_t start,
 	time_t end, BHandler* manager)
 	:
+	AnalyserDispatcher("CatchUpAnalyser"),
+
 	fVolume(volume),
 	fStart(start),
 	fEnd(end),
@@ -101,11 +103,14 @@ CatchUpAnalyser::_CatchUp()
 	for (uint32 i = 0; i < entryList.size(); i++) {
 		if (Stopped())
 			return;
+		if (i % 100 == 0)
+			printf("Catch up: %i/%i\n", (int)i,(int)entryList.size());
 		AnalyseEntry(entryList[i]);
 	}
 	LastEntry();
 
-	_WriteSyncSatus(fEnd);
+	_WriteSyncSatus(fEnd * kSecond);
+	printf("Catched up.\n");
 
 	BMessenger managerMessenger(fCatchUpManager);
 	BMessage msg(kCatchUpDone);
