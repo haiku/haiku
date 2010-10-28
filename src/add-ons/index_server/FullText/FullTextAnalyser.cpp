@@ -68,13 +68,6 @@ FullTextAnalyser::AnalyseEntry(const entry_ref& ref)
 {
 	if (!_InterestingEntry(ref))
 		return;
-	BPath path(&ref);
-	if (BString(path.Path()).FindFirst(fDataBasePath.Path()) == 0) {
-		STRACE("In database path %s\n", path.Path());
-		return;
-	}
-	if (BString(path.Path()).FindFirst("/boot/common/cache/tmp") == 0)
-		return;
 
 	//STRACE("FullTextAnalyser AnalyseEntry: %s %s\n", ref.name, path.Path());
 	fWriteDataBase->AddDocument(ref);
@@ -88,6 +81,8 @@ FullTextAnalyser::AnalyseEntry(const entry_ref& ref)
 void
 FullTextAnalyser::DeleteEntry(const entry_ref& ref)
 {
+	if (!_InterestingEntry(ref))
+		return;
 	STRACE("FullTextAnalyser DeleteEntry: %s\n", ref.name);
 	fWriteDataBase->RemoveDocument(ref);
 }
@@ -131,9 +126,11 @@ FullTextAnalyser::_InterestingEntry(const entry_ref& ref)
 bool
 FullTextAnalyser::_IsInIndexDirectory(const entry_ref& ref)
 {
-	BEntry entry(&ref);
-	BDirectory dataBaseDir(fDataBasePath.Path());
-	if (dataBaseDir.Contains(&entry))
+	BPath path(&ref);
+	if (BString(path.Path()).FindFirst(fDataBasePath.Path()) == 0)
+		return true;
+
+	if (BString(path.Path()).FindFirst("/boot/common/cache/tmp") == 0)
 		return true;
 
 	return false;
