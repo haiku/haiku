@@ -2,13 +2,20 @@ SubDir HAIKU_TOP src add-ons index_server FullText ;
 
 UsePrivateHeaders index_server shared ;
 
-SubDirSysHdrs $(HAIKU_CLUCENE_HEADERS) ;
-
-Addon FullTextAnalyser :
+local sources =
 	CLuceneDataBase.cpp
 	FullTextAnalyser.cpp
 
 	IndexServerAddOn.cpp
+	;
+
+SubDirSysHdrs $(HAIKU_CLUCENE_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_CLUCENE_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+
+Addon FullTextAnalyser :
+	$(sources)
 	:
 	be translation $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
 ;

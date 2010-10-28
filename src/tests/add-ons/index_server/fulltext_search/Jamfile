@@ -1,13 +1,20 @@
 SubDir HAIKU_TOP src tests add-ons index_server fulltext_search ;
 
-UsePrivateHeaders index_server shared ;
-SubDirSysHdrs $(HAIKU_CLUCENE_HEADERS) ;
-
-
-Application FullTextSearch :
+local sources =
 	BeaconSearcher.cpp
 	main.cpp
 	SearchWindow.cpp
-	: be $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
-#	: Sudoku.rdef
+	;
+
+UsePrivateHeaders index_server shared ;
+SubDirSysHdrs $(HAIKU_CLUCENE_HEADERS) ;
+local cluceneSources ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_CLUCENE_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+
+Application FullTextSearch :
+	$(sources)
+	:
+	be $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
 	;
