@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src tests add-ons index_server fulltext_search ;
+
+UsePrivateHeaders index_server shared ;
+SubDirSysHdrs $(HAIKU_CLUCENE_HEADERS) ;
+
+
+Application FullTextSearch :
+	BeaconSearcher.cpp
+	main.cpp
+	SearchWindow.cpp
+	: be $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
+#	: Sudoku.rdef
+	;

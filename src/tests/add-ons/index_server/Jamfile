@@ -1,0 +1,4 @@
+SubDir HAIKU_TOP src tests add-ons index_server ;
+
+SubInclude HAIKU_TOP src tests add-ons index_server fulltext_search ;
+
