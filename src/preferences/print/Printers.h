@@ -22,6 +22,7 @@ public:
 								PrintersApp();
 			void				ReadyToRun();
 			void				MessageReceived(BMessage* msg);
+			void				ArgvReceived(int32 argc, char** argv);
 };
 
 #endif // _PRINTERS_H

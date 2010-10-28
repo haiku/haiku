@@ -18,6 +18,12 @@ resource app_version {
 	long_info = "Printers ©2001-2010 Haiku"
 };
 
+resource(1, "BEOS:FILE_TYPES") message
+{
+	"types" = "application/x-vnd.Be.URL.ipp",
+	"types" = "application/x-vnd.Be.URL.lpr"
+};
+
 resource vector_icon {
 	$"6E6369660B050002001602B76E71BBF8593D1210B8A7674742A04ABEFB00AEFF"
 	$"E1053802001603373333B9333339333337333348E54F4B555400FFBFE5FF9B02"

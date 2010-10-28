@@ -57,3 +57,13 @@ PrintersApp::MessageReceived(BMessage* msg)
 		BApplication::MessageReceived(msg);
 	}
 }
+
+
+void
+PrintersApp::ArgvReceived(int32 argc, char** argv)
+{
+	for (int i; i < argc; i++) {
+		// TODO: show a pre-filled add printer dialog here
+	}
+}
+
