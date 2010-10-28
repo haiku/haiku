@@ -327,9 +327,6 @@ add_page_table(addr_t base)
                         "region\n");
         }
 */
-        gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++]
-                = (uint32)pageTable;
-
         for (int32 i = 0; i < 256; i++)
                 pageTable[i] = 0;
 
@@ -586,15 +583,7 @@ mmu_init(void)
 
 	init_page_directory();
 
-	// Map the page directory into kernel space at 0xffc00000-0xffffffff
-	// this enables a mmu trick where the 4 MB region that this pgdir entry
-	// represents now maps the 4MB of potential pagetables that the pgdir
-	// points to. Thrown away later in VM bringup, but useful for now.
-#warning ARM:TODO!
-/*
-	sPageDirectory[1023] = (uint32)sPageDirectory | kDefaultPageFlags;
-*/
-	// also map it on the next vpage
+	// map the page directory on the next vpage
 	gKernelArgs.arch_args.vir_pgdir = mmu_map_physical_memory(
 		(addr_t)sPageDirectory, MMU_L1_TABLE_SIZE, kDefaultPageFlags);
 
@@ -606,7 +595,6 @@ mmu_init(void)
 
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
-
 }
 
 
