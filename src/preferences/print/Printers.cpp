@@ -62,7 +62,7 @@ PrintersApp::MessageReceived(BMessage* msg)
 void
 PrintersApp::ArgvReceived(int32 argc, char** argv)
 {
-	for (int i; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		// TODO: show a pre-filled add printer dialog here
 	}
 }
