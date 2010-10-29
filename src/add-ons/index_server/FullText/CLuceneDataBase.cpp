@@ -72,17 +72,27 @@ CLuceneWriteDataBase::InitCheck()
 status_t
 CLuceneWriteDataBase::AddDocument(const entry_ref& ref)
 {
+	// check if already in the queue
+	for (unsigned int i = 0; i < fAddQueue.size(); i++) {
+		if (fAddQueue.at(i) == ref)
+			return B_OK;
+	}
 	fAddQueue.push_back(ref);
 
-	return B_ERROR;
+	return B_OK;
 }
 
 
 status_t
 CLuceneWriteDataBase::RemoveDocument(const entry_ref& ref)
 {
+	// check if already in the queue
+	for (unsigned int i = 0; i < fAddQueue.size(); i++) {
+		if (fDeleteQueue.at(i) == ref)
+			return B_OK;
+	}
 	fDeleteQueue.push_back(ref);
-	return B_ERROR;
+	return B_OK;
 }
 
 

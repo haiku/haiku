@@ -81,7 +81,7 @@ FullTextAnalyser::AnalyseEntry(const entry_ref& ref)
 void
 FullTextAnalyser::DeleteEntry(const entry_ref& ref)
 {
-	if (!_InterestingEntry(ref))
+	if (_IsInIndexDirectory(ref))
 		return;
 	STRACE("FullTextAnalyser DeleteEntry: %s\n", ref.name);
 	fWriteDataBase->RemoveDocument(ref);
