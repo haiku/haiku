@@ -54,6 +54,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	LibXML2					- the XML support library
 #	LibXSLT					- xslt library and utility
 #	Links					- the web browser
+#	Lua						- the scripting language
 #	Man						- standard commands to read man pages
 #	Mercurial				- the distributed version control system
 #	Nano					- the command line text editor
@@ -1025,6 +1026,20 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/home/config/bin/links ;
+	}
+}
+
+
+# Lua
+if [ IsOptionalHaikuImagePackageAdded Lua ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Lua available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			lua-5.1.4--x86-gcc2-2010-10-29.zip
+			: $(baseURL)/lua-5.1.4--x86-gcc2-2010-10-29.zip
+			:
+		;
 	}
 }
 
