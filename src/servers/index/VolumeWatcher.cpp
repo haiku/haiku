@@ -258,22 +258,22 @@ VolumeWorker::_Work()
 	_SetBusy(true);
 	for (unsigned int i = 0; i < collection.createdList->size() || Stopped();
 		i++)
-		AnalyseEntry(collection.createdList->at(i));
+		AnalyseEntry((*collection.createdList)[i]);
 	collection.createdList->clear();
 
 	for (unsigned int i = 0; i < collection.deletedList->size() || Stopped();
 		i++)
-		DeleteEntry(collection.deletedList->at(i));
+		DeleteEntry((*collection.deletedList)[i]);
 	collection.deletedList->clear();
 
 	for (unsigned int i = 0; i < collection.modifiedList->size() || Stopped();
 		i++)
-		AnalyseEntry(collection.modifiedList->at(i));
+		AnalyseEntry((*collection.modifiedList)[i]);
 	collection.modifiedList->clear();
 
 	for (unsigned int i = 0; i < collection.movedList->size() || Stopped();
 		i++)
-		MoveEntry(collection.movedFromList->at(i), collection.movedList->at(i));
+		MoveEntry((*collection.movedFromList)[i], (*collection.movedList)[i]);
 	collection.movedList->clear();
 	collection.movedFromList->clear();
 
@@ -385,6 +385,7 @@ SwapEntryRefVector::CurrentList()
 VolumeWatcher::VolumeWatcher(const BVolume& volume)
 	:
 	VolumeWatcherBase(volume),
+	BLooper("VolumeWatcher"),
 
 	fWatching(false),
 	fWatchNameHandler(this),
