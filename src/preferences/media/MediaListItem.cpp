@@ -20,40 +20,40 @@
 
 #include <View.h>
 
+#include "MediaIcons.h"
+
 
 #define kITEM_MARGIN					  1
 
 
 MediaListItem::MediaListItem(dormant_node_info* info, uint32 level,
-		bool isVideo, BList* icons, uint32 modifiers) 
+		bool isVideo, MediaIcons* icons, uint32 modifiers) 
 	:
 	BListItem(level),
+	fInfo(info),
+	fLabel(info->name),
 	fIsAudioMixer(false),
 	fIsVideo(isVideo),
 	fIsDefaultInput(false),
-	fIsDefaultOutput(false)
+	fIsDefaultOutput(false),
+	fIcons(icons)
 {
-	fIcons = icons;
-	fInfo = info;
-	fLabel = fInfo->name;
-	
 	SetHeight(16 + kITEM_MARGIN);
 }
 
 
 MediaListItem::MediaListItem(const char* label, uint32 level,
-		bool isVideo, BList* icons, uint32 modifiers) 
+		bool isVideo, MediaIcons* icons, uint32 modifiers) 
 	:
 	BListItem(level),
+	fInfo(NULL),
 	fLabel(label),
 	fIsAudioMixer(false),
 	fIsVideo(isVideo),
 	fIsDefaultInput(false),
-	fIsDefaultOutput(false)
+	fIsDefaultOutput(false),
+	fIcons(icons)
 {
-	fIcons = icons;
-	fInfo = NULL;
-	
 	SetHeight(16 + kITEM_MARGIN);
 }
 
@@ -88,38 +88,36 @@ MediaListItem::DrawItem(BView* owner, BRect frame, bool complete)
 	}
 	
 	frame.left += 4;
-	BRect iconFrame(frame);
-	iconFrame.Set(iconFrame.left, iconFrame.top+1,
-		iconFrame.left+15, iconFrame.top+16);
-	uint32 index = 0;
-	if (OutlineLevel()==0 || (fIsDefaultInput && fIsDefaultOutput)) {
-		if (fIsDefaultInput && fIsVideo)
-			index = 4;
-		else if (fIsDefaultInput && !fIsVideo)
-			index = 2;
-		owner->SetDrawingMode(B_OP_OVER);
+	BRect iconFrame(fIcons->IconRectAt(BPoint(frame.left, frame.top + 1)));
 
-		BBitmap* icon = static_cast<BBitmap*>(fIcons->ItemAt(index));
+	BBitmap* icon = &fIcons->devicesIcon;
+	if (OutlineLevel() == 0 || (fIsDefaultInput && fIsDefaultOutput)) {
+		if (fIsDefaultInput && fIsVideo)
+			icon = &fIcons->camIcon;
+		else if (fIsDefaultInput && !fIsVideo)
+			icon = &fIcons->micIcon;
+
+		owner->SetDrawingMode(B_OP_OVER);
 		owner->DrawBitmap(icon, iconFrame);
 		owner->SetDrawingMode(B_OP_COPY);
 	}
+
 	iconFrame.OffsetBy(16, 0);
 	if (fIsDefaultInput || fIsDefaultOutput || fIsAudioMixer) {
 		if (fIsAudioMixer)
-			index = 1;
+			icon = &fIcons->mixerIcon;
 		else if (fIsDefaultOutput) {
 			if (fIsVideo)
-				index = 5;
+				icon = &fIcons->tvIcon;
 			else
-				index = 3;
+				icon = &fIcons->speakerIcon;
 		} else {
 			if (fIsVideo)
-				index = 4;
+				icon = &fIcons->camIcon;
 			else
-				index = 2;
+				icon = &fIcons->speakerIcon;
 		}
 		owner->SetDrawingMode(B_OP_OVER);
-		BBitmap* icon = static_cast<BBitmap*>(fIcons->ItemAt(index));
 		owner->DrawBitmap(icon, iconFrame);
 		owner->SetDrawingMode(B_OP_COPY);
 	}
@@ -159,7 +157,7 @@ MediaListItem::SetAudioMixer(bool isAudioMixer)
 void 
 MediaListItem::Update(BView* owner, const BFont* finfo)
 {
-	// we need to override the update method so we can make sure are
+	// we need to override the update method so we can make sure our
 	// list item size doesn't change
 	BListItem::Update(owner, finfo);
 	if ((Height() < 16 + kITEM_MARGIN)) {
@@ -172,9 +170,9 @@ int
 MediaListItem::Compare(const void* firstArg, const void* secondArg)
 {
 	const MediaListItem* item1
-		= *static_cast<const MediaListItem * const *>(firstArg);
+		= *static_cast<const MediaListItem* const*>(firstArg);
 	const MediaListItem* item2
-		= *static_cast<const MediaListItem * const *>(secondArg);
+		= *static_cast<const MediaListItem* const*>(secondArg);
 
 	if (item1->fIsVideo != item2->fIsVideo)
 		return item1->fIsVideo ? 1 : -1;

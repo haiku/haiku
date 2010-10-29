@@ -25,15 +25,17 @@
 
 #include <ObjectList.h>
 
-#include "MediaViews.h"
-#include "MediaListItem.h"
 #include "MediaAlert.h"
+#include "MediaIcons.h"
+#include "MediaListItem.h"
+#include "MediaViews.h"
 
 
 #define SETTINGS_FILE "MediaPrefs Settings"
 
 
 class BSeparatorView;
+// struct dormant_node_info;
 
 
 class MediaWindow : public BWindow
@@ -81,7 +83,9 @@ private:
 			NodeList			fVideoInputs;
 			NodeList			fVideoOutputs;
 	
-			BList				fIcons;
+			MediaIcons			fIcons;
+
+
 			MediaAlert*			fAlert;
 			status_t			fInitCheck;
 };

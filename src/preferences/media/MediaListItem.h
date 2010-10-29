@@ -20,13 +20,16 @@
 #include <MediaAddOn.h>
 
 
+class MediaIcons;
+
+
 class MediaListItem : public BListItem {
 public:
 								MediaListItem(dormant_node_info* info,
-									uint32 level, bool isVideo, BList* icons,
-									uint32 modifiers=0);
+									uint32 level, bool isVideo,
+									MediaIcons* icons, uint32 modifiers = 0);
 								MediaListItem(const char* label, uint32 level,
-									bool isVideo, BList* icons,
+									bool isVideo, MediaIcons* icons,
 									uint32 modifiers=0);
 	virtual						~MediaListItem();
 
@@ -60,7 +63,7 @@ private:
 			bool				fIsDefaultInput;
 			bool				fIsDefaultOutput;
 			//dormant_node_info	fNodeInfo;
-			BList*				fIcons;
+			MediaIcons*			fIcons;
 };
 
 #endif	/* __MEDIALISTITEM_H__ */

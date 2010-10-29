@@ -21,7 +21,8 @@
 
 Media::Media() 
 	:
-	BApplication("application/x-vnd.Haiku-Media")
+	BApplication("application/x-vnd.Haiku-Media"),
+	fWindow(NULL)
 {
 	BRect rect(32, 64, 637, 462);
 

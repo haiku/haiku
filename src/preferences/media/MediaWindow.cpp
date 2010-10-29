@@ -23,6 +23,7 @@
 #include <Locale.h>
 #include <MediaRoster.h>
 #include <MediaTheme.h>
+#include <Resources.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
@@ -32,8 +33,7 @@
 #include <String.h>
 #include <TextView.h>
 
-// Images
-#include "iconfile.h"
+#include "MediaIcons.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -42,6 +42,7 @@
 
 const uint32 ML_SELECTED_NODE = 'MlSN';
 const uint32 ML_INIT_MEDIA = 'MlIM';
+
 
 // MediaWindow - Constructor
 MediaWindow::MediaWindow(BRect frame)
@@ -54,6 +55,7 @@ MediaWindow::MediaWindow(BRect frame)
 	fAudioOutputs(5, true),
 	fVideoInputs(5, true),
 	fVideoOutputs(5, true),
+	fIcons(),
 	fAlert(NULL),
 	fInitCheck(B_OK)
 {
@@ -183,32 +185,8 @@ MediaWindow::_EmptyNodeLists()
 
 
 void
-MediaWindow::InitWindow(void)
+MediaWindow::InitWindow()
 {
-	// Bitmaps
-	BRect iconRect(0, 0, 15, 15);
-	BBitmap* icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kDevicesBits, kDevicesWidth * kDevicesHeight, 0,
-			kDevicesColorSpace);
-	fIcons.AddItem(icon);
-	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kMixerBits, kMixerWidth * kMixerHeight, 0,
-			kMixerColorSpace);
-	fIcons.AddItem(icon);
-	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kMicBits, kMicWidth * kMicHeight, 0, kMicColorSpace);
-	fIcons.AddItem(icon);
-	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kSpeakerBits, kSpeakerWidth * kSpeakerHeight, 0,
-			kSpeakerColorSpace);
-	fIcons.AddItem(icon);
-	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kCamBits, kCamWidth * kCamHeight, 0, kCamColorSpace);
-	fIcons.AddItem(icon);
-	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kTVBits, kTVWidth * kTVHeight, 0, kTVColorSpace);
-	fIcons.AddItem(icon);
-
 	const float scrollWidth = 9 * be_plain_font->Size() + 30;
 
 	fListView = new BListView("media_list_view");

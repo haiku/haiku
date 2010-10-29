@@ -1,3 +1,4 @@
+#include "IconHandles.h"
 
 resource app_signature "application/x-vnd.Haiku-Media";
 
@@ -13,7 +14,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Media", 
-	long_info  = "Media ©2003-2009 Haiku"
+	long_info  = "Media ©2003-2010 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
@@ -41,3 +42,122 @@ resource vector_icon {
 	$"040A07010920372A0A08010A20372A0A09010B20372A"
 };
 
+
+resource(devices_icon) #'CLRB' array {
+	$"ffff0000ffffffffffffffffffffffff"
+	$"ffff009f2929ffffffffffffffffffff"
+	$"ffff0070379f0129ffffffffffffffff"
+	$"ffff01fafa773ab72929ffffffffffff"
+	$"ffff00913e91dc779797290000ffffff"
+	$"ffff00907f71fa6bfa7197071329ffff"
+	$"ffff0071706bfacb6b3e081400ffffff"
+	$"ffff006b45fafaaafa71051129ffffff"
+	$"ffff004be53c777171fa061129ffffff"
+	$"ffff0091fab7713c7770071200ffffff"
+	$"ffff2900fa516b3afafa061229ffffff"
+	$"ffffff290097f951fa97081601ffffff"
+	$"ffffffffff290097fa06071600ffffff"
+	$"ffffffffffffff290000061600ffffff"
+	$"ffffffffffffffffffff000d00ffffff"
+	$"ffffffffffffffffffffff00ffffffff"
+};
+
+
+resource(mixer_icon) #'CLRB' array {
+	$"ffffffffffff00ffffffffffffffffff"
+	$"ffffffffff00170000ffffffffffffff"
+	$"ffffffff001717183f0000ffffffffff"
+	$"ffffff0017173118003f3f0000ffffff"
+	$"ffff001717183f171700003f3f0000ff"
+	$"ff0017173118003f3f17170000181700"
+	$"001718173f171700003f3f1717180a00"
+	$"003f3117003f3f1717000018170b0400"
+	$"0017183f3f00003f3f1717180a050a00"
+	$"00111118173f3f000017170b040b000f"
+	$"000404111118173f3f170b040a000fff"
+	$"0011110404111117180a050a000fffff"
+	$"ff000011110404110b040b000effffff"
+	$"ffffff0000111104040b000fffffffff"
+	$"ffffffffff0000110a000fffffffffff"
+	$"ffffffffffffff00000effffffffffff"
+};
+
+
+resource(tv_icon) #'CLRB' array {
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffff00ffffffffffffff"
+	$"ffff06060506ffff00ffff00ffffffff"
+	$"ff053f3f1e17050600ff00ffffffffff"
+	$"ff043f3f1d1e1d190000ffffffffffff"
+	$"ff0513143f3f1e1e00060600ffffffff"
+	$"ff0511d50c133f3f1e1e1e01ffffffff"
+	$"ff0511d5600c0a153f3f1601ffffffff"
+	$"ff0511d5606086d515170c03ffffffff"
+	$"ff0511d5606086d360190f03ffffffff"
+	$"ff0511d38686862360190f03ffffffff"
+	$"ff00151c1d3fd3d36019100511ffffff"
+	$"ffff020211193f3f60161105111111ff"
+	$"ffffffff0202111a201512051111ffff"
+	$"ffffffffffff0202122a0f0011ffffff"
+	$"ffffffffffffffff02050011ffffffff"
+};
+
+
+resource(cam_icon) #'CLRB' array {
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffff0000ffffffffffff0000ffffff"
+	$"ff00001b1c00ffffff00013f1b01ffff"
+	$"003f1c1a0100ff00001a1c1c3f0f00ff"
+	$"0015153f1c1b021c1c1c3f0f0f0f00ff"
+	$"ff000015153f3f3f3f0f0f0f0f0f00ff"
+	$"ffffff00000a150a0f0f0f0f0f0f00ff"
+	$"ff05050500140b0a0f0f0f0f0f00ffff"
+	$"02021c0e000707070f0f0f0f06000f0f"
+	$"0015063f050707070f0f0600000f0f0f"
+	$"0006063f050707070f00000f0f0fffff"
+	$"02020202057b0700000f0f0fffffffff"
+	$"ff000005ff00000f0f0fffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+};
+
+
+resource(mic_icon) #'CLRB' array {
+	$"ffffffffff000000ffffffffffffffff"
+	$"ffffffff031919190000ffffffffffff"
+	$"ffffffff00091219190f00ffffffffff"
+	$"ffffffff00191912090f0f00ffffffff"
+	$"ffffffff0009121919050f00ffffffff"
+	$"ffffff0209191909050f0f00ffffffff"
+	$"ffffff00191212190f050f00ffffffff"
+	$"ffffff0009191909050f00ffffffffff"
+	$"ffffff00191209190f0f00ffffffffff"
+	$"ffffffff00191909050f00ffffffffff"
+	$"ffffffffff00080c0800ffffffffffff"
+	$"ffffffffffff000c00ffffffffffffff"
+	$"ffffff0000003f0c090000000f0fffff"
+	$"ffff003f1c1c190f0f090909000f0fff"
+	$"ffff00001c1c19140f0f0900000f0fff"
+	$"ffffffff000000000000030f0f0fffff"
+};
+
+
+resource(speaker_icon) #'CLRB' array {
+	$"ffffffffff000000ffffffffffffffff"
+	$"ffffffff003f1c1c0000ffffffffffff"
+	$"ffffff003f1c1c1c1c1c0000ffffffff"
+	$"ffff003f3f1c1c1c1c1c1c1100ffffff"
+	$"ffff0017183f3f1c1c1c110f00ffffff"
+	$"ffff00171718173f3f110f0f00ffffff"
+	$"ffff001100000017110f0f0f00ffffff"
+	$"ffff000008090011110f0f0f00ffffff"
+	$"ffff0000080f0b08110f0f0f00ffffff"
+	$"ffff0011000a0f09110f0f0f00ffffff"
+	$"ffff001711080911110f0f0f00ffffff"
+	$"ffff001717171717110f0f0f000fffff"
+	$"ffff000017172d18110f0f000f0fffff"
+	$"ffffffff00001717110f000f0fffffff"
+	$"ffffffffffff000011000f0fffffffff"
+	$"ffffffffffffffff000f0fffffffffff"
+};
