@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons index_server FullText ;
+SubDir HAIKU_TOP src add-ons index_server fulltext ;
 
 UsePrivateHeaders index_server shared ;
 
@@ -17,7 +17,7 @@ Includes [ FGristFiles $(sources) ] : $(HAIKU_CLUCENE_HEADERS_DEPENDENCY) ;
 Addon FullTextAnalyser :
 	$(sources)
 	:
-	be translation $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
+	be $(HAIKU_CLUCENE_LIBS) $(TARGET_LIBSTDC++)
 ;
 
 SEARCH on [ FGristFiles IndexServerAddOn.cpp ]

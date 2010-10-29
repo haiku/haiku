@@ -1,0 +1,23 @@
+SubDir HAIKU_TOP src add-ons index_server audiotags ;
+
+UsePrivateHeaders index_server shared ;
+
+local sources =
+	AudioTagAnalyser.cpp
+
+	IndexServerAddOn.cpp
+	;
+
+SubDirSysHdrs $(HAIKU_TAGLIB_HEADERS) ;
+Includes [ FGristFiles $(sources) ] : $(HAIKU_TAGLIB_HEADERS_DEPENDENCY) ;
+		# Dependency needed to trigger downloading/unzipping the package before
+		# compiling the files.
+
+Addon AudioTagAnalyser :
+	$(sources)
+	:
+	be $(HAIKU_TAGLIB_LIBS) $(TARGET_LIBSTDC++)
+	;
+
+SEARCH on [ FGristFiles IndexServerAddOn.cpp ]
+	+= [ FDirName $(SUBDIR) $(DOTDOT) ] ;

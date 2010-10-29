@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src add-ons index_server ;
 
-SubInclude HAIKU_TOP src add-ons index_server FullText ;
+SubInclude HAIKU_TOP src add-ons index_server fulltext ;
+SubInclude HAIKU_TOP src add-ons index_server audiotags ;
