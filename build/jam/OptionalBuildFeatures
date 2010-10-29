@@ -206,3 +206,47 @@ if $(HAIKU_BUILD_FEATURE_CLUCENE) {
 			= [ FDirName $(HAIKU_CLUCENE_DIR) common include ] ;
 	}
 }
+
+
+# TagLib
+
+# Automatically install the TagLib feature, when the optional TagLib optional
+# package is enabled.
+if [ IsOptionalHaikuImagePackageAdded TagLib ] {
+	HAIKU_BUILD_FEATURE_TAGLIB = 1 ;
+}
+
+local baseURL = http://haiku-files.org/files/optional-packages ;
+HAIKU_TAGLIB_PACKAGE = taglib-1.6.3-r1a2-x86-gcc2-2010-04-25.zip ;
+HAIKU_TAGLIB_URL = $(baseURL)/$(HAIKU_TAGLIB_PACKAGE) ;
+
+if $(HAIKU_BUILD_FEATURE_TAGLIB) {
+	if $(TARGET_ARCH) != x86 {
+		Echo "TagLib build feature not available for $(TARGET_ARCH)" ;
+	} else {
+		# Download the zip archive.
+		local zipFile = [ DownloadFile $(HAIKU_TAGLIB_PACKAGE)
+			: $(HAIKU_TAGLIB_URL) ] ;
+
+		# zip file and output directory
+		HAIKU_TAGLIB_ZIP_FILE = $(zipFile) ;
+		HAIKU_TAGLIB_DIR = [ FDirName $(HAIKU_OPTIONAL_BUILD_PACKAGES_DIR)
+			$(HAIKU_TAGLIB_PACKAGE:B) ] ;
+
+		# extract headers and libraries
+		HAIKU_TAGLIB_HEADERS_DEPENDENCY = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
+			: common/include/ : $(zipFile)
+		] ;
+
+		HAIKU_TAGLIB_LIBS = [ ExtractArchive $(HAIKU_TAGLIB_DIR)
+			:
+			common/lib/libtag.so
+			common/lib/libtag_c.so
+			: $(zipFile)
+		] ;
+
+		HAIKU_TAGLIB_HEADERS
+			= [ FDirName $(HAIKU_TAGLIB_DIR) common include taglib ] ;
+	}
+}
+

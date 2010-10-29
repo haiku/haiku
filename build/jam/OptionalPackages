@@ -75,6 +75,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Sed						- the ultimate stream editor
 #	SQLite					- the database implementation
 #	Subversion				- the version control system
+#	TagLib					- id3 tag library
 #	Tar						- archiving utility
 #	TimGMSoundFont			- a good quality General MIDI Sound Font
 #	TrackerNewTemplates		- template files for Tracker's New menu
@@ -1412,6 +1413,24 @@ if [ IsOptionalHaikuImagePackageAdded Subversion ] {
 			:
 			: true
 		;
+	}
+}
+
+
+# TagLib
+if [ IsOptionalHaikuImagePackageAdded TagLib ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package TagLib available for $(TARGET_ARCH)" ;
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+			Echo "No optional package TagLib available for $(TARGET_ARCH)-gcc4" ;
+		} else {
+			InstallOptionalHaikuImagePackage
+				taglib-1.6.3-r1a2-x86-gcc2-2010-04-25.zip
+				: $(baseURL)/taglib-1.6.3-r1a2-x86-gcc2-2010-04-25.zip
+				:
+			;
+		}
 	}
 }
 
