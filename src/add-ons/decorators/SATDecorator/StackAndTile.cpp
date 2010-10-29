@@ -130,6 +130,9 @@ StackAndTile::MouseDown(Window* window, BMessage* message, const BPoint& where)
 	if (!satWindow || !satWindow->GetDecorator())
 		return;
 
+	// we are only interested in single clicks
+	if (message->FindInt32("clicks") == 2)
+		return;
 	int32 modifiers = message->FindInt32("modifiers");
 	int32 buttons = message->FindInt32("buttons");
 	click_type clickArea = satWindow->GetDecorator()->MouseAction(message,
