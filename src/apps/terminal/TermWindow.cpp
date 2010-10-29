@@ -744,9 +744,6 @@ TermWindow::_SetTermColors(TermViewContainerView* containerView)
 
 	termView->SetSelectColor(handler->getRGB(PREF_SELECT_FORE_COLOR),
 		handler->getRGB(PREF_SELECT_BACK_COLOR));
-
-	termView->SetCursorColor(handler->getRGB(PREF_CURSOR_FORE_COLOR),
-		handler->getRGB(PREF_CURSOR_BACK_COLOR));
 }
 
 

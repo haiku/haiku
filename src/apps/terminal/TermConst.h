@@ -103,8 +103,6 @@ const char* const PREF_TEXT_FORE_COLOR = "Text";
 const char* const PREF_TEXT_BACK_COLOR = "Background";
 const char* const PREF_SELECT_FORE_COLOR = "Selected text";
 const char* const PREF_SELECT_BACK_COLOR = "Selected background";
-const char* const PREF_CURSOR_FORE_COLOR = "Cursor text";
-const char* const PREF_CURSOR_BACK_COLOR = "Cursor background";
 
 const char* const PREF_IM_FORE_COLOR = "IM foreground color";
 const char* const PREF_IM_BACK_COLOR = "IM background color";

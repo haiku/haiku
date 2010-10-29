@@ -44,8 +44,6 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_TEXT_BACK_COLOR,		"255, 255, 255" },
 	{ PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
 	{ PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
-	{ PREF_CURSOR_FORE_COLOR,	"255, 255, 255" },
-	{ PREF_CURSOR_BACK_COLOR,	"  0,   0,   0" },
 
 	{ PREF_IM_FORE_COLOR,		"  0,   0,   0" },
 	{ PREF_IM_BACK_COLOR,		"152, 203, 255" },
@@ -423,8 +421,6 @@ PrefHandler::_LoadFromFile(const char* path)
 	setString(PREF_HALF_FONT_STYLE, font_style);
 	setRGB(PREF_TEXT_BACK_COLOR, prefs.bg);
 	setRGB(PREF_TEXT_FORE_COLOR, prefs.fg);
-	setRGB(PREF_CURSOR_BACK_COLOR, prefs.curbg);
-	setRGB(PREF_CURSOR_FORE_COLOR, prefs.curfg);
 	setRGB(PREF_SELECT_BACK_COLOR, prefs.selbg);
 	setRGB(PREF_SELECT_FORE_COLOR, prefs.selfg);
 	setString(PREF_TEXT_ENCODING, EncodingAsString(prefs.encoding));
