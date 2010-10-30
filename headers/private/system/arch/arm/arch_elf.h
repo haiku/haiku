@@ -27,7 +27,7 @@
 #define R_ARM_THM_XPC22         16
 #define R_ARM_COPY              20      /* Copy symbol at runtime */
 #define R_ARM_GLOB_DAT          21      /* Create GOT entry */
-#define R_ARM_JUMP_SLOT         22      /* Create PLT entry */
+#define R_ARM_JMP_SLOT          22      /* Create PLT entry */
 #define R_ARM_RELATIVE          23      /* Adjust by program base */
 #define R_ARM_GOTOFF            24      /* 32 bit offset to GOT */
 #define R_ARM_GOTPC             25      /* 32 bit PC relative offset to GOT */
