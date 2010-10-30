@@ -576,7 +576,7 @@ mmu_init(void)
 	gKernelArgs.physical_memory_range[0].size = highestRAMAddress - SDRAM_BASE;
 	gKernelArgs.num_physical_memory_ranges = 1;
 
-	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
+	gKernelArgs.physical_allocated_range[0].start = SDRAM_BASE;
 	gKernelArgs.physical_allocated_range[0].size = 0;
 	gKernelArgs.num_physical_allocated_ranges = 1;
 		// remember the start of the allocated physical pages
