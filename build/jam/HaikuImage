@@ -142,6 +142,7 @@ SYSTEM_ADD_ONS_MEDIA_PLUGINS = $(X86_ONLY)ffmpeg raw_decoder ;
 SYSTEM_ADD_ONS_PRINT = 
 	Canon\ LIPS3\ Compatible 
 	Canon\ LIPS4\ Compatible
+	Gutenprint
 	PCL5\ Compatible
 	PCL6\ Compatible
 	PDF\ Writer

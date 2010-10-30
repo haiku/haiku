@@ -1,0 +1,25 @@
+SubDir HAIKU_TOP src add-ons print drivers gutenprint ;
+
+SubDirSysHdrs [ FDirName $(HAIKU_TOP) src libs print libgutenprint include ] ; 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
+
+AddResources Gutenprint : Gutenprint.rdef ;
+
+Addon Gutenprint :
+	GPBand.cpp
+	GPBinding.cpp
+	GPCapabilities.cpp
+	GPCapabilityExtractor.cpp
+	GPData.cpp
+	GPDriver.cpp
+	GPJob.cpp
+	GPJobConfiguration.cpp
+	GPParameterVisitor.cpp
+	GPPrinterDriver.cpp
+	SelectPrinterDialog.cpp
+	: 
+	be 
+	libgutenprint.a 
+	libprint.a 
+	$(TARGET_LIBSTDC++)
+;
