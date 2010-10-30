@@ -251,11 +251,11 @@ Attribute::_Find(const char* name, int32 index)
 	// try to find it in the small data region
 	if (fInode->HasExtraAttributes() 
 		&& recursive_lock_lock(&fInode->SmallDataLock()) == B_OK) {
-		uint32 block;
-		fVolume->GetInodeBlock(fInode->ID(), block);
+		off_t blockNum;
+		fVolume->GetInodeBlock(fInode->ID(), blockNum);
 		
-		if (block != 0) {
-			fBlock.SetTo(block);
+		if (blockNum != 0) {
+			fBlock.SetTo(blockNum);
 			const uint8* start = fBlock.Block() 
 				+ fVolume->InodeBlockIndex(fInode->ID()) * fVolume->InodeSize();
 			const uint8* end = start + fVolume->InodeSize();

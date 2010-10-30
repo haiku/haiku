@@ -91,8 +91,10 @@ ext2_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_FILE_SYSTEM;
-	partition->content_size = cookie->super_block.NumBlocks()
-		<< cookie->super_block.BlockShift();
+	partition->content_size = cookie->super_block.NumBlocks(
+		(cookie->super_block.CompatibleFeatures()
+			& EXT2_INCOMPATIBLE_FEATURE_64BIT) != 0)
+			<< cookie->super_block.BlockShift();
 	partition->block_size = 1UL << cookie->super_block.BlockShift();
 	partition->content_name = strdup(cookie->super_block.name);
 	if (partition->content_name == NULL)
@@ -491,19 +493,19 @@ ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 			uint32 blocksPerGroup = volume->BlocksPerGroup();
 			uint32 blockSize  = volume->BlockSize();
 			uint32 firstBlock = volume->FirstDataBlock();
-			uint32 start = 0;
+			off_t start = 0;
 			uint32 group = 0;
 			uint32 length;
 
 			TRACE("ioctl: blocks per group: %lu, block size: %lu, "
-				"first block: %lu, start: %lu, group: %lu\n", blocksPerGroup,
+				"first block: %lu, start: %llu, group: %lu\n", blocksPerGroup,
 				blockSize, firstBlock, start, group);
 
 			while (volume->AllocateBlocks(transaction, 1, 2048, group, start,
 					length) == B_OK) {
-				TRACE("ioctl: Allocated blocks in group %lu: %lu-%lu\n", group,
+				TRACE("ioctl: Allocated blocks in group %lu: %llu-%llu\n", group,
 					start, start + length);
-				uint32 blockNum = start + group * blocksPerGroup - firstBlock;
+				off_t blockNum = start + group * blocksPerGroup - firstBlock;
 
 				for (uint32 i = 0; i < length; ++i) {
 					uint8* block = cached.SetToWritable(transaction, blockNum);

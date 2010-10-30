@@ -231,9 +231,8 @@ Volume::~Volume()
 	if (fGroupBlocks != NULL) {
 		uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1)
 			/ fGroupsPerBlock;
-		for (uint32 i = 0; i < blockCount; i++) {
+		for (uint32 i = 0; i < blockCount; i++)
 			free(fGroupBlocks[i]);
-		}
 
 		free(fGroupBlocks);
 	}
@@ -303,16 +302,22 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	fBlockSize = 1UL << fSuperBlock.BlockShift();
 	fFirstDataBlock = fSuperBlock.FirstDataBlock();
 
-	fFreeBlocks = fSuperBlock.FreeBlocks();
+	fFreeBlocks = fSuperBlock.FreeBlocks(Has64bitFeature());
 	fFreeInodes = fSuperBlock.FreeInodes();
 
-	uint32 numBlocks = fSuperBlock.NumBlocks() - fFirstDataBlock;
+	off_t numBlocks = fSuperBlock.NumBlocks(Has64bitFeature()) - fFirstDataBlock;
 	uint32 blocksPerGroup = fSuperBlock.BlocksPerGroup();
 	fNumGroups = numBlocks / blocksPerGroup;
 	if (numBlocks % blocksPerGroup != 0)
 		fNumGroups++;
 
-	fGroupsPerBlock = fBlockSize / sizeof(ext2_block_group);
+	if (Has64bitFeature()) {
+		fGroupDescriptorSize = fSuperBlock.GroupDescriptorSize();
+		if (fGroupDescriptorSize < sizeof(ext2_block_group))
+			return B_ERROR;
+	} else
+		fGroupDescriptorSize = EXT2_BLOCK_GROUP_NORMAL_SIZE;
+	fGroupsPerBlock = fBlockSize / fGroupDescriptorSize;
 	fNumInodes = fSuperBlock.NumInodes();
 
 	TRACE("block size %ld, num groups %ld, groups per block %ld, first %lu\n",
@@ -320,11 +325,11 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	
 	uint32 blockCount = (fNumGroups + fGroupsPerBlock - 1) / fGroupsPerBlock;
 
-	fGroupBlocks = (ext2_block_group**)malloc(blockCount * sizeof(void*));
+	fGroupBlocks = (uint8**)malloc(blockCount * sizeof(uint8*));
 	if (fGroupBlocks == NULL)
 		return B_NO_MEMORY;
 
-	memset(fGroupBlocks, 0, blockCount * sizeof(void*));
+	memset(fGroupBlocks, 0, blockCount * sizeof(uint8*));
 	fInodesPerBlock = fBlockSize / InodeSize();
 
 	// check if the device size is large enough to hold the file system
@@ -452,7 +457,7 @@ Volume::Unmount()
 
 
 status_t
-Volume::GetInodeBlock(ino_t id, uint32& block)
+Volume::GetInodeBlock(ino_t id, off_t& block)
 {
 	ext2_block_group* group;
 	status_t status = GetBlockGroup((id - 1) / fSuperBlock.InodesPerGroup(),
@@ -460,7 +465,7 @@ Volume::GetInodeBlock(ino_t id, uint32& block)
 	if (status != B_OK)
 		return status;
 
-	block = group->InodeTable()
+	block = group->InodeTable(Has64bitFeature())
 		+ ((id - 1) % fSuperBlock.InodesPerGroup()) / fInodesPerBlock;
 	return B_OK;
 }
@@ -544,19 +549,18 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 		if (block == NULL)
 			return B_IO_ERROR;
 
-		ext2_block_group* groupBlock = (ext2_block_group*)malloc(fBlockSize);
-		if (groupBlock == NULL)
+		fGroupBlocks[blockIndex] = (uint8*)malloc(fBlockSize);
+		if (fGroupBlocks[blockIndex] == NULL)
 			return B_NO_MEMORY;
 
-		memcpy((uint8*)groupBlock, block, fBlockSize);
-
-		fGroupBlocks[blockIndex] = groupBlock;
+		memcpy(fGroupBlocks[blockIndex], block, fBlockSize);
 
 		TRACE("group [%ld]: inode table %ld\n", index,
 			(fGroupBlocks[blockIndex] + index % fGroupsPerBlock)->InodeTable());
 	}
 
-	*_group = fGroupBlocks[blockIndex] + index % fGroupsPerBlock;
+	*_group = (ext2_block_group*)(fGroupBlocks[blockIndex]
+		+ (index % fGroupsPerBlock) * fGroupDescriptorSize);
 	return B_OK;
 }
 
@@ -625,7 +629,7 @@ Volume::RemoveOrphan(Transaction& transaction, ino_t id)
 
 	CachedBlock cached(this);
 
-	uint32 blockNum;
+	off_t blockNum;
 	status_t status = GetInodeBlock(currentID, blockNum);
 	if (status != B_OK)
 		return status;
@@ -650,7 +654,7 @@ Volume::RemoveOrphan(Transaction& transaction, ino_t id)
 		return B_OK;
 
 	do {
-		uint32 lastBlockNum = blockNum;
+		off_t lastBlockNum = blockNum;
 		status = GetInodeBlock(currentID, blockNum);
 		if (status != B_OK)
 			return status;
@@ -720,7 +724,7 @@ Volume::FreeInode(Transaction& transaction, ino_t id, bool isDirectory)
 
 status_t
 Volume::AllocateBlocks(Transaction& transaction, uint32 minimum, uint32 maximum,
-	uint32& blockGroup, uint32& start, uint32& length)
+	uint32& blockGroup, off_t& start, uint32& length)
 {
 	TRACE("Volume::AllocateBlocks()\n");
 	if (IsReadOnly())
@@ -742,9 +746,9 @@ Volume::AllocateBlocks(Transaction& transaction, uint32 minimum, uint32 maximum,
 
 
 status_t
-Volume::FreeBlocks(Transaction& transaction, uint32 start, uint32 length)
+Volume::FreeBlocks(Transaction& transaction, off_t start, uint32 length)
 {
-	TRACE("Volume::FreeBlocks(%lu, %lu)\n", start, length);
+	TRACE("Volume::FreeBlocks(%llu, %lu)\n", start, length);
 	if (IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
@@ -776,7 +780,7 @@ Volume::LoadSuperBlock()
 	else
 		memcpy(&fSuperBlock, block, sizeof(fSuperBlock));
 
-	fFreeBlocks = fSuperBlock.FreeBlocks();
+	fFreeBlocks = fSuperBlock.FreeBlocks(Has64bitFeature());
 	fFreeInodes = fSuperBlock.FreeInodes();
 
 	return B_OK;
@@ -787,7 +791,7 @@ status_t
 Volume::WriteSuperBlock(Transaction& transaction)
 {
 	TRACE("Volume::WriteSuperBlock()\n");
-	fSuperBlock.SetFreeBlocks(fFreeBlocks);
+	fSuperBlock.SetFreeBlocks(fFreeBlocks, Has64bitFeature());
 	fSuperBlock.SetFreeInodes(fFreeInodes);
 	// TODO: Rest of fields that can be modified
 

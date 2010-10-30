@@ -16,16 +16,16 @@
 class CachedBlock {
 public:
 							CachedBlock(Volume* volume);
-							CachedBlock(Volume* volume, uint32 block);
+							CachedBlock(Volume* volume, off_t block);
 							~CachedBlock();
 
 			void			Keep();
 			void			Unset();
 
-			const uint8*	SetTo(uint32 block);
+			const uint8*	SetTo(off_t block);
 			uint8*			SetToWritable(Transaction& transaction, 
-								uint32 block, bool empty = false);
-			uint8*			SetToWritableWithoutTransaction(uint32 block,
+								off_t block, bool empty = false);
+			uint8*			SetToWritableWithoutTransaction(off_t block,
 								bool empty = false);
 
 			const uint8*	Block() const { return fBlock; }
@@ -36,12 +36,12 @@ private:
 							CachedBlock &operator=(const CachedBlock &);
 								// no implementation
 						
-			uint8*			_SetToWritableEtc(int32 transaction, uint32 block,
+			uint8*			_SetToWritableEtc(int32 transaction, off_t block,
 								bool empty);
 
 protected:
 			Volume*			fVolume;
-			uint32			fBlockNumber;
+			off_t			fBlockNumber;
 			uint8*			fBlock;
 };
 
@@ -60,7 +60,7 @@ CachedBlock::CachedBlock(Volume* volume)
 
 
 inline
-CachedBlock::CachedBlock(Volume* volume, uint32 block)
+CachedBlock::CachedBlock(Volume* volume, off_t block)
 	:
 	fVolume(volume),
 	fBlockNumber(0),
@@ -95,7 +95,7 @@ CachedBlock::Unset()
 
 
 inline const uint8 *
-CachedBlock::SetTo(uint32 block)
+CachedBlock::SetTo(off_t block)
 {
 	Unset();
 	fBlockNumber = block;
@@ -104,20 +104,20 @@ CachedBlock::SetTo(uint32 block)
 
 
 inline uint8*
-CachedBlock::SetToWritable(Transaction& transaction, uint32 block, bool empty)
+CachedBlock::SetToWritable(Transaction& transaction, off_t block, bool empty)
 {
 	return _SetToWritableEtc(transaction.ID(), block, empty);
 }
 
 
 inline uint8*
-CachedBlock::SetToWritableWithoutTransaction(uint32 block, bool empty)
+CachedBlock::SetToWritableWithoutTransaction(off_t block, bool empty)
 {
 	return _SetToWritableEtc((int32)-1, block, empty);
 }
 
 inline uint8*
-CachedBlock::_SetToWritableEtc(int32 transaction, uint32 block, bool empty)
+CachedBlock::_SetToWritableEtc(int32 transaction, off_t block, bool empty)
 {
 	Unset();
 	fBlockNumber = block;

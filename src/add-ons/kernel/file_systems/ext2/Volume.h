@@ -49,7 +49,8 @@ public:
 			uint32				NumGroups() const
 									{ return fNumGroups; }
 			off_t				NumBlocks() const
-									{ return fSuperBlock.NumBlocks(); }
+									{ return fSuperBlock.NumBlocks(
+										Has64bitFeature()); }
 			off_t				NumFreeBlocks() const
 									{ return fFreeBlocks; }
 			uint32				FirstDataBlock() const
@@ -65,7 +66,7 @@ public:
 									{ return fSuperBlock.InodesPerGroup(); }
 			ext2_super_block&	SuperBlock() { return fSuperBlock; }
 
-			status_t			GetInodeBlock(ino_t id, uint32& block);
+			status_t			GetInodeBlock(ino_t id, off_t& block);
 			uint32				InodeBlockIndex(ino_t id) const;
 			status_t			GetBlockGroup(int32 index,
 									ext2_block_group** _group);
@@ -77,6 +78,9 @@ public:
 			bool				IndexedDirectories() const
 									{ return (fSuperBlock.CompatibleFeatures()
 										& EXT2_FEATURE_DIRECTORY_INDEX) != 0; }
+			bool				Has64bitFeature() const
+									{ return (fSuperBlock.CompatibleFeatures()
+										& EXT2_INCOMPATIBLE_FEATURE_64BIT) != 0; }
 			uint8				DefaultHashVersion() const
 									{ return fSuperBlock.default_hash_version; }
 			bool				HugeFiles() const
@@ -96,10 +100,10 @@ public:
 
 			status_t			AllocateBlocks(Transaction& transaction,
 									uint32 minimum, uint32 maximum,
-									uint32& blockGroup, uint32& start,
+									uint32& blockGroup, off_t& start,
 									uint32& length);
 			status_t			FreeBlocks(Transaction& transaction,
-									uint32 start, uint32 length);
+									off_t start, uint32 length);
 
 			status_t			LoadSuperBlock();
 			status_t			WriteSuperBlock(Transaction& transaction);
@@ -122,6 +126,8 @@ private:
 	static	uint32				_UnsupportedReadOnlyFeatures(
 									ext2_super_block& superBlock);
 			uint32				_GroupDescriptorBlock(uint32 blockIndex);
+			uint16				_GroupDescriptorSize() 
+									{ return fGroupDescriptorSize; }
 
 private:
 			mutex				fLock;
@@ -142,11 +148,12 @@ private:
 
 			uint32				fNumInodes;
 			uint32				fNumGroups;
-			uint32				fFreeBlocks;
+			off_t				fFreeBlocks;
 			uint32				fFreeInodes;
 			uint32				fGroupsPerBlock;
-			ext2_block_group**	fGroupBlocks;
+			uint8**				fGroupBlocks;
 			uint32				fInodesPerBlock;
+			uint16				fGroupDescriptorSize;
 
 			void*				fBlockCache;
 			Inode*				fRootNode;

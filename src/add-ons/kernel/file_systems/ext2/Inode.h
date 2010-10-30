@@ -145,7 +145,6 @@ private:
 			uint32		fNodeSize;
 				// Inodes have a variable size, but the important
 				// information is always the same size (except in ext4)
-			ext2_xattr_header* fAttributesBlock;
 			status_t	fInitStatus;
 
 			mutable recursive_lock fSmallDataLock;

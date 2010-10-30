@@ -19,6 +19,7 @@
 #else
 #	define TRACE(x...) ;
 #endif
+#define ERROR(x...)	dprintf("\33[34mext2:\33[0m " x)
 
 
 DataStream::DataStream(Volume* volume, ext2_data_stream* stream,
@@ -51,12 +52,12 @@ DataStream::~DataStream()
 
 
 status_t
-DataStream::Enlarge(Transaction& transaction, uint32& numBlocks)
+DataStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 {
-	TRACE("DataStream::Enlarge(): current size: %lu, target size: %lu\n",
+	TRACE("DataStream::Enlarge(): current size: %llu, target size: %llu\n",
 		fNumBlocks, numBlocks);
 	
-	uint32 targetBlocks = numBlocks;
+	off_t targetBlocks = numBlocks;
 	fWaiting = _BlocksNeeded(numBlocks);
 	numBlocks = fWaiting;
 
@@ -65,41 +66,56 @@ DataStream::Enlarge(Transaction& transaction, uint32& numBlocks)
 	if (fNumBlocks <= kMaxDirect) {
 		status = _AddForDirectBlocks(transaction, targetBlocks);
 
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::Enlarge(): _AddForDirectBlocks() failed\n");
 			return status;
+		}
 
-		TRACE("DataStream::Enlarge(): current size: %lu, target size: %lu\n",
+		TRACE("DataStream::Enlarge(): current size: %llu, target size: %llu\n",
 			fNumBlocks, targetBlocks);
 	
 		if (fNumBlocks == targetBlocks)
 			return B_OK;
 	}
+
+	TRACE("DataStream::Enlarge(): indirect current size: %llu, target size: %llu\n",
+		fNumBlocks, targetBlocks);
 
 	if (fNumBlocks <= kMaxIndirect) {
 		status = _AddForIndirectBlock(transaction, targetBlocks);
 
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::Enlarge(): _AddForIndirectBlock() failed\n");
 			return status;
+		}
 
-		TRACE("DataStream::Enlarge(): current size: %lu, target size: %lu\n",
+		TRACE("DataStream::Enlarge(): current size: %llu, target size: %llu\n",
 			fNumBlocks, targetBlocks);
 	
 		if (fNumBlocks == targetBlocks)
 			return B_OK;
 	}
+
+	TRACE("DataStream::Enlarge(): indirect2 current size: %llu, target size: %llu\n",
+		fNumBlocks, targetBlocks);
 
 	if (fNumBlocks <= kMaxDoubleIndirect) {
 		status = _AddForDoubleIndirectBlock(transaction, targetBlocks);
 
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::Enlarge(): _AddForDoubleIndirectBlock() failed\n");
 			return status;
+		}
 
-		TRACE("DataStream::Enlarge(): current size: %lu, target size: %lu\n",
+		TRACE("DataStream::Enlarge(): current size: %llu, target size: %llu\n",
 			fNumBlocks, targetBlocks);
 	
 		if (fNumBlocks == targetBlocks)
 			return B_OK;
 	}
+
+	TRACE("DataStream::Enlarge(): indirect3 current size: %llu, target size: %llu\n",
+		fNumBlocks, targetBlocks);
 
 	TRACE("DataStream::Enlarge(): allocated: %lu, waiting: %lu\n", fAllocated,
 		fWaiting);
@@ -109,25 +125,27 @@ DataStream::Enlarge(Transaction& transaction, uint32& numBlocks)
 
 
 status_t
-DataStream::Shrink(Transaction& transaction, uint32& numBlocks)
+DataStream::Shrink(Transaction& transaction, off_t& numBlocks)
 {
-	TRACE("DataStream::Shrink(): current size: %lu, target size: %lu\n",
+	TRACE("DataStream::Shrink(): current size: %llu, target size: %llu\n",
 		fNumBlocks, numBlocks);
 
 	fFreeStart = 0;
 	fFreeCount = 0;
 	fRemovedBlocks = 0;
 
-	uint32 oldNumBlocks = fNumBlocks;
-	uint32 blocksToRemove = fNumBlocks - numBlocks;
+	off_t oldNumBlocks = fNumBlocks;
+	off_t blocksToRemove = fNumBlocks - numBlocks;
 
 	status_t status;
 
 	if (numBlocks < kMaxDirect) {
 		status = _RemoveFromDirectBlocks(transaction, numBlocks);
 
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::Shrink(): _RemoveFromDirectBlocks() failed\n");
 			return status;
+		}
 
 		if (fRemovedBlocks == blocksToRemove) {
 			fNumBlocks -= fRemovedBlocks;
@@ -140,8 +158,10 @@ DataStream::Shrink(Transaction& transaction, uint32& numBlocks)
 	if (numBlocks < kMaxIndirect) {
 		status = _RemoveFromIndirectBlock(transaction, numBlocks);
 
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::Shrink(): _RemoveFromIndirectBlock() failed\n");
 			return status;
+		}
 
 		if (fRemovedBlocks == blocksToRemove) {
 			fNumBlocks -= fRemovedBlocks;
@@ -154,8 +174,10 @@ DataStream::Shrink(Transaction& transaction, uint32& numBlocks)
 	if (numBlocks < kMaxDoubleIndirect) {
 		status = _RemoveFromDoubleIndirectBlock(transaction, numBlocks);
 
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::Shrink(): _RemoveFromDoubleIndirectBlock() failed\n");
 			return status;
+		}
 
 		if (fRemovedBlocks == blocksToRemove) {
 			fNumBlocks -= fRemovedBlocks;
@@ -167,8 +189,10 @@ DataStream::Shrink(Transaction& transaction, uint32& numBlocks)
 
 	status = _RemoveFromTripleIndirectBlock(transaction, numBlocks);
 
-	if (status != B_OK)
+	if (status != B_OK) {
+		ERROR("DataStream::Shrink(): _RemoveFromTripleIndirectBlock() failed\n");
 		return status;
+	}
 
 	fNumBlocks -= fRemovedBlocks;
 	numBlocks = _BlocksNeeded(oldNumBlocks);
@@ -178,10 +202,10 @@ DataStream::Shrink(Transaction& transaction, uint32& numBlocks)
 
 
 uint32
-DataStream::_BlocksNeeded(uint32 numBlocks)
+DataStream::_BlocksNeeded(off_t numBlocks)
 {
-	TRACE("DataStream::BlocksNeeded(): num blocks %lu\n", numBlocks);
-	uint32 blocksNeeded = 0;
+	TRACE("DataStream::BlocksNeeded(): num blocks %llu\n", numBlocks);
+	off_t blocksNeeded = 0;
 
 	if (numBlocks > fNumBlocks) {
 		blocksNeeded += numBlocks - fNumBlocks;
@@ -214,15 +238,15 @@ DataStream::_BlocksNeeded(uint32 numBlocks)
 		}
 	}
 
-	TRACE("DataStream::BlocksNeeded(): %lu\n", blocksNeeded);
+	TRACE("DataStream::BlocksNeeded(): %llu\n", blocksNeeded);
 	return blocksNeeded;
 }
 
 
 status_t
-DataStream::_GetBlock(Transaction& transaction, uint32& block)
+DataStream::_GetBlock(Transaction& transaction, uint32& blockNum)
 {
-	TRACE("DataStream::_GetBlock(): allocated: %lu, pos: %lu, waiting: %lu\n",
+	TRACE("DataStream::_GetBlock(): allocated: %lu, pos: %llu, waiting: %lu\n",
 		fAllocated, fAllocatedPos, fWaiting);
 
 	if (fAllocated == 0) {
@@ -232,18 +256,20 @@ DataStream::_GetBlock(Transaction& transaction, uint32& block)
 
 		status_t status = fVolume->AllocateBlocks(transaction, 1, fWaiting,
 			blockGroup, fAllocatedPos, fAllocated);
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::_GetBlock(): AllocateBlocks() failed()\n");
 			return status;
+		}
 
 		fWaiting -= fAllocated;
 		fAllocatedPos += fVolume->BlocksPerGroup() * blockGroup + fFirstBlock;
 
-		TRACE("DataStream::_GetBlock(): newAllocated: %lu, newpos: %lu,"
+		TRACE("DataStream::_GetBlock(): newAllocated: %lu, newpos: %llu,"
 			"newwaiting: %lu\n", fAllocated, fAllocatedPos, fWaiting);
 	}
 
 	fAllocated--;
-	block = fAllocatedPos++;
+	blockNum = (uint32)fAllocatedPos++;
 
 	return B_OK;
 }
@@ -258,8 +284,10 @@ DataStream::_PrepareBlock(Transaction& transaction, uint32* pos,
 
 	if (blockNum == 0) {
 		status_t status = _GetBlock(transaction, blockNum);
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::_PrepareBlock() _GetBlock() failed blockNum %ld\n", blockNum);
 			return status;
+		}
 
 		*pos = B_HOST_TO_LENDIAN_INT32(blockNum);
 		clear = true;
@@ -270,10 +298,10 @@ DataStream::_PrepareBlock(Transaction& transaction, uint32* pos,
 
 
 status_t
-DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 _count)
+DataStream::_AddBlocks(Transaction& transaction, uint32* block, off_t _count)
 {
-	uint32 count = _count;
-	TRACE("DataStream::_AddBlocks(): count: %lu\n", count);
+	off_t count = _count;
+	TRACE("DataStream::_AddBlocks(): count: %llu\n", count);
 
 	while (count > 0) {
 		uint32 blockNum;
@@ -292,10 +320,10 @@ DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 _count)
 
 
 status_t
-DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 start,
-	uint32 end, int recursion)
+DataStream::_AddBlocks(Transaction& transaction, uint32* block, off_t start,
+	off_t end, int recursion)
 {
-	TRACE("DataStream::_AddBlocks(): start: %lu, end %lu, recursion: %d\n",
+	TRACE("DataStream::_AddBlocks(): start: %llu, end %llu, recursion: %d\n",
 		start, end, recursion);
 
 	bool clear;
@@ -339,8 +367,10 @@ DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 start,
 	if (start % elementWidth != 0) {
 		status = _AddBlocks(transaction, &childBlock[elementPos],
 			start % elementWidth, elementWidth, recursion);
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::_AddBlocks() _AddBlocks() start failed\n");
 			return status;
+		}
 
 		elementPos++;
 	}
@@ -348,8 +378,10 @@ DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 start,
 	while (elementPos < endPos) {
 		status = _AddBlocks(transaction, &childBlock[elementPos], 0,
 			elementWidth, recursion);
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::_AddBlocks() _AddBlocks() mid failed\n");
 			return status;
+		}
 
 		elementPos++;
 	}
@@ -357,8 +389,10 @@ DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 start,
 	if (end % elementWidth != 0) {
 		status = _AddBlocks(transaction, &childBlock[elementPos], 0,
 			end % elementWidth, recursion);
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("DataStream::_AddBlocks() _AddBlocks() end failed\n");
 			return status;
+		}
 	}
 		
 	return B_OK;
@@ -368,7 +402,7 @@ DataStream::_AddBlocks(Transaction& transaction, uint32* block, uint32 start,
 status_t
 DataStream::_AddForDirectBlocks(Transaction& transaction, uint32 numBlocks)
 {
-	TRACE("DataStream::_AddForDirectBlocks(): current size: %lu, target size: "
+	TRACE("DataStream::_AddForDirectBlocks(): current size: %llu, target size: "
 		"%lu\n", fNumBlocks, numBlocks);
 	uint32* direct = &fStream->direct[fNumBlocks];
 	uint32 end = numBlocks > kMaxDirect ? kMaxDirect : numBlocks;
@@ -380,7 +414,7 @@ DataStream::_AddForDirectBlocks(Transaction& transaction, uint32 numBlocks)
 status_t
 DataStream::_AddForIndirectBlock(Transaction& transaction, uint32 numBlocks)
 {
-	TRACE("DataStream::_AddForIndirectBlocks(): current size: %lu, target "
+	TRACE("DataStream::_AddForIndirectBlocks(): current size: %llu, target "
 		"size: %lu\n", fNumBlocks, numBlocks);
 	uint32 *indirect = &fStream->indirect;
 	uint32 start = fNumBlocks - kMaxDirect;
@@ -397,7 +431,7 @@ status_t
 DataStream::_AddForDoubleIndirectBlock(Transaction& transaction,
 	uint32 numBlocks)
 {
-	TRACE("DataStream::_AddForDoubleIndirectBlock(): current size: %lu, "
+	TRACE("DataStream::_AddForDoubleIndirectBlock(): current size: %llu, "
 		"target size: %lu\n", fNumBlocks, numBlocks);
 	uint32 *doubleIndirect = &fStream->double_indirect;
 	uint32 start = fNumBlocks - kMaxIndirect;
@@ -414,7 +448,7 @@ status_t
 DataStream::_AddForTripleIndirectBlock(Transaction& transaction,
 	uint32 numBlocks)
 {
-	TRACE("DataStream::_AddForTripleIndirectBlock(): current size: %lu, "
+	TRACE("DataStream::_AddForTripleIndirectBlock(): current size: %llu, "
 		"target size: %lu\n", fNumBlocks, numBlocks);
 	uint32 *tripleIndirect = &fStream->triple_indirect;
 	uint32 start = fNumBlocks - kMaxDoubleIndirect;
@@ -446,9 +480,11 @@ DataStream::_PerformFree(Transaction& transaction)
 status_t
 DataStream::_MarkBlockForRemoval(Transaction& transaction, uint32* block)
 {
+	
 	TRACE("DataStream::_MarkBlockForRemoval(*(%p) = %lu): free start: %lu, "
-		"free count: %lu\n", block, *block, fFreeStart, fFreeCount);
-	uint32 blockNum = B_LENDIAN_TO_HOST_INT32(*block);	
+		"free count: %lu\n", block, B_LENDIAN_TO_HOST_INT32(*block), 
+		fFreeStart, fFreeCount);
+	uint32 blockNum = B_LENDIAN_TO_HOST_INT32(*block);
 	*block = 0;
 
 	if (blockNum != fFreeStart + fFreeCount) {
@@ -491,11 +527,11 @@ DataStream::_FreeBlocks(Transaction& transaction, uint32* block, uint32 _count)
 
 
 status_t
-DataStream::_FreeBlocks(Transaction& transaction, uint32* block, uint32 start,
-	uint32 end, bool freeParent, int recursion)
+DataStream::_FreeBlocks(Transaction& transaction, uint32* block, off_t start,
+	off_t end, bool freeParent, int recursion)
 {
 	// TODO: Designed specifically for shrinking. Perhaps make it more general?
-	TRACE("DataStream::_FreeBlocks(%p, %lu, %lu, %c, %d)\n",
+	TRACE("DataStream::_FreeBlocks(%p, %llu, %llu, %c, %d)\n",
 		block, start, end, freeParent ? 't' : 'f', recursion);
 
 	uint32 blockNum = B_LENDIAN_TO_HOST_INT32(*block);
@@ -567,10 +603,10 @@ DataStream::_FreeBlocks(Transaction& transaction, uint32* block, uint32 start,
 status_t
 DataStream::_RemoveFromDirectBlocks(Transaction& transaction, uint32 numBlocks)
 {
-	TRACE("DataStream::_RemoveFromDirectBlocks(): current size: %lu, "
+	TRACE("DataStream::_RemoveFromDirectBlocks(): current size: %llu, "
 		"target size: %lu\n", fNumBlocks, numBlocks);
 	uint32* direct = &fStream->direct[numBlocks];
-	uint32 end = fNumBlocks > kMaxDirect ? kMaxDirect : fNumBlocks;
+	off_t end = fNumBlocks > kMaxDirect ? kMaxDirect : fNumBlocks;
 
 	return _FreeBlocks(transaction, direct, end - numBlocks);
 }
@@ -579,11 +615,11 @@ DataStream::_RemoveFromDirectBlocks(Transaction& transaction, uint32 numBlocks)
 status_t
 DataStream::_RemoveFromIndirectBlock(Transaction& transaction, uint32 numBlocks)
 {
-	TRACE("DataStream::_RemoveFromIndirectBlock(): current size: %lu, "
+	TRACE("DataStream::_RemoveFromIndirectBlock(): current size: %llu, "
 		"target size: %lu\n", fNumBlocks, numBlocks);
 	uint32* indirect = &fStream->indirect;
-	uint32 start = numBlocks <= kMaxDirect ? 0 : numBlocks - kMaxDirect;
-	uint32 end = fNumBlocks - kMaxDirect;
+	off_t start = numBlocks <= kMaxDirect ? 0 : numBlocks - kMaxDirect;
+	off_t end = fNumBlocks - kMaxDirect;
 
 	if (end > kIndirectsPerBlock)
 		end = kIndirectsPerBlock;
@@ -598,11 +634,11 @@ status_t
 DataStream::_RemoveFromDoubleIndirectBlock(Transaction& transaction,
 	uint32 numBlocks)
 {
-	TRACE("DataStream::_RemoveFromDoubleIndirectBlock(): current size: %lu, "
+	TRACE("DataStream::_RemoveFromDoubleIndirectBlock(): current size: %llu, "
 		"target size: %lu\n", fNumBlocks, numBlocks);
 	uint32* doubleIndirect = &fStream->double_indirect;
-	uint32 start = numBlocks <= kMaxIndirect ? 0 : numBlocks - kMaxIndirect;
-	uint32 end = fNumBlocks - kMaxIndirect;
+	off_t start = numBlocks <= kMaxIndirect ? 0 : numBlocks - kMaxIndirect;
+	off_t end = fNumBlocks - kMaxIndirect;
 
 	if (end > kIndirectsPerBlock2)
 		end = kIndirectsPerBlock2;
@@ -617,12 +653,12 @@ status_t
 DataStream::_RemoveFromTripleIndirectBlock(Transaction& transaction,
 	uint32 numBlocks)
 {
-	TRACE("DataStream::_RemoveFromTripleIndirectBlock(): current size: %lu, "
+	TRACE("DataStream::_RemoveFromTripleIndirectBlock(): current size: %llu, "
 		"target size: %lu\n", fNumBlocks, numBlocks);
 	uint32* tripleIndirect = &fStream->triple_indirect;
-	uint32 start = numBlocks <= kMaxDoubleIndirect ? 0
+	off_t start = numBlocks <= kMaxDoubleIndirect ? 0
 		: numBlocks - kMaxDoubleIndirect;
-	uint32 end = fNumBlocks - kMaxDoubleIndirect;
+	off_t end = fNumBlocks - kMaxDoubleIndirect;
 
 	bool freeAll = start == 0;
 

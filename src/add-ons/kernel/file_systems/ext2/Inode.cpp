@@ -17,12 +17,16 @@
 #include "Utility.h"
 
 
+#undef ASSERT
 //#define TRACE_EXT2
 #ifdef TRACE_EXT2
 #	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
+#	define ASSERT(x) { if (!(x)) kernel_debugger("ext2: assert failed: " #x "\n"); }
 #else
 #	define TRACE(x...) ;
+#	define ASSERT(x) ;
 #endif
+#define ERROR(x...) dprintf("\33[34mext2:\33[0m " x)
 
 
 Inode::Inode(Volume* volume, ino_t id)
@@ -32,8 +36,7 @@ Inode::Inode(Volume* volume, ino_t id)
 	fCache(NULL),
 	fMap(NULL),
 	fCached(false),
-	fHasExtraAttributes(false),
-	fAttributesBlock(NULL)
+	fHasExtraAttributes(false)
 {
 	rw_lock_init(&fLock, "ext2 inode");
 	recursive_lock_init(&fSmallDataLock, "ext2 inode small data");
@@ -68,7 +71,6 @@ Inode::Inode(Volume* volume)
 	fCache(NULL),
 	fMap(NULL),
 	fCached(false),
-	fAttributesBlock(NULL),
 	fInitStatus(B_NO_INIT)
 {
 	rw_lock_init(&fLock, "ext2 inode");
@@ -89,12 +91,6 @@ Inode::~Inode()
 		TRACE("Deleting the file cache and file map\n");
 		file_cache_delete(FileCache());
 		file_map_delete(Map());
-	}
-
-	if (fAttributesBlock) {
-		TRACE("Returning the attributes block\n");
-		uint32 block = B_LENDIAN_TO_HOST_INT32(Node().file_access_control);
-		block_cache_put(fVolume->BlockCache(), block);
 	}
 
 	TRACE("Inode destructor: Done\n");
@@ -123,9 +119,9 @@ Inode::WriteLockInTransaction(Transaction& transaction)
 status_t
 Inode::WriteBack(Transaction& transaction)
 {
-	uint32 inodeBlock;
+	off_t blockNum;
 
-	status_t status = fVolume->GetInodeBlock(fID, inodeBlock);
+	status_t status = fVolume->GetInodeBlock(fID, blockNum);
 	if (status != B_OK)
 		return status;
 
@@ -136,19 +132,19 @@ Inode::WriteBack(Transaction& transaction)
 	}
 	
 	CachedBlock cached(fVolume);
-	uint8* inodeBlockData = cached.SetToWritable(transaction, inodeBlock);
+	uint8* inodeBlockData = cached.SetToWritable(transaction, blockNum);
 	if (inodeBlockData == NULL)
 		return B_IO_ERROR;
 
-	TRACE("Inode::WriteBack(): Inode ID: %d, inode block: %lu, data: %p, "
+	TRACE("Inode::WriteBack(): Inode ID: %lld, inode block: %llu, data: %p, "
 		"index: %lu, inode size: %lu, node size: %lu, this: %p, node: %p\n",
-		(int)fID, inodeBlock, inodeBlockData, fVolume->InodeBlockIndex(fID),
+		fID, blockNum, inodeBlockData, fVolume->InodeBlockIndex(fID),
 		fVolume->InodeSize(), fNodeSize, this, &fNode);
 	memcpy(inodeBlockData + 
 			fVolume->InodeBlockIndex(fID) * fVolume->InodeSize(),
 		(uint8*)&fNode, fNodeSize);
 
-	TRACE("Inode::WriteBack() finished\n");
+	TRACE("Inode::WriteBack() finished %ld\n", Node().stream.direct[0]);
 
 	return B_OK;
 }
@@ -157,16 +153,16 @@ Inode::WriteBack(Transaction& transaction)
 status_t
 Inode::UpdateNodeFromDisk()
 {
-	uint32 block;
+	off_t blockNum;
 
-	status_t status = fVolume->GetInodeBlock(fID, block);
+	status_t status = fVolume->GetInodeBlock(fID, blockNum);
 	if (status != B_OK)
 		return status;
 
-	TRACE("inode %Ld at block %lu\n", fID, block);
+	TRACE("inode %lld at block %llu\n", fID, blockNum);
 
 	CachedBlock cached(fVolume);
-	const uint8* inodeBlock = cached.SetTo(block);
+	const uint8* inodeBlock = cached.SetTo(blockNum);
 
 	if (inodeBlock == NULL)
 		return B_IO_ERROR;
@@ -238,6 +234,7 @@ Inode::FindBlock(off_t offset, uint32& block)
 	if (index < EXT2_DIRECT_BLOCKS) {
 		// direct blocks
 		block = B_LENDIAN_TO_HOST_INT32(Node().stream.direct[index]);
+		ASSERT(block != 0);
 	} else if ((index -= EXT2_DIRECT_BLOCKS) < perBlock) {
 		// indirect blocks
 		CachedBlock cached(fVolume);
@@ -247,6 +244,7 @@ Inode::FindBlock(off_t offset, uint32& block)
 			return B_IO_ERROR;
 
 		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index]);
+		ASSERT(block != 0);
 	} else if ((index -= perBlock) < perIndirectBlock) {
 		// double indirect blocks
 		CachedBlock cached(fVolume);
@@ -268,6 +266,7 @@ Inode::FindBlock(off_t offset, uint32& block)
 			block = B_LENDIAN_TO_HOST_INT32(
 				indirectBlocks[index & (perBlock - 1)]);
 		}
+		ASSERT(block != 0);
 	} else if ((index -= perIndirectBlock) / perBlock < perIndirectBlock) {
 		// triple indirect blocks
 		CachedBlock cached(fVolume);
@@ -300,13 +299,14 @@ Inode::FindBlock(off_t offset, uint32& block)
 					indirectBlocks[index & (perBlock - 1)]);
 			}
 		}
+		ASSERT(block != 0);
 	} else {
 		// Outside of the possible data stream
 		dprintf("ext2: block outside datastream!\n");
 		return B_ERROR;
 	}
 
-	TRACE("inode %Ld: FindBlock(offset %Ld): %lu\n", ID(), offset, block);
+	TRACE("inode %Ld: FindBlock(offset %lld): %lu\n", ID(), offset, block);
 	return B_OK;
 }
 
@@ -318,13 +318,13 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 	// set/check boundaries for pos/length
 	if (pos < 0) {
-		TRACE("inode %Ld: ReadAt failed(pos %Ld, length %lu)\n", ID(), pos,
+		ERROR("inode %lld: ReadAt failed(pos %lld, length %lu)\n", ID(), pos,
 			length);
 		return B_BAD_VALUE;
 	}
 
 	if (pos >= Size() || length == 0) {
-		TRACE("inode %Ld: ReadAt 0 (pos %Ld, length %lu)\n", ID(), pos, length);
+		TRACE("inode %lld: ReadAt 0 (pos %lld, length %lu)\n", ID(), pos, length);
 		*_length = 0;
 		return B_NO_ERROR;
 	}
@@ -337,8 +337,8 @@ status_t
 Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 	size_t* _length)
 {
-	TRACE("Inode::WriteAt(%lld, %p, *(%p) = %ld)\n", (long long)pos, buffer,
-		_length, (long)*_length);
+	TRACE("Inode::WriteAt(%lld, %p, *(%p) = %ld)\n", pos, buffer,
+		_length, *_length);
 	ReadLocker readLocker(fLock);
 
 	if (IsFileCacheDisabled())
@@ -398,8 +398,8 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 		return B_OK;
 	}
 
-	TRACE("Inode::WriteAt(): Performing write: %p, %d, %p, %d\n",
-		FileCache(), (int)pos, buffer, (int)*_length);
+	TRACE("Inode::WriteAt(): Performing write: %p, %ld, %p, %ld\n",
+		FileCache(), pos, buffer, *_length);
 	status_t status = file_cache_write(FileCache(), NULL, pos, buffer, _length);
 
 	WriteLockInTransaction(transaction);
@@ -413,7 +413,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 status_t
 Inode::FillGapWithZeros(off_t start, off_t end)
 {
-	TRACE("Inode::FileGapWithZeros(%ld - %ld)\n", (long)start, (long)end);
+	TRACE("Inode::FileGapWithZeros(%lld - %lld)\n", start, end);
 
 	while (start < end) {
 		size_t size;
@@ -424,8 +424,7 @@ Inode::FillGapWithZeros(off_t start, off_t end)
 			size = end - start;
 
 		TRACE("Inode::FillGapWithZeros(): Calling file_cache_write(%p, NULL, "
-			"%ld, NULL, &(%ld) = %p)\n", fCache, (long)start, (long)size,
-			&size);
+			"%lld, NULL, &(%lld) = %p)\n", fCache, start, size, &size);
 		status_t status = file_cache_write(fCache, NULL, start, NULL,
 			&size);
 		if (status != B_OK)
@@ -441,7 +440,7 @@ Inode::FillGapWithZeros(off_t start, off_t end)
 status_t
 Inode::Resize(Transaction& transaction, off_t size)
 {
-	TRACE("Inode::Resize(): size: %ld\n", (long)size);
+	TRACE("Inode::Resize() ID:%lld size: %lld\n", ID(), size);
 	if (size < 0)
 		return B_BAD_VALUE;
 
@@ -450,8 +449,7 @@ Inode::Resize(Transaction& transaction, off_t size)
 	if (size == oldSize)
 		return B_OK;
 
-	TRACE("Inode::Resize(): old size: %ld, new size: %ld\n", (long)oldSize,
-		(long)size);
+	TRACE("Inode::Resize(): old size: %lld, new size: %lld\n", oldSize, size);
 
 	status_t status;
 	if (size > oldSize) {
@@ -471,8 +469,7 @@ Inode::Resize(Transaction& transaction, off_t size)
 	file_cache_set_size(FileCache(), size);
 	file_map_set_size(Map(), size);
 
-	TRACE("Inode::Resize(): Writing back inode changes. Size: %ld\n",
-		(long)Size());
+	TRACE("Inode::Resize(): Writing back inode changes. Size: %lld\n", Size());
 
 	return WriteBack(transaction);
 }
@@ -779,8 +776,8 @@ Inode::EnableFileCache()
 		return B_OK;
 	}
 
-	TRACE("Inode::EnableFileCache(): Creating the file cache: %d, %d, %d\n",
-		(int)fVolume->ID(), (int)ID(), (int)Size());
+	TRACE("Inode::EnableFileCache(): Creating file cache: %ld, %ld, %lld\n",
+		fVolume->ID(), ID(), Size());
 	fCache = file_cache_create(fVolume->ID(), ID(), Size());
 	fMap = file_map_create(fVolume->ID(), ID(), Size());
 
@@ -876,13 +873,13 @@ Inode::_EnlargeDataStream(Transaction& transaction, off_t size)
 		return B_OK;
 	}
 
-	uint32 end = size == 0 ? 0 : (size - 1) / fVolume->BlockSize() + 1;
+	off_t end = size == 0 ? 0 : (size - 1) / fVolume->BlockSize() + 1;
 	DataStream stream(fVolume, &fNode.stream, oldSize);
 	stream.Enlarge(transaction, end);
 
-	TRACE("Inode::_EnlargeDataStream(): Setting size to %Ld\n", size);
+	TRACE("Inode::_EnlargeDataStream(): Setting size to %lld\n", size);
 	fNode.SetSize(size);
-	TRACE("Inode::_EnlargeDataStream(): Setting allocated block count to %lu\n",
+	TRACE("Inode::_EnlargeDataStream(): Setting allocated block count to %llu\n",
 		end);
 	return _SetNumBlocks(_NumBlocks() + end * (fVolume->BlockSize() / 512));
 }
@@ -910,7 +907,7 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 		return B_OK;
 	}
 
-	uint32 end = size == 0 ? 0 : (size - 1) / fVolume->BlockSize() + 1;
+	off_t end = size == 0 ? 0 : (size - 1) / fVolume->BlockSize() + 1;
 	DataStream stream(fVolume, &fNode.stream, oldSize);
 	stream.Shrink(transaction, end);
 

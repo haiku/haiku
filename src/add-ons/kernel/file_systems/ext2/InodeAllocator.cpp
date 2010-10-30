@@ -68,15 +68,19 @@ InodeAllocator::Free(Transaction& transaction, ino_t id, bool isDirectory)
 		numInodes = fVolume->NumInodes() - blockGroup * numInodes;
 
 	TRACE("InodeAllocator::Free(): Updating block group data\n");
-	group->SetFreeInodes(group->FreeInodes() + 1);
+	group->SetFreeInodes(group->FreeInodes(fVolume->Has64bitFeature()) + 1,
+		fVolume->Has64bitFeature());
 	if (isDirectory)
-		group->SetUsedDirectories(group->UsedDirectories() - 1);
+		group->SetUsedDirectories(
+			group->UsedDirectories(fVolume->Has64bitFeature()) - 1,
+			fVolume->Has64bitFeature());
 
 	status = fVolume->WriteBlockGroup(transaction, blockGroup);
 	if (status != B_OK)
 		return status;
 
-	return _UnmarkInBitmap(transaction, group->InodeBitmap(), numInodes, id);
+	return _UnmarkInBitmap(transaction,
+		group->InodeBitmap(fVolume->Has64bitFeature()), numInodes, id);
 }
 
 
@@ -97,17 +101,20 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 			if (status != B_OK)
 				return status;
 
-			uint32 freeInodes = group->FreeInodes();
+			uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
 			if (freeInodes != 0) {
-				group->SetFreeInodes(freeInodes - 1);
+				group->SetFreeInodes(freeInodes - 1, fVolume->Has64bitFeature());
 				if (isDirectory)
-					group->SetUsedDirectories(group->UsedDirectories() + 1);
+					group->SetUsedDirectories(group->UsedDirectories(
+						fVolume->Has64bitFeature()) + 1,
+						fVolume->Has64bitFeature());
 
 				status = fVolume->WriteBlockGroup(transaction, blockGroup);
 				if (status != B_OK)
 					return status;
 
-				return _MarkInBitmap(transaction, group->InodeBitmap(),
+				return _MarkInBitmap(transaction, 
+					group->InodeBitmap(fVolume->Has64bitFeature()),
 					blockGroup, fVolume->InodesPerGroup(), id);
 			}
 		}
@@ -119,11 +126,13 @@ InodeAllocator::_Allocate(Transaction& transaction, uint32 preferredBlockGroup,
 			if (status != B_OK)
 				return status;
 
-			uint32 freeInodes = group->FreeInodes();
-			if (group->FreeInodes() != 0) {
-				group->SetFreeInodes(freeInodes - 1);
+			uint32 freeInodes = group->FreeInodes(fVolume->Has64bitFeature());
+			if (freeInodes != 0) {
+				group->SetFreeInodes(freeInodes - 1,
+					fVolume->Has64bitFeature());
 
-				return _MarkInBitmap(transaction, group->InodeBitmap(),
+				return _MarkInBitmap(transaction, 
+					group->InodeBitmap(fVolume->Has64bitFeature()),
 					blockGroup, fVolume->NumInodes()
 						- blockGroup * fVolume->InodesPerGroup(), id);
 			}

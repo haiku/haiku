@@ -22,20 +22,20 @@ public:
 						off_t size);
 					~DataStream();
 
-	status_t		Enlarge(Transaction& transaction, uint32& numBlocks);
-	status_t		Shrink(Transaction& transaction, uint32& numBlocks);
+	status_t		Enlarge(Transaction& transaction, off_t& numBlocks);
+	status_t		Shrink(Transaction& transaction, off_t& numBlocks);
 
 private:
-	uint32			_BlocksNeeded(uint32 end);
+	uint32			_BlocksNeeded(off_t end);
 
 	status_t		_GetBlock(Transaction& transaction, uint32& block);
 	status_t		_PrepareBlock(Transaction& transaction, uint32* pos,
 						uint32& blockNum, bool& clear);
 
 	status_t		_AddBlocks(Transaction& transaction, uint32* block,
-						uint32 count);
+						off_t count);
 	status_t		_AddBlocks(Transaction& transaction, uint32* block,
-						uint32 start, uint32 end, int recursion);
+						off_t start, off_t end, int recursion);
 
 	status_t		_AddForDirectBlocks(Transaction& transaction,
 						uint32 numBlocks);
@@ -53,7 +53,7 @@ private:
 	status_t		_FreeBlocks(Transaction& transaction, uint32* block,
 						uint32 count);
 	status_t		_FreeBlocks(Transaction& transaction, uint32* block,
-						uint32 start, uint32 end, bool freeParent,
+						off_t start, off_t end, bool freeParent,
 						int recursion);
 
 	status_t		_RemoveFromDirectBlocks(Transaction& transaction,
@@ -80,13 +80,13 @@ private:
 	uint32			fFirstBlock;
 
 	uint32			fAllocated;
-	uint32			fAllocatedPos;
+	off_t			fAllocatedPos;
 	uint32			fWaiting;
 
 	uint32			fFreeStart;
 	uint32			fFreeCount;
 
-	uint32			fNumBlocks;
+	off_t			fNumBlocks;
 	uint32			fRemovedBlocks;
 };
 
