@@ -20,17 +20,12 @@ typedef struct {
 	int			mmu_type; 
 	int			platform; 
 	int			machine;  // platform specific machine type
-	bool			has_lpstop; //XXX: use bit flags
 	// architecture specific
 	uint64		cpu_frequency;
 	uint64		bus_frequency;
 	uint64		time_base_frequency;
         uint32  	phys_pgdir;
         uint32  	vir_pgdir;
-        uint32  	num_pgtables;
-        uint32  	pgtables[50];
-        uint32  	page_hole;
-
 } arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_ARM_KERNEL_ARGS_H */
