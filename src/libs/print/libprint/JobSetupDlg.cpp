@@ -119,7 +119,6 @@ const BaseCap *gDitherTypes[] = {
 enum {
 	kMsgRangeAll = 'JSdl',
 	kMsgRangeSelection,
-	kMsgPreview,
 	kMsgCancel,
 	kMsgOK,
 	kMsgQuality,
@@ -318,13 +317,15 @@ JobSetupView::AttachedToWindow()
 	fEvenNumberedPages = CreatePageSelectionItem("evenPages",
 		"Even-Numbered Pages", JobData::kEvenNumberedPages);
 
+	fPreview = new BCheckBox("preview", "Show preview before printing", NULL);
+	if (fJobData->getShowPreview())
+		fPreview->SetValue(B_CONTROL_ON);
+
 	// separator line
 	BBox *separator = new BBox("separator");
 	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
 
 	// buttons
-	BButton* preview = new BButton("preview", "Preview" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgPreview));
 	BButton* cancel = new BButton("cancel", "Cancel",
 		new BMessage(kMsgCancel));
 	BButton* ok = new BButton("ok", "OK", new BMessage(kMsgOK));
@@ -418,12 +419,12 @@ JobSetupView::AttachedToWindow()
 				.AddGlue()
 			.End()
 		.End()
+		.Add(fPreview)
 		.AddGlue()
 		.Add(separator)
 		.AddGroup(B_HORIZONTAL, 10, 1.0f)
 			.AddGlue()
 			.Add(cancel)
-			.Add(preview)
 			.Add(ok)
 		.End()
 		.SetInsets(0, 0, 0, 0)
@@ -732,9 +733,9 @@ JobSetupView::PaperSource()
 }
 
 bool 
-JobSetupView::UpdateJobData(bool showPreview)
+JobSetupView::UpdateJobData()
 {
-	fJobData->setShowPreview(showPreview);
+	fJobData->setShowPreview(fPreview->Value() == B_CONTROL_ON);
 	fJobData->setColor(Color());
 	if (IsHalftoneConfigurationNeeded()) {
 		fJobData->setGamma(Gamma());
@@ -820,8 +821,7 @@ JobSetupDlg::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 	case kMsgOK:
-	case kMsgPreview:
-		fJobSetup->UpdateJobData(message->what == kMsgPreview);
+		fJobSetup->UpdateJobData();
 		SetResult(B_NO_ERROR);
 		PostMessage(B_QUIT_REQUESTED);
 		break;

@@ -34,7 +34,7 @@ public:
 						const PrinterCap* printerCap);
 	virtual	void	AttachedToWindow();
 	virtual void	MessageReceived(BMessage* message);
-			bool	UpdateJobData(bool showPreview);
+			bool	UpdateJobData();
 
 private:
 			void	UpdateButtonEnabledState();
@@ -89,6 +89,7 @@ private:
 	BRadioButton*		fOddNumberedPages;
 	BRadioButton*		fEvenNumberedPages;
 	std::map<PrinterCap::CapID, BPopUpMenu*> fDriverSpecificLists;
+	BCheckBox*			fPreview;
 };
 
 class JobSetupDlg : public DialogWindow {
