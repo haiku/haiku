@@ -158,10 +158,10 @@ ProtocolClassCap::ID() const
 }
 
 
-DriverSpecificCap::DriverSpecificCap(const string& label, bool isDefault,
-	int32 category, Type type)
+DriverSpecificCap::DriverSpecificCap(const string& label, int32 category,
+	Type type)
 	:
-	BaseCap(label, isDefault),
+	BaseCap(label, false),
 	fCategory(category),
 	fType(type)
 {
@@ -172,6 +172,21 @@ int32
 DriverSpecificCap::ID() const
 {
 	return fCategory;
+}
+
+
+ListItemCap::ListItemCap(const string& label, bool isDefault, int32 id)
+	:
+	BaseCap(label, isDefault),
+	fID(id)
+{
+}
+
+
+int32
+ListItemCap::ID() const
+{
+	return fID;
 }
 
 
@@ -206,8 +221,9 @@ PrinterCap::getDefaultCap(CapID category) const
 }
 
 
+template<typename Predicate>
 const BaseCap*
-PrinterCap::findCap(CapID category, int id) const
+PrinterCap::findCap(CapID category, Predicate& predicate) const
 {
 	int count = countCap(category);
 	if (count <= 0)
@@ -215,32 +231,38 @@ PrinterCap::findCap(CapID category, int id) const
 
 	const BaseCap **base_cap = enumCap(category);
 	while (count--) {
-		if ((*base_cap)->ID() == id) {
+		if (predicate(*base_cap)) {
 			return *base_cap;
 		}
 		base_cap++;
 	}
 	return NULL;
+
+}
+
+const BaseCap*
+PrinterCap::findCap(CapID category, int id) const
+{
+	IDPredicate predicate(id);
+	return findCap(category, predicate);
 }
 
 
 const BaseCap*
 PrinterCap::findCap(CapID category, const char* label) const
 {
-	int count = countCap(category);
-	if (count <= 0)
-		return NULL;
-
-	const BaseCap **base_cap = enumCap(category);
-	while (count--) {
-		if ((*base_cap)->fLabel == label) {
-			return *base_cap;
-		}
-		base_cap++;
-	}
-	return NULL;
-
+	LabelPredicate predicate(label);
+	return findCap(category, predicate);
 }
+
+
+const BaseCap*
+PrinterCap::findCapWithKey(CapID category, const char* key) const
+{
+	KeyPredicate predicate(key);
+	return findCap(category, predicate);
+}
+
 
 int
 PrinterCap::getProtocolClass() const {

@@ -7,6 +7,8 @@
 #define __JOBSETUPDLG_H
 
 #include <View.h>
+#include <map>
+
 #include "DialogWindow.h"
 
 #include "JobData.h"
@@ -14,16 +16,17 @@
 #include "JSDSlider.h"
 #include "PrinterCap.h"
 
+class BCheckBox;
+class BGridLayout;
+class BPopUpMenu;
+class BRadioButton;
 class BTextControl;
 class BTextView;
-class BRadioButton;
-class BCheckBox;
-class BPopUpMenu;
-class JobData;
-class PrinterData;
-class PrinterCap;
 class HalftoneView;
+class JobData;
 class PagesView;
+class PrinterCap;
+class PrinterData;
 
 class JobSetupView : public BView {
 public:
@@ -37,6 +40,13 @@ private:
 			void	UpdateButtonEnabledState();
 			bool	IsHalftoneConfigurationNeeded();
 			void	CreateHalftoneConfigurationUI();
+			void	AddDriverSpecificSettings(BGridLayout* gridLayout, int row);
+			string	GetDriverSpecificValue(PrinterCap::CapID category,
+						const char* key);
+			template<typename Predicate>
+			void	FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+						const BaseCap** capabilities, int count,
+						Predicate& predicate);
 			void	FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
 						PrinterCap::CapID category, int id);
 			void	FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
@@ -78,6 +88,7 @@ private:
 	BRadioButton*		fAllPages;
 	BRadioButton*		fOddNumberedPages;
 	BRadioButton*		fEvenNumberedPages;
+	std::map<PrinterCap::CapID, BPopUpMenu*> fDriverSpecificLists;
 };
 
 class JobSetupDlg : public DialogWindow {

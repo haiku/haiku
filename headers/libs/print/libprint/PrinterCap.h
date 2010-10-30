@@ -117,7 +117,7 @@ struct DriverSpecificCap : public BaseCap {
 		};
 
 							DriverSpecificCap(const string& label,
-								bool isDefault, int32 category, Type type);
+								int32 category, Type type);
 
 			int32			ID() const;
 
@@ -125,6 +125,13 @@ struct DriverSpecificCap : public BaseCap {
 			Type			fType;
 };
 
+struct ListItemCap : public BaseCap {
+							ListItemCap(const string& label,
+								bool isDefault, int32 id);
+
+			int32			ID() const;
+			int32			fID;
+};
 
 class PrinterData;
 
@@ -142,7 +149,7 @@ public:
 		kBindingLocation,
 		kColor,
 		kProtocolClass,
-		kDriverSpecifcCapababilities,
+		kDriverSpecificCapabilities,
 
 		// Static boolean settings follow.
 		// For them isSupport() has to be implemented only.
@@ -151,7 +158,54 @@ public:
 						// for class Halftone?
 
 		// The driver specific generic capabilities start here
-		kDriverSpecificCapabablitiesBegin = 100
+		kDriverSpecificCapabilitiesBegin = 100
+	};
+
+	struct IDPredicate
+	{
+		IDPredicate(int id)
+			: fID(id)
+		{
+		}
+
+
+		bool operator()(const BaseCap* baseCap) {
+			return baseCap->ID() == fID;
+		}
+
+		int fID;
+	};
+
+	struct LabelPredicate
+	{
+		LabelPredicate(const char* label)
+			: fLabel(label)
+		{
+		}
+
+
+		bool operator()(const BaseCap* baseCap) {
+			return baseCap->fLabel == fLabel;
+		}
+
+		const char* fLabel;
+
+	};
+
+	struct KeyPredicate
+	{
+		KeyPredicate(const char* key)
+			: fKey(key)
+		{
+		}
+
+
+		bool operator()(const BaseCap* baseCap) {
+			return baseCap->fKey == fKey;
+		}
+
+		const char* fKey;
+
 	};
 
 	virtual	int				countCap(CapID category) const = 0;
@@ -160,18 +214,24 @@ public:
 			const BaseCap*	getDefaultCap(CapID category) const;
 			const BaseCap*	findCap(CapID category, int id) const;
 			const BaseCap*	findCap(CapID category, const char* label) const;
+			const BaseCap*	findCapWithKey(CapID category, const char* key)
+								const;
 
 			int				getProtocolClass() const;
 
 protected:
 							PrinterCap(const PrinterCap& printerCap);
 			PrinterCap&		operator=(const PrinterCap& printerCap);
+			template<typename Predicate>
+			const BaseCap*	findCap(CapID category, Predicate& predicate) const;
 
 			const PrinterData*	getPrinterData() const;
 
 private:
 			const PrinterData*	fPrinterData;
 };
+
+
 
 
 #endif	/* __PRINTERCAP_H */

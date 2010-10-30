@@ -10,6 +10,9 @@
 #include <GraphicsDefs.h>
 #include <Rect.h>
 
+#include <map>
+#include <string>
+
 #include "Halftone.h"
 #include "MarginView.h" // for MarginUnit
 
@@ -255,6 +258,7 @@ private:
 	Halftone::DitherType fDitherType;
 	PageSelection        fPageSelection;
 	MarginUnit  fMarginUnit;
+	map<string, string>	fDriverSpecificSettings;
 
 public:
 	JobData(BMessage *msg, const PrinterCap *cap, Settings settings);
@@ -355,6 +359,14 @@ public:
 	
 	MarginUnit getMarginUnit() const { return fMarginUnit; }
 	void setMarginUnit(MarginUnit marginUnit) { fMarginUnit = marginUnit; }
+
+	bool	HasDriverSpecificSetting(const string& category) const;
+	const string&	DriverSpecificSetting(const string& category) const;
+	void	SetDriverSpecificSetting(const string& category, const string& value);
+
+private:
+	void	SerializePrinterSpecificSettings(BString& serializedSettings);
+	void	DeserializePrinterSpecificSettings(BString& serializedSettings);
 };
 
 #endif	/* __JOBDATA_H */

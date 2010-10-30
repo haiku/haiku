@@ -17,6 +17,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <Debug.h>
 #include <GridView.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -257,7 +258,7 @@ JobSetupView::AttachedToWindow()
 	fNup = new BPopUpMenu("");
 	fNup->SetRadioMode(true);
 	FillCapabilityMenu(fNup, kMsgNone, gNups, sizeof(gNups) / sizeof(gNups[0]),
-		fJobData->getNup());
+		(int)fJobData->getNup());
 	BMenuField* pagesPerSheet = new BMenuField("pagesPerSheet",
 		"Pages Per Sheet:", fNup);
 
@@ -348,6 +349,8 @@ JobSetupView::AttachedToWindow()
 		qualityGridLayout->AddView(fGamma, 0, 2, 2);
 		qualityGridLayout->AddView(fInkDensity, 0, 3, 2);
 		qualityGridLayout->AddView(fHalftoneBox, 0, 4, 2);
+	} else {
+		AddDriverSpecificSettings(qualityGridLayout, 1);
 	}
 	qualityGridLayout->SetSpacing(0, 0);
 	qualityGridLayout->SetInsets(5, 5, 5, 5);
@@ -447,7 +450,7 @@ JobSetupView::CreateHalftoneConfigurationUI()
 	fDitherType->SetRadioMode(true);
 	FillCapabilityMenu(fDitherType, kMsgQuality, gDitherTypes,
 		sizeof(gDitherTypes) / sizeof(gDitherTypes[0]),
-		fJobData->getDitherType());
+		(int)fJobData->getDitherType());
 	fDitherMenuField = new BMenuField("dithering", "Dot Pattern:",
 		fDitherType);
 	fDitherType->SetTargetForItems(this);
@@ -489,17 +492,69 @@ JobSetupView::CreateHalftoneConfigurationUI()
 
 
 void
-JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
-	PrinterCap::CapID category, int id)
+JobSetupView::AddDriverSpecificSettings(BGridLayout* gridLayout, int row)
 {
-	int count = fPrinterCap->countCap(category);
-	const BaseCap **capabilities = fPrinterCap->enumCap(category);
-	FillCapabilityMenu(menu, message, capabilities, count, id);
+	if (!fPrinterCap->isSupport(PrinterCap::kDriverSpecificCapabilities))
+		return;
+
+	int count = fPrinterCap->countCap(PrinterCap::kDriverSpecificCapabilities);
+	const BaseCap** capabilities = fPrinterCap->enumCap(
+		PrinterCap::kDriverSpecificCapabilities);
+
+	for (int i = 0; i < count; i ++) {
+		const DriverSpecificCap* capability = static_cast<const DriverSpecificCap*>(
+			capabilities[i]);
+
+		const char* label = capability->fLabel.c_str();
+		BPopUpMenu* popUpMenu = new BPopUpMenu(label);
+		popUpMenu->SetRadioMode(true);
+
+		PrinterCap::CapID category = static_cast<PrinterCap::CapID>(
+			capability->ID());
+
+		const BaseCap** categoryCapabilities = fPrinterCap->enumCap(category);
+
+		int categoryCount = fPrinterCap->countCap(category);
+
+		string value = GetDriverSpecificValue(category, capability->Key());
+		PrinterCap::KeyPredicate predicate(value.c_str());
+
+		FillCapabilityMenu(popUpMenu, kMsgNone, categoryCapabilities,
+			categoryCount, predicate);
+
+		BString menuLabel = label;
+		menuLabel << ":";
+		BMenuField* menuField = new BMenuField(label, menuLabel.String(),
+			popUpMenu);
+		popUpMenu->SetTargetForItems(this);
+
+		gridLayout->AddItem(menuField->CreateLabelLayoutItem(),
+			0, row);
+		gridLayout->AddItem(menuField->CreateMenuBarLayoutItem(),
+			1, row);
+		row ++;
+
+		fDriverSpecificLists[category] = popUpMenu;
+	}
 }
 
+
+string
+JobSetupView::GetDriverSpecificValue(PrinterCap::CapID category,
+	const char* key)
+{
+	if (fJobData->HasDriverSpecificSetting(key))
+		return fJobData->DriverSpecificSetting(key);
+
+	const BaseCap* defaultCapability = fPrinterCap->getDefaultCap(category);
+	return defaultCapability->fKey;
+}
+
+
+template<typename Predicate>
 void
 JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
-	const BaseCap** capabilities, int count, int id)
+	const BaseCap** capabilities, int count, Predicate& predicate)
 {
 	bool marked = false;
 
@@ -523,7 +578,7 @@ JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
 			defaultItem = item;
 
 
-		if (capability->ID() == id) {
+		if (predicate(capability)) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -538,6 +593,26 @@ JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
 		defaultItem->SetMarked(true);
 	else if (firstItem != NULL)
 		firstItem->SetMarked(true);
+}
+
+
+void
+JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+	PrinterCap::CapID category, int id)
+{
+	PrinterCap::IDPredicate predicate(id);
+	int count = fPrinterCap->countCap(category);
+	const BaseCap **capabilities = fPrinterCap->enumCap(category);
+	FillCapabilityMenu(menu, message, capabilities, count, predicate);
+}
+
+
+void
+JobSetupView::FillCapabilityMenu(BPopUpMenu* menu, uint32 message,
+	const BaseCap** capabilities, int count, int id)
+{
+	PrinterCap::IDPredicate predicate(id);
+	FillCapabilityMenu(menu, message, capabilities, count, predicate);
 }
 
 
@@ -703,6 +778,18 @@ JobSetupView::UpdateJobData(bool showPreview)
 		pageSelection = JobData::kEvenNumberedPages;
 	fJobData->setPageSelection(pageSelection);
 	
+	std::map<PrinterCap::CapID, BPopUpMenu*>::iterator it =
+		fDriverSpecificLists.begin();
+	for(; it != fDriverSpecificLists.end(); it++) {
+		PrinterCap::CapID category = it->first;
+		BPopUpMenu* popUpMenu = it->second;
+		const char* key = fPrinterCap->findCap(
+			PrinterCap::kDriverSpecificCapabilities, (int)category)->Key();
+		const char* label = popUpMenu->FindMarked()->Label();
+		const char* value = fPrinterCap->findCap(category, label)->Key();
+		fJobData->SetDriverSpecificSetting(key, value);
+	}
+
 	fJobData->save();
 	return true;
 }

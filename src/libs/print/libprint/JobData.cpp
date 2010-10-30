@@ -3,9 +3,13 @@
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
  */
 
+#include "JobData.h"
+
 #include <InterfaceDefs.h>
 #include <Message.h>
-#include "JobData.h"
+
+#include <sstream>
+
 #include "PrinterCap.h"
 #include "DbgMsg.h"
 
@@ -39,6 +43,9 @@ static const char* kJDMarginUnit            = "JJJJ_margin_unit";
 static const char* kJDPhysicalRect          = "JJJJ_physical_rect";
 static const char* kJDScaledPhysicalRect    = "JJJJ_scaled_physical_rect";
 static const char* kJDResolution            = "JJJJ_resolution";
+static const char* kJDDriverSpecificSettings = "JJJJ_driverSpecificSettings";
+
+static const char* kDriverSpecificSettingsSeparator = ";";
 
 
 JobData::JobData(BMessage *msg, const PrinterCap *cap, Settings settings)
@@ -92,6 +99,7 @@ JobData::operator=(const JobData &job_data)
 	fMarginUnit            = job_data.fMarginUnit;
 	fPhysicalRect          = job_data.fPhysicalRect;
 	fScaledPhysicalRect    = job_data.fScaledPhysicalRect;
+	fDriverSpecificSettings = job_data.fDriverSpecificSettings;
 	return *this;
 }
 
@@ -288,6 +296,11 @@ JobData::load(BMessage *msg, const PrinterCap *cap, Settings settings)
 		fMarginUnit = (MarginUnit)msg->FindInt32(kJDMarginUnit);
 	else
 		fMarginUnit = kUnitInch;
+
+	BString serializedSettings;
+	if (msg->HasString(kJDDriverSpecificSettings))
+		msg->FindString(kJDDriverSpecificSettings, &serializedSettings);
+	DeserializePrinterSpecificSettings(serializedSettings);
 }
 
 
@@ -406,4 +419,77 @@ JobData::save(BMessage *msg)
 	msg->RemoveName(kJDPageSelection);
 	if (fSettings == kJobSettings)
 		msg->AddInt32(kJDPageSelection, fPageSelection);
+
+	msg->RemoveName(kJDDriverSpecificSettings);
+	if (fSettings == kJobSettings)
+	{
+		BString serializedSettings;
+		SerializePrinterSpecificSettings(serializedSettings);
+		msg->AddString(kJDDriverSpecificSettings, serializedSettings);
+	}
+}
+
+
+bool
+JobData::HasDriverSpecificSetting(const string& category) const
+{
+	return fDriverSpecificSettings.find(category) !=
+		fDriverSpecificSettings.end();
+}
+
+
+const string&
+JobData::DriverSpecificSetting(const string& category) const
+{
+	return fDriverSpecificSettings.find(category)->second;
+}
+
+
+void
+JobData::SetDriverSpecificSetting(const string& category, const string& value)
+{
+	fDriverSpecificSettings[category] = value;
+}
+
+
+void
+JobData::SerializePrinterSpecificSettings(BString& serializedSettings)
+{
+	bool first = true;
+	map<string, string>::iterator it = fDriverSpecificSettings.begin();
+	for (; it != fDriverSpecificSettings.end(); it++) {
+		if (first)
+			first = false;
+		else
+			serializedSettings << kDriverSpecificSettingsSeparator;
+
+		serializedSettings << it->first.c_str()
+			<< kDriverSpecificSettingsSeparator
+			<< it->second.c_str();
+	}
+}
+
+
+void
+JobData::DeserializePrinterSpecificSettings(BString& serializedSettings)
+{
+	// Note: strtok_r terminates the string after the first token
+	fDriverSpecificSettings.clear();
+
+	int length = serializedSettings.Length() + 1;
+	char* state = NULL;
+	char* buffer = serializedSettings.LockBuffer(length);
+	const char* separator = kDriverSpecificSettingsSeparator;
+	char* token = strtok_r(buffer, separator, &state);
+	while (token != NULL) {
+		char* key = token;
+		token = strtok_r(NULL, separator, &state);
+		if (token == NULL)
+			break;
+		char* value = token;
+		fDriverSpecificSettings[key] = value;
+		token = strtok_r(NULL, separator, &state);
+	}
+
+	serializedSettings.UnlockBuffer(0);
 }
