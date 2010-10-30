@@ -5,7 +5,7 @@
 #ifndef ARCH_M68K_VM_H
 #define ARCH_M68K_VM_H
 
-#include <vm/vm_translation_map.h>
+#include <vm/VMTranslationMap.h>
 
 /* This many pages will be read/written on I/O if possible */
 
@@ -16,9 +16,9 @@
 
 
 struct m68k_vm_ops {
-	void *(*m68k_translation_map_get_pgdir)(vm_translation_map *map);
-	status_t (*arch_vm_translation_map_init_map)(vm_translation_map *map, bool kernel);
-	status_t (*arch_vm_translation_map_init_kernel_map_post_sem)(vm_translation_map *map);
+	void *(*m68k_translation_map_get_pgdir)(VMTranslationMap *map);
+	status_t (*arch_vm_translation_map_init_map)(VMTranslationMap *map, bool kernel);
+	status_t (*arch_vm_translation_map_init_kernel_map_post_sem)(VMTranslationMap *map);
 	status_t (*arch_vm_translation_map_init)(kernel_args *args);
 	status_t (*arch_vm_translation_map_init_post_area)(kernel_args *args);
 	status_t (*arch_vm_translation_map_init_post_sem)(kernel_args *args);
@@ -42,7 +42,7 @@ extern "C" {
 
 extern struct m68k_vm_ops *get_vm_ops();
 
-extern void *m68k_translation_map_get_pgdir(vm_translation_map *map);
+extern void *m68k_translation_map_get_pgdir(VMTranslationMap *map);
 extern void m68k_set_pgdir(void *rt);
 
 #ifdef __cplusplus

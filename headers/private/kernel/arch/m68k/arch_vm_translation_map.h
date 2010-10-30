@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-void m68k_translation_map_change_asid(vm_translation_map *map);
+void m68k_translation_map_change_asid(VMTranslationMap *map);
 
 status_t m68k_map_address_range(addr_t virtualAddress,
 	phys_addr_t physicalAddress, size_t size);

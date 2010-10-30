@@ -82,7 +82,7 @@ m68k_get_user_iframe(void)
 
 	for (i = thread->arch_info.iframes.index - 1; i >= 0; i--) {
 		struct iframe *frame = thread->arch_info.iframes.frames[i];
-		if (frame->cpu.sr & (1 << M68K_SR_S) == 0)
+		if ((frame->cpu.sr & (1 << M68K_SR_S)) == 0)
 			return frame;
 	}
 
@@ -101,18 +101,18 @@ m68k_next_page_directory(struct thread *from, struct thread *to)
 		}
 		// switching to a new address space
 		return m68k_translation_map_get_pgdir(
-			&to->team->address_space->TranslationMap());
+			to->team->address_space->TranslationMap());
 	} else if (from->team->address_space == NULL && to->team->address_space == NULL) {
 		// they must both be kernel space threads
 		return NULL;
 	} else if (to->team->address_space == NULL) {
 		// the one we're switching to is kernel space
 		return m68k_translation_map_get_pgdir(
-			&VMAddressSpace::Kernel()->TranslationMap());
+			VMAddressSpace::Kernel()->TranslationMap());
 	}
 
 	return m68k_translation_map_get_pgdir(
-		&to->team->address_space->TranslationMap());
+		to->team->address_space->TranslationMap());
 }
 
 // #pragma mark -

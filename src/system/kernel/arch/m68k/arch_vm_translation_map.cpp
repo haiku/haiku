@@ -61,7 +61,7 @@ m68k_vm_ops *get_vm_ops()
 }
 
 void *
-m68k_translation_map_get_pgdir(vm_translation_map *map)
+m68k_translation_map_get_pgdir(VMTranslationMap *map)
 {
 	return get_vm_ops()->m68k_translation_map_get_pgdir(map);
 }
@@ -71,14 +71,14 @@ m68k_translation_map_get_pgdir(vm_translation_map *map)
 
 
 status_t
-arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
+arch_vm_translation_map_init_map(VMTranslationMap *map, bool kernel)
 {
 	return get_vm_ops()->arch_vm_translation_map_init_map(map, kernel);
 }
 
 
 status_t
-arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
+arch_vm_translation_map_init_kernel_map_post_sem(VMTranslationMap *map)
 {
 	return get_vm_ops()->arch_vm_translation_map_init_kernel_map_post_sem(map);
 }
