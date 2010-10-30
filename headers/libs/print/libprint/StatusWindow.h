@@ -26,7 +26,6 @@ public:
 			void		SetPageCopies(uint32 copies);
 		
 private:
-			BView*		fStatusView;
 			BStatusBar*	fStatusBar;
 			BButton*	fCancelButton;
 			BButton*	fHideButton;
