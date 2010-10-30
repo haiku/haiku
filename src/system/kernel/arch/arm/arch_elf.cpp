@@ -1,4 +1,7 @@
 /*
+ * Copyright 2010, Ithamar R. Adema <ithamar.adema@team-embedded.nl>
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
  * Copyright 2009, Johannes Wischert, johanneswi@gmail.com.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -19,7 +22,7 @@
 #include <arch/elf.h>
 
 
-#define TRACE_ARCH_ELF
+//#define TRACE_ARCH_ELF
 #ifdef TRACE_ARCH_ELF
 #	define TRACE(x) dprintf x
 #	define CHATTY 1
@@ -210,9 +213,21 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			}
 		}
 
+		// calc A
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
+			case R_ARM_RELATIVE:
+				A = *(addr_t *)(image->text_region.delta + rel[i].r_offset);
+				TRACE(("A %p\n", (void *)A));
+				break;
+		}
+
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_ARM_NONE:
 				continue;
+			case R_ARM_RELATIVE:
+				// B + A;
+				finalAddress = image->text_region.delta + A;
+				break;
 			case R_ARM_JMP_SLOT:
 			case R_ARM_GLOB_DAT:
 				finalAddress = S;
