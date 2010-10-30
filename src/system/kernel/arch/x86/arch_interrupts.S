@@ -98,8 +98,9 @@
 						   original eax/edx values */				\
 	iret
 
-#define DISABLE_BREAKPOINTS()											\
-	testl	$THREAD_FLAGS_BREAKPOINTS_INSTALLED, THREAD_flags(%edi);	\
+#define STOP_USER_DEBUGGING()											\
+	testl	$(THREAD_FLAGS_BREAKPOINTS_INSTALLED						\
+				| THREAD_FLAGS_SINGLE_STEP), THREAD_flags(%edi);		\
 	jz		1f;															\
 	call	x86_exit_user_debug_at_kernel_entry;						\
   1:
@@ -521,7 +522,7 @@ STATIC_FUNCTION(int_bottom_user):
 	// disable breakpoints, if installed
 	movl	%dr3, %edi				// thread pointer
 	cli								// disable interrupts
-	DISABLE_BREAKPOINTS()
+	STOP_USER_DEBUGGING()
 
 	// update the thread's user time
 	UPDATE_THREAD_USER_TIME()
@@ -615,7 +616,7 @@ STATIC_FUNCTION(handle_syscall):
 
 	// disable breakpoints, if installed
 	cli								// disable interrupts
-	DISABLE_BREAKPOINTS()
+	STOP_USER_DEBUGGING()
 
 	// update the thread's user time
 	UPDATE_THREAD_USER_TIME_PUSH_TIME()

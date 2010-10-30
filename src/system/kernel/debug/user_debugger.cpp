@@ -749,9 +749,10 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 		if (singleStep) {
 			atomic_or(&thread->debug_info.flags,
 				B_THREAD_DEBUG_SINGLE_STEP);
+			atomic_or(&thread->flags, THREAD_FLAGS_SINGLE_STEP);
 		} else {
 			atomic_and(&thread->debug_info.flags,
-				~B_THREAD_DEBUG_SINGLE_STEP);
+				~(int32)B_THREAD_DEBUG_SINGLE_STEP);
 		}
 
 		// unset the "stopped" state
@@ -1282,6 +1283,10 @@ user_debug_watchpoint_hit()
 void
 user_debug_single_stepped()
 {
+	// clear the single-step thread flag
+	struct thread* thread = thread_get_current_thread();
+	atomic_and(&thread->flags, ~(int32)THREAD_FLAGS_SINGLE_STEP);
+
 	// prepare the message
 	debug_single_step message;
 	arch_get_debug_cpu_state(&message.cpu_state);

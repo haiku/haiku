@@ -352,27 +352,29 @@ struct thread_queue {
 #define	THREAD_FLAGS_DEBUG_THREAD			0x0002
 	// forces the thread into the debugger as soon as possible (set by
 	// debug_thread())
-#define	THREAD_FLAGS_DEBUGGER_INSTALLED		0x0004
+#define	THREAD_FLAGS_SINGLE_STEP			0x0004
+	// indicates that the thread is in single-step mode (in userland)
+#define	THREAD_FLAGS_DEBUGGER_INSTALLED		0x0008
 	// a debugger is installed for the current team (computed flag for
 	// optimization purposes)
-#define	THREAD_FLAGS_BREAKPOINTS_DEFINED	0x0008
+#define	THREAD_FLAGS_BREAKPOINTS_DEFINED	0x0010
 	// hardware breakpoints are defined for the current team (computed flag for
 	// optimization purposes)
-#define	THREAD_FLAGS_BREAKPOINTS_INSTALLED	0x0010
+#define	THREAD_FLAGS_BREAKPOINTS_INSTALLED	0x0020
 	// breakpoints are currently installed for the thread (i.e. the hardware is
 	// actually set up to trigger debug events for them)
-#define	THREAD_FLAGS_64_BIT_SYSCALL_RETURN	0x0020
+#define	THREAD_FLAGS_64_BIT_SYSCALL_RETURN	0x0040
 	// set by 64 bit return value syscalls
-#define	THREAD_FLAGS_RESTART_SYSCALL		0x0040
+#define	THREAD_FLAGS_RESTART_SYSCALL		0x0080
 	// set by handle_signals(), if the current syscall shall be restarted
-#define	THREAD_FLAGS_DONT_RESTART_SYSCALL	0x0080
+#define	THREAD_FLAGS_DONT_RESTART_SYSCALL	0x0100
 	// explicitly disables automatic syscall restarts (e.g. resume_thread())
-#define	THREAD_FLAGS_ALWAYS_RESTART_SYSCALL	0x0100
+#define	THREAD_FLAGS_ALWAYS_RESTART_SYSCALL	0x0200
 	// force syscall restart, even if a signal handler without SA_RESTART was
 	// invoked (e.g. sigwait())
-#define	THREAD_FLAGS_SYSCALL_RESTARTED		0x0200
+#define	THREAD_FLAGS_SYSCALL_RESTARTED		0x0400
 	// the current syscall has been restarted
-#define	THREAD_FLAGS_SYSCALL				0x0400
+#define	THREAD_FLAGS_SYSCALL				0x0800
 	// the thread is currently in a syscall; set/reset only for certain
 	// functions (e.g. ioctl()) to allow inner functions to discriminate
 	// whether e.g. parameters were passed from userland or kernel

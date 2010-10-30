@@ -571,7 +571,8 @@ arch_update_thread_single_step()
 	if (struct iframe* frame = i386_get_user_iframe()) {
 		struct thread* thread = thread_get_current_thread();
 
-		// set/clear TF in EFLAGS depending on if single stepping is desired
+		// set/clear TF in EFLAGS depending on whether single stepping is
+		// desired
 		if (thread->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP)
 			frame->flags |= (1 << X86_EFLAGS_TF);
 		else
@@ -803,14 +804,16 @@ x86_exit_user_debug_at_kernel_entry()
 {
 	struct thread *thread = thread_get_current_thread();
 
-	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_INSTALLED))
-		return;
-
 	// We need to save the current values of dr6 and dr7 in the CPU structure,
 	// since in case of a debug exception we might overwrite them before
-	// x86_handle_debug_exception() is called.
+	// x86_handle_debug_exception() is called. Debug exceptions occur when
+	// hitting a hardware break/watchpoint or when single-stepping.
 	asm("movl %%dr6, %0" : "=r"(thread->cpu->arch.dr6));
 	asm("movl %%dr7, %0" : "=r"(thread->cpu->arch.dr7));
+
+	// The remainder needs only be done, when user breakpoints are installed.
+	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_INSTALLED))
+		return;
 
 	GRAB_THREAD_LOCK();
 
@@ -910,7 +913,7 @@ x86_handle_debug_exception(struct iframe *frame)
 			if (thread->team != team_get_kernel_team()
 				&& i386_get_user_iframe() == NULL) {
 				// TODO: This is not yet fully correct, since a newly created
-				// thread that doesn't have entered userland yet also has this
+				// thread that hasn't entered userland yet also has this
 				// property.
 				inKernel = false;
 			}
@@ -937,6 +940,9 @@ x86_handle_debug_exception(struct iframe *frame)
 					atomic_or(&thread->debug_info.flags,
 						B_THREAD_DEBUG_NOTIFY_SINGLE_STEP
 							| B_THREAD_DEBUG_STOP);
+
+					// also set the respective thread flag
+					atomic_or(&thread->flags, THREAD_FLAGS_DEBUG_THREAD);
 				}
 			}
 		}
