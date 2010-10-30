@@ -1207,7 +1207,7 @@ LowLevelCopy(BEntry *srcEntry, StatStruct *srcStat, BDirectory *destDir,
 			&newLink, loc);
 
 		BNodeInfo nodeInfo(&newLink);
-		ThrowOnError(nodeInfo.SetType(B_LINK_MIMETYPE));
+		nodeInfo.SetType(B_LINK_MIMETYPE);
 
 		newLink.SetPermissions(srcStat->st_mode);
 		newLink.SetOwner(srcStat->st_uid);
