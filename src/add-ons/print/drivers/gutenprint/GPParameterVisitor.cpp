@@ -130,9 +130,9 @@ GPParameterVisitor::VisitParameter(stp_parameter_list_t list,
 	if (parameter->read_only ||
 		(parameter->p_level > kMaxLevel
 			&& strcmp(parameter->name, kResolution) != 0)
-		|| parameterClass != STP_PARAMETER_CLASS_OUTPUT
+		|| (parameterClass != STP_PARAMETER_CLASS_OUTPUT
 			&& parameterClass != STP_PARAMETER_CLASS_CORE
-			&& parameterClass != STP_PARAMETER_CLASS_FEATURE)
+			&& parameterClass != STP_PARAMETER_CLASS_FEATURE))
 		return;
 
 	if (!description->is_active)
