@@ -133,10 +133,9 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 static void
 update_thread_user_debug_flag(struct thread* thread)
 {
-	if (atomic_get(&thread->debug_info.flags)
-			& (B_THREAD_DEBUG_STOP | B_THREAD_DEBUG_SINGLE_STEP)) {
+	if ((atomic_get(&thread->debug_info.flags) & B_THREAD_DEBUG_STOP) != 0)
 		atomic_or(&thread->flags, THREAD_FLAGS_DEBUG_THREAD);
-	} else
+	else
 		atomic_and(&thread->flags, ~THREAD_FLAGS_DEBUG_THREAD);
 }
 
