@@ -19,38 +19,45 @@
 #define HIDE_MSG 	'hidM'
 
 
-StatusWindow::StatusWindow(bool oddPages, bool evenPages, uint32 firstPage, uint32 numPages, uint32 numCopies, uint32 nup)
-	: BWindow (BRect(200, 200, 650, 270), "Print Status", B_DOCUMENT_WINDOW, B_NOT_RESIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE)
+StatusWindow::StatusWindow(bool oddPages, bool evenPages, uint32 firstPage,
+	uint32 numPages, uint32 numCopies, uint32 nup)
+	:
+	BWindow(BRect(200, 200, 650, 270),
+		"Print Status",
+		B_DOCUMENT_WINDOW, B_NOT_RESIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE)
 {
 	//	oddPages	- if true, only print odd numbered pages
 	//	evenPages	- if true, only print even numbered pages
 	//  firstPage	- number of first page
-	//  numPages	- total number of pages (must be recalculate if odd/even is used)
-	//  numCopies - total number of document copies	
+	//  numPages	- total number of pages (must be recalculate if odd/even is
+	//                used)
+	//  numCopies   - total number of document copies
 	
 	BRect frame = Frame();
 	// the status view
 	frame.OffsetTo(B_ORIGIN);
-	fStatusView = new BView(frame,"Status View",B_FOLLOW_ALL, B_WILL_DRAW);
-	fStatusView->SetViewColor(216,216,216);
+	fStatusView = new BView(frame, "Status View", B_FOLLOW_ALL, B_WILL_DRAW);
+	fStatusView->SetViewColor(216, 216, 216);
 	AddChild(fStatusView);			
 	
 	// the status bar
-	fStatusBar = new BStatusBar(BRect(10, 15, 245, 50),"Status Bar","Page: ");
+	fStatusBar = new BStatusBar(BRect(10, 15, 245, 50), "Status Bar", "Page: ");
 	fStatusView->AddChild(fStatusBar);
 	
 	// the cancel button
-	fHideButton = new BButton(BRect(260, 25, 330,50),"Hide Button","Hide Status", new BMessage(HIDE_MSG));
+	fHideButton = new BButton(BRect(260, 25, 330, 50), "Hide Button",
+		"Hide Status", new BMessage(HIDE_MSG));
 	fHideButton->ResizeToPreferred();
 	fStatusView->AddChild(fHideButton);
 
-	fCancelButton = new BButton(BRect(260, 25, 330,50),"Cancel Button","Cancel", new BMessage(CANCEL_MSG));
+	fCancelButton = new BButton(BRect(260, 25, 330,50), "Cancel Button",
+		"Cancel", new BMessage(CANCEL_MSG));
 	fCancelButton->ResizeToPreferred();
 	fCancelButton->MoveBy(90,0);
 	
 	fStatusView->AddChild(fCancelButton);
 	
-	fCancelBar = false;		
+	fCancelled = false;
 			
 	// calculate the real number of pages
 	fNops = numPages;
@@ -78,10 +85,10 @@ StatusWindow::StatusWindow(bool oddPages, bool evenPages, uint32 firstPage, uint
 	uint32 addPage = 0;
 	if (fNops % nup > 0) 
 		addPage = 1;
-	fNops = (uint32) ( fNops/(float)nup ) +  addPage;
+	fNops = (uint32)(fNops / (float)nup) + addPage;
 		// recalculate page numbers nup-pages-up
 			
-	fStatusBar->SetMaxValue ((float)fNops);
+	fStatusBar->SetMaxValue((float)fNops);
 		// max value of status bar = real number of pages
 	fDelta = 1.0/numCopies;
 		// reduce step width of status bar
@@ -140,11 +147,12 @@ StatusWindow::UpdateStatusBar(uint32 page, uint32 copy)
 			string3.Append(string4);		
 		}
 		
-		fStatusBar->Update(fStatusDelta*100.0/fNops, string1.String(), string3.String());
-		if ( (fStatusBar->MaxValue()) == (fStatusBar->CurrentValue()) )
+		fStatusBar->Update(fStatusDelta * 100.0 / fNops,
+			string1.String(), string3.String());
+		if (fStatusBar->MaxValue() == fStatusBar->CurrentValue())
 				fCancelButton->SetEnabled(false);
 	Unlock();
-	return fCancelBar;
+	return fCancelled;
 }
 
 
@@ -152,7 +160,7 @@ void
 StatusWindow::SetPageCopies(uint32 copies)
 {
 	fCopies = copies;
-	fStatusDelta = fDelta/(float)fCopies;
+	fStatusDelta = fDelta / (float)fCopies;
 	fDocCopies--;
 }
 
@@ -164,17 +172,13 @@ StatusWindow::MessageReceived(BMessage *message)
 
 	switch(message->what) {
 		case CANCEL_MSG:	// 'CancelButton' is pressed...
-			{
-				fCancelBar = true;		
-				fCancelButton->SetEnabled(false);
-				fCancelButton->SetLabel("Job cancelled");
-			}
+			fCancelled = true;
+			fCancelButton->SetEnabled(false);
+			fCancelButton->SetLabel("Job cancelled");
 			break;
 
 		case HIDE_MSG:	// 'HideButton' is pressed...
-			{
-				Hide();
-			}
+			Hide();
 			break;
 
 		default:
