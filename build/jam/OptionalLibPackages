@@ -35,7 +35,7 @@ local baseSourceURL = http://haiku-files.org/files/releases/r1alpha2/sources ;
 
 
 # AllegroLibs
-if [ IsOptionalHaikuImagePackageAdded AllegroLibs ]
+if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 	# libsdl and related libs
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package AllegroLibs available for $(TARGET_ARCH)" ;
@@ -215,7 +215,7 @@ if [ IsOptionalHaikuImagePackageAdded physfs ] {
 
 
 # SDLLibs
-if [ IsOptionalHaikuImagePackageAdded SDLLibs ]
+if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package SDLLibs available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
@@ -295,7 +295,7 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ]
 
 
 # XiphLibs
-if [ IsOptionalHaikuImagePackageAdded XiphLibs ]
+if [ IsOptionalHaikuImagePackageAdded XiphLibs ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package XiphLibs available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
