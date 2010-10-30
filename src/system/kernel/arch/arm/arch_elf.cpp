@@ -146,17 +146,97 @@ static const char *kRelocations[] = {
 };
 #endif
 
+
+#ifndef _BOOT_MODE
+static bool
+is_in_image(struct elf_image_info *image, addr_t address)
+{
+	return (address >= image->text_region.start
+			&& address < image->text_region.start + image->text_region.size)
+		|| (address >= image->data_region.start
+			&& address < image->data_region.start + image->data_region.size);
+}
+#endif	// !_BOOT_MODE
+
+
 #ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rel(struct preloaded_image *image,
-	struct Elf32_Rel *rel, int rel_len)
+	struct Elf32_Rel *rel, int relLength)
 #else
 int
 arch_elf_relocate_rel(struct elf_image_info *image,
-	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len)
+	struct elf_image_info *resolveImage, struct Elf32_Rel *rel, int relLength)
 #endif
 {
-	// there are no rel entries in M68K elf
+	addr_t S;
+	addr_t A;
+	addr_t P;
+	addr_t finalAddress;
+	addr_t *resolveAddress;
+	int i;
+
+	S = A = P = 0;
+
+	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < relLength; i++) {
+		TRACE(("looking at rel type %s, offset 0x%lx\n",
+			kRelocations[ELF32_R_TYPE(rel[i].r_info)], rel[i].r_offset));
+
+		// calc S
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
+			case R_ARM_JMP_SLOT:
+			case R_ARM_GLOB_DAT:
+			{
+				struct Elf32_Sym *symbol;
+				status_t status;
+
+				symbol = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
+
+#ifdef _BOOT_MODE
+				status = boot_elf_resolve_symbol(image, symbol, &S);
+#else
+				status = elf_resolve_symbol(image, symbol, resolveImage, &S);
+#endif
+				if (status < B_OK) {
+#ifndef _BOOT_MODE
+					TRACE(("failed relocating %s\n", SYMNAME(image, symbol)));
+#endif
+//IRA					return status;
+					return B_OK;
+				}
+#ifndef _BOOT_MODE
+				TRACE(("S %p (%s)\n", (void *)S, SYMNAME(image, symbol)));
+#endif
+			}
+		}
+
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
+			case R_ARM_NONE:
+				continue;
+			case R_ARM_JMP_SLOT:
+			case R_ARM_GLOB_DAT:
+				finalAddress = S;
+				break;
+
+			default:
+				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n",
+					ELF32_R_TYPE(rel[i].r_info));
+				return B_BAD_DATA;
+		}
+
+		resolveAddress = (addr_t *)(image->text_region.delta + rel[i].r_offset);
+#ifndef _BOOT_MODE
+		if (!is_in_image(image, (addr_t)resolveAddress)) {
+			dprintf("arch_elf_relocate_rel: invalid offset %#lx\n",
+				rel[i].r_offset);
+			return B_BAD_ADDRESS;
+		}
+#endif
+		*resolveAddress = finalAddress;
+		TRACE(("-> offset %#lx = %#lx\n",
+			(image->text_region.delta + rel[i].r_offset), finalAddress));
+	}
+
 	return B_NO_ERROR;
 }
 
