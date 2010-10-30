@@ -19,6 +19,10 @@
 class BMessage;
 class PrinterCap;
 
+
+using namespace std;
+
+
 class JobData {
 public:
 	enum Orientation {
