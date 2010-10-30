@@ -21,6 +21,7 @@
 #include <Catalog.h>
 #include <Deskbar.h>
 #include <Entry.h>
+#include <GridView.h>
 #include <GroupView.h>
 #include <Locale.h>
 #include <MediaAddOn.h>
@@ -45,49 +46,64 @@ SettingsView::SettingsView (bool isVideo)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
+	// create the default box
+
+	// input menu
+	fInputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
+	fInputMenu->SetLabelFromMarked(true);
+	BMenuField* inputMenuField = new BMenuField("inputMenuField",
+		fIsVideo ? B_TRANSLATE("Video input:")
+			: B_TRANSLATE("Audio input:"), fInputMenu, NULL);
+
+	// output menu
+	fOutputMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
+	fOutputMenu->SetLabelFromMarked(true);
+	BMenuField* outputMenuField = new BMenuField("outputMenuField",
+		fIsVideo ? B_TRANSLATE("Video output:")
+			: B_TRANSLATE("Audio output:"), fOutputMenu, NULL);
+
+	// channel menu (audio only)
+	BMenuField* channelMenuField = NULL;
+	if (!fIsVideo) {
+		fChannelMenu = new BPopUpMenu(B_TRANSLATE("<none>"));
+		fChannelMenu->SetLabelFromMarked(true);
+		channelMenuField = new BMenuField("channelMenuField",
+			B_TRANSLATE("Channel:"), fChannelMenu, NULL);
+		channelMenuField->SetDivider(StringWidth(B_TRANSLATE("Channel:"))+5);
+	}
+
 	BBox* defaultsBox = new BBox("defaults");
 	defaultsBox->SetLabel(fIsVideo ? B_TRANSLATE("Default nodes")
 		: B_TRANSLATE("Defaults"));
 
-	// create the default box
-	BGroupLayout* defaultBoxLayout = new BGroupLayout(B_VERTICAL, 5);
-	defaultBoxLayout->SetInsets(10,10,10,10);
-	defaultsBox->SetLayout(defaultBoxLayout);
-	defaultBoxLayout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(5));
+	// put our menus in a BGridView in our BBox, this way, the BBox makes sure
+	// we have are not blocking the label.
+	BGridView* defaultsGridView = new BGridView();
+	defaultsBox->AddChild(defaultsGridView);
 
-	BGroupView* inputField = new BGroupView(B_HORIZONTAL);
-	BGroupView* outputField = new BGroupView(B_HORIZONTAL);
-	defaultsBox->GetLayout()->AddView(inputField);
-	defaultsBox->GetLayout()->AddView(outputField);
+	BGridLayout* defaultsGrid = defaultsGridView->GridLayout();
+	defaultsGrid->SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
+		B_USE_DEFAULT_SPACING);
 
-	float divider = StringWidth(fIsVideo ? B_TRANSLATE("Video output:")
-		: B_TRANSLATE("Audio output:")) + 5;
-	fMenu1 = new BPopUpMenu(B_TRANSLATE("<none>"));
-	fMenu1->SetLabelFromMarked(true);
-	BMenuField* menuField1 = new BMenuField("menuField1",
-		fIsVideo ? B_TRANSLATE("Video input:")
-			: B_TRANSLATE("Audio input:"), fMenu1, NULL);
-	menuField1->SetDivider(divider);
+	BLayoutItem* labelItem = inputMenuField->CreateLabelLayoutItem();
+	BLayoutItem* menuItem = inputMenuField->CreateMenuBarLayoutItem();
+	defaultsGrid->AddItem(labelItem, 0, 0, 1, 1);
+	defaultsGrid->AddItem(menuItem, 1, 0, 3, 1);
 
-	fMenu2 = new BPopUpMenu(B_TRANSLATE("<none>"));
-	fMenu2->SetLabelFromMarked(true);
-	BMenuField* menuField2 = new BMenuField("menuField2",
-		fIsVideo ? B_TRANSLATE("Video output:")
-			: B_TRANSLATE("Audio output:"), fMenu2, NULL);
-	menuField2->SetDivider(divider);
-
-	inputField->GroupLayout()->AddView(menuField1);
-	outputField->GroupLayout()->AddView(menuField2);
-
-	BMenuField* menuField3 = NULL;
-	if (!fIsVideo) {
-		fMenu3 = new BPopUpMenu(B_TRANSLATE("<none>"));
-		fMenu3->SetLabelFromMarked(true);
-		menuField3 = new BMenuField("menuField3",
-			B_TRANSLATE("Channel:"), fMenu3, NULL);
-		outputField->GroupLayout()->AddView(menuField3);
-		menuField3->SetDivider(StringWidth(B_TRANSLATE("Channel:"))+5);
+	int32 outputMenuWidth = 3;
+	if (channelMenuField) {
+		outputMenuWidth = 1;
+		labelItem = channelMenuField->CreateLabelLayoutItem();
+		menuItem = channelMenuField->CreateMenuBarLayoutItem();
+		defaultsGrid->AddItem(labelItem, 2, 1, 1, 1);
+		defaultsGrid->AddItem(menuItem, 3, 1, 1, 1);
 	}
+
+	labelItem = outputMenuField->CreateLabelLayoutItem();
+	menuItem = outputMenuField->CreateMenuBarLayoutItem();
+	defaultsGrid->AddItem(labelItem, 0, 1, 1, 1);
+	defaultsGrid->AddItem(menuItem, 1, 1, outputMenuWidth, 1);
+
 
 	rgb_color red_color = {222, 32, 33};
 	fRestartView = new BStringView("restartStringView",
@@ -136,7 +152,7 @@ SettingsView::SettingsView (bool isVideo)
 	realtimeBoxLayout->AddView(fRealtimeCheckBox);
 	realtimeBoxLayout->AddView(textView);
 
-	// create the bottom line: volumen in deskbar checkbox and restart button
+	// create the bottom line: volume in deskbar checkbox and restart button
 	BGroupView* bottomView = new BGroupView(B_HORIZONTAL);
 	BButton* restartButton = new BButton("restartButton",
 		B_TRANSLATE("Restart media services"),
@@ -168,10 +184,10 @@ SettingsView::SettingsView (bool isVideo)
 void
 SettingsView::AddNodes(NodeList& list, bool isInput)
 {
-	BMenu* menu = isInput ? fMenu1 : fMenu2;
-	void* item;
-	while ((item = menu->RemoveItem((int32)0)) != NULL)
-		delete static_cast<dormant_node_info*>(item);
+	BMenu* menu = isInput ? fInputMenu : fOutputMenu;
+
+	for (BMenuItem* item; (item = menu->RemoveItem((int32)0)) != NULL;)
+		delete item;
 
 	BMessage message(ML_DEFAULT_CHANGE);
 	message.AddBool("isVideo", fIsVideo);
@@ -187,7 +203,7 @@ SettingsView::AddNodes(NodeList& list, bool isInput)
 void
 SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 {
-	BMenu* menu = isInput ? fMenu1 : fMenu2;
+	BMenu* menu = isInput ? fInputMenu : fOutputMenu;
 
 	for (int32 i = 0; i < menu->CountItems(); i++) {
 		SettingsItem* item = static_cast<SettingsItem*>(menu->ItemAt(i));
@@ -200,7 +216,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 
 	if (!fIsVideo && !isInput && outputID >= 0) {
 		BMenuItem* item;
-		while ((item = fMenu3->RemoveItem((int32)0)) != NULL)
+		while ((item = fChannelMenu->RemoveItem((int32)0)) != NULL)
 			delete item;
 
 		BMediaRoster* roster = BMediaRoster::Roster();
@@ -226,7 +242,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 					memcpy(input, &inputs[i], sizeof(*input));
 					item = new Settings2Item(&info, input,
 						new BMessage(message));
-					fMenu3->AddItem(item);
+					fChannelMenu->AddItem(item);
 					if (inputs[i].destination.id == outputID)
 						item->SetMarked(true);
 				}

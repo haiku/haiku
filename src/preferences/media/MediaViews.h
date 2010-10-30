@@ -69,12 +69,10 @@ public:
 			BCheckBox* 			fRealtimeCheckBox;
 			BCheckBox* 			fVolumeCheckBox;
 
-			BMenu* 				fMenu1;
-				// input menu
-			BMenu* 				fMenu2;
-				// output menu
-			BMenu*				fMenu3;
-				// channel menu (audio only)
+			BMenu* 				fInputMenu;
+			BMenu* 				fOutputMenu;
+			BMenu*				fChannelMenu;
+				// (audio only)
 			BStringView*		fRestartView;
 
 private:

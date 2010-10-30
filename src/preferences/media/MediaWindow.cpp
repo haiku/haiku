@@ -114,20 +114,24 @@ MediaWindow::_FindNodes(media_type type, uint64 kind, NodeList& into)
 {
 	dormant_node_info node_info[64];
 	int32 node_info_count = 64;
+
 	media_format format;
-	media_format* format1 = NULL, *format2 = NULL;
-	BMediaRoster* roster = BMediaRoster::Roster();
+	media_format* nodeInputFormat = NULL, *nodeOutputFormat = NULL;
 	format.type = type;
 
+	// output nodes must be BBufferConsumers => they have an input format
+	// input nodes must be BBufferProducers => they have an output format
 	if (kind & B_PHYSICAL_OUTPUT)
-		format1 = &format;
+		nodeInputFormat = &format;
 	else if (kind & B_PHYSICAL_INPUT)
-		format2 = &format;
+		nodeOutputFormat = &format;
 	else
 		return;
 
-	if (roster->GetDormantNodes(node_info, &node_info_count, format1, format2,
-			NULL, kind)!=B_OK) {
+	BMediaRoster* roster = BMediaRoster::Roster();
+
+	if (roster->GetDormantNodes(node_info, &node_info_count, nodeInputFormat,
+		nodeOutputFormat, NULL, kind) != B_OK) {
 		// TODO: better error reporting!
 		fprintf(stderr, "error\n");
 		return;
@@ -430,7 +434,7 @@ MediaWindow::MessageReceived(BMessage* message)
 				if (message->FindInt32("index", &index)!=B_OK)
 					break;
 				Settings2Item* item = static_cast<Settings2Item*>(
-					fAudioView->fMenu3->ItemAt(index));
+					fAudioView->fChannelMenu->ItemAt(index));
 
 				if (item) {
 					BMediaRoster* roster = BMediaRoster::Roster();
@@ -454,8 +458,8 @@ MediaWindow::MessageReceived(BMessage* message)
 				if (message->FindInt32("index", &index)!=B_OK)
 					break;
 				SettingsView* settingsView = isVideo ? fVideoView : fAudioView;
-				BMenu* menu = isInput ? settingsView->fMenu1
-					: settingsView->fMenu2;
+				BMenu* menu = isInput ? settingsView->fInputMenu
+					: settingsView->fOutputMenu;
 				SettingsItem* item = static_cast<SettingsItem*>(
 					menu->ItemAt(index));
 
@@ -542,7 +546,7 @@ MediaWindow::MessageReceived(BMessage* message)
 		case ML_ENABLE_REAL_TIME:
 			{
 				bool isVideo = true;
-				if (message->FindBool("isVideo", &isVideo)!=B_OK)
+				if (message->FindBool("isVideo", &isVideo) != B_OK)
 					break;
 				SettingsView* settingsView = isVideo ? fVideoView : fAudioView;
 				uint32 flags;
