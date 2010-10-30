@@ -263,10 +263,20 @@ ThreadHandler::HandleThreadAction(uint32 action)
 	TRACE_CONTROL("  ip: %#llx\n", frame->InstructionPointer());
 
 	// When the thread is in a syscall, do the same for all step kinds: Stop it
-	// when it return by means of a breakpoint.
+	// when it returns by means of a breakpoint.
 	if (frame->Type() == STACK_FRAME_TYPE_SYSCALL) {
 		// set a breakpoint at the CPU state's instruction pointer (points to
 		// the return address, unlike the stack frame's instruction pointer)
+// TODO: This is doesn't work correctly anymore. When stepping over a "syscall"
+// instruction the thread is stopped twice. The after the first step the PC is
+// incorrectly shown at the "syscall" instruction. Then we step again and are
+// stopped at the temporary breakpoint after the "syscall" instruction. There
+// are two problems. The first one is that we don't (cannot?) discriminate
+// between the thread being in a syscall (like in a blocking syscall) and the
+// thread having been stopped (or singled-stepped) at the end of the syscall.
+// The second issue is that the temporary breakpoint is probably not necessary
+// anymore, since single-stepping over "syscall" instructions should just work
+// as expected.
 		status_t error = _InstallTemporaryBreakpoint(
 			frame->GetCpuState()->InstructionPointer());
 		if (error != B_OK) {
