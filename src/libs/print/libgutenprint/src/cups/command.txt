@@ -1,0 +1,76 @@
+command.txt - 09/10/2000 - CUPS Drivers
+---------------------------------------
+
+This file describes the experimental CUPS command file format,
+used to send printer commands to a printer in a device-
+independent way.
+
+
+FILE FORMAT INFORMATION
+
+CUPS command files are ASCII text files.  The first line of a
+CUPS command file MUST contain:
+
+    #CUPS-COMMAND
+
+After that, each line is either a command or a comment.
+Comments begin with the # character, e.g.:
+
+    # This is a comment
+
+The printer commands are described below.  Printer commands are
+case- insensitive, so "PRINTSELFTESTPAGE", "printselftestpage",
+and "PrintSelfTestPage" are equivalent.  Commands that accept
+arguments have their arguments on the same line separated by
+spaces.
+
+
+PRINTER COMMANDS
+
+The following commands are currently recognized:
+
+    Clean all
+    Clean black
+    Clean color
+    Clean cyan
+    Clean light-cyan
+    Clean light-magenta
+    Clean magenta
+    Clean yellow
+
+	Do a standard print head cleaning.  If a printer does
+	not support cleaning of individual colors or cartridges,
+	then all print heads are cleaned.
+
+    PrintAlignmentPage phase
+
+	Print an alignment page on the printer.  Typically this
+	page shows the horizontal and vertical alignment of the
+	print heads with numbers for each.  The phase number can
+	be omitted.
+
+    PrintSelfTestPage
+
+	Print a self-test page on the printer.  Typically this
+	page shows if all jets on a print head are functioning
+	properly.
+
+    ReportLevels
+
+	Reports the levels of each marking color in the
+	printer-state-message attribute.  The format of the
+	report string is one of:
+
+            K=###
+	    C=### M=### Y=###
+	    K=### C=### M=### Y=###
+	    K=### C=### M=### Y=### LC=### LM=###
+
+	depending on the marking colors available.
+
+    SetAlignment phase x y
+
+	Sets the alignment of the print heads in the X and Y
+	directions. The phase number must match that specified
+	by the PrintAlignmentPage command or be 0.  The Y
+	direction is not used by some printers.

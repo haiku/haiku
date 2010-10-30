@@ -1,0 +1,258 @@
+This file describes issues that packagers and distributors of
+Gutenprint should be aware of.  This information is targeted at Linux
+distributions and others who deliver Gutenprint packages intended for
+end-user use.
+
+1) As of 5.2 and until further notice, Gutenprint will no longer
+   deliver separate "development" and "stable" release series.
+
+   The point release will be advanced between beta/RC releases and
+   stable releases.  The first stable release of 5.2 will be numbered
+   5.2.1; the betas and release candidates will be numbered
+   5.2.0-betaN or 5.2.0-rcN.  Any betas for the next stable release
+   will be numbered 5.2.2-betaN; the next stable release will be
+   numbered 5.2.3 (if there are beta or release candidate builds) or
+   5.2.2 (if there are not).
+
+   This ensures that the highest numbered release is always the most
+   current, and that there will be no confusion between beta releases
+   and stable releases.  Our experience with 5.0 was that many users
+   continued to use beta releases of 5.0 even after 5.0.0 was
+   released, and worse, in some cases referred to the 5.0.0-beta2
+   release (for example) as "5.0.2".  We believe that the numbering
+   scheme described above will avoid that problem.
+
+2) We request that you subscribe to
+   gimp-print-devel@lists.sourceforge.net to get the latest
+   information about upcoming changes.
+
+3) If you intend to make any changes or patches to the source code of
+   this package, we request that you inform us of these changes and
+   discuss them with us prior to distribution, and identify a point of
+   contact to us.
+
+   While this is not required by the GPL, we would greatly appreciate
+   knowing about any changes you plan to make for three reasons:
+
+   * The changes may benefit all users of Gutenprint.
+
+   * We may have already considered this kind of change in the past
+     and elected not to make it, or may be planning to make this kind
+     of change in a different way from what you have done.
+     Coordination in this case may save everyone a lot of work.
+
+   * If we receive bug reports or support requests from users of your
+     package, we will either know who we can direct them to or will
+     have a better understanding of what is different in your package
+     that may cause observed differences from what we expect.
+
+4) We specifically request that you *not* make changes to the margins
+   of any paper size in src/xml/papers.xml, or in general change
+   papers.xml other than to add additional paper sizes.  In the past,
+   a number of distributions have imposed margins for certain paper
+   sizes in this file because printing on certain printers was cut off
+   (cropped).  Change to papers.xml to work around these problems is
+   not an appropriate workaround for this problem, as it results in
+   *all* printers being bound by those margins.  Furthermore, the
+   margin problem has since been fixed in a different way.  Margins
+   should only be listed in papers.xml for papers that intrinsically
+   have margins of their own, such as photo papers with tear-off
+   margins.
+
+   Historically, in Gutenprint 5.0.0 all printers that offered
+   different margins under different circumstances (e. g. a choice
+   between normal margins and full-bleed printing, such as many Epson
+   inkjet printers, or different margins for certain paper sizes, such
+   as many laser printers that offer different margins for A4 than for
+   other paper sizes) always listed the wide margins in the PPD files,
+   and if the full bleed option was not selected (or a paper size that
+   required narrower margins was), the printed image was simply
+   clipped to the margins.  This preserved the image dimension on the
+   page, but in some cases resulted in parts of the image being
+   clipped.  The workaround that some packagers applied, to add
+   margins in papers.xml, made it impossible to print full bleed to
+   these paper sizes even on printers capable of this.  None of these
+   packagers ever discussed this change with us, and as a result we
+   were caught by surprise by some bug reports that it took us a while
+   to track down.
+
+   This issue was fixed in 5.0.1 (in the native CUPS driver) by means
+   of a new PPD option to allow users to either shrink the image to
+   the appropriate margins or to crop the image.  This allows users to
+   select whether they prefer dimensional accuracy or printing the
+   entire image.  However, we have observed that this workaround has
+   still not been removed from all distributors' packages.
+
+   At this point, there should be no reason to specify margins in
+   papers.xml for any reason other than adding a media size that has
+   intrinsic margins of its own, such as a new paper with tear-off
+   margins.  If you think you need to do this for any other reason,
+   please discuss it with us first!
+
+5) Packaging the Core Library (libgutenprint)
+
+   * You may wish to create a development package containing header
+     files and linkable libraries separate from the runtime package.
+     There are a few third party applications that link against
+     Gutenprint.
+
+   * Gutenprint permits installation of Gimp-Print 4.2 and Gutenprint
+     5.0 alongside Gutenprint 5.2, and in the future will permit
+     concurrent installation of different stable versions of
+     Gutenprint with different minor version numbers.  Therefore, you
+     may consider allowing Gutenprint 5.0, Gutenprint 5.2, and
+     Gimp-Print 4.2 to be installed concurrently.
+
+   * The core driver library component also includes XML data files
+     (in src/xml), locale files for the libary, and documentation.
+     The XML data files in src/xml are mandatory; the driver will not
+     function without these files.
+
+   * We do not recommend installing any program linked against
+     libgutenprint with enhanced privileges (via the setuid or setgid
+     mechanism, or any other such mechanism).  We have not audited
+     libgutenprint for safety in this kind of environment, and changes
+     in Gutenprint 5.2 (in particular, moving the Epson driver data
+     into external data files whose root can be changed by means of
+     the environment variable STP_DATA_PATH) may increase risk.
+     Furthermore, if you build the Gutenprint library in modular
+     fashion, such that drivers may be dynamically loaded into running
+     applications, there is an additional hazard in the form of an
+     environment variable that allows specifying where those modules
+     should be loaded from (STP_MODULE_PATH).
+
+     The only program in the core Gutenprint package that has any
+     reason to be installed this way is escputil, because it needs to
+     talk directly to the printer.  See the discussion of escputil
+     below.
+
+6) Packaging the CUPS Driver
+
+   * IMPORTANT: As a special part of the install/upgrade procedure,
+     your installer should check for any queues using the "epson" or
+     "canon" backends and convert them to use an appropriate standard
+     backend, usually the "usb" or "parallel" backend.  Please see the
+     Critical Upgrade Note in the release notes (NEWS file) for more
+     information.
+
+     Note that the epson and canon backends are no longer distributed
+     by Gutenprint, so your installer will have to fix this up in any
+     event.
+
+   * We recommend that your installation package run cups-genppdupdate
+     and restart CUPS as part of the installation process.  This will
+     copy changes made by the user and ensure that the user has
+     correct PPD files.  The CUPS driver will refuse to use a PPD file
+     built with a different version of Gutenprint.
+
+   * Some applications do not translate PPD file contents (option
+     names and values) when globalized PPD files are used (see the
+     release notes for general discussion of globalized PPD files).
+     At the time these notes are being written, we have determined
+     that versions of OpenOffice.org up to and including 3.0.0-rc1 do
+     not translate PPD file contents with globalized PPD files, but
+     language-specific localized PPD files are translated correctly.
+     We have also determined that GIMP 2.4, using the GtkPrint plugin,
+     does not translate PPD contents using globalized PPD files, but
+     does with single language files.
+
+     The CUPS development team has informed us that they have not
+     received complaints from users about this, despite the fact that
+     the basic set of PPD files distributed by CUPS is globalized.
+     Unlike Gutenprint, however, CUPS does not require that its PPD
+     files be upgraded with each release, so users upgrading from
+     older versions of CUPS may not be exposed to this issue.
+
+     Gutenprint does provide a way to upgrade PPD files to
+     language-specific ones, using the -l option to
+     cups-genppdupdate.  PPD files that are being upgraded from a
+     previous release of Gutenprint may be upgraded with
+     cups-genppdupdate -loriginal to update to the original language.
+     Note that this works even if the PPD files have been updated to
+     globalized files, since cups-genppdupdate stores the language of
+     the PPD file it was upgrading.  cups-genppdupdate -l<language>
+     updates PPD files into the specified language; see the release
+     notes or user's manual for the set of languages supported.
+
+     Note that -loriginal will *not* work with PPD files that had been
+     upgraded with Gutenprint 5.2.0-beta4, since cups-genppdupdate in
+     that release does not preserve the original language of the PPD
+     file.
+
+     Distributions have a number of possible options to address this
+     issue, for example:
+
+     - Use globalized PPD files and accept the translation problem or
+       fix the applications that do not translate the PPD files
+       correctly.  You may wish to document the procedure of using
+       cups-genppdupdate to generate language-specific PPD files in
+       this case.
+
+     - Configure Gutenprint with --disable-globalized-cups-ppds, to
+       generate only single-language PPD files.
+
+     - Provide an administrative utility to update either individual
+       PPD files or all PPD files on the system.  If you provide this
+       kind of utility, we recommend using the -l<language> option
+       rather than -loriginal.
+
+   * All files and directories with versioned names (such as
+     rastertogutenprint and the PPD files) may be installed and used
+     concurrently with other versions of Gimp-Print and Gutenprint as
+     described above.  Other executables (such as cups-calibrate) are
+     not versioned, but are not linked against libgutenprint and do
+     not have any other dependencies on Gutenprint.
+
+7) Packaging the IJS Driver and Foomatic Data
+
+   * We recommend packaging the IJS driver
+     (/usr/bin/ijsgutenprint.5.2) and its man page
+     (/usr/man/man1/ijsgutenprint.1.gz) together with the Foomatic
+     data.
+
+   * If your distribution uses CUPS as its print spooler, we very
+     strongly recommend using the native CUPS driver rather than
+     Foomatic.  The native CUPS driver has been better tested than the
+     IJS driver, and has more complete solutions for some issues
+     involving paper dimensions and presentation of numerical
+     options.  The native CUPS driver also has better management tools
+     (cups-genppdupdate, specifically).
+
+     If you wish to improve the IJS driver and Foomatic data, please
+     contact us.
+
+   * The IJS driver and the Foomatic data kit and PPD files are
+     versioned (major and minor), and hence you may consider
+     permitting multiple versions to be installed concurrently.  The
+     man page (/usr/man/man1/ijsgutenprint.1.gz) is not versioned, but
+     the interface to this command, which is intended only to be
+     invoked from within Ghostscript, is not likely to change.
+
+8) Packaging the Enhanced Print Plugin for GIMP
+
+   * The enhanced Print plugin for GIMP, unlike the core library and
+     the Foomatic and CUPS drivers, may not be installed concurrently
+     with other versions.  For example, you may not install both the
+     Gimp-Print 4.2 and the Gutenprint 5.2 version of the Print
+     plugin, as they use different configuration file formats.
+
+9) Packaging the Epson Inkjet Management Utility, escputil
+
+   * We do not recommend installing this utility with enhanced
+     privileges (via the setuid or setgid mechanism, or any other such
+     mechanism) without a careful security audit on your part.  If
+     elevated privileges are required in your installation, we suggest
+     ensuring that the variables STP_DATA_PATH and STP_MODULE_PATH be
+     cleared prior to invoking escputil (or that you patch escputil to
+     clear those variables prior to calling stp_init()) and otherwise
+     using the least privilege required to allow escputil to run.
+     Another option may be to allow (by means of device permissions)
+     an appropriate group of users to run this command.
+
+     With the conversion of the Epson driver to using external data
+     files in XML format rather than data hard-coded into the library
+     binary, there are more opportunities for injection of bad data
+     into the driver.
+
+     Note that the default configuration of Gutenprint does not
+     install escputil with elevated privileges.

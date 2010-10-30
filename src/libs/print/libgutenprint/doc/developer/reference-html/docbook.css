@@ -1,0 +1,12 @@
+.NAVHEADER { display: none }
+.NAVFOOTER { display: none }
+.TOC       { display: none }
+
+.NAVTOC    { margin-left: 15;
+             display: none }
+
+.NAVBTN    { font-size: 10pt }
+
+.TOCTITLE  { font-size: 10pt;
+             color: blue;
+ 	     text-decoration: underline; }

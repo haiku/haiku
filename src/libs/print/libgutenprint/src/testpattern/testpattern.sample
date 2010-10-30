@@ -1,0 +1,171 @@
+# Sample test pattern file, for use with Gimp-Print test pattern generator
+
+# Printer/driver settings. Please see src/ghost/README for appropriate
+# values for each of these settings
+# Printer model
+printer escp2-870;
+# Resolution, or print quality
+parameter Resolution 720sw;
+# Media source (if appropriate for your printer)
+parameter InputSlot Standard;
+# Media type (what kind of paper)
+parameter MediaType Photo;
+# ink_type
+parameter InkType PhotoCMYK;
+# Paper size
+parameter PageSize Letter;
+# Dither algorithm
+#parameter DitherAlgorithm Ordered;
+parameter DitherAlgorithm Ordered;
+
+mode RGB 8;
+
+# Note that due to limitations in the lexical analyzer and parser, all
+# floating point values must be specified with a decimal point.
+
+# Placement settings
+# Horizontal size, as fraction of paper width (defaults to 1.0)
+hsize 0.33;
+# Vertical size, as fraction of paper width (defaults to 1.0)
+vsize 0.33;
+# Left margin, as fraction of paper width (defaults to 0)
+left 0.66;
+# Top margin, as fraction of paper width (defaults to 0)
+top 0.66;
+
+# Output settings
+# These settings are used as the base values for all ramps.  These settings
+# are multiplied by the appropriate values in each pattern definition
+# to compute the effective gamma and conversion values.  All of these
+# default to 1.0.
+# Gamma value applied to all inks
+gamma 1.0;
+# Additional gamma correction applied to cyan, magenta, yellow, and black inks
+gamma cyan 1.0;
+gamma magenta 1.0;
+gamma yellow 1.0;
+gamma black 1.0;
+# Amount of each ink that should be used when black is converted to CMY.
+# These values must be greater than 0 and must not exceed 10.
+level cyan 1.0;
+level magenta 1.0;
+level yellow 1.0;
+
+# Maximum amount of ink that will be printed, relative to solid coverage.
+# 1.0 means that every dot position that can be printed will be.  Normally
+# at high resolutions less ink should be printed.  This is similar to
+# density in normal RGB mode, but does not affect photo ink conversion.
+ink_limit 1.0;
+
+# Density.  Unlike normal RGB mode, the CMYK16 input mode used by the
+# test pattern generator does not automatically scale the amount of ink
+# used by the resolution and paper type (see ink_limit above).  The test
+# driver separates the functions of ink limiting and photo ink conversion
+# to allow maximum control over the output.
+density 1.0;
+
+# Do we want a thin black line between each band? (default yes)
+blackline 0;
+
+# Number of steps in each ramp (default 256)
+steps 16;
+
+# Pattern specifiers
+#     BLACK RAMP   BLACK     BLACK       CYAN        MAGENTA     YELLOW
+#     ENDPOINTS  CONVERSION
+#       Lower   Cyan         Min          Min          Min          Min
+#           Upper   Magenta      Max          Max          Max          Max
+#                       Yellow       Gamma        Gamma        Gamma        Gamma
+
+#  0) White band
+pattern 0.0 0.0 0.0 0.0 0.0 0.0 0.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+#  1) C sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+#  2) M sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 0.0 1.0 0.0 1.0 1.0 0.0 0.0 1.0;
+#  3) Y sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 1.0 1.0;
+#  4) Pure CMY sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 1.0 1.0 0.0 1.0 1.0;
+#  5) K sweep
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+#  6) Adjusted CMY sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 -2.0 1.0 0.0 -2.0 1.0 0.0 -2.0 1.0;
+#  7) Pure CMY sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+#  8) Adjusted CMY sweep
+pattern 1.0 1.0 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+#  9) CMYK, transition band 10-30%
+pattern 0.1 0.3 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 10) Adjusted CMYK, transition band 30-70%
+pattern 0.3 0.7 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 11) CMYK, transition band 10-99.9%
+pattern 0.1 0.999 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 12) CMYK, transition band 30-99.9%
+pattern 0.3 0.999 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 13) CMYK, transition band 50-99.9%
+pattern 0.5 0.999 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 14) Adjusted CMYK, transition band 10-30%
+pattern 0.1 0.3 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 15) CMYK, transition band 30-70%
+pattern 0.3 0.7 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 16) Adjusted CMYK, transition band 10-99.9%
+pattern 0.1 0.999 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 17) Adjusted CMYK, transition band 30-99.9%
+pattern 0.3 0.999 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 18) Adjusted CMYK, transition band 50-99.9%
+pattern 0.5 0.999 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+# 19) Y+M      (R) sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 0.0 1.0 0.0 1.0 1.0 0.0 1.0 1.0;
+# 20) Y+M+.25C     sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.0 1.0 0.0 0.75 1.0 0.0 0.75 1.0;
+# 21) Y+M+.25C     sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.0 1.0 0.0 0.75 1.0 0.0 0.75 1.0;
+# 22) Y+M+.5C      sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.0 1.0 0.0 0.5 1.0 0.0 0.5 1.0;
+# 23) Y+M+.5C      sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.0 1.0 0.0 0.5 1.0 0.0 0.5 1.0;
+# 24) Y+M+.75C     sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.0 1.0 0.0 0.25 1.0 0.0 0.25 1.0;
+# 25) Y+M+.75C     sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.0 1.0 0.0 0.25 1.0 0.0 0.25 1.0;
+# 26) Y+M+.9C      sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.0 1.0 0.0 0.1 1.0 0.0 0.1 1.0;
+# 27) Y+M+.9C      sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.0 1.0 0.0 0.1 1.0 0.0 0.1 1.0;
+# 28) C+Y      (G) sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 0.0 1.0 0.0 1.0 1.0;
+# 29) C+Y+.25M     sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.0 1.0 0.0 0.75 1.0;
+# 30) C+Y+.25M     sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.0 1.0 0.0 0.75 1.0;
+# 31) C+Y+.5M      sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.0 1.0 0.0 0.5 1.0;
+# 32) C+Y+.5M      sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.0 1.0 0.0 0.5 1.0;
+# 33) C+Y+.75M     sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.0 1.0 0.0 0.25 1.0;
+# 34) C+Y+.75M     sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.0 1.0 0.0 0.25 1.0;
+# 35) C+Y+.9M      sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.0 1.0 0.0 0.1 1.0;
+# 36) C+Y+.9M      sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.0 1.0 0.0 0.1 1.0;
+# 37) C+M      (B) sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 1.0 1.0 0.0 0.0 1.0;
+# 38) C+M+.25Y     sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.75 1.0 0.0 0.0 1.0;
+# 39) C+M+.25Y     sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.75 1.0 0.0 0.0 1.0;
+# 40) C+M+.5Y      sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.5 1.0 0.0 0.0 1.0;
+# 41) C+M+.5Y      sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.5 1.0 0.0 0.0 1.0;
+# 42) C+M+.75Y     sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.25 1.0 0.0 0.0 1.0;
+# 43) C+M+.75Y     sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.25 1.0 0.0 0.0 1.0;
+# 44) C+M+.9Y      sweep
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.1 1.0 0.0 0.0 1.0;
+# 45) C+M+.9Y      sweep (using K)
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.1 1.0 0.0 0.0 1.0;

@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Preface</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="The Developer's Guide to Gutenprint"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="The Developer's Guide to Gutenprint"
+HREF="book1.html"><LINK
+REL="NEXT"
+TITLE="Copying, modification and redistribution"
+HREF="c39.html"><META
+http-equiv="Content-Type"
+content="text/html; charset=@encoding@"></HEAD
+><BODY
+CLASS="preface"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Developer's Guide to Gutenprint</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="book1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c39.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="preface"
+><H1
+><A
+NAME="AEN14"
+></A
+>Preface</H1
+><P
+>&#13;    Gutenprint is the print facility of the GNU Image Manipulation
+    Program (GIMP). It is in addition a suite of drivers that may be
+    used with common UNIX spooling systems using Ghostscript or CUPS.
+    These drivers provide printing quality for Linux, MacOS X and UNIX
+    on a par with proprietary vendor-supplied drivers in many cases,
+    and can be used for many of the most demanding printing tasks,
+    especially for high quality printing on modern inkjets, including
+    “photographic quality” models which offer very high
+    resolutions and several inks.  The core of Gutenprint is a shared
+    library (libgutenprint) which may be used by any program that
+    wishes to produce high-quality printed output.
+  </P
+><P
+>&#13;    This manual documents the use of the
+    <SPAN
+CLASS="application"
+>Gutenprint</SPAN
+> package, focusing mainly on
+    the libgutenprint library that is the core of
+    <SPAN
+CLASS="application"
+>Gutenprint</SPAN
+>.  Parts of the manual which
+    describe the use of libgutenprint are aimed primarily at
+    programmers, and do assume that the reader is familiar with C
+    programming, and using standard programming tools on GNU or UNIX
+    systems.
+    </P
+><P
+>&#13;    For the end-user, there is a separate manual documenting
+    programs that come with Gutenprint, including the
+    <SPAN
+CLASS="application"
+>GIMP</SPAN
+> <B
+CLASS="command"
+>print</B
+> plugin,
+    and the <SPAN
+CLASS="application"
+>CUPS</SPAN
+> and
+    <SPAN
+CLASS="application"
+>Ghostscript</SPAN
+> drivers.
+  </P
+><P
+>&#13;    To learn how to use libgutenprint in your own programs is to look
+    at the source of the <B
+CLASS="command"
+>testpattern</B
+>, located in
+    <TT
+CLASS="filename"
+>src/testpattern</TT
+>, as well as
+    the source of the other programs that use libgutenprint, and
+    libgutenprint itself.  Most importantly, please consult the API
+    reference and libgutenprint headers.
+  </P
+><P
+>&#13;    The manual is split into several parts for the programmer.  It
+    starts with a simple usage example of how to link a program with
+    libgutenprint, then how to integrate this into package build
+    scripts, using <B
+CLASS="command"
+>make</B
+>,
+    <B
+CLASS="command"
+>autoconf</B
+> and <B
+CLASS="command"
+>automake</B
+>.  The
+    appendices cover the detail of the inner workings of some parts of
+    libgutenprint.
+  </P
+><P
+>&#13;    The following sections detail the dither and weave algorithms used
+    in libgutenprint, the ESC/P2 printer control language used in Epson
+    printers and how to add support for a new printer to libgutenprint.
+  </P
+><P
+>&#13;    <P
+CLASS="literallayout"
+>We&nbsp;hope&nbsp;you&nbsp;enjoy&nbsp;using&nbsp;Gutenprint!<br>
+—The&nbsp;Gutenprint&nbsp;project<br>
+&nbsp;&nbsp;&nbsp;&nbsp;</P
+>
+  </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c39.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The Developer's Guide to Gutenprint</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Copying, modification and redistribution</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

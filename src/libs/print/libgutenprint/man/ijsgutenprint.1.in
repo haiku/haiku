@@ -1,0 +1,105 @@
+.\" t
+.\" $Id: ijsgutenprint.1.in,v 1.4 2006/05/24 11:25:42 rlk Exp $
+.\" Copyright (C) 2000-2002 Robert Krawitz <rlk@alum.mit.edu>
+.\"                         Roger Leigh <rleigh@debian.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2, or (at your option)
+.\" any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.TH IJSGUTENPRINT 1 "@RELEASE_DATE@" "Version @GUTENPRINT_VERSION@" "Gutenprint Manual Pages"
+.SH NAME
+ijsgutenprint \- Ghostscript driver for Gutenprint
+.SH SYNOPSIS
+.B gs
+\-sDEVICE=ijs
+\-sIjsServer=@prefix@/bin/ijsgutenprint
+\-sDeviceManufacturer=\fIvendor\fP
+\-sDeviceModel=\fIname\fP
+[ \fI\-dIjsUseOutputFD\fP ]
+\-sIjsParams=[ \fIkey1\fP=\fIvalue1\fP,\fIkeyn\fP=\fIvaluen\fP... ]
+[ \fIoptions\fP ]
+[ \fIfiles\fP ]
+.SH DESCRIPTION
+.PP
+.B ijsgutenprint
+provides Ghostscript with a Gutenprint driver, supporting all printers
+supported by libgutenprint.
+.PP
+.B NOTE:
+ijsgutenprint should never be called directly.  Ghostscript will run it if the
+IjsServer parameter is set to IjsServer=ijsgutenprint when invoking the IJS
+driver.
+.PP
+.B NOTE:
+The only \fIsupported\fP method of running ijsgutenprint is via Foomatic.
+Users running ghostscript directly will not be supported.  The driver name used
+by Foomatic is \fIgutenprint\-ijs.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@\fP.
+.SH OPTIONS
+\fIijsgutenprint\fP accepts the following Ghostscript IJS options.  The
+Gutenprint-specific options are not documented here.
+.TP
+.B \-dIjsUseOutputFD
+This option should be specified whenever output from Ghostscript will go to
+stdout or into a pipe.  It may be specified in all other cases, with only a
+slight performance degradation.
+.TP
+\fB\-sIjsParams\fP=\fIOption1\fP=\fIValue1\fP,\fIOption2\fP=\fIValue2\fP
+This parameter contains a single string containing a comma-separated list of
+sub-options.
+.TP
+\fB\-sDeviceManufacturer\fP=\fIvendor\fP \fB\-sDeviceModel\fP=\fIname\fP
+This option must be supplied.  There is no default.  The IJS driver requires
+the \fIvendor\fP (it's part of the protocol), but the ijsgutenprint driver
+ignores it.
+.SH HISTORY
+The Ghostscript \fBstp\fP driver was originally written by Henryk Richter
+(buggs@comlab.uni\-rostock.de), and was integrated into Gutenprint during the
+3.1 development series.  Gutenprint (which was named Gimp-Print prior to
+release 5.0) itself was originally written by Michael Sweet <mike@easysw.com>,
+who released up to version 2.0; Robert Krawitz released version 3.0.  The
+Gutenprint development team (http://gimp\-print.sourceforge.net) now maintains
+the entire package.
+.PP
+The IJS driver was originally written by Russell Lang, and incorporated into
+Gutenprint (known then as Gimp-Print) in early 2002.  This driver corresponds
+with the IJS protocol 0.32.
+.PP
+The \fBstp\fP driver is no longer supported as of Gutenprint 5.0.
+.SH COPYRIGHT
+Copyright \(co  2001\-2006 Robert Krawitz (rlk@alum.mit.edu)
+.PP
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+.PP
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License along with
+this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+Place - Suite 330, Boston, MA 02111-1307, USA.
+.SH AUTHORS
+Robert Krawitz.  Originally written by Russell Lang.
+.PP
+This manual page was written by Robert Krawitz (rlk@alum.mit.edu) and Roger
+Leigh (rleigh@debian.org).
+.SH SEE ALSO
+.BR gs (1)
+.\"#
+.\"# The following sets edit modes for GNU EMACS
+.\"# Local Variables:
+.\"# mode:nroff
+.\"# fill-column:79
+.\"# End:

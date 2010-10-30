@@ -1,0 +1,20 @@
+<option type="enum" id="opt/@@DRVNAME@@-stp_inputslot">
+  <!-- A multilingual <comments> block can appear here, too;
+       it should be treated as documentation for the user. -->
+  <arg_longname>
+   <en>Media Source</en>
+  </arg_longname>
+  <arg_shortname>
+   <en>InputSlot</en><!-- backends only know <en> shortnames! -->
+  </arg_shortname>
+  <arg_execution>@@GROUP@@
+   <arg_order>1000</arg_order>
+   <arg_spot>B</arg_spot>
+   <arg_substitution />
+   <arg_proto>STP_InputSlot=%s,</arg_proto>
+  </arg_execution>
+
+  @@OPTCONSTRAINTS@@
+  @@ENUMVALS@@
+
+</option>

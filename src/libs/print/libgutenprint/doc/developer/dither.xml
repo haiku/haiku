@@ -1,0 +1,679 @@
+<chapter>
+  <title>Dithering</title>
+  <para>
+    The dithering code in
+    <filename>src/main/print-dither.c</filename> attempts to
+    reproduce various shades of gray (or all colors) from only a few
+    different inks (black, cyan, magenta, yellow, and sometimes
+    light cyan and light magenta).  The dots can't vary in darkness
+    or size (except for certain special printers), and so we need to
+    lay down a certain fraction of dots to represent each distinct
+    level.
+  </para>
+  <para>
+    This sounds straightforward; in practice, it isn't.  Completely
+    random distribution of dots (simple probabilistic dithering)
+    would create grainy clumps and light spots.  The smoothest
+    pattern results from an equidistant spacing of dots.
+    Approximating this requires sophisticated algorithms.  We have
+    two dithering algorithms, an ordered dither algorithm that uses
+    a grid (matrix) to decide whether to print, and a modified
+    Floyd-Steinberg error diffusion algorithm that uses a grid in a
+    slightly different way.
+  </para>
+  <para>
+    We currently have three dithering functions:
+  </para>
+  <variablelist>
+    <varlistentry>
+      <term><literal>dither_fastblack</literal></term>
+      <listitem>
+        <para>
+          This produces pure black or white from a pre-dithered
+          input.  This is used for two purposes: for printing pure
+          black and white very quickly (e.g. text), and for printing
+          pre-screened monochrome output that was rasterized
+          externally.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>dither_black</literal></term>
+      <listitem>
+        <para>
+          This produces black from grayscale input.  The new
+          dither_black can produce either a single or multiple
+          levels of black, for printers supporting variable dot
+          size.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><literal>dither_cmyk</literal></term>
+      <listitem>
+        <para>
+          This produces 3, 4, 5, 6, or 7 color output (CMY, CMYK,
+          CcMmYK, CcMmYy, CcMmYyK, or any variants).  The new
+          routine can handle single or multiple levels of each
+          color.
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <para>
+    There is a choice of dithering algorithms.  Four of them are
+    based on a basic error diffusion, with a few tweaks of my own.
+    The other one is &lsquo;ordered&rsquo;.  However, they all share
+    the basic operation in common.  First, the algorithm picks what
+    kind of dot (if there are multiple dot sizes and/or tones that
+    may be picked) is the candidate to be printed.  This decision is
+    made based on the darkness at the point being dithered.  Then,
+    it decides whether the dot will be printed at all.  What this is
+    based on depends upon which algorithm family we use.  This is
+    all described in more detail below.
+  </para>
+  <para>
+    Ordered dithering works by comparing the value at a given point
+    with the value of a tiled matrix.  If the value at the point is
+    greater than the value in the matrix, the dot is printed.  The
+    matrix should consist of a set of evenly spaced points between 0
+    and the upper limit.  The choice of matrix is very important for
+    print quality.  A good dither matrix will emphasize high
+    frequency components, which distributes dots evenly with a
+    minimum of clumping.  The matrices used here are all simple
+    matrices that are expanded recursively to create larger matrices
+    with the same kind of even point distribution.  This is
+    described below.
+  </para>
+  <para>
+    Note that it is important to use different matrices for the two
+    sub-operations, because otherwise the choice about whether to
+    print and the choice of dot size will be correlated.  The usual
+    result is that the print is either too dark or too light, but
+    there can be other problems.
+  </para>
+  <para>
+    Ordered dithering works quite well on single dot size, four
+    color printers.  It has not been well tested on four color,
+    variable dot size printers.  It should be avoided on six color
+    printers.
+  </para>
+  <para>
+    Error diffusion works by taking the output error at a given
+    pixel and &ldquo;diffusing&rdquo; it into surrounding pixels.
+    Output error is the difference between the amount of ink output
+    and the input level at each pixel.  For simple printers, with
+    one or four ink colors and only one dot size, the amount of ink
+    output is either 65536 (i. e. full output) or 0 (no output).
+    The difference between this and the input level is the error.
+    Normal error diffusion adds part of this error to the adjoining
+    pixels in the next column and the next row (the algorithm simply
+    scans each row in turn, never backing up).  The error adds up
+    until it reaches a threshold (half of the full output level, or
+    32768), at which point a dot is output, the output is subtracted
+    from the current value, and the (now negative) error is diffused
+    similarly.
+  </para>
+  <para>
+    Error diffusion works quite well in general, but it tends to
+    generate artifacts which usually appear as worm-like lines or
+    areas of anomalous density.  I have devised some ways, as
+    described below, of ameliorating these artifacts.
+  </para>
+  <para>
+    There are two sub-classes of error diffusion that we use here,
+    &lsquo;random&rsquo; and &lsquo;hybrid&rsquo;.  One of the
+    techniques that we use to ameliorate the artifacts is to use a
+    fuzzy threshold rather than the hard threshold of half of the
+    output level.  Random error diffusion uses a pseudo-random
+    number to perturb the threshold, while hybrid error diffusion
+    uses a matrix.  Hybrid error diffusion worked very poorly in
+    3.1.3, and I couldn't figure out why until I found a bug.  It
+    now works very well.
+  </para>
+  <para>
+    There is one additional variant (on both sub-classes), called
+    &lsquo;adaptive hybrid&rsquo; and &lsquo;adaptive random&rsquo;.
+    The adaptive variant takes advantage of the fact that the
+    patterns that ordered dithering create are less visible at very
+    low densities, while the artifacts created by error diffusion
+    are more objectionable at low densities.  At low densities,
+    therefore, it uses ordered dithering; at higher densities it
+    uses error diffusion.
+  </para>
+  <para>
+    Handling multiple output levels makes life a bit more
+    complicated.  In principle, it shouldn't be much harder: simply
+    figure out what the ratio between the available output levels is
+    and have multiple thresholds.  In practice, getting these right
+    involves a lot of trial and error.  The other thing that's
+    important is to maximize the number of dots that have some ink.
+    This will reduce the amount of speckling.  More on this later.
+  </para>
+  <para>
+    The next question: how do we handle black when printing in
+    color?  Black ink is much darker than colored inks.  It's
+    possible to produce black by adding some mixture of cyan,
+    magenta, and yellow&mdash;in principle.  In practice, the black
+    really isn't very black, and different inks and different papers
+    will produce different color casts.  However, by using CMY to
+    produce gray, we can output a lot more dots!  This makes for a
+    much smoother image.  What's more, one cyan, one magenta, and
+    one yellow dot produce less darkness than one black dot, so
+    we're outputting that many more dots.  Better yet, with 6 or 7
+    color printers, we have to output even more light ink dots.  So
+    Epson Stylus Photo printers can produce really smooth grays---if
+    we do everything right.  The right idea is to use CMY at lower
+    black levels, and gradually mix in black as the overall amount
+    of ink increases, so the black dots don't really become visible
+    within the ink mass.
+  </para>
+  <para>
+    Variable dot sizes are handled by dividing the range between 0
+    and 65536 into segments.  Each segment can either represent a
+    range in which all of one kind of ink (color and/or dot size) is
+    used, with varying amounts of ink, or a transition region
+    between inks, in which equal numbers of dots are printed but the
+    amount of each ink will be adjusted throughout the range.  Each
+    range is represented by four numbers:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        Bottom of the range.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Top of the range.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Value of the lighter ink.
+      </para>
+    </listitem>
+    <listitem>
+      <para>Value of the darker ink.
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    In addition, the bit patterns and which type of ink are also
+    represented, but they don't affect the actual algorithm.
+  </para>
+  <para>
+    As mentioned above, the basic algorithm is the same whether we
+    use ordered dither or error diffusion.  We perform the following
+    steps on each color of each pixel:
+  </para>
+  <orderedlist>
+    <listitem>
+      <para>
+        Compute the value of the particular color we're printing.
+        This isn't usually the pure CMY value; it's adjusted to
+        improve saturation and to limit the use of black in light
+        toned regions (to avoid speckling).
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Find the range containing this value.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Compute where this value lies within the range.  We scale
+        the endpoints between 0 and 65536 for this purpose.  So for
+        example, if the bottom of the range is 10,000 and the top of
+        the range is 20,000, and the value is 12,500, we're 1/4 of
+        the way between the bottom and the top of the range, so our
+        scale point is 16384.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Compute the &ldquo;virtual value&rdquo;.  The virtual value
+        is the distance between the value of the lighter and the
+        value of the darker ink.  So if the value of the light ink
+        is 32768 and the dark ink is 65536, we compute a virtual
+        value scaled appropriately between these two values, which
+        is 40960 in this case.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Using either error diffusion or ordered dither, the standard
+        threshold is 1/2 of the value (20480 in this case).  Using
+        ordered dither, we want to compute a value between 0 and
+        40960 that we will compare the input value against to decide
+        whether to print.  Using pure error diffusion, we would
+        compare the accumulated error against 20480 to decide
+        whether to print.  In practice, we use the same matrix
+        method to decide whether to print.  The correct amount of
+        ink will be printed this way, but we minimize the squiggly
+        lines characteristic of error diffusion by dithering the
+        threshold in this fashion.  A future enhancement will allow
+        us to control the amount of dithering applied to the
+        threshold.
+      </para>
+    </listitem>
+  </orderedlist>
+  <para>
+    The matrices were generated by Thomas Tonino
+    <email>ttonino@bio.vu.nl</email> with an algorithm of his
+    devising.  The algorithm is designed to maximize the spacing
+    between dots at any given density by searching the matrix for
+    holes and placing a dot in the largest available hole.  It
+    requires careful selection of initial points to achieve good
+    results, and is very time consuming.  For best results, a
+    different matrix must be used for modes with 2:1 aspect ratio
+    (e.g. 1440&times;720) than for 1:1 (e. g. 720&times;720).  It is
+    essential with any of these matrices that every point be used.
+    Skipping points generates low-frequency noise.
+  </para>
+  <para>
+    It's essential to use different matrices for deciding whether to
+    print and for deciding what color (dark or light) to print.
+    This should be obvious; the decision about whether to print at
+    all should be as independent as possible from the decision about
+    what color to print, because any bias will result in excess
+    light or dark ink being printed, shifting the tonal balance.  We
+    actually use the same matrices, but we shift them vertically and
+    horizontally.  Assuming that the matrices are not
+    self-correlated, this will yield good results.
+  </para>
+  <para>
+    The ranges are computed from a list of ink values (between 0 and
+    1 for each possible combination of dot size and ink tone, where
+    the value represents the darkness of the ink) and the desired
+    maximum density of the ink.  This is done in dither_set_ranges,
+    and needs more documentation.
+  </para>
+  <para>
+    I stated earlier that I've tweaked the basic error diffusion
+    algorithm.  Here's what I've done to improve it:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        We use a variable threshold to decide when to print, as
+        discussed above.  This does two things for us: it reduces
+        the slightly squiggly diagonal lines that are the mark of
+        error diffusion; and it allows us to lay down some ink even
+        in very light areas near the edge of the image.  The
+        squiggly lines that error diffusion algorithms tend to
+        generate are caused by the gradual accumulation of error.
+        This error is partially added horizontally and partially
+        vertically.  The horizontal accumulation results in a dot
+        eventually being printed.  The vertical accumulation results
+        in a dot getting laid down in roughly the same horizontal
+        position in the next row.  The diagonal squigglies result
+        from the error being added to pixels one forward and one
+        below the current pixel; these lines slope from the top
+        right to the bottom left of the image.
+      </para>
+      <para>
+        Error diffusion also results in pale areas being completely
+        white near the top left of the image (the origin of the
+        printing coordinates).  This is because enough error has to
+        accumulate for anything at all to get printed.  In very pale
+        areas it takes quite a long time to build up anything
+        printable at all; this results in the bare spots.
+      </para>
+      <para>
+        Randomizing the threshold somewhat breaks up the diagonals
+        to some degree by randomizing the exact location that the
+        accumulated output crosses the threshold.  It reduces the
+        false white areas by allowing some dots to be printed even
+        when the accumulated output level is very low.  It doesn't
+        result in excess ink because the full output level is still
+        subtracted and diffused.
+      </para>
+      <para>
+        Excessive randomization leads to blobs at high densities.
+        Therefore, as the density increases, the degree of
+        randomization decreases.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Alternating scan direction between rows (first row is
+        scanned left to right, second is scanned right to left, and
+        so on).  This also helps break up white areas, and it also
+        seems to break up squigglies a bit.  Furthermore, it
+        eliminates directional biases in the horizontal direction.
+        This isn't necessary for ordered dither, but it doesn't hurt
+        either.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Diffusing the error into more pixels.  Instead of diffusing
+        the entire error into (X+1, Y) and (X, Y+1), we diffuse it
+        into (X+1, Y), (X+K, Y+1), (X, Y+1), (X-K, Y+1) where K
+        depends upon the output level (it never exceeds about 10
+        dots, and is greater at higher output levels).  This really
+        reduces squigglies and graininess.  The amount of this
+        spread can be controlled; for line art, it should be less
+        than for photographs (of course, line art doesn't usually
+        contain much light color, but the <emphasis>error</emphasis>
+        value can be small in places!)  In addition to requiring
+        more computation, a wide ink spread results in patterning at
+        high dot densities (note that the dot density can be high
+        even in fairly pale regions if multiple dot sizes are in
+        use).
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Don't lay down any colored ink if we're laying down black
+        ink.  There's no point; the colored ink won't show.  We
+        still pretend that we did for purposes of error diffusion
+        (otherwise excessive error will build up, and will take a
+        long time to clear, resulting in heavy bleeding of ink into
+        surrounding areas, which is very ugly indeed), but we don't
+        bother wasting the ink.  How well this will do with variable
+        dot size remains to be seen.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        Oversampling.  This is how to print 1440&times;720 with Epson
+        Stylus printers.  Printing full density at 1440&times;720 will
+        result in excess ink being laid down.  The trick is to print
+        only every other dot.  We still compute the error as though we
+        printed every dot.  It turns out that randomizing which dots
+        are printed results in very speckled output.  This can be
+        taken too far; oversampling at 1440&times;1440 or
+        1440&times;2880 virtual resolution results in other problems.
+        However, at present 1440&times;1440 (which is more accurately
+        called "1440&times;720 enhanced", as the Epson printers cannot
+        print 1440 rows per inch) does quite well, although it's slow.
+      </para>
+    </listitem>
+  </itemizedlist>
+  <para>
+    What about multiple output levels?  For 6 and 7 color printers,
+    simply using different threshold levels has a problem: the pale
+    inks have trouble being seen when a lot of darker ink is being
+    printed.  So rather than just using the output level of the
+    particular color to decide which ink to print, we look at the
+    total density (sum of all output levels).  If the density's high
+    enough, we prefer to use the dark ink.  Speckling is less
+    visible when there's a lot of ink, anyway.  I haven't yet
+    figured out what to do for multiple levels of one color.
+  </para>
+  <para>
+    You'll note that I haven't quoted a single source on color or
+    printing theory.  I simply did all of this empirically.
+  </para>
+  <para>
+    There are various other tricks to reduce speckling.  One that
+    I've seen is to reduce the amount of ink printed in regions
+    where one color (particularly cyan, which is perceived as the
+    darkest) is very pale.  This does reduce speckling all right,
+    but it also results in strange tonal curves and weird (to my
+    eye) colors.
+  </para>
+  <para>
+    Before any dither routine is used,
+    <function>init_dither</function> must be called.  This takes
+    three arguments: the input width (number of pixels in the
+    input), the output width (number of pixels in the output), and a
+    <type>stp_vars_t</type> structure containing the parameters for
+    the print job.
+  </para>
+  <para>
+    <function>init_dither</function> returns a pointer to an opaque
+    object representing the dither.  This object is passed as the first
+    argument to all of the dither-related routines.
+  </para>
+  <para>
+    After a page is fully dithered, <function>free_dither</function>
+    must be called to free the dither object and perform any
+    cleanup.  In the future, this may do more (such as flush
+    output).  This arrangement permits using these routines with
+    programs that create multiple output pages, such as GhostScript.
+  </para>
+  <para>
+    The dithering routines themselves have a number of control knobs
+    that control internal aspects of the dithering process.  These
+    knobs are accessible via a number of functions that can be
+    called after <function>init_dither</function>.
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        <function>dither_set_density</function> takes a double
+        between 0 and 1 representing the desired ink density for
+        printing solid colors.  This is used in a number of places
+        in the dithering routine to make decisions.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_black_density</function> takes a double
+        between 0 and 1 representing the desired ink density for
+        printing black ink in color printing.  This is used to
+        balance black against color ink.  By default, this is equal
+        to the density set by
+        <function>dither_set_density</function>.  By setting it
+        higher, more black ink will be printed.  For example, if the
+        base density is .4 and the black density is .8, twice as
+        much black ink will be printed as would otherwise be called
+        for.
+      </para>
+      <para>
+        This is not used when printing in monochrome.  When printing
+        monochrome, the base density
+        (<function>dither_set_density</function>) should be adjusted
+        appropriately.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_ink_budget</function> takes an unsigned
+        number representing the most ink that may be deposited at a
+        given point.  This number is arbitrary; the limit is
+        computed by summing the size of each ink dot, which is
+        supplied as a parameter in
+        <function>dither_set_X_ranges</function>.  By default, there
+        is no limit.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_black_lower</function> takes a double
+        that should be between 0 and 1 that represents the lowest
+        density level at which black ink will start to mix in with
+        colored ink to generate grays.  The lower this is, the less
+        density is required to use black ink.  Setting this too low
+        will result in speckling from black dots, particularly on 6
+        and 7 color printers.  Setting this too high will make it
+        hard to get satisfactory black or may result in sharp
+        transition between blended colors and black.  Default:
+        0.0468.
+      </para>
+      <para>
+        It is important to note that since the density scale is
+        never linear (and since this value is adjusted via other
+        things happening during the dithering process) that this
+        does not mean that 95% gray will use any black ink.  At this
+        setting, there will be no black ink used until about 50%
+        gray.
+      </para>
+      <para>
+        This only applies to color mode.
+        </para>
+      <para>
+        This value should be set lower for printers capable of
+        variable dot size, since more dots can be laid down close to
+        each other.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_black_upper</function> takes a double
+        that should be between 0 and 1 that represents the highest
+        density level at which colored inks will be mixed to create
+        gray.  Setting this too low will result in speckly dark
+        grays because there is not enough ink to fill all the holes,
+        or sharp transition between blended colors and black if it
+        is too close to the value of
+        <function>dither_set_black_upper</function> Setting this too
+        high will result in poor black and dark tone quality.
+        Default: 0.5.  This results in 10% and darker grays being
+        printed with essentially all black.
+      </para>
+      <para>
+        This only applies to color mode.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_black_levels</function> takes three
+        doubles that represent the amount of cyan, magenta, and
+        yellow respectively that are blended to create gray.  The
+        defaults are 1.0 for each, which is probably too low for
+        most printers.  These values are adjusted to create a good
+        gray balance.  Setting these too low will result in pale
+        light and midtone grays, with a sharp transition to darker
+        tones as black mixes in.  Setting them too high will result
+        in overly dark grays and use of too much ink, possibly
+        creating bleed-through.
+      </para>
+      <para>
+        This only applies to color mode.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_randomizers</function> takes four
+        integer values representing the degree of randomness used
+        for cyan, magenta, yellow, and black.  This is used to allow
+        some printing to take place in pale areas.  Zero is the most
+        random; greater than 8 or so gives very little randomness at
+        all.  Defaults are 0 for cyan, magenta, and yellow, and 4
+        for black.  Setting the value for black too low will result
+        in black speckling in pale areas.  Setting values too high
+        will result in pale areas getting no ink at all.
+      </para>
+      <para>
+        This currently only applies to single dot size in color and
+        black.  It should be extended to operate in variable dot
+        size mode, although actually applying it correctly will be
+        tricky.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_ink_darkness</function> takes three
+        doubles representing the contribution to perceived darkness
+        of cyan, magenta, and yellow.  This is used to help decide
+        when to switch between light and dark inks in 6 and 7 color
+        printers (with light cyan, light magenta, and possibly light
+        yellow).  Setting these too low will result in too much
+        light ink being laid down, creating flat spots in the
+        darkness curves and bleed-through.  Setting them too high
+        will result in dark ink being used in pale areas, creating
+        speckle.  The defaults are .4 for cyan, .3 for magenta, and
+        .2 for yellow.  Dark cyan will show against yellow much more
+        than dark magenta will show against cyan, since the cyan
+        appears much darker than the yellow.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_light_inks</function> takes three
+        doubles between 0 and 1 representing the ratio in darkness
+        between the light and dark versions of the inks.  Setting
+        these too low will result in too much dark ink being used in
+        pale areas, creating speckling, while setting them too high
+        will result in very smooth texture but too much use of light
+        ink, resulting in flat spots in the density curves and ink
+        bleed-through.  There are no defaults.  Any light ink
+        specified as zero indicates that there is no light ink for
+        that color.
+      </para>
+      <para>
+        This only applies to 6 and 7 color printers in single dot
+        size color mode, and only to those inks which have light
+        versions (usually cyan and magenta).
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_ink_spread</function> takes a small
+        integer representing the amount of ink spread in the dither.
+        Larger numbers mean less spread.  Larger values are
+        appropriate for line art and solid tones; they will yield
+        sharper transitions but more dither artifacts.  Smaller
+        values are more appropriate for photos.  They will reduce
+        resolution and sharpness but reduce dither artifacts up to a
+        point.  A value of 16 or higher implies minimum ink spread
+        at any resolution no matter what the overdensity.  A value
+        of 14 is typical for photos on single dot size, 6 color
+        printers.  For 4 color printers, subtract 1 (more spread;
+        the dots are farther apart).  For variable dot size
+        printers, add 1 (more small dots are printed; less spread is
+        desirable).
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_adaptive_divisor</function> takes a
+        float representing the transition point between error
+        diffusion and ordered dither if adaptive dithering is used.
+        The float is a fraction of the printing density.  For
+        example, if you wish the transition to be at 1/4 of the
+        maximum density (which works well on simple 4-color
+        printers), you would pass .25 here.  With six colors and/or
+        with multiple dot sizes, the values should be set lower.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_transition</function> takes a float
+        representing the exponent of the transition curve between
+        light and dark inks/dot sizes.  A value less than 1 (typical
+        when using error diffusion) mixes in less dark ink/small
+        dots at lower ends of the range, to reduce speckling.  When
+        using ordered dithering, this must be set to 1.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_X_ranges_simple</function>
+        (<literal>X</literal> = <literal>c</literal>,
+        <literal>m</literal>, <literal>y</literal> or
+        <literal>k</literal>) describes the ink choices available
+        for each color.  This is useful in typical cases where a
+        four color printer with variable dot sizes is in use.  It is
+        passed an array of doubles between (0, 1] representing the
+        relative darkness of each dot size.  The dot sizes are
+        assigned bit patterns (and ink quantities, see
+        <function>dither_set_ink_budget</function> above) from 1 to
+        the number of levels.  This also requires a density, which
+        is the desired density for this color.  This density need
+        not equal the density specified in
+        <function>dither_set_density</function>.  Setting it lower
+        will tend to print more dark ink (because the curves are
+        calculated for this color assuming a lower density than is
+        actually supplied).
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <function>dither_set_X_ranges</function>
+        (<literal>X</literal> = <literal>c</literal>,
+        <literal>m</literal>, <literal>y</literal> or
+        <literal>k</literal>) describes in a more general way the
+        ink choices available for each color.  For each possible ink
+        choice, a bit pattern, dot size, value (i. e. relative
+        darkness), and whether the ink is the dark or light variant
+        ink is specified.
+      </para>
+    </listitem>
+  </itemizedlist>
+</chapter>

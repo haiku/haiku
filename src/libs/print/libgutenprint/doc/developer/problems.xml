@@ -1,0 +1,22 @@
+  <chapter>
+    <title>Reporting Bugs</title>
+    <para>
+      If you find a bug in Gutenprint or have any suggestions for
+      modification or improvement, please send electronic mail to the
+      Gutenprint bug reporting address,
+      <email>gimp-print-devel@lists.sourceforge.net</email>.  Please
+      include the version number, which you can find at the bottom of
+      each manual page.  Also include in your message the output that
+      the program produced and the output you expected, if applicable,
+      otherwise the best description of the problem that you can
+      provide.
+    </para>
+    <para>
+      If you have other questions, comments or suggestions about
+      Gutenprint, contact the developers via electronic mail to the
+      Gutenprint mailing list
+      <email>gimp-print-devel@lists.sourceforge.net</email>.  They
+      will try to help you out, although they may not have time to fix
+      your problems.
+    </para>
+  </chapter>

@@ -1,0 +1,40 @@
+<chapter>
+  <title>Copying, modification and redistribution</title>
+  <para>
+    Gutenprint is <emphasis>free</emphasis>; this means that everyone
+    is free to use it and free to redistribute it on a free basis.
+    Gutenprint is not in the public domain; it is copyrighted and
+    there are restrictions on its distribution, but these restrictions
+    are designed to permit everything that a good cooperating citizen
+    would want to do.  What is not allowed is to try to prevent others
+    from further sharing any version of Gutenprint that they might get
+    from you.
+  </para>
+  <para>
+    Specifically, we want to make sure that you have the right to give
+    away copies of Gutenprint, that you receive source code or else
+    can get it if you want it, that you can change Gutenprint or use
+    pieces of it in new free programs, and that you know you can do
+    these things.
+  </para>
+  <para>
+    To make sure that everyone has such rights, we have to forbid you
+    to deprive anyone else of these rights.  For example, if you
+    distribute copies of Gutenprint, you must give the recipients all
+    the rights that you have.  You must make sure that they, too,
+    receive or can get the source code, and you must tell them their
+    rights.
+  </para>
+  <para>
+    Also, for our own protection, we must make certain that everyone
+    finds out that there is no warranty for Gutenprint.  If Gutenprint
+    is modified by someone else and passed on, we want their
+    recipients to know that what they have is not what we distributed,
+    so that any problems introduced by others will no reflect on our
+    reputation.
+  </para>
+  <para>
+    Gutenprint is licensed under the terms of the GNU General Public
+    License (GPL), reproduced in <xref linkend="gpl"/>.
+  </para>
+</chapter>

@@ -1,0 +1,30 @@
+#!@PERL@
+
+%printer_list = ();
+@printer_names = ();
+
+eval `./printers`;
+
+open PRINTERS, "(wget -q -O - http://www.openprinting.org/printer_list.cgi; cat foomatic-printermap) |" or die "Can't get print list: $!";
+
+while (<PRINTERS>) {
+    if (/make ==/) {
+	/.*== "(.*)".*/;
+	$current_make = $1;
+    } elsif (/=new Option/) {
+	/.*"(.*)", *"(.*)".*/;
+	my $printer = "$current_make " . $1;
+	$printer_list{$2} = $printer;
+    } elsif (/^\#gptofoo/) {
+	chomp;
+	my ($junk, $key, $id) = split;
+	$id =~ s,printer/,,;
+	my ($string) = sprintf("%-30s %-15s %s\n", $printer_list{$id}, $key,
+			       $printer_name{$key});
+	push @printer_names, $string;
+    }
+}
+
+close PRINTERS;
+
+print sort @printer_names;

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+        <key>CFBundleDisplayName</key>
+        <string>Gutenprint</string>
+	<key>CFBundleExecutable</key>
+	<string>rastertogutenprint.@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@</string>
+        <key>CFBundleGetInfoString</key>
+        <string>@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@.@GUTENPRINT_MICRO_VERSION@, Copyright 1993-2008 Mike Sweet and Robert Krawitz</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.cups.gutenprint</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+        <key>CFBundleName</key>
+        <string>Gutenprint</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@.@GUTENPRINT_MICRO_VERSION@</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>@GUTENPRINT_MAJOR_VERSION@.@GUTENPRINT_MINOR_VERSION@.@GUTENPRINT_MICRO_VERSION@</string>
+</dict>
+</plist>

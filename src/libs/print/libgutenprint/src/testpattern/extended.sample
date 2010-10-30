@@ -1,0 +1,117 @@
+# Sample test pattern file, for use with Gimp-Print test pattern generator
+
+# Printer/driver settings. Please see src/ghost/README for appropriate
+# values for each of these settings
+# Printer model
+printer escp2-2200;
+mode extended 7 16;
+# Resolution, or print quality
+parameter Resolution 720sw;
+# Media source (if appropriate for your printer)
+#parameter InputSlot Standard;
+# Media type (what kind of paper)
+parameter MediaType Plain;
+# ink_type
+parameter InkType "CMYK";
+# Paper size
+parameter PageSize Letter;
+# Dither algorithm
+parameter DitherAlgorithm Adaptive;
+
+# Note that due to limitations in the lexical analyzer and parser, all
+# floating point values must be specified with a decimal point.
+
+# Placement settings
+# Horizontal size, as fraction of paper width (defaults to 1.0)
+hsize 0.08;
+# Vertical size, as fraction of paper width (defaults to 1.0)
+vsize 0.08;
+# Left margin, as fraction of paper width (defaults to 0)
+left 0.0;
+# Top margin, as fraction of paper width (defaults to 0)
+top 0.0;
+
+# Output settings
+# These settings are used as the base values for all ramps.  These settings
+# are multiplied by the appropriate values in each pattern definition
+# to compute the effective gamma and conversion values.  All of these
+# default to 1.0.
+# Gamma value applied to all inks
+gamma 2.0;
+# Additional gamma correction applied to cyan, magenta, yellow, and black inks
+gamma cyan 1.0;
+gamma l_cyan 1.0;
+gamma magenta 1.0;
+gamma l_magenta 1.0;
+gamma yellow 1.0;
+gamma d_yellow 1.0;
+gamma black 1.0;
+# Amount of each ink that should be used when black is converted to CMY.
+# These values must be greater than 0 and must not exceed 10.
+level cyan 1.0;
+level magenta 1.0;
+level yellow 1.0;
+
+# Maximum amount of ink that will be printed, relative to solid coverage.
+# 1.0 means that every dot position that can be printed will be.  Normally
+# at high resolutions less ink should be printed.  This is similar to
+# density in normal RGB mode, but does not affect photo ink conversion.
+ink_limit 1.0;
+
+# Density.  Unlike normal RGB mode, the CMYK16 input mode used by the
+# test pattern generator does not automatically scale the amount of ink
+# used by the resolution and paper type (see ink_limit above).  The test
+# driver separates the functions of ink limiting and photo ink conversion
+# to allow maximum control over the output.
+density 1.0;
+
+# Do we want a thin black line between each band? (default yes)
+blackline 1;
+
+# Number of steps in each ramp (default 256)
+steps 256;
+
+#  0) White band
+pattern 0.0 0.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0 ;
+#  1) C sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 1.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0 ;
+#  2) M sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 1.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0;
+#  3) Y sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 1.0 1.0;
+#  4) K sweep
+xpattern 0.0 1.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0;
+#  5) c sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 1.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0;
+#  6) m sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 1.0 1.0  0.0 0.0 1.0;
+#  7) k sweep
+xpattern 0.0 0.0 1.0  0.0 1.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0;
+#  8) CM (blue) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.0 1.0  0.0 0.0 1.0;
+#  9) CY (green) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0;
+#  10) MY (red) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.0 1.0  0.0 0.5 1.0;
+#  11) cY (yellow-green) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0;
+#  12) cY (light green) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.75 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.25 1.0;
+#  13) mY (orange) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.5 1.0;
+#  14) mY (light red) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.75 1.0  0.0 0.25 1.0;
+#  15) cm (light blue) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.0 1.0  0.0 0.5 1.0  0.0 0.0 1.0;
+#  16) CMY (gray) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.33 1.0  0.0 0.0 1.0  0.0 0.33 1.0  0.0 0.0 1.0  0.0 0.33 1.0;
+#  17) cmY sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.33 1.0  0.0 0.0 1.0  0.0 0.33 1.0  0.0 0.33 1.0;
+#  18) cmY (light gray) sweep
+xpattern 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.43 1.0  0.0 0.0 1.0  0.0 0.43 1.0  0.0 0.14 1.0;
+#  19) CMYK sweep
+xpattern 0.0 0.25 1.0  0.0 0.0 1.0  0.0 0.25 1.0  0.0 0.0 1.0  0.0 0.25 1.0  0.0 0.0 1.0  0.0 0.25 1.0;
+#  20) cmYk sweep
+xpattern 0.0 0.0 1.0  0.0 0.29 1.0  0.0 0.0 1.0  0.0 0.29 1.0  0.0 0.0 1.0  0.0 0.29 1.0  0.0 0.14 1.0;
+#  21) cmYK sweep
+xpattern 0.0 0.125 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.375 1.0  0.0 0.0 1.0  0.0 0.375 1.0  0.0 0.125 1.0;

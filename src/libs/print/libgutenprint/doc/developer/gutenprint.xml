@@ -1,0 +1,59 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" [
+  <!ENTITY copying SYSTEM "copying.xml">
+  <!ENTITY dither SYSTEM "dither.xml">
+  <!ENTITY escp2 SYSTEM "escp2.xml">
+  <!ENTITY gpl SYSTEM "gpl-appendix.xml">
+  <!ENTITY introduction SYSTEM "introduction.xml">
+  <!ENTITY new-printer SYSTEM "new-printer.xml">
+  <!ENTITY problems SYSTEM "problems.xml">
+  <!ENTITY using SYSTEM "using.xml">
+  <!ENTITY weave SYSTEM "weave.xml">
+]>
+<book>
+
+ <bookinfo>
+   <title>The Developer's Guide to Gutenprint</title>
+    <date>7th Nov, 2003</date>
+    <pubdate>7th Nov, 2003</pubdate>
+  <corpauthor>
+    The Gutenprint Project
+  </corpauthor>
+  <copyright>
+    <year>2003</year>
+    <holder>The Gutenprint Project</holder>
+  </copyright>
+  <legalnotice>
+    <para>
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License as
+      published by the Free Software Foundation; either version 2 of
+      the License, or (at your option) any later version.
+    </para>
+    <para>
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+    </para>
+    <para>
+      You should have received a copy of the GNU General Public
+      License along with this program; if not, write to the Free
+      Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+      MA 02111-1307, USA.
+    </para>
+  </legalnotice>
+  </bookinfo>
+
+&introduction;
+&copying;
+&using;
+&problems;
+&new-printer;
+&escp2;
+&weave;
+&dither;
+&gpl;
+
+</book>

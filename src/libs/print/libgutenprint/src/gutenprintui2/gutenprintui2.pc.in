@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: Gutenprint UI (GTK+-2.0 version)
+Description: Gutenprint Top Quality Printer Drivers - GTK+-2.0 User Interface
+Requires: gutenprint gtk+-2.0
+Version: @VERSION@
+Libs: -L${libdir} @GUTENPRINTUI2_LIBS@
+Libs.private: @gutenprintui2_libdeps@
+Cflags: -I${includedir} @gutenprintui2_cflags@

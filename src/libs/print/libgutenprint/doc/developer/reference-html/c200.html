@@ -1,0 +1,424 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Adding a new printer</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="The Developer's Guide to Gutenprint"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Reporting Bugs"
+HREF="c194.html"><LINK
+REL="NEXT"
+TITLE="The driver file"
+HREF="x271.html"><META
+http-equiv="Content-Type"
+content="text/html; charset=@encoding@"></HEAD
+><BODY
+CLASS="chapter"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Developer's Guide to Gutenprint</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c194.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x271.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="AEN200"
+></A
+>Chapter 4. Adding a new printer</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c200.html#AEN217"
+><TT
+CLASS="filename"
+>printers.xml</TT
+></A
+></DT
+><DT
+><A
+HREF="x271.html"
+>The driver file</A
+></DT
+></DL
+></DIV
+><P
+>&#13;    This chapter covers adding a new ESCP/2, PCL, or Canon printer.
+    Writing a new driver module is not covered.
+  </P
+><P
+>&#13;    The three steps to adding a printer are:
+    <P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;          Add an entry to <TT
+CLASS="filename"
+>printers.xml</TT
+>.
+        </P
+></LI
+><LI
+><P
+>&#13;          Add the appropriate code and data to the appropriate
+          driver module.
+        </P
+></LI
+><LI
+><P
+>&#13;          Tune the printer.
+        </P
+></LI
+></OL
+>
+  </P
+><P
+>&#13;    Printer information is stored in two places: in
+    <TT
+CLASS="filename"
+>printers.xml</TT
+> (which contains the list of
+    printer models available to the the upper-level application),
+    and in the appropriate driver file
+    (<TT
+CLASS="filename"
+>print-escp2.c</TT
+>,
+    <TT
+CLASS="filename"
+>print-pcl.c</TT
+>, or
+    <TT
+CLASS="filename"
+>print-canon.c</TT
+>).
+  </P
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN217"
+><TT
+CLASS="filename"
+>printers.xml</TT
+></A
+></H1
+><P
+>&#13;      <TT
+CLASS="filename"
+>printers.xml</TT
+> is an XML file that contains
+      very simple printer definitions.  A schema may be used to
+      validate the XML (<TT
+CLASS="filename"
+>src/main/gutenprint.xsd</TT
+>).
+      This is an example definition:
+    </P
+><DIV
+CLASS="informalexample"
+><P
+></P
+><A
+NAME="AEN223"
+></A
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#60;printer name="EPSON Stylus Color 1500" driver="escp2-1500"&#62;
+&#60;color value="true"/&#62;
+&#60;model value="2"/&#62;
+&#60;gamma value="0.597"/&#62;
+&#60;density value="1.0"/&#62;
+&#60;/printer&#62;</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><P
+>&#13;      There are other tags that may be present.  The only ones that
+      are mandatory are <TT
+CLASS="literal"
+>&#60;printer&#62;</TT
+>,
+      <TT
+CLASS="literal"
+>&#60;color&#62;</TT
+> and
+      <TT
+CLASS="literal"
+>&#60;model&#62;</TT
+>.  The other optional parameters
+      (<TT
+CLASS="literal"
+>&#60;gamma&#62;</TT
+> and
+      <TT
+CLASS="literal"
+>&#60;density&#62;</TT
+> in this case) can be used to
+      adjust control settings.  This is probably not the right place
+      for them; the printer drivers themselves should contain this
+      information.  There's probably no good reason for anything but
+      gamma and density to be in here.  Gamma refers to the printer's
+      gamma factor; density is the desired base ink density for the
+      printer.  The Epson driver contains the density information for
+      each printer at each resolution internally.  An even better
+      driver would adjust density and possibly even gamma for paper
+      type.  All the more reason not to have that information here.
+    </P
+><P
+>&#13;      If you really are curious about what tags are permitted, please
+      see the schema.  These are the definitions of the tags that do
+      matter:
+    </P
+><P
+></P
+><DIV
+CLASS="variablelist"
+><P
+><B
+>printdef XML elements</B
+></P
+><DL
+><DT
+><TT
+CLASS="literal"
+>&#60;family&#62;</TT
+></DT
+><DD
+><P
+>&#13;            This defines what driver module this printer uses.  The
+            attribute <TT
+CLASS="literal"
+>name</TT
+> is the name of the
+            family driver to associate the printers with, for example
+            <TT
+CLASS="literal"
+>escp2</TT
+>, <TT
+CLASS="literal"
+>pcl</TT
+>,
+            <TT
+CLASS="literal"
+>canon</TT
+>, <TT
+CLASS="literal"
+>ps</TT
+> or
+            <TT
+CLASS="literal"
+>raw</TT
+>.  This tag may only contain
+            <TT
+CLASS="literal"
+>&#60;printer&#62;</TT
+> elements.
+          </P
+></DD
+><DT
+><TT
+CLASS="literal"
+>&#60;printer&#62;</TT
+></DT
+><DD
+><P
+>&#13;            This starts the definition of a printer.  It must contain
+            the attributes <TT
+CLASS="literal"
+>name</TT
+> and
+            <TT
+CLASS="literal"
+>driver</TT
+>.  <TT
+CLASS="literal"
+>name</TT
+> should
+            be is the full name of the printer, and must be human
+            readable.  <TT
+CLASS="literal"
+>driver</TT
+> should consist of
+            alphanumerics and hyphens, and be fairly short.
+            <TT
+CLASS="literal"
+>name</TT
+> is what will appear in the
+            user-visible listing of printers, and may be translated
+            into the user's language, while <TT
+CLASS="literal"
+>driver</TT
+>
+            is what is actually used to key into the list of printers.
+            It is legal to have multiple printers with the same driver
+            name.
+          </P
+></DD
+><DT
+><TT
+CLASS="literal"
+>&#60;color&#62;</TT
+></DT
+><DD
+><P
+>&#13;            This tag may not contain any content, but the
+            <TT
+CLASS="literal"
+>value</TT
+> attribute may be set to
+            <TT
+CLASS="literal"
+>true</TT
+> or <TT
+CLASS="literal"
+>false</TT
+>.  This
+            indicates that this printer is capable of color, or is not
+            capable of color respectively.
+          </P
+></DD
+><DT
+><TT
+CLASS="literal"
+>&#60;model&#62;</TT
+></DT
+><DD
+><P
+>&#13;            This defines a model number.  This tag may not contain any
+            content, but the <TT
+CLASS="literal"
+>value</TT
+> attribute may be
+            set to a positive integer.  This is passed into the
+            driver, which may do whatever it cares to with
+            it—index into a table, compute on, or whatever.
+            This need not be unique.
+          </P
+></DD
+></DL
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c194.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x271.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Reporting Bugs</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The driver file</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

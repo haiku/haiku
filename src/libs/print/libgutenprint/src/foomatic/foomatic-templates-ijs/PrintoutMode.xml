@@ -1,0 +1,19 @@
+<option type="enum" id="opt/@@DRVNAME@@-printoutmode">
+  <!-- A multilingual <comments> block can appear here, too;
+       it should be treated as documentation for the user. -->
+  <arg_longname>
+   <en>Printout Mode</en>
+  </arg_longname>
+  <arg_shortname>
+   <en>PrintoutMode</en><!-- backends only know <en> shortnames! -->
+  </arg_shortname>
+  <arg_execution>@@GROUP@@
+   <arg_order>10</arg_order>
+   <arg_spot>A</arg_spot>
+   <arg_composite />
+  </arg_execution>
+
+  @@OPTCONSTRAINTS@@
+  @@ENUMVALS@@
+
+</option>

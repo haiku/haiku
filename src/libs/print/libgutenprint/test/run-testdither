@@ -1,0 +1,56 @@
+#!/bin/sh
+
+out_status=0
+
+if [ -z "$srcdir" -o "$srcdir" = "." ] ; then
+    sdir=`pwd`
+elif [ -n "`echo $srcdir |grep '^/'`" ] ; then
+    sdir="$srcdir"
+else
+    sdir="`pwd`/$srcdir"
+fi
+
+if [ -z "$STP_DATA_PATH" ] ; then
+    STP_DATA_PATH="$sdir/../src/xml"
+    export STP_DATA_PATH
+fi
+
+if [ -z "$STP_MODULE_PATH" ] ; then
+    STP_MODULE_PATH="$sdir/../src/main:$sdir/../src/main/.libs"
+    export STP_MODULE_PATH
+fi
+
+valcount=0
+valgrind=
+valopts=''
+
+set_args() {
+    while true ; do
+	case "$1" in
+	    -h*|--h*) usage ;;
+	    -v|--valgrind) valopts='--tool=memcheck' ; valcount=`expr $valgrind + 1` ;;
+	    -c|--cachegrind) valopts='--tool=cachegrind'; valcount=4 ;;
+	    -g|--gdb-attach) valopts='--gdb-attach=yes' ;;
+	    -V|--verbose) quiet= ;;
+	    -q|--quiet) quiet=quiet ;;
+	    --) shift; args="$@"; return ;;
+	    *) return ;;
+	esac
+    shift
+    done
+}
+
+set_args `getopt hgvqncV "$@"`
+
+case "$valcount" in
+    1) valopts="$valopts -q --num-callers=100 --error-limit=no --leak-check=yes";;
+    2) valopts="$valopts --num-callers=100 --error-limit=no --leak-resolution=high --leak-check=yes" ;;
+    3) valopts="$valopts --error-limit=no --num-callers=100 --show-reachable=yes --leak-resolution=high --leak-check=yes" ;;
+    *) ;;
+esac
+
+if [ -n "$valopts" ] ; then
+    valgrind="valgrind $valopts"
+fi
+
+$valgrind ./testdither

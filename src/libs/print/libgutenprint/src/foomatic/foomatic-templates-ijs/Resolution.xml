@@ -1,0 +1,20 @@
+<option type="enum" id="opt/@@DRVNAME@@-printerresolution">
+  <!-- A multilingual <comments> block can appear here, too;
+       it should be treated as documentation for the user. -->
+  <arg_longname>
+   <en>Printer Resolution</en>
+  </arg_longname>
+  <arg_shortname>
+   <en>PrinterResolution</en><!-- backends only know <en> shortnames! -->
+  </arg_shortname>
+  <arg_execution>@@GROUP@@
+   <arg_order>800</arg_order>
+   <arg_spot>B</arg_spot>
+   <arg_substitution />
+   <arg_proto>Resolution=%s,</arg_proto>
+  </arg_execution>
+
+  @@OPTCONSTRAINTS@@
+  @@ENUMVALS@@
+
+</option>

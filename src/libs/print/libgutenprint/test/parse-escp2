@@ -1,0 +1,590 @@
+#!/usr/bin/perl
+
+# Copyright 2000-2008 Robert Krawitz <rlk@alum.mit.edu>
+#
+#   This program is free software; you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the Free
+#   Software Foundation; either version 2 of the License, or (at your option)
+#   any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+#   for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+use Getopt::Std;
+use strict;
+
+getopts('VvO:');
+
+use vars qw($atend
+	    $stuff
+	    $opt_v
+	    $opt_V
+	    $opt_O
+	    $curoffset
+	    $curpos
+	    $esc
+	    $initial_vertical_position
+	    $page_mgmt_unit
+	    $horizontal_position
+	    $horizontal_unit
+	    $vertical_unit
+	    $vertical_position
+	    $raster_x
+	    $raster_y
+	    $print_offsets
+	    %seqtable
+	    @seqkeys
+	    %chartable
+	    %xchartable
+	    %nchartable
+	    %rchartable
+	    %keylengths
+	    $total_length
+	    @offsets);
+
+$atend = 0;
+%chartable = ();
+%xchartable = ();
+%nchartable = ();
+%rchartable = ();
+%keylengths = ();
+
+%seqtable = ( "@", 0,
+	      "(R", "REMOTE",
+	      "(", "VARIABLE",
+	      "U", 1,
+	      "\\", 2,
+	      "\$", 2,
+	      "r", 1,
+	      "\031", 1,
+	      ".", "SPECIAL",
+	      "i", "SPECIAL1",
+	      "\000", 2,
+	      "\001", 22
+	  );
+
+map {
+    my ($xchar) = pack("C", $_);
+    if ($_ >= 32 && $_ < 127) {
+	$chartable{$xchar} = " $xchar";
+	$xchartable{$xchar} = " *$xchar";
+	$rchartable{$xchar} = $xchar;
+    } else {
+	$chartable{$xchar} = sprintf("%02x", $_);
+	$xchartable{$xchar} = sprintf("*%02x", $_);
+	$rchartable{$xchar} = sprintf("%02x ", $_);
+    }
+    $nchartable{$xchar} = $_;
+} (0..255);
+
+@seqkeys = (sort { length $b <=> length $a } keys %seqtable);
+
+map { $keylengths{$_} = length $_ } @seqkeys;
+
+$esc = "\033";
+
+$curpos = 0;
+$curoffset = 0;
+
+$page_mgmt_unit = 360;
+$horizontal_unit = 180;
+$vertical_unit = 360;
+
+$initial_vertical_position = 0;
+$vertical_position = 0;
+$horizontal_position = 0;
+$print_offsets = 0;
+$total_length = 0;
+
+sub fill_buffer($) {
+    my ($where) = @_;
+    return 1 if $total_length - $curoffset >= $where;
+    my ($end) = $total_length - $curoffset;
+    if ($curpos == 0 && $end == 0) {
+	$stuff = <>;		# Need to do this once to "activate" ARGV
+	$total_length = length $stuff;
+	$end = $total_length - $curoffset;
+    }
+    my ($old_end) = $end;
+    my ($tmp);
+    my ($bytes_to_read) = 16384;
+    if ($where - $end > $bytes_to_read) {
+	$bytes_to_read = $where - $end;
+    }
+    if ($curoffset >= 16384) {
+	substr($stuff, 0, $curoffset) = "";
+	$total_length -= $curoffset;
+	$curoffset = 0;
+    }
+    while ($end < $where) {
+	my $foo = read ARGV, $tmp, $bytes_to_read;
+	$stuff .= $tmp;
+	$end += $foo;
+	$total_length += $foo;
+	if ($old_end == $end) {
+	    $atend = 1;
+	    return 0;
+	} else {
+	    $bytes_to_read -= $end - $old_end;
+	    $old_end = $end;
+	}
+    }
+    return 1;
+}
+
+sub increment_curpos($) {
+    my ($curpos_increment) = @_;
+    $curpos += $curpos_increment;
+    $curoffset += $curpos_increment;
+}
+
+# This slows things down tremendously...
+sub xdata($;$) {
+    my ($start, $end) = @_;
+    if (defined $end) {
+	return substr($stuff, $start + $curoffset, $end);
+    } else {
+	return substr($stuff, $start + $curoffset);
+    }
+}
+
+sub do_remote_command() {
+    print "\n";
+    printf "%08x  ", $curpos;
+    print "1b  (  R ";
+    increment_curpos(3);
+    fill_buffer(2);
+    my $lchar = substr($stuff, $curoffset + 0, 1);
+    my $nlchar = $nchartable{$lchar};
+    my $hchar = substr($stuff, $curoffset + 1, 1);
+    my $nhchar = $nchartable{$hchar};
+    printf " %02x %02x ", $nlchar, $nhchar;
+    my $skipchars = ($nhchar * 256) + $nlchar;
+    increment_curpos(2);
+    fill_buffer($skipchars);
+    for (my $i = 0; $i < $skipchars; $i++) {
+	print $rchartable{substr($stuff, $curoffset + $i, 1)};
+    }
+    increment_curpos($skipchars);
+    while (fill_buffer(2) &&
+	   substr($stuff, $curoffset + 0, 2) =~ /[A-Z0-9][A-Z0-9]/) {
+	print "\n";
+	printf "%08x    ", $curpos;
+	my ($cmd) = substr($stuff, $curoffset + 0, 2);
+	print $cmd;
+	increment_curpos(2);
+	fill_buffer(2);
+	$lchar = substr($stuff, $curoffset + 0, 1);
+	$nlchar = $nchartable{$lchar};
+	$hchar = substr($stuff, $curoffset + 1, 1);
+	$nhchar = $nchartable{$hchar};
+	if ($cmd eq "DF") {
+	    $skipchars = 0;
+	} else {
+	    $skipchars = ($nhchar * 256) + $nlchar;
+	}
+	printf " %02x %02x ", $nlchar, $nhchar;
+	increment_curpos(2);
+	fill_buffer($skipchars);
+	printf "%*v02x ", " ", substr($stuff, $curoffset, $skipchars);
+	increment_curpos($skipchars);
+    }
+}
+
+sub print_prefix_bytes($$) {
+    my ($bytes_to_print) = @_;
+    print "\n";
+    printf "%08x  ", $curpos;
+    print "1b ";
+    fill_buffer($bytes_to_print);
+    my $char = substr($stuff, $curoffset + 1, 1);
+    print "$chartable{$char} ";
+    printf "%*v02x ", " ", substr($stuff, $curoffset + 2, $bytes_to_print - 2);
+    increment_curpos($bytes_to_print);
+}
+
+sub print_output_data($$$$$$) {
+    my ($comptype, $bitsperpixel, $dots, $rows, $dot_scale, $color) = @_;
+    my $counter;
+    my $fchar;
+    my $last_row = 0;
+    my $first_row = -1;
+    my $i;
+    my $vstuff;
+    $dots *= 8;
+    $dots /= $dot_scale;
+    my $real_dots = $dots / $bitsperpixel;
+    if ($opt_v) {
+	print " ($real_dots dots, $rows rows, $bitsperpixel bits";
+    }
+    my $savedots = $dots;
+    if ($comptype == 0) {
+	fill_buffer($dots / 8);
+	if ($opt_V) {
+	    printf "%*v02x ", " ", substr($stuff, $curoffset + 0, $dots / 8);
+	}
+	increment_curpos($dots / 8);
+    } elsif ($comptype == 1) {
+	foreach $i (0..$rows-1) {
+	    my ($found_something) = 0;
+	    $dots = $savedots;
+	    my ($tstuff) = "\n    $i    ";
+	    while ($dots > 0) {
+		fill_buffer(1);
+		$counter = ord(substr($stuff, $curoffset + 0, 1));
+		increment_curpos(1);
+		if ($counter <= 127) {
+		    $counter++;
+		    fill_buffer($counter);
+		    if ($opt_v || $opt_V) {
+			my $tmp = sprintf "%*v02x ", " ", substr($stuff, $curoffset + 0, $counter);
+			if (!($tmp =~ /^[0 ]+$/)) {
+			    $found_something = 1;
+			    $last_row = $i;
+			    if ($first_row == -1) {
+				$first_row = $i;
+			    }
+			}
+			if ($opt_V) {
+			    $tstuff .= $tmp;
+			}
+		    }
+		    increment_curpos($counter);
+		} else {
+		    $counter = 257 - $counter;
+		    fill_buffer(1);
+		    if ($opt_v || $opt_V) {
+			$fchar = sprintf "%v02x ", substr($stuff, $curoffset + 0, 1);
+			if ($fchar ne "00 ") {
+			    $found_something = 1;
+			    $last_row = $i;
+			    if ($first_row == -1) {
+				$first_row = $i;
+			    }
+			}
+		    }
+		    if ($opt_V) {
+			map { $tstuff .= $fchar } (0..$counter - 1);
+		    }
+		    increment_curpos(1);
+		}
+		$dots -= $counter * 8;
+	    }
+	    if ($opt_V && $found_something) {
+		$vstuff .= $tstuff;
+	    }
+	}
+    } else {
+	print "\nUnknown compression type $comptype!\n";
+    }
+    if ($opt_v) {
+	my ($offset) = $offsets[$color];
+	my ($first_position) = ($vertical_position / $vertical_unit)
+	    + ($first_row + $offset) * $raster_y;
+	my ($last_position) = ($vertical_position / $vertical_unit)
+	    + ($last_row + $offset) * $raster_y;
+	my ($final_position) = ($vertical_position / $vertical_unit)
+	    + ($rows + $offset) * $raster_y;
+	my ($final_horizontal) = $horizontal_position +
+	    ($real_dots * $page_mgmt_unit * $raster_x);
+	if ($print_offsets) {
+	    printf (" %d,%d+%d %.4f  %d,%d+%d %.4f  %.4f) ",
+		    $horizontal_position, $first_row, $offset, $first_position,
+		    $final_horizontal, $last_row, $offset, $last_position,
+		    $final_position);
+	} else {
+	    printf (" %d,%d %.4f  %d,%d %.4f  %.4f) ",
+		    $horizontal_position, $first_row, $first_position,
+		    $final_horizontal, $last_row, $last_position,
+		    $final_position);
+	}
+    }
+    if ($opt_V) {
+	print " $vstuff";
+    }
+}
+
+sub do_special_command() {
+    fill_buffer(8);
+    my $comptype = $nchartable{substr($stuff, $curoffset + 2, 1)};
+    my $color = 0;
+    my $dots = unpack("v", substr($stuff, $curoffset + 6, 2));
+    my $rows = $nchartable{substr($stuff, $curoffset + 5, 1)};
+    print_prefix_bytes(8, 2);
+    print_output_data($comptype, 1, $dots, $rows, 8, $color);
+    fill_buffer(1);
+    while (substr($stuff, $curoffset + 0, 1) eq "\r") {
+	fill_buffer(1);
+	increment_curpos(1);
+    }
+}
+
+sub do_special1_command() {
+    fill_buffer(9);
+    my $color = $nchartable{substr($stuff, $curoffset + 2, 1)};
+    my $comptype = $nchartable{substr($stuff, $curoffset + 3, 1)};
+    my $bitsperpixel = $nchartable{substr($stuff, $curoffset + 4, 1)};
+    my $dots = unpack("v", substr($stuff, $curoffset + 5, 2));
+    my $rows = unpack("v", substr($stuff, $curoffset + 7, 2));
+    print_prefix_bytes(9, 1);
+    print_output_data($comptype, $bitsperpixel, $dots, $rows, 1, $color);
+    fill_buffer(1);
+    while (substr($stuff, $curoffset + 0, 1) eq "\r") {
+	fill_buffer(1);
+	increment_curpos(1);
+    }
+}
+
+sub get_long($) {
+    my ($string) = @_;
+    my ($tmp) = unpack("V", $string);
+    if ($tmp >= (1 << 31)) {
+	return -(0xffffffff ^ $tmp) - 1;
+    } else {
+	return $tmp;
+    }
+}
+
+sub get_short($) {
+    my ($string) = @_;
+    my ($tmp) = unpack("v", $string);
+    if ($tmp >= (1 << 15)) {
+	return -(0xffff ^ $tmp) - 1;
+    } else {
+	return $tmp;
+    }
+}
+
+sub get_byte($) {
+    my ($string) = @_;
+    return $nchartable{$string};
+}
+
+if ($opt_O) {
+    my (@stuff) = split(/,/, $opt_O);
+    map {
+	my ($key, $val) = split(/=/, $_);
+	if ($val) {
+	    $print_offsets = 1;
+	}
+	@offsets[$key] = $val;
+    } @stuff;
+}
+
+while (! $atend) {
+    my $found;
+    my $key;
+    my $skipchars;
+    my $startoff;
+    my $kchar;
+    my $nkchar;
+    my $lchar;
+    my $nlchar;
+    my $hchar;
+    my $nhchar;
+    my $i;
+    my $char;
+    my $nchar;
+    my $bytes;
+    my ($maxklen) = $keylengths{$seqkeys[0]};
+    fill_buffer(1);
+    my $cchar = substr($stuff, $curoffset + 0, 1);
+    if ($cchar eq "$esc") {
+	$found = 0;
+	fill_buffer(2 + $maxklen);
+	foreach $key (@seqkeys) {
+	    my ($klen) = $keylengths{$key};
+	    if (substr($stuff, $curoffset + 1, $klen) eq $key) {
+		$skipchars = $seqtable{$key};
+		if ($skipchars eq "SPECIAL") {
+		    do_special_command();
+		    $found = 2;
+		} elsif ($skipchars eq "SPECIAL1") {
+		    do_special1_command();
+		    $found = 2;
+		} elsif ($skipchars eq "REMOTE") {
+		    do_remote_command();
+		    $found = 2;
+		} else {
+		    print "\n";
+		    printf "%08x  ", $curpos;
+		    print "1b ";
+		    $startoff = 0;
+		    my $print_stuff = 0;
+		    my $print_variable = 0;
+		    if ($skipchars eq "VARIABLE") {
+			fill_buffer(3);
+			$print_variable = 1;
+			$kchar = substr($stuff, $curoffset + $klen + 1, 1);
+			$nkchar = unpack("C", $kchar);
+			$lchar = substr($stuff, $curoffset + $klen + 2, 1);
+			$nlchar = unpack("C", $lchar);
+			$hchar = substr($stuff, $curoffset + $klen + 3, 1);
+			$nhchar = unpack("C", $hchar);
+			$skipchars = ($nhchar * 256) + $nlchar;
+			$startoff = 3;
+			$print_stuff = 1;
+		    }
+		    my ($blen) = $skipchars + $klen + $startoff;
+		    fill_buffer($blen + 1);
+		    $char = substr($stuff, $curoffset + 1, 1);
+		    print "$chartable{$char} ";
+		    if ($blen > 1) {
+			$char = substr($stuff, $curoffset + 2, 1);
+			print "$chartable{$char} ";
+			if ($blen > 2) {
+			    if ($print_variable && $char eq "d") {
+				printf ("%*v02x ", " ",
+					substr($stuff, $curoffset + 3, 2));
+			    } else {
+				printf ("%*v02x ", " ",
+					substr($stuff, $curoffset + 3, $blen - 2));
+			    }
+			}
+		    }
+		    if ($print_stuff) {
+			my $xchar = substr($stuff, $curoffset + 2, 1);
+			if ($xchar eq "c") {
+			    my ($top, $bottom);
+			    if ($skipchars == 8) {
+				$top = get_long(substr($stuff, $curoffset + 5, 4));
+				if ($opt_v) {
+				    $bottom = get_long(substr($stuff, $curoffset + 9, 4));
+				}
+			    } else {
+				$top = get_short(substr($stuff, $curoffset + 5, 2));
+				if ($opt_v) {
+				    $bottom = get_short(substr($stuff, $curoffset + 7, 2));
+				}
+			    }
+			    if ($opt_v) {
+				printf (" (page format %d %d %.2f %.2f)",
+					$top, $bottom, $top / $page_mgmt_unit,
+					$bottom / $page_mgmt_unit);
+			    }
+			    $initial_vertical_position =
+				$top * $vertical_unit / $page_mgmt_unit;
+			    $vertical_position = $initial_vertical_position;
+			} elsif ($xchar eq "S") {
+			    if ($opt_v) {
+				my ($width, $height);
+				if ($skipchars == 8) {
+				    $width = get_long(substr($stuff, $curoffset + 5, 4));
+				    $height = get_long(substr($stuff, $curoffset + 9, 4));
+				} else {
+				    $width = get_short(substr($stuff, $curoffset + 5, 2));
+				    $height = get_short(substr($stuff, $curoffset + 7, 2));
+				}
+				printf (" (paper size %d %d %.2f %.2f)",
+					$width, $height, $width / $page_mgmt_unit,
+					$height / $page_mgmt_unit);
+			    }
+			} elsif ($xchar eq "C") {
+			    if ($opt_v) {
+				my ($length);
+				if ($skipchars == 4) {
+				    $length = get_long(substr($stuff, $curoffset + 5, 4));
+				} else {
+				    $length = get_short(substr($stuff, $curoffset + 5, 2));
+				}
+				printf (" (page length %d %.2f)",
+					$length, $length / $page_mgmt_unit);
+			    }
+			} elsif ($xchar eq "D") {
+			    my $base = get_short(substr($stuff, $curoffset + 5, 2));
+			    my $y = $nchartable{substr($stuff, $curoffset + 7, 1)};
+			    my $x = $nchartable{substr($stuff, $curoffset + 8, 1)};
+			    $raster_x = $x / $base;
+			    $raster_y = $y / $base;
+			    if ($opt_v) {
+				printf (" (raster base %d, %d x %d)",
+					$base, $base / $x, $base / $y);
+			    }
+			} elsif ($xchar eq "U") {
+			    if ($skipchars == 5) {
+				my $page_mgmt = $nchartable{substr($stuff, $curoffset + 5, 1)};
+				my $vertical = $nchartable{substr($stuff, $curoffset + 6, 1)};
+				my $horiz = $nchartable{substr($stuff, $curoffset + 7, 1)};
+				my $scale = get_short(substr($stuff, $curoffset + 8, 2));
+				$page_mgmt_unit = $scale / $page_mgmt;
+				$horizontal_unit = $scale / $horiz;
+				$vertical_unit = $scale / $vertical;
+				if ($opt_v) {
+				    printf (" (units base %d  mgmt %d  vert %d  horiz %d)",
+					    $scale, $page_mgmt_unit,
+					    $vertical_unit, $horizontal_unit);
+				}
+			    } else {
+				my $page_mgmt = $nchartable{substr($stuff, $curoffset + 5, 1)};
+				if ($opt_v) {
+				    printf " (units base = %d/3600)", $page_mgmt;
+				}
+				$page_mgmt_unit = 3600 / $page_mgmt;
+				$horizontal_unit = 3600 / $page_mgmt;
+				$vertical_unit = 3600 / $page_mgmt;
+			    }
+			} elsif ($xchar eq "v") {
+			    my ($length);
+			    if ($skipchars == 4) {
+				$length = get_long(substr($stuff, $curoffset + 5, 4));
+			    } else {
+				$length = get_short(substr($stuff, $curoffset + 5, 2));
+			    }
+			    $vertical_position += $length;
+			    if ($opt_v) {
+				printf (" (skip vertical %d at %d %.4f)",
+					$length, $vertical_position,
+					$vertical_position / $vertical_unit);
+			    }
+			} elsif ($xchar eq "\$") {
+			    if ($skipchars == 4) {
+				$horizontal_position =
+				    get_long(substr($stuff, $curoffset + 5, 4));
+			    } else {
+				$horizontal_position =
+				    get_short(substr($stuff, $curoffset + 5, 2));
+			    }
+			    if ($opt_v) {
+				printf (" (horizontal position %d %.4f)",
+					$horizontal_position,
+					$horizontal_position / $horizontal_unit);
+			    }
+			} elsif ($xchar eq "d") {
+			    if ($opt_v) {
+				printf " (nop)";
+			    }
+			}
+		    }
+		    $found = 1;
+		}
+		$bytes = $klen + 1 + $skipchars + $startoff;
+		last;
+	    }
+	}
+	if (! $found) {
+	    print "\n";
+	    printf "%08x  ", $curpos;
+	    print "1b ";
+	    increment_curpos(1);
+	} elsif ($found == 1) {
+	    increment_curpos($bytes);
+	}
+    } elsif ($cchar eq "\0" || $cchar eq "\f") {
+	printf "\n%08x  ", $curpos;
+	print "$chartable{$cchar} ";
+	$vertical_position = $initial_vertical_position;
+	increment_curpos(1);
+    } else {
+	print "$xchartable{$cchar} " if ($cchar ne "\021");
+	increment_curpos(1);
+    }
+}
+
+print "\n" if $curpos > 1;
+

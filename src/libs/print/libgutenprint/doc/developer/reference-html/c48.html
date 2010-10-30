@@ -1,0 +1,252 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Using libgutenprint</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="The Developer's Guide to Gutenprint"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Copying, modification and redistribution"
+HREF="c39.html"><LINK
+REL="NEXT"
+TITLE="Linking with libgutenprint"
+HREF="x67.html"><META
+http-equiv="Content-Type"
+content="text/html; charset=@encoding@"></HEAD
+><BODY
+CLASS="chapter"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>The Developer's Guide to Gutenprint</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c39.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x67.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="chapter"
+><H1
+><A
+NAME="AEN48"
+></A
+>Chapter 2. Using libgutenprint</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c48.html#AEN51"
+>Code prerequisites</A
+></DT
+><DT
+><A
+HREF="x67.html"
+>Linking with libgutenprint</A
+></DT
+><DT
+><A
+HREF="x79.html"
+>Integrating libgutenprint</A
+></DT
+></DL
+></DIV
+><P
+>&#13;    This chapter describes how to write programs that use
+    libgutenprint.
+  </P
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN51"
+>Code prerequisites</A
+></H1
+><P
+>&#13;      To use libgutenprint with a program, several steps must be taken:
+    </P
+><P
+></P
+><UL
+><LI
+><P
+>&#13;	  Include the master libgutenprint header:
+          <DIV
+CLASS="informalexample"
+><P
+></P
+><A
+NAME="AEN57"
+></A
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#60;gimp-print/gimp-print.h&#62;</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+>
+	</P
+></LI
+><LI
+><P
+>&#13;	  Call <CODE
+CLASS="function"
+>stp_init</CODE
+>.
+	</P
+></LI
+><LI
+><P
+>&#13;	  Link with the libgutenprint library.
+	</P
+></LI
+></UL
+><P
+>&#13;      The following is a short example program. It does not do
+      anything useful, but it does everything required to link with
+      libgutenprint and call other functions from libgutenprint.
+    </P
+><DIV
+CLASS="informalexample"
+><P
+></P
+><A
+NAME="AEN65"
+></A
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>#include &#60;gimp-print/gimp-print.h&#62;
+int
+main (int argc, char *argv[])
+{
+  stp_init();
+  return 0;
+}
+      </PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c39.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x67.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Copying, modification and redistribution</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Linking with libgutenprint</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

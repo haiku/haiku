@@ -1,0 +1,196 @@
+#!/bin/sh
+
+retval=0;
+
+if [ -z "$srcdir" -o "$srcdir" = "." ] ; then
+    sdir=`pwd`
+elif [ -n "`echo $srcdir |grep '^/'`" ] ; then
+    sdir="$srcdir"
+else
+    sdir="`pwd`/$srcdir"
+fi
+
+if [ -z "$STP_DATA_PATH" ] ; then
+    STP_DATA_PATH="$sdir/../xml"
+    export STP_DATA_PATH
+fi
+
+if [ -z "$STP_MODULE_PATH" ] ; then
+    STP_MODULE_PATH="$sdir/../main:$sdir/../main/.libs"
+    export STP_MODULE_PATH
+fi
+
+valgrind=0
+valopts=''
+extra=''
+dontrun=
+output=''
+
+set_opt() {
+    opt=`echo $1 | awk -F= '{print $1}'`
+    val=`echo $1 | awk -F= '{print $2}'`
+    extra="`printf '%s\nparameter \"%s\" \"%s\";' \"$extra\" $opt $val`"
+}
+
+set_message() {
+    the_message="`printf '%s\nmessage \"%s\";' \"$the_message\" \"$@\"`"
+}
+
+usage() {
+    echo "Usage: run-testpattern [-v|--valgrind]"
+    echo "                       [-p|--parameter parameter=value]"
+    echo "                       [-n|--dontrun]"
+    echo "                       [-O|--output]"
+    echo "                       [--] [printers...]"
+    exit 0;
+}
+
+set_args() {
+    while true ; do
+	case "$1" in
+	    -h*|--h*) usage ;;
+	    -v|--valgrind) valopts='--tool=memcheck' ; valgrind=`expr $valgrind + 1` ;;
+	    -c|--cachegrind) valopts='--tool=cachegrind'; valgrind=4 ;;
+	    -g|--gdb-attach) valopts='--gdb-attach=yes' ;;
+	    -p|--parameter) shift; set_opt "$1" ;;
+	    -O|--output) shift; output="$1" ;;
+    	    -n|--dontrun) dontrun=1 ;;
+	    --) shift; args="$@"; return ;;
+	    *) return ;;
+	esac
+    shift
+    done
+}
+
+print_one_testpattern() {
+    printer=$1
+    shift
+    stuff="$@"
+    cat <<EOF
+printer "$printer";
+$stuff
+hsize 0.1;
+vsize 0.1;
+left 0.15;
+top 0.15;
+blackline 0;
+steps 16;
+mode rgb 8;
+pattern 0.0 0.0 0.0 0.0 0.0 0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0  0.0 0.0 1.0 ;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 0.0 1.0 0.0 1.0 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 1.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 1.0 1.0 0.0 1.0 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 -2.0 1.0 0.0 -2.0 1.0 0.0 -2.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.1 0.3 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.3 0.7 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.1 0.999 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.3 0.999 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.5 0.999 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.1 0.3 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.3 0.7 1.0 1.0 1.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.1 0.999 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.3 0.999 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 0.5 0.999 -2.0 -2.0 -2.0 0.0 1.0 1.0  0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 0.0 1.0 0.0 1.0 1.0 0.0 1.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.0 1.0 0.0 0.75 1.0 0.0 0.75 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.0 1.0 0.0 0.75 1.0 0.0 0.75 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.0 1.0 0.0 0.5 1.0 0.0 0.5 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.0 1.0 0.0 0.5 1.0 0.0 0.5 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.0 1.0 0.0 0.25 1.0 0.0 0.25 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.0 1.0 0.0 0.25 1.0 0.0 0.25 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.0 1.0 0.0 0.1 1.0 0.0 0.1 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.0 1.0 0.0 0.1 1.0 0.0 0.1 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 0.0 1.0 0.0 1.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.0 1.0 0.0 0.75 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.0 1.0 0.0 0.75 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.0 1.0 0.0 0.5 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.0 1.0 0.0 0.5 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.0 1.0 0.0 0.25 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.0 1.0 0.0 0.25 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.0 1.0 0.0 0.1 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.0 1.0 0.0 0.1 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0  0.0 1.0 1.0 0.0 1.0 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.75 1.0 0.0 0.0 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.25 1.0  0.0 0.75 1.0 0.0 0.75 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.5 1.0 0.0 0.0 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.5 1.0  0.0 0.5 1.0 0.0 0.5 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.25 1.0 0.0 0.0 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.75 1.0  0.0 0.25 1.0 0.0 0.25 1.0 0.0 0.0 1.0;
+pattern 1.0 1.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.1 1.0 0.0 0.0 1.0;
+pattern 0.0 0.0 1.0 1.0 1.0 0.0 0.9 1.0  0.0 0.1 1.0 0.0 0.1 1.0 0.0 0.0 1.0;
+end;
+EOF
+}
+
+run_testpattern() {
+    suppress=-n
+    if [ -n "$output" ] ; then
+	suppress=''
+    fi
+    case "$valgrind" in
+	1) valgrind $valopts -q --num-callers=100 --leak-check=yes --error-limit=no ./testpattern $suppress ;;
+	2) valgrind $valopts --num-callers=100 --leak-resolution=high --leak-check=yes --error-limit=no ./testpattern $suppress ;;
+	3) valgrind $valopts --error-limit=no --num-callers=100 --show-reachable=yes --leak-resolution=high --leak-check=yes ./testpattern $suppress ;;
+	4) valgrind $valopts ./testpattern $suppress ;;
+	*) ./testpattern $suppress ;;
+    esac
+    if [ $? -ne 0 ] ; then
+	retval=1
+    fi
+    exit $retval
+}
+
+set_args `getopt hgvp:ncO: "$@"`
+
+if [ -z "$args" ] ; then
+    args=`./printers`
+fi
+
+#StandardDithers="EvenTone HybridEvenTone UniTone HybridUniTone Adaptive Ordered Fast VeryFast Floyd Predithered"
+
+StandardDithers="EvenTone HybridEvenTone Adaptive Ordered OrderedNew Fast VeryFast Floyd Predithered Segmented SegmentedNew"
+
+the_message=''
+
+if [ -z "$dontrun" -a -n "$output" -a ! -d "$output" ] ; then
+    mkdir "$output"
+    if [ "$?" -ne 0 ] ; then
+	echo "Cannot create directory '$output'"
+	exit 1
+    fi
+fi
+
+print_all_testpatterns() {
+    if [ -z "`echo $extra |grep DitherAlgorithm`" ] ; then
+	for p in $args ; do
+	    set_message "$p
+"
+	    for d in $StandardDithers ; do
+		if [ -n "$output" ] ; then
+		    outstuff="`printf '\n%s\n' \"output \\\"$output/${p}_${d}\\\";\"`"
+		fi
+		set_message "    $d"
+		print_one_testpattern "$p" "`printf '%s\n' \"parameter \\\"DitherAlgorithm\\\" \\\"$d\\\";\"`" "$extra" "$the_message" "$outstuff"
+		the_message=''
+	    done
+	done
+    else
+	for p in $args ; do
+	    the_message=''
+	    set_message "$p"
+	    print_one_testpattern "$p" "$extra" "$the_message"
+	done
+    fi
+}
+
+if [ -z "$dontrun" ] ; then
+    print_all_testpatterns | run_testpattern 2>&1
+else
+    print_all_testpatterns
+fi
+
+exit $?

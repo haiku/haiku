@@ -1,0 +1,53 @@
+.\" $Id: cups-calibrate.8.in,v 1.8 2004/09/17 18:38:02 rleigh Exp $
+.\" Copyright (C) 2000-2004 Roger Leigh <rleigh@debian.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2, or (at your option)
+.\" any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.TH CUPS\-CALIBRATE "8" "@RELEASE_DATE@" "Version @GUTENPRINT_VERSION@" "Gutenprint Manual Pages"
+.SH NAME
+cups\-calibrate \- ESP CUPS Printer Calibration Tool
+.SH SYNOPSIS
+.B cups\-calibrate
+.SH DESCRIPTION
+This program allows you to calibrate the color output of printers using the
+\fBGutenprint\fR \fICUPS\fR or \fIESP Print Pro\fR drivers.
+.PP
+Please note that this program \fBonly\fP works with the \fBGutenprint\fR
+\fICUPS\fR or \fIESP Print Pro\fR drivers. If you are using the Gutenprint
+\fIstp\fR or \fIijsgimmprint\fR driver for GhostScript or the drivers for the
+Gutenprint Print plug-in for \fIThe GIMP\fR, the calibration will not work.
+.PP
+These drivers are identified by the text \fICUPS+Gutenprint\fR or \fIESP Print
+Pro\fR in the model description displayed by the CUPS web interface, KUPS, the
+ESP Print Pro Printer Manager, or printerdrake.
+.PP
+To make a calibration profile for all users, run this program as
+the \fBroot\fR user.  The program displays a series of prompts which should
+simply be followed.
+.SH SEE ALSO
+CUPS Software Administrators Manual, http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright \(co  2001 Michael Sweet (mike@easysw.com)
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, version 2, as
+published by the Free Software Foundation.
+.PP
+This manual page was written by Roger Leigh (rleigh@debian.org).
+.\"#
+.\"# The following sets edit modes for GNU EMACS
+.\"# Local Variables:
+.\"# mode:nroff
+.\"# fill-column:79
+.\"# End:

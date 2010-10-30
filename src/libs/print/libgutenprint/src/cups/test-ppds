@@ -1,0 +1,29 @@
+#!/bin/sh
+
+if [ "$#" = 0 ] ; then
+    echo "Bypassing test-ppds for now due to bugs in cupstestppd!"
+    exit 0
+    rm -rf ppd ppd-stamp
+    make ppd
+fi
+
+ppd_count=`find ppd \( -name '*.ppd.gz' -o -name '*.ppd' \) -print | wc -l`
+
+failures="`find ppd -name '*.ppd*' -print | xargs cupstestppd |grep 'FAIL$' | awk -F: '{print $1}'`"
+
+if [ -z "$failures" ] ; then
+    echo "All $ppd_count PPD files pass"
+    exit 0
+fi
+
+# Use this with "normal" PPD files without translated numbers.
+echo $failures | xargs cupstestppd 2>&1 | egrep -v 'Missing "[a-z][a-z](_[A-Z][A-Z])?" translation string for option Stp((Brightness|Contrast|Saturation), choice None|([a-zA-Z0-9]+, choice (-?[0-9]+)))!$' |egrep -v 'Missing cupsICCProfile file'
+
+# Use this with PPD files with translated numbers (genppd -N)
+# With normal globalized PPD files this will yield hundreds of megabytes
+# of errors.
+#echo $failures | xargs cupstestppd 2>&1 |egrep -v 'Missing cupsICCProfile file'
+
+fail_count=`echo "$failures" | wc -l`
+echo "$fail_count/$ppd_count fail"
+exit 1

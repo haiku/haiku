@@ -1,0 +1,119 @@
+.\" $Id: cups-genppd.8.in,v 1.6 2008/09/17 02:35:48 mbroughtn Exp $
+.\" Copyright (C) 2000-2004 Roger Leigh <rleigh@debian.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2, or (at your option)
+.\" any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.TH CUPS\-GENPPD "8" "@RELEASE_DATE@" "Version @GUTENPRINT_VERSION@" "Gutenprint Manual Pages"
+.SH NAME
+cups\-genppd \- generate Gutenprint PPD files for use with CUPS
+.SH SYNOPSIS
+.B cups\-genppd
+[\fI\-c localedir\fR] [\fI\-l locale\fR] [\fI\-p prefix\fR] [\fI\-q\fR]
+[\fI\-v\fR] \fImodel1\fR \fI[model2, ...modeln]\fR
+.br
+.B cups\-genppd
+\fI\-L \fR[\fI\-c localedir\fR]
+.br
+.B cups\-genppd
+\fI\-M \fR[\fI\-v\fR]
+.br
+.B cups\-genppd
+\fI\-h\fR
+.br
+.B cups\-genppd
+\fI\-V\fR
+.SH DESCRIPTION
+\fBcups\-genppd\fR generates \fIGutenprint\fR PPD files for use with CUPS.
+The default behavior is to output PPD files for all models of printer
+that the \fIGutenprint\fR printer driver library supports.  You may
+restrict the models by listing either the driver names or the full names
+of the printers you wish to generate PPD files for after any options.
+Additionally, the PPD files may be \fIlocalised\fR, that is,
+translated, to use your native language rather than US English.  There
+are commands to find out what printer models and languages are
+supported.
+.SH EXAMPLES
+.TP
+.B cups\-genppd \-v bjc\-6200 'Epson Stylus Photo 1280' 'HP DeskJet 850C'
+verbosely generate three PPD files, listing the driver name in the
+first case, and the full name in the second.
+.TP
+.B LANG=de_DE genppd \-p ppd \-c /usr/share/locale
+generate PPDs for all available models, in directory \fIppd\fR using
+the locale data found under \fI/usr/share/locale\fR.  The language to
+use is taken from the environment (de_DE).
+.TP
+.B cups\-genppd \-L \-c /usr/local/share/locale
+list available languages using the locale data found under
+\fI/usr/local/share/locale\fR.
+.TP
+.B cups\-genppd \-M \-v
+list available drivers, with long model descriptions
+.SH COMMANDS
+.TP
+\fB\-h\fR
+show a help message
+.TP
+\fB\-L\fR
+list available translations (message catalogs).  If a locale is used
+for which there is not a corresponding translation, then then US
+English will be used.
+.TP
+\fB\-M\fR
+list available printer models.  By default, only driver names are
+listed; if verbose mode is used, the full model name will also be
+printed
+.TP
+\fB\-V\fR
+show version information and defaults
+.IP
+The default behavior is to output PPDs if no command is given.
+.SH OPTIONS
+.TP
+\fB\-c\fR \fIlocaledir\fR
+use \fIlocaledir\fR as the base directory for locale data
+.TP
+\fB\-l\fR \fIlocale\fR
+output PPDs translated with messages for \fIlocale\fR.  Note that \fIlocale\fR
+\fBmust\fR be a locale as shown by \fIlocale \-a\fR.  For example, the \fIde\fR
+translation is used by the \fIde_DE\fR locale; \fIde\fR alone will not work.
+.TP
+\fB\-p\fR \fIprefix\fR
+output PPDs in directory \fIprefix\fR.  Directories are \fBnot\fR recursively
+created.
+.TP
+\fB\-q\fR
+Quiet mode.
+.TP
+\fB\-v\fR
+Verbose mode.
+.TP
+.B models
+a list of printer models, either the driver or quoted full name.
+.SH SEE ALSO
+CUPS Software Administrators Manual, http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright \(co  1992\-2002 Michael Sweet (mike@easysw.com)
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, version 2, as
+published by the Free Software Foundation.
+.PP
+This manual page was written by Roger Leigh (rleigh@debian.org).
+.\"#
+.\"# The following sets edit modes for GNU EMACS
+.\"# Local Variables:
+.\"# mode:nroff
+.\"# fill-column:79
+.\"# End:

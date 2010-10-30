@@ -1,0 +1,62 @@
+<preface>
+  <title>Preface</title>
+  <indexterm><primary>reading</primary></indexterm>
+  <indexterm><primary>manual, how to read</primary></indexterm>
+  <para>
+    Gutenprint is the print facility of the GNU Image Manipulation
+    Program (GIMP). It is in addition a suite of drivers that may be
+    used with common UNIX spooling systems using Ghostscript or CUPS.
+    These drivers provide printing quality for Linux, MacOS X and UNIX
+    on a par with proprietary vendor-supplied drivers in many cases,
+    and can be used for many of the most demanding printing tasks,
+    especially for high quality printing on modern inkjets, including
+    &ldquo;photographic quality&rdquo; models which offer very high
+    resolutions and several inks.  The core of Gutenprint is a shared
+    library (libgutenprint) which may be used by any program that
+    wishes to produce high-quality printed output.
+  </para>
+  <para>
+    This manual documents the use of the
+    <application>Gutenprint</application> package, focusing mainly on
+    the libgutenprint library that is the core of
+    <application>Gutenprint</application>.  Parts of the manual which
+    describe the use of libgutenprint are aimed primarily at
+    programmers, and do assume that the reader is familiar with C
+    programming, and using standard programming tools on GNU or UNIX
+    systems.
+    </para>
+  <para>
+    For the end-user, there is a separate manual documenting
+    programs that come with Gutenprint, including the
+    <application>GIMP</application> <command>print</command> plugin,
+    and the <application>CUPS</application> and
+    <application>Ghostscript</application> drivers.
+  </para>
+  <para>
+    To learn how to use libgutenprint in your own programs is to look
+    at the source of the <command>testpattern</command>, located in
+    <filename class="directory">src/testpattern</filename>, as well as
+    the source of the other programs that use libgutenprint, and
+    libgutenprint itself.  Most importantly, please consult the API
+    reference and libgutenprint headers.
+  </para>
+  <para>
+    The manual is split into several parts for the programmer.  It
+    starts with a simple usage example of how to link a program with
+    libgutenprint, then how to integrate this into package build
+    scripts, using <command>make</command>,
+    <command>autoconf</command> and <command>automake</command>.  The
+    appendices cover the detail of the inner workings of some parts of
+    libgutenprint.
+  </para>
+  <para>
+    The following sections detail the dither and weave algorithms used
+    in libgutenprint, the ESC/P2 printer control language used in Epson
+    printers and how to add support for a new printer to libgutenprint.
+  </para>
+  <para>
+    <literallayout>We hope you enjoy using Gutenprint!
+&mdash;The Gutenprint project
+    </literallayout>
+  </para>
+</preface>

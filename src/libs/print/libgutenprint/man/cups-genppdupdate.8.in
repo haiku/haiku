@@ -1,0 +1,94 @@
+.\" $Id: cups-genppdupdate.8.in,v 1.5 2006/03/29 02:35:25 rlk Exp $
+.\" Copyright (C) 2000 Roger Leigh <rleigh@debian.org>
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2, or (at your option)
+.\" any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.TH CUPS\-GENPPDUPDATE "8" "@RELEASE_DATE@" "Version @GUTENPRINT_VERSION@" "Gutenprint Manual Pages"
+.SH NAME
+cups\-genppdupdate \- update CUPS+Gutenprint PPD files
+.SH SYNOPSIS
+.B cups\-genppdupdate
+[\fI\-h\fP]
+[\fI\-n\fP]
+[\fI\-N\fP]
+[\fI\-q\fP | \fI\-v\fP]
+[\fI\-s ppd-directory\fP]
+[\fI\-s output-directory\fP]
+[\fIPPD-FILES or QUEUES...\fP]
+.SH DESCRIPTION
+\fBcups\-genppdupdate\fP regenerates the \fIGutenprint\fP PPD files in use by
+CUPS, using the PPD files under \fI@cups_conf_datadir@/model/gutenprint\fP as
+templates.  The new PPD file replaces the old PPD file under
+\fI@cups_conf_serverroot@/ppd\fP, but all the options set in the old PPD will
+be merged into the new PPD, provided that they are still valid in the new file.
+.PP
+If no files or queue names are specified, \fBcups\-genppdupdate\fP updates all
+Gutenprint PPD files in \fI@cups_conf_serverroot@/ppd\fP.  Otherwise,
+\fBcups\-genppdupdate\fP updates all files or queues listed on the command
+line.
+.PP
+\fBcups\-genppdupdate\fP does not update Foomatic PPD files or PPD files from
+Gimp-Print 4.2 or earlier.
+.PP
+\fBcups\-genppdupdate\fP does \fBnot\fP restart cupsd.  cupsd will need
+manually reloading (or send SIGHUP) once \fBcups\-genppdupdate\fP has
+completed.
+.SH OPTIONS
+.TP
+.B \-h
+Show a help message.
+.TP
+.B \-n
+No action.  The program will run, but the old PPD files will not be replaced.
+.TP
+.B \-q
+Quiet mode.  No messages will be issued, apart from errors.
+.TP
+.B \-v
+Verbose mode.  More informative messages will be issued.  Note that extremely
+verbose output may be turned on by setting $debug=1 in the source, but this
+output will not be of use to the average user.
+.TP
+.B \-s \fIppd-directory\fP
+Use \fIppd-directory\fP as the base directory to read PPD files from.  By
+default, the base directory is \fP@cups_conf_datadir@/model/gutenprint\fP.
+Under this directory, the PPD files are located in subdirectories according to
+language code and territory.
+.TP
+.B \-o \fIoutput-directory\fP
+Place updated PPD files in \fIoutput-directory\fP.  By default, this is the
+same as the input directory.
+.TP
+.B \-N
+Reset all options to their defaults (do not merge options from the current PPD
+file)
+.SH SEE ALSO
+.BR cups\-genppd (8),
+.BR cups\-genppdconfig (8),
+CUPS Software Administrators Manual, http://localhost:631/documentation.html
+.SH COPYRIGHT
+Copyright \(co  2002\-2006 Roger Leigh (rleigh@debian.org) and Robert Krawitz
+(rlk@alum.mit.edu)
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, version 2, as
+published by the Free Software Foundation.
+.PP
+This manual page was written by Roger Leigh (rleigh@debian.org).
+.\"#
+.\"# The following sets edit modes for GNU EMACS
+.\"# Local Variables:
+.\"# mode:nroff
+.\"# fill-column:79
+.\"# End:

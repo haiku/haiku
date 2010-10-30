@@ -1,0 +1,20 @@
+<option type="enum" id="opt/@@DRVNAME@@-pagesize">
+  <!-- A multilingual <comments> block can appear here, too;
+       it should be treated as documentation for the user. -->
+  <arg_longname>
+   <en>Page Size</en>
+  </arg_longname>
+  <arg_shortname>
+   <en>PageSize</en><!-- backends only know <en> shortnames! -->
+  </arg_shortname>
+  <arg_execution>@@GROUP@@
+   <arg_order>110</arg_order>
+   <arg_spot>A</arg_spot>
+   <arg_substitution />
+   <arg_proto> %s</arg_proto>
+  </arg_execution>
+
+  @@OPTCONSTRAINTS@@
+  @@ENUMVALS@@
+
+</option>
