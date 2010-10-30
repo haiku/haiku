@@ -5,8 +5,8 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
-
+SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
 
 KernelMergeObject kernel_arch_arm.o :
 #	arch_atomic.c
@@ -29,9 +29,19 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_vm_translation_map.cpp
 	arch_asm.S
 	uart.cpp
-	generic_vm_physical_page_mapper.cpp
-	generic_vm_physical_page_ops.cpp
-#
+
+	# paging
+	arm_physical_page_mapper.cpp
+	arm_physical_page_mapper_large_memory.cpp
+	ARMPagingMethod.cpp
+	ARMPagingStructures.cpp
+	ARMVMTranslationMap.cpp
+
+	# paging/32bit
+	ARMPagingMethod32Bit.cpp
+	ARMPagingStructures32Bit.cpp
+	ARMVMTranslationMap32Bit.cpp
+
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 	:

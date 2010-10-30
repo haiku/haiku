@@ -1,136 +1,149 @@
 /*
- * Copyright 2007, François Revol, revol@free.fr.
+ * Copyirght 2010, Ithamar R. Adema, ithamar.adema@team-embedded.nl
+ * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
- * Distributed under the terms of the MIT License.
- *
- * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-#include <KernelExport.h>
-#include <kernel.h>
-#include <vm/vm.h>
-#include <vm/vm_priv.h>
-#include <vm/VMAddressSpace.h>
-#include <int.h>
-#include <boot/kernel_args.h>
+
 #include <arch/vm_translation_map.h>
-#include <arch/cpu.h>
-//#include <arch_mmu.h>
-#include <stdlib.h>
 
-#include "generic_vm_physical_page_mapper.h"
+#include <boot/kernel_args.h>
 
-
-void *
-m68k_translation_map_get_pgdir(VMTranslationMap *map)
-{
-	return NULL;
-#warning ARM:WRITEME
-//get_vm_ops()->m68k_translation_map_get_pgdir(map);
-}
-
-//  #pragma mark -
-//  VM API
+#include "paging/32bit/ARMPagingMethod32Bit.h"
+//#include "paging/pae/ARMPagingMethodPAE.h"
 
 
-status_t
-arch_vm_translation_map_init(kernel_args *args,
-        VMPhysicalPageMapper** _physicalPageMapper)
-{
-	return NULL;
-#warning ARM:WRITEME
+#define TRACE_VM_TMAP
+#ifdef TRACE_VM_TMAP
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
 
-//get_vm_ops()->arch_vm_translation_map_init_map(map, kernel);
-}
+
+static union {
+	uint64	align;
+	char	thirty_two[sizeof(ARMPagingMethod32Bit)];
+#if B_HAIKU_PHYSICAL_BITS == 64
+	char	pae[sizeof(ARMPagingMethodPAE)];
+#endif
+} sPagingMethodBuffer;
+
+
+// #pragma mark - VM API
+
 
 status_t
 arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
 {
-	return NULL;
-#warning ARM:WRITEME
-}
-
-status_t
-arch_vm_translation_map_init_kernel_map_post_sem(VMTranslationMap *map)
-{
-	return NULL;
-#warning ARM:WRITEME
-
-//get_vm_ops()->arch_vm_translation_map_init_kernel_map_post_sem(map);
+	return gARMPagingMethod->CreateTranslationMap(kernel, _map);
 }
 
 
 status_t
-arch_vm_translation_map_init(kernel_args *args)
+arch_vm_translation_map_init(kernel_args *args,
+	VMPhysicalPageMapper** _physicalPageMapper)
 {
-	return NULL;
-#warning ARM:WRITEME
+	TRACE("vm_translation_map_init: entry\n");
 
-//get_vm_ops()->arch_vm_translation_map_init(args);
-}
+#ifdef TRACE_VM_TMAP
+	TRACE("physical memory ranges:\n");
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+		phys_addr_t start = args->physical_memory_range[i].start;
+		phys_addr_t end = start + args->physical_memory_range[i].size;
+		TRACE("  %#10" B_PRIxPHYSADDR " - %#10" B_PRIxPHYSADDR "\n", start,
+			end);
+	}
 
+	TRACE("allocated physical ranges:\n");
+	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
+		phys_addr_t start = args->physical_allocated_range[i].start;
+		phys_addr_t end = start + args->physical_allocated_range[i].size;
+		TRACE("  %#10" B_PRIxPHYSADDR " - %#10" B_PRIxPHYSADDR "\n", start,
+			end);
+	}
 
-status_t
-arch_vm_translation_map_init_post_area(kernel_args *args)
-{
-	return NULL;
-#warning ARM:WRITEME
+	TRACE("allocated virtual ranges:\n");
+	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
+		addr_t start = args->virtual_allocated_range[i].start;
+		addr_t end = start + args->virtual_allocated_range[i].size;
+		TRACE("  %#10" B_PRIxADDR " - %#10" B_PRIxADDR "\n", start, end);
+	}
+#endif
 
-//get_vm_ops()->arch_vm_translation_map_init_post_area(args);
+#if B_HAIKU_PHYSICAL_BITS == 64 //IRA: Check all 64 bit code and adjust for ARM
+	bool paeAvailable = x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON);
+	bool paeNeeded = false;
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+		phys_addr_t end = args->physical_memory_range[i].start
+			+ args->physical_memory_range[i].size;
+		if (end > 0x100000000LL) {
+			paeNeeded = true;
+			break;
+		}
+	}
+
+	if (paeAvailable && paeNeeded) {
+		dprintf("using PAE paging\n");
+		gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethodPAE;
+	} else {
+		dprintf("using 32 bit paging (PAE not %s)\n",
+			paeNeeded ? "available" : "needed");
+		gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethod32Bit;
+	}
+#else
+	gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethod32Bit;
+#endif
+
+	return gARMPagingMethod->Init(args, _physicalPageMapper);
 }
 
 
 status_t
 arch_vm_translation_map_init_post_sem(kernel_args *args)
 {
-	return NULL;
-#warning ARM:WRITEME
-
-//get_vm_ops()->arch_vm_translation_map_init_post_sem(args);
+	return B_OK;
 }
 
-
-/**	Directly maps a page without having knowledge of any kernel structures.
- *	Used only during VM setup.
- *	It currently ignores the "attributes" parameter and sets all pages
- *	read/write.
- */
 
 status_t
-arch_vm_translation_map_early_map(kernel_args *ka, addr_t virtualAddress,
-	phys_addr_t physicalAddress, uint8 attributes,
-	phys_addr_t (*get_free_page)(kernel_args *))
+arch_vm_translation_map_init_post_area(kernel_args *args)
 {
-	return NULL;
-#warning ARM:WRITEME
+	TRACE("vm_translation_map_init_post_area: entry\n");
 
-//get_vm_ops()->arch_vm_translation_map_early_map(ka, virtualAddress, physicalAddress,
-//		attributes, get_free_page);
+	return gARMPagingMethod->InitPostArea(args);
 }
 
-
-// XXX currently assumes this translation map is active
 
 status_t
-arch_vm_translation_map_early_query(addr_t va, phys_addr_t *out_physical)
+arch_vm_translation_map_early_map(kernel_args *args, addr_t va, phys_addr_t pa,
+	uint8 attributes, phys_addr_t (*get_free_page)(kernel_args *))
 {
-	return NULL;
-#warning ARM:WRITEME
+	TRACE("early_tmap: entry pa 0x%lx va 0x%lx\n", pa, va);
 
-//get_vm_ops()->arch_vm_translation_map_early_query(va, out_physical);
+	return gARMPagingMethod->MapEarly(args, va, pa, attributes, get_free_page);
 }
 
 
+/*!	Verifies that the page at the given virtual address can be accessed in the
+	current context.
+
+	This function is invoked in the kernel debugger. Paranoid checking is in
+	order.
+
+	\param virtualAddress The virtual address to be checked.
+	\param protection The area protection for which to check. Valid is a bitwise
+		or of one or more of \c B_KERNEL_READ_AREA or \c B_KERNEL_WRITE_AREA.
+	\return \c true, if the address can be accessed in all ways specified by
+		\a protection, \c false otherwise.
+*/
 bool
 arch_vm_translation_map_is_kernel_page_accessible(addr_t virtualAddress,
-        uint32 protection)
+	uint32 protection)
 {
-#warning ARM:WRITEME
-        return TRUE;
-//get_vm_ops()-arch_vm_translation_map_is_kernel_page_accessible(virtualAddress,
-  //              protection);
+	return gARMPagingMethod->IsKernelPageAccessible(virtualAddress, protection);
 }
-
