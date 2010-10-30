@@ -16,6 +16,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	ABI-compliance-checker	- tool for checking ABI compatibility between libs
 #	APR						- support libraries used for example by Subversion
 #	APR-util				- Apache portable runtime utility library
+#	ArmyKnife				- tool for editing audio file metadata and attributes
 #	Bazaar					- the distributed version control system
 #	BeAE					- open source Audio Editor
 #	Beam					- powerful native e-mail client
@@ -133,6 +134,29 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 			:
 			: true
 		;
+	}
+}
+
+
+# ArmyKnife
+if [ IsOptionalHaikuImagePackageAdded ArmyKnife ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package ArmyKnife available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package ArmyKnife for gcc4" ;
+#		InstallOptionalHaikuImagePackage armyknife-61-x86-gcc4-2010-10-30.zip
+#			: $(baseURL)/armyknife-61-x86-gcc4-2010-10-30.zip
+#			:
+#		;
+#		AddSymlinkToHaikuImage home config be Applications
+#			: /boot/apps/ArmyKnife/ArmyKnife ;
+	} else {
+		InstallOptionalHaikuImagePackage armyknife-61-x86-gcc2-2010-10-30.zip
+			: $(baseURL)/armyknife-61-x86-gcc2-2010-10-30.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/ArmyKnife/ArmyKnife ;
 	}
 }
 
@@ -1587,19 +1611,20 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
 	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		InstallOptionalHaikuImagePackage Vision-0.9.7-H-x86-gcc4-2010-05-22.zip
-			: $(baseURL)/Vision-0.9.7-H-x86-gcc4-2010-05-22.zip
-			:
-		;
-		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-090423/Vision ;
+		Echo "No optional package Vision for gcc4" ;
+#		InstallOptionalHaikuImagePackage vision-908-x86-gcc4-2010-10-30.zip
+#			: $(baseURL)/vision-908-x86-gcc4-2010-10-30.zip
+#			:
+#		;
+#		AddSymlinkToHaikuImage home config be Applications
+#			: /boot/apps/Vision/Vision ;
 	} else {
-		InstallOptionalHaikuImagePackage Vision-0.9.7-H-x86-gcc2-2010-05-22.zip
-			: $(baseURL)/Vision-0.9.7-H-x86-gcc2-2010-05-22.zip
+		InstallOptionalHaikuImagePackage vision-908-x86-gcc2-2010-10-30.zip
+			: $(baseURL)/vision-908-x86-gcc2-2010-10-30.zip
 			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-090423/Vision ;
+			: /boot/apps/Vision/Vision ;
 	}
 }
 

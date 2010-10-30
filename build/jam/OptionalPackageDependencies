@@ -5,6 +5,7 @@
 # dependencies.
 
 OptionalPackageDependencies APR-util : APR Expat ;
+OptionalPackageDependencies ArmyKnife : TagLib ;
 OptionalPackageDependencies Beam : LibIconv LibLayout OpenSSL PCRE ;
 OptionalPackageDependencies BeHappy : BeBook NetSurf ;
 OptionalPackageDependencies BurnItNow : CDRecord ;
