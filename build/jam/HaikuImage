@@ -324,7 +324,7 @@ AddFilesToHaikuImage system bin			: install-wifi-firmwares.sh ;
 # Add the files to be used by installoptionalpackage.
 AddDirectoryToHaikuImage common data optional-packages ;
 local optional-pkg-files = OptionalBuildFeatures OptionalPackageDependencies
-	OptionalPackages ;
+	OptionalPackages OptionalLibPackages ;
 for name in $(optional-pkg-files) {
 	local file = [ FDirName $(HAIKU_TOP) build jam $(name) ] ;
 	AddFilesToHaikuImage common data optional-packages : $(file) ;
@@ -631,6 +631,7 @@ HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS = ;
 
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackages ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalTestPackages ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalLibPackages ] ;
 
 local optionalPackageDescriptions ;
 if $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) {

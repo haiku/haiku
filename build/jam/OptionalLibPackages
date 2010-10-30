@@ -1,0 +1,339 @@
+# This file defines the optional lib packages that can be added to the Haiku image.
+# It is directly included from HaikuImage -- all variables defined there can
+# be used
+
+
+# Available Optional Lib Packages:
+#	AllegroLibs	
+#	fribidi
+#	lcms
+#	libart_lgpl
+#	libevent
+#	libmad
+#	libmikmod
+#	libmng
+#	libmodplug
+#	libpaper
+#	SDLLibs
+#	physfs
+#	pkgconfig
+#	readline
+#	XiphLibs 
+
+
+local baselibURL = http://haiku-files.org/files/optional-packages/lib ;
+local baseSourceURL = http://haiku-files.org/files/releases/r1alpha2/sources ;
+
+
+# AllegroLibs
+if [ IsOptionalHaikuImagePackageAdded XiphLibs ]
+		&& $(TARGET_ARCH) = x86 {
+	# libsdl and related libs
+	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage
+			allegro-4.4.1.1-x86-gcc2-2010-10-30.zip
+			: $(baselibURL)/allegro-4.4.1.1-x86-gcc2-2010-10-30.zip ;
+		InstallOptionalHaikuImagePackage
+			dumb-0.9.3-x86-gcc2-2010-10-30.zip 
+			: $(baselibURL)/dumb-0.9.3-x86-gcc2-2010-10-30.zip ;
+		InstallOptionalHaikuImagePackage
+			jgmod-0.99-x86-gcc2-2010-10-30.zip
+			: $(baselibURL)/jgmod-0.99-x86-gcc2-2010-10-30.zip ;
+	}
+	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
+#		InstallOptionalHaikuImagePackage
+#			allegro-4.4.1.1-x86-gcc4-2010-10-30.zip
+#			: $(baselibURL)/allegro-4.4.1.1-x86-gcc4-2010-10-30.zip ;
+#		InstallOptionalHaikuImagePackage
+#			dumb-0.9.3-x86-gcc4-2010-10-30.zip
+#			: $(baselibURL)/dumb-0.9.3-x86-gcc4-2010-10-30.zip ;
+#		InstallOptionalHaikuImagePackage
+#			jgmod-0.99-x86-gcc4-2010-10-30.zip
+#			: $(baselibURL)/jgmod-0.99-x86-gcc4-2010-10-30.zip ;
+	}
+}
+
+
+# fribidi
+if [ IsOptionalHaikuImagePackageAdded fribidi ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package fribidi available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			fribidi-0.19.2-x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/fribidi-0.19.2-x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# lcms
+if [ IsOptionalHaikuImagePackageAdded lcms ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package lcms available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			lcms-2.0a--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/lcms-2.0a--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# libart_lgpl
+if [ IsOptionalHaikuImagePackageAdded libart_lgpl ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package libart_lgpl available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			libart_lgpl-2.3.21--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libart_lgpl-2.3.21--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# libevent
+if [ IsOptionalHaikuImagePackageAdded libevent ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package libevent available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			libevent-1.4.13--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libevent-1.4.13--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# libmad
+if [ IsOptionalHaikuImagePackageAdded libmad ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package libmad available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			libmad-0.15.1--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libmad-0.15.1--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# libmikmod
+if [ IsOptionalHaikuImagePackageAdded libmikmod ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package libmikmod available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			libmikmod-3.1.11--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libmikmod-3.1.11--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# libmng
+if [ IsOptionalHaikuImagePackageAdded libmng ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package libmng available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			libmng-1.0.10--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libmng-1.0.10--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# libmodplug
+if [ IsOptionalHaikuImagePackageAdded libmodplug ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package libmodplug available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			libmodplug-0.8.7--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libmodplug-0.8.7--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# libpaper
+if [ IsOptionalHaikuImagePackageAdded libpaper ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package libpaper available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			libpaper-1.1.24--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libpaper-1.1.24--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# physfs
+if [ IsOptionalHaikuImagePackageAdded physfs ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package physfs available for $(TARGET_ARCH)" ;
+	} else {
+		InstallOptionalHaikuImagePackage
+			physfs-2.0.1--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/physfs-2.0.1--x86-gcc2-2010-10-29.zip
+			:
+			: true
+		;
+	}
+}
+
+
+# SDLLibs
+if [ IsOptionalHaikuImagePackageAdded SDLLibs ]
+		&& $(TARGET_ARCH) = x86 {
+	# libsdl and related libs
+	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage
+			libsdl-1.2-hg--x86-gcc-2-2010-10-29.zip
+			: $(baselibURL)/libsdl-1.2-hg--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			guilib-1.2.1--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/guilib-1.2.1--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sdl-gfx-2.0.20--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sdl-gfx-2.0.20--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sdl-image-1.2.10--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sdl-image-1.2.10--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sdl-mixer-1.2.11--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sdl-mixer-1.2.11--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sdl-net-1.2.7--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sdl-net-1.2.7--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sdl-sound-1.0.3--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sdl-sound-1.0.3--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sdl-rtf-0.1.0-x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sdl-rtf-0.1.0-x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sdl-ttf-2.0.10-x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sdl-ttf-2.0.10-x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			sge-030809--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/sge-030809--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			smjpeg-0.2.1--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/smjpeg-0.2.1--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			smpeg-0.4.5--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/smpeg-0.4.5--x86-gcc2-2010-10-29.zip ;
+	}
+
+	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
+#		InstallOptionalHaikuImagePackage
+#			libsdl-1.2-hg-x86-gcc-4-2010-10-29.zip
+#			: $(baselibURL)/libsdl-1.2-hg-x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sdl-gfx-2.0.20-x86-gcc-4-2010-10-29.zip
+#			: $(baselibURL)/sdl-gfx-2.0.20-x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sdl-image-1.2.10--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/sdl-image-1.2.10--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sdl-mixer-1.2.11--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/sdl-mixer-1.2.11--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sdl-net-1.2.7--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/sdl-net-1.2.7--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sdl-sound-1.0.3--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/sdl-sound-1.0.3--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sdl-rtf-0.1.0-x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/sdl-rtf-0.1.0-x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sdl-ttf-2.0.10-x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/sdl-ttf-2.0.10-x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			sge-030809--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/sge-030809--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			smjpeg-0.2.1--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/smjpeg-0.2.1--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			smpeg-0.4.5--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/smpeg-0.4.5--x86-gcc4-2010-10-29.zip ;
+	}
+}
+
+
+# XiphLibs
+if [ IsOptionalHaikuImagePackageAdded XiphLibs ]
+		&& $(TARGET_ARCH) = x86 {
+	# libsdl and related libs
+	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) {
+		InstallOptionalHaikuImagePackage
+			flac-1.2.1--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/flac-1.2.1--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			libao-1.0.0--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libao-1.0.0--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			libogg-1.2.0--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libogg-1.2.0--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			libtheora-1.1.1-x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libtheora-1.1.1-x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			libvorbis-1.3.1--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/libvorbis-1.3.1--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			speex-1.2-git--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/speex-1.2-git--x86-gcc2-2010-10-29.zip ;
+		InstallOptionalHaikuImagePackage
+			vorbis-tools-1.4.0--x86-gcc2-2010-10-29.zip
+			: $(baselibURL)/vorbis-tools-1.4.0--x86-gcc2-2010-10-29.zip ;
+	}
+	if $(HAIKU_GCC_VERSION[1]) = 4 || $(isHybridBuild) {
+#		InstallOptionalHaikuImagePackage
+#			flac-1.2.1--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/flac-1.2.1--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			libao-1.0.0--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/libao-1.0.0--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			libogg-1.2.0--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/libogg-1.2.0--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			libtheora-1.1.1-x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/libtheora-1.1.1-x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			libvorbis-1.3.1--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/libvorbis-1.3.1--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			speex-1.2-git--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/speex-1.2-git--x86-gcc4-2010-10-29.zip ;
+#		InstallOptionalHaikuImagePackage
+#			vorbis-tools-1.4.0--x86-gcc4-2010-10-29.zip
+#			: $(baselibURL)/vorbis-tools-1.4.0--x86-gcc4-2010-10-29.zip ;
+	}
+}
+

@@ -27,6 +27,7 @@ OptionalPackageDependencies NetSurf : OpenSSL Curl LibXML2 LibIconv Libmng ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
 OptionalPackageDependencies Paladin : CCache Fastdep ;
 OptionalPackageDependencies Pe : PCRE ;
+OptionalPackageDependencies SDLLibs : XiphLibs libmad libmikmod libmng libmodplug physfs ;
 OptionalPackageDependencies Subversion : APR-util Neon LibIconv LibXML2 OpenSSL SQLite ;
 OptionalPackageDependencies Transmission : LibEvent GetText Curl OpenSSL LibIconv ;
 OptionalPackageDependencies Vim : GetText LibIconv ;
