@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2010, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,7 +18,7 @@
 #include <SerialPort.h>
 
 #include "EasyPenInputDevice.h"
-#include "kb_mouse_driver.h"
+#include "keyboard_mouse_driver.h"
 
 /*
 IN ABSOLUTE MODE (MM Series)
