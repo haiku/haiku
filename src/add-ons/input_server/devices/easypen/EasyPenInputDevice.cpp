@@ -21,7 +21,7 @@
 #include "kb_mouse_driver.h"
 
 /*
-IN ABSOLUTE MODE (MM Series) 
+IN ABSOLUTE MODE (MM Series)
 
                       Least                          Most
 
@@ -62,7 +62,7 @@ const static uint32 kTabletThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
 struct tablet_device {
 	tablet_device(BSerialPort *port);
 	~tablet_device();
-	
+
 	input_device_ref device_ref;
 	thread_id device_watcher;
 	bool active;
@@ -92,7 +92,7 @@ EasyPenInputDevice::~EasyPenInputDevice()
 	CALLED();
 	for (int32 i = 0; i < fDevices.CountItems(); i++)
 		delete (tablet_device *)fDevices.ItemAt(i);
-	
+
 #if DEBUG
 	fclose(sLogFile);
 #endif
@@ -117,15 +117,15 @@ EasyPenInputDevice::InitCheck()
 		serial->SetParityMode(B_ODD_PARITY);
 		serial->SetFlowControl(B_HARDWARE_CONTROL+B_SOFTWARE_CONTROL);
 		serial->SetBlocking(true);
-		serial->SetTimeout(800000); 
-		
+		serial->SetTimeout(800000);
+
 		if (serial->Open(devName) < B_OK) {
 			LOG("Fail to open %s\n", devName);
 			continue;
 		}
 		snooze(250000);
 		serial->Write("z9", 2); // 8 data bits,odd  parity <command>                     z 9
-		serial->Write((char)NULL, 1); //	Reset                <command>                NUL 
+		serial->Write((char)NULL, 1); //	Reset                <command>                NUL
 		serial->Write("DP", 2);		// mode command    D   trigger command    P
 		snooze(250000);
 		serial->ClearInput();
@@ -137,23 +137,23 @@ EasyPenInputDevice::InitCheck()
 		}
 		tablet_device *device = new tablet_device(serial);
 		device->owner = this;
-		
+
 		input_device_ref *devices[2];
 		devices[0] = &device->device_ref;
 		devices[1] = NULL;
-	
+
 		fDevices.AddItem(device);
 		RegisterDevices(devices);
 
 		serial = new BSerialPort();
 	}
-	
+
 	delete serial;
-	
+
 	LOG("Found %ld devices\n", fDevices.CountItems());
-	
+
 	get_click_speed(&fClickSpeed);
-			
+
 	return fDevices.CountItems() > 0 ? B_OK : B_ERROR;
 }
 
@@ -162,20 +162,20 @@ status_t
 EasyPenInputDevice::Start(const char *name, void *cookie)
 {
 	tablet_device *device = (tablet_device *)cookie;
-	
+
 	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
 
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", name);
-	
+
 	device->active = true;
 	device->device_watcher = spawn_thread(DeviceWatcher, threadName,
 		kTabletThreadPriority, device);
-	
+
 	if (device->device_watcher < B_OK)
 		return device->device_watcher;
 	resume_thread(device->device_watcher);
-	
+
 	return B_OK;
 }
 
@@ -184,7 +184,7 @@ status_t
 EasyPenInputDevice::Stop(const char *name, void *cookie)
 {
 	tablet_device *device = (tablet_device *)cookie;
-	
+
 	LOG("%s(%s)\n", __PRETTY_FUNCTION__, name);
 
 	device->active = false;
@@ -194,7 +194,7 @@ EasyPenInputDevice::Stop(const char *name, void *cookie)
 		status_t dummy;
 		wait_for_thread(device->device_watcher, &dummy);
 	}
-	
+
 	return B_OK;
 }
 
@@ -217,7 +217,7 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 {
 	tablet_device *dev = (tablet_device *)arg;
 	EasyPenInputDevice *owner = dev->owner;
-	
+
 	tablet_movement movements;
 	tablet_movement old_movements;
 	BMessage *message;
@@ -227,11 +227,11 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 
 	memset(&movements, 0, sizeof(movements));
 	memset(&old_movements, 0, sizeof(old_movements));
-	
+
 	dev->serial->Write(":@FRb", 5);
 
 	while (dev->active) {
-		byte = 0;  
+		byte = 0;
 		while(!byte)
 			dev->serial->Read(&byte, 1);
 		if (byte & 0x40 || !(byte & 0x80)) { // 7th bit on or 8th bit off
@@ -251,17 +251,17 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 		movements.ypos = (bytes[3] << 7) | bytes[2];
 
 		uint32 buttons = old_movements.buttons ^ movements.buttons;
-	
-		LOG("%s: buttons: 0x%lx, x: %f, y: %f, clicks:%ld, wheel_x:%ld, wheel_y:%ld\n", dev->device_ref.name, movements.buttons, 
+
+		LOG("%s: buttons: 0x%lx, x: %f, y: %f, clicks:%ld, wheel_x:%ld, wheel_y:%ld\n", dev->device_ref.name, movements.buttons,
 			movements.xpos, movements.ypos, movements.clicks, movements.wheel_xdelta, movements.wheel_ydelta);
 
 		movements.xpos /= 1950.0;
 		movements.ypos /= 1500.0;
 
 		LOG("%s: x: %f, y: %f, \n", dev->device_ref.name, movements.xpos, movements.ypos);
-		
+
 		if (buttons != 0) {
-			message = new BMessage(B_MOUSE_UP);				
+			message = new BMessage(B_MOUSE_UP);
 			if ((buttons & movements.buttons) > 0) {
 				message->what = B_MOUSE_DOWN;
 				if(lastClickTimeStamp + owner->fClickSpeed <= movements.timestamp)
@@ -270,18 +270,18 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 					movements.clicks++;
 				lastClickTimeStamp = movements.timestamp;
 				message->AddInt32("clicks", movements.clicks);
-				LOG("B_MOUSE_DOWN\n");	
+				LOG("B_MOUSE_DOWN\n");
 			} else {
 				LOG("B_MOUSE_UP\n");
 			}
-			
+
 			message->AddInt64("when", movements.timestamp);
-			message->AddInt32("buttons", movements.buttons);						
+			message->AddInt32("buttons", movements.buttons);
 			message->AddFloat("x", movements.xpos);
 			message->AddFloat("y", movements.ypos);
 			owner->EnqueueMessage(message);
 		}
-		
+
 		if (movements.xpos != 0.0 || movements.ypos != 0.0) {
 			message = new BMessage(B_MOUSE_MOVED);
 			if (message) {
@@ -297,32 +297,32 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 					message->AddFloat("be:tablet_tilt_x", movements.tilt_x);
 					message->AddFloat("be:tablet_tilt_y", movements.tilt_y);
 				}
-					
+
 				owner->EnqueueMessage(message);
 			}
 		}
-		
+
 		if ((movements.wheel_ydelta != 0) || (movements.wheel_xdelta != 0)) {
 			message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 			if (message) {
 				message->AddInt64("when", movements.timestamp);
 				message->AddFloat("be:wheel_delta_x", movements.wheel_xdelta);
 				message->AddFloat("be:wheel_delta_y", movements.wheel_ydelta);
-				
+
 				owner->EnqueueMessage(message);
-			}	
+			}
 		}
 
 		old_movements = movements;
-		
+
 	}
-	
+
 	return 0;
 }
 
 
 // tablet_device
-tablet_device::tablet_device(BSerialPort *port) 
+tablet_device::tablet_device(BSerialPort *port)
 {
 	serial = port;
 	device_watcher = -1;
