@@ -530,7 +530,7 @@ oops:
 
   ch->mem_size = low_size;
   ch->mem_ptr = addr;
-  ch->mem_phys = (vuchar *)(adrr_t)where.address;
+  ch->mem_phys = (vuchar *)(addr_t)where.address;
 
   ch->wr_1 = ch->mem_ptr;
   ch->wr_2 = ch->wr_1+ch->mem_size/2;
