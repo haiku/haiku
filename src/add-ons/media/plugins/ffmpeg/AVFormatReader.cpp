@@ -84,9 +84,48 @@ avmetadata_to_message(AVMetadata* metaData, BMessage* message)
 	AVMetadataTag* tag = NULL;
 	while ((tag = av_metadata_get(metaData, "", tag,
 		AV_METADATA_IGNORE_SUFFIX))) {
-		// TODO: Make sure we eventually follow a defined convention for
-		// the names of meta-data keys.
-		message->AddString(tag->key, tag->value);
+		// convert tag keys into something more meaningful using the names from
+		// id3v2.c
+		if (strcmp(tag->key, "TALB") == 0 || strcmp(tag->key, "TAL") == 0)
+			message->AddString("album", tag->value);
+		else if (strcmp(tag->key, "TCOM") == 0)
+			message->AddString("composer", tag->value);
+		else if (strcmp(tag->key, "TCON") == 0 || strcmp(tag->key, "TCO") == 0)
+			message->AddString("genre", tag->value);
+		else if (strcmp(tag->key, "TCOP") == 0)
+			message->AddString("copyright", tag->value);
+		else if (strcmp(tag->key, "TDRL") == 0 || strcmp(tag->key, "TDRC") == 0)
+			message->AddString("date", tag->value);
+		else if (strcmp(tag->key, "TENC") == 0 || strcmp(tag->key, "TEN") == 0)
+			message->AddString("encoded_by", tag->value);
+		else if (strcmp(tag->key, "TIT2") == 0 || strcmp(tag->key, "TT2") == 0)
+			message->AddString("title", tag->value);
+		else if (strcmp(tag->key, "TLAN") == 0)
+			message->AddString("language", tag->value);
+		else if (strcmp(tag->key, "TPE1") == 0 || strcmp(tag->key, "TP1") == 0)
+			message->AddString("artist", tag->value);
+		else if (strcmp(tag->key, "TPE2") == 0 || strcmp(tag->key, "TP2") == 0)
+			message->AddString("album_artist", tag->value);
+		else if (strcmp(tag->key, "TPE3") == 0 || strcmp(tag->key, "TP3") == 0)
+			message->AddString("performer", tag->value);
+		else if (strcmp(tag->key, "TPOS") == 0)
+			message->AddString("disc", tag->value);
+		else if (strcmp(tag->key, "TPUB") == 0)
+			message->AddString("publisher", tag->value);
+		else if (strcmp(tag->key, "TRCK") == 0 || strcmp(tag->key, "TRK") == 0)
+			message->AddString("track", tag->value);
+		else if (strcmp(tag->key, "TSOA") == 0)
+			message->AddString("album-sort", tag->value);
+		else if (strcmp(tag->key, "TSOP") == 0)
+			message->AddString("artist-sort", tag->value);
+		else if (strcmp(tag->key, "TSOT") == 0)
+			message->AddString("title-sort", tag->value);
+		else if (strcmp(tag->key, "TSSE") == 0)
+			message->AddString("encoder", tag->value);
+		else if (strcmp(tag->key, "TYER") == 0)
+			message->AddString("year", tag->value);
+		else
+			message->AddString(tag->key, tag->value);
 	}
 }
 
