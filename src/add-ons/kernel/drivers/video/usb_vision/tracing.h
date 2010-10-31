@@ -4,11 +4,11 @@
  * 
  */
 
-#ifndef _USBVISION_TRACING_H_ 
-  #define _USBVISION_TRACING_H_
+#ifndef _USBVISION_TRACING_H_
+#define _USBVISION_TRACING_H_
   
-void load_setting();
-void create_log();
+void load_setting(void);
+void create_log(void);
 void usbvision_trace(bool b_force, char *fmt, ...);
 
 #define TRACE_ALWAYS(x...) usbvision_trace(true, x);

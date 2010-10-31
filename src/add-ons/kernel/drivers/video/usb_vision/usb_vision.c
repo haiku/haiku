@@ -152,7 +152,7 @@ static status_t usb_vision_write (void* cookie, off_t position, const void* buff
 static status_t xet_nt_register(bool is_read, usb_vision_device *uvd, xet_nt100x_reg *ri)
 {
   status_t status = B_ERROR;
-  uint8 req_type = USB_REQTYPE_VENDOR | (is_read ? USB_REQTYPE_DEVICE_IN : USB_REQTYPE_DEVICE_OUT);
+  //uint8 req_type = USB_REQTYPE_VENDOR | (is_read ? USB_REQTYPE_DEVICE_IN : USB_REQTYPE_DEVICE_OUT);
   
   TRACE_FUNCALLS("set_nt_register:%08x, %08x\n", uvd, ri);
   TRACE_FUNCRES(trace_reginfo, ri);
@@ -254,7 +254,7 @@ device_hooks* find_device(const char* name){
   return &usb_vision_hooks;
 }
 
-status_t create_add_device(usb_vision_device *uvd, const struct usb_configuration_info *uci,
+static status_t create_add_device(usb_vision_device *uvd, const struct usb_configuration_info *uci,
                                               struct usb_endpoint_info *control_epi, 
                                               struct usb_endpoint_info *data_epi){
 //  char name[32]; 
@@ -306,7 +306,7 @@ status_t create_add_device(usb_vision_device *uvd, const struct usb_configuratio
   return status;
 }
 
-status_t add_device(usb_vision_device *uvd, const usb_configuration_info *uci){
+static status_t add_device(usb_vision_device *uvd, const usb_configuration_info *uci){
   usb_endpoint_info *control_epi = NULL;
   usb_endpoint_info *data_epi = NULL;
   status_t status = ENODEV;
@@ -359,7 +359,7 @@ status_t usb_vision_device_added(const usb_device *dev, void **cookie){
           memset(uvd, 0, sizeof(usb_vision_device));
           uvd->dev = dev;
           if((status = add_device(uvd, uci)) == B_OK){
-            *cookie = dev;
+            *cookie = (void *)dev;
             TRACE_ALWAYS("(%04x/%04x) added \n", supported_devices[dev_idx].vendor,
                                                supported_devices[dev_idx].product);
             break;

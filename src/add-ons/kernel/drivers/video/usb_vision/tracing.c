@@ -10,10 +10,12 @@
 #include <USB.h>
 //#include <CAM.h>
 #include <stdio.h> //sprintf
+#include <string.h> //strcpy
 #include <unistd.h> //posix file i/o - create, write, close 
 #include <driver_settings.h>
- 
-#include "usbvision.h"
+
+#include "usb_vision.h"
+#include "tracing.h"
 
 #if DEBUG
 bool b_log = true;
@@ -31,7 +33,7 @@ bool b_log_settings_loaded = false;
 static const char *private_log_path="/boot/home/"DRIVER_NAME".log";
 static sem_id loglock;
 
-void load_setting(){
+void load_setting(void){
   if(!b_log_settings_loaded){
     void *settingshandle; 
     settingshandle = load_driver_settings(DRIVER_NAME); 
@@ -48,7 +50,7 @@ void load_setting(){
   }
 }
 
-void create_log(){
+void create_log(void){
   int flags = O_WRONLY | O_CREAT | ((!b_log_append) ? O_TRUNC : 0);
   if(!b_log_file)
     return;
