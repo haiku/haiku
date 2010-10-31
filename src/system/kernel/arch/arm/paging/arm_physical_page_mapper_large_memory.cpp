@@ -1,5 +1,5 @@
 /*
- * Copyirght 2010, Ithamar R. Adema, ithamar.adema@team-embedded.nl
+ * Copyright 2010, Ithamar R. Adema, ithamar.adema@team-embedded.nl
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
