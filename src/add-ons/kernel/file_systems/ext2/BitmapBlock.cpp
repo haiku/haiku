@@ -403,6 +403,7 @@ BitmapBlock::FindNextMarked(uint32& pos)
 		"bits: %lX\n", index, bit, mask, bits);
 
 	bits = bits & ~mask;
+	uint32 maxBit = 32;
 
 	if (bits == 0) {
 		// Find a block of 32 bits that has a marked bit
@@ -414,18 +415,23 @@ BitmapBlock::FindNextMarked(uint32& pos)
 		} while (index < maxIndex && data[index] == 0);
 
 		if (index >= maxIndex) {
-			// Not found
-			TRACE("BitmapBlock::FindNextMarked(): reached end of block, num "
-				"bits: %lu\n", fNumBits);
-			pos = fNumBits;
-			return;
+			maxBit = fNumBits & 0x1F;
+
+			if (maxBit == 0) {
+				// Not found
+				TRACE("BitmapBlock::FindNextMarked(): reached end of block, "
+					"num bits: %lu\n", fNumBits);
+				pos = fNumBits;
+				return;
+			}
+			maxBit++;
 		}
 
 		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		bit = 0;
 	}
 
-	for (; bit < 32; ++bit) {
+	for (; bit < maxBit; ++bit) {
 		// Find the marked bit
 		if ((bits >> bit & 1) != 0) {
 			pos = index << 5 | bit;
@@ -520,18 +526,18 @@ BitmapBlock::FindPreviousMarked(uint32& pos)
 	uint32 index = pos >> 5;
 	int32 bit = pos & 0x1F;
 
-	uint32 mask = (1 << (bit + 1)) - 1;
+	uint32 mask = (1 << bit) - 1;
 	uint32 bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 	bits = bits & mask;
 
-	TRACE("BitmapBlock::FindPreviousMarked(): index: %lu, bit: %lu\n", index,
-		bit);
+	TRACE("BitmapBlock::FindPreviousMarked(): index: %lu bit: %lu bits: %lx\n",
+		index, bit, bits);
 
 	if (bits == 0) {
 		// Find an block of 32 bits that has a marked bit
 		do {
 			index--;
-		} while (data[index] == 0 && index >= 0);
+		} while (data[index] == 0 && index > 0);
 
 		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		if (bits == 0) {
@@ -543,11 +549,11 @@ BitmapBlock::FindPreviousMarked(uint32& pos)
 		bit = 31;
 	}
 
-	TRACE("BitmapBlock::FindPreviousMarked(): index: %lu bit: %lu bits: %lx\n", 
+	TRACE("BitmapBlock::FindPreviousMarked(): index: %lu bit: %lu bits: %lx\n",
 		index, bit, bits);
 
 	for (; bit >= 0; --bit) {
-		// Find the unmarked bit
+		// Find the marked bit
 		if ((bits >> bit & 1) != 0) {
 			pos = index << 5 | bit;
 			return;

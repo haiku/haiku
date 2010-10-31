@@ -489,7 +489,7 @@ Journal::_WriteTransactionToLog()
 		if (size > FreeLogBlocks()) {
 			panic("Transaction fits, but sync didn't result in enough"
 				"free space.\n\tGot %ld when at least %ld was expected.",
-				(long)FreeLogBlocks(), (long)size);
+				FreeLogBlocks(), size);
 		}
 	}
 	

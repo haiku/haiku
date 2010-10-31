@@ -938,7 +938,7 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 	if (size > minSize) {
 		// No need to allocate more blocks
 		TRACE("Inode::_ShrinkDataStream(): No need to allocate more blocks\n");
-		TRACE("Inode::_ShrinkDataStream(): Setting size to %ld\n", (long)size);
+		TRACE("Inode::_ShrinkDataStream(): Setting size to %lld\n", size);
 		fNode.SetSize(size);
 		return B_OK;
 	}
