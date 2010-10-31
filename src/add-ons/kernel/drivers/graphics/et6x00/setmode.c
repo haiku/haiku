@@ -321,7 +321,7 @@ uint8 i;
     }
 }
 /*****************************************************************************/
-uint32 et6000SetGraphicsMode(VIDEO_MODE_INFORMATION *mi,
+static uint32 et6000SetGraphicsMode(VIDEO_MODE_INFORMATION *mi,
                             uint16 pciConfigSpace)
 {
 uint8 m;
@@ -375,6 +375,8 @@ VIDEO_MODE_INFORMATION mi;
             mi.BitsPerPlane = 16;
             mi.NumberGreenBits = 5;
             break;
+		default:
+			return B_BAD_VALUE;
     }
 
     mi.Frequency = (uint16) (mode->timing.pixel_clock * 1000
@@ -404,6 +406,8 @@ uint16 refreshRate;
         case B_RGB15_BIG:
             bpp = 16;
             break;
+		default:
+			return B_BAD_VALUE;
     }
 
     refreshRate = (uint16) (mode->timing.pixel_clock * 1000

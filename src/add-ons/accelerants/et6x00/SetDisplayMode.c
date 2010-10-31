@@ -50,6 +50,8 @@ uint8 bpp;
             case B_RGB15_BIG:
                 bpp = 2;
                 break;
+			default:
+				return B_BAD_VALUE;
         }
         si->fbc.bytes_per_row = target.virtual_width * bpp;
         si->dm = target;

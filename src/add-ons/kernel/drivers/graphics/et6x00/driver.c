@@ -323,7 +323,7 @@ exit0:
     return handled;
 }
 /*****************************************************************************/
-uint32 et6000GetOnboardMemorySize(uint16 pciConfigSpace,
+static uint32 et6000GetOnboardMemorySize(uint16 pciConfigSpace,
                                   volatile void *memory)
 {
 uint32 memSize = 0;
