@@ -666,6 +666,7 @@ BStatusView::Draw(BRect updateRect)
 		SetHighColor(0, 0, 0);
 		DrawString(buffer.String(), tp);
 
+		float rightDivider = tp.x + StringWidth(buffer.String()) + 5.0f;
 		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
 
 		BFont font;
@@ -674,8 +675,6 @@ BStatusView::Draw(BRect updateRect)
 		float fontSize = oldFontSize * 0.8f;
 		font.SetSize(max_c(8.0f, fontSize));
 		SetFont(&font, B_FONT_SIZE);
-
-		float rightDivider = tp.x + StringWidth(buffer.String()) + 5.0f;
 
 		if (sShowSpeed) {
 			// Draw speed info
