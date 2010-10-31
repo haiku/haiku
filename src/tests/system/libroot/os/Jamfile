@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests system libroot os ;
 
 SimpleTest DriverSettingsTest :
 	DriverSettingsTest.cpp
-	driver_settings.c
+	driver_settings.cpp
 	: be
 ;
 
@@ -20,6 +20,6 @@ SimpleTest fs_attr_test :
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
-		driver_settings.c
+		driver_settings.cpp
 		parsedate.cpp
 	] = [ FDirName $(HAIKU_TOP) src system libroot os ] ;

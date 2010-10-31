@@ -20,7 +20,7 @@ DEFINES += DEBUG_APP="\\\"NetFSServer\\\"" ;
 Application <test>NetFSServer
 	: Debug.cpp
 	  DriverSettings.cpp
-	  driver_settings.c
+	  driver_settings.cpp
 	  Locker.cpp
 	  ObjectTracker.cpp
 	  Referencable.cpp

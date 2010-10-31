@@ -20,7 +20,7 @@ DEFINES += DEBUG_APP="\\\"server_config\\\"" ;
 Application <test>netfs_config
 	: Debug.cpp
 #	  DriverSettings.cpp
-#	  driver_settings.c
+#	  driver_settings.cpp
 #	  Locker.cpp
 #	  Referencable.cpp
 #	  String.cpp

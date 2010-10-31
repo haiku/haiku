@@ -21,7 +21,7 @@ Application <test>UserlandFSServer
 	: AreaSupport.cpp
 	  Debug.cpp
 	  DispatcherDefs.cpp
-	  driver_settings.c
+	  driver_settings.cpp
 	  LazyInitializable.cpp
 	  Locker.cpp
 	  ObjectTracker.cpp

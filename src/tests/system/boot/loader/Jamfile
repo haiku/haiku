@@ -37,7 +37,7 @@ ObjectDefines
 
 	# other
 	platform_menu.cpp
-	driver_settings.c
+	driver_settings.cpp
 
 	# partitions
 	amiga_rdb.cpp
@@ -107,10 +107,10 @@ SimpleTest BootLoaderTest :
 	PartitionMapParser.cpp
 
 	# utility functions - Dano has a strlcpy() function in libroot.so, while R5 has not
-	list.c
+	list.cpp
 	strlcat.c
 	strlcpy.c
-	driver_settings.c
+	driver_settings.cpp
 	KMessage.cpp
 
 	: boottest_bfs.a boottest_amiga_ffs.a boottest_tarfs.a libz.a
@@ -118,7 +118,7 @@ SimpleTest BootLoaderTest :
 
 # Tell Jam where to find the utility sources
 
-SEARCH on [ FGristFiles list.c ]
+SEARCH on [ FGristFiles list.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
@@ -127,10 +127,10 @@ SEARCH on [ FGristFiles KMessage.cpp ]
 SEARCH on [ FGristFiles strlcat.c strlcpy.c ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
-SEARCH on [ FGristFiles driver_settings.c ]
+SEARCH on [ FGristFiles driver_settings.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
-SEARCH on [ FGristFiles 
+SEARCH on [ FGristFiles
 		main.cpp vfs.cpp partitions.cpp
 		heap.cpp RootFileSystem.cpp
 		elf.cpp menu.cpp loader.cpp
