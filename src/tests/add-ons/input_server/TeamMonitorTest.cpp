@@ -7,7 +7,7 @@
 #include <Application.h>
 
 #include "KeyboardInputDevice.h"
-#include "TMWindow.h"
+#include "TeamMonitorWindow.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +21,7 @@ int
 main()
 {
 	BApplication app("application/x-vnd.tmwindow-test");
-	TMWindow *window = new TMWindow();
+	TeamMonitorWindow *window = new TeamMonitorWindow();
 	window->Enable();
 
 	// we don't even quit when the window is closed...
