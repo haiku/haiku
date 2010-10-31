@@ -13,7 +13,9 @@ if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
 
 # use different libaries depending on host platform
 local osLibs ;
-if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
+if $(HOST_PLATFORM) in $(HAIKU_HAIKU_COMPATIBLE_PLATFORMS) {
+	osLibs = network ;
+} else if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
 	osLibs = net ;
 } else {
 	osLibs = m ;

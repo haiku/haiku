@@ -22,7 +22,9 @@ for sourceDir in $(sourceDirs) {
 
 # use different libaries depending on host platform
 local osLibs ;
-if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
+if $(HOST_PLATFORM) in $(HAIKU_HAIKU_COMPATIBLE_PLATFORMS) {
+	osLibs = network ;
+} else if $(HOST_PLATFORM) in $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) {
 	osLibs = net ;
 } else {
 	osLibs = m ;
@@ -38,7 +40,7 @@ BuildPlatformStaticLibrary <build>libxslt.a :
 	xslt.c
 	xsltutils.c
 	pattern.c
-	templates.c	
+	templates.c
 	variables.c
 	keys.c
 	numbers.c
