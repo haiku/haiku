@@ -940,24 +940,18 @@ if [ IsOptionalHaikuImagePackageAdded LibEvent ] {
 	} else {
 		if $(HAIKU_GCC_VERSION[1]) >= 4 {
 			InstallOptionalHaikuImagePackage
-				libevent-1.4.13-x86-gcc4-2010-05-06.zip
-				: $(baseURL)/libevent-1.4.13-x86-gcc4-2010-05-06.zip
+				libevent-1.4.13-x86-gcc4-2010-10-30.zip
+				: $(baseURL)/libevent-1.4.13-x86-gcc4-2010-10-30.zip
 				:
 				: true
 			;
-			InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
-				: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
-		} else if $(HAIKU_GCC_VERSION[1]) = 2 && $(isHybridBuild) {
-			InstallOptionalHaikuImagePackage
-				libevent-1.4.13-x86-gcc2h-2010-05-06.zip
-				: $(baseURL)/libevent-1.4.13-x86-gcc2h-2010-05-06.zip
-				:
-				: true
-			;
-			InstallSourceArchive libevent-1.4.13_haiku-2010-05-06.tar.xz
-				: $(baseSourceURL)/libevent-1.4.13_haiku-2010-05-06.tar.xz ;
 		} else {
-			Echo "No optional package LibEvent available for $(TARGET_ARCH)-gcc2" ;
+			InstallOptionalHaikuImagePackage
+				libevent-1.4.13-x86-gcc2-2010-10-29.zip
+				: $(baseURL)/libevent-1.4.13-x86-gcc2-2010-10-29.zip
+				:
+				: true
+			;
 		}
 	}
 }
