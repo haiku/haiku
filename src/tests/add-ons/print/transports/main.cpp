@@ -56,7 +56,7 @@ int main (int argc, char *argv[])
     argc -= optind;
     argv += optind;
 
-    if (argc != 1) {
+    if (argc < 1) {
 		usage(argc, argv);
 		return -1;
     }
@@ -149,8 +149,8 @@ int main (int argc, char *argv[])
 		printf("failed!\n");
 
 
-	if (argc > 2) {
-		BFile data(argv[2], B_READ_ONLY);
+	if (argc > 1) {
+		BFile data(argv[1], B_READ_ONLY);
 		if (data.InitCheck() == B_OK) {
 			uint8 buffer[B_PAGE_SIZE];
 			ssize_t total = 0;
