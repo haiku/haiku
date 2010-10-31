@@ -77,6 +77,7 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 		}
 
 		DestroyReader(*reader);
+		*reader = NULL;
 	}
 
 	TRACE("PluginManager::CreateReader leave\n");
