@@ -84,7 +84,7 @@ HTree::~HTree()
 status_t
 HTree::PrepareForHash()
 {
-	uint32 blockNum;
+	off_t blockNum;
 	status_t status = fDirectory->FindBlock(0, blockNum);
 	if (status != B_OK)
 		return status;
@@ -115,7 +115,7 @@ HTree::Lookup(const char* name, DirectoryIterator** iterator)
 		return _FallbackToLinearIteration(iterator);
 	}
 	
-	uint32 blockNum;
+	off_t blockNum;
 	status_t status = fDirectory->FindBlock(0, blockNum);
 	if (status != B_OK)
 		return _FallbackToLinearIteration(iterator);

@@ -66,7 +66,7 @@ protected:
 
 	uint32				fNumBlocks;
 	uint32				fLogicalBlock;
-	uint32				fPhysicalBlock;
+	off_t				fPhysicalBlock;
 	uint32				fDisplacement;
 	uint32				fPreviousDisplacement;
 

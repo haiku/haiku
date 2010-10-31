@@ -84,7 +84,7 @@ InodeJournal::InitCheck()
 
 
 status_t
-InodeJournal::MapBlock(uint32 logical, uint32& physical)
+InodeJournal::MapBlock(off_t logical, off_t& physical)
 {
 	TRACE("InodeJournal::MapBlock()\n");
 	return fInode->FindBlock(logical * fBlockSize, physical);

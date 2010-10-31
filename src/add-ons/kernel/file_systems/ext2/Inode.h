@@ -79,7 +79,8 @@ public:
 			//::Volume* _Volume() const { return fVolume; }
 			Volume*		GetVolume() const { return fVolume; }
 
-			status_t	FindBlock(off_t offset, uint32& block);
+			status_t	FindBlock(off_t offset, off_t& block,
+							uint32 *_count = NULL);
 			status_t	ReadAt(off_t pos, uint8 *buffer, size_t *length);
 			status_t	WriteAt(Transaction& transaction, off_t pos,
 							const uint8* buffer, size_t* length);

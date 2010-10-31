@@ -217,7 +217,7 @@ Inode::CheckPermissions(int accessMode) const
 
 
 status_t
-Inode::FindBlock(off_t offset, uint32& block)
+Inode::FindBlock(off_t offset, off_t& block, uint32 *_count)
 {
 	uint32 perBlock = fVolume->BlockSize() / 4;
 	uint32 perIndirectBlock = perBlock * perBlock;
@@ -235,6 +235,13 @@ Inode::FindBlock(off_t offset, uint32& block)
 		// direct blocks
 		block = B_LENDIAN_TO_HOST_INT32(Node().stream.direct[index]);
 		ASSERT(block != 0);
+		if (_count) {
+			*_count = 1;
+			uint32 nextBlock = block;
+			while (++index < EXT2_DIRECT_BLOCKS
+				&& Node().stream.direct[index] == ++nextBlock)
+				(*_count)++;
+		}
 	} else if ((index -= EXT2_DIRECT_BLOCKS) < perBlock) {
 		// indirect blocks
 		CachedBlock cached(fVolume);
@@ -245,6 +252,13 @@ Inode::FindBlock(off_t offset, uint32& block)
 
 		block = B_LENDIAN_TO_HOST_INT32(indirectBlocks[index]);
 		ASSERT(block != 0);
+		if (_count) {
+			*_count = 1;
+			uint32 nextBlock = block;
+			while (++index < perBlock
+				&& indirectBlocks[index] == ++nextBlock)
+				(*_count)++;
+		}
 	} else if ((index -= perBlock) < perIndirectBlock) {
 		// double indirect blocks
 		CachedBlock cached(fVolume);
@@ -265,6 +279,13 @@ Inode::FindBlock(off_t offset, uint32& block)
 
 			block = B_LENDIAN_TO_HOST_INT32(
 				indirectBlocks[index & (perBlock - 1)]);
+			if (_count) {
+				*_count = 1;
+				uint32 nextBlock = block;
+				while (((++index & (perBlock - 1)) != 0)
+					&& indirectBlocks[index & (perBlock - 1)] == ++nextBlock)
+					(*_count)++;
+			}
 		}
 		ASSERT(block != 0);
 	} else if ((index -= perIndirectBlock) / perBlock < perIndirectBlock) {
@@ -297,6 +318,14 @@ Inode::FindBlock(off_t offset, uint32& block)
 
 				block = B_LENDIAN_TO_HOST_INT32(
 					indirectBlocks[index & (perBlock - 1)]);
+				if (_count) {
+					*_count = 1;
+					uint32 nextBlock = block;
+					while (((++index & (perBlock - 1)) != 0) 
+						&& indirectBlocks[index & (perBlock - 1)] 
+							== ++nextBlock)
+						(*_count)++;
+				}
 			}
 		}
 		ASSERT(block != 0);
@@ -306,7 +335,8 @@ Inode::FindBlock(off_t offset, uint32& block)
 		return B_ERROR;
 	}
 
-	TRACE("inode %Ld: FindBlock(offset %lld): %lu\n", ID(), offset, block);
+	TRACE("inode %Ld: FindBlock(offset %lld): %lld %ld\n", ID(), offset, block,
+		_count != NULL ? *_count : 1);
 	return B_OK;
 }
 
@@ -398,7 +428,7 @@ Inode::WriteAt(Transaction& transaction, off_t pos, const uint8* buffer,
 		return B_OK;
 	}
 
-	TRACE("Inode::WriteAt(): Performing write: %p, %ld, %p, %ld\n",
+	TRACE("Inode::WriteAt(): Performing write: %p, %lld, %p, %ld\n",
 		FileCache(), pos, buffer, *_length);
 	status_t status = file_cache_write(FileCache(), NULL, pos, buffer, _length);
 
@@ -424,7 +454,7 @@ Inode::FillGapWithZeros(off_t start, off_t end)
 			size = end - start;
 
 		TRACE("Inode::FillGapWithZeros(): Calling file_cache_write(%p, NULL, "
-			"%lld, NULL, &(%lld) = %p)\n", fCache, start, size, &size);
+			"%lld, NULL, &(%ld) = %p)\n", fCache, start, size, &size);
 		status_t status = file_cache_write(fCache, NULL, start, NULL,
 			&size);
 		if (status != B_OK)
@@ -485,7 +515,7 @@ Inode::InitDirectory(Transaction& transaction, Inode* parent)
 	if (status != B_OK)
 		return status;
 
-	uint32 blockNum;
+	off_t blockNum;
 	status = FindBlock(0, blockNum);
 	if (status != B_OK)
 		return status;
@@ -657,14 +687,18 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	TRACE("Inode::Create(): Allocating inode\n");
 	ino_t id;
 	status = volume->AllocateInode(transaction, parent, mode, id);
-	if (status != B_OK)
+	if (status != B_OK) {
+		ERROR("Inode::Create(): AllocateInode() failed\n");
 		return status;
+	}
 
 	if (entries != NULL) {
 		size_t nameLength = strlen(name);
 		status = entries->AddEntry(transaction, name, nameLength, id, type);
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("Inode::Create(): AddEntry() failed\n");
 			return status;
+		}
 	}
 
 	TRACE("Inode::Create(): Creating inode\n");
@@ -696,8 +730,10 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	if (inode->IsDirectory()) {
 		TRACE("Inode::Create(): Initializing directory\n");
 		status = inode->InitDirectory(transaction, parent);
-		if (status != B_OK)
+		if (status != B_OK) {
+			ERROR("Inode::Create(): InitDirectory() failed\n");
 			return status;
+		}
 	}
 
 	// TODO: Maybe it can be better
@@ -776,13 +812,13 @@ Inode::EnableFileCache()
 		return B_OK;
 	}
 
-	TRACE("Inode::EnableFileCache(): Creating file cache: %ld, %ld, %lld\n",
+	TRACE("Inode::EnableFileCache(): Creating file cache: %ld, %lld, %lld\n",
 		fVolume->ID(), ID(), Size());
 	fCache = file_cache_create(fVolume->ID(), ID(), Size());
 	fMap = file_map_create(fVolume->ID(), ID(), Size());
 
 	if (fCache == NULL) {
-		TRACE("Inode::EnableFileCache(): Failed to create file cache\n");
+		ERROR("Inode::EnableFileCache(): Failed to create file cache\n");
 		fCached = false;
 		return B_ERROR;
 	}

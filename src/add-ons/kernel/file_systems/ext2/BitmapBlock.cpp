@@ -463,6 +463,7 @@ BitmapBlock::FindNextUnmarked(uint32& pos)
 		"bits: %lX\n", index, bit, mask, bits);
 
 	bits &= ~mask;
+	uint32 maxBit = 32;
 
 	if (bits == ~mask) {
 		// Find an block of 32 bits that has a unmarked bit
@@ -474,18 +475,22 @@ BitmapBlock::FindNextUnmarked(uint32& pos)
 		} while (index < maxIndex && data[index] == 0xFFFFFFFF);
 
 		if (index >= maxIndex) {
-			// Not found
-			TRACE("BitmapBlock::FindNextUnmarked(): reached end of block, num "
-				"bits: %lu\n", fNumBits);
-			pos = fNumBits;
-			return;
-		}
+			maxBit = fNumBits & 0x1F;
 
+			if (maxBit == 0) {
+				// Not found
+				TRACE("BitmapBlock::FindNextUnmarked(): reached end of block, "
+					"num bits: %lu\n", fNumBits);
+				pos = fNumBits;
+				return;
+			}
+			maxBit++;
+		}
 		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
 		bit = 0;
 	}
 
-	for (; bit < 32; ++bit) {
+	for (; bit < maxBit; ++bit) {
 		// Find the unmarked bit
 		if ((bits >> bit & 1) == 0) {
 			pos = index << 5 | bit;

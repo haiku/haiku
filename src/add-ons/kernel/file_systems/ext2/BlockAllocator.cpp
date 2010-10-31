@@ -131,7 +131,7 @@ AllocationBlockGroup::Initialize(Volume* volume, uint32 blockGroup,
 	status = ScanFreeRanges();
 
 	if (fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature()) != fFreeBits) {
-		TRACE("AllocationBlockGroup::Initialize(): Mismatch between counted "
+		ERROR("AllocationBlockGroup::Initialize(): Mismatch between counted "
 			"free blocks (%lu) and what is set on the group descriptor "
 			"(%lu)\n", fFreeBits, 
 			fGroupDescriptor->FreeBlocks(fVolume->Has64bitFeature()));

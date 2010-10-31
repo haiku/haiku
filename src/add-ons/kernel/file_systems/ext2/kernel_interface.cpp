@@ -186,8 +186,8 @@ ext2_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _node, int* _type,
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	if (id < 2 || id > volume->NumInodes()) {
-		dprintf("ext2: inode at %Ld requested!\n", id);
-		return B_ERROR;
+		dprintf("ext2: invalid inode id %lld requested!\n", id);
+		return B_BAD_VALUE;
 	}
 
 	Inode* inode = new Inode(volume, id);
@@ -397,15 +397,17 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 	size_t index = 0, max = *_count;
 
 	while (true) {
-		uint32 block;
-		status_t status = inode->FindBlock(offset, block);
+		off_t block;
+		uint32 count = 1;
+		status_t status = inode->FindBlock(offset, block, &count);
 		if (status != B_OK)
 			return status;
 
-		off_t blockOffset = (off_t)block << volume->BlockShift();
-		uint32 blockLength = volume->BlockSize();
+		off_t blockOffset = block << volume->BlockShift();
+		uint32 blockLength = volume->BlockSize() * count;
 
-		if (index > 0 && (vecs[index - 1].offset == blockOffset - blockLength
+		if (index > 0 && (vecs[index - 1].offset 
+				== blockOffset - vecs[index - 1].length
 				|| (vecs[index - 1].offset == -1 && block == 0))) {
 			vecs[index - 1].length += blockLength;
 		} else {
@@ -426,11 +428,12 @@ ext2_get_file_map(fs_volume* _volume, fs_vnode* _node, off_t offset,
 		}
 
 		offset += blockLength;
+		size -= blockLength;
 
 		if (size <= vecs[index - 1].length || offset >= inode->Size()) {
 			// We're done!
 			*_count = index;
-			TRACE("ext2_get_file_map for inode %ld\n", (long)inode->ID());
+			TRACE("ext2_get_file_map for inode %lld\n", inode->ID());
 			return B_OK;
 		}
 	}
@@ -750,7 +753,7 @@ ext2_create_symlink(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	ino_t id;
 	status = Inode::Create(transaction, directory, name, S_SYMLINK | 0777,
 		0, (uint8)EXT2_TYPE_SYMLINK, NULL, &id, &link);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	// TODO: We have to prepare the link before publishing?
@@ -925,7 +928,7 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 			if (status != B_OK)
 				return B_IO_ERROR;
 
-			uint32 blockNum;
+			off_t blockNum;
 			status = parent->FindBlock(0, blockNum);
 			if (status != B_OK)
 				return status;

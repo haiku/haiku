@@ -400,8 +400,12 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	TRACE("Volume::Mount(): Initialize block allocator\n");
 	status = fBlockAllocator.Initialize();
 	if (status != B_OK) {
-		FATAL("could not initialize block allocator!\n");
-		return status;
+		FATAL("could not initialize block allocator, going read-only!\n");
+		fFlags |= VOLUME_READ_ONLY;
+		fJournal->Uninit();
+		delete fJournal;
+		delete fJournalInode;
+		fJournal = new(std::nothrow) NoJournal(this);
 	}
 
 	// ready

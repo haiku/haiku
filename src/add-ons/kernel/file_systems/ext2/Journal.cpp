@@ -26,6 +26,7 @@
 #else
 #	define TRACE(x...) ;
 #endif
+#define ERROR(x...) dprintf("\33[34mext2:\33[0m " x)
 
 
 class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
@@ -296,7 +297,7 @@ Journal::Unlock(Transaction* owner, bool success)
 
 
 status_t
-Journal::MapBlock(uint32 logical, uint32& physical)
+Journal::MapBlock(off_t logical, off_t& physical)
 {
 	TRACE("Journal::MapBlock()\n");
 	physical = logical;
@@ -394,7 +395,7 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 
 		logBlock = _WrapAroundLog(logBlock + 1);
 
-		uint32 physicalBlock;
+		off_t physicalBlock;
 		status = MapBlock(logBlock, physicalBlock);
 		if (status != B_OK)
 			return status;
@@ -402,7 +403,7 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 		off_t logOffset = physicalBlock * fBlockSize;
 
 		TRACE("Journal::_WritePartialTransactionToLog(): Writing from memory: "
-			"%p, to disk: %ld\n", finalData, (long)logOffset);
+			"%p, to disk: %llu\n", finalData, logOffset);
 		size_t written = write_pos(fJournalVolume->Device(), logOffset,
 			finalData, fBlockSize);
 		if (written != fBlockSize) {
@@ -426,15 +427,15 @@ Journal::_WritePartialTransactionToLog(JournalHeader* descriptorBlock,
 	--tag;
 	tag->SetLastTagFlag();
 	
-	uint32 physicalBlock;
+	off_t physicalBlock;
 	status = MapBlock(descriptorBlockPos, physicalBlock);
 	if (status != B_OK)
 		return status;
 
 	off_t descriptorBlockOffset = physicalBlock * fBlockSize;
 
-	TRACE("Journal::_WritePartialTransactionToLog(): Writing to: %ld\n",
-		(long)descriptorBlockOffset);
+	TRACE("Journal::_WritePartialTransactionToLog(): Writing to: %lld\n",
+		descriptorBlockOffset);
 	size_t written = write_pos(fJournalVolume->Device(),
 		descriptorBlockOffset, descriptorBlock, fBlockSize);
 	if (written != fBlockSize) {
@@ -569,7 +570,7 @@ Journal::_WriteTransactionToLog()
 		// written. When it recovery reaches where the first commit should be 
 		// and doesn't find it, it considers it found the end of the log.
 
-		uint32 physicalBlock;
+		off_t physicalBlock;
 		status = MapBlock(logBlock, physicalBlock);
 		if (status != B_OK)
 			return status;
@@ -577,7 +578,7 @@ Journal::_WriteTransactionToLog()
 		off_t logOffset = physicalBlock * fBlockSize;
 		
 		TRACE("Journal::_WriteTransactionToLog(): Writting commit block to "
-			"%ld\n", (long)logOffset);
+			"%lld\n", logOffset);
 		off_t written = write_pos(fJournalVolume->Device(), logOffset,
 			commitBlock, fBlockSize);
 		if (written != fBlockSize) {
@@ -592,15 +593,14 @@ Journal::_WriteTransactionToLog()
 	}
 
 	// Transaction will enter the Commit state
-	uint32 physicalBlock;
+	off_t physicalBlock;
 	status = MapBlock(commitBlockPos, physicalBlock);
 	if (status != B_OK)
 		return status;
 
 	off_t logOffset = physicalBlock * fBlockSize;
 
-	TRACE("Journal::_WriteTansactionToLog(): Writing to: %ld\n",
-		(long)logOffset);
+	TRACE("Journal::_WriteTransactionToLog(): Writing to: %lld\n", logOffset);
 	off_t written = write_pos(fJournalVolume->Device(), logOffset, commitBlock,
 		fBlockSize);
 	if (written != fBlockSize) {
@@ -634,8 +634,8 @@ Journal::_WriteTransactionToLog()
 		if (status == B_OK && _FullTransactionSize() > fLogSize) {
 			// If the transaction is too large after writing, there is no way to
 			// recover, so let this transaction fail.
-			dprintf("transaction too large (%d blocks, log size %d)!\n",
-				(int)_FullTransactionSize(), (int)fLogSize);
+			ERROR("transaction too large (%ld blocks, log size %ld)!\n",
+				_FullTransactionSize(), fLogSize);
 			return B_BUFFER_OVERFLOW;
 		}
 	} else {
@@ -652,7 +652,7 @@ status_t
 Journal::_SaveSuperBlock()
 {
 	TRACE("Journal::_SaveSuperBlock()\n");
-	uint32 physicalBlock;
+	off_t physicalBlock;
 	status_t status = MapBlock(0, physicalBlock);
 	if (status != B_OK)
 		return status;
@@ -669,7 +669,7 @@ Journal::_SaveSuperBlock()
 	superblock.SetFirstCommitID(fFirstCommitID);
 	superblock.SetLogStart(fLogStart);
 	
-	TRACE("Journal::SaveSuperBlock(): Write to %ld\n", (long)superblockPos);
+	TRACE("Journal::SaveSuperBlock(): Write to %lld\n", superblockPos);
 	size_t bytesWritten = write_pos(fJournalVolume->Device(), superblockPos,
 		&superblock, sizeof(superblock));
 
@@ -686,13 +686,13 @@ status_t
 Journal::_LoadSuperBlock()
 {
 	TRACE("Journal::_LoadSuperBlock()\n");
-	uint32 superblockPos;
+	off_t superblockPos;
 
 	status_t status = MapBlock(0, superblockPos);
 	if (status != B_OK)
 		return status;
 	
-	TRACE("Journal::_LoadSuperBlock(): super block physical block: %lu\n",
+	TRACE("Journal::_LoadSuperBlock(): super block physical block: %llu\n",
 		superblockPos);
 	
 	JournalSuperBlock superblock;
@@ -700,12 +700,12 @@ Journal::_LoadSuperBlock()
 		* fJournalVolume->BlockSize(), &superblock, sizeof(superblock));
 
 	if (bytesRead != sizeof(superblock)) {
-		TRACE("Journal::_LoadSuperBlock(): failed to read superblock\n");
+		ERROR("Journal::_LoadSuperBlock(): failed to read superblock\n");
 		return B_IO_ERROR;
 	}
 
 	if (!superblock.header.CheckMagic()) {
-		TRACE("Journal::_LoadSuperBlock(): Invalid superblock magic %lX\n",
+		ERROR("Journal::_LoadSuperBlock(): Invalid superblock magic %lX\n",
 			superblock.header.Magic());
 		return B_BAD_VALUE;
 	}
@@ -717,7 +717,7 @@ Journal::_LoadSuperBlock()
 		TRACE("Journal::_LoadSuperBlock(): Journal superblock version 2\n");
 		fVersion = 2;
 	} else {
-		TRACE("Journal::_LoadSuperBlock(): Invalid superblock version\n");
+		ERROR("Journal::_LoadSuperBlock(): Invalid superblock version\n");
 		return B_BAD_VALUE;
 	}
 
@@ -725,7 +725,7 @@ Journal::_LoadSuperBlock()
 		status = _CheckFeatures(&superblock);
 
 		if (status != B_OK) {
-			TRACE("Journal::_LoadSuperBlock(): Unsupported features\n");
+			ERROR("Journal::_LoadSuperBlock(): Unsupported features\n");
 			return status;
 		}
 	}
@@ -833,7 +833,7 @@ Journal::_RecoverPassScan(uint32& lastCommitID)
 	JournalHeader* header;
 	uint32 nextCommitID = fFirstCommitID;
 	uint32 nextBlock = fLogStart;
-	uint32 nextBlockPos;
+	off_t nextBlockPos;
 
 	status_t status = MapBlock(nextBlock, nextBlockPos);
 	if (status != B_OK)
@@ -889,7 +889,7 @@ Journal::_RecoverPassRevoke(uint32 lastCommitID)
 	JournalHeader* header;
 	uint32 nextCommitID = fFirstCommitID;
 	uint32 nextBlock = fLogStart;
-	uint32 nextBlockPos;
+	off_t nextBlockPos;
 
 	status_t status = MapBlock(nextBlock, nextBlockPos);
 	if (status != B_OK)
@@ -951,7 +951,7 @@ Journal::_RecoverPassReplay(uint32 lastCommitID)
 
 	uint32 nextCommitID = fFirstCommitID;
 	uint32 nextBlock = fLogStart;
-	uint32 nextBlockPos;
+	off_t nextBlockPos;
 
 	status_t status = MapBlock(nextBlock, nextBlockPos);
 	if (status != B_OK)
@@ -973,8 +973,8 @@ Journal::_RecoverPassReplay(uint32 lastCommitID)
 
 	while (nextCommitID < lastCommitID) {
 		if (!header->CheckMagic() || header->Sequence() != nextCommitID) {
-			// Somehow the log is different than the expexted
-			TRACE("Journal::_RecoverPassReplay(): Wierd problem with block\n");
+			// Somehow the log is different than the expected
+			ERROR("Journal::_RecoverPassReplay(): Weird problem with block\n");
 			return B_ERROR;
 		}
 

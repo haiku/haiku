@@ -20,7 +20,7 @@ public:
 
 			status_t	InitCheck();
 			
-			status_t	MapBlock(uint32 logical, uint32& physical);
+			status_t	MapBlock(off_t logical, off_t& physical);
 private:
 			Inode*		fInode;
 			status_t	fInitStatus;

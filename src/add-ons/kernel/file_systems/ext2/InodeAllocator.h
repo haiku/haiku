@@ -32,10 +32,10 @@ private:
 							uint32 prefferedBlockGroup, bool isDirectory,
 							ino_t& id);
 			status_t	_MarkInBitmap(Transaction& transaction,
-							uint32 bitmapBlock, uint32 blockGroup,
+							off_t bitmapBlock, uint32 blockGroup,
 							uint32 numInodes, ino_t& id);
 			status_t	_UnmarkInBitmap(Transaction& transaction,
-							uint32 bitmapBlock, uint32 numInodes, ino_t id);
+							off_t bitmapBlock, uint32 numInodes, ino_t id);
 
 
 			Volume*		fVolume;

@@ -41,7 +41,7 @@ HTreeEntryIterator::HTreeEntryIterator(off_t offset, Inode* directory)
 		fCurrentEntry = fFirstEntry;
 	}
 
-	TRACE("HTreeEntryIterator::HTreeEntryIterator(): created %p, block %lu, "
+	TRACE("HTreeEntryIterator::HTreeEntryIterator(): created %p, block %llu, "
 		"entry no. %lu, parent: %p\n", this, fBlockNum, (uint32)fCurrentEntry,
 		fParent);
 }
@@ -100,7 +100,7 @@ HTreeEntryIterator::Init()
 
 	if (fLimit != fBlockSize / sizeof(HTreeEntry) - fFirstEntry) {
 		ERROR("HTreeEntryIterator::Init() bad fLimit %lu should be %lu "
-			"at block %lu\n", (uint32)fLimit, fBlockSize / sizeof(HTreeEntry)
+			"at block %llu\n", (uint32)fLimit, fBlockSize / sizeof(HTreeEntry)
 				- fFirstEntry, fBlockNum);
 		fCount = fLimit = 0;
 		return B_ERROR;
@@ -189,7 +189,7 @@ HTreeEntryIterator::Lookup(uint32 hash, int indirections,
 
 	TRACE("HTreeEntryIterator::Lookup(): Creating a HTree entry iterator "
 		"starting at block: %lu, hash: 0x%lX\n", start->Block(), start->Hash());
-	uint32 blockNum;
+	off_t blockNum;
 	status_t status = fDirectory->FindBlock(start->Block() * fBlockSize,
 		blockNum);
 	if (status != B_OK)
@@ -322,7 +322,7 @@ HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 		panic("Splitting a HTree node required, but isn't yet fully "
 			"supported\n");
 
-		uint32 physicalBlock;
+		off_t physicalBlock;
 		status_t status = fDirectory->FindBlock(newBlocksPos, physicalBlock);
 		if (status != B_OK)
 			return status;
