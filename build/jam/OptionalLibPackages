@@ -36,7 +36,7 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 	# libsdl and related libs
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package AllegroLibs available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			allegro-4.4.1.1-x86-gcc4-2010-10-30.zip
 			: $(baselibURL)/allegro-4.4.1.1-x86-gcc4-2010-10-30.zip ;
@@ -64,7 +64,7 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 if [ IsOptionalHaikuImagePackageAdded fribidi ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package fribidi available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			fribidi-0.19.2-x86-gcc4-2010-10-30.zip
 			: $(baselibURL)/fribidi-0.19.2-x86-gcc4-2010-10-30.zip
@@ -143,6 +143,7 @@ if [ IsOptionalHaikuImagePackageAdded libmikmod ] {
 
 
 # libmng
+# TODO: Libmng exists in OptionalPackages!
 if [ IsOptionalHaikuImagePackageAdded libmng ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package libmng available for $(TARGET_ARCH)" ;
@@ -191,7 +192,7 @@ if [ IsOptionalHaikuImagePackageAdded libpaper ] {
 if [ IsOptionalHaikuImagePackageAdded physfs ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package physfs available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			physfs-2.0.1-x86-gcc4-2010-10-30.zip
 			: $(baselibURL)/physfs-2.0.1-x86-gcc4-2010-10-30.zip
@@ -213,7 +214,7 @@ if [ IsOptionalHaikuImagePackageAdded physfs ] {
 if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package SDLLibs available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			libsdl-1.2-hg-x86-gcc4-2010-10-30.zip
 			: $(baselibURL)/libsdl-1.2-hg-x86-gcc4-2010-10-30.zip ;
@@ -249,7 +250,7 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 			: $(baselibURL)/smjpeg-0.2.1-x86-gcc4-2010-10-30.zip ;
 		InstallOptionalHaikuImagePackage
 			smpeg-0.4.5-x86-gcc4-2010-10-29.zip
-			: $(baselibURL)/smpeg-0.4.5-x86-gcc4-2010-10-29.zip ;	
+			: $(baselibURL)/smpeg-0.4.5-x86-gcc4-2010-10-29.zip ;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libsdl-1.2-hg-x86-gcc2-2010-10-29.zip
@@ -295,7 +296,7 @@ if [ IsOptionalHaikuImagePackageAdded SDLLibs ] {
 if [ IsOptionalHaikuImagePackageAdded XiphLibs ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package XiphLibs available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage
 			flac-1.2.1-x86-gcc4-2010-10-30.zip
 			: $(baselibURL)/flac-1.2.1-x86-gcc4-2010-10-30.zip ;

@@ -142,14 +142,8 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 if [ IsOptionalHaikuImagePackageAdded ArmyKnife ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package ArmyKnife available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package ArmyKnife for gcc4" ;
-#		InstallOptionalHaikuImagePackage armyknife-61-x86-gcc4-2010-10-30.zip
-#			: $(baseURL)/armyknife-61-x86-gcc4-2010-10-30.zip
-#			:
-#		;
-#		AddSymlinkToHaikuImage home config be Applications
-#			: /boot/apps/ArmyKnife/ArmyKnife ;
 	} else {
 		InstallOptionalHaikuImagePackage armyknife-61-x86-gcc2-2010-10-30.zip
 			: $(baseURL)/armyknife-61-x86-gcc2-2010-10-30.zip
@@ -1474,7 +1468,7 @@ if [ IsOptionalHaikuImagePackageAdded TagLib ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package TagLib available for $(TARGET_ARCH)" ;
 	} else {
-		if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 			Echo "No optional package TagLib available for $(TARGET_ARCH)-gcc4" ;
 		} else {
 			InstallOptionalHaikuImagePackage
@@ -1623,14 +1617,8 @@ if [ IsOptionalHaikuImagePackageAdded Vim ] {
 if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
 		Echo "No optional package Vision for gcc4" ;
-#		InstallOptionalHaikuImagePackage vision-908-x86-gcc4-2010-10-30.zip
-#			: $(baseURL)/vision-908-x86-gcc4-2010-10-30.zip
-#			:
-#		;
-#		AddSymlinkToHaikuImage home config be Applications
-#			: /boot/apps/Vision/Vision ;
 	} else {
 		InstallOptionalHaikuImagePackage vision-908-x86-gcc2-2010-10-30.zip
 			: $(baseURL)/vision-908-x86-gcc2-2010-10-30.zip
