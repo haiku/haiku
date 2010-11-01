@@ -79,7 +79,12 @@ ExecDevice::AllocRequest(size_t requestSize)
 status_t
 ExecDevice::Open(const char *name, unsigned long unit, unsigned long flags)
 {
-	status_t err;
+	status_t err = B_OK;
+
+	if (fIORequest == NULL)
+		err = AllocRequest(sizeof(struct IOStdReq));
+	if (err < B_OK)
+		return err;
 	err = exec_error(OpenDevice((uint8 *)name, unit, fIORequest, flags));
 	if (err < B_OK)
 		return err;
