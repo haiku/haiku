@@ -29,6 +29,7 @@
 #include "Globals.h"
 #include "Messages.h"
 #include "PrinterListView.h"
+#include "TransportMenu.h"
 
 
 #undef B_TRANSLATE_CONTEXT
@@ -379,34 +380,12 @@ AddPrinterDialog::_FillTransportMenu(BMenu* menu)
 		}
 
 		// Create submenu
-		BMenu* transportMenu = new BMenu(transportName.String());
+		BMenu* transportMenu = new TransportMenu(transportName.String(),
+			kTransportSelectedMsg, transport, transportName);
 		menu->AddItem(transportMenu);
 		transportMenu->SetRadioMode(true);
 		menu->ItemAt(menu->IndexOf(transportMenu))->
 			SetMessage(new BMessage(kTransportSelectedMsg));
-
-
-		if (reply.FindString("port_id", &portId) != B_OK) {
-			// Show error message in submenu
-			BMessage* portMsg = new BMessage(kTransportSelectedMsg);
-			transportMenu->AddItem(new BMenuItem(
-				B_TRANSLATE("No printer found!"), portMsg));
-			continue;
-		}
-
-		// Add ports to submenu
-		for (int32 i = 0; reply.FindString("port_id", i, &portId) == B_OK;
-			i++) {
-			if (reply.FindString("port_name", i, &portName) != B_OK
-				|| !portName.Length())
-				portName = portId;
-
-			// Create menu item in submenu for port
-			BMessage* portMsg = new BMessage(kTransportSelectedMsg);
-			portMsg->AddString("name", transportName);
-			portMsg->AddString("path", portId);
-			transportMenu->AddItem(new BMenuItem(portName.String(), portMsg));
-		}
 	}
 }
 
