@@ -182,6 +182,26 @@ ATADevice::ReadCapacity(ATARequest *request)
 	uint32 lastBlock = fTotalSectors - 1;
 	data.lba = B_HOST_TO_BENDIAN_INT32(lastBlock);
 	TRACE("returning last block: %lu\n", B_BENDIAN_TO_HOST_INT32(data.lba));
+	
+	copy_sg_data(ccb, 0, ccb->data_length, &data, sizeof(data), false);
+	ccb->data_resid = MAX(ccb->data_length - sizeof(data), 0);
+	return B_OK;
+}
+
+
+status_t
+ATADevice::ReadCapacity16(ATARequest *request)
+{
+	TRACE_FUNCTION("%p\n", request);
+	
+	scsi_ccb *ccb = request->CCB();
+	scsi_res_read_capacity_long data;
+	data.block_size = B_HOST_TO_BENDIAN_INT32(fBlockSize);
+
+	uint64 lastBlock = fTotalSectors - 1;
+	data.lba = (((uint64)B_HOST_TO_BENDIAN_INT32(lastBlock >> 32)) << 32)
+		| B_HOST_TO_BENDIAN_INT32(lastBlock);
+	TRACE("returning last block: %llu\n", data.lba);
 
 	copy_sg_data(ccb, 0, ccb->data_length, &data, sizeof(data), false);
 	ccb->data_resid = MAX(ccb->data_length - sizeof(data), 0);
@@ -250,6 +270,11 @@ ATADevice::ExecuteIO(ATARequest *request)
 
 		case SCSI_OP_READ_CAPACITY:
 			return ReadCapacity(request);
+
+		case SCSI_OP_SERVICE_ACTION_IN:
+			if ((ccb->cdb[1] & 0x1f) == SCSI_SAI_READ_CAPACITY_16)
+				return ReadCapacity16(request);
+			break;
 
 		case SCSI_OP_SYNCHRONIZE_CACHE:
 			// we ignore range and immediate bit, we always immediately
@@ -443,7 +468,8 @@ ATADevice::Configure()
 		}
 	}
 
-	if (!fInfoBlock.lba_supported || fInfoBlock.lba_sector_count == 0) {
+	if (!fInfoBlock.lba_supported || (fInfoBlock.lba_sector_count == 0
+		&& fInfoBlock.lba48_sector_count == 0)) {
 		TRACE_ERROR("non-lba devices not supported\n");
 		return B_ERROR;
 	}

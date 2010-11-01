@@ -92,9 +92,16 @@ get_geometry(das_handle* handle, device_geometry* geometry)
 		return status;
 
 	geometry->bytes_per_sector = info->block_size;
-	geometry->sectors_per_track = 1;
-	geometry->cylinder_count = info->capacity;
-	geometry->head_count = 1;
+	if (info->capacity > UINT_MAX) {
+		// TODO this doesn't work for capacity greater than 35TB
+		geometry->sectors_per_track = 256;
+		geometry->cylinder_count = info->capacity / (256 * 32);
+		geometry->head_count = 32;
+	} else {
+		geometry->sectors_per_track = 1;
+		geometry->cylinder_count = info->capacity;
+		geometry->head_count = 1;
+	}
 	geometry->device_type = B_DISK;
 	geometry->removable = info->removable;
 
@@ -323,7 +330,7 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	das_handle* handle = (das_handle*)cookie;
 	das_driver_info* info = handle->info;
 
-	TRACE("ioctl(op = %d)\n", op);
+	TRACE("ioctl(op = %ld)\n", op);
 
 	switch (op) {
 		case B_GET_DEVICE_SIZE:
@@ -398,7 +405,7 @@ static void
 das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize)
 {
 	TRACE("das_set_capacity(device = %p, capacity = %Ld, blockSize = %ld)\n",
-		device, capacity, blockSize);
+		info, capacity, blockSize);
 
 	// get log2, if possible
 	uint32 blockShift = log2(blockSize);

@@ -176,6 +176,7 @@ public:
 			status_t			Eject(ATARequest *request);
 			status_t			Inquiry(ATARequest *request);
 			status_t			ReadCapacity(ATARequest *request);
+			status_t			ReadCapacity16(ATARequest *request);
 	virtual	status_t			ExecuteIO(ATARequest *request);
 
 			void				GetRestrictions(bool *noAutoSense,

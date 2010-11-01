@@ -313,7 +313,7 @@ typedef struct scsi_page_usn {
 	char	psn[1];			// size according to page_length
 } _PACKED scsi_page_usn;
 
-// READ CAPACITY
+// READ CAPACITY (10)
 
 typedef struct scsi_cmd_read_capacity {
 	uint8	opcode;
@@ -335,6 +335,22 @@ typedef struct scsi_res_read_capacity {
 	uint32	lba;					// big endian
 	uint32	block_size;				// in bytes
 } _PACKED scsi_res_read_capacity;
+
+// READ CAPACITY (16)
+
+typedef struct scsi_cmd_read_capacity_long {
+	uint8	opcode;
+	uint8	service_action;
+	uint64	lba;
+	uint32	alloc_length;
+	uint8	relative_address;
+	uint8	control;
+} _PACKED scsi_cmd_read_capacity_long;
+
+typedef struct scsi_res_read_capacity_long {
+	uint64	lba;					// big endian
+	uint32	block_size;				// in bytes
+} _PACKED scsi_res_read_capacity_long;
 
 
 // READ (6), WRITE (6)
