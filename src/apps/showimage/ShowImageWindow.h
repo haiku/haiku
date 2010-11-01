@@ -11,10 +11,10 @@
 #define SHOW_IMAGE_WINDOW_H
 
 
-#include "PrintOptionsWindow.h"
-
-
 #include <Window.h>
+
+#include "ImageFileNavigator.h"
+#include "PrintOptionsWindow.h"
 
 
 class BFilePanel;
@@ -35,7 +35,6 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
-			status_t			InitCheck();
 			ShowImageView*		GetShowImageView() const { return fImageView; }
 
 			void				UpdateTitle();
@@ -62,6 +61,8 @@ private:
 			void				_MarkSlideShowDelay(float value);
 			void				_ResizeToWindow(bool shrink, uint32 what);
 
+			void				_UpdateStatusText(const BMessage* message);
+			void				_LoadError(const entry_ref& ref);
 			void				_SaveAs(BMessage* message);
 									// Handle Save As submenu choice
 			void				_SaveToFile(BMessage* message);
@@ -79,24 +80,24 @@ private:
 			void				_CloseResizerWindow();
 
 private:
+			ImageFileNavigator	fNavigator;
 			BFilePanel*			fSavePanel;
 			BMenuBar*			fBar;
-			BMenu*				fOpenMenu
-;			BMenu*				fBrowseMenu;
+			BMenu*				fOpenMenu;
+			BMenu*				fBrowseMenu;
 			BMenu*				fGoToPageMenu;
 			BMenu*				fSlideShowDelay;
 			ShowImageView*		fImageView;
 			ShowImageStatusView* fStatusView;
 			bool				fModified;
 			bool				fFullScreen;
-			BRect				fWindowFrame;
 			bool				fShowCaption;
+			BRect				fWindowFrame;
 			BMessage*			fPrintSettings;
 			PrintOptions		fPrintOptions;
 			BMessenger*			fResizerWindowMessenger;
 			BMenuItem*			fResizeItem;
-			int32				fHeight;
-			int32				fWidth;
+			BString				fImageType;
 };
 
 

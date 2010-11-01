@@ -51,16 +51,19 @@
 #include "ShowImageView.h"
 
 
+// BMessage field names used in Save messages
+const char* kTypeField = "be:type";
+const char* kTranslatorField = "be:translator";
+
+
 // #pragma mark -- ShowImageWindow::RecentDocumentsMenu
+
 
 class ShowImageWindow::RecentDocumentsMenu : public BMenu {
 public:
-			RecentDocumentsMenu(const char* title,
-				menu_layout layout = B_ITEMS_IN_COLUMN);
-	bool	AddDynamicItem(add_state addState);
-
-private:
-	void	UpdateRecentDocumentsMenu();
+								RecentDocumentsMenu(const char* title,
+									menu_layout layout = B_ITEMS_IN_COLUMN);
+			bool				AddDynamicItem(add_state addState);
 };
 
 
@@ -102,18 +105,33 @@ ShowImageWindow::RecentDocumentsMenu::AddDynamicItem(add_state addState)
 }
 
 
+// #pragma mark
+
+
+// This is temporary solution for building BString with printf like format.
+// will be removed in the future.
+static void
+bs_printf(BString* string, const char* format, ...)
+{
+	va_list ap;
+	char* buf;
+
+	va_start(ap, format);
+	vasprintf(&buf, format, ap);
+	string->SetTo(buf);
+	free(buf);
+	va_end(ap);
+}
+
+
 //	#pragma mark -- ShowImageWindow
-
-
-// BMessage field names used in Save messages
-const char* kTypeField = "be:type";
-const char* kTranslatorField = "be:translator";
 
 
 ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	const BMessenger& trackerMessenger)
 	:
 	BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0),
+	fNavigator(this),
 	fSavePanel(NULL),
 	fBar(NULL),
 	fOpenMenu(NULL),
@@ -127,9 +145,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	fShowCaption(true),
 	fPrintSettings(NULL),
 	fResizerWindowMessenger(NULL),
-	fResizeItem(NULL),
-	fHeight(0),
-	fWidth(0)
+	fResizeItem(NULL)
 {
 	_LoadSettings();
 
@@ -181,34 +197,16 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	SetSizeLimits(250, 100000, 100, 100000);
 
 	// finish creating the window
-	fImageView->SetImage(ref);
-	fImageView->SetTrackerMessenger(trackerMessenger);
-
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "LoadAlerts"
-
-	if (InitCheck() != B_OK) {
-		BAlert* alert;
-		alert = new BAlert(
-			B_TRANSLATE("ShowImage"),
-			B_TRANSLATE("Could not load image! Either the file or an image "
-				"translator for it does not exist."),
-			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_INFO_ALERT);
-		alert->Go();
-
-		// quit if file could not be opened
+	fNavigator.SetTrackerMessenger(trackerMessenger);
+	if (fNavigator.LoadImage(*ref) != B_OK) {
+		_LoadError(*ref);
 		Quit();
-		return;
 	}
 
-#undef B_TRANSLATE_CONTEXT
-#define B_TRANSLATE_CONTEXT "Menus"
-
 	// add View menu here so it can access ShowImageView methods
-	BMenu* menu = new BMenu(B_TRANSLATE("View"));
+	BMenu* menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("View", "Menus"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
-	UpdateTitle();
 
 	SetPulseRate(100000);
 		// every 1/10 second; ShowImageView needs it for marching ants
@@ -216,14 +214,12 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	_MarkMenuItem(menu, MSG_SELECTION_MODE,
 		fImageView->IsSelectionModeEnabled());
 
-	WindowRedimension(fImageView->GetBitmap());
-	fImageView->ResetZoom();
-	fImageView->MakeFocus(true); // to receive KeyDown messages
-	Show();
-
 	// Tell application object to query the clipboard
 	// and tell this window if it contains interesting data or not
 	be_app_messenger.SendMessage(B_CLIPBOARD_CHANGED);
+
+	// The window will be shown on screen automatically
+	Run();
 }
 
 
@@ -233,22 +229,11 @@ ShowImageWindow::~ShowImageWindow()
 }
 
 
-status_t
-ShowImageWindow::InitCheck()
-{
-	if (!fImageView || fImageView->GetBitmap() == NULL)
-		return B_ERROR;
-
-	return B_OK;
-}
-
-
 void
 ShowImageWindow::UpdateTitle()
 {
-	BString path;
-	fImageView->GetPath(&path);
-	SetTitle(path.String());
+	BPath path(fImageView->Image());
+	SetTitle(path.Path());
 }
 
 
@@ -559,6 +544,41 @@ void
 ShowImageWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kMsgImageLoaded:
+		{
+			bool first = fImageView->Bitmap() == NULL;
+
+			status_t status = fImageView->SetImage(message);
+			if (status != B_OK) {
+				entry_ref ref;
+				message->FindRef("ref", &ref);
+
+				_LoadError(ref);
+
+				// quit if file could not be opened
+				if (first)
+					Quit();
+				break;
+			}
+
+			fImageType = message->FindString("type");
+
+			if (first) {
+				WindowRedimension(fImageView->Bitmap());
+				fImageView->ResetZoom();
+				fImageView->MakeFocus(true);
+					// to receive key messages
+
+				Show();
+			} else {
+				if (!fImageView->StretchesToBounds()
+					&& !fImageView->ShrinksToBounds()
+					&& !fFullScreen)
+					WindowRedimension(fImageView->Bitmap());
+			}
+			break;
+		}
+
 		case MSG_MODIFIED:
 			// If image has been modified due to a Cut or Paste
 			fModified = true;
@@ -583,95 +603,61 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_UPDATE_STATUS:
 		{
-			int32 pages = fImageView->PageCount();
-			int32 curPage = fImageView->CurrentPage();
+			int32 pages = fNavigator.PageCount();
+			int32 currentPage = fNavigator.CurrentPage();
 
-			bool enable = (pages > 1) ? true : false;
+			bool enable = pages > 1 ? true : false;
 			_EnableMenuItem(fBar, MSG_PAGE_FIRST, enable);
 			_EnableMenuItem(fBar, MSG_PAGE_LAST, enable);
 			_EnableMenuItem(fBar, MSG_PAGE_NEXT, enable);
 			_EnableMenuItem(fBar, MSG_PAGE_PREV, enable);
 			fGoToPageMenu->SetEnabled(enable);
 
-			_EnableMenuItem(fBar, MSG_FILE_NEXT, fImageView->HasNextFile());
-			_EnableMenuItem(fBar, MSG_FILE_PREV, fImageView->HasPrevFile());
+			_EnableMenuItem(fBar, MSG_FILE_NEXT, fNavigator.HasNextFile());
+			_EnableMenuItem(fBar, MSG_FILE_PREV, fNavigator.HasPreviousFile());
 
 			if (fGoToPageMenu->CountItems() != pages) {
 				// Only rebuild the submenu if the number of
 				// pages is different
 
-				while (fGoToPageMenu->CountItems() > 0)
+				while (fGoToPageMenu->CountItems() > 0) {
 					// Remove all page numbers
 					delete fGoToPageMenu->RemoveItem(0L);
+				}
 
 				for (int32 i = 1; i <= pages; i++) {
 					// Fill Go To page submenu with an entry for each page
-					BMessage* pgomsg = new BMessage(MSG_GOTO_PAGE);
-					pgomsg->AddInt32("page", i);
+					BMessage* goTo = new BMessage(MSG_GOTO_PAGE);
+					goTo->AddInt32("page", i);
 
 					char shortcut = 0;
-					if (i < 10) {
+					if (i < 10)
 						shortcut = '0' + i;
-					} else if (i == 10) {
-						shortcut = '0';
-					}
 
 					BString strCaption;
 					strCaption << i;
 
-					BMenuItem* item = new BMenuItem(strCaption.String(), pgomsg,
+					BMenuItem* item = new BMenuItem(strCaption.String(), goTo,
 						shortcut);
-					if (curPage == i)
+					if (currentPage == i)
 						item->SetMarked(true);
 					fGoToPageMenu->AddItem(item);
 				}
 			} else {
 				// Make sure the correct page is marked
-				BMenuItem *pcurItem;
-				pcurItem = fGoToPageMenu->ItemAt(curPage - 1);
-				if (!pcurItem->IsMarked()) {
-					pcurItem->SetMarked(true);
-				}
+				BMenuItem* currentItem = fGoToPageMenu->ItemAt(currentPage - 1);
+				if (currentItem != NULL && !currentItem->IsMarked())
+					currentItem->SetMarked(true);
 			}
 
-			BString status;
-			bool messageProvidesSize = false;
-			if (message->FindInt32("width", &fWidth) >= B_OK
-				&& message->FindInt32("height", &fHeight) >= B_OK) {
-				status << fWidth << "x" << fHeight;
-				messageProvidesSize = true;
-			}
-
-			BString str;
-			if (message->FindString("status", &str) == B_OK && str.Length() > 0) {
-				if (status.Length() > 0)
-					status << ", ";
-				status << str;
-			}
-
-			if (messageProvidesSize) {
-				_UpdateResizerWindow(fWidth, fHeight);
-				if (!fImageView->StretchesToBounds()
-					&& !fImageView->ShrinksToBounds()
-					&& !fFullScreen)
-					WindowRedimension(fImageView->GetBitmap());
-			}
-
-			fStatusView->SetText(status);
-
+			_UpdateStatusText(message);
 			UpdateTitle();
 			break;
 		}
 
 		case MSG_UPDATE_STATUS_TEXT:
 		{
-			BString status;
-			status << fWidth << "x" << fHeight;
-			BString str;
-			if (message->FindString("status", &str) == B_OK && str.Length() > 0) {
-				status << ", " << str;
-				fStatusView->SetText(status);
-			}
+			_UpdateStatusText(message);
 			break;
 		}
 
@@ -718,25 +704,26 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_PAGE_FIRST:
 			if (_ClosePrompt())
-				fImageView->FirstPage();
+				fNavigator.FirstPage();
 			break;
 
 		case MSG_PAGE_LAST:
 			if (_ClosePrompt())
-				fImageView->LastPage();
+				fNavigator.LastPage();
 			break;
 
 		case MSG_PAGE_NEXT:
 			if (_ClosePrompt())
-				fImageView->NextPage();
+				fNavigator.NextPage();
 			break;
 
 		case MSG_PAGE_PREV:
 			if (_ClosePrompt())
-				fImageView->PrevPage();
+				fNavigator.PreviousPage();
 			break;
 
-		case MSG_GOTO_PAGE: {
+		case MSG_GOTO_PAGE:
+		{
 			if (!_ClosePrompt())
 				break;
 
@@ -744,19 +731,20 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("page", &newPage) != B_OK)
 				break;
 
-			int32 curPage = fImageView->CurrentPage();
-			int32 pages = fImageView->PageCount();
+			int32 currentPage = fNavigator.CurrentPage();
+			int32 pages = fNavigator.PageCount();
 
 			if (newPage > 0 && newPage <= pages) {
-				BMenuItem* pcurItem = fGoToPageMenu->ItemAt(curPage - 1);
-				BMenuItem* pnewItem = fGoToPageMenu->ItemAt(newPage - 1);
-				if (pcurItem && pnewItem) {
-					pcurItem->SetMarked(false);
-					pnewItem->SetMarked(true);
-					fImageView->GoToPage(newPage);
+				BMenuItem* currentItem = fGoToPageMenu->ItemAt(currentPage - 1);
+				BMenuItem* newItem = fGoToPageMenu->ItemAt(newPage - 1);
+				if (currentItem != NULL && newItem != NULL) {
+					currentItem->SetMarked(false);
+					newItem->SetMarked(true);
+					fNavigator.GoToPage(newPage);
 				}
 			}
-		}	break;
+			break;
+		}
 
 		case MSG_SHRINK_TO_WINDOW:
 			_ResizeToWindow(true, message->what);
@@ -768,12 +756,12 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_FILE_PREV:
 			if (_ClosePrompt())
-				fImageView->PrevFile();
+				fNavigator.PreviousFile();
 			break;
 
 		case MSG_FILE_NEXT:
 			if (_ClosePrompt())
-				fImageView->NextFile();
+				fNavigator.NextFile();
 			break;
 
 		case MSG_ROTATE_90:
@@ -869,36 +857,59 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fImageView->SetScaleBilinear(_ToggleMenuItem(message->what));
 			break;
 
-		case MSG_OPEN_RESIZER_WINDOW: {
-			if (fImageView->GetBitmap() != NULL) {
-				BRect rect = fImageView->GetBitmap()->Bounds();
-				_OpenResizerWindow(rect.IntegerWidth()+1, rect.IntegerHeight()+1);
-			}
-		}	break;
-
-		case MSG_RESIZE: {
-			int w = message->FindInt32("w");
-			int h = message->FindInt32("h");
-			fImageView->ResizeImage(w, h);
-		} break;
-
 		case MSG_RESIZER_WINDOW_QUIT:
 			delete fResizerWindowMessenger;
 			fResizerWindowMessenger = NULL;
 			break;
 
-		case MSG_DESKTOP_BACKGROUND: {
+		case MSG_DESKTOP_BACKGROUND:
+		{
 			BMessage message(B_REFS_RECEIVED);
 			message.AddRef("refs", fImageView->Image());
 			// This is used in the Backgrounds code for scaled placement
 			message.AddInt32("placement", 'scpl');
 			be_roster->Launch("application/x-vnd.haiku-backgrounds", &message);
-		}	break;
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+ShowImageWindow::_UpdateStatusText(const BMessage* message)
+{
+	BString status;
+	if (fImageView->Bitmap() != NULL) {
+		BRect bounds = fImageView->Bitmap()->Bounds();
+		status << bounds.IntegerWidth() + 1
+			<< "x" << bounds.IntegerHeight() + 1 << ", " << fImageType;
+	}
+
+	BString text;
+	if (message != NULL && message->FindString("status", &text) == B_OK
+		&& text.Length() > 0) {
+		status << ", " << text;
+	}
+
+	fStatusView->SetText(status);
+}
+
+
+void
+ShowImageWindow::_LoadError(const entry_ref& ref)
+{
+	// TODO: give a better error message!
+	BAlert* alert = new BAlert(B_TRANSLATE("ShowImage"),
+		B_TRANSLATE_WITH_CONTEXT("Could not load image! Either the "
+			"file or an image translator for it does not exist.",
+			"LoadAlerts"),
+		B_TRANSLATE_WITH_CONTEXT("OK", "Alerts"), NULL, NULL,
+		B_WIDTH_AS_USUAL, B_INFO_ALERT);
+	alert->Go();
 }
 
 
@@ -977,22 +988,6 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 }
 
 
-// This is temporary solution for building BString with printf like format.
-// will be removed in the future.
-static void
-bs_printf(BString* string, const char* format, ...)
-{
-	va_list ap;
-	char* buf;
-
-	va_start(ap, format);
-	vasprintf(&buf, format, ap);
-	string->SetTo(buf);
-	free(buf);
-	va_end(ap);
-}
-
-
 #undef B_TRANSLATE_CONTEXT
 #define B_TRANSLATE_CONTEXT "ClosePrompt"
 
@@ -1002,34 +997,32 @@ ShowImageWindow::_ClosePrompt()
 	if (!fModified)
 		return true;
 
-	int32 page, count;
-	count = fImageView->PageCount();
-	page = fImageView->CurrentPage();
-	BString prompt, name;
-	fImageView->GetName(&name);
+	int32 count = fNavigator.PageCount();
+	int32 page = fNavigator.CurrentPage();
+	BString prompt;
 
 	if (count > 1) {
 		bs_printf(&prompt,
 			B_TRANSLATE("The document '%s' (page %d) has been changed. Do you "
 				"want to close the document?"),
-			name.String(), page);
+			fImageView->Image()->name, page);
 	} else {
 		bs_printf(&prompt,
 			B_TRANSLATE("The document '%s' has been changed. Do you want to "
 				"close the document?"),
-			name.String());
+			fImageView->Image()->name);
 	}
 
-	BAlert* pAlert = new BAlert(B_TRANSLATE("Close document"), prompt.String(),
+	BAlert* alert = new BAlert(B_TRANSLATE("Close document"), prompt.String(),
 		B_TRANSLATE("Cancel"), B_TRANSLATE("Close"));
-	if (pAlert->Go() == 0) {
+	if (alert->Go() == 0) {
 		// Cancel
 		return false;
-	} else {
-		// Close
-		fModified = false;
-		return true;
 	}
+
+	// Close
+	fModified = false;
+	return true;
 }
 
 
@@ -1112,9 +1105,7 @@ ShowImageWindow::_SavePrintOptions()
 bool
 ShowImageWindow::_PageSetup()
 {
-	BString name;
-	fImageView->GetName(&name);
-	BPrintJob printJob(name.String());
+	BPrintJob printJob(fImageView->Image()->name);
 	if (fPrintSettings != NULL)
 		printJob.SetSettings(new BMessage(*fPrintSettings));
 
@@ -1132,16 +1123,13 @@ void
 ShowImageWindow::_PrepareForPrint()
 {
 	if (fPrintSettings == NULL) {
-		BString name;
-		fImageView->GetName(&name);
-
-		BPrintJob printJob("");
+		BPrintJob printJob(fImageView->Image()->name);
 		if (printJob.ConfigJob() == B_OK)
 			fPrintSettings = printJob.Settings();
 	}
 
-	fPrintOptions.SetBounds(fImageView->GetBitmap()->Bounds());
-	fPrintOptions.SetWidth(fImageView->GetBitmap()->Bounds().Width() + 1);
+	fPrintOptions.SetBounds(fImageView->Bitmap()->Bounds());
+	fPrintOptions.SetWidth(fImageView->Bitmap()->Bounds().Width() + 1);
 
 	new PrintOptionsWindow(BPoint(Frame().left + 30, Frame().top + 50),
 		&fPrintOptions, this);
@@ -1157,10 +1145,7 @@ ShowImageWindow::_Print(BMessage* msg)
 
 	_SavePrintOptions();
 
-	BString name;
-	fImageView->GetName(&name);
-
-	BPrintJob printJob(name.String());
+	BPrintJob printJob(fImageView->Image()->name);
 	if (fPrintSettings)
 		printJob.SetSettings(new BMessage(*fPrintSettings));
 
@@ -1178,7 +1163,7 @@ ShowImageWindow::_Print(BMessage* msg)
 		if (lastPage < firstPage)
 			lastPage = firstPage;
 
-		BBitmap* bitmap = fImageView->GetBitmap();
+		BBitmap* bitmap = fImageView->Bitmap();
 		float imageWidth = bitmap->Bounds().Width() + 1.0;
 		float imageHeight = bitmap->Bounds().Height() + 1.0;
 
@@ -1186,7 +1171,8 @@ ShowImageWindow::_Print(BMessage* msg)
 		switch (fPrintOptions.Option()) {
 			case PrintOptions::kFitToPage: {
 				float w1 = printableRect.Width()+1;
-				float w2 = imageWidth * (printableRect.Height() + 1) / imageHeight;
+				float w2 = imageWidth * (printableRect.Height() + 1)
+					/ imageHeight;
 				if (w2 < w1)
 					width = w2;
 				else

@@ -54,8 +54,10 @@ public:
 
 			void				SetTrackerMessenger(
 									const BMessenger& trackerMessenger);
-			status_t			SetImage(const entry_ref* ref);
+			status_t			SetImage(const BMessage* message);
+			status_t			SetImage(const entry_ref* ref, BBitmap* bitmap);
 			const entry_ref*	Image() const { return &fCurrentRef; }
+			BBitmap*			Bitmap();
 
 			BPoint				ImageToView(BPoint p) const;
 			BPoint				ViewToImage(BPoint p) const;
@@ -77,10 +79,6 @@ public:
 									{ return fStretchToBounds; }
 			void				SetFullScreen(bool fullScreen);
 
-			BBitmap*			GetBitmap();
-			void				GetName(BString* name);
-			void				GetPath(BString* name);
-
 			void				FixupScrollBar(enum orientation orientation,
 									float bitmapLength, float viewLength);
 			void				FixupScrollBars();
@@ -94,26 +92,13 @@ public:
 
 			void				CopySelectionToClipboard();
 
-			int32				CurrentPage();
-			int32				PageCount();
-
-			void				FirstPage();
-			void				LastPage();
-			void				NextPage();
-			void				PrevPage();
-			void				GoToPage(int32 page);
-
-			bool				NextFile();
-			bool				PrevFile();
-			bool				HasNextFile();
-			bool				HasPrevFile();
-
 			void				SetSlideShowDelay(float seconds);
 			float				GetSlideShowDelay() const
 									{ return fSlideShowDelay / 10.0; }
 			bool				SlideShowStarted() const { return fSlideShow; }
 			void				StartSlideShow();
 			void				StopSlideShow();
+
 			void				SetZoom(float zoom,
 									BPoint where = BPoint(-1, -1));
 			void				ZoomIn(BPoint where = BPoint(-1, -1));
@@ -170,15 +155,6 @@ private:
 			bool				_ShouldStretch() const;
 			float				_FitToBoundsZoom() const;
 			BRect				_AlignBitmap();
-			bool				_IsImage(const entry_ref* pref);
-	static	int					_CompareEntries(const void* a, const void* b);
-			void				_FreeEntries(BList* entries);
-			void				_SetTrackerSelectionToCurrent();
-			bool				_FindNextImage(entry_ref* inCurrent,
-									entry_ref* outImage, bool next,
-									bool rewind);
-			bool				_ShowNextImage(bool next, bool rewind);
-			bool				_FirstFile();
 			BBitmap*			_CopySelection(uchar alpha = 255,
 									bool imageSize = true);
 			bool				_AddSupportedTypes(BMessage* message,
@@ -219,11 +195,6 @@ private:
 				// of the window that this was launched from
 			entry_ref			fCurrentRef;
 
-			int32				fDocumentIndex;
-				// of the image in the file
-			int32				fDocumentCount;
-				// number of images in the file
-
 			BBitmap*			fBitmap;
 			BBitmap*			fDisplayBitmap;
 			BBitmap*			fSelectionBitmap;
@@ -259,9 +230,8 @@ private:
 			bool				fShowCaption;
 			BString				fCaption;
 
-			BString				fImageType;
-				// Type of image, for use in status bar and caption
-			BString				fImageMime;
+			BString				fFormatDescription;
+			BString				fMimeType;
 
 			bool				fShowingPopUpMenu;
 

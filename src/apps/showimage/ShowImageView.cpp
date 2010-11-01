@@ -55,11 +55,6 @@
 #include "ShowImageWindow.h"
 
 
-// TODO: Remove this and use Tracker's Command.h once it is moved into the private headers
-namespace BPrivate {
-	const uint32 kMoveToTrash = 'Ttrs';
-}
-
 using std::nothrow;
 
 
@@ -92,17 +87,6 @@ const rgb_color kAlphaLow = (rgb_color){ 0xbb, 0xbb, 0xbb, 0xff };
 const rgb_color kAlphaHigh = (rgb_color){ 0xe0, 0xe0, 0xe0, 0xff };
 
 const uint32 kMsgPopUpMenuClosed = 'pmcl';
-
-
-static bool
-entry_ref_is_file(const entry_ref *ref)
-{
-	BEntry entry(ref, true);
-	if (entry.InitCheck() != B_OK)
-		return false;
-
-	return entry.IsFile();
-}
 
 
 inline void
@@ -184,8 +168,6 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 		uint32 flags)
 	:
 	BView(rect, name, resizingMode, flags),
-	fDocumentIndex(1),
-	fDocumentCount(1),
 	fBitmap(NULL),
 	fDisplayBitmap(NULL),
 	fSelectionBitmap(NULL),
@@ -252,6 +234,7 @@ ShowImageView::Pulse()
 		fSelectionBox.Animate();
 		fSelectionBox.Draw(this, Bounds());
 	}
+#if 0
 	if (fSlideShow) {
 		fSlideShowCountDown --;
 		if (fSlideShowCountDown <= 0) {
@@ -261,6 +244,7 @@ ShowImageView::Pulse()
 			}
 		}
 	}
+#endif
 
 	// Hide cursor in full screen mode
 	if (fFullScreen && !fHasSelection && !fShowingPopUpMenu && fIsActiveWin) {
@@ -269,34 +253,6 @@ ShowImageView::Pulse()
 		else
 			fHideCursorCountDown--;
 	}
-}
-
-
-bool
-ShowImageView::_IsImage(const entry_ref *ref)
-{
-	if (ref == NULL || !entry_ref_is_file(ref))
-		return false;
-
-	BFile file(ref, B_READ_ONLY);
-	if (file.InitCheck() != B_OK)
-		return false;
-
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	if (!roster)
-		return false;
-
-	BMessage ioExtension;
-	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
-		return false;
-
-	translator_info info;
-	memset(&info, 0, sizeof(translator_info));
-	if (roster->Identify(&file, &ioExtension, &info, 0, NULL,
-		B_TRANSLATOR_BITMAP) != B_OK)
-		return false;
-
-	return true;
 }
 
 
@@ -310,8 +266,8 @@ ShowImageView::SetTrackerMessenger(const BMessenger& trackerMessenger)
 void
 ShowImageView::_SendMessageToWindow(BMessage *message)
 {
-	BMessenger msgr(Window());
-	msgr.SendMessage(message);
+	BMessenger target(Window());
+	target.SendMessage(message);
 }
 
 
@@ -329,7 +285,6 @@ ShowImageView::_Notify()
 {
 	BMessage msg(MSG_UPDATE_STATUS);
 
-	msg.AddString("status", fImageType.String());
 	msg.AddInt32("width", fBitmap->Bounds().IntegerWidth() + 1);
 	msg.AddInt32("height", fBitmap->Bounds().IntegerHeight() + 1);
 
@@ -345,17 +300,16 @@ void
 ShowImageView::_UpdateStatusText()
 {
 	BMessage msg(MSG_UPDATE_STATUS_TEXT);
-	BString status_to_send = fImageType;
 
 	if (fHasSelection) {
 		char size[50];
-		sprintf(size, " (%.0fx%.0f)",
+		sprintf(size, "(%.0fx%.0f)",
 			fSelectionBox.Bounds().Width() + 1.0,
 			fSelectionBox.Bounds().Height() + 1.0);
-		status_to_send << size;
+
+		msg.AddString("status", size);
 	}
 
-	msg.AddString("status", status_to_send.String());
 	_SendMessageToWindow(&msg);
 }
 
@@ -383,132 +337,94 @@ ShowImageView::_DeleteSelectionBitmap()
 
 
 status_t
-ShowImageView::SetImage(const entry_ref* ref)
+ShowImageView::SetImage(const BMessage* message)
 {
-	// If no file was specified, load the specified page of
-	// the current file.
-	if (ref == NULL)
-		ref = &fCurrentRef;
-
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	if (!roster)
+	BBitmap* bitmap;
+	entry_ref ref;
+	if (message->FindPointer("bitmap", (void**)&bitmap) != B_OK
+		|| message->FindRef("ref", &ref) != B_OK || bitmap == NULL)
 		return B_ERROR;
 
-	if (!entry_ref_is_file(ref))
-		return B_ERROR;
-
-	BFile file(ref, B_READ_ONLY);
-	translator_info info;
-	memset(&info, 0, sizeof(translator_info));
-	BMessage ioExtension;
-	if (ref != &fCurrentRef) {
-		// if new image, reset to first document
-		fDocumentIndex = 1;
-	}
-
-	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
-		return B_ERROR;
-
-	BMessage progress(kMsgProgressStatusUpdate);
-	if (ioExtension.AddMessenger("/progressMonitor", fProgressWindow) == B_OK
-		&& ioExtension.AddMessage("/progressMessage", &progress) == B_OK)
-		fProgressWindow->Start();
-
-	// Translate image data and create a new ShowImage window
-
-	BBitmapStream outstream;
-
-	status_t status = roster->Identify(&file, &ioExtension, &info, 0, NULL,
-		B_TRANSLATOR_BITMAP);
+	status_t status = SetImage(&ref, bitmap);
 	if (status == B_OK) {
-		status = roster->Translate(&file, &info, &ioExtension, &outstream,
-			B_TRANSLATOR_BITMAP);
+		fFormatDescription = message->FindString("type");
+		fMimeType = message->FindString("mime");
 	}
 
-	fProgressWindow->Stop();
+	return status;
+}
 
-	if (status != B_OK)
-		return status;
 
-	BBitmap *newBitmap = NULL;
-	if (outstream.DetachBitmap(&newBitmap) != B_OK)
-		return B_ERROR;
-
-	// Now that I've successfully loaded the new bitmap,
-	// I can be sure it is safe to delete the old one,
-	// and clear everything
+status_t
+ShowImageView::SetImage(const entry_ref* ref, BBitmap* bitmap)
+{
+	// Delete the old one, and clear everything
 	fUndo.Clear();
 	_SetHasSelection(false);
 	fCreatingSelection = false;
 	_DeleteBitmap();
-	fBitmap = newBitmap;
-	fCurrentRef = *ref;
 
-	// prepare the display bitmap
-	if (fBitmap->ColorSpace() == B_RGBA32)
-		fDisplayBitmap = compose_checker_background(fBitmap);
+	fBitmap = bitmap;
+	if (ref == NULL)
+		fCurrentRef.device = -1;
+	else
+		fCurrentRef = *ref;
 
-	if (!fDisplayBitmap)
-		fDisplayBitmap = fBitmap;
+	if (fBitmap != NULL) {
+		// prepare the display bitmap
+		if (fBitmap->ColorSpace() == B_RGBA32)
+			fDisplayBitmap = compose_checker_background(fBitmap);
 
-	// restore orientation
-	int32 orientation;
-	fImageOrientation = k0;
-	if (file.ReadAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0,
-			&orientation, sizeof(orientation)) == sizeof(orientation)) {
-		orientation &= 255;
-		switch (orientation) {
-			case k0:
-				break;
-			case k90:
-				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				break;
-			case k180:
-				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				break;
-			case k270:
-				_DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
-				break;
-			case k0V:
-				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
-				break;
-			case k90V:
-				_DoImageOperation(ImageProcessor::kRotateClockwise, true);
-				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
-				break;
-			case k0H:
-				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipLeftToRight, true);
-				break;
-			case k270V:
-				_DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
-				_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
-				break;
+		if (!fDisplayBitmap)
+			fDisplayBitmap = fBitmap;
+
+		BNode node(ref);
+
+		// restore orientation
+		int32 orientation;
+		fImageOrientation = k0;
+		if (node.ReadAttr(SHOW_IMAGE_ORIENTATION_ATTRIBUTE, B_INT32_TYPE, 0,
+				&orientation, sizeof(orientation)) == sizeof(orientation)) {
+			orientation &= 255;
+			switch (orientation) {
+				case k0:
+					break;
+				case k90:
+					_DoImageOperation(ImageProcessor::kRotateClockwise, true);
+					break;
+				case k180:
+					_DoImageOperation(ImageProcessor::kRotateClockwise, true);
+					_DoImageOperation(ImageProcessor::kRotateClockwise, true);
+					break;
+				case k270:
+					_DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
+					break;
+				case k0V:
+					_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
+					break;
+				case k90V:
+					_DoImageOperation(ImageProcessor::kRotateClockwise, true);
+					_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
+					break;
+				case k0H:
+					_DoImageOperation(ImageProcessor::ImageProcessor::kFlipLeftToRight, true);
+					break;
+				case k270V:
+					_DoImageOperation(ImageProcessor::kRotateCounterClockwise, true);
+					_DoImageOperation(ImageProcessor::ImageProcessor::kFlipTopToBottom, true);
+					break;
+			}
 		}
 	}
 
-	// get the number of documents (pages) if it has been supplied
-	int32 documentCount = 0;
-	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK
-		&& documentCount > 0)
-		fDocumentCount = documentCount;
-	else
-		fDocumentCount = 1;
-
-	fImageType = info.name;
-	fImageMime = info.MIME;
-
-	GetPath(&fCaption);
-	if (fDocumentCount > 1)
-		fCaption << ", " << fDocumentIndex << "/" << fDocumentCount;
-
-	fCaption << ", " << fImageType;
+	BPath path(ref);
+	fCaption = path.Path();
+	fFormatDescription = "Bitmap";
+	fMimeType = "image/x-be-bitmap";
 
 	fFitToBoundsZoom = _FitToBoundsZoom();
 	ResetZoom();
-
-	be_roster->AddToRecentDocuments(&fCurrentRef, kApplicationSignature);
-
+	Invalidate();
 	_Notify();
 	return B_OK;
 }
@@ -599,34 +515,10 @@ ShowImageView::SetFullScreen(bool fullScreen)
 }
 
 
-BBitmap *
-ShowImageView::GetBitmap()
+BBitmap*
+ShowImageView::Bitmap()
 {
 	return fBitmap;
-}
-
-
-void
-ShowImageView::GetName(BString* outName)
-{
-	BEntry entry(&fCurrentRef);
-	char name[B_FILE_NAME_LENGTH];
-	if (entry.InitCheck() < B_OK || entry.GetName(name) < B_OK)
-		outName->SetTo("");
-	else
-		outName->SetTo(name);
-}
-
-
-void
-ShowImageView::GetPath(BString *outPath)
-{
-	BEntry entry(&fCurrentRef);
-	BPath path;
-	if (entry.InitCheck() < B_OK || entry.GetPath(&path) < B_OK)
-		outPath->SetTo("");
-	else
-		outPath->SetTo(path.Path());
 }
 
 
@@ -679,6 +571,9 @@ ShowImageView::_ShouldStretch() const
 float
 ShowImageView::_FitToBoundsZoom() const
 {
+	if (fBitmap == NULL)
+		return 1.0f;
+
 	// the width/height of the bitmap (in pixels)
 	float bitmapWidth = fBitmap->Bounds().Width() + 1;
 	float bitmapHeight = fBitmap->Bounds().Height() + 1;
@@ -935,9 +830,9 @@ ShowImageView::_AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 
 	// add the current image mime first, will make it the preferred format on
 	// left mouse drag
-	msg->AddString("be:types", fImageMime);
-	msg->AddString("be:filetypes", fImageMime);
-	msg->AddString("be:type_descriptions", fImageType);
+	msg->AddString("be:types", fMimeType);
+	msg->AddString("be:filetypes", fMimeType);
+	msg->AddString("be:type_descriptions", fFormatDescription);
 
 	bool foundOther = false;
 	bool foundCurrent = false;
@@ -951,7 +846,7 @@ ShowImageView::_AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
 			int32 count;
 			roster->GetOutputFormats(info[i].translator, &formats, &count);
 			for (int32 j = 0; j < count; j++) {
-				if (fImageMime == formats[j].MIME) {
+				if (fMimeType == formats[j].MIME) {
 					foundCurrent = true;
 				} else if (strcmp(formats[j].MIME, "image/x-be-bitmap") != 0) {
 					foundOther = true;
@@ -1026,22 +921,23 @@ ShowImageView::_OutputFormatForType(BBitmap* bitmap, const char* type,
 {
 	bool found = false;
 
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
 	if (roster == NULL)
 		return false;
 
 	BBitmapStream stream(bitmap);
 
-	translator_info *outInfo;
+	translator_info* outInfo;
 	int32 outNumInfo;
 	if (roster->GetTranslators(&stream, NULL, &outInfo, &outNumInfo) == B_OK) {
 		for (int32 i = 0; i < outNumInfo; i++) {
-			const translation_format *fmts;
-			int32 num_fmts;
-			roster->GetOutputFormats(outInfo[i].translator, &fmts, &num_fmts);
-			for (int32 j = 0; j < num_fmts; j++) {
-				if (strcmp(fmts[j].MIME, type) == 0) {
-					*format = fmts[j];
+			const translation_format* formats;
+			int32 formatCount;
+			roster->GetOutputFormats(outInfo[i].translator, &formats,
+				&formatCount);
+			for (int32 j = 0; j < formatCount; j++) {
+				if (strcmp(formats[j].MIME, type) == 0) {
+					*format = formats[j];
 					found = true;
 					break;
 				}
@@ -1441,18 +1337,8 @@ ShowImageView::KeyDown(const char* bytes, int32 numBytes)
 			break;
 		case B_DELETE:
 		{
-			// Move image to Trash
-			BMessage trash(BPrivate::kMoveToTrash);
-			trash.AddRef("refs", &fCurrentRef);
-			// We create our own messenger because the member fTrackerMessenger
-			// could be invalid
-			BMessenger tracker(kTrackerSignature);
-			if (tracker.SendMessage(&trash) == B_OK)
-				if (!NextFile()) {
-					// This is the last (or only file) in this directory,
-					// close the window
-					_SendMessageToWindow(B_QUIT_REQUESTED);
-				}
+			// TODO!
+			//fNavigator.DeleteFile();
 			break;
 		}
 		case '+':
@@ -1540,6 +1426,8 @@ void
 ShowImageView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+// TODO!
+#if 0
 		case B_SIMPLE_DATA:
 			if (message->WasDropped()) {
 				uint32 type;
@@ -1553,7 +1441,7 @@ ShowImageView::MessageReceived(BMessage* message)
 				}
 			}
 			break;
-
+#endif
 		case B_COPY_TARGET:
 			_HandleDrop(message);
 			break;
@@ -1607,20 +1495,6 @@ ShowImageView::FixupScrollBars()
 
 	FixupScrollBar(B_HORIZONTAL, bitmapRect.Width(), viewRect.Width());
 	FixupScrollBar(B_VERTICAL, bitmapRect.Height(), viewRect.Height());
-}
-
-
-int32
-ShowImageView::CurrentPage()
-{
-	return fDocumentIndex;
-}
-
-
-int32
-ShowImageView::PageCount()
-{
-	return fDocumentCount;
 }
 
 
@@ -1734,201 +1608,6 @@ ShowImageView::CopySelectionToClipboard()
 		}
 	}
 	be_clipboard->Unlock();
-}
-
-
-void
-ShowImageView::FirstPage()
-{
-	if (fDocumentIndex != 1) {
-		fDocumentIndex = 1;
-		SetImage(NULL);
-	}
-}
-
-
-void
-ShowImageView::LastPage()
-{
-	if (fDocumentIndex != fDocumentCount) {
-		fDocumentIndex = fDocumentCount;
-		SetImage(NULL);
-	}
-}
-
-
-void
-ShowImageView::NextPage()
-{
-	if (fDocumentIndex < fDocumentCount) {
-		fDocumentIndex++;
-		SetImage(NULL);
-	}
-}
-
-
-void
-ShowImageView::PrevPage()
-{
-	if (fDocumentIndex > 1) {
-		fDocumentIndex--;
-		SetImage(NULL);
-	}
-}
-
-
-int
-ShowImageView::_CompareEntries(const void* a, const void* b)
-{
-	entry_ref *r1, *r2;
-	r1 = *(entry_ref**)a;
-	r2 = *(entry_ref**)b;
-	return strcasecmp(r1->name, r2->name);
-}
-
-
-void
-ShowImageView::GoToPage(int32 page)
-{
-	if (page > 0 && page <= fDocumentCount && page != fDocumentIndex) {
-		fDocumentIndex = page;
-		SetImage(NULL);
-	}
-}
-
-
-void
-ShowImageView::_FreeEntries(BList* entries)
-{
-	const int32 n = entries->CountItems();
-	for (int32 i = 0; i < n; i ++) {
-		entry_ref* ref = (entry_ref*)entries->ItemAt(i);
-		delete ref;
-	}
-	entries->MakeEmpty();
-}
-
-
-void
-ShowImageView::_SetTrackerSelectionToCurrent()
-{
-	BMessage setsel(B_SET_PROPERTY);
-	setsel.AddSpecifier("Selection");
-	setsel.AddRef("data", &fCurrentRef);
-	fTrackerMessenger.SendMessage(&setsel);
-}
-
-
-bool
-ShowImageView::_FindNextImage(entry_ref *in_current, entry_ref *ref, bool next,
-	bool rewind)
-{
-	// Based on GetTrackerWindowFile function from BeMail
-	if (!fTrackerMessenger.IsValid())
-		return false;
-
-	//
-	//	Ask the Tracker what the next/prev file in the window is.
-	//	Continue asking for the next reference until a valid
-	//	image is found.
-	//
-	entry_ref nextRef = *in_current;
-	bool foundRef = false;
-	while (!foundRef)
-	{
-		BMessage request(B_GET_PROPERTY);
-		BMessage spc;
-		if (rewind)
-			spc.what = B_DIRECT_SPECIFIER;
-		else if (next)
-			spc.what = 'snxt';
-		else
-			spc.what = 'sprv';
-		spc.AddString("property", "Entry");
-		if (rewind)
-			// if rewinding, ask for the ref to the
-			// first item in the directory
-			spc.AddInt32("data", 0);
-		else
-			spc.AddRef("data", &nextRef);
-		request.AddSpecifier(&spc);
-
-		BMessage reply;
-		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK)
-			return false;
-		if (reply.FindRef("result", &nextRef) != B_OK)
-			return false;
-
-		if (_IsImage(&nextRef))
-			foundRef = true;
-
-		rewind = false;
-			// stop asking for the first ref in the directory
-	}
-
-	*ref = nextRef;
-	return foundRef;
-}
-
-bool
-ShowImageView::_ShowNextImage(bool next, bool rewind)
-{
-	entry_ref curRef = fCurrentRef;
-	entry_ref imgRef;
-	bool found = _FindNextImage(&curRef, &imgRef, next, rewind);
-	if (found) {
-		// Keep trying to load images until:
-		// 1. The image loads successfully
-		// 2. The last file in the directory is found (for find next or find first)
-		// 3. The first file in the directory is found (for find prev)
-		// 4. The call to _FindNextImage fails for any other reason
-		while (SetImage(&imgRef) != B_OK) {
-			curRef = imgRef;
-			found = _FindNextImage(&curRef, &imgRef, next, false);
-			if (!found)
-				return false;
-		}
-		_SetTrackerSelectionToCurrent();
-		return true;
-	}
-	return false;
-}
-
-
-bool
-ShowImageView::NextFile()
-{
-	return _ShowNextImage(true, false);
-}
-
-
-bool
-ShowImageView::PrevFile()
-{
-	return _ShowNextImage(false, false);
-}
-
-
-bool
-ShowImageView::HasNextFile()
-{
-	entry_ref ref;
-	return _FindNextImage(&fCurrentRef, &ref, true, false);
-}
-
-
-bool
-ShowImageView::HasPrevFile()
-{
-	entry_ref ref;
-	return _FindNextImage(&fCurrentRef, &ref, false, false);
-}
-
-
-bool
-ShowImageView::_FirstFile()
-{
-	return _ShowNextImage(true, true);
 }
 
 
@@ -2126,11 +1805,10 @@ ShowImageView::Rotate(int degree)
 void
 ShowImageView::Flip(bool vertical)
 {
-	if (vertical) {
+	if (vertical)
 		_UserDoImageOperation(ImageProcessor::kFlipLeftToRight);
-	} else {
+	else
 		_UserDoImageOperation(ImageProcessor::kFlipTopToBottom);
-	}
 }
 
 
