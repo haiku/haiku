@@ -364,25 +364,37 @@ AddPrinterDialog::_FillTransportMenu(BMenu* menu)
 
 		// Now get ports...
 		BString portId, portName;
+		int32 error;
 		msg.MakeEmpty();
 		msg.what = B_GET_PROPERTY;
 		msg.AddSpecifier("Ports");
 		if (transport.SendMessage(&msg, &reply) != B_OK ||
-			reply.FindString("port_id", &portId) != B_OK) {
-			// Can't find ports; so just show transport item, no menu
+			reply.FindInt32("error", &error) != B_OK ||
+			error != B_OK) {
+			// Transport does not provide list of ports
 			BMessage* menuMsg = new BMessage(kTransportSelectedMsg);
 			menuMsg->AddString("name", transportName);
 			menu->AddItem(new BMenuItem(transportName.String(), menuMsg));
 			continue;
 		}
 
-		// We have at least one port; so create submenu
+		// Create submenu
 		BMenu* transportMenu = new BMenu(transportName.String());
 		menu->AddItem(transportMenu);
 		transportMenu->SetRadioMode(true);
 		menu->ItemAt(menu->IndexOf(transportMenu))->
 			SetMessage(new BMessage(kTransportSelectedMsg));
 
+
+		if (reply.FindString("port_id", &portId) != B_OK) {
+			// Show error message in submenu
+			BMessage* portMsg = new BMessage(kTransportSelectedMsg);
+			transportMenu->AddItem(new BMenuItem(
+				B_TRANSLATE("No printer found!"), portMsg));
+			continue;
+		}
+
+		// Add ports to submenu
 		for (int32 i = 0; reply.FindString("port_id", i, &portId) == B_OK;
 			i++) {
 			if (reply.FindString("port_name", i, &portName) != B_OK
