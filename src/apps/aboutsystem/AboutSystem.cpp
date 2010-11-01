@@ -1541,6 +1541,14 @@ AboutView::_CreateCreditsView()
 		.SetURL("http://www.ralinktech.com/"));
 #endif
 
+	// Gutenprint
+	_AddPackageCredit(PackageCredit("Gutenprint")
+		.SetCopyright(COPYRIGHT_STRING
+			"1999 - 2010 by "
+			"the authors of Gutenprint. All rights reserved.")
+		.SetLicense("GNU GPL v2 or above")
+		.SetURL("http://gutenprint.sourceforge.net"));
+
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();
 
