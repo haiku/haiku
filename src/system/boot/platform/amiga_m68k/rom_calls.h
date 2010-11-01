@@ -1370,7 +1370,7 @@ struct NameInfo {
 #define DTAG_NAME	0x80003000
 
 #define DIPF_IS_LACE		0x00000001
-#define DIPF_IS_DUALFP		0x00000002
+#define DIPF_IS_DUALPF		0x00000002
 #define DIPF_IS_PF2PRI		0x00000004
 #define DIPF_IS_HAM			0x00000008
 #define DIPF_IS_ECS			0x00000010
@@ -1475,6 +1475,8 @@ extern struct Library *KEYMAP_BASE_NAME;
 #define LOWLEVEL_BASE_NAME LowLevelBase
 #endif
 
+#define LOWLEVELNAME "lowlevel.library"
+
 #ifndef __ASSEMBLER__
 
 #define GetKey() \
@@ -1484,6 +1486,8 @@ extern struct Library *KEYMAP_BASE_NAME;
 #define QueryKeys(par1, last) \
 	LP2NR(0x36, QueryKeys, struct KeyQuery *, par1, a0, unsigned long, last, d1, \
 	, LOWLEVEL_BASE_NAME)
+
+extern struct Library *LOWLEVEL_BASE_NAME;
 
 #endif /* __ASSEMBLER__ */
 

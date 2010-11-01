@@ -16,6 +16,7 @@
 
 struct GfxBase *GRAPHICS_BASE_NAME = NULL;
 struct Library *KEYMAP_BASE_NAME = NULL;
+struct Library *LOWLEVEL_BASE_NAME = NULL;
 
 
 /*! Maps Amiga error codes to native errors

@@ -63,6 +63,21 @@ class KeyboardDevice : public ExecDevice {
 	protected:
 };
 
+class LLKeyboardDevice : public CharHandle {
+	public:
+		LLKeyboardDevice();
+		virtual ~LLKeyboardDevice();
+
+		status_t	Open();
+
+		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
+		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
+
+		int	WaitForKey();
+
+	protected:
+};
+
 
 static const uint16 kPalette[] = {
 	0x000,
@@ -328,6 +343,105 @@ KeyboardDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t buff
 }
 
 
+// #pragma mark -
+
+
+LLKeyboardDevice::LLKeyboardDevice()
+	: CharHandle()
+{
+}
+
+
+LLKeyboardDevice::~LLKeyboardDevice()
+{
+}
+
+
+status_t
+LLKeyboardDevice::Open()
+{
+	if (LowLevelBase == NULL)
+		LowLevelBase = (Library *)OldOpenLibrary(LOWLEVELNAME);
+	return (LowLevelBase == NULL) ? B_ERROR : B_OK;
+}
+
+
+ssize_t
+LLKeyboardDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	struct InputEvent event;
+	ssize_t actual;
+	status_t err;
+	uint32 key;
+	
+	
+	key = GetKey();
+	if (key & 0x0000ffff == 0x0ff)
+		return B_ERROR;
+	event.ie_Class = IECLASS_RAWKEY;
+	event.ie_SubClass = IESUBCLASS_RAWKEY;
+	event.ie_Code = (uint16)(key & 0x0000ffff);
+	event.ie_Qualifier = (key & 0xffff0000) >> 16;
+
+	actual = MapRawKey(&event, (char *)buffer, bufferSize, NULL);
+	//dprintf("%s actual %d\n", __FUNCTION__, actual);
+	if (actual > 0) {
+		return actual;
+	}
+	return B_ERROR;
+}
+
+
+int
+LLKeyboardDevice::WaitForKey()
+{
+	struct InputEvent event;
+	uint32 key;
+	char ascii;
+	ssize_t actual;
+	status_t err;
+	
+	do {
+		key = GetKey();
+	} while (key & 0x0000ffff == 0x0ff);
+
+	event.ie_Class = IECLASS_RAWKEY;
+	event.ie_SubClass = IESUBCLASS_RAWKEY;
+	event.ie_Code = (uint16)(key & 0x0000ffff);
+	event.ie_Qualifier = (key & 0xffff0000) >> 16;
+
+	switch (event.ie_Code) {
+		case IECODE_KEY_UP:
+			return TEXT_CONSOLE_KEY_UP;
+		case IECODE_KEY_DOWN:
+			return TEXT_CONSOLE_KEY_DOWN;
+		case IECODE_KEY_LEFT:
+			return TEXT_CONSOLE_KEY_LEFT;
+		case IECODE_KEY_RIGHT:
+			return TEXT_CONSOLE_KEY_RIGHT;
+		case IECODE_KEY_PAGE_UP:
+			return TEXT_CONSOLE_KEY_PAGE_UP;
+		case IECODE_KEY_PAGE_DOWN:
+			return TEXT_CONSOLE_KEY_PAGE_DOWN;
+		default:
+			break;
+	}
+	
+	actual = MapRawKey(&event, &ascii, 1, NULL);
+	//dprintf("%s actual %d\n", __FUNCTION__, actual);
+	if (actual > 0)
+		return ascii;
+	return TEXT_CONSOLE_NO_KEY;
+}
+
+
+ssize_t
+LLKeyboardDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	return B_ERROR;
+}
+
+
 //	#pragma mark -
 
 
@@ -411,18 +525,12 @@ console_init(void)
 	if (KEYMAP_BASE_NAME == NULL)
 		panic("Cannot open %s", KEYMAPNAME);
 
+	
 	sInput.AllocRequest(sizeof(struct IOStdReq));
 	err = sInput.Open();
 	if (err < B_OK)
 		panic("sInput.Open() 0x%08lx\n", err);
 	stdin = (FILE *)&sInput;
-
-	dprintf("BytesPerRow %d\n", gScreen->RastPort.BitMap->BytesPerRow);
-	dprintf("Rows %d\n", gScreen->RastPort.BitMap->Rows);
-	dprintf("Flags %02x\n", gScreen->RastPort.BitMap->Flags);
-	dprintf("Depth %d\n", gScreen->RastPort.BitMap->Depth);
-	for (int i = 0; i < 8; i++)
-		dprintf("Planes[%d] %p\n", i, gScreen->RastPort.BitMap->Planes[i]);
 	
 	return B_OK;
 }
