@@ -1546,7 +1546,7 @@ AboutView::_CreateCreditsView()
 		.SetCopyright(COPYRIGHT_STRING
 			"1999 - 2010 by "
 			"the authors of Gutenprint. All rights reserved.")
-		.SetLicense("GNU GPL v2 or above")
+		.SetLicense("GNU GPL v2")
 		.SetURL("http://gutenprint.sourceforge.net"));
 
 	_AddCopyrightsFromAttribute();
