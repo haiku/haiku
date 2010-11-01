@@ -988,11 +988,14 @@ if [ IsOptionalHaikuImagePackageAdded LibLayout ] {
 if [ IsOptionalHaikuImagePackageAdded Libmng ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package Libmng available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && ! $(isHybridBuild) {
-		Echo "No optional package Libmng available for gcc4" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc4-2010-10-30.zip
+			: $(baseURL)/libmng-1.0.10-x86-gcc4-2010-10-30.zip
+			:
+		;
 	} else {
-		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc2-2010-09-26.zip
-			: $(baseURL)/libmng-1.0.10-x86-gcc2-2010-09-26.zip
+		InstallOptionalHaikuImagePackage libmng-1.0.10-x86-gcc2-2010-10-29.zip
+			: $(baseURL)/libmng-1.0.10-x86-gcc2-2010-10-29.zip
 			:
 		;
 	}

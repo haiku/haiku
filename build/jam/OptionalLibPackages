@@ -14,12 +14,12 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 
 # Available Optional Lib Packages:
 #	AllegroLibs
+#	box2d
 #	fribidi
 #	lcms
 #	libart_lgpl
 #	libmad
 #	libmikmod
-#	libmng
 #	libmodplug
 #	libpaper
 #	physfs
@@ -60,6 +60,23 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 }
 
 
+# box2d
+if [ IsOptionalHaikuImagePackageAdded box2d ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package box2d available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			box2d-2.1.2-x86-gcc4-2010-10-30.zip
+			: $(baselibURL)/box2d-2.1.2-x86-gcc4-2010-10-30.zip
+			:
+			: true
+		;
+	} else {
+		echo "No optional package box2d available for gcc2"
+	}
+}
+
+
 # fribidi
 if [ IsOptionalHaikuImagePackageAdded fribidi ] {
 	if $(TARGET_ARCH) != x86 {
@@ -86,6 +103,13 @@ if [ IsOptionalHaikuImagePackageAdded fribidi ] {
 if [ IsOptionalHaikuImagePackageAdded lcms ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package lcms available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			lcms-2.0a-x86-gcc4-2010-10-30.zip
+			: $(baselibURL)/lcms-2.0a-x86-gcc4-2010-10-30.zip
+			:
+			: true
+		;
 	} else {
 		InstallOptionalHaikuImagePackage
 			lcms-2.0a-x86-gcc2-2010-10-29.zip
@@ -101,6 +125,13 @@ if [ IsOptionalHaikuImagePackageAdded lcms ] {
 if [ IsOptionalHaikuImagePackageAdded libart_lgpl ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package libart_lgpl available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			libart_lgpl-2.3.21-x86-gcc4-2010-10-30.zip
+			: $(baselibURL)/libart_lgpl-2.3.21-x86-gcc4-2010-10-30.zip
+			:
+			: true
+		;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libart_lgpl-2.3.21-x86-gcc2-2010-10-29.zip
@@ -116,6 +147,13 @@ if [ IsOptionalHaikuImagePackageAdded libart_lgpl ] {
 if [ IsOptionalHaikuImagePackageAdded libmad ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package libmad available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			libmad-0.15.1-x86-gcc4-2010-10-30.zip
+			: $(baselibURL)/libmad-0.15.1-x86-gcc4-2010-10-30.zip
+			:
+			: true
+		;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libmad-0.15.1-x86-gcc2-2010-10-29.zip
@@ -131,6 +169,13 @@ if [ IsOptionalHaikuImagePackageAdded libmad ] {
 if [ IsOptionalHaikuImagePackageAdded libmikmod ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package libmikmod available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			libmikmod-3.1.11-x86-gcc4-2010-10-30.zip
+			: $(baselibURL)/libmikmod-3.1.11-x86-gcc4-2010-10-30.zip
+			:
+			: true
+		;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libmikmod-3.1.11-x86-gcc2-2010-10-29.zip
@@ -142,26 +187,17 @@ if [ IsOptionalHaikuImagePackageAdded libmikmod ] {
 }
 
 
-# libmng
-# TODO: Libmng exists in OptionalPackages!
-if [ IsOptionalHaikuImagePackageAdded libmng ] {
-	if $(TARGET_ARCH) != x86 {
-		Echo "No optional package libmng available for $(TARGET_ARCH)" ;
-	} else {
-		InstallOptionalHaikuImagePackage
-			libmng-1.0.10-x86-gcc2-2010-10-29.zip
-			: $(baselibURL)/libmng-1.0.10-x86-gcc2-2010-10-29.zip
-			:
-			: true
-		;
-	}
-}
-
-
 # libmodplug
 if [ IsOptionalHaikuImagePackageAdded libmodplug ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package libmodplug available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			libmodplug-0.8.7-x86-gcc4-2010-10-30.zip
+			: $(baselibURL)/libmodplug-0.8.7-x86-gcc4-2010-10-30.zip
+			:
+			: true
+		;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libmodplug-0.8.7-x86-gcc2-2010-10-29.zip
@@ -177,6 +213,13 @@ if [ IsOptionalHaikuImagePackageAdded libmodplug ] {
 if [ IsOptionalHaikuImagePackageAdded libpaper ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package libpaper available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		InstallOptionalHaikuImagePackage
+			libpaper-1.1.24-x86-gcc4-2010-10-30.zip
+			: $(baselibURL)/libpaper-1.1.24-x86-gcc4-2010-10-30.zip
+			:
+			: true
+		;
 	} else {
 		InstallOptionalHaikuImagePackage
 			libpaper-1.1.24-x86-gcc2-2010-10-29.zip
