@@ -64,15 +64,17 @@ if [ IsOptionalHaikuImagePackageAdded AllegroLibs ] {
 if [ IsOptionalHaikuImagePackageAdded box2d ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package box2d available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	} else {
+		if $(HAIKU_GCC_VERSION[1]) >= 4 || $(isHybridBuild) {
 		InstallOptionalHaikuImagePackage
 			box2d-2.1.2-x86-gcc4-2010-10-30.zip
 			: $(baselibURL)/box2d-2.1.2-x86-gcc4-2010-10-30.zip
 			:
 			: true
 		;
-	} else {
-		echo "No optional package box2d available for gcc2" ;
+		} else {
+			Echo "No optional package box2d available for $(TARGET_ARCH)-gcc2" ;
+		}
 	}
 }
 
