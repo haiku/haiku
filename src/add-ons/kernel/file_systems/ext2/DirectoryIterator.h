@@ -70,7 +70,7 @@ protected:
 	uint32				fDisplacement;
 	uint32				fPreviousDisplacement;
 
-	uint32				fStartPhysicalBlock;
+	off_t				fStartPhysicalBlock;
 	uint32				fStartLogicalBlock;
 	uint32				fStartDisplacement;
 

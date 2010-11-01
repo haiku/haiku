@@ -34,8 +34,8 @@ public:
 
 			uint32				BlocksNeededForNewEntry();
 			status_t			InsertEntry(Transaction& transaction,
-									uint32 hash, uint32 block,
-									uint32 newBlocksPos, bool hasCollision);
+									uint32 hash, off_t block,
+									off_t newBlocksPos, bool hasCollision);
 private:
 								HTreeEntryIterator(uint32 block,
 									uint32 blockSize, Inode* directory,

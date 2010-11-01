@@ -269,7 +269,7 @@ HTreeEntryIterator::GetNext(uint32& childBlock)
 uint32
 HTreeEntryIterator::BlocksNeededForNewEntry()
 {
-	TRACE("HTreeEntryIterator::BlocksNeededForNewEntry(): block num: %lu, "
+	TRACE("HTreeEntryIterator::BlocksNeededForNewEntry(): block num: %llu, "
 		"volume: %p\n", fBlockNum, fVolume);
 	CachedBlock cached(fVolume);
 
@@ -303,9 +303,9 @@ HTreeEntryIterator::BlocksNeededForNewEntry()
 
 status_t
 HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
-	uint32 blockNum, uint32 newBlocksPos, bool hasCollision)
+	off_t blockNum, off_t newBlocksPos, bool hasCollision)
 {
-	TRACE("HTreeEntryIterator::InsertEntry(): block num: %lu\n", fBlockNum);
+	TRACE("HTreeEntryIterator::InsertEntry(): block num: %llu\n", fBlockNum);
 	CachedBlock cached(fVolume);
 
 	uint8* blockData = cached.SetToWritable(transaction, fBlockNum);
@@ -345,10 +345,10 @@ HTreeEntryIterator::InsertEntry(Transaction& transaction, uint32 hash,
 	}
 
 	TRACE("HTreeEntryIterator::InsertEntry(): Inserting node. Count: %u, "
-		"current entry: %lu\n", (uint16)count, (uint32)fCurrentEntry);
+		"current entry: %u\n", count, fCurrentEntry);
 
 	if (count > 0) {
-		TRACE("HTreeEntryIterator::InsertEntry(): memmove(%lu, %lu, %lu)\n",
+		TRACE("HTreeEntryIterator::InsertEntry(): memmove(%u, %u, %u)\n",
 			fCurrentEntry + 2, fCurrentEntry + 1, count + fFirstEntry
 				- fCurrentEntry - 1);
 		memmove(&entries[fCurrentEntry + 2], &entries[fCurrentEntry + 1],

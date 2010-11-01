@@ -100,9 +100,8 @@ DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 		size_t length = entry->NameLength();
 
 		TRACE("block %lu, displacement %lu: entry ino %lu, length %u, "
-			"name length %lu, type %lu\n", fLogicalBlock, fDisplacement,
-			entry->InodeID(), entry->Length(), (uint32)length,
-			(uint32)entry->FileType());
+			"name length %lu, type %u\n", fLogicalBlock, fDisplacement,
+			entry->InodeID(), entry->Length(), length, entry->FileType());
 
 		if (*_nameLength > 0) {
 			if (*_nameLength < length)
@@ -145,7 +144,7 @@ DirectoryIterator::Next()
 	entry = (ext2_dir_entry*)(block + fDisplacement);
 
 	do {
-		TRACE("Checking entry at block %lu, displacement %lu\n", fPhysicalBlock,
+		TRACE("Checking entry at block %llu, displacement %lu\n", fPhysicalBlock,
 			fDisplacement);
 
 		if (entry->Length() == 0) {
@@ -215,7 +214,7 @@ void
 DirectoryIterator::Restart()
 {
 	TRACE("DirectoryIterator::Restart(): (logical, physical, displacement): "
-		"current: (%lu, %lu, %lu), start: (%lu, %lu, %lu)\n", fLogicalBlock,
+		"current: (%lu, %llu, %lu), start: (%lu, %llu, %lu)\n", fLogicalBlock,
 		fPhysicalBlock, fDisplacement, fStartLogicalBlock, fStartPhysicalBlock,
 		fStartDisplacement);
 	fLogicalBlock = fStartLogicalBlock;
@@ -442,7 +441,7 @@ DirectoryIterator::_AllocateBestEntryInBlock(uint8 nameLength, uint16& pos,
 		return B_DEVICE_FULL;
 
 	TRACE("DirectoryIterator::_AllocateBestEntryInBlock(): Found a suitable "
-		"location: %lu\n", (uint32)bestPos);
+		"location: %u\n", bestPos);
 	pos = bestPos;
 	newLength = bestRealLength;
 
@@ -455,9 +454,8 @@ DirectoryIterator::_AddEntry(Transaction& transaction, const char* name,
 	uint8 nameLength, ino_t id, uint8 type, uint16 newLength, uint16 pos,
 	bool hasPrevious)
 {
-	TRACE("DirectoryIterator::_AddEntry(%s, %d, %d, %d, %d, %d, %c)\n",
-		name, (int)nameLength, (int)id, (int)type, (int)newLength, (int)pos,
-		hasPrevious ? 't' : 'f');
+	TRACE("DirectoryIterator::_AddEntry(%s, %d, %llu, %d, %d, %d, %c)\n",
+		name, nameLength, id, type, newLength, pos, hasPrevious ? 't' : 'f');
 	CachedBlock cached(fVolume);
 
 	uint8* block = cached.SetToWritable(transaction, fPhysicalBlock);
@@ -492,8 +490,8 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 	uint32 newBlocksPos, bool firstSplit)
 {
 	// Block is full, split required
-	TRACE("DirectoryIterator::_SplitIndexedBlock(.., %s, %u, %lu, %lu, %c)\n",
-		name, (unsigned int)nameLength, (uint32)id, newBlocksPos,
+	TRACE("DirectoryIterator::_SplitIndexedBlock(.., %s, %u, %llu, %lu, %c)\n",
+		name, nameLength, id, newBlocksPos,
 		firstSplit ? 't' : 'f');
 
 	// Allocate a buffer for the entries in the block

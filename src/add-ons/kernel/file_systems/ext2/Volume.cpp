@@ -184,7 +184,7 @@ DeviceOpener::GetSize(off_t* _size, uint32* _blockSize)
 	}
 
 	if (_size) {
-		*_size = 1LL * geometry.head_count * geometry.cylinder_count
+		*_size = 1ULL * geometry.head_count * geometry.cylinder_count
 			* geometry.sectors_per_track * geometry.bytes_per_sector;
 	}
 	if (_blockSize)
@@ -420,11 +420,15 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	if (!fSuperBlock.name[0]) {
 		// generate a more or less descriptive volume name
-		uint32 divisor = 1UL << 30;
-		char unit = 'G';
+		off_t divisor = 1ULL << 40;
+		char unit = 'T';
 		if (diskSize < divisor) {
-			divisor = 1UL << 20;
-			unit = 'M';
+			divisor = 1UL << 30;
+			unit = 'G';
+			if (diskSize < divisor) {
+				divisor = 1UL << 20;
+				unit = 'M';
+			}
 		}
 
 		double size = double((10 * diskSize + divisor - 1) / divisor);
@@ -558,13 +562,12 @@ Volume::GetBlockGroup(int32 index, ext2_block_group** _group)
 			return B_NO_MEMORY;
 
 		memcpy(fGroupBlocks[blockIndex], block, fBlockSize);
-
-		TRACE("group [%ld]: inode table %ld\n", index,
-			(fGroupBlocks[blockIndex] + index % fGroupsPerBlock)->InodeTable());
 	}
 
 	*_group = (ext2_block_group*)(fGroupBlocks[blockIndex]
 		+ (index % fGroupsPerBlock) * fGroupDescriptorSize);
+	TRACE("group [%ld]: inode table %lld\n", index, 
+		(*_group)->InodeTable(Has64bitFeature()));
 	return B_OK;
 }
 
@@ -760,10 +763,10 @@ Volume::FreeBlocks(Transaction& transaction, off_t start, uint32 length)
 	if (status != B_OK)
 		return status;
 
-	TRACE("Volume::FreeBlocks(): number of free blocks (before): %lu\n",
+	TRACE("Volume::FreeBlocks(): number of free blocks (before): %llu\n",
 		fFreeBlocks);
 	fFreeBlocks += length;
-	TRACE("Volume::FreeBlocks(): number of free blocks (after): %lu\n",
+	TRACE("Volume::FreeBlocks(): number of free blocks (after): %llu\n",
 		fFreeBlocks);
 
 	return WriteSuperBlock(transaction);
@@ -799,8 +802,8 @@ Volume::WriteSuperBlock(Transaction& transaction)
 	fSuperBlock.SetFreeInodes(fFreeInodes);
 	// TODO: Rest of fields that can be modified
 
-	TRACE("Volume::WriteSuperBlock(): free blocks: %lu, free inodes: %lu\n",
-		fSuperBlock.FreeBlocks(), fSuperBlock.FreeInodes());
+	TRACE("Volume::WriteSuperBlock(): free blocks: %llu, free inodes: %lu\n",
+		fSuperBlock.FreeBlocks(Has64bitFeature()), fSuperBlock.FreeInodes());
 
 	CachedBlock cached(this);
 	uint8* block = cached.SetToWritable(transaction, fFirstDataBlock);
