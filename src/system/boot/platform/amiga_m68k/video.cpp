@@ -234,7 +234,7 @@ platform_switch_to_logo(void)
 	
 	sFrameBuffer = gKernelArgs.frame_buffer.physical_buffer.start;
 
-	video_display_splash(sFrameBuffer);
+	//video_display_splash(sFrameBuffer);
 
 }
 
@@ -243,6 +243,8 @@ extern "C" void
 platform_switch_to_text_mode(void)
 {
 	// TODO: implement me
+	// force Intuition to redraw everything
+	RemakeDisplay();
 }
 
 

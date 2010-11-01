@@ -51,6 +51,8 @@ ExecDevice::ExecDevice(size_t requestSize)
 
 ExecDevice::ExecDevice()
 {
+	fIORequest = NULL;
+	fIOStdReq = NULL;
 }
 
 
@@ -72,7 +74,7 @@ ExecDevice::AllocRequest(size_t requestSize)
 	if (fIORequest == NULL)
 		panic("CreateIORequest()");
 	fIOStdReq = (struct IOStdReq *)fIORequest;
-	return B_ERROR;
+	return B_OK;
 }
 
 

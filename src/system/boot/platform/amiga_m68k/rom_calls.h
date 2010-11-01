@@ -969,6 +969,14 @@ struct ListNode {
 	const char *ln_Name;
 };
 
+struct List {
+	struct ListNode	*lh_Head;
+	struct ListNode	*lh_Tail;
+	struct ListNode	*lh_TailPred;
+	uint8	lh_Type;
+	uint8	lh_pad;
+};
+
 // <exec/lists.h>
 
 
@@ -1014,6 +1022,14 @@ struct Message {
 	struct ListNode	mn_Node;
 	struct MsgPort	*mn_ReplyPort;
 	uint16	mn_Length;
+} _PACKED;
+
+struct MsgPort {
+	struct ListNode	mp_Node;
+	uint8	mp_Flags;
+	uint8	mp_SigBits;
+	void	*mp_SigTask;
+	struct List	mp_MsgList;
 } _PACKED;
 
 #endif /* __ASSEMBLER__ */
@@ -1402,6 +1418,44 @@ struct NameInfo {
 
 #ifndef __ASSEMBLER__
 
+struct Window {
+	uint8 dummy1[136];
+};
+
+struct NewWindow {
+	int16	LeftEdge, TopEdge;
+	int16	Width, Height;
+	uint8	DetailPen, BlockPen;
+	uint32	IDCMPFlags;
+	uint32	Flags;
+	struct Gadget	*FirstGadget;
+	struct Image	*CheckMark;
+	const char	*Title;
+	struct Screen	*Screen;
+	struct BitMap	*BitMap;
+	int16	MinWidth, MinHeight;
+	uint16	MaxWidth, MaxHeight;
+	uint16	Type;
+};
+
+#endif /* __ASSEMBLER__ */
+
+#define CUSTOMSCREEN 0x000f
+
+#define IDCMP_CLOSEWINDOW	0x00000200
+
+#define WFLG_SIZEGADGET		0x00000001
+#define WFLG_DRAGBAR		0x00000002
+#define WFLG_DEPTHGADGET	0x00000004
+#define WFLG_CLOSEGADGET	0x00000008
+
+#define WFLG_SMART_REFRESH	0x00000000
+#define WFLG_SIMPLE_REFRESH	0x00000040
+
+#define WFLG_ACTIVATE		0x00001000
+
+#ifndef __ASSEMBLER__
+
 // <intuition/screen.h>
 
 struct NewScreen {
@@ -1448,9 +1502,38 @@ extern struct Library *INTUITION_BASE_NAME;
 	LP1(0xc6, struct Screen *, OpenScreen, struct NewScreen *, last, a0, \
 	, INTUITION_BASE_NAME)
 
+#define OpenWindow(last) \
+	LP1(0xcc, struct Window *, OpenWindow, struct NewWindow *, last, a0, \
+	, INTUITION_BASE_NAME)
+
+#define RemakeDisplay() \
+	LP0(0x180, int32, RemakeDisplay, \
+	, INTUITION_BASE_NAME)
+
 
 #endif /* __ASSEMBLER__ */
 
+
+// <devices/conunit.h>
+
+#define CONU_LIBRARY -1
+#define CONU_STANDARD 0
+#define CONU_CHARMAP 1
+
+#ifndef __ASSEMBLER__
+
+struct ConUnit {
+	struct MsgPort	cu_MP;
+	struct Window	*cu_Window;
+	int16	cu_XCP, cu_YCP;
+	int16	cu_XMax, cu_YMax;
+};
+
+#endif /* __ASSEMBLER__ */
+
+// <devices/console.h>
+
+#define CONSOLENAME "console.device"
 
 // <devices/keymap.h>
 

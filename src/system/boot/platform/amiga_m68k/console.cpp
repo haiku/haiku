@@ -24,7 +24,11 @@ class ConsoleHandle : public CharHandle {
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
 			size_t bufferSize);
 
+		void	Clear();
 		void	MoveTo(int16 x, int16 y);
+		void	SetColor(int32 foreground, int32 background);
+		int		Columns();
+		int		Rows();
 
 	private:
 		static int16	fX;
@@ -34,7 +38,7 @@ class ConsoleHandle : public CharHandle {
 
 class ConsoleDevice : public ExecDevice {
 	public:
-		ConsoleDevice();
+		ConsoleDevice(const char *title);
 		virtual ~ConsoleDevice();
 
 		status_t	Open();
@@ -42,9 +46,19 @@ class ConsoleDevice : public ExecDevice {
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
+		void	Clear();
+		void	MoveTo(int16 x, int16 y);
+		void	SetColor(int32 foreground, int32 background);
+
+		int		Columns();
+		int		Rows();
+
 		int	WaitForKey();
 
 	protected:
+		const char	*fTitle;
+		struct Window	*fWindow;
+		int	fRows, fCols;
 };
 
 class KeyboardDevice : public ExecDevice {
@@ -156,6 +170,14 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 
 
 void
+ConsoleHandle::Clear()
+{
+	Move(&gScreen->RastPort, 0, sScreenTopOffset);
+	ClearScreen(&gScreen->RastPort);
+}
+
+
+void
 ConsoleHandle::MoveTo(int16 x, int16 y)
 {
 	fX = x;
@@ -167,11 +189,37 @@ ConsoleHandle::MoveTo(int16 x, int16 y)
 }
 
 
+void
+ConsoleHandle::SetColor(int32 foreground, int32 background)
+{
+	SetAPen(&gScreen->RastPort, foreground);
+	SetBPen(&gScreen->RastPort, background);
+}
+
+
+int
+ConsoleHandle::Columns()
+{
+	int columnCount = gScreen->Width / sFontWidth;
+	return columnCount;
+}
+
+
+int
+ConsoleHandle::Rows()
+{
+	int lineCount = (gScreen->Height - sScreenTopOffset) / sFontHeight;
+	return lineCount;
+}
+
+
 // #pragma mark -
 
 
-ConsoleDevice::ConsoleDevice()
-	: ExecDevice()
+ConsoleDevice::ConsoleDevice(const char *title)
+	: ExecDevice(),
+	fTitle(title),
+	fWindow(NULL)
 {
 }
 
@@ -184,7 +232,57 @@ ConsoleDevice::~ConsoleDevice()
 status_t
 ConsoleDevice::Open()
 {
-	return ExecDevice::Open("console.device", -1);
+	status_t err;
+	
+	if (fWindow)
+		return B_ERROR;
+
+	err = AllocRequest(sizeof(struct IOStdReq));
+	if (err < B_OK)
+		panic("AllocRequest");;
+	if (err < B_OK)
+		return err;
+
+	int16 topEdge = gScreen->Height - 60;
+	int height = 60;
+
+	if (fTitle == NULL) {
+		topEdge = 10;
+		height = gScreen->Height - 40;
+		fTitle = "Console";
+	}
+
+	struct NewWindow newWindow = {
+		0, topEdge,
+		gScreen->Width, height,
+		BLACK, WHITE,
+		IDCMP_CLOSEWINDOW,
+		WFLG_SIZEGADGET | WFLG_DRAGBAR | WFLG_DEPTHGADGET | WFLG_SIMPLE_REFRESH
+			| WFLG_ACTIVATE,
+		NULL,
+		NULL,
+		fTitle,
+		gScreen,
+		NULL,
+		100, 45,
+		gScreen->Width, gScreen->Height,
+		CUSTOMSCREEN
+	};
+	
+	fWindow = OpenWindow(&newWindow);
+	if (fWindow == NULL)
+		panic("OpenWindow");;
+	if (fWindow == NULL)
+		return B_ERROR;
+	fIOStdReq->io_Data = fWindow;
+	fIOStdReq->io_Length = sizeof(struct Window);
+	err = ExecDevice::Open(CONSOLENAME, CONU_STANDARD, 0);
+	if (err < B_OK)
+		return err;
+
+	MoveTo(0, 0);
+	SetColor(WHITE, BLACK);
+	Clear();
 }
 
 
@@ -200,27 +298,44 @@ ConsoleDevice::WaitForKey()
 {
 	char ascii;
 	
-	if (Read(&ascii, 1) < 1) {
-		panic("WFK\n");
-		return 0;
-	}
-	dprintf("ascii %d %c\n", ascii, ascii);
+	if (Read(&ascii, 1) < 1)
+		return TEXT_CONSOLE_NO_KEY;
+	//dprintf("ascii %d %c\n", ascii, ascii);
 
-	switch (ascii) {
-		case IECODE_KEY_UP:
-			return TEXT_CONSOLE_KEY_UP;
-		case IECODE_KEY_DOWN:
-			return TEXT_CONSOLE_KEY_DOWN;
-		case IECODE_KEY_LEFT:
-			return TEXT_CONSOLE_KEY_LEFT;
-		case IECODE_KEY_RIGHT:
-			return TEXT_CONSOLE_KEY_RIGHT;
-		case IECODE_KEY_PAGE_UP:
-			return TEXT_CONSOLE_KEY_PAGE_UP;
-		case IECODE_KEY_PAGE_DOWN:
-			return TEXT_CONSOLE_KEY_PAGE_DOWN;
-		default:
-			break;
+	if (ascii == (char)0x9b) {
+		if (Read(&ascii, 1) < 1)
+			return TEXT_CONSOLE_NO_KEY;
+		//dprintf(">ascii %d %c\n", ascii, ascii);
+		switch (ascii) {
+			case 'A':
+				return TEXT_CONSOLE_KEY_UP;
+			case 'B':
+				return TEXT_CONSOLE_KEY_DOWN;
+			case 'D':
+				return TEXT_CONSOLE_KEY_LEFT;
+			case 'C':
+				return TEXT_CONSOLE_KEY_RIGHT;
+			case '4':
+			{
+				if (Read(&ascii, 1) < 1)
+					return TEXT_CONSOLE_NO_KEY;
+				if (ascii == '~')
+					return TEXT_CONSOLE_NO_KEY;
+				switch (ascii) {
+					case '1':
+						Read(&ascii, 1); // ~
+						return TEXT_CONSOLE_KEY_PAGE_UP;
+					case '2':
+						Read(&ascii, 1); // ~
+						return TEXT_CONSOLE_KEY_PAGE_UP;
+					default:
+						return TEXT_CONSOLE_NO_KEY;
+				}
+				return TEXT_CONSOLE_NO_KEY;
+			}
+			default:
+				break;
+		}
 	}
 	return ascii;
 }
@@ -230,6 +345,74 @@ ssize_t
 ConsoleDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return ExecDevice::WriteAt(cookie, pos, buffer, bufferSize);
+}
+
+
+void
+ConsoleDevice::Clear()
+{
+	char buff[] = "\x0c";
+	WriteAt(NULL, 0LL, buff, sizeof(buff) - 1);
+}
+
+
+void
+ConsoleDevice::MoveTo(int16 x, int16 y)
+{
+	char buff[32];
+	x = MIN(79,MAX(0,x));
+	y = MIN(24,MAX(0,y));
+	sprintf(buff, "\x9b%02d;%02d\x48", y + 1, x + 1);
+	//buff[4] += (char)x;
+	//buff[2] += (char)y;
+	WriteAt(NULL, 0LL, buff, strlen(buff));
+}
+
+
+void
+ConsoleDevice::SetColor(int32 foreground, int32 background)
+{
+	//char buff[] = "\x9b37;40m";
+	char buff[] = "\2330;30;40m";
+
+	
+	if (foreground >= 8) {
+		foreground -= 8;
+		//buff[1] = '1'; // bold
+	}
+	
+	// else
+	//	buff[1] = '2';
+	//if (background >= 8)
+	//	background -= 8;
+
+	if (foreground == background) {
+		foreground = 7 - background;
+	}
+
+	if (foreground < 8)
+		buff[4] += foreground;
+
+	if (background < 8)
+		buff[7] += background;
+
+	WriteAt(NULL, 0LL, buff, sizeof(buff) - 1);
+}
+
+
+int
+ConsoleDevice::Columns()
+{
+	struct ConUnit *unit = (struct ConUnit *)fIOStdReq->io_Unit;
+	return unit->cu_XMax;
+}
+
+
+int
+ConsoleDevice::Rows()
+{
+	struct ConUnit *unit = (struct ConUnit *)fIOStdReq->io_Unit;
+	return unit->cu_YMax - 1;
 }
 
 
@@ -445,11 +628,14 @@ LLKeyboardDevice::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bu
 //	#pragma mark -
 
 
-static ConsoleHandle sOutput;
-static ConsoleHandle sErrorOutput;
-static ConsoleHandle sDebugOutput;
+static ConsoleDevice sOutput(NULL);
+//static ConsoleHandle sOutput;
+//static ConsoleHandle sErrorOutput;
+//static ConsoleHandle sDebugOutput;
+static ConsoleDevice sDebugOutput("Debug");
 
-static KeyboardDevice sInput;
+//static KeyboardDevice sInput;
+static ConsoleDevice &sInput = sOutput;
 
 
 status_t
@@ -498,7 +684,18 @@ console_init(void)
 	
 	//ClearScreen(&gScreen->RastPort);
 
-	dbgerr = stdout = stderr = (FILE *)&sOutput;
+	
+	err = sDebugOutput.Open();
+	if (err < B_OK)
+		panic("sDebugOutput.Open() 0x%08lx\n", err);
+	dbgerr = stderr = (FILE *)&sDebugOutput;
+
+
+	err = sOutput.Open();
+	if (err < B_OK)
+		panic("sOutput.Open() 0x%08lx\n", err);
+
+	stdout = (FILE *)&sOutput;
 
 	console_set_cursor(0, 0);
 	
@@ -526,10 +723,11 @@ console_init(void)
 		panic("Cannot open %s", KEYMAPNAME);
 
 	
-	sInput.AllocRequest(sizeof(struct IOStdReq));
+	/*
 	err = sInput.Open();
 	if (err < B_OK)
 		panic("sInput.Open() 0x%08lx\n", err);
+	*/
 	stdin = (FILE *)&sInput;
 	
 	return B_OK;
@@ -542,24 +740,21 @@ console_init(void)
 void
 console_clear_screen(void)
 {
-	Move(&gScreen->RastPort, 0, sScreenTopOffset);
-	ClearScreen(&gScreen->RastPort);
+	sOutput.Clear();
 }
 
 
 int32
 console_width(void)
 {
-	int columnCount = gScreen->Width / sFontWidth;
-	return columnCount;
+	return sOutput.Columns();
 }
 
 
 int32
 console_height(void)
 {
-	int lineCount = (gScreen->Height - sScreenTopOffset) / sFontHeight;
-	return lineCount;
+	return sOutput.Rows();
 }
 
 
@@ -573,8 +768,7 @@ console_set_cursor(int32 x, int32 y)
 void
 console_set_color(int32 foreground, int32 background)
 {
-	SetAPen(&gScreen->RastPort, foreground);
-	SetBPen(&gScreen->RastPort, background);
+	sOutput.SetColor(foreground, background);
 }
 
 
