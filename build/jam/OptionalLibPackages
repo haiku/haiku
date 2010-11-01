@@ -72,7 +72,7 @@ if [ IsOptionalHaikuImagePackageAdded box2d ] {
 			: true
 		;
 	} else {
-		echo "No optional package box2d available for gcc2"
+		echo "No optional package box2d available for gcc2" ;
 	}
 }
 
