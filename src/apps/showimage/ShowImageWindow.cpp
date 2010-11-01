@@ -17,6 +17,7 @@
 
 #include <new>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -41,10 +42,8 @@
 #include <TranslationDefs.h>
 #include <TranslationUtils.h>
 #include <TranslatorRoster.h>
-#include <stdlib.h> // for bs_printf()
 
 #include "EntryMenuItem.h"
-#include "ResizerWindow.h"
 #include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageStatusView.h"
@@ -143,9 +142,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	fModified(false),
 	fFullScreen(false),
 	fShowCaption(true),
-	fPrintSettings(NULL),
-	fResizerWindowMessenger(NULL),
-	fResizeItem(NULL)
+	fPrintSettings(NULL)
 {
 	_LoadSettings();
 
@@ -225,7 +222,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 
 ShowImageWindow::~ShowImageWindow()
 {
-	delete fResizerWindowMessenger;
 }
 
 
@@ -389,12 +385,10 @@ ShowImageWindow::AddMenus(BMenuBar* bar)
 	_AddItemMenu(menu, B_TRANSLATE("Flip top to bottom"),
 		MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
 	menu->AddSeparatorItem();
-	fResizeItem = _AddItemMenu(menu, B_TRANSLATE("Resize" B_UTF8_ELLIPSIS),
-		MSG_OPEN_RESIZER_WINDOW, 0, 0, this);
-	bar->AddItem(menu);
-	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
 		MSG_DESKTOP_BACKGROUND, 0, 0, this);
+
+	bar->AddItem(menu);
 }
 
 
@@ -787,11 +781,9 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				break;
 			if (item->IsMarked()) {
 				item->SetMarked(false);
-				fResizeItem->SetEnabled(true);
 				fImageView->StopSlideShow();
 			} else if (_ClosePrompt()) {
 				item->SetMarked(true);
-				fResizeItem->SetEnabled(false);
 				fImageView->StartSlideShow();
 			}
 			break;
@@ -855,11 +847,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 
 		case MSG_SCALE_BILINEAR:
 			fImageView->SetScaleBilinear(_ToggleMenuItem(message->what));
-			break;
-
-		case MSG_RESIZER_WINDOW_QUIT:
-			delete fResizerWindowMessenger;
-			fResizerWindowMessenger = NULL;
 			break;
 
 		case MSG_DESKTOP_BACKGROUND:
@@ -1207,45 +1194,6 @@ ShowImageWindow::_Print(BMessage* msg)
 }
 
 
-void
-ShowImageWindow::_OpenResizerWindow(int32 width, int32 height)
-{
-	if (fResizerWindowMessenger == NULL) {
-		// open window if it is not already opened
-		BWindow* window = new ResizerWindow(this, width, height);
-		fResizerWindowMessenger = new BMessenger(window);
-		window->Show();
-	} else {
-		fResizerWindowMessenger->SendMessage(ResizerWindow::kActivateMsg);
-	}
-}
-
-
-void
-ShowImageWindow::_UpdateResizerWindow(int32 width, int32 height)
-{
-	if (fResizerWindowMessenger == NULL)
-		return;
-
-	BMessage updateMsg(ResizerWindow::kUpdateMsg);
-	updateMsg.AddInt32("width", width);
-	updateMsg.AddInt32("height", height);
-	fResizerWindowMessenger->SendMessage(&updateMsg);
-}
-
-
-void
-ShowImageWindow::_CloseResizerWindow()
-{
-	if (fResizerWindowMessenger == NULL)
-		return;
-
-	fResizerWindowMessenger->SendMessage(B_QUIT_REQUESTED);
-	delete fResizerWindowMessenger;
-	fResizerWindowMessenger = NULL;
-}
-
-
 bool
 ShowImageWindow::QuitRequested()
 {
@@ -1255,10 +1203,7 @@ ShowImageWindow::QuitRequested()
 	}
 
 	bool quit = _ClosePrompt();
-
 	if (quit) {
-		_CloseResizerWindow();
-
 		// tell the app to forget about this window
 		be_app->PostMessage(MSG_WINDOW_QUIT);
 	}

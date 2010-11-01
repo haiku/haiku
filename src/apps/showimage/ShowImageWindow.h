@@ -75,10 +75,6 @@ private:
 			void				_PrepareForPrint();
 			void				_Print(BMessage* msg);
 
-			void				_OpenResizerWindow(int32 width, int32 height);
-			void				_UpdateResizerWindow(int32 width, int32 height);
-			void				_CloseResizerWindow();
-
 private:
 			ImageFileNavigator	fNavigator;
 			BFilePanel*			fSavePanel;
@@ -95,8 +91,6 @@ private:
 			BRect				fWindowFrame;
 			BMessage*			fPrintSettings;
 			PrintOptions		fPrintOptions;
-			BMessenger*			fResizerWindowMessenger;
-			BMenuItem*			fResizeItem;
 			BString				fImageType;
 };
 

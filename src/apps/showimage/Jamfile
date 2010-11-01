@@ -10,7 +10,6 @@ Application ShowImage :
 	ImageFileNavigator.cpp
 	PrintOptionsWindow.cpp
 	ProgressWindow.cpp
-	ResizerWindow.cpp
 	SelectionBox.cpp
 	ShowImageApp.cpp
 	ShowImageSettings.cpp
@@ -28,7 +27,6 @@ DoCatalogs ShowImage :
 	:
 	PrintOptionsWindow.cpp
 	ProgressWindow.cpp
-	ResizerWindow.cpp
 	ShowImageApp.cpp
 	ShowImageView.cpp
 	ShowImageWindow.cpp
