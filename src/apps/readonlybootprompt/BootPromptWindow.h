@@ -30,7 +30,7 @@ private:
 			status_t			_GetCurrentKeymapRef(entry_ref& ref) const;
 
 private:
-			BTextView*			fInfoTextView;
+			BView*				fInfoTextView;
 			BStringView*		fLanguagesLabelView;
 			BListView*			fLanguagesListView;
 			BStringView*		fKeymapsLabelView;

@@ -1,13 +1,16 @@
 /*
  * Copyright 2010, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2010, Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "BootPromptWindow.h"
 
+#include <new>
 #include <stdio.h>
 
+#include <Bitmap.h>
 #include <Button.h>
 #include <ControlLook.h>
 #include <Directory.h>
@@ -20,12 +23,15 @@
 #include <ListView.h>
 #include <Locale.h>
 #include <MutableLocaleRoster.h>
+#include <ObjectList.h>
 #include <Path.h>
 #include <ScrollView.h>
 #include <SeparatorView.h>
 #include <StringItem.h>
 #include <StringView.h>
 #include <TextView.h>
+#include <TranslationUtils.h>
+#include <TranslatorFormats.h>
 #include <UnicodeChar.h>
 
 #include "BootPrompt.h"
@@ -52,15 +58,50 @@ public:
 		BStringItem(label),
 		fLanguage(language)
 	{
+		fIcon = new(std::nothrow) BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
+		if (fIcon != NULL && be_locale_roster->GetFlagIconForCountry(fIcon,
+				language) != B_OK) {
+			delete fIcon;
+			fIcon = NULL;
+		}
 	}
+
+
+	~LanguageItem()
+	{
+		delete fIcon;
+	}
+
 
 	const char* Language() const
 	{
 		return fLanguage.String();
 	}
 
+
+	void DrawItem(BView* owner, BRect frame, bool complete)
+	{
+		BStringItem::DrawItem(owner, frame, complete);
+
+		// Draw the icon
+		if (fIcon != NULL && fIcon->IsValid()) {
+			frame.left = frame.right - kFlagWidth;
+			BRect iconFrame(frame);
+			iconFrame.Set(iconFrame.left, iconFrame.top + 1,
+				iconFrame.left + kFlagWidth - 2,
+				iconFrame.top + kFlagWidth - 1);
+
+			owner->SetDrawingMode(B_OP_OVER);
+			owner->DrawBitmap(fIcon, iconFrame);
+			owner->SetDrawingMode(B_OP_COPY);
+		}
+
+	}
+
 private:
 	BString fLanguage;
+	BBitmap* fIcon;
+	static const int kFlagWidth = 16;
 };
 
 
@@ -76,22 +117,139 @@ compare_void_list_items(const void* _a, const void* _b)
 }
 
 
+// This class provides a view with text overlayed on a bitmap background.
+// The text is split on whitespaces in a way that no line is longer than
+// the view itself.
+// However, this splitting is done only when the text is set, so this view
+// cannot be resized.
+class TextBitmapView : public BView
+{
+	public:
+		TextBitmapView(BSize size) : BView("info", B_WILL_DRAW)
+		{
+			fBackground = BTranslationUtils::GetBitmap(B_PNG_FORMAT,
+				"leaf.png");
+			SetExplicitMinSize(size);
+			SetExplicitMaxSize(size);
+			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		}
+
+		~TextBitmapView()
+		{
+			delete fBackground;
+		}
+
+		void SetText(const char* text)
+		{
+			fTextLines.MakeEmpty(); // remove the old text
+
+			const char* currentChar = text;
+				// points to the character we are examining
+			const char* lastWord = text;
+				// points to the start of the last word we encountered in the
+				// text (right after the last space we saw).
+
+			while (*currentChar != '\0') {
+				if (*currentChar == ' ') {
+					// TODO : we should also handle other kinds of whitespace.
+					// Chinese seems to use a different one. ICU has proper
+					// support for it.
+					if (StringWidth(text, currentChar - text)
+						>= MinSize().Width() - fLeftBorder - fRightBorder)
+					{
+						if (text != lastWord) {
+							fTextLines.AddItem(new BString(text,
+								lastWord - text));
+
+							text = lastWord;
+							currentChar = text;
+						} else {
+							// We have a very long line without any spaces in
+							// it. For now, just break on the first space we
+							// find. This results in an ugly layout for the
+							// chinese message, but at least it doesn't enter
+							// an infinite loop.
+							fTextLines.AddItem(new BString(text,
+								currentChar - text));
+							++currentChar;
+							lastWord = currentChar;
+							text = currentChar;
+						}
+					} else
+						lastWord = currentChar + 1;
+				} else if (*currentChar == '\n') {
+					// A line break forces starting a new line.
+					if (StringWidth(text, currentChar - text)
+							>= MinSize().Width() - fLeftBorder - fRightBorder) {
+						// This is the case where the newline hapenned just
+						// after the word that makes the line too long to fit
+						// the view. So we split this extra word to a line more.
+						fTextLines.AddItem(new BString(text, lastWord - text));
+						text = lastWord;
+					}
+					fTextLines.AddItem(new BString(text, currentChar - text));
+					text = currentChar + 1;
+					lastWord = text;
+				}
+
+				++currentChar;
+			}
+
+			// The end of text can happen just after the word that makes the
+			// line too long. Here again, we may have to move this last word to
+			// a separate line.
+			if (StringWidth(text) >= MinSize().Width() - fLeftBorder
+					- fRightBorder) {
+				fTextLines.AddItem(new BString(text, lastWord - text));
+				text = lastWord;
+			}
+			fTextLines.AddItem(new BString(text));
+
+			Invalidate();
+				// The text changed, we have to update the on-screen drawing.
+		}
+
+		void Draw(BRect r)
+		{
+			// TODO : take r into account
+			SetDrawingMode(B_OP_OVER);
+			DrawBitmap(fBackground, BPoint(fLeftBorder, fTopBorder));
+
+			for (int i = 0; i < fTextLines.CountItems(); i++) {
+				DrawString(*fTextLines.ItemAt(i), BPoint(fLeftBorder,
+					fTopBorder + 10 + i * 14));
+			}
+		}
+
+		void SetInsets(int left, int top, int right, int bottom)
+		{
+			fLeftBorder = left;
+			fRightBorder = right;
+			fTopBorder = top;
+			fBottomBorder = bottom;
+		}
+
+	private:
+		BBitmap* fBackground;
+		BObjectList<BString> fTextLines;
+		int fLeftBorder;
+		int fRightBorder;
+		int fTopBorder;
+		int fBottomBorder;
+};
+
+
 BootPromptWindow::BootPromptWindow()
 	:
-	BWindow(BRect(0, 0, 450, 380), "",
+	BWindow(BRect(0, 0, 480, 400), "",
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Get the list of all known languages (suffice to do it only once)
 	be_locale_roster->GetAvailableLanguages(&fInstalledLanguages);
 
-	fInfoTextView = new BTextView("info", be_plain_font, NULL, B_WILL_DRAW);
-	fInfoTextView->SetInsets(10, 10, 10, 10);
-	fInfoTextView->MakeEditable(false);
-	fInfoTextView->MakeSelectable(false);
-
-	BScrollView* infoScrollView = new BScrollView("infoScroll",
-		fInfoTextView, B_WILL_DRAW, false, true);
+	fInfoTextView = new TextBitmapView(BSize(480, 140));
+	static_cast<TextBitmapView*>(fInfoTextView)->SetInsets(5, 5, 5, 5);
 
 	fDesktopButton = new BButton("", new BMessage(MSG_BOOT_DESKTOP));
 	fDesktopButton->SetTarget(be_app);
@@ -124,20 +282,22 @@ BootPromptWindow::BootPromptWindow()
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
 		.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
-			.Add(infoScrollView)
+			.Add(fInfoTextView)
 			.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
 				.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
 					.Add(fLanguagesLabelView)
 					.Add(languagesScrollView)
+					.SetInsets(spacing, 0, 0, 0)
 				)
 				.Add(BGroupLayoutBuilder(B_VERTICAL, spacing)
 					.Add(fKeymapsLabelView)
 					.Add(keymapsScrollView)
+					.SetInsets(0, 0, spacing, 0)
 				)
 			)
-			.SetInsets(spacing, spacing, spacing, spacing)
 		)
 		.Add(new BSeparatorView(B_HORIZONTAL))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
@@ -234,7 +394,7 @@ BootPromptWindow::_UpdateStrings()
 		"<www.haiku-os.org>."
 	);
 
-	fInfoTextView->SetText(infoText);
+	static_cast<TextBitmapView*>(fInfoTextView)->SetText(infoText);
 
 	fDesktopButton->SetLabel(B_TRANSLATE("Desktop (Live-CD)"));
 	fInstallerButton->SetLabel(B_TRANSLATE("Run Installer"));

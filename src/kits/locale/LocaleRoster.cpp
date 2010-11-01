@@ -10,6 +10,7 @@
 
 #include <LocaleRoster.h>
 
+#include <ctype.h>
 #include <set>
 
 #include <assert.h>
@@ -216,7 +217,7 @@ BLocaleRoster::GetAvailableTimeZonesForCountry(BMessage* timeZones,
 				status = B_ERROR;
 				break;
 			}
- 			timeZones->AddString("timeZone", zoneID);
+			timeZones->AddString("timeZone", zoneID);
 		}
 	} else
 		status = B_ERROR;
@@ -250,8 +251,19 @@ BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon, const char* countryCode)
 	}
 
 	size_t size;
+
+	// normalize the country code : 2 letters uparcase
+	// filter things out so that "pt_BR" gived the flag for brazil
+	char normalizedCode[3];
+	normalizedCode[2] = '\0';
+
+	int codeLength = strlen(countryCode);
+
+	normalizedCode[0] = toupper(countryCode[codeLength - 2]);
+	normalizedCode[1] = toupper(countryCode[codeLength - 1]);
+
 	const void* buffer = gRosterData.fResources.LoadResource(B_VECTOR_ICON_TYPE,
-		countryCode, &size);
+		normalizedCode, &size);
 	if (buffer == NULL || size == 0)
 		return B_NAME_NOT_FOUND;
 

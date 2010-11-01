@@ -9,7 +9,7 @@ Application ReadOnlyBootPrompt :
 	BootPromptWindow.cpp
 	Keymap.cpp
 	KeymapListItem.cpp
-	: be libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
+	: be translation libshared.a $(TARGET_LIBSTDC++) $(HAIKU_LOCALE_LIBS)
 	: BootPrompt.rdef
 ;
 
