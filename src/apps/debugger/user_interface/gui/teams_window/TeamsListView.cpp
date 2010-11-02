@@ -298,7 +298,7 @@ TeamsListView::_InitList()
 
 	while (get_next_team_info(&tmi_cookie, &tmi) == B_OK) {
 		TeamListItem* item = new(std::nothrow)  TeamListItem(tmi);
-		if (!item) {
+		if (item == NULL) {
 			// Memory issue. Bail out.
 			break;
 		}
@@ -336,15 +336,16 @@ TeamsListView::_UpdateList()
 				item = (TeamListItem*) ItemAt(index);
 		}
 
-		if (!item || tmi.team != item->TeamID()) {
+		if (item == NULL || tmi.team != item->TeamID()) {
 			// Team not found in previously known teams list: insert a new item
 			TeamListItem* newItem = new(std::nothrow) TeamListItem(tmi);
 			if (newItem != NULL) {
 				bool added;
 
-				if (!item) // No item found with bigger team id: append at end
+				if (item == NULL) {
+					// No item found with bigger team id: append at list end
 					added = AddItem(newItem);
-				else
+				} else
 					added = AddItem(newItem, index);
 
 				if (!added) {
