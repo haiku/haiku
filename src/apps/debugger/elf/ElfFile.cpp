@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,13 +23,16 @@
 // #pragma mark - ElfSection
 
 
-ElfSection::ElfSection(const char* name, int fd, off_t offset, off_t size)
+ElfSection::ElfSection(const char* name, int fd, off_t offset, off_t size,
+	target_addr_t loadAddress, uint32 flags)
 	:
 	fName(name),
 	fFD(fd),
 	fOffset(offset),
 	fSize(size),
 	fData(NULL),
+	fLoadAddress(loadAddress),
+	fFlags(flags),
 	fLoadCount(0)
 {
 }
@@ -190,7 +193,8 @@ ElfFile::Init(const char* fileName)
 	size_t sectionStringSize = stringSectionHeader->sh_size;
 
 	ElfSection* sectionStringSection = new(std::nothrow) ElfSection(".shstrtab",
-		fFD, stringSectionHeader->sh_offset, sectionStringSize);
+		fFD, stringSectionHeader->sh_offset, sectionStringSize,
+		stringSectionHeader->sh_addr, stringSectionHeader->sh_flags);
 	if (sectionStringSection == NULL)
 		return B_NO_MEMORY;
 	fSections.Add(sectionStringSection);
@@ -215,7 +219,8 @@ ElfFile::Init(const char* fileName)
 
 		// create an ElfSection
 		ElfSection* section = new(std::nothrow) ElfSection(name, fFD,
-			sectionHeader->sh_offset, sectionHeader->sh_size);
+			sectionHeader->sh_offset, sectionHeader->sh_size,
+			sectionHeader->sh_addr, sectionHeader->sh_flags);
 		if (section == NULL)
 			return B_NO_MEMORY;
 		fSections.Add(section);

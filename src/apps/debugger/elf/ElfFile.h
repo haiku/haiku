@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ELF_FILE_H
@@ -18,13 +18,18 @@
 class ElfSection : public DoublyLinkedListLinkImpl<ElfSection> {
 public:
 								ElfSection(const char* name, int fd,
-									off_t offset, off_t size);
+									off_t offset, off_t size,
+									target_addr_t loadAddress, uint32 flags);
 								~ElfSection();
 
 			const char*			Name() const	{ return fName; }
 			off_t				Offset() const	{ return fOffset; }
 			off_t				Size() const	{ return fSize; }
 			const void*			Data() const	{ return fData; }
+			target_addr_t		LoadAddress() const
+									{ return fLoadAddress; }
+			bool				IsWritable() const
+									{ return (fFlags & SHF_WRITE) != 0; }
 
 			status_t			Load();
 			void				Unload();
@@ -35,6 +40,8 @@ private:
 			off_t				fOffset;
 			off_t				fSize;
 			void*				fData;
+			target_addr_t		fLoadAddress;
+			uint32				fFlags;
 			int32				fLoadCount;
 };
 
