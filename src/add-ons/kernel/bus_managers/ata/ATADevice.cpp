@@ -311,6 +311,40 @@ ATADevice::ExecuteIO(ATARequest *request)
 				return B_OK;
 			}
 		}
+
+		case SCSI_OP_READ_12:
+		case SCSI_OP_WRITE_12:
+		{
+			scsi_cmd_rw_12 *command = (scsi_cmd_rw_12 *)ccb->cdb;
+			uint32 address = B_BENDIAN_TO_HOST_INT32(command->lba);
+			uint32 sectorCount = B_BENDIAN_TO_HOST_INT32(command->length);
+
+			request->SetIsWrite(command->opcode == SCSI_OP_WRITE_12);
+			if (sectorCount > 0)
+				return ExecuteReadWrite(request, address, sectorCount);
+			else {
+				// we cannot transfer zero blocks (apart from LBA48)
+				request->SetStatus(SCSI_REQ_CMP);
+				return B_OK;
+			}
+		}
+
+		case SCSI_OP_READ_16:
+		case SCSI_OP_WRITE_16:
+		{
+			scsi_cmd_rw_16 *command = (scsi_cmd_rw_16 *)ccb->cdb;
+			uint64 address = B_BENDIAN_TO_HOST_INT64(command->lba);
+			uint32 sectorCount = B_BENDIAN_TO_HOST_INT32(command->length);
+
+			request->SetIsWrite(command->opcode == SCSI_OP_WRITE_16);
+			if (sectorCount > 0)
+				return ExecuteReadWrite(request, address, sectorCount);
+			else {
+				// we cannot transfer zero blocks (apart from LBA48)
+				request->SetStatus(SCSI_REQ_CMP);
+				return B_OK;
+			}
+		}
 	}
 
 	TRACE("command not implemented\n");

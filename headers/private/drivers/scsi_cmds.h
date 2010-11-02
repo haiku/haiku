@@ -166,6 +166,7 @@
 #define	SCSI_OP_READ_6						0x08
 #define SCSI_OP_WRITE_6						0x0a
 #define SCSI_OP_INQUIRY						0x12
+#define SCSI_OP_VERIFY_6					0x13
 #define SCSI_OP_MODE_SELECT_6				0x15
 #define SCSI_OP_RESERVE						0x16
 #define SCSI_OP_RELEASE						0x17
@@ -178,7 +179,7 @@
 #define	SCSI_OP_READ_10						0x28
 #define SCSI_OP_WRITE_10					0x2a
 #define SCSI_OP_POSITION_TO_ELEMENT			0x2b
-#define SCSI_OP_VERIFY						0x2f
+#define SCSI_OP_VERIFY_10					0x2f
 #define	SCSI_OP_SYNCHRONIZE_CACHE			0x35
 #define	SCSI_OP_WRITE_BUFFER				0x3b
 #define	SCSI_OP_READ_BUFFER					0x3c
@@ -193,11 +194,13 @@
 #define	SCSI_OP_MODE_SENSE_10				0x5A
 #define SCSI_OP_READ_16						0x88
 #define SCSI_OP_WRITE_16					0x8a
+#define SCSI_OP_VERIFY_16					0x8f
 #define SCSI_OP_SERVICE_ACTION_IN			0x9e
 #define SCSI_OP_SERVICE_ACTION_OUT			0x9f
 #define SCSI_OP_MOVE_MEDIUM					0xa5
 #define SCSI_OP_READ_12						0xa8
 #define SCSI_OP_WRITE_12					0xaa
+#define SCSI_OP_VERIFY_12					0xaf
 #define SCSI_OP_READ_ELEMENT_STATUS			0xb8
 #define SCSI_OP_SCAN						0xba
 #define SCSI_OP_READ_CD						0xbe
