@@ -985,7 +985,6 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(
 		"Phil Greenway\n"
 		"Gavin James\n"
-		"Jorge G. Mare (aka Koki)\n"
 		"Urias McCullough\n"
 		"Niels Sascha Reedijk\n"
 		"Joachim Seemer (Humdinger)\n"
