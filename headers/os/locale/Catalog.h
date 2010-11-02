@@ -5,9 +5,11 @@
 #ifndef _CATALOG_H_
 #define _CATALOG_H_
 
+
 #include <LocaleRoster.h>
 #include <SupportDefs.h>
 #include <String.h>
+
 
 class BCatalogAddOn;
 class BLocale;
@@ -16,45 +18,48 @@ struct entry_ref;
 
 
 class BCatalog {
+public:
+								BCatalog();
+								BCatalog(const char* signature,
+									const char* language = NULL,
+									uint32 fingerprint = 0);
+	virtual						~BCatalog();
 
-	public:
-		BCatalog();
-		BCatalog(const char *signature, const char *language = NULL,
-			uint32 fingerprint = 0);
-		virtual ~BCatalog();
+			const char*			GetString(const char* string,
+									const char* context = NULL,
+									const char* comment = NULL);
+			const char*			GetString(uint32 id);
 
-		const char *GetString(const char *string, const char *context = NULL,
-						const char *comment = NULL);
-		const char *GetString(uint32 id);
+			const char*			GetNoAutoCollectString(const char* string,
+									const char* context = NULL,
+									const char* comment = NULL);
+			const char*			GetNoAutoCollectString(uint32 id);
 
-		const char *GetNoAutoCollectString(const char *string,
-						const char *context = NULL, const char *comment = NULL);
-		const char *GetNoAutoCollectString(uint32 id);
+			status_t			GetData(const char* name, BMessage* msg);
+			status_t			GetData(uint32 id, BMessage* msg);
 
-		status_t GetData(const char *name, BMessage *msg);
-		status_t GetData(uint32 id, BMessage *msg);
+			status_t			GetSignature(BString* signature);
+			status_t			GetLanguage(BString* language);
+			status_t			GetFingerprint(uint32* fingerprint);
 
-		status_t GetSignature(BString *sig);
-		status_t GetLanguage(BString *lang);
-		status_t GetFingerprint(uint32 *fp);
+			status_t			SetCatalog(const char* signature,
+									uint32 fingerprint);
 
-		status_t SetCatalog(const char* signature, uint32 fingerprint);
+			status_t			InitCheck() const;
+			int32				CountItems() const;
 
-		status_t InitCheck() const;
-		int32 CountItems() const;
+			BCatalogAddOn*		CatalogAddOn();
 
-		BCatalogAddOn *CatalogAddOn();
+protected:
+								BCatalog(const BCatalog&);
+			const BCatalog&		operator= (const BCatalog&);
+									// hide assignment and copy-constructor
 
-	protected:
-		BCatalog(const BCatalog&);
-		const BCatalog& operator= (const BCatalog&);
-			// hide assignment and copy-constructor
+			BCatalogAddOn*		fCatalog;
 
-		BCatalogAddOn *fCatalog;
-
-	private:
-		friend class BLocale;
-		friend status_t get_add_on_catalog(BCatalog*, const char *);
+private:
+			friend class BLocale;
+			friend status_t get_add_on_catalog(BCatalog*, const char*);
 };
 
 
@@ -65,6 +70,8 @@ class BCatalog {
 // you don't want these (in which case you need to collect the catalog keys
 // manually, as collectcatkeys won't do it for you):
 
+// TODO: maybe rename this to B_TRANSLATE_DEFAULT_CONTEXT, so that
+// B_TRANSLATE_WITH_CONTEXT() can just be called B_TRANSLATE_CONTEXT()
 #undef B_TRANSLATE_CONTEXT
 	// In a single application, several strings (e.g. 'Ok') will be used
 	// more than once, in different contexts.
@@ -85,16 +92,21 @@ class BCatalog {
 
 // Translation macros which may be used to shorten translation requests:
 #undef B_TRANSLATE
-#define B_TRANSLATE(str) \
-	be_locale_roster->GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT)
+#define B_TRANSLATE(string) \
+	be_locale_roster->GetCatalog()->GetString((string), B_TRANSLATE_CONTEXT)
+
+#undef B_TRANSLATE_WITH_CONTEXT
+#define B_TRANSLATE_WITH_CONTEXT(string, context) \
+	be_locale_roster->GetCatalog()->GetString((string), (context))
 
 #undef B_TRANSLATE_COMMENT
-#define B_TRANSLATE_COMMENT(str, cmt) \
-	be_locale_roster->GetCatalog()->GetString((str), B_TRANSLATE_CONTEXT, (cmt))
+#define B_TRANSLATE_COMMENT(string, comment) \
+	be_locale_roster->GetCatalog()->GetString((string), B_TRANSLATE_CONTEXT, \
+		(comment))
 
 #undef B_TRANSLATE_ALL
-#define B_TRANSLATE_ALL(str, ctx, cmt) \
-	be_locale_roster->GetCatalog()->GetString((str), (ctx), (cmt))
+#define B_TRANSLATE_ALL(string, context, comment) \
+	be_locale_roster->GetCatalog()->GetString((string), (context), (comment))
 
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
@@ -160,22 +172,29 @@ class BCatalog {
 #endif	/* B_AVOID_TRANSLATION_MACROS */
 
 #else	/* B_COLLECTING_CATKEYS */
+// TODO: why define them here? Since we obviously control the preprocessor, we
+// could simply always include a certain file that defines them; this doesn't
+// really belong into a public header.
 
 // Translation macros used when executing collectcatkeys
 
 #undef B_TRANSLATE_CONTEXT
 
 #undef B_TRANSLATE
-#define B_TRANSLATE(str) \
-	B_CATKEY((str), B_TRANSLATE_CONTEXT)
+#define B_TRANSLATE(string) \
+	B_CATKEY((string), B_TRANSLATE_CONTEXT)
+
+#undef B_TRANSLATE_WITH_CONTEXT
+#define B_TRANSLATE_WITH_CONTEXT(string, context) \
+	B_CATKEY((string), (context))
 
 #undef B_TRANSLATE_COMMENT
-#define B_TRANSLATE_COMMENT(str, cmt) \
-	B_CATKEY((str), B_TRANSLATE_CONTEXT, (cmt))
+#define B_TRANSLATE_COMMENT(string, comment) \
+	B_CATKEY((string), B_TRANSLATE_CONTEXT, (comment))
 
 #undef B_TRANSLATE_ALL
-#define B_TRANSLATE_ALL(str, ctx, cmt) \
-	B_CATKEY((str), (ctx), (cmt))
+#define B_TRANSLATE_ALL(string, context, comment) \
+	B_CATKEY((string), (context), (comment))
 
 #undef B_TRANSLATE_ID
 #define B_TRANSLATE_ID(id) \
@@ -218,69 +237,72 @@ class BCatalog {
 
 /************************************************************************/
 // For BCatalog add-on implementations:
+// TODO: should go into another header
 
 class BCatalogAddOn {
-	public:
-		BCatalogAddOn(const char *signature, const char *language,
-			uint32 fingerprint);
-		virtual ~BCatalogAddOn();
+public:
+								BCatalogAddOn(const char* signature,
+									const char* language,
+									uint32 fingerprint);
+	virtual						~BCatalogAddOn();
 
-		virtual const char *GetString(const char *string,
-								const char *context = NULL,
-								const char *comment = NULL) = 0;
-		virtual const char *GetString(uint32 id) = 0;
+	virtual	const char*			GetString(const char* string,
+									const char* context = NULL,
+									const char* comment = NULL) = 0;
+	virtual	const char*			GetString(uint32 id) = 0;
 
-		status_t InitCheck() const;
-		BCatalogAddOn *Next();
+			status_t			InitCheck() const;
+			BCatalogAddOn*		Next();
 
-		// the following could be used to localize non-textual data (e.g.
-		// icons), but these will only be implemented if there's demand for such
-		// a feature:
-		virtual bool CanHaveData() const;
-		virtual status_t GetData(const char *name, BMessage *msg);
-		virtual status_t GetData(uint32 id, BMessage *msg);
+	// the following could be used to localize non-textual data (e.g.
+	// icons), but these will only be implemented if there's demand for such
+	// a feature:
+	virtual	bool				CanHaveData() const;
+	virtual	status_t			GetData(const char* name, BMessage* msg);
+	virtual	status_t			GetData(uint32 id, BMessage* msg);
 
-		// interface for catalog-editor-app and testing apps:
-		virtual status_t SetString(const char *string,
-							const char *translated,
-							const char *context = NULL,
-							const char *comment = NULL);
-		virtual status_t SetString(int32 id, const char *translated);
+	// interface for catalog-editor-app and testing apps:
+	virtual	status_t			SetString(const char* string,
+									const char* translated,
+									const char* context = NULL,
+									const char* comment = NULL);
+	virtual	status_t			SetString(int32 id, const char* translated);
 
-		virtual bool CanWriteData() const;
-		virtual status_t SetData(const char *name, BMessage *msg);
-		virtual status_t SetData(uint32 id, BMessage *msg);
+	virtual	bool				CanWriteData() const;
+	virtual	status_t			SetData(const char* name, BMessage* msg);
+	virtual	status_t			SetData(uint32 id, BMessage* msg);
 
-		virtual status_t ReadFromFile(const char *path = NULL);
-		virtual status_t ReadFromAttribute(entry_ref *appOrAddOnRef);
-		virtual status_t ReadFromResource(entry_ref *appOrAddOnRef);
-		virtual status_t WriteToFile(const char *path = NULL);
-		virtual status_t WriteToAttribute(entry_ref *appOrAddOnRef);
-		virtual status_t WriteToResource(entry_ref *appOrAddOnRef);
+	virtual	status_t			ReadFromFile(const char* path = NULL);
+	virtual	status_t			ReadFromAttribute(entry_ref* appOrAddOnRef);
+	virtual	status_t			ReadFromResource(entry_ref* appOrAddOnRef);
+	virtual	status_t			WriteToFile(const char* path = NULL);
+	virtual	status_t			WriteToAttribute(entry_ref* appOrAddOnRef);
+	virtual	status_t			WriteToResource(entry_ref* appOrAddOnRef);
 
-		virtual void MakeEmpty();
-		virtual int32 CountItems() const;
+	virtual	void				MakeEmpty();
+	virtual	int32				CountItems() const;
 
-		// magic marker functions which are used to mark a string/id
-		// which will be translated elsewhere in the code (where it can
-		// not be found since it is references by a variable):
-		static const char *MarkForTranslation(const char *str, const char *ctx,
-								const char *cmt);
-		static int32 MarkForTranslation(int32 id);
+	// magic marker functions which are used to mark a string/id
+	// which will be translated elsewhere in the code (where it can
+	// not be found since it is references by a variable):
+	static	const char*			MarkForTranslation(const char* string,
+									const char* context, const char* comment);
+	static	int32				MarkForTranslation(int32 id);
 
-		void SetNext(BCatalogAddOn *next);
+			void				SetNext(BCatalogAddOn* next);
 
-	protected:
-		virtual void UpdateFingerprint();
+protected:
+	virtual	void				UpdateFingerprint();
 
-		status_t 			fInitCheck;
-		BString 			fSignature;
-		BString 			fLanguageName;
-		uint32				fFingerprint;
-		BCatalogAddOn 		*fNext;
+protected:
+			friend class BCatalog;
+			friend status_t get_add_on_catalog(BCatalog*, const char*);
 
-		friend class BCatalog;
-		friend status_t get_add_on_catalog(BCatalog*, const char *);
+			status_t 			fInitCheck;
+			BString 			fSignature;
+			BString 			fLanguageName;
+			uint32				fFingerprint;
+			BCatalogAddOn*		fNext;
 };
 
 // every catalog-add-on should export these symbols...
@@ -399,45 +421,46 @@ BCatalogAddOn::MarkForTranslation(int32 id)
 }
 
 
+// TODO: does not belong here, either
 namespace BPrivate {
 
-/*
- * EditableCatalog
- */
+
 class EditableCatalog : public BCatalog {
+public:
+								EditableCatalog(const char* type,
+									const char* signature,
+									const char* language);
+	virtual						~EditableCatalog();
 
-	public:
-		EditableCatalog(const char *type, const char *signature,
-			const char *language);
-		~EditableCatalog();
+			status_t			SetString(const char* string,
+									const char* translated,
+									const char* context = NULL,
+									const char* comment = NULL);
+			status_t			SetString(int32 id, const char* translated);
 
-		status_t SetString(const char *string,
-					const char *translated,
-					const char *context = NULL,
-					const char *comment = NULL);
-		status_t SetString(int32 id, const char *translated);
+			bool				CanWriteData() const;
+			status_t			SetData(const char* name, BMessage* msg);
+			status_t			SetData(uint32 id, BMessage* msg);
 
-		bool CanWriteData() const;
-		status_t SetData(const char *name, BMessage *msg);
-		status_t SetData(uint32 id, BMessage *msg);
+			status_t			ReadFromFile(const char* path = NULL);
+			status_t			ReadFromAttribute(entry_ref* appOrAddOnRef);
+			status_t			ReadFromResource(entry_ref* appOrAddOnRef);
+			status_t			WriteToFile(const char* path = NULL);
+			status_t			WriteToAttribute(entry_ref* appOrAddOnRef);
+			status_t			WriteToResource(entry_ref* appOrAddOnRef);
 
-		status_t ReadFromFile(const char *path = NULL);
-		status_t ReadFromAttribute(entry_ref *appOrAddOnRef);
-		status_t ReadFromResource(entry_ref *appOrAddOnRef);
-		status_t WriteToFile(const char *path = NULL);
-		status_t WriteToAttribute(entry_ref *appOrAddOnRef);
-		status_t WriteToResource(entry_ref *appOrAddOnRef);
+			void				MakeEmpty();
 
-		void MakeEmpty();
-
-	private:
-		EditableCatalog();
-		EditableCatalog(const EditableCatalog&);
-		const EditableCatalog& operator= (const EditableCatalog&);
-			// hide assignment, default- and copy-constructor
-
+private:
+								EditableCatalog();
+								EditableCatalog(const EditableCatalog& other);
+		const EditableCatalog&	operator=(const EditableCatalog& other);
+									// hide assignment, default-, and
+									// copy-constructor
 };
 
+
 } // namespace BPrivate
+
 
 #endif /* _CATALOG_H_ */
