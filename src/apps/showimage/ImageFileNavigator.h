@@ -72,7 +72,7 @@ public:
 private:
 			bool				_IsImage(const entry_ref& ref);
 			bool				_FindNextImage(const entry_ref& current,
-									entry_ref& next, bool next,
+									entry_ref& ref, bool next,
 									bool rewind);
 			status_t			_LoadNextImage(bool next, bool rewind);
 			void				_SetTrackerSelectionToCurrent();

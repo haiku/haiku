@@ -126,6 +126,10 @@ bs_printf(BString* string, const char* format, ...)
 //	#pragma mark -- ShowImageWindow
 
 
+#undef B_TRANSLATE_CONTEXT
+#define B_TRANSLATE_CONTEXT "Menus"
+
+
 ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	const BMessenger& trackerMessenger)
 	:
@@ -201,7 +205,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	}
 
 	// add View menu here so it can access ShowImageView methods
-	BMenu* menu = new BMenu(B_TRANSLATE_WITH_CONTEXT("View", "Menus"));
+	BMenu* menu = new BMenu(B_TRANSLATE("View"));
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
 
@@ -891,10 +895,9 @@ ShowImageWindow::_LoadError(const entry_ref& ref)
 {
 	// TODO: give a better error message!
 	BAlert* alert = new BAlert(B_TRANSLATE("ShowImage"),
-		B_TRANSLATE_WITH_CONTEXT("Could not load image! Either the "
-			"file or an image translator for it does not exist.",
-			"LoadAlerts"),
-		B_TRANSLATE_WITH_CONTEXT("OK", "Alerts"), NULL, NULL,
+		B_TRANSLATE("Could not load image! Either the "
+			"file or an image translator for it does not exist."),
+		B_TRANSLATE("OK"), NULL, NULL,
 		B_WIDTH_AS_USUAL, B_INFO_ALERT);
 	alert->Go();
 }
