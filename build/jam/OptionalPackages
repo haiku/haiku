@@ -94,7 +94,7 @@ if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) = 1
 #	Yasm					- the assembler utility
 
 local baseURL = http://haiku-files.org/files/optional-packages ;
-local baseLibURL = http://haiku-files.org/files/optional-packages ;
+local baseLibURL = http://haiku-files.org/files/optional-packages/lib ;
 local baseSourceURL = http://haiku-files.org/files/releases/r1alpha2/sources ;
 
 # ABI-compliance-checker
