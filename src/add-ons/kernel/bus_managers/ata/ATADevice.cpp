@@ -199,8 +199,7 @@ ATADevice::ReadCapacity16(ATARequest *request)
 	data.block_size = B_HOST_TO_BENDIAN_INT32(fBlockSize);
 
 	uint64 lastBlock = fTotalSectors - 1;
-	data.lba = (((uint64)B_HOST_TO_BENDIAN_INT32(lastBlock >> 32)) << 32)
-		| B_HOST_TO_BENDIAN_INT32(lastBlock);
+	data.lba = B_HOST_TO_BENDIAN_INT64(lastBlock);
 	TRACE("returning last block: %llu\n", data.lba);
 
 	copy_sg_data(ccb, 0, ccb->data_length, &data, sizeof(data), false);

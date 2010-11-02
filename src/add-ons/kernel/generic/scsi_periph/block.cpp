@@ -76,9 +76,7 @@ periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *request)
 			ACQUIRE_BEN(&device->mutex);
 
 			if (res == B_OK && request->data_resid == 0) {
-				capacity = (((uint64)B_BENDIAN_TO_HOST_INT32(
-						capacityLongResult.lba >> 32)) << 32)
-					| B_BENDIAN_TO_HOST_INT32(capacityLongResult.lba);
+				capacity = B_BENDIAN_TO_HOST_INT64(capacityLongResult.lba);
 			} else
 				capacity = 0;
 		}
