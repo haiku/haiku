@@ -1037,6 +1037,7 @@ AboutView::_CreateCreditsView()
 		"Jerome Leveque\n"
 		"Christof Lutteroth\n"
 		"Graham MacDonald\n"
+		"Jorge G. Mare (Koki)\n"
 		"Jan Matějek\n"
 		"Brian Matzon\n"
 		"Christopher ML Zumwalt May\n"
