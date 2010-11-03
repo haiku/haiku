@@ -1438,7 +1438,7 @@ checksumfs_write_stat(fs_volume* fsVolume, fs_vnode* vnode,
 
 	// start a transaction and add the node to it (write locks the node, too)
 	Transaction transaction(volume);
-	status_t error = transaction.Start();
+	status_t error = transaction.StartAndAddNode(node);
 	if (error != B_OK)
 		return error;
 
@@ -2346,6 +2346,7 @@ fs_vnode_ops gCheckSumFSVnodeOps = {
 	checksumfs_access,
 	checksumfs_read_stat,
 	checksumfs_write_stat,
+	NULL,	// preallocate
 
 	/* file operations */
 	checksumfs_create,
