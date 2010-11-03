@@ -198,6 +198,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	if (fNavigator.LoadImage(*ref) != B_OK) {
 		_LoadError(*ref);
 		Quit();
+		return;
 	}
 
 	// add View menu here so it can access ShowImageView methods
