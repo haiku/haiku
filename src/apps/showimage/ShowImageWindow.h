@@ -67,7 +67,7 @@ private:
 									// Handle save file panel message
 			bool				_ClosePrompt();
 			void				_ToggleFullScreen();
-			void				_LoadSettings();
+			void				_ApplySettings();
 			void				_SavePrintOptions();
 			bool				_PageSetup();
 			void				_PrepareForPrint();

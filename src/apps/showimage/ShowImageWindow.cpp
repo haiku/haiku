@@ -92,7 +92,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	fShowCaption(true),
 	fPrintSettings(NULL)
 {
-	_LoadSettings();
+	_ApplySettings();
 
 	// create menu bar
 	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 1), "menu_bar");
@@ -997,7 +997,7 @@ ShowImageWindow::_ToggleFullScreen()
 
 
 void
-ShowImageWindow::_LoadSettings()
+ShowImageWindow::_ApplySettings()
 {
 	ShowImageSettings* settings = my_app->Settings();
 
