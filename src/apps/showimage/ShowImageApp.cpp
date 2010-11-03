@@ -49,65 +49,6 @@ ShowImageApp::~ShowImageApp()
 
 
 void
-ShowImageApp::AboutRequested()
-{
-	const char* authors[] = {
-		"Fernando F. Oliveira",
-		"Michael Wilber",
-		"Michael Pfeiffer",
-		"Ryan Leavengood",
-		NULL
-	};
-	BAboutWindow about(B_TRANSLATE("ShowImage"), 2003, authors);
-	about.Show();
-}
-
-
-void
-ShowImageApp::ReadyToRun()
-{
-	if (CountWindows() == WINDOWS_TO_IGNORE)
-		fOpenPanel->Show();
-	else {
-		// If image windows are already open
-		// (paths supplied on the command line)
-		// start checking the number of open windows
-		StartPulse();
-	}
-
-	be_clipboard->StartWatching(be_app_messenger);
-		// tell the clipboard to notify this app when its contents change
-}
-
-
-void
-ShowImageApp::StartPulse()
-{
-	if (!fPulseStarted) {
-		// Tell the app to begin checking
-		// for the number of open windows
-		fPulseStarted = true;
-		SetPulseRate(250000);
-			// Set pulse to every 1/4 second
-	}
-}
-
-
-void
-ShowImageApp::Pulse()
-{
-	// Bug: The BFilePanel is automatically closed if the volume that
-	// is displayed is unmounted.
-	if (!IsLaunching() && CountWindows() <= WINDOWS_TO_IGNORE) {
-		// If the application is not launching and
-		// all windows are closed except for the file open panel,
-		// quit the application
-		PostMessage(B_QUIT_REQUESTED);
-	}
-}
-
-
-void
 ShowImageApp::ArgvReceived(int32 argc, char **argv)
 {
 	BMessage message;
@@ -144,6 +85,23 @@ ShowImageApp::ArgvReceived(int32 argc, char **argv)
 
 
 void
+ShowImageApp::ReadyToRun()
+{
+	if (CountWindows() == WINDOWS_TO_IGNORE)
+		fOpenPanel->Show();
+	else {
+		// If image windows are already open
+		// (paths supplied on the command line)
+		// start checking the number of open windows
+		_StartPulse();
+	}
+
+	be_clipboard->StartWatching(be_app_messenger);
+		// tell the clipboard to notify this app when its contents change
+}
+
+
+void
 ShowImageApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -157,11 +115,11 @@ ShowImageApp::MessageReceived(BMessage* message)
 		case B_CANCEL:
 			// File open panel was closed,
 			// start checking count of open windows
-			StartPulse();
+			_StartPulse();
 			break;
 
 		case B_CLIPBOARD_CHANGED:
-			CheckClipboard();
+			_CheckClipboard();
 			break;
 
 		default:
@@ -172,35 +130,84 @@ ShowImageApp::MessageReceived(BMessage* message)
 
 
 void
-ShowImageApp::RefsReceived(BMessage* message)
+ShowImageApp::AboutRequested()
 {
-	// If a tracker window opened me, get a messenger from it.
-	if (message->HasMessenger("TrackerViewToken"))
-		message->FindMessenger("TrackerViewToken", &fTrackerMessenger);
+	const char* authors[] = {
+		"Fernando F. Oliveira",
+		"Michael Wilber",
+		"Michael Pfeiffer",
+		"Ryan Leavengood",
+		NULL
+	};
+	BAboutWindow about(B_TRANSLATE("ShowImage"), 2003, authors);
+	about.Show();
+}
 
-	uint32 type;
-	int32 count;
-	status_t ret = message->GetInfo("refs", &type, &count);
-	if (ret != B_OK || type != B_REF_TYPE)
-		return;
 
-	entry_ref ref;
-	for (int32 i = 0; i < count; i++) {
-		if (message->FindRef("refs", i, &ref) == B_OK)
-			Open(&ref);
+void
+ShowImageApp::Pulse()
+{
+	// Bug: The BFilePanel is automatically closed if the volume that
+	// is displayed is unmounted.
+	if (!IsLaunching() && CountWindows() <= WINDOWS_TO_IGNORE) {
+		// If the application is not launching and
+		// all windows are closed except for the file open panel,
+		// quit the application
+		PostMessage(B_QUIT_REQUESTED);
 	}
 }
 
 
 void
-ShowImageApp::Open(const entry_ref* ref)
+ShowImageApp::RefsReceived(BMessage* message)
 {
-	new ShowImageWindow(ref, fTrackerMessenger);
+	// If a tracker window opened me, get a messenger from it.
+	BMessenger trackerMessenger;
+	if (message->HasMessenger("TrackerViewToken"))
+		message->FindMessenger("TrackerViewToken", &trackerMessenger);
+
+	entry_ref ref;
+	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
+		_Open(&ref, trackerMessenger);
+	}
+}
+
+
+bool
+ShowImageApp::QuitRequested()
+{
+	// Give the windows a chance to prompt the user if there are changes
+	bool result = BApplication::QuitRequested();
+	if (result)
+		be_clipboard->StopWatching(be_app_messenger);
+			// tell clipboard we don't want anymore notification
+
+	return result;
 }
 
 
 void
-ShowImageApp::BroadcastToWindows(BMessage* message)
+ShowImageApp::_StartPulse()
+{
+	if (!fPulseStarted) {
+		// Tell the app to begin checking
+		// for the number of open windows
+		fPulseStarted = true;
+		SetPulseRate(250000);
+			// Set pulse to every 1/4 second
+	}
+}
+
+
+void
+ShowImageApp::_Open(const entry_ref* ref, BMessenger& trackerMessenger)
+{
+	new ShowImageWindow(ref, trackerMessenger);
+}
+
+
+void
+ShowImageApp::_BroadcastToWindows(BMessage* message)
 {
 	const int32 count = CountWindows();
 	for (int32 i = 0; i < count; i ++) {
@@ -212,7 +219,7 @@ ShowImageApp::BroadcastToWindows(BMessage* message)
 
 
 void
-ShowImageApp::CheckClipboard()
+ShowImageApp::_CheckClipboard()
 {
 	// Determines if the contents of the clipboard contain
 	// data that is useful to this application.
@@ -233,20 +240,7 @@ ShowImageApp::CheckClipboard()
 
 	BMessage msg(MSG_CLIPBOARD_CHANGED);
 	msg.AddBool("data_available", dataAvailable);
-	BroadcastToWindows(&msg);
-}
-
-
-bool
-ShowImageApp::QuitRequested()
-{
-	// Give the windows a chance to prompt the user if there are changes
-	bool result = BApplication::QuitRequested();
-	if (result)
-		be_clipboard->StopWatching(be_app_messenger);
-			// tell clipboard we don't want anymore notification
-
-	return result;
+	_BroadcastToWindows(&msg);
 }
 
 

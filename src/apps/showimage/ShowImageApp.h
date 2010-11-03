@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2010, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,33 +23,33 @@ public:
 								ShowImageApp();
 	virtual						~ShowImageApp();
 
-	virtual	void				AboutRequested();
-	virtual	void				ArgvReceived(int32 argc, char **argv);
-	virtual	void				MessageReceived(BMessage *message);
+	virtual	void				ArgvReceived(int32 argc, char** argv);
 	virtual	void				ReadyToRun();
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				AboutRequested();
 	virtual	void				Pulse();
-	virtual	void				RefsReceived(BMessage *message);
+	virtual	void				RefsReceived(BMessage* message);
 	virtual	bool				QuitRequested();
 
 			ShowImageSettings* 	Settings() { return &fSettings; }
 
 private:
-			void				StartPulse();
-			void				Open(const entry_ref *ref);
-			void				BroadcastToWindows(BMessage *message);
-			void				CheckClipboard();
+			void				_StartPulse();
+			void				_Open(const entry_ref* ref,
+									BMessenger& trackerMessenger);
+			void				_BroadcastToWindows(BMessage* message);
+			void				_CheckClipboard();
 
-			BMessenger 			fTrackerMessenger;
-			BFilePanel			*fOpenPanel;
+private:
+			BFilePanel*			fOpenPanel;
 			bool				fPulseStarted;
 			ShowImageSettings	fSettings;
 };
 
 
-extern const char *kApplicationSignature;
+extern const char* kApplicationSignature;
 
 #define my_app dynamic_cast<ShowImageApp*>(be_app)
 
 
 #endif	// SHOW_IMAGE_APP_H
-
