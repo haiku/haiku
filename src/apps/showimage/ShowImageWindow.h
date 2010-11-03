@@ -43,8 +43,6 @@ public:
 			void				WindowRedimension(BBitmap* bitmap);
 
 private:
-	class RecentDocumentsMenu;
-
 			void				_BuildViewMenu(BMenu* menu, bool popupMenu);
 			BMenuItem*			_AddItemMenu(BMenu* menu, const char* label,
 									uint32 what, char shortcut, uint32 modifier,
@@ -79,7 +77,6 @@ private:
 			ImageFileNavigator	fNavigator;
 			BFilePanel*			fSavePanel;
 			BMenuBar*			fBar;
-			BMenu*				fOpenMenu;
 			BMenu*				fBrowseMenu;
 			BMenu*				fGoToPageMenu;
 			BMenu*				fSlideShowDelay;

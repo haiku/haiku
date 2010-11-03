@@ -34,6 +34,7 @@
 #include <MenuItem.h>
 #include <Path.h>
 #include <PrintJob.h>
+#include <RecentItems.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
@@ -53,58 +54,6 @@
 // BMessage field names used in Save messages
 const char* kTypeField = "be:type";
 const char* kTranslatorField = "be:translator";
-
-
-// #pragma mark -- ShowImageWindow::RecentDocumentsMenu
-
-
-class ShowImageWindow::RecentDocumentsMenu : public BMenu {
-public:
-								RecentDocumentsMenu(const char* title,
-									menu_layout layout = B_ITEMS_IN_COLUMN);
-			bool				AddDynamicItem(add_state addState);
-};
-
-
-ShowImageWindow::RecentDocumentsMenu::RecentDocumentsMenu(const char* title,
-	menu_layout layout)
-	:
-	BMenu(title, layout)
-{
-}
-
-
-bool
-ShowImageWindow::RecentDocumentsMenu::AddDynamicItem(add_state addState)
-{
-	if (addState != B_INITIAL_ADD)
-		return false;
-
-	while (CountItems() > 0)
-		delete RemoveItem(0L);
-
-	BMenuItem* item;
-	BMessage list, *msg;
-	entry_ref ref;
-	char name[B_FILE_NAME_LENGTH];
-
-	be_roster->GetRecentDocuments(&list, 20, NULL, kApplicationSignature);
-	for (int i = 0; list.FindRef("refs", i, &ref) == B_OK; i++) {
-		BEntry entry(&ref);
-		if (entry.Exists() && entry.GetName(name) == B_OK) {
-			msg = new BMessage(B_REFS_RECEIVED);
-			msg->AddRef("refs", &ref);
-			item = new EntryMenuItem(&ref, name, msg, 0, 0);
-			AddItem(item);
-			item->SetTarget(be_app, NULL);
-		}
-	}
-
-	return false;
-}
-
-
-// #pragma mark
 
 
 // This is temporary solution for building BString with printf like format.
@@ -133,7 +82,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref* ref,
 	fNavigator(this),
 	fSavePanel(NULL),
 	fBar(NULL),
-	fOpenMenu(NULL),
 	fBrowseMenu(NULL),
 	fGoToPageMenu(NULL),
 	fSlideShowDelay(NULL),
@@ -317,13 +265,16 @@ void
 ShowImageWindow::AddMenus(BMenuBar* bar)
 {
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));
-	fOpenMenu = new RecentDocumentsMenu(B_TRANSLATE("Open"));
-	menu->AddItem(fOpenMenu);
-	fOpenMenu->Superitem()->SetTrigger('O');
-	fOpenMenu->Superitem()->SetMessage(new BMessage(MSG_FILE_OPEN));
-	fOpenMenu->Superitem()->SetTarget(be_app);
-	fOpenMenu->Superitem()->SetShortcut('O', 0);
+
+	// Add recent files to "Open File" entry as sub-menu.
+	BMenuItem* item = new BMenuItem(BRecentFilesList::NewFileListMenu(
+		B_TRANSLATE("Open"B_UTF8_ELLIPSIS), NULL, NULL, be_app, 10, true,
+		NULL, kApplicationSignature), new BMessage(MSG_FILE_OPEN));
+	item->SetShortcut('O', 0);
+	item->SetTarget(be_app);
+	menu->AddItem(item);
 	menu->AddSeparatorItem();
+
 	BMenu* menuSaveAs = new BMenu(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		B_ITEMS_IN_COLUMN);
 	BTranslationUtils::AddTranslationItems(menuSaveAs, B_TRANSLATOR_BITMAP);
