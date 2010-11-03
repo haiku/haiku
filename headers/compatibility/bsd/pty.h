@@ -1,9 +1,10 @@
 /*
- * Copyright 2008-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2010 Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BSD_PTY_H_
 #define _BSD_PTY_H_
+
 
 #include <sys/cdefs.h>
 #include <termios.h>
