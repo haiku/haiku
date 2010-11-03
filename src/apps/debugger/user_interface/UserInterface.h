@@ -61,6 +61,9 @@ public:
 
 	virtual	void				FunctionSourceCodeRequested(
 									FunctionInstance* function) = 0;
+	virtual void				SourceEntryLocateRequested(
+									const char* sourcePath,
+									const char* locatedPath) = 0;
 	virtual	void				ImageDebugInfoRequested(Image* image) = 0;
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,

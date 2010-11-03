@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +22,10 @@ Function::Function()
 Function::~Function()
 {
 	SetSourceCode(NULL, FUNCTION_SOURCE_NOT_LOADED);
+	if (FirstInstance() != NULL) {
+		FirstInstance()->SourceFile()->RemoveListener(this);
+		FirstInstance()->SourceFile()->ReleaseReference();
+	}
 }
 
 
@@ -70,7 +75,12 @@ Function::RemoveListener(Listener* listener)
 void
 Function::AddInstance(FunctionInstance* instance)
 {
+	bool firstInstance = fInstances.First() == NULL;
 	fInstances.Add(instance);
+	if (firstInstance && SourceFile() != NULL) {
+		instance->SourceFile()->AcquireReference();
+		instance->SourceFile()->AddListener(this);
+	}
 }
 
 
@@ -78,6 +88,10 @@ void
 Function::RemoveInstance(FunctionInstance* instance)
 {
 	fInstances.Remove(instance);
+	if (fInstances.First() == NULL && SourceFile() != NULL) {
+		instance->SourceFile()->RemoveListener(this);
+		instance->SourceFile()->ReleaseReference();
+	}
 }
 
 
@@ -90,6 +104,22 @@ Function::NotifySourceCodeChanged()
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
 		listener->FunctionSourceCodeChanged(this);
+	}
+}
+
+
+void
+Function::LocatableFileChanged(LocatableFile* file)
+{
+	BString locatedPath;
+	BString path;
+	file->GetPath(path);
+	if (file->GetLocatedPath(locatedPath) && locatedPath != path) {
+		SetSourceCode(NULL, FUNCTION_SOURCE_NOT_LOADED);
+		for (FunctionInstanceList::Iterator it = fInstances.GetIterator();
+				FunctionInstance* instance = it.Next();) {
+			instance->SetSourceCode(NULL, FUNCTION_SOURCE_NOT_LOADED);
+		}
 	}
 }
 

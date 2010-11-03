@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -23,6 +24,7 @@
 
 class BButton;
 class BMenuBar;
+class BStringView;
 class BTabView;
 class Image;
 class RegistersView;
@@ -129,6 +131,8 @@ private:
 			void				_HandleSourceCodeChanged();
 			void				_HandleUserBreakpointChanged(
 									UserBreakpoint* breakpoint);
+			void				_HandleResolveMissingSourceFile(entry_ref&
+									locatedPath);
 
 private:
 			::Team*				fTeam;
@@ -156,6 +160,7 @@ private:
 			BButton*			fStepIntoButton;
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
+			BStringView*		fSourcePathView;
 };
 
 

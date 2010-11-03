@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -521,6 +522,15 @@ TeamDebugger::MessageReceived(BMessage* message)
 			BLooper::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+TeamDebugger::SourceEntryLocateRequested(const char* sourcePath,
+	const char* locatedPath)
+{
+	AutoLocker<FileManager> locker(fFileManager);
+	fFileManager->SourceEntryLocated(sourcePath, locatedPath);
 }
 
 

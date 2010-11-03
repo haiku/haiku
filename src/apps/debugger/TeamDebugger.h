@@ -48,6 +48,9 @@ private:
 	// UserInterfaceListener
 	virtual	void				FunctionSourceCodeRequested(
 									FunctionInstance* function);
+	virtual void				SourceEntryLocateRequested(
+									const char* sourcePath,
+									const char* locatedPath);
 	virtual	void				ImageDebugInfoRequested(Image* image);
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,

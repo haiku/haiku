@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,11 +10,15 @@
 #include <stdio.h>
 
 #include <Button.h>
+#include <FilePanel.h>
 #include <LayoutBuilder.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Message.h>
+#include <MessageFilter.h>
+#include <Path.h>
+#include <StringView.h>
 #include <TabView.h>
 #include <ScrollView.h>
 #include <SplitView.h>
@@ -27,6 +32,7 @@
 #include "FileSourceCode.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"
+#include "LocatableFile.h"
 #include "MessageCodes.h"
 #include "RegistersView.h"
 #include "StackTrace.h"
@@ -40,6 +46,32 @@
 enum {
 	MAIN_TAB_INDEX_THREADS	= 0,
 	MAIN_TAB_INDEX_IMAGES	= 1
+};
+
+
+enum {
+	MSG_LOCATE_SOURCE_IF_NEEDED = 'lsin'
+};
+
+
+class PathViewMessageFilter : public BMessageFilter {
+public:
+		PathViewMessageFilter(BMessenger teamWindow)
+			:
+			BMessageFilter(B_MOUSE_UP),
+			fTeamWindowMessenger(teamWindow)
+		{
+		}
+
+		virtual filter_result Filter(BMessage*, BHandler**)
+		{
+			fTeamWindowMessenger.SendMessage(MSG_LOCATE_SOURCE_IF_NEEDED);
+
+			return B_DISPATCH_MESSAGE;
+		}
+
+private:
+		BMessenger fTeamWindowMessenger;
 };
 
 
@@ -171,6 +203,30 @@ void
 TeamWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_REFS_RECEIVED:
+		{
+			entry_ref locatedPath;
+			message->FindRef("refs", &locatedPath);
+			_HandleResolveMissingSourceFile(locatedPath);
+			break;
+		}
+		case MSG_LOCATE_SOURCE_IF_NEEDED:
+		{
+			if (fActiveFunction != NULL
+				&& fActiveFunction->GetFunctionDebugInfo()
+					->SourceFile() != NULL && fActiveSourceCode != NULL
+				&& fActiveSourceCode->GetSourceFile() == NULL) {
+				BFilePanel* panel = NULL;
+				try {
+					panel = new BFilePanel(B_OPEN_PANEL,
+						new BMessenger(this));
+					panel->Show();
+				} catch (...) {
+					delete panel;
+				}
+			}
+			break;
+		}
 		case MSG_THREAD_RUN:
 		case MSG_THREAD_STOP:
 		case MSG_THREAD_STEP_OVER:
@@ -405,6 +461,9 @@ TeamWindow::_Init()
 					.Add(fStepOutButton = new BButton("Step Out"))
 					.AddGlue()
 				.End()
+				.Add(fSourcePathView = new BStringView(
+					"source path",
+					"Source path unavailable."), 4.0f)
 				.AddSplit(B_HORIZONTAL, 3.0f)
 					.Add(sourceScrollView = new BScrollView("source scroll",
 						NULL, 0, true, true), 3.0f)
@@ -456,6 +515,12 @@ TeamWindow::_Init()
 	fStepOverButton->SetTarget(this);
 	fStepIntoButton->SetTarget(this);
 	fStepOutButton->SetTarget(this);
+
+	fSourcePathView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	BMessageFilter* filter = new(std::nothrow) PathViewMessageFilter(
+		BMessenger(this));
+	if (filter != NULL)
+		fSourcePathView->AddFilter(filter);
 
 	// add menus and menu items
 	BMenu* menu = new BMenu("File");
@@ -908,8 +973,27 @@ TeamWindow::_HandleSourceCodeChanged()
 	AutoLocker< ::Team> locker(fTeam);
 
 	SourceCode* sourceCode = fActiveFunction->GetFunction()->GetSourceCode();
-	if (sourceCode == NULL)
+	if (sourceCode == NULL) {
 		sourceCode = fActiveFunction->GetSourceCode();
+
+		BString sourceText;
+		LocatableFile* sourceFile = fActiveFunction->GetFunctionDebugInfo()
+			->SourceFile();
+		if (sourceFile != NULL && !sourceFile->GetLocatedPath(sourceText))
+			sourceFile->GetPath(sourceText);
+
+		if (sourceCode != NULL && sourceCode->GetSourceFile() == NULL
+			&& sourceFile != NULL) {
+			sourceText.Prepend("Click to locate source file '");
+			sourceText += "'";
+			fSourcePathView->SetText(sourceText.String());
+		} else if (sourceFile != NULL) {
+			sourceText.Prepend("File: ");
+			fSourcePathView->SetText(sourceText.String());
+		} else
+			fSourcePathView->SetText("Source file unavailable.");
+	}
+
 	Reference<SourceCode> sourceCodeReference(sourceCode);
 
 	locker.Unlock();
@@ -923,4 +1007,23 @@ TeamWindow::_HandleUserBreakpointChanged(UserBreakpoint* breakpoint)
 {
 	fSourceView->UserBreakpointChanged(breakpoint);
 	fBreakpointsView->UserBreakpointChanged(breakpoint);
+}
+
+
+void
+TeamWindow::_HandleResolveMissingSourceFile(entry_ref& locatedPath)
+{
+	if (fActiveFunction != NULL) {
+		LocatableFile* sourceFile = fActiveFunction->GetFunctionDebugInfo()
+			->SourceFile();
+		if (sourceFile != NULL) {
+			BString sourcePath;
+			BString targetPath;
+			sourceFile->GetPath(sourcePath);
+			BPath path(&locatedPath);
+			targetPath = path.Path();
+			fListener->SourceEntryLocateRequested(sourcePath, targetPath);
+			fListener->FunctionSourceCodeRequested(fActiveFunction);
+		}
+	}
 }

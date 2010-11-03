@@ -245,7 +245,7 @@ Application Debugger :
 	libshared.a
 
 	$(TARGET_LIBSTDC++)
-	be libdebug.so
+	be tracker libdebug.so
 
 	: Debugger.rdef
 ;

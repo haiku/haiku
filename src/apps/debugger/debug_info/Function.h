@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2010, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef FUNCTION_H
@@ -9,12 +10,13 @@
 #include <util/OpenHashTable.h>
 
 #include "FunctionInstance.h"
+#include "LocatableFile.h"
 
 
 class FileSourceCode;
 
 
-class Function : public Referenceable {
+class Function : public Referenceable, private LocatableFile::Listener {
 public:
 	class Listener;
 
@@ -59,6 +61,8 @@ public:
 			void				RemoveInstance(FunctionInstance* instance);
 
 			void				NotifySourceCodeChanged();
+
+			void				LocatableFileChanged(LocatableFile* file);
 
 private:
 			typedef DoublyLinkedList<Listener> ListenerList;
