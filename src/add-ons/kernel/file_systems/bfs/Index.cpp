@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
-//! index access functions
+
+//! Index access functions
 
 
 #include "Debug.h"
@@ -100,8 +101,7 @@ Index::SetTo(const char* name)
 }
 
 
-/*!
-	Returns a standard type code for the stat() index type codes. Returns
+/*!	Returns a standard type code for the stat() index type codes. Returns
 	zero if the type is not known (can only happen if the mode field is
 	corrupted somehow or not that of an index).
 */
@@ -166,7 +166,7 @@ Index::KeySize()
 
 
 status_t
-Index::Create(Transaction &transaction, const char* name, uint32 type)
+Index::Create(Transaction& transaction, const char* name, uint32 type)
 {
 	Unset();
 
@@ -213,15 +213,14 @@ Index::Create(Transaction &transaction, const char* name, uint32 type)
 }
 
 
-/*!
-	Updates the specified index, the oldKey will be removed from, the newKey
+/*!	Updates the specified index, the oldKey will be removed from, the newKey
 	inserted into the tree.
 	If the method returns B_BAD_INDEX, it means the index couldn't be found -
 	the most common reason will be that the index doesn't exist.
 	You may not want to let the whole transaction fail because of that.
 */
 status_t
-Index::Update(Transaction &transaction, const char* name, int32 type,
+Index::Update(Transaction& transaction, const char* name, int32 type,
 	const uint8* oldKey, uint16 oldLength, const uint8* newKey,
 	uint16 newLength, Inode* inode)
 {
@@ -238,28 +237,16 @@ Index::Update(Transaction &transaction, const char* name, int32 type,
 	// If the two keys are identical, don't do anything - only compare if the
 	// type has been set, until we have a real type code, we can't do much
 	// about the comparison here
-	if (type != 0 && !compareKeys(type, oldKey, oldLength, newKey, newLength))
+	if (!compareKeys(type, oldKey, oldLength, newKey, newLength))
 		return B_OK;
 
 	// update all live queries about the change, if they have an index or not
-	if (type != 0) {
-		fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength,
-			newKey, newLength);
-	}
+	fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength,
+		newKey, newLength);
 
-	if (((name != fName || strcmp(name, fName)) && SetTo(name) < B_OK)
+	if (((name != fName || strcmp(name, fName)) && SetTo(name) != B_OK)
 		|| fNode == NULL)
 		return B_BAD_INDEX;
-
-	// now that we have the type, check again for equality
-	if (type == 0 && !compareKeys(Type(), oldKey, oldLength, newKey, newLength))
-		return B_OK;
-
-	// same for the live query update
-	if (type == 0) {
-		fVolume->UpdateLiveQueries(inode, name, Type(), oldKey, oldLength,
-			newKey, newLength);
-	}
 
 	BPlusTree* tree = Node()->Tree();
 	if (tree == NULL)
@@ -277,7 +264,7 @@ Index::Update(Transaction &transaction, const char* name, int32 type,
 		if (status == B_ENTRY_NOT_FOUND) {
 			// That's not nice, but no reason to let the whole thing fail
 			INFORM(("Could not find value in index \"%s\"!\n", name));
-		} else if (status < B_OK)
+		} else if (status != B_OK)
 			return status;
 	}
 
@@ -293,21 +280,21 @@ Index::Update(Transaction &transaction, const char* name, int32 type,
 
 
 status_t
-Index::InsertName(Transaction &transaction, const char* name, Inode* inode)
+Index::InsertName(Transaction& transaction, const char* name, Inode* inode)
 {
 	return UpdateName(transaction, NULL, name, inode);
 }
 
 
 status_t
-Index::RemoveName(Transaction &transaction, const char* name, Inode* inode)
+Index::RemoveName(Transaction& transaction, const char* name, Inode* inode)
 {
 	return UpdateName(transaction, name, NULL, inode);
 }
 
 
 status_t
-Index::UpdateName(Transaction &transaction, const char* oldName,
+Index::UpdateName(Transaction& transaction, const char* oldName,
 	const char* newName, Inode* inode)
 {
 	ASSERT(inode->IsRegularNode());
@@ -320,7 +307,7 @@ Index::UpdateName(Transaction &transaction, const char* oldName,
 
 
 status_t
-Index::InsertSize(Transaction &transaction, Inode* inode)
+Index::InsertSize(Transaction& transaction, Inode* inode)
 {
 	ASSERT(inode->InSizeIndex());
 
@@ -331,7 +318,7 @@ Index::InsertSize(Transaction &transaction, Inode* inode)
 
 
 status_t
-Index::RemoveSize(Transaction &transaction, Inode* inode)
+Index::RemoveSize(Transaction& transaction, Inode* inode)
 {
 	ASSERT(inode->InSizeIndex());
 
@@ -343,7 +330,7 @@ Index::RemoveSize(Transaction &transaction, Inode* inode)
 
 
 status_t
-Index::UpdateSize(Transaction &transaction, Inode* inode)
+Index::UpdateSize(Transaction& transaction, Inode* inode)
 {
 	ASSERT(inode->InSizeIndex());
 
@@ -361,7 +348,7 @@ Index::UpdateSize(Transaction &transaction, Inode* inode)
 
 
 status_t
-Index::InsertLastModified(Transaction &transaction, Inode* inode)
+Index::InsertLastModified(Transaction& transaction, Inode* inode)
 {
 	ASSERT(inode->InLastModifiedIndex());
 
@@ -372,7 +359,7 @@ Index::InsertLastModified(Transaction &transaction, Inode* inode)
 
 
 status_t
-Index::RemoveLastModified(Transaction &transaction, Inode* inode)
+Index::RemoveLastModified(Transaction& transaction, Inode* inode)
 {
 	ASSERT(inode->InLastModifiedIndex());
 
@@ -384,7 +371,7 @@ Index::RemoveLastModified(Transaction &transaction, Inode* inode)
 
 
 status_t
-Index::UpdateLastModified(Transaction &transaction, Inode* inode,
+Index::UpdateLastModified(Transaction& transaction, Inode* inode,
 	bigtime_t modified)
 {
 	ASSERT(inode->InLastModifiedIndex());
