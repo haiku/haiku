@@ -75,7 +75,7 @@ Function::RemoveListener(Listener* listener)
 void
 Function::AddInstance(FunctionInstance* instance)
 {
-	bool firstInstance = fInstances.First() == NULL;
+	bool firstInstance = fInstances.IsEmpty();
 	fInstances.Add(instance);
 	if (firstInstance && SourceFile() != NULL) {
 		instance->SourceFile()->AcquireReference();
@@ -88,7 +88,7 @@ void
 Function::RemoveInstance(FunctionInstance* instance)
 {
 	fInstances.Remove(instance);
-	if (fInstances.First() == NULL && SourceFile() != NULL) {
+	if (fInstances.IsEmpty() && instance->SourceFile() != NULL) {
 		instance->SourceFile()->RemoveListener(this);
 		instance->SourceFile()->ReleaseReference();
 	}
